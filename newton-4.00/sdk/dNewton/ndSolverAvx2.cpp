@@ -27,7 +27,178 @@
 #include "ndDynamicsUpdate.h"
 #include "ndJointBilateralConstraint.h"
 
-using namespace ndAvx2;
+
+#define D_RADIX_BITS	5
+#define D_SOA_WORD_GROUP_SIZE	8 
+#define D_RADIX_DIGIT	(1<<(D_RADIX_BITS + 1))
+
+D_MSV_NEWTON_ALIGN_32
+class ndSoaFloat
+{
+	public:
+	D_INLINE ndSoaFloat()
+	{
+	}
+
+	D_INLINE ndSoaFloat(const dFloat32 val)
+		:m_type(_mm256_set1_ps(val))
+	{
+	}
+
+	D_INLINE ndSoaFloat(const __m256 type)
+		: m_type(type)
+	{
+	}
+
+	D_INLINE ndSoaFloat(const ndSoaFloat& copy)
+		: m_type(copy.m_type)
+	{
+	}
+
+	D_INLINE ndSoaFloat(const dVector& low, const dVector& high)
+		: m_type(_mm256_set_m128(high.m_type, low.m_type))
+	{
+	}
+
+	D_INLINE ndSoaFloat(const ndSoaFloat* const baseAddr, const ndSoaFloat& index)
+		: m_type(_mm256_i32gather_ps(&(*baseAddr)[0], index.m_typeInt, 4))
+	{
+	}
+
+	D_INLINE dFloat32& operator[] (dInt32 i)
+	{
+		dAssert(i < D_SOA_WORD_GROUP_SIZE);
+		dAssert(i >= 0);
+		//return m_f[i];
+		dFloat32* const ptr = (dFloat32*)&m_type;
+		return ptr[i];
+	}
+
+	D_INLINE const dFloat32& operator[] (dInt32 i) const
+	{
+		dAssert(i < D_SOA_WORD_GROUP_SIZE);
+		dAssert(i >= 0);
+		//return m_f[i];
+		const dFloat32* const ptr = (dFloat32*)&m_type;
+		return ptr[i];
+	}
+
+	D_INLINE ndSoaFloat operator+ (const ndSoaFloat& A) const
+	{
+		return _mm256_add_ps(m_type, A.m_type);
+	}
+
+	D_INLINE ndSoaFloat operator- (const ndSoaFloat& A) const
+	{
+		return _mm256_sub_ps(m_type, A.m_type);
+	}
+
+	D_INLINE ndSoaFloat operator* (const ndSoaFloat& A) const
+	{
+		return _mm256_mul_ps(m_type, A.m_type);
+	}
+
+	D_INLINE ndSoaFloat MulAdd(const ndSoaFloat& A, const ndSoaFloat& B) const
+	{
+		return _mm256_fmadd_ps(A.m_type, B.m_type, m_type);
+	}
+
+	D_INLINE ndSoaFloat MulSub(const ndSoaFloat& A, const ndSoaFloat& B) const
+	{
+		return _mm256_fnmadd_ps(A.m_type, B.m_type, m_type);
+	}
+
+	D_INLINE ndSoaFloat operator> (const ndSoaFloat& A) const
+	{
+		return _mm256_cmp_ps(m_type, A.m_type, _CMP_GT_OQ);
+	}
+
+	D_INLINE ndSoaFloat operator< (const ndSoaFloat& A) const
+	{
+		return _mm256_cmp_ps(m_type, A.m_type, _CMP_LT_OQ);
+	}
+
+	D_INLINE ndSoaFloat operator| (const ndSoaFloat& A) const
+	{
+		return _mm256_or_ps(m_type, A.m_type);
+	}
+
+	D_INLINE ndSoaFloat operator& (const ndSoaFloat& A) const
+	{
+		return _mm256_and_ps(m_type, A.m_type);
+	}
+
+	D_INLINE ndSoaFloat GetMin(const ndSoaFloat& A) const
+	{
+		return _mm256_min_ps(m_type, A.m_type);
+	}
+
+	D_INLINE ndSoaFloat GetMax(const ndSoaFloat& A) const
+	{
+		return _mm256_max_ps(m_type, A.m_type);
+	}
+
+	D_INLINE dFloat32 AddHorizontal() const
+	{
+		__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
+		__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
+		__m256 tmp2(_mm256_hadd_ps(tmp1, tmp1));
+		//int xxx = _mm256_cvtsi256_si32 (tmp2);
+		return *((dFloat32*)&tmp2);
+	}
+
+	static D_INLINE void FlushRegisters()
+	{
+		_mm256_zeroall();
+	}
+
+	union
+	{
+		__m256 m_type;
+		__m256i m_typeInt;
+	};
+} D_GCC_NEWTON_ALIGN_32;
+
+D_MSV_NEWTON_ALIGN_32
+class ndSoaVector3
+{
+	public:
+	ndSoaFloat m_x;
+	ndSoaFloat m_y;
+	ndSoaFloat m_z;
+} D_GCC_NEWTON_ALIGN_32;
+
+D_MSV_NEWTON_ALIGN_32
+class ndSoaVector6
+{
+	public:
+	ndSoaVector3 m_linear;
+	ndSoaVector3 m_angular;
+} D_GCC_NEWTON_ALIGN_32;
+
+D_MSV_NEWTON_ALIGN_32
+class ndSoaJacobianPair
+{
+	public:
+	ndSoaVector6 m_jacobianM0;
+	ndSoaVector6 m_jacobianM1;
+} D_GCC_NEWTON_ALIGN_32;
+
+D_MSV_NEWTON_ALIGN_32
+class ndSoaMatrixElement
+{
+	public:
+	ndSoaJacobianPair m_Jt;
+	ndSoaJacobianPair m_JMinv;
+
+	ndSoaFloat m_force;
+	ndSoaFloat m_diagDamp;
+	ndSoaFloat m_invJinvMJt;
+	ndSoaFloat m_coordenateAccel;
+	ndSoaFloat m_normalForceIndex;
+	ndSoaFloat m_lowerBoundFrictionCoefficent;
+	ndSoaFloat m_upperBoundFrictionCoefficent;
+} D_GCC_NEWTON_ALIGN_32;
 
 #if 0
 ndSoaFloat ndDynamicsUpdate::m_one(dFloat32 (1.0f));
@@ -1843,7 +2014,8 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
 
 			m_internalForces = &world->m_internalForces[threadIndex * bodyCount];
-			memset(m_internalForces, 0, bodyCount * sizeof(ndJacobian));
+
+			world->ClearJacobianBuffer(bodyCount, m_internalForces);
 			for (dInt32 i = threadIndex; i < jointCount; i += threadCount)
 			{
 				ndConstraint* const joint = jointArray[i];
@@ -2347,7 +2519,7 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 			return accNorm.GetScalar();
 		}
 
-		virtual void Execute()
+		virtual void ExecuteSse()
 		{
 			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
@@ -2363,11 +2535,8 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
 			m_outputForces = &world->m_internalForces[bodyCount * (threadIndex + 1)];
-			m_massMatrix = &world->m_massMatrixAvx2[threadIndex].m_matrix[0];
 
-			int xxx = sizeof(ndSoaMassMatrixElement);
-
-			memset(m_outputForces, 0, bodyCount * sizeof(ndJacobian));
+			world->ClearJacobianBuffer(bodyCount, m_outputForces);
 			for (dInt32 i = threadIndex; i < jointCount; i += threadCount)
 			{
 				ndConstraint* const joint = jointArray[i];
@@ -2375,6 +2544,42 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 			}
 			dFloat32* const accelNorm = (dFloat32*)m_context;
 			accelNorm[threadIndex] = accNorm;
+		}
+
+
+		virtual void ExecuteAvx2()
+		{
+			//D_TRACKTIME();
+			ndSoaMatrixElement matrixSoa[D_CONSTRAINT_MAX_ROWS];
+
+			ndWorld* const world = m_owner->GetWorld();
+			m_leftHandSide = &world->m_leftHandSide[0];
+			m_rightHandSide = &world->m_rightHandSide[0];
+			m_internalForces = &world->m_internalForces[0];
+
+			ndConstraintArray& jointArray = world->m_jointArray;
+			dFloat32 accNorm = dFloat32(0.0f);
+			const dInt32 jointCount = jointArray.GetCount();
+			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
+
+			const dInt32 threadIndex = GetThredId();
+			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
+			m_outputForces = &world->m_internalForces[bodyCount * (threadIndex + 1)];
+
+			m_massMatrix = matrixSoa;
+			world->ClearJacobianBuffer(bodyCount, m_outputForces);
+			for (dInt32 i = threadIndex; i < jointCount; i += threadCount)
+			{
+				ndConstraint* const joint = jointArray[i];
+				accNorm += JointForce(joint);
+			}
+			dFloat32* const accelNorm = (dFloat32*)m_context;
+			accelNorm[threadIndex] = accNorm;
+		}
+
+		virtual void Execute()
+		{
+			ExecuteAvx2();
 		}
 		
 		ndSoaMatrixElement* m_massMatrix;
@@ -2426,12 +2631,6 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 	const dInt32 passes = m_solverPasses;
 	const dInt32 threadsCount = dMax(scene->GetThreadCount(), 1);
 
-	if (threadsCount < m_massMatrixAvx2.GetCapacity())
-	{
-		m_massMatrixAvx2.Resize(threadsCount);
-	}
-
-	m_massMatrixAvx2.SetCount(threadsCount);
 	dFloat32 m_accelNorm[D_MAX_THREADS_COUNT];
 	dFloat32 accNorm = D_SOLVER_MAX_ERROR * dFloat32(2.0f);
 

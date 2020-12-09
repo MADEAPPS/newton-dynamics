@@ -618,7 +618,8 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			const dInt32 threadCount = dMax (m_owner->GetThreadCount(), 1);
 
 			m_internalForces = &world->m_internalForces[threadIndex * bodyCount];
-			memset(m_internalForces, 0, bodyCount * sizeof(ndJacobian));
+
+			world->ClearJacobianBuffer(bodyCount, m_internalForces);
 			for (dInt32 i = threadIndex; i < jointCount; i += threadCount)
 			{
 				ndConstraint* const joint = jointArray[i];
@@ -1364,7 +1365,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
 			m_outputForces = &world->m_internalForces[bodyCount * (threadIndex + 1)];
 
-			memset(m_outputForces, 0, bodyCount * sizeof(ndJacobian));
+			world->ClearJacobianBuffer(bodyCount, m_outputForces);
 			for (dInt32 i = threadIndex; i < jointCount; i += threadCount)
 			{
 				ndConstraint* const joint = jointArray[i];

@@ -23,7 +23,7 @@
 #define __D_WORLD_DYNAMICS_UPDATE_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndSolverAvx2.h"
+//#include "ndSolverAvx2.h"
 
 //#define D_BODY_LRU_STEP				2	
 //#define D_MAX_SKELETON_JOINT_COUNT	256
@@ -112,6 +112,7 @@ class ndDynamicsUpdate
 	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
+	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
 	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const context);
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
@@ -142,7 +143,6 @@ class ndDynamicsUpdate
 	ndConstraintArray m_jointArray;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
-	dArray<ndAvx2::ndSoaMassMatrixElement> m_massMatrixAvx2;
 	dInt32 m_hasJointFeeback[D_MAX_THREADS_COUNT];
 
 	ndWorld* m_world;
@@ -156,11 +156,22 @@ class ndDynamicsUpdate
 	dUnsigned32 m_maxRowsCount;
 	dInt32 m_unConstrainedBodyCount;
 
-	static ndAvx2::ndSoaFloat m_one;
-	static ndAvx2::ndSoaFloat m_zero;
+	//static ndAvx2::ndSoaFloat m_one;
+	//static ndAvx2::ndSoaFloat m_zero;
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
 
+inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const
+{
+	//memset(buffer, 0, count * sizeof(ndJacobian));
+	const dVector zero(dVector::m_zero);
+	dVector* const dst = &buffer[0].m_linear;
+	for (dInt32 i = 0; i < count; i++)
+	{
+		dst[i * 2 + 0] = zero;
+		dst[i * 2 + 1] = zero;
+	}
+}
 
 inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* const body)
 {

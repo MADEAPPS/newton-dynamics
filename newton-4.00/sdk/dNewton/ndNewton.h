@@ -43,7 +43,6 @@
 #include <ndJointHinge.h>
 #include <ndBodyNotify.h>
 #include <ndSceneMixed.h>
-#include <ndSolverAvx2.h>
 #include <ndJointWheel.h>
 #include <ndJointSlider.h>
 #include <ndShapeConvex.h>
