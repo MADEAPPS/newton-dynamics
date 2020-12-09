@@ -63,7 +63,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		// lower vehicle com;
 		dVector com(chassis->GetCentreOfMass());
-		com -= m_localFrame.m_up.Scale(0.25f);
+		com -= m_localFrame.m_up.Scale(0.35f);
 		com += m_localFrame.m_front.Scale(0.25f);
 		chassis->SetCentreOfMass(com);
 
