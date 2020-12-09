@@ -156,8 +156,6 @@ class ndDynamicsUpdate
 	dUnsigned32 m_maxRowsCount;
 	dInt32 m_unConstrainedBodyCount;
 
-	//static ndAvx2::ndSoaFloat m_one;
-	//static ndAvx2::ndSoaFloat m_zero;
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
 
