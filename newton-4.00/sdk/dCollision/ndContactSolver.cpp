@@ -973,7 +973,8 @@ dInt32 ndContactSolver::CalculateContacts(const dVector& point0, const dVector& 
 	dVector ponintOnInstance1(matrix1.UntransformVector(origin));
 	dVector normalOnInstance1(matrix1.UnrotateVector(normal));
 	dFloat32 dist = (normal.DotProduct(point0 - point1)).GetScalar();
-	if (dist < dFloat32(0.0f)) 
+	//if (dist < dFloat32(0.0f)) 
+	if (dist < (D_PENETRATION_TOL * dFloat32 (-0.5f)))
 	{
 		count1 = m_instance1.CalculatePlaneIntersection(normalOnInstance1, ponintOnInstance1, shape1);
 	}
@@ -1007,7 +1008,8 @@ dInt32 ndContactSolver::CalculateContacts(const dVector& point0, const dVector& 
 		const dMatrix& matrix0 = m_instance0.m_globalMatrix;
 		dVector pointOnInstance0(matrix0.UntransformVector(origin));
 		dVector normalOnInstance0(matrix0.UnrotateVector(normal.Scale(dFloat32(-1.0f))));
-		if (dist < dFloat32(0.0f)) 
+		//if (dist < dFloat32(0.0f)) 
+		if (dist < (D_PENETRATION_TOL * dFloat32(-0.5f)))
 		{
 			count0 = m_instance0.CalculatePlaneIntersection(normalOnInstance0, pointOnInstance0, shape0);
 		}

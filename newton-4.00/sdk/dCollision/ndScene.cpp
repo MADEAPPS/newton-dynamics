@@ -1537,6 +1537,8 @@ void ndScene::CalculateContacts()
 				ndContact* const contact = activeContacts[i]->GetAsContact();
 				dAssert(contact);
 //dTrace(("%d %d\n", contact->GetBody0()->GetId(), contact->GetBody1()->GetId()));
+//if (contact->GetBody0()->GetId() == 6 && contact->GetBody1()->GetId() == 7)
+//contact->GetBody0()->GetId();
 				m_owner->CalculateContacts(threadIndex, contact);
 			}
 		}
