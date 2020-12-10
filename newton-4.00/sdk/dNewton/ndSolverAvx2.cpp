@@ -2846,7 +2846,8 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 
 		virtual void Execute()
 		{
-			ExecuteAvx2();
+			//ExecuteAvx2();
+			ExecuteSse();
 		}
 		
 		ndSoaMatrixElement* m_massMatrix;
