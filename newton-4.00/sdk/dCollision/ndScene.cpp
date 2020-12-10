@@ -1531,14 +1531,14 @@ void ndScene::CalculateContacts()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 contactCount = activeContacts.GetCount();
-			const dInt32 step = contactCount / threadCount;
-			const dInt32 start = threadIndex * step;
-			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : contactCount - start;
-
-			for (dInt32 i = 0; i < count; i++)
+			//const dInt32 step = contactCount / threadCount;
+			//const dInt32 start = threadIndex * step;
+			//const dInt32 count = ((threadIndex + 1) < threadCount) ? step : contactCount - start;
+			//for (dInt32 i = 0; i < count; i++)
+			for (dInt32 i = threadIndex; i < contactCount; i += threadCount)
 			{
-				dAssert(activeContacts[start + i]->GetAsContact());
-				m_owner->CalculateContacts(threadIndex, activeContacts[start + i]->GetAsContact());
+				dAssert(activeContacts[i]->GetAsContact());
+				m_owner->CalculateContacts(threadIndex, activeContacts[i]->GetAsContact());
 			}
 		}
 	};
@@ -1559,14 +1559,15 @@ void ndScene::UpdateAabb()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
-			const dInt32 step = bodyCount / threadCount;
-			const dInt32 start = threadIndex * step;
-			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
+			//const dInt32 step = bodyCount / threadCount;
+			//const dInt32 start = threadIndex * step;
+			//const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
 
 			dUnsigned32* const sleepBodiesLane = (dUnsigned32*)m_context;
-			for (dInt32 i = 0; i < count; i++)
+			//for (dInt32 i = 0; i < count; i++)
+			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{
-				ndBodyKinematic* const body = bodyArray[start + i];
+				ndBodyKinematic* const body = bodyArray[i];
 				if (!body->m_equilibrium)
 				{
 					m_owner->UpdateAabb(threadIndex, body);
@@ -1603,13 +1604,13 @@ void ndScene::FindCollidingPairs()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
-			const dInt32 step = bodyCount / threadCount;
-			const dInt32 start = threadIndex * step;
-			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
-			
-			for (dInt32 i = 0; i < count; i++)
+			//const dInt32 step = bodyCount / threadCount;
+			//const dInt32 start = threadIndex * step;
+			//const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
+			//for (dInt32 i = 0; i < count; i++)
+			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{
-				ndBodyKinematic* const body = bodyArray[start + i];
+				ndBodyKinematic* const body = bodyArray[i];
 				m_owner->FindCollidinPairs(threadIndex, body, true);
 			}
 		}
@@ -1626,13 +1627,9 @@ void ndScene::FindCollidingPairs()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
-			const dInt32 step = bodyCount / threadCount;
-			const dInt32 start = threadIndex * step;
-			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
-
-			for (dInt32 i = 0; i < count; i++)
+			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{
-				ndBodyKinematic* const body = bodyArray[start + i];
+				ndBodyKinematic* const body = bodyArray[i];
 				if (!body->m_equilibrium)
 				{
 					m_owner->FindCollidinPairs(threadIndex, body, false);
@@ -1665,13 +1662,9 @@ void ndScene::UpdateTransform()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
-			const dInt32 step = bodyCount / threadCount;
-			const dInt32 start = threadIndex * step;
-			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
-
-			for (dInt32 i = 0; i < count; i++)
+			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{
-				ndBodyKinematic* const body = bodyArray[start + i];
+				ndBodyKinematic* const body = bodyArray[i];
 				m_owner->UpdateTransformNotify(threadIndex, body);
 			}
 		}
@@ -1689,7 +1682,6 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	ndBodyKinematic* const body1 = contact->GetBody1();
 
 	dAssert(!contact->m_isDead);
-	//if (!(contact->m_isDead | (body0->m_equilibrium & body1->m_equilibrium)))
 	if (!(body0->m_equilibrium & body1->m_equilibrium))
 	{
 		dUnsigned32 active = contact->m_active;
@@ -1735,7 +1727,6 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 			}
 			else
 			{
-				//dAssert(contact->m_maxDOF == 0);
 				const ndSceneBodyNode* const bodyNode0 = contact->GetBody0()->m_sceneBodyBodyNode;
 				const ndSceneBodyNode* const bodyNode1 = contact->GetBody1()->m_sceneBodyBodyNode;
 				if (dOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox)) 
@@ -1765,16 +1756,6 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	}
 
 	contact->m_isDead = contact->m_isDead | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
-	//if (!contact->m_isDead)
-	//{
-	//	if (!contact->m_active)
-	//	{
-	//		if (body0->m_equilibrium & body1->m_equilibrium)
-	//		{
-	//			contact->m_isDead = 1;
-	//		}
-	//	}
-	//}
 }
 
 void ndScene::BuildContactArray()
