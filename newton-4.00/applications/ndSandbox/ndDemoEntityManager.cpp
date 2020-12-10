@@ -226,7 +226,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_autoSleepMode = false;
-	m_solverMode = 1;
+	//m_solverMode = 1;
 	//m_sceneType = 1;
 	//m_solverPasses = 4;
 	//m_workerThreads = 4;

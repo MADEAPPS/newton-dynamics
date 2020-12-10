@@ -79,7 +79,7 @@ static void BuildPyramid(ndDemoEntityManager* const scene, dFloat32 mass, const 
 	// create the shape and visual mesh as a common data to be re used
 	ndWorld* const world = scene->GetWorld();
 
-	dVector size(boxSize.Scale(2.0f));
+	dVector size(boxSize.Scale(1.0f));
 	ndShapeInstance shape(new ndShapeBox(size.m_x, size.m_y, size.m_z));
 	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
@@ -120,11 +120,12 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 
 	dVector origin1(0.0f, 0.0f, 4.0f, 0.0f);
-	//BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 30);
+	BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 
 	origin1.m_z = 0.0f;
 	origin1.m_x += 4.0f;
 	BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	//BuildPyramid(scene, 1.0f, dVector::m_zero, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
 
 	dQuaternion rot;
 	//dVector origin(-6.0f, 1.0f, 0.0f, 0.0f);
