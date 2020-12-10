@@ -120,7 +120,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 
 	dVector origin1(0.0f, 0.0f, 4.0f, 0.0f);
-	BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+	//BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 
 	origin1.m_z = 0.0f;
 	origin1.m_x += 4.0f;
