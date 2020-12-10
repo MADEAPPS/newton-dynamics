@@ -1531,14 +1531,13 @@ void ndScene::CalculateContacts()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 contactCount = activeContacts.GetCount();
-			//const dInt32 step = contactCount / threadCount;
-			//const dInt32 start = threadIndex * step;
-			//const dInt32 count = ((threadIndex + 1) < threadCount) ? step : contactCount - start;
-			//for (dInt32 i = 0; i < count; i++)
+//dTrace(("contacts\n"));
 			for (dInt32 i = threadIndex; i < contactCount; i += threadCount)
 			{
-				dAssert(activeContacts[i]->GetAsContact());
-				m_owner->CalculateContacts(threadIndex, activeContacts[i]->GetAsContact());
+				ndContact* const contact = activeContacts[i]->GetAsContact();
+				dAssert(contact);
+//dTrace(("%d %d\n", contact->GetBody0()->GetId(), contact->GetBody1()->GetId()));
+				m_owner->CalculateContacts(threadIndex, contact);
 			}
 		}
 	};
