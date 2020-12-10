@@ -196,8 +196,6 @@ class DemoEntityManager: public dList <DemoEntity*>
 	dFloat m_fps;
 	dFloat m_timestepAcc;
 	dFloat m_currentListenerTimestep;
-	dFloat m_mainThreadPhysicsTime;
-	dFloat m_mainThreadPhysicsTimeAcc;
 
 	int m_solverPasses;
 	int m_solverSubSteps;

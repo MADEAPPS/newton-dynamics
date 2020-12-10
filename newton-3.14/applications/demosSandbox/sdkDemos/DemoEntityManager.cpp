@@ -212,8 +212,6 @@ DemoEntityManager::DemoEntityManager ()
 	,m_fps(0.0f)
 	,m_timestepAcc(0.0f)
 	,m_currentListenerTimestep(0.0f)
-	,m_mainThreadPhysicsTime(0.0f)
-	,m_mainThreadPhysicsTimeAcc(0.0f)
 	,m_broadPhaseType(0)
 	,m_workerThreads(1)
 	,m_solverPasses(4)
@@ -1041,7 +1039,8 @@ void DemoEntityManager::RenderStats()
 			sprintf (text, "fps:           %6.3f", m_fps);
 			ImGui::Text(text, "");
 
-			sprintf (text, "physics time: %6.3f ms", m_mainThreadPhysicsTime * 1000.0f);
+			
+			sprintf (text, "physics time: %6.3f ms", NewtonGetLastUpdateTime(m_world) * 1000.0f);
 			ImGui::Text(text, "");
 
 			sprintf (text, "memory used:   %d kbytes", NewtonGetMemoryUsed() / 1024);
