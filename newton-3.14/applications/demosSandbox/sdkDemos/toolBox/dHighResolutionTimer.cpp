@@ -78,10 +78,15 @@ dFloat dGetElapsedSeconds()
 	unsigned64 miliseconds;
 
 	miliseconds = dGetTimeInMicrosenconds();
+	if (miliseconds < m_prevTime)
+	{
+		m_prevTime = miliseconds;
+	}
 
 	// optimal keep the fps below 120 fps
 	timeStep = dFloat (miliseconds - m_prevTime) * TICKS2SEC;
 	m_prevTime = miliseconds;
+
 
 	return timeStep;
 } 
