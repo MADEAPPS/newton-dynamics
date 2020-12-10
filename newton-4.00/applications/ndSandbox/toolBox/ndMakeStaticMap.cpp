@@ -71,7 +71,6 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
 
 	dMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit.m_y = -0.5f;
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 
