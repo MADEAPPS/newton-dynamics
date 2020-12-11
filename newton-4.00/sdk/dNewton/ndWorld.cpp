@@ -659,8 +659,8 @@ void ndWorld::Load(const char* const path)
 
 void ndWorld::LoadSettings(const nd::TiXmlNode* const rootNode)
 {
-	const nd::TiXmlNode* const settings = rootNode->FirstChild("settings");
-	dAssert(settings);
+	//const nd::TiXmlNode* const settings = rootNode->FirstChild("settings");
+	//dAssert(settings);
 }
 
 void ndWorld::LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath)
