@@ -228,7 +228,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_showListenersDebugInfo;
 	bool m_showCollidingFaces;
 	bool m_suspendPhysicsUpdate;
-	bool m_asynchronousPhysicsUpdate;
+	bool m_synchronousPhysicsUpdate;
 	bool m_showRaycastHit;
 	bool m_profilerMode;
 

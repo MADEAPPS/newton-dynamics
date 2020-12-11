@@ -132,7 +132,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_showListenersDebugInfo(false)
 	,m_showCollidingFaces(false)
 	,m_suspendPhysicsUpdate(false)
-	,m_asynchronousPhysicsUpdate(false)
+	,m_synchronousPhysicsUpdate(false)
 	,m_showRaycastHit(false)
 	,m_profilerMode(false)
 	,m_solverMode(0)
@@ -240,7 +240,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	m_collisionDisplayMode = 3;
 	//m_collisionDisplayMode = 2;
 	//m_showListenersDebugInfo = true;
-	m_asynchronousPhysicsUpdate = true;
+	m_synchronousPhysicsUpdate = false;
 
 	Cleanup();
 	ResetTimer();
@@ -627,7 +627,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("auto sleep mode", &m_autoSleepMode);
 			ImGui::Checkbox("show UI", &m_showUI);
 			ImGui::Checkbox("show stats", &m_showStats);
-			ImGui::Checkbox("concurrent physics update", &m_asynchronousPhysicsUpdate);
+			ImGui::Checkbox("concurrent physics update", &m_synchronousPhysicsUpdate);
 			ImGui::Separator();
 
 			ImGui::Text("solvers");

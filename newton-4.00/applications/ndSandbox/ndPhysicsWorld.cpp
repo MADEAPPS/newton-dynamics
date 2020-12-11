@@ -68,7 +68,7 @@ void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
 		//	DeleteBody(body);
 		//}
 	}
-	if (!m_manager->m_asynchronousPhysicsUpdate)
+	if (m_manager->m_synchronousPhysicsUpdate)
 	{
 		Sync();
 	}
