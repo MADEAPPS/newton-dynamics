@@ -131,8 +131,6 @@ class ndDynamicsUpdate
 	void IntegrateBodiesVelocityAvx2();
 	void CalculateJointsAccelerationAvx2();
 	void IntegrateUnconstrainedBodiesAvx2();
-	
-	dInt32 GetSortKeyAvx2(const ndConstraint* const joint);
 	void UpdateIslandStateAvx2(const ndIsland& island);
 	static dInt32 CompareIslandsAvx2(const ndIsland* const islandA, const ndIsland* const islandB, void* const context);
 
