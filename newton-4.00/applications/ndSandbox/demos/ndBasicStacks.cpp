@@ -124,11 +124,11 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 
 	origin1.m_z = 0.0f;
 	origin1.m_x += 4.0f;
-	BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 1);
 	//BuildPyramid(scene, 1.0f, dVector::m_zero, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
 
 	dQuaternion rot;
 	//dVector origin(-6.0f, 1.0f, 0.0f, 0.0f);
-	dVector origin(-40.0f, 10.0f, 0.0f, 0.0f);
+	dVector origin(-2.0f, 1.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

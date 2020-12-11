@@ -158,7 +158,6 @@ class ndSoaFloat
 	};
 } D_GCC_NEWTON_ALIGN_32;
 
-/*
 D_MSV_NEWTON_ALIGN_32
 class ndSoaVector3
 {
@@ -199,8 +198,6 @@ class ndSoaMatrixElement
 	ndSoaFloat m_lowerBoundFrictionCoefficent;
 	ndSoaFloat m_upperBoundFrictionCoefficent;
 } D_GCC_NEWTON_ALIGN_32;
-*/
-
 
 dInt32 ndDynamicsUpdate::CompareIslandsAvx2(const ndIsland* const islandA, const ndIsland* const islandB, void* const context)
 {
