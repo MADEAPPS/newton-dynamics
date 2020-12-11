@@ -918,13 +918,13 @@ void ndDemoEntityManager::RenderStats()
 		
 		if (ImGui::Begin("statistics", &m_showStats)) 
 		{
-			sprintf (text, "fps:             %6.3f", m_fps);
+			sprintf (text, "fps:            %6.3f", m_fps);
 			ImGui::Text(text, "");
 
-			//sprintf (text, "physics time:   %6.3f ms", m_world->GetUpdateTime() * 1.0e3f);
-			//ImGui::Text(text, "");
+			sprintf(text, "physics time:  %6.3f ms", m_world->GetAverageUpdateTime() * 1.0e3f);
+			ImGui::Text(text, "");
 
-			sprintf(text, "physics time:   %6.3f ms", m_world->GetAverageUpdateTime() * 1.0e3f);
+			sprintf(text, "update mode:    %s", m_synchronousPhysicsUpdate ? "concurrent" : "synchronous");
 			ImGui::Text(text, "");
 
 			if (m_currentPlugin) 
