@@ -23,7 +23,6 @@
 #define __D_WORLD_DYNAMICS_UPDATE_H__
 
 #include "ndNewtonStdafx.h"
-//#include "ndSolverAvx2.h"
 
 //#define D_BODY_LRU_STEP				2	
 //#define D_MAX_SKELETON_JOINT_COUNT	256
@@ -48,20 +47,12 @@
 // For more detail on the derivation of the Runge Kutta coefficients you can go to:  
 // http://pathfinder.scar.utoronto.ca/~dyer/csca57/book_P/node51.html
 
+class ndWorld;
+
 D_MSV_NEWTON_ALIGN_32
-class ndDynamicsUpdate
+class ndDynamicsUpdate: public dClassAlloc
 {
 	public:
-	class dgSolverProgressiveSleepEntry
-	{
-		public:
-		dFloat32 m_maxAccel;
-		dFloat32 m_maxAlpha;
-		dFloat32 m_maxVeloc;
-		dFloat32 m_maxOmega;
-		dInt32 m_steps;
-	};
-
 	class ndBodyIndexPair
 	{
 		public:
@@ -85,7 +76,7 @@ class ndDynamicsUpdate
 	};
 
 	public:
-	ndDynamicsUpdate();
+	ndDynamicsUpdate(ndWorld* const world);
 	~ndDynamicsUpdate();
 
 	protected:

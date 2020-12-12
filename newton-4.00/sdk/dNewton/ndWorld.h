@@ -26,12 +26,13 @@
 #include "ndJointList.h"
 #include "ndModelList.h"
 #include "ndSkeletonList.h"
-#include "ndDynamicsUpdate.h"
+//#include "ndDynamicsUpdate.h"
 #include "ndBodyParticleSetList.h"
 
 class ndWorld;
 class ndModel;
 class ndBodyDynamic;
+class ndDynamicsUpdate;
 class ndJointBilateralConstraint;
 
 #define D_NEWTON_ENGINE_MAJOR_VERSION 4
@@ -41,7 +42,7 @@ class ndJointBilateralConstraint;
 
 
 D_MSV_NEWTON_ALIGN_32
-class ndWorld: public dClassAlloc, public ndDynamicsUpdate
+class ndWorld: public dClassAlloc
 {
 	public:
 	D_NEWTON_API ndWorld();
@@ -130,8 +131,19 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	void LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
 	void LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
 
+	class dgSolverProgressiveSleepEntry
+	{
+		public:
+		dFloat32 m_maxAccel;
+		dFloat32 m_maxAlpha;
+		dFloat32 m_maxVeloc;
+		dFloat32 m_maxOmega;
+		dInt32 m_steps;
+	};
+
 	ndScene* m_scene;
 	ndBodyDynamic* m_sentinelBody;
+	ndDynamicsUpdate* m_solver;
 	ndJointList m_jointList;
 	ndModelList m_modelList;
 	ndSkeletonList m_skeletonList;
@@ -149,8 +161,8 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 
 	dgSolverProgressiveSleepEntry m_sleepTable[D_SLEEP_ENTRIES];
 
-	dInt32 m_solver;
 	dInt32 m_subSteps;
+	dInt32 m_solverMode;
 	dInt32 m_solverIterations;
 	dUnsigned32 m_frameIndex;
 	bool m_collisionUpdate;
@@ -286,12 +298,12 @@ inline void ndWorld::Update(dFloat32 timestep)
 
 inline dInt32 ndWorld::GetSelectedSolver() const
 {
-	return m_solver;
+	return m_solverMode;
 }
 
 inline void ndWorld::SelectSolver(dInt32 solver)
 {
-	m_solver = dClamp(solver, 0, 1);
+	m_solverMode = dClamp(solver, 0, 1);
 }
 
 #endif

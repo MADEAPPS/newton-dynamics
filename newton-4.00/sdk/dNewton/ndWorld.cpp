@@ -26,14 +26,15 @@
 #include "ndWorldScene.h"
 #include "ndBodyDynamic.h"
 #include "ndSkeletonList.h"
+#include "ndDynamicsUpdate.h"
 #include "ndBodyParticleSet.h"
 #include "ndJointBilateralConstraint.h"
 
 ndWorld::ndWorld()
 	:dClassAlloc()
-	,ndDynamicsUpdate()
 	,m_scene(nullptr)
 	,m_sentinelBody(nullptr)
+	,m_solver(nullptr)
 	,m_jointList()
 	,m_modelList()
 	,m_skeletonList()
@@ -47,8 +48,8 @@ ndWorld::ndWorld()
 	,m_averageTimestepAcc(dFloat32(0.0f))
 	,m_averageFramesCount(dFloat32(0.0f))
 	,m_lastExecutionTime(dFloat32(0.0f))
-	,m_solver(0)
 	,m_subSteps(1)
+	,m_solverMode(0)
 	,m_solverIterations(4)
 	,m_frameIndex(0)
 	,m_collisionUpdate(true)
@@ -56,6 +57,7 @@ ndWorld::ndWorld()
 	// start the engine thread;
 	//m_scene = new ndSceneMixed();
 	m_scene = new ndWorldMixedScene(this);
+	m_solver = new ndDynamicsUpdate(this);
 
 	dInt32 steps = 1;
 	dFloat32 freezeAccel2 = m_freezeAccel2;
@@ -131,6 +133,7 @@ ndWorld::~ndWorld()
 
 	delete m_sentinelBody;
 	delete m_scene;
+	delete m_solver;
 	ClearCache();
 }
 
@@ -352,7 +355,7 @@ void ndWorld::UpdateSkeletons()
 		}
 		m_skeletonList.RemoveAll();
 
-		ndDynamicsUpdate& solverUpdate = *this;
+		ndDynamicsUpdate& solverUpdate = *m_solver;
 		ndConstraintArray& jointArray = solverUpdate.m_jointArray;
 		jointArray.SetCount(m_jointList.GetCount() + 1);
 
@@ -847,14 +850,16 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	ModelUpdate();
 
 	// calculate internal forces, integrate bodies and update matrices.
-	if (m_solver == 0)
-	{
-		ndDynamicsUpdate::Update();
-	} 
-	else
-	{
-		ndDynamicsUpdate::UpdateAvx2();
-	}
+	dAssert(m_solver);
+	//if (m_solverMode == 0)
+	//{
+	//	ndDynamicsUpdate::Update();
+	//} 
+	//else
+	//{
+	//	ndDynamicsUpdate::UpdateAvx2();
+	//}
+	m_solver->Update();
 
 	UpdatePostlisteners();
 }
