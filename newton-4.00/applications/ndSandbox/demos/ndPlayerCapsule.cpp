@@ -59,10 +59,10 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(mesh);
 	scene->AddEntity(rootEntity);
 
-	//const int n = 1;
-	//const int stackHigh = 4;
-	const int n = 10;
-	const int stackHigh = 7;
+	const int n = 4;
+	const int stackHigh = 4;
+	//const int n = 10;
+	//const int stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)
@@ -73,7 +73,6 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 	}
 	mesh->Release();
 }
-
 
 static void AddPlatform(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin)
 {
@@ -124,10 +123,10 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height/4.0f, true);
 	
 	location.m_posit.m_z += 2.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
 	
 	location.m_posit.m_z += 2.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
 
 	AddCapsulesStacks(scene, dVector (32.0f, 0.0f, 0.0f, 0.0f));
 	AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));

@@ -19,8 +19,16 @@
 #include "ndBasicPlayerCapsule.h"
 
 #define PLAYER_WALK_SPEED				8.0f
-#define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 #define PLAYER_JUMP_SPEED				5.0f
+
+#define PLAYER_FIRST_PERSON	
+
+#ifdef PLAYER_FIRST_PERSON	
+	#define PLAYER_THIRD_PERSON_VIEW_DIST	0.0f
+#else
+	#define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
+#endif
+
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(ndDemoEntityManager* const scene, const dMatrix& localAxis, const dMatrix& location,
 	dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight, bool isPlayer)
@@ -120,9 +128,9 @@ void ndBasicPlayerCapsule::SetCamera()
 		ndDemoEntity* const player = (ndDemoEntity*)notify->GetUserData();
 		dMatrix playerMatrix(player->GetNextMatrix());
 
-		dFloat32 height = 2.0f;
-		dVector frontDir(camMatrix[0]);
-		dVector upDir(0.0f, 1.0f, 0.0f, 0.0f);
+		const dFloat32 height = m_height;
+		const dVector frontDir(camMatrix[0]);
+		const dVector upDir(0.0f, 1.0f, 0.0f, 0.0f);
 		dVector camOrigin = playerMatrix.TransformVector(upDir.Scale(height));
 		camOrigin -= frontDir.Scale(PLAYER_THIRD_PERSON_VIEW_DIST);
 
@@ -131,7 +139,6 @@ void ndBasicPlayerCapsule::SetCamera()
 		dFloat32 angle0 = camera->GetYawAngle();
 		dFloat32 angle1 = GetHeadingAngle();
 		dFloat32 error = AnglesAdd(angle1, -angle0);
-		//dFloat32 error = 1.0f;
 
 		if ((dAbs (error) > 1.0e-3f) ||
 			m_scene->GetKeyState(' ') ||
