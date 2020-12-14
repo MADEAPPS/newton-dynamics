@@ -238,9 +238,70 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		camera->SetNextMatrix(*manager, camMatrix, camOrigin);
 	}
 
+	void DrawGage(GLuint gage, GLuint needle, dFloat32 param, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size, dFloat32 minAngle, dFloat32 maxAngle) const
+	{
+		dMatrix origin(dGetIdentityMatrix());
+		origin[1][1] = -1.0f;
+		origin.m_posit = dVector(origin_x, origin_y, 0.0f, 1.0f);
+
+		size *= 0.5f;
+
+		// render dial
+		glPushMatrix();
+		glMultMatrix(&origin[0][0]);
+		glBindTexture(GL_TEXTURE_2D, gage);
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(GLfloat(-size), GLfloat(size), 0.0f);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(GLfloat(-size), GLfloat(-size), 0.0f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(GLfloat(size), GLfloat(-size), 0.0f);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(GLfloat(size), GLfloat(size), 0.0f);
+		glEnd();
+
+		// render needle
+		minAngle *= -dDegreeToRad;
+		maxAngle *= -dDegreeToRad;
+		//param = 1.0f;
+		dFloat32 angle = minAngle + (maxAngle - minAngle) * param;
+		dMatrix needleMatrix(dRollMatrix(angle));
+
+		dFloat32 x = size * 0.7f;
+		dFloat32 y = size * 0.7f;
+
+		glPushMatrix();
+		glMultMatrix(&needleMatrix[0][0]);
+		glBindTexture(GL_TEXTURE_2D, needle);
+		glBegin(GL_QUADS);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(GLfloat(-x), GLfloat(y), 0.0f);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(GLfloat(-x), GLfloat(-y), 0.0f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(GLfloat(x), GLfloat(-y), 0.0f);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(GLfloat(x), GLfloat(y), 0.0f);
+		glEnd();
+
+		glPopMatrix();
+		glPopMatrix();
+	}
+
+
 	void RenderUI(ndDemoEntityManager* const scene)
 	{
 		dAssert(0);
+
+		//dMultiBodyVehicleEngine* const engine = m_player->GetEngineControl() ? m_player->GetEngineControl()->GetEngine() : NULL;
+		//
+		//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		//dFloat gageSize = 200.0f;
+		//dFloat y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
+		//
+		//// draw the tachometer
+		//dFloat x = gageSize / 2 + 20.0f;
+		//dFloat rpm = engine ? engine->GetRpm() / engine->GetRedLineRpm() : 0.0f;
+		//DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 90.0f);
+		//
+		//// draw the odometer
+		//x += gageSize;
+		//dFloat speed = engine ? dAbs(engine->GetSpeed()) / engine->GetTopSpeed() : 0.0f;
+		//DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize, -180.0f, 90.0f);
+
 	}
 
 	dFloat32 m_steerAngle;
