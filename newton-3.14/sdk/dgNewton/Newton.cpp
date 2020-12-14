@@ -6193,8 +6193,8 @@ void NewtonBallSetConeLimits(const NewtonJoint* const ball, const dFloat* pin, d
 		}
 	}
 	dgVector lateral (tmp.CrossProduct(coneAxis)); 
-	dgAssert(lateral.m_w = dgFloat32(0.0f));
-	dgAssert(coneAxis.m_w = dgFloat32(0.0f));
+	dgAssert(lateral.m_w == dgFloat32(0.0f));
+	dgAssert(coneAxis.m_w == dgFloat32(0.0f));
 	lateral = lateral.Normalize();
 	coneAxis = coneAxis.Normalize();
 
