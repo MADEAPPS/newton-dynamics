@@ -117,6 +117,12 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 	}
 
+	static void RenderUI(ndDemoEntityManager* const scene, void* const context)
+	{
+		ndBasicMultiBodyVehicle* const me = (ndBasicMultiBodyVehicle*)context;
+		me->RenderUI(scene);
+	}
+
 	private:
 	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, fbxDemoEntity* const chassisEntity)
 	{
@@ -232,6 +238,11 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		camera->SetNextMatrix(*manager, camMatrix, camOrigin);
 	}
 
+	void RenderUI(ndDemoEntityManager* const scene)
+	{
+		dAssert(0);
+	}
+
 	dFloat32 m_steerAngle;
 };
 
@@ -248,6 +259,10 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
+
+
+	//RenderGuiHelpCallback helpCallback, RenderGuiHelpCallback UIcallback, void* const context
+	scene->Set2DDisplayRenderFunction(nullptr, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
