@@ -50,11 +50,9 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		:ndMultiBodyVehicle(dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f))
 		,m_steerAngle(0.0f)
 	{
-		//fbxDemoEntity* const vehicleEntity = LoadFbxMesh("viper.fbx");
-		fbxDemoEntity* const vehicleEntity = LoadFbxMesh("viper1.fbx");
+		//ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, "viper.fbx");
+		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, "viper1.fbx");
 		vehicleEntity->ResetMatrix(*scene, vehicleEntity->CalculateGlobalMatrix() * matrix);
-		vehicleEntity->BuildRenderMeshes(scene);
-		scene->AddEntity(vehicleEntity);
 
 		ndWorld* const world = scene->GetWorld();
 
@@ -112,6 +110,23 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		AddMotor(world, 20, 0.25f, differential);
 	}
 
+	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename)
+	{
+		fbxDemoEntity* const vehicleEntity = LoadFbxMesh(filename);
+		vehicleEntity->BuildRenderMeshes(scene);
+		scene->AddEntity(vehicleEntity);
+
+		// load 2d display assets
+		m_gears = LoadTexture("gears_font.tga");
+		m_odometer = LoadTexture("kmh_dial.tga");
+		m_tachometer = LoadTexture("rpm_dial.tga");
+		m_redNeedle = LoadTexture("needle_red.tga");
+		m_greenNeedle = LoadTexture("needle_green.tga");
+
+		return vehicleEntity;
+	}
+
+
 	void SetAsPlayer(ndDemoEntityManager* const scene)
 	{
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
@@ -124,7 +139,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	}
 
 	private:
-	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, fbxDemoEntity* const chassisEntity)
+	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity)
 	{
 		dFloat32 mass = 1000.0f;
 		dMatrix matrix(chassisEntity->CalculateGlobalMatrix(nullptr));
@@ -281,30 +296,40 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		glPopMatrix();
 	}
 
-
 	void RenderUI(ndDemoEntityManager* const scene)
 	{
-		dAssert(0);
+		//dAssert(0);
 
 		//dMultiBodyVehicleEngine* const engine = m_player->GetEngineControl() ? m_player->GetEngineControl()->GetEngine() : NULL;
-		//
-		//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		//dFloat gageSize = 200.0f;
-		//dFloat y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
-		//
-		//// draw the tachometer
-		//dFloat x = gageSize / 2 + 20.0f;
-		//dFloat rpm = engine ? engine->GetRpm() / engine->GetRedLineRpm() : 0.0f;
-		//DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 90.0f);
-		//
+
+		ndJointVehicleMotor* const motor = m_motor;
+		dAssert(motor);
+		
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		dFloat32 gageSize = 200.0f;
+		dFloat32 y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
+		
+		// draw the tachometer
+		dFloat32 x = gageSize / 2 + 20.0f;
+		//dFloat32 rpm = engine ? engine->GetRpm() / engine->GetRedLineRpm() : 0.0f;
+		dFloat32 rpm = motor->GetSpeed() * 9.55f / 6000.0f;
+		dTrace(("%f %f\n", motor->GetSpeed(), rpm));
+
+		DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 90.0f);
+		
 		//// draw the odometer
 		//x += gageSize;
-		//dFloat speed = engine ? dAbs(engine->GetSpeed()) / engine->GetTopSpeed() : 0.0f;
+		//dFloat32 speed = engine ? dAbs(engine->GetSpeed()) / engine->GetTopSpeed() : 0.0f;
 		//DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize, -180.0f, 90.0f);
-
 	}
 
 	dFloat32 m_steerAngle;
+
+	GLuint m_gears;
+	GLuint m_odometer;
+	GLuint m_redNeedle;
+	GLuint m_tachometer;
+	GLuint m_greenNeedle;
 };
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)

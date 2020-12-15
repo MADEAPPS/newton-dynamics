@@ -59,6 +59,7 @@
 #include <ndBodyParticleSet.h>
 #include <ndJointDoubleHinge.h>
 #include <ndMultiBodyVehicle.h>
+#include <ndJointVehicleMotor.h>
 #include <ndSkeletonContainer.h>
 #include <ndJointBallAndSocket.h>
 #include <ndBodyParticleSetList.h>

@@ -27,68 +27,12 @@
 #include "ndBodyDynamic.h"
 #include "ndJointDoubleHinge.h"
 #include "ndMultiBodyVehicle.h"
+#include "ndJointVehicleMotor.h"
 
-class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
-{
-	public:
-	ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis)
-		:ndJointBilateralConstraint(3, motor, chassis, motor->GetMatrix())
-	{
-	}
-
-	void AlignMatrix()
-	{
-		dMatrix matrix0;
-		dMatrix matrix1;
-		CalculateGlobalMatrix(matrix0, matrix1);
-
-		//matrix1.m_posit += matrix1.m_up.Scale(1.0f);
-
-		m_body0->SetMatrix(matrix1);
-		m_body0->SetVelocity(m_body1->GetVelocity());
-
-		dVector omega0(m_body0->GetOmega());
-		dVector omega1(m_body1->GetOmega());
-		dVector omega(
-			matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar()) +
-			matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega1).GetScalar()) +
-			matrix1.m_right.Scale(matrix1.m_right.DotProduct(omega1).GetScalar()));
-
-		omega += matrix1.m_front.Scale(-40.0f) - matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar());
-		//omega += matrix1.m_up.Scale(5.0f) - matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega0).GetScalar());
-
-		m_body0->SetOmega(omega);
-	}
-
-	void JacobianDerivative(ndConstraintDescritor& desc)
-	{
-		dMatrix matrix0;
-		dMatrix matrix1;
-		CalculateGlobalMatrix(matrix0, matrix1);
-		
-		//// save the current joint Omega
-		dVector omega0(m_body0->GetOmega());
-		dVector omega1(m_body1->GetOmega());
-
-		//// the joint angle can be determined by getting the angle between any two non parallel vectors
-		//const dFloat32 deltaAngle = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_jointAngle);
-		//m_jointAngle += deltaAngle;
-		//m_jointSpeed = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
-
-		// two rows to restrict rotation around around the parent coordinate system
-		const dFloat32 angleError = m_maxAngleError;
-		const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-		AddAngularRowJacobian(desc, matrix1.m_up, angle0);
-
-		const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
-		AddAngularRowJacobian(desc, matrix1.m_right, angle1);
-	}
-};
-
-class ndMultiBodyVehicleMotorGearBox : public ndJointBilateralConstraint
+class ndJointVehicleMotorGearBox : public ndJointBilateralConstraint
 {
 	public: 
-	ndMultiBodyVehicleMotorGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential)
+	ndJointVehicleMotorGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential)
 		:ndJointBilateralConstraint(1, motor, differential, motor->GetMatrix())
 	{
 	}
@@ -333,15 +277,15 @@ ndDifferential* ndMultiBodyVehicle::AddDifferential(ndWorld* const world, dFloat
 	return differential;
 }
 
-ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndDifferential* const differential)
+ndJointVehicleMotor* ndMultiBodyVehicle::AddMotor(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndDifferential* const differential)
 {
 	//dAssert(0);
 	ndBodyDynamic* const motorBody = CreateInternalBodyPart(world, mass, radius);
 
-	m_motor = new ndMultiBodyVehicleMotor(motorBody, m_chassis);
+	m_motor = new ndJointVehicleMotor(motorBody, m_chassis);
 	world->AddJoint(m_motor);
 
-	m_gearBox = new ndMultiBodyVehicleMotorGearBox(motorBody, differential->GetBody0());
+	m_gearBox = new ndJointVehicleMotorGearBox(motorBody, differential->GetBody0());
 	world->AddJoint(m_gearBox);
 
 	return m_motor;
