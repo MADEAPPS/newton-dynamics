@@ -313,14 +313,15 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		dFloat32 x = gageSize / 2 + 20.0f;
 		//dFloat32 rpm = engine ? engine->GetRpm() / engine->GetRedLineRpm() : 0.0f;
 		dFloat32 rpm = motor->GetSpeed() * 9.55f / 6000.0f;
-		dTrace(("%f %f\n", motor->GetSpeed(), rpm));
+		//dTrace(("%f %f\n", motor->GetSpeed(), rpm));
 
 		DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 90.0f);
 		
-		//// draw the odometer
-		//x += gageSize;
+		// draw the odometer
+		x += gageSize;
 		//dFloat32 speed = engine ? dAbs(engine->GetSpeed()) / engine->GetTopSpeed() : 0.0f;
-		//DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize, -180.0f, 90.0f);
+		dFloat32 speed = GetSpeed() / 100.0f;
+		DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize, -180.0f, 90.0f);
 	}
 
 	dFloat32 m_steerAngle;

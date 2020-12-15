@@ -197,6 +197,13 @@ ndMultiBodyVehicle::~ndMultiBodyVehicle()
 	m_tireShape->Release();
 }
 
+dFloat32 ndMultiBodyVehicle::GetSpeed() const
+{
+	const dVector dir(m_chassis->GetMatrix().RotateVector(m_localFrame.m_front));
+	const dFloat32 speed = m_chassis->GetVelocity().DotProduct(dir).GetScalar();
+	return speed;
+}
+
 void ndMultiBodyVehicle::AddChassis(ndBodyDynamic* const chassis)
 {
 	m_chassis = chassis;

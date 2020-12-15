@@ -43,6 +43,8 @@ class ndMultiBodyVehicle: public ndModel
 		return dFloat32(1.0f);
 	}
 
+	D_NEWTON_API dFloat32 GetSpeed() const;
+
 	D_NEWTON_API void SetBrakeTorque(dFloat32 brakeToqrue);
 	D_NEWTON_API void SetHandBrakeTorque(dFloat32 brakeToqrue);
 	D_NEWTON_API void SetSteeringAngle(dFloat32 angleInRadians);
