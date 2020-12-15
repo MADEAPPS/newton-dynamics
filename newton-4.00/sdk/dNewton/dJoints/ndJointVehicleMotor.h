@@ -31,9 +31,19 @@ class ndJointVehicleMotor: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis);
 
 	dFloat32 GetSpeed() const;
+	dFloat32 GetMaxSpeed() const;
+
+	void SetMaxSpeed(dFloat32 maxSpeed);
+	void SetEngineTorque(dFloat32 torque);
+	void SetThrottle(dFloat32 param);
 
 	private:
 	dFloat32 m_speed;
+	dFloat32 m_maxSpeed;
+	dFloat32 m_throttle;
+	dFloat32 m_engineTorque;
+
+
 	void AlignMatrix();
 	void JacobianDerivative(ndConstraintDescritor& desc);
 	friend class ndMultiBodyVehicle;
@@ -42,6 +52,11 @@ class ndJointVehicleMotor: public ndJointBilateralConstraint
 inline dFloat32 ndJointVehicleMotor::GetSpeed() const
 {
 	return m_speed;
+}
+
+inline dFloat32 ndJointVehicleMotor::GetMaxSpeed() const
+{
+	return m_maxSpeed;
 }
 
 #endif

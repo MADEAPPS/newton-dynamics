@@ -39,7 +39,7 @@ class ndJointVehicleMotorGearBox : public ndJointBilateralConstraint
 
 	void JacobianDerivative(ndConstraintDescritor& desc)
 	{
-
+		return;
 		dMatrix matrix0;
 		dMatrix matrix1;
 		CalculateGlobalMatrix(matrix0, matrix1);
