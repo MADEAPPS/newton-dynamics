@@ -324,7 +324,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		dFloat32 x = gageSize / 2 + 20.0f;
 		//dFloat32 rpm = engine ? engine->GetRpm() / engine->GetRedLineRpm() : 0.0f;
 		//dFloat32 rpm = motor->GetSpeed() * 9.55f / 6000.0f;
-		dFloat32 rpm = motor->GetSpeed() / motor->GetMaxSpeed();
+		dFloat32 rpm = motor->GetRpm() / motor->GetMaxRpm();
 		//dTrace(("%f %f\n", motor->GetSpeed(), rpm));
 
 		DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 90.0f);

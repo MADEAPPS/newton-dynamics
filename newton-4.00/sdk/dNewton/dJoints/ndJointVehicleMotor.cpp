@@ -25,11 +25,12 @@
 
 ndJointVehicleMotor::ndJointVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis)
 	:ndJointBilateralConstraint(3, motor, chassis, motor->GetMatrix())
-	,m_speed(dFloat32 (0.0f))
-	,m_maxSpeed(dFloat32(50.0f))
+	,m_omega(dFloat32 (0.0f))
+	,m_maxOmega(dFloat32(9000.0f / 9.55f))
+	,m_idleOmega(dFloat32(1000.0f / 9.55f))
 	,m_throttle(dFloat32(0.0f))
-	,m_gasValve(dFloat32(0.2f))
-	,m_engineTorque(dFloat32(100.0f))
+	,m_gasValve(m_maxOmega * 0.02f)
+	,m_engineTorque(dFloat32(200.0f))
 	,m_startEngine(false)
 {
 	//m_engineTorque = 10.0f;
@@ -68,7 +69,7 @@ void ndJointVehicleMotor::AlignMatrix()
 	//m_body0->SetOmega(omega);
 }
 
-void ndJointVehicleMotor::SetMaxSpeed(dFloat32 maxSpeed)
+void ndJointVehicleMotor::SetMaxRpm(dFloat32 maxSpeed)
 {
 	dAssert(0);
 }
@@ -90,10 +91,10 @@ dFloat32 ndJointVehicleMotor::CalculateAcceleration(ndConstraintDescritor& desc)
 	const ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
 	const ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
 	const dVector relOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-	m_speed = -relOmega.AddHorizontal().GetScalar();
+	m_omega = -relOmega.AddHorizontal().GetScalar();
 
-	dFloat32 desiredSpeed = m_speed;
-	const dFloat32 diff = m_throttle * m_maxSpeed - m_speed;
+	dFloat32 desiredSpeed = m_omega;
+	const dFloat32 diff = m_throttle * m_maxOmega - m_omega;
 	if (diff > dFloat32(1.0e-3f))
 	{
 		desiredSpeed += m_gasValve;
@@ -102,8 +103,9 @@ dFloat32 ndJointVehicleMotor::CalculateAcceleration(ndConstraintDescritor& desc)
 	{
 		desiredSpeed -= m_gasValve;
 	}
-	desiredSpeed = dClamp(desiredSpeed, dFloat32(0.0f), m_maxSpeed);
-	return (m_speed - desiredSpeed) * desc.m_invTimestep;
+
+	desiredSpeed = dClamp(desiredSpeed, m_idleOmega, m_maxOmega);
+	return (m_omega - desiredSpeed) * desc.m_invTimestep;
 }
 
 void ndJointVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
@@ -131,7 +133,7 @@ void ndJointVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 	else
 	{
-		SetMotorAcceleration(desc, m_speed * desc.m_invTimestep);
+		SetMotorAcceleration(desc, m_omega * desc.m_invTimestep);
 	}
 }
 

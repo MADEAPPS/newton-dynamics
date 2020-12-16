@@ -102,6 +102,8 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_sceneBodyBodyNode(nullptr)
 	,m_sceneAggregateNode(nullptr)
 	,m_skeletonContainer(nullptr)
+	,m_maxAngleStep(dFloat32 (90.0f) * dDegreeToRad)
+	,m_maxLinearSpeed(dFloat32 (100.0f))
 	,m_weigh(dFloat32 (0.0f))
 	,m_rank(0)
 	,m_index(0)
@@ -470,11 +472,10 @@ void ndBodyKinematic::IntegrateVelocity(dFloat32 timestep)
 	m_globalCentreOfMass += m_veloc.Scale(timestep);
 	dFloat32 omegaMag2 = m_omega.DotProduct(m_omega).GetScalar();
 #ifdef _DEBUG
-	const dFloat32 err = dFloat32(90.0f * dDegreeToRad);
-	const dFloat32 err2 = err * err;
+	const dFloat32 err2 = m_maxAngleStep * m_maxAngleStep;
 	const dFloat32 step2 = omegaMag2 * timestep * timestep;
 	const dFloat32 speed2 = m_veloc.DotProduct(m_veloc).GetScalar() * timestep * timestep;;
-	if ((step2 > err2) || (speed2 > 100.0f)) 
+	if ((step2 > err2) || (speed2 > m_maxLinearSpeed))
 	{
 		dTrace(("warning bodies %d w(%f %f %f) v(%f %f %f) with very high velocity or angular velocity, may be unstable\n", m_uniqueID,
 			m_omega.m_x, m_omega.m_y, m_omega.m_z, m_veloc.m_x, m_veloc.m_y, m_veloc.m_z));

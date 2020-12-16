@@ -30,13 +30,14 @@ class ndJointVehicleMotor: public ndJointBilateralConstraint
 	public:
 	D_NEWTON_API ndJointVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis);
 
-	dFloat32 GetSpeed() const;
-	dFloat32 GetMaxSpeed() const;
+	dFloat32 GetRpm() const;
+	dFloat32 GetMaxRpm() const;
 	bool GetStart() const;
 	
 	D_NEWTON_API void SetStart(bool startkey);
 	D_NEWTON_API void SetThrottle(dFloat32 param);
-	D_NEWTON_API void SetMaxSpeed(dFloat32 maxSpeed);
+	D_NEWTON_API void SetMaxRpm(dFloat32 maxRpm);
+	D_NEWTON_API void SetIdleRpm(dFloat32 idleRpm);
 	D_NEWTON_API void SetEngineTorque(dFloat32 torque);
 	D_NEWTON_API void SetGasValve(dFloat32 radPerSeconds);
 
@@ -45,8 +46,9 @@ class ndJointVehicleMotor: public ndJointBilateralConstraint
 	void JacobianDerivative(ndConstraintDescritor& desc);
 	dFloat32 CalculateAcceleration(ndConstraintDescritor& desc);
 
-	dFloat32 m_speed;
-	dFloat32 m_maxSpeed;
+	dFloat32 m_omega;
+	dFloat32 m_maxOmega;
+	dFloat32 m_idleOmega;
 	dFloat32 m_throttle;
 	dFloat32 m_gasValve;
 	dFloat32 m_engineTorque;
@@ -54,14 +56,14 @@ class ndJointVehicleMotor: public ndJointBilateralConstraint
 	friend class ndMultiBodyVehicle;
 };
 
-inline dFloat32 ndJointVehicleMotor::GetSpeed() const
+inline dFloat32 ndJointVehicleMotor::GetRpm() const
 {
-	return m_speed;
+	return m_omega * dFloat32 (9.55f);
 }
 
-inline dFloat32 ndJointVehicleMotor::GetMaxSpeed() const
+inline dFloat32 ndJointVehicleMotor::GetMaxRpm() const
 {
-	return m_maxSpeed;
+	return m_maxOmega * dFloat32(9.55f);
 }
 
 inline bool ndJointVehicleMotor::GetStart() const

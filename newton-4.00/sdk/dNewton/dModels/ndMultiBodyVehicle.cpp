@@ -39,7 +39,7 @@ class ndJointVehicleMotorGearBox : public ndJointBilateralConstraint
 
 	void JacobianDerivative(ndConstraintDescritor& desc)
 	{
-		return;
+return;
 		dMatrix matrix0;
 		dMatrix matrix1;
 		CalculateGlobalMatrix(matrix0, matrix1);
@@ -295,6 +295,7 @@ ndJointVehicleMotor* ndMultiBodyVehicle::AddMotor(ndWorld* const world, dFloat32
 	m_gearBox = new ndJointVehicleMotorGearBox(motorBody, differential->GetBody0());
 	world->AddJoint(m_gearBox);
 
+	motorBody->SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32(2.0f * 360.0f) * dDegreeToRad, dFloat32(100.0f));
 	return m_motor;
 }
 

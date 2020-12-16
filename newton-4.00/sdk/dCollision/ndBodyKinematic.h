@@ -108,6 +108,8 @@ class ndBodyKinematic: public ndBody
 	bool GetGyroMode() const;
 	void SetGyroMode(bool state);
 
+	void SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32 angleInRadian, dFloat32 speedInMitersPerSeconds);
+
 	D_COLLISION_API ndShapeInstance& GetCollisionShape();
 	D_COLLISION_API const ndShapeInstance& GetCollisionShape() const;
 	D_COLLISION_API virtual void SetCollisionShape(const ndShapeInstance& shapeInstance);
@@ -194,6 +196,8 @@ class ndBodyKinematic: public ndBody
 	ndSceneAggregate* m_sceneAggregateNode;
 	ndSkeletonContainer* m_skeletonContainer;
 
+	dFloat32 m_maxAngleStep;
+	dFloat32 m_maxLinearSpeed;
 	dFloat32 m_weigh;
 	dInt32 m_rank;
 	dInt32 m_index;
@@ -397,6 +401,12 @@ inline ndSkeletonContainer* ndBodyKinematic::GetSkeleton() const
 inline void ndBodyKinematic::SetSkeleton(ndSkeletonContainer* const skeleton)
 {
 	m_skeletonContainer = skeleton;
+}
+
+inline void ndBodyKinematic::SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32 angleInRadian, dFloat32 speedInMitersPerSeconds)
+{
+	m_maxAngleStep = dMax(dAbs(angleInRadian), dFloat32(90.0f) * dDegreeToRad);
+	m_maxLinearSpeed = dMax(speedInMitersPerSeconds, dFloat32 (100.0f));
 }
 
 #endif 
