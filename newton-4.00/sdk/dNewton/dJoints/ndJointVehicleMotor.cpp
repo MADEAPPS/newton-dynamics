@@ -23,14 +23,18 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointVehicleMotor.h"
 
+// approximately the a 10 cylinder 450 hp viper engine fore the late nineties
+#define D_ENGINE_NOMINAL_TORQUE (dFloat32(600.0f))
+#define D_ENGINE_NOMINAL_RPM (dFloat32(9000.0f / 9.55f))
+
 ndJointVehicleMotor::ndJointVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis)
 	:ndJointBilateralConstraint(3, motor, chassis, motor->GetMatrix())
 	,m_omega(dFloat32 (0.0f))
-	,m_maxOmega(dFloat32(9000.0f / 9.55f))
-	,m_idleOmega(dFloat32(1000.0f / 9.55f))
+	,m_maxOmega(D_ENGINE_NOMINAL_RPM)
+	,m_idleOmega(D_ENGINE_NOMINAL_RPM * dFloat32 (0.1f))
 	,m_throttle(dFloat32(0.0f))
-	,m_gasValve(m_maxOmega * 0.02f)
-	,m_engineTorque(dFloat32(200.0f))
+	,m_gasValve(D_ENGINE_NOMINAL_RPM * dFloat32(0.02f))
+	,m_engineTorque(D_ENGINE_NOMINAL_TORQUE)
 	,m_startEngine(false)
 {
 	//m_engineTorque = 10.0f;
