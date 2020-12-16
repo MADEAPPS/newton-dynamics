@@ -28,9 +28,16 @@ ndJointVehicleMotor::ndJointVehicleMotor(ndBodyKinematic* const motor, ndBodyKin
 	,m_speed(dFloat32 (0.0f))
 	,m_maxSpeed(dFloat32(50.0f))
 	,m_throttle(dFloat32(0.0f))
+	,m_gasValve(dFloat32(0.2f))
+	,m_alphaStep(dFloat32(0.0f))
 	,m_engineTorque(dFloat32(100.0f))
 {
-	m_engineTorque = 10.0f;
+	//m_engineTorque = 10.0f;
+}
+
+void ndJointVehicleMotor::SetGasValve(dFloat32 gasValveSeconds)
+{
+	m_gasValve = dAbs(gasValveSeconds);
 }
 
 void ndJointVehicleMotor::AlignMatrix()
@@ -68,9 +75,21 @@ void ndJointVehicleMotor::SetEngineTorque(dFloat32 torque)
 
 void ndJointVehicleMotor::SetThrottle(dFloat32 param)
 {
-	dAssert(0);
+	dFloat32 desiredSpeed = m_speed;
+	m_throttle = dClamp(param, dFloat32(0.0f), dFloat32(1.0f));
+	const dFloat32 diff = m_throttle * m_maxSpeed - m_speed;
+	if (diff > dFloat32(1.0e-3f))
+	{
+		desiredSpeed += m_gasValve;
+	}
+	else if(diff < dFloat32(-1.0e-3f))
+	{
+		desiredSpeed -= m_gasValve;
+	}
+	desiredSpeed = dClamp(desiredSpeed, dFloat32(0.0f), m_maxSpeed);
+//	dFloat32 relSpeed = dClamp(m_speed - m_throttle * m_maxSpeed, -m_maxSpeed, dFloat32(0.0f));
+	m_alphaStep = m_speed - desiredSpeed;
 }
-
 
 void ndJointVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 {
@@ -85,22 +104,17 @@ void ndJointVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
 
-	//// save the current joint Omega
-
-	m_throttle = 0.5f;
+	// set engine gas and save the current joint Omega
 	AddAngularRowJacobian(desc, matrix1.m_front, dFloat32 (0.0f));
+	SetHighFriction(desc, m_engineTorque);
+	SetLowerFriction(desc, -m_engineTorque);
 
 	const dVector& omega0 = m_body0->GetOmega();
 	const dVector& omega1 = m_body1->GetOmega();
-	ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
-	ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
+	const ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
+	const ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
 	const dVector relOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
 	m_speed = -relOmega.AddHorizontal().GetScalar();
-
-	dFloat32 relSpeed = dClamp(m_speed - m_throttle * m_maxSpeed, -m_maxSpeed, dFloat32(0.0f));
-
-	SetMotorAcceleration(desc, relSpeed * desc.m_invTimestep);
-	SetHighFriction(desc, m_engineTorque);
-	SetLowerFriction(desc, -m_engineTorque);
+	SetMotorAcceleration(desc, m_alphaStep * desc.m_invTimestep);
 }
 

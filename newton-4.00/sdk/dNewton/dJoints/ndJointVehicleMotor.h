@@ -32,17 +32,21 @@ class ndJointVehicleMotor: public ndJointBilateralConstraint
 
 	dFloat32 GetSpeed() const;
 	dFloat32 GetMaxSpeed() const;
-
-	void SetMaxSpeed(dFloat32 maxSpeed);
-	void SetEngineTorque(dFloat32 torque);
-	void SetThrottle(dFloat32 param);
+	
+	D_NEWTON_API void SetThrottle(dFloat32 param);
+	D_NEWTON_API void SetMaxSpeed(dFloat32 maxSpeed);
+	D_NEWTON_API void SetEngineTorque(dFloat32 torque);
+	D_NEWTON_API void SetGasValve(dFloat32 radPerSeconds);
 
 	private:
 	dFloat32 m_speed;
 	dFloat32 m_maxSpeed;
 	dFloat32 m_throttle;
+	dFloat32 m_gasValve;
+	dFloat32 m_alphaStep;
 	dFloat32 m_engineTorque;
 
+	
 
 	void AlignMatrix();
 	void JacobianDerivative(ndConstraintDescritor& desc);
