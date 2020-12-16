@@ -123,16 +123,18 @@ void ndJointVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 
 	// add rotor joint
 	AddAngularRowJacobian(desc, matrix1.m_front, dFloat32(0.0f));
-	SetHighFriction(desc, m_engineTorque);
-	SetLowerFriction(desc, -m_engineTorque);
 	const dFloat32 accel = CalculateAcceleration(desc);
 	if (m_startEngine)
 	{
 		// set engine gas and save the current joint Omega
+		SetHighFriction(desc, m_engineTorque);
+		SetLowerFriction(desc, -m_engineTorque);
 		SetMotorAcceleration(desc, accel);
 	}
 	else
 	{
+		SetHighFriction(desc, m_engineTorque * dFloat32 (4.0f));
+		SetLowerFriction(desc, -m_engineTorque * dFloat32(4.0f));
 		SetMotorAcceleration(desc, m_omega * desc.m_invTimestep);
 	}
 }
