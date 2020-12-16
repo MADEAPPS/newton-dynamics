@@ -39,17 +39,15 @@ class ndJointVehicleMotor: public ndJointBilateralConstraint
 	D_NEWTON_API void SetGasValve(dFloat32 radPerSeconds);
 
 	private:
+	void AlignMatrix();
+	void JacobianDerivative(ndConstraintDescritor& desc);
+	dFloat32 CalculateAcceleration(ndConstraintDescritor& desc);
+
 	dFloat32 m_speed;
 	dFloat32 m_maxSpeed;
 	dFloat32 m_throttle;
 	dFloat32 m_gasValve;
-	dFloat32 m_alphaStep;
 	dFloat32 m_engineTorque;
-
-	
-
-	void AlignMatrix();
-	void JacobianDerivative(ndConstraintDescritor& desc);
 	friend class ndMultiBodyVehicle;
 };
 
