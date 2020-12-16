@@ -32,7 +32,9 @@ class ndJointVehicleMotor: public ndJointBilateralConstraint
 
 	dFloat32 GetSpeed() const;
 	dFloat32 GetMaxSpeed() const;
+	bool GetStart() const;
 	
+	D_NEWTON_API void SetStart(bool startkey);
 	D_NEWTON_API void SetThrottle(dFloat32 param);
 	D_NEWTON_API void SetMaxSpeed(dFloat32 maxSpeed);
 	D_NEWTON_API void SetEngineTorque(dFloat32 torque);
@@ -48,6 +50,7 @@ class ndJointVehicleMotor: public ndJointBilateralConstraint
 	dFloat32 m_throttle;
 	dFloat32 m_gasValve;
 	dFloat32 m_engineTorque;
+	bool m_startEngine;
 	friend class ndMultiBodyVehicle;
 };
 
@@ -59,6 +62,11 @@ inline dFloat32 ndJointVehicleMotor::GetSpeed() const
 inline dFloat32 ndJointVehicleMotor::GetMaxSpeed() const
 {
 	return m_maxSpeed;
+}
+
+inline bool ndJointVehicleMotor::GetStart() const
+{
+	return m_startEngine;
 }
 
 #endif

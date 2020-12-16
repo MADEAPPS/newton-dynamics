@@ -49,6 +49,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const dMatrix& matrix)
 		:ndMultiBodyVehicle(dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f))
 		,m_steerAngle(0.0f)
+		,m_prevKey(false)
 	{
 		//ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, "viper.fbx");
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, "viper1.fbx");
@@ -215,6 +216,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	{
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 
+		bool start = scene->GetKeyState('I');
 		dFloat32 brake = 1000.0f * dFloat32(scene->GetKeyState('S'));
 		dFloat32 handBrake = 1000.0f * dFloat32(scene->GetKeyState(' '));
 		dFloat32 throttle = dFloat32 (scene->GetKeyState('W')) ? 1.0f : 0.0f;
@@ -224,6 +226,12 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		SetBrakeTorque(brake);
 		SetHandBrakeTorque(handBrake);
 		SetSteeringAngle(m_steerAngle * dDegreeToRad);
+
+		if (m_prevKey & !start)
+		{
+			m_motor->SetStart (!m_motor->GetStart());
+		}
+		m_prevKey = start;
 
 		m_motor->SetThrottle(throttle);
 
@@ -335,6 +343,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	GLuint m_redNeedle;
 	GLuint m_tachometer;
 	GLuint m_greenNeedle;
+
+	bool m_prevKey;
 };
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)

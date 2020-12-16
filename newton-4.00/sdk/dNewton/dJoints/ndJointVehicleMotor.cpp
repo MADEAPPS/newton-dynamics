@@ -30,6 +30,7 @@ ndJointVehicleMotor::ndJointVehicleMotor(ndBodyKinematic* const motor, ndBodyKin
 	,m_throttle(dFloat32(0.0f))
 	,m_gasValve(dFloat32(0.2f))
 	,m_engineTorque(dFloat32(100.0f))
+	,m_startEngine(false)
 {
 	//m_engineTorque = 10.0f;
 }
@@ -37,6 +38,11 @@ ndJointVehicleMotor::ndJointVehicleMotor(ndBodyKinematic* const motor, ndBodyKin
 void ndJointVehicleMotor::SetGasValve(dFloat32 gasValveSeconds)
 {
 	m_gasValve = dAbs(gasValveSeconds);
+}
+
+void ndJointVehicleMotor::SetStart(bool startkey)
+{
+	m_startEngine = startkey;
 }
 
 void ndJointVehicleMotor::AlignMatrix()
@@ -113,11 +119,19 @@ void ndJointVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
 
-	// set engine gas and save the current joint Omega
-	AddAngularRowJacobian(desc, matrix1.m_front, dFloat32 (0.0f));
+	// add rotor joint
+	AddAngularRowJacobian(desc, matrix1.m_front, dFloat32(0.0f));
 	SetHighFriction(desc, m_engineTorque);
 	SetLowerFriction(desc, -m_engineTorque);
 	const dFloat32 accel = CalculateAcceleration(desc);
-	SetMotorAcceleration(desc, accel);
+	if (m_startEngine)
+	{
+		// set engine gas and save the current joint Omega
+		SetMotorAcceleration(desc, accel);
+	}
+	else
+	{
+		SetMotorAcceleration(desc, m_speed * desc.m_invTimestep);
+	}
 }
 
