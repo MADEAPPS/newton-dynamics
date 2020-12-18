@@ -172,13 +172,6 @@ ndDemoBezierCurve::ndDemoBezierCurve (const dBezierSpline& curve)
 	m_isVisible = false;
 }
 
-/*
-NewtonMesh* ndDemoBezierCurve::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix)
-{
-	dAssert(0);
-	return nullptr;
-}
-*/
 
 dInt32 ndDemoBezierCurve::GetRenderResolution () const
 {
@@ -195,32 +188,45 @@ void ndDemoBezierCurve::Render(ndDemoEntityManager* const scene, const dMatrix& 
 {
 	if (m_isVisible) 
 	{
-		dAssert(0);
-		//glDisable(GL_TEXTURE_2D);
-		//glColor3f(1.0f, 1.0f, 1.0f);
-		//
-		//dFloat64 scale = 1.0f / m_renderResolution;
-		//glBegin(GL_LINES);
-		//dBigVector p0 (m_curve.CurvePoint(0.0f)) ;
-		//for (dInt32 i = 1; i <= m_renderResolution; i ++) {
-		//	dBigVector p1 (m_curve.CurvePoint(i * scale));
-		//	glVertex3f (GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-		//	glVertex3f (GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-		//	p0 = p1;
-		//}
-		//glEnd();
-/*
-		glPointSize(4.0f);
-		glBegin(GL_POINTS);
-		glColor3f(1.0f, 0.0f, 0.0f);
-		dInt32 count = m_curve.GetKnotCount();
-		for (dInt32 i = 0; i < count; i ++) {
-			dFloat32 u = m_curve.GetKnot(i);
-			dBigVector p0 (m_curve.CurvePoint(u));
-			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
+		ndDemoCamera* const camera = scene->GetCamera();
+		dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+		GLuint shader = scene->GetShaderCache().m_wireFrame;
+
+		glUseProgram(shader);
+
+		GLuint shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+		GLuint projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+		glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+
+		ndMeshVector m_line[2];
+		GLfloat color[4];
+		color[0] = 1.0f;
+		color[1] = 1.0f;
+		color[2] = 1.0f;
+		color[3] = 1.0f;
+
+		glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), m_line);
+		glUniform4fv(shadeColorLocation, 1, color);
+
+		dFloat64 scale = 1.0f / m_renderResolution;
+		dBigVector p0 (m_curve.CurvePoint(0.0f)) ;
+		for (dInt32 i = 1; i <= m_renderResolution; i ++) 
+		{
+			dBigVector p1 (m_curve.CurvePoint(i * scale));
+			m_line[0].m_x = GLfloat (p0.m_x);
+			m_line[0].m_y = GLfloat (p0.m_y);
+			m_line[0].m_z = GLfloat (p0.m_z);
+			m_line[1].m_x = GLfloat (p1.m_x);
+			m_line[1].m_y = GLfloat (p1.m_y);
+			m_line[1].m_z = GLfloat (p1.m_z);
+			glDrawArrays(GL_LINES, 0, 2);
+			p0 = p1;
 		}
-		glEnd();
-*/
+
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glUseProgram(0);
 	}
 }
 
@@ -1098,7 +1104,6 @@ ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, cons
 	// optimize this mesh for hardware buffers if possible
 	OptimizeForRender(points, indices);
 }
-
 
 ndDemoMesh::~ndDemoMesh()
 {

@@ -341,14 +341,27 @@ dInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const jo
 
 dInt32 ndWorld::CompareIslandMember(const ndIslandMember* const A, const ndIslandMember* const B, void* const context)
 {
-	dInt32 ida = A->m_root->m_index * 2 + ((A->m_body->GetInvMass() == dFloat32(0.0f)) ? 0 : 1);
-	dInt32 idb = B->m_root->m_index * 2 + ((B->m_body->GetInvMass() == dFloat32(0.0f)) ? 0 : 1);
+	//dInt32 ida = A->m_root->m_index * 2 + ((A->m_body->GetInvMass() == dFloat32(0.0f)) ? 0 : 1);
+	//dInt32 idb = B->m_root->m_index * 2 + ((B->m_body->GetInvMass() == dFloat32(0.0f)) ? 0 : 1);
 
+	const dInt32 ida = A->m_root->m_index;
+	const dInt32 idb = B->m_root->m_index;
 	if (ida > idb)
 	{
 		return 1;
 	}
 	else if (ida < idb)
+	{
+		return -1;
+	}
+
+	const dFloat32 invMass0 = A->m_body->GetInvMass();
+	const dFloat32 invMass1 = B->m_body->GetInvMass();
+	if (invMass0 > invMass1)
+	{
+		return 1;
+	}
+	else if (invMass0 < invMass1)
 	{
 		return -1;
 	}
@@ -709,7 +722,7 @@ void ndWorld::ModelUpdate()
 	}
 }
 
-#if 1
+#if 0
 void ndWorld::UpdateSkeletons()
 {
 	D_TRACKTIME();
@@ -1088,10 +1101,10 @@ void ndWorld::UpdateSkeletons()
 						childBody->m_skeletonMark = 0;
 						ndSkeletonContainer::ndNode* const node = skeleton->AddChild((ndJointBilateralConstraint*)constraint, rootNode);
 						queuePool.Push(node);
-						if (rootBody->GetInvMass() == dFloat32(0.0f))
-						{
-							break;
-						}
+						//if (rootBody->GetInvMass() == dFloat32(0.0f))
+						//{
+						//	break;
+						//}
 					}
 				}
 			}

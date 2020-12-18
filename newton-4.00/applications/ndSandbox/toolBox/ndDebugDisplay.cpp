@@ -633,6 +633,7 @@ void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 			glUseProgram(0);
 		}
 
+		
 		void DrawLine(const dVector& p0, const dVector& p1, const dVector& color)
 		{
 			m_line[0].m_x = p0.m_x;
@@ -654,7 +655,6 @@ void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 
 	ndJoindDebug debugJoint(scene);
 	ndWorld* const workd = scene->GetWorld();
-	//const ndJointList& jointList = workd->GetJointList();
 	const ndModelList& modelList = workd->GetModelList();
 	for (ndModelList::dListNode* jointNode = modelList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
 	{
