@@ -645,6 +645,7 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	m_scene->m_lru = m_scene->m_lru + 1;
 	m_scene->SetTimestep(timestep);
 
+	UpdateSkeletons();
 	m_scene->BuildBodyArray();
 
 	ndBodyKinematic* sentinelBody = m_sentinelBody;
@@ -665,7 +666,6 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	m_scene->DeleteDeadContact();
 
 	// update all special models.
-	UpdateSkeletons();
 	UpdatePrelisteners();
 
 	// Update Particle base physics
@@ -899,6 +899,7 @@ void ndWorld::UpdateSkeletons()
 }
 
 #else
+
 void ndWorld::UpdateSkeletons()
 {
 	D_TRACKTIME();
@@ -914,7 +915,6 @@ void ndWorld::UpdateSkeletons()
 			//delete skeleton;
 		}
 		m_skeletonList.RemoveAll();
-
 
 		m_scene->BuildBodyArray();
 		ndDynamicsUpdate& solverUpdate = *m_solver;
@@ -1018,18 +1018,12 @@ void ndWorld::UpdateSkeletons()
 			acc += count;
 		}
 
-
 		class ndQueue : public ndFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>
 		{
 			public:
 			ndQueue()
 				:ndFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>()
-				, m_mod(sizeof(m_array) / sizeof(m_array[0]))
-			{
-				Clear();
-			}
-
-			void Clear()
+				,m_mod(sizeof(m_array) / sizeof(m_array[0]))
 			{
 				m_lastIndex = 0;
 				m_firstIndex = 0;
@@ -1037,8 +1031,15 @@ void ndWorld::UpdateSkeletons()
 
 			void Push(ndSkeletonContainer::ndNode* const node)
 			{
-				m_array[m_firstIndex] = node;
 				m_firstIndex++;
+				const dInt32 count = m_firstIndex - m_lastIndex;
+				dInt32 slot = count - 1;
+				for (; (slot > 0) && (m_array[m_lastIndex + slot - 1]->m_joint->m_solverModel); slot--)
+				{
+					m_array[m_lastIndex + slot] = m_array[m_lastIndex + slot - 1];
+				}
+				m_array[m_lastIndex + slot] = node;
+
 				if (m_firstIndex >= m_mod)
 				{
 					m_firstIndex = 0;
@@ -1082,10 +1083,15 @@ void ndWorld::UpdateSkeletons()
 					if (childKey == key)
 					{
 						dAssert(constraint->m_mark);
+						dAssert(childBody->GetInvMass() != dFloat32(0.0f));
 						constraint->m_mark = 0;
 						childBody->m_skeletonMark = 0;
 						ndSkeletonContainer::ndNode* const node = skeleton->AddChild((ndJointBilateralConstraint*)constraint, rootNode);
 						queuePool.Push(node);
+						if (rootBody->GetInvMass() == dFloat32(0.0f))
+						{
+							break;
+						}
 					}
 				}
 			}
@@ -1114,25 +1120,15 @@ void ndWorld::UpdateSkeletons()
 							constraint1->m_mark = 0;
 
 							ndBodyKinematic* const childBody = (constraint1->GetBody0() == parentBody) ? constraint1->GetBody1() : constraint1->GetBody0();
-							if (!constraint1->m_solverModel)
+							if (childBody->m_skeletonMark && (childBody->GetInvMass() != dFloat32(0.0f)))
 							{
-								//if ((childBody->m_dynamicsLru != lru) && (childBody->GetInvMass().m_w != dFloat32(0.0f))) 
-								if (childBody->m_skeletonMark && (childBody->GetInvMass() != dFloat32(0.0f)))
-								{
-									childBody->m_skeletonMark = 0;
-									ndSkeletonContainer::ndNode* const childNode = skeleton->AddChild(constraint1, parentNode);
-									queuePool.Push(childNode);
-								}
-								else if (loopCount < (sizeof(loopJoints) / sizeof(loopJoints[0])))
-								{
-									loopJoints[loopCount] = (ndJointBilateralConstraint*)constraint1;
-									loopCount++;
-								}
+								childBody->m_skeletonMark = 0;
+								ndSkeletonContainer::ndNode* const childNode = skeleton->AddChild(constraint1, parentNode);
+								queuePool.Push(childNode);
 							}
-							else if ((constraint1->m_solverModel == 1) && (loopCount < (sizeof(loopJoints) / sizeof(loopJoints[0]))))
+							else if (loopCount < (sizeof(loopJoints) / sizeof(loopJoints[0])))
 							{
-								dAssert(constraint1->m_solverModel != 0);
-								loopJoints[loopCount] = constraint1;
+								loopJoints[loopCount] = (ndJointBilateralConstraint*)constraint1;
 								loopCount++;
 							}
 						}
