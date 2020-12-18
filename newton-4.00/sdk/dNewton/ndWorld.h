@@ -26,7 +26,6 @@
 #include "ndJointList.h"
 #include "ndModelList.h"
 #include "ndSkeletonList.h"
-//#include "ndDynamicsUpdate.h"
 #include "ndBodyParticleSetList.h"
 
 class ndWorld;
@@ -112,7 +111,6 @@ class ndWorld: public dClassAlloc
 	private:
 	void ThreadFunction();
 	void PostUpdate(dFloat32 timestep);
-	static dInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void* notUsed);
 	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();
@@ -123,14 +121,6 @@ class ndWorld: public dClassAlloc
 	D_NEWTON_API virtual void UpdateListenersPostTransform();
 
 	private:
-	void ModelUpdate();
-	void ParticleUpdate();
-	void CalculateAverageUpdateTime();
-	void SubStepUpdate(dFloat32 timestep);
-	void LoadSettings(const nd::TiXmlNode* const rootNode);
-	void LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
-	void LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
-
 	class dgSolverProgressiveSleepEntry
 	{
 		public:
@@ -140,6 +130,24 @@ class ndWorld: public dClassAlloc
 		dFloat32 m_maxOmega;
 		dInt32 m_steps;
 	};
+
+	class ndIslandMember
+	{
+		public:
+		ndBodyKinematic* m_root;
+		ndBodyKinematic* m_body;
+	};
+
+	void ModelUpdate();
+	void ParticleUpdate();
+	void CalculateAverageUpdateTime();
+	void SubStepUpdate(dFloat32 timestep);
+	void LoadSettings(const nd::TiXmlNode* const rootNode);
+	void LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
+	void LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
+
+	static dInt32 CompareIslandMember(const ndIslandMember* const A, const ndIslandMember* const B, void* const context);
+	static dInt32 CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void* notUsed);
 
 	ndScene* m_scene;
 	ndBodyDynamic* m_sentinelBody;

@@ -168,9 +168,9 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 
 	BuildBallSocket(scene, dVector(0.0f, 0.0f, 0.0f, 0.0f));
 	BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 0.0f), 100.0f, 0.75f);
-	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 0.0f), 10.0f, 0.5f);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 0.0f), 10.0f, 0.5f);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 0.0f), 100.0f, 0.75f);
+	//BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 0.0f), 10.0f, 0.5f);
+	//BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 0.0f), 10.0f, 0.5f);
+	//BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 0.0f), 100.0f, 0.75f);
 	
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
