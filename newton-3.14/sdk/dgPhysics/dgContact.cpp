@@ -207,7 +207,7 @@ bool dgContact::EstimateCCD (dgFloat32 timestep) const
 		dgInt64 attrib1[16];
 		dgFloat32 penetrations[16];
 		dgFloat32 timeToImpact = timestep;
-		dgTrace (("function %s on file %s is too slow, consider using supsteps\n", __FILE__, __FUNCTION__));
+		dgTrace (("file %s on function %s is too slow, consider using supsteps\n", __FILE__, __FUNCTION__));
 
 		const dgInt32 ccdContactCount = world->CollideContinue(
 			collision0, m_body0->m_matrix, veloc0, omega0, collision1, m_body1->m_matrix, veloc1, omega1,
