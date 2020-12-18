@@ -31,28 +31,6 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 		m_linearAndCone,
 		m_linearPlusAngularFriction, // this is pick mode from screen
 	};
-#if 0
-	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const body, const dVector& attachmentPointInGlobalSpace, ndBodyKinematic* const referenceBody = nullptr);
-	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const body, const dMatrix& attachmentMatrixInGlobalSpace, ndBodyKinematic* const referenceBody = nullptr);
-	D_NEWTON_API virtual ~ndJointKinematicController();
-
-	D_NEWTON_API dMatrix GetBodyMatrix() const;
-	D_NEWTON_API void ResetAutoSleep();
-
-	D_NEWTON_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
-
-	protected:
-	D_NEWTON_API virtual void SubmitConstraints (dFloat32 timestep, int threadIndex);
-	D_NEWTON_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
-	D_NEWTON_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const;
-
-	D_NEWTON_API void SubmitLinearConstraints (const dMatrix& matrix0, const dMatrix& matrix1, dFloat32 timestep);
-
-	
-	void Init(const dMatrix& matrix);
-
-	DECLARE_CUSTOM_JOINT(ndJointKinematicController, dCustomJoint)
-#endif
 
 	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const dVector& attachmentPointInGlobalSpace);
 	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const dMatrix& attachmentMatrixInGlobalSpace);

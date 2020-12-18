@@ -502,7 +502,6 @@ void ndWorld::UpdateSkeletons()
 								}
 								else if ((constraint1->m_solverModel == 1) && (loopCount < (sizeof(loopJoints) / sizeof(loopJoints[0])))) 
 								{
-									dAssert(0);
 									dAssert(constraint1->m_solverModel != 0);
 									loopJoints[loopCount] = constraint1;
 									loopCount++;

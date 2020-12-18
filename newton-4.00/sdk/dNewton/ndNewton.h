@@ -39,12 +39,14 @@
 #include <ndShapeNull.h>
 #include <ndModelList.h>
 #include <ndSceneNode.h>
+#include <ndJointGear.h>
 #include <ndConstraint.h>
 #include <ndJointHinge.h>
 #include <ndBodyNotify.h>
 #include <ndSceneMixed.h>
 #include <ndJointWheel.h>
 #include <ndJointSlider.h>
+#include <ndJointPulley.h>
 #include <ndShapeConvex.h>
 #include <ndBodyDynamic.h>
 #include <ndContactList.h>

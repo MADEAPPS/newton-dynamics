@@ -129,16 +129,49 @@ static void BuildHinge(ndDemoEntityManager* const scene, const dVector& origin, 
 }
 
 
+static void BuildGear(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 diameter)
+{
+	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+
+	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y = floor.m_y;
+
+	matrix.m_posit.m_y += 2.0f;
+
+	ndBodyDynamic* const fixBody = world->GetSentinelBody();
+	ndBodyDynamic* const body0 = MakePrimitive(scene, matrix, shape, mesh, mass);
+
+	matrix.m_posit.m_y += diameter * 1.5f;
+	ndBodyDynamic* const body1 = MakePrimitive(scene, matrix, shape, mesh, mass);
+
+	world->AddJoint(new ndJointHinge(matrix, body0, fixBody));
+	world->AddJoint(new ndJointHinge(matrix, body1, fixBody));
+
+	dVector pin(matrix.m_front);
+	world->AddJoint(new ndJointGear(4.0f, pin, body0, pin, body1));
+
+	mesh->Release();
+}
+
+
 void ndBasicJoints (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene);
 
 	BuildBallSocket(scene, dVector(0.0f, 0.0f, 0.0f, 0.0f));
+	BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 0.0f), 100.0f, 0.75f);
 	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 0.0f), 10.0f, 0.5f);
 	BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 0.0f), 10.0f, 0.5f);
 	BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 0.0f), 100.0f, 0.75f);
-
+	
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);

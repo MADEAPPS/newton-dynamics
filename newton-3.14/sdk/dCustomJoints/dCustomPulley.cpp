@@ -38,7 +38,7 @@ dCustomPulley::dCustomPulley(dFloat gearRatio, const dVector& childPin, const dV
 	CalculateLocalMatrix (pinAndPivot1, dommyMatrix, m_localMatrix1);
 	m_localMatrix1.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
-	// set as kinematoc loop
+	// set as kinematic loop
 	SetSolverModel(1);
 }
 

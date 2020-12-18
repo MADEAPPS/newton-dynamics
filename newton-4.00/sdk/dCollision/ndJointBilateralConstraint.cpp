@@ -454,6 +454,7 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKine
 	,m_body1Node(nullptr)
 {
 	dAssert(m_body0 && m_body1);
+	dAssert(m_body0 != m_body1);
 
 	if (m_body0->GetInvMass() == dFloat32(0.0f)) 
 	{
