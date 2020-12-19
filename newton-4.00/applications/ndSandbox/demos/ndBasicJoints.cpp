@@ -221,9 +221,8 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 	//mesh->SetRenderResolution(500);
 	mesh->Release();
 
-	//const int count = 32;
-	const int count = 1;
-	ndBodyDynamic* bodies[count];
+	const int count = 32;
+	//const int count = 2;
 
 	dBigVector point0;
 	dVector positions[count + 1];
@@ -248,6 +247,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 	scene->AddEntity(rootEntity);
 	instanceMesh->Release();
 
+	ndBodyDynamic* bodies[count];
 	ndPhysicsWorld* const world = scene->GetWorld();
 	for (int i = 0; i < count; i++) 
 	{
@@ -277,38 +277,27 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 		
 		world->AddBody(body);
 		
+		bodies[i] = body;
 		matrix.m_posit = pathBodyMatrix.TransformVector(dVector(positions[i].m_x, positions[i].m_y, positions[i].m_z, 1.0));
-		ndFollowSplinePath* const pathJoint = new ndFollowSplinePath(matrix, body, pathBody);
-		world->AddJoint(pathJoint);
+		world->AddJoint(new ndFollowSplinePath(matrix, body, pathBody));
 		
-		//dVector veloc(dir.Scale(20.0f));
-		//NewtonBodySetVelocity(box, &veloc[0]);
+		dVector veloc(dir.Scale(20.0f));
+		body->SetVelocity(veloc);
 	}
 
-#if 0
 	for (int i = 1; i < count; i++) 
 	{
-		NewtonBody* const box0 = bodies[i - 1];
-		NewtonBody* const box1 = bodies[i];
+		ndBodyDynamic* const box0 = bodies[i - 1];
+		ndBodyDynamic* const box1 = bodies[i - 0];
 
-		dMatrix matrix0;
-		dMatrix matrix1;
-		NewtonBodyGetMatrix(box0, &matrix0[0][0]);
-		NewtonBodyGetMatrix(box1, &matrix1[0][0]);
+		dMatrix matrix0(box0->GetMatrix());
+		dMatrix matrix1(box1->GetMatrix());
 
-		matrix0.m_posit.m_y += attachmentOffset;
-		matrix1.m_posit.m_y += attachmentOffset;
+		//matrix0.m_posit.m_y += attachmentOffset;
+		//matrix1.m_posit.m_y += attachmentOffset;
 
-		//new CustomDistanceRope (matrix1.m_posit, matrix0.m_posit, box1, box0);
-		new dCustomFixDistance(matrix1.m_posit, matrix0.m_posit, box1, box0);
+		world->AddJoint(new ndJointFixDistance(matrix1.m_posit, matrix0.m_posit, box1, box0));
 	}
-
-	void* const aggregate = NewtonCollisionAggregateCreate(scene->GetNewton());
-	for (int i = 0; i < count; i++) {
-		NewtonCollisionAggregateAddBody(aggregate, bodies[i]);
-	}
-	NewtonCollisionAggregateSetSelfCollision(aggregate, false);
-#endif
 }
 
 
@@ -317,15 +306,14 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene);
 
-	
-	//BuildBallSocket(scene, dVector(0.0f, 0.0f, 1.0f, 0.0f));
-	//BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	//BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 0.5f);
-	//BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 10.0f, 0.5f);
-	//BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
+	BuildBallSocket(scene, dVector(0.0f, 0.0f, 1.0f, 0.0f));
+	BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 0.5f);
+	BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 10.0f, 0.5f);
+	BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
 	AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	dQuaternion rot;
-	dVector origin(-10.0f, 20.0f, 0.0f, 0.0f);
+	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

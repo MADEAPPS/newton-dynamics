@@ -488,9 +488,7 @@ void ndSkeletonContainer::SortGraph(ndNode* const root, dInt32& index)
 void ndSkeletonContainer::Finalize(dInt32 loopJointsCount, ndJointBilateralConstraint** const loopJointArray)
 {
 	dAssert(m_nodeList.GetCount() >= 1);
-	
-	//const ndBodyKinematic* const rootBody = m_skeleton->m_body;
-	dAssert(((m_skeleton->m_body->GetInvMass() == dFloat32(0.0f)) && (m_skeleton->m_child->m_sibling == nullptr)) || (m_skeleton->m_body->GetInvMass() != dFloat32(0.0f)));
+	//dAssert(((m_skeleton->m_body->GetInvMass() == dFloat32(0.0f)) && (m_skeleton->m_child->m_sibling == nullptr)) || (m_skeleton->m_body->GetInvMass() != dFloat32(0.0f)));
 	
 	m_nodesOrder = (ndNode**)dMemory::Malloc(m_nodeList.GetCount() * sizeof(ndNode*));
 	
