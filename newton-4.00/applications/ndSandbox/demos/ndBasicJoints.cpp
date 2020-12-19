@@ -259,13 +259,6 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 		//
 		//dVector veloc(dir.Scale(20.0f));
 		//NewtonBodySetVelocity(box, &veloc[0]);
-
-		//ndBodyDynamic* const body = MakePrimitiveBody(scene, matrix, shape, mesh, 1.0f);
-		//ndDemoEntity* const entity = (ndDemoEntity*)body->GetNotifyCallback()->GetUserData();
-		//rootEntity->Attach(entity);
-		//world->AddBody(body);
-
-
 	}
 
 #if 0
