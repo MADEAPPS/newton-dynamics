@@ -20,6 +20,34 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+class ndFollowSplinePath : public ndJointFollowPath
+{
+	public:
+	ndFollowSplinePath(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const pathBody)
+		:ndJointFollowPath(pinAndPivotFrame, child, pathBody)
+	{
+	}
+
+	void GetPointAndTangentAtLocation(const dVector& location, dVector& positOut, dVector& tangentOut) const
+	{
+		dAssert(0);
+		//DemoEntity* const pathEntity = (DemoEntity*)NewtonBodyGetUserData(GetBody1());
+		//DemoBezierCurve* const mesh = (DemoBezierCurve*)pathEntity->GetMesh();
+		//const dBezierSpline& spline = mesh->m_curve;
+		//
+		//dMatrix matrix;
+		//NewtonBodyGetMatrix(GetBody1(), &matrix[0][0]);
+		//
+		//dVector p(matrix.UntransformVector(location));
+		//dBigVector point;
+		//dFloat64 knot = spline.FindClosestKnot(point, p, 4);
+		//dBigVector tangent(spline.CurveDerivative(knot));
+		//tangent = tangent.Scale(1.0 / dSqrt(tangent.DotProduct3(tangent)));
+		//positOut = matrix.TransformVector(point);
+		//tangentOut = tangent;
+	}
+};
+
 static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const dMatrix& matrix, const ndShapeInstance& shape, ndDemoMesh* const mesh, dFloat32 mass)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
