@@ -125,7 +125,8 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 		dFloat32 mouseSpeedX = mouseX - m_mousePosX;
 		dFloat32 mouseSpeedY = mouseY - m_mousePosY;
 
-		if ((ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0))) 
+		//if ((ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0))) 
+		if (ImGui::IsMouseDown(0))
 		{
 			if (mouseSpeedX > 0.0f) 
 			{
