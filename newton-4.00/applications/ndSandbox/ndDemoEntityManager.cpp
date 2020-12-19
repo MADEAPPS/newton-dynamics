@@ -34,9 +34,9 @@
 //#define DEFAULT_SCENE	3		// setting basic player
 //#define DEFAULT_SCENE	4		// particle water volume 
 //#define DEFAULT_SCENE	5		// static mesh collision 
-//#define DEFAULT_SCENE	6		// setting basic joints
+#define DEFAULT_SCENE	6		// setting basic joints
 //#define DEFAULT_SCENE	7		// setting basic vehicle
-#define DEFAULT_SCENE	8		// conservation of angular momentum 
+//#define DEFAULT_SCENE	8		// conservation of angular momentum 
 						 
 // demos forward declaration 
 void ndBasicStacks(ndDemoEntityManager* const scene);

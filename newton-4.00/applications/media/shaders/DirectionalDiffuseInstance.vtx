@@ -34,9 +34,8 @@ void main()
 	posit = vec3 (viewModelMatrix * instancePosit);
 
 	// calculate normal
-	vec3 instanceNormal = vec3 (in_matrixOffset * vec4(in_normal, 0.0));
-	normal = vec3 (viewModelMatrix * (instanceNormal, 0.0));
-	normal = normalize (normal);
+	vec4 instanceNormal = in_matrixOffset * vec4(in_normal, 0.0);
+	normal = vec3(viewModelMatrix * instanceNormal);
 
 	// pass uv and position tp pixel shader
 	uv = in_uv;
