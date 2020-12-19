@@ -149,86 +149,6 @@ void ndDemoMesh::RenderNormals ()
 */
 }
 
-/*
-ndDemoBezierCurve::ndDemoBezierCurve(const dScene* const scene, dScene::dTreeNode* const bezierNode)
-	:ndDemoMeshInterface()
-	,m_curve()
-	,m_renderResolution(50)
-{
-	m_isVisible = false;
-	dLineNodeInfo* const bezeriInfo = (dLineNodeInfo*)scene->GetInfoFromNode(bezierNode);
-	dAssert (bezeriInfo->IsType(dLineNodeInfo::GetRttiType()));
-	m_name = bezeriInfo->GetName();
-
-	m_curve = bezeriInfo->GetCurve();
-}
-*/
-
-ndDemoBezierCurve::ndDemoBezierCurve (const dBezierSpline& curve)
-	:ndDemoMeshInterface()
-	,m_curve(curve)
-	,m_renderResolution(50)
-{
-	m_isVisible = false;
-}
-
-
-dInt32 ndDemoBezierCurve::GetRenderResolution () const
-{
-	return m_renderResolution;
-}
-
-void ndDemoBezierCurve::SetRenderResolution (dInt32 breaks)
-{
-	m_renderResolution = breaks;
-}
-
-
-void ndDemoBezierCurve::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
-{
-	if (m_isVisible) 
-	{
-		ndDemoCamera* const camera = scene->GetCamera();
-		dMatrix viewProjectionMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
-		GLuint shader = scene->GetShaderCache().m_wireFrame;
-
-		glUseProgram(shader);
-
-		GLuint shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
-		GLuint projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
-		glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
-
-		glEnableClientState(GL_VERTEX_ARRAY);
-
-		ndMeshVector m_line[2];
-		GLfloat color[4];
-		color[0] = 1.0f;
-		color[1] = 1.0f;
-		color[2] = 1.0f;
-		color[3] = 1.0f;
-
-		glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), m_line);
-		glUniform4fv(shadeColorLocation, 1, color);
-
-		dFloat64 scale = 1.0f / m_renderResolution;
-		dBigVector p0 (m_curve.CurvePoint(0.0f)) ;
-		for (dInt32 i = 1; i <= m_renderResolution; i ++) 
-		{
-			dBigVector p1 (m_curve.CurvePoint(i * scale));
-			m_line[0].m_x = GLfloat (p0.m_x);
-			m_line[0].m_y = GLfloat (p0.m_y);
-			m_line[0].m_z = GLfloat (p0.m_z);
-			m_line[1].m_x = GLfloat (p1.m_x);
-			m_line[1].m_y = GLfloat (p1.m_y);
-			m_line[1].m_z = GLfloat (p1.m_z);
-			glDrawArrays(GL_LINES, 0, 2);
-			p0 = p1;
-		}
-
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glUseProgram(0);
-	}
-}
 
 /*
 ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<ndDemoEntity*, dScene::dTreeNode*>& boneMap, const ndShaderPrograms& shaderCache)
@@ -558,14 +478,6 @@ dGeometryNodeSkinClusterInfo* ndDemoSkinMesh::FindSkinModifier(dScene* const sce
 		}
 	}
 	return nullptr;
-}
-*/
-
-
-/*
-NewtonMesh* ndDemoSkinMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix)
-{
-	return m_mesh->CreateNewtonMesh(world, meshMatrix);
 }
 */
 
@@ -1327,4 +1239,128 @@ void ndDemoMesh::GetVertexArray(dArray<dVector>& points) const
 
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+ndDemoBezierCurve::ndDemoBezierCurve(const dBezierSpline& curve, const ndShaderPrograms& shaderCache, dInt32 resolution)
+	:ndDemoMeshInterface()
+	,m_curve(curve)
+	,m_renderResolution(0)
+{
+	m_isVisible = false;
+	m_shader = shaderCache.m_wireFrame;
+	m_vertexBuffer = 0;
+	m_vetextArrayBuffer = 0;
+	m_shadeColorLocation = 0;
+	m_projectionViewModelMatrixLocation = 0;
+	SetRenderResolution(resolution);
+}
+
+ndDemoBezierCurve::~ndDemoBezierCurve()
+{
+	if (m_vetextArrayBuffer)
+	{
+		glDeleteBuffers(1, &m_vertexBuffer);
+		glDeleteVertexArrays(1, &m_vetextArrayBuffer);
+	}
+}
+
+dInt32 ndDemoBezierCurve::GetRenderResolution() const
+{
+	return m_renderResolution;
+}
+
+void ndDemoBezierCurve::SetRenderResolution(dInt32 breaks)
+{
+	if (breaks != m_renderResolution)
+	{
+		m_renderResolution = breaks;
+		if (m_vetextArrayBuffer)
+		{
+			glDeleteBuffers(1, &m_vertexBuffer);
+			glDeleteVertexArrays(1, &m_vetextArrayBuffer);
+		}
+
+		dFloat64 scale = 1.0f / m_renderResolution;
+		dArray<ndMeshVector> points(m_renderResolution + 1);
+		for (dInt32 i = 0; i < m_renderResolution; i++)
+		{
+			dBigVector p(m_curve.CurvePoint(i * scale));
+			points.PushBack(ndMeshVector(GLfloat(p.m_x), GLfloat(p.m_y), GLfloat(p.m_z)));
+		}
+		points.PushBack(points[0]);
+
+		glGenVertexArrays(1, &m_vetextArrayBuffer);
+		glBindVertexArray(m_vetextArrayBuffer);
+
+		glGenBuffers(1, &m_vertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+		glBufferData(GL_ARRAY_BUFFER, (m_renderResolution + 1) * sizeof(ndMeshVector), &points[0], GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshVector), (void*)0);
+
+		glBindVertexArray(0);
+		glDisableVertexAttribArray(0);
+
+		glUseProgram(m_shader);
+
+		m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
+		m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
+
+		//m_textureLocation = glGetUniformLocation(m_shader, "texture");
+		//m_transparencyLocation = glGetUniformLocation(m_shader, "transparency");
+		//m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+		//m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+		//m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+		//m_directionalLightDirLocation = glGetUniformLocation(m_shader, "directionalLightDir");
+		//
+		//m_materialAmbientLocation = glGetUniformLocation(m_shader, "material_ambient");
+		//m_materialDiffuseLocation = glGetUniformLocation(m_shader, "material_diffuse");
+		//m_materialSpecularLocation = glGetUniformLocation(m_shader, "material_specular");
+
+		glUseProgram(0);
+	}
+}
+
+void ndDemoBezierCurve::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+{
+	if (m_isVisible)
+	{
+		ndDemoCamera* const camera = scene->GetCamera();
+		dMatrix viewProjectionMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
+
+		GLfloat color[4];
+		color[0] = 1.0f;
+		color[1] = 1.0f;
+		color[2] = 1.0f;
+		color[3] = 1.0f;
+
+		glUseProgram(m_shader);
+		glUniform4fv(m_shadeColorLocation, 1, color);
+		glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+
+		//ndMeshVector m_line[2];
+		//glEnableClientState(GL_VERTEX_ARRAY);
+		//glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), m_line);
+		//dFloat64 scale = 1.0f / m_renderResolution;
+		//dBigVector p0(m_curve.CurvePoint(0.0f));
+		//for (dInt32 i = 1; i <= m_renderResolution; i++)
+		//{
+		//	dBigVector p1(m_curve.CurvePoint(i * scale));
+		//	m_line[0].m_x = GLfloat(p0.m_x);
+		//	m_line[0].m_y = GLfloat(p0.m_y);
+		//	m_line[0].m_z = GLfloat(p0.m_z);
+		//	m_line[1].m_x = GLfloat(p1.m_x);
+		//	m_line[1].m_y = GLfloat(p1.m_y);
+		//	m_line[1].m_z = GLfloat(p1.m_z);
+		//	glDrawArrays(GL_LINES, 0, 2);
+		//	p0 = p1;
+		//}
+		//glDisableClientState(GL_VERTEX_ARRAY);
+
+		glBindVertexArray(m_vetextArrayBuffer);
+		glDrawArrays(GL_LINE_STRIP, 0, m_renderResolution + 1);
+		glBindVertexArray(0);
+		glUseProgram(0);
+	}
 }

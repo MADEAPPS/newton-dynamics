@@ -187,11 +187,11 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 
 	spline.CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
 
-	ndDemoBezierCurve* const mesh = new ndDemoBezierCurve(spline);
+	ndDemoBezierCurve* const mesh = new ndDemoBezierCurve(spline, scene->GetShaderCache(), 500);
 	rollerCosterPath->SetMesh(mesh, dGetIdentityMatrix());
 
 	mesh->SetVisible(true);
-	mesh->SetRenderResolution(500);
+	//mesh->SetRenderResolution(500);
 	mesh->Release();
 
 	//const int count = 32;

@@ -101,7 +101,6 @@ class ndDemoMeshInterface: public dClassAlloc, public dRefCounter<ndDemoMeshInte
 
 	virtual void Render (ndDemoEntityManager* const scene, const dMatrix& modelMatrix) = 0;
 	virtual void RenderTransparency(ndDemoEntityManager* const scene, const dMatrix& modelMatrix) {}
-	//virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix) = 0;
 
 	dString m_name;
 	bool m_isVisible;
@@ -128,7 +127,6 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	virtual void Render (ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 	virtual void RenderTransparency(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 	void OptimizeForRender(const dArray<ndMeshPointUV>& points, const dArray<dInt32>& indices);
-	//virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
 
 	void GetVertexArray(dArray<dVector>& points) const;
 
@@ -190,19 +188,21 @@ class ndDemoSkinMesh: public ndDemoMeshInterface
 class ndDemoBezierCurve: public ndDemoMeshInterface
 {
 	public:
-	ndDemoBezierCurve(const dBezierSpline& curve);
-	//ndDemoBezierCurve(const dScene* const scene, dScene::dTreeNode* const meshNode);
-
+	ndDemoBezierCurve(const dBezierSpline& curve, const ndShaderPrograms& shaderCache, dInt32 resolution);
+	~ndDemoBezierCurve();
+	
 	int GetRenderResolution() const;
 	void SetRenderResolution(int breaks);
 
 	virtual void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
-
-
-	//virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
-
+	
 	dBezierSpline m_curve;
-	int m_renderResolution;
+	dInt32 m_renderResolution;
+	GLuint m_shader;
+	GLuint m_vertexBuffer;
+	GLuint m_vetextArrayBuffer;
+	GLuint m_shadeColorLocation;
+	GLuint m_projectionViewModelMatrixLocation;
 };
 
 class ndFlatShadedDebugMesh: public ndDemoMeshInterface
