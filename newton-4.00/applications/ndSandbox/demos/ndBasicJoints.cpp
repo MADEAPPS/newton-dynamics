@@ -285,7 +285,7 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	//BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 0.5f);
 	//BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 10.0f, 0.5f);
 	//BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
-	AddPathFollow(scene, dVector(20.0f, 0.0f, 0.0f, 1.0f));
+	AddPathFollow(scene, dVector(80.0f, 0.0f, 0.0f, 1.0f));
 	
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);

@@ -189,7 +189,7 @@ void ndDemoBezierCurve::Render(ndDemoEntityManager* const scene, const dMatrix& 
 	if (m_isVisible) 
 	{
 		ndDemoCamera* const camera = scene->GetCamera();
-		dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+		dMatrix viewProjectionMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 		GLuint shader = scene->GetShaderCache().m_wireFrame;
 
 		glUseProgram(shader);
