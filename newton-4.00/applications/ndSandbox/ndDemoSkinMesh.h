@@ -1,0 +1,55 @@
+/* Copyright (c) <2003-2019> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+
+#ifndef _D_DEMO_SKIN_MESH_H_
+#define _D_DEMO_SKIN_MESH_H_
+
+#include "ndSandboxStdafx.h"
+#include "ndDemoMeshInterface.h"
+
+class ndDemoMesh;
+class ndDemoEntity;
+class ndShaderPrograms;
+class ndDemoEntityManager;
+
+
+class ndDemoSkinMesh: public ndDemoMeshInterface
+{
+	public:
+	struct dWeightBoneIndex
+	{
+		int m_boneIndex[4];
+	};
+
+	ndDemoSkinMesh(const ndDemoSkinMesh& clone, ndDemoEntity* const owner);
+	//ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<ndDemoEntity*, dScene::dTreeNode*>& boneMap, const ndShaderPrograms& shaderCache);
+	~ndDemoSkinMesh();
+
+	void Render (ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+	//NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
+
+	protected: 
+	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner);
+	int CalculateMatrixPalette(dMatrix* const bindMatrix) const;
+	void ConvertToGlMatrix(int count, const dMatrix* const bindMatrix, GLfloat* const glMatrices) const;
+	//dGeometryNodeSkinClusterInfo* FindSkinModifier(dScene* const scene, dScene::dTreeNode* const meshNode) const;
+	void OptimizeForRender(const ndDemoSubMesh& segment, const dVector* const pointWeights, const dWeightBoneIndex* const pointSkinBone) const;
+
+	ndDemoMesh* m_mesh;
+	ndDemoEntity* m_entity; 
+	dMatrix* m_bindingMatrixArray;
+	int m_nodeCount; 
+	int m_shader;
+};
+
+#endif 
+
+

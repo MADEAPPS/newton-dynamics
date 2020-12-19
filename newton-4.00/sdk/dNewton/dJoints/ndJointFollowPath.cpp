@@ -42,33 +42,34 @@ void ndJointFollowPath::GetPathTarget (dVector& posit, dVector& tangent) const
 //void ndJointFollowPath::SubmitConstraints (dFloat32 timestep, int threadIndex)
 void ndJointFollowPath::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dAssert(0);
-	//dMatrix matrix0;
-	//dMatrix matrix1;
-	//dVector pathPosit(0.0f);
-	//dVector pathTangent(0.0f);
-	//	
-	//// Get the global matrices of each rigid body.
-	//CalculateGlobalMatrix (matrix0, matrix1);
-	//
-	//GetPointAndTangentAtLocation(matrix0.m_posit, pathPosit, pathTangent);
-	//if (pathTangent.DotProduct3(matrix0.m_front) < 0.0f) {
-	//	pathTangent = pathTangent.Scale (-1.0f);
-	//}
-	//matrix1 = dGrammSchmidt(pathTangent);
-	//matrix1.m_posit = pathPosit;
-	//matrix1.m_posit.m_w = 1.0f;
-	//
-	//// Restrict the movement on the pivot point along all tree the normal and bi normal of the path
-	//const dVector& p0 = matrix0.m_posit;
-	//const dVector& p1 = matrix1.m_posit;
-	//dVector p00 (p0 + matrix0.m_front.Scale(50.0f));
-	//dVector p11 (p1 + matrix1.m_front.Scale(50.0f));
-	//
-	//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1[1][0]);
-	//NewtonUserJointAddLinearRow (m_joint, &p0[0], &p1[0], &matrix1[2][0]);
-	//NewtonUserJointAddLinearRow(m_joint, &p00[0], &p11[0], &matrix1[1][0]);
-	//NewtonUserJointAddLinearRow(m_joint, &p00[0], &p11[0], &matrix1[2][0]);
+	dMatrix matrix0;
+	dMatrix matrix1;
+	dVector pathPosit(dVector::m_zero);
+	dVector pathTangent(dVector::m_zero);
+		
+	// Get the global matrices of each rigid body.
+	CalculateGlobalMatrix (matrix0, matrix1);
+	
+	GetPointAndTangentAtLocation(matrix0.m_posit, pathPosit, pathTangent);
+	if (pathTangent.DotProduct(matrix0.m_front).GetScalar() < dFloat32 (0.0f)) 
+	{
+		pathTangent = pathTangent.Scale (-1.0f);
+	}
+
+	matrix1 = dMatrix(pathTangent);
+	matrix1.m_posit = pathPosit;
+	matrix1.m_posit.m_w = 1.0f;
+	
+	// Restrict the movement on the pivot point along all tree the normal and bi normal of the path
+	const dVector& p0 = matrix0.m_posit;
+	const dVector& p1 = matrix1.m_posit;
+	dVector p00 (p0 + matrix0.m_front.Scale(50.0f));
+	dVector p11 (p1 + matrix1.m_front.Scale(50.0f));
+	
+	AddLinearRowJacobian(desc, p0, p1, matrix1[1]);
+	AddLinearRowJacobian(desc, p0, p1, matrix1[2]);
+	AddLinearRowJacobian(desc, p00, p11, matrix1[1]);
+	AddLinearRowJacobian(desc, p00, p11, matrix1[2]);
 }
 
 

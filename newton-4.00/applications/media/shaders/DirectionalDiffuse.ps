@@ -39,7 +39,6 @@ vec3 FlashLightShading(vec3 normalDir)
 	return diffuseCoeff * max (dot(normalDir, lightDir), 0.0) * attenuation;
 }
 
-
 vec3 PhongDirectionalShading(vec3 normalDir)
 {
 	vec3 specularDir = normalize (-posit);

@@ -17,34 +17,33 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndDemoSplinePathMesh.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
 class ndFollowSplinePath : public ndJointFollowPath
 {
 	public:
-	ndFollowSplinePath(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const pathBody)
+	ndFollowSplinePath(const dMatrix& pinAndPivotFrame, ndBodyDynamic* const child, ndBodyDynamic* const pathBody)
 		:ndJointFollowPath(pinAndPivotFrame, child, pathBody)
 	{
 	}
 
 	void GetPointAndTangentAtLocation(const dVector& location, dVector& positOut, dVector& tangentOut) const
 	{
-		dAssert(0);
-		//DemoEntity* const pathEntity = (DemoEntity*)NewtonBodyGetUserData(GetBody1());
-		//DemoBezierCurve* const mesh = (DemoBezierCurve*)pathEntity->GetMesh();
-		//const dBezierSpline& spline = mesh->m_curve;
-		//
-		//dMatrix matrix;
-		//NewtonBodyGetMatrix(GetBody1(), &matrix[0][0]);
-		//
-		//dVector p(matrix.UntransformVector(location));
-		//dBigVector point;
-		//dFloat64 knot = spline.FindClosestKnot(point, p, 4);
-		//dBigVector tangent(spline.CurveDerivative(knot));
-		//tangent = tangent.Scale(1.0 / dSqrt(tangent.DotProduct3(tangent)));
-		//positOut = matrix.TransformVector(point);
-		//tangentOut = tangent;
+		ndDemoEntity* const pathEntity = (ndDemoEntity*)GetBody1()->GetNotifyCallback()->GetUserData();
+		ndDemoSplinePathMesh* const mesh = (ndDemoSplinePathMesh*)pathEntity->GetMesh();
+		const dBezierSpline& spline = mesh->m_curve;
+		
+		dMatrix matrix(GetBody1()->GetMatrix());
+		
+		dVector p(matrix.UntransformVector(location));
+		dBigVector point;
+		dFloat64 knot = spline.FindClosestKnot(point, p, 4);
+		dBigVector tangent(spline.CurveDerivative(knot));
+		tangent = tangent.Scale(1.0 / dSqrt(tangent.DotProduct(tangent).GetScalar()));
+		positOut = matrix.TransformVector(point);
+		tangentOut = tangent;
 	}
 };
 
@@ -215,7 +214,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 
 	spline.CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
 
-	ndDemoBezierCurve* const mesh = new ndDemoBezierCurve(spline, scene->GetShaderCache(), 500);
+	ndDemoSplinePathMesh* const mesh = new ndDemoSplinePathMesh(spline, scene->GetShaderCache(), 500);
 	rollerCosterPath->SetMesh(mesh, dGetIdentityMatrix());
 
 	mesh->SetVisible(true);
@@ -223,7 +222,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 	mesh->Release();
 
 	//const int count = 32;
-	const int count = 2;
+	const int count = 1;
 	ndBodyDynamic* bodies[count];
 
 	dBigVector point0;
@@ -277,14 +276,11 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 		body->SetGyroMode(true);
 		
 		world->AddBody(body);
-
-		//NewtonBodySetMatrix(box, &matrix1[0][0]);
-		//DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(box);
-		//ent->ResetMatrix(*scene, matrix1);
-		//
-		//matrix.m_posit = pathBodyMatrix.TransformVector(dVector(positions[i].m_x, positions[i].m_y, positions[i].m_z, 1.0));
-		//new MyPathFollow(matrix, box, pathBody);
-		//
+		
+		matrix.m_posit = pathBodyMatrix.TransformVector(dVector(positions[i].m_x, positions[i].m_y, positions[i].m_z, 1.0));
+		ndFollowSplinePath* const pathJoint = new ndFollowSplinePath(matrix, body, pathBody);
+		world->AddJoint(pathJoint);
+		
 		//dVector veloc(dir.Scale(20.0f));
 		//NewtonBodySetVelocity(box, &veloc[0]);
 	}
@@ -324,7 +320,7 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	
 	//BuildBallSocket(scene, dVector(0.0f, 0.0f, 1.0f, 0.0f));
 	//BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	//BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 0.5f);
+	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 0.5f);
 	//BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 10.0f, 0.5f);
 	//BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
 	AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));

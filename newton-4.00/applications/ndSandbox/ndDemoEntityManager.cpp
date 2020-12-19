@@ -18,6 +18,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndPhysicsUtils.h"
 #include "ndDebugDisplay.h"
+#include "ndDemoDebugMesh.h"
 #include "ndTargaToOpenGl.h"
 #include "ndShaderPrograms.h"
 #include "ndDemoEntityManager.h"
@@ -33,9 +34,9 @@
 //#define DEFAULT_SCENE	3		// setting basic player
 //#define DEFAULT_SCENE	4		// particle water volume 
 //#define DEFAULT_SCENE	5		// static mesh collision 
-#define DEFAULT_SCENE	6		// setting basic joints
+//#define DEFAULT_SCENE	6		// setting basic joints
 //#define DEFAULT_SCENE	7		// setting basic vehicle
-//#define DEFAULT_SCENE	8		// conservation of angular momentum 
+#define DEFAULT_SCENE	8		// conservation of angular momentum 
 						 
 // demos forward declaration 
 void ndBasicStacks(ndDemoEntityManager* const scene);
@@ -237,7 +238,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
 	m_showModelsDebugInfo = true;
-	m_collisionDisplayMode = 3;
+	//m_collisionDisplayMode = 3;
 	//m_collisionDisplayMode = 2;
 	//m_showListenersDebugInfo = true;
 	m_synchronousPhysicsUpdate = false;

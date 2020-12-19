@@ -33,7 +33,6 @@ class ndDemoMeshIntance : public ndDemoMesh
 	GLuint m_matrixOffsetBuffer;
 };
 
-
 class ndDemoInstanceEntity: public ndDemoEntity
 {
 	public:
