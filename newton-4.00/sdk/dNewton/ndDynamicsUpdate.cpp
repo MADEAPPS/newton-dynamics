@@ -269,6 +269,26 @@ void ndDynamicsUpdate::BuildIsland()
 			jointCountSpans[key] = entry + 1;
 		}
 
+		#ifdef _DEBUG
+		for (dInt32 i = 1; i < m_activeJointCount; i++)
+		{
+			ndConstraint* const joint0 = jointArray[i - 1];
+			ndConstraint* const joint1 = jointArray[i - 0];
+			dAssert(joint0->m_rowCount >= joint1->m_rowCount);
+			dAssert(!(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting));
+			dAssert(!(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting));
+		}
+		for (dInt32 i = m_activeJointCount + 1; i < jointArray.GetCount(); i++)
+		{
+			ndConstraint* const joint0 = jointArray[i - 1];
+			ndConstraint* const joint1 = jointArray[i - 0];
+			dAssert(joint0->m_rowCount >= joint1->m_rowCount);
+			dAssert(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting);
+			dAssert(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting);
+		}
+
+		#endif
+
 		// re use body array and working buffer 
 		m_internalForces.SetCount(bodyArray.GetCount());
 
