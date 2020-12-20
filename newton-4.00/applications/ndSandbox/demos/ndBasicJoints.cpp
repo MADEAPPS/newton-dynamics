@@ -293,8 +293,8 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 		dMatrix matrix0(box0->GetMatrix());
 		dMatrix matrix1(box1->GetMatrix());
 
-		//matrix0.m_posit.m_y += attachmentOffset;
-		//matrix1.m_posit.m_y += attachmentOffset;
+		matrix0.m_posit.m_y += attachmentOffset;
+		matrix1.m_posit.m_y += attachmentOffset;
 
 		world->AddJoint(new ndJointFixDistance(matrix1.m_posit, matrix0.m_posit, box1, box0));
 	}
