@@ -27,6 +27,10 @@
 #include "ndDynamicsUpdate.h"
 #include "ndJointBilateralConstraint.h"
 
+#define D_USE_SOA_METHOD
+#define D_SOA_WORD_GROUP_SIZE	8 
+#define D_RADIX_BITS			5
+
 ndDynamicsUpdate::ndDynamicsUpdate(ndWorld* const world)
 	:m_velocTol(dFloat32(1.0e-8f))
 	,m_islands(1024)
@@ -44,6 +48,7 @@ ndDynamicsUpdate::ndDynamicsUpdate(ndWorld* const world)
 	,m_invTimestepRK(dFloat32(0.0f))
 	,m_solverPasses(0)
 	,m_maxRowsCount(0)
+	,m_activeJointCount(0)
 	,m_unConstrainedBodyCount(0)
 {
 	memset(m_hasJointFeeback, 0, sizeof(m_hasJointFeeback));
@@ -158,12 +163,13 @@ void ndDynamicsUpdate::BuildIsland()
 			const dInt32 test = body0->m_solverSleep1 & body1->m_solverSleep1;
 			if (!test)
 			{
+				const dInt32 resting = (body0->m_equilibrium & body1->m_equilibrium) ? 1 : 0;
 				const dInt32 rows = joint->GetRowsCount();
 				joint->m_rowCount = rows;
 				joint->m_rowStart = rowCount;
 				rowCount += rows;
-
-				const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
+				dAssert(rows > 0);
+				
 				body0->m_bodyIsConstrained = 1;
 				body0->m_resting = body0->m_resting & resting;
 
@@ -213,6 +219,55 @@ void ndDynamicsUpdate::BuildIsland()
 		}
 
 		jointArray.SetCount(currentActive);
+
+		dInt32 jointCountSpans[1 << (D_RADIX_BITS + 2)];
+		m_leftHandSide.SetCount(m_leftHandSide.GetCount() + 1);
+		ndConstraint** const sortBuffer = (ndConstraint**)&m_leftHandSide[0];
+		memset(jointCountSpans, 0, sizeof(jointCountSpans));
+		
+		dInt32 activeJointCount = 0;
+		for (dInt32 i = 0; i < jointArray.GetCount(); i++)
+		{
+			ndConstraint* const joint = jointArray[i];
+			sortBuffer[i] = joint;
+
+			const ndBodyKinematic* const body0 = joint->GetBody0();
+			const ndBodyKinematic* const body1 = joint->GetBody1();
+			const dInt32 resting = (body0->m_resting & body1->m_resting) ? 1 : 0;
+			activeJointCount += (1 - resting);
+			
+			const dInt32 rowKey = (1 << D_RADIX_BITS) - joint->m_rowCount;
+			const dInt32 restingKey = resting << (D_RADIX_BITS + 1);
+			const dInt32 key = restingKey + rowKey;
+			dAssert(key < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
+			jointCountSpans[key] ++;
+		}
+		
+		dInt32 acc = 0;
+		for (dInt32 i = 0; i < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]); i++)
+		{
+			const dInt32 val = jointCountSpans[i];
+			jointCountSpans[i] = acc;
+			acc += val;
+		}
+		
+		m_activeJointCount = activeJointCount;
+		for (dInt32 i = 0; i < jointArray.GetCount(); i++)
+		{
+			ndConstraint* const joint = sortBuffer[i];
+			const ndBodyKinematic* const body0 = joint->GetBody0();
+			const ndBodyKinematic* const body1 = joint->GetBody1();
+			const dInt32 resting = (body0->m_resting & body1->m_resting) ? 1 : 0;
+		
+			const dInt32 rowKey = (1 << D_RADIX_BITS) - joint->m_rowCount;
+			const dInt32 restingKey = resting << (D_RADIX_BITS + 1);
+			const dInt32 key = restingKey + rowKey;
+			dAssert(key < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
+		
+			const dInt32 entry = jointCountSpans[key];
+			jointArray[entry] = joint;
+			jointCountSpans[key] = entry + 1;
+		}
 
 		// re use body array and working buffer 
 		m_internalForces.SetCount(bodyArray.GetCount());
@@ -827,19 +882,27 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
 
 					const ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
-					if (!body->m_resting)
-					{
-						body->m_veloc += velocStep.m_linear;
-						body->m_omega += velocStep.m_angular;
-					}
-					else
-					{
-						const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
-						const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
-						const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
-						const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
-						body->m_resting &= equilibrium;
-					}
+					//if (!body->m_resting)
+					//{
+					//	body->m_veloc += velocStep.m_linear;
+					//	body->m_omega += velocStep.m_angular;
+					//}
+					//else
+					//{
+					//	const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
+					//	const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
+					//	const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
+					//	const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
+					//	body->m_resting &= equilibrium;
+					//}
+					body->m_veloc += velocStep.m_linear;
+					body->m_omega += velocStep.m_angular;
+					const dVector velocStep2(body->m_veloc.DotProduct(body->m_veloc));
+					const dVector omegaStep2(body->m_omega.DotProduct(body->m_omega));
+					const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
+					const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
+					body->m_resting &= equilibrium;
+
 					dAssert(body->m_veloc.m_w == dFloat32(0.0f));
 					dAssert(body->m_omega.m_w == dFloat32(0.0f));
 				}
