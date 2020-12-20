@@ -1389,47 +1389,6 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
 		if (isCollidable) 
 		{
-			//dUnsigned32 group0_ID = dUnsigned32(body0->m_bodyGroupId);
-			//dUnsigned32 group1_ID = dUnsigned32(body1->m_bodyGroupId);
-			//if (group1_ID < group0_ID) {
-			//	dSwap(group0_ID, group1_ID);
-			//}
-			//dUnsigned32 key = (group1_ID << 16) + group0_ID;
-			//const ntBodyMaterialList* const materialList = m_world;
-			//dAssert(materialList->Find(key));
-			//const ntContactMaterial* const material = &materialList->Find(key)->GetInfo();
-			//if (material->m_flags & ntContactMaterial::m_collisionEnable) 
-			//{
-			//	dInt32 isBody0Kinematic = body0->IsRTTIType(ntBody::m_kinematicBodyRTTI);
-			//	dInt32 isBody1Kinematic = body1->IsRTTIType(ntBody::m_kinematicBodyRTTI);
-			//
-			//	const dInt32 kinematicTest = !((isBody0Kinematic && isBody1Kinematic) || ((isBody0Kinematic && body0->IsCollidable()) || (isBody1Kinematic && body1->IsCollidable())));
-			//	const dInt32 collisionTest = kinematicTest && !(body0->m_isdead | body1->m_isdead) && !(body0->m_equilibrium & body1->m_equilibrium);
-			//	if (collisionTest) 
-			//	{
-			//		const dInt32 isSofBody0 = body0->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
-			//		const dInt32 isSofBody1 = body1->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
-			//
-			//		if (isSofBody0 || isSofBody1) 
-			//		{
-			//			m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body0 = body0;
-			//			m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body1 = body1;
-			//			m_pendingSoftBodyPairsCount++;
-			//		}
-			//		else 
-			//		{
-			//			ndContactList& contactList = *m_world;
-			//			dgAtomicExchangeAndAdd(&contactList.m_contactCountReset, 1);
-			//			if (contactList.m_contactCount < contactList.GetElementsCapacity()) 
-			//			{
-			//				contact = new (m_world->m_allocator) ndContact(m_world, material, body0, body1);
-			//				dAssert(contact);
-			//				contactList.Push(contact);
-			//			}
-			//		}
-			//	}
-			//}
-
 			m_contactList.CreateContact(body0, body1);
 		}
 	}
@@ -1756,7 +1715,20 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 		contact->m_sceneLru = m_lru;
 	}
 
-	contact->m_isDead = contact->m_isDead | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
+	if (!contact->m_isDead && (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active))
+	{
+		//dInt32 id0 = contact->GetBody0()->m_uniqueID;
+		//dInt32 id1 = contact->GetBody1()->m_uniqueID;
+		//dAssert(!(((id0 == 10) && (id1 == 11)) || ((id0 == 11) && (id1 == 10))));
+
+		const ndSceneBodyNode* const bodyNode0 = contact->GetBody0()->m_sceneBodyBodyNode;
+		const ndSceneBodyNode* const bodyNode1 = contact->GetBody1()->m_sceneBodyBodyNode;
+		if (!dOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox))
+		{
+			contact->m_isDead = 1;
+		}
+	}
+	//contact->m_isDead = contact->m_isDead | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
 }
 
 void ndScene::BuildContactArray()

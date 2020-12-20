@@ -342,8 +342,8 @@ inline void ndBodyKinematic::PrepareStep(dInt32 index)
 	m_rank = 0;
 	m_index = index;
 	m_resting = 1;
-	m_solveActive0 = 0;
-	m_solveActive1 = 0;
+	m_solverSleep0 = 1;
+	m_solverSleep1 = 1;
 	m_islandSleep = m_equilibrium;
 	m_weigh = dFloat32(0.0f);
 	m_islandParent = this;

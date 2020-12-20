@@ -1213,7 +1213,6 @@ void ndDemoEntityManager::DrawDebugShapes()
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
 		const ndShapeInstance& shapeInstance = body->GetCollisionShape();
-		//if (!shapeInstance->GetShape()->GetAsShapeNull())
 		const ndShape* const key = shapeInstance.GetShape();
 		if (!((ndShape*)key)->GetAsShapeNull())
 		{

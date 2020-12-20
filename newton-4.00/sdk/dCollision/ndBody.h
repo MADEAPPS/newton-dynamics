@@ -96,12 +96,12 @@ class ndBody: public dClassAlloc
 		dUnsigned32 m_flags;
 		struct
 		{
-			dUnsigned32 m_solveActive0 : 1;
-			dUnsigned32 m_solveActive1 : 1;
 			dUnsigned32 m_resting : 1;
 			dUnsigned32 m_autoSleep : 1;
-			dUnsigned32 m_equilibrium : 1;
 			dUnsigned32 m_islandSleep : 1;
+			dUnsigned32 m_solverSleep0 : 1;
+			dUnsigned32 m_solverSleep1 : 1;
+			dUnsigned32 m_equilibrium : 1;
 			dUnsigned32 m_gyroTorqueOn : 1;
 			dUnsigned32 m_skeletonMark : 1;
 			dUnsigned32 m_contactTestOnly : 1;

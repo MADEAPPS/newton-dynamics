@@ -162,7 +162,6 @@ ndBodyKinematic::~ndBodyKinematic()
 
 void ndBodyKinematic::SetSleepState(bool state)
 {
-	//m_sleeping = state ? 1 : 0;
 	m_equilibrium = state ? 1 : 0;
 	if ((m_invMass.m_w > dFloat32(0.0f)) && (m_veloc.DotProduct(m_veloc).GetScalar() < dFloat32(1.0e-10f)) && (m_omega.DotProduct(m_omega).GetScalar() < dFloat32(1.0e-10f))) 
 	{
@@ -209,13 +208,6 @@ void ndBodyKinematic::AttachContact(ndContact* const contact)
 	{
 		m_equilibrium = 0;
 	}
-	//else if (m_equilibrium)
-	//{
-	//	dInt32 mask = m_veloc.TestZero().GetSignMask() | m_omega.TestZero().GetSignMask();
-	//	if (mask != 0x0f)
-	//	{
-	//	}
-	//}
 
 	m_contactList.AttachContact(contact);
 }
@@ -223,7 +215,6 @@ void ndBodyKinematic::AttachContact(ndContact* const contact)
 void ndBodyKinematic::DetachContact(ndContact* const contact)
 {
 	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
-	//m_equilibrium = 0;
 	m_equilibrium = contact->m_body0->m_equilibrium & contact->m_body1->m_equilibrium;
 	m_contactList.DetachContact(contact);
 }
@@ -231,28 +222,6 @@ void ndBodyKinematic::DetachContact(ndContact* const contact)
 ndJointList::dListNode* ndBodyKinematic::AttachJoint(ndJointBilateralConstraint* const joint)
 {
 	m_equilibrium = 0;
-#ifdef _DEBUG
-	//dAssert((joint->GetBody0() == this) || (joint->GetBody1() == this));
-	//dInt32 id0 = joint->GetBody0()->m_uniqueID;
-	//dInt32 id1 = joint->GetBody1()->m_uniqueID;
-	//if (id0 > id1)
-	//{
-	//	dSwap(id0, id1);
-	//}
-	//
-	//for (ndJointList::dListNode* node = m_jointList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	dAssert(0);
-	//	ndJointBilateralConstraint* const joint1 = node->GetInfo();
-	//	dInt32 jd0 = joint1->GetBody0()->m_uniqueID;
-	//	dInt32 jd1 = joint1->GetBody1()->m_uniqueID;
-	//	if (jd0 > jd1)
-	//	{
-	//		dSwap(jd0, jd1);
-	//	}
-	//	dAssert(!((id0 == jd0) && (id1 == jd1)));
-	//}
-#endif
 	return m_jointList.Append(joint);
 }
 

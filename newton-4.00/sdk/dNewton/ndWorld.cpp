@@ -666,8 +666,8 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	sentinelBody->m_resting = 1;
 	sentinelBody->m_autoSleep = 1;
 	sentinelBody->m_equilibrium = 1;
-	sentinelBody->m_solveActive0 = 0;
-	sentinelBody->m_solveActive1 = 0;
+	sentinelBody->m_solverSleep0 = 1;
+	sentinelBody->m_solverSleep1 = 1;
 	m_scene->GetActiveBodyArray().PushBack(sentinelBody);
 
 	ApplyExternalForces();
