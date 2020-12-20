@@ -901,7 +901,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 					const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
 					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
 					ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
-#if 0
+
 					if (!body->m_resting)
 					{
 						body->m_veloc += velocStep.m_linear;
@@ -915,20 +915,6 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 						const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
 						body->m_resting &= equilibrium;
 					}
-#else
-					velocStep.m_linear += body->m_veloc;
-					velocStep.m_angular += body->m_omega;
-					const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
-					const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
-					const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
-					const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
-					if (!equilibrium)
-					{
-						body->m_veloc = velocStep.m_linear;
-						body->m_omega = velocStep.m_angular;
-						body->m_resting = 0;
-					}
-#endif
 
 					dAssert(body->m_veloc.m_w == dFloat32(0.0f));
 					dAssert(body->m_omega.m_w == dFloat32(0.0f));
