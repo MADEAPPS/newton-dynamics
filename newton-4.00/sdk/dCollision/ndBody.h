@@ -96,6 +96,8 @@ class ndBody: public dClassAlloc
 		dUnsigned32 m_flags;
 		struct
 		{
+			dUnsigned32 m_solveActive0 : 1;
+			dUnsigned32 m_solveActive1 : 1;
 			dUnsigned32 m_resting : 1;
 			dUnsigned32 m_autoSleep : 1;
 			dUnsigned32 m_equilibrium : 1;
