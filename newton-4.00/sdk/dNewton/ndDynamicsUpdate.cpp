@@ -900,28 +900,30 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 					const ndJacobian& forceAndTorque = internalForces[index];
 					const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
 					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
-
 					const ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
-					//if (!body->m_resting)
-					//{
-					//	body->m_veloc += velocStep.m_linear;
-					//	body->m_omega += velocStep.m_angular;
-					//}
-					//else
-					//{
-					//	const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
-					//	const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
-					//	const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
-					//	const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
-					//	body->m_resting &= equilibrium;
-					//}
-					body->m_veloc += velocStep.m_linear;
-					body->m_omega += velocStep.m_angular;
-					const dVector velocStep2(body->m_veloc.DotProduct(body->m_veloc));
-					const dVector omegaStep2(body->m_omega.DotProduct(body->m_omega));
-					const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
-					const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
-					body->m_resting &= equilibrium;
+#if 1
+					if (!body->m_resting)
+					{
+						body->m_veloc += velocStep.m_linear;
+						body->m_omega += velocStep.m_angular;
+					}
+					else
+					{
+						const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
+						const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
+						const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
+						const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
+						body->m_resting &= equilibrium;
+					}
+#else
+					//body->m_veloc += velocStep.m_linear;
+					//body->m_omega += velocStep.m_angular;
+					//const dVector velocStep2(body->m_veloc.DotProduct(body->m_veloc));
+					//const dVector omegaStep2(body->m_omega.DotProduct(body->m_omega));
+					//const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
+					//const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
+					//body->m_resting &= equilibrium;
+#endif
 
 					dAssert(body->m_veloc.m_w == dFloat32(0.0f));
 					dAssert(body->m_omega.m_w == dFloat32(0.0f));
