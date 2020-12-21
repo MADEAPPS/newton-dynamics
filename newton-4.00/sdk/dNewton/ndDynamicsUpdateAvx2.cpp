@@ -311,10 +311,6 @@ dInt32 ndDynamicsUpdateAvx2::CompareIslands(const ndIsland* const islandA, const
 void ndDynamicsUpdateAvx2::SortJoints()
 {
 	D_TRACKTIME();
-
-static int xxx;
-xxx++;
-
 	ndScene* const scene = m_world->GetScene();
 	const ndJointList& jointList = m_world->GetJointList();
 	ndConstraintArray& jointArray = scene->GetActiveContactArray();
@@ -359,7 +355,6 @@ xxx++;
 		}
 	}
 
-	dInt32 rowCount = 0;
 	dInt32 currentActive = jointArray.GetCount();
 	for (dInt32 i = 0; i < currentActive; i++)
 	{
@@ -372,8 +367,6 @@ xxx++;
 			const dInt32 resting = (body0->m_equilibrium & body1->m_equilibrium) ? 1 : 0;
 			const dInt32 rows = joint->GetRowsCount();
 			joint->m_rowCount = rows;
-			joint->m_rowStart = rowCount;
-			rowCount += rows;
 			dAssert(rows > 0);
 
 			body0->m_bodyIsConstrained = 1;
@@ -424,6 +417,8 @@ xxx++;
 		}
 	}
 
+	dAssert(currentActive <= jointArray.GetCount());
+	ndConstraint** const jointPtr = &jointArray[0];
 	jointArray.SetCount(currentActive);
 
 	dInt32 jointCountSpans[1 << (D_RADIX_BITS + 2)];
@@ -499,9 +494,10 @@ xxx++;
 	{
 		const dInt32 mask = -dInt32(D_SOA_WORD_GROUP_SIZE);
 		const dInt32 base = m_activeJointCount & mask;
-		const dInt32 count = m_activeJointCount - base;
-		ndConstraint** const array = &jointArray[base];
-		for (dInt32 j = 1; j <= count; j++)
+		const dInt32 count = jointPtr[base + D_SOA_WORD_GROUP_SIZE - 1] ? D_SOA_WORD_GROUP_SIZE : jointArray.GetCount() - base;
+		dAssert(count <= D_SOA_WORD_GROUP_SIZE);
+		ndConstraint** const array = &jointPtr[base];
+		for (dInt32 j = 1; j < count; j++)
 		{
 			dInt32 slot = j;
 			ndConstraint* const joint = array[slot];
@@ -517,7 +513,7 @@ xxx++;
 	const dInt32 jointCount = jointArray.GetCount();
 	const dInt32 soaJointCount = (jointCount + D_SOA_WORD_GROUP_SIZE - 1) & mask;
 	dAssert(jointArray.GetCapacity() > soaJointCount);
-	ndConstraint** const jointPtr = &jointArray[0];
+	
 	for (dInt32 i = jointCount; i < soaJointCount; i++)
 	{
 		jointPtr[i] = nullptr;
@@ -534,14 +530,22 @@ xxx++;
 	}
 	m_soaMassMatrix.SetCount(soaJointRowCount);
 
+	dInt32 rowCount = 0;
+	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
+	{
+		ndConstraint* const joint = jointArray[i];
+		joint->m_rowStart = rowCount;
+		rowCount += joint->m_rowCount;
+	}
+
 	#ifdef _DEBUG
 	for (dInt32 i = 0; i < jointCount; i += D_SOA_WORD_GROUP_SIZE)
 	{
-		const dInt32 count = jointArray[D_SOA_WORD_GROUP_SIZE - 1] ? D_SOA_WORD_GROUP_SIZE : jointCount - i;
+		const dInt32 count = jointPtr[i + D_SOA_WORD_GROUP_SIZE - 1] ? D_SOA_WORD_GROUP_SIZE : jointCount - i;
 		for (dInt32 j = 1; j < count; j++)
 		{
-			ndConstraint* const joint0 = jointArray[i - 1];
-			ndConstraint* const joint1 = jointArray[i - 0];
+			ndConstraint* const joint0 = jointArray[i + j - 1];
+			ndConstraint* const joint1 = jointArray[i + j - 0];
 			dAssert(joint0->m_rowCount >= joint1->m_rowCount);
 		}
 	}
@@ -652,7 +656,7 @@ void ndDynamicsUpdateAvx2::BuildIsland()
 	{
 		D_TRACKTIME();
 		SortJoints();
-
+		SortIslands();
 	}
 }
 

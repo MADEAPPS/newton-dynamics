@@ -207,7 +207,7 @@ void ndDynamicsUpdate::SortJoints()
 			i--;
 		}
 	}
-
+	dAssert(currentActive <= jointArray.GetCount());
 	jointArray.SetCount(currentActive);
 
 	dInt32 jointCountSpans[1 << (D_RADIX_BITS + 2)];
