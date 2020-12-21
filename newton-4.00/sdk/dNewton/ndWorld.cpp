@@ -28,6 +28,7 @@
 #include "ndSkeletonList.h"
 #include "ndDynamicsUpdate.h"
 #include "ndBodyParticleSet.h"
+#include "ndDynamicsUpdateAvx2.h"
 #include "ndJointBilateralConstraint.h"
 
 ndWorld::ndWorld()
@@ -49,7 +50,7 @@ ndWorld::ndWorld()
 	,m_averageFramesCount(dFloat32(0.0f))
 	,m_lastExecutionTime(dFloat32(0.0f))
 	,m_subSteps(1)
-	,m_solverMode(0)
+	,m_solverMode(ndStandardSolver)
 	,m_solverIterations(4)
 	,m_frameIndex(0)
 	,m_collisionUpdate(true)
@@ -136,6 +137,29 @@ ndWorld::~ndWorld()
 	delete m_solver;
 	ClearCache();
 }
+
+void ndWorld::SelectSolver(dInt32 solverMode)
+{
+	if (solverMode != m_solverMode)
+	{
+		delete m_solver;
+		switch (solverMode)
+		{
+			case ndSimdAvx2Solver:
+				m_solverMode = (ndSolverModes)solverMode;
+				m_solver = new ndDynamicsUpdateAvx2(this);
+				break;
+
+			case ndStandardSolver:
+			default:
+				m_solverMode = (ndSolverModes)solverMode;
+				m_solver = new ndDynamicsUpdate(this);
+				break;
+		}
+	}
+	
+}
+
 
 void ndWorld::ClearCache()
 {
@@ -690,14 +714,6 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 
 	// calculate internal forces, integrate bodies and update matrices.
 	dAssert(m_solver);
-	//if (m_solverMode == 0)
-	//{
-	//	ndDynamicsUpdate::Update();
-	//} 
-	//else
-	//{
-	//	ndDynamicsUpdate::UpdateAvx2();
-	//}
 	m_solver->Update();
 
 	UpdatePostlisteners();

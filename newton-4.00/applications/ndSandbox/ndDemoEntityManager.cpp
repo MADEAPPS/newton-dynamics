@@ -227,7 +227,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_autoSleepMode = false;
-	//m_solverMode = 1;
+	m_solverMode = 0;
 	//m_sceneType = 1;
 	//m_solverPasses = 4;
 	//m_workerThreads = 4;
@@ -541,27 +541,11 @@ void ndDemoEntityManager::ApplyMenuOptions()
 	}
 
 	m_world->SelectSolver(m_solverMode);
-
-	//NewtonSelectBroadphaseAlgorithm(m_world, m_sceneType);
-	//NewtonSetParallelSolverOnLargeIsland(m_world, m_solveLargeIslandInParallel ? 1 : 0);
-	//
-	//void* plugin = nullptr;
-	//if (m_currentPlugin) {
-	//	int index = 1;
-	//	for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
-	//		if (index == m_currentPlugin) {
-	//			plugin = ptr;
-	//		}
-	//		index++;
-	//	}
-	//}
-	//NewtonSelectPlugin(m_world, plugin);
 }
 
 void ndDemoEntityManager::ShowMainMenuBar()
 {
-	int mainMenu = 0;
-	//dAssert (m_autoSleepMode);
+	dInt32 mainMenu = 0;
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File")) 

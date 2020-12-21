@@ -44,6 +44,12 @@ D_MSV_NEWTON_ALIGN_32
 class ndWorld: public dClassAlloc
 {
 	public:
+	enum ndSolverModes
+	{	
+		ndStandardSolver,
+		ndSimdAvx2Solver,
+	};
+
 	D_NEWTON_API ndWorld();
 	D_NEWTON_API virtual ~ndWorld();
 
@@ -64,7 +70,7 @@ class ndWorld: public dClassAlloc
 	void SetSubSteps(dInt32 subSteps);
 
 	dInt32 GetSelectedSolver() const;
-	void SelectSolver(dInt32 solver);
+	D_NEWTON_API void SelectSolver(dInt32 solver);
 
 	D_NEWTON_API bool AddBody(ndBody* const body);
 	D_NEWTON_API void RemoveBody(ndBody* const body);
@@ -170,7 +176,7 @@ class ndWorld: public dClassAlloc
 	dgSolverProgressiveSleepEntry m_sleepTable[D_SLEEP_ENTRIES];
 
 	dInt32 m_subSteps;
-	dInt32 m_solverMode;
+	ndSolverModes m_solverMode;
 	dInt32 m_solverIterations;
 	dUnsigned32 m_frameIndex;
 	bool m_collisionUpdate;
@@ -178,6 +184,7 @@ class ndWorld: public dClassAlloc
 	friend class ndScene;
 	friend class ndDynamicsUpdate;
 	friend class ndWorldMixedScene;
+	friend class ndDynamicsUpdateAvx2;
 	friend class ndWorldSegregatedScene;
 } D_GCC_NEWTON_ALIGN_32;
 
@@ -307,11 +314,6 @@ inline void ndWorld::Update(dFloat32 timestep)
 inline dInt32 ndWorld::GetSelectedSolver() const
 {
 	return m_solverMode;
-}
-
-inline void ndWorld::SelectSolver(dInt32 solver)
-{
-	m_solverMode = dClamp(solver, 0, 1);
 }
 
 #endif

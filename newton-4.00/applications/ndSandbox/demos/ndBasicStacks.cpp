@@ -84,7 +84,6 @@ static void BuildPyramid(ndDemoEntityManager* const scene, dFloat32 mass, const 
 	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
 	dVector floor(FindFloor(*world, origin + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	//matrix.m_posit.m_y = floor.m_y + size.m_y * 0.5f;
 	matrix.m_posit.m_y = floor.m_y;
 	
 	dFloat32 stepz = size.m_z + 1.0e-2f;
@@ -94,6 +93,7 @@ static void BuildPyramid(ndDemoEntityManager* const scene, dFloat32 mass, const 
 	dFloat32 z0 = matrix.m_posit.m_z - stepz * count / 2;
 
 	matrix.m_posit.m_y = y0;
+	matrix.m_posit.m_y -= 0.01f;
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);

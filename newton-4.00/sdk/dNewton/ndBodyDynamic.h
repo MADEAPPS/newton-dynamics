@@ -76,7 +76,9 @@ class ndBodyDynamic: public ndBodyKinematic
 	dVector m_impulseTorque;
 	dVector m_savedExternalForce;
 	dVector m_savedExternalTorque;
+
 	friend class ndDynamicsUpdate;
+	friend class ndDynamicsUpdateAvx2;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline dVector ndBodyDynamic::GetForce() const

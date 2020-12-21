@@ -24,16 +24,13 @@
 
 #include "ndNewtonStdafx.h"
 
-//#define D_BODY_LRU_STEP				2	
-//#define D_MAX_SKELETON_JOINT_COUNT	256
-//#define D_MAX_CONTINUE_COLLISON_STEPS	8
-
 //#define D_PROFILE_JOINTS
+#define D_RADIX_BITS					5
 #define D_SMALL_ISLAND_COUNT			32
 #define	D_FREEZZING_VELOCITY_DRAG		dFloat32 (0.9f)
 #define	D_SOLVER_MAX_ERROR				(D_FREEZE_MAG * dFloat32 (0.5f))
 
-//#define D_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
+#define D_DEFAULT_BUFFER_SIZE			1024
 
 // the solver is a RK order 4, but instead of weighting the intermediate derivative by the usual 1/6, 1/3, 1/3, 1/6 coefficients
 // I am using 1/4, 1/4, 1/4, 1/4.
@@ -77,14 +74,20 @@ class ndDynamicsUpdate: public dClassAlloc
 
 	public:
 	ndDynamicsUpdate(ndWorld* const world);
-	~ndDynamicsUpdate();
+	virtual ~ndDynamicsUpdate();
 
-	protected:
-	void Update();
-	void UpdateAvx2();
+	//ndConstraintArray& GetJointArray() { return m_jointArray;}
+	dArray<ndJacobian>& GetInternalForces() { return m_internalForces; }
+	dArray<ndLeftHandSide>& GetLeftHandSide() { return m_leftHandSide; }
+	dArray<ndRightHandSide>& GetRightHandSide() { return m_rightHandSide; }
+	dInt32 GetUnconstrainedBodyCount() const {return m_unConstrainedBodyCount;}
+	dArray<ndBodyKinematic*>& GetBodyIslandOrder() { return m_bodyIslandOrder; }
+
+	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
 
 	private:
-	void Clear();
+	void SortJoints();
+	void SortIslands();
 	void BuildIsland();
 	void InitWeights();
 	void InitBodyArray();
@@ -102,34 +105,17 @@ class ndDynamicsUpdate: public dClassAlloc
 	void DetermineSleepStates();
 	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
-
-	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
 	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const context);
-	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
-	// Avx2 solver implementation
-	void BuildIslandAvx2();
-	void InitWeightsAvx2();
-	void InitBodyArrayAvx2();
-	void InitSkeletonsAvx2();
-	void IntegrateBodiesAvx2();
-	void UpdateSkeletonsAvx2();
-	void CalculateForcesAvx2();
-	void InitJacobianMatrixAvx2();
-	void UpdateForceFeedbackAvx2();
-	void DetermineSleepStatesAvx2();
-	void CalculateJointsForceAvx2();
-	void IntegrateBodiesVelocityAvx2();
-	void CalculateJointsAccelerationAvx2();
-	void IntegrateUnconstrainedBodiesAvx2();
-	void UpdateIslandStateAvx2(const ndIsland& island);
-	static dInt32 CompareIslandsAvx2(const ndIsland* const islandA, const ndIsland* const islandB, void* const context);
+	protected:
+	void Clear();
+	virtual void Update();
+	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
 	dVector m_velocTol;
 	dArray<ndIsland> m_islands;
 	dArray<ndBodyKinematic*> m_bodyIslandOrder;
 	dArray<ndJacobian> m_internalForces;
-	ndConstraintArray m_jointArray;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
 	dInt32 m_hasJointFeeback[D_MAX_THREADS_COUNT];
@@ -145,14 +131,12 @@ class ndDynamicsUpdate: public dClassAlloc
 	dUnsigned32 m_maxRowsCount;
 	dInt32 m_activeJointCount;
 	dInt32 m_unConstrainedBodyCount;
-	
 
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const
 {
-	//memset(buffer, 0, count * sizeof(ndJacobian));
 	const dVector zero(dVector::m_zero);
 	dVector* const dst = &buffer[0].m_linear;
 	for (dInt32 i = 0; i < count; i++)
@@ -173,5 +157,6 @@ inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* cons
 	}
 	return node;
 }
+
 #endif
 

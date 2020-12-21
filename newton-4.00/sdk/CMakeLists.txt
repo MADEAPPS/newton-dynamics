@@ -53,7 +53,7 @@ else()
 		dNewton/dJoints/*.cpp)
 
 	if(MSVC)
-		 set_source_files_properties(dNewton/ndSolverAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
+		 set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
 	endif(MSVC)
 
 	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})

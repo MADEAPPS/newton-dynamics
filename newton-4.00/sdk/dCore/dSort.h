@@ -176,7 +176,6 @@ void dgRadixSort(T* const array, T* const tmpArray, dInt32 elements, dInt32 radi
 template <class T>
 void dSort(T* const array, dInt32 elements, dInt32(*compare) (const T* const  A, const T* const B, void* const context), void* const context = nullptr)
 {
-	D_TRACKTIME();
 	const dInt32 batchSize = 8;
 	dInt32 stack[1024][2];
 

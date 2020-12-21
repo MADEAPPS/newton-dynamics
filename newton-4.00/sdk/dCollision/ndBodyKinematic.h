@@ -210,6 +210,7 @@ class ndBodyKinematic: public ndBody
 	friend class ndSceneBodyNode;
 	friend class ndDynamicsUpdate;
 	friend class ndSkeletonContainer;
+	friend class ndDynamicsUpdateAvx2;
 	friend class ndJointBilateralConstraint;
 } D_GCC_NEWTON_ALIGN_32;
 
