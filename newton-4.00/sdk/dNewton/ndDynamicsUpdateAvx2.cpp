@@ -1083,7 +1083,6 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			m_leftHandSide = &me->GetLeftHandSide()[0];
 			m_rightHandSide = &me->GetRightHandSide()[0];
-
 			
 			ndConstraint** const jointArray = &m_owner->GetActiveContactArray()[0];
 			const dInt32 jointCount = m_owner->GetActiveContactArray().GetCount();
@@ -1428,47 +1427,6 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 		{
 			scene->SubmitJobs<ndInitJacobianAccumulatePartialForces>();
 		}
-/*
-		if (m_activeJointCount - m_jointArray.GetCount())
-		{
-			const dInt32 mask = -dInt32(D_SOA_WORD_GROUP_SIZE);
-			const dInt32 base = m_activeJointCount & mask;
-			const dInt32 count = m_activeJointCount - base;
-			ndConstraint** const array = &m_jointArray[base];
-			for (dInt32 j = 1; j <= count; j++)
-			{
-				dInt32 slot = j;
-				ndConstraint* const joint = array[slot];
-				for (; (slot > 0) && (array[slot - 1]->m_rowCount < joint->m_rowCount); slot--)
-				{
-					array[slot] = array[slot - 1];
-				}
-				array[slot] = joint;
-			}
-		}
-
-		const dInt32 mask = -dInt32(D_SOA_WORD_GROUP_SIZE);
-		const dInt32 jointCount = m_jointArray.GetCount();
-		const dInt32 soaJointCount = (jointCount + D_SOA_WORD_GROUP_SIZE - 1) & mask;
-		dAssert(m_jointArray.GetCapacity() > soaJointCount);
-		ndConstraint** const jointPtr = &m_jointArray[0];
-		for (dInt32 i = jointCount; i < soaJointCount; i++)
-		{
-			//m_jointArray.PushBack(nullptr);
-			jointPtr[i] = nullptr;
-		}
-				
-		dInt32 soaJointRowCount = 0;
-		const dInt32 soaJointCountBatches = soaJointCount / D_SOA_WORD_GROUP_SIZE;
-		m_soaJointRows.SetCount(soaJointCountBatches);
-		for (dInt32 i = 0; i < soaJointCountBatches; i++)
-		{
-			const ndConstraint* const joint = m_jointArray[i * D_SOA_WORD_GROUP_SIZE];
-			m_soaJointRows[i] = soaJointRowCount;
-			soaJointRowCount += joint->m_rowCount;
-		}
-		m_soaMassMatrix.SetCount(soaJointRowCount);
-*/
 		scene->SubmitJobs<ndTransposeMassMatrixAvx2>();
 	}
 }
@@ -1935,7 +1893,6 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 				accNorm = accNorm.MulAdd(a, a);
 				const ndSoaFloat deltaForce(f - row->m_force);
 
-				//row->m_force = f;
 				normalForce[j + 1] = f;
 
 				const ndSoaFloat deltaForce0(deltaForce * preconditioner0);
@@ -2144,8 +2101,6 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 
 			const dInt32* const soaJointRows = &me->m_soaJointRows[0];
 			ndSoaMatrixElement* const soaMassMatrix = &me->m_soaMassMatrix[0];
-			
-static int xxxx;
 
 			dInt32 temp = -1;
 			m_mask = ndSoaFloat(*(dFloat32*)(&temp));
@@ -2156,23 +2111,6 @@ static int xxxx;
 			{
 				accNorm += JointForce(i * D_SOA_WORD_GROUP_SIZE, &soaMassMatrix[soaJointRows[i]]);
 			}
-
-//dTrace(("%d: ", xxxx));
-//for (int i = 0; i < jointCount; i++)
-//{
-//	const ndConstraint* const joint = jointArray[i];
-//	ndBodyKinematic* const body0 = joint->GetBody0();
-//	ndBodyKinematic* const body1 = joint->GetBody1();
-//	const dInt32 m0 = body0->m_index;
-//	const dInt32 m1 = body1->m_index;
-//
-//	const dInt32 rowStart = joint->m_rowStart;
-//	ndRightHandSide* const rhs = &m_rightHandSide[rowStart];
-//	dTrace (("(%d %d %f) ", m0, m1, rhs->m_force))
-//	//dTrace(("(%d %d %f) ", body0->m_uniqueID, body1->m_uniqueID, rhs->m_force))
-//}
-//dTrace(("\n"));
-//xxxx++;
 
 			dFloat32* const accelNorm = (dFloat32*)m_context;
 			accelNorm[threadIndex] = accNorm;
