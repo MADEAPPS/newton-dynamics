@@ -120,7 +120,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 
 	dVector origin1(0.0f, 0.0f, 4.0f, 0.0f);
-	//BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+	BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 15);
 
 	origin1.m_z = 0.0f;
 	origin1.m_x += 4.0f;
@@ -131,7 +131,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	//BuildPyramid(scene, 1.0f, dVector::m_zero, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
 
 	dQuaternion rot;
-	dVector origin(-10.0f, 1.0f, 0.0f, 0.0f);
-	//dVector origin(-2.0f, 1.0f, 0.0f, 0.0f);
+	//dVector origin(-10.0f, 1.0f, 0.0f, 0.0f);
+	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
