@@ -136,6 +136,14 @@ namespace ndAvx2
 			return _mm256_max_ps(m_type, A.m_type);
 		}
 
+		D_INLINE ndSoaFloat Select(const ndSoaFloat& data, const ndSoaFloat& mask) const
+		{
+			// (((b ^ a) & mask)^a)
+			//return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
+			return  _mm256_xor_ps(m_type, _mm256_and_ps(mask.m_type, _mm256_xor_ps(m_type, data.m_type)));
+		}
+
+
 		D_INLINE dFloat32 AddHorizontal() const
 		{
 			__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
