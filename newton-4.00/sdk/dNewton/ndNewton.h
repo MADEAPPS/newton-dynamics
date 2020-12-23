@@ -71,6 +71,7 @@
 #include <ndMultiBodyVehicleGearBox.h>
 #include <ndJointKinematicController.h>
 #include <ndMultiBodyVehicleDifferential.h>
+#include <ndMultiBodyVehicleDifferentialAxle.h>
 
 #endif 
 
