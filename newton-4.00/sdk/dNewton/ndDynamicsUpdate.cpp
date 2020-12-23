@@ -123,7 +123,10 @@ void ndDynamicsUpdate::SortJoints()
 		if (!resting)
 		{
 			body0->m_solverSleep0 = 0;
-			body1->m_solverSleep0 = 0;
+			if (body1->GetInvMass() > dFloat32(0.0f))
+			{
+				body1->m_solverSleep0 = 0;
+			}
 		}
 	}
 
@@ -139,7 +142,10 @@ void ndDynamicsUpdate::SortJoints()
 		if (!test)
 		{
 			body0->m_solverSleep1 = 0;
-			body1->m_solverSleep1 = 0;
+			if (body1->GetInvMass() > dFloat32(0.0f))
+			{
+				body1->m_solverSleep1 = 0;
+			}
 		}
 	}
 

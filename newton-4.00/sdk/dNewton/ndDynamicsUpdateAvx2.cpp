@@ -335,7 +335,10 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		if (!resting)
 		{
 			body0->m_solverSleep0 = 0;
-			body1->m_solverSleep0 = 0;
+			if (body1->GetInvMass() > dFloat32(0.0f))
+			{
+				body1->m_solverSleep0 = 0;
+			}
 		}
 	}
 
@@ -351,7 +354,10 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		if (!test)
 		{
 			body0->m_solverSleep1 = 0;
-			body1->m_solverSleep1 = 0;
+			if (body1->GetInvMass() > dFloat32(0.0f))
+			{
+				body1->m_solverSleep1 = 0;
+			}
 		}
 	}
 
@@ -416,6 +422,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 			i--;
 		}
 	}
+//dTrace(("%d %d\n", currentActive, jointArray.GetCount()));
 
 	dAssert(currentActive <= jointArray.GetCount());
 	ndConstraint** const jointPtr = &jointArray[0];
