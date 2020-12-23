@@ -29,14 +29,16 @@
 
 #define DG_BILATERAL_CONTRAINT_DOF	8
 
+enum ndJointBilateralSolverModel
+{
+	m_primaryOpenLoop,
+	m_secundaryOpenLoop,
+	m_closeLoop,
+};
+
 D_MSV_NEWTON_ALIGN_32
 class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 {
-	//virtual dFloat32 GetStiffness() const;
-	//virtual void SetStiffness(dFloat32 stiffness);
-	//virtual dFloat32 GetMassScaleBody0() const;
-	//virtual dFloat32 GetMassScaleBody1() const;
-
 	public:
 	D_COLLISION_API ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
 	D_COLLISION_API virtual ~ndJointBilateralConstraint();

@@ -21,13 +21,13 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointVehicleMotor.h"
+#include "ndMultiBodyVehicleMotor.h"
 
 // approximately the a 10 cylinder 450 hp viper engine fore the late nineties
 #define D_ENGINE_NOMINAL_TORQUE (dFloat32(600.0f))
 #define D_ENGINE_NOMINAL_RPM (dFloat32(9000.0f / 9.55f))
 
-ndJointVehicleMotor::ndJointVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis)
+ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis)
 	:ndJointBilateralConstraint(3, motor, chassis, motor->GetMatrix())
 	,m_omega(dFloat32 (0.0f))
 	,m_maxOmega(D_ENGINE_NOMINAL_RPM)
@@ -40,17 +40,17 @@ ndJointVehicleMotor::ndJointVehicleMotor(ndBodyKinematic* const motor, ndBodyKin
 	//m_engineTorque = 10.0f;
 }
 
-void ndJointVehicleMotor::SetGasValve(dFloat32 gasValveSeconds)
+void ndMultiBodyVehicleMotor::SetGasValve(dFloat32 gasValveSeconds)
 {
 	m_gasValve = dAbs(gasValveSeconds);
 }
 
-void ndJointVehicleMotor::SetStart(bool startkey)
+void ndMultiBodyVehicleMotor::SetStart(bool startkey)
 {
 	m_startEngine = startkey;
 }
 
-void ndJointVehicleMotor::AlignMatrix()
+void ndMultiBodyVehicleMotor::AlignMatrix()
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -73,22 +73,22 @@ void ndJointVehicleMotor::AlignMatrix()
 	//m_body0->SetOmega(omega);
 }
 
-void ndJointVehicleMotor::SetMaxRpm(dFloat32 maxSpeed)
+void ndMultiBodyVehicleMotor::SetMaxRpm(dFloat32 maxSpeed)
 {
 	dAssert(0);
 }
 
-void ndJointVehicleMotor::SetEngineTorque(dFloat32 torque)
+void ndMultiBodyVehicleMotor::SetEngineTorque(dFloat32 torque)
 {
 	dAssert(0);
 }
 
-void ndJointVehicleMotor::SetThrottle(dFloat32 param)
+void ndMultiBodyVehicleMotor::SetThrottle(dFloat32 param)
 {
 	m_throttle = dClamp(param, dFloat32(0.0f), dFloat32(1.0f));
 }
 
-dFloat32 ndJointVehicleMotor::CalculateAcceleration(ndConstraintDescritor& desc)
+dFloat32 ndMultiBodyVehicleMotor::CalculateAcceleration(ndConstraintDescritor& desc)
 {
 	const dVector& omega0 = m_body0->GetOmega();
 	const dVector& omega1 = m_body1->GetOmega();
@@ -112,7 +112,7 @@ dFloat32 ndJointVehicleMotor::CalculateAcceleration(ndConstraintDescritor& desc)
 	return (m_omega - desiredSpeed) * desc.m_invTimestep;
 }
 
-void ndJointVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
+void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;

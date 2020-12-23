@@ -19,16 +19,16 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_JOINT_VEHICLE_MOTOR_H__
-#define __D_JOINT_VEHICLE_MOTOR_H__
+#ifndef __D_MULTIBODY_VEHICLE_MOTOR_H__
+#define __D_MULTIBODY_VEHICLE_MOTOR_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-class ndJointVehicleMotor: public ndJointBilateralConstraint
+class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 {
 	public:
-	D_NEWTON_API ndJointVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis);
+	D_NEWTON_API ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis);
 
 	dFloat32 GetRpm() const;
 	dFloat32 GetMaxRpm() const;
@@ -56,17 +56,17 @@ class ndJointVehicleMotor: public ndJointBilateralConstraint
 	friend class ndMultiBodyVehicle;
 };
 
-inline dFloat32 ndJointVehicleMotor::GetRpm() const
+inline dFloat32 ndMultiBodyVehicleMotor::GetRpm() const
 {
 	return m_omega * dFloat32 (9.55f);
 }
 
-inline dFloat32 ndJointVehicleMotor::GetMaxRpm() const
+inline dFloat32 ndMultiBodyVehicleMotor::GetMaxRpm() const
 {
 	return m_maxOmega * dFloat32(9.55f);
 }
 
-inline bool ndJointVehicleMotor::GetStart() const
+inline bool ndMultiBodyVehicleMotor::GetStart() const
 {
 	return m_startEngine;
 }

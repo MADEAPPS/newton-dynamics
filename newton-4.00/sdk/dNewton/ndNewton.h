@@ -63,12 +63,14 @@
 #include <ndJointDoubleHinge.h>
 #include <ndJointFixDistance.h>
 #include <ndMultiBodyVehicle.h>
-#include <ndJointVehicleMotor.h>
 #include <ndSkeletonContainer.h>
 #include <ndDynamicsUpdateAvx2.h>
 #include <ndJointBallAndSocket.h>
 #include <ndBodyParticleSetList.h>
+#include <ndMultiBodyVehicleMotor.h>
+#include <ndMultiBodyVehicleGearBox.h>
 #include <ndJointKinematicController.h>
+#include <ndMultiBodyVehicleDifferential.h>
 
 #endif 
 

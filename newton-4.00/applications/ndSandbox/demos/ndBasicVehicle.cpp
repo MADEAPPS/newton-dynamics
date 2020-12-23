@@ -105,7 +105,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		SetAsHandBrake(rl_tire);
 
 		// add the slip differential
-		ndDifferential* const differential = AddDifferential(world, 20.0f, 0.25f, rl_tire, rr_tire);
+		ndMultiBodyVehicleDifferential* const differential = AddDifferential(world, 20.0f, 0.25f, rl_tire, rr_tire);
 
 		// add a motor
 		AddMotor(world, 20, 0.25f, differential);
@@ -313,7 +313,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		//dMultiBodyVehicleEngine* const engine = m_player->GetEngineControl() ? m_player->GetEngineControl()->GetEngine() : NULL;
 
-		ndJointVehicleMotor* const motor = m_motor;
+		ndMultiBodyVehicleMotor* const motor = m_motor;
 		dAssert(motor);
 		
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
