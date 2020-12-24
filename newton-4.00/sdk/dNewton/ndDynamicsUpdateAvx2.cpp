@@ -1947,8 +1947,8 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 					a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_z, forceM1.m_angular.m_z);
 
 					ndSoaFloat a(a0 + a1);
-					a = row->m_coordenateAccel.MulSub(row->m_force, row->m_diagDamp) - a;
 					const ndSoaFloat force(normalForce[j + 1]);
+					a = row->m_coordenateAccel.MulSub(force, row->m_diagDamp) - a;
 					ndSoaFloat f(force.MulAdd(row->m_invJinvMJt, a));
 
 					const ndSoaFloat frictionNormal(normalForce, row->m_normalForceIndex);
