@@ -466,10 +466,11 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKine
 
 	m_mark = 0;
 	m_maxDof = maxDof;
-	m_solverModel = 0;
+	m_rowIsMotor = 0;
 	m_isInSkeleton = 0;
 	m_enableCollision = 0;
-	m_rowIsMotor = 0;
+	m_solverModel = m_primaryOpenLoop;
+
 	m_defualtDiagonalRegularizer = dFloat32(0.0f);
 	m_maxAngleError = dFloat32(5.0f) * dDegreeToRad;
 	//SetStiffness(dFloat32(0.0f));

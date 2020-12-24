@@ -907,7 +907,7 @@ void ndDynamicsUpdateAvx2::GetJacobianDerivatives(ndConstraint* const joint)
 	{
 		ndJointBilateralConstraint* const bilareral = joint->GetAsBilateral();
 		dAssert(bilareral);
-		if (!bilareral->m_isInSkeleton && (bilareral->m_solverModel == 3))
+		if (!bilareral->m_isInSkeleton && (bilareral->GetSolverModel() == m_secundaryCloseLoop))
 		{
 			ndSkeletonContainer* const skeleton0 = bilareral->m_body0->GetSkeleton();
 			ndSkeletonContainer* const skeleton1 = bilareral->m_body1->GetSkeleton();

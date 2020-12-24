@@ -209,7 +209,7 @@ void ndJointKinematicController::Init(const dMatrix& globalMatrix)
 	SetMaxOmega(10.0f * 360.0f * dDegreeToRad);
 	
 	// set as soft joint
-	SetSolverModel(3);
+	SetSolverModel(m_secundaryCloseLoop);
 }
 
 void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)

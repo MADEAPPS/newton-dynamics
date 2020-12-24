@@ -34,6 +34,8 @@ enum ndJointBilateralSolverModel
 	m_primaryOpenLoop,
 	m_secundaryOpenLoop,
 	m_closeLoop,
+	m_secundaryCloseLoop,
+	m_modesCount
 };
 
 D_MSV_NEWTON_ALIGN_32
@@ -66,8 +68,8 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	const dMatrix& GetLocalMatrix0() const;
 	const dMatrix& GetLocalMatrix1() const;
 
-	virtual dInt32 GetSolverModel() const;
-	virtual void SetSolverModel(dInt32 model);
+	virtual ndJointBilateralSolverModel GetSolverModel() const;
+	virtual void SetSolverModel(ndJointBilateralSolverModel model);
 
 	dFloat32 GetMotorZeroAcceleration(ndConstraintDescritor& desc) const;
 	void SetHighFriction(ndConstraintDescritor& desc, dFloat32 friction);
@@ -94,11 +96,11 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	dFloat32 m_maxAngleError;
 	dFloat32 m_defualtDiagonalRegularizer;
 	dUnsigned32 m_maxDof			: 6;
-	dUnsigned32 m_solverModel		: 2;
 	dUnsigned32 m_isInSkeleton		: 1;
 	dUnsigned32 m_mark				: 1;
 	dUnsigned32 m_enableCollision	: 1;
 	dInt8 m_rowIsMotor;
+	ndJointBilateralSolverModel m_solverModel;
 
 	friend class ndWorld;
 	friend class ndDynamicsUpdate;
@@ -106,14 +108,16 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	friend class ndDynamicsUpdateAvx2;
 };
 
-inline dInt32 ndJointBilateralConstraint::GetSolverModel() const
+inline ndJointBilateralSolverModel ndJointBilateralConstraint::GetSolverModel() const
 {
 	return m_solverModel;
 }
 
-inline void ndJointBilateralConstraint::SetSolverModel(dInt32 model)
+inline void ndJointBilateralConstraint::SetSolverModel(ndJointBilateralSolverModel model)
 {
-	m_solverModel = dInt8(dClamp(model, 0, 3));
+	dAssert(model < m_modesCount);
+	dAssert(model >= m_primaryOpenLoop);
+	m_solverModel = dClamp(model, m_primaryOpenLoop, m_modesCount);
 }
 
 inline const dUnsigned32 ndJointBilateralConstraint::GetRowsCount() const

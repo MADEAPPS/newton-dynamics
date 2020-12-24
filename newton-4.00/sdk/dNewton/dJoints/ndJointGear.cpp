@@ -34,7 +34,7 @@ ndJointGear::ndJointGear(dFloat32 gearRatio,
 	m_localMatrix1.m_posit = dVector::m_wOne;
 
 	// set as kinematic loop
-	SetSolverModel(1);
+	SetSolverModel(m_secundaryOpenLoop);
 }
 
 ndJointGear::~ndJointGear()
