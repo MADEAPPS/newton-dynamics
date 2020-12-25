@@ -27,72 +27,6 @@
 #include "ndJointBilateralConstraint.h"
 
 
-#if 0
-ndSkeletonContainer::ndNode* ndSkeletonContainer::GetParent (ndNode* const node) const
-{
-	return node->m_parent;
-}
-
-ndBodyKinematic* ndSkeletonContainer::GetBody(ndSkeletonContainer::ndNode* const node) const
-{
-	return node->m_body;
-}
-
-ndJointBilateralConstraint* ndSkeletonContainer::GetJoint(ndSkeletonContainer::ndNode* const node) const
-{
-	return node->m_joint;
-}
-
-ndSkeletonContainer::ndNode* ndSkeletonContainer::GetFirstChild(ndSkeletonContainer::ndNode* const parent) const
-{
-	return parent->m_child;
-}
-
-ndSkeletonContainer::ndNode* ndSkeletonContainer::GetNextSiblingChild(ndSkeletonContainer::ndNode* const sibling) const
-{
-	return sibling->m_sibling;
-}
-
-dgWorld* ndSkeletonContainer::GetWorld() const
-{
-	return m_world;
-}
-
-ndSkeletonContainer::ndNode* ndSkeletonContainer::FindNode(ndBodyKinematic* const body) const
-{
-	dInt32 stack = 1;
-	ndNode* stackPool[1024];
-
-	stackPool[0] = m_skeleton;
-	while (stack) {
-		stack--;
-		ndNode* const node = stackPool[stack];
-		if (node->m_body == body) {
-			return node;
-		}
-
-		for (ndNode* ptr = node->m_child; ptr; ptr = ptr->m_sibling) {
-			stackPool[stack] = ptr;
-			stack++;
-			dAssert(stack < dInt32(sizeof (stackPool) / sizeof (stackPool[0])));
-		}
-	}
-	return nullptr;
-}
-
-void ndSkeletonContainer::RemoveLoopJoint(ndJointBilateralConstraint* const joint)
-{
-	for (dInt32 i = 0; i < m_loopCount; i++) {
-		if (m_loopingJoints[i] == joint) {
-			joint->m_isInSkeleton = false;
-			m_loopCount--;
-			m_loopingJoints[i] = m_loopingJoints[m_loopCount];
-			break;
-		}
-	}
-}
-#endif
-
 dInt64 ndSkeletonContainer::ndNode::m_ordinalInit = 0x050403020100ll;
 
 ndSkeletonContainer::ndNode::ndNode()
@@ -306,7 +240,6 @@ dInt32 ndSkeletonContainer::ndNode::Factorize(const ndLeftHandSide* const leftHa
 		}
 		dAssert(m_dof > 0);
 		dAssert(m_dof <= 6);
-		//boundedDof += jointInfo->m_pairCount - count;
 		boundedDof += m_joint->m_rowCount - count;
 		GetJacobians(leftHandSide, rightHandSide, jointMassArray);
 	}
@@ -411,6 +344,7 @@ ndSkeletonContainer::ndSkeletonContainer()
 	,m_loopCount(0)
 	,m_dynamicsLoopCount(0)
 	,m_consideredCloseLoop(1)
+	,m_isResting()
 {
 }
 
@@ -531,6 +465,10 @@ void ndSkeletonContainer::AddSelfCollisionJoint(ndConstraint* const joint)
 void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSide, ndRightHandSide* const rightHandSide, bool consideredCloseLoop)
 {
 	D_TRACKTIME();
+	if (m_isResting)
+	{
+		return;
+	}
 	dInt32 rowCount = 0;
 	dInt32 auxiliaryCount = 0;
 	m_leftHandSide = leftHandSide;
@@ -570,6 +508,30 @@ void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSid
 	{
 		InitLoopMassMatrix();
 	}
+}
+
+void ndSkeletonContainer::CheckSleepState()
+{
+	bool equilibrium = true;
+	for (dInt32 i = m_nodeList.GetCount() - 1; i >= 0; --i)
+	{
+		ndNode* const node = m_nodesOrder[i];
+		dAssert(node->m_body);
+		equilibrium &= (node->m_body->m_equilibrium ? true : false);
+	}
+
+	if (!equilibrium)
+	{
+		for (dInt32 i = m_nodeList.GetCount() - 1; i >= 0; --i)
+		{
+			ndNode* const node = m_nodesOrder[i];
+			if (node->m_body->GetInvMass() > dFloat32(0.0f))
+			{
+				node->m_body->m_equilibrium = 0;
+			}
+		}
+	}
+	m_isResting = equilibrium;
 }
 
 void ndSkeletonContainer::CalculateBufferSizeInBytes()
@@ -1437,6 +1399,11 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 void ndSkeletonContainer::CalculateJointForce(const ndBodyKinematic** const bodyArray, ndJacobian* const internalForces)
 {
 	D_TRACKTIME();
+	if (m_isResting)
+	{
+		return;
+	}
+
 	const dInt32 nodeCount = m_nodeList.GetCount();
 	ndForcePair* const force = dAlloca(ndForcePair, nodeCount);
 	ndForcePair* const accel = dAlloca(ndForcePair, nodeCount);

@@ -126,6 +126,8 @@ class ndSkeletonContainer
 	void CalculateJointForce(const ndBodyKinematic** const bodyArray, ndJacobian* const internalForces);
 	void InitMassMatrix(const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide, bool m_consideredCloseLoop = true);
 
+	void CheckSleepState();
+
 	private:
 	void InitLoopMassMatrix();
 	void CalculateBufferSizeInBytes();
@@ -143,22 +145,6 @@ class ndSkeletonContainer
 	D_INLINE void UpdateForces(ndJacobian* const internalForces, const ndForcePair* const force) const;
 	D_INLINE void CalculateJointAccel(const ndJacobian* const internalForces, ndForcePair* const accel) const;
 	D_INLINE void SolveForward(ndForcePair* const force, const ndForcePair* const accel, dInt32 startNode) const;
-	
-
-#if 0
-
-	dInt32 GetJointCount () const {return m_nodeCount - 1;}
-	void RemoveLoopJoint(ndJointBilateralConstraint* const joint);  
-	ndBodyKinematic* GetBody(ndNode* const node) const;
-	ndJointBilateralConstraint* GetJoint(ndNode* const node) const;
-	ndNode* GetParent (ndNode* const node) const;
-	ndNode* GetFirstChild (ndNode* const parent) const;
-	ndNode* GetNextSiblingChild (ndNode* const sibling) const;
-	
-	private:
-	void CalculateLoopMassMatrixCoefficients(dFloat32* const diagDamp);
-	ndNode* FindNode(ndBodyKinematic* const node) const;
-#endif
 
 	ndNode* m_skeleton;
 	ndNode** m_nodesOrder;
@@ -181,6 +167,7 @@ class ndSkeletonContainer
 	dInt16 m_loopCount;
 	dInt16 m_dynamicsLoopCount;
 	dInt16 m_consideredCloseLoop;
+	bool m_isResting;
 };
 
 inline ndSkeletonContainer::ndNode* ndSkeletonContainer::GetRoot() const

@@ -312,6 +312,13 @@ void ndDynamicsUpdateAvx2::SortJoints()
 {
 	D_TRACKTIME();
 	ndScene* const scene = m_world->GetScene();
+
+	for (ndSkeletonList::dListNode* node = m_world->GetSkeletonList().GetFirst(); node; node = node->GetNext())
+	{
+		ndSkeletonContainer* const skeleton = &node->GetInfo();
+		skeleton->CheckSleepState();
+	}
+	
 	const ndJointList& jointList = m_world->GetJointList();
 	ndConstraintArray& jointArray = scene->GetActiveContactArray();
 
