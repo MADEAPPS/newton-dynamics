@@ -35,8 +35,10 @@ const dMatrix& dGetZeroMatrix ()
 	return dMatrix::m_zeroMatrix;
 }
 
-dMatrix::dMatrix (const dQuaternion &quat0, const dVector &position)
+dMatrix::dMatrix (const dQuaternion &quat, const dVector &position)
 {
+	dQuaternion quat0(quat);
+	quat0.Normalize();
 	dQuaternion quat1 (quat0);
 	quat1.Scale(dFloat32 (2.0f));
 

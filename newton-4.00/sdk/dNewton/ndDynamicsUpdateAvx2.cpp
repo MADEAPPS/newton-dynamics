@@ -429,7 +429,6 @@ void ndDynamicsUpdateAvx2::SortJoints()
 			i--;
 		}
 	}
-//dTrace(("%d %d\n", currentActive, jointArray.GetCount()));
 
 	dAssert(currentActive <= jointArray.GetCount());
 	ndConstraint** const jointPtr = &jointArray[0];
@@ -1179,8 +1178,22 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			ndSoaFloat zero(dFloat32(0.0f));
 			for (dInt32 i = threadIndex; i < soaJointCount; i += threadCount)
 			{
-				const dInt32 soaRowBase = soaJointRows[i];
 				const dInt32 index = i * D_SOA_WORD_GROUP_SIZE;
+				for (dInt32 j = 1; j < D_SOA_WORD_GROUP_SIZE; j++)
+				{
+					ndConstraint* const joint = jointArray[index + j];
+					if (joint)
+					{
+						dInt32 slot = j;
+						for (; (slot > 0) && (jointArray[index + slot - 1]->m_rowCount < joint->m_rowCount); slot--)
+						{
+							jointArray[index + slot] = jointArray[index + slot - 1];
+						}
+						jointArray[index + slot] = joint;
+					}
+				}
+
+				const dInt32 soaRowBase = soaJointRows[i];
 				const ndConstraint* const lastJoint = jointArray[index + D_SOA_WORD_GROUP_SIZE - 1];
 				if (lastJoint && (lastJoint->m_rowCount == jointArray[index]->m_rowCount))
 				{
@@ -1262,7 +1275,6 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 						row.m_Jt.m_jacobianM1.m_angular.m_x = ndSoaFloat(tmp[0], tmp[4]);
 						row.m_Jt.m_jacobianM1.m_angular.m_y = ndSoaFloat(tmp[1], tmp[5]);
 						row.m_Jt.m_jacobianM1.m_angular.m_z = ndSoaFloat(tmp[2], tmp[6]);
-					
 					
 						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
 							row0->m_JMinv.m_jacobianM0.m_linear,
