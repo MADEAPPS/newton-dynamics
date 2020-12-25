@@ -407,7 +407,7 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			dArray<ndBodyKinematic*>& bodyArray = me->m_bodyIslandOrder;
@@ -499,7 +499,7 @@ void ndDynamicsUpdate::InitBodyArray()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			dArray<ndBodyKinematic*>& bodyArray = me->m_bodyIslandOrder;
@@ -762,7 +762,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			m_leftHandSide = &me->m_leftHandSide[0];
@@ -797,7 +797,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			const dInt32 threadIndex = GetThreadId();
@@ -845,7 +845,7 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
@@ -889,7 +889,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			dArray<ndBodyKinematic*>& bodyArray = me->m_bodyIslandOrder;
@@ -952,7 +952,7 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
@@ -1000,7 +1000,7 @@ void ndDynamicsUpdate::IntegrateBodies()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			dArray<ndBodyKinematic*>& bodyArray = me->m_bodyIslandOrder;
@@ -1057,7 +1057,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			const dArray<ndIsland>& islandArray = me->m_islands;
@@ -1294,7 +1294,7 @@ void ndDynamicsUpdate::InitSkeletons()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			const dInt32 threadIndex = GetThreadId();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
@@ -1333,7 +1333,7 @@ void ndDynamicsUpdate::UpdateSkeletons()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			const dInt32 threadIndex = GetThreadId();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
@@ -1519,7 +1519,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			m_leftHandSide = &me->m_leftHandSide[0];
@@ -1558,7 +1558,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			const dInt32 threadIndex = GetThreadId();

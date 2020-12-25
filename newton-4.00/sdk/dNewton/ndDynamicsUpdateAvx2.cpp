@@ -65,7 +65,7 @@ void ndDynamicsUpdateAvx2::DetermineSleepStates()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			const dArray<ndIsland>& islandArray = me->m_islands;
@@ -680,7 +680,7 @@ void ndDynamicsUpdateAvx2::IntegrateUnconstrainedBodies()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			dArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
@@ -721,7 +721,7 @@ void ndDynamicsUpdateAvx2::IntegrateBodies()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			dArray<ndBodyKinematic*>& bodyArray = me->m_bodyIslandOrder;
@@ -829,7 +829,7 @@ void ndDynamicsUpdateAvx2::InitBodyArray()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			dArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
@@ -1091,7 +1091,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			m_leftHandSide = &me->GetLeftHandSide()[0];
@@ -1126,7 +1126,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			const dInt32 threadIndex = GetThreadId();
@@ -1159,7 +1159,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			ndConstraint** const jointArray = &m_owner->GetActiveContactArray()[0];
@@ -1465,7 +1465,7 @@ void ndDynamicsUpdateAvx2::UpdateForceFeedback()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
@@ -1514,7 +1514,7 @@ void ndDynamicsUpdateAvx2::InitSkeletons()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			const dInt32 threadIndex = GetThreadId();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
@@ -1553,7 +1553,7 @@ void ndDynamicsUpdateAvx2::UpdateSkeletons()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			const dInt32 threadIndex = GetThreadId();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
@@ -1593,7 +1593,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
@@ -1629,7 +1629,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
@@ -1701,7 +1701,7 @@ void ndDynamicsUpdateAvx2::IntegrateBodiesVelocity()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			dArray<ndBodyKinematic*>& bodyArray = me->m_bodyIslandOrder;
@@ -2107,7 +2107,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			m_leftHandSide = &me->m_leftHandSide[0];
@@ -2159,7 +2159,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 		public:
 		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			const dInt32 threadIndex = GetThreadId();
