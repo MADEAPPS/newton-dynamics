@@ -68,6 +68,7 @@
 #include <ndJointBallAndSocket.h>
 #include <ndBodyParticleSetList.h>
 #include <ndMultiBodyVehicleMotor.h>
+#include <ndMultiBodyVehicleRotor.h>
 #include <ndMultiBodyVehicleGearBox.h>
 #include <ndJointKinematicController.h>
 #include <ndMultiBodyVehicleDifferential.h>

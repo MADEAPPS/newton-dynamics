@@ -28,6 +28,7 @@
 #include "ndJointDoubleHinge.h"
 #include "ndMultiBodyVehicle.h"
 #include "ndMultiBodyVehicleMotor.h"
+#include "ndMultiBodyVehicleRotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 #include "ndMultiBodyVehicleDifferential.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
@@ -124,6 +125,8 @@ ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, const ndJointWhe
 	ndJointWheel* const tireJoint = new ndJointWheel(matrix, tire, m_chassis, desc);
 	m_tiresList.Append(tireJoint);
 	world->AddJoint(tireJoint);
+
+	tire->SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32(2.0f * 360.0f) * dDegreeToRad, dFloat32(100.0f));
 	return tireJoint;
 }
 
@@ -139,6 +142,8 @@ ndBodyDynamic* ndMultiBodyVehicle::CreateInternalBodyPart(ndWorld* const world, 
 	body->SetMassMatrix(mass, diffCollision);
 	body->SetGyroMode(false);
 	world->AddBody(body);
+
+	body->SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32(2.0f * 360.0f) * dDegreeToRad, dFloat32(100.0f));
 	return body;
 }
 
@@ -172,10 +177,11 @@ ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndWorld* const world, dFlo
 	m_motor = new ndMultiBodyVehicleMotor(motorBody, m_chassis);
 	world->AddJoint(m_motor);
 
+	m_rotor = new ndMultiBodyVehicleRotor(motorBody, world);
+	world->AddJoint(m_rotor);
+
 	m_gearBox = new ndJointVehicleMotorGearBox(motorBody, differential->GetBody0());
 	world->AddJoint(m_gearBox);
-
-	motorBody->SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32(2.0f * 360.0f) * dDegreeToRad, dFloat32(100.0f));
 	return m_motor;
 }
 

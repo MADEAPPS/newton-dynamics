@@ -24,8 +24,6 @@
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
 
-//dVector ntDynamicBody::m_equilibriumError2 (DG_ERR_TOLERANCE2);
-
 ndBodyDynamic::ndBodyDynamic()
 	:ndBodyKinematic()
 	,m_accel(dVector::m_zero)

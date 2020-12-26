@@ -229,11 +229,11 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		if (m_prevKey & !start)
 		{
-			m_motor->SetStart (!m_motor->GetStart());
+			m_rotor->SetStart (!m_rotor->GetStart());
 		}
 		m_prevKey = start;
 
-		m_motor->SetThrottle(throttle);
+		m_rotor->SetThrottle(throttle);
 
 		ndMultiBodyVehicle::Update(world, timestep);
 	}
@@ -313,7 +313,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		//dMultiBodyVehicleEngine* const engine = m_player->GetEngineControl() ? m_player->GetEngineControl()->GetEngine() : NULL;
 
-		ndMultiBodyVehicleMotor* const motor = m_motor;
+		ndMultiBodyVehicleRotor* const motor = m_rotor;
 		dAssert(motor);
 		
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);

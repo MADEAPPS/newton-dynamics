@@ -182,7 +182,7 @@ static void BuildGear(ndDemoEntityManager* const scene, const dVector& origin, d
 	world->AddJoint(new ndJointHinge(matrix, body1, fixBody));
 
 	dVector pin(matrix.m_front);
-	world->AddJoint(new ndJointGear(4.0f, pin, body0, pin, body1));
+	world->AddJoint(new ndJointGear(5.0f, pin, body0, pin, body1));
 
 	mesh->Release();
 }

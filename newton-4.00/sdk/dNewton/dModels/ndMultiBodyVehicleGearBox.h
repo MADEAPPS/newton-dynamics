@@ -23,9 +23,10 @@
 #define __D_MULTIBODY_VEHICLE_GEAR_BOX_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndJointBilateralConstraint.h"
+#include "ndJointGear.h"
+//#include "ndJointBilateralConstraint.h"
 
-class ndJointVehicleMotorGearBox : public ndJointBilateralConstraint
+class ndJointVehicleMotorGearBox : public ndJointGear
 {
 	public: 
 	D_NEWTON_API ndJointVehicleMotorGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential);

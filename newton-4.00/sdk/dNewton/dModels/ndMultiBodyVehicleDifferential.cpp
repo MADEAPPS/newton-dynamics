@@ -24,7 +24,7 @@
 #include "ndMultiBodyVehicleDifferential.h"
 
 ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(ndBodyKinematic* const differential, ndBodyKinematic* const chassis)
-	:ndJointBilateralConstraint(2, differential, chassis, differential->GetMatrix())
+	:ndJointBilateralConstraint(1, differential, chassis, differential->GetMatrix())
 {
 }
 
@@ -45,9 +45,6 @@ void ndMultiBodyVehicleDifferential::AlignMatrix()
 		matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar()) +
 		matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega0).GetScalar()) +
 		matrix1.m_right.Scale(matrix1.m_right.DotProduct(omega1).GetScalar()));
-
-	//omega += matrix1.m_front.Scale(5.0f) - matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar());
-	//omega += matrix1.m_up.Scale(5.0f) - matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega0).GetScalar());
 
 	m_body0->SetOmega(omega);
 }

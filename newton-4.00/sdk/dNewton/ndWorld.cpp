@@ -923,10 +923,6 @@ void ndWorld::UpdateSkeletons()
 						childBody->m_skeletonMark = 0;
 						ndSkeletonContainer::ndNode* const node = skeleton->AddChild((ndJointBilateralConstraint*)constraint, rootNode);
 						queuePool.Push(node);
-						//if (rootBody->GetInvMass() == dFloat32(0.0f))
-						//{
-						//	break;
-						//}
 					}
 				}
 			}

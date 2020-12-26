@@ -24,31 +24,38 @@
 #include "ndMultiBodyVehicleGearBox.h"
 
 ndJointVehicleMotorGearBox::ndJointVehicleMotorGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential)
-	:ndJointBilateralConstraint(1, motor, differential, motor->GetMatrix())
+	//:ndJointBilateralConstraint(1, motor, differential, motor->GetMatrix())
+	:ndJointGear(dFloat32 (1.0f), 
+		motor->GetMatrix().m_front, differential,
+		motor->GetMatrix().m_front, motor)
 {
+	SetRatio(dFloat32(4.0f));
+	SetSolverModel(m_closeLoop);
 }
 
 void ndJointVehicleMotorGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 {
-return;
-	dMatrix matrix0;
-	dMatrix matrix1;
-	CalculateGlobalMatrix(matrix0, matrix1);
+//return;
+	//dMatrix matrix0;
+	//dMatrix matrix1;
+	//CalculateGlobalMatrix(matrix0, matrix1);
+	//
+	//AddAngularRowJacobian(desc, matrix1.m_right, dFloat32(0.0f));
+	//
+	//ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
+	//ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
+	//
+	//jacobian0.m_angular = matrix0.m_front;
+	//jacobian1.m_angular = matrix1.m_front;
+	//
+	//const dVector& omega0 = m_body0->GetOmega();
+	//const dVector& omega1 = m_body1->GetOmega();
+	//
+	//const dVector relOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+	//dFloat32 w = (relOmega.m_x + relOmega.m_y + relOmega.m_z) * dFloat32(0.5f);
+	//SetMotorAcceleration(desc, -w * desc.m_invTimestep);
 
-	AddAngularRowJacobian(desc, matrix1.m_right, dFloat32(0.0f));
-
-	ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
-	ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
-
-	jacobian0.m_angular = matrix0.m_front;
-	jacobian1.m_angular = matrix1.m_front;
-
-	const dVector& omega0 = m_body0->GetOmega();
-	const dVector& omega1 = m_body1->GetOmega();
-
-	const dVector relOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-	dFloat32 w = (relOmega.m_x + relOmega.m_y + relOmega.m_z) * dFloat32(0.5f);
-	SetMotorAcceleration(desc, -w * desc.m_invTimestep);
+	ndJointGear::JacobianDerivative(desc);
 }
 
 
