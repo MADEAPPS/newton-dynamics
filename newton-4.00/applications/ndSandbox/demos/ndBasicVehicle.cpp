@@ -223,11 +223,19 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		dFloat32 steerAngle = 35.0f * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
 		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
 
+		static int xxxx;
+		xxxx++;
+		if (xxxx > 300)
+		{
+			start = true;
+			throttle = 0.5f;
+		}
+
 		SetBrakeTorque(brake);
 		SetHandBrakeTorque(handBrake);
 		SetSteeringAngle(m_steerAngle * dDegreeToRad);
 
-		if (m_prevKey & !start)
+		if (!m_prevKey & start)
 		{
 			m_rotor->SetStart (!m_rotor->GetStart());
 		}

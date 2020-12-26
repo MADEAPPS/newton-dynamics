@@ -76,15 +76,26 @@ dFloat32 ndMultiBodyVehicleRotor::CalculateAcceleration(ndConstraintDescritor& d
 	m_omega = -relOmega.AddHorizontal().GetScalar();
 
 	dFloat32 desiredSpeed = m_omega;
-	const dFloat32 diff = m_throttle * m_maxOmega - m_omega;
+	dFloat32 diff = m_throttle * m_maxOmega - m_omega;
+
 	if (diff > dFloat32(1.0e-3f))
 	{
-		desiredSpeed += m_gasValve;
+		if (diff <= m_gasValve) 
+		{
+			diff *= dFloat32 (0.5f);
+		}
+		desiredSpeed += diff;
 	}
 	else if (diff < dFloat32(-1.0e-3f))
 	{
-		desiredSpeed -= m_gasValve;
+		if (diff > -m_gasValve)
+		{
+			diff *= dFloat32(0.5f);
+		}
+		desiredSpeed += diff;
 	}
+
+	dTrace(("%f\n", diff));
 
 	desiredSpeed = dClamp(desiredSpeed, m_idleOmega, m_maxOmega);
 	return (m_omega - desiredSpeed) * desc.m_invTimestep;
