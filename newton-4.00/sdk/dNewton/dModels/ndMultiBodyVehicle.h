@@ -81,7 +81,7 @@ class ndMultiBodyVehicle: public ndModel
 	ndMultiBodyVehicleRotor* m_rotor;
 	ndShapeChamferCylinder* m_tireShape;
 	ndJointVehicleMotorGearBox* m_gearBox;
-	dList<ndJointWheel*> m_tiresList;
+	dList<ndJointWheel*> m_tireList;
 	dList<ndJointWheel*> m_brakeTires;
 	dList<ndJointWheel*> m_handBrakeTires;
 	dList<ndJointWheel*> m_steeringTires;

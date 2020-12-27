@@ -118,7 +118,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
-	dInt32 m_hasJointFeeback[D_MAX_THREADS_COUNT];
+	//dInt32 m_hasJointFeeback[D_MAX_THREADS_COUNT];
 
 	ndWorld* m_world;
 	dFloat32 m_timestep;

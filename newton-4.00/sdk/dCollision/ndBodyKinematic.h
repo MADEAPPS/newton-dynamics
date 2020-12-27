@@ -92,6 +92,7 @@ class ndBodyKinematic: public ndBody
 
 	const dUnsigned32 GetIndex() const;
 	const dFloat32 GetInvMass() const;
+	const dVector GetInvInertia() const;
 	const dVector& GetMassMatrix() const;
 	const dMatrix& GetInvInertiaMatrix() const;
 
@@ -147,6 +148,7 @@ class ndBodyKinematic: public ndBody
 	virtual void SetAlpha(const dVector& alpha);
 
 	ndContactMap& GetContactMap();
+	const ndJointList& GetJointList() const;
 	const ndContactMap& GetContactMap() const;
 
 	private:
@@ -222,6 +224,11 @@ inline const dUnsigned32 ndBodyKinematic::GetIndex() const
 inline const dFloat32 ndBodyKinematic::GetInvMass() const
 {
 	return m_invMass.m_w;
+}
+
+inline const dVector ndBodyKinematic::GetInvInertia() const
+{
+	return m_invMass & dVector::m_triplexMask;
 }
 
 inline const dVector& ndBodyKinematic::GetMassMatrix() const
@@ -358,6 +365,11 @@ inline ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap()
 inline const ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap() const
 {
 	return m_contactList;
+}
+
+inline const ndJointList& ndBodyKinematic::GetJointList() const
+{
+	return m_jointList;
 }
 
 inline ndShapeInstance& ndBodyKinematic::GetCollisionShape()

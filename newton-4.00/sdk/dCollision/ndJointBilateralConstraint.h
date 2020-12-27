@@ -68,6 +68,11 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	const dMatrix& GetLocalMatrix0() const;
 	const dMatrix& GetLocalMatrix1() const;
 
+	dVector GetForceBody0() const;
+	dVector GetTorqueBody0() const;
+	dVector GetForceBody1() const;
+	dVector GetTorqueBody1() const;
+
 	virtual ndJointBilateralSolverModel GetSolverModel() const;
 	virtual void SetSolverModel(ndJointBilateralSolverModel model);
 
@@ -82,6 +87,10 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	protected:
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
+	dVector m_forceBody0;
+	dVector m_torqueBody0;
+	dVector m_forceBody1;
+	dVector m_torqueBody1;
 
 	dVector m_r0[DG_BILATERAL_CONTRAINT_DOF];
 	dVector m_r1[DG_BILATERAL_CONTRAINT_DOF];
@@ -228,6 +237,27 @@ inline bool ndJointBilateralConstraint::IsCollidable() const
 {
 	return m_enableCollision ? true : false;
 }
+
+inline dVector ndJointBilateralConstraint::GetForceBody0() const
+{
+	return m_forceBody0;
+}
+
+inline dVector ndJointBilateralConstraint::GetTorqueBody0() const
+{
+	return m_torqueBody0;
+}
+
+inline dVector ndJointBilateralConstraint::GetForceBody1() const
+{
+	return m_forceBody1;
+}
+
+inline dVector ndJointBilateralConstraint::GetTorqueBody1() const
+{
+	return m_torqueBody1;
+}
+
 
 #endif
 

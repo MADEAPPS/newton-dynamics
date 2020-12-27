@@ -306,12 +306,12 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene);
 
-	BuildBallSocket(scene, dVector(0.0f, 0.0f, 1.0f, 0.0f));
-	BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	//BuildBallSocket(scene, dVector(0.0f, 0.0f, 1.0f, 0.0f));
+	//BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
 	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 0.5f);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 10.0f, 0.5f);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
-	AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
+	//BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 10.0f, 0.5f);
+	//BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
+	//AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	dQuaternion rot;
 	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);

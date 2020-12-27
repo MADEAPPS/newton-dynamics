@@ -40,7 +40,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 	,m_motor(nullptr)
 	,m_tireShape(new ndShapeChamferCylinder(dFloat32(0.75f), dFloat32(0.5f)))
 	,m_gearBox(nullptr)
-	,m_tiresList()
+	,m_tireList()
 	,m_brakeTires()
 	,m_handBrakeTires()
 	,m_steeringTires()
@@ -62,7 +62,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode)
 	,m_localFrame(dGetIdentityMatrix())
 	,m_chassis(nullptr)
 	,m_tireShape(new ndShapeChamferCylinder(dFloat32(0.75f), dFloat32(0.5f)))
-	,m_tiresList()
+	,m_tireList()
 	,m_handBrakeTires()
 	,m_steeringTires()
 	,m_brakeTorque(dFloat32(0.0f))
@@ -123,7 +123,7 @@ ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, const ndJointWhe
 	tire->SetMassMatrix(inertia);
 
 	ndJointWheel* const tireJoint = new ndJointWheel(matrix, tire, m_chassis, desc);
-	m_tiresList.Append(tireJoint);
+	m_tireList.Append(tireJoint);
 	world->AddJoint(tireJoint);
 
 	tire->SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32(2.0f * 360.0f) * dDegreeToRad, dFloat32(100.0f));
@@ -208,19 +208,12 @@ void ndMultiBodyVehicle::SetAsHandBrake(ndJointWheel* const tire)
 	m_handBrakeTires.Append(tire);
 }
 
-void ndMultiBodyVehicle::Update(const ndWorld* const world, dFloat32 timestep)
-{
-	ApplyAligmentAndBalancing();
-	ApplyBrakes();
-	ApplySteering();
-	ApplyTiremodel();
-}
 
 void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 {
 	const dVector chassisOmega(m_chassis->GetOmega());
 	const dVector upDir(m_chassis->GetMatrix().RotateVector(m_localFrame.m_up));
-	for (dList<ndJointWheel*>::dListNode* node = m_tiresList.GetFirst(); node; node = node->GetNext())
+	for (dList<ndJointWheel*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointWheel* const tire = node->GetInfo();
 
@@ -290,15 +283,20 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	chassisMatrix.m_posit = chassisMatrix.TransformVector(m_chassis->GetCentreOfMass());
 	context.DrawFrame(chassisMatrix);
 
+	// draw front direction for side slip angle reference
+	dVector p0(chassisMatrix.m_posit + m_localFrame.m_up.Scale(1.0f));
+	dVector p1(p0 + chassisMatrix.RotateVector(m_localFrame.m_front).Scale(0.5f));
+	context.DrawLine(p0, p1, dVector(1.0f, 1.0f, 1.0f, 0.0f));
+
 	// draw velocity vector
 	dVector veloc(m_chassis->GetVelocity());
-	dVector p0(chassisMatrix.m_posit + m_localFrame.m_up.Scale(1.0f));
-	dVector p1(p0 + veloc.Scale (0.25f));
-	context.DrawLine(p0, p1, dVector(1.0f, 1.0f, 0.0f, 0.0f));
+	dVector p2(p0 + veloc.Scale (0.25f));
+	context.DrawLine(p0, p2, dVector(1.0f, 1.0f, 0.0f, 0.0f));
 
-	// draw front direction for side slip angle reference
-	dVector p2(p0 + chassisMatrix.RotateVector(m_localFrame.m_front).Scale(0.5f));
-	context.DrawLine(p0, p2, dVector(1.0f, 1.0f, 1.0f, 0.0f));
+	// draw body acceleration
+	dVector accel(m_chassis->GetAccel());
+	dVector p3(p0 + accel.Scale(0.5f));
+	context.DrawLine(p0, p3, dVector(1.0f, 0.0f, 1.0f, 0.0f));
 
 	dVector weight(m_chassis->GetForce());
 	dFloat32 scale = dSqrt(weight.DotProduct(weight).GetScalar());
@@ -310,7 +308,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	dVector longitudinalColor(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
 	context.DrawLine(chassisMatrix.m_posit, chassisMatrix.m_posit + weight, forceColor);
 
-	for (dList<ndJointWheel*>::dListNode* node = m_tiresList.GetFirst(); node; node = node->GetNext())
+	for (dList<ndJointWheel*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointWheel* const tire = node->GetInfo();
 		ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
@@ -358,7 +356,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 
 void ndMultiBodyVehicle::ApplyBrakes()
 {
-	for (dList<ndJointWheel*>::dListNode* node = m_tiresList.GetFirst(); node; node = node->GetNext())
+	for (dList<ndJointWheel*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointWheel* const tire = node->GetInfo();
 		tire->SetBrakeTorque(dFloat32 (0.0f));
@@ -434,7 +432,7 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 
 void ndMultiBodyVehicle::ApplyTiremodel()
 {
-	for (dList<ndJointWheel*>::dListNode* node = m_tiresList.GetFirst(); node; node = node->GetNext())
+	for (dList<ndJointWheel*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointWheel* const tire = node->GetInfo();
 
@@ -461,4 +459,60 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 			}
 		}
 	}
+}
+
+
+void ndMultiBodyVehicle::Update(const ndWorld* const world, dFloat32 timestep)
+{
+static int xxxx;
+if (xxxx >= 550) {
+//	m_chassis->SetTorque(dVector(0.0f, 100.0f, 0.0f, 0.0f));
+	xxxx *= 1;
+}
+
+	dVector accel(m_chassis->GetAccel());
+	dTrace(("%d: accel %f\n", xxxx, dSqrt (accel.DotProduct(accel).GetScalar())));
+xxxx++;
+
+dMatrix matrix(m_localFrame * m_chassis->GetMatrix());
+dTrace(("lateral force: "));
+dVector torque(dVector::m_zero);
+for (dList<ndJointWheel*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+{
+	ndJointWheel* const tire = node->GetInfo();
+	dVector force(tire->GetForceBody1());
+	torque += tire->GetTorqueBody1();
+	dVector lateralForce(matrix.UnrotateVector(force));
+	//dTrace(("(%f %f %f) ", force.m_x, force.m_y, force.m_z));
+	dTrace(("%f ", lateralForce.m_z));
+}
+
+dVector torque1(dVector::m_zero);
+const ndJointList& jointList = m_chassis->GetJointList();
+for (ndJointList::dListNode* node = jointList.GetFirst(); node; node = node->GetNext())
+{
+	ndJointBilateralConstraint * const joint = node->GetInfo();
+	torque1 += joint->GetTorqueBody1();
+}
+
+dTrace(("\n"));
+dTrace(("longitudinal force: "));
+for (dList<ndJointWheel*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+{
+	ndJointWheel* const tire = node->GetInfo();
+	dVector force(tire->GetForceBody1());
+	dVector lateralForce(matrix.UnrotateVector(force));
+	//dTrace(("(%f %f %f) ", force.m_x, force.m_y, force.m_z));
+	dTrace(("%f ", lateralForce.m_x));
+}
+
+dTrace(("\n"));
+torque = matrix.UnrotateVector(torque);
+dTrace(("torque %f %f %f\n", torque.m_x, torque.m_y, torque.m_z));
+
+
+	ApplyAligmentAndBalancing();
+	ApplyBrakes();
+	ApplySteering();
+	ApplyTiremodel();
 }

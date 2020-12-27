@@ -46,7 +46,6 @@ ndDynamicsUpdate::ndDynamicsUpdate(ndWorld* const world)
 	,m_activeJointCount(0)
 	,m_unConstrainedBodyCount(0)
 {
-	memset(m_hasJointFeeback, 0, sizeof(m_hasJointFeeback));
 }
 
 ndDynamicsUpdate::~ndDynamicsUpdate()
@@ -917,6 +916,8 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 					const ndJacobian& forceAndTorque = internalForces[index];
 					const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
 					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
+//if (dynBody->GetId()==3)
+//dTrace(("torque0 %f %f %f\n", torque.m_x, torque.m_y, torque.m_z));
 					ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
 
 					if (!body->m_resting)
@@ -965,7 +966,6 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 			const dInt32 start = threadIndex * step;
 			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : jointCount - start;
 
-			bool hasJointFeeback = false;
 			const dFloat32 timestepRK = me->m_timestepRK;
 			for (dInt32 i = 0; i < count; i++)
 			{
@@ -981,10 +981,32 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 					rhs->m_jointFeebackForce->m_force = rhs->m_force;
 					rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;
 				}
-				hasJointFeeback |= joint->m_jointFeebackForce;
-			}
 
-			me->m_hasJointFeeback[threadIndex] = hasJointFeeback ? 1 : 0;
+				if (joint->GetAsBilateral())
+				{
+					const dArray<ndLeftHandSide>& leftHandSide = me->m_leftHandSide;
+					dVector force0(dVector::m_zero);
+					dVector force1(dVector::m_zero);
+					dVector torque0(dVector::m_zero);
+					dVector torque1(dVector::m_zero);
+
+					for (dInt32 j = 0; j < rows; j++)
+					{
+						const ndRightHandSide* const rhs = &rightHandSide[j + first];
+						const ndLeftHandSide* const lhs = &leftHandSide[j + first];
+						const dVector f(rhs->m_force);
+						force0 += lhs->m_Jt.m_jacobianM0.m_linear * f;
+						torque0 += lhs->m_Jt.m_jacobianM0.m_angular * f;
+						force1 += lhs->m_Jt.m_jacobianM1.m_linear * f;
+						torque1 += lhs->m_Jt.m_jacobianM1.m_angular * f;
+					}
+					ndJointBilateralConstraint* const bilateral = joint->GetAsBilateral();
+					bilateral->m_forceBody0 = force0;
+					bilateral->m_torqueBody0 = torque0;
+					bilateral->m_forceBody1 = force1;
+					bilateral->m_torqueBody1 = torque1;
+				}
+			}
 		}
 	};
 
@@ -1636,7 +1658,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 void ndDynamicsUpdate::CalculateForces()
 {
 	D_TRACKTIME();
-	dInt32 hasJointFeeback = 0;
 	if (m_world->GetScene()->GetActiveContactArray().GetCount())
 	{
 		m_firstPassCoef = dFloat32(0.0f);
@@ -1655,21 +1676,10 @@ void ndDynamicsUpdate::CalculateForces()
 			}
 			IntegrateBodiesVelocity();
 		}
-
 		UpdateForceFeedback();
-		for (dInt32 i = 0; i < m_world->GetThreadCount(); i++)
-		{
-			hasJointFeeback |= m_hasJointFeeback[i];
-		}
 	}
 
 	IntegrateBodies();
-
-	if (hasJointFeeback)
-	{
-		dAssert(0);
-		//	UpdateKinematicFeedback();
-	}
 }
 
 
