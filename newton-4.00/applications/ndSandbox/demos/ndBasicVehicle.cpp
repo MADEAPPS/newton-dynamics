@@ -228,7 +228,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		if (xxxx > 300)
 		{
 			start = true;
-			throttle = 0.5f;
+			throttle = 0.25f;
 		}
 
 		SetBrakeTorque(brake);
@@ -360,7 +360,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene);
 
-	dVector location(0.0f, 1.0f, 0.0f, 1.0f);
+	dVector location(0.0f, 0.5f, 0.0f, 1.0f);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = location;
@@ -369,8 +369,6 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
-
-	//RenderGuiHelpCallback helpCallback, RenderGuiHelpCallback UIcallback, void* const context
 	scene->Set2DDisplayRenderFunction(nullptr, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
 	dQuaternion rot;

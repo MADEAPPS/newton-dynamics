@@ -910,6 +910,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 			const dVector timestep4(me->m_timestepRK);
 			const dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));
 
+static int xxxx;
 			const dArray<ndJacobian>& internalForces = me->m_internalForces;
 			for (dInt32 i = 0; i < count; i++)
 			{
@@ -922,8 +923,12 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 					const ndJacobian& forceAndTorque = internalForces[index];
 					const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
 					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
-//if (dynBody->GetId()==3)
-//dTrace(("torque0 %f %f %f\n", torque.m_x, torque.m_y, torque.m_z));
+if (dynBody->GetId() == 3) 
+{
+if (dAbs(torque.m_y) > 100)
+xxxx *= 1;
+dTrace(("torque0: %d %f %f %f\n", xxxx, torque.m_x, torque.m_y, torque.m_z));
+}
 					ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
 
 					if (!body->m_resting)
@@ -944,6 +949,8 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 					dAssert(body->m_omega.m_w == dFloat32(0.0f));
 				}
 			}
+
+xxxx++;
 		}
 	};
 
