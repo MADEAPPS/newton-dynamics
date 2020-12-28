@@ -247,6 +247,7 @@ void ndDynamicsUpdate::SortJoints()
 		const dInt32 rowKey = (1 << D_RADIX_BITS) - joint->m_rowCount;
 		const dInt32 restingKey = resting << (D_RADIX_BITS + 1);
 		const dInt32 key = restingKey + rowKey;
+		dAssert(key >= 0);
 		dAssert(key < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
 		jointCountSpans[key] ++;
 	}
@@ -270,6 +271,7 @@ void ndDynamicsUpdate::SortJoints()
 		const dInt32 rowKey = (1 << D_RADIX_BITS) - joint->m_rowCount;
 		const dInt32 restingKey = resting << (D_RADIX_BITS + 1);
 		const dInt32 key = restingKey + rowKey;
+		dAssert(key >= 0);
 		dAssert(key < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
 
 		const dInt32 entry = jointCountSpans[key];
@@ -923,12 +925,16 @@ static int xxxx;
 					const ndJacobian& forceAndTorque = internalForces[index];
 					const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
 					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
+
 if (dynBody->GetId() == 3) 
 {
 if (dAbs(torque.m_y) > 100)
-xxxx *= 1;
+{
+	xxxx *= 1;
+}
 dTrace(("torque0: %d %f %f %f\n", xxxx, torque.m_x, torque.m_y, torque.m_z));
 }
+
 					ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
 
 					if (!body->m_resting)

@@ -113,7 +113,7 @@ static void BuildPyramid(ndDemoEntityManager* const scene, dFloat32 mass, const 
 	geometry->Release();
 }
 
-
+/*
 static void BirdCrashTest(ndDemoEntityManager* const node)
 {
 	ndShape* const shape = new ndShapeBox(1.0f, 1.0f, 1.0f);
@@ -138,21 +138,23 @@ static void BirdCrashTest(ndDemoEntityManager* const node)
 
 	node->GetWorld()->AddBody(body);
 }
+*/
+
 
 void ndBasicStacks (ndDemoEntityManager* const scene)
 {
-	BirdCrashTest(scene);
-#if 0
+//	BirdCrashTest(scene);
+#if 1
 	// build a floor
 	//BuildFloorBox(scene);
 	BuildFlatPlane(scene, true);
 
 	dVector origin1(0.0f, 0.0f, 4.0f, 0.0f);
-	BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 30);
+	BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 
 	origin1.m_z = 0.0f;
 	origin1.m_x += 4.0f;
-//	BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
 
 	//origin1.m_x += 8.0f;
 	//origin1.m_z += 8.0f;

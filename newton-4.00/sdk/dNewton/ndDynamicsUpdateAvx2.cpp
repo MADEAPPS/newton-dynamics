@@ -458,6 +458,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		const dInt32 rowKey = (1 << D_RADIX_BITS) - joint->m_rowCount;
 		const dInt32 restingKey = resting << (D_RADIX_BITS + 1);
 		const dInt32 key = restingKey + rowKey;
+		dAssert(key >= 0);
 		dAssert(key < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
 		jointCountSpans[key] ++;
 	}
@@ -480,6 +481,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		const dInt32 rowKey = (1 << D_RADIX_BITS) - joint->m_rowCount;
 		const dInt32 restingKey = resting << (D_RADIX_BITS + 1);
 		const dInt32 key = restingKey + rowKey;
+		dAssert(key >= 0);
 		dAssert(key < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
 
 		const dInt32 entry = jointCountSpans[key];
