@@ -837,8 +837,8 @@ void ndWorld::UpdateSkeletons()
 
 		dSort(islands, entriesCount, CompareIslandMember);
 
-		dInt32* const scans = dAlloca(dInt32, inslandCount + 1);
-		memset(scans, 0, sizeof(dInt32) * (inslandCount + 1));
+		dInt32* const scans = dAlloca(dInt32, inslandCount + 256);
+		memset(scans, 0, sizeof(dInt32) * (inslandCount + 256));
 		for (dInt32 i = 0; i < entriesCount; i++)
 		{
 			dInt32 index = islands[i].m_root->m_index;
