@@ -439,7 +439,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	}
 	ndConstraint** const jointPtr = &jointArray[0];
 
-	dInt32 jointCountSpans[1 << (D_RADIX_BITS + 2)];
+	dInt32 jointCountSpans[128];
 	m_leftHandSide.SetCount(m_leftHandSide.GetCount() + 1);
 	ndConstraint** const sortBuffer = (ndConstraint**)&m_leftHandSide[0];
 	memset(jointCountSpans, 0, sizeof(jointCountSpans));
@@ -455,12 +455,10 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		const dInt32 resting = (body0->m_resting & body1->m_resting) ? 1 : 0;
 		activeJointCount += (1 - resting);
 
-		const dInt32 rowKey = (1 << D_RADIX_BITS) - joint->m_rowCount;
-		const dInt32 restingKey = resting << (D_RADIX_BITS + 1);
-		const dInt32 key = restingKey + rowKey;
-		dAssert(key >= 0);
-		dAssert(key < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
-		jointCountSpans[key] ++;
+		const ndSortKey key(resting, joint->m_rowCount);
+		dAssert(key.m_value >= 0);
+		dAssert(key.m_value < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
+		jointCountSpans[key.m_value] ++;
 	}
 
 	dInt32 acc = 0;
@@ -478,15 +476,13 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		const ndBodyKinematic* const body1 = joint->GetBody1();
 		const dInt32 resting = (body0->m_resting & body1->m_resting) ? 1 : 0;
 
-		const dInt32 rowKey = (1 << D_RADIX_BITS) - joint->m_rowCount;
-		const dInt32 restingKey = resting << (D_RADIX_BITS + 1);
-		const dInt32 key = restingKey + rowKey;
-		dAssert(key >= 0);
-		dAssert(key < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
+		const ndSortKey key(resting, joint->m_rowCount);
+		dAssert(key.m_value >= 0);
+		dAssert(key.m_value < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
 
-		const dInt32 entry = jointCountSpans[key];
+		const dInt32 entry = jointCountSpans[key.m_value];
 		jointArray[entry] = joint;
-		jointCountSpans[key] = entry + 1;
+		jointCountSpans[key.m_value] = entry + 1;
 	}
 	m_activeJointCount = activeJointCount;
 

@@ -28,7 +28,6 @@
 namespace ndAvx2
 {
 	#define D_SOA_WORD_GROUP_SIZE	8 
-	#define D_RADIX_BITS	5
 
 	D_MSV_NEWTON_ALIGN_32
 	class ndSoaFloat
