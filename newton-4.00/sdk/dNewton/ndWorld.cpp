@@ -789,7 +789,7 @@ void ndWorld::UpdateSkeletons()
 		}
 
 		const dArray<ndBodyKinematic*>& bodyArray = m_scene->GetActiveBodyArray();
-		solverUpdate.m_leftHandSide.SetCount(bodyArray.GetCount() * 2);
+		solverUpdate.m_leftHandSide.SetCount(dMax (bodyArray.GetCount() * 2,  D_DEFAULT_BUFFER_SIZE));
 		ndIslandMember* const islands = (ndIslandMember*)&solverUpdate.m_leftHandSide[0];
 
 		dInt32 entriesCount = 0;
