@@ -113,14 +113,42 @@ static void BuildPyramid(ndDemoEntityManager* const scene, dFloat32 mass, const 
 	geometry->Release();
 }
 
+
+static void BirdCrashTest(ndDemoEntityManager* const node)
+{
+	ndShape* const shape = new ndShapeBox(1.0f, 1.0f, 1.0f);
+	ndShapeInstance shapeInst(shape);
+
+	dFloat32 s = 1.0f;
+	dVector scale = dVector(s, s, s, 0.0f);
+	shapeInst.SetScale(scale);
+
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	body->SetCollisionShape(shapeInst);
+	body->SetMassMatrix(1.0f, shapeInst);
+	//node->setUserData(body);
+	body->SetGyroMode(false);
+
+	// Newton takes ownership of the NewtonCallback object
+	body->SetNotifyCallback(new ndDemoEntityNotify(node, nullptr));
+
+	dMatrix startPose(dGetIdentityMatrix());
+	//eigenToNewton(node->getSpaceTime().worldTransform, startPose);
+	body->SetMatrix(startPose);
+
+	node->GetWorld()->AddBody(body);
+}
+
 void ndBasicStacks (ndDemoEntityManager* const scene)
 {
+	BirdCrashTest(scene);
+#if 0
 	// build a floor
 	//BuildFloorBox(scene);
 	BuildFlatPlane(scene, true);
 
 	dVector origin1(0.0f, 0.0f, 4.0f, 0.0f);
-	BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 1);
+	BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 30);
 
 	origin1.m_z = 0.0f;
 	origin1.m_x += 4.0f;
@@ -149,6 +177,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	//origin1.m_x += 8.0f;
 	//origin1.m_z += 8.0f;
 	//BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+#endif
 
 	dQuaternion rot;
 	//dVector origin(-10.0f, 1.0f, 0.0f, 0.0f);

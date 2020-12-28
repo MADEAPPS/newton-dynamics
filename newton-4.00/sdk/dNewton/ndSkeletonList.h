@@ -32,7 +32,7 @@ class ndSkeletonList: public dList<ndSkeletonContainer, dContainersFreeListAlloc
 	public:
 	ndSkeletonList()
 		:dList<ndSkeletonContainer, dContainersFreeListAlloc<ndSkeletonContainer>>()
-		,m_skelListIsDirty(true)
+		,m_skelListIsDirty(false)
 	{
 	}
 

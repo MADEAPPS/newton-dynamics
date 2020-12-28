@@ -48,11 +48,14 @@ void ndDemoEntityNotify::OnApplyExternalForce(dInt32 threadIndex, dFloat32 times
 void ndDemoEntityNotify::OnTranform(dInt32 threadIndex, const dMatrix& matrix)
 {
 	// apply this transformation matrix to the application user data.
-	ndBody* const body = GetBody();
-	dQuaternion rot(body->GetRotation());
+	if (m_entity)
+	{
+		ndBody* const body = GetBody();
+		dQuaternion rot(body->GetRotation());
 
-	dScopeSpinLock lock(m_entity->m_lock);
-	m_entity->SetMatrixUsafe(rot, matrix.m_posit);
+		dScopeSpinLock lock(m_entity->m_lock);
+		m_entity->SetMatrixUsafe(rot, matrix.m_posit);
+	}
 }
 
 ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
