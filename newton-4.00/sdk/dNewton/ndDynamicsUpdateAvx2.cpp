@@ -431,8 +431,13 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	}
 
 	dAssert(currentActive <= jointArray.GetCount());
-	ndConstraint** const jointPtr = &jointArray[0];
 	jointArray.SetCount(currentActive);
+	if (!jointArray.GetCount())
+	{
+		m_activeJointCount = 0;
+		return;
+	}
+	ndConstraint** const jointPtr = &jointArray[0];
 
 	dInt32 jointCountSpans[1 << (D_RADIX_BITS + 2)];
 	m_leftHandSide.SetCount(m_leftHandSide.GetCount() + 1);
