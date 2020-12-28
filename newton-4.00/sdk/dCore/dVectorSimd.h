@@ -702,11 +702,6 @@ class dVector
 		D_INLINE dBigVector GetInt() const
 		{
 			dBigVector temp(Floor());
-			//dInt64 x = _mm_cvtsd_si32(temp.m_typeLow);
-			//dInt64 y = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeLow, temp.m_typeLow, PERMUT_MASK_DOUBLE(1, 1)));
-			//dInt64 z = _mm_cvtsd_si32(temp.m_typeHigh);
-			//dInt64 w = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeHigh, temp.m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
-			//return dBigVector(_mm_set_pd(*(dFloat32*)&y, *(dFloat32*)&x), _mm_set_pd(*(dFloat32*)&w, *(dFloat32*)&z));
 			union 
 			{
 				__m128i tmp;
@@ -815,14 +810,11 @@ class dVector
 
 		D_INLINE dInt32 GetSignMask() const
 		{
-			//return _mm_movemask_pd(m_typeLow) | (_mm_movemask_pd(m_typeHigh) << 2);
 			return _mm256_movemask_pd(m_type);
 		}
 
 		D_INLINE dBigVector Floor() const
 		{
-			//dBigVector truncated(_mm256_cvtepi32_pd(_mm256_cvttpd_epi32(m_type)));
-			//dBigVector ret(truncated - (dBigVector::m_one & (*this < truncated)));
 			dBigVector ret(_mm256_floor_pd(m_type));
 			dAssert(ret.m_f[0] == floor(m_f[0]));
 			dAssert(ret.m_f[1] == floor(m_f[1]));
@@ -951,9 +943,8 @@ class dVector
 		}
 
 		D_INLINE dSpatialVector(const dFloat32 a)
-			:m_d0(_mm_set1_pd(a))
-			,m_d1(_mm_set1_pd(a))
-			,m_d2(_mm_set1_pd(a))
+			:m_d0(_mm256_set1_pd(dFloat64(a)))
+			,m_d1(m_d0)
 		{
 		}
 
@@ -968,25 +959,24 @@ class dVector
 		}
 #else 
 		D_INLINE dSpatialVector(const dVector& low, const dVector& high)
-			:m_d0(_mm_cvtps_pd(low.m_type))
-			, m_d1(_mm_cvtps_pd(_mm_unpackhi_ps(low.m_type, _mm_shuffle_ps(low.m_type, high.m_type, PERMUTE_MASK(0, 0, 0, 2)))))
-			, m_d2(_mm_cvtps_pd(_mm_shuffle_ps(high.m_type, high.m_type, PERMUTE_MASK(3, 3, 2, 1))))
+			:m_d0(_mm256_cvtps_pd(low.m_type))
+			,m_d1(_mm256_cvtps_pd(high.ShiftTripleLeft().m_type))
 		{
-			dAssert(0);
+			m_f[3] = m_f[6];
+			m_f[6] = dFloat64(0.0f);
+			m_f[7] = dFloat64(0.0f);
 		}
 #endif
 
 		D_INLINE dSpatialVector(const dSpatialVector& copy)
 			:m_d0(copy.m_d0)
-			, m_d1(copy.m_d1)
-			, m_d2(copy.m_d2)
+			,m_d1(copy.m_d1)
 		{
 		}
 
-		D_INLINE dSpatialVector(const __m128d d0, const __m128d d1, const __m128d d2)
+		D_INLINE dSpatialVector(const __m256d d0, const __m256d d1)
 			:m_d0(d0)
-			, m_d1(d1)
-			, m_d2(d2)
+			,m_d1(d1)
 		{
 		}
 
@@ -994,42 +984,51 @@ class dVector
 		{
 			dAssert(i < 6);
 			dAssert(i >= 0);
-			return ((dFloat64*)&m_d0)[i];
+			return m_f[i];
 		}
 
 		D_INLINE const dFloat64& operator[] (dInt32 i) const
 		{
 			dAssert(i < 6);
 			dAssert(i >= 0);
-			return ((dFloat64*)&m_d0)[i];
+			return m_f[i];
 		}
 
 		D_INLINE dSpatialVector operator+ (const dSpatialVector& A) const
 		{
-			return dSpatialVector(_mm_add_pd(m_d0, A.m_d0), _mm_add_pd(m_d1, A.m_d1), _mm_add_pd(m_d2, A.m_d2));
+			return dSpatialVector(_mm256_add_pd(m_d0, A.m_d0), _mm256_add_pd(m_d1, A.m_d1));
 		}
 
 		D_INLINE dSpatialVector operator*(const dSpatialVector& A) const
 		{
-			return dSpatialVector(_mm_mul_pd(m_d0, A.m_d0), _mm_mul_pd(m_d1, A.m_d1), _mm_mul_pd(m_d2, A.m_d2));
+			return dSpatialVector(_mm256_mul_pd(m_d0, A.m_d0), _mm256_mul_pd(m_d1, A.m_d1));
 		}
 
 		D_INLINE dFloat64 DotProduct(const dSpatialVector& v) const
 		{
 			dSpatialVector tmp(*this * v);
-			__m128d tmp2(_mm_add_pd(tmp.m_d0, _mm_add_pd(tmp.m_d1, tmp.m_d2)));
-			return _mm_cvtsd_f64(_mm_hadd_pd(tmp2, tmp2));
+			__m256d tmp0(_mm256_add_pd(tmp.m_d0, tmp.m_d1));
+			__m256d tmp1(_mm256_hadd_pd(tmp0, tmp0));
+			__m256d tmp2(_mm256_permute2f128_pd(tmp1, tmp1, 1));
+			__m256d tmp3(_mm256_add_pd(tmp1, tmp2));
+			return *((dFloat64*)&tmp3);
 		}
 
 		D_INLINE dSpatialVector Scale(dFloat64 s) const
 		{
-			__m128d tmp(_mm_set1_pd(s));
-			return dSpatialVector(_mm_mul_pd(m_d0, tmp), _mm_mul_pd(m_d1, tmp), _mm_mul_pd(m_d2, tmp));
+			__m256d tmp(_mm256_set1_pd(s));
+			return dSpatialVector(_mm256_mul_pd(m_d0, tmp), _mm256_mul_pd(m_d1, tmp));
 		}
 
-		__m128d m_d0;
-		__m128d m_d1;
-		__m128d m_d2;
+		union
+		{
+			dFloat64 m_f[8];
+			struct
+			{
+				__m256d m_d0;
+				__m256d m_d1;
+			};
+		};
 		static dSpatialVector m_zero;
 	} D_GCC_NEWTON_ALIGN_32;
 
@@ -1478,22 +1477,22 @@ class dVector
 		{
 		}
 
-#ifdef D_NEWTON_USE_DOUBLE
-#define PURMUT_MASK2(y, x)		_MM_SHUFFLE2(x, y)
+	#ifdef D_NEWTON_USE_DOUBLE
+		#define PURMUT_MASK2(y, x)		_MM_SHUFFLE2(x, y)
 		D_INLINE dSpatialVector(const dVector& low, const dVector& high)
 			:m_d0(low.m_typeLow)
 			,m_d1(_mm_shuffle_pd(low.m_typeHigh, high.m_typeLow, PURMUT_MASK2(0, 0)))
 			,m_d2(_mm_shuffle_pd(high.m_typeLow, high.m_typeHigh, PURMUT_MASK2(1, 0)))
 		{
 		}
-#else 
+	#else 
 		D_INLINE dSpatialVector(const dVector& low, const dVector& high)
 			:m_d0(_mm_cvtps_pd(low.m_type))
-			, m_d1(_mm_cvtps_pd(_mm_unpackhi_ps(low.m_type, _mm_shuffle_ps(low.m_type, high.m_type, PERMUTE_MASK(0, 0, 0, 2)))))
-			, m_d2(_mm_cvtps_pd(_mm_shuffle_ps(high.m_type, high.m_type, PERMUTE_MASK(3, 3, 2, 1))))
+			,m_d1(_mm_cvtps_pd(_mm_unpackhi_ps(low.m_type, _mm_shuffle_ps(low.m_type, high.m_type, PERMUTE_MASK(0, 0, 0, 2)))))
+			,m_d2(_mm_cvtps_pd(_mm_shuffle_ps(high.m_type, high.m_type, PERMUTE_MASK(3, 3, 2, 1))))
 		{
 		}
-#endif
+	#endif
 
 		D_INLINE dSpatialVector(const dSpatialVector& copy)
 			:m_d0(copy.m_d0)

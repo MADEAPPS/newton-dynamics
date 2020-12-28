@@ -149,7 +149,6 @@ namespace ndAvx2
 			__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
 			__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
 			__m256 tmp2(_mm256_hadd_ps(tmp1, tmp1));
-			//int xxx = _mm256_cvtsi256_si32 (tmp2);
 			return *((dFloat32*)&tmp2);
 		}
 
