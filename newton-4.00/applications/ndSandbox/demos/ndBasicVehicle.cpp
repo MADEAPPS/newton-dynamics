@@ -217,8 +217,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 
 		bool start = scene->GetKeyState('I');
-		dFloat32 brake = 1000.0f * dFloat32(scene->GetKeyState('S'));
-		dFloat32 handBrake = 1000.0f * dFloat32(scene->GetKeyState(' '));
+		dFloat32 brake = 1500.0f * dFloat32(scene->GetKeyState(' '));
+		dFloat32 handBrake = 1500.0f * dFloat32(scene->GetKeyState('S'));
 		dFloat32 throttle = dFloat32 (scene->GetKeyState('W')) ? 1.0f : 0.0f;
 		dFloat32 steerAngle = 35.0f * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
 		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;

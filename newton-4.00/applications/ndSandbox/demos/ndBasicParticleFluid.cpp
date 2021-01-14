@@ -217,7 +217,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 	world->AddBody(fluidObject);
 }
 
-void ndBasicWaterVolume (ndDemoEntityManager* const scene)
+void ndBasicParticleFluid (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFlatPlane(scene, true);

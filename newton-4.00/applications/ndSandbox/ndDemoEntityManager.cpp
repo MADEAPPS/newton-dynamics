@@ -29,10 +29,10 @@
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0		// setting basic rigidbody
-#define DEFAULT_SCENE	1		// setting basic Stacks
+//#define DEFAULT_SCENE	1		// setting basic Stacks
 //#define DEFAULT_SCENE	2		// setting basic Trigger
 //#define DEFAULT_SCENE	3		// setting basic player
-//#define DEFAULT_SCENE	4		// particle water volume 
+#define DEFAULT_SCENE	4		// setting particle fluid
 //#define DEFAULT_SCENE	5		// static mesh collision 
 //#define DEFAULT_SCENE	6		// setting basic joints
 //#define DEFAULT_SCENE	7		// setting basic vehicle
@@ -44,7 +44,7 @@ void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
-void ndBasicWaterVolume(ndDemoEntityManager* const scene);
+void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
@@ -55,7 +55,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic stack", ndBasicStacks },
 	{ "basic trigger", ndBasicTrigger },
 	{ "basic player", ndPlayerCapsuleDemo },
-	{ "basic water volume", ndBasicWaterVolume },
+	{ "basic particle fluid", ndBasicParticleFluid },
 	{ "static mesh", ndStaticMeshCollisionDemo },
 	{ "basic joints", ndBasicJoints },
 	{ "basic vehicle", ndBasicVehicle },
@@ -612,7 +612,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("auto sleep mode", &m_autoSleepMode);
 			ImGui::Checkbox("show UI", &m_showUI);
 			ImGui::Checkbox("show stats", &m_showStats);
-			ImGui::Checkbox("concurrent physics update", &m_synchronousPhysicsUpdate);
+			ImGui::Checkbox("synchronous physics update", &m_synchronousPhysicsUpdate);
 			ImGui::Separator();
 
 			ImGui::Text("solvers");
@@ -917,7 +917,7 @@ void ndDemoEntityManager::RenderStats()
 			sprintf(text, "physics time:  %6.3f ms", m_world->GetAverageUpdateTime() * 1.0e3f);
 			ImGui::Text(text, "");
 
-			sprintf(text, "update mode:    %s", m_synchronousPhysicsUpdate ? "concurrent" : "synchronous");
+			sprintf(text, "update mode:    %s", m_synchronousPhysicsUpdate ? "synchronous" : "asynchronous");
 			ImGui::Text(text, "");
 
 			if (m_currentPlugin) 
