@@ -33,6 +33,11 @@ class ndFixSizeBuffer: public dClassAlloc
 	{
 	}
 
+	const dInt32 GetSize() const 
+	{
+		return size;
+	}
+
 	T& operator[] (dInt32 i)
 	{
 		dAssert(i >= 0);

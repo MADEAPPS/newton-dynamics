@@ -145,7 +145,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	dVector m_box1;
 	dArray<ndGridHash> m_hashGridMap;
 	dArray<ndGridHash> m_hashGridMapScratchBuffer;
-	dArray<ndGridHash> m_hashGridMapThreadBuffers[D_MAX_THREADS_COUNT];
+//	dArray<ndGridHash> m_hashGridMapThreadBuffers[D_MAX_THREADS_COUNT];
 	dInt32 m_upperDigisIsValid[3];
 	dIsoSurface m_isoSurcase;
 } D_GCC_NEWTON_ALIGN_32 ;

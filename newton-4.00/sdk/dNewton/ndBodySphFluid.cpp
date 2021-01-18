@@ -123,13 +123,45 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 		class ndContext
 		{
 			public:
+			ndContext()
+				:m_fluid(nullptr)
+				,m_iterator(0)
+			{
+			}
+
 			ndBodySphFluid* m_fluid;
-			//dAtomic<dInt32> m_iterator;
+			dAtomic<dInt32> m_iterator;
 		};
 
-		//#define D_SCRATCH_BUFFER_SIZE (1024 * 4)
+		// size of the level one cache minus few values for local variables.
+		#define D_SCRATCH_BUFFER_SIZE (1024 * 24 / sizeof (ndGridHash))
 
-		void AddCell(dInt32 count, const ndGridHash& origin, const ndGridHash& cell, const ndGridHash* const neigborgh, dArray<ndGridHash>& buffer)
+		class ndHashCacheBuffer: public ndFixSizeBuffer<ndGridHash, D_SCRATCH_BUFFER_SIZE + 32>
+		{
+			public:
+			ndHashCacheBuffer()
+				:ndFixSizeBuffer<ndGridHash, D_SCRATCH_BUFFER_SIZE + 32>()
+				,m_size(0)
+			{
+			}
+
+			void SetCount(dInt32 count)
+			{
+				dAssert(count <= GetSize());
+				m_size = count;
+			}
+
+			void PushBack(const ndGridHash& element)
+			{
+				dInt32 index = m_size;
+				m_size++;
+				(*this)[index] = element;
+			}
+
+			dInt32 m_size;
+		};
+
+		void AddCell(dInt32 count, const ndGridHash& origin, const ndGridHash& cell, const ndGridHash* const neigborgh, ndHashCacheBuffer& buffer)
 		{
 			#ifdef _DEBUG 
 			int xxxxx = 0;
@@ -140,8 +172,6 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 				quadrand.m_gridHash += neigborgh[j].m_gridHash;
 				quadrand.m_cellType = (quadrand.m_gridHash == origin.m_gridHash) ? ndHomeGrid : ndAdjacentGrid;
 				
-				//m_scratchBuffer[m_scratchBufferCount] = quadrand;
-				//m_scratchBufferCount++;
 				buffer.PushBack(quadrand);
 				#ifdef _DEBUG 
 				xxxxx += quadrand.m_cellType ? 1 : 0;
@@ -216,8 +246,8 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			stepsCode_z[0] = ndGridHash(0, 0, 0);
 			stepsCode_z[1] = ndGridHash(0, 0, 1);
 
-			dArray<ndGridHash>& bufferOut = fluid->m_hashGridMapThreadBuffers[threadIndex];
-			bufferOut.SetCount(0);
+			ndHashCacheBuffer bufferOut;
+			dAtomic<dInt32>& iterator = ((ndContext*)m_context)->m_iterator;
 			for (dInt32 i = 0; i < count; i++)
 			{
 				dVector r(posit[start + i] - origin);
@@ -301,6 +331,21 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 					default:
 						dAssert(0);
 				}
+
+				if (bufferOut.m_size > D_SCRATCH_BUFFER_SIZE)
+				{
+					dInt32 entry = iterator.fetch_add(bufferOut.m_size);
+					fluid->m_hashGridMap.SetCount(fluid->m_hashGridMap.GetCount() + bufferOut.m_size);
+					memcpy(&fluid->m_hashGridMap[entry], &bufferOut[0], bufferOut.m_size * sizeof(ndGridHash));
+					bufferOut.m_size = 0;
+				}
+			}
+
+			if (bufferOut.m_size)
+			{
+				dInt32 entry = iterator.fetch_add(bufferOut.m_size);
+				fluid->m_hashGridMap.SetCount(fluid->m_hashGridMap.GetCount() + bufferOut.m_size);
+				memcpy(&fluid->m_hashGridMap[entry], &bufferOut[0], bufferOut.m_size * sizeof(ndGridHash));
 			}
 		}
 	};
@@ -312,16 +357,8 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 
 	ndCreateGrids::ndContext context;
 	context.m_fluid = this;
-	scene->SubmitJobs<ndCreateGrids>(&context);
-
 	m_hashGridMap.SetCount(0);
-	for (dInt32 i = 0; i < world->GetThreadCount(); i++)
-	{
-		dInt32 size = m_hashGridMap.GetCount();
-		const dArray<ndGridHash>& source = m_hashGridMapThreadBuffers[i];
-		m_hashGridMap.SetCount(size + source.GetCount());
-		memcpy(&m_hashGridMap[size], &source[0], source.GetCount() * sizeof(ndGridHash));
-	}
+	scene->SubmitJobs<ndCreateGrids>(&context);
 }
 
 void ndBodySphFluid::SortSingleThreaded(const ndWorld* const world)
