@@ -185,7 +185,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 	fluidObject->SetParticleRadius(diameter * 0.5f);
 
 	//dInt32 particleCountPerAxis = 32;
-	dInt32 particleCountPerAxis = 1;
+	//dInt32 particleCountPerAxis = 1;
+	dInt32 particleCountPerAxis = 32;
 	dFloat32 spacing = diameter * 1.0f;
 
 	dFloat32 offset = spacing * particleCountPerAxis / 2.0f;
@@ -196,11 +197,11 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 	for (dInt32 z = 0; z < particleCountPerAxis; z++)
 	//for (dInt32 z = 0; z < 1; z++)
 	{
-		//for (dInt32 y = 0; y < particleCountPerAxis; y++)
-		for (dInt32 y = 0; y < 1; y++)
+		for (dInt32 y = 0; y < particleCountPerAxis; y++)
+		//for (dInt32 y = 0; y < 1; y++)
 		{
-			//for (dInt32 x = 0; x < particleCountPerAxis; x++)
-			for (dInt32 x = 0; x < 1; x++)
+			for (dInt32 x = 0; x < particleCountPerAxis; x++)
+			//for (dInt32 x = 0; x < 1; x++)
 			{
 				dVector posit (matrix.TransformVector(dVector (x * spacing, y * spacing, z * spacing, dFloat32 (1.0f))));
 				fluidObject->AddParticle(0.1f, posit, dVector::m_zero);

@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
-option("NEWTON_BUILD_TEST" "generate test project" "ON")
+option("NEWTON_BUILD_TEST" "generate test project" "OFF")
 option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" "ON")
 option("NEWTON_BUILD_PROFILER" "build profiler" OFF)
 option("NEWTON_BUILD_CREATE_SUB_PROJECTS" "generate independent subproject" OFF)
