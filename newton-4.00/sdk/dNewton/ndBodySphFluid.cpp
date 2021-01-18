@@ -55,6 +55,7 @@ ndBodySphFluid::ndBodySphFluid()
 	,m_box1(dFloat32(1e10f))
 	,m_hashGridMap(1024)
 	,m_hashGridMapScratchBuffer(1024)
+	,m_gridCounts(1024)
 {
 }
 
@@ -112,6 +113,7 @@ void ndBodySphFluid::Update(const ndWorld* const world, dFloat32 timestep)
 
 	CreateGrids(world);
 	SortGrids(world);
+	BuildPairs(world);
 }
 
 void ndBodySphFluid::CreateGrids(const ndWorld* const world)
@@ -719,4 +721,42 @@ return;
 	//	m_isoSurcase.End();
 	//}
 #endif
+}
+
+
+void ndBodySphFluid::BuildScan(const ndWorld* const world)
+{
+	D_TRACKTIME();
+	// count the number of Cells
+	m_gridCounts.SetCount(0);
+	dInt32 count = 0;
+	dUnsigned64 gridHash0 = m_hashGridMap[0].m_gridHash;
+	for (dInt32 i = 0; i < m_hashGridMap.GetCount(); i++)
+	{
+		dUnsigned64 gridHash = m_hashGridMap[i].m_gridHash;
+		if (gridHash != gridHash0)
+		{
+			m_gridCounts.PushBack(count);
+			count = 0;
+			gridHash0 = gridHash;
+		}
+		count++;
+	}
+	m_gridCounts.PushBack(count);
+
+	dInt32 acc = 0;
+	for (dInt32 i = 0; i < m_gridCounts.GetCount(); i++)
+	{
+		dInt32 sum = m_gridCounts[i];
+		m_gridCounts[i] = acc;
+		acc += sum;
+	}
+	m_gridCounts.PushBack(acc);
+}
+
+void ndBodySphFluid::BuildPairs(const ndWorld* const world)
+{
+	D_TRACKTIME();
+
+	BuildScan(world);
 }
