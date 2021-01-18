@@ -127,12 +127,12 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			public:
 			ndContext()
 				:m_fluid(nullptr)
-				,m_iterator(0)
+				,m_lock()
 			{
 			}
 
 			ndBodySphFluid* m_fluid;
-			dAtomic<dInt32> m_iterator;
+			dSpinLock m_lock;
 		};
 
 		// size of the level one cache minus few values for local variables.
@@ -249,7 +249,8 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			stepsCode_z[1] = ndGridHash(0, 0, 1);
 
 			ndHashCacheBuffer bufferOut;
-			dAtomic<dInt32>& iterator = ((ndContext*)m_context)->m_iterator;
+			//dAtomic<dInt32>& iterator = ((ndContext*)m_context)->m_iterator;
+			dSpinLock& lock = ((ndContext*)m_context)->m_lock;
 			for (dInt32 i = 0; i < count; i++)
 			{
 				dVector r(posit[start + i] - origin);
@@ -336,18 +337,22 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 
 				if (bufferOut.m_size > D_SCRATCH_BUFFER_SIZE)
 				{
-					dInt32 entry = iterator.fetch_add(bufferOut.m_size);
-					fluid->m_hashGridMap.SetCount(fluid->m_hashGridMap.GetCount() + bufferOut.m_size);
-					memcpy(&fluid->m_hashGridMap[entry], &bufferOut[0], bufferOut.m_size * sizeof(ndGridHash));
+					D_TRACKTIME();
+					dScopeSpinLock criticalLock(lock);
+					dInt32 dstIndex = fluid->m_hashGridMap.GetCount();
+					fluid->m_hashGridMap.SetCount(dstIndex + bufferOut.m_size);
+					memcpy(&fluid->m_hashGridMap[dstIndex], &bufferOut[0], bufferOut.m_size * sizeof(ndGridHash));
 					bufferOut.m_size = 0;
 				}
 			}
 
 			if (bufferOut.m_size)
 			{
-				dInt32 entry = iterator.fetch_add(bufferOut.m_size);
-				fluid->m_hashGridMap.SetCount(fluid->m_hashGridMap.GetCount() + bufferOut.m_size);
-				memcpy(&fluid->m_hashGridMap[entry], &bufferOut[0], bufferOut.m_size * sizeof(ndGridHash));
+				D_TRACKTIME();
+				dScopeSpinLock criticalLock(lock);
+				dInt32 dstIndex = fluid->m_hashGridMap.GetCount();
+				fluid->m_hashGridMap.SetCount(dstIndex + bufferOut.m_size);
+				memcpy(&fluid->m_hashGridMap[dstIndex], &bufferOut[0], bufferOut.m_size * sizeof(ndGridHash));
 			}
 		}
 	};
