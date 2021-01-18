@@ -160,27 +160,28 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 				(*this)[index] = element;
 			}
 
+			void AddCell(dInt32 count, const ndGridHash& origin, const ndGridHash& cell, const ndGridHash* const neigborgh)
+			{
+				#ifdef _DEBUG 
+				int xxxxx = 0;
+				#endif
+				for (dInt32 j = 0; j < count; j++)
+				{
+					ndGridHash quadrand(cell);
+					quadrand.m_gridHash += neigborgh[j].m_gridHash;
+					quadrand.m_cellType = ndGridType(quadrand.m_gridHash == origin.m_gridHash);
+					dAssert (quadrand.m_cellType == ((quadrand.m_gridHash == origin.m_gridHash) ? ndHomeGrid : ndAdjacentGrid));
+
+					PushBack(quadrand);
+					#ifdef _DEBUG 
+					xxxxx += quadrand.m_cellType ? 1 : 0;
+					#endif
+				}
+				dAssert(xxxxx == 1);
+			}
+
 			dInt32 m_size;
 		};
-
-		void AddCell(dInt32 count, const ndGridHash& origin, const ndGridHash& cell, const ndGridHash* const neigborgh, ndHashCacheBuffer& buffer)
-		{
-			#ifdef _DEBUG 
-			int xxxxx = 0;
-			#endif
-			for (dInt32 j = 0; j < count; j++)
-			{
-				ndGridHash quadrand(cell);
-				quadrand.m_gridHash += neigborgh[j].m_gridHash;
-				quadrand.m_cellType = (quadrand.m_gridHash == origin.m_gridHash) ? ndHomeGrid : ndAdjacentGrid;
-				
-				buffer.PushBack(quadrand);
-				#ifdef _DEBUG 
-				xxxxx += quadrand.m_cellType ? 1 : 0;
-				#endif
-			}
-			dAssert(xxxxx == 1);
-		}
 
 		virtual void Execute()
 		{
@@ -249,8 +250,6 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			stepsCode_z[1] = ndGridHash(0, 0, 1);
 
 			ndHashCacheBuffer bufferOut;
-			//dAtomic<dInt32>& iterator = ((ndContext*)m_context)->m_iterator;
-			dSpinLock& lock = ((ndContext*)m_context)->m_lock;
 			for (dInt32 i = 0; i < count; i++)
 			{
 				dVector r(posit[start + i] - origin);
@@ -284,21 +283,21 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 					case 1:
 					{
 						// this grid goes across all cell.
-						AddCell(2, hashKey, box0Hash, stepsCode_x, bufferOut);
+						bufferOut.AddCell(2, hashKey, box0Hash, stepsCode_x);
 						break;
 					}
 
 					case 2:
 					{
 						// this grid goes across all cell.
-						AddCell(2, hashKey, box0Hash, stepsCode_y, bufferOut);
+						bufferOut.AddCell(2, hashKey, box0Hash, stepsCode_y);
 						break;
 					}
 
 					case 4:
 					{
 						// this grid goes across all cell.
-						AddCell(2, hashKey, box0Hash, stepsCode_z, bufferOut);
+						bufferOut.AddCell(2, hashKey, box0Hash, stepsCode_z);
 						break;
 					}
 
@@ -306,28 +305,28 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 					case 3:
 					{
 						// this grid goes across all cell.
-						AddCell(4, hashKey, box0Hash, stepsCode_xy, bufferOut);
+						bufferOut.AddCell(4, hashKey, box0Hash, stepsCode_xy);
 						break;
 					}
 
 					case 5:
 					{
 						// this grid goes across all cell.
-						AddCell(4, hashKey, box0Hash, stepsCode_xz, bufferOut);
+						bufferOut.AddCell(4, hashKey, box0Hash, stepsCode_xz);
 						break;
 					}
 
 					case 6:
 					{
 						// this grid goes across all cell.
-						AddCell(4, hashKey, box0Hash, stepsCode_yz, bufferOut);
+						bufferOut.AddCell(4, hashKey, box0Hash, stepsCode_yz);
 						break;
 					}
 
 					case 7:
 					{
 						// this grid goes across all cell.
-						AddCell(8, hashKey, box0Hash, stepsCode_xyz, bufferOut);
+						bufferOut.AddCell(8, hashKey, box0Hash, stepsCode_xyz);
 						break;
 					}
 
@@ -338,7 +337,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 				if (bufferOut.m_size > D_SCRATCH_BUFFER_SIZE)
 				{
 					D_TRACKTIME();
-					dScopeSpinLock criticalLock(lock);
+					dScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
 					dInt32 dstIndex = fluid->m_hashGridMap.GetCount();
 					fluid->m_hashGridMap.SetCount(dstIndex + bufferOut.m_size);
 					memcpy(&fluid->m_hashGridMap[dstIndex], &bufferOut[0], bufferOut.m_size * sizeof(ndGridHash));
@@ -349,7 +348,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			if (bufferOut.m_size)
 			{
 				D_TRACKTIME();
-				dScopeSpinLock criticalLock(lock);
+				dScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
 				dInt32 dstIndex = fluid->m_hashGridMap.GetCount();
 				fluid->m_hashGridMap.SetCount(dstIndex + bufferOut.m_size);
 				memcpy(&fluid->m_hashGridMap[dstIndex], &bufferOut[0], bufferOut.m_size * sizeof(ndGridHash));
