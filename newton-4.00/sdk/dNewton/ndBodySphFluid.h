@@ -26,7 +26,7 @@
 #include "ndBodyParticleSet.h"
 
 #define D_RADIX_DIGIT_SIZE	10
-#define D_GRID_SIZE_FACTOR	dFloat32(4.0f)
+//#define D_GRID_SIZE_FACTOR	dFloat32(4.0f)
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodySphFluid: public ndBodyParticleSet
@@ -96,8 +96,9 @@ class ndBodySphFluid: public ndBodyParticleSet
 			m_particleIndex = particelIndex;
 		}
 
-		dInt32 m_particleIndex;
+#ifdef _DEBUG
 		ndGridType m_cellType;
+#endif
 
 		union
 		{
@@ -119,6 +120,14 @@ class ndBodySphFluid: public ndBodyParticleSet
 
 			dUnsigned64 m_gridHash;
 		};
+
+#ifdef _DEBUG
+		dInt32 m_particleIndex;
+#else 
+		dInt32 m_particleIndex;
+		ndGridType m_cellType;
+#endif
+
 	};
 
 	class ndParticlePair
@@ -143,8 +152,9 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void AddCounters(const ndWorld* const world, ndContext& context) const;
 	void CaculateAABB(const ndWorld* const world, dVector& boxP0, dVector& boxP1) const;
 
+	void SortByCenterType();
+	void SortSingleThreaded();
 	void SortParallel(const ndWorld* const world);
-	void SortSingleThreaded(const ndWorld* const world);
 	void BuildScan(const ndWorld* const world);
 	dFloat32 CalculateGridSize() const;
 
@@ -175,7 +185,7 @@ inline const dIsoSurface& ndBodySphFluid::GetIsoSurface() const
 
 inline dFloat32 ndBodySphFluid::CalculateGridSize() const
 {
-	return m_radius * dFloat32(2.0f) * D_GRID_SIZE_FACTOR;
+	return m_radius * dFloat32(2.0f) * dFloat32(1.125f);
 }
 
 #endif 
