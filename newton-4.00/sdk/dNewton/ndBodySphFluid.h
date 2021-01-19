@@ -96,6 +96,9 @@ class ndBodySphFluid: public ndBodyParticleSet
 			m_particleIndex = particelIndex;
 		}
 
+		dInt32 m_particleIndex;
+		ndGridType m_cellType;
+
 		union
 		{
 			struct
@@ -116,9 +119,13 @@ class ndBodySphFluid: public ndBodyParticleSet
 
 			dUnsigned64 m_gridHash;
 		};
+	};
 
-		dInt32 m_particleIndex;
-		ndGridType m_cellType;
+	class ndParticlePair
+	{
+		public:
+		dInt32 m_m0;
+		dInt32 m_m1;
 	};
 
 	class ndContext
@@ -144,6 +151,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	dVector m_box0;
 	dVector m_box1;
 	dArray<ndGridHash> m_hashGridMap;
+	dArray<ndParticlePair> m_particlesPairs;
 	dArray<ndGridHash> m_hashGridMapScratchBuffer;
 	dArray<dInt32> m_gridCounts;
 	dInt32 m_upperDigisIsValid[3];

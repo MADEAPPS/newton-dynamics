@@ -54,6 +54,7 @@ ndBodySphFluid::ndBodySphFluid()
 	,m_box0(dFloat32(-1e10f))
 	,m_box1(dFloat32(1e10f))
 	,m_hashGridMap(1024)
+	,m_particlesPairs(1024)
 	,m_hashGridMapScratchBuffer(1024)
 	,m_gridCounts(1024)
 {
@@ -125,8 +126,8 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 		class ndContext
 		{
 			public:
-			ndContext()
-				:m_fluid(nullptr)
+			ndContext(ndBodySphFluid* const fluid)
+				:m_fluid(fluid)
 				,m_lock()
 			{
 			}
@@ -145,12 +146,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 				:ndFixSizeBuffer<ndGridHash, D_SCRATCH_BUFFER_SIZE + 32>()
 				,m_size(0)
 			{
-			}
-
-			void SetCount(dInt32 count)
-			{
-				dAssert(count <= GetSize());
-				m_size = count;
+				dAssert(GetSize() * sizeof(ndGridHash) < 32 * 1024);
 			}
 
 			void PushBack(const ndGridHash& element)
@@ -361,8 +357,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 	m_upperDigisIsValid[1] = 0;
 	m_upperDigisIsValid[2] = 0;
 
-	ndCreateGrids::ndContext context;
-	context.m_fluid = this;
+	ndCreateGrids::ndContext context(this);
 	m_hashGridMap.SetCount(0);
 	scene->SubmitJobs<ndCreateGrids>(&context);
 }
@@ -762,5 +757,171 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 {
 	D_TRACKTIME();
 
+	class ndBodySphFluidSortScans : public ndScene::ndBaseJob
+	{
+		static dInt32 CompareCells(const ndGridHash* const cellA, const ndGridHash* const cellB, void* const context)
+		{
+			ndBodySphFluid* const fluid = (ndBodySphFluid*)context;
+			const dArray<dVector>& position = fluid->GetPositions();
+			const dFloat32 positA = position[cellA->m_particleIndex].m_x;
+			const dFloat32 positB = position[cellB->m_particleIndex].m_x;
+
+			if (positA < positB)
+			{
+				return -1;
+			}
+			else if (positA > positB)
+			{
+				return 1;
+			}
+			return 0;
+		}
+		
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			ndBodySphFluid* const fluid = (ndBodySphFluid*)m_context;
+			const dInt32 threadId = GetThreadId();
+			const dInt32 threadCount = world->GetThreadCount();
+
+			const dArray<dInt32> gridCounts = fluid->m_gridCounts;;
+			const dInt32 count = gridCounts.GetCount() - 1;
+			const dInt32 size = count / threadCount;
+			const dInt32 start = threadId * size;
+			const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
+			ndGridHash* const srcArray = &fluid->m_hashGridMap[0];
+			for (dInt32 i = 0; i < batchSize; i++)
+			{
+				const dInt32 cellStart = gridCounts[i + start];
+				const dInt32 cellCount = gridCounts[i + start + 1] - cellStart;
+				dSort(&srcArray[cellStart], cellCount, CompareCells, fluid);
+			}
+		}
+	};
+
+	class ndBodySphFluidCreatePair: public ndScene::ndBaseJob
+	{
+		public:
+		class ndContext
+		{
+			public:
+			ndContext(ndBodySphFluid* const fluid)
+				:m_fluid(fluid)
+				,m_lock()
+			{
+			}
+
+			ndBodySphFluid* m_fluid;
+			dSpinLock m_lock;
+		};
+
+
+		#define D_SCRATCH_PAIR_BUFFER_SIZE (1024 * 24 / sizeof (ndParticlePair))
+
+		class ndParticlePairCacheBuffer: public ndFixSizeBuffer<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + 512>
+		{
+			public:
+			ndParticlePairCacheBuffer()
+				:ndFixSizeBuffer<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + 512>()
+				,m_size(0)
+			{
+				dAssert(GetSize() * sizeof(ndParticlePair) < 32 * 1024);
+			}
+
+			void PushBack(dInt32 m0, dInt32 m1)
+			{
+				dInt32 index = m_size;
+				m_size++;
+				dAssert(m_size < GetSize());
+				ndParticlePair& pair = (*this)[index];
+				pair.m_m0 = m0;
+				pair.m_m1 = m1;
+			}
+			dInt32 m_size;
+		};
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			ndBodySphFluid* const fluid = ((ndContext*)m_context)->m_fluid;
+			const dInt32 threadId = GetThreadId();
+			const dInt32 threadCount = world->GetThreadCount();
+
+			const dArray<dInt32> gridCounts = fluid->m_gridCounts;;
+			const dInt32 count = gridCounts.GetCount() - 1;
+			const dInt32 size = count / threadCount;
+			const dInt32 start = threadId * size;
+			const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
+			const ndGridHash* const srcArray = &fluid->m_hashGridMap[0];
+			const dVector* const positions = &fluid->m_posit[0];
+
+			const dFloat32 diameter = dFloat32 (2.0f) * fluid->m_radius;
+			const dFloat32 diameter2 = diameter * diameter;
+
+			ndParticlePairCacheBuffer buffer;
+			for (dInt32 i = 0; i < batchSize; i++)
+			{
+				const dInt32 cellStart = gridCounts[i + start];
+				const dInt32 cellCount = gridCounts[i + start + 1] - cellStart;
+
+				for (dInt32 j = 0; j < (cellCount - 1); j++)
+				{
+					const ndGridHash& cell0 = srcArray[cellStart + j];
+					const dInt32 m0 = cell0.m_particleIndex;
+					const dVector& posit0 = positions[m0];
+
+					bool continueLoop = true;
+					for (dInt32 k = j + 1; (k < cellCount) && continueLoop; k++)
+					{
+						const ndGridHash& cell1 = srcArray[cellStart + k];
+						const dInt32 m1 = cell1.m_particleIndex;
+						const dVector& posit1 = positions[m1];
+
+						dVector dist(posit1 - posit0);
+						continueLoop = false;
+						if (dist.m_x <= diameter)
+						{
+							continueLoop = true;
+							dFloat32 dist2 = dist.DotProduct(dist).GetScalar();
+							bool test = cell0.m_cellType || cell1.m_cellType;
+							test = test & (dist2 <= diameter2);
+							test = test & (cell0.m_gridHash <= cell1.m_gridHash);
+
+							if (test)
+							{
+								buffer.PushBack(m0, m1);
+							}
+						}
+					}
+				}
+
+				if (buffer.m_size > D_SCRATCH_PAIR_BUFFER_SIZE)
+				{
+					dScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
+					dInt32 dstIndex = fluid->m_particlesPairs.GetCount();
+					fluid->m_particlesPairs.SetCount(dstIndex + buffer.m_size);
+					memcpy(&fluid->m_particlesPairs[dstIndex], &buffer[0], buffer.m_size * sizeof(ndParticlePair));
+					buffer.m_size = 0;
+				}
+			}
+
+			if (buffer.m_size)
+			{
+				D_TRACKTIME();
+				dScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
+				dInt32 dstIndex = fluid->m_particlesPairs.GetCount();
+				fluid->m_particlesPairs.SetCount(dstIndex + buffer.m_size);
+				memcpy(&fluid->m_particlesPairs[dstIndex], &buffer[0], buffer.m_size * sizeof(ndParticlePair));
+			}
+		}
+	};
+
 	BuildScan(world);
+	ndScene* const scene = world->GetScene();
+	m_particlesPairs.SetCount(0);
+	ndBodySphFluidCreatePair::ndContext context(this);
+	scene->SubmitJobs<ndBodySphFluidSortScans>(this);
+	scene->SubmitJobs<ndBodySphFluidCreatePair>(&context);
 }
