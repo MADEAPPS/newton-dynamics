@@ -770,7 +770,8 @@ void ndBodySphFluid::CalculateScans(const ndWorld* const world)
 	// count the number of Cells
 
 	m_gridCounts.SetCount(0);
-#if 1 
+
+#if 1
 	dInt32 count = 0;
 	dUnsigned64 gridHash0 = m_hashGridMap[0].m_gridHash;
 	for (dInt32 i = 0; i < m_hashGridMap.GetCount(); i++)
@@ -787,45 +788,56 @@ void ndBodySphFluid::CalculateScans(const ndWorld* const world)
 	m_gridCounts.PushBack(count);
 
 #else
-	union ndIndexStep
-	{
-		ndIndexStep(dInt64 hash)
-			:m_hash(hash)
-		{
-		}
-
-		dInt64 m_hash;
-		dUnsigned64 m_mask64;
-		dUnsigned32 m_mask32[2];
-		dUnsigned8 m_mask8[8];
-	};
 
 	dInt32 count = 0;
 	dInt64 gridHash0 = m_hashGridMap[0].m_gridHash;
-	dInt32 index = 0;
+	for (dInt32 i = 0; i < m_hashGridMap.GetCount() - 1; i++)
+	{
+		const dInt64 gridHash1 = m_hashGridMap[i + 1].m_gridHash;
+		count += dUnsigned64(gridHash0 - gridHash1) >> 63;
+		gridHash0 = gridHash1;
+	}
 
-	dInt32 cacheArray[1024 * 4];
+	m_gridCounts.SetCount(count + 1);
+	memset(&m_gridCounts[0], 0, m_gridCounts.GetCount() * sizeof(dInt32));
+
+	count = 0;
+	gridHash0 = m_hashGridMap[0].m_gridHash;
+	for (dInt32 i = 0; i < m_hashGridMap.GetCount() - 1; i++)
+	{
+		const dInt64 gridHash1 = m_hashGridMap[i + 1].m_gridHash;
+		m_gridCounts[count] ++;
+		count += dUnsigned64(gridHash0 - gridHash1) >> 63;
+		gridHash0 = gridHash1;
+	}
+	m_gridCounts[count] ++;
+#endif
+
+
+#if 0
+	dInt32 count__ = 0;
+	dUnsigned64 gridHash0__ = m_hashGridMap[0].m_gridHash;
+	static dArray<dInt32> m_gridCounts__;
+	m_gridCounts__.SetCount(0);
 	for (dInt32 i = 0; i < m_hashGridMap.GetCount(); i++)
 	{
-		const dInt64 gridHash = m_hashGridMap[i].m_gridHash;
-		dAssert(gridHash >= gridHash0);
-		const ndIndexStep diff(gridHash0 - gridHash);
-		const dInt32 step = diff.m_mask8[7] >> 7;
-		cacheArray[index] = count;
-		//if (gridHash != gridHash0)
-		//{
-		//	m_gridCounts.PushBack(count);
-		//	count = 0;
-		//	gridHash0 = gridHash;
-		//}
-		//count++;
-
-		index += step;
-		gridHash0 = (diff.m_mask64 & gridHash) | (~diff.m_mask64 & gridHash0);
-		count += (diff.m_mask32[1] & -count) | (~diff.m_mask32[1] & 1);
+		dUnsigned64 gridHash = m_hashGridMap[i].m_gridHash;
+		if (gridHash != gridHash0__)
+		{
+			m_gridCounts__.PushBack(count__);
+			count__ = 0;
+			gridHash0__ = gridHash;
+		}
+		count__++;
 	}
-	m_gridCounts.PushBack(count);
+	m_gridCounts__.PushBack(count__);
+	dAssert(m_gridCounts.GetCount() == m_gridCounts__.GetCount());
+	for (dInt32 i = 0; i < m_gridCounts.GetCount(); i++)
+	{
+		dAssert(m_gridCounts[i] == m_gridCounts__[i]);
+	}
 #endif
+
 
 	dInt32 acc = 0;
 	for (dInt32 i = 0; i < m_gridCounts.GetCount(); i++)
