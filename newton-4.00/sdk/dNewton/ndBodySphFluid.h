@@ -96,10 +96,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 			m_particleIndex = particelIndex;
 		}
 
-#ifdef _DEBUG
-		ndGridType m_cellType;
-#endif
-
 		union
 		{
 			struct
@@ -121,13 +117,8 @@ class ndBodySphFluid: public ndBodyParticleSet
 			dUnsigned64 m_gridHash;
 		};
 
-#ifdef _DEBUG
-		dInt32 m_particleIndex;
-#else 
 		dInt32 m_particleIndex;
 		ndGridType m_cellType;
-#endif
-
 	};
 
 	class ndParticlePair
@@ -155,7 +146,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void SortByCenterType();
 	void SortSingleThreaded();
 	void SortParallel(const ndWorld* const world);
-	void BuildScan(const ndWorld* const world);
+	void CalculateScans(const ndWorld* const world);
 	dFloat32 CalculateGridSize() const;
 
 	dVector m_box0;
