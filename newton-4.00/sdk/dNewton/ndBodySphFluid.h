@@ -147,6 +147,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void SortSingleThreaded();
 	void SortParallel(const ndWorld* const world);
 	void CalculateScans(const ndWorld* const world);
+	void CalculateScansDebug(dArray<dInt32>& gridScans);
 	dFloat32 CalculateGridSize() const;
 
 	dVector m_box0;
@@ -154,7 +155,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	dArray<ndGridHash> m_hashGridMap;
 	dArray<ndParticlePair> m_particlesPairs;
 	dArray<ndGridHash> m_hashGridMapScratchBuffer;
-	dArray<dInt32> m_gridCounts;
+	dArray<dInt32> m_gridScans[D_MAX_THREADS_COUNT];
 	dInt32 m_upperDigisIsValid[3];
 	dIsoSurface m_isoSurcase;
 } D_GCC_NEWTON_ALIGN_32 ;

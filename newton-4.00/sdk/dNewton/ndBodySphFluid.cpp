@@ -56,7 +56,7 @@ ndBodySphFluid::ndBodySphFluid()
 	,m_hashGridMap(1024)
 	,m_particlesPairs(1024)
 	,m_hashGridMapScratchBuffer(1024)
-	,m_gridCounts(1024)
+//	,m_gridScans(1024)
 {
 }
 
@@ -764,89 +764,117 @@ return;
 }
 
 
-void ndBodySphFluid::CalculateScans(const ndWorld* const world)
+void ndBodySphFluid::CalculateScansDebug(dArray<dInt32>& gridScans)
 {
-	D_TRACKTIME();
-	// count the number of Cells
-
-	m_gridCounts.SetCount(0);
-
-#if 1
 	dInt32 count = 0;
+	gridScans.SetCount(0);
 	dUnsigned64 gridHash0 = m_hashGridMap[0].m_gridHash;
 	for (dInt32 i = 0; i < m_hashGridMap.GetCount(); i++)
 	{
 		dUnsigned64 gridHash = m_hashGridMap[i].m_gridHash;
 		if (gridHash != gridHash0)
 		{
-			m_gridCounts.PushBack(count);
+			gridScans.PushBack(count);
 			count = 0;
 			gridHash0 = gridHash;
 		}
 		count++;
 	}
-	m_gridCounts.PushBack(count);
-
-#else
-
-	dInt32 count = 0;
-	dInt64 gridHash0 = m_hashGridMap[0].m_gridHash;
-	for (dInt32 i = 0; i < m_hashGridMap.GetCount() - 1; i++)
-	{
-		const dInt64 gridHash1 = m_hashGridMap[i + 1].m_gridHash;
-		count += dUnsigned64(gridHash0 - gridHash1) >> 63;
-		gridHash0 = gridHash1;
-	}
-
-	m_gridCounts.SetCount(count + 1);
-	memset(&m_gridCounts[0], 0, m_gridCounts.GetCount() * sizeof(dInt32));
-
-	count = 0;
-	gridHash0 = m_hashGridMap[0].m_gridHash;
-	for (dInt32 i = 0; i < m_hashGridMap.GetCount() - 1; i++)
-	{
-		const dInt64 gridHash1 = m_hashGridMap[i + 1].m_gridHash;
-		m_gridCounts[count] ++;
-		count += dUnsigned64(gridHash0 - gridHash1) >> 63;
-		gridHash0 = gridHash1;
-	}
-	m_gridCounts[count] ++;
-#endif
-
-
-#if 0
-	dInt32 count__ = 0;
-	dUnsigned64 gridHash0__ = m_hashGridMap[0].m_gridHash;
-	static dArray<dInt32> m_gridCounts__;
-	m_gridCounts__.SetCount(0);
-	for (dInt32 i = 0; i < m_hashGridMap.GetCount(); i++)
-	{
-		dUnsigned64 gridHash = m_hashGridMap[i].m_gridHash;
-		if (gridHash != gridHash0__)
-		{
-			m_gridCounts__.PushBack(count__);
-			count__ = 0;
-			gridHash0__ = gridHash;
-		}
-		count__++;
-	}
-	m_gridCounts__.PushBack(count__);
-	dAssert(m_gridCounts.GetCount() == m_gridCounts__.GetCount());
-	for (dInt32 i = 0; i < m_gridCounts.GetCount(); i++)
-	{
-		dAssert(m_gridCounts[i] == m_gridCounts__[i]);
-	}
-#endif
-
+	gridScans.PushBack(count);
 
 	dInt32 acc = 0;
-	for (dInt32 i = 0; i < m_gridCounts.GetCount(); i++)
+	for (dInt32 i = 0; i < gridScans.GetCount(); i++)
 	{
-		dInt32 sum = m_gridCounts[i];
-		m_gridCounts[i] = acc;
+		dInt32 sum = gridScans[i];
+		gridScans[i] = acc;
 		acc += sum;
 	}
-	m_gridCounts.PushBack(acc);
+	gridScans.PushBack(acc);
+}
+
+void ndBodySphFluid::CalculateScans(const ndWorld* const world)
+{
+	D_TRACKTIME();
+	// count the number of Cells
+
+	dInt32 threadCount = 4;
+	dInt32 particleCount = m_hashGridMap.GetCount();
+
+	dInt32 scan[32];
+	memset(scan, 1, sizeof(scan));
+	
+	dInt32 acc0 = 0;
+	dInt32 stride = particleCount / threadCount;
+	for (dInt32 threadIndex = 0; threadIndex < threadCount; threadIndex++)
+	{
+		scan[threadIndex] = acc0;
+		acc0 += stride;
+		while (acc0 < particleCount && (m_hashGridMap[acc0].m_gridHash == m_hashGridMap[acc0 - 1].m_gridHash))
+		{
+			acc0++;
+		}
+	}
+	scan[threadCount] = particleCount;
+
+	for (dInt32 threadIndex = 0; threadIndex < threadCount; threadIndex++)
+	{
+		D_TRACKTIME();
+		const dInt32 start = scan[threadIndex];
+		const dInt32 strideCount = scan[threadIndex + 1] - start;
+		dInt32 count = 0;
+		dUnsigned64 gridHash0 = m_hashGridMap[start].m_gridHash;
+
+		dArray<dInt32>& gridScans = m_gridScans[threadIndex];
+		gridScans.SetCount(0);
+		for (dInt32 i = 0; i < strideCount; i++)
+		{
+			dUnsigned64 gridHash = m_hashGridMap[start + i].m_gridHash;
+			if (gridHash != gridHash0)
+			{
+				gridScans.PushBack(count);
+				count = 0;
+				gridHash0 = gridHash;
+			}
+			count++;
+		}
+		gridScans.PushBack(count);
+	}
+
+	dInt32 acc = 0;
+	dArray<dInt32>& gridScans = m_gridScans[0];
+	for (dInt32 i = 0; i < gridScans.GetCount(); i++)
+	{
+		dInt32 sum = gridScans[i];
+		gridScans[i] = acc;
+		acc += sum;
+	}
+
+	for (dInt32 threadIndex = 1; threadIndex < threadCount; threadIndex++)
+	{
+		dArray<dInt32>& dstGridScans = m_gridScans[0];
+		const dArray<dInt32>& srcGridScans = m_gridScans[threadIndex];
+		const dInt32 base = dstGridScans.GetCount();
+		dstGridScans.SetCount(base + srcGridScans.GetCount());
+
+		dInt32* const dst = &dstGridScans[base];
+		for (dInt32 i = 0; i < srcGridScans.GetCount(); i++)
+		{
+			dInt32 sum = srcGridScans[i];
+			dst[i] = acc;
+			acc += sum;
+		}
+	}
+	gridScans.PushBack(acc);
+
+#ifdef _DEBUG
+	CalculateScansDebug(m_gridScans[1]);
+	dAssert(m_gridScans[1].GetCount() == m_gridScans[0].GetCount());
+	for (dInt32 i = 0; i < m_gridScans[0].GetCount(); i++)
+	{
+		dAssert(m_gridScans[1][i] == m_gridScans[0][i]);
+	}
+#endif
+
 }
 
 void ndBodySphFluid::BuildPairs(const ndWorld* const world)
@@ -902,7 +930,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			const dInt32 threadId = GetThreadId();
 			const dInt32 threadCount = world->GetThreadCount();
 
-			const dArray<dInt32> gridCounts = fluid->m_gridCounts;;
+			const dArray<dInt32>& gridCounts = fluid->m_gridScans[0];
 			const dInt32 count = gridCounts.GetCount() - 1;
 			const dInt32 size = count / threadCount;
 			const dInt32 start = threadId * size;
