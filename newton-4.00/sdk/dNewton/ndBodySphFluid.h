@@ -140,6 +140,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void SortGrids(const ndWorld* const world);
 	void BuildPairs(const ndWorld* const world);
 	void CreateGrids(const ndWorld* const world);
+	void CalculateAccelerations(const ndWorld* const world);
 	void AddCounters(const ndWorld* const world, ndContext& context) const;
 	void CaculateAABB(const ndWorld* const world, dVector& boxP0, dVector& boxP1) const;
 
