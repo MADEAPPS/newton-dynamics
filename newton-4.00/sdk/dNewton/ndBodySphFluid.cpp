@@ -533,12 +533,8 @@ void ndBodySphFluid::CalculateScans(const ndWorld* const world)
 			{
 				memset(m_scan, 0, sizeof(m_scan));
 
-				//dInt32 threadCount = 4;
 				const dInt32 threadCount = world->GetThreadCount();
 				dInt32 particleCount = m_fluid->m_hashGridMap.GetCount();
-
-				//dInt32 scan[32];
-				//memset(scan, 1, sizeof(scan));
 
 				dInt32 acc0 = 0;
 				dInt32 stride = particleCount / threadCount;
@@ -564,7 +560,6 @@ void ndBodySphFluid::CalculateScans(const ndWorld* const world)
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
-			const dInt32 threadId = GetThreadId();
 			const dInt32 threadCount = world->GetThreadCount();
 		
 			const dInt32 threadIndex = GetThreadId();
@@ -931,7 +926,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 		};
 
 		#define D_SCRATCH_PAIR_BUFFER_SIZE		(1024 * 24 / sizeof (ndParticlePair))
-		#define D_SCRATCH_PAIR_BUFFER_SIZE_PADD (64)
+		#define D_SCRATCH_PAIR_BUFFER_SIZE_PADD (256)
 
 		class ndParticlePairCacheBuffer : public ndFixSizeBuffer<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>
 		{
@@ -1041,4 +1036,48 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 {
 	D_TRACKTIME();
+
+	class ndCalculateDensity: public ndScene::ndBaseJob
+	{
+		public:
+		class ndContext
+		{
+			public:
+			ndContext(ndBodySphFluid* const fluid)
+				:m_fluid(fluid)
+			{
+			}
+
+			ndBodySphFluid* m_fluid;
+		};
+
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			ndBodySphFluid* const fluid = ((ndContext*)m_context)->m_fluid;
+			const dInt32 threadId = GetThreadId();
+			const dInt32 threadCount = world->GetThreadCount();
+			
+
+			dArray<ndParticlePair>& particlesPairs = fluid->m_particlesPairs;
+			const dInt32 count = particlesPairs.GetCount();
+			const dInt32 stride = count / threadCount;
+			const dInt32 start = threadId * stride;
+			const dInt32 batchStride = (threadId == threadCount - 1) ? count - start : stride;
+
+			for (dInt32 i = 0; i < batchStride; i++)
+			{
+				//ndParticlePair& pair = particlesPairs[i];
+			}
+		}
+	};
+
+	ndScene* const scene = world->GetScene();
+	//m_particlesPairs.SetCount(0);
+	//ndBodySphFluidCreatePair::ndContext context(this);
+
+	ndCalculateDensity::ndContext densityContext(this);
+	scene->SubmitJobs<ndCalculateDensity>(&densityContext);
 }

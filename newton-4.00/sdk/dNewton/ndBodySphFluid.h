@@ -178,7 +178,8 @@ inline const dIsoSurface& ndBodySphFluid::GetIsoSurface() const
 
 inline dFloat32 ndBodySphFluid::CalculateGridSize() const
 {
-	return m_radius * dFloat32(2.0f) * dFloat32(1.125f);
+	//return m_radius * dFloat32(2.0f) * dFloat32(1.125f);
+	return m_radius * (dFloat32(2.0f) * dFloat32(2.0f));
 }
 
 #endif 

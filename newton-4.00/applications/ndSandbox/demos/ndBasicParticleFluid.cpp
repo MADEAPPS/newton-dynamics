@@ -186,7 +186,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 
 	//dInt32 particleCountPerAxis = 32;
 	//dInt32 particleCountPerAxis = 25;
-	dInt32 particleCountPerAxis = 20;
+	dInt32 particleCountPerAxis = 32;
 	dFloat32 spacing = diameter * 1.0f;
 
 	dFloat32 offset = spacing * particleCountPerAxis / 2.0f;
