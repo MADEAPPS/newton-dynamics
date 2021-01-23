@@ -31,7 +31,6 @@ static void AddShape(ndDemoEntityManager* const scene,
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	//matrix.m_posit.m_y = floor.m_y + diameter * 0.5f + 7.0f;
 	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f + 7.0f;
 
 	for (dInt32 i = 0; i < count; i++)
@@ -61,10 +60,10 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 
 	//const int n = 2;
 	//const int stackHigh = 7;
-	//const int n = 1;
-	//const int stackHigh = 1;
-	const int n = 10;
-	const int stackHigh = 7;
+	const int n = 1;
+	const int stackHigh = 1;
+	//const int n = 10;
+	//const int stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)
@@ -81,7 +80,7 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene);
-//scene->GetWorld()->Load("C://tmp//newton-4.00//applications//ndSandbox//xxx.ngd");
+	//scene->GetWorld()->Load("C://tmp//newton-4.00//applications//ndSandbox//xxx.ngd");
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	AddCapsulesStacks(scene, origin1);
