@@ -306,6 +306,7 @@ static void CapsuleStack(DemoEntityManager* const scene, dFloat mass, const dVec
 	dMatrix matrix3(matrix2);
 	matrix3.m_posit.m_x -= horizontalStep;
 
+#if 0
 	int bodyCount = 0;
 	NewtonBody* bodyArray[256];
 	for (int i = 0; i < count/2; i++) {
@@ -325,7 +326,6 @@ static void CapsuleStack(DemoEntityManager* const scene, dFloat mass, const dVec
 		NewtonBodySetGyroscopicTorque(body, 1);
 	}
 
-
 	// hack the inertia (yes I know it is a cheat, but this can be fix with more iterations as well)
 	dFloat inertiaScale = 3.0f;
 	for (int i = 0; i < bodyCount; i++) {
@@ -339,10 +339,20 @@ static void CapsuleStack(DemoEntityManager* const scene, dFloat mass, const dVec
 		Izz *= inertiaScale;
 		NewtonBodySetMassMatrix(bodyArray[i], m, Ixx, Iyy, Izz);
 	}
+#else
 
-//matrix0.m_posit.m_y += 10.0f;
-//mass *= 4.0f;
-//CreateSimpleSolid(scene, geometry, mass, matrix0, collision, defaultMaterialID);
+	matrix0.m_posit.m_y += 0.0f;
+	matrix0 = dYawMatrix(30.0f * dDegreeToRad) * dRollMatrix(30.0f * dDegreeToRad) * matrix0;
+	NewtonBody* body = CreateSimpleSolid(scene, geometry, mass, matrix0, collision, defaultMaterialID);
+	dVector damp(0.0f);
+	NewtonBodySetLinearDamping(body, damp.m_w);
+	NewtonBodySetAngularDamping(body, &damp.m_x);
+	NewtonBodySetMassMatrix(body, 10.0f, 1.11163867f, 2.90651083f, 2.90651083f);
+	NewtonBodySetGyroscopicTorque(body, 1);
+
+	dVector omega(matrix0.m_front.Scale(20.0f));
+	NewtonBodySetOmega(body, &omega.m_x);
+#endif
 
 	// do not forget to release the assets	
 	geometry->Release();
@@ -409,7 +419,7 @@ high = 30;
 //high = 12;
 //high = 10;
 	for (int i = 0; i < 1; i ++) {
-		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0f), high, _BOX_PRIMITIVE);
+		//BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0f), high, _BOX_PRIMITIVE);
 		//BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.75f, 0.35f, 0.75f, 0.0f), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * dPi));
 		//BuildPyramid (scene, 10.0f, dVector( 20.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.35f, 0.8f, 0.0f), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * dPi));
 		//BuildPyramid (scene, 10.0f, dVector( 30.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0f), high, _REGULAR_CONVEX_HULL_PRIMITIVE, dRollMatrix(0.5f * dPi));
@@ -424,10 +434,12 @@ high = 30;
 	}
 
 	high = 20;
+	high = 1;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
 			//SphereStack(scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
 			//CapsuleStack (scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -14.0f + i * 8, 0.0f), dVector (0.8f, 4.0f, 0.8f, 0.0f), high);
+			CapsuleStack(scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -14.0f + i * 8, 0.0f), dVector(1.0f, 1.0f, 1.0f, 0.0f), high);
 			//BoxStack(scene, 1.0f, dVector(-5.5f + j * 8, 0.0f, 6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
 		}
 	}

@@ -38,14 +38,23 @@ static void AddShape(ndDemoEntityManager* const scene,
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
 
+matrix.m_posit.m_y += -6.0f;
+matrix = dYawMatrix(30.0f * dDegreeToRad) * dRollMatrix(30.0f * dDegreeToRad) * matrix;
+
+
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(sphereShape);
 		body->SetMassMatrix(mass, sphereShape);
 		body->SetGyroMode(true);
 
+		body->SetOmega(matrix.m_front.Scale(20.0f));
+
+
 		world->AddBody(body);
 		matrix.m_posit.m_y += diameter * 2.5f;
+
+
 	}
 }
 
@@ -87,6 +96,7 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
-	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
+	//dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
