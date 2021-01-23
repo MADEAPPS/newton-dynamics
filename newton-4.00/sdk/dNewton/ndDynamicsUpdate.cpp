@@ -922,15 +922,6 @@ static int xxxx;
 					const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
 					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
 
-if (dynBody->GetId() == 3) 
-{
-if (dAbs(torque.m_y) > 100)
-{
-	xxxx *= 1;
-}
-dTrace(("torque0: %d %f %f %f\n", xxxx, torque.m_x, torque.m_y, torque.m_z));
-}
-
 					ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
 
 					if (!body->m_resting)

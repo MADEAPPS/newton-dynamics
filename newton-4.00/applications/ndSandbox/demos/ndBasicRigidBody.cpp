@@ -20,6 +20,25 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+class DebugNotify : public ndDemoEntityNotify
+{
+	public: 
+	DebugNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity)
+		:ndDemoEntityNotify(manager, entity)
+	{
+	}
+
+	void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
+	{
+		static int xxxx;
+		
+		ndDemoEntityNotify::OnApplyExternalForce(threadIndex, timestep);
+		dVector omega(GetBody()->GetOmega());
+		dTrace(("%d wMag = %f  w(%f %f %f)\n", xxxx, dSqrt(omega.DotProduct(omega).GetScalar()), omega.m_x, omega.m_y, omega.m_z));
+		xxxx++;
+	}
+};
+
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count)
@@ -42,7 +61,8 @@ matrix.m_posit.m_y += -6.0f;
 matrix = dYawMatrix(30.0f * dDegreeToRad) * dRollMatrix(30.0f * dDegreeToRad) * matrix;
 
 
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+		//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+		body->SetNotifyCallback(new DebugNotify(scene, entity));
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(sphereShape);
 		body->SetMassMatrix(mass, sphereShape);
@@ -53,8 +73,6 @@ matrix = dYawMatrix(30.0f * dDegreeToRad) * dRollMatrix(30.0f * dDegreeToRad) * 
 
 		world->AddBody(body);
 		matrix.m_posit.m_y += diameter * 2.5f;
-
-
 	}
 }
 
