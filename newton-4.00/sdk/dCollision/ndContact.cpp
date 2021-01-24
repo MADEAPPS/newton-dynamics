@@ -144,7 +144,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	const ndJacobian& normalJacobian0 = desc.m_jacobian[normalIndex].m_jacobianM0;
 	const ndJacobian& normalJacobian1 = desc.m_jacobian[normalIndex].m_jacobianM1;
 
-	const dFloat32 impulseOrForceScale = (desc.m_timestep > dFloat32(0.0f)) ? desc.m_invTimestep : dFloat32(1.0f);
+	//const dFloat32 impulseOrForceScale = (desc.m_timestep > dFloat32(0.0f)) ? desc.m_invTimestep : dFloat32(1.0f);
 	const dFloat32 restitutionCoefficient = contact.m_material.m_restitution;
 	
 	dFloat32 relSpeed = -(normalJacobian0.m_linear * veloc0 + normalJacobian0.m_angular * omega0 + normalJacobian1.m_linear * veloc1 + normalJacobian1.m_angular * omega1).AddHorizontal().GetScalar();
@@ -169,7 +169,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	desc.m_diagonalRegularizer[normalIndex] = isHardContact ? D_DIAGONAL_REGULARIZER : dMax(D_DIAGONAL_REGULARIZER, contact.m_material.m_skinThickness);
 	const dFloat32 relGyro = (normalJacobian0.m_angular * gyroAlpha0 + normalJacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 	
-	desc.m_jointAccel[normalIndex] = relGyro + relSpeed * impulseOrForceScale;
+	desc.m_jointAccel[normalIndex] = relGyro + relSpeed * desc.m_timestep;
 	if (contact.m_material.m_flags & m_overrideNormalAccel)
 	{
 		dAssert(0);
@@ -208,7 +208,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		{
 			const dFloat32 relFrictionGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 			desc.m_restitution[jacobIndex] = dFloat32(0.0f);
-			desc.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * impulseOrForceScale;
+			desc.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * desc.m_timestep;
 		}
 		if (dAbs(relVelocErr) > D_MAX_DYNAMIC_FRICTION_SPEED) 
 		{
@@ -252,7 +252,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		{
 			const dFloat32 relFrictionGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 			desc.m_restitution[jacobIndex] = dFloat32(0.0f);
-			desc.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * impulseOrForceScale;
+			desc.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * desc.m_timestep;
 		}
 		if (dAbs(relVelocErr) > D_MAX_DYNAMIC_FRICTION_SPEED) 
 		{

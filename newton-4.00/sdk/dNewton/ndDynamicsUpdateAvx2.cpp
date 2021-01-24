@@ -1032,8 +1032,6 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 
 			const dVector weigh0(body0->m_weigh * joint->m_preconditioner0);
 			const dVector weigh1(body1->m_weigh * joint->m_preconditioner0);
-
-			const dFloat32 forceImpulseScale = dFloat32(1.0f);
 			const dFloat32 preconditioner0 = joint->m_preconditioner0;
 			const dFloat32 preconditioner1 = joint->m_preconditioner1;
 
@@ -1054,10 +1052,10 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					JMinvM1.m_linear * force1 + JMinvM1.m_angular * torque1);
 
 				dFloat32 extenalAcceleration = -tmpAccel.AddHorizontal().GetScalar();
-				rhs->m_deltaAccel = extenalAcceleration * forceImpulseScale;
-				rhs->m_coordenateAccel += extenalAcceleration * forceImpulseScale;
+				rhs->m_deltaAccel = extenalAcceleration;
+				rhs->m_coordenateAccel += extenalAcceleration;
 				dAssert(rhs->m_jointFeebackForce);
-				const dFloat32 force = rhs->m_jointFeebackForce->GetInitiailGuess() * forceImpulseScale;
+				const dFloat32 force = rhs->m_jointFeebackForce->GetInitiailGuess();
 
 				rhs->m_force = isBilateral ? dClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 				rhs->m_maxImpact = dFloat32(0.0f);
