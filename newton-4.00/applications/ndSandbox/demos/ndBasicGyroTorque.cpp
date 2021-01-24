@@ -43,7 +43,7 @@ static void DzhanibekovEffect(ndDemoEntityManager* const scene, dFloat32 mass, d
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
 	body->SetMassMatrix(mass, shape);
-	body->SetGyroMode(true);
+	//body->SetGyroMode(true);
 
 	world->AddBody(body);
 	scene->AddEntity(entity);
@@ -79,7 +79,7 @@ static void Phitop(ndDemoEntityManager* const scene, dFloat32 mass, dFloat32 ang
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
 	body->SetMassMatrix(mass, shape);
-	body->SetGyroMode(true);
+	//body->SetGyroMode(true);
 
 	world->AddBody(body);
 	scene->AddEntity(entity);

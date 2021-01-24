@@ -92,7 +92,6 @@ void ndContact::DetachFromBodies()
 void ndContact::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dInt32 frictionIndex = 0;
-	//m_impulseSpeed = dFloat32(0.0f);
 	if (m_maxDOF) 
 	{
 		dInt32 i = 0;
@@ -143,8 +142,6 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	dAssert(contact.m_normal.m_w == dFloat32(0.0f));
 	const ndJacobian& normalJacobian0 = desc.m_jacobian[normalIndex].m_jacobianM0;
 	const ndJacobian& normalJacobian1 = desc.m_jacobian[normalIndex].m_jacobianM1;
-
-	//const dFloat32 impulseOrForceScale = (desc.m_timestep > dFloat32(0.0f)) ? desc.m_invTimestep : dFloat32(1.0f);
 	const dFloat32 restitutionCoefficient = contact.m_material.m_restitution;
 	
 	dFloat32 relSpeed = -(normalJacobian0.m_linear * veloc0 + normalJacobian0.m_angular * omega0 + normalJacobian1.m_linear * veloc1 + normalJacobian1.m_angular * omega1).AddHorizontal().GetScalar();
@@ -157,10 +154,8 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	desc.m_forceBounds[normalIndex].m_jointForce = (ndForceImpactPair*)&contact.m_normal_Force;
 	
 	const dFloat32 restitutionVelocity = (relSpeed > D_REST_RELATIVE_VELOCITY) ? relSpeed * restitutionCoefficient : dFloat32(0.0f);
-	//m_impulseSpeed = dMax(m_impulseSpeed, restitutionVelocity);
-	
-	dFloat32 penetrationStiffness = D_MAX_PENETRATION_STIFFNESS * contact.m_material.m_softness;
-	dFloat32 penetrationVeloc = penetration * penetrationStiffness;
+	const dFloat32 penetrationStiffness = D_MAX_PENETRATION_STIFFNESS * contact.m_material.m_softness;
+	const dFloat32 penetrationVeloc = penetration * penetrationStiffness;
 	dAssert(dAbs(penetrationVeloc - D_MAX_PENETRATION_STIFFNESS * contact.m_material.m_softness * penetration) < dFloat32(1.0e-6f));
 	desc.m_penetrationStiffness[normalIndex] = penetrationStiffness;
 	relSpeed += dMax(restitutionVelocity, penetrationVeloc);
@@ -278,14 +273,16 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 	const dVector gyroAlpha1(m_body1->GetGyroAlpha());
 
 	const dInt32 count = desc->m_rowsCount;
+	const dFloat32 timestep = desc->m_timestep;
+	const dFloat32 invTimestep = desc->m_invTimeStep;
+	dAssert(invTimestep >= dFloat32(0.0f));
 
-	dFloat32 timestep = dFloat32(1.0f);
-	dFloat32 invTimestep = dFloat32(1.0f);
-	if (desc->m_timestep > dFloat32(0.0f)) 
-	{
-		timestep = desc->m_timestep;
-		invTimestep = desc->m_invTimeStep;
-	}
+static int xxxx;
+xxxx++;
+if (xxxx > 800)
+	xxxx *= 1;
+
+
 
 	ndRightHandSide* const rightHandSide = desc->m_rightHandSide;
 	const ndLeftHandSide* const leftHandSide = desc->m_leftHandSide;

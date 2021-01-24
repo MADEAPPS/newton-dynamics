@@ -107,9 +107,6 @@ void ndBodyDynamic::ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep)
 		dAssert(m_externalTorque.m_w == dFloat32(0.0f));
 	}
 
-	m_gyroRotation = m_rotation;
-	m_gyroTorque = dVector::m_zero;
-
 	m_externalForce += m_impulseForce;
 	m_externalTorque += m_impulseTorque;
 	m_impulseForce = dVector::m_zero;
@@ -178,68 +175,67 @@ void ndBodyDynamic::IntegrateVelocity(dFloat32 timestep)
 	m_savedExternalTorque = m_externalTorque;
 }
 
-ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep)
+ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep) const
 {
 	ndJacobian velocStep;
 
-	if ((dAbs(m_invMass.m_x - m_invMass.m_y) < dFloat32(1.0e-5f)) &&
-		(dAbs(m_invMass.m_x - m_invMass.m_z) < dFloat32(1.0e-5f)))
+	//dVector dtHalf(timestep * dVector::m_half);
+	const dVector dtHalf(timestep);
+	const dMatrix matrix(m_gyroRotation, dVector::m_wOne);
+	
+	const dVector localOmega(matrix.UnrotateVector(m_omega));
+	const dVector localTorque(matrix.UnrotateVector(torque - m_gyroTorque));
+	
+	// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
+	const dVector dw(localOmega * dtHalf);
+	const dMatrix jacobianMatrix(
+		dVector(m_mass[0], (m_mass[2] - m_mass[1]) * dw[2], (m_mass[2] - m_mass[1]) * dw[1], dFloat32(0.0f)),
+		dVector((m_mass[0] - m_mass[2]) * dw[2], m_mass[1], (m_mass[0] - m_mass[2]) * dw[0], dFloat32(1.0f)),
+		dVector((m_mass[1] - m_mass[0]) * dw[1], (m_mass[1] - m_mass[0]) * dw[0], m_mass[2], dFloat32(1.0f)),
+		dVector::m_wOne);
+	
+	// and solving for alpha we get the angular acceleration at t + dt
+	// calculate gradient at a full time step
+	const dVector gradientStep(jacobianMatrix.SolveByGaussianElimination(localTorque * timestep));
+
+	velocStep.m_angular = matrix.RotateVector(gradientStep);
+	velocStep.m_linear = force.Scale(m_invMass.m_w) * timestep;
+	return velocStep;
+}
+
+void ndBodyDynamic::IntegrateGyroSubstep(const dVector& timestep)
+{
+	const dFloat32 omegaMag2 = m_omega.DotProduct(m_omega).GetScalar() + dFloat32(1.0e-12f);
+	const dFloat32 tol = (dFloat32(0.0125f) * dDegreeToRad);
+	if (omegaMag2 > (tol * tol))
 	{
-		velocStep.m_angular = torque * m_invMass * timestep;
-		dAssert(velocStep.m_angular.m_w == dFloat32(0.0f));
-	} 
-	else if (!m_gyroTorqueOn)
-	{
-		velocStep.m_angular = m_invWorldInertiaMatrix.RotateVector(torque) * timestep;
-		dAssert(velocStep.m_angular.m_w == dFloat32(0.0f));
+		// calculate new matrix
+		const dFloat32 invOmegaMag = dRsqrt(omegaMag2);
+		const dVector omegaAxis(m_omega.Scale(invOmegaMag));
+		dFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep.GetScalar();
+		const dQuaternion rotationStep(omegaAxis, omegaAngle);
+		m_gyroRotation = m_gyroRotation * rotationStep;
+		dAssert((m_gyroRotation.DotProduct(m_gyroRotation) - dFloat32(1.0f)) < dFloat32(1.0e-5f));
+		
+		// calculate new Gyro torque and Gyro acceleration
+		const dMatrix matrix(m_gyroRotation, dVector::m_wOne);
+
+		const dVector localOmega(matrix.UnrotateVector(m_omega));
+		//const dVector localAngularMomentum(m_mass * localOmega);
+		//const dVector angularMomentum(matrix.RotateVector(localAngularMomentum));
+		//
+		//m_gyroTorque = m_omega.CrossProduct(angularMomentum);
+		//m_gyroAlpha = m_invWorldInertiaMatrix.RotateVector(m_gyroTorque);
+
+		const dVector localGyroTorque(localOmega.CrossProduct(m_mass * localOmega));
+		m_gyroTorque = matrix.RotateVector(localGyroTorque);
+		m_gyroAlpha = matrix.RotateVector(localGyroTorque * m_invMass);
 	}
 	else
 	{
-		dVector dtHalf(timestep * dVector::m_half);
-		dMatrix matrix(m_gyroRotation, dVector::m_wOne);
-
-		dVector localOmega(matrix.UnrotateVector(m_omega));
-		dVector localTorque(matrix.UnrotateVector(torque - m_gyroTorque));
-
-		// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
-		dVector dw(localOmega * dtHalf);
-		dMatrix jacobianMatrix(
-			dVector(m_mass[0], (m_mass[2] - m_mass[1]) * dw[2], (m_mass[2] - m_mass[1]) * dw[1], dFloat32(0.0f)),
-			dVector((m_mass[0] - m_mass[2]) * dw[2], m_mass[1], (m_mass[0] - m_mass[2]) * dw[0], dFloat32(1.0f)),
-			dVector((m_mass[1] - m_mass[0]) * dw[1], (m_mass[1] - m_mass[0]) * dw[0], m_mass[2], dFloat32(1.0f)),
-			dVector::m_wOne);
-
-		// and solving for alpha we get the angular acceleration at t + dt
-		// calculate gradient at a full time step
-		//dVector gradientStep(localTorque * timestep);
-		dVector gradientStep(jacobianMatrix.SolveByGaussianElimination(localTorque * timestep));
-
-		dVector omega(matrix.RotateVector(localOmega + gradientStep));
-		dAssert(omega.m_w == dFloat32(0.0f));
-
-		// integrate rotation here
-		dFloat32 omegaMag2 = omega.DotProduct(omega).GetScalar() + dFloat32(1.0e-12f);
-		dFloat32 invOmegaMag = dRsqrt(omegaMag2);
-		dVector omegaAxis(omega.Scale(invOmegaMag));
-		dFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep.GetScalar();
-		dQuaternion deltaRotation(omegaAxis, omegaAngle);
-		m_gyroRotation = m_gyroRotation * deltaRotation;
-		dAssert((m_gyroRotation.DotProduct(m_gyroRotation) - dFloat32(1.0f)) < dFloat32(1.0e-5f));
-
-		matrix = dMatrix(m_gyroRotation, dVector::m_wOne);
-		localOmega = matrix.UnrotateVector(omega);
-		//dVector angularMomentum(inertia * localOmega);
-		//body->m_gyroTorque = matrix.RotateVector(localOmega.CrossProduct(angularMomentum));
-		//body->m_gyroAlpha = body->m_invWorldInertiaMatrix.RotateVector(body->m_gyroTorque);
-		dVector localGyroTorque(localOmega.CrossProduct(m_mass * localOmega));
-		m_gyroTorque = matrix.RotateVector(localGyroTorque);
-		m_gyroAlpha = matrix.RotateVector(localGyroTorque * m_invMass);
-
-		velocStep.m_angular = matrix.RotateVector(gradientStep);
+		m_gyroAlpha = dVector::m_zero;
+		m_gyroTorque = dVector::m_zero;
 	}
-
-	velocStep.m_linear = force.Scale(m_invMass.m_w) * timestep;
-	return velocStep;
 }
 
 void ndBodyDynamic::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const

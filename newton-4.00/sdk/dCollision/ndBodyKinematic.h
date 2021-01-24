@@ -106,8 +106,8 @@ class ndBodyKinematic: public ndBody
 	bool GetAutoSleep() const;
 	void SetAutoSleep(bool state);
 
-	bool GetGyroMode() const;
-	void SetGyroMode(bool state);
+	//bool GetGyroMode() const;
+	//void SetGyroMode(bool state);
 
 	void SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32 angleInRadian, dFloat32 speedInMitersPerSeconds);
 
@@ -167,8 +167,6 @@ class ndBodyKinematic: public ndBody
 
 	D_COLLISION_API virtual ndJointList::dListNode* AttachJoint(ndJointBilateralConstraint* const joint);
 	D_COLLISION_API virtual void DetachJoint(ndJointList::dListNode* const node);
-
-	D_COLLISION_API void UpdateGyroData();
 	D_COLLISION_API virtual void IntegrateExternalForce(dFloat32 timestep);
 
 	void UpdateCollisionMatrix();
@@ -404,15 +402,15 @@ inline void ndBodyKinematic::SetAutoSleep(bool state)
 	SetSleepState(false);
 }
 
-inline bool ndBodyKinematic::GetGyroMode() const
-{
-	return m_gyroTorqueOn ? true : false;
-}
-
-inline void ndBodyKinematic::SetGyroMode(bool state)
-{
-	m_gyroTorqueOn = state ? 1 : 0;
-}
+//inline bool ndBodyKinematic::GetGyroMode() const
+//{
+//	return m_gyroTorqueOn ? true : false;
+//}
+//
+//inline void ndBodyKinematic::SetGyroMode(bool state)
+//{
+//	m_gyroTorqueOn = state ? 1 : 0;
+//}
 
 inline ndSkeletonContainer* ndBodyKinematic::GetSkeleton() const
 { 

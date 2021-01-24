@@ -67,7 +67,7 @@ ndBody::ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, d
 	m_omega = xmlGetVector3(xmlNode, "omega");
 	m_localCentreOfMass = xmlGetVector3(xmlNode, "centreOfMass");
 	m_autoSleep = xmlGetInt(xmlNode, "autoSleep") ? 1 : 0;
-	m_gyroTorqueOn = xmlGetInt(xmlNode, "useGyroTorque") ? 1 : 0;
+	//m_gyroTorqueOn = xmlGetInt(xmlNode, "useGyroTorque") ? 1 : 0;
 	m_collideWithLinkedBodies = xmlGetInt(xmlNode, "collideWithLinkedBodies") ? 1 : 0;
 
 	SetMatrix(matrix);
@@ -165,7 +165,7 @@ void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath,
 	xmlSaveParam(paramNode, "omega", m_omega);
 	xmlSaveParam(paramNode, "centreOfMass", m_localCentreOfMass);
 	xmlSaveParam(paramNode, "autoSleep", m_autoSleep ? 1 : 0);
-	xmlSaveParam(paramNode, "useGyroTorque", m_gyroTorqueOn ? 1 : 0);
+	//xmlSaveParam(paramNode, "useGyroTorque", m_gyroTorqueOn ? 1 : 0);
 	xmlSaveParam(paramNode, "collideWithLinkedBodies", m_collideWithLinkedBodies ? 1 : 0);
 
 	if (m_notifyCallback)

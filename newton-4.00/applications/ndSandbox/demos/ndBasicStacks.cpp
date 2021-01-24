@@ -29,7 +29,7 @@ static void AddRigidBody(ndDemoEntityManager* const scene, const dMatrix& matrix
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
 	body->SetMassMatrix(mass, shape);
-	body->SetGyroMode(true);
+	//body->SetGyroMode(true);
 
 	ndWorld* const world = scene->GetWorld();
 	world->AddBody(body);

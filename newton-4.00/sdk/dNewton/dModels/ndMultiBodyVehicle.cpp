@@ -140,7 +140,7 @@ ndBodyDynamic* ndMultiBodyVehicle::CreateInternalBodyPart(ndWorld* const world, 
 	body->SetMatrix(m_localFrame * m_chassis->GetMatrix());
 	body->SetCollisionShape(diffCollision);
 	body->SetMassMatrix(mass, diffCollision);
-	body->SetGyroMode(false);
+	//body->SetGyroMode(false);
 	world->AddBody(body);
 
 	body->SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32(2.0f * 360.0f) * dDegreeToRad, dFloat32(100.0f));

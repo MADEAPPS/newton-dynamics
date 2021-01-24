@@ -73,7 +73,7 @@ matrix = dYawMatrix(30.0f * dDegreeToRad) * dRollMatrix(30.0f * dDegreeToRad) * 
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(sphereShape);
 		body->SetMassMatrix(mass, sphereShape);
-		body->SetGyroMode(true);
+		//body->SetGyroMode(true);
 
 		//body->SetAngularDamping(dVector(dFloat32(0.1045f)));
 		body->SetOmega(matrix.m_front.Scale(20.0f));

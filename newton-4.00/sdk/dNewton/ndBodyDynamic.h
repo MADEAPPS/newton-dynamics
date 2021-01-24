@@ -72,7 +72,8 @@ class ndBodyDynamic: public ndBodyKinematic
 	dVector GetAlpha() const;
 	virtual void SetAlpha(const dVector& alpha);
 
-	ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep);
+	void IntegrateGyroSubstep(const dVector& timestep);
+	ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep) const;
 
 	protected:
 	dVector m_accel;

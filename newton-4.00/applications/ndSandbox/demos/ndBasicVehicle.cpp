@@ -154,7 +154,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		body->SetCollisionShape(*chassisCollision);
 		body->SetMassMatrix(mass, *chassisCollision);
 		//body->SetGyroMode(true);
-		body->SetGyroMode(false);
+		//body->SetGyroMode(false);
 
 		world->AddBody(body);
 		delete chassisCollision;

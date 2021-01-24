@@ -524,8 +524,16 @@ void ndDynamicsUpdate::InitBodyArray()
 					dAssert(kinBody->m_bodyIsConstrained);
 					kinBody->UpdateInvInertiaMatrix();
 					kinBody->AddDampingAcceleration(m_timestep);
+
+					const dVector localOmega(kinBody->m_matrix.UnrotateVector(kinBody->m_omega));
+					const dVector localAngularMomentum(kinBody->m_mass * localOmega);
+					const dVector angularMomentum(kinBody->m_matrix.RotateVector(localAngularMomentum));
+
 					kinBody->m_accel = kinBody->m_veloc;
 					kinBody->m_alpha = kinBody->m_omega;
+					kinBody->m_gyroRotation = kinBody->m_rotation;
+					kinBody->m_gyroTorque = kinBody->m_omega.CrossProduct(angularMomentum);
+					kinBody->m_gyroAlpha = kinBody->m_invWorldInertiaMatrix.RotateVector(kinBody->m_gyroTorque);
 				}
 			}
 		}
@@ -554,7 +562,6 @@ void ndDynamicsUpdate::GetJacobianDerivatives(ndConstraint* const joint)
 	const dInt32 dof = constraintParam.m_rowsCount;
 	dAssert(dof <= joint->m_rowCount);
 
-	//if (constraint->GetId() == dgConstraint::m_contactConstraint) 
 	if (joint->GetAsContact())
 	{
 		ndContact* const contactJoint = joint->GetAsContact();
@@ -707,10 +714,10 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			const dFloat32 preconditioner0 = joint->m_preconditioner0;
 			const dFloat32 preconditioner1 = joint->m_preconditioner1;
 
-			//static int xxxx;
-			//xxxx++;
-			//if (xxxx > 200)
-			//	xxxx *= 1;
+			static int xxxx;
+			xxxx++;
+			if (xxxx > 200)
+				xxxx *= 1;
 
 			for (dInt32 i = 0; i < count; i++)
 			{
@@ -912,7 +919,6 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 			const dVector timestep4(me->m_timestepRK);
 			const dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));
 
-static int xxxx;
 			const dArray<ndJacobian>& internalForces = me->m_internalForces;
 			for (dInt32 i = 0; i < count; i++)
 			{
@@ -932,6 +938,7 @@ static int xxxx;
 					{
 						body->m_veloc += velocStep.m_linear;
 						body->m_omega += velocStep.m_angular;
+						dynBody->IntegrateGyroSubstep(timestep4);
 					}
 					else
 					{
@@ -946,8 +953,6 @@ static int xxxx;
 					dAssert(body->m_omega.m_w == dFloat32(0.0f));
 				}
 			}
-
-xxxx++;
 		}
 	};
 
