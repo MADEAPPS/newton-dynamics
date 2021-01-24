@@ -56,6 +56,13 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API void SetForce(const dVector& force);
 	D_NEWTON_API void SetTorque(const dVector& torque);
 
+	D_NEWTON_API dFloat32 GetLinearDamping() const;
+	D_NEWTON_API void SetLinearDamping(dFloat32 linearDamp);
+
+	D_NEWTON_API dVector GetAngularDamping() const;
+	D_NEWTON_API void SetAngularDamping(const dVector& angularDamp);
+	
+
 	virtual dVector GetForce() const;
 	virtual dVector GetTorque() const;
 
@@ -76,6 +83,9 @@ class ndBodyDynamic: public ndBodyKinematic
 	dVector m_impulseTorque;
 	dVector m_savedExternalForce;
 	dVector m_savedExternalTorque;
+	dVector m_dampCoef;
+	dVector m_cachedDampCoef;
+	dFloat32 m_cachedTimeStep;
 
 	friend class ndDynamicsUpdate;
 	friend class ndDynamicsUpdateAvx2;

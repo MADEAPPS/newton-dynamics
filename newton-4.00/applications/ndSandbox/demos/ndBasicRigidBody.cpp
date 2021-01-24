@@ -36,6 +36,8 @@ class DebugNotify : public ndDemoEntityNotify
 		dVector omega(GetBody()->GetOmega());
 		dTrace(("%d wMag = %f  w(%f %f %f)\n", xxxx, dSqrt(omega.DotProduct(omega).GetScalar()), omega.m_x, omega.m_y, omega.m_z));
 		xxxx++;
+		if (xxxx > 500)
+			xxxx *= 1;
 	}
 };
 
@@ -68,6 +70,7 @@ matrix = dYawMatrix(30.0f * dDegreeToRad) * dRollMatrix(30.0f * dDegreeToRad) * 
 		body->SetMassMatrix(mass, sphereShape);
 		body->SetGyroMode(true);
 
+		body->SetAngularDamping(dVector(dFloat32(0.1045f)));
 		body->SetOmega(matrix.m_front.Scale(20.0f));
 
 

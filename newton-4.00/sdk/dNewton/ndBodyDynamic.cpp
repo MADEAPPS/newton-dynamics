@@ -34,6 +34,9 @@ ndBodyDynamic::ndBodyDynamic()
 	,m_impulseTorque(dVector::m_zero)
 	,m_savedExternalForce(dVector::m_zero)
 	,m_savedExternalTorque(dVector::m_zero)
+	,m_dampCoef(dVector::m_zero)
+	,m_cachedDampCoef(dVector::m_zero)
+	,m_cachedTimeStep(dFloat32 (0.0f))
 {
 }
 
@@ -47,6 +50,9 @@ ndBodyDynamic::ndBodyDynamic(const nd::TiXmlNode* const xmlNode, const dTree<con
 	,m_impulseTorque(dVector::m_zero)
 	,m_savedExternalForce(dVector::m_zero)
 	,m_savedExternalTorque(dVector::m_zero)
+	,m_dampCoef(dVector::m_zero)
+	,m_cachedDampCoef(dVector::m_zero)
+	,m_cachedTimeStep(dFloat32(0.0f))
 {
 	// nothing was saved
 	//dAssert(0);
@@ -110,14 +116,59 @@ void ndBodyDynamic::ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep)
 	m_impulseTorque = dVector::m_zero;
 }
 
+void ndBodyDynamic::SetLinearDamping(dFloat32 linearDamp)
+{
+	linearDamp = dClamp(linearDamp, dFloat32(0.0f), dFloat32(1.0f));
+	m_dampCoef.m_w = D_MAX_SPEED_ATT * linearDamp;
+	m_cachedTimeStep = dFloat32(0.0f);
+}
+
+dFloat32 ndBodyDynamic::GetLinearDamping() const
+{
+	return m_dampCoef.m_w / D_MAX_SPEED_ATT;
+}
+
+dVector ndBodyDynamic::GetAngularDamping() const
+{
+	return dVector(m_dampCoef.m_x / D_MAX_SPEED_ATT,
+				   m_dampCoef.m_y / D_MAX_SPEED_ATT,
+				   m_dampCoef.m_z / D_MAX_SPEED_ATT, dFloat32(0.0f));
+}
+
+
+void ndBodyDynamic::SetAngularDamping(const dVector& angularDamp)
+{
+	dFloat32 tmp = dClamp(angularDamp.m_x, dFloat32(0.0f), dFloat32(1.0f));
+	m_dampCoef.m_x = D_MAX_SPEED_ATT * tmp;
+
+	tmp = dClamp(angularDamp.m_y, dFloat32(0.0f), dFloat32(1.0f));
+	m_dampCoef.m_y = D_MAX_SPEED_ATT * tmp;
+
+	tmp = dClamp(angularDamp.m_z, dFloat32(0.0f), dFloat32(1.0f));
+	m_dampCoef.m_z = D_MAX_SPEED_ATT * tmp;
+
+	m_cachedTimeStep = dFloat32(0.0f);
+}
+
 void ndBodyDynamic::AddDampingAcceleration(dFloat32 timestep)
 {
+	if (dAbs(m_cachedTimeStep - timestep) > dFloat32(1.0e-6f)) 
+	{
+		m_cachedTimeStep = timestep;
+		const dFloat32 tau = dFloat32(60.0f) * timestep;
+		m_cachedDampCoef.m_x = dPow(dFloat32(1.0f) - m_dampCoef.m_x, tau);
+		m_cachedDampCoef.m_y = dPow(dFloat32(1.0f) - m_dampCoef.m_y, tau);
+		m_cachedDampCoef.m_z = dPow(dFloat32(1.0f) - m_dampCoef.m_z, tau);
+		m_cachedDampCoef.m_w = dPow(dFloat32(1.0f) - m_dampCoef.m_w, tau);
+	}
+	dVector damp (m_cachedDampCoef);
+
 	//dVector damp(GetDampCoeffcient(timestep));
-	//dVector omegaDamp(damp & dVector::m_triplexMask);
-	//dVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
-	//
-	//m_veloc = m_veloc.Scale(damp.m_w);
-	//m_omega = m_matrix.RotateVector(omega);
+	dVector omegaDamp(damp & dVector::m_triplexMask);
+	dVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
+	
+	m_veloc = m_veloc.Scale(damp.m_w);
+	m_omega = m_matrix.RotateVector(omega);
 }
 
 void ndBodyDynamic::IntegrateVelocity(dFloat32 timestep)

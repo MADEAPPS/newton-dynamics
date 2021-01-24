@@ -111,6 +111,12 @@ class ndBodyKinematic: public ndBody
 
 	void SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32 angleInRadian, dFloat32 speedInMitersPerSeconds);
 
+	virtual dFloat32 GetLinearDamping() const;
+	virtual void SetLinearDamping(dFloat32 linearDamp);
+
+	virtual dVector GetAngularDamping() const;
+	virtual void SetAngularDamping(const dVector& angularDamp);
+
 	D_COLLISION_API ndShapeInstance& GetCollisionShape();
 	D_COLLISION_API const ndShapeInstance& GetCollisionShape() const;
 	D_COLLISION_API virtual void SetCollisionShape(const ndShapeInstance& shapeInstance);
@@ -422,6 +428,24 @@ inline void ndBodyKinematic::SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dF
 {
 	m_maxAngleStep = dMax(dAbs(angleInRadian), dFloat32(90.0f) * dDegreeToRad);
 	m_maxLinearSpeed = dMax(speedInMitersPerSeconds, dFloat32 (100.0f));
+}
+
+inline void ndBodyKinematic::SetLinearDamping(dFloat32 linearDamp)
+{
+}
+
+inline dFloat32 ndBodyKinematic::GetLinearDamping() const
+{
+	return dFloat32(0.0f);
+}
+
+inline void ndBodyKinematic::SetAngularDamping(const dVector& angularDamp)
+{
+}
+
+inline dVector ndBodyKinematic::GetAngularDamping() const
+{
+	return dVector::m_zero;
 }
 
 #endif 
