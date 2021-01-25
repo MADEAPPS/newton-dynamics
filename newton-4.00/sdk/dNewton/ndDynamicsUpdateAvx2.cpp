@@ -854,8 +854,16 @@ void ndDynamicsUpdateAvx2::InitBodyArray()
 					dAssert(kinBody->m_bodyIsConstrained);
 					kinBody->UpdateInvInertiaMatrix();
 					kinBody->AddDampingAcceleration(m_timestep);
+
+					const dVector localOmega(kinBody->m_matrix.UnrotateVector(kinBody->m_omega));
+					const dVector localAngularMomentum(kinBody->m_mass * localOmega);
+					const dVector angularMomentum(kinBody->m_matrix.RotateVector(localAngularMomentum));
+
 					kinBody->m_accel = kinBody->m_veloc;
 					kinBody->m_alpha = kinBody->m_omega;
+					kinBody->m_gyroRotation = kinBody->m_rotation;
+					kinBody->m_gyroTorque = kinBody->m_omega.CrossProduct(angularMomentum);
+					kinBody->m_gyroAlpha = kinBody->m_invWorldInertiaMatrix.RotateVector(kinBody->m_gyroTorque);
 				}
 			}
 		}
@@ -1756,6 +1764,7 @@ void ndDynamicsUpdateAvx2::IntegrateBodiesVelocity()
 					{
 						body->m_veloc += velocStep.m_linear;
 						body->m_omega += velocStep.m_angular;
+						dynBody->IntegrateGyroSubstep(timestep4);
 					}
 					else
 					{
