@@ -274,15 +274,9 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 
 	const dInt32 count = desc->m_rowsCount;
 	const dFloat32 timestep = desc->m_timestep;
-	const dFloat32 invTimestep = desc->m_invTimeStep;
-	dAssert(invTimestep >= dFloat32(0.0f));
-
-static int xxxx;
-xxxx++;
-if (xxxx > 800)
-	xxxx *= 1;
-
-
+	const dFloat32 invTimestep = desc->m_invTimestep;
+	dAssert(desc->m_timestep > dFloat32(0.0f));
+	dAssert(desc->m_invTimestep > dFloat32(0.0f));
 
 	ndRightHandSide* const rightHandSide = desc->m_rightHandSide;
 	const ndLeftHandSide* const leftHandSide = desc->m_leftHandSide;

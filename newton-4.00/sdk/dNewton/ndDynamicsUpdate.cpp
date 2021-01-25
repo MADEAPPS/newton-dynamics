@@ -866,7 +866,7 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 
 			ndJointAccelerationDecriptor joindDesc;
 			joindDesc.m_timestep = me->m_timestepRK;
-			joindDesc.m_invTimeStep = me->m_invTimestepRK;
+			joindDesc.m_invTimestep = me->m_invTimestepRK;
 			joindDesc.m_firstPassCoefFlag = me->m_firstPassCoef;
 			dArray<ndLeftHandSide>& leftHandSide = me->m_leftHandSide;
 			dArray<ndRightHandSide>& rightHandSide = me->m_rightHandSide;

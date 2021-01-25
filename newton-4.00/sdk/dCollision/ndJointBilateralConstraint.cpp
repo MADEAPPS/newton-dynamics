@@ -218,6 +218,9 @@ void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& de
 	const dVector& omega1 = m_body1->GetOmega();
 	const dFloat32 relOmega = -(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular).AddHorizontal().GetScalar();
 
+	dAssert(desc.m_timestep > dFloat32(0.0f));
+	dAssert(desc.m_invTimestep > dFloat32(0.0f));
+	
 	m_rowIsMotor &= ~(1 << index);
 	m_motorAcceleration[index] = dFloat32(0.0f);
 	if (desc.m_timestep > dFloat32(0.0f)) {
@@ -325,6 +328,8 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 	ndRightHandSide* const rhs = desc->m_rightHandSide;
 	const ndLeftHandSide* const row = desc->m_leftHandSide;
 	dAssert(desc->m_timestep > dFloat32(0.0f));
+	dAssert(desc->m_invTimestep > dFloat32(0.0f));
+
 	if (desc->m_timestep > dFloat32(0.0f)) 
 	{
 		const dFloat32 ks = DG_POS_DAMP * dFloat32(0.5f);
@@ -347,10 +352,9 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 				const dVector relVeloc(
 					Jt.m_jacobianM0.m_linear * bodyVeloc0 + Jt.m_jacobianM0.m_angular * bodyOmega0 +
 					Jt.m_jacobianM1.m_linear * bodyVeloc1 + Jt.m_jacobianM1.m_angular * bodyOmega1);
-				const dFloat32 relGyro = (Jt.m_jacobianM0.m_angular * gyroAlpha0 + Jt.m_jacobianM1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
-				const dFloat32 relCentr = -(Jt.m_jacobianM0.m_linear * centripetal0 + Jt.m_jacobianM1.m_linear * centripetal1).AddHorizontal().GetScalar();
-
-				dFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
+				const dVector relGyro (Jt.m_jacobianM0.m_angular * gyroAlpha0 + Jt.m_jacobianM1.m_angular * gyroAlpha1);
+				const dVector relCentr (Jt.m_jacobianM0.m_linear * centripetal0 + Jt.m_jacobianM1.m_linear * centripetal1);
+				const dFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
 
 				//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 				//alphaError = num / den;
@@ -363,14 +367,14 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 				//dFloat32 den = dFloat32 (1.0f) + dt * kd + dt * ksd;
 				//accelError = num / den;
 
-				dFloat32 relPosit = rhs[k].m_penetration - vRel * dt * desc->m_firstPassCoefFlag;
+				const dFloat32 relPosit = rhs[k].m_penetration - vRel * dt * desc->m_firstPassCoefFlag;
 				rhs[k].m_penetration = relPosit;
 
-				dFloat32 ksd = dt * ks;
-				dFloat32 num = ks * relPosit - kd * vRel - ksd * vRel;
-				dFloat32 den = dFloat32(1.0f) + dt * kd + dt * ksd;
-				dFloat32 aRelErr = num / den;
-				rhs[k].m_coordenateAccel = rhs[k].m_deltaAccel + aRelErr + relCentr + relGyro;
+				const dFloat32 ksd = dt * ks;
+				const dFloat32 num = ks * relPosit - kd * vRel - ksd * vRel;
+				const dFloat32 den = dFloat32(1.0f) + dt * kd + dt * ksd;
+				const dFloat32 aRelErr = num / den;
+				rhs[k].m_coordenateAccel = rhs[k].m_deltaAccel + aRelErr + (relGyro - relCentr).AddHorizontal().GetScalar();
 			}
 		}
 	}

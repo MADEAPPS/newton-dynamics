@@ -154,7 +154,7 @@ class ndJointAccelerationDecriptor
 	public:
 	dInt32 m_rowsCount;
 	dFloat32 m_timestep;
-	dFloat32 m_invTimeStep;
+	dFloat32 m_invTimestep;
 	dFloat32 m_firstPassCoefFlag;
 	ndRightHandSide* m_rightHandSide;
 	const ndLeftHandSide* m_leftHandSide;

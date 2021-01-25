@@ -20,32 +20,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-class DebugNotify : public ndDemoEntityNotify
-{
-	public: 
-	DebugNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity)
-		:ndDemoEntityNotify(manager, entity)
-	{
-	}
-
-	void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
-	{
-		static int xxxx;
-		dVector omega(GetBody()->GetOmega());
-		dTrace(("%d wMag = %f  w(%f %f %f)\n", xxxx, dSqrt(omega.DotProduct(omega).GetScalar()), omega.m_x, omega.m_y, omega.m_z));
-
-		//if (xxxx > 500)
-		//{
-		//	return;
-		//}
-		
-		ndDemoEntityNotify::OnApplyExternalForce(threadIndex, timestep);
-		xxxx++;
-		if (xxxx > 500)
-			xxxx *= 1;
-	}
-};
-
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count)
@@ -64,20 +38,11 @@ static void AddShape(ndDemoEntityManager* const scene,
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
 
-matrix.m_posit.m_y += -6.0f;
-matrix = dYawMatrix(30.0f * dDegreeToRad) * dRollMatrix(30.0f * dDegreeToRad) * matrix;
-
-
-		//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-		body->SetNotifyCallback(new DebugNotify(scene, entity));
+		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(sphereShape);
 		body->SetMassMatrix(mass, sphereShape);
-		//body->SetGyroMode(true);
-
-		//body->SetAngularDamping(dVector(dFloat32(0.1045f)));
-		body->SetOmega(matrix.m_front.Scale(20.0f));
-
+		body->SetAngularDamping(dVector(dFloat32(0.5f)));
 
 		world->AddBody(body);
 		matrix.m_posit.m_y += diameter * 2.5f;
@@ -93,12 +58,10 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);
 
-	//const int n = 2;
-	//const int stackHigh = 7;
-	const int n = 1;
-	const int stackHigh = 1;
-	//const int n = 10;
-	//const int stackHigh = 7;
+	//const int n = 1;
+	//const int stackHigh = 1;
+	const int n = 10;
+	const int stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)
@@ -122,7 +85,7 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
-	//dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
-	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-60.0f, 5.0f, 0.0f, 0.0f);
+	//dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
