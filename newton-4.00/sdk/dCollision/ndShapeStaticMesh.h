@@ -115,26 +115,6 @@ class ndPolygonMeshDesc: public dFastAabbInfo
 	dgMesh m_meshData;
 } D_GCC_NEWTON_ALIGN_32;
 
-#if 0
-D_MSV_NEWTON_ALIGN_32 
-class dgCollisionMeshRayHitDesc
-{
-	public:
-	dgCollisionMeshRayHitDesc ()
-		:m_matrix (dGetIdentityMatrix())
-	{
-	}
-
-	dVector m_localP0; 
-	dVector m_localP1; 
-	dVector m_normal;
-	dUnsigned64 m_userId;
-	void*  m_userData;
-	void*  m_altenateUserData;
-	dMatrix m_matrix;
-}D_GCC_NEWTON_ALIGN_32;
-#endif
-
 class ndShapeStaticMesh: public ndShape
 {
 	public:
@@ -168,34 +148,6 @@ class ndShapeStaticMesh: public ndShape
 		dInt32 m_vertexCount;
 		dInt32 m_vertexStrideInBytes;
 	} D_GCC_NEWTON_ALIGN_32;
-
-#if 0
-	ndShapeStaticMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
-	
-	virtual void GetVertexListIndexList (const dVector& p0, const dVector& p1, ndMeshVertexListIndexList &data) const = 0;
-	void SetDebugCollisionCallback (dgCollisionMeshCollisionCallback debugCallback);
-	dgCollisionMeshCollisionCallback GetDebugCollisionCallback() const { return m_debugCallback;} 
-
-	protected:
-	virtual void SetCollisionBBox (const dVector& p0, const dVector& p1);
-
-	private:
-	virtual dInt32 CalculateSignature () const;
-	virtual void DebugCollision  (const dMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
-
-	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
-	virtual void Serialize(dgSerialize callback, void* const userData) const;
-
-
-#ifdef DG_DEBUG_AABB
-	dVector BoxSupportMapping  (const dVector& dir) const;
-#endif
-
-	protected:
-	dgCollisionMeshCollisionCallback m_debugCallback;
-	friend class dgWorld;
-	friend class ndShapeInstance;
-#endif
 };
 
 inline dFloat32 ndShapeStaticMesh::GetVolume() const

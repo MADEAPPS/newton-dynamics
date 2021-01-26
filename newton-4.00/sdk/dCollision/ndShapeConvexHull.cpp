@@ -39,64 +39,6 @@ class ndShapeConvexHull::ndConvexBox
 	dInt32 m_rightBox;
 } D_GCC_NEWTON_ALIGN_32;
 
-#if 0
-dInt32 ndShapeConvexHull::GetFaceIndices (dInt32 index, dInt32* const indices) const
-{
-	dInt32 count = 0;
-	const ndConvexSimplexEdge* face = m_faceArray[index];
-	do {
-		indices [count] = face->m_vertex;
-		count ++;
-		face = face->m_next;
-	} while (face != m_faceArray[index]);
-
-	return count;
-}
-
-bool ndShapeConvexHull::CheckConvex (dPolyhedra& polyhedra1, const dBigVector* hullVertexArray) const
-{
-	dPolyhedra polyhedra(polyhedra1);
-
-	dPolyhedra::Iterator iter (polyhedra);
-	dBigVector center (dFloat32 (0.0f), dFloat32 (0.0f), dFloat32 (0.0f), dFloat32 (0.0f));
-
-	dInt32 count = 0;
-	dInt32 mark = polyhedra.IncLRU();
-	for (iter.Begin(); iter; iter ++) {
-		dEdge* const edge = &(*iter);
-		if (edge->m_mark < mark) {
-			count ++;
-			center += hullVertexArray[edge->m_incidentVertex];
-			dEdge* ptr = edge;
-			do {
-				ptr->m_mark = mark;
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != edge);
-		}
-	}
-	center = center.Scale (dFloat64 (1.0f) / dFloat64 (count));
-
-	for (iter.Begin(); iter; iter ++) {
-		dEdge* const edge = &(*iter);
-		dBigVector normal0 (FaceNormal (edge, hullVertexArray));
-		dBigVector normal1 (FaceNormal (edge->m_twin, hullVertexArray));
-
-		dBigPlane plane0 (normal0, - normal0.DotProduct(hullVertexArray[edge->m_incidentVertex]).GetScalar());
-		dBigPlane plane1 (normal1, - normal1.DotProduct(hullVertexArray[edge->m_twin->m_incidentVertex]).GetScalar());
-		dFloat64 test0 = plane0.Evalue(center);
-		if (test0 > dFloat64 (1.0e-3f)) {
-			return false;
-		}
-		dFloat64 test1 = plane1.Evalue(center);
-//		if (test1 > dFloat64 (0.0f)) {
-		if (test1 > dFloat64 (1.0e-3f)) {
-			return false;
-		}
-	}
-	return true;
-}
-
-#endif
 
 ndShapeConvexHull::ndShapeConvexHull (dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray)
 	:ndShapeConvex(m_convexHull)

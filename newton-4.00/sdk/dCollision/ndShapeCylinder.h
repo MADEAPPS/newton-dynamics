@@ -19,19 +19,21 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_SHAPE_CAPSULE_H__
-#define __D_SHAPE_CAPSULE_H__
+#ifndef __D_SHAPE_CYLINDER_H__
+#define __D_SHAPE_CYLINDER_H__
 
 #include "ndShapeConvex.h"
 
+#define D_TAPED_CYLINDER_SEGMENTS 12
+
 D_MSV_NEWTON_ALIGN_32
-class ndShapeCapsule : public ndShapeConvex
+class ndShapeCylinder : public ndShapeConvex
 {
 	public:
-	D_COLLISION_API ndShapeCapsule(const nd::TiXmlNode* const xmlNode);
-	D_COLLISION_API ndShapeCapsule (dFloat32 radio0, dFloat32 radio1, dFloat32 height);
+	D_COLLISION_API ndShapeCylinder(const nd::TiXmlNode* const xmlNode);
+	D_COLLISION_API ndShapeCylinder (dFloat32 radio0, dFloat32 radio1, dFloat32 height);
 
-	virtual ndShapeCapsule* GetAsShapeCapsule() { return this; }
+	virtual ndShapeCylinder* GetAsShapeCylinder() { return this; }
 
 	protected:
 	D_COLLISION_API void Init (dFloat32 radio0, dFloat32 radio1, dFloat32 height);
@@ -46,15 +48,24 @@ class ndShapeCapsule : public ndShapeConvex
 	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
 
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
-	void TesselateTriangle(dInt32 level, const dVector& p0, const dVector& p1, const dVector& p2, dInt32& count, dVector* ouput) const;
-	
-	dVector m_p0;
-	dVector m_p1;
-	dVector m_normal;
-	dVector m_transform;
-	dFloat32 m_height;
+
+	//dVector m_p0;
+	//dVector m_p1;
+	//dVector m_normal;
+	//dVector m_transform;
+	//dFloat32 m_height;
+	//dFloat32 m_radius0;
+	//dFloat32 m_radius1;
+
+	dVector m_profile[4];
+	dVector m_vertex[D_TAPED_CYLINDER_SEGMENTS * 2];
 	dFloat32 m_radius0;
 	dFloat32 m_radius1;
+	dFloat32 m_height;
+
+	static dInt32 m_shapeRefCount;
+	static ndConvexSimplexEdge m_edgeArray[];
+
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif 

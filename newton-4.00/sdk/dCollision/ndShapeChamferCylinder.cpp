@@ -169,32 +169,6 @@ void ndShapeChamferCylinder::Save(nd::TiXmlElement* const xmlNode, const char* c
 	xmlSaveParam(paramNode, "height", m_height * dFloat32(2.0f));
 }
 
-#if 0
-
-
-void ndShapeChamferCylinder::CalculateImplicitContacts(dInt32 count, dgContactPoint* const contactPoints) const
-{
-	for (dInt32 i = 0; i < count; i ++) {
-		dVector diskPoint (contactPoints[i].m_point);
-		diskPoint.m_x = dFloat32 (0.0f);
-		diskPoint.m_w = dFloat32 (0.0f);
-		dAssert(diskPoint.DotProduct(diskPoint).GetScalar() > dFloat32(0.0f));
-		dFloat32 r2 = diskPoint.DotProduct(diskPoint).GetScalar();
-		if (r2 >= m_radius * m_radius) {
-			diskPoint = diskPoint.Normalize().Scale (m_radius);
-			dVector normal (contactPoints[i].m_point - diskPoint);
-			normal = normal.Normalize();
-			contactPoints[i].m_point = diskPoint + normal.Scale (m_height);
-			contactPoints[i].m_normal = normal * dVector::m_negOne;
-		} else {
-			contactPoints[i].m_normal = dVector::m_zero;
-			contactPoints[i].m_normal.m_x = dSign(contactPoints[i].m_point.m_x);
-			contactPoints[i].m_point.m_x = dSign(contactPoints[i].m_normal.m_x) * m_height;
-		}
-	}
-}
-#endif
-
 ndShapeInfo ndShapeChamferCylinder::GetShapeInfo() const
 {
 	ndShapeInfo info(ndShapeConvex::GetShapeInfo());

@@ -65,25 +65,6 @@ class ndShapeStaticBVH : public ndShapeStaticMesh, public dAabbPolygonSoup
 		const ndShapeStaticBVH* m_me;
 	} D_GCC_NEWTON_ALIGN_32;
 
-#if 0	
-	void GetVertexListIndexList (const dVector& p0, const dVector& p1, ndMeshVertexListIndexList &data) const;
-	void ForEachFace (dgAABBIntersectCallback callback, void* const context) const;
-
-	private:
-	
-	static dFloat32 RayHitUser (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount);
-	static dIntersectStatus CollectVertexListIndexList (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
-	virtual dVector SupportVertex (const dVector& dir) const;
-
-	virtual void GetLocalAABB (const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
-
-	virtual dVector SupportVertex (const dVector& dir, dInt32* const vertexIndex) const;
-	virtual dVector SupportVertexSpecial (const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
-	virtual dVector SupportVertexSpecialProjectPoint (const dVector& point, const dVector& dir) const {return point;}
-	friend class dgCollisionCompound;
-	friend class dgCollisionDeformableMesh;
-#endif
-
 	private: 
 	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
 	dInt32 m_trianglesCount;
