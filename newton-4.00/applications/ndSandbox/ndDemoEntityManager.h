@@ -122,6 +122,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	void ImportPLYfile (const char* const name);
 
 	ndDemoCamera* GetCamera() const;
+	ndDemoCameraManager* GetCameraManager() const;
 	bool GetMouseSpeed(dFloat32& posX, dFloat32& posY) const;
 	bool GetMousePosition (dFloat32& posX, dFloat32& posY) const;
 	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
@@ -273,6 +274,11 @@ inline void ndDemoEntityManager::SetDebugDisplay(int mode) const
 inline const ndShaderPrograms& ndDemoEntityManager::GetShaderCache() const
 {
 	return m_shaderCache;
+}
+
+inline ndDemoCameraManager* ndDemoEntityManager::GetCameraManager() const
+{
+	return m_cameraManager;
 }
 
 #endif

@@ -134,7 +134,7 @@ class dgDynamicBodyAsymetric: public dgDynamicBody
 	virtual dgMatrix CalculateLocalInertiaMatrix() const;
 	virtual dgMatrix CalculateInvInertiaMatrix() const;
 	virtual void SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia);
-	virtual void IntegrateOpenLoopExternalForce(dgFloat32 timestep);
+	
 
 	dgMatrix m_principalAxis;
 } DG_GCC_VECTOR_ALIGNMENT;

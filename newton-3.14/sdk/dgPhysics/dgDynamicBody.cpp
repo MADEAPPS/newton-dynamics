@@ -103,11 +103,6 @@ dgMatrix dgDynamicBodyAsymetric::CalculateInvInertiaMatrix() const
 	return matrix * diagonal * matrix.Inverse();
 }
 
-void dgDynamicBodyAsymetric::IntegrateOpenLoopExternalForce(dgFloat32 timestep)
-{
-	dgDynamicBody::IntegrateOpenLoopExternalForce(timestep);
-}
-
 
 dgDynamicBody::dgDynamicBody()
 	:dgBody()

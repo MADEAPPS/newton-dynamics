@@ -714,11 +714,6 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			const dFloat32 preconditioner0 = joint->m_preconditioner0;
 			const dFloat32 preconditioner1 = joint->m_preconditioner1;
 
-			static int xxxx;
-			xxxx++;
-			if (xxxx > 200)
-				xxxx *= 1;
-
 			for (dInt32 i = 0; i < count; i++)
 			{
 				ndLeftHandSide* const row = &m_leftHandSide[index + i];

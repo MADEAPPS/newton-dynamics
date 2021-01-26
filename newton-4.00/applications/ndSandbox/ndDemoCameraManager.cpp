@@ -55,6 +55,7 @@ ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const scene)
 	,m_pickedBodyParam(0.0f)
 	,m_prevMouseState(false)
 	,m_mouseLockState(false)
+	,m_pickingMode(false)
 {
 }
 
@@ -265,7 +266,10 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 
 				m_pickJoint = new ndDemoCameraPickBodyJoint (body, scene->GetWorld()->GetSentinelBody(), posit, this);
 				scene->GetWorld()->AddJoint(m_pickJoint);
-				m_pickJoint->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
+				m_pickingMode ? 
+					m_pickJoint->SetControlMode(ndJointKinematicController::m_linear) : 
+					m_pickJoint->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
+				
 				
 				m_pickJoint->SetMaxLinearFriction(mass.m_w * linearFrictionAccel);
 				m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);

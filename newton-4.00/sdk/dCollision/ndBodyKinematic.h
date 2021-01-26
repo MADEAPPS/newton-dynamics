@@ -105,10 +105,6 @@ class ndBodyKinematic: public ndBody
 
 	bool GetAutoSleep() const;
 	void SetAutoSleep(bool state);
-
-	//bool GetGyroMode() const;
-	//void SetGyroMode(bool state);
-
 	void SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32 angleInRadian, dFloat32 speedInMitersPerSeconds);
 
 	virtual dFloat32 GetLinearDamping() const;
@@ -127,9 +123,9 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API dFloat32 TotalEnergy() const;
 
 	D_COLLISION_API dMatrix CalculateInertiaMatrix() const;
-	D_COLLISION_API dMatrix CalculateInvInertiaMatrix() const;
-	D_COLLISION_API void UpdateInvInertiaMatrix();
+	D_COLLISION_API virtual dMatrix CalculateInvInertiaMatrix() const;
 
+	D_COLLISION_API void UpdateInvInertiaMatrix();
 	D_COLLISION_API virtual void IntegrateVelocity(dFloat32 timestep);
 
 	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
@@ -157,13 +153,11 @@ class ndBodyKinematic: public ndBody
 	const ndJointList& GetJointList() const;
 	const ndContactMap& GetContactMap() const;
 
-	private:
-	D_COLLISION_API void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);
-
 	protected:
 	D_COLLISION_API static void ReleaseMemory();
 	D_COLLISION_API virtual void AttachContact(ndContact* const contact);
 	D_COLLISION_API virtual void DetachContact(ndContact* const contact);
+	D_COLLISION_API virtual void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);
 
 	D_COLLISION_API virtual ndJointList::dListNode* AttachJoint(ndJointBilateralConstraint* const joint);
 	D_COLLISION_API virtual void DetachJoint(ndJointList::dListNode* const node);

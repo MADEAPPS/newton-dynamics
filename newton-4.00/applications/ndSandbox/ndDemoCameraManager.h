@@ -33,6 +33,8 @@ class ndDemoCameraManager: public dClassAlloc
 
 	void SetCameraMouseLock (bool loockState);
 
+	void SetPickMode(bool mode) {m_pickingMode = mode;}
+
 	void RenderPickedTarget () const;
 	void InterpolateMatrices (ndDemoEntityManager* const scene, dFloat32 timeStepFraction);
 
@@ -62,7 +64,8 @@ class ndDemoCameraManager: public dClassAlloc
 	dFloat32 m_pickedBodyParam;
 	
 	bool m_prevMouseState;	
-	bool m_mouseLockState;	
+	bool m_mouseLockState;
+	bool m_pickingMode;
 
 	friend class ndDemoCamera;
 };
