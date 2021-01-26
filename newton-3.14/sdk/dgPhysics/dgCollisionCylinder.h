@@ -60,8 +60,8 @@ class dgCollisionCylinder: public dgCollisionConvex
 
 	dgVector m_profile[4];
 	dgVector m_vertex[DG_TAPED_CYLINDER_SEGMENTS * 2];
-	dgFloat32 m_radio0;
-	dgFloat32 m_radio1;
+	dgFloat32 m_radius0;
+	dgFloat32 m_radius1;
 	dgFloat32 m_height;
 
 	static dgInt32 m_shapeRefCount;

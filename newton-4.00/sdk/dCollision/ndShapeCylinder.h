@@ -32,6 +32,7 @@ class ndShapeCylinder : public ndShapeConvex
 	public:
 	D_COLLISION_API ndShapeCylinder(const nd::TiXmlNode* const xmlNode);
 	D_COLLISION_API ndShapeCylinder (dFloat32 radio0, dFloat32 radio1, dFloat32 height);
+	D_COLLISION_API ~ndShapeCylinder();
 
 	virtual ndShapeCylinder* GetAsShapeCylinder() { return this; }
 
@@ -48,14 +49,6 @@ class ndShapeCylinder : public ndShapeConvex
 	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
 
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
-
-	//dVector m_p0;
-	//dVector m_p1;
-	//dVector m_normal;
-	//dVector m_transform;
-	//dFloat32 m_height;
-	//dFloat32 m_radius0;
-	//dFloat32 m_radius1;
 
 	dVector m_profile[4];
 	dVector m_vertex[D_TAPED_CYLINDER_SEGMENTS * 2];

@@ -53,16 +53,16 @@ dgCollisionCylinder::dgCollisionCylinder(dgWorld* const world, dgDeserialize des
 void dgCollisionCylinder::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height)
 {
 	m_rtti |= dgCollisionCylinder_RTTI;
-	m_radio0 = dgMax (dgAbs (radio0), D_MIN_CONVEX_SHAPE_SIZE);
-	m_radio1 = dgMax (dgAbs (radio1), D_MIN_CONVEX_SHAPE_SIZE);
+	m_radius0 = dgMax (dgAbs (radio0), D_MIN_CONVEX_SHAPE_SIZE);
+	m_radius1 = dgMax (dgAbs (radio1), D_MIN_CONVEX_SHAPE_SIZE);
 	m_height = dgMax (dgAbs (height * dgFloat32 (0.5f)), D_MIN_CONVEX_SHAPE_SIZE);
 
 	dgFloat32 angle = dgFloat32 (0.0f);
 	for (dgInt32 i = 0; i < DG_TAPED_CYLINDER_SEGMENTS; i ++) {
 		dgFloat32 sinAngle = dgSin (angle);
 		dgFloat32 cosAngle = dgCos (angle);
-		m_vertex[i                       ]       = dgVector (- m_height, m_radio0 * cosAngle, m_radio0 * sinAngle, dgFloat32 (0.0f));
-		m_vertex[i + DG_TAPED_CYLINDER_SEGMENTS] = dgVector (  m_height, m_radio1 * cosAngle, m_radio1 * sinAngle, dgFloat32 (0.0f));
+		m_vertex[i                       ]       = dgVector (- m_height, m_radius0 * cosAngle, m_radius0 * sinAngle, dgFloat32 (0.0f));
+		m_vertex[i + DG_TAPED_CYLINDER_SEGMENTS] = dgVector (  m_height, m_radius1 * cosAngle, m_radius1 * sinAngle, dgFloat32 (0.0f));
 		angle += dgPI2 / DG_TAPED_CYLINDER_SEGMENTS;
 	}
 
@@ -117,10 +117,10 @@ void dgCollisionCylinder::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 he
 		}
 	}
 
-	m_profile[0] = dgVector( m_height,  m_radio1, dgFloat32 (0.0f), dgFloat32 (0.0f));
-	m_profile[1] = dgVector(-m_height,  m_radio0, dgFloat32 (0.0f), dgFloat32 (0.0f));
-	m_profile[2] = dgVector(-m_height, -m_radio0, dgFloat32 (0.0f), dgFloat32 (0.0f));
-	m_profile[3] = dgVector(m_height,  -m_radio1, dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_profile[0] = dgVector( m_height,  m_radius1, dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_profile[1] = dgVector(-m_height,  m_radius0, dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_profile[2] = dgVector(-m_height, -m_radius0, dgFloat32 (0.0f), dgFloat32 (0.0f));
+	m_profile[3] = dgVector(m_height,  -m_radius1, dgFloat32 (0.0f), dgFloat32 (0.0f));
 
 	m_shapeRefCount ++;
 	dgCollisionConvex::m_simplex = m_edgeArray;
@@ -150,7 +150,7 @@ dgInt32 dgCollisionCylinder::CalculateSignature (dgFloat32 radio0, dgFloat32 rad
 
 dgInt32 dgCollisionCylinder::CalculateSignature () const
 {
-	return CalculateSignature (m_radio0, m_radio1, m_height);
+	return CalculateSignature (m_radius0, m_radius1, m_height);
 }
 
 
@@ -168,11 +168,11 @@ void dgCollisionCylinder::DebugCollision (const dgMatrix& matrix, dgCollision::O
 		dgFloat32 z = dgSin (angle);
 		dgFloat32 y = dgCos (angle);
 		pool[i].m_x = - m_height;
-		pool[i].m_y = y * m_radio0;
-		pool[i].m_z = z * m_radio0;
+		pool[i].m_y = y * m_radius0;
+		pool[i].m_z = z * m_radius0;
 		pool[i + 24].m_x = m_height;
-		pool[i + 24].m_y = y * m_radio1;
-		pool[i + 24].m_z = z * m_radio1;
+		pool[i + 24].m_y = y * m_radius1;
+		pool[i + 24].m_z = z * m_radius1;
 		angle += dgPI2 / dgFloat32 (24.0f);
 	}
 
@@ -203,15 +203,15 @@ void dgCollisionCylinder::DebugCollision (const dgMatrix& matrix, dgCollision::O
 
 void dgCollisionCylinder::MassProperties()
 {
-//	dgFloat32 Ixx = (1.0f / 2.0f) * m_radio0 * m_radio0;
-//	dgFloat32 Iyy= (1.0f / 12.0f) * (3.0f * m_radio0 * m_radio0 + 4.0f * m_height * m_height);
+//	dgFloat32 Ixx = (1.0f / 2.0f) * m_radius0 * m_radius0;
+//	dgFloat32 Iyy= (1.0f / 12.0f) * (3.0f * m_radius0 * m_radius0 + 4.0f * m_height * m_height);
 	dgCollisionConvex::MassProperties();
 	
 //	m_centerOfMass = dgVector::m_zero;
 //	m_crossInertia = dgVector::m_zero;
 //	dgFloat32 volume = dgFloat32(2.0f * dgPI) * m_radius *  m_radius * m_height;
-//	dgFloat32 II = (1.0f / 2.0f) * m_radio0 * m_radio0;
-//	dgFloat32 JJ = (1.0f / 12.0f) * (3.0f * m_radio0 * m_radio0 + 4.0f * m_height * m_height);
+//	dgFloat32 II = (1.0f / 2.0f) * m_radius0 * m_radius0;
+//	dgFloat32 JJ = (1.0f / 12.0f) * (3.0f * m_radius0 * m_radius0 + 4.0f * m_height * m_height);
 //	m_inertia = dgVector(II, JJ, JJ, dgFloat32(0.0f));
 //	m_centerOfMass.m_w = volume;
 }
@@ -231,8 +231,8 @@ dgVector dgCollisionCylinder::SupportVertex (const dgVector& dir, dgInt32* const
 		dgFloat32 mag2 = dir_yz.DotProduct(dir_yz).GetScalar();
 		dgAssert (mag2 > dgFloat32 (0.0f));
 		dir_yz = dir_yz.Scale (dgFloat32 (1.0f) / dgSqrt (mag2));
-		dgVector p0 (dir_yz.Scale (m_radio0));
-		dgVector p1 (dir_yz.Scale (m_radio1));
+		dgVector p0 (dir_yz.Scale (m_radius0));
+		dgVector p1 (dir_yz.Scale (m_radius1));
 
 		p0.m_x = -m_height;
 		p1.m_x =  m_height;
@@ -264,8 +264,8 @@ dgVector dgCollisionCylinder::SupportVertexSpecial (const dgVector& dir, dgFloat
 		dgFloat32 mag2 = dir_yz.DotProduct(dir_yz).GetScalar();
 		dgAssert (mag2 > dgFloat32 (0.0f));
 		dir_yz = dir_yz.Scale(dgFloat32(1.0f) / dgSqrt(mag2));
-		dgVector p0(dir_yz.Scale(m_radio0 - thickness));
-		dgVector p1(dir_yz.Scale(m_radio1 - thickness));
+		dgVector p0(dir_yz.Scale(m_radius0 - thickness));
+		dgVector p1(dir_yz.Scale(m_radius1 - thickness));
 
 		p0.m_x = - (m_height - thickness);
 		p1.m_x =   m_height - thickness;
@@ -300,7 +300,7 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 		if (normal.m_x < -inclination) {
 			dgMatrix matrix(normal);
 			matrix.m_posit.m_x = origin.m_x;
-			count = BuildCylinderCapPoly (m_radio0, matrix, contactsOut);
+			count = BuildCylinderCapPoly (m_radius0, matrix, contactsOut);
 			//count = RectifyConvexSlice(n, normal, contactsOut);
 		} else {
 			dgFloat32 magInv = dgRsqrt(normal.m_y * normal.m_y + normal.m_z * normal.m_z);
@@ -339,7 +339,7 @@ dgInt32 dgCollisionCylinder::CalculatePlaneIntersection (const dgVector& normal,
 		if (normal.m_x > inclination) {
 			dgMatrix matrix(normal);
 			matrix.m_posit.m_x = origin.m_x;
-			count = BuildCylinderCapPoly (m_radio1, matrix, contactsOut);
+			count = BuildCylinderCapPoly (m_radius1, matrix, contactsOut);
 			//count = RectifyConvexSlice(n, normal, contactsOut);
 		} else {
 			dgFloat32 magInv = dgRsqrt(normal.m_y * normal.m_y + normal.m_z * normal.m_z);
@@ -413,15 +413,15 @@ void dgCollisionCylinder::GetCollisionInfo(dgCollisionInfo* const info) const
 {
 	dgCollisionConvex::GetCollisionInfo(info);
 
-	info->m_cylinder.m_radio0 = m_radio0;
-	info->m_cylinder.m_radio1 = m_radio1;
+	info->m_cylinder.m_radio0 = m_radius0;
+	info->m_cylinder.m_radio1 = m_radius1;
 	info->m_cylinder.m_height = m_height * dgFloat32 (2.0f);
 }
 
 
 void dgCollisionCylinder::Serialize(dgSerialize callback, void* const userData) const
 {
-	dgVector size (m_radio0, m_radio1, m_height * dgFloat32 (2.0f), dgFloat32 (0.0f));
+	dgVector size (m_radius0, m_radius1, m_height * dgFloat32 (2.0f), dgFloat32 (0.0f));
 	SerializeLow(callback, userData);
 	callback (userData, &size, sizeof (dgVector));
 }

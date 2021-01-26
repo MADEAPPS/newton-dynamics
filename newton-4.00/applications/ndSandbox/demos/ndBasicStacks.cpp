@@ -70,6 +70,43 @@ static void BuildBoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const
 	geometry->Release();
 }
 
+static void BuildCylinderStack(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& size, dInt32 count)
+{
+	// build a standard block stack of 20 * 3 boxes for a total of 60
+	ndWorld* const world = scene->GetWorld();
+
+	dVector blockBoxSize(size);
+
+	// create the stack
+	dMatrix baseMatrix(dGetIdentityMatrix());
+
+	// for the elevation of the floor at the stack position
+	baseMatrix.m_posit.m_x = origin.m_x;
+	baseMatrix.m_posit.m_z = origin.m_z;
+
+	dVector floor(FindFloor(*world, baseMatrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y * 0.5f;
+
+	ndShapeInstance shape(new ndShapeCylinder(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z));
+	shape.SetLocalMatrix(dRollMatrix(dPi * 0.5f));
+	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+
+	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
+	scene->AddEntity(rootEntity);
+
+	dMatrix rotation(dYawMatrix(20.0f * dDegreeToRad));
+
+	for (int i = 0; i < count; i++)
+	{
+		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
+		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
+		baseMatrix = rotation * baseMatrix;
+	}
+
+	geometry->Release();
+}
+
+
 static void BuildPyramid(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& boxSize, dInt32 count)
 {
 	dMatrix matrix(dGetIdentityMatrix());
@@ -122,10 +159,14 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	dVector origin1(0.0f, 0.0f, 4.0f, 0.0f);
 	BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 
+	origin1.m_z = -4.0f;
+	BuildCylinderStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+
 	origin1.m_z = 0.0f;
 	origin1.m_x += 4.0f;
 	BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
 
+/*
 	//origin1.m_x += 8.0f;
 	//origin1.m_z += 8.0f;
 	//BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
@@ -149,6 +190,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	//origin1.m_x += 8.0f;
 	//origin1.m_z += 8.0f;
 	//BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+*/
 
 	dQuaternion rot;
 	//dVector origin(-10.0f, 1.0f, 0.0f, 0.0f);

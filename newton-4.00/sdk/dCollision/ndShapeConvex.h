@@ -36,7 +36,6 @@ class ndShapeConvex: public ndShape
 
 	//bool IntesectionTest (dShapeParamProxy& proxy) const;
 
-	protected:
 	class ndConvexSimplexEdge
 	{
 		public:
@@ -46,6 +45,7 @@ class ndShapeConvex: public ndShape
 		dInt32 m_vertex;
 	};
 
+	protected:
 	D_COLLISION_API ndShapeConvex (ndShapeID id);
 	D_COLLISION_API ~ndShapeConvex ();
 
