@@ -36,6 +36,7 @@
 #include <ndBodyList.h>
 #include <ndShapeBox.h>
 #include <ndShapeNull.h>
+#include <ndShapeCone.h>
 #include <ndSceneNode.h>
 #include <ndJointList.h>
 #include <ndSceneMixed.h>

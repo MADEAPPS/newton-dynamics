@@ -28,6 +28,7 @@ class ndBody;
 class ndShape;
 class ndShapeBox;
 class ndShapeNull;
+class ndShapeCone;
 class ndShapeConvex;
 class ndShapeSphere;
 class ndShapeCapsule;
@@ -53,7 +54,7 @@ enum ndShapeID
 	m_cylinderCollision,
 	m_chamferCylinderCollision,
 	m_boxCollision,
-	//m_coneCollision,
+	m_coneCollision,
 	m_convexHull, // this must be the last convex shape ID
 
 	// non convex collisions.
@@ -220,6 +221,7 @@ class ndShape: public dClassAlloc
 	virtual dInt32 Release() const;
 
 	virtual ndShapeBox* GetAsShapeBox() { return nullptr; }
+	virtual ndShapeCone* GetAsShapeCone() { return nullptr; }
 	virtual ndShapeSphere* GetAsShapeSphere() { return nullptr; }
 	virtual ndShapeCapsule* GetAsShapeCapsule() { return nullptr; }
 	virtual ndShapeCylinder* GetAsShapeCylinder() { return nullptr; }
