@@ -30,7 +30,7 @@
 #include "dMatrix.h"
 #include "dQuaternion.h"
 
-#define DG_OLD_CONVEXHULL_3D
+#define D_OLD_CONVEXHULL_3D
 
 class dConvexHull3dVertex;
 class dConvexHull3dAABBTreeNode;
@@ -59,7 +59,7 @@ class dConvexHull3dFace
 D_MSV_NEWTON_ALIGN_32
 class dConvexHull3d: public dClassAlloc, public dList<dConvexHull3dFace>
 {
-#ifdef	DG_OLD_CONVEXHULL_3D
+#ifdef	D_OLD_CONVEXHULL_3D
 	class dNormalMap;
 #endif
 

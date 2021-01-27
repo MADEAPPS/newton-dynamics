@@ -52,6 +52,7 @@
 #include <dPerlinNoise.h>
 #include <dTinyXmlGlue.h>
 #include <dConvexHull3d.h>
+#include <dConvexHull4d.h>
 #include <dBezierSpline.h>
 #include <dNodeHierarchy.h>
 #include <dFixSizeBuffer.h>

@@ -30,7 +30,7 @@
 
 #define DG_CONVEXHULL_3D_VERTEX_CLUSTER_SIZE		8
 
-#ifdef	DG_OLD_CONVEXHULL_3D
+#ifdef	D_OLD_CONVEXHULL_3D
 class dConvexHull3d::dNormalMap
 {
 	public:
@@ -252,7 +252,7 @@ void dConvexHull3d::BuildHull (const dFloat64* const vertexCloud, dInt32 strideI
 	dStack<dgConvexHull3dPointCluster> treePool (treeCount + 256);
 	count = InitVertexArray(&points[0], vertexCloud, strideInBytes, count, &treePool[0], treePool.GetSizeInBytes());
 
-#ifdef	DG_OLD_CONVEXHULL_3D
+#ifdef	D_OLD_CONVEXHULL_3D
 	if (m_count >= 4) 
 	{
 		CalculateConvexHull3d (&treePool[0], &points[0], count, distTol, maxVertexCount);
@@ -474,7 +474,7 @@ dInt32 dConvexHull3d::InitVertexArray(dConvexHull3dVertex* const points, const d
 	dAssert (boxSize.m_w == dFloat32 (0.0f));
 	m_diag = dFloat32 (sqrt (boxSize.DotProduct(boxSize).GetScalar()));
 
-#ifdef DG_OLD_CONVEXHULL_3D
+#ifdef D_OLD_CONVEXHULL_3D
 	const dNormalMap& normalMap = dNormalMap::GetNormaMap();
 
 	dInt32 index0 = SupportVertex (&tree, points, normalMap.m_normal[0]);
