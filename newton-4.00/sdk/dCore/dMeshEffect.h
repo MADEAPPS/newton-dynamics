@@ -187,7 +187,7 @@ class dMeshEffect: public dPolyhedra
 	dMeshEffect* CreateTetrahedraIsoSurface() const;
 	void CreateTetrahedraLinearBlendSkinWeightsChannel (const dMeshEffect* const tetrahedraMesh);
 
-	static dMeshEffect* CreateVoronoiConvexDecomposition (dMemoryAllocator___* const allocator, dInt32 pointCount, dInt32 pointStrideInBytes, const dFloat32* const pointCloud, dInt32 materialId, const dMatrix& textureProjectionMatrix);
+	
 	static dMeshEffect* CreateFromSerialization (dMemoryAllocator___* const allocator, dgDeserialize deserialization, void* const userData);
 
 	void LoadOffMesh (const char* const filename);
@@ -233,8 +233,6 @@ class dMeshEffect: public dPolyhedra
 	dBigVector GetOrigin ()const;
 	dInt32 CalculateMaxAttributes () const;
 	dFloat64 QuantizeCordinade(dFloat64 val) const;
-
-	void MergeFaces (const dMeshEffect* const source);
 //	void ReverseMergeFaces (dMeshEffect* const source);
 
 	bool PlaneClip (const dMeshEffect& convexMesh, const dEdge* const face);
@@ -414,6 +412,9 @@ class dMeshEffect: public dPolyhedra
 	D_CORE_API dMeshEffect();
 	D_CORE_API virtual ~dMeshEffect();
 
+	// Create a convex hull Mesh form point cloud
+	D_CORE_API dMeshEffect(const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol);
+
 	void SetName (const dString& name);
 	const dString& GetName() const;
 
@@ -468,6 +469,8 @@ class dMeshEffect: public dPolyhedra
 	D_CORE_API void BoxMapping(dInt32 front, dInt32 side, dInt32 top, const dMatrix& uvAligment);
 	D_CORE_API void RepairTJoints();
 
+	D_CORE_API static dMeshEffect* CreateVoronoiConvexDecomposition(dInt32 pointCount, dInt32 pointStrideInBytes, const dFloat32* const pointCloud, dInt32 materialId, const dMatrix& textureProjectionMatrix);
+
 	protected:
 	D_CORE_API void Init();
 	D_CORE_API virtual void BeginFace();
@@ -478,6 +481,8 @@ class dMeshEffect: public dPolyhedra
 	void UnpackAttibuteData();
 	bool SeparateDuplicateLoops(dEdge* const face);
 	dInt32 AddInterpolatedHalfAttribute(dEdge* const edge, dInt32 midPoint);
+
+	void MergeFaces(const dMeshEffect* const source);
 
 	dString m_name;
 	dPointFormat m_points;

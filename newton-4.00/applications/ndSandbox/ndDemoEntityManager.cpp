@@ -47,7 +47,9 @@ void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
+void ndSimpleConvexFracturing(ndDemoEntityManager* const scene);
 void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
+
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
@@ -60,6 +62,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic joints", ndBasicJoints },
 	{ "basic vehicle", ndBasicVehicle },
 	{ "angular momentum", ndBasicAngularMomentum },
+	{ "simple convex fracture", ndSimpleConvexFracturing },
 };
 
 ndDemoEntityManager::ButtonKey::ButtonKey (bool state)

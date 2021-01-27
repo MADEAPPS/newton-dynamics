@@ -995,39 +995,6 @@ dMeshEffect::dMeshEffect(dgCollisionInstance* const collision)
 	CalculateNormals(dFloat32 (45.0f * dDegreeToRad));
 }
 
-// create a convex hull
-dMeshEffect::dMeshEffect(dgMemoryAllocator* const allocator, const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol)
-	:dPolyhedra(allocator)
-	,m_points(allocator)
-	,m_attrib(allocator)
-{
-	Init();
-	if (count >= 4) {
-		dConvexHull3d convexHull(allocator, vertexCloud, strideInByte, count, distTol);
-		if (convexHull.GetCount()) {
-			dStack<dInt32> faceCountPool(convexHull.GetCount());
-			dStack<dInt32> vertexIndexListPool(convexHull.GetCount() * 3);
-
-			dInt32 index = 0;
-			dMeshVertexFormat format;
-			format.m_faceCount = convexHull.GetCount();
-			format.m_faceIndexCount = &faceCountPool[0];
-			format.m_vertex.m_indexList = &vertexIndexListPool[0];
-			format.m_vertex.m_data = &convexHull.GetVertexPool()[0].m_x;
-			format.m_vertex.m_strideInBytes = sizeof (dBigVector);
-			for (dConvexHull3d::dListNode* faceNode = convexHull.GetFirst(); faceNode; faceNode = faceNode->GetNext()) {
-				dConvexHull3dFace& face = faceNode->GetInfo();
-				faceCountPool[index] = 3;
-				vertexIndexListPool[index * 3 + 0] = face.m_index[0];
-				vertexIndexListPool[index * 3 + 1] = face.m_index[1];
-				vertexIndexListPool[index * 3 + 2] = face.m_index[2];
-				index++;
-			}
-			BuildFromIndexList(&format);
-			RepairTJoints();
-		}
-	}
-}
 
 
 dMeshEffect::dMeshEffect (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData)
@@ -2472,54 +2439,6 @@ dMeshEffect* dMeshEffect::GetNextLayer (dInt32 mark)
 	}
 	return solid;
 }
-
-
-
-void dMeshEffect::MergeFaces (const dMeshEffect* const source)
-{
-	dInt32 mark = source->IncLRU();
-	dPolyhedra::Iterator iter (*source);
-	for(iter.Begin(); iter; iter ++){
-		dEdge* const edge = &(*iter);
-		if ((edge->m_incidentFace > 0) && (edge->m_mark < mark)) {
-			BeginBuildFace ();
-			dEdge* ptr = edge;
-			do {
-				ptr->m_mark = mark;
-				dInt32 vIndex = ptr->m_incidentVertex;
-				dInt32 aIndex = dInt32 (ptr->m_userData);
-				AddPoint (source->m_points.m_vertex[vIndex].m_x, source->m_points.m_vertex[vIndex].m_y, source->m_points.m_vertex[vIndex].m_z);
-				if (source->m_points.m_layers.m_count) {
-					AddLayer (source->m_points.m_layers[vIndex]);
-				}
-
-				if (source->m_attrib.m_materialChannel.m_count) {
-					AddMaterial (source->m_attrib.m_materialChannel[aIndex]);
-				}
-				if (source->m_attrib.m_colorChannel.m_count) {
-					AddVertexColor(source->m_attrib.m_colorChannel[aIndex].m_x, source->m_attrib.m_colorChannel[aIndex].m_y, source->m_attrib.m_colorChannel[aIndex].m_z, source->m_attrib.m_colorChannel[aIndex].m_w);
-				}
-				if (source->m_attrib.m_normalChannel.m_count) {
-					AddNormal(source->m_attrib.m_normalChannel[aIndex].m_x, source->m_attrib.m_normalChannel[aIndex].m_y, source->m_attrib.m_normalChannel[aIndex].m_z);
-				}
-				if (source->m_attrib.m_binormalChannel.m_count) {
-					AddBinormal(source->m_attrib.m_binormalChannel[aIndex].m_x, source->m_attrib.m_binormalChannel[aIndex].m_y, source->m_attrib.m_binormalChannel[aIndex].m_z);
-				}
-				if (source->m_attrib.m_uv0Channel.m_count) {
-					AddUV0(source->m_attrib.m_uv0Channel[aIndex].m_u, source->m_attrib.m_uv0Channel[aIndex].m_v);
-				}
-				if (source->m_attrib.m_uv1Channel.m_count) {
-					AddUV1(source->m_attrib.m_uv1Channel[aIndex].m_u, source->m_attrib.m_uv1Channel[aIndex].m_v);
-				}
-				ptr = ptr->m_next;
-			} while (ptr != edge);
-			EndBuildFace ();
-		}
-	}
-}
-
-
-
 #endif
 
 dInt32 dMeshEffect::dFormat::CompareVertex(const dSortKey* const ptr0, const dSortKey* const ptr1, void* const context)
@@ -4156,4 +4075,83 @@ void dMeshEffect::ApplyTransform(const dMatrix& matrix)
 		m_attrib.m_binormalChannel[i].m_y = n.m_y;
 		m_attrib.m_binormalChannel[i].m_z = n.m_z;
 	}
+}
+
+// create a convex hull
+dMeshEffect::dMeshEffect(const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol)
+	:dPolyhedra()
+	,m_points()
+	,m_attrib()
+{
+	dAssert(0);
+	//Init();
+	//if (count >= 4) {
+	//	dConvexHull3d convexHull(allocator, vertexCloud, strideInByte, count, distTol);
+	//	if (convexHull.GetCount()) {
+	//		dStack<dInt32> faceCountPool(convexHull.GetCount());
+	//		dStack<dInt32> vertexIndexListPool(convexHull.GetCount() * 3);
+	//
+	//		dInt32 index = 0;
+	//		dMeshVertexFormat format;
+	//		format.m_faceCount = convexHull.GetCount();
+	//		format.m_faceIndexCount = &faceCountPool[0];
+	//		format.m_vertex.m_indexList = &vertexIndexListPool[0];
+	//		format.m_vertex.m_data = &convexHull.GetVertexPool()[0].m_x;
+	//		format.m_vertex.m_strideInBytes = sizeof(dBigVector);
+	//		for (dConvexHull3d::dListNode* faceNode = convexHull.GetFirst(); faceNode; faceNode = faceNode->GetNext()) {
+	//			dConvexHull3dFace& face = faceNode->GetInfo();
+	//			faceCountPool[index] = 3;
+	//			vertexIndexListPool[index * 3 + 0] = face.m_index[0];
+	//			vertexIndexListPool[index * 3 + 1] = face.m_index[1];
+	//			vertexIndexListPool[index * 3 + 2] = face.m_index[2];
+	//			index++;
+	//		}
+	//		BuildFromIndexList(&format);
+	//		RepairTJoints();
+	//	}
+	//}
+}
+
+void dMeshEffect::MergeFaces(const dMeshEffect* const source)
+{
+	dAssert(0);
+	//dInt32 mark = source->IncLRU();
+	//dPolyhedra::Iterator iter(*source);
+	//for (iter.Begin(); iter; iter++) {
+	//	dEdge* const edge = &(*iter);
+	//	if ((edge->m_incidentFace > 0) && (edge->m_mark < mark)) {
+	//		BeginBuildFace();
+	//		dEdge* ptr = edge;
+	//		do {
+	//			ptr->m_mark = mark;
+	//			dInt32 vIndex = ptr->m_incidentVertex;
+	//			dInt32 aIndex = dInt32(ptr->m_userData);
+	//			AddPoint(source->m_points.m_vertex[vIndex].m_x, source->m_points.m_vertex[vIndex].m_y, source->m_points.m_vertex[vIndex].m_z);
+	//			if (source->m_points.m_layers.m_count) {
+	//				AddLayer(source->m_points.m_layers[vIndex]);
+	//			}
+	//
+	//			if (source->m_attrib.m_materialChannel.m_count) {
+	//				AddMaterial(source->m_attrib.m_materialChannel[aIndex]);
+	//			}
+	//			if (source->m_attrib.m_colorChannel.m_count) {
+	//				AddVertexColor(source->m_attrib.m_colorChannel[aIndex].m_x, source->m_attrib.m_colorChannel[aIndex].m_y, source->m_attrib.m_colorChannel[aIndex].m_z, source->m_attrib.m_colorChannel[aIndex].m_w);
+	//			}
+	//			if (source->m_attrib.m_normalChannel.m_count) {
+	//				AddNormal(source->m_attrib.m_normalChannel[aIndex].m_x, source->m_attrib.m_normalChannel[aIndex].m_y, source->m_attrib.m_normalChannel[aIndex].m_z);
+	//			}
+	//			if (source->m_attrib.m_binormalChannel.m_count) {
+	//				AddBinormal(source->m_attrib.m_binormalChannel[aIndex].m_x, source->m_attrib.m_binormalChannel[aIndex].m_y, source->m_attrib.m_binormalChannel[aIndex].m_z);
+	//			}
+	//			if (source->m_attrib.m_uv0Channel.m_count) {
+	//				AddUV0(source->m_attrib.m_uv0Channel[aIndex].m_u, source->m_attrib.m_uv0Channel[aIndex].m_v);
+	//			}
+	//			if (source->m_attrib.m_uv1Channel.m_count) {
+	//				AddUV1(source->m_attrib.m_uv1Channel[aIndex].m_u, source->m_attrib.m_uv1Channel[aIndex].m_v);
+	//			}
+	//			ptr = ptr->m_next;
+	//		} while (ptr != edge);
+	//		EndBuildFace();
+	//	}
+	//}
 }

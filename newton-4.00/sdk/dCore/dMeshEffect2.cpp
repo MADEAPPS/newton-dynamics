@@ -20,10 +20,13 @@
 */
 
 #include "dCoreStdafx.h"
+#include "dStack.h"
+#include "dMatrix.h"
 #include "dMeshEffect.h"
-//#include "dgBody.h"
-//#include "dgWorld.h"
-//#include "dMeshEffect.h"
+#include "dConvexHull3d.h"
+#include "dConvexHull4d.h"
+#include "dDelaunayTetrahedralization.h"
+
 //#include "dgCollisionConvexHull.h"
 
 
@@ -937,129 +940,6 @@ void dMeshEffect::LoadTetraMesh (const char* const filename)
 	}
 }
 
-dMeshEffect* dMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dInt32 pointCount, dInt32 pointStrideInBytes, const dFloat32* const pointCloud, dInt32 materialId, const dMatrix& textureProjectionMatrix)
-{
-	dStack<dBigVector> buffer(pointCount + 16);
-	dBigVector* const pool = &buffer[0];
-	dInt32 count = 0;
-	dFloat64 quantizeFactor = dFloat64 (16.0f);
-	dFloat64 invQuantizeFactor = dFloat64 (1.0f) / quantizeFactor;
-	dInt32 stride = pointStrideInBytes / sizeof (dFloat32); 
-
-	dBigVector pMin (dFloat32 (1.0e10f), dFloat32 (1.0e10f), dFloat32 (1.0e10f), dFloat32 (0.0f));
-	dBigVector pMax (dFloat32 (-1.0e10f), dFloat32 (-1.0e10f), dFloat32 (-1.0e10f), dFloat32 (0.0f));
-	for (dInt32 i = 0; i < pointCount; i ++) {
-		dFloat64 x = pointCloud[i * stride + 0];
-		dFloat64 y	= pointCloud[i * stride + 1];
-		dFloat64 z	= pointCloud[i * stride + 2];
-		x = floor (x * quantizeFactor) * invQuantizeFactor;
-		y = floor (y * quantizeFactor) * invQuantizeFactor;
-		z = floor (z * quantizeFactor) * invQuantizeFactor;
-		dBigVector p (x, y, z, dFloat64 (0.0f));
-		pMin = dBigVector (dMin (x, pMin.m_x), dMin (y, pMin.m_y), dMin (z, pMin.m_z), dFloat64 (0.0f));
-		pMax = dBigVector (dMax (x, pMax.m_x), dMax (y, pMax.m_y), dMax (z, pMax.m_z), dFloat64 (0.0f));
-		pool[count] = p;
-		count ++;
-	}
-	// add the bbox as a barrier
-	pool[count + 0] = dBigVector ( pMin.m_x, pMin.m_y, pMin.m_z, dFloat64 (0.0f));
-	pool[count + 1] = dBigVector ( pMax.m_x, pMin.m_y, pMin.m_z, dFloat64 (0.0f));
-	pool[count + 2] = dBigVector ( pMin.m_x, pMax.m_y, pMin.m_z, dFloat64 (0.0f));
-	pool[count + 3] = dBigVector ( pMax.m_x, pMax.m_y, pMin.m_z, dFloat64 (0.0f));
-	pool[count + 4] = dBigVector ( pMin.m_x, pMin.m_y, pMax.m_z, dFloat64 (0.0f));
-	pool[count + 5] = dBigVector ( pMax.m_x, pMin.m_y, pMax.m_z, dFloat64 (0.0f));
-	pool[count + 6] = dBigVector ( pMin.m_x, pMax.m_y, pMax.m_z, dFloat64 (0.0f));
-	pool[count + 7] = dBigVector ( pMax.m_x, pMax.m_y, pMax.m_z, dFloat64 (0.0f));
-	count += 8;
-
-	dStack<dInt32> indexList(count);
-	count = dgVertexListToIndexList(&pool[0].m_x, sizeof (dBigVector), 3, count, &indexList[0], dFloat64 (5.0e-2f));	
-	dAssert (count >= 8);
-
-	dFloat64 maxSize = dMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y, pMax.m_z - pMin.m_z);
-	pMin -= dBigVector (maxSize, maxSize, maxSize, dFloat64 (0.0f));
-	pMax += dBigVector (maxSize, maxSize, maxSize, dFloat64 (0.0f));
-
-	// add the a guard zone, so that we do no have to clip
-	dInt32 guardVertexKey = count;
-	pool[count + 0] = dBigVector ( pMin.m_x, pMin.m_y, pMin.m_z, dFloat64 (0.0f));
-	pool[count + 1] = dBigVector ( pMax.m_x, pMin.m_y, pMin.m_z, dFloat64 (0.0f));
-	pool[count + 2] = dBigVector ( pMin.m_x, pMax.m_y, pMin.m_z, dFloat64 (0.0f));
-	pool[count + 3] = dBigVector ( pMax.m_x, pMax.m_y, pMin.m_z, dFloat64 (0.0f));
-	pool[count + 4] = dBigVector ( pMin.m_x, pMin.m_y, pMax.m_z, dFloat64 (0.0f));
-	pool[count + 5] = dBigVector ( pMax.m_x, pMin.m_y, pMax.m_z, dFloat64 (0.0f));
-	pool[count + 6] = dBigVector ( pMin.m_x, pMax.m_y, pMax.m_z, dFloat64 (0.0f));
-	pool[count + 7] = dBigVector ( pMax.m_x, pMax.m_y, pMax.m_z, dFloat64 (0.0f));
-	count += 8; 
-
-	dgDelaunayTetrahedralization delaunayTetrahedras (allocator, &pool[0].m_x, count, sizeof (dBigVector), dFloat32 (0.0f));
-	delaunayTetrahedras.RemoveUpperHull ();
-
-//	delaunayTetrahedras.Save("xxx0.txt");
-	dInt32 tetraCount = delaunayTetrahedras.GetCount();
-	dStack<dBigVector> voronoiPoints(tetraCount + 32);
-	dStack<dgDelaunayTetrahedralization::dListNode*> tetradrumNode(tetraCount);
-	dTree<dList<dInt32>, dInt32> delaunayNodes (allocator);	
-
-	dInt32 index = 0;
-	const dgConvexHull4dVector* const convexHulPoints = delaunayTetrahedras.GetHullVertexArray();
-	for (dgDelaunayTetrahedralization::dListNode* node = delaunayTetrahedras.GetFirst(); node; node = node->GetNext()) {
-		dgConvexHull4dTetraherum& tetra = node->GetInfo();
-		voronoiPoints[index] = tetra.CircumSphereCenter (convexHulPoints);
-		tetradrumNode[index] = node;
-
-		for (dInt32 i = 0; i < 4; i ++) {
-			dTree<dList<dInt32>, dInt32>::dTreeNode* header = delaunayNodes.Find(tetra.m_faces[0].m_index[i]);
-			if (!header) {
-				dList<dInt32> list (allocator);
-				header = delaunayNodes.Insert(list, tetra.m_faces[0].m_index[i]);
-			}
-			header->GetInfo().Append (index);
-		}
-		index ++;
-	}
-
-	const dFloat32 normalAngleInRadians = dFloat32 (30.0f * dDegreeToRad);
-	dMeshEffect* const voronoiPartition = new (allocator) dMeshEffect (allocator);
-	voronoiPartition->BeginBuild();
-	dInt32 layer = 0;
-	dTree<dList<dInt32>, dInt32>::Iterator iter (delaunayNodes);
-	for (iter.Begin(); iter; iter ++) {
-		dTree<dList<dInt32>, dInt32>::dTreeNode* const nodeNode = iter.GetNode();
-		const dList<dInt32>& list = nodeNode->GetInfo();
-		dInt32 key = nodeNode->GetKey();
-
-		if (key < guardVertexKey) {
-			dBigVector pointArray[512];
-			dInt32 indexArray[512];
-			
-			dInt32 count1 = 0;
-			for (dList<dInt32>::dListNode* ptr = list.GetFirst(); ptr; ptr = ptr->GetNext()) {
-				dInt32 i = ptr->GetInfo();
-				pointArray[count1] = voronoiPoints[i];
-				count1 ++;
-				dAssert (count1 < dInt32 (sizeof (pointArray) / sizeof (pointArray[0])));
-			}
-
-			count1 = dgVertexListToIndexList(&pointArray[0].m_x, sizeof (dBigVector), 3, count1, &indexArray[0], dFloat64 (1.0e-3f));	
-			if (count1 >= 4) {
-				dMeshEffect convexMesh (allocator, &pointArray[0].m_x, count1, sizeof (dBigVector), dFloat64 (0.0f));
-				if (convexMesh.GetCount()) {
-					convexMesh.CalculateNormals(normalAngleInRadians);
-					convexMesh.UniformBoxMapping (materialId, textureProjectionMatrix);
-					for (dInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; i ++) {
-						convexMesh.m_points.m_layers[i] = layer;
-					}
-					voronoiPartition->MergeFaces(&convexMesh);
-					layer ++;
-				}
-			}
-		}
-	}
-	voronoiPartition->EndBuild(dFloat64 (1.0e-8f), false);
-	//voronoiPartition->SaveOFF("xxx0.off");
-	return voronoiPartition;
-}
 
 
 dMeshEffect* dMeshEffect::CreateTetrahedraIsoSurface() const
@@ -1222,3 +1102,136 @@ dAssert(0);
 }
 
 #endif
+
+dMeshEffect* dMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, dInt32 pointStrideInBytes, const dFloat32* const pointCloud, dInt32 materialId, const dMatrix& textureProjectionMatrix)
+{
+	dStack<dBigVector> buffer(pointCount + 16);
+	dBigVector* const pool = &buffer[0];
+	dInt32 count = 0;
+	dFloat64 quantizeFactor = dFloat64(16.0f);
+	dFloat64 invQuantizeFactor = dFloat64(1.0f) / quantizeFactor;
+	dInt32 stride = pointStrideInBytes / sizeof(dFloat32);
+
+	dBigVector pMin(dFloat32(1.0e10f), dFloat32(1.0e10f), dFloat32(1.0e10f), dFloat32(0.0f));
+	dBigVector pMax(dFloat32(-1.0e10f), dFloat32(-1.0e10f), dFloat32(-1.0e10f), dFloat32(0.0f));
+	for (dInt32 i = 0; i < pointCount; i++) 
+	{
+		dFloat64 x = pointCloud[i * stride + 0];
+		dFloat64 y = pointCloud[i * stride + 1];
+		dFloat64 z = pointCloud[i * stride + 2];
+		x = floor(x * quantizeFactor) * invQuantizeFactor;
+		y = floor(y * quantizeFactor) * invQuantizeFactor;
+		z = floor(z * quantizeFactor) * invQuantizeFactor;
+		dBigVector p(x, y, z, dFloat64(0.0f));
+		pMin = dBigVector(dMin(x, pMin.m_x), dMin(y, pMin.m_y), dMin(z, pMin.m_z), dFloat64(0.0f));
+		pMax = dBigVector(dMax(x, pMax.m_x), dMax(y, pMax.m_y), dMax(z, pMax.m_z), dFloat64(0.0f));
+		pool[count] = p;
+		count++;
+	}
+	// add the bbox as a barrier
+	pool[count + 0] = dBigVector(pMin.m_x, pMin.m_y, pMin.m_z, dFloat64(0.0f));
+	pool[count + 1] = dBigVector(pMax.m_x, pMin.m_y, pMin.m_z, dFloat64(0.0f));
+	pool[count + 2] = dBigVector(pMin.m_x, pMax.m_y, pMin.m_z, dFloat64(0.0f));
+	pool[count + 3] = dBigVector(pMax.m_x, pMax.m_y, pMin.m_z, dFloat64(0.0f));
+	pool[count + 4] = dBigVector(pMin.m_x, pMin.m_y, pMax.m_z, dFloat64(0.0f));
+	pool[count + 5] = dBigVector(pMax.m_x, pMin.m_y, pMax.m_z, dFloat64(0.0f));
+	pool[count + 6] = dBigVector(pMin.m_x, pMax.m_y, pMax.m_z, dFloat64(0.0f));
+	pool[count + 7] = dBigVector(pMax.m_x, pMax.m_y, pMax.m_z, dFloat64(0.0f));
+	count += 8;
+
+	dStack<dInt32> indexList(count);
+	count = dVertexListToIndexList(&pool[0].m_x, sizeof(dBigVector), 3, count, &indexList[0], dFloat64(5.0e-2f));
+	dAssert(count >= 8);
+
+	dFloat64 maxSize = dMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y, pMax.m_z - pMin.m_z);
+	pMin -= dBigVector(maxSize, maxSize, maxSize, dFloat64(0.0f));
+	pMax += dBigVector(maxSize, maxSize, maxSize, dFloat64(0.0f));
+
+	// add the a guard zone, so that we do no have to clip
+	dInt32 guardVertexKey = count;
+	pool[count + 0] = dBigVector(pMin.m_x, pMin.m_y, pMin.m_z, dFloat64(0.0f));
+	pool[count + 1] = dBigVector(pMax.m_x, pMin.m_y, pMin.m_z, dFloat64(0.0f));
+	pool[count + 2] = dBigVector(pMin.m_x, pMax.m_y, pMin.m_z, dFloat64(0.0f));
+	pool[count + 3] = dBigVector(pMax.m_x, pMax.m_y, pMin.m_z, dFloat64(0.0f));
+	pool[count + 4] = dBigVector(pMin.m_x, pMin.m_y, pMax.m_z, dFloat64(0.0f));
+	pool[count + 5] = dBigVector(pMax.m_x, pMin.m_y, pMax.m_z, dFloat64(0.0f));
+	pool[count + 6] = dBigVector(pMin.m_x, pMax.m_y, pMax.m_z, dFloat64(0.0f));
+	pool[count + 7] = dBigVector(pMax.m_x, pMax.m_y, pMax.m_z, dFloat64(0.0f));
+	count += 8;
+
+	dDelaunayTetrahedralization delaunayTetrahedras(&pool[0].m_x, count, sizeof(dBigVector), dFloat32(0.0f));
+	delaunayTetrahedras.RemoveUpperHull();
+
+	//	delaunayTetrahedras.Save("xxx0.txt");
+	dInt32 tetraCount = delaunayTetrahedras.GetCount();
+	dStack<dBigVector> voronoiPoints(tetraCount + 32);
+	dStack<dDelaunayTetrahedralization::dListNode*> tetradrumNode(tetraCount);
+	dTree<dList<dInt32>, dInt32> delaunayNodes;
+
+	dInt32 index = 0;
+	const dConvexHull4dVector* const convexHulPoints = delaunayTetrahedras.GetHullVertexArray();
+	for (dDelaunayTetrahedralization::dListNode* node = delaunayTetrahedras.GetFirst(); node; node = node->GetNext()) 
+	{
+		dConvexHull4dTetraherum& tetra = node->GetInfo();
+		voronoiPoints[index] = tetra.CircumSphereCenter(convexHulPoints);
+		tetradrumNode[index] = node;
+
+		for (dInt32 i = 0; i < 4; i++) 
+		{
+			dTree<dList<dInt32>, dInt32>::dTreeNode* header = delaunayNodes.Find(tetra.m_faces[0].m_index[i]);
+			if (!header) {
+				dList<dInt32> list;
+				header = delaunayNodes.Insert(list, tetra.m_faces[0].m_index[i]);
+			}
+			header->GetInfo().Append(index);
+		}
+		index++;
+	}
+
+	const dFloat32 normalAngleInRadians = dFloat32(30.0f * dDegreeToRad);
+	dMeshEffect* const voronoiPartition = new dMeshEffect;
+	voronoiPartition->BeginBuild();
+	dInt32 layer = 0;
+	dTree<dList<dInt32>, dInt32>::Iterator iter(delaunayNodes);
+	for (iter.Begin(); iter; iter++) 
+	{
+		dTree<dList<dInt32>, dInt32>::dTreeNode* const nodeNode = iter.GetNode();
+		const dList<dInt32>& list = nodeNode->GetInfo();
+		dInt32 key = nodeNode->GetKey();
+
+		if (key < guardVertexKey) 
+		{
+			dBigVector pointArray[512];
+			dInt32 indexArray[512];
+
+			dInt32 count1 = 0;
+			for (dList<dInt32>::dListNode* ptr = list.GetFirst(); ptr; ptr = ptr->GetNext()) 
+			{
+				dInt32 i = ptr->GetInfo();
+				pointArray[count1] = voronoiPoints[i];
+				count1++;
+				dAssert(count1 < dInt32(sizeof(pointArray) / sizeof(pointArray[0])));
+			}
+
+			count1 = dVertexListToIndexList(&pointArray[0].m_x, sizeof(dBigVector), 3, count1, &indexArray[0], dFloat64(1.0e-3f));
+			if (count1 >= 4) 
+			{
+				dMeshEffect convexMesh(&pointArray[0].m_x, count1, sizeof(dBigVector), dFloat64(0.0f));
+				if (convexMesh.GetCount()) 
+				{
+					convexMesh.CalculateNormals(normalAngleInRadians);
+					convexMesh.UniformBoxMapping(materialId, textureProjectionMatrix);
+					for (dInt32 i = 0; i < convexMesh.m_points.m_vertex.GetCount(); i++) 
+					{
+						convexMesh.m_points.m_layers[i] = layer;
+					}
+					voronoiPartition->MergeFaces(&convexMesh);
+					layer++;
+				}
+			}
+		}
+	}
+	voronoiPartition->EndBuild(dFloat64(1.0e-8f), false);
+	//voronoiPartition->SaveOFF("xxx0.off");
+	return voronoiPartition;
+}
