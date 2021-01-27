@@ -13,7 +13,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 #include "ndSandboxStdafx.h"
-#include "ndWoodFracture.h"
+#include "ndSimpleConvexFracture.h"
 
 #define D_WOODFRACTURE_LISTENER "woodFractureListener"
 //#define BREAK_IMPACT_IN_METERS_PER_SECONDS		8.0f
@@ -418,4 +418,21 @@ void AddFracturedWoodPrimitive(ndDemoEntityManager* const scene, dFloat32 densit
 	//	woodFractureManager = new dWoodFractureListener(world);
 	//}
 	//woodFractureManager->AddFracturedWoodPrimitive(density, origin, size, xCount, zCount, spacing, stype, materialID, shapeOffsetMatrix);
+}
+
+
+ndSimpleConvexFracture::ndSimpleConvexFracture(ndDemoEntityManager* const scene)
+	:ndModel()
+{
+
+}
+
+ndSimpleConvexFracture::~ndSimpleConvexFracture()
+{
+
+}
+
+void ndSimpleConvexFracture::Update(const ndWorld* const world, dFloat32 timestep)
+{
+
 }

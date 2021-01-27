@@ -19,6 +19,7 @@
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
+#include "ndSimpleConvexFracture.h"
 
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
@@ -74,11 +75,13 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 	instanceMesh->Release();
 }
 
-void ndSimpleConvexFracturing(ndDemoEntityManager* const scene)
+void ndBasicConvexFracturing(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene);
-	//scene->GetWorld()->Load("C://tmp//newton-4.00//applications//ndSandbox//xxx.ngd");
+
+	ndSimpleConvexFracture* const fractureManager = new ndSimpleConvexFracture(scene);
+	scene->GetWorld()->AddModel(fractureManager);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	AddCapsulesStacks(scene, origin1);

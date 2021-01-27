@@ -122,9 +122,9 @@ class ndWorld: public dClassAlloc
 	D_NEWTON_API virtual void UpdateSkeletons();
 	D_NEWTON_API virtual void UpdateTransforms();
 	D_NEWTON_API virtual void ApplyExternalForces();
-	D_NEWTON_API virtual void UpdatePrelisteners();
-	D_NEWTON_API virtual void UpdatePostlisteners();
-	D_NEWTON_API virtual void UpdateListenersPostTransform();
+	//D_NEWTON_API virtual void UpdatePrelisteners();
+	//D_NEWTON_API virtual void UpdatePostlisteners();
+	//D_NEWTON_API virtual void UpdateListenersPostTransform();
 
 	private:
 	class dgSolverProgressiveSleepEntry

@@ -177,17 +177,17 @@ void ndWorld::ClearCache()
 	ndSkeletonContainer::ndNodeList::FlushFreeList();
 }
 
-void ndWorld::UpdatePrelisteners()
-{
-}
-
-void ndWorld::UpdatePostlisteners()
-{
-}
-
-void ndWorld::UpdateListenersPostTransform()
-{
-}
+//void ndWorld::UpdatePrelisteners()
+//{
+//}
+//
+//void ndWorld::UpdatePostlisteners()
+//{
+//}
+//
+//void ndWorld::UpdateListenersPostTransform()
+//{
+//}
 
 void ndWorld::UpdateTransforms()
 {
@@ -649,7 +649,7 @@ void ndWorld::ThreadFunction()
 
 		m_scene->SetTimestep(m_timestep);
 		UpdateTransforms();
-		UpdateListenersPostTransform();
+		//UpdateListenersPostTransform();
 		PostUpdate(m_timestep);
 		m_scene->End();
 	}
@@ -704,7 +704,7 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	m_scene->DeleteDeadContact();
 
 	// update all special models.
-	UpdatePrelisteners();
+	//UpdatePrelisteners();
 
 	// Update Particle base physics
 	ParticleUpdate();
@@ -716,7 +716,7 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	dAssert(m_solver);
 	m_solver->Update();
 
-	UpdatePostlisteners();
+	//UpdatePostlisteners();
 }
 
 void ndWorld::ParticleUpdate()
