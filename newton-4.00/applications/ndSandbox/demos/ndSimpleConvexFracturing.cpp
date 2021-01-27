@@ -22,7 +22,7 @@
 
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
-	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count)
+	dFloat32 mass, const dVector& origin, const dFloat32 diameter, dInt32 count)
 {
 	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit = origin;
@@ -58,10 +58,10 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);
 
-	//const int n = 1;
-	//const int stackHigh = 1;
-	const int n = 10;
-	const int stackHigh = 7;
+	//const dInt32 n = 1;
+	//const dInt32 stackHigh = 1;
+	const dInt32 n = 10;
+	const dInt32 stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)

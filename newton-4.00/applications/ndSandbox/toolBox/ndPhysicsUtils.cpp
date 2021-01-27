@@ -19,7 +19,7 @@
 #include "ndHighResolutionTimer.h"
 
 #ifdef DEMO_CHECK_ASYN_UPDATE
-int g_checkAsyncUpdate = 1;
+dInt32 g_checkAsyncUpdate = 1;
 #endif
 
 #if 0
@@ -168,10 +168,10 @@ void ShowJointInfo(const NewtonCustomJoint* joint)
 static void ShowMeshCollidingFaces (
 	const ndBodyKinematic* bodyWithTreeCollision, 
 	const ndBodyKinematic* body, 
-	int faceID, 
-	int vertexCount, 
+	dInt32 faceID, 
+	dInt32 vertexCount, 
 	const dFloat* vertex, 
-	int vertexstrideInBytes)
+	dInt32 vertexstrideInBytes)
 {
 
 	// we are coping data to and array of memory, another call back may be doing the same thing
@@ -179,8 +179,8 @@ static void ShowMeshCollidingFaces (
 	ndWorldCriticalSectionLock (ndBodyKinematicGetWorld (bodyWithTreeCollision));
 
 	dVector face[64];
-	int stride = vertexstrideInBytes / sizeof (dFloat);
-	for (int j = 0; j < vertexCount; j ++) {
+	dInt32 stride = vertexstrideInBytes / sizeof (dFloat);
+	for (dInt32 j = 0; j < vertexCount; j ++) {
 		face [j] = dVector (vertex[j * stride + 0], vertex[j * stride + 1] , vertex[j * stride + 2]);
 	}
 	DebugDrawPolygon (vertexCount, face);
@@ -190,7 +190,7 @@ static void ShowMeshCollidingFaces (
 }
 
 
-void SetShowMeshCollision (SceneManager& me, int mode)
+void SetShowMeshCollision (SceneManager& me, dInt32 mode)
 {
 	NewtonTreeCollisionCallback showFaceCallback;
 
@@ -224,12 +224,12 @@ void SetShowMeshCollision (SceneManager& me, int mode)
 	}
 }
 
-void SetShowIslands (SceneManager& me, int mode)
+void SetShowIslands (SceneManager& me, dInt32 mode)
 {
 	showIslans = mode;
 }
 
-int PhysicsIslandUpdate (const ndWorld* world, const void* islandHandle, int bodyCount)
+dInt32 PhysicsIslandUpdate (const ndWorld* world, const void* islandHandle, dInt32 bodyCount)
 {
 	if (showIslans) {
 		dVector minAABB ( 1.0e10f,  1.0e10f,  1.0e10f, 0.0f);
@@ -253,7 +253,7 @@ int PhysicsIslandUpdate (const ndWorld* world, const void* islandHandle, int bod
 			ndBodyKinematicGetMatrix (body, &matrix[0][0]);
 			CalculateAABB (collision, matrix, p0, p1);
 #endif
-			for (int j = 0; j < 3; j ++ ) {
+			for (dInt32 j = 0; j < 3; j ++ ) {
 				minAABB[j] = p0[j] < minAABB[j] ? p0[j] : minAABB[j];
 				maxAABB[j] = p1[j] > maxAABB[j] ? p1[j] : maxAABB[j];
 			}
@@ -265,9 +265,9 @@ int PhysicsIslandUpdate (const ndWorld* world, const void* islandHandle, int bod
 	return 1;
 }
 
-void GenericContactProcess (const NewtonJoint* contactJoint, dFloat32 timestep, int threadIndex)
+void GenericContactProcess (const NewtonJoint* contactJoint, dFloat32 timestep, dInt32 threadIndex)
 {
-	int isHightField;
+	dInt32 isHightField;
 	ndBodyKinematic* body;
 	NewtonCollision* collision;
 	NewtonCollisionInfoRecord info;
@@ -287,7 +287,7 @@ void GenericContactProcess (const NewtonJoint* contactJoint, dFloat32 timestep, 
 	if (isHightField) {
 		void* nextContact;
 		for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = nextContact) {
-			int faceID;
+			dInt32 faceID;
 			NewtonMaterial* material;
 
 			nextContact = NewtonContactJointGetNextContact (contactJoint, contact);
@@ -335,7 +335,7 @@ void GetForceOnStaticBody (ndBodyKinematic* body, ndBodyKinematic* staticBody)
 
 
 
-static void ExtrudeFaces (void* userData, int vertexCount, const dFloat32* faceVertec, int id)
+static void ExtrudeFaces (void* userData, dInt32 vertexCount, const dFloat32* faceVertec, dInt32 id)
 {
 	dFloat32 OFFSET = 0.1f;
 	dFloat32 face[32][10];
@@ -528,7 +528,7 @@ void  PhysicsBodyDestructor (const ndBodyKinematic* body)
 }
 
 // add force and torque to rigid body
-void PhysicsApplyGravityForce (const ndBodyKinematic* body, dFloat32 timestep, int threadIndex)
+void PhysicsApplyGravityForce (const ndBodyKinematic* body, dFloat32 timestep, dInt32 threadIndex)
 {
 	dFloat32 Ixx;
 	dFloat32 Iyy;
@@ -561,7 +561,7 @@ void PhysicsApplyGravityForce (const ndBodyKinematic* body, dFloat32 timestep, i
 //	ndBodyKinematicSetSleepState(body, 0);
 }
 
-void GenericContactProcess (const NewtonJoint* contactJoint, dFloat32 timestep, int threadIndex)
+void GenericContactProcess (const NewtonJoint* contactJoint, dFloat32 timestep, dInt32 threadIndex)
 {
 #if 0 
 	dFloat speed0;
@@ -646,7 +646,7 @@ void GenericContactProcess (const NewtonJoint* contactJoint, dFloat32 timestep, 
 
 
 
-NewtonCollision* CreateConvexCollision (ndWorld* const world, const dMatrix& srcMatrix, const dVector& originalSize, ndPrimitiveType type, int materialID__)
+NewtonCollision* CreateConvexCollision (ndWorld* const world, const dMatrix& srcMatrix, const dVector& originalSize, ndPrimitiveType type, dInt32 materialID__)
 {
 	dVector size (originalSize);
 
@@ -720,7 +720,7 @@ NewtonCollision* CreateConvexCollision (ndWorld* const world, const dMatrix& src
 			cloud [4] = dVector (0.0f, 0.0f,  size.m_z * 0.5f, 0.0f); 
 			cloud [5] = dVector (0.0f, 0.0f, -size.m_z * 0.5f, 0.0f); 
 
-			int count = 6;
+			dInt32 count = 6;
 			// populate the cloud with pseudo Gaussian random points
 			for (dInt32 i = 6; i < SAMPLE_COUNT; i ++) {
 				cloud [i].m_x = dGaussianRandom (size.m_x);
@@ -740,7 +740,7 @@ NewtonCollision* CreateConvexCollision (ndWorld* const world, const dMatrix& src
 
 			//dVector cloud [STEPS_HULL * 4 + 256];
 			dFloat32 cloud [STEPS_HULL * 4 + 256][3];
-			int count = 0;
+			dInt32 count = 0;
 			dFloat32 radius = size.m_y;
 			dFloat32 height = size.m_x * 0.999f;
 			dFloat32 x = - height * 0.5f;
@@ -750,7 +750,7 @@ NewtonCollision* CreateConvexCollision (ndWorld* const world, const dMatrix& src
 				dVector p (x, 0.0f, radius + pad);
 				x += 0.3333f * height;
 				dMatrix acc (dGetIdentityMatrix());
-				for (int j = 0; j < STEPS_HULL; j ++) {
+				for (dInt32 j = 0; j < STEPS_HULL; j ++) {
 					dVector tmp (acc.RotateVector(p)); 
 					cloud[count][0] = tmp.m_x;
 					cloud[count][1] = tmp.m_y;
@@ -805,7 +805,7 @@ NewtonCollision* CreateConvexCollision (ndWorld* const world, const dMatrix& src
 	return collision;
 }
 
-ndBodyKinematic* CreateSimpleBody (ndWorld* const world, void* const userData, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
+ndBodyKinematic* CreateSimpleBody (ndWorld* const world, void* const userData, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, dInt32 materialId, bool generalInertia)
 {
 	dAssert(0);
 	return nullptr;
@@ -855,7 +855,7 @@ ndBodyKinematic* CreateSimpleBody (ndWorld* const world, void* const userData, d
 */
 }
 
-ndBodyKinematic* CreateSimpleSolid (ndDemoEntityManager* const scene, ndDemoMesh* const mesh, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
+ndBodyKinematic* CreateSimpleSolid (ndDemoEntityManager* const scene, ndDemoMesh* const mesh, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, dInt32 materialId, bool generalInertia)
 {
 	dAssert(0);
 	return nullptr;
@@ -873,7 +873,7 @@ ndBodyKinematic* CreateSimpleSolid (ndDemoEntityManager* const scene, ndDemoMesh
 }
 
 
-ndBodyKinematic* CreateInstancedSolid(ndDemoEntityManager* const scene, ndDemoEntity* const parent, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
+ndBodyKinematic* CreateInstancedSolid(ndDemoEntityManager* const scene, ndDemoEntity* const parent, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, dInt32 materialId, bool generalInertia)
 {
 	dAssert(0);
 	return nullptr;
@@ -886,7 +886,7 @@ ndBodyKinematic* CreateInstancedSolid(ndDemoEntityManager* const scene, ndDemoEn
 }
 
 
-void AddPrimitiveArray (ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat32 spacing, ndPrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix, dFloat32 startElevation, dFloat32 offsetHigh)
+void AddPrimitiveArray (ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& size, dInt32 xCount, dInt32 zCount, dFloat32 spacing, ndPrimitiveType type, dInt32 materialID, const dMatrix& shapeOffsetMatrix, dFloat32 startElevation, dFloat32 offsetHigh)
 {
 	dAssert(0);
 /*
@@ -902,7 +902,7 @@ void AddPrimitiveArray (ndDemoEntityManager* const scene, dFloat32 mass, const d
 	dMatrix matrix (dGetIdentityMatrix());
 	for (dInt32 i = 0; i < xCount; i ++) {
 		dFloat32 x = origin.m_x + (i - xCount / 2) * spacing;
-		for (int j = 0; j < zCount; j ++) {
+		for (dInt32 j = 0; j < zCount; j ++) {
 			dFloat32 z = origin.m_z + (j - zCount / 2) * spacing;
 
 			matrix.m_posit.m_x = x;
@@ -939,7 +939,7 @@ void CalculateAABB (const NewtonCollision* const collision, const dMatrix& matri
 	}
 }
 
-void SetAutoSleepMode (ndWorld* const world, int mode)
+void SetAutoSleepMode (ndWorld* const world, dInt32 mode)
 {
 	mode = mode ? 0 : 1;
 	for (const ndBodyKinematic* body = ndWorldGetFirstBody (world); body; body = ndWorldGetNextBody (world, body)) {
@@ -953,7 +953,7 @@ class CollsionTreeFaceMap
 	struct FaceInfo
 	{
 		//void* m_face;
-		int m_materialIndex;
+		dInt32 m_materialIndex;
 	};
 
 	CollsionTreeFaceMap (NewtonCollision* const collisionTree)
@@ -972,31 +972,31 @@ class CollsionTreeFaceMap
 		delete[] m_faceMapInfo;
 	}
 
-	static int CountFaces (void* const context, const dFloat32* const polygon, int strideInBytes, const int* const indexArray, int indexCount)
+	static dInt32 CountFaces (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount)
 	{
 		CollsionTreeFaceMap* const me = (CollsionTreeFaceMap*) context;
 		me->m_faceCount ++;
 		return 1;
 	}
-	static int MarkFaces (void* const context, const dFloat32* const polygon, int strideInBytes, const int* const indexArray, int indexCount)
+	static dInt32 MarkFaces (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount)
 	{
 		CollsionTreeFaceMap* const me = (CollsionTreeFaceMap*) context;
 
 		// repmap material index, by enumerating the face and storing the user material info at each face index
-		int faceIndex = NewtonTreeCollisionGetFaceAttribute (me->m_collisionTree, indexArray, indexCount); 
+		dInt32 faceIndex = NewtonTreeCollisionGetFaceAttribute (me->m_collisionTree, indexArray, indexCount); 
 		me->m_faceMapInfo[me->m_faceCount].m_materialIndex = faceIndex;
 		NewtonTreeCollisionSetFaceAttribute (me->m_collisionTree, indexArray, indexCount, me->m_faceCount); 
 
 		me->m_faceCount ++;
 		return 1;
 	}
-	int m_faceCount;
+	dInt32 m_faceCount;
 	FaceInfo* m_faceMapInfo;
 	NewtonCollision* m_collisionTree;
 };
 
 
-NewtonCollision* CreateCollisionTree (ndWorld* const world, ndDemoEntity* const entity, int materialID, bool optimize)
+NewtonCollision* CreateCollisionTree (ndWorld* const world, ndDemoEntity* const entity, dInt32 materialID, bool optimize)
 {
 	// measure the time to build a collision tree
 	dUnsigned64 timer0 = dGetTimeInMicrosenconds();
@@ -1023,8 +1023,8 @@ NewtonCollision* CreateCollisionTree (ndWorld* const world, ndDemoEntity* const 
 		dFloat32* const vertex = mesh->m_vertex;
 		for (ndDemoMesh::dListNode* nodes = mesh->GetFirst(); nodes; nodes = nodes->GetNext()) {
 			ndDemoSubMesh& segment = nodes->GetInfo();
-			//int matID = segment.m_textureHandle;
-			int matID = 1;
+			//dInt32 matID = segment.m_textureHandle;
+			dInt32 matID = 1;
 			if (segment.m_textureName.Find("wood") != -1) {
 				matID  = 2;
 			} else if (segment.m_textureName.Find("floor") != -1) {
@@ -1036,8 +1036,8 @@ NewtonCollision* CreateCollisionTree (ndWorld* const world, ndDemoEntity* const 
 
 			for (dInt32 i = 0; i < segment.m_indexCount; i += 3) {
 				dFloat32 face[3][3];
-				for (int j = 0; j < 3; j ++) {
-					int index = segment.m_indexes[i + j] * 3;
+				for (dInt32 j = 0; j < 3; j ++) {
+					dInt32 index = segment.m_indexes[i + j] * 3;
 					face[j][0] = vertex[index + 0];
 					face[j][1] = vertex[index + 1];
 					face[j][2] = vertex[index + 2];
@@ -1080,14 +1080,14 @@ ndBodyKinematic* CreateLevelMeshBody (ndWorld* const world, ndDemoEntity* const 
 	NewtonCollisionInfoRecord collisionInfo;
 	NewtonCollisionGetInfo (collision, &collisionInfo);
 	if (collisionInfo.m_collisionType == SERIALIZE_ID_TREE) {
-		int count;
+		dInt32 count;
 		dVector p0(-100, -100, -100);
 		dVector p1(100, 100, 100);
 		const dFloat* vertexArray;
-		int vertexStrideInBytes;
-		int vertexCount;
-		int indexList[256];
-		int attributeList[256/3];
+		dInt32 vertexStrideInBytes;
+		dInt32 vertexCount;
+		dInt32 indexList[256];
+		dInt32 attributeList[256/3];
 		count = NewtonTreeCollisionGetVertexListTriangleListInAABB (collision, &p0[0], &p1[0], 
 			&vertexArray, &vertexCount, &vertexStrideInBytes, 
 			indexList, sizeof (indexList)/sizeof (indexList[0]), 
@@ -1113,7 +1113,7 @@ ndBodyKinematic* AddFloorBox(ndDemoEntityManager* const scene, const dVector& or
 /*
 	// create the shape and visual mesh as a common data to be re used
 	ndWorld* const world = scene->GetWorld();
-	const int materialID = NewtonMaterialGetDefaultGroupID(scene->GetWorld());
+	const dInt32 materialID = NewtonMaterialGetDefaultGroupID(scene->GetWorld());
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, materialID);
 
 	// test collision mode
@@ -1144,8 +1144,8 @@ ndBodyKinematic* CreatePLYMesh (ndDemoEntityManager* const scene, const char* co
 
 	char buffer[265];
 
-	int faceCount;
-	int vertexCount;
+	dInt32 faceCount;
+	dInt32 vertexCount;
 	fgets(buffer, sizeof (buffer), file);
 	fgets(buffer, sizeof (buffer), file);
 	fscanf(file, "%s %s %d\n", buffer, buffer, &vertexCount);
@@ -1173,11 +1173,11 @@ ndBodyKinematic* CreatePLYMesh (ndDemoEntityManager* const scene, const char* co
 	// prepare to create collision geometry
 	NewtonTreeCollisionBeginBuild(collision);
 	for (dInt32 i = 0; i < faceCount; i++) {
-		int count;
+		dInt32 count;
 		dFloat32 face[32][3];
 		fscanf(file, "%d", &count);
-		for (int j = 0; j < count; j++) {
-			int index;
+		for (dInt32 j = 0; j < count; j++) {
+			dInt32 index;
 			fscanf(file, "%d", &index);
 			face[j][0] = points[index][0];
 			face[j][1] = points[index][1];
@@ -1204,7 +1204,7 @@ ndBodyKinematic* CreatePLYMesh (ndDemoEntityManager* const scene, const char* co
 */
 }
 
-void LoadLumberYardMesh(ndDemoEntityManager* const scene, const dVector& location, int shapeid)
+void LoadLumberYardMesh(ndDemoEntityManager* const scene, const dVector& location, dInt32 shapeid)
 {
 	dAssert(0);
 /*
@@ -1215,7 +1215,7 @@ void LoadLumberYardMesh(ndDemoEntityManager* const scene, const dVector& locatio
 
 	dFloat32 density = 1000.0f;
 
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetWorld());
+	dInt32 defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetWorld());
 	for (ndDemoEntity* child = entity->GetFirst(); child; child = child->GetNext()) {
 		ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 		if (mesh) {

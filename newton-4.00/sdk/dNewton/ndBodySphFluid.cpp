@@ -444,9 +444,9 @@ return;
 	//	dAssert((hashBox1.m_y - hashBox0.m_y) > 1);
 	//	dAssert((hashBox1.m_x - hashBox0.m_x) > 1);
 	//
-	//	const int x_ = 6;
-	//	const int y_ = 6;
-	//	const int z_ = 20;
+	//	const dInt32 x_ = 6;
+	//	const dInt32 y_ = 6;
+	//	const dInt32 z_ = 20;
 	//	dFloat32 xxx[z_][y_][x_];
 	//	memset(xxx, 0, sizeof(xxx));
 	//	for (dInt32 i = 0; i < uniqueCount; i++)

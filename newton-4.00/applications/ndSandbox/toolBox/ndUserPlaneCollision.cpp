@@ -54,7 +54,7 @@ class dInfinitePlane
 			// face area (the plane is clipped around the box, the face size is always optimal)
 			m_indexArray[i][4 + 2 + 4] = 0;
 
-			for (int j = 0; j < 4; j ++) {
+			for (dInt32 j = 0; j < 4; j ++) {
 				// face vertex index
 				m_indexArray[i][j] = j;
 				// face adjacent index (infinite plane does not have shared edge with other faces)
@@ -142,14 +142,14 @@ class dInfinitePlane
 		delete me;
 	}
 
-	static int PlaneCollisionGetFacesInAABB (void* me, const dFloat32* p0, const dFloat32* p1, const dFloat32** vertexArray, int* vertexCount, int* vertexStrideInBytes, const int* indexList, int maxIndexCount, const int* userDataList)
+	static dInt32 PlaneCollisionGetFacesInAABB (void* me, const dFloat32* p0, const dFloat32* p1, const dFloat32** vertexArray, dInt32* vertexCount, dInt32* vertexStrideInBytes, const dInt32* indexList, dInt32 maxIndexCount, const dInt32* userDataList)
 	{
 		dAssert (0);
 		return 0;
 	}
 
 
-	static int PlaneCollisionAABBOverlapTest (void* userData, const dFloat32* const box0, const dFloat32* const box1)
+	static dInt32 PlaneCollisionAABBOverlapTest (void* userData, const dFloat32* const box0, const dFloat32* const box1)
 	{
 		const dInfinitePlane* const me = (dInfinitePlane*) userData;
 

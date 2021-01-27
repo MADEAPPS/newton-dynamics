@@ -81,7 +81,7 @@ class dString: public dClassAlloc
 	protected:
 	char* AllocMem(dInt32 size);
 	void FreeMem (char* const ptr);
-	D_CORE_API dString (const dString& src, const char* const concatenate, int maxSize);
+	D_CORE_API dString (const dString& src, const char* const concatenate, dInt32 maxSize);
 	
 	char* m_string;
 	dInt32 m_size;

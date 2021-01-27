@@ -221,14 +221,14 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 	//mesh->SetRenderResolution(500);
 	mesh->Release();
 
-	const int count = 32;
-	//const int count = 2;
+	const dInt32 count = 32;
+	//const dInt32 count = 2;
 
 	dBigVector point0;
 	dVector positions[count + 1];
 	dFloat64 knot = spline.FindClosestKnot(point0, dBigVector(dVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f)), 4);
 	positions[0] = point0;
-	for (int i = 0; i < count; i++) 
+	for (dInt32 i = 0; i < count; i++) 
 	{
 		dBigVector point1;
 		dBigVector tangent(spline.CurveDerivative(knot));
@@ -249,7 +249,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 
 	ndBodyDynamic* bodies[count];
 	ndPhysicsWorld* const world = scene->GetWorld();
-	for (int i = 0; i < count; i++) 
+	for (dInt32 i = 0; i < count; i++) 
 	{
 		dVector location0(positions[i + 0].m_x, positions[i + 0].m_y, positions[i + 0].m_z, 0.0);
 		dVector location1(positions[i + 1].m_x, positions[i + 1].m_y, positions[i + 1].m_z, 0.0);
@@ -285,7 +285,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 		body->SetVelocity(veloc);
 	}
 
-	for (int i = 1; i < count; i++) 
+	for (dInt32 i = 1; i < count; i++) 
 	{
 		ndBodyDynamic* const box0 = bodies[i - 1];
 		ndBodyDynamic* const box1 = bodies[i - 0];

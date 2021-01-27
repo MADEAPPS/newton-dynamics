@@ -186,8 +186,8 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene)
 	// create the height field collision and rigid body
 
 	// create the attribute map
-	int width = size;
-	int height = size;
+	dInt32 width = size;
+	dInt32 height = size;
 	char* const attibutes = new char [size * size];
 	memset (attibutes, 0, width * height * sizeof (char));
 	NewtonCollision* collision = NewtonCreateHeightFieldCollision (scene->GetWorld(), width, height, 1, 0, elevation, attibutes, 1.0f, cellSize, cellSize, 0);

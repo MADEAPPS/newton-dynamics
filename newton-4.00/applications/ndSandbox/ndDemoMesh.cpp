@@ -509,7 +509,7 @@ void ndDemoMesh::GetVertexArray(dArray<dVector>& points) const
 
 	points.Resize(m_vertexCount);
 	points.SetCount(m_vertexCount);
-	for (int i = 0; i < m_vertexCount; i++)
+	for (dInt32 i = 0; i < m_vertexCount; i++)
 	{
 		points[i] = dVector(data[i].m_posit.m_x, data[i].m_posit.m_y, data[i].m_posit.m_z, dFloat32 (0.0f));
 	}

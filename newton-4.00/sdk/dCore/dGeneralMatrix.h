@@ -260,7 +260,7 @@ template<class T>
 bool dTestPSDmatrix(dInt32 size, dInt32 stride, T* const matrix)
 {
 	T* const copy = dAlloca(T, size * size);
-	int row = 0;
+	dInt32 row = 0;
 	for (dInt32 i = 0; i < size; i++) 
 	{
 		memcpy(&copy[i * size], &matrix[row], size * sizeof (T));
@@ -620,15 +620,15 @@ void dGaussSeidelLcpSor(const dInt32 size, const T* const matrix, T* const x, co
 }
 
 template <class T>
-void dGaussSeidelLcpSor(const int size, const int stride, const T* const matrix, T* const x, const T* const b, const int* const normalIndex, const T* const low, const T* const high, T tol2, int maxIterCount, T sor)
+void dGaussSeidelLcpSor(const dInt32 size, const dInt32 stride, const T* const matrix, T* const x, const T* const b, const dInt32* const normalIndex, const T* const low, const T* const high, T tol2, dInt32 maxIterCount, T sor)
 {
 	const T* const me = matrix;
 	T* const invDiag1 = dAlloca(T, size);
 	T* const u = dAlloca(T, size + 1);
-	int* const index = dAlloca(int, size);
+	dInt32* const index = dAlloca(dInt32, size);
 
 	u[size] = T(1.0f);
-	int rowStart = 0;
+	dInt32 rowStart = 0;
 	for (dInt32 j = 0; j < size; j++) 
 	{
 		u[j] = x[j];
@@ -647,10 +647,10 @@ void dGaussSeidelLcpSor(const int size, const int stride, const T* const matrix,
 
 	T tolerance(tol2 * 2.0f);
 	const T* const invDiag = invDiag1;
-	const int maxCount = dMax(8, size);
+	const dInt32 maxCount = dMax(8, size);
 	for (dInt32 i = 0; (i < maxCount) && (tolerance > tol2); i++) 
 	{
-		int base = 0;
+		dInt32 base = 0;
 		tolerance = T(0.0f);
 		for (dInt32 j = 0; j < size; j++) 
 		{
@@ -679,11 +679,11 @@ void dGaussSeidelLcpSor(const int size, const int stride, const T* const matrix,
 	}
 
 #ifdef _DEBUG 
-	int passes = 0;
+	dInt32 passes = 0;
 #endif
 	for (dInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); i++) 
 	{
-		int base = 0;
+		dInt32 base = 0;
 		tolerance = T(0.0f);
 #ifdef _DEBUG 
 		passes++;

@@ -232,7 +232,7 @@ dGoogol dGoogol::operator/ (const dGoogol &A) const
 	dGoogol tmp (1.0 / A);
 	tmp = tmp * (m_two - A * tmp);
 	tmp = tmp * (m_two - A * tmp);
-	int test = 0;
+	dInt32 test = 0;
 	dInt32 passes = 0;
 	do 
 	{

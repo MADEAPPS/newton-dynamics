@@ -638,7 +638,7 @@ dFloat64 ndScene::ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const root
 	}
 	else
 	{
-		int count = 0;
+		dInt32 count = 0;
 		ndFitnessList::dListNode* node = fitness.m_currentNode;
 		for ( ;node && count < 64; node = node->GetNext())
 		{

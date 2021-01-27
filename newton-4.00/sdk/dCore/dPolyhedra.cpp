@@ -213,13 +213,16 @@ void dPolyhedra::SavePLY(const char* const fileName, const dFloat64* const verte
 
 	dInt32 faceCount = 0;
 	Iterator iter(copy);
-	int mark = copy.IncLRU();
-	for (iter.Begin(); iter; iter++) {
+	dInt32 mark = copy.IncLRU();
+	for (iter.Begin(); iter; iter++) 
+	{
 		dEdge* const face = &iter.GetNode()->GetInfo();
-		if ((face->m_mark < mark) && (face->m_incidentFace > 0)) {
+		if ((face->m_mark < mark) && (face->m_incidentFace > 0)) 
+		{
 			faceCount++;
 			dEdge* edge = face;
-			do {
+			do 
+			{
 				edge->m_mark = mark;
 				edge = edge->m_next;
 			} while (edge != face);
@@ -228,11 +231,14 @@ void dPolyhedra::SavePLY(const char* const fileName, const dFloat64* const verte
 
 	mark = copy.IncLRU();
 	dInt32 vertexCount = 0;
-	for (iter.Begin(); iter; iter++) {
+	for (iter.Begin(); iter; iter++) 
+	{
 		dEdge* const vertex = &iter.GetNode()->GetInfo();
-		if (vertex->m_mark < mark) {
+		if (vertex->m_mark < mark) 
+		{
 			dEdge* edge = vertex;
-			do {
+			do 
+			{
 				edge->m_userData = vertexCount;
 				edge->m_mark = mark;
 				edge = edge->m_twin->m_next;

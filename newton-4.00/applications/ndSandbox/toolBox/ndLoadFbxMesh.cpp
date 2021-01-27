@@ -220,7 +220,7 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNoceM
 
 		nodeMap.Insert(node, data.m_fbxNode);
 		const dInt32 count = GetChildrenNodes(data.m_fbxNode, buffer);
-		for (int i = 0; i < count; i++) 
+		for (dInt32 i = 0; i < count; i++) 
 		{
 			ofbx::Object* const child = buffer[count - i - 1];
 			nodeStack[stack] = fbxImportStackData(child, node);
@@ -398,25 +398,25 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 	//mesh->RepairTJoints();
 
 	// import skin if there is any
-	//int deformerCount = fbxMesh->GetDeformerCount(FbxDeformer::eSkin);
+	//dInt32 deformerCount = fbxMesh->GetDeformerCount(FbxDeformer::eSkin);
 	if (geom->getSkin())
 	{
 		dAssert(0);
 		#if 0
 		FbxSkin* const skin = geom->getSkin();
-		for (int i = 0; i < deformerCount; i++)
+		for (dInt32 i = 0; i < deformerCount; i++)
 		{
 			// count the number of weights
-			int skinVertexDataCount = 0;
-			int clusterCount = skin->GetClusterCount();
-			for (int i = 0; i < clusterCount; i++) {
+			dInt32 skinVertexDataCount = 0;
+			dInt32 clusterCount = skin->GetClusterCount();
+			for (dInt32 i = 0; i < clusterCount; i++) {
 				FbxCluster* cluster = skin->GetCluster(i);
 				skinVertexDataCount += cluster->GetControlPointIndicesCount();
 			}
 			dGeometryNodeSkinModifierInfo::dBoneVertexWeightData* const skinVertexData = new dGeometryNodeSkinModifierInfo::dBoneVertexWeightData[skinVertexDataCount];
 				
-			int actualSkinVertexCount = 0;
-			for (int i = 0; i < clusterCount; i++)
+			dInt32 actualSkinVertexCount = 0;
+			for (dInt32 i = 0; i < clusterCount; i++)
 			{
 				FbxCluster* const cluster = skin->GetCluster(i);
 				FbxNode* const fbxBone = cluster->GetLink(); // Get a reference to the bone's node
@@ -431,12 +431,12 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 					//FbxAMatrix bindPoseMatrix;
 					//cluster->GetTransformLinkMatrix(bindPoseMatrix);
 				
-					int *boneVertexIndices = cluster->GetControlPointIndices();
+					dInt32 *boneVertexIndices = cluster->GetControlPointIndices();
 					double *boneVertexWeights = cluster->GetControlPointWeights();
 					// Iterate through all the vertices, which are affected by the bone
-					int numBoneVertexIndices = cluster->GetControlPointIndicesCount();
-					for (int j = 0; j < numBoneVertexIndices; j++) {
-						int boneVertexIndex = boneVertexIndices[j];
+					dInt32 numBoneVertexIndices = cluster->GetControlPointIndicesCount();
+					for (dInt32 j = 0; j < numBoneVertexIndices; j++) {
+						dInt32 boneVertexIndex = boneVertexIndices[j];
 						float boneWeight = (float)boneVertexWeights[j];
 						skinVertexData[actualSkinVertexCount].m_vertexIndex = boneVertexIndex;
 						skinVertexData[actualSkinVertexCount].m_weight = boneWeight;
@@ -531,7 +531,7 @@ static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 
 	//UsedMaterials::Iterator iter1(usedMaterials);
 	//for (iter1.Begin(); iter1; iter1++) {
-	//	int count = iter1.GetNode()->GetInfo();
+	//	dInt32 count = iter1.GetNode()->GetInfo();
 	//	if (!count) {
 	//		dScene::dTreeNode* const materiaCacheNode = ngdScene->FindGetMaterialCacheNode();
 	//		dScene::dTreeNode* const materialNode = iter1.GetKey();

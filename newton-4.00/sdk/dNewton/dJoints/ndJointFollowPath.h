@@ -29,7 +29,6 @@ class ndJointFollowPath: public ndJointBilateralConstraint
 	}
 
 	protected:
-	//D_NEWTON_API virtual void SubmitConstraints (dFloat32 timestep, int threadIndex);
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 };
 

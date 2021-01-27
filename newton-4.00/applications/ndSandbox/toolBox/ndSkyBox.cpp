@@ -37,7 +37,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 
 	// index array for glDrawElements()
 	// A cube requires 36 indices = 6 sides * 2 tris * 3 verts
-	static int indices[] =
+	static dInt32 indices[] =
 	{
 		0, 1, 2,   2, 3, 0,    // v0-v1-v2, v2-v3-v0 (front)
 		4, 5, 6,   6, 7, 4,    // v0-v3-v4, v4-v5-v0 (right)
@@ -68,7 +68,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(int), &indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(dInt32), &indices[0], GL_STATIC_DRAW);
 	
 	glBindVertexArray(0);
 	
@@ -122,8 +122,8 @@ void ndSkyBox::LoadCubeTexture(GLenum face, char* const filename)
 	tgaHeader.height = SWAP_INT16(tgaHeader.height);
 	
 	// Get width, height, and depth of texture
-	int width = tgaHeader.width;
-	int height = tgaHeader.height;
+	dInt32 width = tgaHeader.width;
+	dInt32 height = tgaHeader.height;
 	short sDepth = tgaHeader.bits / 8;
 	dAssert((sDepth == 3) || (sDepth == 4));
 	
@@ -148,7 +148,7 @@ void ndSkyBox::LoadCubeTexture(GLenum face, char* const filename)
 		return;
 	}
 	
-	int readret = int(fread(pBits, lImageSize, 1, pFile));
+	dInt32 readret = dInt32(fread(pBits, lImageSize, 1, pFile));
 	if (readret != 1)
 	{
 		dAssert(0);

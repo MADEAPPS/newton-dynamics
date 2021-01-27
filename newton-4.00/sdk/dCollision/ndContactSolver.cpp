@@ -1321,7 +1321,7 @@ dInt32 ndContactSolver::Prune2dContacts(const dMatrix& matrix, dInt32 count, ndC
 	stack[1].m_p0 = stack[0].m_p1;
 	stack[1].m_p1 = stack[0].m_p0;
 
-	int hullCount = 2;
+	dInt32 hullCount = 2;
 	dInt32 stackIndex = 2;
 	dFloat32 totalArea = dFloat32(0.0f);
 	while (stackIndex && count && (hullCount < sizeof(convexHull) / sizeof(convexHull[0]))) 

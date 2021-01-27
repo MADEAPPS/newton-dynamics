@@ -38,7 +38,7 @@ dSpatialMatrix dSpatialMatrix::Inverse(dInt32 rows) const
 		dFloat64 pivot = dAbs(tmp[i][i]);
 		if (pivot < dFloat64(0.01f)) 
 		{
-			int permute = i;
+			dInt32 permute = i;
 			for (dInt32 j = i + 1; j < rows; j++) 
 			{
 				dFloat64 pivot1 = dAbs(tmp[j][i]);

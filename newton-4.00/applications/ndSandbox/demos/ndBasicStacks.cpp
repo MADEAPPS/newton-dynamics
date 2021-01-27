@@ -60,7 +60,7 @@ static void BuildBoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const
 	scene->AddEntity(rootEntity);
 
 	dMatrix rotation(dYawMatrix(20.0f * dDegreeToRad));
-	for (int i = 0; i < count; i++) 
+	for (dInt32 i = 0; i < count; i++) 
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
@@ -96,7 +96,7 @@ static void BuildCylinderStack(ndDemoEntityManager* const scene, dFloat32 mass, 
 
 	dMatrix rotation(dYawMatrix(20.0f * dDegreeToRad));
 
-	for (int i = 0; i < count; i++)
+	for (dInt32 i = 0; i < count; i++)
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
@@ -135,10 +135,10 @@ static void BuildPyramid(ndDemoEntityManager* const scene, dFloat32 mass, const 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
-	for (int j = 0; j < count; j++) 
+	for (dInt32 j = 0; j < count; j++) 
 	{
 		matrix.m_posit.m_z = z0;
-		for (int i = 0; i < (count - j); i++) 
+		for (dInt32 i = 0; i < (count - j); i++) 
 		{
 			AddRigidBody(scene, matrix, shape, rootEntity, mass);
 			matrix.m_posit.m_z += stepz;

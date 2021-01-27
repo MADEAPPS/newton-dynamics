@@ -409,7 +409,7 @@ class dVector
 		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 0, 2, 1));
 	}
 
-	D_INLINE dVector ShiftRightLogical (int bits) const
+	D_INLINE dVector ShiftRightLogical (dInt32 bits) const
 	{
 		return dVector (_mm_srli_epi32(m_typeInt, bits)); 
 	}
@@ -799,7 +799,7 @@ class dVector
 			return tmp3;
 		}
 
-		D_INLINE dBigVector ShiftRightLogical(int bits) const
+		D_INLINE dBigVector ShiftRightLogical(dInt32 bits) const
 		{
 			dUnsigned64 x = ((dUnsigned64)m_ix) >> bits;
 			dUnsigned64 y = ((dUnsigned64)m_iy) >> bits;
@@ -1333,7 +1333,7 @@ class dVector
 			return dBigVector(_mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(0, 1)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(1, 0)));
 		}
 
-		D_INLINE dBigVector ShiftRightLogical(int bits) const
+		D_INLINE dBigVector ShiftRightLogical(dInt32 bits) const
 		{
 			//return dBigVector(dInt64(dUnsigned64(m_ix) >> bits), dInt64(dUnsigned64(m_iy) >> bits), dInt64(dUnsigned64(m_iz) >> bits), dInt64(dUnsigned64(m_iw) >> bits));
 			return dBigVector(_mm_srli_epi64(m_typeIntLow, bits), _mm_srli_epi64(m_typeIntHigh, bits));

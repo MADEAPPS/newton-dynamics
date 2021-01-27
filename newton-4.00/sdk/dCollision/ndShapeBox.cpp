@@ -102,7 +102,7 @@ void ndShapeBox::Init(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 		}
 		polyhedra.EndFace();
 	
-		int index = 0;
+		dInt32 index = 0;
 		dInt32 mark = polyhedra.IncLRU();;
 		dPolyhedra::Iterator iter(polyhedra);
 		for (iter.Begin(); iter; iter++) {

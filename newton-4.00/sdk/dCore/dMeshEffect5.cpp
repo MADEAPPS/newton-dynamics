@@ -1032,7 +1032,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 		dgBooleanMeshClipper BVHmeshA(meshA);
 		dgBooleanMeshClipper BVHmeshB(meshB);
 
-		int stack = 1;
+		dInt32 stack = 1;
 		
 		dgMeshBVHNode* stackPool[2 * DG_MESH_EFFECT_BVH_STACK_DEPTH][2];
 

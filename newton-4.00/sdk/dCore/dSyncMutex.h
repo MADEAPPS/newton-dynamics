@@ -50,7 +50,7 @@ class dSyncMutex
 	private:
 	std::mutex m_mutex;
 	std::condition_variable m_condition;
-	int m_count;
+	dInt32 m_count;
 #endif
 };
 

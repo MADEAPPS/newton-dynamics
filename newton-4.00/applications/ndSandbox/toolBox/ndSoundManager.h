@@ -40,7 +40,7 @@ class dSoundManager
 		private:
 		void LinkAsset (dTree<dSoundAsset, dUnsigned64>::dTreeNode* const assetNode);
 
-		int m_source;
+		dInt32 m_source;
 		dTree<dSoundAsset, dUnsigned64>::dTreeNode* m_myAssetNode;
 		friend class dSoundManager;
 	};
@@ -59,7 +59,7 @@ class dSoundManager
 		using dRefCounter::operator delete;
 
 
-		int m_buffer;
+		dInt32 m_buffer;
 		dFloat m_lenght;
 		dFloat m_frequecy;
 	};

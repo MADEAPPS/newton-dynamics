@@ -419,7 +419,7 @@ class dVector
 		return dVector (m_y, m_z, m_x, m_w); 
 	}
 
-	D_INLINE dVector ShiftRightLogical (int bits) const
+	D_INLINE dVector ShiftRightLogical (dInt32 bits) const
 	{
 		return dVector (dInt32 (dUnsigned32 (m_ix) >> bits), dInt32 (dUnsigned32 (m_iy) >> bits), dInt32 (dUnsigned32 (m_iz) >> bits), dInt32 (dUnsigned32 (m_iw) >> bits)); 
 	}
@@ -852,7 +852,7 @@ class dBigVector
 		return dBigVector (m_y, m_z, m_x, m_w); 
 	}
 
-	D_INLINE dBigVector ShiftRightLogical (int bits) const
+	D_INLINE dBigVector ShiftRightLogical (dInt32 bits) const
 	{
 		return dBigVector (dInt64 (dUnsigned64 (m_ix) >> bits), dInt64 (dUnsigned64 (m_iy) >> bits), dInt64 (dUnsigned64 (m_iz) >> bits), dInt64 (dUnsigned64 (m_iw) >> bits)); 
 	}

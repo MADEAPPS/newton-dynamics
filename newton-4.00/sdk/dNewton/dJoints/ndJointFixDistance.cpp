@@ -36,7 +36,6 @@ ndJointFixDistance::~ndJointFixDistance()
 {
 }
 
-//void ndJointFixDistance::SubmitConstraints(dFloat32 timestep, int threadIndex)
 void ndJointFixDistance::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;

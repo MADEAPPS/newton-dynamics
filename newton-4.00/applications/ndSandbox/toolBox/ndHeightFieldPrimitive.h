@@ -9,9 +9,12 @@
 * freely
 */
 
-#ifndef __HeightFieldPrimitive_H__
-#define __HeightFieldPrimitive_H__
+#ifndef __D_HeightFieldPrimitive_H__
+#define __D_HeightFieldPrimitive_H__
 
+#include "ndSandboxStdafx.h"
+
+class ndDemoEntityManager;
 ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene);
 #endif 
 

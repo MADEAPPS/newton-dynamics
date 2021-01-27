@@ -179,7 +179,7 @@ void ndDemoMeshIntance::SetTransforms(dInt32 count, const dMatrix* const matrixA
 	m_instanceCount = count;
 }
 
-void ndDemoMeshIntance::RenderBatch(int start, ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+void ndDemoMeshIntance::RenderBatch(dInt32 start, ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_matrixOffsetBuffer);
 

@@ -37,7 +37,7 @@ static void GetCollisionInfo (void* userData, NewtonCollisionInfoRecord* infoRec
 	// copy here what ever information you wan t pass to the APP;
 	UserHeightFieldCollision* me = (UserHeightFieldCollision*) userData;
 
-	//we will pass the info int the HightField Structure bu the APP can use the extra space
+	//we will pass the info dInt32 the HightField Structure bu the APP can use the extra space
 	infoRecord->m_heightField.m_width = HEIGHT_SIZE;
 	infoRecord->m_heightField.m_height = HEIGHT_SIZE;
 	infoRecord->m_heightField.m_verticalScale = HIGHTSCALE_SIZE;
@@ -48,11 +48,11 @@ static void GetCollisionInfo (void* userData, NewtonCollisionInfoRecord* infoRec
 }
 
 
-static int UserMeshCollisionGetFacesInAABB (
+static dInt32 UserMeshCollisionGetFacesInAABB (
 	void* userData, const dFloat* p0, const dFloat* p1,
     const dFloat** vertexArray, 
-	int* vertexCount, int* vertexStrideInBytes, 
-    const int* indexList, int maxIndexCount, const int* userDataList)
+	dInt32* vertexCount, dInt32* vertexStrideInBytes, 
+    const dInt32* indexList, dInt32 maxIndexCount, const dInt32* userDataList)
 {
 	// this is implementation dependent, 			
 	// The application must find all that Faces intersecting BBox p0-p1 and copy then in to the passed parameters.
@@ -83,10 +83,10 @@ UserHeightFieldCollision::UserHeightFieldCollision(NewtonWorld* nWorld)
 {
 dAssert (0);
 /*
-	int width;
-	int height;
-	int index;
-	int vertexIndex;
+	dInt32 width;
+	dInt32 height;
+	dInt32 index;
+	dInt32 vertexIndex;
 	dFloat32 minY;
 	dFloat32 maxY;
 	OGLMesh* geometry;
@@ -97,8 +97,8 @@ dAssert (0);
 	height = HEIGHT_SIZE;
 
 	// build a simple height field array. Note this could be load it from a texture map file
-	for (int z = 0; z < height; z ++) {
-		for (int x = 0; x < width; x ++) {
+	for (dInt32 z = 0; z < height; z ++) {
+		for (dInt32 x = 0; x < width; x ++) {
 			dFloat32 y;
 			// add sine wave for rolling terrain
 			y = (5.0f * dSin(x/5.0f) + 7.0f * dCos((z)/7.0f)) * 1.5f;
@@ -115,12 +115,12 @@ dAssert (0);
 	geometry->Release();
 
 	geometry->AllocVertexData(width * height);
-	for (int z = 0; z < height; z ++) {
+	for (dInt32 z = 0; z < height; z ++) {
 		dInt32 z0;
 		dInt32 z1;
 		z0 = ((z - 1) < 0) ? 0 : z - 1;
 		z1 = ((z + 1) > (height - 1)) ? height - 1 : z + 1 ;
-		for (int x = 0; x < width; x ++) {
+		for (dInt32 x = 0; x < width; x ++) {
 			dInt32 x0;
 			dInt32 x1;
 
@@ -162,9 +162,9 @@ dAssert (0);
 
 	index = 0;
 	vertexIndex = 0;
-	for (int z = 0; z < height - 1; z ++) {
+	for (dInt32 z = 0; z < height - 1; z ++) {
 		vertexIndex = z * width;
-		for (int x = 0; x < width - 1; x ++) {
+		for (dInt32 x = 0; x < width - 1; x ++) {
 			segment->m_indexes[index + 0] = GLushort (vertexIndex);
 			segment->m_indexes[index + 1] = GLushort (vertexIndex + width + 1);
 			segment->m_indexes[index + 2] = GLushort (vertexIndex + 1);
@@ -196,14 +196,14 @@ dAssert (0);
 	NewtonCollisionInfoRecord collisionInfo;
 	NewtonCollisionGetInfo (collision, &collisionInfo);
 	if (collisionInfo.m_collisionType == SERIALIZE_ID_USERMESH) {
-		int count;
+		dInt32 count;
 		dVector p0(-100, -100, -100);
 		dVector p1(100, 100, 100);
 		const dFloat32* vertexArray;
-		int vertexStrideInBytes;
-		int vertexCount;
-		int indexList[256];
-		int attributeList[256/3];
+		dInt32 vertexStrideInBytes;
+		dInt32 vertexCount;
+		dInt32 indexList[256];
+		dInt32 attributeList[256/3];
 		count = NewtonTreeCollisionGetVertexListTriangleListInAABB (collision, &p0[0], &p1[0], 
 			&vertexArray, &vertexCount, &vertexStrideInBytes, 
 			indexList, sizeof (indexList)/sizeof (indexList[0]), 

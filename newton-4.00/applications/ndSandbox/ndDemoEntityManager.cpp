@@ -72,14 +72,14 @@ ndDemoEntityManager::ButtonKey::ButtonKey (bool state)
 {
 }
 
-int ndDemoEntityManager::ButtonKey::UpdateTrigger (bool triggerValue)
+dInt32 ndDemoEntityManager::ButtonKey::UpdateTrigger (bool triggerValue)
 {
 	m_memory0 = m_memory1;
 	m_memory1 = triggerValue;
 	return (!m_memory0 & m_memory1) ? 1 : 0;
 }
 
-int ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
+dInt32 ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 {
 	if (UpdateTrigger (triggerValue)) 
 	{
@@ -157,14 +157,14 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	m_mainFrame = glfwCreateWindow(1280, 720, version, nullptr, nullptr);
 	glfwMakeContextCurrent(m_mainFrame);
 
-	int monitorsCount;
+	dInt32 monitorsCount;
 	GLFWmonitor** monitors = glfwGetMonitors(&monitorsCount);
 	if (monitorsCount > 1) 
 	{
-		int window_x;
-		int window_y;
-		int monitor_x;
-		int monitor_y;
+		dInt32 window_x;
+		dInt32 window_y;
+		dInt32 monitor_x;
+		dInt32 monitor_y;
 
 		glfwGetMonitorPos(monitors[1], &monitor_x, &monitor_y);
 		glfwGetWindowPos(m_mainFrame, &window_x, &window_y);
@@ -275,9 +275,9 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	dMatrixTimeVector(2, &A[0][0], x, b);
 	dSolveDantzigLCP(2, &A[0][0], x, b, l, h);
 
-	int xxx = 0;
-	const int xxxxxx = 450;
-	dDownHeap<int, unsigned> xxxxx (xxxxxx + 2);
+	dInt32 xxx = 0;
+	const dInt32 xxxxxx = 450;
+	dDownHeap<dInt32, unsigned> xxxxx (xxxxxx + 2);
 	for (dInt32 i = 0; i < xxxxxx; i ++)
 	{
 		xxxxx.Push (xxx, i);
@@ -285,8 +285,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 	for (dInt32 i = 0; i < 10000; i ++)
 	{
-		int index = dRand() % xxxxxx;
-		int key = xxxxx.Value(index);
+		dInt32 index = dRand() % xxxxxx;
+		dInt32 key = xxxxx.Value(index);
 		xxxxx.Remove (index);
 		xxxxx.Push (xxx, key);
 	}
@@ -322,7 +322,7 @@ ndDemoCamera* ndDemoEntityManager::GetCamera() const
 	return m_cameraManager->GetCamera();
 }
 
-bool ndDemoEntityManager::GetKeyState(int key) const
+bool ndDemoEntityManager::GetKeyState(dInt32 key) const
 {
 	const ImGuiIO& io = ImGui::GetIO();
 	return io.KeysDown[key];
@@ -348,7 +348,7 @@ bool ndDemoEntityManager::GetCaptured() const
 	return io.WantCaptureMouse;
 }
 
-bool ndDemoEntityManager::GetMouseKeyState (int button) const
+bool ndDemoEntityManager::GetMouseKeyState (dInt32 button) const
 {
 	ImGuiIO& io = ImGui::GetIO();
 	return io.MouseDown[button];
@@ -367,9 +367,9 @@ void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback,
 	m_updateCameraContext = context;
 }
 
-int ndDemoEntityManager::GetJoystickAxis (dFloat32* const axisValues, int maxAxis) const
+dInt32 ndDemoEntityManager::GetJoystickAxis (dFloat32* const axisValues, dInt32 maxAxis) const
 {
-	int axisCount = 0;
+	dInt32 axisCount = 0;
 	if (m_hasJoytick) 
 	{
 		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
@@ -382,9 +382,9 @@ int ndDemoEntityManager::GetJoystickAxis (dFloat32* const axisValues, int maxAxi
 	return axisCount;
 }
 
-int ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, int maxButton) const
+dInt32 ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, dInt32 maxButton) const
 {
-	int buttonsCount = 0;
+	dInt32 buttonsCount = 0;
 	if (m_hasJoytick) {
 		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
 		buttonsCount = dMin (buttonsCount, maxButton);
@@ -504,7 +504,7 @@ void ndDemoEntityManager::LoadFont()
 	// If your ImTextureId represent a higher-level concept than just a GL texture id, 
 	// consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
 	unsigned char* pixels;
-	int width, height;
+	dInt32 width, height;
 	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);   
 
 	// Upload texture to graphics system
@@ -518,7 +518,7 @@ void ndDemoEntityManager::LoadFont()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 	// Store our identifier
-	m_defaultFont = int (font_texture);
+	m_defaultFont = dInt32 (font_texture);
 	io.Fonts->TexID = (void *)(intptr_t)m_defaultFont;
 
 	// Restore state
@@ -594,7 +594,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		if (ImGui::BeginMenu("Demos")) 
 		{
 			m_suspendPhysicsUpdate = true;
-			int demosCount = int (sizeof (m_demosSelection) / sizeof m_demosSelection[0]);
+			dInt32 demosCount = dInt32 (sizeof (m_demosSelection) / sizeof m_demosSelection[0]);
 			for (dInt32 i = 0; i < demosCount; i ++) 
 			{
 				if (ImGui::MenuItem(m_demosSelection[i].m_name, "")) 
@@ -623,7 +623,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::RadioButton("avx2", &m_solverMode, 1);
 			ImGui::Separator();
 
-			//int index = 0;
+			//dInt32 index = 0;
 			//ImGui::RadioButton("default solver", &m_currentPlugin, index);
 			//char ids[32][32];
 			//for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
@@ -771,7 +771,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 	}
 }
 
-void ndDemoEntityManager::LoadDemo(int menu)
+void ndDemoEntityManager::LoadDemo(dInt32 menu)
 {
 	char newTitle[256];
 	Cleanup();
@@ -786,14 +786,14 @@ void ndDemoEntityManager::LoadDemo(int menu)
 	ResetTimer();
 }
 
-void ndDemoEntityManager::ErrorCallback(int error, const char* description)
+void ndDemoEntityManager::ErrorCallback(dInt32 error, const char* description)
 {
 	dTrace (("Error %d: %s\n", error, description));
 	fprintf(stderr, "Error %d: %s\n", error, description);
 	dAssert (0);
 }
 
-void ndDemoEntityManager::MouseButtonCallback(GLFWwindow*, int button, int action, int)
+void ndDemoEntityManager::MouseButtonCallback(GLFWwindow*, dInt32 button, dInt32 action, dInt32)
 {
 	if (button >= 0 && button < 3) 
 	{
@@ -837,14 +837,14 @@ bool ndDemoEntityManager::GetMousePosition (dFloat32& posX, dFloat32& posY) cons
 	return true;
 }
 
-void ndDemoEntityManager::CharCallback(GLFWwindow* window, unsigned int ch)
+void ndDemoEntityManager::CharCallback(GLFWwindow* window, dUnsigned32 ch)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	io.AddInputCharacter((unsigned short)ch);
 }
 
 
-void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, int key, int, int action, int mods)
+void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, dInt32 key, dInt32, dInt32 action, dInt32 mods)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	if (action == GLFW_PRESS)
@@ -858,7 +858,7 @@ void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, int key, int, in
 	io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
 	io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 	
-	static int prevKey;
+	static dInt32 prevKey;
 	ndDemoEntityManager* const manager = (ndDemoEntityManager*)glfwGetWindowUserPointer(window);
 	if ((key == GLFW_KEY_F10) && (key != prevKey)) 
 	{
@@ -895,8 +895,8 @@ void ndDemoEntityManager::BeginFrame()
 	ImGuiIO& io = ImGui::GetIO();
 
 	// Setup display size (every frame to accommodate for window resizing)
-	int w, h;
-	int display_w, display_h;
+	dInt32 w, h;
+	dInt32 display_w, display_h;
 	glfwGetWindowSize(m_mainFrame, &w, &h);
 	glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
 	io.DisplaySize = ImVec2((float)w, (float)h);
@@ -926,7 +926,7 @@ void ndDemoEntityManager::RenderStats()
 			if (m_currentPlugin) 
 			{
 				dAssert(0);
-				//int index = 1;
+				//dInt32 index = 1;
 				//for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
 				//	if (index == m_currentPlugin) {
 				//		sprintf(text, "plugin:        %s", NewtonGetPluginString(m_world, plugin));
@@ -1028,7 +1028,7 @@ void ndDemoEntityManager::ImportPLYfile (const char* const fileName)
 	//CreatePLYMesh (this, fileName, true);
 }
 
-int ndDemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
+dInt32 ndDemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
 {
 	va_list argptr;
 	char string[1024];
@@ -1074,8 +1074,8 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
 	ImGuiIO& io = ImGui::GetIO();
 
-	int fb_width = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-	int fb_height = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+	dInt32 fb_width = (dInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+	dInt32 fb_height = (dInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 	if (fb_width == 0 || fb_height == 0)
 		return;
 
@@ -1118,7 +1118,7 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	// Render command lists
 	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
 	#define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
-	for (int n = 0; n < draw_data->CmdListsCount; n++)
+	for (dInt32 n = 0; n < draw_data->CmdListsCount; n++)
 	{
 		const ImDrawList* cmd_list = draw_data->CmdLists[n];
 		const ImDrawVert* vtx_buffer = cmd_list->VtxBuffer.Data;
@@ -1127,7 +1127,7 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 		glTexCoordPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, uv)));
 		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, col)));
 
-		for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
+		for (dInt32 cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
 		{
 			const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
 			if (pcmd->UserCallback)
@@ -1137,7 +1137,7 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 			else
 			{
 				glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
-				glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
+				glScissor((dInt32)pcmd->ClipRect.x, (dInt32)(fb_height - pcmd->ClipRect.w), (dInt32)(pcmd->ClipRect.z - pcmd->ClipRect.x), (dInt32)(pcmd->ClipRect.w - pcmd->ClipRect.y));
 				glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer);
 			}
 			idx_buffer += pcmd->ElemCount;
@@ -1252,8 +1252,8 @@ void ndDemoEntityManager::RenderScene()
 	m_cameraManager->InterpolateMatrices (this, CalculateInteplationParam());
 
 	ImGuiIO& io = ImGui::GetIO();
-	int display_w = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-	int display_h = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+	dInt32 display_w = (dInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+	dInt32 display_h = (dInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 	glViewport(0, 0, display_w, display_h);
 	glScissor(0, 0, display_w, display_h);
 	glEnable(GL_SCISSOR_TEST);	

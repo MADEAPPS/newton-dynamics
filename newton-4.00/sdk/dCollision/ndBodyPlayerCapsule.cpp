@@ -413,7 +413,7 @@ void ndBodyPlayerCapsule::ResolveInterpenetrations(ndBodyPlayerCapsuleContactSol
 	dFloat32 invTimestep = dFloat32(1.0f) / timestep;
 	
 	dFloat32 penetration = D_MAX_COLLISION_PENETRATION * 10.0f;
-	for (int j = 0; (j < 8) && (penetration > D_MAX_COLLISION_PENETRATION); j++) 
+	for (dInt32 j = 0; (j < 8) && (penetration > D_MAX_COLLISION_PENETRATION); j++) 
 	{
 		SetVelocity(dVector::m_zero);
 		dMatrix matrix(GetMatrix());
@@ -483,7 +483,7 @@ void ndBodyPlayerCapsule::ResolveCollision(ndBodyPlayerCapsuleContactSolver& con
 		ndContactPoint* const contact = &contactSolver.m_contactBuffer[i];
 		dVector point(contact->m_point);
 		dVector normal(contact->m_normal);
-		const int normalIndex = impulseSolver.AddContactRow(contact, normal, point - com, dFloat32 (0.0f), dFloat32(0.0f), dFloat32(1.0e12f));
+		const dInt32 normalIndex = impulseSolver.AddContactRow(contact, normal, point - com, dFloat32 (0.0f), dFloat32(0.0f), dFloat32(1.0e12f));
 		dVector localPoint(frameMatrix.UntransformVector(point));
 		
 		if (localPoint.m_x < contactPatchHigh) 
@@ -623,7 +623,7 @@ dVector ndBodyPlayerCapsuleImpulseSolver::CalculateImpulse()
 		massMatrix[i][i] = a00;
 
 		m_impulseMag[i] = 0.0f;
-		for (int j = i + 1; j < m_rowCount; j++) 
+		for (dInt32 j = i + 1; j < m_rowCount; j++) 
 		{
 			dVector tmp1(
 				jInvMass.m_jacobianM0.m_linear * m_jacobianPairs[j].m_jacobianM0.m_linear +
@@ -712,7 +712,7 @@ void ndBodyPlayerCapsuleImpulseSolver::AddAngularRows()
 void ndBodyPlayerCapsuleImpulseSolver::ApplyReaction(dFloat32 timestep)
 {
 	dFloat32 invTimeStep = 0.1f / timestep;
-	for (int i = 0; i < m_rowCount; i++) 
+	for (dInt32 i = 0; i < m_rowCount; i++) 
 	{
 		if (m_contactPoint[i]) 
 		{

@@ -29,11 +29,11 @@ class dBezierSpline : public dClassAlloc
 
 	D_CORE_API dBezierSpline& operator = (const dBezierSpline &copy) ;
 
-	D_CORE_API int GetDegree () const;
+	D_CORE_API dInt32 GetDegree () const;
 
 	D_CORE_API dBigVector CurvePoint (dFloat64 u) const;
-	D_CORE_API dBigVector CurveDerivative (dFloat64 u, int index = 1) const;
-	D_CORE_API int CurveAllDerivatives (dFloat64 u, dBigVector* const defivatives) const;
+	D_CORE_API dBigVector CurveDerivative (dFloat64 u, dInt32 index = 1) const;
+	D_CORE_API dInt32 CurveAllDerivatives (dFloat64 u, dBigVector* const defivatives) const;
 
 	D_CORE_API dFloat64 CalculateLength (dFloat64 tol) const;
 

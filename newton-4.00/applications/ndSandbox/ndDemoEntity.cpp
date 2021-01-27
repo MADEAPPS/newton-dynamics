@@ -176,7 +176,7 @@ void ndDemoEntity::SetUserData (UserData* const data)
 }
 
 /*
-void ndDemoEntity::TransformCallback(const NewtonBody* body, const dFloat32* matrix, int threadIndex)
+void ndDemoEntity::TransformCallback(const NewtonBody* body, const dFloat32* matrix, dInt32 threadIndex)
 {
 	ndDemoEntity* const ent = (ndDemoEntity*) NewtonBodyGetUserData(body);
 	if (ent) {
@@ -362,7 +362,7 @@ void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, c
 ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const world) const
 //NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const world) const
 {
-	int count = 1;
+	dInt32 count = 1;
 	ndShapeInstance* shapeArray[128];
 	
 	shapeArray[0] = nullptr;

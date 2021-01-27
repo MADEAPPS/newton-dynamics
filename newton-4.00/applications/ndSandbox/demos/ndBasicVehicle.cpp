@@ -223,7 +223,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		dFloat32 steerAngle = 35.0f * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
 		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
 
-		static int xxxx;
+		static dInt32 xxxx;
 		xxxx++;
 		if (xxxx > 300)
 		{

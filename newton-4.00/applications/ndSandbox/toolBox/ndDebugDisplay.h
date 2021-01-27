@@ -26,7 +26,7 @@ void RenderNormalForces (NewtonWorld* const world);
 
 void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug);
 
-void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat32* const faceVertec, int faceId);
+void DebugShowSoftBodySpecialCollision (void* userData, dInt32 vertexCount, const dFloat32* const faceVertec, dInt32 faceId);
 
 
 void DebugDrawPoint (const dVector& p0, dFloat32 size);
@@ -34,7 +34,7 @@ void DebugDrawLine (const dVector& p0, const dVector& p1);
 void DebugDrawCollision (const NewtonCollision* const collision, const dMatrix& matrix, dDebugDisplayMode mode);
 
 void ClearDebugDisplay(NewtonWorld* const world);
-void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, int faceID, int vertexCount, const dFloat32* const vertex, int vertexstrideInBytes);
+void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, dInt32 faceID, dInt32 vertexCount, const dFloat32* const vertex, dInt32 vertexstrideInBytes);
 #endif
 
 

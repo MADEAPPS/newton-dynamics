@@ -26,8 +26,8 @@ class ndDemoSplinePathMesh: public ndDemoMeshInterface
 	ndDemoSplinePathMesh(const dBezierSpline& curve, const ndShaderPrograms& shaderCache, dInt32 resolution);
 	~ndDemoSplinePathMesh();
 	
-	int GetRenderResolution() const;
-	void SetRenderResolution(int breaks);
+	dInt32 GetRenderResolution() const;
+	void SetRenderResolution(dInt32 breaks);
 
 	virtual void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 	

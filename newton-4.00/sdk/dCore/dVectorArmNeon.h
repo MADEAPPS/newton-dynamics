@@ -47,14 +47,14 @@ A R M 6 4
 
 #define D_INLINE_FORCEINLINE(type) static inline type
 
-D_INLINE_FORCEINLINE(int) vec_minv(uint32x4_t v)
+D_INLINE_FORCEINLINE(dInt32) vec_minv(uint32x4_t v)
 {
 	uint32x2_t tmp = vpmin_u32(vget_low_u32(v), vget_high_u32(v));
 	tmp = vpmin_u32(tmp, tmp);
 	return tmp[0] != 0;
 }
 
-D_INLINE_FORCEINLINE(int) vec_maxv(uint32x4_t v)
+D_INLINE_FORCEINLINE(dInt32) vec_maxv(uint32x4_t v)
 {
 	uint32x2_t tmp = vpmax_u32(vget_low_u32(v), vget_high_u32(v));
 	tmp = vpmax_u32(tmp, tmp);
@@ -517,7 +517,7 @@ public:
         return dVector (m_y, m_z, m_x, m_w);
     }
     
-    D_INLINE dVector ShiftRightLogical (int bits) const
+    D_INLINE dVector ShiftRightLogical (dInt32 bits) const
     {
         return dVector (dInt32 (dUnsigned32 (m_ix) >> bits), dInt32 (dUnsigned32 (m_iy) >> bits), dInt32 (dUnsigned32 (m_iz) >> bits), dInt32 (dUnsigned32 (m_iw) >> bits));
     }
@@ -937,7 +937,7 @@ public:
 		return dBigVector(m_y, m_z, m_x, m_w);
 	}
 
-	D_INLINE dBigVector ShiftRightLogical(int bits) const
+	D_INLINE dBigVector ShiftRightLogical(dInt32 bits) const
 	{
 		return dBigVector(dInt64(dUnsigned64(m_ix) >> bits), dInt64(dUnsigned64(m_iy) >> bits), dInt64(dUnsigned64(m_iz) >> bits), dInt64(dUnsigned64(m_iw) >> bits));
 	}
@@ -1457,7 +1457,7 @@ class dVector
 		return dVector(m_y, m_z, m_x, m_w);
 	}
 
-	D_INLINE dVector ShiftRightLogical(int bits) const
+	D_INLINE dVector ShiftRightLogical(dInt32 bits) const
 	{
 		return dVector(dInt32(dUnsigned32(m_ix) >> bits), dInt32(dUnsigned32(m_iy) >> bits), dInt32(dUnsigned32(m_iz) >> bits), dInt32(dUnsigned32(m_iw) >> bits));
 	}
@@ -1894,7 +1894,7 @@ class dBigVector
 		return dBigVector(m_y, m_z, m_x, m_w);
 	}
 
-	D_INLINE dBigVector ShiftRightLogical(int bits) const
+	D_INLINE dBigVector ShiftRightLogical(dInt32 bits) const
 	{
 		return dBigVector(dInt64(dUnsigned64(m_ix) >> bits), dInt64(dUnsigned64(m_iy) >> bits), dInt64(dUnsigned64(m_iz) >> bits), dInt64(dUnsigned64(m_iw) >> bits));
 	}

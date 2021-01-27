@@ -67,7 +67,7 @@ void ndShapeCapsule::Init(dFloat32 radio0, dFloat32 radio1, dFloat32 height)
 	m_normal = dVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
 	dVector side(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f));
 
-	for (int i = 0; i < 16; i++) 
+	for (dInt32 i = 0; i < 16; i++) 
 	{
 		dVector p1p0(m_p1 - m_p0);
 		m_normal = side.CrossProduct(p1p0).Normalize();

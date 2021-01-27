@@ -464,7 +464,7 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 
 void ndMultiBodyVehicle::Update(const ndWorld* const world, dFloat32 timestep)
 {
-//static int xxxx;
+//static dInt32 xxxx;
 //if (xxxx >= 550) {
 ////	m_chassis->SetTorque(dVector(0.0f, 100.0f, 0.0f, 0.0f));
 //	xxxx *= 1;

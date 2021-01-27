@@ -1691,7 +1691,7 @@ dInt32 dMeshEffect::GetPointIndex (const void* const point) const
 {
 	dTreeNode* const node = (dTreeNode*) point;
 	dEdge* const edge = &node->GetInfo();
-	return int (edge->m_userData);
+	return dInt32 (edge->m_userData);
 }
 
 
@@ -1781,8 +1781,8 @@ void dMeshEffect::GetEdgeIndex (const void* const edge, dInt32& v0, dInt32& v1) 
 //void dMeshEffect::GetEdgeAttributeIndex (const void* edge, dInt32& v0, dInt32& v1) const
 //{
 //	dTreeNode* node = (dTreeNode*) edge;
-//	v0 = int (node->GetInfo().m_userData);
-//	v1 = int (node->GetInfo().m_twin->m_userData);
+//	v0 = dInt32 (node->GetInfo().m_userData);
+//	v1 = dInt32 (node->GetInfo().m_twin->m_userData);
 //}
 
 
@@ -1844,7 +1844,7 @@ dInt32 dMeshEffect::GetFaceMaterial (const void* const face) const
 	return dInt32 (m_attrib.m_materialChannel.m_count ? m_attrib.m_materialChannel[dInt32 (edge->m_userData)] : 0);
 }
 
-void dMeshEffect::SetFaceMaterial (const void* const face, int mateialID)
+void dMeshEffect::SetFaceMaterial (const void* const face, dInt32 mateialID)
 {
 	if (m_attrib.m_materialChannel.m_count) {
 		dTreeNode* const node = (dTreeNode*) face;
@@ -1863,7 +1863,7 @@ void dMeshEffect::SetFaceMaterial (const void* const face, int mateialID)
 
 dInt32 dMeshEffect::GetFaceIndexCount (const void* const face) const
 {
-	int count = 0;
+	dInt32 count = 0;
 	dTreeNode* node = (dTreeNode*) face;
 	dEdge* const edge = &node->GetInfo();
 	dEdge* ptr = edge;
@@ -1876,7 +1876,7 @@ dInt32 dMeshEffect::GetFaceIndexCount (const void* const face) const
 
 void dMeshEffect::GetFaceIndex (const void* const face, dInt32* const indices) const
 {
-	int count = 0;
+	dInt32 count = 0;
 	dTreeNode* node = (dTreeNode*) face;
 	dEdge* const edge = &node->GetInfo();
 	dEdge* ptr = edge;
@@ -1889,12 +1889,12 @@ void dMeshEffect::GetFaceIndex (const void* const face, dInt32* const indices) c
 
 void dMeshEffect::GetFaceAttributeIndex (const void* const face, dInt32* const indices) const
 {
-	int count = 0;
+	dInt32 count = 0;
 	dTreeNode* node = (dTreeNode*) face;
 	dEdge* const edge = &node->GetInfo();
 	dEdge* ptr = edge;
 	do {
-		indices[count] = int (ptr->m_userData);
+		indices[count] = dInt32 (ptr->m_userData);
 		count ++;
 		ptr = ptr->m_next;
 	} while (ptr != edge);

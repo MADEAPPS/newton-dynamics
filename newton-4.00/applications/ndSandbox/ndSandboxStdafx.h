@@ -148,9 +148,9 @@ unsigned dRand ();
 void dSetRandSeed (unsigned seed);
 dFloat32 dGaussianRandom (dFloat32 amp);
 
-inline int dTwosPower (int x)
+inline dInt32 dTwosPower (dInt32 x)
 {
-	int rval=1;
+	dInt32 rval=1;
 	for (; rval < x; rval *= 2);
 	return rval;
 }

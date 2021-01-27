@@ -45,7 +45,7 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	protected:
 	D_NEWTON_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	D_NEWTON_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
-	D_NEWTON_API virtual void SubmitConstraints (dFloat32 timestep, int threadIndex);
+	D_NEWTON_API virtual void SubmitConstraints (dFloat32 timestep, dInt32 threadIndex);
 
 	void SubmitTwistAngle(const dVector& pin, dFloat32 pitchAngle, dFloat32 timestep);
 	void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, dFloat32 timestep);

@@ -201,7 +201,7 @@ class dMeshEffect: public dPolyhedra
 
 	void* GetFirstVertex () const;
 	void* GetNextVertex (const void* const vertex) const;
-	int GetVertexIndex (const void* const vertex) const;
+	dInt32 GetVertexIndex (const void* const vertex) const;
 
 	void* GetFirstPoint () const;
 	void* GetNextPoint (const void* const point) const;
@@ -224,7 +224,7 @@ class dMeshEffect: public dPolyhedra
 	void GetFaceAttributeIndex (const void* const face, dInt32* const indices) const;
 	dBigVector CalculateFaceNormal (const void* const face) const;
 
-	void SetFaceMaterial (const void* const face, int materialID);
+	void SetFaceMaterial (const void* const face, dInt32 materialID);
 	void AddInterpolatedEdgeAttribute (dEdge* const edge, dFloat64 param);
 	dInt32 InterpolateVertex (const dBigVector& point, const dEdge* const face) const;
 

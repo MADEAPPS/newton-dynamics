@@ -39,7 +39,6 @@ void ndJointFollowPath::GetPathTarget (dVector& posit, dVector& tangent) const
 }
 */
 
-//void ndJointFollowPath::SubmitConstraints (dFloat32 timestep, int threadIndex)
 void ndJointFollowPath::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;

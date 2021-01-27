@@ -133,7 +133,7 @@ void ndJointBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 	debugDisplay->DrawFrame(matrix0);
 	debugDisplay->DrawFrame(matrix1);
 
-	const int subdiv = 8;
+	const dInt32 subdiv = 8;
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;
 	dFloat cosAngleCos = coneDir0.DotProduct3(coneDir1);
@@ -168,13 +168,13 @@ void ndJointBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 		dFloat angle0 = m_minTwistAngle;
 
 		debugDisplay->SetColor(dVector(0.4f, 0.0f, 0.0f, 0.0f));
-		for (int i = 0; i <= subdiv; i++) {
+		for (dInt32 i = 0; i <= subdiv; i++) {
 			arch[i] = pitchMatrix.TransformVector(dPitchMatrix(angle0).RotateVector(point));
 			debugDisplay->DrawLine(pitchMatrix.m_posit, arch[i]);
 			angle0 += angleStep;
 		}
 
-		for (int i = 0; i < subdiv; i++) {
+		for (dInt32 i = 0; i < subdiv; i++) {
 			debugDisplay->DrawLine(arch[i], arch[i + 1]);
 		}
 	}
@@ -186,7 +186,7 @@ void ndJointBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 		dFloat angle0 = 0.0f;
 		debugDisplay->SetColor(dVector(0.3f, 0.8f, 0.0f, 0.0f));
 
-		for (int i = 0; i <= subdiv; i++) {
+		for (dInt32 i = 0; i <= subdiv; i++) {
 			dVector conePoint(dPitchMatrix(angle0).RotateVector(point));
 			dVector p(matrix1.TransformVector(conePoint));
 			arch[i] = p;
@@ -194,7 +194,7 @@ void ndJointBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 			angle0 += angleStep;
 		}
 
-		for (int i = 0; i < subdiv; i++) {
+		for (dInt32 i = 0; i < subdiv; i++) {
 			debugDisplay->DrawLine(arch[i], arch[i + 1]);
 		}
 	}
@@ -346,7 +346,7 @@ void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 	}
 }
 
-void ndJointBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
+void ndJointBallAndSocket::SubmitConstraints(dFloat timestep, dInt32 threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;

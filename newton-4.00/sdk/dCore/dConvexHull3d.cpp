@@ -199,11 +199,13 @@ dConvexHull3d::dConvexHull3d(const dConvexHull3d& source)
 {
 	m_points.SetCount(source.m_count);
 	m_points[m_count-1].m_w = dFloat64 (0.0f);
-	for (int i = 0; i < m_count; i ++) {
+	for (dInt32 i = 0; i < m_count; i ++) 
+	{
 		m_points[i] = source.m_points[i];
 	}
 	dTree<dListNode*, dListNode*> map;
-	for(dListNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext() ) {
+	for(dListNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext() ) 
+	{
 		dListNode* const node = Append();
 		map.Insert(node, sourceNode);
 	}
@@ -441,7 +443,7 @@ dInt32 dConvexHull3d::GetUniquePoints(dConvexHull3dVertex* const points, const d
 	dSort(points, count, ConvexCompareVertex);
 
 	dInt32 indexCount = 0;
-	for (int i = 1; i < count; i++) 
+	for (dInt32 i = 1; i < count; i++) 
 	{
 		for (; i < count; i++) {
 			if (ConvexCompareVertex(&points[indexCount], &points[i], nullptr)) 
@@ -1169,7 +1171,7 @@ dFloat64 dConvexHull3d::RayCast (const dBigVector& localP0, const dBigVector& lo
 void dConvexHull3d::Save (const char* const filename) const
 {
 	FILE* const file = fopen(filename, "wb");
-	int index = 0;
+	dInt32 index = 0;
 //	fprintf(file, "final\n");
 	for (dListNode* nodePtr = GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
 		fprintf(file, "triangle %d\n", index);

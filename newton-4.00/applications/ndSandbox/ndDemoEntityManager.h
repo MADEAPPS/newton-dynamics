@@ -82,9 +82,9 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	{
 		public:
 		ButtonKey (bool initialState);
-		int UpdateTrigger (bool triggerValue);
-		int UpdatePushButton (bool triggerValue);
-		int GetPushButtonState() const { return m_state ? 1 : 0;}
+		dInt32 UpdateTrigger (bool triggerValue);
+		dInt32 UpdatePushButton (bool triggerValue);
+		dInt32 GetPushButtonState() const { return m_state ? 1 : 0;}
 
 		private:
 		bool m_state;
@@ -112,8 +112,8 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	void AddEntity(ndDemoEntity* const ent);
 	void RemoveEntity(ndDemoEntity* const ent);
 
-	int GetWidth() const;
-	int GetHeight() const;
+	dInt32 GetWidth() const;
+	dInt32 GetHeight() const;
 
 	ndPhysicsWorld* GetWorld() const;
 
@@ -133,15 +133,15 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	bool IsShiftKeyDown () const;
 	bool IsControlKeyDown () const;
-	bool GetKeyState(int key) const;
-	int GetJoystickAxis (dFloat32* const axisValues, int maxAxis = 8) const;
-	int GetJoystickButtons (char* const axisbuttons, int maxButton = 32) const;
+	bool GetKeyState(dInt32 key) const;
+	dInt32 GetJoystickAxis (dFloat32* const axisValues, dInt32 maxAxis = 8) const;
+	dInt32 GetJoystickButtons (char* const axisbuttons, dInt32 maxButton = 32) const;
 
 	bool GetCaptured () const;
-	bool GetMouseKeyState (int button ) const;
-	int Print (const dVector& color, const char *fmt, ... ) const;
-	int GetDebugDisplay() const;
-	void SetDebugDisplay(int mode) const;
+	bool GetMouseKeyState (dInt32 button ) const;
+	dInt32 Print (const dVector& color, const char *fmt, ... ) const;
+	dInt32 GetDebugDisplay() const;
+	void SetDebugDisplay(dInt32 mode) const;
 
 	const ndShaderPrograms& GetShaderCache() const;  
 	
@@ -166,21 +166,21 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	static void RenderDrawListsCallback(ImDrawData* const draw_data);
 
-	static void CharCallback(GLFWwindow* window, unsigned int ch);
-	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);
+	static void CharCallback(GLFWwindow* window, dUnsigned32 ch);
+	static void KeyCallback(GLFWwindow* const window, dInt32 key, dInt32, dInt32 action, dInt32 mods);
 	static void CursorposCallback  (GLFWwindow* const window, double x, double y);
 	static void MouseScrollCallback (GLFWwindow* const window, double x, double y);
-	static void MouseButtonCallback(GLFWwindow* const window, int button, int action, int mods);
-	static void ErrorCallback(int error, const char* const description);
+	static void MouseButtonCallback(GLFWwindow* const window, dInt32 button, dInt32 action, dInt32 mods);
+	static void ErrorCallback(dInt32 error, const char* const description);
 	//static void PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep);
 
 	void ApplyMenuOptions();
-	void LoadDemo(int menu);
+	void LoadDemo(dInt32 menu);
 
 	void DrawDebugShapes();
 	
 	GLFWwindow* m_mainFrame;
-	int	m_defaultFont;
+	dInt32	m_defaultFont;
 	bool m_mousePressed[3];
 
 	ndDemoEntity* m_sky;
@@ -196,17 +196,17 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	dUnsigned64 m_microsecunds;
 	TransparentHeap m_tranparentHeap;
 
-	int m_currentScene;
-	int m_lastCurrentScene;
-	int m_framesCount;
-	int m_physicsFramesCount;
-	int m_currentPlugin;
-	int m_solverPasses;
-	int m_solverSubSteps;
-	int m_sceneType;
-	int m_workerThreads;
-	int m_debugDisplayMode;
-	int m_collisionDisplayMode;
+	dInt32 m_currentScene;
+	dInt32 m_lastCurrentScene;
+	dInt32 m_framesCount;
+	dInt32 m_physicsFramesCount;
+	dInt32 m_currentPlugin;
+	dInt32 m_solverPasses;
+	dInt32 m_solverSubSteps;
+	dInt32 m_sceneType;
+	dInt32 m_workerThreads;
+	dInt32 m_debugDisplayMode;
+	dInt32 m_collisionDisplayMode;
 
 	dFloat32 m_fps;
 	dFloat32 m_timestepAcc;
@@ -248,25 +248,25 @@ inline ndPhysicsWorld* ndDemoEntityManager::GetWorld() const
 	return m_world;
 }
 
-inline int ndDemoEntityManager::GetWidth() const 
+inline dInt32 ndDemoEntityManager::GetWidth() const 
 { 
 	ImGuiIO& io = ImGui::GetIO();
-	return (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+	return (dInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
 }
 
-inline int ndDemoEntityManager::GetHeight() const 
+inline dInt32 ndDemoEntityManager::GetHeight() const 
 { 
 	ImGuiIO& io = ImGui::GetIO();
-	return (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+	return (dInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 }
 
-inline int ndDemoEntityManager::GetDebugDisplay() const
+inline dInt32 ndDemoEntityManager::GetDebugDisplay() const
 {
 	dAssert (0);
 	return 0;
 }
 
-inline void ndDemoEntityManager::SetDebugDisplay(int mode) const
+inline void ndDemoEntityManager::SetDebugDisplay(dInt32 mode) const
 {
 	dAssert (0);
 }

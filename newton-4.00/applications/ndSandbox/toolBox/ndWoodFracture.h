@@ -1,15 +1,9 @@
-#ifndef AFX_WOOD_FRACTURE_H___H
-#define AFX_WOOD_FRACTURE_H___H
+#ifndef __D_WOOD_FRACTURE_H__
+#define __D_WOOD_FRACTURE_H__
 
 #include "ndSandboxStdafx.h"
-#include "ndTargaToOpenGl.h"
-#include "ndDemoMesh.h"
-#include "ndDemoEntityManager.h"
-#include "ndDemoCamera.h"
-#include "ndPhysicsUtils.h"
 
-#if 0
-void AddFracturedWoodPrimitive(ndDemoEntityManager* const scene, dFloat32 density, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat32 spacing, int stype, int materialID, const dMatrix& shapeOffsetMatrix);
-#endif
+class ndDemoEntityManager;
+void AddFracturedWoodPrimitive(ndDemoEntityManager* const scene, dFloat32 density, const dVector& origin, const dVector& size, dInt32 xCount, dInt32 zCount, dFloat32 spacing, dInt32 type, dInt32 materialID, const dMatrix& shapeOffsetMatrix);
 
 #endif

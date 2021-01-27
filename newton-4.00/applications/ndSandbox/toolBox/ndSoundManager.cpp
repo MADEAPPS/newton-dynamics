@@ -189,16 +189,16 @@ void dSoundManager::LoadWaveFile(dSoundAsset* const asset, const char* const fil
 		if (!strcmp(xbuffer, "RIFF")) {
 
 			//file_read_int32_le(xbuffer, wave);
-			int chunkSize;
-			fread(&chunkSize, sizeof(int), 1, wave);
+			dInt32 chunkSize;
+			fread(&chunkSize, sizeof(dInt32), 1, wave);
 			fread(xbuffer, sizeof(char), 4, wave);
 			if (!strcmp(xbuffer, "WAVE")) {
 				fread(xbuffer, sizeof(char), 4, wave);
 				if (!strcmp(xbuffer, "fmt ")) {
-					fread(&chunkSize, sizeof(int), 1, wave);
+					fread(&chunkSize, sizeof(dInt32), 1, wave);
 
-					int sampleRate;
-					int byteRate;
+					dInt32 sampleRate;
+					dInt32 byteRate;
 					short channels;
 					short audioFormat;
 					short blockAlign;
@@ -206,8 +206,8 @@ void dSoundManager::LoadWaveFile(dSoundAsset* const asset, const char* const fil
 
 					fread(&audioFormat, sizeof(short), 1, wave);
 					fread(&channels, sizeof(short), 1, wave);
-					fread(&sampleRate, sizeof(int), 1, wave);
-					fread(&byteRate, sizeof(int), 1, wave);
+					fread(&sampleRate, sizeof(dInt32), 1, wave);
+					fread(&byteRate, sizeof(dInt32), 1, wave);
 					fread(&blockAlign, sizeof(short), 1, wave);
 					fread(&bitsPerSample, sizeof(short), 1, wave);
 					for (dInt32 i = 0; i < (chunkSize - 16); i ++) {
@@ -225,22 +225,22 @@ void dSoundManager::LoadWaveFile(dSoundAsset* const asset, const char* const fil
 
 					fread(xbuffer, sizeof(char), 4, wave);
 					if (!strcmp(xbuffer, "fact")) {
-						int size;
-						int samplesPerChannels;
-						fread(&size, sizeof(int), 1, wave);
-						fread(&samplesPerChannels, sizeof(int), 1, wave);
+						dInt32 size;
+						dInt32 samplesPerChannels;
+						fread(&size, sizeof(dInt32), 1, wave);
+						fread(&samplesPerChannels, sizeof(dInt32), 1, wave);
 						fread(xbuffer, sizeof(char), 4, wave);
 					}
 
 					if (!strcmp(xbuffer, "data")) {
-						int size;
-						fread(&size, sizeof(int), 1, wave);
+						dInt32 size;
+						fread(&size, sizeof(dInt32), 1, wave);
 
 						char* const data = new char[size];
 						fread(data, sizeof(char), size, wave);
 
 
-						int waveFormat = AL_FORMAT_MONO8;
+						dInt32 waveFormat = AL_FORMAT_MONO8;
 						if (channels == 1) {
 							if (bitsPerSample == 8) {
 								waveFormat = AL_FORMAT_MONO8;

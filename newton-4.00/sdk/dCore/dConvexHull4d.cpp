@@ -369,7 +369,7 @@ const dConvexHull4d::dgNormalMap& dConvexHull4d::GetNormaMap()
 void dConvexHull4d::Save (const char* const filename) const
 {
 	FILE* const file = fopen (filename, "wb");
-	int index = 0;
+	dInt32 index = 0;
 //	fprintf (file, "final\n");
 	for (dListNode* nodePtr = GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
 		fprintf (file, "tetra %d\n", index);
@@ -633,7 +633,7 @@ dInt32 dConvexHull4d::InitVertexArray(dConvexHull4dVector* const points, const d
 
 	dSort(points, count, ConvexCompareVertex);
 	dInt32 indexCount = 0;
-	for (int i = 1; i < count; i ++) {
+	for (dInt32 i = 1; i < count; i ++) {
 		for (; i < count; i ++) {
 			if (ConvexCompareVertex (&points[indexCount], &points[i], nullptr)) {
 				indexCount ++;
@@ -805,13 +805,13 @@ void dConvexHull4d::LinkSibling (dListNode* node0, dListNode* node1)	const
 {
 	dConvexHull4dTetraherum* const tetra0 = &node0->GetInfo();
 	dConvexHull4dTetraherum* const tetra1 = &node1->GetInfo();
-	for (int i = 0; i < 4; i ++) {
+	for (dInt32 i = 0; i < 4; i ++) {
 		dConvexHull4dTetraherum::dgTetrahedrumFace* const face0 = &tetra0->m_faces[i];
 		if (!face0->m_twin) {
 			dInt32 i0 = face0->m_index[0];
 			dInt32 i1 = face0->m_index[1];
 			dInt32 i2 = face0->m_index[2];
-			for (int j = 0; j < 4; j ++) {
+			for (dInt32 j = 0; j < 4; j ++) {
 				dConvexHull4dTetraherum::dgTetrahedrumFace* const face1 = &tetra1->m_faces[j];
 				if (!face1->m_twin) {
 					dInt32 j2 = face1->m_index[0];

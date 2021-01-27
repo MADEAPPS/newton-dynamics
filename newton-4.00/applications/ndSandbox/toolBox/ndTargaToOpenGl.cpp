@@ -108,7 +108,7 @@ class ndTextureCache: public dTree<ndTextureEntry, dUnsigned64>
 };
 
 
-static GLuint LoadTargaImage(const char* const cacheName, const char* const buffer, int width, int hight, TextureImageFormat format)
+static GLuint LoadTargaImage(const char* const cacheName, const char* const buffer, dInt32 width, dInt32 hight, TextureImageFormat format)
 {
 	// Get width, height, and depth of texture
 	GLint iWidth = width;
@@ -224,8 +224,8 @@ GLuint LoadTexture(const char* const filename)
 		tgaHeader.height = SWAP_INT16(tgaHeader.height);
 
 		// Get width, height, and depth of texture
-		int width = tgaHeader.width;
-		int height = tgaHeader.height;
+		dInt32 width = tgaHeader.width;
+		dInt32 height = tgaHeader.height;
 		short sDepth = tgaHeader.bits / 8;
 		dAssert ((sDepth == 3) || (sDepth == 4));
 
@@ -251,7 +251,7 @@ GLuint LoadTexture(const char* const filename)
 		// Read in the bits
 		// Check for read error. This should catch RLE or other 
 		// weird formats that I don't want to recognize
-		int readret = int (fread(pBits, lImageSize, 1, pFile));
+		dInt32 readret = dInt32 (fread(pBits, lImageSize, 1, pFile));
 		if(readret != 1)  
 		{
 			fclose(pFile);

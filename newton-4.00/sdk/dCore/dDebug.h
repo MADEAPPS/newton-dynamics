@@ -59,7 +59,7 @@
 #ifdef _DEBUG
 	inline void TraceFuntionName (const char *name)
 	{
-		//	static int trace;
+		//	static dInt32 trace;
 		//	dTrace (("%d %s\n", trace, name));
 		dTrace (("%s\n", name));
 	}

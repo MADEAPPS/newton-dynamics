@@ -330,9 +330,9 @@ dInt32 ndShapeCone::CalculatePlaneIntersection(const dVector& normal, const dVec
 		dVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, dFloat32(0.0f));
 
 		count = 0;
-		int i0 = 2;
+		dInt32 i0 = 2;
 		dVector test0((m_profile[i0] - origin1).DotProduct(normal1));
-		for (int i = 0; (i < 3) && (count < 2); i++) 
+		for (dInt32 i = 0; (i < 3) && (count < 2); i++) 
 		{
 			dVector test1((m_profile[i] - origin1).DotProduct(normal1));
 			dVector acrossPlane(test0 * test1);

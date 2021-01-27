@@ -62,9 +62,9 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 	dMatrix shapeBindMatrix(m_entity->GetMeshMatrix() * m_entity->CalculateGlobalMatrix());
 
 	const dInt32 boneCount = boneMap.GetCount() + 1024;
-//	int* const boneClusterRemapIndex = dAlloca (int, boneCount);
-	dArray<int> boneClusterRemapIndex (boneCount);
-	memset (&boneClusterRemapIndex[0], -1, boneCount * sizeof (int));
+//	dInt32* const boneClusterRemapIndex = dAlloca (dInt32, boneCount);
+	dArray<dInt32> boneClusterRemapIndex (boneCount);
+	memset (&boneClusterRemapIndex[0], -1, boneCount * sizeof (dInt32));
 	while (stack) {
 		stack--;
 		ndDemoEntity* const entity = pool[stack];
@@ -128,7 +128,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 	}
 
 	dInt32 weightcount = 0;
-	const int* const indexToPointMap = meshInfo->GetIndexToVertexMap();
+	const dInt32* const indexToPointMap = meshInfo->GetIndexToVertexMap();
 	const dInt32 vertexBaseCount = NewtonMeshGetVertexBaseCount(meshInfo->GetMesh());
 
 	for (dInt32 i = 0; i < vertexBaseCount; i ++) {
@@ -158,7 +158,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 	dArray<dWeightBoneIndex> pointSkinBone(m_mesh->m_vertexCount);
 	memset(&pointSkinBone[0], 0, m_mesh->m_vertexCount * sizeof(dWeightBoneIndex));
 
-	dList<int> pendingVertices;
+	dList<dInt32> pendingVertices;
 	for (dInt32 i = 0; i < m_mesh->m_vertexCount; i ++) {
 		dInt32 index = indexToPointMap[i];
 
@@ -172,7 +172,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 		}
 	}
 
-	for (dList<int>::dListNode* ptr = pendingVertices.GetFirst(); ptr; ptr = ptr->GetNext()) {
+	for (dList<dInt32>::dListNode* ptr = pendingVertices.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		dInt32 i = ptr->GetInfo();
 		dVector p (m_mesh->m_vertex[i * 3 + 0], m_mesh->m_vertex[i * 3 + 1], m_mesh->m_vertex[i * 3 + 2], 0.0f);
 		for (dInt32 j = 0; j < m_mesh->m_vertexCount; j ++) {

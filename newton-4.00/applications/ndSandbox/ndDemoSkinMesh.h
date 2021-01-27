@@ -26,7 +26,7 @@ class ndDemoSkinMesh: public ndDemoMeshInterface
 	public:
 	struct dWeightBoneIndex
 	{
-		int m_boneIndex[4];
+		dInt32 m_boneIndex[4];
 	};
 
 	ndDemoSkinMesh(const ndDemoSkinMesh& clone, ndDemoEntity* const owner);
@@ -38,16 +38,16 @@ class ndDemoSkinMesh: public ndDemoMeshInterface
 
 	protected: 
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner);
-	int CalculateMatrixPalette(dMatrix* const bindMatrix) const;
-	void ConvertToGlMatrix(int count, const dMatrix* const bindMatrix, GLfloat* const glMatrices) const;
+	dInt32 CalculateMatrixPalette(dMatrix* const bindMatrix) const;
+	void ConvertToGlMatrix(dInt32 count, const dMatrix* const bindMatrix, GLfloat* const glMatrices) const;
 	//dGeometryNodeSkinClusterInfo* FindSkinModifier(dScene* const scene, dScene::dTreeNode* const meshNode) const;
 	void OptimizeForRender(const ndDemoSubMesh& segment, const dVector* const pointWeights, const dWeightBoneIndex* const pointSkinBone) const;
 
 	ndDemoMesh* m_mesh;
 	ndDemoEntity* m_entity; 
 	dMatrix* m_bindingMatrixArray;
-	int m_nodeCount; 
-	int m_shader;
+	dInt32 m_nodeCount; 
+	dInt32 m_shader;
 };
 
 #endif 

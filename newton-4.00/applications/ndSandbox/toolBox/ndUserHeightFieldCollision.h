@@ -19,7 +19,7 @@
 
 #if 0
 class ndDemoEntityManager;
-NewtonBody* CreateUserHeightFieldTerrain (ndDemoEntityManager* const scene, int sizeInPowerOfTwos, dFloat32 cellSize, dFloat32 elevationScale, dFloat32 roughness, dFloat32 maxElevation, dFloat32 minElevation);
+NewtonBody* CreateUserHeightFieldTerrain (ndDemoEntityManager* const scene, dInt32 sizeInPowerOfTwos, dFloat32 cellSize, dFloat32 elevationScale, dFloat32 roughness, dFloat32 maxElevation, dFloat32 minElevation);
 
 /*
 #include "Newton.h"

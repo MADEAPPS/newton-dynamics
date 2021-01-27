@@ -16,7 +16,7 @@
 //#define DEMO_GRAVITY  dFloat32(0.0f)
 
 #ifdef DEMO_CHECK_ASYN_UPDATE
-extern int g_checkAsyncUpdate;
+extern dInt32 g_checkAsyncUpdate;
 #endif
 
 #if 0
@@ -39,7 +39,7 @@ class ndMakeViualMesh : public dScene::dSceneExportCallback
 {
 	public:
 	ndMakeViualMesh(ndWorld* const world);
-	NewtonMesh* CreateVisualMesh(ndBodyKinematic* const body, char* const name, int maxNameSize) const;
+	NewtonMesh* CreateVisualMesh(ndBodyKinematic* const body, char* const name, dInt32 maxNameSize) const;
 	ndWorld* m_world;
 };
 
@@ -58,30 +58,30 @@ dCustomJoint* FindJoint(const ndBodyKinematic* const body0, const ndBodyKinemati
 
 
 void PhysicsBodyDestructor (const ndBodyKinematic* body);
-void PhysicsApplyGravityForce (const ndBodyKinematic* body, dFloat32 timestep, int threadIndex);
+void PhysicsApplyGravityForce (const ndBodyKinematic* body, dFloat32 timestep, dInt32 threadIndex);
 
-void SetAutoSleepMode (ndWorld* const world, int mode);
+void SetAutoSleepMode (ndWorld* const world, dInt32 mode);
 void CalculateAABB (const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP);
 
-void GenericContactProcess (const NewtonJoint* contactJoint, dFloat32 timestep, int threadIndex);
+void GenericContactProcess (const NewtonJoint* contactJoint, dFloat32 timestep, dInt32 threadIndex);
 
 bool GetLastHit (dVector& posit, dVector& normal);
-NewtonCollision* CreateCollisionTree (ndWorld* const world, ndDemoEntity* const entity, int materialID, bool optimize);
-NewtonCollision* CreateConvexCollision (ndWorld* const world, const dMatrix& offsetMatrix, const dVector& size, ndPrimitiveType type, int materialID);
+NewtonCollision* CreateCollisionTree (ndWorld* const world, ndDemoEntity* const entity, dInt32 materialID, bool optimize);
+NewtonCollision* CreateConvexCollision (ndWorld* const world, const dMatrix& offsetMatrix, const dVector& size, ndPrimitiveType type, dInt32 materialID);
 
 ndBodyKinematic* CreatePLYMesh (ndDemoEntityManager* const scene, const char* const name, bool optimized);
 ndBodyKinematic* CreateLevelMeshBody (ndWorld* const world, ndDemoEntity* const ent, bool optimize);
-ndBodyKinematic* CreateSimpleBody(ndWorld* const world, void* const userData, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia = false);
-ndBodyKinematic* CreateSimpleSolid (ndDemoEntityManager* const scene, ndDemoMesh* const mesh, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia = false);
-void AddPrimitiveArray (ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat32 spacing, ndPrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix, dFloat32 findFloorElevation = 1000.0f, dFloat32 offsetHigh = 5.0f);
+ndBodyKinematic* CreateSimpleBody(ndWorld* const world, void* const userData, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, dInt32 materialId, bool generalInertia = false);
+ndBodyKinematic* CreateSimpleSolid (ndDemoEntityManager* const scene, ndDemoMesh* const mesh, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, dInt32 materialId, bool generalInertia = false);
+void AddPrimitiveArray (ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& size, dInt32 xCount, dInt32 zCount, dFloat32 spacing, ndPrimitiveType type, dInt32 materialID, const dMatrix& shapeOffsetMatrix, dFloat32 findFloorElevation = 1000.0f, dFloat32 offsetHigh = 5.0f);
 
-ndBodyKinematic* CreateInstancedSolid(ndDemoEntityManager* const scene, ndDemoEntity* const parent, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia = false);
+ndBodyKinematic* CreateInstancedSolid(ndDemoEntityManager* const scene, ndDemoEntity* const parent, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, dInt32 materialId, bool generalInertia = false);
 
 ndBodyKinematic* AddFloorBox(ndDemoEntityManager* const scene, const dVector& origin, const dVector& size);
 ndBodyKinematic* CreateLevelMesh (ndDemoEntityManager* const scene, const char* const levelName, bool optimized);
 
 
-void LoadLumberYardMesh(ndDemoEntityManager* const scene, const dVector& location, int shapeid);
+void LoadLumberYardMesh(ndDemoEntityManager* const scene, const dVector& location, dInt32 shapeid);
 //void SerializationWorld (const char* const name, ndWorld* const world);
 #endif
 

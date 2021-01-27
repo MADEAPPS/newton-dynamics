@@ -82,7 +82,7 @@ bool ndShaderPrograms::CreateAllEffects()
 
 void ndShaderPrograms::LoadShaderCode (const char* const filename, char* const buffer)
 {
-	int size;
+	dInt32 size;
 	FILE* file;
 	char fullPathName[2048];
 

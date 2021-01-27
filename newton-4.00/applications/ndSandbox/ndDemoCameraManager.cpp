@@ -166,7 +166,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	{
 		dVector m_p0;
 		dVector m_p1;
-		int m_mouseState;
+		dInt32 m_mouseState;
 	};
 	ndReplay replay;
 
