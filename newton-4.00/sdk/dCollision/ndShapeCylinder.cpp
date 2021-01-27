@@ -149,11 +149,12 @@ ndShapeInfo ndShapeCylinder::GetShapeInfo() const
 
 void ndShapeCylinder::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
-	dVector face[24];
-	dVector pool[24 * 2];
+	#define NUMBER_OF_DEBUG_SEGMENTS 24
+	dVector face[NUMBER_OF_DEBUG_SEGMENTS];
+	dVector pool[NUMBER_OF_DEBUG_SEGMENTS * 2];
 
 	dFloat32 angle = dFloat32(0.0f);
-	for (dInt32 i = 0; i < 24; i++) 
+	for (dInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
 	{
 		dFloat32 z = dSin(angle);
 		dFloat32 y = dCos(angle);
@@ -161,37 +162,37 @@ void ndShapeCylinder::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& de
 		pool[i].m_y = y * m_radius0;
 		pool[i].m_z = z * m_radius0;
 		pool[i].m_w = dFloat32 (0.0f);
-		pool[i + 24].m_x = m_height;
-		pool[i + 24].m_y = y * m_radius1;
-		pool[i + 24].m_z = z * m_radius1;
-		pool[i + 24].m_w = dFloat32(0.0f);
-		angle += dFloat32 (2.0) * dPi / dFloat32(24.0f);
+		pool[i + NUMBER_OF_DEBUG_SEGMENTS].m_x = m_height;
+		pool[i + NUMBER_OF_DEBUG_SEGMENTS].m_y = y * m_radius1;
+		pool[i + NUMBER_OF_DEBUG_SEGMENTS].m_z = z * m_radius1;
+		pool[i + NUMBER_OF_DEBUG_SEGMENTS].m_w = dFloat32(0.0f);
+		angle += dFloat32 (2.0) * dPi / dFloat32(NUMBER_OF_DEBUG_SEGMENTS);
 	}
 
-	matrix.TransformTriplex(&pool[0].m_x, sizeof(dVector), &pool[0].m_x, sizeof(dVector), 24 * 2);
+	matrix.TransformTriplex(&pool[0].m_x, sizeof(dVector), &pool[0].m_x, sizeof(dVector), NUMBER_OF_DEBUG_SEGMENTS * 2);
 
-	dInt32 j = 24 - 1;
-	for (dInt32 i = 0; i < 24; i++) 
+	dInt32 j = NUMBER_OF_DEBUG_SEGMENTS - 1;
+	for (dInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
 	{
 		face[0] = pool[j];
 		face[1] = pool[i];
-		face[2] = pool[i + 24];
-		face[3] = pool[j + 24];
+		face[2] = pool[i + NUMBER_OF_DEBUG_SEGMENTS];
+		face[3] = pool[j + NUMBER_OF_DEBUG_SEGMENTS];
 		j = i;
 		debugCallback.DrawPolygon(4, face);
 	}
 
-	for (dInt32 i = 0; i < 24; i++) 
+	for (dInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
 	{
-		face[i] = pool[24 - 1 - i];
+		face[i] = pool[NUMBER_OF_DEBUG_SEGMENTS - 1 - i];
 	}
-	debugCallback.DrawPolygon(24, face);
+	debugCallback.DrawPolygon(NUMBER_OF_DEBUG_SEGMENTS, face);
 
-	for (dInt32 i = 0; i < 24; i++) 
+	for (dInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
 	{
-		face[i] = pool[i + 24];
+		face[i] = pool[i + NUMBER_OF_DEBUG_SEGMENTS];
 	}
-	debugCallback.DrawPolygon(24, face);
+	debugCallback.DrawPolygon(NUMBER_OF_DEBUG_SEGMENTS, face);
 }
 
 dVector ndShapeCylinder::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const

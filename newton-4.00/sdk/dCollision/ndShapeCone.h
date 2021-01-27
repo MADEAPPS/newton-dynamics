@@ -24,20 +24,20 @@
 
 #include "ndShapeConvex.h"
 
-#define D_TAPED_CYLINDER_SEGMENTS 12
+#define D_CONE_SEGMENTS 12
 
 D_MSV_NEWTON_ALIGN_32
 class ndShapeCone : public ndShapeConvex
 {
 	public:
+	D_COLLISION_API ndShapeCone(dFloat32 radio, dFloat32 height);
 	D_COLLISION_API ndShapeCone(const nd::TiXmlNode* const xmlNode);
-	D_COLLISION_API ndShapeCone (dFloat32 radio0, dFloat32 radio1, dFloat32 height);
 	D_COLLISION_API ~ndShapeCone();
 
 	virtual ndShapeCone* GetAsShapeCone() { return this; }
 
 	protected:
-	D_COLLISION_API void Init (dFloat32 radio0, dFloat32 radio1, dFloat32 height);
+	D_COLLISION_API void Init (dFloat32 radio, dFloat32 height);
 
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
@@ -50,11 +50,10 @@ class ndShapeCone : public ndShapeConvex
 
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 
-	dVector m_profile[4];
-	dVector m_vertex[D_TAPED_CYLINDER_SEGMENTS * 2];
-	dFloat32 m_radius0;
-	dFloat32 m_radius1;
+	dVector m_profile[3];
 	dFloat32 m_height;
+	dFloat32 m_radius;
+	dVector m_vertex[D_CONE_SEGMENTS + 1];
 
 	static dInt32 m_shapeRefCount;
 	static ndConvexSimplexEdge m_edgeArray[];

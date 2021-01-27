@@ -279,8 +279,8 @@ static void PrecessingTop(DemoEntityManager* const scene, const dVector& posit)
 	NewtonBodySetGyroscopicTorque(gyroTop, 1);
 	NewtonBodySetMassProperties(gyroTop, 10.0f, cone);
 
-	dFloat m, Ixx, Iyy, Izz;
-	NewtonBodyGetMass(gyroTop, &m, &Ixx, &Iyy, &Izz);
+	//dFloat m, Ixx, Iyy, Izz;
+	//NewtonBodyGetMass(gyroTop, &m, &Ixx, &Iyy, &Izz);
 
 	dVector omega (matrix.m_up.Scale (40.0f));
 	NewtonBodySetOmega(gyroTop, &omega[0]);

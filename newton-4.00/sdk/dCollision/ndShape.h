@@ -127,7 +127,7 @@ class ndShapeInfo
 
 	struct dgConeData
 	{
-		dFloat32 m_r;
+		dFloat32 m_radius;
 		dFloat32 m_height;
 	};
 
