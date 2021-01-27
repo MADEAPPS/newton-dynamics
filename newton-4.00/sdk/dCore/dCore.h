@@ -67,6 +67,7 @@
 #include <dPolygonSoupBuilder.h>
 #include <dPolygonSoupDatabase.h>
 #include <dPolyhedraMassProperties.h>
+#include <dDelaunayTetrahedralization.h>
 
 #endif
 

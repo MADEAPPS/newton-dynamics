@@ -489,6 +489,7 @@ union dDoubleInt
 
 D_CORE_API dUnsigned64 dGetCpuClock();
 D_CORE_API dUnsigned64 dGetTimeInMicrosenconds();
+D_CORE_API dFloat64 dRoundToFloat(dFloat64 val);
 
 #ifdef D_USE_THREAD_EMULATION
 	template<class T>

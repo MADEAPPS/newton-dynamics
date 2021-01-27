@@ -31,6 +31,20 @@ dUnsigned64 dGetCpuClock()
 	return __rdtsc();
 }
 
+dFloat64 dRoundToFloat(dFloat64 val)
+{
+	dInt32 exp;
+	dFloat64 mantissa = frexp(val, &exp);
+
+	const dFloat64 power = 1 << 23;
+	const dFloat64 invPower = dFloat64(1.0f) / power;
+	mantissa = floor(mantissa * power) * invPower;
+
+	dFloat64 val1 = ldexp(mantissa, exp);
+	return val1;
+}
+
+
 dUnsigned64 dGetTimeInMicrosenconds()
 {
 	static std::chrono::high_resolution_clock::time_point timeStampBase = std::chrono::high_resolution_clock::now();

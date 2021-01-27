@@ -89,7 +89,7 @@ class dConvexHull4dTetraherum
 	dInt32 m_debugID;
 #endif
 	friend class dConvexHull4d;
-	friend class dgDelaunayTetrahedralization;
+	friend class dDelaunayTetrahedralization;
 };
 
 class dConvexHull4d: public dList<dConvexHull4dTetraherum>
