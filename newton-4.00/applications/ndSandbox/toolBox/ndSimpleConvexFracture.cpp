@@ -402,37 +402,71 @@ class dWoodFractureListener: public dCustomParallelListener
 };
 */
 
-//void AddFracturedWoodPrimitive(
-//	DemoEntityManager* const scene, dFloat32 density,
-//	const dVector& origin, const dVector& size,
-//	dInt32 xCount, dInt32 zCount, dFloat32 spacing, dInt32 stype, dInt32 materialID, const dMatrix& shapeOffsetMatrix)
-
-void AddFracturedWoodPrimitive(ndDemoEntityManager* const scene, dFloat32 density, const dVector& origin, const dVector& size, dInt32 xCount, dInt32 zCount, dFloat32 spacing, dInt32 type, dInt32 materialID, const dMatrix& shapeOffsetMatrix)
-{
-	// create the shape and visual mesh as a common data to be re used
-	dAssert(0);
-	//NewtonWorld* const world = scene->GetNewton();
-	//
-	//dWoodFractureListener* woodFractureManager = (dWoodFractureListener*)NewtonWorldGetListener(world, D_WOODFRACTURE_LISTENER);
-	//if (!woodFractureManager) {
-	//	woodFractureManager = new dWoodFractureListener(world);
-	//}
-	//woodFractureManager->AddFracturedWoodPrimitive(density, origin, size, xCount, zCount, spacing, stype, materialID, shapeOffsetMatrix);
-}
-
-
 ndSimpleConvexFracture::ndSimpleConvexFracture(ndDemoEntityManager* const scene)
 	:ndModel()
 {
-
 }
 
 ndSimpleConvexFracture::~ndSimpleConvexFracture()
 {
-
 }
 
 void ndSimpleConvexFracture::Update(const ndWorld* const world, dFloat32 timestep)
 {
+}
 
+void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
+	ndDemoEntityManager* const scene, const ndShapeInstance& shape,
+	dFloat32 density, const dVector& origin,
+	dInt32 xCount, dInt32 zCount, dFloat32 spacing,
+	dInt32 type, dInt32 materialID)
+{
+	// create the shape and visual mesh as a common data to be re used
+	//NewtonWorld* const world = GetWorld();
+	//
+	//// create the shape and visual mesh as a common data to be re used
+	//DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+	//
+	//NewtonCollision* const collision = NewtonCreateCylinder(world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, stype, NULL);
+	//
+	//// create a newton mesh from the collision primitive
+
+	//dMeshEffect* const mesh = NewtonMeshCreateFromCollision(collision);
+	
+	//// apply a material map
+	//dInt32 externalMaterial = LoadTexture("reljef.tga");
+	//dInt32 internalMaterial = LoadTexture("concreteBrick.tga");
+	//
+	//dMatrix aligmentUV(dGetIdentityMatrix());
+	//NewtonMeshApplyBoxMapping(mesh, externalMaterial, externalMaterial, externalMaterial, &aligmentUV[0][0]);
+	//
+	//// make a visual mesh for display
+	//DemoMesh* const visualMesh = new DemoMesh(mesh, scene->GetShaderCache());
+	//
+	//// create a  mesh fracture from the newton mesh primitive
+	//WoodVoronoidEffect fracture(world, mesh, internalMaterial);
+	//
+	//dFloat32 startElevation = 100.0f;
+	//dMatrix matrix(dGetIdentityMatrix());
+	//
+	//for (dInt32 i = 0; i < xCount; i++) {
+	//	dFloat32 x = origin.m_x + (i - xCount / 2) * spacing;
+	//	for (dInt32 j = 0; j < zCount; j++) {
+	//		dFloat32 z = origin.m_z + (j - zCount / 2) * spacing;
+	//
+	//		matrix.m_posit.m_x = x;
+	//		matrix.m_posit.m_z = z;
+	//		dVector floor(FindFloor(world, dVector(matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
+	//		matrix.m_posit.m_y = floor.m_y + 0.5f;
+	//		dFloat32 mass = density * NewtonConvexCollisionCalculateVolume(collision);
+	//		NewtonBody* const body = CreateSimpleSolid(scene, visualMesh, mass, matrix, collision, materialID);
+	//		WoodVoronoidEffect& newEffect = m_effectList.Append(fracture)->GetInfo();
+	//		newEffect.m_body = body;
+	//	}
+	//}
+	//
+	//// do not forget to release the assets	
+	//NewtonMeshDestroy(mesh);
+	//visualMesh->Release();
+	//NewtonDestroyCollision(collision);
 }

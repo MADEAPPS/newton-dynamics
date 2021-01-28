@@ -36,7 +36,8 @@
 //#define DEFAULT_SCENE	5		// static mesh collision 
 //#define DEFAULT_SCENE	6		// setting basic joints
 //#define DEFAULT_SCENE	7		// setting basic vehicle
-#define DEFAULT_SCENE	8		// conservation of angular momentum 
+//#define DEFAULT_SCENE	8		// conservation of angular momentum 
+#define DEFAULT_SCENE	9		// simple voronoi fracture
 						 
 // demos forward declaration 
 void ndBasicStacks(ndDemoEntityManager* const scene);

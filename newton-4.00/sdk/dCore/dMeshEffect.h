@@ -410,10 +410,12 @@ class dMeshEffect: public dPolyhedra
 	};
 	
 	D_CORE_API dMeshEffect();
-	D_CORE_API virtual ~dMeshEffect();
-
+	//D_CORE_API dMeshEffect(dgCollisionInstance* const collision);
+	
 	// Create a convex hull Mesh form point cloud
 	D_CORE_API dMeshEffect(const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol);
+
+	D_CORE_API virtual ~dMeshEffect();
 
 	void SetName (const dString& name);
 	const dString& GetName() const;
