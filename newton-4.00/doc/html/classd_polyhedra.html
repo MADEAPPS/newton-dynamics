@@ -109,10 +109,11 @@ Inheritance diagram for dPolyhedra:</div>
  <div class="center">
   <img src="classd_polyhedra.png" usemap="#dPolyhedra_map" alt=""/>
   <map id="dPolyhedra_map" name="dPolyhedra_map">
-<area href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes." alt="dClassAlloc" shape="rect" coords="0,0,180,24"/>
-<area href="classd_tree.html" alt="dTree&lt; dEdge, dEdgeKey &gt;" shape="rect" coords="190,0,370,24"/>
-<area href="classd_mesh_effect.html" alt="dMeshEffect" shape="rect" coords="95,112,275,136"/>
-<area href="classnd_shape_instance_mesh_builder.html" alt="ndShapeInstanceMeshBuilder" shape="rect" coords="95,168,275,192"/>
+<area href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes." alt="dClassAlloc" shape="rect" coords="0,0,288,24"/>
+<area href="classd_tree.html" alt="dTree&lt; dEdge, dEdgeKey &gt;" shape="rect" coords="298,0,586,24"/>
+<area href="classd_polygon_soup_builder_1_1dg_poly_soup_filter_allocator.html" alt="dPolygonSoupBuilder::dgPolySoupFilterAllocator" shape="rect" coords="0,112,288,136"/>
+<area href="classnd_mesh_effect.html" alt="ndMeshEffect" shape="rect" coords="298,112,586,136"/>
+<area href="classnd_shape_instance_mesh_builder.html" alt="ndShapeInstanceMeshBuilder" shape="rect" coords="298,168,586,192"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -243,9 +244,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a7971d84738e604d38afac60b2eb1f4bc inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a7971d84738e604d38afac60b2eb1f4bc"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>operator dInt32</b> () const</td></tr>
 <tr class="separator:a7971d84738e604d38afac60b2eb1f4bc inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a8c13a5e90eaa05619d87714844e213 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a2a8c13a5e90eaa05619d87714844e213"></a>
-dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetCount</b> () const</td></tr>
-<tr class="separator:a2a8c13a5e90eaa05619d87714844e213 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5729c1e4875b33faebc10875449c862 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="af5729c1e4875b33faebc10875449c862"></a>
+const dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetCount</b> () const</td></tr>
+<tr class="separator:af5729c1e4875b33faebc10875449c862 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3676a0909152317356d9d8cc11516b85 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a3676a0909152317356d9d8cc11516b85"></a>
 dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>GetRoot</b> () const</td></tr>
 <tr class="separator:a3676a0909152317356d9d8cc11516b85 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -261,18 +262,21 @@ dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Find</b> (dEdg
 <tr class="memitem:a6e34585dac4874749f63b4de4d57e8df inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a6e34585dac4874749f63b4de4d57e8df"></a>
 dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindGreater</b> (dEdgeKey key) const</td></tr>
 <tr class="separator:a6e34585dac4874749f63b4de4d57e8df inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18a8083f5208bd7490993d062b5ccc47 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a18a8083f5208bd7490993d062b5ccc47"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindGreaterEqual</b> (dEdgeKey key) const</td></tr>
-<tr class="separator:a18a8083f5208bd7490993d062b5ccc47 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c4b8e56f3eecbea2433695cada781ad inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a3c4b8e56f3eecbea2433695cada781ad"></a>
 dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindLessEqual</b> (dEdgeKey key) const</td></tr>
 <tr class="separator:a3c4b8e56f3eecbea2433695cada781ad inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18a8083f5208bd7490993d062b5ccc47 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a18a8083f5208bd7490993d062b5ccc47"></a>
+dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindGreaterEqual</b> (dEdgeKey key) const</td></tr>
+<tr class="separator:a18a8083f5208bd7490993d062b5ccc47 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f23a4fa25dd16132848a3bf129597bf inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a6f23a4fa25dd16132848a3bf129597bf"></a>
+dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindCreate</b> (dEdgeKey key, bool &amp;wasFound)</td></tr>
+<tr class="separator:a6f23a4fa25dd16132848a3bf129597bf inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65e3bf09ae59d0a9cf2b4fe06f5d9d12 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a65e3bf09ae59d0a9cf2b4fe06f5d9d12"></a>
 dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>GetNodeFromInfo</b> (<a class="el" href="classd_edge.html">dEdge</a> &amp;info) const</td></tr>
 <tr class="separator:a65e3bf09ae59d0a9cf2b4fe06f5d9d12 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8506642722bf36d08c9a1aa2ae534c28 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a8506642722bf36d08c9a1aa2ae534c28"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Insert</b> (const <a class="el" href="classd_edge.html">dEdge</a> &amp;element, dEdgeKey key, bool &amp;elementWasInTree)</td></tr>
-<tr class="separator:a8506642722bf36d08c9a1aa2ae534c28 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23907b4618f0a2a2e75df06645059e9d inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a23907b4618f0a2a2e75df06645059e9d"></a>
+dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Insert</b> (const <a class="el" href="classd_edge.html">dEdge</a> &amp;element, dEdgeKey key, bool &amp;wasFound)</td></tr>
+<tr class="separator:a23907b4618f0a2a2e75df06645059e9d inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90c14007977c92a9631075f637225289 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a90c14007977c92a9631075f637225289"></a>
 dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Insert</b> (const <a class="el" href="classd_edge.html">dEdge</a> &amp;element, dEdgeKey key)</td></tr>
 <tr class="separator:a90c14007977c92a9631075f637225289 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>

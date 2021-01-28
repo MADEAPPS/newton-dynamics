@@ -129,7 +129,7 @@ $(document).ready(function(){initNavTree('d_convex_hull3d_8h_source.html',''); i
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &quot;dMatrix.h&quot;</span></div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#include &quot;dQuaternion.h&quot;</span></div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#define DG_OLD_CONVEXHULL_3D</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#define D_OLD_CONVEXHULL_3D</span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">class </span><a class="code" href="classd_convex_hull3d_vertex.html">dConvexHull3dVertex</a>;</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">class </span><a class="code" href="classd_convex_hull3d_a_a_b_b_tree_node.html">dConvexHull3dAABBTreeNode</a>;</div>
@@ -158,14 +158,14 @@ $(document).ready(function(){initNavTree('d_convex_hull3d_8h_source.html',''); i
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;D_MSV_NEWTON_ALIGN_32</div>
 <div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="classd_convex_hull3d.html">   60</a></span>&#160;<span class="keyword">class </span><a class="code" href="classd_convex_hull3d.html">dConvexHull3d</a>: <span class="keyword">public</span> <a class="code" href="classd_class_alloc.html">dClassAlloc</a>, <span class="keyword">public</span> <a class="code" href="classd_list.html">dList</a>&lt;dConvexHull3dFace&gt;</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;{</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#ifdef  DG_OLD_CONVEXHULL_3D</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#ifdef  D_OLD_CONVEXHULL_3D</span></div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">class </span><a class="code" href="classd_convex_hull3d_1_1d_normal_map.html">dNormalMap</a>;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <a class="code" href="classd_convex_hull3d.html">dConvexHull3d</a>(<span class="keyword">const</span> <a class="code" href="classd_convex_hull3d.html">dConvexHull3d</a>&amp; source);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <a class="code" href="classd_convex_hull3d.html">dConvexHull3d</a>(<span class="keyword">const</span> dFloat64* <span class="keyword">const</span> vertexCloud, dInt32 strideInBytes, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount = 0x7fffffff);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classd_convex_hull3d.html">dConvexHull3d</a>();</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    D_CORE_API <a class="code" href="classd_convex_hull3d.html">dConvexHull3d</a>(<span class="keyword">const</span> <a class="code" href="classd_convex_hull3d.html">dConvexHull3d</a>&amp; source);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    D_CORE_API <a class="code" href="classd_convex_hull3d.html">dConvexHull3d</a>(<span class="keyword">const</span> dFloat64* <span class="keyword">const</span> vertexCloud, dInt32 strideInBytes, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount = 0x7fffffff);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    D_CORE_API <span class="keyword">virtual</span> ~<a class="code" href="classd_convex_hull3d.html">dConvexHull3d</a>();</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    dInt32 GetVertexCount() <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keyword">const</span> <a class="code" href="classd_big_vector.html">dBigVector</a>* GetVertexPool() <span class="keyword">const</span>;</div>

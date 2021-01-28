@@ -146,14 +146,14 @@ $(document).ready(function(){initNavTree('d_vector_arm_neon_8h_source.html','');
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#define D_INLINE_FORCEINLINE(type) static inline type</span></div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;D_INLINE_FORCEINLINE(<span class="keywordtype">int</span>) vec_minv(uint32x4_t v)</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;D_INLINE_FORCEINLINE(dInt32) vec_minv(uint32x4_t v)</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;{</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    uint32x2_t tmp = vpmin_u32(vget_low_u32(v), vget_high_u32(v));</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    tmp = vpmin_u32(tmp, tmp);</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keywordflow">return</span> tmp[0] != 0;</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;}</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;D_INLINE_FORCEINLINE(<span class="keywordtype">int</span>) vec_maxv(uint32x4_t v)</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;D_INLINE_FORCEINLINE(dInt32) vec_maxv(uint32x4_t v)</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;{</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    uint32x2_t tmp = vpmax_u32(vget_low_u32(v), vget_high_u32(v));</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    tmp = vpmax_u32(tmp, tmp);</div>
@@ -616,7 +616,7 @@ $(document).ready(function(){initNavTree('d_vector_arm_neon_8h_source.html','');
 <div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classd_vector.html">dVector</a> (m_y, m_z, m_x, m_w);</div>
 <div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;    }</div>
 <div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;    </div>
-<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;    D_INLINE <a class="code" href="classd_vector.html">dVector</a> ShiftRightLogical (<span class="keywordtype">int</span> bits)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;    D_INLINE <a class="code" href="classd_vector.html">dVector</a> ShiftRightLogical (dInt32 bits)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;<span class="keyword">    </span>{</div>
 <div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classd_vector.html">dVector</a> (dInt32 (dUnsigned32 (m_ix) &gt;&gt; bits), dInt32 (dUnsigned32 (m_iy) &gt;&gt; bits), dInt32 (dUnsigned32 (m_iz) &gt;&gt; bits), dInt32 (dUnsigned32 (m_iw) &gt;&gt; bits));</div>
 <div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;    }</div>
@@ -1036,7 +1036,7 @@ $(document).ready(function(){initNavTree('d_vector_arm_neon_8h_source.html','');
 <div class="line"><a name="l00937"></a><span class="lineno">  937</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classd_big_vector.html">dBigVector</a>(m_y, m_z, m_x, m_w);</div>
 <div class="line"><a name="l00938"></a><span class="lineno">  938</span>&#160;    }</div>
 <div class="line"><a name="l00939"></a><span class="lineno">  939</span>&#160; </div>
-<div class="line"><a name="l00940"></a><span class="lineno">  940</span>&#160;    D_INLINE <a class="code" href="classd_big_vector.html">dBigVector</a> ShiftRightLogical(<span class="keywordtype">int</span> bits)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00940"></a><span class="lineno">  940</span>&#160;    D_INLINE <a class="code" href="classd_big_vector.html">dBigVector</a> ShiftRightLogical(dInt32 bits)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00941"></a><span class="lineno">  941</span>&#160;<span class="keyword">    </span>{</div>
 <div class="line"><a name="l00942"></a><span class="lineno">  942</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classd_big_vector.html">dBigVector</a>(dInt64(dUnsigned64(m_ix) &gt;&gt; bits), dInt64(dUnsigned64(m_iy) &gt;&gt; bits), dInt64(dUnsigned64(m_iz) &gt;&gt; bits), dInt64(dUnsigned64(m_iw) &gt;&gt; bits));</div>
 <div class="line"><a name="l00943"></a><span class="lineno">  943</span>&#160;    }</div>
@@ -1556,7 +1556,7 @@ $(document).ready(function(){initNavTree('d_vector_arm_neon_8h_source.html','');
 <div class="line"><a name="l01457"></a><span class="lineno"> 1457</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classd_vector.html">dVector</a>(m_y, m_z, m_x, m_w);</div>
 <div class="line"><a name="l01458"></a><span class="lineno"> 1458</span>&#160;    }</div>
 <div class="line"><a name="l01459"></a><span class="lineno"> 1459</span>&#160; </div>
-<div class="line"><a name="l01460"></a><span class="lineno"> 1460</span>&#160;    D_INLINE <a class="code" href="classd_vector.html">dVector</a> ShiftRightLogical(<span class="keywordtype">int</span> bits)<span class="keyword"> const</span></div>
+<div class="line"><a name="l01460"></a><span class="lineno"> 1460</span>&#160;    D_INLINE <a class="code" href="classd_vector.html">dVector</a> ShiftRightLogical(dInt32 bits)<span class="keyword"> const</span></div>
 <div class="line"><a name="l01461"></a><span class="lineno"> 1461</span>&#160;<span class="keyword">    </span>{</div>
 <div class="line"><a name="l01462"></a><span class="lineno"> 1462</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classd_vector.html">dVector</a>(dInt32(dUnsigned32(m_ix) &gt;&gt; bits), dInt32(dUnsigned32(m_iy) &gt;&gt; bits), dInt32(dUnsigned32(m_iz) &gt;&gt; bits), dInt32(dUnsigned32(m_iw) &gt;&gt; bits));</div>
 <div class="line"><a name="l01463"></a><span class="lineno"> 1463</span>&#160;    }</div>
@@ -1993,7 +1993,7 @@ $(document).ready(function(){initNavTree('d_vector_arm_neon_8h_source.html','');
 <div class="line"><a name="l01894"></a><span class="lineno"> 1894</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classd_big_vector.html">dBigVector</a>(m_y, m_z, m_x, m_w);</div>
 <div class="line"><a name="l01895"></a><span class="lineno"> 1895</span>&#160;    }</div>
 <div class="line"><a name="l01896"></a><span class="lineno"> 1896</span>&#160; </div>
-<div class="line"><a name="l01897"></a><span class="lineno"> 1897</span>&#160;    D_INLINE <a class="code" href="classd_big_vector.html">dBigVector</a> ShiftRightLogical(<span class="keywordtype">int</span> bits)<span class="keyword"> const</span></div>
+<div class="line"><a name="l01897"></a><span class="lineno"> 1897</span>&#160;    D_INLINE <a class="code" href="classd_big_vector.html">dBigVector</a> ShiftRightLogical(dInt32 bits)<span class="keyword"> const</span></div>
 <div class="line"><a name="l01898"></a><span class="lineno"> 1898</span>&#160;<span class="keyword">    </span>{</div>
 <div class="line"><a name="l01899"></a><span class="lineno"> 1899</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classd_big_vector.html">dBigVector</a>(dInt64(dUnsigned64(m_ix) &gt;&gt; bits), dInt64(dUnsigned64(m_iy) &gt;&gt; bits), dInt64(dUnsigned64(m_iz) &gt;&gt; bits), dInt64(dUnsigned64(m_iw) &gt;&gt; bits));</div>
 <div class="line"><a name="l01900"></a><span class="lineno"> 1900</span>&#160;    }</div>

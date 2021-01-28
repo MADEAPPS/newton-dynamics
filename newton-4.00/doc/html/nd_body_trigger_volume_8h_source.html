@@ -129,46 +129,52 @@ $(document).ready(function(){initNavTree('nd_body_trigger_volume_8h_source.html'
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;{</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    D_COLLISION_API <a class="code" href="classnd_body_trigger_volume.html">ndBodyTriggerVolume</a>();</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> ~<a class="code" href="classnd_body_trigger_volume.html">ndBodyTriggerVolume</a>();</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="classnd_body_trigger_volume.html">ndBodyTriggerVolume</a>* ndBodyTriggerVolume::GetAsBodyTriggerVolume();</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> OnTrigger(<a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body, dFloat32 timestep);</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> OnTriggerEnter(<a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body, dFloat32 timestep);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> OnTriggerExit(<a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body, dFloat32 timestep);</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> IntegrateExternalForce(dFloat32 timestep);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    D_COLLISION_API <a class="code" href="classnd_body_trigger_volume.html">ndBodyTriggerVolume</a>(<span class="keyword">const</span> <a class="code" href="classnd_1_1_ti_xml_node.html">nd::TiXmlNode</a>* <span class="keyword">const</span> xmlNode, <span class="keyword">const</span> <a class="code" href="classd_tree.html">dTree&lt;const ndShape*, dUnsigned32&gt;</a>&amp; shapesCache);</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> ~<a class="code" href="classnd_body_trigger_volume.html">ndBodyTriggerVolume</a>();</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <a class="code" href="classnd_body_trigger_volume.html">ndBodyTriggerVolume</a>* GetAsBodyTriggerVolume();</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> OnTrigger(<a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body, dFloat32 timestep);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> OnTriggerEnter(<a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body, dFloat32 timestep);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> OnTriggerExit(<a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body, dFloat32 timestep);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> Save(<a class="code" href="classnd_1_1_ti_xml_element.html">nd::TiXmlElement</a>* <span class="keyword">const</span> rootNode, <span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> assetPath, dInt32 nodeid, <span class="keyword">const</span> <a class="code" href="classd_tree.html">dTree&lt;dUnsigned32, const ndShape*&gt;</a>&amp; shapesCache) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;} D_GCC_NEWTON_ALIGN_32;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_body_trigger_volume.html">ndBodyTriggerVolume</a>* ndBodyTriggerVolume::GetAsBodyTriggerVolume()</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;{ </div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">this</span>; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;}</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndBodyTriggerVolume::OnTriggerEnter(<a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body, dFloat32 timestep)</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;{</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    dAssert(0);</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;}</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndBodyTriggerVolume::OnTrigger(<a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body, dFloat32 timestep)</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;{</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    dAssert(0);</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;}</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndBodyTriggerVolume::OnTriggerExit(<a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body, dFloat32 timestep)</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;{</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    dAssert(0);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;}</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndBodyTriggerVolume::IntegrateExternalForce(dFloat32 timestep) </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;{</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;}</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> IntegrateExternalForce(dFloat32 timestep);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;} D_GCC_NEWTON_ALIGN_32;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_body_trigger_volume.html">ndBodyTriggerVolume</a>* ndBodyTriggerVolume::GetAsBodyTriggerVolume()</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;{ </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">this</span>; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;}</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndBodyTriggerVolume::OnTriggerEnter(<a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body, dFloat32 timestep)</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;{</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="comment">//dAssert(0);</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;}</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndBodyTriggerVolume::OnTrigger(<a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body, dFloat32 timestep)</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;{</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="comment">//dAssert(0);</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;}</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndBodyTriggerVolume::OnTriggerExit(<a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body, dFloat32 timestep)</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;{</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="comment">//dAssert(0);</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;}</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndBodyTriggerVolume::IntegrateExternalForce(dFloat32 timestep) </div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;{</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;}</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="aclassnd_1_1_ti_xml_node_html"><div class="ttname"><a href="classnd_1_1_ti_xml_node.html">nd::TiXmlNode</a></div><div class="ttdoc">The parent class for everything in the Document Object Model.</div><div class="ttdef"><b>Definition:</b> tinyxml.h:427</div></div>
+<div class="ttc" id="aclassd_tree_html"><div class="ttname"><a href="classd_tree.html">dTree</a></div><div class="ttdef"><b>Definition:</b> dTree.h:80</div></div>
+<div class="ttc" id="aclassnd_1_1_ti_xml_element_html"><div class="ttname"><a href="classnd_1_1_ti_xml_element.html">nd::TiXmlElement</a></div><div class="ttdoc">The element is a container class.</div><div class="ttdef"><b>Definition:</b> tinyxml.h:947</div></div>
 <div class="ttc" id="aclassnd_body_kinematic_html"><div class="ttname"><a href="classnd_body_kinematic.html">ndBodyKinematic</a></div><div class="ttdef"><b>Definition:</b> ndBodyKinematic.h:37</div></div>
 <div class="ttc" id="aclassnd_body_trigger_volume_html"><div class="ttname"><a href="classnd_body_trigger_volume.html">ndBodyTriggerVolume</a></div><div class="ttdef"><b>Definition:</b> ndBodyTriggerVolume.h:30</div></div>
 <!-- start footer part -->

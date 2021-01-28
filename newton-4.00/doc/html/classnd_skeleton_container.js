@@ -11,6 +11,7 @@ var classnd_skeleton_container =
     [ "AddChild", "classnd_skeleton_container.html#ac10d638b421f871a154c15be4f58e448", null ],
     [ "AddSelfCollisionJoint", "classnd_skeleton_container.html#ab1330d98d98823c26a42a45068d16b3a", null ],
     [ "CalculateJointForce", "classnd_skeleton_container.html#a6414304aa5848d4839d0a09dfb9c4d3e", null ],
+    [ "CheckSleepState", "classnd_skeleton_container.html#a62bc05d3e9e91d337bcdb813836cc511", null ],
     [ "ClearSelfCollision", "classnd_skeleton_container.html#a5c566eea4aa6d3b712dd744116dc9e61", null ],
     [ "Finalize", "classnd_skeleton_container.html#ae4d256958bb879eef1f70852558989aa", null ],
     [ "GetRoot", "classnd_skeleton_container.html#a13ff4c26e756466a3f06d833eb38505d", null ],

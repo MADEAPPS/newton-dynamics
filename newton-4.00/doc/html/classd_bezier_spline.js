@@ -6,7 +6,7 @@ var classd_bezier_spline =
     [ "CalculateLength", "classd_bezier_spline.html#a91cd815ac0ec6bc466edec971bfbaf95", null ],
     [ "CreateFromKnotVectorAndControlPoints", "classd_bezier_spline.html#aad29b164dc789f86baf2ed06befeba52", null ],
     [ "CurveAllDerivatives", "classd_bezier_spline.html#acd62b908b8092b1032c06987a5d49f64", null ],
-    [ "CurveDerivative", "classd_bezier_spline.html#a7414d83435ba674d6f9c9454cd9d1f07", null ],
+    [ "CurveDerivative", "classd_bezier_spline.html#a173fbb2070bed5b00dcc73d2dae83e5f", null ],
     [ "CurvePoint", "classd_bezier_spline.html#a18ee8cc99ad46515e4e2ea1cdf3991e5", null ],
     [ "FindClosestKnot", "classd_bezier_spline.html#a450128bfdd62344e86467ae9a30caa89", null ],
     [ "GetControlPoint", "classd_bezier_spline.html#aeeb16a10d171062afa6f1de4064337c2", null ],

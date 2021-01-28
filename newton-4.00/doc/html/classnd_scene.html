@@ -159,10 +159,10 @@ const <a class="el" href="classnd_constraint_array.html">ndConstraintArray</a> &
 <tr class="memitem:a9675d9e7b9214d51fbc3009740b2a086"><td class="memItemLeft" align="right" valign="top"><a id="a9675d9e7b9214d51fbc3009740b2a086"></a>
 const <a class="el" href="classd_array.html">dArray</a>&lt; <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetActiveBodyArray</b> () const</td></tr>
 <tr class="separator:a9675d9e7b9214d51fbc3009740b2a086"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7990924149bba119a08a1ccfd2820cce"><td class="memTemplParams" colspan="2"><a id="a7990924149bba119a08a1ccfd2820cce"></a>
+<tr class="memitem:a5db0019b5c021ebfb5b6ecbff0c72987"><td class="memTemplParams" colspan="2"><a id="a5db0019b5c021ebfb5b6ecbff0c72987"></a>
 template&lt;class T &gt; </td></tr>
-<tr class="memitem:a7990924149bba119a08a1ccfd2820cce"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SubmitJobs</b> ()</td></tr>
-<tr class="separator:a7990924149bba119a08a1ccfd2820cce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5db0019b5c021ebfb5b6ecbff0c72987"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SubmitJobs</b> (void *const context=nullptr)</td></tr>
+<tr class="separator:a5db0019b5c021ebfb5b6ecbff0c72987"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac20dc3793f676a58254ac53a926370e7"><td class="memItemLeft" align="right" valign="top"><a id="ac20dc3793f676a58254ac53a926370e7"></a>
 dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetTimestep</b> () const</td></tr>
 <tr class="separator:ac20dc3793f676a58254ac53a926370e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -295,9 +295,9 @@ D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Build
 <tr class="memitem:aa2efad959883c883888cd3ab8a6bf5f4"><td class="memItemLeft" align="right" valign="top"><a id="aa2efad959883c883888cd3ab8a6bf5f4"></a>
 D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateAabb</b> ()</td></tr>
 <tr class="separator:aa2efad959883c883888cd3ab8a6bf5f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94dd0cfcd8b95e4a6dd85c53656aae87"><td class="memItemLeft" align="right" valign="top"><a id="a94dd0cfcd8b95e4a6dd85c53656aae87"></a>
-D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>TransformUpdate</b> ()</td></tr>
-<tr class="separator:a94dd0cfcd8b95e4a6dd85c53656aae87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7de4711b363b11d026adce9cf9c0b8ac"><td class="memItemLeft" align="right" valign="top"><a id="a7de4711b363b11d026adce9cf9c0b8ac"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateTransform</b> ()</td></tr>
+<tr class="separator:a7de4711b363b11d026adce9cf9c0b8ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2ff36a248cac9f24943d60f76e256cc"><td class="memItemLeft" align="right" valign="top"><a id="ae2ff36a248cac9f24943d60f76e256cc"></a>
 D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateContacts</b> ()</td></tr>
 <tr class="separator:ae2ff36a248cac9f24943d60f76e256cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -373,12 +373,6 @@ dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>m_timestep</b></t
 <tr class="memitem:a8968bf92a551d014b48dcd49f05d5c75"><td class="memItemLeft" align="right" valign="top"><a id="a8968bf92a551d014b48dcd49f05d5c75"></a>
 dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_sleepBodies</b></td></tr>
 <tr class="separator:a8968bf92a551d014b48dcd49f05d5c75"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90c3b8576d7a5f9e2468712cc63f2cf1"><td class="memItemLeft" align="right" valign="top"><a id="a90c3b8576d7a5f9e2468712cc63f2cf1"></a>
-<a class="el" href="classd_atomic.html">dAtomic</a>&lt; dUnsigned32 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_activeBodyCount</b></td></tr>
-<tr class="separator:a90c3b8576d7a5f9e2468712cc63f2cf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad601aac125049f4e69de9498b42d8bf4"><td class="memItemLeft" align="right" valign="top"><a id="ad601aac125049f4e69de9498b42d8bf4"></a>
-dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_sleepBodiesLane</b> [D_MAX_THREADS_COUNT]</td></tr>
-<tr class="separator:ad601aac125049f4e69de9498b42d8bf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac25cef1956062ca244244b9b4b05f81e"><td class="memItemLeft" align="right" valign="top"><a id="ac25cef1956062ca244244b9b4b05f81e"></a>
 dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_lru</b></td></tr>
 <tr class="separator:ac25cef1956062ca244244b9b4b05f81e"><td class="memSeparator" colspan="2">&#160;</td></tr>

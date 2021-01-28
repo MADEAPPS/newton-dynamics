@@ -19,5 +19,6 @@ var classnd_contact =
     [ "ndBodyPlayerCapsuleContactSolver", "classnd_contact.html#a544b9d8f135efab318a4bfa4c19ba7cd", null ],
     [ "ndContactList", "classnd_contact.html#aed85a6c742400c2a0b737d7aba496243", null ],
     [ "ndContactSolver", "classnd_contact.html#abb14f8befffc9be23e2578f7432978da", null ],
-    [ "ndScene", "classnd_contact.html#a3bf9f82d7440931a3e417bef7fdb94ab", null ]
+    [ "ndScene", "classnd_contact.html#a3bf9f82d7440931a3e417bef7fdb94ab", null ],
+    [ "ndShapeConvexPolygon", "classnd_contact.html#a37a8200fa67b16b0d926dd259abf4cc6", null ]
 ];

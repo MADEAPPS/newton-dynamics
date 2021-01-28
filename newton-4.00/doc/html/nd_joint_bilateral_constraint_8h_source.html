@@ -128,220 +128,254 @@ $(document).ready(function(){initNavTree('nd_joint_bilateral_constraint_8h_sourc
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#define DG_BILATERAL_CONTRAINT_DOF  8</span></div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;D_MSV_NEWTON_ALIGN_32</div>
-<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="classnd_joint_bilateral_constraint.html">   33</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a>: <span class="keyword">public</span> <a class="code" href="classnd_constraint.html">ndConstraint</a>, <span class="keyword">public</span> <a class="code" href="classd_class_alloc.html">dClassAlloc</a></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;{</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment">    public:</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="comment">    virtual void SetDestructorCallback (OnConstraintDestroy destructor);</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment">    virtual void Serialize (dgSerialize serializeCallback, void* const userData) = 0;</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">    bool IsRowMotor(dInt32 index) const {return m_rowIsMotor &amp; (1 &lt;&lt; index) ? true : false; }</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">    protected:</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">    virtual void Init (){dgAssert (0);}</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">    virtual void Remove (dgWorld* world) {dgAssert (0);}</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment">    virtual dFloat32 GetStiffness() const;</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">    virtual void SetStiffness(dFloat32 stiffness);</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment">    virtual dFloat32 GetMassScaleBody0() const;</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment">    virtual dFloat32 GetMassScaleBody1() const;</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">    void CalculateMatrixOffset (const dVector&amp; pivot, const dVector&amp; dir, dMatrix&amp; matrix0, dMatrix&amp; matrix1) const;</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">    void SetPivotAndPinDir(const dVector &amp;pivot, const dVector &amp;pinDirection, dMatrix&amp; matrix0, dMatrix&amp; matrix1) const;</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment">    void SetPivotAndPinDir(const dVector&amp; pivot, const dVector&amp; pinDirection0, const dVector&amp; pinDirection1, dMatrix&amp; matrix0, dMatrix&amp; matrix1) const;</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">    dVector CalculateGlobalMatrixAndAngle (const dMatrix&amp; localMatrix0, const dMatrix&amp; localMatrix1, dMatrix&amp; globalMatrix0, dMatrix&amp; globalMatrix1) const;</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">    virtual void JointAccelerations(dgJointAccelerationDecriptor* const params); </span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">    dFloat32 GetRowAcceleration (dInt32 index, dgContraintDescritor&amp; desc) const;</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment">    dFloat32 CalculateMotorAcceleration (dInt32 index, dgContraintDescritor&amp; desc) const;</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment">    void SetMotorAcceleration (dInt32 index, dFloat32 acceleration, dgContraintDescritor&amp; desc);</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment">    void SetSpringDamperAcceleration (dInt32 index, dgContraintDescritor&amp; desc, dFloat32 rowStiffness, dFloat32 spring, dFloat32 damper);</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment">    void SetJacobianDerivative (dInt32 index, dgContraintDescritor&amp; desc, const dFloat32* const jacobianA, const dFloat32* const jacobianB, dgForceImpactPair* const jointForce);</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">    void CalculatePointDerivative (dInt32 index, dgContraintDescritor&amp; desc, const dVector&amp; normalGlobal, const dgPointParam&amp; param, dgForceImpactPair* const jointForce);</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment">    void CalculateAngularDerivative (dInt32 index, dgContraintDescritor&amp; desc, const dVector&amp; normalGlobal, dFloat32 stiffness, dFloat32 jointAngle, dgForceImpactPair* const jointForce);</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">    void AppendToJointList();</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment">    </span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment">    dFloat32 m_massScaleBody0;</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment">    dFloat32 m_massScaleBody1;</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment">    dFloat32 m_defualtDiagonalRegularizer;</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment">    OnConstraintDestroy m_destructor;</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">    dBilateralConstraintList::dListNode* m_jointNode;</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    D_COLLISION_API <a class="code" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a>(dInt32 maxDof, <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body0, <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body1, <span class="keyword">const</span> <a class="code" href="classd_matrix.html">dMatrix</a>&amp; globalMatrix);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> ~<a class="code" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a>();</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordtype">bool</span> IsCollidable() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a>* GetAsBilateral() { <span class="keywordflow">return</span> <span class="keyword">this</span>; }</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> dUnsigned32 GetRowsCount() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> JacobianDerivative(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc);</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    </div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* GetBody0() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* GetBody1() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordtype">void</span> CalculateGlobalMatrix(<a class="code" href="classd_matrix.html">dMatrix</a>&amp; matrix0, <a class="code" href="classd_matrix.html">dMatrix</a>&amp; matrix1) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> JointAccelerations(<a class="code" href="classnd_joint_acceleration_decriptor.html">ndJointAccelerationDecriptor</a>* <span class="keyword">const</span> desc);</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    D_COLLISION_API <span class="keywordtype">void</span> CalculateLocalMatrix(<span class="keyword">const</span> <a class="code" href="classd_matrix.html">dMatrix</a>&amp; pinsAndPivotFrame, <a class="code" href="classd_matrix.html">dMatrix</a>&amp; localMatrix0, <a class="code" href="classd_matrix.html">dMatrix</a>&amp; localMatrix1) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    D_COLLISION_API <span class="keywordtype">void</span> AddAngularRowJacobian(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; dir, dFloat32 relAngle);</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    D_COLLISION_API <span class="keywordtype">void</span> AddLinearRowJacobian(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; pivot0, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; pivot1, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; dir);</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> DebugJoint(<a class="code" href="classnd_constraint_debug_callback.html">ndConstraintDebugCallback</a>&amp; debugCallback) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keyword">virtual</span> dInt32 GetSolverModel() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> SetSolverModel(dInt32 model);</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keywordtype">void</span> SetHighFriction(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, dInt32 index, dFloat32 friction);</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keywordtype">void</span> SetLowerFriction(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, dInt32 index, dFloat32 friction);</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordtype">void</span> SetMotorAcceleration(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, dInt32 index, dFloat32 acceleration);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">enum</span> ndJointBilateralSolverModel</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;{</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    m_primaryOpenLoop,</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    m_secundaryOpenLoop,</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    m_closeLoop,</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    m_secundaryCloseLoop,</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    m_modesCount</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;};</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;D_MSV_NEWTON_ALIGN_32</div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="classnd_joint_bilateral_constraint.html">   42</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a>: <span class="keyword">public</span> <a class="code" href="classnd_constraint.html">ndConstraint</a>, <span class="keyword">public</span> <a class="code" href="classd_class_alloc.html">dClassAlloc</a></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;{</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    D_COLLISION_API <a class="code" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a>(dInt32 maxDof, <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body0, <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body1, <span class="keyword">const</span> <a class="code" href="classd_matrix.html">dMatrix</a>&amp; globalMatrix);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> ~<a class="code" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a>();</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">bool</span> IsCollidable() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a>* GetAsBilateral() { <span class="keywordflow">return</span> <span class="keyword">this</span>; }</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> dUnsigned32 GetRowsCount() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> JacobianDerivative(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* GetBody0() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* GetBody1() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordtype">void</span> CalculateGlobalMatrix(<a class="code" href="classd_matrix.html">dMatrix</a>&amp; matrix0, <a class="code" href="classd_matrix.html">dMatrix</a>&amp; matrix1) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    D_COLLISION_API dFloat32 CalculateAngle(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; planeDir, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; cosDir, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; sinDir) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> JointAccelerations(<a class="code" href="classnd_joint_acceleration_decriptor.html">ndJointAccelerationDecriptor</a>* <span class="keyword">const</span> desc);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    D_COLLISION_API <span class="keywordtype">void</span> CalculateLocalMatrix(<span class="keyword">const</span> <a class="code" href="classd_matrix.html">dMatrix</a>&amp; pinsAndPivotFrame, <a class="code" href="classd_matrix.html">dMatrix</a>&amp; localMatrix0, <a class="code" href="classd_matrix.html">dMatrix</a>&amp; localMatrix1) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    D_COLLISION_API <span class="keywordtype">void</span> AddAngularRowJacobian(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; dir, dFloat32 relAngle);</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    D_COLLISION_API <span class="keywordtype">void</span> AddLinearRowJacobian(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; pivot0, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; pivot1, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; dir);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> DebugJoint(<a class="code" href="classnd_constraint_debug_callback.html">ndConstraintDebugCallback</a>&amp; debugCallback) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    D_COLLISION_API dFloat32 CalculateSpringDamperAcceleration(dFloat32 dt, dFloat32 ks, dFloat32 x, dFloat32 kd, dFloat32 v) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">const</span> <a class="code" href="classd_matrix.html">dMatrix</a>&amp; GetLocalMatrix0() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keyword">const</span> <a class="code" href="classd_matrix.html">dMatrix</a>&amp; GetLocalMatrix1() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> GetForceBody0() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> GetTorqueBody0() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> GetForceBody1() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> GetTorqueBody1() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keyword">virtual</span> ndJointBilateralSolverModel GetSolverModel() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> SetSolverModel(ndJointBilateralSolverModel model);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    dFloat32 GetMotorZeroAcceleration(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordtype">void</span> SetHighFriction(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, dFloat32 friction);</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordtype">void</span> SetLowerFriction(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, dFloat32 friction);</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordtype">void</span> SetMotorAcceleration(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, dFloat32 acceleration);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    D_COLLISION_API <span class="keywordtype">void</span> SetMassSpringDamperAcceleration(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, dFloat32 spring, dFloat32 damper);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordtype">void</span> SetSkeletonFlag(<span class="keywordtype">bool</span> flag);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <a class="code" href="classd_matrix.html">dMatrix</a> m_localMatrix0;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <a class="code" href="classd_matrix.html">dMatrix</a> m_localMatrix1;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_forceBody0;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_torqueBody0;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_forceBody1;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_torqueBody1;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_r0[DG_BILATERAL_CONTRAINT_DOF];</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_r1[DG_BILATERAL_CONTRAINT_DOF];</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <a class="code" href="classnd_force_impact_pair.html">ndForceImpactPair</a> m_jointForce[DG_BILATERAL_CONTRAINT_DOF];</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    dFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* m_body0;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* m_body1;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    ndJointList::dListNode* m_worldNode;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    ndJointList::dListNode* m_body0Node;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    ndJointList::dListNode* m_body1Node;</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordtype">void</span> SetSkeletonFlag(<span class="keywordtype">bool</span> flag);</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <a class="code" href="classd_matrix.html">dMatrix</a> m_localMatrix0;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <a class="code" href="classd_matrix.html">dMatrix</a> m_localMatrix1;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_r0[DG_BILATERAL_CONTRAINT_DOF];</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_r1[DG_BILATERAL_CONTRAINT_DOF];</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <a class="code" href="classnd_force_impact_pair.html">ndForceImpactPair</a> m_jointForce[DG_BILATERAL_CONTRAINT_DOF];</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; </div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    dFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* m_body0;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* m_body1;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    ndJointList::dListNode* m_worldNode;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    ndJointList::dListNode* m_body0Node;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    ndJointList::dListNode* m_body1Node;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    dFloat32 m_defualtDiagonalRegularizer;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    dUnsigned32 m_maxDof            : 6;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    dUnsigned32 m_solverModel       : 2;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    dUnsigned32 m_isInSkeleton      : 1;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    dUnsigned32 m_mark              : 1;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    dUnsigned32 m_enableCollision   : 1;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    dInt8 m_rowIsMotor;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160; </div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_world.html">ndWorld</a>;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_dynamics_update.html">ndDynamicsUpdate</a>;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_skeleton_container.html">ndSkeletonContainer</a>;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;};</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="keyword">inline</span> dInt32 ndJointBilateralConstraint::GetSolverModel()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="keywordflow">return</span> m_solverModel;</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;}</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndJointBilateralConstraint::SetSolverModel(dInt32 model)</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;{</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    m_solverModel = dInt8(dClamp(model, 0, 3));</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;}</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> dUnsigned32 ndJointBilateralConstraint::GetRowsCount()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keywordflow">return</span> m_maxDof;</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;}</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160; </div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndJointBilateralConstraint::CalculateGlobalMatrix(<a class="code" href="classd_matrix.html">dMatrix</a>&amp; matrix0, <a class="code" href="classd_matrix.html">dMatrix</a>&amp; matrix1)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    matrix0 = m_localMatrix0 * m_body0-&gt;GetMatrix();</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    matrix1 = m_localMatrix1 * m_body1-&gt;GetMatrix();</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;}</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* ndJointBilateralConstraint::GetBody0()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="keywordflow">return</span> m_body0;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;}</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* ndJointBilateralConstraint::GetBody1()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordflow">return</span> m_body1;</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;}</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndJointBilateralConstraint::SetMotorAcceleration(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, dInt32 index, dFloat32 acceleration)</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;{</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    m_rowIsMotor |= (1 &lt;&lt; index);</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    desc.m_flags[index] = 0;</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    m_motorAcceleration[index] = acceleration;</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    desc.m_jointAccel[index] = acceleration;</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    desc.m_penetrationStiffness[index] = acceleration;</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;}</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndJointBilateralConstraint::SetLowerFriction(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, dInt32 index, dFloat32 friction)</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;{</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    dAssert(index &lt; dInt32 (m_maxDof));</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    desc.m_forceBounds[index].m_low = dClamp(friction, dFloat32(D_MIN_BOUND), dFloat32(-0.001f));</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    dAssert(desc.m_forceBounds[index].m_normalIndex == D_INDEPENDENT_ROW);</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="preprocessor">    #ifdef _DEBUG</span></div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    dInt32 i0 = 0;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    dInt32 i1 = index - 1;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">while</span> ((i0 &lt;= i1) &amp;&amp; (desc.m_forceBounds[i0].m_normalIndex == D_INDEPENDENT_ROW)) i0++;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordflow">while</span> ((i1 &gt;= i0) &amp;&amp; (desc.m_forceBounds[i1].m_normalIndex != D_INDEPENDENT_ROW)) i1--;</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    dAssert((i0 - i1) == 1);</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="keywordflow">if</span> ((i0 - i1) != 1) </div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    {</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;        dTrace((<span class="stringliteral">&quot;make sure that friction joint are issue at last\n&quot;</span>));</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    }</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="preprocessor">    #endif</span></div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;}</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160; </div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndJointBilateralConstraint::SetHighFriction(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, dInt32 index, dFloat32 friction)</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;{</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    dAssert(index &lt; dInt32(m_maxDof));</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    </div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    desc.m_forceBounds[index].m_upper = dClamp(friction, dFloat32(0.001f), dFloat32(D_MAX_BOUND));</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    dAssert(desc.m_forceBounds[index].m_normalIndex == D_INDEPENDENT_ROW);</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="preprocessor">    #ifdef _DEBUG</span></div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    dInt32 i0 = 0;</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    dInt32 i1 = index - 1;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="keywordflow">while</span> ((i0 &lt;= i1) &amp;&amp; (desc.m_forceBounds[i0].m_normalIndex == D_INDEPENDENT_ROW)) i0++;</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="keywordflow">while</span> ((i1 &gt;= i0) &amp;&amp; (desc.m_forceBounds[i1].m_normalIndex != D_INDEPENDENT_ROW)) i1--;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    dAssert((i0 - i1) == 1);</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keywordflow">if</span> ((i0 - i1) != 1) </div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    {</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        dTrace((<span class="stringliteral">&quot;make sure that friction joint are issue at last\n&quot;</span>));</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    }</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;<span class="preprocessor">    #endif</span></div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;}</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160; </div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndJointBilateralConstraint::JacobianDerivative(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc)</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;{</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    dAssert(0);</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;}</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160; </div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndJointBilateralConstraint::SetSkeletonFlag(<span class="keywordtype">bool</span> flag)</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;{</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    m_isInSkeleton = flag ? 1 : 0;</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;}</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160; </div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> ndJointBilateralConstraint::IsCollidable()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keywordflow">return</span> m_enableCollision ? true : <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;}</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    dFloat32 m_maxAngleError;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    dFloat32 m_defualtDiagonalRegularizer;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    dUnsigned32 m_maxDof            : 6;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    dUnsigned32 m_isInSkeleton      : 1;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    dUnsigned32 m_mark              : 1;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    dUnsigned32 m_enableCollision   : 1;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    dInt8 m_rowIsMotor;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    ndJointBilateralSolverModel m_solverModel;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_world.html">ndWorld</a>;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_dynamics_update.html">ndDynamicsUpdate</a>;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_skeleton_container.html">ndSkeletonContainer</a>;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_dynamics_update_avx2.html">ndDynamicsUpdateAvx2</a>;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;};</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="keyword">inline</span> ndJointBilateralSolverModel ndJointBilateralConstraint::GetSolverModel()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordflow">return</span> m_solverModel;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;}</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160; </div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndJointBilateralConstraint::SetSolverModel(ndJointBilateralSolverModel model)</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;{</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    dAssert(model &lt; m_modesCount);</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    dAssert(model &gt;= m_primaryOpenLoop);</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    m_solverModel = dClamp(model, m_primaryOpenLoop, m_modesCount);</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;}</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> dUnsigned32 ndJointBilateralConstraint::GetRowsCount()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keywordflow">return</span> m_maxDof;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;}</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160; </div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndJointBilateralConstraint::CalculateGlobalMatrix(<a class="code" href="classd_matrix.html">dMatrix</a>&amp; matrix0, <a class="code" href="classd_matrix.html">dMatrix</a>&amp; matrix1)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    matrix0 = m_localMatrix0 * m_body0-&gt;GetMatrix();</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    matrix1 = m_localMatrix1 * m_body1-&gt;GetMatrix();</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;}</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* ndJointBilateralConstraint::GetBody0()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keywordflow">return</span> m_body0;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;}</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160; </div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* ndJointBilateralConstraint::GetBody1()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <span class="keywordflow">return</span> m_body1;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;}</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="classd_matrix.html">dMatrix</a>&amp; ndJointBilateralConstraint::GetLocalMatrix0()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="keywordflow">return</span> m_localMatrix0;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;}</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160; </div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="keyword">inline</span> <span class="keyword">const</span> <a class="code" href="classd_matrix.html">dMatrix</a>&amp; ndJointBilateralConstraint::GetLocalMatrix1()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="keywordflow">return</span> m_localMatrix1;</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;}</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="keyword">inline</span> dFloat32 ndJointBilateralConstraint::GetMotorZeroAcceleration(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keyword">const</span> dInt32 index = desc.m_rowsCount - 1;</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    dAssert(index &gt;= 0);</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    dAssert(index &lt; dInt32(m_maxDof));</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keywordflow">return</span> desc.m_zeroRowAcceleration[index];</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;}</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndJointBilateralConstraint::SetMotorAcceleration(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, dFloat32 acceleration)</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;{</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keyword">const</span> dInt32 index = desc.m_rowsCount - 1;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    dAssert(index &gt;= 0);</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    dAssert(index &lt; dInt32(m_maxDof));</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    m_rowIsMotor |= (1 &lt;&lt; index);</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    desc.m_flags[index] = 0;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    m_motorAcceleration[index] = acceleration;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    desc.m_jointAccel[index] = acceleration;</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    desc.m_penetrationStiffness[index] = acceleration;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;}</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160; </div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndJointBilateralConstraint::SetLowerFriction(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, dFloat32 friction)</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;{</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keyword">const</span> dInt32 index = desc.m_rowsCount - 1;</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    dAssert(index &gt;= 0);</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    dAssert(index &lt; dInt32 (m_maxDof));</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    desc.m_forceBounds[index].m_low = dClamp(friction, dFloat32(D_MIN_BOUND), dFloat32(-0.001f));</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    dAssert(desc.m_forceBounds[index].m_normalIndex == D_INDEPENDENT_ROW);</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160; </div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="preprocessor">    #ifdef _DEBUG</span></div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    dInt32 i0 = 0;</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    dInt32 i1 = index - 1;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keywordflow">while</span> ((i0 &lt;= i1) &amp;&amp; (desc.m_forceBounds[i0].m_normalIndex == D_INDEPENDENT_ROW)) i0++;</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keywordflow">while</span> ((i1 &gt;= i0) &amp;&amp; (desc.m_forceBounds[i1].m_normalIndex != D_INDEPENDENT_ROW)) i1--;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    dAssert((i0 - i1) == 1);</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordflow">if</span> ((i0 - i1) != 1) </div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    {</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        dTrace((<span class="stringliteral">&quot;make sure that friction joint are issue at last\n&quot;</span>));</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    }</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="preprocessor">    #endif</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;}</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160; </div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndJointBilateralConstraint::SetHighFriction(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc, dFloat32 friction)</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;{</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keyword">const</span> dInt32 index = desc.m_rowsCount - 1;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    dAssert(index &gt;= 0);</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    dAssert(index &lt; dInt32(m_maxDof));</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    </div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    desc.m_forceBounds[index].m_upper = dClamp(friction, dFloat32(0.001f), dFloat32(D_MAX_BOUND));</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    dAssert(desc.m_forceBounds[index].m_normalIndex == D_INDEPENDENT_ROW);</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160; </div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="preprocessor">    #ifdef _DEBUG</span></div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    dInt32 i0 = 0;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    dInt32 i1 = index - 1;</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="keywordflow">while</span> ((i0 &lt;= i1) &amp;&amp; (desc.m_forceBounds[i0].m_normalIndex == D_INDEPENDENT_ROW)) i0++;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="keywordflow">while</span> ((i1 &gt;= i0) &amp;&amp; (desc.m_forceBounds[i1].m_normalIndex != D_INDEPENDENT_ROW)) i1--;</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    dAssert((i0 - i1) == 1);</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="keywordflow">if</span> ((i0 - i1) != 1) </div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    {</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        dTrace((<span class="stringliteral">&quot;make sure that friction joint are issue at last\n&quot;</span>));</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    }</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="preprocessor">    #endif</span></div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;}</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160; </div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndJointBilateralConstraint::JacobianDerivative(<a class="code" href="classnd_constraint_descritor.html">ndConstraintDescritor</a>&amp; desc)</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;{</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    dAssert(0);</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;}</div>
 <div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160; </div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndJointBilateralConstraint::SetSkeletonFlag(<span class="keywordtype">bool</span> flag)</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;{</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    m_isInSkeleton = flag ? 1 : 0;</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;}</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160; </div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> ndJointBilateralConstraint::IsCollidable()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="keywordflow">return</span> m_enableCollision ? true : <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;}</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160; </div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;<span class="keyword">inline</span> <a class="code" href="classd_vector.html">dVector</a> ndJointBilateralConstraint::GetForceBody0()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordflow">return</span> m_forceBody0;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;}</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160; </div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="keyword">inline</span> <a class="code" href="classd_vector.html">dVector</a> ndJointBilateralConstraint::GetTorqueBody0()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="keywordflow">return</span> m_torqueBody0;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;}</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160; </div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;<span class="keyword">inline</span> <a class="code" href="classd_vector.html">dVector</a> ndJointBilateralConstraint::GetForceBody1()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keywordflow">return</span> m_forceBody1;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;}</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160; </div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;<span class="keyword">inline</span> <a class="code" href="classd_vector.html">dVector</a> ndJointBilateralConstraint::GetTorqueBody1()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="keywordflow">return</span> m_torqueBody1;</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;}</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160; </div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160; </div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_skeleton_container_html"><div class="ttname"><a href="classnd_skeleton_container.html">ndSkeletonContainer</a></div><div class="ttdef"><b>Definition:</b> ndSkeletonContainer.h:35</div></div>
-<div class="ttc" id="aclassnd_constraint_descritor_html"><div class="ttname"><a href="classnd_constraint_descritor.html">ndConstraintDescritor</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:206</div></div>
+<div class="ttc" id="aclassnd_constraint_descritor_html"><div class="ttname"><a href="classnd_constraint_descritor.html">ndConstraintDescritor</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:174</div></div>
 <div class="ttc" id="aclassd_class_alloc_html"><div class="ttname"><a href="classd_class_alloc.html">dClassAlloc</a></div><div class="ttdoc">Base class for providing memory allocation for all other engine classes.</div><div class="ttdef"><b>Definition:</b> dClassAlloc.h:29</div></div>
-<div class="ttc" id="aclassnd_joint_bilateral_constraint_html"><div class="ttname"><a href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a></div><div class="ttdef"><b>Definition:</b> ndJointBilateralConstraint.h:34</div></div>
-<div class="ttc" id="aclassnd_force_impact_pair_html"><div class="ttname"><a href="classnd_force_impact_pair.html">ndForceImpactPair</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:142</div></div>
+<div class="ttc" id="aclassnd_joint_bilateral_constraint_html"><div class="ttname"><a href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a></div><div class="ttdef"><b>Definition:</b> ndJointBilateralConstraint.h:43</div></div>
+<div class="ttc" id="aclassnd_force_impact_pair_html"><div class="ttname"><a href="classnd_force_impact_pair.html">ndForceImpactPair</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:110</div></div>
 <div class="ttc" id="aclassnd_constraint_debug_callback_html"><div class="ttname"><a href="classnd_constraint_debug_callback.html">ndConstraintDebugCallback</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:43</div></div>
 <div class="ttc" id="aclassnd_body_kinematic_html"><div class="ttname"><a href="classnd_body_kinematic.html">ndBodyKinematic</a></div><div class="ttdef"><b>Definition:</b> ndBodyKinematic.h:37</div></div>
+<div class="ttc" id="aclassnd_dynamics_update_avx2_html"><div class="ttname"><a href="classnd_dynamics_update_avx2.html">ndDynamicsUpdateAvx2</a></div><div class="ttdef"><b>Definition:</b> ndDynamicsUpdateAvx2.h:211</div></div>
 <div class="ttc" id="aclassd_vector_html"><div class="ttname"><a href="classd_vector.html">dVector</a></div><div class="ttdef"><b>Definition:</b> dVectorArmNeon.h:1104</div></div>
 <div class="ttc" id="aclassd_matrix_html"><div class="ttname"><a href="classd_matrix.html">dMatrix</a></div><div class="ttdef"><b>Definition:</b> dMatrix.h:39</div></div>
-<div class="ttc" id="aclassnd_constraint_html"><div class="ttname"><a href="classnd_constraint.html">ndConstraint</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:255</div></div>
+<div class="ttc" id="aclassnd_constraint_html"><div class="ttname"><a href="classnd_constraint.html">ndConstraint</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:223</div></div>
 <div class="ttc" id="aclassnd_dynamics_update_html"><div class="ttname"><a href="classnd_dynamics_update.html">ndDynamicsUpdate</a></div><div class="ttdef"><b>Definition:</b> ndDynamicsUpdate.h:50</div></div>
-<div class="ttc" id="aclassnd_joint_acceleration_decriptor_html"><div class="ttname"><a href="classnd_joint_acceleration_decriptor.html">ndJointAccelerationDecriptor</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:185</div></div>
-<div class="ttc" id="aclassnd_world_html"><div class="ttname"><a href="classnd_world.html">ndWorld</a></div><div class="ttdef"><b>Definition:</b> ndWorld.h:41</div></div>
+<div class="ttc" id="aclassnd_joint_acceleration_decriptor_html"><div class="ttname"><a href="classnd_joint_acceleration_decriptor.html">ndJointAccelerationDecriptor</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:153</div></div>
+<div class="ttc" id="aclassnd_world_html"><div class="ttname"><a href="classnd_world.html">ndWorld</a></div><div class="ttdef"><b>Definition:</b> ndWorld.h:45</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

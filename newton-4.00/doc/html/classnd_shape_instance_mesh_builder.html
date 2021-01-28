@@ -106,7 +106,7 @@ Inheritance diagram for ndShapeInstanceMeshBuilder:</div>
  <div class="center">
   <img src="classnd_shape_instance_mesh_builder.png" usemap="#ndShapeInstanceMeshBuilder_map" alt=""/>
   <map id="ndShapeInstanceMeshBuilder_map" name="ndShapeInstanceMeshBuilder_map">
-<area href="classd_mesh_effect.html" alt="dMeshEffect" shape="rect" coords="95,112,275,136"/>
+<area href="classnd_mesh_effect.html" alt="ndMeshEffect" shape="rect" coords="95,112,275,136"/>
 <area href="classd_polyhedra.html" alt="dPolyhedra" shape="rect" coords="95,56,275,80"/>
 <area href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes." alt="dClassAlloc" shape="rect" coords="0,0,180,24"/>
 <area href="classd_tree.html" alt="dTree&lt; dEdge, dEdgeKey &gt;" shape="rect" coords="190,0,370,24"/>
@@ -118,79 +118,109 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1d4028c91d97540b25a61a9ae01d892d"><td class="memItemLeft" align="right" valign="top"><a id="a1d4028c91d97540b25a61a9ae01d892d"></a>
 D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndShapeInstanceMeshBuilder</b> (const <a class="el" href="classnd_shape_instance.html">ndShapeInstance</a> &amp;instance)</td></tr>
 <tr class="separator:a1d4028c91d97540b25a61a9ae01d892d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pub_methods_classd_mesh_effect"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classd_mesh_effect')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classd_mesh_effect.html">dMeshEffect</a></td></tr>
-<tr class="memitem:ab30898213b7a6a9e00f7b2265940f629 inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ab30898213b7a6a9e00f7b2265940f629"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateNormals</b> (dFloat64 angleInRadians)</td></tr>
-<tr class="separator:ab30898213b7a6a9e00f7b2265940f629 inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4bf5f7210eee8a888cc390288bb0236 inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="aa4bf5f7210eee8a888cc390288bb0236"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>BuildFromIndexList</b> (const <a class="el" href="classd_mesh_effect_1_1d_mesh_vertex_format.html">dMeshVertexFormat</a> *const format)</td></tr>
-<tr class="separator:aa4bf5f7210eee8a888cc390288bb0236 inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78362dea95828463f4ab28f427e1b91c inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a78362dea95828463f4ab28f427e1b91c"></a>
+<tr class="inherit_header pub_methods_classnd_mesh_effect"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_mesh_effect')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_mesh_effect.html">ndMeshEffect</a></td></tr>
+<tr class="memitem:aaaae93041a867ccc05e9668acc8b93f5 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="aaaae93041a867ccc05e9668acc8b93f5"></a>
+D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndMeshEffect</b> (const dFloat64 *const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol)</td></tr>
+<tr class="separator:aaaae93041a867ccc05e9668acc8b93f5 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bacaa28f33b810d1e4dd35352a7b4fe inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a7bacaa28f33b810d1e4dd35352a7b4fe"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetName</b> (const <a class="el" href="classd_string.html">dString</a> &amp;name)</td></tr>
+<tr class="separator:a7bacaa28f33b810d1e4dd35352a7b4fe inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa4ade9704dd2cd32717a0459d288636 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="aaa4ade9704dd2cd32717a0459d288636"></a>
+const <a class="el" href="classd_string.html">dString</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetName</b> () const</td></tr>
+<tr class="separator:aaa4ade9704dd2cd32717a0459d288636 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c159924cc68bb2ca50a7825ae2bf66a inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a4c159924cc68bb2ca50a7825ae2bf66a"></a>
+<a class="el" href="classd_array.html">dArray</a>&lt; <a class="el" href="classnd_mesh_effect_1_1d_material.html">dMaterial</a> &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaterials</b> ()</td></tr>
+<tr class="separator:a4c159924cc68bb2ca50a7825ae2bf66a inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75da7560eb9e21b8abc2951092c198d6 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a75da7560eb9e21b8abc2951092c198d6"></a>
 dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetPropertiesCount</b> () const</td></tr>
-<tr class="separator:a78362dea95828463f4ab28f427e1b91c inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a184821b63844390b0a207e67fcc54d39 inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a184821b63844390b0a207e67fcc54d39"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetVertexChannel64</b> (dInt32 strideInByte, dFloat64 *const bufferOut) const</td></tr>
-<tr class="separator:a184821b63844390b0a207e67fcc54d39 inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b2538d9763480d818cd275b56537c5d inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a1b2538d9763480d818cd275b56537c5d"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetVertexChannel</b> (dInt32 strideInByte, dFloat32 *const bufferOut) const</td></tr>
-<tr class="separator:a1b2538d9763480d818cd275b56537c5d inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3357a901c9aae4a1663391b7d075e20c inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a3357a901c9aae4a1663391b7d075e20c"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetNormalChannel</b> (dInt32 strideInByte, dFloat32 *const bufferOut) const</td></tr>
-<tr class="separator:a3357a901c9aae4a1663391b7d075e20c inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a468be7d1888cc1ca9dee3ecd80565537 inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a468be7d1888cc1ca9dee3ecd80565537"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetBinormalChannel</b> (dInt32 strideInByte, dFloat32 *const bufferOut) const</td></tr>
-<tr class="separator:a468be7d1888cc1ca9dee3ecd80565537 inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae61192e6bbdee3661cbbbd084dca98a7 inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ae61192e6bbdee3661cbbbd084dca98a7"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetUV0Channel</b> (dInt32 strideInByte, dFloat32 *const bufferOut) const</td></tr>
-<tr class="separator:ae61192e6bbdee3661cbbbd084dca98a7 inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9dbbe13d069cf1a6c28133362d1f0cd inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="af9dbbe13d069cf1a6c28133362d1f0cd"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetUV1Channel</b> (dInt32 strideInByte, dFloat32 *const bufferOut) const</td></tr>
-<tr class="separator:af9dbbe13d069cf1a6c28133362d1f0cd inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae3453e739d37194397574a1988d9f110 inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ae3453e739d37194397574a1988d9f110"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetVertexColorChannel</b> (dInt32 strideInByte, dFloat32 *const bufferOut) const</td></tr>
-<tr class="separator:ae3453e739d37194397574a1988d9f110 inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0633279d9d226c7ad129662b64c5ae25 inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a0633279d9d226c7ad129662b64c5ae25"></a>
-D_CORE_API <a class="el" href="classnd_index_array.html">ndIndexArray</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>MaterialGeometryBegin</b> ()</td></tr>
-<tr class="separator:a0633279d9d226c7ad129662b64c5ae25 inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab873cfb179c191459127eb53971870e6 inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ab873cfb179c191459127eb53971870e6"></a>
-D_CORE_API dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetFirstMaterial</b> (<a class="el" href="classnd_index_array.html">ndIndexArray</a> *const handle) const</td></tr>
-<tr class="separator:ab873cfb179c191459127eb53971870e6 inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f7484d3095bc2e65b29b1515468883e inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a0f7484d3095bc2e65b29b1515468883e"></a>
-D_CORE_API dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetNextMaterial</b> (<a class="el" href="classnd_index_array.html">ndIndexArray</a> *const handle, dInt32 materialHandle) const</td></tr>
-<tr class="separator:a0f7484d3095bc2e65b29b1515468883e inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10221fb964522610941bbe4e777dbe70 inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a10221fb964522610941bbe4e777dbe70"></a>
-D_CORE_API dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaterialID</b> (<a class="el" href="classnd_index_array.html">ndIndexArray</a> *const handle, dInt32 materialHandle) const</td></tr>
-<tr class="separator:a10221fb964522610941bbe4e777dbe70 inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0c179e3b1540978bec9d16feb54d5de inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="af0c179e3b1540978bec9d16feb54d5de"></a>
-D_CORE_API dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaterialIndexCount</b> (<a class="el" href="classnd_index_array.html">ndIndexArray</a> *const handle, dInt32 materialHandle) const</td></tr>
-<tr class="separator:af0c179e3b1540978bec9d16feb54d5de inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0261b524a9c98ff15b01cbdc9ddfc108 inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a0261b524a9c98ff15b01cbdc9ddfc108"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaterialGetIndexStream</b> (<a class="el" href="classnd_index_array.html">ndIndexArray</a> *const handle, dInt32 materialHandle, dInt32 *const index) const</td></tr>
-<tr class="separator:a0261b524a9c98ff15b01cbdc9ddfc108 inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ca26b54eb56f698918cbd0feb78a9d4 inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a1ca26b54eb56f698918cbd0feb78a9d4"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaterialGetIndexStreamShort</b> (<a class="el" href="classnd_index_array.html">ndIndexArray</a> *const handle, dInt32 materialHandle, dInt16 *const index) const</td></tr>
-<tr class="separator:a1ca26b54eb56f698918cbd0feb78a9d4 inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd5fce4548c663e11ee35d0a7623769c inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="acd5fce4548c663e11ee35d0a7623769c"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>MaterialGeomteryEnd</b> (<a class="el" href="classnd_index_array.html">ndIndexArray</a> *const handle)</td></tr>
-<tr class="separator:acd5fce4548c663e11ee35d0a7623769c inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b648af0c9e45e8d9320b953b1439e9c inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a4b648af0c9e45e8d9320b953b1439e9c"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>BeginBuild</b> ()</td></tr>
-<tr class="separator:a4b648af0c9e45e8d9320b953b1439e9c inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68c904dc46549bd6650615131a14d80b inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a68c904dc46549bd6650615131a14d80b"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>EndBuild</b> (dFloat64 tol, bool fixTjoint=true)</td></tr>
-<tr class="separator:a68c904dc46549bd6650615131a14d80b inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0436dd42f2d5af528c9379e26793c2ea inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a0436dd42f2d5af528c9379e26793c2ea"></a>
-D_CORE_API <a class="el" href="classd_big_vector.html">dBigVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetOrigin</b> () const</td></tr>
-<tr class="separator:a0436dd42f2d5af528c9379e26793c2ea inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adecfe26a36a5dbcc57c2e85bdc2bbdcd inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="adecfe26a36a5dbcc57c2e85bdc2bbdcd"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>SphericalMapping</b> (dInt32 material, const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;uvAligment)</td></tr>
-<tr class="separator:adecfe26a36a5dbcc57c2e85bdc2bbdcd inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac70454cb9e42ef62e2c1d22f86d367f inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="aac70454cb9e42ef62e2c1d22f86d367f"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>UniformBoxMapping</b> (dInt32 material, const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;textureMatrix)</td></tr>
-<tr class="separator:aac70454cb9e42ef62e2c1d22f86d367f inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a0ee699cef7c5dd81ee8a7ef8d93ae3 inherit pub_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a8a0ee699cef7c5dd81ee8a7ef8d93ae3"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>BoxMapping</b> (dInt32 front, dInt32 side, dInt32 top, const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;uvAligment)</td></tr>
-<tr class="separator:a8a0ee699cef7c5dd81ee8a7ef8d93ae3 inherit pub_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a75da7560eb9e21b8abc2951092c198d6 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9521afd2856364aaa8cf3f7474868b87 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a9521afd2856364aaa8cf3f7474868b87"></a>
+dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetVertexCount</b> () const</td></tr>
+<tr class="separator:a9521afd2856364aaa8cf3f7474868b87 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6c39b2adae9e4f7362ef47925c9b872 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ae6c39b2adae9e4f7362ef47925c9b872"></a>
+dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetVertexStrideInByte</b> () const</td></tr>
+<tr class="separator:ae6c39b2adae9e4f7362ef47925c9b872 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cf8a0a42e6cc92bcc49d36c43b0a6b1 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a0cf8a0a42e6cc92bcc49d36c43b0a6b1"></a>
+const dFloat64 *&#160;</td><td class="memItemRight" valign="bottom"><b>GetVertexPool</b> () const</td></tr>
+<tr class="separator:a0cf8a0a42e6cc92bcc49d36c43b0a6b1 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61244c2ce5835cc0ded9d0c18c07190a inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a61244c2ce5835cc0ded9d0c18c07190a"></a>
+dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetFaceMaterial</b> (<a class="el" href="classd_edge.html">dEdge</a> *const faceEdge) const</td></tr>
+<tr class="separator:a61244c2ce5835cc0ded9d0c18c07190a inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9049a638ced0a75a7f5971d4608e0d74 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a9049a638ced0a75a7f5971d4608e0d74"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>ApplyTransform</b> (const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;matrix)</td></tr>
+<tr class="separator:a9049a638ced0a75a7f5971d4608e0d74 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a388ffa9a1ee29d08c06de44df5f9e777 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a388ffa9a1ee29d08c06de44df5f9e777"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateNormals</b> (dFloat64 angleInRadians)</td></tr>
+<tr class="separator:a388ffa9a1ee29d08c06de44df5f9e777 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10922f824170d3172bc9d8ef0eb28479 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a10922f824170d3172bc9d8ef0eb28479"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>BuildFromIndexList</b> (const <a class="el" href="classnd_mesh_effect_1_1d_mesh_vertex_format.html">dMeshVertexFormat</a> *const format)</td></tr>
+<tr class="separator:a10922f824170d3172bc9d8ef0eb28479 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86d8765c9210d6baa49035aab6a7c9a3 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a86d8765c9210d6baa49035aab6a7c9a3"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetVertexChannel64</b> (dInt32 strideInByte, dFloat64 *const bufferOut) const</td></tr>
+<tr class="separator:a86d8765c9210d6baa49035aab6a7c9a3 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d6dee31993165e1b702caaecabfaf2a inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a3d6dee31993165e1b702caaecabfaf2a"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetVertexChannel</b> (dInt32 strideInByte, dFloat32 *const bufferOut) const</td></tr>
+<tr class="separator:a3d6dee31993165e1b702caaecabfaf2a inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51cc22080309c4d8197b524d466dc05f inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a51cc22080309c4d8197b524d466dc05f"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetNormalChannel</b> (dInt32 strideInByte, dFloat32 *const bufferOut) const</td></tr>
+<tr class="separator:a51cc22080309c4d8197b524d466dc05f inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30da8d1fd76bb69efced5af5a927925e inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a30da8d1fd76bb69efced5af5a927925e"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetBinormalChannel</b> (dInt32 strideInByte, dFloat32 *const bufferOut) const</td></tr>
+<tr class="separator:a30da8d1fd76bb69efced5af5a927925e inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa864e35afa7b9fbed0a596c766dad814 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="aa864e35afa7b9fbed0a596c766dad814"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetUV0Channel</b> (dInt32 strideInByte, dFloat32 *const bufferOut) const</td></tr>
+<tr class="separator:aa864e35afa7b9fbed0a596c766dad814 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a779cdd0e570a4f5fba9bda862eeff183 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a779cdd0e570a4f5fba9bda862eeff183"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetUV1Channel</b> (dInt32 strideInByte, dFloat32 *const bufferOut) const</td></tr>
+<tr class="separator:a779cdd0e570a4f5fba9bda862eeff183 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e8ecbe1139ea69071e8f7bcbd195eb0 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a0e8ecbe1139ea69071e8f7bcbd195eb0"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetVertexColorChannel</b> (dInt32 strideInByte, dFloat32 *const bufferOut) const</td></tr>
+<tr class="separator:a0e8ecbe1139ea69071e8f7bcbd195eb0 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4a6d7e53df0a3a06e11b20c271df7b2 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="af4a6d7e53df0a3a06e11b20c271df7b2"></a>
+D_COLLISION_API <a class="el" href="classnd_index_array.html">ndIndexArray</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>MaterialGeometryBegin</b> ()</td></tr>
+<tr class="separator:af4a6d7e53df0a3a06e11b20c271df7b2 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd89a82be0347ea7c042729c73b57227 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="afd89a82be0347ea7c042729c73b57227"></a>
+D_COLLISION_API dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetFirstMaterial</b> (<a class="el" href="classnd_index_array.html">ndIndexArray</a> *const handle) const</td></tr>
+<tr class="separator:afd89a82be0347ea7c042729c73b57227 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0cd4de13479b9b3f9bc75326a155235 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ac0cd4de13479b9b3f9bc75326a155235"></a>
+D_COLLISION_API dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetNextMaterial</b> (<a class="el" href="classnd_index_array.html">ndIndexArray</a> *const handle, dInt32 materialHandle) const</td></tr>
+<tr class="separator:ac0cd4de13479b9b3f9bc75326a155235 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b232daf9c6f52a775b076138f56278a inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a5b232daf9c6f52a775b076138f56278a"></a>
+D_COLLISION_API dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaterialID</b> (<a class="el" href="classnd_index_array.html">ndIndexArray</a> *const handle, dInt32 materialHandle) const</td></tr>
+<tr class="separator:a5b232daf9c6f52a775b076138f56278a inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a373896e50071dfa60dc63ea82583236d inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a373896e50071dfa60dc63ea82583236d"></a>
+D_COLLISION_API dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaterialIndexCount</b> (<a class="el" href="classnd_index_array.html">ndIndexArray</a> *const handle, dInt32 materialHandle) const</td></tr>
+<tr class="separator:a373896e50071dfa60dc63ea82583236d inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf4e84769ae046367fe1f41583dd637b inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="abf4e84769ae046367fe1f41583dd637b"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaterialGetIndexStream</b> (<a class="el" href="classnd_index_array.html">ndIndexArray</a> *const handle, dInt32 materialHandle, dInt32 *const index) const</td></tr>
+<tr class="separator:abf4e84769ae046367fe1f41583dd637b inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f79be08d9a019eb952810d35c112164 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a9f79be08d9a019eb952810d35c112164"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaterialGetIndexStreamShort</b> (<a class="el" href="classnd_index_array.html">ndIndexArray</a> *const handle, dInt32 materialHandle, dInt16 *const index) const</td></tr>
+<tr class="separator:a9f79be08d9a019eb952810d35c112164 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26a53fb504b2ad1cd3e62abf594719fa inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a26a53fb504b2ad1cd3e62abf594719fa"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>MaterialGeomteryEnd</b> (<a class="el" href="classnd_index_array.html">ndIndexArray</a> *const handle)</td></tr>
+<tr class="separator:a26a53fb504b2ad1cd3e62abf594719fa inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7dd0b60f308f7f15e4d6752af5374a0b inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a7dd0b60f308f7f15e4d6752af5374a0b"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>BeginBuild</b> ()</td></tr>
+<tr class="separator:a7dd0b60f308f7f15e4d6752af5374a0b inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a767c15e456689dd4659229c1ea0030f2 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a767c15e456689dd4659229c1ea0030f2"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>EndBuild</b> (dFloat64 tol, bool fixTjoint=true)</td></tr>
+<tr class="separator:a767c15e456689dd4659229c1ea0030f2 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7858c7a15b76f330759bc62ca55306f3 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a7858c7a15b76f330759bc62ca55306f3"></a>
+D_COLLISION_API <a class="el" href="classd_big_vector.html">dBigVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetOrigin</b> () const</td></tr>
+<tr class="separator:a7858c7a15b76f330759bc62ca55306f3 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3f8c1921ba6585852fafb4d7405259c inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ae3f8c1921ba6585852fafb4d7405259c"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>SphericalMapping</b> (dInt32 material, const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;uvAligment)</td></tr>
+<tr class="separator:ae3f8c1921ba6585852fafb4d7405259c inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a297cf361afa7ef552e7ac2d2b166c1a0 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a297cf361afa7ef552e7ac2d2b166c1a0"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>UniformBoxMapping</b> (dInt32 material, const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;textureMatrix)</td></tr>
+<tr class="separator:a297cf361afa7ef552e7ac2d2b166c1a0 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2805af65267378cccccbbeb33e8b4207 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a2805af65267378cccccbbeb33e8b4207"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>BoxMapping</b> (dInt32 front, dInt32 side, dInt32 top, const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;uvAligment)</td></tr>
+<tr class="separator:a2805af65267378cccccbbeb33e8b4207 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66a004522b32fa2f2eb5c7c744b795f5 inherit pub_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a66a004522b32fa2f2eb5c7c744b795f5"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>RepairTJoints</b> ()</td></tr>
+<tr class="separator:a66a004522b32fa2f2eb5c7c744b795f5 inherit pub_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classd_polyhedra"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classd_polyhedra')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classd_polyhedra.html">dPolyhedra</a></td></tr>
 <tr class="memitem:a6ac894a1736e758414b2756be6c940ec inherit pub_methods_classd_polyhedra"><td class="memItemLeft" align="right" valign="top"><a id="a6ac894a1736e758414b2756be6c940ec"></a>
 D_CORE_API&#160;</td><td class="memItemRight" valign="bottom"><b>dPolyhedra</b> (const <a class="el" href="classd_polyhedra.html">dPolyhedra</a> &amp;polyhedra)</td></tr>
@@ -306,9 +336,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a7971d84738e604d38afac60b2eb1f4bc inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a7971d84738e604d38afac60b2eb1f4bc"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>operator dInt32</b> () const</td></tr>
 <tr class="separator:a7971d84738e604d38afac60b2eb1f4bc inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a8c13a5e90eaa05619d87714844e213 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a2a8c13a5e90eaa05619d87714844e213"></a>
-dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetCount</b> () const</td></tr>
-<tr class="separator:a2a8c13a5e90eaa05619d87714844e213 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5729c1e4875b33faebc10875449c862 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="af5729c1e4875b33faebc10875449c862"></a>
+const dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetCount</b> () const</td></tr>
+<tr class="separator:af5729c1e4875b33faebc10875449c862 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3676a0909152317356d9d8cc11516b85 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a3676a0909152317356d9d8cc11516b85"></a>
 dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>GetRoot</b> () const</td></tr>
 <tr class="separator:a3676a0909152317356d9d8cc11516b85 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -324,18 +354,21 @@ dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Find</b> (dEdg
 <tr class="memitem:a6e34585dac4874749f63b4de4d57e8df inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a6e34585dac4874749f63b4de4d57e8df"></a>
 dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindGreater</b> (dEdgeKey key) const</td></tr>
 <tr class="separator:a6e34585dac4874749f63b4de4d57e8df inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18a8083f5208bd7490993d062b5ccc47 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a18a8083f5208bd7490993d062b5ccc47"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindGreaterEqual</b> (dEdgeKey key) const</td></tr>
-<tr class="separator:a18a8083f5208bd7490993d062b5ccc47 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c4b8e56f3eecbea2433695cada781ad inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a3c4b8e56f3eecbea2433695cada781ad"></a>
 dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindLessEqual</b> (dEdgeKey key) const</td></tr>
 <tr class="separator:a3c4b8e56f3eecbea2433695cada781ad inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18a8083f5208bd7490993d062b5ccc47 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a18a8083f5208bd7490993d062b5ccc47"></a>
+dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindGreaterEqual</b> (dEdgeKey key) const</td></tr>
+<tr class="separator:a18a8083f5208bd7490993d062b5ccc47 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f23a4fa25dd16132848a3bf129597bf inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a6f23a4fa25dd16132848a3bf129597bf"></a>
+dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>FindCreate</b> (dEdgeKey key, bool &amp;wasFound)</td></tr>
+<tr class="separator:a6f23a4fa25dd16132848a3bf129597bf inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65e3bf09ae59d0a9cf2b4fe06f5d9d12 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a65e3bf09ae59d0a9cf2b4fe06f5d9d12"></a>
 dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>GetNodeFromInfo</b> (<a class="el" href="classd_edge.html">dEdge</a> &amp;info) const</td></tr>
 <tr class="separator:a65e3bf09ae59d0a9cf2b4fe06f5d9d12 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8506642722bf36d08c9a1aa2ae534c28 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a8506642722bf36d08c9a1aa2ae534c28"></a>
-dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Insert</b> (const <a class="el" href="classd_edge.html">dEdge</a> &amp;element, dEdgeKey key, bool &amp;elementWasInTree)</td></tr>
-<tr class="separator:a8506642722bf36d08c9a1aa2ae534c28 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23907b4618f0a2a2e75df06645059e9d inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a23907b4618f0a2a2e75df06645059e9d"></a>
+dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Insert</b> (const <a class="el" href="classd_edge.html">dEdge</a> &amp;element, dEdgeKey key, bool &amp;wasFound)</td></tr>
+<tr class="separator:a23907b4618f0a2a2e75df06645059e9d inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90c14007977c92a9631075f637225289 inherit pub_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="a90c14007977c92a9631075f637225289"></a>
 dTreeNode *&#160;</td><td class="memItemRight" valign="bottom"><b>Insert</b> (const <a class="el" href="classd_edge.html">dEdge</a> &amp;element, dEdgeKey key)</td></tr>
 <tr class="separator:a90c14007977c92a9631075f637225289 inherit pub_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -372,6 +405,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>SanityCheck</b> () co
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_static_methods_classnd_mesh_effect"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classnd_mesh_effect')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classnd_mesh_effect.html">ndMeshEffect</a></td></tr>
+<tr class="memitem:a288e679a424c7a42e9f52e2597b218b6 inherit pub_static_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a288e679a424c7a42e9f52e2597b218b6"></a>
+static D_COLLISION_API <a class="el" href="classnd_mesh_effect.html">ndMeshEffect</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>CreateVoronoiConvexDecomposition</b> (dInt32 pointCount, dInt32 pointStrideInBytes, const dFloat32 *const pointCloud, dInt32 materialId, const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;textureProjectionMatrix)</td></tr>
+<tr class="separator:a288e679a424c7a42e9f52e2597b218b6 inherit pub_static_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_static_methods_classd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classd_class_alloc.html">dClassAlloc</a></td></tr>
 <tr class="memitem:ae74817104a54a91a0ed1f74fb1733540 inherit pub_static_methods_classd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="ae74817104a54a91a0ed1f74fb1733540"></a>
 static D_CORE_API void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#ae74817104a54a91a0ed1f74fb1733540">Malloc</a> (size_t size)</td></tr>
@@ -385,34 +422,38 @@ static D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a cla
 <tr class="memitem:aeb65c1ea1a74898400b0599cea8cb9b7 inherit pub_static_methods_classd_tree"><td class="memItemLeft" align="right" valign="top"><a id="aeb65c1ea1a74898400b0599cea8cb9b7"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>FlushFreeList</b> ()</td></tr>
 <tr class="separator:aeb65c1ea1a74898400b0599cea8cb9b7 inherit pub_static_methods_classd_tree"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_methods_classd_mesh_effect"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classd_mesh_effect')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classd_mesh_effect.html">dMeshEffect</a></td></tr>
-<tr class="memitem:a354d9e3be164c86ea5bf90e989f4360e inherit pro_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a354d9e3be164c86ea5bf90e989f4360e"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Init</b> ()</td></tr>
-<tr class="separator:a354d9e3be164c86ea5bf90e989f4360e inherit pro_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acbf33f45e9abf2c235c8f40ca06eaf64 inherit pro_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="acbf33f45e9abf2c235c8f40ca06eaf64"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>RepairTJoints</b> ()</td></tr>
-<tr class="separator:acbf33f45e9abf2c235c8f40ca06eaf64 inherit pro_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5bd2b99c3185a84ea07af468e4032ed8 inherit pro_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a5bd2b99c3185a84ea07af468e4032ed8"></a>
-virtual D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>BeginFace</b> ()</td></tr>
-<tr class="separator:a5bd2b99c3185a84ea07af468e4032ed8 inherit pro_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac80de45e8b064dc6f2df281e4c3c6292 inherit pro_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ac80de45e8b064dc6f2df281e4c3c6292"></a>
-virtual D_CORE_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>EndFace</b> ()</td></tr>
-<tr class="separator:ac80de45e8b064dc6f2df281e4c3c6292 inherit pro_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb4611fc1d3a2067eb131033a5a6baa4 inherit pro_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="acb4611fc1d3a2067eb131033a5a6baa4"></a>
+<tr class="inherit_header pub_attribs_classnd_mesh_effect"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classnd_mesh_effect')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classnd_mesh_effect.html">ndMeshEffect</a></td></tr>
+<tr class="memitem:ab365419f57a8c0e9fbf54607c191ee7d inherit pub_attribs_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ab365419f57a8c0e9fbf54607c191ee7d"></a>
+D_MSV_NEWTON_ALIGN_16 class <a class="el" href="classnd_mesh_effect_1_1d_material.html">ndMeshEffect::dMaterial</a>&#160;</td><td class="memItemRight" valign="bottom"><b>D_GCC_NEWTON_ALIGN_16</b></td></tr>
+<tr class="separator:ab365419f57a8c0e9fbf54607c191ee7d inherit pub_attribs_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_classnd_mesh_effect"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classnd_mesh_effect')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classnd_mesh_effect.html">ndMeshEffect</a></td></tr>
+<tr class="memitem:a345f80bbe59c8f2120d408425163ab1c inherit pro_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a345f80bbe59c8f2120d408425163ab1c"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Init</b> ()</td></tr>
+<tr class="separator:a345f80bbe59c8f2120d408425163ab1c inherit pro_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa150238e789f54ca86eed3ddcd2f1d37 inherit pro_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="aa150238e789f54ca86eed3ddcd2f1d37"></a>
+virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>BeginFace</b> ()</td></tr>
+<tr class="separator:aa150238e789f54ca86eed3ddcd2f1d37 inherit pro_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aabe58a19df9eab403ebdde12383903d4 inherit pro_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="aabe58a19df9eab403ebdde12383903d4"></a>
+virtual D_COLLISION_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>EndFace</b> ()</td></tr>
+<tr class="separator:aabe58a19df9eab403ebdde12383903d4 inherit pro_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ffb718a7aa5f7020c483b28e5287d38 inherit pro_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a4ffb718a7aa5f7020c483b28e5287d38"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Sanity</b> () const</td></tr>
-<tr class="separator:acb4611fc1d3a2067eb131033a5a6baa4 inherit pro_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2987128978a95fffd8bb84efe04dfc21 inherit pro_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a2987128978a95fffd8bb84efe04dfc21"></a>
+<tr class="separator:a4ffb718a7aa5f7020c483b28e5287d38 inherit pro_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69f6d8cbe1af91908b436751687e6b5d inherit pro_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a69f6d8cbe1af91908b436751687e6b5d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>PackAttibuteData</b> ()</td></tr>
-<tr class="separator:a2987128978a95fffd8bb84efe04dfc21 inherit pro_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a692591764ed087c21effe9d318d2cef8 inherit pro_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a692591764ed087c21effe9d318d2cef8"></a>
+<tr class="separator:a69f6d8cbe1af91908b436751687e6b5d inherit pro_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad77af87bea534f3b255bbb3b8bb701bf inherit pro_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ad77af87bea534f3b255bbb3b8bb701bf"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>UnpackAttibuteData</b> ()</td></tr>
-<tr class="separator:a692591764ed087c21effe9d318d2cef8 inherit pro_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace8ab469b9c1040c6f13cf9e3ed07ee1 inherit pro_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ace8ab469b9c1040c6f13cf9e3ed07ee1"></a>
+<tr class="separator:ad77af87bea534f3b255bbb3b8bb701bf inherit pro_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0688683dc8c45980c3864b8f14eaa38a inherit pro_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a0688683dc8c45980c3864b8f14eaa38a"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>SeparateDuplicateLoops</b> (<a class="el" href="classd_edge.html">dEdge</a> *const face)</td></tr>
-<tr class="separator:ace8ab469b9c1040c6f13cf9e3ed07ee1 inherit pro_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a3c260de16fe0ab84145f6a1c15f17d inherit pro_methods_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a0a3c260de16fe0ab84145f6a1c15f17d"></a>
+<tr class="separator:a0688683dc8c45980c3864b8f14eaa38a inherit pro_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad90733a980a9509ba4a059af4fefc69c inherit pro_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ad90733a980a9509ba4a059af4fefc69c"></a>
 dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>AddInterpolatedHalfAttribute</b> (<a class="el" href="classd_edge.html">dEdge</a> *const edge, dInt32 midPoint)</td></tr>
-<tr class="separator:a0a3c260de16fe0ab84145f6a1c15f17d inherit pro_methods_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:ad90733a980a9509ba4a059af4fefc69c inherit pro_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1865f7bbe6ebb67697dd6724312174d3 inherit pro_methods_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a1865f7bbe6ebb67697dd6724312174d3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>MergeFaces</b> (const <a class="el" href="classnd_mesh_effect.html">ndMeshEffect</a> *const source)</td></tr>
+<tr class="separator:a1865f7bbe6ebb67697dd6724312174d3 inherit pro_methods_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classd_polyhedra"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classd_polyhedra')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classd_polyhedra.html">dPolyhedra</a></td></tr>
 <tr class="memitem:a14f620d0deeda1a4baa9fb6087711d34 inherit pro_methods_classd_polyhedra"><td class="memItemLeft" align="right" valign="top"><a id="a14f620d0deeda1a4baa9fb6087711d34"></a>
 D_CORE_API <a class="el" href="classd_edge.html">dEdge</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>CollapseEdge</b> (<a class="el" href="classd_edge.html">dEdge</a> *const edge)</td></tr>
@@ -423,19 +464,25 @@ D_CORE_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>Polygonize
 <tr class="memitem:a41809aad7158aea59e459c64d8336755 inherit pro_methods_classd_polyhedra"><td class="memItemLeft" align="right" valign="top"><a id="a41809aad7158aea59e459c64d8336755"></a>
 D_CORE_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>TriangulateFace</b> (<a class="el" href="classd_edge.html">dEdge</a> *const face, const dFloat64 *const pool, dInt32 stride)</td></tr>
 <tr class="separator:a41809aad7158aea59e459c64d8336755 inherit pro_methods_classd_polyhedra"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_attribs_classd_mesh_effect"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classd_mesh_effect')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classd_mesh_effect.html">dMeshEffect</a></td></tr>
-<tr class="memitem:aa6215204b8b44be07f5f5f06e18b8b09 inherit pro_attribs_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="aa6215204b8b44be07f5f5f06e18b8b09"></a>
+<tr class="inherit_header pro_attribs_classnd_mesh_effect"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classnd_mesh_effect')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classnd_mesh_effect.html">ndMeshEffect</a></td></tr>
+<tr class="memitem:a24996ead59e98dd36a5e4b543150aeb1 inherit pro_attribs_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a24996ead59e98dd36a5e4b543150aeb1"></a>
+<a class="el" href="classd_string.html">dString</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_name</b></td></tr>
+<tr class="separator:a24996ead59e98dd36a5e4b543150aeb1 inherit pro_attribs_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef2565b4b4ade65cebdb6f7805f3f667 inherit pro_attribs_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="aef2565b4b4ade65cebdb6f7805f3f667"></a>
 dPointFormat&#160;</td><td class="memItemRight" valign="bottom"><b>m_points</b></td></tr>
-<tr class="separator:aa6215204b8b44be07f5f5f06e18b8b09 inherit pro_attribs_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d63e816fb0455d5d37ba7943ab3bce6 inherit pro_attribs_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a1d63e816fb0455d5d37ba7943ab3bce6"></a>
+<tr class="separator:aef2565b4b4ade65cebdb6f7805f3f667 inherit pro_attribs_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cce27d1ca4c9b617b37fb35bb2f195f inherit pro_attribs_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a3cce27d1ca4c9b617b37fb35bb2f195f"></a>
 dAttibutFormat&#160;</td><td class="memItemRight" valign="bottom"><b>m_attrib</b></td></tr>
-<tr class="separator:a1d63e816fb0455d5d37ba7943ab3bce6 inherit pro_attribs_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a3a4a209b1f9f2fdd8deb1672452a3f inherit pro_attribs_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a1a3a4a209b1f9f2fdd8deb1672452a3f"></a>
+<tr class="separator:a3cce27d1ca4c9b617b37fb35bb2f195f inherit pro_attribs_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4f53963fa13133efb63420e70ce1bc8c inherit pro_attribs_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="a4f53963fa13133efb63420e70ce1bc8c"></a>
+<a class="el" href="classd_array.html">dArray</a>&lt; <a class="el" href="classnd_mesh_effect_1_1d_material.html">dMaterial</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_materials</b></td></tr>
+<tr class="separator:a4f53963fa13133efb63420e70ce1bc8c inherit pro_attribs_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab86a2687886e0734b641f89c0f97e8ed inherit pro_attribs_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ab86a2687886e0734b641f89c0f97e8ed"></a>
 dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_vertexBaseCount</b></td></tr>
-<tr class="separator:a1a3a4a209b1f9f2fdd8deb1672452a3f inherit pro_attribs_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab6f5ffb43ce0f35167d73c726fd0494a inherit pro_attribs_classd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ab6f5ffb43ce0f35167d73c726fd0494a"></a>
+<tr class="separator:ab86a2687886e0734b641f89c0f97e8ed inherit pro_attribs_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad72029c48edc499928969b0c11a60431 inherit pro_attribs_classnd_mesh_effect"><td class="memItemLeft" align="right" valign="top"><a id="ad72029c48edc499928969b0c11a60431"></a>
 dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_constructionIndex</b></td></tr>
-<tr class="separator:ab6f5ffb43ce0f35167d73c726fd0494a inherit pro_attribs_classd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:ad72029c48edc499928969b0c11a60431 inherit pro_attribs_classnd_mesh_effect"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->

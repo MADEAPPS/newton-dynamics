@@ -1,5 +1,6 @@
 var classnd_body_player_capsule =
 [
+    [ "ndBodyPlayerCapsule", "classnd_body_player_capsule.html#a50da12613575dcdafa2b122f9c983273", null ],
     [ "ndBodyPlayerCapsule", "classnd_body_player_capsule.html#a795d0c0ccee3811e1350321cc6be797f", null ],
     [ "~ndBodyPlayerCapsule", "classnd_body_player_capsule.html#a0cb8998dc88e7506d8aaf3c007346ba2", null ],
     [ "ApplyInputs", "classnd_body_player_capsule.html#aacd9fb0cf4d3d4ef4035d2419f8018e8", null ],
@@ -9,6 +10,7 @@ var classnd_body_player_capsule =
     [ "GetHeadingAngle", "classnd_body_player_capsule.html#a5c849dde8948eba5e4ed7539613aabfb", null ],
     [ "GetLateralSpeed", "classnd_body_player_capsule.html#ad43f933e9492b136e2cad38614847545", null ],
     [ "IsOnFloor", "classnd_body_player_capsule.html#ad39868539f151a84a759aaa27e43eea0", null ],
+    [ "Save", "classnd_body_player_capsule.html#ae6e5a3b1178833f62b8acab42d9adf20", null ],
     [ "SetForwardSpeed", "classnd_body_player_capsule.html#a567286c4a7c674c473a6cc7367b02a18", null ],
     [ "SetHeadingAngle", "classnd_body_player_capsule.html#a4ac1e9877398f8c8dbce7e549e4eb47b", null ],
     [ "SetLateralSpeed", "classnd_body_player_capsule.html#aa5217b81ccef9732153a6844a23adb48", null ],
@@ -25,6 +27,7 @@ var classnd_body_player_capsule =
     [ "m_lateralSpeed", "classnd_body_player_capsule.html#a8fd3fa458fe56e5e38de5104e9c51e5e", null ],
     [ "m_localFrame", "classnd_body_player_capsule.html#a35c92f15638bf57e256e0964fa594cf3", null ],
     [ "m_mass", "classnd_body_player_capsule.html#a89c211a95c5584bb9912fc3e5c2d33e1", null ],
+    [ "m_radius", "classnd_body_player_capsule.html#a34938a81b9297650179a360b6027a991", null ],
     [ "m_stepHeight", "classnd_body_player_capsule.html#a84be81d398cb4eba2580ee7efa2c7450", null ],
     [ "m_weistScale", "classnd_body_player_capsule.html#aaeaae147f6244552c9d07c3e2210e51e", null ]
 ];

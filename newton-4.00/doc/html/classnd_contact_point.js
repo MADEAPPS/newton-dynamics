@@ -5,6 +5,8 @@ var classnd_contact_point =
     [ "m_normal", "classnd_contact_point.html#ad4a6ed0d0e3acbcf3ec03ac7b028d6c1", null ],
     [ "m_penetration", "classnd_contact_point.html#aa364c2c98521cc9cd8807f8b804adced", null ],
     [ "m_point", "classnd_contact_point.html#ab0a5c0d395c99fdd61e0296e3f59b24f", null ],
+    [ "m_shapeId0", "classnd_contact_point.html#a2dee5312edac0476e8d311643e8d7712", null ],
+    [ "m_shapeId1", "classnd_contact_point.html#a09a041eb2499e20774542619656ccd65", null ],
     [ "m_shapeInstance0", "classnd_contact_point.html#a946799b10f045fb7ecb4d587260e74c0", null ],
     [ "m_shapeInstance1", "classnd_contact_point.html#a33e6dc3a6fcad0487a5241ec87359b1f", null ]
 ];

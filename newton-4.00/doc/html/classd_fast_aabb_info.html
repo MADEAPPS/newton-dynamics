@@ -94,6 +94,9 @@ $(document).ready(function(){initNavTree('classd_fast_aabb_info.html',''); initR
 
 <div class="header">
   <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="classd_fast_aabb_info-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">dFastAabbInfo Class Reference</div>  </div>
@@ -105,12 +108,28 @@ Inheritance diagram for dFastAabbInfo:</div>
  <div class="center">
   <img src="classd_fast_aabb_info.png" usemap="#dFastAabbInfo_map" alt=""/>
   <map id="dFastAabbInfo_map" name="dFastAabbInfo_map">
-<area href="classd_matrix.html" alt="dMatrix" shape="rect" coords="0,0,94,24"/>
+<area href="classd_matrix.html" alt="dMatrix" shape="rect" coords="0,0,132,24"/>
+<area href="classnd_polygon_mesh_desc.html" alt="ndPolygonMeshDesc" shape="rect" coords="0,112,132,136"/>
   </map>
 </div></div>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
-Additional Inherited Members</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a3bbc278ef5bcb1b6441d3ad9c16b3bfb"><td class="memItemLeft" align="right" valign="top"><a id="a3bbc278ef5bcb1b6441d3ad9c16b3bfb"></a>
+D_INLINE&#160;</td><td class="memItemRight" valign="bottom"><b>dFastAabbInfo</b> (const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;matrix, const <a class="el" href="classd_vector.html">dVector</a> &amp;size)</td></tr>
+<tr class="separator:a3bbc278ef5bcb1b6441d3ad9c16b3bfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02b7fcb9f8592cbbc955208bc913f696"><td class="memItemLeft" align="right" valign="top"><a id="a02b7fcb9f8592cbbc955208bc913f696"></a>
+D_INLINE&#160;</td><td class="memItemRight" valign="bottom"><b>dFastAabbInfo</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;p0, const <a class="el" href="classd_vector.html">dVector</a> &amp;p1)</td></tr>
+<tr class="separator:a02b7fcb9f8592cbbc955208bc913f696"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a187050c43e0ba9f16b2bb45e00d69a9c"><td class="memItemLeft" align="right" valign="top"><a id="a187050c43e0ba9f16b2bb45e00d69a9c"></a>
+D_INLINE void&#160;</td><td class="memItemRight" valign="bottom"><b>SetTransposeAbsMatrix</b> (const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;matrix)</td></tr>
+<tr class="separator:a187050c43e0ba9f16b2bb45e00d69a9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a285141192b9c1ed78e014c53c341c027"><td class="memItemLeft" align="right" valign="top"><a id="a285141192b9c1ed78e014c53c341c027"></a>
+D_INLINE dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>PolygonBoxRayDistance</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;faceNormal, dInt32 indexCount, const dInt32 *const indexArray, dInt32 stride, const dFloat32 *const vertexArray, const <a class="el" href="classd_fast_ray_test.html">dFastRayTest</a> &amp;ray) const</td></tr>
+<tr class="separator:a285141192b9c1ed78e014c53c341c027"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a737b00b464bd310abe7c127b86ae2db0"><td class="memItemLeft" align="right" valign="top"><a id="a737b00b464bd310abe7c127b86ae2db0"></a>
+D_INLINE dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>PolygonBoxDistance</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;faceNormal, dInt32 indexCount, const dInt32 *const indexArray, dInt32 stride, const dFloat32 *const vertexArray) const</td></tr>
+<tr class="separator:a737b00b464bd310abe7c127b86ae2db0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classd_matrix"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classd_matrix')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classd_matrix.html">dMatrix</a></td></tr>
 <tr class="memitem:a0658e7ed7ba39b66d0e6436ffde495d0 inherit pub_methods_classd_matrix"><td class="memItemLeft" align="right" valign="top"><a id="a0658e7ed7ba39b66d0e6436ffde495d0"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>dMatrix</b> (const dFloat32 *const array)</td></tr>
@@ -208,6 +227,33 @@ D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>PolarDecom
 <tr class="memitem:acf20f704dd5cd7c39fca78ac3b9810b9 inherit pub_methods_classd_matrix"><td class="memItemLeft" align="right" valign="top"><a id="acf20f704dd5cd7c39fca78ac3b9810b9"></a>
 D_CORE_API&#160;</td><td class="memItemRight" valign="bottom"><b>dMatrix</b> (const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;transformMatrix, const <a class="el" href="classd_vector.html">dVector</a> &amp;scale, const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;stretchAxis)</td></tr>
 <tr class="separator:acf20f704dd5cd7c39fca78ac3b9810b9 inherit pub_methods_classd_matrix"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:aaae0662fdb400357a2a84073ce3aa77f"><td class="memItemLeft" align="right" valign="top"><a id="aaae0662fdb400357a2a84073ce3aa77f"></a>
+<a class="el" href="classd_matrix.html">dMatrix</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_absDir</b></td></tr>
+<tr class="separator:aaae0662fdb400357a2a84073ce3aa77f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11fc367f0fc19d325a47624ac98f6c77"><td class="memItemLeft" align="right" valign="top"><a id="a11fc367f0fc19d325a47624ac98f6c77"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_p0</b></td></tr>
+<tr class="separator:a11fc367f0fc19d325a47624ac98f6c77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89f3633ab790ee0179dbefdad2f64a3d"><td class="memItemLeft" align="right" valign="top"><a id="a89f3633ab790ee0179dbefdad2f64a3d"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_p1</b></td></tr>
+<tr class="separator:a89f3633ab790ee0179dbefdad2f64a3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aedf53c6e6f6c2559adbe9880e3559793"><td class="memItemLeft" align="right" valign="top"><a id="aedf53c6e6f6c2559adbe9880e3559793"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_size</b></td></tr>
+<tr class="separator:aedf53c6e6f6c2559adbe9880e3559793"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91ccaa381b587749bbfebf31bca36bc6"><td class="memItemLeft" align="right" valign="top"><a id="a91ccaa381b587749bbfebf31bca36bc6"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_separationDistance</b></td></tr>
+<tr class="separator:a91ccaa381b587749bbfebf31bca36bc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:aef10a103794b65f7e1216054c83a7a56"><td class="memItemLeft" align="right" valign="top"><a id="aef10a103794b65f7e1216054c83a7a56"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>dAabbPolygonSoup</b></td></tr>
+<tr class="separator:aef10a103794b65f7e1216054c83a7a56"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pub_attribs_classd_matrix"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classd_matrix')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classd_matrix.html">dMatrix</a></td></tr>
 <tr class="memitem:ac9985bc7afefd327fa801fe4790e7b51 inherit pub_attribs_classd_matrix"><td class="memItemLeft" align="right" valign="top"><a id="ac9985bc7afefd327fa801fe4790e7b51"></a>
 <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_front</b></td></tr>

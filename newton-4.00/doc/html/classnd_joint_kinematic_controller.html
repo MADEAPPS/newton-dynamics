@@ -191,6 +191,9 @@ virtual <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *&#
 <tr class="memitem:ad86572d0bd059607c58137439a54744e inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="ad86572d0bd059607c58137439a54744e"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateGlobalMatrix</b> (<a class="el" href="classd_matrix.html">dMatrix</a> &amp;matrix0, <a class="el" href="classd_matrix.html">dMatrix</a> &amp;matrix1) const</td></tr>
 <tr class="separator:ad86572d0bd059607c58137439a54744e inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f664e8f1e68c9db40e5a4d1a7d14794 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a7f664e8f1e68c9db40e5a4d1a7d14794"></a>
+D_COLLISION_API dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateAngle</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;planeDir, const <a class="el" href="classd_vector.html">dVector</a> &amp;cosDir, const <a class="el" href="classd_vector.html">dVector</a> &amp;sinDir) const</td></tr>
+<tr class="separator:a7f664e8f1e68c9db40e5a4d1a7d14794 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa93804efa76ee8d19aab350660bb30c9 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="aa93804efa76ee8d19aab350660bb30c9"></a>
 virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>JointAccelerations</b> (<a class="el" href="classnd_joint_acceleration_decriptor.html">ndJointAccelerationDecriptor</a> *const desc)</td></tr>
 <tr class="separator:aa93804efa76ee8d19aab350660bb30c9 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -206,21 +209,48 @@ D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>AddLi
 <tr class="memitem:ad12f624e2699643002e152f7e9dd069f inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="ad12f624e2699643002e152f7e9dd069f"></a>
 virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>DebugJoint</b> (<a class="el" href="classnd_constraint_debug_callback.html">ndConstraintDebugCallback</a> &amp;debugCallback) const</td></tr>
 <tr class="separator:ad12f624e2699643002e152f7e9dd069f inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e7c41e9d51abb5ea3deab232a1703fa inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a1e7c41e9d51abb5ea3deab232a1703fa"></a>
-virtual dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetSolverModel</b> () const</td></tr>
-<tr class="separator:a1e7c41e9d51abb5ea3deab232a1703fa inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50bbfdf183189727049e38f51e884181 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a50bbfdf183189727049e38f51e884181"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>SetSolverModel</b> (dInt32 model)</td></tr>
-<tr class="separator:a50bbfdf183189727049e38f51e884181 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afdc0c732e945218ced6ca9b05a10c7e1 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="afdc0c732e945218ced6ca9b05a10c7e1"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetHighFriction</b> (<a class="el" href="classnd_constraint_descritor.html">ndConstraintDescritor</a> &amp;desc, dInt32 index, dFloat32 friction)</td></tr>
-<tr class="separator:afdc0c732e945218ced6ca9b05a10c7e1 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aadf7a34f058b3282b7f7b1e480bd0adc inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="aadf7a34f058b3282b7f7b1e480bd0adc"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetLowerFriction</b> (<a class="el" href="classnd_constraint_descritor.html">ndConstraintDescritor</a> &amp;desc, dInt32 index, dFloat32 friction)</td></tr>
-<tr class="separator:aadf7a34f058b3282b7f7b1e480bd0adc inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a63dbec199019e723a982a9c44007655e inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a63dbec199019e723a982a9c44007655e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetMotorAcceleration</b> (<a class="el" href="classnd_constraint_descritor.html">ndConstraintDescritor</a> &amp;desc, dInt32 index, dFloat32 acceleration)</td></tr>
-<tr class="separator:a63dbec199019e723a982a9c44007655e inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab62fb69ba5f5c10e3b3f718a56fd99f8 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="ab62fb69ba5f5c10e3b3f718a56fd99f8"></a>
+D_COLLISION_API dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateSpringDamperAcceleration</b> (dFloat32 dt, dFloat32 ks, dFloat32 x, dFloat32 kd, dFloat32 v) const</td></tr>
+<tr class="separator:ab62fb69ba5f5c10e3b3f718a56fd99f8 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a806bc6b304c77445b463151a482e3a5e inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a806bc6b304c77445b463151a482e3a5e"></a>
+const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetLocalMatrix0</b> () const</td></tr>
+<tr class="separator:a806bc6b304c77445b463151a482e3a5e inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada7b46c7479b79a74fb2256f8ac588cc inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="ada7b46c7479b79a74fb2256f8ac588cc"></a>
+const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetLocalMatrix1</b> () const</td></tr>
+<tr class="separator:ada7b46c7479b79a74fb2256f8ac588cc inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16d335b168521dc1215f9d4e4cb9a783 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a16d335b168521dc1215f9d4e4cb9a783"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetForceBody0</b> () const</td></tr>
+<tr class="separator:a16d335b168521dc1215f9d4e4cb9a783 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0b8628b043dfb704e80ac89ad4d0cad inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="ae0b8628b043dfb704e80ac89ad4d0cad"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetTorqueBody0</b> () const</td></tr>
+<tr class="separator:ae0b8628b043dfb704e80ac89ad4d0cad inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c6c08ed970686439e34653b630130db inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a1c6c08ed970686439e34653b630130db"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetForceBody1</b> () const</td></tr>
+<tr class="separator:a1c6c08ed970686439e34653b630130db inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af23d31d3270f98da212a65e5a3e8aaf3 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="af23d31d3270f98da212a65e5a3e8aaf3"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetTorqueBody1</b> () const</td></tr>
+<tr class="separator:af23d31d3270f98da212a65e5a3e8aaf3 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d7334448e8205b46a4addd6889c1b45 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a2d7334448e8205b46a4addd6889c1b45"></a>
+virtual ndJointBilateralSolverModel&#160;</td><td class="memItemRight" valign="bottom"><b>GetSolverModel</b> () const</td></tr>
+<tr class="separator:a2d7334448e8205b46a4addd6889c1b45 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3806e8ede1a3fba93bd770223f0ebfb3 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a3806e8ede1a3fba93bd770223f0ebfb3"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>SetSolverModel</b> (ndJointBilateralSolverModel model)</td></tr>
+<tr class="separator:a3806e8ede1a3fba93bd770223f0ebfb3 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1af4681eba886b0ec06909bb8f112b1 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="ae1af4681eba886b0ec06909bb8f112b1"></a>
+dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetMotorZeroAcceleration</b> (<a class="el" href="classnd_constraint_descritor.html">ndConstraintDescritor</a> &amp;desc) const</td></tr>
+<tr class="separator:ae1af4681eba886b0ec06909bb8f112b1 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add993bf08b62e565da2d774725ccae4d inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="add993bf08b62e565da2d774725ccae4d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetHighFriction</b> (<a class="el" href="classnd_constraint_descritor.html">ndConstraintDescritor</a> &amp;desc, dFloat32 friction)</td></tr>
+<tr class="separator:add993bf08b62e565da2d774725ccae4d inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affe02bdfa324617aaf5ef7d32af7117a inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="affe02bdfa324617aaf5ef7d32af7117a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetLowerFriction</b> (<a class="el" href="classnd_constraint_descritor.html">ndConstraintDescritor</a> &amp;desc, dFloat32 friction)</td></tr>
+<tr class="separator:affe02bdfa324617aaf5ef7d32af7117a inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aded680855b13d9db61be27d0b5bef112 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="aded680855b13d9db61be27d0b5bef112"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetMotorAcceleration</b> (<a class="el" href="classnd_constraint_descritor.html">ndConstraintDescritor</a> &amp;desc, dFloat32 acceleration)</td></tr>
+<tr class="separator:aded680855b13d9db61be27d0b5bef112 inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31578c16339e536ce66999d5e130e2be inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a31578c16339e536ce66999d5e130e2be"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>SetMassSpringDamperAcceleration</b> (<a class="el" href="classnd_constraint_descritor.html">ndConstraintDescritor</a> &amp;desc, dFloat32 spring, dFloat32 damper)</td></tr>
+<tr class="separator:a31578c16339e536ce66999d5e130e2be inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a526267776372cb6f0fe8daddc410c31a inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a526267776372cb6f0fe8daddc410c31a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetSkeletonFlag</b> (bool flag)</td></tr>
 <tr class="separator:a526267776372cb6f0fe8daddc410c31a inherit pub_methods_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -291,6 +321,18 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>m_autoSleepState</b><
 <tr class="memitem:ae6b031539779daf01a34a9bb47d25b9c inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="ae6b031539779daf01a34a9bb47d25b9c"></a>
 <a class="el" href="classd_matrix.html">dMatrix</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_localMatrix1</b></td></tr>
 <tr class="separator:ae6b031539779daf01a34a9bb47d25b9c inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a414c86931019f1e0af89bb2bb5bceb81 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a414c86931019f1e0af89bb2bb5bceb81"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_forceBody0</b></td></tr>
+<tr class="separator:a414c86931019f1e0af89bb2bb5bceb81 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a73d6073b7f101fc74386702a9d2dd0 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a0a73d6073b7f101fc74386702a9d2dd0"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_torqueBody0</b></td></tr>
+<tr class="separator:a0a73d6073b7f101fc74386702a9d2dd0 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa87187ea4838e716cef4c6c65f9b0a2 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="aaa87187ea4838e716cef4c6c65f9b0a2"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_forceBody1</b></td></tr>
+<tr class="separator:aaa87187ea4838e716cef4c6c65f9b0a2 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c50bf247fabed2f04894d38c6af0694 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a6c50bf247fabed2f04894d38c6af0694"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_torqueBody1</b></td></tr>
+<tr class="separator:a6c50bf247fabed2f04894d38c6af0694 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3105e1aa3efe4e55d8fc93a3424a715e inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a3105e1aa3efe4e55d8fc93a3424a715e"></a>
 <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_r0</b> [DG_BILATERAL_CONTRAINT_DOF]</td></tr>
 <tr class="separator:a3105e1aa3efe4e55d8fc93a3424a715e inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -318,15 +360,15 @@ ndJointList::dListNode *&#160;</td><td class="memItemRight" valign="bottom"><b>m
 <tr class="memitem:a9e1f9605ae5ac0df43000e5f11186ec0 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a9e1f9605ae5ac0df43000e5f11186ec0"></a>
 ndJointList::dListNode *&#160;</td><td class="memItemRight" valign="bottom"><b>m_body1Node</b></td></tr>
 <tr class="separator:a9e1f9605ae5ac0df43000e5f11186ec0 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7c03822718247e7ae301f8144df3b60 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="ad7c03822718247e7ae301f8144df3b60"></a>
+dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>m_maxAngleError</b></td></tr>
+<tr class="separator:ad7c03822718247e7ae301f8144df3b60 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a97c6633979f0c4b12cc686a78534888d inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a97c6633979f0c4b12cc686a78534888d"></a>
 dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>m_defualtDiagonalRegularizer</b></td></tr>
 <tr class="separator:a97c6633979f0c4b12cc686a78534888d inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a407447f25a040fe00a7d4febbd6a251e inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a407447f25a040fe00a7d4febbd6a251e"></a>
 dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_maxDof</b>: 6</td></tr>
 <tr class="separator:a407447f25a040fe00a7d4febbd6a251e inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a606b8fae52b4af58383489611a85086d inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a606b8fae52b4af58383489611a85086d"></a>
-dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_solverModel</b>: 2</td></tr>
-<tr class="separator:a606b8fae52b4af58383489611a85086d inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1cc9d439272fa831c989a457a9b1ca2a inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a1cc9d439272fa831c989a457a9b1ca2a"></a>
 dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_isInSkeleton</b>: 1</td></tr>
 <tr class="separator:a1cc9d439272fa831c989a457a9b1ca2a inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -339,6 +381,9 @@ dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_enableCollis
 <tr class="memitem:a09b1cea55892827a688d76d02803af73 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a09b1cea55892827a688d76d02803af73"></a>
 dInt8&#160;</td><td class="memItemRight" valign="bottom"><b>m_rowIsMotor</b></td></tr>
 <tr class="separator:a09b1cea55892827a688d76d02803af73 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9067e0412021042343eb68741c668030 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memItemLeft" align="right" valign="top"><a id="a9067e0412021042343eb68741c668030"></a>
+ndJointBilateralSolverModel&#160;</td><td class="memItemRight" valign="bottom"><b>m_solverModel</b></td></tr>
+<tr class="separator:a9067e0412021042343eb68741c668030 inherit pro_attribs_classnd_joint_bilateral_constraint"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>

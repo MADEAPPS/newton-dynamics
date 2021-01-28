@@ -9,7 +9,7 @@ var classd_string =
     [ "dString", "classd_string.html#a618884dccfab4dc693b8643f11a7caaa", null ],
     [ "dString", "classd_string.html#af977e30115c1df58e049a65a444bc3b2", null ],
     [ "~dString", "classd_string.html#abed67317cb73e5b966b18e2ba49a7274", null ],
-    [ "dString", "classd_string.html#a85e07a97e1166b34f4a072b97575be0e", null ],
+    [ "dString", "classd_string.html#a77e94f1009eb67627629d172eddb8549", null ],
     [ "AllocMem", "classd_string.html#a6a4e322e25404dcbc8a08298dbe478b7", null ],
     [ "Capacity", "classd_string.html#a937a7af77737c2c64e2d8a67426ec62d", null ],
     [ "Clear", "classd_string.html#ad87eec995a46122025920f900e9fdfe3", null ],

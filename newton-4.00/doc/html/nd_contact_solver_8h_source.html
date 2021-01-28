@@ -127,7 +127,7 @@ $(document).ready(function(){initNavTree('nd_contact_solver_8h_source.html','');
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">class </span><a class="code" href="classd_plane.html">dPlane</a>;</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">class </span><a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">//class ndContactPoint;</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">class </span><a class="code" href="classnd_polygon_mesh_desc.html">ndPolygonMeshDesc</a>;</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;D_MSV_NEWTON_ALIGN_32</div>
 <div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classnd_mink_face.html">   34</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_mink_face.html">ndMinkFace</a></div>
@@ -171,108 +171,123 @@ $(document).ready(function(){initNavTree('nd_contact_solver_8h_source.html','');
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    dInt32 ConvexContacts();</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    dInt32 CalculateConvexToConvexContacts();</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    dInt32 CalculatePairContacts(dInt32 threadIndex);</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    dFloat32 RayCast (<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; localP0, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; localP1, dFloat32 maxT, <a class="code" href="classnd_contact_point.html">ndContactPoint</a>&amp; contactOut);</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keyword">class </span>dgPerimenterEdge</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    {</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>* m_vertex;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        dgPerimenterEdge* m_next;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        dgPerimenterEdge* m_prev;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    };</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keyword">class </span>dgFaceFreeList</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        dgFaceFreeList* m_next;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    };</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    D_INLINE <a class="code" href="classnd_mink_face.html">ndMinkFace</a>* NewFace();</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    D_INLINE <span class="keywordtype">void</span> PushFace(<a class="code" href="classnd_mink_face.html">ndMinkFace</a>* <span class="keyword">const</span> face);</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    D_INLINE <span class="keywordtype">void</span> DeleteFace(<a class="code" href="classnd_mink_face.html">ndMinkFace</a>* <span class="keyword">const</span> face);</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    D_INLINE <a class="code" href="classnd_mink_face.html">ndMinkFace</a>* AddFace(dInt32 v0, dInt32 v1, dInt32 v2);</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    </div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="comment">//D_INLINE void TranslateSimplex(const dVector&amp; step);</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="comment">//D_INLINE dgPerimenterEdge* OldReduceContacts(dgPerimenterEdge* poly, dInt32 maxCount) const;</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="comment">//bool SanityCheck() const;</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    dInt32 CalculateClosestSimplex();</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordtype">bool</span> CalculateClosestPoints();</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    dInt32 ConvexToConvexContacts();</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    dInt32 CalculateIntersectingPlane(dInt32 count);</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    dInt32 PruneContacts(dInt32 count, dInt32 maxCount) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    dInt32 CalculateContacts(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; point0, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; point1, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; normal);</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    dInt32 ConvexPolygonsIntersection(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; normal, dInt32 count1, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> shape1, dInt32 count2, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> shape2, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> contactOut, dInt32 maxContacts) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    dInt32 ConvexPolygonToLineIntersection(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; normal, dInt32 count1, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> shape1, dInt32 count2, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> shape2, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> contactOut, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> mem) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    D_INLINE <a class="code" href="classd_big_vector.html">dBigVector</a> ReduceLine(dInt32&amp; indexOut);</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    D_INLINE <a class="code" href="classd_big_vector.html">dBigVector</a> ReduceTriangle (dInt32&amp; indexOut);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    D_INLINE <a class="code" href="classd_big_vector.html">dBigVector</a> ReduceTetrahedrum (dInt32&amp; indexOut);</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    D_INLINE <span class="keywordtype">void</span> SupportVertex(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; dir, dInt32 vertexIndex);</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    dInt32 CalculateConvexToSaticMeshContacts();</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    dInt32 CalculatePairContacts(dInt32 threadIndex);</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    dFloat32 RayCast (<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; localP0, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; localP1, <a class="code" href="classnd_contact_point.html">ndContactPoint</a>&amp; contactOut);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    </div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keyword">class </span>dgPerimenterEdge</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    {</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>* m_vertex;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        dgPerimenterEdge* m_next;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        dgPerimenterEdge* m_prev;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    };</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keyword">class </span>dgFaceFreeList</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    {</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        dgFaceFreeList* m_next;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    };</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    D_INLINE <a class="code" href="classnd_mink_face.html">ndMinkFace</a>* NewFace();</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    D_INLINE <span class="keywordtype">void</span> PushFace(<a class="code" href="classnd_mink_face.html">ndMinkFace</a>* <span class="keyword">const</span> face);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    D_INLINE <span class="keywordtype">void</span> DeleteFace(<a class="code" href="classnd_mink_face.html">ndMinkFace</a>* <span class="keyword">const</span> face);</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    D_INLINE <a class="code" href="classnd_mink_face.html">ndMinkFace</a>* AddFace(dInt32 v0, dInt32 v1, dInt32 v2);</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="comment">//D_INLINE void TranslateSimplex(const dVector&amp; step);</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="comment">//D_INLINE dgPerimenterEdge* OldReduceContacts(dgPerimenterEdge* poly, dInt32 maxCount) const;</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="comment">//bool SanityCheck() const;</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    dInt32 CalculateClosestSimplex();</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="keywordtype">bool</span> CalculateClosestPoints();</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    dInt32 ConvexToConvexContacts();</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    dInt32 ConvexToStaticMeshContacts();</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    dInt32 CalculateIntersectingPlane(dInt32 count);</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    dInt32 PruneContacts(dInt32 count, dInt32 maxCount) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    dInt32 PruneSupport(dInt32 count, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; dir, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> points) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    dInt32 CalculateContacts(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; point0, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; point1, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; normal);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    dInt32 Prune2dContacts(<span class="keyword">const</span> <a class="code" href="classd_matrix.html">dMatrix</a>&amp; matrix, dInt32 count, <a class="code" href="classnd_contact_point.html">ndContactPoint</a>* <span class="keyword">const</span> contactArray, dInt32 maxCount) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    dInt32 Prune3dContacts(<span class="keyword">const</span> <a class="code" href="classd_matrix.html">dMatrix</a>&amp; matrix, dInt32 count, <a class="code" href="classnd_contact_point.html">ndContactPoint</a>* <span class="keyword">const</span> contactArray, dInt32 maxCount) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    dInt32 ConvexPolygonsIntersection(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; normal, dInt32 count1, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> shape1, dInt32 count2, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> shape2, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> contactOut, dInt32 maxContacts) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    dInt32 ConvexPolygonToLineIntersection(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; normal, dInt32 count1, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> shape1, dInt32 count2, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> shape2, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> contactOut, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> mem) <span class="keyword">const</span>;</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    D_INLINE <span class="keywordtype">void</span> CalculateContactFromFeacture(dInt32 featureType);</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    dInt32 CalculatePolySoupToHullContactsDescrete(<a class="code" href="classnd_polygon_mesh_desc.html">ndPolygonMeshDesc</a>&amp; data);</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <a class="code" href="classnd_shape_instance.html">ndShapeInstance</a> m_instance0;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <a class="code" href="classnd_shape_instance.html">ndShapeInstance</a> m_instance1;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_closestPoint0;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_closestPoint1;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_separatingVector;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keyword">union</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    {</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        <a class="code" href="classd_vector.html">dVector</a> m_buffer[2 * D_CONVEX_MINK_MAX_POINTS];</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        <span class="keyword">struct</span></div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        {</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;            <a class="code" href="classd_vector.html">dVector</a> m_hullDiff[D_CONVEX_MINK_MAX_POINTS];</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;            <a class="code" href="classd_vector.html">dVector</a> m_hullSum[D_CONVEX_MINK_MAX_POINTS];</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        };</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    };</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <a class="code" href="classnd_contact.html">ndContact</a>* m_contact;</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    dgFaceFreeList* m_freeFace; </div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <a class="code" href="classnd_contact_point.html">ndContactPoint</a>* m_contactBuffer;</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    dFloat32 m_timestep;</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    dFloat32 m_separationDistance;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    dFloat32 m_skinThickness;</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160; </div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    dInt32 m_maxCount;</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    dInt32 m_vertexIndex;</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    dUnsigned32 m_ccdMode : 1;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    dUnsigned32 m_intersectionTestOnly : 1;</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    </div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    dInt32 m_faceIndex;</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <a class="code" href="classnd_mink_face.html">ndMinkFace</a>* m_faceStack[D_CONVEX_MINK_STACK_SIZE];</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <a class="code" href="classnd_mink_face.html">ndMinkFace</a>* m_coneFaceList[D_CONVEX_MINK_STACK_SIZE];</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <a class="code" href="classnd_mink_face.html">ndMinkFace</a>* m_deletedFaceList[D_CONVEX_MINK_STACK_SIZE];</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <a class="code" href="classnd_mink_face.html">ndMinkFace</a> m_facePool[D_CONVEX_MINK_MAX_FACES];</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    dInt8 m_heapBuffer[D_CONVEX_MINK_MAX_FACES * (<span class="keyword">sizeof</span> (dFloat32) + <span class="keyword">sizeof</span> (<a class="code" href="classnd_mink_face.html">ndMinkFace</a> *))];</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="keyword">static</span> <a class="code" href="classd_vector.html">dVector</a> m_hullDirs[14]; </div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keyword">static</span> dInt32 m_rayCastSimplex[4][4];</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160; </div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_scene.html">ndScene</a>;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_body_player_capsule_contact_solver.html">ndBodyPlayerCapsuleContactSolver</a>;</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;} D_GCC_NEWTON_ALIGN_32 ;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    D_INLINE <a class="code" href="classd_big_vector.html">dBigVector</a> ReduceLine(dInt32&amp; indexOut);</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    D_INLINE <a class="code" href="classd_big_vector.html">dBigVector</a> ReduceTriangle (dInt32&amp; indexOut);</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    D_INLINE <a class="code" href="classd_big_vector.html">dBigVector</a> ReduceTetrahedrum (dInt32&amp; indexOut);</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    D_INLINE <span class="keywordtype">void</span> SupportVertex(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; dir, dInt32 vertexIndex);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    D_INLINE <span class="keywordtype">void</span> CalculateContactFromFeacture(dInt32 featureType);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <a class="code" href="classnd_shape_instance.html">ndShapeInstance</a> m_instance0;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <a class="code" href="classnd_shape_instance.html">ndShapeInstance</a> m_instance1;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_closestPoint0;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_closestPoint1;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_separatingVector;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keyword">union</span></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    {</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <a class="code" href="classd_vector.html">dVector</a> m_buffer[2 * D_CONVEX_MINK_MAX_POINTS];</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        <span class="keyword">struct</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        {</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;            <a class="code" href="classd_vector.html">dVector</a> m_hullDiff[D_CONVEX_MINK_MAX_POINTS];</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;            <a class="code" href="classd_vector.html">dVector</a> m_hullSum[D_CONVEX_MINK_MAX_POINTS];</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        };</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    };</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <a class="code" href="classnd_contact.html">ndContact</a>* m_contact;</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    dgFaceFreeList* m_freeFace; </div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160; </div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <a class="code" href="classnd_contact_point.html">ndContactPoint</a>* m_contactBuffer;</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    dFloat32 m_timestep;</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    dFloat32 m_separationDistance;</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    dFloat32 m_skinThickness;</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160; </div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    dInt32 m_maxCount;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    dInt32 m_vertexIndex;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    dUnsigned32 m_ccdMode : 1;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    dUnsigned32 m_intersectionTestOnly : 1;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    </div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    dInt32 m_faceIndex;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <a class="code" href="classnd_mink_face.html">ndMinkFace</a>* m_faceStack[D_CONVEX_MINK_STACK_SIZE];</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <a class="code" href="classnd_mink_face.html">ndMinkFace</a>* m_coneFaceList[D_CONVEX_MINK_STACK_SIZE];</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <a class="code" href="classnd_mink_face.html">ndMinkFace</a>* m_deletedFaceList[D_CONVEX_MINK_STACK_SIZE];</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <a class="code" href="classnd_mink_face.html">ndMinkFace</a> m_facePool[D_CONVEX_MINK_MAX_FACES];</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    dInt8 m_heapBuffer[D_CONVEX_MINK_MAX_FACES * (<span class="keyword">sizeof</span> (dFloat32) + <span class="keyword">sizeof</span> (<a class="code" href="classnd_mink_face.html">ndMinkFace</a> *))];</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="preprocessor">#endif </span></div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; </div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keyword">static</span> <a class="code" href="classd_vector.html">dVector</a> m_pruneUpDir;</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keyword">static</span> <a class="code" href="classd_vector.html">dVector</a> m_pruneSupportX;</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keyword">static</span> <a class="code" href="classd_vector.html">dVector</a> m_hullDirs[14]; </div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keyword">static</span> dInt32 m_rayCastSimplex[4][4];</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160; </div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_scene.html">ndScene</a>;</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_polygon_mesh_desc.html">ndPolygonMeshDesc</a>;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_shape_convex_polygon.html">ndShapeConvexPolygon</a>;</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code" href="classnd_body_player_capsule_contact_solver.html">ndBodyPlayerCapsuleContactSolver</a>;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;} D_GCC_NEWTON_ALIGN_32 ;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;<span class="preprocessor">#endif </span></div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160; </div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160; </div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassd_down_heap_html"><div class="ttname"><a href="classd_down_heap.html">dDownHeap</a></div><div class="ttdef"><b>Definition:</b> dHeap.h:73</div></div>
+<div class="ttc" id="aclassnd_polygon_mesh_desc_html"><div class="ttname"><a href="classnd_polygon_mesh_desc.html">ndPolygonMeshDesc</a></div><div class="ttdef"><b>Definition:</b> ndShapeStaticMesh.h:42</div></div>
 <div class="ttc" id="aclassnd_scene_html"><div class="ttname"><a href="classnd_scene.html">ndScene</a></div><div class="ttdef"><b>Definition:</b> ndScene.h:60</div></div>
 <div class="ttc" id="aclassnd_contact_html"><div class="ttname"><a href="classnd_contact.html">ndContact</a></div><div class="ttdef"><b>Definition:</b> ndContact.h:107</div></div>
+<div class="ttc" id="aclassnd_shape_convex_polygon_html"><div class="ttname"><a href="classnd_shape_convex_polygon.html">ndShapeConvexPolygon</a></div><div class="ttdef"><b>Definition:</b> ndShapeConvexPolygon.h:32</div></div>
 <div class="ttc" id="aclassnd_contact_solver_html"><div class="ttname"><a href="classnd_contact_solver.html">ndContactSolver</a></div><div class="ttdef"><b>Definition:</b> ndContactSolver.h:59</div></div>
-<div class="ttc" id="aclassnd_body_player_capsule_contact_solver_html"><div class="ttname"><a href="classnd_body_player_capsule_contact_solver.html">ndBodyPlayerCapsuleContactSolver</a></div><div class="ttdef"><b>Definition:</b> ndBodyPlayerCapsule.cpp:39</div></div>
+<div class="ttc" id="aclassnd_body_player_capsule_contact_solver_html"><div class="ttname"><a href="classnd_body_player_capsule_contact_solver.html">ndBodyPlayerCapsuleContactSolver</a></div><div class="ttdef"><b>Definition:</b> ndBodyPlayerCapsule.cpp:40</div></div>
 <div class="ttc" id="aclassnd_contact_point_html"><div class="ttname"><a href="classnd_contact_point.html">ndContactPoint</a></div><div class="ttdef"><b>Definition:</b> ndContact.h:40</div></div>
 <div class="ttc" id="aclassd_big_vector_html"><div class="ttname"><a href="classd_big_vector.html">dBigVector</a></div><div class="ttdef"><b>Definition:</b> dVectorArmNeon.h:1521</div></div>
 <div class="ttc" id="aclassnd_body_kinematic_html"><div class="ttname"><a href="classnd_body_kinematic.html">ndBodyKinematic</a></div><div class="ttdef"><b>Definition:</b> ndBodyKinematic.h:37</div></div>
 <div class="ttc" id="aclassd_vector_html"><div class="ttname"><a href="classd_vector.html">dVector</a></div><div class="ttdef"><b>Definition:</b> dVectorArmNeon.h:1104</div></div>
+<div class="ttc" id="aclassd_matrix_html"><div class="ttname"><a href="classd_matrix.html">dMatrix</a></div><div class="ttdef"><b>Definition:</b> dMatrix.h:39</div></div>
 <div class="ttc" id="aclassnd_mink_face_html"><div class="ttname"><a href="classnd_mink_face.html">ndMinkFace</a></div><div class="ttdef"><b>Definition:</b> ndContactSolver.h:35</div></div>
 <div class="ttc" id="aclassd_plane_html"><div class="ttname"><a href="classd_plane.html">dPlane</a></div><div class="ttdef"><b>Definition:</b> dPlane.h:35</div></div>
 <div class="ttc" id="aclassnd_shape_instance_html"><div class="ttname"><a href="classnd_shape_instance.html">ndShapeInstance</a></div><div class="ttdef"><b>Definition:</b> ndShapeInstance.h:55</div></div>

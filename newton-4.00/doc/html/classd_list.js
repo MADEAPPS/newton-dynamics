@@ -11,7 +11,7 @@ var classd_list =
     [ "Append", "classd_list.html#abbfe2df68b0beb0263b0fa1db5d57e9b", null ],
     [ "Append", "classd_list.html#aa9c4841588af64e9419505abf43acd70", null ],
     [ "Find", "classd_list.html#a5231d9d810f1097d89fcd268a9b6e66e", null ],
-    [ "GetCount", "classd_list.html#a6605fa9c35922a7443ef1e5c8fbb8d4c", null ],
+    [ "GetCount", "classd_list.html#aa4943745087f96813184f33cb1e4b819", null ],
     [ "GetFirst", "classd_list.html#a38c31b42699c197686588595759a1dff", null ],
     [ "GetLast", "classd_list.html#a1d7288fb26d2e4812c0273dda3221641", null ],
     [ "GetNodeFromInfo", "classd_list.html#a8b96b815df9a3c4611c583da5525a8b3", null ],

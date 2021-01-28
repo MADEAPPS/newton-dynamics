@@ -1,0 +1,28 @@
+var classnd_shape_convex_polygon =
+[
+    [ "dgClippedFaceEdge", "classnd_shape_convex_polygon_1_1dg_clipped_face_edge.html", "classnd_shape_convex_polygon_1_1dg_clipped_face_edge" ],
+    [ "ndShapeConvexPolygon", "classnd_shape_convex_polygon.html#a83e99dd2a1d7bf774d1e6a45b4e8dcf2", null ],
+    [ "~ndShapeConvexPolygon", "classnd_shape_convex_polygon.html#aacaad65cab4372d1e287d2ba25ca76ce", null ],
+    [ "BeamClipping", "classnd_shape_convex_polygon.html#aa57b749baf6835e81ec6773dcd000242", null ],
+    [ "CalculateContactToConvexHullDescrete", "classnd_shape_convex_polygon.html#a52623661395fff288f21076557a77133", null ],
+    [ "CalculateGlobalNormal", "classnd_shape_convex_polygon.html#a82da40c04de9217304ab0d68d400e29f", null ],
+    [ "CalculatePlaneIntersection", "classnd_shape_convex_polygon.html#a11779ae545f0d37c0375a46b10e8b786", null ],
+    [ "GetAsShapeAsConvexPolygon", "classnd_shape_convex_polygon.html#a7d6659db1451bd15cf1ab6bb13123bae", null ],
+    [ "GetBoxMaxRadius", "classnd_shape_convex_polygon.html#a73915895cb05363a33870f4a27e276e8", null ],
+    [ "GetBoxMinRadius", "classnd_shape_convex_polygon.html#aad57656ca8ae143a83bac89a4e9321ab", null ],
+    [ "GetVolume", "classnd_shape_convex_polygon.html#ad7d9fd804b83109b95b1cedf67972a5d", null ],
+    [ "RayCast", "classnd_shape_convex_polygon.html#a0eaa6357df0baceb23ced85d8dbbe80d", null ],
+    [ "SupportVertex", "classnd_shape_convex_polygon.html#a183ce9846bc9517d2550d0068243afaf", null ],
+    [ "m_adjacentFaceEdgeNormalIndex", "classnd_shape_convex_polygon.html#a148442eeb22d1f3d8de97212d75adf95", null ],
+    [ "m_clippEdgeNormal", "classnd_shape_convex_polygon.html#ac860f1d3bc9e9769cff3f9b04b5060b6", null ],
+    [ "m_count", "classnd_shape_convex_polygon.html#aa6b88fdb1244025bc52a907bb9afc564", null ],
+    [ "m_faceClipSize", "classnd_shape_convex_polygon.html#a47d0a7f7a17a4aa201ebcaf4098dc2a5", null ],
+    [ "m_faceId", "classnd_shape_convex_polygon.html#a21b762e1ebc51d3683cda840faeffec7", null ],
+    [ "m_faceNormalIndex", "classnd_shape_convex_polygon.html#a0fa0192bff59514de0a415b06f606db3", null ],
+    [ "m_localPoly", "classnd_shape_convex_polygon.html#ad762e25f575903aa4cbc4b593760ced3", null ],
+    [ "m_normal", "classnd_shape_convex_polygon.html#ac0b9e3b28ca55725b256fc8d5f666939", null ],
+    [ "m_paddedCount", "classnd_shape_convex_polygon.html#ae86851086ebad639eb703d22528f0b20", null ],
+    [ "m_stride", "classnd_shape_convex_polygon.html#ae693d710c618145ff7c59d8860fe650a", null ],
+    [ "m_vertex", "classnd_shape_convex_polygon.html#a0c45718cf3425ca0b8d95d2ecdf23eb3", null ],
+    [ "m_vertexIndex", "classnd_shape_convex_polygon.html#ad83b32407e9f165370ed236429ff2b35", null ]
+];

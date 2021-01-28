@@ -19,5 +19,5 @@ var classd_node_base_hierarchy =
     [ "GetPrev", "classd_node_base_hierarchy.html#a90b605f7a6703a6d3ad779928ffee16f", null ],
     [ "GetRoot", "classd_node_base_hierarchy.html#aab1708be5d4e1c5409c9a020828c71d5", null ],
     [ "GetSibling", "classd_node_base_hierarchy.html#a4e1add9a0601a3f983f1c723fb7a60d6", null ],
-    [ "SetNameID", "classd_node_base_hierarchy.html#a06578e707e546cb2fbfb9f3e0566ee92", null ]
+    [ "SetName", "classd_node_base_hierarchy.html#a8017cf0c5f4ff7c54c17390a836bc1ff", null ]
 ];

@@ -518,7 +518,7 @@ $(document).ready(function(){initNavTree('d_vector_scalar_8h_source.html',''); i
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classd_vector.html">dVector</a> (m_y, m_z, m_x, m_w); </div>
 <div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    }</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160; </div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    D_INLINE <a class="code" href="classd_vector.html">dVector</a> ShiftRightLogical (<span class="keywordtype">int</span> bits)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    D_INLINE <a class="code" href="classd_vector.html">dVector</a> ShiftRightLogical (dInt32 bits)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;<span class="keyword">    </span>{</div>
 <div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classd_vector.html">dVector</a> (dInt32 (dUnsigned32 (m_ix) &gt;&gt; bits), dInt32 (dUnsigned32 (m_iy) &gt;&gt; bits), dInt32 (dUnsigned32 (m_iz) &gt;&gt; bits), dInt32 (dUnsigned32 (m_iw) &gt;&gt; bits)); </div>
 <div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    }</div>
@@ -951,7 +951,7 @@ $(document).ready(function(){initNavTree('d_vector_scalar_8h_source.html',''); i
 <div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classd_big_vector.html">dBigVector</a> (m_y, m_z, m_x, m_w); </div>
 <div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;    }</div>
 <div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160; </div>
-<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;    D_INLINE <a class="code" href="classd_big_vector.html">dBigVector</a> ShiftRightLogical (<span class="keywordtype">int</span> bits)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;    D_INLINE <a class="code" href="classd_big_vector.html">dBigVector</a> ShiftRightLogical (dInt32 bits)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;<span class="keyword">    </span>{</div>
 <div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classd_big_vector.html">dBigVector</a> (dInt64 (dUnsigned64 (m_ix) &gt;&gt; bits), dInt64 (dUnsigned64 (m_iy) &gt;&gt; bits), dInt64 (dUnsigned64 (m_iz) &gt;&gt; bits), dInt64 (dUnsigned64 (m_iw) &gt;&gt; bits)); </div>
 <div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;    }</div>

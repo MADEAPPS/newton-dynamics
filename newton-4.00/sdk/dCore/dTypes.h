@@ -486,12 +486,19 @@ union dDoubleInt
 	#define _stricmp(x,y) strcasecmp(x,y)
 #endif
 
-
+/// Returns the cpu ticks count 
 D_CORE_API dUnsigned64 dGetCpuClock();
+
+/// Returns the time in micro seconds since application started 
 D_CORE_API dUnsigned64 dGetTimeInMicrosenconds();
+
+/// Round a 64 bit float to a 32 bit float by truncating the mantissa a 24 bit 
+/// \param dFloat64 val: 64 bit float 
+/// \return a 64 bit double precision with a 32 bit mantissa
 D_CORE_API dFloat64 dRoundToFloat(dFloat64 val);
 
 #ifdef D_USE_THREAD_EMULATION
+	/// wrapper over standard atomic operations
 	template<class T>
 	class dAtomic
 	{
@@ -538,6 +545,7 @@ D_CORE_API dFloat64 dRoundToFloat(dFloat64 val);
 		T m_val;
 	};
 #else
+	/// wrapper over standard atomic operations
 	template<class T>
 	class dAtomic: public std::atomic<T>
 	{
@@ -554,6 +562,7 @@ D_CORE_API dFloat64 dRoundToFloat(dFloat64 val);
 	};
 #endif
 
+/// Simple spin lock for synchronizing threads for very short period of time.
 class dSpinLock
 {
 	public:
@@ -566,27 +575,28 @@ class dSpinLock
 
 	void Lock()
 	{
-#ifndef D_USE_THREAD_EMULATION	
+		#ifndef D_USE_THREAD_EMULATION	
 		while (m_lock.exchange(1)) 
 		{
 			std::this_thread::yield();
 		}
-#endif
+		#endif
 	}
 
 	void Unlock()
 	{
-#ifndef D_USE_THREAD_EMULATION	
+		#ifndef D_USE_THREAD_EMULATION	
 		m_lock.exchange(0);
-#endif
+		#endif
 	}
 
-#ifndef D_USE_THREAD_EMULATION	
+	#ifndef D_USE_THREAD_EMULATION	
 	private:
 	dAtomic<dUnsigned32> m_lock;
-#endif
+	#endif
 };
 
+/// Simple scope based spin lock.
 class dScopeSpinLock
 {
 	public:
@@ -607,6 +617,7 @@ class dScopeSpinLock
 D_CORE_API dInt32 dVertexListToIndexList (dFloat64* const vertexList, dInt32 strideInBytes, dInt32 compareCount,     dInt32 vertexCount,         dInt32* const indexListOut, dFloat64 tolerance = dEpsilon);
 D_CORE_API dInt32 dVertexListToIndexList (dFloat32* const vertexList, dInt32 strideInBytes, dInt32 floatSizeInBytes, dInt32 unsignedSizeInBytes, dInt32 vertexCount, dInt32* const indexListOut, dFloat32 tolerance = dEpsilon);
 
+/// Set cpu floating point exceptions, the original exception state is restored when the destructor is called.
 class dFloatExceptions
 {
 	public:
@@ -626,6 +637,7 @@ class dFloatExceptions
 	#endif
 };
 
+/// Set cpu floating point precision mode, the original mode is restored when the destructor is called.
 class dSetPrecisionDouble 
 {
 	public:
