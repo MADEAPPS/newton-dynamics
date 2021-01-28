@@ -23,10 +23,11 @@
 #define __D_SHAPE_INSTANCE_MESH_BUILDER_H__ 
 
 #include "ndCollisionStdafx.h"
+#include "ndMeshEffect.h"
 
 class ndShapeInstance;
 
-class ndShapeInstanceMeshBuilder : public dMeshEffect
+class ndShapeInstanceMeshBuilder : public ndMeshEffect
 {
 	public:
 	D_COLLISION_API ndShapeInstanceMeshBuilder(const ndShapeInstance& instance);

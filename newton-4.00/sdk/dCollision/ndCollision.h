@@ -42,6 +42,7 @@
 #include <ndSceneMixed.h>
 #include <ndConstraint.h>
 #include <ndBodyNotify.h>
+#include <ndMeshEffect.h>
 #include <ndShapeSphere.h>
 #include <ndShapeConvex.h>
 #include <ndContactList.h>

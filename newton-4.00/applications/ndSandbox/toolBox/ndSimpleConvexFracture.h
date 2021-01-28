@@ -30,7 +30,7 @@ class ndSimpleConvexFracture: public ndModel
 	class WoodVoronoidEffect : public dList<WoodFractureAtom>
 	{
 		public:
-		WoodVoronoidEffect(ndWorld* const world, dMeshEffect* const mesh, dInt32 interiorMaterial);
+		WoodVoronoidEffect(ndWorld* const world, ndMeshEffect* const mesh, dInt32 interiorMaterial);
 		WoodVoronoidEffect(const WoodVoronoidEffect& list);
 		~WoodVoronoidEffect();
 		ndBodyKinematic* m_body;

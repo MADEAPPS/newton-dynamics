@@ -36,9 +36,9 @@
 #include "dCoreStdafx.h"
 #include "dStack.h"
 #include "dMatrix.h"
-#include "dMeshEffect.h"
+#include "ndMeshEffect.h"
 //#include "dgWorld.h"
-//#include "dMeshEffect.h"
+//#include "ndMeshEffect.h"
 
 #if 0
 #define dgABF_MAX_ITERATIONS		5
@@ -58,7 +58,7 @@
 class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 {
 	public:
-	dgTriangleAnglesToUV (dMeshEffect* const mesh, dInt32 material, dgReportProgress progressReportCallback, void* const userData, const dFloat64* const pinnedPoint, dFloat64* const triangleAnglesVector = nullptr)
+	dgTriangleAnglesToUV (ndMeshEffect* const mesh, dInt32 material, dgReportProgress progressReportCallback, void* const userData, const dFloat64* const pinnedPoint, dFloat64* const triangleAnglesVector = nullptr)
 		:m_hessianCoLumnIndex (mesh->GetAllocator())
 		,m_hessianCoLumnValue(mesh->GetAllocator())
 		,m_mesh(mesh)
@@ -69,7 +69,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 		,m_allocated(false)
 	{
 		dInt32 mark = m_mesh->IncLRU();
-		dMeshEffect::Iterator iter (*m_mesh);
+		ndMeshEffect::Iterator iter (*m_mesh);
 		for (iter.Begin(); iter; iter ++) {
 			dEdge* const edge = &iter.GetNode()->GetInfo();
 			if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) {
@@ -124,7 +124,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 				dAssert (0);
 /*
 				dInt32 index = dInt32 (uvEdge->m_userData);
-				dMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
+				ndMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
 				m_uvArray[index * 2 + 0] = attribute.m_u0;
 				m_uvArray[index * 2 + 1] = attribute.m_v0;
 */
@@ -162,7 +162,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 
 		dAssert (0);
 /*
-		dStack<dMeshEffect::dgVertexAtribute>attribArray (m_mesh->GetCount());
+		dStack<ndMeshEffect::dgVertexAtribute>attribArray (m_mesh->GetCount());
 //		dInt32 attribCount = m_mesh->EnumerateAttributeArray (&attribArray[0]);
 		mark = m_mesh->IncLRU();
 		for (iter.Begin(); iter; iter ++) {
@@ -176,7 +176,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 				do {
 					if (ptr->m_incidentFace > 0) {
 						dInt32 index = dInt32 (ptr->m_userData);
-						dMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
+						ndMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
 						attribute.m_u0 = u;
 						attribute.m_v0 = v;
 						attribute.m_material = material;
@@ -834,7 +834,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 
 	dgArray<dInt32> m_hessianCoLumnIndex;
 	dgArray<dFloat64> m_hessianCoLumnValue;
-	dMeshEffect* m_mesh;
+	ndMeshEffect* m_mesh;
 	dEdge** m_triangles;
 	dEdge** m_vertexEdge;
 	dFloat64* m_uvArray;
@@ -853,7 +853,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 class dgAngleBasedFlatteningMapping: public dgSymmetricConjugateGradientSolver<dFloat64>
 {
 	public: 
-	dgAngleBasedFlatteningMapping (dMeshEffect* const mesh, dInt32 material, dgReportProgress progressReportCallback, void* const userData)
+	dgAngleBasedFlatteningMapping (ndMeshEffect* const mesh, dInt32 material, dgReportProgress progressReportCallback, void* const userData)
 		:m_mesh(mesh)
 		,m_progressReportUserData(userData)
 		,m_progressReportCallback(progressReportCallback)
@@ -870,7 +870,7 @@ dAssert (0);
 		do {
 			if (ptr->m_incidentFace > 0) {
 				dInt32 index = dInt32 (ptr->m_userData);
-				dMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
+				ndMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
 				attribute.m_u0 = dFloat32 (0.0f);
 				attribute.m_v0 = dFloat32 (0.0f);
 			}
@@ -888,7 +888,7 @@ dAssert (0);
 		do {
 			if (ptr->m_incidentFace > 0) {
 				dInt32 index = dInt32 (ptr->m_userData);
-				dMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
+				ndMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
 				attribute.m_u0 = e0length;
 				attribute.m_v0 = dFloat32 (0.0f);
 			}
@@ -961,7 +961,7 @@ dAssert (0);
 		m_interiorVertexCount = 0;
 
 		dInt32 mark = m_mesh->IncLRU();
-		dMeshEffect::Iterator iter (*m_mesh);
+		ndMeshEffect::Iterator iter (*m_mesh);
 		for (iter.Begin(); iter; iter ++) {
 			dEdge* const edge = &iter.GetNode()->GetInfo();
 			if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) {
@@ -997,7 +997,7 @@ dAssert (0);
 	{
 		dInt32 count = 0;
 		dInt32 mark = m_mesh->IncLRU();
-		dMeshEffect::Iterator iter (*m_mesh);
+		ndMeshEffect::Iterator iter (*m_mesh);
 		for (iter.Begin(); iter; iter ++) {
 			dEdge* const edge = &iter.GetNode()->GetInfo();
 			if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) {
@@ -1444,7 +1444,7 @@ dAssert (0);
 #endif
 	}
 
-	dMeshEffect* m_mesh;
+	ndMeshEffect* m_mesh;
 	dEdge** m_betaEdge;
 	dInt32* m_interiorIndirectMap;
 
@@ -1470,7 +1470,7 @@ dAssert (0);
 
 
 /*
-void dMeshEffect::ClearAttributeArray ()
+void ndMeshEffect::ClearAttributeArray ()
 {
 	dAssert(0);
 
@@ -1501,7 +1501,7 @@ void dMeshEffect::ClearAttributeArray ()
 
 
 
-void dMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMaterial, const dMatrix& uvAligment)
+void ndMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMaterial, const dMatrix& uvAligment)
 {
 	dBigVector origin (GetOrigin());
 	dStack<dBigVector> buffer(m_points.m_vertex.m_count);
@@ -1616,11 +1616,11 @@ void dMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMateria
 	PackAttibuteData();
 }
 
-void dMeshEffect::AngleBaseFlatteningMapping (dInt32 material, dgReportProgress progressReportCallback, void* const userData)
+void ndMeshEffect::AngleBaseFlatteningMapping (dInt32 material, dgReportProgress progressReportCallback, void* const userData)
 {
 	dgSetPrecisionDouble presicion;
 
-	dMeshEffect tmp (*this);
+	ndMeshEffect tmp (*this);
 
 	dBigVector minBox;
 	dBigVector maxBox;
@@ -1641,7 +1641,7 @@ void dMeshEffect::AngleBaseFlatteningMapping (dInt32 material, dgReportProgress 
 #endif
 
 
-void dMeshEffect::CalculateNormals(dFloat64 angleInRadians)
+void ndMeshEffect::CalculateNormals(dFloat64 angleInRadians)
 {
 	dEdge* edgeBuffer[256];
 	dBigVector faceNormal[256];
@@ -1726,7 +1726,7 @@ void dMeshEffect::CalculateNormals(dFloat64 angleInRadians)
 	PackAttibuteData();
 }
 
-dBigVector dMeshEffect::GetOrigin()const
+dBigVector ndMeshEffect::GetOrigin()const
 {
 	dBigVector origin(dFloat64(0.0f), dFloat64(0.0f), dFloat64(0.0f), dFloat64(0.0f));
 	for (dInt32 i = 0; i < m_points.m_vertex.GetCount(); i++) 
@@ -1736,7 +1736,7 @@ dBigVector dMeshEffect::GetOrigin()const
 	return origin.Scale(dFloat64(1.0f) / m_points.m_vertex.GetCount());
 }
 
-void dMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const dMatrix& uvAligment)
+void ndMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const dMatrix& uvAligment)
 {
 	dBigVector origin(GetOrigin());
 	dStack<dBigVector> buffer(m_points.m_vertex.GetCount());
@@ -1826,7 +1826,7 @@ void dMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const dMatri
 	PackAttibuteData();
 }
 
-void dMeshEffect::UniformBoxMapping(dInt32 material, const dMatrix& textureMatrix)
+void ndMeshEffect::UniformBoxMapping(dInt32 material, const dMatrix& textureMatrix)
 {
 	UnpackAttibuteData();
 
@@ -1887,7 +1887,7 @@ void dMeshEffect::UniformBoxMapping(dInt32 material, const dMatrix& textureMatri
 	PackAttibuteData();
 }
 
-void dMeshEffect::SphericalMapping(dInt32 material, const dMatrix& uvAligment)
+void ndMeshEffect::SphericalMapping(dInt32 material, const dMatrix& uvAligment)
 {
 	dBigVector origin(GetOrigin());
 	dStack<dBigVector>sphere(m_points.m_vertex.GetCount());

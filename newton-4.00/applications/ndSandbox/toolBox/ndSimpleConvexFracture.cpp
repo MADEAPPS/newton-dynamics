@@ -431,7 +431,7 @@ void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 	//
 	//// create a newton mesh from the collision primitive
 
-	//dMeshEffect* const mesh = NewtonMeshCreateFromCollision(collision);
+	//ndMeshEffect* const mesh = NewtonMeshCreateFromCollision(collision);
 	
 	//// apply a material map
 	//dInt32 externalMaterial = LoadTexture("reljef.tga");

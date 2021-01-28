@@ -23,10 +23,10 @@
 #include "dSort.h"
 #include "dStack.h"
 #include "dMatrix.h"
-#include "dMeshEffect.h"
+#include "ndMeshEffect.h"
 //#include "dgBody.h"
 //#include "dgWorld.h"
-//#include "dMeshEffect.h"
+//#include "ndMeshEffect.h"
 //#include "ndShapeStaticBVH.h"
 //#include "dgCollisionCompound.h"
 //#include "ndShapeConvexHull.h"
@@ -36,7 +36,7 @@
 #if 0
 
 
-void dMeshEffect::dAttibutFormat::CopyFrom (const dAttibutFormat& source)
+void ndMeshEffect::dAttibutFormat::CopyFrom (const dAttibutFormat& source)
 {
 	m_pointChannel.CopyFrom(source.m_pointChannel);
 	m_materialChannel.CopyFrom(source.m_materialChannel);
@@ -48,12 +48,12 @@ void dMeshEffect::dAttibutFormat::CopyFrom (const dAttibutFormat& source)
 }
 
 
-dMeshEffect::dMeshBVH::dgFitnessList::dgFitnessList (dgMemoryAllocator* const allocator)
+ndMeshEffect::dMeshBVH::dgFitnessList::dgFitnessList (dgMemoryAllocator* const allocator)
 	:dTree <dgMeshBVHNode*, dgMeshBVHNode*>(allocator)
 {
 }
 
-dFloat64 dMeshEffect::dMeshBVH::dgFitnessList::TotalCost () const
+dFloat64 ndMeshEffect::dMeshBVH::dgFitnessList::TotalCost () const
 {
 	dFloat64 cost = dFloat32 (0.0f);
 	Iterator iter (*this);
@@ -66,7 +66,7 @@ dFloat64 dMeshEffect::dMeshBVH::dgFitnessList::TotalCost () const
 }
 
 
-dMeshEffect::dMeshBVH::dgMeshBVHNode::dgMeshBVHNode (const dMeshEffect* const mesh, dEdge* const face, void* const userData)
+ndMeshEffect::dMeshBVH::dgMeshBVHNode::dgMeshBVHNode (const ndMeshEffect* const mesh, dEdge* const face, void* const userData)
 	:m_area(dFloat32 (0.0f))
 	,m_face (face)
 	,m_userData(userData)
@@ -93,7 +93,7 @@ dMeshEffect::dMeshBVH::dgMeshBVHNode::dgMeshBVHNode (const dMeshEffect* const me
 	SetBox (p0 - padding, p1 + padding);
 }
 
-dMeshEffect::dMeshBVH::dgMeshBVHNode::dgMeshBVHNode (dgMeshBVHNode* const left, dgMeshBVHNode* const right)
+ndMeshEffect::dMeshBVH::dgMeshBVHNode::dgMeshBVHNode (dgMeshBVHNode* const left, dgMeshBVHNode* const right)
 	:m_area(dFloat32 (0.0f))
 	,m_face (nullptr)
 	,m_userData(nullptr)
@@ -112,7 +112,7 @@ dMeshEffect::dMeshBVH::dgMeshBVHNode::dgMeshBVHNode (dgMeshBVHNode* const left, 
 }
 
 
-dMeshEffect::dMeshBVH::dgMeshBVHNode::~dgMeshBVHNode ()
+ndMeshEffect::dMeshBVH::dgMeshBVHNode::~dgMeshBVHNode ()
 {
 	if (m_left) {
 		delete m_left;
@@ -122,7 +122,7 @@ dMeshEffect::dMeshBVH::dgMeshBVHNode::~dgMeshBVHNode ()
 	}
 }
 
-void dMeshEffect::dMeshBVH::dgMeshBVHNode::SetBox (const dVector& p0, const dVector& p1)
+void ndMeshEffect::dMeshBVH::dgMeshBVHNode::SetBox (const dVector& p0, const dVector& p1)
 {
 	m_p0 = p0 & dVector::m_triplexMask;
 	m_p1 = p1 & dVector::m_triplexMask;
@@ -132,7 +132,7 @@ void dMeshEffect::dMeshBVH::dgMeshBVHNode::SetBox (const dVector& p0, const dVec
 	m_area = size.DotProduct(size1).GetScalar();
 }
 
-dMeshEffect::dMeshBVH::dMeshBVH (const dMeshEffect* const mesh)
+ndMeshEffect::dMeshBVH::dMeshBVH (const ndMeshEffect* const mesh)
 	:m_mesh(mesh)
 	,m_rootNode(nullptr)
 	,m_fitness(m_mesh->GetAllocator())
@@ -140,17 +140,17 @@ dMeshEffect::dMeshBVH::dMeshBVH (const dMeshEffect* const mesh)
 }
 
 
-dMeshEffect::dMeshBVH::~dMeshBVH()
+ndMeshEffect::dMeshBVH::~dMeshBVH()
 {
 	Cleanup ();
 }
 
-dMeshEffect* dMeshEffect::CreateFromSerialization (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData)
+ndMeshEffect* ndMeshEffect::CreateFromSerialization (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData)
 {
-	return new (allocator) dMeshEffect(allocator, deserialization, userData);
+	return new (allocator) ndMeshEffect(allocator, deserialization, userData);
 }
 
-void dMeshEffect::Serialize (dgSerialize callback, void* const userData) const
+void ndMeshEffect::Serialize (dgSerialize callback, void* const userData) const
 {
 	dAssert(0);
 /*
@@ -201,7 +201,7 @@ void dMeshEffect::Serialize (dgSerialize callback, void* const userData) const
 */
 }
 
-void dMeshEffect::dMeshBVH::Build ()
+void ndMeshEffect::dMeshBVH::Build ()
 {
 	dInt32 lru = m_mesh->IncLRU();
 /*
@@ -214,7 +214,7 @@ void dMeshEffect::dMeshBVH::Build ()
 		}
 	}
 */
-	dMeshEffect::Iterator iter(*m_mesh);
+	ndMeshEffect::Iterator iter(*m_mesh);
 	for (iter.Begin(); iter; iter++) {
 		dEdge* const face = &iter.GetNode()->GetInfo();
 		if (face->m_mark != lru) {
@@ -224,14 +224,14 @@ void dMeshEffect::dMeshBVH::Build ()
 	ImproveNodeFitness ();
 }
 
-void dMeshEffect::dMeshBVH::Cleanup ()
+void ndMeshEffect::dMeshBVH::Cleanup ()
 {
 	if (m_rootNode) {
 		delete m_rootNode;
 	}
 }
 
-dFloat32 dMeshEffect::dMeshBVH::CalculateSurfaceArea (dgMeshBVHNode* const node0, dgMeshBVHNode* const node1, dVector& minBox, dVector& maxBox) const
+dFloat32 ndMeshEffect::dMeshBVH::CalculateSurfaceArea (dgMeshBVHNode* const node0, dgMeshBVHNode* const node1, dVector& minBox, dVector& maxBox) const
 {
 	minBox = dVector (dMin (node0->m_p0.m_x, node1->m_p0.m_x), dMin (node0->m_p0.m_y, node1->m_p0.m_y), dMin (node0->m_p0.m_z, node1->m_p0.m_z), dFloat32 (0.0f));
 	maxBox = dVector (dMax (node0->m_p1.m_x, node1->m_p1.m_x), dMax (node0->m_p1.m_y, node1->m_p1.m_y), dMax (node0->m_p1.m_z, node1->m_p1.m_z), dFloat32 (0.0f));		
@@ -241,7 +241,7 @@ dFloat32 dMeshEffect::dMeshBVH::CalculateSurfaceArea (dgMeshBVHNode* const node0
 	return side0.DotProduct(side1).GetScalar();
 }
 
-void dMeshEffect::dMeshBVH::ImproveNodeFitness (dgMeshBVHNode* const node)
+void ndMeshEffect::dMeshBVH::ImproveNodeFitness (dgMeshBVHNode* const node)
 {
 	dAssert (node->m_left);
 	dAssert (node->m_right);
@@ -379,7 +379,7 @@ void dMeshEffect::dMeshBVH::ImproveNodeFitness (dgMeshBVHNode* const node)
 }
 
 
-void dMeshEffect::dMeshBVH::ImproveNodeFitness ()
+void ndMeshEffect::dMeshBVH::ImproveNodeFitness ()
 {
 	dFloat64 cost0 = m_fitness.TotalCost ();
 	dFloat64 cost1 = cost0;
@@ -395,14 +395,14 @@ void dMeshEffect::dMeshBVH::ImproveNodeFitness ()
 }
 
 /*
-dMeshEffect::dMeshBVH::dgMeshBVHNode* dMeshEffect::dMeshBVH::CreateLeafNode (dEdge* const face, void* const userData)
+ndMeshEffect::dMeshBVH::dgMeshBVHNode* ndMeshEffect::dMeshBVH::CreateLeafNode (dEdge* const face, void* const userData)
 {
 	dgMemoryAllocator* const allocator = m_mesh->GetAllocator();
 	return new (allocator) dgMeshBVHNode (m_mesh, face, userData);
 }
 */
 
-dMeshEffect::dMeshBVH::dgMeshBVHNode* dMeshEffect::dMeshBVH::AddFaceNode (dEdge* const face, void* const userData)
+ndMeshEffect::dMeshBVH::dgMeshBVHNode* ndMeshEffect::dMeshBVH::AddFaceNode (dEdge* const face, void* const userData)
 {
 	dgMemoryAllocator* const allocator = m_mesh->GetAllocator();
 
@@ -469,7 +469,7 @@ dMeshEffect::dMeshBVH::dgMeshBVHNode* dMeshEffect::dMeshBVH::AddFaceNode (dEdge*
 }
 
 
-void dMeshEffect::dMeshBVH::RemoveNode (dgMeshBVHNode* const treeNode)
+void ndMeshEffect::dMeshBVH::RemoveNode (dgMeshBVHNode* const treeNode)
 {
 	if (!treeNode->m_parent) {
 		delete (m_rootNode);
@@ -521,7 +521,7 @@ void dMeshEffect::dMeshBVH::RemoveNode (dgMeshBVHNode* const treeNode)
 	//dAssert (SanityCheck());
 }
 
-bool dMeshEffect::dMeshBVH::SanityCheck() const
+bool ndMeshEffect::dMeshBVH::SanityCheck() const
 {
 	#ifdef _DEBUG
 	dAssert (m_mesh->Sanity ());
@@ -571,7 +571,7 @@ bool dMeshEffect::dMeshBVH::SanityCheck() const
 	return true;
 }
 
-void dMeshEffect::dMeshBVH::GetOverlapNodes (dList<dgMeshBVHNode*>& overlapNodes, const dBigVector& p0, const dBigVector& p1) const
+void ndMeshEffect::dMeshBVH::GetOverlapNodes (dList<dgMeshBVHNode*>& overlapNodes, const dBigVector& p0, const dBigVector& p1) const
 {
 	dgMeshBVHNode* stackPool[DG_MESH_EFFECT_BVH_STACK_DEPTH];
 
@@ -606,7 +606,7 @@ void dMeshEffect::dMeshBVH::GetOverlapNodes (dList<dgMeshBVHNode*>& overlapNodes
 }
 
 /*
-dFloat64 dMeshEffect::dMeshBVH::VertexRayCast (const dBigVector& p0, const dBigVector& p1) const
+dFloat64 ndMeshEffect::dMeshBVH::VertexRayCast (const dBigVector& p0, const dBigVector& p1) const
 {
 	dAssert (0);
 
@@ -662,7 +662,7 @@ dFloat64 dMeshEffect::dMeshBVH::VertexRayCast (const dBigVector& p0, const dBigV
 }
 
 
-bool dMeshEffect::dMeshBVH::RayRayIntersect (dEdge* const edge, const dMeshEffect* const otherMesh, dEdge* const otherEdge, dFloat64& param, dFloat64& otherParam) const
+bool ndMeshEffect::dMeshBVH::RayRayIntersect (dEdge* const edge, const ndMeshEffect* const otherMesh, dEdge* const otherEdge, dFloat64& param, dFloat64& otherParam) const
 {
 	dAssert (0);
 
@@ -712,7 +712,7 @@ bool dMeshEffect::dMeshBVH::RayRayIntersect (dEdge* const edge, const dMeshEffec
 */
 
 
-dFloat64 dMeshEffect::dMeshBVH::RayFaceIntersect (const dgMeshBVHNode* const faceNode, const dBigVector& p0, const dBigVector& p1, void* const userData) const
+dFloat64 ndMeshEffect::dMeshBVH::RayFaceIntersect (const dgMeshBVHNode* const faceNode, const dBigVector& p0, const dBigVector& p1, void* const userData) const
 {
 	dAssert (0);
 	return 0;
@@ -777,7 +777,7 @@ dFloat64 dMeshEffect::dMeshBVH::RayFaceIntersect (const dgMeshBVHNode* const fac
 }
 
 
-void dMeshEffect::dMeshBVH::FaceRayCast (const dBigVector& p0, const dBigVector& p1, void* const userData) const
+void ndMeshEffect::dMeshBVH::FaceRayCast (const dBigVector& p0, const dBigVector& p1, void* const userData) const
 {
 	dgMeshBVHNode* stackPool[DG_MESH_EFFECT_BVH_STACK_DEPTH];
 
@@ -823,7 +823,7 @@ void dMeshEffect::dMeshBVH::FaceRayCast (const dBigVector& p0, const dBigVector&
 
 
 
-dMeshEffect::dMeshEffect(dgMemoryAllocator* const allocator)
+ndMeshEffect::ndMeshEffect(dgMemoryAllocator* const allocator)
 	:dPolyhedra(allocator)
 	,m_points(allocator)
 	,m_attrib(allocator)
@@ -833,7 +833,7 @@ dMeshEffect::dMeshEffect(dgMemoryAllocator* const allocator)
 	Init();
 }
 
-dMeshEffect::dMeshEffect (dgMemoryAllocator* const allocator, const dMatrix& planeMatrix, dFloat32 witdth, dFloat32 breadth, dInt32 material, const dMatrix& textureMatrix0, const dMatrix& textureMatrix1)
+ndMeshEffect::ndMeshEffect (dgMemoryAllocator* const allocator, const dMatrix& planeMatrix, dFloat32 witdth, dFloat32 breadth, dInt32 material, const dMatrix& textureMatrix0, const dMatrix& textureMatrix1)
 	:dPolyhedra(allocator)
 	,m_points(allocator)
 	,m_attrib(allocator)
@@ -890,7 +890,7 @@ dMeshEffect::dMeshEffect (dgMemoryAllocator* const allocator, const dMatrix& pla
 }
 
 
-dMeshEffect::dMeshEffect(dPolyhedra& mesh, const dMeshEffect& source)
+ndMeshEffect::ndMeshEffect(dPolyhedra& mesh, const ndMeshEffect& source)
 	:dPolyhedra (mesh) 
 	,m_points(source.m_points)
 	,m_attrib(source.m_attrib)
@@ -900,7 +900,7 @@ dMeshEffect::dMeshEffect(dPolyhedra& mesh, const dMeshEffect& source)
 	Init();
 }
 
-dMeshEffect::dMeshEffect(const dMeshEffect& source)
+ndMeshEffect::ndMeshEffect(const ndMeshEffect& source)
 	:dPolyhedra (source) 
 	,m_points(source.m_points)
 	,m_attrib(source.m_attrib)
@@ -910,7 +910,7 @@ dMeshEffect::dMeshEffect(const dMeshEffect& source)
 	Init();
 }
 
-dMeshEffect::dMeshEffect(dgCollisionInstance* const collision)
+ndMeshEffect::ndMeshEffect(dgCollisionInstance* const collision)
 	:dPolyhedra (collision->GetAllocator()) 
 	,m_points(collision->GetAllocator())
 	,m_attrib(collision->GetAllocator())
@@ -997,7 +997,7 @@ dMeshEffect::dMeshEffect(dgCollisionInstance* const collision)
 
 
 
-dMeshEffect::dMeshEffect (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData)
+ndMeshEffect::ndMeshEffect (dgMemoryAllocator* const allocator, dgDeserialize deserialization, void* const userData)
 	:dPolyhedra (allocator) 
 	,m_points(allocator)
 	,m_attrib(allocator)
@@ -1037,13 +1037,13 @@ dAssert (0);
 }
 
 
-dMeshEffect::~dMeshEffect(void)
+ndMeshEffect::~ndMeshEffect(void)
 {
 }
 
 
 
-void dMeshEffect::Trace () const
+void ndMeshEffect::Trace () const
 {
 dAssert (0);
 /*
@@ -1073,7 +1073,7 @@ dAssert (0);
 */
 };
 
-void dMeshEffect::FlipWinding()
+void ndMeshEffect::FlipWinding()
 {
 	dInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
 	dInt64	userData[DG_MESH_EFFECT_POINT_SPLITED];
@@ -1104,7 +1104,7 @@ void dMeshEffect::FlipWinding()
 }
 
 
-void dMeshEffect::Triangulate  ()
+void ndMeshEffect::Triangulate  ()
 {
 /*
 	dInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
@@ -1172,7 +1172,7 @@ void dMeshEffect::Triangulate  ()
 	dAssert (Sanity ());
 }
 
-void dMeshEffect::ConvertToPolygons ()
+void ndMeshEffect::ConvertToPolygons ()
 {
 	UnpackPoints();
 	dPolyhedra leftOversOut(GetAllocator());
@@ -1190,7 +1190,7 @@ void dMeshEffect::ConvertToPolygons ()
 	dAssert (Sanity ());
 }
 
-void dMeshEffect::RemoveUnusedVertices(dInt32* const vertexMapResult)
+void ndMeshEffect::RemoveUnusedVertices(dInt32* const vertexMapResult)
 {
 	dAssert (!vertexMapResult);
 	UnpackAttibuteData();
@@ -1201,7 +1201,7 @@ void dMeshEffect::RemoveUnusedVertices(dInt32* const vertexMapResult)
 
 
 
-dMatrix dMeshEffect::CalculateOOBB (dBigVector& size) const
+dMatrix ndMeshEffect::CalculateOOBB (dBigVector& size) const
 {
 	dgObb sphere (CalculateSphere (&m_points.m_vertex[0].m_x, sizeof (dBigVector), nullptr));
 	size = sphere.m_size;
@@ -1222,7 +1222,7 @@ dMatrix dMeshEffect::CalculateOOBB (dBigVector& size) const
 	return sphere;
 }
 
-void dMeshEffect::CalculateAABB (dBigVector& minBox, dBigVector& maxBox) const
+void ndMeshEffect::CalculateAABB (dBigVector& minBox, dBigVector& maxBox) const
 {
 	dBigVector minP ( dFloat64 (1.0e15f),  dFloat64 (1.0e15f),  dFloat64 (1.0e15f), dFloat64 (0.0f)); 
 	dBigVector maxP (-dFloat64 (1.0e15f), -dFloat64 (1.0e15f), -dFloat64 (1.0e15f), dFloat64 (0.0f)); 
@@ -1249,28 +1249,28 @@ void dMeshEffect::CalculateAABB (dBigVector& minBox, dBigVector& maxBox) const
 
 
 
-void dMeshEffect::BeginBuildFace ()
+void ndMeshEffect::BeginBuildFace ()
 {
 	m_constructionIndex = m_points.m_vertex.m_count;
 }
 
-void dMeshEffect::AddPoint (dFloat64 x, dFloat64 y, dFloat64 z)
+void ndMeshEffect::AddPoint (dFloat64 x, dFloat64 y, dFloat64 z)
 {
 	m_attrib.m_pointChannel.PushBack(m_points.m_vertex.m_count);
 	m_points.m_vertex.PushBack(dBigVector (QuantizeCordinade(x), QuantizeCordinade(y), QuantizeCordinade(z), dFloat64(0.0f)));
 }
 
-void dMeshEffect::AddLayer(dInt32 layer)
+void ndMeshEffect::AddLayer(dInt32 layer)
 {
 	m_points.m_layers.PushBack(layer);
 }
 
-void dMeshEffect::AddVertexColor(dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
+void ndMeshEffect::AddVertexColor(dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
 {
 	m_attrib.m_colorChannel.PushBack(dVector (x, y, z, w));
 }
 
-void dMeshEffect::AddNormal(dFloat32 x, dFloat32 y, dFloat32 z)
+void ndMeshEffect::AddNormal(dFloat32 x, dFloat32 y, dFloat32 z)
 {
 	dTriplex n;
 	n.m_x = x;
@@ -1279,7 +1279,7 @@ void dMeshEffect::AddNormal(dFloat32 x, dFloat32 y, dFloat32 z)
 	m_attrib.m_normalChannel.PushBack(n);
 }
 
-void dMeshEffect::AddBinormal(dFloat32 x, dFloat32 y, dFloat32 z)
+void ndMeshEffect::AddBinormal(dFloat32 x, dFloat32 y, dFloat32 z)
 {
 	dTriplex n;
 	n.m_x = x;
@@ -1288,7 +1288,7 @@ void dMeshEffect::AddBinormal(dFloat32 x, dFloat32 y, dFloat32 z)
 	m_attrib.m_binormalChannel.PushBack(n);
 }
 
-void dMeshEffect::AddUV0(dFloat32 u, dFloat32 v)
+void ndMeshEffect::AddUV0(dFloat32 u, dFloat32 v)
 {
 	dAttibutFormat::dgUV uv;
 	uv.m_u = u;
@@ -1296,7 +1296,7 @@ void dMeshEffect::AddUV0(dFloat32 u, dFloat32 v)
 	m_attrib.m_uv0Channel.PushBack(uv);
 }
 
-void dMeshEffect::AddUV1(dFloat32 u, dFloat32 v)
+void ndMeshEffect::AddUV1(dFloat32 u, dFloat32 v)
 {
 	dAttibutFormat::dgUV uv;
 	uv.m_u = u;
@@ -1304,13 +1304,13 @@ void dMeshEffect::AddUV1(dFloat32 u, dFloat32 v)
 	m_attrib.m_uv1Channel.PushBack(uv);
 }
 
-void dMeshEffect::AddMaterial (dInt32 materialIndex)
+void ndMeshEffect::AddMaterial (dInt32 materialIndex)
 {
 	m_attrib.m_materialChannel.PushBack(materialIndex);
 }
 
 
-void dMeshEffect::EndBuildFace ()
+void ndMeshEffect::EndBuildFace ()
 {
 	dInt32 count = m_points.m_vertex.m_count - m_constructionIndex;
 	if (count > 3) {
@@ -1443,7 +1443,7 @@ void dMeshEffect::EndBuildFace ()
 	}
 }
 
-void dMeshEffect::PackPoints (dFloat64 tol)
+void ndMeshEffect::PackPoints (dFloat64 tol)
 {
 	dStack<dInt32>vertexIndexMapBuffer(m_points.m_vertex.m_count);
 	dInt32* const vertexIndexMap = &vertexIndexMapBuffer[0];
@@ -1482,7 +1482,7 @@ void dMeshEffect::PackPoints (dFloat64 tol)
 	EndFace();
 }
 
-void dMeshEffect::UnpackPoints()
+void ndMeshEffect::UnpackPoints()
 {
 	do {
 		dPointFormat points(m_points);
@@ -1534,24 +1534,24 @@ void dMeshEffect::UnpackPoints()
 
 
 
-void dMeshEffect::OptimizePoints()
+void ndMeshEffect::OptimizePoints()
 {
 
 }
 
-void dMeshEffect::OptimizeAttibutes()
+void ndMeshEffect::OptimizeAttibutes()
 {
 	UnpackAttibuteData ();
 	PackAttibuteData();
 }
 
 
-dInt32 dMeshEffect::GetTotalFaceCount() const
+dInt32 ndMeshEffect::GetTotalFaceCount() const
 {
 	return GetFaceCount();
 }
 
-dInt32 dMeshEffect::GetTotalIndexCount() const
+dInt32 ndMeshEffect::GetTotalIndexCount() const
 {
 	Iterator iter (*this);
 	dInt32 count = 0;
@@ -1576,7 +1576,7 @@ dInt32 dMeshEffect::GetTotalIndexCount() const
 	return count;
 }
 
-void dMeshEffect::GetFaces (dInt32* const facesIndex, dInt32* const materials, void** const faceNodeList) const
+void ndMeshEffect::GetFaces (dInt32* const facesIndex, dInt32* const materials, void** const faceNodeList) const
 {
 	Iterator iter (*this);
 
@@ -1611,7 +1611,7 @@ void dMeshEffect::GetFaces (dInt32* const facesIndex, dInt32* const materials, v
 	}
 }
 
-void* dMeshEffect::GetFirstVertex () const
+void* ndMeshEffect::GetFirstVertex () const
 {
 	Iterator iter (*this);
 	iter.Begin();
@@ -1631,7 +1631,7 @@ void* dMeshEffect::GetFirstVertex () const
 	return node;
 }
 
-void* dMeshEffect::GetNextVertex (const void* const vertex) const
+void* ndMeshEffect::GetNextVertex (const void* const vertex) const
 {
 	dTreeNode* const node0 = (dTreeNode*) vertex;
 	dInt32 mark = node0->GetInfo().m_mark;
@@ -1653,14 +1653,14 @@ void* dMeshEffect::GetNextVertex (const void* const vertex) const
 	return nullptr;
 }
 
-dInt32 dMeshEffect::GetVertexIndex (const void* const vertex) const
+dInt32 ndMeshEffect::GetVertexIndex (const void* const vertex) const
 {
 	dTreeNode* const node = (dTreeNode*) vertex;
 	dEdge* const edge = &node->GetInfo();
 	return edge->m_incidentVertex;
 }
 
-void* dMeshEffect::GetFirstPoint () const
+void* ndMeshEffect::GetFirstPoint () const
 {
 	Iterator iter (*this);
 	for (iter.Begin(); iter; iter ++) {
@@ -1673,7 +1673,7 @@ void* dMeshEffect::GetFirstPoint () const
 	return nullptr;
 }
 
-void* dMeshEffect::GetNextPoint (const void* const point) const
+void* ndMeshEffect::GetNextPoint (const void* const point) const
 {
 	Iterator iter (*this);
 	iter.Set ((dTreeNode*) point);
@@ -1687,7 +1687,7 @@ void* dMeshEffect::GetNextPoint (const void* const point) const
 	return nullptr;
 }
 
-dInt32 dMeshEffect::GetPointIndex (const void* const point) const
+dInt32 ndMeshEffect::GetPointIndex (const void* const point) const
 {
 	dTreeNode* const node = (dTreeNode*) point;
 	dEdge* const edge = &node->GetInfo();
@@ -1695,12 +1695,12 @@ dInt32 dMeshEffect::GetPointIndex (const void* const point) const
 }
 
 
-dInt32 dMeshEffect::GetVertexIndexFromPoint (const void* const point) const
+dInt32 ndMeshEffect::GetVertexIndexFromPoint (const void* const point) const
 {
 	return GetVertexIndex (point);
 }
 
-dEdge* dMeshEffect::SpliteFace (dInt32 v0, dInt32 v1)
+dEdge* ndMeshEffect::SpliteFace (dInt32 v0, dInt32 v1)
 {
 	if (!FindEdge(v0, v1)) {
 		dPolyhedra::dgPairKey key (v0, 0);
@@ -1723,13 +1723,13 @@ dEdge* dMeshEffect::SpliteFace (dInt32 v0, dInt32 v1)
 	return nullptr;
 }
 
-const dEdge* dMeshEffect::GetPolyhedraEdgeFromNode(const void* const edge) const
+const dEdge* ndMeshEffect::GetPolyhedraEdgeFromNode(const void* const edge) const
 {
 	dTreeNode* const node = (dTreeNode*)edge;
 	return &node->GetInfo();
 }
 
-void* dMeshEffect::GetFirstEdge () const
+void* ndMeshEffect::GetFirstEdge () const
 {
 	Iterator iter (*this);
 	iter.Begin();
@@ -1747,7 +1747,7 @@ void* dMeshEffect::GetFirstEdge () const
 	return node;
 }
 
-void* dMeshEffect::GetNextEdge (const void* const edge) const
+void* ndMeshEffect::GetNextEdge (const void* const edge) const
 {
 	dTreeNode* const node0 = (dTreeNode*) edge;
 	dInt32 mark = node0->GetInfo().m_mark;
@@ -1766,19 +1766,19 @@ void* dMeshEffect::GetNextEdge (const void* const edge) const
 }
 
 
-void dMeshEffect::GetEdgeIndex (const void* const edge, dInt32& v0, dInt32& v1) const
+void ndMeshEffect::GetEdgeIndex (const void* const edge, dInt32& v0, dInt32& v1) const
 {
 	dTreeNode* const node = (dTreeNode*) edge;
 	v0 = node->GetInfo().m_incidentVertex;
 	v1 = node->GetInfo().m_twin->m_incidentVertex;
 }
 
-//void* dMeshEffect::FindEdge (dInt32 v0, dInt32 v1) const
+//void* ndMeshEffect::FindEdge (dInt32 v0, dInt32 v1) const
 //{
 //	return FindEdgeNode(v0, v1);
 //}
 
-//void dMeshEffect::GetEdgeAttributeIndex (const void* edge, dInt32& v0, dInt32& v1) const
+//void ndMeshEffect::GetEdgeAttributeIndex (const void* edge, dInt32& v0, dInt32& v1) const
 //{
 //	dTreeNode* node = (dTreeNode*) edge;
 //	v0 = dInt32 (node->GetInfo().m_userData);
@@ -1786,7 +1786,7 @@ void dMeshEffect::GetEdgeIndex (const void* const edge, dInt32& v0, dInt32& v1) 
 //}
 
 
-void* dMeshEffect::GetFirstFace () const
+void* ndMeshEffect::GetFirstFace () const
 {
 	Iterator iter (*this);
 	iter.Begin();
@@ -1807,7 +1807,7 @@ void* dMeshEffect::GetFirstFace () const
 	return node;
 }
 
-void* dMeshEffect::GetNextFace (const void* const face) const
+void* ndMeshEffect::GetNextFace (const void* const face) const
 {
 	dTreeNode* const node0 = (dTreeNode*) face;
 	dInt32 mark = node0->GetInfo().m_mark;
@@ -1830,21 +1830,21 @@ void* dMeshEffect::GetNextFace (const void* const face) const
 }
 
 
-dInt32 dMeshEffect::IsFaceOpen (const void* const face) const
+dInt32 ndMeshEffect::IsFaceOpen (const void* const face) const
 {
 	dTreeNode* const node = (dTreeNode*) face;
 	dEdge* const edge = &node->GetInfo();
 	return (edge->m_incidentFace > 0) ? 0 : 1;
 }
 
-dInt32 dMeshEffect::GetFaceMaterial (const void* const face) const
+dInt32 ndMeshEffect::GetFaceMaterial (const void* const face) const
 {
 	dTreeNode* const node = (dTreeNode*) face;
 	dEdge* const edge = &node->GetInfo();
 	return dInt32 (m_attrib.m_materialChannel.m_count ? m_attrib.m_materialChannel[dInt32 (edge->m_userData)] : 0);
 }
 
-void dMeshEffect::SetFaceMaterial (const void* const face, dInt32 mateialID)
+void ndMeshEffect::SetFaceMaterial (const void* const face, dInt32 mateialID)
 {
 	if (m_attrib.m_materialChannel.m_count) {
 		dTreeNode* const node = (dTreeNode*) face;
@@ -1861,7 +1861,7 @@ void dMeshEffect::SetFaceMaterial (const void* const face, dInt32 mateialID)
 	}
 }
 
-dInt32 dMeshEffect::GetFaceIndexCount (const void* const face) const
+dInt32 ndMeshEffect::GetFaceIndexCount (const void* const face) const
 {
 	dInt32 count = 0;
 	dTreeNode* node = (dTreeNode*) face;
@@ -1874,7 +1874,7 @@ dInt32 dMeshEffect::GetFaceIndexCount (const void* const face) const
 	return count;
 }
 
-void dMeshEffect::GetFaceIndex (const void* const face, dInt32* const indices) const
+void ndMeshEffect::GetFaceIndex (const void* const face, dInt32* const indices) const
 {
 	dInt32 count = 0;
 	dTreeNode* node = (dTreeNode*) face;
@@ -1887,7 +1887,7 @@ void dMeshEffect::GetFaceIndex (const void* const face, dInt32* const indices) c
 	} while (ptr != edge);
 }
 
-void dMeshEffect::GetFaceAttributeIndex (const void* const face, dInt32* const indices) const
+void ndMeshEffect::GetFaceAttributeIndex (const void* const face, dInt32* const indices) const
 {
 	dInt32 count = 0;
 	dTreeNode* node = (dTreeNode*) face;
@@ -1901,7 +1901,7 @@ void dMeshEffect::GetFaceAttributeIndex (const void* const face, dInt32* const i
 }
 
 
-dBigVector dMeshEffect::CalculateFaceNormal (const void* const face) const
+dBigVector ndMeshEffect::CalculateFaceNormal (const void* const face) const
 {
 	dTreeNode* const node = (dTreeNode*) face;
 	dEdge* const faceEdge = &node->GetInfo();
@@ -1971,34 +1971,34 @@ dInt32 GetTotalFaceCount() const;
 }
 */
 
-bool dMeshEffect::HasNormalChannel() const
+bool ndMeshEffect::HasNormalChannel() const
 {
 	return m_attrib.m_normalChannel.m_count != 0;
 }
 
-bool dMeshEffect::HasBinormalChannel() const
+bool ndMeshEffect::HasBinormalChannel() const
 {
 	return m_attrib.m_binormalChannel.m_count != 0;
 }
 
-bool dMeshEffect::HasUV0Channel() const
+bool ndMeshEffect::HasUV0Channel() const
 {
 	return m_attrib.m_uv0Channel.m_count != 0;
 }
 
-bool dMeshEffect::HasUV1Channel() const
+bool ndMeshEffect::HasUV1Channel() const
 {
 	return m_attrib.m_uv1Channel.m_count != 0;
 }
 
-bool dMeshEffect::HasVertexColorChannel() const
+bool ndMeshEffect::HasVertexColorChannel() const
 {
 	return m_attrib.m_colorChannel.m_count != 0;
 }
 
 
 /*
-void dMeshEffect::GetWeightBlendChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
+void ndMeshEffect::GetWeightBlendChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
 {
 	dInt8* const buffer = (dInt8*)bufferOut;
 	for (dInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i++) {
@@ -2014,7 +2014,7 @@ void dMeshEffect::GetWeightBlendChannel(dInt32 strideInByte, dFloat32* const buf
 	}
 }
 
-void dMeshEffect::GetWeightIndexChannel(dInt32 strideInByte, dInt32* const bufferOut) const
+void ndMeshEffect::GetWeightIndexChannel(dInt32 strideInByte, dInt32* const bufferOut) const
 {
 	dInt8* const buffer = (dInt8*)bufferOut;
 	for (dInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i++) {
@@ -2031,7 +2031,7 @@ void dMeshEffect::GetWeightIndexChannel(dInt32 strideInByte, dInt32* const buffe
 */
 
 
-dgCollisionInstance* dMeshEffect::CreateCollisionTree(dgWorld* const world, dInt32 shapeID) const
+dgCollisionInstance* ndMeshEffect::CreateCollisionTree(dgWorld* const world, dInt32 shapeID) const
 {
 	ndShapeStaticBVH* const collision = new  (GetAllocator()) ndShapeStaticBVH (world);
 
@@ -2065,7 +2065,7 @@ dgCollisionInstance* dMeshEffect::CreateCollisionTree(dgWorld* const world, dInt
 	return instance;
 }
 
-dgCollisionInstance* dMeshEffect::CreateConvexCollision(dgWorld* const world, dFloat64 tolerance, dInt32 shapeID, const dMatrix& srcMatrix) const
+dgCollisionInstance* ndMeshEffect::CreateConvexCollision(dgWorld* const world, dFloat64 tolerance, dInt32 shapeID, const dMatrix& srcMatrix) const
 {
 	dStack<dVector> poolPtr (m_points.m_vertex.m_count * 2); 
 	dVector* const pool = &poolPtr[0];
@@ -2112,7 +2112,7 @@ dgCollisionInstance* dMeshEffect::CreateConvexCollision(dgWorld* const world, dF
 }
 
 
-void dMeshEffect::TransformMesh (const dMatrix& matrix)
+void ndMeshEffect::TransformMesh (const dMatrix& matrix)
 {
 	dAssert(0);
 	/*
@@ -2126,7 +2126,7 @@ void dMeshEffect::TransformMesh (const dMatrix& matrix)
 }
 
 
-void dMeshEffect::AddInterpolatedEdgeAttribute (dEdge* const edge, dFloat64 param)
+void ndMeshEffect::AddInterpolatedEdgeAttribute (dEdge* const edge, dFloat64 param)
 {
 	dFloat64 t1 = param;
 	dFloat64 t0 = dFloat64 (1.0f) - t1;
@@ -2194,7 +2194,7 @@ void dMeshEffect::AddInterpolatedEdgeAttribute (dEdge* const edge, dFloat64 para
 
 
 
-dEdge* dMeshEffect::InsertEdgeVertex (dEdge* const edge, dFloat64 param)
+dEdge* ndMeshEffect::InsertEdgeVertex (dEdge* const edge, dFloat64 param)
 {
 	dEdge* const twin = edge->m_twin;
 	AddInterpolatedEdgeAttribute(edge, param);
@@ -2218,8 +2218,8 @@ dEdge* dMeshEffect::InsertEdgeVertex (dEdge* const edge, dFloat64 param)
 
 
 
-//dMeshEffect::dgVertexAtribute dMeshEffect::InterpolateVertex (const dBigVector& srcPoint, const dEdge* const face) const
-dInt32 dMeshEffect::InterpolateVertex (const dBigVector& srcPoint, const dEdge* const face) const
+//ndMeshEffect::dgVertexAtribute ndMeshEffect::InterpolateVertex (const dBigVector& srcPoint, const dEdge* const face) const
+dInt32 ndMeshEffect::InterpolateVertex (const dBigVector& srcPoint, const dEdge* const face) const
 {
 dAssert(0);
 return 0;
@@ -2336,7 +2336,7 @@ return 0;
 */
 }
 
-bool dMeshEffect::HasOpenEdges () const
+bool ndMeshEffect::HasOpenEdges () const
 {
 	dPolyhedra::Iterator iter (*this);
 	for (iter.Begin(); iter; iter ++){
@@ -2348,7 +2348,7 @@ bool dMeshEffect::HasOpenEdges () const
 	return false;
 }
 
-dFloat64 dMeshEffect::CalculateVolume () const
+dFloat64 ndMeshEffect::CalculateVolume () const
 {
 	dAssert (0);
 	return 0;
@@ -2390,7 +2390,7 @@ dFloat64 dMeshEffect::CalculateVolume () const
 }
 
 
-dMeshEffect* dMeshEffect::GetNextLayer (dInt32 mark)
+ndMeshEffect* ndMeshEffect::GetNextLayer (dInt32 mark)
 {
 	Iterator iter(*this);
 	dEdge* edge = nullptr;
@@ -2432,16 +2432,16 @@ dMeshEffect* dMeshEffect::GetNextLayer (dInt32 mark)
 	}
 	polyhedra.EndFace ();
 
-	dMeshEffect* solid = nullptr;
+	ndMeshEffect* solid = nullptr;
 	if (polyhedra.GetCount()) {
-		solid = new (GetAllocator()) dMeshEffect(polyhedra, *this);
+		solid = new (GetAllocator()) ndMeshEffect(polyhedra, *this);
 		solid->SetLRU(mark);
 	}
 	return solid;
 }
 #endif
 
-dInt32 dMeshEffect::dFormat::CompareVertex(const dSortKey* const ptr0, const dSortKey* const ptr1, void* const context)
+dInt32 ndMeshEffect::dFormat::CompareVertex(const dSortKey* const ptr0, const dSortKey* const ptr1, void* const context)
 {
 	const dVertexSortData* const sortContext = (dVertexSortData*)context;
 	const dInt32 compIndex = sortContext->m_vertexSortIndex;
@@ -2460,7 +2460,7 @@ dInt32 dMeshEffect::dFormat::CompareVertex(const dSortKey* const ptr0, const dSo
 	return 0;
 }
 
-dInt32 dMeshEffect::dFormat::GetSortIndex(const dChannel<dBigVector, m_point>& points, dFloat64& dist) const
+dInt32 ndMeshEffect::dFormat::GetSortIndex(const dChannel<dBigVector, m_point>& points, dFloat64& dist) const
 {
 	dBigVector xc(dBigVector::m_zero);
 	dBigVector x2c(dBigVector::m_zero);
@@ -2496,7 +2496,7 @@ dInt32 dMeshEffect::dFormat::GetSortIndex(const dChannel<dBigVector, m_point>& p
 	return firstSortAxis;
 }
 
-void dMeshEffect::dPointFormat::CompressData(dInt32* const indexList)
+void ndMeshEffect::dPointFormat::CompressData(dInt32* const indexList)
 {
 	dAssert(0);
 	//dFloat64 minDist;
@@ -2589,7 +2589,7 @@ void dMeshEffect::dPointFormat::CompressData(dInt32* const indexList)
 	//}
 }
 
-void dMeshEffect::dAttibutFormat::CompressData(const dPointFormat& points, dInt32* const indexList)
+void ndMeshEffect::dAttibutFormat::CompressData(const dPointFormat& points, dInt32* const indexList)
 {
 	dFloat64 minDist;
 	const dInt32 firstSortAxis = GetSortIndex(points.m_vertex, minDist);
@@ -2783,7 +2783,7 @@ void dMeshEffect::dAttibutFormat::CompressData(const dPointFormat& points, dInt3
 	}
 }
 
-dMeshEffect::dMeshEffect()
+ndMeshEffect::ndMeshEffect()
 	:dPolyhedra()
 	,m_points()
 	,m_attrib()
@@ -2793,18 +2793,18 @@ dMeshEffect::dMeshEffect()
 	Init();
 }
 
-dMeshEffect::~dMeshEffect()
+ndMeshEffect::~ndMeshEffect()
 {
 }
 
-void dMeshEffect::Init()
+void ndMeshEffect::Init()
 {
 }
 
-bool dMeshEffect::Sanity() const
+bool ndMeshEffect::Sanity() const
 {
 #ifdef  _DEBUG
-	dMeshEffect::Iterator iter(*this);
+	ndMeshEffect::Iterator iter(*this);
 	for (iter.Begin(); iter; iter++) {
 		dEdge* const edge = &iter.GetNode()->GetInfo();
 		dAssert(edge->m_twin);
@@ -2818,7 +2818,7 @@ bool dMeshEffect::Sanity() const
 	return true;
 }
 
-void dMeshEffect::BeginBuild()
+void ndMeshEffect::BeginBuild()
 {
 	m_points.Clear();
 	m_attrib.Clear();
@@ -2828,7 +2828,7 @@ void dMeshEffect::BeginBuild()
 	m_constructionIndex = 0;
 }
 
-void dMeshEffect::EndBuild(dFloat64 tol, bool fixTjoint)
+void ndMeshEffect::EndBuild(dFloat64 tol, bool fixTjoint)
 {
 	dAssert(0);
 #ifdef _DEBUG
@@ -2933,12 +2933,12 @@ void dMeshEffect::EndBuild(dFloat64 tol, bool fixTjoint)
 //#endif
 }
 
-void dMeshEffect::BeginFace()
+void ndMeshEffect::BeginFace()
 {
 	dPolyhedra::BeginFace();
 }
 
-bool dMeshEffect::EndFace()
+bool ndMeshEffect::EndFace()
 {
 	dPolyhedra::EndFace();
 	bool state = false;
@@ -3043,7 +3043,7 @@ bool dMeshEffect::EndFace()
 	return !state;
 }
 
-void dMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
+void ndMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 {
 	BeginBuild();
 	dAssert(format->m_vertex.m_data);
@@ -3251,7 +3251,7 @@ void dMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 	PackAttibuteData();
 }
 
-void dMeshEffect::PackAttibuteData()
+void ndMeshEffect::PackAttibuteData()
 {
 	dStack<dInt32>attrIndexBuffer(m_attrib.m_pointChannel.GetCount());
 	dInt32* const attrIndexMap = &attrIndexBuffer[0];
@@ -3314,7 +3314,7 @@ void dMeshEffect::PackAttibuteData()
 	}
 }
 
-void dMeshEffect::UnpackAttibuteData()
+void ndMeshEffect::UnpackAttibuteData()
 {
 	dAttibutFormat attibutes(m_attrib);
 	m_attrib.Clear();
@@ -3375,7 +3375,7 @@ void dMeshEffect::UnpackAttibuteData()
 }
 
 
-bool dMeshEffect::SeparateDuplicateLoops(dEdge* const face)
+bool ndMeshEffect::SeparateDuplicateLoops(dEdge* const face)
 {
 	for (dEdge* ptr0 = face; ptr0 != face->m_prev; ptr0 = ptr0->m_next) 
 	{
@@ -3403,7 +3403,7 @@ bool dMeshEffect::SeparateDuplicateLoops(dEdge* const face)
 	return false;
 }
 
-dInt32 dMeshEffect::AddInterpolatedHalfAttribute(dEdge* const edge, dInt32 midPoint)
+dInt32 ndMeshEffect::AddInterpolatedHalfAttribute(dEdge* const edge, dInt32 midPoint)
 {
 	dBigVector p0(m_points.m_vertex[edge->m_incidentVertex]);
 	dBigVector p2(m_points.m_vertex[edge->m_next->m_incidentVertex]);
@@ -3462,7 +3462,7 @@ dInt32 dMeshEffect::AddInterpolatedHalfAttribute(dEdge* const edge, dInt32 midPo
 	return m_attrib.m_pointChannel.GetCount() - 1;
 }
 
-void dMeshEffect::RepairTJoints()
+void ndMeshEffect::RepairTJoints()
 {
 	dAssert(Sanity());
 
@@ -3831,7 +3831,7 @@ void dMeshEffect::RepairTJoints()
 }
 
 
-void dMeshEffect::GetVertexChannel64(dInt32 strideInByte, dFloat64* const bufferOut) const
+void ndMeshEffect::GetVertexChannel64(dInt32 strideInByte, dFloat64* const bufferOut) const
 {
 	dInt32 stride = strideInByte / sizeof(dFloat64);
 	for (dInt32 i = 0; i < m_attrib.m_pointChannel.GetCount(); i++) 
@@ -3844,7 +3844,7 @@ void dMeshEffect::GetVertexChannel64(dInt32 strideInByte, dFloat64* const buffer
 	}
 }
 
-void dMeshEffect::GetVertexChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
+void ndMeshEffect::GetVertexChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
 {
 	dInt32 stride = strideInByte / sizeof(dFloat32);
 	for (dInt32 i = 0; i < m_attrib.m_pointChannel.GetCount(); i++) 
@@ -3858,7 +3858,7 @@ void dMeshEffect::GetVertexChannel(dInt32 strideInByte, dFloat32* const bufferOu
 	}
 }
 
-void dMeshEffect::GetNormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
+void ndMeshEffect::GetNormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
 {
 	dInt32 stride = strideInByte / sizeof(dFloat32);
 	for (dInt32 i = 0; i < m_attrib.m_normalChannel.GetCount(); i++) 
@@ -3870,7 +3870,7 @@ void dMeshEffect::GetNormalChannel(dInt32 strideInByte, dFloat32* const bufferOu
 	}
 }
 
-void dMeshEffect::GetBinormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
+void ndMeshEffect::GetBinormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
 {
 	dInt32 stride = strideInByte / sizeof(dFloat32);
 	for (dInt32 i = 0; i < m_attrib.m_binormalChannel.GetCount(); i++) 
@@ -3882,7 +3882,7 @@ void dMeshEffect::GetBinormalChannel(dInt32 strideInByte, dFloat32* const buffer
 	}
 }
 
-void dMeshEffect::GetUV0Channel(dInt32 strideInByte, dFloat32* const bufferOut) const
+void ndMeshEffect::GetUV0Channel(dInt32 strideInByte, dFloat32* const bufferOut) const
 {
 	dInt32 stride = strideInByte / sizeof(dFloat32);
 	for (dInt32 i = 0; i < m_attrib.m_uv0Channel.GetCount(); i++) 
@@ -3893,7 +3893,7 @@ void dMeshEffect::GetUV0Channel(dInt32 strideInByte, dFloat32* const bufferOut) 
 	}
 }
 
-void dMeshEffect::GetUV1Channel(dInt32 strideInByte, dFloat32* const bufferOut) const
+void ndMeshEffect::GetUV1Channel(dInt32 strideInByte, dFloat32* const bufferOut) const
 {
 	dInt32 stride = strideInByte / sizeof(dFloat32);
 	for (dInt32 i = 0; i < m_attrib.m_uv1Channel.GetCount(); i++) 
@@ -3904,7 +3904,7 @@ void dMeshEffect::GetUV1Channel(dInt32 strideInByte, dFloat32* const bufferOut) 
 	}
 }
 
-void dMeshEffect::GetVertexColorChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
+void ndMeshEffect::GetVertexColorChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
 {
 	dInt32 stride = strideInByte / sizeof(dFloat32);
 	for (dInt32 i = 0; i < m_attrib.m_colorChannel.GetCount(); i++) 
@@ -3917,7 +3917,7 @@ void dMeshEffect::GetVertexColorChannel(dInt32 strideInByte, dFloat32* const buf
 	}
 }
 
-ndIndexArray* dMeshEffect::MaterialGeometryBegin()
+ndIndexArray* ndMeshEffect::MaterialGeometryBegin()
 {
 	dInt32 materials[256];
 	dInt32 streamIndexMap[256];
@@ -3983,17 +3983,17 @@ ndIndexArray* dMeshEffect::MaterialGeometryBegin()
 	return array;
 }
 
-void dMeshEffect::MaterialGeomteryEnd(ndIndexArray* const handle)
+void ndMeshEffect::MaterialGeomteryEnd(ndIndexArray* const handle)
 {
 	dMemory::Free(handle);
 }
 
-dInt32 dMeshEffect::GetFirstMaterial(ndIndexArray* const handle) const
+dInt32 ndMeshEffect::GetFirstMaterial(ndIndexArray* const handle) const
 {
 	return GetNextMaterial(handle, -1);
 }
 
-dInt32 dMeshEffect::GetNextMaterial(ndIndexArray* const handle, dInt32 materialId) const
+dInt32 ndMeshEffect::GetNextMaterial(ndIndexArray* const handle, dInt32 materialId) const
 {
 	materialId++;
 	if (materialId >= handle->m_materialCount) 
@@ -4003,17 +4003,17 @@ dInt32 dMeshEffect::GetNextMaterial(ndIndexArray* const handle, dInt32 materialI
 	return materialId;
 }
 
-dInt32 dMeshEffect::GetMaterialID(ndIndexArray* const handle, dInt32 materialHandle) const
+dInt32 ndMeshEffect::GetMaterialID(ndIndexArray* const handle, dInt32 materialHandle) const
 {
 	return handle->m_materials[materialHandle];
 }
 
-dInt32 dMeshEffect::GetMaterialIndexCount(ndIndexArray* const handle, dInt32 materialHandle) const
+dInt32 ndMeshEffect::GetMaterialIndexCount(ndIndexArray* const handle, dInt32 materialHandle) const
 {
 	return handle->m_materialsIndexCount[materialHandle];
 }
 
-void dMeshEffect::GetMaterialGetIndexStream(ndIndexArray* const handle, dInt32 materialHandle, dInt32* const indexArray) const
+void ndMeshEffect::GetMaterialGetIndexStream(ndIndexArray* const handle, dInt32 materialHandle, dInt32* const indexArray) const
 {
 	dInt32 index = 0;
 	dInt32 textureID = handle->m_materials[materialHandle];
@@ -4029,7 +4029,7 @@ void dMeshEffect::GetMaterialGetIndexStream(ndIndexArray* const handle, dInt32 m
 	}
 }
 
-void dMeshEffect::GetMaterialGetIndexStreamShort(ndIndexArray* const handle, dInt32 materialHandle, dInt16* const indexArray) const
+void ndMeshEffect::GetMaterialGetIndexStreamShort(ndIndexArray* const handle, dInt32 materialHandle, dInt16* const indexArray) const
 {
 	dInt32 index = 0;
 	dInt32 textureID = handle->m_materials[materialHandle];
@@ -4045,7 +4045,7 @@ void dMeshEffect::GetMaterialGetIndexStreamShort(ndIndexArray* const handle, dIn
 	}
 }
 
-void dMeshEffect::ApplyTransform(const dMatrix& matrix)
+void ndMeshEffect::ApplyTransform(const dMatrix& matrix)
 {
 	matrix.TransformTriplex(&m_points.m_vertex[0].m_x, sizeof(dBigVector), &m_points.m_vertex[0].m_x, sizeof(dBigVector), m_points.m_vertex.GetCount());
 	
@@ -4078,7 +4078,7 @@ void dMeshEffect::ApplyTransform(const dMatrix& matrix)
 }
 
 // create a convex hull
-dMeshEffect::dMeshEffect(const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol)
+ndMeshEffect::ndMeshEffect(const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol)
 	:dPolyhedra()
 	,m_points()
 	,m_attrib()
@@ -4112,7 +4112,7 @@ dMeshEffect::dMeshEffect(const dFloat64* const vertexCloud, dInt32 count, dInt32
 	//}
 }
 
-void dMeshEffect::MergeFaces(const dMeshEffect* const source)
+void ndMeshEffect::MergeFaces(const ndMeshEffect* const source)
 {
 	dAssert(0);
 	//dInt32 mark = source->IncLRU();

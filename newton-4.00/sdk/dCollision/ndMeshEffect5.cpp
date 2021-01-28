@@ -20,15 +20,15 @@
 */
 
 #include "dCoreStdafx.h"
-#include "dMeshEffect.h"
+#include "ndMeshEffect.h"
 //#include "dgBody.h"
 //#include "dgWorld.h"
-//#include "dMeshEffect.h"
+//#include "ndMeshEffect.h"
 //#include "dgCollisionConvexHull.h"
 
 
 #if 0
-bool dMeshEffect::PlaneClip(const dMeshEffect& convexMesh, const dEdge* const convexFace)
+bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const convexFace)
 {
 	dAssert (convexFace->m_incidentFace > 0);
 
@@ -301,11 +301,11 @@ bool dMeshEffect::PlaneClip(const dMeshEffect& convexMesh, const dEdge* const co
 }
 
 
-dMeshEffect* dMeshEffect::ConvexMeshIntersection (const dMeshEffect* const convexMeshSrc) const
+ndMeshEffect* ndMeshEffect::ConvexMeshIntersection (const ndMeshEffect* const convexMeshSrc) const
 {
-	dMeshEffect convexMesh (*convexMeshSrc);
+	ndMeshEffect convexMesh (*convexMeshSrc);
 	convexMesh.ConvertToPolygons();
-	dMeshEffect* const convexIntersection = new (GetAllocator()) dMeshEffect (*this);
+	ndMeshEffect* const convexIntersection = new (GetAllocator()) ndMeshEffect (*this);
 
 	dInt32 mark = convexMesh.IncLRU();
 	dPolyhedra::Iterator iter (convexMesh);
@@ -334,28 +334,28 @@ dMeshEffect* dMeshEffect::ConvexMeshIntersection (const dMeshEffect* const conve
 }
 
 
-void dMeshEffect::ClipMesh (const dMatrix& matrix, const dMeshEffect* const clipMesh, dMeshEffect** const back, dMeshEffect** const front) const
+void ndMeshEffect::ClipMesh (const dMatrix& matrix, const ndMeshEffect* const clipMesh, ndMeshEffect** const back, ndMeshEffect** const front) const
 {
 	dAssert (0);
 /*
-	dMeshEffect clipper (*clipMesh);
+	ndMeshEffect clipper (*clipMesh);
 	clipper.TransformMesh (matrix);
 
-	dMeshEffect* backMeshSource = nullptr;
-	dMeshEffect* frontMeshSource = nullptr;
-	dMeshEffect* backMeshClipper = nullptr;
-	dMeshEffect* frontMeshClipper = nullptr;
+	ndMeshEffect* backMeshSource = nullptr;
+	ndMeshEffect* frontMeshSource = nullptr;
+	ndMeshEffect* backMeshClipper = nullptr;
+	ndMeshEffect* frontMeshClipper = nullptr;
 
 	ClipMesh (&clipper, &backMeshSource, &frontMeshSource);
 	if (backMeshSource && frontMeshSource) {
 		clipper.ClipMesh (this, &backMeshClipper, &frontMeshClipper);
 		if (backMeshSource && frontMeshSource) {
 
-			dMeshEffect* backMesh;
-			dMeshEffect* frontMesh;
+			ndMeshEffect* backMesh;
+			ndMeshEffect* frontMesh;
 
-			backMesh = new (GetAllocator()) dMeshEffect (GetAllocator(), true);
-			frontMesh = new (GetAllocator()) dMeshEffect (GetAllocator(), true);
+			backMesh = new (GetAllocator()) ndMeshEffect (GetAllocator(), true);
+			frontMesh = new (GetAllocator()) ndMeshEffect (GetAllocator(), true);
 
 			backMesh->BeginPolygon();
 			frontMesh->BeginPolygon();
@@ -395,18 +395,18 @@ void dMeshEffect::ClipMesh (const dMatrix& matrix, const dMeshEffect* const clip
 
 
 
-dMeshEffect* dMeshEffect::Union (const dMatrix& matrix, const dMeshEffect* const clipperMesh) const
+ndMeshEffect* ndMeshEffect::Union (const dMatrix& matrix, const ndMeshEffect* const clipperMesh) const
 {
 	dAssert (0);
 	return nullptr;
 /*
-	dMeshEffect copy (*this);
-	dMeshEffect clipper (*clipperMesh);
+	ndMeshEffect copy (*this);
+	ndMeshEffect clipper (*clipperMesh);
 	clipper.TransformMesh (matrix);
 
 	dgBooleanMeshClipper::ClipMeshesAndColorize (&copy, &clipper);
 
-	dMeshEffect* const mesh = new (GetAllocator()) dMeshEffect (GetAllocator());
+	ndMeshEffect* const mesh = new (GetAllocator()) ndMeshEffect (GetAllocator());
 	mesh->BeginFace();
 	dgBooleanMeshClipper::CopyPoints(mesh, &copy);
 	dgBooleanMeshClipper::AddExteriorFaces (mesh, &copy);
@@ -419,16 +419,16 @@ dMeshEffect* dMeshEffect::Union (const dMatrix& matrix, const dMeshEffect* const
 */
 }
 
-dMeshEffect* dMeshEffect::Difference (const dMatrix& matrix, const dMeshEffect* const clipperMesh) const
+ndMeshEffect* ndMeshEffect::Difference (const dMatrix& matrix, const ndMeshEffect* const clipperMesh) const
 {
 /*
-	dMeshEffect copy (*this);
-	dMeshEffect clipper (*clipperMesh);
+	ndMeshEffect copy (*this);
+	ndMeshEffect clipper (*clipperMesh);
 	clipper.TransformMesh (matrix);
 
 	dgBooleanMeshClipper::ClipMeshesAndColorize (&copy, &clipper);
 
-	dMeshEffect* const mesh = new (GetAllocator()) dMeshEffect (GetAllocator());
+	ndMeshEffect* const mesh = new (GetAllocator()) ndMeshEffect (GetAllocator());
 	mesh->BeginFace();
 	dgBooleanMeshClipper::CopyPoints(mesh, &copy);
 	dgBooleanMeshClipper::AddExteriorFaces (mesh, &copy);
@@ -444,7 +444,7 @@ dMeshEffect* dMeshEffect::Difference (const dMatrix& matrix, const dMeshEffect* 
 }
 
 
-class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
+class dgBooleanMeshClipper: public ndMeshEffect::dMeshBVH
 {
 	class dgPoint: public dBigVector
 	{
@@ -505,7 +505,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 		}
 */
 /*
-		dgHugeVector CalculateFaceNormal (const dMeshEffect* const mesh, dEdge* const face)
+		dgHugeVector CalculateFaceNormal (const ndMeshEffect* const mesh, dEdge* const face)
 		{
 			dgHugeVector plane(dgGoogol::m_zero, dgGoogol::m_zero, dgGoogol::m_zero, dgGoogol::m_zero);
 			dEdge* edge = face;
@@ -527,7 +527,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 		}
 
 
-		bool IsPointInFace (const dgHugeVector& point, const dMeshEffect* const mesh, dEdge* const face, const dgHugeVector& normal) const 
+		bool IsPointInFace (const dgHugeVector& point, const ndMeshEffect* const mesh, dEdge* const face, const dgHugeVector& normal) const 
 		{
 			dEdge* edge = face;
 
@@ -554,7 +554,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 			return true;
 		}
 
-		dFloat64 ClipEdgeFace(const dMeshEffect* const meshEdge, dEdge* const edge, const dMeshEffect* const meshFace, dEdge* const face, const dgHugeVector& plane)
+		dFloat64 ClipEdgeFace(const ndMeshEffect* const meshEdge, dEdge* const edge, const ndMeshEffect* const meshFace, dEdge* const face, const dgHugeVector& plane)
 		{
 			dgHugeVector p0 (meshEdge->GetVertex(edge->m_incidentVertex));
 			dgHugeVector p1 (meshEdge->GetVertex(edge->m_twin->m_incidentVertex));
@@ -584,7 +584,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 			return -1.0f;
 		}
 
-		void AddPoint (dMeshEffect* const edgeOwnerMesh, dEdge* const edgeStart, dMeshEffect* const faceOwnerMesh, dEdge* const face, const dgHugeVector& plane, dTreeNode** nodes, dInt32& index)
+		void AddPoint (ndMeshEffect* const edgeOwnerMesh, dEdge* const edgeStart, ndMeshEffect* const faceOwnerMesh, dEdge* const face, const dgHugeVector& plane, dTreeNode** nodes, dInt32& index)
 		{
 			dEdge* edge = edgeStart;
 			do {
@@ -649,7 +649,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 			}
 		}
 
-		void EmbedCurveToSingleFace (dList<dTreeNode*>& curve, dMeshEffect* const mesh)
+		void EmbedCurveToSingleFace (dList<dTreeNode*>& curve, ndMeshEffect* const mesh)
 		{
 			dEdge* const face = curve.GetFirst()->GetInfo()->GetInfo().m_face;
 
@@ -659,7 +659,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 			for (dList<dTreeNode*>::dListNode* node = curve.GetFirst(); node; node = node->GetNext()) {
 				dgPoint& point = node->GetInfo()->GetInfo();
 				dAssert (point.m_face == face);
-				dMeshEffect::dgVertexAtribute attribute(mesh->InterpolateVertex(point.m_posit, face));
+				ndMeshEffect::dgVertexAtribute attribute(mesh->InterpolateVertex(point.m_posit, face));
 				mesh->AddVertex(point.m_posit);
 				mesh->AddAtribute(attribute);
 			}
@@ -719,7 +719,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 			mesh->PolygonizeFace(glueEdge, mesh->GetVertexPool(), sizeof (dBigVector));
 		}
 
-		void EmbedCurveToMulipleFaces (dList<dTreeNode*>& curve, dMeshEffect* const mesh)
+		void EmbedCurveToMulipleFaces (dList<dTreeNode*>& curve, ndMeshEffect* const mesh)
 		{
 			for (dList<dTreeNode*>::dListNode* node = curve.GetFirst(); node; node = node->GetNext()) {
 				dgPoint& point = node->GetInfo()->GetInfo();
@@ -740,7 +740,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 		}
 
 
-		void AddCurveToMesh (dList<dTreeNode*>& curve, dMeshEffect* const mesh)
+		void AddCurveToMesh (dList<dTreeNode*>& curve, ndMeshEffect* const mesh)
 		{
 			bool isIscribedInFace = true; 
 			dEdge* const face = curve.GetFirst()->GetInfo()->GetInfo().m_face;
@@ -775,37 +775,37 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 			m_meshB->SaveOFF("xxxB0.off");
 		}
 
-		dMeshEffect* m_meshA;
-		dMeshEffect* m_meshB;
+		ndMeshEffect* m_meshA;
+		ndMeshEffect* m_meshB;
 		dInt32 m_pointBaseA;
 		dInt32 m_pointBaseB;
 		dInt32 m_lru;
 */
 	};
 
-	class dgClippedFace: public dMeshEffect
+	class dgClippedFace: public ndMeshEffect
 	{
 		public:
 		dgClippedFace ()
-			:dMeshEffect()
+			:ndMeshEffect()
 			,m_curveNetwork()
 		{
 			dAssert (0);
 		}
 
 		dgClippedFace (dgMemoryAllocator* const allocator)
-			:dMeshEffect(allocator)
+			:ndMeshEffect(allocator)
 			,m_curveNetwork(allocator)
 		{
 		}
 
 		dgClippedFace (const dgClippedFace& copy)
-			:dMeshEffect(copy)
+			:ndMeshEffect(copy)
 			,m_curveNetwork(copy.m_curveNetwork)
 		{
 		}
 
-		void InitFace(dMeshEffect* const mesh, dEdge* const face)
+		void InitFace(ndMeshEffect* const mesh, dEdge* const face)
 		{
 			dInt32 indexCount = 0;
 			dInt32 faceIndex[256];
@@ -814,7 +814,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 			dEdge* ptr = face;
 			do {
 				dAssert (0);
-				//const dMeshEffect::dgVertexAtribute& point =  mesh->GetAttribute(dInt32 (ptr->m_userData));
+				//const ndMeshEffect::dgVertexAtribute& point =  mesh->GetAttribute(dInt32 (ptr->m_userData));
 				//AddPoint (&point.m_vertex.m_x, dInt32 (point.m_material));
 				faceIndex[indexCount] = indexCount;
 				faceDataIndex[indexCount] = indexCount;
@@ -846,13 +846,13 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 	class dgClipppedFaces: public dTree<dgClippedFace, dEdge*>
 	{
 		public:
-		dgClipppedFaces(dMeshEffect* const mesh)
+		dgClipppedFaces(ndMeshEffect* const mesh)
 			:dTree<dgClippedFace, dEdge*>(mesh->GetAllocator())
 			,m_parentMesh (mesh)
 		{
 		}
 
-		void ClipMeshesFaces(dEdge* const faceA, const dMeshEffect* const meshB, dEdge* const faceB, const dBigVector& planeB, const dBigVector* const segment)
+		void ClipMeshesFaces(dEdge* const faceA, const ndMeshEffect* const meshB, dEdge* const faceB, const dBigVector& planeB, const dBigVector* const segment)
 		{
 			dTreeNode* node = Find (faceA);
 			if (!node) {
@@ -866,12 +866,12 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 			faceHead.AddSegment(planeB, segment);
 		}
 
-		dMeshEffect* m_parentMesh;
+		ndMeshEffect* m_parentMesh;
 	};
 	
 
 	public:
-	dgBooleanMeshClipper(dMeshEffect* const mesh)
+	dgBooleanMeshClipper(ndMeshEffect* const mesh)
 		:dMeshBVH(mesh)
 		,m_clippedFaces(mesh)
 	{
@@ -883,7 +883,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 	}
 
 /*
-	dFloat64 IntersetionSegment(const dMeshEffect* const meshEdge, dEdge* const edge, const dMeshEffect* const meshFace, dEdge* const face, const dgHugeVector& plane)
+	dFloat64 IntersetionSegment(const ndMeshEffect* const meshEdge, dEdge* const edge, const ndMeshEffect* const meshFace, dEdge* const face, const dgHugeVector& plane)
 	{
 		dgHugeVector p0 (meshEdge->GetVertex(edge->m_incidentVertex));
 		dgHugeVector p1 (meshEdge->GetVertex(edge->m_twin->m_incidentVertex));
@@ -914,7 +914,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 	}
 */
 
-	static dgHugeVector CalculateFaceNormal (const dMeshEffect* const mesh, dEdge* const face)
+	static dgHugeVector CalculateFaceNormal (const ndMeshEffect* const mesh, dEdge* const face)
 	{
 		dgHugeVector plane(dgGoogol::m_zero, dgGoogol::m_zero, dgGoogol::m_zero, dgGoogol::m_zero);
 		dEdge* edge = face;
@@ -936,7 +936,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 		return plane;
 	}
 
-	static bool IsPointInFace (const dgHugeVector& point, const dMeshEffect* const mesh, dEdge* const face, const dgHugeVector& normal)
+	static bool IsPointInFace (const dgHugeVector& point, const ndMeshEffect* const mesh, dEdge* const face, const dgHugeVector& normal)
 	{
 		dEdge* edge = face;
 		dgHugeVector p0(mesh->GetVertex(face->m_incidentVertex));
@@ -956,7 +956,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 		return true;
 	}
 
-	static bool ClipEdgeFace(dBigVector& point, const dMeshEffect* const meshEdge, dEdge* const edgeSrc, const dMeshEffect* const meshFace, dEdge* const face, const dgHugeVector& plane)
+	static bool ClipEdgeFace(dBigVector& point, const ndMeshEffect* const meshEdge, dEdge* const edgeSrc, const ndMeshEffect* const meshFace, dEdge* const face, const dgHugeVector& plane)
 	{
 		const dEdge* const edge = (edgeSrc->m_incidentVertex < edgeSrc->m_twin->m_incidentVertex) ? edgeSrc : edgeSrc->m_twin;
 		dgHugeVector p0 (meshEdge->GetVertex(edge->m_incidentVertex));
@@ -989,7 +989,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 		return false;
 	}
 
-	static void CalculateIntersection (const dMeshEffect* const edgeOwnerMesh, dEdge* const edgeStart, const dMeshEffect* const faceOwnerMesh, dEdge* const face, const dgHugeVector& facePlane, dBigVector* const data, dInt32& index)
+	static void CalculateIntersection (const ndMeshEffect* const edgeOwnerMesh, dEdge* const edgeStart, const ndMeshEffect* const faceOwnerMesh, dEdge* const face, const dgHugeVector& facePlane, dBigVector* const data, dInt32& index)
 	{
 		dEdge* edge = edgeStart;
 		do {
@@ -1003,8 +1003,8 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 
 	static void ClipMeshesFaces(dgBooleanMeshClipper& bvhMeshA, dEdge* const faceA, dgBooleanMeshClipper& bvhMeshB, dEdge* const faceB)
 	{
-		const dMeshEffect* const meshA = bvhMeshA.m_mesh;
-		const dMeshEffect* const meshB = bvhMeshB.m_mesh;
+		const ndMeshEffect* const meshA = bvhMeshA.m_mesh;
+		const ndMeshEffect* const meshB = bvhMeshB.m_mesh;
 		dAssert (meshA->FindEdge(faceA->m_incidentVertex, faceA->m_twin->m_incidentVertex) == faceA);
 		dAssert (meshB->FindEdge(faceB->m_incidentVertex, faceB->m_twin->m_incidentVertex) == faceB);
 
@@ -1025,7 +1025,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 		}
 	}
 
-	static void ClipMeshesAndColorize(dMeshEffect* const meshA, dMeshEffect* const meshB)
+	static void ClipMeshesAndColorize(ndMeshEffect* const meshA, ndMeshEffect* const meshB)
 	{
 		dAssert (0);
 /*
@@ -1134,15 +1134,15 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 
 
 
-dMeshEffect* dMeshEffect::Intersection (const dMatrix& matrix, const dMeshEffect* const clipperMesh) const
+ndMeshEffect* ndMeshEffect::Intersection (const dMatrix& matrix, const ndMeshEffect* const clipperMesh) const
 {
-	dMeshEffect copy (*this);
-	dMeshEffect clipper (*clipperMesh);
+	ndMeshEffect copy (*this);
+	ndMeshEffect clipper (*clipperMesh);
 	clipper.TransformMesh (matrix);
 
 	dgBooleanMeshClipper::ClipMeshesAndColorize (&copy, &clipper);
 /*
-	dMeshEffect* const mesh = new (GetAllocator()) dMeshEffect (GetAllocator());
+	ndMeshEffect* const mesh = new (GetAllocator()) ndMeshEffect (GetAllocator());
 	mesh->BeginFace();
 	dgBooleanMeshClipper::CopyPoints(mesh, &copy);
 	dgBooleanMeshClipper::AddInteriorFaces (mesh, &copy);

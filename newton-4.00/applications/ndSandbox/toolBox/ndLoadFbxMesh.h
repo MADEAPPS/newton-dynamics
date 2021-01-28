@@ -32,7 +32,7 @@ class fbxDemoEntity : public ndDemoEntity
 	void BuildRenderMeshes(ndDemoEntityManager* const scene);
 	void ApplyTransform(const dMatrix& cordinateSystem);
 
-	dMeshEffect* m_fbxMeshEffect;
+	ndMeshEffect* m_fbxMeshEffect;
 };
 
 fbxDemoEntity* LoadFbxMesh(const char* const meshName);

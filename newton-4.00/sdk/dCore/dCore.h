@@ -48,7 +48,6 @@
 #include <dThreadPool.h>
 #include <dIsoSurface.h>
 #include <dQuaternion.h>
-#include <dMeshEffect.h>
 #include <dPerlinNoise.h>
 #include <dTinyXmlGlue.h>
 #include <dConvexHull3d.h>

@@ -191,7 +191,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	OptimizeForRender(points, indices);
 }
 
-ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
+ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
 	,m_indexCount(0)
@@ -228,14 +228,14 @@ ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, cons
 
 	dInt32 segmentStart = 0;
 	bool hasTransparency = false;
-	const dArray<dMeshEffect::dMaterial>& materialArray = meshNode->GetMaterials();
+	const dArray<ndMeshEffect::dMaterial>& materialArray = meshNode->GetMaterials();
 	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
 	{
 		dInt32 materialIndex = meshNode->GetMaterialID(geometryHandle, handle);
 		//if (materialIndex == 0) continue;
 		ndDemoSubMesh* const segment = AddSubMesh();
 		
-		const dMeshEffect::dMaterial& material = materialArray[materialIndex];
+		const ndMeshEffect::dMaterial& material = materialArray[materialIndex];
 		segment->m_material.m_ambient = material.m_ambient;
 		segment->m_material.m_diffuse = material.m_diffuse;
 		segment->m_material.m_specular = material.m_specular;

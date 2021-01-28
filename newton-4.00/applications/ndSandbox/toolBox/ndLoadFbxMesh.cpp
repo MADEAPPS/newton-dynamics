@@ -231,21 +231,21 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNoceM
 	return entity;
 }
 
-static void ImportMaterials(const ofbx::Mesh* const fbxMesh, dMeshEffect* const mesh)
+static void ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const mesh)
 {
-	dArray<dMeshEffect::dMaterial>& materialArray = mesh->GetMaterials();
+	dArray<ndMeshEffect::dMaterial>& materialArray = mesh->GetMaterials();
 	
 	dInt32 materialCount = fbxMesh->getMaterialCount();
 	if (materialCount == 0)
 	{
-		dMeshEffect::dMaterial defaultMaterial;
+		ndMeshEffect::dMaterial defaultMaterial;
 		materialArray.PushBack(defaultMaterial);
 	}
 	else
 	{
 		for (dInt32 i = 0; i < materialCount; i++)
 		{
-			dMeshEffect::dMaterial material;
+			ndMeshEffect::dMaterial material;
 			const ofbx::Material* const fbxMaterial = fbxMesh->getMaterial(i);
 			dAssert(fbxMaterial);
 
@@ -297,7 +297,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 
 	dAssert(nodeMap.Find(fbxNode));
 	fbxDemoEntity* const entity = nodeMap.Find(fbxNode)->GetInfo();
-	dMeshEffect* const mesh = new dMeshEffect();
+	ndMeshEffect* const mesh = new ndMeshEffect();
 	mesh->SetName(fbxMesh->name);
 
 	dMatrix pivotMatrix(ofbxMatrix2dMatrix(fbxMesh->getGeometricMatrix()));
@@ -328,7 +328,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 
 	dInt32 count = 0;
 	dInt32 faceIndex = 0;
-	const dArray<dMeshEffect::dMaterial>& materialArray = mesh->GetMaterials();
+	const dArray<ndMeshEffect::dMaterial>& materialArray = mesh->GetMaterials();
 	dInt32 materialId = (materialArray.GetCount() <= 1) ? 0 : -1;
 	for (dInt32 i = 0; i < indexCount; i++)
 	{
@@ -352,7 +352,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 		}
 	}
 
-	dMeshEffect::dMeshVertexFormat format;
+	ndMeshEffect::dMeshVertexFormat format;
 	format.m_vertex.m_data = &vertices[0].x;
 	format.m_vertex.m_indexList = indexArray;
 	format.m_vertex.m_strideInBytes = sizeof(ofbx::Vec3);

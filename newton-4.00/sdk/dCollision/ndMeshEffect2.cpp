@@ -22,7 +22,7 @@
 #include "dCoreStdafx.h"
 #include "dStack.h"
 #include "dMatrix.h"
-#include "dMeshEffect.h"
+#include "ndMeshEffect.h"
 #include "dConvexHull3d.h"
 #include "dConvexHull4d.h"
 #include "dDelaunayTetrahedralization.h"
@@ -31,11 +31,11 @@
 
 
 #if 0
-class dgRayTrataAABBAccelerator: public dMeshEffect::dMeshBVH
+class dgRayTrataAABBAccelerator: public ndMeshEffect::dMeshBVH
 {
 	public:
-	dgRayTrataAABBAccelerator(const dMeshEffect* const tetraMesh)
-		:dMeshEffect::dMeshBVH(tetraMesh)
+	dgRayTrataAABBAccelerator(const ndMeshEffect* const tetraMesh)
+		:ndMeshEffect::dMeshBVH(tetraMesh)
 	{
 		Build();
 	}
@@ -207,11 +207,11 @@ class dgTetraIsoSufaceStuffing
 		dInt32 m_count;
 	};
 
-	class dgClosePointsAccelerator: public dMeshEffect::dMeshBVH
+	class dgClosePointsAccelerator: public ndMeshEffect::dMeshBVH
 	{
 		public:
-		dgClosePointsAccelerator(const dMeshEffect* const mesh)
-			:dMeshEffect::dMeshBVH(mesh)
+		dgClosePointsAccelerator(const ndMeshEffect* const mesh)
+			:ndMeshEffect::dMeshBVH(mesh)
 		{
 			Build();
 		}
@@ -275,7 +275,7 @@ class dgTetraIsoSufaceStuffing
 		}
 	};
 
-	class dgRayTraceAccelerator: public dMeshEffect::dMeshBVH
+	class dgRayTraceAccelerator: public ndMeshEffect::dMeshBVH
 	{
 		enum dgTraceType
 		{
@@ -319,8 +319,8 @@ class dgTetraIsoSufaceStuffing
 		};
 
 		public:
-		dgRayTraceAccelerator(const dMeshEffect* const mesh, dFloat64 diameter)
-			:dMeshEffect::dMeshBVH(mesh)
+		dgRayTraceAccelerator(const ndMeshEffect* const mesh, dFloat64 diameter)
+			:ndMeshEffect::dMeshBVH(mesh)
 			,m_normals()
 			,m_diameter(diameter)
 		{
@@ -484,7 +484,7 @@ class dgTetraIsoSufaceStuffing
 		dFloat64 m_diameter;
 	};
 
-	dgTetraIsoSufaceStuffing(const dMeshEffect* const mesh, dFloat64 cellSize)
+	dgTetraIsoSufaceStuffing(const ndMeshEffect* const mesh, dFloat64 cellSize)
 		:m_points(mesh->GetAllocator())
 		,m_tetraList(mesh->GetAllocator())
 		,m_pointCount(0)
@@ -579,7 +579,7 @@ class dgTetraIsoSufaceStuffing
 		}
 	}
 
-	dgGridDimension CalculateGridSize(const dMeshEffect* const mesh, dFloat64 cellsize) const
+	dgGridDimension CalculateGridSize(const ndMeshEffect* const mesh, dFloat64 cellsize) const
 	{
 		dBigVector minBox;
 		dBigVector maxBox;
@@ -777,7 +777,7 @@ class dgTetraIsoSufaceStuffing
 	dInt32 m_tetraCount;
 };
 
-void dMeshEffect::LoadOffMesh(const char* const fileName)
+void ndMeshEffect::LoadOffMesh(const char* const fileName)
 {
 	class ParceOFF
 	{
@@ -897,7 +897,7 @@ void dMeshEffect::LoadOffMesh(const char* const fileName)
 	}
 }
 
-void dMeshEffect::LoadTetraMesh (const char* const filename)
+void ndMeshEffect::LoadTetraMesh (const char* const filename)
 {
 	FILE* const file = fopen(filename, "rb");
 	if (file) {
@@ -926,7 +926,7 @@ void dMeshEffect::LoadTetraMesh (const char* const filename)
 				pointArray[i] = points[index];
 			}
 
-			dMeshEffect convexMesh(allocator, &pointArray[0].m_x, 4, sizeof (dBigVector), dFloat64(0.0f));
+			ndMeshEffect convexMesh(allocator, &pointArray[0].m_x, 4, sizeof (dBigVector), dFloat64(0.0f));
 
 			dAssert(convexMesh.GetCount());
 			convexMesh.CalculateNormals(dFloat32(30.0f * dDegreeToRad));
@@ -942,10 +942,10 @@ void dMeshEffect::LoadTetraMesh (const char* const filename)
 
 
 
-dMeshEffect* dMeshEffect::CreateTetrahedraIsoSurface() const
+ndMeshEffect* ndMeshEffect::CreateTetrahedraIsoSurface() const
 {
 /*
-dMeshEffect xxxx  (GetAllocator());
+ndMeshEffect xxxx  (GetAllocator());
 xxxx.BeginBuild();
 
 xxxx.BeginBuildFace ();
@@ -976,10 +976,10 @@ xxxx.EndBuild(dFloat64(1.0e-8f), false);
 
 	dgTetraIsoSufaceStuffing tetraIsoStuffing (this, dFloat64(0.125f));
 
-	dMeshEffect* delaunayPartition = nullptr;
+	ndMeshEffect* delaunayPartition = nullptr;
 	if (tetraIsoStuffing.m_tetraCount) {
 		dgMemoryAllocator* const allocator = GetAllocator();
-		delaunayPartition = new (allocator) dMeshEffect (allocator);
+		delaunayPartition = new (allocator) ndMeshEffect (allocator);
 		delaunayPartition->BeginBuild();
 		dInt32 layer = 0;
 		dBigVector pointArray[4];
@@ -989,7 +989,7 @@ xxxx.EndBuild(dFloat64(1.0e-8f), false);
 				dInt32 index = tetra[i];
 				pointArray[i] = tetraIsoStuffing.m_points[index];
 			}
-			dMeshEffect convexMesh(allocator, &pointArray[0].m_x, 4, sizeof (dBigVector), dFloat64(0.0f));
+			ndMeshEffect convexMesh(allocator, &pointArray[0].m_x, 4, sizeof (dBigVector), dFloat64(0.0f));
 			//dAssert (convexMesh.GetCount());
 			//convexMesh.CalculateNormals(dFloat32 (30.0f * dgDEG2RAD));
 			for (dInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; i++) {
@@ -1004,7 +1004,7 @@ xxxx.EndBuild(dFloat64(1.0e-8f), false);
 	return delaunayPartition;
 }
 
-void dMeshEffect::CreateTetrahedraLinearBlendSkinWeightsChannel (const dMeshEffect* const tetrahedraMesh)
+void ndMeshEffect::CreateTetrahedraLinearBlendSkinWeightsChannel (const ndMeshEffect* const tetrahedraMesh)
 {
 dAssert(0);
 /*
@@ -1103,7 +1103,7 @@ dAssert(0);
 
 #endif
 
-dMeshEffect* dMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, dInt32 pointStrideInBytes, const dFloat32* const pointCloud, dInt32 materialId, const dMatrix& textureProjectionMatrix)
+ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, dInt32 pointStrideInBytes, const dFloat32* const pointCloud, dInt32 materialId, const dMatrix& textureProjectionMatrix)
 {
 	dStack<dBigVector> buffer(pointCount + 16);
 	dBigVector* const pool = &buffer[0];
@@ -1189,7 +1189,7 @@ dMeshEffect* dMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, dI
 	}
 
 	const dFloat32 normalAngleInRadians = dFloat32(30.0f * dDegreeToRad);
-	dMeshEffect* const voronoiPartition = new dMeshEffect;
+	ndMeshEffect* const voronoiPartition = new ndMeshEffect;
 	voronoiPartition->BeginBuild();
 	dInt32 layer = 0;
 	dTree<dList<dInt32>, dInt32>::Iterator iter(delaunayNodes);
@@ -1216,7 +1216,7 @@ dMeshEffect* dMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, dI
 			count1 = dVertexListToIndexList(&pointArray[0].m_x, sizeof(dBigVector), 3, count1, &indexArray[0], dFloat64(1.0e-3f));
 			if (count1 >= 4) 
 			{
-				dMeshEffect convexMesh(&pointArray[0].m_x, count1, sizeof(dBigVector), dFloat64(0.0f));
+				ndMeshEffect convexMesh(&pointArray[0].m_x, count1, sizeof(dBigVector), dFloat64(0.0f));
 				if (convexMesh.GetCount()) 
 				{
 					convexMesh.CalculateNormals(normalAngleInRadians);

@@ -27,7 +27,7 @@
 #include "ndShapeInstanceMeshBuilder.h"
 
 ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& instance)
-	:dMeshEffect()
+	:ndMeshEffect()
 {
 	class dgMeshEffectBuilder: public ndShapeDebugCallback
 	{
@@ -82,7 +82,7 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 	dInt32* const indexList = &indexListBuffer[0];
 	dVertexListToIndexList(&builder.m_vertex[0].m_x, sizeof(dBigVector), 4, builder.m_vertex.GetCount(), &indexList[0], DG_VERTEXLIST_INDEXLIST_TOL);
 	
-	dMeshEffect::dMeshVertexFormat vertexFormat;
+	ndMeshEffect::dMeshVertexFormat vertexFormat;
 	
 	vertexFormat.m_faceCount = builder.m_faceIndexCount.GetCount();
 	vertexFormat.m_faceIndexCount = &builder.m_faceIndexCount[0];
