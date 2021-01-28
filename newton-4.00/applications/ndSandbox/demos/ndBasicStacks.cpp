@@ -158,14 +158,13 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 
 	dVector origin1(0.0f, 0.0f, 4.0f, 0.0f);
 	BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
-	//BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 1);
 
-	//origin1.m_z = -4.0f;
-	//BuildCylinderStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
-	//
-	//origin1.m_z = 0.0f;
-	//origin1.m_x += 4.0f;
-	//BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	origin1.m_z = -4.0f;
+	BuildCylinderStack(scene, 1.0f, origin1, dVector(0.5f, 0.3f, 0.5f, 0.0f), 20);
+	
+	origin1.m_z = 0.0f;
+	origin1.m_x += 4.0f;
+	BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
 
 	dQuaternion rot;
 	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
