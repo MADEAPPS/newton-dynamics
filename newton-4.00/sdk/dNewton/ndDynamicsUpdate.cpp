@@ -1045,7 +1045,6 @@ void ndDynamicsUpdate::IntegrateBodies()
 			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
 
 			const dFloat32 timestep = m_timestep;
-			const dFloat32 maxAccNorm2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
 			const dVector invTime(me->m_invTimestep);
 			for (dInt32 i = 0; i < count; i++)
 			{
@@ -1056,11 +1055,8 @@ void ndDynamicsUpdate::IntegrateBodies()
 				{
 					if (!dynBody->m_equilibrium)
 					{
-						dVector accel(invTime * (dynBody->m_veloc - dynBody->m_accel));
-						dVector alpha(invTime * (dynBody->m_omega - dynBody->m_alpha));
-						dVector accelTest((accel.DotProduct(accel) > maxAccNorm2) | (alpha.DotProduct(alpha) > maxAccNorm2));
-						dynBody->m_accel = accel & accelTest;
-						dynBody->m_alpha = alpha & accelTest;
+						dynBody->m_accel = invTime * (dynBody->m_veloc - dynBody->m_accel);
+						dynBody->m_alpha = invTime * (dynBody->m_omega - dynBody->m_alpha);
 						dynBody->IntegrateVelocity(timestep);
 					}
 				}
@@ -1130,12 +1126,12 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 
 	const dFloat32 speedFreeze = m_world->m_freezeSpeed2;
 	const dFloat32 accelFreeze = m_world->m_freezeAccel2 * ((count <= D_SMALL_ISLAND_COUNT) ? dFloat32(0.01f) : dFloat32(1.0f));
-	//const dFloat32 accelFreeze = me->m_freezeAccel2 * ((count <= DG_SMALL_ISLAND_COUNT) ? dFloat32(0.0025f) : dFloat32(1.0f));
-	dVector velocDragVect(velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, dFloat32(0.0f));
+	const dFloat32 acc2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
+	const dFloat32 maxAccNorm2 = (count > 4) ? acc2 : acc2 * dFloat32(0.0625f);
+	const dVector velocDragVect(velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, dFloat32(0.0f));
 
 	dInt32 stackSleeping = 1;
 	dInt32 sleepCounter = 10000;
-
 	ndBodyKinematic** const bodyIslands = &m_bodyIslandOrder[island.m_start];
 	for (dInt32 i = 0; i < count; i++)
 	{
@@ -1147,6 +1143,10 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 			dAssert(dynBody->m_veloc.m_w == dFloat32(0.0f));
 			dAssert(dynBody->m_omega.m_w == dFloat32(0.0f));
 
+			dVector accelTest((dynBody->m_accel.DotProduct(dynBody->m_accel) > maxAccNorm2) | (dynBody->m_alpha.DotProduct(dynBody->m_alpha) > maxAccNorm2));
+			dynBody->m_accel = dynBody->m_accel & accelTest;
+			dynBody->m_alpha = dynBody->m_alpha & accelTest;
+			
 			dUnsigned32 equilibrium = (dynBody->GetInvMass() == dFloat32(0.0f)) ? 1 : dynBody->m_autoSleep;
 			const dVector isMovingMask(dynBody->m_veloc + dynBody->m_omega + dynBody->m_accel + dynBody->m_alpha);
 			const dVector mask(isMovingMask.TestZero());
