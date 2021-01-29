@@ -489,21 +489,24 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDem
 		nextDebri = debriMeshPieces->GetNextLayer(debri);
 	
 		//clip the voronoi cell convexes against the mesh 
-	//	NewtonMesh* const fracturePiece = NewtonMeshConvexMeshIntersection(mesh, debri);
-	//	if (fracturePiece) {
-	//		// make a convex hull collision shape
-	//		NewtonCollision* const collision = NewtonCreateConvexHullFromMesh(world, fracturePiece, dFloat32 (0.0f), 16);
-	//		if (collision) {
-	//			// we have a piece which has a convex collision  representation, add that to the list
-	//			WoodFractureAtom& atom = Append()->GetInfo();
-	//			atom.m_mesh = new DemoMesh(fracturePiece, scene->GetShaderCache());
-	//			NewtonConvexCollisionCalculateInertialMatrix(collision, &atom.m_momentOfInertia[0], &atom.m_centerOfMass[0]);
-	//			dFloat32 debriVolume = NewtonConvexCollisionCalculateVolume(collision);
-	//			atom.m_massFraction = debriVolume / volume;
-	//			atom.m_collision = collision;
-	//		}
-	//		NewtonMeshDestroy(fracturePiece);
-	//	}
+		ndMeshEffect* const fracturePiece = mesh->ConvexMeshIntersection(debri);
+		if (fracturePiece) 
+		{
+			// make a convex hull collision shape
+			//NewtonCollision* const collision = NewtonCreateConvexHullFromMesh(world, fracturePiece, dFloat32 (0.0f), 16);
+			ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
+			if (collision) 
+			{
+			//	// we have a piece which has a convex collision  representation, add that to the list
+			//	WoodFractureAtom& atom = Append()->GetInfo();
+			//	atom.m_mesh = new DemoMesh(fracturePiece, scene->GetShaderCache());
+			//	NewtonConvexCollisionCalculateInertialMatrix(collision, &atom.m_momentOfInertia[0], &atom.m_centerOfMass[0]);
+			//	dFloat32 debriVolume = NewtonConvexCollisionCalculateVolume(collision);
+			//	atom.m_massFraction = debriVolume / volume;
+			//	atom.m_collision = collision;
+			}
+			delete fracturePiece;
+		}
 	
 		delete debri;
 	}

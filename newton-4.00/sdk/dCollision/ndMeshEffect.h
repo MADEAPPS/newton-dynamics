@@ -128,21 +128,15 @@ class ndMeshEffect: public dPolyhedra
 	void CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMaterial, const dMatrix& uvAligment);
 	void AngleBaseFlatteningMapping (dInt32 cylinderMaterial, dgReportProgress progressReportCallback, void* const userData);
 
-	dEdge* InsertEdgeVertex (dEdge* const edge, dFloat64 param);
-
 	ndMeshEffect* Union (const dMatrix& matrix, const ndMeshEffect* const clipper) const;
 	ndMeshEffect* Difference (const dMatrix& matrix, const ndMeshEffect* const clipper) const;
 	ndMeshEffect* Intersection (const dMatrix& matrix, const ndMeshEffect* const clipper) const;
 	void ClipMesh (const dMatrix& matrix, const ndMeshEffect* const clipper, ndMeshEffect** const top, ndMeshEffect** const bottom) const;
 
 	//bool PlaneClip (const dBigPlane& plane);
-	
-	ndMeshEffect* ConvexMeshIntersection (const ndMeshEffect* const convexMesh) const;
 
 	void Triangulate ();
-	void ConvertToPolygons ();
-	void RemoveUnusedVertices(dInt32* const vertexRemapTable);
-
+	
 	dInt32 GetVertexBaseCount() const;
 	void SetVertexBaseCount(dInt32 count);
 	
@@ -152,7 +146,6 @@ class ndMeshEffect: public dPolyhedra
 	dInt32 GetTotalIndexCount() const;
 	void GetFaces (dInt32* const faceCount, dInt32* const materials, void** const faceNodeList) const;
 
-	bool HasOpenEdges () const;
 	void OptimizePoints();
 	void OptimizeAttibutes();
 	const dInt32* GetIndexToVertexMap() const;
@@ -165,8 +158,6 @@ class ndMeshEffect: public dPolyhedra
 	bool HasVertexColorChannel() const;
 	
 	dgCollisionInstance* CreateCollisionTree(dgWorld* const world, dInt32 shapeID) const;
-	dgCollisionInstance* CreateConvexCollision(dgWorld* const world, dFloat64 tolerance, dInt32 shapeID, const dMatrix& matrix = dGetIdentityMatrix()) const;
-
 	ndMeshEffect* CreateSimplification (dInt32 maxVertexCount, dgReportProgress reportProgressCallback, void* const userData) const;
 	ndMeshEffect* CreateConvexApproximation (dFloat32 maxConcavity, dFloat32 backFaceDistanceFactor, dInt32 maxHullOuputCount, dInt32 maxVertexPerHull, dgReportProgress reportProgressCallback, void* const userData) const;
 
@@ -211,7 +202,6 @@ class ndMeshEffect: public dPolyhedra
 	dBigVector CalculateFaceNormal (const void* const face) const;
 
 	void SetFaceMaterial (const void* const face, dInt32 materialID);
-	void AddInterpolatedEdgeAttribute (dEdge* const edge, dFloat64 param);
 	dInt32 InterpolateVertex (const dBigVector& point, const dEdge* const face) const;
 
 	protected:
@@ -220,11 +210,8 @@ class ndMeshEffect: public dPolyhedra
 	dInt32 CalculateMaxAttributes () const;
 //	void ReverseMergeFaces (ndMeshEffect* const source);
 
-	bool PlaneClip (const ndMeshEffect& convexMesh, const dEdge* const face);
-
 	ndMeshEffect* GetNextLayer (dInt32 mark);
 	ndMeshEffect* CreateVoronoiConvex (const dBigVector* const conevexPointCloud, dInt32 count, dInt32 materialId, const dMatrix& textureProjectionMatrix, dFloat32 normalAngleInRadians) const;
-	
 	
 	friend class dConvexHull3d;
 	friend class dgConvexHull4d;
@@ -462,7 +449,16 @@ class ndMeshEffect: public dPolyhedra
 	ndMeshEffect* GetFirstLayer();
 	ndMeshEffect* GetNextLayer(ndMeshEffect* const layer);
 
+	
+	D_COLLISION_API bool HasOpenEdges() const;
+	D_COLLISION_API void ConvertToPolygons();
+	D_COLLISION_API dEdge* InsertEdgeVertex(dEdge* const edge, dFloat64 param);
+	D_COLLISION_API void AddInterpolatedEdgeAttribute(dEdge* const edge, dFloat64 param);
+	D_COLLISION_API void RemoveUnusedVertices(dInt32* const vertexRemapTable);
+	D_COLLISION_API bool PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const face);
+	D_COLLISION_API ndShapeInstance* CreateConvexCollision(dFloat64 tolerance) const;
 	D_COLLISION_API ndMeshEffect* CreateVoronoiConvexDecomposition(dInt32 interiorMaterialIndex, const dMatrix& textureProjectionMatrix);
+	D_COLLISION_API ndMeshEffect* ConvexMeshIntersection(const ndMeshEffect* const convexMesh) const;
 
 	protected:
 	D_COLLISION_API void Init();

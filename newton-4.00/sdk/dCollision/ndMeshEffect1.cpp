@@ -27,6 +27,7 @@
 #include "ndShape.h"
 #include "ndMeshEffect.h"
 #include "ndShapeInstance.h"
+#include "ndShapeConvexHull.h"
 
 #if 0
 void ndMeshEffect::dAttibutFormat::CopyFrom(const dAttibutFormat& source)
@@ -1080,32 +1081,7 @@ void ndMeshEffect::Triangulate()
 	dAssert(Sanity());
 }
 
-void ndMeshEffect::ConvertToPolygons()
-{
-	UnpackPoints();
-	dPolyhedra leftOversOut(GetAllocator());
-	dPolyhedra::ConvexPartition(&m_points.m_vertex[0].m_x, sizeof(dBigVector), &leftOversOut);
-	dAssert(leftOversOut.GetCount() == 0);
 
-	dPolyhedra::Iterator iter(*this);
-	for (iter.Begin(); iter; iter++) {
-		dEdge* const edge = &iter.GetNode()->GetInfo();
-		edge->m_userData = (edge->m_incidentFace) > 0 ? edge->m_incidentVertex : 0;
-	}
-	PackPoints(dFloat32(1.0e-24f));
-
-	RepairTJoints();
-	dAssert(Sanity());
-}
-
-void ndMeshEffect::RemoveUnusedVertices(dInt32* const vertexMapResult)
-{
-	dAssert(!vertexMapResult);
-	UnpackAttibuteData();
-	PackAttibuteData();
-	UnpackPoints();
-	PackPoints(dFloat32(1.0e-24f));
-}
 
 void ndMeshEffect::OptimizePoints()
 {
@@ -1638,53 +1614,6 @@ dgCollisionInstance* ndMeshEffect::CreateCollisionTree(dgWorld* const world, dIn
 	return instance;
 }
 
-dgCollisionInstance* ndMeshEffect::CreateConvexCollision(dgWorld* const world, dFloat64 tolerance, dInt32 shapeID, const dMatrix& srcMatrix) const
-{
-	dStack<dVector> poolPtr(m_points.m_vertex.m_count * 2);
-	dVector* const pool = &poolPtr[0];
-
-	dBigVector minBox;
-	dBigVector maxBox;
-	CalculateAABB(minBox, maxBox);
-	//dVector com ((minBox + maxBox).Scale (dFloat32 (0.5f)));
-	dVector com((minBox + maxBox) * dVector::m_half);
-
-	dInt32 count = 0;
-	dInt32 mark = IncLRU();
-	dPolyhedra::Iterator iter(*this);
-	for (iter.Begin(); iter; iter++) {
-		dEdge* const vertex = &(*iter);
-		if (vertex->m_mark != mark) {
-			dEdge* ptr = vertex;
-			do {
-				ptr->m_mark = mark;
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != vertex);
-
-			if (count < dInt32(poolPtr.GetElementsCount())) {
-				const dBigVector p(m_points.m_vertex[vertex->m_incidentVertex]);
-				pool[count] = dVector(p) - com;
-				count++;
-			}
-		}
-	}
-
-	dMatrix matrix(srcMatrix);
-	matrix.m_posit += matrix.RotateVector(com);
-	matrix.m_posit.m_w = dFloat32(1.0f);
-
-	dUnsigned32 crc = ndShapeConvexHull::CalculateSignature(count, &pool[0].m_x, sizeof(dVector));
-	ndShapeConvexHull* const collision = new (GetAllocator()) ndShapeConvexHull(GetAllocator(), crc, count, sizeof(dVector), dFloat32(tolerance), &pool[0].m_x);
-	if (!collision->GetConvexVertexCount()) {
-		collision->Release();
-		return nullptr;
-	}
-	dgCollisionInstance* const instance = world->CreateInstance(collision, shapeID, matrix);
-	collision->Release();
-	return instance;
-}
-
-
 void ndMeshEffect::TransformMesh(const dMatrix& matrix)
 {
 	dAssert(0);
@@ -1696,97 +1625,6 @@ void ndMeshEffect::TransformMesh(const dMatrix& matrix)
 	matrix.TransformTriplex (&m_attrib[0].m_vertex.m_x, sizeof (dgVertexAtribute), &m_attrib[0].m_vertex.m_x, sizeof (dgVertexAtribute), m_atribCount);
 	normalMatrix.TransformTriplex (&m_attrib[0].m_normal_x, sizeof (dgVertexAtribute), &m_attrib[0].m_normal_x, sizeof (dgVertexAtribute), m_atribCount);
 */
-}
-
-
-void ndMeshEffect::AddInterpolatedEdgeAttribute(dEdge* const edge, dFloat64 param)
-{
-	dFloat64 t1 = param;
-	dFloat64 t0 = dFloat64(1.0f) - t1;
-	dAssert(t1 >= dFloat64(0.0f));
-	dAssert(t1 <= dFloat64(1.0f));
-
-	const dInt32 vertexIndex = m_points.m_vertex.m_count;
-	m_points.m_vertex.PushBack(m_points.m_vertex[edge->m_incidentVertex].Scale(t0) + m_points.m_vertex[edge->m_next->m_incidentVertex].Scale(t1));
-	if (m_points.m_layers.m_count) {
-		m_points.m_layers.PushBack(m_points.m_layers[edge->m_incidentVertex]);
-	}
-
-	m_attrib.m_pointChannel.PushBack(vertexIndex);
-	m_attrib.m_pointChannel.PushBack(vertexIndex);
-
-	if (m_attrib.m_materialChannel.m_count) {
-		m_attrib.m_materialChannel.PushBack(m_attrib.m_materialChannel[dInt32(edge->m_userData)]);
-		m_attrib.m_materialChannel.PushBack(m_attrib.m_materialChannel[dInt32(edge->m_twin->m_userData)]);
-	}
-	if (m_attrib.m_normalChannel.m_count) {
-		dTriplex edgeNormal;
-		dTriplex edgeNormal0(m_attrib.m_normalChannel[dInt32(edge->m_userData)]);
-		dTriplex edgeNormal1(m_attrib.m_normalChannel[dInt32(edge->m_next->m_userData)]);
-		edgeNormal.m_x = edgeNormal0.m_x * dFloat32(t0) + edgeNormal1.m_x * dFloat32(t1);
-		edgeNormal.m_y = edgeNormal0.m_y * dFloat32(t0) + edgeNormal1.m_y * dFloat32(t1);
-		edgeNormal.m_z = edgeNormal0.m_z * dFloat32(t0) + edgeNormal1.m_z * dFloat32(t1);
-		m_attrib.m_normalChannel.PushBack(edgeNormal);
-
-		dTriplex twinNormal;
-		dTriplex twinNormal0(m_attrib.m_normalChannel[dInt32(edge->m_twin->m_next->m_userData)]);
-		dTriplex twinNormal1(m_attrib.m_normalChannel[dInt32(edge->m_twin->m_userData)]);
-		twinNormal.m_x = twinNormal0.m_x * dFloat32(t0) + twinNormal1.m_x * dFloat32(t1);
-		twinNormal.m_y = twinNormal0.m_y * dFloat32(t0) + twinNormal1.m_y * dFloat32(t1);
-		twinNormal.m_z = twinNormal0.m_z * dFloat32(t0) + twinNormal1.m_z * dFloat32(t1);
-		m_attrib.m_normalChannel.PushBack(twinNormal);
-	}
-	if (m_attrib.m_binormalChannel.m_count) {
-		dAssert(0);
-	}
-
-	if (m_attrib.m_uv0Channel.m_count) {
-		dAttibutFormat::dgUV edgeUV;
-		dAttibutFormat::dgUV edgeUV0(m_attrib.m_uv0Channel[dInt32(edge->m_userData)]);
-		dAttibutFormat::dgUV edgeUV1(m_attrib.m_uv0Channel[dInt32(edge->m_next->m_userData)]);
-		edgeUV.m_u = edgeUV0.m_u * dFloat32(t0) + edgeUV1.m_u * dFloat32(t1);
-		edgeUV.m_v = edgeUV0.m_v * dFloat32(t0) + edgeUV1.m_v * dFloat32(t1);
-		m_attrib.m_uv0Channel.PushBack(edgeUV);
-
-		dAttibutFormat::dgUV twinUV;
-		dAttibutFormat::dgUV twinUV0(m_attrib.m_uv0Channel[dInt32(edge->m_twin->m_next->m_userData)]);
-		dAttibutFormat::dgUV twinUV1(m_attrib.m_uv0Channel[dInt32(edge->m_twin->m_userData)]);
-		twinUV.m_u = twinUV0.m_u * dFloat32(t0) + twinUV1.m_u * dFloat32(t1);
-		twinUV.m_v = twinUV0.m_v * dFloat32(t0) + twinUV1.m_v * dFloat32(t1);
-		m_attrib.m_uv0Channel.PushBack(twinUV);
-	}
-
-	if (m_attrib.m_uv1Channel.m_count) {
-		dAssert(0);
-	}
-
-	if (m_attrib.m_colorChannel.m_count) {
-		dAssert(0);
-	}
-}
-
-
-
-dEdge* ndMeshEffect::InsertEdgeVertex(dEdge* const edge, dFloat64 param)
-{
-	dEdge* const twin = edge->m_twin;
-	AddInterpolatedEdgeAttribute(edge, param);
-
-	dInt32 edgeAttrV0 = dInt32(edge->m_userData);
-	dInt32 twinAttrV0 = dInt32(twin->m_userData);
-
-	dEdge* const faceA0 = edge->m_next;
-	dEdge* const faceA1 = edge->m_prev;
-	dEdge* const faceB0 = twin->m_next;
-	dEdge* const faceB1 = twin->m_prev;
-	SpliteEdge(m_points.m_vertex.m_count - 1, edge);
-
-	faceA0->m_prev->m_userData = dUnsigned64(m_attrib.m_pointChannel.m_count - 2);
-	faceA1->m_next->m_userData = dUnsigned64(edgeAttrV0);
-
-	faceB0->m_prev->m_userData = dUnsigned64(m_attrib.m_pointChannel.m_count - 1);
-	faceB1->m_next->m_userData = dUnsigned64(twinAttrV0);
-	return faceA1->m_next;
 }
 
 
@@ -1909,17 +1747,6 @@ dInt32 ndMeshEffect::InterpolateVertex(const dBigVector& srcPoint, const dEdge* 
 	*/
 }
 
-bool ndMeshEffect::HasOpenEdges() const
-{
-	dPolyhedra::Iterator iter(*this);
-	for (iter.Begin(); iter; iter++) {
-		dEdge* const face = &(*iter);
-		if (face->m_incidentFace < 0) {
-			return true;
-		}
-	}
-	return false;
-}
 
 #endif
 
@@ -4215,4 +4042,193 @@ ndMeshEffect* ndMeshEffect::GetNextLayer(dInt32 mark)
 		solid->SetLRU(mark);
 	}
 	return solid;
+}
+
+ndShapeInstance* ndMeshEffect::CreateConvexCollision(dFloat64 tolerance) const
+{
+	dStack<dVector> poolPtr(m_points.m_vertex.GetCount() * 2);
+	dVector* const pool = &poolPtr[0];
+	
+	dBigVector minBox;
+	dBigVector maxBox;
+	CalculateAABB(minBox, maxBox);
+	//dVector com ((minBox + maxBox).Scale (dFloat32 (0.5f)));
+	dVector com((minBox + maxBox) * dVector::m_half);
+	
+	dInt32 count = 0;
+	dInt32 mark = IncLRU();
+	dPolyhedra::Iterator iter(*this);
+	for (iter.Begin(); iter; iter++) 
+	{
+		dEdge* const vertex = &(*iter);
+		if (vertex->m_mark != mark) 
+		{
+			dEdge* ptr = vertex;
+			do 
+			{
+				ptr->m_mark = mark;
+				ptr = ptr->m_twin->m_next;
+			} while (ptr != vertex);
+	
+			if (count < dInt32(poolPtr.GetElementsCount())) 
+			{
+				const dBigVector p(m_points.m_vertex[vertex->m_incidentVertex]);
+				pool[count] = dVector(p) - com;
+				count++;
+			}
+		}
+	}
+	
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit += matrix.RotateVector(com);
+	matrix.m_posit.m_w = dFloat32(1.0f);
+	
+	ndShapeConvexHull* const collision = new ndShapeConvexHull(count, sizeof(dVector), dFloat32(tolerance), &pool[0].m_x);
+	if (!collision->GetConvexVertexCount()) 
+	{
+		collision->Release();
+		return nullptr;
+	}
+	ndShapeInstance* const instance = new ndShapeInstance(collision);
+	//collision->Release();
+	return instance;
+}
+
+void ndMeshEffect::ConvertToPolygons()
+{
+	UnpackPoints();
+	dPolyhedra leftOversOut;
+	dPolyhedra::ConvexPartition(&m_points.m_vertex[0].m_x, sizeof(dBigVector), &leftOversOut);
+	dAssert(leftOversOut.GetCount() == 0);
+
+	dPolyhedra::Iterator iter(*this);
+	for (iter.Begin(); iter; iter++) 
+	{
+		dEdge* const edge = &iter.GetNode()->GetInfo();
+		edge->m_userData = (edge->m_incidentFace) > 0 ? edge->m_incidentVertex : 0;
+	}
+	PackPoints(dFloat32(1.0e-24f));
+
+	RepairTJoints();
+	dAssert(Sanity());
+}
+
+
+bool ndMeshEffect::HasOpenEdges() const
+{
+	dPolyhedra::Iterator iter(*this);
+	for (iter.Begin(); iter; iter++) 
+	{
+		dEdge* const face = &(*iter);
+		if (face->m_incidentFace < 0) 
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void ndMeshEffect::RemoveUnusedVertices(dInt32* const vertexMapResult)
+{
+	dAssert(!vertexMapResult);
+	UnpackAttibuteData();
+	PackAttibuteData();
+	UnpackPoints();
+	PackPoints(dFloat32(1.0e-24f));
+}
+
+dEdge* ndMeshEffect::InsertEdgeVertex(dEdge* const edge, dFloat64 param)
+{
+	dEdge* const twin = edge->m_twin;
+	AddInterpolatedEdgeAttribute(edge, param);
+
+	dInt32 edgeAttrV0 = dInt32(edge->m_userData);
+	dInt32 twinAttrV0 = dInt32(twin->m_userData);
+
+	dEdge* const faceA0 = edge->m_next;
+	dEdge* const faceA1 = edge->m_prev;
+	dEdge* const faceB0 = twin->m_next;
+	dEdge* const faceB1 = twin->m_prev;
+	SpliteEdge(m_points.m_vertex.GetCount() - 1, edge);
+
+	faceA0->m_prev->m_userData = dUnsigned64(m_attrib.m_pointChannel.GetCount() - 2);
+	faceA1->m_next->m_userData = dUnsigned64(edgeAttrV0);
+
+	faceB0->m_prev->m_userData = dUnsigned64(m_attrib.m_pointChannel.GetCount() - 1);
+	faceB1->m_next->m_userData = dUnsigned64(twinAttrV0);
+	return faceA1->m_next;
+}
+
+void ndMeshEffect::AddInterpolatedEdgeAttribute(dEdge* const edge, dFloat64 param)
+{
+	dFloat64 t1 = param;
+	dFloat64 t0 = dFloat64(1.0f) - t1;
+	dAssert(t1 >= dFloat64(0.0f));
+	dAssert(t1 <= dFloat64(1.0f));
+
+	const dInt32 vertexIndex = m_points.m_vertex.GetCount();
+	m_points.m_vertex.PushBack(m_points.m_vertex[edge->m_incidentVertex].Scale(t0) + m_points.m_vertex[edge->m_next->m_incidentVertex].Scale(t1));
+	if (m_points.m_layers.GetCount())
+	{
+		m_points.m_layers.PushBack(m_points.m_layers[edge->m_incidentVertex]);
+	}
+
+	m_attrib.m_pointChannel.PushBack(vertexIndex);
+	m_attrib.m_pointChannel.PushBack(vertexIndex);
+
+	if (m_attrib.m_materialChannel.GetCount()) 
+	{
+		m_attrib.m_materialChannel.PushBack(m_attrib.m_materialChannel[dInt32(edge->m_userData)]);
+		m_attrib.m_materialChannel.PushBack(m_attrib.m_materialChannel[dInt32(edge->m_twin->m_userData)]);
+	}
+
+	if (m_attrib.m_normalChannel.GetCount())
+	{
+		dTriplex edgeNormal;
+		dTriplex edgeNormal0(m_attrib.m_normalChannel[dInt32(edge->m_userData)]);
+		dTriplex edgeNormal1(m_attrib.m_normalChannel[dInt32(edge->m_next->m_userData)]);
+		edgeNormal.m_x = edgeNormal0.m_x * dFloat32(t0) + edgeNormal1.m_x * dFloat32(t1);
+		edgeNormal.m_y = edgeNormal0.m_y * dFloat32(t0) + edgeNormal1.m_y * dFloat32(t1);
+		edgeNormal.m_z = edgeNormal0.m_z * dFloat32(t0) + edgeNormal1.m_z * dFloat32(t1);
+		m_attrib.m_normalChannel.PushBack(edgeNormal);
+
+		dTriplex twinNormal;
+		dTriplex twinNormal0(m_attrib.m_normalChannel[dInt32(edge->m_twin->m_next->m_userData)]);
+		dTriplex twinNormal1(m_attrib.m_normalChannel[dInt32(edge->m_twin->m_userData)]);
+		twinNormal.m_x = twinNormal0.m_x * dFloat32(t0) + twinNormal1.m_x * dFloat32(t1);
+		twinNormal.m_y = twinNormal0.m_y * dFloat32(t0) + twinNormal1.m_y * dFloat32(t1);
+		twinNormal.m_z = twinNormal0.m_z * dFloat32(t0) + twinNormal1.m_z * dFloat32(t1);
+		m_attrib.m_normalChannel.PushBack(twinNormal);
+	}
+	if (m_attrib.m_binormalChannel.GetCount()) 
+	{
+		dAssert(0);
+	}
+
+	if (m_attrib.m_uv0Channel.GetCount()) 
+	{
+		dAttibutFormat::dgUV edgeUV;
+		dAttibutFormat::dgUV edgeUV0(m_attrib.m_uv0Channel[dInt32(edge->m_userData)]);
+		dAttibutFormat::dgUV edgeUV1(m_attrib.m_uv0Channel[dInt32(edge->m_next->m_userData)]);
+		edgeUV.m_u = edgeUV0.m_u * dFloat32(t0) + edgeUV1.m_u * dFloat32(t1);
+		edgeUV.m_v = edgeUV0.m_v * dFloat32(t0) + edgeUV1.m_v * dFloat32(t1);
+		m_attrib.m_uv0Channel.PushBack(edgeUV);
+
+		dAttibutFormat::dgUV twinUV;
+		dAttibutFormat::dgUV twinUV0(m_attrib.m_uv0Channel[dInt32(edge->m_twin->m_next->m_userData)]);
+		dAttibutFormat::dgUV twinUV1(m_attrib.m_uv0Channel[dInt32(edge->m_twin->m_userData)]);
+		twinUV.m_u = twinUV0.m_u * dFloat32(t0) + twinUV1.m_u * dFloat32(t1);
+		twinUV.m_v = twinUV0.m_v * dFloat32(t0) + twinUV1.m_v * dFloat32(t1);
+		m_attrib.m_uv0Channel.PushBack(twinUV);
+	}
+
+	if (m_attrib.m_uv1Channel.GetCount())
+	{
+		dAssert(0);
+	}
+
+	if (m_attrib.m_colorChannel.GetCount())
+	{
+		dAssert(0);
+	}
 }
