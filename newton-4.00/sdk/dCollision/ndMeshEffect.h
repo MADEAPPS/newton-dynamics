@@ -112,7 +112,6 @@ class ndMeshEffect: public dPolyhedra
 	ndMeshEffect(dMemoryAllocator___* const allocator);
 	ndMeshEffect(dgCollisionInstance* const collision);
 	ndMeshEffect(const ndMeshEffect& source);
-	ndMeshEffect(dPolyhedra& mesh, const ndMeshEffect& source);
 	ndMeshEffect (dMemoryAllocator___* const allocator, dgDeserialize deserialization, void* const userData);
 
 	// create from OFF or PLY file format
@@ -139,9 +138,6 @@ class ndMeshEffect: public dPolyhedra
 	//bool PlaneClip (const dBigPlane& plane);
 	
 	ndMeshEffect* ConvexMeshIntersection (const ndMeshEffect* const convexMesh) const;
-
-	ndMeshEffect* GetFirstLayer ();
-	ndMeshEffect* GetNextLayer (ndMeshEffect* const layer);
 
 	void Triangulate ();
 	void ConvertToPolygons ();
@@ -398,6 +394,7 @@ class ndMeshEffect: public dPolyhedra
 	
 	D_COLLISION_API ndMeshEffect();
 	D_COLLISION_API ndMeshEffect(const ndShapeInstance& shape);
+	D_COLLISION_API ndMeshEffect(dPolyhedra& mesh, const ndMeshEffect& source);
 	
 	// Create a convex hull Mesh from point cloud
 	D_COLLISION_API ndMeshEffect(const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol);
@@ -462,7 +459,9 @@ class ndMeshEffect: public dPolyhedra
 	D_COLLISION_API void BoxMapping(dInt32 front, dInt32 side, dInt32 top, const dMatrix& uvAligment);
 	D_COLLISION_API void RepairTJoints();
 
-	//D_COLLISION_API static ndMeshEffect* CreateVoronoiConvexDecomposition(dInt32 pointCount, dInt32 pointStrideInBytes, const dFloat32* const pointCloud, dInt32 materialId, const dMatrix& textureProjectionMatrix);
+	ndMeshEffect* GetFirstLayer();
+	ndMeshEffect* GetNextLayer(ndMeshEffect* const layer);
+
 	D_COLLISION_API ndMeshEffect* CreateVoronoiConvexDecomposition(dInt32 interiorMaterialIndex, const dMatrix& textureProjectionMatrix);
 
 	protected:
@@ -478,8 +477,9 @@ class ndMeshEffect: public dPolyhedra
 	void UnpackAttibuteData();
 	bool SeparateDuplicateLoops(dEdge* const face);
 	dInt32 AddInterpolatedHalfAttribute(dEdge* const edge, dInt32 midPoint);
-
+	
 	void MergeFaces(const ndMeshEffect* const source);
+	D_COLLISION_API ndMeshEffect* GetNextLayer(dInt32 mark);
 
 	dString m_name;
 	dPointFormat m_points;
@@ -526,18 +526,6 @@ inline dInt32 ndMeshEffect::GetVertexLayer(dInt32 index) const
 	return (m_points.m_layers.m_count) ? m_points.m_layers[index] : 0;
 }
 
-inline ndMeshEffect* ndMeshEffect::GetFirstLayer ()
-{
-	return GetNextLayer (IncLRU());
-}
-
-inline ndMeshEffect* ndMeshEffect::GetNextLayer (ndMeshEffect* const layerSegment)
-{
-	if (!layerSegment) {
-		return nullptr;
-	}
-	return GetNextLayer (layerSegment->IncLRU() - 1);
-}
 
 #endif
 inline dFloat64 ndMeshEffect::QuantizeCordinade(dFloat64 x) const
@@ -713,6 +701,20 @@ inline dInt32 ndMeshEffect::GetFaceMaterial(dEdge* const faceEdge) const
 	//dTreeNode* const node = (dTreeNode*)face;
 	//dEdge* const edge = &node->GetInfo();
 	return dInt32(m_attrib.m_materialChannel.GetCount() ? m_attrib.m_materialChannel[dInt32(faceEdge->m_userData)] : 0);
+}
+
+inline ndMeshEffect* ndMeshEffect::GetFirstLayer()
+{
+	return GetNextLayer(IncLRU());
+}
+
+inline ndMeshEffect* ndMeshEffect::GetNextLayer(ndMeshEffect* const layerSegment)
+{
+	if (!layerSegment) 
+	{
+		return nullptr;
+	}
+	return GetNextLayer(layerSegment->IncLRU() - 1);
 }
 
 

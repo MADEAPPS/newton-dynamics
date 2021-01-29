@@ -48,6 +48,9 @@ class ndSimpleConvexFracture: public ndModel
 		dInt32 type, dInt32 materialID);
 
 	virtual void Update(const ndWorld* const world, dFloat32 timestep);
+
+	void UpdateEffect(ndVoronoidFractureEffect& effect, dFloat32 timestep);
+	dList<ndVoronoidFractureEffect> m_effectList;
 };
 
 

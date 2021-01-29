@@ -86,19 +86,18 @@ void ndBasicConvexFracturing(ndDemoEntityManager* const scene)
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	//AddCapsulesStacks(scene, origin1);
 
-	int woodX = 8;
-	int woodZ = 8;
+	dInt32 woodX = 1;
+	dInt32 woodZ = 1;
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_x += 10.0f;
 	matrix.m_posit.m_y += 2.0f;
 	ndShapeInstance shape(new ndShapeCylinder(0.5f, 0.5f, 3.0f));
 	
-	fractureManager->AddFracturedWoodPrimitive(scene, shape, 1000.0f, 
-		matrix.m_posit,	woodX, woodZ, 0.5f, 0, 0);
+	fractureManager->AddFracturedWoodPrimitive(scene, shape, 1000.0f, matrix.m_posit,	woodX, woodZ, 0.5f, 0, 0);
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
-	dVector origin(-60.0f, 5.0f, 0.0f, 0.0f);
-	//dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
+	//dVector origin(-60.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

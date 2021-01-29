@@ -894,15 +894,6 @@ ndMeshEffect::ndMeshEffect(dgMemoryAllocator* const allocator, const dMatrix& pl
 }
 
 
-ndMeshEffect::ndMeshEffect(dPolyhedra& mesh, const ndMeshEffect& source)
-	:dPolyhedra(mesh)
-	, m_points(source.m_points)
-	, m_attrib(source.m_attrib)
-	, m_vertexBaseCount(-1)
-	, m_constructionIndex(0)
-{
-	Init();
-}
 
 ndMeshEffect::ndMeshEffect(const ndMeshEffect& source)
 	:dPolyhedra(source)
@@ -1930,55 +1921,6 @@ bool ndMeshEffect::HasOpenEdges() const
 	return false;
 }
 
-ndMeshEffect* ndMeshEffect::GetNextLayer(dInt32 mark)
-{
-	Iterator iter(*this);
-	dEdge* edge = nullptr;
-	for (iter.Begin(); iter; iter++) {
-		edge = &(*iter);
-		if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
-			break;
-		}
-	}
-
-	if (!edge) {
-		return nullptr;
-	}
-
-	const dInt32 layer = m_points.m_layers.m_count ? m_points.m_layers[edge->m_incidentVertex] : 0;
-	dPolyhedra polyhedra(GetAllocator());
-
-	polyhedra.BeginFace();
-	for (iter.Begin(); iter; iter++) {
-		dEdge* const edge1 = &(*iter);
-		if ((edge1->m_mark < mark) && (edge1->m_incidentFace > 0)) {
-			const dInt32 thislayer = m_points.m_layers.m_count ? m_points.m_layers[edge1->m_incidentVertex] : 0;
-			if (thislayer == layer) {
-				dEdge* ptr = edge1;
-				dInt32 count = 0;
-				dInt32 faceIndex[256];
-				dInt64 faceDataIndex[256];
-				do {
-					ptr->m_mark = mark;
-					faceIndex[count] = ptr->m_incidentVertex;
-					faceDataIndex[count] = ptr->m_userData;
-					count++;
-					dAssert(count < dInt32(sizeof(faceIndex) / sizeof(faceIndex[0])));
-					ptr = ptr->m_next;
-				} while (ptr != edge1);
-				polyhedra.AddFace(count, &faceIndex[0], &faceDataIndex[0]);
-			}
-		}
-	}
-	polyhedra.EndFace();
-
-	ndMeshEffect* solid = nullptr;
-	if (polyhedra.GetCount()) {
-		solid = new (GetAllocator()) ndMeshEffect(polyhedra, *this);
-		solid->SetLRU(mark);
-	}
-	return solid;
-}
 #endif
 
 dInt32 ndMeshEffect::dFormat::CompareVertex(const dSortKey* const ptr0, const dSortKey* const ptr1, void* const context)
@@ -2346,6 +2288,17 @@ ndMeshEffect::ndMeshEffect()
 {
 	Init();
 }
+
+ndMeshEffect::ndMeshEffect(dPolyhedra& mesh, const ndMeshEffect& source)
+	:dPolyhedra(mesh)
+	,m_points(source.m_points)
+	,m_attrib(source.m_attrib)
+	,m_vertexBaseCount(-1)
+	,m_constructionIndex(0)
+{
+	Init();
+}
+
 
 ndMeshEffect::~ndMeshEffect()
 {
@@ -4204,4 +4157,62 @@ dFloat64 ndMeshEffect::CalculateVolume() const
 	dVector crossInertia;
 	dFloat32 volume = localData.MassProperties(com, inertia, crossInertia);
 	return volume;
+}
+
+ndMeshEffect* ndMeshEffect::GetNextLayer(dInt32 mark)
+{
+	Iterator iter(*this);
+	dEdge* edge = nullptr;
+	for (iter.Begin(); iter; iter++) 
+	{
+		edge = &(*iter);
+		if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) 
+		{
+			break;
+		}
+	}
+
+	if (!edge) 
+	{
+		return nullptr;
+	}
+
+	const dInt32 layer = m_points.m_layers.GetCount() ? m_points.m_layers[edge->m_incidentVertex] : 0;
+	dPolyhedra polyhedra;
+
+	polyhedra.BeginFace();
+	for (iter.Begin(); iter; iter++) 
+	{
+		dEdge* const edge1 = &(*iter);
+		if ((edge1->m_mark < mark) && (edge1->m_incidentFace > 0)) 
+		{
+			const dInt32 thislayer = m_points.m_layers.GetCount() ? m_points.m_layers[edge1->m_incidentVertex] : 0;
+			if (thislayer == layer) 
+			{
+				dEdge* ptr = edge1;
+				dInt32 count = 0;
+				dInt32 faceIndex[256];
+				dInt64 faceDataIndex[256];
+				do 
+				{
+					ptr->m_mark = mark;
+					faceIndex[count] = ptr->m_incidentVertex;
+					faceDataIndex[count] = ptr->m_userData;
+					count++;
+					dAssert(count < dInt32(sizeof(faceIndex) / sizeof(faceIndex[0])));
+					ptr = ptr->m_next;
+				} while (ptr != edge1);
+				polyhedra.AddFace(count, &faceIndex[0], &faceDataIndex[0]);
+			}
+		}
+	}
+	polyhedra.EndFace();
+
+	ndMeshEffect* solid = nullptr;
+	if (polyhedra.GetCount()) 
+	{
+		solid = new ndMeshEffect(polyhedra, *this);
+		solid->SetLRU(mark);
+	}
+	return solid;
 }
