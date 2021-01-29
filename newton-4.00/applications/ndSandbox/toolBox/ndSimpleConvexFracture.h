@@ -8,10 +8,10 @@ class ndDemoEntityManager;
 
 class ndSimpleConvexFracture: public ndModel
 {
-	class WoodFractureAtom
+	class ndFractureAtom
 	{
 		public:
-		WoodFractureAtom()
+		ndFractureAtom()
 			:m_centerOfMass(0.0f)
 			,m_momentOfInertia(0.0f)
 			,m_mesh(nullptr)
@@ -27,12 +27,12 @@ class ndSimpleConvexFracture: public ndModel
 		dFloat32 m_massFraction;
 	};
 
-	class WoodVoronoidEffect : public dList<WoodFractureAtom>
+	class ndVoronoidFractureEffect : public dList<ndFractureAtom>
 	{
 		public:
-		WoodVoronoidEffect(ndWorld* const world, ndMeshEffect* const mesh, dInt32 interiorMaterial);
-		WoodVoronoidEffect(const WoodVoronoidEffect& list);
-		~WoodVoronoidEffect();
+		ndVoronoidFractureEffect(ndDemoEntityManager* const scene, ndMeshEffect* const mesh, dInt32 interiorMaterial);
+		ndVoronoidFractureEffect(const ndVoronoidFractureEffect& list);
+		~ndVoronoidFractureEffect();
 		ndBodyKinematic* m_body;
 		bool m_isDead;
 	};

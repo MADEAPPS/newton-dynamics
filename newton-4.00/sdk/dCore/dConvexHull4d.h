@@ -95,6 +95,10 @@ class dConvexHull4dTetraherum
 class dConvexHull4d: public dList<dConvexHull4dTetraherum>
 {
 	public:
+	class ndTempList: public dList<dListNode*, dContainersFreeListAlloc<dListNode*>>
+	{
+	};
+
 	D_CORE_API dConvexHull4d(const dConvexHull4d& source);
 	D_CORE_API dConvexHull4d(const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, dFloat64 distTol);
 	D_CORE_API virtual ~dConvexHull4d();
@@ -122,7 +126,7 @@ class dConvexHull4d: public dList<dConvexHull4dTetraherum>
 
 	dListNode* FindFacingNode(const dBigVector& vertex);
 	
-	void InsertNewVertex(dInt32 vertexIndex, dListNode* const frontFace, dList<dListNode*>& deletedFaces, dList<dListNode*>& newFaces);
+	void InsertNewVertex(dInt32 vertexIndex, dListNode* const frontFace, ndTempList& deletedFaces, ndTempList& newFaces);
 	dInt32 SupportVertex (dConvexHull4dAABBTreeNode** const tree, const dConvexHull4dVector* const points, const dBigVector& dir, const bool removeEntry = true) const;
 	
 	void CalculateConvexHull (dConvexHull4dAABBTreeNode* vertexTree, dConvexHull4dVector* const points, dInt32 count, dFloat64 distTol);

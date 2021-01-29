@@ -156,7 +156,8 @@ class dPolyhedra: public dClassAlloc, public dTree <dEdge, dEdgeKey>
 	D_CORE_API bool GetConectedSurface (dPolyhedra &polyhedra) const;
 	void EndConectedSurface() const;
 
-//	dgObb CalculateSphere (const dFloat64* const vertex, dInt32 strideInBytes, const dMatrix* const basis = nullptr) const;
+	D_CORE_API dMatrix CalculateSphere(dBigVector& size, const dFloat64* const vertex, dInt32 strideInBytes) const;
+	
 	D_CORE_API void ChangeEdgeIncidentVertex (dEdge* const edge, dInt32 newIndex);
 	D_CORE_API void DeleteDegenerateFaces (const dFloat64* const pool, dInt32 dstStrideInBytes, dFloat64 minArea);
 

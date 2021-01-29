@@ -29,7 +29,7 @@
 #include "dVector.h"
 #include "dMatrix.h"
 #include "dPolyhedra.h"
-//#include "dConvexHull3d.h"
+#include "dConvexHull3d.h"
 #include "dSmallDeterminant.h"
 
 #define DG_LOCAL_BUFFER_SIZE  1024
@@ -1864,101 +1864,6 @@ bool dPolyhedra::IsEssensialDiagonal (dEdge* const diagonal, const dBigVector& n
 	return IsEssensialPointDiagonal (diagonal, normal, pool, stride) || IsEssensialPointDiagonal (diagonal->m_twin, normal, pool, stride); 
 }
 
-/*
-dgObb dPolyhedra::CalculateSphere (const dFloat64* const vertex, dInt32 strideInBytes, const dMatrix* const basis) const
-{
-	dInt32 stride = dInt32 (strideInBytes / sizeof (dFloat64));	
-
-	dInt32 vertexCount = 0;
-	dInt32 mark = IncLRU();
-	dPolyhedra::Iterator iter(*this);
-	for (iter.Begin(); iter; iter ++) {
-		dEdge* const edge = &(*iter);
-		if (edge->m_mark != mark) {
-			dEdge* ptr = edge;
-			do {
-				ptr->m_mark = mark;
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != edge);
-			vertexCount ++;
-		}
-	}
-	dAssert (vertexCount);
-
-	mark = IncLRU();
-	dInt32 vertexCountIndex = 0;
-	dStack<dBigVector> pool (vertexCount);
-	for (iter.Begin(); iter; iter ++) {
-		dEdge* const edge = &(*iter);
-		if (edge->m_mark != mark) {
-			dEdge* ptr = edge;
-			do {
-				ptr->m_mark = mark;
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != edge);
-			dInt32 incidentVertex = edge->m_incidentVertex * stride;
-			pool[vertexCountIndex] = dBigVector (vertex[incidentVertex + 0], vertex[incidentVertex + 1], vertex[incidentVertex + 2], dFloat32 (0.0f));
-			vertexCountIndex ++;
-		}
-	}
-	dAssert (vertexCountIndex <= vertexCount);
-
-	dMatrix axis (dGetIdentityMatrix());
-	dgObb sphere (axis);
-	dConvexHull3d convexHull (GetAllocator(), &pool[0].m_x, sizeof (dBigVector), vertexCountIndex, 0.0f);
-	if (convexHull.GetCount()) {
-		dStack<dInt32> triangleList (convexHull.GetCount() * 3); 				
-		dInt32 trianglesCount = 0;
-		for (dConvexHull3d::dListNode* node = convexHull.GetFirst(); node; node = node->GetNext()) {
-			dConvexHull3DFace* const face = &node->GetInfo();
-			triangleList[trianglesCount * 3 + 0] = face->m_index[0];
-			triangleList[trianglesCount * 3 + 1] = face->m_index[1];
-			triangleList[trianglesCount * 3 + 2] = face->m_index[2];
-			trianglesCount ++;
-			dAssert ((trianglesCount * 3) <= triangleList.GetElementsCount());
-		}
-
-		dVector* const dst = (dVector*) &pool[0].m_x;
-		for (dInt32 i = 0; i < convexHull.GetVertexCount(); i ++) {
-			dst[i] = convexHull.GetVertex(i);
-		}
-		sphere.SetDimensions (&dst[0].m_x, sizeof (dVector), &triangleList[0], trianglesCount * 3, nullptr);
-
-	} else if (vertexCountIndex >= 3) {
-		dStack<dInt32> triangleList (GetCount() * 3 * 2); 
-		dInt32 mark1 = IncLRU();
-		dInt32 trianglesCount = 0;
-		for (iter.Begin(); iter; iter ++) {
-			dEdge* const edge = &(*iter);
-			if (edge->m_mark != mark1) {
-				dEdge* ptr = edge;
-				do {
-					ptr->m_mark = mark1;
-					ptr = ptr->m_twin->m_next;
-				} while (ptr != edge);
-
-				ptr = edge->m_next->m_next;
-				do {
-					triangleList[trianglesCount * 3 + 0] = edge->m_incidentVertex;
-					triangleList[trianglesCount * 3 + 1] = ptr->m_prev->m_incidentVertex;
-					triangleList[trianglesCount * 3 + 2] = ptr->m_incidentVertex;
-					trianglesCount ++;
-					dAssert ((trianglesCount * 3) <= triangleList.GetElementsCount());
-					ptr = ptr->m_twin->m_next;
-				} while (ptr != edge);
-
-				dVector* const dst = (dVector*) &pool[0].m_x;
-				for (dInt32 i = 0; i < vertexCountIndex; i ++) {
-					dst[i] = pool[i];
-				}
-				sphere.SetDimensions (&dst[0].m_x, sizeof (dVector), &triangleList[0], trianglesCount * 3, nullptr);
-			}
-		}
-	}
-	return sphere;
-}
-*/
-
 dBigPlane dPolyhedra::EdgePlane (dInt32 i0, dInt32 i1, dInt32 i2, const dBigVector* const pool) const
 {
 	const dBigVector& p0 = pool[i0];
@@ -2980,4 +2885,125 @@ void dPolyhedra::ConvexPartition (const dFloat64* const vertex, dInt32 strideInB
 			SwapInfo(buildConvex);
 		}
 	}
+}
+
+
+dMatrix dPolyhedra::CalculateSphere(dBigVector& size, const dFloat64* const vertex, dInt32 strideInBytes) const
+{
+	dInt32 stride = dInt32(strideInBytes / sizeof(dFloat64));
+
+	dInt32 vertexCount = 0;
+	dInt32 mark = IncLRU();
+	dPolyhedra::Iterator iter(*this);
+	for (iter.Begin(); iter; iter++) 
+	{
+		dEdge* const edge = &(*iter);
+		if (edge->m_mark != mark) 
+		{
+			dEdge* ptr = edge;
+			do 
+			{
+				ptr->m_mark = mark;
+				ptr = ptr->m_twin->m_next;
+			} while (ptr != edge);
+			vertexCount++;
+		}
+	}
+	dAssert(vertexCount);
+
+	mark = IncLRU();
+	dInt32 vertexCountIndex = 0;
+	dStack<dBigVector> pool(vertexCount);
+	for (iter.Begin(); iter; iter++) 
+	{
+		dEdge* const edge = &(*iter);
+		if (edge->m_mark != mark) 
+		{
+			dEdge* ptr = edge;
+			do 
+			{
+				ptr->m_mark = mark;
+				ptr = ptr->m_twin->m_next;
+			} while (ptr != edge);
+			dInt32 incidentVertex = edge->m_incidentVertex * stride;
+			pool[vertexCountIndex] = dBigVector(vertex[incidentVertex + 0], vertex[incidentVertex + 1], vertex[incidentVertex + 2], dFloat32(0.0f));
+			vertexCountIndex++;
+		}
+	}
+	dAssert(vertexCountIndex <= vertexCount);
+
+	//dMatrix axis(dGetIdentityMatrix());
+	//dgObb sphere(axis);
+	dConvexHull3d convexHull(&pool[0].m_x, sizeof(dBigVector), vertexCountIndex, 0.0f);
+
+	size = dBigVector::m_zero;
+	dMatrix sphere(dGetIdentityMatrix());
+	if (convexHull.GetCount()) 
+	{
+		dStack<dInt32> triangleList(convexHull.GetCount() * 3);
+		dInt32 trianglesCount = 0;
+		for (dConvexHull3d::dListNode* node = convexHull.GetFirst(); node; node = node->GetNext()) 
+		{
+			dConvexHull3dFace* const face = &node->GetInfo();
+			triangleList[trianglesCount * 3 + 0] = face->m_index[0];
+			triangleList[trianglesCount * 3 + 1] = face->m_index[1];
+			triangleList[trianglesCount * 3 + 2] = face->m_index[2];
+			trianglesCount++;
+			dAssert((trianglesCount * 3) <= triangleList.GetElementsCount());
+		}
+		
+		//dVector* const dst = (dVector*)&pool[0].m_x;
+		for (dInt32 i = 0; i < convexHull.GetVertexCount(); i++) 
+		{
+			pool[i] = convexHull.GetVertex(i);
+		}
+
+		dVector eigen;
+		dBigVector var(dBigVector::m_zero);
+		dBigVector cov(dBigVector::m_zero);
+		dBigVector origin(dBigVector::m_zero);
+
+		for (dInt32 i = 0; i < vertexCount; i++) 
+		{
+			const dBigVector p(pool[i] & dBigVector::m_triplexMask);
+			const dBigVector q(p.ShiftTripleLeft());
+			origin += p;
+			var += p * p;
+			cov += p * q;
+		}
+		dSwap(cov.m_y, cov.m_z);
+
+		dFloat64 k = dFloat64(1.0) / vertexCount;
+		var = var.Scale(k);
+		cov = cov.Scale(k);
+		origin = origin.Scale(k);
+		
+		dFloat64 Ixx = var.m_x - origin.m_x * origin.m_x;
+		dFloat64 Iyy = var.m_y - origin.m_y * origin.m_y;
+		dFloat64 Izz = var.m_z - origin.m_z * origin.m_z;
+		
+		dFloat64 Ixy = cov.m_x - origin.m_x * origin.m_y;
+		dFloat64 Ixz = cov.m_y - origin.m_x * origin.m_z;
+		dFloat64 Iyz = cov.m_z - origin.m_y * origin.m_z;
+		
+		sphere.m_front = dVector(dFloat32(Ixx), dFloat32(Ixy), dFloat32(Ixz), dFloat32(0.0f));
+		sphere.m_up    = dVector(dFloat32(Ixy), dFloat32(Iyy), dFloat32(Iyz), dFloat32(0.0f));
+		sphere.m_right = dVector(dFloat32(Ixz), dFloat32(Iyz), dFloat32(Izz), dFloat32(0.0f));
+		dVector eigenValues(sphere.EigenVectors());
+
+		dVector minVal(dFloat32(1e15f));
+		dVector maxVal(dFloat32(-1e15f));
+		for (dInt32 i = 0; i < vertexCount; i++)
+		{
+			dVector tmp(sphere.UnrotateVector(pool[i]));
+			minVal = minVal.GetMin(tmp);
+			maxVal = maxVal.GetMax(tmp);
+		}
+
+		dVector massCenter((maxVal + minVal) * dVector::m_half);
+		massCenter.m_w = dFloat32(1.0f);
+		sphere.m_posit = sphere.TransformVector(massCenter);
+		size = dVector ((maxVal - minVal) * dVector::m_half);
+	}
+	return sphere;
 }

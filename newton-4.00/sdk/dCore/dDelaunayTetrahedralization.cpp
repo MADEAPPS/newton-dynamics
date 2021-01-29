@@ -65,6 +65,7 @@ dDelaunayTetrahedralization::dDelaunayTetrahedralization(const dFloat64* const v
 		points[count + 1].m_w -= dFloat64 (1.0f);
  		BuildHull (&pool[0].m_x, sizeof (dBigVector), count + 2, distTol);
 	}
+
 	if (oldCount > m_count) 
 	{
 		// this is probably a regular convex solid, which will have a zero volume hull
@@ -102,6 +103,8 @@ dDelaunayTetrahedralization::dDelaunayTetrahedralization(const dFloat64* const v
 	}
 
 	SortVertexArray ();
+
+	ndTempList::FlushFreeList();
 }
 
 dDelaunayTetrahedralization::~dDelaunayTetrahedralization()

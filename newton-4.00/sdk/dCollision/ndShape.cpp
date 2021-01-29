@@ -21,7 +21,6 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
-//#include "ndBody.h"
 #include "ndShape.h"
 
 dVector ndShape::m_flushZero(dFloat32(1.0e-7f));

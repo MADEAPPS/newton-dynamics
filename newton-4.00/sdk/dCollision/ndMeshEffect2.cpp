@@ -1103,22 +1103,23 @@ dAssert(0);
 
 #endif
 
-ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, dInt32 pointStrideInBytes, const dFloat32* const pointCloud, dInt32 materialId, const dMatrix& textureProjectionMatrix)
+//ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, dInt32 pointStrideInBytes, const dFloat32* const pointCloud, dInt32 materialId, const dMatrix& textureProjectionMatrix)
+ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 interiorMaterialIndex, const dMatrix& textureProjectionMatrix)
 {
-	dStack<dBigVector> buffer(pointCount + 16);
+	dStack<dBigVector> buffer(m_points.m_vertex.GetCount() + 16);
 	dBigVector* const pool = &buffer[0];
 	dInt32 count = 0;
 	dFloat64 quantizeFactor = dFloat64(16.0f);
 	dFloat64 invQuantizeFactor = dFloat64(1.0f) / quantizeFactor;
-	dInt32 stride = pointStrideInBytes / sizeof(dFloat32);
-
+	//dInt32 stride = pointStrideInBytes / sizeof(dFloat32);
+	
 	dBigVector pMin(dFloat32(1.0e10f), dFloat32(1.0e10f), dFloat32(1.0e10f), dFloat32(0.0f));
 	dBigVector pMax(dFloat32(-1.0e10f), dFloat32(-1.0e10f), dFloat32(-1.0e10f), dFloat32(0.0f));
-	for (dInt32 i = 0; i < pointCount; i++) 
+	for (dInt32 i = 0; i < m_points.m_vertex.GetCount(); i++)
 	{
-		dFloat64 x = pointCloud[i * stride + 0];
-		dFloat64 y = pointCloud[i * stride + 1];
-		dFloat64 z = pointCloud[i * stride + 2];
+		dFloat64 x = m_points.m_vertex[i].m_x;
+		dFloat64 y = m_points.m_vertex[i].m_y;
+		dFloat64 z = m_points.m_vertex[i].m_z;
 		x = floor(x * quantizeFactor) * invQuantizeFactor;
 		y = floor(y * quantizeFactor) * invQuantizeFactor;
 		z = floor(z * quantizeFactor) * invQuantizeFactor;
@@ -1138,15 +1139,15 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, 
 	pool[count + 6] = dBigVector(pMin.m_x, pMax.m_y, pMax.m_z, dFloat64(0.0f));
 	pool[count + 7] = dBigVector(pMax.m_x, pMax.m_y, pMax.m_z, dFloat64(0.0f));
 	count += 8;
-
+	
 	dStack<dInt32> indexList(count);
 	count = dVertexListToIndexList(&pool[0].m_x, sizeof(dBigVector), 3, count, &indexList[0], dFloat64(5.0e-2f));
 	dAssert(count >= 8);
-
+	
 	dFloat64 maxSize = dMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y, pMax.m_z - pMin.m_z);
 	pMin -= dBigVector(maxSize, maxSize, maxSize, dFloat64(0.0f));
 	pMax += dBigVector(maxSize, maxSize, maxSize, dFloat64(0.0f));
-
+	
 	// add the a guard zone, so that we do no have to clip
 	dInt32 guardVertexKey = count;
 	pool[count + 0] = dBigVector(pMin.m_x, pMin.m_y, pMin.m_z, dFloat64(0.0f));
@@ -1158,16 +1159,16 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, 
 	pool[count + 6] = dBigVector(pMin.m_x, pMax.m_y, pMax.m_z, dFloat64(0.0f));
 	pool[count + 7] = dBigVector(pMax.m_x, pMax.m_y, pMax.m_z, dFloat64(0.0f));
 	count += 8;
-
+	
 	dDelaunayTetrahedralization delaunayTetrahedras(&pool[0].m_x, count, sizeof(dBigVector), dFloat32(0.0f));
 	delaunayTetrahedras.RemoveUpperHull();
-
+	
 	//	delaunayTetrahedras.Save("xxx0.txt");
 	dInt32 tetraCount = delaunayTetrahedras.GetCount();
 	dStack<dBigVector> voronoiPoints(tetraCount + 32);
 	dStack<dDelaunayTetrahedralization::dListNode*> tetradrumNode(tetraCount);
 	dTree<dList<dInt32>, dInt32> delaunayNodes;
-
+	
 	dInt32 index = 0;
 	const dConvexHull4dVector* const convexHulPoints = delaunayTetrahedras.GetHullVertexArray();
 	for (dDelaunayTetrahedralization::dListNode* node = delaunayTetrahedras.GetFirst(); node; node = node->GetNext()) 
@@ -1175,11 +1176,12 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, 
 		dConvexHull4dTetraherum& tetra = node->GetInfo();
 		voronoiPoints[index] = tetra.CircumSphereCenter(convexHulPoints);
 		tetradrumNode[index] = node;
-
+	
 		for (dInt32 i = 0; i < 4; i++) 
 		{
 			dTree<dList<dInt32>, dInt32>::dTreeNode* header = delaunayNodes.Find(tetra.m_faces[0].m_index[i]);
-			if (!header) {
+			if (!header) 
+			{
 				dList<dInt32> list;
 				header = delaunayNodes.Insert(list, tetra.m_faces[0].m_index[i]);
 			}
@@ -1187,7 +1189,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, 
 		}
 		index++;
 	}
-
+	
 	const dFloat32 normalAngleInRadians = dFloat32(30.0f * dDegreeToRad);
 	ndMeshEffect* const voronoiPartition = new ndMeshEffect;
 	voronoiPartition->BeginBuild();
@@ -1198,12 +1200,12 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, 
 		dTree<dList<dInt32>, dInt32>::dTreeNode* const nodeNode = iter.GetNode();
 		const dList<dInt32>& list = nodeNode->GetInfo();
 		dInt32 key = nodeNode->GetKey();
-
+	
 		if (key < guardVertexKey) 
 		{
 			dBigVector pointArray[512];
 			dInt32 indexArray[512];
-
+	
 			dInt32 count1 = 0;
 			for (dList<dInt32>::dListNode* ptr = list.GetFirst(); ptr; ptr = ptr->GetNext()) 
 			{
@@ -1212,7 +1214,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, 
 				count1++;
 				dAssert(count1 < dInt32(sizeof(pointArray) / sizeof(pointArray[0])));
 			}
-
+	
 			count1 = dVertexListToIndexList(&pointArray[0].m_x, sizeof(dBigVector), 3, count1, &indexArray[0], dFloat64(1.0e-3f));
 			if (count1 >= 4) 
 			{
@@ -1220,7 +1222,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, 
 				if (convexMesh.GetCount()) 
 				{
 					convexMesh.CalculateNormals(normalAngleInRadians);
-					convexMesh.UniformBoxMapping(materialId, textureProjectionMatrix);
+					convexMesh.UniformBoxMapping(interiorMaterialIndex, textureProjectionMatrix);
 					for (dInt32 i = 0; i < convexMesh.m_points.m_vertex.GetCount(); i++) 
 					{
 						convexMesh.m_points.m_layers[i] = layer;
