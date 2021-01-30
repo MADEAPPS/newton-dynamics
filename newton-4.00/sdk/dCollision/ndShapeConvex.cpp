@@ -226,7 +226,7 @@ dMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatri
 		}
 	
 		inertia.m_posit = origin;
-		inertia.m_posit.m_w = 1.0f;
+		inertia.m_posit.m_w = dFloat32 (1.0f);
 		return inertia;
 	}
 	else 

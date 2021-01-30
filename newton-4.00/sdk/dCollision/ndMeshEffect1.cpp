@@ -4086,7 +4086,7 @@ ndShapeInstance* ndMeshEffect::CreateConvexCollision(dFloat64 tolerance) const
 	ndShapeConvexHull* const collision = new ndShapeConvexHull(count, sizeof(dVector), dFloat32(tolerance), &pool[0].m_x);
 	if (!collision->GetConvexVertexCount()) 
 	{
-		collision->Release();
+		delete collision;
 		return nullptr;
 	}
 	ndShapeInstance* const instance = new ndShapeInstance(collision);

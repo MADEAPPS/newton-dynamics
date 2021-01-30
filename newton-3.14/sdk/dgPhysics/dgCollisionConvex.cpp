@@ -281,7 +281,7 @@ dgMatrix dgCollisionConvex::CalculateInertiaAndCenterOfMass (const dgMatrix& ali
 		}
 
 		inertia.m_posit = origin;
-		inertia.m_posit.m_w = 1.0f;
+		inertia.m_posit.m_w = dgFloat32 (1.0f);
 		return inertia;
 	} else {
 		// for non uniform scale we need to the general divergence theorem

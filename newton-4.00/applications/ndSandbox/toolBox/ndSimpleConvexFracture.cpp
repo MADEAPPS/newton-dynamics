@@ -415,8 +415,8 @@ void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 			world->AddBody(body);
 			scene->AddEntity(entity);
 
-			ndVoronoidFractureEffect& newEffect = m_effectList.Append(fracture)->GetInfo();
-			newEffect.m_body = body;
+			//ndVoronoidFractureEffect& newEffect = m_effectList.Append(fracture)->GetInfo();
+			//newEffect.m_body = body;
 		}
 	}
 	
@@ -493,17 +493,18 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDem
 		if (fracturePiece) 
 		{
 			// make a convex hull collision shape
-			//NewtonCollision* const collision = NewtonCreateConvexHullFromMesh(world, fracturePiece, dFloat32 (0.0f), 16);
 			ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
 			if (collision) 
 			{
-			//	// we have a piece which has a convex collision  representation, add that to the list
-			//	WoodFractureAtom& atom = Append()->GetInfo();
-			//	atom.m_mesh = new DemoMesh(fracturePiece, scene->GetShaderCache());
-			//	NewtonConvexCollisionCalculateInertialMatrix(collision, &atom.m_momentOfInertia[0], &atom.m_centerOfMass[0]);
-			//	dFloat32 debriVolume = NewtonConvexCollisionCalculateVolume(collision);
-			//	atom.m_massFraction = debriVolume / volume;
-			//	atom.m_collision = collision;
+				// we have a piece which has a convex collision  representation, add that to the list
+				ndFractureAtom& atom = Append()->GetInfo();
+				atom.m_mesh = new ndDemoMesh("fracture", fracturePiece, scene->GetShaderCache());
+				dMatrix inertia (collision->CalculateInertia());
+				atom.m_centerOfMass = inertia.m_posit;
+				atom.m_momentOfInertia = dVector(inertia[0][0], inertia[1][1], inertia[2][2], dFloat32(0.0f));
+				dFloat32 debriVolume = collision->GetVolume();
+				atom.m_massFraction = debriVolume / volume;
+				atom.m_collision = collision;
 			}
 			delete fracturePiece;
 		}
@@ -532,10 +533,9 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::~ndVoronoidFractureEffect()
 {
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) 
 	{
-		dAssert(0);
-	//	WoodFractureAtom& atom = node->GetInfo();
-	//	NewtonDestroyCollision(atom.m_collision);
-	//	atom.m_mesh->Release();
+		ndFractureAtom& atom = node->GetInfo();
+		delete atom.m_collision;
+		atom.m_mesh->Release();
 	}
 }
 
