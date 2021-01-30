@@ -415,8 +415,8 @@ void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 			world->AddBody(body);
 			scene->AddEntity(entity);
 
-			//ndVoronoidFractureEffect& newEffect = m_effectList.Append(fracture)->GetInfo();
-			//newEffect.m_body = body;
+			ndVoronoidFractureEffect& newEffect = m_effectList.Append(fracture)->GetInfo();
+			newEffect.m_body = body;
 		}
 	}
 	
@@ -521,11 +521,9 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(const
 {
 	for (dListNode* node = list.GetFirst(); node; node = node->GetNext()) 
 	{
-		dAssert(0);
-		//ndFractureAtom& atom = Append(node->GetInfo())->GetInfo();
-		//atom.m_mesh->AddRef();
-		//atom.m_collision = NewtonCollisionCreateInstance(atom.m_collision);
-		//NewtonCollisionSetUserID(atom.m_collision, 16);
+		ndFractureAtom& atom = Append(node->GetInfo())->GetInfo();
+		atom.m_collision = new ndShapeInstance(*atom.m_collision);
+		atom.m_mesh->AddRef();
 	}
 }
 
