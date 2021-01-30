@@ -1528,7 +1528,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 
 			for (dInt32 j = 0; j < rowsCount; j++)
 			{
-				const ndRightHandSide* const rhs = &m_rightHandSide[rowStart + j];
+				ndRightHandSide* const rhs = &m_rightHandSide[rowStart + j];
 				const ndLeftHandSide* const lhs = &m_leftHandSide[rowStart + j];
 
 				dVector f(rhs->m_force);
@@ -1536,6 +1536,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				torqueM0 = torqueM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_angular, f);
 				forceM1 = forceM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_linear, f);
 				torqueM1 = torqueM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_angular, f);
+				rhs->m_maxImpact = dMax(dAbs(f.GetScalar()), rhs->m_maxImpact);
 			}
 
 			ndJacobian& outBody0 = m_outputForces[m0];
