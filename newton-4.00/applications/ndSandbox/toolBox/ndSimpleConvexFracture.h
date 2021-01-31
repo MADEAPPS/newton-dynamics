@@ -34,7 +34,7 @@ class ndSimpleConvexFracture: public ndModel
 		ndVoronoidFractureEffect(const ndVoronoidFractureEffect& list);
 		~ndVoronoidFractureEffect();
 		ndBodyKinematic* m_body;
-		//bool m_isDead;
+		dFloat32 m_breakImpactSpeed;
 	};
 
 	public:
@@ -43,6 +43,7 @@ class ndSimpleConvexFracture: public ndModel
 
 	void AddFracturedWoodPrimitive(ndDemoEntityManager* const scene, 
 		const ndShapeInstance& shape, 
+		dFloat32 breakImpactSpeed,
 		dFloat32 density, const dVector& origin, 
 		dInt32 xCount, dInt32 zCount, dFloat32 spacing, 
 		dInt32 type, dInt32 materialID);

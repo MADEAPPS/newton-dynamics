@@ -23,9 +23,7 @@
 #include "ndSimpleConvexFracture.h"
 
 #define D_WOODFRACTURE_LISTENER "woodFractureListener"
-//#define BREAK_IMPACT_IN_METERS_PER_SECONDS		8.0f
-//#define BREAK_IMPACT_IN_METERS_PER_SECONDS      10.0f
-#define BREAK_IMPACT_IN_METERS_PER_SECONDS      0.0f
+#define BREAK_IMPACT_IN_METERS_PER_SECONDS      10.0f
 
 ndSimpleConvexFracture::ndSimpleConvexFracture(ndDemoEntityManager* const scene)
 	:ndModel()
@@ -41,6 +39,7 @@ ndSimpleConvexFracture::~ndSimpleConvexFracture()
 
 void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 	ndDemoEntityManager* const scene, const ndShapeInstance& shape,
+	dFloat32 breakImpactSpeed,
 	dFloat32 density, const dVector& origin,
 	dInt32 xCount, dInt32 zCount, dFloat32 spacing,
 	dInt32 type, dInt32 materialID)
@@ -94,6 +93,7 @@ void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 
 			ndVoronoidFractureEffect& newEffect = m_effectList.Append(fracture)->GetInfo();
 			newEffect.m_body = body;
+			newEffect.m_breakImpactSpeed = breakImpactSpeed;
 		}
 	}
 	
@@ -103,6 +103,7 @@ void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 
 ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDemoEntityManager* const scene, ndMeshEffect* const mesh, dInt32 interiorMaterial)
 	:m_body(nullptr)
+	,m_breakImpactSpeed(BREAK_IMPACT_IN_METERS_PER_SECONDS)
 {
 	// first we populate the bounding Box area with few random point to get some interior subdivisions.
 	// the subdivision are local to the point placement, by placing these pointCloud visual ally with a 3d tool
@@ -183,6 +184,7 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDem
 
 ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(const ndVoronoidFractureEffect& list)
 	:m_body(nullptr)
+	,m_breakImpactSpeed(list.m_breakImpactSpeed)
 {
 	for (dListNode* node = list.GetFirst(); node; node = node->GetNext()) 
 	{
@@ -232,7 +234,7 @@ void ndSimpleConvexFracture::Update(const ndWorld* const world, dFloat32 timeste
 		}
 
 		dFloat32 impactSpeed = maxImpactImpulse * effect.m_body->GetInvMass();
-		if (impactSpeed > BREAK_IMPACT_IN_METERS_PER_SECONDS)
+		if (impactSpeed > effect.m_breakImpactSpeed)
 		{
 			dScopeSpinLock lock (m_lock);
 			m_effectList.Unlink(node);
