@@ -58,7 +58,7 @@ class ndWorld: public dClassAlloc
 		return D_NEWTON_ENGINE_MAJOR_VERSION * 100 + D_NEWTON_ENGINE_MINOR_VERSION;
 	}
 
-	void Sync();
+	void Sync() const;
 	void Update(dFloat32 timestep);
 
 	virtual void OnPostUpdate(dFloat32 timestep);
@@ -187,7 +187,7 @@ class ndWorld: public dClassAlloc
 	friend class ndWorldSegregatedScene;
 } D_GCC_NEWTON_ALIGN_32;
 
-inline void ndWorld::Sync()
+inline void ndWorld::Sync() const
 {
 	m_scene->Sync();
 }

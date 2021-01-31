@@ -35,7 +35,7 @@ class ndModel: public dClassAlloc
 	D_NEWTON_API ndModel(const nd::TiXmlNode* const xmlNode);
 	virtual ~ndModel ();
 
-	virtual void AppUpdate(const ndWorld* const world);
+	virtual void AppUpdate(ndWorld* const world);
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 
 	protected:
@@ -56,7 +56,7 @@ inline ndModel::~ndModel()
 	dAssert(!m_node);
 }
 
-inline void ndModel::AppUpdate(const ndWorld* const world)
+inline void ndModel::AppUpdate(ndWorld* const world)
 {
 }
 

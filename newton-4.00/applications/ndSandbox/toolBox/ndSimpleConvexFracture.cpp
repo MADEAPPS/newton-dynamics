@@ -108,7 +108,6 @@ void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 
 ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDemoEntityManager* const scene, ndMeshEffect* const mesh, dInt32 interiorMaterial)
 	:m_body(nullptr)
-	//,m_isDead(false)
 {
 	// first we populate the bounding Box area with few random point to get some interior subdivisions.
 	// the subdivision are local to the point placement, by placing these points visual ally with a 3d tool
@@ -199,7 +198,6 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDem
 
 ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(const ndVoronoidFractureEffect& list)
 	:m_body(nullptr)
-	//,m_isDead(false)
 {
 	for (dListNode* node = list.GetFirst(); node; node = node->GetNext()) 
 	{
@@ -214,8 +212,8 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::~ndVoronoidFractureEffect()
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) 
 	{
 		ndFractureAtom& atom = node->GetInfo();
-		delete atom.m_collision;
 		atom.m_mesh->Release();
+		delete atom.m_collision;
 	}
 }
 
@@ -258,118 +256,74 @@ void ndSimpleConvexFracture::Update(const ndWorld* const world, dFloat32 timeste
 	}
 }
 
-void ndSimpleConvexFracture::UpdateEffect(const ndWorld* const world, ndVoronoidFractureEffect& effect)
-{
-//	dMatrix bodyMatrix;
-//	dVector com(0.0f);
-//	dVector veloc(0.0f);
-//	dVector omega(0.0f);
-//	dFloat32 Ixx;
-//	dFloat32 Iyy;
-//	dFloat32 Izz;
-//	dFloat32 mass;
-	
-//	const ndPhysicsWorld* const physicsWorld = (ndPhysicsWorld*)physicsWorld;
-//	NewtonWorld* const world = GetWorld();
-//	// create the shape and visual mesh as a common data to be re used
-//	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-
-//	NewtonBodyGetVelocity(effect.m_body, &veloc[0]);
-//	NewtonBodyGetOmega(effect.m_body, &omega[0]);
-//	NewtonBodyGetCentreOfMass(effect.m_body, &com[0]);
-//	NewtonBodyGetMatrix(effect.m_body, &bodyMatrix[0][0]);
-//	NewtonBodyGetMass(effect.m_body, &mass, &Ixx, &Iyy, &Izz);
-
-	dVector omega(effect.m_body->GetOmega());
-	dVector veloc(effect.m_body->GetVelocity());
-	dVector massMatrix(effect.m_body->GetMassMatrix());
-	dMatrix bodyMatrix(effect.m_body->GetMatrix());
-	dVector com(bodyMatrix.TransformVector(effect.m_body->GetCentreOfMass()));
-	
-//	NewtonCollisionMaterial material;
-//	dInt32 defaultMaterialID = NewtonBodyGetMaterialGroupID(effect.m_body);
-//	NewtonCollisionGetMaterial(NewtonBodyGetCollision(effect.m_body), &material);
-	
-	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)effect.m_body->GetNotifyCallback();
-	ndDemoEntity* const visualEntiry = (ndDemoEntity*)notify->GetUserData();
-	
-	dMatrix matrix(visualEntiry->GetCurrentMatrix());
-	dQuaternion rotation(matrix);
-
-	for (ndVoronoidFractureEffect::dListNode* node = effect.GetFirst(); node; node = node->GetNext()) 
-	{
-		//ndFractureAtom& atom = node->GetInfo();
-		//ndDemoEntity* const entity = new ndDemoEntity(dMatrix(rotation, matrix.m_posit), nullptr);
-		//entity->SetMesh(atom.m_mesh, dGetIdentityMatrix());
-		//scene->Append(entity);
-		//
-		//dFloat32 debriMass = mass * atom.m_massFraction;
-		//
-		////create the rigid body
-		//NewtonBody* const rigidBody = NewtonCreateDynamicBody(world, atom.m_collision, &matrix[0][0]);
-		//
-		//// calculate debris initial velocity
-		//dVector center(matrix.TransformVector(atom.m_centerOfMass));
-		//dVector v(veloc + omega.CrossProduct(center - com));
-		//
-		//// set initial velocity
-		//NewtonBodySetVelocity(rigidBody, &v[0]);
-		//NewtonBodySetOmega(rigidBody, &omega[0]);
-		//
-		//// set the debris mass properties, mass, center of mass, and inertia 
-		//NewtonBodySetMassProperties(rigidBody, debriMass, atom.m_collision);
-		//
-		//dFloat32 mass;
-		//dFloat32 Ixx;
-		//dFloat32 Iyy;
-		//dFloat32 Izz;
-		//NewtonBodyGetMass(rigidBody, &mass, &Ixx, &Iyy, &Izz);
-		//if (Iyy > 10.0f * Ixx) {
-		//	Iyy *= 0.25f;
-		//}
-		//if (Izz > 5.0f * Ixx) {
-		//	Izz *= 0.25f;
-		//}
-		//NewtonBodySetMassMatrix(rigidBody, mass, Ixx, Iyy, Izz);
-		//
-		//// save the pointer to the graphic object with the body.
-		//NewtonBodySetUserData(rigidBody, entity);
-		//
-		//// assign the wood id
-		//NewtonBodySetMaterialGroupID(rigidBody, defaultMaterialID);
-		//
-		//// set high accuracy simulation
-		//NewtonBodySetGyroscopicTorque(rigidBody, 1);
-		//
-		////  set continuous collision mode
-		////	NewtonBodySetContinuousCollisionMode (rigidBody, continueCollisionMode);
-		//
-		//// set a destructor for this rigid body
-		//NewtonBodySetDestructorCallback(rigidBody, PhysicsBodyDestructor);
-		//
-		//// set the transform call back function
-		//NewtonBodySetTransformCallback(rigidBody, DemoEntity::TransformCallback);
-		//
-		//// set the force and torque call back function
-		//NewtonBodySetForceAndTorqueCallback(rigidBody, PhysicsApplyGravityForce);
-		//
-		//NewtonCollision* const collision = NewtonBodyGetCollision(rigidBody);
-		//NewtonCollisionSetMaterial(collision, &material);
-	}
-}
-
-void ndSimpleConvexFracture::AppUpdate(const ndWorld* const world)
+void ndSimpleConvexFracture::AppUpdate(ndWorld* const world)
 {
 	if (m_pendingEffect.GetCount())
 	{
-		dScopeSpinLock lock(m_lock);
+		world->Sync();
 		dList<ndVoronoidFractureEffect>::dListNode* next;
 		for (dList<ndVoronoidFractureEffect>::dListNode* node = m_pendingEffect.GetFirst(); node; node = next)
 		{
 			next = node->GetNext();
 			ndVoronoidFractureEffect& effect = node->GetInfo();
 			UpdateEffect(world, effect);
+			world->DeleteBody(effect.m_body);
 			m_pendingEffect.Remove(node);
 		}
+	}
+}
+
+void ndSimpleConvexFracture::UpdateEffect(ndWorld* const world, ndVoronoidFractureEffect& effect)
+{
+	dVector omega(effect.m_body->GetOmega());
+	dVector veloc(effect.m_body->GetVelocity());
+	dVector massMatrix(effect.m_body->GetMassMatrix());
+	dMatrix bodyMatrix(effect.m_body->GetMatrix());
+	dVector com(bodyMatrix.TransformVector(effect.m_body->GetCentreOfMass()));
+
+	ndPhysicsWorld* const physicsWorld = (ndPhysicsWorld*)world;
+	ndDemoEntityManager* const scene = physicsWorld->GetManager();
+	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)effect.m_body->GetNotifyCallback();
+	ndDemoEntity* const visualEntiry = (ndDemoEntity*)notify->GetUserData();
+
+	dMatrix matrix(visualEntiry->GetCurrentMatrix());
+	dQuaternion rotation(matrix);
+
+	for (ndVoronoidFractureEffect::dListNode* node = effect.GetFirst(); node; node = node->GetNext())
+	{
+		ndFractureAtom& atom = node->GetInfo();
+		ndDemoEntity* const entity = new ndDemoEntity(dMatrix(rotation, matrix.m_posit), nullptr);
+		entity->SetName("debris");
+		entity->SetMesh(atom.m_mesh, dGetIdentityMatrix());
+		scene->AddEntity(entity);
+		
+		dFloat32 debriMass = massMatrix.m_w * atom.m_massFraction;
+		
+		// calculate debris initial velocity
+		dVector center(matrix.TransformVector(atom.m_centerOfMass));
+		dVector debriVeloc(veloc + omega.CrossProduct(center - com));
+
+		ndBodyDynamic* const body = new ndBodyDynamic();
+		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+		body->SetMatrix(matrix);
+		body->SetCollisionShape(*atom.m_collision);
+		body->SetMassMatrix(debriMass, *atom.m_collision);
+		body->SetAngularDamping(dVector(dFloat32(0.25f)));
+
+		body->SetOmega(omega);
+		body->SetVelocity(debriVeloc);
+		
+		// debris can have very skew inertia matrix
+		// if this happens, fake it by making is a little elliptical. 
+		dVector debriMassMatrix(body->GetMassMatrix());
+		
+		dFloat32 minInertia = dMin(dMin(debriMassMatrix.m_x, debriMassMatrix.m_y), debriMassMatrix.m_z);
+		dFloat32 maxInertia = dMax(dMax(debriMassMatrix.m_x, debriMassMatrix.m_y), debriMassMatrix.m_z);
+		if (maxInertia > dFloat32(10.0f) * minInertia) 
+		{
+			//dAssert(0);
+		}
+
+		world->AddBody(body);
 	}
 }
