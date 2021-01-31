@@ -22,7 +22,7 @@ class dRefCounter
 	dInt32 GetRef() const;
 
 	T* AddRef();
-	dInt32 Release();
+	virtual dInt32 Release();
 
 	protected:
 	virtual ~dRefCounter(void);

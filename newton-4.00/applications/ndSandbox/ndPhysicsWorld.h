@@ -23,15 +23,22 @@ class ndPhysicsWorld: public ndWorld
 	virtual ~ndPhysicsWorld();
 
 	void AdvanceTime(dFloat32 timestep);
-	ndDemoEntityManager* GetManager();
+	ndDemoEntityManager* GetManager() const;
+
+	void DeleteBody(ndBody* const body);
 
 	private:
 	void OnPostUpdate(dFloat32 timestep);
 
+	void DeletePending();
 	ndBody* LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath) const;
 
 	ndDemoEntityManager* m_manager;
 	dFloat32 m_timeAccumulator;
+
+	dSpinLock m_lock;
+	std::thread::id m_mainThread;
+	dList<ndBody*> m_pendingRelease;
 };
 
 #endif

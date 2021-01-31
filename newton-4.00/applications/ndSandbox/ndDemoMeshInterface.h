@@ -94,6 +94,9 @@ class ndDemoMeshInterface: public dClassAlloc, public dRefCounter<ndDemoMeshInte
 	~ndDemoMeshInterface();
 	const dString& GetName () const;
 
+	dInt32 Release();
+	static void ReleasePending();
+
 	bool GetVisible () const;
 	void SetVisible (bool visibilityFlag);
 
@@ -104,6 +107,10 @@ class ndDemoMeshInterface: public dClassAlloc, public dRefCounter<ndDemoMeshInte
 
 	dString m_name;
 	bool m_isVisible;
+
+	static std::thread::id m_renderThread;
+	static dSpinLock m_lock;
+	static dList<ndDemoMeshInterface*> m_pendingRelease;
 };
 
 

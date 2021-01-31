@@ -13,6 +13,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"
+#include "ndDemoMeshInterface.h"
 #include "ndBasicPlayerCapsule.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
@@ -23,17 +24,51 @@ ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	:ndWorld()
 	,m_manager(manager)
 	,m_timeAccumulator(0.0f)
+	,m_lock()
+	,m_mainThread(std::this_thread::get_id())
+	,m_pendingRelease()
 {
+	ndDemoMeshInterface::m_renderThread = std::this_thread::get_id();
 	ClearCache();
 }
 
 ndPhysicsWorld::~ndPhysicsWorld()
 {
+	DeletePending();
+	ndDemoMeshInterface::ReleasePending();
 }
 
-ndDemoEntityManager* ndPhysicsWorld::GetManager()
+ndDemoEntityManager* ndPhysicsWorld::GetManager() const
 {
 	return m_manager;
+}
+
+void ndPhysicsWorld::DeleteBody(ndBody* const body)
+{
+	std::thread::id threadId = std::this_thread::get_id();
+	if (threadId == m_mainThread)
+	{
+		ndWorld::DeleteBody(body);
+	}
+	else
+	{
+		dScopeSpinLock lock(m_lock);
+		m_pendingRelease.Append(body);
+	}
+}
+
+void ndPhysicsWorld::DeletePending()
+{
+	ndDemoMeshInterface::ReleasePending();
+	if (m_pendingRelease.GetCount())
+	{
+		dScopeSpinLock lock(m_lock);
+		while (m_pendingRelease.GetCount())
+		{
+			DeleteBody(m_pendingRelease.GetFirst()->GetInfo());
+			m_pendingRelease.Remove(m_pendingRelease.GetFirst());
+		}
+	}
 }
 
 void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
@@ -50,9 +85,10 @@ void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
 		dAssert(steps >= 0.0f);
 		m_timeAccumulator -= descreteStep * steps;
 	}
-
+	
 	while (m_timeAccumulator > descreteStep)
 	{
+		DeletePending();
 		Update(descreteStep);
 		m_timeAccumulator -= descreteStep;
 
@@ -63,8 +99,6 @@ void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
 		//	xxxx = 0;
 		//	const ndBodyList& bodyList = GetBodyList();
 		//	ndBodyKinematic* body = bodyList.GetFirst()->GetNext()->GetInfo();
-		//	//RemoveBody(body);
-		//	//delete body;
 		//	DeleteBody(body);
 		//}
 	}

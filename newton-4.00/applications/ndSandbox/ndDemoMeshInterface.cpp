@@ -13,6 +13,11 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoMeshInterface.h"
 
+
+std::thread::id ndDemoMeshInterface::m_renderThread;
+dSpinLock ndDemoMeshInterface::m_lock;
+dList<ndDemoMeshInterface*> ndDemoMeshInterface::m_pendingRelease;
+
 ndDemoSubMeshMaterial::ndDemoSubMeshMaterial()
 	:m_ambient(0.8f, 0.8f, 0.8f, 1.0f)
 	,m_diffuse(0.8f, 0.8f, 0.8f, 1.0f)
@@ -42,6 +47,34 @@ ndDemoMeshInterface::ndDemoMeshInterface()
 
 ndDemoMeshInterface::~ndDemoMeshInterface()
 {
+}
+
+dInt32 ndDemoMeshInterface::Release()
+{
+	std::thread::id threadId = std::this_thread::get_id();
+	if (threadId == m_renderThread)
+	{
+		return dRefCounter<ndDemoMeshInterface>::Release();
+	}
+	else
+	{
+		dScopeSpinLock lock(m_lock);
+		m_pendingRelease.Append(this);
+		return 0;
+	}
+}
+
+void ndDemoMeshInterface::ReleasePending()
+{
+	if (m_pendingRelease.GetCount())
+	{
+		dScopeSpinLock lock(m_lock);
+		while (m_pendingRelease.GetCount())
+		{
+			m_pendingRelease.GetFirst()->GetInfo()->Release();
+			m_pendingRelease.Remove(m_pendingRelease.GetFirst());
+		}
+	}
 }
 
 const dString& ndDemoMeshInterface::GetName () const

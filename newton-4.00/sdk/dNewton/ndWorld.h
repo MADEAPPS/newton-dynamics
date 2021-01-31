@@ -72,15 +72,14 @@ class ndWorld: public dClassAlloc
 	dInt32 GetSelectedSolver() const;
 	D_NEWTON_API void SelectSolver(dInt32 solver);
 
-	D_NEWTON_API bool AddBody(ndBody* const body);
-	D_NEWTON_API void RemoveBody(ndBody* const body);
-	D_NEWTON_API void AddJoint(ndJointBilateralConstraint* const joint);
-	D_NEWTON_API void RemoveJoint(ndJointBilateralConstraint* const joint);
+	D_NEWTON_API virtual bool AddBody(ndBody* const body);
+	D_NEWTON_API virtual void RemoveBody(ndBody* const body);
+	D_NEWTON_API virtual void AddJoint(ndJointBilateralConstraint* const joint);
+	D_NEWTON_API virtual void RemoveJoint(ndJointBilateralConstraint* const joint);
 
-	D_NEWTON_API void AddModel(ndModel* const model);
-	D_NEWTON_API void RemoveModel(ndModel* const model);
-
-	D_NEWTON_API void DeleteBody(ndBody* const body);
+	D_NEWTON_API virtual void AddModel(ndModel* const model);
+	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
+	D_NEWTON_API virtual void DeleteBody(ndBody* const body);
 
 	D_NEWTON_API void Load(const char* const path);
 	D_NEWTON_API void Load(const nd::TiXmlElement* const rootNode, const char* const assetPath);
