@@ -132,8 +132,8 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDem
 		pointCloud[i] += dVector(x, y, z, dFloat32(0.0f));
 	}
 	
-	pointCloud[0] = dVector::m_zero;
-	count = 0;
+	//pointCloud[0] = dVector::m_zero;
+	//count = 0;
 	
 	// create a texture matrix, for applying the material's UV to all internal faces
 	dMatrix textureMatrix(dGetIdentityMatrix());
