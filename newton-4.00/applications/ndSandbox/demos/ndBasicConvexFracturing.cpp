@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 #include "ndSimpleConvexFracture.h"
-
+/*
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, dInt32 count)
@@ -74,14 +74,17 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 
 	instanceMesh->Release();
 }
+*/
 
 void ndBasicConvexFracturing(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene);
 
+	ndPhysicsWorld* const world = scene->GetWorld();
 	ndSimpleConvexFracture* const fractureManager = new ndSimpleConvexFracture(scene);
-	scene->GetWorld()->AddModel(fractureManager);
+	world->AddModel(fractureManager);
+	world->RegisterModelUpdate(fractureManager);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	//AddCapsulesStacks(scene, origin1);

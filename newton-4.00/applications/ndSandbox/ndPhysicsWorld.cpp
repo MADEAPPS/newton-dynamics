@@ -24,18 +24,15 @@ ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	:ndWorld()
 	,m_manager(manager)
 	,m_timeAccumulator(0.0f)
-	,m_lock()
-	,m_mainThread(std::this_thread::get_id())
-	,m_pendingRelease()
+	//,m_lock()
+	//,m_mainThread(std::this_thread::get_id())
+	//,m_pendingRelease()
 {
-	ndDemoMeshInterface::m_renderThread = std::this_thread::get_id();
 	ClearCache();
 }
 
 ndPhysicsWorld::~ndPhysicsWorld()
 {
-	DeletePending();
-	ndDemoMeshInterface::ReleasePending();
 }
 
 ndDemoEntityManager* ndPhysicsWorld::GetManager() const
@@ -43,32 +40,9 @@ ndDemoEntityManager* ndPhysicsWorld::GetManager() const
 	return m_manager;
 }
 
-void ndPhysicsWorld::DeleteBody(ndBody* const body)
+void ndPhysicsWorld::RegisterModelUpdate(ndModel* const model)
 {
-	std::thread::id threadId = std::this_thread::get_id();
-	if (threadId == m_mainThread)
-	{
-		ndWorld::DeleteBody(body);
-	}
-	else
-	{
-		dScopeSpinLock lock(m_lock);
-		m_pendingRelease.Append(body);
-	}
-}
-
-void ndPhysicsWorld::DeletePending()
-{
-	ndDemoMeshInterface::ReleasePending();
-	if (m_pendingRelease.GetCount())
-	{
-		dScopeSpinLock lock(m_lock);
-		while (m_pendingRelease.GetCount())
-		{
-			DeleteBody(m_pendingRelease.GetFirst()->GetInfo());
-			m_pendingRelease.Remove(m_pendingRelease.GetFirst());
-		}
-	}
+	m_modelUpdate.Append(model);
 }
 
 void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
@@ -88,9 +62,14 @@ void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
 	
 	while (m_timeAccumulator > descreteStep)
 	{
-		DeletePending();
 		Update(descreteStep);
 		m_timeAccumulator -= descreteStep;
+
+		for (dList<ndModel*>::dListNode* node = m_modelUpdate.GetFirst(); node; node = node->GetNext())
+		{
+			ndModel* const model = node->GetInfo();
+			model->AppUpdate(this);
+		}
 
 		//xxxx++;
 		//if (xxxx == 500)

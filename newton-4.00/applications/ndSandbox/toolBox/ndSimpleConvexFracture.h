@@ -34,7 +34,7 @@ class ndSimpleConvexFracture: public ndModel
 		ndVoronoidFractureEffect(const ndVoronoidFractureEffect& list);
 		~ndVoronoidFractureEffect();
 		ndBodyKinematic* m_body;
-		bool m_isDead;
+		//bool m_isDead;
 	};
 
 	public:
@@ -48,13 +48,13 @@ class ndSimpleConvexFracture: public ndModel
 		dInt32 type, dInt32 materialID);
 
 	virtual void Update(const ndWorld* const world, dFloat32 timestep);
+	virtual void AppUpdate(const ndWorld* const world);
 
-	void UpdateEffect(const ndWorld* const world, ndVoronoidFractureEffect& effect, dFloat32 timestep);
+	void UpdateEffect(const ndWorld* const world, ndVoronoidFractureEffect& effect);
 
 	dList<ndVoronoidFractureEffect> m_effectList;
+	dList<ndVoronoidFractureEffect> m_pendingEffect;
 	dSpinLock m_lock;
 };
-
-
 
 #endif
