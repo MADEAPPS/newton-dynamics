@@ -53,16 +53,6 @@ if (NEWTON_BUILD_PROFILER)
 endif ()
 
 if(MSVC OR MINGW)
-    if(NEWTON_BUILD_SHARED_LIBS)
-        add_definitions(-D_DSCENE_DLL)
-        add_definitions(-D_DCONTAINERS_DLL)
-    else(NEWTON_BUILD_SHARED_LIBS)
-        add_definitions(-D_NEWTON_STATIC_LIB)
-        add_definitions(-D_DVEHICLE_STATIC_LIB)
-        add_definitions(-D_CNEWTON_STATIC_LIB)
-        add_definitions(-D_CUSTOM_JOINTS_STATIC_LIB)
-    endif(NEWTON_BUILD_SHARED_LIBS)
-
     target_link_libraries (${projectName} glu32 opengl32)
 
     if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
