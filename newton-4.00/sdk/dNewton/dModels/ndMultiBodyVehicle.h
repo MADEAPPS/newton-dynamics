@@ -41,7 +41,7 @@ class ndMultiBodyVehicle: public ndModel
 
 	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const tire, const ndContactMaterial& contactPoint) const
 	{
-		return dFloat32(1.0f);
+		return dFloat32(2.0f);
 	}
 
 	D_NEWTON_API dFloat32 GetSpeed() const;
