@@ -36,8 +36,8 @@ void ndBasicConvexFracturing(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_x += 10.0f;
 	matrix.m_posit.m_y += 2.0f;
 
-	//ndShapeInstance shape(new ndShapeCylinder(0.5f, 0.5f, 3.0f));
-	ndShapeInstance shape(new ndShapeBox(1.0f, 1.0f, 1.0f));
+	ndShapeInstance shape(new ndShapeCylinder(0.5f, 0.5f, 3.0f));
+	//ndShapeInstance shape(new ndShapeBox(1.0f, 1.0f, 1.0f));
 	fractureManager->AddFracturedWoodPrimitive(scene, shape, 10.0f, 1000.0f, matrix.m_posit,	woodX, woodZ, 0.5f, 0, 0);
 
 	dQuaternion rot;
