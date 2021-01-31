@@ -18,63 +18,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
-#include "ndDemoInstanceEntity.h"
 #include "ndSimpleConvexFracture.h"
-/*
-static void AddShape(ndDemoEntityManager* const scene,
-	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
-	dFloat32 mass, const dVector& origin, const dFloat32 diameter, dInt32 count)
-{
-	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
-	ndPhysicsWorld* const world = scene->GetWorld();
-
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f + 7.0f;
-
-	for (dInt32 i = 0; i < count; i++)
-	{
-		ndBodyDynamic* const body = new ndBodyDynamic();
-		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
-
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-		body->SetMatrix(matrix);
-		body->SetCollisionShape(sphereShape);
-		body->SetMassMatrix(mass, sphereShape);
-		body->SetAngularDamping(dVector(dFloat32(0.5f)));
-
-		world->AddBody(body);
-		matrix.m_posit.m_y += diameter * 2.5f;
-	}
-}
-
-static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& origin)
-{
-	dFloat32 diameter = 1.0f;
-	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
-	ndDemoMeshIntance* const instanceMesh = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
-
-	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
-	scene->AddEntity(rootEntity);
-
-	//const dInt32 n = 1;
-	//const dInt32 stackHigh = 1;
-	const dInt32 n = 10;
-	const dInt32 stackHigh = 7;
-	for (dInt32 i = 0; i < n; i++)
-	{
-		for (dInt32 j = 0; j < n; j++)
-		{
-			dVector location((j - n / 2) * 4.0f, 0.0f, (i - n / 2) * 4.0f, 0.0f);
-			AddShape(scene, rootEntity, shape, 10.0f, location + origin, diameter, stackHigh);
-		}
-	}
-
-	instanceMesh->Release();
-}
-*/
 
 void ndBasicConvexFracturing(ndDemoEntityManager* const scene)
 {
@@ -86,21 +30,19 @@ void ndBasicConvexFracturing(ndDemoEntityManager* const scene)
 	world->AddModel(fractureManager);
 	world->RegisterModelUpdate(fractureManager);
 
-	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	//AddCapsulesStacks(scene, origin1);
-
 	dInt32 woodX = 1;
 	dInt32 woodZ = 1;
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_x += 10.0f;
 	matrix.m_posit.m_y += 2.0f;
-	ndShapeInstance shape(new ndShapeCylinder(0.5f, 0.5f, 3.0f));
-	
+
+	//ndShapeInstance shape(new ndShapeCylinder(0.5f, 0.5f, 3.0f));
+	ndShapeInstance shape(new ndShapeBox(1.0f, 1.0f, 1.0f));
 	fractureManager->AddFracturedWoodPrimitive(scene, shape, 1000.0f, matrix.m_posit,	woodX, woodZ, 0.5f, 0, 0);
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
 	//dVector origin(-60.0f, 5.0f, 0.0f, 0.0f);
-	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-5.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

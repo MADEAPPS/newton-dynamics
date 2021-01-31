@@ -24,7 +24,8 @@
 
 #define D_WOODFRACTURE_LISTENER "woodFractureListener"
 //#define BREAK_IMPACT_IN_METERS_PER_SECONDS		8.0f
-#define BREAK_IMPACT_IN_METERS_PER_SECONDS      10.0f
+//#define BREAK_IMPACT_IN_METERS_PER_SECONDS      10.0f
+#define BREAK_IMPACT_IN_METERS_PER_SECONDS      0.0f
 
 ndSimpleConvexFracture::ndSimpleConvexFracture(ndDemoEntityManager* const scene)
 	:ndModel()
@@ -46,10 +47,6 @@ void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 {
 	// create a newton mesh from the collision primitive
 	ndMeshEffect mesh(shape);
-	
-	// apply a material map
-	//dInt32 externalMaterial = LoadTexture("reljef.tga");
-	//dInt32 internalMaterial = LoadTexture("concreteBrick.tga");
 
 	// add the interial material;
 	mesh.GetMaterials().PushBack(ndMeshEffect::dMaterial());
@@ -59,7 +56,6 @@ void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 	strcpy(material1.m_textureName, "concreteBrick.tga");
 
 	dMatrix aligmentUV(dGetIdentityMatrix());
-	//NewtonMeshApplyBoxMapping(mesh, externalMaterial, externalMaterial, externalMaterial, &aligmentUV[0][0]);
 	mesh.UniformBoxMapping(0, aligmentUV);
 
 	// make a visual mesh for display
@@ -93,7 +89,6 @@ void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 			body->SetMatrix(matrix);
 			body->SetCollisionShape(shape);
 			body->SetMassMatrix(mass, shape);
-			//body->SetAngularDamping(dVector(dFloat32(0.5f)));
 			world->AddBody(body);
 			scene->AddEntity(entity);
 
@@ -118,27 +113,33 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDem
 	dVector size(bigSize);
 
 	dVector points[32];
-	points[0] = dVector(-size.m_x * 0.5f, -size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
-	points[1] = dVector(-size.m_x * 0.5f, -size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
-	points[2] = dVector(-size.m_x * 0.5f,  size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
-	points[3] = dVector(-size.m_x * 0.5f,  size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
+	//points[0] = dVector(-size.m_x * 0.5f, -size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
+	//points[1] = dVector(-size.m_x * 0.5f, -size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
+	//points[2] = dVector(-size.m_x * 0.5f,  size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
+	//points[3] = dVector(-size.m_x * 0.5f,  size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
+	//
+	//points[4] = dVector(size.m_x * 0.5f, -size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
+	//points[5] = dVector(size.m_x * 0.5f, -size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
+	//points[6] = dVector(size.m_x * 0.5f,  size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
+	//points[7] = dVector(size.m_x * 0.5f,  size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
+	//
+	//dInt32 count = 8;
+	//for (dInt32 i = 0; i < 8; i++) 
+	//{
+	//	dFloat32 x = dGaussianRandom(size.m_x * 0.1f);
+	//	dFloat32 y = dGaussianRandom(size.m_y * 0.1f);
+	//	dFloat32 z = dGaussianRandom(size.m_y * 0.1f);
+	//	if ((x <= size.m_x) && (x >= -size.m_x) && (y <= size.m_y) && (y >= -size.m_y) && (z <= size.m_z) && (z >= -size.m_z)) 
+	//	{
+	//		//points[count] = dVector(x, y, z, dFloat32(0.0f));
+	//		//count++;
+	//	}
+	//}
 	
-	points[4] = dVector(size.m_x * 0.5f, -size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
-	points[5] = dVector(size.m_x * 0.5f, -size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
-	points[6] = dVector(size.m_x * 0.5f,  size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
-	points[7] = dVector(size.m_x * 0.5f,  size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
-	
-	dInt32 count = 8;
-	for (dInt32 i = 0; i < count; i++) 
-	{
-		dFloat32 x = dGaussianRandom(size.m_x * 0.1f);
-		dFloat32 y = dGaussianRandom(size.m_y * 0.1f);
-		dFloat32 z = dGaussianRandom(size.m_y * 0.1f);
-		points[i] += dVector(x, y, z, dFloat32 (0.0f));
-	}
-	
+	points[0] = dVector::m_zero;
+	dInt32 count = 1;
 	// add the bounding box as a safeguard area
-	size += 1.0f;
+	size += size.Scale (2.0f) + dVector::m_one;
 	points[count + 0] = dVector(size.m_x, size.m_y, size.m_z, dFloat32 (0.0f));
 	points[count + 1] = dVector(size.m_x, size.m_y, -size.m_z, dFloat32 (0.0f));
 	points[count + 2] = dVector(size.m_x, -size.m_y, size.m_z, dFloat32 (0.0f));
