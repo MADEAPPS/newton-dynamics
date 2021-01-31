@@ -20,6 +20,7 @@
 */
 
 #include "dCoreStdafx.h"
+#include "ndCollisionStdafx.h"
 #include "dStack.h"
 #include "dMatrix.h"
 #include "ndMeshEffect.h"

@@ -20,6 +20,7 @@
 */
 
 #include "dCoreStdafx.h"
+#include "ndCollisionStdafx.h"
 #include "dSort.h"
 #include "dStack.h"
 #include "dVector.h"

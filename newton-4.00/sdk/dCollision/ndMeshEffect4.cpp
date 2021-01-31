@@ -20,6 +20,7 @@
 */
 
 #include "dCoreStdafx.h"
+#include "ndCollisionStdafx.h"
 #include "ndMeshEffect.h"
 //#include "dgBody.h"
 //#include "dgWorld.h"
