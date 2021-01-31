@@ -4090,7 +4090,7 @@ ndShapeInstance* ndMeshEffect::CreateConvexCollision(dFloat64 tolerance) const
 		return nullptr;
 	}
 	ndShapeInstance* const instance = new ndShapeInstance(collision);
-	//collision->Release();
+	instance->SetLocalMatrix(matrix);
 	return instance;
 }
 

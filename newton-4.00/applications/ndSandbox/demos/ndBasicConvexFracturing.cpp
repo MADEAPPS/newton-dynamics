@@ -43,6 +43,6 @@ void ndBasicConvexFracturing(ndDemoEntityManager* const scene)
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
 	//dVector origin(-60.0f, 5.0f, 0.0f, 0.0f);
-	dVector origin(-5.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(5.0f, 1.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

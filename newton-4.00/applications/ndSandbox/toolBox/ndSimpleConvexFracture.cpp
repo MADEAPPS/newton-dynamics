@@ -105,50 +105,35 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDem
 	:m_body(nullptr)
 {
 	// first we populate the bounding Box area with few random point to get some interior subdivisions.
-	// the subdivision are local to the point placement, by placing these points visual ally with a 3d tool
+	// the subdivision are local to the point placement, by placing these pointCloud visual ally with a 3d tool
 	// and have precise control of how the debris are created.
 	// the number of pieces is equal to the number of point inside the Mesh plus the number of point on the mesh 
 	dBigVector bigSize;
 	dMatrix matrix(mesh->CalculateOOBB(bigSize));
 	dVector size(bigSize);
 
-	dVector points[32];
-	//points[0] = dVector(-size.m_x * 0.5f, -size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
-	//points[1] = dVector(-size.m_x * 0.5f, -size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
-	//points[2] = dVector(-size.m_x * 0.5f,  size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
-	//points[3] = dVector(-size.m_x * 0.5f,  size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
-	//
-	//points[4] = dVector(size.m_x * 0.5f, -size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
-	//points[5] = dVector(size.m_x * 0.5f, -size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
-	//points[6] = dVector(size.m_x * 0.5f,  size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
-	//points[7] = dVector(size.m_x * 0.5f,  size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
-	//
-	//dInt32 count = 8;
-	//for (dInt32 i = 0; i < 8; i++) 
-	//{
-	//	dFloat32 x = dGaussianRandom(size.m_x * 0.1f);
-	//	dFloat32 y = dGaussianRandom(size.m_y * 0.1f);
-	//	dFloat32 z = dGaussianRandom(size.m_y * 0.1f);
-	//	if ((x <= size.m_x) && (x >= -size.m_x) && (y <= size.m_y) && (y >= -size.m_y) && (z <= size.m_z) && (z >= -size.m_z)) 
-	//	{
-	//		//points[count] = dVector(x, y, z, dFloat32(0.0f));
-	//		//count++;
-	//	}
-	//}
+	dVector pointCloud[32];
+	pointCloud[0] = dVector(-size.m_x * 0.5f, -size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
+	pointCloud[1] = dVector(-size.m_x * 0.5f, -size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
+	pointCloud[2] = dVector(-size.m_x * 0.5f,  size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
+	pointCloud[3] = dVector(-size.m_x * 0.5f,  size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
 	
-	points[0] = dVector::m_zero;
-	dInt32 count = 1;
-	// add the bounding box as a safeguard area
-	size += size.Scale (2.0f) + dVector::m_one;
-	points[count + 0] = dVector(size.m_x, size.m_y, size.m_z, dFloat32 (0.0f));
-	points[count + 1] = dVector(size.m_x, size.m_y, -size.m_z, dFloat32 (0.0f));
-	points[count + 2] = dVector(size.m_x, -size.m_y, size.m_z, dFloat32 (0.0f));
-	points[count + 3] = dVector(size.m_x, -size.m_y, -size.m_z, dFloat32 (0.0f));
-	points[count + 4] = dVector(-size.m_x, size.m_y, size.m_z, dFloat32 (0.0f));
-	points[count + 5] = dVector(-size.m_x, size.m_y, -size.m_z, dFloat32 (0.0f));
-	points[count + 6] = dVector(-size.m_x, -size.m_y, size.m_z, dFloat32 (0.0f));
-	points[count + 7] = dVector(-size.m_x, -size.m_y, -size.m_z, dFloat32 (0.0f));
-	count += 8;
+	pointCloud[4] = dVector(size.m_x * 0.5f, -size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
+	pointCloud[5] = dVector(size.m_x * 0.5f, -size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
+	pointCloud[6] = dVector(size.m_x * 0.5f,  size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
+	pointCloud[7] = dVector(size.m_x * 0.5f,  size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
+	
+	dInt32 count = 8;
+	for (dInt32 i = 0; i < count; i++)
+	{
+		dFloat32 x = dGaussianRandom(size.m_x * 0.1f);
+		dFloat32 y = dGaussianRandom(size.m_y * 0.1f);
+		dFloat32 z = dGaussianRandom(size.m_y * 0.1f);
+		pointCloud[i] += dVector(x, y, z, dFloat32(0.0f));
+	}
+	
+	pointCloud[0] = dVector::m_zero;
+	count = 0;
 	
 	// create a texture matrix, for applying the material's UV to all internal faces
 	dMatrix textureMatrix(dGetIdentityMatrix());
@@ -159,8 +144,7 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDem
 	dFloat32 volume = dFloat32 (mesh->CalculateVolume());
 
 	// now we call create we decompose the mesh into several convex pieces 
-	//ndMeshEffect* const debriMeshPieces = NewtonMeshCreateVoronoiConvexDecomposition(world, count, &points[0].m_x, sizeof(dVector), interiorMaterial, &textureMatrix[0][0]);
-	ndMeshEffect* const debriMeshPieces = mesh->CreateVoronoiConvexDecomposition(interiorMaterial, &textureMatrix[0][0]);
+	ndMeshEffect* const debriMeshPieces = mesh->CreateVoronoiConvexDecomposition(count, pointCloud, interiorMaterial, &textureMatrix[0][0]);
 	dAssert(debriMeshPieces);
 	
 	// now we iterate over each pieces and for each one we create a visual entity and a rigid body
@@ -261,6 +245,7 @@ void ndSimpleConvexFracture::AppUpdate(ndWorld* const world)
 {
 	if (m_pendingEffect.GetCount())
 	{
+		D_TRACKTIME();
 		world->Sync();
 		dList<ndVoronoidFractureEffect>::dListNode* next;
 		for (dList<ndVoronoidFractureEffect>::dListNode* node = m_pendingEffect.GetFirst(); node; node = next)
@@ -276,6 +261,7 @@ void ndSimpleConvexFracture::AppUpdate(ndWorld* const world)
 
 void ndSimpleConvexFracture::UpdateEffect(ndWorld* const world, ndVoronoidFractureEffect& effect)
 {
+	D_TRACKTIME();
 	dVector omega(effect.m_body->GetOmega());
 	dVector veloc(effect.m_body->GetVelocity());
 	dVector massMatrix(effect.m_body->GetMassMatrix());

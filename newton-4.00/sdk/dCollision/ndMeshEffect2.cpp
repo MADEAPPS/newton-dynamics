@@ -1100,26 +1100,23 @@ dAssert(0);
 	}
 */
 }
-
 #endif
 
-//ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, dInt32 pointStrideInBytes, const dFloat32* const pointCloud, dInt32 materialId, const dMatrix& textureProjectionMatrix)
-ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 interiorMaterialIndex, const dMatrix& textureProjectionMatrix)
+ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, dVector* const pointCloud, dInt32 interiorMaterialIndex, const dMatrix& textureProjectionMatrix)
 {
-	dStack<dBigVector> buffer(m_points.m_vertex.GetCount() + 16);
+	dStack<dBigVector> buffer(pointCount + 32);
 	dBigVector* const pool = &buffer[0];
 	dInt32 count = 0;
 	dFloat64 quantizeFactor = dFloat64(16.0f);
 	dFloat64 invQuantizeFactor = dFloat64(1.0f) / quantizeFactor;
-	//dInt32 stride = pointStrideInBytes / sizeof(dFloat32);
 	
 	dBigVector pMin(dFloat32(1.0e10f), dFloat32(1.0e10f), dFloat32(1.0e10f), dFloat32(0.0f));
 	dBigVector pMax(dFloat32(-1.0e10f), dFloat32(-1.0e10f), dFloat32(-1.0e10f), dFloat32(0.0f));
-	for (dInt32 i = 0; i < m_points.m_vertex.GetCount(); i++)
+	for (dInt32 i = 0; i < pointCount; i++)
 	{
-		dFloat64 x = m_points.m_vertex[i].m_x;
-		dFloat64 y = m_points.m_vertex[i].m_y;
-		dFloat64 z = m_points.m_vertex[i].m_z;
+		dFloat64 x = pointCloud[i].m_x;
+		dFloat64 y = pointCloud[i].m_y;
+		dFloat64 z = pointCloud[i].m_z;
 		x = floor(x * quantizeFactor) * invQuantizeFactor;
 		y = floor(y * quantizeFactor) * invQuantizeFactor;
 		z = floor(z * quantizeFactor) * invQuantizeFactor;
@@ -1129,7 +1126,15 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 interiorMate
 		pool[count] = p;
 		count++;
 	}
-	// add the bbox as a barrier
+
+	dBigVector meshMin;
+	dBigVector meshMax;
+	CalculateAABB(meshMin, meshMax);
+
+	pMin = pMin.GetMin(meshMin);
+	pMax = pMax.GetMax(meshMax);
+
+	// add the bounding box as a barrier
 	pool[count + 0] = dBigVector(pMin.m_x, pMin.m_y, pMin.m_z, dFloat64(0.0f));
 	pool[count + 1] = dBigVector(pMax.m_x, pMin.m_y, pMin.m_z, dFloat64(0.0f));
 	pool[count + 2] = dBigVector(pMin.m_x, pMax.m_y, pMin.m_z, dFloat64(0.0f));
@@ -1147,7 +1152,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 interiorMate
 	dFloat64 maxSize = dMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y, pMax.m_z - pMin.m_z);
 	pMin -= dBigVector(maxSize, maxSize, maxSize, dFloat64(0.0f));
 	pMax += dBigVector(maxSize, maxSize, maxSize, dFloat64(0.0f));
-	
+
 	// add the a guard zone, so that we do no have to clip
 	dInt32 guardVertexKey = count;
 	pool[count + 0] = dBigVector(pMin.m_x, pMin.m_y, pMin.m_z, dFloat64(0.0f));
