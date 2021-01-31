@@ -22,8 +22,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndSimpleConvexFracture.h"
 
-#define D_WOODFRACTURE_LISTENER "woodFractureListener"
-#define BREAK_IMPACT_IN_METERS_PER_SECONDS      10.0f
+#define BREAK_IMPACT_IN_METERS_PER_SECONDS	10.0f
 
 ndSimpleConvexFracture::ndSimpleConvexFracture(ndDemoEntityManager* const scene)
 	:ndModel()

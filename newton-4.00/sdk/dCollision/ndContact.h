@@ -54,23 +54,6 @@ D_MSV_NEWTON_ALIGN_32
 class ndContactMaterial: public ndContactPoint
 {
 	public:
-	//D_MSV_NEWTON_ALIGN_32
-	//class ndUserContactPoint
-	//{
-	//	public:
-	//	dVector m_point;
-	//	dVector m_normal;
-	//	dUnsigned64 m_shapeId0;
-	//	dUnsigned64 m_shapeId1;
-	//	dFloat32 m_penetration;
-	//	dUnsigned32 m_unused[3];
-	//} D_GCC_NEWTON_ALIGN_32;
-
-	//typedef bool (dgApi *OnAABBOverlap) (dgContact& contactJoint, dFloat32 timestep, dInt32 threadIndex);
-	//typedef void (dgApi *OnContactCallback) (dgContact& contactJoint, dFloat32 timestep, dInt32 threadIndex);
-	//typedef bool (dgApi *OnCompoundCollisionPrefilter) (dgContact& contactJoint, dFloat32 timestep, const dgBody* bodyA, const void* collisionNodeA, const dgBody* bodyB, const void* collisionNodeB, dInt32 threadIndex);
-	//typedef bool (dgApi *OnContactGeneration) (const dgContactMaterial& material, const dgBody& body0, const dgCollisionInstance* collisionIntance0, const dgBody& body1, const dgCollisionInstance* collisionIntance1, dgUserContactPoint* const contacts, dInt32 maxCount, dInt32 threadIndex);
-
 	ndContactMaterial()
 		:m_dir0(dVector::m_zero)
 		,m_dir1(dVector::m_zero)
@@ -80,13 +63,6 @@ class ndContactMaterial: public ndContactPoint
 		m_dir1_Force.Clear();
 		m_normal_Force.Clear();
 	}
-	//void* GetUserData() const;
-	//void SetUserData(void* const userData);
-	//void SetAsSoftContact(dFloat32 regularizer);
-	//void SetCollisionGenerationCallback(OnContactGeneration contactGeneration);
-	//void SetCollisionCallback(OnAABBOverlap abbOvelap, OnContactCallback callback);
-	//void SetCompoundCollisionCallback(OnCompoundCollisionPrefilter abbCompounndOvelap);
-
 	dVector m_dir0;
 	dVector m_dir1;
 	ndForceImpactPair m_normal_Force;

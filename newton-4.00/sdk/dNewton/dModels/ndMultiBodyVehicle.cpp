@@ -410,16 +410,6 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 	const dFloat32 gamma = dSqrt(cx * cx + cz * cz) + dFloat32 (1.0e-3f);
 
 	const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
-	// the code bellow not needed if we use a rigid body solver, 
-	// since the solve will calculate the correct forces.
-	//dAssert(gamma > dFloat32(0.0f));
-	//const dFloat32 maxGamma = dFloat32(3.0f) * frictionCoefficient * contactPoint.m_normal_Force.m_force;
-	//dFloat32 normalForce = frictionCoefficient * contactPoint.m_normal_Force.m_force;
-	//if (gamma <= maxGamma)
-	//{
-	//	normalForce = gamma * (dFloat32(1.0f) - gamma / dFloat32 (3.0f) + gamma * gamma / dFloat32 (27.0f));
-	//}
-
 	const dFloat32 lateralFrictionCoefficient = frictionCoefficient * cz / gamma;
 	const dFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
 

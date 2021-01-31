@@ -249,7 +249,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const tire, const ndContactMaterial& contactPoint) const
 	{
-		return dFloat32(1.0f);
+		return dFloat32(2.0f);
 	}
 
 	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, dFloat32 timestep)
