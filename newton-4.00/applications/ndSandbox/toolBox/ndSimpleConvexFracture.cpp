@@ -228,6 +228,14 @@ xxxx++;
 					dFloat32 debriVolume = collision->GetVolume();
 					atom.m_massFraction = debriVolume / volume;
 					atom.m_collision = collision;
+
+
+					ndFractureAtom& atom1 = Append()->GetInfo();
+					atom1.m_mesh = (ndDemoMesh*)atom.m_mesh->AddRef();
+					atom1.m_centerOfMass = atom.m_centerOfMass;
+					atom1.m_momentOfInertia = atom.m_centerOfMass;
+					atom1.m_massFraction = atom.m_massFraction;
+					atom1.m_collision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
 				}
 			}
 			delete fracturePiece;
