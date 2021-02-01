@@ -24,6 +24,55 @@
 
 #define BREAK_IMPACT_IN_METERS_PER_SECONDS	10.0f
 
+ndSimpleConvexFracture::ndDebriBody::ndDebriBody()
+	:ndBodyDynamic()
+	,m_principalAxis(dGetIdentityMatrix())
+{
+}
+
+//#define ASYMTERIX_INERTIA
+void ndSimpleConvexFracture::ndDebriBody::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
+{
+#ifdef ASYMTERIX_INERTIA
+	m_principalAxis = inertia;
+	dVector eigenValues(m_principalAxis.EigenVectors());
+	dMatrix massMatrix(dGetIdentityMatrix());
+	massMatrix[0][0] = eigenValues[0];
+	massMatrix[1][1] = eigenValues[1];
+	massMatrix[2][2] = eigenValues[2];
+	ndBodyDynamic::SetMassMatrix(mass, massMatrix);
+
+#else
+	ndBodyDynamic::SetMassMatrix(mass, inertia);
+#endif
+
+	// debris can have very skew inertia matrix
+	// if this happens, fake it by making is a little elliptical. 
+	//dVector debriMassMatrix(body->GetMassMatrix());
+	//
+	//dFloat32 minInertia = dMin(dMin(debriMassMatrix.m_x, debriMassMatrix.m_y), debriMassMatrix.m_z);
+	//dFloat32 maxInertia = dMax(dMax(debriMassMatrix.m_x, debriMassMatrix.m_y), debriMassMatrix.m_z);
+	//if (maxInertia > dFloat32(20.0f) * minInertia)
+	//{
+	//	minInertia *= 1.0f;
+	//}
+}
+
+dMatrix ndSimpleConvexFracture::ndDebriBody::CalculateInvInertiaMatrix() const
+{
+#ifdef ASYMTERIX_INERTIA
+	dMatrix matrix(m_principalAxis * m_matrix);
+	matrix.m_posit = dVector::m_wOne;
+	dMatrix diagonal(dGetIdentityMatrix());
+	diagonal[0][0] = m_invMass[0];
+	diagonal[1][1] = m_invMass[1];
+	diagonal[2][2] = m_invMass[2];
+	return matrix * diagonal * matrix.Inverse();
+#else
+	return ndBodyDynamic::CalculateInvInertiaMatrix();
+#endif
+}
+
 ndSimpleConvexFracture::ndSimpleConvexFracture(ndDemoEntityManager* const scene)
 	:ndModel()
 	,m_effectList()
@@ -291,27 +340,16 @@ void ndSimpleConvexFracture::UpdateEffect(ndWorld* const world, ndVoronoidFractu
 		dVector center(matrix.TransformVector(atom.m_centerOfMass));
 		dVector debriVeloc(veloc + omega.CrossProduct(center - com));
 
-		ndBodyDynamic* const body = new ndBodyDynamic();
+		//ndBodyDynamic* const body = new ndBodyDynamic();
+		ndBodyDynamic* const body = new ndDebriBody();
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(*atom.m_collision);
 		body->SetMassMatrix(debriMass, *atom.m_collision);
-		body->SetAngularDamping(dVector(dFloat32(0.25f)));
+		body->SetAngularDamping(dVector(dFloat32(0.1f)));
 
 		body->SetOmega(omega);
 		body->SetVelocity(debriVeloc);
-		
-		// debris can have very skew inertia matrix
-		// if this happens, fake it by making is a little elliptical. 
-		dVector debriMassMatrix(body->GetMassMatrix());
-		
-		dFloat32 minInertia = dMin(dMin(debriMassMatrix.m_x, debriMassMatrix.m_y), debriMassMatrix.m_z);
-		dFloat32 maxInertia = dMax(dMax(debriMassMatrix.m_x, debriMassMatrix.m_y), debriMassMatrix.m_z);
-		if (maxInertia > dFloat32(10.0f) * minInertia) 
-		{
-			//dAssert(0);
-		}
-
 		world->AddBody(body);
 	}
 }

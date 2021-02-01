@@ -29,14 +29,14 @@ class ndAsymetricInertiaBody: public ndBodyDynamic
 	{
 	}
 	
-	void SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
+	virtual void SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 	{
 		m_principalAxis = inertia;
-		dVector II(m_principalAxis.EigenVectors());
+		dVector eigenValues(m_principalAxis.EigenVectors());
 		dMatrix massMatrix(dGetIdentityMatrix());
-		massMatrix[0][0] = II[0];
-		massMatrix[1][1] = II[1];
-		massMatrix[2][2] = II[2];
+		massMatrix[0][0] = eigenValues[0];
+		massMatrix[1][1] = eigenValues[1];
+		massMatrix[2][2] = eigenValues[2];
 		ndBodyDynamic::SetMassMatrix(mass, massMatrix);
 	}
 
