@@ -8,16 +8,6 @@ class ndDemoEntityManager;
 
 class ndSimpleConvexFracture: public ndModel
 {
-	class ndDebriBody : public ndBodyDynamic
-	{
-		public:
-		ndDebriBody();
-		virtual dMatrix CalculateInvInertiaMatrix() const;
-		virtual void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);
-
-		dMatrix m_principalAxis;
-	};
-
 	class ndFractureAtom
 	{
 		public:
@@ -30,8 +20,9 @@ class ndSimpleConvexFracture: public ndModel
 		{
 		}
 
-		dVector m_centerOfMass;
+
 		dVector m_momentOfInertia;
+		dVector m_centerOfMass;
 		ndDemoMesh* m_mesh;
 		ndShapeInstance* m_collision;
 		dFloat32 m_massFraction;
