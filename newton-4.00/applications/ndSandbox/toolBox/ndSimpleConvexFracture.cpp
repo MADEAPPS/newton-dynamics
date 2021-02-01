@@ -43,7 +43,7 @@ void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 	dInt32 xCount, dInt32 zCount, dFloat32 spacing,
 	dInt32 type, dInt32 materialID)
 {
-breakImpactSpeed = 0;
+//breakImpactSpeed = 0;
 
 	// create a newton mesh from the collision primitive
 	ndMeshEffect mesh(shape);
