@@ -22,6 +22,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndSimpleConvexFracture.h"
 
+//#define USE_DEBRI_GENERAL_INERTIA
 #define BREAK_IMPACT_IN_METERS_PER_SECONDS	10.0f
 
 ndSimpleConvexFracture::ndDebriBody::ndDebriBody()
@@ -30,10 +31,10 @@ ndSimpleConvexFracture::ndDebriBody::ndDebriBody()
 {
 }
 
-//#define ASYMTERIX_INERTIA
+
 void ndSimpleConvexFracture::ndDebriBody::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 {
-#ifdef ASYMTERIX_INERTIA
+#ifdef USE_DEBRI_GENERAL_INERTIA
 	m_principalAxis = inertia;
 	dVector eigenValues(m_principalAxis.EigenVectors());
 	dMatrix massMatrix(dGetIdentityMatrix());
@@ -60,7 +61,7 @@ void ndSimpleConvexFracture::ndDebriBody::SetMassMatrix(dFloat32 mass, const dMa
 
 dMatrix ndSimpleConvexFracture::ndDebriBody::CalculateInvInertiaMatrix() const
 {
-#ifdef ASYMTERIX_INERTIA
+#ifdef USE_DEBRI_GENERAL_INERTIA
 	dMatrix matrix(m_principalAxis * m_matrix);
 	matrix.m_posit = dVector::m_wOne;
 	dMatrix diagonal(dGetIdentityMatrix());
@@ -92,6 +93,8 @@ void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 	dInt32 xCount, dInt32 zCount, dFloat32 spacing,
 	dInt32 type, dInt32 materialID)
 {
+breakImpactSpeed = 0;
+
 	// create a newton mesh from the collision primitive
 	ndMeshEffect mesh(shape);
 
@@ -196,6 +199,8 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDem
 	ndMeshEffect* const debriMeshPieces = mesh->CreateVoronoiConvexDecomposition(count, pointCloud, interiorMaterial, &textureMatrix[0][0]);
 	dAssert(debriMeshPieces);
 	
+
+int xxxx = 0;
 	// now we iterate over each pieces and for each one we create a visual entity and a rigid body
 	ndMeshEffect* nextDebri;
 	for (ndMeshEffect* debri = debriMeshPieces->GetFirstLayer(); debri; debri = nextDebri)
@@ -203,23 +208,27 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDem
 		// get next segment piece
 		nextDebri = debriMeshPieces->GetNextLayer(debri);
 	
+xxxx++;
 		//clip the voronoi cell convexes against the mesh 
 		ndMeshEffect* const fracturePiece = mesh->ConvexMeshIntersection(debri);
 		if (fracturePiece) 
 		{
-			// make a convex hull collision shape
-			ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
-			if (collision) 
+			if (xxxx == 2)
 			{
-				// we have a piece which has a convex collision  representation, add that to the list
-				ndFractureAtom& atom = Append()->GetInfo();
-				atom.m_mesh = new ndDemoMesh("fracture", fracturePiece, scene->GetShaderCache());
-				dMatrix inertia (collision->CalculateInertia());
-				atom.m_centerOfMass = inertia.m_posit;
-				atom.m_momentOfInertia = dVector(inertia[0][0], inertia[1][1], inertia[2][2], dFloat32(0.0f));
-				dFloat32 debriVolume = collision->GetVolume();
-				atom.m_massFraction = debriVolume / volume;
-				atom.m_collision = collision;
+				// make a convex hull collision shape
+				ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
+				if (collision)
+				{
+					// we have a piece which has a convex collision  representation, add that to the list
+					ndFractureAtom& atom = Append()->GetInfo();
+					atom.m_mesh = new ndDemoMesh("fracture", fracturePiece, scene->GetShaderCache());
+					dMatrix inertia(collision->CalculateInertia());
+					atom.m_centerOfMass = inertia.m_posit;
+					atom.m_momentOfInertia = dVector(inertia[0][0], inertia[1][1], inertia[2][2], dFloat32(0.0f));
+					dFloat32 debriVolume = collision->GetVolume();
+					atom.m_massFraction = debriVolume / volume;
+					atom.m_collision = collision;
+				}
 			}
 			delete fracturePiece;
 		}
@@ -282,7 +291,7 @@ void ndSimpleConvexFracture::Update(const ndWorld* const world, dFloat32 timeste
 		}
 
 		dFloat32 impactSpeed = maxImpactImpulse * effect.m_body->GetInvMass();
-		if (impactSpeed > effect.m_breakImpactSpeed)
+		if (impactSpeed >= effect.m_breakImpactSpeed)
 		{
 			dScopeSpinLock lock (m_lock);
 			m_effectList.Unlink(node);
