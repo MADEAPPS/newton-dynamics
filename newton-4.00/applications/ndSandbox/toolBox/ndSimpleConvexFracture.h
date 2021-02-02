@@ -20,9 +20,8 @@ class ndSimpleConvexFracture: public ndModel
 		{
 		}
 
-
-		dVector m_momentOfInertia;
 		dVector m_centerOfMass;
+		dVector m_momentOfInertia;
 		ndDemoMesh* m_mesh;
 		ndShapeInstance* m_collision;
 		dFloat32 m_massFraction;
