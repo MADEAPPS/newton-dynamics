@@ -1872,7 +1872,8 @@ void ndMeshEffect::UniformBoxMapping(dInt32 material, const dMatrix& textureMatr
 					{
 						ptr->m_mark = mark;
 						dAttibutFormat::dgUV uv;
-						dVector p(textureMatrix.TransformVector(rotationMatrix.RotateVector(m_points.m_vertex[ptr->m_incidentVertex])));
+						dVector point(rotationMatrix.RotateVector(m_points.m_vertex[ptr->m_incidentVertex]));
+						dVector p(textureMatrix.TransformVector(point));
 						uv.m_u = p.m_x;
 						uv.m_v = p.m_y;
 						m_attrib.m_uv0Channel[dInt32(ptr->m_userData)] = uv;

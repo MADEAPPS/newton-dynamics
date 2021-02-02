@@ -43,8 +43,8 @@ class ndSimpleConvexFracture: public ndModel
 
 	void AddFracturedWoodPrimitive(ndDemoEntityManager* const scene, 
 		const ndShapeInstance& shape, 
-		dFloat32 breakImpactSpeed,
-		dFloat32 density, const dVector& origin, 
+		const char* const outTexture, const char* const innerTexture,
+		dFloat32 breakImpactSpeed, dFloat32 density, const dVector& origin, 
 		dInt32 xCount, dInt32 zCount, dFloat32 spacing, 
 		dInt32 type, dInt32 materialID);
 

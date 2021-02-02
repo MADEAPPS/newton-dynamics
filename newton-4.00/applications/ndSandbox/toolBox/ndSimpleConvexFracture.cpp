@@ -38,8 +38,8 @@ ndSimpleConvexFracture::~ndSimpleConvexFracture()
 
 void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 	ndDemoEntityManager* const scene, const ndShapeInstance& shape,
-	dFloat32 breakImpactSpeed,
-	dFloat32 density, const dVector& origin,
+	const char* const outTexture, const char* const innerTexture,
+	dFloat32 breakImpactSpeed, dFloat32 density, const dVector& origin,
 	dInt32 xCount, dInt32 zCount, dFloat32 spacing,
 	dInt32 type, dInt32 materialID)
 {
@@ -52,10 +52,12 @@ void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 	mesh.GetMaterials().PushBack(ndMeshEffect::dMaterial());
 	ndMeshEffect::dMaterial& material0 = mesh.GetMaterials()[0];
 	ndMeshEffect::dMaterial& material1 = mesh.GetMaterials()[1];
-	strcpy(material0.m_textureName, "reljef.tga");
-	strcpy(material1.m_textureName, "concreteBrick.tga");
+	strcpy(material0.m_textureName, outTexture);
+	strcpy(material1.m_textureName, innerTexture);
 
 	dMatrix aligmentUV(dGetIdentityMatrix());
+	aligmentUV.m_posit.m_x = -0.5f;
+	aligmentUV.m_posit.m_y = -0.5f;
 	mesh.UniformBoxMapping(0, aligmentUV);
 
 	// make a visual mesh for display
