@@ -1,12 +1,12 @@
-#ifndef __D_SIMPLE_CONVEX_FRACTURE_H__
-#define __D_SIMPLE_CONVEX_FRACTURE_H__
+#ifndef __D_SKIN_PEEL_FRACTURE_H__
+#define __D_SKIN_PEEL_FRACTURE_H__
 
 #include "ndSandboxStdafx.h"
 
 class ndDemoMesh;
 class ndDemoEntityManager;
 
-class ndSimpleConvexFracture: public ndModel
+class ndSkinPeelFracture: public ndModel
 {
 	class ndFractureAtom
 	{
@@ -38,8 +38,8 @@ class ndSimpleConvexFracture: public ndModel
 	};
 
 	public:
-	ndSimpleConvexFracture(ndDemoEntityManager* const scene);
-	~ndSimpleConvexFracture();
+	ndSkinPeelFracture(ndDemoEntityManager* const scene);
+	~ndSkinPeelFracture();
 
 	void AddFracturedWoodPrimitive(ndDemoEntityManager* const scene, 
 		const ndShapeInstance& shape, 

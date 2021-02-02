@@ -20,11 +20,9 @@
 #include "ndPhysicsWorld.h"
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
-#include "ndSimpleConvexFracture.h"
+#include "ndSkinPeelFracture.h"
 
-//#define BREAK_IMPACT_IN_METERS_PER_SECONDS	10.0f
-
-ndSimpleConvexFracture::ndSimpleConvexFracture(ndDemoEntityManager* const scene)
+ndSkinPeelFracture::ndSkinPeelFracture(ndDemoEntityManager* const scene)
 	:ndModel()
 	,m_effectList()
 	,m_pendingEffect()
@@ -32,11 +30,11 @@ ndSimpleConvexFracture::ndSimpleConvexFracture(ndDemoEntityManager* const scene)
 {
 }
 
-ndSimpleConvexFracture::~ndSimpleConvexFracture()
+ndSkinPeelFracture::~ndSkinPeelFracture()
 {
 }
 
-void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
+void ndSkinPeelFracture::AddFracturedWoodPrimitive(
 	ndDemoEntityManager* const scene, const ndShapeInstance& shape,
 	const char* const outTexture, const char* const innerTexture,
 	dFloat32 breakImpactSpeed, dFloat32 density, const dVector& origin,
@@ -104,7 +102,7 @@ void ndSimpleConvexFracture::AddFracturedWoodPrimitive(
 	visualMesh->Release();
 }
 
-ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDemoEntityManager* const scene, ndMeshEffect* const mesh, dInt32 interiorMaterial)
+ndSkinPeelFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDemoEntityManager* const scene, ndMeshEffect* const mesh, dInt32 interiorMaterial)
 	:m_body(nullptr)
 	,m_breakImpactSpeed(0.0f)
 {
@@ -202,7 +200,7 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDem
 	delete debriMeshPieces;
 }
 
-ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(const ndVoronoidFractureEffect& list)
+ndSkinPeelFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(const ndVoronoidFractureEffect& list)
 	:m_body(nullptr)
 	,m_breakImpactSpeed(list.m_breakImpactSpeed)
 {
@@ -214,7 +212,7 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(const
 	}
 }
 
-ndSimpleConvexFracture::ndVoronoidFractureEffect::~ndVoronoidFractureEffect()
+ndSkinPeelFracture::ndVoronoidFractureEffect::~ndVoronoidFractureEffect()
 {
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) 
 	{
@@ -224,7 +222,7 @@ ndSimpleConvexFracture::ndVoronoidFractureEffect::~ndVoronoidFractureEffect()
 	}
 }
 
-void ndSimpleConvexFracture::Update(const ndWorld* const world, dFloat32 timestep)
+void ndSkinPeelFracture::Update(const ndWorld* const world, dFloat32 timestep)
 {
 	dList<ndVoronoidFractureEffect>::dListNode* nextNody;
 	for (dList<ndVoronoidFractureEffect>::dListNode* node = m_effectList.GetFirst(); node; node = nextNody)
@@ -263,7 +261,7 @@ void ndSimpleConvexFracture::Update(const ndWorld* const world, dFloat32 timeste
 	}
 }
 
-void ndSimpleConvexFracture::AppUpdate(ndWorld* const world)
+void ndSkinPeelFracture::AppUpdate(ndWorld* const world)
 {
 	if (m_pendingEffect.GetCount())
 	{
@@ -281,7 +279,7 @@ void ndSimpleConvexFracture::AppUpdate(ndWorld* const world)
 	}
 }
 
-void ndSimpleConvexFracture::UpdateEffect(ndWorld* const world, ndVoronoidFractureEffect& effect)
+void ndSkinPeelFracture::UpdateEffect(ndWorld* const world, ndVoronoidFractureEffect& effect)
 {
 	D_TRACKTIME();
 	dVector omega(effect.m_body->GetOmega());
