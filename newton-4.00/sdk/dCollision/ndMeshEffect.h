@@ -124,7 +124,6 @@ class ndMeshEffect: public dPolyhedra
 	ndMeshEffect(dMemoryAllocator___* const allocator, const dMatrix& planeMatrix, dFloat32 witdth, dFloat32 breadth, dInt32 material, const dMatrix& textureMatrix0, const dMatrix& textureMatrix1);
 
 	void Trace () const;
-	void FlipWinding(); 
 	void CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMaterial, const dMatrix& uvAligment);
 	void AngleBaseFlatteningMapping (dInt32 cylinderMaterial, dgReportProgress progressReportCallback, void* const userData);
 
@@ -205,21 +204,10 @@ class ndMeshEffect: public dPolyhedra
 	dInt32 InterpolateVertex (const dBigVector& point, const dEdge* const face) const;
 
 	protected:
-
 	dBigVector GetOrigin ()const;
 	dInt32 CalculateMaxAttributes () const;
 //	void ReverseMergeFaces (ndMeshEffect* const source);
-
-	ndMeshEffect* GetNextLayer (dInt32 mark);
-	ndMeshEffect* CreateVoronoiConvex (const dBigVector* const conevexPointCloud, dInt32 count, dInt32 materialId, const dMatrix& textureProjectionMatrix, dFloat32 normalAngleInRadians) const;
 	
-	friend class dConvexHull3d;
-	friend class dgConvexHull4d;
-	friend class dgBooleanMeshBVH;
-	friend class dgHACDClusterGraph;
-	friend class dgTriangleAnglesToUV;
-	friend class dgTetraIsoSufaceStuffing;
-	friend class dgCollisionCompoundFractured;
 #endif
 
 	enum dChannelType
@@ -450,6 +438,7 @@ class ndMeshEffect: public dPolyhedra
 	ndMeshEffect* GetNextLayer(ndMeshEffect* const layer);
 
 	
+	D_COLLISION_API void FlipWinding();
 	D_COLLISION_API bool HasOpenEdges() const;
 	D_COLLISION_API void ConvertToPolygons();
 	D_COLLISION_API dEdge* InsertEdgeVertex(dEdge* const edge, dFloat64 param);

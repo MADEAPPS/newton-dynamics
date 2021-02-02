@@ -983,37 +983,6 @@ void ndMeshEffect::Trace() const
 	*/
 };
 
-void ndMeshEffect::FlipWinding()
-{
-	dInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
-	dInt64	userData[DG_MESH_EFFECT_POINT_SPLITED];
-
-	dPolyhedra polyhedra(*this);
-	RemoveAll();
-
-	dPolyhedra::BeginFace();
-	dInt32 mark = polyhedra.IncLRU();
-	dPolyhedra::Iterator iter(polyhedra);
-	for (iter.Begin(); iter; iter++) {
-		dEdge* const face = &iter.GetNode()->GetInfo();
-		if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {
-
-			dEdge* ptr = face;
-			dInt32 indexCount = 0;
-			do {
-				index[indexCount] = ptr->m_incidentVertex;
-				userData[indexCount] = ptr->m_userData;
-				ptr->m_mark = mark;
-				indexCount++;
-				ptr = ptr->m_prev;
-			} while (ptr != face);
-			AddFace(indexCount, index, userData);
-		}
-	}
-	dPolyhedra::EndFace();
-}
-
-
 void ndMeshEffect::Triangulate()
 {
 	/*
@@ -4233,3 +4202,36 @@ void ndMeshEffect::AddInterpolatedEdgeAttribute(dEdge* const edge, dFloat64 para
 		dAssert(0);
 	}
 }
+
+void ndMeshEffect::FlipWinding()
+{
+	dInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
+	dInt64	userData[DG_MESH_EFFECT_POINT_SPLITED];
+
+	dPolyhedra polyhedra(*this);
+	RemoveAll();
+
+	dPolyhedra::BeginFace();
+	dInt32 mark = polyhedra.IncLRU();
+	dPolyhedra::Iterator iter(polyhedra);
+	for (iter.Begin(); iter; iter++) 
+	{
+		dEdge* const face = &iter.GetNode()->GetInfo();
+		if ((face->m_mark != mark) && (face->m_incidentFace > 0)) 
+		{
+			dEdge* ptr = face;
+			dInt32 indexCount = 0;
+			do 
+			{
+				index[indexCount] = ptr->m_incidentVertex;
+				userData[indexCount] = ptr->m_userData;
+				ptr->m_mark = mark;
+				indexCount++;
+				ptr = ptr->m_prev;
+			} while (ptr != face);
+			AddFace(indexCount, index, userData);
+		}
+	}
+	dPolyhedra::EndFace();
+}
+
