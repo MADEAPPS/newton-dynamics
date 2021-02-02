@@ -4208,6 +4208,7 @@ void ndMeshEffect::FlipWinding()
 	dInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
 	dInt64	userData[DG_MESH_EFFECT_POINT_SPLITED];
 
+	dAssert(0);
 	dPolyhedra polyhedra(*this);
 	RemoveAll();
 

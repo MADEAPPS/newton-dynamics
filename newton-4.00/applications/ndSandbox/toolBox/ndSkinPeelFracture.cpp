@@ -19,8 +19,9 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndTargaToOpenGl.h"
-#include "ndDemoEntityManager.h"
 #include "ndSkinPeelFracture.h"
+#include "ndDemoEntityManager.h"
+
 
 ndSkinPeelFracture::ndSkinPeelFracture(ndDemoEntityManager* const scene)
 	:ndModel()

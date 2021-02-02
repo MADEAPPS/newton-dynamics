@@ -38,6 +38,8 @@
 //#define DEFAULT_SCENE	7		// setting basic vehicle
 //#define DEFAULT_SCENE	8		// conservation of angular momentum 
 #define DEFAULT_SCENE	9		// simple voronoi fracture
+#define DEFAULT_SCENE	10		// simple voronoi fracture
+
 						 
 // demos forward declaration 
 void ndBasicStacks(ndDemoEntityManager* const scene);
@@ -45,12 +47,12 @@ void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
-void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
+void ndSkinPeelFracturing(ndDemoEntityManager* const scene);
+void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndBasicConvexFracturing(ndDemoEntityManager* const scene);
 void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
-
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
@@ -64,6 +66,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic vehicle", ndBasicVehicle },
 	{ "angular momentum", ndBasicAngularMomentum },
 	{ "simple convex fracture", ndBasicConvexFracturing },
+	{ "simple skin peeling fracture", ndSkinPeelFracturing },
 };
 
 ndDemoEntityManager::ButtonKey::ButtonKey (bool state)
