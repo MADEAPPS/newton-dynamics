@@ -8,17 +8,12 @@ class ndDemoEntityManager;
 
 class ndSimpleConvexFracture: public ndModel
 {
-	class ndFractureAtom
+	class ndAtom
 	{
 		public:
-		ndFractureAtom()
-			:m_centerOfMass(0.0f)
-			,m_momentOfInertia(0.0f)
-			,m_mesh(nullptr)
-			,m_collision(nullptr)
-			,m_massFraction(0.0f)
-		{
-		}
+		ndAtom();
+		ndAtom(const ndAtom& atom);
+		~ndAtom();
 
 		dVector m_centerOfMass;
 		dVector m_momentOfInertia;
@@ -27,34 +22,56 @@ class ndSimpleConvexFracture: public ndModel
 		dFloat32 m_massFraction;
 	};
 
-	class ndVoronoidFractureEffect : public dList<ndFractureAtom>
+	public:
+	class ndDesc
 	{
 		public:
-		ndVoronoidFractureEffect(ndDemoEntityManager* const scene, ndMeshEffect* const mesh, dInt32 interiorMaterial);
-		ndVoronoidFractureEffect(const ndVoronoidFractureEffect& list);
-		~ndVoronoidFractureEffect();
-		ndBodyKinematic* m_body;
+		ndDesc()
+			:m_pointCloud()
+			,m_shape(nullptr)
+			,m_outTexture(nullptr)
+			,m_innerTexture(nullptr)
+			,m_breakImpactSpeed(10.0f)
+		{
+		}
+
+		dArray<dVector> m_pointCloud;
+		ndShapeInstance* m_shape;
+		const char* m_outTexture;
+		const char* m_innerTexture; 
 		dFloat32 m_breakImpactSpeed;
+	};
+
+	class ndEffect : public dList<ndAtom>
+	{
+		public:
+		ndEffect(ndSimpleConvexFracture* const manager, const ndDesc& desc);
+		ndEffect(const ndEffect& effect);
+		~ndEffect();
+
+		private:
+		ndBodyKinematic* m_body;
+		ndShapeInstance* m_shape;
+		ndDemoMesh* m_visualMesh;
+		dFloat32 m_breakImpactSpeed;
+
+		friend ndSimpleConvexFracture;
 	};
 
 	public:
 	ndSimpleConvexFracture(ndDemoEntityManager* const scene);
 	~ndSimpleConvexFracture();
 
-	void AddFracturedWoodPrimitive(ndDemoEntityManager* const scene, 
-		const ndShapeInstance& shape, 
-		const char* const outTexture, const char* const innerTexture,
-		dFloat32 breakImpactSpeed, dFloat32 density, const dVector& origin, 
-		dInt32 xCount, dInt32 zCount, dFloat32 spacing, 
-		dInt32 type, dInt32 materialID);
+	void AddEffect(const ndEffect& effect, dFloat32 mass, const dMatrix& location);
 
 	virtual void AppUpdate(ndWorld* const world);
 	virtual void Update(const ndWorld* const world, dFloat32 timestep);
 
-	void UpdateEffect(ndWorld* const world, ndVoronoidFractureEffect& effect);
+	void UpdateEffect(ndWorld* const world, ndEffect& effect);
 
-	dList<ndVoronoidFractureEffect> m_effectList;
-	dList<ndVoronoidFractureEffect> m_pendingEffect;
+	dList<ndEffect> m_effectList;
+	dList<ndEffect> m_pendingEffect;
+	ndDemoEntityManager* m_scene;
 	dSpinLock m_lock;
 };
 

@@ -447,7 +447,7 @@ class ndMeshEffect: public dPolyhedra
 	D_COLLISION_API bool PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const face);
 	D_COLLISION_API ndShapeInstance* CreateConvexCollision(dFloat64 tolerance) const;
 	D_COLLISION_API ndMeshEffect* ConvexMeshIntersection(const ndMeshEffect* const convexMesh) const;
-	D_COLLISION_API ndMeshEffect* CreateVoronoiConvexDecomposition(dInt32 pointCount, dVector* const pointCloud, dInt32 interiorMaterialIndex, const dMatrix& textureProjectionMatrix);
+	D_COLLISION_API ndMeshEffect* CreateVoronoiConvexDecomposition(const dArray<dVector>& pointCloud, dInt32 interiorMaterialIndex, const dMatrix& textureProjectionMatrix);
 
 	protected:
 	D_COLLISION_API void Init();

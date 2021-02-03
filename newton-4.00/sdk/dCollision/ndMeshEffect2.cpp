@@ -1103,17 +1103,17 @@ dAssert(0);
 }
 #endif
 
-ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(dInt32 pointCount, dVector* const pointCloud, dInt32 interiorMaterialIndex, const dMatrix& textureProjectionMatrix)
+ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const dArray<dVector>& pointCloud, dInt32 interiorMaterialIndex, const dMatrix& textureProjectionMatrix)
 {
-	dStack<dBigVector> buffer(pointCount + 32);
+	dStack<dBigVector> buffer(pointCloud.GetCount() + 32);
 	dBigVector* const pool = &buffer[0];
 	dInt32 count = 0;
 	dFloat64 quantizeFactor = dFloat64(16.0f);
 	dFloat64 invQuantizeFactor = dFloat64(1.0f) / quantizeFactor;
 	
-	dBigVector pMin(dFloat32(1.0e10f), dFloat32(1.0e10f), dFloat32(1.0e10f), dFloat32(0.0f));
-	dBigVector pMax(dFloat32(-1.0e10f), dFloat32(-1.0e10f), dFloat32(-1.0e10f), dFloat32(0.0f));
-	for (dInt32 i = 0; i < pointCount; i++)
+	dBigVector pMin(dFloat32(1.0e10f));
+	dBigVector pMax(dFloat32(-1.0e10f));
+	for (dInt32 i = 0; i <pointCloud.GetCount(); i++)
 	{
 		dFloat64 x = pointCloud[i].m_x;
 		dFloat64 y = pointCloud[i].m_y;

@@ -115,7 +115,7 @@ ndSkinPeelFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDemoEnt
 	dMatrix matrix(mesh->CalculateOOBB(bigSize));
 	dVector size(bigSize);
 
-	dVector pointCloud[32];
+	dArray<dVector> pointCloud(32);
 	pointCloud[0] = dVector(-size.m_x * 0.5f, -size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
 	pointCloud[1] = dVector(-size.m_x * 0.5f, -size.m_y * 0.5f,  size.m_z * 0.5f, dFloat32 (0.0f));
 	pointCloud[2] = dVector(-size.m_x * 0.5f,  size.m_y * 0.5f, -size.m_z * 0.5f, dFloat32 (0.0f));
@@ -147,7 +147,7 @@ ndSkinPeelFracture::ndVoronoidFractureEffect::ndVoronoidFractureEffect(ndDemoEnt
 	dFloat32 volume = dFloat32 (mesh->CalculateVolume());
 
 	// now we call create we decompose the mesh into several convex pieces 
-	ndMeshEffect* const debriMeshPieces = mesh->CreateVoronoiConvexDecomposition(count, pointCloud, interiorMaterial, &textureMatrix[0][0]);
+	ndMeshEffect* const debriMeshPieces = mesh->CreateVoronoiConvexDecomposition(pointCloud, interiorMaterial, &textureMatrix[0][0]);
 	dAssert(debriMeshPieces);
 	
 	// now we iterate over each pieces and for each one we create a visual entity and a rigid body
