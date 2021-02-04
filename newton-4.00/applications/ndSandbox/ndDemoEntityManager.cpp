@@ -29,15 +29,16 @@
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0		// setting basic rigidbody
-//#define DEFAULT_SCENE	1		// setting basic Stacks
-//#define DEFAULT_SCENE	2		// setting basic Trigger
-//#define DEFAULT_SCENE	3		// setting basic player
-//#define DEFAULT_SCENE	4		// setting particle fluid
-//#define DEFAULT_SCENE	5		// static mesh collision 
-//#define DEFAULT_SCENE	6		// setting basic joints
-//#define DEFAULT_SCENE	7		// setting basic vehicle
-//#define DEFAULT_SCENE	8		// conservation of angular momentum 
-#define DEFAULT_SCENE	9		// simple voronoi fracture
+#define DEFAULT_SCENE	1		// setting friction ramp
+//#define DEFAULT_SCENE	2		// setting basic Stacks
+//#define DEFAULT_SCENE	3		// setting basic Trigger
+//#define DEFAULT_SCENE	4		// setting basic player
+//#define DEFAULT_SCENE	5		// setting particle fluid
+//#define DEFAULT_SCENE	6		// static mesh collision 
+//#define DEFAULT_SCENE	7		// setting basic joints
+//#define DEFAULT_SCENE	8		// setting basic vehicle
+//#define DEFAULT_SCENE	9		// conservation of angular momentum 
+//#define DEFAULT_SCENE	10		// simple voronoi fracture
 //#define DEFAULT_SCENE	10		// skin peel voronoi fracture
 						 
 // demos forward declaration 
@@ -46,6 +47,7 @@ void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
+void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
 void ndSkinPeelFracturing(ndDemoEntityManager* const scene);
 void ndBasicParticleFluid(ndDemoEntityManager* const scene);
@@ -56,6 +58,7 @@ void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
 	{ "basic rigidbody", ndBasicRigidBody },
+	{ "basic rigidbody friction", ndBasicFrictionRamp },
 	{ "basic stack", ndBasicStacks },
 	{ "basic trigger", ndBasicTrigger },
 	{ "basic player", ndPlayerCapsuleDemo },

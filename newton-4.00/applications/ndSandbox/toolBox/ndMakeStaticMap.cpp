@@ -44,7 +44,6 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene)
 	return body;
 }
 
-
 ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
