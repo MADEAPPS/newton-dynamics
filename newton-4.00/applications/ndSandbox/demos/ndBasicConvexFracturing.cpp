@@ -74,21 +74,27 @@ static void AddBoxEffect(ndSimpleConvexFracture* const manager, const dMatrix& m
 {
 	ndSimpleConvexFracture::ndDesc desc;
 
+	// first ww make a collision shape that we wnat to brake to pieces
 	ndShapeInstance shape(new ndShapeBox(3.0f, 0.5f, 0.5f));
 
+	// next we populate the descriptor for how the shape is going toi be broken in pieces.
 	desc.m_shape = &shape;
 	desc.m_outTexture = "reljef.tga";
 	desc.m_innerTexture = "concreteBrick.tga";
 	desc.m_breakImpactSpeed = 10.0f;
+	makePointCloud(desc);
 
+	// now with make a template effect that we can place 
+	// in the scene many time.
+	ndSimpleConvexFracture::ndEffect effect(manager, desc);
+
+	// get a locatiobn in the scene
 	dMatrix location(matrix);
 	ndWorld* const world = manager->m_scene->GetWorld();
 	dVector floor(FindFloor(*world, dVector(location.m_posit.m_x, 100.0f, location.m_posit.m_z, dFloat32(0.0f)), 2.0f * 100.0f));
 	location.m_posit.m_y = floor.m_y + 0.25f;
 
-	makePointCloud(desc);
-	ndSimpleConvexFracture::ndEffect effect(manager, desc);
-
+	// place few instance of teh same effect in teh scane.
 	const dFloat32 z0 = location.m_posit.m_z;
 	for (dInt32 j = 0; j < 5; j++)
 	{
