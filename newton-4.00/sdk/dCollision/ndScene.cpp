@@ -250,7 +250,6 @@ ndContactNotify* ndScene::GetContactNotify() const
 
 void ndScene::SetContactNotify(ndContactNotify* const notify)
 {
-	dAssert(0);
 	dAssert(m_contactNotifyCallback);
 	delete m_contactNotifyCallback;
 	
@@ -992,7 +991,7 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 	dAssert(body1);
 	dAssert(body0 != body1);
 
-	ndMaterial material(m_contactNotifyCallback->GetMaterial(body0->GetCollisionShape(), body1->GetCollisionShape()));
+	ndMaterial material(m_contactNotifyCallback->GetMaterial(contact, body0->GetCollisionShape(), body1->GetCollisionShape()));
 	const ndContactPoint* const contactArray = contactSolver->m_contactBuffer;
 	
 	//if (material->m_flags & ndContactMaterial::m_resetSkeletonSelfCollision) {
@@ -1089,8 +1088,7 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 			dScopeSpinLock lock(m_contactLock);
 			contactNode = list.Append();
 		}
-	
-	//	ndContactMaterial* const contactMaterial = &contactNode->GetInfo();
+
 		ndContactMaterial* const contactPoint = &contactNode->GetInfo();
 	
 		dAssert(dCheckFloat(contactArray[i].m_point.m_x));

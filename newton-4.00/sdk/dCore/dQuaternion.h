@@ -37,9 +37,6 @@ class dQuaternion
 	dQuaternion (dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3);
 	D_CORE_API dQuaternion (const dVector &unit_Axis, dFloat32 angle = dFloat32 (0.0f));
 
-//	dFloat32& operator[] (dInt32 i);
-//	const dFloat32& operator[] (dInt32 i) const;
-
 	void Scale (dFloat32 scale); 
 	void Normalize (); 
 	dQuaternion Inverse () const; 
@@ -74,22 +71,6 @@ D_INLINE dQuaternion::dQuaternion(dFloat32 Q0, dFloat32 Q1, dFloat32 Q2, dFloat3
 {
 //	dAssert (dAbs (DotProduct (*this) -dFloat32 (1.0f)) < dFloat32(1.0e-4f));
 }
-
-/*
-D_INLINE dFloat32& dQuaternion::operator[] (dInt32 i)
-{
-	dAssert(i < 4);
-	dAssert(i >= 0);
-	return (&m_w)[i];
-}
-
-D_INLINE const dFloat32& dQuaternion::operator[] (dInt32 i) const
-{
-	dAssert(i < 4);
-	dAssert(i >= 0);
-	return (&m_w)[i];
-}
-*/
 
 D_INLINE void dQuaternion::Scale (dFloat32 scale) 
 {

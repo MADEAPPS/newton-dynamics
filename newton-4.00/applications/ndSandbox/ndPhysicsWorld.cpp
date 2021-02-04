@@ -11,6 +11,7 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndPhysicsWorld.h"
+#include "ndContactCallback.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"
 #include "ndDemoMeshInterface.h"
@@ -24,11 +25,10 @@ ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	:ndWorld()
 	,m_manager(manager)
 	,m_timeAccumulator(0.0f)
-	//,m_lock()
-	//,m_mainThread(std::this_thread::get_id())
-	//,m_pendingRelease()
 {
 	ClearCache();
+	ndContactCallback* const contactCallback = new ndContactCallback;
+	SetContactNotify(contactCallback);
 }
 
 ndPhysicsWorld::~ndPhysicsWorld()

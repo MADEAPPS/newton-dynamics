@@ -68,25 +68,25 @@ class ndContactNotify: public dClassAlloc
 	{
 	}
 
-	void OnBodyAdded(ndBodyKinematic* const body) const
+	virtual void OnBodyAdded(ndBodyKinematic* const body) const
 	{
 	}
 
-	void OnBodyRemoved(ndBodyKinematic* const body) const
+	virtual void OnBodyRemoved(ndBodyKinematic* const body) const
 	{
 	}
 
-	virtual ndMaterial GetMaterial(const ndShapeInstance& instance0, const ndShapeInstance& instance1) const
+	virtual ndMaterial GetMaterial(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const
 	{
 		return ndMaterial();
 	}
 
-	virtual bool OnAaabbOverlap(const ndContact* const contact, dFloat32 timestep)
+	virtual bool OnAaabbOverlap(const ndContact* const contactJoint, dFloat32 timestep)
 	{
 		return true;
 	}
 
-	virtual void OnContactCallback(dInt32 threadIndex, const ndContact* const contact, dFloat32 timestep)
+	virtual void OnContactCallback(dInt32 threadIndex, const ndContact* const contactJoint, dFloat32 timestep)
 	{
 	}
 
