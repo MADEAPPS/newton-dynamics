@@ -58,7 +58,7 @@ void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
 	{ "basic rigidbody", ndBasicRigidBody },
-	{ "basic rigidbody friction", ndBasicFrictionRamp },
+	{ "basic friction ramp", ndBasicFrictionRamp },
 	{ "basic stack", ndBasicStacks },
 	{ "basic trigger", ndBasicTrigger },
 	{ "basic player", ndPlayerCapsuleDemo },
