@@ -70,12 +70,11 @@ static void makePointCloud(ndSimpleConvexFracture::ndDesc& desc)
 	}
 }
 
-
-static void AddEffect0(ndSimpleConvexFracture* const manager, const dMatrix& matrix)
+static void AddBoxEffect(ndSimpleConvexFracture* const manager, const dMatrix& matrix)
 {
 	ndSimpleConvexFracture::ndDesc desc;
 
-	ndShapeInstance shape(new ndShapeBox(0.5f, 0.5f, 3.0f));
+	ndShapeInstance shape(new ndShapeBox(3.0f, 0.5f, 0.5f));
 
 	desc.m_shape = &shape;
 	desc.m_outTexture = "reljef.tga";
@@ -90,12 +89,83 @@ static void AddEffect0(ndSimpleConvexFracture* const manager, const dMatrix& mat
 	makePointCloud(desc);
 	ndSimpleConvexFracture::ndEffect effect(manager, desc);
 
-//	for (dInt32 j = 0; j < 3; j++)
-	for (dInt32 i = 0; i < 3; i++)
+	const dFloat32 z0 = location.m_posit.m_z;
+	for (dInt32 j = 0; j < 5; j++)
 	{
-		manager->AddEffect(effect, 200.0f, location);
+		location.m_posit.m_z = z0;
+		for (dInt32 i = 0; i < 5; i++)
+		{
+			location.m_posit.m_z += 0.5f;
+			manager->AddEffect(effect, 200.0f, location);
+		}
+		location.m_posit.m_y += 0.5f;
 	}
 }
+
+static void AddCapsuleEffect(ndSimpleConvexFracture* const manager, const dMatrix& matrix)
+{
+	ndSimpleConvexFracture::ndDesc desc;
+
+	ndShapeInstance shape(new ndShapeCapsule(0.25f, 0.25f, 4.0f));
+
+	desc.m_shape = &shape;
+	desc.m_outTexture = "wood_0.tga";
+	desc.m_innerTexture = "wood_1.tga";
+	desc.m_breakImpactSpeed = 10.0f;
+
+	dMatrix location(matrix);
+	ndWorld* const world = manager->m_scene->GetWorld();
+	dVector floor(FindFloor(*world, dVector(location.m_posit.m_x, 100.0f, location.m_posit.m_z, dFloat32(0.0f)), 2.0f * 100.0f));
+	location.m_posit.m_y = floor.m_y + 0.25f;
+
+	makePointCloud(desc);
+	ndSimpleConvexFracture::ndEffect effect(manager, desc);
+
+	const dFloat32 z0 = location.m_posit.m_z;
+	for (dInt32 j = 0; j < 5; j++)
+	{
+		location.m_posit.m_z = z0;
+		for (dInt32 i = 0; i < 5; i++)
+		{
+			location.m_posit.m_z += 0.5f;
+			manager->AddEffect(effect, 200.0f, location);
+		}
+		location.m_posit.m_y += 0.5f;
+	}
+}
+
+static void AddCylinderEffect(ndSimpleConvexFracture* const manager, const dMatrix& matrix)
+{
+	ndSimpleConvexFracture::ndDesc desc;
+
+	ndShapeInstance shape(new ndShapeCylinder(0.25f, 0.25f, 4.0f));
+
+	desc.m_shape = &shape;
+	desc.m_outTexture = "wood_3.tga";
+	desc.m_innerTexture = "wood_4.tga";
+	desc.m_breakImpactSpeed = 10.0f;
+
+	dMatrix location(matrix);
+	ndWorld* const world = manager->m_scene->GetWorld();
+	dVector floor(FindFloor(*world, dVector(location.m_posit.m_x, 100.0f, location.m_posit.m_z, dFloat32(0.0f)), 2.0f * 100.0f));
+	location.m_posit.m_y = floor.m_y + 0.25f;
+
+	makePointCloud(desc);
+	ndSimpleConvexFracture::ndEffect effect(manager, desc);
+
+	const dFloat32 z0 = location.m_posit.m_z;
+	for (dInt32 j = 0; j < 5; j++)
+	{
+		location.m_posit.m_z = z0;
+		for (dInt32 i = 0; i < 5; i++)
+		{
+			location.m_posit.m_z += 0.5f;
+			manager->AddEffect(effect, 200.0f, location);
+		}
+		location.m_posit.m_y += 0.5f;
+	}
+}
+
 
 void ndBasicConvexFracturing(ndDemoEntityManager* const scene)
 {
@@ -107,32 +177,18 @@ void ndBasicConvexFracturing(ndDemoEntityManager* const scene)
 	world->AddModel(fractureManager);
 	world->RegisterModelUpdate(fractureManager);
 
-	//dInt32 woodX = 3;
-	//dInt32 woodZ = 3;
 	dMatrix matrix(dGetIdentityMatrix());
+
 	matrix.m_posit.m_x += 10.0f;
 	matrix.m_posit.m_y += 2.0f;
+	matrix.m_posit.m_z -= 5.0f;
+	AddBoxEffect(fractureManager, matrix);
 
-	AddEffect0(fractureManager, matrix);
-	//ndShapeInstance shape2(new ndShapeBox(0.5f, 0.5f, 3.0f));
-	//fractureManager->AddFracturedWoodPrimitive(scene, shape2, 
-	//	"wood_4.tga", "wood_0.tga",
-	//	10.0f, 1000.0f, matrix.m_posit, woodX, woodZ, 1.0f, 0, 0);
+	matrix.m_posit.m_z += 5.0f;
+	AddCapsuleEffect(fractureManager, matrix);
 
-
-	//ndShapeInstance shape0(new ndShapeCylinder(0.5f, 0.5f, 3.0f));
-	//fractureManager->AddFracturedWoodPrimitive(scene, shape0, 
-	//	"reljef.tga", "concreteBrick.tga",
-	//	10.0f, 1000.0f, matrix.m_posit, woodX, woodZ, 1.0f, 0, 0);
-	//
-	//matrix.m_posit.m_x += 10.0f;
-	//matrix.m_posit.m_z += 4.0f;
-	//ndShapeInstance shape1(new ndShapeCapsule(0.5f, 0.5f, 3.0f));
-	//fractureManager->AddFracturedWoodPrimitive(scene, shape1, 
-	//	"wood_0.tga", "wood_1.tga",
-	//	10.0f, 1000.0f, matrix.m_posit, woodX, woodZ, 1.0f, 0, 0);
-
-
+	matrix.m_posit.m_z += 5.0f;
+	AddCylinderEffect(fractureManager, matrix);
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
