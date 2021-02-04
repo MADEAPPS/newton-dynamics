@@ -22,27 +22,54 @@
 
 static void makePointCloud(ndSimpleConvexFracture::ndDesc& desc)
 {
+	//	dVector pMin;
+	//	dVector pMax;
+	//	desc.m_shape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
+	//
+	//	dInt32 steps = 2;
+	//	dVector size (pMax - pMin);
+	//	for (dInt32 z = 0; z <= steps; z++)
+	//	{
+	//		dFloat32 z0 = pMin.m_z + z * size.m_z / steps + dGaussianRandom(size.m_z * 0.1f);
+	//		for (dInt32 y = 0; y <= steps; y++)
+	//		{
+	//			dFloat32 y0 = pMin.m_y + y * size.m_y / steps + dGaussianRandom(size.m_y * 0.1f);
+	//			for (dInt32 x = 0; x <= steps; x++)
+	//			{
+	//				dFloat32 x0 = pMin.m_x + x * size.m_x / steps + dGaussianRandom(size.m_x * 0.1f);
+	//				dVector point(x0, y0, z0, dFloat32(0.0f));
+	//				desc.m_pointCloud.PushBack(point);
+	//			}
+	//		}
+	//	}
+	//}
+
 	dVector pMin;
 	dVector pMax;
 	desc.m_shape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
+	dVector size((pMax - pMin).Scale(0.25f));
 
-	dInt32 steps = 2;
-	dVector size (pMax - pMin);
-	for (dInt32 z = 0; z <= steps; z++)
+	desc.m_pointCloud.PushBack(dVector::m_zero);
+
+	desc.m_pointCloud.PushBack(dVector(-size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
+	desc.m_pointCloud.PushBack(dVector(-size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
+	desc.m_pointCloud.PushBack(dVector(-size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
+	desc.m_pointCloud.PushBack(dVector(-size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
+
+	desc.m_pointCloud.PushBack(dVector(size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
+	desc.m_pointCloud.PushBack(dVector(size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
+	desc.m_pointCloud.PushBack(dVector(size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
+	desc.m_pointCloud.PushBack(dVector(size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
+
+	for (dInt32 i = 0; i < desc.m_pointCloud.GetCount(); i++)
 	{
-		dFloat32 z0 = pMin.m_z + z * size.m_z / steps + dGaussianRandom(size.m_z * 0.1f);
-		for (dInt32 y = 0; y <= steps; y++)
-		{
-			dFloat32 y0 = pMin.m_y + y * size.m_y / steps + dGaussianRandom(size.m_y * 0.1f);
-			for (dInt32 x = 0; x <= steps; x++)
-			{
-				dFloat32 x0 = pMin.m_x + x * size.m_x / steps + dGaussianRandom(size.m_x * 0.1f);
-				dVector point(x0, y0, z0, dFloat32(0.0f));
-				desc.m_pointCloud.PushBack(point);
-			}
-		}
+		dFloat32 x = dGaussianRandom(size.m_x);
+		dFloat32 y = dGaussianRandom(size.m_y);
+		dFloat32 z = dGaussianRandom(size.m_y);
+		desc.m_pointCloud[i] += dVector(x, y, z, dFloat32(0.0f));
 	}
 }
+
 
 static void AddEffect0(ndSimpleConvexFracture* const manager, const dMatrix& matrix)
 {
@@ -60,10 +87,14 @@ static void AddEffect0(ndSimpleConvexFracture* const manager, const dMatrix& mat
 	dVector floor(FindFloor(*world, dVector(location.m_posit.m_x, 100.0f, location.m_posit.m_z, dFloat32(0.0f)), 2.0f * 100.0f));
 	location.m_posit.m_y = floor.m_y + 0.25f;
 
-	//makePointCloud(desc);
+	makePointCloud(desc);
 	ndSimpleConvexFracture::ndEffect effect(manager, desc);
 
-	manager->AddEffect(effect, 200.0f, location);
+//	for (dInt32 j = 0; j < 3; j++)
+	for (dInt32 i = 0; i < 3; i++)
+	{
+		manager->AddEffect(effect, 200.0f, location);
+	}
 }
 
 void ndBasicConvexFracturing(ndDemoEntityManager* const scene)

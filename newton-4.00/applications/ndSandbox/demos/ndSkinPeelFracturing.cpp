@@ -53,10 +53,10 @@ void ndSkinPeelFracturing(ndDemoEntityManager* const scene)
 woodX = 1;
 woodZ = 1;
 
-	ndShapeInstance shape2(new ndShapeBox(1.0f, 5.0f, 20.0f));
-	fractureManager->AddFracturedWoodPrimitive(scene, shape2, 
-		"wood_4.tga", "wood_0.tga",
-		10.0f, 1000.0f, matrix.m_posit, woodX, woodZ, 1.0f, 0, 0);
+	//ndShapeInstance shape2(new ndShapeBox(1.0f, 5.0f, 20.0f));
+	//fractureManager->AddFracturedWoodPrimitive(scene, shape2, 
+	//	"wood_4.tga", "wood_0.tga",
+	//	10.0f, 1000.0f, matrix.m_posit, woodX, woodZ, 1.0f, 0, 0);
 
 
 	dQuaternion rot;

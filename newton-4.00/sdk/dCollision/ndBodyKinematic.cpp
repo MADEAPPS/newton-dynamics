@@ -314,22 +314,25 @@ dFloat32 ndBodyKinematic::RayCast(ndRayCastNotify& callback, const dFastRayTest&
 		dAssert(p1p0.m_w == dFloat32(0.0f));
 		if (p1p0.DotProduct(p1p0).GetScalar() > dFloat32(1.0e-12f))
 		{
-			ndContactPoint contactOut;
-			dFloat32 t = m_shapeInstance.RayCast(callback, localP0, localP1, this, contactOut);
-			if (t < dFloat32(1.0f))
+			if (m_shapeInstance.GetCollisionMode())
 			{
-				dAssert(localP0.m_w == localP1.m_w);
-				dVector p(globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale(t)));
-				t = ray.m_diff.DotProduct(p - ray.m_p0).GetScalar() / ray.m_diff.DotProduct(ray.m_diff).GetScalar();
-				if (t < maxT)
+				ndContactPoint contactOut;
+				dFloat32 t = m_shapeInstance.RayCast(callback, localP0, localP1, this, contactOut);
+				if (t < dFloat32(1.0f))
 				{
-					dAssert(t >= dFloat32(0.0f));
-					dAssert(t <= dFloat32(1.0f));
-					contactOut.m_body0 = this;
-					contactOut.m_body1 = this;
-					contactOut.m_point = p;
-					contactOut.m_normal = globalMatrix.RotateVector(contactOut.m_normal);
-					maxT = callback.OnRayCastAction(contactOut, t);
+					dAssert(localP0.m_w == localP1.m_w);
+					dVector p(globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale(t)));
+					t = ray.m_diff.DotProduct(p - ray.m_p0).GetScalar() / ray.m_diff.DotProduct(ray.m_diff).GetScalar();
+					if (t < maxT)
+					{
+						dAssert(t >= dFloat32(0.0f));
+						dAssert(t <= dFloat32(1.0f));
+						contactOut.m_body0 = this;
+						contactOut.m_body1 = this;
+						contactOut.m_point = p;
+						contactOut.m_normal = globalMatrix.RotateVector(contactOut.m_normal);
+						maxT = callback.OnRayCastAction(contactOut, t);
+					}
 				}
 			}
 		}
