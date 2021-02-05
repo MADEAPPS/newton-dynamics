@@ -991,7 +991,8 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 	dAssert(body1);
 	dAssert(body0 != body1);
 
-	ndMaterial material(m_contactNotifyCallback->GetMaterial(contact, body0->GetCollisionShape(), body1->GetCollisionShape()));
+	//ndMaterial material(m_contactNotifyCallback->GetMaterial(contact, body0->GetCollisionShape(), body1->GetCollisionShape()));
+	contact->m_material = m_contactNotifyCallback->GetMaterial(contact, body0->GetCollisionShape(), body1->GetCollisionShape());
 	const ndContactPoint* const contactArray = contactSolver->m_contactBuffer;
 	
 	//if (material->m_flags & ndContactMaterial::m_resetSkeletonSelfCollision) {
@@ -1118,7 +1119,7 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		//contactPoint->m_dynamicFriction1 = material->m_dynamicFriction1;
 		//contactPoint->m_flags = ndContactMaterial::m_collisionEnable | (material->m_flags & (ndContactMaterial::m_friction0Enable | ndContactMaterial::m_friction1Enable));
 		//contactPoint->m_userData = material->m_userData;
-		contactPoint->m_material = material;
+		contactPoint->m_material = contact->m_material;
 	
 		if (staticMotion) 
 		{

@@ -94,6 +94,8 @@ class ndContact
 	ndContact* GetAsContact() { return this; }
 	dFloat32 GetPruningTolerance() const;
 
+	const ndMaterial& GetMaterial() const;
+
 	virtual const dUnsigned32 GetRowsCount() const;
 	virtual void JacobianDerivative(ndConstraintDescritor& desc);
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
@@ -116,6 +118,7 @@ class ndContact
 	ndBodyKinematic* m_body0;
 	ndBodyKinematic* m_body1;
 	dList<ndContact, dContainersFreeListAlloc<ndContact>>::dListNode* m_linkNode;
+	ndMaterial m_material;
 	dFloat32 m_timeOfImpact;
 	dFloat32 m_separationDistance;
 	dFloat32 m_contactPruningTolereance;
@@ -137,8 +140,12 @@ class ndContact
 	friend class ndBodyPlayerCapsuleContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;
 
+inline const ndMaterial& ndContact::GetMaterial() const
+{
+	return m_material;
+}
 
-D_INLINE dFloat32 ndContact::GetPruningTolerance() const
+inline dFloat32 ndContact::GetPruningTolerance() const
 {
 	return m_contactPruningTolereance;
 }

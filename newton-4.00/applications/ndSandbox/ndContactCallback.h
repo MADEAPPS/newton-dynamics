@@ -16,12 +16,56 @@
 class ndContactCallback: public ndContactNotify
 {
 	public: 
+	enum ndMaterialFlags
+	{
+		playSound = 1<<0
+	};
+
+	class ndMaterailKey
+	{
+		public:
+		ndMaterailKey()
+			:m_key(0)
+		{
+		}
+
+		ndMaterailKey(dUnsigned64 low, dUnsigned64 high)
+			:m_lowKey(dUnsigned32((low, high)))
+			,m_highKey(dUnsigned32(dMax(low, high)))
+		{
+		}
+
+		bool operator<(const ndMaterailKey& other) const
+		{
+			return (m_key < other.m_key);
+		}
+
+		bool operator>(const ndMaterailKey& other) const
+		{
+			return (m_key > other.m_key);
+		}
+
+		union
+		{
+			struct 
+			{
+				dUnsigned32 m_lowKey;
+				dUnsigned32 m_highKey;
+			};
+			dUnsigned64 m_key;
+		};
+	};
+
 	ndContactCallback();
 	virtual void OnBodyAdded(ndBodyKinematic* const body) const;
 	virtual void OnBodyRemoved(ndBodyKinematic* const body) const;
 	virtual ndMaterial GetMaterial(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const;
 	virtual bool OnAaabbOverlap(const ndContact* const contactJoint, dFloat32 timestep);
 	virtual void OnContactCallback(dInt32 threadIndex, const ndContact* const contactJoint, dFloat32 timestep);
+
+	void PlaySoundTest(const ndContact* const contactJoint);
+
+	dTree<ndMaterial, ndMaterailKey> m_materialMap;
 };
 
 

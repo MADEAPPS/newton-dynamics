@@ -42,6 +42,7 @@ class ndMaterial
 		m_softness = dFloat32(0.1f);
 		m_skinThickness = dFloat32 (0.0f);
 		m_flags = m_collisionEnable | m_friction0Enable | m_friction1Enable;
+		m_userFlags = 0;
 	}
 
 	dFloat32 m_restitution;
@@ -51,7 +52,8 @@ class ndMaterial
 	dFloat32 m_dynamicFriction1;
 	dFloat32 m_softness;
 	dFloat32 m_skinThickness;
-	dInt32 m_flags;
+	dUnsigned32 m_flags;
+	dUnsigned32 m_userFlags;
 };
 
 D_MSV_NEWTON_ALIGN_32

@@ -27,8 +27,7 @@ ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	,m_timeAccumulator(0.0f)
 {
 	ClearCache();
-	ndContactCallback* const contactCallback = new ndContactCallback;
-	SetContactNotify(contactCallback);
+	SetContactNotify(new ndContactCallback);
 }
 
 ndPhysicsWorld::~ndPhysicsWorld()
