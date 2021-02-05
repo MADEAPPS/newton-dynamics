@@ -84,19 +84,21 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	for (dInt32 i = 0; i < 10; i++)
 	{
 		ndBodyDynamic* const boxBody = AddRigidBody(scene, matrix, boxGeometry, shape, 5.0f);
-		ndShapeInstance& instanceShape = boxBody->GetCollisionShape();
+		matrix.m_posit.m_x += 2.5f;
 
+		// assign material id to the collision shape.
+		ndShapeInstance& instanceShape = boxBody->GetCollisionShape();
 		dInt32 newId = i + 1;
 		instanceShape.m_shapeMaterial.m_userId = newId;
-		ndMaterial& material = callback->RegisterMaterial(0, newId);
 
+		// register a contact joint physics material pair and 
+		// set the physics parameters and application custom options 
+		ndMaterial& material = callback->RegisterMaterial(0, newId);
 		dFloat32 frictionValue = dFloat32(i) / 15.0f;
 		material.m_staticFriction0 = frictionValue;
 		material.m_staticFriction1 = frictionValue;
 		material.m_dynamicFriction0 = frictionValue;
 		material.m_dynamicFriction1 = frictionValue;
-
-		matrix.m_posit.m_x += 2.5f;
 	}
 	boxGeometry->Release();
 }
