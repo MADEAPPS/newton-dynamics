@@ -27,6 +27,17 @@ void ndContactCallback::OnBodyRemoved(ndBodyKinematic* const body) const
 {
 }
 
+ndMaterial& ndContactCallback::RegisterMaterial(dUnsigned32 id0, dUnsigned32 id1)
+{
+	ndMaterailKey key(id0, id1);
+	dTree<ndMaterial, ndMaterailKey>::dTreeNode* node = m_materialMap.Find(key);
+	if (!node)
+	{
+		node = m_materialMap.Insert(ndMaterial(), key);
+	}
+	return node->GetInfo();
+}
+
 ndMaterial ndContactCallback::GetMaterial(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const
 {
 	ndMaterailKey key(instance0.GetMaterial().m_userId, instance1.GetMaterial().m_userId);

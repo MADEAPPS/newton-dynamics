@@ -57,6 +57,9 @@ class ndContactCallback: public ndContactNotify
 	};
 
 	ndContactCallback();
+
+	virtual ndMaterial& RegisterMaterial(dUnsigned32 id0, dUnsigned32 id1);
+
 	virtual void OnBodyAdded(ndBodyKinematic* const body) const;
 	virtual void OnBodyRemoved(ndBodyKinematic* const body) const;
 	virtual ndMaterial GetMaterial(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const;
