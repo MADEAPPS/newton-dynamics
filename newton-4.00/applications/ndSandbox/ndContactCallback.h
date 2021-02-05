@@ -30,7 +30,7 @@ class ndContactCallback: public ndContactNotify
 		}
 
 		ndMaterailKey(dUnsigned64 low, dUnsigned64 high)
-			:m_lowKey(dUnsigned32((low, high)))
+			:m_lowKey(dUnsigned32(dMin(low, high)))
 			,m_highKey(dUnsigned32(dMax(low, high)))
 		{
 		}

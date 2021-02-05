@@ -17,10 +17,11 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndContactCallback.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-static void AddRigidBody(ndDemoEntityManager* const scene, const dMatrix& matrix, ndDemoMesh* const geometry, const ndShapeInstance& shape, dFloat32 mass)
+static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const dMatrix& matrix, ndDemoMesh* const geometry, const ndShapeInstance& shape, dFloat32 mass)
 {
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
@@ -35,6 +36,7 @@ static void AddRigidBody(ndDemoEntityManager* const scene, const dMatrix& matrix
 	
 	ndWorld* const world = scene->GetWorld();
 	world->AddBody(body);
+	return body;
 }
 
 static void BuildFrictionRamp(ndDemoEntityManager* const scene)
@@ -78,9 +80,22 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	const char* const boxTexName = "wood_0.tga";
 	ndDemoMesh* const boxGeometry = new ndDemoMesh("box", scene->GetShaderCache(), &shape, boxTexName, boxTexName, boxTexName, 1.0f, texMatrix);
 
+	ndContactCallback* const callback = (ndContactCallback*)world->GetContactNotify();
 	for (dInt32 i = 0; i < 10; i++)
 	{
-		AddRigidBody(scene, matrix, boxGeometry, shape, 5.0f);
+		ndBodyDynamic* const boxBody = AddRigidBody(scene, matrix, boxGeometry, shape, 5.0f);
+		ndShapeInstance& instanceShape = boxBody->GetCollisionShape();
+
+		dInt32 newId = i + 1;
+		instanceShape.m_shapeMaterial.m_userId = newId;
+		ndMaterial& material = callback->RegisterMaterial(0, newId);
+
+		dFloat32 frictionValue = dFloat32(i) / 15.0f;
+		material.m_staticFriction0 = frictionValue;
+		material.m_staticFriction1 = frictionValue;
+		material.m_dynamicFriction0 = frictionValue;
+		material.m_dynamicFriction1 = frictionValue;
+
 		matrix.m_posit.m_x += 2.5f;
 	}
 	boxGeometry->Release();
