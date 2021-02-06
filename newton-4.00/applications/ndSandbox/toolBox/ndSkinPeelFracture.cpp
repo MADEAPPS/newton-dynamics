@@ -24,19 +24,19 @@
 
 ndSkinPeelFracture::ndAtom::ndAtom()
 	:m_centerOfMass(0.0f)
-	, m_momentOfInertia(0.0f)
-	, m_mesh(nullptr)
-	, m_collision(nullptr)
-	, m_massFraction(0.0f)
+	,m_momentOfInertia(0.0f)
+	,m_mesh(nullptr)
+	,m_collision(nullptr)
+	,m_massFraction(0.0f)
 {
 }
 
 ndSkinPeelFracture::ndAtom::ndAtom(const ndAtom& atom)
 	:m_centerOfMass(atom.m_centerOfMass)
-	, m_momentOfInertia(atom.m_momentOfInertia)
-	, m_mesh((ndDemoMesh*)atom.m_mesh->AddRef())
-	, m_collision(new ndShapeInstance(*atom.m_collision))
-	, m_massFraction(atom.m_massFraction)
+	,m_momentOfInertia(atom.m_momentOfInertia)
+	,m_mesh((ndDemoMesh*)atom.m_mesh->AddRef())
+	,m_collision(new ndShapeInstance(*atom.m_collision))
+	,m_massFraction(atom.m_massFraction)
 {
 }
 
@@ -55,9 +55,9 @@ ndSkinPeelFracture::ndAtom::~ndAtom()
 
 ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const ndDesc& desc)
 	:dList<ndAtom>()
-	, m_body(nullptr)
-	, m_shape(new ndShapeInstance(*desc.m_shape))
-	, m_breakImpactSpeed(desc.m_breakImpactSpeed)
+	,m_body(nullptr)
+	,m_shape(new ndShapeInstance(*desc.m_shape))
+	,m_breakImpactSpeed(desc.m_breakImpactSpeed)
 {
 	dVector pMin;
 	dVector pMax;
@@ -74,7 +74,7 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 
 	// create a texture matrix, for applying the material's UV to all internal faces
 	dMatrix textureMatrix(dGetIdentityMatrix());
-	textureMatrix[0][0] = 1.0f / size.m_x;
+	textureMatrix[0][0] = 1.0f / size.m_z;
 	textureMatrix[1][1] = 1.0f / size.m_y;
 	textureMatrix.m_posit.m_x = -0.5f;
 	textureMatrix.m_posit.m_y = -0.5f;

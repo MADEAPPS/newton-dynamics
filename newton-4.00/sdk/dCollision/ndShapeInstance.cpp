@@ -160,10 +160,6 @@ void ndShapeInstance::CalculateAABB(const dMatrix& matrix, dVector& p0, dVector&
 		}
 
 		case m_uniform:
-		{
-
-		}
-
 		case m_nonUniform:
 		{
 			dMatrix matrix1(matrix);
@@ -482,4 +478,9 @@ void ndShapeInstance::Save(nd::TiXmlElement* const rootNode, const dTree<dUnsign
 		sprintf(name, "intData%d", i);
 		xmlSaveParam(paramNode, name, dInt64(m_shapeMaterial.m_userParam[i].m_intData));
 	}
+}
+
+dVector ndShapeInstance::GetBoxPadding()
+{
+	return m_padding;
 }

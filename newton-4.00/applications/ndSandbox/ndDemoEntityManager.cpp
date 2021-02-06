@@ -29,7 +29,7 @@
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0		// setting basic rigidbody
-#define DEFAULT_SCENE	1		// setting friction ramp
+//#define DEFAULT_SCENE	1		// setting friction ramp
 //#define DEFAULT_SCENE	2		// setting basic Stacks
 //#define DEFAULT_SCENE	3		// setting basic Trigger
 //#define DEFAULT_SCENE	4		// setting basic player
@@ -39,7 +39,7 @@
 //#define DEFAULT_SCENE	8		// setting basic vehicle
 //#define DEFAULT_SCENE	9		// conservation of angular momentum 
 //#define DEFAULT_SCENE	10		// simple voronoi fracture
-//#define DEFAULT_SCENE	10		// skin peel voronoi fracture
+#define DEFAULT_SCENE	11		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndBasicStacks(ndDemoEntityManager* const scene);

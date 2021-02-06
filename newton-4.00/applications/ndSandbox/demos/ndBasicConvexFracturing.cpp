@@ -22,28 +22,6 @@
 
 static void makePointCloud(ndSimpleConvexFracture::ndDesc& desc)
 {
-	//	dVector pMin;
-	//	dVector pMax;
-	//	desc.m_shape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
-	//
-	//	dInt32 steps = 2;
-	//	dVector size (pMax - pMin);
-	//	for (dInt32 z = 0; z <= steps; z++)
-	//	{
-	//		dFloat32 z0 = pMin.m_z + z * size.m_z / steps + dGaussianRandom(size.m_z * 0.1f);
-	//		for (dInt32 y = 0; y <= steps; y++)
-	//		{
-	//			dFloat32 y0 = pMin.m_y + y * size.m_y / steps + dGaussianRandom(size.m_y * 0.1f);
-	//			for (dInt32 x = 0; x <= steps; x++)
-	//			{
-	//				dFloat32 x0 = pMin.m_x + x * size.m_x / steps + dGaussianRandom(size.m_x * 0.1f);
-	//				dVector point(x0, y0, z0, dFloat32(0.0f));
-	//				desc.m_pointCloud.PushBack(point);
-	//			}
-	//		}
-	//	}
-	//}
-
 	dVector pMin;
 	dVector pMax;
 	desc.m_shape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
@@ -70,14 +48,28 @@ static void makePointCloud(ndSimpleConvexFracture::ndDesc& desc)
 	}
 }
 
+static dVector CalculateLocation(ndSimpleConvexFracture* const manager, const dMatrix& matrix, const ndShapeInstance& shape)
+{
+	dVector minBox;
+	dVector maxBox;
+	shape.CalculateAABB(dGetIdentityMatrix(), minBox, maxBox);
+
+	ndWorld* const world = manager->m_scene->GetWorld();
+	dVector floor(FindFloor(*world, dVector(matrix.m_posit.m_x, 100.0f, matrix.m_posit.m_z, dFloat32(0.0f)), 2.0f * 100.0f));
+
+	dVector boxPadding(ndShapeInstance::GetBoxPadding());
+	floor.m_y += (maxBox.m_y - minBox.m_y) * 0.5f - boxPadding.m_y;
+	return floor;
+}
+
 static void AddBoxEffect(ndSimpleConvexFracture* const manager, const dMatrix& matrix)
 {
 	ndSimpleConvexFracture::ndDesc desc;
 
-	// first ww make a collision shape that we wnat to brake to pieces
+	// first make a collision shape that we want to brake to pieces
 	ndShapeInstance shape(new ndShapeBox(3.0f, 0.5f, 0.5f));
 
-	// next we populate the descriptor for how the shape is going toi be broken in pieces.
+	// next we populate the descriptor for how the shape is going to be broken in pieces.
 	desc.m_shape = &shape;
 	desc.m_outTexture = "reljef.tga";
 	desc.m_innerTexture = "concreteBrick.tga";
@@ -88,18 +80,17 @@ static void AddBoxEffect(ndSimpleConvexFracture* const manager, const dMatrix& m
 	// in the scene many time.
 	ndSimpleConvexFracture::ndEffect effect(manager, desc);
 
-	// get a locatiobn in the scene
+	// get a location in the scene
 	dMatrix location(matrix);
-	ndWorld* const world = manager->m_scene->GetWorld();
-	dVector floor(FindFloor(*world, dVector(location.m_posit.m_x, 100.0f, location.m_posit.m_z, dFloat32(0.0f)), 2.0f * 100.0f));
-	location.m_posit.m_y = floor.m_y + 0.25f;
+	location.m_posit = CalculateLocation(manager, matrix, shape);
 
-	// place few instance of teh same effect in teh scane.
+	// place few instance of the same effect in the scene.
+	const dInt32 count = 5;
 	const dFloat32 z0 = location.m_posit.m_z;
-	for (dInt32 j = 0; j < 5; j++)
+	for (dInt32 j = 0; j < count; j++)
 	{
 		location.m_posit.m_z = z0;
-		for (dInt32 i = 0; i < 5; i++)
+		for (dInt32 i = 0; i < count; i++)
 		{
 			location.m_posit.m_z += 0.5f;
 			manager->AddEffect(effect, 200.0f, location);
@@ -120,18 +111,17 @@ static void AddCapsuleEffect(ndSimpleConvexFracture* const manager, const dMatri
 	desc.m_breakImpactSpeed = 10.0f;
 
 	dMatrix location(matrix);
-	ndWorld* const world = manager->m_scene->GetWorld();
-	dVector floor(FindFloor(*world, dVector(location.m_posit.m_x, 100.0f, location.m_posit.m_z, dFloat32(0.0f)), 2.0f * 100.0f));
-	location.m_posit.m_y = floor.m_y + 0.25f;
+	location.m_posit = CalculateLocation(manager, matrix, shape);
 
 	makePointCloud(desc);
 	ndSimpleConvexFracture::ndEffect effect(manager, desc);
 
+	const dInt32 count = 5;
 	const dFloat32 z0 = location.m_posit.m_z;
-	for (dInt32 j = 0; j < 5; j++)
+	for (dInt32 j = 0; j < count; j++)
 	{
 		location.m_posit.m_z = z0;
-		for (dInt32 i = 0; i < 5; i++)
+		for (dInt32 i = 0; i < count; i++)
 		{
 			location.m_posit.m_z += 0.5f;
 			manager->AddEffect(effect, 200.0f, location);
@@ -152,18 +142,17 @@ static void AddCylinderEffect(ndSimpleConvexFracture* const manager, const dMatr
 	desc.m_breakImpactSpeed = 10.0f;
 
 	dMatrix location(matrix);
-	ndWorld* const world = manager->m_scene->GetWorld();
-	dVector floor(FindFloor(*world, dVector(location.m_posit.m_x, 100.0f, location.m_posit.m_z, dFloat32(0.0f)), 2.0f * 100.0f));
-	location.m_posit.m_y = floor.m_y + 0.25f;
+	location.m_posit = CalculateLocation(manager, matrix, shape);
 
 	makePointCloud(desc);
 	ndSimpleConvexFracture::ndEffect effect(manager, desc);
 
+	const dInt32 count = 5;
 	const dFloat32 z0 = location.m_posit.m_z;
-	for (dInt32 j = 0; j < 5; j++)
+	for (dInt32 j = 0; j < count; j++)
 	{
 		location.m_posit.m_z = z0;
-		for (dInt32 i = 0; i < 5; i++)
+		for (dInt32 i = 0; i < count; i++)
 		{
 			location.m_posit.m_z += 0.5f;
 			manager->AddEffect(effect, 200.0f, location);
@@ -171,7 +160,6 @@ static void AddCylinderEffect(ndSimpleConvexFracture* const manager, const dMatr
 		location.m_posit.m_y += 0.5f;
 	}
 }
-
 
 void ndBasicConvexFracturing(ndDemoEntityManager* const scene)
 {
