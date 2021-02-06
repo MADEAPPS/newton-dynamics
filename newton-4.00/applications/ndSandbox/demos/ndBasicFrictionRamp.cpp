@@ -90,6 +90,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 		ndShapeInstance& instanceShape = boxBody->GetCollisionShape();
 		dInt32 newId = i + 1;
 		instanceShape.m_shapeMaterial.m_userId = newId;
+		instanceShape.m_shapeMaterial.m_userParam[0].m_floatData = 10.0f;
 
 		// register a contact joint physics material pair and 
 		// set the physics parameters and application custom options 
@@ -99,7 +100,10 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 		material.m_staticFriction1 = frictionValue;
 		material.m_dynamicFriction0 = frictionValue;
 		material.m_dynamicFriction1 = frictionValue;
+
+		material.m_userFlags |= ndContactCallback::playSound;
 	}
+
 	boxGeometry->Release();
 }
 

@@ -53,29 +53,50 @@ bool ndContactCallback::OnAaabbOverlap(const ndContact* const contactJoint, dFlo
 void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 {
 	const ndBodyKinematic* const body0 = contactJoint->GetBody0();
-	const ndBodyKinematic* const body1 = contactJoint->GetBody0();
+	const ndBodyKinematic* const body1 = contactJoint->GetBody1();
 	const ndContactPointList& contactPoints = contactJoint->GetContactPoints();
 
-	dFloat32 maxSpeed = dFloat32 (0.0f);
-	const ndContactMaterial* contact = nullptr;
+	dFloat32 maxNornalSpeed = dFloat32 (0.0f);
+	dFloat32 maxTangentSpeed = dFloat32(0.0f);
+	const ndContactMaterial* normalContact = nullptr;
+	const ndContactMaterial* tangentContact = nullptr;
 	for (ndContactPointList::dListNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 	{
 		const ndContactMaterial& contactPoint = contactNode->GetInfo();
 		const dVector pointVeloc0(body0->GetVelocityAtPoint(contactPoint.m_point));
 		const dVector pointVeloc1(body1->GetVelocityAtPoint(contactPoint.m_point));
+		const dVector veloc(pointVeloc1 - pointVeloc0);
 
-		dFloat32 speed = dAbs(contactPoint.m_normal.DotProduct(pointVeloc1 - pointVeloc0).GetScalar());
-		if (speed > maxSpeed)
+		const dFloat32 verticalSpeed = contactPoint.m_normal.DotProduct(veloc).GetScalar();
+		const dFloat32 nornalSpeed = dAbs(verticalSpeed);
+		if (nornalSpeed > maxNornalSpeed)
 		{
-			maxSpeed = speed;
-			contact = &contactPoint;
+			maxNornalSpeed = nornalSpeed;
+			normalContact = &contactPoint;
+		}
+
+		dVector tangVeloc(veloc - contactPoint.m_normal.Scale(verticalSpeed));
+		const dFloat32 tangentSpeed = tangVeloc.DotProduct(tangVeloc).GetScalar();
+		if (tangentSpeed > maxTangentSpeed)
+		{
+			maxTangentSpeed = tangentSpeed;
+			tangentContact = &contactPoint;
 		}
 	}
 
-	if (maxSpeed > 10.0f)
+	const ndShapeInstance& instance0 = body0->GetCollisionShape();
+	const ndShapeInstance& instance1 = body1->GetCollisionShape();
+	const dFloat32 speedThreshold = dMax(instance0.GetMaterial().m_userParam[0].m_floatData, instance1.GetMaterial().m_userParam[0].m_floatData);
+	if (maxNornalSpeed > speedThreshold)
 	{
-		// playsound here;
+		// play impact sound here;
 
+	}
+
+	maxTangentSpeed = dSqrt(maxTangentSpeed);
+	if (maxTangentSpeed > speedThreshold)
+	{
+		// play scratching sound here;
 	}
 }
 
