@@ -60,30 +60,35 @@ static void makePointCloud(ndSkinPeelFracture::ndDesc& desc)
 
 	dVector pMin;
 	dVector pMax;
-	desc.m_shape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
-	dVector size((pMax - pMin).Scale(0.25f));
+	desc.m_outerShape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
+	dVector size(pMax - pMin);
 
-	desc.m_pointCloud.PushBack(dVector::m_zero);
-
-	desc.m_pointCloud.PushBack(dVector(-size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
-	desc.m_pointCloud.PushBack(dVector(-size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
-	desc.m_pointCloud.PushBack(dVector(-size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
-	desc.m_pointCloud.PushBack(dVector(-size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
-
-	desc.m_pointCloud.PushBack(dVector(size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
-	desc.m_pointCloud.PushBack(dVector(size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
-	desc.m_pointCloud.PushBack(dVector(size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
-	desc.m_pointCloud.PushBack(dVector(size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
-
-	for (dInt32 i = 0; i < desc.m_pointCloud.GetCount(); i++)
+	//desc.m_pointCloud.PushBack(dVector::m_zero);
+	//
+	//desc.m_pointCloud.PushBack(dVector(-size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(dVector(-size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(dVector(-size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(dVector(-size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
+	//
+	//desc.m_pointCloud.PushBack(dVector(size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(dVector(size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(dVector(size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(dVector(size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
+	//for (dInt32 i = 0; i < desc.m_pointCloud.GetCount(); i++)
+	//{
+	//	dFloat32 x = dGaussianRandom(size.m_x);
+	//	dFloat32 y = dGaussianRandom(size.m_y);
+	//	dFloat32 z = dGaussianRandom(size.m_y);
+	//	desc.m_pointCloud[i] += dVector(x, y, z, dFloat32(0.0f));
+	//}
+	for (dInt32 i = 0; i < 10; i++)
 	{
-		dFloat32 x = dGaussianRandom(size.m_x);
-		dFloat32 y = dGaussianRandom(size.m_y);
-		dFloat32 z = dGaussianRandom(size.m_y);
-		desc.m_pointCloud[i] += dVector(x, y, z, dFloat32(0.0f));
+		dFloat32 x = pMin.m_x + dRand() * size.m_x;
+		dFloat32 y = pMin.m_y + dRand() * size.m_y;
+		dFloat32 z = pMin.m_z + dRand() * size.m_z;
+		desc.m_pointCloud.PushBack (dVector(x, y, z, dFloat32(0.0f)));
 	}
 }
-
 
 static void AddBoxEffect(ndSkinPeelFracture* const manager, const dMatrix& matrix)
 {
@@ -93,7 +98,7 @@ static void AddBoxEffect(ndSkinPeelFracture* const manager, const dMatrix& matri
 	ndShapeInstance shape(new ndShapeBox(1.0f, 5.0f, 20.0f));
 
 	// next we populate the descriptor for how the shape is going to be broken in pieces.
-	desc.m_shape = &shape;
+	desc.m_outerShape = &shape;
 	desc.m_outTexture = "reljef.tga";
 	desc.m_innerTexture = "concreteBrick.tga";
 	desc.m_breakImpactSpeed = 10.0f;

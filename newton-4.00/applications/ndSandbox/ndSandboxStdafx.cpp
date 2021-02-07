@@ -19,28 +19,38 @@
 // TODO: reference any additional headers you need in STDAFX.H
 // and not in this file
 
-static unsigned ___dRandSeed___ = 0;
+static dUnsigned32 ___dRandSeed___ = 0;
 
-void dSetRandSeed (unsigned seed)
+void dSetRandSeed (dUnsigned32 seed)
 {
 	___dRandSeed___	= seed; 
 }
 
-unsigned dRand ()
+/// return a random variable between 0.0 and 1.0
+dFloat32 dRand()
 {
-	#define RAND_MUL 31415821u
-	___dRandSeed___ = RAND_MUL * ___dRandSeed___ + 1; 
-	return ___dRandSeed___ & dRAND_MAX;
+	// numerical recipe in c
+	#define RAND_MUL 1664525u
+	#define RAND_ADD 1013904223u
+	___dRandSeed___ = RAND_MUL * ___dRandSeed___ + RAND_ADD;
+	dFloat32 r = dFloat32(___dRandSeed___ & dRAND_MAX) * ((dFloat32(1.0f) / dRAND_MAX));
+	//dTrace(("%f\n", r));
+	return r;
 }
 
-// a pseudo Gaussian random with mean 0 and variance 0.5f
+/// return a pseudo Gaussian random with mean 0 and variance 0.5f
 dFloat32 dGaussianRandom (dFloat32 amp)
 {
-	unsigned val;
-	val = dRand() + dRand();
-	return amp * (dFloat32 (val) / dFloat32(dRAND_MAX) - 1.0f) * 0.5f;
+	const dInt32 count = 4;
+	dFloat32 r = dFloat32(0.0f);
+	for (dInt32 i = 0; i < count; i++)
+	{
+		r += dFloat32(2.0f) * dRand() - dFloat32 (1.0f);
+	}
+	r *= (dFloat32(1.0f) / count);
+	//dTrace(("%f\n", r));
+	return r;
 }
-
 
 // Windows user assets path
 void dGetWorkingFileName (const char* const name, char* const outPathName)
@@ -84,21 +94,22 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 
 	// little Indian/big Indian conversion
 #ifdef __ppc__
-	unsigned short SWAP_INT16(unsigned short x)
+	dUnsigned16 SWAP_INT16(dUnsigned16 short x)
 	{
 		return ((x >> 8) & 0xff) + ((x & 0xff) << 8);
 	}
-	unsigned SWAP_INT32(unsigned x)
+
+	dUnsigned32 SWAP_INT32(dUnsigned32 x)
 	{
 		return SWAP_INT16 ( x >> 16) + (SWAP_INT16 (x) << 16);
 	}
-
 
 	void SWAP_FLOAT32_ARRAY (void* const array, dInt32 count)
 	{
 		dInt32* const ptr = (dInt32*) array;
 		count /= sizeof (dInt32);
-		for (dInt32 i = 0; i < count; i ++) {
+		for (dInt32 i = 0; i < count; i ++) 
+		{
 			dInt32 x;
 			x = SWAP_INT32 (ptr[i]);
 			ptr[i] = x;
@@ -107,12 +118,12 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 
 #else
 
-	unsigned SWAP_INT32(unsigned x)
+	dUnsigned32 SWAP_INT32(dUnsigned32 x)
 	{
 		return x;
 	}
 
-	unsigned short SWAP_INT16(unsigned short x)
+	dUnsigned16 SWAP_INT16(dUnsigned16 x)
 	{
 		return x;
 	}

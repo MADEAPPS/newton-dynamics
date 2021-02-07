@@ -142,10 +142,11 @@ inline void glMaterialParam (GLenum face, GLenum pname, const dFloat32 *params)
 
 
 //#define DEMO_CHECK_ASYN_UPDATE
-#define dRAND_MAX		0x0fffffff
+#define dRAND_MAX		0x00ffffff
 
-unsigned dRand ();
-void dSetRandSeed (unsigned seed);
+//dUnsigned32 dRand____ ();
+dFloat32 dRand();
+void dSetRandSeed (dUnsigned32 seed);
 dFloat32 dGaussianRandom (dFloat32 amp);
 
 inline dInt32 dTwosPower (dInt32 x)
@@ -162,11 +163,9 @@ inline dInt32 dTwosPower (dInt32 x)
 //void GetAplicationDirectory (char* const aplicationDir);
 void dGetWorkingFileName (const char* const name, char* const outPathName);
 
-
 // little Indian/big Indian conversion
-unsigned SWAP_INT32(unsigned x);
-unsigned short SWAP_INT16(unsigned short x);
+dUnsigned32 SWAP_INT32(dUnsigned32 x);
+dUnsigned16 SWAP_INT16(dUnsigned16 x);
 void SWAP_FLOAT32_ARRAY (void* const array, dInt32 count);
-
 #endif 
 

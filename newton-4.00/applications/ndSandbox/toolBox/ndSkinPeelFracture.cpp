@@ -56,16 +56,16 @@ ndSkinPeelFracture::ndAtom::~ndAtom()
 ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const ndDesc& desc)
 	:dList<ndAtom>()
 	,m_body(nullptr)
-	,m_shape(new ndShapeInstance(*desc.m_shape))
+	,m_shape(new ndShapeInstance(*desc.m_outerShape))
 	,m_breakImpactSpeed(desc.m_breakImpactSpeed)
 {
 	dVector pMin;
 	dVector pMax;
-	desc.m_shape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
+	desc.m_outerShape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
 	dVector size(pMax - pMin);
 
 	// Get the volume of the original mesh
-	ndMeshEffect mesh(*desc.m_shape);
+	ndMeshEffect mesh(*desc.m_outerShape);
 	mesh.GetMaterials().PushBack(ndMeshEffect::dMaterial());
 	ndMeshEffect::dMaterial& material0 = mesh.GetMaterials()[0];
 	ndMeshEffect::dMaterial& material1 = mesh.GetMaterials()[1];
