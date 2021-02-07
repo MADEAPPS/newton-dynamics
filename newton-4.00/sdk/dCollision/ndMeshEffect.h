@@ -368,6 +368,7 @@ class ndMeshEffect: public dPolyhedra
 	};
 	
 	D_COLLISION_API ndMeshEffect();
+	D_COLLISION_API ndMeshEffect(const ndMeshEffect& source);
 	D_COLLISION_API ndMeshEffect(const ndShapeInstance& shape);
 	D_COLLISION_API ndMeshEffect(dPolyhedra& mesh, const ndMeshEffect& source);
 	

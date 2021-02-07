@@ -29,6 +29,7 @@ class ndSkinPeelFracture: public ndModel
 		ndDesc()
 			:m_pointCloud()
 			,m_outerShape(nullptr)
+			,m_innerShape(nullptr)
 			,m_outTexture(nullptr)
 			,m_innerTexture(nullptr)
 			,m_breakImpactSpeed(10.0f)
@@ -37,6 +38,7 @@ class ndSkinPeelFracture: public ndModel
 
 		dArray<dVector> m_pointCloud;
 		ndShapeInstance* m_outerShape;
+		ndShapeInstance* m_innerShape;
 		const char* m_outTexture;
 		const char* m_innerTexture;
 		dFloat32 m_breakImpactSpeed;

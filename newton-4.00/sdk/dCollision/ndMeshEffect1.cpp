@@ -2090,12 +2090,23 @@ ndMeshEffect::ndMeshEffect(dPolyhedra& mesh, const ndMeshEffect& source)
 	:dPolyhedra(mesh)
 	,m_points(source.m_points)
 	,m_attrib(source.m_attrib)
+	,m_materials(source.m_materials)
 	,m_vertexBaseCount(-1)
 	,m_constructionIndex(0)
 {
 	Init();
 }
 
+ndMeshEffect::ndMeshEffect(const ndMeshEffect& source)
+	:dPolyhedra(source)
+	,m_points(source.m_points)
+	,m_attrib(source.m_attrib)
+	,m_materials(source.m_materials)
+	,m_vertexBaseCount(-1)
+	,m_constructionIndex(0)
+{
+	Init();
+}
 
 ndMeshEffect::~ndMeshEffect()
 {
@@ -4208,7 +4219,6 @@ void ndMeshEffect::FlipWinding()
 	dInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
 	dInt64	userData[DG_MESH_EFFECT_POINT_SPLITED];
 
-	dAssert(0);
 	dPolyhedra polyhedra(*this);
 	RemoveAll();
 

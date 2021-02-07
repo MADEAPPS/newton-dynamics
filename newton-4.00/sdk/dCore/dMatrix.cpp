@@ -656,7 +656,7 @@ dVector dMatrix::EigenVectors ()
 		d = b; 
 	}
 
-	#ifdef _DEBUG
+	#ifdef _DEBUG___
 		dMatrix diag(dGetIdentityMatrix());
 		diag[0][0] = d[0];
 		diag[1][1] = d[1];

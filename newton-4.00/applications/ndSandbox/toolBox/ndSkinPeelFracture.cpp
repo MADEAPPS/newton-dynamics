@@ -65,12 +65,16 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 	dVector size(pMax - pMin);
 
 	// Get the volume of the original mesh
-	ndMeshEffect mesh(*desc.m_outerShape);
-	mesh.GetMaterials().PushBack(ndMeshEffect::dMaterial());
-	ndMeshEffect::dMaterial& material0 = mesh.GetMaterials()[0];
-	ndMeshEffect::dMaterial& material1 = mesh.GetMaterials()[1];
-	strcpy(material0.m_textureName, desc.m_outTexture);
-	strcpy(material1.m_textureName, desc.m_innerTexture);
+	ndMeshEffect outerMesh(*desc.m_outerShape);
+	ndMeshEffect innerMesh(*desc.m_innerShape);
+	outerMesh.GetMaterials().PushBack(ndMeshEffect::dMaterial());
+	innerMesh.GetMaterials().PushBack(ndMeshEffect::dMaterial());
+
+	strcpy(outerMesh.GetMaterials()[0].m_textureName, desc.m_outTexture);
+	strcpy(outerMesh.GetMaterials()[1].m_textureName, desc.m_innerTexture);
+
+	strcpy(innerMesh.GetMaterials()[0].m_textureName, desc.m_outTexture);
+	strcpy(innerMesh.GetMaterials()[1].m_textureName, desc.m_outTexture);
 
 	// create a texture matrix, for applying the material's UV to all internal faces
 	dMatrix textureMatrix(dGetIdentityMatrix());
@@ -78,30 +82,34 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 	textureMatrix[1][1] = 1.0f / size.m_y;
 	textureMatrix.m_posit.m_x = -0.5f;
 	textureMatrix.m_posit.m_y = -0.5f;
-	mesh.UniformBoxMapping(0, textureMatrix);
+	outerMesh.UniformBoxMapping(0, textureMatrix);
+	innerMesh.UniformBoxMapping(0, textureMatrix);
 
-	m_visualMesh = new ndDemoMesh("fracture", &mesh, manager->m_scene->GetShaderCache());
+	m_visualMesh = new ndDemoMesh("fracture", &outerMesh, manager->m_scene->GetShaderCache());
 
 	// now we call create we decompose the mesh into several convex pieces 
-	ndMeshEffect* const debriMeshPieces = mesh.CreateVoronoiConvexDecomposition(desc.m_pointCloud, 1, &textureMatrix[0][0]);
-	dAssert(debriMeshPieces);
-
-	// now we iterate over each pieces and for each one we create a visual entity and a rigid body
-	ndMeshEffect* nextDebri;
-	dMatrix translateMatrix(dGetIdentityMatrix());
-
-	dFloat32 volume = dFloat32(mesh.CalculateVolume());
-	ndDemoEntityManager* const scene = manager->m_scene;
-	for (ndMeshEffect* debri = debriMeshPieces->GetFirstLayer(); debri; debri = nextDebri)
+	ndMeshEffect* const convexVoronoiMesh = outerMesh.CreateVoronoiConvexDecomposition(desc.m_pointCloud, 1, &textureMatrix[0][0]);
+	
+	dList<ndMeshEffect*> rawConvexPieces;
+	for (ndMeshEffect* convexPart = convexVoronoiMesh->GetFirstLayer(); convexPart; convexPart = convexVoronoiMesh->GetNextLayer(convexPart))
 	{
-		// get next segment piece
-		nextDebri = debriMeshPieces->GetNextLayer(debri);
+		rawConvexPieces.Append(convexPart);
+		break;
+	}
+	delete convexVoronoiMesh;
 
-		//clip the voronoi cell convexes against the mesh 
-		ndMeshEffect* const fracturePiece = mesh.ConvexMeshIntersection(debri);
+//outerMesh.FlipWinding();
+
+	dMatrix translateMatrix(dGetIdentityMatrix());
+	dFloat32 volume = dFloat32(outerMesh.CalculateVolume());
+	ndDemoEntityManager* const scene = manager->m_scene;
+	for (dList<ndMeshEffect*>::dListNode* node = rawConvexPieces.GetFirst(); node; node = node->GetNext())
+	{
+		ndMeshEffect* const debri = node->GetInfo();
+		//ndMeshEffect* const fracturePiece = outerMesh.ConvexMeshIntersection(debri);
+		ndMeshEffect* const fracturePiece = new ndMeshEffect(*debri);
 		if (fracturePiece)
 		{
-			// make a convex hull collision shape
 			ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
 			if (collision)
 			{
@@ -132,11 +140,12 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 			}
 			delete fracturePiece;
 		}
-
-		delete debri;
 	}
 
-	delete debriMeshPieces;
+	for (dList<ndMeshEffect*>::dListNode* node = rawConvexPieces.GetFirst(); node; node = node->GetNext())
+	{
+		delete node->GetInfo();
+	}
 }
 
 ndSkinPeelFracture::ndEffect::ndEffect(const ndEffect& effect)

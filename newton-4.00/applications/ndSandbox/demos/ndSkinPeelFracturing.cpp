@@ -36,52 +36,14 @@ static dVector CalculateLocation(ndSkinPeelFracture* const manager, const dMatri
 
 static void makePointCloud(ndSkinPeelFracture::ndDesc& desc)
 {
-	//	dVector pMin;
-	//	dVector pMax;
-	//	desc.m_shape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
-	//
-	//	dInt32 steps = 2;
-	//	dVector size (pMax - pMin);
-	//	for (dInt32 z = 0; z <= steps; z++)
-	//	{
-	//		dFloat32 z0 = pMin.m_z + z * size.m_z / steps + dGaussianRandom(size.m_z * 0.1f);
-	//		for (dInt32 y = 0; y <= steps; y++)
-	//		{
-	//			dFloat32 y0 = pMin.m_y + y * size.m_y / steps + dGaussianRandom(size.m_y * 0.1f);
-	//			for (dInt32 x = 0; x <= steps; x++)
-	//			{
-	//				dFloat32 x0 = pMin.m_x + x * size.m_x / steps + dGaussianRandom(size.m_x * 0.1f);
-	//				dVector point(x0, y0, z0, dFloat32(0.0f));
-	//				desc.m_pointCloud.PushBack(point);
-	//			}
-	//		}
-	//	}
-	//}
-
 	dVector pMin;
 	dVector pMax;
 	desc.m_outerShape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
 	dVector size(pMax - pMin);
 
-	//desc.m_pointCloud.PushBack(dVector::m_zero);
-	//
-	//desc.m_pointCloud.PushBack(dVector(-size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(dVector(-size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(dVector(-size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(dVector(-size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
-	//
-	//desc.m_pointCloud.PushBack(dVector(size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(dVector(size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(dVector(size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(dVector(size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
-	//for (dInt32 i = 0; i < desc.m_pointCloud.GetCount(); i++)
-	//{
-	//	dFloat32 x = dGaussianRandom(size.m_x);
-	//	dFloat32 y = dGaussianRandom(size.m_y);
-	//	dFloat32 z = dGaussianRandom(size.m_y);
-	//	desc.m_pointCloud[i] += dVector(x, y, z, dFloat32(0.0f));
-	//}
-	for (dInt32 i = 0; i < 10; i++)
+	//const dInt32 count = 10;
+	const dInt32 count = 0;
+	for (dInt32 i = 0; i < count; i++)
 	{
 		dFloat32 x = pMin.m_x + dRand() * size.m_x;
 		dFloat32 y = pMin.m_y + dRand() * size.m_y;
@@ -95,10 +57,16 @@ static void AddBoxEffect(ndSkinPeelFracture* const manager, const dMatrix& matri
 	ndSkinPeelFracture::ndDesc desc;
 
 	// first make a collision shape that we want to brake to pieces
-	ndShapeInstance shape(new ndShapeBox(1.0f, 5.0f, 20.0f));
+
+	dVector shapeBox(1.0f, 5.0f, 20.0f, 0.0f);
+	ndShapeInstance outerShape(new ndShapeBox(shapeBox.m_x, shapeBox.m_y, shapeBox.m_z));
+
+	shapeBox -= dVector(0.1f);
+	ndShapeInstance innerShape(new ndShapeBox(shapeBox.m_x, shapeBox.m_y, shapeBox.m_z));
 
 	// next we populate the descriptor for how the shape is going to be broken in pieces.
-	desc.m_outerShape = &shape;
+	desc.m_outerShape = &outerShape;
+	desc.m_innerShape = &innerShape;
 	desc.m_outTexture = "reljef.tga";
 	desc.m_innerTexture = "concreteBrick.tga";
 	desc.m_breakImpactSpeed = 10.0f;
@@ -111,8 +79,9 @@ static void AddBoxEffect(ndSkinPeelFracture* const manager, const dMatrix& matri
 
 	// get a location in the scene
 	dMatrix location(matrix);
-	location.m_posit = CalculateLocation(manager, matrix, shape);
+	location.m_posit = CalculateLocation(manager, matrix, outerShape);
 location.m_posit.m_y += 0.5f;
+location.m_posit.m_y += 40.0f;
 
 	// place few instance of the same effect in the scene.
 	const dInt32 count = 1;

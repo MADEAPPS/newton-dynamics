@@ -232,7 +232,6 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
 	{
 		dInt32 materialIndex = meshNode->GetMaterialID(geometryHandle, handle);
-		//if (materialIndex == 0) continue;
 		ndDemoSubMesh* const segment = AddSubMesh();
 		
 		const ndMeshEffect::dMaterial& material = materialArray[materialIndex];
