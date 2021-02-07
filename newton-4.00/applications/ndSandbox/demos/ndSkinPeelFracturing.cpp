@@ -20,6 +20,20 @@
 #include "ndSkinPeelFracture.h"
 #include "ndDemoEntityManager.h"
 
+static dVector CalculateLocation(ndSkinPeelFracture* const manager, const dMatrix& matrix, const ndShapeInstance& shape)
+{
+	dVector minBox;
+	dVector maxBox;
+	shape.CalculateAABB(dGetIdentityMatrix(), minBox, maxBox);
+
+	ndWorld* const world = manager->m_scene->GetWorld();
+	dVector floor(FindFloor(*world, dVector(matrix.m_posit.m_x, 100.0f, matrix.m_posit.m_z, dFloat32(0.0f)), 2.0f * 100.0f));
+
+	dVector boxPadding(ndShapeInstance::GetBoxPadding());
+	floor.m_y += (maxBox.m_y - minBox.m_y) * 0.5f - boxPadding.m_y;
+	return floor;
+}
+
 static void makePointCloud(ndSkinPeelFracture::ndDesc& desc)
 {
 	//	dVector pMin;
@@ -70,19 +84,6 @@ static void makePointCloud(ndSkinPeelFracture::ndDesc& desc)
 	}
 }
 
-static dVector CalculateLocation(ndSkinPeelFracture* const manager, const dMatrix& matrix, const ndShapeInstance& shape)
-{
-	dVector minBox;
-	dVector maxBox;
-	shape.CalculateAABB(dGetIdentityMatrix(), minBox, maxBox);
-
-	ndWorld* const world = manager->m_scene->GetWorld();
-	dVector floor(FindFloor(*world, dVector(matrix.m_posit.m_x, 100.0f, matrix.m_posit.m_z, dFloat32(0.0f)), 2.0f * 100.0f));
-
-	dVector boxPadding(ndShapeInstance::GetBoxPadding());
-	floor.m_y += (maxBox.m_y - minBox.m_y) * 0.5f - boxPadding.m_y;
-	return floor;
-}
 
 static void AddBoxEffect(ndSkinPeelFracture* const manager, const dMatrix& matrix)
 {
@@ -96,6 +97,7 @@ static void AddBoxEffect(ndSkinPeelFracture* const manager, const dMatrix& matri
 	desc.m_outTexture = "reljef.tga";
 	desc.m_innerTexture = "concreteBrick.tga";
 	desc.m_breakImpactSpeed = 10.0f;
+	desc.m_breakImpactSpeed = 0.0f;
 	makePointCloud(desc);
 
 	// now with make a template effect that we can place 
@@ -105,6 +107,7 @@ static void AddBoxEffect(ndSkinPeelFracture* const manager, const dMatrix& matri
 	// get a location in the scene
 	dMatrix location(matrix);
 	location.m_posit = CalculateLocation(manager, matrix, shape);
+location.m_posit.m_y += 0.5f;
 
 	// place few instance of the same effect in the scene.
 	const dInt32 count = 1;
