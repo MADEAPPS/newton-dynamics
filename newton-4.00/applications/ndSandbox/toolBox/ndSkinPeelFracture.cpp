@@ -102,10 +102,15 @@ xxxx0.SetLocalMatrix(xxxxxxx);
 	ndMeshEffect* const convexVoronoiMesh = outerMesh.CreateVoronoiConvexDecomposition(desc.m_pointCloud, 1, &textureMatrix[0][0]);
 	
 	dList<ndMeshEffect*> rawConvexPieces;
+int xxx = 0;
 	for (ndMeshEffect* convexPart = convexVoronoiMesh->GetFirstLayer(); convexPart; convexPart = convexVoronoiMesh->GetNextLayer(convexPart))
 	{
-		rawConvexPieces.Append(convexPart);
-		//break;
+		if (xxx == 4) 
+		{
+			rawConvexPieces.Append(convexPart);
+			break;
+		}
+xxx++;
 	}
 	delete convexVoronoiMesh;
 
@@ -190,9 +195,9 @@ xxxx0.SetLocalMatrix(xxxxxxx);
 
 ndSkinPeelFracture::ndEffect::ndEffect(const ndEffect& effect)
 	:m_body(new ndBodyDynamic())
-	, m_shape(nullptr)
-	, m_visualMesh(nullptr)
-	, m_breakImpactSpeed(effect.m_breakImpactSpeed)
+	,m_shape(nullptr)
+	,m_visualMesh(nullptr)
+	,m_breakImpactSpeed(effect.m_breakImpactSpeed)
 {
 	m_body->SetCollisionShape(*effect.m_shape);
 	for (dListNode* node = effect.GetFirst(); node; node = node->GetNext())

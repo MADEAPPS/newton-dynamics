@@ -42,7 +42,7 @@ static void makePointCloud(ndSkinPeelFracture::ndDesc& desc)
 	dVector size(pMax - pMin);
 
 	//const dInt32 count = 10;
-	const dInt32 count = 2;
+	const dInt32 count = 0;
 	for (dInt32 i = 0; i < count; i++)
 	{
 		dFloat32 x = pMin.m_x + dRand() * size.m_x;
