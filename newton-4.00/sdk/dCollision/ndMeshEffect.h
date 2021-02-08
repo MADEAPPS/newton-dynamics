@@ -445,9 +445,10 @@ class ndMeshEffect: public dPolyhedra
 	D_COLLISION_API dEdge* InsertEdgeVertex(dEdge* const edge, dFloat64 param);
 	D_COLLISION_API void AddInterpolatedEdgeAttribute(dEdge* const edge, dFloat64 param);
 	D_COLLISION_API void RemoveUnusedVertices(dInt32* const vertexRemapTable);
-	D_COLLISION_API bool PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const face);
+	D_COLLISION_API dInt32 PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const face);
 	D_COLLISION_API ndShapeInstance* CreateConvexCollision(dFloat64 tolerance) const;
 	D_COLLISION_API ndMeshEffect* ConvexMeshIntersection(const ndMeshEffect* const convexMesh) const;
+	D_COLLISION_API ndMeshEffect* InverseConvexMeshIntersection(const ndMeshEffect* const convexMesh) const;
 	D_COLLISION_API ndMeshEffect* CreateVoronoiConvexDecomposition(const dArray<dVector>& pointCloud, dInt32 interiorMaterialIndex, const dMatrix& textureProjectionMatrix);
 
 	protected:
@@ -511,9 +512,8 @@ inline dInt32 ndMeshEffect::GetVertexLayer(dInt32 index) const
 	dAssert(index < m_points.m_vertex.m_count);
 	return (m_points.m_layers.m_count) ? m_points.m_layers[index] : 0;
 }
-
-
 #endif
+
 inline dFloat64 ndMeshEffect::QuantizeCordinade(dFloat64 x) const
 {
 	dInt32 exp;
@@ -523,7 +523,6 @@ inline dFloat64 ndMeshEffect::QuantizeCordinade(dFloat64 x) const
 	dFloat64 x1 = ldexp(mantissa, exp);
 	return x1;
 }
-
 
 template<class T, ndMeshEffect::dChannelType type>
 ndMeshEffect::dChannel<T, type>::dChannel()
@@ -569,7 +568,7 @@ inline ndMeshEffect::dPointFormat::dPointFormat()
 
 inline ndMeshEffect::dPointFormat::dPointFormat(const dPointFormat& source)
 	:m_layers(source.m_layers)
-	, m_vertex(source.m_vertex)
+	,m_vertex(source.m_vertex)
 {
 }
 
@@ -585,10 +584,11 @@ inline void ndMeshEffect::dPointFormat::Clear()
 
 inline void ndMeshEffect::dPointFormat::SetCount(dInt32 count)
 {
-	m_layers.Resize(count);
 	m_vertex.Resize(count);
-	m_layers.SetCount(count);
 	m_vertex.SetCount(count);
+
+	m_layers.Resize(count);
+	m_layers.SetCount(count);
 }
 
 inline ndMeshEffect::dAttibutFormat::dAttibutFormat()
@@ -631,19 +631,24 @@ inline void ndMeshEffect::dAttibutFormat::Clear()
 inline void ndMeshEffect::dAttibutFormat::SetCount(dInt32 count)
 {
 	m_pointChannel.Resize(count);
-	m_materialChannel.Resize(count);
-	m_normalChannel.Resize(count);
-	m_binormalChannel.Resize(count);
-	m_colorChannel.Resize(count);
-	m_uv0Channel.Resize(count);
-	m_uv1Channel.Resize(count);
-
 	m_pointChannel.SetCount(count);
+
+	m_materialChannel.Resize(count);
 	m_materialChannel.SetCount(count);
+
+	m_normalChannel.Resize(count);
 	m_normalChannel.SetCount(count);
+
+	m_binormalChannel.Resize(count);
 	m_binormalChannel.SetCount(count);
+
+	m_colorChannel.Resize(count);
 	m_colorChannel.SetCount(count);
+
+	m_uv0Channel.Resize(count);
 	m_uv0Channel.SetCount(count);
+
+	m_uv1Channel.Resize(count);
 	m_uv1Channel.SetCount(count);
 }
 
@@ -684,8 +689,6 @@ inline const dFloat64* ndMeshEffect::GetVertexPool() const
 
 inline dInt32 ndMeshEffect::GetFaceMaterial(dEdge* const faceEdge) const
 {
-	//dTreeNode* const node = (dTreeNode*)face;
-	//dEdge* const edge = &node->GetInfo();
 	return dInt32(m_attrib.m_materialChannel.GetCount() ? m_attrib.m_materialChannel[dInt32(faceEdge->m_userData)] : 0);
 }
 

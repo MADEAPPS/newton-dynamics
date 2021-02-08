@@ -855,56 +855,20 @@ ndMeshEffect* ndMeshEffect::Intersection (const dMatrix& matrix, const ndMeshEff
 
 #endif
 
-
-ndMeshEffect* ndMeshEffect::ConvexMeshIntersection(const ndMeshEffect* const convexMeshSrc) const
-{
-	ndMeshEffect convexMesh(*convexMeshSrc);
-	convexMesh.ConvertToPolygons();
-	ndMeshEffect* const convexIntersection = new ndMeshEffect(*this);
-	
-	dInt32 mark = convexMesh.IncLRU();
-	dPolyhedra::Iterator iter(convexMesh);
-	
-	for (iter.Begin(); iter; iter++) 
-	{
-		dEdge* const convexFace = &(*iter);
-		if ((convexFace->m_incidentFace > 0) && (convexFace->m_mark != mark)) 
-		{
-			dEdge* ptr = convexFace;
-			do 
-			{
-				ptr->m_mark = mark;
-				ptr = ptr->m_next;
-			} while (ptr != convexFace);
-			if (!convexIntersection->PlaneClip(convexMesh, convexFace)) 
-			{
-				delete convexIntersection;
-				return nullptr;
-			}
-		}
-	}
-	
-	if (!convexIntersection->GetVertexCount()) 
-	{
-		delete convexIntersection;
-		return nullptr;
-	}
-
-	convexIntersection->RemoveUnusedVertices(nullptr);
-	return convexIntersection;
-}
-
-
-bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const convexFace)
+// return 0 if the the shape was clipped
+// return 1 if the shape is the positive size of the plane
+// return -1 if the shape is the negative size of the plane
+// return -2 if function fail
+dInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const convexFace)
 {
 	dAssert(convexFace->m_incidentFace > 0);
 
 	dBigVector normal(convexMesh.FaceNormal(convexFace, &convexMesh.m_points.m_vertex[0].m_x, sizeof(dBigVector)));
 	dFloat64 mag2 = normal.DotProduct(normal).GetScalar();
-	if (mag2 < dFloat64(1.0e-30)) 
+	if (mag2 < dFloat64(1.0e-30))
 	{
 		dAssert(0);
-		return true;
+		return -2;
 	}
 
 	normal = normal.Normalize();
@@ -916,10 +880,10 @@ bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const 
 	dInt32 pointCount = GetVertexCount();
 	dStack <dFloat64> testPool(2 * pointCount + 1024);
 	dFloat64* const test = &testPool[0];
-	for (dInt32 i = 0; i < pointCount; i++) 
+	for (dInt32 i = 0; i < pointCount; i++)
 	{
 		test[i] = plane.Evalue(m_points.m_vertex[i]);
-		if (fabs(test[i]) < dFloat32(1.0e-5f)) 
+		if (fabs(test[i]) < dFloat32(1.0e-5f))
 		{
 			test[i] = dFloat32(0.0f);
 		}
@@ -928,19 +892,21 @@ bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const 
 	dInt32 positive = 0;
 	dInt32 negative = 0;
 	dPolyhedra::Iterator iter(*this);
-	for (iter.Begin(); iter && !(positive && negative); iter++) 
+	for (iter.Begin(); iter && !(positive && negative); iter++)
 	{
 		dEdge* const edge = &(*iter);
 		positive += test[edge->m_incidentVertex] > dFloat32(0.0f);
 		negative += test[edge->m_incidentVertex] < dFloat32(0.0f);
 	}
-	if (positive && !negative) 
+	if (positive && !negative)
 	{
-		return false;
+		return 1;
 	}
 
-	if (positive && negative) 
+	dInt32 retValue = -1;
+	if (positive && negative)
 	{
+		retValue = 0;
 		const dEdge* e0 = convexFace;
 		const dEdge* e1 = e0->m_next;
 		const dEdge* e2 = e1->m_next;
@@ -966,17 +932,17 @@ bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const 
 		dVector faceNormal(matrix.UnrotateVector(dVector(normal)));
 		dAssert(faceNormal.m_w == dFloat32(0.0f));
 		dFloat32 areaInv = faceNormal.DotProduct(p10.CrossProduct(p20)).GetScalar();
-		if (e2->m_next != e0) 
+		if (e2->m_next != e0)
 		{
 			const dEdge* edge = e2;
 			dVector r1(q2);
 			dVector q10(p20);
-			do 
+			do
 			{
 				dVector r2(matrix.UntransformVector(dVector(convexMesh.m_points.m_vertex[edge->m_next->m_incidentVertex])));
 				dVector q20(r2 - q0);
 				dFloat32 areaInv1 = faceNormal.DotProduct(q10.CrossProduct(q20)).GetScalar();
-				if (areaInv1 > areaInv) 
+				if (areaInv1 > areaInv)
 				{
 					e1 = edge;
 					e2 = edge->m_next;
@@ -1011,14 +977,14 @@ bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const 
 			uv1[2] = dVector(dFloat32(convexMesh.m_attrib.m_uv1Channel[dInt32(e2->m_userData)].m_u), dFloat32(convexMesh.m_attrib.m_uv1Channel[dInt32(e2->m_userData)].m_v), dFloat32(0.0f), dFloat32(0.0f));
 		}
 
-		for (iter.Begin(); iter; iter++) 
+		for (iter.Begin(); iter; iter++)
 		{
 			dEdge* const edge = &(*iter);
 
 			dFloat64 side0 = test[edge->m_prev->m_incidentVertex];
 			dFloat64 side1 = test[edge->m_incidentVertex];
 
-			if ((side0 < dFloat32(0.0f)) && (side1 > dFloat64(0.0f))) 
+			if ((side0 < dFloat32(0.0f)) && (side1 > dFloat64(0.0f)))
 			{
 				dBigVector dp(m_points.m_vertex[edge->m_incidentVertex] - m_points.m_vertex[edge->m_prev->m_incidentVertex]);
 				dAssert(dp.m_w == dFloat32(0.0f));
@@ -1030,29 +996,29 @@ bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const 
 		}
 
 		dInt32 colorMark = IncLRU();
-		for (iter.Begin(); iter; iter++) 
+		for (iter.Begin(); iter; iter++)
 		{
 			dEdge* const edge = &(*iter);
 			dFloat64 side0 = test[edge->m_incidentVertex];
 			dFloat64 side1 = test[edge->m_next->m_incidentVertex];
 
-			if ((side0 > dFloat32(0.0f)) || (side1 > dFloat64(0.0f))) 
+			if ((side0 > dFloat32(0.0f)) || (side1 > dFloat64(0.0f)))
 			{
 				edge->m_mark = colorMark;
 			}
 		}
 
-		for (iter.Begin(); iter; iter++) 
+		for (iter.Begin(); iter; iter++)
 		{
 			dEdge* const edge = &(*iter);
 			dFloat64 side0 = test[edge->m_incidentVertex];
 			dFloat64 side1 = test[edge->m_next->m_incidentVertex];
-			if ((side0 == dFloat32(0.0f)) && (side1 == dFloat64(0.0f))) 
+			if ((side0 == dFloat32(0.0f)) && (side1 == dFloat64(0.0f)))
 			{
 				dEdge* ptr = edge->m_next;
-				do 
+				do
 				{
-					if (ptr->m_mark == colorMark) 
+					if (ptr->m_mark == colorMark)
 					{
 						edge->m_mark = colorMark;
 						break;
@@ -1062,16 +1028,16 @@ bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const 
 			}
 		}
 
-		for (iter.Begin(); iter; iter++) 
+		for (iter.Begin(); iter; iter++)
 		{
 			dEdge* const edge = &(*iter);
-			if ((edge->m_mark == colorMark) && (edge->m_next->m_mark < colorMark)) 
+			if ((edge->m_mark == colorMark) && (edge->m_next->m_mark < colorMark))
 			{
 				dEdge* const startEdge = edge->m_next;
 				dEdge* end = startEdge;
-				do 
+				do
 				{
-					if (end->m_mark == colorMark) 
+					if (end->m_mark == colorMark)
 					{
 						break;
 					}
@@ -1092,14 +1058,14 @@ bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const 
 
 		dInt32 mark = IncLRU();
 		dList<dEdge*> faceList;
-		for (iter.Begin(); iter; iter++) 
+		for (iter.Begin(); iter; iter++)
 		{
 			dEdge* const face = &(*iter);
-			if ((face->m_mark >= colorMark) && (face->m_mark != mark)) 
+			if ((face->m_mark >= colorMark) && (face->m_mark != mark))
 			{
 				faceList.Append(face);
 				dEdge* edge = face;
-				do 
+				do
 				{
 					edge->m_mark = mark;
 					edge = edge->m_next;
@@ -1107,7 +1073,7 @@ bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const 
 			}
 		}
 
-		for (dList<dEdge*>::dListNode* node = faceList.GetFirst(); node; node = node->GetNext()) 
+		for (dList<dEdge*>::dListNode* node = faceList.GetFirst(); node; node = node->GetNext())
 		{
 			dEdge* const face = node->GetInfo();
 			DeleteFace(face);
@@ -1115,14 +1081,14 @@ bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const 
 
 		mark = IncLRU();
 		faceList.RemoveAll();
-		for (iter.Begin(); iter; iter++) 
+		for (iter.Begin(); iter; iter++)
 		{
 			dEdge* const face = &(*iter);
-			if ((face->m_mark != mark) && (face->m_incidentFace < 0)) 
+			if ((face->m_mark != mark) && (face->m_incidentFace < 0))
 			{
 				faceList.Append(face);
 				dEdge* edge = face;
-				do 
+				do
 				{
 					edge->m_mark = mark;
 					edge = edge->m_next;
@@ -1131,18 +1097,18 @@ bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const 
 		}
 
 		const dInt32 capAttribute = convexMesh.m_attrib.m_materialChannel.GetCount() ? convexMesh.m_attrib.m_materialChannel[dInt32(convexFace->m_userData)] : 0;
-		for (dList<dEdge*>::dListNode* node = faceList.GetFirst(); node; node = node->GetNext()) 
+		for (dList<dEdge*>::dListNode* node = faceList.GetFirst(); node; node = node->GetNext())
 		{
 			dEdge* const face = node->GetInfo();
 
 			dEdge* edge = face;
-			do 
+			do
 			{
 				edge->m_incidentFace = 1;
 				edge->m_userData = m_attrib.m_pointChannel.GetCount();
 
 				m_attrib.m_pointChannel.PushBack(edge->m_incidentVertex);
-				if (m_attrib.m_normalChannel.GetCount()) 
+				if (m_attrib.m_normalChannel.GetCount())
 				{
 					dTriplex n;
 					n.m_x = dFloat32(normal.m_x);
@@ -1161,7 +1127,7 @@ bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const 
 					dAssert(0);
 				}
 
-				if (m_attrib.m_materialChannel.GetCount()) 
+				if (m_attrib.m_materialChannel.GetCount())
 				{
 					m_attrib.m_materialChannel.PushBack(capAttribute);
 				}
@@ -1179,7 +1145,7 @@ bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const 
 				//alpha0 = 0.0f;
 				//alpha1 = 0.0f;
 				//alpha2 = 0.0;
-				if (m_attrib.m_uv0Channel.GetCount() && convexMesh.m_attrib.m_uv0Channel.GetCount()) 
+				if (m_attrib.m_uv0Channel.GetCount() && convexMesh.m_attrib.m_uv0Channel.GetCount())
 				{
 					dAttibutFormat::dgUV uv;
 					uv.m_u = uv0[0].m_x * alpha0 + uv0[1].m_x * alpha1 + uv0[2].m_x * alpha2;
@@ -1187,7 +1153,7 @@ bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const 
 					m_attrib.m_uv0Channel.PushBack(uv);
 				}
 
-				if (m_attrib.m_uv1Channel.GetCount() && convexMesh.m_attrib.m_uv1Channel.GetCount()) 
+				if (m_attrib.m_uv1Channel.GetCount() && convexMesh.m_attrib.m_uv1Channel.GetCount())
 				{
 					dAttibutFormat::dgUV uv;
 					uv.m_u = uv1[0].m_x * alpha0 + uv1[1].m_x * alpha1 + uv1[2].m_x * alpha2;
@@ -1200,5 +1166,133 @@ bool ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* const 
 		}
 	}
 
-	return true;
+	return retValue;
 }
+ndMeshEffect* ndMeshEffect::ConvexMeshIntersection(const ndMeshEffect* const convexMeshSrc) const
+{
+	ndMeshEffect convexMesh(*convexMeshSrc);
+	convexMesh.ConvertToPolygons();
+	ndMeshEffect* const convexIntersection = new ndMeshEffect(*this);
+	
+	dInt32 mark = convexMesh.IncLRU();
+	dPolyhedra::Iterator iter(convexMesh);
+	
+	for (iter.Begin(); iter; iter++) 
+	{
+		dEdge* const convexFace = &(*iter);
+		if ((convexFace->m_incidentFace > 0) && (convexFace->m_mark != mark)) 
+		{
+			dEdge* ptr = convexFace;
+			do 
+			{
+				ptr->m_mark = mark;
+				ptr = ptr->m_next;
+			} while (ptr != convexFace);
+
+			dInt32 clipCode = convexIntersection->PlaneClip(convexMesh, convexFace);
+			if (clipCode > 0)
+			{
+				delete convexIntersection;
+				return nullptr;
+			}
+		}
+	}
+	
+	if (!convexIntersection->GetVertexCount()) 
+	{
+		delete convexIntersection;
+		return nullptr;
+	}
+
+	convexIntersection->RemoveUnusedVertices(nullptr);
+	return convexIntersection;
+}
+
+ndMeshEffect* ndMeshEffect::InverseConvexMeshIntersection(const ndMeshEffect* const convexMeshSrc) const
+{
+	ndMeshEffect concaveMesh(*convexMeshSrc);
+	concaveMesh.ConvertToPolygons();
+
+	ndMeshEffect convexMesh(concaveMesh);
+
+	ndMeshEffect* mergedOutput = nullptr;
+	ndMeshEffect* intersection = new ndMeshEffect(*this);
+
+	dInt32 layer = 0;
+	for (dInt32 i = 0; i < intersection->m_points.m_vertex.GetCount(); i++)
+	{
+		intersection->m_points.m_layers[i] = layer;
+	}
+	
+	concaveMesh.FlipWinding();
+	dInt32 mark = concaveMesh.IncLRU();
+	dPolyhedra::Iterator iter(concaveMesh);
+	for (iter.Begin(); iter; iter++)
+	{
+		dEdge* const concaveFace = &(*iter);
+		if ((concaveFace->m_incidentFace > 0) && (concaveFace->m_mark != mark))
+		{
+			dEdge* ptr = concaveFace;
+			do
+			{
+				ptr->m_mark = mark;
+				ptr = ptr->m_next;
+			} while (ptr != concaveFace);
+
+			ndMeshEffect clipTest (*intersection);
+			dInt32 clipCode = clipTest.PlaneClip(concaveMesh, concaveFace);
+			if (clipCode <= 0)
+			{
+				if (!mergedOutput)
+				{
+					mergedOutput = new ndMeshEffect(clipTest);
+				}
+				else
+				{
+					mergedOutput->MergeFaces(&clipTest);
+				}
+
+				if (clipCode < 0)
+				{
+					break;
+				}
+
+				convexMesh.RemoveAll();
+				convexMesh.BeginFace();
+
+				ptr = concaveFace;
+				dInt32 count = 0;
+				dInt32 vetexIndex[256];
+				dInt64 attribIndex[256];
+				do
+				{
+					vetexIndex[count] = ptr->m_incidentVertex;
+					attribIndex[count] = ptr->m_userData;
+					count++;
+					ptr = ptr->m_prev;
+				} while (ptr != concaveFace);
+				dEdge* const edge = convexMesh.AddFace(count, vetexIndex, attribIndex);
+				convexMesh.EndFace();
+
+				ndMeshEffect clipTest1(*intersection);
+				delete intersection;
+				clipTest1.PlaneClip(convexMesh, edge);
+				intersection = new ndMeshEffect(clipTest1);
+
+				layer++;
+				for (dInt32 i = 0; i < intersection->m_points.m_vertex.GetCount(); i++)
+				{
+					intersection->m_points.m_layers[i] = layer;
+				}
+			}
+		}
+	}
+	
+	delete intersection;
+	if (mergedOutput)
+	{
+		mergedOutput->RemoveUnusedVertices(nullptr);
+	}
+	return mergedOutput;
+}
+

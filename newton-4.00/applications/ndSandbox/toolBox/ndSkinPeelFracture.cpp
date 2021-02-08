@@ -59,6 +59,17 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 	,m_shape(new ndShapeInstance(*desc.m_outerShape))
 	,m_breakImpactSpeed(desc.m_breakImpactSpeed)
 {
+ndShapeInstance xxxx0(new ndShapeBox(2.0, 2.0, 2.0));
+dMatrix xxxxxxx(dGetIdentityMatrix());
+xxxxxxx.m_posit.m_x = 1.0f;
+xxxxxxx.m_posit.m_z = 1.0f;
+xxxx0.SetLocalMatrix(xxxxxxx);
+
+//ndShapeInstance xxxx1(new ndShapeBox(1.0, 1.0, 1.0));
+//ndMeshEffect zzzz0(xxxx0);
+//ndMeshEffect zzzz1(xxxx1);
+//ndMeshEffect* qqqqqqq = zzzz1.InverseConvexMeshIntersection(&zzzz0);
+
 	dVector pMin;
 	dVector pMax;
 	desc.m_outerShape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
@@ -94,51 +105,80 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 	for (ndMeshEffect* convexPart = convexVoronoiMesh->GetFirstLayer(); convexPart; convexPart = convexVoronoiMesh->GetNextLayer(convexPart))
 	{
 		rawConvexPieces.Append(convexPart);
-		break;
+		//break;
 	}
 	delete convexVoronoiMesh;
 
-//outerMesh.FlipWinding();
+	// clip to get all the pieces inside the outer shape
+	dList<ndMeshEffect*>::dListNode* nextNode;
+	for (dList<ndMeshEffect*>::dListNode* node = rawConvexPieces.GetFirst(); node; node = nextNode)
+	{
+		nextNode = node->GetNext();
+		ndMeshEffect* const convexElement = node->GetInfo();
+		ndMeshEffect* const fracturePiece = outerMesh.ConvexMeshIntersection(convexElement);
+		if (fracturePiece)
+		{
+			node->GetInfo() = fracturePiece;
+		}
+		else
+		{
+			rawConvexPieces.Remove(node);
+		}
+		delete convexElement;
+	}
+
+	// clip to get all the pieces outside the inner shape
+	for (dList<ndMeshEffect*>::dListNode* node = rawConvexPieces.GetFirst(); node; node = nextNode)
+	{
+		nextNode = node->GetNext();
+		ndMeshEffect* const convexElement = node->GetInfo();
+		ndMeshEffect* const fracturePiece = convexElement->InverseConvexMeshIntersection(&innerMesh);
+		if (fracturePiece)
+		{
+			//node->GetInfo() = fracturePiece;
+			for (ndMeshEffect* convexPart = fracturePiece->GetFirstLayer(); convexPart; convexPart = fracturePiece->GetNextLayer(convexPart))
+			{
+				rawConvexPieces.Addtop(convexPart);
+			}
+			delete fracturePiece;
+		}
+		rawConvexPieces.Remove(node);
+		delete convexElement;
+	}
 
 	dMatrix translateMatrix(dGetIdentityMatrix());
 	dFloat32 volume = dFloat32(outerMesh.CalculateVolume());
 	ndDemoEntityManager* const scene = manager->m_scene;
 	for (dList<ndMeshEffect*>::dListNode* node = rawConvexPieces.GetFirst(); node; node = node->GetNext())
 	{
-		ndMeshEffect* const debri = node->GetInfo();
-		//ndMeshEffect* const fracturePiece = outerMesh.ConvexMeshIntersection(debri);
-		ndMeshEffect* const fracturePiece = new ndMeshEffect(*debri);
-		if (fracturePiece)
+		ndMeshEffect* const fracturePiece = node->GetInfo();
+		ndShapeInstance* const fracturedCollision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
+		if (fracturedCollision)
 		{
-			ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
-			if (collision)
-			{
-				// we have a piece which has a convex collision  representation, add that to the list
-				ndAtom& atom = Append()->GetInfo();
-				atom.m_mesh = new ndDemoMesh("fracture", fracturePiece, scene->GetShaderCache());
+			// we have a piece which has a convex collision  representation, add that to the list
+			ndAtom& atom = Append()->GetInfo();
+			atom.m_mesh = new ndDemoMesh("fracture", fracturePiece, scene->GetShaderCache());
 
-				// get center of mass
-				dMatrix inertia(collision->CalculateInertia());
-				atom.m_centerOfMass = inertia.m_posit;
+			// get center of mass
+			dMatrix inertia(fracturedCollision->CalculateInertia());
+			atom.m_centerOfMass = inertia.m_posit;
 
-				// get the mass fraction;
-				dFloat32 debriVolume = collision->GetVolume();
-				atom.m_massFraction = debriVolume / volume;
+			// get the mass fraction;
+			dFloat32 debriVolume = fracturedCollision->GetVolume();
+			atom.m_massFraction = debriVolume / volume;
 
-				// set the collision shape
-				atom.m_collision = collision;
+			// set the collision shape
+			atom.m_collision = fracturedCollision;
 
-				// transform the mesh the center mass in order to get the 
-				//local inertia of this debri piece.
-				translateMatrix.m_posit = atom.m_centerOfMass.Scale(-1.0f);
-				translateMatrix.m_posit.m_w = 1.0f;
-				fracturePiece->ApplyTransform(translateMatrix);
-				ndShapeInstance* const inertiaShape = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
-				dMatrix momentOfInertia(inertiaShape->CalculateInertia());
-				atom.m_momentOfInertia = dVector(momentOfInertia[0][0], momentOfInertia[1][1], momentOfInertia[2][2], dFloat32(0.0f));
-				delete inertiaShape;
-			}
-			delete fracturePiece;
+			//transform the mesh the center mass in order to get the 
+			//local inertia of this debri piece.
+			translateMatrix.m_posit = atom.m_centerOfMass.Scale(-1.0f);
+			translateMatrix.m_posit.m_w = 1.0f;
+			fracturePiece->ApplyTransform(translateMatrix);
+			ndShapeInstance* const inertiaShape = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
+			dMatrix momentOfInertia(inertiaShape->CalculateInertia());
+			atom.m_momentOfInertia = dVector(momentOfInertia[0][0], momentOfInertia[1][1], momentOfInertia[2][2], dFloat32(0.0f));
+			delete inertiaShape;
 		}
 	}
 

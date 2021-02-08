@@ -2231,7 +2231,7 @@ void ndMeshEffect::EndBuildFace()
 				attibutes.m_binormalChannel.PushBack(m_attrib.m_binormalChannel[m_constructionIndex + i]);
 			}
 		
-			if (m_attrib.m_binormalChannel.GetCount())
+			if (m_attrib.m_colorChannel.GetCount())
 			{
 				attibutes.m_colorChannel.PushBack(m_attrib.m_colorChannel[m_constructionIndex + i]);
 			}
@@ -2241,9 +2241,9 @@ void ndMeshEffect::EndBuildFace()
 				attibutes.m_uv0Channel.PushBack(m_attrib.m_uv0Channel[m_constructionIndex + i]);
 			}
 		
-			if (attibutes.m_uv1Channel.GetCount())
+			if (m_attrib.m_uv1Channel.GetCount())
 			{
-				attibutes.m_uv1Channel.PushBack(attibutes.m_uv1Channel[m_constructionIndex + i]);
+				attibutes.m_uv1Channel.PushBack(m_attrib.m_uv1Channel[m_constructionIndex + i]);
 			}
 		}
 		
@@ -2252,8 +2252,8 @@ void ndMeshEffect::EndBuildFace()
 		polygon.EndFace();
 		polygon.Triangulate(&points.m_vertex[0].m_x, sizeof(dBigVector), nullptr);
 		
-		m_points.SetCount(m_constructionIndex);
-		m_attrib.SetCount(m_constructionIndex);
+		//m_points.SetCount(m_constructionIndex);
+		//m_attrib.SetCount(m_constructionIndex);
 		dInt32 mark = polygon.IncLRU();
 		dPolyhedra::Iterator iter(polygon);
 		for (iter.Begin(); iter; iter++) 
@@ -4033,7 +4033,6 @@ ndShapeInstance* ndMeshEffect::CreateConvexCollision(dFloat64 tolerance) const
 	dBigVector minBox;
 	dBigVector maxBox;
 	CalculateAABB(minBox, maxBox);
-	//dVector com ((minBox + maxBox).Scale (dFloat32 (0.5f)));
 	dVector com((minBox + maxBox) * dVector::m_half);
 	
 	dInt32 count = 0;
