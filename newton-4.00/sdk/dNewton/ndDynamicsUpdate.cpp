@@ -33,7 +33,7 @@ ndDynamicsUpdate::ndDynamicsUpdate(ndWorld* const world)
 	,m_bodyIslandOrder(D_DEFAULT_BUFFER_SIZE)
 	,m_internalForces(D_DEFAULT_BUFFER_SIZE)
 	,m_leftHandSide(D_DEFAULT_BUFFER_SIZE * 4)
-	,m_rightHandSide(D_DEFAULT_BUFFER_SIZE)
+	,m_rightHandSide(D_DEFAULT_BUFFER_SIZE * 4)
 	,m_world(world)
 	,m_timestep(dFloat32(0.0f))
 	,m_invTimestep(dFloat32(0.0f))
@@ -42,7 +42,6 @@ ndDynamicsUpdate::ndDynamicsUpdate(ndWorld* const world)
 	,m_timestepRK(dFloat32(0.0f))
 	,m_invTimestepRK(dFloat32(0.0f))
 	,m_solverPasses(0)
-	,m_maxRowsCount(0)
 	,m_activeJointCount(0)
 	,m_unConstrainedBodyCount(0)
 {
@@ -57,7 +56,7 @@ void ndDynamicsUpdate::Clear()
 {
 	m_islands.Resize(D_DEFAULT_BUFFER_SIZE);
 	m_leftHandSide.Resize(D_DEFAULT_BUFFER_SIZE * 4);
-	m_rightHandSide.Resize(D_DEFAULT_BUFFER_SIZE);
+	m_rightHandSide.Resize(D_DEFAULT_BUFFER_SIZE * 4);
 	m_internalForces.Resize(D_DEFAULT_BUFFER_SIZE);
 	m_bodyIslandOrder.Resize(D_DEFAULT_BUFFER_SIZE);
 }
@@ -155,7 +154,7 @@ void ndDynamicsUpdate::SortJoints()
 		}
 	}
 
-	dInt32 rowCount = 0;
+	//dInt32 rowCount = 0;
 	dInt32 currentActive = jointArray.GetCount();
 	for (dInt32 i = 0; i < currentActive; i++)
 	{
@@ -168,9 +167,9 @@ void ndDynamicsUpdate::SortJoints()
 			const dInt32 resting = (body0->m_equilibrium & body1->m_equilibrium) ? 1 : 0;
 			const dInt32 rows = joint->GetRowsCount();
 			joint->m_rowCount = rows;
-			joint->m_rowStart = rowCount;
-			rowCount += rows;
-			dAssert(rows > 0);
+			//joint->m_rowStart = rowCount;
+			//rowCount += rows;
+			//dAssert(rows > 0);
 
 			body0->m_bodyIsConstrained = 1;
 			body0->m_resting = body0->m_resting & resting;
@@ -229,7 +228,7 @@ void ndDynamicsUpdate::SortJoints()
 	}
 
 	dInt32 jointCountSpans[128];
-	m_leftHandSide.SetCount(m_leftHandSide.GetCount() + 1);
+	m_leftHandSide.SetCount(jointArray.GetCount() + 32);
 	ndConstraint** const sortBuffer = (ndConstraint**)&m_leftHandSide[0];
 	memset(jointCountSpans, 0, sizeof(jointCountSpans));
 
@@ -258,7 +257,7 @@ void ndDynamicsUpdate::SortJoints()
 		acc += val;
 	}
 
-	m_activeJointCount = activeJointCount;
+	dInt32 rowCount = 0;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = sortBuffer[i];
@@ -273,7 +272,14 @@ void ndDynamicsUpdate::SortJoints()
 		const dInt32 entry = jointCountSpans[key.m_value];
 		jointArray[entry] = joint;
 		jointCountSpans[key.m_value] = entry + 1;
+
+		joint->m_rowStart = rowCount;
+		rowCount += joint->m_rowCount;
 	}
+
+	m_activeJointCount = activeJointCount;
+	m_leftHandSide.SetCount(rowCount);
+	m_rightHandSide.SetCount(rowCount);
 
 	#ifdef _DEBUG
 	for (dInt32 i = 1; i < m_activeJointCount; i++)
@@ -284,6 +290,7 @@ void ndDynamicsUpdate::SortJoints()
 		dAssert(!(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting));
 		dAssert(!(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting));
 	}
+
 	for (dInt32 i = m_activeJointCount + 1; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint0 = jointArray[i - 1];
@@ -485,10 +492,6 @@ void ndDynamicsUpdate::InitWeights()
 		dAssert(body0->GetInvMass() != dFloat32(0.0f));
 		extraPasses = dMax(body0->m_weigh, extraPasses);
 	}
-
-	m_maxRowsCount = maxRowCount;
-	m_leftHandSide.SetCount(maxRowCount);
-	m_rightHandSide.SetCount(maxRowCount);
 
 	const dInt32 conectivity = 7;
 	m_solverPasses = m_world->GetSolverIterations() + 2 * dInt32(extraPasses) / conectivity + 1;

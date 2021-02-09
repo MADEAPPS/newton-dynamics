@@ -148,7 +148,6 @@ class ndDynamicsUpdate: public dClassAlloc
 	dFloat32 m_timestepRK;
 	dFloat32 m_invTimestepRK;
 	dUnsigned32 m_solverPasses;
-	dUnsigned32 m_maxRowsCount;
 	dInt32 m_activeJointCount;
 	dInt32 m_unConstrainedBodyCount;
 

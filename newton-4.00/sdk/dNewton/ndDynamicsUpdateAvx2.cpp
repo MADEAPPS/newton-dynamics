@@ -50,7 +50,8 @@ void ndDynamicsUpdateAvx2::Update()
 	{
 		IntegrateUnconstrainedBodies();
 		InitWeights();
-		InitBodyArray();
+
+  		InitBodyArray();
 		InitJacobianMatrix();
 		CalculateForces();
 		DetermineSleepStates();
@@ -444,7 +445,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	ndConstraint** const jointPtr = &jointArray[0];
 
 	dInt32 jointCountSpans[128];
-	m_leftHandSide.SetCount(m_leftHandSide.GetCount() + 1);
+	m_leftHandSide.SetCount(jointArray.GetCount() + 32);
 	ndConstraint** const sortBuffer = (ndConstraint**)&m_leftHandSide[0];
 	memset(jointCountSpans, 0, sizeof(jointCountSpans));
 
@@ -473,6 +474,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		acc += val;
 	}
 
+	dInt32 rowCount = 0;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = sortBuffer[i];
@@ -487,8 +489,13 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		const dInt32 entry = jointCountSpans[key.m_value];
 		jointArray[entry] = joint;
 		jointCountSpans[key.m_value] = entry + 1;
+
+		joint->m_rowStart = rowCount;
+		rowCount += joint->m_rowCount;
 	}
 	m_activeJointCount = activeJointCount;
+	m_leftHandSide.SetCount(rowCount);
+	m_rightHandSide.SetCount(rowCount);
 
 	#ifdef _DEBUG
 	for (dInt32 i = 1; i < m_activeJointCount; i++)
@@ -550,13 +557,15 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	}
 	m_soaMassMatrix.SetCount(soaJointRowCount);
 
-	dInt32 rowCount = 0;
-	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
-	{
-		ndConstraint* const joint = jointArray[i];
-		joint->m_rowStart = rowCount;
-		rowCount += joint->m_rowCount;
-	}
+	//dInt32 rowCount = 0;
+	//for (dInt32 i = 0; i < jointArray.GetCount(); i++)
+	//{
+	//	ndConstraint* const joint = jointArray[i];
+	//	joint->m_rowStart = rowCount;
+	//	rowCount += joint->m_rowCount;
+	//}
+	//m_leftHandSide.SetCount(rowCount);
+	//m_rightHandSide.SetCount(rowCount);
 
 	#ifdef _DEBUG
 	for (dInt32 i = 0; i < jointCount; i += D_SOA_WORD_GROUP_SIZE)
@@ -792,14 +801,12 @@ void ndDynamicsUpdateAvx2::InitWeights()
 	const dInt32 buffersCount = dMax(scene->GetThreadCount(), 1) + 1;
 	m_internalForces.SetCount(bodyCount * buffersCount);
 
-	dUnsigned32 maxRowCount = 0;
 	dFloat32 extraPasses = dFloat32(1.0f);
 	for (dInt32 i = constraintArray.GetCount() - 1; i >= 0; i--)
 	{
 		ndConstraint* const constraint = constraintArray[i];
 		ndBodyKinematic* const body0 = constraint->GetBody0();
 		ndBodyKinematic* const body1 = constraint->GetBody1();
-		maxRowCount += constraint->GetRowsCount();
 
 		if (body1->GetInvMass() == dFloat32(0.0f))
 		{
@@ -815,10 +822,6 @@ void ndDynamicsUpdateAvx2::InitWeights()
 		dAssert(body0->GetInvMass() != dFloat32(0.0f));
 		extraPasses = dMax(body0->m_weigh, extraPasses);
 	}
-
-	m_maxRowsCount = maxRowCount;
-	m_leftHandSide.SetCount(maxRowCount);
-	m_rightHandSide.SetCount(maxRowCount);
 
 	const dInt32 conectivity = 7;
 	m_solverPasses = m_world->GetSolverIterations() + 2 * dInt32(extraPasses) / conectivity + 1;
