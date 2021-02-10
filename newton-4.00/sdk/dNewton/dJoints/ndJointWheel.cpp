@@ -63,7 +63,7 @@ void ndJointWheel::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc
 		SetLowerFriction(desc, dFloat32 (0.0f));
 
 		dFloat32 accel = GetMotorZeroAcceleration(desc);
-		accel += accel * dFloat32(0.1f);
+		accel = accel + dSign(accel) * dFloat32(0.15f) * desc.m_invTimestep;
 		SetMotorAcceleration(desc, accel);
 	}
 	else if (x > m_info.m_maxLimit)
@@ -73,7 +73,7 @@ void ndJointWheel::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc
 		SetHighFriction(desc, dFloat32(0.0f));
 
 		dFloat32 accel = GetMotorZeroAcceleration(desc);
-		accel += accel * dFloat32(0.1f);
+		accel = accel + dSign(accel) * dFloat32 (0.15f) * desc.m_invTimestep;
 		SetMotorAcceleration(desc, accel);
 	}
 	else 
