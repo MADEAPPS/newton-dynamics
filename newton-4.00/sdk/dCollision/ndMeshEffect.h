@@ -134,7 +134,7 @@ class ndMeshEffect: public dPolyhedra
 
 	//bool PlaneClip (const dBigPlane& plane);
 
-	void Triangulate ();
+	
 	
 	dInt32 GetVertexBaseCount() const;
 	void SetVertexBaseCount(dInt32 count);
@@ -441,6 +441,7 @@ class ndMeshEffect: public dPolyhedra
 	
 	D_COLLISION_API void FlipWinding();
 	D_COLLISION_API bool HasOpenEdges() const;
+	D_COLLISION_API void Triangulate();
 	D_COLLISION_API void ConvertToPolygons();
 	D_COLLISION_API dEdge* InsertEdgeVertex(dEdge* const edge, dFloat64 param);
 	D_COLLISION_API void AddInterpolatedEdgeAttribute(dEdge* const edge, dFloat64 param);

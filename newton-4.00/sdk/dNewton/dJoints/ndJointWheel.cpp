@@ -62,10 +62,6 @@ void ndJointWheel::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_up);
 		SetLowerFriction(desc, dFloat32 (0.0f));
 
-		//dFloat32 accel = GetMotorZeroAcceleration(desc);
-		//accel = accel + dSign(accel) * dFloat32(0.15f) * desc.m_invTimestep;
-		//SetMotorAcceleration(desc, accel);
-
 		dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		stopAccel = stopAccel + dSign(stopAccel) * dFloat32(0.1f) * desc.m_invTimestep;
 		dFloat32 springAccel = CalculateSpringDamperAcceleration(desc.m_timestep, m_info.m_springK, m_posit, m_info.m_damperC, m_speed);
@@ -77,7 +73,6 @@ void ndJointWheel::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc
 		{
 			SetMotorAcceleration(desc, springAccel);
 		}
-
 	}
 	else if (x > m_info.m_maxLimit)
 	{

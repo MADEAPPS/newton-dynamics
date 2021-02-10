@@ -983,79 +983,8 @@ void ndMeshEffect::Trace() const
 	*/
 };
 
-void ndMeshEffect::Triangulate()
-{
-	/*
-		dInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
-		dInt64	userData[DG_MESH_EFFECT_POINT_SPLITED];
-		dPolyhedra polygon(GetAllocator());
-		polygon.BeginFace();
-		dInt32 mark = IncLRU();
-		dPolyhedra::Iterator iter1 (*this);
-		for (iter1.Begin(); iter1; iter1 ++) {
-			dEdge* const face = &iter1.GetNode()->GetInfo();
-			if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {
-				dEdge* ptr = face;
-				dInt32 indexCount = 0;
-				do {
-					index[indexCount] = dInt32 (ptr->m_userData);
-					userData[indexCount] = ptr->m_incidentVertex;
-					ptr->m_mark = mark;
-					indexCount ++;
-					ptr = ptr->m_next;
-				} while (ptr != face);
-				polygon.AddFace(indexCount, index, userData);
-			}
-		}
-		polygon.EndFace();
-
-		dPolyhedra leftOversOut(GetAllocator());
-		polygon.Triangulate(&m_points.m_vertex[0].m_x, sizeof (dBigVector), &leftOversOut);
-		dAssert (leftOversOut.GetCount() == 0);
-
-		SetLRU (0);
-		RemoveAll();
-		BeginFace();
-		mark = polygon.IncLRU();
-		dPolyhedra::Iterator iter (polygon);
-		for (iter.Begin(); iter; iter ++){
-			dEdge* const face = &iter.GetNode()->GetInfo();
-			if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {
-				dEdge* ptr = face;
-				dInt32 indexCount = 0;
-				do {
-					ptr->m_mark = mark;
-					index[indexCount] = dInt32 (ptr->m_userData);
-					userData[indexCount] = ptr->m_incidentVertex;
-					indexCount ++;
-					ptr = ptr->m_next;
-				} while (ptr != face);
-				AddFace(indexCount, index, userData);
-			}
-		}
-		EndFace();
-	*/
-	UnpackPoints();
-	dPolyhedra leftOversOut(GetAllocator());
-	dPolyhedra::Triangulate(&m_points.m_vertex[0].m_x, sizeof(dBigVector), &leftOversOut);
-	dAssert(leftOversOut.GetCount() == 0);
-
-	dPolyhedra::Iterator iter(*this);
-	for (iter.Begin(); iter; iter++) {
-		dEdge* const edge = &iter.GetNode()->GetInfo();
-		edge->m_userData = (edge->m_incidentFace) > 0 ? edge->m_incidentVertex : 0;
-	}
-	PackPoints(dFloat32(1.0e-24f));
-
-	RepairTJoints();
-	dAssert(Sanity());
-}
-
-
-
 void ndMeshEffect::OptimizePoints()
 {
-
 }
 
 void ndMeshEffect::OptimizeAttibutes()
@@ -3003,7 +2932,6 @@ void ndMeshEffect::UnpackAttibuteData()
 	dAssert(m_attrib.m_pointChannel.GetCount() == attributeCount);
 }
 
-
 bool ndMeshEffect::SeparateDuplicateLoops(dEdge* const face)
 {
 	for (dEdge* ptr0 = face; ptr0 != face->m_prev; ptr0 = ptr0->m_next)
@@ -3712,11 +3640,11 @@ void ndMeshEffect::MergeFaces(const ndMeshEffect* const source)
 	dPolyhedra::Iterator iter(*source);
 	for (iter.Begin(); iter; iter++) 
 	{
-		dEdge* const edge = &(*iter);
-		if ((edge->m_incidentFace > 0) && (edge->m_mark < mark)) 
+		dEdge* const face = &(*iter);
+		if ((face->m_incidentFace > 0) && (face->m_mark < mark)) 
 		{
 			BeginBuildFace();
-			dEdge* ptr = edge;
+			dEdge* ptr = face;
 			do {
 				ptr->m_mark = mark;
 				dInt32 vIndex = ptr->m_incidentVertex;
@@ -3757,8 +3685,15 @@ void ndMeshEffect::MergeFaces(const ndMeshEffect* const source)
 					AddUV1(source->m_attrib.m_uv1Channel[aIndex].m_u, source->m_attrib.m_uv1Channel[aIndex].m_v);
 				}
 				ptr = ptr->m_next;
-			} while (ptr != edge);
+			} while (ptr != face);
 			EndBuildFace();
+
+			dInt32 materialIndex = source->m_attrib.m_materialChannel[dInt32(face->m_userData)];
+			if (materialIndex >= m_materials.GetCount())
+			{ 
+				m_materials.SetCount(materialIndex + 1);
+				m_materials[materialIndex] = source->m_materials[materialIndex];
+			}
 		}
 	}
 }
@@ -4093,6 +4028,75 @@ void ndMeshEffect::ConvertToPolygons()
 	dAssert(Sanity());
 }
 
+void ndMeshEffect::Triangulate()
+{
+/*	
+	dInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
+	dInt64	userData[DG_MESH_EFFECT_POINT_SPLITED];
+	dPolyhedra polygon(GetAllocator());
+	polygon.BeginFace();
+	dInt32 mark = IncLRU();
+	dPolyhedra::Iterator iter1(*this);
+	for (iter1.Begin(); iter1; iter1++) {
+		dEdge* const face = &iter1.GetNode()->GetInfo();
+		if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {
+			dEdge* ptr = face;
+			dInt32 indexCount = 0;
+			do {
+				index[indexCount] = dInt32(ptr->m_userData);
+				userData[indexCount] = ptr->m_incidentVertex;
+				ptr->m_mark = mark;
+				indexCount++;
+				ptr = ptr->m_next;
+			} while (ptr != face);
+			polygon.AddFace(indexCount, index, userData);
+		}
+	}
+	polygon.EndFace();
+
+	dPolyhedra leftOversOut(GetAllocator());
+	polygon.Triangulate(&m_points.m_vertex[0].m_x, sizeof(dBigVector), &leftOversOut);
+	dAssert(leftOversOut.GetCount() == 0);
+
+	SetLRU(0);
+	RemoveAll();
+	BeginFace();
+	mark = polygon.IncLRU();
+	dPolyhedra::Iterator iter(polygon);
+	for (iter.Begin(); iter; iter++) {
+		dEdge* const face = &iter.GetNode()->GetInfo();
+		if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {
+			dEdge* ptr = face;
+			dInt32 indexCount = 0;
+			do {
+				ptr->m_mark = mark;
+				index[indexCount] = dInt32(ptr->m_userData);
+				userData[indexCount] = ptr->m_incidentVertex;
+				indexCount++;
+				ptr = ptr->m_next;
+			} while (ptr != face);
+			AddFace(indexCount, index, userData);
+		}
+	}
+	EndFace();
+*/	
+
+	UnpackPoints();
+	dPolyhedra leftOversOut;
+	dPolyhedra::Triangulate(&m_points.m_vertex[0].m_x, sizeof(dBigVector), &leftOversOut);
+	dAssert(leftOversOut.GetCount() == 0);
+
+	dPolyhedra::Iterator iter(*this);
+	for (iter.Begin(); iter; iter++) 
+	{
+		dEdge* const edge = &iter.GetNode()->GetInfo();
+		edge->m_userData = (edge->m_incidentFace) > 0 ? edge->m_incidentVertex : 0;
+	}
+	PackPoints(dFloat32(1.0e-24f));
+
+	RepairTJoints();
+	dAssert(Sanity());
+}
 
 bool ndMeshEffect::HasOpenEdges() const
 {

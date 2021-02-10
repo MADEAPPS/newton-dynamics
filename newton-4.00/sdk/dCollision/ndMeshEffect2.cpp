@@ -1227,6 +1227,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const dArray<dVecto
 				ndMeshEffect convexMesh(&pointArray[0].m_x, count1, sizeof(dBigVector), dFloat64(0.0f));
 				if (convexMesh.GetCount()) 
 				{
+					convexMesh.m_materials.SetCount(interiorMaterialIndex + 1);
 					convexMesh.CalculateNormals(normalAngleInRadians);
 					convexMesh.UniformBoxMapping(interiorMaterialIndex, textureProjectionMatrix);
 					for (dInt32 i = 0; i < convexMesh.m_points.m_vertex.GetCount(); i++) 

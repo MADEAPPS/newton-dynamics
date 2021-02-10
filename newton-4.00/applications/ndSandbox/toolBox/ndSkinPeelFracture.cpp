@@ -140,7 +140,6 @@ xxx++;
 		ndMeshEffect* const fracturePiece = convexElement->InverseConvexMeshIntersection(&innerMesh);
 		if (fracturePiece)
 		{
-			//node->GetInfo() = fracturePiece;
 			for (ndMeshEffect* convexPart = fracturePiece->GetFirstLayer(); convexPart; convexPart = fracturePiece->GetNextLayer(convexPart))
 			{
 				rawConvexPieces.Addtop(convexPart);

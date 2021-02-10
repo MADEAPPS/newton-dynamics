@@ -1214,9 +1214,10 @@ ndMeshEffect* ndMeshEffect::InverseConvexMeshIntersection(const ndMeshEffect* co
 	concaveMesh.ConvertToPolygons();
 
 	ndMeshEffect convexMesh(concaveMesh);
-
-	ndMeshEffect* mergedOutput = nullptr;
 	ndMeshEffect* intersection = new ndMeshEffect(*this);
+
+	ndMeshEffect* const mergedOutput = new ndMeshEffect;
+	mergedOutput->BeginBuild();
 
 	dInt32 layer = 0;
 	for (dInt32 i = 0; i < intersection->m_points.m_vertex.GetCount(); i++)
@@ -1243,15 +1244,10 @@ ndMeshEffect* ndMeshEffect::InverseConvexMeshIntersection(const ndMeshEffect* co
 			dInt32 clipCode = clipTest.PlaneClip(concaveMesh, concaveFace);
 			if (clipCode <= 0)
 			{
-				if (!mergedOutput)
-				{
-					mergedOutput = new ndMeshEffect(clipTest);
-				}
-				else
-				{
-					mergedOutput->MergeFaces(&clipTest);
-				}
+				clipTest.Triangulate();
+				mergedOutput->MergeFaces(&clipTest);
 
+				layer++;
 				if (clipCode < 0)
 				{
 					break;
@@ -1278,8 +1274,7 @@ ndMeshEffect* ndMeshEffect::InverseConvexMeshIntersection(const ndMeshEffect* co
 				delete intersection;
 				clipTest1.PlaneClip(convexMesh, edge);
 				intersection = new ndMeshEffect(clipTest1);
-
-				layer++;
+				
 				for (dInt32 i = 0; i < intersection->m_points.m_vertex.GetCount(); i++)
 				{
 					intersection->m_points.m_layers[i] = layer;
@@ -1289,10 +1284,14 @@ ndMeshEffect* ndMeshEffect::InverseConvexMeshIntersection(const ndMeshEffect* co
 	}
 	
 	delete intersection;
-	if (mergedOutput)
+	mergedOutput->EndBuild(dFloat64(1.0e-8f), false);
+
+	if (!layer)
 	{
-		mergedOutput->RemoveUnusedVertices(nullptr);
+		delete mergedOutput;
+		return nullptr;
 	}
+	mergedOutput->RemoveUnusedVertices(nullptr);
 	return mergedOutput;
 }
 
