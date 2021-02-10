@@ -98,8 +98,10 @@ void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& des
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
 		SetLowerFriction(desc, dFloat32 (0.0f));
 
-		const dFloat32 springAccel = CalculateSpringDamperAcceleration(desc.m_timestep, m_springK, m_posit, m_damperC, m_speed);
-		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc) + springAccel;
+		//const dFloat32 springAccel = CalculateSpringDamperAcceleration(desc.m_timestep, m_springK, m_posit, m_damperC, m_speed);
+		//const dFloat32 stopAccel = GetMotorZeroAcceleration(desc) + springAccel;
+		dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		stopAccel += stopAccel * dFloat32(0.1f);
 		SetMotorAcceleration(desc, stopAccel);
 	}
 	else if (x > m_maxLimit)
@@ -108,8 +110,10 @@ void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& des
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
 		SetHighFriction(desc, dFloat32(0.0f));
 
-		const dFloat32 springAccel = CalculateSpringDamperAcceleration(desc.m_timestep, m_springK, m_posit, m_damperC, m_speed);
-		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc) + springAccel;
+		//const dFloat32 springAccel = CalculateSpringDamperAcceleration(desc.m_timestep, m_springK, m_posit, m_damperC, m_speed);
+		//const dFloat32 stopAccel = GetMotorZeroAcceleration(desc) + springAccel;
+		dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		stopAccel += stopAccel * dFloat32(0.1f);
 		SetMotorAcceleration(desc, stopAccel);
 	}
 	else 
