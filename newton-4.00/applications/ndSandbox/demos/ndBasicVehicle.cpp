@@ -21,10 +21,7 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
-
-
-
-
+#include "ndBasicPlayerCapsule.h"
 
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
@@ -424,7 +421,21 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene);
 
-	dVector location(0.0f, 0.5f, 0.0f, 1.0f);
+	dMatrix location0(dGetIdentityMatrix());
+	location0.m_posit.m_y += 2.0f;
+	location0.m_posit.m_z += 2.0f;
+	dMatrix localAxis(dGetIdentityMatrix());
+	localAxis[0] = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+	localAxis[1] = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
+	dFloat32 height = 1.9f;
+	dFloat32 radio = 0.5f;
+	dFloat32 mass = 100.0f;
+
+	new ndBasicPlayerCapsule(scene, localAxis, location0, mass, radio, height, height / 4.0f, true);
+
+	//dVector location(0.0f, 0.5f, 0.0f, 1.0f);
+	dVector location(0.0f, 6.0f, 0.0f, 1.0f);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = location;

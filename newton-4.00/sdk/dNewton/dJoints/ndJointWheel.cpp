@@ -58,17 +58,14 @@ void ndJointWheel::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc
 	dFloat32 x = m_posit + m_speed * desc.m_timestep;
 	if (x < m_info.m_minLimit)
 	{
-		//dVector p1(matrix1.m_posit + matrix1.m_up.Scale(m_info.m_minLimit));
-		//AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_up);
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 
 		dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-		stopAccel = stopAccel + dSign(stopAccel) * dFloat32(0.1f) * desc.m_invTimestep;
 		dFloat32 springAccel = CalculateSpringDamperAcceleration(desc.m_timestep, m_info.m_springK, m_posit, m_info.m_damperC, m_speed);
 		if (dAbs(stopAccel) > dAbs(springAccel))
 		{
 			SetLowerFriction(desc, dFloat32(0.0f));
-			SetMotorAcceleration(desc, stopAccel);
+			SetMotorAcceleration(desc, dClamp (stopAccel, dFloat32 (-100.0f), dFloat32(100.0f)));
 		}
 		else
 		{
@@ -77,17 +74,14 @@ void ndJointWheel::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc
 	}
 	else if (x > m_info.m_maxLimit)
 	{
-		//dVector p1(matrix1.m_posit + matrix1.m_up.Scale(m_info.m_maxLimit));
-		//AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_up);
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 
 		dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-		stopAccel = stopAccel + dSign(stopAccel) * dFloat32 (0.1f) * desc.m_invTimestep;
 		dFloat32 springAccel = CalculateSpringDamperAcceleration(desc.m_timestep, m_info.m_springK, m_posit, m_info.m_damperC, m_speed);
 		if (dAbs(stopAccel) > dAbs(springAccel))
 		{
 			SetHighFriction(desc, dFloat32(0.0f));
-			SetMotorAcceleration(desc, stopAccel);
+			SetMotorAcceleration(desc, dClamp(stopAccel, dFloat32(-100.0f), dFloat32(100.0f)));
 		}
 		else
 		{
