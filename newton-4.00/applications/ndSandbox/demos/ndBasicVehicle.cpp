@@ -61,10 +61,10 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);
 
-	//const dInt32 n = 1;
-	//const dInt32 stackHigh = 1;
-	const dInt32 n = 2;
-	const dInt32 stackHigh = 7;
+	const dInt32 n = 1;
+	const dInt32 stackHigh = 1;
+	//const dInt32 n = 2;
+	//const dInt32 stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)
@@ -432,7 +432,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	dFloat32 radio = 0.5f;
 	dFloat32 mass = 100.0f;
 
-	new ndBasicPlayerCapsule(scene, localAxis, location0, mass, radio, height, height / 4.0f, true);
+	//new ndBasicPlayerCapsule(scene, localAxis, location0, mass, radio, height, height / 4.0f, true);
 
 	//dVector location(0.0f, 0.5f, 0.0f, 1.0f);
 	dVector location(0.0f, 6.0f, 0.0f, 1.0f);
@@ -446,7 +446,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 
 	scene->Set2DDisplayRenderFunction(nullptr, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
-//AddCapsulesStacks(scene, location);
+	AddCapsulesStacks(scene, location);
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
