@@ -446,7 +446,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 
 	scene->Set2DDisplayRenderFunction(nullptr, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
-	AddCapsulesStacks(scene, location);
+	//AddCapsulesStacks(scene, location);
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
