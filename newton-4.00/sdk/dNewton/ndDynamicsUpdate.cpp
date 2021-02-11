@@ -33,7 +33,7 @@ ndDynamicsUpdate::ndDynamicsUpdate(ndWorld* const world)
 	,m_bodyIslandOrder(D_DEFAULT_BUFFER_SIZE)
 	,m_internalForces(D_DEFAULT_BUFFER_SIZE)
 	,m_leftHandSide(D_DEFAULT_BUFFER_SIZE * 4)
-	,m_rightHandSide(D_DEFAULT_BUFFER_SIZE * 4)
+	,m_rightHandSide(D_DEFAULT_BUFFER_SIZE)
 	,m_world(world)
 	,m_timestep(dFloat32(0.0f))
 	,m_invTimestep(dFloat32(0.0f))
@@ -56,27 +56,9 @@ void ndDynamicsUpdate::Clear()
 {
 	m_islands.Resize(D_DEFAULT_BUFFER_SIZE);
 	m_leftHandSide.Resize(D_DEFAULT_BUFFER_SIZE * 4);
-	m_rightHandSide.Resize(D_DEFAULT_BUFFER_SIZE * 4);
+	m_rightHandSide.Resize(D_DEFAULT_BUFFER_SIZE);
 	m_internalForces.Resize(D_DEFAULT_BUFFER_SIZE);
 	m_bodyIslandOrder.Resize(D_DEFAULT_BUFFER_SIZE);
-}
-
-void ndDynamicsUpdate::Update()
-{
-	m_timestep = m_world->GetScene()->GetTimestep();
-
-	BuildIsland();
-	if (m_islands.GetCount())
-	{
-		IntegrateUnconstrainedBodies();
-	
-		InitWeights();
-		InitBodyArray();
-		InitJacobianMatrix();
-		CalculateForces();
-	
-		DetermineSleepStates();
-	}
 }
 
 dInt32 ndDynamicsUpdate::CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const context)
@@ -258,6 +240,7 @@ void ndDynamicsUpdate::SortJoints()
 	}
 
 	dInt32 rowCount = 0;
+	m_activeJointCount = activeJointCount;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = sortBuffer[i];
@@ -276,29 +259,37 @@ void ndDynamicsUpdate::SortJoints()
 		joint->m_rowStart = rowCount;
 		rowCount += joint->m_rowCount;
 	}
-
-	m_activeJointCount = activeJointCount;
+	
 	m_leftHandSide.SetCount(rowCount);
 	m_rightHandSide.SetCount(rowCount);
 
 	#ifdef _DEBUG
-	for (dInt32 i = 1; i < m_activeJointCount; i++)
-	{
-		ndConstraint* const joint0 = jointArray[i - 1];
-		ndConstraint* const joint1 = jointArray[i - 0];
-		dAssert(joint0->m_rowCount >= joint1->m_rowCount);
-		dAssert(!(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting));
-		dAssert(!(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting));
-	}
+		dAssert(m_activeJointCount <= jointArray.GetCount());
+		const dInt32 maxRowCount = m_leftHandSide.GetCount();
+		for (dInt32 i = 0; i < jointArray.GetCount(); i++)
+		{
+			ndConstraint* const joint = jointArray[i];
+			dAssert(joint->m_rowStart < m_leftHandSide.GetCount());
+			dAssert((joint->m_rowStart + joint->m_rowCount) <= rowCount);
+		}
 
-	for (dInt32 i = m_activeJointCount + 1; i < jointArray.GetCount(); i++)
-	{
-		ndConstraint* const joint0 = jointArray[i - 1];
-		ndConstraint* const joint1 = jointArray[i - 0];
-		dAssert(joint0->m_rowCount >= joint1->m_rowCount);
-		dAssert(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting);
-		dAssert(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting);
-	}
+		for (dInt32 i = 1; i < m_activeJointCount; i++)
+		{
+			ndConstraint* const joint0 = jointArray[i - 1];
+			ndConstraint* const joint1 = jointArray[i - 0];
+			dAssert(joint0->m_rowCount >= joint1->m_rowCount);
+			dAssert(!(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting));
+			dAssert(!(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting));
+		}
+
+		for (dInt32 i = m_activeJointCount + 1; i < jointArray.GetCount(); i++)
+		{
+			ndConstraint* const joint0 = jointArray[i - 1];
+			ndConstraint* const joint1 = jointArray[i - 0];
+			dAssert(joint0->m_rowCount >= joint1->m_rowCount);
+			dAssert(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting);
+			dAssert(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting);
+		}
 	#endif
 }
 
@@ -1696,5 +1687,20 @@ void ndDynamicsUpdate::CalculateForces()
 	IntegrateBodies();
 }
 
+void ndDynamicsUpdate::Update()
+{
+	m_timestep = m_world->GetScene()->GetTimestep();
 
+	BuildIsland();
+	if (m_islands.GetCount())
+	{
+		IntegrateUnconstrainedBodies();
 
+		InitWeights();
+		InitBodyArray();
+		InitJacobianMatrix();
+		CalculateForces();
+
+		DetermineSleepStates();
+	}
+}

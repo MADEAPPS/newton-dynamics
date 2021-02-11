@@ -59,17 +59,6 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 	,m_shape(new ndShapeInstance(*desc.m_outerShape))
 	,m_breakImpactSpeed(desc.m_breakImpactSpeed)
 {
-ndShapeInstance xxxx0(new ndShapeBox(2.0, 2.0, 2.0));
-dMatrix xxxxxxx(dGetIdentityMatrix());
-xxxxxxx.m_posit.m_x = 1.0f;
-xxxxxxx.m_posit.m_z = 1.0f;
-xxxx0.SetLocalMatrix(xxxxxxx);
-
-//ndShapeInstance xxxx1(new ndShapeBox(1.0, 1.0, 1.0));
-//ndMeshEffect zzzz0(xxxx0);
-//ndMeshEffect zzzz1(xxxx1);
-//ndMeshEffect* qqqqqqq = zzzz1.InverseConvexMeshIntersection(&zzzz0);
-
 	dVector pMin;
 	dVector pMax;
 	desc.m_outerShape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
@@ -102,15 +91,15 @@ xxxx0.SetLocalMatrix(xxxxxxx);
 	ndMeshEffect* const convexVoronoiMesh = outerMesh.CreateVoronoiConvexDecomposition(desc.m_pointCloud, 1, &textureMatrix[0][0]);
 	
 	dList<ndMeshEffect*> rawConvexPieces;
-int xxx = 0;
+//int xxx = 0;
 	for (ndMeshEffect* convexPart = convexVoronoiMesh->GetFirstLayer(); convexPart; convexPart = convexVoronoiMesh->GetNextLayer(convexPart))
 	{
-		if (xxx == 4) 
+//		if (xxx == 5) 
 		{
 			rawConvexPieces.Append(convexPart);
-			break;
+//			break;
 		}
-xxx++;
+//xxx++;
 	}
 	delete convexVoronoiMesh;
 

@@ -3638,6 +3638,7 @@ void ndMeshEffect::MergeFaces(const ndMeshEffect* const source)
 {
 	dInt32 mark = source->IncLRU();
 	dPolyhedra::Iterator iter(*source);
+	dInt32 maxMatIndex = 0;
 	for (iter.Begin(); iter; iter++) 
 	{
 		dEdge* const face = &(*iter);
@@ -3657,7 +3658,9 @@ void ndMeshEffect::MergeFaces(const ndMeshEffect* const source)
 	
 				if (source->m_attrib.m_materialChannel.GetCount()) 
 				{
-					AddMaterial(source->m_attrib.m_materialChannel[aIndex]);
+					dInt32 matIndex = source->m_attrib.m_materialChannel[aIndex];
+					maxMatIndex = dMax(matIndex, maxMatIndex);
+					AddMaterial(matIndex);
 				}
 
 				if (source->m_attrib.m_colorChannel.GetCount())
@@ -3687,14 +3690,12 @@ void ndMeshEffect::MergeFaces(const ndMeshEffect* const source)
 				ptr = ptr->m_next;
 			} while (ptr != face);
 			EndBuildFace();
-
-			dInt32 materialIndex = source->m_attrib.m_materialChannel[dInt32(face->m_userData)];
-			if (materialIndex >= m_materials.GetCount())
-			{ 
-				m_materials.SetCount(materialIndex + 1);
-				m_materials[materialIndex] = source->m_materials[materialIndex];
-			}
 		}
+	}
+
+	for (dInt32 i = m_materials.GetCount(); i <= maxMatIndex; i++)
+	{
+		m_materials.PushBack(source->m_materials[i]);
 	}
 }
 

@@ -50,7 +50,6 @@ void ndDynamicsUpdateAvx2::Update()
 	{
 		IntegrateUnconstrainedBodies();
 		InitWeights();
-
   		InitBodyArray();
 		InitJacobianMatrix();
 		CalculateForces();
@@ -557,27 +556,26 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	}
 	m_soaMassMatrix.SetCount(soaJointRowCount);
 
-	//dInt32 rowCount = 0;
-	//for (dInt32 i = 0; i < jointArray.GetCount(); i++)
-	//{
-	//	ndConstraint* const joint = jointArray[i];
-	//	joint->m_rowStart = rowCount;
-	//	rowCount += joint->m_rowCount;
-	//}
-	//m_leftHandSide.SetCount(rowCount);
-	//m_rightHandSide.SetCount(rowCount);
-
 	#ifdef _DEBUG
-	for (dInt32 i = 0; i < jointCount; i += D_SOA_WORD_GROUP_SIZE)
-	{
-		const dInt32 count = jointPtr[i + D_SOA_WORD_GROUP_SIZE - 1] ? D_SOA_WORD_GROUP_SIZE : jointCount - i;
-		for (dInt32 j = 1; j < count; j++)
+		dAssert(jointArray.GetCount() == jointCount);
+		const dInt32 maxRowCount = m_leftHandSide.GetCount();
+		for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 		{
-			ndConstraint* const joint0 = jointArray[i + j - 1];
-			ndConstraint* const joint1 = jointArray[i + j - 0];
-			dAssert(joint0->m_rowCount >= joint1->m_rowCount);
+			ndConstraint* const joint = jointArray[i];
+			dAssert(joint->m_rowStart < m_leftHandSide.GetCount());
+			dAssert((joint->m_rowStart + joint->m_rowCount) <= maxRowCount);
 		}
-	}
+
+		for (dInt32 i = 0; i < jointCount; i += D_SOA_WORD_GROUP_SIZE)
+		{
+			const dInt32 count = jointPtr[i + D_SOA_WORD_GROUP_SIZE - 1] ? D_SOA_WORD_GROUP_SIZE : jointCount - i;
+			for (dInt32 j = 1; j < count; j++)
+			{
+				ndConstraint* const joint0 = jointArray[i + j - 1];
+				ndConstraint* const joint1 = jointArray[i + j - 0];
+				dAssert(joint0->m_rowCount >= joint1->m_rowCount);
+			}
+		}
 	#endif
 }
 
