@@ -328,7 +328,18 @@ void ndSkinPeelFracture::UpdateEffect(ndWorld* const world, ndEffect& effect)
 		world->AddBody(body);
 
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+
 		body->SetMatrix(matrix);
+
+dVector xxx (center - matrix.m_posit);
+xxx.m_w = 0.0f;
+dVector dir(xxx.Normalize());
+dFloat32 lenght = dSqrt (xxx.DotProduct(xxx).GetScalar());
+dir = dir.Scale(lenght * 0.3f);
+dMatrix xxx1(matrix);
+xxx1.m_posit += dir;
+body->SetMatrix(xxx1);
+
 		body->SetCollisionShape(*atom.m_collision);
 		dVector debriMassMatrix(atom.m_momentOfInertia.Scale(debriMass));
 		debriMassMatrix.m_w = debriMass;
