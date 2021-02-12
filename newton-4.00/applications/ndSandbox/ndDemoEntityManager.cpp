@@ -247,7 +247,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
 	//m_showModelsDebugInfo = true;
-	m_collisionDisplayMode = 3;
+	//m_collisionDisplayMode = 3;
 	//m_collisionDisplayMode = 2;
 	//m_showListenersDebugInfo = true;
 	//m_synchronousPhysicsUpdate = false;
