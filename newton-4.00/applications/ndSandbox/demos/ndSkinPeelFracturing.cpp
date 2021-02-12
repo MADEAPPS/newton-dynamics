@@ -42,12 +42,19 @@ static void makePointCloud(ndSkinPeelFracture::ndDesc& desc)
 	dVector size(pMax - pMin);
 
 	//const dInt32 count = 10;
-	const dInt32 count = 10;
+	const dInt32 count = 50;
+	dFloat32 scale = 0.2f;
+	dFloat32 invScale = 1.0f / scale;
 	for (dInt32 i = 0; i < count; i++)
 	{
-		dFloat32 x = pMin.m_x + dRand() * size.m_x;
-		dFloat32 y = pMin.m_y + dRand() * size.m_y;
-		dFloat32 z = pMin.m_z + dRand() * size.m_z;
+		//dFloat32 x = pMin.m_x + dRand() * size.m_x;
+		//dFloat32 y = pMin.m_y + dRand() * size.m_y;
+		//dFloat32 z = pMin.m_z + dRand() * size.m_z;
+
+		dFloat32 x = pMin.m_x + scale * dFloor(dRand() * size.m_x * invScale);
+		dFloat32 y = pMin.m_y + scale * dFloor(dRand() * size.m_y * invScale);
+		dFloat32 z = pMin.m_z + scale * dFloor(dRand() * size.m_z * invScale);
+
 		desc.m_pointCloud.PushBack (dVector(x, y, z, dFloat32(0.0f)));
 	}
 }
