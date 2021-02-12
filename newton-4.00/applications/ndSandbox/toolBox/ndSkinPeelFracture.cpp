@@ -19,6 +19,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndTargaToOpenGl.h"
+#include "ndDemoDebriEntity.h"
 #include "ndSkinPeelFracture.h"
 #include "ndDemoEntityManager.h"
 
@@ -293,6 +294,7 @@ void ndSkinPeelFracture::AddEffect(const ndEffect& effect, dFloat32 mass, const 
 	body->SetMassMatrix(mass, *effect.m_shape);
 }
 
+#if 0
 void ndSkinPeelFracture::UpdateEffect(ndWorld* const world, ndEffect& effect)
 {
 	D_TRACKTIME();
@@ -305,9 +307,9 @@ void ndSkinPeelFracture::UpdateEffect(ndWorld* const world, ndEffect& effect)
 	ndPhysicsWorld* const physicsWorld = (ndPhysicsWorld*)world;
 	ndDemoEntityManager* const scene = physicsWorld->GetManager();
 	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)effect.m_body->GetNotifyCallback();
-	ndDemoEntity* const visualEntiry = (ndDemoEntity*)notify->GetUserData();
+	ndDemoEntity* const visualEntity = (ndDemoEntity*)notify->GetUserData();
 
-	dMatrix matrix(visualEntiry->GetCurrentMatrix());
+	dMatrix matrix(visualEntity->GetCurrentMatrix());
 	dQuaternion rotation(matrix);
 
 	for (ndEffect::dListNode* node = effect.GetFirst(); node; node = node->GetNext())
@@ -351,3 +353,67 @@ body->SetMatrix(xxx1);
 		body->SetVelocity(debriVeloc);
 	}
 }
+
+#else
+
+void ndSkinPeelFracture::UpdateEffect(ndWorld* const world, ndEffect& effect)
+{
+	D_TRACKTIME();
+	dVector omega(effect.m_body->GetOmega());
+	dVector veloc(effect.m_body->GetVelocity());
+	dVector massMatrix(effect.m_body->GetMassMatrix());
+	dMatrix bodyMatrix(effect.m_body->GetMatrix());
+	dVector com(bodyMatrix.TransformVector(effect.m_body->GetCentreOfMass()));
+
+	ndPhysicsWorld* const physicsWorld = (ndPhysicsWorld*)world;
+	ndDemoEntityManager* const scene = physicsWorld->GetManager();
+	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)effect.m_body->GetNotifyCallback();
+	ndDemoEntity* const visualEntity = (ndDemoEntity*)notify->GetUserData();
+
+	dMatrix matrix(visualEntity->GetCurrentMatrix());
+	dQuaternion rotation(matrix);
+
+	ndDemoEntity* const debriRootEnt = new ndDemoDebriEntity;
+	scene->AddEntity(debriRootEnt);
+	for (ndEffect::dListNode* node = effect.GetFirst(); node; node = node->GetNext())
+	{
+		ndAtom& atom = node->GetInfo();
+		ndDemoEntity* const entity = new ndDemoEntity(dMatrix(rotation, matrix.m_posit), debriRootEnt);
+		entity->SetName("debris");
+		entity->SetMesh(atom.m_mesh, dGetIdentityMatrix());
+		//scene->AddEntity(entity);
+
+		dFloat32 debriMass = massMatrix.m_w * atom.m_massFraction;
+
+		// calculate debris initial velocity
+		dVector center(matrix.TransformVector(atom.m_centerOfMass));
+		dVector debriVeloc(veloc + omega.CrossProduct(center - com));
+
+		ndBodyDynamic* const body = new ndBodyDynamic();
+		world->AddBody(body);
+
+		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+
+		body->SetMatrix(matrix);
+
+dVector xxx(center - matrix.m_posit);
+xxx.m_w = 0.0f;
+dVector dir(xxx.Normalize());
+dFloat32 lenght = dSqrt(xxx.DotProduct(xxx).GetScalar());
+dir = dir.Scale(lenght * 0.3f);
+dMatrix xxx1(matrix);
+xxx1.m_posit += dir;
+body->SetMatrix(xxx1);
+
+		body->SetCollisionShape(*atom.m_collision);
+		dVector debriMassMatrix(atom.m_momentOfInertia.Scale(debriMass));
+		debriMassMatrix.m_w = debriMass;
+		body->SetMassMatrix(debriMassMatrix);
+		body->SetCentreOfMass(atom.m_centerOfMass);
+		body->SetAngularDamping(dVector(dFloat32(0.1f)));
+
+		body->SetOmega(omega);
+		body->SetVelocity(debriVeloc);
+	}
+}
+#endif

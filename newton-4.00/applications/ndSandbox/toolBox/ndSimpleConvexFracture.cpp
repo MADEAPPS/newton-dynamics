@@ -261,9 +261,9 @@ void ndSimpleConvexFracture::UpdateEffect(ndWorld* const world, ndEffect& effect
 	ndPhysicsWorld* const physicsWorld = (ndPhysicsWorld*)world;
 	ndDemoEntityManager* const scene = physicsWorld->GetManager();
 	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)effect.m_body->GetNotifyCallback();
-	ndDemoEntity* const visualEntiry = (ndDemoEntity*)notify->GetUserData();
+	ndDemoEntity* const visualEntity = (ndDemoEntity*)notify->GetUserData();
 
-	dMatrix matrix(visualEntiry->GetCurrentMatrix());
+	dMatrix matrix(visualEntity->GetCurrentMatrix());
 	dQuaternion rotation(matrix);
 
 	for (ndEffect::dListNode* node = effect.GetFirst(); node; node = node->GetNext())
