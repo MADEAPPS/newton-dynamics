@@ -64,7 +64,7 @@ static void AddBoxEffect(ndSkinPeelFracture* const manager, const dMatrix& matri
 	dVector shapeBox(1.0f, 5.0f, 20.0f, 0.0f);
 	ndShapeInstance outerShape(new ndShapeBox(shapeBox.m_x, shapeBox.m_y, shapeBox.m_z));
 
-	shapeBox -= dVector(0.1f);
+	shapeBox -= dVector(0.25f);
 	ndShapeInstance innerShape(new ndShapeBox(shapeBox.m_x, shapeBox.m_y, shapeBox.m_z));
 
 	// next we populate the descriptor for how the shape is going to be broken in pieces.
