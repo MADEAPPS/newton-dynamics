@@ -41,8 +41,8 @@ static void makePointCloud(ndSkinPeelFracture::ndDesc& desc)
 	desc.m_outerShape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
 	dVector size(pMax - pMin);
 
-	//const dInt32 count = 10;
-	const dInt32 count = 100;
+	//const dInt32 count = 100;
+	const dInt32 count = 0;
 	dFloat32 scale = 0.2f;
 	dFloat32 invScale = 1.0f / scale;
 	for (dInt32 i = 0; i < count; i++)

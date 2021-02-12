@@ -136,9 +136,8 @@ void ndDynamicsUpdate::SortJoints()
 		}
 	}
 
-	//dInt32 rowCount = 0;
 	dInt32 currentActive = jointArray.GetCount();
-	for (dInt32 i = 0; i < currentActive; i++)
+	for (dInt32 i = currentActive - 1; i >= 0; i--)
 	{
 		ndConstraint* const joint = jointArray[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
@@ -149,9 +148,6 @@ void ndDynamicsUpdate::SortJoints()
 			const dInt32 resting = (body0->m_equilibrium & body1->m_equilibrium) ? 1 : 0;
 			const dInt32 rows = joint->GetRowsCount();
 			joint->m_rowCount = rows;
-			//joint->m_rowStart = rowCount;
-			//rowCount += rows;
-			//dAssert(rows > 0);
 
 			body0->m_bodyIsConstrained = 1;
 			body0->m_resting = body0->m_resting & resting;
@@ -197,7 +193,6 @@ void ndDynamicsUpdate::SortJoints()
 		{
 			currentActive--;
 			jointArray[i] = jointArray[currentActive];
-			i--;
 		}
 	}
 
@@ -239,7 +234,6 @@ void ndDynamicsUpdate::SortJoints()
 		acc += val;
 	}
 
-	dInt32 rowCount = 0;
 	m_activeJointCount = activeJointCount;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
@@ -255,11 +249,16 @@ void ndDynamicsUpdate::SortJoints()
 		const dInt32 entry = jointCountSpans[key.m_value];
 		jointArray[entry] = joint;
 		jointCountSpans[key.m_value] = entry + 1;
-
+	}
+	
+	dInt32 rowCount = 0;
+	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
+	{
+		ndConstraint* const joint = jointArray[i];
 		joint->m_rowStart = rowCount;
 		rowCount += joint->m_rowCount;
 	}
-	
+
 	m_leftHandSide.SetCount(rowCount);
 	m_rightHandSide.SetCount(rowCount);
 

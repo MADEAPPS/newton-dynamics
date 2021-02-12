@@ -373,7 +373,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	}
 
 	dInt32 currentActive = jointArray.GetCount();
-	for (dInt32 i = 0; i < currentActive; i++)
+	for (dInt32 i = currentActive - 1; i >= 0 ; i--)
 	{
 		ndConstraint* const joint = jointArray[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
@@ -430,7 +430,6 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		{
 			currentActive--;
 			jointArray[i] = jointArray[currentActive];
-			i--;
 		}
 	}
 
@@ -473,7 +472,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		acc += val;
 	}
 
-	dInt32 rowCount = 0;
+	m_activeJointCount = activeJointCount;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = sortBuffer[i];
@@ -488,32 +487,37 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		const dInt32 entry = jointCountSpans[key.m_value];
 		jointArray[entry] = joint;
 		jointCountSpans[key.m_value] = entry + 1;
+	}
 
+	dInt32 rowCount = 0;
+	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
+	{
+		ndConstraint* const joint = jointArray[i];
 		joint->m_rowStart = rowCount;
 		rowCount += joint->m_rowCount;
 	}
-	m_activeJointCount = activeJointCount;
+	
 	m_leftHandSide.SetCount(rowCount);
 	m_rightHandSide.SetCount(rowCount);
 
 	#ifdef _DEBUG
-	for (dInt32 i = 1; i < m_activeJointCount; i++)
-	{
-		ndConstraint* const joint0 = jointArray[i - 1];
-		ndConstraint* const joint1 = jointArray[i - 0];
-		dAssert(joint0->m_rowCount >= joint1->m_rowCount);
-		dAssert(!(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting));
-		dAssert(!(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting));
-	}
+		for (dInt32 i = 1; i < m_activeJointCount; i++)
+		{
+			ndConstraint* const joint0 = jointArray[i - 1];
+			ndConstraint* const joint1 = jointArray[i - 0];
+			dAssert(joint0->m_rowCount >= joint1->m_rowCount);
+			dAssert(!(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting));
+			dAssert(!(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting));
+		}
 
-	for (dInt32 i = m_activeJointCount + 1; i < jointArray.GetCount(); i++)
-	{
-		ndConstraint* const joint0 = jointArray[i - 1];
-		ndConstraint* const joint1 = jointArray[i - 0];
-		dAssert(joint0->m_rowCount >= joint1->m_rowCount);
-		dAssert(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting);
-		dAssert(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting);
-	}
+		for (dInt32 i = m_activeJointCount + 1; i < jointArray.GetCount(); i++)
+		{
+			ndConstraint* const joint0 = jointArray[i - 1];
+			ndConstraint* const joint1 = jointArray[i - 0];
+			dAssert(joint0->m_rowCount >= joint1->m_rowCount);
+			dAssert(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting);
+			dAssert(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting);
+		}
 	#endif
 
 	if (m_activeJointCount - jointArray.GetCount())
@@ -539,7 +543,6 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	const dInt32 jointCount = jointArray.GetCount();
 	const dInt32 soaJointCount = (jointCount + D_SOA_WORD_GROUP_SIZE - 1) & mask;
 	dAssert(jointArray.GetCapacity() > soaJointCount);
-	
 	for (dInt32 i = jointCount; i < soaJointCount; i++)
 	{
 		jointPtr[i] = nullptr;
@@ -557,7 +560,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	m_soaMassMatrix.SetCount(soaJointRowCount);
 
 	#ifdef _DEBUG
-		dAssert(jointArray.GetCount() == jointCount);
+		dAssert(m_activeJointCount <= jointArray.GetCount());
 		const dInt32 maxRowCount = m_leftHandSide.GetCount();
 		for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 		{
