@@ -167,9 +167,6 @@ ndDemoDebriMesh::ndDemoDebriMesh(const char* const name, dArray<ndMeshPointUV>& 
 	//
 	//glUseProgram(0);
 
-
-	meshNode->RemoveUnusedVertices(nullptr);
-
 	dInt32 indexCount = 0;
 	ndIndexArray* const geometryHandle = meshNode->MaterialGeometryBegin();
 	dInt32 vertexCount = meshNode->GetPropertiesCount();
@@ -199,7 +196,7 @@ ndDemoDebriMesh::ndDemoDebriMesh(const char* const name, dArray<ndMeshPointUV>& 
 		meshNode->GetMaterialGetIndexStream(geometryHandle, handle, &indexArray[segmentStart]);
 		for (dInt32 i = 0; i < segment->m_indexCount; i++)
 		{
-			indexArray[segmentStart] += base;
+			indexArray[segmentStart + i] += base;
 		}
 		segmentStart += segment->m_indexCount;
 	}
@@ -211,6 +208,7 @@ ndDemoDebriMesh::~ndDemoDebriMesh()
 //	glDeleteBuffers(1, &m_matrixOffsetBuffer);
 	dAssert(0);
 }
+
 
 /*
 void ndDemoMeshIntance::SetTransforms(dInt32 count, const dMatrix* const matrixArray)
@@ -318,6 +316,23 @@ ndDemoDebriEntity::~ndDemoDebriEntity(void)
 {
 //	m_instanceMesh->Release();
 }
+
+void ndDemoDebriEntity::FinalizeConstruction(dArray<ndMeshPointUV>& vertexArray, dArray<dInt32>& indexArray)
+{
+	dArray<dInt32> remapIndex;
+	remapIndex.SetCount(vertexArray.GetCount());
+	dInt32 vertexCount = dVertexListToIndexList(&vertexArray[0].m_posit.m_x, sizeof(ndMeshPointUV), sizeof(ndMeshPointUV), 0, vertexArray.GetCount(), &remapIndex[0], dFloat32(1.0e-6f));
+
+	for (dInt32 i = 0; i < indexArray.GetCount(); i++)
+	{
+		dInt32 index = indexArray[i];
+		dAssert(index < remapIndex.GetCount());
+		indexArray[i] = remapIndex[index];
+	}
+	
+
+}
+
 
 void ndDemoDebriEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {

@@ -105,7 +105,7 @@ ndSimpleConvexFracture::ndEffect::ndEffect(ndSimpleConvexFracture* const manager
 			{
 				// we have a piece which has a convex collision  representation, add that to the list
 				ndAtom& atom = Append()->GetInfo();
-				fracturePiece->RemoveUnusedVertices(nullptr);
+				//fracturePiece->RemoveUnusedVertices(nullptr);
 				atom.m_mesh = new ndDemoMesh("fracture", fracturePiece, scene->GetShaderCache());
 
 				// get center of mass

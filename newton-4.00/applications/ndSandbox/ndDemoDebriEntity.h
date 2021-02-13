@@ -45,6 +45,8 @@ class ndDemoDebriEntity: public ndDemoEntity
 	ndDemoDebriEntity(const ndDemoDebriEntity& copyFrom);
 	virtual ~ndDemoDebriEntity(void);
 
+	void FinalizeConstruction(dArray<ndMeshPointUV>& vertexArrayOut, dArray<dInt32>& indexArrayOut);
+
 	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
 
 	//ndDemoMeshIntance* m_instanceMesh;

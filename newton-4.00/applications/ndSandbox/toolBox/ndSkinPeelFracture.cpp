@@ -181,7 +181,7 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 
 	dArray<dInt32> indexArray;
 	dArray<ndMeshPointUV> vertexArray;
-	//ndDemoDebriEntity* const debriRootEnt = new ndDemoDebriEntity;
+	ndDemoDebriEntity* const debriRootEnt = new ndDemoDebriEntity;
 	for (dList<ndMeshEffect*>::dListNode* node = rawConvexPieces.GetFirst(); node; node = node->GetNext())
 	{
 		ndMeshEffect* const fracturePiece = node->GetInfo();
@@ -190,7 +190,7 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 		{
 			// we have a piece which has a convex collision  representation, add that to the list
 			ndAtom& atom = Append()->GetInfo();
-
+			fracturePiece->RemoveUnusedVertices(nullptr);
 			atom.m_mesh = new ndDemoDebriMesh("fracture", vertexArray, indexArray, fracturePiece, scene->GetShaderCache());
 
 			// get center of mass
@@ -215,6 +215,10 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 			delete inertiaShape;
 		}
 	}
+
+	debriRootEnt->FinalizeConstruction(vertexArray, indexArray);
+
+
 #endif
 
 	for (dList<ndMeshEffect*>::dListNode* node = rawConvexPieces.GetFirst(); node; node = node->GetNext())
