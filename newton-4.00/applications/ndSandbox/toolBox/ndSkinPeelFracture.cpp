@@ -23,6 +23,10 @@
 #include "ndSkinPeelFracture.h"
 #include "ndDemoEntityManager.h"
 
+
+#define DEBRI_EXPLODE_LOCATION
+#define USE_SPECIAL_DEBRIS_MESH
+
 ndSkinPeelFracture::ndAtom::ndAtom()
 	:m_centerOfMass(0.0f)
 	,m_momentOfInertia(0.0f)
@@ -92,15 +96,10 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 	ndMeshEffect* const convexVoronoiMesh = outerMesh.CreateVoronoiConvexDecomposition(desc.m_pointCloud, 1, &textureMatrix[0][0]);
 	
 	dList<ndMeshEffect*> rawConvexPieces;
-//int xxx = 0;
+
 	for (ndMeshEffect* convexPart = convexVoronoiMesh->GetFirstLayer(); convexPart; convexPart = convexVoronoiMesh->GetNextLayer(convexPart))
 	{
-//		if (xxx == 5) 
-		{
-			rawConvexPieces.Append(convexPart);
-//			break;
-		}
-//xxx++;
+		rawConvexPieces.Append(convexPart);
 	}
 	delete convexVoronoiMesh;
 
@@ -180,6 +179,14 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 	{
 		delete node->GetInfo();
 	}
+
+	// optimized mesh 
+	//for (dListNode* node = GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndAtom& atom = node->GetInfo();
+	//
+	//
+	//}
 }
 
 ndSkinPeelFracture::ndEffect::ndEffect(const ndEffect& effect)
@@ -294,7 +301,19 @@ void ndSkinPeelFracture::AddEffect(const ndEffect& effect, dFloat32 mass, const 
 	body->SetMassMatrix(mass, *effect.m_shape);
 }
 
-#if 0
+void ndSkinPeelFracture::ExplodeLocation(ndBodyDynamic* const body, const dMatrix& location, dFloat32 factor) const
+{
+	dVector center(body->GetCentreOfMass());
+	dVector radios((center - location.m_posit) & dVector::m_triplexMask);
+	dVector dir(radios.Normalize());
+	dFloat32 lenght = dSqrt(radios.DotProduct(radios).GetScalar());
+	dir = dir.Scale(lenght * factor);
+	dMatrix matrix(location);
+	matrix.m_posit += dir;
+	body->SetMatrix(matrix);
+}
+
+#ifndef USE_SPECIAL_DEBRIS_MESH
 void ndSkinPeelFracture::UpdateEffect(ndWorld* const world, ndEffect& effect)
 {
 	D_TRACKTIME();
@@ -330,17 +349,7 @@ void ndSkinPeelFracture::UpdateEffect(ndWorld* const world, ndEffect& effect)
 		world->AddBody(body);
 
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-
 		body->SetMatrix(matrix);
-
-dVector xxx (center - matrix.m_posit);
-xxx.m_w = 0.0f;
-dVector dir(xxx.Normalize());
-dFloat32 lenght = dSqrt (xxx.DotProduct(xxx).GetScalar());
-dir = dir.Scale(lenght * 0.3f);
-dMatrix xxx1(matrix);
-xxx1.m_posit += dir;
-body->SetMatrix(xxx1);
 
 		body->SetCollisionShape(*atom.m_collision);
 		dVector debriMassMatrix(atom.m_momentOfInertia.Scale(debriMass));
@@ -351,6 +360,10 @@ body->SetMatrix(xxx1);
 
 		body->SetOmega(omega);
 		body->SetVelocity(debriVeloc);
+
+#ifdef DEBRI_EXPLODE_LOCATION
+		ExplodeLocation(body, matrix, 0.3f);
+#endif
 	}
 }
 
@@ -393,17 +406,7 @@ void ndSkinPeelFracture::UpdateEffect(ndWorld* const world, ndEffect& effect)
 		world->AddBody(body);
 
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-
 		body->SetMatrix(matrix);
-
-dVector xxx(center - matrix.m_posit);
-xxx.m_w = 0.0f;
-dVector dir(xxx.Normalize());
-dFloat32 lenght = dSqrt(xxx.DotProduct(xxx).GetScalar());
-dir = dir.Scale(lenght * 0.3f);
-dMatrix xxx1(matrix);
-xxx1.m_posit += dir;
-body->SetMatrix(xxx1);
 
 		body->SetCollisionShape(*atom.m_collision);
 		dVector debriMassMatrix(atom.m_momentOfInertia.Scale(debriMass));
@@ -414,6 +417,9 @@ body->SetMatrix(xxx1);
 
 		body->SetOmega(omega);
 		body->SetVelocity(debriVeloc);
+#ifdef DEBRI_EXPLODE_LOCATION
+		ExplodeLocation(body, matrix, 0.3f);
+#endif
 	}
 }
 #endif

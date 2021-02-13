@@ -41,8 +41,8 @@ static void makePointCloud(ndSkinPeelFracture::ndDesc& desc)
 	desc.m_outerShape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
 	dVector size(pMax - pMin);
 
-	const dInt32 count = 100;
-	//const dInt32 count = 50;
+	//const dInt32 count = 100;
+	const dInt32 count = 0;
 	dFloat32 scale = 0.2f;
 	dFloat32 invScale = 1.0f / scale;
 	for (dInt32 i = 0; i < count; i++)
@@ -83,7 +83,7 @@ static void AddBoxEffect(ndSkinPeelFracture* const manager, const dMatrix& matri
 	// get a location in the scene
 	dMatrix location(matrix);
 	location.m_posit = CalculateLocation(manager, matrix, outerShape);
-location.m_posit.m_y += 2.0f;
+location.m_posit.m_y += 3.0f;
 
 	// place few instance of the same effect in the scene.
 	const dInt32 count = 1;

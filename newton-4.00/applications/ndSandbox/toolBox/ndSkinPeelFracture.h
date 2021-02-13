@@ -71,6 +71,8 @@ class ndSkinPeelFracture: public ndModel
 
 	void UpdateEffect(ndWorld* const world, ndEffect& effect);
 
+	void ExplodeLocation(ndBodyDynamic* const body, const dMatrix& matrix, dFloat32 factor) const;
+
 	dList<ndEffect> m_effectList;
 	dList<ndEffect> m_pendingEffect;
 	ndDemoEntityManager* m_scene;
