@@ -44,7 +44,8 @@ class ndHeightfieldMesh : public ndDemoMesh
 
 		BuildTilesArray(indexList);
 		BuildVertexAndNormals(indexList, heightfield, points);
-		OptimizeForRender(points, indexList);
+		//OptimizeForRender(points, indexList);
+		OptimizeForRender(&points[0], points.GetCount(), &indexList[0], indexList.GetCount());
 	}
 
 	private:

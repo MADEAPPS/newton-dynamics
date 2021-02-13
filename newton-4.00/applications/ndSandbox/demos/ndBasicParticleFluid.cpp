@@ -44,7 +44,8 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 
 	void UpdateBuffers(const dArray<ndMeshPointUV>& points, const dArray<dInt32>& indexList)
 	{
-		OptimizeForRender(points, indexList);
+		//OptimizeForRender(points, indexList);
+		OptimizeForRender(&points[0], points.GetCount(), &indexList[0], indexList.GetCount());
 
 		ndDemoSubMesh& segment = GetFirst()->GetInfo();
 		segment.m_indexCount = indexList.GetCount();

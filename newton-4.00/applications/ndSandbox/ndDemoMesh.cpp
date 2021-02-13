@@ -147,19 +147,20 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	// extract the materials index array for mesh
 	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
 
-	// extract vertex data  from the newton mesh		
-	dInt32 vertexCount = mesh.GetPropertiesCount();
+	// extract vertex data  from the newton mesh
 	dInt32 indexCount = 0;
+	dInt32 vertexCount = mesh.GetPropertiesCount();
 	for (dInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
 	{
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	dArray<dInt32> indices(indexCount);
-	dArray<ndMeshPointUV> points(vertexCount);
-	
-	points.SetCount(vertexCount);
-	indices.SetCount(indexCount);
+	//dArray<dInt32> indices(indexCount);
+	//dArray<ndMeshPointUV> points(vertexCount);
+	//points.SetCount(vertexCount);
+	//indices.SetCount(indexCount);
+	dInt32* const indices = dAlloca(dInt32, indexCount);
+	ndMeshPointUV* const points = dAlloca(ndMeshPointUV, vertexCount);
 
 	mesh.GetVertexChannel(sizeof(ndMeshPointUV), &points[0].m_posit.m_x);
 	mesh.GetNormalChannel(sizeof(ndMeshPointUV), &points[0].m_normal.m_x);
@@ -179,7 +180,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		segment->m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
 
 		segment->m_segmentStart = segmentStart;
-		mesh.GetMaterialGetIndexStream(geometryHandle, handle, (dInt32*)&indices[segmentStart]);
+		mesh.GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
 		segmentStart += segment->m_indexCount;
 	}
 
@@ -188,7 +189,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	m_hasTransparency = hasTransparency;
 
 	// optimize this mesh for hardware buffers if possible
-	OptimizeForRender(points, indices);
+	//OptimizeForRender(points, indices);
+	OptimizeForRender(&points[0], vertexCount, &indices[0], indexCount);
 }
 
 ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
@@ -209,18 +211,20 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 	ndIndexArray* const geometryHandle = meshNode->MaterialGeometryBegin();
 
 	// extract vertex data  from the newton mesh		
-	dInt32 vertexCount = meshNode->GetPropertiesCount();
 	dInt32 indexCount = 0;
+	dInt32 vertexCount = meshNode->GetPropertiesCount();
 	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
 	{
 		indexCount += meshNode->GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	dArray<dInt32> indices(indexCount);
-	dArray<ndMeshPointUV> points(vertexCount);
+	//dArray<dInt32> indices(indexCount);
+	//dArray<ndMeshPointUV> points(vertexCount);
+	//points.SetCount(vertexCount);
+	//indices.SetCount(indexCount);
 
-	points.SetCount(vertexCount);
-	indices.SetCount(indexCount);
+	dInt32* const indices = dAlloca(dInt32, indexCount);
+	ndMeshPointUV* const points = dAlloca(ndMeshPointUV, vertexCount);
 
 	meshNode->GetVertexChannel(sizeof(ndMeshPointUV), &points[0].m_posit.m_x);
 	meshNode->GetNormalChannel(sizeof(ndMeshPointUV), &points[0].m_normal.m_x);
@@ -249,7 +253,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 		segment->m_indexCount = meshNode->GetMaterialIndexCount(geometryHandle, handle);
 		
 		segment->m_segmentStart = segmentStart;
-		meshNode->GetMaterialGetIndexStream(geometryHandle, handle, (dInt32*)&indices[segmentStart]);
+		meshNode->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
 		segmentStart += segment->m_indexCount;
 	}
 
@@ -258,7 +262,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 	m_hasTransparency = hasTransparency;
 
 	// optimize this mesh for hardware buffers if possible
-	OptimizeForRender(points, indices);
+	OptimizeForRender(&points[0], vertexCount, &indices[0], indexCount);
 }
 
 ndDemoMesh::~ndDemoMesh()
@@ -298,7 +302,10 @@ void ndDemoMesh::RenderNormals()
 }
 
 
-void ndDemoMesh::OptimizeForRender(const dArray<ndMeshPointUV>& points, const dArray<dInt32>& indices)
+//void ndDemoMesh::OptimizeForRender(const dArray<ndMeshPointUV>& points, const dArray<dInt32>& indices)
+void ndDemoMesh::OptimizeForRender(
+	const ndMeshPointUV* const points, dInt32 pointCount,
+	const dInt32* const indices, dInt32 indexCount)
 {
 	// first make sure the previous optimization is removed
 	ResetOptimization();
@@ -308,7 +315,8 @@ void ndDemoMesh::OptimizeForRender(const dArray<ndMeshPointUV>& points, const dA
 
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, points.GetCount() * sizeof(ndMeshPointUV), &points[0], GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, points.GetCount() * sizeof(ndMeshPointUV), &points[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, pointCount * sizeof(ndMeshPointUV), &points[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)0);
@@ -327,7 +335,8 @@ void ndDemoMesh::OptimizeForRender(const dArray<ndMeshPointUV>& points, const dA
 
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.GetCount() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.GetCount() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glUseProgram(m_shader);
@@ -344,8 +353,10 @@ void ndDemoMesh::OptimizeForRender(const dArray<ndMeshPointUV>& points, const dA
 
 	glUseProgram(0);
 
-	m_vertexCount = points.GetCount();
-	m_indexCount = indices.GetCount();
+	//m_vertexCount = points.GetCount();
+	//m_indexCount = indices.GetCount();
+	m_vertexCount = pointCount;
+	m_indexCount = indexCount;
 }
 
 void  ndDemoMesh::ResetOptimization()

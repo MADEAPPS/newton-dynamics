@@ -15,25 +15,28 @@
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 
-/*
-class ndDemoMeshIntance : public ndDemoMesh
+
+class ndDemoDebriEntity;
+class ndDemoDebriMesh : public ndDemoMesh
 {
 	public:
-	ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
-	~ndDemoMeshIntance();
+	//ndDemoDebriMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
+	ndDemoDebriMesh(const char* const name, dArray<ndMeshPointUV>& vertexArrayOut, dArray<dInt32>& indexArrayOut, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
+	~ndDemoDebriMesh();
 
-	virtual void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
-	void SetTransforms(dInt32 count, const dMatrix* const matrixArray);
+	//virtual void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+	//void SetTransforms(dInt32 count, const dMatrix* const matrixArray);
 
 	private:
-	void RenderBatch(dInt32 start, ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
-
-	const dMatrix* m_offsets;
-	dInt32 m_instanceCount;
-	dInt32 m_maxInstanceCount;
-	GLuint m_matrixOffsetBuffer;
+	//void RenderBatch(dInt32 start, ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+	//
+	//const dMatrix* m_offsets;
+	//dInt32 m_instanceCount;
+	//dInt32 m_maxInstanceCount;
+	//GLuint m_matrixOffsetBuffer;
+	
 };
-*/
+
 
 class ndDemoDebriEntity: public ndDemoEntity
 {

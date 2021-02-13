@@ -89,7 +89,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 		segment->m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
 
 		segment->m_segmentStart = segmentStart;
-		mesh.GetMaterialGetIndexStream(geometryHandle, handle, (dInt32*)&indices[segmentStart]);
+		mesh.GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
 		segmentStart += segment->m_indexCount;
 	}
 
