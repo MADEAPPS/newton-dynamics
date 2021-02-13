@@ -17,6 +17,25 @@
 
 
 class ndDemoDebriEntity;
+
+
+
+class ndDemoDebriMesh____ : public ndDemoMesh
+{
+	public:
+	ndDemoDebriMesh____(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
+
+	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+
+	ndDemoSubMeshMaterial m_material[2];
+	dInt32 m_textureLocation1;
+};
+
+
+
+
+
+
 class ndDemoDebriMesh : public ndDemoMesh
 {
 	public:

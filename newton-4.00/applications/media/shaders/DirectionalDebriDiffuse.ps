@@ -1,0 +1,87 @@
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/  
+   
+#version 330 core
+
+uniform sampler2D texture0;
+uniform sampler2D texture1;
+
+uniform float transparency;
+uniform vec3 material_ambient;
+uniform vec3 material_diffuse; 
+uniform vec3 material_specular; 
+
+in vec2 uv;
+in vec3 posit;
+in vec3 normal;
+in vec3 lightDir;
+in float materialBlend;
+
+out vec4 pixelColor;
+
+vec3 FlashLightShading(vec3 normalDir)
+{
+	vec3 lightDir = -normalize (posit);
+
+	vec3 diffuseCoeff = vec3(0.7f, 0.7f, 0.7f);  
+
+	float k1 = 7.0/120.0; 
+	float k2 = 1.0/240.0; 
+	float d2 = dot(posit, posit);
+	float d1 = sqrt(d2);
+	float attenuation = 1.0 / (1.0 + k1 * d1 + k2 * d2);
+	
+	return diffuseCoeff * max (dot(normalDir, lightDir), 0.0) * attenuation;
+}
+
+vec3 PhongDirectionalShading(vec3 normalDir)
+{
+	vec3 specularDir = normalize (-posit);
+	
+	vec3 reflectionDir = -reflect (lightDir, normalDir);
+	
+	//vec3 ambientCoeff = vec3(gl_LightSource[0].ambient * gl_FrontMaterial.ambient);
+	//vec3 diffuseCoeff = vec3(gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse); 
+	//vec3 specularCoeff = vec3(gl_LightSource[0].specular * gl_FrontMaterial.specular);
+
+	//vec3 ambientCoeff = vec3(material_ambient);
+	vec3 diffuseCoeff = vec3(material_diffuse); 
+	//vec3 specularCoeff = vec3(material_specular);
+
+	vec3 ambientCoeff = vec3(0.0f, 0.0f, 0.0f);
+	//vec3 diffuseCoeff = vec3(1.0f, 0.0f, 0.0f); 
+	vec3 specularCoeff = vec3(0.0f, 0.0f, 0.0f);
+	
+	//vec3 emission = vec3(0.0f, 0.0f, 0.0f);
+	vec3 emission = vec3(0.3f, 0.3f, 0.3f);
+	float shininess = 20.0f;
+	
+	vec3 ambientColor = ambientCoeff + emission; 
+	vec3 diffuseColor = diffuseCoeff * max (dot(normalDir, lightDir), 0.0f);
+	vec3 specularColor = specularCoeff * pow (max (dot (reflectionDir, specularDir), 0.1), shininess);
+	
+	return ambientColor + diffuseColor + specularColor;
+}
+
+void main()
+{
+	vec3 normalDir = normalize (normal);
+
+	//vec3 lightIntensity = PhongDirectionalShading(normalDir) + FlashLightShading(normalDir);
+	vec3 lightIntensity = PhongDirectionalShading(normalDir);
+
+	vec3 text0 = vec3 (texture2D(texture0, uv));
+	vec3 text1 = vec3 (texture2D(texture1, uv));
+	vec3 text = text0 * materialBlend + text1 * (1.0 - materialBlend);
+
+	vec3 texColor = lightIntensity * text;
+	pixelColor = vec4(texColor, transparency);
+}

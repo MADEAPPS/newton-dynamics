@@ -30,7 +30,6 @@ ndDemoMesh::ndDemoMesh(const char* const name)
 	,m_materialAmbientLocation(0)
 	,m_materialDiffuseLocation(0)
 	,m_materialSpecularLocation(0)
-
 	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)

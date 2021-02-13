@@ -17,6 +17,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndTargaToOpenGl.h"
+#include "ndDemoDebriEntity.h"
 #include "ndDemoEntityManager.h"
 #include "ndSimpleConvexFracture.h"
 
@@ -106,7 +107,8 @@ ndSimpleConvexFracture::ndEffect::ndEffect(ndSimpleConvexFracture* const manager
 				// we have a piece which has a convex collision  representation, add that to the list
 				ndAtom& atom = Append()->GetInfo();
 				//fracturePiece->RemoveUnusedVertices(nullptr);
-				atom.m_mesh = new ndDemoMesh("fracture", fracturePiece, scene->GetShaderCache());
+				//atom.m_mesh = new ndDemoMesh("fracture", fracturePiece, scene->GetShaderCache());
+				atom.m_mesh = new ndDemoDebriMesh____("fracture", fracturePiece, scene->GetShaderCache());
 
 				// get center of mass
 				dMatrix inertia(collision->CalculateInertia());

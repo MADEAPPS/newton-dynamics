@@ -20,6 +20,7 @@ ndShaderPrograms::ndShaderPrograms(void)
 	m_decalEffect = 0;
 	m_texturedDecal = 0;
 	m_diffuseEffect = 0;
+	m_diffuseDebriEffect = 0;
 	m_diffuseIntanceEffect = 0;
 	m_skinningDiffuseEffect = 0;
 	m_diffuseNoTextureEffect = 0;
@@ -51,6 +52,10 @@ ndShaderPrograms::~ndShaderPrograms(void)
 	{
 		glDeleteShader(m_diffuseEffect);
 	}
+	if (m_diffuseDebriEffect)
+	{
+		glDeleteShader(m_diffuseDebriEffect);
+	}
 	if (m_diffuseNoTextureEffect) 
 	{
 		glDeleteShader(m_diffuseNoTextureEffect);
@@ -73,6 +78,7 @@ bool ndShaderPrograms::CreateAllEffects()
 	m_texturedDecal = CreateShaderEffect ("TextureDecal", "TextureDecal");
 
 	m_diffuseEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuse");
+	m_diffuseDebriEffect = CreateShaderEffect("DirectionalDebriDiffuse", "DirectionalDebriDiffuse");
 	m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse", "DirectionalDiffuse");
 	m_diffuseNoTextureEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuseNoTexture");
 	m_diffuseIntanceEffect = CreateShaderEffect ("DirectionalDiffuseInstance", "DirectionalDiffuse");
