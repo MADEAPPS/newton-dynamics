@@ -158,13 +158,14 @@ void ndDemoDebriMesh____::Render(ndDemoEntityManager* const scene, const dMatrix
 	glUniform3fv(m_materialDiffuseLocation, 1, &m_material[0].m_diffuse.m_x);
 	glUniform3fv(m_materialSpecularLocation, 1, &m_material[0].m_specular.m_x);
 
+	// these call make the font display wrong
+	glActiveTexture(GL_TEXTURE1);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glBindTexture(GL_TEXTURE_2D, m_material[1].m_textureHandle);
+
 	glActiveTexture(GL_TEXTURE0);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBindTexture(GL_TEXTURE_2D, m_material[0].m_textureHandle);
-
-	glActiveTexture(GL_TEXTURE0 + 1);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glBindTexture(GL_TEXTURE_2D, m_material[1].m_textureHandle);
 
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 
@@ -172,9 +173,6 @@ void ndDemoDebriMesh____::Render(ndDemoEntityManager* const scene, const dMatrix
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
-
-	//glActiveTexture(GL_TEXTURE0 + 1);
-	//glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 //ndDemoDebriMesh::ndDemoDebriMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity, const dMatrix& uvMatrix)
