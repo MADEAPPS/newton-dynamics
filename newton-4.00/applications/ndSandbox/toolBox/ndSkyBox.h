@@ -40,7 +40,7 @@ class ndSkyBox: public ndDemoEntity
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
 	GLuint m_texturecubemap;
-	GLuint m_vetextArrayBuffer;
+	GLuint m_vertextArrayBuffer;
 	GLint m_matrixUniformLocation;
 	GLint m_textureMatrixLocation;
 };

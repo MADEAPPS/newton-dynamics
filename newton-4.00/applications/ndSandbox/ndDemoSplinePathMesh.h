@@ -35,7 +35,7 @@ class ndDemoSplinePathMesh: public ndDemoMeshInterface
 	dInt32 m_renderResolution;
 	GLuint m_shader;
 	GLuint m_vertexBuffer;
-	GLuint m_vetextArrayBuffer;
+	GLuint m_vertextArrayBuffer;
 	GLuint m_shadeColorLocation;
 	GLuint m_projectionViewModelMatrixLocation;
 };

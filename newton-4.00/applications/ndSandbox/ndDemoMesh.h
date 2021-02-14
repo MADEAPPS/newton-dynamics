@@ -67,8 +67,9 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	GLuint m_shader;
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
-	GLuint m_vetextArrayBuffer;
+	GLuint m_vertextArrayBuffer;
 	bool m_hasTransparency;
+
 	friend class ndDemoEntity;
 };
 

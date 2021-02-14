@@ -25,7 +25,7 @@ ndDemoSplinePathMesh::ndDemoSplinePathMesh(const dBezierSpline& curve, const ndS
 	m_isVisible = false;
 	m_shader = shaderCache.m_wireFrame;
 	m_vertexBuffer = 0;
-	m_vetextArrayBuffer = 0;
+	m_vertextArrayBuffer = 0;
 	m_shadeColorLocation = 0;
 	m_projectionViewModelMatrixLocation = 0;
 	SetRenderResolution(resolution);
@@ -33,10 +33,10 @@ ndDemoSplinePathMesh::ndDemoSplinePathMesh(const dBezierSpline& curve, const ndS
 
 ndDemoSplinePathMesh::~ndDemoSplinePathMesh()
 {
-	if (m_vetextArrayBuffer)
+	if (m_vertextArrayBuffer)
 	{
 		glDeleteBuffers(1, &m_vertexBuffer);
-		glDeleteVertexArrays(1, &m_vetextArrayBuffer);
+		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
 	}
 }
 
@@ -50,10 +50,10 @@ void ndDemoSplinePathMesh::SetRenderResolution(dInt32 breaks)
 	if (breaks != m_renderResolution)
 	{
 		m_renderResolution = breaks;
-		if (m_vetextArrayBuffer)
+		if (m_vertextArrayBuffer)
 		{
 			glDeleteBuffers(1, &m_vertexBuffer);
-			glDeleteVertexArrays(1, &m_vetextArrayBuffer);
+			glDeleteVertexArrays(1, &m_vertextArrayBuffer);
 		}
 
 		dFloat64 scale = 1.0f / m_renderResolution;
@@ -65,8 +65,8 @@ void ndDemoSplinePathMesh::SetRenderResolution(dInt32 breaks)
 		}
 		points.PushBack(points[0]);
 
-		glGenVertexArrays(1, &m_vetextArrayBuffer);
-		glBindVertexArray(m_vetextArrayBuffer);
+		glGenVertexArrays(1, &m_vertextArrayBuffer);
+		glBindVertexArray(m_vertextArrayBuffer);
 
 		glGenBuffers(1, &m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -123,7 +123,7 @@ void ndDemoSplinePathMesh::Render(ndDemoEntityManager* const scene, const dMatri
 		//}
 		//glDisableClientState(GL_VERTEX_ARRAY);
 
-		glBindVertexArray(m_vetextArrayBuffer);
+		glBindVertexArray(m_vertextArrayBuffer);
 		glDrawArrays(GL_LINE_STRIP, 0, m_renderResolution + 1);
 		glBindVertexArray(0);
 		glUseProgram(0);

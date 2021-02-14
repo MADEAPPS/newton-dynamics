@@ -108,7 +108,7 @@ ndSimpleConvexFracture::ndEffect::ndEffect(ndSimpleConvexFracture* const manager
 				ndAtom& atom = Append()->GetInfo();
 				//fracturePiece->RemoveUnusedVertices(nullptr);
 				//atom.m_mesh = new ndDemoMesh("fracture", fracturePiece, scene->GetShaderCache());
-				atom.m_mesh = new ndDemoDebriMesh____("fracture", fracturePiece, scene->GetShaderCache());
+				atom.m_mesh = new ndDemoDebriMesh("fracture", fracturePiece, scene->GetShaderCache());
 
 				// get center of mass
 				dMatrix inertia(collision->CalculateInertia());

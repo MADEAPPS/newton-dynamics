@@ -16,14 +16,19 @@
 #include "ndDemoEntity.h"
 
 
-class ndDemoDebriEntity;
+struct DebriPoint
+{
+	ndMeshVector4 m_posit;
+	ndMeshVector m_normal;
+	ndMeshUV m_uv;
+};
 
+class ndDemoDebriEntityRoot;
 
-
-class ndDemoDebriMesh____ : public ndDemoMesh
+class ndDemoDebriMesh: public ndDemoMesh
 {
 	public:
-	ndDemoDebriMesh____(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
+	ndDemoDebriMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
 
 	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 
@@ -31,44 +36,46 @@ class ndDemoDebriMesh____ : public ndDemoMesh
 	dInt32 m_textureLocation1;
 };
 
-
-
-
-
-
-class ndDemoDebriMesh : public ndDemoMesh
+class ndDemoDebriMesh2 : public ndDemoMesh
 {
 	public:
-	//ndDemoDebriMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
-	ndDemoDebriMesh(const char* const name, dArray<ndMeshPointUV>& vertexArrayOut, dArray<dInt32>& indexArrayOut, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
-	~ndDemoDebriMesh();
-
-	//virtual void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
-	//void SetTransforms(dInt32 count, const dMatrix* const matrixArray);
+	//ndDemoDebriMesh2(const char* const name, dArray<ndMeshPointUV>& vertexArrayOut, dArray<dInt32>& indexArrayOut, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
+	ndDemoDebriMesh2(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
+	~ndDemoDebriMesh2();
 
 	private:
-	//void RenderBatch(dInt32 start, ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
-	//
-	//const dMatrix* m_offsets;
-	//dInt32 m_instanceCount;
-	//dInt32 m_maxInstanceCount;
-	//GLuint m_matrixOffsetBuffer;
-	
+	ndDemoSubMeshMaterial m_material[2];
+	dInt32 m_textureLocation1;
 };
 
-
-class ndDemoDebriEntity: public ndDemoEntity
+class ndDemoDebriEntityRoot: public ndDemoEntity
 {
 	public:
-	ndDemoDebriEntity();
-	ndDemoDebriEntity(const ndDemoDebriEntity& copyFrom);
-	virtual ~ndDemoDebriEntity(void);
+	ndDemoDebriEntityRoot();
+	ndDemoDebriEntityRoot(const ndDemoDebriEntityRoot& copyFrom);
+	virtual ~ndDemoDebriEntityRoot(void);
 
-	void FinalizeConstruction(dArray<ndMeshPointUV>& vertexArrayOut, dArray<dInt32>& indexArrayOut);
+	void FinalizeConstruction(dArray<DebriPoint>& vertexArray);
 
 	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
 
-	//ndDemoMeshIntance* m_instanceMesh;
+	dInt32 m_vertexCount;
+	dInt32 m_buffRefCount;
+	GLuint m_vertexBuffer;
+	GLuint m_vertextArrayBuffer;
 };
+
+class ndDemoDebriEntity : public ndDemoEntity
+{
+	public:
+	ndDemoDebriEntity(ndMeshEffect* const meshNode, dArray<DebriPoint>& vertexArray, ndDemoDebriEntityRoot* const parent, const ndShaderPrograms& shaderCache);
+	//	ndDemoDebriEntityRoot(const ndDemoDebriEntityRoot& copyFrom);
+	//virtual ~ndDemoDebriEntity(void);
+
+	dNodeBaseHierarchy* CreateClone() const;
+
+	dInt32 m_vertexOffestBase;
+};
+
 
 #endif

@@ -3,8 +3,12 @@
 
 #include "ndSandboxStdafx.h"
 
+#define USE_SINGLE_MESH
+
 class ndDemoMesh;
+class ndDemoDebriEntity;
 class ndDemoEntityManager;
+class ndDemoDebriEntityRoot;
 
 class ndSkinPeelFracture: public ndModel
 {
@@ -17,7 +21,11 @@ class ndSkinPeelFracture: public ndModel
 
 		dVector m_centerOfMass;
 		dVector m_momentOfInertia;
+#ifdef USE_SINGLE_MESH
 		ndDemoMesh* m_mesh;
+#else	
+		ndDemoDebriEntity* m_mesh;
+#endif
 		ndShapeInstance* m_collision;
 		dFloat32 m_massFraction;
 	};
@@ -56,6 +64,9 @@ class ndSkinPeelFracture: public ndModel
 		ndShapeInstance* m_shape;
 		ndDemoMesh* m_visualMesh;
 		dFloat32 m_breakImpactSpeed;
+#ifndef USE_SINGLE_MESH
+		ndDemoDebriEntityRoot* m_debriRootEnt;
+#endif
 
 		friend ndSkinPeelFracture;
 	};

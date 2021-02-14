@@ -104,8 +104,8 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	// create vertex semantic layout
-	glGenVertexArrays(1, &m_vetextArrayBuffer);
-	glBindVertexArray(m_vetextArrayBuffer);
+	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
 
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -217,7 +217,7 @@ void ndDemoMeshIntance::RenderBatch(dInt32 start, ndDemoEntityManager* const sce
 	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
 	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 
-	glBindVertexArray(m_vetextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 

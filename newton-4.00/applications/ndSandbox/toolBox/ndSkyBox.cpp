@@ -20,7 +20,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_texturecubemap(0)
-	,m_vetextArrayBuffer(0)
+	,m_vertextArrayBuffer(0)
 	,m_matrixUniformLocation(0)
 	,m_textureMatrixLocation(0)
 {
@@ -54,8 +54,8 @@ ndSkyBox::ndSkyBox(GLuint shader)
 		
 	SetupCubeMap();
 
-	glGenVertexArrays(1, &m_vetextArrayBuffer);
-	glBindVertexArray(m_vetextArrayBuffer);
+	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
 	
 	glGenBuffers(1, &m_vertexBuffer); //m_vbo
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -204,9 +204,9 @@ ndSkyBox::~ndSkyBox()
 		glDeleteBuffers(1, &m_vertexBuffer);
 	}
 
-	if (m_vetextArrayBuffer)
+	if (m_vertextArrayBuffer)
 	{
-		glDeleteVertexArrays(1, &m_vetextArrayBuffer);
+		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
 	}
 }
 
@@ -231,7 +231,7 @@ void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_texturecubemap);
-	glBindVertexArray(m_vetextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 

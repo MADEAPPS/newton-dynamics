@@ -23,6 +23,7 @@
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"
 
+/*
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, dInt32 count)
@@ -51,9 +52,11 @@ static void AddShape(ndDemoEntityManager* const scene,
 		matrix.m_posit.m_y += diameter * 2.5f;
 	}
 }
+*/
 
-static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& origin)
+static void AddSomeObstacles(ndDemoEntityManager* const scene, const dVector& origin)
 {
+/*
 	dFloat32 diameter = 1.0f;
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	ndDemoMeshIntance* const instanceMesh = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
@@ -75,11 +78,8 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 	}
 
 	instanceMesh->Release();
+*/
 }
-
-
-
-
 
 class ndTireNotifyNotify : public ndDemoEntityNotify
 {
@@ -421,17 +421,16 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene);
 
-	dMatrix location0(dGetIdentityMatrix());
-	location0.m_posit.m_y += 2.0f;
-	location0.m_posit.m_z += 2.0f;
-	dMatrix localAxis(dGetIdentityMatrix());
-	localAxis[0] = dVector(0.0f, 1.0f, 0.0f, 0.0f);
-	localAxis[1] = dVector(1.0f, 0.0f, 0.0f, 0.0f);
-	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
-	dFloat32 height = 1.9f;
-	dFloat32 radio = 0.5f;
-	dFloat32 mass = 100.0f;
-
+	//dMatrix location0(dGetIdentityMatrix());
+	//location0.m_posit.m_y += 2.0f;
+	//location0.m_posit.m_z += 2.0f;
+	//dMatrix localAxis(dGetIdentityMatrix());
+	//localAxis[0] = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+	//localAxis[1] = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+	//localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
+	//dFloat32 height = 1.9f;
+	//dFloat32 radio = 0.5f;
+	//dFloat32 mass = 100.0f;
 	//new ndBasicPlayerCapsule(scene, localAxis, location0, mass, radio, height, height / 4.0f, true);
 
 	//dVector location(0.0f, 0.5f, 0.0f, 1.0f);
@@ -446,7 +445,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 
 	scene->Set2DDisplayRenderFunction(nullptr, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
-	//AddCapsulesStacks(scene, location);
+	AddSomeObstacles(scene, location);
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);

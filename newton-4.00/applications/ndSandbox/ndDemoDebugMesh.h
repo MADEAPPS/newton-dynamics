@@ -45,7 +45,7 @@ class ndFlatShadedDebugMesh: public ndDemoMeshInterface
 
 	GLuint m_shader;
 	GLuint m_vertexBuffer;
-	GLuint m_vetextArrayBuffer;
+	GLuint m_vertextArrayBuffer;
 	GLuint m_triangleIndexBuffer;
 };
 
@@ -72,7 +72,7 @@ class ndWireFrameDebugMesh: public ndDemoMeshInterface
 
 	GLuint m_shader;
 	GLuint m_vertexBuffer;
-	GLuint m_vetextArrayBuffer;
+	GLuint m_vertextArrayBuffer;
 	GLuint m_lineIndexBuffer;
 };
 

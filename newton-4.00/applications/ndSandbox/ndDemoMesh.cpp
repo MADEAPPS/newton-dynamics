@@ -33,7 +33,7 @@ ndDemoMesh::ndDemoMesh(const char* const name)
 	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
-	,m_vetextArrayBuffer(0)
+	,m_vertextArrayBuffer(0)
 	,m_hasTransparency(false)
 {
 	m_name = name;
@@ -47,7 +47,7 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCac
 	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
-	,m_vetextArrayBuffer(0)
+	,m_vertextArrayBuffer(0)
 	,m_hasTransparency(false)
 {
 	dAssert(0);
@@ -87,7 +87,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
-	,m_vetextArrayBuffer(0)
+	,m_vertextArrayBuffer(0)
 	,m_hasTransparency(false)
 {
 	m_name = name;
@@ -200,7 +200,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
-	,m_vetextArrayBuffer(0)
+	,m_vertextArrayBuffer(0)
 	,m_hasTransparency(false)
 {
 	m_name = name;
@@ -309,8 +309,8 @@ void ndDemoMesh::OptimizeForRender(
 	// first make sure the previous optimization is removed
 	ResetOptimization();
 
-	glGenVertexArrays(1, &m_vetextArrayBuffer);
-	glBindVertexArray(m_vetextArrayBuffer);
+	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
 
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -360,11 +360,11 @@ void ndDemoMesh::OptimizeForRender(
 
 void  ndDemoMesh::ResetOptimization()
 {
-	if (m_vetextArrayBuffer)
+	if (m_vertextArrayBuffer)
 	{
 		glDeleteBuffers(1, &m_indexBuffer);
 		glDeleteBuffers(1, &m_vertexBuffer);
-		glDeleteVertexArrays(1, &m_vetextArrayBuffer);
+		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
 	}
 }
 
@@ -414,7 +414,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 			//dAssert(attenuation > 0.0f);
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-			glBindVertexArray(m_vetextArrayBuffer);
+			glBindVertexArray(m_vertextArrayBuffer);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 			glActiveTexture(GL_TEXTURE0);
@@ -459,7 +459,7 @@ void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const dMatrix&
 	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
 	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 
-	glBindVertexArray(m_vetextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 	glActiveTexture(GL_TEXTURE0);

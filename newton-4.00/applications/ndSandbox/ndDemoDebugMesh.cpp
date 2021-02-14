@@ -83,8 +83,8 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 	m_color.m_z = 1.0f;
 	m_color.m_w = 1.0f;
 
-	glGenVertexArrays(1, &m_vetextArrayBuffer);
-	glBindVertexArray(m_vetextArrayBuffer);
+	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
 
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -119,11 +119,11 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 
 ndFlatShadedDebugMesh::~ndFlatShadedDebugMesh()
 {
-	if (m_vetextArrayBuffer)
+	if (m_vertextArrayBuffer)
 	{
 		glDeleteBuffers(1, &m_triangleIndexBuffer);
 		glDeleteBuffers(1, &m_vertexBuffer);
-		glDeleteVertexArrays(1, &m_vetextArrayBuffer);
+		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
 	}
 }
 
@@ -142,7 +142,7 @@ void ndFlatShadedDebugMesh::Render(ndDemoEntityManager* const scene, const dMatr
 	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
 	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 
-	glBindVertexArray(m_vetextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
 
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
@@ -229,8 +229,8 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 	m_color.m_z = 1.0f;
 	m_color.m_w = 1.0f;
 
-	glGenVertexArrays(1, &m_vetextArrayBuffer);
-	glBindVertexArray(m_vetextArrayBuffer);
+	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
 
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -259,11 +259,11 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 
 ndWireFrameDebugMesh::~ndWireFrameDebugMesh()
 {
-	if (m_vetextArrayBuffer)
+	if (m_vertextArrayBuffer)
 	{
 		glDeleteBuffers(1, &m_lineIndexBuffer);
 		glDeleteBuffers(1, &m_vertexBuffer);
-		glDeleteVertexArrays(1, &m_vetextArrayBuffer);
+		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
 	}
 }
 
@@ -279,7 +279,7 @@ void ndWireFrameDebugMesh::Render(ndDemoEntityManager* const scene, const dMatri
 	glUniform4fv(m_shadeColorLocation, 1, &m_color.m_x);
 	glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &projectionViewModelMatrix[0][0]);
 
-	glBindVertexArray(m_vetextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_lineIndexBuffer);
 
 	glDrawElements(GL_LINES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
