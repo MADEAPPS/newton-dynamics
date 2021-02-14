@@ -31,7 +31,7 @@ void main()
 	lightDir = vec3(directionalLightDir.x, directionalLightDir.y, directionalLightDir.z);
 
 	materialBlend = in_position.w;
-//materialBlend = 0.0;
+//materialBlend = 1.0f;
 	posit = vec3 (viewModelMatrix * vec4(vec3(in_position), 1.0));
 	normal = vec3 (normalize (normalMatrix * vec4(in_normal, 0.0)));
 	uv = in_uv;

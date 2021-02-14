@@ -80,7 +80,9 @@ void main()
 
 	vec3 text0 = vec3 (texture2D(texture0, uv));
 	vec3 text1 = vec3 (texture2D(texture1, uv));
-	vec3 text = text0 * materialBlend + text1 * (1.0 - materialBlend);
+	//vec3 text = text0 * materialBlend + text1 * (1.0 - materialBlend);
+	vec3 text = text0 * materialBlend;
+	//vec3 text = text1 * (1.0 - materialBlend);
 
 	vec3 texColor = lightIntensity * text;
 	pixelColor = vec4(texColor, transparency);

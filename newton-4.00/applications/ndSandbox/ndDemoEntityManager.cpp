@@ -38,8 +38,8 @@
 //#define DEFAULT_SCENE	7		// setting basic joints
 //#define DEFAULT_SCENE	8		// setting basic vehicle
 //#define DEFAULT_SCENE	9		// conservation of angular momentum 
-#define DEFAULT_SCENE	10		// simple voronoi fracture
-//#define DEFAULT_SCENE	11		// skin peel voronoi fracture
+//#define DEFAULT_SCENE	10		// simple voronoi fracture
+#define DEFAULT_SCENE	11		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndBasicStacks(ndDemoEntityManager* const scene);

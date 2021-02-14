@@ -154,6 +154,7 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 			ndAtom& atom = Append()->GetInfo();
 			fracturePiece->RemoveUnusedVertices(nullptr);
 			atom.m_mesh = new ndDemoMesh("fracture", fracturePiece, scene->GetShaderCache());
+			//atom.m_mesh = new ndDemoDebriMesh____("fracture", fracturePiece, scene->GetShaderCache());
 
 			// get center of mass
 			dMatrix inertia(fracturedCollision->CalculateInertia());
@@ -225,14 +226,6 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 	{
 		delete node->GetInfo();
 	}
-
-	// optimized mesh 
-	//for (dListNode* node = GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndAtom& atom = node->GetInfo();
-	//
-	//
-	//}
 }
 
 ndSkinPeelFracture::ndEffect::ndEffect(const ndEffect& effect)

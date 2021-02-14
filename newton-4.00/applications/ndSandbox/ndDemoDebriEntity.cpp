@@ -47,6 +47,10 @@ ndDemoDebriMesh____::ndDemoDebriMesh____(const char* const name, ndMeshEffect* c
 	meshNode->GetNormalChannel(sizeof(DebriPoint), &points[0].m_normal.m_x);
 	meshNode->GetUV0Channel(sizeof(DebriPoint), &points[0].m_uv.m_u);
 
+for (int i = 0; i < vertexCount; i++)
+{
+	points[i].m_posit.m_w = -1.0;
+}
 	
 	dInt32 segmentStart = 0;
 	dInt32 materialCount = 0;
@@ -54,16 +58,7 @@ ndDemoDebriMesh____::ndDemoDebriMesh____(const char* const name, ndMeshEffect* c
 	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
 	{
 		dInt32 materialIndex = meshNode->GetMaterialID(geometryHandle, handle);
-		//ndDemoSubMesh* const segment = AddSubMesh();
-
 		const ndMeshEffect::dMaterial& material = materialArray[materialIndex];
-		//segment->m_material.m_ambient = material.m_ambient;
-		//segment->m_material.m_diffuse = material.m_diffuse;
-		//segment->m_material.m_specular = material.m_specular;
-		//segment->m_material.m_opacity = material.m_opacity;
-		//segment->m_material.m_shiness = material.m_shiness;
-		//strcpy(segment->m_material.m_textureName, material.m_textureName);
-		//segment->m_material.m_textureHandle = LoadTexture(material.m_textureName);
 
 		m_material[materialCount].m_ambient = material.m_ambient;
 		m_material[materialCount].m_diffuse = material.m_diffuse;
@@ -72,9 +67,6 @@ ndDemoDebriMesh____::ndDemoDebriMesh____(const char* const name, ndMeshEffect* c
 		m_material[materialCount].m_shiness = material.m_shiness;
 		strcpy(m_material[materialCount].m_textureName, material.m_textureName);
 		m_material[materialCount].m_textureHandle = LoadTexture(material.m_textureName);
-
-		//segment->m_indexCount = meshNode->GetMaterialIndexCount(geometryHandle, handle);
-		//segment->m_segmentStart = segmentStart;
 
 		dInt32 subIndexCount = meshNode->GetMaterialIndexCount(geometryHandle, handle);
 		meshNode->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
@@ -106,7 +98,7 @@ ndDemoDebriMesh____::ndDemoDebriMesh____(const char* const name, ndMeshEffect* c
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DebriPoint), (void*)sizeof(ndMeshVector4));
 
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)(sizeof (ndMeshVector4) + sizeof(ndMeshVector)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(DebriPoint), (void*)(sizeof (ndMeshVector4) + sizeof(ndMeshVector)));
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
@@ -152,7 +144,7 @@ void ndDemoDebriMesh____::Render(ndDemoEntityManager* const scene, const dMatrix
 	dVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
 
 	glUniform1i(m_textureLocation, 0);
-	glUniform1i(m_textureLocation1, 0);
+	glUniform1i(m_textureLocation1, 1);
 	glUniform1f(m_transparencyLocation, 1.0f);
 	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight.m_x);
 	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
@@ -162,7 +154,6 @@ void ndDemoDebriMesh____::Render(ndDemoEntityManager* const scene, const dMatrix
 	glBindVertexArray(m_vetextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
-	//glActiveTexture(GL_TEXTURE0);
 	glUniform3fv(m_materialAmbientLocation, 1, &m_material[0].m_ambient.m_x);
 	glUniform3fv(m_materialDiffuseLocation, 1, &m_material[0].m_diffuse.m_x);
 	glUniform3fv(m_materialSpecularLocation, 1, &m_material[0].m_specular.m_x);
@@ -181,6 +172,9 @@ void ndDemoDebriMesh____::Render(ndDemoEntityManager* const scene, const dMatrix
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
+
+	//glActiveTexture(GL_TEXTURE0 + 1);
+	//glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 //ndDemoDebriMesh::ndDemoDebriMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity, const dMatrix& uvMatrix)
