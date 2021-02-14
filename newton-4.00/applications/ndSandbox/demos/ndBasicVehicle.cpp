@@ -81,6 +81,53 @@ static void AddSomeObstacles(ndDemoEntityManager* const scene, const dVector& or
 */
 }
 
+
+static void PlaceRampRamp(ndDemoEntityManager* const scene, 
+	const dMatrix& location, ndDemoMesh* const geometry, ndShapeInstance ramp)
+{
+	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
+	scene->AddEntity(entity);
+	entity->SetMesh(geometry, dGetIdentityMatrix());
+
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(location);
+	body->SetCollisionShape(ramp);
+	scene->GetWorld()->AddBody(body);
+}
+
+static void AddRamps(ndDemoEntityManager* const scene, const dVector& origin)
+{
+	ndShapeInstance box(new ndShapeBox(5.0f, 0.125f, 6.f));
+	dMatrix uvMatrix(dGetIdentityMatrix());
+	uvMatrix[0][0] *= 0.25f;
+	uvMatrix[1][1] *= 0.25f;
+	uvMatrix[2][2] *= 0.25f;
+	uvMatrix.m_posit = dVector(-0.5f, -0.5f, 0.0f, 1.0f);
+	const char* const textureName = "wood_3.tga";
+	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, textureName, textureName, textureName, 1.0f, uvMatrix);
+
+	dMatrix matrix(dRollMatrix(20.0f * dDegreeToRad));
+	matrix.m_posit = origin;
+	PlaceRampRamp(scene, matrix, geometry, box);
+
+	matrix = dGetIdentityMatrix();
+	matrix.m_posit = origin;
+	matrix.m_posit.m_x += 4.8f;
+	matrix.m_posit.m_y += 0.85f;
+	PlaceRampRamp(scene, matrix, geometry, box);
+
+	matrix.m_posit.m_x += 5.0f;
+	PlaceRampRamp(scene, matrix, geometry, box);
+
+	matrix = matrix * dRollMatrix(-20.0f * dDegreeToRad);
+	matrix.m_posit.m_x += 5.0f;
+	matrix.m_posit.m_y = origin.m_y;
+	PlaceRampRamp(scene, matrix, geometry, box);
+
+	geometry->Release();
+}
+
 class ndTireNotifyNotify : public ndDemoEntityNotify
 {
 	public:
@@ -282,10 +329,10 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		dFloat32 handBrake = 1500.0f * dFloat32(scene->GetKeyState(' '));
 		dFloat32 throttle = dFloat32 (scene->GetKeyState('W')) ? 1.0f : 0.0f;
 		dFloat32 steerAngle = 35.0f * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
-		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
+     		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
 
 		static dInt32 xxxx;
-		xxxx++;
+ 		xxxx++;
 		if (xxxx > 300)
 		{
 			start = true;
@@ -434,7 +481,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//new ndBasicPlayerCapsule(scene, localAxis, location0, mass, radio, height, height / 4.0f, true);
 
 	//dVector location(0.0f, 0.5f, 0.0f, 1.0f);
-	dVector location(0.0f, 6.0f, 0.0f, 1.0f);
+	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = location;
@@ -444,6 +491,10 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	vehicle->SetAsPlayer(scene);
 
 	scene->Set2DDisplayRenderFunction(nullptr, ndBasicMultiBodyVehicle::RenderUI, vehicle);
+
+	location.m_z = 4.0f;
+	location.m_y = 0.5f;
+	AddRamps(scene, location);
 
 	AddSomeObstacles(scene, location);
 

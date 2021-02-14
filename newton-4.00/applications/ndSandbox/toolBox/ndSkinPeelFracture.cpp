@@ -38,18 +38,29 @@ ndSkinPeelFracture::ndAtom::ndAtom()
 ndSkinPeelFracture::ndAtom::ndAtom(const ndAtom& atom)
 	:m_centerOfMass(atom.m_centerOfMass)
 	,m_momentOfInertia(atom.m_momentOfInertia)
+#ifdef USE_SINGLE_MESH
 	,m_mesh((ndDemoMesh*)atom.m_mesh->AddRef())
+#endif
 	,m_collision(new ndShapeInstance(*atom.m_collision))
 	,m_massFraction(atom.m_massFraction)
 {
+#ifndef USE_SINGLE_MESH
+	dAssert(0);
+#endif
 }
 
 ndSkinPeelFracture::ndAtom::~ndAtom()
 {
+#ifndef USE_SINGLE_MESH
+dAssert(0);
+#endif
+
+#ifdef USE_SINGLE_MESH
 	if (m_mesh)
 	{
 		m_mesh->Release();
 	}
+#endif
 
 	if (m_collision)
 	{
