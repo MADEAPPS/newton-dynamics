@@ -24,6 +24,7 @@
 
 #include "dCoreStdafx.h"
 #include "dClassAlloc.h"
+#include "dMemory.h"
 
 template<class T>
 class dContainersAlloc: public dClassAlloc
