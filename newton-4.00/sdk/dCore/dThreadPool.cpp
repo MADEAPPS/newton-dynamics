@@ -23,7 +23,6 @@
 #include "dThreadPool.h"
 #include "dProfiler.h"
 
-#ifdef D_LOCK_FREE_THREADS_POOL
 void dThreadPool::dThreadLockFreeUpdate::Execute()
 {
 	m_begin.store(true);
@@ -41,7 +40,6 @@ void dThreadPool::dThreadLockFreeUpdate::Execute()
 		}
 	}
 }
-#endif
 
 dThreadPool::dWorkerThread::dWorkerThread()
 	:dClassAlloc()
@@ -84,20 +82,16 @@ dThreadPool::dThreadPool(const char* const baseName)
 	,m_sync()
 	,m_workers(nullptr)
 	,m_count(0)
-#ifdef D_LOCK_FREE_THREADS_POOL
 	,m_joindInqueue(0)
-#endif
 {
 	char name[256];
 	strncpy(m_baseName, baseName, sizeof (m_baseName));
 	sprintf(name, "%s_%d", m_baseName, 0);
 	SetName(name);
-#ifdef D_LOCK_FREE_THREADS_POOL
 	for (dInt32 i = 0; i < D_MAX_THREADS_COUNT; i++)
 	{
 		m_lockFreeJobs[i].m_joindInqueue = &m_joindInqueue;
 	}
-#endif
 }
 
 dThreadPool::~dThreadPool()
@@ -142,7 +136,6 @@ void dThreadPool::SetCount(dInt32 count)
 
 void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs)
 {
-#ifdef D_LOCK_FREE_THREADS_POOL
 	if (m_count > 0)
 	{
 		m_joindInqueue.fetch_add(m_count);
@@ -164,29 +157,10 @@ void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs)
 		jobs[0]->m_threadIndex = 0;
 		jobs[0]->Execute();
 	}
-#else
-	if (m_count > 0)
-	{
-		for (dInt32 i = 0; i < m_count; i++)
-		{
-			m_workers[i].ExecuteJob(jobs[i]);
-		}
-
-		jobs[m_count]->m_threadIndex = m_count;
-		jobs[m_count]->Execute();
-		m_sync.Sync();
-	}
-	else
-	{
-		jobs[0]->m_threadIndex = 0;
-		jobs[0]->Execute();
-	}
-#endif
 }
 
 void dThreadPool::Begin()
 {
-#ifdef	D_LOCK_FREE_THREADS_POOL
 	D_TRACKTIME();
 	for (dInt32 i = 0; i < m_count; i++)
 	{
@@ -208,18 +182,15 @@ void dThreadPool::Begin()
 		extJobPtr[i] = &extJob[i];
 	}
 	ExecuteJobs(extJobPtr);
-#endif
 }
 
 void dThreadPool::End()
 {
-#ifdef	D_LOCK_FREE_THREADS_POOL
 	for (dInt32 i = 0; i < m_count; i++)
 	{
 		m_lockFreeJobs[i].m_begin.store(false);
 	}
 	m_sync.Sync();
-#endif
 }
 
 void dThreadPool::TickOne()

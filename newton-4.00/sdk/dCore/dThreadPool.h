@@ -32,8 +32,6 @@
 
 #define	D_MAX_THREADS_COUNT	16
 
-#define	D_LOCK_FREE_THREADS_POOL
-
 class dThreadPoolJob
 {
 	public:
@@ -75,7 +73,6 @@ class dThreadPool: public dSyncMutex, public dThread
 		friend class dThreadPool;
 	};
 
-#ifdef D_LOCK_FREE_THREADS_POOL
 	class dThreadLockFreeUpdate: public dThreadPoolJob
 	{
 		public:
@@ -93,9 +90,7 @@ class dThreadPool: public dSyncMutex, public dThread
 		dAtomic<bool> m_begin;
 		dAtomic<dInt32>* m_joindInqueue;
 		friend class dThreadPool;
-		
 	};
-#endif
 
 	public:
 	D_CORE_API dThreadPool(const char* const baseName);
@@ -117,11 +112,8 @@ class dThreadPool: public dSyncMutex, public dThread
 	dWorkerThread* m_workers;
 	dInt32 m_count;
 	char m_baseName[32];
-
-#ifdef D_LOCK_FREE_THREADS_POOL
 	dAtomic<dInt32> m_joindInqueue;
 	dThreadLockFreeUpdate m_lockFreeJobs[D_MAX_THREADS_COUNT];
-#endif
 };
 
 #endif
