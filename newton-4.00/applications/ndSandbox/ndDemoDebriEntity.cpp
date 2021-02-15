@@ -160,47 +160,52 @@ void ndDemoDebriMesh::Render(ndDemoEntityManager* const scene, const dMatrix& mo
 	glUseProgram(0);
 }
 
-//ndDemoDebriMesh2::ndDemoDebriMesh2(const char* const name, dArray<ndMeshPointUV>& vertexArray, dArray<dInt32>& indexArray, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
-ndDemoDebriMesh2::ndDemoDebriMesh2(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
+ndDemoDebriMesh2::ndDemoDebriMesh2(ndDemoDebriMesh2* const srcMeshconst, const dArray<DebriPoint>& vertexArray)
+	:ndDemoMesh("vertexBufferMesh")
+{
+	m_shader = srcMeshconst->m_shader;
+	m_indexCount = 0;
+	m_vertexCount = vertexArray.GetCount();
+	m_textureLocation = srcMeshconst->m_textureLocation;
+	m_transparencyLocation = srcMeshconst->m_transparencyLocation;
+	m_normalMatrixLocation = srcMeshconst->m_normalMatrixLocation;
+	m_projectMatrixLocation = srcMeshconst->m_projectMatrixLocation;
+	m_viewModelMatrixLocation = srcMeshconst->m_viewModelMatrixLocation;
+	m_directionalLightDirLocation = srcMeshconst->m_directionalLightDirLocation;
+
+	m_materialAmbientLocation = srcMeshconst->m_materialAmbientLocation;
+	m_materialDiffuseLocation = srcMeshconst->m_materialAmbientLocation;
+	m_materialSpecularLocation = srcMeshconst->m_materialSpecularLocation;
+
+	m_textureLocation1 = srcMeshconst->m_textureLocation1;
+	memcpy(m_material, srcMeshconst->m_material, sizeof(m_material));
+
+	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
+	
+	glGenBuffers(1, &m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, m_vertexCount * sizeof(DebriPoint), &vertexArray[0].m_posit.m_x, GL_STATIC_DRAW);
+	
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(DebriPoint), (void*)0);
+	
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DebriPoint), (void*)sizeof(ndMeshVector4));
+	
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(DebriPoint), (void*)(sizeof(ndMeshVector4) + sizeof(ndMeshVector)));
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
+	glBindVertexArray(0);
+	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+}
+
+ndDemoDebriMesh2::ndDemoDebriMesh2(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase)
 	:ndDemoMesh(name)
 {
-/*
-	dInt32 indexCount = 0;
-	ndIndexArray* const geometryHandle = meshNode->MaterialGeometryBegin();
-	dInt32 vertexCount = meshNode->GetPropertiesCount();
-	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
-	{
-		indexCount += meshNode->GetMaterialIndexCount(geometryHandle, handle);
-	}
-
-	const dInt32 base = vertexArray.GetCount();
-	dInt32 segmentStart = indexArray.GetCount();
-	indexArray.SetCount(indexArray.GetCount() + indexCount);
-	vertexArray.SetCount(vertexArray.GetCount() + vertexCount);
-
-	meshNode->GetVertexChannel(sizeof(ndMeshPointUV), &vertexArray[base].m_posit.m_x);
-	meshNode->GetNormalChannel(sizeof(ndMeshPointUV), &vertexArray[base].m_normal.m_x);
-	meshNode->GetUV0Channel(sizeof(ndMeshPointUV), &vertexArray[base].m_uv.m_u);
-	
-	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
-	{
-		dInt32 material = meshNode->GetMaterialID(geometryHandle, handle);
-		ndDemoSubMesh* const segment = AddSubMesh();
-	
-		segment->m_material.m_textureHandle = (GLuint)material;
-		segment->m_indexCount = meshNode->GetMaterialIndexCount(geometryHandle, handle);
-	
-		segment->m_segmentStart = segmentStart;
-		meshNode->GetMaterialGetIndexStream(geometryHandle, handle, &indexArray[segmentStart]);
-		for (dInt32 i = 0; i < segment->m_indexCount; i++)
-		{
-			indexArray[segmentStart + i] += base;
-		}
-		segmentStart += segment->m_indexCount;
-	}
-	meshNode->MaterialGeomteryEnd(geometryHandle);
-*/
-
 	m_name = name;
 	m_shader = shaderCache.m_diffuseDebriEffect;
 
@@ -234,21 +239,16 @@ ndDemoDebriMesh2::ndDemoDebriMesh2(const char* const name, ndMeshEffect* const m
 
 		dInt32 subIndexCount = meshNode->GetMaterialIndexCount(geometryHandle, handle);
 		meshNode->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
-
-		//dFloat32 blend = materialCount ? 0.0f : 1.0f;
-		//for (dInt32 i = 0; i < subIndexCount; i++)
-		//{
-		//	dInt32 index = indices[segmentStart + i];
-		//	points[index].m_posit.m_w = blend;
-		//}
+		for (dInt32 i = 0; i < subIndexCount; i++)
+		{
+			indices[i] += offsetBase;
+		}
 
 		materialCount++;
 		segmentStart += subIndexCount;
 	}
-
 	meshNode->MaterialGeomteryEnd(geometryHandle);
 
-	
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
@@ -276,17 +276,59 @@ ndDemoDebriMesh2::~ndDemoDebriMesh2()
 {
 }
 
+void ndDemoDebriMesh2::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+{
+	ndDemoCamera* const camera = scene->GetCamera();
+
+	const dMatrix& viewMatrix = camera->GetViewMatrix();
+	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
+	dMatrix viewModelMatrix(modelMatrix * viewMatrix);
+	dVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+
+	glUniform1i(m_textureLocation, 0);
+	glUniform1i(m_textureLocation1, 1);
+	glUniform1f(m_transparencyLocation, 1.0f);
+	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight.m_x);
+	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+
+	//glBindVertexArray(m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+
+	glUniform3fv(m_materialAmbientLocation, 1, &m_material[0].m_ambient.m_x);
+	glUniform3fv(m_materialDiffuseLocation, 1, &m_material[0].m_diffuse.m_x);
+	glUniform3fv(m_materialSpecularLocation, 1, &m_material[0].m_specular.m_x);
+
+	// these call make the font display wrong
+	glActiveTexture(GL_TEXTURE1);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glBindTexture(GL_TEXTURE_2D, m_material[1].m_textureHandle);
+
+	glActiveTexture(GL_TEXTURE0);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glBindTexture(GL_TEXTURE_2D, m_material[0].m_textureHandle);
+
+	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	//glBindVertexArray(0);
+	//glUseProgram(0);
+}
+
 ndDemoDebriEntity::ndDemoDebriEntity(ndMeshEffect* const meshNode, dArray<DebriPoint>& vertexArray, ndDemoDebriEntityRoot* const parent, const ndShaderPrograms& shaderCache)
 	:ndDemoEntity(dGetIdentityMatrix(), parent)
-	,m_vertexOffestBase(vertexArray.GetCount())
 {
 	dInt32 vertexCount = meshNode->GetPropertiesCount();
-	vertexArray.SetCount(m_vertexOffestBase + vertexCount);
-	meshNode->GetVertexChannel(sizeof(DebriPoint), &vertexArray[m_vertexOffestBase].m_posit.m_x);
-	meshNode->GetNormalChannel(sizeof(DebriPoint), &vertexArray[m_vertexOffestBase].m_normal.m_x);
-	meshNode->GetUV0Channel(sizeof(DebriPoint), &vertexArray[m_vertexOffestBase].m_uv.m_u);
 
-	ndDemoDebriMesh2* const mesh = new ndDemoDebriMesh2("fracture", meshNode, shaderCache);
+	dInt32 const vertexOffsetBase = vertexArray.GetCount();
+	vertexArray.SetCount(vertexOffsetBase + vertexCount);
+	meshNode->GetVertexChannel(sizeof(DebriPoint), &vertexArray[vertexOffsetBase].m_posit.m_x);
+	meshNode->GetNormalChannel(sizeof(DebriPoint), &vertexArray[vertexOffsetBase].m_normal.m_x);
+	meshNode->GetUV0Channel(sizeof(DebriPoint), &vertexArray[vertexOffsetBase].m_uv.m_u);
+
+	ndDemoDebriMesh2* const mesh = new ndDemoDebriMesh2("fracture", meshNode, shaderCache, vertexOffsetBase);
 	SetMesh(mesh, dGetIdentityMatrix());
 	mesh->Release();
 
@@ -303,7 +345,7 @@ ndDemoDebriEntity::ndDemoDebriEntity(ndMeshEffect* const meshNode, dArray<DebriP
 		for (dInt32 i = 0; i < subIndexCount; i++)
 		{
 			dInt32 index = indices[segmentStart + i];
-			vertexArray[m_vertexOffestBase + index].m_posit.m_w = blend;
+			vertexArray[vertexOffsetBase + index].m_posit.m_w = blend;
 		}
 		materialCount++;
 		segmentStart += subIndexCount;
@@ -313,13 +355,11 @@ ndDemoDebriEntity::ndDemoDebriEntity(ndMeshEffect* const meshNode, dArray<DebriP
 
 ndDemoDebriEntity::ndDemoDebriEntity(const ndDemoDebriEntity& copyFrom)
 	:ndDemoEntity(copyFrom)
-	,m_vertexOffestBase(copyFrom.m_vertexOffestBase)
 {
 }
 
 ndDemoDebriEntity::~ndDemoDebriEntity()
 {
-
 }
 
 dNodeBaseHierarchy* ndDemoDebriEntity::CreateClone() const
@@ -327,73 +367,46 @@ dNodeBaseHierarchy* ndDemoDebriEntity::CreateClone() const
 	return new ndDemoDebriEntity(*this);
 }
 
-ndDemoDebriEntityRoot::ndDemoDebriEntityRoot(const ndDemoDebriEntityRoot& copyFrom)
-	:ndDemoEntity(copyFrom)
-	,m_vertexCount(copyFrom.m_vertexCount)
-	,m_buffRefCount(copyFrom.m_vertexCount + 1)
-	,m_vertexBuffer(copyFrom.m_vertexBuffer)
-	,m_vertextArrayBuffer(copyFrom.m_vertextArrayBuffer)
+void ndDemoDebriEntity::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
+	const dMatrix modelMatrix(m_matrix * matrix);
+
+	m_mesh->Render(scene, modelMatrix);
 }
 
 ndDemoDebriEntityRoot::ndDemoDebriEntityRoot()
 	:ndDemoEntity(dGetIdentityMatrix(), nullptr)
-	,m_vertexCount(0)
-	,m_buffRefCount(0)
-	,m_vertexBuffer(0)
-	,m_vertextArrayBuffer(0)
+{
+}
+
+ndDemoDebriEntityRoot::ndDemoDebriEntityRoot(const ndDemoDebriEntityRoot& copyFrom)
+	:ndDemoEntity(copyFrom)
 {
 }
 
 ndDemoDebriEntityRoot::~ndDemoDebriEntityRoot(void)
 {
-	m_buffRefCount--;
-	if ((m_buffRefCount <= 0) && m_vertextArrayBuffer)
-	{
-		glDeleteBuffers(1, &m_vertexBuffer);
-		glDeleteVertexArrays(1, &m_vertextArrayBuffer);
-	}
 }
 
-void ndDemoDebriEntityRoot::FinalizeConstruction(dArray<DebriPoint>& vertexArray)
+void ndDemoDebriEntityRoot::FinalizeConstruction(const dArray<DebriPoint>& vertexArray)
 {
-//	dArray<dInt32> remapIndex;
-//	remapIndex.SetCount(vertexArray.GetCount());
-//	dInt32 vertexCount = dVertexListToIndexList(&vertexArray[0].m_posit.m_x, sizeof(ndMeshPointUV), sizeof(ndMeshPointUV), 0, vertexArray.GetCount(), &remapIndex[0], dFloat32(1.0e-6f));
-//
-//	for (dInt32 i = 0; i < indexArray.GetCount(); i++)
-//	{
-//		dInt32 index = indexArray[i];
-//		dAssert(index < remapIndex.GetCount());
-//		indexArray[i] = remapIndex[index];
-//	}
-
-	m_buffRefCount++;
-	glGenVertexArrays(1, &m_vertextArrayBuffer);
-	glBindVertexArray(m_vertextArrayBuffer);
-	
-	m_vertexCount = vertexArray.GetCount();
-	glGenBuffers(1, &m_vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, m_vertexCount * sizeof(DebriPoint), &vertexArray[0].m_posit.m_x, GL_STATIC_DRAW);
-	
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(DebriPoint), (void*)0);
-	
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DebriPoint), (void*)sizeof(ndMeshVector4));
-	
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(DebriPoint), (void*)(sizeof(ndMeshVector4) + sizeof(ndMeshVector)));
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
-	glBindVertexArray(0);
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
+	ndDemoDebriMesh2* const shaderMesh = (ndDemoDebriMesh2*)GetChild()->GetMesh();
+	m_mesh = new ndDemoDebriMesh2(shaderMesh, vertexArray);
 }
 
 void ndDemoDebriEntityRoot::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
-	//ndDemoEntity::Render(timestep, scene, matrix);
+	//ndDemoDebriMesh2* const shaderMesh = (ndDemoDebriMesh2*)GetChild()->GetMesh();
+	ndDemoDebriMesh2* const shaderMesh = ((ndDemoDebriMesh2*)m_mesh);
+	glUseProgram(shaderMesh->m_shader);
+	glBindVertexArray(shaderMesh->m_vertextArrayBuffer);
+	
+	const dMatrix nodeMatrix(m_matrix * matrix);
+	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
+	{
+		child->Render(timestep, scene, nodeMatrix);
+	}
+	
+	glBindVertexArray(0);
+	glUseProgram(0);
 }

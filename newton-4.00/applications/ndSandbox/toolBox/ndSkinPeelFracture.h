@@ -3,7 +3,7 @@
 
 #include "ndSandboxStdafx.h"
 
-#define USE_SINGLE_MESH
+//#define USE_SINGLE_MESH
 
 class ndDemoMesh;
 class ndDemoDebriEntity;
@@ -67,7 +67,6 @@ class ndSkinPeelFracture: public ndModel
 #ifndef USE_SINGLE_MESH
 		ndDemoDebriEntityRoot* m_debriRootEnt;
 #endif
-
 		friend ndSkinPeelFracture;
 	};
 
