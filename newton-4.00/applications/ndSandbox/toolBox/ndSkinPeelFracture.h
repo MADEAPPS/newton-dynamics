@@ -63,10 +63,10 @@ class ndSkinPeelFracture: public ndModel
 		ndBodyKinematic* m_body;
 		ndShapeInstance* m_shape;
 		ndDemoMesh* m_visualMesh;
-		dFloat32 m_breakImpactSpeed;
 #ifndef USE_SINGLE_MESH
 		ndDemoDebriEntityRoot* m_debriRootEnt;
 #endif
+		dFloat32 m_breakImpactSpeed;
 		friend ndSkinPeelFracture;
 	};
 

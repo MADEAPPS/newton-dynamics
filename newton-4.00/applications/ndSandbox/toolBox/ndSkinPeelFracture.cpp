@@ -9,9 +9,6 @@
 * freely
 */
 
-// dGeometry.cpp: implementation of the dGeometry class.
-//
-//////////////////////////////////////////////////////////////////////
 #include "ndSandboxStdafx.h"
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
@@ -67,10 +64,11 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 	:dList<ndAtom>()
 	,m_body(nullptr)
 	,m_shape(new ndShapeInstance(*desc.m_outerShape))
-	,m_breakImpactSpeed(desc.m_breakImpactSpeed)
+	,m_visualMesh(nullptr)
 #ifndef USE_SINGLE_MESH
 	,m_debriRootEnt(nullptr)
 #endif
+	,m_breakImpactSpeed(desc.m_breakImpactSpeed)
 {
 	dVector pMin;
 	dVector pMax;
@@ -200,7 +198,6 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 			ndAtom& atom = Append()->GetInfo();
 			fracturePiece->RemoveUnusedVertices(nullptr);
 			atom.m_mesh = new ndDemoDebriEntity(fracturePiece, vertexArray, m_debriRootEnt, scene->GetShaderCache());
-			//atom.m_mesh = new ndDemoDebriMesh2("fracture", vertexArray, indexArray, fracturePiece, scene->GetShaderCache());
 
 			// get center of mass
 			dMatrix inertia(fracturedCollision->CalculateInertia());
@@ -238,10 +235,10 @@ ndSkinPeelFracture::ndEffect::ndEffect(const ndEffect& effect)
 	:m_body(new ndBodyDynamic())
 	,m_shape(nullptr)
 	,m_visualMesh(nullptr)
-	,m_breakImpactSpeed(effect.m_breakImpactSpeed)
 #ifndef USE_SINGLE_MESH
 	,m_debriRootEnt(new ndDemoDebriEntityRoot(*effect.m_debriRootEnt))
 #endif
+	,m_breakImpactSpeed(effect.m_breakImpactSpeed)
 {
 	m_body->SetCollisionShape(*effect.m_shape);
 

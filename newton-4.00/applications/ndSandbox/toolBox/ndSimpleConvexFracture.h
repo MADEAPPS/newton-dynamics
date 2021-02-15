@@ -4,6 +4,7 @@
 #include "ndSandboxStdafx.h"
 
 class ndDemoMesh;
+class ndDemoDebriEntity;
 class ndDemoEntityManager;
 
 class ndSimpleConvexFracture: public ndModel
@@ -17,7 +18,7 @@ class ndSimpleConvexFracture: public ndModel
 
 		dVector m_centerOfMass;
 		dVector m_momentOfInertia;
-		ndDemoMesh* m_mesh;
+		ndDemoDebriEntity* m_mesh;
 		ndShapeInstance* m_collision;
 		dFloat32 m_massFraction;
 	};
@@ -53,6 +54,7 @@ class ndSimpleConvexFracture: public ndModel
 		ndBodyKinematic* m_body;
 		ndShapeInstance* m_shape;
 		ndDemoMesh* m_visualMesh;
+		ndDemoDebriEntityRoot* m_debriRootEnt;
 		dFloat32 m_breakImpactSpeed;
 
 		friend ndSimpleConvexFracture;

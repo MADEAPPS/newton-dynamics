@@ -22,29 +22,46 @@
 
 static void makePointCloud(ndSimpleConvexFracture::ndDesc& desc)
 {
+	//dVector pMin;
+	//dVector pMax;
+	//desc.m_shape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
+	//dVector size((pMax - pMin).Scale(0.25f));
+	//
+	//desc.m_pointCloud.PushBack(dVector::m_zero);
+	//
+	//desc.m_pointCloud.PushBack(dVector(-size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(dVector(-size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(dVector(-size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(dVector(-size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
+	//
+	//desc.m_pointCloud.PushBack(dVector(size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(dVector(size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(dVector(size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(dVector(size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
+	//
+	//for (dInt32 i = 0; i < desc.m_pointCloud.GetCount(); i++)
+	//{
+	//	dFloat32 x = dGaussianRandom(size.m_x);
+	//	dFloat32 y = dGaussianRandom(size.m_y);
+	//	dFloat32 z = dGaussianRandom(size.m_y);
+	//	desc.m_pointCloud[i] += dVector(x, y, z, dFloat32(0.0f));
+	//}
+
 	dVector pMin;
 	dVector pMax;
 	desc.m_shape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
-	dVector size((pMax - pMin).Scale(0.25f));
+	dVector size(pMax - pMin);
 
-	desc.m_pointCloud.PushBack(dVector::m_zero);
-
-	desc.m_pointCloud.PushBack(dVector(-size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
-	desc.m_pointCloud.PushBack(dVector(-size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
-	desc.m_pointCloud.PushBack(dVector(-size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
-	desc.m_pointCloud.PushBack(dVector(-size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
-
-	desc.m_pointCloud.PushBack(dVector(size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
-	desc.m_pointCloud.PushBack(dVector(size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
-	desc.m_pointCloud.PushBack(dVector(size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
-	desc.m_pointCloud.PushBack(dVector(size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
-
-	for (dInt32 i = 0; i < desc.m_pointCloud.GetCount(); i++)
+	const dInt32 count = 20;
+	dFloat32 scale = 0.2f;
+	dFloat32 invScale = 1.0f / scale;
+	for (dInt32 i = 0; i < count; i++)
 	{
-		dFloat32 x = dGaussianRandom(size.m_x);
-		dFloat32 y = dGaussianRandom(size.m_y);
-		dFloat32 z = dGaussianRandom(size.m_y);
-		desc.m_pointCloud[i] += dVector(x, y, z, dFloat32(0.0f));
+		dFloat32 x = pMin.m_x + scale * dFloor(dRand() * size.m_x * invScale);
+		dFloat32 y = pMin.m_y + scale * dFloor(dRand() * size.m_y * invScale);
+		dFloat32 z = pMin.m_z + scale * dFloor(dRand() * size.m_z * invScale);
+
+		desc.m_pointCloud.PushBack(dVector(x, y, z, dFloat32(0.0f)));
 	}
 }
 

@@ -33,7 +33,7 @@ ndSimpleConvexFracture::ndAtom::ndAtom()
 ndSimpleConvexFracture::ndAtom::ndAtom(const ndAtom& atom)
 	:m_centerOfMass(atom.m_centerOfMass)
 	,m_momentOfInertia(atom.m_momentOfInertia)
-	,m_mesh((ndDemoMesh*)atom.m_mesh->AddRef())
+	,m_mesh(nullptr)
 	,m_collision(new ndShapeInstance(*atom.m_collision))
 	,m_massFraction(atom.m_massFraction)
 {
@@ -41,11 +41,6 @@ ndSimpleConvexFracture::ndAtom::ndAtom(const ndAtom& atom)
 
 ndSimpleConvexFracture::ndAtom::~ndAtom()
 {
-	if (m_mesh)
-	{
-		m_mesh->Release();
-	}
-
 	if (m_collision)
 	{
 		delete m_collision;
@@ -56,6 +51,8 @@ ndSimpleConvexFracture::ndEffect::ndEffect(ndSimpleConvexFracture* const manager
 	:dList<ndAtom>()
 	,m_body(nullptr)
 	,m_shape(new ndShapeInstance(*desc.m_shape))
+	,m_visualMesh(nullptr)
+	,m_debriRootEnt(nullptr)
 	,m_breakImpactSpeed(desc.m_breakImpactSpeed)
 {
 	dVector pMin;
@@ -91,6 +88,9 @@ ndSimpleConvexFracture::ndEffect::ndEffect(ndSimpleConvexFracture* const manager
 
 	dFloat32 volume = dFloat32(mesh.CalculateVolume());
 	ndDemoEntityManager* const scene = manager->m_scene;
+
+	dArray<DebriPoint> vertexArray;
+	m_debriRootEnt = new ndDemoDebriEntityRoot;
 	for (ndMeshEffect* debri = debriMeshPieces->GetFirstLayer(); debri; debri = nextDebri)
 	{
 		// get next segment piece
@@ -106,9 +106,7 @@ ndSimpleConvexFracture::ndEffect::ndEffect(ndSimpleConvexFracture* const manager
 			{
 				// we have a piece which has a convex collision  representation, add that to the list
 				ndAtom& atom = Append()->GetInfo();
-				//fracturePiece->RemoveUnusedVertices(nullptr);
-				//atom.m_mesh = new ndDemoMesh("fracture", fracturePiece, scene->GetShaderCache());
-				atom.m_mesh = new ndDemoDebriMesh("fracture", fracturePiece, scene->GetShaderCache());
+				atom.m_mesh = new ndDemoDebriEntity(fracturePiece, vertexArray, m_debriRootEnt, scene->GetShaderCache());
 
 				// get center of mass
 				dMatrix inertia(collision->CalculateInertia());
@@ -136,6 +134,7 @@ ndSimpleConvexFracture::ndEffect::ndEffect(ndSimpleConvexFracture* const manager
 
 		delete debri;
 	}
+	m_debriRootEnt->FinalizeConstruction(vertexArray);
 
 	delete debriMeshPieces;
 }
@@ -144,12 +143,19 @@ ndSimpleConvexFracture::ndEffect::ndEffect(const ndEffect& effect)
 	:m_body(new ndBodyDynamic())
 	,m_shape(nullptr)
 	,m_visualMesh(nullptr)
+	,m_debriRootEnt(new ndDemoDebriEntityRoot(*effect.m_debriRootEnt))
 	,m_breakImpactSpeed(effect.m_breakImpactSpeed)
 {
 	m_body->SetCollisionShape(*effect.m_shape);
+	ndDemoDebriEntity* mesh = (ndDemoDebriEntity*)m_debriRootEnt->GetChild();
 	for (dListNode* node = effect.GetFirst(); node; node = node->GetNext())
 	{
-		Append(node->GetInfo())->GetInfo();
+		const ndAtom& srcAtom = node->GetInfo();
+		ndAtom& newAtom = Append(srcAtom)->GetInfo();
+		newAtom.m_mesh = mesh;
+		dAssert(newAtom.m_mesh->GetMesh() == srcAtom.m_mesh->GetMesh());
+
+		mesh = (ndDemoDebriEntity*)mesh->GetSibling();
 	}
 }
 
@@ -163,6 +169,11 @@ ndSimpleConvexFracture::ndEffect::~ndEffect()
 	if (m_shape)
 	{
 		delete m_shape;
+	}
+
+	if (m_debriRootEnt)
+	{
+		delete m_debriRootEnt;
 	}
 }
 
@@ -269,13 +280,15 @@ void ndSimpleConvexFracture::UpdateEffect(ndWorld* const world, ndEffect& effect
 	dMatrix matrix(visualEntity->GetCurrentMatrix());
 	dQuaternion rotation(matrix);
 
+	ndDemoEntity* const debriRootEnt = effect.m_debriRootEnt;
+	effect.m_debriRootEnt = nullptr;
+	scene->AddEntity(debriRootEnt);
+
 	for (ndEffect::dListNode* node = effect.GetFirst(); node; node = node->GetNext())
 	{
 		ndAtom& atom = node->GetInfo();
-		ndDemoEntity* const entity = new ndDemoEntity(dMatrix(rotation, matrix.m_posit), nullptr);
-		entity->SetName("debris");
-		entity->SetMesh(atom.m_mesh, dGetIdentityMatrix());
-		scene->AddEntity(entity);
+		ndDemoDebriEntity* const entity = atom.m_mesh;
+		entity->SetMatrixUsafe(rotation, matrix.m_posit);
 
 		dFloat32 debriMass = massMatrix.m_w * atom.m_massFraction;
 
