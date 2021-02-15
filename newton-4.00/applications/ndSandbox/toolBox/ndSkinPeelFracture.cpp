@@ -40,21 +40,16 @@ ndSkinPeelFracture::ndAtom::ndAtom(const ndAtom& atom)
 	,m_momentOfInertia(atom.m_momentOfInertia)
 #ifdef USE_SINGLE_MESH
 	,m_mesh((ndDemoMesh*)atom.m_mesh->AddRef())
+#else
+	,m_mesh(nullptr)
 #endif
 	,m_collision(new ndShapeInstance(*atom.m_collision))
 	,m_massFraction(atom.m_massFraction)
 {
-#ifndef USE_SINGLE_MESH
-	dAssert(0);
-#endif
 }
 
 ndSkinPeelFracture::ndAtom::~ndAtom()
 {
-#ifndef USE_SINGLE_MESH
-dAssert(0);
-#endif
-
 #ifdef USE_SINGLE_MESH
 	if (m_mesh)
 	{
@@ -249,10 +244,25 @@ ndSkinPeelFracture::ndEffect::ndEffect(const ndEffect& effect)
 #endif
 {
 	m_body->SetCollisionShape(*effect.m_shape);
+
+#ifdef USE_SINGLE_MESH
 	for (dListNode* node = effect.GetFirst(); node; node = node->GetNext())
 	{
-		Append(node->GetInfo())->GetInfo();
+		const ndAtom& srcAtom = node->GetInfo();
+		Append(srcAtom)->GetInfo();
 	}
+#else
+	ndDemoDebriEntity* mesh = (ndDemoDebriEntity*) m_debriRootEnt->GetChild();
+	for (dListNode* node = effect.GetFirst(); node; node = node->GetNext())
+	{
+		const ndAtom& srcAtom = node->GetInfo();
+		ndAtom& newAtom = Append(srcAtom)->GetInfo();
+		newAtom.m_mesh = mesh;
+		dAssert(newAtom.m_mesh->GetMesh() == srcAtom.m_mesh->GetMesh());
+
+		mesh = (ndDemoDebriEntity*)mesh->GetSibling();
+	}
+#endif
 }
 
 ndSkinPeelFracture::ndEffect::~ndEffect()
@@ -433,7 +443,6 @@ void ndSkinPeelFracture::UpdateEffect(ndWorld* const world, ndEffect& effect)
 {
 	D_TRACKTIME();
 
-dAssert(0);
 	dVector omega(effect.m_body->GetOmega());
 	dVector veloc(effect.m_body->GetVelocity());
 	dVector massMatrix(effect.m_body->GetMassMatrix());
@@ -448,16 +457,15 @@ dAssert(0);
 	dMatrix matrix(visualEntity->GetCurrentMatrix());
 	dQuaternion rotation(matrix);
 
-	ndDemoEntity* const debriRootEnt = new ndDemoDebriEntityRoot;
+	ndDemoEntity* const debriRootEnt = effect.m_debriRootEnt;
+	effect.m_debriRootEnt = nullptr;
 	scene->AddEntity(debriRootEnt);
-	
-/*
+
 	for (ndEffect::dListNode* node = effect.GetFirst(); node; node = node->GetNext())
 	{
 		ndAtom& atom = node->GetInfo();
-		ndDemoEntity* const entity = new ndDemoEntity(dMatrix(rotation, matrix.m_posit), debriRootEnt);
-		entity->SetName("debris");
-		entity->SetMesh(atom.m_mesh, dGetIdentityMatrix());
+		ndDemoDebriEntity* const entity = atom.m_mesh;
+		entity->SetMatrixUsafe(rotation, matrix.m_posit);
 
 		dFloat32 debriMass = massMatrix.m_w * atom.m_massFraction;
 
@@ -484,6 +492,5 @@ dAssert(0);
 		ExplodeLocation(body, matrix, 0.3f);
 #endif
 	}
-*/
 }
 #endif

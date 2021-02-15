@@ -274,8 +274,6 @@ ndDemoDebriMesh2::ndDemoDebriMesh2(const char* const name, ndMeshEffect* const m
 
 ndDemoDebriMesh2::~ndDemoDebriMesh2()
 {
-//	glDeleteBuffers(1, &m_matrixOffsetBuffer);
-	dAssert(0);
 }
 
 ndDemoDebriEntity::ndDemoDebriEntity(ndMeshEffect* const meshNode, dArray<DebriPoint>& vertexArray, ndDemoDebriEntityRoot* const parent, const ndShaderPrograms& shaderCache)
@@ -310,12 +308,23 @@ ndDemoDebriEntity::ndDemoDebriEntity(ndMeshEffect* const meshNode, dArray<DebriP
 		materialCount++;
 		segmentStart += subIndexCount;
 	}
+	meshNode->MaterialGeomteryEnd(geometryHandle);
+}
+
+ndDemoDebriEntity::ndDemoDebriEntity(const ndDemoDebriEntity& copyFrom)
+	:ndDemoEntity(copyFrom)
+	,m_vertexOffestBase(copyFrom.m_vertexOffestBase)
+{
+}
+
+ndDemoDebriEntity::~ndDemoDebriEntity()
+{
+
 }
 
 dNodeBaseHierarchy* ndDemoDebriEntity::CreateClone() const
 {
-	dAssert(0);
-	return nullptr;
+	return new ndDemoDebriEntity(*this);
 }
 
 ndDemoDebriEntityRoot::ndDemoDebriEntityRoot(const ndDemoDebriEntityRoot& copyFrom)
@@ -325,7 +334,6 @@ ndDemoDebriEntityRoot::ndDemoDebriEntityRoot(const ndDemoDebriEntityRoot& copyFr
 	,m_vertexBuffer(copyFrom.m_vertexBuffer)
 	,m_vertextArrayBuffer(copyFrom.m_vertextArrayBuffer)
 {
-	dAssert(0);
 }
 
 ndDemoDebriEntityRoot::ndDemoDebriEntityRoot()
@@ -387,5 +395,5 @@ void ndDemoDebriEntityRoot::FinalizeConstruction(dArray<DebriPoint>& vertexArray
 
 void ndDemoDebriEntityRoot::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
-	ndDemoEntity::Render(timestep, scene, matrix);
+	//ndDemoEntity::Render(timestep, scene, matrix);
 }

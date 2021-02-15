@@ -39,7 +39,6 @@ class ndDemoDebriMesh: public ndDemoMesh
 class ndDemoDebriMesh2 : public ndDemoMesh
 {
 	public:
-	//ndDemoDebriMesh2(const char* const name, dArray<ndMeshPointUV>& vertexArrayOut, dArray<dInt32>& indexArrayOut, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
 	ndDemoDebriMesh2(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
 	~ndDemoDebriMesh2();
 
@@ -69,9 +68,8 @@ class ndDemoDebriEntity : public ndDemoEntity
 {
 	public:
 	ndDemoDebriEntity(ndMeshEffect* const meshNode, dArray<DebriPoint>& vertexArray, ndDemoDebriEntityRoot* const parent, const ndShaderPrograms& shaderCache);
-	//	ndDemoDebriEntityRoot(const ndDemoDebriEntityRoot& copyFrom);
-	//virtual ~ndDemoDebriEntity(void);
-
+	ndDemoDebriEntity(const ndDemoDebriEntity& copyFrom);
+	virtual ~ndDemoDebriEntity();
 	dNodeBaseHierarchy* CreateClone() const;
 
 	dInt32 m_vertexOffestBase;
