@@ -702,18 +702,18 @@ class dVector
 		D_INLINE dBigVector GetInt() const
 		{
 			dBigVector temp(Floor());
-			union 
+			union
 			{
-				__m128i tmp;
-				struct  
+				__m128i m;
+				struct
 				{
 					dInt32 m_x;
 					dInt32 m_y;
 					dInt32 m_z;
 					dInt32 m_w;
 				};
-			};
-			tmp = _mm256_cvttpd_epi32(temp.m_type);
+			} tmp;
+			tmp.m = _mm256_cvttpd_epi32(temp.m_type);
 			return dBigVector(m_x, m_y, m_z, m_w);
 		}
 
