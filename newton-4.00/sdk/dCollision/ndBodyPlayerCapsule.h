@@ -36,7 +36,7 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 	D_COLLISION_API ndBodyPlayerCapsule(const dMatrix& localAxis, dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight);
 	D_COLLISION_API virtual ~ndBodyPlayerCapsule();
 
-	ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule();
+	ndBodyPlayerCapsule* GetAsBodyPlayerCapsule();
 
 	dFloat32 GetForwardSpeed() const;
 	void SetForwardSpeed(dFloat32 speed);
