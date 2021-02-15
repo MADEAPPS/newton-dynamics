@@ -55,7 +55,7 @@ dUnsigned64 dGetTimeInMicrosenconds()
 
 dFloatExceptions::dFloatExceptions(dUnsigned32 mask)
 {
-#if defined (WIN32)
+#if defined (_MSC_VER)
 	dClearFP();
 	m_mask = dControlFP(0, 0);
 	dControlFP(m_mask & ~mask, _MCW_EM);
