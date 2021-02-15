@@ -40,7 +40,7 @@ class ndDemoDebriMesh2 : public ndDemoMesh
 {
 	public:
 	ndDemoDebriMesh2(ndDemoDebriMesh2* const srcMesh, const dArray<DebriPoint>& vertexArray);
-	ndDemoDebriMesh2(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase);
+	ndDemoDebriMesh2(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase, dArray<DebriPoint>& vertexArray);
 	~ndDemoDebriMesh2();
 
 	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);

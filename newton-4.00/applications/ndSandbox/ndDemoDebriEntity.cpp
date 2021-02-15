@@ -203,7 +203,7 @@ ndDemoDebriMesh2::ndDemoDebriMesh2(ndDemoDebriMesh2* const srcMeshconst, const d
 	glDisableVertexAttribArray(0);
 }
 
-ndDemoDebriMesh2::ndDemoDebriMesh2(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase)
+ndDemoDebriMesh2::ndDemoDebriMesh2(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase, dArray<DebriPoint>& vertexArray)
 	:ndDemoMesh(name)
 {
 	m_name = name;
@@ -239,15 +239,20 @@ ndDemoDebriMesh2::ndDemoDebriMesh2(const char* const name, ndMeshEffect* const m
 
 		dInt32 subIndexCount = meshNode->GetMaterialIndexCount(geometryHandle, handle);
 		meshNode->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
+
+		dFloat32 blend = materialCount ? 0.0f : 1.0f;
 		for (dInt32 i = 0; i < subIndexCount; i++)
 		{
-			indices[i] += offsetBase;
+			dInt32 index = indices[segmentStart + i] + offsetBase;
+			indices[segmentStart + i] = index;
+			vertexArray[index].m_posit.m_w = blend;
 		}
 
 		materialCount++;
 		segmentStart += subIndexCount;
 	}
 	meshNode->MaterialGeomteryEnd(geometryHandle);
+
 
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
@@ -328,29 +333,9 @@ ndDemoDebriEntity::ndDemoDebriEntity(ndMeshEffect* const meshNode, dArray<DebriP
 	meshNode->GetNormalChannel(sizeof(DebriPoint), &vertexArray[vertexOffsetBase].m_normal.m_x);
 	meshNode->GetUV0Channel(sizeof(DebriPoint), &vertexArray[vertexOffsetBase].m_uv.m_u);
 
-	ndDemoDebriMesh2* const mesh = new ndDemoDebriMesh2("fracture", meshNode, shaderCache, vertexOffsetBase);
+	ndDemoDebriMesh2* const mesh = new ndDemoDebriMesh2("fracture", meshNode, shaderCache, vertexOffsetBase, vertexArray);
 	SetMesh(mesh, dGetIdentityMatrix());
 	mesh->Release();
-
-	dInt32 indices[1024 * 4];
-	dInt32 segmentStart = 0;
-	dInt32 materialCount = 0;
-	ndIndexArray* const geometryHandle = meshNode->MaterialGeometryBegin();
-	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
-	{
-		dInt32 subIndexCount = meshNode->GetMaterialIndexCount(geometryHandle, handle);
-		meshNode->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
-	
-		dFloat32 blend = materialCount ? 0.0f : 1.0f;
-		for (dInt32 i = 0; i < subIndexCount; i++)
-		{
-			dInt32 index = indices[segmentStart + i];
-			vertexArray[vertexOffsetBase + index].m_posit.m_w = blend;
-		}
-		materialCount++;
-		segmentStart += subIndexCount;
-	}
-	meshNode->MaterialGeomteryEnd(geometryHandle);
 }
 
 ndDemoDebriEntity::ndDemoDebriEntity(const ndDemoDebriEntity& copyFrom)
@@ -402,9 +387,14 @@ void ndDemoDebriEntityRoot::Render(dFloat32 timestep, ndDemoEntityManager* const
 	glBindVertexArray(shaderMesh->m_vertextArrayBuffer);
 	
 	const dMatrix nodeMatrix(m_matrix * matrix);
+int xxx = 0;
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
 	{
 		child->Render(timestep, scene, nodeMatrix);
+xxx++;
+//if (xxx >= 2)
+//break;
+
 	}
 	
 	glBindVertexArray(0);
