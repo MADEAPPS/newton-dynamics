@@ -48,6 +48,8 @@ class ndDemoDebriMesh2 : public ndDemoMesh
 	private:
 	ndDemoSubMeshMaterial m_material[2];
 	dInt32 m_textureLocation1;
+
+	friend class ndDemoDebriEntityRoot;
 };
 
 class ndDemoDebriEntityRoot: public ndDemoEntity

@@ -174,7 +174,7 @@ ndDemoDebriMesh2::ndDemoDebriMesh2(ndDemoDebriMesh2* const srcMeshconst, const d
 	m_directionalLightDirLocation = srcMeshconst->m_directionalLightDirLocation;
 
 	m_materialAmbientLocation = srcMeshconst->m_materialAmbientLocation;
-	m_materialDiffuseLocation = srcMeshconst->m_materialAmbientLocation;
+	m_materialDiffuseLocation = srcMeshconst->m_materialDiffuseLocation;
 	m_materialSpecularLocation = srcMeshconst->m_materialSpecularLocation;
 
 	m_textureLocation1 = srcMeshconst->m_textureLocation1;
@@ -286,40 +286,13 @@ void ndDemoDebriMesh2::Render(ndDemoEntityManager* const scene, const dMatrix& m
 	ndDemoCamera* const camera = scene->GetCamera();
 
 	const dMatrix& viewMatrix = camera->GetViewMatrix();
-	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
 	dMatrix viewModelMatrix(modelMatrix * viewMatrix);
-	dVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
 
-	glUniform1i(m_textureLocation, 0);
-	glUniform1i(m_textureLocation1, 1);
-	glUniform1f(m_transparencyLocation, 1.0f);
-	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight.m_x);
 	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
 	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-
-	//glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
-	glUniform3fv(m_materialAmbientLocation, 1, &m_material[0].m_ambient.m_x);
-	glUniform3fv(m_materialDiffuseLocation, 1, &m_material[0].m_diffuse.m_x);
-	glUniform3fv(m_materialSpecularLocation, 1, &m_material[0].m_specular.m_x);
-
-	// these call make the font display wrong
-	glActiveTexture(GL_TEXTURE1);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glBindTexture(GL_TEXTURE_2D, m_material[1].m_textureHandle);
-
-	glActiveTexture(GL_TEXTURE0);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glBindTexture(GL_TEXTURE_2D, m_material[0].m_textureHandle);
-
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	//glBindVertexArray(0);
-	//glUseProgram(0);
 }
 
 ndDemoDebriEntity::ndDemoDebriEntity(ndMeshEffect* const meshNode, dArray<DebriPoint>& vertexArray, ndDemoDebriEntityRoot* const parent, const ndShaderPrograms& shaderCache)
@@ -381,22 +354,41 @@ void ndDemoDebriEntityRoot::FinalizeConstruction(const dArray<DebriPoint>& verte
 
 void ndDemoDebriEntityRoot::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
-	//ndDemoDebriMesh2* const shaderMesh = (ndDemoDebriMesh2*)GetChild()->GetMesh();
 	ndDemoDebriMesh2* const shaderMesh = ((ndDemoDebriMesh2*)m_mesh);
 	glUseProgram(shaderMesh->m_shader);
 	glBindVertexArray(shaderMesh->m_vertextArrayBuffer);
+
+	ndDemoCamera* const camera = scene->GetCamera();
+	const dMatrix& viewMatrix = camera->GetViewMatrix();
+	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
+	const dVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+
+	glUniform1i(shaderMesh->m_textureLocation, 0);
+	glUniform1i(shaderMesh->m_textureLocation1, 1);
+	glUniform1f(shaderMesh->m_transparencyLocation, 1.0f);
+	glUniform4fv(shaderMesh->m_directionalLightDirLocation, 1, &directionaLight.m_x);
+	glUniformMatrix4fv(shaderMesh->m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+
+	glUniform3fv(shaderMesh->m_materialAmbientLocation, 1, &shaderMesh->m_material[0].m_ambient.m_x);
+	glUniform3fv(shaderMesh->m_materialDiffuseLocation, 1, &shaderMesh->m_material[0].m_diffuse.m_x);
+	glUniform3fv(shaderMesh->m_materialSpecularLocation, 1, &shaderMesh->m_material[0].m_specular.m_x);
+
+	// these call make the font display wrong
+	glActiveTexture(GL_TEXTURE1);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glBindTexture(GL_TEXTURE_2D, shaderMesh->m_material[1].m_textureHandle);
+
+	glActiveTexture(GL_TEXTURE0);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glBindTexture(GL_TEXTURE_2D, shaderMesh->m_material[0].m_textureHandle);
 	
 	const dMatrix nodeMatrix(m_matrix * matrix);
-int xxx = 0;
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
 	{
 		child->Render(timestep, scene, nodeMatrix);
-xxx++;
-//if (xxx >= 2)
-//break;
-
 	}
-	
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
 }
