@@ -64,7 +64,6 @@
 #include <thread>
 #include <chrono>
 #include <math.h>
-#include <float.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,11 +73,24 @@
 #include <tinyxml.h>
 #include <condition_variable>
 
+// we need _clearfp() and _controlfp() from float.h which are excluded if __STRICT_ANSI__ is defined
+// weird workaround but i'm not sure how a global compiler flag would affect the rest of the code
+// probably useless since this functionality will not be used/implemented but to avoid compiler errors
+#if defined(__STRICT_ANSI__) && (defined (__MINGW32__) || defined (__MINGW64__))
+    #pragma push_macro("__STRICT_ANSI__")
+    #undef __STRICT_ANSI__
+#endif
+// include without __STRICT_ANSI__
+#include <float.h>
+// restore __STRICT_ANSI__ back
+#if (defined (__MINGW32__) || defined (__MINGW64__))
+	#pragma pop_macro("__STRICT_ANSI__")
+#endif
+
 #if (defined (__MINGW32__) || defined (__MINGW64__))
 	#include <io.h> 
 	#include <direct.h> 
 	#include <malloc.h>
-	#include <float.h>
 	#include <windows.h>
 	#include <process.h>
 #endif
