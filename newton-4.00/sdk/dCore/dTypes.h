@@ -504,7 +504,7 @@ D_CORE_API dFloat64 dRoundToFloat(dFloat64 val);
 	{
 		public:
 		dAtomic<T>()
-			: m_val(T(val))
+			: m_val(T())
 		{
 		}
 
