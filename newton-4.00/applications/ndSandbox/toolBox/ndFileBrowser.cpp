@@ -42,7 +42,7 @@ bool dGetOpenFileNamePLY(char* const fileName, int maxSize)
 	ofn.nMaxFile = maxSize;
 	ofn.lpstrFilter = "import file *.ply\0*.ply\0";
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFileTitle = "Newton Dynamics demos";
+	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics demos");
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = appPath;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
@@ -75,7 +75,7 @@ bool dGetOpenFileNameNgd (char* const fileName, int maxSize)
 	ofn.nMaxFile = maxSize;
 	ofn.lpstrFilter = "newton xml files *.ngd\0*.ngd\0";
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFileTitle = "Newton Dynamics demos";
+	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics demos");
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = appPath;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
@@ -107,7 +107,7 @@ bool dGetOpenFileNameSerialization(char* const fileName, int maxSize)
 	ofn.nMaxFile = maxSize;
 	ofn.lpstrFilter = "newton serialized file *.bin\0*.bin\0";
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFileTitle = "Newton Dynamics demos";
+	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics demos");
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = appPath;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
@@ -140,7 +140,7 @@ bool dGetSaveFileNameNgd(char* const fileName, int maxSize)
 	ofn.nMaxFile = maxSize;
 	ofn.lpstrFilter = "newton xml files *.ngd\0*.ngd\0";
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFileTitle = "Newton Dynamics demos";
+	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics demos");
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = appPath;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
@@ -180,7 +180,7 @@ bool dGetSaveFileNameSerialization(char* const fileName, int maxSize)
 	ofn.nMaxFile = maxSize;
 	ofn.lpstrFilter = "newton serialized file *.bin\0*.bin\0";
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFileTitle = "Newton Dynamics demos";
+	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics demos");
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = appPath;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
