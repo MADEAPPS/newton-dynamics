@@ -17,13 +17,12 @@
 #include "ndPhysicsWorld.h"
 #include "ndTargaToOpenGl.h"
 #include "ndDemoDebriEntity.h"
-#include "ndSkinPeelFracture.h"
 #include "ndDemoEntityManager.h"
-
+#include "ndConvexFractureModel_4.h"
 
 #define DEBRI_EXPLODE_LOCATION
 
-ndSkinPeelFracture::ndAtom::ndAtom()
+ndConvexFractureModel_4::ndAtom::ndAtom()
 	:m_centerOfMass(0.0f)
 	,m_momentOfInertia(0.0f)
 	,m_mesh(nullptr)
@@ -32,42 +31,29 @@ ndSkinPeelFracture::ndAtom::ndAtom()
 {
 }
 
-ndSkinPeelFracture::ndAtom::ndAtom(const ndAtom& atom)
+ndConvexFractureModel_4::ndAtom::ndAtom(const ndAtom& atom)
 	:m_centerOfMass(atom.m_centerOfMass)
 	,m_momentOfInertia(atom.m_momentOfInertia)
-#ifdef USE_SINGLE_MESH
-	,m_mesh((ndDemoMesh*)atom.m_mesh->AddRef())
-#else
 	,m_mesh(nullptr)
-#endif
 	,m_collision(new ndShapeInstance(*atom.m_collision))
 	,m_massFraction(atom.m_massFraction)
 {
 }
 
-ndSkinPeelFracture::ndAtom::~ndAtom()
+ndConvexFractureModel_4::ndAtom::~ndAtom()
 {
-#ifdef USE_SINGLE_MESH
-	if (m_mesh)
-	{
-		m_mesh->Release();
-	}
-#endif
-
 	if (m_collision)
 	{
 		delete m_collision;
 	}
 }
 
-ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const ndDesc& desc)
+ndConvexFractureModel_4::ndEffect::ndEffect(ndConvexFractureModel_4* const manager, const ndDesc& desc)
 	:dList<ndAtom>()
-	,m_body____(nullptr)
+	,m_body(nullptr)
 	,m_shape(new ndShapeInstance(*desc.m_outerShape))
-	,m_visualMesh____(nullptr)
-#ifndef USE_SINGLE_MESH
+	,m_visualMesh(nullptr)
 	,m_debriRootEnt(nullptr)
-#endif
 	,m_breakImpactSpeed(desc.m_breakImpactSpeed)
 {
 	dVector pMin;
@@ -98,7 +84,7 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 	innerMesh.UniformBoxMapping(1, textureMatrix);
 
 	//m_visualMesh = new ndDemoMesh("fracture", &outerMesh, manager->m_scene->GetShaderCache());
-	m_visualMesh____ = new ndDemoMesh("fracture", &innerMesh, manager->m_scene->GetShaderCache());
+	m_visualMesh = new ndDemoMesh("fracture", &innerMesh, manager->m_scene->GetShaderCache());
 
 	// now we call create we decompose the mesh into several convex pieces 
 	ndMeshEffect* const convexVoronoiMesh = outerMesh.CreateVoronoiConvexDecomposition(desc.m_pointCloud, 1, &textureMatrix[0][0]);
@@ -151,43 +137,6 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 	dFloat32 volume = dFloat32(outerMesh.CalculateVolume());
 	ndDemoEntityManager* const scene = manager->m_scene;
 
-#ifdef USE_SINGLE_MESH
-	for (dList<ndMeshEffect*>::dListNode* node = rawConvexPieces.GetFirst(); node; node = node->GetNext())
-	{
-		ndMeshEffect* const fracturePiece = node->GetInfo();
-		ndShapeInstance* const fracturedCollision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
-		if (fracturedCollision)
-		{
-			// we have a piece which has a convex collision  representation, add that to the list
-			ndAtom& atom = Append()->GetInfo();
-			fracturePiece->RemoveUnusedVertices(nullptr);
-			//atom.m_mesh = new ndDemoMesh("fracture", fracturePiece, scene->GetShaderCache());
-			atom.m_mesh = new ndDemoDebriMesh("fracture", fracturePiece, scene->GetShaderCache());
-
-			// get center of mass
-			dMatrix inertia(fracturedCollision->CalculateInertia());
-			atom.m_centerOfMass = inertia.m_posit;
-
-			// get the mass fraction;
-			dFloat32 debriVolume = fracturedCollision->GetVolume();
-			atom.m_massFraction = debriVolume / volume;
-
-			// set the collision shape
-			atom.m_collision = fracturedCollision;
-
-			//transform the mesh the center mass in order to get the 
-			//local inertia of this debri piece.
-			translateMatrix.m_posit = atom.m_centerOfMass.Scale(-1.0f);
-			translateMatrix.m_posit.m_w = 1.0f;
-			fracturePiece->ApplyTransform(translateMatrix);
-			ndShapeInstance* const inertiaShape = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
-			dMatrix momentOfInertia(inertiaShape->CalculateInertia());
-			atom.m_momentOfInertia = dVector(momentOfInertia[0][0], momentOfInertia[1][1], momentOfInertia[2][2], dFloat32(0.0f));
-			delete inertiaShape;
-		}
-	}
-#else
-
 	dArray<DebriPoint> vertexArray;
 	m_debriRootEnt = new ndDemoDebriEntityRoot;
 	for (dList<ndMeshEffect*>::dListNode* node = rawConvexPieces.GetFirst(); node; node = node->GetNext())
@@ -225,7 +174,6 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 	}
 
 	m_debriRootEnt->FinalizeConstruction(vertexArray);
-#endif
 
 	for (dList<ndMeshEffect*>::dListNode* node = rawConvexPieces.GetFirst(); node; node = node->GetNext())
 	{
@@ -233,24 +181,15 @@ ndSkinPeelFracture::ndEffect::ndEffect(ndSkinPeelFracture* const manager, const 
 	}
 }
 
-ndSkinPeelFracture::ndEffect::ndEffect(const ndEffect& effect)
-	:m_body____(new ndBodyDynamic())
+ndConvexFractureModel_4::ndEffect::ndEffect(const ndEffect& effect)
+	:m_body(new ndBodyDynamic())
 	,m_shape(nullptr)
-	,m_visualMesh____(nullptr)
-#ifndef USE_SINGLE_MESH
+	,m_visualMesh(nullptr)
 	,m_debriRootEnt(new ndDemoDebriEntityRoot(*effect.m_debriRootEnt))
-#endif
 	,m_breakImpactSpeed(effect.m_breakImpactSpeed)
 {
-	m_body____->SetCollisionShape(*effect.m_shape);
+	m_body->SetCollisionShape(*effect.m_shape);
 
-#ifdef USE_SINGLE_MESH
-	for (dListNode* node = effect.GetFirst(); node; node = node->GetNext())
-	{
-		const ndAtom& srcAtom = node->GetInfo();
-		Append(srcAtom)->GetInfo();
-	}
-#else
 	ndDemoDebriEntity* mesh = (ndDemoDebriEntity*) m_debriRootEnt->GetChild();
 	for (dListNode* node = effect.GetFirst(); node; node = node->GetNext())
 	{
@@ -261,14 +200,13 @@ ndSkinPeelFracture::ndEffect::ndEffect(const ndEffect& effect)
 
 		mesh = (ndDemoDebriEntity*)mesh->GetSibling();
 	}
-#endif
 }
 
-ndSkinPeelFracture::ndEffect::~ndEffect()
+ndConvexFractureModel_4::ndEffect::~ndEffect()
 {
-	if (m_visualMesh____)
+	if (m_visualMesh)
 	{
-		m_visualMesh____->Release();
+		m_visualMesh->Release();
 	}
 
 	if (m_shape)
@@ -276,15 +214,13 @@ ndSkinPeelFracture::ndEffect::~ndEffect()
 		delete m_shape;
 	}
 
-#ifndef USE_SINGLE_MESH
 	if (m_debriRootEnt)
 	{
 		delete m_debriRootEnt;
 	}
-#endif
 }
 
-ndSkinPeelFracture::ndSkinPeelFracture(ndDemoEntityManager* const scene)
+ndConvexFractureModel_4::ndConvexFractureModel_4(ndDemoEntityManager* const scene)
 	:ndModel()
 	, m_effectList()
 	, m_pendingEffect()
@@ -293,11 +229,11 @@ ndSkinPeelFracture::ndSkinPeelFracture(ndDemoEntityManager* const scene)
 {
 }
 
-ndSkinPeelFracture::~ndSkinPeelFracture()
+ndConvexFractureModel_4::~ndConvexFractureModel_4()
 {
 }
 
-void ndSkinPeelFracture::Update(const ndWorld* const world, dFloat32 timestep)
+void ndConvexFractureModel_4::Update(const ndWorld* const world, dFloat32 timestep)
 {
 	dList<ndEffect>::dListNode* nextNody;
 	for (dList<ndEffect>::dListNode* node = m_effectList.GetFirst(); node; node = nextNody)
@@ -306,7 +242,7 @@ void ndSkinPeelFracture::Update(const ndWorld* const world, dFloat32 timestep)
 		ndEffect& effect = node->GetInfo();
 
 		dFloat32 maxImpactImpulse = 0.0f;
-		const ndBodyKinematic::ndContactMap& contactMap = effect.m_body____->GetContactMap();
+		const ndBodyKinematic::ndContactMap& contactMap = effect.m_body->GetContactMap();
 		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
 		for (it.Begin(); it; it++)
 		{
@@ -326,7 +262,7 @@ void ndSkinPeelFracture::Update(const ndWorld* const world, dFloat32 timestep)
 			}
 		}
 
-		dFloat32 impactSpeed = maxImpactImpulse * effect.m_body____->GetInvMass();
+		dFloat32 impactSpeed = maxImpactImpulse * effect.m_body->GetInvMass();
 		if (impactSpeed >= effect.m_breakImpactSpeed)
 		{
 			dScopeSpinLock lock(m_lock);
@@ -336,7 +272,7 @@ void ndSkinPeelFracture::Update(const ndWorld* const world, dFloat32 timestep)
 	}
 }
 
-void ndSkinPeelFracture::AppUpdate(ndWorld* const world)
+void ndConvexFractureModel_4::AppUpdate(ndWorld* const world)
 {
 	if (m_pendingEffect.GetCount())
 	{
@@ -348,21 +284,21 @@ void ndSkinPeelFracture::AppUpdate(ndWorld* const world)
 			next = node->GetNext();
 			ndEffect& effect = node->GetInfo();
 			UpdateEffect(world, effect);
-			//world->DeleteBody(effect.m_body____);
+			//world->DeleteBody(effect.m_body);
 			m_pendingEffect.Remove(node);
 		}
 	}
 }
 
-void ndSkinPeelFracture::AddEffect(const ndEffect& effect, dFloat32 mass, const dMatrix& location)
+void ndConvexFractureModel_4::AddEffect(const ndEffect& effect, dFloat32 mass, const dMatrix& location)
 {
 	ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
 
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetMesh(effect.m_visualMesh____, dGetIdentityMatrix());
+	entity->SetMesh(effect.m_visualMesh, dGetIdentityMatrix());
 	m_scene->AddEntity(entity);
 
-	ndBodyDynamic* const body = newEffect.m_body____->GetAsBodyDynamic();
+	ndBodyDynamic* const body = newEffect.m_body->GetAsBodyDynamic();
 	m_scene->GetWorld()->AddBody(body);
 
 	body->SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
@@ -370,7 +306,7 @@ void ndSkinPeelFracture::AddEffect(const ndEffect& effect, dFloat32 mass, const 
 	body->SetMassMatrix(mass, *effect.m_shape);
 }
 
-void ndSkinPeelFracture::ExplodeLocation(ndBodyDynamic* const body, const dMatrix& location, dFloat32 factor) const
+void ndConvexFractureModel_4::ExplodeLocation(ndBodyDynamic* const body, const dMatrix& location, dFloat32 factor) const
 {
 	dVector center(location.TransformVector(body->GetCentreOfMass()));
 	dVector radios((center - location.m_posit) & dVector::m_triplexMask);
@@ -382,10 +318,10 @@ void ndSkinPeelFracture::ExplodeLocation(ndBodyDynamic* const body, const dMatri
 	body->SetMatrix(matrix);
 }
 
-#ifdef USE_SINGLE_MESH
-void ndSkinPeelFracture::UpdateEffect(ndWorld* const world, ndEffect& effect)
+void ndConvexFractureModel_4::UpdateEffect(ndWorld* const world, ndEffect& effect)
 {
 	D_TRACKTIME();
+
 	dVector omega(effect.m_body->GetOmega());
 	dVector veloc(effect.m_body->GetVelocity());
 	dVector massMatrix(effect.m_body->GetMassMatrix());
@@ -395,62 +331,6 @@ void ndSkinPeelFracture::UpdateEffect(ndWorld* const world, ndEffect& effect)
 	ndPhysicsWorld* const physicsWorld = (ndPhysicsWorld*)world;
 	ndDemoEntityManager* const scene = physicsWorld->GetManager();
 	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)effect.m_body->GetNotifyCallback();
-	ndDemoEntity* const visualEntity = (ndDemoEntity*)notify->GetUserData();
-
-	dMatrix matrix(visualEntity->GetCurrentMatrix());
-	dQuaternion rotation(matrix);
-
-	for (ndEffect::dListNode* node = effect.GetFirst(); node; node = node->GetNext())
-	{
-		ndAtom& atom = node->GetInfo();
-		ndDemoEntity* const entity = new ndDemoEntity(dMatrix(rotation, matrix.m_posit), nullptr);
-		entity->SetName("debris");
-		entity->SetMesh(atom.m_mesh, dGetIdentityMatrix());
-		scene->AddEntity(entity);
-
-		dFloat32 debriMass = massMatrix.m_w * atom.m_massFraction;
-
-		// calculate debris initial velocity
-		dVector center(matrix.TransformVector(atom.m_centerOfMass));
-		dVector debriVeloc(veloc + omega.CrossProduct(center - com));
-
-		ndBodyDynamic* const body = new ndBodyDynamic();
-		world->AddBody(body);
-
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-		body->SetMatrix(matrix);
-
-		body->SetCollisionShape(*atom.m_collision);
-		dVector debriMassMatrix(atom.m_momentOfInertia.Scale(debriMass));
-		debriMassMatrix.m_w = debriMass;
-		body->SetMassMatrix(debriMassMatrix);
-		body->SetCentreOfMass(atom.m_centerOfMass);
-		body->SetAngularDamping(dVector(dFloat32(0.1f)));
-
-		body->SetOmega(omega);
-		body->SetVelocity(debriVeloc);
-
-#ifdef DEBRI_EXPLODE_LOCATION
-		ExplodeLocation(body, matrix, 0.3f);
-#endif
-	}
-}
-
-#else
-
-void ndSkinPeelFracture::UpdateEffect(ndWorld* const world, ndEffect& effect)
-{
-	D_TRACKTIME();
-
-	dVector omega(effect.m_body____->GetOmega());
-	dVector veloc(effect.m_body____->GetVelocity());
-	dVector massMatrix(effect.m_body____->GetMassMatrix());
-	dMatrix bodyMatrix(effect.m_body____->GetMatrix());
-	dVector com(bodyMatrix.TransformVector(effect.m_body____->GetCentreOfMass()));
-
-	ndPhysicsWorld* const physicsWorld = (ndPhysicsWorld*)world;
-	ndDemoEntityManager* const scene = physicsWorld->GetManager();
-	ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)effect.m_body____->GetNotifyCallback();
 	ndDemoEntity* const visualEntity = (ndDemoEntity*)notify->GetUserData();
 
 	dMatrix matrix(visualEntity->GetCurrentMatrix());
@@ -492,4 +372,3 @@ void ndSkinPeelFracture::UpdateEffect(ndWorld* const world, ndEffect& effect)
 #endif
 	}
 }
-#endif

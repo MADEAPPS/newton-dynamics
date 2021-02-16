@@ -49,10 +49,10 @@ void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
-void ndSkinPeelFracturing(ndDemoEntityManager* const scene);
+void ndBasicFracture_4(ndDemoEntityManager* const scene);
 void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
-void ndBasicConvexFracturing(ndDemoEntityManager* const scene);
+void ndBasicFracture_1(ndDemoEntityManager* const scene);
 void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
@@ -67,8 +67,8 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic joints", ndBasicJoints },
 	{ "basic vehicle", ndBasicVehicle },
 	{ "angular momentum", ndBasicAngularMomentum },
-	{ "simple convex fracture", ndBasicConvexFracturing },
-	{ "simple skin peeling fracture", ndSkinPeelFracturing },
+	{ "simple convex fracture", ndBasicFracture_1 },
+	{ "simple skin peeling fracture", ndBasicFracture_4 },
 };
 
 ndDemoEntityManager::ButtonKey::ButtonKey (bool state)

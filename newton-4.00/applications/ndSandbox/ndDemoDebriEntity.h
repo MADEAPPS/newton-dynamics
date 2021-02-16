@@ -25,23 +25,11 @@ struct DebriPoint
 
 class ndDemoDebriEntityRoot;
 
-class ndDemoDebriMesh: public ndDemoMesh
+class ndDemoDebriMesh : public ndDemoMesh
 {
 	public:
-	ndDemoDebriMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
-
-	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
-
-	ndDemoSubMeshMaterial m_material[2];
-	dInt32 m_textureLocation1;
-};
-
-class ndDemoDebriMesh2 : public ndDemoMesh
-{
-	public:
-	ndDemoDebriMesh2(ndDemoDebriMesh2* const srcMesh, const dArray<DebriPoint>& vertexArray);
-	ndDemoDebriMesh2(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase, dArray<DebriPoint>& vertexArray);
-	~ndDemoDebriMesh2();
+	ndDemoDebriMesh(ndDemoDebriMesh* const srcMesh, const dArray<DebriPoint>& vertexArray);
+	ndDemoDebriMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase, dArray<DebriPoint>& vertexArray);
 
 	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 

@@ -17,10 +17,10 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
-#include "ndSkinPeelFracture.h"
+#include "ndConvexFractureModel_4.h"
 #include "ndDemoEntityManager.h"
 
-static dVector CalculateLocation(ndSkinPeelFracture* const manager, const dMatrix& matrix, const ndShapeInstance& shape)
+static dVector CalculateLocation(ndConvexFractureModel_4* const manager, const dMatrix& matrix, const ndShapeInstance& shape)
 {
 	dVector minBox;
 	dVector maxBox;
@@ -34,7 +34,7 @@ static dVector CalculateLocation(ndSkinPeelFracture* const manager, const dMatri
 	return floor;
 }
 
-static void makePointCloud(ndSkinPeelFracture::ndDesc& desc)
+static void makePointCloud(ndConvexFractureModel_4::ndDesc& desc)
 {
 	dVector pMin;
 	dVector pMax;
@@ -55,9 +55,9 @@ static void makePointCloud(ndSkinPeelFracture::ndDesc& desc)
 	}
 }
 
-static void AddBoxEffect(ndSkinPeelFracture* const manager, const dMatrix& matrix)
+static void AddBoxEffect(ndConvexFractureModel_4* const manager, const dMatrix& matrix)
 {
-	ndSkinPeelFracture::ndDesc desc;
+	ndConvexFractureModel_4::ndDesc desc;
 
 	// first make a collision shape that we want to brake to pieces
 
@@ -78,7 +78,7 @@ static void AddBoxEffect(ndSkinPeelFracture* const manager, const dMatrix& matri
 
 	// now with make a template effect that we can place 
 	// in the scene many time.
-	ndSkinPeelFracture::ndEffect effect(manager, desc);
+	ndConvexFractureModel_4::ndEffect effect(manager, desc);
 
 	// get a location in the scene
 	dMatrix location(matrix);
@@ -101,13 +101,13 @@ location.m_posit.m_y += 2.0f;
 	}
 }
 
-void ndSkinPeelFracturing(ndDemoEntityManager* const scene)
+void ndBasicFracture_4(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndSkinPeelFracture* const fractureManager = new ndSkinPeelFracture(scene);
+	ndConvexFractureModel_4* const fractureManager = new ndConvexFractureModel_4(scene);
 	world->AddModel(fractureManager);
 	world->RegisterModelUpdate(fractureManager);
 
