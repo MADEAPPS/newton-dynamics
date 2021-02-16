@@ -1,5 +1,5 @@
-#ifndef __D_SKIN_PEEL_FRACTURE_H__
-#define __D_SKIN_PEEL_FRACTURE_H__
+#ifndef __D_CONVEX_FRACTURE_4_H__
+#define __D_CONVEX_FRACTURE_4_H__
 
 #include "ndSandboxStdafx.h"
 

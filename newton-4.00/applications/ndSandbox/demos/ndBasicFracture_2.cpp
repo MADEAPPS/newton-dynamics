@@ -18,9 +18,9 @@
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
-#include "ndConvexFractureModel_4.h"
+#include "ndConvexFractureModel_2.h"
 
-static dVector CalculateLocation(ndConvexFractureModel_4* const manager, const dMatrix& matrix, const ndShapeInstance& shape)
+static dVector CalculateLocation(ndConvexFractureModel_2* const manager, const dMatrix& matrix, const ndShapeInstance& shape)
 {
 	dVector minBox;
 	dVector maxBox;
@@ -34,7 +34,7 @@ static dVector CalculateLocation(ndConvexFractureModel_4* const manager, const d
 	return floor;
 }
 
-static void makePointCloud(ndConvexFractureModel_4::ndDesc& desc)
+static void makePointCloud(ndConvexFractureModel_2::ndDesc& desc)
 {
 	dVector pMin;
 	dVector pMax;
@@ -60,9 +60,9 @@ static void makePointCloud(ndConvexFractureModel_4::ndDesc& desc)
 	}
 }
 
-static void AddBoxEffect(ndConvexFractureModel_4* const manager, const dMatrix& matrix)
+static void AddBoxEffect(ndConvexFractureModel_2* const manager, const dMatrix& matrix)
 {
-	ndConvexFractureModel_4::ndDesc desc;
+	ndConvexFractureModel_2::ndDesc desc;
 
 	// first make a collision shape that we want to brake to pieces
 
@@ -83,7 +83,7 @@ static void AddBoxEffect(ndConvexFractureModel_4* const manager, const dMatrix& 
 
 	// now with make a template effect that we can place 
 	// in the scene many time.
-	ndConvexFractureModel_4::ndEffect effect(manager, desc);
+	ndConvexFractureModel_2::ndEffect effect(manager, desc);
 
 	// get a location in the scene
 	dMatrix location(matrix);
@@ -106,13 +106,13 @@ location.m_posit.m_y += 2.0f;
 	}
 }
 
-void ndBasicFracture_4(ndDemoEntityManager* const scene)
+void ndBasicFracture_2(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndConvexFractureModel_4* const fractureManager = new ndConvexFractureModel_4(scene);
+	ndConvexFractureModel_2* const fractureManager = new ndConvexFractureModel_2(scene);
 	world->AddModel(fractureManager);
 	world->RegisterModelUpdate(fractureManager);
 
