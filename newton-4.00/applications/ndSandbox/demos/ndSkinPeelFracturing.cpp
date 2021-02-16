@@ -83,7 +83,8 @@ static void AddBoxEffect(ndSkinPeelFracture* const manager, const dMatrix& matri
 	// get a location in the scene
 	dMatrix location(matrix);
 	location.m_posit = CalculateLocation(manager, matrix, outerShape);
-location.m_posit.m_y += 3.0f;
+
+location.m_posit.m_y += 2.0f;
 
 	// place few instance of the same effect in the scene.
 	const dInt32 count = 1;
