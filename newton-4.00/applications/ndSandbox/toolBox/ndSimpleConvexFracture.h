@@ -6,6 +6,7 @@
 class ndDemoMesh;
 class ndDemoDebriEntity;
 class ndDemoEntityManager;
+class ndDemoDebriEntityRoot;
 
 class ndSimpleConvexFracture: public ndModel
 {
