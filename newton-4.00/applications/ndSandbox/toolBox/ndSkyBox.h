@@ -33,7 +33,7 @@ class ndSkyBox: public ndDemoEntity
 	private:
 	void SetupCubeMap();
 
-	void LoadCubeTexture(GLenum face, char* const filename);
+	void LoadCubeTexture(GLenum face, const char* filename);
 
 	dMatrix m_textureMatrix;
 	GLuint m_shader;
