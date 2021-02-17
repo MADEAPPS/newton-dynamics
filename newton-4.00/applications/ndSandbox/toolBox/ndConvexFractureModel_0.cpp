@@ -31,6 +31,12 @@ class ndConvexFractureRootEntity : public ndDemoDebriRootEntity
 	{
 	}
 
+	ndConvexFractureRootEntity(const ndConvexFractureRootEntity& copyFrom)
+		:ndDemoDebriRootEntity(copyFrom)
+		,m_meshVolume(copyFrom.m_meshVolume)
+	{
+	}
+
 	dFloat32 m_meshVolume;
 };
 
@@ -51,7 +57,7 @@ class ndConvexFractureEntity: public ndDemoDebriEntity
 		m_massFraction = debriVolume / volume;
 		
 		// transform the mesh the center mass in order to get the 
-		//local inertia of this debri piece.
+		// local inertia of this debri piece.
 		dMatrix translateMatrix(dGetIdentityMatrix());
 		translateMatrix.m_posit = m_centerOfMass.Scale(-1.0f);
 		translateMatrix.m_posit.m_w = 1.0f;
@@ -64,8 +70,17 @@ class ndConvexFractureEntity: public ndDemoDebriEntity
 
 	ndConvexFractureEntity(const ndConvexFractureEntity& clone)
 		:ndDemoDebriEntity(clone)
+		,m_centerOfMass(clone.m_centerOfMass)
+		,m_momentOfInertia(clone.m_momentOfInertia)
+		,m_collision(new ndShapeInstance(*clone.m_collision))
+		,m_massFraction(clone.m_massFraction)
 	{
-		dAssert(0);
+		//ndBodyDynamic* const body = newEffect.m_body->GetAsBodyDynamic();
+		//m_scene->GetWorld()->AddBody(body);
+		//
+		//body->SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
+		//body->SetMatrix(location);
+		//body->SetMassMatrix(mass, *effect.m_shape);
 	}
 	
 	~ndConvexFractureEntity()
@@ -75,7 +90,6 @@ class ndConvexFractureEntity: public ndDemoDebriEntity
 
 	dNodeBaseHierarchy* CreateClone() const
 	{
-		dAssert(0);
 		return new ndConvexFractureEntity(*this);
 	}
 
@@ -136,4 +150,11 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 	m_debriRootEnt->FinalizeConstruction(vertexArray);
 
 	delete debriMeshPieces;
+}
+
+void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix& location)
+{
+	ndConvexFractureRootEntity* const entity = new ndConvexFractureRootEntity(*((ndConvexFractureRootEntity*)m_debriRootEnt));
+	scene->AddEntity(entity);
+	entity->SetMatrixUsafe(dQuaternion(location), location.m_posit);
 }

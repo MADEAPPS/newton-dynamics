@@ -48,13 +48,12 @@ class ndConvexFractureBox: public ndConvexFracture
 		ndShapeInstance shape(new ndShapeBox(shapeBox.m_x, shapeBox.m_y, shapeBox.m_z));
 		m_singleManifoldMesh = new ndMeshEffect(shape);
 
-		ndMeshEffect::dMaterial material;
-		strcpy(material.m_textureName, "reljef.tga");
-		m_singleManifoldMesh->GetMaterials().PushBack(ndMeshEffect::dMaterial());
+		ndMeshEffect::dMaterial& material0 = m_singleManifoldMesh->GetMaterials()[0];
+		strcpy(material0.m_textureName, "reljef.tga");
 
 		dMatrix textureMatrix(dGetIdentityMatrix());
-		textureMatrix[0][0] = 1.0f;
-		textureMatrix[1][1] = 1.0f;
+		textureMatrix[0][0] = 1.0f / 8.0f;
+		textureMatrix[1][1] = 1.0f / 4.0f;
 		textureMatrix.m_posit.m_x = -0.5f;
 		textureMatrix.m_posit.m_y = -0.5f;
 		m_singleManifoldMesh->UniformBoxMapping(0, textureMatrix);
@@ -66,8 +65,10 @@ class ndConvexFractureBox: public ndConvexFracture
 		m_textureMatrix[1][1] = 1.0f;
 		m_textureMatrix.m_posit.m_x = -0.5f;
 		m_textureMatrix.m_posit.m_y = -0.5f;
-		strcpy(material.m_textureName, "concreteBrick.tga");
+
 		m_singleManifoldMesh->GetMaterials().PushBack(ndMeshEffect::dMaterial());
+		ndMeshEffect::dMaterial& material1 = m_singleManifoldMesh->GetMaterials()[1];
+		strcpy(material1.m_textureName, "concreteBrick.tga");
 
 		m_interiorMaterialIndex = m_singleManifoldMesh->GetMaterials().GetCount() - 1;
 		GenerateEffect(scene);
@@ -84,33 +85,14 @@ void ndBasicFracture_0(ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene);
 
-	//ndPhysicsWorld* const world = scene->GetWorld();
-	//ndConvexFractureModel_1* const fractureManager = new ndConvexFractureModel_1(scene);
-	//world->AddModel(fractureManager);
-	//world->RegisterModelUpdate(fractureManager);
-	//
-	//dMatrix matrix(dGetIdentityMatrix());
-	//
-	//matrix.m_posit.m_x += 10.0f;
-	//matrix.m_posit.m_y += 2.0f;
-	//matrix.m_posit.m_z -= 5.0f;
-	//AddBoxEffect(fractureManager, matrix);
-	//
-	//matrix.m_posit.m_z += 5.0f;
-	//AddCapsuleEffect(fractureManager, matrix);
-	//
-	//matrix.m_posit.m_z += 5.0f;
-	//AddCylinderEffect(fractureManager, matrix);
+	ndConvexFractureBox fractureBox(scene);
 
-	//ndMeshEffect* const mesh = MakeBoxMesh();
-	ndConvexFractureBox box(scene);
-
-
-	
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit.m_x += 10.0f;
+	matrix.m_posit.m_y += 2.0f;
+	fractureBox.AddEffect(scene, matrix);
 
 	dQuaternion rot;
-	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
-	//dVector origin(-60.0f, 5.0f, 0.0f, 0.0f);
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

@@ -12,6 +12,8 @@ class ndConvexFracture
 
 	void GenerateEffect(ndDemoEntityManager* const scene);
 
+	void AddEffect(ndDemoEntityManager* const scene, const dMatrix& location);
+
 	dMatrix m_textureMatrix;
 	dArray<dVector> m_pointCloud;
 	ndMeshEffect* m_singleManifoldMesh;
