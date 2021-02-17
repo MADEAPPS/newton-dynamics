@@ -23,7 +23,7 @@ struct DebriPoint
 	ndMeshUV m_uv;
 };
 
-class ndDemoDebriEntityRoot;
+class ndDemoDebriRootEntity;
 
 class ndDemoDebriMesh : public ndDemoMesh
 {
@@ -37,15 +37,15 @@ class ndDemoDebriMesh : public ndDemoMesh
 	ndDemoSubMeshMaterial m_material[2];
 	dInt32 m_textureLocation1;
 
-	friend class ndDemoDebriEntityRoot;
+	friend class ndDemoDebriRootEntity;
 };
 
-class ndDemoDebriEntityRoot: public ndDemoEntity
+class ndDemoDebriRootEntity: public ndDemoEntity
 {
 	public:
-	ndDemoDebriEntityRoot();
-	ndDemoDebriEntityRoot(const ndDemoDebriEntityRoot& copyFrom);
-	virtual ~ndDemoDebriEntityRoot(void);
+	ndDemoDebriRootEntity();
+	ndDemoDebriRootEntity(const ndDemoDebriRootEntity& copyFrom);
+	virtual ~ndDemoDebriRootEntity(void);
 
 	void FinalizeConstruction(const dArray<DebriPoint>& vertexArray);
 
@@ -60,7 +60,7 @@ class ndDemoDebriEntityRoot: public ndDemoEntity
 class ndDemoDebriEntity : public ndDemoEntity
 {
 	public:
-	ndDemoDebriEntity(ndMeshEffect* const meshNode, dArray<DebriPoint>& vertexArray, ndDemoDebriEntityRoot* const parent, const ndShaderPrograms& shaderCache);
+	ndDemoDebriEntity(ndMeshEffect* const meshNode, dArray<DebriPoint>& vertexArray, ndDemoDebriRootEntity* const parent, const ndShaderPrograms& shaderCache);
 	ndDemoDebriEntity(const ndDemoDebriEntity& copyFrom);
 	virtual ~ndDemoDebriEntity();
 	dNodeBaseHierarchy* CreateClone() const;

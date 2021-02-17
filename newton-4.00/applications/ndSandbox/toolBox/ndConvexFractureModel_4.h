@@ -6,7 +6,7 @@
 class ndDemoMesh;
 class ndDemoDebriEntity;
 class ndDemoEntityManager;
-class ndDemoDebriEntityRoot;
+class ndDemoDebriRootEntity;
 
 class ndConvexFractureModel_4: public ndModel
 {
@@ -57,7 +57,7 @@ class ndConvexFractureModel_4: public ndModel
 		ndBodyKinematic* m_body;
 		ndShapeInstance* m_shape;
 		ndDemoMesh* m_visualMesh;
-		ndDemoDebriEntityRoot* m_debriRootEnt;
+		ndDemoDebriRootEntity* m_debriRootEnt;
 		dFloat32 m_breakImpactSpeed;
 		friend ndConvexFractureModel_4;
 	};

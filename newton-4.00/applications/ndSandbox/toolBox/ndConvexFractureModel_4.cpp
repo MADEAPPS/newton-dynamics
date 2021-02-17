@@ -83,7 +83,6 @@ ndConvexFractureModel_4::ndEffect::ndEffect(ndConvexFractureModel_4* const manag
 	outerMesh.UniformBoxMapping(0, textureMatrix);
 	innerMesh.UniformBoxMapping(1, textureMatrix);
 
-	//m_visualMesh = new ndDemoMesh("fracture", &outerMesh, manager->m_scene->GetShaderCache());
 	m_visualMesh = new ndDemoMesh("fracture", &innerMesh, manager->m_scene->GetShaderCache());
 
 	// now we call create we decompose the mesh into several convex pieces 
@@ -138,7 +137,7 @@ ndConvexFractureModel_4::ndEffect::ndEffect(ndConvexFractureModel_4* const manag
 	ndDemoEntityManager* const scene = manager->m_scene;
 
 	dArray<DebriPoint> vertexArray;
-	m_debriRootEnt = new ndDemoDebriEntityRoot;
+	m_debriRootEnt = new ndDemoDebriRootEntity;
 	for (dList<ndMeshEffect*>::dListNode* node = rawConvexPieces.GetFirst(); node; node = node->GetNext())
 	{
 		ndMeshEffect* const fracturePiece = node->GetInfo();
@@ -185,7 +184,7 @@ ndConvexFractureModel_4::ndEffect::ndEffect(const ndEffect& effect)
 	:m_body(new ndBodyDynamic())
 	,m_shape(nullptr)
 	,m_visualMesh(nullptr)
-	,m_debriRootEnt(new ndDemoDebriEntityRoot(*effect.m_debriRootEnt))
+	,m_debriRootEnt(new ndDemoDebriRootEntity(*effect.m_debriRootEnt))
 	,m_breakImpactSpeed(effect.m_breakImpactSpeed)
 {
 	m_body->SetCollisionShape(*effect.m_shape);

@@ -38,7 +38,7 @@ static void makePointCloud(ndConvexFractureModel_2::ndDesc& desc)
 {
 	dVector pMin;
 	dVector pMax;
-	desc.m_outerShape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
+	desc.m_shape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
 	dVector size(pMax - pMin);
 
 	const dInt32 count = 100;
@@ -67,14 +67,10 @@ static void AddBoxEffect(ndConvexFractureModel_2* const manager, const dMatrix& 
 	// first make a collision shape that we want to brake to pieces
 
 	dVector shapeBox(1.0f, 5.0f, 20.0f, 0.0f);
-	ndShapeInstance outerShape(new ndShapeBox(shapeBox.m_x, shapeBox.m_y, shapeBox.m_z));
-
-	shapeBox -= dVector(0.25f);
-	ndShapeInstance innerShape(new ndShapeBox(shapeBox.m_x, shapeBox.m_y, shapeBox.m_z));
+	ndShapeInstance shape(new ndShapeBox(shapeBox.m_x, shapeBox.m_y, shapeBox.m_z));
 
 	// next we populate the descriptor for how the shape is going to be broken in pieces.
-	desc.m_outerShape = &outerShape;
-	desc.m_innerShape = &innerShape;
+	desc.m_shape = &shape;
 	desc.m_outTexture = "reljef.tga";
 	desc.m_innerTexture = "concreteBrick.tga";
 	desc.m_breakImpactSpeed = 10.0f;
@@ -87,7 +83,7 @@ static void AddBoxEffect(ndConvexFractureModel_2* const manager, const dMatrix& 
 
 	// get a location in the scene
 	dMatrix location(matrix);
-	location.m_posit = CalculateLocation(manager, matrix, outerShape);
+	location.m_posit = CalculateLocation(manager, matrix, shape);
 
 location.m_posit.m_y += 2.0f;
 

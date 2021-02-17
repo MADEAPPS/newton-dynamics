@@ -2005,12 +2005,12 @@ void ndMeshEffect::dAttibutFormat::CompressData(const dPointFormat& points, dInt
 
 ndMeshEffect::ndMeshEffect()
 	:dPolyhedra()
-	, m_name()
-	, m_points()
-	, m_attrib()
-	, m_materials()
-	, m_vertexBaseCount(-1)
-	, m_constructionIndex(0)
+	,m_name()
+	,m_points()
+	,m_attrib()
+	,m_materials()
+	,m_vertexBaseCount(-1)
+	,m_constructionIndex(0)
 {
 	Init();
 }

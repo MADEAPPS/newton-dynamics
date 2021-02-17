@@ -1,14 +1,36 @@
-#ifndef __D_CONVEX_FRACTURE_2_H__
-#define __D_CONVEX_FRACTURE_2_H__
+#ifndef __D_CONVEX_FRACTURE_0_H__
+#define __D_CONVEX_FRACTURE_0_H__
 
 #include "ndSandboxStdafx.h"
 
+
+class ndConvexFracture
+{
+	public:
+	ndConvexFracture();
+	~ndConvexFracture();
+
+	void GenerateEffect(ndDemoEntityManager* const scene);
+
+	dMatrix m_textureMatrix;
+	dArray<dVector> m_pointCloud;
+	ndMeshEffect* m_singleManifoldMesh;
+	const char* m_innerTexture;
+	dFloat32 m_tileFactor;
+	dFloat32 m_breakImpactSpeed;
+	dInt32 m_interiorMaterialIndex;
+
+	private:
+	ndDemoDebriRootEntity* m_debriRootEnt;
+};
+
+
+/*
 class ndDemoMesh;
 class ndDemoDebriEntity;
 class ndDemoEntityManager;
-class ndDemoDebriRootEntity;
 
-class ndConvexFractureModel_2: public ndModel
+class ndConvexFractureModel_1: public ndModel
 {
 	class ndAtom
 	{
@@ -40,14 +62,14 @@ class ndConvexFractureModel_2: public ndModel
 		dArray<dVector> m_pointCloud;
 		ndShapeInstance* m_shape;
 		const char* m_outTexture;
-		const char* m_innerTexture;
+		const char* m_innerTexture; 
 		dFloat32 m_breakImpactSpeed;
 	};
 
 	class ndEffect : public dList<ndAtom>
 	{
 		public:
-		ndEffect(ndConvexFractureModel_2* const manager, const ndDesc& desc);
+		ndEffect(ndConvexFractureModel_1* const manager, const ndDesc& desc);
 		ndEffect(const ndEffect& effect);
 		~ndEffect();
 
@@ -57,12 +79,13 @@ class ndConvexFractureModel_2: public ndModel
 		ndDemoMesh* m_visualMesh;
 		ndDemoDebriRootEntity* m_debriRootEnt;
 		dFloat32 m_breakImpactSpeed;
-		friend ndConvexFractureModel_2;
+
+		friend ndConvexFractureModel_1;
 	};
 
 	public:
-	ndConvexFractureModel_2(ndDemoEntityManager* const scene);
-	~ndConvexFractureModel_2();
+	ndConvexFractureModel_1(ndDemoEntityManager* const scene);
+	~ndConvexFractureModel_1();
 
 	void AddEffect(const ndEffect& effect, dFloat32 mass, const dMatrix& location);
 
@@ -71,12 +94,10 @@ class ndConvexFractureModel_2: public ndModel
 
 	void UpdateEffect(ndWorld* const world, ndEffect& effect);
 
-	void ExplodeLocation(ndBodyDynamic* const body, const dMatrix& matrix, dFloat32 factor) const;
-
 	dList<ndEffect> m_effectList;
 	dList<ndEffect> m_pendingEffect;
 	ndDemoEntityManager* m_scene;
 	dSpinLock m_lock;
 };
-
+*/
 #endif

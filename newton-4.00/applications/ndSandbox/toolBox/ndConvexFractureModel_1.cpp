@@ -90,7 +90,7 @@ ndConvexFractureModel_1::ndEffect::ndEffect(ndConvexFractureModel_1* const manag
 	ndDemoEntityManager* const scene = manager->m_scene;
 
 	dArray<DebriPoint> vertexArray;
-	m_debriRootEnt = new ndDemoDebriEntityRoot;
+	m_debriRootEnt = new ndDemoDebriRootEntity;
 	for (ndMeshEffect* debri = debriMeshPieces->GetFirstLayer(); debri; debri = nextDebri)
 	{
 		// get next segment piece
@@ -143,7 +143,7 @@ ndConvexFractureModel_1::ndEffect::ndEffect(const ndEffect& effect)
 	:m_body(new ndBodyDynamic())
 	,m_shape(nullptr)
 	,m_visualMesh(nullptr)
-	,m_debriRootEnt(new ndDemoDebriEntityRoot(*effect.m_debriRootEnt))
+	,m_debriRootEnt(new ndDemoDebriRootEntity(*effect.m_debriRootEnt))
 	,m_breakImpactSpeed(effect.m_breakImpactSpeed)
 {
 	m_body->SetCollisionShape(*effect.m_shape);

@@ -147,7 +147,7 @@ void ndDemoDebriMesh::Render(ndDemoEntityManager* const scene, const dMatrix& mo
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 }
 
-ndDemoDebriEntity::ndDemoDebriEntity(ndMeshEffect* const meshNode, dArray<DebriPoint>& vertexArray, ndDemoDebriEntityRoot* const parent, const ndShaderPrograms& shaderCache)
+ndDemoDebriEntity::ndDemoDebriEntity(ndMeshEffect* const meshNode, dArray<DebriPoint>& vertexArray, ndDemoDebriRootEntity* const parent, const ndShaderPrograms& shaderCache)
 	:ndDemoEntity(dGetIdentityMatrix(), parent)
 {
 	dInt32 vertexCount = meshNode->GetPropertiesCount();
@@ -184,27 +184,27 @@ void ndDemoDebriEntity::Render(dFloat32 timeStep, ndDemoEntityManager* const sce
 	m_mesh->Render(scene, modelMatrix);
 }
 
-ndDemoDebriEntityRoot::ndDemoDebriEntityRoot()
+ndDemoDebriRootEntity::ndDemoDebriRootEntity()
 	:ndDemoEntity(dGetIdentityMatrix(), nullptr)
 {
 }
 
-ndDemoDebriEntityRoot::ndDemoDebriEntityRoot(const ndDemoDebriEntityRoot& copyFrom)
+ndDemoDebriRootEntity::ndDemoDebriRootEntity(const ndDemoDebriRootEntity& copyFrom)
 	:ndDemoEntity(copyFrom)
 {
 }
 
-ndDemoDebriEntityRoot::~ndDemoDebriEntityRoot(void)
+ndDemoDebriRootEntity::~ndDemoDebriRootEntity(void)
 {
 }
 
-void ndDemoDebriEntityRoot::FinalizeConstruction(const dArray<DebriPoint>& vertexArray)
+void ndDemoDebriRootEntity::FinalizeConstruction(const dArray<DebriPoint>& vertexArray)
 {
 	ndDemoDebriMesh* const shaderMesh = (ndDemoDebriMesh*)GetChild()->GetMesh();
 	m_mesh = new ndDemoDebriMesh(shaderMesh, vertexArray);
 }
 
-void ndDemoDebriEntityRoot::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
+void ndDemoDebriRootEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
 	ndDemoDebriMesh* const shaderMesh = ((ndDemoDebriMesh*)m_mesh);
 	glUseProgram(shaderMesh->m_shader);
