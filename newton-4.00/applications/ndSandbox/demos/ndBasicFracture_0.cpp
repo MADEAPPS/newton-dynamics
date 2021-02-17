@@ -44,6 +44,7 @@ class ndConvexFractureBox: public ndConvexFracture
 	ndConvexFractureBox(ndDemoEntityManager* const scene)
 		:ndConvexFracture()
 	{
+		m_mass = 100.0f;
 		dVector shapeBox(1.0f, 5.0f, 20.0f, 0.0f);
 		ndShapeInstance shape(new ndShapeBox(shapeBox.m_x, shapeBox.m_y, shapeBox.m_z));
 		m_singleManifoldMesh = new ndMeshEffect(shape);
@@ -58,7 +59,7 @@ class ndConvexFractureBox: public ndConvexFracture
 		textureMatrix.m_posit.m_y = -0.5f;
 		m_singleManifoldMesh->UniformBoxMapping(0, textureMatrix);
 
-		makePointCloud(shapeBox, 20, m_pointCloud);
+		makePointCloud(shapeBox, 40, m_pointCloud);
 
 		m_textureMatrix = dGetIdentityMatrix();
 		m_textureMatrix[0][0] = 1.0f;
@@ -89,7 +90,7 @@ void ndBasicFracture_0(ndDemoEntityManager* const scene)
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_x += 10.0f;
-	matrix.m_posit.m_y += 2.0f;
+	matrix.m_posit.m_y += 5.0f;
 	fractureBox.AddEffect(scene, matrix);
 
 	dQuaternion rot;

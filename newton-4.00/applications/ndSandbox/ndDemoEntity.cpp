@@ -134,7 +134,6 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene
 */
 
 ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
-	//:dClassInfo()
 	:dNodeHierarchy<ndDemoEntity>(copyFrom)
 	,m_matrix(copyFrom.m_matrix)
 	,m_curPosition(copyFrom.m_curPosition)

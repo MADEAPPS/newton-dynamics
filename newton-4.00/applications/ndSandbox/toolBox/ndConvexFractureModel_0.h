@@ -19,6 +19,7 @@ class ndConvexFracture
 	ndMeshEffect* m_singleManifoldMesh;
 	const char* m_innerTexture;
 	dFloat32 m_tileFactor;
+	dFloat32 m_mass;
 	dFloat32 m_breakImpactSpeed;
 	dInt32 m_interiorMaterialIndex;
 
