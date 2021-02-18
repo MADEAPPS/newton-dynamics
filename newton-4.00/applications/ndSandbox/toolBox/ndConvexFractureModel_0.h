@@ -14,6 +14,8 @@ class ndConvexFracture
 
 	void AddEffect(ndDemoEntityManager* const scene, const dMatrix& location);
 
+	void ExplodeLocation(ndBodyDynamic* const body, const dMatrix& location, dFloat32 factor) const;
+
 	dMatrix m_textureMatrix;
 	dArray<dVector> m_pointCloud;
 	ndMeshEffect* m_singleManifoldMesh;

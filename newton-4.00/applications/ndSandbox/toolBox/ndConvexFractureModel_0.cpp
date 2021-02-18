@@ -165,6 +165,18 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 	delete debriMeshPieces;
 }
 
+void ndConvexFracture::ExplodeLocation(ndBodyDynamic* const body, const dMatrix& location, dFloat32 factor) const
+{
+	dVector center(location.TransformVector(body->GetCentreOfMass()));
+	dVector radios((center - location.m_posit) & dVector::m_triplexMask);
+	dVector dir(radios.Normalize());
+	dFloat32 lenght = dSqrt(radios.DotProduct(radios).GetScalar());
+	dir = dir.Scale(lenght * factor);
+	dMatrix matrix(location);
+	matrix.m_posit += dir;
+	body->SetMatrix(matrix);
+}
+
 void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix& location)
 {
 	ndConvexFractureRootEntity* const entity = new ndConvexFractureRootEntity(*((ndConvexFractureRootEntity*)m_debriRootEnt));
@@ -178,5 +190,8 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 		world->AddBody(body);
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, debriEnt));
 		body->SetMatrix(location);
+#if 1
+		ExplodeLocation(body, location, 0.3f);
+#endif
 	}
 }
