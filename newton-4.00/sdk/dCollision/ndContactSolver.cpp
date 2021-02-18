@@ -2300,10 +2300,8 @@ dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDes
 		m_vertexIndex = 0;
 		m_contactBuffer = &contactOut[count];
 		dInt32 count1 = polygon.CalculateContactToConvexHullDescrete(&polySoupInstance, *this);
-		//closestDist = dMin(closestDist, contactJoint->m_closestDistance);
 		closestDist = dMin(closestDist, contactJoint->m_separationDistance);
-	
-		//if (count1 > 0) 
+
 		if (count1 > 0)
 		{
 			if (!m_intersectionTestOnly)

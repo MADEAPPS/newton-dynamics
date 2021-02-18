@@ -167,6 +167,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	static dInt32 m_rayCastSimplex[4][4];
 
 	friend class ndScene;
+	friend class ndShapeInstance;
 	friend class ndPolygonMeshDesc;
 	friend class ndShapeConvexPolygon;
 	friend class ndBodyPlayerCapsuleContactSolver;

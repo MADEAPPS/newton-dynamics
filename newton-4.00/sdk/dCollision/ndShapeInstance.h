@@ -74,6 +74,10 @@ class ndShapeInstance: public dClassAlloc
 	D_COLLISION_API void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	D_COLLISION_API dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const;
 
+	D_COLLISION_API bool ClosestPoint(const dMatrix& worldMatrix, 
+									  const ndShapeInstance& otherShape, const dMatrix& otherMatrix,
+									  dVector& point0, dVector& otherPoint, dVector& normal) const;
+
 	D_COLLISION_API ndShapeInfo GetShapeInfo() const;
 
 	D_COLLISION_API dFloat32 CalculateBuoyancyCenterOfPresure(dVector& com, const dMatrix& matrix, const dVector& fluidPlane) const;
