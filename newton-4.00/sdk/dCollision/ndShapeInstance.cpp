@@ -485,31 +485,47 @@ dVector ndShapeInstance::GetBoxPadding()
 	return m_padding;
 }
 
-bool ndShapeInstance::ClosestPoint(const dMatrix& worldMatrix,
-	const ndShapeInstance& otherShape, const dMatrix& otherMatrix,
-	dVector& point0, dVector& otherPoint, dVector& normal) const
+dInt32 ndShapeInstance::ClosestPoint(const dMatrix& matrix, const dVector& point, dVector& contactPoint) const
 {
+	ndContact contact;
 	ndBodyKinematic body0;
 	ndBodyKinematic body1;
-	ndContact contact;
 
 	body0.SetCollisionShape(*this);
-	body1.SetCollisionShape(otherShape);
+	body1.SetCollisionShape(*this);
+	body0.SetMassMatrix(dVector::m_one);
+	contact.SetBodies(&body0, &body1);
+	
+	ndShapeInstance& shape0 = body0.GetCollisionShape();
+	shape0.SetGlobalMatrix(shape0.GetLocalMatrix() * dGetIdentityMatrix());
+	dVector localPoint(matrix.TransformVector(point));
 
-	dMatrix matrix0(worldMatrix);
-	dMatrix matrix1(otherMatrix);
+	ndContactSolver solver(&contact);
+	dInt32 feature = solver.CalculatePointOnsurface(localPoint, contactPoint);
+	contactPoint = matrix.TransformVector(contactPoint);
+
+	return feature;
+}
+
+bool ndShapeInstance::ndDistanceCalculator::ClosestPoint()
+{
+	ndContact contact;
+	ndBodyKinematic body0;
+	ndBodyKinematic body1;
+
+	body0.SetCollisionShape(*m_shape0);
+	body1.SetCollisionShape(*m_shape1);
+
+	dMatrix matrix0(m_matrix0);
+	dMatrix matrix1(m_matrix1);
 
 	matrix0.m_posit = dVector::m_wOne;
-	matrix1.m_posit = (otherMatrix.m_posit - worldMatrix.m_posit) | dVector::m_wOne;
+	matrix1.m_posit = (m_matrix1.m_posit - m_matrix0.m_posit) | dVector::m_wOne;
 
 	body0.SetMatrix(matrix0);
 	body1.SetMatrix(matrix1);
 	body0.SetMassMatrix(dVector::m_one);
 	contact.SetBodies(&body0, &body1);
-
-//dMatrix xxxx(matrix1);
-//xxxx.m_posit.m_x = 210.0f;
-//body1.SetMatrix(xxxx);
 
 	ndShapeInstance& shape0 = body0.GetCollisionShape();
 	ndShapeInstance& shape1 = body1.GetCollisionShape();
@@ -519,10 +535,10 @@ bool ndShapeInstance::ClosestPoint(const dMatrix& worldMatrix,
 	ndContactSolver solver(&contact);
 	bool ret = solver.CalculateClosestPoints();
 
-	normal = solver.m_separatingVector;
-	point0 = solver.m_closestPoint0 + worldMatrix.m_posit;
-	otherPoint = solver.m_closestPoint1 + worldMatrix.m_posit;
-	point0.m_w = dFloat32(1.0f);
-	otherPoint.m_w = dFloat32(1.0f);
+	m_normal = solver.m_separatingVector;
+	m_point0 = solver.m_closestPoint0 + m_matrix0.m_posit;
+	m_point1 = solver.m_closestPoint1 + m_matrix0.m_posit;
+	m_point0.m_w = dFloat32(1.0f);
+	m_point1.m_w = dFloat32(1.0f);
 	return ret;
 }

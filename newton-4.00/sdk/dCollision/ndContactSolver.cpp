@@ -800,7 +800,11 @@ D_INLINE void ndContactSolver::CalculateContactFromFeacture(dInt32 featureType)
 	m_closestPoint1 = dVector::m_half * (s - d);
 	dAssert(m_separatingVector.m_w == dFloat32(0.0f));
 	dAssert(dAbs(m_separatingVector.DotProduct(m_separatingVector).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
-	//m_proxy->m_contactJoint->m_separatingVector = m_normal;
+}
+
+dInt32 ndContactSolver::CalculatePointOnsurface(const dVector& point, dVector& pointOnsurface) const
+{
+	return 3;
 }
 
 bool ndContactSolver::CalculateClosestPoints()

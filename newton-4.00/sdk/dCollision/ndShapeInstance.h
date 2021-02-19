@@ -54,6 +54,38 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeInstance: public dClassAlloc
 {
 	public:
+	class ndDistanceCalculator
+	{
+		public:
+		ndDistanceCalculator()
+		{
+		}
+
+		ndDistanceCalculator(
+			ndShapeInstance* const shape0, const dMatrix& matrix0,
+			ndShapeInstance* const shape1, const dMatrix& matrix1)
+			:m_matrix0(matrix0)
+			,m_matrix1(matrix1)
+			,m_point0(dVector::m_wOne)
+			,m_point1(dVector::m_wOne)
+			,m_normal(dVector::m_zero)
+			,m_shape0(shape0)
+			,m_shape1(shape1)
+		{
+		}
+
+		D_COLLISION_API bool ClosestPoint();
+
+		dMatrix m_matrix0;
+		dMatrix m_matrix1;
+		dVector m_point0;
+		dVector m_point1;
+		dVector m_normal;
+		ndShapeInstance* m_shape0;
+		ndShapeInstance* m_shape1;
+	};
+
+
 	enum ndScaleType
 	{
 		m_unit,
@@ -74,9 +106,7 @@ class ndShapeInstance: public dClassAlloc
 	D_COLLISION_API void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	D_COLLISION_API dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const;
 
-	D_COLLISION_API bool ClosestPoint(const dMatrix& worldMatrix, 
-									  const ndShapeInstance& otherShape, const dMatrix& otherMatrix,
-									  dVector& point0, dVector& otherPoint, dVector& normal) const;
+	D_COLLISION_API dInt32 ClosestPoint(const dMatrix& matrix, const dVector& point, dVector& contactPoint) const;
 
 	D_COLLISION_API ndShapeInfo GetShapeInfo() const;
 

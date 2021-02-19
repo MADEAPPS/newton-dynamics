@@ -125,6 +125,8 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 
 	D_INLINE void CalculateContactFromFeacture(dInt32 featureType);
 
+	dInt32 CalculatePointOnsurface(const dVector& point, dVector& pointOnsurface) const;
+
 	ndShapeInstance m_instance0;
 	ndShapeInstance m_instance1;
 	dVector m_closestPoint0;
