@@ -145,6 +145,8 @@ ndConvexFracture::~ndConvexFracture()
 void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 {
 	ndMeshEffect* const debriMeshPieces = m_singleManifoldMesh->CreateVoronoiConvexDecomposition(m_pointCloud, m_interiorMaterialIndex, &m_textureMatrix[0][0]);
+
+		
 	
 	dArray<DebriPoint> vertexArray;
 	m_debriRootEnt = new ndConvexFractureRootEntity(m_singleManifoldMesh, m_mass);
@@ -185,32 +187,36 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 	distanceCalculator.m_matrix1 = dGetIdentityMatrix();
 	for (ndConvexFractureEntity* ent0 = (ndConvexFractureEntity*)m_debriRootEnt->GetChild(); ent0; ent0 = (ndConvexFractureEntity*)ent0->GetSibling())
 	{
-		distanceCalculator.m_shape0 = ent0->m_collision;;
+		distanceCalculator.m_shape0 = ent0->m_collision;
 		for (ndConvexFractureEntity* ent1 = (ndConvexFractureEntity*)ent0->GetSibling(); ent1; ent1 = (ndConvexFractureEntity*)ent1->GetSibling())
 		{
-			//ndShapeInstance* const collision1 = ent1->m_collision;
-			distanceCalculator.m_shape1 = ent1->m_collision;;
+			if ((ent1->m_enumerator != 7))	continue;
+
+			distanceCalculator.m_shape1 = ent1->m_collision;
 			if (distanceCalculator.ClosestPoint())
 			{
 				dFloat32 dist = distanceCalculator.m_normal.DotProduct(distanceCalculator.m_point1 - distanceCalculator.m_point0).GetScalar();
 				if (dist <= dFloat32(1.0e-2f))
 				{
 					dVector point;
-					dVector midPoint((distanceCalculator.m_point1 + distanceCalculator.m_point0).Scale(0.0f));
+					dVector midPoint((distanceCalculator.m_point1 + distanceCalculator.m_point0).Scale(0.5f));
 
-					bool isFaceContact = (distanceCalculator.m_shape0->ClosestPoint(distanceCalculator.m_matrix0, midPoint, midPoint) == 3);
-					isFaceContact = isFaceContact || (distanceCalculator.m_shape1->ClosestPoint(distanceCalculator.m_matrix1, midPoint, midPoint) == 3);
+					dVector p0(midPoint + distanceCalculator.m_normal.Scale(0.1f));
+					dVector p1(midPoint - distanceCalculator.m_normal.Scale(0.1f));
+					bool isFaceContact = (distanceCalculator.m_shape0->ClosestPoint(distanceCalculator.m_matrix0, p0, point) == 3);
+					isFaceContact = isFaceContact || (distanceCalculator.m_shape1->ClosestPoint(distanceCalculator.m_matrix1, p1, point) == 3);
 					if (isFaceContact)
 					{
 						dTrace(("pair %d %d\n", ent0->m_enumerator, ent1->m_enumerator));
-						//	ndConvexFractureRootEntity::JointPair pair;
-						//	pair.m_m0 = ent0->m_enumerator;
-						//	pair.m_m1 = ent1->m_enumerator;
-						//	rootEntity->m_jointConnection.PushBack(pair);
+						ndConvexFractureRootEntity::JointPair pair;
+						pair.m_m0 = ent0->m_enumerator;
+						pair.m_m1 = ent1->m_enumerator;
+						rootEntity->m_jointConnection.PushBack(pair);
 					}
 				}
 			}
 		}
+		break;
 	}
 }
 
@@ -234,8 +240,16 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 
 	ndWorld* const world = scene->GetWorld();
 
-	const dArray<ndConvexFractureRootEntity::JointPair>& jointConnection = rootEntity->m_jointConnection;
-	ndBodyDynamic** const bodyArray = dAlloca(ndBodyDynamic*, jointConnection.GetCount());
+	dInt32 bodyCount = 0;
+	for (ndConvexFractureEntity* debriEnt = (ndConvexFractureEntity*)entity->GetChild(); debriEnt; debriEnt = (ndConvexFractureEntity*)debriEnt->GetSibling())
+	{
+		bodyCount++;
+		dAssert(debriEnt->m_drebriBody);
+		dAssert(debriEnt->m_enumerator < bodyCount);
+	}
+
+	ndBodyDynamic** const bodyArray = dAlloca(ndBodyDynamic*, bodyCount);
+	memset(bodyArray, 0, bodyCount * sizeof(ndBodyDynamic*));
 	for (ndConvexFractureEntity* debriEnt = (ndConvexFractureEntity*)entity->GetChild(); debriEnt; debriEnt = (ndConvexFractureEntity*)debriEnt->GetSibling())
 	{
 		debriEnt->SetMatrixUsafe(dQuaternion(location), location.m_posit);
@@ -243,16 +257,14 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 		world->AddBody(body);
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, debriEnt));
 		body->SetMatrix(location);
-		if (debriEnt->m_enumerator < jointConnection.GetCount())
-		{
-			bodyArray[debriEnt->m_enumerator] = body;
-		}
+		bodyArray[debriEnt->m_enumerator] = body;
 #if 1
 		ExplodeLocation(body, location, 0.3f);
 #endif
 	}
 
 	// create all the joints
+	const dArray<ndConvexFractureRootEntity::JointPair>& jointConnection = rootEntity->m_jointConnection;
 	for (dInt32 i = 0; i < jointConnection.GetCount(); i++)
 	{
 		ndBodyDynamic* const body0 = bodyArray[jointConnection[i].m_m0];

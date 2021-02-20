@@ -23,6 +23,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndContact.h"
 #include "ndShape.h"
+#include "ndShapePoint.h"
 #include "ndShapeConvex.h"
 #include "ndBodyKinematic.h"
 #include "ndContactSolver.h"
@@ -800,33 +801,6 @@ D_INLINE void ndContactSolver::CalculateContactFromFeacture(dInt32 featureType)
 	m_closestPoint1 = dVector::m_half * (s - d);
 	dAssert(m_separatingVector.m_w == dFloat32(0.0f));
 	dAssert(dAbs(m_separatingVector.DotProduct(m_separatingVector).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
-}
-
-dInt32 ndContactSolver::CalculatePointOnsurface(const dVector& point, dVector& pointOnsurface) const
-{
-	return 3;
-}
-
-bool ndContactSolver::CalculateClosestPoints()
-{
-	dInt32 simplexPointCount = CalculateClosestSimplex();
-	if (simplexPointCount < 0)
-	{
-		simplexPointCount = CalculateIntersectingPlane(-simplexPointCount);
-	}
-
-	if (simplexPointCount > 0)
-	{
-		dAssert((simplexPointCount > 0) && (simplexPointCount <= 3));
-		CalculateContactFromFeacture(simplexPointCount);
-		
-		const dMatrix& matrix0 = m_instance0.m_globalMatrix;
-		const dMatrix& matrix1 = m_instance1.m_globalMatrix;
-		m_closestPoint0 = matrix0.TransformVector(m_instance0.SupportVertexSpecialProjectPoint(matrix0.UntransformVector(m_closestPoint0), matrix0.UnrotateVector(m_separatingVector)));
-		m_closestPoint1 = matrix1.TransformVector(m_instance1.SupportVertexSpecialProjectPoint(matrix1.UntransformVector(m_closestPoint1), matrix1.UnrotateVector(m_separatingVector * dVector::m_negOne)));
-		m_vertexIndex = simplexPointCount;
-	}
-	return simplexPointCount >= 0;
 }
 
 dInt32 ndContactSolver::CalculateContacts(const dVector& point0, const dVector& point1, const dVector& normal)
@@ -2386,4 +2360,108 @@ dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDes
 	m_instance1 = polySoupInstance;
 
 	return count;
+}
+
+bool ndContactSolver::CalculateClosestPoints()
+{
+	dInt32 simplexPointCount = CalculateClosestSimplex();
+	if (simplexPointCount < 0)
+	{
+		simplexPointCount = CalculateIntersectingPlane(-simplexPointCount);
+	}
+
+	if (simplexPointCount > 0)
+	{
+		dAssert((simplexPointCount > 0) && (simplexPointCount <= 3));
+		CalculateContactFromFeacture(simplexPointCount);
+
+		const dMatrix& matrix0 = m_instance0.m_globalMatrix;
+		const dMatrix& matrix1 = m_instance1.m_globalMatrix;
+		m_closestPoint0 = matrix0.TransformVector(m_instance0.SupportVertexSpecialProjectPoint(matrix0.UntransformVector(m_closestPoint0), matrix0.UnrotateVector(m_separatingVector)));
+		m_closestPoint1 = matrix1.TransformVector(m_instance1.SupportVertexSpecialProjectPoint(matrix1.UntransformVector(m_closestPoint1), matrix1.UnrotateVector(m_separatingVector * dVector::m_negOne)));
+		m_vertexIndex = simplexPointCount;
+	}
+	return simplexPointCount >= 0;
+}
+
+dInt32 ndContactSolver::CalculatePointOnsurface(const ndShapeInstance* const shape, const dMatrix& matrix, const dVector& point, dVector& pointOnsurface)
+{
+	class ndPoint : public ndShapePoint
+	{
+	public:
+		ndPoint()
+		{
+			AddRef();
+		}
+
+		~ndPoint()
+		{
+			m_refCount--;
+		}
+	};
+
+	ndContact contact;
+	ndPoint pointShape;
+	ndBodyKinematic body0;
+	ndBodyKinematic body1;
+	ndShapeInstance shape1(&pointShape);
+
+	body0.SetCollisionShape(*shape);
+	body1.SetCollisionShape(shape1);
+	body0.SetMassMatrix(dVector::m_one);
+	contact.SetBodies(&body0, &body1);
+
+
+class xxxxxxxx : public ndShapeDebugCallback
+{
+public:
+	xxxxxxxx(const dVector& point)
+		:m_point(point)
+	{
+	}
+
+	void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray)
+	{
+		for (dInt32 i = 0; i < vertexCount; i++)
+		{
+			dVector p(faceArray[i] - m_point);
+			dTrace(("%f %f %f\n", p[0], p[1], p[2]));
+		}
+		dTrace(("\n"));
+	}
+
+	dVector m_point;
+};
+
+xxxxxxxx xxx(point);
+shape->DebugShape(matrix, xxx);
+
+	dMatrix matrix0(matrix);
+	matrix0.m_posit = dVector::m_wOne;
+	dMatrix matrix1(dGetIdentityMatrix());
+	matrix1.m_posit = point - matrix.m_posit;
+	matrix1.m_posit.m_w = dFloat32(1.0f);
+	body0.SetMatrix(matrix0);
+	body1.SetMatrix(matrix1);
+
+	ndShapeInstance& shapeInst0 = body0.GetCollisionShape();
+	ndShapeInstance& shapeInst1 = body1.GetCollisionShape();
+	shapeInst0.SetGlobalMatrix(shapeInst0.GetLocalMatrix() * matrix0);
+	shapeInst1.SetGlobalMatrix(shapeInst1.GetLocalMatrix() * matrix1);
+
+	ndContactSolver solver(&contact);
+	dInt32 simplexPointCount = solver.CalculateClosestSimplex();
+	if (simplexPointCount < 0)
+	{
+		simplexPointCount = 0;
+	}
+	else
+	{
+		solver.CalculateContactFromFeacture(simplexPointCount);
+	}
+
+	pointOnsurface = solver.m_closestPoint0 + matrix.m_posit;
+	pointOnsurface.m_w = dFloat32(1.0f);
+
+	return simplexPointCount;
 }

@@ -485,28 +485,6 @@ dVector ndShapeInstance::GetBoxPadding()
 	return m_padding;
 }
 
-dInt32 ndShapeInstance::ClosestPoint(const dMatrix& matrix, const dVector& point, dVector& contactPoint) const
-{
-	ndContact contact;
-	ndBodyKinematic body0;
-	ndBodyKinematic body1;
-
-	body0.SetCollisionShape(*this);
-	body1.SetCollisionShape(*this);
-	body0.SetMassMatrix(dVector::m_one);
-	contact.SetBodies(&body0, &body1);
-	
-	ndShapeInstance& shape0 = body0.GetCollisionShape();
-	shape0.SetGlobalMatrix(shape0.GetLocalMatrix() * dGetIdentityMatrix());
-	dVector localPoint(matrix.TransformVector(point));
-
-	ndContactSolver solver(&contact);
-	dInt32 feature = solver.CalculatePointOnsurface(localPoint, contactPoint);
-	contactPoint = matrix.TransformVector(contactPoint);
-
-	return feature;
-}
-
 bool ndShapeInstance::ndDistanceCalculator::ClosestPoint()
 {
 	ndContact contact;
@@ -541,4 +519,9 @@ bool ndShapeInstance::ndDistanceCalculator::ClosestPoint()
 	m_point0.m_w = dFloat32(1.0f);
 	m_point1.m_w = dFloat32(1.0f);
 	return ret;
+}
+
+dInt32 ndShapeInstance::ClosestPoint(const dMatrix& matrix, const dVector& point, dVector& contactPoint) const
+{
+	return ndContactSolver::CalculatePointOnsurface(this, matrix, point, contactPoint);
 }

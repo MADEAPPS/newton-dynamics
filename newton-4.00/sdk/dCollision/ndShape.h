@@ -29,6 +29,7 @@ class ndShape;
 class ndShapeBox;
 class ndShapeNull;
 class ndShapeCone;
+class ndShapePoint;
 class ndShapeConvex;
 class ndShapeSphere;
 class ndShapeCapsule;
@@ -57,7 +58,8 @@ enum ndShapeID
 	m_coneCollision,
 	m_convexHull, // this must be the last convex shape ID
 
-	// non convex collisions.
+	// special and non convex collisions.
+	m_pointCollision,
 	m_nullCollision,
 	m_boundingBoxHierachy,
 	//m_compoundCollision,
@@ -104,6 +106,11 @@ class ndShapeInfo
 		dFloat32 m_x;
 		dFloat32 m_y;
 		dFloat32 m_z;
+	};
+
+	struct dgPointData
+	{
+		dFloat32 m_noUsed;
 	};
 
 	struct dgSphereData
@@ -196,6 +203,7 @@ class ndShapeInfo
 	{
 		dgBoxData m_box;
 		dgConeData m_cone;
+		dgPointData m_point;
 		dgSphereData m_sphere;
 		dgCapsuleData m_capsule;
 		dgCylinderData m_cylinder;
@@ -227,6 +235,7 @@ class ndShape: public dClassAlloc
 	virtual ndShapeCylinder* GetAsShapeCylinder() { return nullptr; }
 	virtual ndShapeCompound* GetAsShapeCompound() { return nullptr; }
 	virtual ndShapeNull* GetAsShapeNull() { return nullptr; }
+	virtual ndShapePoint* GetAsShapePoint() { return nullptr; }
 	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon() { return nullptr; }
 	virtual ndShapeConvex* GetAsShapeConvex() { return nullptr; }
 	virtual ndShapeStaticMesh* GetAsShapeStaticMeshShape() { return nullptr; }
