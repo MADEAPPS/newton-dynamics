@@ -106,7 +106,7 @@ class ndShapeInstance: public dClassAlloc
 	D_COLLISION_API void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	D_COLLISION_API dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const;
 
-	D_COLLISION_API dInt32 ClosestPoint(const dMatrix& matrix, const dVector& point, dVector& contactPoint) const;
+	//D_COLLISION_API dInt32 ClosestPoint(const dMatrix& matrix, const dVector& point, dVector& contactPoint) const;
 
 	D_COLLISION_API ndShapeInfo GetShapeInfo() const;
 

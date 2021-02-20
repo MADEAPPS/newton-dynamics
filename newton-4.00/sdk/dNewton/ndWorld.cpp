@@ -177,18 +177,6 @@ void ndWorld::ClearCache()
 	ndSkeletonContainer::ndNodeList::FlushFreeList();
 }
 
-//void ndWorld::UpdatePrelisteners()
-//{
-//}
-//
-//void ndWorld::UpdatePostlisteners()
-//{
-//}
-//
-//void ndWorld::UpdateListenersPostTransform()
-//{
-//}
-
 void ndWorld::UpdateTransforms()
 {
 	for (ndBodyParticleSetList::dListNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())

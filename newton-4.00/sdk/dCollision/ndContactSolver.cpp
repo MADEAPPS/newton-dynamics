@@ -2384,6 +2384,7 @@ bool ndContactSolver::CalculateClosestPoints()
 	return simplexPointCount >= 0;
 }
 
+/*
 dInt32 ndContactSolver::CalculatePointOnsurface(const ndShapeInstance* const shape, const dMatrix& matrix, const dVector& point, dVector& pointOnsurface)
 {
 	class ndPoint : public ndShapePoint
@@ -2465,3 +2466,4 @@ shape->DebugShape(matrix, xxx);
 
 	return simplexPointCount;
 }
+*/

@@ -521,7 +521,7 @@ bool ndShapeInstance::ndDistanceCalculator::ClosestPoint()
 	return ret;
 }
 
-dInt32 ndShapeInstance::ClosestPoint(const dMatrix& matrix, const dVector& point, dVector& contactPoint) const
-{
-	return ndContactSolver::CalculatePointOnsurface(this, matrix, point, contactPoint);
-}
+//dInt32 ndShapeInstance::ClosestPoint(const dMatrix& matrix, const dVector& point, dVector& contactPoint) const
+//{
+//	return ndContactSolver::CalculatePointOnsurface(this, matrix, point, contactPoint);
+//}

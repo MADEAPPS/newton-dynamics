@@ -125,7 +125,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 
 	D_INLINE void CalculateContactFromFeacture(dInt32 featureType);
 
-	static dInt32 CalculatePointOnsurface(const ndShapeInstance* const shape, const dMatrix& matrix, const dVector& point, dVector& pointOnsurface);
+	//static dInt32 CalculatePointOnsurface(const ndShapeInstance* const shape, const dMatrix& matrix, const dVector& point, dVector& pointOnsurface);
 
 	ndShapeInstance m_instance0;
 	ndShapeInstance m_instance1;
