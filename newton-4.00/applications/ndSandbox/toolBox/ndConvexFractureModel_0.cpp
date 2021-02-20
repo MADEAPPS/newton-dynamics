@@ -190,7 +190,7 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 		distanceCalculator.m_shape0 = ent0->m_collision;
 		for (ndConvexFractureEntity* ent1 = (ndConvexFractureEntity*)ent0->GetSibling(); ent1; ent1 = (ndConvexFractureEntity*)ent1->GetSibling())
 		{
-			if ((ent1->m_enumerator != 7))	continue;
+			if ((ent1->m_enumerator != 2))	continue;
 
 			distanceCalculator.m_shape1 = ent1->m_collision;
 			if (distanceCalculator.ClosestPoint())

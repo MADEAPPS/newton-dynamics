@@ -402,8 +402,6 @@ class dFastAabbInfo : public dMatrix
 	mutable dVector m_separationDistance;
 
 	friend class dAabbPolygonSoup;
-//	friend class dCollisionUserMesh;
-//	friend class dCollisionHeightField;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #endif

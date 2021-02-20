@@ -28,18 +28,17 @@
 class dDelaunayTetrahedralization: public dConvexHull4d
 {
 	public:
-	dDelaunayTetrahedralization(const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol);
-	virtual ~dDelaunayTetrahedralization();
-	void RemoveUpperHull ();
+	D_CORE_API dDelaunayTetrahedralization(const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol);
+	D_CORE_API virtual ~dDelaunayTetrahedralization();
+	D_CORE_API void RemoveUpperHull ();
 
-	dInt32 AddVertex (const dBigVector& vertex);
+	D_CORE_API dInt32 AddVertex (const dBigVector& vertex);
 
 	protected:
-	virtual void DeleteFace (dListNode* const node) ;
+	D_CORE_API void SortVertexArray();
+	D_CORE_API virtual void DeleteFace (dListNode* const node) ;
 
-	void SortVertexArray ();
 	static dInt32 CompareVertexByIndex(const dConvexHull4dVector* const  A, const dConvexHull4dVector* const B, void* const context);
-
 };
 
 #endif

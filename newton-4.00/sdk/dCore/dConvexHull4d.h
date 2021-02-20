@@ -71,7 +71,7 @@ class dConvexHull4dTetraherum
 	dConvexHull4dTetraherum();
 	dgTetrahedrumPlane GetPlaneEquation (const dConvexHull4dVector* const points) const;
 	dFloat64 GetTetraVolume (const dConvexHull4dVector* const pointArray) const;	
-	dBigVector CircumSphereCenter (const dConvexHull4dVector* const pointArray) const;
+	D_CORE_API dBigVector CircumSphereCenter (const dConvexHull4dVector* const pointArray) const;
 	dFloat64 Evalue (const dConvexHull4dVector* const pointArray, const dBigVector& point) const;
 
 	dInt32 GetMark() const { return m_mark; }
