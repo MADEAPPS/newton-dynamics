@@ -26,7 +26,7 @@ class ndConvexFracture
 	dInt32 m_interiorMaterialIndex;
 
 	private:
-	ndDemoDebriRootEntity* m_debriRootEnt;
+	ndDemoDebrisRootEntity* m_debriRootEnt;
 };
 
 
@@ -82,7 +82,7 @@ class ndConvexFractureModel_1: public ndModel
 		ndBodyKinematic* m_body;
 		ndShapeInstance* m_shape;
 		ndDemoMesh* m_visualMesh;
-		ndDemoDebriRootEntity* m_debriRootEnt;
+		ndDemoDebrisRootEntity* m_debriRootEnt;
 		dFloat32 m_breakImpactSpeed;
 
 		friend ndConvexFractureModel_1;

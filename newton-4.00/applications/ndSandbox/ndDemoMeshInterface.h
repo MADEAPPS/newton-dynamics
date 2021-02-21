@@ -17,8 +17,9 @@
 class ndDemoEntity;
 class ndDemoEntityManager;
 
-struct ndMeshVector
+class ndMeshVector
 {
+	public:
 	ndMeshVector() {}
 	ndMeshVector(GLfloat x, GLfloat y, GLfloat z)
 		:m_x(x), m_y(y), m_z(z)
@@ -30,30 +31,35 @@ struct ndMeshVector
 	GLfloat m_z;
 };
 
-struct ndMeshVector4: public ndMeshVector
+class ndMeshVector4: public ndMeshVector
 {
+	public:
 	GLfloat m_w;
 };
 
-struct ndMeshMatrix
+class ndMeshMatrix
 {
+	public:
 	ndMeshVector4 m_array[4];
 };
 
-struct ndMeshUV
+class ndMeshUV
 {
+	public:
 	GLfloat m_u;
 	GLfloat m_v;
 };
 
-struct ndPointNormal
+class ndPointNormal
 {
+	public:
 	ndMeshVector m_posit;
 	ndMeshVector m_normal;
 };
 
-struct ndMeshPointUV: public ndPointNormal
+class ndMeshPointUV: public ndPointNormal
 {
+	public:
 	ndMeshUV m_uv;
 };
 

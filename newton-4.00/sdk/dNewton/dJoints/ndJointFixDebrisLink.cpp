@@ -11,9 +11,9 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointFixDistance.h"
+#include "ndJointFixDebrisLink.h"
 
-ndJointFixDistance::ndJointFixDistance(const dVector& pivotInChildInGlobalSpace, const dVector& pivotInParentInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointFixDebrisLink::ndJointFixDebrisLink(const dVector& pivotInChildInGlobalSpace, const dVector& pivotInParentInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(3, child, parent, dGetIdentityMatrix())
 {
 	dVector dist(pivotInChildInGlobalSpace - pivotInParentInGlobalSpace);
@@ -32,11 +32,11 @@ ndJointFixDistance::ndJointFixDistance(const dVector& pivotInChildInGlobalSpace,
 	CalculateLocalMatrix(parentMatrix, dummy, m_localMatrix1);
 }
 
-ndJointFixDistance::~ndJointFixDistance()
+ndJointFixDebrisLink::~ndJointFixDebrisLink()
 {
 }
 
-void ndJointFixDistance::JacobianDerivative(ndConstraintDescritor& desc)
+void ndJointFixDebrisLink::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -49,13 +49,6 @@ void ndJointFixDistance::JacobianDerivative(ndConstraintDescritor& desc)
 
 	dVector dir(p1 - p0);
 	dFloat32 mag2 = dir.DotProduct(dir).GetScalar();
-	//if (mag2 < dFloat32 (1.0e-3f)) 
-	//{
-	//	AddLinearRowJacobian(desc, p0, p1, matrix0.m_front);
-	//	AddLinearRowJacobian(desc, p0, p1, matrix0.m_up);
-	//	AddLinearRowJacobian(desc, p0, p1, matrix0.m_right);
-	//} 
-	//else 
 	if (mag2 > dFloat32(1.0e-3f))
 	{
 		dir = dir.Scale(1.0f / dSqrt(mag2));

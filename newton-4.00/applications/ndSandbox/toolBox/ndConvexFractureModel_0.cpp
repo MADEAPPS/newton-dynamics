@@ -17,23 +17,23 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndTargaToOpenGl.h"
-#include "ndDemoDebriEntity.h"
+#include "ndDemoDebrisEntity.h"
 #include "ndDemoEntityManager.h"
 #include "ndConvexFractureModel_0.h"
 
 
-class ndConvexFractureRootEntity : public ndDemoDebriRootEntity
+class ndConvexFractureRootEntity : public ndDemoDebrisRootEntity
 {
 	public:
 	ndConvexFractureRootEntity(ndMeshEffect* const singleManifoldMesh, dFloat32 mass)
-		:ndDemoDebriRootEntity()
+		:ndDemoDebrisRootEntity()
 		,m_mass(mass)
 		,m_meshVolume(dFloat32(singleManifoldMesh->CalculateVolume()))
 	{
 	}
 
 	ndConvexFractureRootEntity(const ndConvexFractureRootEntity& copyFrom)
-		:ndDemoDebriRootEntity(copyFrom)
+		:ndDemoDebrisRootEntity(copyFrom)
 		,m_mass(copyFrom.m_mass)
 		,m_meshVolume(copyFrom.m_meshVolume)
 	{
@@ -50,11 +50,11 @@ class ndConvexFractureRootEntity : public ndDemoDebriRootEntity
 	dFloat32 m_meshVolume;
 };
 
-class ndConvexFractureEntity: public ndDemoDebriEntity
+class ndConvexFractureEntity: public ndDemoDebrisEntity
 {
 	public:
-	ndConvexFractureEntity(ndMeshEffect* const meshNode, dArray<DebriPoint>& vertexArray, ndDemoDebriRootEntity* const parent, const ndShaderPrograms& shaderCache, ndShapeInstance* const collision, dInt32 enumerator)
-		:ndDemoDebriEntity(meshNode, vertexArray, parent, shaderCache)
+	ndConvexFractureEntity(ndMeshEffect* const meshNode, dArray<DebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache, ndShapeInstance* const collision, dInt32 enumerator)
+		:ndDemoDebrisEntity(meshNode, vertexArray, parent, shaderCache)
 		,m_collision(collision)
 		,m_drebriBody(nullptr)
 		,m_enumerator(enumerator)
@@ -81,7 +81,7 @@ class ndConvexFractureEntity: public ndDemoDebriEntity
 	}
 
 	ndConvexFractureEntity(const ndConvexFractureEntity& clone)
-		:ndDemoDebriEntity(clone)
+		:ndDemoDebrisEntity(clone)
 		,m_centerOfMass(clone.m_centerOfMass)
 		,m_momentOfInertia(clone.m_momentOfInertia)
 		,m_collision(new ndShapeInstance(*clone.m_collision))
@@ -144,19 +144,17 @@ ndConvexFracture::~ndConvexFracture()
 
 void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 {
-	ndMeshEffect* const debriMeshPieces = m_singleManifoldMesh->CreateVoronoiConvexDecomposition(m_pointCloud, m_interiorMaterialIndex, &m_textureMatrix[0][0]);
-
-		
+	ndMeshEffect* const debrisMeshPieces = m_singleManifoldMesh->CreateVoronoiConvexDecomposition(m_pointCloud, m_interiorMaterialIndex, &m_textureMatrix[0][0]);
 	
-	dArray<DebriPoint> vertexArray;
+	dArray<DebrisPoint> vertexArray;
 	m_debriRootEnt = new ndConvexFractureRootEntity(m_singleManifoldMesh, m_mass);
 	
 	dInt32 enumerator = 0;
-	ndMeshEffect* nextDebri;
-	for (ndMeshEffect* debri = debriMeshPieces->GetFirstLayer(); debri; debri = nextDebri)
+	ndMeshEffect* nextDebris;
+	for (ndMeshEffect* debri = debrisMeshPieces->GetFirstLayer(); debri; debri = nextDebris)
 	{
 		// get next segment piece
-		nextDebri = debriMeshPieces->GetNextLayer(debri);
+		nextDebris = debrisMeshPieces->GetNextLayer(debri);
 	
 		//clip the voronoi cell convexes against the mesh 
 		ndMeshEffect* const fracturePiece = m_singleManifoldMesh->ConvexMeshIntersection(debri);
@@ -224,8 +222,7 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 		dArray<ndSegment> m_edges;
 	};
 
-
-	delete debriMeshPieces;
+	delete debrisMeshPieces;
 	ndConvexFractureRootEntity* const rootEntity = (ndConvexFractureRootEntity*)m_debriRootEnt;
 
 	// calculate joint graph pairs, brute force for now
@@ -281,23 +278,23 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 	ndWorld* const world = scene->GetWorld();
 
 	dInt32 bodyCount = 0;
-	for (ndConvexFractureEntity* debriEnt = (ndConvexFractureEntity*)entity->GetChild(); debriEnt; debriEnt = (ndConvexFractureEntity*)debriEnt->GetSibling())
+	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetSibling())
 	{
 		bodyCount++;
-		dAssert(debriEnt->m_drebriBody);
-		dAssert(debriEnt->m_enumerator < bodyCount);
+		dAssert(debrisEnt->m_drebriBody);
+		dAssert(debrisEnt->m_enumerator < bodyCount);
 	}
 
 	ndBodyDynamic** const bodyArray = dAlloca(ndBodyDynamic*, bodyCount);
 	memset(bodyArray, 0, bodyCount * sizeof(ndBodyDynamic*));
-	for (ndConvexFractureEntity* debriEnt = (ndConvexFractureEntity*)entity->GetChild(); debriEnt; debriEnt = (ndConvexFractureEntity*)debriEnt->GetSibling())
+	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetSibling())
 	{
-		debriEnt->SetMatrixUsafe(dQuaternion(location), location.m_posit);
-		ndBodyDynamic* const body = debriEnt->m_drebriBody;
+		debrisEnt->SetMatrixUsafe(dQuaternion(location), location.m_posit);
+		ndBodyDynamic* const body = debrisEnt->m_drebriBody;
 		world->AddBody(body);
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, debriEnt));
+		body->SetNotifyCallback(new ndDemoEntityNotify(scene, debrisEnt));
 		body->SetMatrix(location);
-		bodyArray[debriEnt->m_enumerator] = body;
+		bodyArray[debrisEnt->m_enumerator] = body;
 #if 1
 		ExplodeLocation(body, location, 0.3f);
 #endif
@@ -314,7 +311,7 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 		dMatrix matrix1(body1->GetMatrix());
 		dVector pivot0(matrix0.TransformVector(body0->GetCentreOfMass()));
 		dVector pivot1(matrix1.TransformVector(body1->GetCentreOfMass()));
-		ndJointFixDistance* const joint = new ndJointFixDistance(pivot0, pivot1, body0, body1);
+		ndJointFixDebrisLink* const joint = new ndJointFixDebrisLink(pivot0, pivot1, body0, body1);
 		joint->SetSolverModel(m_secundaryCloseLoop);
 		world->AddJoint(joint);
 	}

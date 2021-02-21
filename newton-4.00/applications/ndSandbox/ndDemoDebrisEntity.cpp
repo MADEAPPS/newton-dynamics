@@ -12,11 +12,11 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoCamera.h"
 #include "ndTargaToOpenGl.h"
-#include "ndDemoDebriEntity.h"
+#include "ndDemoDebrisEntity.h"
 #include "ndDemoEntityManager.h"
 
 
-ndDemoDebriMesh::ndDemoDebriMesh(ndDemoDebriMesh* const srcMeshconst, const dArray<DebriPoint>& vertexArray)
+ndDemoDebrisMesh::ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMeshconst, const dArray<DebrisPoint>& vertexArray)
 	:ndDemoMesh("vertexBufferMesh")
 {
 	m_shader = srcMeshconst->m_shader;
@@ -41,16 +41,16 @@ ndDemoDebriMesh::ndDemoDebriMesh(ndDemoDebriMesh* const srcMeshconst, const dArr
 	
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, m_vertexCount * sizeof(DebriPoint), &vertexArray[0].m_posit.m_x, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_vertexCount * sizeof(DebrisPoint), &vertexArray[0].m_posit.m_x, GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(DebriPoint), (void*)0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(DebrisPoint), (void*)0);
 	
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DebriPoint), (void*)sizeof(ndMeshVector4));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DebrisPoint), (void*)sizeof(ndMeshVector4));
 	
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(DebriPoint), (void*)(sizeof(ndMeshVector4) + sizeof(ndMeshVector)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(DebrisPoint), (void*)(sizeof(ndMeshVector4) + sizeof(ndMeshVector)));
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 	glBindVertexArray(0);
@@ -59,11 +59,11 @@ ndDemoDebriMesh::ndDemoDebriMesh(ndDemoDebriMesh* const srcMeshconst, const dArr
 	glDisableVertexAttribArray(0);
 }
 
-ndDemoDebriMesh::ndDemoDebriMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase, dArray<DebriPoint>& vertexArray)
+ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase, dArray<DebrisPoint>& vertexArray)
 	:ndDemoMesh(name)
 {
 	m_name = name;
-	m_shader = shaderCache.m_diffuseDebriEffect;
+	m_shader = shaderCache.m_diffuseDebrisEffect;
 
 	// extract the materials index array for mesh
 	ndIndexArray* const geometryHandle = meshNode->MaterialGeometryBegin();
@@ -133,7 +133,7 @@ ndDemoDebriMesh::ndDemoDebriMesh(const char* const name, ndMeshEffect* const mes
 	m_indexCount = indexCount;
 }
 
-void ndDemoDebriMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+void ndDemoDebrisMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
 	ndDemoCamera* const camera = scene->GetCamera();
 
@@ -147,66 +147,66 @@ void ndDemoDebriMesh::Render(ndDemoEntityManager* const scene, const dMatrix& mo
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 }
 
-ndDemoDebriEntity::ndDemoDebriEntity(ndMeshEffect* const meshNode, dArray<DebriPoint>& vertexArray, ndDemoDebriRootEntity* const parent, const ndShaderPrograms& shaderCache)
+ndDemoDebrisEntity::ndDemoDebrisEntity(ndMeshEffect* const meshNode, dArray<DebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache)
 	:ndDemoEntity(dGetIdentityMatrix(), parent)
 {
 	dInt32 vertexCount = meshNode->GetPropertiesCount();
 
 	dInt32 const vertexOffsetBase = vertexArray.GetCount();
 	vertexArray.SetCount(vertexOffsetBase + vertexCount);
-	meshNode->GetVertexChannel(sizeof(DebriPoint), &vertexArray[vertexOffsetBase].m_posit.m_x);
-	meshNode->GetNormalChannel(sizeof(DebriPoint), &vertexArray[vertexOffsetBase].m_normal.m_x);
-	meshNode->GetUV0Channel(sizeof(DebriPoint), &vertexArray[vertexOffsetBase].m_uv.m_u);
+	meshNode->GetVertexChannel(sizeof(DebrisPoint), &vertexArray[vertexOffsetBase].m_posit.m_x);
+	meshNode->GetNormalChannel(sizeof(DebrisPoint), &vertexArray[vertexOffsetBase].m_normal.m_x);
+	meshNode->GetUV0Channel(sizeof(DebrisPoint), &vertexArray[vertexOffsetBase].m_uv.m_u);
 
-	ndDemoDebriMesh* const mesh = new ndDemoDebriMesh("fracture", meshNode, shaderCache, vertexOffsetBase, vertexArray);
+	ndDemoDebrisMesh* const mesh = new ndDemoDebrisMesh("fracture", meshNode, shaderCache, vertexOffsetBase, vertexArray);
 	SetMesh(mesh, dGetIdentityMatrix());
 	mesh->Release();
 }
 
-ndDemoDebriEntity::ndDemoDebriEntity(const ndDemoDebriEntity& copyFrom)
+ndDemoDebrisEntity::ndDemoDebrisEntity(const ndDemoDebrisEntity& copyFrom)
 	:ndDemoEntity(copyFrom)
 {
 }
 
-ndDemoDebriEntity::~ndDemoDebriEntity()
+ndDemoDebrisEntity::~ndDemoDebrisEntity()
 {
 }
 
-dNodeBaseHierarchy* ndDemoDebriEntity::CreateClone() const
+dNodeBaseHierarchy* ndDemoDebrisEntity::CreateClone() const
 {
-	return new ndDemoDebriEntity(*this);
+	return new ndDemoDebrisEntity(*this);
 }
 
-void ndDemoDebriEntity::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
+void ndDemoDebrisEntity::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
 	const dMatrix modelMatrix(m_matrix * matrix);
 
 	m_mesh->Render(scene, modelMatrix);
 }
 
-ndDemoDebriRootEntity::ndDemoDebriRootEntity()
+ndDemoDebrisRootEntity::ndDemoDebrisRootEntity()
 	:ndDemoEntity(dGetIdentityMatrix(), nullptr)
 {
 }
 
-ndDemoDebriRootEntity::ndDemoDebriRootEntity(const ndDemoDebriRootEntity& copyFrom)
+ndDemoDebrisRootEntity::ndDemoDebrisRootEntity(const ndDemoDebrisRootEntity& copyFrom)
 	:ndDemoEntity(copyFrom)
 {
 }
 
-ndDemoDebriRootEntity::~ndDemoDebriRootEntity(void)
+ndDemoDebrisRootEntity::~ndDemoDebrisRootEntity(void)
 {
 }
 
-void ndDemoDebriRootEntity::FinalizeConstruction(const dArray<DebriPoint>& vertexArray)
+void ndDemoDebrisRootEntity::FinalizeConstruction(const dArray<DebrisPoint>& vertexArray)
 {
-	ndDemoDebriMesh* const shaderMesh = (ndDemoDebriMesh*)GetChild()->GetMesh();
-	m_mesh = new ndDemoDebriMesh(shaderMesh, vertexArray);
+	ndDemoDebrisMesh* const shaderMesh = (ndDemoDebrisMesh*)GetChild()->GetMesh();
+	m_mesh = new ndDemoDebrisMesh(shaderMesh, vertexArray);
 }
 
-void ndDemoDebriRootEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
+void ndDemoDebrisRootEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
-	ndDemoDebriMesh* const shaderMesh = ((ndDemoDebriMesh*)m_mesh);
+	ndDemoDebrisMesh* const shaderMesh = ((ndDemoDebrisMesh*)m_mesh);
 	glUseProgram(shaderMesh->m_shader);
 	glBindVertexArray(shaderMesh->m_vertextArrayBuffer);
 
