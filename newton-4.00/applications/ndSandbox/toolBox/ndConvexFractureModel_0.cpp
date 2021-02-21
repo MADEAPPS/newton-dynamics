@@ -306,13 +306,9 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 	{
 		ndBodyDynamic* const body0 = bodyArray[jointConnection[i].m_m0];
 		ndBodyDynamic* const body1 = bodyArray[jointConnection[i].m_m1];
-
-		dMatrix matrix0(body0->GetMatrix());
-		dMatrix matrix1(body1->GetMatrix());
-		dVector pivot0(matrix0.TransformVector(body0->GetCentreOfMass()));
-		dVector pivot1(matrix1.TransformVector(body1->GetCentreOfMass()));
-		ndJointFixDebrisLink* const joint = new ndJointFixDebrisLink(pivot0, pivot1, body0, body1);
+		ndJointFixDebrisLink* const joint = new ndJointFixDebrisLink(body0, body1);
 		joint->SetSolverModel(m_secundaryCloseLoop);
 		world->AddJoint(joint);
+break;
 	}
 }

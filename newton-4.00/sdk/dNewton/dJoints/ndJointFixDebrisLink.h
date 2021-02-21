@@ -18,7 +18,7 @@
 class ndJointFixDebrisLink: public ndJointBilateralConstraint
 {
 	public:
-	D_NEWTON_API ndJointFixDebrisLink(const dVector& childPivotInGlobalSpace, const dVector& parentPivotInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointFixDebrisLink(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 	D_NEWTON_API virtual ~ndJointFixDebrisLink();
 
 	protected:
