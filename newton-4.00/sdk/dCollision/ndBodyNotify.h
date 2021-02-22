@@ -35,6 +35,7 @@ class ndBodyNotify: public dClassAlloc
 	virtual ~ndBodyNotify();
 
 	ndBody* GetBody();
+	const ndBody* GetBody() const;
 	virtual void* GetUserData() const;
 	dVector GetGravity() const;
 	void SetGravity(const dVector& defualtGravity);
@@ -63,6 +64,11 @@ inline ndBodyNotify::~ndBodyNotify()
 }
 
 inline ndBody* ndBodyNotify::GetBody()
+{
+	return m_body;
+}
+
+inline const ndBody* ndBodyNotify::GetBody() const
 {
 	return m_body;
 }

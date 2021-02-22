@@ -30,6 +30,7 @@ class ndDemoEntityNotify: public ndBodyNotify
 		return m_entity;
 	}
 
+	virtual void OnObjectPick() const;
 	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix);
 	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep);
 

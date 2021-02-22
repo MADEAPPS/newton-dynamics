@@ -21,7 +21,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndConvexFractureModel_0.h"
 
-
 class ndConvexFractureRootEntity : public ndDemoDebrisRootEntity
 {
 	public:
@@ -121,6 +120,18 @@ class ndConvexFractureEntity: public ndDemoDebrisEntity
 	dInt32 m_enumerator;
 };
 
+ndConvexFracture::ndDebrisNotify::ndDebrisNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity)
+	:ndDemoEntityNotify(manager, entity)
+{
+}
+
+void ndConvexFracture::ndDebrisNotify::OnObjectPick() const
+{
+	ndConvexFractureEntity* const debris = (ndConvexFractureEntity*) m_entity;
+	dTrace(("debris entity id: %d    ", debris->m_enumerator));
+	ndDemoEntityNotify::OnObjectPick();
+}
+
 ndConvexFracture::ndConvexFracture()
 	:m_singleManifoldMesh(nullptr)
 	,m_textureMatrix(dGetIdentityMatrix())
@@ -164,9 +175,9 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 			ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
 			if (collision)
 			{
+if (enumerator == 0 || enumerator == 11)
 				new ndConvexFractureEntity(fracturePiece, vertexArray, m_debriRootEnt, scene->GetShaderCache(), collision, enumerator);
 				enumerator++;
-				
 			}
 			delete fracturePiece;
 		}
@@ -245,7 +256,7 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 					dVector midPoint((distanceCalculator.m_point1 + distanceCalculator.m_point0).Scale(0.5f));
 					if (checkConectivitity.IsFaceContact(midPoint))
 					{
-						//dTrace(("pair %d %d\n", ent0->m_enumerator, ent1->m_enumerator));
+						dTrace(("pair %d %d\n", ent0->m_enumerator, ent1->m_enumerator));
 						ndConvexFractureRootEntity::JointPair pair;
 						pair.m_m0 = ent0->m_enumerator;
 						pair.m_m1 = ent1->m_enumerator;
@@ -282,7 +293,7 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 	{
 		bodyCount++;
 		dAssert(debrisEnt->m_drebriBody);
-		dAssert(debrisEnt->m_enumerator < bodyCount);
+		//dAssert(debrisEnt->m_enumerator < bodyCount);
 	}
 
 	ndBodyDynamic** const bodyArray = dAlloca(ndBodyDynamic*, bodyCount);
@@ -292,7 +303,7 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 		debrisEnt->SetMatrixUsafe(dQuaternion(location), location.m_posit);
 		ndBodyDynamic* const body = debrisEnt->m_drebriBody;
 		world->AddBody(body);
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, debrisEnt));
+		body->SetNotifyCallback(new ndDebrisNotify(scene, debrisEnt));
 		body->SetMatrix(location);
 		bodyArray[debrisEnt->m_enumerator] = body;
 #if 0

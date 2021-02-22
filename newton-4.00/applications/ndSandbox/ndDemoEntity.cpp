@@ -29,6 +29,11 @@ ndDemoEntityNotify::~ndDemoEntityNotify()
 	}
 }
 
+void ndDemoEntityNotify::OnObjectPick() const
+{
+	dTrace(("picked body id: %d\n", GetBody()->GetId()));
+}
+
 void ndDemoEntityNotify::OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
 {
 	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
