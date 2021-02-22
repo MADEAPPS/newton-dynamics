@@ -245,7 +245,7 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 					dVector midPoint((distanceCalculator.m_point1 + distanceCalculator.m_point0).Scale(0.5f));
 					if (checkConectivitity.IsFaceContact(midPoint))
 					{
-						dTrace(("pair %d %d\n", ent0->m_enumerator, ent1->m_enumerator));
+						//dTrace(("pair %d %d\n", ent0->m_enumerator, ent1->m_enumerator));
 						ndConvexFractureRootEntity::JointPair pair;
 						pair.m_m0 = ent0->m_enumerator;
 						pair.m_m1 = ent1->m_enumerator;

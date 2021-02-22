@@ -98,7 +98,7 @@ void ndJointFixDebrisLink::SubmitAngularAxisCartisianApproximation(ndConstraintD
 	dFloat32 angle2 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
 	AddAngularRowJacobian(desc, matrix1.m_front, angle2);
 
-	dTrace(("%f %f %f\n", angle0 * dRadToDegree, angle1 * dRadToDegree, angle2 * dRadToDegree));
+	//dTrace(("%f %f %f\n", angle0 * dRadToDegree, angle1 * dRadToDegree, angle2 * dRadToDegree));
 }
 
 
