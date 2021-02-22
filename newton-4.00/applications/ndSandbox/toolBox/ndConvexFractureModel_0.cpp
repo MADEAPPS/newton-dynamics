@@ -295,7 +295,7 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, debrisEnt));
 		body->SetMatrix(location);
 		bodyArray[debrisEnt->m_enumerator] = body;
-#if 1
+#if 0
 		ExplodeLocation(body, location, 0.3f);
 #endif
 	}
@@ -309,6 +309,5 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 		ndJointFixDebrisLink* const joint = new ndJointFixDebrisLink(body0, body1);
 		joint->SetSolverModel(m_secundaryCloseLoop);
 		world->AddJoint(joint);
-break;
 	}
 }

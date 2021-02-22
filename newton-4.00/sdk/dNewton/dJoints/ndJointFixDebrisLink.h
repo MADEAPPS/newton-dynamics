@@ -21,8 +21,10 @@ class ndJointFixDebrisLink: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointFixDebrisLink(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 	D_NEWTON_API virtual ~ndJointFixDebrisLink();
 
-	protected:
+	private:
 	void JacobianDerivative(ndConstraintDescritor& desc);
+
+	void SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 
 	dFloat32 m_distance;
 };

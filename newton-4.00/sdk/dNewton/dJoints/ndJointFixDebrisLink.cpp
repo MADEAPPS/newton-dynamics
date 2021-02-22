@@ -47,48 +47,10 @@ void ndJointFixDebrisLink::JacobianDerivative(ndConstraintDescritor& desc)
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	//dVector p0(matrix0.m_posit);
-	//dVector p1(matrix1.m_posit);
-	//
-	//dVector dir(p1 - p0);
-	//dFloat32 mag2 = dir.DotProduct(dir).GetScalar();
-	//if (mag2 > dFloat32(1.0e-3f))
-	//{
-	//	dir = dir.Scale(1.0f / dSqrt(mag2));
-	//	dFloat32 x = dSqrt (mag2) - m_distance;
-	//
-	//	dMatrix matrix(dir);
-	//	dVector com0(m_body0->GetCentreOfMass());
-	//	dMatrix body0Matrix(m_body0->GetMatrix());
-	//	dVector veloc0(m_body0->GetVelocityAtPoint(p0));
-	//
-	//	dVector com1(m_body1->GetCentreOfMass());
-	//	dMatrix body1Matrix(m_body1->GetMatrix());
-	//	dVector veloc1(m_body1->GetVelocityAtPoint(p1));
-	//
-	//	dFloat32 v((veloc0 - veloc1).DotProduct(dir).GetScalar());
-	//	dFloat32 a = (x - v * desc.m_timestep) * desc.m_invTimestep * desc.m_invTimestep;
-	//
-	//	dVector r0 ((p0 - body0Matrix.TransformVector(com0)).CrossProduct(matrix.m_front));
-	//	dVector r1 ((p1 - body1Matrix.TransformVector(com1)).CrossProduct(matrix.m_front));
-	//
-	//	AddLinearRowJacobian(desc, p0, p0, matrix0.m_right);
-	//	ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
-	//	ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
-	//
-	//	jacobian0.m_linear = matrix[0];
-	//	jacobian0.m_angular = r0;
-	//
-	//	jacobian1.m_linear = matrix[0].Scale(dFloat32 (-1.0f));
-	//	jacobian1.m_angular = r1.Scale(dFloat32(-1.0f));
-	//
-	//	SetMotorAcceleration(desc, a);
-	//}
-
 	const dVector veloc0(m_body0->GetVelocity());
 	const dVector veloc1(m_body1->GetVelocity());
 
-	const dVector step (matrix1.m_posit - matrix0.m_posit);
+	const dVector step (matrix0.UnrotateVector (matrix1.m_posit - matrix0.m_posit));
 
 	dVector dist(dVector::m_zero);
 	dist.m_x = m_distance;
@@ -112,6 +74,31 @@ void ndJointFixDebrisLink::JacobianDerivative(ndConstraintDescritor& desc)
 
 		SetMotorAcceleration(desc, a);
 	}
+
+	dFloat32 cosAngle = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
+	if (cosAngle >= dFloat32(0.998f)) 
+	{
+		SubmitAngularAxisCartisianApproximation(desc, matrix0, matrix1);
+	}
+	else 
+	{
+		dAssert(0);
+		//SubmitAngularAxis(matrix0, matrix1, timestep);
+	}
+}
+
+void ndJointFixDebrisLink::SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
+{
+	dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+	AddAngularRowJacobian(desc, matrix1.m_up, angle0);
+
+	dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
+	
+	dFloat32 angle2 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
+	AddAngularRowJacobian(desc, matrix1.m_front, angle2);
+
+	dTrace(("%f %f %f\n", angle0 * dRadToDegree, angle1 * dRadToDegree, angle2 * dRadToDegree));
 }
 
 
