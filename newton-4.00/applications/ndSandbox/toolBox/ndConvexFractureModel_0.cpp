@@ -29,16 +29,33 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 		dPlane m_plane;
 		dFixSizeBuffer<dVector, 8> m_polygon;
 		dInt32 m_count;
+
+		bool CheckCoplanal(const ndFaceInfo& plane) const
+		{
+			dVector dir(m_plane & dVector::m_triplexMask);
+			dFloat32 project = dir.DotProduct(plane.m_plane).GetScalar();
+			if (project > dFloat32(0.9999f)) 
+			{
+				dFloat32 dist = m_plane.m_w - plane.m_plane.m_w;
+				if (dAbs(dist) < dFloat32(1.0e-4f)) 
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 	};
 
-	ndFaceArrayDatabase()
+	ndFaceArrayDatabase(dFloat32 sign = 1.0f)
 		:ndShapeDebugCallback()
+		,m_sign(sign)
+		,m_count(0)
 	{
 	}
 
 	void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray)
 	{
-		ndFaceInfo face;
+		ndFaceInfo& face = m_polygons[m_count];
 		face.m_count = vertexCount;
 		dAssert(vertexCount < face.m_polygon.GetSize());
 		for (dInt32 i = 0; i < vertexCount; i++)
@@ -55,83 +72,37 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 			edge0 = edge1;
 		}
 		normal = normal & dVector::m_triplexMask;
-		normal = normal.Normalize();
+		normal = normal.Normalize().Scale (m_sign);
 		face.m_plane = dPlane(normal, -normal.DotProduct(faceArray[0]).GetScalar());
 		//dTrace(("%f %f %f %f\n", face.m_plane.m_x, face.m_plane.m_y, face.m_plane.m_z, face.m_plane.m_w));
-		m_polygons.PushBack(face);
+		m_count++;
+		dAssert(m_count < m_polygons.GetSize());
 	}
 
-	bool IsFaceContact(ndShapeInstance* const shape);
-
-
-	bool CheckCoplanal(const dPlane& plane) const
+	bool ndFaceArrayDatabase::IsFaceContact(ndShapeInstance* const shape)
 	{
+		ndFaceArrayDatabase siblingDataBase(-1.0f);
+		shape->DebugShape(dGetIdentityMatrix(), siblingDataBase);
+
+		for (dInt32 i = 0; i < m_count; i++)
+		{
+			const ndFaceInfo& face0 = m_polygons[i];
+			for (dInt32 j = 0; j < m_count; j++)
+			{
+				const ndFaceInfo& face1 = siblingDataBase.m_polygons[j];
+				if (face0.CheckCoplanal(face1)) 
+				{
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 
-	dArray<ndFaceInfo> m_polygons;
+	dFixSizeBuffer<ndFaceInfo, 128> m_polygons;
+	dFloat32 m_sign;
+	dInt32 m_count;
 };
-
-class ndScanConvexFaces : public ndShapeDebugCallback
-{
-	public:
-	ndScanConvexFaces(ndFaceArrayDatabase* const polygons)
-		:ndShapeDebugCallback()
-		,m_polygons(polygons)
-		,m_disjoint(true)
-	{
-	}
-
-	void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray)
-	{
-		if (m_disjoint)
-		{
-			//dBigVector p0(point);
-			//dFloat32 minDist2(dFloat32(0.01f) * dFloat32(0.01f));
-			//for (dInt32 i = 0; i < m_edges.GetCount(); i++)
-			//{
-			//	const ndSegment& segment = m_edges[i];
-			//	dBigVector p1(dPointToRayDistance(point, segment.m_p0, segment.m_p1));
-			//	dBigVector p01(dBigVector::m_triplexMask & (p1 - p0));
-			//	dFloat64 dist2 = p01.DotProduct(p01).GetScalar();
-			//	if (dist2 < minDist2)
-			//	{
-			//		return false;
-			//	}
-			//}
-			//return true;
-
-			dVector normal(dVector::m_zero);
-			dVector edge0(faceArray[1] - faceArray[0]);
-			for (dInt32 i = 2; i < vertexCount; i++)
-			{
-				dVector edge1(faceArray[i] - faceArray[0]);
-				normal -= edge0.CrossProduct(edge1);
-				edge0 = edge1;
-			}
-			normal = normal & dVector::m_triplexMask;
-			normal = normal.Normalize();
-			dPlane plane(normal, -normal.DotProduct(faceArray[0]).GetScalar());
-
-			bool isCoplanal = m_polygons->CheckCoplanal(plane);
-			if (isCoplanal)
-			{
-				dAssert(0);
-			}
-
-		}
-	}
-
-	ndFaceArrayDatabase* m_polygons;
-	bool m_disjoint;
-};
-
-bool ndFaceArrayDatabase::IsFaceContact(ndShapeInstance* const shape)
-{
-	ndScanConvexFaces test(this);
-	shape->DebugShape(dGetIdentityMatrix(), test);
-	return !test.m_disjoint;
-}
 
 
 class ndConvexFractureRootEntity : public ndDemoDebrisRootEntity
@@ -374,11 +345,8 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 				dFloat32 dist = distanceCalculator.m_normal.DotProduct(distanceCalculator.m_point1 - distanceCalculator.m_point0).GetScalar();
 				if (dist <= dFloat32(1.0e-2f))
 				{
-					//dVector midPoint((distanceCalculator.m_point1 + distanceCalculator.m_point0).Scale(0.5f));
-					//if (checkConectivitity.IsFaceContact(midPoint))
 					if (checkConectivitity.IsFaceContact(ent1->m_collision))
 					{
-						dAssert(0);
 						dTrace(("pair %d %d\n", ent0->m_enumerator, ent1->m_enumerator));
 						ndConvexFractureRootEntity::JointPair pair;
 						pair.m_m0 = ent0->m_enumerator;
