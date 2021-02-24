@@ -652,11 +652,11 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 		#define D_SCRATCH_BUFFER_SIZE		(1024 * 24 / sizeof (ndGridHash))
 		#define D_SCRATCH_BUFFER_SIZE_PADD	(32)
 
-		class ndHashCacheBuffer : public ndFixSizeBuffer<ndGridHash, D_SCRATCH_BUFFER_SIZE + D_SCRATCH_BUFFER_SIZE_PADD>
+		class ndHashCacheBuffer : public dFixSizeBuffer<ndGridHash, D_SCRATCH_BUFFER_SIZE + D_SCRATCH_BUFFER_SIZE_PADD>
 		{
 			public:
 			ndHashCacheBuffer()
-				:ndFixSizeBuffer<ndGridHash, D_SCRATCH_BUFFER_SIZE + D_SCRATCH_BUFFER_SIZE_PADD>()
+				:dFixSizeBuffer<ndGridHash, D_SCRATCH_BUFFER_SIZE + D_SCRATCH_BUFFER_SIZE_PADD>()
 				, m_size(0)
 			{
 				// check the local scratch buffer is smaller than level one cache
@@ -928,11 +928,11 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 		#define D_SCRATCH_PAIR_BUFFER_SIZE		(1024 * 24 / sizeof (ndParticlePair))
 		#define D_SCRATCH_PAIR_BUFFER_SIZE_PADD (256)
 
-		class ndParticlePairCacheBuffer : public ndFixSizeBuffer<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>
+		class ndParticlePairCacheBuffer : public dFixSizeBuffer<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>
 		{
 			public:
 			ndParticlePairCacheBuffer()
-				:ndFixSizeBuffer<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>()
+				:dFixSizeBuffer<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>()
 				, m_size(0)
 			{
 				// check the local scratch buffer is smaller than level one cache

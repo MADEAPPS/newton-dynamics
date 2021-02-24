@@ -841,11 +841,11 @@ void ndWorld::UpdateSkeletons()
 			acc += count;
 		}
 
-		class ndQueue : public ndFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>
+		class ndQueue : public dFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>
 		{
 			public:
 			ndQueue()
-				:ndFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>()
+				:dFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>()
 				,m_mod(sizeof(m_array) / sizeof(m_array[0]))
 			{
 				m_lastIndex = 0;

@@ -21,6 +21,119 @@
 #include "ndDemoEntityManager.h"
 #include "ndConvexFractureModel_0.h"
 
+class ndFaceArrayDatabase : public ndShapeDebugCallback
+{
+	public:
+	struct ndFaceInfo
+	{
+		dPlane m_plane;
+		dFixSizeBuffer<dVector, 8> m_polygon;
+		dInt32 m_count;
+	};
+
+	ndFaceArrayDatabase()
+		:ndShapeDebugCallback()
+	{
+	}
+
+	void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray)
+	{
+		ndFaceInfo face;
+		face.m_count = vertexCount;
+		dAssert(vertexCount < face.m_polygon.GetSize());
+		for (dInt32 i = 0; i < vertexCount; i++)
+		{
+			face.m_polygon[i] = faceArray[i];
+		}
+
+		dVector normal(dVector::m_zero);
+		dVector edge0(faceArray[1] - faceArray[0]);
+		for (dInt32 i = 2; i < vertexCount; i++)
+		{
+			dVector edge1(faceArray[i] - faceArray[0]);
+			normal += edge0.CrossProduct(edge1);
+			edge0 = edge1;
+		}
+		normal = normal & dVector::m_triplexMask;
+		normal = normal.Normalize();
+		face.m_plane = dPlane(normal, -normal.DotProduct(faceArray[0]).GetScalar());
+		//dTrace(("%f %f %f %f\n", face.m_plane.m_x, face.m_plane.m_y, face.m_plane.m_z, face.m_plane.m_w));
+		m_polygons.PushBack(face);
+	}
+
+	bool IsFaceContact(ndShapeInstance* const shape);
+
+
+	bool CheckCoplanal(const dPlane& plane) const
+	{
+		return false;
+	}
+
+	dArray<ndFaceInfo> m_polygons;
+};
+
+class ndScanConvexFaces : public ndShapeDebugCallback
+{
+	public:
+	ndScanConvexFaces(ndFaceArrayDatabase* const polygons)
+		:ndShapeDebugCallback()
+		,m_polygons(polygons)
+		,m_disjoint(true)
+	{
+	}
+
+	void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray)
+	{
+		if (m_disjoint)
+		{
+			//dBigVector p0(point);
+			//dFloat32 minDist2(dFloat32(0.01f) * dFloat32(0.01f));
+			//for (dInt32 i = 0; i < m_edges.GetCount(); i++)
+			//{
+			//	const ndSegment& segment = m_edges[i];
+			//	dBigVector p1(dPointToRayDistance(point, segment.m_p0, segment.m_p1));
+			//	dBigVector p01(dBigVector::m_triplexMask & (p1 - p0));
+			//	dFloat64 dist2 = p01.DotProduct(p01).GetScalar();
+			//	if (dist2 < minDist2)
+			//	{
+			//		return false;
+			//	}
+			//}
+			//return true;
+
+			dVector normal(dVector::m_zero);
+			dVector edge0(faceArray[1] - faceArray[0]);
+			for (dInt32 i = 2; i < vertexCount; i++)
+			{
+				dVector edge1(faceArray[i] - faceArray[0]);
+				normal -= edge0.CrossProduct(edge1);
+				edge0 = edge1;
+			}
+			normal = normal & dVector::m_triplexMask;
+			normal = normal.Normalize();
+			dPlane plane(normal, -normal.DotProduct(faceArray[0]).GetScalar());
+
+			bool isCoplanal = m_polygons->CheckCoplanal(plane);
+			if (isCoplanal)
+			{
+				dAssert(0);
+			}
+
+		}
+	}
+
+	ndFaceArrayDatabase* m_polygons;
+	bool m_disjoint;
+};
+
+bool ndFaceArrayDatabase::IsFaceContact(ndShapeInstance* const shape)
+{
+	ndScanConvexFaces test(this);
+	shape->DebugShape(dGetIdentityMatrix(), test);
+	return !test.m_disjoint;
+}
+
+
 class ndConvexFractureRootEntity : public ndDemoDebrisRootEntity
 {
 	public:
@@ -153,121 +266,6 @@ ndConvexFracture::~ndConvexFracture()
 	}
 }
 
-void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
-{
-	ndMeshEffect* const debrisMeshPieces = m_singleManifoldMesh->CreateVoronoiConvexDecomposition(m_pointCloud, m_interiorMaterialIndex, &m_textureMatrix[0][0]);
-	
-	dArray<DebrisPoint> vertexArray;
-	m_debriRootEnt = new ndConvexFractureRootEntity(m_singleManifoldMesh, m_mass);
-	
-	dInt32 enumerator = 0;
-	ndMeshEffect* nextDebris;
-	for (ndMeshEffect* debri = debrisMeshPieces->GetFirstLayer(); debri; debri = nextDebris)
-	{
-		// get next segment piece
-		nextDebris = debrisMeshPieces->GetNextLayer(debri);
-	
-		//clip the voronoi cell convexes against the mesh 
-		ndMeshEffect* const fracturePiece = m_singleManifoldMesh->ConvexMeshIntersection(debri);
-		if (fracturePiece)
-		{
-			// make a convex hull collision shape
-			ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
-			if (collision)
-			{
-if (enumerator == 0 || enumerator == 11)
-				new ndConvexFractureEntity(fracturePiece, vertexArray, m_debriRootEnt, scene->GetShaderCache(), collision, enumerator);
-				enumerator++;
-			}
-			delete fracturePiece;
-		}
-	
-		delete debri;
-	}
-	m_debriRootEnt->FinalizeConstruction(vertexArray);
-
-	class ndFaceContactTest: public ndShapeDebugCallback
-	{
-		public:
-		ndFaceContactTest()
-			:ndShapeDebugCallback()
-		{
-		}
-
-		void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray)
-		{
-			dInt32 i0 = vertexCount - 1;
-			for (dInt32 i = 0; i < vertexCount; i++)
-			{
-				ndSegment segment;
-				segment.m_p0 = faceArray[i0];
-				segment.m_p1 = faceArray[i];
-				m_edges.PushBack(segment);
-				i0 = i;
-			}
-		}
-
-		bool IsFaceContact(const dVector& point)
-		{
-			dBigVector p0(point);
-			dFloat32 minDist2(dFloat32(0.01f) * dFloat32(0.01f));
-			for (dInt32 i = 0; i < m_edges.GetCount(); i++)
-			{
-				const ndSegment& segment = m_edges[i];
-				dBigVector p1(dPointToRayDistance(point, segment.m_p0, segment.m_p1));
-				dBigVector p01(dBigVector::m_triplexMask & (p1 - p0));
-				dFloat64 dist2 = p01.DotProduct(p01).GetScalar();
-				if (dist2 < minDist2) 
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-
-		struct ndSegment
-		{
-			dVector m_p0;
-			dVector m_p1;
-		};
-		dArray<ndSegment> m_edges;
-	};
-
-	delete debrisMeshPieces;
-	ndConvexFractureRootEntity* const rootEntity = (ndConvexFractureRootEntity*)m_debriRootEnt;
-
-	// calculate joint graph pairs, brute force for now
-	ndShapeInstance::ndDistanceCalculator distanceCalculator;
-	distanceCalculator.m_matrix0 = dGetIdentityMatrix();
-	distanceCalculator.m_matrix1 = dGetIdentityMatrix();
-	for (ndConvexFractureEntity* ent0 = (ndConvexFractureEntity*)m_debriRootEnt->GetChild(); ent0; ent0 = (ndConvexFractureEntity*)ent0->GetSibling())
-	{
-		ndFaceContactTest checkConectivitity;
-		distanceCalculator.m_shape0 = ent0->m_collision;
-		distanceCalculator.m_shape0->DebugShape(distanceCalculator.m_matrix0, checkConectivitity);
-		for (ndConvexFractureEntity* ent1 = (ndConvexFractureEntity*)ent0->GetSibling(); ent1; ent1 = (ndConvexFractureEntity*)ent1->GetSibling())
-		{
-			distanceCalculator.m_shape1 = ent1->m_collision;
-			if (distanceCalculator.ClosestPoint())
-			{
-				dFloat32 dist = distanceCalculator.m_normal.DotProduct(distanceCalculator.m_point1 - distanceCalculator.m_point0).GetScalar();
-				if (dist <= dFloat32(1.0e-2f))
-				{
-					dVector midPoint((distanceCalculator.m_point1 + distanceCalculator.m_point0).Scale(0.5f));
-					if (checkConectivitity.IsFaceContact(midPoint))
-					{
-						dTrace(("pair %d %d\n", ent0->m_enumerator, ent1->m_enumerator));
-						ndConvexFractureRootEntity::JointPair pair;
-						pair.m_m0 = ent0->m_enumerator;
-						pair.m_m1 = ent1->m_enumerator;
-						rootEntity->m_jointConnection.PushBack(pair);
-					}
-				}
-			}
-		}
-	}
-}
-
 void ndConvexFracture::ExplodeLocation(ndBodyDynamic* const body, const dMatrix& location, dFloat32 factor) const
 {
 	dVector center(location.TransformVector(body->GetCentreOfMass()));
@@ -320,5 +318,75 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 		ndJointFixDebrisLink* const joint = new ndJointFixDebrisLink(body0, body1);
 		joint->SetSolverModel(m_secundaryCloseLoop);
 		world->AddJoint(joint);
+	}
+}
+
+void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
+{
+	ndMeshEffect* const debrisMeshPieces = m_singleManifoldMesh->CreateVoronoiConvexDecomposition(m_pointCloud, m_interiorMaterialIndex, &m_textureMatrix[0][0]);
+
+	dArray<DebrisPoint> vertexArray;
+	m_debriRootEnt = new ndConvexFractureRootEntity(m_singleManifoldMesh, m_mass);
+
+	dInt32 enumerator = 0;
+	ndMeshEffect* nextDebris;
+	for (ndMeshEffect* debri = debrisMeshPieces->GetFirstLayer(); debri; debri = nextDebris)
+	{
+		// get next segment piece
+		nextDebris = debrisMeshPieces->GetNextLayer(debri);
+
+		//clip the voronoi cell convexes against the mesh 
+		ndMeshEffect* const fracturePiece = m_singleManifoldMesh->ConvexMeshIntersection(debri);
+		if (fracturePiece)
+		{
+			// make a convex hull collision shape
+			ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
+			if (collision)
+			{
+				if (enumerator == 0 || enumerator == 11)
+					new ndConvexFractureEntity(fracturePiece, vertexArray, m_debriRootEnt, scene->GetShaderCache(), collision, enumerator);
+				enumerator++;
+			}
+			delete fracturePiece;
+		}
+
+		delete debri;
+	}
+	m_debriRootEnt->FinalizeConstruction(vertexArray);
+
+	delete debrisMeshPieces;
+	ndConvexFractureRootEntity* const rootEntity = (ndConvexFractureRootEntity*)m_debriRootEnt;
+
+	// calculate joint graph pairs, brute force for now
+	ndShapeInstance::ndDistanceCalculator distanceCalculator;
+	distanceCalculator.m_matrix0 = dGetIdentityMatrix();
+	distanceCalculator.m_matrix1 = dGetIdentityMatrix();
+	for (ndConvexFractureEntity* ent0 = (ndConvexFractureEntity*)m_debriRootEnt->GetChild(); ent0; ent0 = (ndConvexFractureEntity*)ent0->GetSibling())
+	{
+		ndFaceArrayDatabase checkConectivitity;
+		distanceCalculator.m_shape0 = ent0->m_collision;
+		distanceCalculator.m_shape0->DebugShape(distanceCalculator.m_matrix0, checkConectivitity);
+		for (ndConvexFractureEntity* ent1 = (ndConvexFractureEntity*)ent0->GetSibling(); ent1; ent1 = (ndConvexFractureEntity*)ent1->GetSibling())
+		{
+			distanceCalculator.m_shape1 = ent1->m_collision;
+			if (distanceCalculator.ClosestPoint())
+			{
+				dFloat32 dist = distanceCalculator.m_normal.DotProduct(distanceCalculator.m_point1 - distanceCalculator.m_point0).GetScalar();
+				if (dist <= dFloat32(1.0e-2f))
+				{
+					//dVector midPoint((distanceCalculator.m_point1 + distanceCalculator.m_point0).Scale(0.5f));
+					//if (checkConectivitity.IsFaceContact(midPoint))
+					if (checkConectivitity.IsFaceContact(ent1->m_collision))
+					{
+						dAssert(0);
+						dTrace(("pair %d %d\n", ent0->m_enumerator, ent1->m_enumerator));
+						ndConvexFractureRootEntity::JointPair pair;
+						pair.m_m0 = ent0->m_enumerator;
+						pair.m_m1 = ent1->m_enumerator;
+						rootEntity->m_jointConnection.PushBack(pair);
+					}
+				}
+			}
+		}
 	}
 }

@@ -19,40 +19,12 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_FIX_SIZE_BUFFER_H__
-#define __D_FIX_SIZE_BUFFER_H__
+#ifndef __DG_CONVEXHULL_2D__
+#define __DG_CONVEXHULL_2D__
 
 #include "dCoreStdafx.h"
+#include "dVector.h"
 
-template<class T, dInt32 size>
-class dFixSizeBuffer: public dClassAlloc
-{
-	public:
-	dFixSizeBuffer()
-		:dClassAlloc()
-	{
-	}
-
-	const dInt32 GetSize() const 
-	{
-		return size;
-	}
-
-	T& operator[] (dInt32 i)
-	{
-		dAssert(i >= 0);
-		dAssert(i < size);
-		return m_array[i];
-	}
-
-	const T& operator[] (dInt32 i) const
-	{
-		dAssert(i >= 0);
-		dAssert(i < size);
-		return m_array[i];
-	}
-
-	T m_array[size];
-};
+D_CORE_API dInt32 dConvexHull2d(const dVector* const vertexCloud2d, dInt32 count);
 
 #endif
