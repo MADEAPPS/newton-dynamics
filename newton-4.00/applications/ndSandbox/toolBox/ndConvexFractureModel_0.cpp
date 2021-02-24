@@ -87,7 +87,7 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 		for (dInt32 i = 0; i < m_count; i++)
 		{
 			const ndFaceInfo& face0 = m_polygons[i];
-			for (dInt32 j = 0; j < m_count; j++)
+			for (dInt32 j = 0; j < siblingDataBase.m_count; j++)
 			{
 				const ndFaceInfo& face1 = siblingDataBase.m_polygons[j];
 				if (face0.CheckCoplanal(face1)) 
@@ -260,7 +260,7 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 	dInt32 bodyCount = 0;
 	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetSibling())
 	{
-		bodyCount++;
+		bodyCount = dMax(bodyCount, debrisEnt->m_enumerator + 1);
 		dAssert(debrisEnt->m_drebriBody);
 		//dAssert(debrisEnt->m_enumerator < bodyCount);
 	}
@@ -314,8 +314,9 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 			ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
 			if (collision)
 			{
-				if (enumerator == 0 || enumerator == 11)
-					new ndConvexFractureEntity(fracturePiece, vertexArray, m_debriRootEnt, scene->GetShaderCache(), collision, enumerator);
+//if (enumerator == 16 || enumerator == 7 || enumerator == 5)
+//if (enumerator == 16 || enumerator == 7)
+				new ndConvexFractureEntity(fracturePiece, vertexArray, m_debriRootEnt, scene->GetShaderCache(), collision, enumerator);
 				enumerator++;
 			}
 			delete fracturePiece;
