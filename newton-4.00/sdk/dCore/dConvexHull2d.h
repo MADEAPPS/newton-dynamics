@@ -25,6 +25,6 @@
 #include "dCoreStdafx.h"
 #include "dVector.h"
 
-D_CORE_API dInt32 dConvexHull2d(const dVector* const vertexCloud2d, dInt32 count);
+D_CORE_API dInt32 dConvexHull2d(dVector* const vertexCloud2d, dInt32 count);
 
 #endif

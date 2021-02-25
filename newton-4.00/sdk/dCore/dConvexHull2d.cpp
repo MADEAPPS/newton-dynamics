@@ -23,8 +23,8 @@
 #include "dConvexHull2d.h"
 
 
-dInt32 dConvexHull2d(const dVector* const vertexCloud2d, dInt32 count)
+dInt32 dConvexHull2d(dVector* const vertexCloud2d, dInt32 count)
 {
-	dAssert(0);
+//	dAssert(0);
 	return 0;
 }

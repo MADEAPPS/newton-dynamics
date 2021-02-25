@@ -30,8 +30,9 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 		dFixSizeBuffer<dVector, 8> m_polygon;
 		dInt32 m_count;
 
-		bool CheckCoplanal(const ndFaceInfo& plane) const
+		bool CheckCoplanal(const ndFaceInfo& plane, const dMatrix& matrix, const ndFaceInfo& plane2d) const
 		{
+			dVector pointCloud2d[128];
 			dVector dir(m_plane & dVector::m_triplexMask);
 			dFloat32 project = dir.DotProduct(plane.m_plane).GetScalar();
 			if (project > dFloat32(0.9999f)) 
@@ -39,6 +40,17 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 				dFloat32 dist = m_plane.m_w - plane.m_plane.m_w;
 				if (dAbs(dist) < dFloat32(1.0e-4f)) 
 				{
+					dInt32 pointCount = 0;
+					for (dInt32 i = 0; i < m_count; i++)
+					{
+						for (dInt32 j = 0; j < plane.m_count; j++)
+						{
+							pointCloud2d[pointCount] = plane2d.m_polygon[i] - matrix.TransformVector(plane.m_polygon[j]);
+							pointCount++;
+						}
+					}
+					pointCount = dConvexHull2d(pointCloud2d, pointCount);
+
 					return true;
 				}
 			}
@@ -87,10 +99,26 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 		for (dInt32 i = 0; i < m_count; i++)
 		{
 			const ndFaceInfo& face0 = m_polygons[i];
+
+			dMatrix matrix;
+			matrix.m_posit = face0.m_polygon[0];
+			matrix.m_front = (face0.m_polygon[1] - matrix.m_posit) & dVector::m_triplexMask;
+			matrix.m_front = matrix.m_front.Normalize();
+			matrix.m_right = face0.m_plane & dVector::m_triplexMask;
+			matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front) & dVector::m_triplexMask;
+			matrix.m_posit.m_w = 1.0f;
+			matrix = matrix.Inverse();
+
+			ndFaceInfo transformedFace;
+			for (dInt32 j = 0; j < face0.m_count; j++)
+			{
+				transformedFace.m_polygon[j] = matrix.TransformVector(face0.m_polygon[j]);
+			}
+
 			for (dInt32 j = 0; j < siblingDataBase.m_count; j++)
 			{
 				const ndFaceInfo& face1 = siblingDataBase.m_polygons[j];
-				if (face0.CheckCoplanal(face1)) 
+				if (face0.CheckCoplanal(face1, matrix, transformedFace))
 				{
 					return true;
 				}
