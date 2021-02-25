@@ -20,11 +20,75 @@
 */
 
 #include "dCoreStdafx.h"
+#include "dSort.h"
 #include "dConvexHull2d.h"
 
+static dInt32 CompareVertex(const dVector* const A, const dVector* const B, void*)
+{
+	if (A->m_x < B->m_x) 
+	{
+		return 1;
+	}
+	else if (A->m_x > B->m_x)
+	{
+		return -1;
+	}
+	else
+	{
+		if (A->m_y < B->m_y)
+		{
+			return 1;
+		}
+		else if (A->m_y > B->m_y)
+		{
+			return -1;
+		}
+	}
+	return 0;
+}
+
+static dFloat32 Cross(const dVector &O, const dVector &A, const dVector &B)
+{
+	dVector A0(A - O);
+	dVector B0(B - O);
+	return A0.m_x * B0.m_y - A0.m_y * B0.m_x;
+}
 
 dInt32 dConvexHull2d(dVector* const vertexCloud2d, dInt32 count)
 {
-//	dAssert(0);
-	return 0;
+	if (count <= 3)
+	{
+		return count;
+	}
+
+	dVector* const hull = dAlloca(dVector, 2 * count);
+
+	// Sort points lexicographically
+	dSort(vertexCloud2d, count, CompareVertex);
+
+	// Build lower hull
+	dInt32 k = 0;
+	for (dInt32 i = 0; i < count; i++) 
+	{
+		while (k >= 2 && Cross(hull[k - 2], hull[k - 1], vertexCloud2d[i]) <= 0.0f)
+		{
+			k--;
+		}
+		hull[k] = vertexCloud2d[i];
+		k++;
+	}
+	
+	// Build upper hull
+	for (dInt32 i = count - 1, t = k + 1; i > 0; i--) 
+	{
+		while (k >= t && Cross(hull[k - 2], hull[k - 1], vertexCloud2d[i - 1]) <= 0.0f)
+		{
+			k--;
+		}
+		hull[k] = vertexCloud2d[i - 1];
+		k++;
+	}
+
+	memcpy(vertexCloud2d, hull, k * sizeof(dVector));
+	return k - 1;
 }

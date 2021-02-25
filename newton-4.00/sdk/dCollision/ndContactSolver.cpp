@@ -1239,30 +1239,30 @@ dInt32 ndContactSolver::PruneSupport(dInt32 count, const dVector& dir, const dVe
 
 dInt32 ndContactSolver::Prune2dContacts(const dMatrix& matrix, dInt32 count, ndContactPoint* const contactArray, dInt32 maxCount) const
 {
-	class dgConvexFaceNode
+	class ndConvexFaceNode
 	{
 		public:
 		dVector m_point2d;
 		ndContactPoint m_contact;
-		dgConvexFaceNode* m_next;
-		dgConvexFaceNode* m_prev;
+		ndConvexFaceNode* m_next;
+		ndConvexFaceNode* m_prev;
 		dInt32 m_mask;
 	};
 
-	class dgHullStackSegment
+	class ndHullStackSegment
 	{
 		public:
 		dVector m_p0;
 		dVector m_p1;
-		dgConvexFaceNode* m_edgeP0;
+		ndConvexFaceNode* m_edgeP0;
 	};
 
 	dVector xyMask(dVector::m_xMask | dVector::m_yMask);
 
 	dVector array[D_MAX_CONTATCS];
-	dgHullStackSegment stack[D_MAX_CONTATCS];
+	ndHullStackSegment stack[D_MAX_CONTATCS];
 
-	dgConvexFaceNode convexHull[32];
+	ndConvexFaceNode convexHull[32];
 	ndContactPoint buffer[32];
 
 	// it is a big mistake to set contact to deepest penetration because si cause unwanted pops.
@@ -1306,7 +1306,7 @@ dInt32 ndContactSolver::Prune2dContacts(const dMatrix& matrix, dInt32 count, ndC
 	{
 		stackIndex--;
 
-		dgHullStackSegment segment(stack[stackIndex]);
+		ndHullStackSegment segment(stack[stackIndex]);
 		dVector p1p0((segment.m_p1 - segment.m_p0));
 		dFloat32 mag2 = p1p0.DotProduct(p1p0).GetScalar();
 		if (mag2 > dFloat32(1.0e-5f)) 
@@ -1346,15 +1346,15 @@ dInt32 ndContactSolver::Prune2dContacts(const dMatrix& matrix, dInt32 count, ndC
 	}
 	dAssert(hullCount < sizeof(convexHull) / sizeof(convexHull[0]));
 
-	dUpHeap<dgConvexFaceNode*, dFloat32> sortHeap(array, sizeof(array));
-	dgConvexFaceNode* hullPoint = &convexHull[0];
+	dUpHeap<ndConvexFaceNode*, dFloat32> sortHeap(array, sizeof(array));
+	ndConvexFaceNode* hullPoint = &convexHull[0];
 
 	bool hasLinearCombination = true;
 	while (hasLinearCombination) 
 	{
 		sortHeap.Flush();
 		hasLinearCombination = false;
-		dgConvexFaceNode* ptr = hullPoint;
+		ndConvexFaceNode* ptr = hullPoint;
 		dVector e0(ptr->m_next->m_point2d - ptr->m_point2d);
 		do 
 		{
@@ -1368,7 +1368,7 @@ dInt32 ndContactSolver::Prune2dContacts(const dMatrix& matrix, dInt32 count, ndC
 
 		while (sortHeap.GetCount() && (sortHeap.Value() * dFloat32(16.0f) < totalArea)) 
 		{
-			dgConvexFaceNode* const corner = sortHeap[0];
+			ndConvexFaceNode* const corner = sortHeap[0];
 			if (corner->m_mask && corner->m_prev->m_mask) 
 			{
 				if (hullPoint == corner) 
@@ -1388,7 +1388,7 @@ dInt32 ndContactSolver::Prune2dContacts(const dMatrix& matrix, dInt32 count, ndC
 	while (hullCount > maxCount) 
 	{
 		sortHeap.Flush();
-		dgConvexFaceNode* ptr = hullPoint;
+		ndConvexFaceNode* ptr = hullPoint;
 		dVector e0(ptr->m_next->m_point2d - ptr->m_point2d);
 		do 
 		{
@@ -1402,7 +1402,7 @@ dInt32 ndContactSolver::Prune2dContacts(const dMatrix& matrix, dInt32 count, ndC
 
 		while (sortHeap.GetCount() && (hullCount > maxCount)) 
 		{
-			dgConvexFaceNode* const corner = sortHeap[0];
+			ndConvexFaceNode* const corner = sortHeap[0];
 			if (corner->m_mask && corner->m_prev->m_mask) 
 			{
 				if (hullPoint == corner) 
@@ -1420,7 +1420,7 @@ dInt32 ndContactSolver::Prune2dContacts(const dMatrix& matrix, dInt32 count, ndC
 	}
 
 	hullCount = 0;
-	dgConvexFaceNode* ptr = hullPoint;
+	ndConvexFaceNode* ptr = hullPoint;
 	do 
 	{
 		contactArray[hullCount] = ptr->m_contact;

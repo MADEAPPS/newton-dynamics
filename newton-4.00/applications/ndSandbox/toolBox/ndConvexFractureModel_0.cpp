@@ -51,6 +51,19 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 					}
 					pointCount = dConvexHull2d(pointCloud2d, pointCount);
 
+					dInt32 k0 = pointCount - 1;
+					for (dInt32 k = 0; k < pointCount; k++)
+					{
+						const dVector e0(dVector::m_zero - pointCloud2d[k0]);
+						const dVector e1(pointCloud2d[k] - pointCloud2d[k0]);
+						const dVector cross(e1.CrossProduct(e0));
+						if (cross.m_z < dFloat32 (1.0e-6f))
+						{
+							return false;
+						}
+						k0 = k;
+					}
+
 					return true;
 				}
 			}
