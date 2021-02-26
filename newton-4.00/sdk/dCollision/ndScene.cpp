@@ -893,9 +893,9 @@ bool ndScene::ValidateContactCache(ndContact* const contact, const dVector& time
 		//dVector rotationStep(timestep * (body0->m_omega - body1->m_omega));
 		dVector rotationStep(timestep * (body0->m_residualOmega - body1->m_residualOmega));
 		rotationStep = ((rotationStep.DotProduct(rotationStep)) > m_velocTol) & rotationStep;
-		contact->m_rotationAcc = contact->m_rotationAcc * dQuaternion(dFloat32(1.0f), rotationStep.m_x, rotationStep.m_y, rotationStep.m_z);
+		contact->m_rotationAcc = contact->m_rotationAcc * dQuaternion(rotationStep.m_x, rotationStep.m_y, rotationStep.m_z, dFloat32(1.0f));
 	
-		dVector angle(contact->m_rotationAcc.m_x, contact->m_rotationAcc.m_y, contact->m_rotationAcc.m_z, dFloat32(0.0f));
+		dVector angle(contact->m_rotationAcc & dVector::m_triplexMask);
 		dVector rotatError2(angle.DotProduct(angle));
 		dVector rotationSign(dVector::m_negOne & (rotatError2 < m_linearContactError2));
 		if (rotationSign.GetSignMask())

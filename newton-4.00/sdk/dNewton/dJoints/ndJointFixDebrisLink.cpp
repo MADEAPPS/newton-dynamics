@@ -82,8 +82,7 @@ void ndJointFixDebrisLink::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 	else 
 	{
-		dAssert(0);
-		//SubmitAngularAxis(matrix0, matrix1, timestep);
+		SubmitAngularAxis(desc, matrix0, matrix1);
 	}
 }
 
@@ -101,4 +100,10 @@ void ndJointFixDebrisLink::SubmitAngularAxisCartisianApproximation(ndConstraintD
 	//dTrace(("%f %f %f\n", angle0 * dRadToDegree, angle1 * dRadToDegree, angle2 * dRadToDegree));
 }
 
+void ndJointFixDebrisLink::SubmitAngularAxis(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
+{
+	dQuaternion rotation(matrix0 * matrix1.Inverse());
+	dVector dir(rotation & dVector::m_triplexMask);
+	dAssert(dir.DotProduct(dir).GetScalar() > dFloat32(1.0e-4f));
 
+}

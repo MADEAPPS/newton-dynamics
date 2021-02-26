@@ -79,7 +79,7 @@ dQuaternion::dQuaternion(const dMatrix& matrix)
 		dAssert (err < dFloat32 (1.0e-2f));
 	}
 
-	dFloat32 err = dAbs (DotProduct(*this) - dFloat32(1.0f));
+	dFloat32 err = dAbs (DotProduct(*this).GetScalar() - dFloat32(1.0f));
 	dAssert (err < dFloat32(dEpsilon * 100.0f));
 #endif
 }
@@ -103,9 +103,9 @@ dQuaternion::dQuaternion (const dVector &unitAxis, dFloat32 angle)
 dVector dQuaternion::CalcAverageOmega (const dQuaternion &q1, dFloat32 invdt) const
 {
 	dQuaternion q0 (*this);
-	if (q0.DotProduct (q1) < 0.0f) 
+	if (q0.DotProduct (q1).GetScalar() < dFloat32 (0.0f)) 
 	{
-		q0.Scale(-1.0f);
+		q0 = q0.Scale____(dFloat32 (-1.0f));
 	}
 	dQuaternion dq (q0.Inverse() * q1);
 	dVector omegaDir (dq.m_x, dq.m_y, dq.m_z, dFloat32 (0.0f));
@@ -127,7 +127,7 @@ dQuaternion dQuaternion::Slerp (const dQuaternion &q1, dFloat32 t) const
 {
 	dQuaternion q0;
 
-	dFloat32 dot = DotProduct (q1);
+	dFloat32 dot = DotProduct(q1).GetScalar();
 	if ((dot + dFloat32(1.0f)) > dEpsilon) 
 	{
 		dFloat32 Sclp;
@@ -169,7 +169,7 @@ dQuaternion dQuaternion::Slerp (const dQuaternion &q1, dFloat32 t) const
 		q0.m_z = m_z * Sclp + q0.m_z * Sclq;
 	}
 
-	dot = q0.DotProduct (q0);
+	dot = q0.DotProduct (q0).GetScalar();
 	if ((dot) < dFloat32(1.0f - dEpsilon * 10.0f) ) 
 	{
 		//dot = dFloat32(1.0f) / dSqrt (dot);

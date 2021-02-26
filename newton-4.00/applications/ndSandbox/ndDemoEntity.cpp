@@ -68,8 +68,8 @@ ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
 	,m_matrix(matrix) 
 	,m_curPosition (matrix.m_posit)
 	,m_nextPosition (matrix.m_posit)
-	,m_curRotation (dQuaternion (matrix))
-	,m_nextRotation (dQuaternion (matrix))
+	,m_curRotation (matrix)
+	,m_nextRotation (matrix)
 	,m_meshMatrix(dGetIdentityMatrix())
 	,m_mesh(nullptr)
 	,m_userData(nullptr)
@@ -261,10 +261,10 @@ void ndDemoEntity::SetMatrixUsafe(const dQuaternion& rotation, const dVector& po
 	m_nextPosition = position;
 	m_nextRotation = rotation;
 
-	dFloat32 angle = m_curRotation.DotProduct(m_nextRotation);
+	dFloat32 angle = m_curRotation.DotProduct(m_nextRotation).GetScalar();
 	if (angle < 0.0f) 
 	{
-		m_curRotation.Scale(-1.0f);
+		m_curRotation = m_curRotation.Scale____(dFloat32(-1.0f));
 	}
 }
 
@@ -283,9 +283,10 @@ void ndDemoEntity::SetNextMatrix (ndDemoEntityManager& world, const dQuaternion&
 	m_nextPosition = position;
 	m_nextRotation = rotation;
 
-	dFloat32 angle = m_curRotation.DotProduct(m_nextRotation);
-	if (angle < 0.0f) {
-		m_curRotation.Scale(-1.0f);
+	dFloat32 angle = m_curRotation.DotProduct(m_nextRotation).GetScalar();
+	if (angle < 0.0f) 
+	{
+		m_curRotation = m_curRotation.Scale____(dFloat32 (-1.0f));
 	}
 }
 
@@ -294,7 +295,7 @@ void ndDemoEntity::ResetMatrix(ndDemoEntityManager& scene, const dMatrix& matrix
 	dQuaternion rot (matrix);
 	SetMatrix(scene, rot, matrix.m_posit);
 	SetMatrix(scene, rot, matrix.m_posit);
-	InterpolateMatrix (scene, 0.0f);
+	InterpolateMatrix (scene, dFloat32 (0.0f));
 }
 
 void ndDemoEntity::InterpolateMatrixUnsafe(dFloat32 param)

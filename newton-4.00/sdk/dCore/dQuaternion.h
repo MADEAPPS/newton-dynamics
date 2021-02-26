@@ -24,71 +24,70 @@
 
 #include "dCoreStdafx.h"
 #include "dTypes.h"
+#include "dVector.h"
 
-class dVector;
 class dMatrix;
 
-D_MSV_NEWTON_ALIGN_16
-class dQuaternion
+class dQuaternion: public dVector
 {
 	public:
-	dQuaternion (); 
+	dQuaternion(); 
+	dQuaternion(const dVector& quat);
+	dQuaternion(const dQuaternion& quat);
 	D_CORE_API dQuaternion (const dMatrix& matrix);
 	dQuaternion (dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3);
-	D_CORE_API dQuaternion (const dVector &unit_Axis, dFloat32 angle = dFloat32 (0.0f));
+	D_CORE_API dQuaternion (const dVector &unit_Axis, dFloat32 angle);
 
-	void Scale (dFloat32 scale); 
-	void Normalize (); 
+	dQuaternion Normalize____() const
+	{
+		return dVector::Normalize();
+	}
+
+	dQuaternion Scale____(dFloat32 scale) const
+	{
+		return dVector::Scale(scale);
+	}
+
+	void Scale(dFloat32 scale)
+	{
+		dAssert(0);
+	}
+
+	void Normalize()
+	{
+		dAssert(0);
+	}
+
 	dQuaternion Inverse () const; 
 	D_CORE_API dQuaternion Slerp (const dQuaternion &q1, dFloat32 t) const;
-
-	dFloat32 DotProduct (const dQuaternion &QB) const;
 	D_CORE_API dVector CalcAverageOmega (const dQuaternion &q1, dFloat32 invdt) const;
 
 	dQuaternion operator* (const dQuaternion &B) const;
 	dQuaternion operator+ (const dQuaternion &B) const; 
 	dQuaternion operator- (const dQuaternion &B) const; 
-
-	dFloat32 m_x;
-	dFloat32 m_y;
-	dFloat32 m_z;
-	dFloat32 m_w;
-} D_GCC_NEWTON_ALIGN_32;
+};
 
 D_INLINE dQuaternion::dQuaternion()
-	:m_x(dFloat32(0.0f))
-	,m_y(dFloat32(0.0f))
-	,m_z(dFloat32(0.0f))
-	,m_w(dFloat32(1.0f))
+	:dVector(dVector::m_wOne)
 {
 }
 
-D_INLINE dQuaternion::dQuaternion(dFloat32 Q0, dFloat32 Q1, dFloat32 Q2, dFloat32 Q3)
-	:m_x(Q1)
-	,m_y(Q2)
-	,m_z(Q3)
-	,m_w(Q0)
+D_INLINE dQuaternion::dQuaternion(const dVector& quat)
+	:dVector(quat)
+{
+}
+
+D_INLINE dQuaternion::dQuaternion(const dQuaternion& quat)
+	:dVector(quat)
+{
+}
+
+D_INLINE dQuaternion::dQuaternion(dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3)
+	:dVector(q0, q1, q2, q3)
 {
 //	dAssert (dAbs (DotProduct (*this) -dFloat32 (1.0f)) < dFloat32(1.0e-4f));
 }
 
-D_INLINE void dQuaternion::Scale (dFloat32 scale) 
-{
-	m_w *= scale;
-	m_x *= scale;
-	m_y *= scale;
-	m_z *= scale;
-}
-
-D_INLINE void dQuaternion::Normalize () 
-{
-	Scale (dRsqrt (DotProduct (*this)));
-}
-
-D_INLINE dFloat32 dQuaternion::DotProduct (const dQuaternion &q1) const
-{
-	return m_w * q1.m_w + m_x * q1.m_x + m_y * q1.m_y + m_z * q1.m_z;
-}
 
 D_INLINE dQuaternion dQuaternion::Inverse () const 
 {
@@ -107,10 +106,10 @@ D_INLINE dQuaternion dQuaternion::operator- (const dQuaternion &q) const
 
 D_INLINE dQuaternion dQuaternion::operator* (const dQuaternion &q) const
 {
-	return dQuaternion (q.m_w * m_w - q.m_x * m_x - q.m_y * m_y - q.m_z * m_z, 
-				 		q.m_x * m_w + q.m_w * m_x - q.m_z * m_y + q.m_y * m_z, 
+	return dQuaternion (q.m_x * m_w + q.m_w * m_x - q.m_z * m_y + q.m_y * m_z, 
 						q.m_y * m_w + q.m_z * m_x + q.m_w * m_y - q.m_x * m_z, 
-						q.m_z * m_w - q.m_y * m_x + q.m_x * m_y + q.m_w * m_z); 
+						q.m_z * m_w - q.m_y * m_x + q.m_x * m_y + q.m_w * m_z,
+						q.m_w * m_w - q.m_x * m_x - q.m_y * m_y - q.m_z * m_z);
 }
 
 #endif

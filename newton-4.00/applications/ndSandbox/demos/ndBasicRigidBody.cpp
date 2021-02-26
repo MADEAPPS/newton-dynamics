@@ -84,8 +84,6 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 	AddCapsulesStacks(scene, origin1);
 
 	dQuaternion rot;
-	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
 	dVector origin(-60.0f, 5.0f, 0.0f, 0.0f);
-	//dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

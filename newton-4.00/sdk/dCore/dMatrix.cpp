@@ -37,10 +37,9 @@ const dMatrix& dGetZeroMatrix ()
 
 dMatrix::dMatrix (const dQuaternion &quat, const dVector &position)
 {
+	dAssert((quat.DotProduct(quat).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-5f));
 	dQuaternion quat0(quat);
-	quat0.Normalize();
-	dQuaternion quat1 (quat0);
-	quat1.Scale(dFloat32 (2.0f));
+	dQuaternion quat1(quat0.Scale____ (dFloat32(2.0f)));
 
 	dFloat32 x2 = quat0.m_x * quat1.m_x;
 	dFloat32 y2 = quat0.m_y * quat1.m_y;

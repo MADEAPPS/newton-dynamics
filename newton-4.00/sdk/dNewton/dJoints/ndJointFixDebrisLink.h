@@ -24,6 +24,7 @@ class ndJointFixDebrisLink: public ndJointBilateralConstraint
 	private:
 	void JacobianDerivative(ndConstraintDescritor& desc);
 
+	void SubmitAngularAxis(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 	void SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 
 	dFloat32 m_distance;
