@@ -90,8 +90,9 @@ void ndBasicFracture_0(ndDemoEntityManager* const scene)
 	ndConvexFractureBox fractureBox(scene);
 
 	dMatrix matrix(dGetIdentityMatrix());
+	matrix = dPitchMatrix(5.0f * dDegreeToRad) * matrix;
 	matrix.m_posit.m_x += 10.0f;
-	matrix.m_posit.m_y += 3.0f;
+	matrix.m_posit.m_y += 5.0f;
 	fractureBox.AddEffect(scene, matrix);
 
 	dQuaternion rot;

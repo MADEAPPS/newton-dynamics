@@ -291,68 +291,6 @@ void ndConvexFracture::ExplodeLocation(ndBodyDynamic* const body, const dMatrix&
 	body->SetMatrix(matrix);
 }
 
-void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix& location)
-{
-	const ndConvexFractureRootEntity* const rootEntity = (ndConvexFractureRootEntity*)m_debriRootEnt;
-	ndConvexFractureRootEntity* const entity = new ndConvexFractureRootEntity(*rootEntity);
-	scene->AddEntity(entity);
-
-	ndWorld* const world = scene->GetWorld();
-
-	dInt32 bodyCount = 0;
-	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetSibling())
-	{
-		bodyCount = dMax(bodyCount, debrisEnt->m_enumerator + 1);
-		dAssert(debrisEnt->m_drebriBody);
-		//dAssert(debrisEnt->m_enumerator < bodyCount);
-	}
-
-	ndContactCallback* const callback = (ndContactCallback*)world->GetContactNotify();
-	ndBodyDynamic** const bodyArray = dAlloca(ndBodyDynamic*, bodyCount);
-	memset(bodyArray, 0, bodyCount * sizeof(ndBodyDynamic*));
-
-	dInt32 debrisID = ndContactCallback::m_dedris;
-	ndMaterial& material0 = callback->RegisterMaterial(ndContactCallback::m_default, ndContactCallback::m_dedris);
-	//ndMaterial& material1 = callback->RegisterMaterial(ndContactCallback::m_dedris, ndContactCallback::m_dedris);
-	//instanceShape.m_shapeMaterial.m_userParam[0].m_floatData = 10.0f;
-
-	// register a contact joint physics material pair and 
-	// set the physics parameters and application custom options 
-	//dFloat32 frictionValue = dFloat32(i) / 15.0f;
-	//material.m_staticFriction0 = frictionValue;
-	//material.m_staticFriction1 = frictionValue;
-	//material.m_dynamicFriction0 = frictionValue;
-	//material.m_dynamicFriction1 = frictionValue;
-
-
-	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetSibling())
-	{
-		debrisEnt->SetMatrixUsafe(dQuaternion(location), location.m_posit);
-		ndBodyDynamic* const body = debrisEnt->m_drebriBody;
-		world->AddBody(body);
-		body->SetNotifyCallback(new ndDebrisNotify(scene, debrisEnt));
-		body->SetMatrix(location);
-		bodyArray[debrisEnt->m_enumerator] = body;
-
-		// set material id properties
-		ndShapeInstance& instanceShape = body->GetCollisionShape();
-		instanceShape.m_shapeMaterial.m_userId = debrisID;
-#if 0
-		ExplodeLocation(body, location, 0.3f);
-#endif
-	}
-
-	// create all the joints
-	const dArray<ndConvexFractureRootEntity::JointPair>& jointConnection = rootEntity->m_jointConnection;
-	for (dInt32 i = 0; i < jointConnection.GetCount(); i++)
-	{
-		ndBodyDynamic* const body0 = bodyArray[jointConnection[i].m_m0];
-		ndBodyDynamic* const body1 = bodyArray[jointConnection[i].m_m1];
-		ndJointFixDebrisLink* const joint = new ndJointFixDebrisLink(body0, body1);
-		world->AddJoint(joint);
-	}
-}
-
 void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 {
 	ndMeshEffect* const debrisMeshPieces = m_singleManifoldMesh->CreateVoronoiConvexDecomposition(m_pointCloud, m_interiorMaterialIndex, &m_textureMatrix[0][0]);
@@ -416,6 +354,85 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 						rootEntity->m_jointConnection.PushBack(pair);
 					}
 				}
+			}
+		}
+	}
+}
+
+
+void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix& location)
+{
+	const ndConvexFractureRootEntity* const rootEntity = (ndConvexFractureRootEntity*)m_debriRootEnt;
+	ndConvexFractureRootEntity* const entity = new ndConvexFractureRootEntity(*rootEntity);
+	scene->AddEntity(entity);
+
+	ndWorld* const world = scene->GetWorld();
+
+	dInt32 bodyCount = 0;
+	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetSibling())
+	{
+		bodyCount = dMax(bodyCount, debrisEnt->m_enumerator + 1);
+		dAssert(debrisEnt->m_drebriBody);
+		//dAssert(debrisEnt->m_enumerator < bodyCount);
+	}
+
+	ndContactCallback* const callback = (ndContactCallback*)world->GetContactNotify();
+	ndBodyDynamic** const bodyArray = dAlloca(ndBodyDynamic*, bodyCount);
+	memset(bodyArray, 0, bodyCount * sizeof(ndBodyDynamic*));
+
+	dInt32 debrisID = ndContactCallback::m_dedris;
+	ndMaterial& material0 = callback->RegisterMaterial(ndContactCallback::m_default, ndContactCallback::m_dedris);
+	//ndMaterial& material1 = callback->RegisterMaterial(ndContactCallback::m_dedris, ndContactCallback::m_dedris);
+	//instanceShape.m_shapeMaterial.m_userParam[0].m_floatData = 10.0f;
+
+	// register a contact joint physics material pair and 
+	// set the physics parameters and application custom options 
+	//dFloat32 frictionValue = dFloat32(i) / 15.0f;
+	//material.m_staticFriction0 = frictionValue;
+	//material.m_staticFriction1 = frictionValue;
+	//material.m_dynamicFriction0 = frictionValue;
+	//material.m_dynamicFriction1 = frictionValue;
+
+
+	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetSibling())
+	{
+
+bool test = debrisEnt->m_enumerator == 0;
+test = test || debrisEnt->m_enumerator == 3;
+if (!test)
+debrisEnt->SetMatrixUsafe(dQuaternion(location), location.m_posit + dVector(0.0f, -10.0f, 0.0f, 0.0f));
+else
+{
+
+		debrisEnt->SetMatrixUsafe(dQuaternion(location), location.m_posit);
+		ndBodyDynamic* const body = debrisEnt->m_drebriBody;
+		world->AddBody(body);
+		body->SetNotifyCallback(new ndDebrisNotify(scene, debrisEnt));
+		body->SetMatrix(location);
+		bodyArray[debrisEnt->m_enumerator] = body;
+
+		// set material id properties
+		ndShapeInstance& instanceShape = body->GetCollisionShape();
+		instanceShape.m_shapeMaterial.m_userId = debrisID;
+	#if 0
+		ExplodeLocation(body, location, 0.3f);
+	#endif
+}
+	}
+
+	// create all the joints
+	const dArray<ndConvexFractureRootEntity::JointPair>& jointConnection = rootEntity->m_jointConnection;
+	for (dInt32 i = 0; i < jointConnection.GetCount(); i++)
+	{
+		bool test = jointConnection[i].m_m0 == 0 && jointConnection[i].m_m1 == 3;
+		if (test)
+		{
+			ndBodyDynamic* const body0 = bodyArray[jointConnection[i].m_m0];
+			ndBodyDynamic* const body1 = bodyArray[jointConnection[i].m_m1];
+			if (body0 && body1)
+			{
+				ndJointFixDebrisLink* const joint = new ndJointFixDebrisLink(body0, body1);
+				world->AddJoint(joint);
 			}
 		}
 	}
