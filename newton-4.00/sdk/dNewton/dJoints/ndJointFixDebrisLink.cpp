@@ -33,6 +33,8 @@ ndJointFixDebrisLink::ndJointFixDebrisLink(ndBodyKinematic* const body0, ndBodyK
 	dMatrix matrix1(matrix0);
 	matrix1.m_posit = body1->GetMatrix().TransformVector(body1->GetCentreOfMass());
 	CalculateLocalMatrix(matrix1, dummy, m_localMatrix1);
+
+	//SetSolverModel(m_secundaryCloseLoop);
 }
 
 ndJointFixDebrisLink::~ndJointFixDebrisLink()
@@ -102,8 +104,9 @@ void ndJointFixDebrisLink::SubmitAngularAxisCartisianApproximation(ndConstraintD
 
 void ndJointFixDebrisLink::SubmitAngularAxis(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
 {
-	dQuaternion rotation(matrix0 * matrix1.Inverse());
-	dVector dir(rotation & dVector::m_triplexMask);
+	const dQuaternion rotation(matrix0 * matrix1.Inverse());
+	const dVector dir(rotation & dVector::m_triplexMask);
 	dAssert(dir.DotProduct(dir).GetScalar() > dFloat32(1.0e-4f));
+	dMatrix basis(dir);
 
 }

@@ -47,6 +47,16 @@ ndMaterial ndContactCallback::GetMaterial(const ndContact* const contactJoint, c
 
 bool ndContactCallback::OnAaabbOverlap(const ndContact* const contactJoint, dFloat32 timestep)
 {
+	const ndBodyKinematic* const body0 = contactJoint->GetBody0();
+	const ndBodyKinematic* const body1 = contactJoint->GetBody1();
+
+	const ndShapeInstance& instanceShape0 = body0->GetCollisionShape();
+	const ndShapeInstance& instanceShape1 = body1->GetCollisionShape();
+	if ((instanceShape0.GetUserDataID() == m_dedris) && (instanceShape1.GetUserDataID() == m_dedris))
+	{
+		return false;
+	}
+
 	return true;
 }
 
@@ -103,7 +113,7 @@ void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 void ndContactCallback::OnContactCallback(dInt32 threadIndex, const ndContact* const contactJoint, dFloat32 timestep)
 {
 	const ndMaterial& material = contactJoint->GetMaterial();
-	if (material.m_userFlags & playSound)
+	if (material.m_userFlags & m_playSound)
 	{
 		PlaySoundTest(contactJoint);
 	}

@@ -90,7 +90,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 		ndShapeInstance& instanceShape = boxBody->GetCollisionShape();
 		dInt32 newId = i + 1;
 		instanceShape.m_shapeMaterial.m_userId = newId;
-		//sound play sound only when the relative speed is parger that 10.0f
+		//sound play sound only when the relative speed is larger that 10.0f
 		instanceShape.m_shapeMaterial.m_userParam[0].m_floatData = 10.0f;
 
 		// register a contact joint physics material pair and 
@@ -103,7 +103,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 		material.m_dynamicFriction1 = frictionValue;
 
 		// set the user flag so that it is read in the contact callback for doing stuff
-		material.m_userFlags |= ndContactCallback::playSound;
+		material.m_userFlags |= ndContactCallback::m_playSound;
 	}
 
 	boxGeometry->Release();

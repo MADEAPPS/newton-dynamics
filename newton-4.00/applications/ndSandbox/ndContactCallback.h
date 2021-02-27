@@ -16,9 +16,16 @@
 class ndContactCallback: public ndContactNotify
 {
 	public: 
+	enum ndMaterialUserIDs
+	{
+		m_default = 0,
+		m_dedris = 100,
+	};
+
 	enum ndMaterialFlags
 	{
-		playSound = 1<<0
+		m_playSound = 1 << 0,
+		//m_debrisBody = 1 << 1,
 	};
 
 	class ndMaterailKey
