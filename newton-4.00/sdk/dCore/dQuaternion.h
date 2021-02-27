@@ -38,33 +38,16 @@ class dQuaternion: public dVector
 	dQuaternion (dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3);
 	D_CORE_API dQuaternion (const dVector &unit_Axis, dFloat32 angle);
 
-	dQuaternion Normalize____() const
-	{
-		return dVector::Normalize();
-	}
-
-	dQuaternion Scale____(dFloat32 scale) const
-	{
-		return dVector::Scale(scale);
-	}
-
-	void Scale(dFloat32 scale)
-	{
-		dAssert(0);
-	}
-
-	void Normalize()
-	{
-		dAssert(0);
-	}
-
+	dQuaternion Normalize() const;
+	dQuaternion Scale(dFloat32 scale) const;
 	dQuaternion Inverse () const; 
-	D_CORE_API dQuaternion Slerp (const dQuaternion &q1, dFloat32 t) const;
-	D_CORE_API dVector CalcAverageOmega (const dQuaternion &q1, dFloat32 invdt) const;
-
-	dQuaternion operator* (const dQuaternion &B) const;
 	dQuaternion operator+ (const dQuaternion &B) const; 
 	dQuaternion operator- (const dQuaternion &B) const; 
+
+	D_CORE_API dQuaternion operator* (const dQuaternion &B) const;
+	D_CORE_API dQuaternion Slerp(const dQuaternion &q1, dFloat32 t) const;
+	D_CORE_API dVector CalcAverageOmega(const dQuaternion &q1, dFloat32 invdt) const;
+
 };
 
 D_INLINE dQuaternion::dQuaternion()
@@ -88,7 +71,6 @@ D_INLINE dQuaternion::dQuaternion(dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat3
 //	dAssert (dAbs (DotProduct (*this) -dFloat32 (1.0f)) < dFloat32(1.0e-4f));
 }
 
-
 D_INLINE dQuaternion dQuaternion::Inverse () const 
 {
 	return dQuaternion (m_w, -m_x, -m_y, -m_z);
@@ -104,12 +86,14 @@ D_INLINE dQuaternion dQuaternion::operator- (const dQuaternion &q) const
 	return dQuaternion (m_w - q.m_w, m_x - q.m_x, m_y - q.m_y, m_z - q.m_z);
 }
 
-D_INLINE dQuaternion dQuaternion::operator* (const dQuaternion &q) const
+D_INLINE dQuaternion dQuaternion::Normalize() const
 {
-	return dQuaternion (q.m_x * m_w + q.m_w * m_x - q.m_z * m_y + q.m_y * m_z, 
-						q.m_y * m_w + q.m_z * m_x + q.m_w * m_y - q.m_x * m_z, 
-						q.m_z * m_w - q.m_y * m_x + q.m_x * m_y + q.m_w * m_z,
-						q.m_w * m_w - q.m_x * m_x - q.m_y * m_y - q.m_z * m_z);
+	return dVector::Normalize();
+}
+
+D_INLINE dQuaternion dQuaternion::Scale(dFloat32 scale) const
+{
+	return dVector::Scale(scale);
 }
 
 #endif

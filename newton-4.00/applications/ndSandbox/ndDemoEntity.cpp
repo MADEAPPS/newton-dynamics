@@ -264,7 +264,7 @@ void ndDemoEntity::SetMatrixUsafe(const dQuaternion& rotation, const dVector& po
 	dFloat32 angle = m_curRotation.DotProduct(m_nextRotation).GetScalar();
 	if (angle < 0.0f) 
 	{
-		m_curRotation = m_curRotation.Scale____(dFloat32(-1.0f));
+		m_curRotation = m_curRotation.Scale(dFloat32(-1.0f));
 	}
 }
 
@@ -286,7 +286,7 @@ void ndDemoEntity::SetNextMatrix (ndDemoEntityManager& world, const dQuaternion&
 	dFloat32 angle = m_curRotation.DotProduct(m_nextRotation).GetScalar();
 	if (angle < 0.0f) 
 	{
-		m_curRotation = m_curRotation.Scale____(dFloat32 (-1.0f));
+		m_curRotation = m_curRotation.Scale(dFloat32 (-1.0f));
 	}
 }
 

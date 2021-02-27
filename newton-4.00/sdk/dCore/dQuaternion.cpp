@@ -100,12 +100,42 @@ dQuaternion::dQuaternion (const dVector &unitAxis, dFloat32 angle)
 	m_z = unitAxis.m_z * sinAng;
 }
 
+dQuaternion dQuaternion::operator* (const dQuaternion &q) const
+{
+	//return dQuaternion(
+	//	q.m_x * m_w + q.m_w * m_x - q.m_z * m_y + q.m_y * m_z,
+	//	q.m_y * m_w + q.m_z * m_x + q.m_w * m_y - q.m_x * m_z,
+	//	q.m_z * m_w - q.m_y * m_x + q.m_x * m_y + q.m_w * m_z,
+	//	q.m_w * m_w - q.m_x * m_x - q.m_y * m_y - q.m_z * m_z);
+
+	const dVector x( q.m_w,  q.m_z, -q.m_y, -q.m_x);
+	const dVector y(-q.m_z,  q.m_w,  q.m_x, -q.m_y);
+	const dVector z( q.m_y, -q.m_x,  q.m_w, -q.m_z);
+	const dVector w( q.m_x,  q.m_y,  q.m_z,  q.m_w);
+
+//#ifdef _DEBUG
+//	dQuaternion xxx0(x * dVector(m_x) + y * dVector(m_y) + z * dVector(m_z) + w * dVector(m_w));
+//	dQuaternion xxx1(
+//		q.m_x * m_w + q.m_w * m_x - q.m_z * m_y + q.m_y * m_z,
+//		q.m_y * m_w + q.m_z * m_x + q.m_w * m_y - q.m_x * m_z,
+//		q.m_z * m_w - q.m_y * m_x + q.m_x * m_y + q.m_w * m_z,
+//		q.m_w * m_w - q.m_x * m_x - q.m_y * m_y - q.m_z * m_z);
+//
+//	dFloat32 mag0 = xxx0.DotProduct(xxx0).GetScalar();
+//	dFloat32 mag1 = xxx1.DotProduct(xxx1).GetScalar();
+//	dFloat32 error = mag0 - mag1;
+//	dAssert(dAbs(error) < dFloat32(1.0e-5f));
+//#endif
+
+	return x * dVector(m_x) + y * dVector(m_y) + z * dVector(m_z) + w * dVector(m_w);
+}
+
 dVector dQuaternion::CalcAverageOmega (const dQuaternion &q1, dFloat32 invdt) const
 {
 	dQuaternion q0 (*this);
 	if (q0.DotProduct (q1).GetScalar() < dFloat32 (0.0f)) 
 	{
-		q0 = q0.Scale____(dFloat32 (-1.0f));
+		q0 = q0.Scale(dFloat32 (-1.0f));
 	}
 	dQuaternion dq (q0.Inverse() * q1);
 	dVector omegaDir (dq.m_x, dq.m_y, dq.m_z, dFloat32 (0.0f));

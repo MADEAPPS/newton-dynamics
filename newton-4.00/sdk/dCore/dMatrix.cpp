@@ -39,7 +39,7 @@ dMatrix::dMatrix (const dQuaternion &quat, const dVector &position)
 {
 	dAssert((quat.DotProduct(quat).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-5f));
 	dQuaternion quat0(quat);
-	dQuaternion quat1(quat0.Scale____ (dFloat32(2.0f)));
+	dQuaternion quat1(quat0.Scale (dFloat32(2.0f)));
 
 	dFloat32 x2 = quat0.m_x * quat1.m_x;
 	dFloat32 y2 = quat0.m_y * quat1.m_y;
@@ -69,21 +69,25 @@ dMatrix::dMatrix (const dQuaternion &quat, const dVector &position)
 
 dMatrix::dMatrix (const dMatrix& transformMatrix, const dVector& scale, const dMatrix& stretchAxis)
 {
-	dMatrix scaledAxis;
-	scaledAxis[0] = stretchAxis[0].Scale (scale[0]);
-	scaledAxis[1] = stretchAxis[1].Scale (scale[1]);
-	scaledAxis[2] = stretchAxis[2].Scale (scale[2]);
-	scaledAxis[3] = stretchAxis[3];
-
+	//dMatrix scaledAxis;
+	//scaledAxis[0] = stretchAxis[0].Scale (scale[0]);
+	//scaledAxis[1] = stretchAxis[1].Scale (scale[1]);
+	//scaledAxis[2] = stretchAxis[2].Scale (scale[2]);
+	//scaledAxis[3] = stretchAxis[3];
+	dMatrix scaledAxis(
+		stretchAxis[0].Scale(scale[0]),
+		stretchAxis[1].Scale(scale[1]),
+		stretchAxis[2].Scale(scale[2]),
+		stretchAxis[3]);
 	*this = stretchAxis.Transpose() * scaledAxis * transformMatrix;
 }
 
 dMatrix dMatrix::Multiply3X3 (const dMatrix &B) const
 {
 	return dMatrix (B.m_front * m_front.BroadcastX() + B.m_up * m_front.BroadcastY() + B.m_right * m_front.BroadcastZ(), 
-					 B.m_front * m_up.BroadcastX()    + B.m_up * m_up.BroadcastY()    + B.m_right * m_up.BroadcastZ(), 
-					 B.m_front * m_right.BroadcastX() + B.m_up * m_right.BroadcastY() + B.m_right * m_right.BroadcastZ(), 
-					 dVector::m_wOne); 
+					B.m_front * m_up.BroadcastX()    + B.m_up * m_up.BroadcastY()    + B.m_right * m_up.BroadcastZ(), 
+					B.m_front * m_right.BroadcastX() + B.m_up * m_right.BroadcastY() + B.m_right * m_right.BroadcastZ(), 
+					dVector::m_wOne); 
 }
 
 dMatrix dMatrix::operator* (const dMatrix &B) const

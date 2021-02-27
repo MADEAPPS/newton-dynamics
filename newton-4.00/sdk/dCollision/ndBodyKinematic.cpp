@@ -449,7 +449,7 @@ void ndBodyKinematic::IntegrateVelocity(dFloat32 timestep)
 		dQuaternion rotationStep(omegaAxis, omegaAngle);
 		//m_rotation = m_rotation * rotationStep;
 		//m_rotation.Scale(dRsqrt(m_rotation.DotProduct(m_rotation)));
-		m_rotation = (m_rotation * rotationStep).Normalize____();
+		m_rotation = (m_rotation * rotationStep).Normalize();
 		m_matrix = dMatrix(m_rotation, m_matrix.m_posit);
 	}
 
