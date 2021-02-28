@@ -19,8 +19,8 @@ ndJointFix6dof::ndJointFix6dof(ndBodyKinematic* const body0, ndBodyKinematic* co
 	,m_maxForce(D_MAX_BOUND)
 	,m_maxTorque(D_MAX_BOUND)
 {
-m_maxForce = 20000.0f;
-m_maxTorque = 10000.0f;
+m_maxForce = 2000.0f;
+m_maxTorque = 500.0f;
 
 	const dVector posit0(body0->GetMatrix().TransformVector(body0->GetCentreOfMass()));
 	const dVector posit1(body1->GetMatrix().TransformVector(body1->GetCentreOfMass()));
@@ -53,12 +53,8 @@ void ndJointFix6dof::JacobianDerivative(ndConstraintDescritor& desc)
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-static float xxxx;
-float xxxx1 = 0;
 for (dInt32 i = 0; i < 3; i++)
 {
-xxxx1 = dMax(xxxx1, dAbs(m_jointForce[i + 0].m_force));
-xxxx1 = dMax(xxxx1, dAbs(m_jointForce[i + 3].m_force));
 	if ((dAbs(m_jointForce[i + 0].m_force) >= m_maxForce * 0.99f) ||
 		(dAbs(m_jointForce[i + 3].m_force) >= m_maxTorque * 0.99f))
 	{
@@ -67,11 +63,6 @@ xxxx1 = dMax(xxxx1, dAbs(m_jointForce[i + 3].m_force));
 	}
 }
 
-if (xxxx1 > xxxx)
-{
-	xxxx = xxxx1;
-	dTrace(("xxxxxxxxx %f\n", xxxx));
-}
 
 	dAssert(IsActive());
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 

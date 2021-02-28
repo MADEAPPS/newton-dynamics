@@ -27,13 +27,9 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 	public:
 	struct ndFaceInfo
 	{
-		dPlane m_plane;
-		dFixSizeBuffer<dVector, 16> m_polygon;
-		dInt32 m_count;
-
 		bool CheckCoplanal(const ndFaceInfo& plane, const dMatrix& matrix, const ndFaceInfo& plane2d) const
 		{
-			dVector pointCloud2d[128];
+			dVector pointCloud2d[16*16];
 			dVector dir(m_plane & dVector::m_triplexMask);
 			dFloat32 project = dir.DotProduct(plane.m_plane).GetScalar();
 			if (project > dFloat32(0.9999f)) 
@@ -48,6 +44,7 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 						{
 							pointCloud2d[pointCount] = plane2d.m_polygon[i] - matrix.TransformVector(plane.m_polygon[j]);
 							pointCount++;
+							dAssert(pointCount < sizeof(pointCloud2d) / sizeof(pointCloud2d[0]));
 						}
 					}
 					pointCount = dConvexHull2d(pointCloud2d, pointCount);
@@ -70,6 +67,10 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 			}
 			return false;
 		}
+
+		dPlane m_plane;
+		dFixSizeBuffer<dVector, 16> m_polygon;
+		dInt32 m_count;
 	};
 
 	ndFaceArrayDatabase(dFloat32 sign = 1.0f)
