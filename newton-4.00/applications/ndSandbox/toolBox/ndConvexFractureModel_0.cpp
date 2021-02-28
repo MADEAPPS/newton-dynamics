@@ -395,10 +395,10 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 	{
 
 bool test = debrisEnt->m_enumerator == 0;
-//test = test || debrisEnt->m_enumerator == 1;
+test = test || debrisEnt->m_enumerator == 1;
 test = test || debrisEnt->m_enumerator == 3;
-//test = test || debrisEnt->m_enumerator == 5;
-//test = true;
+test = test || debrisEnt->m_enumerator == 5;
+test = true;
 if (!test)
 debrisEnt->SetMatrixUsafe(dQuaternion(location), location.m_posit + dVector(0.0f, -10.0f, 0.0f, 0.0f));
 else
@@ -424,10 +424,10 @@ else
 	for (dInt32 i = 0; i < jointConnection.GetCount(); i++)
 	{
 		bool test = false;
-		//test = test || jointConnection[i].m_m0 == 0 && jointConnection[i].m_m1 == 1;
+		test = test || jointConnection[i].m_m0 == 0 && jointConnection[i].m_m1 == 1;
 		test = test || jointConnection[i].m_m0 == 0 && jointConnection[i].m_m1 == 3;
-		//test = test || jointConnection[i].m_m0 == 0 && jointConnection[i].m_m1 == 5;
-		//test = true;
+		test = test || jointConnection[i].m_m0 == 0 && jointConnection[i].m_m1 == 5;
+		test = true;
 		if (test)
 		{
 			ndBodyDynamic* const body0 = bodyArray[jointConnection[i].m_m0];
