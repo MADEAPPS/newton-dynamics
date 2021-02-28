@@ -23,20 +23,34 @@ ndJointFixDebrisLink::ndJointFixDebrisLink(ndBodyKinematic* const body0, ndBodyK
 	dAssert(body0->GetInvMass() > dFloat32(0.0f));
 	dMatrix dummy;
 
+	//dVector posit0(body0->GetMatrix().TransformVector(body0->GetCentreOfMass()));
+	//dVector posit1(body1->GetMatrix().TransformVector(body1->GetCentreOfMass()));
+	//
+	//dVector dist(posit1 - posit0);
+	//m_distance = dSqrt(dist.DotProduct(dist).GetScalar());
+	//dAssert(m_distance > dFloat32(1.0e-3f));
+	//
+	//dMatrix matrix0(dist);
+	//matrix0.m_posit = posit0;
+	//CalculateLocalMatrix(matrix0, m_localMatrix0, dummy);
+	//
+	//dMatrix matrix1(matrix0);
+	//matrix1.m_posit = body1->GetMatrix().TransformVector(body1->GetCentreOfMass());
+	//CalculateLocalMatrix(matrix1, dummy, m_localMatrix1);
+
 	dVector posit0(body0->GetMatrix().TransformVector(body0->GetCentreOfMass()));
 	dVector posit1(body1->GetMatrix().TransformVector(body1->GetCentreOfMass()));
+	
+	dVector pivot((posit1 + posit0).Scale (dFloat32 (0.5f)));
+	//m_distance = dSqrt(dist.DotProduct(dist).GetScalar());
 
-	dVector dist(posit1 - posit0);
-	m_distance = dSqrt(dist.DotProduct(dist).GetScalar());
-	dAssert(m_distance > dFloat32(1.0e-3f));
-
-	dMatrix matrix0(dist);
-	matrix0.m_posit = posit0;
-	CalculateLocalMatrix(matrix0, m_localMatrix0, dummy);
-
-	dMatrix matrix1(matrix0);
-	matrix1.m_posit = body1->GetMatrix().TransformVector(body1->GetCentreOfMass());
-	CalculateLocalMatrix(matrix1, dummy, m_localMatrix1);
+	dVector dir(posit1 - posit0);
+	dAssert(dir.DotProduct(dir).GetScalar() > dFloat32(1.0e-3f));
+	
+	dMatrix matrix(dir);
+	matrix.m_posit = pivot;
+	matrix.m_posit.m_w = 1.0f;
+	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
 	
 	SetSolverModel(m_secundaryCloseLoop);
 }
@@ -53,32 +67,37 @@ void ndJointFixDebrisLink::JacobianDerivative(ndConstraintDescritor& desc)
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	const dVector step (matrix0.UnrotateVector (matrix1.m_posit - matrix0.m_posit));
+	//const dVector step (matrix0.UnrotateVector (matrix1.m_posit - matrix0.m_posit));
+	//const dVector veloc0(m_body0->GetVelocity());
+	//const dVector veloc1(m_body1->GetVelocityAtPoint(matrix0.m_posit));
+	//const dVector relVeloc(veloc1 - veloc0);
+	//
+	//dVector distanceOffset(dVector::m_zero);
+	//distanceOffset.m_x = m_distance;
+	//for (dInt32 i = 0; i < 3; i++)
+	//{
+	//	const dVector& dir = matrix0[i];
+	//	
+	//	AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, dir);
+	//	const dFloat32 x = step[i] - distanceOffset[i];
+	//	const dFloat32 v = relVeloc.DotProduct(dir).GetScalar();
+	//	const dFloat32 a = -CalculateSpringDamperAcceleration(desc.m_timestep, D_DEBRIS_SPRING, x, D_DEBRIS_DAMPER, v);
+	//
+	//	SetMotorAcceleration(desc, a);
+	//	SetDiagonalRegularizer(desc, D_DEBRIS_REGULARIZER);
+	//
+	//	ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
+	//	ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
+	//	jacobian0.m_linear = dir;
+	//	jacobian0.m_angular = dVector::m_zero;
+	//	jacobian1.m_linear = dir.Scale(dFloat32(-1.0f));
+	//	jacobian1.m_angular = dVector::m_zero;
+	//}
 
-	const dVector veloc0(m_body0->GetVelocity());
-	const dVector veloc1(m_body1->GetVelocityAtPoint(matrix0.m_posit));
-	const dVector relVeloc(veloc1 - veloc0);
-
-	dVector distanceOffset(dVector::m_zero);
-	distanceOffset.m_x = m_distance;
 	for (dInt32 i = 0; i < 3; i++)
 	{
-		const dVector& dir = matrix0[i];
-		
-		AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, dir);
-		const dFloat32 x = step[i] - distanceOffset[i];
-		const dFloat32 v = relVeloc.DotProduct(dir).GetScalar();
-		const dFloat32 a = -CalculateSpringDamperAcceleration(desc.m_timestep, D_DEBRIS_SPRING, x, D_DEBRIS_DAMPER, v);
-
-		SetMotorAcceleration(desc, a);
+		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[i]);
 		SetDiagonalRegularizer(desc, D_DEBRIS_REGULARIZER);
-
-		ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
-		ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
-		jacobian0.m_linear = dir;
-		jacobian0.m_angular = dVector::m_zero;
-		jacobian1.m_linear = dir.Scale(dFloat32(-1.0f));
-		jacobian1.m_angular = dVector::m_zero;
 	}
 
 	dFloat32 cosAngle = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();

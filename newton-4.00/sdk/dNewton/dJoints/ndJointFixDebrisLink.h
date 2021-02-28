@@ -27,7 +27,7 @@ class ndJointFixDebrisLink: public ndJointBilateralConstraint
 	void SubmitAngularAxis(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 	void SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 
-	dFloat32 m_distance;
+	//dFloat32 m_distance;
 };
 #endif 
 
