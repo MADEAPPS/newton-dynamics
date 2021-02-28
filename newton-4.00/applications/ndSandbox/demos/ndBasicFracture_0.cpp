@@ -59,7 +59,7 @@ class ndConvexFractureBox: public ndConvexFracture
 		textureMatrix.m_posit.m_y = -0.5f;
 		m_singleManifoldMesh->UniformBoxMapping(0, textureMatrix);
 
-		//makePointCloud(shapeBox, 200, m_pointCloud);
+		makePointCloud(shapeBox, 200, m_pointCloud);
 		//makePointCloud(shapeBox, 20, m_pointCloud);
 
 		m_textureMatrix = dGetIdentityMatrix();
