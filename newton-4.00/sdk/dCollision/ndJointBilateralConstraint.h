@@ -82,6 +82,9 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	void SetMotorAcceleration(ndConstraintDescritor& desc, dFloat32 acceleration);
 	D_COLLISION_API void SetMassSpringDamperAcceleration(ndConstraintDescritor& desc, dFloat32 spring, dFloat32 damper);
 
+	dFloat32 GetStiffness(const ndConstraintDescritor& desc) const;
+	void SetStiffness(ndConstraintDescritor& desc, dFloat32 stiffness);
+
 	void SetSkeletonFlag(bool flag);
 
 	protected:
@@ -256,6 +259,22 @@ inline dVector ndJointBilateralConstraint::GetForceBody1() const
 inline dVector ndJointBilateralConstraint::GetTorqueBody1() const
 {
 	return m_torqueBody1;
+}
+
+inline dFloat32 ndJointBilateralConstraint::GetStiffness(const ndConstraintDescritor& desc) const
+{
+	const dInt32 index = desc.m_rowsCount - 1;
+	dAssert(index >= 0);
+	dAssert(index < dInt32(m_maxDof));
+	return desc.m_diagonalRegularizer[index];
+}
+
+inline void ndJointBilateralConstraint::SetStiffness(ndConstraintDescritor& desc, dFloat32 stiffness)
+{
+	const dInt32 index = desc.m_rowsCount - 1;
+	dAssert(index >= 0);
+	dAssert(index < dInt32(m_maxDof));
+	desc.m_diagonalRegularizer[index] = dClamp(stiffness, dFloat32(0.0f), dFloat32(1.0f));
 }
 
 

@@ -228,7 +228,7 @@ class dgConstraint
 		dgVector m_r1;
 		dgVector m_posit0;
 		dgVector m_posit1;
-		dgFloat32 m_defualtDiagonalRegularizer;
+		dgFloat32 m_defaultDiagonalRegularizer;
 	};
 
 	protected:

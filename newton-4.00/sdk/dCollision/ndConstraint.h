@@ -87,7 +87,7 @@ class dgPointParam
 	dVector m_r1;
 	dVector m_posit0;
 	dVector m_posit1;
-	dFloat32 m_defualtDiagonalRegularizer;
+	dFloat32 m_defaultDiagonalRegularizer;
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32

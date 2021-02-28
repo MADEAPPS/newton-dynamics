@@ -442,7 +442,7 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		const dgFloat32 relAccel = accelError + relCentr + relGyro;
 		desc.m_flags[index] = dgContactMaterial::m_none;
 		desc.m_penetration[index] = relPosit;
-		desc.m_diagonalRegularizer[index] = param.m_defualtDiagonalRegularizer;
+		desc.m_diagonalRegularizer[index] = param.m_defaultDiagonalRegularizer;
 		desc.m_jointAccel[index] = relAccel;
 		desc.m_penetrationStiffness[index] = relAccel;
 		desc.m_restitution[index] = dgFloat32 (0.0f);
@@ -458,7 +458,7 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 
 		desc.m_flags[index] = dgContactMaterial::m_none;
 		desc.m_penetration[index] = dgFloat32 (0.0f);
-		desc.m_diagonalRegularizer[index] = param.m_defualtDiagonalRegularizer;
+		desc.m_diagonalRegularizer[index] = param.m_defaultDiagonalRegularizer;
 		desc.m_jointAccel[index] = relVeloc;
 		desc.m_penetrationStiffness[index] = relVeloc;
 		desc.m_restitution[index] = dgFloat32 (0.0f);

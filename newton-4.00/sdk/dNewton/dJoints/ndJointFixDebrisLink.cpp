@@ -33,7 +33,7 @@ ndJointFixDebrisLink::ndJointFixDebrisLink(ndBodyKinematic* const body0, ndBodyK
 	dMatrix matrix1(matrix0);
 	matrix1.m_posit = body1->GetMatrix().TransformVector(body1->GetCentreOfMass());
 	CalculateLocalMatrix(matrix1, dummy, m_localMatrix1);
-
+	
 	//SetSolverModel(m_secundaryCloseLoop);
 }
 
@@ -54,8 +54,8 @@ void ndJointFixDebrisLink::JacobianDerivative(ndConstraintDescritor& desc)
 
 	const dVector step (matrix0.UnrotateVector (matrix1.m_posit - matrix0.m_posit));
 
-	dVector dist(dVector::m_zero);
-	dist.m_x = m_distance;
+	dVector distanceOffset(dVector::m_zero);
+	distanceOffset.m_x = m_distance;
 	for (dInt32 i = 0; i < 3; i++)
 	{
 		const dVector& dir = matrix0[i];
@@ -64,9 +64,15 @@ void ndJointFixDebrisLink::JacobianDerivative(ndConstraintDescritor& desc)
 		ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
 		ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
 
-		dFloat32 x = step[i] - dist[i];
+		dFloat32 x = step[i] - distanceOffset[i];
+		const dFloat32 maxDist = dFloat32 (0.1f);
+		x = dClamp(x, -maxDist, maxDist);
+		dFloat32 restoreSpeed = 10.0f * x / maxDist;
+//restoreSpeed = 0;
 		dFloat32 v((veloc0 - veloc1).DotProduct(dir).GetScalar());
-		dFloat32 a = (x - v * desc.m_timestep) * desc.m_invTimestep * desc.m_invTimestep;
+//		dFloat32 a = (x - v * desc.m_timestep) * desc.m_invTimestep * desc.m_invTimestep;
+		dFloat32 a = (restoreSpeed - v) * desc.m_invTimestep;
+dTrace(("x=%f v=%f a=%f)   ", restoreSpeed, v, a));
 
 		jacobian0.m_linear = dir;
 		jacobian0.m_angular = dVector::m_zero;
@@ -74,8 +80,10 @@ void ndJointFixDebrisLink::JacobianDerivative(ndConstraintDescritor& desc)
 		jacobian1.m_linear = dir.Scale(dFloat32(-1.0f));
 		jacobian1.m_angular = dVector::m_zero;
 
+		SetStiffness(desc, dFloat32(1.0f));
 		SetMotorAcceleration(desc, a);
 	}
+dTrace(("\n"));
 
 	dFloat32 cosAngle = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
 	if (cosAngle >= dFloat32(0.998f)) 
@@ -84,7 +92,7 @@ void ndJointFixDebrisLink::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 	else 
 	{
-		SubmitAngularAxis(desc, matrix0, matrix1);
+		//SubmitAngularAxis(desc, matrix0, matrix1);
 	}
 }
 
@@ -92,12 +100,15 @@ void ndJointFixDebrisLink::SubmitAngularAxisCartisianApproximation(ndConstraintD
 {
 	dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	AddAngularRowJacobian(desc, matrix1.m_up, angle0);
+	SetStiffness(desc, dFloat32(1.0f));
 
 	dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
+	SetStiffness(desc, dFloat32(1.0f));
 	
 	dFloat32 angle2 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
 	AddAngularRowJacobian(desc, matrix1.m_front, angle2);
+	SetStiffness(desc, dFloat32(1.0f));
 
 	//dTrace(("%f %f %f\n", angle0 * dRadToDegree, angle1 * dRadToDegree, angle2 * dRadToDegree));
 }

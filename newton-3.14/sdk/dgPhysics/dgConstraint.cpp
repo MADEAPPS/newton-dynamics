@@ -53,7 +53,7 @@ void dgConstraint::InitPointParam (dgPointParam& param, dgFloat32 stiffness, con
 {
 	dgAssert (m_body0);
 	dgAssert (m_body1);
-	param.m_defualtDiagonalRegularizer = stiffness; 
+	param.m_defaultDiagonalRegularizer = stiffness; 
 
 	param.m_posit0 = p0Global;
 	param.m_posit1 = p1Global;

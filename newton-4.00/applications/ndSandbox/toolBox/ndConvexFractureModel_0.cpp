@@ -313,8 +313,6 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 			ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
 			if (collision)
 			{
-//if (enumerator == 16 || enumerator == 7 || enumerator == 5)
-//if (enumerator == 16 || enumerator == 7)
 				new ndConvexFractureEntity(fracturePiece, vertexArray, m_debriRootEnt, scene->GetShaderCache(), collision, enumerator);
 				enumerator++;
 			}
@@ -347,7 +345,7 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 				{
 					if (checkConectivitity.IsFaceContact(ent1->m_collision))
 					{
-						dTrace(("pair %d %d\n", ent0->m_enumerator, ent1->m_enumerator));
+						//dTrace(("pair %d %d\n", ent0->m_enumerator, ent1->m_enumerator));
 						ndConvexFractureRootEntity::JointPair pair;
 						pair.m_m0 = ent0->m_enumerator;
 						pair.m_m1 = ent1->m_enumerator;
@@ -358,7 +356,6 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 		}
 	}
 }
-
 
 void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix& location)
 {
@@ -398,12 +395,11 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 	{
 
 bool test = debrisEnt->m_enumerator == 0;
-//test = test || debrisEnt->m_enumerator == 3;
+test = test || debrisEnt->m_enumerator == 3;
 if (!test)
 debrisEnt->SetMatrixUsafe(dQuaternion(location), location.m_posit + dVector(0.0f, -10.0f, 0.0f, 0.0f));
 else
 {
-
 		debrisEnt->SetMatrixUsafe(dQuaternion(location), location.m_posit);
 		ndBodyDynamic* const body = debrisEnt->m_drebriBody;
 		world->AddBody(body);
@@ -425,7 +421,7 @@ else
 	for (dInt32 i = 0; i < jointConnection.GetCount(); i++)
 	{
 		bool test = false;
-		//test = test || jointConnection[i].m_m0 == 0 && jointConnection[i].m_m1 == 3;
+		test = test || jointConnection[i].m_m0 == 0 && jointConnection[i].m_m1 == 3;
 		if (test)
 		{
 			ndBodyDynamic* const body0 = bodyArray[jointConnection[i].m_m0];

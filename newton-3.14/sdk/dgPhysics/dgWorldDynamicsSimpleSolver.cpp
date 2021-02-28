@@ -391,23 +391,21 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointImpulse(const dgJointImpulseInfo* 
 
 	for (dgInt32 j = 0; j < rowsCount; j++) {
 		const dgLeftHandSide* const row = &matrixRow[j];
-		const dgRightHandSide* const rhs____ = &rightHandSide[j];
+		const dgRightHandSide* const rhs = &rightHandSide[j];
 		dgVector a(row->m_JMinv.m_jacobianM0.m_linear * linearM0);
 		a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_angular, angularM0);
 		a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_linear, linearM1);
 		a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_angular, angularM1);
-		//a = dgVector(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
-		a = dgVector(relVel[j] - out[j] * rhs____->m_diagDamp) - a.AddHorizontal();
+		a = dgVector(relVel[j] - out[j] * rhs->m_diagDamp) - a.AddHorizontal();
 
-		//dgVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
-		dgVector f(out[j] + rhs____->m_invJinvMJt * a.GetScalar());
-		dgAssert(rhs____->m_normalForceIndex >= -1);
-		dgAssert(rhs____->m_normalForceIndex <= rowsCount);
+		dgVector f(out[j] + rhs->m_invJinvMJt * a.GetScalar());
+		dgAssert(rhs->m_normalForceIndex >= -1);
+		dgAssert(rhs->m_normalForceIndex <= rowsCount);
 
-		dgInt32 frictionIndex = rhs____->m_normalForceIndex + 1;
+		dgInt32 frictionIndex = rhs->m_normalForceIndex + 1;
 		dgFloat32 frictionNormal = normalForce[frictionIndex];
-		dgVector lowerFrictionForce(frictionNormal * rhs____->m_lowerBoundFrictionCoefficent);
-		dgVector upperFrictionForce(frictionNormal * rhs____->m_upperBoundFrictionCoefficent);
+		dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
+		dgVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
 
 		a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 		f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
@@ -434,23 +432,21 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointImpulse(const dgJointImpulseInfo* 
 		maxAccel = dgVector::m_zero;
 		for (dgInt32 j = 0; j < rowsCount; j++) {
 			const dgLeftHandSide* const row = &matrixRow[j];
-			const dgRightHandSide* const rhs____ = &rightHandSide[j];
+			const dgRightHandSide* const rhs = &rightHandSide[j];
 			dgVector a(row->m_JMinv.m_jacobianM0.m_linear * linearM0);
 			a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_angular, angularM0);
 			a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_linear, linearM1);
 			a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_angular, angularM1);
-			//a = dgVector(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
-			a = dgVector(relVel[j] - out[j] * rhs____->m_diagDamp) - a.AddHorizontal();
+			a = dgVector(relVel[j] - out[j] * rhs->m_diagDamp) - a.AddHorizontal();
 
-			//dgVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
-			dgVector f(out[j] + rhs____->m_invJinvMJt * a.GetScalar());
-			dgAssert(rhs____->m_normalForceIndex >= -1);
-			dgAssert(rhs____->m_normalForceIndex <= rowsCount);
+			dgVector f(out[j] + rhs->m_invJinvMJt * a.GetScalar());
+			dgAssert(rhs->m_normalForceIndex >= -1);
+			dgAssert(rhs->m_normalForceIndex <= rowsCount);
 
-			dgInt32 frictionIndex = rhs____->m_normalForceIndex + 1;
+			dgInt32 frictionIndex = rhs->m_normalForceIndex + 1;
 			dgFloat32 frictionNormal = normalForce[frictionIndex];
-			dgVector lowerFrictionForce(frictionNormal * rhs____->m_lowerBoundFrictionCoefficent);
-			dgVector upperFrictionForce(frictionNormal * rhs____->m_upperBoundFrictionCoefficent);
+			dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
+			dgVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
 
 			a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 			f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);

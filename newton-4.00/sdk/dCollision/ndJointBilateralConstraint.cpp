@@ -60,7 +60,6 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKine
 
 	m_defualtDiagonalRegularizer = dFloat32(0.0f);
 	m_maxAngleError = dFloat32(5.0f) * dDegreeToRad;
-	//SetStiffness(dFloat32(0.0f));
 	
 	memset(m_jointForce, 0, sizeof(m_jointForce));
 	memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
@@ -168,7 +167,7 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 		const dFloat32 relAccel = accelError + relCentr + relGyro;
 		desc.m_flags[index] = 0;
 		desc.m_penetration[index] = relPosit;
-		desc.m_diagonalRegularizer[index] = param.m_defualtDiagonalRegularizer;
+		desc.m_diagonalRegularizer[index] = param.m_defaultDiagonalRegularizer;
 		desc.m_jointAccel[index] = relAccel;
 		desc.m_penetrationStiffness[index] = relAccel;
 		desc.m_restitution[index] = dFloat32(0.0f);
