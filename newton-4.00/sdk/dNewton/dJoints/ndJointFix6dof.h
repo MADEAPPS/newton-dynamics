@@ -31,6 +31,8 @@ class ndJointFix6dof: public ndJointBilateralConstraint
 	void SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 
 	dFloat32 m_softness;
+	dFloat32 m_maxForce;
+	dFloat32 m_maxTorque;
 };
 #endif 
 

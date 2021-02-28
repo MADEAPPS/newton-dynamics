@@ -102,7 +102,7 @@ class ndContact
 
 	const ndContactPointList& GetContactPoints() const;
 
-	bool IsActive() const;
+	//bool IsActive() const;
 	bool IsSkeletonSelftCollision() const;
 	bool IsSkeletonIntraCollision() const;
 	
@@ -124,7 +124,7 @@ class ndContact
 	dFloat32 m_contactPruningTolereance;
 	dUnsigned32 m_maxDOF;
 	dUnsigned32 m_sceneLru;
-	dUnsigned32 m_active : 1;
+	//dUnsigned32 m_active : 1;
 	dUnsigned32 m_isDead : 1;
 	dUnsigned32 m_isAttached : 1;
 	dUnsigned32 m_isIntersetionTestOnly : 1;
@@ -171,10 +171,10 @@ inline const ndContactPointList& ndContact::GetContactPoints() const
 	return m_contacPointsList;
 }
 
-inline bool ndContact::IsActive() const
-{
-	return m_active ? true : false;
-}
+//inline bool ndContact::IsActive() const
+//{
+//	return m_active ? true : false;
+//}
 
 inline bool ndContact::IsSkeletonSelftCollision() const
 {

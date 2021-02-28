@@ -34,6 +34,7 @@ ndConstraint::ndConstraint()
 	,m_rowStart(0)
 	,m_jointFeebackForce(false)
 	,m_isInSkeletonLoop(false)
+	,m_active(true)
 {
 }
 

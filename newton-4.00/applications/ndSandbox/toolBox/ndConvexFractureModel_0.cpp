@@ -253,8 +253,7 @@ ndConvexFracture::ndDebrisNotify::ndDebrisNotify(ndDemoEntityManager* const mana
 
 void ndConvexFracture::ndDebrisNotify::OnObjectPick() const
 {
-	ndConvexFractureEntity* const debris = (ndConvexFractureEntity*) m_entity;
-	dTrace(("debris entity id: %d    ", debris->m_enumerator));
+	dTrace(("debris entity id: %d    ", ((ndConvexFractureEntity*)m_entity)->m_enumerator));
 	ndDemoEntityNotify::OnObjectPick();
 }
 

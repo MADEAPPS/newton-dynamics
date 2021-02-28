@@ -94,9 +94,14 @@ void ndDynamicsUpdate::SortJoints()
 	jointArray.SetCount(index + jointList.GetCount());
 	for (ndJointList::dListNode* node = jointList.GetFirst(); node; node = node->GetNext())
 	{
-		jointArray[index] = node->GetInfo();
-		index++;
+		ndJointBilateralConstraint* const joint = node->GetInfo();
+		if (joint->IsActive())
+		{
+			jointArray[index] = joint;
+			index++;
+		}
 	}
+	jointArray.SetCount(index);
 
 	for (dInt32 i = jointArray.GetCount() - 1; i >= 0; i--)
 	{

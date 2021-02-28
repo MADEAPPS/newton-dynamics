@@ -1639,7 +1639,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	dAssert(!contact->m_isDead);
 	if (!(body0->m_equilibrium & body1->m_equilibrium))
 	{
-		dUnsigned32 active = contact->m_active;
+		bool active = contact->IsActive();
 		if (ValidateContactCache(contact, deltaTime))
 		{
 			contact->m_sceneLru = m_lru;
@@ -1647,7 +1647,8 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 		}
 		else
 		{
-			contact->m_active = false;
+			//contact->m_active = false;
+			contact->SetActive(false);
 			contact->m_positAcc = dVector::m_zero;
 			contact->m_rotationAcc = dQuaternion();
 
@@ -1675,7 +1676,8 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 				CalculateJointContacts(threadIndex, contact);
 				if (contact->m_maxDOF || contact->m_isIntersetionTestOnly)
 				{
-					contact->m_active = true;
+					//contact->m_active = true;
+					contact->SetActive(true);
 					contact->m_timeOfImpact = dFloat32(1.0e10f);
 				}
 				contact->m_sceneLru = m_lru;
@@ -1695,7 +1697,8 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 			}
 		}
 
-		if (active ^ contact->m_active)
+		//if (active ^ contact->m_active)
+		if (active ^ contact->IsActive())
 		{
 			dAssert(body0->GetInvMass() > dFloat32(0.0f));
 			body0->m_equilibrium = false;
@@ -1710,7 +1713,8 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 		contact->m_sceneLru = m_lru;
 	}
 
-	if (!contact->m_isDead && (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active))
+	//if (!contact->m_isDead && (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active))
+	if (!contact->m_isDead && (body0->m_equilibrium & body1->m_equilibrium & !contact->IsActive()))
 	{
 		//dInt32 id0 = contact->GetBody0()->m_uniqueID;
 		//dInt32 id1 = contact->GetBody1()->m_uniqueID;
@@ -1760,7 +1764,8 @@ void ndScene::DeleteDeadContact()
 			m_contactList.DeleteContact(contact);
 			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
 		}
-		else if (!contact->m_active || !contact->m_maxDOF)
+		//else if (!contact->m_active || !contact->m_maxDOF)
+		else if (!contact->IsActive() || !contact->m_maxDOF)
 		{
 			activeCount--;
 			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];

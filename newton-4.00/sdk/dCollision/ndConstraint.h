@@ -227,6 +227,8 @@ class ndConstraint
 	virtual ndContact* GetAsContact() { return nullptr; }
 	virtual ndJointBilateralConstraint* GetAsBilateral() { return nullptr; }
 
+	bool IsActive() const { return m_active; }
+	void SetActive(bool state) { m_active = state;}
 	virtual bool IsBilateral() const { return false; }
 
 	virtual const dUnsigned32 GetRowsCount() const = 0;
@@ -234,7 +236,7 @@ class ndConstraint
 	virtual ndBodyKinematic* GetBody1() const { return nullptr; }
 	virtual void JacobianDerivative(ndConstraintDescritor& desc) = 0;
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc) = 0;
-
+	
 	void InitPointParam(dgPointParam& param, dFloat32 stiffness, const dVector& p0Global, const dVector& p1Global) const;
 
 	virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const {}
@@ -245,6 +247,7 @@ class ndConstraint
 	dInt32 m_rowStart;
 	bool m_jointFeebackForce;
 	bool m_isInSkeletonLoop;
+	bool m_active;
 	protected:
 	ndConstraint();
 } D_GCC_NEWTON_ALIGN_32 ;
