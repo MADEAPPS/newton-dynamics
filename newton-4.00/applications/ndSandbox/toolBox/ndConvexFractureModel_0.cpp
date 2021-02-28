@@ -28,7 +28,7 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 	struct ndFaceInfo
 	{
 		dPlane m_plane;
-		dFixSizeBuffer<dVector, 8> m_polygon;
+		dFixSizeBuffer<dVector, 16> m_polygon;
 		dInt32 m_count;
 
 		bool CheckCoplanal(const ndFaceInfo& plane, const dMatrix& matrix, const ndFaceInfo& plane2d) const
@@ -83,7 +83,7 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 	{
 		ndFaceInfo& face = m_polygons[m_count];
 		face.m_count = vertexCount;
-		dAssert(vertexCount < face.m_polygon.GetSize());
+		dAssert(vertexCount <= face.m_polygon.GetSize());
 		for (dInt32 i = 0; i < vertexCount; i++)
 		{
 			face.m_polygon[i] = faceArray[i];
@@ -395,7 +395,10 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 	{
 
 bool test = debrisEnt->m_enumerator == 0;
+//test = test || debrisEnt->m_enumerator == 1;
 test = test || debrisEnt->m_enumerator == 3;
+//test = test || debrisEnt->m_enumerator == 5;
+//test = true;
 if (!test)
 debrisEnt->SetMatrixUsafe(dQuaternion(location), location.m_posit + dVector(0.0f, -10.0f, 0.0f, 0.0f));
 else
@@ -421,7 +424,10 @@ else
 	for (dInt32 i = 0; i < jointConnection.GetCount(); i++)
 	{
 		bool test = false;
+		//test = test || jointConnection[i].m_m0 == 0 && jointConnection[i].m_m1 == 1;
 		test = test || jointConnection[i].m_m0 == 0 && jointConnection[i].m_m1 == 3;
+		//test = test || jointConnection[i].m_m0 == 0 && jointConnection[i].m_m1 == 5;
+		//test = true;
 		if (test)
 		{
 			ndBodyDynamic* const body0 = bodyArray[jointConnection[i].m_m0];

@@ -44,25 +44,23 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	public:
 	D_COLLISION_API ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
 	D_COLLISION_API virtual ~ndJointBilateralConstraint();
-	
-	bool IsCollidable() const;
-	virtual ndJointBilateralConstraint* GetAsBilateral() { return this; }
-
-	virtual const dUnsigned32 GetRowsCount() const;
-	virtual void JacobianDerivative(ndConstraintDescritor& desc);
 
 	virtual ndBodyKinematic* GetBody0() const;
 	virtual ndBodyKinematic* GetBody1() const;
-	
-	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const;
-	D_COLLISION_API dFloat32 CalculateAngle(const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
+	virtual const dUnsigned32 GetRowsCount() const;
+	virtual ndJointBilateralConstraint* GetAsBilateral() { return this; }
+	virtual void JacobianDerivative(ndConstraintDescritor& desc);
+	virtual ndJointBilateralSolverModel GetSolverModel() const;
+	virtual void SetSolverModel(ndJointBilateralSolverModel model);
 
+	D_COLLISION_API dFloat32 CalculateAngle(const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
 	D_COLLISION_API virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
 	D_COLLISION_API void CalculateLocalMatrix(const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
 	D_COLLISION_API void AddAngularRowJacobian(ndConstraintDescritor& desc, const dVector& dir, dFloat32 relAngle);
 	D_COLLISION_API void AddLinearRowJacobian(ndConstraintDescritor& desc, const dVector& pivot0, const dVector& pivot1, const dVector& dir);
 
 	D_COLLISION_API virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
+	D_COLLISION_API void SetMassSpringDamperAcceleration(ndConstraintDescritor& desc, dFloat32 spring, dFloat32 damper);
 	D_COLLISION_API dFloat32 CalculateSpringDamperAcceleration(dFloat32 dt, dFloat32 ks, dFloat32 x, dFloat32 kd, dFloat32 v) const;
 	
 	const dMatrix& GetLocalMatrix0() const;
@@ -73,19 +71,15 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	dVector GetForceBody1() const;
 	dVector GetTorqueBody1() const;
 
-	virtual ndJointBilateralSolverModel GetSolverModel() const;
-	virtual void SetSolverModel(ndJointBilateralSolverModel model);
-
+	bool IsCollidable() const;
+	void SetSkeletonFlag(bool flag);
+	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const;
 	dFloat32 GetMotorZeroAcceleration(ndConstraintDescritor& desc) const;
 	void SetHighFriction(ndConstraintDescritor& desc, dFloat32 friction);
 	void SetLowerFriction(ndConstraintDescritor& desc, dFloat32 friction);
 	void SetMotorAcceleration(ndConstraintDescritor& desc, dFloat32 acceleration);
-	D_COLLISION_API void SetMassSpringDamperAcceleration(ndConstraintDescritor& desc, dFloat32 spring, dFloat32 damper);
-
-	dFloat32 GetStiffness(const ndConstraintDescritor& desc) const;
-	void SetStiffness(ndConstraintDescritor& desc, dFloat32 stiffness);
-
-	void SetSkeletonFlag(bool flag);
+	dFloat32 GetDiagonalRegularizer(const ndConstraintDescritor& desc) const;
+	void SetDiagonalRegularizer(ndConstraintDescritor& desc, dFloat32 stiffness);
 
 	protected:
 	dMatrix m_localMatrix0;
@@ -261,7 +255,7 @@ inline dVector ndJointBilateralConstraint::GetTorqueBody1() const
 	return m_torqueBody1;
 }
 
-inline dFloat32 ndJointBilateralConstraint::GetStiffness(const ndConstraintDescritor& desc) const
+inline dFloat32 ndJointBilateralConstraint::GetDiagonalRegularizer(const ndConstraintDescritor& desc) const
 {
 	const dInt32 index = desc.m_rowsCount - 1;
 	dAssert(index >= 0);
@@ -269,7 +263,7 @@ inline dFloat32 ndJointBilateralConstraint::GetStiffness(const ndConstraintDescr
 	return desc.m_diagonalRegularizer[index];
 }
 
-inline void ndJointBilateralConstraint::SetStiffness(ndConstraintDescritor& desc, dFloat32 stiffness)
+inline void ndJointBilateralConstraint::SetDiagonalRegularizer(ndConstraintDescritor& desc, dFloat32 stiffness)
 {
 	const dInt32 index = desc.m_rowsCount - 1;
 	dAssert(index >= 0);

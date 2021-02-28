@@ -161,7 +161,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	dVector p0(m_camera->ScreenToWorld(dVector(mouseX, mouseY, 0.0f, 0.0f)));
 	dVector p1(m_camera->ScreenToWorld(dVector(mouseX, mouseY, 1.0f, 0.0f)));
 
-#if 1
+#if 0
 	struct ndReplay
 	{
 		dVector m_p0;

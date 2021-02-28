@@ -1244,9 +1244,9 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
 //	AddHinge(scene, dVector(-20.0f, 0.0f, 0.0f));
 //	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
-	AddFlexyPipe(scene, dVector(-20.0f, 0.0f, 0.0f));
+//	AddFlexyPipe(scene, dVector(-20.0f, 0.0f, 0.0f));
 
-#if 0
+#if 1
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
