@@ -48,6 +48,20 @@ void ndJointFix6dof::JacobianDerivative(ndConstraintDescritor& desc)
 	dMatrix matrix0;
 	dMatrix matrix1;
 
+	bool xxx = false;
+	for (dInt32 i = 0; i < 6; i++)
+	{
+		if (dAbs(m_jointForce[i].m_force) > 250.0f)
+		{
+			xxx = true;
+		}
+	}
+
+	if (xxx)
+	{
+		return;
+	}
+
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
 
