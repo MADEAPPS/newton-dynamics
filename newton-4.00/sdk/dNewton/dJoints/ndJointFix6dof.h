@@ -9,17 +9,20 @@
 * freely
 */
 
-#ifndef __D_JOINT_DEBRIS_LINK_H_
-#define __D_JOINT_DEBRIS_LINK_H_
+#ifndef __D_JOINT_FIX_6DOF_H_
+#define __D_JOINT_FIX_6DOF_H_
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-class ndJointFixDebrisLink: public ndJointBilateralConstraint
+class ndJointFix6dof: public ndJointBilateralConstraint
 {
 	public:
-	D_NEWTON_API ndJointFixDebrisLink(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
-	D_NEWTON_API virtual ~ndJointFixDebrisLink();
+	D_NEWTON_API ndJointFix6dof(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
+	D_NEWTON_API virtual ~ndJointFix6dof();
+
+	D_NEWTON_API void SetAsSoftJoint(bool mode);
+	D_NEWTON_API void SetRegularizer(dFloat32 regularizer);
 
 	private:
 	void JacobianDerivative(ndConstraintDescritor& desc);
@@ -27,7 +30,7 @@ class ndJointFixDebrisLink: public ndJointBilateralConstraint
 	void SubmitAngularAxis(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 	void SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 
-	//dFloat32 m_distance;
+	dFloat32 m_softness;
 };
 #endif 
 

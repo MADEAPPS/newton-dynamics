@@ -11,17 +11,12 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointFixDebrisLink.h"
+#include "ndJointFix6dof.h"
 
-#define D_DEBRIS_REGULARIZER	dFloat32 (0.001f)
-
-ndJointFixDebrisLink::ndJointFixDebrisLink(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
+ndJointFix6dof::ndJointFix6dof(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 	:ndJointBilateralConstraint(6, body0, body1, dGetIdentityMatrix())
+	,m_softness(dFloat32 (0.0f))
 {
-	dAssert(body0->GetInvMass() > dFloat32(0.0f));
-	dMatrix dummy;
-
-
 	const dVector posit0(body0->GetMatrix().TransformVector(body0->GetCentreOfMass()));
 	const dVector posit1(body1->GetMatrix().TransformVector(body1->GetCentreOfMass()));
 	const dVector pivot((posit1 + posit0).Scale (dFloat32 (0.5f)));
@@ -32,15 +27,23 @@ ndJointFixDebrisLink::ndJointFixDebrisLink(ndBodyKinematic* const body0, ndBodyK
 	matrix.m_posit = pivot;
 	matrix.m_posit.m_w = 1.0f;
 	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
-	
-	SetSolverModel(m_secundaryCloseLoop);
 }
 
-ndJointFixDebrisLink::~ndJointFixDebrisLink()
+ndJointFix6dof::~ndJointFix6dof()
 {
 }
 
-void ndJointFixDebrisLink::JacobianDerivative(ndConstraintDescritor& desc)
+void ndJointFix6dof::SetAsSoftJoint(bool mode)
+{
+	SetSolverModel(mode ? m_secundaryCloseLoop : m_primaryOpenLoop);
+}
+
+void ndJointFix6dof::SetRegularizer(dFloat32 regularizer)
+{
+	m_softness = dClamp(regularizer, dFloat32(0.0f), dFloat32(1.0f));
+}
+
+void ndJointFix6dof::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -51,38 +54,40 @@ void ndJointFixDebrisLink::JacobianDerivative(ndConstraintDescritor& desc)
 	for (dInt32 i = 0; i < 3; i++)
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[i]);
-		SetDiagonalRegularizer(desc, D_DEBRIS_REGULARIZER);
+		SetDiagonalRegularizer(desc, m_softness);
 	}
 
 	dFloat32 cosAngle = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
 	if (cosAngle >= dFloat32(0.998f)) 
 	{
+		// about 3.5 degree deviation, consider small angular approximation  
 		SubmitAngularAxisCartisianApproximation(desc, matrix0, matrix1);
 	}
 	else 
 	{
+		// beyond 3.5 degree need to decompose the relative matrix into an orthonormal basics 
 		SubmitAngularAxis(desc, matrix0, matrix1);
 	}
 }
 
-void ndJointFixDebrisLink::SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
+void ndJointFix6dof::SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
 {
 	// since very small angle rotation commute, we can issue
 	// three angle around the matrix1 axis in any order.
 	dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	AddAngularRowJacobian(desc, matrix1.m_up, angle0);
-	SetDiagonalRegularizer(desc, D_DEBRIS_REGULARIZER);
+	SetDiagonalRegularizer(desc, m_softness);
 
 	dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
-	SetDiagonalRegularizer(desc, D_DEBRIS_REGULARIZER);
+	SetDiagonalRegularizer(desc, m_softness);
 	
 	dFloat32 angle2 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
 	AddAngularRowJacobian(desc, matrix1.m_front, angle2);
-	SetDiagonalRegularizer(desc, D_DEBRIS_REGULARIZER);
+	SetDiagonalRegularizer(desc, m_softness);
 }
 
-void ndJointFixDebrisLink::SubmitAngularAxis(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
+void ndJointFix6dof::SubmitAngularAxis(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
 {
 	// calculate cone angle
 	dVector lateralDir(matrix1.m_front.CrossProduct(matrix0.m_front));
@@ -92,16 +97,16 @@ void ndJointFixDebrisLink::SubmitAngularAxis(ndConstraintDescritor& desc, const 
 	dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
 
 	AddAngularRowJacobian(desc, lateralDir, -coneAngle);
-	SetDiagonalRegularizer(desc, D_DEBRIS_REGULARIZER);
+	SetDiagonalRegularizer(desc, m_softness);
 
 	dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
 	AddAngularRowJacobian(desc, sideDir, dFloat32(0.0f));
-	SetDiagonalRegularizer(desc, D_DEBRIS_REGULARIZER);
+	SetDiagonalRegularizer(desc, m_softness);
 
 	// calculate pitch angle
 	dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 	dFloat32 pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 	AddAngularRowJacobian(desc, matrix0.m_front, pitchAngle);
-	SetDiagonalRegularizer(desc, D_DEBRIS_REGULARIZER);
+	SetDiagonalRegularizer(desc, m_softness);
 	//dTrace(("%f %f\n", coneAngle * dRadToDegree, pitchAngle * dRadToDegree));
 }

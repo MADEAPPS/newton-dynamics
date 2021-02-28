@@ -50,6 +50,7 @@
 #include <ndShapeConvex.h>
 #include <ndBodyDynamic.h>
 #include <ndContactList.h>
+#include <ndJointFix6dof.h>
 #include <ndBodySphFluid.h>
 #include <ndSkeletonList.h>
 #include <ndBodyKinematic.h>
@@ -64,7 +65,6 @@
 #include <ndJointFixDistance.h>
 #include <ndMultiBodyVehicle.h>
 #include <ndSkeletonContainer.h>
-#include <ndJointFixDebrisLink.h>
 #include <ndDynamicsUpdateAvx2.h>
 #include <ndJointBallAndSocket.h>
 #include <ndBodyParticleSetList.h>
