@@ -35,8 +35,8 @@ class ndModel: public dClassAlloc
 	D_NEWTON_API ndModel(const nd::TiXmlNode* const xmlNode);
 	virtual ~ndModel ();
 
-	virtual void AppUpdate(ndWorld* const world);
 	virtual void Debug(ndConstraintDebugCallback& context) const;
+	virtual void PostUpdate(const ndWorld* const world, dFloat32 timestep);
 
 	protected:
 	virtual void Update(const ndWorld* const world, dFloat32 timestep) = 0;
@@ -56,13 +56,14 @@ inline ndModel::~ndModel()
 	dAssert(!m_node);
 }
 
-inline void ndModel::AppUpdate(ndWorld* const world)
-{
-}
-
 inline void ndModel::Debug(ndConstraintDebugCallback& context) const
 {
 }
+
+inline void ndModel::PostUpdate(const ndWorld* const world, dFloat32 timestep)
+{
+}
+
 #endif 
 
 

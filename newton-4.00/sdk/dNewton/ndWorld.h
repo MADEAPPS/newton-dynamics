@@ -144,6 +144,7 @@ class ndWorld: public dClassAlloc
 	};
 
 	void ModelUpdate();
+	void ModelPostUpdate();
 	void ParticleUpdate();
 	void CalculateAverageUpdateTime();
 	void SubStepUpdate(dFloat32 timestep);

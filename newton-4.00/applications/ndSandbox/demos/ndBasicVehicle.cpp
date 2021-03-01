@@ -188,8 +188,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		tireInfo.m_springK = 5000.0f;
 		tireInfo.m_damperC = 100.0f;
 		tireInfo.m_minLimit = -0.05f;
-		//tireInfo.m_maxLimit = 0.2f;
-		tireInfo.m_maxLimit = 0.1f;
+		tireInfo.m_maxLimit = 0.2f;
+		//tireInfo.m_maxLimit = 0.1f;
 		tireInfo.m_laterialStiffeness = 1.0f;
 		tireInfo.m_longitudinalStiffeness = 1.0f;
 

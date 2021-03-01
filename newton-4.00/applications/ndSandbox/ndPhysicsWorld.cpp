@@ -39,11 +39,6 @@ ndDemoEntityManager* ndPhysicsWorld::GetManager() const
 	return m_manager;
 }
 
-void ndPhysicsWorld::RegisterModelUpdate(ndModel* const model)
-{
-	m_modelUpdate.Append(model);
-}
-
 void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
 {
 	const dFloat32 descreteStep = (1.0f / MAX_PHYSICS_FPS);
@@ -63,12 +58,6 @@ void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
 	{
 		Update(descreteStep);
 		m_timeAccumulator -= descreteStep;
-
-		for (dList<ndModel*>::dListNode* node = m_modelUpdate.GetFirst(); node; node = node->GetNext())
-		{
-			ndModel* const model = node->GetInfo();
-			model->AppUpdate(this);
-		}
 
 		//xxxx++;
 		//if (xxxx == 500)

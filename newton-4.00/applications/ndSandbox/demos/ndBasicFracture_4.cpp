@@ -114,7 +114,8 @@ void ndBasicFracture_4(ndDemoEntityManager* const scene)
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndConvexFractureModel_4* const fractureManager = new ndConvexFractureModel_4(scene);
 	world->AddModel(fractureManager);
-	world->RegisterModelUpdate(fractureManager);
+	dAssert(0);
+	//world->RegisterModelUpdate(fractureManager);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_x += 10.0f;

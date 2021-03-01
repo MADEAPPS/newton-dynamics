@@ -691,8 +691,7 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	m_scene->CalculateContacts();
 	m_scene->DeleteDeadContact();
 
-	// update all special models.
-	//UpdatePrelisteners();
+	// update all special models, particle, models, ect.
 
 	// Update Particle base physics
 	ParticleUpdate();
@@ -704,7 +703,8 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	dAssert(m_solver);
 	m_solver->Update();
 
-	//UpdatePostlisteners();
+	// second pass on models
+	ModelPostUpdate();
 }
 
 void ndWorld::ParticleUpdate()
@@ -714,16 +714,6 @@ void ndWorld::ParticleUpdate()
 	{
 		ndBodyParticleSet* const body = node->GetInfo();
 		body->Update(this, m_timestep);
-	}
-}
-
-void ndWorld::ModelUpdate()
-{
-	D_TRACKTIME();
-	for (ndModelList::dListNode* node = m_modelList.GetFirst(); node; node = node->GetNext())
-	{
-		ndModel* const model = node->GetInfo();
-		model->Update(this, m_timestep);
 	}
 }
 
@@ -970,4 +960,74 @@ void ndWorld::UpdateSkeletons()
 		ndSkeletonContainer* const skeleton = &iter.GetNode()->GetInfo();
 		skeleton->ClearSelfCollision();
 	}
+}
+
+void ndWorld::ModelUpdate()
+{
+	D_TRACKTIME();
+	class ndModelUpdate : public ndScene::ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadId = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			const dFloat32 timestep = m_timestep;
+			ndWorld* const world = m_owner->GetWorld();
+			ndModelList& modelList = world->m_modelList;
+			ndModelList::dListNode* node = modelList.GetFirst();
+			for (dInt32 i = 0; i < threadId; i++)
+			{
+				node = node ? node->GetNext() : nullptr;
+			}
+
+			while (node)
+			{
+				ndModel* const model = node->GetInfo();
+				model->Update(world, timestep);
+
+				for (dInt32 i = 0; i < threadCount; i++)
+				{
+					node = node ? node->GetNext() : nullptr;
+				}
+			}
+		}
+	};
+	m_scene->SubmitJobs<ndModelUpdate>();
+}
+
+void ndWorld::ModelPostUpdate()
+{
+	D_TRACKTIME();
+	class ndModelPostUpdate: public ndScene::ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadId = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			const dFloat32 timestep = m_timestep;
+			ndWorld* const world = m_owner->GetWorld();
+			ndModelList& modelList = world->m_modelList;
+			ndModelList::dListNode* node = modelList.GetFirst();
+			for (dInt32 i = 0; i < threadId; i++)
+			{
+				node = node ? node->GetNext() : nullptr;
+			}
+
+			while (node)
+			{
+				ndModel* const model = node->GetInfo();
+				model->PostUpdate(world, timestep);
+
+				for (dInt32 i = 0; i < threadCount; i++)
+				{
+					node = node ? node->GetNext() : nullptr;
+				}
+			}
+		}
+	};
+	m_scene->SubmitJobs<ndModelPostUpdate>();
 }
