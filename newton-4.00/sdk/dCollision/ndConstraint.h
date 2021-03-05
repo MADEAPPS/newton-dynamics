@@ -218,10 +218,17 @@ class ndRightHandSide
 	dInt32 m_normalForceIndex;
 } D_GCC_NEWTON_ALIGN_32;
 
+#define ND_JOINT_RELECTION(Class)							\
+	virtual const char* GetClassName() {return #Class;} 
+
+
 D_MSV_NEWTON_ALIGN_32
 class ndConstraint
 {
 	public:
+	// add some reflexion to the classes
+	ND_JOINT_RELECTION(ndConstraint);
+
 	virtual ~ndConstraint();
 
 	virtual ndContact* GetAsContact() { return nullptr; }

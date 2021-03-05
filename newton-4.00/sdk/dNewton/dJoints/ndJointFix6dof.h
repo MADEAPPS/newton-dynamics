@@ -18,6 +18,7 @@
 class ndJointFix6dof: public ndJointBilateralConstraint
 {
 	public:
+	ND_JOINT_RELECTION(ndJointFix6dof);
 	D_NEWTON_API ndJointFix6dof(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 	D_NEWTON_API virtual ~ndJointFix6dof();
 
