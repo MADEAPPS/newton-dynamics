@@ -222,8 +222,12 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 	//points.SetCount(vertexCount);
 	//indices.SetCount(indexCount);
 
-	dInt32* const indices = dAlloca(dInt32, indexCount);
-	ndMeshPointUV* const points = dAlloca(ndMeshPointUV, vertexCount);
+	//dInt32* const indices = dAlloca(dInt32, indexCount);
+	//ndMeshPointUV* const points = dAlloca(ndMeshPointUV, vertexCount);
+	dArray<dInt32> indices;
+	dArray<ndMeshPointUV> points;
+	indices.SetCount(indexCount);
+	points.SetCount(vertexCount);
 
 	meshNode->GetVertexChannel(sizeof(ndMeshPointUV), &points[0].m_posit.m_x);
 	meshNode->GetNormalChannel(sizeof(ndMeshPointUV), &points[0].m_normal.m_x);
