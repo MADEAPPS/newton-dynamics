@@ -73,17 +73,19 @@ D_INLINE dQuaternion::dQuaternion(dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat3
 
 D_INLINE dQuaternion dQuaternion::Inverse () const 
 {
-	return dQuaternion (m_w, -m_x, -m_y, -m_z);
+	return dQuaternion (-m_x, -m_y, -m_z, m_w);
 }
 
 D_INLINE dQuaternion dQuaternion::operator+ (const dQuaternion &q) const
 {
-	return dQuaternion (m_w + q.m_w, m_x + q.m_x, m_y + q.m_y, m_z + q.m_z);
+	//return dQuaternion (m_x + q.m_x, m_y + q.m_y, m_z + q.m_z, m_w + q.m_w);
+	return dVector::operator+(q);
 }
 
 D_INLINE dQuaternion dQuaternion::operator- (const dQuaternion &q) const
 {
-	return dQuaternion (m_w - q.m_w, m_x - q.m_x, m_y - q.m_y, m_z - q.m_z);
+	//return dQuaternion (m_x - q.m_x, m_y - q.m_y, m_z - q.m_z, m_w - q.m_w);
+	return dVector::operator-(q);
 }
 
 D_INLINE dQuaternion dQuaternion::Normalize() const
