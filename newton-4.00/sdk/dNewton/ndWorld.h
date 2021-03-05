@@ -74,12 +74,13 @@ class ndWorld: public dClassAlloc
 
 	D_NEWTON_API virtual bool AddBody(ndBody* const body);
 	D_NEWTON_API virtual void RemoveBody(ndBody* const body);
+	D_NEWTON_API virtual void DeleteBody(ndBody* const body);
+
 	D_NEWTON_API virtual void AddJoint(ndJointBilateralConstraint* const joint);
 	D_NEWTON_API virtual void RemoveJoint(ndJointBilateralConstraint* const joint);
 
 	D_NEWTON_API virtual void AddModel(ndModel* const model);
 	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
-	D_NEWTON_API virtual void DeleteBody(ndBody* const body);
 
 	D_NEWTON_API void Load(const char* const path);
 	D_NEWTON_API void Load(const nd::TiXmlElement* const rootNode, const char* const assetPath);
@@ -121,9 +122,6 @@ class ndWorld: public dClassAlloc
 	D_NEWTON_API virtual void UpdateSkeletons();
 	D_NEWTON_API virtual void UpdateTransforms();
 	D_NEWTON_API virtual void ApplyExternalForces();
-	//D_NEWTON_API virtual void UpdatePrelisteners();
-	//D_NEWTON_API virtual void UpdatePostlisteners();
-	//D_NEWTON_API virtual void UpdateListenersPostTransform();
 
 	private:
 	class dgSolverProgressiveSleepEntry
@@ -179,7 +177,9 @@ class ndWorld: public dClassAlloc
 	ndSolverModes m_solverMode;
 	dInt32 m_solverIterations;
 	dUnsigned32 m_frameIndex;
+	bool m_inUpdate;
 	bool m_collisionUpdate;
+	
 
 	friend class ndScene;
 	friend class ndDynamicsUpdate;

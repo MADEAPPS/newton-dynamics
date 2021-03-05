@@ -320,7 +320,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		return tireBody;
 	}
 
-	void Update(const ndWorld* const world, dFloat32 timestep)
+	void Update(ndWorld* const world, dFloat32 timestep)
 	{
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 

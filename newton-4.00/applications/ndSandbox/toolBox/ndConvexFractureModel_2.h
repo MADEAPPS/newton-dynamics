@@ -66,8 +66,9 @@ class ndConvexFractureModel_2: public ndModel
 
 	void AddEffect(const ndEffect& effect, dFloat32 mass, const dMatrix& location);
 
-	virtual void AppUpdate(ndWorld* const world);
-	virtual void Update(const ndWorld* const world, dFloat32 timestep);
+	//virtual void AppUpdate(ndWorld* const world);
+	virtual void Update(ndWorld* const world, dFloat32 timestep);
+	virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
 
 	void UpdateEffect(ndWorld* const world, ndEffect& effect);
 

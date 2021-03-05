@@ -227,7 +227,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_showContactPoints;
 	bool m_showJointDebugInfo;
 	bool m_showModelsDebugInfo;
-	bool m_showListenersDebugInfo;
 	bool m_showCollidingFaces;
 	bool m_suspendPhysicsUpdate;
 	bool m_synchronousPhysicsUpdate;

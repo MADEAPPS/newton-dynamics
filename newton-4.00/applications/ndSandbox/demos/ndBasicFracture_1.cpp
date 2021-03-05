@@ -190,8 +190,6 @@ void ndBasicFracture_1(ndDemoEntityManager* const scene)
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndConvexFractureModel_1* const fractureManager = new ndConvexFractureModel_1(scene);
 	world->AddModel(fractureManager);
-	dAssert(0);
-	//world->RegisterModelUpdate(fractureManager);
 
 	dMatrix matrix(dGetIdentityMatrix());
 

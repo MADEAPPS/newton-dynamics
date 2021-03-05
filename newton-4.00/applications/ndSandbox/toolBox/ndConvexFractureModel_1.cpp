@@ -190,7 +190,7 @@ ndConvexFractureModel_1::~ndConvexFractureModel_1()
 {
 }
 
-void ndConvexFractureModel_1::Update(const ndWorld* const world, dFloat32 timestep)
+void ndConvexFractureModel_1::Update(ndWorld* const world, dFloat32 timestep)
 {
 	dList<ndEffect>::dListNode* nextNody;
 	for (dList<ndEffect>::dListNode* node = m_effectList.GetFirst(); node; node = nextNody)
@@ -229,19 +229,20 @@ void ndConvexFractureModel_1::Update(const ndWorld* const world, dFloat32 timest
 	}
 }
 
-void ndConvexFractureModel_1::AppUpdate(ndWorld* const world)
+void ndConvexFractureModel_1::PostUpdate(ndWorld* const world, dFloat32 timestep)
 {
 	if (m_pendingEffect.GetCount())
 	{
 		D_TRACKTIME();
-		world->Sync();
 		dList<ndEffect>::dListNode* next;
+		ndPhysicsWorld* const appWorld = (ndPhysicsWorld*)world;
 		for (dList<ndEffect>::dListNode* node = m_pendingEffect.GetFirst(); node; node = next)
 		{
 			next = node->GetNext();
 			ndEffect& effect = node->GetInfo();
 			UpdateEffect(world, effect);
-			world->DeleteBody(effect.m_body);
+			//world->DeleteBody(effect.m_body);
+			appWorld->QueueBodyForDelete(effect.m_body);
 			m_pendingEffect.Remove(node);
 		}
 	}

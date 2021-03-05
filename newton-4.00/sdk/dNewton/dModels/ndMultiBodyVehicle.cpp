@@ -451,7 +451,7 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 }
 
 
-void ndMultiBodyVehicle::Update(const ndWorld* const world, dFloat32 timestep)
+void ndMultiBodyVehicle::Update(ndWorld* const world, dFloat32 timestep)
 {
 //static dInt32 xxxx;
 //if (xxxx >= 550) {

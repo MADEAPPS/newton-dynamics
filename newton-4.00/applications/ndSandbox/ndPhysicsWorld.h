@@ -25,12 +25,19 @@ class ndPhysicsWorld: public ndWorld
 	void AdvanceTime(dFloat32 timestep);
 	ndDemoEntityManager* GetManager() const;
 
+	void QueueBodyForDelete(ndBody* const body);
+
 	private:
 	void OnPostUpdate(dFloat32 timestep);
 	ndBody* LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath) const;
 
+	void DeletePendingObjects();
+
 	ndDemoEntityManager* m_manager;
 	dFloat32 m_timeAccumulator;
+	dArray<ndBody*> m_deletedBodies;
+	dAtomic<bool> m_hasPendingObjectToDelete;
+	dSpinLock m_deletedLock;
 };
 
 #endif

@@ -38,8 +38,8 @@
 //#define DEFAULT_SCENE	7		// setting basic joints
 //#define DEFAULT_SCENE	8		// setting basic vehicle
 //#define DEFAULT_SCENE	9		// conservation of angular momentum 
-#define DEFAULT_SCENE	10		// basic voronoi fracture
-//#define DEFAULT_SCENE	11		// simple voronoi fracture
+//#define DEFAULT_SCENE	10		// basic voronoi fracture
+#define DEFAULT_SCENE	11		// simple voronoi fracture
 //#define DEFAULT_SCENE	12		// linked voronoi fracture
 //#define DEFAULT_SCENE	13		// skin peel voronoi fracture
 						 
@@ -146,7 +146,6 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_showContactPoints(false)
 	,m_showJointDebugInfo(false)
 	,m_showModelsDebugInfo(false)
-	,m_showListenersDebugInfo(false)
 	,m_showCollidingFaces(false)
 	,m_suspendPhysicsUpdate(false)
 	,m_synchronousPhysicsUpdate(false)
@@ -256,7 +255,6 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 2;
 	m_collisionDisplayMode = 3;
-	//m_showListenersDebugInfo = true;
 	//m_synchronousPhysicsUpdate = false;
 
 	Cleanup();
@@ -674,7 +672,6 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show body frame", &m_showBodyFrame);
 			ImGui::Checkbox("show joints debug info", &m_showJointDebugInfo);
 			ImGui::Checkbox("show models debug info", &m_showModelsDebugInfo);
-			ImGui::Checkbox("show listeners debug info", &m_showListenersDebugInfo);
 			ImGui::Checkbox("show colliding faces", &m_showCollidingFaces);
 
 			ImGui::EndMenu();
@@ -1380,12 +1377,6 @@ void ndDemoEntityManager::RenderScene()
 	//
 	//if (m_showBodyFrame) {
 	//	RenderBodyFrame(m_world);
-	//}
-
-	//if (m_showListenersDebugInfo) {
-	//	dJointDebugDisplay listenerDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
-	//	listenerDebugRender.SetScale(0.5f);
-	//	RenderListenersDebugInfo (m_world, &listenerDebugRender);
 	//}
 
 	if (m_showJointDebugInfo) 

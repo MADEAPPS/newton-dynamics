@@ -73,7 +73,8 @@ class ndMultiBodyVehicle: public ndModel
 
 	protected:
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
-	D_NEWTON_API virtual void Update(const ndWorld* const world, dFloat32 timestep);
+	D_NEWTON_API virtual void Update(ndWorld* const world, dFloat32 timestep);
+	virtual void PostUpdate(ndWorld* const world, dFloat32 timestep) {}
 
 	dMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;

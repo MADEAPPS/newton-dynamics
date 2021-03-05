@@ -36,10 +36,11 @@ class ndModel: public dClassAlloc
 	virtual ~ndModel ();
 
 	virtual void Debug(ndConstraintDebugCallback& context) const;
-	virtual void PostUpdate(const ndWorld* const world, dFloat32 timestep);
 
 	protected:
-	virtual void Update(const ndWorld* const world, dFloat32 timestep) = 0;
+	virtual void Update(ndWorld* const world, dFloat32 timestep) = 0;
+	virtual void PostUpdate(ndWorld* const world, dFloat32 timestep) = 0;
+
 	ndModelList::dListNode* m_node;
 
 	friend class ndWorld;
@@ -57,10 +58,6 @@ inline ndModel::~ndModel()
 }
 
 inline void ndModel::Debug(ndConstraintDebugCallback& context) const
-{
-}
-
-inline void ndModel::PostUpdate(const ndWorld* const world, dFloat32 timestep)
 {
 }
 

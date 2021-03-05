@@ -53,6 +53,7 @@ ndWorld::ndWorld()
 	,m_solverMode(ndStandardSolver)
 	,m_solverIterations(4)
 	,m_frameIndex(0)
+	,m_inUpdate(false)
 	,m_collisionUpdate(true)
 {
 	// start the engine thread;
@@ -245,6 +246,7 @@ bool ndWorld::AddBody(ndBody* const body)
 
 void ndWorld::RemoveBody(ndBody* const body)
 {
+	dAssert(!m_inUpdate);
 	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
 	dAssert(kinematicBody != m_sentinelBody);
 	if (kinematicBody)
@@ -261,6 +263,7 @@ void ndWorld::RemoveBody(ndBody* const body)
 
 void ndWorld::DeleteBody(ndBody* const body)
 {
+	dAssert(!m_inUpdate);
 	RemoveBody(body);
 	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
 	if (kinematicBody)
@@ -289,6 +292,7 @@ void ndWorld::AddJoint(ndJointBilateralConstraint* const joint)
 
 void ndWorld::RemoveJoint(ndJointBilateralConstraint* const joint)
 {
+	dAssert(!m_inUpdate);
 	dAssert(joint->m_worldNode != nullptr);
 	dAssert(joint->m_body0Node != nullptr);
 	dAssert(joint->m_body1Node != nullptr);
@@ -315,6 +319,7 @@ void ndWorld::AddModel(ndModel* const model)
 
 void ndWorld::RemoveModel(ndModel* const model)
 {
+	dAssert(!m_inUpdate);
 	if (model->m_node)
 	{
 		m_modelList.Remove(model->m_node);
@@ -617,15 +622,19 @@ void ndWorld::ThreadFunction()
 {
 	dUnsigned64 timeAcc = dGetTimeInMicrosenconds();
 	const bool collisionUpdate = m_collisionUpdate;
-	m_collisionUpdate = true;
+	m_inUpdate = true;
+
 	if (collisionUpdate)
 	{
+		m_collisionUpdate = true;
 		m_scene->CollisionOnlyUpdate();
+		m_inUpdate = false;
 	}
 	else
 	{
 		D_TRACKTIME();
 		m_scene->Begin();
+		m_collisionUpdate = true;
 		m_scene->BalanceScene();
 
 		dInt32 const steps = m_subSteps;
@@ -637,7 +646,7 @@ void ndWorld::ThreadFunction()
 
 		m_scene->SetTimestep(m_timestep);
 		UpdateTransforms();
-		//UpdateListenersPostTransform();
+		m_inUpdate = false;
 		PostUpdate(m_timestep);
 		m_scene->End();
 	}

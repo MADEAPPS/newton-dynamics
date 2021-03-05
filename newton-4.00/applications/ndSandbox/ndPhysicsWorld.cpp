@@ -25,6 +25,9 @@ ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	:ndWorld()
 	,m_manager(manager)
 	,m_timeAccumulator(0.0f)
+	,m_deletedBodies()
+	,m_hasPendingObjectToDelete(false)
+	,m_deletedLock()
 {
 	ClearCache();
 	SetContactNotify(new ndContactCallback);
@@ -37,6 +40,27 @@ ndPhysicsWorld::~ndPhysicsWorld()
 ndDemoEntityManager* ndPhysicsWorld::GetManager() const
 {
 	return m_manager;
+}
+
+void ndPhysicsWorld::QueueBodyForDelete(ndBody* const body)
+{
+	dScopeSpinLock lock(m_deletedLock);
+	m_hasPendingObjectToDelete.store(true);
+	m_deletedBodies.PushBack(body);
+}
+
+void ndPhysicsWorld::DeletePendingObjects()
+{
+	if (!m_hasPendingObjectToDelete.load())
+	{
+		Sync();
+		m_hasPendingObjectToDelete.store(false);
+		for (dInt32 i = 0; i < m_deletedBodies.GetCount(); i++)
+		{
+			DeleteBody(m_deletedBodies[i]);
+		}
+		m_deletedBodies.SetCount(0);
+	}
 }
 
 void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
@@ -58,6 +82,8 @@ void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
 	{
 		Update(descreteStep);
 		m_timeAccumulator -= descreteStep;
+
+		DeletePendingObjects();
 
 		//xxxx++;
 		//if (xxxx == 500)

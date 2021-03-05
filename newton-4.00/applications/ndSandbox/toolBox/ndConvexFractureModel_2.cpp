@@ -197,7 +197,7 @@ ndConvexFractureModel_2::~ndConvexFractureModel_2()
 {
 }
 
-void ndConvexFractureModel_2::Update(const ndWorld* const world, dFloat32 timestep)
+void ndConvexFractureModel_2::Update(ndWorld* const world, dFloat32 timestep)
 {
 	dAssert(0);
 	dList<ndEffect>::dListNode* nextNody;
@@ -237,13 +237,12 @@ void ndConvexFractureModel_2::Update(const ndWorld* const world, dFloat32 timest
 	}
 }
 
-void ndConvexFractureModel_2::AppUpdate(ndWorld* const world)
+void ndConvexFractureModel_2::PostUpdate(ndWorld* const world, dFloat32 timestep)
 {
 	dAssert(0);
 	if (m_pendingEffect.GetCount())
 	{
 		D_TRACKTIME();
-		world->Sync();
 		dList<ndEffect>::dListNode* next;
 		for (dList<ndEffect>::dListNode* node = m_pendingEffect.GetFirst(); node; node = next)
 		{
