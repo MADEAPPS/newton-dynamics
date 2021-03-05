@@ -392,13 +392,14 @@ ndSkeletonContainer::ndNode* ndSkeletonContainer::AddChild(ndJointBilateralConst
 	node->m_swapJacobianBodiesIndex = (joint->GetBody0() == parent->m_body);
 
 	dAssert(node->m_parent);
-	dAssert(node->m_body->GetInvMass() != dFloat32(0.0f));
 #ifdef _DEBUG
 	if (node->m_body->GetInvMass() != dFloat32(0.0f))
 	{
 		dTrace(("%s %f %f\n", joint->GetClassName(), joint->GetBody0()->GetInvMass(), joint->GetBody1()->GetInvMass()));
 	}
 #endif
+	dAssert(node->m_body->GetInvMass() != dFloat32(0.0f));
+
 	if (node->m_parent->m_child)
 	{
 		node->m_sibling = node->m_parent->m_child;
