@@ -217,11 +217,6 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 		indexCount += meshNode->GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	//dArray<dInt32> indices(indexCount);
-	//dArray<ndMeshPointUV> points(vertexCount);
-	//points.SetCount(vertexCount);
-	//indices.SetCount(indexCount);
-
 	//dInt32* const indices = dAlloca(dInt32, indexCount);
 	//ndMeshPointUV* const points = dAlloca(ndMeshPointUV, vertexCount);
 	dArray<dInt32> indices;
