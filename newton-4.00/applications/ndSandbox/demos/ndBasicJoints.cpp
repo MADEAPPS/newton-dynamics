@@ -99,6 +99,20 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 	mesh->Release();
 }
 
+static void BuildBall(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 diameter)
+{
+	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+	//
+	ndShapeInstance shape2(new ndShapeSphere(diameter * 0.5f));
+	ndDemoMesh* const mesh2 = new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "marble.tga", "marble.tga", "marble.tga");
+	matrix.m_posit.m_y += 5.0f;
+	ndBodyDynamic* const bodyA = MakePrimitive(scene, matrix, shape2, mesh2, mass);
+	mesh2->Release();
+	//
+}
+
 static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 diameter)
 {
 	//ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
@@ -306,12 +320,13 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene);
 
-	BuildBallSocket(scene, dVector(0.0f, 0.0f, 1.0f, 0.0f));
+	//BuildBallSocket(scene, dVector(0.0f, 0.0f, 1.0f, 0.0f));
 	BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
 	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 0.5f);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 10.0f, 0.5f);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
-	AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
+	BuildBall(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
+	//BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 10.0f, 0.5f);
+	//BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
+	//AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	dQuaternion rot;
 	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
