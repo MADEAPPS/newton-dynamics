@@ -150,7 +150,7 @@ class ndWorld: public dClassAlloc
 	void LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
 	void LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
 
-	static dInt32 CompareIslandMember(const ndIslandMember* const A, const ndIslandMember* const B, void* const context);
+	bool SkeletonJointTest(ndJointBilateralConstraint* const jointA) const;
 	static dInt32 CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void* notUsed);
 
 	ndScene* m_scene;

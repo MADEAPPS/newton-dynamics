@@ -98,12 +98,13 @@ class ndBody: public dClassAlloc
 		{
 			dUnsigned32 m_resting : 1;
 			dUnsigned32 m_autoSleep : 1;
+			dUnsigned32 m_equilibrium : 1;
 			dUnsigned32 m_islandSleep : 1;
 			dUnsigned32 m_solverSleep0 : 1;
 			dUnsigned32 m_solverSleep1 : 1;
-			dUnsigned32 m_equilibrium : 1;
-			//dUnsigned32 m_gyroTorqueOn : 1;
 			dUnsigned32 m_skeletonMark : 1;
+			dUnsigned32 m_skeletonMark0 : 1;
+			dUnsigned32 m_skeletonMark1 : 1;
 			dUnsigned32 m_contactTestOnly : 1;
 			dUnsigned32 m_transformIsDirty : 1;
 			dUnsigned32 m_bodyIsConstrained : 1;
@@ -112,8 +113,8 @@ class ndBody: public dClassAlloc
 		};
 	};
 
-	dUnsigned32 m_uniqueID;
-	static dUnsigned32 m_uniqueIDCount;
+	dUnsigned32 m_uniqueId;
+	static dUnsigned32 m_uniqueIdCount;
 
 	friend class ndScene;
 	friend class ndConstraint;
@@ -123,7 +124,7 @@ class ndBody: public dClassAlloc
 
 inline dUnsigned32 ndBody::GetId() const
 {
-	return m_uniqueID;
+	return m_uniqueId;
 }
 
 inline ndBodyNotify* ndBody::GetNotifyCallback() const

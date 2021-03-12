@@ -39,7 +39,7 @@ ndMultiBodyVehicleRotor::ndMultiBodyVehicleRotor(ndBodyKinematic* const motor, n
 	,m_engineTorque(D_ENGINE_NOMINAL_TORQUE)
 	,m_startEngine(false)
 {
-	SetSolverModel(m_closeLoop);
+	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
 void ndMultiBodyVehicleRotor::SetGasValve(dFloat32 gasValveSeconds)

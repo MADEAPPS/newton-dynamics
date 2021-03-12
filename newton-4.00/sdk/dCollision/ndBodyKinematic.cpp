@@ -433,7 +433,7 @@ void ndBodyKinematic::IntegrateVelocity(dFloat32 timestep)
 	const dFloat32 speed2 = m_veloc.DotProduct(m_veloc).GetScalar() * timestep * timestep;;
 	if ((step2 > err2) || (speed2 > m_maxLinearSpeed))
 	{
-		dTrace(("warning bodies %d w(%f %f %f) v(%f %f %f) with very high velocity or angular velocity, may be unstable\n", m_uniqueID,
+		dTrace(("warning bodies %d w(%f %f %f) v(%f %f %f) with very high velocity or angular velocity, may be unstable\n", m_uniqueId,
 			m_omega.m_x, m_omega.m_y, m_omega.m_z, m_veloc.m_x, m_veloc.m_y, m_veloc.m_z));
 		//dAssert(0);
 	}

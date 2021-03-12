@@ -24,13 +24,10 @@
 #include "ndMultiBodyVehicleGearBox.h"
 
 ndJointVehicleMotorGearBox::ndJointVehicleMotorGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential)
-	//:ndJointBilateralConstraint(1, motor, differential, motor->GetMatrix())
-	:ndJointGear(dFloat32 (1.0f), 
-		motor->GetMatrix().m_front, differential,
-		motor->GetMatrix().m_front, motor)
+	:ndJointGear(dFloat32 (1.0f), motor->GetMatrix().m_front, differential,	motor->GetMatrix().m_front, motor)
 {
 	SetRatio(dFloat32(4.0f));
-	SetSolverModel(m_closeLoop);
+	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
 void ndJointVehicleMotorGearBox::JacobianDerivative(ndConstraintDescritor& desc)

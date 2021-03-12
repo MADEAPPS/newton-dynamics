@@ -51,12 +51,13 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKine
 
 	CalculateLocalMatrix(globalMatrix, m_localMatrix0, m_localMatrix1);
 
-	m_mark = 0;
+	m_mark0 = 0;
+	m_mark1	= 0;
 	m_maxDof = maxDof;
 	m_rowIsMotor = 0;
 	m_isInSkeleton = 0;
 	m_enableCollision = 0;
-	m_solverModel = m_primaryOpenLoop;
+	m_solverModel = m_jointkinematicOpenLoop;
 
 	m_defualtDiagonalRegularizer = dFloat32(0.0f);
 	m_maxAngleError = dFloat32(5.0f) * dDegreeToRad;

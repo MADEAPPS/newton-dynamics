@@ -28,8 +28,8 @@
 class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 {
 	public:
+	ND_JOINT_RELECTION(ndMultiBodyVehicleMotor);
 	D_NEWTON_API ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis);
-
 
 	private:
 	void AlignMatrix();

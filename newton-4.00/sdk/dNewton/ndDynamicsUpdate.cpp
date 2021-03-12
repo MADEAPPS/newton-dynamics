@@ -592,7 +592,7 @@ void ndDynamicsUpdate::GetJacobianDerivatives(ndConstraint* const joint)
 	{
 		ndJointBilateralConstraint* const bilareral = joint->GetAsBilateral();
 		dAssert(bilareral);
-		if (!bilareral->m_isInSkeleton && (bilareral->GetSolverModel() == m_secundaryCloseLoop))
+		if (!bilareral->m_isInSkeleton && (bilareral->GetSolverModel() == m_jointkinematicAttachment))
 		{
 			ndSkeletonContainer* const skeleton0 = bilareral->m_body0->GetSkeleton();
 			ndSkeletonContainer* const skeleton1 = bilareral->m_body1->GetSkeleton();

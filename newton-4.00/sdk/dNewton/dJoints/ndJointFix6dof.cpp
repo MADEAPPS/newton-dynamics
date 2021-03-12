@@ -40,7 +40,8 @@ ndJointFix6dof::~ndJointFix6dof()
 
 void ndJointFix6dof::SetAsSoftJoint(bool mode)
 {
-	SetSolverModel(mode ? m_secundaryCloseLoop : m_primaryOpenLoop);
+	dAssert(0);
+	//SetSolverModel(mode ? m_secundaryCloseLoop : m_primaryOpenLoop);
 }
 
 void ndJointFix6dof::SetRegularizer(dFloat32 regularizer)

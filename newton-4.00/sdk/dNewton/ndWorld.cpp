@@ -31,6 +31,50 @@
 #include "ndDynamicsUpdateAvx2.h"
 #include "ndJointBilateralConstraint.h"
 
+class ndSkeletonQueue : public dFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>
+{
+public:
+	ndSkeletonQueue()
+		:dFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>()
+		, m_mod(sizeof(m_array) / sizeof(m_array[0]))
+	{
+		m_lastIndex = 0;
+		m_firstIndex = 0;
+	}
+
+	void Push(ndSkeletonContainer::ndNode* const node)
+	{
+		m_firstIndex++;
+		const dInt32 count = m_firstIndex - m_lastIndex;
+		dInt32 slot = count - 1;
+		for (; (slot > 0) && (m_array[m_lastIndex + slot - 1]->m_joint->GetSolverModel()); slot--)
+		{
+			m_array[m_lastIndex + slot] = m_array[m_lastIndex + slot - 1];
+		}
+		m_array[m_lastIndex + slot] = node;
+
+		if (m_firstIndex >= m_mod)
+		{
+			m_firstIndex = 0;
+		}
+		dAssert(m_firstIndex != m_lastIndex);
+	}
+
+	void Reset()
+	{
+		m_lastIndex = m_firstIndex;
+	}
+
+	bool IsEmpty() const
+	{
+		return (m_firstIndex == m_lastIndex);
+	}
+
+	dInt32 m_lastIndex;
+	dInt32 m_firstIndex;
+	dInt32 m_mod;
+};
+
 ndWorld::ndWorld()
 	:dClassAlloc()
 	,m_scene(nullptr)
@@ -281,7 +325,7 @@ void ndWorld::DeleteBody(ndBody* const body)
 void ndWorld::AddJoint(ndJointBilateralConstraint* const joint)
 {
 	dAssert(joint->m_worldNode == nullptr);
-	if (joint->GetSolverModel() < m_secundaryCloseLoop)
+	if (joint->IsSkeleton())
 	{
 		m_skeletonList.m_skelListIsDirty = true;
 	}
@@ -300,7 +344,7 @@ void ndWorld::RemoveJoint(ndJointBilateralConstraint* const joint)
 	joint->GetBody1()->DetachJoint(joint->m_body1Node);
 
 	m_jointList.Remove(joint->m_worldNode);
-	if (joint->GetSolverModel() < m_secundaryCloseLoop)
+	if (joint->IsSkeleton())
 	{
 		m_skeletonList.m_skelListIsDirty = true;
 	}
@@ -352,35 +396,6 @@ dInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const jo
 		{
 			return 1;
 		}
-	}
-	return 0;
-}
-
-dInt32 ndWorld::CompareIslandMember(const ndIslandMember* const A, const ndIslandMember* const B, void* const context)
-{
-	//dInt32 ida = A->m_root->m_index * 2 + ((A->m_body->GetInvMass() == dFloat32(0.0f)) ? 0 : 1);
-	//dInt32 idb = B->m_root->m_index * 2 + ((B->m_body->GetInvMass() == dFloat32(0.0f)) ? 0 : 1);
-
-	const dInt32 ida = A->m_root->m_index;
-	const dInt32 idb = B->m_root->m_index;
-	if (ida > idb)
-	{
-		return 1;
-	}
-	else if (ida < idb)
-	{
-		return -1;
-	}
-
-	const dFloat32 invMass0 = A->m_body->GetInvMass();
-	const dFloat32 invMass1 = B->m_body->GetInvMass();
-	if (invMass0 > invMass1)
-	{
-		return 1;
-	}
-	else if (invMass0 < invMass1)
-	{
-		return -1;
 	}
 	return 0;
 }
@@ -726,250 +741,6 @@ void ndWorld::ParticleUpdate()
 	}
 }
 
-void ndWorld::UpdateSkeletons()
-{
-	D_TRACKTIME();
-
-	if (m_skeletonList.m_skelListIsDirty)
-	{
-		m_skeletonList.m_skelListIsDirty = false;
-		while (m_skeletonList.GetFirst())
-		{
-			m_skeletonList.Remove(m_skeletonList.GetFirst());
-		}
-
-		m_scene->BuildBodyArray();
-		ndDynamicsUpdate& solverUpdate = *m_solver;
-		for (ndJointList::dListNode* node = m_jointList.GetFirst(); node; node = node->GetNext())
-		{
-			ndJointBilateralConstraint* const constraint = node->GetInfo();
-			dAssert(constraint && constraint->GetAsBilateral());
-			bool test = constraint->GetSolverModel() < m_closeLoop;
-			test = test && (constraint->m_preconditioner0 == dFloat32(1.0f));
-			test = test && (constraint->m_preconditioner1 == dFloat32(1.0f));
-			test = test && (constraint->GetRowsCount() > 0);
-
-			constraint->m_mark = 1;
-			if (test)
-			{
-				ndBodyKinematic* const body0 = constraint->GetBody0();
-				ndBodyKinematic* const body1 = constraint->GetBody1();
-				if (body1->GetInvMass() > dFloat32(0.0f))
-				{
-					ndBodyKinematic* root0 = solverUpdate.FindRootAndSplit(body0);
-					ndBodyKinematic* root1 = solverUpdate.FindRootAndSplit(body1);
-					if (root0 != root1)
-					{
-						if (root0->m_rank > root1->m_rank)
-						{
-							dSwap(root0, root1);
-						}
-						root0->m_islandParent = root1;
-						if (root0->m_rank == root1->m_rank)
-						{
-							root1->m_rank += 1;
-							dAssert(root1->m_rank <= 6);
-						}
-					}
-				}
-			}
-		}
-
-		const dArray<ndBodyKinematic*>& bodyArray = m_scene->GetActiveBodyArray();
-		solverUpdate.m_leftHandSide.SetCount(dMax (bodyArray.GetCount() * 2,  D_DEFAULT_BUFFER_SIZE));
-		ndIslandMember* const islands = (ndIslandMember*)&solverUpdate.m_leftHandSide[0];
-
-		dInt32 entriesCount = 0;
-		for (dInt32 i = bodyArray.GetCount() - 1; i >= 0; i--)
-		{
-			ndBodyKinematic* const body = bodyArray[i];
-			body->m_index = -1;
-			body->m_skeletonMark = 1;
-			if (body->GetInvMass() > dFloat32(0.0f))
-			{
-				ndIslandMember& entry = islands[entriesCount];
-				entry.m_body = body;
-				entry.m_root = solverUpdate.FindRootAndSplit(body);
-				entriesCount++;
-			}
-		}
-
-		dInt32 inslandCount = 0;
-		for (ndJointList::dListNode* node = m_jointList.GetFirst(); node; node = node->GetNext())
-		{
-			ndJointBilateralConstraint* const constraint = node->GetInfo();
-			ndBodyKinematic* const root = solverUpdate.FindRootAndSplit(constraint->GetBody0());
-			if (root->m_index < 0)
-			{
-				root->m_index = inslandCount;
-				inslandCount++;
-			}
-
-			if (constraint->GetSolverModel() < m_closeLoop)
-			{
-				ndBodyKinematic* const body = constraint->GetBody1();
-				if (body->GetInvMass() == dFloat32(0.0f))
-				{
-					if (root->m_rank >= 0)
-					{
-						root->m_rank = -1;
-						ndIslandMember& entry = islands[entriesCount];
-						entry.m_body = body;
-						entry.m_root = root;
-						entriesCount++;
-					}
-				}
-			}
-		}
-
-		dSort(islands, entriesCount, CompareIslandMember);
-
-		dInt32* const scans = dAlloca(dInt32, inslandCount + 256);
-		memset(scans, 0, sizeof(dInt32) * (inslandCount + 256));
-		for (dInt32 i = 0; i < entriesCount; i++)
-		{
-			dInt32 index = islands[i].m_root->m_index;
-			scans[index] ++;
-		}
-
-		dInt32 acc = 0;
-		for (dInt32 i = 0; i < inslandCount + 1; i++)
-		{
-			dInt32 count = scans[i];
-			scans[i] = acc;
-			acc += count;
-		}
-
-		class ndQueue : public dFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>
-		{
-			public:
-			ndQueue()
-				:dFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>()
-				,m_mod(sizeof(m_array) / sizeof(m_array[0]))
-			{
-				m_lastIndex = 0;
-				m_firstIndex = 0;
-			}
-
-			void Push(ndSkeletonContainer::ndNode* const node)
-			{
-				m_firstIndex++;
-				const dInt32 count = m_firstIndex - m_lastIndex;
-				dInt32 slot = count - 1;
-				for (; (slot > 0) && (m_array[m_lastIndex + slot - 1]->m_joint->GetSolverModel()); slot--)
-				{
-					m_array[m_lastIndex + slot] = m_array[m_lastIndex + slot - 1];
-				}
-				m_array[m_lastIndex + slot] = node;
-
-				if (m_firstIndex >= m_mod)
-				{
-					m_firstIndex = 0;
-				}
-				dAssert(m_firstIndex != m_lastIndex);
-			}
-
-			void Reset()
-			{
-				m_lastIndex = m_firstIndex;
-			}
-
-			bool IsEmpty() const
-			{
-				return (m_firstIndex == m_lastIndex);
-			}
-
-			dInt32 m_lastIndex;
-			dInt32 m_firstIndex;
-			dInt32 m_mod;
-		};
-
-		for (dInt32 i = 0; i < inslandCount; i++)
-		{
-			ndQueue queuePool;
-			ndJointBilateralConstraint* loopJoints[128];
-
-			dInt32 loopCount = 0;
-			dInt32 start = scans[i];
-			ndBodyKinematic* const rootBody = islands[start].m_body;
-			dInt32 key = solverUpdate.FindRootAndSplit(islands[start].m_root)->m_index;
-			ndSkeletonContainer* const skeleton = m_skeletonList.CreateContatiner(rootBody);
-			ndSkeletonContainer::ndNode* const rootNode = skeleton->GetRoot();
-			for (ndJointList::dListNode* jointNode = rootBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
-			{
-				ndJointBilateralConstraint* const constraint = jointNode->GetInfo();
-				if (constraint->GetSolverModel() < m_closeLoop)
-				{
-					ndBodyKinematic* const childBody = constraint->GetBody0();
-					dInt32 childKey = solverUpdate.FindRootAndSplit(childBody)->m_index;
-					if (childKey == key)
-					{
-						dAssert(constraint->m_mark);
-						dAssert(childBody->GetInvMass() != dFloat32(0.0f));
-						constraint->m_mark = 0;
-						childBody->m_skeletonMark = 0;
-						ndSkeletonContainer::ndNode* const node = skeleton->AddChild((ndJointBilateralConstraint*)constraint, rootNode);
-						queuePool.Push(node);
-					}
-				}
-			}
-
-			while (!queuePool.IsEmpty())
-			{
-				dInt32 count = queuePool.m_firstIndex - queuePool.m_lastIndex;
-				if (count < 0)
-				{
-					count += queuePool.m_mod;
-				}
-
-				dInt32 index = queuePool.m_lastIndex;
-				queuePool.Reset();
-
-				for (dInt32 j = 0; j < count; j++)
-				{
-					ndSkeletonContainer::ndNode* const parentNode = queuePool[index];
-					ndBodyKinematic* const parentBody = parentNode->m_body;
-
-					for (ndJointList::dListNode* jointNode1 = parentBody->m_jointList.GetFirst(); jointNode1; jointNode1 = jointNode1->GetNext())
-					{
-						ndJointBilateralConstraint* const constraint1 = jointNode1->GetInfo();
-						if (constraint1->m_mark)
-						{
-							constraint1->m_mark = 0;
-
-							ndBodyKinematic* const childBody = (constraint1->GetBody0() == parentBody) ? constraint1->GetBody1() : constraint1->GetBody0();
-							if (childBody->m_skeletonMark && (childBody->GetInvMass() != dFloat32(0.0f)))
-							{
-								childBody->m_skeletonMark = 0;
-								ndSkeletonContainer::ndNode* const childNode = skeleton->AddChild(constraint1, parentNode);
-								queuePool.Push(childNode);
-							}
-							else if (loopCount < (sizeof(loopJoints) / sizeof(loopJoints[0])))
-							{
-								loopJoints[loopCount] = (ndJointBilateralConstraint*)constraint1;
-								loopCount++;
-							}
-						}
-					}
-
-					index++;
-					if (index >= queuePool.m_mod)
-					{
-						index = 0;
-					}
-				}
-			}
-			skeleton->Finalize(loopCount, loopJoints);
-		}
-	}
-
-	ndSkeletonList::Iterator iter(m_skeletonList);
-	for (iter.Begin(); iter; iter++)
-	{
-		ndSkeletonContainer* const skeleton = &iter.GetNode()->GetInfo();
-		skeleton->ClearSelfCollision();
-	}
-}
 
 void ndWorld::ModelUpdate()
 {
@@ -1039,4 +810,274 @@ void ndWorld::ModelPostUpdate()
 		}
 	};
 	m_scene->SubmitJobs<ndModelPostUpdate>();
+}
+
+bool ndWorld::SkeletonJointTest(ndJointBilateralConstraint* const constraint) const
+{
+	bool test = true;
+	dAssert(constraint && constraint->GetAsBilateral());
+	test = test && (constraint->m_preconditioner0 == dFloat32(1.0f));
+	test = test && (constraint->m_preconditioner1 == dFloat32(1.0f));
+	test = test && (constraint->GetRowsCount() > 0);
+	test = test && (constraint->IsSkeleton());
+	return test;
+}
+
+void ndWorld::UpdateSkeletons()
+{
+	D_TRACKTIME();
+
+	if (m_skeletonList.m_skelListIsDirty)
+	{
+		m_skeletonList.m_skelListIsDirty = false;
+		while (m_skeletonList.GetFirst())
+		{
+			m_skeletonList.Remove(m_skeletonList.GetFirst());
+		}
+
+		m_scene->BuildBodyArray();
+
+		// build connectivity graph and reset of all joint dirty state
+		ndDynamicsUpdate& solverUpdate = *m_solver;
+		for (ndJointList::dListNode* node = m_jointList.GetFirst(); node; node = node->GetNext())
+		{
+			ndJointBilateralConstraint* const constraint = node->GetInfo();
+			const bool test = SkeletonJointTest(constraint);
+			constraint->m_mark0 = 0;
+			constraint->m_mark1 = 0;
+			if (test)
+			{
+				ndBodyKinematic* const body0 = constraint->GetBody0();
+				ndBodyKinematic* const body1 = constraint->GetBody1();
+				if (body1->GetInvMass() > dFloat32(0.0f))
+				{
+					ndBodyKinematic* root0 = solverUpdate.FindRootAndSplit(body0);
+					ndBodyKinematic* root1 = solverUpdate.FindRootAndSplit(body1);
+					if (root0 != root1)
+					{
+						if (root0->m_rank > root1->m_rank)
+						{
+							dSwap(root0, root1);
+						}
+						root0->m_islandParent = root1;
+						if (root0->m_rank == root1->m_rank)
+						{
+							root1->m_rank += 1;
+							dAssert(root1->m_rank <= 6);
+						}
+					}
+				}
+			}
+		}
+
+		// reset of all bodies dirty state
+		const dArray<ndBodyKinematic*>& bodyArray = m_scene->GetActiveBodyArray();
+		for (dInt32 i = bodyArray.GetCount() - 1; i >= 0; i--)
+		{
+			ndBodyKinematic* const body = bodyArray[i];
+			body->m_index = -1;
+			body->m_skeletonMark = 0;
+			body->m_skeletonMark0 = 0;
+			body->m_skeletonMark1 = 0;
+		}
+
+		// find all root nodes for all independent joint arrangements
+		dInt32 inslandCount = 0;
+		solverUpdate.m_leftHandSide.SetCount(dMax(bodyArray.GetCount() + 256, D_DEFAULT_BUFFER_SIZE));
+		ndIslandMember* const islands = (ndIslandMember*)&solverUpdate.m_leftHandSide[0];
+		for (dInt32 i = 0; i < bodyArray.GetCount(); i++)
+		{
+			ndBodyKinematic* const body = bodyArray[i];
+			if (body->GetInvMass() > dFloat32(0.0f))
+			{
+				ndBodyKinematic* const root = solverUpdate.FindRootAndSplit(body);
+				if (root->m_index == -1)
+				{
+					ndIslandMember& entry = islands[inslandCount];
+					entry.m_body = body;
+					entry.m_root = body;
+					root->m_index = inslandCount;
+					inslandCount++;
+				}
+				dInt32 index = root->m_index;
+				dAssert(index != -1);
+				ndIslandMember& entry = islands[index];
+				if (body->GetInvMass() < entry.m_body->GetInvMass())
+				{
+					entry.m_body = body;
+				}
+			}
+		}
+
+		// build the root node
+		for (dInt32 i = 0; i < inslandCount; i++)
+		{
+			ndSkeletonQueue queuePool;
+			dInt32 stack = 1;
+			ndBodyKinematic* stackPool[256];
+			stackPool[0] = islands[i].m_body;
+			ndSkeletonContainer* skeleton = nullptr;
+
+			// find if this root node is connected to static bodies 
+			// if so, them make that static body the root node and add all the children
+			while (stack)
+			{
+				stack--;
+				ndBodyKinematic* const rootBody = stackPool[stack];
+				if (!rootBody->m_skeletonMark1)
+				{
+					rootBody->m_skeletonMark1 = 1;
+					for (ndJointList::dListNode* jointNode = rootBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+					{
+						ndJointBilateralConstraint* const constraint = jointNode->GetInfo();
+						dAssert(constraint && constraint->GetAsBilateral());
+						if (!constraint->m_mark1)
+						{
+							constraint->m_mark1 = 1;
+							const bool test = SkeletonJointTest(constraint);
+							if (test && (constraint->GetSolverModel() != m_jointkinematicCloseLoop))
+							{
+								ndBodyKinematic* const childBody = (constraint->GetBody0() != rootBody) ? constraint->GetBody0() : constraint->GetBody1();
+								if (childBody->GetInvMass() == dFloat32(0.0f))
+								{
+									if (!skeleton)
+									{
+										skeleton = m_skeletonList.CreateContatiner(childBody);
+									}
+
+									dTrace(("%s %d %d\n", constraint->GetClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
+									constraint->m_mark0 = 1;
+									dAssert(childBody == skeleton->GetRoot()->m_body);
+									ndSkeletonContainer::ndNode* const node = skeleton->AddChild((ndJointBilateralConstraint*)constraint, skeleton->GetRoot());
+									node->m_body->m_skeletonMark = 1;
+									dAssert(node->m_body != childBody);
+									queuePool.Push(node);
+								}
+								else if (!childBody->m_skeletonMark1)
+								{
+									stackPool[stack] = childBody;
+									stack++;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if (queuePool.IsEmpty())
+			{
+				// if this root node is not static, 
+				// them add the first children to this root
+				bool hasJoints = false;
+				ndBodyKinematic* const rootBody = islands[i].m_body;
+				rootBody->m_skeletonMark0 = 1;
+				for (ndJointList::dListNode* jointNode = rootBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+				{
+					ndJointBilateralConstraint* const constraint = jointNode->GetInfo();
+				
+					const bool test = SkeletonJointTest(constraint);
+					if (test && (constraint->GetSolverModel() != m_jointkinematicCloseLoop))
+					{
+						ndBodyKinematic* const childBody = (constraint->GetBody0() != rootBody) ? constraint->GetBody0() : constraint->GetBody1();
+						if (childBody->GetInvMass())
+						{
+							hasJoints = true;
+							break;
+						}
+					}
+				}
+
+				if (hasJoints)
+				{
+					// the root node is not static and has children, 
+					// them add the first children to this root
+					skeleton = m_skeletonList.CreateContatiner(rootBody);
+
+					for (ndJointList::dListNode* jointNode = rootBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+					{
+						ndJointBilateralConstraint* const constraint = jointNode->GetInfo();
+						dTrace(("%s %d %d\n", constraint->GetClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
+						const bool test = SkeletonJointTest(constraint);
+						if (test && (constraint->GetSolverModel() != m_jointkinematicCloseLoop))
+						{
+							constraint->m_mark0 = 1;
+							dAssert(skeleton->GetRoot()->m_body != ((constraint->GetBody0() != rootBody) ? constraint->GetBody0() : constraint->GetBody1()));
+							ndSkeletonContainer::ndNode* const node = skeleton->AddChild((ndJointBilateralConstraint*)constraint, skeleton->GetRoot());
+							node->m_body->m_skeletonMark = 1;
+							dAssert(node->m_body == ((constraint->GetBody0() != rootBody) ? constraint->GetBody0() : constraint->GetBody1()));
+							queuePool.Push(node);
+						}
+					}
+				}
+			}
+
+			if (skeleton)
+			{
+				// add the rest the children to this skeleton
+				dInt32 loopCount = 0;
+				ndJointBilateralConstraint* loopJoints[128];
+
+				while (!queuePool.IsEmpty())
+				{
+					dInt32 count = queuePool.m_firstIndex - queuePool.m_lastIndex;
+					if (count < 0)
+					{
+						count += queuePool.m_mod;
+					}
+
+					dInt32 index = queuePool.m_lastIndex;
+					queuePool.Reset();
+
+					for (dInt32 j = 0; j < count; j++)
+					{
+						ndSkeletonContainer::ndNode* const parentNode = queuePool[index];
+						ndBodyKinematic* const parentBody = parentNode->m_body;
+						dAssert(parentBody->GetId() > dFloat32(0.0f));
+						if (!parentBody->m_skeletonMark0)
+						{
+							parentBody->m_skeletonMark0 = 1;
+							for (ndJointList::dListNode* jointNode = parentBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+							{
+								ndJointBilateralConstraint* const constraint = jointNode->GetInfo();
+								if (!constraint->m_mark0)
+								{
+									dTrace(("%s %d %d\n", constraint->GetClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
+									constraint->m_mark0 = 1;
+									if (SkeletonJointTest(constraint))
+									{
+										ndBodyKinematic* const childBody = (constraint->GetBody0() == parentBody) ? constraint->GetBody1() : constraint->GetBody0();
+										if (!childBody->m_skeletonMark && (childBody->GetInvMass() != dFloat32(0.0f)))
+										{
+											childBody->m_skeletonMark = 1;
+											ndSkeletonContainer::ndNode* const childNode = skeleton->AddChild(constraint, parentNode);
+											queuePool.Push(childNode);
+										}
+										else if (loopCount < (sizeof(loopJoints) / sizeof(loopJoints[0])))
+										{
+											loopJoints[loopCount] = (ndJointBilateralConstraint*)constraint;
+											loopCount++;
+										}
+									}
+								}
+							}
+						}
+
+						index++;
+						if (index >= queuePool.m_mod)
+						{
+							index = 0;
+						}
+					}
+				}
+				skeleton->Finalize(loopCount, loopJoints);
+			}
+		}
+	}
+
+	ndSkeletonList::Iterator iter(m_skeletonList);
+	for (iter.Begin(); iter; iter++)
+	{
+		ndSkeletonContainer* const skeleton = &iter.GetNode()->GetInfo();
+		skeleton->ClearSelfCollision();
+	}
 }

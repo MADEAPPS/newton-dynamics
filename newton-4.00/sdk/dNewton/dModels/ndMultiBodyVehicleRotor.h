@@ -28,6 +28,7 @@
 class ndMultiBodyVehicleRotor: public ndJointBilateralConstraint
 {
 	public:
+	ND_JOINT_RELECTION(ndMultiBodyVehicleRotor);
 	ndMultiBodyVehicleRotor(ndBodyKinematic* const motor, ndWorld* const world);
 
 	dFloat32 GetRpm() const;

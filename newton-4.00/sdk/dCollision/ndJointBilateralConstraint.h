@@ -31,11 +31,12 @@
 
 enum ndJointBilateralSolverModel
 {
-	m_primaryOpenLoop,
-	m_secundaryOpenLoop,
-	m_closeLoop,
-	m_secundaryCloseLoop,
-	m_modesCount
+	m_jointIterativeSoft,
+	m_jointkinematicOpenLoop,
+	m_jointkinematicCloseLoop,
+	//m_jointkinematicHintOpenLoop,
+	m_jointkinematicAttachment,
+	m_jointModesCount
 };
 
 D_MSV_NEWTON_ALIGN_32
@@ -81,6 +82,8 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	dFloat32 GetDiagonalRegularizer(const ndConstraintDescritor& desc) const;
 	void SetDiagonalRegularizer(ndConstraintDescritor& desc, dFloat32 stiffness);
 
+	bool IsSkeleton() const;
+
 	protected:
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
@@ -102,8 +105,9 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	dFloat32 m_maxAngleError;
 	dFloat32 m_defualtDiagonalRegularizer;
 	dUnsigned32 m_maxDof			: 6;
+	dUnsigned32 m_mark0				: 1;
+	dUnsigned32 m_mark1				: 1;
 	dUnsigned32 m_isInSkeleton		: 1;
-	dUnsigned32 m_mark				: 1;
 	dUnsigned32 m_enableCollision	: 1;
 	dInt8 m_rowIsMotor;
 	ndJointBilateralSolverModel m_solverModel;
@@ -121,9 +125,9 @@ inline ndJointBilateralSolverModel ndJointBilateralConstraint::GetSolverModel() 
 
 inline void ndJointBilateralConstraint::SetSolverModel(ndJointBilateralSolverModel model)
 {
-	dAssert(model < m_modesCount);
-	dAssert(model >= m_primaryOpenLoop);
-	m_solverModel = dClamp(model, m_primaryOpenLoop, m_modesCount);
+	dAssert(model < m_jointModesCount);
+	dAssert(model >= m_jointIterativeSoft);
+	m_solverModel = dClamp(model, m_jointIterativeSoft, m_jointModesCount);
 }
 
 inline const dUnsigned32 ndJointBilateralConstraint::GetRowsCount() const
@@ -271,6 +275,15 @@ inline void ndJointBilateralConstraint::SetDiagonalRegularizer(ndConstraintDescr
 	desc.m_diagonalRegularizer[index] = dClamp(stiffness, dFloat32(0.0f), dFloat32(1.0f));
 }
 
+inline bool ndJointBilateralConstraint::IsSkeleton() const
+{
+	const ndJointBilateralSolverModel mode = GetSolverModel();
+	bool test = false;
+	test = test || (mode == m_jointkinematicOpenLoop);
+	test = test || (mode == m_jointkinematicCloseLoop);
+	//test = test || (mode == m_jointkinematicHintOpenLoop);
+	return test;
+}
 
 #endif
 

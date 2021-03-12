@@ -25,7 +25,7 @@
 #include "ndContact.h"
 #include "ndBodyNotify.h"
 
-dUnsigned32 ndBody::m_uniqueIDCount = 0;
+dUnsigned32 ndBody::m_uniqueIdCount = 0;
 
 ndBody::ndBody()
 	:m_matrix(dGetIdentityMatrix())
@@ -38,12 +38,12 @@ ndBody::ndBody()
 	,m_rotation()
 	,m_notifyCallback(nullptr)
 	,m_flags(0)
-	,m_uniqueID(m_uniqueIDCount)
+	,m_uniqueId(m_uniqueIdCount)
 {
 	m_autoSleep = 1;
 	m_transformIsDirty = 1;
 	m_collideWithLinkedBodies = 1;
-	m_uniqueIDCount++;
+	m_uniqueIdCount++;
 }
 
 ndBody::ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
@@ -57,9 +57,9 @@ ndBody::ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, d
 	,m_rotation()
 	,m_notifyCallback(nullptr)
 	,m_flags(0)
-	,m_uniqueID(m_uniqueIDCount)
+	,m_uniqueId(m_uniqueIdCount)
 {
-	m_uniqueIDCount++;
+	m_uniqueIdCount++;
 	m_transformIsDirty = 1;
 
 	dMatrix matrix(xmlGetMatrix(xmlNode, "matrix"));

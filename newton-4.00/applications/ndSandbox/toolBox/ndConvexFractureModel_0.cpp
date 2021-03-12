@@ -435,7 +435,8 @@ else
 			if (body0 && body1)
 			{
 				ndJointFix6dof* const joint = new ndJointFix6dof(body0, body1);
-				joint->SetSolverModel(m_secundaryCloseLoop);
+				dAssert(0);
+				//joint->SetSolverModel(m_secundaryCloseLoop);
 				world->AddJoint(joint);
 			}
 		}

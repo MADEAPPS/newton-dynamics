@@ -33,7 +33,7 @@ ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle(
 	dMatrix matrix1(pin1);
 	CalculateLocalMatrix(matrix0, m_localMatrix0, temp);
 	CalculateLocalMatrix(matrix1, temp, m_localMatrix1);
-	SetSolverModel(m_closeLoop);
+	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
 void ndMultiBodyVehicleDifferentialAxle::JacobianDerivative(ndConstraintDescritor& desc)
