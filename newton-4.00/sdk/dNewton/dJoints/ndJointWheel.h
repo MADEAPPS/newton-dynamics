@@ -21,10 +21,22 @@ class ndJointWheel: public ndJointBilateralConstraint
 	class ndWheelDescriptor
 	{
 		public:
+		ndWheelDescriptor()
+			:m_springK(dFloat32(1.0f))
+			,m_damperC(dFloat32(0.0f))
+			,m_minLimit(dFloat32(-0.1f))
+			,m_maxLimit(dFloat32(0.2f))
+			,m_regularizer(dFloat32(0.1f))
+			,m_laterialStiffeness(dFloat32(0.5f))
+			,m_longitudinalStiffeness(dFloat32(0.5f))
+		{
+		}
+
 		dFloat32 m_springK;
 		dFloat32 m_damperC;
 		dFloat32 m_minLimit;
 		dFloat32 m_maxLimit;
+		dFloat32 m_regularizer;
 		dFloat32 m_laterialStiffeness;
 		dFloat32 m_longitudinalStiffeness;
 	};

@@ -185,8 +185,9 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		// 2- each tire to the mode, this function will create the tire joints
 
 		ndJointWheel::ndWheelDescriptor tireInfo;
-		tireInfo.m_springK = 5000.0f;
-		tireInfo.m_damperC = 100.0f;
+		tireInfo.m_springK = 1000.0f;
+		tireInfo.m_damperC = 10.0f;
+		tireInfo.m_regularizer = 0.1f;
 		tireInfo.m_minLimit = -0.05f;
 		tireInfo.m_maxLimit = 0.2f;
 		//tireInfo.m_maxLimit = 0.1f;

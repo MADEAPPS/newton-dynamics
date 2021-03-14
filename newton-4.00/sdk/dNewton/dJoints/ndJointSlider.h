@@ -42,6 +42,7 @@ class ndJointSlider: public ndJointBilateralConstraint
 	dFloat32 m_minLimit;
 	dFloat32 m_maxLimit;
 	dFloat32 m_friction;
+	dFloat32 m_springDamperRegularizer;
 
 	bool m_hasLimits;
 	bool m_isStringDamper;

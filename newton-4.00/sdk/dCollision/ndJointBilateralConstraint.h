@@ -61,8 +61,8 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	D_COLLISION_API void AddLinearRowJacobian(ndConstraintDescritor& desc, const dVector& pivot0, const dVector& pivot1, const dVector& dir);
 
 	D_COLLISION_API virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
-	D_COLLISION_API void SetMassSpringDamperAcceleration(ndConstraintDescritor& desc, dFloat32 spring, dFloat32 damper);
 	D_COLLISION_API dFloat32 CalculateSpringDamperAcceleration(dFloat32 dt, dFloat32 ks, dFloat32 x, dFloat32 kd, dFloat32 v) const;
+	D_COLLISION_API void SetMassSpringDamperAcceleration(ndConstraintDescritor& desc, dFloat32 regularizer, dFloat32 spring, dFloat32 damper);
 	
 	const dMatrix& GetLocalMatrix0() const;
 	const dMatrix& GetLocalMatrix1() const;

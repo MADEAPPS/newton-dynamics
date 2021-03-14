@@ -69,7 +69,7 @@ void ndJointWheel::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc
 		}
 		else
 		{
-			SetMassSpringDamperAcceleration(desc, m_info.m_springK, m_info.m_damperC);
+			SetMassSpringDamperAcceleration(desc, m_info.m_regularizer, m_info.m_springK, m_info.m_damperC);
 		}
 	}
 	else if (x > m_info.m_maxLimit)
@@ -85,13 +85,13 @@ void ndJointWheel::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc
 		}
 		else
 		{
-			SetMassSpringDamperAcceleration(desc, m_info.m_springK, m_info.m_damperC);
+			SetMassSpringDamperAcceleration(desc, m_info.m_regularizer, m_info.m_springK, m_info.m_damperC);
 		}
 	}
 	else 
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
-		SetMassSpringDamperAcceleration(desc, m_info.m_springK, m_info.m_damperC);
+		SetMassSpringDamperAcceleration(desc, m_info.m_regularizer, m_info.m_springK, m_info.m_damperC);
 	}
 }
 

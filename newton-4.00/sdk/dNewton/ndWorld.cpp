@@ -945,7 +945,7 @@ void ndWorld::UpdateSkeletons()
 										skeleton = m_skeletonList.CreateContatiner(childBody);
 									}
 
-									dTrace(("%s %d %d\n", constraint->GetClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
+									//dTrace(("%s %d %d\n", constraint->GetClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
 									constraint->m_mark0 = 1;
 									dAssert(childBody == skeleton->GetRoot()->m_body);
 									ndSkeletonContainer::ndNode* const node = skeleton->AddChild((ndJointBilateralConstraint*)constraint, skeleton->GetRoot());
@@ -996,7 +996,7 @@ void ndWorld::UpdateSkeletons()
 					for (ndJointList::dListNode* jointNode = rootBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
 					{
 						ndJointBilateralConstraint* const constraint = jointNode->GetInfo();
-						dTrace(("%s %d %d\n", constraint->GetClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
+						//dTrace(("%s %d %d\n", constraint->GetClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
 						const bool test = SkeletonJointTest(constraint);
 						if (test && (constraint->GetSolverModel() != m_jointkinematicCloseLoop))
 						{
@@ -1041,7 +1041,7 @@ void ndWorld::UpdateSkeletons()
 								ndJointBilateralConstraint* const constraint = jointNode->GetInfo();
 								if (!constraint->m_mark0)
 								{
-									dTrace(("%s %d %d\n", constraint->GetClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
+									//dTrace(("%s %d %d\n", constraint->GetClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
 									constraint->m_mark0 = 1;
 									if (SkeletonJointTest(constraint))
 									{

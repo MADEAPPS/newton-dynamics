@@ -22,6 +22,7 @@ ndJointSlider::ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* c
 	,m_minLimit(dFloat32(0.0f))
 	,m_maxLimit(dFloat32(0.0f))
 	,m_friction(dFloat32(0.0f))
+	,m_springDamperRegularizer(dFloat32(0.1f))
 	,m_hasLimits(false)
 	,m_isStringDamper(false)
 {
@@ -55,7 +56,7 @@ void ndJointSlider::SetAsSpringDamper(bool state, dFloat32 spring, dFloat32 damp
 void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
 {
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
-	SetMassSpringDamperAcceleration(desc, m_springK, m_damperC);
+	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 }
 
 void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
@@ -91,6 +92,9 @@ void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dM
 
 void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
 {
+SubmitSpringDamper(desc, matrix0, matrix1);
+return;
+
 	dFloat32 x = m_posit + m_speed * desc.m_timestep;
 	if (x < m_minLimit)
 	{
