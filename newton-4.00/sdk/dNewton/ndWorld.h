@@ -46,8 +46,9 @@ class ndWorld: public dClassAlloc
 	public:
 	enum ndSolverModes
 	{	
-		ndStandardSolver,
+		ndSimdSoaSolver,
 		ndSimdAvx2Solver,
+		ndStandardSolver,
 	};
 
 	D_NEWTON_API ndWorld();
@@ -184,6 +185,7 @@ class ndWorld: public dClassAlloc
 	friend class ndScene;
 	friend class ndDynamicsUpdate;
 	friend class ndWorldMixedScene;
+	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndWorldSegregatedScene;
 } D_GCC_NEWTON_ALIGN_32;

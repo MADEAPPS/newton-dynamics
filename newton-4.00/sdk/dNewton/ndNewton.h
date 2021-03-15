@@ -65,6 +65,7 @@
 #include <ndJointFixDistance.h>
 #include <ndMultiBodyVehicle.h>
 #include <ndSkeletonContainer.h>
+#include <ndDynamicsUpdateSoa.h>
 #include <ndDynamicsUpdateAvx2.h>
 #include <ndJointBallAndSocket.h>
 #include <ndBodyParticleSetList.h>

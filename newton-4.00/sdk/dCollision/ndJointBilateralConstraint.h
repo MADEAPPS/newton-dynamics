@@ -115,6 +115,7 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	friend class ndWorld;
 	friend class ndDynamicsUpdate;
 	friend class ndSkeletonContainer;
+	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 };
 

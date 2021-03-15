@@ -89,6 +89,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	dFloat32 m_cachedTimeStep;
 
 	friend class ndDynamicsUpdate;
+	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 } D_GCC_NEWTON_ALIGN_32 ;
 

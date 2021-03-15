@@ -28,6 +28,7 @@
 #include "ndSkeletonList.h"
 #include "ndDynamicsUpdate.h"
 #include "ndBodyParticleSet.h"
+#include "ndDynamicsUpdateSoa.h"
 #include "ndDynamicsUpdateAvx2.h"
 #include "ndJointBilateralConstraint.h"
 
@@ -190,6 +191,11 @@ void ndWorld::SelectSolver(dInt32 solverMode)
 		delete m_solver;
 		switch (solverMode)
 		{
+			case ndSimdSoaSolver:
+				m_solverMode = (ndSolverModes)solverMode;
+				m_solver = new ndDynamicsUpdateSoa(this);
+				break;
+
 			case ndSimdAvx2Solver:
 				m_solverMode = (ndSolverModes)solverMode;
 				m_solver = new ndDynamicsUpdateAvx2(this);

@@ -19,16 +19,21 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_WORLD_DYNAMICS_UPDATE_AVX2_H__
-#define __D_WORLD_DYNAMICS_UPDATE_AVX2_H__
+#ifndef __D_WORLD_DYNAMICS_UPDATE_SOA_H__
+#define __D_WORLD_DYNAMICS_UPDATE_SOA_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndDynamicsUpdate.h"
 
-namespace ndAvx2
+namespace ndSoa
 {
-	#define D_AVX_WORD_GROUP_SIZE	8 
+	#define D_SOA_WORD_GROUP_SIZE 4 
 
+	//class ndSoaFloat: public dVector
+	//{
+	//};
+	typedef dVector ndSoaFloat;
+/*
 	D_MSV_NEWTON_ALIGN_32
 	class ndSoaFloat
 	{
@@ -64,7 +69,7 @@ namespace ndAvx2
 
 		D_INLINE dFloat32& operator[] (dInt32 i)
 		{
-			dAssert(i < D_AVX_WORD_GROUP_SIZE);
+			dAssert(i < D_SOA_WORD_GROUP_SIZE);
 			dAssert(i >= 0);
 			//return m_f[i];
 			dFloat32* const ptr = (dFloat32*)&m_type;
@@ -73,7 +78,7 @@ namespace ndAvx2
 
 		D_INLINE const dFloat32& operator[] (dInt32 i) const
 		{
-			dAssert(i < D_AVX_WORD_GROUP_SIZE);
+			dAssert(i < D_SOA_WORD_GROUP_SIZE);
 			dAssert(i >= 0);
 			//return m_f[i];
 			const dFloat32* const ptr = (dFloat32*)&m_type;
@@ -162,6 +167,7 @@ namespace ndAvx2
 			__m256i m_typeInt;
 		};
 	} D_GCC_NEWTON_ALIGN_32;
+*/
 
 	D_MSV_NEWTON_ALIGN_32
 	class ndSoaVector3
@@ -207,11 +213,11 @@ namespace ndAvx2
 };
 
 D_MSV_NEWTON_ALIGN_32
-class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
+class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 {
 	public:
-	ndDynamicsUpdateAvx2(ndWorld* const world);
-	virtual ~ndDynamicsUpdateAvx2();
+	ndDynamicsUpdateSoa(ndWorld* const world);
+	virtual ~ndDynamicsUpdateSoa();
 
 	protected:
 	virtual void Update();
@@ -239,7 +245,7 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	static dInt32 CompareIslands(const ndIsland* const A, const ndIsland* const B, void* const context);
 
 	dArray<dInt32> m_soaJointRows;
-	dArray<ndAvx2::ndSoaMatrixElement> m_soaMassMatrix;
+	dArray<ndSoa::ndSoaMatrixElement> m_soaMassMatrix;
 
 } D_GCC_NEWTON_ALIGN_32;
 
