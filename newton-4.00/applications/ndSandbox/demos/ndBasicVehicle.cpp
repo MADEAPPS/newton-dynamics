@@ -83,7 +83,7 @@ static void AddSomeObstacles(ndDemoEntityManager* const scene, const dVector& or
 
 
 static void PlaceRampRamp(ndDemoEntityManager* const scene, 
-	const dMatrix& location, ndDemoMesh* const geometry, ndShapeInstance ramp)
+	const dMatrix& location, ndDemoMesh* const geometry, ndShapeInstance& ramp)
 {
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
 	scene->AddEntity(entity);
