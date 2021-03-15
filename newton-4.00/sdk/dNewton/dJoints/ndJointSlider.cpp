@@ -44,19 +44,22 @@ void ndJointSlider::EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimi
 	dAssert(maxLimit >= 0.0f);
 	m_minLimit = minLimit;
 	m_maxLimit = maxLimit;
+
+	// adding one extra dof, this makes the mass matrix ill conditioned, 
+	// but it could work with the direct solver
+	m_maxDof = (m_isStringDamper && m_hasLimits) ? 7 : 6;
 }
 
-void ndJointSlider::SetAsSpringDamper(bool state, dFloat32 spring, dFloat32 damper)
+void ndJointSlider::SetAsSpringDamper(bool state, dFloat32 regularizer, dFloat32 spring, dFloat32 damper)
 {
 	m_springK = dAbs(spring);
 	m_damperC = dAbs(damper);
+	m_springDamperRegularizer = dClamp(regularizer, dFloat32(1.0e-2f), dFloat32(0.99f));
 	m_isStringDamper = state;
-}
 
-void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
-{
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
-	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
+	// adding one extra dof, this makes the mass matrix ill conditioned, 
+	// but it could work with the direct solver
+	m_maxDof = (m_isStringDamper && m_hasLimits) ? 7 : 6;
 }
 
 void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
@@ -92,37 +95,26 @@ void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dM
 
 void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
 {
-SubmitSpringDamper(desc, matrix0, matrix1);
-return;
+	// add spring damper row
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
+	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 
 	dFloat32 x = m_posit + m_speed * desc.m_timestep;
 	if (x < m_minLimit)
 	{
-		dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_minLimit));
+		const dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_minLimit));
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
 		SetLowerFriction(desc, dFloat32 (0.0f));
-
-		//const dFloat32 springAccel = CalculateSpringDamperAcceleration(desc.m_timestep, m_springK, m_posit, m_damperC, m_speed);
-		//const dFloat32 stopAccel = GetMotorZeroAcceleration(desc) + springAccel;
-		dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-		stopAccel += stopAccel * dFloat32(0.1f);
+		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		SetMotorAcceleration(desc, stopAccel);
 	}
 	else if (x > m_maxLimit)
 	{
-		dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_maxLimit));
+		const dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_maxLimit));
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
 		SetHighFriction(desc, dFloat32(0.0f));
-
-		//const dFloat32 springAccel = CalculateSpringDamperAcceleration(desc.m_timestep, m_springK, m_posit, m_damperC, m_speed);
-		//const dFloat32 stopAccel = GetMotorZeroAcceleration(desc) + springAccel;
-		dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-		stopAccel += stopAccel * dFloat32(0.1f);
+		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		SetMotorAcceleration(desc, stopAccel);
-	}
-	else 
-	{
-		SubmitSpringDamper(desc, matrix0, matrix1);
 	}
 }
 
@@ -184,16 +176,20 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	{
 		if (m_isStringDamper)
 		{
+			// spring damper with limits
 			SubmitConstraintLimitSpringDamper(desc, matrix0, matrix1);
 		}
 		else
 		{
+			// only hard limits
 			SubmitConstraintLimits(desc, matrix0, matrix1);
 		}
 	}
 	else if (m_isStringDamper)
 	{
-		SubmitSpringDamper(desc, matrix0, matrix1);
+		// spring damper without limits
+		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
+		SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 	}
 }
 

@@ -1510,7 +1510,7 @@ class dVector
 
 		D_INLINE dFloat64& operator[] (dInt32 i)
 		{
-			dAssert(i < 6);
+			//dAssert(i < 6);
 			dAssert(i >= 0);
 			return ((dFloat64*)&m_d0)[i];
 		}

@@ -25,10 +25,9 @@ class ndJointSlider: public ndJointBilateralConstraint
 
 	D_NEWTON_API void SetFriction(dFloat32 friction);
 	D_NEWTON_API void EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimit);
-	D_NEWTON_API void SetAsSpringDamper(bool state, dFloat32 spring, dFloat32 damper);
+	D_NEWTON_API void SetAsSpringDamper(bool state, dFloat32 regularizer, dFloat32 spring, dFloat32 damper);
 
 	private:
-	void SubmitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 	void SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 	void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 

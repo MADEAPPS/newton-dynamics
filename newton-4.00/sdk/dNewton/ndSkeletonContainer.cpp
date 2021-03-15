@@ -27,7 +27,7 @@
 #include "ndJointBilateralConstraint.h"
 
 
-dInt64 ndSkeletonContainer::ndNode::m_ordinalInit = 0x050403020100ll;
+dInt64 ndSkeletonContainer::ndNode::m_ordinalInit = 0x0706050403020100ll;
 
 ndSkeletonContainer::ndNode::ndNode()
 	:m_body(nullptr)
