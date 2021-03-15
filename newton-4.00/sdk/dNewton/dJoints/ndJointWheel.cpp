@@ -14,7 +14,7 @@
 #include "ndJointWheel.h"
 
 ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info)
-	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
+	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	,m_baseFrame(m_localMatrix1)
 	,m_info(info)
 	,m_posit(dFloat32 (0.0f))
@@ -53,48 +53,6 @@ void ndJointWheel::SetSteeringAngle(dFloat32 steeringAngle)
 	m_body0->SetMatrix(tireBodyMatrix);
 }
 
-void ndJointWheel::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
-{
-	dFloat32 x = m_posit + m_speed * desc.m_timestep;
-	if (x < m_info.m_minLimit)
-	{
-		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
-
-		dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-		dFloat32 springAccel = CalculateSpringDamperAcceleration(desc.m_timestep, m_info.m_springK, m_posit, m_info.m_damperC, m_speed);
-		if (dAbs(stopAccel) > dAbs(springAccel))
-		{
-			SetLowerFriction(desc, dFloat32(0.0f));
-			SetMotorAcceleration(desc, dClamp (stopAccel, dFloat32 (-100.0f), dFloat32(100.0f)));
-		}
-		else
-		{
-			SetMassSpringDamperAcceleration(desc, m_info.m_regularizer, m_info.m_springK, m_info.m_damperC);
-		}
-	}
-	else if (x > m_info.m_maxLimit)
-	{
-		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
-
-		dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-		dFloat32 springAccel = CalculateSpringDamperAcceleration(desc.m_timestep, m_info.m_springK, m_posit, m_info.m_damperC, m_speed);
-		if (dAbs(stopAccel) > dAbs(springAccel))
-		{
-			SetHighFriction(desc, dFloat32(0.0f));
-			SetMotorAcceleration(desc, dClamp(stopAccel, dFloat32(-100.0f), dFloat32(100.0f)));
-		}
-		else
-		{
-			SetMassSpringDamperAcceleration(desc, m_info.m_regularizer, m_info.m_springK, m_info.m_damperC);
-		}
-	}
-	else 
-	{
-		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
-		SetMassSpringDamperAcceleration(desc, m_info.m_regularizer, m_info.m_springK, m_info.m_damperC);
-	}
-}
-
 void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
@@ -126,7 +84,9 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
 	
-	SubmitConstraintLimitSpringDamper(desc, matrix0, matrix1);
+	// add suspension spring damper row
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
+	SetMassSpringDamperAcceleration(desc, m_info.m_regularizer, m_info.m_springK, m_info.m_damperC);
 
 	if (m_brakeTorque > dFloat32(0.0f))
 	{
@@ -138,5 +98,22 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		SetMotorAcceleration(desc, -rpm * desc.m_invTimestep);
 		SetLowerFriction(desc, -m_brakeTorque);
 		SetHighFriction(desc, m_brakeTorque);
+	}
+
+	// add suspension limits alone the vertical axis 
+	const dFloat32 x = m_posit + m_speed * desc.m_timestep;
+	if (x < m_info.m_minLimit)
+	{
+		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
+		SetLowerFriction(desc, dFloat32(0.0f));
+		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		SetMotorAcceleration(desc, stopAccel);
+	}
+	else if (x > m_info.m_maxLimit)
+	{
+		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
+		SetHighFriction(desc, dFloat32(0.0f));
+		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		SetMotorAcceleration(desc, stopAccel);
 	}
 }
