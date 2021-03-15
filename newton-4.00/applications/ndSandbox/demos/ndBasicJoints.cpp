@@ -133,8 +133,9 @@ static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin,
 	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 	
 	ndJointSlider* const joint = new ndJointSlider(matrix, body, fixBody);
-	joint->SetAsSpringDamper(true, 0.1f, 500.0f, 0.05f);
-	//joint->SetFriction(mass * 10.0f * 2.0f);
+
+	dFloat32 regularizer = diameter > 0.5f ? 0.9f : 0.1f;
+	joint->SetAsSpringDamper(true, regularizer, 500.0f, 0.05f);
 	joint->EnableLimits(true, -1.0f, 1.0f);
 	world->AddJoint(joint);
 
@@ -323,8 +324,8 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
 	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 0.5f);
 	BuildBall(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 10.0f, 0.5f);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.5f);
+	BuildSlider(scene, dVector(0.0f, 0.0f, 2.5f, 1.0f), 10.0f, 0.5f);
+	BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
 	AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	dQuaternion rot;
