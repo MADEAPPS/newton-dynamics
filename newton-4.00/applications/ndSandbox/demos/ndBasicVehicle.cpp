@@ -494,7 +494,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->Set2DDisplayRenderFunction(nullptr, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
 	location.m_z = 4.0f;
-	location.m_y = 0.5f;
+	location.m_y = 0.5f; 
 	//AddRamps(scene, location);
 	//AddSomeObstacles(scene, location);
 

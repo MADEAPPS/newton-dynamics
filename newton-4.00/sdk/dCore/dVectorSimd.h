@@ -64,15 +64,12 @@ class dVector
 	}
 
 	// emulate gather instruction
-	D_INLINE dVector(const dFloat32* const baseAddr, const dFloat32* const index)
+	D_INLINE dVector(const dFloat32* const baseAddr, const dInt32* const index)
+		:m_x(baseAddr[index[0]])
+		,m_y(baseAddr[index[1]])
+		,m_z(baseAddr[index[2]])
+		,m_w(baseAddr[index[3]])
 	{
-		const dInt32* const indirectIndex = (dInt32*)&index[0];
-		//const dFloat32* const src = &(*baseAddr)[0];
-		dFloat32* const dst = &(*this)[0];
-		for (dInt32 i = 0; i < 4; i++) 
-		{
-			dst[i] = baseAddr[indirectIndex[i]];
-		}
 	}
 
 #ifndef	D_NEWTON_USE_DOUBLE
