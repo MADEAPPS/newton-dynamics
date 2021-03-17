@@ -30,6 +30,7 @@
 #include "ndBodyParticleSet.h"
 #include "ndDynamicsUpdateSoa.h"
 #include "ndDynamicsUpdateAvx2.h"
+#include "ndDynamicsUpdateOpencl.h"
 #include "ndJointBilateralConstraint.h"
 
 class ndSkeletonQueue : public dFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>
@@ -201,6 +202,11 @@ void ndWorld::SelectSolver(dInt32 solverMode)
 				m_solver = new ndDynamicsUpdateAvx2(this);
 				break;
 
+			case ndOpenclSolver:
+				m_solverMode = (ndSolverModes)solverMode;
+				m_solver = new ndDynamicsUpdateOpencl(this);
+				break;
+
 			case ndStandardSolver:
 			default:
 				m_solverMode = (ndSolverModes)solverMode;
@@ -208,9 +214,12 @@ void ndWorld::SelectSolver(dInt32 solverMode)
 				break;
 		}
 	}
-	
 }
 
+const char* ndWorld::GetSolverString() const
+{
+	return m_solver->GetStringId();
+}
 
 void ndWorld::ClearCache()
 {

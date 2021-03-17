@@ -96,7 +96,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	ndDynamicsUpdate(ndWorld* const world);
 	virtual ~ndDynamicsUpdate();
 
-	//ndConstraintArray& GetJointArray() { return m_jointArray;}
+	virtual const char* GetStringId() const;
 	dArray<ndJacobian>& GetInternalForces() { return m_internalForces; }
 	dArray<ndLeftHandSide>& GetLeftHandSide() { return m_leftHandSide; }
 	dArray<ndRightHandSide>& GetRightHandSide() { return m_rightHandSide; }
@@ -138,7 +138,6 @@ class ndDynamicsUpdate: public dClassAlloc
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
-	//dInt32 m_hasJointFeeback[D_MAX_THREADS_COUNT];
 
 	ndWorld* m_world;
 	dFloat32 m_timestep;

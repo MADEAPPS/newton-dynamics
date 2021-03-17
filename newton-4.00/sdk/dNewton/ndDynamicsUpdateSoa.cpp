@@ -41,6 +41,11 @@ ndDynamicsUpdateSoa::~ndDynamicsUpdateSoa()
 	m_soaJointRows.Resize(1024);
 }
 
+const char* ndDynamicsUpdateSoa::GetStringId() const
+{
+	return "sse soa";
+}
+
 void ndDynamicsUpdateSoa::Update()
 {
 	m_timestep = m_world->GetScene()->GetTimestep();

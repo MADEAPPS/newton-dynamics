@@ -19,15 +19,15 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_WORLD_DYNAMICS_UPDATE_SOA_H__
-#define __D_WORLD_DYNAMICS_UPDATE_SOA_H__
+#ifndef __D_WORLD_DYNAMICS_UPDATE_OPENCL_H__
+#define __D_WORLD_DYNAMICS_UPDATE_OPENCL_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndDynamicsUpdate.h"
 
-namespace ndSoa
+namespace ndOpencl
 {
-	#define D_SOA_WORD_GROUP_SIZE 4 
+	#define D_OPENCL_WORD_GROUP_SIZE 4 
 
 	class ndSoaVector3
 	{
@@ -68,11 +68,11 @@ namespace ndSoa
 };
 
 D_MSV_NEWTON_ALIGN_32
-class ndDynamicsUpdateSoa: public ndDynamicsUpdate
+class ndDynamicsUpdateOpencl: public ndDynamicsUpdate
 {
 	public:
-	ndDynamicsUpdateSoa(ndWorld* const world);
-	virtual ~ndDynamicsUpdateSoa();
+	ndDynamicsUpdateOpencl(ndWorld* const world);
+	virtual ~ndDynamicsUpdateOpencl();
 
 	virtual const char* GetStringId() const;
 
@@ -102,7 +102,7 @@ class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 	static dInt32 CompareIslands(const ndIsland* const A, const ndIsland* const B, void* const context);
 
 	dArray<dInt32> m_soaJointRows;
-	dArray<ndSoa::ndSoaMatrixElement> m_soaMassMatrix;
+	dArray<ndOpencl::ndSoaMatrixElement> m_soaMassMatrix;
 
 } D_GCC_NEWTON_ALIGN_32;
 

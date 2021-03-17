@@ -48,6 +48,7 @@ class ndWorld: public dClassAlloc
 	{	
 		ndSimdSoaSolver,
 		ndSimdAvx2Solver,
+		ndOpenclSolver,
 		ndStandardSolver,
 	};
 
@@ -72,6 +73,7 @@ class ndWorld: public dClassAlloc
 
 	dInt32 GetSelectedSolver() const;
 	D_NEWTON_API void SelectSolver(dInt32 solver);
+	D_NEWTON_API const char* GetSolverString() const;
 
 	D_NEWTON_API virtual bool AddBody(ndBody* const body);
 	D_NEWTON_API virtual void RemoveBody(ndBody* const body);
@@ -187,6 +189,7 @@ class ndWorld: public dClassAlloc
 	friend class ndWorldMixedScene;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
+	friend class ndDynamicsUpdateOpencl;
 	friend class ndWorldSegregatedScene;
 } D_GCC_NEWTON_ALIGN_32;
 

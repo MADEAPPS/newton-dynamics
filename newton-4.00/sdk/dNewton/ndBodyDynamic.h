@@ -91,6 +91,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	friend class ndDynamicsUpdate;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
+	friend class ndDynamicsUpdateOpencl;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline dVector ndBodyDynamic::GetForce() const

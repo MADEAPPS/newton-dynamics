@@ -632,6 +632,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Text("solvers");
 			ImGui::RadioButton("default", &m_solverMode, 0);
 			ImGui::RadioButton("avx2", &m_solverMode, 1);
+			ImGui::RadioButton("opencl", &m_solverMode, 2);
 			ImGui::Separator();
 
 			//dInt32 index = 0;
@@ -968,7 +969,7 @@ void ndDemoEntityManager::RenderStats()
 			sprintf(text, "Substeps:       %d", m_world->GetSubSteps());
 			ImGui::Text(text, "");
 
-			sprintf(text, "%s", m_solverMode ? "solver:         avx2" : "solver:         default");
+			sprintf(text, "solver:         %s", m_world->GetSolverString());
 			ImGui::Text(text, "");
 
 			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  

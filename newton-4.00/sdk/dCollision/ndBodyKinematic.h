@@ -212,6 +212,7 @@ class ndBodyKinematic: public ndBody
 	friend class ndSkeletonContainer;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
+	friend class ndDynamicsUpdateOpencl;
 	friend class ndJointBilateralConstraint;
 } D_GCC_NEWTON_ALIGN_32;
 
@@ -396,16 +397,6 @@ inline void ndBodyKinematic::SetAutoSleep(bool state)
 	m_autoSleep = state ? 1 : 0;
 	SetSleepState(false);
 }
-
-//inline bool ndBodyKinematic::GetGyroMode() const
-//{
-//	return m_gyroTorqueOn ? true : false;
-//}
-//
-//inline void ndBodyKinematic::SetGyroMode(bool state)
-//{
-//	m_gyroTorqueOn = state ? 1 : 0;
-//}
 
 inline ndSkeletonContainer* ndBodyKinematic::GetSkeleton() const
 { 

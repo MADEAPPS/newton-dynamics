@@ -52,6 +52,11 @@ ndDynamicsUpdate::~ndDynamicsUpdate()
 	Clear();
 }
 
+const char* ndDynamicsUpdate::GetStringId() const
+{
+	return "default";
+}
+
 void ndDynamicsUpdate::Clear()
 {
 	m_islands.Resize(D_DEFAULT_BUFFER_SIZE);

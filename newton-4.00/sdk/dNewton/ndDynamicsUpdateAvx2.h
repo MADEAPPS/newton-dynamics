@@ -213,6 +213,8 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	ndDynamicsUpdateAvx2(ndWorld* const world);
 	virtual ~ndDynamicsUpdateAvx2();
 
+	virtual const char* GetStringId() const;
+
 	protected:
 	virtual void Update();
 
