@@ -1193,7 +1193,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 			const dInt32 soaJointCount = ((jointCount + D_SOA_WORD_GROUP_SIZE - 1) & mask) / D_SOA_WORD_GROUP_SIZE;
 			const dInt32* const soaJointRows = &me->m_soaJointRows[0];
 
-			const ndSoaFloat zero(dVector::m_zero);
+			const dVector zero(dVector::m_zero);
 			for (dInt32 i = threadIndex; i < soaJointCount; i += threadCount)
 			{
 				const dInt32 index = i * D_SOA_WORD_GROUP_SIZE;
@@ -1219,17 +1219,12 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 					const ndConstraint* const joint1 = jointArray[index + 1];
 					const ndConstraint* const joint2 = jointArray[index + 2];
 					const ndConstraint* const joint3 = jointArray[index + 3];
-					//const ndConstraint* const joint4 = jointArray[index + 4];
-					//const ndConstraint* const joint5 = jointArray[index + 5];
-					//const ndConstraint* const joint6 = jointArray[index + 6];
-					//const ndConstraint* const joint7 = jointArray[index + 7];
 					
 					const ndConstraint* const joint = jointArray[index];
 					const dInt32 rowCount = joint->m_rowCount;
 					
 					for (dInt32 j = 0; j < rowCount; j++)
 					{
-						//dVector tmp[D_SOA_WORD_GROUP_SIZE];
 						dVector tmp;
 						const ndLeftHandSide* const row0 = &leftHandSide[joint0->m_rowStart + j];
 						const ndLeftHandSide* const row1 = &leftHandSide[joint1->m_rowStart + j];
@@ -1774,13 +1769,13 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 
 		dFloat32 JointForce(dInt32 block, ndSoaMatrixElement* const massMatrix)
 		{
-			ndSoaFloat weight0;
-			ndSoaFloat weight1;
+			dVector weight0;
+			dVector weight1;
 			ndSoaVector6 forceM0;
 			ndSoaVector6 forceM1;
-			ndSoaFloat preconditioner0;
-			ndSoaFloat preconditioner1;
-			ndSoaFloat normalForce[D_CONSTRAINT_MAX_ROWS + 1];
+			dVector preconditioner0;
+			dVector preconditioner1;
+			dVector normalForce[D_CONSTRAINT_MAX_ROWS + 1];
 
 			ndConstraint** const jointGroup = &m_jointArray[block];
 
@@ -1887,14 +1882,14 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			preconditioner1 = preconditioner1 * weight1;
 
 			normalForce[0] = m_one;
-			ndSoaFloat accNorm(m_zero);
+			dVector accNorm(m_zero);
 			const dInt32 rowsCount = jointGroup[0]->m_rowCount;
 		
 			for (dInt32 j = 0; j < rowsCount; j++)
 			{
 				const ndSoaMatrixElement* const row = &massMatrix[j];
 
-				ndSoaFloat a(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x);
+				dVector a(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x);
 				a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_y, forceM0.m_linear.m_y);
 				a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_z, forceM0.m_linear.m_z);
 
@@ -1911,22 +1906,22 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 				a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_z, forceM1.m_angular.m_z);
 
 				a = row->m_coordenateAccel.MulSub(row->m_force, row->m_diagDamp) - a;
-				ndSoaFloat f(row->m_force.MulAdd(row->m_invJinvMJt, a));
+				dVector f(row->m_force.MulAdd(row->m_invJinvMJt, a));
 
-				const ndSoaFloat frictionNormal(&normalForce[0].m_x, row->m_normalForceIndex.m_i);
-				const ndSoaFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
-				const ndSoaFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
+				const dVector frictionNormal(&normalForce[0].m_x, row->m_normalForceIndex.m_i);
+				const dVector lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
+				const dVector upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
 
 				a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 
 				accNorm = accNorm.MulAdd(a, a);
-				const ndSoaFloat deltaForce(f - row->m_force);
+				const dVector deltaForce(f - row->m_force);
 
 				normalForce[j + 1] = f;
 
-				const ndSoaFloat deltaForce0(deltaForce * preconditioner0);
-				const ndSoaFloat deltaForce1(deltaForce * preconditioner1);
+				const dVector deltaForce0(deltaForce * preconditioner0);
+				const dVector deltaForce1(deltaForce * preconditioner1);
 
 				forceM0.m_linear.m_x = forceM0.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_x, deltaForce0);
 				forceM0.m_linear.m_y = forceM0.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_y, deltaForce0);
@@ -1946,7 +1941,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			const dFloat32 tol = dFloat32(0.5f);
 			const dFloat32 tol2 = tol * tol;
 
-			ndSoaFloat maxAccel(accNorm);
+			dVector maxAccel(accNorm);
 			for (dInt32 k = 0; (k < 4) && (maxAccel.AddHorizontal().GetScalar() > tol2); k++)
 			{
 				maxAccel = m_zero;
@@ -1954,7 +1949,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 				{
 					const ndSoaMatrixElement* const row = &massMatrix[j];
 
-					ndSoaFloat a(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x);
+					dVector a(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x);
 					a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_y, forceM0.m_linear.m_y);
 					a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_z, forceM0.m_linear.m_z);
 
@@ -1970,25 +1965,25 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 					a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_y, forceM1.m_angular.m_y);
 					a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_z, forceM1.m_angular.m_z);
 
-					const ndSoaFloat force(normalForce[j + 1]);
+					const dVector force(normalForce[j + 1]);
 					a = row->m_coordenateAccel.MulSub(force, row->m_diagDamp) - a;
-					ndSoaFloat f(force.MulAdd(row->m_invJinvMJt, a));
+					dVector f(force.MulAdd(row->m_invJinvMJt, a));
 
-					const ndSoaFloat frictionNormal(&normalForce[0].m_x, row->m_normalForceIndex.m_i);
-					const ndSoaFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
-					const ndSoaFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
+					const dVector frictionNormal(&normalForce[0].m_x, row->m_normalForceIndex.m_i);
+					const dVector lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
+					const dVector upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
 
 					a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 					f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 
 					maxAccel = maxAccel.MulAdd(a, a);
 
-					const ndSoaFloat deltaForce(f - force);
+					const dVector deltaForce(f - force);
 
 					normalForce[j + 1] = f;
 
-					const ndSoaFloat deltaForce0(deltaForce * preconditioner0);
-					const ndSoaFloat deltaForce1(deltaForce * preconditioner1);
+					const dVector deltaForce0(deltaForce * preconditioner0);
+					const dVector deltaForce1(deltaForce * preconditioner1);
 
 					forceM0.m_linear.m_x = forceM0.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_x, deltaForce0);
 					forceM0.m_linear.m_y = forceM0.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_y, deltaForce0);
@@ -2006,7 +2001,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 				}
 			}
 
-			ndSoaFloat mask(m_mask);
+			dVector mask(m_mask);
 			if ((block + D_SOA_WORD_GROUP_SIZE) > m_activeCount)
 			{
 				for (dInt32 i = 0; i < D_SOA_WORD_GROUP_SIZE; i++)
@@ -2047,7 +2042,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			for (dInt32 i = 0; i < rowsCount; i++)
 			{
 				ndSoaMatrixElement* const row = &massMatrix[i];
-				const ndSoaFloat force(row->m_force.Select(normalForce[i + 1], mask));
+				const dVector force(row->m_force.Select(normalForce[i + 1], mask));
 				row->m_force = force;
 
 				forceM0.m_linear.m_x = forceM0.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_x, force);
@@ -2133,7 +2128,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			ndSoaMatrixElement* const soaMassMatrix = &me->m_soaMassMatrix[0];
 
 			dInt32 temp = -1;
-			m_mask = ndSoaFloat(*(dFloat32*)(&temp));
+			m_mask = dVector(*(dFloat32*)(&temp));
 			const dInt32 mask = -dInt32(D_SOA_WORD_GROUP_SIZE);
 			const dInt32 soaJointCount = ((jointCount + D_SOA_WORD_GROUP_SIZE - 1) & mask) / D_SOA_WORD_GROUP_SIZE;
 			me->ClearJacobianBuffer(bodyCount, m_outputForces);
@@ -2146,9 +2141,9 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			accelNorm[threadIndex] = accNorm;
 		}
 
-		ndSoaFloat m_one;
-		ndSoaFloat m_zero;
-		ndSoaFloat m_mask;
+		dVector m_one;
+		dVector m_zero;
+		dVector m_mask;
 		ndJacobian* m_outputForces;
 		ndJacobian* m_internalForces;
 		ndRightHandSide* m_rightHandSide;

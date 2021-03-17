@@ -29,49 +29,42 @@ namespace ndSoa
 {
 	#define D_SOA_WORD_GROUP_SIZE 4 
 
-	typedef dVector ndSoaFloat;
-
-	D_MSV_NEWTON_ALIGN_32
 	class ndSoaVector3
 	{
 		public:
-		ndSoaFloat m_x;
-		ndSoaFloat m_y;
-		ndSoaFloat m_z;
-	} D_GCC_NEWTON_ALIGN_32;
+		dVector m_x;
+		dVector m_y;
+		dVector m_z;
+	};
 
-	D_MSV_NEWTON_ALIGN_32
 	class ndSoaVector6
 	{
 		public:
 		ndSoaVector3 m_linear;
 		ndSoaVector3 m_angular;
-	} D_GCC_NEWTON_ALIGN_32;
+	};
 
-	D_MSV_NEWTON_ALIGN_32
 	class ndSoaJacobianPair
 	{
 		public:
 		ndSoaVector6 m_jacobianM0;
 		ndSoaVector6 m_jacobianM1;
-	} D_GCC_NEWTON_ALIGN_32;
+	};
 
-
-	D_MSV_NEWTON_ALIGN_32
 	class ndSoaMatrixElement
 	{
 		public:
 		ndSoaJacobianPair m_Jt;
 		ndSoaJacobianPair m_JMinv;
 
-		ndSoaFloat m_force;
-		ndSoaFloat m_diagDamp;
-		ndSoaFloat m_invJinvMJt;
-		ndSoaFloat m_coordenateAccel;
-		ndSoaFloat m_normalForceIndex;
-		ndSoaFloat m_lowerBoundFrictionCoefficent;
-		ndSoaFloat m_upperBoundFrictionCoefficent;
-	} D_GCC_NEWTON_ALIGN_32;
+		dVector m_force;
+		dVector m_diagDamp;
+		dVector m_invJinvMJt;
+		dVector m_coordenateAccel;
+		dVector m_normalForceIndex;
+		dVector m_lowerBoundFrictionCoefficent;
+		dVector m_upperBoundFrictionCoefficent;
+	};
 };
 
 D_MSV_NEWTON_ALIGN_32
