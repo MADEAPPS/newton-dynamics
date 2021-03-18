@@ -1198,7 +1198,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			const dInt32 soaJointCount = ((jointCount + D_AVX_WORD_GROUP_SIZE - 1) & mask) / D_AVX_WORD_GROUP_SIZE;
 			const dInt32* const soaJointRows = &me->m_soaJointRows[0];
 
-			const ndSoaFloat zero(dFloat32(0.0f));
+			const ndAvxFloat zero(dFloat32(0.0f));
 			for (dInt32 i = threadIndex; i < soaJointCount; i += threadCount)
 			{
 				const dInt32 index = i * D_AVX_WORD_GROUP_SIZE;
@@ -1255,9 +1255,9 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 							row5->m_Jt.m_jacobianM0.m_linear,
 							row6->m_Jt.m_jacobianM0.m_linear,
 							row7->m_Jt.m_jacobianM0.m_linear);
-						row.m_Jt.m_jacobianM0.m_linear.m_x = ndSoaFloat(tmp[0], tmp[4]);
-						row.m_Jt.m_jacobianM0.m_linear.m_y = ndSoaFloat(tmp[1], tmp[5]);
-						row.m_Jt.m_jacobianM0.m_linear.m_z = ndSoaFloat(tmp[2], tmp[6]);
+						row.m_Jt.m_jacobianM0.m_linear.m_x = ndAvxFloat(tmp[0], tmp[4]);
+						row.m_Jt.m_jacobianM0.m_linear.m_y = ndAvxFloat(tmp[1], tmp[5]);
+						row.m_Jt.m_jacobianM0.m_linear.m_z = ndAvxFloat(tmp[2], tmp[6]);
 						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
 							row0->m_Jt.m_jacobianM0.m_angular,
 							row1->m_Jt.m_jacobianM0.m_angular,
@@ -1268,9 +1268,9 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 							row5->m_Jt.m_jacobianM0.m_angular,
 							row6->m_Jt.m_jacobianM0.m_angular,
 							row7->m_Jt.m_jacobianM0.m_angular);
-						row.m_Jt.m_jacobianM0.m_angular.m_x = ndSoaFloat(tmp[0], tmp[4]);
-						row.m_Jt.m_jacobianM0.m_angular.m_y = ndSoaFloat(tmp[1], tmp[5]);
-						row.m_Jt.m_jacobianM0.m_angular.m_z = ndSoaFloat(tmp[2], tmp[6]);
+						row.m_Jt.m_jacobianM0.m_angular.m_x = ndAvxFloat(tmp[0], tmp[4]);
+						row.m_Jt.m_jacobianM0.m_angular.m_y = ndAvxFloat(tmp[1], tmp[5]);
+						row.m_Jt.m_jacobianM0.m_angular.m_z = ndAvxFloat(tmp[2], tmp[6]);
 					
 						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
 							row0->m_Jt.m_jacobianM1.m_linear,
@@ -1282,9 +1282,9 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 							row5->m_Jt.m_jacobianM1.m_linear,
 							row6->m_Jt.m_jacobianM1.m_linear,
 							row7->m_Jt.m_jacobianM1.m_linear);
-						row.m_Jt.m_jacobianM1.m_linear.m_x = ndSoaFloat(tmp[0], tmp[4]);
-						row.m_Jt.m_jacobianM1.m_linear.m_y = ndSoaFloat(tmp[1], tmp[5]);
-						row.m_Jt.m_jacobianM1.m_linear.m_z = ndSoaFloat(tmp[2], tmp[6]);
+						row.m_Jt.m_jacobianM1.m_linear.m_x = ndAvxFloat(tmp[0], tmp[4]);
+						row.m_Jt.m_jacobianM1.m_linear.m_y = ndAvxFloat(tmp[1], tmp[5]);
+						row.m_Jt.m_jacobianM1.m_linear.m_z = ndAvxFloat(tmp[2], tmp[6]);
 						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
 							row0->m_Jt.m_jacobianM1.m_angular,
 							row1->m_Jt.m_jacobianM1.m_angular,
@@ -1295,9 +1295,9 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 							row5->m_Jt.m_jacobianM1.m_angular,
 							row6->m_Jt.m_jacobianM1.m_angular,
 							row7->m_Jt.m_jacobianM1.m_angular);
-						row.m_Jt.m_jacobianM1.m_angular.m_x = ndSoaFloat(tmp[0], tmp[4]);
-						row.m_Jt.m_jacobianM1.m_angular.m_y = ndSoaFloat(tmp[1], tmp[5]);
-						row.m_Jt.m_jacobianM1.m_angular.m_z = ndSoaFloat(tmp[2], tmp[6]);
+						row.m_Jt.m_jacobianM1.m_angular.m_x = ndAvxFloat(tmp[0], tmp[4]);
+						row.m_Jt.m_jacobianM1.m_angular.m_y = ndAvxFloat(tmp[1], tmp[5]);
+						row.m_Jt.m_jacobianM1.m_angular.m_z = ndAvxFloat(tmp[2], tmp[6]);
 					
 						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
 							row0->m_JMinv.m_jacobianM0.m_linear,
@@ -1309,9 +1309,9 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 							row5->m_JMinv.m_jacobianM0.m_linear,
 							row6->m_JMinv.m_jacobianM0.m_linear,
 							row7->m_JMinv.m_jacobianM0.m_linear);
-						row.m_JMinv.m_jacobianM0.m_linear.m_x = ndSoaFloat(tmp[0], tmp[4]);
-						row.m_JMinv.m_jacobianM0.m_linear.m_y = ndSoaFloat(tmp[1], tmp[5]);
-						row.m_JMinv.m_jacobianM0.m_linear.m_z = ndSoaFloat(tmp[2], tmp[6]);
+						row.m_JMinv.m_jacobianM0.m_linear.m_x = ndAvxFloat(tmp[0], tmp[4]);
+						row.m_JMinv.m_jacobianM0.m_linear.m_y = ndAvxFloat(tmp[1], tmp[5]);
+						row.m_JMinv.m_jacobianM0.m_linear.m_z = ndAvxFloat(tmp[2], tmp[6]);
 						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
 							row0->m_JMinv.m_jacobianM0.m_angular,
 							row1->m_JMinv.m_jacobianM0.m_angular,
@@ -1322,9 +1322,9 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 							row5->m_JMinv.m_jacobianM0.m_angular,
 							row6->m_JMinv.m_jacobianM0.m_angular,
 							row7->m_JMinv.m_jacobianM0.m_angular);
-						row.m_JMinv.m_jacobianM0.m_angular.m_x = ndSoaFloat(tmp[0], tmp[4]);
-						row.m_JMinv.m_jacobianM0.m_angular.m_y = ndSoaFloat(tmp[1], tmp[5]);
-						row.m_JMinv.m_jacobianM0.m_angular.m_z = ndSoaFloat(tmp[2], tmp[6]);
+						row.m_JMinv.m_jacobianM0.m_angular.m_x = ndAvxFloat(tmp[0], tmp[4]);
+						row.m_JMinv.m_jacobianM0.m_angular.m_y = ndAvxFloat(tmp[1], tmp[5]);
+						row.m_JMinv.m_jacobianM0.m_angular.m_z = ndAvxFloat(tmp[2], tmp[6]);
 					
 						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
 							row0->m_JMinv.m_jacobianM1.m_linear,
@@ -1336,9 +1336,9 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 							row5->m_JMinv.m_jacobianM1.m_linear,
 							row6->m_JMinv.m_jacobianM1.m_linear,
 							row7->m_JMinv.m_jacobianM1.m_linear);
-						row.m_JMinv.m_jacobianM1.m_linear.m_x = ndSoaFloat(tmp[0], tmp[4]);
-						row.m_JMinv.m_jacobianM1.m_linear.m_y = ndSoaFloat(tmp[1], tmp[5]);
-						row.m_JMinv.m_jacobianM1.m_linear.m_z = ndSoaFloat(tmp[2], tmp[6]);
+						row.m_JMinv.m_jacobianM1.m_linear.m_x = ndAvxFloat(tmp[0], tmp[4]);
+						row.m_JMinv.m_jacobianM1.m_linear.m_y = ndAvxFloat(tmp[1], tmp[5]);
+						row.m_JMinv.m_jacobianM1.m_linear.m_z = ndAvxFloat(tmp[2], tmp[6]);
 						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
 							row0->m_JMinv.m_jacobianM1.m_angular,
 							row1->m_JMinv.m_jacobianM1.m_angular,
@@ -1349,9 +1349,9 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 							row5->m_JMinv.m_jacobianM1.m_angular,
 							row6->m_JMinv.m_jacobianM1.m_angular,
 							row7->m_JMinv.m_jacobianM1.m_angular);
-						row.m_JMinv.m_jacobianM1.m_angular.m_x = ndSoaFloat(tmp[0], tmp[4]);
-						row.m_JMinv.m_jacobianM1.m_angular.m_y = ndSoaFloat(tmp[1], tmp[5]);
-						row.m_JMinv.m_jacobianM1.m_angular.m_z = ndSoaFloat(tmp[2], tmp[6]);
+						row.m_JMinv.m_jacobianM1.m_angular.m_x = ndAvxFloat(tmp[0], tmp[4]);
+						row.m_JMinv.m_jacobianM1.m_angular.m_y = ndAvxFloat(tmp[1], tmp[5]);
+						row.m_JMinv.m_jacobianM1.m_angular.m_z = ndAvxFloat(tmp[2], tmp[6]);
 					
 						dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
 						for (dInt32 k = 0; k < D_AVX_WORD_GROUP_SIZE; k++)
@@ -1814,13 +1814,13 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 
 		dFloat32 JointForce(dInt32 block, ndSoaMatrixElement* const massMatrix)
 		{
-			ndSoaFloat weight0;
-			ndSoaFloat weight1;
-			ndSoaVector6 forceM0;
-			ndSoaVector6 forceM1;
-			ndSoaFloat preconditioner0;
-			ndSoaFloat preconditioner1;
-			ndSoaFloat normalForce[D_CONSTRAINT_MAX_ROWS + 1];
+			ndAvxFloat weight0;
+			ndAvxFloat weight1;
+			ndOpenclVector6 forceM0;
+			ndOpenclVector6 forceM1;
+			ndAvxFloat preconditioner0;
+			ndAvxFloat preconditioner1;
+			ndAvxFloat normalForce[D_CONSTRAINT_MAX_ROWS + 1];
 
 			ndConstraint** const jointGroup = &m_jointArray[block];
 
@@ -1927,15 +1927,15 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			preconditioner1 = preconditioner1 * weight1;
 
 			normalForce[0] = m_one;
-			ndSoaFloat accNorm(m_zero);
+			ndAvxFloat accNorm(m_zero);
 			const dInt32 rowsCount = jointGroup[0]->m_rowCount;
 		
 			for (dInt32 j = 0; j < rowsCount; j++)
 			{
 				ndSoaMatrixElement* const row = &massMatrix[j];
 
-				ndSoaFloat a0(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x);
-				ndSoaFloat a1(row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x);
+				ndAvxFloat a0(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x);
+				ndAvxFloat a1(row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x);
 				a0 = a0.MulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_x, forceM0.m_angular.m_x);
 				a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_x, forceM1.m_angular.m_x);
 
@@ -1949,24 +1949,24 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 				a0 = a0.MulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_z, forceM0.m_angular.m_z);
 				a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_z, forceM1.m_angular.m_z);
 
-				ndSoaFloat a (a0 + a1);
+				ndAvxFloat a (a0 + a1);
 				a = row->m_coordenateAccel.MulSub(row->m_force, row->m_diagDamp) - a;
-				ndSoaFloat f(row->m_force.MulAdd(row->m_invJinvMJt, a));
+				ndAvxFloat f(row->m_force.MulAdd(row->m_invJinvMJt, a));
 
-				const ndSoaFloat frictionNormal(normalForce, row->m_normalForceIndex);
-				const ndSoaFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
-				const ndSoaFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
+				const ndAvxFloat frictionNormal(normalForce, row->m_normalForceIndex);
+				const ndAvxFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
+				const ndAvxFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
 
 				a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 
 				accNorm = accNorm.MulAdd(a, a);
-				const ndSoaFloat deltaForce(f - row->m_force);
+				const ndAvxFloat deltaForce(f - row->m_force);
 
 				normalForce[j + 1] = f;
 
-				const ndSoaFloat deltaForce0(deltaForce * preconditioner0);
-				const ndSoaFloat deltaForce1(deltaForce * preconditioner1);
+				const ndAvxFloat deltaForce0(deltaForce * preconditioner0);
+				const ndAvxFloat deltaForce1(deltaForce * preconditioner1);
 
 				forceM0.m_linear.m_x = forceM0.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_x, deltaForce0);
 				forceM0.m_linear.m_y = forceM0.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_y, deltaForce0);
@@ -1986,7 +1986,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			const dFloat32 tol = dFloat32(0.5f);
 			const dFloat32 tol2 = tol * tol;
 
-			ndSoaFloat maxAccel(accNorm);
+			ndAvxFloat maxAccel(accNorm);
 			for (dInt32 k = 0; (k < 4) && (maxAccel.AddHorizontal() > tol2); k++)
 			{
 				maxAccel = m_zero;
@@ -1994,8 +1994,8 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 				{
 					ndSoaMatrixElement* const row = &massMatrix[j];
 
-					ndSoaFloat a0(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x);
-					ndSoaFloat a1(row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x);
+					ndAvxFloat a0(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x);
+					ndAvxFloat a1(row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x);
 					a0 = a0.MulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_x, forceM0.m_angular.m_x);
 					a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_x, forceM1.m_angular.m_x);
 
@@ -2009,26 +2009,26 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 					a0 = a0.MulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_z, forceM0.m_angular.m_z);
 					a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_z, forceM1.m_angular.m_z);
 
-					ndSoaFloat a(a0 + a1);
-					const ndSoaFloat force(normalForce[j + 1]);
+					ndAvxFloat a(a0 + a1);
+					const ndAvxFloat force(normalForce[j + 1]);
 					a = row->m_coordenateAccel.MulSub(force, row->m_diagDamp) - a;
-					ndSoaFloat f(force.MulAdd(row->m_invJinvMJt, a));
+					ndAvxFloat f(force.MulAdd(row->m_invJinvMJt, a));
 
-					const ndSoaFloat frictionNormal(normalForce, row->m_normalForceIndex);
-					const ndSoaFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
-					const ndSoaFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
+					const ndAvxFloat frictionNormal(normalForce, row->m_normalForceIndex);
+					const ndAvxFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
+					const ndAvxFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
 
 					a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 					f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 
 					maxAccel = maxAccel.MulAdd(a, a);
 
-					const ndSoaFloat deltaForce(f - force);
+					const ndAvxFloat deltaForce(f - force);
 
 					normalForce[j + 1] = f;
 
-					const ndSoaFloat deltaForce0(deltaForce * preconditioner0);
-					const ndSoaFloat deltaForce1(deltaForce * preconditioner1);
+					const ndAvxFloat deltaForce0(deltaForce * preconditioner0);
+					const ndAvxFloat deltaForce1(deltaForce * preconditioner1);
 
 					forceM0.m_linear.m_x = forceM0.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_x, deltaForce0);
 					forceM0.m_linear.m_y = forceM0.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_y, deltaForce0);
@@ -2046,7 +2046,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 				}
 			}
 
-			ndSoaFloat mask(m_mask);
+			ndAvxFloat mask(m_mask);
 			if ((block + D_AVX_WORD_GROUP_SIZE) > m_activeCount)
 			{
 				for (dInt32 i = 0; i < D_AVX_WORD_GROUP_SIZE; i++)
@@ -2087,7 +2087,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			for (dInt32 i = 0; i < rowsCount; i++)
 			{
 				ndSoaMatrixElement* const row = &massMatrix[i];
-				const ndSoaFloat force(row->m_force.Select(normalForce[i + 1], mask));
+				const ndAvxFloat force(row->m_force.Select(normalForce[i + 1], mask));
 				row->m_force = force;
 
 				forceM0.m_linear.m_x = forceM0.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_x, force);
@@ -2173,7 +2173,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			ndSoaMatrixElement* const soaMassMatrix = &me->m_soaMassMatrix[0];
 
 			dInt32 temp = -1;
-			m_mask = ndSoaFloat(*(dFloat32*)(&temp));
+			m_mask = ndAvxFloat(*(dFloat32*)(&temp));
 			const dInt32 mask = -dInt32(D_AVX_WORD_GROUP_SIZE);
 			const dInt32 soaJointCount = ((jointCount + D_AVX_WORD_GROUP_SIZE - 1) & mask) / D_AVX_WORD_GROUP_SIZE;
 			me->ClearJacobianBuffer(bodyCount, m_outputForces);
@@ -2186,9 +2186,9 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			accelNorm[threadIndex] = accNorm;
 		}
 
-		ndSoaFloat m_one;
-		ndSoaFloat m_zero;
-		ndSoaFloat m_mask;
+		ndAvxFloat m_one;
+		ndAvxFloat m_zero;
+		ndAvxFloat m_mask;
 		ndJacobian* m_outputForces;
 		ndJacobian* m_internalForces;
 		ndRightHandSide* m_rightHandSide;

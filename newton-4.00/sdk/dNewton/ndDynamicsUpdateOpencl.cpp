@@ -1192,7 +1192,7 @@ void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
 			const ndLeftHandSide* const leftHandSide = &me->GetLeftHandSide()[0];
 			const ndRightHandSide* const rightHandSide = &me->GetRightHandSide()[0];
-			dArray<ndOpencl::ndSoaMatrixElement>& massMatrix = me->m_soaMassMatrix;
+			dArray<ndOpencl::ndOpenclMatrixElement>& massMatrix = me->m_soaMassMatrix;
 
 			const dInt32 mask = -dInt32(D_OPENCL_WORD_GROUP_SIZE);
 			const dInt32 soaJointCount = ((jointCount + D_OPENCL_WORD_GROUP_SIZE - 1) & mask) / D_OPENCL_WORD_GROUP_SIZE;
@@ -1236,7 +1236,7 @@ void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 						const ndLeftHandSide* const row2 = &leftHandSide[joint2->m_rowStart + j];
 						const ndLeftHandSide* const row3 = &leftHandSide[joint3->m_rowStart + j];
 
-						ndOpencl::ndSoaMatrixElement& row = massMatrix[soaRowBase + j];
+						ndOpencl::ndOpenclMatrixElement& row = massMatrix[soaRowBase + j];
 						dVector::Transpose4x4(
 							row.m_Jt.m_jacobianM0.m_linear.m_x, 
 							row.m_Jt.m_jacobianM0.m_linear.m_y,
@@ -1333,7 +1333,7 @@ void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 					const ndConstraint* const firstJoint = jointArray[index];
 					for (dInt32 j = 0; j < firstJoint->m_rowCount; j++)
 					{
-						ndOpencl::ndSoaMatrixElement& row = massMatrix[soaRowBase + j];
+						ndOpencl::ndOpenclMatrixElement& row = massMatrix[soaRowBase + j];
 						row.m_Jt.m_jacobianM0.m_linear.m_x = zero;
 						row.m_Jt.m_jacobianM0.m_linear.m_y = zero;
 						row.m_Jt.m_jacobianM0.m_linear.m_z = zero;
@@ -1380,7 +1380,7 @@ void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 						{
 							for (dInt32 k = 0; k < joint->m_rowCount; k++)
 							{
-								ndOpencl::ndSoaMatrixElement& row = massMatrix[soaRowBase + k];
+								ndOpencl::ndOpenclMatrixElement& row = massMatrix[soaRowBase + k];
 								const ndLeftHandSide* const lhs = &leftHandSide[joint->m_rowStart + k];
 					
 								row.m_Jt.m_jacobianM0.m_linear.m_x[j] = lhs->m_Jt.m_jacobianM0.m_linear.m_x;
@@ -1647,7 +1647,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsAcceleration()
 			const dInt32 soaJointCountBatches = ((jointCount + D_OPENCL_WORD_GROUP_SIZE - 1) & mask) / D_OPENCL_WORD_GROUP_SIZE;
 
 			const ndConstraint* const * jointArrayPtr = &jointArray[0];
-			ndSoaMatrixElement* const massMatrix = &me->m_soaMassMatrix[0];
+			ndOpenclMatrixElement* const massMatrix = &me->m_soaMassMatrix[0];
 			for (dInt32 i = threadIndex; i < soaJointCountBatches; i += threadCount)
 			{
 				const ndConstraint* const * jointGroup = &jointArrayPtr[i * D_OPENCL_WORD_GROUP_SIZE];
@@ -1663,7 +1663,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsAcceleration()
 						const dInt32 startBase = Joint->m_rowStart;
 						for (dInt32 k = 0; k < rowCount; k++)
 						{
-							ndSoaMatrixElement* const row = &massMatrix[soaRowStartBase + k];
+							ndOpenclMatrixElement* const row = &massMatrix[soaRowStartBase + k];
 							row->m_coordenateAccel[j] = rightHandSide[startBase + k].m_coordenateAccel;
 						}
 					}
@@ -1679,7 +1679,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsAcceleration()
 							const dInt32 startBase = Joint->m_rowStart;
 							for (dInt32 k = 0; k < rowCount; k++)
 							{
-								ndSoaMatrixElement* const row = &massMatrix[soaRowStartBase + k];
+								ndOpenclMatrixElement* const row = &massMatrix[soaRowStartBase + k];
 								row->m_coordenateAccel[j] = rightHandSide[startBase + k].m_coordenateAccel;
 							}
 						}
@@ -1772,12 +1772,12 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 		{
 		}
 
-		dFloat32 JointForce(dInt32 block, ndSoaMatrixElement* const massMatrix)
+		dFloat32 JointForce(dInt32 block, ndOpenclMatrixElement* const massMatrix)
 		{
 			dVector weight0;
 			dVector weight1;
-			ndSoaVector6 forceM0;
-			ndSoaVector6 forceM1;
+			ndOpenclVector6 forceM0;
+			ndOpenclVector6 forceM1;
 			dVector preconditioner0;
 			dVector preconditioner1;
 			dVector normalForce[D_CONSTRAINT_MAX_ROWS + 1];
@@ -1892,7 +1892,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 		
 			for (dInt32 j = 0; j < rowsCount; j++)
 			{
-				const ndSoaMatrixElement* const row = &massMatrix[j];
+				const ndOpenclMatrixElement* const row = &massMatrix[j];
 
 				dVector a(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x);
 				a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_y, forceM0.m_linear.m_y);
@@ -1952,7 +1952,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 				maxAccel = m_zero;
 				for (dInt32 j = 0; j < rowsCount; j++)
 				{
-					const ndSoaMatrixElement* const row = &massMatrix[j];
+					const ndOpenclMatrixElement* const row = &massMatrix[j];
 
 					dVector a(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x);
 					a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_y, forceM0.m_linear.m_y);
@@ -2046,7 +2046,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 			forceM1.m_angular.m_z = m_zero;
 			for (dInt32 i = 0; i < rowsCount; i++)
 			{
-				ndSoaMatrixElement* const row = &massMatrix[i];
+				ndOpenclMatrixElement* const row = &massMatrix[i];
 				const dVector force(row->m_force.Select(normalForce[i + 1], mask));
 				row->m_force = force;
 
@@ -2098,7 +2098,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 					dInt32 const rowStartBase = joint->m_rowStart;
 					for (dInt32 j = 0; j < rowCount; j++)
 					{
-						const ndSoaMatrixElement* const row = &massMatrix[j];
+						const ndOpenclMatrixElement* const row = &massMatrix[j];
 						rightHandSide[j + rowStartBase].m_force = row->m_force[i];
 						rightHandSide[j + rowStartBase].m_maxImpact = dMax(dAbs(row->m_force[i]), rightHandSide[j + rowStartBase].m_maxImpact);
 					}
@@ -2130,7 +2130,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 			m_jointArray = &jointArray[0];
 
 			const dInt32* const soaJointRows = &me->m_soaJointRows[0];
-			ndSoaMatrixElement* const soaMassMatrix = &me->m_soaMassMatrix[0];
+			ndOpenclMatrixElement* const soaMassMatrix = &me->m_soaMassMatrix[0];
 
 			dInt32 temp = -1;
 			m_mask = dVector(*(dFloat32*)(&temp));

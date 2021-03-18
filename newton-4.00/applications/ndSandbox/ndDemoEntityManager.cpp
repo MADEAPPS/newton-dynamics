@@ -151,7 +151,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_synchronousPhysicsUpdate(false)
 	,m_showRaycastHit(false)
 	,m_profilerMode(false)
-	,m_solverMode(0)
+	,m_solverMode(ndWorld::ndSimdSoaSolver)
 	//,m_directionalLight(0.0f, 1.0f, 0.0f, 0.0f)
 	,m_debugShapeCache()
 {
@@ -242,7 +242,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_autoSleepMode = false;
-	//m_solverMode = 1;
+	m_solverMode = ndWorld::ndOpenclSolver;
 	//m_sceneType = 1;
 	//m_solverPasses = 4;
 	//m_workerThreads = 4;
@@ -630,9 +630,12 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Separator();
 
 			ImGui::Text("solvers");
-			ImGui::RadioButton("default", &m_solverMode, 0);
-			ImGui::RadioButton("avx2", &m_solverMode, 1);
-			ImGui::RadioButton("opencl", &m_solverMode, 2);
+			dInt32 solverMode(m_solverMode);
+			ImGui::RadioButton("sse soa", &solverMode, ndWorld::ndSimdSoaSolver);
+			ImGui::RadioButton("avx2", &solverMode, ndWorld::ndSimdAvx2Solver);
+			ImGui::RadioButton("opencl", &solverMode, ndWorld::ndOpenclSolver);
+			ImGui::RadioButton("default", &solverMode, ndWorld::ndStandardSolver);
+			m_solverMode = ndWorld::ndSolverModes(solverMode);
 			ImGui::Separator();
 
 			//dInt32 index = 0;

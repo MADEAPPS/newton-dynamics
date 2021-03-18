@@ -30,34 +30,34 @@ namespace ndAvx2
 	#define D_AVX_WORD_GROUP_SIZE	8 
 
 	D_MSV_NEWTON_ALIGN_32
-	class ndSoaFloat
+	class ndAvxFloat
 	{
 		public:
-		D_INLINE ndSoaFloat()
+		D_INLINE ndAvxFloat()
 		{
 		}
 
-		D_INLINE ndSoaFloat(const dFloat32 val)
+		D_INLINE ndAvxFloat(const dFloat32 val)
 			:m_type(_mm256_set1_ps(val))
 		{
 		}
 
-		D_INLINE ndSoaFloat(const __m256 type)
+		D_INLINE ndAvxFloat(const __m256 type)
 			: m_type(type)
 		{
 		}
 
-		D_INLINE ndSoaFloat(const ndSoaFloat& copy)
+		D_INLINE ndAvxFloat(const ndAvxFloat& copy)
 			: m_type(copy.m_type)
 		{
 		}
 
-		D_INLINE ndSoaFloat(const dVector& low, const dVector& high)
+		D_INLINE ndAvxFloat(const dVector& low, const dVector& high)
 			: m_type(_mm256_set_m128(high.m_type, low.m_type))
 		{
 		}
 
-		D_INLINE ndSoaFloat(const ndSoaFloat* const baseAddr, const ndSoaFloat& index)
+		D_INLINE ndAvxFloat(const ndAvxFloat* const baseAddr, const ndAvxFloat& index)
 			: m_type(_mm256_i32gather_ps(&(*baseAddr)[0], index.m_typeInt, 4))
 		{
 		}
@@ -80,62 +80,62 @@ namespace ndAvx2
 			return ptr[i];
 		}
 
-		D_INLINE ndSoaFloat operator+ (const ndSoaFloat& A) const
+		D_INLINE ndAvxFloat operator+ (const ndAvxFloat& A) const
 		{
 			return _mm256_add_ps(m_type, A.m_type);
 		}
 
-		D_INLINE ndSoaFloat operator- (const ndSoaFloat& A) const
+		D_INLINE ndAvxFloat operator- (const ndAvxFloat& A) const
 		{
 			return _mm256_sub_ps(m_type, A.m_type);
 		}
 
-		D_INLINE ndSoaFloat operator* (const ndSoaFloat& A) const
+		D_INLINE ndAvxFloat operator* (const ndAvxFloat& A) const
 		{
 			return _mm256_mul_ps(m_type, A.m_type);
 		}
 
-		D_INLINE ndSoaFloat MulAdd(const ndSoaFloat& A, const ndSoaFloat& B) const
+		D_INLINE ndAvxFloat MulAdd(const ndAvxFloat& A, const ndAvxFloat& B) const
 		{
 			return _mm256_fmadd_ps(A.m_type, B.m_type, m_type);
 		}
 
-		D_INLINE ndSoaFloat MulSub(const ndSoaFloat& A, const ndSoaFloat& B) const
+		D_INLINE ndAvxFloat MulSub(const ndAvxFloat& A, const ndAvxFloat& B) const
 		{
 			return _mm256_fnmadd_ps(A.m_type, B.m_type, m_type);
 		}
 
-		D_INLINE ndSoaFloat operator> (const ndSoaFloat& A) const
+		D_INLINE ndAvxFloat operator> (const ndAvxFloat& A) const
 		{
 			return _mm256_cmp_ps(m_type, A.m_type, _CMP_GT_OQ);
 		}
 
-		D_INLINE ndSoaFloat operator< (const ndSoaFloat& A) const
+		D_INLINE ndAvxFloat operator< (const ndAvxFloat& A) const
 		{
 			return _mm256_cmp_ps(m_type, A.m_type, _CMP_LT_OQ);
 		}
 
-		D_INLINE ndSoaFloat operator| (const ndSoaFloat& A) const
+		D_INLINE ndAvxFloat operator| (const ndAvxFloat& A) const
 		{
 			return _mm256_or_ps(m_type, A.m_type);
 		}
 
-		D_INLINE ndSoaFloat operator& (const ndSoaFloat& A) const
+		D_INLINE ndAvxFloat operator& (const ndAvxFloat& A) const
 		{
 			return _mm256_and_ps(m_type, A.m_type);
 		}
 
-		D_INLINE ndSoaFloat GetMin(const ndSoaFloat& A) const
+		D_INLINE ndAvxFloat GetMin(const ndAvxFloat& A) const
 		{
 			return _mm256_min_ps(m_type, A.m_type);
 		}
 
-		D_INLINE ndSoaFloat GetMax(const ndSoaFloat& A) const
+		D_INLINE ndAvxFloat GetMax(const ndAvxFloat& A) const
 		{
 			return _mm256_max_ps(m_type, A.m_type);
 		}
 
-		D_INLINE ndSoaFloat Select(const ndSoaFloat& data, const ndSoaFloat& mask) const
+		D_INLINE ndAvxFloat Select(const ndAvxFloat& data, const ndAvxFloat& mask) const
 		{
 			// (((b ^ a) & mask)^a)
 			//return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
@@ -164,28 +164,28 @@ namespace ndAvx2
 	} D_GCC_NEWTON_ALIGN_32;
 
 	D_MSV_NEWTON_ALIGN_32
-	class ndSoaVector3
+	class ndAvxVector3
 	{
 		public:
-		ndSoaFloat m_x;
-		ndSoaFloat m_y;
-		ndSoaFloat m_z;
+		ndAvxFloat m_x;
+		ndAvxFloat m_y;
+		ndAvxFloat m_z;
 	} D_GCC_NEWTON_ALIGN_32;
 
 	D_MSV_NEWTON_ALIGN_32
-	class ndSoaVector6
+	class ndOpenclVector6
 	{
 		public:
-		ndSoaVector3 m_linear;
-		ndSoaVector3 m_angular;
+		ndAvxVector3 m_linear;
+		ndAvxVector3 m_angular;
 	} D_GCC_NEWTON_ALIGN_32;
 
 	D_MSV_NEWTON_ALIGN_32
-	class ndSoaJacobianPair
+	class ndOpenclJacobianPair
 	{
 		public:
-		ndSoaVector6 m_jacobianM0;
-		ndSoaVector6 m_jacobianM1;
+		ndOpenclVector6 m_jacobianM0;
+		ndOpenclVector6 m_jacobianM1;
 	} D_GCC_NEWTON_ALIGN_32;
 
 
@@ -193,16 +193,16 @@ namespace ndAvx2
 	class ndSoaMatrixElement
 	{
 		public:
-		ndSoaJacobianPair m_Jt;
-		ndSoaJacobianPair m_JMinv;
+		ndOpenclJacobianPair m_Jt;
+		ndOpenclJacobianPair m_JMinv;
 
-		ndSoaFloat m_force;
-		ndSoaFloat m_diagDamp;
-		ndSoaFloat m_invJinvMJt;
-		ndSoaFloat m_coordenateAccel;
-		ndSoaFloat m_normalForceIndex;
-		ndSoaFloat m_lowerBoundFrictionCoefficent;
-		ndSoaFloat m_upperBoundFrictionCoefficent;
+		ndAvxFloat m_force;
+		ndAvxFloat m_diagDamp;
+		ndAvxFloat m_invJinvMJt;
+		ndAvxFloat m_coordenateAccel;
+		ndAvxFloat m_normalForceIndex;
+		ndAvxFloat m_lowerBoundFrictionCoefficent;
+		ndAvxFloat m_upperBoundFrictionCoefficent;
 	} D_GCC_NEWTON_ALIGN_32;
 };
 

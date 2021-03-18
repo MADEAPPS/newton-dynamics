@@ -29,7 +29,7 @@ namespace ndOpencl
 {
 	#define D_OPENCL_WORD_GROUP_SIZE 4 
 
-	class ndSoaVector3
+	class ndOpenclVector3
 	{
 		public:
 		dVector m_x;
@@ -37,25 +37,25 @@ namespace ndOpencl
 		dVector m_z;
 	};
 
-	class ndSoaVector6
+	class ndOpenclVector6
 	{
 		public:
-		ndSoaVector3 m_linear;
-		ndSoaVector3 m_angular;
+		ndOpenclVector3 m_linear;
+		ndOpenclVector3 m_angular;
 	};
 
-	class ndSoaJacobianPair
+	class ndOpenclJacobianPair
 	{
 		public:
-		ndSoaVector6 m_jacobianM0;
-		ndSoaVector6 m_jacobianM1;
+		ndOpenclVector6 m_jacobianM0;
+		ndOpenclVector6 m_jacobianM1;
 	};
 
-	class ndSoaMatrixElement
+	class ndOpenclMatrixElement
 	{
 		public:
-		ndSoaJacobianPair m_Jt;
-		ndSoaJacobianPair m_JMinv;
+		ndOpenclJacobianPair m_Jt;
+		ndOpenclJacobianPair m_JMinv;
 
 		dVector m_force;
 		dVector m_diagDamp;
@@ -102,7 +102,7 @@ class ndDynamicsUpdateOpencl: public ndDynamicsUpdate
 	static dInt32 CompareIslands(const ndIsland* const A, const ndIsland* const B, void* const context);
 
 	dArray<dInt32> m_soaJointRows;
-	dArray<ndOpencl::ndSoaMatrixElement> m_soaMassMatrix;
+	dArray<ndOpencl::ndOpenclMatrixElement> m_soaMassMatrix;
 
 } D_GCC_NEWTON_ALIGN_32;
 

@@ -71,8 +71,8 @@ class ndWorld: public dClassAlloc
 	dInt32 GetSubSteps() const;
 	void SetSubSteps(dInt32 subSteps);
 
-	dInt32 GetSelectedSolver() const;
-	D_NEWTON_API void SelectSolver(dInt32 solver);
+	ndSolverModes GetSelectedSolver() const;
+	D_NEWTON_API void SelectSolver(ndSolverModes solverMode);
 	D_NEWTON_API const char* GetSolverString() const;
 
 	D_NEWTON_API virtual bool AddBody(ndBody* const body);
@@ -316,7 +316,7 @@ inline void ndWorld::Update(dFloat32 timestep)
 	m_scene->TickOne();
 }
 
-inline dInt32 ndWorld::GetSelectedSolver() const
+inline ndWorld::ndSolverModes ndWorld::GetSelectedSolver() const
 {
 	return m_solverMode;
 }

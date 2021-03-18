@@ -185,7 +185,7 @@ ndWorld::~ndWorld()
 	ClearCache();
 }
 
-void ndWorld::SelectSolver(dInt32 solverMode)
+void ndWorld::SelectSolver(ndSolverModes solverMode)
 {
 	if (solverMode != m_solverMode)
 	{
