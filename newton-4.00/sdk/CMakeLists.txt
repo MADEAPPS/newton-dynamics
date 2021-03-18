@@ -35,7 +35,21 @@ else()
 	include_directories(dCollision/)
 	include_directories(dNewton/dModels/)
 	include_directories(dNewton/dJoints/)
-	
+
+	if (NEWTON_ENABLE_GPU_SOLVER)
+		add_definitions(-D_D_NEWTON_OPENCL)
+		add_definitions(-DCL_TARGET_OPENCL_VERSION=120)
+		include_directories(dOpencl/)
+
+		if(NEWTON_BUILD_SHARED_LIBS STREQUAL "ON")
+			if (BUILD_64)
+				link_libraries ("$(NEWTON_OPENCL_RUNTIME)/lib/x64/OpenCL.lib")
+			else(BUILD_64)
+				link_libraries ("$(NEWTON_OPENCL_RUNTIME)/lib/x86/OpenCL.lib")
+			endif(BUILD_64)
+		endif ()
+	endif(NEWTON_ENABLE_GPU_SOLVER)
+
 	# source and header files
 	file(GLOB HEADERS dTinyxml/*.h dCore/*.h dNewton/*.h dCollision/*.h dNewton/dJoints/*.h dNewton/dModels/*.h)
 	file(GLOB CPP_SOURCE 

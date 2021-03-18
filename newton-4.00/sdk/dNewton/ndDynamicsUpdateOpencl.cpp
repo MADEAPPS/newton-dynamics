@@ -27,16 +27,258 @@
 #include "ndDynamicsUpdateOpencl.h"
 #include "ndJointBilateralConstraint.h"
 
+#ifdef _D_NEWTON_OPENCL
+#include <CL/cl.h>
+
 using namespace ndOpencl;
+
+class ocl_args_d_t
+{
+	public:
+	ocl_args_d_t()
+		:context(nullptr)
+		,device(nullptr)
+		,commandQueue(nullptr)
+		,program(nullptr)
+		,kernel(nullptr)
+		,platformVersion(CL_TARGET_OPENCL_VERSION)
+		,deviceVersion(CL_TARGET_OPENCL_VERSION)
+		,compilerVersion(CL_TARGET_OPENCL_VERSION)
+		,srcA(nullptr)
+		,srcB(nullptr)
+		,dstMem(nullptr)
+	{
+	}
+
+	~ocl_args_d_t()
+	{
+	}
+
+	static ocl_args_d_t* Singleton()
+	{
+		//cl_int err;
+		//cl_device_type deviceType = CL_DEVICE_TYPE_GPU;
+
+		//SetupOpenCL(ocl_args_d_t *ocl, cl_device_type deviceType)
+		SetupOpenCL();
+
+		return nullptr;
+	}
+
+	static bool CheckPreferredPlatformMatch(cl_platform_id platform, const char* preferredPlatform)
+	{
+		//size_t stringLength = 0;
+		//cl_int err = CL_SUCCESS;
+		//bool match = false;
+		//
+		//// In order to read the platform's name, we first read the platform's name string length (param_value is NULL).
+		//// The value returned in stringLength
+		//err = clGetPlatformInfo(platform, CL_PLATFORM_NAME, 0, NULL, &stringLength);
+		//if (CL_SUCCESS != err)
+		//{
+		//	LogError("Error: clGetPlatformInfo() to get CL_PLATFORM_NAME length returned '%s'.\n", TranslateOpenCLError(err));
+		//	return false;
+		//}
+		//
+		//// Now, that we know the platform's name string length, we can allocate enough space before read it
+		//std::vector<char> platformName(stringLength);
+		//
+		//// Read the platform's name string
+		//// The read value returned in platformName
+		//err = clGetPlatformInfo(platform, CL_PLATFORM_NAME, stringLength, &platformName[0], NULL);
+		//if (CL_SUCCESS != err)
+		//{
+		//	LogError("Error: clGetplatform_ids() to get CL_PLATFORM_NAME returned %s.\n", TranslateOpenCLError(err));
+		//	return false;
+		//}
+		//const char *xxx = &platformName[0];
+		//
+		//// Now check if the platform's name is the required one
+		//if (strstr(&platformName[0], preferredPlatform) != 0)
+		//{
+		//	// The checked platform is the one we're looking for
+		//	LogInfo("Platform: %s\n", &platformName[0]);
+		//	match = true;
+		//}
+		//
+		//return match;
+		return false;
+	}
+
+	//cl_platform_id FindOpenCLPlatform(const char* preferredPlatform, cl_device_type deviceType)
+	static cl_platform_id FindOpenCLPlatform()
+	{
+		cl_uint numPlatforms = 0;
+		cl_int err = CL_SUCCESS;
+
+		// Get (in numPlatforms) the number of OpenCL platforms available
+		// No platform ID will be return, since platforms is nullptr
+
+		err = clGetPlatformIDs(0, nullptr, &numPlatforms);
+		if (CL_SUCCESS != err)
+		{
+			return nullptr;
+		}
+
+		//LogInfo("Number of available platforms: %u\n", numPlatforms);
+		//
+		//if (0 == numPlatforms)
+		//{
+		//	LogError("Error: No platforms found!\n");
+		//	return nullptr;
+		//}
+		//
+		//std::vector<cl_platform_id> platforms(numPlatforms);
+
+		// Now, obtains a list of numPlatforms OpenCL platforms available
+		// The list of platforms available will be returned in platforms
+		cl_platform_id platforms[32];
+		err = clGetPlatformIDs(numPlatforms, &platforms[0], nullptr);
+		if (CL_SUCCESS != err)
+		{
+			return nullptr;
+		}
+
+		// Check if one of the available platform matches the preferred requirements
+		for (cl_uint i = 0; i < numPlatforms; i++)
+		{
+			bool match = true;
+			cl_uint numDevices = 0;
+
+			// If the preferredPlatform is not nullptr then check if platforms[i] is the required one
+			// Otherwise, continue the check with platforms[i]
+			//if ((nullptr != preferredPlatform) && (strlen(preferredPlatform) > 0))
+			{
+				// In case we're looking for a specific platform
+				match = CheckPreferredPlatformMatch(platforms[i], preferredPlatform);
+			}
+
+			// match is true if the platform's name is the required one or don't care (nullptr)
+			if (match)
+			{
+				// Obtains the number of deviceType devices available on platform
+				// When the function failed we expect numDevices to be zero.
+				// We ignore the function return value since a non-zero error code
+				// could happen if this platform doesn't support the specified device type.
+				err = clGetDeviceIDs(platforms[i], deviceType, 0, nullptr, &numDevices);
+				if (CL_SUCCESS != err)
+				{
+					LogInfo("   Required device was not found on this platform.\n");
+				}
+
+				if (0 != numDevices)
+				{
+					// There is at list one device that answer the requirements
+					LogInfo("   Required device was found.\n");
+					return platforms[i];
+				}
+			}
+		}
+
+		return nullptr;
+	}
+
+	//static int SetupOpenCL(ocl_args_d_t *ocl, cl_device_type deviceType)
+	static int SetupOpenCL()
+	{
+
+		// The following variable stores return codes for all OpenCL calls.
+		cl_int err = CL_SUCCESS;
+
+		// Query for all available OpenCL platforms on the system
+		// Here you enumerate all platforms and pick one which name has preferredPlatform as a sub-string
+		//cl_platform_id platformId = FindOpenCLPlatform("Intel", deviceType);
+		//cl_platform_id platformId = FindOpenCLPlatform("AMD Accelerated Parallel Processing", deviceType);
+		cl_platform_id platformId = FindOpenCLPlatform();
+		if (nullptr == platformId)
+		{
+			//LogError("Error: Failed to find OpenCL platform.\n");
+			return CL_INVALID_VALUE;
+		}
+/*
+		// Create context with device of specified type.
+		// Required device type is passed as function argument deviceType.
+		// So you may use this function to create context for any CPU or GPU OpenCL device.
+		// The creation is synchronized (pfn_notify is nullptr) and nullptr user_data
+		cl_context_properties contextProperties[] = { CL_CONTEXT_PLATFORM, (cl_context_properties)platformId, 0 };
+		ocl->context = clCreateContextFromType(contextProperties, deviceType, nullptr, nullptr, &err);
+		if ((CL_SUCCESS != err) || (nullptr == ocl->context))
+		{
+			LogError("Couldn't create a context, clCreateContextFromType() returned '%s'.\n", TranslateOpenCLError(err));
+			return err;
+		}
+
+		// Query for OpenCL device which was used for context creation
+		err = clGetContextInfo(ocl->context, CL_CONTEXT_DEVICES, sizeof(cl_device_id), &ocl->device, nullptr);
+		if (CL_SUCCESS != err)
+		{
+			LogError("Error: clGetContextInfo() to get list of devices returned %s.\n", TranslateOpenCLError(err));
+			return err;
+		}
+
+		// Read the OpenCL platform's version and the device OpenCL and OpenCL C versions
+		GetPlatformAndDeviceVersion(platformId, ocl);
+
+		// Create command queue.
+		// OpenCL kernels are enqueued for execution to a particular device through special objects called command queues.
+		// Command queue guarantees some ordering between calls and other OpenCL commands.
+		// Here you create a simple in-order OpenCL command queue that doesn't allow execution of two kernels in parallel on a target device.
+#ifdef CL_VERSION_2_0
+		if (OPENCL_VERSION_2_0 == ocl->deviceVersion)
+		{
+			const cl_command_queue_properties properties[] = { CL_QUEUE_PROPERTIES, CL_QUEUE_PROFILING_ENABLE, 0 };
+			ocl->commandQueue = clCreateCommandQueueWithProperties(ocl->context, ocl->device, properties, &err);
+		}
+		else {
+			// default behavior: OpenCL 1.2
+			cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
+			ocl->commandQueue = clCreateCommandQueue(ocl->context, ocl->device, properties, &err);
+		}
+#else
+		// default behavior: OpenCL 1.2
+		cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
+		ocl->commandQueue = clCreateCommandQueue(ocl->context, ocl->device, properties, &err);
+#endif
+		if (CL_SUCCESS != err)
+		{
+			LogError("Error: clCreateCommandQueue() returned %s.\n", TranslateOpenCLError(err));
+			return err;
+		}
+*/
+		return CL_SUCCESS;
+	}
+
+	// Regular OpenCL objects:
+	cl_context       context;           // hold the context handler
+	cl_device_id     device;            // hold the selected device handler
+	cl_command_queue commandQueue;      // hold the commands-queue handler
+	cl_program       program;           // hold the program handler
+	cl_kernel        kernel;            // hold the kernel handler
+	float            platformVersion;   // hold the OpenCL platform version (default 1.2)
+	float            deviceVersion;     // hold the OpenCL device version (default. 1.2)
+	float            compilerVersion;   // hold the device OpenCL C version (default. 1.2)
+
+										// Objects that are specific for algorithm implemented in this sample
+	cl_mem           srcA;              // hold first source buffer
+	cl_mem           srcB;              // hold second source buffer
+	cl_mem           dstMem;            // hold destination buffer
+};
+
 
 ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world)
 	:ndDynamicsUpdate(world)
 	,m_soaJointRows(D_DEFAULT_BUFFER_SIZE * 4)
+	,m_openCl(nullptr)
 {
+	m_openCl = ocl_args_d_t::Singleton();
 }
 
 ndDynamicsUpdateOpencl::~ndDynamicsUpdateOpencl()
 {
+	if (m_openCl)
+	{
+		delete m_openCl;
+	}
 	Clear();
 	m_soaJointRows.Resize(1024);
 }
@@ -2266,3 +2508,4 @@ void ndDynamicsUpdateOpencl::CalculateForces()
 	IntegrateBodies();
 }
 
+#endif

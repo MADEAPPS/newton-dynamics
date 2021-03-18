@@ -67,10 +67,21 @@ namespace ndOpencl
 	};
 };
 
+class ocl_args_d_t;
+
 D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdateOpencl: public ndDynamicsUpdate
 {
 	public:
+#ifndef _D_NEWTON_OPENCL
+	ndDynamicsUpdateOpencl(ndWorld* const world)
+		:ndDynamicsUpdate(world)
+	{
+	}
+	virtual ~ndDynamicsUpdateOpencl()
+	{
+	}
+#else
 	ndDynamicsUpdateOpencl(ndWorld* const world);
 	virtual ~ndDynamicsUpdateOpencl();
 
@@ -104,6 +115,8 @@ class ndDynamicsUpdateOpencl: public ndDynamicsUpdate
 	dArray<dInt32> m_soaJointRows;
 	dArray<ndOpencl::ndOpenclMatrixElement> m_soaMassMatrix;
 
+	ocl_args_d_t* m_openCl;
+#endif
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif
