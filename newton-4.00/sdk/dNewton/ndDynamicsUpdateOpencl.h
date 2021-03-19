@@ -67,7 +67,7 @@ namespace ndOpencl
 	};
 };
 
-class ocl_args_d_t;
+class OpenclSystem;
 
 D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdateOpencl: public ndDynamicsUpdate
@@ -115,7 +115,7 @@ class ndDynamicsUpdateOpencl: public ndDynamicsUpdate
 	dArray<dInt32> m_soaJointRows;
 	dArray<ndOpencl::ndOpenclMatrixElement> m_soaMassMatrix;
 
-	ocl_args_d_t* m_openCl;
+	OpenclSystem* m_openCl;
 #endif
 } D_GCC_NEWTON_ALIGN_32;
 

@@ -32,11 +32,11 @@
 
 using namespace ndOpencl;
 
-class ocl_args_d_t
+class OpenclSystem
 {
 	public:
-	ocl_args_d_t()
-		//:context(nullptr)
+	OpenclSystem(cl_context context)
+		:m_context(context)
 		//,device(nullptr)
 		//,commandQueue(nullptr)
 		//,program(nullptr)
@@ -48,27 +48,74 @@ class ocl_args_d_t
 		//,srcB(nullptr)
 		//,dstMem(nullptr)
 	{
+		cl_int err;
+		// get the device
+		err = clGetContextInfo(m_context, CL_CONTEXT_DEVICES, sizeof(cl_device_id), &m_device, nullptr);
+		dAssert(err == CL_SUCCESS);
 	}
 
-	~ocl_args_d_t()
+	~OpenclSystem()
 	{
+		cl_int err;
+		err = clReleaseContext(m_context);
+		dAssert(err == CL_SUCCESS);
 	}
 
-	static ocl_args_d_t* Singleton()
+	static OpenclSystem* Singleton()
 	{
 		cl_uint numPlatforms = 0;
-		cl_int err = clGetPlatformIDs(0, NULL, &numPlatforms);
-		if (CL_SUCCESS != err)
+		cl_int err = clGetPlatformIDs(0, nullptr, &numPlatforms);
+		if ((err != CL_SUCCESS) || (numPlatforms == 0))
 		{
 			return nullptr;
 		}
 
-		return nullptr;
+		dAssert(numPlatforms < 16);
+		cl_platform_id platforms[16];
+		err = clGetPlatformIDs(numPlatforms, &platforms[0], nullptr);
+		if (err != CL_SUCCESS)
+		{
+			return nullptr;
+		}
+
+		//size_t stringLength = 0;
+		cl_platform_id bestPlatform = 0;
+		for (cl_uint i = 0; i < numPlatforms; i++)
+		{
+			cl_uint numDevices = 0;
+			err = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 0, nullptr, &numDevices);
+			if (!((err != CL_SUCCESS) || (numDevices == 0)))
+			{
+				bestPlatform = platforms[i];
+			}
+
+
+			//err = clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, 0, nullptr, &stringLength);
+			//if (err != CL_SUCCESS)
+			//{
+			//	return nullptr;
+			//}
+		}
+
+		if (bestPlatform == nullptr)
+		{
+			return nullptr;
+		}
+
+		cl_context_properties contextProperties[] = { CL_CONTEXT_PLATFORM, (cl_context_properties)bestPlatform, 0 };
+
+		cl_context context = clCreateContextFromType(contextProperties, CL_DEVICE_TYPE_GPU, nullptr, nullptr, &err);
+		if ((CL_SUCCESS != err) || (context == nullptr))
+		{
+			return nullptr;
+		}
+
+		return new OpenclSystem(context);
 	}
 
 	// Regular OpenCL objects:
-	//cl_context       context;           // hold the context handler
-	//cl_device_id     device;            // hold the selected device handler
+	cl_context m_context;           // hold the context handler
+	cl_device_id m_device;            // hold the selected device handler
 	//cl_command_queue commandQueue;      // hold the commands-queue handler
 	//cl_program       program;           // hold the program handler
 	//cl_kernel        kernel;            // hold the kernel handler
@@ -79,6 +126,7 @@ class ocl_args_d_t
 	//cl_mem           srcA;              // hold first source buffer
 	//cl_mem           srcB;              // hold second source buffer
 	//cl_mem           dstMem;            // hold destination buffer
+	char m_platformName[128];
 };
 
 
@@ -87,7 +135,7 @@ ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world)
 	,m_soaJointRows(D_DEFAULT_BUFFER_SIZE * 4)
 	,m_openCl(nullptr)
 {
-	m_openCl = ocl_args_d_t::Singleton();
+	m_openCl = OpenclSystem::Singleton();
 }
 
 ndDynamicsUpdateOpencl::~ndDynamicsUpdateOpencl()
