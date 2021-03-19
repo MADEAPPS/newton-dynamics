@@ -67,11 +67,23 @@ class OpenclSystem
 		dAssert(stringLength < sizeof(m_platformName));
 		err = clGetDeviceInfo(m_device, CL_DEVICE_VERSION, stringLength, m_platformName, nullptr);
 		dAssert(err == CL_SUCCESS);
+
+		// create command queue
+		cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
+		m_commandQueue = clCreateCommandQueue(m_context, m_device, properties, &err);
+		dAssert(err == CL_SUCCESS);
 	}
 
 	~OpenclSystem()
 	{
 		cl_int err;
+
+		err = clReleaseCommandQueue(m_commandQueue);
+		dAssert(err == CL_SUCCESS);
+
+		err = clReleaseDevice(m_device);
+		dAssert(err == CL_SUCCESS);
+
 		err = clReleaseContext(m_context);
 		dAssert(err == CL_SUCCESS);
 	}
@@ -122,9 +134,9 @@ class OpenclSystem
 	}
 
 	// Regular OpenCL objects:
-	cl_context m_context;           // hold the context handler
-	cl_device_id m_device;            // hold the selected device handler
-	//cl_command_queue commandQueue;      // hold the commands-queue handler
+	cl_context m_context;					// hold the context handler
+	cl_device_id m_device;					// hold the selected device handler
+	cl_command_queue m_commandQueue;		// hold the commands-queue handler
 	//cl_program       program;           // hold the program handler
 	//cl_kernel        kernel;            // hold the kernel handler
 	//float            platformVersion;   // hold the OpenCL platform version (default 1.2)
