@@ -35,7 +35,7 @@ using namespace ndOpencl;
 class OpenclSystem
 {
 	public:
-	OpenclSystem(cl_context context)
+	OpenclSystem(cl_context context, cl_platform_id platform)
 		:m_context(context)
 		//,device(nullptr)
 		//,commandQueue(nullptr)
@@ -52,6 +52,11 @@ class OpenclSystem
 		// get the device
 		err = clGetContextInfo(m_context, CL_CONTEXT_DEVICES, sizeof(cl_device_id), &m_device, nullptr);
 		dAssert(err == CL_SUCCESS);
+
+		size_t stringLength = 0;
+		err = clGetPlatformInfo(platform, CL_PLATFORM_NAME, 0, nullptr, &stringLength);
+		dAssert(stringLength < sizeof(m_platformName));
+		err = clGetPlatformInfo(platform, CL_PLATFORM_NAME, stringLength, m_platformName, nullptr);
 	}
 
 	~OpenclSystem()
@@ -88,13 +93,6 @@ class OpenclSystem
 			{
 				bestPlatform = platforms[i];
 			}
-
-
-			//err = clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, 0, nullptr, &stringLength);
-			//if (err != CL_SUCCESS)
-			//{
-			//	return nullptr;
-			//}
 		}
 
 		if (bestPlatform == nullptr)
@@ -110,7 +108,7 @@ class OpenclSystem
 			return nullptr;
 		}
 
-		return new OpenclSystem(context);
+		return new OpenclSystem(context, bestPlatform);
 	}
 
 	// Regular OpenCL objects:
@@ -150,7 +148,7 @@ ndDynamicsUpdateOpencl::~ndDynamicsUpdateOpencl()
 
 const char* ndDynamicsUpdateOpencl::GetStringId() const
 {
-	return "opencl (in progress)";
+	return m_openCl ? m_openCl->m_platformName : "not opencl support";
 }
 
 void ndDynamicsUpdateOpencl::Update()
