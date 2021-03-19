@@ -53,10 +53,22 @@ class OpenclSystem
 		err = clGetContextInfo(m_context, CL_CONTEXT_DEVICES, sizeof(cl_device_id), &m_device, nullptr);
 		dAssert(err == CL_SUCCESS);
 
+		// get vender driver support
 		size_t stringLength = 0;
 		err = clGetPlatformInfo(platform, CL_PLATFORM_NAME, 0, nullptr, &stringLength);
+		dAssert(err == CL_SUCCESS);
+
 		dAssert(stringLength < sizeof(m_platformName));
 		err = clGetPlatformInfo(platform, CL_PLATFORM_NAME, stringLength, m_platformName, nullptr);
+		dAssert(err == CL_SUCCESS);
+
+		// get open cl version
+		err = clGetDeviceInfo(m_device, CL_DEVICE_VERSION, 0, NULL, &stringLength);
+		dAssert(err == CL_SUCCESS);
+
+		err = clGetDeviceInfo(m_device, CL_DEVICE_VERSION, stringLength, m_platformName, nullptr);
+		dAssert(err == CL_SUCCESS);
+
 	}
 
 	~OpenclSystem()
