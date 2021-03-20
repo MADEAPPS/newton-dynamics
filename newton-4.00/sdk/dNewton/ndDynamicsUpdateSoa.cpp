@@ -1922,10 +1922,9 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 
 				accNorm = accNorm.MulAdd(a, a);
-				const dVector deltaForce(f - row->m_force);
-
 				normalForce[j + 1] = f;
 
+				const dVector deltaForce(f - row->m_force);
 				const dVector deltaForce0(deltaForce * preconditioner0);
 				const dVector deltaForce1(deltaForce * preconditioner1);
 
@@ -1983,11 +1982,9 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 					f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 
 					maxAccel = maxAccel.MulAdd(a, a);
-
-					const dVector deltaForce(f - force);
-
 					normalForce[j + 1] = f;
 
+					const dVector deltaForce(f - force);
 					const dVector deltaForce0(deltaForce * preconditioner0);
 					const dVector deltaForce1(deltaForce * preconditioner1);
 

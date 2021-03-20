@@ -35,10 +35,10 @@ template<class T>
 class dOpenclBuffer: public dArray<T>
 {
 	public:
-	dOpenclBuffer()
+	dOpenclBuffer(cl_mem_flags flags)
 		:dArray<T>(D_DEFAULT_BUFFER_SIZE)
+		,m_flags(flags)
 		,m_gpuBuffer(nullptr)
-		,m_context(nullptr)
 	{
 		SetCount(D_DEFAULT_BUFFER_SIZE);
 	}
@@ -53,13 +53,20 @@ class dOpenclBuffer: public dArray<T>
 		}
 	}
 
-	void SyncSize(int size)
+	void SyncSize(cl_context context, dInt32 size)
 	{
 		cl_int err;
 		if (m_gpuBuffer == nullptr)
 		{
-			void* const hostBuffer = &(*this)[0];
-			m_gpuBuffer = clCreateBuffer(m_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, sizeof(T) * GetCapacity(), hostBuffer, &err);
+			if (m_flags & CL_MEM_USE_HOST_PTR)
+			{
+				void* const hostBuffer = &(*this)[0];
+				m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * GetCapacity(), hostBuffer, &err);
+			}
+			else
+			{
+				m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * GetCapacity(), nullptr, &err);
+			}
 			dAssert(err == CL_SUCCESS);
 		}
 		if (GetCapacity() < size)
@@ -68,17 +75,22 @@ class dOpenclBuffer: public dArray<T>
 		}
 	}
 
+	cl_mem_flags m_flags;
 	cl_mem m_gpuBuffer;
-	cl_context m_context;
 };
 
 class ndOpenclBodyProxy
 {
 	public:
 	cl_float4 m_matrix[4];
-	cl_float4 m_invWorldInertiaMatrix[4];
 	cl_float4 m_invMass;
 	ndBodyKinematic* m_body;
+};
+
+class ndOpenclInternalBodyProxy
+{
+	public:
+	cl_float4 m_invWorldInertiaMatrix[4];
 };
 
 class OpenclSystem
@@ -86,7 +98,8 @@ class OpenclSystem
 	public:
 	OpenclSystem(cl_context context, cl_platform_id platform)
 		:m_context(context)
-		,m_bodyArray()
+		,m_bodyArray(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR)
+		,m_internalBodyArray(CL_MEM_READ_WRITE)
 	{
 		cl_int err;
 		// get the device
@@ -116,8 +129,6 @@ class OpenclSystem
 		char programFile[256];
 		sprintf(programFile, "%s/CL/solver/solver.cl", CL_KERNEL_PATH);
 		m_solverProgram = CompileProgram(programFile);
-
-		m_bodyArray.m_context = m_context;
 	}
 
 	~OpenclSystem()
@@ -226,6 +237,7 @@ class OpenclSystem
 	char m_platformName[128];
 
 	dOpenclBuffer<ndOpenclBodyProxy> m_bodyArray;
+	dOpenclBuffer<ndOpenclInternalBodyProxy> m_internalBodyArray;
 };
 
 ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world)
@@ -252,8 +264,8 @@ void ndDynamicsUpdateOpencl::Update()
 {
 	if (m_openCl)
 	{
-		//ndDynamicsUpdate::Update();
-		GpuUpdate();
+		ndDynamicsUpdate::Update();
+		//GpuUpdate();
 	}
 }
 
@@ -593,7 +605,10 @@ void ndDynamicsUpdateOpencl::SortIslands()
 
 void ndDynamicsUpdateOpencl::CopyBodyData()
 {
-	m_openCl->m_bodyArray.SyncSize(m_bodyIslandOrder.GetCount());
+	m_openCl->m_bodyArray.SyncSize(m_openCl->m_context, m_bodyIslandOrder.GetCount());
+	m_openCl->m_internalBodyArray.SyncSize(m_openCl->m_context, m_bodyIslandOrder.GetCount());
+
+	int xxx = sizeof(ndOpenclBodyProxy);
 	
 	for (dInt32 i = 0; i < m_bodyIslandOrder.GetCount(); i++)
 	{

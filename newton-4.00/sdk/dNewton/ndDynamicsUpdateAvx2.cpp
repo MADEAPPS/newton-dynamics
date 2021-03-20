@@ -1962,10 +1962,9 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 
 				accNorm = accNorm.MulAdd(a, a);
-				const ndAvxFloat deltaForce(f - row->m_force);
-
 				normalForce[j + 1] = f;
 
+				const ndAvxFloat deltaForce(f - row->m_force);
 				const ndAvxFloat deltaForce0(deltaForce * preconditioner0);
 				const ndAvxFloat deltaForce1(deltaForce * preconditioner1);
 
@@ -2023,11 +2022,9 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 					f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 
 					maxAccel = maxAccel.MulAdd(a, a);
-
-					const ndAvxFloat deltaForce(f - force);
-
 					normalForce[j + 1] = f;
 
+					const ndAvxFloat deltaForce(f - force);
 					const ndAvxFloat deltaForce0(deltaForce * preconditioner0);
 					const ndAvxFloat deltaForce1(deltaForce * preconditioner1);
 

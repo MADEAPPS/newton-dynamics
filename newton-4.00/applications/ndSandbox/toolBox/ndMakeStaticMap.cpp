@@ -44,6 +44,44 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene)
 	return body;
 }
 
+void BuildFlatPlane1(ndDemoEntityManager* const scene, bool optimized)
+{
+	ndMeshEffect meshEffect;
+
+	dVector floor[] =
+	{
+		{ 100.0f, 0.0f,  100.0f, 1.0f },
+		{ 100.0f, 0.0f, -100.0f, 1.0f },
+		{ -100.0f, 0.0f, -100.0f, 1.0f },
+		{ -100.0f, 0.0f,  100.0f, 1.0f },
+	};
+	dInt32 index[][3] = { { 0, 1, 2 },{ 0, 2, 3 } };
+
+	meshEffect.BeginBuild();
+	for (dInt32 i = 0; i < 2; i++)
+	{
+		meshEffect.BeginBuildFace();
+		for (dInt32 j = 0; j < 3; j++)
+		{
+			dFloat64 x = floor[index[i][j]].m_x;
+			dFloat64 y = floor[index[i][j]].m_y;
+			dFloat64 z = floor[index[i][j]].m_z;
+			meshEffect.AddPoint(x, y, z);
+
+			// you can add these other face attributes
+			//AddLayer(dInt32 layer);
+			//AddMaterial(dInt32 materialIndex);
+			//AddNormal(dFloat32 x, dFloat32 y, dFloat32 z);
+			//AddBinormal(dFloat32 x, dFloat32 y, dFloat32 z);
+			//AddVertexColor(dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w);
+			//AddUV0(dFloat32 u, dFloat32 v);
+			//AddUV1(dFloat32 u, dFloat32 v);
+		}
+		meshEffect.EndBuildFace();
+	}
+	meshEffect.EndBuild(0.0f);
+}
+
 ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
