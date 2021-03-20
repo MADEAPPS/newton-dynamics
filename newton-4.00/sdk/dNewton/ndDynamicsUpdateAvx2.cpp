@@ -58,6 +58,7 @@ void ndDynamicsUpdateAvx2::Update()
   		InitBodyArray();
 		InitJacobianMatrix();
 		CalculateForces();
+		IntegrateBodies();
 		DetermineSleepStates();
 	}
 }
@@ -2302,7 +2303,5 @@ void ndDynamicsUpdateAvx2::CalculateForces()
 		
 		UpdateForceFeedback();
 	}
-
-	IntegrateBodies();
 }
 

@@ -55,6 +55,7 @@ class ndDynamicsUpdate: public dClassAlloc
 		ndSortKey(dInt32 sleep, dInt32 rows)
 			:m_value(0)
 		{
+			dAssert(rows > 0);
 			m_upperBit = sleep;
 			m_lowerBit = (1 << 6) - rows - 1;
 		}
@@ -125,7 +126,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	void DetermineSleepStates();
 	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
-	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const context);
+	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const);
 
 	protected:
 	void Clear();

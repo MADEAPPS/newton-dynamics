@@ -66,7 +66,7 @@ void ndDynamicsUpdate::Clear()
 	m_bodyIslandOrder.Resize(D_DEFAULT_BUFFER_SIZE);
 }
 
-dInt32 ndDynamicsUpdate::CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const context)
+dInt32 ndDynamicsUpdate::CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const)
 {
 	dUnsigned32 keyA = islandA->m_count * 2 + islandA->m_root->m_bodyIsConstrained;
 	dUnsigned32 keyB = islandB->m_count * 2 + islandB->m_root->m_bodyIsConstrained;;
@@ -1692,8 +1692,6 @@ void ndDynamicsUpdate::CalculateForces()
 		}
 		UpdateForceFeedback();
 	}
-
-	IntegrateBodies();
 }
 
 void ndDynamicsUpdate::Update()
@@ -1709,7 +1707,7 @@ void ndDynamicsUpdate::Update()
 		InitBodyArray();
 		InitJacobianMatrix();
 		CalculateForces();
-
+		IntegrateBodies();
 		DetermineSleepStates();
 	}
 }

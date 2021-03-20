@@ -25,11 +25,23 @@
 #include "ndNewtonStdafx.h"
 #include "ndDynamicsUpdate.h"
 
+#define D_BLOCK_SIZE	128
+
 class OpenclSystem;
 
 class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 {
 	public:
+	
+	class ndOpenclBodyProxy
+	{
+		public:
+
+		
+		ndBodyKinematic* m_body;
+	};
+
+
 	ndDynamicsUpdateOpencl(ndWorld* const world);
 	virtual ~ndDynamicsUpdateOpencl();
 
@@ -38,9 +50,17 @@ class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 	protected:
 	virtual void Update();
 
+	static dInt32 CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const);
 	void GpuUpdate();
+	void BuildIsland();
+	void SortJoints();
+	void SortIslands();
+
+	void IntegrateBodies();
+	void IntegrateUnconstrainedBodies();
 
 	OpenclSystem* m_openCl;
+	dArray<ndOpenclBodyProxy> m_bodyArray;
 };
 
 #ifndef _D_NEWTON_OPENCL

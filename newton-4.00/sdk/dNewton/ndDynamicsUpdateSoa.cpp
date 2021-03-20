@@ -58,6 +58,7 @@ void ndDynamicsUpdateSoa::Update()
   		InitBodyArray();
 		InitJacobianMatrix();
 		CalculateForces();
+		IntegrateBodies();
 		DetermineSleepStates();
 	}
 }
@@ -2262,7 +2263,5 @@ void ndDynamicsUpdateSoa::CalculateForces()
 		
 		UpdateForceFeedback();
 	}
-
-	IntegrateBodies();
 }
 
