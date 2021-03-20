@@ -495,8 +495,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 
 	location.m_z = 4.0f;
 	location.m_y = 0.5f; 
-	//AddRamps(scene, location);
-	//AddSomeObstacles(scene, location);
+	AddRamps(scene, location);
+	AddSomeObstacles(scene, location);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);

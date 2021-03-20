@@ -379,6 +379,8 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 
 	dInt32 debrisID = ndContactCallback::m_dedris;
 	ndMaterial& material0 = callback->RegisterMaterial(ndContactCallback::m_default, ndContactCallback::m_dedris);
+	dAssert(0);
+	material0;
 	//ndMaterial& material1 = callback->RegisterMaterial(ndContactCallback::m_dedris, ndContactCallback::m_dedris);
 	//instanceShape.m_shapeMaterial.m_userParam[0].m_floatData = 10.0f;
 

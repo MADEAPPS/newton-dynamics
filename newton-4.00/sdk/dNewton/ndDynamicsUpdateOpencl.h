@@ -25,63 +25,11 @@
 #include "ndNewtonStdafx.h"
 #include "ndDynamicsUpdate.h"
 
-namespace ndOpencl
-{
-	#define D_OPENCL_WORD_GROUP_SIZE 4 
-
-	class ndOpenclVector3
-	{
-		public:
-		dVector m_x;
-		dVector m_y;
-		dVector m_z;
-	};
-
-	class ndOpenclVector6
-	{
-		public:
-		ndOpenclVector3 m_linear;
-		ndOpenclVector3 m_angular;
-	};
-
-	class ndOpenclJacobianPair
-	{
-		public:
-		ndOpenclVector6 m_jacobianM0;
-		ndOpenclVector6 m_jacobianM1;
-	};
-
-	class ndOpenclMatrixElement
-	{
-		public:
-		ndOpenclJacobianPair m_Jt;
-		ndOpenclJacobianPair m_JMinv;
-
-		dVector m_force;
-		dVector m_diagDamp;
-		dVector m_invJinvMJt;
-		dVector m_coordenateAccel;
-		dVector m_normalForceIndex;
-		dVector m_lowerBoundFrictionCoefficent;
-		dVector m_upperBoundFrictionCoefficent;
-	};
-};
-
 class OpenclSystem;
 
-D_MSV_NEWTON_ALIGN_32
-class ndDynamicsUpdateOpencl: public ndDynamicsUpdate
+class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 {
 	public:
-#ifndef _D_NEWTON_OPENCL
-	ndDynamicsUpdateOpencl(ndWorld* const world)
-		:ndDynamicsUpdate(world)
-	{
-	}
-	virtual ~ndDynamicsUpdateOpencl()
-	{
-	}
-#else
 	ndDynamicsUpdateOpencl(ndWorld* const world);
 	virtual ~ndDynamicsUpdateOpencl();
 
@@ -90,34 +38,33 @@ class ndDynamicsUpdateOpencl: public ndDynamicsUpdate
 	protected:
 	virtual void Update();
 
-	private:
-	void SortJoints();
-	void SortIslands();
-	void BuildIsland();
-	void InitWeights();
-	void InitBodyArray();
-	void InitSkeletons();
-	void CalculateForces();
-	void IntegrateBodies();
-	void UpdateSkeletons();
-	void InitJacobianMatrix();
-	void UpdateForceFeedback();
-	void CalculateJointsForce();
-	void IntegrateBodiesVelocity();
-	void CalculateJointsAcceleration();
-	void IntegrateUnconstrainedBodies();
-	
-	void DetermineSleepStates();
-	void UpdateIslandState(const ndIsland& island);
-	void GetJacobianDerivatives(ndConstraint* const joint);
-	static dInt32 CompareIslands(const ndIsland* const A, const ndIsland* const B, void* const context);
-
-	dArray<dInt32> m_soaJointRows;
-	dArray<ndOpencl::ndOpenclMatrixElement> m_soaMassMatrix;
+	void GpuUpdate();
 
 	OpenclSystem* m_openCl;
+};
+
+#ifndef _D_NEWTON_OPENCL
+inline ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world)
+	:ndDynamicsUpdate(world)
+	,m_openCl(nullptr)
+{
+}
+
+inline ndDynamicsUpdateOpencl::~ndDynamicsUpdateOpencl()
+{
+}
+
+inline const char* ndDynamicsUpdateOpencl::GetStringId() const
+{
+	return "no opencl support";
+}
+
+inline void ndDynamicsUpdateOpencl::Update()
+{
+	ndDynamicsUpdate::Update();
+}
+
 #endif
-} D_GCC_NEWTON_ALIGN_32;
 
 #endif
 
