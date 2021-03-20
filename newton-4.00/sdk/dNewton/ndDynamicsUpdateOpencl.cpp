@@ -30,23 +30,63 @@
 #ifdef _D_NEWTON_OPENCL
 #include <CL/cl.h>
 
-//using namespace ndOpencl;
+
+template<class T>
+class dOpenclBuffer: public dArray<T>
+{
+	public:
+	dOpenclBuffer()
+		:dArray<T>(D_DEFAULT_BUFFER_SIZE)
+		,m_gpuBuffer(nullptr)
+		,m_context(nullptr)
+	{
+		SetCount(D_DEFAULT_BUFFER_SIZE);
+	}
+
+	~dOpenclBuffer()
+	{
+		if (m_gpuBuffer)
+		{
+			cl_int err;
+			err = clReleaseMemObject(m_gpuBuffer);
+			dAssert(err == CL_SUCCESS);
+		}
+	}
+
+	void SyncSize(int size)
+	{
+		cl_int err;
+		if (m_gpuBuffer == nullptr)
+		{
+			void* const hostBuffer = &(*this)[0];
+			m_gpuBuffer = clCreateBuffer(m_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, sizeof(T) * GetCapacity(), hostBuffer, &err);
+			dAssert(err == CL_SUCCESS);
+		}
+		if (GetCapacity() < size)
+		{
+			dAssert(0);
+		}
+	}
+
+	cl_mem m_gpuBuffer;
+	cl_context m_context;
+};
+
+class ndOpenclBodyProxy
+{
+	public:
+	cl_float4 m_matrix[4];
+	cl_float4 m_invWorldInertiaMatrix[4];
+	cl_float4 m_invMass;
+	ndBodyKinematic* m_body;
+};
 
 class OpenclSystem
 {
 	public:
 	OpenclSystem(cl_context context, cl_platform_id platform)
 		:m_context(context)
-		//,device(nullptr)
-		//,commandQueue(nullptr)
-		//,program(nullptr)
-		//,kernel(nullptr)
-		//,platformVersion(CL_TARGET_OPENCL_VERSION)
-		//,deviceVersion(CL_TARGET_OPENCL_VERSION)
-		//,compilerVersion(CL_TARGET_OPENCL_VERSION)
-		//,srcA(nullptr)
-		//,srcB(nullptr)
-		//,dstMem(nullptr)
+		,m_bodyArray()
 	{
 		cl_int err;
 		// get the device
@@ -76,6 +116,8 @@ class OpenclSystem
 		char programFile[256];
 		sprintf(programFile, "%s/CL/solver/solver.cl", CL_KERNEL_PATH);
 		m_solverProgram = CompileProgram(programFile);
+
+		m_bodyArray.m_context = m_context;
 	}
 
 	~OpenclSystem()
@@ -181,25 +223,10 @@ class OpenclSystem
 	cl_command_queue m_commandQueue;		// hold the commands-queue handler
 
 	//cl_kernel        kernel;				// hold the kernel handler
-	//cl_mem           srcA;				// hold first source buffer
-	//cl_mem           srcB;				// hold second source buffer
-	//cl_mem           dstMem;				// hold destination buffer
 	char m_platformName[128];
+
+	dOpenclBuffer<ndOpenclBodyProxy> m_bodyArray;
 };
-
-
-void ndDynamicsUpdateOpencl::ndOpenclBodyProxyArray::CopyData(dArray<ndBodyKinematic*>& sourceData)
-{
-	SetCount(sourceData.GetCount());
-	for (dInt32 i = 0; i < GetCount(); i++)
-	{
-		ndOpenclBodyProxy& data = (*this)[i];
-		ndBodyKinematic* const body = sourceData[i];
-		data.m_matrix = body->m_matrix;
-		data.m_invMass = body->m_invMass;
-		data.m_body = body;
-	}
-}
 
 ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world)
 	:ndDynamicsUpdate(world)
@@ -237,7 +264,7 @@ void ndDynamicsUpdateOpencl::GpuUpdate()
 	BuildIsland();
 	if (m_islands.GetCount())
 	{
-		m_bodyArray.CopyData(m_bodyIslandOrder);
+		CopyBodyData();
 		IntegrateUnconstrainedBodies();
 
 		//InitWeights();
@@ -561,6 +588,29 @@ void ndDynamicsUpdateOpencl::SortIslands()
 
 		m_unConstrainedBodyCount = unConstrainedCount;
 		dSort(&m_islands[0], m_islands.GetCount(), CompareIslands);
+	}
+}
+
+void ndDynamicsUpdateOpencl::CopyBodyData()
+{
+	m_openCl->m_bodyArray.SyncSize(m_bodyIslandOrder.GetCount());
+	
+	for (dInt32 i = 0; i < m_bodyIslandOrder.GetCount(); i++)
+	{
+		ndOpenclBodyProxy& data = m_openCl->m_bodyArray[i];
+		ndBodyKinematic* const body = m_bodyIslandOrder[i];
+		for (dInt32 j = 0; j < 4; j++)
+		{
+			data.m_matrix[j].x = cl_float(body->m_matrix[j].m_x);
+			data.m_matrix[j].y = cl_float(body->m_matrix[j].m_y);
+			data.m_matrix[j].z = cl_float(body->m_matrix[j].m_z);
+			data.m_matrix[j].w = cl_float(body->m_matrix[j].m_w);
+		}
+		data.m_invMass.x = body->m_invMass.m_x;
+		data.m_invMass.y = body->m_invMass.m_y;
+		data.m_invMass.z = body->m_invMass.m_z;
+		data.m_invMass.w = body->m_invMass.m_w;
+		data.m_body = body;
 	}
 }
 
