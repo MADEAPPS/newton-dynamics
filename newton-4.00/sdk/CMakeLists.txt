@@ -39,6 +39,7 @@ else()
 	if (NEWTON_ENABLE_GPU_SOLVER)
 		add_definitions(-D_D_NEWTON_OPENCL)
 		add_definitions(-DCL_TARGET_OPENCL_VERSION=120)
+		add_definitions(-DCL_KERNEL_PATH="${CMAKE_CURRENT_SOURCE_DIR}/dOpencl/")
 		include_directories(dOpencl/)
 
 		if(NEWTON_BUILD_SHARED_LIBS STREQUAL "ON")

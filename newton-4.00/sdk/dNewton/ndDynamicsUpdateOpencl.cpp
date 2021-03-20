@@ -72,11 +72,18 @@ class OpenclSystem
 		cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
 		m_commandQueue = clCreateCommandQueue(m_context, m_device, properties, &err);
 		dAssert(err == CL_SUCCESS);
+
+		char programFile[256];
+		sprintf(programFile, "%s/CL/solver/solver.cl", CL_KERNEL_PATH);
+		m_solverProgram = CompileProgram(programFile);
 	}
 
 	~OpenclSystem()
 	{
 		cl_int err;
+
+		err = clReleaseProgram(m_solverProgram);
+		dAssert(err == CL_SUCCESS);
 
 		err = clReleaseCommandQueue(m_commandQueue);
 		dAssert(err == CL_SUCCESS);
@@ -86,6 +93,41 @@ class OpenclSystem
 
 		err = clReleaseContext(m_context);
 		dAssert(err == CL_SUCCESS);
+	}
+
+	cl_program CompileProgram(char* const filename)
+	{
+		FILE* const fp = fopen(filename, "rb");
+		if (fp)
+		{
+			size_t sourceSize;
+			fseek(fp, 0, SEEK_END);
+			sourceSize = ftell(fp);
+			fseek(fp, 0, SEEK_SET);
+
+			char* const source = dAlloca(char, sourceSize * 256);
+			fread(source, 1, sourceSize, fp);
+			fclose(fp);
+
+			int errorCode;
+			cl_program program = clCreateProgramWithSource(m_context, 1, (const char**)&source, &sourceSize, &errorCode);
+			dAssert(errorCode == CL_SUCCESS);
+
+			errorCode = clBuildProgram(program, 1, &m_device, "", nullptr, nullptr);
+			if (errorCode == CL_BUILD_PROGRAM_FAILURE)
+			{
+				size_t log_size = 0;
+				clGetProgramBuildInfo(program, m_device, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
+
+				char* const build_log = dAlloca(char, log_size * 256);
+				clGetProgramBuildInfo(program, m_device, CL_PROGRAM_BUILD_LOG, log_size, build_log, nullptr);
+				dTrace((build_log));
+			}
+			dAssert(errorCode == CL_SUCCESS);
+
+			return program;
+		}
+		return nullptr;
 	}
 
 	static OpenclSystem* Singleton()
@@ -137,7 +179,7 @@ class OpenclSystem
 	cl_context m_context;					// hold the context handler
 	cl_device_id m_device;					// hold the selected device handler
 	cl_command_queue m_commandQueue;		// hold the commands-queue handler
-	//cl_program       program;           // hold the program handler
+	cl_program       m_solverProgram;           // hold the program handler
 	//cl_kernel        kernel;            // hold the kernel handler
 	//float            platformVersion;   // hold the OpenCL platform version (default 1.2)
 	//float            deviceVersion;     // hold the OpenCL device version (default. 1.2)
