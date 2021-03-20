@@ -188,6 +188,19 @@ class OpenclSystem
 };
 
 
+void ndDynamicsUpdateOpencl::ndOpenclBodyProxyArray::CopyData(dArray<ndBodyKinematic*>& sourceData)
+{
+	SetCount(sourceData.GetCount());
+	for (dInt32 i = 0; i < GetCount(); i++)
+	{
+		ndOpenclBodyProxy& data = (*this)[i];
+		ndBodyKinematic* const body = sourceData[i];
+		data.m_matrix = body->m_matrix;
+		data.m_invMass = body->m_invMass;
+		data.m_body = body;
+	}
+}
+
 ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world)
 	:ndDynamicsUpdate(world)
 	,m_openCl(nullptr)
@@ -224,6 +237,7 @@ void ndDynamicsUpdateOpencl::GpuUpdate()
 	BuildIsland();
 	if (m_islands.GetCount())
 	{
+		m_bodyArray.CopyData(m_bodyIslandOrder);
 		IntegrateUnconstrainedBodies();
 
 		//InitWeights();

@@ -36,10 +36,23 @@ class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 	class ndOpenclBodyProxy
 	{
 		public:
-
-		
+		dMatrix m_matrix;
+		dMatrix m_invWorldInertiaMatrix;
+		dVector m_invMass;
+	
 		ndBodyKinematic* m_body;
 	};
+
+	class ndOpenclBodyProxyArray : public dArray<ndOpenclBodyProxy>
+	{
+		public: 
+		ndOpenclBodyProxyArray()
+			:dArray<ndOpenclBodyProxy>(D_DEFAULT_BUFFER_SIZE)
+		{
+		}
+		void CopyData(dArray<ndBodyKinematic*>& sourceData);
+	};
+	
 
 
 	ndDynamicsUpdateOpencl(ndWorld* const world);
@@ -56,11 +69,12 @@ class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 	void SortJoints();
 	void SortIslands();
 
+
 	void IntegrateBodies();
 	void IntegrateUnconstrainedBodies();
 
 	OpenclSystem* m_openCl;
-	dArray<ndOpenclBodyProxy> m_bodyArray;
+	ndOpenclBodyProxyArray m_bodyArray;
 };
 
 #ifndef _D_NEWTON_OPENCL
