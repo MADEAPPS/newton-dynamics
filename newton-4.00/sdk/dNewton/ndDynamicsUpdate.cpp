@@ -261,7 +261,8 @@ void ndDynamicsUpdate::SortJoints()
 		jointCountSpans[key.m_value] = entry + 1;
 	}
 	
-	dInt32 rowCount = 0;
+//	dInt32 rowCount = 0;
+	dInt32 rowCount = 1;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = jointArray[i];
@@ -639,7 +640,9 @@ void ndDynamicsUpdate::GetJacobianDerivatives(ndConstraint* const joint)
 		rhs->m_jointFeebackForce = constraintParam.m_forceBounds[i].m_jointForce;
 
 		dAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -1);
-		rhs->m_normalForceIndex = constraintParam.m_forceBounds[i].m_normalIndex;
+		const dInt32 frictionIndex = constraintParam.m_forceBounds[i].m_normalIndex;
+		const dInt32 mask = frictionIndex >> 31;
+		rhs->m_normalForceIndex = (mask & 0) + (~mask & (frictionIndex + baseIndex));
 	}
 }
 
@@ -841,6 +844,8 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 	if (scene->GetActiveContactArray().GetCount())
 	{
 		D_TRACKTIME();
+
+		m_rightHandSide[0].m_force = dFloat32(1.0f);
 		scene->SubmitJobs<ndInitJacobianMatrix>();
 		if (scene->GetThreadCount() > 1)
 		{
@@ -1414,7 +1419,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		dFloat32 JointForce(ndConstraint* const joint)
 		{
 			dVector accNorm(m_zero);
-			dFloat32 normalForce[D_CONSTRAINT_MAX_ROWS + 1];
 
 			ndBodyKinematic* const body0 = joint->GetBody0();
 			ndBodyKinematic* const body1 = joint->GetBody1();
@@ -1440,7 +1444,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				preconditioner0 = preconditioner0.Scale(body0->m_weigh);
 				preconditioner1 = preconditioner1.Scale(body1->m_weigh);
 
-				normalForce[0] = dFloat32(1.0f);
 				for (dInt32 j = 0; j < rowsCount; j++)
 				{
 					ndRightHandSide* const rhs = &m_rightHandSide[rowStart + j];
@@ -1450,14 +1453,11 @@ void ndDynamicsUpdate::CalculateJointsForce()
 					a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_linear, forceM1);
 					a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_angular, torqueM1);
 					a = dVector(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
-
-					dVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
-
-					dAssert(rhs->m_normalForceIndex >= -1);
-					dAssert(rhs->m_normalForceIndex <= rowsCount);
-
-					const dInt32 frictionIndex = rhs->m_normalForceIndex + 1;
-					const dFloat32 frictionNormal = normalForce[frictionIndex];
+					const dVector force (rhs->m_force);
+					dVector f(force + a.Scale (rhs->m_invJinvMJt));
+					dAssert(rhs->m_normalForceIndex >= 0);
+					const dInt32 frictionIndex = rhs->m_normalForceIndex;
+					const dFloat32 frictionNormal = m_rightHandSide[frictionIndex].m_force;
 					const dVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
 					const dVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
 
@@ -1465,8 +1465,8 @@ void ndDynamicsUpdate::CalculateJointsForce()
 					f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 					accNorm = accNorm.MulAdd(a, a);
 
-					normalForce[j + 1] = f.GetScalar();
-					const dVector deltaForce(f - dVector(rhs->m_force));
+					rhs->m_force = f.GetScalar();
+					const dVector deltaForce(f - force);
 					const dVector deltaForce0(deltaForce * preconditioner0);
 					const dVector deltaForce1(deltaForce * preconditioner1);
 
@@ -1494,21 +1494,20 @@ void ndDynamicsUpdate::CalculateJointsForce()
 						a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_angular, torqueM1);
 						a = dVector(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
 
-						const dFloat32 force = normalForce[j + 1];
-						dVector f(force + rhs->m_invJinvMJt * a.GetScalar());
+						const dVector force = rhs->m_force;
+						dVector f(force + a.Scale(rhs->m_invJinvMJt));
 
 						dAssert(rhs->m_normalForceIndex >= -1);
-						dAssert(rhs->m_normalForceIndex <= rowsCount);
+						const dInt32 frictionIndex = rhs->m_normalForceIndex;
+						const dFloat32 frictionNormal = m_rightHandSide[frictionIndex].m_force;
 
-						const dInt32 frictionIndex = rhs->m_normalForceIndex + 1;
-						const dFloat32 frictionNormal = normalForce[frictionIndex];
 						const dVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
 						const dVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
 
 						a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 						f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 						maxAccel = maxAccel.MulAdd(a, a);
-						normalForce[j + 1] = f.GetScalar();
+						rhs->m_force = f.GetScalar();
 
 						const dVector deltaForce(f - force);
 						const dVector deltaForce0(deltaForce * preconditioner0);
@@ -1531,9 +1530,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				ndRightHandSide* const rhs = &m_rightHandSide[rowStart + j];
 				const ndLeftHandSide* const lhs = &m_leftHandSide[rowStart + j];
 
-				rhs->m_force = normalForce[j + 1];
-				dVector f(rhs->m_force);
-			
+				const dVector f(rhs->m_force);
 				forceM0 = forceM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_linear, f);
 				torqueM0 = torqueM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_angular, f);
 				forceM1 = forceM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_linear, f);
