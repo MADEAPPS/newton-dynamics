@@ -1215,7 +1215,13 @@ void ndSkeletonContainer::SolveLcp(dInt32 stride, dInt32 size, const dFloat32* c
 		for (dInt32 i = 0; i < size; i++) 
 		{
 			const dInt32 index = normalIndex[i];
-			const dFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
+			//const dFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
+
+			const dInt32 mask = index>>31;
+			const dInt32 index0 = i + index;
+			const dInt32 index1 = (~mask & size) | (mask & index0);
+			const dFloat32 coefficient = x[index1] + x0[index1];
+
 			const dFloat32 l = low[i] * coefficient - x0[i];
 			const dFloat32 h = high[i] * coefficient - x0[i];
 			x[i] = dClamp(dFloat32(0.0f), l, h);
@@ -1244,7 +1250,13 @@ void ndSkeletonContainer::SolveLcp(dInt32 stride, dInt32 size, const dFloat32* c
 			{
 				const dFloat32 r = residual[i];
 				const dInt32 index = normalIndex[i];
-				const dFloat32 coefficient = index ? x[i + index] + x0[i + index] : one;
+				//const dFloat32 coefficient = index ? x[i + index] + x0[i + index] : one;
+
+				const dInt32 mask = index >> 31;
+				const dInt32 index0 = i + index;
+				const dInt32 index1 = (~mask & size) | (mask & index0);
+				const dFloat32 coefficient = x[index1] + x0[index1];
+
 				const dFloat32 l = low[i] * coefficient - x0[i];
 				const dFloat32 h = high[i] * coefficient - x0[i];
 
@@ -1323,11 +1335,11 @@ void ndSkeletonContainer::SolveBlockLcp(dInt32 size, dInt32 blockSize, const dFl
 void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const
 {
 	dFloat32* const f = dAlloca(dFloat32, m_rowCount);
-	dFloat32* const u = dAlloca(dFloat32, m_auxiliaryRowCount);
 	dFloat32* const b = dAlloca(dFloat32, m_auxiliaryRowCount);
-	dFloat32* const u0 = dAlloca(dFloat32, m_auxiliaryRowCount);
 	dFloat32* const low = dAlloca(dFloat32, m_auxiliaryRowCount);
 	dFloat32* const high = dAlloca(dFloat32, m_auxiliaryRowCount);
+	dFloat32* const u = dAlloca(dFloat32, m_auxiliaryRowCount + 1);
+	dFloat32* const u0 = dAlloca(dFloat32, m_auxiliaryRowCount + 1);
 	dInt32* const normalIndex = dAlloca(dInt32, m_auxiliaryRowCount);
 
 	dInt32 primaryIndex = 0;
@@ -1379,6 +1391,8 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 		b[i] -= dDotProduct(primaryCount, matrixRow10, f);
 	}
 
+	u[m_auxiliaryRowCount] = dFloat32(0.0f);
+	u0[m_auxiliaryRowCount] = dFloat32(1.0f);
 	SolveBlockLcp(m_auxiliaryRowCount, m_blockSize, u0, u, b, low, high, normalIndex);
 
 	for (dInt32 i = 0; i < m_auxiliaryRowCount; i++) 

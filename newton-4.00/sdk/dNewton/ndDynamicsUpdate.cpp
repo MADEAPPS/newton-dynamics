@@ -641,8 +641,8 @@ void ndDynamicsUpdate::GetJacobianDerivatives(ndConstraint* const joint)
 		dAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -1);
 		const dInt32 frictionIndex = constraintParam.m_forceBounds[i].m_normalIndex;
 		const dInt32 mask = frictionIndex >> 31;
-		rhs->m_normalForceIndex = constraintParam.m_forceBounds[i].m_normalIndex;
-		rhs->m_normalForceIndexFlat = (mask & 0) + (~mask & (frictionIndex + baseIndex));
+		rhs->m_normalForceIndex = frictionIndex;
+		rhs->m_normalForceIndexFlat = ~mask & (frictionIndex + baseIndex);
 	}
 }
 
