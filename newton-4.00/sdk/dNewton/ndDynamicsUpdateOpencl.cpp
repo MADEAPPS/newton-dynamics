@@ -481,7 +481,7 @@ void ndDynamicsUpdateOpencl::SortJoints()
 		jointCountSpans[key.m_value] = entry + 1;
 	}
 
-	dInt32 rowCount = 0;
+	dInt32 rowCount = 1;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = jointArray[i];

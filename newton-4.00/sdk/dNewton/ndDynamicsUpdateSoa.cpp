@@ -46,22 +46,6 @@ const char* ndDynamicsUpdateSoa::GetStringId() const
 	return "sse soa";
 }
 
-void ndDynamicsUpdateSoa::Update()
-{
-	m_timestep = m_world->GetScene()->GetTimestep();
-
-	BuildIsland();
-	if (m_islands.GetCount())
-	{
-		IntegrateUnconstrainedBodies();
-		InitWeights();
-  		InitBodyArray();
-		InitJacobianMatrix();
-		CalculateForces();
-		IntegrateBodies();
-		DetermineSleepStates();
-	}
-}
 
 void ndDynamicsUpdateSoa::DetermineSleepStates()
 {
@@ -2262,3 +2246,19 @@ void ndDynamicsUpdateSoa::CalculateForces()
 	}
 }
 
+void ndDynamicsUpdateSoa::Update()
+{
+	m_timestep = m_world->GetScene()->GetTimestep();
+
+	BuildIsland();
+	if (m_islands.GetCount())
+	{
+		IntegrateUnconstrainedBodies();
+		InitWeights();
+		InitBodyArray();
+		InitJacobianMatrix();
+		CalculateForces();
+		IntegrateBodies();
+		DetermineSleepStates();
+	}
+}

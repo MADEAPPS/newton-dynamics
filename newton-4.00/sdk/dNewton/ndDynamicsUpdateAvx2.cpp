@@ -46,23 +46,6 @@ const char* ndDynamicsUpdateAvx2::GetStringId() const
 	return "avx2";
 }
 
-void ndDynamicsUpdateAvx2::Update()
-{
-	m_timestep = m_world->GetScene()->GetTimestep();
-
-	BuildIsland();
-	if (m_islands.GetCount())
-	{
-		IntegrateUnconstrainedBodies();
-		InitWeights();
-  		InitBodyArray();
-		InitJacobianMatrix();
-		CalculateForces();
-		IntegrateBodies();
-		DetermineSleepStates();
-	}
-}
-
 void ndDynamicsUpdateAvx2::DetermineSleepStates()
 {
 	D_TRACKTIME();
@@ -1817,8 +1800,8 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 		{
 			ndAvxFloat weight0;
 			ndAvxFloat weight1;
-			ndOpenclVector6 forceM0;
-			ndOpenclVector6 forceM1;
+			ndAvxVector6 forceM0;
+			ndAvxVector6 forceM1;
 			ndAvxFloat preconditioner0;
 			ndAvxFloat preconditioner1;
 			ndAvxFloat normalForce[D_CONSTRAINT_MAX_ROWS + 1];
@@ -2302,3 +2285,19 @@ void ndDynamicsUpdateAvx2::CalculateForces()
 	}
 }
 
+void ndDynamicsUpdateAvx2::Update()
+{
+	m_timestep = m_world->GetScene()->GetTimestep();
+
+	BuildIsland();
+	if (m_islands.GetCount())
+	{
+		IntegrateUnconstrainedBodies();
+		InitWeights();
+		InitBodyArray();
+		InitJacobianMatrix();
+		CalculateForces();
+		IntegrateBodies();
+		DetermineSleepStates();
+	}
+}

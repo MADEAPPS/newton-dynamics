@@ -216,6 +216,7 @@ class ndRightHandSide
 
 	ndForceImpactPair* m_jointFeebackForce;
 	dInt32 m_normalForceIndex;
+	dInt32 m_normalForceIndexFlat;
 } D_GCC_NEWTON_ALIGN_32;
 
 #define ND_JOINT_RELECTION(Class)							\

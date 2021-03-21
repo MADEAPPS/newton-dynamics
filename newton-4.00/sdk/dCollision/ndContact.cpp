@@ -283,6 +283,7 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 	ndRightHandSide* const rightHandSide = desc->m_rightHandSide;
 	const ndLeftHandSide* const leftHandSide = desc->m_leftHandSide;
 
+	//dTrace(("zzzzzz %d: ", xxxxxxx));
 	for (dInt32 k = 0; k < count; k++) 
 	{
 		// note: using restitution been negative to indicate that the acceleration was override
@@ -299,8 +300,8 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 		
 			if (rhs->m_normalForceIndex == D_INDEPENDENT_ROW) 
 			{
-				dAssert(rhs->m_restitution >= 0.0f);
-				dAssert(rhs->m_restitution <= 2.0f);
+				dAssert(rhs->m_restitution >= dFloat32 (0.0f));
+				dAssert(rhs->m_restitution <= dFloat32(2.0f));
 		
 				dFloat32 penetrationVeloc = dFloat32(0.0f);
 				dFloat32 restitution = (vRel <= dFloat32(0.0f)) ? (dFloat32(1.0f) + rhs->m_restitution) : dFloat32(1.0f);

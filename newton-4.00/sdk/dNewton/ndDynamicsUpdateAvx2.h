@@ -173,7 +173,7 @@ namespace ndAvx2
 	} D_GCC_NEWTON_ALIGN_32;
 
 	D_MSV_NEWTON_ALIGN_32
-	class ndOpenclVector6
+	class ndAvxVector6
 	{
 		public:
 		ndAvxVector3 m_linear;
@@ -184,8 +184,8 @@ namespace ndAvx2
 	class ndOpenclJacobianPair
 	{
 		public:
-		ndOpenclVector6 m_jacobianM0;
-		ndOpenclVector6 m_jacobianM1;
+		ndAvxVector6 m_jacobianM0;
+		ndAvxVector6 m_jacobianM1;
 	} D_GCC_NEWTON_ALIGN_32;
 
 
