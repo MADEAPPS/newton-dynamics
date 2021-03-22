@@ -2188,29 +2188,8 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 
 	for (dInt32 i = 0; (i < passes) && (accNorm > D_SOLVER_MAX_ERROR); i++)
 	{
-#ifdef D_PROFILE_JOINTS
-		dUnsigned64 cpuClock = dGetCpuClock();
-#endif
-
 		scene->SubmitJobs<ndCalculateJointsForce>(m_accelNorm);
 		scene->SubmitJobs<ndInitJacobianAccumulatePartialForces>();
-
-#ifdef D_PROFILE_JOINTS
-		static dUnsigned64 ticks = 0;
-		static dUnsigned64 joints = 0;
-		static dInt32 averageCount = 0;
-		cpuClock = dGetCpuClock() - cpuClock;
-		ticks += cpuClock;
-		joints += m_me->m_jointArray.GetCount();
-		averageCount++;
-		if (averageCount > 10000)
-		{
-			dgExpandTraceMessage("ticks per joints: %d\n", ticks / joints);
-			joints = 0;
-			ticks = 0;
-			averageCount = 0;
-		}
-#endif
 
 		accNorm = dFloat32(0.0f);
 		for (dInt32 j = 0; j < threadsCount; j++)

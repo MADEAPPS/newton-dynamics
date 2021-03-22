@@ -188,13 +188,13 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene);
 
-	DzhanibekovEffect(scene, 10.0f,  5.0f, dVector(0.0f, 0.0f, -2.0f, 0.0f));
+	DzhanibekovEffect(scene, 10.0f, 5.0f, dVector(0.0f, 0.0f, -2.0f, 0.0f));
 	DzhanibekovEffect(scene, 10.0f, -5.0f, dVector(0.0f, 0.0f, 0.0f, 0.0f));
 	DzhanibekovEffect(scene, 10.0f, 10.0f, dVector(0.0f, 0.0f, 2.0f, 0.0f));
-	
+
 	Phitop(scene, 10.0f, 25.0f, dVector(10.0f, 0.0f, -4.0f, 0.0f));
 	Phitop(scene, 10.0f, -25.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
-	Phitop(scene, 10.0f, 35.0f, dVector(10.0f, 0.0f,  4.0f, 0.0f));
+	Phitop(scene, 10.0f, 35.0f, dVector(10.0f, 0.0f, 4.0f, 0.0f));
 
 	PrecessingTop(scene, dVector(5.0f, 0.0f, -4.0f, 0.0f));
 	PrecessingTop(scene, dVector(5.0f, 0.0f, 0.0f, 0.0f));

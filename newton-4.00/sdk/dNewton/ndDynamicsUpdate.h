@@ -24,7 +24,6 @@
 
 #include "ndNewtonStdafx.h"
 
-//#define D_PROFILE_JOINTS
 #define D_SMALL_ISLAND_COUNT			32
 #define	D_FREEZZING_VELOCITY_DRAG		dFloat32 (0.9f)
 #define	D_SOLVER_MAX_ERROR				(D_FREEZE_MAG * dFloat32 (0.5f))
