@@ -75,6 +75,15 @@ class dOpenclBuffer: public dArray<T>
 		}
 	}
 
+	void ReadData(cl_command_queue commandQueue)
+	{
+		void* const source = &(*this)[0];
+		cl_int err = clEnqueueReadBuffer(commandQueue, m_gpuBuffer,
+			CL_FALSE, 0, sizeof(T) * GetCount(), source,
+			0, nullptr, nullptr);
+		dAssert(err == CL_SUCCESS);
+	}
+
 	cl_mem_flags m_flags;
 	cl_mem m_gpuBuffer;
 };
@@ -84,7 +93,6 @@ class ndOpenclBodyProxy
 	public:
 	cl_float4 m_matrix[4];
 	cl_float4 m_invMass;
-	ndBodyKinematic* m_body;
 };
 
 class ndOpenclInternalBodyProxy
@@ -264,8 +272,8 @@ void ndDynamicsUpdateOpencl::Update()
 {
 	if (m_openCl)
 	{
-		ndDynamicsUpdate::Update();
-		//GpuUpdate();
+		//ndDynamicsUpdate::Update();
+		GpuUpdate();
 	}
 }
 
@@ -286,6 +294,8 @@ void ndDynamicsUpdateOpencl::GpuUpdate()
 		IntegrateBodies();
 		//DetermineSleepStates();
 	}
+	cl_int err = clFinish(m_openCl->m_commandQueue);
+	dAssert(err == CL_SUCCESS);
 }
 
 void ndDynamicsUpdateOpencl::BuildIsland()
@@ -608,7 +618,8 @@ void ndDynamicsUpdateOpencl::CopyBodyData()
 	m_openCl->m_bodyArray.SyncSize(m_openCl->m_context, m_bodyIslandOrder.GetCount());
 	m_openCl->m_internalBodyArray.SyncSize(m_openCl->m_context, m_bodyIslandOrder.GetCount());
 
-	int xxx = sizeof(ndOpenclBodyProxy);
+	int xxx;
+	xxx = sizeof(ndOpenclBodyProxy);
 	
 	for (dInt32 i = 0; i < m_bodyIslandOrder.GetCount(); i++)
 	{
@@ -625,8 +636,9 @@ void ndDynamicsUpdateOpencl::CopyBodyData()
 		data.m_invMass.y = body->m_invMass.m_y;
 		data.m_invMass.z = body->m_invMass.m_z;
 		data.m_invMass.w = body->m_invMass.m_w;
-		data.m_body = body;
 	}
+
+	m_openCl->m_bodyArray.ReadData(m_openCl->m_commandQueue);
 }
 
 void ndDynamicsUpdateOpencl::IntegrateUnconstrainedBodies()
