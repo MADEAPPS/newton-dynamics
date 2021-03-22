@@ -19,12 +19,42 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-__kernel void TestKernel(__global int* pA, __global int* pB, __global int* pC)
+struct ndOpenclMatrix3x3
 {
-    const int x = get_global_id(0);
-    const int y = get_global_id(1);
-    const int width = get_global_size(0);
-    const int id = y * width + x;
+	float3 m_elements[3];
+};
 
-    pC[id] = pA[id] + pB[id];
+struct ndOpenclMatrix3x4
+{
+	float4 m_elements[3];
+};
+
+struct ndOpenclBodyProxy
+{
+	struct ndOpenclMatrix3x4 m_matrix;
+	float4 m_invMass;
+};
+
+struct ndOpenclInternalBodyProxy
+{
+	struct ndOpenclMatrix3x3 m_invWorldInertiaMatrix;
+};
+
+//__kernel void TestKernel(__global int* pA, __global int* pB, __global int* pC)
+//{
+//    const int x = get_global_id(0);
+//    const int y = get_global_id(1);
+//    const int width = get_global_size(0);
+//    const int id = y * width + x;
+//
+//    pC[id] = pA[id] + pB[id];
+//}
+
+void UpdateInvInertiaMatrix(__global struct ndOpenclBodyProxy* inputArray, __global struct ndOpenclInternalBodyProxy* outputBuffer)
+{
+}
+
+__kernel void IntegrateUnconstrainedBodies(__global struct ndOpenclBodyProxy* inputArray, __global struct ndOpenclInternalBodyProxy* outputBuffer)
+{
+	UpdateInvInertiaMatrix(inputArray, outputBuffer);
 }
