@@ -56,6 +56,7 @@ class dOpenclBuffer: public dArray<T>
 	void SyncSize(cl_context context, dInt32 size)
 	{
 		cl_int err;
+
 		if (m_gpuBuffer == nullptr)
 		{
 			if (m_flags & CL_MEM_USE_HOST_PTR)
@@ -69,10 +70,12 @@ class dOpenclBuffer: public dArray<T>
 			}
 			dAssert(err == CL_SUCCESS);
 		}
+
 		if (GetCapacity() < size)
 		{
 			dAssert(0);
 		}
+		SetCount(size);
 	}
 
 	void ReadData(cl_command_queue commandQueue)
@@ -148,7 +151,8 @@ class OpenclSystem
 	public:
 	OpenclSystem(cl_context context, cl_platform_id platform)
 		:m_context(context)
-		,m_bodyArray(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR)
+		//,m_bodyArray(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR)
+		,m_bodyArray(CL_MEM_READ_WRITE)
 		,m_internalBodyArray(CL_MEM_READ_WRITE)
 	{
 		cl_int err;
