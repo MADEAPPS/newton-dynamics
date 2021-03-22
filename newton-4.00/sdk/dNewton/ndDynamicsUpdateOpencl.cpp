@@ -84,6 +84,16 @@ class dOpenclBuffer: public dArray<T>
 		dAssert(err == CL_SUCCESS);
 	}
 
+	void WriteData(cl_command_queue commandQueue)
+	{
+		const void* const source = &(*this)[0];
+		cl_int err = clEnqueueWriteBuffer(commandQueue, m_gpuBuffer,
+			CL_FALSE, 0, sizeof(T) * GetCount(), source,
+			0, nullptr, nullptr);
+		dAssert(err == CL_SUCCESS);
+	}
+
+
 	cl_mem_flags m_flags;
 	cl_mem m_gpuBuffer;
 };
@@ -665,7 +675,7 @@ void ndDynamicsUpdateOpencl::CopyBodyData()
 		data.m_invMass.w = body->m_invMass.m_w;
 	}
 
-	m_openCl->m_bodyArray.ReadData(m_openCl->m_commandQueue);
+	m_openCl->m_bodyArray.WriteData(m_openCl->m_commandQueue);
 }
 
 void ndDynamicsUpdateOpencl::IntegrateUnconstrainedBodies()
