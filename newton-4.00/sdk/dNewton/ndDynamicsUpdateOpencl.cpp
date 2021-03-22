@@ -88,17 +88,49 @@ class dOpenclBuffer: public dArray<T>
 	cl_mem m_gpuBuffer;
 };
 
+class ndOpenclMatrix3x3
+{
+	public:
+	//ndOpenclMatrix3x4(const dMatrix& matrix)
+	//{
+	//	for (dInt32 i = 0; i < 4; i++)
+	//	{
+	//		for (dInt32 j = 0; j < 3; j++)
+	//		{
+	//			m_elements[j].s[i] = matrix[i][j];
+	//		}
+	//	}
+	//}
+	cl_float3 m_elements[3];
+};
+
+class ndOpenclMatrix3x4
+{
+	public:
+	ndOpenclMatrix3x4(const dMatrix& matrix)
+	{
+		for (dInt32 i = 0; i < 4; i++)
+		{
+			for (dInt32 j = 0; j < 3; j++)
+			{
+				m_elements[j].s[i] = matrix[i][j];
+			}
+		}
+	}
+	cl_float4 m_elements[3];
+};
+
 class ndOpenclBodyProxy
 {
 	public:
-	cl_float4 m_matrix[4];
+	ndOpenclMatrix3x4 m_matrix;
 	cl_float4 m_invMass;
 };
 
 class ndOpenclInternalBodyProxy
 {
 	public:
-	cl_float4 m_invWorldInertiaMatrix[4];
+	ndOpenclMatrix3x3 m_invWorldInertiaMatrix;
 };
 
 class OpenclSystem
@@ -625,13 +657,8 @@ void ndDynamicsUpdateOpencl::CopyBodyData()
 	{
 		ndOpenclBodyProxy& data = m_openCl->m_bodyArray[i];
 		ndBodyKinematic* const body = m_bodyIslandOrder[i];
-		for (dInt32 j = 0; j < 4; j++)
-		{
-			data.m_matrix[j].x = cl_float(body->m_matrix[j].m_x);
-			data.m_matrix[j].y = cl_float(body->m_matrix[j].m_y);
-			data.m_matrix[j].z = cl_float(body->m_matrix[j].m_z);
-			data.m_matrix[j].w = cl_float(body->m_matrix[j].m_w);
-		}
+
+		data.m_matrix = ndOpenclMatrix3x4(body->m_matrix);
 		data.m_invMass.x = body->m_invMass.m_x;
 		data.m_invMass.y = body->m_invMass.m_y;
 		data.m_invMass.z = body->m_invMass.m_z;
