@@ -243,7 +243,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showScene = true;
 	//m_autoSleepMode = false;
 	m_solverMode = ndWorld::ndOpenclSolver;
-	m_solverMode = ndWorld::ndStandardSolver;
+	//m_solverMode = ndWorld::ndStandardSolver;
 	//m_sceneType = 1;
 	//m_solverPasses = 4;
 	//m_workerThreads = 4;

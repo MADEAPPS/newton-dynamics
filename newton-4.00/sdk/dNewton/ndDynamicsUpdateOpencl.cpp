@@ -96,55 +96,45 @@ class dOpenclBuffer: public dArray<T>
 		dAssert(err == CL_SUCCESS);
 	}
 
-
 	cl_mem_flags m_flags;
 	cl_mem m_gpuBuffer;
-};
-
-class ndOpenclMatrix3x3
-{
-	public:
-	//ndOpenclMatrix3x4(const dMatrix& matrix)
-	//{
-	//	for (dInt32 i = 0; i < 4; i++)
-	//	{
-	//		for (dInt32 j = 0; j < 3; j++)
-	//		{
-	//			m_elements[j].s[i] = matrix[i][j];
-	//		}
-	//	}
-	//}
-	cl_float3 m_elements[3];
-};
-
-class ndOpenclMatrix3x4
-{
-	public:
-	ndOpenclMatrix3x4(const dMatrix& matrix)
-	{
-		for (dInt32 i = 0; i < 4; i++)
-		{
-			for (dInt32 j = 0; j < 3; j++)
-			{
-				m_elements[j].s[i] = matrix[i][j];
-			}
-		}
-	}
-	cl_float4 m_elements[3];
 };
 
 class ndOpenclBodyProxy
 {
 	public:
-	ndOpenclMatrix3x4 m_matrix;
+	cl_float4 m_rotation;
+	cl_float3 m_position;
+	cl_float3 m_veloc;
+	cl_float3 m_omega;
 	cl_float4 m_invMass;
 };
 
-class ndOpenclInternalBodyProxy
+//class ndOpenclOutBodyProxy
+//{
+//	public:
+//	cl_float3 m_matrix[3];
+//	cl_float3 m_position;
+//	cl_float4 m_rotation;
+//	cl_float3 m_veloc;
+//	cl_float3 m_omega;
+//};
+
+class ndOpenclMatrix3x3
+{
+	cl_float3 m_matrix[3];
+};
+
+class ndOpenclBodyWorkingBuffer
 {
 	public:
-	ndOpenclMatrix3x3 m_invWorldInertiaMatrix;
+	ndOpenclMatrix3x3 m_matrix;
+	cl_float4 m_rotation;
+	cl_float3 m_position;
+	cl_float3 m_veloc;
+	cl_float3 m_omega;
 };
+
 
 class OpenclSystem
 {
@@ -152,8 +142,10 @@ class OpenclSystem
 	OpenclSystem(cl_context context, cl_platform_id platform)
 		:m_context(context)
 		//,m_bodyArray(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR)
-		,m_bodyArray(CL_MEM_READ_WRITE)
-		,m_internalBodyArray(CL_MEM_READ_WRITE)
+		,m_bodyArray(CL_MEM_READ_ONLY)
+		//,m_outBodyArray(CL_MEM_WRITE_ONLY)
+		,m_bodyWorkingArray(CL_MEM_READ_WRITE)
+		,m_integrateUnconstrainedBodies(nullptr)
 	{
 		cl_int err;
 		// get the device
@@ -183,11 +175,17 @@ class OpenclSystem
 		char programFile[256];
 		sprintf(programFile, "%s/CL/solver/solver.cl", CL_KERNEL_PATH);
 		m_solverProgram = CompileProgram(programFile);
+
+		m_integrateUnconstrainedBodies = clCreateKernel(m_solverProgram, "IntegrateUnconstrainedBodies", &err);
+		dAssert(err == CL_SUCCESS);
 	}
 
 	~OpenclSystem()
 	{
 		cl_int err;
+
+		err = clReleaseKernel(m_integrateUnconstrainedBodies);
+		dAssert(err == CL_SUCCESS);
 
 		err = clReleaseProgram(m_solverProgram);
 		dAssert(err == CL_SUCCESS);
@@ -291,32 +289,36 @@ class OpenclSystem
 	char m_platformName[128];
 
 	dOpenclBuffer<ndOpenclBodyProxy> m_bodyArray;
-	dOpenclBuffer<ndOpenclInternalBodyProxy> m_internalBodyArray;
+	dOpenclBuffer<ndOpenclBodyWorkingBuffer> m_bodyWorkingArray;
+//	dOpenclBuffer<ndOpenclOutBodyProxy> m_outBodyArray;
+
+	cl_kernel m_integrateUnconstrainedBodies;
+
 };
 
 ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world)
 	:ndDynamicsUpdate(world)
-	,m_openCl(nullptr)
+	,m_opencl(nullptr)
 {
-	m_openCl = OpenclSystem::Singleton();
+	m_opencl = OpenclSystem::Singleton();
 }
 
 ndDynamicsUpdateOpencl::~ndDynamicsUpdateOpencl()
 {
-	if (m_openCl)
+	if (m_opencl)
 	{
-		delete m_openCl;
+		delete m_opencl;
 	}
 }
 
 const char* ndDynamicsUpdateOpencl::GetStringId() const
 {
-	return m_openCl ? m_openCl->m_platformName : "no opencl support";
+	return m_opencl ? m_opencl->m_platformName : "no opencl support";
 }
 
 void ndDynamicsUpdateOpencl::Update()
 {
-	if (m_openCl)
+	if (m_opencl)
 	{
 		//ndDynamicsUpdate::Update();
 		GpuUpdate();
@@ -337,10 +339,12 @@ void ndDynamicsUpdateOpencl::GpuUpdate()
 		//InitBodyArray();
 		//InitJacobianMatrix();
 		//CalculateForces();
-		IntegrateBodies();
+		//IntegrateBodies();
 		//DetermineSleepStates();
 	}
-	cl_int err = clFinish(m_openCl->m_commandQueue);
+	
+	//m_opencl->m_outBodyArray.ReadData(m_opencl->m_commandQueue);
+	cl_int err = clFinish(m_opencl->m_commandQueue);
 	dAssert(err == CL_SUCCESS);
 }
 
@@ -661,65 +665,99 @@ void ndDynamicsUpdateOpencl::SortIslands()
 
 void ndDynamicsUpdateOpencl::CopyBodyData()
 {
-	m_openCl->m_bodyArray.SyncSize(m_openCl->m_context, m_bodyIslandOrder.GetCount());
-	m_openCl->m_internalBodyArray.SyncSize(m_openCl->m_context, m_bodyIslandOrder.GetCount());
+	m_opencl->m_bodyArray.SyncSize(m_opencl->m_context, m_bodyIslandOrder.GetCount());
+	//m_opencl->m_outBodyArray.SyncSize(m_opencl->m_context, m_bodyIslandOrder.GetCount());
+	m_opencl->m_bodyWorkingArray.SyncSize(m_opencl->m_context, m_bodyIslandOrder.GetCount());
 
 	int xxx;
 	xxx = sizeof(ndOpenclBodyProxy);
 	
 	for (dInt32 i = 0; i < m_bodyIslandOrder.GetCount(); i++)
 	{
-		ndOpenclBodyProxy& data = m_openCl->m_bodyArray[i];
+		ndOpenclBodyProxy& data = m_opencl->m_bodyArray[i];
 		ndBodyKinematic* const body = m_bodyIslandOrder[i];
 
-		data.m_matrix = ndOpenclMatrix3x4(body->m_matrix);
+		data.m_rotation.x = body->m_rotation.m_x;
+		data.m_rotation.y = body->m_rotation.m_y;
+		data.m_rotation.z = body->m_rotation.m_z;
+		data.m_rotation.w = body->m_rotation.m_w;
+		data.m_position.x = body->m_matrix.m_posit.m_x;
+		data.m_position.y = body->m_matrix.m_posit.m_y;
+		data.m_position.z = body->m_matrix.m_posit.m_z;
+		data.m_veloc.x = body->m_veloc.m_x;
+		data.m_veloc.y = body->m_veloc.m_y;
+		data.m_veloc.z = body->m_veloc.m_z;
+		data.m_omega.x = body->m_omega.m_x;
+		data.m_omega.y = body->m_omega.m_y;
+		data.m_omega.z = body->m_omega.m_z;
 		data.m_invMass.x = body->m_invMass.m_x;
 		data.m_invMass.y = body->m_invMass.m_y;
 		data.m_invMass.z = body->m_invMass.m_z;
 		data.m_invMass.w = body->m_invMass.m_w;
 	}
 
-	m_openCl->m_bodyArray.WriteData(m_openCl->m_commandQueue);
+	m_opencl->m_bodyArray.WriteData(m_opencl->m_commandQueue);
 }
 
 void ndDynamicsUpdateOpencl::IntegrateUnconstrainedBodies()
 {
-	class ndIntegrateUnconstrainedBodies : public ndScene::ndBaseJob
-	{
-		public:
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
-			ndDynamicsUpdateOpencl* const me = (ndDynamicsUpdateOpencl*)world->m_solver;
-			dArray<ndBodyKinematic*>& bodyArray = me->m_bodyIslandOrder;
+	//class ndIntegrateUnconstrainedBodies : public ndScene::ndBaseJob
+	//{
+	//	public:
+	//	virtual void Execute()
+	//	{
+	//		D_TRACKTIME();
+	//		ndWorld* const world = m_owner->GetWorld();
+	//		ndDynamicsUpdateOpencl* const me = (ndDynamicsUpdateOpencl*)world->m_solver;
+	//		dArray<ndBodyKinematic*>& bodyArray = me->m_bodyIslandOrder;
+	//
+	//		const dInt32 threadIndex = GetThreadId();
+	//		const dInt32 threadCount = m_owner->GetThreadCount();
+	//		const dInt32 bodyCount = me->m_unConstrainedBodyCount;
+	//		const dInt32 base = bodyArray.GetCount() - bodyCount;
+	//		const dInt32 step = bodyCount / threadCount;
+	//		const dInt32 start = threadIndex * step;
+	//		const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
+	//		const dFloat32 timestep = m_timestep;
+	//
+	//		for (dInt32 i = 0; i < count; i++)
+	//		{
+	//			ndBodyKinematic* const body = bodyArray[base + start + i]->GetAsBodyKinematic();
+	//			dAssert(body);
+	//			body->UpdateInvInertiaMatrix();
+	//			body->AddDampingAcceleration(m_timestep);
+	//			body->IntegrateExternalForce(timestep);
+	//		}
+	//	}
+	//};
+	//
+	//if (m_unConstrainedBodyCount)
+	//{
+	//	D_TRACKTIME();
+	//	ndScene* const scene = m_world->GetScene();
+	//	scene->SubmitJobs<ndIntegrateUnconstrainedBodies>();
+	//}
 
-			const dInt32 threadIndex = GetThreadId();
-			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = me->m_unConstrainedBodyCount;
-			const dInt32 base = bodyArray.GetCount() - bodyCount;
-			const dInt32 step = bodyCount / threadCount;
-			const dInt32 start = threadIndex * step;
-			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
-			const dFloat32 timestep = m_timestep;
+	cl_int err;
+	const cl_float timestep = m_timestep;
+	const cl_int bodyCount = m_unConstrainedBodyCount;
 
-			for (dInt32 i = 0; i < count; i++)
-			{
-				ndBodyKinematic* const body = bodyArray[base + start + i]->GetAsBodyKinematic();
-				dAssert(body);
-				body->UpdateInvInertiaMatrix();
-				body->AddDampingAcceleration(m_timestep);
-				body->IntegrateExternalForce(timestep);
-			}
-		}
-	};
+	err = clSetKernelArg(m_opencl->m_integrateUnconstrainedBodies, 0, sizeof(cl_float), &timestep);
+	dAssert(err == CL_SUCCESS);
 
-	if (m_unConstrainedBodyCount)
-	{
-		D_TRACKTIME();
-		ndScene* const scene = m_world->GetScene();
-		scene->SubmitJobs<ndIntegrateUnconstrainedBodies>();
-	}
+	err = clSetKernelArg(m_opencl->m_integrateUnconstrainedBodies, 1, sizeof(cl_int), &bodyCount);
+	dAssert(err == CL_SUCCESS);
+
+	err = clSetKernelArg(m_opencl->m_integrateUnconstrainedBodies, 2, sizeof(cl_mem), &m_opencl->m_bodyArray.m_gpuBuffer);
+	dAssert(err == CL_SUCCESS);
+
+	err = clSetKernelArg(m_opencl->m_integrateUnconstrainedBodies, 3, sizeof(cl_mem), &m_opencl->m_bodyWorkingArray.m_gpuBuffer);
+	dAssert(err == CL_SUCCESS);
+
+	size_t globalWorkSize = bodyCount;
+	err = clEnqueueNDRangeKernel(m_opencl->m_commandQueue, m_opencl->m_integrateUnconstrainedBodies, 1, nullptr, &globalWorkSize, nullptr, 0, nullptr, nullptr);
+	dAssert(err == CL_SUCCESS);
+
 }
 
 void ndDynamicsUpdateOpencl::IntegrateBodies()

@@ -89,7 +89,7 @@ static void AddSphere(ndDemoEntityManager* const scene, const dVector& origin, d
 	dFloat32 diameter = 0.5f;
 	ndShapeInstance shape(new ndShapeSphere(diameter));
 
-	dMatrix matrix(dGetIdentityMatrix());
+	dMatrix matrix(dPitchMatrix(15.0f*dDegreeToRad) * dRollMatrix(15.0f*dDegreeToRad));
 	matrix.m_posit = origin;
 
 	AddShape(scene, matrix, shape, 10.0f, density);
@@ -100,7 +100,8 @@ static void AddCapsule(ndDemoEntityManager* const scene, const dVector& origin, 
 	dFloat32 diameter = 1.0f;
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 
-	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
+	//dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
+	dMatrix matrix(dPitchMatrix(35.0f*dDegreeToRad) * dRollMatrix(25.0f*dDegreeToRad));
 	matrix.m_posit = origin;
 
 	AddShape(scene, matrix, shape, 10.0f, density);
@@ -109,7 +110,7 @@ static void AddCapsule(ndDemoEntityManager* const scene, const dVector& origin, 
 static void AddBox(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 density)
 {
 	ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.7f));
-	dMatrix matrix(dGetIdentityMatrix());
+	dMatrix matrix(dPitchMatrix(10.0f*dDegreeToRad) * dRollMatrix(150.0f*dDegreeToRad));
 	matrix.m_posit = origin;
 
 	AddShape(scene, matrix, shape, 10.0f, density);
@@ -131,7 +132,7 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origi
 
 	//ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.7f));
 	ndShapeInstance shape(new ndShapeConvexHull(count, sizeof (dVector), 0.0f, &points[0].m_x));
-	dMatrix matrix(dGetIdentityMatrix());
+	dMatrix matrix(dPitchMatrix(135.0f*dDegreeToRad) * dRollMatrix(75.0f*dDegreeToRad));
 	matrix.m_posit = origin;
 
 	AddShape(scene, matrix, shape, 10.0f, density);
@@ -147,10 +148,10 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 
 	AddBox(scene, dVector(0.0f, 0.0f, -3.0f, 1.0f), 0.6f);
 	AddSphere(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 0.5f);
-	AddCapsule(scene, dVector(0.0f, 0.0f, 3.0f, 1.0f), 0.7f);
-	AddConvexHull(scene, dVector(-2.0f, 0.0f, -2.0f, 1.0f), 7, 0.8f);
-	AddConvexHull(scene, dVector(-2.0f, 0.0f,  2.0f, 1.0f), 21, 0.7f);
-	AddConvexHull(scene, dVector( 2.0f, 0.0f,  3.0f, 1.0f), 210, 0.9f);
+	//AddCapsule(scene, dVector(0.0f, 0.0f, 3.0f, 1.0f), 0.7f);
+	//AddConvexHull(scene, dVector(-2.0f, 0.0f, -2.0f, 1.0f), 7, 0.8f);
+	//AddConvexHull(scene, dVector(-2.0f, 0.0f,  2.0f, 1.0f), 21, 0.7f);
+	//AddConvexHull(scene, dVector( 2.0f, 0.0f,  3.0f, 1.0f), 210, 0.9f);
 
 	dQuaternion rot;
 	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
