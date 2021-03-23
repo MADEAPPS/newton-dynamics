@@ -89,8 +89,9 @@ class dOpenclBuffer: public dArray<T>
 
 	void WriteData(cl_command_queue commandQueue)
 	{
+		cl_int err;
 		const void* const source = &(*this)[0];
-		cl_int err = clEnqueueWriteBuffer(commandQueue, m_gpuBuffer,
+		err = clEnqueueWriteBuffer(commandQueue, m_gpuBuffer,
 			CL_FALSE, 0, sizeof(T) * GetCount(), source,
 			0, nullptr, nullptr);
 		dAssert(err == CL_SUCCESS);
@@ -344,7 +345,9 @@ void ndDynamicsUpdateOpencl::GpuUpdate()
 	}
 	
 	//m_opencl->m_outBodyArray.ReadData(m_opencl->m_commandQueue);
-	cl_int err = clFinish(m_opencl->m_commandQueue);
+
+	cl_int err;
+	err = clFinish(m_opencl->m_commandQueue);
 	dAssert(err == CL_SUCCESS);
 }
 

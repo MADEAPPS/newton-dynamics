@@ -58,7 +58,6 @@ static void BuildBoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
-count = 2;
 	dMatrix rotation(dYawMatrix(20.0f * dDegreeToRad));
 	for (dInt32 i = 0; i < count; i++) 
 	{
@@ -96,7 +95,6 @@ static void BuildCylinderStack(ndDemoEntityManager* const scene, dFloat32 mass, 
 
 	dMatrix rotation(dYawMatrix(20.0f * dDegreeToRad));
 
-count = 1;
 	for (dInt32 i = 0; i < count; i++)
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
@@ -106,7 +104,6 @@ count = 1;
 
 	geometry->Release();
 }
-
 
 static void BuildPyramid(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& boxSize, dInt32 count)
 {
@@ -161,11 +158,11 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 
 	origin1.m_z = -4.0f;
-	BuildCylinderStack(scene, 1.0f, origin1, dVector(0.5f, 0.3f, 0.5f, 0.0f), 20);
+	BuildCylinderStack(scene, 1.0f, origin1, dVector(0.5f, 0.4f, 0.5f, 0.0f), 20);
 	
 	origin1.m_z = 0.0f;
 	origin1.m_x += 8.0f;
-//	BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
 
 	dQuaternion rot;
 	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
