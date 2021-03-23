@@ -18,6 +18,7 @@
 #include "ndBasicPlayerCapsule.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
+#define MAX_PHYSICS_STEPS			1
 #define MAX_PHYSICS_FPS				60.0f
 //#define MAX_PHYSICS_RECOVER_STEPS	2
 
@@ -67,7 +68,7 @@ void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
 {
 	const dFloat32 descreteStep = (1.0f / MAX_PHYSICS_FPS);
 
-	dInt32 maxSteps = 10;
+	dInt32 maxSteps = MAX_PHYSICS_STEPS;
 	m_timeAccumulator += timestep;
 
 	// if the time step is more than max timestep par frame, throw away the extra steps.

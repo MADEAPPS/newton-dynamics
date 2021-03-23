@@ -40,7 +40,8 @@ class dOpenclBuffer: public dArray<T>
 		,m_flags(flags)
 		,m_gpuBuffer(nullptr)
 	{
-		SetCount(D_DEFAULT_BUFFER_SIZE);
+		//SetCount(D_DEFAULT_BUFFER_SIZE);
+		SetCount(D_DEFAULT_BUFFER_SIZE * 10);
 	}
 
 	~dOpenclBuffer()
@@ -294,7 +295,6 @@ class OpenclSystem
 //	dOpenclBuffer<ndOpenclOutBodyProxy> m_outBodyArray;
 
 	cl_kernel m_integrateUnconstrainedBodies;
-
 };
 
 ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world)

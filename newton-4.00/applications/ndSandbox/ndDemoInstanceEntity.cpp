@@ -275,6 +275,7 @@ ndDemoInstanceEntity::~ndDemoInstanceEntity(void)
 
 void ndDemoInstanceEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
+	D_TRACKTIME();
 	//count active instances 
 	dInt32 count = 0;
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())

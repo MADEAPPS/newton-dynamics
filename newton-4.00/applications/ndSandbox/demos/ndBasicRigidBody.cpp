@@ -21,7 +21,7 @@
 #include "ndDemoInstanceEntity.h"
 
 static void AddShape(ndDemoEntityManager* const scene,
-	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
+	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& shape,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, dInt32 count)
 {
 	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
@@ -40,8 +40,8 @@ static void AddShape(ndDemoEntityManager* const scene,
 
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 		body->SetMatrix(matrix);
-		body->SetCollisionShape(sphereShape);
-		body->SetMassMatrix(mass, sphereShape);
+		body->SetCollisionShape(shape);
+		body->SetMassMatrix(mass, shape);
 		body->SetAngularDamping(dVector(dFloat32(0.5f)));
 
 		world->AddBody(body);

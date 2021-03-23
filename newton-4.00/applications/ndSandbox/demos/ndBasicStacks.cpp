@@ -20,7 +20,10 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-static void AddRigidBody(ndDemoEntityManager* const scene, const dMatrix& matrix, const ndShapeInstance& shape, ndDemoInstanceEntity* const rootEntity, dFloat32 mass)
+//static void AddRigidBody(ndDemoEntityManager* const scene, const dMatrix& matrix, const ndShapeInstance& shape, ndDemoInstanceEntity* const rootEntity, dFloat32 mass)
+static void AddRigidBody(ndDemoEntityManager* const scene, 
+	const dMatrix& matrix, const ndShapeInstance& shape, 
+	ndDemoInstanceEntity* const rootEntity, dFloat32 mass)
 {
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
@@ -105,7 +108,9 @@ static void BuildCylinderStack(ndDemoEntityManager* const scene, dFloat32 mass, 
 	geometry->Release();
 }
 
-static void BuildPyramid(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& boxSize, dInt32 count)
+static void BuildPyramid(ndDemoEntityManager* const scene, 
+	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& shape,
+	dFloat32 mass, const dVector& origin, const dVector& boxSize, dInt32 count)
 {
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -114,24 +119,17 @@ static void BuildPyramid(ndDemoEntityManager* const scene, dFloat32 mass, const 
 	// create the shape and visual mesh as a common data to be re used
 	ndWorld* const world = scene->GetWorld();
 
-	dVector size(boxSize.Scale(1.0f));
-	ndShapeInstance shape(new ndShapeBox(size.m_x, size.m_y, size.m_z));
-	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
-
 	dVector floor(FindFloor(*world, origin + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 	
-	dFloat32 stepz = size.m_z + 1.0e-2f;
-	dFloat32 stepy = size.m_y + 1.0e-2f;
+	dFloat32 stepz = boxSize.m_z + 1.0e-2f;
+	dFloat32 stepy = boxSize.m_y + 1.0e-2f;
 	
 	dFloat32 y0 = matrix.m_posit.m_y + stepy / 2.0f;
 	dFloat32 z0 = matrix.m_posit.m_z - stepz * count / 2;
 
 	matrix.m_posit.m_y = y0;
 	matrix.m_posit.m_y -= 0.01f;
-
-	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
-	scene->AddEntity(rootEntity);
 
 	for (dInt32 j = 0; j < count; j++) 
 	{
@@ -144,7 +142,26 @@ static void BuildPyramid(ndDemoEntityManager* const scene, dFloat32 mass, const 
 		z0 += stepz * 0.5f;
 		matrix.m_posit.m_y += stepy;
 	}
+}
 
+void BuildPyramidStacks(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& boxSize, dInt32 count)
+{
+	dVector origin1(origin);
+
+	dVector size(boxSize.Scale(1.0f));
+	ndShapeInstance shape(new ndShapeBox(size.m_x, size.m_y, size.m_z));
+	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+
+	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
+	scene->AddEntity(rootEntity);
+
+	origin1.m_z = 0.0f;
+	for (dInt32 i = 0; i < count; i++)
+	{
+		origin1.m_x += 3.0f;
+		//origin1.m_z += (i & 1) ? 4.0f : -4.0f;
+		BuildPyramid(scene, rootEntity, shape, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	}
 	geometry->Release();
 }
 
@@ -154,21 +171,16 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	//BuildFloorBox(scene);
 	BuildFlatPlane(scene, true);
 
-	dVector origin1(0.0f, 0.0f, 4.0f, 0.0f);
-	BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+	dVector origin(0.0f, 0.0f, 4.0f, 0.0f);
+	//BuildBoxStack(scene, 1.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 
-	origin1.m_z = -4.0f;
-	BuildCylinderStack(scene, 1.0f, origin1, dVector(0.5f, 0.4f, 0.5f, 0.0f), 20);
+	origin.m_z = -4.0f;
+	//BuildCylinderStack(scene, 1.0f, origin, dVector(0.5f, 0.4f, 0.5f, 0.0f), 20);
 	
-	origin1.m_z = 0.0f;
-	dInt32 count = 20;
-	for (int i = 0; i < count; i++)
-	{
-		origin1.m_x += 2.0f;
-		BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
-	}
+	origin.m_x += 4.0f;
+	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 20);
 
-	dQuaternion rot;
-	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
-	scene->SetCameraMatrix(rot, origin);
+	dQuaternion rot(dYawMatrix (90.0f * dDegreeToRad));
+	dVector origin1(20.0f, 5.0f, 30.0f, 0.0f);
+	scene->SetCameraMatrix(rot, origin1);
 }
