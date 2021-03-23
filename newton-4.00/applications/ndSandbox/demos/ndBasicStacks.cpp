@@ -161,8 +161,12 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	BuildCylinderStack(scene, 1.0f, origin1, dVector(0.5f, 0.4f, 0.5f, 0.0f), 20);
 	
 	origin1.m_z = 0.0f;
-	origin1.m_x += 8.0f;
-	BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	dInt32 count = 20;
+	for (int i = 0; i < count; i++)
+	{
+		origin1.m_x += 2.0f;
+		BuildPyramid(scene, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	}
 
 	dQuaternion rot;
 	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
