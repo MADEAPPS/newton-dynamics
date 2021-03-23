@@ -288,7 +288,6 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 		body->SetMatrix(matrix1);
 		body->SetCollisionShape(shape);
 		body->SetMassMatrix(1.0f, shape);
-		//body->SetGyroMode(true);
 		
 		world->AddBody(body);
 		

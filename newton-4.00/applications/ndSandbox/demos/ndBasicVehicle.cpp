@@ -262,8 +262,6 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(*chassisCollision);
 		body->SetMassMatrix(mass, *chassisCollision);
-		//body->SetGyroMode(true);
-		//body->SetGyroMode(false);
 
 		world->AddBody(body);
 		delete chassisCollision;
@@ -315,7 +313,6 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		tireBody->SetMatrix(matrix);
 		tireBody->SetCollisionShape(tireCollision);
 		tireBody->SetMassMatrix(mass, tireCollision);
-		//tireBody->SetGyroMode(false);
 
 		world->AddBody(tireBody);
 		return tireBody;

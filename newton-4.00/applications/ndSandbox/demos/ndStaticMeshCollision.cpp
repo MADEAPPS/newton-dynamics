@@ -46,7 +46,6 @@ static void AddShape(ndDemoEntityManager* const scene,
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(shape);
 		body->SetMassMatrix(mass, shape);
-		//body->SetGyroMode(true);
 
 		world->AddBody(body);
 		scene->AddEntity(entity);
@@ -99,7 +98,6 @@ static void AddPlatform(ndDemoEntityManager* const scene, dFloat32 mass, const d
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
 	body->SetMassMatrix(mass, shape);
-	//body->SetGyroMode(true);
 
 	world->AddBody(body);
 	scene->AddEntity(entity);
@@ -142,7 +140,6 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origi
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
 	body->SetMassMatrix(10.0f, shape);
-	//body->SetGyroMode(true);
 
 	world->AddBody(body);
 	scene->AddEntity(entity);

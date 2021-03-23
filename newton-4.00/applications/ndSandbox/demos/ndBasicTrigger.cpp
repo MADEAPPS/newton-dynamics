@@ -71,7 +71,6 @@ static void AddShape(ndDemoEntityManager* const scene, const dMatrix& location,
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
 	body->SetMassMatrix(mass, shape);
-	//body->SetGyroMode(true);
 
 	// save the density with the body shape.
 	ndShapeMaterial material;

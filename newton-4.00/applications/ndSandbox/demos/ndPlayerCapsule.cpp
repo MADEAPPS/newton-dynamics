@@ -43,7 +43,6 @@ static void AddShape(ndDemoEntityManager* const scene,
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(sphereShape);
 		body->SetMassMatrix(mass, sphereShape);
-		//body->SetGyroMode(true);
 
 		world->AddBody(body);
 		matrix.m_posit.m_y += diameter * 3.0f;
@@ -96,7 +95,6 @@ static void AddPlatform(ndDemoEntityManager* const scene, dFloat32 mass, const d
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
 	body->SetMassMatrix(mass, shape);
-	//body->SetGyroMode(true);
 
 	world->AddBody(body);
 	scene->AddEntity(entity);
