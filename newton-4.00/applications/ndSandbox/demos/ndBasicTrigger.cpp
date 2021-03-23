@@ -147,10 +147,10 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 
 	AddBox(scene, dVector(0.0f, 0.0f, -3.0f, 1.0f), 0.6f);
 	AddSphere(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 0.5f);
-	//AddCapsule(scene, dVector(0.0f, 0.0f, 3.0f, 1.0f), 0.7f);
-	//AddConvexHull(scene, dVector(-2.0f, 0.0f, -2.0f, 1.0f), 7, 0.8f);
-	//AddConvexHull(scene, dVector(-2.0f, 0.0f,  2.0f, 1.0f), 21, 0.7f);
-	//AddConvexHull(scene, dVector( 2.0f, 0.0f,  3.0f, 1.0f), 210, 0.9f);
+	AddCapsule(scene, dVector(0.0f, 0.0f, 3.0f, 1.0f), 0.7f);
+	AddConvexHull(scene, dVector(-2.0f, 0.0f, -2.0f, 1.0f), 7, 0.8f);
+	AddConvexHull(scene, dVector(-2.0f, 0.0f,  2.0f, 1.0f), 21, 0.7f);
+	AddConvexHull(scene, dVector( 2.0f, 0.0f,  3.0f, 1.0f), 210, 0.9f);
 
 	dQuaternion rot;
 	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);

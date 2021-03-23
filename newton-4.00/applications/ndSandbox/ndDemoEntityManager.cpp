@@ -29,25 +29,27 @@
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0		// setting basic rigidbody
-//#define DEFAULT_SCENE	1		// setting friction ramp
-//#define DEFAULT_SCENE	2		// setting basic Stacks
-#define DEFAULT_SCENE	3		// setting basic Trigger
-//#define DEFAULT_SCENE	4		// setting basic player
-//#define DEFAULT_SCENE	5		// setting particle fluid
-//#define DEFAULT_SCENE	6		// static mesh collision 
-//#define DEFAULT_SCENE	7		// setting basic joints
-//#define DEFAULT_SCENE	8		// setting basic vehicle
-//#define DEFAULT_SCENE	9		// conservation of angular momentum 
-//#define DEFAULT_SCENE	10		// basic voronoi fracture
-//#define DEFAULT_SCENE	11		// simple voronoi fracture
-//#define DEFAULT_SCENE	12		// linked voronoi fracture
-//#define DEFAULT_SCENE	13		// skin peel voronoi fracture
+#define DEFAULT_SCENE	1		// setting gpu basic rigidbody
+//#define DEFAULT_SCENE	2		// setting friction ramp
+//#define DEFAULT_SCENE	3		// setting basic Stacks
+//#define DEFAULT_SCENE	4		// setting basic Trigger
+//#define DEFAULT_SCENE	5		// setting basic player
+//#define DEFAULT_SCENE	6		// setting particle fluid
+//#define DEFAULT_SCENE	7		// static mesh collision 
+//#define DEFAULT_SCENE	8		// setting basic joints
+//#define DEFAULT_SCENE	9		// setting basic vehicle
+//#define DEFAULT_SCENE	10		// conservation of angular momentum 
+//#define DEFAULT_SCENE	11		// basic voronoi fracture
+//#define DEFAULT_SCENE	12		// simple voronoi fracture
+//#define DEFAULT_SCENE	13		// linked voronoi fracture
+//#define DEFAULT_SCENE	14		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
+void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
@@ -58,11 +60,13 @@ void ndBasicFracture_0(ndDemoEntityManager* const scene);
 void ndBasicFracture_1(ndDemoEntityManager* const scene);
 void ndBasicFracture_2(ndDemoEntityManager* const scene);
 void ndBasicFracture_4(ndDemoEntityManager* const scene);
+void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
 	{ "basic rigidbody", ndBasicRigidBody },
+	{ "basic gpu rigidbody", ndBasicGpuRigidBody },
 	{ "basic friction ramp", ndBasicFrictionRamp },
 	{ "basic stack", ndBasicStacks },
 	{ "basic trigger", ndBasicTrigger },
