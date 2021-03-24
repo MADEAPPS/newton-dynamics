@@ -52,7 +52,7 @@ void ndPhysicsWorld::QueueBodyForDelete(ndBody* const body)
 
 void ndPhysicsWorld::DeletePendingObjects()
 {
-	if (!m_hasPendingObjectToDelete.load())
+	if (m_hasPendingObjectToDelete.load())
 	{
 		Sync();
 		m_hasPendingObjectToDelete.store(false);
@@ -85,16 +85,6 @@ void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
 		m_timeAccumulator -= descreteStep;
 
 		DeletePendingObjects();
-
-		//xxxx++;
-		//if (xxxx == 500)
-		//{
-		//	Sync();
-		//	xxxx = 0;
-		//	const ndBodyList& bodyList = GetBodyList();
-		//	ndBodyKinematic* body = bodyList.GetFirst()->GetNext()->GetInfo();
-		//	DeleteBody(body);
-		//}
 	}
 	if (m_manager->m_synchronousPhysicsUpdate)
 	{

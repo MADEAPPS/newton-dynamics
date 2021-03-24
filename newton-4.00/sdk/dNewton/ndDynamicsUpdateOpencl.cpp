@@ -662,6 +662,7 @@ void ndDynamicsUpdateOpencl::SortIslands()
 		}
 
 		m_unConstrainedBodyCount = unConstrainedCount;
+		D_TRACKTIME();
 		dSort(&m_islands[0], m_islands.GetCount(), CompareIslands);
 	}
 }
