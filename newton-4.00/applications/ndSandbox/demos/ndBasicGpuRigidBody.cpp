@@ -18,7 +18,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
-#include "ndArchimedesBuoyancyVolume.h"
+#include "ndDemoInstanceEntity.h"
 
 //class ndZeroGravityNotify : public ndDemoEntityNotify
 //{
@@ -40,25 +40,21 @@
 //};
 
 static void AddShape(ndDemoEntityManager* const scene, const dMatrix& location,
+	ndDemoInstanceEntity* const rootEntity,
 	const ndShapeInstance& shape, dFloat32 mass, dFloat32 density)
 {
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
-
 	dMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	//dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	dVector floor(dVector::m_zero);
-	matrix.m_posit.m_y = floor.m_y + 10.0f;
-
 	ndBodyDynamic* const body = new ndBodyDynamic();
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(mesh, dGetIdentityMatrix());
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
 
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
 	body->SetMassMatrix(mass, shape);
+
+	body->SetOmega(dVector(1.0f, 2.0f, 2.0f, 0.0f));
 
 	ndBodyNotify* const notification = body->GetNotifyCallback();
 	notification->SetGravity(dVector::m_zero);
@@ -69,9 +65,6 @@ static void AddShape(ndDemoEntityManager* const scene, const dMatrix& location,
 	body->GetCollisionShape().SetMaterial(material);
 
 	world->AddBody(body);
-	scene->AddEntity(entity);
-
-	mesh->Release();
 }
 
 //static void AddSphere(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 density)
@@ -125,7 +118,27 @@ static void AddBox(ndDemoEntityManager* const scene, const dVector& origin, dFlo
 	dMatrix matrix(dPitchMatrix(10.0f*dDegreeToRad) * dRollMatrix(150.0f*dDegreeToRad));
 	matrix.m_posit = origin;
 
-	AddShape(scene, matrix, shape, 10.0f, density);
+	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+
+	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
+	scene->AddEntity(rootEntity);
+
+	dInt32 count = 30;
+	dFloat32 step = 3.0f;
+	for (dInt32 i = 0; i < count; i ++)
+	{
+		for (dInt32 j = 0; j < count; j++)
+		{
+			for (dInt32 k = 0; k < count; k++)
+			{
+				dVector posit(step * i, step * j, step * k, 0.0f);
+				matrix.m_posit = origin + posit;
+				AddShape(scene, matrix, rootEntity, shape, 10.0f, density);
+			}
+		}
+	}
+
+	geometry->Release();
 }
 
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)

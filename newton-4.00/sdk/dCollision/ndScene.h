@@ -88,7 +88,7 @@ class ndScene
 
 	void Sync();
 
-	dInt32 GetThreadCount() const;
+	const dInt32 GetThreadCount() const;
 	virtual ndWorld* GetWorld() const;
 	const ndBodyList& GetBodyList() const;
 
@@ -176,7 +176,6 @@ class ndScene
 	ndContactNotify* m_contactNotifyCallback;
 	dFloat32 m_timestep;
 	dUnsigned32 m_sleepBodies;
-	//dUnsigned32 m_sleepBodiesLane[D_MAX_THREADS_COUNT];
 	dUnsigned32 m_lru;
 	bool m_fullScan;
 
@@ -199,7 +198,7 @@ inline ndWorld* ndScene::GetWorld() const
 	return nullptr;
 }
 
-inline dInt32 ndScene::GetThreadCount() const
+inline const dInt32 ndScene::GetThreadCount() const
 {
 	const dThreadPool& pool = *this;
 	return pool.GetCount();

@@ -815,11 +815,11 @@ void ndScene::UpdateTransformNotify(dInt32 threadIndex, ndBodyKinematic* const b
 
 void ndScene::UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body)
 {
-	ndSceneBodyNode* const node = body->GetSceneBodyNode();
+	ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
 	body->UpdateCollisionMatrix();
 		
-	dAssert(!node->GetLeft());
-	dAssert(!node->GetRight());
+	dAssert(!bodyNode->GetLeft());
+	dAssert(!bodyNode->GetRight());
 	dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
 
 	if (body->GetSceneAggregate()) 
@@ -830,16 +830,19 @@ void ndScene::UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body)
 		//aggregate->m_isInEquilibrium = body1->m_equilibrium;
 	}
 
-	if (!dBoxInclusionTest(body->m_minAABB, body->m_maxAABB, node->m_minBox, node->m_maxBox)) 
+	const dInt32 test = dBoxInclusionTest(body->m_minAABB, body->m_maxAABB, bodyNode->m_minBox, bodyNode->m_maxBox);
+	if (!test) 
 	{
-		dAssert(!node->GetAsSceneAggregate());
-		node->SetAABB(body->m_minAABB, body->m_maxAABB);
+		dAssert(!bodyNode->GetAsSceneAggregate());
+
+		body->m_broaphaseEquilibrium = 0;
+		bodyNode->SetAABB(body->m_minAABB, body->m_maxAABB);
 
 		if (!m_rootNode->GetAsSceneBodyNode()) 
 		{
 			const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
 			dAssert(root == nullptr);
-			for (ndSceneNode* parent = node->m_parent; parent != root; parent = parent->m_parent) 
+			for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent) 
 			{
 				dScopeSpinLock lock(parent->m_lock);
 				if (!parent->GetAsSceneAggregate()) 
@@ -1514,9 +1517,14 @@ void ndScene::UpdateAabb()
 				if (!body->m_equilibrium)
 				{
 					m_owner->UpdateAabb(threadIndex, body);
+					if (body->m_broaphaseEquilibrium)
+					{
+						sleepBodiesLane[threadIndex] += 1;
+					}
 				}
 				else
 				{
+					dAssert(body->m_broaphaseEquilibrium);
 					sleepBodiesLane[threadIndex] += 1;
 				}
 			}
@@ -1569,7 +1577,8 @@ void ndScene::FindCollidingPairs()
 			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{
 				ndBodyKinematic* const body = bodyArray[i];
-				if (!body->m_equilibrium)
+				//if (!body->m_equilibrium)
+				if (!body->m_broaphaseEquilibrium)
 				{
 					m_owner->FindCollidinPairs(threadIndex, body, false);
 				}
@@ -1681,7 +1690,6 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 			}
 		}
 
-		//if (active ^ contact->m_active)
 		if (active ^ contact->IsActive())
 		{
 			dAssert(body0->GetInvMass() > dFloat32(0.0f));
@@ -1697,13 +1705,8 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 		contact->m_sceneLru = m_lru;
 	}
 
-	//if (!contact->m_isDead && (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active))
 	if (!contact->m_isDead && (body0->m_equilibrium & body1->m_equilibrium & !contact->IsActive()))
 	{
-		//dInt32 id0 = contact->GetBody0()->m_uniqueID;
-		//dInt32 id1 = contact->GetBody1()->m_uniqueID;
-		//dAssert(!(((id0 == 10) && (id1 == 11)) || ((id0 == 11) && (id1 == 10))));
-
 		const ndSceneBodyNode* const bodyNode0 = contact->GetBody0()->m_sceneBodyBodyNode;
 		const ndSceneBodyNode* const bodyNode1 = contact->GetBody1()->m_sceneBodyBodyNode;
 		if (!dOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox))
@@ -1711,7 +1714,6 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 			contact->m_isDead = 1;
 		}
 	}
-	//contact->m_isDead = contact->m_isDead | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
 }
 
 void ndScene::BuildContactArray()

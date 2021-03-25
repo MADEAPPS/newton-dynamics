@@ -155,12 +155,14 @@ void BuildPyramidStacks(ndDemoEntityManager* const scene, dFloat32 mass, const d
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
+	dInt32 stackHigh = 30;
 	origin1.m_z = 0.0f;
+//count = 1;
+//stackHigh = 10;
 	for (dInt32 i = 0; i < count; i++)
 	{
 		origin1.m_x += 3.0f;
-		//origin1.m_z += (i & 1) ? 4.0f : -4.0f;
-		BuildPyramid(scene, rootEntity, shape, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+		BuildPyramid(scene, rootEntity, shape, 1.0f, origin1, dVector(0.5f, 0.25f, 0.8f, 0.0f), stackHigh);
 	}
 	geometry->Release();
 }

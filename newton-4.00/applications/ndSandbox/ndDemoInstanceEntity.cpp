@@ -15,6 +15,8 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+dArray<dMatrix> ndDemoInstanceEntity::m_matrixStack;
+
 ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity, const dMatrix& uvMatrix)
 	:ndDemoMesh(name)
 	,m_offsets(nullptr)
@@ -285,14 +287,15 @@ void ndDemoInstanceEntity::Render(dFloat32 timestep, ndDemoEntityManager* const 
 	
 	// prepare the transforms buffer form all the children matrices
 	dInt32 index = 0;
-	dMatrix* const matrixStack = dAlloca(dMatrix, count);
+	//dMatrix* const matrixStack = dAlloca(dMatrix, count);
+	m_matrixStack.SetCount(count);
 	
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
 	{
-		matrixStack[index] = child->GetCurrentMatrix();
+		m_matrixStack[index] = child->GetCurrentMatrix();
 		index++;
 	}
-	m_instanceMesh->SetTransforms(count, &matrixStack[0]);
+	m_instanceMesh->SetTransforms(count, &m_matrixStack[0]);
 	
 	dMatrix nodeMatrix(m_matrix * matrix);
 	m_instanceMesh->Render(scene, nodeMatrix);

@@ -109,6 +109,7 @@ class ndBody: public dClassAlloc
 			dUnsigned32 m_transformIsDirty : 1;
 			dUnsigned32 m_bodyIsConstrained : 1;
 			dUnsigned32 m_equilibriumOverride : 1;
+			dUnsigned32 m_broaphaseEquilibrium : 1;
 			dUnsigned32 m_collideWithLinkedBodies : 1;
 		};
 	};

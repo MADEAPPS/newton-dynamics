@@ -24,7 +24,8 @@
 #include "ndBodyKinematic.h"
 #include "ndSceneNode.h"
 
-#define D_AABB_QUANTIZATION		dFloat32 (8.0f)
+//#define D_AABB_QUANTIZATION		dFloat32 (8.0f)
+#define D_AABB_QUANTIZATION		dFloat32 (4.0f)
 #define D_AABB_INV_QUANTIZATION	(dFloat32 (1.0f) / D_AABB_QUANTIZATION)
 
 dVector ndSceneNode::m_aabbQuantization(D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, dFloat32 (0.0f));
@@ -41,25 +42,6 @@ ndSceneBodyNode::ndSceneBodyNode(ndBodyKinematic* const body)
 ndSceneBodyNode::~ndSceneBodyNode()
 {
 	m_body->SetSceneBodyNode(nullptr);
-}
-
-void ndSceneNode::SetAABB(const dVector& minBox, const dVector& maxBox)
-{
-	dAssert(minBox.m_x <= maxBox.m_x);
-	dAssert(minBox.m_y <= maxBox.m_y);
-	dAssert(minBox.m_z <= maxBox.m_z);
-
-	dVector p0(minBox * m_aabbQuantization);
-	dVector p1(maxBox * m_aabbQuantization + dVector::m_one);
-
-	m_minBox = p0.Floor() * m_aabbInvQuantization;
-	m_maxBox = p1.Floor() * m_aabbInvQuantization;
-
-	dAssert(m_minBox.m_w == dFloat32(0.0f));
-	dAssert(m_maxBox.m_w == dFloat32(0.0f));
-
-	dVector size(m_maxBox - m_minBox);
-	m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
 }
 
 ndSceneTreeNode::ndSceneTreeNode(ndSceneNode* const sibling, ndSceneNode* const myNode)

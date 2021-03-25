@@ -36,10 +36,10 @@ class ndSceneNode: public dClassAlloc
 	ndSceneNode(ndSceneNode* const parent)
 		:dClassAlloc()
 		,m_minBox(dFloat32(-1.0e15f))
-		,m_maxBox(dFloat32(1.0e15f))
+		,m_maxBox(dFloat32( 1.0e15f))
 		,m_parent(parent)
-		,m_lock()
 		,m_surfaceArea(dFloat32(1.0e20f))
+		,m_lock()
 	{
 	}
 
@@ -47,13 +47,8 @@ class ndSceneNode: public dClassAlloc
 	{
 	}
 
-	void GetAABB(dVector& minBox, dVector& maxBox) const
-	{
-		minBox = m_minBox;
-		maxBox = m_maxBox;
-	}
-
-	D_COLLISION_API void SetAABB(const dVector& minBox, const dVector& maxBox);
+	void GetAABB(dVector& minBox, dVector& maxBox) const;
+	void SetAABB(const dVector& minBox, const dVector& maxBox);
 
 	virtual ndSceneNode* GetAsSceneNode() { return this; }
 	virtual ndSceneBodyNode* GetAsSceneBodyNode() { return nullptr; }
@@ -89,8 +84,8 @@ class ndSceneNode: public dClassAlloc
 	dVector m_minBox;
 	dVector m_maxBox;
 	ndSceneNode* m_parent;
-	dSpinLock m_lock;
 	dFloat32 m_surfaceArea;
+	dSpinLock m_lock;
 
 	static dVector m_aabbQuantization;
 	static dVector m_aabbInvQuantization;
@@ -137,4 +132,28 @@ class ndSceneTreeNode: public ndSceneNode
 } D_GCC_NEWTON_ALIGN_32;
 
 
+inline void ndSceneNode::GetAABB(dVector& minBox, dVector& maxBox) const
+{
+	minBox = m_minBox;
+	maxBox = m_maxBox;
+}
+
+inline void ndSceneNode::SetAABB(const dVector& minBox, const dVector& maxBox)
+{
+	dAssert(minBox.m_x <= maxBox.m_x);
+	dAssert(minBox.m_y <= maxBox.m_y);
+	dAssert(minBox.m_z <= maxBox.m_z);
+
+	const dVector p0(minBox * m_aabbQuantization);
+	const dVector p1(maxBox * m_aabbQuantization + dVector::m_one);
+
+	m_minBox = p0.Floor() * m_aabbInvQuantization;
+	m_maxBox = p1.Floor() * m_aabbInvQuantization;
+
+	dAssert(m_minBox.m_w == dFloat32(0.0f));
+	dAssert(m_maxBox.m_w == dFloat32(0.0f));
+
+	const dVector size(m_maxBox - m_minBox);
+	m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
+}
 #endif
