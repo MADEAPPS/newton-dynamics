@@ -2227,6 +2227,7 @@ void ndDynamicsUpdateSoa::CalculateForces()
 
 void ndDynamicsUpdateSoa::Update()
 {
+	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
 
 	BuildIsland();

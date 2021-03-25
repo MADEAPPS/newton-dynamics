@@ -1670,6 +1670,7 @@ void ndDynamicsUpdate::CalculateForces()
 
 void ndDynamicsUpdate::Update()
 {
+	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
 
 	BuildIsland();

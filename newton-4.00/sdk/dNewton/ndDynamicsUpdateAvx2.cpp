@@ -2265,6 +2265,7 @@ void ndDynamicsUpdateAvx2::CalculateForces()
 
 void ndDynamicsUpdateAvx2::Update()
 {
+	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
 
 	BuildIsland();

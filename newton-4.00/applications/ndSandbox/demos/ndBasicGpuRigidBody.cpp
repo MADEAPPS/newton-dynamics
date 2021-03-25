@@ -54,7 +54,8 @@ static void AddShape(ndDemoEntityManager* const scene, const dMatrix& location,
 	body->SetCollisionShape(shape);
 	body->SetMassMatrix(mass, shape);
 
-	body->SetOmega(dVector(1.0f, 2.0f, 2.0f, 0.0f));
+	const dVector omega(dGaussianRandom(2.0f), dGaussianRandom(4.0f), dGaussianRandom(3.0f), 0.0f);
+	body->SetOmega(omega);
 
 	ndBodyNotify* const notification = body->GetNotifyCallback();
 	notification->SetGravity(dVector::m_zero);
@@ -124,14 +125,15 @@ static void AddBox(ndDemoEntityManager* const scene, const dVector& origin, dFlo
 	scene->AddEntity(rootEntity);
 
 	dInt32 count = 30;
-	dFloat32 step = 3.0f;
+	dFloat32 step = 4.0f;
+count = 25;
 	for (dInt32 i = 0; i < count; i ++)
 	{
 		for (dInt32 j = 0; j < count; j++)
 		{
 			for (dInt32 k = 0; k < count; k++)
 			{
-				dVector posit(step * i, step * j, step * k, 0.0f);
+				dVector posit(step * (i - count/2), step * (j - count / 2), step * (k - count / 2), 0.0f);
 				matrix.m_posit = origin + posit;
 				AddShape(scene, matrix, rootEntity, shape, 10.0f, density);
 			}
@@ -149,6 +151,6 @@ void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
 	AddBox(scene, dVector(0.0f, 0.0f, -3.0f, 1.0f), 0.6f);
 
 	dQuaternion rot;
-	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-160.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

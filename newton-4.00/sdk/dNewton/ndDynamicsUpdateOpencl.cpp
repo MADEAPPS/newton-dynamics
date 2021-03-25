@@ -319,6 +319,7 @@ const char* ndDynamicsUpdateOpencl::GetStringId() const
 
 void ndDynamicsUpdateOpencl::Update()
 {
+	D_TRACKTIME();
 	if (m_opencl)
 	{
 		//ndDynamicsUpdate::Update();
