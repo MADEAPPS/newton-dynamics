@@ -70,7 +70,7 @@ class ndContactCallback: public ndContactNotify
 	virtual void OnBodyAdded(ndBodyKinematic* const body) const;
 	virtual void OnBodyRemoved(ndBodyKinematic* const body) const;
 	virtual ndMaterial GetMaterial(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const;
-	virtual bool OnAaabbOverlap(const ndContact* const contactJoint, dFloat32 timestep);
+	virtual bool OnAabbOverlap(const ndContact* const contactJoint, dFloat32 timestep);
 	virtual void OnContactCallback(dInt32 threadIndex, const ndContact* const contactJoint, dFloat32 timestep);
 
 	void PlaySoundTest(const ndContact* const contactJoint);

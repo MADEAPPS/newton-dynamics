@@ -560,6 +560,7 @@ void ndDemoEntityManager::ApplyMenuOptions()
 	}
 
 	m_world->SelectSolver(m_solverMode);
+	m_solverMode = m_world->GetSelectedSolver();
 }
 
 void ndDemoEntityManager::ShowMainMenuBar()

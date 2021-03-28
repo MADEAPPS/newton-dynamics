@@ -45,7 +45,7 @@ ndMaterial ndContactCallback::GetMaterial(const ndContact* const contactJoint, c
 	return node ? node->GetInfo() : ndMaterial();
 }
 
-bool ndContactCallback::OnAaabbOverlap(const ndContact* const contactJoint, dFloat32 timestep)
+bool ndContactCallback::OnAabbOverlap(const ndContact* const contactJoint, dFloat32 timestep)
 {
 	const ndBodyKinematic* const body0 = contactJoint->GetBody0();
 	const ndBodyKinematic* const body1 = contactJoint->GetBody1();

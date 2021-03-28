@@ -918,7 +918,7 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 	}
 
 	dAssert(m_contactNotifyCallback);
-	bool processContacts = m_contactNotifyCallback->OnAaabbOverlap(contact, m_timestep);
+	bool processContacts = m_contactNotifyCallback->OnAabbOverlap(contact, m_timestep);
 	if (processContacts)
 	{
 		dAssert(!body0->GetAsBodyTriggerVolume());

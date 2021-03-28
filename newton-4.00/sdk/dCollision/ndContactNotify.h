@@ -83,7 +83,7 @@ class ndContactNotify: public dClassAlloc
 		return ndMaterial();
 	}
 
-	virtual bool OnAaabbOverlap(const ndContact* const contactJoint, dFloat32 timestep)
+	virtual bool OnAabbOverlap(const ndContact* const contactJoint, dFloat32 timestep)
 	{
 		return true;
 	}
