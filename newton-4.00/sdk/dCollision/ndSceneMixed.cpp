@@ -369,6 +369,5 @@ void ndSceneMixed::DebugScene(ndSceneTreeNotiFy* const notify)
 		{
 			notify->OnDebugNode(node->GetInfo()->GetRight());
 		}
-
 	}
 }

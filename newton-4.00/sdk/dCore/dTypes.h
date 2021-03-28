@@ -551,7 +551,7 @@ D_CORE_API dFloat64 dRoundToFloat(dFloat64 val);
 	{
 		public: 
 		dAtomic<T>()
-			: std::atomic<T>(T(0))
+			:std::atomic<T>(T(0))
 		{
 		}
 

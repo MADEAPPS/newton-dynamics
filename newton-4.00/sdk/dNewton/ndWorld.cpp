@@ -193,23 +193,23 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 		switch (solverMode)
 		{
 			case ndSimdSoaSolver:
-				m_solverMode = (ndSolverModes)solverMode;
+				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateSoa(this);
 				break;
 
 			case ndSimdAvx2Solver:
-				m_solverMode = (ndSolverModes)solverMode;
+				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateAvx2(this);
 				break;
 
 			case ndOpenclSolver:
-				m_solverMode = (ndSolverModes)solverMode;
+				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateOpencl(this);
 				break;
 
 			case ndStandardSolver:
 			default:
-				m_solverMode = (ndSolverModes)solverMode;
+				m_solverMode = ndStandardSolver;
 				m_solver = new ndDynamicsUpdate(this);
 				break;
 		}
