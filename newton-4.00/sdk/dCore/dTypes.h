@@ -559,6 +559,16 @@ D_CORE_API dFloat64 dRoundToFloat(dFloat64 val);
 			:std::atomic<T>(val)
 		{
 		}
+
+		dAtomic<T>(const dAtomic<T>& copy)
+			:std::atomic<T>(copy)
+		{
+		}
+
+		T operator=(T value)
+		{
+			return std::atomic<T>::operator=(value);
+		}
 	};
 #endif
 
@@ -576,10 +586,14 @@ class dSpinLock
 	void Lock()
 	{
 		#ifndef D_USE_THREAD_EMULATION	
-		while (m_lock.exchange(1)) 
+		//while (m_lock.exchange(1)) 
+		dUnsigned32 test = 0;
+		while (!m_lock.compare_exchange_weak(test, 1))
 		{
+			test = 0;
 			std::this_thread::yield();
 		}
+
 		#endif
 	}
 
