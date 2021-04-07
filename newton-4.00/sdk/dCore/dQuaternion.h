@@ -68,7 +68,7 @@ D_INLINE dQuaternion::dQuaternion(const dQuaternion& quat)
 D_INLINE dQuaternion::dQuaternion(dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3)
 	:dVector(q0, q1, q2, q3)
 {
-//	dAssert (dAbs (DotProduct (*this) -dFloat32 (1.0f)) < dFloat32(1.0e-4f));
+	*this = Normalize();
 }
 
 D_INLINE dQuaternion dQuaternion::Inverse () const 
