@@ -586,14 +586,17 @@ class dSpinLock
 	void Lock()
 	{
 		#ifndef D_USE_THREAD_EMULATION	
-		//while (m_lock.exchange(1)) 
-		dUnsigned32 test = 0;
-		while (!m_lock.compare_exchange_weak(test, 1))
-		{
-			test = 0;
-			std::this_thread::yield();
-		}
 
+		//while (m_lock.exchange(1)) 
+		//{
+		//	std::this_thread::yield();
+		//}
+
+		dInt32 exp = 1;
+		for (dUnsigned32 test = 0; !m_lock.compare_exchange_weak(test, 1); test = 0)
+		{
+			Delay(exp);
+		}
 		#endif
 	}
 
@@ -606,6 +609,8 @@ class dSpinLock
 
 	#ifndef D_USE_THREAD_EMULATION	
 	private:
+	D_CORE_API void Delay(dInt32& exp);
+
 	dAtomic<dUnsigned32> m_lock;
 	#endif
 };

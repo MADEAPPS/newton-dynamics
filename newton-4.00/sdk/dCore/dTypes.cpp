@@ -458,3 +458,17 @@ dInt32 dVertexListToIndexList(dFloat64* const vertList, dInt32 strideInBytes, dI
 	return count;
 }
 
+
+void dSpinLock::Delay(dInt32& exp)
+{
+	// adding exponential pause delay
+	for (dInt32 i = 0; i < exp; i++)
+	{
+		for (volatile dInt32 j = 0; j < 4; j++)
+		{
+			_mm_pause();
+		}
+	}
+	exp = dMin(exp * 2, 64);
+}
+
