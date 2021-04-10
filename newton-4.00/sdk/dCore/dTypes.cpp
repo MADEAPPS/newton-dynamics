@@ -67,6 +67,9 @@ dFloatExceptions::dFloatExceptions(dUnsigned32 mask)
 	#endif
 #elif (defined (_WIN_64_VER) || defined (_WIN_32_VER))
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+	dInt32 crs = _mm_getcsr();
+	dInt32 sseDenormalMask = _MM_FLUSH_ZERO_MASK | _MM_MASK_DENORM;
+	_mm_setcsr(crs | sseDenormalMask);
 #elif defined (_ARM_VER)
 	//_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 	#pragma message ("warning!!! do not forget to set flush to zero for arm cpus")
@@ -461,14 +464,19 @@ dInt32 dVertexListToIndexList(dFloat64* const vertList, dInt32 strideInBytes, dI
 
 void dSpinLock::Delay(dInt32& exp)
 {
+	#if defined (_WIN_32_VER) || defined (_WIN_64_VER)
 	// adding exponential pause delay
 	for (dInt32 i = 0; i < exp; i++)
 	{
-		for (volatile dInt32 j = 0; j < 4; j++)
-		{
-			_mm_pause();
-		}
+		_mm_pause();
+		_mm_pause();
+		_mm_pause();
+		_mm_pause();
 	}
 	exp = dMin(exp * 2, 64);
+	#else
+	// use standard thread yield on non x86 platforms 
+	std::this_thread::yield();
+	#endif
 }
 
