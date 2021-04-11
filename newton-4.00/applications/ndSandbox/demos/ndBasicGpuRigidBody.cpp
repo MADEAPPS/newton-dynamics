@@ -127,6 +127,7 @@ static void AddBox(ndDemoEntityManager* const scene, const dVector& origin, dFlo
 	dInt32 count = 30;
 	dFloat32 step = 4.0f;
 count = 25;
+
 	for (dInt32 i = 0; i < count; i ++)
 	{
 		for (dInt32 j = 0; j < count; j++)
@@ -134,8 +135,10 @@ count = 25;
 			for (dInt32 k = 0; k < count; k++)
 			{
 				dVector posit(step * (i - count/2), step * (j - count / 2), step * (k - count / 2), 0.0f);
-				matrix.m_posit = origin + posit;
-				AddShape(scene, matrix, rootEntity, shape, 10.0f, density);
+				dQuaternion rotation(dGaussianRandom(1.0f), dGaussianRandom(1.0f), dGaussianRandom(1.0f), dGaussianRandom(1.0f) + 0.1f);
+				//matrix.m_posit = origin + posit;
+				dMatrix location(rotation, origin + posit);
+				AddShape(scene, location, rootEntity, shape, 10.0f, density);
 			}
 		}
 	}

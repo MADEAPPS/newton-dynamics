@@ -841,7 +841,6 @@ bool ndWorld::SkeletonJointTest(ndJointBilateralConstraint* const constraint) co
 void ndWorld::UpdateSkeletons()
 {
 	D_TRACKTIME();
-
 	if (m_skeletonList.m_skelListIsDirty)
 	{
 		m_skeletonList.m_skelListIsDirty = false;

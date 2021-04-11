@@ -29,9 +29,9 @@
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0		// setting basic rigidbody
-#define DEFAULT_SCENE	1		// setting gpu basic rigidbody
+//#define DEFAULT_SCENE	1		// setting gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// setting friction ramp
-//#define DEFAULT_SCENE	3		// setting basic Stacks
+#define DEFAULT_SCENE	3		// setting basic Stacks
 //#define DEFAULT_SCENE	4		// setting basic Trigger
 //#define DEFAULT_SCENE	5		// setting basic player
 //#define DEFAULT_SCENE	6		// setting particle fluid
@@ -246,7 +246,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_autoSleepMode = false;
-	m_solverMode = ndWorld::ndOpenclSolver;
+	//m_solverMode = ndWorld::ndOpenclSolver;
 	m_solverMode = ndWorld::ndStandardSolver;
 	//m_sceneType = 1;
 	//m_solverPasses = 4;

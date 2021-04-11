@@ -1677,7 +1677,6 @@ void ndDynamicsUpdate::Update()
 	if (m_islands.GetCount())
 	{
 		IntegrateUnconstrainedBodies();
-
 		InitWeights();
 		InitBodyArray();
 		InitJacobianMatrix();

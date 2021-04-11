@@ -160,7 +160,7 @@ void BuildPyramidStacks(ndDemoEntityManager* const scene, dFloat32 mass, const d
 	dInt32 stackHigh = 30;
 	origin1.m_z = 0.0f;
 count = 1;
-stackHigh = 1;
+stackHigh = 30;
 
 	for (dInt32 i = 0; i < count; i++)
 	{
