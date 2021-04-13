@@ -143,8 +143,8 @@ class ndScene
 	protected:
 	D_COLLISION_API ndScene();
 	
-	D_COLLISION_API void BuildBodyArray();
 	D_COLLISION_API void UpdateAabb();
+	D_COLLISION_API void BuildBodyArray();
 	D_COLLISION_API void UpdateTransform();
 	D_COLLISION_API void CalculateContacts();
 	D_COLLISION_API void DeleteDeadContact();

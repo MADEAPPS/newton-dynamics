@@ -1468,7 +1468,7 @@ void ndScene::BuildBodyArray()
 	dAtomic<dUnsigned32> activeBodyCount(0);
 	m_activeBodyArray.SetCount(m_bodyList.GetCount());
 	SubmitJobs<ndBuildBodyArray>(&activeBodyCount);
-	m_activeBodyArray.SetCount(activeBodyCount.load());
+	m_activeBodyArray.SetCount(activeBodyCount);
 }
 
 void ndScene::CalculateContacts()
