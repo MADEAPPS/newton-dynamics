@@ -239,7 +239,8 @@ ndDemoMeshInterface* ndDemoSkinMesh::Clone(ndDemoEntity* const owner)
 	return (ndDemoSkinMesh*)new ndDemoSkinMesh(*this, owner);
 }
 
-void ndDemoSkinMesh::OptimizeForRender(const ndDemoSubMesh& segment, const dVector* const pointWeights, const dWeightBoneIndex* const pointSkinBone) const
+//void ndDemoSkinMesh::OptimizeForRender(const ndDemoSubMesh& segment, const dVector* const pointWeights, const dWeightBoneIndex* const pointSkinBone) const
+void ndDemoSkinMesh::OptimizeForRender(const ndDemoSubMesh&, const dVector* const, const dWeightBoneIndex* const) const
 {
 	dAssert(0);
 /*
@@ -349,7 +350,8 @@ dGeometryNodeSkinClusterInfo* ndDemoSkinMesh::FindSkinModifier(dScene* const sce
 }
 */
 
-void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+//void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+void ndDemoSkinMesh::Render(ndDemoEntityManager* const, const dMatrix&)
 {
 	dAssert(0);
 	//dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);

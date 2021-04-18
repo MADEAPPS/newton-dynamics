@@ -17,7 +17,7 @@
 
 dArray<dMatrix> ndDemoInstanceEntity::m_matrixStack;
 
-ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity, const dMatrix& uvMatrix)
+ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const, const char* const, dFloat32 opacity, const dMatrix& uvMatrix)
 	:ndDemoMesh(name)
 	,m_offsets(nullptr)
 	,m_instanceCount(0)
@@ -275,7 +275,7 @@ ndDemoInstanceEntity::~ndDemoInstanceEntity(void)
 	m_instanceMesh->Release();
 }
 
-void ndDemoInstanceEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
+void ndDemoInstanceEntity::Render(dFloat32, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
 	D_TRACKTIME();
 	//count active instances 

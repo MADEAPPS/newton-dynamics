@@ -46,7 +46,7 @@ ndBody::ndBody()
 	m_uniqueIdCount++;
 }
 
-ndBody::ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
+ndBody::ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>&)
 	:m_matrix(dGetIdentityMatrix())
 	,m_veloc(dVector::m_zero)
 	,m_omega(dVector::m_zero)
@@ -157,7 +157,7 @@ nd::TiXmlElement* ndBody::CreateRootElement(nd::TiXmlElement* const rootNode, co
 	return paramNode;
 }
 
-void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>&) const
 {
 	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBody", nodeid);
 	xmlSaveParam(paramNode, "matrix", m_matrix);

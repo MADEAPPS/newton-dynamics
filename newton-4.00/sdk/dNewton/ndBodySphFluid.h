@@ -161,7 +161,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	dIsoSurface m_isoSurcase;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-inline dFloat32 ndBodySphFluid::RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const
+inline dFloat32 ndBodySphFluid::RayCast(ndRayCastNotify&, const dFastRayTest&, const dFloat32) const
 {
 	return dFloat32(1.2f);
 }

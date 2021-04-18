@@ -107,7 +107,8 @@ void ndBasicPlayerCapsule::ApplyInputs(dFloat32 timestep)
 	SetHeadingAngle(m_playerInput.m_heading);
 }
 
-dFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const
+//dFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const
+dFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const dVector&, const dVector& normal, dInt32, const ndBodyKinematic* const) const
 {
 	//return dFloat32(2.0f);
 	if (dAbs(normal.m_y) < 0.8f)
@@ -164,7 +165,8 @@ void ndBasicPlayerCapsule::SetCamera()
 	}
 }
 
-void ndBasicPlayerCapsule::UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, dFloat32 timestep)
+//void ndBasicPlayerCapsule::UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, dFloat32 timestep)
+void ndBasicPlayerCapsule::UpdateCameraCallback(ndDemoEntityManager* const, void* const context, dFloat32)
 {
 	ndBasicPlayerCapsule* const me = (ndBasicPlayerCapsule*)context;
 	me->SetCamera();

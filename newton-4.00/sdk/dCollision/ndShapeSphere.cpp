@@ -192,17 +192,17 @@ void ndShapeSphere::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) co
 	p1 = (matrix[3] + size) & dVector::m_triplexMask;
 }
 
-dVector ndShapeSphere::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const
+dVector ndShapeSphere::SupportVertexSpecialProjectPoint(const dVector&, const dVector& dir) const
 {
 	return dir.Scale(m_radius - D_PENETRATION_TOL);
 }
 
-dVector ndShapeSphere::SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const
+dVector ndShapeSphere::SupportVertexSpecial(const dVector&, dFloat32, dInt32* const) const
 {
 	return dVector::m_zero;
 }
 
-dVector ndShapeSphere::SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
+dVector ndShapeSphere::SupportVertex(const dVector& dir, dInt32* const) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
@@ -218,7 +218,7 @@ dInt32 ndShapeSphere::CalculatePlaneIntersection(const dVector& normal, const dV
 	return 1;
 }
 
-dFloat32 ndShapeSphere::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeSphere::RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const, ndContactPoint& contactOut) const
 {
 	dFloat32 t = dRayCastSphere(localP0, localP1, dVector::m_zero, m_radius);
 	if (t < maxT) 
@@ -272,7 +272,7 @@ void ndShapeSphere::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debu
 	}
 }
 
-D_COLLISION_API void ndShapeSphere::Save( nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid ) const
+D_COLLISION_API void ndShapeSphere::Save( nd::TiXmlElement* const xmlNode, const char* const, dInt32 nodeid ) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeSphere");
 	xmlNode->LinkEndChild(paramNode);

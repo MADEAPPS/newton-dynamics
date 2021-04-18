@@ -54,7 +54,8 @@ static void AddShape(ndDemoEntityManager* const scene,
 }
 */
 
-static void AddSomeObstacles(ndDemoEntityManager* const scene, const dVector& origin)
+//static void AddSomeObstacles(ndDemoEntityManager* const scene, const dVector& origin)
+static void AddSomeObstacles(ndDemoEntityManager* const, const dVector&)
 {
 /*
 	dFloat32 diameter = 1.0f;
@@ -137,7 +138,7 @@ class ndTireNotifyNotify : public ndDemoEntityNotify
 	{
 	}
 
-	void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
+	void OnTranform(dInt32, const dMatrix& matrix)
 	{
 		dMatrix parentMatrix(m_chassis->GetMatrix());
 		dMatrix localMatrix(matrix * parentMatrix.Inverse());
@@ -268,7 +269,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		return body;
 	}
 
-	void CalculateTireDimensions(const char* const tireName, dFloat32& width, dFloat32& radius, ndWorld* const world, ndDemoEntity* const vehEntity)
+	void CalculateTireDimensions(const char* const tireName, dFloat32& width, dFloat32& radius, ndDemoEntity* const vehEntity)
 	{
 		// find the the tire visual mesh 
 		ndDemoEntity* const tirePart = vehEntity->Find(tireName);
@@ -300,7 +301,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		dFloat32 radius;
 		ndWorld* const world = scene->GetWorld();
 		ndDemoEntity* const chassisEntity = (ndDemoEntity*)chassis->GetNotifyCallback()->GetUserData();
-		CalculateTireDimensions(tireName, width, radius, world, chassisEntity);
+		CalculateTireDimensions(tireName, width, radius, chassisEntity);
 
 		dFloat32 mass(20.0f);
 		ndShapeInstance tireCollision(CreateTireShape(radius, width));
@@ -352,7 +353,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndMultiBodyVehicle::Update(world, timestep);
 	}
 
-	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const tire, const ndContactMaterial& contactPoint) const
+	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const
 	{
 		return dFloat32(2.0f);
 	}
@@ -363,7 +364,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		me->SetCamera(manager, timestep);
 	}
 
-	void SetCamera(ndDemoEntityManager* const manager, dFloat32 timestep)
+	void SetCamera(ndDemoEntityManager* const manager, dFloat32)
 	{
 		ndDemoCamera* const camera = manager->GetCamera();
 		ndDemoEntity* const chassisEntity = (ndDemoEntity*)m_chassis->GetNotifyCallback()->GetUserData();

@@ -36,7 +36,7 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 	D_COLLISION_API ndBodyPlayerCapsule(const dMatrix& localAxis, dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight);
 	D_COLLISION_API virtual ~ndBodyPlayerCapsule();
 
-	ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule();
+	ndBodyPlayerCapsule* GetAsBodyPlayerCapsule();
 
 	dFloat32 GetForwardSpeed() const;
 	void SetForwardSpeed(dFloat32 speed);
@@ -98,16 +98,16 @@ inline ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule()
 	return this; 
 }
 
-inline void ndBodyPlayerCapsule::SetCollisionShape(const ndShapeInstance& shapeInstance)
+inline void ndBodyPlayerCapsule::SetCollisionShape(const ndShapeInstance&)
 {
 	// ignore the changing collision shape;
 }
 
-inline void ndBodyPlayerCapsule::ApplyInputs(dFloat32 timestep)
+inline void ndBodyPlayerCapsule::ApplyInputs(dFloat32)
 {
 }
 
-inline dFloat32 ndBodyPlayerCapsule::ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const
+inline dFloat32 ndBodyPlayerCapsule::ContactFrictionCallback(const dVector&, const dVector&, dInt32, const ndBodyKinematic* const) const
 {
 	return dFloat32 (2.0f);
 }
@@ -147,7 +147,7 @@ inline void ndBodyPlayerCapsule::SetHeadingAngle(dFloat32 angle)
 	m_headingAngle = headingAngle;
 }
 
-inline void ndBodyPlayerCapsule::IntegrateVelocity(dFloat32 timestep)
+inline void ndBodyPlayerCapsule::IntegrateVelocity(dFloat32)
 {
 	m_residualVeloc = m_veloc;
 	m_residualOmega = m_omega;

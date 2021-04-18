@@ -31,7 +31,7 @@ ndBodyNotify::ndBodyNotify(const nd::TiXmlNode* const rootNode)
 	m_defualtGravity = xmlGetVector3(rootNode, "gravity");
 }
 
-void ndBodyNotify::OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
+void ndBodyNotify::OnApplyExternalForce(dInt32, dFloat32)
 {
 	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
 	dAssert(body);
@@ -47,7 +47,7 @@ void ndBodyNotify::OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
 	}
 }
 
-void ndBodyNotify::Save(nd::TiXmlElement* const rootNode, const char* const assetPath) const
+void ndBodyNotify::Save(nd::TiXmlElement* const rootNode, const char* const) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndBodyNotify");
 	rootNode->LinkEndChild(paramNode);

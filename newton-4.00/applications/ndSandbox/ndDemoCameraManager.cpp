@@ -36,7 +36,7 @@ class ndDemoCameraPickBodyJoint: public ndJointKinematicController
 	ndDemoCameraManager* m_manager;
 };
 
-ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const scene)
+ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const)
 	:dClassAlloc()
 	,m_pickedBodyTargetPosition(dVector::m_wOne)
 	,m_pickedBodyLocalAtachmentPoint(dVector::m_wOne)
@@ -229,7 +229,7 @@ void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene,
 	m_camera->InterpolateMatrix (*scene, param);
 }
 
-void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool mousePickState, const dVector& p0, const dVector& p1, dFloat32 timestep) 
+void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool mousePickState, const dVector& p0, const dVector& p1, dFloat32) 
 {
 	// handle pick body from the screen
 	if (!m_targetPicked) 
@@ -247,7 +247,7 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 				notiFy->OnObjectPick();
 
 				m_targetPicked = body;
-				dMatrix matrix (m_targetPicked->GetMatrix());
+				//dMatrix matrix (m_targetPicked->GetMatrix());
 				
 				m_pickedBodyParam = param;
 				if(m_pickJoint) 

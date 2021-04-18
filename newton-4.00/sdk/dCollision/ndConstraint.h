@@ -113,7 +113,7 @@ class ndForceImpactPair
 	{
 		m_force = dFloat32(dFloat32(0.0f));
 		m_impact = dFloat32(dFloat32(0.0f));
-		for (dInt32 i = 0; i < sizeof(m_initialGuess) / sizeof(m_initialGuess[0]); i++) 
+		for (dInt32 i = 0; i < dInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); i++)
 		{
 			m_initialGuess[i] = dFloat32(dFloat32(0.0f));
 		}
@@ -121,7 +121,7 @@ class ndForceImpactPair
 
 	void Push(dFloat32 val)
 	{
-		for (dInt32 i = 1; i < sizeof(m_initialGuess) / sizeof(m_initialGuess[0]); i++) 
+		for (dInt32 i = 1; i < dInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); i++)
 		{
 			m_initialGuess[i - 1] = m_initialGuess[i];
 		}
@@ -132,7 +132,7 @@ class ndForceImpactPair
 	{
 		dFloat32 value = dFloat32(dFloat32(0.0f));
 		dFloat32 smallest = dFloat32(1.0e15f);
-		for (dInt32 i = 0; i < sizeof(m_initialGuess) / sizeof(m_initialGuess[0]); i++)
+		for (dInt32 i = 0; i < dInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); i++)
 		{
 			dFloat32 mag = dAbs(m_initialGuess[i]);
 			if (mag < smallest) 
@@ -239,7 +239,7 @@ class ndConstraint
 	void SetActive(bool state) { m_active = state;}
 	virtual bool IsBilateral() const { return false; }
 
-	virtual const dUnsigned32 GetRowsCount() const = 0;
+	virtual dUnsigned32 GetRowsCount() const = 0;
 	virtual ndBodyKinematic* GetBody0() const { return nullptr; }
 	virtual ndBodyKinematic* GetBody1() const { return nullptr; }
 	virtual void JacobianDerivative(ndConstraintDescritor& desc) = 0;
@@ -247,7 +247,7 @@ class ndConstraint
 	
 	void InitPointParam(dgPointParam& param, dFloat32 stiffness, const dVector& p0Global, const dVector& p1Global) const;
 
-	virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const {}
+	virtual void DebugJoint(ndConstraintDebugCallback&) const {}
 
 	dFloat32 m_preconditioner0;
 	dFloat32 m_preconditioner1;

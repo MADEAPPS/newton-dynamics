@@ -99,7 +99,7 @@ dThreadPool::~dThreadPool()
 	SetCount(0);
 }
 
-const dInt32 dThreadPool::GetCount() const
+dInt32 dThreadPool::GetCount() const
 {
 	return m_count + 1;
 }

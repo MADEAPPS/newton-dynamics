@@ -57,7 +57,7 @@ inline ndModel::~ndModel()
 	dAssert(!m_node);
 }
 
-inline void ndModel::Debug(ndConstraintDebugCallback& context) const
+inline void ndModel::Debug(ndConstraintDebugCallback&) const
 {
 }
 

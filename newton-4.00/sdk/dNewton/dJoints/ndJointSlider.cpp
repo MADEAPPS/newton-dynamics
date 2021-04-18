@@ -79,7 +79,7 @@ void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dM
 		}
 		else if (x > m_maxLimit)
 		{
-			dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_maxLimit));
+			//dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_maxLimit));
 			AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1.m_front);
 			SetHighFriction(desc, m_friction);
 		}

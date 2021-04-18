@@ -94,7 +94,7 @@ const char* Error::s_message = "";
 
 template <typename T> struct OptionalError
 {
-	OptionalError(Error error)
+	OptionalError(Error)
 		: is_error(true)
 	{
 	}
@@ -189,7 +189,14 @@ static Matrix operator*(const Matrix& lhs, const Matrix& rhs)
 
 static Matrix makeIdentity()
 {
-	return {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+	// return {{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}};
+	Matrix matrix;
+	memset(&matrix.m[0], 0, sizeof(matrix));
+	for (int i = 0; i < 4; i++)
+	{
+		matrix.f[i][i] = 1.0;
+	}
+	return matrix;
 }
 
 
@@ -269,11 +276,10 @@ i64 secondsToFbxTime(double value)
 }
 
 
-static Vec3 operator*(const Vec3& v, float f)
-{
-	return {v.x * f, v.y * f, v.z * f};
-}
-
+//static Vec3 operator*(const Vec3& v, float f)
+//{
+//	return {v.x * f, v.y * f, v.z * f};
+//}
 
 static Vec3 operator+(const Vec3& a, const Vec3& b)
 {
@@ -509,10 +515,10 @@ static Vec3 resolveVec3Property(const Object& object, const char* name, const Ve
 
 
 Object::Object(const Scene& _scene, const IElement& _element)
-	: scene(_scene)
-	, element(_element)
-	, is_node(false)
-	, node_attribute(nullptr)
+	:element(_element)
+	,node_attribute(nullptr) 
+	,is_node(false)
+	,scene(_scene)
 {
 	auto& e = (Element&)_element;
 	if (e.first_property && e.first_property->next)
@@ -994,35 +1000,35 @@ static OptionalError<Element*> tokenize(const u8* data, size_t size, u32& versio
 }
 
 
-static void parseTemplates(const Element& root)
-{
-	const Element* defs = findChild(root, "Definitions");
-	if (!defs) return;
-
-	std::unordered_map<std::string, Element*> templates;
-	Element* def = defs->child;
-	while (def)
-	{
-		if (def->id == "ObjectType")
-		{
-			Element* subdef = def->child;
-			while (subdef)
-			{
-				if (subdef->id == "PropertyTemplate")
-				{
-					DataView prop1 = def->first_property->value;
-					DataView prop2 = subdef->first_property->value;
-					std::string key((const char*)prop1.begin, prop1.end - prop1.begin);
-					key += std::string((const char*)prop1.begin, prop1.end - prop1.begin);
-					templates[key] = subdef;
-				}
-				subdef = subdef->sibling;
-			}
-		}
-		def = def->sibling;
-	}
-	// TODO
-}
+//static void parseTemplates(const Element& root)
+//{
+//	const Element* defs = findChild(root, "Definitions");
+//	if (!defs) return;
+//
+//	std::unordered_map<std::string, Element*> templates;
+//	Element* def = defs->child;
+//	while (def)
+//	{
+//		if (def->id == "ObjectType")
+//		{
+//			Element* subdef = def->child;
+//			while (subdef)
+//			{
+//				if (subdef->id == "PropertyTemplate")
+//				{
+//					DataView prop1 = def->first_property->value;
+//					//DataView prop2 = subdef->first_property->value;
+//					std::string key((const char*)prop1.begin, prop1.end - prop1.begin);
+//					key += std::string((const char*)prop1.begin, prop1.end - prop1.begin);
+//					templates[key] = subdef;
+//				}
+//				subdef = subdef->sibling;
+//			}
+//		}
+//		def = def->sibling;
+//	}
+//	// TODO
+//}
 
 
 struct Scene;
@@ -1450,7 +1456,7 @@ struct BlendShapeChannelImpl : BlendShapeChannel
 			if (!parseBinaryArray(*full_weights_el->first_property, &fullWeights)) return false;
 		}
 
-		for (int i = 0; i < shapes.size(); i++)
+		for (int i = 0; i < int (shapes.size()); i++)
 		{
 			auto shape = (ShapeImpl*)shapes[i];
 			if (!shape->postprocess(geom, allocator)) return false;
@@ -1600,7 +1606,7 @@ struct Scene : IScene
 	const AnimationStack* getAnimationStack(int index) const override
 	{
 		assert(index >= 0);
-		assert(index < m_animation_stacks.size());
+		assert(index < int (m_animation_stacks.size()));
 		return m_animation_stacks[index];
 	}
 
@@ -1608,7 +1614,7 @@ struct Scene : IScene
 	const Mesh* getMesh(int index) const override
 	{
 		assert(index >= 0);
-		assert(index < m_meshes.size());
+		assert(index < int (m_meshes.size()));
 		return m_meshes[index];
 	}
 
@@ -1774,7 +1780,7 @@ struct AnimationLayerImpl : AnimationLayer
 
 	const AnimationCurveNode* getCurveNode(int index) const override
 	{
-		if (index >= curve_nodes.size() || index < 0) return nullptr;
+		if (index >= int (curve_nodes.size()) || index < 0) return nullptr;
 		return curve_nodes[index];
 	}
 
@@ -1792,7 +1798,7 @@ struct AnimationLayerImpl : AnimationLayer
 	std::vector<AnimationCurveNodeImpl*> curve_nodes;
 };
 
-void parseVideo(Scene& scene, const Element& element, Allocator& allocator)
+void parseVideo(Scene& scene, const Element& element, Allocator&)
 {
 	if (!element.first_property) return;
 	if (!element.first_property->next) return;
@@ -2475,7 +2481,7 @@ static void triangulate(
 	};
 
 	int in_polygon_idx = 0;
-	for (int i = 0; i < old_indices.size(); ++i)
+	for (int i = 0; i < int (old_indices.size()); ++i)
 	{
 		int idx = getIdx(i);
 		if (in_polygon_idx <= 2) //-V1051
@@ -3194,6 +3200,7 @@ static bool parseObjects(const Element& root, Scene* scene, u64 flags, Allocator
 					node->bone_link_property = con.property;
 				}
 				break;
+			default:;
 		}
 
 		switch (parent->getType())
@@ -3211,7 +3218,11 @@ static bool parseObjects(const Element& root, Scene* scene, u64 flags, Allocator
 						}
 						mesh->geometry = (Geometry*)child;
 						break;
-					case Object::Type::MATERIAL: mesh->materials.push_back((Material*)child); break;
+					case Object::Type::MATERIAL: 
+						mesh->materials.push_back((Material*)child); 
+						break;
+
+					default:;
 				}
 				break;
 			}
@@ -3345,6 +3356,7 @@ static bool parseObjects(const Element& root, Scene* scene, u64 flags, Allocator
 				}
 				break;
 			}
+			default:;
 		}
 	}
 
@@ -3353,7 +3365,8 @@ static bool parseObjects(const Element& root, Scene* scene, u64 flags, Allocator
 		{
 			Object* obj = iter.second.object;
 			if (!obj) continue;
-			switch (obj->getType()) {
+			switch (obj->getType()) 
+			{
 				case Object::Type::CLUSTER:
 					if (!((ClusterImpl*)iter.second.object)->postprocess(scene->m_allocator)) {
 						Error::s_message = "Failed to postprocess cluster";
@@ -3372,6 +3385,7 @@ static bool parseObjects(const Element& root, Scene* scene, u64 flags, Allocator
 						return false;
 					}
 					break;
+				default:;
 			}
 		}
 	}

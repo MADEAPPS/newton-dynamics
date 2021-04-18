@@ -829,7 +829,7 @@ void ndDemoEntityManager::MouseButtonCallback(GLFWwindow*, dInt32 button, dInt32
 	}
 }
 
-void ndDemoEntityManager::MouseScrollCallback(GLFWwindow* const window, double x, double y)
+void ndDemoEntityManager::MouseScrollCallback(GLFWwindow* const, double, double y)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	io.MouseWheel += float (y);
@@ -857,7 +857,7 @@ bool ndDemoEntityManager::GetMousePosition (dFloat32& posX, dFloat32& posY) cons
 	return true;
 }
 
-void ndDemoEntityManager::CharCallback(GLFWwindow* window, dUnsigned32 ch)
+void ndDemoEntityManager::CharCallback(GLFWwindow*, dUnsigned32 ch)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	io.AddInputCharacter((unsigned short)ch);
@@ -1041,14 +1041,15 @@ void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const 
 }
 
 
-void ndDemoEntityManager::ImportPLYfile (const char* const fileName)
+//void ndDemoEntityManager::ImportPLYfile (const char* const fileName)
+void ndDemoEntityManager::ImportPLYfile(const char* const)
 {
 	dAssert(0);
 	//m_collisionDisplayMode = 2;
 	//CreatePLYMesh (this, fileName, true);
 }
 
-dInt32 ndDemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
+dInt32 ndDemoEntityManager::Print (const dVector&, const char *fmt, ... ) const
 {
 	va_list argptr;
 	char string[1024];

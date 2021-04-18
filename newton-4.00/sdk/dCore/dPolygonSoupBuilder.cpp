@@ -301,7 +301,7 @@ void dPolygonSoupBuilder::AddFaceIndirect(const dFloat32* const vertex, dInt32 s
 void dPolygonSoupBuilder::AddFace(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 vertexCount, const dInt32 faceId)
 {
 	dInt32 indexArray[1024];
-	dAssert(vertexCount < sizeof(indexArray)/sizeof (indexArray[0]));
+	dAssert(vertexCount < dInt32 (sizeof(indexArray)/sizeof (indexArray[0])));
 	for (dInt32 i = 0; i < vertexCount; i++)
 	{
 		indexArray[i] = i;

@@ -38,7 +38,7 @@ ndDemoCamera::~ndDemoCamera()
 {
 }
 
-void ndDemoCamera::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
+void ndDemoCamera::Render(dFloat32, ndDemoEntityManager* const, const dMatrix&) const
 {
 }
 
@@ -184,7 +184,8 @@ dVector ndDemoCamera::ScreenToWorld (const dVector& screenPoint) const
 	return dVector (dFloat32(objx), dFloat32(objy), dFloat32(objz), dFloat32 (1.0f));
 }
 
-dVector ndDemoCamera::WorldToScreen (const dVector& worldPoint) const
+//dVector ndDemoCamera::WorldToScreen (const dVector& worldPoint) const
+dVector ndDemoCamera::WorldToScreen(const dVector&) const
 {
 dAssert (0);
 

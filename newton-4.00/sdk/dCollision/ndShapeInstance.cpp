@@ -85,7 +85,7 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const dTree
 	m_shapeMaterial.m_userId = xmlGetInt64(xmlNode, "materialID");
 	m_shapeMaterial.m_alignPad = xmlGetInt64(xmlNode, "materialUserData");
 
-	for (dInt32 i = 0; i < sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0]); i++)
+	for (dInt32 i = 0; i < dInt32 (sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); i++)
 	{
 		char name[64];
 		sprintf(name, "intData%d", i);
@@ -249,7 +249,7 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 		{
 			case m_unit:
 			{
-				t = m_shape->RayCast(callback, localP0, localP1, body, contactOut);
+				t = m_shape->RayCast(callback, localP0, localP1, dFloat32(1.0f), body, contactOut);
 				if (t < dFloat32 (1.0f)) 
 				{
 					//dAssert(((ndShape*)m_shape)->GetAsShapeBox() || ((ndShape*)m_shape)->GetAsShapeSphere());
@@ -274,7 +274,7 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 			{
 				dVector p0(localP0 * m_invScale);
 				dVector p1(localP1 * m_invScale);
-				t = m_shape->RayCast(callback, p0, p1, body, contactOut);
+				t = m_shape->RayCast(callback, p0, p1, dFloat32(1.0f), body, contactOut);
 				if (t < dFloat32(1.0f))
 				{
 					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
@@ -298,7 +298,7 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 			{
 				dVector p0(localP0 * m_invScale);
 				dVector p1(localP1 * m_invScale);
-				t = m_shape->RayCast(callback, p0, p1, body, contactOut);
+				t = m_shape->RayCast(callback, p0, p1, dFloat32(1.0f), body, contactOut);
 				if (t < dFloat32(1.0f))
 				{
 					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
@@ -328,7 +328,7 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 			{
 				dVector p0(m_aligmentMatrix.UntransformVector(localP0 * m_invScale));
 				dVector p1(m_aligmentMatrix.UntransformVector(localP1 * m_invScale));
-				t = m_shape->RayCast(callback, p0, p1, body, contactOut);
+				t = m_shape->RayCast(callback, p0, p1, dFloat32(1.0f), body, contactOut);
 				if (t < dFloat32(1.0f))
 				{
 					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
@@ -472,7 +472,7 @@ void ndShapeInstance::Save(nd::TiXmlElement* const rootNode, const dTree<dUnsign
 	xmlSaveParam(paramNode, "collisionMode", m_collisionMode ? 1 : 0);
 	xmlSaveParam(paramNode, "materialID", m_shapeMaterial.m_userId);
 	xmlSaveParam(paramNode, "materialUserData", dInt64(m_shapeMaterial.m_alignPad));
-	for (dInt32 i = 0; i < sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0]); i++)
+	for (dInt32 i = 0; i < dInt32 (sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); i++)
 	{
 		char name[64];
 		sprintf(name, "intData%d", i);

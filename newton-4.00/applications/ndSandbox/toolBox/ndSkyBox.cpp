@@ -177,14 +177,14 @@ void ndSkyBox::SetupCubeMap()
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_X, "NewtonSky0003.tga");
-	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, "NewtonSky0001.tga");
+	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_X, (char*)"NewtonSky0003.tga");
+	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, (char*)"NewtonSky0001.tga");
 
-	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, "NewtonSky0006.tga");
-	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, "NewtonSky0005.tga");
+	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, (char*)"NewtonSky0006.tga");
+	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, (char*)"NewtonSky0005.tga");
 
-	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, "NewtonSky0002.tga");
-	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "NewtonSky0004.tga");
+	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, (char*)"NewtonSky0002.tga");
+	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, (char*)"NewtonSky0004.tga");
 }
 
 ndSkyBox::~ndSkyBox()
@@ -210,7 +210,7 @@ ndSkyBox::~ndSkyBox()
 	}
 }
 
-void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix__) const
+void ndSkyBox::Render(dFloat32, ndDemoEntityManager* const scene, const dMatrix&) const
 {
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
@@ -222,7 +222,7 @@ void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const
 	dMatrix viewMatrix(camera->GetViewMatrix());
 	skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, 0.0f, 1.0f));
 
-	dMatrix viewModelMatrix(skyMatrix * camera->GetViewMatrix());
+	//dMatrix viewModelMatrix(skyMatrix * camera->GetViewMatrix());
 	dMatrix projectionViewModelMatrix(skyMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 	
 	glUseProgram(m_shader);

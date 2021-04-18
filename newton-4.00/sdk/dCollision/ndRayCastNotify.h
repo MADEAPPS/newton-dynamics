@@ -46,7 +46,7 @@ class ndRayCastNotify
 		return m_scene->RayCast(*this, p0, p1);
 	}
 
-	virtual dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const collision)
+	virtual dUnsigned32 OnRayPrecastAction(const ndBody* const, const ndShapeInstance* const)
 	{
 		return 1;
 	}
@@ -67,7 +67,7 @@ class ndRayCastClosestHitCallback: public ndRayCastNotify
 	{
 	}
 
-	dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const collision)
+	dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
 	{
 		return ((ndBody*)body)->GetAsBodyDynamic() ? 1 : 0;
 	}

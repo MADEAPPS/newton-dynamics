@@ -165,29 +165,29 @@ inline dFloat32 ndShapeStaticMesh::GetBoxMaxRadius() const
 	return dFloat32(0.0f);
 }
 
-inline dVector ndShapeStaticMesh::SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
+inline dVector ndShapeStaticMesh::SupportVertex(const dVector&, dInt32* const) const
 {
 	dAssert(0);
 	return dVector::m_zero;
 }
 
-inline dVector ndShapeStaticMesh::SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const
+inline dVector ndShapeStaticMesh::SupportVertexSpecial(const dVector& dir, dFloat32, dInt32* const vertexIndex) const
 {
 	dAssert(0);
 	return SupportVertex(dir, vertexIndex);
 }
 
-inline dVector ndShapeStaticMesh::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const
+inline dVector ndShapeStaticMesh::SupportVertexSpecialProjectPoint(const dVector& point, const dVector&) const
 { 
 	return point; 
 }
 
-inline dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const
+inline dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dVector&, const dVector&, dVector* const) const
 {
 	return 0;
 }
 
-inline dVector ndShapeStaticMesh::CalculateVolumeIntegral(const dMatrix& globalMatrix, const dVector& plane, const ndShapeInstance& parentScale) const
+inline dVector ndShapeStaticMesh::CalculateVolumeIntegral(const dMatrix&, const dVector&, const ndShapeInstance&) const
 {
 	return dVector::m_zero;
 }

@@ -38,7 +38,7 @@ ndDynamicsUpdateSoa::ndDynamicsUpdateSoa(ndWorld* const world)
 ndDynamicsUpdateSoa::~ndDynamicsUpdateSoa()
 {
 	Clear();
-	m_soaJointRows.Resize(1024);
+	//m_soaJointRows.Resize(1024);
 }
 
 const char* ndDynamicsUpdateSoa::GetStringId() const
@@ -284,7 +284,7 @@ void ndDynamicsUpdateSoa::UpdateIslandState(const ndIsland& island)
 	}
 }
 
-dInt32 ndDynamicsUpdateSoa::CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const context)
+dInt32 ndDynamicsUpdateSoa::CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const)
 {
 	dUnsigned32 keyA = islandA->m_count * 2 + islandA->m_root->m_bodyIsConstrained;
 	dUnsigned32 keyB = islandB->m_count * 2 + islandB->m_root->m_bodyIsConstrained;
@@ -452,12 +452,12 @@ void ndDynamicsUpdateSoa::SortJoints()
 
 		const ndSortKey key(resting, joint->m_rowCount);
 		dAssert(key.m_value >= 0);
-		dAssert(key.m_value < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
+		dAssert(key.m_value < dInt32 (sizeof(jointCountSpans) / sizeof(jointCountSpans[0])));
 		jointCountSpans[key.m_value] ++;
 	}
 
 	dInt32 acc = 0;
-	for (dInt32 i = 0; i < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]); i++)
+	for (dInt32 i = 0; i < dInt32 (sizeof(jointCountSpans) / sizeof(jointCountSpans[0])); i++)
 	{
 		const dInt32 val = jointCountSpans[i];
 		jointCountSpans[i] = acc;
@@ -474,7 +474,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 
 		const ndSortKey key(resting, joint->m_rowCount);
 		dAssert(key.m_value >= 0);
-		dAssert(key.m_value < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
+		dAssert(key.m_value < dInt32 (sizeof(jointCountSpans) / sizeof(jointCountSpans[0])));
 
 		const dInt32 entry = jointCountSpans[key.m_value];
 		jointArray[entry] = joint;
@@ -854,7 +854,7 @@ void ndDynamicsUpdateSoa::InitBodyArray()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - me->GetUnconstrainedBodyCount();
-			const dFloat32 timestep = m_timestep;
+			//const dFloat32 timestep = m_timestep;
 
 			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{
@@ -1699,7 +1699,7 @@ void ndDynamicsUpdateSoa::IntegrateBodiesVelocity()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - me->m_unConstrainedBodyCount;
-			const dFloat32 timestep = m_timestep;
+			//const dFloat32 timestep = m_timestep;
 
 			const dVector timestep4(me->m_timestepRK);
 			const dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));

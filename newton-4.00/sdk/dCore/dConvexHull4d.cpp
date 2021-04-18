@@ -68,8 +68,7 @@ dConvexHull4d::dgNormalMap::dgNormalMap()
 			dFloat64 y = cosBeta * tmp[i].m_y;
 			dFloat64 x = cosBeta * tmp[i].m_x;
 			dInt32 index = dBitReversal(count, sizeof (m_normal) / sizeof (m_normal[0]));
-			dAssert (index < sizeof (m_normal) / sizeof (m_normal[0]));
-			dAssert (count < sizeof (m_normal) / sizeof (m_normal[0]));
+			dAssert (index < dInt32 (sizeof (m_normal) / sizeof (m_normal[0])));
 			m_normal[index] = dBigVector (x, y, z, w);
 			count ++;
 		}
@@ -186,7 +185,7 @@ dConvexHull4dTetraherum::dConvexHull4dTetraherum()
 	m_monotonicID ++;
 }
 
-void dConvexHull4dTetraherum::Init (const dConvexHull4dVector* const points, dInt32 v0, dInt32 v1, dInt32 v2, dInt32 v3)
+void dConvexHull4dTetraherum::Init (const dConvexHull4dVector* const, dInt32 v0, dInt32 v1, dInt32 v2, dInt32 v3)
 {
 	m_faces[0].m_index[0] = v0;
 	m_faces[0].m_index[1] = v1;
@@ -214,12 +213,12 @@ void dConvexHull4dTetraherum::Init (const dConvexHull4dVector* const points, dIn
 	}
 
 #ifdef _DEBUG
-	dBigVector p1p0 (points[v1] - points[v0]);
-	dBigVector p2p0 (points[v2] - points[v0]);
-	dBigVector p3p0 (points[v3] - points[v0]);
-	dBigVector normal (p1p0.CrossProduct(p2p0, p3p0));
-	dFloat64 volume = normal.DotProduct(normal).m_x;
-	dAssert (volume > dFloat64 (0.0f));
+	//dBigVector p1p0 (points[v1] - points[v0]);
+	//dBigVector p2p0 (points[v2] - points[v0]);
+	//dBigVector p3p0 (points[v3] - points[v0]);
+	//dBigVector normal (p1p0.CrossProduct(p2p0, p3p0));
+	//dFloat64 volume = normal.DotProduct(normal).m_x;
+	//dAssert (volume > dFloat64 (0.0f));
 #endif
 }
 
@@ -345,7 +344,7 @@ dConvexHull4d::dConvexHull4d ()
 {
 }
 
-dConvexHull4d::dConvexHull4d(const dConvexHull4d& source)
+dConvexHull4d::dConvexHull4d(const dConvexHull4d&)
 	:dList<dConvexHull4dTetraherum>()
 {
 	dAssert(0);
@@ -514,12 +513,16 @@ dInt32 dConvexHull4d::SupportVertex (dConvexHull4dAABBTreeNode** const treePoint
 	return index;
 }
 
-dInt32 dConvexHull4d::ConvexCompareVertex(const dConvexHull4dVector* const  A, const dConvexHull4dVector* const B, void* const context)
+dInt32 dConvexHull4d::ConvexCompareVertex(const dConvexHull4dVector* const  A, const dConvexHull4dVector* const B, void* const)
 {
-	for (dInt32 i = 0; i < 4; i ++) {
-		if ((*A)[i] < (*B)[i]) {
+	for (dInt32 i = 0; i < 4; i ++) 
+	{
+		if ((*A)[i] < (*B)[i]) 
+		{
 			return -1;
-		} else if ((*A)[i] > (*B)[i]) {
+		} 
+		else if ((*A)[i] > (*B)[i]) 
+		{
 			return 1;
 		}
 	}

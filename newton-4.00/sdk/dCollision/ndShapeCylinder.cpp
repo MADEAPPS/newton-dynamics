@@ -202,7 +202,7 @@ dVector ndShapeCylinder::SupportVertexSpecialProjectPoint(const dVector& point, 
 	return point + dir.Scale(D_PENETRATION_TOL);
 }
 
-dVector ndShapeCylinder::SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
+dVector ndShapeCylinder::SupportVertex(const dVector& dir, dInt32* const) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
@@ -239,7 +239,7 @@ dVector ndShapeCylinder::SupportVertex(const dVector& dir, dInt32* const vertexI
 	return p0;
 }
 
-dVector ndShapeCylinder::SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const
+dVector ndShapeCylinder::SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
@@ -276,9 +276,9 @@ dVector ndShapeCylinder::SupportVertexSpecial(const dVector& dir, dFloat32 skinT
 	return p0;
 }
 
-dFloat32 ndShapeCylinder::RayCast(ndRayCastNotify& callback, const dVector& r0, const dVector& r1, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeCylinder::RayCast(ndRayCastNotify& callback, const dVector& r0, const dVector& r1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
-	return ndShapeConvex::RayCast(callback, r0, r1, body, contactOut);
+	return ndShapeConvex::RayCast(callback, r0, r1, maxT, body, contactOut);
 }
 
 dInt32 ndShapeCylinder::CalculatePlaneIntersection(const dVector& normal, const dVector& origin, dVector* const contactsOut) const
@@ -424,7 +424,7 @@ void ndShapeCylinder::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) 
 	ndShapeConvex::CalcAABB(matrix, p0, p1);
 }
 
-void ndShapeCylinder::Save( nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid ) const
+void ndShapeCylinder::Save( nd::TiXmlElement* const xmlNode, const char* const, dInt32 nodeid ) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeCylinder");
 	xmlNode->LinkEndChild(paramNode);

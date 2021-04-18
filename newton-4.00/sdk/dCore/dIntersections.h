@@ -375,7 +375,7 @@ class dFastAabbInfo : public dMatrix
 		maxBox = faceBoxP1 - boxP0;
 	}
 
-	D_INLINE dMatrix MakeFaceMatrix (const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const
+	D_INLINE dMatrix MakeFaceMatrix (const dVector& faceNormal, dInt32, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const
 	{
 		dMatrix faceMatrix;
 		dVector origin (&vertexArray[indexArray[0] * stride]);

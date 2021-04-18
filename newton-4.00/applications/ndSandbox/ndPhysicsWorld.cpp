@@ -101,7 +101,8 @@ void ndPhysicsWorld::OnPostUpdate(dFloat32 timestep)
 	}
 }
 
-ndBody* ndPhysicsWorld::LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath) const
+//ndBody* ndPhysicsWorld::LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath) const
+ndBody* ndPhysicsWorld::LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const) const
 {
 	if (!strcmp(bodyClassName, "ndArchimedesBuoyancyVolume"))
 	{

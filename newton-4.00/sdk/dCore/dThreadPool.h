@@ -43,7 +43,7 @@ class dThreadPoolJob
 	{
 	}
 
-	const dInt32 GetThreadId() const 
+	dInt32 GetThreadId() const 
 	{ 
 		return m_threadIndex; 
 	}
@@ -96,7 +96,7 @@ class dThreadPool: public dSyncMutex, public dThread
 	D_CORE_API dThreadPool(const char* const baseName);
 	D_CORE_API virtual ~dThreadPool();
 
-	D_CORE_API const dInt32 GetCount() const;
+	D_CORE_API dInt32 GetCount() const;
 	D_CORE_API void SetCount(dInt32 count);
 
 	D_CORE_API void TickOne();

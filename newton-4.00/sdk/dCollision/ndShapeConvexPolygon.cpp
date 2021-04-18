@@ -265,7 +265,7 @@ dInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const dVector& normalIn
 	return count;
 }
 
-dVector ndShapeConvexPolygon::SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
+dVector ndShapeConvexPolygon::SupportVertex(const dVector& dir, dInt32* const) const
 {
 	dAssert(dAbs(dir.m_w) == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - 1.0f) < dFloat32(1.0e-2f));
@@ -281,7 +281,7 @@ dVector ndShapeConvexPolygon::SupportVertex(const dVector& dir, dInt32* const ve
 			index = i;
 		}
 	}
-	dAssert(vertexIndex == nullptr);
+	//dAssert(vertexIndex == nullptr);
 	return m_localPoly[index];
 }
 
@@ -322,7 +322,7 @@ bool ndShapeConvexPolygon::BeamClipping(const dVector& origin, dFloat32 dist, co
 	for (dInt32 i = 0; i < m_count; i++) 
 	{
 		dInt32 j = i << 1;
-		dAssert(j < sizeof(clippedFace) / sizeof(clippedFace[0]));
+		dAssert(j < dInt32 (sizeof(clippedFace) / sizeof(clippedFace[0])));
 
 		points[i] = m_localPoly[i];
 
@@ -389,7 +389,7 @@ bool ndShapeConvexPolygon::BeamClipping(const dVector& origin, dFloat32 dist, co
 					indexCount++;
 					edgeCount += 2;
 					ptr = newEdge;
-					dAssert(indexCount < sizeof(points) / sizeof(points[0]));
+					dAssert(indexCount < dInt32 (sizeof(points) / sizeof(points[0])));
 				}
 			}
 			else 
@@ -425,7 +425,7 @@ bool ndShapeConvexPolygon::BeamClipping(const dVector& origin, dFloat32 dist, co
 					edgeCount += 2;
 
 					ptr = newEdge;
-					dAssert(indexCount < sizeof(points) / sizeof(points[0]));
+					dAssert(indexCount < dInt32 (sizeof(points) / sizeof(points[0])));
 				}
 			}
 

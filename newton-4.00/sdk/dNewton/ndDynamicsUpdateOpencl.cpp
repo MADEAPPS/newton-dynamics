@@ -41,7 +41,7 @@ class dOpenclBuffer: public dArray<T>
 		,m_gpuBuffer(nullptr)
 	{
 		//SetCount(D_DEFAULT_BUFFER_SIZE);
-		SetCount(D_DEFAULT_BUFFER_SIZE * 10);
+		dArray<T>::SetCount(D_DEFAULT_BUFFER_SIZE * 10);
 	}
 
 	~dOpenclBuffer()
@@ -63,20 +63,20 @@ class dOpenclBuffer: public dArray<T>
 			if (m_flags & CL_MEM_USE_HOST_PTR)
 			{
 				void* const hostBuffer = &(*this)[0];
-				m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * GetCapacity(), hostBuffer, &err);
+				m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * dArray<T>::GetCapacity(), hostBuffer, &err);
 			}
 			else
 			{
-				m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * GetCapacity(), nullptr, &err);
+				m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * dArray<T>::GetCapacity(), nullptr, &err);
 			}
 			dAssert(err == CL_SUCCESS);
 		}
 
-		if (GetCapacity() < size)
+		if (dArray<T>::GetCapacity() < size)
 		{
 			dAssert(0);
 		}
-		SetCount(size);
+		dArray<T>::SetCount(size);
 	}
 
 	void ReadData(cl_command_queue commandQueue)
@@ -93,7 +93,7 @@ class dOpenclBuffer: public dArray<T>
 		cl_int err;
 		const void* const source = &(*this)[0];
 		err = clEnqueueWriteBuffer(commandQueue, m_gpuBuffer,
-			CL_FALSE, 0, sizeof(T) * GetCount(), source,
+			CL_FALSE, 0, sizeof(T) * dArray<T>::GetCount(), source,
 			0, nullptr, nullptr);
 		dAssert(err == CL_SUCCESS);
 	}
@@ -124,19 +124,18 @@ class ndOpenclBodyProxy
 
 class ndOpenclMatrix3x3
 {
-	cl_float3 m_matrix[3];
+	//cl_float3 m_matrix[3];
 };
 
 class ndOpenclBodyWorkingBuffer
 {
 	public:
-	ndOpenclMatrix3x3 m_matrix;
+	//ndOpenclMatrix3x3 m_matrix;
 	cl_float4 m_rotation;
 	cl_float3 m_position;
 	cl_float3 m_veloc;
 	cl_float3 m_omega;
 };
-
 
 class OpenclSystem
 {
@@ -516,12 +515,12 @@ void ndDynamicsUpdateOpencl::SortJoints()
 
 		const ndSortKey key(resting, joint->m_rowCount);
 		dAssert(key.m_value >= 0);
-		dAssert(key.m_value < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
+		dAssert(key.m_value < dInt32 (sizeof(jointCountSpans) / sizeof(jointCountSpans[0])));
 		jointCountSpans[key.m_value] ++;
 	}
 
 	dInt32 acc = 0;
-	for (dInt32 i = 0; i < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]); i++)
+	for (dInt32 i = 0; i < dInt32 (sizeof(jointCountSpans) / sizeof(jointCountSpans[0])); i++)
 	{
 		const dInt32 val = jointCountSpans[i];
 		jointCountSpans[i] = acc;
@@ -538,7 +537,7 @@ void ndDynamicsUpdateOpencl::SortJoints()
 
 		const ndSortKey key(resting, joint->m_rowCount);
 		dAssert(key.m_value >= 0);
-		dAssert(key.m_value < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
+		dAssert(key.m_value < dInt32 (sizeof(jointCountSpans) / sizeof(jointCountSpans[0])));
 
 		const dInt32 entry = jointCountSpans[key.m_value];
 		jointArray[entry] = joint;

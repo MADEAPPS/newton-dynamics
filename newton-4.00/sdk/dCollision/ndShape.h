@@ -262,7 +262,7 @@ class ndShape: public dClassAlloc
 	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinSkinThickness, dInt32* const vertexIndex) const = 0;
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const = 0;
 	virtual dVector CalculateVolumeIntegral(const dMatrix& globalMatrix, const dVector& globalPlane, const ndShapeInstance& parentScale) const = 0;
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const = 0;
+	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const = 0;
 
 	virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
 	virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
@@ -312,13 +312,13 @@ inline dInt32 ndShape::GetRefCount() const
 	return m_refCount.load();
 }
 
-inline dFloat32 ndShape::CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const
+inline dFloat32 ndShape::CalculateMassProperties(const dMatrix&, dVector&, dVector&, dVector&) const
 { 
 	dAssert(0); 
 	return 0; 
 }
 
-inline dMatrix ndShape::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const
+inline dMatrix ndShape::CalculateInertiaAndCenterOfMass(const dMatrix&, const dVector&, const dMatrix&) const
 {
 	dAssert(0);
 	return dGetZeroMatrix();
@@ -339,7 +339,7 @@ inline dFloat32 ndShape::GetUmbraClipSize() const
 	return dFloat32(3.0f) * GetBoxMaxRadius();
 }
 
-inline void ndShape::Save( nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid ) const
+inline void ndShape::Save( nd::TiXmlElement* const, const char* const, dInt32) const
 {
 	dAssert(0);
 }

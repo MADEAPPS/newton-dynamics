@@ -225,7 +225,7 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNoceM
 			ofbx::Object* const child = buffer[count - i - 1];
 			nodeStack[stack] = fbxImportStackData(child, node);
 			stack++;
-			dAssert(stack < sizeof(nodeStack) / sizeof(nodeStack[0]));
+			dAssert(stack < dInt32(sizeof(nodeStack) / sizeof(nodeStack[0])));
 		}
 	}
 	return entity;

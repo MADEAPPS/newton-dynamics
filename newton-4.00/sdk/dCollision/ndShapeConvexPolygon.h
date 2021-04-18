@@ -58,7 +58,7 @@ class ndShapeConvexPolygon: public ndShapeConvex
 	bool BeamClipping(const dVector& origin, dFloat32 size, const ndShapeInstance* const parentMesh);
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const;
+	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
 	dVector m_normal;
 	dVector m_localPoly[D_CONVEX_POLYGON_MAX_VERTEX_COUNT];
@@ -79,7 +79,7 @@ inline ndShapeConvexPolygon* ndShapeConvexPolygon::GetAsShapeAsConvexPolygon()
 	return this; 
 }
 
-inline dFloat32 ndShapeConvexPolygon::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const
+inline dFloat32 ndShapeConvexPolygon::RayCast(ndRayCastNotify&, const dVector&, const dVector&, dFloat32, const ndBody* const, ndContactPoint&) const
 {
 	return dFloat32(1.2f);
 }

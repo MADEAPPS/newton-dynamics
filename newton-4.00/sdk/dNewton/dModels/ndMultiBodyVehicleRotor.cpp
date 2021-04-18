@@ -53,12 +53,12 @@ void ndMultiBodyVehicleRotor::SetStart(bool startkey)
 }
 
 
-void ndMultiBodyVehicleRotor::SetMaxRpm(dFloat32 maxSpeed)
+void ndMultiBodyVehicleRotor::SetMaxRpm(dFloat32)
 {
 	dAssert(0);
 }
 
-void ndMultiBodyVehicleRotor::SetEngineTorque(dFloat32 torque)
+void ndMultiBodyVehicleRotor::SetEngineTorque(dFloat32)
 {
 	dAssert(0);
 }

@@ -200,7 +200,7 @@ dVector ndShapeBox::SupportVertex(const dVector& dir0, dInt32* const vertexIndex
 	return m_size[0].Select(m_size[1], mask);
 }
 
-dVector ndShapeBox::SupportVertexSpecial(const dVector& dir0, dFloat32 skinThickness, dInt32* const vertexIndex) const
+dVector ndShapeBox::SupportVertexSpecial(const dVector& dir0, dFloat32, dInt32* const vertexIndex) const
 {
 	dVector mask0(dir0.Abs() > m_flushZero);
 	dVector dir(dir0 & mask0);
@@ -228,7 +228,7 @@ dVector ndShapeBox::SupportVertexSpecialProjectPoint(const dVector& point, const
 	return point + dir.Scale(D_PENETRATION_TOL);
 }
 
-dFloat32 ndShapeBox::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeBox::RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32, const ndBody* const, ndContactPoint& contactOut) const
 {
 	dAssert(localP0.m_w == localP1.m_w);
 
@@ -473,7 +473,7 @@ ndShapeInfo ndShapeBox::GetShapeInfo() const
 	return info;
 }
 
-D_COLLISION_API void ndShapeBox::Save( nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid ) const
+D_COLLISION_API void ndShapeBox::Save( nd::TiXmlElement* const xmlNode, const char* const, dInt32 nodeid ) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeBox");
 	xmlNode->LinkEndChild(paramNode);

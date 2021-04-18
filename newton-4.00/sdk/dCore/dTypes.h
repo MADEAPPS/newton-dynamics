@@ -87,6 +87,9 @@
 	#include <intrin.h>
 	#include <emmintrin.h> 
 	#include <pmmintrin.h>
+	#ifdef D_USE_VECTOR_AVX
+		#include <immintrin.h>
+	#endif
 #endif
 
 #if (defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (__MINGW32__) || defined (__MINGW64__))

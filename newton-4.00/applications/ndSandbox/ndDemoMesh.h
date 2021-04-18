@@ -28,7 +28,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
 	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
 
-	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner) 
+	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const) 
 	{ 
 		AddRef(); 
 		return this;

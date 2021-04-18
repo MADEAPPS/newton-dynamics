@@ -34,7 +34,7 @@ void *operator new (size_t size)
 	return PhysicsAlloc(size);
 }
 
-void operator delete (void* ptr)
+void operator delete (void* ptr) noexcept
 {
 	PhysicsFree(ptr);
 }

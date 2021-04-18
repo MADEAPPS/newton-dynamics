@@ -91,7 +91,7 @@ class dConvexHull3d::dNormalMap
 			dInt32 index = dBitReversal(count, sizeof(m_normal) / sizeof(m_normal[0]));
 			m_normal[index] = n;
 			count++;
-			dAssert(count <= sizeof(m_normal) / sizeof(m_normal[0]));
+			dAssert(count <= dInt32 (sizeof(m_normal) / sizeof(m_normal[0])));
 		}
 	}
 
@@ -181,20 +181,20 @@ dBigPlane dConvexHull3dFace::GetPlaneEquation (const dBigVector* const pointArra
 
 dConvexHull3d::dConvexHull3d ()
 	:dList<dConvexHull3dFace>()
-	,m_count (0)
-	,m_diag()
 	,m_aabbP0(dBigVector (dFloat64 (0.0f)))
 	,m_aabbP1(dBigVector (dFloat64 (0.0f)))
+	,m_count(0)
+	,m_diag()
 	,m_points()
 {
 }
 
 dConvexHull3d::dConvexHull3d(const dConvexHull3d& source)
 	:dList<dConvexHull3dFace>()
-	,m_count (source.m_count)
-	,m_diag(source.m_diag)
 	,m_aabbP0 (source.m_aabbP0)
 	,m_aabbP1 (source.m_aabbP1)
+	,m_count(source.m_count)
+	,m_diag(source.m_diag)
 	,m_points(source.m_count)
 {
 	m_points.SetCount(source.m_count);
@@ -226,10 +226,10 @@ dConvexHull3d::dConvexHull3d(const dConvexHull3d& source)
 
 dConvexHull3d::dConvexHull3d(const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount)
 	:dList<dConvexHull3dFace>()
+	,m_aabbP0(dBigVector::m_zero)
+	,m_aabbP1(dBigVector::m_zero)
 	,m_count(0)
 	,m_diag()
-	,m_aabbP0 (dBigVector::m_zero)
-	,m_aabbP1 (dBigVector::m_zero)
 	,m_points()
 {
 	BuildHull (vertexCloud, strideInBytes, count, distTol, maxVertexCount);
@@ -275,7 +275,7 @@ void dConvexHull3d::BuildHull (const dFloat64* const vertexCloud, dInt32 strideI
 #endif
 }
 
-dInt32 dConvexHull3d::ConvexCompareVertex(const dConvexHull3dVertex* const  A, const dConvexHull3dVertex* const B, void* const context)
+dInt32 dConvexHull3d::ConvexCompareVertex(const dConvexHull3dVertex* const  A, const dConvexHull3dVertex* const B, void* const)
 {
 	for (dInt32 i = 0; i < 3; i ++) {
 		if ((*A)[i] < (*B)[i]) {
@@ -405,7 +405,7 @@ dConvexHull3dAABBTreeNode* dConvexHull3d::BuildTree (dConvexHull3dAABBTreeNode* 
 	return tree;
 }
 
-dInt32 dConvexHull3d::GetUniquePoints(dConvexHull3dVertex* const points, const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, void* const memoryPool, dInt32 maxMemSize)
+dInt32 dConvexHull3d::GetUniquePoints(dConvexHull3dVertex* const points, const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, void* const, dInt32)
 {
 	const dInt32 stride = dInt32(strideInBytes / sizeof(dFloat64));
 	//if (stride >= 4) 
@@ -831,7 +831,7 @@ bool dConvexHull3d::Sanity() const
 	return true;
 }
 
-bool dConvexHull3d::CheckFlatSurface(dConvexHull3dAABBTreeNode* tree, dConvexHull3dVertex* const points, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount)
+bool dConvexHull3d::CheckFlatSurface(dConvexHull3dAABBTreeNode* tree, dConvexHull3dVertex* const points, dInt32, dFloat64, dInt32)
 {
 	dBigVector e0(m_points[1] - m_points[0]);
 	dBigVector e1(m_points[2] - m_points[0]);
@@ -867,7 +867,7 @@ bool dConvexHull3d::CheckFlatSurface(dConvexHull3dAABBTreeNode* tree, dConvexHul
 }
 
 
-void dConvexHull3d::CalculateConvexHull2d(dConvexHull3dAABBTreeNode* tree, dConvexHull3dVertex* const points, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount)
+void dConvexHull3d::CalculateConvexHull2d(dConvexHull3dAABBTreeNode*, dConvexHull3dVertex* const, dInt32, dFloat64, dInt32)
 {
 
 }

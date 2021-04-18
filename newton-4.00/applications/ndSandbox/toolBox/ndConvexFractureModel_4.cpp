@@ -59,7 +59,7 @@ ndConvexFractureModel_4::ndEffect::ndEffect(ndConvexFractureModel_4* const manag
 	dVector pMin;
 	dVector pMax;
 	desc.m_outerShape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
-	dVector size(pMax - pMin);
+	//dVector size(pMax - pMin);
 
 	// Get the volume of the original mesh
 	ndMeshEffect outerMesh(*desc.m_outerShape);
@@ -232,7 +232,8 @@ ndConvexFractureModel_4::~ndConvexFractureModel_4()
 {
 }
 
-void ndConvexFractureModel_4::Update(ndWorld* const world, dFloat32 timestep)
+//void ndConvexFractureModel_4::Update(ndWorld* const world, dFloat32 timestep)
+void ndConvexFractureModel_4::Update(ndWorld* const, dFloat32)
 {
 	dList<ndEffect>::dListNode* nextNody;
 	for (dList<ndEffect>::dListNode* node = m_effectList.GetFirst(); node; node = nextNody)
@@ -271,7 +272,8 @@ void ndConvexFractureModel_4::Update(ndWorld* const world, dFloat32 timestep)
 	}
 }
 
-void ndConvexFractureModel_4::PostUpdate(ndWorld* const world, dFloat32 timestep)
+//void ndConvexFractureModel_4::PostUpdate(ndWorld* const world, dFloat32 timestep)
+void ndConvexFractureModel_4::PostUpdate(ndWorld* const world, dFloat32)
 {
 	if (m_pendingEffect.GetCount())
 	{

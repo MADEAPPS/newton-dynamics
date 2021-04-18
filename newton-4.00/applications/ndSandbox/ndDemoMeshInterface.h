@@ -102,10 +102,10 @@ class ndDemoMeshInterface: public dClassAlloc, public dRefCounter<ndDemoMeshInte
 	bool GetVisible () const;
 	void SetVisible (bool visibilityFlag);
 
-	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner) { dAssert(0); return nullptr; }
+	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const) { dAssert(0); return nullptr; }
 
 	virtual void Render (ndDemoEntityManager* const scene, const dMatrix& modelMatrix) = 0;
-	virtual void RenderTransparency(ndDemoEntityManager* const scene, const dMatrix& modelMatrix) {}
+	virtual void RenderTransparency(ndDemoEntityManager* const, const dMatrix&) {}
 
 	dString m_name;
 	bool m_isVisible;

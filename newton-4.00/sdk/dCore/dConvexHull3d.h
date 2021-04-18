@@ -98,10 +98,10 @@ class dConvexHull3d: public dClassAlloc, public dList<dConvexHull3dFace>
 	bool Sanity() const;
 	void Save (const char* const filename) const;
 
-	dInt32 m_count;
-	dFloat64 m_diag;
 	dBigVector m_aabbP0;
 	dBigVector m_aabbP1;
+	dInt32 m_count;
+	dFloat64 m_diag;
 	dArray<dBigVector> m_points;
 } D_GCC_NEWTON_ALIGN_32;
 

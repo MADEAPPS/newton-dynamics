@@ -54,7 +54,7 @@ class ndBody: public dClassAlloc
 	dUnsigned32 GetId() const;
 	void GetAABB(dVector& p0, dVector& p1) const;
 
-	virtual const dFloat32 GetInvMass() const { return dFloat32(0.0f); }
+	virtual dFloat32 GetInvMass() const;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const = 0;
 
 	const dVector& GetCentreOfMass() const;
@@ -77,9 +77,9 @@ class ndBody: public dClassAlloc
 	protected:
 	D_COLLISION_API static const nd::TiXmlNode* FindNode(const nd::TiXmlNode* const rootNode, const char* const name);
 	D_COLLISION_API virtual nd::TiXmlElement* CreateRootElement(nd::TiXmlElement* const rootNode, const char* const name, dInt32 nodeid) const;
-	virtual void AttachContact(ndContact* const contact) {}
-	virtual void DetachContact(ndContact* const contact) {}
-	virtual ndContact* FindContact(const ndBody* const otherBody) const { return nullptr; }
+	virtual void AttachContact(ndContact* const) {}
+	virtual void DetachContact(ndContact* const) {}
+	virtual ndContact* FindContact(const ndBody* const) const { return nullptr; }
 
 	dMatrix m_matrix;
 	dVector m_veloc;
@@ -159,6 +159,10 @@ inline dVector ndBody::GetVelocityAtPoint(const dVector& point) const
 	return m_veloc + m_omega.CrossProduct(point - m_globalCentreOfMass);
 }
 
+inline dFloat32 ndBody::GetInvMass() const 
+{ 
+	return dFloat32(0.0f); 
+}
 
 #endif 
 

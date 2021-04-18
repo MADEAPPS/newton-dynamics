@@ -119,8 +119,9 @@ static void BuildBall(ndDemoEntityManager* const scene, const dVector& origin, d
 	ndShapeInstance shape2(new ndShapeSphere(diameter * 0.5f));
 	ndDemoMesh* const mesh2 = new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "marble.tga", "marble.tga", "marble.tga");
 	matrix.m_posit.m_y += 5.0f;
-	ndBodyDynamic* const bodyA = MakePrimitive(scene, matrix, shape2, mesh2, mass);
-	bodyA;
+	//ndBodyDynamic* const bodyA = MakePrimitive(scene, matrix, shape2, mesh2, mass);
+	MakePrimitive(scene, matrix, shape2, mesh2, mass);
+
 	mesh2->Release();
 }
 

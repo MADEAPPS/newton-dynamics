@@ -2711,7 +2711,7 @@ void ndMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 	PackAttibuteData();
 }
 
-void ndMeshEffect::PackPoints(dFloat64 tol)
+void ndMeshEffect::PackPoints(dFloat64)
 {
 	dStack<dInt32>vertexIndexMapBuffer(m_points.m_vertex.GetCount());
 	dInt32* const vertexIndexMap = &vertexIndexMapBuffer[0];
@@ -4113,9 +4113,9 @@ bool ndMeshEffect::HasOpenEdges() const
 	return false;
 }
 
-void ndMeshEffect::RemoveUnusedVertices(dInt32* const vertexMapResult)
+void ndMeshEffect::RemoveUnusedVertices(dInt32* const)
 {
-	dAssert(!vertexMapResult);
+	//dAssert(!vertexMapResult);
 	UnpackAttibuteData();
 	PackAttibuteData();
 	UnpackPoints();

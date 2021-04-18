@@ -721,7 +721,7 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 }
 
 
-dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormalsOld (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
+dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormalsOld (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32)
 {
 	dInt32 stride = dInt32 (strideInBytes / sizeof (dFloat32));
 
@@ -768,7 +768,7 @@ dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormalsOld (void* const c
 	return t_ContinueSearh;
 }
 
-dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormals(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
+dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormals(void* const context, const dFloat32* const, dInt32, const dInt32* const indexArray, dInt32 indexCount, dFloat32)
 {
 	//dInt32 stride = dInt32(strideInBytes / sizeof(dFloat32));
 	//
@@ -825,7 +825,7 @@ dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormals(void* const conte
 	return t_ContinueSearh;
 }
 
-dIntersectStatus dAabbPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
+dIntersectStatus dAabbPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32)
 {
 	#define DG_WELDING_TOL (1.0e-2f)
 	#define DG_WELDING_TOL2 (DG_WELDING_TOL * DG_WELDING_TOL)
@@ -1498,7 +1498,7 @@ void dAabbPolygonSoup::ForAllSectorsRayHit (const dFastRayTest& raySrc, dFloat32
 	}
 }
 
-void dAabbPolygonSoup::ForAllSectors (const dFastAabbInfo& obbAabbInfo, const dVector& boxDistanceTravel, dFloat32 m_maxT, dAaabbIntersectCallback callback, void* const context) const
+void dAabbPolygonSoup::ForAllSectors (const dFastAabbInfo& obbAabbInfo, const dVector& boxDistanceTravel, dFloat32, dAaabbIntersectCallback callback, void* const context) const
 {
 	dAssert (dAbs(dAbs(obbAabbInfo[0][0]) - obbAabbInfo.m_absDir[0][0]) < dFloat32 (1.0e-4f));
 	dAssert (dAbs(dAbs(obbAabbInfo[1][1]) - obbAabbInfo.m_absDir[1][1]) < dFloat32 (1.0e-4f));

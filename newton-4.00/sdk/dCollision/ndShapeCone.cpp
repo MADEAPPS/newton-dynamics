@@ -182,7 +182,7 @@ dVector ndShapeCone::SupportVertexSpecialProjectPoint(const dVector& point, cons
 	return point + dir.Scale(D_PENETRATION_TOL);
 }
 
-dVector ndShapeCone::SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
+dVector ndShapeCone::SupportVertex(const dVector& dir, dInt32* const) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
@@ -220,7 +220,7 @@ dVector ndShapeCone::SupportVertex(const dVector& dir, dInt32* const vertexIndex
 	return p0;
 }
 
-dVector ndShapeCone::SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const
+dVector ndShapeCone::SupportVertexSpecial(const dVector& dir, dFloat32, dInt32* const) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
@@ -258,9 +258,9 @@ dVector ndShapeCone::SupportVertexSpecial(const dVector& dir, dFloat32 skinThick
 	return p0;
 }
 
-dFloat32 ndShapeCone::RayCast(ndRayCastNotify& callback, const dVector& r0, const dVector& r1, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeCone::RayCast(ndRayCastNotify& callback, const dVector& r0, const dVector& r1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
-	return ndShapeConvex::RayCast(callback, r0, r1, body, contactOut);
+	return ndShapeConvex::RayCast(callback, r0, r1, maxT, body, contactOut);
 }
 
 dInt32 ndShapeCone::CalculatePlaneIntersection(const dVector& normal, const dVector& origin, dVector* const contactsOut) const
@@ -363,7 +363,7 @@ void ndShapeCone::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) cons
 	ndShapeConvex::CalcAABB(matrix, p0, p1);
 }
 
-void ndShapeCone::Save( nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid ) const
+void ndShapeCone::Save( nd::TiXmlElement* const xmlNode, const char* const, dInt32 nodeid ) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeCone");
 	xmlNode->LinkEndChild(paramNode);

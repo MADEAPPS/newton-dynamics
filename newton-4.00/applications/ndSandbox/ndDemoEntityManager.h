@@ -265,7 +265,7 @@ inline dInt32 ndDemoEntityManager::GetDebugDisplay() const
 	return 0;
 }
 
-inline void ndDemoEntityManager::SetDebugDisplay(dInt32 mode) const
+inline void ndDemoEntityManager::SetDebugDisplay(dInt32) const
 {
 	dAssert (0);
 }

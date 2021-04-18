@@ -41,7 +41,7 @@ class dArray
 
 	~dArray ();
 
-	const dInt32 GetCount() const;
+	dInt32 GetCount() const;
 	void SetCount(dInt32 count);
 
 	void Clear();
@@ -135,7 +135,7 @@ void dArray<T>::PushBack(const T& element)
 }
 
 template<class T>
-const dInt32 dArray<T>::GetCount() const
+dInt32 dArray<T>::GetCount() const
 {
 	return m_size;
 }

@@ -25,7 +25,7 @@
 #include "ndModel.h"
 
 
-ndModel::ndModel(const nd::TiXmlNode* const xmlNode)
+ndModel::ndModel(const nd::TiXmlNode* const)
 	:dClassAlloc()
 	,m_node(nullptr)
 {

@@ -371,11 +371,11 @@ static dInt32 QuickSortVertices(dFloat64* const vertList, dInt32 stride, dInt32 
 	return count;
 }
 
-dInt32 dVertexListToIndexList(dFloat32* const vertList, dInt32 strideInBytes, dInt32 floatSizeInBytes, dInt32 unsignedSizeInBytes, dInt32 vertexCount, dInt32* const indexList, dFloat32 tolerance)
+dInt32 dVertexListToIndexList(dFloat32* const vertList, dInt32 strideInBytes, dInt32 floatSizeInBytes, dInt32 , dInt32 vertexCount, dInt32* const indexList, dFloat32 tolerance)
 {
 	dInt32 stride = dInt32(strideInBytes / sizeof(dFloat32));
 
-	dAssert(!unsignedSizeInBytes);
+	//dAssert(!unsignedSizeInBytes);
 	dStack<dFloat64> pool(vertexCount * stride);
 
 	dInt32 floatCount = dInt32(floatSizeInBytes / sizeof(dFloat32));

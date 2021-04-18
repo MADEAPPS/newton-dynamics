@@ -232,12 +232,12 @@ void ndDynamicsUpdate::SortJoints()
 
 		const ndSortKey key(resting, joint->m_rowCount);
 		dAssert(key.m_value >= 0);
-		dAssert(key.m_value < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
+		dAssert(key.m_value < dInt32 (sizeof(jointCountSpans) / sizeof(jointCountSpans[0])));
 		jointCountSpans[key.m_value] ++;
 	}
 
 	dInt32 acc = 0;
-	for (dInt32 i = 0; i < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]); i++)
+	for (dInt32 i = 0; i < dInt32 (sizeof(jointCountSpans) / sizeof(jointCountSpans[0])); i++)
 	{
 		const dInt32 val = jointCountSpans[i];
 		jointCountSpans[i] = acc;
@@ -254,7 +254,7 @@ void ndDynamicsUpdate::SortJoints()
 
 		const ndSortKey key(resting, joint->m_rowCount);
 		dAssert(key.m_value >= 0);
-		dAssert(key.m_value < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
+		dAssert(key.m_value < dInt32 (sizeof(jointCountSpans) / sizeof(jointCountSpans[0])));
 
 		const dInt32 entry = jointCountSpans[key.m_value];
 		jointArray[entry] = joint;
@@ -274,7 +274,7 @@ void ndDynamicsUpdate::SortJoints()
 
 	#ifdef _DEBUG
 		dAssert(m_activeJointCount <= jointArray.GetCount());
-		const dInt32 maxRowCount = m_leftHandSide.GetCount();
+		//const dInt32 maxRowCount = m_leftHandSide.GetCount();
 		for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 		{
 			ndConstraint* const joint = jointArray[i];
@@ -531,7 +531,7 @@ void ndDynamicsUpdate::InitBodyArray()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - me->m_unConstrainedBodyCount;
-			const dFloat32 timestep = m_timestep;
+			//const dFloat32 timestep = m_timestep;
 
 			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{
@@ -921,7 +921,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - me->m_unConstrainedBodyCount;
-			const dFloat32 timestep = m_timestep;
+			//const dFloat32 timestep = m_timestep;
 
 			const dVector timestep4(me->m_timestepRK);
 			const dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));
@@ -1555,7 +1555,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
 			dFloat32 accNorm = dFloat32(0.0f);
 			const dInt32 jointCount = jointArray.GetCount();
-			const dInt32 activejointCount = me->m_activeJointCount;
+			//const dInt32 activejointCount = me->m_activeJointCount;
 			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
 
 			const dInt32 threadIndex = GetThreadId();

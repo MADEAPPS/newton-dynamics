@@ -61,10 +61,10 @@ dInt32 ndContactSolver::m_rayCastSimplex[4][4] =
 
 ndContactSolver::ndContactSolver(ndShapeInstance* const instance)
 	:dDownHeap<ndMinkFace*, dFloat32>(m_heapBuffer, sizeof (m_heapBuffer))
-	,m_contact(nullptr)
 	,m_instance0(*instance)
 	,m_instance1(*instance)
 	,m_separatingVector(ndContact::m_initialSeparatingVector)
+	,m_contact(nullptr)
 	,m_contactBuffer(nullptr)
 	,m_timestep(dFloat32(1.0e10f))
 	,m_separationDistance(dFloat32(0.0f))
@@ -78,12 +78,12 @@ ndContactSolver::ndContactSolver(ndShapeInstance* const instance)
 
 ndContactSolver::ndContactSolver(ndContact* const contact)
 	:dDownHeap<ndMinkFace*, dFloat32>(m_heapBuffer, sizeof(m_heapBuffer))
-	,m_contact(contact)
 	,m_instance0(contact->GetBody0()->GetCollisionShape())
 	,m_instance1(contact->GetBody1()->GetCollisionShape())
 	,m_closestPoint0(dVector::m_zero)
 	,m_closestPoint1(dVector::m_zero)
 	,m_separatingVector(ndContact::m_initialSeparatingVector)
+	,m_contact(contact)
 	,m_contactBuffer(nullptr)
 	,m_timestep(dFloat32 (1.0e10f))
 	,m_separationDistance(dFloat32(0.0f))
@@ -193,7 +193,7 @@ dInt32 ndContactSolver::ConvexContacts()
 	return count;
 }
 
-dInt32 ndContactSolver::CalculatePairContacts(dInt32 threadIndex)
+dInt32 ndContactSolver::CalculatePairContacts(dInt32)
 {
 	//ndContact* const contact = pair->m_contact;
 	//dgBody* const body0 = contact->m_body0;
@@ -1302,7 +1302,7 @@ dInt32 ndContactSolver::Prune2dContacts(const dMatrix& matrix, dInt32 count, ndC
 	dInt32 hullCount = 2;
 	dInt32 stackIndex = 2;
 	dFloat32 totalArea = dFloat32(0.0f);
-	while (stackIndex && count && (hullCount < sizeof(convexHull) / sizeof(convexHull[0]))) 
+	while (stackIndex && count && (hullCount < dInt32 (sizeof(convexHull) / sizeof(convexHull[0])))) 
 	{
 		stackIndex--;
 
@@ -1344,7 +1344,7 @@ dInt32 ndContactSolver::Prune2dContacts(const dMatrix& matrix, dInt32 count, ndC
 			}
 		}
 	}
-	dAssert(hullCount < sizeof(convexHull) / sizeof(convexHull[0]));
+	dAssert(hullCount < dInt32 (sizeof(convexHull) / sizeof(convexHull[0])));
 
 	dUpHeap<ndConvexFaceNode*, dFloat32> sortHeap(array, sizeof(array));
 	ndConvexFaceNode* hullPoint = &convexHull[0];
@@ -2120,7 +2120,7 @@ dInt32 ndContactSolver::CalculateIntersectingPlane(dInt32 count)
 
 						m_deletedFaceList[deletedCount] = face;
 						deletedCount++;
-						dAssert(deletedCount < sizeof(m_deletedFaceList) / sizeof(m_deletedFaceList[0]));
+						dAssert(deletedCount < dInt32 (sizeof(m_deletedFaceList) / sizeof(m_deletedFaceList[0])));
 						face->m_mark = 1;
 
 						for (dInt32 i = 0; i < 3; i++) 
@@ -2130,7 +2130,7 @@ dInt32 ndContactSolver::CalculateIntersectingPlane(dInt32 count)
 							{
 								m_faceStack[stackIndex] = twinFace;
 								stackIndex++;
-								dAssert(stackIndex < sizeof(m_faceStack) / sizeof(m_faceStack[0]));
+								dAssert(stackIndex < dInt32 (sizeof(m_faceStack) / sizeof(m_faceStack[0])));
 							}
 						}
 					}
@@ -2164,7 +2164,7 @@ dInt32 ndContactSolver::CalculateIntersectingPlane(dInt32 count)
 
 								m_coneFaceList[newCount] = newFace;
 								newCount++;
-								dAssert(newCount < sizeof(m_coneFaceList) / sizeof(m_coneFaceList[0]));
+								dAssert(newCount < dInt32 (sizeof(m_coneFaceList) / sizeof(m_coneFaceList[0])));
 							}
 							else 
 							{
@@ -2202,7 +2202,7 @@ dInt32 ndContactSolver::CalculateIntersectingPlane(dInt32 count)
 				}
 
 				m_vertexIndex++;
-				dAssert(m_vertexIndex < sizeof(m_hullDiff) / sizeof(m_hullDiff[0]));
+				dAssert(m_vertexIndex < dInt32 (sizeof(m_hullDiff) / sizeof(m_hullDiff[0])));
 				//dAssert(SanityCheck());
 			}
 		}

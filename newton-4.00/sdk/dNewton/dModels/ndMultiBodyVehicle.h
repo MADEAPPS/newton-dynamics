@@ -39,7 +39,7 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode);
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
 
-	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const tire, const ndContactMaterial& contactPoint) const
+	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const
 	{
 		return dFloat32(2.0f);
 	}
@@ -74,7 +74,7 @@ class ndMultiBodyVehicle: public ndModel
 	protected:
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	D_NEWTON_API virtual void Update(ndWorld* const world, dFloat32 timestep);
-	virtual void PostUpdate(ndWorld* const world, dFloat32 timestep) {}
+	virtual void PostUpdate(ndWorld* const, dFloat32) {}
 
 	dMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;

@@ -33,7 +33,7 @@ class dFixSizeBuffer: public dClassAlloc
 	{
 	}
 
-	const dInt32 GetSize() const 
+	dInt32 GetSize() const 
 	{
 		return size;
 	}

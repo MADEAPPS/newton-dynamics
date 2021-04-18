@@ -19,11 +19,11 @@ ndContactCallback::ndContactCallback()
 	m_materialMap.Insert(ndMaterial(), ndMaterailKey(0, 0));
 }
 
-void ndContactCallback::OnBodyAdded(ndBodyKinematic* const body) const
+void ndContactCallback::OnBodyAdded(ndBodyKinematic* const) const
 {
 }
 
-void ndContactCallback::OnBodyRemoved(ndBodyKinematic* const body) const
+void ndContactCallback::OnBodyRemoved(ndBodyKinematic* const) const
 {
 }
 
@@ -38,14 +38,15 @@ ndMaterial& ndContactCallback::RegisterMaterial(dUnsigned32 id0, dUnsigned32 id1
 	return node->GetInfo();
 }
 
-ndMaterial ndContactCallback::GetMaterial(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const
+//ndMaterial ndContactCallback::GetMaterial(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const
+ndMaterial ndContactCallback::GetMaterial(const ndContact* const, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const
 {
 	ndMaterailKey key(instance0.GetMaterial().m_userId, instance1.GetMaterial().m_userId);
 	dTree<ndMaterial, ndMaterailKey>::dTreeNode* const node = m_materialMap.Find(key);
 	return node ? node->GetInfo() : ndMaterial();
 }
 
-bool ndContactCallback::OnAabbOverlap(const ndContact* const contactJoint, dFloat32 timestep)
+bool ndContactCallback::OnAabbOverlap(const ndContact* const contactJoint, dFloat32)
 {
 	const ndBodyKinematic* const body0 = contactJoint->GetBody0();
 	const ndBodyKinematic* const body1 = contactJoint->GetBody1();
@@ -110,7 +111,8 @@ void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 	}
 }
 
-void ndContactCallback::OnContactCallback(dInt32 threadIndex, const ndContact* const contactJoint, dFloat32 timestep)
+//void ndContactCallback::OnContactCallback(dInt32 threadIndex, const ndContact* const contactJoint, dFloat32 timestep)
+void ndContactCallback::OnContactCallback(dInt32, const ndContact* const contactJoint, dFloat32)
 {
 	const ndMaterial& material = contactJoint->GetMaterial();
 	if (material.m_userFlags & m_playSound)

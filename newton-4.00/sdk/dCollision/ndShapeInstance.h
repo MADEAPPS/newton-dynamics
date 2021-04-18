@@ -85,7 +85,6 @@ class ndShapeInstance: public dClassAlloc
 		ndShapeInstance* m_shape1;
 	};
 
-
 	enum ndScaleType
 	{
 		m_unit,
@@ -111,7 +110,7 @@ class ndShapeInstance: public dClassAlloc
 	D_COLLISION_API ndShapeInfo GetShapeInfo() const;
 
 	D_COLLISION_API dFloat32 CalculateBuoyancyCenterOfPresure(dVector& com, const dMatrix& matrix, const dVector& fluidPlane) const;
-	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
+	D_COLLISION_API void Save(nd::TiXmlElement* const rootNode, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
 	D_COLLISION_API static dVector GetBoxPadding();
 

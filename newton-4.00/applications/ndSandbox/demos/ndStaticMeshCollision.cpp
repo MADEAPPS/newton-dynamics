@@ -84,7 +84,7 @@ static void AddPlatform(ndDemoEntityManager* const scene, dFloat32 mass, const d
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	//dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y += 1.0f;
 
 	ndShapeInstance shape(new ndShapeBox(2.0f, 0.25f, 2.5f));

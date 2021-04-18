@@ -30,7 +30,7 @@ ndShapePoint::ndShapePoint()
 {
 }
 
-ndShapePoint::ndShapePoint(const nd::TiXmlNode* const xmlNode)
+ndShapePoint::ndShapePoint(const nd::TiXmlNode* const)
 	: ndShapeConvex(m_pointCollision)
 {
 }
@@ -50,7 +50,7 @@ void ndShapePoint::MassProperties()
 	//m_centerOfMass.m_w = volume;
 }
 
-void ndShapePoint::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const
+void ndShapePoint::CalcAABB(const dMatrix&, dVector &, dVector &) const
 {
 	dAssert(0);
 	//dVector size(m_radius);
@@ -58,19 +58,19 @@ void ndShapePoint::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) con
 	//p1 = (matrix[3] + size) & dVector::m_triplexMask;
 }
 
-dVector ndShapePoint::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const
+dVector ndShapePoint::SupportVertexSpecialProjectPoint(const dVector&, const dVector&) const
 {
 	dAssert(0);
 	//return dir.Scale(m_radius - D_PENETRATION_TOL);
 	return dVector::m_zero;
 }
 
-dVector ndShapePoint::SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const
+dVector ndShapePoint::SupportVertexSpecial(const dVector&, dFloat32, dInt32* const) const
 {
 	return dVector::m_zero;
 }
 
-dVector ndShapePoint::SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
+dVector ndShapePoint::SupportVertex(const dVector&, dInt32* const) const
 {
 	dAssert(0);
 	//dAssert(dir.m_w == dFloat32(0.0f));
@@ -88,7 +88,7 @@ dInt32 ndShapePoint::CalculatePlaneIntersection(const dVector& normal, const dVe
 	return 1;
 }
 
-dFloat32 ndShapePoint::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapePoint::RayCast(ndRayCastNotify&, const dVector&, const dVector&, dFloat32, const ndBody* const, ndContactPoint&) const
 {
 	dAssert(0);
 	return dFloat32 (1.2f);
@@ -111,7 +111,7 @@ ndShapeInfo ndShapePoint::GetShapeInfo() const
 	return info;
 }
 
-void ndShapePoint::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+void ndShapePoint::DebugShape(const dMatrix&, ndShapeDebugCallback&) const
 {
 	dAssert(0);
 	//dVector tmpVectex[1024 * 2];
@@ -145,7 +145,7 @@ void ndShapePoint::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debug
 	//}
 }
 
-D_COLLISION_API void ndShapePoint::Save( nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid ) const
+D_COLLISION_API void ndShapePoint::Save( nd::TiXmlElement* const xmlNode, const char* const, dInt32 nodeid ) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapePoint");
 	xmlNode->LinkEndChild(paramNode);

@@ -112,7 +112,7 @@ void ndShapeCapsule::Init(dFloat32 radio0, dFloat32 radio1, dFloat32 height)
 			tempVertex[index] = dVector(x0, y * r0, z * r0, dFloat32(0.0f));
 			index++;
 			angle += (dFloat32(2.0f) * dPi) / DG_CAPSULE_CAP_SEGMENTS;
-			dAssert(index < sizeof(tempVertex) / sizeof(tempVertex[0]));
+			dAssert(index < dInt32 (sizeof(tempVertex) / sizeof(tempVertex[0])));
 		}
 	}
 
@@ -132,7 +132,7 @@ void ndShapeCapsule::Init(dFloat32 radio0, dFloat32 radio1, dFloat32 height)
 			tempVertex[index] = dVector(x1, y * r1, z * r1, dFloat32(0.0f));
 			index++;
 			angle += (dFloat32(2.0f) * dPi) / DG_CAPSULE_CAP_SEGMENTS;
-			dAssert(index < sizeof(tempVertex) / sizeof(tempVertex[0]));
+			dAssert(index < dInt32 (sizeof(tempVertex) / sizeof(tempVertex[0])));
 		}
 		x1 += step;
 	}
@@ -368,7 +368,7 @@ dVector ndShapeCapsule::SupportVertexSpecialProjectPoint(const dVector& testPoin
 }
 
 
-dVector ndShapeCapsule::SupportVertex(const dVector& direction, dInt32* const vertexIndex) const
+dVector ndShapeCapsule::SupportVertex(const dVector& direction, dInt32* const) const
 {
 	dVector dir(direction * m_transform);
 	dAssert(dir.m_w == dFloat32(0.0f));
@@ -387,7 +387,7 @@ dVector ndShapeCapsule::SupportVertex(const dVector& direction, dInt32* const ve
 	return p0 * m_transform;
 }
 
-dVector ndShapeCapsule::SupportVertexSpecial(const dVector& direction, dFloat32 skinThickness, dInt32* const vertexIndex) const
+dVector ndShapeCapsule::SupportVertexSpecial(const dVector& direction, dFloat32, dInt32* const) const
 {
 	dVector dir(direction * m_transform);
 	dAssert(dir.m_w == dFloat32(0.0f));
@@ -406,7 +406,7 @@ dVector ndShapeCapsule::SupportVertexSpecial(const dVector& direction, dFloat32 
 	return p0 * m_transform;
 }
 
-dFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const dVector& r0, const dVector& r1, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const dVector& r0, const dVector& r1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
 	dVector q0(r0 * m_transform);
 	dVector q1(r1 * m_transform);
@@ -461,7 +461,7 @@ dFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const dVector& r0, c
 		}
 	}
 
-	dFloat32 ret = ndShapeConvex::RayCast(callback, q0, q1, body, contactOut);
+	dFloat32 ret = ndShapeConvex::RayCast(callback, q0, q1, maxT, body, contactOut);
 	if (ret <= dFloat32(1.0f)) 
 	{
 		contactOut.m_normal = m_transform * contactOut.m_normal;
@@ -514,7 +514,7 @@ void ndShapeCapsule::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) c
 	p1 = max_q0.GetMax(max_q1) & dVector::m_triplexMask;
 }
 
-void ndShapeCapsule::Save( nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid ) const
+void ndShapeCapsule::Save( nd::TiXmlElement* const xmlNode, const char* const, dInt32 nodeid ) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeCapsule");
 	xmlNode->LinkEndChild(paramNode);

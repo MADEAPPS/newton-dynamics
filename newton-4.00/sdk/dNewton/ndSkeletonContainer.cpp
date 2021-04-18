@@ -1240,7 +1240,7 @@ void ndSkeletonContainer::SolveLcp(dInt32 stride, dInt32 size, const dFloat32* c
 		dInt32 iterCount = 0;
 		dFloat32 tolerance(tol2 * dFloat32(2.0f));
 		const dFloat32* const invDiag = invDiag1;
-		const dFloat32 one = dFloat32(1.0f);
+		//const dFloat32 one = dFloat32(1.0f);
 		for (dInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); k++) 
 		{
 			base = 0;
@@ -1332,7 +1332,7 @@ void ndSkeletonContainer::SolveBlockLcp(dInt32 size, dInt32 blockSize, const dFl
 	}
 }
 
-void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const
+void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const ndForcePair* const, ndForcePair* const force) const
 {
 	dFloat32* const f = dAlloca(dFloat32, m_rowCount);
 	dFloat32* const b = dAlloca(dFloat32, m_auxiliaryRowCount);
@@ -1419,7 +1419,7 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 	}
 }
 
-void ndSkeletonContainer::CalculateJointForce(const ndBodyKinematic** const bodyArray, ndJacobian* const internalForces)
+void ndSkeletonContainer::CalculateJointForce(const ndBodyKinematic** const, ndJacobian* const internalForces)
 {
 	D_TRACKTIME();
 	if (m_isResting)

@@ -154,7 +154,7 @@ void ndShapeChamferCylinder::Init (dFloat32 radius, dFloat32 height)
 
 
 //void ndShapeChamferCylinder::Serialize(dgSerialize callback, void* const userData) const
-void ndShapeChamferCylinder::Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const
+void ndShapeChamferCylinder::Save(nd::TiXmlElement* const xmlNode, const char* const, dInt32 nodeid) const
 {
 	//dVector size(m_radius, m_height * dFloat32(2.0f), dFloat32(0.0f), dFloat32(0.0f));
 	//SerializeLow(callback, userData);
@@ -267,7 +267,7 @@ dVector ndShapeChamferCylinder::SupportVertexSpecialProjectPoint(const dVector& 
 	return point + dir.Scale(m_height - D_PENETRATION_TOL);
 }
 
-dVector ndShapeChamferCylinder::SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
+dVector ndShapeChamferCylinder::SupportVertex(const dVector& dir, dInt32* const) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
@@ -283,7 +283,7 @@ dVector ndShapeChamferCylinder::SupportVertex(const dVector& dir, dInt32* const 
 	return sideDir.Scale(m_radius) + dir.Scale(m_height);
 }
 
-dVector ndShapeChamferCylinder::SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const
+dVector ndShapeChamferCylinder::SupportVertexSpecial(const dVector& dir, dFloat32, dInt32* const) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
@@ -299,8 +299,9 @@ dVector ndShapeChamferCylinder::SupportVertexSpecial(const dVector& dir, dFloat3
 	return sideDir.Normalize().Scale(m_radius);
 }
 
-dFloat32 ndShapeChamferCylinder::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeChamferCylinder::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
+	dAssert(0);
 	if (localP0.m_x > m_height) 
 	{
 		if (localP1.m_x < m_height) 
@@ -344,7 +345,7 @@ dFloat32 ndShapeChamferCylinder::RayCast(ndRayCastNotify& callback, const dVecto
 	if (dAbs(dir.m_x) > 0.9999f) 
 	{
 		//return ndShapeConvex::RayCast(localP0, localP1, maxT, contactOut, body, nullptr, nullptr);
-		return ndShapeConvex::RayCast(callback, localP0, localP1, body, contactOut);
+		return ndShapeConvex::RayCast(callback, localP0, localP1, maxT, body, contactOut);
 	}
 
 	dVector p0(localP0 & dVector::m_triplexMask);

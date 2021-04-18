@@ -29,7 +29,7 @@
 #include "dMemory.h"
 #include "dPolygonSoupDatabase.h"
 
-dPolygonSoupDatabase::dPolygonSoupDatabase(const char* const name)
+dPolygonSoupDatabase::dPolygonSoupDatabase(const char* const)
 {
 	m_vertexCount = 0;
 	m_strideInBytes = 0;

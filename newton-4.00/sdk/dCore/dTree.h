@@ -234,7 +234,7 @@ class dTree
 	~dTree (); 
 
 	operator dInt32() const;
-	const dInt32 GetCount() const;
+	dInt32 GetCount() const;
 
 	dTreeNode* GetRoot () const;
 	dTreeNode* Minimum () const;
@@ -338,7 +338,7 @@ dTree<OBJECT, KEY, allocator>::operator dInt32() const
 }
 
 template<class OBJECT, class KEY, class allocator>
-const dInt32 dTree<OBJECT, KEY, allocator>::GetCount() const
+dInt32 dTree<OBJECT, KEY, allocator>::GetCount() const
 {
 	return m_count;
 }

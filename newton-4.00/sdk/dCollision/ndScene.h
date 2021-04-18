@@ -88,7 +88,7 @@ class ndScene
 
 	void Sync();
 
-	const dInt32 GetThreadCount() const;
+	dInt32 GetThreadCount() const;
 	virtual ndWorld* GetWorld() const;
 	const ndBodyList& GetBodyList() const;
 
@@ -198,7 +198,7 @@ inline ndWorld* ndScene::GetWorld() const
 	return nullptr;
 }
 
-inline const dInt32 ndScene::GetThreadCount() const
+inline dInt32 ndScene::GetThreadCount() const
 {
 	const dThreadPool& pool = *this;
 	return pool.GetCount();

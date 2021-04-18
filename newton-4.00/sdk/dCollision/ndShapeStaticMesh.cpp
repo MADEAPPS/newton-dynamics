@@ -117,7 +117,7 @@ void ndPolygonMeshDesc::SortFaceArray()
 #endif
 }
 
-ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, void* const userData)
+ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, void* const)
 	:dFastAabbInfo()
 	,m_boxDistanceTravelInMeshSpace(dVector::m_zero)
 	//,m_threadNumber(proxy.m_threadIndex)
@@ -209,7 +209,8 @@ void ndShapeStaticMesh::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1
 }
 
 
-dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 stride, const dPlane& localPlane, dVector* const contactsOut) const
+//dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 stride, const dPlane& localPlane, dVector* const contactsOut) const
+dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dFloat32* const, const dInt32* const, dInt32, dInt32, const dPlane&, dVector* const) const
 {
 	dAssert(0);
 	return 0;

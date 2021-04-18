@@ -48,7 +48,8 @@
 			MemWrite(&item->zoneBegin.thread, thread);
 			MemWrite(&item->zoneBegin.srcloc, (uint64_t)srcloc);
 			tail.store(magic + 1, std::memory_order_release);
-			return long long(thread);
+			//return long long(thread);
+			return thread;
 		} 
 		else 
 		{

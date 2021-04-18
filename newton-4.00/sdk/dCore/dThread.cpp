@@ -24,10 +24,10 @@
 #include "dProfiler.h"
 
 dThread::dThread()
+	:dSemaphore()
 #ifndef D_USE_THREAD_EMULATION
-	:dAtomic<bool>(true)
+	,dAtomic<bool>(true)
 	,std::condition_variable()
-	,dSemaphore()
 	,std::thread(&dThread::ThreadFunctionCallback, this)
 #endif
 {

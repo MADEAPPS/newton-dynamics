@@ -165,7 +165,7 @@ stackHigh = 30;
 	for (dInt32 i = 0; i < count; i++)
 	{
 		origin1.m_x += 3.0f;
-		BuildPyramid(scene, rootEntity, shape, 1.0f, origin1, boxSize, stackHigh);
+		BuildPyramid(scene, rootEntity, shape, mass, origin1, boxSize, stackHigh);
 	}
 	geometry->Release();
 }
@@ -177,10 +177,10 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 
 	dVector origin(0.0f, 0.0f, 4.0f, 0.0f);
-	//BuildBoxStack(scene, 1.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+	BuildBoxStack(scene, 1.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 
 	origin.m_z = -4.0f;
-	//BuildCylinderStack(scene, 1.0f, origin, dVector(0.5f, 0.4f, 0.5f, 0.0f), 20);
+	BuildCylinderStack(scene, 1.0f, origin, dVector(0.5f, 0.4f, 0.5f, 0.0f), 20);
 	
 	origin.m_x += 4.0f;
 	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 20);

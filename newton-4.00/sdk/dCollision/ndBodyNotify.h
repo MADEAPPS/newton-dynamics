@@ -89,7 +89,7 @@ inline void* ndBodyNotify::GetUserData() const
 	return nullptr;
 }
 
-inline void ndBodyNotify::OnTranform(dInt32 threadIndex, const dMatrix& matrix)
+inline void ndBodyNotify::OnTranform(dInt32, const dMatrix&)
 {
 }
 

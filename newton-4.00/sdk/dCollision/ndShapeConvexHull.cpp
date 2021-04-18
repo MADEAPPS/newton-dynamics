@@ -856,24 +856,24 @@ inline dVector ndShapeConvexHull::SupportVertexhierarchical(const dVector& dir, 
 					distPool[stack] = leftBoxDist;
 					stackPool[stack] = &leftBox1;
 					stack++;
-					dAssert(stack < sizeof(distPool) / sizeof(distPool[0]));
+					dAssert(stack < dInt32 (sizeof(distPool) / sizeof(distPool[0])));
 
 					distPool[stack] = rightBoxDist;
 					stackPool[stack] = &rightBox1;
 					stack++;
-					dAssert(stack < sizeof(distPool) / sizeof(distPool[0]));
+					dAssert(stack < dInt32 (sizeof(distPool) / sizeof(distPool[0])));
 				}
 				else
 				{
 					distPool[stack] = rightBoxDist;
 					stackPool[stack] = &rightBox1;
 					stack++;
-					dAssert(stack < sizeof(distPool) / sizeof(distPool[0]));
+					dAssert(stack < dInt32 (sizeof(distPool) / sizeof(distPool[0])));
 
 					distPool[stack] = leftBoxDist;
 					stackPool[stack] = &leftBox1;
 					stack++;
-					dAssert(stack < sizeof(distPool) / sizeof(distPool[0]));
+					dAssert(stack < dInt32 (sizeof(distPool) / sizeof(distPool[0])));
 				}
 			}
 			else
@@ -945,7 +945,7 @@ void ndShapeConvexHull::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& 
 		{
 			vertex[count] = m_vertex[ptr->m_vertex];
 			count++;
-			dAssert(count < sizeof(vertex) / sizeof(vertex[0]));
+			dAssert(count < dInt32 (sizeof(vertex) / sizeof(vertex[0])));
 			ptr = ptr->m_next;
 		} while (ptr != face);
 		matrix.TransformTriplex(&vertex[0].m_x, sizeof(dVector), &vertex[0].m_x, sizeof(dVector), count);
@@ -953,7 +953,7 @@ void ndShapeConvexHull::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& 
 	}
 }
 
-D_COLLISION_API void ndShapeConvexHull::Save( nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid ) const
+D_COLLISION_API void ndShapeConvexHull::Save( nd::TiXmlElement* const xmlNode, const char* const, dInt32 nodeid ) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeConvexHull");
 	xmlNode->LinkEndChild(paramNode);

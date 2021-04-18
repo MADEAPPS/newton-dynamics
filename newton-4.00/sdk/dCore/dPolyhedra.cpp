@@ -2989,7 +2989,7 @@ dMatrix dPolyhedra::CalculateSphere(dBigVector& size, const dFloat64* const vert
 		sphere.m_front = dVector(dFloat32(Ixx), dFloat32(Ixy), dFloat32(Ixz), dFloat32(0.0f));
 		sphere.m_up    = dVector(dFloat32(Ixy), dFloat32(Iyy), dFloat32(Iyz), dFloat32(0.0f));
 		sphere.m_right = dVector(dFloat32(Ixz), dFloat32(Iyz), dFloat32(Izz), dFloat32(0.0f));
-		dVector eigenValues(sphere.EigenVectors());
+		//dVector eigenValues(sphere.EigenVectors());
 
 		dVector minVal(dFloat32(1e15f));
 		dVector maxVal(dFloat32(-1e15f));

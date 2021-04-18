@@ -51,22 +51,22 @@ inline ndBodyTriggerVolume* ndBodyTriggerVolume::GetAsBodyTriggerVolume()
 	return this; 
 }
 
-inline void ndBodyTriggerVolume::OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep)
+inline void ndBodyTriggerVolume::OnTriggerEnter(ndBodyKinematic* const, dFloat32)
 {
 	//dAssert(0);
 }
 
-inline void ndBodyTriggerVolume::OnTrigger(ndBodyKinematic* const body, dFloat32 timestep)
+inline void ndBodyTriggerVolume::OnTrigger(ndBodyKinematic* const, dFloat32)
 {
 	//dAssert(0);
 }
 
-inline void ndBodyTriggerVolume::OnTriggerExit(ndBodyKinematic* const body, dFloat32 timestep)
+inline void ndBodyTriggerVolume::OnTriggerExit(ndBodyKinematic* const, dFloat32)
 {
 	//dAssert(0);
 }
 
-inline void ndBodyTriggerVolume::IntegrateExternalForce(dFloat32 timestep) 
+inline void ndBodyTriggerVolume::IntegrateExternalForce(dFloat32) 
 {
 }
 

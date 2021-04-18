@@ -161,7 +161,7 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndWorld* con
 	ndMultiBodyVehicleDifferentialAxle* const leftAxle = new ndMultiBodyVehicleDifferentialAxle(pin0, upPin, differentialBody, leftPin1, leftTire->GetBody0());
 	world->AddJoint(leftAxle);
 
-	dVector rightPin1(rightTire->GetBody0()->GetMatrix().RotateVector(rightTire->GetLocalMatrix0().m_front));
+	//dVector rightPin1(rightTire->GetBody0()->GetMatrix().RotateVector(rightTire->GetLocalMatrix0().m_front));
 	ndMultiBodyVehicleDifferentialAxle* const rightAxle = new ndMultiBodyVehicleDifferentialAxle(pin0, upPin.Scale (dFloat32 (-1.0f)), differentialBody, leftPin1, rightTire->GetBody0());
 	world->AddJoint(rightAxle);
 
@@ -451,7 +451,8 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 }
 
 
-void ndMultiBodyVehicle::Update(ndWorld* const world, dFloat32 timestep)
+//void ndMultiBodyVehicle::Update(ndWorld* const world, dFloat32 timestep)
+void ndMultiBodyVehicle::Update(ndWorld* const, dFloat32)
 {
 //static dInt32 xxxx;
 //if (xxxx >= 550) {

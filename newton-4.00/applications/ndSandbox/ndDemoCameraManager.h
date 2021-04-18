@@ -38,7 +38,8 @@ class ndDemoCameraManager: public dClassAlloc
 	void RenderPickedTarget () const;
 	void InterpolateMatrices (ndDemoEntityManager* const scene, dFloat32 timeStepFraction);
 
-	virtual void FixUpdate(ndDemoEntityManager* const scene, dFloat32 timestep);
+	//virtual void FixUpdate(ndDemoEntityManager* const scene, dFloat32 timestep);
+	void FixUpdate(ndDemoEntityManager* const scene, dFloat32 timestep);
 
 	void ResetPickBody();
 

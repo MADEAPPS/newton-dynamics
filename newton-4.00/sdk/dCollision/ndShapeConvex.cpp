@@ -274,14 +274,14 @@ void ndShapeConvex::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) co
 	p1 = (origin + size) & dVector::m_triplexMask;
 }
 
-dFloat32 ndShapeConvex::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeConvex::RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32, const ndBody* const body, ndContactPoint& contactOut) const
 {
 	ndBodyKinematic* const kinBody = ((ndBodyKinematic*)body)->GetAsBodyKinematic();
 	ndContactSolver rayCaster(&kinBody->GetCollisionShape());
 	return rayCaster.RayCast(localP0, localP1, contactOut);
 }
 
-dVector ndShapeConvex::SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
+dVector ndShapeConvex::SupportVertex(const dVector& dir, dInt32* const) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));

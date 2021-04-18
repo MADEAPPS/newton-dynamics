@@ -120,7 +120,7 @@ class dPolyhedra: public dClassAlloc, public dTree <dEdge, dEdgeKey>
 	D_CORE_API dPolyhedra (const dPolyhedra &polyhedra);
 	D_CORE_API virtual ~dPolyhedra();
 
-	virtual bool ReportProgress(dFloat32 percentProgress) const { return true;}
+	virtual bool ReportProgress(dFloat32) const { return true;}
 
 	virtual void BeginFace();
 	dEdge* AddFace (dInt32 v0, dInt32 v1, dInt32 v2);

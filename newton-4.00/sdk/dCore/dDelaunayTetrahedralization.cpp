@@ -123,12 +123,13 @@ dInt32 dDelaunayTetrahedralization::AddVertex (const dBigVector& vertex)
 	return index;
 }
 
-dInt32 dDelaunayTetrahedralization::CompareVertexByIndex(const dConvexHull4dVector* const  A, const dConvexHull4dVector* const B, void* const context)
+dInt32 dDelaunayTetrahedralization::CompareVertexByIndex(const dConvexHull4dVector* const A, const dConvexHull4dVector* const B, void* const)
 {
 	if (A->m_index < B ->m_index) 
 	{
 		return -1;
-	} else if (A->m_index > B->m_index) 
+	} 
+	else if (A->m_index > B->m_index) 
 	{
 		return 1;
 	}

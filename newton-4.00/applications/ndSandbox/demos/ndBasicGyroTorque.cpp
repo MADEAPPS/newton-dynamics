@@ -62,7 +62,7 @@ static void DzhanibekovEffect(ndDemoEntityManager* const scene, dFloat32 mass, d
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	//dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y += 5.0f;
 
 	ndShapeInstance shape(new ndShapeBox(2.0f, 0.5f, 1.0));
@@ -93,7 +93,7 @@ static void Phitop(ndDemoEntityManager* const scene, dFloat32 mass, dFloat32 ang
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	//dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y += 0.5f;
 
 	ndShapeInstance shape(new ndShapeSphere(1.0f));
@@ -126,7 +126,7 @@ static void RattleBack(ndDemoEntityManager* const scene, dFloat32 mass, const dV
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	//dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y += 0.25f;
 
 	dMatrix shapeMatrix(dYawMatrix(5.0f * dDegreeToRad));
@@ -167,7 +167,7 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const dVector& origi
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	//dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y += 1.0f;
 
 	const dFloat32 mass = 1.0f;

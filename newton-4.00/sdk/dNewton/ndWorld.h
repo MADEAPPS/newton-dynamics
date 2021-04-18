@@ -101,7 +101,7 @@ class ndWorld: public dClassAlloc
 
 	ndBodyDynamic* GetSentinelBody() const;
 
-	const dInt32 GetSolverIterations() const;
+	dInt32 GetSolverIterations() const;
 	void SetSolverIterations(dInt32 iterations);
 
 	ndScene* GetScene() const;
@@ -223,7 +223,7 @@ inline ndScene* ndWorld::GetScene() const
 	return m_scene;
 }
 
-inline const dInt32 ndWorld::GetSolverIterations() const
+inline dInt32 ndWorld::GetSolverIterations() const
 {
 	return m_solverIterations;
 }
@@ -294,7 +294,7 @@ inline dUnsigned32 ndWorld::GetFrameIndex() const
 	return m_frameIndex;
 }
 
-inline void ndWorld::OnPostUpdate(dFloat32 timestep)
+inline void ndWorld::OnPostUpdate(dFloat32)
 {
 }
 

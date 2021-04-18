@@ -48,7 +48,7 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 
 	virtual ndBodyKinematic* GetBody0() const;
 	virtual ndBodyKinematic* GetBody1() const;
-	virtual const dUnsigned32 GetRowsCount() const;
+	virtual dUnsigned32 GetRowsCount() const;
 	virtual ndJointBilateralConstraint* GetAsBilateral() { return this; }
 	virtual void JacobianDerivative(ndConstraintDescritor& desc);
 	virtual ndJointBilateralSolverModel GetSolverModel() const;
@@ -132,7 +132,7 @@ inline void ndJointBilateralConstraint::SetSolverModel(ndJointBilateralSolverMod
 	m_solverModel = dClamp(model, m_jointIterativeSoft, m_jointModesCount);
 }
 
-inline const dUnsigned32 ndJointBilateralConstraint::GetRowsCount() const
+inline dUnsigned32 ndJointBilateralConstraint::GetRowsCount() const
 {
 	return m_maxDof;
 }
@@ -226,7 +226,7 @@ inline void ndJointBilateralConstraint::SetHighFriction(ndConstraintDescritor& d
 	#endif
 }
 
-inline void ndJointBilateralConstraint::JacobianDerivative(ndConstraintDescritor& desc)
+inline void ndJointBilateralConstraint::JacobianDerivative(ndConstraintDescritor&)
 {
 	dAssert(0);
 }

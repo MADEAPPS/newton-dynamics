@@ -39,7 +39,7 @@ void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)
 		{
 		}
 
-		dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const collision)
+		dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
 		{
 			return ((ndBody*)body)->GetAsBodyTriggerVolume() ? 1 : 0;
 		}
@@ -66,12 +66,12 @@ void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)
 	m_hasPlane = hasPlane;
 }
 
-void ndArchimedesBuoyancyVolume::OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep)
+void ndArchimedesBuoyancyVolume::OnTriggerEnter(ndBodyKinematic* const body, dFloat32)
 {
 	CalculatePlane(body);
 }
 	
-void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, dFloat32 timestep)
+void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, dFloat32)
 {
 	ndBodyDynamic* const body = kinBody->GetAsBodyDynamic();
 	if (!m_hasPlane)
@@ -130,7 +130,7 @@ void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, dFloa
 	}
 }
 
-void ndArchimedesBuoyancyVolume::OnTriggerExit(ndBodyKinematic* const body, dFloat32 timestep)
+void ndArchimedesBuoyancyVolume::OnTriggerExit(ndBodyKinematic* const, dFloat32)
 {
 	//dTrace(("exit trigger body: %d\n", body->GetId()));
 }

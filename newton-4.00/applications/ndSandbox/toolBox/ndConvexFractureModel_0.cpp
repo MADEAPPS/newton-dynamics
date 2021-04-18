@@ -44,7 +44,7 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 						{
 							pointCloud2d[pointCount] = plane2d.m_polygon[i] - matrix.TransformVector(plane.m_polygon[j]);
 							pointCount++;
-							dAssert(pointCount < sizeof(pointCloud2d) / sizeof(pointCloud2d[0]));
+							dAssert(pointCount < dInt32(sizeof(pointCloud2d) / sizeof(pointCloud2d[0])));
 						}
 					}
 					pointCount = dConvexHull2d(pointCloud2d, pointCount);
@@ -106,7 +106,7 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 		dAssert(m_count < m_polygons.GetSize());
 	}
 
-	bool ndFaceArrayDatabase::IsFaceContact(ndShapeInstance* const shape)
+	bool IsFaceContact(ndShapeInstance* const shape)
 	{
 		ndFaceArrayDatabase siblingDataBase(-1.0f);
 		shape->DebugShape(dGetIdentityMatrix(), siblingDataBase);
@@ -259,9 +259,9 @@ void ndConvexFracture::ndDebrisNotify::OnObjectPick() const
 }
 
 ndConvexFracture::ndConvexFracture()
-	:m_singleManifoldMesh(nullptr)
-	,m_textureMatrix(dGetIdentityMatrix())
+	:m_textureMatrix(dGetIdentityMatrix())
 	,m_pointCloud()
+	,m_singleManifoldMesh(nullptr)
 	,m_innerTexture(nullptr)
 	,m_tileFactor(1.0f)
 	,m_mass(1.0f)
@@ -373,14 +373,16 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const dMatrix
 		//dAssert(debrisEnt->m_enumerator < bodyCount);
 	}
 
-	ndContactCallback* const callback = (ndContactCallback*)world->GetContactNotify();
+	//ndContactCallback* const callback = (ndContactCallback*)world->GetContactNotify();
 	ndBodyDynamic** const bodyArray = dAlloca(ndBodyDynamic*, bodyCount);
 	memset(bodyArray, 0, bodyCount * sizeof(ndBodyDynamic*));
 
+	
 	dInt32 debrisID = ndContactCallback::m_dedris;
-	ndMaterial& material0 = callback->RegisterMaterial(ndContactCallback::m_default, ndContactCallback::m_dedris);
 	dAssert(0);
-	material0;
+	//ndMaterial& material0 = callback->RegisterMaterial(ndContactCallback::m_default, ndContactCallback::m_dedris);
+	//dAssert(0);
+	//material0;
 	//ndMaterial& material1 = callback->RegisterMaterial(ndContactCallback::m_dedris, ndContactCallback::m_dedris);
 	//instanceShape.m_shapeMaterial.m_userParam[0].m_floatData = 10.0f;
 
@@ -426,9 +428,9 @@ else
 	for (dInt32 i = 0; i < jointConnection.GetCount(); i++)
 	{
 		bool test = false;
-		test = test || jointConnection[i].m_m0 == 0 && jointConnection[i].m_m1 == 1;
-		test = test || jointConnection[i].m_m0 == 0 && jointConnection[i].m_m1 == 3;
-		test = test || jointConnection[i].m_m0 == 0 && jointConnection[i].m_m1 == 5;
+		test = test || ((jointConnection[i].m_m0 == 0) && (jointConnection[i].m_m1 == 1));
+		test = test || ((jointConnection[i].m_m0 == 0) && (jointConnection[i].m_m1 == 3));
+		test = test || ((jointConnection[i].m_m0 == 0) && (jointConnection[i].m_m1 == 5));
 		test = true;
 		if (test)
 		{

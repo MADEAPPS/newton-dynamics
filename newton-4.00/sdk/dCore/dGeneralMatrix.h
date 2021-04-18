@@ -206,7 +206,7 @@ void dCovarianceMatrix(dInt32 size, T* const matrix, const T* const vectorA, con
 }
 
 template<class T>
-bool dCholeskyFactorizationAddRow(dInt32 size, dInt32 stride, dInt32 n, T* const matrix, T* const invDiagonalOut)
+bool dCholeskyFactorizationAddRow(dInt32, dInt32 stride, dInt32 n, T* const matrix, T* const invDiagonalOut)
 {
 	T* const rowN = &matrix[stride * n];
 

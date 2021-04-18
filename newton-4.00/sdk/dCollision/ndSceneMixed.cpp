@@ -227,7 +227,7 @@ void ndSceneMixed::BalanceScene()
 	UpdateFitness(m_fitness, m_treeEntropy, &m_rootNode);
 }
 
-void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body, bool oneWay)
+void ndSceneMixed::FindCollidinPairs(dInt32, ndBodyKinematic* const body, bool oneWay)
 {
 	//ndSceneNode* const leafNode = body->GetSceneBodyNode();
 	ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();

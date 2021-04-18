@@ -562,7 +562,7 @@ void ndBodyPlayerCapsuleContactSolver::CalculateContacts()
 			{
 				m_contactBuffer[m_contactCount] = contactBuffer[i];
 				m_contactCount++;
-				dAssert(m_contactCount < sizeof(m_contactBuffer) / sizeof(m_contactBuffer[0]));
+				dAssert(m_contactCount < dInt32 (sizeof(m_contactBuffer) / sizeof(m_contactBuffer[0])));
 			}
 		}
 	}

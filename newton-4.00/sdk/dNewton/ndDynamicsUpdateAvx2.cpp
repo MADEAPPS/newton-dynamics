@@ -27,18 +27,196 @@
 #include "ndDynamicsUpdateAvx2.h"
 #include "ndJointBilateralConstraint.h"
 
-using namespace ndAvx2;
+#define D_AVX_WORD_GROUP_SIZE	8 
+
+D_MSV_NEWTON_ALIGN_32
+class ndAvxFloat
+{
+	public:
+	D_INLINE ndAvxFloat()
+	{
+	}
+
+	D_INLINE ndAvxFloat(const dFloat32 val)
+		:m_type(_mm256_set1_ps(val))
+	{
+	}
+
+	D_INLINE ndAvxFloat(const __m256 type)
+		: m_type(type)
+	{
+	}
+
+	D_INLINE ndAvxFloat(const ndAvxFloat& copy)
+		: m_type(copy.m_type)
+	{
+	}
+
+	D_INLINE ndAvxFloat(const dVector& low, const dVector& high)
+		: m_type(_mm256_set_m128(high.m_type, low.m_type))
+	{
+	}
+
+	D_INLINE ndAvxFloat(const ndAvxFloat* const baseAddr, const ndAvxFloat& index)
+		: m_type(_mm256_i32gather_ps(&(*baseAddr)[0], index.m_typeInt, 4))
+	{
+	}
+
+	D_INLINE dFloat32& operator[] (dInt32 i)
+	{
+		dAssert(i < D_AVX_WORD_GROUP_SIZE);
+		dAssert(i >= 0);
+		//return m_f[i];
+		dFloat32* const ptr = (dFloat32*)&m_type;
+		return ptr[i];
+	}
+
+	D_INLINE const dFloat32& operator[] (dInt32 i) const
+	{
+		dAssert(i < D_AVX_WORD_GROUP_SIZE);
+		dAssert(i >= 0);
+		//return m_f[i];
+		const dFloat32* const ptr = (dFloat32*)&m_type;
+		return ptr[i];
+	}
+
+	D_INLINE ndAvxFloat operator+ (const ndAvxFloat& A) const
+	{
+		return _mm256_add_ps(m_type, A.m_type);
+	}
+
+	D_INLINE ndAvxFloat operator- (const ndAvxFloat& A) const
+	{
+		return _mm256_sub_ps(m_type, A.m_type);
+	}
+
+	D_INLINE ndAvxFloat operator* (const ndAvxFloat& A) const
+	{
+		return _mm256_mul_ps(m_type, A.m_type);
+	}
+
+	D_INLINE ndAvxFloat MulAdd(const ndAvxFloat& A, const ndAvxFloat& B) const
+	{
+		return _mm256_fmadd_ps(A.m_type, B.m_type, m_type);
+	}
+
+	D_INLINE ndAvxFloat MulSub(const ndAvxFloat& A, const ndAvxFloat& B) const
+	{
+		return _mm256_fnmadd_ps(A.m_type, B.m_type, m_type);
+	}
+
+	D_INLINE ndAvxFloat operator> (const ndAvxFloat& A) const
+	{
+		return _mm256_cmp_ps(m_type, A.m_type, _CMP_GT_OQ);
+	}
+
+	D_INLINE ndAvxFloat operator< (const ndAvxFloat& A) const
+	{
+		return _mm256_cmp_ps(m_type, A.m_type, _CMP_LT_OQ);
+	}
+
+	D_INLINE ndAvxFloat operator| (const ndAvxFloat& A) const
+	{
+		return _mm256_or_ps(m_type, A.m_type);
+	}
+
+	D_INLINE ndAvxFloat operator& (const ndAvxFloat& A) const
+	{
+		return _mm256_and_ps(m_type, A.m_type);
+	}
+
+	D_INLINE ndAvxFloat GetMin(const ndAvxFloat& A) const
+	{
+		return _mm256_min_ps(m_type, A.m_type);
+	}
+
+	D_INLINE ndAvxFloat GetMax(const ndAvxFloat& A) const
+	{
+		return _mm256_max_ps(m_type, A.m_type);
+	}
+
+	D_INLINE ndAvxFloat Select(const ndAvxFloat& data, const ndAvxFloat& mask) const
+	{
+		// (((b ^ a) & mask)^a)
+		//return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
+		return  _mm256_xor_ps(m_type, _mm256_and_ps(mask.m_type, _mm256_xor_ps(m_type, data.m_type)));
+	}
+
+
+	D_INLINE dFloat32 AddHorizontal() const
+	{
+		__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
+		__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
+		__m256 tmp2(_mm256_hadd_ps(tmp1, tmp1));
+		return *((dFloat32*)&tmp2);
+	}
+
+	static D_INLINE void FlushRegisters()
+	{
+		_mm256_zeroall();
+	}
+
+	union
+	{
+		__m256 m_type;
+		__m256i m_typeInt;
+	};
+} D_GCC_NEWTON_ALIGN_32;
+
+D_MSV_NEWTON_ALIGN_32
+class ndAvxVector3
+{
+	public:
+	ndAvxFloat m_x;
+	ndAvxFloat m_y;
+	ndAvxFloat m_z;
+} D_GCC_NEWTON_ALIGN_32;
+
+D_MSV_NEWTON_ALIGN_32
+class ndAvxVector6
+{
+	public:
+	ndAvxVector3 m_linear;
+	ndAvxVector3 m_angular;
+} D_GCC_NEWTON_ALIGN_32;
+
+D_MSV_NEWTON_ALIGN_32
+class ndOpenclJacobianPair
+{
+	public:
+	ndAvxVector6 m_jacobianM0;
+	ndAvxVector6 m_jacobianM1;
+}D_GCC_NEWTON_ALIGN_32;
+
+D_MSV_NEWTON_ALIGN_32
+class ndSoaMatrixElement
+{
+	public:
+	ndOpenclJacobianPair m_Jt;
+	ndOpenclJacobianPair m_JMinv;
+
+	ndAvxFloat m_force;
+	ndAvxFloat m_diagDamp;
+	ndAvxFloat m_invJinvMJt;
+	ndAvxFloat m_coordenateAccel;
+	ndAvxFloat m_normalForceIndex;
+	ndAvxFloat m_lowerBoundFrictionCoefficent;
+	ndAvxFloat m_upperBoundFrictionCoefficent;
+} D_GCC_NEWTON_ALIGN_32;
 
 ndDynamicsUpdateAvx2::ndDynamicsUpdateAvx2(ndWorld* const world)
 	:ndDynamicsUpdate(world)
 	,m_soaJointRows(D_DEFAULT_BUFFER_SIZE * 4)
 {
+	m_soaMassMatrixArray = new dArray<ndSoaMatrixElement>;
 }
 
 ndDynamicsUpdateAvx2::~ndDynamicsUpdateAvx2()
 {
 	Clear();
-	m_soaJointRows.Resize(1024);
+	//m_soaJointRows.Resize(1024);
+	dArray<ndSoaMatrixElement>* m_soaMassMatrix = (dArray<ndSoaMatrixElement>*)m_soaMassMatrixArray;
+	delete m_soaMassMatrix;
 }
 
 const char* ndDynamicsUpdateAvx2::GetStringId() const
@@ -283,7 +461,7 @@ void ndDynamicsUpdateAvx2::UpdateIslandState(const ndIsland& island)
 	}
 }
 
-dInt32 ndDynamicsUpdateAvx2::CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const context)
+dInt32 ndDynamicsUpdateAvx2::CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const)
 {
 	dUnsigned32 keyA = islandA->m_count * 2 + islandA->m_root->m_bodyIsConstrained;
 	dUnsigned32 keyB = islandB->m_count * 2 + islandB->m_root->m_bodyIsConstrained;
@@ -451,12 +629,12 @@ void ndDynamicsUpdateAvx2::SortJoints()
 
 		const ndSortKey key(resting, joint->m_rowCount);
 		dAssert(key.m_value >= 0);
-		dAssert(key.m_value < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
+		dAssert(key.m_value < dInt32 (sizeof(jointCountSpans) / sizeof(jointCountSpans[0])));
 		jointCountSpans[key.m_value] ++;
 	}
 
 	dInt32 acc = 0;
-	for (dInt32 i = 0; i < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]); i++)
+	for (dInt32 i = 0; i < dInt32 (sizeof(jointCountSpans) / sizeof(jointCountSpans[0])); i++)
 	{
 		const dInt32 val = jointCountSpans[i];
 		jointCountSpans[i] = acc;
@@ -473,7 +651,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 
 		const ndSortKey key(resting, joint->m_rowCount);
 		dAssert(key.m_value >= 0);
-		dAssert(key.m_value < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]));
+		dAssert(key.m_value < dInt32 (sizeof(jointCountSpans) / sizeof(jointCountSpans[0])));
 
 		const dInt32 entry = jointCountSpans[key.m_value];
 		jointArray[entry] = joint;
@@ -537,6 +715,8 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		m_soaJointRows[i] = soaJointRowCount;
 		soaJointRowCount += joint->m_rowCount;
 	}
+
+	dArray<ndSoaMatrixElement>& m_soaMassMatrix = *(dArray<ndSoaMatrixElement>*)m_soaMassMatrixArray;
 	m_soaMassMatrix.SetCount(soaJointRowCount);
 
 	dInt32 rowCount = 0;
@@ -852,7 +1032,7 @@ void ndDynamicsUpdateAvx2::InitBodyArray()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - me->GetUnconstrainedBodyCount();
-			const dFloat32 timestep = m_timestep;
+			//const dFloat32 timestep = m_timestep;
 
 			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{
@@ -1183,7 +1363,8 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
 			const ndLeftHandSide* const leftHandSide = &me->GetLeftHandSide()[0];
 			const ndRightHandSide* const rightHandSide = &me->GetRightHandSide()[0];
-			dArray<ndAvx2::ndSoaMatrixElement>& massMatrix = me->m_soaMassMatrix;
+			//dArray<ndSoaMatrixElement>& massMatrix = me->m_soaMassMatrix;
+			dArray<ndSoaMatrixElement>& massMatrix = *(dArray<ndSoaMatrixElement>*)me->m_soaMassMatrixArray;
 
 			const dInt32 mask = -dInt32(D_AVX_WORD_GROUP_SIZE);
 			const dInt32 soaJointCount = ((jointCount + D_AVX_WORD_GROUP_SIZE - 1) & mask) / D_AVX_WORD_GROUP_SIZE;
@@ -1234,7 +1415,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 						const ndLeftHandSide* const row5 = &leftHandSide[joint5->m_rowStart + j];
 						const ndLeftHandSide* const row6 = &leftHandSide[joint6->m_rowStart + j];
 						const ndLeftHandSide* const row7 = &leftHandSide[joint7->m_rowStart + j];
-						ndAvx2::ndSoaMatrixElement& row = massMatrix[soaRowBase + j];
+						ndSoaMatrixElement& row = massMatrix[soaRowBase + j];
 					
 						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
 							row0->m_Jt.m_jacobianM0.m_linear,
@@ -1364,7 +1545,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					const ndConstraint* const firstJoint = jointArray[index];
 					for (dInt32 j = 0; j < firstJoint->m_rowCount; j++)
 					{
-						ndAvx2::ndSoaMatrixElement& row = massMatrix[soaRowBase + j];
+						ndSoaMatrixElement& row = massMatrix[soaRowBase + j];
 						row.m_Jt.m_jacobianM0.m_linear.m_x = zero;
 						row.m_Jt.m_jacobianM0.m_linear.m_y = zero;
 						row.m_Jt.m_jacobianM0.m_linear.m_z = zero;
@@ -1411,7 +1592,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 						{
 							for (dInt32 k = 0; k < joint->m_rowCount; k++)
 							{
-								ndAvx2::ndSoaMatrixElement& row = massMatrix[soaRowBase + k];
+								ndSoaMatrixElement& row = massMatrix[soaRowBase + k];
 								const ndLeftHandSide* const lhs = &leftHandSide[joint->m_rowStart + k];
 					
 								row.m_Jt.m_jacobianM0.m_linear.m_x[j] = lhs->m_Jt.m_jacobianM0.m_linear.m_x;
@@ -1672,7 +1853,8 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 			const dInt32 soaJointCountBatches = ((jointCount + D_AVX_WORD_GROUP_SIZE - 1) & mask) / D_AVX_WORD_GROUP_SIZE;
 
 			const ndConstraint* const * jointArrayPtr = &jointArray[0];
-			ndSoaMatrixElement* const massMatrix = &me->m_soaMassMatrix[0];
+			//ndSoaMatrixElement* const massMatrix = &me->m_soaMassMatrix[0];
+			dArray<ndSoaMatrixElement>& massMatrix = *(dArray<ndSoaMatrixElement>*)me->m_soaMassMatrixArray;
 			for (dInt32 i = threadIndex; i < soaJointCountBatches; i += threadCount)
 			{
 				const ndConstraint* const * jointGroup = &jointArrayPtr[i * D_AVX_WORD_GROUP_SIZE];
@@ -1737,7 +1919,7 @@ void ndDynamicsUpdateAvx2::IntegrateBodiesVelocity()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - me->m_unConstrainedBodyCount;
-			const dFloat32 timestep = m_timestep;
+			//const dFloat32 timestep = m_timestep;
 
 			const dVector timestep4(me->m_timestepRK);
 			const dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));
@@ -2149,7 +2331,9 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			m_jointArray = &jointArray[0];
 
 			const dInt32* const soaJointRows = &me->m_soaJointRows[0];
-			ndSoaMatrixElement* const soaMassMatrix = &me->m_soaMassMatrix[0];
+			//ndSoaMatrixElement* const soaMassMatrix = &me->m_soaMassMatrix[0];
+			dArray<ndSoaMatrixElement>& soaMassMatrixArray = *(dArray<ndSoaMatrixElement>*)me->m_soaMassMatrixArray;
+			ndSoaMatrixElement* const soaMassMatrix = &soaMassMatrixArray[0];
 
 			dInt32 temp = -1;
 			m_mask = ndAvxFloat(*(dFloat32*)(&temp));

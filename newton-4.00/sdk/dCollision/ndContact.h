@@ -96,7 +96,7 @@ class ndContact
 
 	const ndMaterial& GetMaterial() const;
 
-	virtual const dUnsigned32 GetRowsCount() const;
+	virtual dUnsigned32 GetRowsCount() const;
 	virtual void JacobianDerivative(ndConstraintDescritor& desc);
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
 
@@ -151,7 +151,7 @@ inline dFloat32 ndContact::GetPruningTolerance() const
 	return m_contactPruningTolereance;
 }
 
-inline const dUnsigned32 ndContact::GetRowsCount() const
+inline dUnsigned32 ndContact::GetRowsCount() const
 {
 	return m_maxDOF;
 }

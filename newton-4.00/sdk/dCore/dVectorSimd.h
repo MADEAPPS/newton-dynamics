@@ -28,6 +28,10 @@
 	#define dVector dBigVector
 #else
 
+#ifdef D_USE_SSE3
+	//#define D_USE_SSE3
+#endif
+
 class dBigVector;
 // *****************************************************************************************
 //
@@ -210,7 +214,7 @@ class dVector
 
 	D_INLINE dVector DotProduct(const dVector& A) const
 	{
-		dVector tmp(_mm_mul_ps(m_type, A.m_type));
+		const dVector tmp(_mm_mul_ps(m_type, A.m_type));
 		return tmp.AddHorizontal();
 	}
 
@@ -273,8 +277,13 @@ class dVector
 
 	D_INLINE dVector AddHorizontal () const
 	{
-		__m128 tmp (_mm_hadd_ps (m_type, m_type));
-		return _mm_hadd_ps (tmp, tmp);
+		#ifdef D_USE_SSE3
+			__m128 tmp (_mm_hadd_ps (m_type, m_type));
+			return _mm_hadd_ps (tmp, tmp);
+		#else
+			__m128 tmp = _mm_add_ps (m_type, _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(1, 0, 3, 2)));
+			return _mm_add_ps(tmp, _mm_shuffle_ps(tmp, tmp, PERMUTE_MASK(2, 3, 0, 1)));
+		#endif	
 	}
 
 	D_INLINE dVector Abs () const
@@ -437,13 +446,14 @@ class dVector
 	}
 
 #ifdef _DEBUG
-	D_INLINE void Trace(char* const name) const
+	//D_INLINE void Trace(char* const name) const
+	D_INLINE void Trace(char* const) const
 	{
 		dAssert(0);
 		//dTrace(("%s %f %f %f %f\n", name, m_x, m_y, m_z, m_w));
 	}
 #else 
-	D_INLINE void Trace(char* const name) const {}
+	D_INLINE void Trace(char* const) const {}
 #endif
 
 	union 
@@ -858,7 +868,7 @@ class dVector
 		// return dot 4d dot product
 		D_INLINE dBigVector DotProduct(const dBigVector &A) const
 		{
-			dBigVector tmp(_mm256_mul_pd(m_type, A.m_type));
+			const dBigVector tmp(_mm256_mul_pd(m_type, A.m_type));
 			return tmp.AddHorizontal();
 		}
 
@@ -917,7 +927,6 @@ class dVector
 			dInt64 m_i[4];
 			__m256d m_type;
 			__m256i m_typeInt;
-			__m256 m_typeGen;
 			struct
 			{
 				dInt64 m_ix;
@@ -1189,7 +1198,11 @@ class dVector
 		D_INLINE dBigVector AddHorizontal() const
 		{
 			__m128d tmp0(_mm_add_pd(m_typeHigh, m_typeLow));
-			__m128d tmp1(_mm_hadd_pd(tmp0, tmp0));
+			#ifdef D_USE_SSE3
+				__m128d tmp1(_mm_hadd_pd(tmp0, tmp0));
+			#else
+				__m128d tmp1(_mm_add_pd(tmp0, _mm_shuffle_pd(tmp0, tmp0, PERMUT_MASK_DOUBLE(0, 1))));
+			#endif
 			return dBigVector(tmp1, tmp1);
 		}
 
@@ -1380,7 +1393,7 @@ class dVector
 		// return dot 4d dot product
 		D_INLINE dBigVector DotProduct(const dBigVector &A) const
 		{
-			dBigVector tmp(_mm_mul_pd(m_typeLow, A.m_typeLow), _mm_mul_pd(m_typeHigh, A.m_typeHigh));
+			const dBigVector tmp(_mm_mul_pd(m_typeLow, A.m_typeLow), _mm_mul_pd(m_typeHigh, A.m_typeHigh));
 			return tmp.AddHorizontal();
 		}
 
@@ -1390,7 +1403,8 @@ class dVector
 			dFloat64 array[4][4];
 
 			const dBigVector& me = *this;
-			for (dInt32 i = 0; i < 4; i++) {
+			for (dInt32 i = 0; i < 4; i++) 
+			{
 				array[0][i] = me[i];
 				array[1][i] = A[i];
 				array[2][i] = B[i];
@@ -1543,9 +1557,13 @@ class dVector
 
 		D_INLINE dFloat64 DotProduct(const dSpatialVector& v) const
 		{
-			dSpatialVector tmp(*this * v);
+			const dSpatialVector tmp(*this * v);
 			__m128d tmp2(_mm_add_pd(tmp.m_d0, _mm_add_pd(tmp.m_d1, tmp.m_d2)));
-			return _mm_cvtsd_f64(_mm_hadd_pd(tmp2, tmp2));
+			#ifdef D_USE_SSE3
+				return _mm_cvtsd_f64(_mm_hadd_pd(tmp2, tmp2));
+			#else
+				return _mm_cvtsd_f64(_mm_add_pd(tmp2, _mm_shuffle_pd(tmp2, tmp2, PERMUT_MASK_DOUBLE(0, 1))));
+			#endif
 		}
 
 		D_INLINE dSpatialVector Scale(dFloat64 s) const

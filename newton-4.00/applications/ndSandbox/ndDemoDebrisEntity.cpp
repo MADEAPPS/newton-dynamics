@@ -177,7 +177,7 @@ dNodeBaseHierarchy* ndDemoDebrisEntity::CreateClone() const
 	return new ndDemoDebrisEntity(*this);
 }
 
-void ndDemoDebrisEntity::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
+void ndDemoDebrisEntity::Render(dFloat32, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
 	const dMatrix modelMatrix(m_matrix * matrix);
 

@@ -16,7 +16,7 @@
 ndJointPulley::ndJointPulley(dFloat32 gearRatio,
 	const dVector& body0Pin, ndBodyKinematic* const body0,
 	const dVector& body1Pin, ndBodyKinematic* const body1)
-	:ndJointBilateralConstraint(1, body0, body0, dGetIdentityMatrix())
+	:ndJointBilateralConstraint(1, body0, body1, dGetIdentityMatrix())
 {
 	m_gearRatio = gearRatio;
 

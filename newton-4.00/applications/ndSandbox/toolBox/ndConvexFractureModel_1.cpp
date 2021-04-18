@@ -190,7 +190,8 @@ ndConvexFractureModel_1::~ndConvexFractureModel_1()
 {
 }
 
-void ndConvexFractureModel_1::Update(ndWorld* const world, dFloat32 timestep)
+//void ndConvexFractureModel_1::Update(ndWorld* const world, dFloat32 timestep)
+void ndConvexFractureModel_1::Update(ndWorld* const, dFloat32)
 {
 	dList<ndEffect>::dListNode* nextNody;
 	for (dList<ndEffect>::dListNode* node = m_effectList.GetFirst(); node; node = nextNody)
@@ -229,7 +230,8 @@ void ndConvexFractureModel_1::Update(ndWorld* const world, dFloat32 timestep)
 	}
 }
 
-void ndConvexFractureModel_1::PostUpdate(ndWorld* const world, dFloat32 timestep)
+//void ndConvexFractureModel_1::PostUpdate(ndWorld* const world, dFloat32 timestep)
+void ndConvexFractureModel_1::PostUpdate(ndWorld* const world, dFloat32)
 {
 	if (m_pendingEffect.GetCount())
 	{

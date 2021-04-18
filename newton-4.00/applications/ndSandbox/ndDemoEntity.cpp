@@ -34,7 +34,7 @@ void ndDemoEntityNotify::OnObjectPick() const
 	dTrace(("picked body id: %d\n", GetBody()->GetId()));
 }
 
-void ndDemoEntityNotify::OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
+void ndDemoEntityNotify::OnApplyExternalForce(dInt32, dFloat32)
 {
 	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
 	dAssert(body);
@@ -50,7 +50,7 @@ void ndDemoEntityNotify::OnApplyExternalForce(dInt32 threadIndex, dFloat32 times
 	}
 }
 
-void ndDemoEntityNotify::OnTranform(dInt32 threadIndex, const dMatrix& matrix)
+void ndDemoEntityNotify::OnTranform(dInt32, const dMatrix& matrix)
 {
 	// apply this transformation matrix to the application user data.
 	if (m_entity)
@@ -268,14 +268,14 @@ void ndDemoEntity::SetMatrixUsafe(const dQuaternion& rotation, const dVector& po
 	}
 }
 
-void ndDemoEntity::SetMatrix(ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position)
+void ndDemoEntity::SetMatrix(ndDemoEntityManager&, const dQuaternion& rotation, const dVector& position)
 {
 	// read the data in a critical section to prevent race condition from other thread  
 	dScopeSpinLock lock(m_lock);
 	SetMatrixUsafe(rotation, position);
 }
 
-void ndDemoEntity::SetNextMatrix (ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position)
+void ndDemoEntity::SetNextMatrix (ndDemoEntityManager&, const dQuaternion& rotation, const dVector& position)
 {
 	// read the data in a critical section to prevent race condition from other thread  
 	dScopeSpinLock lock(m_lock);
@@ -315,7 +315,7 @@ void ndDemoEntity::InterpolateMatrixUnsafe(dFloat32 param)
 	}
 }
 
-void ndDemoEntity::InterpolateMatrix (ndDemoEntityManager& world, dFloat32 param)
+void ndDemoEntity::InterpolateMatrix (ndDemoEntityManager&, dFloat32 param)
 {
 	// read the data in a critical section to prevent race condition from other thread  
 	dScopeSpinLock lock(m_lock);
@@ -364,8 +364,8 @@ void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, c
 	}
 }
 
-ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const world) const
-//NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const world) const
+//ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const world) const
+ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 {
 	dInt32 count = 1;
 	ndShapeInstance* shapeArray[128];
@@ -443,7 +443,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const world)
 			shapeArray[count] = new ndShapeInstance(new ndShapeConvexHull(mesh->m_vertexCount, sizeof(dVector), 0.01f, &points[0].m_x));
 			shapeArray[count]->SetLocalMatrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
 			count++;
-			dAssert(count < sizeof(shapeArray) / sizeof(shapeArray[0]));
+			dAssert(count < dInt32 (sizeof(shapeArray) / sizeof(shapeArray[0])));
 		}
 	}
 	

@@ -39,12 +39,16 @@ void ndMultiBodyVehicleMotor::AlignMatrix()
 	m_body0->SetMatrix(matrix1);
 	m_body0->SetVelocity(m_body1->GetVelocity());
 
-	dVector omega0(m_body0->GetOmega());
-	dVector omega1(m_body1->GetOmega());
-	dVector omega(
+	const dVector omega0(m_body0->GetOmega());
+	const dVector omega1(m_body1->GetOmega());
+	const dVector omega(
 		matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar()) +
 		matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega1).GetScalar()) +
 		matrix1.m_right.Scale(matrix1.m_right.DotProduct(omega1).GetScalar()));
+
+	//dVector error(omega1 - omega);
+	//dTrace(("(%f %f %f)\n", error.m_x, error.m_y, error.m_z));
+	m_body0->SetOmega(omega);
 }
 
 void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)

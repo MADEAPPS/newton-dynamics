@@ -47,7 +47,7 @@ dFloat32 dGaussianRandom (dFloat32 amp)
 	{
 		r += dFloat32(2.0f) * dRand() - dFloat32 (1.0f);
 	}
-	r *= (dFloat32(1.0f) / count);
+	r *= (amp / count);
 	//dTrace(("%f\n", r));
 	return r;
 }
@@ -128,7 +128,7 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 		return x;
 	}
 
-	void SWAP_FLOAT32_ARRAY (void* const array, dInt32 count)
+	void SWAP_FLOAT32_ARRAY (void* const, dInt32)
 	{
 	}
 #endif

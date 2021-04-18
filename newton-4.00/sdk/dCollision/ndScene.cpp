@@ -813,7 +813,7 @@ void ndScene::UpdateTransformNotify(dInt32 threadIndex, ndBodyKinematic* const b
 	}
 }
 
-void ndScene::UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body)
+void ndScene::UpdateAabb(dInt32, ndBodyKinematic* const body)
 {
 	ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
 	body->UpdateCollisionMatrix();
@@ -1240,8 +1240,8 @@ void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
 				}
 				else 
 				{
-					ndSceneAggregate* const aggregate = leafNode->GetAsSceneAggregate();
-					dAssert(aggregate);
+					//ndSceneAggregate* const aggregate = leafNode->GetAsSceneAggregate();
+					//dAssert(aggregate);
 					if (body1) 
 					{
 						dAssert(0);

@@ -90,8 +90,8 @@ class ndBodyKinematic: public ndBody
 
 	ndScene* GetScene() const;
 
-	const dUnsigned32 GetIndex() const;
-	const dFloat32 GetInvMass() const;
+	dUnsigned32 GetIndex() const;
+	dFloat32 GetInvMass() const;
 	const dVector GetInvInertia() const;
 	const dVector& GetMassMatrix() const;
 	const dMatrix& GetInvInertiaMatrix() const;
@@ -216,12 +216,12 @@ class ndBodyKinematic: public ndBody
 	friend class ndJointBilateralConstraint;
 } D_GCC_NEWTON_ALIGN_32;
 
-inline const dUnsigned32 ndBodyKinematic::GetIndex() const
+inline dUnsigned32 ndBodyKinematic::GetIndex() const
 {
 	return m_index;
 }
 
-inline const dFloat32 ndBodyKinematic::GetInvMass() const
+inline dFloat32 ndBodyKinematic::GetInvMass() const
 {
 	return m_invMass.m_w;
 }
@@ -325,23 +325,23 @@ inline dVector ndBodyKinematic::GetTorque() const
 	return dVector::m_zero;
 }
 
-inline void ndBodyKinematic::SetForce(const dVector& force)
+inline void ndBodyKinematic::SetForce(const dVector&)
 {
 }
 
-inline void ndBodyKinematic::SetTorque(const dVector& torque)
+inline void ndBodyKinematic::SetTorque(const dVector&)
 {
 }
 
-inline void ndBodyKinematic::SetAccel(const dVector& accel)
+inline void ndBodyKinematic::SetAccel(const dVector&)
 {
 }
 
-inline void ndBodyKinematic::SetAlpha(const dVector& alpha)
+inline void ndBodyKinematic::SetAlpha(const dVector&)
 {
 }
 
-inline void ndBodyKinematic::AddDampingAcceleration(dFloat32 timestep)
+inline void ndBodyKinematic::AddDampingAcceleration(dFloat32)
 {
 }
 
@@ -414,7 +414,7 @@ inline void ndBodyKinematic::SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dF
 	m_maxLinearSpeed = dMax(speedInMitersPerSeconds, dFloat32 (100.0f));
 }
 
-inline void ndBodyKinematic::SetLinearDamping(dFloat32 linearDamp)
+inline void ndBodyKinematic::SetLinearDamping(dFloat32)
 {
 }
 
@@ -423,7 +423,7 @@ inline dFloat32 ndBodyKinematic::GetLinearDamping() const
 	return dFloat32(0.0f);
 }
 
-inline void ndBodyKinematic::SetAngularDamping(const dVector& angularDamp)
+inline void ndBodyKinematic::SetAngularDamping(const dVector&)
 {
 }
 

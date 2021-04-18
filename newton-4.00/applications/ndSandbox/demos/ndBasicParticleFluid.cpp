@@ -55,7 +55,8 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 class ndWaterVolumeEntity : public ndDemoEntity
 {
 	public:
-	ndWaterVolumeEntity(ndDemoEntityManager* const scene, const dMatrix& location, const dVector& size, ndBodySphFluid* const fluidBody, dFloat32 radius)
+	//ndWaterVolumeEntity(ndDemoEntityManager* const scene, const dMatrix& location, const dVector& size, ndBodySphFluid* const fluidBody, dFloat32 radius)
+		ndWaterVolumeEntity(ndDemoEntityManager* const scene, const dMatrix& location, const dVector&, ndBodySphFluid* const fluidBody, dFloat32)
 		:ndDemoEntity(location, nullptr)
 		,m_fluidBody(fluidBody)
 		,m_hasNewMesh(false)
@@ -84,7 +85,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		m_isoSurfaceMesh1->Release();
 	}
 
-	void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
+	void Render(dFloat32, ndDemoEntityManager* const scene, const dMatrix&) const
 	{
 		// for now the mesh in is global space I need to fix that
 		//dMatrix nodeMatrix(m_matrix * matrix);
@@ -153,7 +154,7 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 	{
 	}
 
-	void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
+	void OnTranform(dInt32, const dMatrix&)
 	{
 		ndBodySphFluid* const fluid = GetBody()->GetAsBodySphFluid();
 		dAssert(fluid);

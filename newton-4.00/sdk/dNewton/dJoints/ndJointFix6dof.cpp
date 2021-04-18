@@ -38,7 +38,7 @@ ndJointFix6dof::~ndJointFix6dof()
 {
 }
 
-void ndJointFix6dof::SetAsSoftJoint(bool mode)
+void ndJointFix6dof::SetAsSoftJoint(bool)
 {
 	dAssert(0);
 	//SetSolverModel(mode ? m_secundaryCloseLoop : m_primaryOpenLoop);

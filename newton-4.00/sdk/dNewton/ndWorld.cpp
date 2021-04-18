@@ -276,7 +276,7 @@ void ndWorld::ApplyExternalForces()
 	m_scene->SubmitJobs<ndApplyExternalForces>();
 }
 
-void ndWorld::PostUpdate(dFloat32 timestep)
+void ndWorld::PostUpdate(dFloat32)
 {
 	D_TRACKTIME();
 	OnPostUpdate(m_timestep);
@@ -383,7 +383,7 @@ void ndWorld::RemoveModel(ndModel* const model)
 	}
 }
 
-dInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void* notUsed)
+dInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void*)
 {
 	dInt32 modeA = jointA->GetSolverModel();
 	dInt32 modeB = jointB->GetSolverModel();
@@ -542,7 +542,7 @@ void ndWorld::Load(const char* const path)
 	setlocale(LC_ALL, oldloc);
 }
 
-void ndWorld::LoadSettings(const nd::TiXmlNode* const rootNode)
+void ndWorld::LoadSettings(const nd::TiXmlNode* const)
 {
 	//const nd::TiXmlNode* const settings = rootNode->FirstChild("settings");
 	//dAssert(settings);
@@ -623,7 +623,7 @@ void ndWorld::LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShap
 	}
 }
 
-ndBody* ndWorld::LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath) const
+ndBody* ndWorld::LoadUserDefinedBody(const nd::TiXmlNode* const, const char* const, dTree<const ndShape*, dUnsigned32>&, const char* const) const
 {
 	dAssert(0);
 	return nullptr;
@@ -1063,7 +1063,7 @@ void ndWorld::UpdateSkeletons()
 											ndSkeletonContainer::ndNode* const childNode = skeleton->AddChild(constraint, parentNode);
 											queuePool.Push(childNode);
 										}
-										else if (loopCount < (sizeof(loopJoints) / sizeof(loopJoints[0])))
+										else if (loopCount < dInt32 ((sizeof(loopJoints) / sizeof(loopJoints[0]))))
 										{
 											loopJoints[loopCount] = (ndJointBilateralConstraint*)constraint;
 											loopCount++;
