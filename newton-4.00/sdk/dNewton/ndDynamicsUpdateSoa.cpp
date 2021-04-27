@@ -854,7 +854,6 @@ void ndDynamicsUpdateSoa::InitBodyArray()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - me->GetUnconstrainedBodyCount();
-			//const dFloat32 timestep = m_timestep;
 
 			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{

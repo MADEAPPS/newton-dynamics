@@ -175,7 +175,6 @@ class ndBodyKinematic: public ndBody
 
 	virtual void AddDampingAcceleration(dFloat32 timestep);
 	
-
 	dMatrix m_invWorldInertiaMatrix;
 	ndShapeInstance m_shapeInstance;
 	dVector m_mass;

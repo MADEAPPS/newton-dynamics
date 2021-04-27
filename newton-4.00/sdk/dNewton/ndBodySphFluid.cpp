@@ -966,7 +966,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			const dVector* const positions = &fluid->m_posit[0];
 			
 			const dFloat32 diameter = dFloat32(2.0f) * fluid->m_radius;
-			//const dFloat32 diameter2 = diameter * diameter;
+			const dFloat32 diameter2 = diameter * diameter;
 			
 			ndParticlePairCacheBuffer buffer;
 			for (dInt32 i = 0; i < batchSize; i++)
