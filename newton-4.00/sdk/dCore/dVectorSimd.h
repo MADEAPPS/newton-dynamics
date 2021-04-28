@@ -291,11 +291,16 @@ class dVector
 		return _mm_and_ps (m_type, m_signMask.m_type);
 	}
 
-	dFloat32 GetMax () const
+	//dFloat32 GetMax () const
+	//{
+	//	__m128 tmp (_mm_max_ps (m_type, _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(1, 0, 3, 2))));
+	//	return _mm_cvtss_f32(_mm_max_ss (tmp, _mm_shuffle_ps(tmp, tmp, PERMUTE_MASK(2, 3, 0, 1))));
+	//}
+
+	dVector GetMax() const
 	{
-		__m128 tmp (_mm_max_ps (m_type, _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 2, 3, 2))));
-		//return dVector (_mm_max_ps (tmp, _mm_shuffle_ps (tmp, tmp, PERMUTE_MASK(3, 2, 0, 1)))).GetScalar();
-		return _mm_cvtss_f32(_mm_max_ss (tmp, _mm_shuffle_ps(tmp, tmp, PERMUTE_MASK(3, 2, 0, 1))));
+		__m128 tmp(_mm_max_ps(m_type, _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(1, 0, 3, 2))));
+		return _mm_max_ps(tmp, _mm_shuffle_ps(tmp, tmp, PERMUTE_MASK(2, 3, 0, 1)));
 	}
 
 	dVector GetMax (const dVector& data) const
