@@ -73,6 +73,7 @@
 #include <ndMultiBodyVehicleMotor.h>
 #include <ndMultiBodyVehicleRotor.h>
 #include <ndMultiBodyVehicleGearBox.h>
+#include <ndJointDryRollingFriction.h>
 #include <ndJointKinematicController.h>
 #include <ndMultiBodyVehicleDifferential.h>
 #include <ndMultiBodyVehicleDifferentialAxle.h>
