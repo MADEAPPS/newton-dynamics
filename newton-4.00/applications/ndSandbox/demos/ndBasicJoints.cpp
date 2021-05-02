@@ -110,17 +110,22 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 	mesh->Release();
 }
 
-static void BuildBall(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 diameter)
+static void BuildRollingFriction(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 diameter)
 {
 	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
-	//
+	
 	ndShapeInstance shape2(new ndShapeSphere(diameter * 0.5f));
 	ndDemoMesh* const mesh2 = new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "marble.tga", "marble.tga", "marble.tga");
 	matrix.m_posit.m_y += 5.0f;
 	//ndBodyDynamic* const bodyA = MakePrimitive(scene, matrix, shape2, mesh2, mass);
-	MakePrimitive(scene, matrix, shape2, mesh2, mass);
+	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape2, mesh2, mass);
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndJointBilateralConstraint* const joint = new ndJointDryRollingFriction(body, world->GetSentinelBody(), 0.5f);
+
+	world->AddJoint(joint);
 
 	mesh2->Release();
 }
@@ -332,13 +337,15 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene);
 
-	BuildBallSocket(scene, dVector(0.0f, 0.0f, 1.0f, 0.0f));
-	BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 0.5f);
-	BuildBall(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 2.5f, 1.0f), 10.0f, 0.5f);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
-	AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
+	//BuildBallSocket(scene, dVector(0.0f, 0.0f, 1.0f, 0.0f));
+	//BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	//BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 0.5f);
+	BuildRollingFriction(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
+	//BuildSlider(scene, dVector(0.0f, 0.0f, 2.5f, 1.0f), 10.0f, 0.5f);
+	//BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
+	//AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
+
+	//:ndJointBilateralConstraint(1, body0, body1, dGetIdentityMatrix())
 	
 	dQuaternion rot;
 	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);

@@ -291,12 +291,6 @@ class dVector
 		return _mm_and_ps (m_type, m_signMask.m_type);
 	}
 
-	//dFloat32 GetMax () const
-	//{
-	//	__m128 tmp (_mm_max_ps (m_type, _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(1, 0, 3, 2))));
-	//	return _mm_cvtss_f32(_mm_max_ss (tmp, _mm_shuffle_ps(tmp, tmp, PERMUTE_MASK(2, 3, 0, 1))));
-	//}
-
 	dVector GetMax() const
 	{
 		__m128 tmp(_mm_max_ps(m_type, _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(1, 0, 3, 2))));
@@ -703,14 +697,20 @@ class dVector
 			return Scale(dFloat64(1.0f) / sqrt(mag2));
 		}
 
-		dFloat64 GetMax() const
+		dBigVector GetMax() const
 		{
-			__m256d tmp0(_mm256_permute2f128_pd(m_type, m_type, 5));
+			#if 0
+			dBigVector tmp1(_mm256_max_pd(m_type, _mm256_permute2f128_pd(m_type, m_type, 1)));
+			dBigVector tmp2(tmp1.m_x);
+			dBigVector tmp3(tmp1.m_y);
+			return tmp2.GetMax(tmp3);
+			#else
+			__m256d tmp0(_mm256_permute2f128_pd(m_type, m_type, 1));
 			__m256d tmp1(_mm256_max_pd(m_type, tmp0));
 			__m256d tmp2(_mm256_unpackhi_pd(tmp1, tmp1));
-			__m256d tmp3(_mm256_max_pd(tmp1, tmp2));
-			dBigVector tmp4(tmp3);
-			return tmp4.GetScalar();
+			dBigVector tmp3(_mm256_max_pd(tmp1, tmp2));
+			return tmp3.GetScalar();
+			#endif
 		}
 
 		dBigVector GetMax(const dBigVector& data) const
@@ -1264,10 +1264,11 @@ class dVector
 			return Scale(dFloat64 (1.0f) / sqrt (mag2));
 		}
 
-		dFloat64 GetMax() const
+		dBigVector GetMax() const
 		{
 			__m128d tmp(_mm_max_pd(m_typeLow, m_typeHigh));
-			return dBigVector(_mm_max_pd(tmp, _mm_shuffle_pd(tmp, tmp, PERMUT_MASK_DOUBLE(0, 1))), tmp).GetScalar();
+			tmp = _mm_max_pd(tmp, _mm_shuffle_pd(tmp, tmp, PERMUT_MASK_DOUBLE(0, 1)));
+			return dBigVector(tmp, tmp);
 		}
 
 		dBigVector GetMax(const dBigVector& data) const

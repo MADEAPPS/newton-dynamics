@@ -14,22 +14,14 @@
 #include "ndJointDryRollingFriction.h"
 
 
-//ndJointDryRollingFriction::ndJointDryRollingFriction(NewtonBody* child, dFloat radius, dFloat coefficient)
 ndJointDryRollingFriction::ndJointDryRollingFriction(ndBodyKinematic* const body0, ndBodyKinematic* const body1, dFloat32 coefficient)
 	:ndJointBilateralConstraint(1, body0, body1, dGetIdentityMatrix())
+	,m_coefficient(dClamp (coefficient, dFloat32(0.0f), dFloat32 (1.0f)))
 {
-	//dFloat mass;
-	//dFloat Ixx;
-	//dFloat Iyy;
-	//dFloat Izz;
-	//
-	//NewtonBodyGetMass (child, &mass, &Ixx, &Iyy, &Izz);
-	//
-	//m_frictionCoef = coefficient;
-	//m_frictionTorque = Ixx * radius;
-	//
-	//// set as soft joint loop
-	//SetSolverModel(2);
+	dMatrix matrix(body0->GetMatrix());
+	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix0);
+
+	SetSolverModel(m_jointIterativeSoft);
 }
 
 ndJointDryRollingFriction::~ndJointDryRollingFriction()
