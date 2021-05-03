@@ -34,6 +34,7 @@ class ndJointDryRollingFriction: public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
 	dFloat32 m_coefficient;
+	dFloat32 m_contactTrail;
 };
 
 #endif 

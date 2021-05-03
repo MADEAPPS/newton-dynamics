@@ -17,6 +17,7 @@
 ndJointDryRollingFriction::ndJointDryRollingFriction(ndBodyKinematic* const body0, ndBodyKinematic* const body1, dFloat32 coefficient)
 	:ndJointBilateralConstraint(1, body0, body1, dGetIdentityMatrix())
 	,m_coefficient(dClamp (coefficient, dFloat32(0.0f), dFloat32 (1.0f)))
+	,m_contactTrail(dFloat32 (0.1f))
 {
 	dMatrix matrix(body0->GetMatrix());
 	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix0);
@@ -39,32 +40,51 @@ ndJointDryRollingFriction::~ndJointDryRollingFriction()
 //void ndJointDryRollingFriction::SubmitConstraints (dFloat timestep, int threadIndex)
 void ndJointDryRollingFriction::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dAssert(0);
-	//dVector omega(0.0f);
-	//
-	//// get the omega vector
-	//NewtonBodyGetOmega(m_body0, &omega[0]);
-	//
-	//dFloat omegaMag = dSqrt (omega.DotProduct3(omega));
-	//if (omegaMag > 0.1f) {
-	//	// tell newton to used this the friction of the omega vector to apply the rolling friction
-	//	dVector pin (omega.Scale (1.0f / omegaMag));
-	//	NewtonUserJointAddAngularRow (m_joint, 0.0f, &pin[0]);
-	//
-	//	// calculate the acceleration to stop the ball in one time step
-	//	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep: 1.0f;
-	//	NewtonUserJointSetRowAcceleration (m_joint, -omegaMag * invTimestep);
-	//
-	//	// set the friction limit proportional the sphere Inertia
-	//	dFloat torqueFriction = m_frictionTorque * m_frictionCoef;
-	//	NewtonUserJointSetRowMinimumFriction (m_joint, -torqueFriction);
-	//	NewtonUserJointSetRowMaximumFriction (m_joint, torqueFriction);
-	//
-	//} else {
-	//	// when omega is too low sheath a little bit and damp the omega directly
-	//	omega = omega.Scale (0.2f);
-	//	NewtonBodySetOmega(m_body0, &omega[0]);
-	//}
+	const ndBodyKinematic::ndContactMap& contactMap = m_body0->GetContactMap();
+
+	dFloat32 maxForce = dFloat32 (0.0f);
+	ndBodyKinematic::ndContactMap::Iterator it(contactMap);
+	for (it.Begin(); it; it++)
+	{
+		const ndContact* const contact = *it;
+		if (contact->IsActive())
+		{
+			const ndContactPointList& contactPoints = contact->GetContactPoints();
+			for (ndContactPointList::dListNode* node = contactPoints.GetFirst(); node; node = node->GetNext())
+			{
+				const ndForceImpactPair& normalForce = node->GetInfo().m_normal_Force;
+				dFloat32 force = normalForce.GetInitiailGuess();
+				maxForce = dMax(force, maxForce);
+			}
+		}
+	}
+	
+	if (maxForce > dFloat32 (0.0f))
+	{
+		dVector omega(m_body0->GetOmega());
+
+		dFloat32 omegaMag = omega.DotProduct(omega).GetScalar();
+		if (omegaMag > dFloat32(0.1f * 0.1f))
+		{
+			// tell newton to used this the friction of the omega vector to apply the rolling friction
+			dVector pin(omega.Normalize());
+
+			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
+
+			dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			SetMotorAcceleration(desc, stopAccel);
+			
+			dFloat32 torqueFriction = maxForce * m_coefficient * m_contactTrail;
+			SetLowerFriction(desc, -torqueFriction);
+			SetHighFriction(desc, torqueFriction);
+		}
+		else
+		{
+			// when omega is too low cheat a little bit and damp the omega directly
+			omega = omega.Scale(0.5f);
+			m_body0->SetOmega(omega);
+		}
+	}
 }
 
 
