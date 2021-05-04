@@ -334,9 +334,10 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
  		xxxx++;
 		if (xxxx > 300)
 		{
-			start = true;
-			throttle = 0.25f;
+			//start = true;
+			//throttle = 0.25f;
 		}
+		throttle = dClamp(throttle, 0.0f, 0.3f);
 
 		SetBrakeTorque(brake);
 		SetHandBrakeTorque(handBrake);
