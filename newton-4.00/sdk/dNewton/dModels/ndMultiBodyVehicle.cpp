@@ -179,7 +179,7 @@ ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndWorld* const world, dFlo
 	m_rotor = new ndMultiBodyVehicleRotor(motorBody, world);
 	world->AddJoint(m_rotor);
 
-	m_gearBox = new ndJointVehicleMotorGearBox(motorBody, differential->GetBody0());
+	m_gearBox = new ndJointVehicleMotorGearBox(motorBody, differential->GetBody0(), this);
 	world->AddJoint(m_gearBox);
 	return m_motor;
 }

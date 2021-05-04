@@ -24,16 +24,19 @@
 
 #include "ndNewtonStdafx.h"
 #include "ndJointGear.h"
-//#include "ndJointBilateralConstraint.h"
+
+class ndMultiBodyVehicle;
 
 class ndJointVehicleMotorGearBox : public ndJointGear
 {
 	public: 
 	ND_JOINT_RELECTION(ndJointVehicleMotorGearBox);
-	D_NEWTON_API ndJointVehicleMotorGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential);
+	D_NEWTON_API ndJointVehicleMotorGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, const ndMultiBodyVehicle* const chassis);
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+
+	const ndMultiBodyVehicle* m_chassis;
 };
 
 #endif

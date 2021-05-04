@@ -91,6 +91,8 @@ class ndMultiBodyVehicle: public ndModel
 	dFloat32 m_steeringAngle;
 	dFloat32 m_handBrakeTorque;
 	dFloat32 m_steeringAngleMemory;
+
+	friend class ndJointVehicleMotorGearBox;
 };
 
 #endif

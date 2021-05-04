@@ -21,10 +21,14 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
+#include "ndJointWheel.h"
+#include "ndMultiBodyVehicle.h"
+#include "ndMultiBodyVehicleRotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 
-ndJointVehicleMotorGearBox::ndJointVehicleMotorGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential)
+ndJointVehicleMotorGearBox::ndJointVehicleMotorGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, const ndMultiBodyVehicle* const chassis)
 	:ndJointGear(dFloat32 (1.0f), motor->GetMatrix().m_front, differential,	motor->GetMatrix().m_front, motor)
+	,m_chassis(chassis)
 {
 	SetRatio(dFloat32(4.0f));
 	SetSolverModel(m_jointkinematicCloseLoop);
@@ -32,27 +36,33 @@ ndJointVehicleMotorGearBox::ndJointVehicleMotorGearBox(ndBodyKinematic* const mo
 
 void ndJointVehicleMotorGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 {
-//return;
-	//dMatrix matrix0;
-	//dMatrix matrix1;
-	//CalculateGlobalMatrix(matrix0, matrix1);
-	//
-	//AddAngularRowJacobian(desc, matrix1.m_right, dFloat32(0.0f));
-	//
-	//ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
-	//ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
-	//
-	//jacobian0.m_angular = matrix0.m_front;
-	//jacobian1.m_angular = matrix1.m_front;
-	//
-	//const dVector& omega0 = m_body0->GetOmega();
-	//const dVector& omega1 = m_body1->GetOmega();
-	//
-	//const dVector relOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-	//dFloat32 w = (relOmega.m_x + relOmega.m_y + relOmega.m_z) * dFloat32(0.5f);
-	//SetMotorAcceleration(desc, -w * desc.m_invTimestep);
+	dMatrix matrix0;
+	dMatrix matrix1;
 
-	ndJointGear::JacobianDerivative(desc);
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	AddAngularRowJacobian(desc, matrix0.m_front, dFloat32(0.0f));
+
+	ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
+	ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
+
+	jacobian0.m_angular = matrix0.m_front.Scale(m_gearRatio);
+	jacobian1.m_angular = matrix1.m_front;
+
+	const dVector& omega0 = m_body0->GetOmega();
+	const dVector& omega1 = m_body1->GetOmega();
+
+	ndMultiBodyVehicleRotor* const rotor = m_chassis->m_rotor;
+
+	dFloat32 idleOmega = rotor->m_idleOmega * 0.75f;
+	dFloat32 w0 = omega0.DotProduct(jacobian0.m_angular).GetScalar();
+	dFloat32 w1 = dMin (omega1.DotProduct(jacobian1.m_angular).GetScalar() + idleOmega, dFloat32 (0.0f));
+
+	//const dVector relOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+	//const dFloat32 w = relOmega.AddHorizontal().GetScalar() * dFloat32(0.5f);
+	const dFloat32 w = (w0 + w1) * dFloat32(0.5f);
+	SetMotorAcceleration(desc, -w * desc.m_invTimestep);
 }
 
 
