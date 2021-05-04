@@ -154,13 +154,12 @@ class ndTireNotifyNotify : public ndDemoEntityNotify
 class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 {
 	public:
-	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const dMatrix& matrix)
+	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const char* fileName, const dMatrix& matrix)
 		:ndMultiBodyVehicle(dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f))
 		,m_steerAngle(0.0f)
 		,m_prevKey(false)
 	{
-		//ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, "viper.fbx");
-		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, "viper1.fbx");
+		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, fileName);
 		vehicleEntity->ResetMatrix(*scene, vehicleEntity->CalculateGlobalMatrix() * matrix);
 
 		ndWorld* const world = scene->GetWorld();
@@ -486,7 +485,9 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = location;
 
-	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, matrix);
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "viper.fbx", matrix);
+	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "viper1.fbx", matrix);
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "monsterTruck.fbx", matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
