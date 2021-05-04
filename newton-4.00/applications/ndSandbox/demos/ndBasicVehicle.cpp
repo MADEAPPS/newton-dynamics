@@ -334,8 +334,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
  		xxxx++;
 		if (xxxx > 300)
 		{
-			//start = true;
-			//throttle = 0.25f;
+			start = true;
+			throttle = 0.25f;
 		}
 
 		SetBrakeTorque(brake);

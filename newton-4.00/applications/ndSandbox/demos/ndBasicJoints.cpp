@@ -120,12 +120,17 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const dVector
 	ndDemoMesh* const mesh2 = new ndDemoMesh("shape2", scene->GetShaderCache(), &shape2, "marble.tga", "marble.tga", "marble.tga");
 	matrix.m_posit.m_y += 5.0f;
 	//ndBodyDynamic* const bodyA = MakePrimitive(scene, matrix, shape2, mesh2, mass);
-	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape2, mesh2, mass);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndJointBilateralConstraint* const joint = new ndJointDryRollingFriction(body, world->GetSentinelBody(), 0.5f);
-
-	world->AddJoint(joint);
+	dVector posit(matrix.m_posit);
+	for (dInt32 i = 0; i < 8; i++)
+	{
+		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape2, mesh2, mass);
+		ndJointBilateralConstraint* const joint = new ndJointDryRollingFriction(body, world->GetSentinelBody(), 0.5f);
+		world->AddJoint(joint);
+		posit.m_y += diameter * 1.5f;
+		matrix.m_posit = posit + dVector(dGaussianRandom(0.01f), 0.0f, dGaussianRandom(0.01f), 0.0f);
+	}
 
 	mesh2->Release();
 }

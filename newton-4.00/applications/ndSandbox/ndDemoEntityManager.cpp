@@ -31,12 +31,12 @@
 //#define DEFAULT_SCENE	0		// setting basic rigidbody
 //#define DEFAULT_SCENE	1		// setting gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// setting friction ramp
-#define DEFAULT_SCENE	3		// setting basic Stacks
+//#define DEFAULT_SCENE	3		// setting basic Stacks
 //#define DEFAULT_SCENE	4		// setting basic Trigger
 //#define DEFAULT_SCENE	5		// setting basic player
 //#define DEFAULT_SCENE	6		// setting particle fluid
 //#define DEFAULT_SCENE	7		// static mesh collision 
-//#define DEFAULT_SCENE	8		// setting basic joints
+#define DEFAULT_SCENE	8		// setting basic joints
 //#define DEFAULT_SCENE	9		// setting basic vehicle
 //#define DEFAULT_SCENE	10		// conservation of angular momentum 
 //#define DEFAULT_SCENE	11		// basic voronoi fracture
@@ -250,7 +250,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	m_solverMode = ndWorld::ndStandardSolver;
 	//m_sceneType = 1;
 	//m_solverPasses = 4;
-	//m_workerThreads = 4;
+	//m_workerThreads = 3;
 	//m_solverSubSteps = 2;
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
@@ -259,7 +259,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showJointDebugInfo = true;
 	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 2;
-	m_collisionDisplayMode = 3;
+	//m_collisionDisplayMode = 3;
 	//m_synchronousPhysicsUpdate = false;
 
 	Cleanup();

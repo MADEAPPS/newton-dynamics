@@ -301,7 +301,6 @@ dVector ndShapeChamferCylinder::SupportVertexSpecial(const dVector& dir, dFloat3
 
 dFloat32 ndShapeChamferCylinder::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
-	dAssert(0);
 	if (localP0.m_x > m_height) 
 	{
 		if (localP1.m_x < m_height) 
