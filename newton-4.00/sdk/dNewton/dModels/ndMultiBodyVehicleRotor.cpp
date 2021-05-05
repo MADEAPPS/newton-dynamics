@@ -26,7 +26,8 @@
 #include "ndMultiBodyVehicleRotor.h"
 
 // approximately the a 10 cylinder 450 hp viper engine fore the late nineties
-#define D_ENGINE_NOMINAL_TORQUE (dFloat32(600.0f))
+//#define D_ENGINE_NOMINAL_TORQUE (dFloat32(600.0f))
+#define D_ENGINE_NOMINAL_TORQUE (dFloat32(900.0f))
 #define D_ENGINE_NOMINAL_RPM (dFloat32(9000.0f / 9.55f))
 
 ndMultiBodyVehicleRotor::ndMultiBodyVehicleRotor(ndBodyKinematic* const motor, ndWorld* const world)
@@ -73,11 +74,13 @@ dFloat32 ndMultiBodyVehicleRotor::CalculateAcceleration(ndConstraintDescritor& d
 	const dVector& omega0 = m_body0->GetOmega();
 	const ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
 	const dVector relOmega(omega0 * jacobian0.m_angular);
-	m_omega = -relOmega.AddHorizontal().GetScalar();
 
+#if 0
+	m_omega = -relOmega.AddHorizontal().GetScalar();
 	dFloat32 desiredSpeed = m_omega;
 	dFloat32 diff = m_throttle * m_maxOmega - m_omega;
-
+	
+	// simulate a carburator of fuel injection device
 	if (diff > dFloat32(1.0e-3f))
 	{
 		if (diff <= m_gasValve) 
@@ -94,9 +97,19 @@ dFloat32 ndMultiBodyVehicleRotor::CalculateAcceleration(ndConstraintDescritor& d
 		}
 		desiredSpeed += diff;
 	}
-
+	
 	desiredSpeed = dClamp(desiredSpeed, m_idleOmega, m_maxOmega);
+	dTrace(("%f %f\n", desiredSpeed, m_omega));
 	return (m_omega - desiredSpeed) * desc.m_invTimestep;
+
+#else
+	m_omega = -relOmega.AddHorizontal().GetScalar();
+	const dFloat32 throttleOmega = dClamp(m_throttle * m_maxOmega, m_idleOmega, m_maxOmega);
+	const dFloat32 deltaOmega = throttleOmega - m_omega;
+	dFloat32 omegaError = dClamp(deltaOmega, -m_gasValve, m_gasValve);
+	//dTrace(("%f %f\n", throttleOmega, m_omega));
+	return -omegaError * desc.m_invTimestep;
+#endif
 }
 
 void ndMultiBodyVehicleRotor::JacobianDerivative(ndConstraintDescritor& desc)

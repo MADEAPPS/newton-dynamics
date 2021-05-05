@@ -55,7 +55,7 @@ void ndJointVehicleMotorGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 
 	ndMultiBodyVehicleRotor* const rotor = m_chassis->m_rotor;
 
-	dFloat32 idleOmega = rotor->m_idleOmega * 0.75f;
+	dFloat32 idleOmega = rotor->m_idleOmega * dFloat32 (0.9f);
 	dFloat32 w0 = omega0.DotProduct(jacobian0.m_angular).GetScalar();
 	dFloat32 w1 = dMin (omega1.DotProduct(jacobian1.m_angular).GetScalar() + idleOmega, dFloat32 (0.0f));
 
