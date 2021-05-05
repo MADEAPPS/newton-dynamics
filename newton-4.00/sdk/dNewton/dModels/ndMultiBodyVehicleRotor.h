@@ -53,7 +53,6 @@ class ndMultiBodyVehicleRotor: public ndJointBilateralConstraint
 	dFloat32 m_gasValve;
 	dFloat32 m_engineTorque;
 	bool m_startEngine;
-
 	friend class ndJointVehicleMotorGearBox;
 };
 
