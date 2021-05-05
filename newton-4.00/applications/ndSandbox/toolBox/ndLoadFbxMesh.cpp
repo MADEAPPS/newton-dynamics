@@ -481,6 +481,11 @@ static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 				ImportMeshNode(fbxNode, nodeMap);
 				break;
 			}
+
+			case ofbx::Object::Type::NULL_NODE:
+			{
+				break;
+			}
 		
 			//case FbxNodeAttribute::eSkeleton:
 			//{
@@ -499,11 +504,7 @@ static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 			//	ImportNurbCurveShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
 			//	break;
 			//}
-			//
-			//case FbxNodeAttribute::eNull:
-			//{
-			//	break;
-			//}
+
 			//
 			//case FbxNodeAttribute::eMarker:
 			//case FbxNodeAttribute::eNurbs:
