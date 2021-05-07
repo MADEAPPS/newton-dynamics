@@ -41,6 +41,7 @@ class ndShapeInstance;
 class ndShapeStaticMesh;
 class ndShapeConvexPolygon;
 class ndShapeDebugCallback;
+class ndShapeCompoundConvex;
 class ndShapeChamferCylinder;
 
 #ifdef _DEBUG
@@ -62,7 +63,7 @@ enum ndShapeID
 	m_pointCollision,
 	m_nullCollision,
 	m_boundingBoxHierachy,
-	//m_compoundCollision,
+	m_compoundConvex,
 	//m_heightField,
 	//m_deformableClothPatch,
 	//m_deformableSolidMesh,
@@ -240,6 +241,7 @@ class ndShape: public dClassAlloc
 	virtual ndShapeConvex* GetAsShapeConvex() { return nullptr; }
 	virtual ndShapeStaticMesh* GetAsShapeStaticMeshShape() { return nullptr; }
 	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return nullptr; }
+	virtual ndShapeCompoundConvex* GetAsShapeCompoundConvex() { return nullptr; }
 
 	virtual dInt32 GetConvexVertexCount() const;
 
