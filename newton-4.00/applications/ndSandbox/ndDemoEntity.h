@@ -89,12 +89,6 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
 	ndShapeInstance* CreateCollisionFromchildren(ndWorld* const world) const;
 
-	dSpinLock& GetLock()
-	{
-		return m_lock;
-	}
-		
-
 	protected:
 	mutable dMatrix m_matrix;			// interpolated matrix
 	dVector m_curPosition;				// position one physics simulation step in the future
@@ -106,7 +100,6 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 	ndDemoMeshInterface* m_mesh;
 	UserData* m_userData;
 	dList <ndDemoEntity*>::dListNode* m_rootNode;
-	dSpinLock m_lock;
 	bool m_isVisible;
 
 	friend class ndDemoEntityNotify;

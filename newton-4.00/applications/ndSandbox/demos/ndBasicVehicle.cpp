@@ -144,7 +144,6 @@ class ndTireNotifyNotify : public ndDemoEntityNotify
 		dMatrix localMatrix(matrix * parentMatrix.Inverse());
 
 		dQuaternion rot(localMatrix);
-		dScopeSpinLock lock(m_entity->GetLock());
 		m_entity->SetMatrixUsafe(rot, localMatrix.m_posit);
 	}
 

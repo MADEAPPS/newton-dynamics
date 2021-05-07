@@ -58,7 +58,6 @@ void ndDemoEntityNotify::OnTranform(dInt32, const dMatrix& matrix)
 		ndBody* const body = GetBody();
 		dQuaternion rot(body->GetRotation());
 
-		dScopeSpinLock lock(m_entity->m_lock);
 		m_entity->SetMatrixUsafe(rot, matrix.m_posit);
 	}
 }
@@ -74,7 +73,6 @@ ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
 	,m_mesh(nullptr)
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
-	,m_lock() 
 	,m_isVisible(true)
 {
 	if (parent) 
@@ -149,7 +147,6 @@ ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	,m_mesh(nullptr)
 	,m_userData(nullptr)
 	,m_rootNode(nullptr)
-	,m_lock()
 	,m_isVisible(copyFrom.m_isVisible)
 {
 	m_mesh = copyFrom.m_mesh ? copyFrom.m_mesh->Clone(this) : nullptr;
@@ -271,15 +268,12 @@ void ndDemoEntity::SetMatrixUsafe(const dQuaternion& rotation, const dVector& po
 void ndDemoEntity::SetMatrix(ndDemoEntityManager&, const dQuaternion& rotation, const dVector& position)
 {
 	// read the data in a critical section to prevent race condition from other thread  
-	dScopeSpinLock lock(m_lock);
 	SetMatrixUsafe(rotation, position);
 }
 
 void ndDemoEntity::SetNextMatrix (ndDemoEntityManager&, const dQuaternion& rotation, const dVector& position)
 {
 	// read the data in a critical section to prevent race condition from other thread  
-	dScopeSpinLock lock(m_lock);
-
 	m_nextPosition = position;
 	m_nextRotation = rotation;
 
