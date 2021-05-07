@@ -235,13 +235,13 @@ dAssert (0);
 
 
 
-void ndDemoCamera::SetMatrix (ndDemoEntityManager& scene, const dQuaternion& rotation, const dVector& position)
+void ndDemoCamera::SetMatrix (const dQuaternion& rotation, const dVector& position)
 {
 	dMatrix matrix (rotation, position);
 	m_cameraPitch = dAsin (matrix.m_front.m_y);
 	m_cameraYaw = dAtan2 (-matrix.m_front.m_z, matrix.m_front.m_x);
 
-	ndDemoEntity::SetMatrix (scene, rotation, position);
+	ndDemoEntity::SetMatrix (rotation, position);
 }
 
 

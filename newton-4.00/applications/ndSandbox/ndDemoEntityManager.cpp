@@ -1063,7 +1063,7 @@ dInt32 ndDemoEntityManager::Print (const dVector&, const char *fmt, ... ) const
 
 void ndDemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
 {
-	m_cameraManager->SetCameraMatrix(this, rotation, position);
+	m_cameraManager->SetCameraMatrix(rotation, position);
 }
 
 void ndDemoEntityManager::UpdatePhysics(dFloat32 timestep)

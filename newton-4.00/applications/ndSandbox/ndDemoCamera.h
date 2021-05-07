@@ -32,7 +32,7 @@ class ndDemoCamera: public ndDemoEntity
 	const dMatrix& GetViewMatrix() const;
 	const dMatrix& GetProjectionMatrix() const;
 
-	void SetMatrix (ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
+	void SetMatrix (const dQuaternion& rotation, const dVector& position);
 	void SetViewMatrix (dInt32 width, dInt32 height);
 
 	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;

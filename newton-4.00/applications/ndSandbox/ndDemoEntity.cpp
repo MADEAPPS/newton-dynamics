@@ -265,13 +265,13 @@ void ndDemoEntity::SetMatrixUsafe(const dQuaternion& rotation, const dVector& po
 	}
 }
 
-void ndDemoEntity::SetMatrix(ndDemoEntityManager&, const dQuaternion& rotation, const dVector& position)
+void ndDemoEntity::SetMatrix(const dQuaternion& rotation, const dVector& position)
 {
 	// read the data in a critical section to prevent race condition from other thread  
 	SetMatrixUsafe(rotation, position);
 }
 
-void ndDemoEntity::SetNextMatrix (ndDemoEntityManager&, const dQuaternion& rotation, const dVector& position)
+void ndDemoEntity::SetNextMatrix (const dQuaternion& rotation, const dVector& position)
 {
 	// read the data in a critical section to prevent race condition from other thread  
 	m_nextPosition = position;
@@ -284,11 +284,11 @@ void ndDemoEntity::SetNextMatrix (ndDemoEntityManager&, const dQuaternion& rotat
 	}
 }
 
-void ndDemoEntity::ResetMatrix(ndDemoEntityManager& scene, const dMatrix& matrix)
+void ndDemoEntity::ResetMatrix(const dMatrix& matrix)
 {
 	dQuaternion rot (matrix);
-	SetMatrix(scene, rot, matrix.m_posit);
-	SetMatrix(scene, rot, matrix.m_posit);
+	SetMatrix(rot, matrix.m_posit);
+	SetMatrix(rot, matrix.m_posit);
 	InterpolateMatrix (dFloat32 (0.0f));
 }
 

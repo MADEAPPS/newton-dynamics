@@ -29,7 +29,7 @@ class ndDemoCameraManager: public dClassAlloc
 		return m_camera;
 	}
 
-	void SetCameraMatrix (ndDemoEntityManager* const scene, const dQuaternion& rotation, const dVector& position);
+	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
 
 	void SetCameraMouseLock (bool loockState);
 

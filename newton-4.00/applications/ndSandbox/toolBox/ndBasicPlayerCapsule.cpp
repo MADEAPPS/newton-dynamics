@@ -135,7 +135,7 @@ void ndBasicPlayerCapsule::SetCamera()
 		dVector camOrigin = playerMatrix.TransformVector(upDir.Scale(height));
 		camOrigin -= frontDir.Scale(PLAYER_THIRD_PERSON_VIEW_DIST);
 
-		camera->SetNextMatrix(*m_scene, camMatrix, camOrigin);
+		camera->SetNextMatrix(camMatrix, camOrigin);
 
 		dFloat32 angle0 = camera->GetYawAngle();
 		dFloat32 angle1 = GetHeadingAngle();

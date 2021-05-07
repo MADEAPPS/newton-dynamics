@@ -69,10 +69,10 @@ ndDemoCameraManager::~ndDemoCameraManager()
 	delete m_camera;
 }
 
-void ndDemoCameraManager::SetCameraMatrix(ndDemoEntityManager* const scene, const dQuaternion& rotation, const dVector& position)
+void ndDemoCameraManager::SetCameraMatrix(const dQuaternion& rotation, const dVector& position)
 {
-	m_camera->SetMatrix(*scene, rotation, position);
-	m_camera->SetMatrix(*scene, rotation, position);
+	m_camera->SetMatrix(rotation, position);
+	m_camera->SetMatrix(rotation, position);
 	m_yaw = m_camera->GetYawAngle();
 	m_pitch = m_camera->GetPichAngle();
 }
@@ -155,7 +155,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 
 	dMatrix matrix (dRollMatrix(m_pitch) * dYawMatrix(m_yaw));
 	dQuaternion rot (matrix);
-	m_camera->SetMatrix (*scene, rot, targetMatrix.m_posit);
+	m_camera->SetMatrix (rot, targetMatrix.m_posit);
 
 	// get the mouse pick parameter so that we can do replay for debugging
 	dVector p0(m_camera->ScreenToWorld(dVector(mouseX, mouseY, 0.0f, 0.0f)));

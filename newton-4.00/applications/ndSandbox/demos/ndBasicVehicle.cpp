@@ -159,7 +159,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		,m_prevKey(false)
 	{
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, fileName);
-		vehicleEntity->ResetMatrix(*scene, vehicleEntity->CalculateGlobalMatrix() * matrix);
+		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
 
 		ndWorld* const world = scene->GetWorld();
 
@@ -375,7 +375,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		camOrigin = playerMatrix.m_posit + dVector(0.0f, 1.0f, 0.0f, 0.0f);
 		camOrigin -= frontDir.Scale(10.0f);
 
-		camera->SetNextMatrix(*manager, camMatrix, camOrigin);
+		camera->SetNextMatrix(camMatrix, camOrigin);
 	}
 
 	void DrawGage(GLuint gage, GLuint needle, dFloat32 param, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size, dFloat32 minAngle, dFloat32 maxAngle) const
