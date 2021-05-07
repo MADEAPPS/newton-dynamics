@@ -79,7 +79,7 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 	virtual void SetMatrix(const dQuaternion& rotation, const dVector& position);
 	virtual void SetNextMatrix (const dQuaternion& rotation, const dVector& position);
 
-	void SetMatrixUsafe(const dQuaternion& rotation, const dVector& position);
+	//void SetMatrixUsafe(const dQuaternion& rotation, const dVector& position);
 
 	virtual void ResetMatrix(const dMatrix& matrix);
 	virtual void InterpolateMatrix (dFloat32 param);

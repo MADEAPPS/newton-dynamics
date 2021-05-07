@@ -344,7 +344,7 @@ void ndConvexFractureModel_4::UpdateEffect(ndWorld* const world, ndEffect& effec
 	{
 		ndAtom& atom = node->GetInfo();
 		ndDemoDebrisEntity* const entity = atom.m_mesh;
-		entity->SetMatrixUsafe(rotation, matrix.m_posit);
+		entity->SetMatrix(rotation, matrix.m_posit);
 
 		dFloat32 debrisMass = massMatrix.m_w * atom.m_massFraction;
 

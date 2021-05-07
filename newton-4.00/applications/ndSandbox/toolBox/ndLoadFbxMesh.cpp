@@ -90,8 +90,8 @@ void fbxDemoEntity::ApplyTransform(const dMatrix& transform)
 		ent->SetRenderMatrix(entMatrix);
 
 		dQuaternion rot(entMatrix);
-		ent->SetMatrixUsafe(rot, entMatrix.m_posit);
-		ent->SetMatrixUsafe(rot, entMatrix.m_posit);
+		ent->SetMatrix(rot, entMatrix.m_posit);
+		ent->SetMatrix(rot, entMatrix.m_posit);
 
 		if (ent->m_fbxMeshEffect)
 		{

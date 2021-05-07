@@ -58,7 +58,7 @@ void ndDemoEntityNotify::OnTranform(dInt32, const dMatrix& matrix)
 		ndBody* const body = GetBody();
 		dQuaternion rot(body->GetRotation());
 
-		m_entity->SetMatrixUsafe(rot, matrix.m_posit);
+		m_entity->SetMatrix(rot, matrix.m_posit);
 	}
 }
 
@@ -235,7 +235,8 @@ dMatrix ndDemoEntity::GetNextMatrix () const
 dMatrix ndDemoEntity::CalculateGlobalMatrix (const ndDemoEntity* const root) const
 {
 	dMatrix matrix (dGetIdentityMatrix());
-	for (const ndDemoEntity* ptr = this; ptr != root; ptr = ptr->GetParent()) {
+	for (const ndDemoEntity* ptr = this; ptr != root; ptr = ptr->GetParent()) 
+	{
 		matrix = matrix * ptr->GetCurrentMatrix ();
 	}
 	return matrix;
@@ -244,13 +245,14 @@ dMatrix ndDemoEntity::CalculateGlobalMatrix (const ndDemoEntity* const root) con
 dMatrix ndDemoEntity::CalculateInterpolatedGlobalMatrix (const ndDemoEntity* const root) const
 {
 	dMatrix matrix (dGetIdentityMatrix());
-	for (const ndDemoEntity* ptr = this; ptr != root; ptr = ptr->GetParent()) {
+	for (const ndDemoEntity* ptr = this; ptr != root; ptr = ptr->GetParent()) 
+	{
 		matrix = matrix * ptr->m_matrix;
 	}
 	return matrix;
 }
 
-void ndDemoEntity::SetMatrixUsafe(const dQuaternion& rotation, const dVector& position)
+void ndDemoEntity::SetMatrix(const dQuaternion& rotation, const dVector& position)
 {
 	m_curPosition = m_nextPosition;
 	m_curRotation = m_nextRotation;
@@ -263,12 +265,6 @@ void ndDemoEntity::SetMatrixUsafe(const dQuaternion& rotation, const dVector& po
 	{
 		m_curRotation = m_curRotation.Scale(dFloat32(-1.0f));
 	}
-}
-
-void ndDemoEntity::SetMatrix(const dQuaternion& rotation, const dVector& position)
-{
-	// read the data in a critical section to prevent race condition from other thread  
-	SetMatrixUsafe(rotation, position);
 }
 
 void ndDemoEntity::SetNextMatrix (const dQuaternion& rotation, const dVector& position)

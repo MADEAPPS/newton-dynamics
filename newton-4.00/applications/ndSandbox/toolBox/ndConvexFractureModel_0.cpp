@@ -404,10 +404,10 @@ test = test || debrisEnt->m_enumerator == 3;
 test = test || debrisEnt->m_enumerator == 5;
 test = true;
 if (!test)
-debrisEnt->SetMatrixUsafe(dQuaternion(location), location.m_posit + dVector(0.0f, -10.0f, 0.0f, 0.0f));
+debrisEnt->SetMatrix(dQuaternion(location), location.m_posit + dVector(0.0f, -10.0f, 0.0f, 0.0f));
 else
 {
-		debrisEnt->SetMatrixUsafe(dQuaternion(location), location.m_posit);
+		debrisEnt->SetMatrix(dQuaternion(location), location.m_posit);
 		ndBodyDynamic* const body = debrisEnt->m_drebriBody;
 		world->AddBody(body);
 		body->SetNotifyCallback(new ndDebrisNotify(scene, debrisEnt));

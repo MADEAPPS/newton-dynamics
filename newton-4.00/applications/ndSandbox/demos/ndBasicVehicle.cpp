@@ -144,7 +144,7 @@ class ndTireNotifyNotify : public ndDemoEntityNotify
 		dMatrix localMatrix(matrix * parentMatrix.Inverse());
 
 		dQuaternion rot(localMatrix);
-		m_entity->SetMatrixUsafe(rot, localMatrix.m_posit);
+		m_entity->SetMatrix(rot, localMatrix.m_posit);
 	}
 
 	ndBodyDynamic* m_chassis;
