@@ -219,14 +219,19 @@ void ndDemoCameraManager::RenderPickedTarget () const
 void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene, dFloat32 param)
 {
 	// interpolate the location of all entities in the world
+	ndWorld* const world = scene->GetWorld();
+	world->UpdateTransformsLock();
+
 	for (ndDemoEntityManager::dListNode* node = scene->GetFirst(); node; node = node->GetNext()) 
 	{
 		ndDemoEntity* const entity = node->GetInfo();
-		entity->InterpolateMatrix(*scene, param);
+		entity->InterpolateMatrix(param);
 	}
 
 	// interpolate the Camera matrix;
-	m_camera->InterpolateMatrix (*scene, param);
+	m_camera->InterpolateMatrix (param);
+
+	world->UpdateTransformsUnlock();
 }
 
 void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool mousePickState, const dVector& p0, const dVector& p1, dFloat32) 

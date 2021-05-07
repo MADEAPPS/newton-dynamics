@@ -35,7 +35,7 @@
 
 class ndSkeletonQueue : public dFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>
 {
-public:
+	public:
 	ndSkeletonQueue()
 		:dFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>()
 		, m_mod(sizeof(m_array) / sizeof(m_array[0]))
@@ -99,6 +99,7 @@ ndWorld::ndWorld()
 	,m_solverMode(ndStandardSolver)
 	,m_solverIterations(4)
 	,m_frameIndex(0)
+	,m_transformsLock()
 	,m_inUpdate(false)
 	,m_collisionUpdate(true)
 {
@@ -672,9 +673,13 @@ void ndWorld::ThreadFunction()
 		}
 
 		m_scene->SetTimestep(m_timestep);
+		
+		UpdateTransformsLock();
 		UpdateTransforms();
 		m_inUpdate = false;
 		PostUpdate(m_timestep);
+		UpdateTransformsUnlock();
+
 		m_scene->End();
 	}
 	
@@ -752,7 +757,6 @@ void ndWorld::ParticleUpdate()
 		body->Update(this, m_timestep);
 	}
 }
-
 
 void ndWorld::ModelUpdate()
 {

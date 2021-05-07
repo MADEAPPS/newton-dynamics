@@ -295,10 +295,10 @@ void ndDemoEntity::ResetMatrix(ndDemoEntityManager& scene, const dMatrix& matrix
 	dQuaternion rot (matrix);
 	SetMatrix(scene, rot, matrix.m_posit);
 	SetMatrix(scene, rot, matrix.m_posit);
-	InterpolateMatrix (scene, dFloat32 (0.0f));
+	InterpolateMatrix (dFloat32 (0.0f));
 }
 
-void ndDemoEntity::InterpolateMatrixUnsafe(dFloat32 param)
+void ndDemoEntity::InterpolateMatrix(dFloat32 param)
 {
 	dVector p0(m_curPosition);
 	dVector p1(m_nextPosition);
@@ -311,16 +311,10 @@ void ndDemoEntity::InterpolateMatrixUnsafe(dFloat32 param)
 
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
 	{
-		child->InterpolateMatrixUnsafe(param);
+		child->InterpolateMatrix(param);
 	}
 }
 
-void ndDemoEntity::InterpolateMatrix (ndDemoEntityManager&, dFloat32 param)
-{
-	// read the data in a critical section to prevent race condition from other thread  
-	dScopeSpinLock lock(m_lock);
-	InterpolateMatrixUnsafe(param);
-}
 
 const dMatrix& ndDemoEntity::GetRenderMatrix () const
 {

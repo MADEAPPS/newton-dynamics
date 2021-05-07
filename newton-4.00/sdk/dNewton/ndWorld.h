@@ -65,6 +65,9 @@ class ndWorld: public dClassAlloc
 
 	virtual void OnPostUpdate(dFloat32 timestep);
 
+	void UpdateTransformsLock();
+	void UpdateTransformsUnlock();
+
 	dInt32 GetThreadCount() const;
 	void SetThreadCount(dInt32 count);
 
@@ -180,9 +183,9 @@ class ndWorld: public dClassAlloc
 	ndSolverModes m_solverMode;
 	dInt32 m_solverIterations;
 	dUnsigned32 m_frameIndex;
+	std::mutex m_transformsLock;
 	bool m_inUpdate;
 	bool m_collisionUpdate;
-	
 
 	friend class ndScene;
 	friend class ndDynamicsUpdate;
@@ -320,5 +323,16 @@ inline ndWorld::ndSolverModes ndWorld::GetSelectedSolver() const
 {
 	return m_solverMode;
 }
+
+inline void ndWorld::UpdateTransformsLock()
+{
+	m_transformsLock.lock();
+}
+
+inline void ndWorld::UpdateTransformsUnlock()
+{
+	m_transformsLock.unlock();
+}
+
 
 #endif

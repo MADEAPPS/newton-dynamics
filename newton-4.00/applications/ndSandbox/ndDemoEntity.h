@@ -79,11 +79,10 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 	virtual void SetMatrix(ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
 	virtual void SetNextMatrix (ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
 
-	void InterpolateMatrixUnsafe(dFloat32 param);
 	void SetMatrixUsafe(const dQuaternion& rotation, const dVector& position);
 
 	virtual void ResetMatrix(ndDemoEntityManager& world, const dMatrix& matrix);
-	virtual void InterpolateMatrix (ndDemoEntityManager& world, dFloat32 param);
+	virtual void InterpolateMatrix (dFloat32 param);
 	dMatrix CalculateInterpolatedGlobalMatrix (const ndDemoEntity* const root = nullptr) const;
 
 	void RenderBone() const;
