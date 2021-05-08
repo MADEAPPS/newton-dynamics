@@ -157,6 +157,9 @@ class ndShapeInstance: public dClassAlloc
 	ndShapeMaterial m_shapeMaterial;
 	const ndShape* m_shape;
 	const ndBody* m_ownerBody;
+	const void* m_subCollisionHandle;
+	const ndShapeInstance* m_parent;
+
 	dFloat32 m_skinThickness;
 	ndScaleType m_scaleType;
 	bool m_collisionMode;

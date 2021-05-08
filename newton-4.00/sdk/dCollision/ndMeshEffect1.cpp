@@ -3783,7 +3783,7 @@ ndMeshEffect::ndMeshEffect(const ndShapeInstance& shape)
 	ndMeshEffectBuilder builder;
 
 	Init();
-	if (((ndShape*)shape.GetShape())->GetAsShapeCompound())
+	if (((ndShape*)shape.GetShape())->GetAsShapeCompoundConvex())
 	{
 		dAssert(0);
 		//	dgCollisionInfo collisionInfo;

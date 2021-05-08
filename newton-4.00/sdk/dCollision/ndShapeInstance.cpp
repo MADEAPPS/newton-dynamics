@@ -39,6 +39,8 @@ ndShapeInstance::ndShapeInstance(ndShape* const shape)
 	,m_maxScale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
 	,m_shape(shape->AddRef())
 	,m_ownerBody(nullptr)
+	,m_subCollisionHandle(nullptr)
+	,m_parent(nullptr)
 	,m_skinThickness(dFloat32(0.0f))
 	,m_scaleType(m_unit)
 	,m_collisionMode(true)
@@ -55,10 +57,16 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 	,m_maxScale(instance.m_maxScale)
 	,m_shape(instance.m_shape->AddRef())
 	,m_ownerBody(instance.m_ownerBody)
+	,m_subCollisionHandle(instance.m_subCollisionHandle)
+	,m_parent(instance.m_parent)
 	,m_skinThickness(instance.m_skinThickness)
 	,m_scaleType(instance.m_scaleType)
 	,m_collisionMode(instance.m_collisionMode)
 {
+	if (((ndShape*)m_shape)->GetAsShapeCompoundConvex())
+	{
+		dAssert(0);
+	}
 }
 
 ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
@@ -71,6 +79,8 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const dTree
 	,m_maxScale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
 	,m_shape(nullptr)
 	,m_ownerBody(nullptr)
+	,m_subCollisionHandle(nullptr)
+	,m_parent(nullptr)
 	,m_skinThickness(dFloat32(0.0f))
 	,m_scaleType(m_unit)
 	,m_collisionMode(true)
@@ -117,6 +127,10 @@ ndShapeInstance& ndShapeInstance::operator=(const ndShapeInstance& instance)
 	m_shape->Release();
 	m_shape = instance.m_shape->AddRef();
 	m_ownerBody = instance.m_ownerBody;
+
+	m_subCollisionHandle = instance.m_subCollisionHandle;
+	m_parent = instance.m_parent;
+
 	return *this;
 }
 
@@ -253,7 +267,7 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				if (t < dFloat32 (1.0f)) 
 				{
 					//dAssert(((ndShape*)m_shape)->GetAsShapeBox() || ((ndShape*)m_shape)->GetAsShapeSphere());
-					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
+					dAssert(!((ndShape*)m_shape)->GetAsShapeCompoundConvex());
 				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
 				//	{
 				//		contactOut.m_shapeId0 = GetUserDataID();
@@ -277,7 +291,7 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				t = m_shape->RayCast(callback, p0, p1, dFloat32(1.0f), body, contactOut);
 				if (t < dFloat32(1.0f))
 				{
-					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
+					dAssert(!((ndShape*)m_shape)->GetAsShapeCompoundConvex());
 				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
 				//	{
 				//		contactOut.m_shapeId0 = GetUserDataID();
@@ -301,7 +315,7 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				t = m_shape->RayCast(callback, p0, p1, dFloat32(1.0f), body, contactOut);
 				if (t < dFloat32(1.0f))
 				{
-					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
+					dAssert(!((ndShape*)m_shape)->GetAsShapeCompoundConvex());
 				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
 				//	{
 				//		contactOut.m_shapeId0 = GetUserDataID();
@@ -331,7 +345,7 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				t = m_shape->RayCast(callback, p0, p1, dFloat32(1.0f), body, contactOut);
 				if (t < dFloat32(1.0f))
 				{
-					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
+					dAssert(!((ndShape*)m_shape)->GetAsShapeCompoundConvex());
 				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
 				//	{
 				//		contactOut.m_shapeId0 = GetUserDataID();
@@ -416,7 +430,7 @@ void ndShapeInstance::SetScale(const dVector& scale)
 	dAssert(scaleZ > dFloat32(0.0f));
 
 	//if (IsType(dgCollision::dgCollisionCompound_RTTI)) 
-	if (((ndShape*)m_shape)->GetAsShapeCompound())
+	if (((ndShape*)m_shape)->GetAsShapeCompoundConvex())
 	{
 		dAssert(0);
 		//dAssert(m_scaleType == m_unit);

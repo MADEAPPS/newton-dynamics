@@ -234,7 +234,7 @@ class ndShape: public dClassAlloc
 	virtual ndShapeSphere* GetAsShapeSphere() { return nullptr; }
 	virtual ndShapeCapsule* GetAsShapeCapsule() { return nullptr; }
 	virtual ndShapeCylinder* GetAsShapeCylinder() { return nullptr; }
-	virtual ndShapeCompound* GetAsShapeCompound() { return nullptr; }
+	//virtual ndShapeCompound* GetAsShapeCompound() { return nullptr; }
 	virtual ndShapeNull* GetAsShapeNull() { return nullptr; }
 	virtual ndShapePoint* GetAsShapePoint() { return nullptr; }
 	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon() { return nullptr; }

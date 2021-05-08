@@ -27,26 +27,86 @@
 #include "ndShapeCompoundConvex.h"
 
 
+ndShapeCompoundConvex::ndNodeBase::ndNodeBase(ndShapeInstance* const instance)
+	:m_type(m_leaf)
+	,m_left(nullptr)
+	,m_right(nullptr)
+	,m_parent(nullptr)
+	,m_shape(new ndShapeInstance(*instance))
+	,m_myNode(nullptr)
+{
+	CalculateAABB();
+}
+
+ndShapeCompoundConvex::ndNodeBase::ndNodeBase(ndNodeBase* const left, ndNodeBase* const right)
+	:m_type(m_node)
+	,m_left(left)
+	,m_right(right)
+	,m_parent(nullptr)
+	,m_shape(nullptr)
+	,m_myNode(nullptr)
+{
+	m_left->m_parent = this;
+	m_right->m_parent = this;
+
+	dVector p0(left->m_p0.GetMin(right->m_p0));
+	dVector p1(left->m_p1.GetMax(right->m_p1));
+	SetBox(p0, p1);
+}
+
+void ndShapeCompoundConvex::ndNodeBase::SetBox(const dVector& p0, const dVector& p1)
+{
+	m_p0 = p0;
+	m_p1 = p1;
+	dAssert(m_p0.m_w == dFloat32(0.0f));
+	dAssert(m_p1.m_w == dFloat32(0.0f));
+	m_size = dVector::m_half * (m_p1 - m_p0);
+	m_origin = dVector::m_half * (m_p1 + m_p0);
+	m_area = m_size.DotProduct(m_size.ShiftTripleRight()).m_x;
+}
+
+void ndShapeCompoundConvex::ndNodeBase::CalculateAABB()
+{
+	dVector p0;
+	dVector p1;
+	m_shape->CalculateAABB(m_shape->GetLocalMatrix(), p0, p1);
+	SetBox(p0, p1);
+}
+
 ndShapeCompoundConvex::ndTreeArray::ndTreeArray()
 	:dTree<ndNodeBase*, dInt32, dContainersFreeListAlloc<ndNodeBase*>>()
 {
-	dAssert(0);
 }
 
-//void ndShapeCompoundConvex::ndTreeArray::AddNode(ndNodeBase* const node, dInt32 index, const ndShapeInstance* const parent)
-void ndShapeCompoundConvex::ndTreeArray::AddNode(ndNodeBase* const, dInt32, const ndShapeInstance* const)
+void ndShapeCompoundConvex::ndTreeArray::AddNode(ndNodeBase* const node, dInt32 index, const ndShapeInstance* const parent)
 {
-	dAssert(0);
+	ndTreeArray::dTreeNode* const myNode = Insert(node, index);
+	node->m_myNode = myNode;
+	node->m_shape->m_parent = parent;
+	node->m_shape->m_subCollisionHandle = myNode;
 }
-
 
 ndShapeCompoundConvex::ndShapeCompoundConvex()
 	:ndShape(m_compoundConvex)
+	,m_array()
+	,m_treeEntropy(dFloat32(0.0f))
+	,m_boxMinRadius(dFloat32(0.0f))
+	,m_boxMaxRadius(dFloat32(0.0f))
+	,m_root(nullptr)
+	,m_myInstance(nullptr)
+	,m_idIndex(0)
 {
 }
 
 ndShapeCompoundConvex::ndShapeCompoundConvex(const nd::TiXmlNode* const xmlNode)
 	:ndShape(m_compoundConvex)
+	,m_array()
+	,m_treeEntropy(dFloat32 (0.0f))
+	,m_boxMinRadius(dFloat32(0.0f))
+	,m_boxMaxRadius(dFloat32(0.0f))
+	,m_root(nullptr)
+	,m_myInstance(nullptr)
+	,m_idIndex(0)
 {
 	dAssert(0);
 	xmlGetInt(xmlNode, "xxxx");
@@ -199,80 +259,379 @@ dFloat32 ndShapeCompoundConvex::RayCast(ndRayCastNotify&, const dVector&, const 
 
 void ndShapeCompoundConvex::BeginAddRemove()
 {
+	dAssert(m_myInstance);
 }
 
-void ndShapeCompoundConvex::EndAddRemove(bool flushCache)
+void ndShapeCompoundConvex::ImproveNodeFitness(ndNodeBase* const node) const
 {
-	dAssert(0);
-	flushCache = false;
+	dAssert(node->m_left);
+	dAssert(node->m_right);
+
+	if (node->m_parent) 
+	{
+		if (node->m_parent->m_left == node) 
+		{
+			dFloat32 cost0 = node->m_area;
+
+			dVector cost1P0;
+			dVector cost1P1;
+			dFloat32 cost1 = CalculateSurfaceArea(node->m_right, node->m_parent->m_right, cost1P0, cost1P1);
+
+			dVector cost2P0;
+			dVector cost2P1;
+			dFloat32 cost2 = CalculateSurfaceArea(node->m_left, node->m_parent->m_right, cost2P0, cost2P1);
+
+			dAssert(node->m_parent->m_p0.m_w == dFloat32(0.0f));
+			dAssert(node->m_parent->m_p1.m_w == dFloat32(0.0f));
+
+			if ((cost1 <= cost0) && (cost1 <= cost2)) 
+			{
+				ndNodeBase* const parent = node->m_parent;
+				node->m_p0 = parent->m_p0;
+				node->m_p1 = parent->m_p1;
+				node->m_area = parent->m_area;
+				node->m_size = parent->m_size;
+				node->m_origin = parent->m_origin;
+
+				if (parent->m_parent) 
+				{
+					if (parent->m_parent->m_left == parent) 
+					{
+						parent->m_parent->m_left = node;
+					}
+					else 
+					{
+						dAssert(parent->m_parent->m_right == parent);
+						parent->m_parent->m_right = node;
+					}
+				}
+				node->m_parent = parent->m_parent;
+				parent->m_parent = node;
+				node->m_right->m_parent = parent;
+				parent->m_left = node->m_right;
+				node->m_right = parent;
+				parent->m_p0 = cost1P0;
+				parent->m_p1 = cost1P1;
+				parent->m_area = cost1;
+				parent->m_size = (parent->m_p1 - parent->m_p0) * dVector::m_half;
+				parent->m_origin = (parent->m_p1 + parent->m_p0) * dVector::m_half;
+
+			}
+			else if ((cost2 <= cost0) && (cost2 <= cost1)) 
+			{
+				ndNodeBase* const parent = node->m_parent;
+				node->m_p0 = parent->m_p0;
+				node->m_p1 = parent->m_p1;
+				node->m_area = parent->m_area;
+				node->m_size = parent->m_size;
+				node->m_origin = parent->m_origin;
+
+				if (parent->m_parent) 
+				{
+					if (parent->m_parent->m_left == parent) 
+					{
+						parent->m_parent->m_left = node;
+					}
+					else 
+					{
+						dAssert(parent->m_parent->m_right == parent);
+						parent->m_parent->m_right = node;
+					}
+				}
+				node->m_parent = parent->m_parent;
+				parent->m_parent = node;
+				node->m_left->m_parent = parent;
+				parent->m_left = node->m_left;
+				node->m_left = parent;
+
+				parent->m_p0 = cost2P0;
+				parent->m_p1 = cost2P1;
+				parent->m_area = cost2;
+				parent->m_size = (parent->m_p1 - parent->m_p0) * dVector::m_half;
+				parent->m_origin = (parent->m_p1 + parent->m_p0) * dVector::m_half;
+			}
+		}
+		else 
+		{
+			dFloat32 cost0 = node->m_area;
+
+			dVector cost1P0;
+			dVector cost1P1;
+			dFloat32 cost1 = CalculateSurfaceArea(node->m_left, node->m_parent->m_left, cost1P0, cost1P1);
+
+			dVector cost2P0;
+			dVector cost2P1;
+			dFloat32 cost2 = CalculateSurfaceArea(node->m_right, node->m_parent->m_left, cost2P0, cost2P1);
+
+			if ((cost1 <= cost0) && (cost1 <= cost2)) 
+			{
+				ndNodeBase* const parent = node->m_parent;
+				node->m_p0 = parent->m_p0;
+				node->m_p1 = parent->m_p1;
+				node->m_area = parent->m_area;
+				node->m_size = parent->m_size;
+				node->m_origin = parent->m_origin;
+
+				if (parent->m_parent) 
+				{
+					if (parent->m_parent->m_left == parent) 
+					{
+						parent->m_parent->m_left = node;
+					}
+					else 
+					{
+						dAssert(parent->m_parent->m_right == parent);
+						parent->m_parent->m_right = node;
+					}
+				}
+				node->m_parent = parent->m_parent;
+				parent->m_parent = node;
+				node->m_left->m_parent = parent;
+				parent->m_right = node->m_left;
+				node->m_left = parent;
+
+				parent->m_p0 = cost1P0;
+				parent->m_p1 = cost1P1;
+				parent->m_area = cost1;
+				parent->m_size = (parent->m_p1 - parent->m_p0) * dVector::m_half;
+				parent->m_origin = (parent->m_p1 + parent->m_p0) * dVector::m_half;
+
+			}
+			else if ((cost2 <= cost0) && (cost2 <= cost1)) 
+			{
+				ndNodeBase* const parent = node->m_parent;
+				node->m_p0 = parent->m_p0;
+				node->m_p1 = parent->m_p1;
+				node->m_area = parent->m_area;
+				node->m_size = parent->m_size;
+				node->m_origin = parent->m_origin;
+
+				if (parent->m_parent) 
+				{
+					if (parent->m_parent->m_left == parent) 
+					{
+						parent->m_parent->m_left = node;
+					}
+					else 
+					{
+						dAssert(parent->m_parent->m_right == parent);
+						parent->m_parent->m_right = node;
+					}
+				}
+				node->m_parent = parent->m_parent;
+				parent->m_parent = node;
+				node->m_right->m_parent = parent;
+				parent->m_right = node->m_right;
+				node->m_right = parent;
+
+				parent->m_p0 = cost2P0;
+				parent->m_p1 = cost2P1;
+				parent->m_area = cost2;
+				parent->m_size = (parent->m_p1 - parent->m_p0) * dVector::m_half;
+				parent->m_origin = (parent->m_p1 + parent->m_p0) * dVector::m_half;
+			}
+		}
+	}
+	else 
+{
+		// in the future I can handle this but it is too much work for little payoff
+	}
 }
 
-//ndShapeCompoundConvex::ndTreeArray::dTreeNode* ndShapeCompoundConvex::AddCollision(ndShapeInstance* const part)
-ndShapeCompoundConvex::ndTreeArray::dTreeNode* ndShapeCompoundConvex::AddCollision(ndShapeInstance* const)
+dFloat64 ndShapeCompoundConvex::CalculateEntropy(dInt32 count, ndNodeBase** array)
 {
-	dAssert(0);
-	//dgNodeBase* const newNode = new (m_allocator) dgNodeBase(shape);
-	//m_array.AddNode(newNode, m_idIndex, m_myInstance);
-	//
-	//m_idIndex++;
-	//
-	//if (!m_root) {
-	//	m_root = newNode;
-	//}
-	//else {
-	//	dgVector p0;
-	//	dgVector p1;
-	//	dgNodeBase* sibling = m_root;
-	//	dgFloat32 surfaceArea = CalculateSurfaceArea(newNode, sibling, p0, p1);
-	//	while (sibling->m_left && sibling->m_right) {
-	//
-	//		if (surfaceArea > sibling->m_area) {
-	//			break;
-	//		}
-	//
-	//		sibling->SetBox(p0, p1);
-	//
-	//		dgVector leftP0;
-	//		dgVector leftP1;
-	//		dgFloat32 leftSurfaceArea = CalculateSurfaceArea(newNode, sibling->m_left, leftP0, leftP1);
-	//
-	//		dgVector rightP0;
-	//		dgVector rightP1;
-	//		dgFloat32 rightSurfaceArea = CalculateSurfaceArea(newNode, sibling->m_right, rightP0, rightP1);
-	//
-	//		if (leftSurfaceArea < rightSurfaceArea) {
-	//			sibling = sibling->m_left;
-	//			p0 = leftP0;
-	//			p1 = leftP1;
-	//			surfaceArea = leftSurfaceArea;
-	//		}
-	//		else {
-	//			sibling = sibling->m_right;
-	//			p0 = rightP0;
-	//			p1 = rightP1;
-	//			surfaceArea = rightSurfaceArea;
-	//		}
-	//	}
-	//
-	//	if (!sibling->m_parent) {
-	//		m_root = new (m_world->GetAllocator()) dgNodeBase(sibling, newNode);
-	//	}
-	//	else {
-	//		dgNodeBase* const parent = sibling->m_parent;
-	//		if (parent->m_left == sibling) {
-	//			dgNodeBase* const node = new (m_world->GetAllocator()) dgNodeBase(sibling, newNode);
-	//			parent->m_left = node;
-	//			node->m_parent = parent;
-	//		}
-	//		else {
-	//			dgAssert(parent->m_right == sibling);
-	//			dgNodeBase* const node = new (m_world->GetAllocator()) dgNodeBase(sibling, newNode);
-	//			parent->m_right = node;
-	//			node->m_parent = parent;
-	//		}
-	//	}
-	//}
-	//
-	//return newNode->m_myNode;
-	return nullptr;
+	dFloat64 cost0 = dFloat32(1.0e20f);
+	dFloat64 cost1 = cost0;
+	do {
+		cost1 = cost0;
+		//for (dgList<ndNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
+		for (dInt32 i = 0; i < count; i ++) 
+		{
+			ndNodeBase* const node = array[i];
+			ImproveNodeFitness(node);
+		}
+
+		cost0 = dFloat32(0.0f);
+		//for (dgList<ndNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
+		for (dInt32 i = 0; i < count; i++)
+		{
+			//ndNodeBase* const node = listNode->GetInfo();
+			ndNodeBase* const node = array[i];
+			cost0 += node->m_area;
+		}
+	} while (cost0 < (cost1 * dFloat32(0.9999f)));
+	return cost0;
+}
+
+void ndShapeCompoundConvex::EndAddRemove()
+{
+	if (m_root) 
+	{
+		//dgScopeSpinLock lock(&m_criticalSectionLock);
+
+		ndTreeArray::Iterator iter(m_array);
+		for (iter.Begin(); iter; iter++) 
+		{
+			ndNodeBase* const node = iter.GetNode()->GetInfo();
+			node->CalculateAABB();
+		}
+		
+		//dList<ndNodeBase*> list;
+		//dList<ndNodeBase*> stack;
+
+
+		dInt32 stack = 1;
+		dInt32 listCount = 0;
+		ndNodeBase** list = dAlloca(ndNodeBase*, m_array.GetCount() * 2 + 10);
+		ndNodeBase* stackBuffer[1024];
+
+		stackBuffer[0] = m_root;
+		while (stack) 
+		{
+			stack--;
+			ndNodeBase* const node = stackBuffer[stack];
+		
+			if (node->m_type == m_node) 
+			{
+				list[listCount] = node;
+				listCount++;
+				//stack.Append(node->m_right);
+				stackBuffer[stack] = node->m_right;
+				stack++;
+				dAssert(stack < sizeof(stackBuffer) / sizeof(stackBuffer[0]));
+				//stack.Append(node->m_left);
+				stackBuffer[stack] = node->m_left;
+				stack++;
+				dAssert(stack < sizeof(stackBuffer) / sizeof(stackBuffer[0]));
+			}
+		}
+		
+		if (listCount) 
+		{
+			dFloat64 cost = CalculateEntropy(listCount, list);
+			if ((cost > m_treeEntropy * dFloat32(2.0f)) || (cost < m_treeEntropy * dFloat32(0.5f))) 
+			{
+				dInt32 count = listCount * 2 + 12;
+				dInt32 leafNodesCount = 0;
+				//dgStack<ndNodeBase*> leafArray(count);
+		//		for (dgList<ndNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
+				for (dInt32 i = 0; i < listCount; i++)
+				{ 
+		//			ndNodeBase* const node = listNode->GetInfo();
+					ndNodeBase* const node = list[i];
+					if (node->m_left->m_type == m_leaf) 
+					{
+						dAssert(0);
+		//				leafArray[leafNodesCount] = node->m_left;
+		//				leafNodesCount++;
+					}
+					if (node->m_right->m_type == m_leaf) 
+					{
+						dAssert(0);
+		//				leafArray[leafNodesCount] = node->m_right;
+		//				leafNodesCount++;
+					}
+				}
+		
+				dAssert(0);
+		//		dgList<ndNodeBase*>::dgListNode* nodePtr = list.GetFirst();
+		//		dgSortIndirect(&leafArray[0], leafNodesCount, CompareNodes);
+		//		m_root = BuildTopDownBig(&leafArray[0], 0, leafNodesCount - 1, &nodePtr);
+				m_treeEntropy = CalculateEntropy(listCount, list);
+			}
+			while (m_root->m_parent) 
+			{
+				m_root = m_root->m_parent;
+			}
+		}
+		else 
+		{
+			m_treeEntropy = dFloat32(2.0f);
+		}
+		
+		dAssert(m_root->m_size.m_w == dFloat32(0.0f));
+		m_boxMinRadius = dMin(m_root->m_size.m_x, m_root->m_size.m_y, m_root->m_size.m_z);
+		m_boxMaxRadius = dSqrt(m_root->m_size.DotProduct(m_root->m_size).GetScalar());
+		
+		m_boxSize = m_root->m_size;
+		m_boxOrigin = m_root->m_origin;
+		MassProperties();
+	}
+}
+
+ndShapeCompoundConvex::ndTreeArray::dTreeNode* ndShapeCompoundConvex::AddCollision(ndShapeInstance* const shape)
+{
+	dAssert(m_myInstance);
+	ndNodeBase* const newNode = new ndNodeBase(shape);
+	m_array.AddNode(newNode, m_idIndex, m_myInstance);
+
+	m_idIndex++;
+	
+	if (!m_root) 
+	{
+		m_root = newNode;
+	}
+	else 
+	{
+		dVector p0;
+		dVector p1;
+		ndNodeBase* sibling = m_root;
+		dFloat32 surfaceArea = CalculateSurfaceArea(newNode, sibling, p0, p1);
+		while (sibling->m_left && sibling->m_right) 
+		{
+			if (surfaceArea > sibling->m_area) 
+			{
+				break;
+			}
+	
+			sibling->SetBox(p0, p1);
+	
+			dVector leftP0;
+			dVector leftP1;
+			dFloat32 leftSurfaceArea = CalculateSurfaceArea(newNode, sibling->m_left, leftP0, leftP1);
+	
+			dVector rightP0;
+			dVector rightP1;
+			dFloat32 rightSurfaceArea = CalculateSurfaceArea(newNode, sibling->m_right, rightP0, rightP1);
+	
+			if (leftSurfaceArea < rightSurfaceArea) 
+			{
+				sibling = sibling->m_left;
+				p0 = leftP0;
+				p1 = leftP1;
+				surfaceArea = leftSurfaceArea;
+			}
+			else 
+			{
+				sibling = sibling->m_right;
+				p0 = rightP0;
+				p1 = rightP1;
+				surfaceArea = rightSurfaceArea;
+			}
+		}
+	
+		if (!sibling->m_parent) 
+		{
+			m_root = new ndNodeBase(sibling, newNode);
+		}
+		else 
+		{
+			ndNodeBase* const parent = sibling->m_parent;
+			if (parent->m_left == sibling) 
+			{
+				ndNodeBase* const node = new ndNodeBase(sibling, newNode);
+				parent->m_left = node;
+				node->m_parent = parent;
+			}
+			else 
+			{
+				dAssert(parent->m_right == sibling);
+				ndNodeBase* const node = new ndNodeBase(sibling, newNode);
+				parent->m_right = node;
+				node->m_parent = parent;
+			}
+		}
+	}
+	
+	return newNode->m_myNode;
 }

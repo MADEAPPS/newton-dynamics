@@ -433,8 +433,10 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 	
 	if (count > 2) 
 	{
-		ndShapeInstance* compoundInstance = new ndShapeInstance(new ndShapeCompoundConvex());
+		ndShapeInstance* const compoundInstance = new ndShapeInstance(new ndShapeCompoundConvex());
 		ndShapeCompoundConvex* const compound = compoundInstance->GetShape()->GetAsShapeCompoundConvex();
+		compound->SetOwner(compoundInstance);
+
 		compound->BeginAddRemove ();
 		for (dInt32 i = 1; i < count; i ++) 
 		{
@@ -442,9 +444,8 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 			delete shapeArray[i];
 		}
 		compound->EndAddRemove ();
-		dAssert(0);
-	//	shapeArray[0] = compound;
-	//	count = 1;
+		shapeArray[0] = compoundInstance;
+		count = 1;
 	} 
 	else if (count == 2) 
 	{
