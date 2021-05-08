@@ -29,9 +29,23 @@
 class ndShapeCompoundConvex: public ndShape
 {
 	public:
+
+	class ndNodeBase;
+	class ndTreeArray : public dTree<ndNodeBase*, dInt32, dContainersFreeListAlloc<ndNodeBase*>>
+	{
+		public:
+		ndTreeArray();
+		void AddNode(ndNodeBase* const node, dInt32 index, const ndShapeInstance* const parent);
+	};
+
+
 	D_COLLISION_API ndShapeCompoundConvex();
 	D_COLLISION_API ndShapeCompoundConvex(const nd::TiXmlNode* const xmlNode);
 	D_COLLISION_API virtual ~ndShapeCompoundConvex();
+
+	D_COLLISION_API virtual void BeginAddRemove();
+	D_COLLISION_API virtual ndTreeArray::dTreeNode* AddCollision(ndShapeInstance* const part);
+	D_COLLISION_API virtual void EndAddRemove(bool flushCache = true);
 
 	protected:
 	virtual ndShapeInfo GetShapeInfo() const;

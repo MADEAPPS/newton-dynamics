@@ -26,10 +26,23 @@
 #include "ndCollisionStdafx.h"
 #include "ndShapeCompoundConvex.h"
 
+
+ndShapeCompoundConvex::ndTreeArray::ndTreeArray()
+	:dTree<ndNodeBase*, dInt32, dContainersFreeListAlloc<ndNodeBase*>>()
+{
+	dAssert(0);
+}
+
+//void ndShapeCompoundConvex::ndTreeArray::AddNode(ndNodeBase* const node, dInt32 index, const ndShapeInstance* const parent)
+void ndShapeCompoundConvex::ndTreeArray::AddNode(ndNodeBase* const, dInt32, const ndShapeInstance* const)
+{
+	dAssert(0);
+}
+
+
 ndShapeCompoundConvex::ndShapeCompoundConvex()
 	:ndShape(m_compoundConvex)
 {
-	dAssert(0);
 }
 
 ndShapeCompoundConvex::ndShapeCompoundConvex(const nd::TiXmlNode* const xmlNode)
@@ -182,4 +195,21 @@ dFloat32 ndShapeCompoundConvex::RayCast(ndRayCastNotify&, const dVector&, const 
 {
 	dAssert(0);
 	return 0;
+}
+
+void ndShapeCompoundConvex::BeginAddRemove()
+{
+}
+
+void ndShapeCompoundConvex::EndAddRemove(bool flushCache)
+{
+	dAssert(0);
+	flushCache = false;
+}
+
+//ndShapeCompoundConvex::ndTreeArray::dTreeNode* ndShapeCompoundConvex::AddCollision(ndShapeInstance* const part)
+ndShapeCompoundConvex::ndTreeArray::dTreeNode* ndShapeCompoundConvex::AddCollision(ndShapeInstance* const)
+{
+	dAssert(0);
+	return nullptr;
 }

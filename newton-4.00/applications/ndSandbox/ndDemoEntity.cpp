@@ -433,16 +433,16 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 	
 	if (count > 2) 
 	{
+		ndShapeInstance* compoundInstance = new ndShapeInstance(new ndShapeCompoundConvex());
+		ndShapeCompoundConvex* const compound = compoundInstance->GetShape()->GetAsShapeCompoundConvex();
+		compound->BeginAddRemove ();
+		for (dInt32 i = 1; i < count; i ++) 
+		{
+			compound->AddCollision(shapeArray[i]);
+			delete shapeArray[i];
+		}
+		compound->EndAddRemove ();
 		dAssert(0);
-	//	NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
-
-		ndShapeInstance* compoundShape = new ndShapeInstance(new ndShapeCompoundConvex());
-	//	NewtonCompoundCollisionBeginAddRemove (compound);	
-	//	for (dInt32 i = 1; i < count; i ++) {
-	//		NewtonCompoundCollisionAddSubCollision (compound, shapeArray[i]);
-	//		NewtonDestroyCollision(shapeArray[i]);
-	//	}
-	//	NewtonCompoundCollisionEndAddRemove (compound);	
 	//	shapeArray[0] = compound;
 	//	count = 1;
 	} 

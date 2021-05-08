@@ -28,6 +28,7 @@
 #include "ndContactNotify.h"
 #include "ndContactSolver.h"
 #include "ndBodyTriggerVolume.h"
+#include "ndShapeCompoundConvex.h"
 #include "ndJointBilateralConstraint.h"
 
 #define D_CONTACT_DELAY_FRAMES		4
@@ -208,6 +209,7 @@ ndScene::~ndScene()
 	delete m_contactNotifyCallback;
 	ndContactList::FlushFreeList();
 	ndContactPointList::FlushFreeList();
+	ndShapeCompoundConvex::ndTreeArray::FlushFreeList();
 }
 
 void ndScene::CollisionOnlyUpdate()
