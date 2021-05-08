@@ -37,8 +37,9 @@ class ndShapeCompoundConvex: public ndShape
 
 	protected:
 	class ndNodeBase;
-	public:
+	class ndSpliteInfo;
 
+	public:
 	class ndTreeArray : public dTree<ndNodeBase*, dInt32, dContainersFreeListAlloc<ndNodeBase*>>
 	{
 		public:
@@ -58,46 +59,6 @@ class ndShapeCompoundConvex: public ndShape
 	D_COLLISION_API virtual void EndAddRemove();
 
 	protected:
-	class ndNodeBase
-	{
-		public:
-		//ndNodeBase();
-		//ndNodeBase(const ndNodeBase& copyFrom);
-		ndNodeBase(ndShapeInstance* const instance);
-		ndNodeBase(ndNodeBase* const left, ndNodeBase* const right);
-		//~ndNodeBase();
-
-		void CalculateAABB();
-		void SetBox(const dVector& p0, const dVector& p1);
-		//bool BoxTest(const dgOOBBTestData& data) const;
-		//bool BoxTest(const dgOOBBTestData& data, const ndNodeBase* const otherNode) const;
-		//dFloat32 RayBoxDistance(const dgOOBBTestData& data, const dgFastRayTest& myRay, const dgFastRayTest& otherRay, const ndNodeBase* const otherNode) const;
-		//
-		//DG_INLINE ndShapeInstance* GetShape() const
-		//{
-		//	return m_shape;
-		//}
-		//
-		//DG_INLINE dgInt32 BoxIntersect(const dgFastRayTest& ray, const dVector& boxP0, const dVector& boxP1) const
-		//{
-		//	dVector minBox(m_p0 - boxP1);
-		//	dVector maxBox(m_p1 - boxP0);
-		//	return ray.BoxTest(minBox, maxBox);
-		//}
-		
-		dVector m_p0;
-		dVector m_p1;
-		dVector m_size;
-		dVector m_origin;
-		dFloat32 m_area;
-		dInt32 m_type;
-		ndNodeBase* m_left;
-		ndNodeBase* m_right;
-		ndNodeBase* m_parent;
-		ndShapeInstance* m_shape;
-		ndTreeArray::dTreeNode* m_myNode;
-	};
-
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
@@ -116,8 +77,12 @@ class ndShapeCompoundConvex: public ndShape
 	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	//D_COLLISION_API dInt32 CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 strideInFloat, const dPlane& localPlane, dVector* const contactsOut) const;
 
+	virtual void MassProperties();
 	void ImproveNodeFitness(ndNodeBase* const node) const;
 	dFloat64 CalculateEntropy(dInt32 count, ndNodeBase** array);
+	static dInt32 CompareNodes(const ndNodeBase* const nodeA, const ndNodeBase* const nodeB, void*);
+	ndNodeBase* BuildTopDown(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory);
+	ndNodeBase* BuildTopDownBig(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory);
 	dFloat32 CalculateSurfaceArea(ndNodeBase* const node0, ndNodeBase* const node1, dVector& minBox, dVector& maxBox) const;
 
 	ndTreeArray m_array;
@@ -138,15 +103,6 @@ inline void ndShapeCompoundConvex::SetOwner(const ndShapeInstance* const instanc
 {
 	m_myInstance = instance;
 }
-
-inline dFloat32 ndShapeCompoundConvex::CalculateSurfaceArea(ndNodeBase* const node0, ndNodeBase* const node1, dVector& minBox, dVector& maxBox) const
-{
-	minBox = node0->m_p0.GetMin(node1->m_p0);
-	maxBox = node0->m_p1.GetMax(node1->m_p1);
-	dVector side0(dVector::m_half * (maxBox - minBox));
-	return side0.DotProduct(side0.ShiftTripleRight()).GetScalar();
-}
-
 
 #endif 
 

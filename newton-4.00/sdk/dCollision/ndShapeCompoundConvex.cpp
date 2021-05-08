@@ -27,51 +27,197 @@
 #include "ndShapeCompoundConvex.h"
 
 
-ndShapeCompoundConvex::ndNodeBase::ndNodeBase(ndShapeInstance* const instance)
-	:m_type(m_leaf)
-	,m_left(nullptr)
-	,m_right(nullptr)
-	,m_parent(nullptr)
-	,m_shape(new ndShapeInstance(*instance))
-	,m_myNode(nullptr)
+class ndShapeCompoundConvex::ndNodeBase
 {
-	CalculateAABB();
-}
+	public:
+	//ndNodeBase();
+	//ndNodeBase(const ndNodeBase& copyFrom);
+	ndNodeBase(ndShapeInstance* const instance)
+		:m_type(m_leaf)
+		, m_left(nullptr)
+		, m_right(nullptr)
+		, m_parent(nullptr)
+		, m_shape(new ndShapeInstance(*instance))
+		, m_myNode(nullptr)
+	{
+		CalculateAABB();
+	}
 
-ndShapeCompoundConvex::ndNodeBase::ndNodeBase(ndNodeBase* const left, ndNodeBase* const right)
-	:m_type(m_node)
-	,m_left(left)
-	,m_right(right)
-	,m_parent(nullptr)
-	,m_shape(nullptr)
-	,m_myNode(nullptr)
+	ndNodeBase(ndNodeBase* const left, ndNodeBase* const right)
+		:m_type(m_node)
+		,m_left(left)
+		,m_right(right)
+		,m_parent(nullptr)
+		,m_shape(nullptr)
+		,m_myNode(nullptr)
+	{
+		m_left->m_parent = this;
+		m_right->m_parent = this;
+
+		dVector p0(left->m_p0.GetMin(right->m_p0));
+		dVector p1(left->m_p1.GetMax(right->m_p1));
+		SetBox(p0, p1);
+	}
+
+	//~ndNodeBase();
+
+	void CalculateAABB()
+	{
+		dVector p0;
+		dVector p1;
+		m_shape->CalculateAABB(m_shape->GetLocalMatrix(), p0, p1);
+		SetBox(p0, p1);
+	}
+
+	void SetBox(const dVector& p0, const dVector& p1)
+	{
+		m_p0 = p0;
+		m_p1 = p1;
+		dAssert(m_p0.m_w == dFloat32(0.0f));
+		dAssert(m_p1.m_w == dFloat32(0.0f));
+		m_size = dVector::m_half * (m_p1 - m_p0);
+		m_origin = dVector::m_half * (m_p1 + m_p0);
+		m_area = m_size.DotProduct(m_size.ShiftTripleRight()).m_x;
+	}
+
+	//bool BoxTest(const dgOOBBTestData& data) const;
+	//bool BoxTest(const dgOOBBTestData& data, const ndNodeBase* const otherNode) const;
+	//dFloat32 RayBoxDistance(const dgOOBBTestData& data, const dgFastRayTest& myRay, const dgFastRayTest& otherRay, const ndNodeBase* const otherNode) const;
+	
+	ndShapeInstance* GetShape() const
+	{
+		return m_shape;
+	}
+	
+	//DG_INLINE dInt32 BoxIntersect(const dgFastRayTest& ray, const dVector& boxP0, const dVector& boxP1) const
+	//{
+	//	dVector minBox(m_p0 - boxP1);
+	//	dVector maxBox(m_p1 - boxP0);
+	//	return ray.BoxTest(minBox, maxBox);
+	//}
+
+	dVector m_p0;
+	dVector m_p1;
+	dVector m_size;
+	dVector m_origin;
+	dFloat32 m_area;
+	dInt32 m_type;
+	ndNodeBase* m_left;
+	ndNodeBase* m_right;
+	ndNodeBase* m_parent;
+	ndShapeInstance* m_shape;
+	ndTreeArray::dTreeNode* m_myNode;
+};
+
+
+class ndShapeCompoundConvex::ndSpliteInfo
 {
-	m_left->m_parent = this;
-	m_right->m_parent = this;
+	public:
+	ndSpliteInfo(ndNodeBase** const boxArray, dInt32 boxCount)
+	{
+		dVector minP(dFloat32(1.0e15f));
+		dVector maxP(-dFloat32(1.0e15f));
 
-	dVector p0(left->m_p0.GetMin(right->m_p0));
-	dVector p1(left->m_p1.GetMax(right->m_p1));
-	SetBox(p0, p1);
-}
+		if (boxCount == 2)
+		{
+			m_axis = 1;
+			for (dInt32 i = 0; i < boxCount; i++)
+			{
+				ndNodeBase* const node = boxArray[i];
+				dAssert(node->m_type == m_leaf);
+				minP = minP.GetMin(node->m_p0);
+				maxP = maxP.GetMax(node->m_p1);
+			}
+		}
+		else
+		{
+			dVector median(dVector::m_zero);
+			dVector varian(dVector::m_zero);
 
-void ndShapeCompoundConvex::ndNodeBase::SetBox(const dVector& p0, const dVector& p1)
-{
-	m_p0 = p0;
-	m_p1 = p1;
-	dAssert(m_p0.m_w == dFloat32(0.0f));
-	dAssert(m_p1.m_w == dFloat32(0.0f));
-	m_size = dVector::m_half * (m_p1 - m_p0);
-	m_origin = dVector::m_half * (m_p1 + m_p0);
-	m_area = m_size.DotProduct(m_size.ShiftTripleRight()).m_x;
-}
+			for (dInt32 i = 0; i < boxCount; i++)
+			{
+				ndNodeBase* const node = boxArray[i];
+				dAssert(node->m_type == m_leaf);
+				minP = minP.GetMin(node->m_p0);
+				maxP = maxP.GetMax(node->m_p1);
+				dVector p(dVector::m_half * (node->m_p0 + node->m_p1));
+				median += p;
+				varian += p * p;
+			}
 
-void ndShapeCompoundConvex::ndNodeBase::CalculateAABB()
-{
-	dVector p0;
-	dVector p1;
-	m_shape->CalculateAABB(m_shape->GetLocalMatrix(), p0, p1);
-	SetBox(p0, p1);
-}
+			varian = varian.Scale(dFloat32(boxCount)) - median * median;
+
+			dInt32 index = 0;
+			dFloat32 maxVarian = dFloat32(-1.0e10f);
+			for (dInt32 i = 0; i < 3; i++)
+			{
+				if (varian[i] > maxVarian)
+				{
+					index = i;
+					maxVarian = varian[i];
+				}
+			}
+
+			dVector center = median.Scale(dFloat32(1.0f) / dFloat32(boxCount));
+
+			dFloat32 test = center[index];
+
+			dInt32 i0 = 0;
+			dInt32 i1 = boxCount - 1;
+			do
+			{
+				for (; i0 <= i1; i0++)
+				{
+					ndNodeBase* const node = boxArray[i0];
+					dFloat32 val = (node->m_p0[index] + node->m_p1[index]) * dFloat32(0.5f);
+					if (val > test)
+					{
+						break;
+					}
+				}
+
+				for (; i1 >= i0; i1--)
+				{
+					ndNodeBase* const node = boxArray[i1];
+					dFloat32 val = (node->m_p0[index] + node->m_p1[index]) * dFloat32(0.5f);
+					if (val < test)
+					{
+						break;
+					}
+				}
+
+				if (i0 < i1)
+				{
+					dSwap(boxArray[i0], boxArray[i1]);
+					i0++;
+					i1--;
+				}
+
+			} while (i0 <= i1);
+
+			if (i0 > 0)
+			{
+				i0--;
+			}
+			if ((i0 + 1) >= boxCount)
+			{
+				i0 = boxCount - 2;
+			}
+
+			m_axis = i0 + 1;
+		}
+
+		dAssert(maxP.m_x - minP.m_x >= dFloat32(0.0f));
+		dAssert(maxP.m_y - minP.m_y >= dFloat32(0.0f));
+		dAssert(maxP.m_z - minP.m_z >= dFloat32(0.0f));
+		m_p0 = minP;
+		m_p1 = maxP;
+	}
+
+	dInt32 m_axis;
+	dVector m_p0;
+	dVector m_p1;
+};
 
 ndShapeCompoundConvex::ndTreeArray::ndTreeArray()
 	:dTree<ndNodeBase*, dInt32, dContainersFreeListAlloc<ndNodeBase*>>()
@@ -261,6 +407,15 @@ void ndShapeCompoundConvex::BeginAddRemove()
 {
 	dAssert(m_myInstance);
 }
+
+dFloat32 ndShapeCompoundConvex::CalculateSurfaceArea(ndNodeBase* const node0, ndNodeBase* const node1, dVector& minBox, dVector& maxBox) const
+{
+	minBox = node0->m_p0.GetMin(node1->m_p0);
+	maxBox = node0->m_p1.GetMax(node1->m_p1);
+	dVector side0(dVector::m_half * (maxBox - minBox));
+	return side0.DotProduct(side0.ShiftTripleRight()).GetScalar();
+}
+
 
 void ndShapeCompoundConvex::ImproveNodeFitness(ndNodeBase* const node) const
 {
@@ -463,6 +618,96 @@ dFloat64 ndShapeCompoundConvex::CalculateEntropy(dInt32 count, ndNodeBase** arra
 	return cost0;
 }
 
+dInt32 ndShapeCompoundConvex::CompareNodes(const ndNodeBase* const nodeA, const ndNodeBase* const nodeB, void*)
+{
+	dFloat32 areaA = nodeA->m_area;
+	dFloat32 areaB = nodeB->m_area;
+	if (areaA < areaB) 
+	{
+		return -1;
+	}
+	if (areaA > areaB) 
+	{
+		return 1;
+	}
+	return 0;
+}
+
+ndShapeCompoundConvex::ndNodeBase* ndShapeCompoundConvex::BuildTopDown(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory)
+{
+	dAssert(lastBox >= 0);
+	dAssert(firstBox >= 0);
+
+	if (lastBox == firstBox) 
+	{
+		return leafArray[firstBox];
+	}
+
+	ndSpliteInfo info(&leafArray[firstBox], lastBox - firstBox + 1);
+		
+	ndNodeBase* const parent = *rootNodesMemory;
+	rootNodesMemory++;
+	parent->m_parent = nullptr;
+		
+	parent->SetBox(info.m_p0, info.m_p1);
+	parent->m_right = BuildTopDown(leafArray, firstBox + info.m_axis, lastBox, rootNodesMemory);
+	parent->m_right->m_parent = parent;
+		
+	parent->m_left = BuildTopDown(leafArray, firstBox, firstBox + info.m_axis - 1, rootNodesMemory);
+	parent->m_left->m_parent = parent;
+	return parent;
+}
+
+ndShapeCompoundConvex::ndNodeBase* ndShapeCompoundConvex::BuildTopDownBig(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory)
+{
+	if (lastBox == firstBox) 
+	{
+		return BuildTopDown(leafArray, firstBox, lastBox, rootNodesMemory);
+	}
+
+	dInt32 midPoint = -1;
+	const dFloat32 scale = dFloat32(10.0f);
+	const dFloat32 scale2 = dFloat32(3.0f) * scale * scale;
+	const dInt32 count = lastBox - firstBox;
+	for (dInt32 i = 0; i < count; i++) 
+	{
+		const ndNodeBase* const node0 = leafArray[firstBox + i];
+		const ndNodeBase* const node1 = leafArray[firstBox + i + 1];
+		if (node1->m_area > (scale2 * node0->m_area)) 
+		{
+			midPoint = i;
+			break;
+		}
+	}
+
+	if (midPoint == -1) 
+	{
+		return BuildTopDown(leafArray, firstBox, lastBox, rootNodesMemory);
+	}
+
+	ndNodeBase* const parent = *rootNodesMemory;
+	rootNodesMemory++;
+	parent->m_parent = nullptr;
+	
+	dVector minP(dFloat32(1.0e15f));
+	dVector maxP(-dFloat32(1.0e15f));
+	for (dInt32 i = 0; i <= count; i++) 
+	{
+		const ndNodeBase* const node = leafArray[firstBox + i];
+		dAssert(node->m_shape);
+		minP = minP.GetMin(node->m_p0);
+		maxP = maxP.GetMax(node->m_p1);
+	}
+	
+	parent->SetBox(minP, maxP);
+	parent->m_left = BuildTopDown(leafArray, firstBox, firstBox + midPoint, rootNodesMemory);
+	parent->m_left->m_parent = parent;
+	
+	parent->m_right = BuildTopDownBig(leafArray, firstBox + midPoint + 1, lastBox, rootNodesMemory);
+	parent->m_right->m_parent = parent;
+	return parent;
+}
+
 void ndShapeCompoundConvex::EndAddRemove()
 {
 	if (m_root) 
@@ -475,14 +720,10 @@ void ndShapeCompoundConvex::EndAddRemove()
 			ndNodeBase* const node = iter.GetNode()->GetInfo();
 			node->CalculateAABB();
 		}
-		
-		//dList<ndNodeBase*> list;
-		//dList<ndNodeBase*> stack;
-
 
 		dInt32 stack = 1;
-		dInt32 listCount = 0;
-		ndNodeBase** list = dAlloca(ndNodeBase*, m_array.GetCount() * 2 + 10);
+		dInt32 nodeCount = 0;
+		ndNodeBase** nodeArray = dAlloca(ndNodeBase*, m_array.GetCount() + 10);
 		ndNodeBase* stackBuffer[1024];
 
 		stackBuffer[0] = m_root;
@@ -493,51 +734,49 @@ void ndShapeCompoundConvex::EndAddRemove()
 		
 			if (node->m_type == m_node) 
 			{
-				list[listCount] = node;
-				listCount++;
-				//stack.Append(node->m_right);
+				nodeArray[nodeCount] = node;
+				nodeCount++;
+				dAssert(nodeCount <= m_array.GetCount());
+
 				stackBuffer[stack] = node->m_right;
 				stack++;
 				dAssert(stack < sizeof(stackBuffer) / sizeof(stackBuffer[0]));
-				//stack.Append(node->m_left);
+
 				stackBuffer[stack] = node->m_left;
 				stack++;
 				dAssert(stack < sizeof(stackBuffer) / sizeof(stackBuffer[0]));
 			}
 		}
 		
-		if (listCount) 
+		if (nodeCount)
 		{
-			dFloat64 cost = CalculateEntropy(listCount, list);
+			dFloat64 cost = CalculateEntropy(nodeCount, nodeArray);
 			if ((cost > m_treeEntropy * dFloat32(2.0f)) || (cost < m_treeEntropy * dFloat32(0.5f))) 
 			{
-				dInt32 count = listCount * 2 + 12;
+				//dInt32 count = nodeCount * 2 + 12;
 				dInt32 leafNodesCount = 0;
-				//dgStack<ndNodeBase*> leafArray(count);
-		//		for (dgList<ndNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
-				for (dInt32 i = 0; i < listCount; i++)
+				ndNodeBase** leafArray = dAlloca(ndNodeBase*, nodeCount + 12);
+				for (dInt32 i = 0; i < nodeCount; i++)
 				{ 
-		//			ndNodeBase* const node = listNode->GetInfo();
-					ndNodeBase* const node = list[i];
+
+					ndNodeBase* const node = nodeArray[i];
 					if (node->m_left->m_type == m_leaf) 
 					{
-						dAssert(0);
-		//				leafArray[leafNodesCount] = node->m_left;
-		//				leafNodesCount++;
+						leafArray[leafNodesCount] = node->m_left;
+						leafNodesCount++;
+						dAssert(leafNodesCount <= (nodeCount + 1));
 					}
 					if (node->m_right->m_type == m_leaf) 
 					{
-						dAssert(0);
-		//				leafArray[leafNodesCount] = node->m_right;
-		//				leafNodesCount++;
+						leafArray[leafNodesCount] = node->m_right;
+						leafNodesCount++;
+						dAssert(leafNodesCount <= (nodeCount + 1));
 					}
 				}
 		
-				dAssert(0);
-		//		dgList<ndNodeBase*>::dgListNode* nodePtr = list.GetFirst();
-		//		dgSortIndirect(&leafArray[0], leafNodesCount, CompareNodes);
-		//		m_root = BuildTopDownBig(&leafArray[0], 0, leafNodesCount - 1, &nodePtr);
-				m_treeEntropy = CalculateEntropy(listCount, list);
+				dSortIndirect(&leafArray[0], leafNodesCount, CompareNodes);
+				m_root = BuildTopDownBig(&leafArray[0], 0, leafNodesCount - 1, nodeArray);
+				m_treeEntropy = CalculateEntropy(nodeCount, nodeArray);
 			}
 			while (m_root->m_parent) 
 			{
@@ -634,4 +873,50 @@ ndShapeCompoundConvex::ndTreeArray::dTreeNode* ndShapeCompoundConvex::AddCollisi
 	}
 	
 	return newNode->m_myNode;
+}
+
+void ndShapeCompoundConvex::MassProperties()
+{
+#ifdef _DEBUG
+	//	dVector origin_ (dVector::m_zero);
+	//	dVector inertia_ (dVector::m_zero);
+	//	dVector crossInertia_ (dVector::m_zero);
+	//	dgPolyhedraMassProperties localData;
+	//	DebugCollision (dgGetIdentityMatrix(), CalculateInertia, &localData);
+	//	dFloat32 volume_ = localData.MassProperties (origin_, inertia_, crossInertia_);
+	//	dgAssert (volume_ > dFloat32 (0.0f));
+	//	dFloat32 invVolume_ = dFloat32 (1.0f)/volume_;
+	//	m_centerOfMass = origin_.Scale (invVolume_);
+	//	m_centerOfMass.m_w = volume_;
+	//	m_inertia = inertia_.Scale (invVolume_);
+	//	m_crossInertia = crossInertia_.Scale(invVolume_);
+#endif
+
+
+	dFloat32 volume = dFloat32(0.0f);
+	dVector origin(dVector::m_zero);
+	dVector inertiaII(dVector::m_zero);
+	dVector inertiaIJ(dVector::m_zero);
+	ndTreeArray::Iterator iter(m_array);
+	for (iter.Begin(); iter; iter++) 
+	{
+		ndShapeInstance* const collision = iter.GetNode()->GetInfo()->GetShape();
+		dMatrix shapeInertia(collision->CalculateInertia());
+		dFloat32 shapeVolume = collision->GetVolume();
+
+		volume += shapeVolume;
+		origin += shapeInertia.m_posit.Scale(shapeVolume);
+		inertiaII += dVector(shapeInertia[0][0], shapeInertia[1][1], shapeInertia[2][2], dFloat32(0.0f)).Scale(shapeVolume);
+		inertiaIJ += dVector(shapeInertia[1][2], shapeInertia[0][2], shapeInertia[0][1], dFloat32(0.0f)).Scale(shapeVolume);
+	}
+	if (volume > dFloat32(0.0f)) 
+	{
+		dFloat32 invVolume = dFloat32(1.0f) / volume;
+		m_inertia = inertiaII.Scale(invVolume);
+		m_crossInertia = inertiaIJ.Scale(invVolume);
+		m_centerOfMass = origin.Scale(invVolume);
+		m_centerOfMass.m_w = volume;
+	}
+
+	ndShape::MassProperties();
 }
