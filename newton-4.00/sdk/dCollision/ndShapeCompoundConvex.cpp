@@ -211,5 +211,68 @@ void ndShapeCompoundConvex::EndAddRemove(bool flushCache)
 ndShapeCompoundConvex::ndTreeArray::dTreeNode* ndShapeCompoundConvex::AddCollision(ndShapeInstance* const)
 {
 	dAssert(0);
+	//dgNodeBase* const newNode = new (m_allocator) dgNodeBase(shape);
+	//m_array.AddNode(newNode, m_idIndex, m_myInstance);
+	//
+	//m_idIndex++;
+	//
+	//if (!m_root) {
+	//	m_root = newNode;
+	//}
+	//else {
+	//	dgVector p0;
+	//	dgVector p1;
+	//	dgNodeBase* sibling = m_root;
+	//	dgFloat32 surfaceArea = CalculateSurfaceArea(newNode, sibling, p0, p1);
+	//	while (sibling->m_left && sibling->m_right) {
+	//
+	//		if (surfaceArea > sibling->m_area) {
+	//			break;
+	//		}
+	//
+	//		sibling->SetBox(p0, p1);
+	//
+	//		dgVector leftP0;
+	//		dgVector leftP1;
+	//		dgFloat32 leftSurfaceArea = CalculateSurfaceArea(newNode, sibling->m_left, leftP0, leftP1);
+	//
+	//		dgVector rightP0;
+	//		dgVector rightP1;
+	//		dgFloat32 rightSurfaceArea = CalculateSurfaceArea(newNode, sibling->m_right, rightP0, rightP1);
+	//
+	//		if (leftSurfaceArea < rightSurfaceArea) {
+	//			sibling = sibling->m_left;
+	//			p0 = leftP0;
+	//			p1 = leftP1;
+	//			surfaceArea = leftSurfaceArea;
+	//		}
+	//		else {
+	//			sibling = sibling->m_right;
+	//			p0 = rightP0;
+	//			p1 = rightP1;
+	//			surfaceArea = rightSurfaceArea;
+	//		}
+	//	}
+	//
+	//	if (!sibling->m_parent) {
+	//		m_root = new (m_world->GetAllocator()) dgNodeBase(sibling, newNode);
+	//	}
+	//	else {
+	//		dgNodeBase* const parent = sibling->m_parent;
+	//		if (parent->m_left == sibling) {
+	//			dgNodeBase* const node = new (m_world->GetAllocator()) dgNodeBase(sibling, newNode);
+	//			parent->m_left = node;
+	//			node->m_parent = parent;
+	//		}
+	//		else {
+	//			dgAssert(parent->m_right == sibling);
+	//			dgNodeBase* const node = new (m_world->GetAllocator()) dgNodeBase(sibling, newNode);
+	//			parent->m_right = node;
+	//			node->m_parent = parent;
+	//		}
+	//	}
+	//}
+	//
+	//return newNode->m_myNode;
 	return nullptr;
 }
