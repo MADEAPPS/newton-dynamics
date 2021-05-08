@@ -435,6 +435,8 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 	{
 		dAssert(0);
 	//	NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
+
+		ndShapeInstance* compoundShape = new ndShapeInstance(new ndShapeCompoundConvex());
 	//	NewtonCompoundCollisionBeginAddRemove (compound);	
 	//	for (dInt32 i = 1; i < count; i ++) {
 	//		NewtonCompoundCollisionAddSubCollision (compound, shapeArray[i]);

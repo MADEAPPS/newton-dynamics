@@ -334,5 +334,4 @@ inline void ndWorld::UpdateTransformsUnlock()
 	m_transformsLock.unlock();
 }
 
-
 #endif

@@ -26,11 +26,17 @@
 #include "ndCollisionStdafx.h"
 #include "ndShapeCompoundConvex.h"
 
-
 ndShapeCompoundConvex::ndShapeCompoundConvex()
 	:ndShape(m_compoundConvex)
 {
 	dAssert(0);
+}
+
+ndShapeCompoundConvex::ndShapeCompoundConvex(const nd::TiXmlNode* const xmlNode)
+	:ndShape(m_compoundConvex)
+{
+	dAssert(0);
+	xmlGetInt(xmlNode, "xxxx");
 }
 
 ndShapeCompoundConvex::~ndShapeCompoundConvex()
@@ -38,6 +44,7 @@ ndShapeCompoundConvex::~ndShapeCompoundConvex()
 	dAssert(0);
 }
 
+/*
 void ndShapeCompoundConvex::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const
 {
 	dAssert(0);
@@ -98,4 +105,81 @@ dInt32 ndShapeCompoundConvex::CalculatePlaneIntersection(const dFloat32* const, 
 	//}
 	//
 	//return count;
+}
+*/
+
+ndShapeInfo ndShapeCompoundConvex::GetShapeInfo() const
+{
+	ndShapeInfo info(ndShape::GetShapeInfo());
+
+	dAssert(0);
+	return info;
+}
+
+//void ndShapeCompoundConvex::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+void ndShapeCompoundConvex::DebugShape(const dMatrix&, ndShapeDebugCallback&) const
+{
+	dAssert(0);
+}
+
+dFloat32 ndShapeCompoundConvex::GetVolume() const
+{
+	dAssert(0);
+	return dFloat32(0.0f);
+}
+
+dFloat32 ndShapeCompoundConvex::GetBoxMinRadius() const
+{
+	dAssert(0);
+	return dFloat32(0.0f);
+}
+
+dFloat32 ndShapeCompoundConvex::GetBoxMaxRadius() const
+{
+	dAssert(0);
+	return dFloat32(0.0f);
+}
+
+//void ndShapeCompoundConvex::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
+void ndShapeCompoundConvex::CalcAABB(const dMatrix&, dVector&, dVector&) const
+{
+	dAssert(0);
+}
+
+dVector ndShapeCompoundConvex::SupportVertex(const dVector&, dInt32* const) const
+{
+	dAssert(0);
+	return dVector::m_zero;
+}
+
+//dVector ndShapeCompoundConvex::SupportVertexSpecialProjectPoint(const dVector& point, const dVector&) const
+dVector ndShapeCompoundConvex::SupportVertexSpecialProjectPoint(const dVector&, const dVector&) const
+{ 
+	dAssert(0);
+	return dVector::m_zero;
+}
+
+dVector ndShapeCompoundConvex::SupportVertexSpecial(const dVector& dir, dFloat32, dInt32* const vertexIndex) const
+{
+	dAssert(0);
+	return SupportVertex(dir, vertexIndex);
+}
+
+dInt32 ndShapeCompoundConvex::CalculatePlaneIntersection(const dVector&, const dVector&, dVector* const) const
+{
+	dAssert(0);
+	return 0;
+}
+
+dVector ndShapeCompoundConvex::CalculateVolumeIntegral(const dMatrix&, const dVector&, const ndShapeInstance&) const
+{
+	dAssert(0);
+	return dVector::m_zero;
+}
+
+//dFloat32 ndShapeCompoundConvex::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeCompoundConvex::RayCast(ndRayCastNotify&, const dVector&, const dVector&, dFloat32, const ndBody* const, ndContactPoint&) const
+{
+	dAssert(0);
+	return 0;
 }

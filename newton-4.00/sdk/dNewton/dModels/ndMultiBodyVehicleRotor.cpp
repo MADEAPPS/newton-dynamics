@@ -99,7 +99,7 @@ dFloat32 ndMultiBodyVehicleRotor::CalculateAcceleration(ndConstraintDescritor& d
 	}
 	
 	desiredSpeed = dClamp(desiredSpeed, m_idleOmega, m_maxOmega);
-	dTrace(("%f %f\n", desiredSpeed, m_omega));
+	//dTrace(("%f %f\n", desiredSpeed, m_omega));
 	return (m_omega - desiredSpeed) * desc.m_invTimestep;
 
 #else

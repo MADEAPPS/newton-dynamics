@@ -30,10 +30,14 @@ class ndShapeCompoundConvex: public ndShape
 {
 	public:
 	D_COLLISION_API ndShapeCompoundConvex();
+	D_COLLISION_API ndShapeCompoundConvex(const nd::TiXmlNode* const xmlNode);
 	D_COLLISION_API virtual ~ndShapeCompoundConvex();
 
-	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const = 0;
 	protected:
+	virtual ndShapeInfo GetShapeInfo() const;
+	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
+	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+
 	virtual dFloat32 GetVolume() const;
 	virtual dFloat32 GetBoxMinRadius() const;
 	virtual dFloat32 GetBoxMaxRadius() const;
@@ -43,65 +47,10 @@ class ndShapeCompoundConvex: public ndShape
 	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 	virtual dVector CalculateVolumeIntegral(const dMatrix& globalMatrix, const dVector& plane, const ndShapeInstance& parentScale) const;
-
+	
 	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
-	D_COLLISION_API dInt32 CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 strideInFloat, const dPlane& localPlane, dVector* const contactsOut) const;
-
-	D_MSV_NEWTON_ALIGN_32 
-	class ndMeshVertexListIndexList
-	{
-		public:
-		dInt32* m_indexList;
-		dInt32* m_userDataList;
-		dFloat32* m_veterxArray;
-		dInt32 m_triangleCount; 
-		dInt32 m_maxIndexCount;
-		dInt32 m_vertexCount;
-		dInt32 m_vertexStrideInBytes;
-	} D_GCC_NEWTON_ALIGN_32;
+	//D_COLLISION_API dInt32 CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 strideInFloat, const dPlane& localPlane, dVector* const contactsOut) const;
 };
-
-inline dFloat32 ndShapeCompoundConvex::GetVolume() const
-{
-	return dFloat32(0.0f);
-}
-
-inline dFloat32 ndShapeCompoundConvex::GetBoxMinRadius() const
-{
-	return dFloat32(0.0f);
-}
-
-inline dFloat32 ndShapeCompoundConvex::GetBoxMaxRadius() const
-{
-	return dFloat32(0.0f);
-}
-
-inline dVector ndShapeCompoundConvex::SupportVertex(const dVector&, dInt32* const) const
-{
-	dAssert(0);
-	return dVector::m_zero;
-}
-
-inline dVector ndShapeCompoundConvex::SupportVertexSpecial(const dVector& dir, dFloat32, dInt32* const vertexIndex) const
-{
-	dAssert(0);
-	return SupportVertex(dir, vertexIndex);
-}
-
-inline dVector ndShapeCompoundConvex::SupportVertexSpecialProjectPoint(const dVector& point, const dVector&) const
-{ 
-	return point; 
-}
-
-inline dInt32 ndShapeCompoundConvex::CalculatePlaneIntersection(const dVector&, const dVector&, dVector* const) const
-{
-	return 0;
-}
-
-inline dVector ndShapeCompoundConvex::CalculateVolumeIntegral(const dMatrix&, const dVector&, const ndShapeInstance&) const
-{
-	return dVector::m_zero;
-}
 
 inline ndShapeCompoundConvex* ndShapeCompoundConvex::GetAsShapeCompoundConvex()
 { 
