@@ -186,7 +186,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndJointWheel::ndWheelDescriptor tireInfo;
 		tireInfo.m_springK = 1000.0f;
 		tireInfo.m_damperC = 20.0f;
-		tireInfo.m_regularizer = 0.1f;
+		//tireInfo.m_regularizer = 0.1f; // soft
+		tireInfo.m_regularizer = 0.025f; // stiff
 		tireInfo.m_minLimit = -0.05f;
 		tireInfo.m_maxLimit = 0.2f;
 		//tireInfo.m_maxLimit = 0.1f;

@@ -341,11 +341,11 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_normal.Scale (normalForce), forceColor);
 
 					// lateral force
-					dFloat32 lateralForce = dFloat32(2.0f) * contactPoint.m_dir0_Force.m_force / scale;
+					dFloat32 lateralForce = -dFloat32(2.0f) * contactPoint.m_dir0_Force.m_force / scale;
 					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir0.Scale(lateralForce), lateralColor);
 
 					// longitudinal force
-					dFloat32 longitudinalForce = dFloat32(2.0f) * contactPoint.m_dir1_Force.m_force / scale;
+					dFloat32 longitudinalForce = -dFloat32(2.0f) * contactPoint.m_dir1_Force.m_force / scale;
 					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir1.Scale(longitudinalForce), longitudinalColor);
 				}
 			}
