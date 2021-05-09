@@ -19,13 +19,13 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndContact.h"
 #include "ndShapeInstance.h"
 #include "ndRayCastNotify.h"
 #include "ndBodyKinematic.h"
+#include "ndShapeCompoundConvex.h"
 
 dVector ndShapeInstance::m_padding(D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, dFloat32(0.0f));
 
@@ -65,7 +65,23 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 {
 	if (((ndShape*)m_shape)->GetAsShapeCompoundConvex())
 	{
-		dAssert(0);
+		//if (m_childShape->IsType(dgCollision::dgCollisionCompoundBreakable_RTTI)) 
+		//{
+		//	dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*)m_childShape;
+		//	m_childShape = new (m_world->GetAllocator()) dgCollisionCompoundFractured(*compound, this);
+		//}
+		//else if (m_childShape->IsType(dgCollision::dgCollisionScene_RTTI)) 
+		//{
+		//	dgCollisionScene* const scene = (dgCollisionScene*)m_childShape;
+		//	m_childShape = new (m_world->GetAllocator()) dgCollisionScene(*scene, this);
+		//}
+		//else 
+		{
+			m_shape->Release();
+			ndShapeCompoundConvex* const convexShape = ((ndShape*)m_shape)->GetAsShapeCompoundConvex();
+			m_shape = new ndShapeCompoundConvex(*convexShape, this);
+			m_shape->AddRef();
+		}
 	}
 }
 
@@ -432,10 +448,9 @@ void ndShapeInstance::SetScale(const dVector& scale)
 	//if (IsType(dgCollision::dgCollisionCompound_RTTI)) 
 	if (((ndShape*)m_shape)->GetAsShapeCompoundConvex())
 	{
-		dAssert(0);
-		//dAssert(m_scaleType == m_unit);
-		//dgCollisionCompound* const compound = (dgCollisionCompound*)m_shape;
-		//compound->ApplyScale(scale);
+		dAssert(m_scaleType == m_unit);
+		ndShapeCompoundConvex* const compound = ((ndShape*)m_shape)->GetAsShapeCompoundConvex();
+		compound->ApplyScale(scale);
 	}
 	else if ((dAbs(scaleX - scaleY) < dFloat32(1.0e-4f)) && (dAbs(scaleX - scaleZ) < dFloat32(1.0e-4f))) 
 	{
@@ -460,6 +475,66 @@ void ndShapeInstance::SetScale(const dVector& scale)
 		m_maxScale = dMax(scaleX, scaleY, scaleZ);
 		m_scale = dVector(scaleX, scaleY, scaleZ, dFloat32(0.0f));
 		m_invScale = dVector(dFloat32(1.0f) / scaleX, dFloat32(1.0f) / scaleY, dFloat32(1.0f) / scaleZ, dFloat32(0.0f));
+	}
+}
+
+void ndShapeInstance::SetGlobalScale(const dVector& scale)
+{
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix[0][0] = m_scale.m_x;
+	matrix[1][1] = m_scale.m_y;
+	matrix[2][2] = m_scale.m_z;
+	matrix = m_aligmentMatrix * matrix * m_localMatrix;
+
+	// extract the original local matrix
+	dMatrix transpose(matrix.Transpose());
+	dVector globalScale(dSqrt(transpose[0].DotProduct(transpose[0]).GetScalar()), dSqrt(transpose[1].DotProduct(transpose[1]).GetScalar()), dSqrt(transpose[2].DotProduct(transpose[2]).GetScalar()), dFloat32(1.0f));
+	dVector invGlobalScale(dFloat32(1.0f) / globalScale.m_x, dFloat32(1.0f) / globalScale.m_y, dFloat32(1.0f) / globalScale.m_z, dFloat32(1.0f));
+	dMatrix localMatrix(m_aligmentMatrix.Transpose() * m_localMatrix);
+	localMatrix.m_posit = matrix.m_posit * invGlobalScale;
+	dAssert(localMatrix.m_posit.m_w == dFloat32(1.0f));
+
+	if ((dAbs(scale[0] - scale[1]) < dFloat32(1.0e-4f)) && (dAbs(scale[0] - scale[2]) < dFloat32(1.0e-4f))) 
+	{
+		m_localMatrix = localMatrix;
+		m_localMatrix.m_posit = m_localMatrix.m_posit * scale | dVector::m_wOne;
+		m_aligmentMatrix = dGetIdentityMatrix();
+		SetScale(scale);
+	}
+	else 
+	{
+		// create a new scale matrix 
+		localMatrix[0] = localMatrix[0] * scale;
+		localMatrix[1] = localMatrix[1] * scale;
+		localMatrix[2] = localMatrix[2] * scale;
+		localMatrix[3] = localMatrix[3] * scale;
+		localMatrix[3][3] = dFloat32(1.0f);
+
+		// decompose into to align * scale * local
+		localMatrix.PolarDecomposition(m_localMatrix, m_scale, m_aligmentMatrix);
+
+		m_localMatrix = m_aligmentMatrix * m_localMatrix;
+		m_aligmentMatrix = m_aligmentMatrix.Transpose();
+
+		dAssert(m_localMatrix.TestOrthogonal());
+		dAssert(m_aligmentMatrix.TestOrthogonal());
+
+		//dMatrix xxx1 (dgGetIdentityMatrix());
+		//xxx1[0][0] = m_scale.m_x;
+		//xxx1[1][1] = m_scale.m_y;
+		//xxx1[2][2] = m_scale.m_z;
+		//dMatrix xxx (m_aligmentMatrix * xxx1 * m_localMatrix);
+
+		bool isIdentity = true;
+		for (dInt32 i = 0; i < 3; i++) 
+		{
+			isIdentity &= dAbs(m_aligmentMatrix[i][i] - dFloat32(1.0f)) < dFloat32(1.0e-5f);
+			isIdentity &= dAbs(m_aligmentMatrix[3][i]) < dFloat32(1.0e-5f);
+		}
+		m_scaleType = isIdentity ? m_nonUniform : m_global;
+
+		m_maxScale = dMax(m_scale[0], m_scale[1], m_scale[2]);
+		m_invScale = dVector(dFloat32(1.0f) / m_scale[0], dFloat32(1.0f) / m_scale[1], dFloat32(1.0f) / m_scale[2], dFloat32(0.0f));
 	}
 }
 

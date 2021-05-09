@@ -30,15 +30,39 @@
 class ndShapeCompoundConvex::ndNodeBase
 {
 	public:
-	//ndNodeBase();
-	//ndNodeBase(const ndNodeBase& copyFrom);
+	ndNodeBase()
+		:m_type(m_node)
+		,m_left(nullptr)
+		,m_right(nullptr)
+		,m_parent(nullptr)
+		,m_shape(nullptr)
+		,m_myNode(nullptr)
+	{
+	}
+
+	ndNodeBase(const ndNodeBase& copyFrom)
+		:m_p0(copyFrom.m_p0)
+		,m_p1(copyFrom.m_p1)
+		,m_size(copyFrom.m_size)
+		,m_origin(copyFrom.m_origin)
+		,m_area(copyFrom.m_area)
+		,m_type(copyFrom.m_type)
+		,m_left(nullptr)
+		,m_right(nullptr)
+		,m_parent(nullptr)
+		,m_shape(nullptr)
+		,m_myNode(nullptr)
+	{
+		dAssert(!copyFrom.m_shape);
+	}
+
 	ndNodeBase(ndShapeInstance* const instance)
 		:m_type(m_leaf)
-		, m_left(nullptr)
-		, m_right(nullptr)
-		, m_parent(nullptr)
-		, m_shape(new ndShapeInstance(*instance))
-		, m_myNode(nullptr)
+		,m_left(nullptr)
+		,m_right(nullptr)
+		,m_parent(nullptr)
+		,m_shape(new ndShapeInstance(*instance))
+		,m_myNode(nullptr)
 	{
 		CalculateAABB();
 	}
@@ -59,7 +83,22 @@ class ndShapeCompoundConvex::ndNodeBase
 		SetBox(p0, p1);
 	}
 
-	//~ndNodeBase();
+	~ndNodeBase()
+	{
+		if (m_shape) 
+		{
+			//m_shape->Release();
+			delete m_shape;
+		}
+		if (m_left) 
+		{
+			delete m_left;
+		}
+		if (m_right) 
+		{
+			delete m_right;
+		}
+	}
 
 	void CalculateAABB()
 	{
@@ -96,6 +135,7 @@ class ndShapeCompoundConvex::ndNodeBase
 	//	return ray.BoxTest(minBox, maxBox);
 	//}
 
+	int xxxxxx;
 	dVector m_p0;
 	dVector m_p1;
 	dVector m_size;
@@ -244,6 +284,105 @@ ndShapeCompoundConvex::ndShapeCompoundConvex()
 {
 }
 
+ndShapeCompoundConvex::ndShapeCompoundConvex(const ndShapeCompoundConvex& source, const ndShapeInstance* const myInstance)
+	:ndShape(source)
+	,m_array()
+	,m_treeEntropy(dFloat32(0.0f))
+	,m_boxMinRadius(dFloat32(0.0f))
+	,m_boxMaxRadius(dFloat32(0.0f))
+	,m_root(nullptr)
+	,m_myInstance(myInstance)
+	,m_idIndex(0)
+{
+	ndTreeArray::Iterator iter(source.m_array);
+	for (iter.Begin(); iter; iter++) 
+	{
+		ndNodeBase* const node = iter.GetNode()->GetInfo();
+		ndShapeInstance* const shape = node->GetShape();
+		ndNodeBase* const newNode = new ndNodeBase(shape);
+		m_array.AddNode(newNode, iter.GetNode()->GetKey(), m_myInstance);
+	}
+
+	if (source.m_root) 
+	{
+		ndNodeBase* pool[D_COMPOUND_STACK_DEPTH];
+		ndNodeBase* parents[D_COMPOUND_STACK_DEPTH];
+		pool[0] = source.m_root;
+		parents[0] = nullptr;
+		dInt32 stack = 1;
+		while (stack) 
+		{
+			stack--;
+			ndNodeBase* const sourceNode = pool[stack];
+	
+			ndNodeBase* parent = nullptr;
+			if (sourceNode->m_type == m_node) 
+			{
+				parent = new ndNodeBase(*sourceNode);
+				if (!sourceNode->m_parent) 
+				{
+					m_root = parent;
+				}
+				else 
+				{
+					parent->m_parent = parents[stack];
+					if (parent->m_parent) 
+					{
+						if (sourceNode->m_parent->m_left == sourceNode) 
+						{
+							parent->m_parent->m_left = parent;
+						}
+						else 
+						{
+							dAssert(sourceNode->m_parent->m_right == sourceNode);
+							parent->m_parent->m_right = parent;
+						}
+					}
+				}
+			}
+			else 
+			{
+				//ndNodeBase* const node = m_array.Find (sourceNode->m_shape)->GetInfo();
+				ndNodeBase* const node = m_array.Find(sourceNode->m_myNode->GetKey())->GetInfo();
+				dAssert(node);
+				node->m_parent = parents[stack];
+				if (node->m_parent) 
+				{
+					if (sourceNode->m_parent->m_left == sourceNode) 
+					{
+						node->m_parent->m_left = node;
+					}
+					else 
+					{
+						dAssert(sourceNode->m_parent->m_right == sourceNode);
+						node->m_parent->m_right = node;
+					}
+				}
+				else 
+				{
+					m_root = node;
+				}
+			}
+	
+			if (sourceNode->m_left) 
+			{
+				parents[stack] = parent;
+				pool[stack] = sourceNode->m_left;
+				stack++;
+				dAssert(stack < D_COMPOUND_STACK_DEPTH);
+			}
+	
+			if (sourceNode->m_right) 
+			{
+				parents[stack] = parent;
+				pool[stack] = sourceNode->m_right;
+				stack++;
+				dAssert(stack < D_COMPOUND_STACK_DEPTH);
+			}
+		}
+	}
+}
+
 ndShapeCompoundConvex::ndShapeCompoundConvex(const nd::TiXmlNode* const xmlNode)
 	:ndShape(m_compoundConvex)
 	,m_array()
@@ -260,7 +399,10 @@ ndShapeCompoundConvex::ndShapeCompoundConvex(const nd::TiXmlNode* const xmlNode)
 
 ndShapeCompoundConvex::~ndShapeCompoundConvex()
 {
-	dAssert(0);
+	if (m_root) 
+	{
+		delete m_root;
+	}
 }
 
 /*
@@ -335,10 +477,14 @@ ndShapeInfo ndShapeCompoundConvex::GetShapeInfo() const
 	return info;
 }
 
-//void ndShapeCompoundConvex::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
-void ndShapeCompoundConvex::DebugShape(const dMatrix&, ndShapeDebugCallback&) const
+void ndShapeCompoundConvex::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
-	dAssert(0);
+	ndTreeArray::Iterator iter(m_array);
+	for (iter.Begin(); iter; iter++) 
+	{
+		ndShapeInstance* const collision = iter.GetNode()->GetInfo()->GetShape();
+		collision->DebugShape(matrix, debugCallback);
+	}
 }
 
 dFloat32 ndShapeCompoundConvex::GetVolume() const
@@ -359,10 +505,20 @@ dFloat32 ndShapeCompoundConvex::GetBoxMaxRadius() const
 	return dFloat32(0.0f);
 }
 
-//void ndShapeCompoundConvex::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
-void ndShapeCompoundConvex::CalcAABB(const dMatrix&, dVector&, dVector&) const
+void ndShapeCompoundConvex::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
 {
-	dAssert(0);
+	if (m_root) 
+	{
+		const dVector origin(matrix.TransformVector(m_root->m_origin));
+		const dVector size(matrix.m_front.Abs().Scale(m_root->m_size.m_x) + matrix.m_up.Abs().Scale(m_root->m_size.m_y) + matrix.m_right.Abs().Scale(m_root->m_size.m_z));
+		p0 = (origin - size) & dVector::m_triplexMask;
+		p1 = (origin + size) & dVector::m_triplexMask;
+	}
+	else 
+{
+		p0 = dVector::m_zero;
+		p1 = dVector::m_zero;
+	}
 }
 
 dVector ndShapeCompoundConvex::SupportVertex(const dVector&, dInt32* const) const
@@ -587,10 +743,6 @@ void ndShapeCompoundConvex::ImproveNodeFitness(ndNodeBase* const node) const
 			}
 		}
 	}
-	else 
-{
-		// in the future I can handle this but it is too much work for little payoff
-	}
 }
 
 dFloat64 ndShapeCompoundConvex::CalculateEntropy(dInt32 count, ndNodeBase** array)
@@ -638,9 +790,14 @@ ndShapeCompoundConvex::ndNodeBase* ndShapeCompoundConvex::BuildTopDown(ndNodeBas
 	dAssert(lastBox >= 0);
 	dAssert(firstBox >= 0);
 
+static int xxxxx;
 	if (lastBox == firstBox) 
 	{
-		return leafArray[firstBox];
+		ndNodeBase* const node = leafArray[firstBox];
+		node->xxxxxx = xxxxx;
+		xxxxx++;
+
+		return node;
 	}
 
 	ndSpliteInfo info(&leafArray[firstBox], lastBox - firstBox + 1);
@@ -648,6 +805,10 @@ ndShapeCompoundConvex::ndNodeBase* ndShapeCompoundConvex::BuildTopDown(ndNodeBas
 	ndNodeBase* const parent = *rootNodesMemory;
 	rootNodesMemory++;
 	parent->m_parent = nullptr;
+
+
+parent->xxxxxx = xxxxx;
+xxxxx++;
 		
 	parent->SetBox(info.m_p0, info.m_p1);
 	parent->m_right = BuildTopDown(leafArray, firstBox + info.m_axis, lastBox, rootNodesMemory);
@@ -724,7 +885,7 @@ void ndShapeCompoundConvex::EndAddRemove()
 		dInt32 stack = 1;
 		dInt32 nodeCount = 0;
 		ndNodeBase** nodeArray = dAlloca(ndNodeBase*, m_array.GetCount() + 10);
-		ndNodeBase* stackBuffer[1024];
+		ndNodeBase* stackBuffer[D_COMPOUND_STACK_DEPTH];
 
 		stackBuffer[0] = m_root;
 		while (stack) 
@@ -753,12 +914,10 @@ void ndShapeCompoundConvex::EndAddRemove()
 			dFloat64 cost = CalculateEntropy(nodeCount, nodeArray);
 			if ((cost > m_treeEntropy * dFloat32(2.0f)) || (cost < m_treeEntropy * dFloat32(0.5f))) 
 			{
-				//dInt32 count = nodeCount * 2 + 12;
 				dInt32 leafNodesCount = 0;
 				ndNodeBase** leafArray = dAlloca(ndNodeBase*, nodeCount + 12);
 				for (dInt32 i = 0; i < nodeCount; i++)
 				{ 
-
 					ndNodeBase* const node = nodeArray[i];
 					if (node->m_left->m_type == m_leaf) 
 					{
@@ -884,14 +1043,13 @@ void ndShapeCompoundConvex::MassProperties()
 	//	dgPolyhedraMassProperties localData;
 	//	DebugCollision (dgGetIdentityMatrix(), CalculateInertia, &localData);
 	//	dFloat32 volume_ = localData.MassProperties (origin_, inertia_, crossInertia_);
-	//	dgAssert (volume_ > dFloat32 (0.0f));
+	//	dAssert (volume_ > dFloat32 (0.0f));
 	//	dFloat32 invVolume_ = dFloat32 (1.0f)/volume_;
 	//	m_centerOfMass = origin_.Scale (invVolume_);
 	//	m_centerOfMass.m_w = volume_;
 	//	m_inertia = inertia_.Scale (invVolume_);
 	//	m_crossInertia = crossInertia_.Scale(invVolume_);
 #endif
-
 
 	dFloat32 volume = dFloat32(0.0f);
 	dVector origin(dVector::m_zero);
@@ -919,4 +1077,17 @@ void ndShapeCompoundConvex::MassProperties()
 	}
 
 	ndShape::MassProperties();
+}
+
+void ndShapeCompoundConvex::ApplyScale(const dVector& scale)
+{
+	ndTreeArray::Iterator iter(m_array);
+	for (iter.Begin(); iter; iter++) 
+	{
+		ndNodeBase* const node = iter.GetNode()->GetInfo();
+		ndShapeInstance* const collision = node->GetShape();
+		collision->SetGlobalScale(scale);
+	}
+	m_treeEntropy = dFloat32(0.0f);
+	EndAddRemove();
 }

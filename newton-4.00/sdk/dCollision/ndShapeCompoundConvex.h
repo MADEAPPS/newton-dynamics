@@ -25,6 +25,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndShape.h"
 
+#define D_COMPOUND_STACK_DEPTH	256
 
 class ndShapeCompoundConvex: public ndShape
 {
@@ -47,7 +48,6 @@ class ndShapeCompoundConvex: public ndShape
 		void AddNode(ndNodeBase* const node, dInt32 index, const ndShapeInstance* const parent);
 	};
 
-
 	D_COLLISION_API ndShapeCompoundConvex();
 	D_COLLISION_API ndShapeCompoundConvex(const nd::TiXmlNode* const xmlNode);
 	D_COLLISION_API virtual ~ndShapeCompoundConvex();
@@ -59,6 +59,7 @@ class ndShapeCompoundConvex: public ndShape
 	D_COLLISION_API virtual void EndAddRemove();
 
 	protected:
+	ndShapeCompoundConvex(const ndShapeCompoundConvex& source, const ndShapeInstance* const myInstance);
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
@@ -78,6 +79,7 @@ class ndShapeCompoundConvex: public ndShape
 	//D_COLLISION_API dInt32 CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 strideInFloat, const dPlane& localPlane, dVector* const contactsOut) const;
 
 	virtual void MassProperties();
+	void ApplyScale(const dVector& scale);
 	void ImproveNodeFitness(ndNodeBase* const node) const;
 	dFloat64 CalculateEntropy(dInt32 count, ndNodeBase** array);
 	static dInt32 CompareNodes(const ndNodeBase* const nodeA, const ndNodeBase* const nodeB, void*);
@@ -92,6 +94,8 @@ class ndShapeCompoundConvex: public ndShape
 	ndNodeBase* m_root;
 	const ndShapeInstance* m_myInstance;
 	dInt32 m_idIndex;
+
+	friend class ndShapeInstance;
 };
 
 inline ndShapeCompoundConvex* ndShapeCompoundConvex::GetAsShapeCompoundConvex()

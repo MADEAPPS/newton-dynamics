@@ -138,6 +138,7 @@ class ndShapeInstance: public dClassAlloc
 	const dVector& GetScale() const;
 	const dVector& GetInvScale() const;
 	D_COLLISION_API void SetScale(const dVector& scale);
+	D_COLLISION_API void SetGlobalScale(const dVector& scale);
 
 	dFloat32 GetVolume() const;
 	dFloat32 GetBoxMinRadius() const;
