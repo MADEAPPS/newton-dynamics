@@ -486,8 +486,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	matrix.m_posit = location;
 
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "viper.fbx", matrix);
-	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "viper1.fbx", matrix);
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "monsterTruck.fbx", matrix);
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "viper1.fbx", matrix);
+	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "monsterTruck.fbx", matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 

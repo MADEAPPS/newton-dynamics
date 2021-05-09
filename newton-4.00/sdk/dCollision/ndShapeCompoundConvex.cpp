@@ -100,6 +100,28 @@ class ndShapeCompoundConvex::ndNodeBase
 		}
 	}
 
+	//void Sanity(int level = 0)
+	//{
+	//	char space[256];
+	//	for (int i = 0; i < level; i++)
+	//	{
+	//		space[i] = ' ';
+	//	}
+	//	space[level] = 0;
+	//
+	//	dTrace(("%s%d\n", space, xxxxxx_));
+	//
+	//	if (m_left)
+	//	{
+	//		m_left->Sanity(level + 1);
+	//	}
+	//
+	//	if (m_right)
+	//	{
+	//		m_right->Sanity(level + 1);
+	//	}
+	//}
+
 	void CalculateAABB()
 	{
 		dVector p0;
@@ -135,7 +157,6 @@ class ndShapeCompoundConvex::ndNodeBase
 	//	return ray.BoxTest(minBox, maxBox);
 	//}
 
-	int xxxxxx;
 	dVector m_p0;
 	dVector m_p1;
 	dVector m_size;
@@ -785,45 +806,37 @@ dInt32 ndShapeCompoundConvex::CompareNodes(const ndNodeBase* const nodeA, const 
 	return 0;
 }
 
-ndShapeCompoundConvex::ndNodeBase* ndShapeCompoundConvex::BuildTopDown(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory)
+ndShapeCompoundConvex::ndNodeBase* ndShapeCompoundConvex::BuildTopDown(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory, dInt32& rootIndex)
 {
 	dAssert(lastBox >= 0);
 	dAssert(firstBox >= 0);
-
-static int xxxxx;
+	
 	if (lastBox == firstBox) 
 	{
 		ndNodeBase* const node = leafArray[firstBox];
-		node->xxxxxx = xxxxx;
-		xxxxx++;
-
 		return node;
 	}
-
+	
 	ndSpliteInfo info(&leafArray[firstBox], lastBox - firstBox + 1);
 		
-	ndNodeBase* const parent = *rootNodesMemory;
-	rootNodesMemory++;
+	ndNodeBase* const parent = rootNodesMemory[rootIndex];
+	rootIndex++;
 	parent->m_parent = nullptr;
-
-
-parent->xxxxxx = xxxxx;
-xxxxx++;
 		
 	parent->SetBox(info.m_p0, info.m_p1);
-	parent->m_right = BuildTopDown(leafArray, firstBox + info.m_axis, lastBox, rootNodesMemory);
+	parent->m_right = BuildTopDown(leafArray, firstBox + info.m_axis, lastBox, rootNodesMemory, rootIndex);
 	parent->m_right->m_parent = parent;
 		
-	parent->m_left = BuildTopDown(leafArray, firstBox, firstBox + info.m_axis - 1, rootNodesMemory);
+	parent->m_left = BuildTopDown(leafArray, firstBox, firstBox + info.m_axis - 1, rootNodesMemory, rootIndex);
 	parent->m_left->m_parent = parent;
 	return parent;
 }
 
-ndShapeCompoundConvex::ndNodeBase* ndShapeCompoundConvex::BuildTopDownBig(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory)
+ndShapeCompoundConvex::ndNodeBase* ndShapeCompoundConvex::BuildTopDownBig(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory, dInt32& rootIndex)
 {
 	if (lastBox == firstBox) 
 	{
-		return BuildTopDown(leafArray, firstBox, lastBox, rootNodesMemory);
+		return BuildTopDown(leafArray, firstBox, lastBox, rootNodesMemory, rootIndex);
 	}
 
 	dInt32 midPoint = -1;
@@ -843,11 +856,11 @@ ndShapeCompoundConvex::ndNodeBase* ndShapeCompoundConvex::BuildTopDownBig(ndNode
 
 	if (midPoint == -1) 
 	{
-		return BuildTopDown(leafArray, firstBox, lastBox, rootNodesMemory);
+		return BuildTopDown(leafArray, firstBox, lastBox, rootNodesMemory, rootIndex);
 	}
 
-	ndNodeBase* const parent = *rootNodesMemory;
-	rootNodesMemory++;
+	ndNodeBase* const parent = rootNodesMemory[rootIndex];
+	rootIndex++;
 	parent->m_parent = nullptr;
 	
 	dVector minP(dFloat32(1.0e15f));
@@ -861,10 +874,10 @@ ndShapeCompoundConvex::ndNodeBase* ndShapeCompoundConvex::BuildTopDownBig(ndNode
 	}
 	
 	parent->SetBox(minP, maxP);
-	parent->m_left = BuildTopDown(leafArray, firstBox, firstBox + midPoint, rootNodesMemory);
+	parent->m_left = BuildTopDown(leafArray, firstBox, firstBox + midPoint, rootNodesMemory, rootIndex);
 	parent->m_left->m_parent = parent;
 	
-	parent->m_right = BuildTopDownBig(leafArray, firstBox + midPoint + 1, lastBox, rootNodesMemory);
+	parent->m_right = BuildTopDownBig(leafArray, firstBox + midPoint + 1, lastBox, rootNodesMemory, rootIndex);
 	parent->m_right->m_parent = parent;
 	return parent;
 }
@@ -934,13 +947,19 @@ void ndShapeCompoundConvex::EndAddRemove()
 				}
 		
 				dSortIndirect(&leafArray[0], leafNodesCount, CompareNodes);
-				m_root = BuildTopDownBig(&leafArray[0], 0, leafNodesCount - 1, nodeArray);
+
+				dInt32 rootIndex = 0;
+				m_root = BuildTopDownBig(&leafArray[0], 0, leafNodesCount - 1, nodeArray, rootIndex);
+
+				//m_root->Sanity();
 				m_treeEntropy = CalculateEntropy(nodeCount, nodeArray);
 			}
 			while (m_root->m_parent) 
 			{
 				m_root = m_root->m_parent;
 			}
+
+			//m_root->Sanity();
 		}
 		else 
 		{
