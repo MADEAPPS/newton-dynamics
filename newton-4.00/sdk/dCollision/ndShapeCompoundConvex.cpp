@@ -21,7 +21,6 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
-#include "ndContact.h"
 #include "ndShapeInstance.h"
 #include "ndContactSolver.h"
 #include "ndCollisionStdafx.h"
