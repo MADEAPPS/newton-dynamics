@@ -269,7 +269,6 @@ void ndShapeInstance::CalculateObb(dVector& origin, dVector& size) const
 	dAssert(origin.m_w == dFloat32(0.0f));
 }
 
-
 dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const
 {
 	dFloat32 t = dFloat32(1.2f);
