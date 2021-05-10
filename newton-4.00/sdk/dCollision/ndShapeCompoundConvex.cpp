@@ -21,11 +21,11 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
+#include "ndContact.h"
 #include "ndShapeInstance.h"
 #include "ndContactSolver.h"
 #include "ndCollisionStdafx.h"
 #include "ndShapeCompoundConvex.h"
-
 
 class ndShapeCompoundConvex::ndNodeBase
 {
@@ -573,11 +573,92 @@ dVector ndShapeCompoundConvex::CalculateVolumeIntegral(const dMatrix&, const dVe
 	return dVector::m_zero;
 }
 
-//dFloat32 ndShapeCompoundConvex::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
-dFloat32 ndShapeCompoundConvex::RayCast(ndRayCastNotify&, const dVector&, const dVector&, dFloat32, const ndBody* const, ndContactPoint&) const
+dFloat32 ndShapeCompoundConvex::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
-	dAssert(0);
-	return 0;
+	if (!m_root) 
+	{
+		return dFloat32 (1.2f);
+	}
+
+	dFloat32 distance[D_COMPOUND_STACK_DEPTH];
+	const ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
+
+//	dFloat32 maxParam = maxT;
+	dFastRayTest ray (localP0, localP1);
+
+	dInt32 stack = 1;
+	stackPool[0] = m_root;
+	distance[0] = ray.BoxIntersect(m_root->m_p0, m_root->m_p1);
+	while (stack) 
+	{
+		stack --;
+		dFloat32 dist = distance[stack];
+
+		if (dist > maxT) 
+		{
+			break;
+		} 
+		else 
+		{
+			const ndNodeBase* const me = stackPool[stack];
+			dAssert (me);
+			if (me->m_type == m_leaf) 
+			{
+				ndContactPoint tmpContactOut;
+				ndShapeInstance* const shape = me->GetShape();
+				dVector p0 (shape->GetLocalMatrix().UntransformVector (localP0));
+				dVector p1 (shape->GetLocalMatrix().UntransformVector (localP1));
+				dAssert(0);
+				//dFloat32 param = shape->RayCast (p0, p1, maxT, tmpContactOut, preFilter, body, userData);
+				//dFloat32 param = shape->RayCast(callback, p0, p1, maxT, body, &tmpContactOut);
+				//if (param < maxT) 
+				//{
+				//	maxT = param;
+				//	contactOut.m_normal = shape->GetLocalMatrix().RotateVector (tmpContactOut.m_normal);
+				//	contactOut.m_shapeId0 = tmpContactOut.m_shapeId0;
+				//	contactOut.m_shapeId1 = tmpContactOut.m_shapeId0;
+				//	contactOut.m_collision0 = tmpContactOut.m_collision0;
+				//	contactOut.m_collision1 = tmpContactOut.m_collision1;
+				//}
+
+			} 
+			else 
+			{
+				dAssert(0);
+				//dAssert (me->m_type == m_node);
+				//const ndNodeBase* const left = me->m_left;
+				//dAssert (left);
+				//dFloat32 dist1 = ray.BoxIntersect(left->m_p0, left->m_p1);
+				//if (dist1 < maxT) {
+				//	dInt32 j = stack;
+				//	for ( ; j && (dist1 > distance[j - 1]); j --) {
+				//		stackPool[j] = stackPool[j - 1];
+				//		distance[j] = distance[j - 1];
+				//	}
+				//	stackPool[j] = left;
+				//	distance[j] = dist1;
+				//	stack++;
+				//	dgAssert (stack < dInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
+				//}
+				//
+				//const ndNodeBase* const right = me->m_right;
+				//dgAssert (right);
+				//dist1 = ray.BoxIntersect(right->m_p0, right->m_p1);
+				//if (dist1 < maxT) {
+				//	dInt32 j = stack;
+				//	for ( ; j && (dist1 > distance[j - 1]); j --) {
+				//		stackPool[j] = stackPool[j - 1];
+				//		distance[j] = distance[j - 1];
+				//	}
+				//	stackPool[j] = right;
+				//	distance[j] = dist1;
+				//	stack++;
+				//	dgAssert (stack < dInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
+				//}
+			}
+		}
+	}
+	return maxT;
 }
 
 void ndShapeCompoundConvex::BeginAddRemove()
