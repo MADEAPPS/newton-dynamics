@@ -185,7 +185,7 @@ ndShapeInfo ndShapeInstance::GetShapeInfo() const
 dMatrix ndShapeInstance::CalculateInertia() const
 {
 	ndShape* const shape = (ndShape*)m_shape;
-	if (shape->GetAsShapeNull() || !shape->GetAsShapeConvex()) 
+	if (shape->GetAsShapeNull() || !(shape->GetAsShapeConvex() || shape->GetAsShapeCompoundConvex()))
 	{
 		return dGetZeroMatrix();
 	}

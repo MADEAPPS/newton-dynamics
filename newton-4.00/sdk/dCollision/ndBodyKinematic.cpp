@@ -25,6 +25,7 @@
 #include "ndShapeNull.h"
 #include "ndRayCastNotify.h"
 #include "ndBodyKinematic.h"
+#include "ndShapeCompoundConvex.h"
 #include "ndJointBilateralConstraint.h"
 
 #define D_MINIMUM_MASS	dFloat32(1.0e-5f)
@@ -179,6 +180,10 @@ void ndBodyKinematic::SetCollisionShape(const ndShapeInstance& shapeInstance)
 {
 	m_shapeInstance = shapeInstance;
 	m_shapeInstance.m_ownerBody = this;
+	if (m_shapeInstance.GetShape()->GetAsShapeCompoundConvex())
+	{
+		m_shapeInstance.GetShape()->GetAsShapeCompoundConvex()->SetSubShapeOwner(this);
+	}
 }
 
 ndSceneAggregate* ndBodyKinematic::GetSceneAggregate() const

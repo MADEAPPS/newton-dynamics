@@ -24,7 +24,7 @@
 #include "ndContact.h"
 #include "ndShapeInstance.h"
 #include "ndContactSolver.h"
-#include "ndCollisionStdafx.h"
+#include "ndBodyKinematic.h"
 #include "ndShapeCompoundConvex.h"
 
 class ndShapeCompoundConvex::ndNodeBase
@@ -1178,6 +1178,17 @@ void ndShapeCompoundConvex::MassProperties()
 	}
 
 	ndShape::MassProperties();
+}
+
+void ndShapeCompoundConvex::SetSubShapeOwner(ndBodyKinematic* const body)
+{
+	ndTreeArray::Iterator iter(m_array);
+	for (iter.Begin(); iter; iter++)
+	{
+		ndNodeBase* const node = iter.GetNode()->GetInfo();
+		ndShapeInstance* const collision = node->GetShape();
+		collision->m_ownerBody = body;
+	}
 }
 
 void ndShapeCompoundConvex::ApplyScale(const dVector& scale)
