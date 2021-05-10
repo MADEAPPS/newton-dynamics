@@ -85,6 +85,24 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 	}
 }
 
+ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance, ndShape* const shape)
+	:dClassAlloc()
+	,m_globalMatrix(instance.m_globalMatrix)
+	,m_localMatrix(instance.m_localMatrix)
+	,m_aligmentMatrix(instance.m_aligmentMatrix)
+	,m_scale(instance.m_scale)
+	,m_invScale(instance.m_invScale)
+	,m_maxScale(instance.m_maxScale)
+	,m_shape(shape->AddRef())
+	,m_ownerBody(instance.m_ownerBody)
+	,m_subCollisionHandle(instance.m_subCollisionHandle)
+	,m_parent(instance.m_parent)
+	,m_skinThickness(instance.m_skinThickness)
+	,m_scaleType(instance.m_scaleType)
+	,m_collisionMode(instance.m_collisionMode)
+{
+}
+
 ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
 	:dClassAlloc()
 	,m_globalMatrix(dGetIdentityMatrix())
@@ -282,7 +300,6 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				if (t < dFloat32 (1.0f)) 
 				{
 					//dAssert(((ndShape*)m_shape)->GetAsShapeBox() || ((ndShape*)m_shape)->GetAsShapeSphere());
-					dAssert(!((ndShape*)m_shape)->GetAsShapeCompoundConvex());
 				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
 				//	{
 				//		contactOut.m_shapeId0 = GetUserDataID();

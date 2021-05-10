@@ -33,7 +33,6 @@ ndShape::ndShape(ndShapeID id)
 	,m_boxSize(dVector::m_zero)
 	,m_boxOrigin(dVector::m_zero)
 	,m_refCount(0)
-//	,m_signature(signature)
 	,m_collisionId(id)
 {
 }
@@ -46,9 +45,7 @@ ndShape::ndShape(const ndShape& source)
 	,m_boxSize(source.m_boxSize)
 	,m_boxOrigin(source.m_boxOrigin)
 	,m_refCount(0)
-	//,m_signature(source.m_signature)
-	//,m_collisionId(source.m_collisionId)
-	//,m_allocator(source.m_allocator)
+	,m_collisionId(source.m_collisionId)
 {
 }
 

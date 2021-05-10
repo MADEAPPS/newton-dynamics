@@ -114,6 +114,8 @@ class ndShapeInstance: public dClassAlloc
 
 	D_COLLISION_API static dVector GetBoxPadding();
 
+	ndShapeInstance(const ndShapeInstance& instance, ndShape* const shape);
+
 	ndShape* GetShape();
 	const ndShape* GetShape() const;
 	dVector SupportVertex(const dVector& dir) const;

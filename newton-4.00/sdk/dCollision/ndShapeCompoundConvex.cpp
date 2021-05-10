@@ -536,7 +536,7 @@ void ndShapeCompoundConvex::CalcAABB(const dMatrix& matrix, dVector& p0, dVector
 		p1 = (origin + size) & dVector::m_triplexMask;
 	}
 	else 
-{
+	{
 		p0 = dVector::m_zero;
 		p1 = dVector::m_zero;
 	}
@@ -606,55 +606,56 @@ dFloat32 ndShapeCompoundConvex::RayCast(ndRayCastNotify& callback, const dVector
 			{
 				ndContactPoint tmpContactOut;
 				ndShapeInstance* const shape = me->GetShape();
-				dVector p0 (shape->GetLocalMatrix().UntransformVector (localP0));
-				dVector p1 (shape->GetLocalMatrix().UntransformVector (localP1));
-				dAssert(0);
+				const dVector p0 (shape->GetLocalMatrix().UntransformVector (localP0) & dVector::m_triplexMask);
+				const dVector p1 (shape->GetLocalMatrix().UntransformVector (localP1) & dVector::m_triplexMask);
 				//dFloat32 param = shape->RayCast (p0, p1, maxT, tmpContactOut, preFilter, body, userData);
-				//dFloat32 param = shape->RayCast(callback, p0, p1, maxT, body, &tmpContactOut);
-				//if (param < maxT) 
-				//{
-				//	maxT = param;
-				//	contactOut.m_normal = shape->GetLocalMatrix().RotateVector (tmpContactOut.m_normal);
-				//	contactOut.m_shapeId0 = tmpContactOut.m_shapeId0;
-				//	contactOut.m_shapeId1 = tmpContactOut.m_shapeId0;
-				//	contactOut.m_collision0 = tmpContactOut.m_collision0;
-				//	contactOut.m_collision1 = tmpContactOut.m_collision1;
-				//}
-
+				dFloat32 param = shape->RayCast(callback, p0, p1, body, tmpContactOut);
+				if (param < maxT) 
+				{
+					maxT = param;
+					contactOut.m_normal = shape->GetLocalMatrix().RotateVector (tmpContactOut.m_normal);
+					contactOut.m_shapeId0 = tmpContactOut.m_shapeId0;
+					contactOut.m_shapeId1 = tmpContactOut.m_shapeId0;
+					contactOut.m_shapeInstance0 = tmpContactOut.m_shapeInstance0;
+					contactOut.m_shapeInstance1 = tmpContactOut.m_shapeInstance1;
+				}
 			} 
 			else 
 			{
-				dAssert(0);
-				//dAssert (me->m_type == m_node);
-				//const ndNodeBase* const left = me->m_left;
-				//dAssert (left);
-				//dFloat32 dist1 = ray.BoxIntersect(left->m_p0, left->m_p1);
-				//if (dist1 < maxT) {
-				//	dInt32 j = stack;
-				//	for ( ; j && (dist1 > distance[j - 1]); j --) {
-				//		stackPool[j] = stackPool[j - 1];
-				//		distance[j] = distance[j - 1];
-				//	}
-				//	stackPool[j] = left;
-				//	distance[j] = dist1;
-				//	stack++;
-				//	dgAssert (stack < dInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
-				//}
-				//
-				//const ndNodeBase* const right = me->m_right;
-				//dgAssert (right);
-				//dist1 = ray.BoxIntersect(right->m_p0, right->m_p1);
-				//if (dist1 < maxT) {
-				//	dInt32 j = stack;
-				//	for ( ; j && (dist1 > distance[j - 1]); j --) {
-				//		stackPool[j] = stackPool[j - 1];
-				//		distance[j] = distance[j - 1];
-				//	}
-				//	stackPool[j] = right;
-				//	distance[j] = dist1;
-				//	stack++;
-				//	dgAssert (stack < dInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
-				//}
+				dAssert (me->m_type == m_node);
+				const ndNodeBase* const left = me->m_left;
+				dAssert (left);
+				dFloat32 dist1 = ray.BoxIntersect(left->m_p0, left->m_p1);
+				if (dist1 < maxT) 
+				{
+					dInt32 j = stack;
+					for ( ; j && (dist1 > distance[j - 1]); j --) 
+					{
+						stackPool[j] = stackPool[j - 1];
+						distance[j] = distance[j - 1];
+					}
+					stackPool[j] = left;
+					distance[j] = dist1;
+					stack++;
+					dAssert (stack < dInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
+				}
+				
+				const ndNodeBase* const right = me->m_right;
+				dAssert (right);
+				dist1 = ray.BoxIntersect(right->m_p0, right->m_p1);
+				if (dist1 < maxT) 
+				{
+					dInt32 j = stack;
+					for ( ; j && (dist1 > distance[j - 1]); j --) 
+					{
+						stackPool[j] = stackPool[j - 1];
+						distance[j] = distance[j - 1];
+					}
+					stackPool[j] = right;
+					distance[j] = dist1;
+					stack++;
+					dAssert (stack < dInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
+				}
 			}
 		}
 	}
