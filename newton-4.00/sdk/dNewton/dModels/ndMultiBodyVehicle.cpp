@@ -293,9 +293,9 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	context.DrawLine(p0, p2, dVector(1.0f, 1.0f, 0.0f, 0.0f));
 
 	// draw body acceleration
-	dVector accel(m_chassis->GetAccel());
-	dVector p3(p0 + accel.Scale(0.5f));
-	context.DrawLine(p0, p3, dVector(0.0f, 1.0f, 1.0f, 0.0f));
+	//dVector accel(m_chassis->GetAccel());
+	//dVector p3(p0 + accel.Scale(0.5f));
+	//context.DrawLine(p0, p3, dVector(0.0f, 1.0f, 1.0f, 0.0f));
 
 	dVector weight(m_chassis->GetForce());
 	dFloat32 scale = dSqrt(weight.DotProduct(weight).GetScalar());
