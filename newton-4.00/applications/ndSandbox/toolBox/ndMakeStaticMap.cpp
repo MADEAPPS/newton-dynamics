@@ -44,7 +44,6 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene)
 	return body;
 }
 
-//void BuildFlatPlane1(ndDemoEntityManager* const scene, bool optimized)
 void BuildFlatPlane1(ndDemoEntityManager* const, bool)
 {
 	ndMeshEffect meshEffect;

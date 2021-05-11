@@ -470,7 +470,9 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene);
+	//BuildFloorBox(scene);
+	BuildStaticMesh(scene, "track.fbx", true);
+	//BuildStaticMesh(scene, "playerarena.fbx", true);
 
 	//dMatrix location0(dGetIdentityMatrix());
 	//location0.m_posit.m_y += 2.0f;
@@ -491,17 +493,17 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	matrix.m_posit = location;
 
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "viper.fbx", matrix);
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "viper1.fbx", matrix);
-	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "monsterTruck.fbx", matrix);
+	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "viper1.fbx", matrix);
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "monsterTruck.fbx", matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
 	scene->Set2DDisplayRenderFunction(nullptr, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
-	location.m_z = 4.0f;
-	location.m_y = 0.5f; 
-	AddRamps(scene, location);
-	AddSomeObstacles(scene, location);
+	//location.m_z = 4.0f;
+	//location.m_y = 0.5f; 
+	//AddRamps(scene, location);
+	//AddSomeObstacles(scene, location);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
