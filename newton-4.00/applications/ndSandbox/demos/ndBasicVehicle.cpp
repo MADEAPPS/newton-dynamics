@@ -277,6 +277,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		// make a convex hull collision shape to assist in calculation of the tire shape size
 		ndDemoMesh* const tireMesh = (ndDemoMesh*)tirePart->GetMesh();
 
+		const dMatrix matrix(tirePart->GetMeshMatrix());
+
 		dArray<dVector> temp;
 		tireMesh->GetVertexArray(temp);
 
@@ -284,13 +286,16 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		dVector maxVal(-1.0e10f);
 		for (dInt32 i = 0; i < temp.GetCount(); i++)
 		{
-			minVal = minVal.GetMin(temp[i]);
-			maxVal = maxVal.GetMax(temp[i]);
+			dVector p(matrix.TransformVector(temp[i]));
+			minVal = minVal.GetMin(p);
+			maxVal = maxVal.GetMax(p);
 		}
 
 		dVector size(maxVal - minVal);
-		width = size.m_y;
-		radius = size.m_x * 0.5f;
+		//width = size.m_y;
+		//radius = size.m_x * 0.5f;
+		width = size.m_x;
+		radius = size.m_y * 0.5f;
 	}
 
 	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, const char* const tireName)

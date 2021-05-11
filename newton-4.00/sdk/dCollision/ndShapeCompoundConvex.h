@@ -88,7 +88,6 @@ class ndShapeCompoundConvex: public ndShape
 	ndNodeBase* BuildTopDownBig(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory, dInt32& rootIndex);
 	dFloat32 CalculateSurfaceArea(ndNodeBase* const node0, ndNodeBase* const node1, dVector& minBox, dVector& maxBox) const;
 
-
 	ndTreeArray m_array;
 	dFloat64 m_treeEntropy;
 	dFloat32 m_boxMinRadius;
