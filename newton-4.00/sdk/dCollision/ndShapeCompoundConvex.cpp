@@ -27,6 +27,8 @@
 #include "ndBodyKinematic.h"
 #include "ndShapeCompoundConvex.h"
 
+#define D_MAX_MIN_VOLUME	dFloat32 (1.0e-3f)
+
 class ndShapeCompoundConvex::ndNodeBase
 {
 	public:
@@ -1202,4 +1204,59 @@ void ndShapeCompoundConvex::ApplyScale(const dVector& scale)
 	}
 	m_treeEntropy = dFloat32(0.0f);
 	EndAddRemove();
+}
+
+dFloat32 ndShapeCompoundConvex::CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const
+{
+	class ndCalculateMassProperties: public ndShapeDebugCallback
+	{
+		public:
+
+		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray)
+		{
+			//dPolyhedraMassProperties& localData = *((dgPolyhedraMassProperties*)userData);
+			m_localData.AddInertiaAndCrossFace(vertexCount, faceArray);
+		}
+
+		dPolyhedraMassProperties m_localData;
+	};
+
+	ndCalculateMassProperties massPropretiesCalculator;
+	DebugShape(offset, massPropretiesCalculator);
+	return massPropretiesCalculator.m_localData.MassProperties(centerOfMass, inertia, crossInertia);
+}
+
+dMatrix ndShapeCompoundConvex::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const
+{
+	dVector inertiaII;
+	dVector crossInertia;
+	dVector centerOfMass;
+	dMatrix scaledMatrix(matrix);
+	scaledMatrix[0] = scaledMatrix[0].Scale(localScale.m_x);
+	scaledMatrix[1] = scaledMatrix[1].Scale(localScale.m_y);
+	scaledMatrix[2] = scaledMatrix[2].Scale(localScale.m_z);
+	scaledMatrix = alignMatrix * scaledMatrix;
+
+	dFloat32 volume = CalculateMassProperties(scaledMatrix, inertiaII, crossInertia, centerOfMass);
+	if (volume < D_MAX_MIN_VOLUME)
+	{
+		volume = D_MAX_MIN_VOLUME;
+	}
+
+	dFloat32 invVolume = dFloat32(1.0f) / volume;
+	centerOfMass = centerOfMass.Scale(invVolume);
+	inertiaII = inertiaII.Scale(invVolume);
+	crossInertia = crossInertia.Scale(invVolume);
+	dMatrix inertia(dGetIdentityMatrix());
+	inertia[0][0] = inertiaII[0];
+	inertia[1][1] = inertiaII[1];
+	inertia[2][2] = inertiaII[2];
+	inertia[0][1] = crossInertia[2];
+	inertia[1][0] = crossInertia[2];
+	inertia[0][2] = crossInertia[1];
+	inertia[2][0] = crossInertia[1];
+	inertia[1][2] = crossInertia[0];
+	inertia[2][1] = crossInertia[0];
+	inertia[3] = centerOfMass;
+	return inertia;
 }

@@ -249,7 +249,8 @@ void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 	mass = dAbs(mass);
 
 	ndShape* const shape = m_shapeInstance.GetShape();
-	if ((mass < D_MINIMUM_MASS) || shape->GetAsShapeNull() || !shape->GetAsShapeConvex())
+	//if ((mass < D_MINIMUM_MASS) || shape->GetAsShapeNull() || !shape->GetAsShapeConvex())
+	if ((mass < D_MINIMUM_MASS) || shape->GetAsShapeNull() || shape->GetAsShapeStaticMeshShape())
 	{
 		mass = D_INFINITE_MASS * 2.0f;
 	}
