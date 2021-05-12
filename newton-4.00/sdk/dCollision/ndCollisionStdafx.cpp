@@ -38,7 +38,7 @@
 		dMemory::Free(ptr);
 	}
 
-	BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+	BOOL APIENTRY DllMain(HMODULE , DWORD  ul_reason_for_call, LPVOID )
 	{
 		switch (ul_reason_for_call)
 		{
@@ -48,6 +48,7 @@
 					// Track all memory leaks at the operating system level.
 					// make sure no Newton tool or utility leaves leaks behind.
 					_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
+					//_CrtSetBreakAlloc(3342281);
 				#endif
 
 			case DLL_THREAD_DETACH:

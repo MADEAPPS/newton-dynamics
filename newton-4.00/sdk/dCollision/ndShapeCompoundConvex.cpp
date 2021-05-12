@@ -29,11 +29,12 @@
 
 #define D_MAX_MIN_VOLUME	dFloat32 (1.0e-3f)
 
-class ndShapeCompoundConvex::ndNodeBase
+class ndShapeCompoundConvex::ndNodeBase: public dClassAlloc
 {
 	public:
 	ndNodeBase()
-		:m_type(m_node)
+		:dClassAlloc()
+		,m_type(m_node)
 		,m_left(nullptr)
 		,m_right(nullptr)
 		,m_parent(nullptr)
@@ -43,7 +44,8 @@ class ndShapeCompoundConvex::ndNodeBase
 	}
 
 	ndNodeBase(const ndNodeBase& copyFrom)
-		:m_p0(copyFrom.m_p0)
+		:dClassAlloc()
+		,m_p0(copyFrom.m_p0)
 		,m_p1(copyFrom.m_p1)
 		,m_size(copyFrom.m_size)
 		,m_origin(copyFrom.m_origin)
@@ -59,7 +61,8 @@ class ndShapeCompoundConvex::ndNodeBase
 	}
 
 	ndNodeBase(ndShapeInstance* const instance)
-		:m_type(m_leaf)
+		:dClassAlloc()
+		,m_type(m_leaf)
 		,m_left(nullptr)
 		,m_right(nullptr)
 		,m_parent(nullptr)
@@ -70,7 +73,8 @@ class ndShapeCompoundConvex::ndNodeBase
 	}
 
 	ndNodeBase(ndNodeBase* const left, ndNodeBase* const right)
-		:m_type(m_node)
+		:dClassAlloc()
+		,m_type(m_node)
 		,m_left(left)
 		,m_right(right)
 		,m_parent(nullptr)
@@ -171,7 +175,6 @@ class ndShapeCompoundConvex::ndNodeBase
 	ndShapeInstance* m_shape;
 	ndTreeArray::dTreeNode* m_myNode;
 };
-
 
 class ndShapeCompoundConvex::ndSpliteInfo
 {
