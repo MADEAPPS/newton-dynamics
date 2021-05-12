@@ -23,6 +23,38 @@
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"
 
+class nvVehicleDectriptor
+{
+	public:
+	nvVehicleDectriptor(
+		const char* const modelName,
+		dFloat32 suspensionRegularizer,
+		const dVector& comDisplacement)
+		:m_name(modelName)
+		,m_suspensionRegularizer(suspensionRegularizer)
+		,m_comDisplacement(comDisplacement)
+	{
+	}
+
+
+	const char* m_name;
+	dFloat32 m_suspensionRegularizer;
+	dVector m_comDisplacement;
+};
+
+//tireInfo.m_regularizer = 0.1f; // soft
+//tireInfo.m_regularizer = 0.025f; // stiff
+//com -= m_localFrame.m_up.Scale(0.35f);
+//com += m_localFrame.m_front.Scale(0.25f);
+
+static nvVehicleDectriptor sportViper("viper1.fbx", 0.025f, dVector(0.25f, -0.35f, 0.0f, 0.0f));
+static nvVehicleDectriptor sedanViper("viper1.fbx", 0.1f, dVector(0.25f, -0.35f, 0.0f, 0.0f));
+
+// hart to dricf but more stable
+static nvVehicleDectriptor monterTruckNormal("monsterTruck.fbx", 0.1f, dVector(0.25f, -0.8f, 0.0f, 0.0f));
+// this make the vehicle drift.
+static nvVehicleDectriptor monterTruckDrift("monsterTruck.fbx", 0.1f, dVector(0.25f, -0.9f, 0.0f, 0.0f));
+
 /*
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
@@ -153,13 +185,13 @@ class ndTireNotifyNotify : public ndDemoEntityNotify
 class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 {
 	public:
-	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const char* fileName, const dMatrix& matrix)
+	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const nvVehicleDectriptor& desc, const dMatrix& matrix)
 		:ndMultiBodyVehicle(dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f))
 		,m_steerAngle(0.0f)
 		,m_ignition()
 		,m_reverse()
 	{
-		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, fileName);
+		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
 
 		ndWorld* const world = scene->GetWorld();
@@ -169,8 +201,11 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		// lower vehicle com;
 		dVector com(chassis->GetCentreOfMass());
-		com -= m_localFrame.m_up.Scale(0.35f);
-		com += m_localFrame.m_front.Scale(0.25f);
+		//com -= m_localFrame.m_up.Scale(0.35f);
+		//com += m_localFrame.m_front.Scale(0.25f);
+		com += m_localFrame.m_up.Scale(desc.m_comDisplacement.m_y);
+		com += m_localFrame.m_front.Scale(desc.m_comDisplacement.m_x);
+		com += m_localFrame.m_right.Scale(desc.m_comDisplacement.m_z);
 		chassis->SetCentreOfMass(com);
 
 		// create the tire chassis as a normal rigid body
@@ -187,8 +222,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndJointWheel::ndWheelDescriptor tireInfo;
 		tireInfo.m_springK = 1000.0f;
 		tireInfo.m_damperC = 20.0f;
-		tireInfo.m_regularizer = 0.1f; // soft
-		//tireInfo.m_regularizer = 0.025f; // stiff
+		tireInfo.m_regularizer = desc.m_suspensionRegularizer;
 		tireInfo.m_minLimit = -0.05f;
 		tireInfo.m_maxLimit = 0.2f;
 		//tireInfo.m_maxLimit = 0.1f;
@@ -500,9 +534,11 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = location;
 
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "viper.fbx", matrix);
-	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "viper1.fbx", matrix);
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, "monsterTruck.fbx", matrix);
+
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, sportViper, matrix);
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, sedanViper, matrix);
+	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckNormal, matrix);
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDrift, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 

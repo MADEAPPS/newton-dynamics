@@ -251,7 +251,8 @@ dInt32 ndContactSolver::CalculatePairContacts(dInt32)
 	//}
 	else
 	{
-		dAssert(0);
+		dTrace(("!!!!!Fix compound contact\n"));
+//		dAssert(0);
 	}
 
 	m_contact->m_timeOfImpact = m_timestep;
