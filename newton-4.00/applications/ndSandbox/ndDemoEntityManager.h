@@ -32,6 +32,24 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	typedef void (*RenderGuiHelpCallback) (ndDemoEntityManager* const manager, void* const context);
 	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, dFloat32 timestep);
 
+	class ndKeyTrigger
+	{
+		public: 
+		ndKeyTrigger()
+			:m_memory(false)
+		{
+		}
+
+		bool Update(bool value)
+		{
+			bool ret = m_memory & !value;
+			m_memory = value;
+			return ret;
+		}
+
+		bool m_memory;
+	};
+
 	class ndLightSource
 	{
 		public:

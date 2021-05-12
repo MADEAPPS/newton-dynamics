@@ -156,8 +156,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const char* fileName, const dMatrix& matrix)
 		:ndMultiBodyVehicle(dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f))
 		,m_steerAngle(0.0f)
-		,m_prevKey(false)
-		,m_prevReverse(false)
+		,m_ignition()
+		,m_reverse()
 	{
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, fileName);
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
@@ -328,8 +328,6 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	{
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 
-		bool start = scene->GetKeyState('I');
-		bool reverseGear = scene->GetKeyState('R');
 		dFloat32 brake = 1500.0f * dFloat32(scene->GetKeyState('S'));
 		dFloat32 handBrake = 1500.0f * dFloat32(scene->GetKeyState(' '));
 		dFloat32 throttle = dFloat32 (scene->GetKeyState('W')) ? 1.0f : 0.0f;
@@ -349,20 +347,18 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		SetHandBrakeTorque(handBrake);
 		SetSteeringAngle(m_steerAngle * dDegreeToRad);
 
-		if (!m_prevKey & start)
+		//if (!m_prevKey & start)
+		if (m_ignition.Update(scene->GetKeyState('I')))
 		{
 			m_rotor->SetStart (!m_rotor->GetStart());
 		}
-		m_prevKey = start;
 
-		if (!m_prevReverse & reverseGear)
+		if (m_reverse.Update(scene->GetKeyState('R')))
 		{
-			//dFloat32 ratio = m_gearBox->GetRatio() > 0.0f ? -6.0f : 4.0f;
-			dFloat32 ratio = m_gearBox->GetRatio() > 0.0f ? -0.0f : 4.0f;
+			dFloat32 ratio = m_gearBox->GetRatio() > 0.0f ? -6.0f : 4.0f;
+			//dFloat32 ratio = m_gearBox->GetRatio() > 0.0f ? -0.0f : 4.0f;
 			m_gearBox->SetRatio(ratio);
 		}
-		m_prevReverse = reverseGear;
-
 
 		m_rotor->SetThrottle(throttle);
 
@@ -475,8 +471,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	GLuint m_tachometer;
 	GLuint m_greenNeedle;
 
-	bool m_prevKey;
-	bool m_prevReverse;
+	ndDemoEntityManager::ndKeyTrigger m_ignition;
+	ndDemoEntityManager::ndKeyTrigger m_reverse;
 };
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
