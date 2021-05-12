@@ -537,8 +537,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, sportViper, matrix);
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, sedanViper, matrix);
-	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckNormal, matrix);
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDrift, matrix);
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckNormal, matrix);
+	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDrift, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
