@@ -157,6 +157,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		:ndMultiBodyVehicle(dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f))
 		,m_steerAngle(0.0f)
 		,m_prevKey(false)
+		,m_prevReverse(false)
 	{
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, fileName);
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
@@ -328,11 +329,12 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 
 		bool start = scene->GetKeyState('I');
+		bool reverseGear = dFloat32(scene->GetKeyState('R'));
 		dFloat32 brake = 1500.0f * dFloat32(scene->GetKeyState('S'));
 		dFloat32 handBrake = 1500.0f * dFloat32(scene->GetKeyState(' '));
 		dFloat32 throttle = dFloat32 (scene->GetKeyState('W')) ? 1.0f : 0.0f;
 		dFloat32 steerAngle = 35.0f * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
-     		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
+   		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
 
 		static dInt32 xxxx;
  		xxxx++;
@@ -343,6 +345,9 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		}
 		throttle = dClamp(throttle, 0.0f, 0.3f);
 
+		//dFloat32 GetRatio() const;
+		//void SetRatio(dFloat32 ratio);
+
 		SetBrakeTorque(brake);
 		SetHandBrakeTorque(handBrake);
 		SetSteeringAngle(m_steerAngle * dDegreeToRad);
@@ -352,6 +357,14 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			m_rotor->SetStart (!m_rotor->GetStart());
 		}
 		m_prevKey = start;
+
+		if (!m_prevReverse & reverseGear)
+		{
+			dFloat32 ratio = m_gearBox->GetRatio() > 0.0f ? -6.0f : 4.0f;
+			m_gearBox->SetRatio(ratio);
+		}
+		m_prevReverse = reverseGear;
+
 
 		m_rotor->SetThrottle(throttle);
 
@@ -453,7 +466,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		x += gageSize;
 		//dFloat32 speed = engine ? dAbs(engine->GetSpeed()) / engine->GetTopSpeed() : 0.0f;
 		dFloat32 speed = GetSpeed() / 100.0f;
-		DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize, -180.0f, 90.0f);
+		DrawGage(m_odometer, m_greenNeedle, dAbs(speed), x, y, gageSize, -180.0f, 90.0f);
 	}
 
 	dFloat32 m_steerAngle;
@@ -465,6 +478,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	GLuint m_greenNeedle;
 
 	bool m_prevKey;
+	bool m_prevReverse;
 };
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
