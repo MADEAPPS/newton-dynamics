@@ -372,9 +372,9 @@ bool ndDemoEntityManager::GetMouseKeyState (dInt32 button) const
 
 void ndDemoEntityManager::Set2DDisplayRenderFunction (RenderGuiHelpCallback helpCallback, RenderGuiHelpCallback UIcallback, void* const context)
 {
+	m_renderUIContext = context;
 	m_renderDemoGUI = UIcallback;
 	m_renderHelpMenus = helpCallback;
-	m_renderUIContext = context;
 }
 
 void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context)
