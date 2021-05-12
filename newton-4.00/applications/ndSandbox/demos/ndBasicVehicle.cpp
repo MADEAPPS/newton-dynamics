@@ -187,8 +187,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndJointWheel::ndWheelDescriptor tireInfo;
 		tireInfo.m_springK = 1000.0f;
 		tireInfo.m_damperC = 20.0f;
-		//tireInfo.m_regularizer = 0.1f; // soft
-		tireInfo.m_regularizer = 0.025f; // stiff
+		tireInfo.m_regularizer = 0.1f; // soft
+		//tireInfo.m_regularizer = 0.025f; // stiff
 		tireInfo.m_minLimit = -0.05f;
 		tireInfo.m_maxLimit = 0.2f;
 		//tireInfo.m_maxLimit = 0.1f;
@@ -329,7 +329,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 
 		bool start = scene->GetKeyState('I');
-		bool reverseGear = dFloat32(scene->GetKeyState('R'));
+		bool reverseGear = scene->GetKeyState('R');
 		dFloat32 brake = 1500.0f * dFloat32(scene->GetKeyState('S'));
 		dFloat32 handBrake = 1500.0f * dFloat32(scene->GetKeyState(' '));
 		dFloat32 throttle = dFloat32 (scene->GetKeyState('W')) ? 1.0f : 0.0f;
@@ -345,9 +345,6 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		}
 		throttle = dClamp(throttle, 0.0f, 0.3f);
 
-		//dFloat32 GetRatio() const;
-		//void SetRatio(dFloat32 ratio);
-
 		SetBrakeTorque(brake);
 		SetHandBrakeTorque(handBrake);
 		SetSteeringAngle(m_steerAngle * dDegreeToRad);
@@ -360,7 +357,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		if (!m_prevReverse & reverseGear)
 		{
-			dFloat32 ratio = m_gearBox->GetRatio() > 0.0f ? -6.0f : 4.0f;
+			//dFloat32 ratio = m_gearBox->GetRatio() > 0.0f ? -6.0f : 4.0f;
+			dFloat32 ratio = m_gearBox->GetRatio() > 0.0f ? -0.0f : 4.0f;
 			m_gearBox->SetRatio(ratio);
 		}
 		m_prevReverse = reverseGear;

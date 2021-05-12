@@ -167,10 +167,8 @@ dFloat32 ndShapeConvex::CalculateMassProperties(const dMatrix& offset, dVector& 
 	class dMassPropertiesCalculator : public ndShapeDebugCallback
 	{
 		public:
-		//dMassPropertiesCalculator(const ndShapeConvex* const shape)
-			dMassPropertiesCalculator()
+		dMassPropertiesCalculator()
 			:m_localData()
-			//,m_me(shape)
 		{
 		}
 
@@ -180,10 +178,8 @@ dFloat32 ndShapeConvex::CalculateMassProperties(const dMatrix& offset, dVector& 
 		}
 
 		dPolyhedraMassProperties m_localData;
-		//const ndShapeConvex* m_me;
 	};
 		
-	//dMassPropertiesCalculator massPropretiesCalculator(this);
 	dMassPropertiesCalculator massPropretiesCalculator;
 		
 	DebugShape(offset, massPropretiesCalculator);
