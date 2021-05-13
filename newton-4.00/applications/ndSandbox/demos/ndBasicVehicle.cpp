@@ -384,17 +384,17 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		//if (!m_prevKey & start)
 		if (m_ignition.Update(scene->GetKeyState('I')))
 		{
-			m_rotor->SetStart (!m_rotor->GetStart());
+			m_motor->SetStart (!m_motor->GetStart());
 		}
 
 		if (m_reverse.Update(scene->GetKeyState('R')))
 		{
-			dFloat32 ratio = m_gearBox->GetRatio() > 0.0f ? -6.0f : 4.0f;
-			//dFloat32 ratio = m_gearBox->GetRatio() > 0.0f ? -0.0f : 4.0f;
+			//dFloat32 ratio = m_gearBox->GetRatio() > 0.0f ? -6.0f : 4.0f;
+			dFloat32 ratio = m_gearBox->GetRatio() > 0.0f ? -0.0f : 4.0f;
 			m_gearBox->SetRatio(ratio);
 		}
 
-		m_rotor->SetThrottle(throttle);
+		m_motor->SetThrottle(throttle);
 
 		ndMultiBodyVehicle::Update(world, timestep);
 	}
@@ -470,11 +470,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 	void RenderUI(ndDemoEntityManager* const scene)
 	{
-		//dAssert(0);
-
-		//dMultiBodyVehicleEngine* const engine = m_player->GetEngineControl() ? m_player->GetEngineControl()->GetEngine() : NULL;
-
-		ndMultiBodyVehicleRotor* const motor = m_rotor;
+		ndMultiBodyVehicleMotor* const motor = m_motor;
 		dAssert(motor);
 		
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -487,7 +483,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		//dFloat32 rpm = motor->GetSpeed() * 9.55f / 6000.0f;
 		dFloat32 rpm = motor->GetRpm() / motor->GetMaxRpm();
 		//dTrace(("%f %f\n", motor->GetSpeed(), rpm));
-
+		
 		DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 90.0f);
 		
 		// draw the odometer
@@ -534,11 +530,10 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = location;
 
-
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, sportViper, matrix);
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, sedanViper, matrix);
+	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, sedanViper, matrix);
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckNormal, matrix);
-	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDrift, matrix);
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDrift, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 

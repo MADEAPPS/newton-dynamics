@@ -25,17 +25,58 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
+class ndMultiBodyVehicle;
+
 class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 {
 	public:
 	ND_JOINT_RELECTION(ndMultiBodyVehicleMotor);
-	D_NEWTON_API ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis);
+	//D_NEWTON_API ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis, );
+	D_NEWTON_API ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel);
+
+	bool GetStart() const;
+	dFloat32 GetRpm() const;
+	dFloat32 GetMaxRpm() const;
+
+	D_NEWTON_API void SetStart(bool startkey);
+	D_NEWTON_API void SetThrottle(dFloat32 param);
+	D_NEWTON_API void SetMaxRpm(dFloat32 maxRpm);
+	//D_NEWTON_API void SetIdleRpm(dFloat32 idleRpm);
+	D_NEWTON_API void SetEngineTorque(dFloat32 torque);
+	D_NEWTON_API void SetGasValve(dFloat32 radPerSeconds);
 
 	private:
 	void AlignMatrix();
 	void JacobianDerivative(ndConstraintDescritor& desc);
+	dFloat32 CalculateAcceleration(ndConstraintDescritor& desc);
 
+	protected:
+	dFloat32 m_omega;
+	dFloat32 m_maxOmega;
+	dFloat32 m_idleOmega;
+	dFloat32 m_throttle;
+	dFloat32 m_gasValve;
+	dFloat32 m_engineTorque;
+	ndMultiBodyVehicle* m_vehicelModel;
+	bool m_startEngine;
 	friend class ndMultiBodyVehicle;
+	friend class ndJointVehicleMotorGearBox;
 };
+
+inline bool ndMultiBodyVehicleMotor::GetStart() const
+{
+	return m_startEngine;
+}
+
+inline dFloat32 ndMultiBodyVehicleMotor::GetMaxRpm() const
+{
+	return m_maxOmega * dFloat32(9.55f);
+}
+
+inline dFloat32 ndMultiBodyVehicleMotor::GetRpm() const
+{
+	return m_omega * dFloat32(9.55f);
+}
+
 
 #endif

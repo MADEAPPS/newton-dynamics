@@ -28,7 +28,6 @@
 #include "ndJointDoubleHinge.h"
 #include "ndMultiBodyVehicle.h"
 #include "ndMultiBodyVehicleMotor.h"
-#include "ndMultiBodyVehicleRotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 #include "ndMultiBodyVehicleDifferential.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
@@ -173,11 +172,8 @@ ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndWorld* const world, dFlo
 	//dAssert(0);
 	ndBodyDynamic* const motorBody = CreateInternalBodyPart(world, mass, radius);
 
-	m_motor = new ndMultiBodyVehicleMotor(motorBody, m_chassis);
+	m_motor = new ndMultiBodyVehicleMotor(motorBody, this);
 	world->AddJoint(m_motor);
-
-	m_rotor = new ndMultiBodyVehicleRotor(motorBody, world);
-	world->AddJoint(m_rotor);
 
 	m_gearBox = new ndJointVehicleMotorGearBox(motorBody, differential->GetBody0(), this);
 	world->AddJoint(m_gearBox);

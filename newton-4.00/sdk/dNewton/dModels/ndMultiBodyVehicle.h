@@ -28,7 +28,6 @@
 class ndWorld;
 class ndJointWheel;
 class ndMultiBodyVehicleMotor;
-class ndMultiBodyVehicleRotor;
 class ndJointVehicleMotorGearBox;
 class ndMultiBodyVehicleDifferential;
 
@@ -79,7 +78,6 @@ class ndMultiBodyVehicle: public ndModel
 	dMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
 	ndMultiBodyVehicleMotor* m_motor;
-	ndMultiBodyVehicleRotor* m_rotor;
 	ndShapeChamferCylinder* m_tireShape;
 	ndJointVehicleMotorGearBox* m_gearBox;
 	dList<ndJointWheel*> m_tireList;
@@ -91,6 +89,7 @@ class ndMultiBodyVehicle: public ndModel
 	dFloat32 m_steeringAngle;
 	dFloat32 m_handBrakeTorque;
 	dFloat32 m_steeringAngleMemory;
+	friend class ndMultiBodyVehicleMotor;
 	friend class ndJointVehicleMotorGearBox;
 };
 

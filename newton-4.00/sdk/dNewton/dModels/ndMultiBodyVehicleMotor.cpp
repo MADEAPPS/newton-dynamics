@@ -21,10 +21,25 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
+#include "ndJointWheel.h"
+#include "ndBodyDynamic.h"
+#include "ndMultiBodyVehicle.h"
 #include "ndMultiBodyVehicleMotor.h"
+#include "ndMultiBodyVehicleGearBox.h"
 
-ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis)
-	:ndJointBilateralConstraint(2, motor, chassis, motor->GetMatrix())
+#define D_ENGINE_NOMINAL_TORQUE (dFloat32(900.0f))
+#define D_ENGINE_NOMINAL_RPM (dFloat32(9000.0f / 9.55f))
+
+ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel)
+	:ndJointBilateralConstraint(3, motor, vehicelModel->m_chassis, motor->GetMatrix())
+	,m_omega(dFloat32(0.0f))
+	,m_maxOmega(D_ENGINE_NOMINAL_RPM)
+	,m_idleOmega(D_ENGINE_NOMINAL_RPM * dFloat32(0.1f))
+	,m_throttle(dFloat32(0.0f))
+	,m_gasValve(D_ENGINE_NOMINAL_RPM * dFloat32(0.02f))
+	,m_engineTorque(D_ENGINE_NOMINAL_TORQUE)
+	,m_vehicelModel(vehicelModel)
+	,m_startEngine(false)
 {
 }
 
@@ -51,6 +66,74 @@ void ndMultiBodyVehicleMotor::AlignMatrix()
 	m_body0->SetOmega(omega);
 }
 
+void ndMultiBodyVehicleMotor::SetGasValve(dFloat32 gasValve)
+{
+	m_gasValve = dAbs(gasValve);
+}
+
+void ndMultiBodyVehicleMotor::SetStart(bool startkey)
+{
+	m_startEngine = startkey;
+}
+
+void ndMultiBodyVehicleMotor::SetMaxRpm(dFloat32)
+{
+	dAssert(0);
+}
+
+void ndMultiBodyVehicleMotor::SetEngineTorque(dFloat32)
+{
+	dAssert(0);
+}
+
+void ndMultiBodyVehicleMotor::SetThrottle(dFloat32 param)
+{
+	m_throttle = dClamp(param, dFloat32(0.0f), dFloat32(1.0f));
+}
+
+dFloat32 ndMultiBodyVehicleMotor::CalculateAcceleration(ndConstraintDescritor& desc)
+{
+	const dVector& omega0 = m_body0->GetOmega();
+	const ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
+	const dVector relOmega(omega0 * jacobian0.m_angular);
+
+#if 0
+	m_omega = -relOmega.AddHorizontal().GetScalar();
+	dFloat32 desiredSpeed = m_omega;
+	dFloat32 diff = m_throttle * m_maxOmega - m_omega;
+
+	// simulate a carburator of fuel injection device
+	if (diff > dFloat32(1.0e-3f))
+	{
+		if (diff <= m_gasValve)
+		{
+			diff *= dFloat32(0.5f);
+		}
+		desiredSpeed += diff;
+	}
+	else if (diff < dFloat32(-1.0e-3f))
+	{
+		if (diff > -m_gasValve)
+		{
+			diff *= dFloat32(0.5f);
+		}
+		desiredSpeed += diff;
+	}
+
+	desiredSpeed = dClamp(desiredSpeed, m_idleOmega, m_maxOmega);
+	//dTrace(("%f %f\n", desiredSpeed, m_omega));
+	return (m_omega - desiredSpeed) * desc.m_invTimestep;
+
+#else
+	m_omega = -relOmega.AddHorizontal().GetScalar();
+	const dFloat32 throttleOmega = dClamp(m_throttle * m_maxOmega, m_idleOmega, m_maxOmega);
+	const dFloat32 deltaOmega = throttleOmega - m_omega;
+	dFloat32 omegaError = dClamp(deltaOmega, -m_gasValve, m_gasValve);
+	//dTrace(("%f %f\n", throttleOmega, m_omega));
+	return -omegaError * desc.m_invTimestep;
+#endif
+}
+
 void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
@@ -63,5 +146,29 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 
 	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
+
+
+	// add rotor joint
+	AddAngularRowJacobian(desc, matrix0.m_front, dFloat32(0.0f));
+	const dFloat32 accel = CalculateAcceleration(desc);
+	if (m_startEngine)
+	{
+		const ndJointVehicleMotorGearBox* const gearBox = m_vehicelModel->m_gearBox;
+		if (gearBox && dAbs(gearBox->GetRatio()) > dFloat32(0.0f))
+		{
+			ndJacobian& jacobian = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
+			jacobian.m_angular = dVector::m_zero;
+		}
+		// set engine gas and save the current joint omega
+		SetHighFriction(desc, m_engineTorque);
+		SetLowerFriction(desc, -m_engineTorque);
+		SetMotorAcceleration(desc, accel);
+	}
+	else
+	{
+		SetHighFriction(desc, m_engineTorque * dFloat32(4.0f));
+		SetLowerFriction(desc, -m_engineTorque * dFloat32(4.0f));
+		SetMotorAcceleration(desc, m_omega * desc.m_invTimestep);
+	}
 }
 
