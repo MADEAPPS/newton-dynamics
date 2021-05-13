@@ -30,13 +30,12 @@ ndJointVehicleMotorGearBox::ndJointVehicleMotorGearBox(ndBodyKinematic* const mo
 	:ndJointGear(dFloat32 (1.0f), motor->GetMatrix().m_front, differential,	motor->GetMatrix().m_front, motor)
 	,m_chassis(chassis)
 {
-	SetRatio(dFloat32(4.0f));
+	SetRatio(dFloat32(0.0f));
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
 void ndJointVehicleMotorGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 {
-//m_gearRatio = 0;
 	if (dAbs(m_gearRatio) > dFloat32(1.0e-1f))
 	{
 		dMatrix matrix0;

@@ -189,7 +189,9 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		:ndMultiBodyVehicle(dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f))
 		,m_steerAngle(0.0f)
 		,m_ignition()
-		,m_reverse()
+		,m_neutralGear()
+		,m_reverseGear()
+		,m_automaticGear()
 	{
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
@@ -364,12 +366,12 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		dFloat32 brake = 1500.0f * dFloat32(scene->GetKeyState('S'));
 		dFloat32 handBrake = 1500.0f * dFloat32(scene->GetKeyState(' '));
-		dFloat32 throttle = dFloat32 (scene->GetKeyState('W')) ? 1.0f : 0.0f;
+		dFloat32 throttle = dFloat32(scene->GetKeyState('W')) ? 1.0f : 0.0f;
 		dFloat32 steerAngle = 35.0f * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
-   		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
+		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
 
 		static dInt32 xxxx;
- 		xxxx++;
+		xxxx++;
 		if (xxxx > 300)
 		{
 			//start = true;
@@ -384,14 +386,20 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		//if (!m_prevKey & start)
 		if (m_ignition.Update(scene->GetKeyState('I')))
 		{
-			m_motor->SetStart (!m_motor->GetStart());
+			m_motor->SetStart(!m_motor->GetStart());
 		}
 
-		if (m_reverse.Update(scene->GetKeyState('R')))
+		if (m_neutralGear.Update(scene->GetKeyState('N')))
 		{
-			//dFloat32 ratio = m_gearBox->GetRatio() > 0.0f ? -6.0f : 4.0f;
-			dFloat32 ratio = m_gearBox->GetRatio() > 0.0f ? -0.0f : 4.0f;
-			m_gearBox->SetRatio(ratio);
+			m_gearBox->SetRatio(0.0f);
+		} 
+		if (m_reverseGear.Update(scene->GetKeyState('R')))
+		{
+			m_gearBox->SetRatio(-10.0f);
+		}
+		if (m_automaticGear.Update(scene->GetKeyState('T')))
+		{
+			m_gearBox->SetRatio(4.0f);
 		}
 
 		m_motor->SetThrottle(throttle);
@@ -502,7 +510,9 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	GLuint m_greenNeedle;
 
 	ndDemoEntityManager::ndKeyTrigger m_ignition;
-	ndDemoEntityManager::ndKeyTrigger m_reverse;
+	ndDemoEntityManager::ndKeyTrigger m_neutralGear;
+	ndDemoEntityManager::ndKeyTrigger m_reverseGear;
+	ndDemoEntityManager::ndKeyTrigger m_automaticGear;
 };
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
