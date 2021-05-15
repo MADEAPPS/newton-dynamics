@@ -25,6 +25,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
+#define D_MINIMUM_SLIP_OMEGA dFloat32 (10.0f)
+
 class ndMultiBodyVehicleDifferential : public ndJointBilateralConstraint
 {
 	public:
@@ -35,7 +37,21 @@ class ndMultiBodyVehicleDifferential : public ndJointBilateralConstraint
 	void AlignMatrix();
 	void JacobianDerivative(ndConstraintDescritor& desc);
 
+	dFloat32 GetSlipOmega() const;
+	void SetSlipOmega(dFloat32 speed);
+
 	friend class ndMultiBodyVehicle;
+	dFloat32 m_limitedSlipOmega;
 };
+
+inline dFloat32 ndMultiBodyVehicleDifferential::GetSlipOmega() const
+{
+	return m_limitedSlipOmega;
+}
+
+inline void ndMultiBodyVehicleDifferential::SetSlipOmega(dFloat32 omega)
+{
+	m_limitedSlipOmega = dMax(D_MINIMUM_SLIP_OMEGA, dAbs(omega));
+}
 
 #endif

@@ -24,7 +24,8 @@
 #include "ndMultiBodyVehicleDifferential.h"
 
 ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(ndBodyKinematic* const differential, ndBodyKinematic* const chassis)
-	:ndJointBilateralConstraint(1, differential, chassis, differential->GetMatrix())
+	:ndJointBilateralConstraint(2, differential, chassis, differential->GetMatrix())
+	,m_limitedSlipOmega(D_MINIMUM_SLIP_OMEGA * dFloat32 (1.0f))
 {
 }
 
@@ -55,13 +56,37 @@ void ndMultiBodyVehicleDifferential::JacobianDerivative(ndConstraintDescritor& d
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	// save the current joint Omega
-	//dVector omega0(m_body0->GetOmega());
-	//dVector omega1(m_body1->GetOmega());
-
-	// only one rows to restrict rotation around around the parent coordinate system
-	//const dFloat32 angleError = m_maxAngleError;
+	//one rows to restrict rotation around around the parent coordinate system
 	const dFloat32 angle = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle);
+
+	const dVector omega0(m_body0->GetOmega());
+	const dVector omega1(m_body1->GetOmega());
+
+	dFloat32 slipOmega = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
+	if (dAbs(slipOmega) > m_limitedSlipOmega) 
+	{
+		AddAngularRowJacobian(desc, matrix1.m_up, dFloat32 (0.0f));
+		ndJacobian& jacobian = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
+		jacobian.m_angular = dVector::m_zero;
+		if (slipOmega > m_limitedSlipOmega)
+		{
+			slipOmega -= m_limitedSlipOmega;
+			dFloat32 alpha = slipOmega * desc.m_invTimestep;
+			SetMotorAcceleration(desc, -alpha);
+			//SetLowerFriction(desc, dFloat32 (0.0f));
+			SetHighFriction(desc, dFloat32(0.0f));
+		} 
+		else
+		{
+			dAssert(slipOmega < -m_limitedSlipOmega);
+			slipOmega += m_limitedSlipOmega;
+			dFloat32 alpha = slipOmega * desc.m_invTimestep;
+			SetMotorAcceleration(desc, -alpha);
+			SetLowerFriction(desc, dFloat32(0.0f));
+			//SetHighFriction(desc, dFloat32(0.0f));
+		}
+	}
+	dTrace(("%f, (%f %f %f)\n", slipOmega, matrix1.m_up.m_x, matrix1.m_up.m_y, matrix1.m_up.m_z));
 }
 

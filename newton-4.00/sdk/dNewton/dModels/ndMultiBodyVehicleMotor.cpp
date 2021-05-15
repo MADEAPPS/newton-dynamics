@@ -147,7 +147,6 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
 
-
 	// add rotor joint
 	AddAngularRowJacobian(desc, matrix0.m_front, dFloat32(0.0f));
 	const dFloat32 accel = CalculateAcceleration(desc);
