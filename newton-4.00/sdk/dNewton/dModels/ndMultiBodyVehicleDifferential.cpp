@@ -87,6 +87,6 @@ void ndMultiBodyVehicleDifferential::JacobianDerivative(ndConstraintDescritor& d
 			//SetHighFriction(desc, dFloat32(0.0f));
 		}
 	}
-	dTrace(("%f, (%f %f %f)\n", slipOmega, matrix1.m_up.m_x, matrix1.m_up.m_y, matrix1.m_up.m_z));
+	//dTrace(("%f, (%f %f %f)\n", slipOmega, matrix1.m_up.m_x, matrix1.m_up.m_y, matrix1.m_up.m_z));
 }
 
