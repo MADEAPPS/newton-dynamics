@@ -285,6 +285,12 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		me->RenderUI(scene);
 	}
 
+	static void RenderHelp(ndDemoEntityManager* const scene, void* const context)
+	{
+		ndBasicMultiBodyVehicle* const me = (ndBasicMultiBodyVehicle*)context;
+		me->RenderHelp(scene);
+	}
+
 	private:
 	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity)
 	{
@@ -476,6 +482,30 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		glPopMatrix();
 	}
 
+	void RenderHelp(ndDemoEntityManager* const scene)
+	{
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print(color, "Vehicle driving keyboard control");
+		scene->Print(color, "accelerator        : 'w'");
+		scene->Print(color, "reverse            : 's'");
+		scene->Print(color, "turn left          : 'a'");
+		scene->Print(color, "turn right         : 'd'");
+		scene->Print(color, "hand brakes        : 'space'");
+
+		ImGui::Separator();
+		scene->Print(color, "gear box");
+		scene->Print(color, "ignition           : 'i'");
+		scene->Print(color, "neutral gear	   : 'n'");
+		scene->Print(color, "forward gear	   : 't'");
+		scene->Print(color, "reverse gear	   : 'r'");
+		//ImGui::RadioButton("free", &m_differentialMode, 1);
+		//ImGui::RadioButton("rwd", &m_differentialMode, 2);
+		//ImGui::RadioButton("fwd", &m_differentialMode, 3);
+		
+		ImGui::Separator();
+		scene->Print(color, "hide help          : 'r'");
+	}
+
 	void RenderUI(ndDemoEntityManager* const scene)
 	{
 		ndMultiBodyVehicleMotor* const motor = m_motor;
@@ -547,7 +577,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
-	scene->Set2DDisplayRenderFunction(nullptr, ndBasicMultiBodyVehicle::RenderUI, vehicle);
+	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
 	//location.m_z = 4.0f;
 	//location.m_y = 0.5f; 
