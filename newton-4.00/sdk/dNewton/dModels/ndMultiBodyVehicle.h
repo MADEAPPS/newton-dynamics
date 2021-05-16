@@ -34,6 +34,25 @@ class ndMultiBodyVehicleDifferential;
 class ndMultiBodyVehicle: public ndModel
 {
 	public:
+	class ndDownForce
+	{
+		public:
+		class ndSpeedForcePair
+		{
+			public:
+			dFloat32 m_speed;
+			dFloat32 m_forceFactor;
+			private:
+			dFloat32 m_aerodynamicsConst;
+			friend class ndDownForce;
+		};
+
+		D_NEWTON_API ndDownForce();
+		D_NEWTON_API dFloat32 GetDownforceFactor(dFloat32 speed) const;
+		
+		ndSpeedForcePair m_downForceTable[3];
+	};
+
 	D_NEWTON_API ndMultiBodyVehicle(const dVector& frontDir, const dVector& upDir);
 	D_NEWTON_API ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode);
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
@@ -51,7 +70,7 @@ class ndMultiBodyVehicle: public ndModel
 
 	D_NEWTON_API ndShapeInstance CreateTireShape(dFloat32 radius, dFloat32 width) const;
 
-	D_NEWTON_API void AddChassis(ndBodyDynamic* const chassis);
+	D_NEWTON_API void AddChassis(ndBodyDynamic* const chassis, dFloat32 gravityMag);
 	D_NEWTON_API ndJointWheel* AddTire(ndWorld* const world, const ndJointWheel::ndWheelDescriptor& desc, ndBodyDynamic* const tire);
 	D_NEWTON_API ndMultiBodyVehicleMotor* AddMotor(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndMultiBodyVehicleDifferential* const differential);
 	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndJointWheel* const leftTire, ndJointWheel* const rightTire);
@@ -85,10 +104,13 @@ class ndMultiBodyVehicle: public ndModel
 	dList<ndJointWheel*> m_handBrakeTires;
 	dList<ndJointWheel*> m_steeringTires;
 	dList<ndMultiBodyVehicleDifferential*> m_differentials;
+	ndDownForce m_downForce;
+	dFloat32 m_gravityMag;
 	dFloat32 m_brakeTorque;
 	dFloat32 m_steeringAngle;
 	dFloat32 m_handBrakeTorque;
 	dFloat32 m_steeringAngleMemory;
+	
 	friend class ndMultiBodyVehicleMotor;
 	friend class ndJointVehicleMotorGearBox;
 };

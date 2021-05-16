@@ -217,7 +217,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, "fl_tire");
 		
 		// 1- add chassis to the vehicle mode 
-		AddChassis(chassis);
+		AddChassis(chassis, DEMO_GRAVITY);
 
 		// 2- each tire to the mode, this function will create the tire joints
 
@@ -415,7 +415,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const
 	{
-		return dFloat32(2.0f);
+		return dFloat32(1.5f);
 	}
 
 	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, dFloat32 timestep)
@@ -487,7 +487,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Vehicle driving keyboard control");
 		scene->Print(color, "accelerator        : 'w'");
-		scene->Print(color, "reverse            : 's'");
+		scene->Print(color, "brakes             : 's'");
 		scene->Print(color, "turn left          : 'a'");
 		scene->Print(color, "turn right         : 'd'");
 		scene->Print(color, "hand brakes        : 'space'");
