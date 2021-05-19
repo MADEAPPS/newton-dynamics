@@ -55,7 +55,6 @@ static nvVehicleDectriptor monterTruckNormal("monsterTruck.fbx", 0.1f, dVector(0
 // this make the vehicle drift.
 static nvVehicleDectriptor monterTruckDrift("monsterTruck.fbx", 0.1f, dVector(0.25f, -0.9f, 0.0f, 0.0f));
 
-/*
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, dInt32 count)
@@ -84,23 +83,19 @@ static void AddShape(ndDemoEntityManager* const scene,
 		matrix.m_posit.m_y += diameter * 2.5f;
 	}
 }
-*/
 
-//static void AddSomeObstacles(ndDemoEntityManager* const scene, const dVector& origin)
-static void AddSomeObstacles(ndDemoEntityManager* const, const dVector&)
+static void AddSomeObstacles(ndDemoEntityManager* const scene, const dVector& origin)
+//static void AddSomeObstacles(ndDemoEntityManager* const, const dVector&)
 {
-/*
-	dFloat32 diameter = 1.0f;
+	dFloat32 diameter = 0.5f;
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	ndDemoMeshIntance* const instanceMesh = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);
 
-	const dInt32 n = 1;
-	const dInt32 stackHigh = 1;
-	//const dInt32 n = 2;
-	//const dInt32 stackHigh = 7;
+	const dInt32 n = 4;
+	const dInt32 stackHigh = 2;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)
@@ -111,7 +106,6 @@ static void AddSomeObstacles(ndDemoEntityManager* const, const dVector&)
 	}
 
 	instanceMesh->Release();
-*/
 }
 
 
@@ -210,16 +204,17 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		com += m_localFrame.m_right.Scale(desc.m_comDisplacement.m_z);
 		chassis->SetCentreOfMass(com);
 
-		// create the tire chassis as a normal rigid body
+		// 1- add chassis to the vehicle mode 
+		AddChassis(chassis, DEMO_GRAVITY);
+#if 0 
+
+		// 2- each tire to the model, 
+		// this function will create the tire as a normal rigid body
+		// and attach them to the chassis with the tire joints
 		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, "rr_tire");
 		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, "rl_tire");
 		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, "fr_tire");
 		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, "fl_tire");
-		
-		// 1- add chassis to the vehicle mode 
-		AddChassis(chassis, DEMO_GRAVITY);
-
-		// 2- each tire to the mode, this function will create the tire joints
 
 		ndJointWheel::ndWheelDescriptor tireInfo;
 		tireInfo.m_springK = 1000.0f;
@@ -255,6 +250,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		// add a motor
 		AddMotor(world, 20, 0.25f, differential);
+#endif
 	}
 
 	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename)
@@ -370,47 +366,50 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	{
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 
-		dFloat32 brake = 1500.0f * dFloat32(scene->GetKeyState('S'));
-		dFloat32 handBrake = 1500.0f * dFloat32(scene->GetKeyState(' '));
-		dFloat32 throttle = dFloat32(scene->GetKeyState('W')) ? 1.0f : 0.0f;
-		dFloat32 steerAngle = 35.0f * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
-		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
-
-		static dInt32 xxxx;
-		xxxx++;
-		if (xxxx > 300)
+		if (m_motor)
 		{
-			//start = true;
-			//throttle = 0.25f;
+			dFloat32 brake = 1500.0f * dFloat32(scene->GetKeyState('S'));
+			dFloat32 handBrake = 1500.0f * dFloat32(scene->GetKeyState(' '));
+			dFloat32 throttle = dFloat32(scene->GetKeyState('W')) ? 1.0f : 0.0f;
+			dFloat32 steerAngle = 35.0f * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
+			m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
+
+			static dInt32 xxxx;
+			xxxx++;
+			if (xxxx > 300)
+			{
+				//start = true;
+				//throttle = 0.25f;
+			}
+			throttle = dClamp(throttle, 0.0f, 0.3f);
+
+			SetBrakeTorque(brake);
+			SetHandBrakeTorque(handBrake);
+			SetSteeringAngle(m_steerAngle * dDegreeToRad);
+
+			//if (!m_prevKey & start)
+			if (m_ignition.Update(scene->GetKeyState('I')))
+			{
+				m_motor->SetStart(!m_motor->GetStart());
+			}
+
+			if (m_neutralGear.Update(scene->GetKeyState('N')))
+			{
+				m_gearBox->SetRatio(0.0f);
+			}
+			if (m_reverseGear.Update(scene->GetKeyState('R')))
+			{
+				m_gearBox->SetRatio(-10.0f);
+			}
+			if (m_automaticGear.Update(scene->GetKeyState('T')))
+			{
+				m_gearBox->SetRatio(4.0f);
+			}
+
+			m_motor->SetThrottle(throttle);
+
+			ndMultiBodyVehicle::Update(world, timestep);
 		}
-		throttle = dClamp(throttle, 0.0f, 0.3f);
-
-		SetBrakeTorque(brake);
-		SetHandBrakeTorque(handBrake);
-		SetSteeringAngle(m_steerAngle * dDegreeToRad);
-
-		//if (!m_prevKey & start)
-		if (m_ignition.Update(scene->GetKeyState('I')))
-		{
-			m_motor->SetStart(!m_motor->GetStart());
-		}
-
-		if (m_neutralGear.Update(scene->GetKeyState('N')))
-		{
-			m_gearBox->SetRatio(0.0f);
-		} 
-		if (m_reverseGear.Update(scene->GetKeyState('R')))
-		{
-			m_gearBox->SetRatio(-10.0f);
-		}
-		if (m_automaticGear.Update(scene->GetKeyState('T')))
-		{
-			m_gearBox->SetRatio(4.0f);
-		}
-
-		m_motor->SetThrottle(throttle);
-
-		ndMultiBodyVehicle::Update(world, timestep);
 	}
 
 	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const
@@ -509,26 +508,29 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	void RenderUI(ndDemoEntityManager* const scene)
 	{
 		ndMultiBodyVehicleMotor* const motor = m_motor;
-		dAssert(motor);
-		
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		dFloat32 gageSize = 200.0f;
-		dFloat32 y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
-		
-		// draw the tachometer
-		dFloat32 x = gageSize / 2 + 20.0f;
-		//dFloat32 rpm = engine ? engine->GetRpm() / engine->GetRedLineRpm() : 0.0f;
-		//dFloat32 rpm = motor->GetSpeed() * 9.55f / 6000.0f;
-		dFloat32 rpm = motor->GetRpm() / motor->GetMaxRpm();
-		//dTrace(("%f %f\n", motor->GetSpeed(), rpm));
-		
-		DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 90.0f);
-		
-		// draw the odometer
-		x += gageSize;
-		//dFloat32 speed = engine ? dAbs(engine->GetSpeed()) / engine->GetTopSpeed() : 0.0f;
-		dFloat32 speed = GetSpeed() / 100.0f;
-		DrawGage(m_odometer, m_greenNeedle, dAbs(speed), x, y, gageSize, -180.0f, 90.0f);
+		if (motor)
+		{
+			dAssert(motor);
+
+			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			dFloat32 gageSize = 200.0f;
+			dFloat32 y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
+
+			// draw the tachometer
+			dFloat32 x = gageSize / 2 + 20.0f;
+			//dFloat32 rpm = engine ? engine->GetRpm() / engine->GetRedLineRpm() : 0.0f;
+			//dFloat32 rpm = motor->GetSpeed() * 9.55f / 6000.0f;
+			dFloat32 rpm = motor->GetRpm() / motor->GetMaxRpm();
+			//dTrace(("%f %f\n", motor->GetSpeed(), rpm));
+
+			DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 90.0f);
+
+			// draw the odometer
+			x += gageSize;
+			//dFloat32 speed = engine ? dAbs(engine->GetSpeed()) / engine->GetTopSpeed() : 0.0f;
+			dFloat32 speed = GetSpeed() / 100.0f;
+			DrawGage(m_odometer, m_greenNeedle, dAbs(speed), x, y, gageSize, -180.0f, 90.0f);
+		}
 	}
 
 	dFloat32 m_steerAngle;
@@ -548,8 +550,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	//BuildFloorBox(scene);
-	BuildStaticMesh(scene, "track.fbx", true);
+	BuildFloorBox(scene);
+	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 
 	//dMatrix location0(dGetIdentityMatrix());
@@ -571,8 +573,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	matrix.m_posit = location;
 
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, sportViper, matrix);
-	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, sedanViper, matrix);
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckNormal, matrix);
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, sedanViper, matrix);
+	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckNormal, matrix);
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDrift, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
@@ -582,7 +584,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//location.m_z = 4.0f;
 	//location.m_y = 0.5f; 
 	//AddRamps(scene, location);
-	//AddSomeObstacles(scene, location);
+	AddSomeObstacles(scene, location);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);

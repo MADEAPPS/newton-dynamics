@@ -533,6 +533,7 @@ ndBodyPlayerCapsuleContactSolver::ndBodyPlayerCapsuleContactSolver(ndBodyPlayerC
 void ndBodyPlayerCapsuleContactSolver::CalculateContacts()
 {
 	m_contactCount = 0;
+	ndScene* const scene = m_player->GetScene();
 	ndBodyKinematic::ndContactMap::Iterator it(m_player->GetContactMap());
 	for (it.Begin(); it; it++)
 	{
@@ -549,7 +550,7 @@ void ndBodyPlayerCapsuleContactSolver::CalculateContacts()
 			contact.SetBodies(body0, body1);
 
 			ndContactPoint contactBuffer[D_MAX_CONTATCS];
-			ndContactSolver contactSolver(&contact);
+			ndContactSolver contactSolver(&contact, scene);
 			contactSolver.m_instance0.SetGlobalMatrix(contactSolver.m_instance0.GetLocalMatrix() * body0->GetMatrix());
 			contactSolver.m_instance1.SetGlobalMatrix(contactSolver.m_instance1.GetLocalMatrix() * body1->GetMatrix());
 			contactSolver.m_separatingVector = srcContact->m_separatingVector;
@@ -557,7 +558,7 @@ void ndBodyPlayerCapsuleContactSolver::CalculateContacts()
 			contactSolver.m_ccdMode = 0;
 			contactSolver.m_intersectionTestOnly = 0;
 			contactSolver.m_contactBuffer = contactBuffer;
-			const dInt32 count = contactSolver.CalculatePairContacts(0);
+			const dInt32 count = contactSolver.CalculatePairContacts();
 			for (dInt32 i = 0; i < count; i++)
 			{
 				m_contactBuffer[m_contactCount] = contactBuffer[i];

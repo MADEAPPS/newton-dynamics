@@ -277,7 +277,7 @@ dFloat32 ndShapeConvex::RayCast(ndRayCastNotify&, const dVector& localP0, const 
 	ndBodyKinematic* const kinBody = ((ndBodyKinematic*)body)->GetAsBodyKinematic();
 	//ndContactSolver rayCaster(&kinBody->GetCollisionShape(), (ndShape*)this);
 	ndShapeInstance tempInstance (kinBody->GetCollisionShape(), (ndShape*)this);
-	ndContactSolver rayCaster(&tempInstance);
+	ndContactSolver rayCaster(&tempInstance, kinBody->GetScene());
 	return rayCaster.RayCast(localP0, localP1, contactOut);
 }
 

@@ -27,6 +27,7 @@
 #include "ndShape.h"
 
 class ndBody;
+class ndScene;
 class ndShapeInfo;
 class ndContactPoint;
 class ndShapeInstance;
@@ -57,11 +58,12 @@ class ndShapeInstance: public dClassAlloc
 	class ndDistanceCalculator
 	{
 		public:
-		ndDistanceCalculator()
+		ndDistanceCalculator(ndScene* const scene)
 		{
+			m_scene = scene;
 		}
 
-		ndDistanceCalculator(
+		ndDistanceCalculator(ndScene* const scene,
 			ndShapeInstance* const shape0, const dMatrix& matrix0,
 			ndShapeInstance* const shape1, const dMatrix& matrix1)
 			:m_matrix0(matrix0)
@@ -69,6 +71,7 @@ class ndShapeInstance: public dClassAlloc
 			,m_point0(dVector::m_wOne)
 			,m_point1(dVector::m_wOne)
 			,m_normal(dVector::m_zero)
+			,m_scene(scene)
 			,m_shape0(shape0)
 			,m_shape1(shape1)
 		{
@@ -81,6 +84,7 @@ class ndShapeInstance: public dClassAlloc
 		dVector m_point0;
 		dVector m_point1;
 		dVector m_normal;
+		ndScene* m_scene;
 		ndShapeInstance* m_shape0;
 		ndShapeInstance* m_shape1;
 	};

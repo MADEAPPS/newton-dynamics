@@ -928,14 +928,14 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 		dAssert(!body1->GetCollisionShape().GetShape()->GetAsShapeNull());
 			
 		ndContactPoint contactBuffer[D_MAX_CONTATCS];
-		ndContactSolver contactSolver(contact);
+		ndContactSolver contactSolver(contact, this);
 		contactSolver.m_separatingVector = contact->m_separatingVector;
 		contactSolver.m_timestep = m_timestep;
 		contactSolver.m_ccdMode = 0;
 		contactSolver.m_contactBuffer = contactBuffer;
 		contactSolver.m_intersectionTestOnly = body0->m_contactTestOnly | body1->m_contactTestOnly;
 		
-		dInt32 count = contactSolver.CalculatePairContacts(threadIndex);
+		dInt32 count = contactSolver.CalculatePairContacts();
 		if (count)
 		{
 			if (contactSolver.m_intersectionTestOnly)

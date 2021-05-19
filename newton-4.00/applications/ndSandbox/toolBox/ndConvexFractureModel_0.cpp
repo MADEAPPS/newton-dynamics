@@ -327,7 +327,7 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 	ndConvexFractureRootEntity* const rootEntity = (ndConvexFractureRootEntity*)m_debriRootEnt;
 
 	// calculate joint graph pairs, brute force for now
-	ndShapeInstance::ndDistanceCalculator distanceCalculator;
+	ndShapeInstance::ndDistanceCalculator distanceCalculator(scene->GetWorld()->GetScene());
 	distanceCalculator.m_matrix0 = dGetIdentityMatrix();
 	distanceCalculator.m_matrix1 = dGetIdentityMatrix();
 	for (ndConvexFractureEntity* ent0 = (ndConvexFractureEntity*)m_debriRootEnt->GetChild(); ent0; ent0 = (ndConvexFractureEntity*)ent0->GetSibling())

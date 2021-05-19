@@ -28,153 +28,209 @@
 #include "ndShapeCompoundConvex.h"
 
 #define D_MAX_MIN_VOLUME	dFloat32 (1.0e-3f)
+dVector ndShapeCompoundConvex::ndOOBBTestData::m_padding(dFloat32(1.0e-3f));
+dVector ndShapeCompoundConvex::ndOOBBTestData::m_maxDist(dFloat32(1.0e10f));
 
-class ndShapeCompoundConvex::ndNodeBase: public dClassAlloc
+ndShapeCompoundConvex::ndOOBBTestData::ndOOBBTestData(const dMatrix& matrix)
+	:m_matrix(matrix)
+	,m_separatingDistance(dFloat32(1.0e10f))
 {
-	public:
-	ndNodeBase()
-		:dClassAlloc()
-		,m_type(m_node)
-		,m_left(nullptr)
-		,m_right(nullptr)
-		,m_parent(nullptr)
-		,m_shape(nullptr)
-		,m_myNode(nullptr)
-	{
-	}
+	m_absMatrix[0] = m_matrix[0].Abs();
+	m_absMatrix[1] = m_matrix[1].Abs();
+	m_absMatrix[2] = m_matrix[2].Abs();
+	m_absMatrix[3] = dVector::m_wOne;
 
-	ndNodeBase(const ndNodeBase& copyFrom)
-		:dClassAlloc()
-		,m_p0(copyFrom.m_p0)
-		,m_p1(copyFrom.m_p1)
-		,m_size(copyFrom.m_size)
-		,m_origin(copyFrom.m_origin)
-		,m_area(copyFrom.m_area)
-		,m_type(copyFrom.m_type)
-		,m_left(nullptr)
-		,m_right(nullptr)
-		,m_parent(nullptr)
-		,m_shape(nullptr)
-		,m_myNode(nullptr)
+	dInt32 index = 0;
+	for (dInt32 i = 0; i < 3; i++)
 	{
-		dAssert(!copyFrom.m_shape);
-	}
-
-	ndNodeBase(ndShapeInstance* const instance)
-		:dClassAlloc()
-		,m_type(m_leaf)
-		,m_left(nullptr)
-		,m_right(nullptr)
-		,m_parent(nullptr)
-		,m_shape(new ndShapeInstance(*instance))
-		,m_myNode(nullptr)
-	{
-		CalculateAABB();
-	}
-
-	ndNodeBase(ndNodeBase* const left, ndNodeBase* const right)
-		:dClassAlloc()
-		,m_type(m_node)
-		,m_left(left)
-		,m_right(right)
-		,m_parent(nullptr)
-		,m_shape(nullptr)
-		,m_myNode(nullptr)
-	{
-		m_left->m_parent = this;
-		m_right->m_parent = this;
-
-		dVector p0(left->m_p0.GetMin(right->m_p0));
-		dVector p1(left->m_p1.GetMax(right->m_p1));
-		SetBox(p0, p1);
-	}
-
-	~ndNodeBase()
-	{
-		if (m_shape) 
+		dVector dir(dVector::m_zero);
+		dir[i] = dFloat32(1.0f);
+		for (dInt32 j = 0; j < 3; j++)
 		{
-			//m_shape->Release();
-			delete m_shape;
-		}
-		if (m_left) 
-		{
-			delete m_left;
-		}
-		if (m_right) 
-		{
-			delete m_right;
+			dVector axis(dir.CrossProduct(m_matrix[j]));
+			m_crossAxis[index] = axis;
+			m_crossAxisAbs[index] = axis.Abs();
+			m_crossAxisDotAbs[index] = matrix.UnrotateVector(axis).Abs();
+			index++;
 		}
 	}
 
-	//void Sanity(int level = 0)
-	//{
-	//	char space[256];
-	//	for (int i = 0; i < level; i++)
-	//	{
-	//		space[i] = ' ';
-	//	}
-	//	space[level] = 0;
-	//
-	//	dTrace(("%s%d\n", space, xxxxxx_));
-	//
-	//	if (m_left)
-	//	{
-	//		m_left->Sanity(level + 1);
-	//	}
-	//
-	//	if (m_right)
-	//	{
-	//		m_right->Sanity(level + 1);
-	//	}
-	//}
+	dVector tmp;
+	dVector::Transpose4x4(m_crossAxis[0], m_crossAxis[1], m_crossAxis[2], m_crossAxis[3], m_crossAxis[0], m_crossAxis[1], m_crossAxis[2], m_crossAxis[3]);
+	dVector::Transpose4x4(m_crossAxis[3], m_crossAxis[4], m_crossAxis[5], m_crossAxis[6], m_crossAxis[4], m_crossAxis[5], m_crossAxis[6], m_crossAxis[7]);
+	dVector::Transpose4x4(m_crossAxis[6], m_crossAxis[7], m_crossAxis[8], tmp, m_crossAxis[8], m_crossAxis[8], m_crossAxis[8], m_crossAxis[8]);
 
-	void CalculateAABB()
+	dVector::Transpose4x4(m_crossAxisAbs[0], m_crossAxisAbs[1], m_crossAxisAbs[2], m_crossAxisAbs[3], m_crossAxisAbs[0], m_crossAxisAbs[1], m_crossAxisAbs[2], m_crossAxisAbs[3]);
+	dVector::Transpose4x4(m_crossAxisAbs[3], m_crossAxisAbs[4], m_crossAxisAbs[5], m_crossAxisAbs[6], m_crossAxisAbs[4], m_crossAxisAbs[5], m_crossAxisAbs[6], m_crossAxisAbs[7]);
+	dVector::Transpose4x4(m_crossAxisAbs[6], m_crossAxisAbs[7], m_crossAxisAbs[8], tmp, m_crossAxisAbs[8], m_crossAxisAbs[8], m_crossAxisAbs[8], m_crossAxisAbs[8]);
+
+	dVector::Transpose4x4(m_crossAxisDotAbs[0], m_crossAxisDotAbs[1], m_crossAxisDotAbs[2], m_crossAxisDotAbs[3], m_crossAxisDotAbs[0], m_crossAxisDotAbs[1], m_crossAxisDotAbs[2], m_crossAxisDotAbs[3]);
+	dVector::Transpose4x4(m_crossAxisDotAbs[3], m_crossAxisDotAbs[4], m_crossAxisDotAbs[5], m_crossAxisDotAbs[6], m_crossAxisDotAbs[4], m_crossAxisDotAbs[5], m_crossAxisDotAbs[6], m_crossAxisDotAbs[7]);
+	dVector::Transpose4x4(m_crossAxisDotAbs[6], m_crossAxisDotAbs[7], m_crossAxisDotAbs[8], tmp, m_crossAxisDotAbs[8], m_crossAxisDotAbs[8], m_crossAxisDotAbs[8], m_crossAxisDotAbs[8]);
+}
+
+ndShapeCompoundConvex::ndOOBBTestData::ndOOBBTestData(const dMatrix& matrix, const dVector& localOrigin, const dVector& localSize)
+	:m_matrix(matrix)
+	,m_origin(localOrigin)
+	,m_size(localSize)
+	,m_localP0(localOrigin - localSize)
+	,m_localP1(localOrigin + localSize)
+	,m_separatingDistance(dFloat32(1.0e10f))
+{
+	m_absMatrix[0] = m_matrix[0].Abs();
+	m_absMatrix[1] = m_matrix[1].Abs();
+	m_absMatrix[2] = m_matrix[2].Abs();
+	m_absMatrix[3] = dVector::m_wOne;
+
+	dInt32 index = 0;
+	for (dInt32 i = 0; i < 3; i++)
 	{
-		dVector p0;
-		dVector p1;
-		m_shape->CalculateAABB(m_shape->GetLocalMatrix(), p0, p1);
-		SetBox(p0, p1);
+		dVector dir(dVector::m_zero);
+		dir[i] = dFloat32(1.0f);
+		for (dInt32 j = 0; j < 3; j++)
+		{
+			m_crossAxis[index] = dir.CrossProduct(m_matrix[j]);
+			index++;
+		}
 	}
 
-	void SetBox(const dVector& p0, const dVector& p1)
+	dVector size(m_absMatrix.RotateVector(m_size));
+	dVector origin(m_matrix.TransformVector(m_origin));
+	m_aabbP0 = origin - size;
+	m_aabbP1 = origin + size;
+
+	index = 0;
+	dVector extends[9];
+	for (dInt32 i = 0; i < 3; i++)
 	{
-		m_p0 = p0;
-		m_p1 = p1;
-		dAssert(m_p0.m_w == dFloat32(0.0f));
-		dAssert(m_p1.m_w == dFloat32(0.0f));
-		m_size = dVector::m_half * (m_p1 - m_p0);
-		m_origin = dVector::m_half * (m_p1 + m_p0);
-		m_area = m_size.DotProduct(m_size.ShiftTripleRight()).m_x;
+		for (dInt32 j = 0; j < 3; j++)
+		{
+			const dVector& axis = m_crossAxis[index];
+			dAssert(axis.m_w == dFloat32(0.0f));
+			dVector tmp(m_matrix.UnrotateVector(axis));
+			dVector d(m_size.DotProduct(tmp.Abs()) + m_padding);
+			dVector c(origin.DotProduct(axis));
+			dVector diff(c - d);
+			dVector sum(c + d);
+			extends[index] = dVector(diff.m_x, sum.m_x, diff.m_y, sum.m_y);
+			m_crossAxisAbs[index] = axis.Abs();
+			index++;
+		}
 	}
 
-	//bool BoxTest(const dgOOBBTestData& data) const;
-	//bool BoxTest(const dgOOBBTestData& data, const ndNodeBase* const otherNode) const;
-	//dFloat32 RayBoxDistance(const dgOOBBTestData& data, const dgFastRayTest& myRay, const dgFastRayTest& otherRay, const ndNodeBase* const otherNode) const;
+	dVector tmp;
+	dVector::Transpose4x4(m_crossAxis[0], m_crossAxis[1], m_crossAxis[2], m_crossAxis[3], m_crossAxis[0], m_crossAxis[1], m_crossAxis[2], m_crossAxis[3]);
+	dVector::Transpose4x4(m_crossAxis[3], m_crossAxis[4], m_crossAxis[5], m_crossAxis[6], m_crossAxis[4], m_crossAxis[5], m_crossAxis[6], m_crossAxis[7]);
+	dVector::Transpose4x4(m_crossAxis[6], m_crossAxis[7], m_crossAxis[8], tmp, m_crossAxis[8], m_crossAxis[8], m_crossAxis[8], m_crossAxis[8]);
+
+	dVector::Transpose4x4(m_crossAxisAbs[0], m_crossAxisAbs[1], m_crossAxisAbs[2], m_crossAxisAbs[3], m_crossAxisAbs[0], m_crossAxisAbs[1], m_crossAxisAbs[2], m_crossAxisAbs[3]);
+	dVector::Transpose4x4(m_crossAxisAbs[3], m_crossAxisAbs[4], m_crossAxisAbs[5], m_crossAxisAbs[6], m_crossAxisAbs[4], m_crossAxisAbs[5], m_crossAxisAbs[6], m_crossAxisAbs[7]);
+	dVector::Transpose4x4(m_crossAxisAbs[6], m_crossAxisAbs[7], m_crossAxisAbs[8], tmp, m_crossAxisAbs[8], m_crossAxisAbs[8], m_crossAxisAbs[8], m_crossAxisAbs[8]);
+
+	dVector::Transpose4x4(m_extendsMinX[0], m_extendsMaxX[0], tmp, tmp, extends[0], extends[1], extends[2], extends[3]);
+	dVector::Transpose4x4(m_extendsMinX[1], m_extendsMaxX[1], tmp, tmp, extends[4], extends[5], extends[6], extends[7]);
+	dVector::Transpose4x4(m_extendsMinX[2], m_extendsMaxX[2], tmp, tmp, extends[8], extends[8], extends[8], extends[8]);
+}
+
+dFloat32 ndShapeCompoundConvex::ndOOBBTestData::UpdateSeparatingDistance(const dVector& box0Min, const dVector& box0Max, const dVector& box1Min, const dVector& box1Max) const
+{
+	const dVector minBox(box0Min - box1Max);
+	const dVector maxBox(box0Max - box1Min);
+	const dVector mask((minBox * maxBox) < dVector::m_zero);
+	const dVector boxDist((maxBox.Abs()).GetMin(minBox.Abs()));
+
+	//dVector dist((mask & m_maxDist) | boxDist.AndNot(mask));
+	dVector dist(boxDist.Select(m_maxDist, mask));
+
+	dist = dist.GetMin(dist.ShiftTripleRight());
+	dist = dist.GetMin(dist.ShiftTripleRight());
+	return dist.GetScalar();
+}
+
+ndShapeCompoundConvex::ndNodeBase::~ndNodeBase()
+{
+	if (m_shape) 
+	{
+		//m_shape->Release();
+		delete m_shape;
+	}
+	if (m_left) 
+	{
+		delete m_left;
+	}
+	if (m_right) 
+	{
+		delete m_right;
+	}
+}
+
+//void ndShapeCompoundConvex::ndNodeBase::Sanity(int level = 0)
+//{
+//	char space[256];
+//	for (int i = 0; i < level; i++)
+//	{
+//		space[i] = ' ';
+//	}
+//	space[level] = 0;
+//
+//	dTrace(("%s%d\n", space, xxxxxx_));
+//
+//	if (m_left)
+//	{
+//		m_left->Sanity(level + 1);
+//	}
+//
+//	if (m_right)
+//	{
+//		m_right->Sanity(level + 1);
+//	}
+//}
+
+
+bool ndShapeCompoundConvex::ndNodeBase::BoxTest(const ndOOBBTestData& data) const
+{
+	dFloat32 separatingDistance = data.UpdateSeparatingDistance(data.m_aabbP0, data.m_aabbP1, m_p0, m_p1);
+	if (dOverlapTest(data.m_aabbP0, data.m_aabbP1, m_p0, m_p1)) 
+	{
+		// this assert is in fact a bug
+		//dgAssert (separatingDistance > dFloat32 (1000.0f));
+		dVector origin(data.m_matrix.UntransformVector(m_origin));
+		dVector size(data.m_absMatrix.UnrotateVector(m_size));
+		dVector p0(origin - size);
+		dVector p1(origin + size);
+		data.m_separatingDistance = dMin(data.m_separatingDistance, data.UpdateSeparatingDistance(p0, p1, data.m_localP0, data.m_localP1));
+		if (dOverlapTest(p0, p1, data.m_localP0, data.m_localP1)) 
+		{
+			dVector size_x(m_size.m_x);
+			dVector size_y(m_size.m_y);
+			dVector size_z(m_size.m_z);
+
+			dVector origin_x(m_origin.m_x);
+			dVector origin_y(m_origin.m_y);
+			dVector origin_z(m_origin.m_z);
+
+			bool ret = true;
+			for (dInt32 i = 0; (i < 3) && ret; i++) 
+			{
+				const dInt32 j = i * 3;
+				dVector c(origin_x * data.m_crossAxis[j + 0] + origin_y * data.m_crossAxis[j + 1] + origin_z * data.m_crossAxis[j + 2]);
+				dVector d(size_x * data.m_crossAxisAbs[j + 0] + size_y * data.m_crossAxisAbs[j + 1] + size_z * data.m_crossAxisAbs[j + 2] + ndOOBBTestData::m_padding);
+				dVector x0(c - d);
+				dVector x1(c + d);
+				dVector box0(x0 - data.m_extendsMaxX[i]);
+				dVector box1(x1 - data.m_extendsMinX[i]);
+				dVector test(box0 * box1);
+				ret = (test.GetSignMask() & 0x0f) == 0x0f;
+			}
+			return ret;
+		}
+	}
+	data.m_separatingDistance = dMin(data.m_separatingDistance, separatingDistance);
+	return false;
+}
 	
-	ndShapeInstance* GetShape() const
-	{
-		return m_shape;
-	}
-	
-	//DG_INLINE dInt32 BoxIntersect(const dgFastRayTest& ray, const dVector& boxP0, const dVector& boxP1) const
-	//{
-	//	dVector minBox(m_p0 - boxP1);
-	//	dVector maxBox(m_p1 - boxP0);
-	//	return ray.BoxTest(minBox, maxBox);
-	//}
 
-	dVector m_p0;
-	dVector m_p1;
-	dVector m_size;
-	dVector m_origin;
-	dFloat32 m_area;
-	dInt32 m_type;
-	ndNodeBase* m_left;
-	ndNodeBase* m_right;
-	ndNodeBase* m_parent;
-	ndShapeInstance* m_shape;
-	ndTreeArray::dTreeNode* m_myNode;
-};
+
 
 class ndShapeCompoundConvex::ndSpliteInfo
 {

@@ -58,10 +58,11 @@ D_MSV_NEWTON_ALIGN_32
 class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>  
 {
 	public: 
-	ndContactSolver(ndContact* const contact);
-	ndContactSolver(ndShapeInstance* const instance);
+	//ndContactSolver(const ndContactSolver& src);
+	ndContactSolver(ndContact* const contact, ndScene* const scene);
+	ndContactSolver(ndShapeInstance* const instance, ndScene* const scene);
 
-	//ndContactSolver(const ndShapeInstance& instance0, const ndShapeInstance& instance1);
+	ndContactSolver(const ndContactSolver& src, const ndShapeInstance& instance0, const ndShapeInstance& instance1);
 	//ndContactSolver(dCollisionParamProxy* const proxy);
 	//dInt32 CalculateConvexCastContacts();
 	//const dVector& GetNormal() const {return m_normal;}
@@ -71,9 +72,12 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	//void CalculateContacts(ntPair* const pair, dInt32 threadIndex, bool ccdMode, bool intersectionTestOnly);
 
 	dInt32 ConvexContacts();
+	dInt32 CompoundContacts();
+	dInt32 CalculatePairContacts();
 	dInt32 CalculateConvexToConvexContacts();
+	dInt32 CalculateConvexToCompoundContacts();
+	dInt32 CalculateCompoundToConvexContacts();
 	dInt32 CalculateConvexToSaticMeshContacts();
-	dInt32 CalculatePairContacts(dInt32 threadIndex);
 
 	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, ndContactPoint& contactOut);
 	
@@ -142,7 +146,9 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 		};
 	};
 
+	ndScene* m_scene;
 	ndContact* m_contact;
+	
 	dgFaceFreeList* m_freeFace; 
 
 	ndContactPoint* m_contactBuffer;
@@ -152,8 +158,9 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 
 	dInt32 m_maxCount;
 	dInt32 m_vertexIndex;
-	dUnsigned32 m_ccdMode : 1;
-	dUnsigned32 m_intersectionTestOnly : 1;
+	dUnsigned32 m_ccdMode				: 1;
+	dUnsigned32 m_pruneContacts			: 1;
+	dUnsigned32 m_intersectionTestOnly	: 1;
 	
 	dInt32 m_faceIndex;
 	ndMinkFace* m_faceStack[D_CONVEX_MINK_STACK_SIZE];

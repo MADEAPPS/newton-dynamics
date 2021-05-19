@@ -36,6 +36,34 @@ class ndShapeCompoundConvex: public ndShape
 		m_node,
 	};
 
+	D_MSV_NEWTON_ALIGN_32
+	class ndOOBBTestData
+	{
+		public:
+		ndOOBBTestData(const dMatrix& matrix);
+		ndOOBBTestData(const dMatrix& matrix, const dVector& origin, const dVector& size);
+
+		dFloat32 UpdateSeparatingDistance(const dVector& box0Min, const dVector& box0Max, const dVector& box1Min, const dVector& box1Max) const;
+
+		dMatrix m_matrix;
+		dMatrix m_absMatrix;
+		dVector m_origin;
+		dVector m_size;
+		dVector m_localP0;
+		dVector m_localP1;
+		dVector m_aabbP0;
+		dVector m_aabbP1;
+
+		dVector m_crossAxis[9];
+		dVector m_crossAxisAbs[9];
+		dVector m_crossAxisDotAbs[9];
+		dVector m_extendsMinX[3];
+		dVector m_extendsMaxX[3];
+		mutable dFloat32 m_separatingDistance;
+		static dVector m_maxDist;
+		static dVector m_padding;
+	} D_GCC_NEWTON_ALIGN_32;
+
 	protected:
 	class ndNodeBase;
 	class ndSpliteInfo;
@@ -100,6 +128,7 @@ class ndShapeCompoundConvex: public ndShape
 
 	friend class ndBodyKinematic;
 	friend class ndShapeInstance;
+	friend class ndContactSolver;
 };
 
 inline ndShapeCompoundConvex* ndShapeCompoundConvex::GetAsShapeCompoundConvex()
@@ -111,6 +140,133 @@ inline void ndShapeCompoundConvex::SetOwner(const ndShapeInstance* const instanc
 {
 	m_myInstance = instance;
 }
+
+
+class ndShapeCompoundConvex::ndNodeBase: public dClassAlloc
+{
+	public:
+	ndNodeBase();
+	ndNodeBase(const ndNodeBase& copyFrom);
+	ndNodeBase(ndShapeInstance* const instance);
+	ndNodeBase(ndNodeBase* const left, ndNodeBase* const right);
+	~ndNodeBase();
+
+	//void Sanity(int level = 0);
+	void CalculateAABB();
+	void SetBox(const dVector& p0, const dVector& p1);
+
+	bool BoxTest(const ndOOBBTestData& data) const;
+	//bool BoxTest(const ndOOBBTestData& data, const ndNodeBase* const otherNode) const;
+	//dFloat32 RayBoxDistance(const ndOOBBTestData& data, const dgFastRayTest& myRay, const dgFastRayTest& otherRay, const ndNodeBase* const otherNode) const;
+
+	ndShapeInstance* GetShape() const;
+
+	//DG_INLINE dInt32 BoxIntersect(const dgFastRayTest& ray, const dVector& boxP0, const dVector& boxP1) const
+	//{
+	//	dVector minBox(m_p0 - boxP1);
+	//	dVector maxBox(m_p1 - boxP0);
+	//	return ray.BoxTest(minBox, maxBox);
+	//}
+
+	dVector m_p0;
+	dVector m_p1;
+	dVector m_size;
+	dVector m_origin;
+	dFloat32 m_area;
+	dInt32 m_type;
+	ndNodeBase* m_left;
+	ndNodeBase* m_right;
+	ndNodeBase* m_parent;
+	ndShapeInstance* m_shape;
+	ndTreeArray::dTreeNode* m_myNode;
+};
+
+inline ndShapeCompoundConvex::ndNodeBase::ndNodeBase()
+	:dClassAlloc()
+	,m_type(m_node)
+	,m_left(nullptr)
+	,m_right(nullptr)
+	,m_parent(nullptr)
+	,m_shape(nullptr)
+	,m_myNode(nullptr)
+{
+}
+
+inline ndShapeCompoundConvex::ndNodeBase::ndNodeBase(const ndNodeBase& copyFrom)
+	:dClassAlloc()
+	,m_p0(copyFrom.m_p0)
+	,m_p1(copyFrom.m_p1)
+	,m_size(copyFrom.m_size)
+	,m_origin(copyFrom.m_origin)
+	,m_area(copyFrom.m_area)
+	,m_type(copyFrom.m_type)
+	,m_left(nullptr)
+	,m_right(nullptr)
+	,m_parent(nullptr)
+	,m_shape(nullptr)
+	,m_myNode(nullptr)
+{
+	dAssert(!copyFrom.m_shape);
+}
+
+inline ndShapeCompoundConvex::ndNodeBase::ndNodeBase(ndShapeInstance* const instance)
+	:dClassAlloc()
+	,m_type(m_leaf)
+	,m_left(nullptr)
+	,m_right(nullptr)
+	,m_parent(nullptr)
+	,m_shape(new ndShapeInstance(*instance))
+	,m_myNode(nullptr)
+{
+	CalculateAABB();
+}
+
+inline ndShapeCompoundConvex::ndNodeBase::ndNodeBase(ndNodeBase* const left, ndNodeBase* const right)
+	:dClassAlloc()
+	,m_type(m_node)
+	,m_left(left)
+	,m_right(right)
+	,m_parent(nullptr)
+	,m_shape(nullptr)
+	,m_myNode(nullptr)
+{
+	m_left->m_parent = this;
+	m_right->m_parent = this;
+
+	dVector p0(left->m_p0.GetMin(right->m_p0));
+	dVector p1(left->m_p1.GetMax(right->m_p1));
+	SetBox(p0, p1);
+}
+
+inline ndShapeInstance* ndShapeCompoundConvex::ndNodeBase::GetShape() const
+{
+	return m_shape;
+}
+
+inline void ndShapeCompoundConvex::ndNodeBase::CalculateAABB()
+{
+	dVector p0;
+	dVector p1;
+	m_shape->CalculateAABB(m_shape->GetLocalMatrix(), p0, p1);
+	SetBox(p0, p1);
+}
+
+inline void ndShapeCompoundConvex::ndNodeBase::SetBox(const dVector& p0, const dVector& p1)
+{
+	m_p0 = p0;
+	m_p1 = p1;
+	dAssert(m_p0.m_w == dFloat32(0.0f));
+	dAssert(m_p1.m_w == dFloat32(0.0f));
+	m_size = dVector::m_half * (m_p1 - m_p0);
+	m_origin = dVector::m_half * (m_p1 + m_p0);
+	m_area = m_size.DotProduct(m_size.ShiftTripleRight()).m_x;
+}
+
+//bool BoxTest(const dgOOBBTestData& data) const;
+
+
+
+
 
 #endif 
 

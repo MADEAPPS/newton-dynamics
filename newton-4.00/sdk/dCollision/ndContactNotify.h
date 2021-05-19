@@ -83,6 +83,13 @@ class ndContactNotify: public dClassAlloc
 		return ndMaterial();
 	}
 
+	//bool OnCompoundSubShapeOverlap(const ndContact* const contact, dFloat32 timestep, const ndShapeInstance* const subShapeA, const ndShapeInstance* const subShapeB);
+	bool OnCompoundSubShapeOverlap(const ndContact* const, dFloat32, const ndShapeInstance* const, const ndShapeInstance* const)
+	{
+		return true;
+	}
+
+	//virtual bool OnAabbOverlap(const ndContact* const contact, dFloat32 timestep)
 	virtual bool OnAabbOverlap(const ndContact* const, dFloat32)
 	{
 		return true;
