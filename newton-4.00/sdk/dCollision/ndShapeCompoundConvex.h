@@ -156,7 +156,7 @@ class ndShapeCompoundConvex::ndNodeBase: public dClassAlloc
 	void SetBox(const dVector& p0, const dVector& p1);
 
 	bool BoxTest(const ndOOBBTestData& data) const;
-	//bool BoxTest(const ndOOBBTestData& data, const ndNodeBase* const otherNode) const;
+	bool BoxTest(const ndOOBBTestData& data, const ndNodeBase* const otherNode) const;
 	//dFloat32 RayBoxDistance(const ndOOBBTestData& data, const dgFastRayTest& myRay, const dgFastRayTest& otherRay, const ndNodeBase* const otherNode) const;
 
 	ndShapeInstance* GetShape() const;

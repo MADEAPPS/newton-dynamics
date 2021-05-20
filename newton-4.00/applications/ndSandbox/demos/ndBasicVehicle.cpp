@@ -50,7 +50,7 @@ class nvVehicleDectriptor
 static nvVehicleDectriptor sportViper("viper1.fbx", 0.025f, dVector(0.25f, -0.35f, 0.0f, 0.0f));
 static nvVehicleDectriptor sedanViper("viper1.fbx", 0.1f, dVector(0.25f, -0.35f, 0.0f, 0.0f));
 
-// hart to dricf but more stable
+// hard to drift but more stable
 static nvVehicleDectriptor monterTruckNormal("monsterTruck.fbx", 0.1f, dVector(0.25f, -0.8f, 0.0f, 0.0f));
 // this make the vehicle drift.
 static nvVehicleDectriptor monterTruckDrift("monsterTruck.fbx", 0.1f, dVector(0.25f, -0.9f, 0.0f, 0.0f));
@@ -206,8 +206,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		// 1- add chassis to the vehicle mode 
 		AddChassis(chassis, DEMO_GRAVITY);
-#if 0 
-
+#if 1 
 		// 2- each tire to the model, 
 		// this function will create the tire as a normal rigid body
 		// and attach them to the chassis with the tire joints
@@ -579,12 +578,15 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
+	matrix.m_posit.m_y += 5.0f;
+	scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckNormal, matrix));
+
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
 	//location.m_z = 4.0f;
 	//location.m_y = 0.5f; 
 	//AddRamps(scene, location);
-	AddSomeObstacles(scene, location);
+	//AddSomeObstacles(scene, location);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);

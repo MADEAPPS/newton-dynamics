@@ -78,6 +78,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 CalculateConvexToCompoundContacts();
 	dInt32 CalculateCompoundToConvexContacts();
 	dInt32 CalculateConvexToSaticMeshContacts();
+	dInt32 CalculateCompoundToCompoundContacts();
 
 	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, ndContactPoint& contactOut);
 	
