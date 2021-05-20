@@ -57,13 +57,10 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode);
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
 
-	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const
-	{
-		return dFloat32(2.0f);
-	}
+	ndMultiBodyVehicle* GetAsMultiBodyVehicle();
+	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const;
 
 	D_NEWTON_API dFloat32 GetSpeed() const;
-
 	D_NEWTON_API void SetBrakeTorque(dFloat32 brakeToqrue);
 	D_NEWTON_API void SetHandBrakeTorque(dFloat32 brakeToqrue);
 	D_NEWTON_API void SetSteeringAngle(dFloat32 angleInRadians);
@@ -114,5 +111,16 @@ class ndMultiBodyVehicle: public ndModel
 	friend class ndMultiBodyVehicleMotor;
 	friend class ndJointVehicleMotorGearBox;
 };
+
+inline dFloat32 ndMultiBodyVehicle::GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const
+{
+	return dFloat32(2.0f);
+}
+
+inline ndMultiBodyVehicle* ndMultiBodyVehicle::GetAsMultiBodyVehicle() 
+{ 
+	return this; 
+}
+
 
 #endif

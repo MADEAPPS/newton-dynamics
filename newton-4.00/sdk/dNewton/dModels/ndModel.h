@@ -25,6 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndModelList.h"
 
+class ndMultiBodyVehicle;
 class ndConstraintDebugCallback;
 
 D_MSV_NEWTON_ALIGN_32
@@ -34,6 +35,9 @@ class ndModel: public dClassAlloc
 	ndModel();
 	D_NEWTON_API ndModel(const nd::TiXmlNode* const xmlNode);
 	virtual ~ndModel ();
+
+	ndModel* GetAsModel();
+	ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 
@@ -55,6 +59,16 @@ inline ndModel::ndModel()
 inline ndModel::~ndModel()
 {
 	dAssert(!m_node);
+}
+
+inline ndModel* ndModel::GetAsModel()
+{ 
+	return this; 
+}
+
+inline ndMultiBodyVehicle* ndModel::GetAsMultiBodyVehicle()
+{ 
+	return nullptr; 
 }
 
 inline void ndModel::Debug(ndConstraintDebugCallback&) const

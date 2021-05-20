@@ -186,6 +186,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		,m_neutralGear()
 		,m_reverseGear()
 		,m_automaticGear()
+		,m_isPlayer(false)
 	{
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
@@ -268,9 +269,9 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		return vehicleEntity;
 	}
 
-
 	void SetAsPlayer(ndDemoEntityManager* const scene)
 	{
+		m_isPlayer = true;
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 	}
 
@@ -363,10 +364,9 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 	void Update(ndWorld* const world, dFloat32 timestep)
 	{
-		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-
-		if (m_motor)
+		if (m_isPlayer && m_motor)
 		{
+			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 			dFloat32 brake = 1500.0f * dFloat32(scene->GetKeyState('S'));
 			dFloat32 handBrake = 1500.0f * dFloat32(scene->GetKeyState(' '));
 			dFloat32 throttle = dFloat32(scene->GetKeyState('W')) ? 1.0f : 0.0f;
@@ -406,9 +406,9 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			}
 
 			m_motor->SetThrottle(throttle);
-
-			ndMultiBodyVehicle::Update(world, timestep);
 		}
+
+		ndMultiBodyVehicle::Update(world, timestep);
 	}
 
 	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const
@@ -544,12 +544,14 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	ndDemoEntityManager::ndKeyTrigger m_neutralGear;
 	ndDemoEntityManager::ndKeyTrigger m_reverseGear;
 	ndDemoEntityManager::ndKeyTrigger m_automaticGear;
+	bool m_isPlayer;
 };
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene);
+	//BuildFlatPlane(scene, true);
 	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 
@@ -578,8 +580,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
-	matrix.m_posit.m_y += 5.0f;
-	scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckNormal, matrix));
+	//matrix.m_posit.m_y += 5.0f;
+	//scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckNormal, matrix));
 
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 

@@ -492,6 +492,12 @@ dInt32 ndContactSolver::CalculateCompoundToCompoundContacts()
 	return contactCount;
 }
 
+dInt32 ndContactSolver::CalculateCompoundToSaticMeshContacts()
+{
+	dAssert(0);
+	return 0;
+}
+
 dInt32 ndContactSolver::CalculateConvexToSaticMeshContacts()
 {
 	dInt32 count = 0;
@@ -571,24 +577,28 @@ dInt32 ndContactSolver::ConvexContacts()
 
 dInt32 ndContactSolver::CompoundContacts()
 {
-	if (!m_instance0.GetShape()->GetAsShapeCompoundConvex())
+	if (!m_instance1.GetShape()->GetAsShapeCompoundConvex())
 	{
-		dAssert(m_instance1.GetShape()->GetAsShapeCompoundConvex());
-		if (m_instance0.GetShape()->GetAsShapeConvex())
+		dAssert(m_instance0.GetShape()->GetAsShapeCompoundConvex());
+		if (m_instance1.GetShape()->GetAsShapeConvex())
 		{
-			return CalculateConvexToCompoundContacts();
+			return CalculateCompoundToConvexContacts();
+		}
+		else if (m_instance1.GetShape()->GetAsShapeStaticMeshShape())
+		{
+			return CalculateCompoundToSaticMeshContacts();
 		}
 		else
 		{
 			dAssert(0);
 		}
 	}
-	else if (!m_instance1.GetShape()->GetAsShapeCompoundConvex())
+	else if (!m_instance0.GetShape()->GetAsShapeCompoundConvex())
 	{
-		dAssert(m_instance0.GetShape()->GetAsShapeCompoundConvex());
-		if (m_instance1.GetShape()->GetAsShapeConvex())
+		dAssert(m_instance1.GetShape()->GetAsShapeCompoundConvex());
+		if (m_instance0.GetShape()->GetAsShapeConvex())
 		{
-			return CalculateCompoundToConvexContacts();
+			return CalculateConvexToCompoundContacts();
 		}
 		else
 		{
