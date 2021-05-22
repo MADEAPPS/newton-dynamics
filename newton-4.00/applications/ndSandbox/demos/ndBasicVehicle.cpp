@@ -28,31 +28,34 @@ class nvVehicleDectriptor
 	public:
 	nvVehicleDectriptor(
 		const char* const modelName,
+		dFloat32 rearTireMass,
+		dFloat32 frontTireMass,
 		dFloat32 suspensionRegularizer,
 		const dVector& comDisplacement)
 		:m_name(modelName)
+		,m_rearTireMass(rearTireMass)
+		,m_frontTireMass(frontTireMass)
 		,m_suspensionRegularizer(suspensionRegularizer)
 		,m_comDisplacement(comDisplacement)
 	{
 	}
 
 	const char* m_name;
+	dFloat32 m_rearTireMass;
+	dFloat32 m_frontTireMass;
 	dFloat32 m_suspensionRegularizer;
 	dVector m_comDisplacement;
 };
 
-//tireInfo.m_regularizer = 0.1f; // soft
-//tireInfo.m_regularizer = 0.025f; // stiff
-//com -= m_localFrame.m_up.Scale(0.35f);
-//com += m_localFrame.m_front.Scale(0.25f);
-
-static nvVehicleDectriptor sportViper("viper1.fbx", 0.025f, dVector(0.25f, -0.35f, 0.0f, 0.0f));
-static nvVehicleDectriptor sedanViper("viper1.fbx", 0.1f, dVector(0.25f, -0.35f, 0.0f, 0.0f));
+static nvVehicleDectriptor sportViper("viper1.fbx", 20.0f, 20.0f, 0.025f, dVector(0.25f, -0.35f, 0.0f, 0.0f));
+static nvVehicleDectriptor sedanViper("viper1.fbx", 20.0f, 20.0f, 0.1f, dVector(0.25f, -0.35f, 0.0f, 0.0f));
 
 // hard to drift but more stable
-static nvVehicleDectriptor monterTruckNormal("monsterTruck.fbx", 0.1f, dVector(0.25f, -0.8f, 0.0f, 0.0f));
+//static nvVehicleDectriptor monterTruckNormal("monsterTruck.fbx", 200.0f, 200.0f, 0.1f, dVector(0.25f, -0.8f, 0.0f, 0.0f));
+static nvVehicleDectriptor monterTruckNormal("monsterTruck.fbx", 200.0f, 200.0f, 0.1f, dVector(0.0f, -0.4f, 0.0f, 0.0f));
 // this make the vehicle drift.
-static nvVehicleDectriptor monterTruckDrift("monsterTruck.fbx", 0.1f, dVector(0.25f, -0.9f, 0.0f, 0.0f));
+//static nvVehicleDectriptor monterTruckDrift("monsterTruck.fbx", 200.0f, 200.0f, 0.1f, dVector(0.25f, -0.9f, 0.0f, 0.0f));
+static nvVehicleDectriptor monterTruckDrift("monsterTruck.fbx", 200.0f, 200.0f, 0.1f, dVector(0.0f, -0.4f, 0.0f, 0.0f));
 
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
@@ -206,14 +209,14 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		// 1- add chassis to the vehicle mode 
 		AddChassis(chassis, DEMO_GRAVITY);
-#if 0 
+#if 1 
 		// 2- each tire to the model, 
 		// this function will create the tire as a normal rigid body
 		// and attach them to the chassis with the tire joints
-		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, "rr_tire");
-		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, "rl_tire");
-		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, "fr_tire");
-		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, "fl_tire");
+		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, desc.m_rearTireMass, "rr_tire");
+		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, desc.m_rearTireMass, "rl_tire");
+		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, desc.m_frontTireMass, "fr_tire");
+		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, desc.m_frontTireMass, "fl_tire");
 
 		ndJointWheel::ndWheelDescriptor tireInfo;
 		tireInfo.m_springK = 1000.0f;
@@ -336,7 +339,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		radius = size.m_y * 0.5f;
 	}
 
-	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, const char* const tireName)
+	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, dFloat32 mass, const char* const tireName)
 	{
 		//rr_tire
 		dFloat32 width;
@@ -345,7 +348,6 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndDemoEntity* const chassisEntity = (ndDemoEntity*)chassis->GetNotifyCallback()->GetUserData();
 		CalculateTireDimensions(tireName, width, radius, chassisEntity);
 
-		dFloat32 mass(20.0f);
 		ndShapeInstance tireCollision(CreateTireShape(radius, width));
 
 		ndDemoEntity* const tireEntity = chassisEntity->Find(tireName);

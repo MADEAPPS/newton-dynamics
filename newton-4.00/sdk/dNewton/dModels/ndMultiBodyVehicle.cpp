@@ -278,7 +278,10 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	// draw vehicle cordinade system;
 	dMatrix chassisMatrix(m_chassis->GetMatrix());
 	chassisMatrix.m_posit = chassisMatrix.TransformVector(m_chassis->GetCentreOfMass());
-	context.DrawFrame(chassisMatrix);
+	//context.DrawFrame(chassisMatrix);
+
+	dFloat32 totalMass = m_chassis->GetMassMatrix().m_w;
+	dVector effectiveCom(chassisMatrix.m_posit.Scale(totalMass));
 
 	// draw front direction for side slip angle reference
 	dVector p0(chassisMatrix.m_posit + m_localFrame.m_up.Scale(1.0f));
@@ -300,15 +303,24 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	weight = weight.Normalize().Scale(-2.0f);
 
 	// draw vehicle weight;
-	dVector forceColor(dFloat32 (0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f));
-	dVector lateralColor(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
-	dVector longitudinalColor(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+	dVector forceColor(dFloat32 (0.8f), dFloat32(0.8f), dFloat32(0.8f), dFloat32(0.0f));
+	dVector lateralColor(dFloat32(0.3f), dFloat32(0.7f), dFloat32(0.0f), dFloat32(0.0f));
+	dVector longitudinalColor(dFloat32(0.7f), dFloat32(0.3f), dFloat32(0.0f), dFloat32(0.0f));
 	context.DrawLine(chassisMatrix.m_posit, chassisMatrix.m_posit + weight, forceColor);
 
 	for (dList<ndJointWheel*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
-		ndJointWheel* const tire = node->GetInfo();
-		ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
+		ndJointWheel* const tireJoint = node->GetInfo();
+		ndBodyDynamic* const tireBody = tireJoint->GetBody0()->GetAsBodyDynamic();
+
+		// show tire center of mass;
+		dMatrix tireFrame(tireBody->GetMatrix());
+		dVector com(tireBody->GetCentreOfMass());
+		tireFrame.m_posit = tireFrame.TransformVector(tireBody->GetCentreOfMass());
+		context.DrawFrame(tireFrame);
+
+		totalMass += tireBody->GetMassMatrix().m_w;
+		effectiveCom += tireFrame.m_posit.Scale(tireBody->GetMassMatrix().m_w);
 
 		//tire->DebugJoint(context);
 		//dVector color(1.0f, 1.0f, 1.0f, 0.0f);
@@ -349,6 +361,11 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 			}
 		}
 	}
+
+	effectiveCom = effectiveCom.Scale(dFloat32(1.0f) / totalMass);
+	chassisMatrix.m_posit = effectiveCom;
+	chassisMatrix.m_posit.m_w = dFloat32(1.0f);
+	context.DrawFrame(chassisMatrix);
 }
 
 void ndMultiBodyVehicle::ApplyBrakes()
