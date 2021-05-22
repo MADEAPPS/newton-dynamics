@@ -29,7 +29,7 @@ class ndBodyKinematic;
 class ndShapeStaticBVH;
 typedef dFloat32 (*dgCollisionBVHUserRayCastCallback) (const ndBodyKinematic* const body, const ndShapeStaticBVH* const collsionShape, dFloat32 interception, dFloat32* normal, dInt32 faceId, void* usedData);
 
-class ndShapeStaticBVH : public ndShapeStaticMesh, public dAabbPolygonSoup
+class ndShapeStaticBVH: public ndShapeStaticMesh, public dAabbPolygonSoup
 {
 	public:
 	D_COLLISION_API ndShapeStaticBVH(const dPolygonSoupBuilder& builder);
@@ -38,6 +38,7 @@ class ndShapeStaticBVH : public ndShapeStaticMesh, public dAabbPolygonSoup
 
 	protected:
 	virtual ndShapeInfo GetShapeInfo() const;
+	virtual ndShapeStaticBVH* GetAsShapeStaticBVH() { return this; }
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
@@ -46,6 +47,7 @@ class ndShapeStaticBVH : public ndShapeStaticMesh, public dAabbPolygonSoup
 	static dIntersectStatus ShowDebugPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 	static dIntersectStatus GetTriangleCount(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 	static dIntersectStatus GetPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
+
 	public:
 	D_MSV_NEWTON_ALIGN_32 
 	class ndBvhRay: public dFastRayTest 

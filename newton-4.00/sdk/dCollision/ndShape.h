@@ -38,6 +38,7 @@ class ndShapeCylinder;
 class ndShapeCompound;
 class ndRayCastNotify;
 class ndShapeInstance;
+class ndShapeStaticBVH;
 class ndShapeStaticMesh;
 class ndShapeConvexPolygon;
 class ndShapeDebugCallback;
@@ -230,17 +231,18 @@ class ndShape: public dClassAlloc
 	virtual dInt32 Release() const;
 
 	virtual ndShapeBox* GetAsShapeBox() { return nullptr; }
+	virtual ndShapeNull* GetAsShapeNull() { return nullptr; }
 	virtual ndShapeCone* GetAsShapeCone() { return nullptr; }
+	virtual ndShapePoint* GetAsShapePoint() { return nullptr; }
+	virtual ndShapeConvex* GetAsShapeConvex() { return nullptr; }
 	virtual ndShapeSphere* GetAsShapeSphere() { return nullptr; }
 	virtual ndShapeCapsule* GetAsShapeCapsule() { return nullptr; }
 	virtual ndShapeCylinder* GetAsShapeCylinder() { return nullptr; }
-	virtual ndShapeNull* GetAsShapeNull() { return nullptr; }
-	virtual ndShapePoint* GetAsShapePoint() { return nullptr; }
-	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon() { return nullptr; }
-	virtual ndShapeConvex* GetAsShapeConvex() { return nullptr; }
+	virtual ndShapeStaticBVH* GetAsShapeStaticBVH() { return nullptr; }
 	virtual ndShapeStaticMesh* GetAsShapeStaticMeshShape() { return nullptr; }
-	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return nullptr; }
+	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon() { return nullptr; }
 	virtual ndShapeCompoundConvex* GetAsShapeCompoundConvex() { return nullptr; }
+	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return nullptr; }
 
 	virtual dInt32 GetConvexVertexCount() const;
 

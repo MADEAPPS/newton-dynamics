@@ -85,10 +85,7 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 				return ((dNode*) root) + m_node;
 			}
 
-			union 
-			{
-				dUnsigned32 m_node;
-			};
+			dUnsigned32 m_node;
 		};
 
 		dNode ()
@@ -205,21 +202,22 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	D_CORE_API virtual void ForAllSectors (const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 m_maxT, dAaabbIntersectCallback callback, void* const context) const;
 	D_CORE_API virtual dVector ForAllSectorsSupportVectex(const dVector& dir) const;
 
-	inline void* GetRootNode() const 
+	//inline void* GetRootNode() const 
+	inline dNode* GetRootNode() const
 	{
 		return m_aabb;
 	}
 
-	inline void* GetBackNode(const void* const root) const 
+	inline dNode* GetBackNode(const void* const root) const
 	{
 		dNode* const node = (dNode*) root;
-		return node->m_left.IsLeaf() ? NULL : node->m_left.GetNode(m_aabb);
+		return node->m_left.IsLeaf() ? nullptr : node->m_left.GetNode(m_aabb);
 	}
 
-	inline void* GetFrontNode(const void* const root) const 
+	inline dNode* GetFrontNode(const void* const root) const
 	{
 		dNode* const node = (dNode*) root;
-		return node->m_right.IsLeaf() ? NULL : node->m_right.GetNode(m_aabb);
+		return node->m_right.IsLeaf() ? nullptr : node->m_right.GetNode(m_aabb);
 	}
 
 	inline void GetNodeAABB(const void* const root, dVector& p0, dVector& p1) const 
@@ -230,8 +228,6 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 		p0 = p0 & dVector::m_triplexMask;
 		p1 = p1 & dVector::m_triplexMask;
 	}
-
-	
 
 	private:
 	dgNodeBuilder* BuildTopDown (dgNodeBuilder* const leafArray, dInt32 firstBox, dInt32 lastBox, dgNodeBuilder** const allocator) const;
@@ -246,6 +242,7 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	dInt32 m_indexCount;
 	dNode* m_aabb;
 	dInt32* m_indices;
+	friend class ndContactSolver;
 };
 
 

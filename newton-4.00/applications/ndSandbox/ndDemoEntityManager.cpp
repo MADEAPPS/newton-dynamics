@@ -1363,12 +1363,6 @@ void ndDemoEntityManager::RenderScene()
 		m_world->Sync();
 		RenderContactPoints(this);
 	}
-
-	if (m_collisionDisplayMode) 
-	{
-		m_world->Sync();
-		DrawDebugShapes();
-	}
 	
 	if (m_showAABB) 
 	{
@@ -1405,10 +1399,16 @@ void ndDemoEntityManager::RenderScene()
 		RenderCenterOfMass(this);
 	}
 
-	//if (m_showNormalForces) {
+	//if (m_showNormalForces) 
+	//{
 	//	RenderNormalForces (m_world);
 	//}
-	//
+
+	if (m_collisionDisplayMode)
+	{
+		m_world->Sync();
+		DrawDebugShapes();
+	}
 }
 
 void ndDemoEntityManager::Run()

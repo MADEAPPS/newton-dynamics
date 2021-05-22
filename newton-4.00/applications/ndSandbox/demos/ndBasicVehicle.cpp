@@ -36,7 +36,6 @@ class nvVehicleDectriptor
 	{
 	}
 
-
 	const char* m_name;
 	dFloat32 m_suspensionRegularizer;
 	dVector m_comDisplacement;
@@ -207,7 +206,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		// 1- add chassis to the vehicle mode 
 		AddChassis(chassis, DEMO_GRAVITY);
-#if 1 
+#if 0 
 		// 2- each tire to the model, 
 		// this function will create the tire as a normal rigid body
 		// and attach them to the chassis with the tire joints
@@ -550,10 +549,10 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene);
+	//BuildFloorBox(scene);
 	//BuildFlatPlane(scene, true);
 	//BuildStaticMesh(scene, "track.fbx", true);
-	//BuildStaticMesh(scene, "playerarena.fbx", true);
+	BuildStaticMesh(scene, "playerarena.fbx", true);
 
 	//dMatrix location0(dGetIdentityMatrix());
 	//location0.m_posit.m_y += 2.0f;
