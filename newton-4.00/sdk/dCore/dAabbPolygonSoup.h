@@ -202,7 +202,6 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	D_CORE_API virtual void ForAllSectors (const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 m_maxT, dAaabbIntersectCallback callback, void* const context) const;
 	D_CORE_API virtual dVector ForAllSectorsSupportVectex(const dVector& dir) const;
 
-	//inline void* GetRootNode() const 
 	inline dNode* GetRootNode() const
 	{
 		return m_aabb;
