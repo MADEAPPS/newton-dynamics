@@ -513,18 +513,18 @@ dInt32 ndContactSolver::CalculateCompoundToShapeStaticBvhContacts()
 	ndContact* const contactJoint = m_contact;
 	ndContactPoint* const contacts = m_contactBuffer;
 	ndBodyKinematic* const compoundBody = contactJoint->GetBody0();
-	ndBodyKinematic* const treeBody = contactJoint->GetBody1();
+	ndBodyKinematic* const bvhTreeBody = contactJoint->GetBody1();
 	ndContactNotify* const notification = m_scene->GetContactNotify();
 	ndShapeInstance* const compoundInstance = &compoundBody->GetCollisionShape();
-	ndShapeInstance* const bbhTreeInstance = &treeBody->GetCollisionShape();
-	ndShapeStaticBVH* const treeCollision = m_instance1.GetShape()->GetAsShapeStaticBVH();
+	ndShapeInstance* const bvhTreeInstance = &bvhTreeBody->GetCollisionShape();
+	ndShapeStaticBVH* const bvhTreeCollision = m_instance1.GetShape()->GetAsShapeStaticBVH();
 	ndShapeCompoundConvex* const compoundShape = m_instance0.GetShape()->GetAsShapeCompoundConvex();
 
-	dAssert(treeCollision);
+	dAssert(bvhTreeCollision);
 	dAssert(compoundShape);
 
 	const dMatrix& compoundMatrix = compoundInstance->GetGlobalMatrix();
-	const dMatrix& treeMatrix = bbhTreeInstance->GetGlobalMatrix();
+	const dMatrix& treeMatrix = bvhTreeInstance->GetGlobalMatrix();
 	ndShapeCompoundConvex::ndOOBBTestData data(treeMatrix * compoundMatrix.Inverse());
 
 	dInt32 stack = 1;
@@ -532,12 +532,12 @@ dInt32 ndContactSolver::CalculateCompoundToShapeStaticBvhContacts()
 
 	stackPool[0].m_treeNodeIsLeaf = 0;
 	stackPool[0].m_compoundNode = compoundShape->m_root;
-	stackPool[0].m_collisionTreeNode = treeCollision->GetRootNode();
+	stackPool[0].m_collisionTreeNode = bvhTreeCollision->GetRootNode();
 	
 	dFloat32 closestDist = dFloat32(1.0e10f);
 	const dFloat32 timestep = m_scene->GetTimestep();
 
-	const dVector treeScale (bbhTreeInstance->GetScale());
+	const dVector treeScale (bvhTreeInstance->GetScale());
 	
 	ndShapeCompoundConvex::ndNodeBase nodeProxi;
 	while (stack)
@@ -552,7 +552,7 @@ dInt32 ndContactSolver::CalculateCompoundToShapeStaticBvhContacts()
 		dVector p0;
 		dVector p1;
 
-		treeCollision->GetNodeAABB(collisionTreeNode, p0, p1);
+		bvhTreeCollision->GetNodeAABB(collisionTreeNode, p0, p1);
 		nodeProxi.m_p0 = p0 * treeScale;
 		nodeProxi.m_p1 = p1 * treeScale;
 
@@ -569,7 +569,7 @@ dInt32 ndContactSolver::CalculateCompoundToShapeStaticBvhContacts()
 				ndShapeInstance* const subShape = compoundNode->GetShape();
 				if (subShape->GetCollisionMode())
 				{
-					bool processContacts = notification->OnCompoundSubShapeOverlap(contactJoint, timestep, subShape, bbhTreeInstance);
+					bool processContacts = notification->OnCompoundSubShapeOverlap(contactJoint, timestep, subShape, bvhTreeInstance);
 					if (processContacts)
 					{
 						ndShapeInstance childInstance(*subShape, subShape->GetShape());
@@ -580,7 +580,8 @@ dInt32 ndContactSolver::CalculateCompoundToShapeStaticBvhContacts()
 						contactSolver.m_maxCount = D_MAX_CONTATCS - contactCount;
 						contactSolver.m_contactBuffer += contactCount;
 				
-						dInt32 count = contactSolver.ConvexContacts();
+						//dInt32 count = contactSolver.ConvexContacts();
+						dInt32 count = contactSolver.CalculateConvexToSaticStaticBvhContactsNode(collisionTreeNode);
 						closestDist = dMin(closestDist, contactSolver.m_separationDistance);
 						if (!m_intersectionTestOnly)
 						{
@@ -607,8 +608,8 @@ dInt32 ndContactSolver::CalculateCompoundToShapeStaticBvhContacts()
 			{
 				dAssert(!treeNodeIsLeaf);
 				
-				const dAabbPolygonSoup::dNode* const backNode = treeCollision->GetBackNode(collisionTreeNode);
-				const dAabbPolygonSoup::dNode* const frontNode = treeCollision->GetFrontNode(collisionTreeNode);
+				const dAabbPolygonSoup::dNode* const backNode = bvhTreeCollision->GetBackNode(collisionTreeNode);
+				const dAabbPolygonSoup::dNode* const frontNode = bvhTreeCollision->GetFrontNode(collisionTreeNode);
 				
 				if (backNode && frontNode)
 				{
@@ -682,8 +683,8 @@ dInt32 ndContactSolver::CalculateCompoundToShapeStaticBvhContacts()
 				dAssert(compoundNode->m_type == ndShapeCompoundConvex::m_node);
 				dAssert(!treeNodeIsLeaf);
 				
-				const dAabbPolygonSoup::dNode* const backNode = treeCollision->GetBackNode(collisionTreeNode);
-				const dAabbPolygonSoup::dNode* const frontNode = treeCollision->GetFrontNode(collisionTreeNode);
+				const dAabbPolygonSoup::dNode* const backNode = bvhTreeCollision->GetBackNode(collisionTreeNode);
+				const dAabbPolygonSoup::dNode* const frontNode = bvhTreeCollision->GetFrontNode(collisionTreeNode);
 				
 				if (backNode && frontNode)
 				{
@@ -839,6 +840,90 @@ dInt32 ndContactSolver::ConvexContacts()
 		for (dInt32 i = count - 1; i >= 0; i--)
 		{
 			contactOut[i].m_point += offset;
+		}
+	}
+
+	m_instance0.m_globalMatrix.m_posit = origin0;
+	m_instance1.m_globalMatrix.m_posit = origin1;
+	return count;
+}
+
+dInt32 ndContactSolver::CalculateConvexToSaticStaticBvhContactsNode(const dAabbPolygonSoup::dNode* const node)
+{
+	dVector origin0(m_instance0.m_globalMatrix.m_posit);
+	dVector origin1(m_instance1.m_globalMatrix.m_posit);
+	m_instance0.m_globalMatrix.m_posit = dVector::m_wOne;
+	m_instance1.m_globalMatrix.m_posit -= (origin0 & dVector::m_triplexMask);
+
+	dAssert (m_instance1.GetShape()->GetAsShapeStaticBVH());
+	//dInt32 count = CalculateConvexToSaticMeshContacts();
+
+	ndShapeStaticBVH* const polysoup = m_instance1.GetShape()->GetAsShapeStaticBVH();
+	dAssert(polysoup);
+
+	ndPolygonMeshDesc data(*this, NULL);
+	if (m_ccdMode)
+	{
+		dAssert(0);
+	}
+	
+	//polysoup->GetCollidingFaces(&data);
+	data.m_me = polysoup;
+	data.m_vertex = polysoup->GetLocalVertexPool();
+	data.m_vertexStrideInBytes = polysoup->GetStrideInBytes();
+	data.m_faceCount = 0;
+	data.m_globalIndexCount = 0;
+	data.m_faceIndexCount = data.m_meshData.m_globalFaceIndexCount;
+	data.m_faceIndexStart = data.m_meshData.m_globalFaceIndexStart;
+	data.m_faceVertexIndex = data.m_globalFaceVertexIndex;
+	data.m_hitDistance = data.m_meshData.m_globalHitDistance;
+	polysoup->ForThisSector(node, data, data.m_boxDistanceTravelInMeshSpace, data.m_maxT, polysoup->GetPolygon, &data);
+
+	dInt32 count = 0;
+	if (data.m_faceCount)
+	{
+		if (m_ccdMode)
+		{
+			dAssert(0);
+			//count = CalculateConvexToNonConvexContactsContinue(proxy);
+		}
+		else
+		{
+			count = CalculatePolySoupToHullContactsDescrete(data);
+		}
+	}
+
+	ndBodyKinematic* const body0 = m_contact->GetBody0();
+	ndBodyKinematic* const body1 = m_contact->GetBody1();
+	ndShapeInstance* const instance0 = &body0->GetCollisionShape();
+	ndShapeInstance* const instance1 = &body1->GetCollisionShape();
+
+	//if (!m_intersectionTestOnly)
+	//{
+	//	ndContactPoint* const contactOut = m_contactBuffer;
+	//	for (dInt32 i = count - 1; i >= 0; i--)
+	//	{
+	//		contactOut[i].m_body0 = body0;
+	//		contactOut[i].m_body1 = body1;
+	//		contactOut[i].m_shapeInstance0 = instance0;
+	//		contactOut[i].m_shapeInstance1 = instance1;
+	//	}
+	//}
+
+	dVector offset = (origin0 & dVector::m_triplexMask);
+	m_closestPoint0 += offset;
+	m_closestPoint1 += offset;
+
+	if (!m_intersectionTestOnly)
+	{
+		ndContactPoint* const contactOut = m_contactBuffer;
+		for (dInt32 i = count - 1; i >= 0; i--)
+		{
+			contactOut[i].m_point += offset;
+			contactOut[i].m_body0 = body0;
+			contactOut[i].m_body1 = body1;
+			contactOut[i].m_shapeInstance0 = instance0;
+			contactOut[i].m_shapeInstance1 = instance1;
 		}
 	}
 

@@ -70,6 +70,8 @@ class ndShapeStaticBVH: public ndShapeStaticMesh, public dAabbPolygonSoup
 	private: 
 	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
 	dInt32 m_trianglesCount;
+
+	friend class ndContactSolver;
 };
 
 

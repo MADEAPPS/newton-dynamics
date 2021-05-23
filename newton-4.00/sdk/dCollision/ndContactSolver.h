@@ -80,6 +80,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 CalculateConvexToSaticMeshContacts();
 	dInt32 CalculateCompoundToCompoundContacts();
 	dInt32 CalculateCompoundToShapeStaticBvhContacts();
+	dInt32 CalculateConvexToSaticStaticBvhContactsNode(const dAabbPolygonSoup::dNode* const node);
 
 	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, ndContactPoint& contactOut);
 	

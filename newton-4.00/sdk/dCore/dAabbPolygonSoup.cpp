@@ -113,7 +113,6 @@ class dAabbPolygonSoup::dgNodeBuilder: public dAabbPolygonSoup::dNode
 		maxBox = node0->m_p1.GetMax(node1->m_p1);
 
 		dVector side0 ((maxBox - minBox) * dVector::m_half);
-		//dVector side1 (side0.m_y, side0.m_z, side0.m_x, dFloat32 (0.0f));
 		dVector side1 (side0.ShiftTripleLeft());
 		return side0.DotProduct(side1).GetScalar();
 	}
@@ -493,8 +492,6 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 	GetAABB (p0, p1);
 	dFastAabbInfo box (p0, p1);
 
-//	ForAllSectors(box, dVector::m_zero, dFloat32(1.0f), CalculateAllFaceEdgeNormalsOld, this);
-
 	dPolyhedra adjacenyMesh;
 	adjacenyMesh.BeginFace();
 	ForAllSectors(box, dVector::m_zero, dFloat32(1.0f), CalculateAllFaceEdgeNormals, &adjacenyMesh);
@@ -720,7 +717,6 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 	}
 }
 
-
 dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormalsOld (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32)
 {
 	dInt32 stride = dInt32 (strideInBytes / sizeof (dFloat32));
@@ -770,49 +766,6 @@ dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormalsOld (void* const c
 
 dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormals(void* const context, const dFloat32* const, dInt32, const dInt32* const indexArray, dInt32 indexCount, dFloat32)
 {
-	//dInt32 stride = dInt32(strideInBytes / sizeof(dFloat32));
-	//
-	//AdjacentdFace adjacentFaces;
-	//adjacentFaces.m_count = indexCount;
-	//adjacentFaces.m_index = (dInt32*)indexArray;
-	//
-	//dVector n(&polygon[indexArray[indexCount + 1] * stride]);
-	//dVector p(&polygon[indexArray[0] * stride]);
-	//n = n & dVector::m_triplexMask;
-	//p = p & dVector::m_triplexMask;
-	//adjacentFaces.m_normal = dPlane(n, -n.DotProduct(p).GetScalar());
-	//
-	//dAssert(indexCount < dInt32(sizeof(adjacentFaces.m_edgeMap) / sizeof(adjacentFaces.m_edgeMap[0])));
-	//
-	//dInt32 edgeIndex = indexCount - 1;
-	//dInt32 i0 = indexArray[indexCount - 1];
-	//dVector p0(dFloat32(1.0e15f), dFloat32(1.0e15f), dFloat32(1.0e15f), dFloat32(0.0f));
-	//dVector p1(-dFloat32(1.0e15f), -dFloat32(1.0e15f), -dFloat32(1.0e15f), dFloat32(0.0f));
-	//for (dInt32 i = 0; i < indexCount; i++)
-	//{
-	//	dInt32 i1 = indexArray[i];
-	//	dInt32 index = i1 * stride;
-	//	dVector point(&polygon[index]);
-	//	point = point & dVector::m_triplexMask;
-	//	p0 = p0.GetMin(point);
-	//	p1 = p1.GetMax(point);
-	//	adjacentFaces.m_edgeMap[edgeIndex] = (dInt64(i1) << 32) + i0;
-	//	edgeIndex = i;
-	//	i0 = i1;
-	//}
-	//
-	//dFloat32 padding = dFloat32(1.0f / 16.0f);
-	//p0.m_x -= padding;
-	//p0.m_y -= padding;
-	//p0.m_z -= padding;
-	//p1.m_x += padding;
-	//p1.m_y += padding;
-	//p1.m_z += padding;
-	//
-	//dAabbPolygonSoup* const me = (dAabbPolygonSoup*)context;
-	//dFastAabbInfo box(p0, p1);
-	//me->ForAllSectors(box, dVector::m_zero, dFloat32(1.0f), CalculateDisjointedFaceEdgeNormals, &adjacentFaces);
-
 	dInt32 face[256];
 	dInt64 data[256];
 	dPolyhedra& adjacency = *((dPolyhedra*)context);
@@ -832,7 +785,8 @@ dIntersectStatus dAabbPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* con
 
 	const AdjacentdFace& adjacentFace = *((AdjacentdFace*)context);
 
-	if (adjacentFace.m_index != indexArray) {	
+	if (adjacentFace.m_index != indexArray) 
+	{	
 		dInt32 adjacentCount = adjacentFace.m_count;
 		dInt32 stride = dInt32 (strideInBytes / sizeof (dFloat32));
 
@@ -1732,4 +1686,170 @@ void dAabbPolygonSoup::ForAllSectors (const dFastAabbInfo& obbAabbInfo, const dV
 	}
 }
 
+void dAabbPolygonSoup::ForThisSector(const dAabbPolygonSoup::dNode* const node, const dFastAabbInfo& obbAabbInfo, const dVector& boxDistanceTravel, dFloat32, dAaabbIntersectCallback callback, void* const context) const
+{
+	//ForAllSectors(obbAabbInfo, boxDistanceTravel, maxT, callback, context);
 
+	dAssert(dAbs(dAbs(obbAabbInfo[0][0]) - obbAabbInfo.m_absDir[0][0]) < dFloat32(1.0e-4f));
+	dAssert(dAbs(dAbs(obbAabbInfo[1][1]) - obbAabbInfo.m_absDir[1][1]) < dFloat32(1.0e-4f));
+	dAssert(dAbs(dAbs(obbAabbInfo[2][2]) - obbAabbInfo.m_absDir[2][2]) < dFloat32(1.0e-4f));
+
+	dAssert(dAbs(dAbs(obbAabbInfo[0][1]) - obbAabbInfo.m_absDir[1][0]) < dFloat32(1.0e-4f));
+	dAssert(dAbs(dAbs(obbAabbInfo[0][2]) - obbAabbInfo.m_absDir[2][0]) < dFloat32(1.0e-4f));
+	dAssert(dAbs(dAbs(obbAabbInfo[1][2]) - obbAabbInfo.m_absDir[2][1]) < dFloat32(1.0e-4f));
+
+	if (m_aabb)
+	{
+		const dInt32 stride = sizeof(dTriplex) / sizeof(dFloat32);
+		const dTriplex* const vertexArray = (dTriplex*)m_localVertex;
+
+		dAssert(boxDistanceTravel.m_w == dFloat32(0.0f));
+		if (boxDistanceTravel.DotProduct(boxDistanceTravel).GetScalar() < dFloat32(1.0e-8f))
+		{
+			dFloat32 dist = node->BoxPenetration(obbAabbInfo, vertexArray);
+			if (dist <= dFloat32(0.0f))
+			{
+				obbAabbInfo.m_separationDistance = dMin(obbAabbInfo.m_separationDistance[0], dist);
+			}
+			if (dist > dFloat32(0.0f))
+			{
+				if (node->m_left.IsLeaf())
+				{
+					dInt32 index = dInt32(node->m_left.GetIndex());
+					dInt32 vCount = dInt32(node->m_left.GetCount());
+					if (vCount > 0)
+					{
+						const dInt32* const indices = &m_indices[index];
+						dInt32 normalIndex = indices[vCount + 1];
+						dVector faceNormal(&vertexArray[normalIndex].m_x);
+						faceNormal = faceNormal & dVector::m_triplexMask;
+						dFloat32 dist1 = obbAabbInfo.PolygonBoxDistance(faceNormal, vCount, indices, stride, &vertexArray[0].m_x);
+						if (dist1 > dFloat32(0.0f))
+						{
+							obbAabbInfo.m_separationDistance = dFloat32(0.0f);
+							dAssert(vCount >= 3);
+							callback(context, &vertexArray[0].m_x, sizeof(dTriplex), indices, vCount, dist1);
+						}
+					}
+				}
+			
+				if (node->m_right.IsLeaf())
+				{
+					dInt32 index = dInt32(node->m_right.GetIndex());
+					dInt32 vCount = dInt32(node->m_right.GetCount());
+					if (vCount > 0)
+					{
+						const dInt32* const indices = &m_indices[index];
+						dInt32 normalIndex = indices[vCount + 1];
+						dVector faceNormal(&vertexArray[normalIndex].m_x);
+						faceNormal = faceNormal & dVector::m_triplexMask;
+						dFloat32 dist1 = obbAabbInfo.PolygonBoxDistance(faceNormal, vCount, indices, stride, &vertexArray[0].m_x);
+						if (dist1 > dFloat32(0.0f))
+						{
+							dAssert(vCount >= 3);
+							obbAabbInfo.m_separationDistance = dFloat32(0.0f);
+							callback(context, &vertexArray[0].m_x, sizeof(dTriplex), indices, vCount, dist1);
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			dAssert(0);
+			//dFastRayTest ray(dVector(dFloat32(0.0f)), boxDistanceTravel);
+			//dFastRayTest obbRay(dVector(dFloat32(0.0f)), obbAabbInfo.UnrotateVector(boxDistanceTravel));
+			//dInt32 stack = 1;
+			//stackPool[0] = m_aabb;
+			//distance[0] = m_aabb->BoxIntersect(ray, obbRay, obbAabbInfo, vertexArray);
+			//
+			//while (stack)
+			//{
+			//	stack--;
+			//	const dFloat32 dist = distance[stack];
+			//	const dNode* const me = stackPool[stack];
+			//	if (dist < dFloat32(1.0f))
+			//	{
+			//		if (me->m_left.IsLeaf())
+			//		{
+			//			dInt32 index = dInt32(me->m_left.GetIndex());
+			//			dInt32 vCount = dInt32(me->m_left.GetCount());
+			//			if (vCount > 0)
+			//			{
+			//				const dInt32* const indices = &m_indices[index];
+			//				dInt32 normalIndex = indices[vCount + 1];
+			//				dVector faceNormal(&vertexArray[normalIndex].m_x);
+			//				faceNormal = faceNormal & dVector::m_triplexMask;
+			//				dFloat32 hitDistance = obbAabbInfo.PolygonBoxRayDistance(faceNormal, vCount, indices, stride, &vertexArray[0].m_x, ray);
+			//				if (hitDistance < dFloat32(1.0f))
+			//				{
+			//					dAssert(vCount >= 3);
+			//					if (callback(context, &vertexArray[0].m_x, sizeof(dTriplex), indices, vCount, hitDistance) == t_StopSearh)
+			//					{
+			//						return;
+			//					}
+			//				}
+			//			}
+			//		}
+			//		else
+			//		{
+			//			const dNode* const node = me->m_left.GetNode(m_aabb);
+			//			dFloat32 dist1 = node->BoxIntersect(ray, obbRay, obbAabbInfo, vertexArray);
+			//			if (dist1 < dFloat32(1.0f))
+			//			{
+			//				dInt32 j = stack;
+			//				for (; j && (dist1 > distance[j - 1]); j--)
+			//				{
+			//					stackPool[j] = stackPool[j - 1];
+			//					distance[j] = distance[j - 1];
+			//				}
+			//				dAssert(stack < DG_STACK_DEPTH);
+			//				stackPool[j] = node;
+			//				distance[j] = dist1;
+			//				stack++;
+			//			}
+			//		}
+			//
+			//		if (me->m_right.IsLeaf())
+			//		{
+			//			dInt32 index = dInt32(me->m_right.GetIndex());
+			//			dInt32 vCount = dInt32(me->m_right.GetCount());
+			//			if (vCount > 0)
+			//			{
+			//				const dInt32* const indices = &m_indices[index];
+			//				dInt32 normalIndex = indices[vCount + 1];
+			//				dVector faceNormal(&vertexArray[normalIndex].m_x);
+			//				faceNormal = faceNormal & dVector::m_triplexMask;
+			//				dFloat32 hitDistance = obbAabbInfo.PolygonBoxRayDistance(faceNormal, vCount, indices, stride, &vertexArray[0].m_x, ray);
+			//				if (hitDistance < dFloat32(1.0f))
+			//				{
+			//					dAssert(vCount >= 3);
+			//					if (callback(context, &vertexArray[0].m_x, sizeof(dTriplex), indices, vCount, hitDistance) == t_StopSearh) {
+			//						return;
+			//					}
+			//				}
+			//			}
+			//		}
+			//		else
+			//		{
+			//			const dNode* const node = me->m_right.GetNode(m_aabb);
+			//			dFloat32 dist1 = node->BoxIntersect(ray, obbRay, obbAabbInfo, vertexArray);
+			//			if (dist1 < dFloat32(1.0f))
+			//			{
+			//				dInt32 j = stack;
+			//				for (; j && (dist1 > distance[j - 1]); j--)
+			//				{
+			//					stackPool[j] = stackPool[j - 1];
+			//					distance[j] = distance[j - 1];
+			//				}
+			//				dAssert(stack < DG_STACK_DEPTH);
+			//				stackPool[j] = node;
+			//				distance[j] = dist1;
+			//				stack++;
+			//			}
+			//		}
+			//	}
+			//}
+		}
+	}
+}

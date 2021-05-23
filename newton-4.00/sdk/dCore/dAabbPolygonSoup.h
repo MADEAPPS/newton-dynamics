@@ -198,9 +198,10 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 
 	D_CORE_API void Create (const dPolygonSoupBuilder& builder);
 	D_CORE_API void CalculateAdjacendy ();
-	D_CORE_API virtual void ForAllSectorsRayHit (const dFastRayTest& ray, dFloat32 maxT, dRayIntersectCallback callback, void* const context) const;
-	D_CORE_API virtual void ForAllSectors (const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 m_maxT, dAaabbIntersectCallback callback, void* const context) const;
 	D_CORE_API virtual dVector ForAllSectorsSupportVectex(const dVector& dir) const;
+	D_CORE_API virtual void ForAllSectorsRayHit (const dFastRayTest& ray, dFloat32 maxT, dRayIntersectCallback callback, void* const context) const;
+	D_CORE_API virtual void ForAllSectors (const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
+	D_CORE_API virtual void ForThisSector(const dAabbPolygonSoup::dNode* const node, const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
 
 	inline dNode* GetRootNode() const
 	{
@@ -231,7 +232,6 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	private:
 	dgNodeBuilder* BuildTopDown (dgNodeBuilder* const leafArray, dInt32 firstBox, dInt32 lastBox, dgNodeBuilder** const allocator) const;
 	dFloat32 CalculateFaceMaxSize (const dVector* const vertex, dInt32 indexCount, const dInt32* const indexArray) const;
-//	static dIntersectStatus CalculateManifoldFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount);
 	static dIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 	static dIntersectStatus CalculateAllFaceEdgeNormalsOld (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 	static dIntersectStatus CalculateAllFaceEdgeNormals(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
