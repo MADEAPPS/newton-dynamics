@@ -393,6 +393,7 @@ dInt32 ndDemoEntityManager::GetJoystickAxis (dFloat32* const axisValues, dInt32 
 		for (dInt32 i = 0; i < axisCount; i ++) 
 		{
 			axisValues[i] = axis[i];
+			//if (axis[i] && axis[i] > -1.0f) dTrace(("%d %f\n", i, axis[i]));
 		}
 	}
 	return axisCount;
@@ -407,6 +408,7 @@ dInt32 ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, dInt32 
 		for (dInt32 i = 0; i < buttonsCount; i ++) 
 		{
 			axisbuttons[i] = buttons[i];
+			//if (buttons[i]) dTrace(("%d %d\n", i, buttons[i]));
 		}
 	}
 	return buttonsCount;

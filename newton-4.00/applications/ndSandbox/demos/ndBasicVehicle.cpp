@@ -368,11 +368,32 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		if (m_isPlayer && m_motor)
 		{
 			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+			dFloat32 axis[32];
+			char buttons[32];
+			scene->GetJoystickAxis(axis);
+			scene->GetJoystickButtons(buttons);
+
 			dFloat32 brake = 1500.0f * dFloat32(scene->GetKeyState('S'));
-			dFloat32 handBrake = 1500.0f * dFloat32(scene->GetKeyState(' '));
+			if (brake == 0.0f)
+			{
+				brake = 1500.0f * (axis[4] + 1.0f) * 0.5f;
+				//dTrace(("brake %f\n", brake));
+			}
+
 			dFloat32 throttle = dFloat32(scene->GetKeyState('W')) ? 1.0f : 0.0f;
+			if (throttle == 0.0f)
+			{
+				throttle = (axis[5] + 1.0f) * 0.5f;
+				//dTrace(("throttle %f\n", throttle));
+			}
+
 			dFloat32 steerAngle = 35.0f * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
+			if (dAbs(steerAngle) == 0.0f)
+			{
+				steerAngle = 35.0f * axis[0];
+			}
 			m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
+
 
 			static dInt32 xxxx;
 			xxxx++;
@@ -383,28 +404,32 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			}
 			throttle = dClamp(throttle, 0.0f, 0.3f);
 
-			SetBrakeTorque(brake);
-			SetHandBrakeTorque(handBrake);
-			SetSteeringAngle(m_steerAngle * dDegreeToRad);
+			dFloat32 handBrake = 5000.0f * dFloat32(scene->GetKeyState(' ') || buttons[4]);
+			//dTrace(("handBrake %f\n", handBrake));
 
-			//if (!m_prevKey & start)
-			if (m_ignition.Update(scene->GetKeyState('I')))
+			if (m_ignition.Update(scene->GetKeyState('I') || buttons[0]))
 			{
 				m_motor->SetStart(!m_motor->GetStart());
 			}
 
-			if (m_neutralGear.Update(scene->GetKeyState('N')))
-			{
-				m_gearBox->SetRatio(0.0f);
-			}
-			if (m_reverseGear.Update(scene->GetKeyState('R')))
-			{
-				m_gearBox->SetRatio(-10.0f);
-			}
-			if (m_automaticGear.Update(scene->GetKeyState('T')))
+			if (m_automaticGear.Update(scene->GetKeyState('T') || buttons[1]))
 			{
 				m_gearBox->SetRatio(4.0f);
 			}
+
+			if (m_neutralGear.Update(scene->GetKeyState('N') || buttons[2]))
+			{
+				m_gearBox->SetRatio(0.0f);
+			}
+
+			if (m_reverseGear.Update(scene->GetKeyState('R') || buttons[3]))
+			{
+				m_gearBox->SetRatio(-10.0f);
+			}
+
+			SetBrakeTorque(brake);
+			SetHandBrakeTorque(handBrake);
+			SetSteeringAngle(m_steerAngle * dDegreeToRad);
 
 			m_motor->SetThrottle(throttle);
 		}
@@ -553,8 +578,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	// build a floor
 	//BuildFloorBox(scene);
 	//BuildFlatPlane(scene, true);
-	//BuildStaticMesh(scene, "track.fbx", true);
-	BuildStaticMesh(scene, "playerarena.fbx", true);
+	BuildStaticMesh(scene, "track.fbx", true);
+	//BuildStaticMesh(scene, "playerarena.fbx", true);
 
 	//dMatrix location0(dGetIdentityMatrix());
 	//location0.m_posit.m_y += 2.0f;
