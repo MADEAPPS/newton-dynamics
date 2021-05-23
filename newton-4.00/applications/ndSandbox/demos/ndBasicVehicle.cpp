@@ -52,10 +52,10 @@ static nvVehicleDectriptor sedanViper("viper1.fbx", 20.0f, 20.0f, 0.1f, dVector(
 
 // hard to drift but more stable
 //static nvVehicleDectriptor monterTruckNormal("monsterTruck.fbx", 200.0f, 200.0f, 0.1f, dVector(0.25f, -0.8f, 0.0f, 0.0f));
-static nvVehicleDectriptor monterTruckNormal("monsterTruck.fbx", 200.0f, 200.0f, 0.1f, dVector(0.0f, -0.4f, 0.0f, 0.0f));
+static nvVehicleDectriptor monterTruckNormal("monsterTruck.fbx", 100.0f, 100.0f, 0.1f, dVector(0.0f, -0.55f, 0.0f, 0.0f));
 // this make the vehicle drift.
 //static nvVehicleDectriptor monterTruckDrift("monsterTruck.fbx", 200.0f, 200.0f, 0.1f, dVector(0.25f, -0.9f, 0.0f, 0.0f));
-static nvVehicleDectriptor monterTruckDrift("monsterTruck.fbx", 200.0f, 200.0f, 0.1f, dVector(0.0f, -0.4f, 0.0f, 0.0f));
+static nvVehicleDectriptor monterTruckDrift("monsterTruck.fbx", 100.0f, 100.0f, 0.1f, dVector(0.0f, -0.55f, 0.0f, 0.0f));
 
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
