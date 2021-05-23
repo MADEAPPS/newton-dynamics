@@ -376,7 +376,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			dFloat32 brake = 1500.0f * dFloat32(scene->GetKeyState('S'));
 			if (brake == 0.0f)
 			{
-				brake = 1500.0f * (axis[4] + 1.0f) * 0.5f;
+				dFloat32 val = (axis[4] + 1.0f) * 0.5f;
+				brake = 3000.0f * val * val * val;
 				//dTrace(("brake %f\n", brake));
 			}
 
@@ -384,13 +385,14 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			if (throttle == 0.0f)
 			{
 				throttle = (axis[5] + 1.0f) * 0.5f;
+				throttle = throttle * throttle * throttle;
 				//dTrace(("throttle %f\n", throttle));
 			}
 
 			dFloat32 steerAngle = 35.0f * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
 			if (dAbs(steerAngle) == 0.0f)
 			{
-				steerAngle = 35.0f * axis[0];
+				steerAngle = 35.0f * (axis[0] * axis[0] * axis[0]);
 			}
 			m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
 
@@ -404,10 +406,10 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			}
 			throttle = dClamp(throttle, 0.0f, 0.3f);
 
-			dFloat32 handBrake = 5000.0f * dFloat32(scene->GetKeyState(' ') || buttons[4]);
+			dFloat32 handBrake = 5000.0f * dFloat32(scene->GetKeyState(' ') || buttons[0]);
 			//dTrace(("handBrake %f\n", handBrake));
 
-			if (m_ignition.Update(scene->GetKeyState('I') || buttons[0]))
+			if (m_ignition.Update(scene->GetKeyState('I') || buttons[5]))
 			{
 				m_motor->SetStart(!m_motor->GetStart());
 			}
