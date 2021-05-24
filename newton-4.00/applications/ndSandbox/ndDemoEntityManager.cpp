@@ -383,9 +383,22 @@ void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback,
 	m_updateCameraContext = context;
 }
 
-dInt32 ndDemoEntityManager::GetJoystickAxis (dFloat32* const axisValues, dInt32 maxAxis) const
+dInt32 ndDemoEntityManager::GetJoystickAxis (dFloat32* const axisValues, dInt32 maxAxis)
 {
 	dInt32 axisCount = 0;
+	for (dInt32 i = 0; i < maxAxis; i++)
+	{
+		axisValues[i] = dFloat32(0.0f);
+	}
+	// for xbox controllers.
+	axisValues[4] = dFloat32(-1.0f);
+	axisValues[5] = dFloat32(-1.0f);
+
+	if (!m_hasJoytick)
+	{
+		m_hasJoytick = glfwJoystickPresent(0) ? true : false;
+	}
+
 	if (m_hasJoytick) 
 	{
 		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
@@ -399,10 +412,18 @@ dInt32 ndDemoEntityManager::GetJoystickAxis (dFloat32* const axisValues, dInt32 
 	return axisCount;
 }
 
-dInt32 ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, dInt32 maxButton) const
+dInt32 ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, dInt32 maxButton)
 {
 	dInt32 buttonsCount = 0;
-	if (m_hasJoytick) {
+	memset(axisbuttons, 0, maxButton);
+
+	if (!m_hasJoytick)
+	{
+		m_hasJoytick = glfwJoystickPresent(0) ? true : false;
+	}
+
+	if (m_hasJoytick) 
+	{
 		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
 		buttonsCount = dMin (buttonsCount, maxButton);
 		for (dInt32 i = 0; i < buttonsCount; i ++) 
