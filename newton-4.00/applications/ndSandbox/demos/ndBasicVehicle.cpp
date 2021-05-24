@@ -26,36 +26,112 @@
 class nvVehicleDectriptor
 {
 	public:
-	nvVehicleDectriptor(
-		const char* const modelName,
-		dFloat32 rearTireMass,
-		dFloat32 frontTireMass,
-		dFloat32 suspensionRegularizer,
-		const dVector& comDisplacement)
-		:m_name(modelName)
-		,m_rearTireMass(rearTireMass)
-		,m_frontTireMass(frontTireMass)
-		,m_suspensionRegularizer(suspensionRegularizer)
-		,m_comDisplacement(comDisplacement)
+	nvVehicleDectriptor()
 	{
+		m_name[0] = 0;
+		SetDefualt();
 	}
 
-	const char* m_name;
+	nvVehicleDectriptor(const char* const name)
+	{
+		strcpy(m_name, name);
+		SetDefualt();
+	}
+
+	void SetDefualt()
+	{
+		m_chassisMass = 1000.0f;
+		m_rearTireMass = 20.0f;
+		m_frontTireMass = 20.0f;
+		m_suspensionRegularizer = 0.1f;
+		m_comDisplacement = dVector::m_zero;
+
+		m_steeringAngle = 35.0f;
+		m_brakeTorque = 1500.0f;
+		m_handBrakeTorque = 1500.0f;
+
+		m_motor_mass = 20.0f;
+		m_motor_radius = 0.25f;
+
+		m_differential_mass = 20.0f;
+		m_differential_radius = 0.25f;
+
+		m_springK = 1000.0f;
+		m_damperC = 20.0f;
+		m_regularizer = 0.1f;
+		m_minLimit = -0.05f;
+		m_maxLimit = 0.2f;
+		m_laterialStiffeness = 1.0f;
+		m_longitudinalStiffeness = 1.0f;
+
+		m_frictionCoefficientScale = 1.5f;
+	}
+
+	char m_name[32];
+
+	dFloat32 m_chassisMass;
 	dFloat32 m_rearTireMass;
 	dFloat32 m_frontTireMass;
 	dFloat32 m_suspensionRegularizer;
+
+	dFloat32 m_steeringAngle;
+	dFloat32 m_springK;
+	dFloat32 m_damperC;
+	dFloat32 m_regularizer;
+	dFloat32 m_minLimit;
+	dFloat32 m_maxLimit;
+	dFloat32 m_laterialStiffeness;
+	dFloat32 m_longitudinalStiffeness;
+	dFloat32 m_frictionCoefficientScale;
+
+	dFloat32 m_brakeTorque;
+	dFloat32 m_handBrakeTorque;
+
+	dFloat32 m_motor_mass;
+	dFloat32 m_motor_radius;
+
+	dFloat32 m_differential_mass;
+	dFloat32 m_differential_radius;
+
 	dVector m_comDisplacement;
 };
 
-static nvVehicleDectriptor sportViper("viper1.fbx", 20.0f, 20.0f, 0.025f, dVector(0.25f, -0.35f, 0.0f, 0.0f));
-static nvVehicleDectriptor sedanViper("viper1.fbx", 20.0f, 20.0f, 0.1f, dVector(0.25f, -0.35f, 0.0f, 0.0f));
+class nvVehicleDectriptorViper : public nvVehicleDectriptor
+{
+	public:
+	nvVehicleDectriptorViper()
+		:nvVehicleDectriptor("viper1.fbx")
+	{
+		//static nvVehicleDectriptor sportViper("viper1.fbx", 20.0f, 20.0f, 0.025f, dVector(0.25f, -0.35f, 0.0f, 0.0f));
+		m_comDisplacement = dVector(0.25f, -0.35f, 0.0f, 0.0f);
+	}
+};
 
-// hard to drift but more stable
-//static nvVehicleDectriptor monterTruckNormal("monsterTruck.fbx", 200.0f, 200.0f, 0.1f, dVector(0.25f, -0.8f, 0.0f, 0.0f));
-static nvVehicleDectriptor monterTruckNormal("monsterTruck.fbx", 100.0f, 100.0f, 0.1f, dVector(0.0f, -0.55f, 0.0f, 0.0f));
-// this make the vehicle drift.
-//static nvVehicleDectriptor monterTruckDrift("monsterTruck.fbx", 200.0f, 200.0f, 0.1f, dVector(0.25f, -0.9f, 0.0f, 0.0f));
-static nvVehicleDectriptor monterTruckDrift("monsterTruck.fbx", 100.0f, 100.0f, 0.1f, dVector(0.0f, -0.55f, 0.0f, 0.0f));
+class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
+{
+	public:
+	nvVehicleDectriptorMonsterTruck()
+		:nvVehicleDectriptor("monsterTruck.fbx")
+	{
+		//"monsterTruck.fbx", 100.0f, 100.0f, 0.1f, dVector(0.0f, -0.55f, 0.0f, 0.0f));
+		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
+		m_rearTireMass = 100.0f;
+		m_frontTireMass = 100.0f;
+
+		m_brakeTorque = 5000.0f;
+		m_handBrakeTorque = 5000.0f;
+
+		m_springK = 500.0f;
+		m_damperC = 50.0f;
+		m_suspensionRegularizer = 0.2f;
+		m_maxLimit = 0.4f;
+
+		m_frictionCoefficientScale = 1.3f;
+	}
+};
+
+static nvVehicleDectriptorViper viperDesc;
+static nvVehicleDectriptorMonsterTruck monterTruckDesc;
 
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
@@ -109,7 +185,6 @@ static void AddSomeObstacles(ndDemoEntityManager* const scene, const dVector& or
 
 	instanceMesh->Release();
 }
-
 
 static void PlaceRampRamp(ndDemoEntityManager* const scene, 
 	const dMatrix& location, ndDemoMesh* const geometry, ndShapeInstance& ramp)
@@ -183,6 +258,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	public:
 	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const nvVehicleDectriptor& desc, const dMatrix& matrix)
 		:ndMultiBodyVehicle(dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f))
+		,m_configuration(desc)
 		,m_steerAngle(0.0f)
 		,m_ignition()
 		,m_neutralGear()
@@ -196,15 +272,13 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndWorld* const world = scene->GetWorld();
 
 		// create the vehicle chassis as a normal rigid body
-		ndBodyDynamic* const chassis = CreateChassis(scene, vehicleEntity);
+		ndBodyDynamic* const chassis = CreateChassis(scene, vehicleEntity, m_configuration.m_chassisMass);
 
 		// lower vehicle com;
 		dVector com(chassis->GetCentreOfMass());
-		//com -= m_localFrame.m_up.Scale(0.35f);
-		//com += m_localFrame.m_front.Scale(0.25f);
-		com += m_localFrame.m_up.Scale(desc.m_comDisplacement.m_y);
-		com += m_localFrame.m_front.Scale(desc.m_comDisplacement.m_x);
-		com += m_localFrame.m_right.Scale(desc.m_comDisplacement.m_z);
+		com += m_localFrame.m_up.Scale(m_configuration.m_comDisplacement.m_y);
+		com += m_localFrame.m_front.Scale(m_configuration.m_comDisplacement.m_x);
+		com += m_localFrame.m_right.Scale(m_configuration.m_comDisplacement.m_z);
 		chassis->SetCentreOfMass(com);
 
 		// 1- add chassis to the vehicle mode 
@@ -213,20 +287,19 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		// 2- each tire to the model, 
 		// this function will create the tire as a normal rigid body
 		// and attach them to the chassis with the tire joints
-		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, desc.m_rearTireMass, "rr_tire");
-		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, desc.m_rearTireMass, "rl_tire");
-		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, desc.m_frontTireMass, "fr_tire");
-		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, desc.m_frontTireMass, "fl_tire");
+		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTireMass, "rr_tire");
+		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTireMass, "rl_tire");
+		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTireMass, "fr_tire");
+		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTireMass, "fl_tire");
 
 		ndJointWheel::ndWheelDescriptor tireInfo;
-		tireInfo.m_springK = 1000.0f;
-		tireInfo.m_damperC = 20.0f;
-		tireInfo.m_regularizer = desc.m_suspensionRegularizer;
-		tireInfo.m_minLimit = -0.05f;
-		tireInfo.m_maxLimit = 0.2f;
-		//tireInfo.m_maxLimit = 0.1f;
-		tireInfo.m_laterialStiffeness = 1.0f;
-		tireInfo.m_longitudinalStiffeness = 1.0f;
+		tireInfo.m_springK = m_configuration.m_springK;
+		tireInfo.m_damperC = m_configuration.m_damperC;
+		tireInfo.m_regularizer = m_configuration.m_suspensionRegularizer;
+		tireInfo.m_minLimit = m_configuration.m_minLimit;
+		tireInfo.m_maxLimit = m_configuration.m_maxLimit;
+		tireInfo.m_laterialStiffeness = m_configuration.m_laterialStiffeness;
+		tireInfo.m_longitudinalStiffeness = m_configuration.m_longitudinalStiffeness;
 
 		ndJointWheel* const rr_tire = AddTire(world, tireInfo, rr_tire_body);
 		ndJointWheel* const rl_tire = AddTire(world, tireInfo, rl_tire_body);
@@ -248,10 +321,10 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		SetAsHandBrake(rl_tire);
 
 		// add the slip differential
-		ndMultiBodyVehicleDifferential* const differential = AddDifferential(world, 20.0f, 0.25f, rl_tire, rr_tire);
+		ndMultiBodyVehicleDifferential* const differential = AddDifferential(world, m_configuration.m_differential_mass, m_configuration.m_differential_radius, rl_tire, rr_tire);
 
 		// add a motor
-		AddMotor(world, 20, 0.25f, differential);
+		AddMotor(world, m_configuration.m_motor_mass, m_configuration.m_motor_radius, differential);
 #endif
 	}
 
@@ -290,9 +363,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	}
 
 	private:
-	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity)
+	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, dFloat32 mass)
 	{
-		dFloat32 mass = 1000.0f;
 		dMatrix matrix(chassisEntity->CalculateGlobalMatrix(nullptr));
 
 		ndWorld* const world = scene->GetWorld();
@@ -333,8 +405,6 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		}
 
 		dVector size(maxVal - minVal);
-		//width = size.m_y;
-		//radius = size.m_x * 0.5f;
 		width = size.m_x;
 		radius = size.m_y * 0.5f;
 	}
@@ -373,11 +443,11 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			scene->GetJoystickAxis(axis);
 			scene->GetJoystickButtons(buttons);
 
-			dFloat32 brake = 1500.0f * dFloat32(scene->GetKeyState('S'));
+			dFloat32 brake = m_configuration.m_brakeTorque * dFloat32(scene->GetKeyState('S'));
 			if (brake == 0.0f)
 			{
 				dFloat32 val = (axis[4] + 1.0f) * 0.5f;
-				brake = 3000.0f * val * val * val;
+				brake = m_configuration.m_brakeTorque * val * val * val;
 				//dTrace(("brake %f\n", brake));
 			}
 
@@ -389,10 +459,10 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 				//dTrace(("throttle %f\n", throttle));
 			}
 
-			dFloat32 steerAngle = 35.0f * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
+			dFloat32 steerAngle = m_configuration.m_steeringAngle * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
 			if (dAbs(steerAngle) == 0.0f)
 			{
-				steerAngle = -35.0f * (axis[0] * axis[0] * axis[0]);
+				steerAngle = -m_configuration.m_steeringAngle * (axis[0] * axis[0] * axis[0]);
 			}
 			m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
 
@@ -406,7 +476,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			}
 			throttle = dClamp(throttle, 0.0f, 0.3f);
 
-			dFloat32 handBrake = 5000.0f * dFloat32(scene->GetKeyState(' ') || buttons[0]);
+			dFloat32 handBrake = m_configuration.m_handBrakeTorque * dFloat32(scene->GetKeyState(' ') || buttons[0]);
 			//dTrace(("handBrake %f\n", handBrake));
 
 			if (m_ignition.Update(scene->GetKeyState('I') || buttons[5]))
@@ -441,7 +511,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const
 	{
-		return dFloat32(1.5f);
+		//return dFloat32(1.5f);
+		return m_configuration.m_frictionCoefficientScale;
 	}
 
 	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, dFloat32 timestep)
@@ -560,6 +631,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		}
 	}
 
+	nvVehicleDectriptor m_configuration;
 	dFloat32 m_steerAngle;
 
 	GLuint m_gears;
@@ -567,7 +639,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	GLuint m_redNeedle;
 	GLuint m_tachometer;
 	GLuint m_greenNeedle;
-
+	
 	ndDemoEntityManager::ndKeyTrigger m_ignition;
 	ndDemoEntityManager::ndKeyTrigger m_neutralGear;
 	ndDemoEntityManager::ndKeyTrigger m_reverseGear;
@@ -601,15 +673,13 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = location;
 
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, sportViper, matrix);
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, sedanViper, matrix);
-	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckNormal, matrix);
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDrift, matrix);
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, viperDesc, matrix);
+	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
 	//matrix.m_posit.m_y += 5.0f;
-	//scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckNormal, matrix));
+	//scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, viperDesc, matrix));
 
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
