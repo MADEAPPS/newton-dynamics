@@ -21,9 +21,6 @@ ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 	,m_speed(dFloat32(0.0f))
 	,m_brakeTorque(dFloat32(0.0f))
 {
-	//static int xxxxxxxxxxxx;
-	//xxxxx = xxxxxxxxxxxx;
-	//xxxxxxxxxxxx++;
 }
 
 ndJointWheel::~ndJointWheel()
