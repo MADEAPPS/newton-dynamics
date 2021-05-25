@@ -264,6 +264,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		,m_neutralGear()
 		,m_reverseGear()
 		,m_automaticGear()
+		,m_currentGear(0)
 		,m_isPlayer(false)
 	{
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
@@ -326,6 +327,15 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		// add a motor
 		AddMotor(world, m_configuration.m_motor_mass, m_configuration.m_motor_radius, differential);
 #endif
+	}
+
+	~ndBasicMultiBodyVehicle()
+	{
+		ReleaseTexture(m_gears);
+		ReleaseTexture(m_odometer);
+		ReleaseTexture(m_redNeedle);
+		ReleaseTexture(m_tachometer);
+		ReleaseTexture(m_greenNeedle);
 	}
 
 	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename)
@@ -486,16 +496,19 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 			if (m_automaticGear.Update(scene->GetKeyState('T') || buttons[1]))
 			{
+				m_currentGear = 2;
 				m_gearBox->SetRatio(4.0f);
 			}
 
 			if (m_neutralGear.Update(scene->GetKeyState('N') || buttons[2]))
 			{
+				m_currentGear = 0;
 				m_gearBox->SetRatio(0.0f);
 			}
 
 			if (m_reverseGear.Update(scene->GetKeyState('R') || buttons[3]))
 			{
+				m_currentGear = 1;
 				m_gearBox->SetRatio(-10.0f);
 			}
 
@@ -579,6 +592,33 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		glPopMatrix();
 	}
 
+	void DrawGear(dInt32 gear, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size) const
+	{
+		dMatrix origin(dGetIdentityMatrix());
+		origin[1][1] = -1.0f;
+		origin.m_posit = dVector(origin_x + size * 0.3f, origin_y - size * 0.25f, 0.0f, 1.0f);
+
+		glPushMatrix();
+		glMultMatrix(&origin[0][0]);
+
+		dFloat32 uwith = 0.1f;
+		dFloat32 u0 = uwith * gear;
+		dFloat32 u1 = u0 + uwith;
+
+		dFloat32 x1 = 10.0f;
+		dFloat32 y1 = 10.0f;
+		glColor4f(1, 1, 0, 1);
+		glBindTexture(GL_TEXTURE_2D, m_gears);
+		glBegin(GL_QUADS);
+		glTexCoord2f(GLfloat(u0), 1.0f); glVertex3f(GLfloat(-x1), GLfloat(y1), 0.0f);
+		glTexCoord2f(GLfloat(u0), 0.0f); glVertex3f(GLfloat(-x1), GLfloat(-y1), 0.0f);
+		glTexCoord2f(GLfloat(u1), 0.0f); glVertex3f(GLfloat(x1), GLfloat(-y1), 0.0f);
+		glTexCoord2f(GLfloat(u1), 1.0f); glVertex3f(GLfloat(x1), GLfloat(y1), 0.0f);
+		glEnd();
+
+		glPopMatrix();
+	}
+
 	void RenderHelp(ndDemoEntityManager* const scene)
 	{
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
@@ -628,6 +668,9 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			//dFloat32 speed = engine ? dAbs(engine->GetSpeed()) / engine->GetTopSpeed() : 0.0f;
 			dFloat32 speed = GetSpeed() / 100.0f;
 			DrawGage(m_odometer, m_greenNeedle, dAbs(speed), x, y, gageSize, -180.0f, 90.0f);
+
+			// draw the current gear
+			DrawGear(m_currentGear, x, y + 98, gageSize);
 		}
 	}
 
@@ -644,6 +687,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	ndDemoEntityManager::ndKeyTrigger m_neutralGear;
 	ndDemoEntityManager::ndKeyTrigger m_reverseGear;
 	ndDemoEntityManager::ndKeyTrigger m_automaticGear;
+	dInt32 m_currentGear;
 	bool m_isPlayer;
 };
 

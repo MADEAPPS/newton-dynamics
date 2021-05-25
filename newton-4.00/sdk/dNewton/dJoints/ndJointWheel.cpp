@@ -21,6 +21,9 @@ ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 	,m_speed(dFloat32(0.0f))
 	,m_brakeTorque(dFloat32(0.0f))
 {
+	//static int xxxxxxxxxxxx;
+	//xxxxx = xxxxxxxxxxxx;
+	//xxxxxxxxxxxx++;
 }
 
 ndJointWheel::~ndJointWheel()
@@ -75,30 +78,52 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	m_posit = prel.DotProduct(matrix1.m_up).GetScalar();
 	const dVector projectedPoint = p1 + pin.Scale(pin.DotProduct(prel).GetScalar());
 
+	const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[0]);
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[2]);
-
-	const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	AddAngularRowJacobian(desc, matrix1.m_up, angle0);
-
-	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
 	
 	// add suspension spring damper row
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 	SetMassSpringDamperAcceleration(desc, m_info.m_regularizer, m_info.m_springK, m_info.m_damperC);
 
+	// set tire rotation axel joint, break or load transfer
+	//AddAngularRowJacobian(desc, matrix1.m_front, dFloat32(0.0f));
+	//const dVector tireOmega(m_body0->GetOmega());
+	//const dVector chassisOmega(m_body1->GetOmega());
+	//dVector relOmega(tireOmega - chassisOmega);
+	//dFloat32 rpm = relOmega.DotProduct(matrix1.m_front).GetScalar();
+	//SetMotorAcceleration(desc, -rpm * desc.m_invTimestep);
 	if (m_brakeTorque > dFloat32(0.0f))
 	{
+		AddAngularRowJacobian(desc, matrix1.m_front, dFloat32(0.0f));
 		const dVector tireOmega(m_body0->GetOmega());
 		const dVector chassisOmega(m_body1->GetOmega());
 		dVector relOmega(tireOmega - chassisOmega);
 		dFloat32 rpm = relOmega.DotProduct(matrix1.m_front).GetScalar();
-		AddAngularRowJacobian(desc, matrix1.m_front, dFloat32 (0.0f));
 		SetMotorAcceleration(desc, -rpm * desc.m_invTimestep);
+
 		SetLowerFriction(desc, -m_brakeTorque);
 		SetHighFriction(desc, m_brakeTorque);
 	}
+	//else
+	//{
+	//	if (xxxxx < 2)
+	//	{
+	//		AddAngularRowJacobian(desc, matrix1.m_front, dFloat32(0.0f));
+	//		const dVector tireOmega(m_body0->GetOmega());
+	//		const dVector chassisOmega(m_body1->GetOmega());
+	//		dVector relOmega(tireOmega - chassisOmega);
+	//		dFloat32 rpm = relOmega.DotProduct(matrix1.m_front).GetScalar();
+	//		SetMotorAcceleration(desc, -rpm * desc.m_invTimestep);
+	//
+	//		SetLowerFriction(desc, -1500.0f);
+	//		SetHighFriction(desc, 1500.0f);
+	//	}
+	//}
 
 	// add suspension limits alone the vertical axis 
 	const dFloat32 x = m_posit + m_speed * desc.m_timestep;
