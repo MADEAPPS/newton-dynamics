@@ -26,6 +26,13 @@
 class nvVehicleDectriptor
 {
 	public:
+	enum ndDifferentialType
+	{
+		m_rearWheelDrive,
+		m_frontWheelDrive,
+		m_fourWheeldrive,
+	};
+
 	nvVehicleDectriptor()
 	{
 		m_name[0] = 0;
@@ -65,10 +72,13 @@ class nvVehicleDectriptor
 		m_longitudinalStiffeness = 1.0f;
 
 		m_frictionCoefficientScale = 1.5f;
+
+		m_differentialType = m_rearWheelDrive;
 	}
 
 	char m_name[32];
 
+	dVector m_comDisplacement;
 	dFloat32 m_chassisMass;
 	dFloat32 m_rearTireMass;
 	dFloat32 m_frontTireMass;
@@ -92,8 +102,8 @@ class nvVehicleDectriptor
 
 	dFloat32 m_differential_mass;
 	dFloat32 m_differential_radius;
-
-	dVector m_comDisplacement;
+	
+	ndDifferentialType m_differentialType;
 };
 
 class nvVehicleDectriptorViper : public nvVehicleDectriptor
@@ -127,6 +137,8 @@ class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
 		m_maxLimit = 0.4f;
 
 		m_frictionCoefficientScale = 1.3f;
+
+		m_differentialType = m_fourWheeldrive;
 	}
 };
 
@@ -322,7 +334,30 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		SetAsHandBrake(rl_tire);
 
 		// add the slip differential
-		ndMultiBodyVehicleDifferential* const differential = AddDifferential(world, m_configuration.m_differential_mass, m_configuration.m_differential_radius, rl_tire, rr_tire);
+		ndMultiBodyVehicleDifferential* differential = nullptr;
+		switch (m_configuration.m_differentialType)
+		{
+			case nvVehicleDectriptor::m_rearWheelDrive:
+			{
+				differential = AddDifferential(world, m_configuration.m_differential_mass, m_configuration.m_differential_radius, rl_tire, rr_tire);
+				break;
+			}
+
+			case nvVehicleDectriptor::m_frontWheelDrive:
+			{
+				differential = AddDifferential(world, m_configuration.m_differential_mass, m_configuration.m_differential_radius, fl_tire, fr_tire);				break;
+			}
+
+			case nvVehicleDectriptor::m_fourWheeldrive:
+			{
+				ndMultiBodyVehicleDifferential* const rearDifferential = AddDifferential(world, m_configuration.m_differential_mass, m_configuration.m_differential_radius, rl_tire, rr_tire);
+				ndMultiBodyVehicleDifferential* const frontDifferential = AddDifferential(world, m_configuration.m_differential_mass, m_configuration.m_differential_radius, fl_tire, fr_tire);
+				differential = AddDifferential(world, m_configuration.m_differential_mass, m_configuration.m_differential_radius, rearDifferential, frontDifferential);
+				break;
+			}
+		}
+
+		
 
 		// add a motor
 		AddMotor(world, m_configuration.m_motor_mass, m_configuration.m_motor_radius, differential);

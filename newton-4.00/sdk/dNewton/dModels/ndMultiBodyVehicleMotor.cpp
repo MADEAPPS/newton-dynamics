@@ -134,16 +134,16 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 		if (m_omega <= dFloat32(0.0f))
 		{
 			// engine rpm can not be negative
-			dFloat32 stopAccel = GetMotorZeroAcceleration(desc) - dFloat32 (0.5f) * desc.m_invTimestep;
+			dFloat32 stopAccel = (m_omega - 0.5f) * desc.m_invTimestep;
 			SetMotorAcceleration(desc, stopAccel);
-			SetLowerFriction(desc, -m_engineTorque);
+			SetHighFriction(desc, m_engineTorque);
 		}
 		else if (m_omega >= m_maxOmega)
 		{
 			// engine rpm can not pass maximum allowed
 			dFloat32 stopAccel = (m_omega - m_maxOmega) * desc.m_invTimestep;
 			SetMotorAcceleration(desc, stopAccel);
-			SetHighFriction(desc, m_engineTorque);
+			SetLowerFriction(desc, -m_engineTorque);
 		}
 		else
 		{
