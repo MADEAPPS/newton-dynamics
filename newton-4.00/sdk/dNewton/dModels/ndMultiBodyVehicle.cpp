@@ -433,7 +433,7 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 
 	// calculate side slip ratio
 	const dFloat32 sideSpeed = dAbs(relVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
-	const dFloat32 lateralSleep = sideSpeed / (relSpeed + dFloat32 (0.1f));
+	const dFloat32 lateralSleep = sideSpeed / (relSpeed + dFloat32 (0.01f));
 
 	const dFloat32 den = dFloat32(1.0f) / (dFloat32(1.0f) + longitudialSlip);
 	const dFloat32 v = lateralSleep * den;
@@ -447,6 +447,7 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 	const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
 	const dFloat32 lateralFrictionCoefficient = frictionCoefficient * cz / gamma;
 	const dFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
+	//dTrace(("%f %f\n", sideSpeed, lateralFrictionCoefficient));
 
 	contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
 	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;

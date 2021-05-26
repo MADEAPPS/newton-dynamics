@@ -68,8 +68,8 @@ class nvVehicleDectriptor
 		m_regularizer = 0.1f;
 		m_minLimit = -0.05f;
 		m_maxLimit = 0.2f;
-		m_laterialStiffeness = 1.0f;
-		m_longitudinalStiffeness = 1.0f;
+		m_laterialStiffeness = 0.5f;
+		m_longitudinalStiffeness = 0.5f;
 
 		m_frictionCoefficientScale = 1.5f;
 
@@ -136,6 +136,8 @@ class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
 		m_suspensionRegularizer = 0.2f;
 		m_maxLimit = 0.4f;
 
+		m_laterialStiffeness = 1.0f/1000.0f;
+		m_longitudinalStiffeness = 50.0f/1000.0f;
 		m_frictionCoefficientScale = 1.3f;
 
 		m_differentialType = m_fourWheeldrive;
@@ -356,8 +358,6 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 				break;
 			}
 		}
-
-		
 
 		// add a motor
 		AddMotor(world, m_configuration.m_motor_mass, m_configuration.m_motor_radius, differential);
