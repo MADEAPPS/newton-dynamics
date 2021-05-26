@@ -926,6 +926,15 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 		dAssert(!body0->GetAsBodyTriggerVolume());
 		dAssert(!body0->GetCollisionShape().GetShape()->GetAsShapeNull());
 		dAssert(!body1->GetCollisionShape().GetShape()->GetAsShapeNull());
+
+		//if (body0->GetCollisionShape().GetShape()->GetAsShapeCompoundConvex() && body1->GetCollisionShape().GetShape()->GetAsShapeCompoundConvex())
+		//{
+		//	body0->GetCollisionShape().GetShape()->GetAsShapeCompoundConvex();
+		//}
+		//if (body0->GetCollisionShape().GetShape()->GetAsShapeCompoundConvex())
+		//{
+		//	body0->GetCollisionShape().GetShape()->GetAsShapeCompoundConvex();
+		//}
 			
 		ndContactPoint contactBuffer[D_MAX_CONTATCS];
 		ndContactSolver contactSolver(contact, this);

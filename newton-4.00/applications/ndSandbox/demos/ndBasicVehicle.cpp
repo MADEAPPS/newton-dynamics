@@ -757,8 +757,10 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
-	//matrix.m_posit.m_y += 5.0f;
-	//scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, viperDesc, matrix));
+	for (int i = 0; i < 10; i++) {
+		matrix.m_posit.m_y += 5.0f;
+		scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, viperDesc, matrix));
+	}
 
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
