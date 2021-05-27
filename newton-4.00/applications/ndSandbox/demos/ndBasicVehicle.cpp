@@ -658,7 +658,10 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			if (m_reverseGear.Update(scene->GetKeyState('R') || buttons[12]))
 			{
 				m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]);
-				m_gearBox->SetRatio(-40.0f);
+
+				//m_gearBox->SetRatio(-40.0f);
+				dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
+				m_gearBox->SetRatio(gearGain);
 			}
 
 			SetBrakeTorque(brake);
