@@ -26,7 +26,7 @@
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 
-ndJointVehicleMotorGearBox::ndJointVehicleMotorGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, const ndMultiBodyVehicle* const chassis)
+ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, const ndMultiBodyVehicle* const chassis)
 	:ndJointGear(dFloat32 (1.0f), motor->GetMatrix().m_front, differential,	motor->GetMatrix().m_front, motor)
 	,m_chassis(chassis)
 {
@@ -34,7 +34,7 @@ ndJointVehicleMotorGearBox::ndJointVehicleMotorGearBox(ndBodyKinematic* const mo
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
-void ndJointVehicleMotorGearBox::JacobianDerivative(ndConstraintDescritor& desc)
+void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	if (dAbs(m_gearRatio) > dFloat32(1.0e-1f))
 	{

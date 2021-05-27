@@ -429,7 +429,7 @@ dInt32 ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, dInt32 
 		for (dInt32 i = 0; i < buttonsCount; i ++) 
 		{
 			axisbuttons[i] = buttons[i];
-			//if (buttons[i]) dTrace(("%d %d\n", i, buttons[i]));
+			if (buttons[i]) dTrace(("%d %d\n", i, buttons[i]));
 		}
 	}
 	return buttonsCount;

@@ -124,7 +124,7 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	const dFloat32 accel = CalculateAcceleration(desc);
 	if (m_startEngine)
 	{
-		const ndJointVehicleMotorGearBox* const gearBox = m_vehicelModel->m_gearBox;
+		const ndMultiBodyVehicleGearBox* const gearBox = m_vehicelModel->m_gearBox;
 		if (gearBox && dAbs(gearBox->GetRatio()) > dFloat32(0.0f))
 		{
 			ndJacobian& jacobian = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;

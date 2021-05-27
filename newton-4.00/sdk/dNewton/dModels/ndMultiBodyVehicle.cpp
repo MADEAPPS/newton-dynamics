@@ -190,7 +190,7 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndWorld* con
 	return differential;
 }
 
-ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndMultiBodyVehicleDifferential* const differential)
+ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndWorld* const world, dFloat32 mass, dFloat32 radius)
 {
 	//dAssert(0);
 	ndBodyDynamic* const motorBody = CreateInternalBodyPart(world, mass, radius);
@@ -198,9 +198,20 @@ ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndWorld* const world, dFlo
 	m_motor = new ndMultiBodyVehicleMotor(motorBody, this);
 	world->AddJoint(m_motor);
 
-	m_gearBox = new ndJointVehicleMotorGearBox(motorBody, differential->GetBody0(), this);
-	world->AddJoint(m_gearBox);
 	return m_motor;
+}
+
+ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndWorld* const world, ndMultiBodyVehicleMotor* const motor, ndMultiBodyVehicleDifferential* const differential)
+{
+	dAssert(m_motor == motor);
+	m_gearBox = new ndMultiBodyVehicleGearBox(motor->GetBody0(), differential->GetBody0(), this);
+	world->AddJoint(m_gearBox);
+	return m_gearBox;
+}
+
+ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndWorld* const world)
+{
+	return nullptr;
 }
 
 ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 width) const

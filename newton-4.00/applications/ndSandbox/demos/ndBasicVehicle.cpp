@@ -33,6 +33,14 @@ class nvVehicleDectriptor
 		m_fourWheeldrive,
 	};
 
+	enum ndTorsionBarType
+	{
+		m_noWheelAxle,
+		m_rearWheelAxle,
+		m_frontWheelAxle,
+		m_fourWheelAxle,
+	};
+
 	nvVehicleDectriptor()
 	{
 		m_name[0] = 0;
@@ -57,11 +65,11 @@ class nvVehicleDectriptor
 		m_brakeTorque = 1500.0f;
 		m_handBrakeTorque = 1500.0f;
 
-		m_motor_mass = 20.0f;
-		m_motor_radius = 0.25f;
+		m_motorMass = 20.0f;
+		m_motorRadius = 0.25f;
 
-		m_differential_mass = 20.0f;
-		m_differential_radius = 0.25f;
+		m_differentialMass = 20.0f;
+		m_differentialRadius = 0.25f;
 
 		m_springK = 1000.0f;
 		m_damperC = 20.0f;
@@ -73,6 +81,9 @@ class nvVehicleDectriptor
 
 		m_frictionCoefficientScale = 1.5f;
 
+		m_torsionBarTorque = 0.0f;
+
+		m_torsionBarType = m_noWheelAxle;
 		m_differentialType = m_rearWheelDrive;
 	}
 
@@ -97,12 +108,15 @@ class nvVehicleDectriptor
 	dFloat32 m_brakeTorque;
 	dFloat32 m_handBrakeTorque;
 
-	dFloat32 m_motor_mass;
-	dFloat32 m_motor_radius;
+	dFloat32 m_motorMass;
+	dFloat32 m_motorRadius;
 
-	dFloat32 m_differential_mass;
-	dFloat32 m_differential_radius;
+	dFloat32 m_differentialMass;
+	dFloat32 m_differentialRadius;
+
+	dFloat32 m_torsionBarTorque;
 	
+	ndTorsionBarType m_torsionBarType;
 	ndDifferentialType m_differentialType;
 };
 
@@ -141,6 +155,9 @@ class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
 		m_frictionCoefficientScale = 1.3f;
 
 		m_differentialType = m_fourWheeldrive;
+
+		m_torsionBarType = m_fourWheelAxle;
+		m_torsionBarTorque = 1000.0f;
 	}
 };
 
@@ -341,26 +358,44 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		{
 			case nvVehicleDectriptor::m_rearWheelDrive:
 			{
-				differential = AddDifferential(world, m_configuration.m_differential_mass, m_configuration.m_differential_radius, rl_tire, rr_tire);
+				differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire, rr_tire);
 				break;
 			}
 
 			case nvVehicleDectriptor::m_frontWheelDrive:
 			{
-				differential = AddDifferential(world, m_configuration.m_differential_mass, m_configuration.m_differential_radius, fl_tire, fr_tire);				break;
+				differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire, fr_tire);				break;
 			}
 
 			case nvVehicleDectriptor::m_fourWheeldrive:
 			{
-				ndMultiBodyVehicleDifferential* const rearDifferential = AddDifferential(world, m_configuration.m_differential_mass, m_configuration.m_differential_radius, rl_tire, rr_tire);
-				ndMultiBodyVehicleDifferential* const frontDifferential = AddDifferential(world, m_configuration.m_differential_mass, m_configuration.m_differential_radius, fl_tire, fr_tire);
-				differential = AddDifferential(world, m_configuration.m_differential_mass, m_configuration.m_differential_radius, rearDifferential, frontDifferential);
+				ndMultiBodyVehicleDifferential* const rearDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire, rr_tire);
+				ndMultiBodyVehicleDifferential* const frontDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire, fr_tire);
+				differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential, frontDifferential);
 				break;
 			}
 		}
 
 		// add a motor
-		AddMotor(world, m_configuration.m_motor_mass, m_configuration.m_motor_radius, differential);
+		AddMotor(world, m_configuration.m_motorMass, m_configuration.m_motorRadius);
+
+		// add the gear box
+		AddGearBox(world, m_motor, differential);
+
+		switch (m_configuration.m_torsionBarType)
+		{
+			case nvVehicleDectriptor::m_noWheelAxle:
+			{
+				// no torsion bar
+				break;
+			}
+
+			case nvVehicleDectriptor::m_fourWheelAxle:
+			{
+				AddTorsionBar(world);
+				break;
+			}
+		}
 #endif
 	}
 
@@ -521,30 +556,40 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			}
 			throttle = dClamp(throttle, 0.0f, 0.3f);
 
-			dFloat32 handBrake = m_configuration.m_handBrakeTorque * dFloat32(scene->GetKeyState(' ') || buttons[0]);
+			dFloat32 handBrake = m_configuration.m_handBrakeTorque * dFloat32(scene->GetKeyState(' ') || buttons[4]);
 			//dTrace(("handBrake %f\n", handBrake));
 
-			if (m_ignition.Update(scene->GetKeyState('I') || buttons[5]))
+			if (m_ignition.Update(scene->GetKeyState('I') || buttons[7]))
 			{
 				m_motor->SetStart(!m_motor->GetStart());
 			}
 
-			if (m_automaticGear.Update(scene->GetKeyState('T') || buttons[1]))
+			// transmission front gear up
+			if (m_automaticGear.Update(scene->GetKeyState('T') || buttons[11]))
 			{
 				m_currentGear = 2;
 				m_gearBox->SetRatio(4.0f);
 			}
 
-			if (m_neutralGear.Update(scene->GetKeyState('N') || buttons[2]))
+			// transmission front gear down
+			if (m_automaticGear.Update(scene->GetKeyState('T') || buttons[13]))
+			{
+				m_currentGear = 2;
+				m_gearBox->SetRatio(4.0f);
+			}
+
+			// neural gear
+			if (m_neutralGear.Update(scene->GetKeyState('N') || buttons[10]))
 			{
 				m_currentGear = 0;
 				m_gearBox->SetRatio(0.0f);
 			}
 
-			if (m_reverseGear.Update(scene->GetKeyState('R') || buttons[3]))
+			// reverse gear
+			if (m_reverseGear.Update(scene->GetKeyState('R') || buttons[12]))
 			{
 				m_currentGear = 1;
-				m_gearBox->SetRatio(-10.0f);
+				m_gearBox->SetRatio(-40.0f);
 			}
 
 			SetBrakeTorque(brake);

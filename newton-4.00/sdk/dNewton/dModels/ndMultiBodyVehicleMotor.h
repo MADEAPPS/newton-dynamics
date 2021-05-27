@@ -60,7 +60,7 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 	ndMultiBodyVehicle* m_vehicelModel;
 	bool m_startEngine;
 	friend class ndMultiBodyVehicle;
-	friend class ndJointVehicleMotorGearBox;
+	friend class ndMultiBodyVehicleGearBox;
 };
 
 inline bool ndMultiBodyVehicleMotor::GetStart() const
