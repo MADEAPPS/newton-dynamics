@@ -26,6 +26,25 @@
 class nvVehicleDectriptor
 {
 	public:
+	class ndGearBox
+	{
+		public:
+		dInt32 m_gearsCount;
+		union
+		{
+			struct
+			{
+				dFloat32 m_fowardRatios[5];
+				dFloat32 m_reverseRatio;
+				dFloat32 m_neutral;
+			};
+			dFloat32 m_ratios[8];
+		};
+		dFloat32 m_crownGearRatio;
+		dFloat32 m_torqueConverter;
+		
+	};
+
 	enum ndDifferentialType
 	{
 		m_rearWheelDrive,
@@ -61,6 +80,16 @@ class nvVehicleDectriptor
 		m_suspensionRegularizer = 0.1f;
 		m_comDisplacement = dVector::m_zero;
 
+		m_transmission.m_gearsCount = 4;
+		m_transmission.m_neutral = 0.0f;
+		m_transmission.m_crownGearRatio = 10.0f;
+		m_transmission.m_reverseRatio = -3.0f;
+		m_transmission.m_fowardRatios[0] = 2.75f;
+		m_transmission.m_fowardRatios[1] = 1.75f;
+		m_transmission.m_fowardRatios[2] = 1.75f;
+		m_transmission.m_fowardRatios[3] = 1.75f;
+		m_transmission.m_torqueConverter = 1000.0f;
+
 		m_steeringAngle = 35.0f;
 		m_brakeTorque = 1500.0f;
 		m_handBrakeTorque = 1500.0f;
@@ -94,6 +123,8 @@ class nvVehicleDectriptor
 	dFloat32 m_rearTireMass;
 	dFloat32 m_frontTireMass;
 	dFloat32 m_suspensionRegularizer;
+
+	ndGearBox m_transmission;
 
 	dFloat32 m_steeringAngle;
 	dFloat32 m_springK;
@@ -294,7 +325,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		,m_ignition()
 		,m_neutralGear()
 		,m_reverseGear()
-		,m_automaticGear()
+		,m_automaticGearUp()
+		,m_automaticGearDown()
 		,m_currentGear(0)
 		,m_isPlayer(false)
 	{
@@ -337,6 +369,15 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndJointWheel* const rl_tire = AddTire(world, tireInfo, rl_tire_body);
 		ndJointWheel* const fr_tire = AddTire(world, tireInfo, fr_tire_body);
 		ndJointWheel* const fl_tire = AddTire(world, tireInfo, fl_tire_body);
+
+
+		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 0] = 1;
+		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1] = 0;
+		for (int i = 0; i < m_configuration.m_transmission.m_gearsCount; i++)
+		{
+			m_gearMap[i] = i + 2;
+		}
+		m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1;
 
 		// configure vehicle steering
 		SetAsSteering(fr_tire);
@@ -565,30 +606,58 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			}
 
 			// transmission front gear up
-			if (m_automaticGear.Update(scene->GetKeyState('T') || buttons[11]))
+			if (m_automaticGearUp.Update(scene->GetKeyState('T') || buttons[11]))
 			{
-				m_currentGear = 2;
-				m_gearBox->SetRatio(4.0f);
+				if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
+				{
+					m_currentGear = 0;
+				}
+				else
+				{
+					m_currentGear++;
+					if (m_currentGear >= m_configuration.m_transmission.m_gearsCount)
+					{
+						m_currentGear = m_configuration.m_transmission.m_gearsCount - 1;
+					}
+				}
+				//m_gearBox->SetRatio(4.0f);
+				dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
+				m_gearBox->SetRatio(gearGain);
 			}
 
 			// transmission front gear down
-			if (m_automaticGear.Update(scene->GetKeyState('T') || buttons[13]))
+			if (m_automaticGearDown.Update(scene->GetKeyState('T') || buttons[13]))
 			{
-				m_currentGear = 2;
-				m_gearBox->SetRatio(4.0f);
+				//m_currentGear = 2;
+				//m_gearBox->SetRatio(4.0f);
+				if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
+				{
+					m_currentGear = 0;
+				}
+				else
+				{
+					m_currentGear--;
+					if (m_currentGear <= 0)
+					{
+						m_currentGear = 0;
+					}
+				}
+				//m_gearBox->SetRatio(4.0f);
+				dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
+				m_gearBox->SetRatio(gearGain);
 			}
 
 			// neural gear
 			if (m_neutralGear.Update(scene->GetKeyState('N') || buttons[10]))
 			{
-				m_currentGear = 0;
+				m_currentGear = sizeof (m_configuration.m_transmission.m_fowardRatios) / sizeof (m_configuration.m_transmission.m_fowardRatios[0]) + 1;
 				m_gearBox->SetRatio(0.0f);
 			}
 
 			// reverse gear
 			if (m_reverseGear.Update(scene->GetKeyState('R') || buttons[12]))
 			{
-				m_currentGear = 1;
+				m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]);
 				m_gearBox->SetRatio(-40.0f);
 			}
 
@@ -750,7 +819,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			DrawGage(m_odometer, m_greenNeedle, dAbs(speed), x, y, gageSize, -180.0f, 90.0f);
 
 			// draw the current gear
-			DrawGear(m_currentGear, x, y + 98, gageSize);
+			DrawGear(m_gearMap[m_currentGear], x, y + 98, gageSize);
 		}
 	}
 
@@ -762,11 +831,13 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	GLuint m_redNeedle;
 	GLuint m_tachometer;
 	GLuint m_greenNeedle;
+	dInt32 m_gearMap[8];
 	
 	ndDemoEntityManager::ndKeyTrigger m_ignition;
 	ndDemoEntityManager::ndKeyTrigger m_neutralGear;
 	ndDemoEntityManager::ndKeyTrigger m_reverseGear;
-	ndDemoEntityManager::ndKeyTrigger m_automaticGear;
+	ndDemoEntityManager::ndKeyTrigger m_automaticGearUp;
+	ndDemoEntityManager::ndKeyTrigger m_automaticGearDown;
 	dInt32 m_currentGear;
 	bool m_isPlayer;
 };
