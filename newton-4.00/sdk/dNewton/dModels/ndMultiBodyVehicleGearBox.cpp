@@ -65,6 +65,9 @@ void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 		//const dFloat32 w = relOmega.AddHorizontal().GetScalar() * dFloat32(0.5f);
 		const dFloat32 w = (w0 + w1) * dFloat32(0.5f);
 		SetMotorAcceleration(desc, -w * desc.m_invTimestep);
+
+		SetHighFriction(desc, 1000.0f);
+		SetLowerFriction(desc, -1000.0f);
 	}
 }
 

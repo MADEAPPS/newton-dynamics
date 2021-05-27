@@ -590,12 +590,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 			static dInt32 xxxx;
 			xxxx++;
-			if (xxxx > 300)
-			{
-				//start = true;
-				//throttle = 0.25f;
-			}
-			throttle = dClamp(throttle, 0.0f, 0.3f);
+			throttle = dClamp(throttle, 0.0f, 0.7f);
 
 			dFloat32 handBrake = m_configuration.m_handBrakeTorque * dFloat32(scene->GetKeyState(' ') || buttons[4]);
 			//dTrace(("handBrake %f\n", handBrake));
