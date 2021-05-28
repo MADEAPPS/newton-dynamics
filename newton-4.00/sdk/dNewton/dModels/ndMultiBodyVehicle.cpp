@@ -106,7 +106,7 @@ void ndMultiBodyVehicle::SetSteeringAngle(dFloat32 angleInRadians)
 	m_steeringAngle = angleInRadians;
 }
 
-ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, const ndJointWheel::ndWheelDescriptor& desc, ndBodyDynamic* const tire)
+ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, const ndWheelDescriptor& desc, ndBodyDynamic* const tire)
 {
 	dMatrix tireFrame(dGetIdentityMatrix());
 	tireFrame.m_front = dVector(0.0f, 0.0f, 1.0f, 0.0f);
@@ -450,7 +450,7 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 	const dFloat32 v = lateralSleep * den;
 	const dFloat32 u = longitudialSlip * den;
 
-	const ndJointWheel::ndWheelDescriptor& info = tire->GetInfo();
+	const ndWheelDescriptor& info = tire->GetInfo();
 	const dFloat32 cz = info.m_laterialStiffeness * v;
 	const dFloat32 cx = info.m_longitudinalStiffeness * u;
 	const dFloat32 gamma = dSqrt(cx * cx + cz * cz) + dFloat32 (1.0e-3f);

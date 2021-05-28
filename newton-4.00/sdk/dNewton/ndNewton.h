@@ -74,6 +74,7 @@
 #include <ndMultiBodyVehicleGearBox.h>
 #include <ndJointDryRollingFriction.h>
 #include <ndJointKinematicController.h>
+#include <ndMultiBodyVehicleTorsionBar.h>
 #include <ndMultiBodyVehicleDifferential.h>
 #include <ndMultiBodyVehicleDifferentialAxle.h>
 

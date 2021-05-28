@@ -356,7 +356,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTireMass, "fr_tire");
 		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTireMass, "fl_tire");
 
-		ndJointWheel::ndWheelDescriptor tireInfo;
+		ndWheelDescriptor tireInfo;
 		tireInfo.m_springK = m_configuration.m_springK;
 		tireInfo.m_damperC = m_configuration.m_damperC;
 		tireInfo.m_regularizer = m_configuration.m_suspensionRegularizer;

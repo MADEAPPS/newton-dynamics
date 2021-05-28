@@ -27,6 +27,7 @@
 
 class ndWorld;
 class ndJointWheel;
+class ndWheelDescriptor;
 class ndMultiBodyVehicleMotor;
 class ndMultiBodyVehicleGearBox;
 class ndMultiBodyVehicleTorsionBar;
@@ -69,7 +70,7 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndShapeInstance CreateTireShape(dFloat32 radius, dFloat32 width) const;
 
 	D_NEWTON_API void AddChassis(ndBodyDynamic* const chassis, dFloat32 gravityMag);
-	D_NEWTON_API ndJointWheel* AddTire(ndWorld* const world, const ndJointWheel::ndWheelDescriptor& desc, ndBodyDynamic* const tire);
+	D_NEWTON_API ndJointWheel* AddTire(ndWorld* const world, const ndWheelDescriptor& desc, ndBodyDynamic* const tire);
 	D_NEWTON_API ndMultiBodyVehicleMotor* AddMotor(ndWorld* const world, dFloat32 mass, dFloat32 radius);
 	D_NEWTON_API ndMultiBodyVehicleGearBox* AddGearBox(ndWorld* const world, ndMultiBodyVehicleMotor* const motor, ndMultiBodyVehicleDifferential* const differential);
 	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndJointWheel* const leftTire, ndJointWheel* const rightTire);
@@ -114,6 +115,7 @@ class ndMultiBodyVehicle: public ndModel
 	
 	friend class ndMultiBodyVehicleMotor;
 	friend class ndMultiBodyVehicleGearBox;
+	friend class ndMultiBodyVehicleTorsionBar;
 };
 
 inline dFloat32 ndMultiBodyVehicle::GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const
