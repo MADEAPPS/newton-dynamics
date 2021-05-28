@@ -325,10 +325,12 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		,m_ignition()
 		,m_neutralGear()
 		,m_reverseGear()
-		,m_automaticGearUp()
-		,m_automaticGearDown()
+		,m_forwardGearUp()
+		,m_forwardGearDown()
+		,m_manualTransmission()
 		,m_currentGear(0)
 		,m_isPlayer(false)
+		,m_isManualTransmission(false)
 	{
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
@@ -369,7 +371,6 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndJointWheel* const rl_tire = AddTire(world, tireInfo, rl_tire_body);
 		ndJointWheel* const fr_tire = AddTire(world, tireInfo, fr_tire_body);
 		ndJointWheel* const fl_tire = AddTire(world, tireInfo, fl_tire_body);
-
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1] = 0;
@@ -600,8 +601,13 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 				m_motor->SetStart(!m_motor->GetStart());
 			}
 
+			if (m_manualTransmission.Update(scene->GetKeyState('?') || scene->GetKeyState('/') || buttons[6]))
+			{
+				m_isManualTransmission = !m_isManualTransmission;
+			}
+
 			// transmission front gear up
-			if (m_automaticGearUp.Update(scene->GetKeyState('>') || scene->GetKeyState('.') || buttons[11]))
+			if (m_forwardGearUp.Update(scene->GetKeyState('>') || scene->GetKeyState('.') || buttons[11]))
 			{
 				if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
 				{
@@ -615,16 +621,13 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 						m_currentGear = m_configuration.m_transmission.m_gearsCount - 1;
 					}
 				}
-				//m_gearBox->SetRatio(4.0f);
 				dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
 				m_gearBox->SetRatio(gearGain);
 			}
 
 			// transmission front gear down
-			if (m_automaticGearDown.Update(scene->GetKeyState('<') || scene->GetKeyState(',') || buttons[13]))
+			if (m_forwardGearDown.Update(scene->GetKeyState('<') || scene->GetKeyState(',') || buttons[13]))
 			{
-				//m_currentGear = 2;
-				//m_gearBox->SetRatio(4.0f);
 				if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
 				{
 					m_currentGear = 0;
@@ -637,9 +640,16 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 						m_currentGear = 0;
 					}
 				}
-				//m_gearBox->SetRatio(4.0f);
 				dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
 				m_gearBox->SetRatio(gearGain);
+			}
+
+			if (!m_isManualTransmission)
+			{
+				if (m_currentGear < m_configuration.m_transmission.m_gearsCount)
+				{
+					//dAssert(0);
+				}
 			}
 
 			// neural gear
@@ -778,11 +788,12 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		ImGui::Separator();
 		scene->Print(color, "gear box");
-		scene->Print(color, "ignition           : 'i'");
-		scene->Print(color, "neutral gear	   : 'n'");
-		scene->Print(color, "forward gear up    : '>'");
-		scene->Print(color, "forward gear down  : '<'");
-		scene->Print(color, "reverse gear	   : 'r'");
+		scene->Print(color, "ignition            : 'i'");
+		scene->Print(color, "manual transmission : '?'");
+		scene->Print(color, "neutral gear	    : 'n'");
+		scene->Print(color, "forward gear up     : '>'");
+		scene->Print(color, "forward gear down   : '<'");
+		scene->Print(color, "reverse gear	    : 'r'");
 	}
 
 	void RenderUI(ndDemoEntityManager* const scene)
@@ -829,10 +840,12 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	ndDemoEntityManager::ndKeyTrigger m_ignition;
 	ndDemoEntityManager::ndKeyTrigger m_neutralGear;
 	ndDemoEntityManager::ndKeyTrigger m_reverseGear;
-	ndDemoEntityManager::ndKeyTrigger m_automaticGearUp;
-	ndDemoEntityManager::ndKeyTrigger m_automaticGearDown;
+	ndDemoEntityManager::ndKeyTrigger m_forwardGearUp;
+	ndDemoEntityManager::ndKeyTrigger m_forwardGearDown;
+	ndDemoEntityManager::ndKeyTrigger m_manualTransmission;
 	dInt32 m_currentGear;
 	bool m_isPlayer;
+	bool m_isManualTransmission;
 };
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
