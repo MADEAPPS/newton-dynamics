@@ -29,6 +29,7 @@
 #include "ndMultiBodyVehicle.h"
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
+#include "ndMultiBodyVehicleTorsionBar.h"
 #include "ndMultiBodyVehicleDifferential.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
 
@@ -39,6 +40,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 	,m_motor(nullptr)
 	,m_tireShape(new ndShapeChamferCylinder(dFloat32(0.75f), dFloat32(0.5f)))
 	,m_gearBox(nullptr)
+	,m_torsionBar(nullptr)
 	,m_tireList()
 	,m_brakeTires()
 	,m_handBrakeTires()
@@ -211,7 +213,9 @@ ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndWorld* const world, 
 
 ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndWorld* const world)
 {
-	return nullptr;
+	m_torsionBar = new ndMultiBodyVehicleTorsionBar(this, world->GetSentinelBody());
+	world->AddJoint(m_torsionBar);
+	return m_torsionBar;
 }
 
 ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 width) const

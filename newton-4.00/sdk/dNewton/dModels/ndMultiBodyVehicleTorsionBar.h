@@ -31,12 +31,25 @@ class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 {
 	public: 
 	ND_JOINT_RELECTION(ndMultiBodyVehicleTorsionBar);
-	D_NEWTON_API ndMultiBodyVehicleTorsionBar(ndWorld* const world, const ndMultiBodyVehicle* const chassis);
+	D_NEWTON_API ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehicle* const chassis, ndBodyDynamic* const fixedbody);
+
+	D_NEWTON_API void AddAxel(const ndBodyDynamic* const leftTire, const ndBodyDynamic* const rightTire);
+	D_NEWTON_API void SetTorsionTorque(dFloat32 springK, dFloat32 damperC, dFloat32 springDamperRegularizer);
 
 	protected:
+	class ndAxles
+	{
+		public:
+		const ndBodyDynamic* m_leftTire;
+		const ndBodyDynamic* m_rightTire;
+	};
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
-	const ndMultiBodyVehicle* m_chassis;
+	ndAxles m_axles[2];
+	dFloat32 m_springK;
+	dFloat32 m_damperC;
+	dFloat32 m_springDamperRegularizer;
+	dInt32 m_axeldCount;
 };
 
 #endif

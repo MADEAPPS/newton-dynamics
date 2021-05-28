@@ -101,6 +101,7 @@ class ndMultiBodyVehicle: public ndModel
 	ndMultiBodyVehicleMotor* m_motor;
 	ndShapeChamferCylinder* m_tireShape;
 	ndMultiBodyVehicleGearBox* m_gearBox;
+	ndMultiBodyVehicleTorsionBar* m_torsionBar;
 	dList<ndJointWheel*> m_tireList;
 	dList<ndJointWheel*> m_brakeTires;
 	dList<ndJointWheel*> m_handBrakeTires;
