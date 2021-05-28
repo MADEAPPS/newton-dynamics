@@ -84,10 +84,10 @@ class nvVehicleDectriptor
 		m_transmission.m_neutral = 0.0f;
 		m_transmission.m_crownGearRatio = 10.0f;
 		m_transmission.m_reverseRatio = -3.0f;
-		m_transmission.m_fowardRatios[0] = 2.75f;
-		m_transmission.m_fowardRatios[1] = 1.75f;
-		m_transmission.m_fowardRatios[2] = 1.75f;
-		m_transmission.m_fowardRatios[3] = 1.75f;
+		m_transmission.m_fowardRatios[0] = 2.25f;
+		m_transmission.m_fowardRatios[1] = 1.60f;
+		m_transmission.m_fowardRatios[2] = 1.10f;
+		m_transmission.m_fowardRatios[3] = 0.80f;
 		m_transmission.m_torqueConverter = 1000.0f;
 
 		m_steeringAngle = 35.0f;

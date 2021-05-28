@@ -27,16 +27,16 @@
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 
-#define D_ENGINE_NOMINAL_TORQUE (dFloat32(900.0f))
-#define D_ENGINE_NOMINAL_RPM (dFloat32(9000.0f / 9.55f))
+#define D_ENGINE_NOMINAL_TORQUE			(dFloat32(600.0f))
+#define D_ENGINE_NOMINAL_RAD_PER_SEC	(dFloat32(7000.0f / 9.55f))
 
 ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel)
 	:ndJointBilateralConstraint(3, motor, vehicelModel->m_chassis, motor->GetMatrix())
 	,m_omega(dFloat32(0.0f))
-	,m_maxOmega(D_ENGINE_NOMINAL_RPM)
-	,m_idleOmega(D_ENGINE_NOMINAL_RPM * dFloat32(0.1f))
+	,m_maxOmega(D_ENGINE_NOMINAL_RAD_PER_SEC)
+	,m_idleOmega(D_ENGINE_NOMINAL_RAD_PER_SEC * dFloat32(0.1f))
 	,m_throttle(dFloat32(0.0f))
-	,m_gasValve(D_ENGINE_NOMINAL_RPM * dFloat32(0.02f))
+	,m_gasValve(D_ENGINE_NOMINAL_RAD_PER_SEC * dFloat32(0.02f))
 	,m_engineTorque(D_ENGINE_NOMINAL_TORQUE)
 	,m_vehicelModel(vehicelModel)
 	,m_startEngine(false)

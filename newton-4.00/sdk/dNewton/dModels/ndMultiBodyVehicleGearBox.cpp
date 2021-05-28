@@ -36,7 +36,7 @@ ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const moto
 
 void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	if (dAbs(m_gearRatio) > dFloat32(1.0e-1f))
+	if (dAbs(m_gearRatio) > dFloat32(1.0e-2f))
 	{
 		dMatrix matrix0;
 		dMatrix matrix1;
@@ -48,26 +48,27 @@ void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 		
 		ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
 		ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
+
+		dFloat32 gearRatio = dFloat32(1.0f) / m_gearRatio;
 		
-		jacobian0.m_angular = matrix0.m_front.Scale(m_gearRatio);
-		jacobian1.m_angular = matrix1.m_front;
+		jacobian0.m_angular = matrix0.m_front;
+		jacobian1.m_angular = matrix1.m_front.Scale(gearRatio);
 		
 		const dVector& omega0 = m_body0->GetOmega();
 		const dVector& omega1 = m_body1->GetOmega();
 		
 		ndMultiBodyVehicleMotor* const rotor = m_chassis->m_motor;
 		
-		dFloat32 idleOmega = rotor->m_idleOmega * dFloat32(0.9f);
+		dFloat32 idleOmega = rotor->m_idleOmega * gearRatio * dFloat32(0.9f);
 		dFloat32 w0 = omega0.DotProduct(jacobian0.m_angular).GetScalar();
-		dFloat32 w1 = dMin(omega1.DotProduct(jacobian1.m_angular).GetScalar() + idleOmega, dFloat32(0.0f));
+		dFloat32 w1 = omega1.DotProduct(jacobian1.m_angular).GetScalar() + idleOmega;
+		w1 = (gearRatio > dFloat32(0.0f)) ? dMin(w1, dFloat32(0.0f)) : dMax(w1, dFloat32(0.0f));
 		
-		//const dVector relOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-		//const dFloat32 w = relOmega.AddHorizontal().GetScalar() * dFloat32(0.5f);
 		const dFloat32 w = (w0 + w1) * dFloat32(0.5f);
 		SetMotorAcceleration(desc, -w * desc.m_invTimestep);
 
-		SetHighFriction(desc, 1000.0f);
-		SetLowerFriction(desc, -1000.0f);
+		//SetHighFriction(desc, 1000.0f);
+		//SetLowerFriction(desc, -1000.0f);
 	}
 }
 
