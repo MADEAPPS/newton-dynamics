@@ -23,6 +23,8 @@
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"
 
+#define AUTOMATION_TRANSMISSION_FRAME_DELAY 120
+
 class nvVehicleDectriptor
 {
 	public:
@@ -329,6 +331,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		,m_forwardGearDown()
 		,m_manualTransmission()
 		,m_currentGear(0)
+		,m_autoGearShiftTimer(0)
 		,m_isPlayer(false)
 		,m_isManualTransmission(false)
 	{
@@ -623,6 +626,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 				}
 				dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
 				m_gearBox->SetRatio(gearGain);
+				m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 			}
 
 			// transmission front gear down
@@ -642,15 +646,37 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 				}
 				dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
 				m_gearBox->SetRatio(gearGain);
+				m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 			}
 
-			if (!m_isManualTransmission)
+			if (!m_isManualTransmission && (m_autoGearShiftTimer < 0))
 			{
 				if (m_currentGear < m_configuration.m_transmission.m_gearsCount)
 				{
-					//dAssert(0);
+					dFloat32 rpm = m_motor->GetRpm() / m_motor->GetMaxRpm();
+					if (rpm < 0.25f)
+					{
+						if (m_currentGear > 0)
+						{
+							m_currentGear--;
+							dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
+							m_gearBox->SetRatio(gearGain);
+							m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
+						}
+					}
+					else if (rpm > 0.55f)
+					{
+						if (m_currentGear < (m_configuration.m_transmission.m_gearsCount - 1))
+						{
+							m_currentGear++;
+							dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
+							m_gearBox->SetRatio(gearGain);
+							m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
+						}
+					}
 				}
 			}
+			m_autoGearShiftTimer--;
 
 			// neural gear
 			if (m_neutralGear.Update(scene->GetKeyState('N') || buttons[10]))
@@ -809,10 +835,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 			// draw the tachometer
 			dFloat32 x = gageSize / 2 + 20.0f;
-			//dFloat32 rpm = engine ? engine->GetRpm() / engine->GetRedLineRpm() : 0.0f;
-			//dFloat32 rpm = motor->GetSpeed() * 9.55f / 6000.0f;
 			dFloat32 rpm = motor->GetRpm() / motor->GetMaxRpm();
-			//dTrace(("%f %f\n", motor->GetSpeed(), rpm));
 
 			DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 90.0f);
 
@@ -844,6 +867,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	ndDemoEntityManager::ndKeyTrigger m_forwardGearDown;
 	ndDemoEntityManager::ndKeyTrigger m_manualTransmission;
 	dInt32 m_currentGear;
+	dInt32 m_autoGearShiftTimer;
 	bool m_isPlayer;
 	bool m_isManualTransmission;
 };
