@@ -601,7 +601,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			}
 
 			// transmission front gear up
-			if (m_automaticGearUp.Update(scene->GetKeyState('T') || buttons[11]))
+			if (m_automaticGearUp.Update(scene->GetKeyState('>') || scene->GetKeyState('.') || buttons[11]))
 			{
 				if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
 				{
@@ -621,7 +621,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			}
 
 			// transmission front gear down
-			if (m_automaticGearDown.Update(scene->GetKeyState('T') || buttons[13]))
+			if (m_automaticGearDown.Update(scene->GetKeyState('<') || scene->GetKeyState(',') || buttons[13]))
 			{
 				//m_currentGear = 2;
 				//m_gearBox->SetRatio(4.0f);
@@ -780,14 +780,9 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		scene->Print(color, "gear box");
 		scene->Print(color, "ignition           : 'i'");
 		scene->Print(color, "neutral gear	   : 'n'");
-		scene->Print(color, "forward gear	   : 't'");
+		scene->Print(color, "forward gear up    : '>'");
+		scene->Print(color, "forward gear down  : '<'");
 		scene->Print(color, "reverse gear	   : 'r'");
-		//ImGui::RadioButton("free", &m_differentialMode, 1);
-		//ImGui::RadioButton("rwd", &m_differentialMode, 2);
-		//ImGui::RadioButton("fwd", &m_differentialMode, 3);
-		
-		ImGui::Separator();
-		scene->Print(color, "hide help          : 'r'");
 	}
 
 	void RenderUI(ndDemoEntityManager* const scene)
