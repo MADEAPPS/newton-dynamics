@@ -80,6 +80,10 @@ class nvVehicleDectriptor
 		m_rearTireMass = 20.0f;
 		m_frontTireMass = 20.0f;
 		m_suspensionRegularizer = 0.1f;
+
+		m_rearTireVerticalOffset = 0.0f;
+		m_frontTireVerticalOffset = 0.0f;
+
 		m_comDisplacement = dVector::m_zero;
 
 		m_transmission.m_gearsCount = 4;
@@ -126,6 +130,9 @@ class nvVehicleDectriptor
 	dFloat32 m_frontTireMass;
 	dFloat32 m_suspensionRegularizer;
 
+	dFloat32 m_rearTireVerticalOffset;
+	dFloat32 m_frontTireVerticalOffset;
+
 	ndGearBox m_transmission;
 
 	dFloat32 m_steeringAngle;
@@ -159,8 +166,39 @@ class nvVehicleDectriptorViper : public nvVehicleDectriptor
 	nvVehicleDectriptorViper()
 		:nvVehicleDectriptor("viper1.fbx")
 	{
-		//static nvVehicleDectriptor sportViper("viper1.fbx", 20.0f, 20.0f, 0.025f, dVector(0.25f, -0.35f, 0.0f, 0.0f));
 		m_comDisplacement = dVector(0.25f, -0.35f, 0.0f, 0.0f);
+	}
+};
+
+class nvVehicleDectriptorJeep : public nvVehicleDectriptor
+{
+	public:
+	nvVehicleDectriptorJeep()
+		:nvVehicleDectriptor("jeep.fbx")
+	{
+		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
+		m_rearTireMass = 100.0f;
+		m_frontTireMass = 100.0f;
+
+		m_rearTireVerticalOffset = -0.15f;
+		m_frontTireVerticalOffset = -0.15f;
+
+		m_brakeTorque = 5000.0f;
+		m_handBrakeTorque = 5000.0f;
+
+		m_springK = 500.0f;
+		m_damperC = 50.0f;
+		m_suspensionRegularizer = 0.2f;
+		m_maxLimit = 0.4f;
+
+		m_laterialStiffeness = 1.0f / 1000.0f;
+		m_longitudinalStiffeness = 50.0f / 1000.0f;
+		m_frictionCoefficientScale = 1.3f;
+
+		m_differentialType = m_fourWheeldrive;
+
+		m_torsionBarType = m_fourWheelAxle;
+		m_torsionBarTorque = 1000.0f;
 	}
 };
 
@@ -170,7 +208,6 @@ class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
 	nvVehicleDectriptorMonsterTruck()
 		:nvVehicleDectriptor("monsterTruck.fbx")
 	{
-		//"monsterTruck.fbx", 100.0f, 100.0f, 0.1f, dVector(0.0f, -0.55f, 0.0f, 0.0f));
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
 		m_rearTireMass = 100.0f;
 		m_frontTireMass = 100.0f;
@@ -194,6 +231,7 @@ class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
 	}
 };
 
+static nvVehicleDectriptorJeep jeep;
 static nvVehicleDectriptorViper viperDesc;
 static nvVehicleDectriptorMonsterTruck monterTruckDesc;
 
@@ -257,10 +295,10 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		// 2- each tire to the model, 
 		// this function will create the tire as a normal rigid body
 		// and attach them to the chassis with the tire joints
-		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTireMass, "rr_tire");
-		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTireMass, "rl_tire");
-		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTireMass, "fr_tire");
-		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTireMass, "fl_tire");
+		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTireMass, m_configuration.m_rearTireVerticalOffset, "rr_tire");
+		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTireMass, m_configuration.m_rearTireVerticalOffset, "rl_tire");
+		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTireMass, m_configuration.m_frontTireVerticalOffset, "fr_tire");
+		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTireMass, m_configuration.m_frontTireVerticalOffset, "fl_tire");
 
 		ndWheelDescriptor tireInfo;
 		tireInfo.m_springK = m_configuration.m_springK;
@@ -442,9 +480,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		radius = size.m_y * 0.5f;
 	}
 
-	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, dFloat32 mass, const char* const tireName)
+	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, dFloat32 mass, dFloat32 veticalOffset, const char* const tireName)
 	{
-		//rr_tire
 		dFloat32 width;
 		dFloat32 radius;
 		ndWorld* const world = scene->GetWorld();
@@ -455,6 +492,9 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		ndDemoEntity* const tireEntity = chassisEntity->Find(tireName);
 		dMatrix matrix(tireEntity->CalculateGlobalMatrix(nullptr));
+
+		const dMatrix chassisMatrix(m_localFrame * m_chassis->GetMatrix());
+		matrix.m_posit += chassisMatrix.m_up.Scale (veticalOffset);
 
 		ndBodyDynamic* const tireBody = new ndBodyDynamic();
 		tireBody->SetNotifyCallback(new ndTireNotifyNotify(scene, tireEntity, chassis));
@@ -932,7 +972,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 
 	matrix.m_posit.m_x += 8.0f;
 	matrix.m_posit.m_z += 2.0f;
-	scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix));
+	scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, jeep, matrix));
 	//for (int i = 0; i < 0; i++) 
 	//{
 	//	matrix.m_posit.m_y += 5.0f;
