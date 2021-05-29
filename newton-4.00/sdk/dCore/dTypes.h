@@ -316,6 +316,10 @@ class dBigVector;
 //		#define dCheckFloat(x) 1
 #endif
 
+#define ND_CLASS_RELECTION(Class)	\
+	virtual const char* GetClassName() const {return #Class;} 
+
+
 //typedef void (*dDeserialize) (void* const userData, void* buffer, dInt32 size);
 //typedef void (*dSerialize) (void* const userData, const void* const buffer, dInt32 size);
 //typedef bool (*dReportProgress) (dFloat32 progressNormalzedPercent, void* const userData);

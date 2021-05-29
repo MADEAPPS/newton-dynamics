@@ -32,7 +32,7 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 		m_linearPlusAngularFriction, // this is pick mode from screen
 	};
 
-	ND_JOINT_RELECTION(ndJointKinematicController);
+	ND_CLASS_RELECTION(ndJointKinematicController);
 	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const dVector& attachmentPointInGlobalSpace);
 	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const dMatrix& attachmentMatrixInGlobalSpace);
 	D_NEWTON_API virtual ~ndJointKinematicController();

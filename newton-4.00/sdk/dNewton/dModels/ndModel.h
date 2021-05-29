@@ -36,8 +36,9 @@ class ndModel: public dClassAlloc
 	D_NEWTON_API ndModel(const nd::TiXmlNode* const xmlNode);
 	virtual ~ndModel ();
 
-	ndModel* GetAsModel();
-	ndMultiBodyVehicle* GetAsMultiBodyVehicle();
+	ND_CLASS_RELECTION(ndModel);
+	virtual ndModel* GetAsModel();
+	virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 

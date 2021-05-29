@@ -30,7 +30,7 @@ class ndMultiBodyVehicle;
 class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 {
 	public: 
-	ND_JOINT_RELECTION(ndMultiBodyVehicleTorsionBar);
+	ND_CLASS_RELECTION(ndMultiBodyVehicleTorsionBar);
 	D_NEWTON_API ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehicle* const chassis, ndBodyDynamic* const fixedbody);
 
 	D_NEWTON_API void AddAxel(const ndBodyDynamic* const leftTire, const ndBodyDynamic* const rightTire);

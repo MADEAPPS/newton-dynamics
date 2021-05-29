@@ -30,7 +30,7 @@
 class ndMultiBodyVehicleDifferential : public ndJointBilateralConstraint
 {
 	public:
-	ND_JOINT_RELECTION(ndMultiBodyVehicleDifferential);
+	ND_CLASS_RELECTION(ndMultiBodyVehicleDifferential);
 	D_NEWTON_API ndMultiBodyVehicleDifferential(ndBodyKinematic* const differential, ndBodyKinematic* const chassis);
 
 	protected:

@@ -543,30 +543,6 @@ dFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(dFloat32 speed) con
 
 void ndMultiBodyVehicle::Update(ndWorld* const, dFloat32)
 {
-//dMatrix matrix(m_localFrame * m_chassis->GetMatrix());
-//dVector torque1(dVector::m_zero);
-//const ndJointList& jointList = m_chassis->GetJointList();
-//for (ndJointList::dListNode* node = jointList.GetFirst(); node; node = node->GetNext())
-//{
-//	ndJointBilateralConstraint * const joint = node->GetInfo();
-//	torque1 += joint->GetTorqueBody1();
-//}
-//
-//dTrace(("\n"));
-//dTrace(("longitudinal force: "));
-//for (dList<ndJointWheel*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
-//{
-//	ndJointWheel* const tire = node->GetInfo();
-//	dVector force(tire->GetForceBody1());
-//	dVector lateralForce(matrix.UnrotateVector(force));
-//	//dTrace(("(%f %f %f) ", force.m_x, force.m_y, force.m_z));
-//	dTrace(("%f ", lateralForce.m_x));
-//}
-//
-//dTrace(("\n"));
-//torque = matrix.UnrotateVector(torque);
-//dTrace(("torque %f %f %f\n", torque.m_x, torque.m_y, torque.m_z));
-
 	// apply down force
 	dFloat32 downForceFactor = m_downForce.GetDownforceFactor(GetSpeed());
 	if (downForceFactor > dFloat32(0.0f))

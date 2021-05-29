@@ -19,7 +19,7 @@
 class ndJointFollowPath: public ndJointBilateralConstraint
 {
 	public:
-	ND_JOINT_RELECTION(ndJointFollowPath);
+	ND_CLASS_RELECTION(ndJointFollowPath);
 	D_NEWTON_API ndJointFollowPath (const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointFollowPath();
 

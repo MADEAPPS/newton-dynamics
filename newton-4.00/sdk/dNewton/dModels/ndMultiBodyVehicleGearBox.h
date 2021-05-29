@@ -30,7 +30,7 @@ class ndMultiBodyVehicle;
 class ndMultiBodyVehicleGearBox : public ndJointGear
 {
 	public: 
-	ND_JOINT_RELECTION(ndMultiBodyVehicleGearBox);
+	ND_CLASS_RELECTION(ndMultiBodyVehicleGearBox);
 	D_NEWTON_API ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, const ndMultiBodyVehicle* const chassis);
 
 	protected:

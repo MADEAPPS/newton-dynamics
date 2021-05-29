@@ -197,105 +197,6 @@ class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
 static nvVehicleDectriptorViper viperDesc;
 static nvVehicleDectriptorMonsterTruck monterTruckDesc;
 
-static void AddShape(ndDemoEntityManager* const scene,
-	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
-	dFloat32 mass, const dVector& origin, const dFloat32 diameter, dInt32 count)
-{
-	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
-	ndPhysicsWorld* const world = scene->GetWorld();
-
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f + 7.0f;
-
-	for (dInt32 i = 0; i < count; i++)
-	{
-		ndBodyDynamic* const body = new ndBodyDynamic();
-		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
-
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-		body->SetMatrix(matrix);
-		body->SetCollisionShape(sphereShape);
-		body->SetMassMatrix(mass, sphereShape);
-		body->SetAngularDamping(dVector(dFloat32(0.5f)));
-
-		world->AddBody(body);
-		matrix.m_posit.m_y += diameter * 2.5f;
-	}
-}
-
-static void AddSomeObstacles(ndDemoEntityManager* const scene, const dVector& origin)
-//static void AddSomeObstacles(ndDemoEntityManager* const, const dVector&)
-{
-	dFloat32 diameter = 0.5f;
-	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
-	ndDemoMeshIntance* const instanceMesh = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
-
-	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
-	scene->AddEntity(rootEntity);
-
-	const dInt32 n = 4;
-	const dInt32 stackHigh = 2;
-	for (dInt32 i = 0; i < n; i++)
-	{
-		for (dInt32 j = 0; j < n; j++)
-		{
-			dVector location((j - n / 2) * 4.0f, 0.0f, (i - n / 2) * 4.0f, 0.0f);
-			AddShape(scene, rootEntity, shape, 10.0f, location + origin, diameter, stackHigh);
-		}
-	}
-
-	instanceMesh->Release();
-}
-
-static void PlaceRampRamp(ndDemoEntityManager* const scene, 
-	const dMatrix& location, ndDemoMesh* const geometry, ndShapeInstance& ramp)
-{
-	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	scene->AddEntity(entity);
-	entity->SetMesh(geometry, dGetIdentityMatrix());
-
-	ndBodyDynamic* const body = new ndBodyDynamic();
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(location);
-	body->SetCollisionShape(ramp);
-	scene->GetWorld()->AddBody(body);
-}
-
-static void AddRamps(ndDemoEntityManager* const scene, const dVector& origin)
-{
-	ndShapeInstance box(new ndShapeBox(5.0f, 0.125f, 6.f));
-	dMatrix uvMatrix(dGetIdentityMatrix());
-	uvMatrix[0][0] *= 0.25f;
-	uvMatrix[1][1] *= 0.25f;
-	uvMatrix[2][2] *= 0.25f;
-	uvMatrix.m_posit = dVector(-0.5f, -0.5f, 0.0f, 1.0f);
-	const char* const textureName = "wood_3.tga";
-	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, textureName, textureName, textureName, 1.0f, uvMatrix);
-
-	dMatrix matrix(dRollMatrix(20.0f * dDegreeToRad));
-	matrix.m_posit = origin;
-	PlaceRampRamp(scene, matrix, geometry, box);
-
-	matrix = dGetIdentityMatrix();
-	matrix.m_posit = origin;
-	matrix.m_posit.m_x += 4.8f;
-	matrix.m_posit.m_y += 0.85f;
-	PlaceRampRamp(scene, matrix, geometry, box);
-
-	matrix.m_posit.m_x += 5.0f;
-	PlaceRampRamp(scene, matrix, geometry, box);
-
-	matrix = matrix * dRollMatrix(-20.0f * dDegreeToRad);
-	matrix.m_posit.m_x += 5.0f;
-	matrix.m_posit.m_y = origin.m_y;
-	PlaceRampRamp(scene, matrix, geometry, box);
-
-	geometry->Release();
-}
-
 class ndTireNotifyNotify : public ndDemoEntityNotify
 {
 	public:
@@ -352,7 +253,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		// 1- add chassis to the vehicle mode 
 		AddChassis(chassis, DEMO_GRAVITY);
-#if 1 
+
 		// 2- each tire to the model, 
 		// this function will create the tire as a normal rigid body
 		// and attach them to the chassis with the tire joints
@@ -441,7 +342,6 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 				break;
 			}
 		}
-#endif
 	}
 
 	~ndBasicMultiBodyVehicle()
@@ -452,6 +352,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ReleaseTexture(m_tachometer);
 		ReleaseTexture(m_greenNeedle);
 	}
+
+	ND_CLASS_RELECTION(ndBasicMultiBodyVehicle);
 
 	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename)
 	{
@@ -469,10 +371,16 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		return vehicleEntity;
 	}
 
-	void SetAsPlayer(ndDemoEntityManager* const scene)
+	void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true)
 	{
-		m_isPlayer = true;
+		m_isPlayer = mode;
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
+		scene->Set2DDisplayRenderFunction(RenderHelp, RenderUI, this);
+	}
+
+	bool IsPlayer() const
+	{
+		return m_isPlayer;
 	}
 
 	static void RenderUI(ndDemoEntityManager* const scene, void* const context)
@@ -562,9 +470,10 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	{
 		if (m_isPlayer && m_motor)
 		{
-			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 			dFloat32 axis[32];
 			char buttons[32];
+			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+
 			scene->GetJoystickAxis(axis);
 			scene->GetJoystickButtons(buttons);
 
@@ -806,6 +715,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	{
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Vehicle driving keyboard control");
+		scene->Print(color, "change vehicle     : 'c'");
 		scene->Print(color, "accelerator        : 'w'");
 		scene->Print(color, "brakes             : 's'");
 		scene->Print(color, "turn left          : 'a'");
@@ -866,11 +776,124 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	ndDemoEntityManager::ndKeyTrigger m_forwardGearUp;
 	ndDemoEntityManager::ndKeyTrigger m_forwardGearDown;
 	ndDemoEntityManager::ndKeyTrigger m_manualTransmission;
+	
 	dInt32 m_currentGear;
 	dInt32 m_autoGearShiftTimer;
 	bool m_isPlayer;
 	bool m_isManualTransmission;
 };
+
+class ndGlobalControl : public ndModel
+{
+	public:
+	ndGlobalControl()
+		:ndModel()
+		,m_changeVehicle()
+	{
+	}
+
+	void Update(ndWorld* const, dFloat32)
+	{
+	}
+
+	void PostUpdate(ndWorld* const world, dFloat32)
+	{
+		char buttons[32];
+		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+		scene->GetJoystickButtons(buttons);
+		if (m_changeVehicle.Update(scene->GetKeyState('C') || buttons[5]))
+		{
+			const ndModelList& modelList = world->GetModelList();
+
+			dInt32 vehiclesCount = 0;
+			ndBasicMultiBodyVehicle* vehicleArray[1024];
+			for (ndModelList::dListNode* node = modelList.GetFirst(); node; node = node->GetNext())
+			{
+				ndModel* const model = node->GetInfo();
+				if (!strcmp(model->GetClassName(), "ndBasicMultiBodyVehicle"))
+				{
+					vehicleArray[vehiclesCount] = (ndBasicMultiBodyVehicle*)model->GetAsMultiBodyVehicle();
+					vehiclesCount++;
+				}
+			}
+
+			if (vehiclesCount > 1)
+			{
+				for (dInt32 i = 0; i < vehiclesCount; i++)
+				{
+					if (vehicleArray[i]->IsPlayer())
+					{
+						ndBasicMultiBodyVehicle* const nexVehicle = vehicleArray[(i + 1) % vehiclesCount];
+						vehicleArray[i]->SetAsPlayer(scene, false);
+						nexVehicle->SetAsPlayer(scene, true);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
+};
+
+
+//static void PlaceRampRamp(ndDemoEntityManager* const scene,
+//	const dMatrix& location, ndDemoMesh* const geometry, ndShapeInstance& ramp)
+//{
+//	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
+//	scene->AddEntity(entity);
+//	entity->SetMesh(geometry, dGetIdentityMatrix());
+//
+//	ndBodyDynamic* const body = new ndBodyDynamic();
+//	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+//	body->SetMatrix(location);
+//	body->SetCollisionShape(ramp);
+//	scene->GetWorld()->AddBody(body);
+//}
+//
+//static void AddRamps(ndDemoEntityManager* const scene, const dVector& origin)
+//{
+//	ndShapeInstance box(new ndShapeBox(5.0f, 0.125f, 6.f));
+//	dMatrix uvMatrix(dGetIdentityMatrix());
+//	uvMatrix[0][0] *= 0.25f;
+//	uvMatrix[1][1] *= 0.25f;
+//	uvMatrix[2][2] *= 0.25f;
+//	uvMatrix.m_posit = dVector(-0.5f, -0.5f, 0.0f, 1.0f);
+//	const char* const textureName = "wood_3.tga";
+//	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, textureName, textureName, textureName, 1.0f, uvMatrix);
+//
+//	dMatrix matrix(dRollMatrix(20.0f * dDegreeToRad));
+//	matrix.m_posit = origin;
+//	PlaceRampRamp(scene, matrix, geometry, box);
+//
+//	matrix = dGetIdentityMatrix();
+//	matrix.m_posit = origin;
+//	matrix.m_posit.m_x += 4.8f;
+//	matrix.m_posit.m_y += 0.85f;
+//	PlaceRampRamp(scene, matrix, geometry, box);
+//
+//	matrix.m_posit.m_x += 5.0f;
+//	PlaceRampRamp(scene, matrix, geometry, box);
+//
+//	matrix = matrix * dRollMatrix(-20.0f * dDegreeToRad);
+//	matrix.m_posit.m_x += 5.0f;
+//	matrix.m_posit.m_y = origin.m_y;
+//	PlaceRampRamp(scene, matrix, geometry, box);
+//
+//	geometry->Release();
+//}
+
+static void AddPlanks(ndDemoEntityManager* const scene, const dVector& origin)
+{
+	for (dInt32 i = 0; i < 5; i++)
+	{
+		for (dInt32 j = 0; j < 5; j++)
+		{
+			dVector posit(origin + dVector((i - 2)* 5.0f, 0.0f, (j - 2) * 5.0f, 0.0f));
+			AddBox(scene, posit, 40.0f, 4.0f, 0.25f, 3.0f);
+		}
+	}
+}
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
@@ -898,23 +921,31 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = location;
 
+	// add a model for general controls
+	ndGlobalControl* const controls = new ndGlobalControl();
+	scene->GetWorld()->AddModel(controls);
+
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, viperDesc, matrix);
 	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
-	for (int i = 0; i < 0; i++) 
-	{
-		matrix.m_posit.m_y += 5.0f;
-		scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, viperDesc, matrix));
-	}
+	matrix.m_posit.m_x += 8.0f;
+	matrix.m_posit.m_z += 2.0f;
+	scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix));
+	//for (int i = 0; i < 0; i++) 
+	//{
+	//	matrix.m_posit.m_y += 5.0f;
+	//	scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, viperDesc, matrix));
+	//}
 
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
 	//location.m_z = 4.0f;
 	//location.m_y = 0.5f; 
 	//AddRamps(scene, location);
-	//AddSomeObstacles(scene, location);
+	matrix.m_posit.m_x += 10.0f;
+	AddPlanks(scene, matrix.m_posit);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);

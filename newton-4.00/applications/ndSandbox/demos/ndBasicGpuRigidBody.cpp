@@ -39,34 +39,34 @@
 //	//}
 //};
 
-static void AddShape(ndDemoEntityManager* const scene, const dMatrix& location,
-	ndDemoInstanceEntity* const rootEntity,
-	const ndShapeInstance& shape, dFloat32 mass, dFloat32 density)
-{
-	dMatrix matrix(location);
-	ndPhysicsWorld* const world = scene->GetWorld();
-
-	ndBodyDynamic* const body = new ndBodyDynamic();
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
-
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, shape);
-
-	const dVector omega(dGaussianRandom(2.0f), dGaussianRandom(4.0f), dGaussianRandom(3.0f), 0.0f);
-	body->SetOmega(omega);
-
-	ndBodyNotify* const notification = body->GetNotifyCallback();
-	notification->SetGravity(dVector::m_zero);
-
-	// save the density with the body shape.
-	ndShapeMaterial material;
-	material.m_userParam[0].m_floatData = density;
-	body->GetCollisionShape().SetMaterial(material);
-
-	world->AddBody(body);
-}
+//static void AddShape(ndDemoEntityManager* const scene, const dMatrix& location,
+//	ndDemoInstanceEntity* const rootEntity,
+//	const ndShapeInstance& shape, dFloat32 mass, dFloat32 density)
+//{
+//	dMatrix matrix(location);
+//	ndPhysicsWorld* const world = scene->GetWorld();
+//
+//	ndBodyDynamic* const body = new ndBodyDynamic();
+//	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
+//
+//	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+//	body->SetMatrix(matrix);
+//	body->SetCollisionShape(shape);
+//	body->SetMassMatrix(mass, shape);
+//
+//	const dVector omega(dGaussianRandom(2.0f), dGaussianRandom(4.0f), dGaussianRandom(3.0f), 0.0f);
+//	body->SetOmega(omega);
+//
+//	ndBodyNotify* const notification = body->GetNotifyCallback();
+//	notification->SetGravity(dVector::m_zero);
+//
+//	// save the density with the body shape.
+//	ndShapeMaterial material;
+//	material.m_userParam[0].m_floatData = density;
+//	body->GetCollisionShape().SetMaterial(material);
+//
+//	world->AddBody(body);
+//}
 
 //static void AddSphere(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 density)
 //{
@@ -113,47 +113,48 @@ static void AddShape(ndDemoEntityManager* const scene, const dMatrix& location,
 //	AddShape(scene, matrix, shape, 10.0f, density);
 //}
 
-static void AddBox(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 density)
-{
-	ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.7f));
-	dMatrix matrix(dPitchMatrix(10.0f*dDegreeToRad) * dRollMatrix(150.0f*dDegreeToRad));
-	matrix.m_posit = origin;
-
-	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
-
-	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
-	scene->AddEntity(rootEntity);
-
-	dInt32 count = 30;
-	dFloat32 step = 4.0f;
-count = 25;
-
-	for (dInt32 i = 0; i < count; i ++)
-	{
-		for (dInt32 j = 0; j < count; j++)
-		{
-			for (dInt32 k = 0; k < count; k++)
-			{
-				dVector posit(step * (i - count/2), step * (j - count / 2), step * (k - count / 2), 0.0f);
-				dQuaternion rotation(dGaussianRandom(1.0f), dGaussianRandom(1.0f), dGaussianRandom(1.0f), dGaussianRandom(1.0f) + 0.1f);
-				//matrix.m_posit = origin + posit;
-				dMatrix location(rotation, origin + posit);
-				AddShape(scene, location, rootEntity, shape, 10.0f, density);
-			}
-		}
-	}
-
-	geometry->Release();
-}
+//static void AddBox(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 density)
+//{
+//	ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.7f));
+//	dMatrix matrix(dPitchMatrix(10.0f*dDegreeToRad) * dRollMatrix(150.0f*dDegreeToRad));
+//	matrix.m_posit = origin;
+//
+//	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+//
+//	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
+//	scene->AddEntity(rootEntity);
+//
+//	dInt32 count = 30;
+//	dFloat32 step = 4.0f;
+//count = 25;
+//
+//	for (dInt32 i = 0; i < count; i ++)
+//	{
+//		for (dInt32 j = 0; j < count; j++)
+//		{
+//			for (dInt32 k = 0; k < count; k++)
+//			{
+//				dVector posit(step * (i - count/2), step * (j - count / 2), step * (k - count / 2), 0.0f);
+//				dQuaternion rotation(dGaussianRandom(1.0f), dGaussianRandom(1.0f), dGaussianRandom(1.0f), dGaussianRandom(1.0f) + 0.1f);
+//				//matrix.m_posit = origin + posit;
+//				dMatrix location(rotation, origin + posit);
+//				AddShape(scene, location, rootEntity, shape, 10.0f, density);
+//			}
+//		}
+//	}
+//
+//	geometry->Release();
+//}
 
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFloorBox(scene);
 
-	AddBox(scene, dVector(0.0f, 0.0f, -3.0f, 1.0f), 0.6f);
-
-	dQuaternion rot;
-	dVector origin(-160.0f, 5.0f, 0.0f, 0.0f);
-	scene->SetCameraMatrix(rot, origin);
+	dAssert(0);
+	//AddBox(scene, dVector(0.0f, 0.0f, -3.0f, 1.0f), 0.6f);
+	//
+	//dQuaternion rot;
+	//dVector origin(-160.0f, 5.0f, 0.0f, 0.0f);
+	//scene->SetCameraMatrix(rot, origin);
 }
