@@ -400,6 +400,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			{
 				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world);
 				torsionBar->AddAxel(rl_tire->GetBody0(), rr_tire->GetBody0());
+				torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
 				break;
 			}
 
@@ -407,6 +408,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			{
 				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world);
 				torsionBar->AddAxel(fl_tire->GetBody0(), fr_tire->GetBody0());
+				torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
 				break;
 			}
 
@@ -415,6 +417,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world);
 				torsionBar->AddAxel(rl_tire->GetBody0(), rr_tire->GetBody0());
 				torsionBar->AddAxel(fl_tire->GetBody0(), fr_tire->GetBody0());
+				torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
 				break;
 			}
 		}

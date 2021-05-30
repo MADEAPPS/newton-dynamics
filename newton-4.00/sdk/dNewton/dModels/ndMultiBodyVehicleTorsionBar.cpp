@@ -41,7 +41,7 @@ ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehi
 
 void ndMultiBodyVehicleTorsionBar::SetTorsionTorque(dFloat32 springK, dFloat32 damperC, dFloat32 springDamperRegularizer)
 {
-	m_springK = dAbs (springK);
+	m_springK = dAbs(springK);
 	m_damperC = dAbs(damperC);
 	m_springDamperRegularizer = dClamp (springDamperRegularizer, dFloat32 (0.001), dFloat32(0.99f));
 }
@@ -59,8 +59,7 @@ void ndMultiBodyVehicleTorsionBar::AddAxel(const ndBodyKinematic* const leftTire
 
 void ndMultiBodyVehicleTorsionBar::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	//if (m_axeldCount)
-	if (0)
+	if (m_axeldCount)
 	{
 		dMatrix matrix0;
 		dMatrix matrix1;
