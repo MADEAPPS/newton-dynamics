@@ -50,7 +50,7 @@ class nvVehicleDectriptor
 			// take from the data sheet of a 2005 dodge viper, 
 			// some values are missing so I have to improvise them
 			dFloat32 idleTorquePoundFoot = 100.0f;
-			dFloat32 idleRmp = 1000.0f;
+			dFloat32 idleRmp = 800.0f;
 			dFloat32 horsePower = 400.0f;
 			dFloat32 rpm0 = 5000.0f;
 			dFloat32 rpm1 = 6200.0f;
@@ -186,7 +186,7 @@ class nvVehicleDectriptor
 		strncpy (m_name, fileName, sizeof (m_name));
 
 		dFloat32 idleTorquePoundFoot = 100.0f;
-		dFloat32 idleRmp = 1000.0f;
+		dFloat32 idleRmp = 900.0f;
 		dFloat32 horsePower = 400.0f;
 		dFloat32 rpm0 = 5000.0f;
 		dFloat32 rpm1 = 6200.0f;
@@ -278,6 +278,16 @@ class nvVehicleDectriptorViper : public nvVehicleDectriptor
 		:nvVehicleDectriptor("viper1.fbx")
 	{
 		m_comDisplacement = dVector(0.25f, -0.35f, 0.0f, 0.0f);
+
+		dFloat32 idleTorquePoundFoot = 100.0f;
+		dFloat32 idleRmp = 700.0f;
+		dFloat32 horsePower = 400.0f;
+		dFloat32 rpm0 = 5000.0f;
+		dFloat32 rpm1 = 6200.0f;
+		dFloat32 horsePowerAtRedLine = 100.0f;
+		dFloat32 redLineRpm = 7000.0f;
+		m_engine.Init(idleTorquePoundFoot, idleRmp, horsePower, rpm0, rpm1,
+			horsePowerAtRedLine, redLineRpm);
 	}
 };
 
@@ -288,6 +298,16 @@ class nvVehicleDectriptorJeep : public nvVehicleDectriptor
 		:nvVehicleDectriptor("jeep.fbx")
 	{
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
+
+		dFloat32 idleTorquePoundFoot = 200.0f;
+		dFloat32 idleRmp = 800.0f;
+		dFloat32 horsePower = 400.0f;
+		dFloat32 rpm0 = 5000.0f;
+		dFloat32 rpm1 = 6200.0f;
+		dFloat32 horsePowerAtRedLine = 100.0f;
+		dFloat32 redLineRpm = 7000.0f;
+		m_engine.Init(idleTorquePoundFoot, idleRmp, horsePower, rpm0, rpm1,
+			horsePowerAtRedLine, redLineRpm);
 
 		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_steeringAngle = 35.0f;
@@ -328,6 +348,16 @@ class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
 		:nvVehicleDectriptor("monsterTruck.fbx")
 	{
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
+
+		dFloat32 idleTorquePoundFoot = 250.0f;
+		dFloat32 idleRmp = 800.0f;
+		dFloat32 horsePower = 400.0f;
+		dFloat32 rpm0 = 5000.0f;
+		dFloat32 rpm1 = 6200.0f;
+		dFloat32 horsePowerAtRedLine = 150.0f;
+		dFloat32 redLineRpm = 7000.0f;
+		m_engine.Init(idleTorquePoundFoot, idleRmp, horsePower, rpm0, rpm1,
+			horsePowerAtRedLine, redLineRpm);
 
 		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_steeringAngle = 35.0f;
@@ -1064,12 +1094,12 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
-	//matrix.m_posit.m_x += 8.0f;
-	//matrix.m_posit.m_z += 2.0f;
-	//scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix));
-	//
-	//matrix.m_posit.m_x += 15.0f;
-	//AddPlanks(scene, matrix.m_posit);
+	matrix.m_posit.m_x += 8.0f;
+	matrix.m_posit.m_z += 2.0f;
+	scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix));
+	
+	matrix.m_posit.m_x += 15.0f;
+	AddPlanks(scene, matrix.m_posit);
 
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
