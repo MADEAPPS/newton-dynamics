@@ -27,17 +27,16 @@
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 
-#define D_ENGINE_NOMINAL_TORQUE			(dFloat32(600.0f))
-#define D_ENGINE_NOMINAL_RAD_PER_SEC	(dFloat32(7000.0f / 9.55f))
+//#define D_ENGINE_NOMINAL_TORQUE			(dFloat32(600.0f))
+//#define D_ENGINE_NOMINAL_RAD_PER_SEC	(dFloat32(7000.0f / 9.55f))
 
 ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel)
 	:ndJointBilateralConstraint(3, motor, vehicelModel->m_chassis, motor->GetMatrix())
 	,m_omega(dFloat32(0.0f))
-	,m_maxOmega(D_ENGINE_NOMINAL_RAD_PER_SEC)
-	,m_idleOmega(D_ENGINE_NOMINAL_RAD_PER_SEC * dFloat32(0.1f))
+	,m_idleOmega(dFloat32(0.0f))
 	,m_throttle(dFloat32(0.0f))
-	,m_gasValve(D_ENGINE_NOMINAL_RAD_PER_SEC * dFloat32(0.02f))
-	,m_engineTorque(D_ENGINE_NOMINAL_TORQUE)
+	,m_gasValve(dFloat32(0.02f))
+	,m_engineTorque(dFloat32(0.0f))
 	,m_vehicelModel(vehicelModel)
 	,m_startEngine(false)
 {
@@ -77,14 +76,15 @@ void ndMultiBodyVehicleMotor::SetStart(bool startkey)
 	m_startEngine = startkey;
 }
 
-void ndMultiBodyVehicleMotor::SetMaxRpm(dFloat32)
+void ndMultiBodyVehicleMotor::SetRpmLimits(dFloat32 idleRpm, dFloat32 redLineRpm)
 {
-	dAssert(0);
+	m_idleOmega = dAbs(idleRpm / dFloat32(9.55f));
+	m_maxOmega = dMax(redLineRpm / dFloat32(9.55f), m_idleOmega);
 }
 
-void ndMultiBodyVehicleMotor::SetEngineTorque(dFloat32)
+void ndMultiBodyVehicleMotor::SetTorque(dFloat32 torqueInNewtonMeters)
 {
-	dAssert(0);
+	m_engineTorque = torqueInNewtonMeters;
 }
 
 void ndMultiBodyVehicleMotor::SetThrottle(dFloat32 param)
@@ -101,7 +101,8 @@ dFloat32 ndMultiBodyVehicleMotor::CalculateAcceleration(ndConstraintDescritor& d
 	m_omega = -relOmega.AddHorizontal().GetScalar();
 	const dFloat32 throttleOmega = dClamp(m_throttle * m_maxOmega, m_idleOmega, m_maxOmega);
 	const dFloat32 deltaOmega = throttleOmega - m_omega;
-	dFloat32 omegaError = dClamp(deltaOmega, -m_gasValve, m_gasValve);
+	const dFloat32 gasValve = m_gasValve * m_maxOmega;
+	dFloat32 omegaError = dClamp(deltaOmega, -gasValve, gasValve);
 	//dTrace(("%f %f\n", throttleOmega, m_omega));
 	return -omegaError * desc.m_invTimestep;
 }
@@ -122,6 +123,7 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	// add rotor joint
 	AddAngularRowJacobian(desc, matrix0.m_front, dFloat32(0.0f));
 	const dFloat32 accel = CalculateAcceleration(desc);
+	//dTrace(("%f\n", accel));
 	if (m_startEngine)
 	{
 		const ndMultiBodyVehicleGearBox* const gearBox = m_vehicelModel->m_gearBox;
@@ -134,14 +136,14 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 		if (m_omega <= dFloat32(0.0f))
 		{
 			// engine rpm can not be negative
-			dFloat32 stopAccel = (m_omega - 0.5f) * desc.m_invTimestep;
+			dFloat32 stopAccel = dMin ((m_omega - 0.5f) * desc.m_invTimestep, accel);
 			SetMotorAcceleration(desc, stopAccel);
 			SetHighFriction(desc, m_engineTorque);
 		}
 		else if (m_omega >= m_maxOmega)
 		{
 			// engine rpm can not pass maximum allowed
-			dFloat32 stopAccel = (m_omega - m_maxOmega) * desc.m_invTimestep;
+			dFloat32 stopAccel = dMax ((m_omega - m_maxOmega) * desc.m_invTimestep, accel);
 			SetMotorAcceleration(desc, stopAccel);
 			SetLowerFriction(desc, -m_engineTorque);
 		}

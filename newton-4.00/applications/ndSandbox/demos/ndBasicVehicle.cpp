@@ -89,6 +89,22 @@ class nvVehicleDectriptor
 			return m_torqueCurve[1].m_radPerSeconds;
 		}
 
+		dFloat32 GetLowGearShiftRadPerSec() const
+		{
+			return m_torqueCurve[2].m_radPerSeconds;
+		}
+
+		dFloat32 GetHighGearShiftRadPerSec() const
+		{
+			return m_torqueCurve[3].m_radPerSeconds;
+		}
+
+		dFloat32 GetRedLineRadPerSec() const
+		{
+			const int maxIndex = sizeof(m_torqueCurve) / sizeof(m_torqueCurve[0]);
+			return m_torqueCurve[maxIndex - 1].m_radPerSeconds;
+		}
+
 		dFloat32 GetTorque(dFloat32 omegaInRadPerSeconds) const
 		{
 			const int maxIndex = sizeof(m_torqueCurve) / sizeof(m_torqueCurve[0]);
@@ -480,7 +496,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		}
 
 		// add a motor
-		AddMotor(world, m_configuration.m_motorMass, m_configuration.m_motorRadius);
+		ndMultiBodyVehicleMotor* const motor = AddMotor(world, m_configuration.m_motorMass, m_configuration.m_motorRadius);
+		motor->SetRpmLimits(m_configuration.m_engine.GetIdleRadPerSec() * 9.55f, m_configuration.m_engine.GetRedLineRadPerSec() * 9.55f);
 
 		// add the gear box
 		AddGearBox(world, m_motor, differential);
@@ -678,13 +695,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			}
 			m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
 
-
-			static dInt32 xxxx;
-			xxxx++;
-			throttle = dClamp(throttle, 0.0f, 0.7f);
-
 			dFloat32 handBrake = m_configuration.m_handBrakeTorque * dFloat32(scene->GetKeyState(' ') || buttons[4]);
-			//dTrace(("handBrake %f\n", handBrake));
 
 			if (m_ignition.Update(scene->GetKeyState('I') || buttons[7]))
 			{
@@ -740,8 +751,11 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			{
 				if (m_currentGear < m_configuration.m_transmission.m_gearsCount)
 				{
-					dFloat32 rpm = m_motor->GetRpm() / m_motor->GetMaxRpm();
-					if (rpm < 0.25f)
+					//dFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * 9.55f;
+					//dFloat32 rpm = m_motor->GetRpm() / maxRpm;
+					dFloat32 omega = m_motor->GetRpm() / 9.55f;
+
+					if (omega < m_configuration.m_engine.GetLowGearShiftRadPerSec())
 					{
 						if (m_currentGear > 0)
 						{
@@ -751,7 +765,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 							m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 						}
 					}
-					else if (rpm > 0.55f)
+					else if (omega > m_configuration.m_engine.GetHighGearShiftRadPerSec())
 					{
 						if (m_currentGear < (m_configuration.m_transmission.m_gearsCount - 1))
 						{
@@ -787,6 +801,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			SetSteeringAngle(m_steerAngle * dDegreeToRad);
 
 			m_motor->SetThrottle(throttle);
+			m_motor->SetTorque(m_configuration.m_engine.GetTorque(m_motor->GetRpm() / 9.55f));
 		}
 
 		ndMultiBodyVehicle::Update(world, timestep);
@@ -923,7 +938,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 			// draw the tachometer
 			dFloat32 x = gageSize / 2 + 20.0f;
-			dFloat32 rpm = motor->GetRpm() / motor->GetMaxRpm();
+			dFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * 9.55f;
+			dFloat32 rpm = motor->GetRpm() / maxRpm;
 
 			DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 90.0f);
 
@@ -1048,14 +1064,14 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
-	matrix.m_posit.m_x += 8.0f;
-	matrix.m_posit.m_z += 2.0f;
-	scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix));
+	//matrix.m_posit.m_x += 8.0f;
+	//matrix.m_posit.m_z += 2.0f;
+	//scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix));
+	//
+	//matrix.m_posit.m_x += 15.0f;
+	//AddPlanks(scene, matrix.m_posit);
 
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
-
-	matrix.m_posit.m_x += 15.0f;
-	AddPlanks(scene, matrix.m_posit);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);

@@ -31,18 +31,17 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 {
 	public:
 	ND_CLASS_RELECTION(ndMultiBodyVehicleMotor);
-	//D_NEWTON_API ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis, );
 	D_NEWTON_API ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel);
 
 	bool GetStart() const;
 	dFloat32 GetRpm() const;
-	dFloat32 GetMaxRpm() const;
 
 	D_NEWTON_API void SetStart(bool startkey);
 	D_NEWTON_API void SetThrottle(dFloat32 param);
-	D_NEWTON_API void SetMaxRpm(dFloat32 maxRpm);
-	//D_NEWTON_API void SetIdleRpm(dFloat32 idleRpm);
-	D_NEWTON_API void SetEngineTorque(dFloat32 torque);
+
+	D_NEWTON_API void SetRpmLimits(dFloat32 idle, dFloat32 redLineRpm);
+
+	D_NEWTON_API void SetTorque(dFloat32 torqueInNewtonMeters);
 	D_NEWTON_API void SetGasValve(dFloat32 radPerSeconds);
 
 	private:
@@ -68,15 +67,9 @@ inline bool ndMultiBodyVehicleMotor::GetStart() const
 	return m_startEngine;
 }
 
-inline dFloat32 ndMultiBodyVehicleMotor::GetMaxRpm() const
-{
-	return m_maxOmega * dFloat32(9.55f);
-}
-
 inline dFloat32 ndMultiBodyVehicleMotor::GetRpm() const
 {
 	return m_omega * dFloat32(9.55f);
 }
-
 
 #endif
