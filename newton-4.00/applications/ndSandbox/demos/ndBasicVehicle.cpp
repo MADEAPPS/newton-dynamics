@@ -28,6 +28,92 @@
 class nvVehicleDectriptor
 {
 	public:
+	class ndEngineTorqueCurve
+	{
+		class ndTorqueTap
+		{
+			public:
+			ndTorqueTap() {}
+			ndTorqueTap(dFloat32 rpm, dFloat32 torqueInPoundFeet)
+				:m_radPerSeconds(rpm * 0.105f)
+				,m_torqueInNewtonMeters(torqueInPoundFeet * 1.36f)
+			{
+			}
+
+			dFloat32 m_radPerSeconds;
+			dFloat32 m_torqueInNewtonMeters;
+		};
+
+		public:
+		ndEngineTorqueCurve()
+		{
+			dFloat32 idleTorquePoundFoot = 100.0f;
+			dFloat32 idleRmp = 1000.0f;
+			dFloat32 horsePower = 400.0f;
+			dFloat32 rpm0 = 5000.0f;
+			dFloat32 rpm1 = 6200.0f;
+			dFloat32 horsePowerAtRedLine = 100.0f;
+			dFloat32 redLineRpm = 7000.0f;
+			Init(idleTorquePoundFoot, idleRmp,
+				horsePower, rpm0, rpm1,
+				horsePowerAtRedLine, redLineRpm);
+		}
+
+		void Init(dFloat32 idleTorquePoundFoot, dFloat32 idleRmp,
+				  dFloat32 horsePower, dFloat32 rpm0, dFloat32 rpm1, 
+				  dFloat32 horsePowerAtRedLine, dFloat32 redLineRpm)
+		{
+			m_torqueCurve[0] = ndTorqueTap(0.0f, idleTorquePoundFoot);
+			m_torqueCurve[1] = ndTorqueTap(idleRmp, idleTorquePoundFoot);
+
+			dFloat32 power = horsePower * 746.0f;
+			dFloat32 omegaInRadPerSec = rpm0 * 0.105f;
+			dFloat32 torqueInPoundFood = (power / omegaInRadPerSec) / 1.36f;
+			m_torqueCurve[2] = ndTorqueTap(rpm0, torqueInPoundFood);
+
+			power = horsePower * 746.0f;
+			omegaInRadPerSec = rpm1 * 0.105f;
+			torqueInPoundFood = (power / omegaInRadPerSec) / 1.36f;
+			m_torqueCurve[3] = ndTorqueTap(rpm0, torqueInPoundFood);
+
+			power = horsePowerAtRedLine * 746.0f;
+			omegaInRadPerSec = redLineRpm * 0.105f;
+			torqueInPoundFood = (power / omegaInRadPerSec) / 1.36f;
+			m_torqueCurve[4] = ndTorqueTap(redLineRpm, torqueInPoundFood);
+		}
+
+		dFloat32 GetIdleRadPerSec() const
+		{
+			return m_torqueCurve[1].m_radPerSeconds;
+		}
+
+		dFloat32 GetTorque(dFloat32 omegaInRadPerSeconds) const
+		{
+			const int maxIndex = sizeof(m_torqueCurve) / sizeof(m_torqueCurve[0]);
+			omegaInRadPerSeconds = dClamp(omegaInRadPerSeconds, dFloat32(0.0f), m_torqueCurve[maxIndex - 1].m_radPerSeconds);
+
+			for (dInt32 i = 1; i < maxIndex; i++) 
+			{
+				if (omegaInRadPerSeconds <= m_torqueCurve[i].m_radPerSeconds)
+				{
+					dFloat32 omega0 = m_torqueCurve[i- 0].m_radPerSeconds;
+					dFloat32 omega1 = m_torqueCurve[i - 1].m_radPerSeconds;
+			
+					dFloat32 torque0 = m_torqueCurve[i - 0].m_torqueInNewtonMeters;
+					dFloat32 torque1 = m_torqueCurve[i - 1].m_torqueInNewtonMeters;
+			
+					dFloat32 torque = torque0 + (omegaInRadPerSeconds - omega0) * (torque1 - torque0) / (omega1 - omega0);
+					return torque;
+				}
+			}
+			
+			return m_torqueCurve[maxIndex - 1].m_torqueInNewtonMeters;
+		}
+
+		private:
+		ndTorqueTap m_torqueCurve[5];
+	};
+
 	class ndGearBox
 	{
 		public:
@@ -80,10 +166,18 @@ class nvVehicleDectriptor
 		:m_comDisplacement(dVector::m_zero)
 	{
 		strncpy (m_name, fileName, sizeof (m_name));
-		//SetDefualt();
+
+		dFloat32 idleTorquePoundFoot = 100.0f;
+		dFloat32 idleRmp = 1000.0f;
+		dFloat32 horsePower = 400.0f;
+		dFloat32 rpm0 = 5000.0f;
+		dFloat32 rpm1 = 6200.0f;
+		dFloat32 horsePowerAtRedLine = 100.0f;
+		dFloat32 redLineRpm = 7000.0f;
+		m_engine.Init(idleTorquePoundFoot, idleRmp,	horsePower, rpm0, rpm1,
+					  horsePowerAtRedLine, redLineRpm);
 
 		m_chassisMass = 1000.0f;
-
 		m_transmission.m_gearsCount = 4;
 		m_transmission.m_neutral = 0.0f;
 		m_transmission.m_crownGearRatio = 10.0f;
@@ -137,6 +231,7 @@ class nvVehicleDectriptor
 	char m_name[32];
 
 	dFloat32 m_chassisMass;
+	ndEngineTorqueCurve m_engine;
 	ndGearBox m_transmission;
 	ndTireDefinition m_frontTire;
 	ndTireDefinition m_rearTire;
