@@ -1020,8 +1020,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//location.m_z = 4.0f;
 	//location.m_y = 0.5f; 
 	//AddRamps(scene, location);
-	matrix.m_posit.m_x += 10.0f;
-	//AddPlanks(scene, matrix.m_posit);
+	matrix.m_posit.m_x += 15.0f;
+	AddPlanks(scene, matrix.m_posit);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
