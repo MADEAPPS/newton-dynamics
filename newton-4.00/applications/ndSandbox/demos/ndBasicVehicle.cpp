@@ -47,6 +47,8 @@ class nvVehicleDectriptor
 		public:
 		ndEngineTorqueCurve()
 		{
+			// take from the data sheet of a 2005 dodge viper, 
+			// some values are missing so I have to improvise them
 			dFloat32 idleTorquePoundFoot = 100.0f;
 			dFloat32 idleRmp = 1000.0f;
 			dFloat32 horsePower = 400.0f;
@@ -1012,53 +1014,6 @@ class ndGlobalControl : public ndModel
 	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
 };
 
-
-//static void PlaceRampRamp(ndDemoEntityManager* const scene,
-//	const dMatrix& location, ndDemoMesh* const geometry, ndShapeInstance& ramp)
-//{
-//	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-//	scene->AddEntity(entity);
-//	entity->SetMesh(geometry, dGetIdentityMatrix());
-//
-//	ndBodyDynamic* const body = new ndBodyDynamic();
-//	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-//	body->SetMatrix(location);
-//	body->SetCollisionShape(ramp);
-//	scene->GetWorld()->AddBody(body);
-//}
-//
-//static void AddRamps(ndDemoEntityManager* const scene, const dVector& origin)
-//{
-//	ndShapeInstance box(new ndShapeBox(5.0f, 0.125f, 6.f));
-//	dMatrix uvMatrix(dGetIdentityMatrix());
-//	uvMatrix[0][0] *= 0.25f;
-//	uvMatrix[1][1] *= 0.25f;
-//	uvMatrix[2][2] *= 0.25f;
-//	uvMatrix.m_posit = dVector(-0.5f, -0.5f, 0.0f, 1.0f);
-//	const char* const textureName = "wood_3.tga";
-//	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, textureName, textureName, textureName, 1.0f, uvMatrix);
-//
-//	dMatrix matrix(dRollMatrix(20.0f * dDegreeToRad));
-//	matrix.m_posit = origin;
-//	PlaceRampRamp(scene, matrix, geometry, box);
-//
-//	matrix = dGetIdentityMatrix();
-//	matrix.m_posit = origin;
-//	matrix.m_posit.m_x += 4.8f;
-//	matrix.m_posit.m_y += 0.85f;
-//	PlaceRampRamp(scene, matrix, geometry, box);
-//
-//	matrix.m_posit.m_x += 5.0f;
-//	PlaceRampRamp(scene, matrix, geometry, box);
-//
-//	matrix = matrix * dRollMatrix(-20.0f * dDegreeToRad);
-//	matrix.m_posit.m_x += 5.0f;
-//	matrix.m_posit.m_y = origin.m_y;
-//	PlaceRampRamp(scene, matrix, geometry, box);
-//
-//	geometry->Release();
-//}
-
 static void AddPlanks(ndDemoEntityManager* const scene, const dVector& origin)
 {
 	for (dInt32 i = 0; i < 5; i++)
@@ -1079,19 +1034,6 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	BuildStaticMesh(scene, "track.fbx", true);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 
-	//dMatrix location0(dGetIdentityMatrix());
-	//location0.m_posit.m_y += 2.0f;
-	//location0.m_posit.m_z += 2.0f;
-	//dMatrix localAxis(dGetIdentityMatrix());
-	//localAxis[0] = dVector(0.0f, 1.0f, 0.0f, 0.0f);
-	//localAxis[1] = dVector(1.0f, 0.0f, 0.0f, 0.0f);
-	//localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
-	//dFloat32 height = 1.9f;
-	//dFloat32 radio = 0.5f;
-	//dFloat32 mass = 100.0f;
-	//new ndBasicPlayerCapsule(scene, localAxis, location0, mass, radio, height, height / 4.0f, true);
-
-	//dVector location(0.0f, 0.5f, 0.0f, 1.0f);
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
 
 	dMatrix matrix(dGetIdentityMatrix());
@@ -1112,9 +1054,6 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
-	//location.m_z = 4.0f;
-	//location.m_y = 0.5f; 
-	//AddRamps(scene, location);
 	matrix.m_posit.m_x += 15.0f;
 	AddPlanks(scene, matrix.m_posit);
 
