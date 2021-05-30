@@ -46,10 +46,11 @@ void ndMultiBodyVehicleTorsionBar::SetTorsionTorque(dFloat32 springK, dFloat32 d
 	m_springDamperRegularizer = dClamp (springDamperRegularizer, dFloat32 (0.001), dFloat32(0.99f));
 }
 
-void ndMultiBodyVehicleTorsionBar::AddAxel(const ndBodyDynamic* const leftTire, const ndBodyDynamic* const rightTire)
+void ndMultiBodyVehicleTorsionBar::AddAxel(const ndBodyKinematic* const leftTire, const ndBodyKinematic* const rightTire)
 {
 	if (m_axeldCount < sizeof(m_axles) / sizeof(m_axles[0]))
 	{
+		m_axles[m_axeldCount].m_axleAngle = dFloat32(0.0f);
 		m_axles[m_axeldCount].m_leftTire = leftTire;
 		m_axles[m_axeldCount].m_rightTire = rightTire;
 		m_axeldCount++;
@@ -58,43 +59,32 @@ void ndMultiBodyVehicleTorsionBar::AddAxel(const ndBodyDynamic* const leftTire, 
 
 void ndMultiBodyVehicleTorsionBar::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	if (m_axeldCount)
+	//if (m_axeldCount)
+	if (0)
 	{
-		dAssert(0);
-		//if (dAbs(m_gearRatio) > dFloat32(1.0e-2f))
-		//{
-		//	dMatrix matrix0;
-		//	dMatrix matrix1;
-		//	
-		//	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-		//	CalculateGlobalMatrix(matrix0, matrix1);
-		//	
-		//	AddAngularRowJacobian(desc, matrix0.m_front, dFloat32(0.0f));
-		//	
-		//	ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
-		//	ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
-		//
-		//	dFloat32 gearRatio = dFloat32(1.0f) / m_gearRatio;
-		//	
-		//	jacobian0.m_angular = matrix0.m_front;
-		//	jacobian1.m_angular = matrix1.m_front.Scale(gearRatio);
-		//	
-		//	const dVector& omega0 = m_body0->GetOmega();
-		//	const dVector& omega1 = m_body1->GetOmega();
-		//	
-		//	ndMultiBodyVehicleMotor* const rotor = m_chassis->m_motor;
-		//	
-		//	dFloat32 idleOmega = rotor->m_idleOmega * gearRatio * dFloat32(0.9f);
-		//	dFloat32 w0 = omega0.DotProduct(jacobian0.m_angular).GetScalar();
-		//	dFloat32 w1 = omega1.DotProduct(jacobian1.m_angular).GetScalar() + idleOmega;
-		//	w1 = (gearRatio > dFloat32(0.0f)) ? dMin(w1, dFloat32(0.0f)) : dMax(w1, dFloat32(0.0f));
-		//	
-		//	const dFloat32 w = (w0 + w1) * dFloat32(0.5f);
-		//	SetMotorAcceleration(desc, -w * desc.m_invTimestep);
-		//
-		//	//SetHighFriction(desc, 1000.0f);
-		//	//SetLowerFriction(desc, -1000.0f);
-		//}
+		dMatrix matrix0;
+		dMatrix matrix1;
+	
+		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+		CalculateGlobalMatrix(matrix0, matrix1);
+	
+		dFloat32 angle = dFloat32(0.0f);
+		dFloat32 omega = dFloat32(0.0f);
+		for (dInt32 i = 0; i < m_axeldCount; i++)
+		{
+			dVector dir(m_axles[i].m_rightTire->GetMatrix().m_posit - m_axles[i].m_leftTire->GetMatrix().m_posit);
+			dir = dir.Normalize();
+			angle += matrix0.m_right.CrossProduct(dir).DotProduct(matrix0.m_front).GetScalar();
+			omega += (angle - m_axles[i].m_axleAngle) * desc.m_invTimestep;
+			m_axles[i].m_axleAngle = angle;
+		}
+		angle = angle / m_axeldCount;
+		omega = omega / m_axeldCount;
+		//dTrace(("%f\n", angle * dRadToDegree));
+		AddAngularRowJacobian(desc, matrix0.m_front, dFloat32(0.0f));
+		dFloat32 accel = -CalculateSpringDamperAcceleration(desc.m_timestep, 300.0f, angle, dFloat32(10.0f), omega);
+		SetMotorAcceleration(desc, accel);
+		SetDiagonalRegularizer(desc, dFloat32 (0.2f));
 	}
 }
 
