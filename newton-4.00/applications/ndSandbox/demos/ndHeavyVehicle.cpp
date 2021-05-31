@@ -17,19 +17,18 @@
 #include "ndLoadFbxMesh.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
+#include "ndVehicleCommon.h"
 #include "ndMakeStaticMap.h"
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"
 
-#define AUTOMATION_TRANSMISSION_FRAME_DELAY 120
-
 class nvVehicleDectriptorLav25: public nvVehicleDectriptor
 {
 	public:
 	nvVehicleDectriptorLav25()
-		:nvVehicleDectriptor("monsterTruck.fbx")
+		:nvVehicleDectriptor("lav_25.fbx")
 	{
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
 
@@ -76,31 +75,12 @@ class nvVehicleDectriptorLav25: public nvVehicleDectriptor
 
 static nvVehicleDectriptorLav25 lav25Desc;
 
-class ndTireNotifyNotify : public ndDemoEntityNotify
+
+
+class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 {
 	public:
-	ndTireNotifyNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const chassis)
-		:ndDemoEntityNotify(manager, entity)
-		,m_chassis(chassis)
-	{
-	}
-
-	void OnTranform(dInt32, const dMatrix& matrix)
-	{
-		dMatrix parentMatrix(m_chassis->GetMatrix());
-		dMatrix localMatrix(matrix * parentMatrix.Inverse());
-
-		dQuaternion rot(localMatrix);
-		m_entity->SetMatrix(rot, localMatrix.m_posit);
-	}
-
-	ndBodyDynamic* m_chassis;
-};
-
-class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
-{
-	public:
-	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const nvVehicleDectriptor& desc, const dMatrix& matrix)
+	ndHeavyMultiBodyVehicle(ndDemoEntityManager* const scene, const nvVehicleDectriptor& desc, const dMatrix& matrix)
 		:ndMultiBodyVehicle(dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f))
 		,m_configuration(desc)
 		,m_steerAngle(0.0f)
@@ -250,7 +230,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		}
 	}
 
-	~ndBasicMultiBodyVehicle()
+	~ndHeavyMultiBodyVehicle()
 	{
 		ReleaseTexture(m_gears);
 		ReleaseTexture(m_odometer);
@@ -259,7 +239,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ReleaseTexture(m_greenNeedle);
 	}
 
-	ND_CLASS_RELECTION(ndBasicMultiBodyVehicle);
+	ND_CLASS_RELECTION(ndHeavyMultiBodyVehicle);
 
 	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename)
 	{
@@ -291,13 +271,13 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 	static void RenderUI(ndDemoEntityManager* const scene, void* const context)
 	{
-		ndBasicMultiBodyVehicle* const me = (ndBasicMultiBodyVehicle*)context;
+		ndHeavyMultiBodyVehicle* const me = (ndHeavyMultiBodyVehicle*)context;
 		me->RenderUI(scene);
 	}
 
 	static void RenderHelp(ndDemoEntityManager* const scene, void* const context)
 	{
-		ndBasicMultiBodyVehicle* const me = (ndBasicMultiBodyVehicle*)context;
+		ndHeavyMultiBodyVehicle* const me = (ndHeavyMultiBodyVehicle*)context;
 		me->RenderHelp(scene);
 	}
 
@@ -509,13 +489,13 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			SetHandBrakeTorque(handBrake);
 			SetSteeringAngle(m_steerAngle * dDegreeToRad);
 
-			if (omega <= m_configuration.m_engine.GetIdleRadPerSec())
+			if (omega <= (m_configuration.m_engine.GetIdleRadPerSec() * 1.01f))
 			{
-				m_motor->SetFuelRate(1.0f);
+				m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_idleClutchTorque);
 			}
 			else
 			{
-				m_motor->SetFuelRate(m_configuration.m_engine.GetFuelRate());
+				m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_lockedClutchTorque);
 			}
 
 			m_motor->SetThrottle(throttle);
@@ -533,7 +513,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, dFloat32 timestep)
 	{
-		ndBasicMultiBodyVehicle* const me = (ndBasicMultiBodyVehicle*)context;
+		ndHeavyMultiBodyVehicle* const me = (ndHeavyMultiBodyVehicle*)context;
 		me->SetCamera(manager, timestep);
 	}
 
@@ -719,13 +699,13 @@ class ndGlobalControl : public ndModel
 			const ndModelList& modelList = world->GetModelList();
 
 			dInt32 vehiclesCount = 0;
-			ndBasicMultiBodyVehicle* vehicleArray[1024];
+			ndHeavyMultiBodyVehicle* vehicleArray[1024];
 			for (ndModelList::dListNode* node = modelList.GetFirst(); node; node = node->GetNext())
 			{
 				ndModel* const model = node->GetInfo();
-				if (!strcmp(model->GetClassName(), "ndBasicMultiBodyVehicle"))
+				if (!strcmp(model->GetClassName(), "ndHeavyMultiBodyVehicle"))
 				{
-					vehicleArray[vehiclesCount] = (ndBasicMultiBodyVehicle*)model->GetAsMultiBodyVehicle();
+					vehicleArray[vehiclesCount] = (ndHeavyMultiBodyVehicle*)model->GetAsMultiBodyVehicle();
 					vehiclesCount++;
 				}
 			}
@@ -736,7 +716,7 @@ class ndGlobalControl : public ndModel
 				{
 					if (vehicleArray[i]->IsPlayer())
 					{
-						ndBasicMultiBodyVehicle* const nexVehicle = vehicleArray[(i + 1) % vehiclesCount];
+						ndHeavyMultiBodyVehicle* const nexVehicle = vehicleArray[(i + 1) % vehiclesCount];
 						vehicleArray[i]->SetAsPlayer(scene, false);
 						nexVehicle->SetAsPlayer(scene, true);
 						break;
@@ -753,8 +733,8 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFloorBox(scene);
-	//BuildFlatPlane(scene, true);
-	BuildStaticMesh(scene, "track.fbx", true);
+	BuildFlatPlane(scene, true);
+	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
@@ -766,19 +746,19 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndGlobalControl* const controls = new ndGlobalControl();
 	scene->GetWorld()->AddModel(controls);
 
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, viperDesc, matrix);
-	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, lav25Desc, matrix);
+	//ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, viperDesc, matrix);
+	ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
 	//matrix.m_posit.m_x += 8.0f;
 	//matrix.m_posit.m_z += 2.0f;
-	//scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix));
+	//scene->GetWorld()->AddModel(new ndHeavyMultiBodyVehicle(scene, monterTruckDesc, matrix));
 	//
 	//matrix.m_posit.m_x += 15.0f;
 	//AddPlanks(scene, matrix.m_posit);
 
-	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
+	scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);

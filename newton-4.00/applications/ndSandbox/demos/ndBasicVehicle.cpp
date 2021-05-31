@@ -17,13 +17,12 @@
 #include "ndLoadFbxMesh.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
+#include "ndVehicleCommon.h"
 #include "ndMakeStaticMap.h"
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"
-
-#define AUTOMATION_TRANSMISSION_FRAME_DELAY 120
 
 class nvVehicleDectriptorViper : public nvVehicleDectriptor
 {
@@ -149,27 +148,6 @@ class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
 static nvVehicleDectriptorJeep jeep;
 static nvVehicleDectriptorViper viperDesc;
 static nvVehicleDectriptorMonsterTruck monterTruckDesc;
-
-class ndTireNotifyNotify : public ndDemoEntityNotify
-{
-	public:
-	ndTireNotifyNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const chassis)
-		:ndDemoEntityNotify(manager, entity)
-		,m_chassis(chassis)
-	{
-	}
-
-	void OnTranform(dInt32, const dMatrix& matrix)
-	{
-		dMatrix parentMatrix(m_chassis->GetMatrix());
-		dMatrix localMatrix(matrix * parentMatrix.Inverse());
-
-		dQuaternion rot(localMatrix);
-		m_entity->SetMatrix(rot, localMatrix.m_posit);
-	}
-
-	ndBodyDynamic* m_chassis;
-};
 
 class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 {
@@ -583,16 +561,17 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			SetHandBrakeTorque(handBrake);
 			SetSteeringAngle(m_steerAngle * dDegreeToRad);
 
-			if (omega <= m_configuration.m_engine.GetIdleRadPerSec())
+			if (omega <= (m_configuration.m_engine.GetIdleRadPerSec() * 1.01f))
 			{
-				m_motor->SetFuelRate(1.0f);
+				m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_idleClutchTorque);
 			}
 			else
 			{
-				m_motor->SetFuelRate(m_configuration.m_engine.GetFuelRate());
+				m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_lockedClutchTorque);
 			}
 
 			m_motor->SetThrottle(throttle);
+			m_motor->SetFuelRate(m_configuration.m_engine.GetFuelRate());
 			m_motor->SetTorque(m_configuration.m_engine.GetTorque(m_motor->GetRpm() / 9.55f));
 		}
 
