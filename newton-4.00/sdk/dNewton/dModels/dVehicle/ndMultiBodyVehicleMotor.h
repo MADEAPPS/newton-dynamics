@@ -41,8 +41,8 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 
 	D_NEWTON_API void SetRpmLimits(dFloat32 idle, dFloat32 redLineRpm);
 
+	D_NEWTON_API void SetFuelRate(dFloat32 radPerSecondsStep);
 	D_NEWTON_API void SetTorque(dFloat32 torqueInNewtonMeters);
-	D_NEWTON_API void SetGasValve(dFloat32 radPerSeconds);
 
 	private:
 	void AlignMatrix();
@@ -54,8 +54,8 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 	dFloat32 m_maxOmega;
 	dFloat32 m_idleOmega;
 	dFloat32 m_throttle;
-	dFloat32 m_gasValve;
 	dFloat32 m_engineTorque;
+	dFloat32 m_fuelValveRate;
 	ndMultiBodyVehicle* m_vehicelModel;
 	bool m_startEngine;
 	friend class ndMultiBodyVehicle;

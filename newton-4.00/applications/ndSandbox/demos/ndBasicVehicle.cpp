@@ -49,6 +49,7 @@ class nvVehicleDectriptor
 		{
 			// take from the data sheet of a 2005 dodge viper, 
 			// some values are missing so I have to improvise them
+			dFloat32 fuelInjectionRate = 10.0f;
 			dFloat32 idleTorquePoundFoot = 100.0f;
 			dFloat32 idleRmp = 800.0f;
 			dFloat32 horsePower = 400.0f;
@@ -56,15 +57,16 @@ class nvVehicleDectriptor
 			dFloat32 rpm1 = 6200.0f;
 			dFloat32 horsePowerAtRedLine = 100.0f;
 			dFloat32 redLineRpm = 8000.0f;
-			Init(idleTorquePoundFoot, idleRmp,
-				horsePower, rpm0, rpm1,
-				horsePowerAtRedLine, redLineRpm);
+			Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp,
+ 				 horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 		}
 
-		void Init(dFloat32 idleTorquePoundFoot, dFloat32 idleRmp,
+		void Init(dFloat32 fuelInjectionRate,
+				  dFloat32 idleTorquePoundFoot, dFloat32 idleRmp,
 				  dFloat32 horsePower, dFloat32 rpm0, dFloat32 rpm1, 
 				  dFloat32 horsePowerAtRedLine, dFloat32 redLineRpm)
 		{
+			m_fuelInjectionRate = fuelInjectionRate;
 			m_torqueCurve[0] = ndTorqueTap(0.0f, idleTorquePoundFoot);
 			m_torqueCurve[1] = ndTorqueTap(idleRmp, idleTorquePoundFoot);
 
@@ -82,6 +84,11 @@ class nvVehicleDectriptor
 			omegaInRadPerSec = redLineRpm * 0.105f;
 			torqueInPoundFood = (power / omegaInRadPerSec) / 1.36f;
 			m_torqueCurve[4] = ndTorqueTap(redLineRpm, torqueInPoundFood);
+		}
+
+		dFloat32 GetFuelRate() const
+		{
+			return m_fuelInjectionRate;
 		}
 
 		dFloat32 GetIdleRadPerSec() const
@@ -130,6 +137,7 @@ class nvVehicleDectriptor
 
 		private:
 		ndTorqueTap m_torqueCurve[5];
+		dFloat32 m_fuelInjectionRate;
 	};
 
 	class ndGearBox
@@ -185,6 +193,7 @@ class nvVehicleDectriptor
 	{
 		strncpy (m_name, fileName, sizeof (m_name));
 
+		dFloat32 fuelInjectionRate = 10.0f;
 		dFloat32 idleTorquePoundFoot = 100.0f;
 		dFloat32 idleRmp = 900.0f;
 		dFloat32 horsePower = 400.0f;
@@ -192,8 +201,8 @@ class nvVehicleDectriptor
 		dFloat32 rpm1 = 6200.0f;
 		dFloat32 horsePowerAtRedLine = 100.0f;
 		dFloat32 redLineRpm = 8000.0f;
-		m_engine.Init(idleTorquePoundFoot, idleRmp,	horsePower, rpm0, rpm1,
-					  horsePowerAtRedLine, redLineRpm);
+		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp,	
+					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_chassisMass = 1000.0f;
 		m_transmission.m_gearsCount = 4;
@@ -279,6 +288,7 @@ class nvVehicleDectriptorViper : public nvVehicleDectriptor
 	{
 		m_comDisplacement = dVector(0.25f, -0.35f, 0.0f, 0.0f);
 
+		dFloat32 fuelInjectionRate = 10.0f;
 		dFloat32 idleTorquePoundFoot = 100.0f;
 		dFloat32 idleRmp = 700.0f;
 		dFloat32 horsePower = 400.0f;
@@ -286,8 +296,8 @@ class nvVehicleDectriptorViper : public nvVehicleDectriptor
 		dFloat32 rpm1 = 6200.0f;
 		dFloat32 horsePowerAtRedLine = 100.0f;
 		dFloat32 redLineRpm = 8000.0f;
-		m_engine.Init(idleTorquePoundFoot, idleRmp, horsePower, rpm0, rpm1,
-			horsePowerAtRedLine, redLineRpm);
+		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
+					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 	}
 };
 
@@ -299,6 +309,7 @@ class nvVehicleDectriptorJeep : public nvVehicleDectriptor
 	{
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
 
+		dFloat32 fuelInjectionRate = 10.0f;
 		dFloat32 idleTorquePoundFoot = 200.0f;
 		dFloat32 idleRmp = 800.0f;
 		dFloat32 horsePower = 400.0f;
@@ -306,8 +317,8 @@ class nvVehicleDectriptorJeep : public nvVehicleDectriptor
 		dFloat32 rpm1 = 6200.0f;
 		dFloat32 horsePowerAtRedLine = 100.0f;
 		dFloat32 redLineRpm = 8000.0f;
-		m_engine.Init(idleTorquePoundFoot, idleRmp, horsePower, rpm0, rpm1,
-			horsePowerAtRedLine, redLineRpm);
+		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
+					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_steeringAngle = 35.0f;
@@ -349,6 +360,7 @@ class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
 	{
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
 
+		dFloat32 fuelInjectionRate = 10.0f;
 		dFloat32 idleTorquePoundFoot = 250.0f;
 		dFloat32 idleRmp = 800.0f;
 		dFloat32 horsePower = 400.0f;
@@ -356,8 +368,8 @@ class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
 		dFloat32 rpm1 = 6200.0f;
 		dFloat32 horsePowerAtRedLine = 150.0f;
 		dFloat32 redLineRpm = 8000.0f;
-		m_engine.Init(idleTorquePoundFoot, idleRmp, horsePower, rpm0, rpm1,
-			horsePowerAtRedLine, redLineRpm);
+		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
+					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_steeringAngle = 35.0f;
@@ -715,7 +727,6 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			{
 				throttle = (axis[5] + 1.0f) * 0.5f;
 				throttle = throttle * throttle * throttle;
-				//dTrace(("throttle %f\n", throttle));
 			}
 
 			dFloat32 steerAngle = m_configuration.m_frontTire.m_steeringAngle * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
@@ -777,11 +788,11 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 				m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 			}
 
+			const dFloat32 omega = m_motor->GetRpm() / 9.55f;
 			if (!m_isManualTransmission && (m_autoGearShiftTimer < 0))
 			{
 				if (m_currentGear < m_configuration.m_transmission.m_gearsCount)
 				{
-					dFloat32 omega = m_motor->GetRpm() / 9.55f;
 					if (omega < m_configuration.m_engine.GetLowGearShiftRadPerSec())
 					{
 						if (m_currentGear > 0)
@@ -826,6 +837,15 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			SetBrakeTorque(brake);
 			SetHandBrakeTorque(handBrake);
 			SetSteeringAngle(m_steerAngle * dDegreeToRad);
+
+			if (omega <= m_configuration.m_engine.GetIdleRadPerSec())
+			{
+				m_motor->SetFuelRate(1.0f);
+			}
+			else
+			{
+				m_motor->SetFuelRate(m_configuration.m_engine.GetFuelRate());
+			}
 
 			m_motor->SetThrottle(throttle);
 			m_motor->SetTorque(m_configuration.m_engine.GetTorque(m_motor->GetRpm() / 9.55f));

@@ -27,16 +27,13 @@
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 
-//#define D_ENGINE_NOMINAL_TORQUE			(dFloat32(600.0f))
-//#define D_ENGINE_NOMINAL_RAD_PER_SEC	(dFloat32(7000.0f / 9.55f))
-
 ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel)
 	:ndJointBilateralConstraint(3, motor, vehicelModel->m_chassis, motor->GetMatrix())
 	,m_omega(dFloat32(0.0f))
 	,m_idleOmega(dFloat32(0.0f))
 	,m_throttle(dFloat32(0.0f))
-	,m_gasValve(dFloat32(0.02f))
 	,m_engineTorque(dFloat32(0.0f))
+	,m_fuelValveRate(dFloat32(10.0f))
 	,m_vehicelModel(vehicelModel)
 	,m_startEngine(false)
 {
@@ -66,9 +63,9 @@ void ndMultiBodyVehicleMotor::AlignMatrix()
 	m_body0->SetOmega(omega);
 }
 
-void ndMultiBodyVehicleMotor::SetGasValve(dFloat32 gasValve)
+void ndMultiBodyVehicleMotor::SetFuelRate(dFloat32 radPerSecondsStep)
 {
-	m_gasValve = dAbs(gasValve);
+	m_fuelValveRate = dAbs(radPerSecondsStep);
 }
 
 void ndMultiBodyVehicleMotor::SetStart(bool startkey)
@@ -101,8 +98,7 @@ dFloat32 ndMultiBodyVehicleMotor::CalculateAcceleration(ndConstraintDescritor& d
 	m_omega = -relOmega.AddHorizontal().GetScalar();
 	const dFloat32 throttleOmega = dClamp(m_throttle * m_maxOmega, m_idleOmega, m_maxOmega);
 	const dFloat32 deltaOmega = throttleOmega - m_omega;
-	const dFloat32 gasValve = m_gasValve * m_maxOmega;
-	dFloat32 omegaError = dClamp(deltaOmega, -gasValve, gasValve);
+	dFloat32 omegaError = dClamp(deltaOmega, -m_fuelValveRate, m_fuelValveRate);
 	//dTrace(("%f %f\n", throttleOmega, m_omega));
 	return -omegaError * desc.m_invTimestep;
 }
