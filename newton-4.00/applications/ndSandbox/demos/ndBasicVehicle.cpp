@@ -133,6 +133,7 @@ class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
 		m_rearTire.m_regularizer = 0.2f;
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
+		m_rearTire.m_verticalOffset = 0.0f;
 		m_rearTire.m_laterialStiffeness = 1.0f / 1000.0f;
 		m_rearTire.m_longitudinalStiffeness = 50.0f / 1000.0f;
 		
@@ -248,7 +249,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 			case nvVehicleDectriptor::m_frontWheelDrive:
 			{
-				differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire, fr_tire);				break;
+				differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire, fr_tire);
+				break;
 			}
 
 			case nvVehicleDectriptor::m_fourWheeldrive:
@@ -830,7 +832,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix));
 	
 	matrix.m_posit.m_x += 15.0f;
-	AddPlanks(scene, matrix.m_posit);
+	AddPlanks(scene, matrix.m_posit, 60.0f);
 
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 

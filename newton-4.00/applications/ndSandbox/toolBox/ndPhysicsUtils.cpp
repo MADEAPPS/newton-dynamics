@@ -94,14 +94,14 @@ static void AddShape(ndDemoEntityManager* const scene,
 	}
 }
 
-void AddPlanks(ndDemoEntityManager* const scene, const dVector& origin)
+void AddPlanks(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass)
 {
 	for (dInt32 i = 0; i < 5; i++)
 	{
 		for (dInt32 j = 0; j < 5; j++)
 		{
 			dVector posit(origin + dVector((i - 2)* 5.0f, 0.0f, (j - 2) * 5.0f, 0.0f));
-			AddBox(scene, posit, 40.0f, 4.0f, 0.25f, 3.0f);
+			AddBox(scene, posit, mass, 4.0f, 0.25f, 3.0f);
 		}
 	}
 }

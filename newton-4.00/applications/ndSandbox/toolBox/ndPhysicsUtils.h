@@ -25,7 +25,7 @@ ndBodyKinematic* AddBox(ndDemoEntityManager* const scene, const dVector& origin,
 ndBodyKinematic* AddCapsule(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 radius0, dFloat32 radius1, dFloat32 high);
 ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 radius, dFloat32 high, dInt32 segments);
 
-void AddPlanks(ndDemoEntityManager* const scene, const dVector& origin);
+void AddPlanks(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass);
 void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 radius0, dFloat32 radius1, dFloat32 high, dInt32 rows_x, dInt32 rows_z, dInt32 columHigh);
 
 
