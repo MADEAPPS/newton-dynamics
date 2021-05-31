@@ -36,6 +36,7 @@ class ndMultiBodyVehicleDifferential : public ndJointBilateralConstraint
 	protected:
 	void AlignMatrix();
 	void JacobianDerivative(ndConstraintDescritor& desc);
+	void DebugJoint(ndConstraintDebugCallback&) const {}
 
 	dFloat32 GetSlipOmega() const;
 	void SetSlipOmega(dFloat32 speed);

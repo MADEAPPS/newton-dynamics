@@ -46,6 +46,7 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 
 	private:
 	void AlignMatrix();
+	void DebugJoint(ndConstraintDebugCallback&) const {}
 	void JacobianDerivative(ndConstraintDescritor& desc);
 	dFloat32 CalculateAcceleration(ndConstraintDescritor& desc);
 

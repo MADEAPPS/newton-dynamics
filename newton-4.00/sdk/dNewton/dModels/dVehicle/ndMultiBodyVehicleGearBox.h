@@ -36,7 +36,8 @@ class ndMultiBodyVehicleGearBox : public ndJointGear
 	void SetClutchTorque(dFloat32 torqueInNewtonMeters);
 
 	protected:
-	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+	void DebugJoint(ndConstraintDebugCallback&) const {}
+	void JacobianDerivative(ndConstraintDescritor& desc);
 
 	const ndMultiBodyVehicle* m_chassis;
 	dFloat32 m_clutchTorque;

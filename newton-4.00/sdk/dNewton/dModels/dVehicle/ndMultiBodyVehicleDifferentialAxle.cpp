@@ -50,11 +50,6 @@ void ndMultiBodyVehicleDifferentialAxle::JacobianDerivative(ndConstraintDescrito
 	jacobian0.m_angular = matrix0.m_front + matrix0.m_up;
 	jacobian1.m_angular = matrix1.m_front;
 
-	//if ((differential->m_mode == dMultiBodyVehicleDifferential::m_open) ||
-	//	(differential->m_mode == dMultiBodyVehicleDifferential::m_slipLocked)) {
-	//	jacobian1.m_angular = diffMatrix.m_front + diffMatrix.m_up.Scale(m_diffSign);
-	//}
-
 	const dVector& omega0 = m_body0->GetOmega();
 	const dVector& omega1 = m_body1->GetOmega();
 

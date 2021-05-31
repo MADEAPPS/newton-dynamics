@@ -44,7 +44,9 @@ class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 		const ndBodyKinematic* m_rightTire;
 		dFloat32 m_axleAngle;
 	};
-	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+
+	void DebugJoint(ndConstraintDebugCallback&) const {}
+	void JacobianDerivative(ndConstraintDescritor& desc);
 
 	ndAxles m_axles[2];
 	dFloat32 m_springK;

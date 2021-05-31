@@ -35,6 +35,7 @@ class ndMultiBodyVehicleDifferentialAxle : public ndJointBilateralConstraint
 
 	protected:
 	void JacobianDerivative(ndConstraintDescritor& desc);
+	void DebugJoint(ndConstraintDebugCallback&) const {}
 };
 
 #endif
