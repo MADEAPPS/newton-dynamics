@@ -25,82 +25,10 @@
 
 #define AUTOMATION_TRANSMISSION_FRAME_DELAY 120
 
-class nvVehicleDectriptorViper : public nvVehicleDectriptor
+class nvVehicleDectriptorLav25: public nvVehicleDectriptor
 {
 	public:
-	nvVehicleDectriptorViper()
-		:nvVehicleDectriptor("viper1.fbx")
-	{
-		m_comDisplacement = dVector(0.25f, -0.35f, 0.0f, 0.0f);
-
-		dFloat32 fuelInjectionRate = 10.0f;
-		dFloat32 idleTorquePoundFoot = 100.0f;
-		dFloat32 idleRmp = 700.0f;
-		dFloat32 horsePower = 400.0f;
-		dFloat32 rpm0 = 5000.0f;
-		dFloat32 rpm1 = 6200.0f;
-		dFloat32 horsePowerAtRedLine = 100.0f;
-		dFloat32 redLineRpm = 8000.0f;
-		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
-					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
-	}
-};
-
-class nvVehicleDectriptorJeep : public nvVehicleDectriptor
-{
-	public:
-	nvVehicleDectriptorJeep()
-		:nvVehicleDectriptor("jeep.fbx")
-	{
-		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
-
-		dFloat32 fuelInjectionRate = 10.0f;
-		dFloat32 idleTorquePoundFoot = 200.0f;
-		dFloat32 idleRmp = 800.0f;
-		dFloat32 horsePower = 400.0f;
-		dFloat32 rpm0 = 5000.0f;
-		dFloat32 rpm1 = 6200.0f;
-		dFloat32 horsePowerAtRedLine = 100.0f;
-		dFloat32 redLineRpm = 8000.0f;
-		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
-					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
-
-		m_frontTire.m_mass = 100.0f;
-		m_frontTire.m_steeringAngle = 35.0f;
-		m_frontTire.m_springK = 500.0f;
-		m_frontTire.m_damperC = 50.0f;
-		m_frontTire.m_regularizer = 0.2f;
-		m_frontTire.m_upperStop = -0.05f;
-		m_frontTire.m_lowerStop = 0.4f;
-		m_frontTire.m_verticalOffset = -0.15f;
-		m_frontTire.m_laterialStiffeness = 1.0f / 1000.0f;
-		m_frontTire.m_longitudinalStiffeness = 50.0f / 1000.0f;
-
-		m_rearTire.m_mass = 100.0f;
-		m_rearTire.m_steeringAngle = 0.0f;
-		m_rearTire.m_springK = 500.0f;
-		m_rearTire.m_damperC = 50.0f;
-		m_rearTire.m_regularizer = 0.2f;
-		m_rearTire.m_upperStop = -0.05f;
-		m_rearTire.m_lowerStop = 0.4f;
-		m_rearTire.m_verticalOffset = -0.15f;
-		m_rearTire.m_laterialStiffeness = 1.0f / 1000.0f;
-		m_rearTire.m_longitudinalStiffeness = 50.0f / 1000.0f;
-
-		m_brakeTorque = 5000.0f;
-		m_handBrakeTorque = 5000.0f;
-		
-		m_frictionCoefficientScale = 1.3f;
-		
-		m_torsionBarType = m_fourWheelAxle;
-		m_differentialType = m_fourWheeldrive;
-	}
-};
-
-class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
-{
-	public:
-	nvVehicleDectriptorMonsterTruck()
+	nvVehicleDectriptorLav25()
 		:nvVehicleDectriptor("monsterTruck.fbx")
 	{
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
@@ -146,9 +74,7 @@ class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
 	}
 };
 
-static nvVehicleDectriptorJeep jeep;
-static nvVehicleDectriptorViper viperDesc;
-static nvVehicleDectriptorMonsterTruck monterTruckDesc;
+static nvVehicleDectriptorLav25 lav25Desc;
 
 class ndTireNotifyNotify : public ndDemoEntityNotify
 {
@@ -823,8 +749,7 @@ class ndGlobalControl : public ndModel
 	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
 };
 
-
-void ndBasicVehicle (ndDemoEntityManager* const scene)
+void ndHeavyVehicle (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFloorBox(scene);
@@ -842,16 +767,16 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(controls);
 
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, viperDesc, matrix);
-	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, jeep, matrix);
+	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, lav25Desc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
-	matrix.m_posit.m_x += 8.0f;
-	matrix.m_posit.m_z += 2.0f;
-	scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix));
-	
-	matrix.m_posit.m_x += 15.0f;
-	AddPlanks(scene, matrix.m_posit);
+	//matrix.m_posit.m_x += 8.0f;
+	//matrix.m_posit.m_z += 2.0f;
+	//scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix));
+	//
+	//matrix.m_posit.m_x += 15.0f;
+	//AddPlanks(scene, matrix.m_posit);
 
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 

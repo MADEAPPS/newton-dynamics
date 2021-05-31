@@ -94,6 +94,18 @@ static void AddShape(ndDemoEntityManager* const scene,
 	}
 }
 
+void AddPlanks(ndDemoEntityManager* const scene, const dVector& origin)
+{
+	for (dInt32 i = 0; i < 5; i++)
+	{
+		for (dInt32 j = 0; j < 5; j++)
+		{
+			dVector posit(origin + dVector((i - 2)* 5.0f, 0.0f, (j - 2) * 5.0f, 0.0f));
+			AddBox(scene, posit, 40.0f, 4.0f, 0.25f, 3.0f);
+		}
+	}
+}
+
 void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 radius0, dFloat32 radius1, dFloat32 high, dInt32 rows_x, dInt32 rows_z, dInt32 columHigh)
 {
 	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));

@@ -37,17 +37,19 @@
 //#define DEFAULT_SCENE	6		// setting particle fluid
 //#define DEFAULT_SCENE	7		// static mesh collision 
 //#define DEFAULT_SCENE	8		// setting basic joints
-#define DEFAULT_SCENE	9		// setting basic vehicle
-//#define DEFAULT_SCENE	10		// conservation of angular momentum 
-//#define DEFAULT_SCENE	11		// basic voronoi fracture
-//#define DEFAULT_SCENE	12		// simple voronoi fracture
-//#define DEFAULT_SCENE	13		// linked voronoi fracture
-//#define DEFAULT_SCENE	14		// skin peel voronoi fracture
+//#define DEFAULT_SCENE	9		// setting basic vehicle
+#define DEFAULT_SCENE	10		// setting heavy vehicle
+//#define DEFAULT_SCENE	11		// conservation of angular momentum 
+//#define DEFAULT_SCENE	12		// basic voronoi fracture
+//#define DEFAULT_SCENE	13		// simple voronoi fracture
+//#define DEFAULT_SCENE	14		// linked voronoi fracture
+//#define DEFAULT_SCENE	15		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicVehicle(ndDemoEntityManager* const scene);
+void ndHeavyVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
@@ -75,6 +77,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "static mesh", ndStaticMeshCollisionDemo },
 	{ "basic joints", ndBasicJoints },
 	{ "basic vehicle", ndBasicVehicle },
+	{ "basic vehicle", ndHeavyVehicle },
 	{ "angular momentum", ndBasicAngularMomentum },
 	{ "basic convex fracture", ndBasicFracture_0 },
 	{ "simple convex fracture", ndBasicFracture_1 },
