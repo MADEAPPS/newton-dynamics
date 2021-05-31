@@ -116,11 +116,12 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 		// 2- each tire to the model, 
 		// this function will create the tire as a normal rigid body
 		// and attach them to the chassis with the tire joints
-		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rr_tire");
-		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rl_tire");
-		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fr_tire");
-		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fl_tire");
+		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rtire_3");
+		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "ltire_3");
+		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "rtire_0");
+		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "ltire_0");
 
+#if 1
 		ndWheelDescriptor tireInfo;
 		tireInfo.m_springK = m_configuration.m_rearTire.m_springK;
 		tireInfo.m_damperC = m_configuration.m_rearTire.m_damperC;
@@ -228,6 +229,7 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 				break;
 			}
 		}
+#endif
 	}
 
 	~ndHeavyMultiBodyVehicle()
