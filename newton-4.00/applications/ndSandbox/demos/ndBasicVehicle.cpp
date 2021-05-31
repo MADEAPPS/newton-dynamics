@@ -55,7 +55,7 @@ class nvVehicleDectriptor
 			dFloat32 rpm0 = 5000.0f;
 			dFloat32 rpm1 = 6200.0f;
 			dFloat32 horsePowerAtRedLine = 100.0f;
-			dFloat32 redLineRpm = 7000.0f;
+			dFloat32 redLineRpm = 8000.0f;
 			Init(idleTorquePoundFoot, idleRmp,
 				horsePower, rpm0, rpm1,
 				horsePowerAtRedLine, redLineRpm);
@@ -191,7 +191,7 @@ class nvVehicleDectriptor
 		dFloat32 rpm0 = 5000.0f;
 		dFloat32 rpm1 = 6200.0f;
 		dFloat32 horsePowerAtRedLine = 100.0f;
-		dFloat32 redLineRpm = 7000.0f;
+		dFloat32 redLineRpm = 8000.0f;
 		m_engine.Init(idleTorquePoundFoot, idleRmp,	horsePower, rpm0, rpm1,
 					  horsePowerAtRedLine, redLineRpm);
 
@@ -285,7 +285,7 @@ class nvVehicleDectriptorViper : public nvVehicleDectriptor
 		dFloat32 rpm0 = 5000.0f;
 		dFloat32 rpm1 = 6200.0f;
 		dFloat32 horsePowerAtRedLine = 100.0f;
-		dFloat32 redLineRpm = 7000.0f;
+		dFloat32 redLineRpm = 8000.0f;
 		m_engine.Init(idleTorquePoundFoot, idleRmp, horsePower, rpm0, rpm1,
 			horsePowerAtRedLine, redLineRpm);
 	}
@@ -305,7 +305,7 @@ class nvVehicleDectriptorJeep : public nvVehicleDectriptor
 		dFloat32 rpm0 = 5000.0f;
 		dFloat32 rpm1 = 6200.0f;
 		dFloat32 horsePowerAtRedLine = 100.0f;
-		dFloat32 redLineRpm = 7000.0f;
+		dFloat32 redLineRpm = 8000.0f;
 		m_engine.Init(idleTorquePoundFoot, idleRmp, horsePower, rpm0, rpm1,
 			horsePowerAtRedLine, redLineRpm);
 
@@ -355,7 +355,7 @@ class nvVehicleDectriptorMonsterTruck: public nvVehicleDectriptor
 		dFloat32 rpm0 = 5000.0f;
 		dFloat32 rpm1 = 6200.0f;
 		dFloat32 horsePowerAtRedLine = 150.0f;
-		dFloat32 redLineRpm = 7000.0f;
+		dFloat32 redLineRpm = 8000.0f;
 		m_engine.Init(idleTorquePoundFoot, idleRmp, horsePower, rpm0, rpm1,
 			horsePowerAtRedLine, redLineRpm);
 
@@ -781,10 +781,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 			{
 				if (m_currentGear < m_configuration.m_transmission.m_gearsCount)
 				{
-					//dFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * 9.55f;
-					//dFloat32 rpm = m_motor->GetRpm() / maxRpm;
 					dFloat32 omega = m_motor->GetRpm() / 9.55f;
-
 					if (omega < m_configuration.m_engine.GetLowGearShiftRadPerSec())
 					{
 						if (m_currentGear > 0)
@@ -968,7 +965,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 			// draw the tachometer
 			dFloat32 x = gageSize / 2 + 20.0f;
-			dFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * 9.55f;
+			//dFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * 9.55f;
+			dFloat32 maxRpm = 9000.0f;
 			dFloat32 rpm = motor->GetRpm() / maxRpm;
 
 			DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 90.0f);

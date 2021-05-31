@@ -24,15 +24,20 @@ file(GLOB CPP_SOURCE
 	dModels/*.h	
 	dModels/*.cpp
 	dJoints/*.h
-	dJoints/*.cpp)
+	dJoints/*.cpp
+	dModels/dVehicle*.h	
+	dModels/dVehicle/*.cpp)
+
 file(GLOB HEADERS *.h dJoints/*.h)
 file(GLOB HEADERS *.h dModels/*.h)
+file(GLOB HEADERS *.h dModels/dVehicle/*.h)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(./)
 include_directories(dJoints/)
 include_directories(dModels/)
+include_directories(dModels/dVehicle/)
 include_directories(../dCore/)
 include_directories(../dTinyxml/)
 include_directories(../dCollision/)

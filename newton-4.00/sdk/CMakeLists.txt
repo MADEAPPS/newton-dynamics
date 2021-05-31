@@ -35,6 +35,7 @@ else()
 	include_directories(dCollision/)
 	include_directories(dNewton/dModels/)
 	include_directories(dNewton/dJoints/)
+	include_directories(dNewton/dJoints/dVehicle)
 
 	if (NEWTON_ENABLE_GPU_SOLVER)
 		add_definitions(-D_D_NEWTON_OPENCL)
@@ -54,7 +55,7 @@ else()
 	endif(NEWTON_ENABLE_GPU_SOLVER)
 
 	# source and header files
-	file(GLOB HEADERS dTinyxml/*.h dCore/*.h dNewton/*.h dCollision/*.h dNewton/dJoints/*.h dNewton/dModels/*.h)
+	file(GLOB HEADERS dTinyxml/*.h dCore/*.h dNewton/*.h dCollision/*.h dNewton/dJoints/*.h dNewton/dModels/*.h dNewton/dModels/dVehicle/*.h)
 	file(GLOB CPP_SOURCE 
 		dTinyxml/*.h
 		dTinyxml/*.cpp
@@ -67,7 +68,9 @@ else()
 		dNewton/dModels/*.h 
 		dNewton/dModels/*.cpp
 		dNewton/dJoints/*.h 
-		dNewton/dJoints/*.cpp)
+		dNewton/dJoints/*.cpp
+		dNewton/dModels/dVehicle/*.h 
+		dNewton/dModels/dVehicle/*.cpp)
 
 	if(MSVC)
 		 set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
