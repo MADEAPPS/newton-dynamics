@@ -59,14 +59,16 @@ ndShapeConvex::~ndShapeConvex()
 
 void ndShapeConvex::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
-	dInt8 mark[D_MAX_EDGE_COUNT];
 	dVector tmp[D_MAX_EDGE_COUNT];
 	dVector vertex[D_MAX_EDGE_COUNT];
+	dInt8 mark[D_MAX_EDGE_COUNT];
+	ndShapeDebugCallback::ndEdgeType edgeType[D_MAX_EDGE_COUNT];
 
 	dAssert(m_edgeCount < D_MAX_EDGE_COUNT);
 	dAssert(m_vertexCount < D_MAX_EDGE_COUNT);
 
 	memset(mark, 0, sizeof(mark));
+	memset(edgeType, ndShapeDebugCallback::m_shared, sizeof(edgeType));
 	matrix.TransformTriplex(&tmp[0].m_x, sizeof(dVector), &m_vertex[0].m_x, sizeof(dVector), m_vertexCount);
 	for (dInt32 i = 0; i < m_edgeCount; i++) 
 	{
@@ -83,7 +85,7 @@ void ndShapeConvex::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debu
 				count++;
 				edge = edge->m_next;
 			} while (edge != face);
-			debugCallback.DrawPolygon(count, vertex);
+			debugCallback.DrawPolygon(count, vertex, edgeType);
 		}
 	}
 }
@@ -172,7 +174,7 @@ dFloat32 ndShapeConvex::CalculateMassProperties(const dMatrix& offset, dVector& 
 		{
 		}
 
-		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray)
+		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray, const ndEdgeType* const)
 		{
 			m_localData.AddInertiaAndCrossFace(vertexCount, faceArray);
 		}

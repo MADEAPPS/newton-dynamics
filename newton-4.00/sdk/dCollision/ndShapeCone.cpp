@@ -140,6 +140,8 @@ void ndShapeCone::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugC
 	#define NUMBER_OF_DEBUG_SEGMENTS  40
 	dVector pool[NUMBER_OF_DEBUG_SEGMENTS + 1];
 	dVector face[NUMBER_OF_DEBUG_SEGMENTS];
+	ndShapeDebugCallback::ndEdgeType edgeType[NUMBER_OF_DEBUG_SEGMENTS];
+	memset(edgeType, ndShapeDebugCallback::m_shared, sizeof(edgeType));
 
 	dFloat32 angle = dFloat32(0.0f);
 	for (dInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
@@ -165,14 +167,14 @@ void ndShapeCone::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugC
 		face[1] = pool[i];
 		face[2] = pool[NUMBER_OF_DEBUG_SEGMENTS];
 		j = i;
-		debugCallback.DrawPolygon(3, face);
+		debugCallback.DrawPolygon(3, face, edgeType);
 	}
 
 	for (dInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
 	{
 		face[i] = pool[NUMBER_OF_DEBUG_SEGMENTS - 1 - i];
 	}
-	debugCallback.DrawPolygon(NUMBER_OF_DEBUG_SEGMENTS, face);
+	debugCallback.DrawPolygon(NUMBER_OF_DEBUG_SEGMENTS, face, edgeType);
 }
 
 dVector ndShapeCone::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const

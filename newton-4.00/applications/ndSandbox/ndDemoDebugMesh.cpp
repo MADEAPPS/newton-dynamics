@@ -28,7 +28,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 		{
 		}
 
-		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex)
+		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex, const ndEdgeType* const edgeType)
 		{
 			dVector p0(faceVertex[0]);
 			dVector p1(faceVertex[1]);
@@ -164,7 +164,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 		{
 		}
 
-		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex)
+		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex, const ndEdgeType* const edgeType)
 		{
 			dInt32 i0 = vertexCount - 1;
 			for (dInt32 i = 0; i < vertexCount; i++)

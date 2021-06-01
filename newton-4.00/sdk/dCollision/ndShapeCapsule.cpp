@@ -278,6 +278,10 @@ void ndShapeCapsule::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& deb
 		TesselateTriangle(POWER, p1, p5, p3, count, tmpVectex);
 		TesselateTriangle(POWER, p1, p2, p5, count, tmpVectex);
 
+		dVector face[4];
+		ndShapeDebugCallback::ndEdgeType edgeType[4];
+		memset(edgeType, ndShapeDebugCallback::m_shared, sizeof(edgeType));
+
 		for (dInt32 i = 0; i < count; i += 3) 
 		{
 			dInt32 positive = 0;
@@ -291,7 +295,6 @@ void ndShapeCapsule::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& deb
 
 			if (positive) 
 			{
-				dVector face[4];
 				face[0] = tmpVectex[i + 0];
 				face[1] = tmpVectex[i + 1];
 				face[2] = tmpVectex[i + 2];
@@ -300,12 +303,11 @@ void ndShapeCapsule::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& deb
 				face[2].m_x += m_height;
 				matrix.TransformTriplex(&face[0].m_x, sizeof(dVector), &face[0].m_x, sizeof(dVector), 3);
 
-				debugCallback.DrawPolygon(3, face);
-				//callback(userData, 3, &face[0].m_x, 0);
+				debugCallback.DrawPolygon(3, face, edgeType);
 			}
 			else 
 			{
-				dVector face[4];
+				
 				face[0] = tmpVectex[i + 0];
 				face[1] = tmpVectex[i + 1];
 				face[2] = tmpVectex[i + 2];
@@ -313,8 +315,8 @@ void ndShapeCapsule::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& deb
 				face[1].m_x -= m_height;
 				face[2].m_x -= m_height;
 				matrix.TransformTriplex(&face[0].m_x, sizeof(dVector), &face[0].m_x, sizeof(dVector), 3);
-				//callback(userData, 3, &face[0].m_x, 0);
-				debugCallback.DrawPolygon(3, face);
+
+				debugCallback.DrawPolygon(3, face, edgeType);
 			}
 			if (positive == 1) 
 			{
@@ -331,7 +333,6 @@ void ndShapeCapsule::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& deb
 					q1 = tmpVectex[i + 0];
 				}
 
-				dVector face[4];
 				face[0] = q1;
 				face[1] = q0;
 				face[2] = q0;
@@ -341,24 +342,21 @@ void ndShapeCapsule::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& deb
 				face[2].m_x -= m_height;
 				face[3].m_x -= m_height;
 				matrix.TransformTriplex(&face[0].m_x, sizeof(dVector), &face[0].m_x, sizeof(dVector), 4);
-				//callback(userData, 4, &face[0].m_x, 0);
-				debugCallback.DrawPolygon(4, face);
+
+				debugCallback.DrawPolygon(4, face, edgeType);
 			}
 		}
 	}
 	else 
 	{
-		dAssert(0);
 		dMatrix transform(matrix);
 		transform[0] = transform[0].Scale(m_transform.m_x);
 		transform[1] = transform[1].Scale(m_transform.m_y);
 		transform[2] = transform[2].Scale(m_transform.m_z);
-		//ndShapeConvex::DebugCollision(transform, callback, userData);
 		ndShapeConvex::DebugShape(transform, debugCallback);
 	}
 }
 
-//dVector ndShapeCapsule::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const
 dVector ndShapeCapsule::SupportVertexSpecialProjectPoint(const dVector& testPoint, const dVector& direction) const
 {
 	dVector dir(direction * m_transform);

@@ -37,6 +37,12 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeDebugCallback : public dClassAlloc
 {
 	public: 
+	enum ndEdgeType
+	{
+		m_shared,
+		m_open,
+	};
+
 	ndShapeDebugCallback()
 		:m_instance(nullptr)
 	{
@@ -46,7 +52,7 @@ class ndShapeDebugCallback : public dClassAlloc
 	{
 	}
 
-	virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray) = 0;
+	virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray, const ndEdgeType* const edgeType) = 0;
 
 	const ndShapeInstance* m_instance;
 } D_GCC_NEWTON_ALIGN_32;

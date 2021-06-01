@@ -1326,9 +1326,8 @@ dFloat32 ndShapeCompoundConvex::CalculateMassProperties(const dMatrix& offset, d
 	{
 		public:
 
-		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray)
+		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray, const ndEdgeType* const)
 		{
-			//dPolyhedraMassProperties& localData = *((dgPolyhedraMassProperties*)userData);
 			m_localData.AddInertiaAndCrossFace(vertexCount, faceArray);
 		}
 

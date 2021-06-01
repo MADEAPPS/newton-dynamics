@@ -80,7 +80,7 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 	{
 	}
 
-	void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray)
+	void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray, const ndEdgeType* const)
 	{
 		ndFaceInfo& face = m_polygons[m_count];
 		face.m_count = vertexCount;

@@ -3761,7 +3761,7 @@ ndMeshEffect::ndMeshEffect(const ndShapeInstance& shape)
 		{
 		}
 
-		void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex)
+		void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex, const ndEdgeType* const)
 		{
 			const dFloat64 brush = m_brush;
 			m_faceIndexCount.PushBack(vertexCount);

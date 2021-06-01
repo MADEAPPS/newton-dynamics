@@ -205,7 +205,6 @@ void ndShapeChamferCylinder::DebugShape(const dMatrix& matrix, ndShapeDebugCallb
 	dFloat32 sliceAngle = dFloat32(0.0f);
 	dFloat32 sliceStep = dPi / slices;
 	dFloat32 breakStep = dFloat32(2.0f) * dPi / brakes;
-
 	dVector pool[24 * (12 + 1)];
 
 	dMatrix rot(dPitchMatrix(breakStep));
@@ -216,9 +215,6 @@ void ndShapeChamferCylinder::DebugShape(const dMatrix& matrix, ndShapeDebugCallb
 		sliceAngle += sliceStep;
 		for (dInt32 i = 0; i < brakes; i++)
 		{
-			//pool[index].m_x = p0.m_x;
-			//pool[index].m_y = p0.m_y;
-			//pool[index].m_z = p0.m_z;
 			pool[index] = p0;
 			p0 = rot.UnrotateVector(p0);
 			index++;
@@ -228,6 +224,8 @@ void ndShapeChamferCylinder::DebugShape(const dMatrix& matrix, ndShapeDebugCallb
 	matrix.TransformTriplex(&pool[0].m_x, sizeof(dVector), &pool[0].m_x, sizeof(dVector), 24 * (12 + 1));
 
 	dVector face[32];
+	ndShapeDebugCallback::ndEdgeType edgeType[32];
+	memset(edgeType, ndShapeDebugCallback::m_shared, sizeof(edgeType));
 
 	index = 0;
 	for (dInt32 j = 0; j < slices; j++)
@@ -241,8 +239,7 @@ void ndShapeChamferCylinder::DebugShape(const dMatrix& matrix, ndShapeDebugCallb
 			face[3] = pool[index + brakes];
 			index0 = index;
 			index++;
-			//callback (userData, 4, &face[0].m_x, 0);
-			debugCallback.DrawPolygon(4, face);
+			debugCallback.DrawPolygon(4, face, edgeType);
 		}
 	}
 
@@ -250,15 +247,13 @@ void ndShapeChamferCylinder::DebugShape(const dMatrix& matrix, ndShapeDebugCallb
 	{
 		face[i] = pool[i];
 	}
-	//callback (userData, 24, &face[0].m_x, 0);
-	debugCallback.DrawPolygon(24, face);
+	debugCallback.DrawPolygon(24, face, edgeType);
 
 	for (dInt32 i = 0; i < brakes; i++)
 	{
 		face[i] = pool[brakes * (slices + 1) - i - 1];
 	}
-	//callback (userData, 24, &face[0].m_x, 0);
-	debugCallback.DrawPolygon(24, face);
+	debugCallback.DrawPolygon(24, face, edgeType);
 }
 
 dVector ndShapeChamferCylinder::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const

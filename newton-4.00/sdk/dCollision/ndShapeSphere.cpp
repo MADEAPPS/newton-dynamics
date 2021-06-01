@@ -242,6 +242,7 @@ ndShapeInfo ndShapeSphere::GetShapeInfo() const
 void ndShapeSphere::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
 	dVector tmpVectex[1024 * 2];
+	ndShapeDebugCallback::ndEdgeType edgeType[1024 * 2];
 
 	dVector p0(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
 	dVector p1(-dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
@@ -263,12 +264,13 @@ void ndShapeSphere::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debu
 
 	for (dInt32 i = 0; i < count; i++) 
 	{
+		edgeType[i] = ndShapeDebugCallback::m_shared;
 		tmpVectex[i] = matrix.TransformVector(tmpVectex[i].Scale(m_radius)) & dVector::m_triplexMask;
 	}
 
 	for (dInt32 i = 0; i < count; i += 3) 
 	{
-		debugCallback.DrawPolygon(3, &tmpVectex[i]);
+		debugCallback.DrawPolygon(3, &tmpVectex[i], &edgeType[i]);
 	}
 }
 

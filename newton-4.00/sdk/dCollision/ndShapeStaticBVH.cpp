@@ -131,6 +131,8 @@ ndShapeInfo ndShapeStaticBVH::GetShapeInfo() const
 dIntersectStatus ndShapeStaticBVH::ShowDebugPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32)
 {
 	dVector poly[128];
+	ndShapeDebugCallback::ndEdgeType edgeType[128];
+
 	dInt32 stride = dInt32(strideInBytes / sizeof(dFloat32));
 
 	dgCollisionBVHShowPolyContext& data = *(dgCollisionBVHShowPolyContext*)context;
@@ -138,8 +140,10 @@ dIntersectStatus ndShapeStaticBVH::ShowDebugPolygon(void* const context, const d
 	{
 		dVector p(&polygon[indexArray[i] * stride]);
 		poly[i] = data.m_matrix.TransformVector(p & dVector::m_triplexMask);
+		edgeType[i] = ndShapeDebugCallback::m_shared;
 	}
-	data.m_callback->DrawPolygon(indexCount, poly);
+	//dAssert(0);
+	data.m_callback->DrawPolygon(indexCount, poly, edgeType);
 	return t_ContinueSearh;
 }
 
@@ -205,36 +209,15 @@ dIntersectStatus ndShapeStaticBVH::GetPolygon(void* const context, const dFloat3
 		return t_StopSearh;
 	}
 
-	//if (data.m_me->GetDebugCollisionCallback()) 
-	//{
-	//	dTriplex triplex[128];
-	//	dInt32 stride = dInt32(strideInBytes / sizeof(dFloat32));
-	//	const dVector scale = data.m_polySoupInstance->GetScale();
-	//	dMatrix matrix(data.m_polySoupInstance->GetLocalMatrix() * data.m_polySoupBody->GetMatrix());
-	//	for (dInt32 i = 0; i < indexCount; i++) {
-	//		dVector p(matrix.TransformVector(scale * (dVector(&polygon[indexArray[i] * stride]) & dVector::m_triplexMask)));
-	//		triplex[i].m_x = p.m_x;
-	//		triplex[i].m_y = p.m_y;
-	//		triplex[i].m_z = p.m_z;
-	//	}
-	//	if (data.m_polySoupBody) 
-	//	{
-	//		data.m_me->GetDebugCollisionCallback() (data.m_polySoupBody, data.m_objBody, indexArray[indexCount], indexCount, &triplex[0].m_x, sizeof(dTriplex));
-	//	}
-	//}
-
-	//dAssert(data.m_vertex == polygon);
 	dInt32 count = indexCount * 2 + 3;
 
 	data.m_faceIndexCount[data.m_faceCount] = indexCount;
-	//data.m_faceIndexStart[data.m_faceCount] = data.m_faceCount ? (data.m_faceIndexStart[data.m_faceCount - 1] + data.m_faceIndexCount[data.m_faceCount - 1]) : 0;
 	data.m_faceIndexStart[data.m_faceCount] = data.m_globalIndexCount;
 	data.m_hitDistance[data.m_faceCount] = hitDistance;
 	data.m_faceCount++;
 	dInt32* const dst = &data.m_faceVertexIndex[data.m_globalIndexCount];
 
 	//the docks say memcpy is an intrinsic function but as usual this is another Microsoft lied
-	//memcpy (dst, indexArray, sizeof (dInt32) * count);
 	for (dInt32 i = 0; i < count; i++) 
 	{
 		dst[i] = indexArray[i];

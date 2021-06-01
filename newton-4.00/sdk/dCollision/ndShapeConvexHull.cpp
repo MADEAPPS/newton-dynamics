@@ -936,6 +936,8 @@ ndShapeInfo ndShapeConvexHull::GetShapeInfo() const
 void ndShapeConvexHull::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
 	dVector vertex[512];
+	ndShapeDebugCallback::ndEdgeType edgeType[512];
+	memset(edgeType, ndShapeDebugCallback::m_shared, sizeof(edgeType));
 	for (dInt32 i = 0; i < m_faceCount; i++) 
 	{
 		ndConvexSimplexEdge* const face = m_faceArray[i];
@@ -949,7 +951,7 @@ void ndShapeConvexHull::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& 
 			ptr = ptr->m_next;
 		} while (ptr != face);
 		matrix.TransformTriplex(&vertex[0].m_x, sizeof(dVector), &vertex[0].m_x, sizeof(dVector), count);
-		debugCallback.DrawPolygon(count, vertex);
+		debugCallback.DrawPolygon(count, vertex, edgeType);
 	}
 }
 

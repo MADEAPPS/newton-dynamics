@@ -152,6 +152,8 @@ void ndShapeCylinder::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& de
 	#define NUMBER_OF_DEBUG_SEGMENTS 24
 	dVector face[NUMBER_OF_DEBUG_SEGMENTS];
 	dVector pool[NUMBER_OF_DEBUG_SEGMENTS * 2];
+	ndShapeDebugCallback::ndEdgeType edgeType[NUMBER_OF_DEBUG_SEGMENTS];
+	memset(edgeType, ndShapeDebugCallback::m_shared, sizeof(edgeType));
 
 	dFloat32 angle = dFloat32(0.0f);
 	for (dInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
@@ -179,20 +181,20 @@ void ndShapeCylinder::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& de
 		face[2] = pool[i + NUMBER_OF_DEBUG_SEGMENTS];
 		face[3] = pool[j + NUMBER_OF_DEBUG_SEGMENTS];
 		j = i;
-		debugCallback.DrawPolygon(4, face);
+		debugCallback.DrawPolygon(4, face, edgeType);
 	}
 
 	for (dInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
 	{
 		face[i] = pool[NUMBER_OF_DEBUG_SEGMENTS - 1 - i];
 	}
-	debugCallback.DrawPolygon(NUMBER_OF_DEBUG_SEGMENTS, face);
+	debugCallback.DrawPolygon(NUMBER_OF_DEBUG_SEGMENTS, face, edgeType);
 
 	for (dInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
 	{
 		face[i] = pool[i + NUMBER_OF_DEBUG_SEGMENTS];
 	}
-	debugCallback.DrawPolygon(NUMBER_OF_DEBUG_SEGMENTS, face);
+	debugCallback.DrawPolygon(NUMBER_OF_DEBUG_SEGMENTS, face, edgeType);
 }
 
 dVector ndShapeCylinder::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const
