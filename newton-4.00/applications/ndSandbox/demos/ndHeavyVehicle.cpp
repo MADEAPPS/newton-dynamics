@@ -72,12 +72,11 @@ class nvVehicleDectriptorLav25: public nvVehicleDectriptor
 		m_frictionCoefficientScale = 1.3f;
 		
 		m_torsionBarType = m_fourWheelAxle;
-		m_differentialType = m_fourWheeldrive;
+		m_differentialType = m_eightWheeldrive;
 	}
 };
 
 static nvVehicleDectriptorLav25 lav25Desc;
-
 
 class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 {
@@ -86,6 +85,7 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 		:ndMultiBodyVehicle(dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f))
 		,m_configuration(desc)
 		,m_steerAngle(0.0f)
+		,m_parking()
 		,m_ignition()
 		,m_neutralGear()
 		,m_reverseGear()
@@ -95,6 +95,7 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 		,m_currentGear(0)
 		,m_autoGearShiftTimer(0)
 		,m_isPlayer(false)
+		,m_isParked(true)
 		,m_isManualTransmission(false)
 	{
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
@@ -200,6 +201,12 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 			}
 
 			case nvVehicleDectriptor::m_fourWheeldrive:
+			{
+				dAssert(0);
+				break;
+			}
+
+			case nvVehicleDectriptor::m_eightWheeldrive:
 			{
 				ndMultiBodyVehicleDifferential* const rearDifferential0 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0);
 				ndMultiBodyVehicleDifferential* const rearDifferential1 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire1, rr_tire1);
@@ -416,6 +423,11 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 
 			dFloat32 handBrake = m_configuration.m_handBrakeTorque * dFloat32(scene->GetKeyState(' ') || buttons[4]);
 
+			if (m_parking.Update(scene->GetKeyState('P') || buttons[6]))
+			{
+				m_isParked = !m_isParked;
+			}
+
 			if (m_ignition.Update(scene->GetKeyState('I') || buttons[7]))
 			{
 				m_motor->SetStart(!m_motor->GetStart());
@@ -429,6 +441,7 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 			// transmission front gear up
 			if (m_forwardGearUp.Update(scene->GetKeyState('>') || scene->GetKeyState('.') || buttons[11]))
 			{
+				m_isParked = false;
 				if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
 				{
 					m_currentGear = 0;
@@ -449,6 +462,7 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 			// transmission front gear down
 			if (m_forwardGearDown.Update(scene->GetKeyState('<') || scene->GetKeyState(',') || buttons[13]))
 			{
+				m_isParked = false;
 				if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
 				{
 					m_currentGear = 0;
@@ -527,6 +541,12 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 
 			m_motor->SetThrottle(throttle);
 			m_motor->SetTorque(m_configuration.m_engine.GetTorque(m_motor->GetRpm() / 9.55f));
+		}
+
+		if (m_isParked)
+		{
+			dFloat32 brake = m_configuration.m_brakeTorque;
+			SetBrakeTorque(brake);
 		}
 
 		ndMultiBodyVehicle::Update(world, timestep);
@@ -648,6 +668,7 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 		scene->Print(color, "forward gear up     : '>'");
 		scene->Print(color, "forward gear down   : '<'");
 		scene->Print(color, "reverse gear	    : 'r'");
+		scene->Print(color, "parking gear	    : 'p'");
 	}
 
 	void RenderUI(ndDemoEntityManager* const scene)
@@ -690,6 +711,7 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 	GLuint m_greenNeedle;
 	dInt32 m_gearMap[8];
 	
+	ndDemoEntityManager::ndKeyTrigger m_parking;
 	ndDemoEntityManager::ndKeyTrigger m_ignition;
 	ndDemoEntityManager::ndKeyTrigger m_neutralGear;
 	ndDemoEntityManager::ndKeyTrigger m_reverseGear;
@@ -700,6 +722,7 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 	dInt32 m_currentGear;
 	dInt32 m_autoGearShiftTimer;
 	bool m_isPlayer;
+	bool m_isParked;
 	bool m_isManualTransmission;
 };
 

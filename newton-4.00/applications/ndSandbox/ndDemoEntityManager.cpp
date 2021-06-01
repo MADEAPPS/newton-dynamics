@@ -77,7 +77,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "static mesh", ndStaticMeshCollisionDemo },
 	{ "basic joints", ndBasicJoints },
 	{ "basic vehicle", ndBasicVehicle },
-	{ "basic vehicle", ndHeavyVehicle },
+	{ "heavy vehicle", ndHeavyVehicle },
 	{ "angular momentum", ndBasicAngularMomentum },
 	{ "basic convex fracture", ndBasicFracture_0 },
 	{ "simple convex fracture", ndBasicFracture_1 },

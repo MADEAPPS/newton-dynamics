@@ -15,7 +15,6 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntity.h"
 
-
 #define AUTOMATION_TRANSMISSION_FRAME_DELAY 120
 
 class ndTireNotifyNotify : public ndDemoEntityNotify
@@ -106,6 +105,7 @@ class nvVehicleDectriptor
 		m_rearWheelDrive,
 		m_frontWheelDrive,
 		m_fourWheeldrive,
+		m_eightWheeldrive,
 	};
 
 	enum ndTorsionBarType
