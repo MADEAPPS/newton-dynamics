@@ -398,6 +398,26 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 			//shapeArray[count] = NewtonCreateBox(world, extremes.m_x, extremes.m_y, extremes.m_z, 0, &matrix[0][0]);
 			//count++;
 			//dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
+
+			dAssert(0);
+			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+			dArray<dVector> points;
+			mesh->GetVertexArray(points);
+			dVector extremes(dVector::m_zero);
+			for (dInt32 i = 0; i < mesh->m_vertexCount; i++)
+			{
+				extremes = extremes.GetMax(points[i]);
+			}
+
+			extremes = extremes.Scale(2.0f);
+			dMatrix matrix(child->GetCurrentMatrix());
+
+			shapeArray[count] = new ndShapeInstance(new ndShapeBox(extremes.m_x, extremes.m_y, extremes.m_z));
+			shapeArray[count]->SetLocalMatrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
+			count++;
+			dAssert(count < sizeof(shapeArray) / sizeof(shapeArray[0]));
+			break;
+
 		} 
 		else if (strstr (name, "capsule")) 
 		{
