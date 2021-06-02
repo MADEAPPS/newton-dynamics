@@ -1263,13 +1263,16 @@ void ndSkeletonContainer::SolveLcp(dInt32 stride, dInt32 size, const dFloat32* c
 				const dFloat32* const row = &matrix[base];
 #if 0
 				dFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
-				if (f > h) {
+				if (f > h) 
+				{
 					f = h;
 				}
-				else if (f < l) {
+				else if (f < l) 
+				{
 					f = l;
 				}
-				else {
+				else 
+				{
 					tolerance += r * r;
 				}
 				const dFloat32 dx = f - x[i];
@@ -1301,7 +1304,6 @@ void ndSkeletonContainer::SolveBlockLcp(dInt32 size, dInt32 blockSize, const dFl
 		dSolveCholesky(blockSize, size, m_massMatrix11, x, b);
 		if (blockSize != size) 
 		{
-
 			dInt32 base = blockSize * size;
 			for (dInt32 i = blockSize; i < size; i++) 
 			{

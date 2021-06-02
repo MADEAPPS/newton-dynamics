@@ -1092,14 +1092,14 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndGlobalControlHeavyVehicle* const controls = new ndGlobalControlHeavyVehicle();
 	scene->GetWorld()->AddModel(controls);
 
-	ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, tractorDesc, matrix);
-	//ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix);
+	//ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, tractorDesc, matrix);
+	ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
 	matrix.m_posit.m_x += 8.0f;
 	matrix.m_posit.m_z += 2.0f;
-	scene->GetWorld()->AddModel(new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix));
+	//scene->GetWorld()->AddModel(new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix));
 	//
 	//matrix.m_posit.m_x += 15.0f;
 	//AddPlanks(scene, matrix.m_posit, 300.0f);

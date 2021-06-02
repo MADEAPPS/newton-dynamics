@@ -144,4 +144,50 @@ class nvVehicleDectriptor
 	ndTorsionBarType m_torsionBarType;
 };
 
+class ndBasicVehicle : public ndMultiBodyVehicle
+{
+	public:
+	ND_CLASS_RELECTION(ndBasicVehicle);
+
+	ndBasicVehicle(ndDemoEntityManager* const scene, const nvVehicleDectriptor& desc, const dMatrix& matrix);
+	virtual ~ndBasicVehicle();
+
+	bool IsPlayer() const;
+	void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true);
+	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename);
+
+	protected:
+	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, dFloat32 mass);
+	void CalculateTireDimensions(const char* const tireName, dFloat32& width, dFloat32& radius, ndDemoEntity* const vehEntity);
+	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, const nvVehicleDectriptor::ndTireDefinition& definition, const char* const tireName);
+	void Update(ndWorld* const world, dFloat32 timestep);
+	dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const;
+
+	nvVehicleDectriptor m_configuration;
+	dFloat32 m_steerAngle;
+
+	ndDemoEntityManager::ndKeyTrigger m_parking;
+	ndDemoEntityManager::ndKeyTrigger m_ignition;
+	ndDemoEntityManager::ndKeyTrigger m_neutralGear;
+	ndDemoEntityManager::ndKeyTrigger m_reverseGear;
+	ndDemoEntityManager::ndKeyTrigger m_forwardGearUp;
+	ndDemoEntityManager::ndKeyTrigger m_forwardGearDown;
+	ndDemoEntityManager::ndKeyTrigger m_manualTransmission;
+
+	dInt32 m_currentGear;
+	dInt32 m_autoGearShiftTimer;
+	bool m_isPlayer;
+	bool m_isParked;
+	bool m_isManualTransmission;
+};
+
+class ndVehicleSelector : public ndModel
+{
+	public:
+	ndVehicleSelector();
+	void Update(ndWorld* const, dFloat32){}
+	void PostUpdate(ndWorld* const world, dFloat32);
+	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
+};
+
 #endif
