@@ -641,6 +641,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 		ndBodyDynamic* const axleBody = new ndBodyDynamic();
 		//axleBody->SetNotifyCallback(new ndDemoEntityNotify(scene, chassisEntity));
+		axleBody->SetNotifyCallback(new ndTireNotifyNotify(scene, axleEntity, chassis));
 		axleBody->SetMatrix(axleMatrix);
 		axleBody->SetCollisionShape(*axleCollision);
 		axleBody->SetMassMatrix(axleMass, *axleCollision);
@@ -832,8 +833,8 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndVehicleSelector* const controls = new ndVehicleSelector();
 	scene->GetWorld()->AddModel(controls);
 
-	//ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, tractorDesc, matrix);
-	ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix);
+	ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, tractorDesc, matrix);
+	//ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 

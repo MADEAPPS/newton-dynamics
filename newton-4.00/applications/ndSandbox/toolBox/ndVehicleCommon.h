@@ -20,10 +20,10 @@
 class ndTireNotifyNotify : public ndDemoEntityNotify
 {
 	public:
-	ndTireNotifyNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const chassis);
+	ndTireNotifyNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parent);
 	void OnTranform(dInt32, const dMatrix& matrix);
 
-	ndBodyDynamic* m_chassis;
+	ndBodyDynamic* m_parent;
 };
 
 class ndVehicleDectriptor
