@@ -26,7 +26,7 @@ class ndTireNotifyNotify : public ndDemoEntityNotify
 	ndBodyDynamic* m_chassis;
 };
 
-class nvVehicleDectriptor
+class ndVehicleDectriptor
 {
 	public:
 	class ndTorqueTap
@@ -116,7 +116,8 @@ class nvVehicleDectriptor
 		m_fourWheelAxle,
 	};
 
-	nvVehicleDectriptor(const char* const fileName);
+	ndVehicleDectriptor() {}
+	ndVehicleDectriptor(const char* const fileName);
 
 	dVector m_comDisplacement;
 	char m_name[32];
@@ -149,21 +150,17 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 	public:
 	ND_CLASS_RELECTION(ndBasicVehicle);
 
-	ndBasicVehicle(ndDemoEntityManager* const scene, const nvVehicleDectriptor& desc, const dMatrix& matrix);
+	ndBasicVehicle(const ndVehicleDectriptor& desc);
 	virtual ~ndBasicVehicle();
 
 	bool IsPlayer() const;
-	void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true);
-	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename);
+	virtual void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true);
 
 	protected:
-	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, dFloat32 mass);
-	void CalculateTireDimensions(const char* const tireName, dFloat32& width, dFloat32& radius, ndDemoEntity* const vehEntity);
-	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, const nvVehicleDectriptor::ndTireDefinition& definition, const char* const tireName);
 	void Update(ndWorld* const world, dFloat32 timestep);
 	dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const;
 
-	nvVehicleDectriptor m_configuration;
+	ndVehicleDectriptor m_configuration;
 	dFloat32 m_steerAngle;
 
 	ndDemoEntityManager::ndKeyTrigger m_parking;
@@ -187,6 +184,7 @@ class ndVehicleSelector : public ndModel
 	ndVehicleSelector();
 	void Update(ndWorld* const, dFloat32){}
 	void PostUpdate(ndWorld* const world, dFloat32);
+
 	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
 };
 

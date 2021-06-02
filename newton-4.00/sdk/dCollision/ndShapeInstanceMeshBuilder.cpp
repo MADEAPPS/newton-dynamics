@@ -41,7 +41,6 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 
 		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex, const ndEdgeType* const)
 		{
-			dAssert(0);
 			m_faceIndexCount.PushBack(vertexCount);
 			for (dInt32 i = 0; i < vertexCount; i++) 
 			{

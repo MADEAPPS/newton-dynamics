@@ -24,11 +24,11 @@
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"
 
-class nvVehicleDectriptorLav25: public nvVehicleDectriptor
+class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 {
 	public:
-	nvVehicleDectriptorLav25()
-		:nvVehicleDectriptor("lav_25.fbx")
+	ndVehicleDectriptorLav25()
+		:ndVehicleDectriptor("lav_25.fbx")
 	{
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
 
@@ -76,11 +76,11 @@ class nvVehicleDectriptorLav25: public nvVehicleDectriptor
 	}
 };
 
-class nvVehicleDectriptorTractor : public nvVehicleDectriptor
+class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 {
 	public:
-	nvVehicleDectriptorTractor()
-		:nvVehicleDectriptor("tractor.fbx")
+	ndVehicleDectriptorTractor()
+		:ndVehicleDectriptor("tractor.fbx")
 	{
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
 
@@ -128,28 +128,14 @@ class nvVehicleDectriptorTractor : public nvVehicleDectriptor
 	}
 };
 
-static nvVehicleDectriptorLav25 lav25Desc;
-static nvVehicleDectriptorTractor tractorDesc;
+static ndVehicleDectriptorLav25 lav25Desc;
+static ndVehicleDectriptorTractor tractorDesc;
 
-class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
+class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 {
 	public:
-	ndHeavyMultiBodyVehicle(ndDemoEntityManager* const scene, const nvVehicleDectriptor& desc, const dMatrix& matrix)
-		:ndMultiBodyVehicle(dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f))
-		,m_configuration(desc)
-		,m_steerAngle(0.0f)
-		,m_parking()
-		,m_ignition()
-		,m_neutralGear()
-		,m_reverseGear()
-		,m_forwardGearUp()
-		,m_forwardGearDown()
-		,m_manualTransmission()
-		,m_currentGear(0)
-		,m_autoGearShiftTimer(0)
-		,m_isPlayer(false)
-		,m_isParked(true)
-		,m_isManualTransmission(false)
+	ndHeavyMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const dMatrix& matrix)
+		:ndBasicVehicle(desc)
 	{
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
@@ -253,25 +239,25 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 		ndMultiBodyVehicleDifferential* differential = nullptr;
 		switch (m_configuration.m_differentialType)
 		{
-			case nvVehicleDectriptor::m_rearWheelDrive:
+			case ndVehicleDectriptor::m_rearWheelDrive:
 			{
 				differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0);
 				break;
 			}
 
-			case nvVehicleDectriptor::m_frontWheelDrive:
+			case ndVehicleDectriptor::m_frontWheelDrive:
 			{
 				differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire0, fr_tire0);
 				break;
 			}
 
-			case nvVehicleDectriptor::m_fourWheeldrive:
+			case ndVehicleDectriptor::m_fourWheeldrive:
 			{
 				dAssert(0);
 				break;
 			}
 
-			case nvVehicleDectriptor::m_eightWheeldrive:
+			case ndVehicleDectriptor::m_eightWheeldrive:
 			{
 				ndMultiBodyVehicleDifferential* const rearDifferential0 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0);
 				ndMultiBodyVehicleDifferential* const rearDifferential1 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire1, rr_tire1);
@@ -296,13 +282,13 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 
 		switch (m_configuration.m_torsionBarType)
 		{
-			case nvVehicleDectriptor::m_noWheelAxle:
+			case ndVehicleDectriptor::m_noWheelAxle:
 			{
 				// no torsion bar
 				break;
 			}
 
-			case nvVehicleDectriptor::m_rearWheelAxle:
+			case ndVehicleDectriptor::m_rearWheelAxle:
 			{
 				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world);
 				torsionBar->AddAxel(rl_tire0->GetBody0(), rr_tire0->GetBody0());
@@ -310,7 +296,7 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 				break;
 			}
 
-			case nvVehicleDectriptor::m_frontWheelAxle:
+			case ndVehicleDectriptor::m_frontWheelAxle:
 			{
 				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world);
 				torsionBar->AddAxel(fl_tire0->GetBody0(), fr_tire0->GetBody0());
@@ -318,7 +304,7 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 				break;
 			}
 
-			case nvVehicleDectriptor::m_fourWheelAxle:
+			case ndVehicleDectriptor::m_fourWheelAxle:
 			{
 				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world);
 				torsionBar->AddAxel(rl_tire0->GetBody0(), rr_tire0->GetBody0());
@@ -339,8 +325,6 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 		ReleaseTexture(m_greenNeedle);
 	}
 
-	ND_CLASS_RELECTION(ndHeavyMultiBodyVehicle);
-
 	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename)
 	{
 		fbxDemoEntity* const vehicleEntity = LoadFbxMesh(filename);
@@ -359,14 +343,9 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 
 	void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true)
 	{
-		m_isPlayer = mode;
+		ndBasicVehicle::SetAsPlayer(scene, mode);
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 		scene->Set2DDisplayRenderFunction(RenderHelp, RenderUI, this);
-	}
-
-	bool IsPlayer() const
-	{
-		return m_isPlayer;
 	}
 
 	static void RenderUI(ndDemoEntityManager* const scene, void* const context)
@@ -623,7 +602,7 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 		radius = size.m_y * 0.5f;
 	}
 
-	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, const nvVehicleDectriptor::ndTireDefinition& definition, const char* const tireName)
+	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, const ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName)
 	{
 		dFloat32 width;
 		dFloat32 radius;
@@ -649,7 +628,7 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 		return tireBody;
 	}
 
-	ndBodyDynamic* MakeFronAxel(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, const nvVehicleDectriptor& definition)
+	ndBodyDynamic* MakeFronAxel(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, const ndVehicleDectriptor& definition)
 	{
 		ndWorld* const world = scene->GetWorld();
 		ndDemoEntity* const chassisEntity = (ndDemoEntity*)chassis->GetNotifyCallback()->GetUserData();
@@ -682,176 +661,6 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 
 		delete axleCollision;
 		return axleBody;
-	}
-
-	void Update(ndWorld* const world, dFloat32 timestep)
-	{
-		if (m_isPlayer && m_motor)
-		{
-			dFloat32 axis[32];
-			char buttons[32];
-			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-
-			scene->GetJoystickAxis(axis);
-			scene->GetJoystickButtons(buttons);
-
-			dFloat32 brake = m_configuration.m_brakeTorque * dFloat32(scene->GetKeyState('S'));
-			if (brake == 0.0f)
-			{
-				dFloat32 val = (axis[4] + 1.0f) * 0.5f;
-				brake = m_configuration.m_brakeTorque * val * val * val;
-				//dTrace(("brake %f\n", brake));
-			}
-
-			dFloat32 throttle = dFloat32(scene->GetKeyState('W')) ? 1.0f : 0.0f;
-			if (throttle == 0.0f)
-			{
-				throttle = (axis[5] + 1.0f) * 0.5f;
-				throttle = throttle * throttle * throttle;
-			}
-
-			dFloat32 steerAngle = m_configuration.m_frontTire.m_steeringAngle * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
-			if (dAbs(steerAngle) == 0.0f)
-			{
-				steerAngle = -m_configuration.m_frontTire.m_steeringAngle * (axis[0] * axis[0] * axis[0]);
-			}
-			m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
-
-			dFloat32 handBrake = m_configuration.m_handBrakeTorque * dFloat32(scene->GetKeyState(' ') || buttons[4]);
-
-			if (m_parking.Update(scene->GetKeyState('P') || buttons[6]))
-			{
-				m_isParked = !m_isParked;
-			}
-
-			if (m_ignition.Update(scene->GetKeyState('I') || buttons[7]))
-			{
-				m_motor->SetStart(!m_motor->GetStart());
-			}
-
-			if (m_manualTransmission.Update(scene->GetKeyState('?') || scene->GetKeyState('/') || buttons[6]))
-			{
-				m_isManualTransmission = !m_isManualTransmission;
-			}
-
-			// transmission front gear up
-			if (m_forwardGearUp.Update(scene->GetKeyState('>') || scene->GetKeyState('.') || buttons[11]))
-			{
-				m_isParked = false;
-				if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
-				{
-					m_currentGear = 0;
-				}
-				else
-				{
-					m_currentGear++;
-					if (m_currentGear >= m_configuration.m_transmission.m_gearsCount)
-					{
-						m_currentGear = m_configuration.m_transmission.m_gearsCount - 1;
-					}
-				}
-				dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
-				m_gearBox->SetRatio(gearGain);
-				m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
-			}
-
-			// transmission front gear down
-			if (m_forwardGearDown.Update(scene->GetKeyState('<') || scene->GetKeyState(',') || buttons[13]))
-			{
-				m_isParked = false;
-				if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
-				{
-					m_currentGear = 0;
-				}
-				else
-				{
-					m_currentGear--;
-					if (m_currentGear <= 0)
-					{
-						m_currentGear = 0;
-					}
-				}
-				dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
-				m_gearBox->SetRatio(gearGain);
-				m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
-			}
-
-			const dFloat32 omega = m_motor->GetRpm() / 9.55f;
-			if (!m_isManualTransmission && (m_autoGearShiftTimer < 0))
-			{
-				if (m_currentGear < m_configuration.m_transmission.m_gearsCount)
-				{
-					if (omega < m_configuration.m_engine.GetLowGearShiftRadPerSec())
-					{
-						if (m_currentGear > 0)
-						{
-							m_currentGear--;
-							dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
-							m_gearBox->SetRatio(gearGain);
-							m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
-						}
-					}
-					else if (omega > m_configuration.m_engine.GetHighGearShiftRadPerSec())
-					{
-						if (m_currentGear < (m_configuration.m_transmission.m_gearsCount - 1))
-						{
-							m_currentGear++;
-							dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
-							m_gearBox->SetRatio(gearGain);
-							m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
-						}
-					}
-				}
-			}
-			m_autoGearShiftTimer--;
-
-			// neural gear
-			if (m_neutralGear.Update(scene->GetKeyState('N') || buttons[10]))
-			{
-				m_currentGear = sizeof (m_configuration.m_transmission.m_fowardRatios) / sizeof (m_configuration.m_transmission.m_fowardRatios[0]) + 1;
-				m_gearBox->SetRatio(0.0f);
-			}
-
-			// reverse gear
-			if (m_reverseGear.Update(scene->GetKeyState('R') || buttons[12]))
-			{
-				m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]);
-
-				//m_gearBox->SetRatio(-40.0f);
-				dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
-				m_gearBox->SetRatio(gearGain);
-			}
-
-			SetBrakeTorque(brake);
-			SetHandBrakeTorque(handBrake);
-			SetSteeringAngle(m_steerAngle * dDegreeToRad);
-
-			if (omega <= (m_configuration.m_engine.GetIdleRadPerSec() * 1.01f))
-			{
-				m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_idleClutchTorque);
-			}
-			else
-			{
-				m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_lockedClutchTorque);
-			}
-
-			m_motor->SetThrottle(throttle);
-			m_motor->SetTorque(m_configuration.m_engine.GetTorque(m_motor->GetRpm() / 9.55f));
-		}
-
-		if (m_isParked)
-		{
-			dFloat32 brake = m_configuration.m_brakeTorque;
-			SetBrakeTorque(brake);
-		}
-
-		ndMultiBodyVehicle::Update(world, timestep);
-	}
-
-	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const
-	{
-		//return dFloat32(1.5f);
-		return m_configuration.m_frictionCoefficientScale;
 	}
 
 	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, dFloat32 timestep)
@@ -997,83 +806,14 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 		}
 	}
 
-	nvVehicleDectriptor m_configuration;
-	dFloat32 m_steerAngle;
-
 	GLuint m_gears;
 	GLuint m_odometer;
 	GLuint m_redNeedle;
 	GLuint m_tachometer;
 	GLuint m_greenNeedle;
 	dInt32 m_gearMap[8];
-	
-	ndDemoEntityManager::ndKeyTrigger m_parking;
-	ndDemoEntityManager::ndKeyTrigger m_ignition;
-	ndDemoEntityManager::ndKeyTrigger m_neutralGear;
-	ndDemoEntityManager::ndKeyTrigger m_reverseGear;
-	ndDemoEntityManager::ndKeyTrigger m_forwardGearUp;
-	ndDemoEntityManager::ndKeyTrigger m_forwardGearDown;
-	ndDemoEntityManager::ndKeyTrigger m_manualTransmission;
-	
-	dInt32 m_currentGear;
-	dInt32 m_autoGearShiftTimer;
-	bool m_isPlayer;
-	bool m_isParked;
-	bool m_isManualTransmission;
 };
 
-class ndGlobalControlHeavyVehicle : public ndModel
-{
-	public:
-	ndGlobalControlHeavyVehicle()
-		:ndModel()
-		,m_changeVehicle()
-	{
-	}
-
-	void Update(ndWorld* const, dFloat32)
-	{
-	}
-
-	void PostUpdate(ndWorld* const world, dFloat32)
-	{
-		char buttons[32];
-		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-		scene->GetJoystickButtons(buttons);
-		if (m_changeVehicle.Update(scene->GetKeyState('C') || buttons[5]))
-		{
-			const ndModelList& modelList = world->GetModelList();
-
-			dInt32 vehiclesCount = 0;
-			ndHeavyMultiBodyVehicle* vehicleArray[1024];
-			for (ndModelList::dListNode* node = modelList.GetFirst(); node; node = node->GetNext())
-			{
-				ndModel* const model = node->GetInfo();
-				if (!strcmp(model->GetClassName(), "ndHeavyMultiBodyVehicle"))
-				{
-					vehicleArray[vehiclesCount] = (ndHeavyMultiBodyVehicle*)model->GetAsMultiBodyVehicle();
-					vehiclesCount++;
-				}
-			}
-
-			if (vehiclesCount > 1)
-			{
-				for (dInt32 i = 0; i < vehiclesCount; i++)
-				{
-					if (vehicleArray[i]->IsPlayer())
-					{
-						ndHeavyMultiBodyVehicle* const nexVehicle = vehicleArray[(i + 1) % vehiclesCount];
-						vehicleArray[i]->SetAsPlayer(scene, false);
-						nexVehicle->SetAsPlayer(scene, true);
-						break;
-					}
-				}
-			}
-		}
-	}
-
-	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
-};
 
 void ndHeavyVehicle (ndDemoEntityManager* const scene)
 {
@@ -1089,7 +829,7 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	matrix.m_posit = location;
 
 	// add a model for general controls
-	ndGlobalControlHeavyVehicle* const controls = new ndGlobalControlHeavyVehicle();
+	ndVehicleSelector* const controls = new ndVehicleSelector();
 	scene->GetWorld()->AddModel(controls);
 
 	//ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, tractorDesc, matrix);
