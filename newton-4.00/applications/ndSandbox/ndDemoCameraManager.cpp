@@ -249,35 +249,38 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 			if (body) 
 			{
 				ndDemoEntityNotify* const notiFy = (ndDemoEntityNotify*)body->GetNotifyCallback();
-				notiFy->OnObjectPick();
-
-				m_targetPicked = body;
-				//dMatrix matrix (m_targetPicked->GetMatrix());
-				
-				m_pickedBodyParam = param;
-				if(m_pickJoint) 
+				if (notiFy)
 				{
-					scene->GetWorld()->RemoveJoint(m_pickJoint);
-					delete m_pickJoint;
-					m_pickJoint = nullptr;
+					notiFy->OnObjectPick();
+
+					m_targetPicked = body;
+					//dMatrix matrix (m_targetPicked->GetMatrix());
+
+					m_pickedBodyParam = param;
+					if (m_pickJoint)
+					{
+						scene->GetWorld()->RemoveJoint(m_pickJoint);
+						delete m_pickJoint;
+						m_pickJoint = nullptr;
+					}
+
+					dVector mass(m_targetPicked->GetMassMatrix());
+
+					// change this to make the grabbing stronger or weaker
+					//const dFloat32 angularFritionAccel = 10.0f;
+					const dFloat32 angularFritionAccel = 100.0f;
+					const dFloat32 linearFrictionAccel = 400.0f * dMax(dAbs(DEMO_GRAVITY), dFloat32(10.0f));
+					const dFloat32 inertia = dMax(mass.m_z, dMax(mass.m_x, mass.m_y));
+
+					m_pickJoint = new ndDemoCameraPickBodyJoint(body, scene->GetWorld()->GetSentinelBody(), posit, this);
+					scene->GetWorld()->AddJoint(m_pickJoint);
+					m_pickingMode ?
+						m_pickJoint->SetControlMode(ndJointKinematicController::m_linear) :
+						m_pickJoint->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
+
+					m_pickJoint->SetMaxLinearFriction(mass.m_w * linearFrictionAccel);
+					m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
 				}
-					
-				dVector mass (m_targetPicked->GetMassMatrix());
-
-				// change this to make the grabbing stronger or weaker
-				//const dFloat32 angularFritionAccel = 10.0f;
-				const dFloat32 angularFritionAccel = 100.0f;
-				const dFloat32 linearFrictionAccel = 400.0f * dMax (dAbs (DEMO_GRAVITY), dFloat32(10.0f));
-				const dFloat32 inertia = dMax (mass.m_z, dMax (mass.m_x, mass.m_y));
-
-				m_pickJoint = new ndDemoCameraPickBodyJoint (body, scene->GetWorld()->GetSentinelBody(), posit, this);
-				scene->GetWorld()->AddJoint(m_pickJoint);
-				m_pickingMode ? 
-					m_pickJoint->SetControlMode(ndJointKinematicController::m_linear) : 
-					m_pickJoint->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
-				
-				m_pickJoint->SetMaxLinearFriction(mass.m_w * linearFrictionAccel);
-				m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
 			}
 		}
 	} 

@@ -93,13 +93,13 @@ class nvVehicleDectriptorTractor : public nvVehicleDectriptor
 		dFloat32 horsePowerAtRedLine = 150.0f;
 		dFloat32 redLineRpm = 5000.0f;
 		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp,
-			horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
+					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_steeringAngle = 25.0f;
-		m_frontTire.m_springK = 500.0f;
-		m_frontTire.m_damperC = 50.0f;
-		m_frontTire.m_regularizer = 0.2f;
+		m_frontTire.m_springK = 1000.0f;
+		m_frontTire.m_damperC = 25.0f;
+		m_frontTire.m_regularizer = 0.01f;
 		m_frontTire.m_upperStop = -0.05f;
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_verticalOffset = -0.1f;
@@ -108,9 +108,9 @@ class nvVehicleDectriptorTractor : public nvVehicleDectriptor
 
 		m_rearTire.m_mass = 100.0f;
 		m_rearTire.m_steeringAngle = 0.0f;
-		m_rearTire.m_springK = 500.0f;
-		m_rearTire.m_damperC = 50.0f;
-		m_rearTire.m_regularizer = 0.2f;
+		m_rearTire.m_springK = 1000.0f;
+		m_rearTire.m_damperC = 25.0f;
+		m_rearTire.m_regularizer = 0.01f;
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_verticalOffset = -0.1f;
@@ -173,7 +173,7 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 		} 
 		else if (!strcmp(m_configuration.m_name, "tractor.fbx"))
 		{
-			//CreateTractor(scene);
+			CreateTractor(scene);
 		}
 		else
 		{
@@ -491,15 +491,12 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 		ndWorld* const world = scene->GetWorld();
 		ndBodyDynamic* const chassis = m_chassis;
 
-		ndBodyDynamic* const rr_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rtire_3");
-		ndBodyDynamic* const rl_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "ltire_3");
-		ndBodyDynamic* const rr_tire1_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rtire_2");
-		ndBodyDynamic* const rl_tire1_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "ltire_2");
+		ndBodyDynamic* const rr_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rr_tire");
+		ndBodyDynamic* const rl_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rl_tire");
 
-		ndBodyDynamic* const fr_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "rtire_0");
-		ndBodyDynamic* const fl_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "ltire_0");
-		ndBodyDynamic* const fr_tire1_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "rtire_1");
-		ndBodyDynamic* const fl_tire1_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "ltire_1");
+		ndBodyDynamic* const frontAxel_body = MakeFronAxel(scene, chassis, m_configuration);
+		//ndBodyDynamic* const fr_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fr_tire");
+		//ndBodyDynamic* const fl_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fl_tire");
 
 		ndWheelDescriptor tireInfo;
 		tireInfo.m_springK = m_configuration.m_rearTire.m_springK;
@@ -511,20 +508,18 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 		tireInfo.m_longitudinalStiffeness = m_configuration.m_rearTire.m_longitudinalStiffeness;
 		ndJointWheel* const rr_tire0 = AddTire(world, tireInfo, rr_tire0_body);
 		ndJointWheel* const rl_tire0 = AddTire(world, tireInfo, rl_tire0_body);
-		ndJointWheel* const rr_tire1 = AddTire(world, tireInfo, rr_tire1_body);
-		ndJointWheel* const rl_tire1 = AddTire(world, tireInfo, rl_tire1_body);
 
-		tireInfo.m_springK = m_configuration.m_frontTire.m_springK;
-		tireInfo.m_damperC = m_configuration.m_frontTire.m_damperC;
-		tireInfo.m_regularizer = m_configuration.m_frontTire.m_regularizer;
-		tireInfo.m_minLimit = m_configuration.m_frontTire.m_upperStop;
-		tireInfo.m_maxLimit = m_configuration.m_frontTire.m_lowerStop;
-		tireInfo.m_laterialStiffeness = m_configuration.m_frontTire.m_laterialStiffeness;
-		tireInfo.m_longitudinalStiffeness = m_configuration.m_frontTire.m_longitudinalStiffeness;
-		ndJointWheel* const fr_tire0 = AddTire(world, tireInfo, fr_tire0_body);
-		ndJointWheel* const fl_tire0 = AddTire(world, tireInfo, fl_tire0_body);
-		ndJointWheel* const fr_tire1 = AddTire(world, tireInfo, fr_tire1_body);
-		ndJointWheel* const fl_tire1 = AddTire(world, tireInfo, fl_tire1_body);
+		//tireInfo.m_springK = m_configuration.m_frontTire.m_springK;
+		//tireInfo.m_damperC = m_configuration.m_frontTire.m_damperC;
+		//tireInfo.m_regularizer = m_configuration.m_frontTire.m_regularizer;
+		//tireInfo.m_minLimit = m_configuration.m_frontTire.m_upperStop;
+		//tireInfo.m_maxLimit = m_configuration.m_frontTire.m_lowerStop;
+		//tireInfo.m_laterialStiffeness = m_configuration.m_frontTire.m_laterialStiffeness;
+		//tireInfo.m_longitudinalStiffeness = m_configuration.m_frontTire.m_longitudinalStiffeness;
+		//ndJointWheel* const fr_tire0 = AddTire(world, tireInfo, fr_tire0_body);
+		//ndJointWheel* const fl_tire0 = AddTire(world, tireInfo, fl_tire0_body);
+		//ndJointWheel* const fr_tire1 = AddTire(world, tireInfo, fr_tire1_body);
+		//ndJointWheel* const fl_tire1 = AddTire(world, tireInfo, fl_tire1_body);
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1] = 0;
@@ -535,51 +530,51 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 		m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1;
 
 		// configure vehicle steering
-		SetAsSteering(fr_tire0);
-		SetAsSteering(fl_tire0);
-		SetAsSteering(fr_tire1);
-		SetAsSteering(fl_tire1);
+		//SetAsSteering(fr_tire0);
+		//SetAsSteering(fl_tire0);
+		//SetAsSteering(fr_tire1);
+		//SetAsSteering(fl_tire1);
 
 		// configure the tires brake
 		SetAsBrake(rr_tire0);
 		SetAsBrake(rl_tire0);
-		SetAsBrake(fr_tire0);
-		SetAsBrake(fl_tire0);
-		SetAsBrake(rr_tire1);
-		SetAsBrake(rl_tire1);
-		SetAsBrake(fr_tire1);
-		SetAsBrake(fl_tire1);
+		//SetAsBrake(fr_tire0);
+		//SetAsBrake(fl_tire0);
+		//SetAsBrake(rr_tire1);
+		//SetAsBrake(rl_tire1);
+		//SetAsBrake(fr_tire1);
+		//SetAsBrake(fl_tire1);
 
 		// configure the tires hand brake
 		SetAsHandBrake(rr_tire0);
 		SetAsHandBrake(rl_tire0);
-		SetAsHandBrake(rr_tire1);
-		SetAsHandBrake(rl_tire1);
+		//SetAsHandBrake(rr_tire1);
+		//SetAsHandBrake(rl_tire1);
 
 		// add the slip differential
-		ndMultiBodyVehicleDifferential* const rearDifferential0 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0);
-		ndMultiBodyVehicleDifferential* const rearDifferential1 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire1, rr_tire1);
-
-		ndMultiBodyVehicleDifferential* const frontDifferential0 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire0, fr_tire0);
-		ndMultiBodyVehicleDifferential* const frontDifferential1 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire1, fr_tire1);
-
-		ndMultiBodyVehicleDifferential* const rearDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential0, rearDifferential1);
-		ndMultiBodyVehicleDifferential* const frontDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, frontDifferential0, frontDifferential1);
-
-		ndMultiBodyVehicleDifferential* const differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential, frontDifferential);
-
-		// add a motor
-		ndMultiBodyVehicleMotor* const motor = AddMotor(world, m_configuration.m_motorMass, m_configuration.m_motorRadius);
-		motor->SetRpmLimits(m_configuration.m_engine.GetIdleRadPerSec() * 9.55f, m_configuration.m_engine.GetRedLineRadPerSec() * 9.55f);
-
-		// add the gear box
-		AddGearBox(world, m_motor, differential);
-
-		// add torsion bar
-		ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world);
-		torsionBar->AddAxel(rl_tire0->GetBody0(), rr_tire0->GetBody0());
-		torsionBar->AddAxel(fl_tire0->GetBody0(), fr_tire0->GetBody0());
-		torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
+		//ndMultiBodyVehicleDifferential* const rearDifferential0 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0);
+		//ndMultiBodyVehicleDifferential* const rearDifferential1 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire1, rr_tire1);
+		//
+		//ndMultiBodyVehicleDifferential* const frontDifferential0 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire0, fr_tire0);
+		//ndMultiBodyVehicleDifferential* const frontDifferential1 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire1, fr_tire1);
+		//
+		//ndMultiBodyVehicleDifferential* const rearDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential0, rearDifferential1);
+		//ndMultiBodyVehicleDifferential* const frontDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, frontDifferential0, frontDifferential1);
+		//
+		//ndMultiBodyVehicleDifferential* const differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential, frontDifferential);
+		//
+		//// add a motor
+		//ndMultiBodyVehicleMotor* const motor = AddMotor(world, m_configuration.m_motorMass, m_configuration.m_motorRadius);
+		//motor->SetRpmLimits(m_configuration.m_engine.GetIdleRadPerSec() * 9.55f, m_configuration.m_engine.GetRedLineRadPerSec() * 9.55f);
+		//
+		//// add the gear box
+		//AddGearBox(world, m_motor, differential);
+		//
+		//// add torsion bar
+		//ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world);
+		//torsionBar->AddAxel(rl_tire0->GetBody0(), rr_tire0->GetBody0());
+		//torsionBar->AddAxel(fl_tire0->GetBody0(), fr_tire0->GetBody0());
+		//torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
 	}
 
 	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, dFloat32 mass)
@@ -652,6 +647,41 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 
 		world->AddBody(tireBody);
 		return tireBody;
+	}
+
+	ndBodyDynamic* MakeFronAxel(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, const nvVehicleDectriptor& definition)
+	{
+		ndWorld* const world = scene->GetWorld();
+		ndDemoEntity* const chassisEntity = (ndDemoEntity*)chassis->GetNotifyCallback()->GetUserData();
+
+		ndDemoEntity* const axleEntity = chassisEntity->Find("front_axel");
+		ndShapeInstance* const axleCollision = axleEntity->CreateCollisionFromchildren(scene->GetWorld());
+
+		dMatrix axleMatrix(axleEntity->CalculateGlobalMatrix(nullptr));
+		dFloat32 axleMass = definition.m_chassisMass * 0.2f;
+
+		ndBodyDynamic* const axleBody = new ndBodyDynamic();
+		//axleBody->SetNotifyCallback(new ndDemoEntityNotify(scene, chassisEntity));
+		axleBody->SetMatrix(axleMatrix);
+		axleBody->SetCollisionShape(*axleCollision);
+		axleBody->SetMassMatrix(axleMass, *axleCollision);
+		world->AddBody(axleBody);
+
+		//// connect the part to the main body with a hinge
+		//dMatrix hingeFrame;
+		//NewtonBodyGetMatrix(fronAxelBody, &hingeFrame[0][0]);
+		//hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
+		//dCustomHinge* const hinge = new dCustomHinge(hingeFrame, fronAxelBody, chassisBody);
+		//hinge->EnableLimits(true);
+		//hinge->SetLimits(-15.0f * dDegreeToRad, 15.0f * dDegreeToRad);
+		//
+		////dMatrix bindMatrix(bodyPart->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
+		//dMatrix bindMatrix(dGetIdentityMatrix());
+		//return new dModelNode(fronAxelBody, bindMatrix, this);
+
+
+		delete axleCollision;
+		return axleBody;
 	}
 
 	void Update(ndWorld* const world, dFloat32 timestep)
@@ -992,10 +1022,10 @@ class ndHeavyMultiBodyVehicle : public ndMultiBodyVehicle
 	bool m_isManualTransmission;
 };
 
-class ndGlobalControl : public ndModel
+class ndGlobalControlHeavyVehicle : public ndModel
 {
 	public:
-	ndGlobalControl()
+	ndGlobalControlHeavyVehicle()
 		:ndModel()
 		,m_changeVehicle()
 	{
@@ -1059,7 +1089,7 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	matrix.m_posit = location;
 
 	// add a model for general controls
-	ndGlobalControl* const controls = new ndGlobalControl();
+	ndGlobalControlHeavyVehicle* const controls = new ndGlobalControlHeavyVehicle();
 	scene->GetWorld()->AddModel(controls);
 
 	ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, tractorDesc, matrix);
@@ -1067,9 +1097,9 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
-	//matrix.m_posit.m_x += 8.0f;
-	//matrix.m_posit.m_z += 2.0f;
-	////scene->GetWorld()->AddModel(new ndHeavyMultiBodyVehicle(scene, monterTruckDesc, matrix));
+	matrix.m_posit.m_x += 8.0f;
+	matrix.m_posit.m_z += 2.0f;
+	scene->GetWorld()->AddModel(new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix));
 	//
 	//matrix.m_posit.m_x += 15.0f;
 	//AddPlanks(scene, matrix.m_posit, 300.0f);
