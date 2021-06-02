@@ -1062,8 +1062,8 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndGlobalControl* const controls = new ndGlobalControl();
 	scene->GetWorld()->AddModel(controls);
 
-	//ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, tractorDesc, matrix);
-	ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix);
+	ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, tractorDesc, matrix);
+	//ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 

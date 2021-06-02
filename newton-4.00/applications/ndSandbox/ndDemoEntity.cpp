@@ -381,43 +381,26 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 		} 
 		else if (strstr (name, "box")) 
 		{
-			dAssert(0);
-			//ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
-			////dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
-			//// go over the vertex array and find and collect all vertices's weighted by this bone.
-			//dFloat32* const array = mesh->m_vertex;
-			//dVector extremes(0.0f);
-			//for (dInt32 i = 0; i < mesh->m_vertexCount; i++) {
-			//	extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
-			//	extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
-			//	extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
-			//}
-			//
-			//extremes = extremes.Scale (2.0f); 
-			//dMatrix matrix(child->GetCurrentMatrix());
-			//shapeArray[count] = NewtonCreateBox(world, extremes.m_x, extremes.m_y, extremes.m_z, 0, &matrix[0][0]);
-			//count++;
-			//dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
-
-			dAssert(0);
-			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			dArray<dVector> points;
+			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			mesh->GetVertexArray(points);
-			dVector extremes(dVector::m_zero);
+			
+			dVector minP(dFloat32(1.0e10f));
+			dVector maxP(dFloat32(-1.0e10f));
 			for (dInt32 i = 0; i < mesh->m_vertexCount; i++)
 			{
-				extremes = extremes.GetMax(points[i]);
+				minP = minP.GetMin(points[i]);
+				maxP = maxP.GetMax(points[i]);
 			}
+			dVector size(maxP - minP);
+			shapeArray[count] = new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z));
 
-			extremes = extremes.Scale(2.0f);
-			dMatrix matrix(child->GetCurrentMatrix());
-
-			shapeArray[count] = new ndShapeInstance(new ndShapeBox(extremes.m_x, extremes.m_y, extremes.m_z));
-			shapeArray[count]->SetLocalMatrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
+			dVector origin((maxP + minP).Scale (dFloat32 (0.5f)));
+			dMatrix matrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
+			matrix.m_posit += origin;
+			shapeArray[count]->SetLocalMatrix(matrix);
 			count++;
-			dAssert(count < sizeof(shapeArray) / sizeof(shapeArray[0]));
-			break;
-
+			dAssert(count < dInt32(sizeof(shapeArray) / sizeof(shapeArray[0])));
 		} 
 		else if (strstr (name, "capsule")) 
 		{
@@ -445,7 +428,8 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			mesh->GetVertexArray(points);
 			shapeArray[count] = new ndShapeInstance(new ndShapeConvexHull(mesh->m_vertexCount, sizeof(dVector), 0.01f, &points[0].m_x));
-			shapeArray[count]->SetLocalMatrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
+			const dMatrix matrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
+			shapeArray[count]->SetLocalMatrix(matrix);
 			count++;
 			dAssert(count < dInt32 (sizeof(shapeArray) / sizeof(shapeArray[0])));
 		}
