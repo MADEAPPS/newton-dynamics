@@ -325,8 +325,8 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		ndBodyDynamic* const rl_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rl_tire");
 
 		ndBodyDynamic* const frontAxel_body = MakeFronAxel(scene, chassis, m_configuration);
-		//ndBodyDynamic* const fr_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fr_tire");
-		//ndBodyDynamic* const fl_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fl_tire");
+		ndBodyDynamic* const fr_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fr_tire");
+		ndBodyDynamic* const fl_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fl_tire");
 
 		ndWheelDescriptor tireInfo;
 		tireInfo.m_springK = m_configuration.m_rearTire.m_springK;
@@ -339,17 +339,15 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		ndJointWheel* const rr_tire0 = AddTire(world, tireInfo, rr_tire0_body);
 		ndJointWheel* const rl_tire0 = AddTire(world, tireInfo, rl_tire0_body);
 
-		//tireInfo.m_springK = m_configuration.m_frontTire.m_springK;
-		//tireInfo.m_damperC = m_configuration.m_frontTire.m_damperC;
-		//tireInfo.m_regularizer = m_configuration.m_frontTire.m_regularizer;
-		//tireInfo.m_minLimit = m_configuration.m_frontTire.m_upperStop;
-		//tireInfo.m_maxLimit = m_configuration.m_frontTire.m_lowerStop;
-		//tireInfo.m_laterialStiffeness = m_configuration.m_frontTire.m_laterialStiffeness;
-		//tireInfo.m_longitudinalStiffeness = m_configuration.m_frontTire.m_longitudinalStiffeness;
-		//ndJointWheel* const fr_tire0 = AddTire(world, tireInfo, fr_tire0_body);
-		//ndJointWheel* const fl_tire0 = AddTire(world, tireInfo, fl_tire0_body);
-		//ndJointWheel* const fr_tire1 = AddTire(world, tireInfo, fr_tire1_body);
-		//ndJointWheel* const fl_tire1 = AddTire(world, tireInfo, fl_tire1_body);
+		tireInfo.m_springK = m_configuration.m_frontTire.m_springK;
+		tireInfo.m_damperC = m_configuration.m_frontTire.m_damperC;
+		tireInfo.m_regularizer = m_configuration.m_frontTire.m_regularizer;
+		tireInfo.m_minLimit = m_configuration.m_frontTire.m_upperStop;
+		tireInfo.m_maxLimit = m_configuration.m_frontTire.m_lowerStop;
+		tireInfo.m_laterialStiffeness = m_configuration.m_frontTire.m_laterialStiffeness;
+		tireInfo.m_longitudinalStiffeness = m_configuration.m_frontTire.m_longitudinalStiffeness;
+		ndJointWheel* const fr_tire0 = AddAxleTire(world, tireInfo, fr_tire0_body, frontAxel_body);
+		ndJointWheel* const fl_tire0 = AddAxleTire(world, tireInfo, fl_tire0_body, frontAxel_body);
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1] = 0;

@@ -108,13 +108,13 @@ void ndMultiBodyVehicle::SetSteeringAngle(dFloat32 angleInRadians)
 	m_steeringAngle = angleInRadians;
 }
 
-ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, const ndWheelDescriptor& desc, ndBodyDynamic* const tire)
+ndJointWheel* ndMultiBodyVehicle::AddAxleTire(ndWorld* const world, const ndWheelDescriptor& desc, ndBodyDynamic* const tire, ndBodyDynamic* const axleBody)
 {
 	dMatrix tireFrame(dGetIdentityMatrix());
 	tireFrame.m_front = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	tireFrame.m_up    = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+	tireFrame.m_up = dVector(0.0f, 1.0f, 0.0f, 0.0f);
 	tireFrame.m_right = dVector(-1.0f, 0.0f, 0.0f, 0.0f);
-	dMatrix matrix (tireFrame * m_localFrame * m_chassis->GetMatrix());
+	dMatrix matrix(tireFrame * m_localFrame * axleBody->GetMatrix());
 	matrix.m_posit = tire->GetMatrix().m_posit;
 
 	// make tire inertia spherical
@@ -125,12 +125,17 @@ ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, const ndWheelDes
 	inertia.m_z = maxInertia;
 	tire->SetMassMatrix(inertia);
 
-	ndJointWheel* const tireJoint = new ndJointWheel(matrix, tire, m_chassis, desc);
+	ndJointWheel* const tireJoint = new ndJointWheel(matrix, tire, axleBody, desc);
 	m_tireList.Append(tireJoint);
 	world->AddJoint(tireJoint);
 
 	tire->SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32(2.0f * 360.0f) * dDegreeToRad, dFloat32(100.0f));
 	return tireJoint;
+}
+
+ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, const ndWheelDescriptor& desc, ndBodyDynamic* const tire)
+{
+	return AddAxleTire(world, desc, tire, m_chassis);
 }
 
 ndBodyDynamic* ndMultiBodyVehicle::CreateInternalBodyPart(ndWorld* const world, dFloat32 mass, dFloat32 radius) const
