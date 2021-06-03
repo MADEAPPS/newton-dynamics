@@ -33,13 +33,13 @@ class ndMultiBodyVehicleDifferential : public ndJointBilateralConstraint
 	ND_CLASS_RELECTION(ndMultiBodyVehicleDifferential);
 	D_NEWTON_API ndMultiBodyVehicleDifferential(ndBodyKinematic* const differential, ndBodyKinematic* const chassis);
 
+	dFloat32 GetSlipOmega() const;
+	void SetSlipOmega(dFloat32 speed);
+
 	protected:
 	void AlignMatrix();
 	void JacobianDerivative(ndConstraintDescritor& desc);
 	void DebugJoint(ndConstraintDebugCallback&) const {}
-
-	dFloat32 GetSlipOmega() const;
-	void SetSlipOmega(dFloat32 speed);
 
 	friend class ndMultiBodyVehicle;
 	dFloat32 m_limitedSlipOmega;

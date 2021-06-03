@@ -74,7 +74,6 @@ void ndMultiBodyVehicleDifferential::JacobianDerivative(ndConstraintDescritor& d
 			slipOmega -= m_limitedSlipOmega;
 			dFloat32 alpha = slipOmega * desc.m_invTimestep;
 			SetMotorAcceleration(desc, -alpha);
-			//SetLowerFriction(desc, dFloat32 (0.0f));
 			SetHighFriction(desc, dFloat32(0.0f));
 		} 
 		else
@@ -84,9 +83,7 @@ void ndMultiBodyVehicleDifferential::JacobianDerivative(ndConstraintDescritor& d
 			dFloat32 alpha = slipOmega * desc.m_invTimestep;
 			SetMotorAcceleration(desc, -alpha);
 			SetLowerFriction(desc, dFloat32(0.0f));
-			//SetHighFriction(desc, dFloat32(0.0f));
 		}
 	}
-	//dTrace(("%f, (%f %f %f)\n", slipOmega, matrix1.m_up.m_x, matrix1.m_up.m_y, matrix1.m_up.m_z));
 }
 
