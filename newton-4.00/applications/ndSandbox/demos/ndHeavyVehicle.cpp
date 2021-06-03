@@ -368,8 +368,8 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		SetAsBrake(fl_tire0);
 
 		// configure the tires hand brake
-		SetAsHandBrake(rr_tire0);
-		SetAsHandBrake(rl_tire0);
+		//SetAsHandBrake(rr_tire0);
+		//SetAsHandBrake(rl_tire0);
 		//SetAsHandBrake(rr_tire1);
 		//SetAsHandBrake(rl_tire1);
 
@@ -377,7 +377,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		ndMultiBodyVehicleDifferential* const rearDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0);
 		ndMultiBodyVehicleDifferential* const frontDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire0, fr_tire0);
 		ndMultiBodyVehicleDifferential* const differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential, frontDifferential);
-		differential->SetSlipOmega(1000.0f);
+		differential->SetSlipOmega(100.0f);
 		
 		// add a motor
 		ndMultiBodyVehicleMotor* const motor = AddMotor(world, m_configuration.m_motorMass, m_configuration.m_motorRadius);
@@ -477,7 +477,6 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		dFloat32 axleMass = definition.m_chassisMass * 0.2f;
 
 		ndBodyDynamic* const axleBody = new ndBodyDynamic();
-		//axleBody->SetNotifyCallback(new ndDemoEntityNotify(scene, chassisEntity));
 		axleBody->SetNotifyCallback(new ndTireNotifyNotify(scene, axleEntity, chassis));
 		axleBody->SetMatrix(axleMatrix);
 		axleBody->SetCollisionShape(*axleCollision);
@@ -487,14 +486,14 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		// connect the part to the main body with a hinge
 		dMatrix hingeFrame (axleBody->GetMatrix());
 		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
+		//dMatrix hingeFrame1(m_localFrame * axleBody->GetMatrix());
+		//dMatrix hingeFrame2(m_localFrame * m_chassis->GetMatrix());
+		//dMatrix hingeFrame1(axleBody->GetMatrix());
+		//dMatrix hingeFrame2(m_chassis->GetMatrix());
 		ndJointHinge* const hinge = new ndJointHinge(hingeFrame, axleBody, chassis);
 		world->AddJoint(hinge);
 		//hinge->EnableLimits(true);
 		//hinge->SetLimits(-15.0f * dDegreeToRad, 15.0f * dDegreeToRad);
-		//
-		////dMatrix bindMatrix(bodyPart->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
-		//dMatrix bindMatrix(dGetIdentityMatrix());
-		//return new dModelNode(fronAxelBody, bindMatrix, this);
 
 		delete axleCollision;
 		return axleBody;
