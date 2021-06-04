@@ -199,6 +199,7 @@ class ndShapeInfo
 	};
 
 	dMatrix m_offsetMatrix;
+	dVector m_scale;
 	ndShapeMaterial m_shapeMaterial;
 	ndShapeID m_collisionType;
 	union

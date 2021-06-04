@@ -373,17 +373,27 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		SetAsBrake(fr_tire0);
 		SetAsBrake(fl_tire0);
 
-		// configure the tires hand brake
-		//SetAsHandBrake(rr_tire0);
-		//SetAsHandBrake(rl_tire0);
-		//SetAsHandBrake(rr_tire1);
-		//SetAsHandBrake(rl_tire1);
-
+#if 0
 		// add the slip differential
 		ndMultiBodyVehicleDifferential* const rearDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0);
 		ndMultiBodyVehicleDifferential* const frontDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire0, fr_tire0);
 		ndMultiBodyVehicleDifferential* const differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential, frontDifferential);
 		differential->SetSlipOmega(100.0f);
+#else
+		ndMultiBodyVehicleDifferential* const differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0);
+
+		ndShapeInfo rearInfo(rl_tire0->GetBody0()->GetCollisionShape().GetShapeInfo());
+		ndShapeInfo frontInfo(fl_tire0->GetBody0()->GetCollisionShape().GetShapeInfo());
+		dFloat32 tireRatio = frontInfo.m_scale.m_y / rearInfo.m_scale.m_y;
+
+		dMatrix rearLeftPin(rl_tire0->GetLocalMatrix0() * rl_tire0->GetBody0()->GetMatrix());
+		dMatrix frontLeftPin(fl_tire0->GetLocalMatrix0() * fl_tire0->GetBody0()->GetMatrix());
+		world->AddJoint (new ndJointGear(tireRatio, frontLeftPin.m_front.Scale (-1.0f), fl_tire0->GetBody0(), rearLeftPin.m_front, rl_tire0->GetBody0()));
+
+		dMatrix rearRightPin(rr_tire0->GetLocalMatrix0() * rr_tire0->GetBody0()->GetMatrix());
+		dMatrix frontRightPin(fr_tire0->GetLocalMatrix0() * fr_tire0->GetBody0()->GetMatrix());
+		world->AddJoint(new ndJointGear(tireRatio, frontRightPin.m_front.Scale(-1.0f), fr_tire0->GetBody0(), rearRightPin.m_front, rr_tire0->GetBody0()));
+#endif
 		
 		// add a motor
 		ndMultiBodyVehicleMotor* const motor = AddMotor(world, m_configuration.m_motorMass, m_configuration.m_motorRadius);

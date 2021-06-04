@@ -469,6 +469,9 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 	const dFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
 	//dTrace(("%f %f\n", sideSpeed, lateralFrictionCoefficient));
 
+	//contactPoint.m_material.m_flags |= m_isSoftContact;
+	//contactPoint.m_material.m_skinThickness = dFloat32 (0.25f);
+
 	contactPoint.m_material.m_restitution = dFloat32 (0.1f);
 	contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
 	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;

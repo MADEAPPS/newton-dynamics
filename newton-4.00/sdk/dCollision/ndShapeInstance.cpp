@@ -178,7 +178,7 @@ ndShapeInfo ndShapeInstance::GetShapeInfo() const
 {
 	ndShapeInfo info(m_shape->GetShapeInfo());
 	info.m_offsetMatrix = m_localMatrix;
-	//info.m_collisionMaterial = m_material;
+	info.m_scale = m_scale;
 	return info;
 }
 
