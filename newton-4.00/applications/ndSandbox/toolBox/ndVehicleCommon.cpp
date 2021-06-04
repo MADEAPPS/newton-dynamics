@@ -138,10 +138,6 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_chassisMass = 1000.0f;
 	m_transmission.m_gearsCount = 4;
 	m_transmission.m_neutral = 0.0f;
-
-	m_transmission.m_idleClutchTorque = 200.0f;
-	m_transmission.m_lockedClutchTorque = 1.0e5f;
-
 	m_transmission.m_crownGearRatio = 10.0f;
 	m_transmission.m_reverseRatio = -3.0f;
 	m_transmission.m_fowardRatios[0] = 2.25f;
@@ -149,6 +145,8 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_transmission.m_fowardRatios[2] = 1.10f;
 	m_transmission.m_fowardRatios[3] = 0.80f;
 	m_transmission.m_torqueConverter = 1000.0f;
+	m_transmission.m_idleClutchTorque = 200.0f;
+	m_transmission.m_lockedClutchTorque = 1.0e5f;
 
 	m_frontTire.m_mass = 20.0f;
 	m_frontTire.m_steeringAngle = 35.0f;

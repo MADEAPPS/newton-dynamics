@@ -95,6 +95,12 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp,
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
+		m_transmission.m_gearsCount = 2;
+		m_transmission.m_crownGearRatio = 20.0f;
+		m_transmission.m_reverseRatio = -3.0f;
+		m_transmission.m_fowardRatios[0] = 4.0f;
+		m_transmission.m_fowardRatios[1] = 3.0f;
+
 		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_steeringAngle = 25.0f;
 		m_frontTire.m_springK = 1000.0f;
@@ -103,8 +109,8 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		m_frontTire.m_upperStop = -0.05f;
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_verticalOffset = -0.1f;
-		m_frontTire.m_laterialStiffeness = 1.0f / 1000.0f;
-		m_frontTire.m_longitudinalStiffeness = 50.0f / 1000.0f;
+		m_frontTire.m_laterialStiffeness = 500.0f / 1000.0f;
+		m_frontTire.m_longitudinalStiffeness = 500.0f / 1000.0f;
 
 		m_rearTire.m_mass = 100.0f;
 		m_rearTire.m_steeringAngle = 0.0f;
@@ -114,8 +120,8 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_verticalOffset = -0.1f;
-		m_rearTire.m_laterialStiffeness = 10.0f / 1000.0f;
-		m_rearTire.m_longitudinalStiffeness = 50.0f / 1000.0f;
+		m_rearTire.m_laterialStiffeness = 500.0f / 1000.0f;
+		m_rearTire.m_longitudinalStiffeness = 500.0f / 1000.0f;
 
 		m_transmission.m_crownGearRatio = 20.0f;
 
@@ -484,12 +490,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		world->AddBody(axleBody);
 
 		// connect the part to the main body with a hinge
-		dMatrix hingeFrame (axleBody->GetMatrix());
-		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
-		//dMatrix hingeFrame1(m_localFrame * axleBody->GetMatrix());
-		//dMatrix hingeFrame2(m_localFrame * m_chassis->GetMatrix());
-		//dMatrix hingeFrame1(axleBody->GetMatrix());
-		//dMatrix hingeFrame2(m_chassis->GetMatrix());
+		dMatrix hingeFrame(m_localFrame * axleBody->GetMatrix());
 		ndJointHinge* const hinge = new ndJointHinge(hingeFrame, axleBody, chassis);
 		world->AddJoint(hinge);
 		//hinge->EnableLimits(true);
@@ -656,8 +657,8 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	// build a floor
 	//BuildFloorBox(scene);
 	//BuildFlatPlane(scene, true);
-	//BuildStaticMesh(scene, "track.fbx", true);
-	BuildStaticMesh(scene, "playerarena.fbx", true);
+	BuildStaticMesh(scene, "track.fbx", true);
+	//BuildStaticMesh(scene, "playerarena.fbx", true);
 
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
 
@@ -675,10 +676,10 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 
 	matrix.m_posit.m_x += 8.0f;
 	matrix.m_posit.m_z += 2.0f;
-	//scene->GetWorld()->AddModel(new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix));
-	//
-	//matrix.m_posit.m_x += 15.0f;
-	//AddPlanks(scene, matrix.m_posit, 300.0f);
+	scene->GetWorld()->AddModel(new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix));
+	
+	matrix.m_posit.m_x += 15.0f;
+	AddPlanks(scene, matrix.m_posit, 300.0f);
 
 	scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle);
 
