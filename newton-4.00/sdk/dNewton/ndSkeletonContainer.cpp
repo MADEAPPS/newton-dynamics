@@ -444,11 +444,7 @@ void ndSkeletonContainer::Finalize(dInt32 loopJointsCount, ndJointBilateralConst
 		for (dInt32 i = 0; i < loopJointsCount; i++) 
 		{
 			ndJointBilateralConstraint* const joint = loopJointArray[i];
-			//dAssert(joint->GetBody0()->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-			//dAssert(joint->GetBody1()->IsRTTIType(dgBody::m_dynamicBodyRTTI));
-			//dAssert((FindNode((ndBodyKinematic*)joint->GetBody0()) || FindNode((ndBodyKinematic*)joint->GetBody1())));
 			joint->m_isInSkeleton = true;
-			//m_loopingJoints[m_loopCount] = joint;
 			m_loopingJoints.PushBack(joint);
 			m_loopCount++;
 		}

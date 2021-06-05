@@ -47,13 +47,20 @@ class ndSkeletonQueue : public dFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024
 	void Push(ndSkeletonContainer::ndNode* const node)
 	{
 		m_firstIndex++;
-		const dInt32 count = m_firstIndex - m_lastIndex;
-		dInt32 slot = count - 1;
-		for (; (slot > 0) && (m_array[m_lastIndex + slot - 1]->m_joint->GetSolverModel()); slot--)
+		if (node->m_joint->GetSolverModel() != m_jointkinematicOpenLoop)
 		{
-			m_array[m_lastIndex + slot] = m_array[m_lastIndex + slot - 1];
+			m_array[m_firstIndex-1] = node;
 		}
-		m_array[m_lastIndex + slot] = node;
+		else
+		{
+			const dInt32 count = m_firstIndex - m_lastIndex;
+			dInt32 slot = count - 1;
+			for (; (slot > 0) && (m_array[m_lastIndex + slot - 1]->m_joint->GetSolverModel() != m_jointkinematicOpenLoop); slot--)
+			{
+				m_array[m_lastIndex + slot] = m_array[m_lastIndex + slot - 1];
+			}
+			m_array[m_lastIndex + slot] = node;
+		}
 
 		if (m_firstIndex >= m_mod)
 		{

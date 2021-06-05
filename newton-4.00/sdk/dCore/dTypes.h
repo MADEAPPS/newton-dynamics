@@ -504,6 +504,71 @@ D_CORE_API dUnsigned64 dGetTimeInMicrosenconds();
 /// \return a 64 bit double precision with a 32 bit mantissa
 D_CORE_API dFloat64 dRoundToFloat(dFloat64 val);
 
+/*
+class dAngleArithmetic
+{
+	public:
+	dAngleArithmetic()
+	{
+		SetAngle(0.0f);
+	}
+
+	dAngleArithmetic(dFloat32 angle)
+	{
+		SetAngle(angle);
+	}
+
+	dFloat32 GetAngle() const
+	{
+		return m_angle;
+	}
+
+	void SetAngle(dFloat32 angle)
+	{
+		m_angle = angle;
+		m_sinJointAngle = dSin(angle);
+		m_cosJointAngle = dCos(angle);
+	}
+
+	dFloat32 Update(dFloat32 newAngleCos, dFloat32 newAngleSin)
+	{
+		dFloat32 sin_da = newAngleSin * m_cosJointAngle - newAngleCos * m_sinJointAngle;
+		dFloat32 cos_da = newAngleCos * m_cosJointAngle + newAngleSin * m_sinJointAngle;
+
+		m_angle += dAtan2(sin_da, cos_da);
+		m_cosJointAngle = newAngleCos;
+		m_sinJointAngle = newAngleSin;
+		return m_angle;
+	}
+
+	dAngleArithmetic operator+ (const dAngleArithmetic& angle) const
+	{
+		dFloat32 sin_da = angle.m_sinJointAngle * m_cosJointAngle + angle.m_cosJointAngle * m_sinJointAngle;
+		dFloat32 cos_da = angle.m_cosJointAngle * m_cosJointAngle - angle.m_sinJointAngle * m_sinJointAngle;
+		dFloat32 angle_da = dAtan2(sin_da, cos_da);
+		return dAngleArithmetic(m_angle + angle_da);
+	}
+
+	dAngleArithmetic operator- (const dAngleArithmetic& angle) const
+	{
+		dFloat32 sin_da = angle.m_sinJointAngle * m_cosJointAngle - angle.m_cosJointAngle * m_sinJointAngle;
+		dFloat32 cos_da = angle.m_cosJointAngle * m_cosJointAngle + angle.m_sinJointAngle * m_sinJointAngle;
+		dFloat32 angle_da = dAtan2(sin_da, cos_da);
+		return dAngleArithmetic(angle_da);
+		}
+
+	dFloat32 Update(dFloat32 angle)
+	{
+		return Update(dCos(angle), dSin(angle));
+	}
+
+	private:
+	dFloat32 m_angle;
+	dFloat32 m_sinJointAngle;
+	dFloat32 m_cosJointAngle;
+	};
+*/
+
 #ifdef D_USE_THREAD_EMULATION
 	/// wrapper over standard atomic operations
 	template<class T>
@@ -584,20 +649,15 @@ class dSpinLock
 {
 	public:
 	dSpinLock()
-#ifndef D_USE_THREAD_EMULATION	
+		#ifndef D_USE_THREAD_EMULATION	
 		:m_lock(0)
-#endif
+		#endif
 	{
 	}
 
 	void Lock()
 	{
 		#ifndef D_USE_THREAD_EMULATION	
-
-		//while (m_lock.exchange(1)) 
-		//{
-		//	std::this_thread::yield();
-		//}
 
 		dInt32 exp = 1;
 		for (dUnsigned32 test = 0; !m_lock.compare_exchange_weak(test, 1); test = 0)

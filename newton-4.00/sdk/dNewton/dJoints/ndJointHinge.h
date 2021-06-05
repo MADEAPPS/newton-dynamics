@@ -22,11 +22,23 @@ class ndJointHinge: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointHinge();
 
+	D_NEWTON_API dFloat32 GetFriction() const;
+	D_NEWTON_API void SetFriction(dFloat32 frictionTorque);
+	D_NEWTON_API void EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimit);
+
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
+	D_NEWTON_API void SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
+
 	dFloat32 m_jointAngle;
+	//dAngleArithmetic m_jointAngle;
 	dFloat32 m_jointSpeed;
+	dFloat32 m_minLimit;
+	dFloat32 m_maxLimit;
+	dFloat32 m_friction;
+	bool m_hasLimits;
+	bool m_limitReached;
 };
 
 #endif 

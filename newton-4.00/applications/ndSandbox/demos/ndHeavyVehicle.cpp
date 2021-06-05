@@ -503,8 +503,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		dMatrix hingeFrame(m_localFrame * axleBody->GetMatrix());
 		ndJointHinge* const hinge = new ndJointHinge(hingeFrame, axleBody, chassis);
 		world->AddJoint(hinge);
-		//hinge->EnableLimits(true);
-		//hinge->SetLimits(-15.0f * dDegreeToRad, 15.0f * dDegreeToRad);
+		hinge->EnableLimits(true, -15.0f * dDegreeToRad, 15.0f * dDegreeToRad);
 
 		delete axleCollision;
 		return axleBody;

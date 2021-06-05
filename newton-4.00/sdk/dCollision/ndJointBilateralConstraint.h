@@ -34,7 +34,6 @@ enum ndJointBilateralSolverModel
 	m_jointIterativeSoft,
 	m_jointkinematicOpenLoop,
 	m_jointkinematicCloseLoop,
-	//m_jointkinematicHintOpenLoop,
 	m_jointkinematicAttachment,
 	m_jointModesCount
 };
@@ -43,6 +42,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 {
 	public:
+
 	D_COLLISION_API ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
 	D_COLLISION_API virtual ~ndJointBilateralConstraint();
 
