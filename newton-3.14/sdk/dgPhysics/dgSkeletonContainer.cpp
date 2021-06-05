@@ -559,28 +559,54 @@ void dgSkeletonContainer::Finalize(dgInt32 loopJointsCount, dgBilateralConstrain
 void dgSkeletonContainer::FactorizeMatrix(dgInt32 size, dgInt32 stride, dgFloat32* const matrix, dgFloat32* const diagDamp) const
 {
 	DG_TRACKTIME();
+	//bool isPsdMatrix = false;
+	//dgFloat32* const backupMatrix = dgAlloca(dgFloat32, size * stride);
+	//do {
+	//	{
+	//		dgInt32 srcLine = 0;
+	//		dgInt32 dstLine = 0;
+	//		for (dgInt32 i = 0; i < size; i++) {
+	//			memcpy(&backupMatrix[dstLine], &matrix[srcLine], size * sizeof(dgFloat32));
+	//			srcLine += size;
+	//			dstLine += stride;
+	//		}
+	//	}
+	//	isPsdMatrix = dgCholeskyFactorization(size, stride, matrix);
+	//	if (!isPsdMatrix) {
+	//		dgInt32 srcLine = 0;
+	//		dgInt32 dstLine = 0;
+	//		for (dgInt32 i = 0; i < size; i++) {
+	//			memcpy(&matrix[dstLine], &backupMatrix[srcLine], size * sizeof(dgFloat32));
+	//			diagDamp[i] *= dgFloat32(4.0f);
+	//			matrix[dstLine + i] += diagDamp[i];
+	//			dstLine += size;
+	//			srcLine += stride;
+	//		}
+	//	}
+	//} while (!isPsdMatrix);
+
 	bool isPsdMatrix = false;
 	dgFloat32* const backupMatrix = dgAlloca(dgFloat32, size * stride);
+
+	// save the matrix 
+	dgInt32 srcLine = 0;
+	dgInt32 dstLine = 0;
+	for (dgInt32 i = 0; i < size; i++) {
+		memcpy(&backupMatrix[dstLine], &matrix[srcLine], size * sizeof(dgFloat32));
+		dstLine += size;
+		srcLine += stride;
+	}
 	do {
-		{
-			dgInt32 srcLine = 0;
-			dgInt32 dstLine = 0;
-			for (dgInt32 i = 0; i < size; i++) {
-				memcpy(&backupMatrix[dstLine], &matrix[srcLine], size * sizeof(dgFloat32));
-				srcLine += size;
-				dstLine += stride;
-			}
-		}
 		isPsdMatrix = dgCholeskyFactorization(size, stride, matrix);
 		if (!isPsdMatrix) {
-			dgInt32 srcLine = 0;
-			dgInt32 dstLine = 0;
+			srcLine = 0;
+			dstLine = 0;
 			for (dgInt32 i = 0; i < size; i++) {
 				memcpy(&matrix[dstLine], &backupMatrix[srcLine], size * sizeof(dgFloat32));
 				diagDamp[i] *= dgFloat32(4.0f);
 				matrix[dstLine + i] += diagDamp[i];
-				dstLine += size;
-				srcLine += stride;
+				dstLine += stride;
+				srcLine += size;
 			}
 		}
 	} while (!isPsdMatrix);

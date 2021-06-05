@@ -686,6 +686,11 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	matrix.m_posit.m_x += 8.0f;
 	matrix.m_posit.m_z += 2.0f;
 	scene->GetWorld()->AddModel(new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix));
+	//for (dInt32 i = 0; i < 10; i++)
+	//{
+	//	matrix.m_posit.m_y += 4.0f;
+	//	scene->GetWorld()->AddModel(new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix));
+	//}
 	
 	matrix.m_posit.m_x += 15.0f;
 	AddPlanks(scene, matrix.m_posit, 300.0f);
