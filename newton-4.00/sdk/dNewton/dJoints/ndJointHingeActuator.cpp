@@ -145,3 +145,8 @@ void ndJointHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatri
 	}
 }
 */
+
+void ndJointHingeActuator::JacobianDerivative(ndConstraintDescritor& desc)
+{
+	ndJointHinge::JacobianDerivative(desc);
+}

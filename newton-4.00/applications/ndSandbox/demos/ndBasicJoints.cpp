@@ -258,8 +258,8 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 	//mesh->SetRenderResolution(500);
 	mesh->Release();
 
-	//const dInt32 count = 32;
-	const dInt32 count = 3;
+	const dInt32 count = 32;
+	//const dInt32 count = 3;
 
 	dBigVector point0;
 	dVector positions[count + 1];
