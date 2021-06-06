@@ -316,6 +316,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		SetAsHandBrake(rl_tire1);
 
 		// add the slip differential
+#if 0
 		ndMultiBodyVehicleDifferential* const rearDifferential0 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0);
 		ndMultiBodyVehicleDifferential* const rearDifferential1 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire1, rr_tire1);
 
@@ -326,6 +327,17 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		ndMultiBodyVehicleDifferential* const frontDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, frontDifferential0, frontDifferential1);
 
 		ndMultiBodyVehicleDifferential* const differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential, frontDifferential);
+#else
+		ndMultiBodyVehicleDifferential* const frontDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire0, fr_tire0);
+		ndMultiBodyVehicleDifferential* const rearDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0);
+		ndMultiBodyVehicleDifferential* const differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential, frontDifferential);
+
+		LinkTires(world, fl_tire0, fl_tire1);
+		LinkTires(world, rl_tire0, rl_tire1);
+
+		LinkTires(world, fr_tire0, fr_tire1);
+		LinkTires(world, rr_tire0, rr_tire1);
+#endif
 
 		// add a motor
 		ndMultiBodyVehicleMotor* const motor = AddMotor(world, m_configuration.m_motorMass, m_configuration.m_motorRadius);
@@ -342,6 +354,20 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 		// add vehicle turret
 		CreateEightWheelTurret(scene);
+	}
+
+	void LinkTires(ndWorld* const world, const ndJointWheel* const tire0, const ndJointWheel* const tire1) const
+	{
+		ndBodyKinematic* const body0 = tire0->GetBody0();
+		ndBodyKinematic* const body1 = tire1->GetBody0();
+		
+		ndShapeInfo rearInfo(body0->GetCollisionShape().GetShapeInfo());
+		ndShapeInfo frontInfo(body1->GetCollisionShape().GetShapeInfo());
+		dFloat32 tireRatio = frontInfo.m_scale.m_y / rearInfo.m_scale.m_y;
+
+		dMatrix pin0(tire0->GetLocalMatrix0() * body0->GetMatrix());
+		dMatrix pin1(tire1->GetLocalMatrix0() * body1->GetMatrix());
+		world->AddJoint(new ndJointGear(tireRatio, pin0.m_front.Scale(-1.0f), body0, pin1.m_front, body1));
 	}
 
 	void CreateTractor(ndDemoEntityManager* const scene)
@@ -407,18 +433,8 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		differential->SetSlipOmega(100.0f);
 #else
 		ndMultiBodyVehicleDifferential* const differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0);
-
-		ndShapeInfo rearInfo(rl_tire0->GetBody0()->GetCollisionShape().GetShapeInfo());
-		ndShapeInfo frontInfo(fl_tire0->GetBody0()->GetCollisionShape().GetShapeInfo());
-		dFloat32 tireRatio = frontInfo.m_scale.m_y / rearInfo.m_scale.m_y;
-
-		dMatrix rearLeftPin(rl_tire0->GetLocalMatrix0() * rl_tire0->GetBody0()->GetMatrix());
-		dMatrix frontLeftPin(fl_tire0->GetLocalMatrix0() * fl_tire0->GetBody0()->GetMatrix());
-		world->AddJoint (new ndJointGear(tireRatio, frontLeftPin.m_front.Scale (-1.0f), fl_tire0->GetBody0(), rearLeftPin.m_front, rl_tire0->GetBody0()));
-
-		dMatrix rearRightPin(rr_tire0->GetLocalMatrix0() * rr_tire0->GetBody0()->GetMatrix());
-		dMatrix frontRightPin(fr_tire0->GetLocalMatrix0() * fr_tire0->GetBody0()->GetMatrix());
-		world->AddJoint(new ndJointGear(tireRatio, frontRightPin.m_front.Scale(-1.0f), fr_tire0->GetBody0(), rearRightPin.m_front, rr_tire0->GetBody0()));
+		LinkTires(world, rl_tire0, fl_tire0);
+		LinkTires(world, rr_tire0, fr_tire0);
 #endif
 		
 		// add a motor

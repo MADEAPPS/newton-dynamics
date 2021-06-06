@@ -313,7 +313,7 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 			m_motor->SetStart(!m_motor->GetStart());
 		}
 
-		if (m_manualTransmission.Update(scene->GetKeyState('?') || scene->GetKeyState('/') || buttons[6]))
+		if (m_manualTransmission.Update(scene->GetKeyState('?') || scene->GetKeyState('/') || buttons[8]))
 		{
 			m_isManualTransmission = !m_isManualTransmission;
 		}
@@ -399,6 +399,7 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 		// reverse gear
 		if (m_reverseGear.Update(scene->GetKeyState('R') || buttons[12]))
 		{
+			m_isParked = false;
 			m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]);
 
 			//m_gearBox->SetRatio(-40.0f);
