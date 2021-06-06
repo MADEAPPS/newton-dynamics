@@ -218,6 +218,28 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 	}
 
 	private:
+	void Update(ndWorld* const world, dFloat32 timestep)
+	{
+		ndBasicVehicle::Update(world, timestep);
+	}
+
+	void CreateEightWheelTurret(ndDemoEntityManager* const scene)
+	{
+		ndWorld* const world = scene->GetWorld();
+
+		// connect the part to the main body with a hinge
+		ndBodyDynamic* const turretBody = MakeChildPart(scene, m_chassis, "turret", m_configuration.m_chassisMass * 0.1f);
+		dMatrix turretFrame(m_localFrame * turretBody->GetMatrix());
+		ndJointHinge* const turretHinge = new ndJointHinge(turretFrame, turretBody, m_chassis);
+		world->AddJoint(turretHinge);
+
+		//canon_convexhull
+		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.05f);
+		dMatrix canonFrame(m_localFrame * canonBody->GetMatrix());
+		ndJointHinge* const canonHinge = new ndJointHinge(canonFrame, canonBody, turretBody);
+		world->AddJoint(canonHinge);
+	}
+
 	void CreateEightWheelTruck (ndDemoEntityManager* const scene)
 	{
 		// 2- each tire to the model, 
@@ -316,6 +338,9 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		torsionBar->AddAxel(rl_tire0->GetBody0(), rr_tire0->GetBody0());
 		torsionBar->AddAxel(fl_tire0->GetBody0(), fr_tire0->GetBody0());
 		torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
+
+		// add vehicle turret
+		CreateEightWheelTurret(scene);
 	}
 
 	void CreateTractor(ndDemoEntityManager* const scene)
@@ -330,7 +355,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		ndBodyDynamic* const rr_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rr_tire");
 		ndBodyDynamic* const rl_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rl_tire");
 
-		ndBodyDynamic* const frontAxel_body = MakeFronAxel(scene, chassis, m_configuration);
+		ndBodyDynamic* const frontAxel_body = MakeFronAxel(scene, chassis);
 		ndBodyDynamic* const fr_tire0_body = CreateTireBody(scene, frontAxel_body, m_configuration.m_frontTire, "fr_tire");
 		ndBodyDynamic* const fl_tire0_body = CreateTireBody(scene, frontAxel_body, m_configuration.m_frontTire, "fl_tire");
 
@@ -481,31 +506,36 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		return tireBody;
 	}
 
-	ndBodyDynamic* MakeFronAxel(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, const ndVehicleDectriptor& definition)
+	ndBodyDynamic* MakeChildPart(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, const char* const partName, dFloat32 mass) const
 	{
 		ndWorld* const world = scene->GetWorld();
-		ndDemoEntity* const chassisEntity = (ndDemoEntity*)chassis->GetNotifyCallback()->GetUserData();
+		ndDemoEntity* const parentEntity = (ndDemoEntity*)parentBody->GetNotifyCallback()->GetUserData();
 
-		ndDemoEntity* const axleEntity = chassisEntity->Find("front_axel");
-		ndShapeInstance* const axleCollision = axleEntity->CreateCollisionFromchildren(scene->GetWorld());
+		ndDemoEntity* const vehPart = parentEntity->Find(partName);
+		ndShapeInstance* const vehCollision = vehPart->CreateCollisionFromchildren(scene->GetWorld());
 
-		dMatrix axleMatrix(axleEntity->CalculateGlobalMatrix(nullptr));
-		dFloat32 axleMass = definition.m_chassisMass * 0.2f;
+		ndBodyDynamic* const vehBody = new ndBodyDynamic();
+		const dMatrix matrix(vehPart->CalculateGlobalMatrix(nullptr));
+		vehBody->SetNotifyCallback(new ndTireNotifyNotify(scene, vehPart, parentBody));
+		vehBody->SetMatrix(matrix);
+		vehBody->SetCollisionShape(*vehCollision);
+		vehBody->SetMassMatrix(mass, *vehCollision);
+		world->AddBody(vehBody);
 
-		ndBodyDynamic* const axleBody = new ndBodyDynamic();
-		axleBody->SetNotifyCallback(new ndTireNotifyNotify(scene, axleEntity, chassis));
-		axleBody->SetMatrix(axleMatrix);
-		axleBody->SetCollisionShape(*axleCollision);
-		axleBody->SetMassMatrix(axleMass, *axleCollision);
-		world->AddBody(axleBody);
+		delete vehCollision;
+		return vehBody;
+	}
+
+	ndBodyDynamic* MakeFronAxel(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis)
+	{
+		ndBodyDynamic* const axleBody = MakeChildPart(scene, m_chassis, "front_axel", m_configuration.m_chassisMass * 0.2f);
 
 		// connect the part to the main body with a hinge
+		ndWorld* const world = scene->GetWorld();
 		dMatrix hingeFrame(m_localFrame * axleBody->GetMatrix());
 		ndJointHinge* const hinge = new ndJointHinge(hingeFrame, axleBody, chassis);
 		world->AddJoint(hinge);
 		hinge->EnableLimits(true, -15.0f * dDegreeToRad, 15.0f * dDegreeToRad);
-
-		delete axleCollision;
 		return axleBody;
 	}
 
@@ -666,8 +696,8 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	// build a floor
 	//BuildFloorBox(scene);
 	//BuildFlatPlane(scene, true);
-	BuildStaticMesh(scene, "track.fbx", true);
-	//BuildStaticMesh(scene, "playerarena.fbx", true);
+	//BuildStaticMesh(scene, "track.fbx", true);
+	BuildStaticMesh(scene, "playerarena.fbx", true);
 
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
 
@@ -678,14 +708,14 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndVehicleSelector* const controls = new ndVehicleSelector();
 	scene->GetWorld()->AddModel(controls);
 
-	ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, tractorDesc, matrix);
-	//ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix);
+	//ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, tractorDesc, matrix);
+	ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
 	matrix.m_posit.m_x += 8.0f;
 	matrix.m_posit.m_z += 2.0f;
-	scene->GetWorld()->AddModel(new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix));
+	//scene->GetWorld()->AddModel(new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix));
 	//for (dInt32 i = 0; i < 10; i++)
 	//{
 	//	matrix.m_posit.m_y += 4.0f;
