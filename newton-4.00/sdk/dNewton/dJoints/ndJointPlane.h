@@ -18,7 +18,7 @@
 class ndJointPlane: public ndJointBilateralConstraint
 {
 	public:
-	ND_CLASS_RELECTION(ndJointPlane);
+	D_CLASS_RELECTION(ndJointPlane);
 	D_NEWTON_API ndJointPlane (const dVector& pivot, const dVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointPlane();
 

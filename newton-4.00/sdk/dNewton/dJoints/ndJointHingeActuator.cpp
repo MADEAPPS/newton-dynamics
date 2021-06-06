@@ -14,7 +14,7 @@
 #include "ndJointHingeActuator.h"
 
 /*
-ndJointHingeActuator::ndJointHingeActuator(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+ndJointHingeActuator::ndJointHingeActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:dCustomHinge (pinAndPivotFrame, child, parent)
 	,m_targetAngle(0.0f)
 	,m_maxTorque(D_CUSTOM_LARGE_VALUE)
@@ -25,23 +25,27 @@ ndJointHingeActuator::ndJointHingeActuator(const dMatrix& pinAndPivotFrame, Newt
 	SetMinAngularLimit(-180.0f * dDegreeToRad);
 	SetMaxAngularLimit(180.0f * dDegreeToRad);
 }
+*/
 
-ndJointHingeActuator::ndJointHingeActuator(const dMatrix& pinAndPivotFrame, dFloat32 angularRate, dFloat32 minAngle, dFloat32 maxAngle, NewtonBody* const child, NewtonBody* const parent)
-	:dCustomHinge (pinAndPivotFrame, child, parent)
+ndJointHingeActuator::ndJointHingeActuator(const dMatrix& pinAndPivotFrame, dFloat32 angularRate, dFloat32 minAngle, dFloat32 maxAngle, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+	:ndJointHinge(pinAndPivotFrame, child, parent)
 	,m_targetAngle(0.0f)
+	,m_motorSpeed(angularRate)
 	,m_maxTorque(D_CUSTOM_LARGE_VALUE)
 {
 	m_friction = 0.0f;
-	dAssert(m_options.m_value == 0);
-	SetAngularRate(angularRate);
-	SetMinAngularLimit(minAngle);
-	SetMaxAngularLimit(maxAngle);
+	////dAssert(m_options.m_value == 0);
+	//SetAngularRate(angularRate);
+	//SetMinAngularLimit(minAngle);
+	//SetMaxAngularLimit(maxAngle);
+	EnableLimits(true, minAngle, maxAngle);
 }
 
 ndJointHingeActuator::~ndJointHingeActuator()
 {
 }
 
+/*
 dFloat32 ndJointHingeActuator::GetTargetAngle() const
 {
 	return GetJointAngle();
@@ -61,7 +65,6 @@ dFloat32 ndJointHingeActuator::GetAngularRate() const
 {
 	return m_motorSpeed;
 }
-
 
 void ndJointHingeActuator::SetMinAngularLimit(dFloat32 limit)
 {
@@ -83,7 +86,7 @@ void ndJointHingeActuator::SetTargetAngle(dFloat32 angle)
 {
 	angle = dClamp (angle, m_minAngle, m_maxAngle);
 	if (dAbs (angle - m_targetAngle.GetAngle()) > dFloat32 (1.0e-3f)) {
-		NewtonBodySetSleepState(m_body0, 0);
+		ndBodyKinematicSetSleepState(m_body0, 0);
 		m_targetAngle.SetAngle (dClamp (angle, m_minAngle, m_maxAngle));
 	}
 }

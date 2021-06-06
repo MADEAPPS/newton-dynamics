@@ -23,9 +23,8 @@
 #include "ndCollisionStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-#define DG_VEL_DAMP				 (dFloat32(100.0f))
-#define DG_POS_DAMP				 (dFloat32(1500.0f))
-
+#define D_VEL_DAMP				 (dFloat32(100.0f))
+#define D_POS_DAMP				 (dFloat32(1500.0f))
 
 ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix)
 	:ndConstraint()
@@ -147,8 +146,8 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 	
 		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 		const dFloat32 dt = desc.m_timestep;
-		const dFloat32 ks = DG_POS_DAMP;
-		const dFloat32 kd = DG_VEL_DAMP;
+		const dFloat32 ks = D_POS_DAMP;
+		const dFloat32 kd = D_VEL_DAMP;
 		const dFloat32 ksd = dt * ks;
 		const dFloat32 num = ks * relPosit + kd * relVeloc + ksd * relVeloc;
 		const dFloat32 den = dFloat32(1.0f) + dt * kd + dt * ksd;
@@ -225,8 +224,8 @@ void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& de
 
 		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 		dFloat32 dt = desc.m_timestep;
-		dFloat32 ks = DG_POS_DAMP;
-		dFloat32 kd = DG_VEL_DAMP;
+		dFloat32 ks = D_POS_DAMP;
+		dFloat32 kd = D_VEL_DAMP;
 		dFloat32 ksd = dt * ks;
 		dFloat32 num = ks * relAngle + kd * relOmega + ksd * relOmega;
 		dFloat32 den = dFloat32(1.0f) + dt * kd + dt * ksd;
@@ -273,8 +272,8 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 
 	if (desc->m_timestep > dFloat32(0.0f)) 
 	{
-		const dFloat32 ks = DG_POS_DAMP * dFloat32(0.5f);
-		const dFloat32 kd = DG_VEL_DAMP * dFloat32(4.0f);
+		const dFloat32 ks = D_POS_DAMP * dFloat32(0.5f);
+		const dFloat32 kd = D_VEL_DAMP * dFloat32(4.0f);
 		const dFloat32 dt = desc->m_timestep;
 		for (dInt32 k = 0; k < desc->m_rowsCount; k++) 
 		{
@@ -301,8 +300,8 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 				//alphaError = num / den;
 				//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 				//dFloat32 dt = desc.m_timestep;
-				//dFloat32 ks = DG_POS_DAMP;
-				//dFloat32 kd = DG_VEL_DAMP;
+				//dFloat32 ks = D_POS_DAMP;
+				//dFloat32 kd = D_VEL_DAMP;
 				//dFloat32 ksd = dt * ks;
 				//dFloat32 num = ks * relPosit + kd * relVeloc + ksd * relVeloc;
 				//dFloat32 den = dFloat32 (1.0f) + dt * kd + dt * ksd;

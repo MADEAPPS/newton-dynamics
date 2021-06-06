@@ -30,7 +30,7 @@ class ndMultiBodyVehicle;
 class ndMultiBodyVehicleGearBox : public ndJointGear
 {
 	public: 
-	ND_CLASS_RELECTION(ndMultiBodyVehicleGearBox);
+	D_CLASS_RELECTION(ndMultiBodyVehicleGearBox);
 	D_NEWTON_API ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, const ndMultiBodyVehicle* const chassis);
 
 	void SetClutchTorque(dFloat32 torqueInNewtonMeters);

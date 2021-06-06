@@ -316,7 +316,7 @@ class dBigVector;
 //		#define dCheckFloat(x) 1
 #endif
 
-#define ND_CLASS_RELECTION(Class)	\
+#define D_CLASS_RELECTION(Class)	\
 	virtual const char* GetClassName() const {return #Class;} 
 
 

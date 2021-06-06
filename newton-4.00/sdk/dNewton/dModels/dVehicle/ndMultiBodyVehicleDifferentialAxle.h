@@ -28,7 +28,7 @@
 class ndMultiBodyVehicleDifferentialAxle : public ndJointBilateralConstraint
 {
 	public:
-	ND_CLASS_RELECTION(ndMultiBodyVehicleDifferentialAxle);
+	D_CLASS_RELECTION(ndMultiBodyVehicleDifferentialAxle);
 	D_NEWTON_API ndMultiBodyVehicleDifferentialAxle(
 		const dVector& pin0, const dVector& upPin, ndBodyKinematic* const differentialBody0,
 		const dVector& pin1, ndBodyKinematic* const body1);

@@ -236,7 +236,8 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		//canon_convexhull
 		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.05f);
 		dMatrix canonFrame(m_localFrame * canonBody->GetMatrix());
-		ndJointHinge* const canonHinge = new ndJointHinge(canonFrame, canonBody, turretBody);
+		//ndJointHinge* const canonHinge = new ndJointHinge(canonFrame, canonBody, turretBody);
+		ndJointHingeActuator* const canonHinge = new ndJointHingeActuator(canonFrame, 0.5f, -30.0f * dDegreeToRad, 30.0f * dDegreeToRad, canonBody, turretBody);
 		world->AddJoint(canonHinge);
 	}
 

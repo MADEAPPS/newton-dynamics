@@ -148,7 +148,7 @@ class ndVehicleDectriptor
 class ndBasicVehicle : public ndMultiBodyVehicle
 {
 	public:
-	ND_CLASS_RELECTION(ndBasicVehicle);
+	D_CLASS_RELECTION(ndBasicVehicle);
 
 	ndBasicVehicle(const ndVehicleDectriptor& desc);
 	virtual ~ndBasicVehicle();

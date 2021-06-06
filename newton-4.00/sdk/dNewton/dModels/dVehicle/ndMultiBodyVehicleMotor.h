@@ -30,7 +30,7 @@ class ndMultiBodyVehicle;
 class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 {
 	public:
-	ND_CLASS_RELECTION(ndMultiBodyVehicleMotor);
+	D_CLASS_RELECTION(ndMultiBodyVehicleMotor);
 	D_NEWTON_API ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel);
 
 	bool GetStart() const;
