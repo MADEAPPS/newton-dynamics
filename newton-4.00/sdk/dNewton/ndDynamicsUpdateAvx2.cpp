@@ -1775,8 +1775,8 @@ void ndDynamicsUpdateAvx2::UpdateSkeletons()
 			}
 
 			ndJacobian* const internalForces = &me->m_internalForces[0];
-			const dArray<ndBodyKinematic*>& ativeBodies = m_owner->ndScene::GetActiveBodyArray();
-			const ndBodyKinematic** const bodyArray = (const ndBodyKinematic**)&ativeBodies[0];
+			const dArray<ndBodyKinematic*>& activeBodies = m_owner->ndScene::GetActiveBodyArray();
+			const ndBodyKinematic** const bodyArray = (const ndBodyKinematic**)&activeBodies[0];
 
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			while (node)

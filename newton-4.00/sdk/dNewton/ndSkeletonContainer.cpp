@@ -829,35 +829,30 @@ void ndSkeletonContainer::RebuildMassMatrix(const dFloat32* const diagDamp) cons
 void ndSkeletonContainer::FactorizeMatrix(dInt32 size, dInt32 stride, dFloat32* const matrix, dFloat32* const diagDamp) const
 {
 	D_TRACKTIME();
-	bool isPsdMatrix = false;
-	dFloat32* const backupMatrix = dAlloca(dFloat32, size * stride);
-
 	// save the matrix 
 	dInt32 srcLine = 0;
 	dInt32 dstLine = 0;
+	dFloat32* const backupMatrix = dAlloca(dFloat32, size * stride);
 	for (dInt32 i = 0; i < size; i++) 
 	{
 		memcpy(&backupMatrix[dstLine], &matrix[srcLine], size * sizeof(dFloat32));
 		dstLine += size;
 		srcLine += stride;
 	}
-	do 
+
+	while (!dCholeskyFactorization(size, stride, matrix))
 	{
-		isPsdMatrix = dCholeskyFactorization(size, stride, matrix);
-		if (!isPsdMatrix) 
+		srcLine = 0;
+		dstLine = 0;
+		for (dInt32 i = 0; i < size; i++)
 		{
-			srcLine = 0;
-			dstLine = 0;
-			for (dInt32 i = 0; i < size; i++) 
-			{
-				memcpy(&matrix[dstLine], &backupMatrix[srcLine], size * sizeof(dFloat32));
-				diagDamp[i] *= dFloat32(4.0f);
-				matrix[dstLine + i] += diagDamp[i];
-				dstLine += stride;
-				srcLine += size;
-			}
+			memcpy(&matrix[dstLine], &backupMatrix[srcLine], size * sizeof(dFloat32));
+			diagDamp[i] *= dFloat32(4.0f);
+			matrix[dstLine + i] += diagDamp[i];
+			dstLine += stride;
+			srcLine += size;
 		}
-	} while (!isPsdMatrix);
+	}
 }
 
 void ndSkeletonContainer::InitLoopMassMatrix()

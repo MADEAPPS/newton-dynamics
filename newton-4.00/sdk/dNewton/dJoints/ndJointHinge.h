@@ -28,7 +28,6 @@ class ndJointHinge: public ndJointBilateralConstraint
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-
 	D_NEWTON_API void SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 
 	dFloat32 m_jointAngle;
