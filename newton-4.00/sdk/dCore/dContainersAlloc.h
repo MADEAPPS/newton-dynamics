@@ -23,6 +23,7 @@
 #define _D_CONTAINERS_ALLOC_H_
 
 #include "dCoreStdafx.h"
+#include "dMemory.h"
 #include "dClassAlloc.h"
 
 template<class T>
