@@ -78,7 +78,7 @@ else()
 
 	if(UNIX)
 		#set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
-	endif(MSVC)
+	endif(UNIX)
 
 	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
