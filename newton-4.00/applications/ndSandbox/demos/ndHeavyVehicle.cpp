@@ -142,6 +142,8 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 	public:
 	ndHeavyMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const dMatrix& matrix)
 		:ndBasicVehicle(desc)
+		,m_turretHinge(nullptr)
+		,m_turretAngle(0.0f)
 	{
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
@@ -218,11 +220,6 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 	}
 
 	private:
-	void Update(ndWorld* const world, dFloat32 timestep)
-	{
-		ndBasicVehicle::Update(world, timestep);
-	}
-
 	void CreateEightWheelTurret(ndDemoEntityManager* const scene)
 	{
 		ndWorld* const world = scene->GetWorld();
@@ -230,15 +227,21 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		// connect the part to the main body with a hinge
 		ndBodyDynamic* const turretBody = MakeChildPart(scene, m_chassis, "turret", m_configuration.m_chassisMass * 0.1f);
 		dMatrix turretFrame(m_localFrame * turretBody->GetMatrix());
-		ndJointHinge* const turretHinge = new ndJointHinge(turretFrame, turretBody, m_chassis);
-		world->AddJoint(turretHinge);
+		//ndJointHinge* const turretHinge = new ndJointHinge(turretFrame, turretBody, m_chassis);
+		m_turretHinge = new ndJointHingeActuator(turretFrame, 0.5f, -1000.0f * dDegreeToRad, 1000.0f * dDegreeToRad, turretBody, m_chassis);
+		world->AddJoint(m_turretHinge);
 
-		//canon_convexhull
-		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.05f);
-		dMatrix canonFrame(m_localFrame * canonBody->GetMatrix());
-		//ndJointHinge* const canonHinge = new ndJointHinge(canonFrame, canonBody, turretBody);
-		ndJointHingeActuator* const canonHinge = new ndJointHingeActuator(canonFrame, 0.5f, -30.0f * dDegreeToRad, 30.0f * dDegreeToRad, canonBody, turretBody);
-		world->AddJoint(canonHinge);
+		dVector euler0;
+		dVector euler1;
+		turretFrame.CalcPitchYawRoll(euler0, euler1);
+		m_turretAngle = euler0.m_x;
+
+
+		////canon_convexhull
+		//ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.05f);
+		//dMatrix canonFrame(m_localFrame * canonBody->GetMatrix());
+		//ndJointHingeActuator* const canonHinge = new ndJointHingeActuator(canonFrame, 0.5f, -30.0f * dDegreeToRad, 30.0f * dDegreeToRad, canonBody, turretBody);
+		//world->AddJoint(canonHinge);
 	}
 
 	void CreateEightWheelTruck (ndDemoEntityManager* const scene)
@@ -682,7 +685,6 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 			// draw the tachometer
 			dFloat32 x = gageSize / 2 + 20.0f;
-			//dFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * 9.55f;
 			dFloat32 maxRpm = 9000.0f;
 			dFloat32 rpm = motor->GetRpm() / maxRpm;
 
@@ -690,7 +692,6 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 			// draw the odometer
 			x += gageSize;
-			//dFloat32 speed = engine ? dAbs(engine->GetSpeed()) / engine->GetTopSpeed() : 0.0f;
 			dFloat32 speed = GetSpeed() / 100.0f;
 			DrawGage(m_odometer, m_greenNeedle, dAbs(speed), x, y, gageSize, -180.0f, 90.0f);
 
@@ -699,12 +700,40 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		}
 	}
 
+	//void MillitaryControl(ndWorld* const world, dFloat32 timestep)
+	void MillitaryControl(ndWorld* const , dFloat32 )
+	{
+		//ndVehicleDectriptorLav25* const descriptor = (ndVehicleDectriptorLav25*)& m_configuration;
+		ndBodyKinematic* const turretBody = m_turretHinge->GetBody0();
+
+		dVector euler0;
+		dVector euler1;
+		const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * turretBody->GetMatrix());
+		turretMatrix.CalcPitchYawRoll(euler0, euler1);
+		dTrace(("angle %f\n", euler0.m_x * dRadToDegree));
+
+
+	}
+
+	void Update(ndWorld* const world, dFloat32 timestep)
+	{
+		ndBasicVehicle::Update(world, timestep);
+		if (!strcmp(m_configuration.m_name, "lav_25.fbx"))
+		{
+			MillitaryControl(world, timestep);
+		}
+	}
+
+
 	GLuint m_gears;
 	GLuint m_odometer;
 	GLuint m_redNeedle;
 	GLuint m_tachometer;
 	GLuint m_greenNeedle;
 	dInt32 m_gearMap[8];
+
+	ndJointHingeActuator* m_turretHinge;
+	dFloat32 m_turretAngle;
 };
 
 
