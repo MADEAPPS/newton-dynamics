@@ -28,7 +28,7 @@
 #include "ndBodyKinematic.h"
 
 #define DG_BILATERAL_CONTRAINT_DOF	8
-#define D_CUSTOM_LARGE_VALUE		(dFloat32 (1.0e20f))
+#define D_CUSTOM_LARGE_VALUE		(D_LCP_MAX_VALUE * dFloat32 (10.0f))
 
 enum ndJointBilateralSolverModel
 {

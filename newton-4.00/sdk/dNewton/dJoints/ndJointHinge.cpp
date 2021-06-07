@@ -29,6 +29,16 @@ ndJointHinge::~ndJointHinge()
 {
 }
 
+dFloat32 ndJointHinge::GetAngle() const
+{
+	return m_jointAngle;
+}
+
+dFloat32 ndJointHinge::GetOmega() const
+{
+	return m_jointSpeed;
+}
+
 void ndJointHinge::EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimit)
 {
 	m_hasLimits = state;

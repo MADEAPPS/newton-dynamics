@@ -24,8 +24,8 @@
 
 #include "ndCollisionStdafx.h"
 
-#define D_MAX_BOUND				dFloat32 (1.0e15f)
-#define D_MIN_BOUND				(-D_MAX_BOUND)
+#define D_MAX_BOUND				D_LCP_MAX_VALUE
+#define D_MIN_BOUND				(-D_LCP_MAX_VALUE)
 #define D_INDEPENDENT_ROW		-1 
 #define D_CONSTRAINT_MAX_ROWS	(3 * 16)
 #define MIN_JOINT_PIN_LENGTH	dFloat32 (50.0f)

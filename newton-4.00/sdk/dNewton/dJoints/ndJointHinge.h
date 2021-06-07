@@ -22,6 +22,9 @@ class ndJointHinge: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointHinge();
 
+	D_NEWTON_API dFloat32 GetAngle() const;
+	D_NEWTON_API dFloat32 GetOmega() const;
+
 	D_NEWTON_API dFloat32 GetFriction() const;
 	D_NEWTON_API void SetFriction(dFloat32 frictionTorque);
 	D_NEWTON_API void EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimit);

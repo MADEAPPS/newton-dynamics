@@ -33,11 +33,8 @@ ndJointHingeActuator::ndJointHingeActuator(const dMatrix& pinAndPivotFrame, dFlo
 	,m_motorSpeed(angularRate)
 	,m_maxTorque(D_CUSTOM_LARGE_VALUE)
 {
-	m_friction = 0.0f;
-	////dAssert(m_options.m_value == 0);
-	//SetAngularRate(angularRate);
-	//SetMinAngularLimit(minAngle);
-	//SetMaxAngularLimit(maxAngle);
+	m_friction = dFloat32 (0.0f);
+	SetAngularRate(angularRate);
 	EnableLimits(true, minAngle, maxAngle);
 }
 
@@ -45,20 +42,14 @@ ndJointHingeActuator::~ndJointHingeActuator()
 {
 }
 
-/*
-dFloat32 ndJointHingeActuator::GetTargetAngle() const
-{
-	return GetJointAngle();
-}
-
 dFloat32 ndJointHingeActuator::GetMinAngularLimit() const
 {
-	return m_minAngle;
+	return m_minLimit;
 }
 
 dFloat32 ndJointHingeActuator::GetMaxAngularLimit() const
 {
-	return m_maxAngle;
+	return m_maxLimit;
 }
 
 dFloat32 ndJointHingeActuator::GetAngularRate() const
@@ -68,32 +59,33 @@ dFloat32 ndJointHingeActuator::GetAngularRate() const
 
 void ndJointHingeActuator::SetMinAngularLimit(dFloat32 limit)
 {
-	m_minAngle = limit;
+	m_minLimit = limit;
 }
 
 void ndJointHingeActuator::SetMaxAngularLimit(dFloat32 limit)
 {
-	m_maxAngle = limit;
+	m_maxLimit = limit;
 }
-
 
 void ndJointHingeActuator::SetAngularRate(dFloat32 rate)
 {
-	EnableMotor(false, rate);
+	m_motorSpeed = rate;
+}
+
+dFloat32 ndJointHingeActuator::GetTargetAngle() const
+{
+	return m_targetAngle;
 }
 
 void ndJointHingeActuator::SetTargetAngle(dFloat32 angle)
 {
-	angle = dClamp (angle, m_minAngle, m_maxAngle);
-	if (dAbs (angle - m_targetAngle.GetAngle()) > dFloat32 (1.0e-3f)) {
-		ndBodyKinematicSetSleepState(m_body0, 0);
-		m_targetAngle.SetAngle (dClamp (angle, m_minAngle, m_maxAngle));
+	angle = dClamp (angle, m_minLimit, m_maxLimit);
+	if (dAbs (angle - m_targetAngle) > dFloat32 (1.0e-3f))
+	{
+		//ndBodyKinematicSetSleepState(m_body0, 0);
+		//m_targetAngle = dClamp (angle, m_minLimit, m_maxLimit);
+		m_targetAngle = angle;
 	}
-}
-
-dFloat32 ndJointHingeActuator::GetActuatorAngle() const
-{
-	return GetJointAngle();
 }
 
 dFloat32 ndJointHingeActuator::GetMaxTorque() const
@@ -106,47 +98,47 @@ void ndJointHingeActuator::SetMaxTorque(dFloat32 torque)
     m_maxTorque = dAbs (torque);
 }
 
-void ndJointHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat32 timestep)
-{
-	// make sure not other option is activated
-	m_options.m_value = 0;
-
-	dCustomHinge::SubmitAngularRow(matrix0, matrix1, timestep);
-
-	dAssert(m_motorSpeed >= 0.0f);
-	const dFloat32 angle = m_curJointAngle.GetAngle();
-	const dFloat32 targetAngle = m_targetAngle.GetAngle();
-
-	dFloat32 invTimeStep = 1.0f / timestep;
-	dFloat32 step = m_motorSpeed * timestep;
-	dFloat32 currentSpeed = 0.0f;
-
-	if (angle < (targetAngle - step)) {
-		currentSpeed = m_motorSpeed;
-	} else if (angle < targetAngle) {
-		currentSpeed = 0.3f * (targetAngle - angle) * invTimeStep;
-	} else if (angle > (targetAngle + step)) {
-		currentSpeed = -m_motorSpeed;
-	} else if (angle > targetAngle) {
-		currentSpeed = 0.3f * (targetAngle - angle) * invTimeStep;
-	}
-
-	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-	dFloat32 accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + currentSpeed * invTimeStep;
-	NewtonUserJointSetRowAcceleration(m_joint, accel);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	if (angle > GetMaxAngularLimit()) {
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque);
-	} else if (angle < GetMinAngularLimit()) {
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque);
-	} else {
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque);
-	}
-}
-*/
-
 void ndJointHingeActuator::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	ndJointHinge::JacobianDerivative(desc);
+
+	dAssert(m_motorSpeed >= 0.0f);
+	dFloat32 step = m_motorSpeed * desc.m_timestep;
+	dFloat32 currentSpeed = 0.0f;
+	
+	if (m_jointAngle < (m_targetAngle - step))
+	{
+		currentSpeed = m_motorSpeed;
+	}
+	else if (m_jointAngle < m_targetAngle)
+	{
+		currentSpeed = dFloat32 (0.3f) * (m_targetAngle - m_jointAngle) * desc.m_invTimestep;
+	}
+	else if (m_jointAngle > (m_targetAngle + step))
+	{
+		currentSpeed = -m_motorSpeed;
+	}
+	else if (m_jointAngle > m_targetAngle)
+	{
+		currentSpeed = 0.3f * (m_targetAngle - m_jointAngle) * desc.m_invTimestep;
+	}
+
+	const dVector pin(m_body0->GetMatrix().RotateVector(m_localMatrix0.m_front));
+	
+	AddAngularRowJacobian(desc, pin, dFloat32 (0.0f));
+	dFloat32 accel = GetMotorZeroAcceleration(desc) + currentSpeed * desc.m_invTimestep;
+	SetMotorAcceleration(desc, accel);
+	if (m_jointAngle > GetMaxAngularLimit())
+	{
+		SetHighFriction(desc, m_maxTorque);
+	}
+	else if (m_jointAngle < GetMinAngularLimit())
+	{
+		SetLowerFriction(desc, -m_maxTorque);
+	}
+	else 
+	{
+		SetHighFriction(desc, m_maxTorque);
+		SetLowerFriction(desc, -m_maxTorque);
+	}
 }

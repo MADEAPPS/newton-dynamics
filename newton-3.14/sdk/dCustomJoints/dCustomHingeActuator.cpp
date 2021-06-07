@@ -67,7 +67,7 @@ void dCustomHingeActuator::Serialize(NewtonSerializeCallback callback, void* con
 
 dFloat dCustomHingeActuator::GetTargetAngle() const
 {
-	return GetJointAngle();
+	return m_targetAngle.GetAngle();
 }
 
 dFloat dCustomHingeActuator::GetMinAngularLimit() const
