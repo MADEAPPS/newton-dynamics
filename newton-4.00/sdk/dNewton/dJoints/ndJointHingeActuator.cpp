@@ -31,7 +31,7 @@ ndJointHingeActuator::ndJointHingeActuator(const dMatrix& pinAndPivotFrame, dFlo
 	:ndJointHinge(pinAndPivotFrame, child, parent)
 	,m_targetAngle(0.0f)
 	,m_motorSpeed(angularRate)
-	,m_maxTorque(D_CUSTOM_LARGE_VALUE)
+	,m_maxTorque(D_LCP_MAX_VALUE)
 {
 	m_friction = dFloat32 (0.0f);
 	SetAngularRate(angularRate);

@@ -26,7 +26,7 @@
 #include "ndSkeletonContainer.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_MAX_SKELETON_LCP_VALUE (D_LCP_MAX_VALUE * 0.1f)
+#define D_MAX_SKELETON_LCP_VALUE (D_LCP_MAX_VALUE * dFloat32 (0.25f))
 
 dInt64 ndSkeletonContainer::ndNode::m_ordinalInit = 0x0706050403020100ll;
 
