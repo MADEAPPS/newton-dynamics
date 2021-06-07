@@ -38,6 +38,7 @@
 		dMemory::Free(ptr);
 	}
 
+#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	BOOL APIENTRY DllMain(HMODULE , DWORD  ul_reason_for_call, LPVOID )
 	{
 		switch (ul_reason_for_call)
@@ -57,4 +58,5 @@
 		}
 		return TRUE;
 	}
+#endif
 #endif

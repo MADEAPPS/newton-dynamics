@@ -749,7 +749,6 @@ typename dTree<OBJECT, KEY, allocator>::dTreeNode* dTree<OBJECT, KEY, allocator>
 		}
 	}
 
-	dAssert (m_allocator);
 	ptr = new dTreeNode (element, key, parent);
 	if (!parent) 
 	{
