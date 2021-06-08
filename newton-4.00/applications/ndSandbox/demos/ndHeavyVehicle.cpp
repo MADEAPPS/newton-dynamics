@@ -234,7 +234,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		dVector euler0;
 		dVector euler1;
 		turretFrame.CalcPitchYawRoll(euler0, euler1);
-		m_turretAngle = euler0.m_x;
+		m_turretAngle = euler1.m_x;
 
 
 		////canon_convexhull
@@ -710,7 +710,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		dVector euler1;
 		const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * turretBody->GetMatrix());
 		turretMatrix.CalcPitchYawRoll(euler0, euler1);
-		dTrace(("angle %f\n", euler0.m_x * dRadToDegree));
+		dTrace(("angle %f\n", euler1.m_x * dRadToDegree));
 
 
 	}

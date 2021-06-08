@@ -64,7 +64,7 @@ if (MSVC)
 endif(MSVC)
 
 if(UNIX)
-	set_source_files_properties(./ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /march=haswell " )
+	set_source_files_properties(./ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " -march=haswell " )
 endif(UNIX)
 
 if(NEWTON_BUILD_SHARED_LIBS)

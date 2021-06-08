@@ -77,7 +77,7 @@ else()
 	endif(MSVC)
 
 	if(UNIX)
-		set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /march=haswell " )
+		set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " -march=haswell " )
 	endif(UNIX)
 
 	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
