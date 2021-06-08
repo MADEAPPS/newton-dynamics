@@ -235,6 +235,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		world->AddJoint(m_turretHinge);
 		turretMatrix.CalcPitchYawRoll(euler0, euler1);
 		m_turretAngle = euler0.m_x;
+		m_turretAngle += 10.0f * dDegreeToRad;
 
 		//canon_convexhull
 		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.05f);
@@ -243,6 +244,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		world->AddJoint(m_cannonHinge);
 		canonMatrix.CalcPitchYawRoll(euler0, euler1);
 		m_cannonAngle = euler0.m_x;
+		m_cannonAngle += 10.0f * dDegreeToRad;
 	}
 
 	void CreateEightWheelTruck (ndDemoEntityManager* const scene)
@@ -701,20 +703,48 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		}
 	}
 
-	//void MillitaryControl(ndWorld* const world, dFloat32 timestep)
-	void MillitaryControl(ndWorld* const , dFloat32 )
+	void MillitaryControl(ndWorld* const)
 	{
-		//ndVehicleDectriptorLav25* const descriptor = (ndVehicleDectriptorLav25*)& m_configuration;
-		ndBodyKinematic* const turretBody = m_turretHinge->GetBody0();
-
 		dVector euler0;
 		dVector euler1;
-		const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * turretBody->GetMatrix());
-		turretMatrix.CalcPitchYawRoll(euler0, euler1);
-		dFloat32 angleError = AnglesAdd(euler0.m_x, -m_turretAngle);
-		m_turretHinge->SetTargetAngle(m_turretHinge->GetAngle() - angleError);
 
-		//dTrace(("wordAngle:%f  targetAngle:%f\n", m_turretAngle * dRadToDegree, m_turretHinge->GetTargetAngle() * dRadToDegree));
+		const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
+		turretMatrix.CalcPitchYawRoll(euler0, euler1);
+
+		dFloat32 turretAngle = m_turretHinge->GetAngle();
+		dFloat32 turretErrorAngle = AnglesAdd(m_turretAngle, -euler0.m_x);
+		if (dAbs(turretErrorAngle) > (3.0f * dDegreeToRad))
+		{
+			if (turretErrorAngle > 0.0f)
+			{
+				turretAngle = 1000.0f;
+			}
+			else
+			{
+				turretAngle = -1000.0f;
+			}
+		}
+		m_turretHinge->SetTargetAngle(turretAngle);
+		//dTrace(("errorAngle:%f  turretAngle:%f\n", turretErrorAngle * dRadToDegree, m_turretHinge->GetAngle() * dRadToDegree));
+
+		//const dMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
+		//cannonMatrix.CalcPitchYawRoll(euler0, euler1);
+		//
+		//dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
+		//dFloat32 cannonErrorAngle = AnglesAdd(m_cannonAngle, - euler0.m_x);
+		//if (dAbs(cannonErrorAngle) > (3.0f * dDegreeToRad))
+		//{
+		//	if (cannonErrorAngle > 0.0f)
+		//	{
+		//		cannonTargetAngle = 1000.0f;
+		//	}
+		//	else
+		//	{
+		//		cannonTargetAngle = -1000.0f;
+		//	}
+		//}
+		//m_cannonHinge->SetTargetAngle(cannonTargetAngle);
+		//dTrace(("errorAngle:%f  cannonAngle:%f\n", cannonErrorAngle * dRadToDegree, m_cannonHinge->GetAngle() * dRadToDegree));
 	}
 
 	void Update(ndWorld* const world, dFloat32 timestep)
@@ -722,7 +752,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		ndBasicVehicle::Update(world, timestep);
 		if (!strcmp(m_configuration.m_name, "lav_25.fbx"))
 		{
-			MillitaryControl(world, timestep);
+			MillitaryControl(world);
 		}
 	}
 	
