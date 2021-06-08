@@ -72,6 +72,7 @@
 #include <stdarg.h>
 #include <locale.h>
 #include <tinyxml.h>
+#include <immintrin.h>
 #include <condition_variable>
 
 #if (defined (__MINGW32__) || defined (__MINGW64__))
@@ -83,14 +84,15 @@
 	#include <process.h>
 #endif
 
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#include <intrin.h>
-	#include <emmintrin.h> 
-	#include <pmmintrin.h>
-	#ifdef D_USE_VECTOR_AVX
-		#include <immintrin.h>
-	#endif
-#endif
+//#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+//	#include <intrin.h>
+//	#include <emmintrin.h> 
+//	#include <pmmintrin.h>
+//	#ifdef D_USE_VECTOR_AVX
+//		#include <immintrin.h>
+//	#endif
+//#endif
+
 
 #if (defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (__MINGW32__) || defined (__MINGW64__))
   // CMake defines NDEBUG for _not_ debug builds. Therefore, set
