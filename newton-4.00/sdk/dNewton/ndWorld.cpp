@@ -454,7 +454,7 @@ void ndWorld::Save(const char* const path) const
 #if defined (_WIN_32_VER) || defined (_WIN_64_VER)
 	_mkdir(assetPath);
 #else
-	mkdir(assetPath);
+	mkdir(assetPath, S_IRWXU);
 #endif
 
 	Save(worldNode, assetPath);
