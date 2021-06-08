@@ -243,7 +243,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		m_cannonHinge = new ndJointHingeActuator(canonMatrix, 0.5f, -30.0f * dDegreeToRad, 30.0f * dDegreeToRad, canonBody, turretBody);
 		world->AddJoint(m_cannonHinge);
 		canonMatrix.CalcPitchYawRoll(euler0, euler1);
-		m_cannonAngle = euler0.m_x;
+		m_cannonAngle = euler0.m_z;
 		m_cannonAngle += 10.0f * dDegreeToRad;
 	}
 
@@ -710,12 +710,11 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 		const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
 		turretMatrix.CalcPitchYawRoll(euler0, euler1);
-
 		dFloat32 turretAngle = m_turretHinge->GetAngle();
 		dFloat32 turretErrorAngle = AnglesAdd(m_turretAngle, -euler0.m_x);
 		if (dAbs(turretErrorAngle) > (3.0f * dDegreeToRad))
 		{
-			if (turretErrorAngle > 0.0f)
+			if (turretErrorAngle < 0.0f)
 			{
 				turretAngle = 1000.0f;
 			}
@@ -725,16 +724,15 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 			}
 		}
 		m_turretHinge->SetTargetAngle(turretAngle);
-		//dTrace(("errorAngle:%f  turretAngle:%f\n", turretErrorAngle * dRadToDegree, m_turretHinge->GetAngle() * dRadToDegree));
+		dTrace(("errorAngle:%f  turretAngle:%f\n", turretErrorAngle * dRadToDegree, m_turretHinge->GetAngle() * dRadToDegree));
 
 		//const dMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
 		//cannonMatrix.CalcPitchYawRoll(euler0, euler1);
-		//
 		//dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
-		//dFloat32 cannonErrorAngle = AnglesAdd(m_cannonAngle, - euler0.m_x);
+		//dFloat32 cannonErrorAngle = AnglesAdd(m_cannonAngle, - euler0.m_z);
 		//if (dAbs(cannonErrorAngle) > (3.0f * dDegreeToRad))
 		//{
-		//	if (cannonErrorAngle > 0.0f)
+		//	if (cannonErrorAngle < 0.0f)
 		//	{
 		//		cannonTargetAngle = 1000.0f;
 		//	}
