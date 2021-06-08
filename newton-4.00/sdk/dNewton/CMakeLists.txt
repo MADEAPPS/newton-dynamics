@@ -63,6 +63,10 @@ if (MSVC)
 	set_source_files_properties(./ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
 endif(MSVC)
 
+if(UNIX)
+	set_source_files_properties(./ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /march=haswell " )
+endif(UNIX)
+
 if(NEWTON_BUILD_SHARED_LIBS)
 	add_definitions(-D_D_NEWTON_EXPORT_DLL)
 	add_library(${projectName} SHARED ${CPP_SOURCE})
