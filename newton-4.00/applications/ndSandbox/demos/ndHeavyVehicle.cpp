@@ -227,15 +227,14 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		// connect the part to the main body with a hinge
 		ndBodyDynamic* const turretBody = MakeChildPart(scene, m_chassis, "turret", m_configuration.m_chassisMass * 0.1f);
 		dMatrix turretFrame(m_localFrame * turretBody->GetMatrix());
-		//ndJointHinge* const turretHinge = new ndJointHinge(turretFrame, turretBody, m_chassis);
-		m_turretHinge = new ndJointHingeActuator(turretFrame, 0.5f, -1000.0f * dDegreeToRad, 1000.0f * dDegreeToRad, turretBody, m_chassis);
+		m_turretHinge = new ndJointHingeActuator(turretFrame, 1.5f, -1000.0f * dDegreeToRad, 1000.0f * dDegreeToRad, turretBody, m_chassis);
 		world->AddJoint(m_turretHinge);
 
 		dVector euler0;
 		dVector euler1;
 		turretFrame.CalcPitchYawRoll(euler0, euler1);
 		m_turretAngle = euler1.m_x;
-
+		//m_turretAngle += 45.0f * dDegreeToRad;
 
 		////canon_convexhull
 		//ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.05f);
@@ -710,9 +709,10 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		dVector euler1;
 		const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * turretBody->GetMatrix());
 		turretMatrix.CalcPitchYawRoll(euler0, euler1);
-		dTrace(("angle %f\n", euler1.m_x * dRadToDegree));
+		dFloat32 angleError = AnglesAdd(euler1.m_x, -m_turretAngle);
+		m_turretHinge->SetTargetAngle(m_turretHinge->GetAngle() - angleError);
 
-
+		//dTrace(("wordAngle:%f  targetAngle:%f\n", m_turretAngle * dRadToDegree, m_turretHinge->GetTargetAngle() * dRadToDegree));
 	}
 
 	void Update(ndWorld* const world, dFloat32 timestep)
@@ -723,8 +723,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 			MillitaryControl(world, timestep);
 		}
 	}
-
-
+	
 	GLuint m_gears;
 	GLuint m_odometer;
 	GLuint m_redNeedle;
