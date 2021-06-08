@@ -28,7 +28,11 @@
 
 dUnsigned64 dGetCpuClock()
 {
+#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	return __rdtsc();
+#else
+	return dGetTimeInMicrosenconds();
+#endif
 }
 
 dFloat64 dRoundToFloat(dFloat64 val)
