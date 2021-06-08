@@ -495,9 +495,6 @@ union dDoubleInt
 	#define _stricmp(x,y) strcasecmp(x,y)
 #endif
 
-/// Returns the cpu ticks count 
-D_CORE_API dUnsigned64 dGetCpuClock();
-
 /// Returns the time in micro seconds since application started 
 D_CORE_API dUnsigned64 dGetTimeInMicrosenconds();
 
