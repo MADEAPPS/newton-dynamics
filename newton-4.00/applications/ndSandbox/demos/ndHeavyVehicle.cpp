@@ -728,7 +728,6 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		dFloat32 y = cannonMatrix[1][1];
 		dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
 		dFloat32 cannonAngle = dAtan2(y, x);
-		//dFloat32 cannonErrorAngle = AnglesAdd(m_cannonAngle0, -cannonAngle);
 		dFloat32 cannonErrorAngle = AnglesAdd(cannonAngle, - m_cannonAngle0);
 		
 		dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
