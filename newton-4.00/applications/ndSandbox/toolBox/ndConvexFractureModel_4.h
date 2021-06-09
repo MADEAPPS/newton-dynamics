@@ -17,6 +17,7 @@
 class ndDemoMesh;
 class ndDemoDebrisEntity;
 class ndDemoEntityManager;
+class ndDemoDebriEntityRoot;
 class ndDemoDebrisRootEntity;
 
 class ndConvexFractureModel_4: public ndModel

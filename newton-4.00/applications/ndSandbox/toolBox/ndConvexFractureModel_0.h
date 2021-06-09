@@ -14,6 +14,11 @@
 
 #include "ndSandboxStdafx.h"
 
+class ndDemoMesh;
+class ndDemoDebrisEntity;
+class ndDemoEntityManager;
+class ndDemoDebriEntityRoot;
+class ndDemoDebrisRootEntity;
 
 class ndConvexFracture
 {
