@@ -228,23 +228,23 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		dVector euler1;
 		ndWorld* const world = scene->GetWorld();
 
-		// connect the part to the main body with a hinge
+		//turrect servo controller actuator
 		ndBodyDynamic* const turretBody = MakeChildPart(scene, m_chassis, "turret", m_configuration.m_chassisMass * 0.1f);
 		dMatrix turretMatrix(m_localFrame * turretBody->GetMatrix());
 		m_turretHinge = new ndJointHingeActuator(turretMatrix, 1.5f, -1000.0f * dDegreeToRad, 1000.0f * dDegreeToRad, turretBody, m_chassis);
 		world->AddJoint(m_turretHinge);
-		turretMatrix.CalcPitchYawRoll(euler0, euler1);
-		m_turretAngle = euler0.m_x;
-		m_turretAngle += 10.0f * dDegreeToRad;
+		m_turretAngle = dAtan2(turretMatrix[2][0], turretMatrix[2][2]);
+		//m_turretAngle += 10.0f * dDegreeToRad;
 
-		//canon_convexhull
+		//cannon servo controller actuator
 		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.05f);
 		dMatrix cannonMatrix(m_localFrame * canonBody->GetMatrix());
 		m_cannonHinge = new ndJointHingeActuator(cannonMatrix, 1.5f, -30.0f * dDegreeToRad, 10.0f * dDegreeToRad, canonBody, turretBody);
 		world->AddJoint(m_cannonHinge);
-		//cannonMatrix.CalcPitchYawRoll(euler0, euler1);
-		m_cannonAngle = -dAtan2(cannonMatrix[2][1], cannonMatrix[1][1]);
-		//m_cannonAngle -= 15.0f * dDegreeToRad;
+		dFloat32 y = cannonMatrix[1][1];
+		dFloat32 x = dSqrt (cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
+		m_cannonAngle = dAtan2(y, x);
+		m_cannonAngle += 10.0f * dDegreeToRad;
 	}
 
 	void CreateEightWheelTruck (ndDemoEntityManager* const scene)
@@ -705,35 +705,35 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 	void MillitaryControl(ndWorld* const)
 	{
-		dVector euler0;
-		dVector euler1;
+		const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
+		dFloat32 turretAngle = dAtan2(turretMatrix[2][0], turretMatrix[2][2]);
+		dFloat32 turretErrorAngle = AnglesAdd(turretAngle, -m_turretAngle);
 
-		//const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
-		//turretMatrix.CalcPitchYawRoll(euler0, euler1);
-		//dFloat32 turretAngle = m_turretHinge->GetAngle();
-		//dFloat32 turretErrorAngle = AnglesAdd(m_turretAngle, -euler0.m_x);
-		//if (dAbs(turretErrorAngle) > (3.0f * dDegreeToRad))
-		//{
-		//	if (turretErrorAngle < 0.0f)
-		//	{
-		//		turretAngle = 1000.0f;
-		//	}
-		//	else
-		//	{
-		//		turretAngle = -1000.0f;
-		//	}
-		//}
-		//m_turretHinge->SetTargetAngle(turretAngle);
-		//dTrace(("errorAngle:%f  turretAngle:%f\n", turretErrorAngle * dRadToDegree, m_turretHinge->GetAngle() * dRadToDegree));
+		dFloat32 turretTargetAngle = m_turretHinge->GetAngle();
+		if (dAbs(turretErrorAngle) > (1.0f * dDegreeToRad))
+		{
+			if (turretErrorAngle > 0.0f)
+			{
+				turretTargetAngle = 1000.0f;
+			}
+			else
+			{
+				turretTargetAngle = -1000.0f;
+			}
+		}
+		m_turretHinge->SetTargetAngle(turretTargetAngle);
+		//dTrace(("errorAngle:%f  turretAngle:%f\n", turretErrorAngle * dRadToDegree, turretAngle * dRadToDegree));
 
 		const dMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
-		dFloat32 cannonAngle = -dAtan2(cannonMatrix[2][1], cannonMatrix[1][1]);
+		dFloat32 y = cannonMatrix[1][1];
+		dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
+		dFloat32 cannonAngle = dAtan2(y, x);
 		dFloat32 cannonErrorAngle = AnglesAdd(m_cannonAngle, -cannonAngle);
-
+		
 		dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
 		if (dAbs(cannonErrorAngle) > (1.0f * dDegreeToRad))
 		{
-			if (cannonErrorAngle > 0.0f)
+			if (cannonErrorAngle < 0.0f)
 			{
 				cannonTargetAngle = 1000.0f;
 			}
@@ -743,9 +743,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 			}
 		}
 		m_cannonHinge->SetTargetAngle(cannonTargetAngle);
-
 		//dTrace(("errorAngle:%f  cannonAngle:%f\n", cannonErrorAngle * dRadToDegree, cannonAngle * dRadToDegree));
-		//dTrace(("errorAngle:%f  cannonAngle:%f\n", cannonErrorAngle * dRadToDegree, m_cannonHinge->GetAngle() * dRadToDegree));
 	}
 
 	void Update(ndWorld* const world, dFloat32 timestep)
@@ -766,7 +764,6 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 	ndJointHingeActuator* m_turretHinge;
 	ndJointHingeActuator* m_cannonHinge;
-	dVector m_saveCannonEuler;
 	dFloat32 m_turretAngle;
 	dFloat32 m_cannonAngle;
 };
