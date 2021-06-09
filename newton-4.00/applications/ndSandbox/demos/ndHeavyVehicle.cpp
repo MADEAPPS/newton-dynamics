@@ -240,11 +240,11 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		//canon_convexhull
 		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.05f);
 		dMatrix canonMatrix(m_localFrame * canonBody->GetMatrix());
-		m_cannonHinge = new ndJointHingeActuator(canonMatrix, 0.5f, -30.0f * dDegreeToRad, 30.0f * dDegreeToRad, canonBody, turretBody);
+		m_cannonHinge = new ndJointHingeActuator(canonMatrix, 0.5f, -30.0f * dDegreeToRad, 10.0f * dDegreeToRad, canonBody, turretBody);
 		world->AddJoint(m_cannonHinge);
 		canonMatrix.CalcPitchYawRoll(euler0, euler1);
-		m_cannonAngle = euler0.m_z;
-		m_cannonAngle += 10.0f * dDegreeToRad;
+		m_cannonAngle = euler0.m_x;
+		m_cannonAngle -= 15.0f * dDegreeToRad;
 	}
 
 	void CreateEightWheelTruck (ndDemoEntityManager* const scene)
@@ -729,10 +729,10 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		const dMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
 		cannonMatrix.CalcPitchYawRoll(euler0, euler1);
 		dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
-		dFloat32 cannonErrorAngle = AnglesAdd(m_cannonAngle, - euler0.m_z);
+		dFloat32 cannonErrorAngle = AnglesAdd(m_cannonAngle, - euler0.m_x);
 		if (dAbs(cannonErrorAngle) > (3.0f * dDegreeToRad))
 		{
-			if (cannonErrorAngle < 0.0f)
+			if (cannonErrorAngle > 0.0f)
 			{
 				cannonTargetAngle = 1000.0f;
 			}
