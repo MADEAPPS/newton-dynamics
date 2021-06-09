@@ -117,26 +117,22 @@ inline void glMaterialParam (GLenum face, GLenum pname, const dFloat32 *params)
 #define glGetFloat(x,y) glGetFloatv(x, (GLfloat*)y) 
 #endif
 
-
 #ifndef _MSC_VER
 	#ifndef stricmp
 		#define stricmp strcasecmp
 	#endif
 
 	#ifndef _strlwr
-		inline char *_strlwr_ (char *a) 
+		inline char* _strlwr (char* const ptr) 
 		{ 
-			char *ret = a; 
-			while (*a != '\0') 
+			char* ret = ptr; 
+			while (*ret != '\0')
 			{ 
-				//if (isupper (*a)) 
-				*a = char (tolower (*a)); 
-				++a; 
+				*ret = char (tolower (*ret));
+				ret ++;
 			} 
-			return ret; 
+			return ptr; 
 		}
-
-		#define strlwr(a) _strlwr_ (a) 
 	#endif
 #endif
 
