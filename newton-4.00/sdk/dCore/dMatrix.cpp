@@ -289,56 +289,6 @@ void dMatrix::CalcPitchYawRoll (dVector& euler0, dVector& euler1) const
 	const dMatrix& matrix = *this;
 	dAssert (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() > 0.0f);
 	dAssert (dAbs (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-4f));
-/*
-	// Assuming the angles are in radians.
-	if (matrix[0][2] > dFloat32 (0.99995f)) {
-		dFloat32 picth0 = dFloat32 (0.0f);
-		dFloat32 yaw0 = dFloat32 (-dgPI * 0.5f);
-		dFloat32 roll0 = - dAtan2(matrix[2][1], matrix[1][1]);
-		euler0[0] = picth0;
-		euler0[1] = yaw0;
-		euler0[2] = roll0;
-
-		euler1[0] = picth0;
-		euler1[1] = yaw0;
-		euler1[2] = roll0;
-
-	} else if (matrix[0][2] < dFloat32 (-0.99995f)) {
-		dFloat32 picth0 = dFloat32 (0.0f);
-		dFloat32 yaw0 = dFloat32 (dgPI * 0.5f);
-		dFloat32 roll0 = dAtan2(matrix[2][1], matrix[1][1]);
-		euler0[0] = picth0;
-		euler0[1] = yaw0;
-		euler0[2] = roll0;
-
-		euler1[0] = picth0;
-		euler1[1] = yaw0;
-		euler1[2] = roll0;
-	} else {
-		dFloat32 yaw0 = -dAsin ( matrix[0][2]);
-		dFloat32 yaw1 = dFloat32 (dgPI) - yaw0;
-		dFloat32 sign0 = dSign(dCos (yaw0));
-		dFloat32 sign1 = dSign(dCos (yaw1));
-
-		dFloat32 picth0 = dAtan2(matrix[1][2] * sign0, matrix[2][2] * sign0);
-		dFloat32 picth1 = dAtan2(matrix[1][2] * sign1, matrix[2][2] * sign1);
-
-		dFloat32 roll0 = dAtan2(matrix[0][1] * sign0, matrix[0][0] * sign0);
-		dFloat32 roll1 = dAtan2(matrix[0][1] * sign1, matrix[0][0] * sign1);
-
-		if (yaw1 > dFloat32 (dgPI)) {
-			yaw1 -= dFloat32 (2.0f * dgPI);
-		}
-
-		euler0[0] = picth0;
-		euler0[1] = yaw0;
-		euler0[2] = roll0;
-
-		euler1[0] = picth1;
-		euler1[1] = yaw1;
-		euler1[2] = roll1;
-	}
-*/
 
 	// Assuming the angles are in radians.
 	if (matrix[0][2] > dFloat32 (0.99995f)) 
