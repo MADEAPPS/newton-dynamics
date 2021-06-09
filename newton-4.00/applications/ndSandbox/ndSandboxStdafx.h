@@ -30,7 +30,6 @@
 #define USE_STATIC_MESHES_DEBUG_COLLISION
 //#define USE_TEST_ALL_FACE_USER_RAYCAST_CALLBACK
 
-
 #ifdef _WIN32
 	#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 
@@ -47,8 +46,7 @@
 	#include <time.h>
 	#include <tchar.h>
 	#include <crtdbg.h>
-
-	#include <ofbx.h>
+	
 	#include <glatter.h>
 	#include <GL/glu.h>
 	#include <GL/gl.h>
@@ -85,6 +83,9 @@
 	#include <OpenAl/al.h>
 	#include <OpenAl/alc.h>
 #endif
+
+// some thierd party lib includes
+#include <ofbx.h>
 
 // SDK includes
 #include <ndNewton.h>
