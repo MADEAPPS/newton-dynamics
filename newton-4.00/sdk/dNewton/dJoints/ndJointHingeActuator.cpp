@@ -35,7 +35,8 @@ ndJointHingeActuator::ndJointHingeActuator(const dMatrix& pinAndPivotFrame, dFlo
 {
 	m_friction = dFloat32 (0.0f);
 	SetAngularRate(angularRate);
-	EnableLimits(true, minAngle, maxAngle);
+	//EnableLimits(true, minAngle, maxAngle);
+	EnableLimits(false, minAngle, maxAngle);
 }
 
 ndJointHingeActuator::~ndJointHingeActuator()
@@ -141,4 +142,5 @@ void ndJointHingeActuator::JacobianDerivative(ndConstraintDescritor& desc)
 		SetHighFriction(desc, m_maxTorque);
 		SetLowerFriction(desc, -m_maxTorque);
 	}
+	dAssert(desc.m_rowsCount <= 6);
 }

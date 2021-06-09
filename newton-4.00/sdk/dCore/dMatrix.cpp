@@ -343,9 +343,11 @@ void dMatrix::CalcPitchYawRoll (dVector& euler0, dVector& euler1) const
 	// Assuming the angles are in radians.
 	if (matrix[0][2] > dFloat32 (0.99995f)) 
 	{
-		dFloat32 picth0 = dFloat32(0.0f);
+		//dFloat32 picth0 = dFloat32(0.0f);
+		dFloat32 picth0 = dAtan2(matrix[2][1], matrix[1][1]);
 		dFloat32 yaw0 = dFloat32(-dPi * 0.5f);
-		dFloat32 roll0 = -dAtan2(matrix[2][1], matrix[1][1]);
+		//dFloat32 roll0 = -dAtan2(matrix[2][1], matrix[1][1]);
+		dFloat32 roll0 = dFloat32(0.0f);
 		euler0[0] = picth0;
 		euler0[1] = yaw0;
 		euler0[2] = roll0;
@@ -357,9 +359,11 @@ void dMatrix::CalcPitchYawRoll (dVector& euler0, dVector& euler1) const
 	} 
 	else if (matrix[0][2] < dFloat32 (-0.99995f)) 
 	{
-		dFloat32 picth0 = dFloat32 (0.0f);
+		//dFloat32 picth0 = dFloat32 (0.0f);
+		dFloat32 picth0 = -dAtan2(matrix[2][1], matrix[1][1]);
 		dFloat32 yaw0 = dFloat32(dPi * 0.5f);
-		dFloat32 roll0 = dAtan2(matrix[2][1], matrix[1][1]);
+		//dFloat32 roll0 = dAtan2(matrix[2][1], matrix[1][1]);
+		dFloat32 roll0 = dFloat32(0.0f);
 		euler0[0] = picth0;
 		euler0[1] = yaw0;
 		euler0[2] = roll0;
@@ -367,7 +371,8 @@ void dMatrix::CalcPitchYawRoll (dVector& euler0, dVector& euler1) const
 		euler1[0] = picth0;
 		euler1[1] = yaw0;
 		euler1[2] = roll0;
-
+		//dMatrix xxxx(dPitchMatrix(picth0) * dYawMatrix(yaw0) * dRollMatrix(roll0));
+		//dMatrix xxxx1(dPitchMatrix(picth0) * dYawMatrix(yaw0) * dRollMatrix(roll0));
 	} 
 	else 
 	{

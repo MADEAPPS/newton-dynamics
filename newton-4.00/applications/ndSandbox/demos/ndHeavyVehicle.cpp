@@ -708,41 +708,41 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		dVector euler0;
 		dVector euler1;
 
-		const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
-		turretMatrix.CalcPitchYawRoll(euler0, euler1);
-		dFloat32 turretAngle = m_turretHinge->GetAngle();
-		dFloat32 turretErrorAngle = AnglesAdd(m_turretAngle, -euler0.m_x);
-		if (dAbs(turretErrorAngle) > (3.0f * dDegreeToRad))
-		{
-			if (turretErrorAngle < 0.0f)
-			{
-				turretAngle = 1000.0f;
-			}
-			else
-			{
-				turretAngle = -1000.0f;
-			}
-		}
-		m_turretHinge->SetTargetAngle(turretAngle);
-		dTrace(("errorAngle:%f  turretAngle:%f\n", turretErrorAngle * dRadToDegree, m_turretHinge->GetAngle() * dRadToDegree));
-
-		//const dMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
-		//cannonMatrix.CalcPitchYawRoll(euler0, euler1);
-		//dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
-		//dFloat32 cannonErrorAngle = AnglesAdd(m_cannonAngle, - euler0.m_z);
-		//if (dAbs(cannonErrorAngle) > (3.0f * dDegreeToRad))
+		//const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
+		//turretMatrix.CalcPitchYawRoll(euler0, euler1);
+		//dFloat32 turretAngle = m_turretHinge->GetAngle();
+		//dFloat32 turretErrorAngle = AnglesAdd(m_turretAngle, -euler0.m_x);
+		//if (dAbs(turretErrorAngle) > (3.0f * dDegreeToRad))
 		//{
-		//	if (cannonErrorAngle < 0.0f)
+		//	if (turretErrorAngle < 0.0f)
 		//	{
-		//		cannonTargetAngle = 1000.0f;
+		//		turretAngle = 1000.0f;
 		//	}
 		//	else
 		//	{
-		//		cannonTargetAngle = -1000.0f;
+		//		turretAngle = -1000.0f;
 		//	}
 		//}
-		//m_cannonHinge->SetTargetAngle(cannonTargetAngle);
-		//dTrace(("errorAngle:%f  cannonAngle:%f\n", cannonErrorAngle * dRadToDegree, m_cannonHinge->GetAngle() * dRadToDegree));
+		//m_turretHinge->SetTargetAngle(turretAngle);
+		//dTrace(("errorAngle:%f  turretAngle:%f\n", turretErrorAngle * dRadToDegree, m_turretHinge->GetAngle() * dRadToDegree));
+
+		const dMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
+		cannonMatrix.CalcPitchYawRoll(euler0, euler1);
+		dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
+		dFloat32 cannonErrorAngle = AnglesAdd(m_cannonAngle, - euler0.m_z);
+		if (dAbs(cannonErrorAngle) > (3.0f * dDegreeToRad))
+		{
+			if (cannonErrorAngle < 0.0f)
+			{
+				cannonTargetAngle = 1000.0f;
+			}
+			else
+			{
+				cannonTargetAngle = -1000.0f;
+			}
+		}
+		m_cannonHinge->SetTargetAngle(cannonTargetAngle);
+		dTrace(("errorAngle:%f  cannonAngle:%f\n", cannonErrorAngle * dRadToDegree, m_cannonHinge->GetAngle() * dRadToDegree));
 	}
 
 	void Update(ndWorld* const world, dFloat32 timestep)
