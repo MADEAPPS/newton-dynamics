@@ -53,7 +53,7 @@ dFloat64 ndMeshEffect::dMeshBVH::dgFitnessList::TotalCost() const
 	dFloat64 cost = dFloat32(0.0f);
 	Iterator iter(*this);
 	for (iter.Begin(); iter; iter++) {
-		dTreeNode* const node = iter.GetNode();
+		dNode* const node = iter.GetNode();
 		dgMeshBVHNode* const box = node->GetInfo();
 		cost += box->m_area;
 	}
@@ -202,7 +202,7 @@ void ndMeshEffect::dMeshBVH::Build()
 	/*
 		for (void* faceNode = m_mesh->GetFirstFace (); faceNode; faceNode = m_mesh->GetNextFace(faceNode)) {
 			if (!m_mesh->IsFaceOpen(faceNode)) {
-				dEdge* const face = &((dTreeNode*)faceNode)->GetInfo();
+				dEdge* const face = &((dNode*)faceNode)->GetInfo();
 				if (face->m_mark != mark) {
 					AddFaceNode(face, nullptr);
 				}
@@ -393,7 +393,7 @@ void ndMeshEffect::dMeshBVH::ImproveNodeFitness()
 		cost0 = cost1;
 		dgFitnessList::Iterator iter(m_fitness);
 		for (iter.Begin(); iter; iter++) {
-			dgFitnessList::dTreeNode* const node = iter.GetNode();
+			dgFitnessList::dNode* const node = iter.GetNode();
 			ImproveNodeFitness(node->GetInfo());
 		}
 		cost1 = m_fitness.TotalCost();
@@ -1064,7 +1064,7 @@ void* ndMeshEffect::GetFirstVertex() const
 	Iterator iter(*this);
 	iter.Begin();
 
-	dTreeNode* node = nullptr;
+	dNode* node = nullptr;
 	if (iter) {
 		dInt32 mark = IncLRU();
 		node = iter.GetNode();
@@ -1081,13 +1081,13 @@ void* ndMeshEffect::GetFirstVertex() const
 
 void* ndMeshEffect::GetNextVertex(const void* const vertex) const
 {
-	dTreeNode* const node0 = (dTreeNode*)vertex;
+	dNode* const node0 = (dNode*)vertex;
 	dInt32 mark = node0->GetInfo().m_mark;
 
 	Iterator iter(*this);
 	iter.Set(node0);
 	for (iter++; iter; iter++) {
-		dTreeNode* node = iter.GetNode();
+		dNode* node = iter.GetNode();
 		if (node->GetInfo().m_mark != mark) {
 			dEdge* const edge = &node->GetInfo();
 			dEdge* ptr = edge;
@@ -1103,7 +1103,7 @@ void* ndMeshEffect::GetNextVertex(const void* const vertex) const
 
 dInt32 ndMeshEffect::GetVertexIndex(const void* const vertex) const
 {
-	dTreeNode* const node = (dTreeNode*)vertex;
+	dNode* const node = (dNode*)vertex;
 	dEdge* const edge = &node->GetInfo();
 	return edge->m_incidentVertex;
 }
@@ -1112,7 +1112,7 @@ void* ndMeshEffect::GetFirstPoint() const
 {
 	Iterator iter(*this);
 	for (iter.Begin(); iter; iter++) {
-		dTreeNode* const node = iter.GetNode();
+		dNode* const node = iter.GetNode();
 		dEdge* const edge = &node->GetInfo();
 		if (edge->m_incidentFace > 0) {
 			return node;
@@ -1124,9 +1124,9 @@ void* ndMeshEffect::GetFirstPoint() const
 void* ndMeshEffect::GetNextPoint(const void* const point) const
 {
 	Iterator iter(*this);
-	iter.Set((dTreeNode*)point);
+	iter.Set((dNode*)point);
 	for (iter++; iter; iter++) {
-		dTreeNode* const node = iter.GetNode();
+		dNode* const node = iter.GetNode();
 		dEdge* const edge = &node->GetInfo();
 		if (edge->m_incidentFace > 0) {
 			return node;
@@ -1137,7 +1137,7 @@ void* ndMeshEffect::GetNextPoint(const void* const point) const
 
 dInt32 ndMeshEffect::GetPointIndex(const void* const point) const
 {
-	dTreeNode* const node = (dTreeNode*)point;
+	dNode* const node = (dNode*)point;
 	dEdge* const edge = &node->GetInfo();
 	return dInt32(edge->m_userData);
 }
@@ -1152,7 +1152,7 @@ dEdge* ndMeshEffect::SpliteFace(dInt32 v0, dInt32 v1)
 {
 	if (!FindEdge(v0, v1)) {
 		dPolyhedra::dgPairKey key(v0, 0);
-		dTreeNode* const node = FindGreaterEqual(key.GetVal());
+		dNode* const node = FindGreaterEqual(key.GetVal());
 		if (node) {
 			dEdge* const edge = &node->GetInfo();
 			dEdge* edge0 = edge;
@@ -1173,7 +1173,7 @@ dEdge* ndMeshEffect::SpliteFace(dInt32 v0, dInt32 v1)
 
 const dEdge* ndMeshEffect::GetPolyhedraEdgeFromNode(const void* const edge) const
 {
-	dTreeNode* const node = (dTreeNode*)edge;
+	dNode* const node = (dNode*)edge;
 	return &node->GetInfo();
 }
 
@@ -1182,7 +1182,7 @@ void* ndMeshEffect::GetFirstEdge() const
 	Iterator iter(*this);
 	iter.Begin();
 
-	dTreeNode* node = nullptr;
+	dNode* node = nullptr;
 	if (iter) {
 		dInt32 mark = IncLRU();
 
@@ -1197,13 +1197,13 @@ void* ndMeshEffect::GetFirstEdge() const
 
 void* ndMeshEffect::GetNextEdge(const void* const edge) const
 {
-	dTreeNode* const node0 = (dTreeNode*)edge;
+	dNode* const node0 = (dNode*)edge;
 	dInt32 mark = node0->GetInfo().m_mark;
 
 	Iterator iter(*this);
 	iter.Set(node0);
 	for (iter++; iter; iter++) {
-		dTreeNode* const node = iter.GetNode();
+		dNode* const node = iter.GetNode();
 		if (node->GetInfo().m_mark != mark) {
 			node->GetInfo().m_mark = mark;
 			node->GetInfo().m_twin->m_mark = mark;
@@ -1216,7 +1216,7 @@ void* ndMeshEffect::GetNextEdge(const void* const edge) const
 
 void ndMeshEffect::GetEdgeIndex(const void* const edge, dInt32& v0, dInt32& v1) const
 {
-	dTreeNode* const node = (dTreeNode*)edge;
+	dNode* const node = (dNode*)edge;
 	v0 = node->GetInfo().m_incidentVertex;
 	v1 = node->GetInfo().m_twin->m_incidentVertex;
 }
@@ -1228,7 +1228,7 @@ void ndMeshEffect::GetEdgeIndex(const void* const edge, dInt32& v0, dInt32& v1) 
 
 //void ndMeshEffect::GetEdgeAttributeIndex (const void* edge, dInt32& v0, dInt32& v1) const
 //{
-//	dTreeNode* node = (dTreeNode*) edge;
+//	dNode* node = (dNode*) edge;
 //	v0 = dInt32 (node->GetInfo().m_userData);
 //	v1 = dInt32 (node->GetInfo().m_twin->m_userData);
 //}
@@ -1239,7 +1239,7 @@ void* ndMeshEffect::GetFirstFace() const
 	Iterator iter(*this);
 	iter.Begin();
 
-	dTreeNode* node = nullptr;
+	dNode* node = nullptr;
 	if (iter) {
 		dInt32 mark = IncLRU();
 		node = iter.GetNode();
@@ -1257,13 +1257,13 @@ void* ndMeshEffect::GetFirstFace() const
 
 void* ndMeshEffect::GetNextFace(const void* const face) const
 {
-	dTreeNode* const node0 = (dTreeNode*)face;
+	dNode* const node0 = (dNode*)face;
 	dInt32 mark = node0->GetInfo().m_mark;
 
 	Iterator iter(*this);
 	iter.Set(node0);
 	for (iter++; iter; iter++) {
-		dTreeNode* node = iter.GetNode();
+		dNode* node = iter.GetNode();
 		if (node->GetInfo().m_mark != mark) {
 			dEdge* const edge = &node->GetInfo();
 			dEdge* ptr = edge;
@@ -1280,14 +1280,14 @@ void* ndMeshEffect::GetNextFace(const void* const face) const
 
 dInt32 ndMeshEffect::IsFaceOpen(const void* const face) const
 {
-	dTreeNode* const node = (dTreeNode*)face;
+	dNode* const node = (dNode*)face;
 	dEdge* const edge = &node->GetInfo();
 	return (edge->m_incidentFace > 0) ? 0 : 1;
 }
 
 dInt32 ndMeshEffect::GetFaceMaterial(const void* const face) const
 {
-	dTreeNode* const node = (dTreeNode*)face;
+	dNode* const node = (dNode*)face;
 	dEdge* const edge = &node->GetInfo();
 	return dInt32(m_attrib.m_materialChannel.m_count ? m_attrib.m_materialChannel[dInt32(edge->m_userData)] : 0);
 }
@@ -1295,7 +1295,7 @@ dInt32 ndMeshEffect::GetFaceMaterial(const void* const face) const
 void ndMeshEffect::SetFaceMaterial(const void* const face, dInt32 mateialID)
 {
 	if (m_attrib.m_materialChannel.m_count) {
-		dTreeNode* const node = (dTreeNode*)face;
+		dNode* const node = (dNode*)face;
 		dEdge* const edge = &node->GetInfo();
 		if (edge->m_incidentFace > 0) {
 			dEdge* ptr = edge;
@@ -1312,7 +1312,7 @@ void ndMeshEffect::SetFaceMaterial(const void* const face, dInt32 mateialID)
 dInt32 ndMeshEffect::GetFaceIndexCount(const void* const face) const
 {
 	dInt32 count = 0;
-	dTreeNode* node = (dTreeNode*)face;
+	dNode* node = (dNode*)face;
 	dEdge* const edge = &node->GetInfo();
 	dEdge* ptr = edge;
 	do {
@@ -1325,7 +1325,7 @@ dInt32 ndMeshEffect::GetFaceIndexCount(const void* const face) const
 void ndMeshEffect::GetFaceIndex(const void* const face, dInt32* const indices) const
 {
 	dInt32 count = 0;
-	dTreeNode* node = (dTreeNode*)face;
+	dNode* node = (dNode*)face;
 	dEdge* const edge = &node->GetInfo();
 	dEdge* ptr = edge;
 	do {
@@ -1338,7 +1338,7 @@ void ndMeshEffect::GetFaceIndex(const void* const face, dInt32* const indices) c
 void ndMeshEffect::GetFaceAttributeIndex(const void* const face, dInt32* const indices) const
 {
 	dInt32 count = 0;
-	dTreeNode* node = (dTreeNode*)face;
+	dNode* node = (dNode*)face;
 	dEdge* const edge = &node->GetInfo();
 	dEdge* ptr = edge;
 	do {
@@ -1351,7 +1351,7 @@ void ndMeshEffect::GetFaceAttributeIndex(const void* const face, dInt32* const i
 
 dBigVector ndMeshEffect::CalculateFaceNormal(const void* const face) const
 {
-	dTreeNode* const node = (dTreeNode*)face;
+	dNode* const node = (dNode*)face;
 	dEdge* const faceEdge = &node->GetInfo();
 	dBigVector normal(FaceNormal(faceEdge, &m_points.m_vertex[0].m_x, sizeof(dBigVector)));
 	dAssert(normal.m_w == dFloat32(0.0f));
@@ -1488,7 +1488,7 @@ dgCollisionInstance* ndMeshEffect::CreateCollisionTree(dgWorld* const world, dIn
 	dInt32 mark = IncLRU();
 	dPolyhedra::Iterator iter(*this);
 	for (iter.Begin(); iter; iter++) {
-		dTreeNode* const faceNode = iter.GetNode();
+		dNode* const faceNode = iter.GetNode();
 		//dEdge* const face = &(*iter);
 		dEdge* const face = &faceNode->GetInfo();
 		if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {
@@ -2412,7 +2412,7 @@ bool ndMeshEffect::EndFace()
 
 		Iterator iter(*this);
 		dInt32 mark = IncLRU();
-		dList<dTreeNode*> collisionFound;
+		dList<dNode*> collisionFound;
 		for (iter.Begin(); iter; iter++)
 		{
 			dEdge* const edge = &iter.GetNode()->GetInfo();
@@ -2437,7 +2437,7 @@ bool ndMeshEffect::EndFace()
 		}
 
 		dAssert(!collisionFound.GetFirst() || Sanity());
-		for (dList<dTreeNode*>::dListNode* node = collisionFound.GetFirst(); node; node = node->GetNext())
+		for (dList<dNode*>::dNode* node = collisionFound.GetFirst(); node; node = node->GetNext())
 		{
 			state = true;
 			dEdge* const edge = &node->GetInfo()->GetInfo();
@@ -2484,11 +2484,11 @@ bool ndMeshEffect::EndFace()
 					ptr->m_userData = m_attrib.m_pointChannel.GetCount() - 1;
 				}
 
-				dTreeNode* const edgeNode = GetNodeFromInfo(*ptr);
+				dNode* const edgeNode = GetNodeFromInfo(*ptr);
 				dgPairKey edgeKey(ptr->m_incidentVertex, ptr->m_twin->m_incidentVertex);
 				ReplaceKey(edgeNode, edgeKey.GetVal());
 
-				dTreeNode* const twinNode = GetNodeFromInfo(*(ptr->m_twin));
+				dNode* const twinNode = GetNodeFromInfo(*(ptr->m_twin));
 				dgPairKey twinKey(ptr->m_twin->m_incidentVertex, ptr->m_incidentVertex);
 				ReplaceKey(twinNode, twinKey.GetVal());
 
@@ -3725,7 +3725,7 @@ ndMeshEffect::ndMeshEffect(const dFloat64* const vertexCloud, dInt32 count, dInt
 			format.m_vertex.m_indexList = &vertexIndexListPool[0];
 			format.m_vertex.m_data = &convexHull.GetVertexPool()[0].m_x;
 			format.m_vertex.m_strideInBytes = sizeof(dBigVector);
-			for (dConvexHull3d::dListNode* faceNode = convexHull.GetFirst(); faceNode; faceNode = faceNode->GetNext()) 
+			for (dConvexHull3d::dNode* faceNode = convexHull.GetFirst(); faceNode; faceNode = faceNode->GetNext()) 
 			{
 				dConvexHull3dFace& face = faceNode->GetInfo();
 				faceCountPool[index] = 3;
@@ -3792,7 +3792,7 @@ ndMeshEffect::ndMeshEffect(const ndShapeInstance& shape)
 		//	dInt32 brush = 0;
 		//	dMatrix matrix(collisionInfo.m_offsetMatrix);
 		//	dgCollisionCompound* const compoundCollision = (dgCollisionCompound*)collision->GetChildShape();
-		//	for (dTree<dgCollisionCompound::dgNodeBase*, dInt32>::dTreeNode* node = compoundCollision->GetFirstNode(); node; node = compoundCollision->GetNextNode(node)) {
+		//	for (dTree<dgCollisionCompound::dgNodeBase*, dInt32>::dNode* node = compoundCollision->GetFirstNode(); node; node = compoundCollision->GetNextNode(node)) {
 		//		builder.m_brush = brush;
 		//		brush++;
 		//		dgCollisionInstance* const childShape = compoundCollision->GetCollisionFromNode(node);

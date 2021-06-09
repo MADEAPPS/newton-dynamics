@@ -160,13 +160,13 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API virtual void DetachContact(ndContact* const contact);
 	D_COLLISION_API virtual void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);
 
-	D_COLLISION_API virtual ndJointList::dListNode* AttachJoint(ndJointBilateralConstraint* const joint);
-	D_COLLISION_API virtual void DetachJoint(ndJointList::dListNode* const node);
+	D_COLLISION_API virtual ndJointList::dNode* AttachJoint(ndJointBilateralConstraint* const joint);
+	D_COLLISION_API virtual void DetachJoint(ndJointList::dNode* const node);
 	D_COLLISION_API virtual void IntegrateExternalForce(dFloat32 timestep);
 
 	void UpdateCollisionMatrix();
 	void PrepareStep(dInt32 index);
-	void SetSceneNodes(ndScene* const scene, ndBodyList::dListNode* const node);
+	void SetSceneNodes(ndScene* const scene, ndBodyList::dNode* const node);
 
 	ndSceneBodyNode* GetSceneBodyNode() const;
 	void SetSceneBodyNode(ndSceneBodyNode* const node);
@@ -191,7 +191,7 @@ class ndBodyKinematic: public ndBody
 	dSpinLock m_lock;
 	ndScene* m_scene;
 	ndBodyKinematic* m_islandParent;
-	ndBodyList::dListNode* m_sceneNode;
+	ndBodyList::dNode* m_sceneNode;
 	ndSceneBodyNode* m_sceneBodyBodyNode;
 	ndSceneAggregate* m_sceneAggregateNode;
 	ndSkeletonContainer* m_skeletonContainer;
@@ -299,7 +299,7 @@ inline ndScene* ndBodyKinematic::GetScene() const
 	return m_scene;
 }
 
-inline void ndBodyKinematic::SetSceneNodes(ndScene* const scene, ndBodyList::dListNode* const node)
+inline void ndBodyKinematic::SetSceneNodes(ndScene* const scene, ndBodyList::dNode* const node)
 {
 	m_scene = scene;
 	m_sceneNode = node;

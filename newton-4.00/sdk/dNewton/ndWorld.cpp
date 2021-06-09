@@ -247,7 +247,7 @@ void ndWorld::ClearCache()
 
 void ndWorld::UpdateTransforms()
 {
-	for (ndBodyParticleSetList::dListNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
+	for (ndBodyParticleSetList::dNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyParticleSet* const particleSet = node->GetInfo();
 		particleSet->GetNotifyCallback()->OnTranform(0, particleSet->GetMatrix());
@@ -302,7 +302,7 @@ bool ndWorld::AddBody(ndBody* const body)
 	{
 		ndBodyParticleSet* const particleSet = body->GetAsBodyParticleSet();
 		dAssert(particleSet->m_listNode == nullptr);
-		ndBodyParticleSetList::dListNode* const node = m_particleSetList.Append(particleSet);
+		ndBodyParticleSetList::dNode* const node = m_particleSetList.Append(particleSet);
 		particleSet->m_listNode = node;
 	}
 	return false;
@@ -476,7 +476,7 @@ void ndWorld::Save(nd::TiXmlElement* const worldNode, const char* const assetPat
 	dInt32 shapesCount = 0;
 	dTree<dUnsigned32, const ndShape*> uniqueShapes;
 	const ndBodyList& bodyList = GetBodyList();
-	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
 		ndShape* const shape = body->GetCollisionShape().GetShape();
@@ -507,7 +507,7 @@ void ndWorld::Save(nd::TiXmlElement* const worldNode, const char* const assetPat
 		nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("ndBodies");
 		worldNode->LinkEndChild(bodiesNode);
 
-		for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+		for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
 			ndBodyKinematic* const body = bodyNode->GetInfo();
 			body->Save(bodiesNode, assetPath, bodyIndex, uniqueShapes);
@@ -762,7 +762,7 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 void ndWorld::ParticleUpdate()
 {
 	D_TRACKTIME();
-	for (ndBodyParticleSetList::dListNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
+	for (ndBodyParticleSetList::dNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyParticleSet* const body = node->GetInfo();
 		body->Update(this, m_timestep);
@@ -783,7 +783,7 @@ void ndWorld::ModelUpdate()
 			const dFloat32 timestep = m_timestep;
 			ndWorld* const world = m_owner->GetWorld();
 			ndModelList& modelList = world->m_modelList;
-			ndModelList::dListNode* node = modelList.GetFirst();
+			ndModelList::dNode* node = modelList.GetFirst();
 			for (dInt32 i = 0; i < threadId; i++)
 			{
 				node = node ? node->GetNext() : nullptr;
@@ -818,7 +818,7 @@ void ndWorld::ModelPostUpdate()
 			const dFloat32 timestep = m_timestep;
 			ndWorld* const world = m_owner->GetWorld();
 			ndModelList& modelList = world->m_modelList;
-			ndModelList::dListNode* node = modelList.GetFirst();
+			ndModelList::dNode* node = modelList.GetFirst();
 			for (dInt32 i = 0; i < threadId; i++)
 			{
 				node = node ? node->GetNext() : nullptr;
@@ -865,7 +865,7 @@ void ndWorld::UpdateSkeletons()
 
 		// build connectivity graph and reset of all joint dirty state
 		ndDynamicsUpdate& solverUpdate = *m_solver;
-		for (ndJointList::dListNode* node = m_jointList.GetFirst(); node; node = node->GetNext())
+		for (ndJointList::dNode* node = m_jointList.GetFirst(); node; node = node->GetNext())
 		{
 			ndJointBilateralConstraint* const constraint = node->GetInfo();
 			const bool test = SkeletonJointTest(constraint);
@@ -953,7 +953,7 @@ void ndWorld::UpdateSkeletons()
 				if (!rootBody->m_skeletonMark1)
 				{
 					rootBody->m_skeletonMark1 = 1;
-					for (ndJointList::dListNode* jointNode = rootBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+					for (ndJointList::dNode* jointNode = rootBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
 					{
 						ndJointBilateralConstraint* const constraint = jointNode->GetInfo();
 						dAssert(constraint && constraint->GetAsBilateral());
@@ -997,7 +997,7 @@ void ndWorld::UpdateSkeletons()
 				bool hasJoints = false;
 				ndBodyKinematic* const rootBody = islands[i].m_body;
 				rootBody->m_skeletonMark0 = 1;
-				for (ndJointList::dListNode* jointNode = rootBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+				for (ndJointList::dNode* jointNode = rootBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
 				{
 					ndJointBilateralConstraint* const constraint = jointNode->GetInfo();
 				
@@ -1019,7 +1019,7 @@ void ndWorld::UpdateSkeletons()
 					// them add the first children to this root
 					skeleton = m_skeletonList.CreateContatiner(rootBody);
 
-					for (ndJointList::dListNode* jointNode = rootBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+					for (ndJointList::dNode* jointNode = rootBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
 					{
 						ndJointBilateralConstraint* const constraint = jointNode->GetInfo();
 						//dTrace(("%s %d %d\n", constraint->GetClassName(), constraint->GetBody0()->GetId(), constraint->GetBody1()->GetId()));
@@ -1062,7 +1062,7 @@ void ndWorld::UpdateSkeletons()
 						if (!parentBody->m_skeletonMark0)
 						{
 							parentBody->m_skeletonMark0 = 1;
-							for (ndJointList::dListNode* jointNode = parentBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+							for (ndJointList::dNode* jointNode = parentBody->m_jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
 							{
 								ndJointBilateralConstraint* const constraint = jointNode->GetInfo();
 								if (!constraint->m_mark0)

@@ -974,7 +974,7 @@ void dAabbPolygonSoup::Create (const dPolygonSoupBuilder& builder)
 		stack.Append(root);
 		while (stack.GetCount()) 
 		{
-			dList<dgNodeBuilder*>::dListNode* const stackNode = stack.GetLast();
+			dList<dgNodeBuilder*>::dNode* const stackNode = stack.GetLast();
 			dgNodeBuilder* const node = stackNode->GetInfo();
 			stack.Remove(stackNode);
 
@@ -992,14 +992,14 @@ void dAabbPolygonSoup::Create (const dPolygonSoupBuilder& builder)
 		do 
 		{
 			prevCost = newCost;
-			for (dList<dgNodeBuilder*>::dListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) 
+			for (dList<dgNodeBuilder*>::dNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) 
 			{
 				dgNodeBuilder* const node = listNode->GetInfo();
 				ImproveNodeFitness (node);
 			}
 
 			newCost = dFloat32 (0.0f);
-			for (dList<dgNodeBuilder*>::dListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) 
+			for (dList<dgNodeBuilder*>::dNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) 
 			{
 				dgNodeBuilder* const node = listNode->GetInfo();
 				newCost += node->m_area;

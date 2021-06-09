@@ -423,9 +423,9 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 				
 																//char xxx[256];
 																//sprintf (xxx, "%s", fbxBone->GetName());
-				GlobalNoceMap::dTreeNode* const boneNode = nodeMap.Find(fbxBone);
+				GlobalNoceMap::dNode* const boneNode = nodeMap.Find(fbxBone);
 				if (boneNode) {
-					dPluginScene::dTreeNode* const bone = boneNode->GetInfo();
+					dPluginScene::dNode* const bone = boneNode->GetInfo();
 				
 					// Get the bind pose
 					//FbxAMatrix bindPoseMatrix;
@@ -449,7 +449,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 				
 			char skinName[256];
 			sprintf(skinName, "%s_skin", fbxMeshNode->GetName());
-			dPluginScene::dTreeNode* const skinNode = ngdScene->CreateSkinModifierNode(meshNode);
+			dPluginScene::dNode* const skinNode = ngdScene->CreateSkinModifierNode(meshNode);
 			dGeometryNodeSkinModifierInfo* const info = (dGeometryNodeSkinModifierInfo*)ngdScene->GetInfoFromNode(skinNode);
 			info->SetName(skinName);
 			info->SkinMesh(skinNode, ngdScene, skinVertexData, actualSkinVertexCount);
@@ -534,12 +534,12 @@ static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 	//for (iter1.Begin(); iter1; iter1++) {
 	//	dInt32 count = iter1.GetNode()->GetInfo();
 	//	if (!count) {
-	//		dScene::dTreeNode* const materiaCacheNode = ngdScene->FindGetMaterialCacheNode();
-	//		dScene::dTreeNode* const materialNode = iter1.GetKey();
+	//		dScene::dNode* const materiaCacheNode = ngdScene->FindGetMaterialCacheNode();
+	//		dScene::dNode* const materialNode = iter1.GetKey();
 	//		void* nextLink;
 	//		for (void* link = ngdScene->GetFirstParentLink(materialNode); link; link = nextLink) {
 	//			nextLink = ngdScene->GetNextParentLink(materialNode, link);
-	//			dScene::dTreeNode* const parentNode = ngdScene->GetNodeFromLink(link);
+	//			dScene::dNode* const parentNode = ngdScene->GetNodeFromLink(link);
 	//			if (parentNode != materiaCacheNode) {
 	//				ngdScene->RemoveReference(parentNode, materialNode);
 	//			}

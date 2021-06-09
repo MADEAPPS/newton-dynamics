@@ -128,7 +128,7 @@ class ndSceneTreeNode: public ndSceneNode
 
 	ndSceneNode* m_left;
 	ndSceneNode* m_right;
-	dList<ndSceneTreeNode*, dContainersFreeListAlloc<ndSceneTreeNode*>>::dListNode* m_fitnessNode;
+	dList<ndSceneTreeNode*, dContainersFreeListAlloc<ndSceneTreeNode*>>::dNode* m_fitnessNode;
 } D_GCC_NEWTON_ALIGN_32;
 
 

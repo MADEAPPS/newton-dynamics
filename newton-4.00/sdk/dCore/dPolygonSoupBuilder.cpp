@@ -70,7 +70,7 @@ class dPolygonSoupBuilder::dgFaceMap: public dTree<dgFaceBucket, dInt32>
 			dInt32 count = faceVertexCounts[i];
 			dInt32 attribute = faceVertexIndex[polygonIndex + count - 1];
 			
-			dTreeNode* node = Find(attribute);
+			dNode* node = Find(attribute);
 			if (!node) 
 			{
 				dgFaceBucket tmp;
@@ -607,9 +607,9 @@ void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket
 	dInt32 faceIndex[256];
 	if (faceBucket.GetCount() >= DG_MESH_PARTITION_SIZE) 
 	{
-		dStack<dgFaceBucket::dListNode*> array(faceBucket.GetCount());
+		dStack<dgFaceBucket::dNode*> array(faceBucket.GetCount());
 		dInt32 count = 0;
-		for (dgFaceBucket::dListNode* node = faceBucket.GetFirst(); node; node = node->GetNext()) 
+		for (dgFaceBucket::dNode* node = faceBucket.GetFirst(); node; node = node->GetNext()) 
 		{
 			array[count] = node;
 			count ++;
@@ -752,7 +752,7 @@ void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket
 	else 
 	{
 		dPolygonSoupBuilder tmpBuilder;
-		for (dgFaceBucket::dListNode* node = faceBucket.GetFirst(); node; node = node->GetNext()) 
+		for (dgFaceBucket::dNode* node = faceBucket.GetFirst(); node; node = node->GetNext()) 
 		{
 			const dgFaceInfo& faceInfo = node->GetInfo();
 

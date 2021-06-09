@@ -138,7 +138,7 @@ class dPolyhedra: public dClassAlloc, public dTree <dEdge, dEdgeKey>
 	void SetLRU(dInt32 lru) const;
 
 	dEdge* FindEdge (dInt32 v0, dInt32 v1) const;
-	dTreeNode* FindEdgeNode (dInt32 v0, dInt32 v1) const;
+	dNode* FindEdgeNode (dInt32 v0, dInt32 v1) const;
 
 	D_CORE_API dEdge* AddHalfEdge (dInt32 v0, dInt32 v1);
 	D_CORE_API void DeleteEdge (dEdge* const edge);
@@ -307,7 +307,7 @@ inline void dPolyhedra::EndConectedSurface() const
 {
 }
 
-inline dPolyhedra::dTreeNode* dPolyhedra::FindEdgeNode (dInt32 i0, dInt32 i1) const
+inline dPolyhedra::dNode* dPolyhedra::FindEdgeNode (dInt32 i0, dInt32 i1) const
 {
 	dgPairKey key (i0, i1);
 	return Find (key.GetVal());
@@ -315,14 +315,14 @@ inline dPolyhedra::dTreeNode* dPolyhedra::FindEdgeNode (dInt32 i0, dInt32 i1) co
 
 inline dEdge *dPolyhedra::FindEdge (dInt32 i0, dInt32 i1) const
 {
-	dTreeNode* const node = FindEdgeNode (i0, i1);
+	dNode* const node = FindEdgeNode (i0, i1);
 	return node ? &node->GetInfo() : nullptr;
 }
 
 inline void dPolyhedra::DeleteEdge (dInt32 v0, dInt32 v1)
 {
 	dgPairKey pairKey (v0, v1);
-	dTreeNode* const node = Find(pairKey.GetVal());
+	dNode* const node = Find(pairKey.GetVal());
 	dEdge* const edge = node ? &node->GetInfo() : nullptr;
 	if (!edge) 
 	{

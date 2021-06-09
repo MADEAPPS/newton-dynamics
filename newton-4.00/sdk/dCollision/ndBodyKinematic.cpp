@@ -61,7 +61,7 @@ ndBodyKinematic::ndContactMap::ndContactMap()
 ndContact* ndBodyKinematic::ndContactMap::FindContact(const ndBody* const body0, const ndBody* const body1) const
 {
 	ndContactkey key(body0->GetId(), body1->GetId());
-	dTreeNode* const node = Find(key);
+	dNode* const node = Find(key);
 	return node ? node->GetInfo() : nullptr;
 }
 
@@ -224,18 +224,18 @@ void ndBodyKinematic::DetachContact(ndContact* const contact)
 	m_contactList.DetachContact(contact);
 }
 
-ndJointList::dListNode* ndBodyKinematic::AttachJoint(ndJointBilateralConstraint* const joint)
+ndJointList::dNode* ndBodyKinematic::AttachJoint(ndJointBilateralConstraint* const joint)
 {
 	m_equilibrium = 0;
 	return m_jointList.Append(joint);
 }
 
-void ndBodyKinematic::DetachJoint(ndJointList::dListNode* const node)
+void ndBodyKinematic::DetachJoint(ndJointList::dNode* const node)
 {
 	m_equilibrium = 0;
 #ifdef _DEBUG
 	bool found = false;
-	for (ndJointList::dListNode* nodeptr = m_jointList.GetFirst(); nodeptr; nodeptr = nodeptr->GetNext())
+	for (ndJointList::dNode* nodeptr = m_jointList.GetFirst(); nodeptr; nodeptr = nodeptr->GetNext())
 	{
 		found = found || nodeptr;
 	}
@@ -291,7 +291,7 @@ void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 	//#ifdef _DEBUG
 #if 0
 	dgBodyMasterList& me = *m_world;
-	for (dgBodyMasterList::dListNode* refNode = me.GetFirst(); refNode; refNode = refNode->GetNext()) {
+	for (dgBodyMasterList::dNode* refNode = me.GetFirst(); refNode; refNode = refNode->GetNext()) {
 		dgBody* const body0 = refNode->GetInfo().GetBody();
 		dVector invMass(body0->GetInvMass());
 		if (invMass.m_w != 0.0f) {

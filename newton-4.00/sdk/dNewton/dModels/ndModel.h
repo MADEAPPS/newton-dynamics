@@ -46,7 +46,7 @@ class ndModel: public dClassAlloc
 	virtual void Update(ndWorld* const world, dFloat32 timestep) = 0;
 	virtual void PostUpdate(ndWorld* const world, dFloat32 timestep) = 0;
 
-	ndModelList::dListNode* m_node;
+	ndModelList::dNode* m_node;
 
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;

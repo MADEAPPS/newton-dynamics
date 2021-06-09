@@ -580,7 +580,7 @@ void dIsoSurface::RemapIndexList()
 	{
 		for (dInt32 i = 0; i < 3; i++)
 		{
-			dIsoVertexMap::dTreeNode* const node = m_vertexMap.Find(m_trianglesList[k].m_pointId[i]);
+			dIsoVertexMap::dNode* const node = m_vertexMap.Find(m_trianglesList[k].m_pointId[i]);
 			dAssert(node);
 			dInt32 id = dInt32 (node->GetInfo().m_w);
 			m_trianglesList[k].m_pointId[i] = id;

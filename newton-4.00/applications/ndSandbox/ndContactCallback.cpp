@@ -30,7 +30,7 @@ void ndContactCallback::OnBodyRemoved(ndBodyKinematic* const) const
 ndMaterial& ndContactCallback::RegisterMaterial(dUnsigned32 id0, dUnsigned32 id1)
 {
 	ndMaterailKey key(id0, id1);
-	dTree<ndMaterial, ndMaterailKey>::dTreeNode* node = m_materialMap.Find(key);
+	dTree<ndMaterial, ndMaterailKey>::dNode* node = m_materialMap.Find(key);
 	if (!node)
 	{
 		node = m_materialMap.Insert(ndMaterial(), key);
@@ -42,7 +42,7 @@ ndMaterial& ndContactCallback::RegisterMaterial(dUnsigned32 id0, dUnsigned32 id1
 ndMaterial ndContactCallback::GetMaterial(const ndContact* const, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const
 {
 	ndMaterailKey key(instance0.GetMaterial().m_userId, instance1.GetMaterial().m_userId);
-	dTree<ndMaterial, ndMaterailKey>::dTreeNode* const node = m_materialMap.Find(key);
+	dTree<ndMaterial, ndMaterailKey>::dNode* const node = m_materialMap.Find(key);
 	return node ? node->GetInfo() : ndMaterial();
 }
 
@@ -71,7 +71,7 @@ void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 	dFloat32 maxTangentSpeed = dFloat32(0.0f);
 	const ndContactMaterial* normalContact = nullptr;
 	const ndContactMaterial* tangentContact = nullptr;
-	for (ndContactPointList::dListNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+	for (ndContactPointList::dNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 	{
 		const ndContactMaterial& contactPoint = contactNode->GetInfo();
 		const dVector pointVeloc0(body0->GetVelocityAtPoint(contactPoint.m_point));

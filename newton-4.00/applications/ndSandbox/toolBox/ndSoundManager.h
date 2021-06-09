@@ -38,10 +38,10 @@ class dSoundManager
 
 
 		private:
-		void LinkAsset (dTree<dSoundAsset, dUnsigned64>::dTreeNode* const assetNode);
+		void LinkAsset (dTree<dSoundAsset, dUnsigned64>::dNode* const assetNode);
 
 		dInt32 m_source;
-		dTree<dSoundAsset, dUnsigned64>::dTreeNode* m_myAssetNode;
+		dTree<dSoundAsset, dUnsigned64>::dNode* m_myAssetNode;
 		friend class dSoundManager;
 	};
 
@@ -68,7 +68,7 @@ class dSoundManager
 	{
 	};
 
-	class dSoundChannelPlaying: public dList<dSoundChannelList::dListNode*>
+	class dSoundChannelPlaying: public dList<dSoundChannelList::dNode*>
 	{
 	};
 	

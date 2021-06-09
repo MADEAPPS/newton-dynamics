@@ -83,7 +83,7 @@ class ndShapeCompoundConvex: public ndShape
 	void SetOwner(const ndShapeInstance* const myInstance);
 
 	D_COLLISION_API virtual void BeginAddRemove();
-	D_COLLISION_API virtual ndTreeArray::dTreeNode* AddCollision(ndShapeInstance* const part);
+	D_COLLISION_API virtual ndTreeArray::dNode* AddCollision(ndShapeInstance* const part);
 	D_COLLISION_API virtual void EndAddRemove();
 
 	protected:
@@ -178,7 +178,7 @@ class ndShapeCompoundConvex::ndNodeBase: public dClassAlloc
 	ndNodeBase* m_right;
 	ndNodeBase* m_parent;
 	ndShapeInstance* m_shape;
-	ndTreeArray::dTreeNode* m_myNode;
+	ndTreeArray::dNode* m_myNode;
 };
 
 inline ndShapeCompoundConvex::ndNodeBase::ndNodeBase()

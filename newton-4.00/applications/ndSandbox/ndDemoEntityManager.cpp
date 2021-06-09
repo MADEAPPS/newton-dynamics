@@ -468,7 +468,7 @@ void ndDemoEntityManager::Cleanup ()
 
 	while (m_debugShapeCache.GetRoot())
 	{
-		ndDebugMeshCache::dTreeNode* const root = m_debugShapeCache.GetRoot();
+		ndDebugMeshCache::dNode* const root = m_debugShapeCache.GetRoot();
 		root->GetInfo().m_wireFrame->Release();
 		root->GetInfo().m_flatShaded->Release();
 		m_debugShapeCache.Remove(root);
@@ -486,7 +486,7 @@ void ndDemoEntityManager::Cleanup ()
 	if (m_world) 
 	{
 		const ndBodyList& bodyList = m_world->GetBodyList();
-		for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+		for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
 			ndBodyKinematic* const body = bodyNode->GetInfo();
 			ndDemoEntityNotify* const callback = (ndDemoEntityNotify*)body->GetNotifyCallback();
@@ -579,7 +579,7 @@ void ndDemoEntityManager::ApplyMenuOptions()
 
 	bool state = m_autoSleepMode ? true : false;
 	const ndBodyList& bodyList = m_world->GetBodyList();
-	for (ndBodyList::dListNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	for (ndBodyList::dNode* node = bodyList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyKinematic* const body = node->GetInfo();
 		body->SetAutoSleep(state);
@@ -1226,13 +1226,13 @@ void ndDemoEntityManager::DrawDebugShapes()
 	{
 		// do a z buffer pre pass for hidden line 
 		glColorMask(0, 0, 0, 0);
-		for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+		for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
 			ndBodyKinematic* const body = bodyNode->GetInfo();
 			if (!body->GetAsBodyTriggerVolume())
 			{
 				const ndShapeInstance& shapeInstance = body->GetCollisionShape();
-				ndDebugMeshCache::dTreeNode* const shapeNode = m_debugShapeCache.Find(shapeInstance.GetShape());
+				ndDebugMeshCache::dNode* const shapeNode = m_debugShapeCache.Find(shapeInstance.GetShape());
 				if (shapeNode)
 				{
 					dMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
@@ -1243,14 +1243,14 @@ void ndDemoEntityManager::DrawDebugShapes()
 		glColorMask(1, 1, 1, 1);
 	}
 
-	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
 		const ndShapeInstance& shapeInstance = body->GetCollisionShape();
 		const ndShape* const key = shapeInstance.GetShape();
 		if (!((ndShape*)key)->GetAsShapeNull())
 		{
-			ndDebugMeshCache::dTreeNode* shapeNode = m_debugShapeCache.Find(key);
+			ndDebugMeshCache::dNode* shapeNode = m_debugShapeCache.Find(key);
 			if (!shapeNode)
 			{
 				ndShapeInstance shape(body->GetCollisionShape());
@@ -1370,7 +1370,7 @@ void ndDemoEntityManager::RenderScene()
 	} 
 	else 
 	{
-		for (dListNode* node = dList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext()) 
+		for (dNode* node = dList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext()) 
 		{
 			ndDemoEntity* const entity = node->GetInfo();
 			entity->Render(timestep, this, globalMatrix);

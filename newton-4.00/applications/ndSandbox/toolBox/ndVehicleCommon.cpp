@@ -204,7 +204,7 @@ void ndVehicleSelector::PostUpdate(ndWorld* const world, dFloat32)
 
 		dInt32 vehiclesCount = 0;
 		ndBasicVehicle* vehicleArray[1024];
-		for (ndModelList::dListNode* node = modelList.GetFirst(); node; node = node->GetNext())
+		for (ndModelList::dNode* node = modelList.GetFirst(); node; node = node->GetNext())
 		{
 			ndModel* const model = node->GetInfo();
 			if (!strcmp(model->GetClassName(), "ndBasicVehicle"))

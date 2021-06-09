@@ -99,7 +99,7 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 	dMatrix m_meshMatrix;
 	ndDemoMeshInterface* m_mesh;
 	UserData* m_userData;
-	dList <ndDemoEntity*>::dListNode* m_rootNode;
+	dList <ndDemoEntity*>::dNode* m_rootNode;
 	bool m_isVisible;
 
 	friend class ndDemoEntityNotify;

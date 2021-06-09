@@ -86,7 +86,7 @@ void ndDynamicsUpdate::SortJoints()
 	D_TRACKTIME();
 	ndScene* const scene = m_world->GetScene();
 
-	for (ndSkeletonList::dListNode* node = m_world->GetSkeletonList().GetFirst(); node; node = node->GetNext())
+	for (ndSkeletonList::dNode* node = m_world->GetSkeletonList().GetFirst(); node; node = node->GetNext())
 	{
 		ndSkeletonContainer* const skeleton = &node->GetInfo();
 		skeleton->CheckSleepState();
@@ -97,7 +97,7 @@ void ndDynamicsUpdate::SortJoints()
 
 	dInt32 index = jointArray.GetCount();
 	jointArray.SetCount(index + jointList.GetCount());
-	for (ndJointList::dListNode* node = jointList.GetFirst(); node; node = node->GetNext())
+	for (ndJointList::dNode* node = jointList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = node->GetInfo();
 		if (joint->IsActive())
@@ -1332,7 +1332,7 @@ void ndDynamicsUpdate::InitSkeletons()
 			const dInt32 threadIndex = GetThreadId();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
-			ndSkeletonList::dListNode* node = world->GetSkeletonList().GetFirst();
+			ndSkeletonList::dNode* node = world->GetSkeletonList().GetFirst();
 			for (dInt32 i = 0; i < threadIndex; i++)
 			{
 				node = node ? node->GetNext() : nullptr;
@@ -1371,7 +1371,7 @@ void ndDynamicsUpdate::UpdateSkeletons()
 			const dInt32 threadIndex = GetThreadId();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
-			ndSkeletonList::dListNode* node = world->GetSkeletonList().GetFirst();
+			ndSkeletonList::dNode* node = world->GetSkeletonList().GetFirst();
 			for (dInt32 i = 0; i < threadIndex; i++)
 			{
 				node = node ? node->GetNext() : nullptr;

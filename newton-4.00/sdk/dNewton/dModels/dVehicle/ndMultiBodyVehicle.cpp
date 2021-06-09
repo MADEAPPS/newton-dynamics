@@ -251,7 +251,7 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 {
 	const dVector chassisOmega(m_chassis->GetOmega());
 	const dVector upDir(m_chassis->GetMatrix().RotateVector(m_localFrame.m_up));
-	for (dList<ndJointWheel*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	for (dList<ndJointWheel*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointWheel* const tire = node->GetInfo();
 
@@ -289,7 +289,7 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 		}
 	}
 
-	for (dList<ndMultiBodyVehicleDifferential*>::dListNode* node = m_differentials.GetFirst(); node; node = node->GetNext())
+	for (dList<ndMultiBodyVehicleDifferential*>::dNode* node = m_differentials.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleDifferential* const diff = node->GetInfo();
 		diff->AlignMatrix();
@@ -306,7 +306,7 @@ void ndMultiBodyVehicle::ApplySteering()
 	if (dAbs(m_steeringAngleMemory - m_steeringAngle) > dFloat32(1.0e-3f))
 	{
 		m_steeringAngleMemory = m_steeringAngle;
-		for (dList<ndJointWheel*>::dListNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext())
+		for (dList<ndJointWheel*>::dNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext())
 		{
 			ndJointWheel* const tire = node->GetInfo();
 			tire->SetSteeringAngle(m_steeringAngle);
@@ -349,7 +349,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	dVector longitudinalColor(dFloat32(0.7f), dFloat32(0.3f), dFloat32(0.0f), dFloat32(0.0f));
 	context.DrawLine(chassisMatrix.m_posit, chassisMatrix.m_posit + weight, forceColor);
 
-	for (dList<ndJointWheel*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	for (dList<ndJointWheel*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointWheel* const tireJoint = node->GetInfo();
 		ndBodyDynamic* const tireBody = tireJoint->GetBody0()->GetAsBodyDynamic();
@@ -376,7 +376,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 			if (contact->IsActive())
 			{
 				const ndContactPointList& contactPoints = contact->GetContactPoints();
-				for (ndContactPointList::dListNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+				for (ndContactPointList::dNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 				{
 					const ndContactMaterial& contactPoint = contactNode->GetInfo();
 					dMatrix frame(contactPoint.m_normal, contactPoint.m_dir0, contactPoint.m_dir1, contactPoint.m_point);
@@ -411,13 +411,13 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 
 void ndMultiBodyVehicle::ApplyBrakes()
 {
-	for (dList<ndJointWheel*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	for (dList<ndJointWheel*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointWheel* const tire = node->GetInfo();
 		tire->SetBrakeTorque(dFloat32 (0.0f));
 	}
 
-	for (dList<ndJointWheel*>::dListNode* node = m_brakeTires.GetFirst(); node; node = node->GetNext())
+	for (dList<ndJointWheel*>::dNode* node = m_brakeTires.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointWheel* const tire = node->GetInfo();
 		tire->SetBrakeTorque(m_brakeTorque);
@@ -425,7 +425,7 @@ void ndMultiBodyVehicle::ApplyBrakes()
 
 	if (m_brakeTorque == dFloat32(0.0f))
 	{
-		for (dList<ndJointWheel*>::dListNode* node = m_handBrakeTires.GetFirst(); node; node = node->GetNext())
+		for (dList<ndJointWheel*>::dNode* node = m_handBrakeTires.GetFirst(); node; node = node->GetNext())
 		{
 			ndJointWheel* const tire = node->GetInfo();
 
@@ -481,7 +481,7 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 
 void ndMultiBodyVehicle::ApplyTiremodel()
 {
-	for (dList<ndJointWheel*>::dListNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	for (dList<ndJointWheel*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointWheel* const tire = node->GetInfo();
 
@@ -494,7 +494,7 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 			if (contact->IsActive())
 			{
 				const ndContactPointList& contactPoints = contact->GetContactPoints();
-				for (ndContactPointList::dListNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+				for (ndContactPointList::dNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 				{
 					ndContactMaterial& contactPoint = contactNode->GetInfo();
 					const dVector fronDir(contactPoint.m_normal.CrossProduct(tireMatrix.m_front));

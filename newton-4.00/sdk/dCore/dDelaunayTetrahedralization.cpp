@@ -139,7 +139,7 @@ dInt32 dDelaunayTetrahedralization::CompareVertexByIndex(const dConvexHull4dVect
 void dDelaunayTetrahedralization::SortVertexArray ()
 {
 	dConvexHull4dVector* const points = &m_points[0];
-	for (dListNode* node = GetFirst(); node; node = node->GetNext())
+	for (dNode* node = GetFirst(); node; node = node->GetNext())
 	{	
 		dConvexHull4dTetraherum* const tetra = &node->GetInfo();
 		for (dInt32 i = 0; i < 4; i ++) 
@@ -160,8 +160,8 @@ void dDelaunayTetrahedralization::RemoveUpperHull ()
 {
 	dSetPrecisionDouble precision;
 
-	dListNode* nextNode = NULL;
-	for (dListNode* node = GetFirst(); node; node = nextNode) 
+	dNode* nextNode = NULL;
+	for (dNode* node = GetFirst(); node; node = nextNode) 
 	{
 		nextNode = node->GetNext();
 
@@ -175,12 +175,12 @@ void dDelaunayTetrahedralization::RemoveUpperHull ()
 	}
 }
 
-void dDelaunayTetrahedralization::DeleteFace (dListNode* const node)
+void dDelaunayTetrahedralization::DeleteFace (dNode* const node)
 {
 	dConvexHull4dTetraherum* const tetra = &node->GetInfo();
 	for (dInt32 i = 0; i < 4; i ++) 
 	{
-		dListNode* const twinNode = tetra->m_faces[i].m_twin;
+		dNode* const twinNode = tetra->m_faces[i].m_twin;
 		if (twinNode) 
 		{
 			dConvexHull4dTetraherum* const twinTetra = &twinNode->GetInfo();

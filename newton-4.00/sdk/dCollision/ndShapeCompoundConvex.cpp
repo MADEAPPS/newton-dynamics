@@ -403,7 +403,7 @@ ndShapeCompoundConvex::ndTreeArray::ndTreeArray()
 
 void ndShapeCompoundConvex::ndTreeArray::AddNode(ndNodeBase* const node, dInt32 index, const ndShapeInstance* const parent)
 {
-	ndTreeArray::dTreeNode* const myNode = Insert(node, index);
+	ndTreeArray::dNode* const myNode = Insert(node, index);
 	node->m_myNode = myNode;
 	node->m_shape->m_parent = parent;
 	node->m_shape->m_subCollisionHandle = myNode;
@@ -1174,7 +1174,7 @@ void ndShapeCompoundConvex::EndAddRemove()
 	}
 }
 
-ndShapeCompoundConvex::ndTreeArray::dTreeNode* ndShapeCompoundConvex::AddCollision(ndShapeInstance* const shape)
+ndShapeCompoundConvex::ndTreeArray::dNode* ndShapeCompoundConvex::AddCollision(ndShapeInstance* const shape)
 {
 	dAssert(m_myInstance);
 	ndNodeBase* const newNode = new ndNodeBase(shape);

@@ -97,7 +97,7 @@ void RenderBodiesAABB(ndDemoEntityManager* const scene)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof (ndMeshVector), box);
 
-	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		dVector p0;
 		dVector p1;
@@ -190,13 +190,13 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof (ndMeshVector), pointBuffer);
 	const ndContactList& contactList = world->GetContactList();
-	for (ndContactList::dListNode* contactNode = contactList.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+	for (ndContactList::dNode* contactNode = contactList.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 	{
 		const ndContact* const contact = &contactNode->GetInfo();
 		if (contact->IsActive())
 		{
 			const ndContactPointList& contactPoints = contact->GetContactPoints();
-			for (ndContactPointList::dListNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
+			for (ndContactPointList::dNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
 			{
 				const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
 				dVector point(viewProjectionMatrix.TransformVector1x4(contactPoint.m_point));
@@ -235,7 +235,7 @@ void RenderCenterOfMass(ndDemoEntityManager* const scene)
 	glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), line);
 
 	const ndBodyList& bodyList = world->GetBodyList();
-	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
 
@@ -308,7 +308,7 @@ void RenderParticles(ndDemoEntityManager* const scene)
 	glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), pointBuffer);
 
 	const ndBodyParticleSetList& particles = world->GetParticleList();
-	for (ndBodyParticleSetList::dListNode* particleNode = particles.GetFirst(); particleNode; particleNode = particleNode->GetNext())
+	for (ndBodyParticleSetList::dNode* particleNode = particles.GetFirst(); particleNode; particleNode = particleNode->GetNext())
 	{
 		ndBodyParticleSet* const particle = particleNode->GetInfo();
 		const dArray<dVector>& positions = particle->GetPositions();
@@ -381,7 +381,7 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 	ndJoindDebug debugJoint(scene);
 	ndWorld* const workd = scene->GetWorld();
 	const ndJointList& jointList = workd->GetJointList();
-	for (ndJointList::dListNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+	for (ndJointList::dNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = jointNode->GetInfo();
 		joint->DebugJoint(debugJoint);
@@ -437,7 +437,7 @@ void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 	ndJoindDebug debugJoint(scene);
 	ndWorld* const workd = scene->GetWorld();
 	const ndModelList& modelList = workd->GetModelList();
-	for (ndModelList::dListNode* jointNode = modelList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+	for (ndModelList::dNode* jointNode = modelList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
 	{
 		ndModel* const model = jointNode->GetInfo();
 		model->Debug(debugJoint);

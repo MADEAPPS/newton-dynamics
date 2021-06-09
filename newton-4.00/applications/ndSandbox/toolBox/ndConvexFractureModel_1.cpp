@@ -148,7 +148,7 @@ ndConvexFractureModel_1::ndEffect::ndEffect(const ndEffect& effect)
 {
 	m_body->SetCollisionShape(*effect.m_shape);
 	ndDemoDebrisEntity* mesh = (ndDemoDebrisEntity*)m_debrisRootEnt->GetChild();
-	for (dListNode* node = effect.GetFirst(); node; node = node->GetNext())
+	for (dNode* node = effect.GetFirst(); node; node = node->GetNext())
 	{
 		const ndAtom& srcAtom = node->GetInfo();
 		ndAtom& newAtom = Append(srcAtom)->GetInfo();
@@ -193,8 +193,8 @@ ndConvexFractureModel_1::~ndConvexFractureModel_1()
 //void ndConvexFractureModel_1::Update(ndWorld* const world, dFloat32 timestep)
 void ndConvexFractureModel_1::Update(ndWorld* const, dFloat32)
 {
-	dList<ndEffect>::dListNode* nextNody;
-	for (dList<ndEffect>::dListNode* node = m_effectList.GetFirst(); node; node = nextNody)
+	dList<ndEffect>::dNode* nextNody;
+	for (dList<ndEffect>::dNode* node = m_effectList.GetFirst(); node; node = nextNody)
 	{
 		nextNody = node->GetNext();
 		ndEffect& effect = node->GetInfo();
@@ -208,7 +208,7 @@ void ndConvexFractureModel_1::Update(ndWorld* const, dFloat32)
 			if (contact->IsActive())
 			{
 				const ndContactPointList& contactPoints = contact->GetContactPoints();
-				for (ndContactPointList::dListNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+				for (ndContactPointList::dNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 				{
 					const ndContactMaterial& contactPoint = contactNode->GetInfo();
 					const dFloat32 impulseImpact = contactPoint.m_normal_Force.m_impact;
@@ -236,9 +236,9 @@ void ndConvexFractureModel_1::PostUpdate(ndWorld* const world, dFloat32)
 	if (m_pendingEffect.GetCount())
 	{
 		D_TRACKTIME();
-		dList<ndEffect>::dListNode* next;
+		dList<ndEffect>::dNode* next;
 		ndPhysicsWorld* const appWorld = (ndPhysicsWorld*)world;
-		for (dList<ndEffect>::dListNode* node = m_pendingEffect.GetFirst(); node; node = next)
+		for (dList<ndEffect>::dNode* node = m_pendingEffect.GetFirst(); node; node = next)
 		{
 			next = node->GetNext();
 			ndEffect& effect = node->GetInfo();
@@ -287,7 +287,7 @@ void ndConvexFractureModel_1::UpdateEffect(ndWorld* const world, ndEffect& effec
 	effect.m_debrisRootEnt = nullptr;
 	scene->AddEntity(debriRootEnt);
 
-	for (ndEffect::dListNode* node = effect.GetFirst(); node; node = node->GetNext())
+	for (ndEffect::dNode* node = effect.GetFirst(); node; node = node->GetNext())
 	{
 		ndAtom& atom = node->GetInfo();
 		ndDemoDebrisEntity* const entity = atom.m_mesh;

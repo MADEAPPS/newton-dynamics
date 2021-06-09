@@ -98,7 +98,7 @@ void ndContact::JacobianDerivative(ndConstraintDescritor& desc)
 	{
 		dInt32 i = 0;
 		frictionIndex = m_contacPointsList.GetCount();
-		for (ndContactPointList::dListNode* node = m_contacPointsList.GetFirst(); node; node = node->GetNext())
+		for (ndContactPointList::dNode* node = m_contacPointsList.GetFirst(); node; node = node->GetNext())
 		{
 			const ndContactMaterial& contact = node->GetInfo();
 			JacobianContactDerivative(desc, contact, i, frictionIndex);

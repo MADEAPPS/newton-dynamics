@@ -38,7 +38,7 @@ class ndSkeletonList: public dList<ndSkeletonContainer, dContainersFreeListAlloc
 
 	ndSkeletonContainer* CreateContatiner(ndBodyKinematic* const rootBody)
 	{
-		dListNode* const node = Append();
+		dNode* const node = Append();
 		ndSkeletonContainer* const container = &node->GetInfo();
 		container->Init(rootBody);
 		return container;

@@ -369,7 +369,7 @@ void ndDynamicsUpdateOpencl::SortJoints()
 	D_TRACKTIME();
 	ndScene* const scene = m_world->GetScene();
 
-	for (ndSkeletonList::dListNode* node = m_world->GetSkeletonList().GetFirst(); node; node = node->GetNext())
+	for (ndSkeletonList::dNode* node = m_world->GetSkeletonList().GetFirst(); node; node = node->GetNext())
 	{
 		ndSkeletonContainer* const skeleton = &node->GetInfo();
 		skeleton->CheckSleepState();
@@ -380,7 +380,7 @@ void ndDynamicsUpdateOpencl::SortJoints()
 
 	dInt32 index = jointArray.GetCount();
 	jointArray.SetCount(index + jointList.GetCount());
-	for (ndJointList::dListNode* node = jointList.GetFirst(); node; node = node->GetNext())
+	for (ndJointList::dNode* node = jointList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = node->GetInfo();
 		if (joint->IsActive())

@@ -42,7 +42,7 @@ class dConvexHull3dFace
 	
 	void SetMark(dInt32 mark) {m_mark = mark;}
 	dInt32 GetMark() const {return m_mark;}
-	dList<dConvexHull3dFace>::dListNode* GetTwin(dInt32 index) const { return m_twin[index];}
+	dList<dConvexHull3dFace>::dNode* GetTwin(dInt32 index) const { return m_twin[index];}
 
 	private:
 	dFloat64 Evalue (const dBigVector* const pointArray, const dBigVector& point) const;
@@ -52,7 +52,7 @@ class dConvexHull3dFace
 	dInt32 m_index[3]; 
 	private:
 	dInt32 m_mark;
-	dList<dConvexHull3dFace>::dListNode* m_twin[3];
+	dList<dConvexHull3dFace>::dNode* m_twin[3];
 	friend class dConvexHull3d;
 };
 
@@ -81,8 +81,8 @@ class dConvexHull3d: public dClassAlloc, public dList<dConvexHull3dFace>
 	dConvexHull3d();
 	void BuildHull (const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount);
 
-	virtual dListNode* AddFace (dInt32 i0, dInt32 i1, dInt32 i2);
-	virtual void DeleteFace (dListNode* const node) ;
+	virtual dNode* AddFace (dInt32 i0, dInt32 i1, dInt32 i2);
+	virtual void DeleteFace (dNode* const node) ;
 	virtual dInt32 InitVertexArray(dConvexHull3dVertex* const points, const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, void* const memoryPool, dInt32 maxMemSize);
 
 	bool CheckFlatSurface(dConvexHull3dAABBTreeNode* vertexTree, dConvexHull3dVertex* const points, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount);

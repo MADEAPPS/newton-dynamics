@@ -97,9 +97,9 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	dFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];
 	ndBodyKinematic* m_body0;
 	ndBodyKinematic* m_body1;
-	ndJointList::dListNode* m_worldNode;
-	ndJointList::dListNode* m_body0Node;
-	ndJointList::dListNode* m_body1Node;
+	ndJointList::dNode* m_worldNode;
+	ndJointList::dNode* m_body0Node;
+	ndJointList::dNode* m_body1Node;
 
 	dFloat32 m_maxAngleError;
 	dFloat32 m_defualtDiagonalRegularizer;

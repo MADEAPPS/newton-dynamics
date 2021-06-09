@@ -203,15 +203,15 @@ dConvexHull3d::dConvexHull3d(const dConvexHull3d& source)
 	{
 		m_points[i] = source.m_points[i];
 	}
-	dTree<dListNode*, dListNode*> map;
-	for(dListNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext() ) 
+	dTree<dNode*, dNode*> map;
+	for(dNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext() ) 
 	{
-		dListNode* const node = Append();
+		dNode* const node = Append();
 		map.Insert(node, sourceNode);
 	}
 
-	for(dListNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext() ) {
-		dListNode* const node = map.Find(sourceNode)->GetInfo();
+	for(dNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext() ) {
+		dNode* const node = map.Find(sourceNode)->GetInfo();
 
 		dConvexHull3dFace& face = node->GetInfo();
 		dConvexHull3dFace& srcFace = sourceNode->GetInfo();
@@ -783,9 +783,9 @@ dInt32 dConvexHull3d::SupportVertex (dConvexHull3dAABBTreeNode** const treePoint
 	return index;
 }
 
-dConvexHull3d::dListNode* dConvexHull3d::AddFace (dInt32 i0, dInt32 i1, dInt32 i2)
+dConvexHull3d::dNode* dConvexHull3d::AddFace (dInt32 i0, dInt32 i1, dInt32 i2)
 {
-	dListNode* const node = Append();
+	dNode* const node = Append();
 	dConvexHull3dFace& face = node->GetInfo();
 
 	face.m_index[0] = i0;
@@ -794,7 +794,7 @@ dConvexHull3d::dListNode* dConvexHull3d::AddFace (dInt32 i0, dInt32 i1, dInt32 i
 	return node;
 }
 
-void dConvexHull3d::DeleteFace (dListNode* const node)
+void dConvexHull3d::DeleteFace (dNode* const node)
 {
 	Remove (node);
 }
@@ -802,16 +802,16 @@ void dConvexHull3d::DeleteFace (dListNode* const node)
 bool dConvexHull3d::Sanity() const
 {
 /*
-	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+	for (dNode* node = GetFirst(); node; node = node->GetNext()) {
 		dConvexHull3dFace* const face = &node->GetInfo();
 		for (dInt32 i = 0; i < 3; i ++) {
-			dListNode* const twinNode = face->m_twin[i];
+			dNode* const twinNode = face->m_twin[i];
 			if (!twinNode) {
 				return false;
 			}
 
 			dInt32 count = 0;
-			dListNode* me = nullptr;
+			dNode* me = nullptr;
 			dConvexHull3dFace* const twinFace = &twinNode->GetInfo();
 			for (dInt32 j = 0; j < 3; j ++) {
 				if (twinFace->m_twin[j] == node) {
@@ -875,33 +875,33 @@ void dConvexHull3d::CalculateConvexHull2d(dConvexHull3dAABBTreeNode*, dConvexHul
 void dConvexHull3d::CalculateConvexHull3d (dConvexHull3dAABBTreeNode* vertexTree, dConvexHull3dVertex* const points, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount)
 {
 	distTol = dAbs (distTol) * m_diag;
-	dListNode* const f0Node = AddFace (0, 1, 2);
-	dListNode* const f1Node = AddFace (0, 2, 3);
-	dListNode* const f2Node = AddFace (2, 1, 3);
-	dListNode* const f3Node = AddFace (1, 0, 3);
+	dNode* const f0Node = AddFace (0, 1, 2);
+	dNode* const f1Node = AddFace (0, 2, 3);
+	dNode* const f2Node = AddFace (2, 1, 3);
+	dNode* const f3Node = AddFace (1, 0, 3);
 
 	dConvexHull3dFace* const f0 = &f0Node->GetInfo();
 	dConvexHull3dFace* const f1 = &f1Node->GetInfo();
 	dConvexHull3dFace* const f2 = &f2Node->GetInfo();
 	dConvexHull3dFace* const f3 = &f3Node->GetInfo();
 
-	f0->m_twin[0] = (dList<dConvexHull3dFace>::dListNode*)f3Node;
-	f0->m_twin[1] = (dList<dConvexHull3dFace>::dListNode*)f2Node;
-	f0->m_twin[2] = (dList<dConvexHull3dFace>::dListNode*)f1Node;
+	f0->m_twin[0] = (dList<dConvexHull3dFace>::dNode*)f3Node;
+	f0->m_twin[1] = (dList<dConvexHull3dFace>::dNode*)f2Node;
+	f0->m_twin[2] = (dList<dConvexHull3dFace>::dNode*)f1Node;
 
-	f1->m_twin[0] = (dList<dConvexHull3dFace>::dListNode*)f0Node;
-	f1->m_twin[1] = (dList<dConvexHull3dFace>::dListNode*)f2Node;
-	f1->m_twin[2] = (dList<dConvexHull3dFace>::dListNode*)f3Node;
+	f1->m_twin[0] = (dList<dConvexHull3dFace>::dNode*)f0Node;
+	f1->m_twin[1] = (dList<dConvexHull3dFace>::dNode*)f2Node;
+	f1->m_twin[2] = (dList<dConvexHull3dFace>::dNode*)f3Node;
 
-	f2->m_twin[0] = (dList<dConvexHull3dFace>::dListNode*)f0Node;
-	f2->m_twin[1] = (dList<dConvexHull3dFace>::dListNode*)f3Node;
-	f2->m_twin[2] = (dList<dConvexHull3dFace>::dListNode*)f1Node;
+	f2->m_twin[0] = (dList<dConvexHull3dFace>::dNode*)f0Node;
+	f2->m_twin[1] = (dList<dConvexHull3dFace>::dNode*)f3Node;
+	f2->m_twin[2] = (dList<dConvexHull3dFace>::dNode*)f1Node;
 
-	f3->m_twin[0] = (dList<dConvexHull3dFace>::dListNode*)f0Node;
-	f3->m_twin[1] = (dList<dConvexHull3dFace>::dListNode*)f1Node;
-	f3->m_twin[2] = (dList<dConvexHull3dFace>::dListNode*)f2Node;
+	f3->m_twin[0] = (dList<dConvexHull3dFace>::dNode*)f0Node;
+	f3->m_twin[1] = (dList<dConvexHull3dFace>::dNode*)f1Node;
+	f3->m_twin[2] = (dList<dConvexHull3dFace>::dNode*)f2Node;
 
-	dList<dListNode*> boundaryFaces;
+	dList<dNode*> boundaryFaces;
 
 	boundaryFaces.Append(f0Node);
 	boundaryFaces.Append(f1Node);
@@ -911,13 +911,13 @@ void dConvexHull3d::CalculateConvexHull3d (dConvexHull3dAABBTreeNode* vertexTree
 	maxVertexCount -= 4;
 	dInt32 currentIndex = 4;
 
-	dStack<dListNode*> stackPool(1024 + m_count);
-	dStack<dListNode*> coneListPool(1024 + m_count);
-	dStack<dListNode*> deleteListPool(1024 + m_count);
+	dStack<dNode*> stackPool(1024 + m_count);
+	dStack<dNode*> coneListPool(1024 + m_count);
+	dStack<dNode*> deleteListPool(1024 + m_count);
 
-	dListNode** const stack = &stackPool[0];
-	dListNode** const coneList = &stackPool[0];
-	dListNode** const deleteList = &deleteListPool[0];
+	dNode** const stack = &stackPool[0];
+	dNode** const coneList = &stackPool[0];
+	dNode** const deleteList = &deleteListPool[0];
 
 	while (boundaryFaces.GetCount() && count && (maxVertexCount > 0)) 
 	{
@@ -937,10 +937,10 @@ void dConvexHull3d::CalculateConvexHull3d (dConvexHull3dAABBTreeNode* vertexTree
 
 		#if 0
 			// using stack (faster)
-			dListNode* const faceNode = boundaryFaces.GetFirst()->GetInfo();
+			dNode* const faceNode = boundaryFaces.GetFirst()->GetInfo();
 		#else
 			// using a queue (some what slower by better hull when reduced vertex count is desired)
-			dListNode* const faceNode = boundaryFaces.GetLast()->GetInfo();
+			dNode* const faceNode = boundaryFaces.GetLast()->GetInfo();
 		#endif
 
 		dConvexHull3dFace* const face = &faceNode->GetInfo();
@@ -963,7 +963,7 @@ void dConvexHull3d::CalculateConvexHull3d (dConvexHull3dAABBTreeNode* vertexTree
 			while (stackIndex) 
 			{
 				stackIndex --;
-				dListNode* const node1 = stack[stackIndex];
+				dNode* const node1 = stack[stackIndex];
 				dConvexHull3dFace* const face1 = &node1->GetInfo();
 
 				if (!face1->m_mark && (face1->Evalue(&m_points[0], p) > dFloat64(0.0f))) 
@@ -981,7 +981,7 @@ void dConvexHull3d::CalculateConvexHull3d (dConvexHull3dAABBTreeNode* vertexTree
 					face1->m_mark = 1;
 					for (dInt32 i = 0; i < 3; i ++) 
 					{
-						dListNode* const twinNode = (dListNode*)face1->m_twin[i];
+						dNode* const twinNode = (dNode*)face1->m_twin[i];
 						dAssert (twinNode);
 						dConvexHull3dFace* const twinFace = &twinNode->GetInfo();
 						if (!twinFace->m_mark) 
@@ -1000,17 +1000,17 @@ void dConvexHull3d::CalculateConvexHull3d (dConvexHull3dAABBTreeNode* vertexTree
 			dInt32 newCount = 0;
 			for (dInt32 i = 0; i < deletedCount; i ++) 
 			{
-				dListNode* const node1 = deleteList[i];
+				dNode* const node1 = deleteList[i];
 				dConvexHull3dFace* const face1 = &node1->GetInfo();
 				dAssert (face1->m_mark == 1);
 				for (dInt32 j0 = 0; j0 < 3; j0 ++) 
 				{
-					dListNode* const twinNode = face1->m_twin[j0];
+					dNode* const twinNode = face1->m_twin[j0];
 					dConvexHull3dFace* const twinFace = &twinNode->GetInfo();
 					if (!twinFace->m_mark) 
 					{
 						dInt32 j1 = (j0 == 2) ? 0 : j0 + 1;
-						dListNode* const newNode = AddFace (currentIndex, face1->m_index[j0], face1->m_index[j1]);
+						dNode* const newNode = AddFace (currentIndex, face1->m_index[j0], face1->m_index[j1]);
 						boundaryFaces.Addtop(newNode);
 
 						dConvexHull3dFace* const newFace = &newNode->GetInfo();
@@ -1031,11 +1031,11 @@ void dConvexHull3d::CalculateConvexHull3d (dConvexHull3dAABBTreeNode* vertexTree
 
 			for (dInt32 i = 0; i < newCount - 1; i ++) 
 			{
-				dListNode* const nodeA = coneList[i];
+				dNode* const nodeA = coneList[i];
 				dConvexHull3dFace* const faceA = &nodeA->GetInfo();
 				dAssert (faceA->m_mark == 0);
 				for (dInt32 j = i + 1; j < newCount; j ++) {
-					dListNode* const nodeB = coneList[j];
+					dNode* const nodeB = coneList[j];
 					dConvexHull3dFace* const faceB = &nodeB->GetInfo();
 					dAssert (faceB->m_mark == 0);
 					if (faceA->m_index[2] == faceB->m_index[1]) 
@@ -1048,7 +1048,7 @@ void dConvexHull3d::CalculateConvexHull3d (dConvexHull3dAABBTreeNode* vertexTree
 
 				for (dInt32 j = i + 1; j < newCount; j ++) 
 				{
-					dListNode* const nodeB = coneList[j];
+					dNode* const nodeB = coneList[j];
 					dConvexHull3dFace* const faceB = &nodeB->GetInfo();
 					dAssert (faceB->m_mark == 0);
 					if (faceA->m_index[1] == faceB->m_index[2]) 
@@ -1062,7 +1062,7 @@ void dConvexHull3d::CalculateConvexHull3d (dConvexHull3dAABBTreeNode* vertexTree
 
 			for (dInt32 i = 0; i < deletedCount; i ++) 
 			{
-				dListNode* const node = deleteList[i];
+				dNode* const node = deleteList[i];
 				boundaryFaces.Remove (node);
 				DeleteFace (node);
 			}
@@ -1084,7 +1084,7 @@ void dConvexHull3d::CalculateVolumeAndSurfaceArea (dFloat64& volume, dFloat64& s
 {
 	dFloat64 areaAcc = dFloat32 (0.0f);
 	dFloat64  volumeAcc = dFloat32 (0.0f);
-	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+	for (dNode* node = GetFirst(); node; node = node->GetNext()) {
 		const dConvexHull3dFace* const face = &node->GetInfo();
 		dInt32 i0 = face->m_index[0];
 		dInt32 i1 = face->m_index[1];
@@ -1117,7 +1117,7 @@ dFloat64 dConvexHull3d::RayCast (const dBigVector& localP0, const dBigVector& lo
 	dAssert(dS.m_w == dFloat32(0.0f));
 	dInt32 hasHit = 0;
 
-	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+	for (dNode* node = GetFirst(); node; node = node->GetNext()) {
 		const dConvexHull3dFace* const face = &node->GetInfo();
 
 		dInt32 i0 = face->m_index[0];
@@ -1173,7 +1173,7 @@ void dConvexHull3d::Save (const char* const filename) const
 	FILE* const file = fopen(filename, "wb");
 	dInt32 index = 0;
 //	fprintf(file, "final\n");
-	for (dListNode* nodePtr = GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
+	for (dNode* nodePtr = GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) {
 		fprintf(file, "triangle %d\n", index);
 		index++;
 		const dConvexHull3dFace& face = nodePtr->GetInfo();

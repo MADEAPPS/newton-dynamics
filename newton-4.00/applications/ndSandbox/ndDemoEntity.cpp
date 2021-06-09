@@ -82,7 +82,7 @@ ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
 }
 
 /*
-ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<ndDemoMeshInterface*, dScene::dTreeNode*>& meshCache, ndDemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent)
+ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene, dScene::dNode* const rootSceneNode, dTree<ndDemoMeshInterface*, dScene::dNode*>& meshCache, ndDemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent)
 	:dClassInfo()
 	,dHierarchy<ndDemoEntity>()
 	,m_matrix(dGetIdentityMatrix())
@@ -105,7 +105,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene
 	if (parent) {
 		Attach (parent);
 		dAssert (scene->FindParentByType(rootSceneNode, dSceneNodeInfo::GetRttiType()));
-//		dScene::dTreeNode* const parentNode = scene->FindParentByType(rootSceneNode, dSceneNodeInfo::GetRttiType());
+//		dScene::dNode* const parentNode = scene->FindParentByType(rootSceneNode, dSceneNodeInfo::GetRttiType());
 //		dSceneNodeInfo* const parentInfo = (dSceneNodeInfo*)scene->GetInfoFromNode (parentNode);
 //		dAssert (parentInfo->IsType(dSceneNodeInfo::GetRttiType()));
 //		parentMatrix = parentInfo->GetTransform();
@@ -118,7 +118,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene
 	SetNameID(sceneInfo->GetName());
 
 	// if this node has a mesh, find it and attach it to this entity
-	dScene::dTreeNode* const meshNode = scene->FindChildByType(rootSceneNode, dMeshNodeInfo::GetRttiType());
+	dScene::dNode* const meshNode = scene->FindChildByType(rootSceneNode, dMeshNodeInfo::GetRttiType());
 	if (meshNode) {
 		ndDemoMeshInterface* const mesh = meshCache.Find(meshNode)->GetInfo();
 		SetMesh(mesh, sceneInfo->GetGeometryTransform());
@@ -127,7 +127,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene
 	// we now scan for all dSceneNodeInfo node with direct connection to this rootSceneNode, 
 	// and we load the as children of this entity
 	for (void* child = scene->GetFirstChildLink(rootSceneNode); child; child = scene->GetNextChildLink (rootSceneNode, child)) {
-		dScene::dTreeNode* const node = scene->GetNodeFromLink(child);
+		dScene::dNode* const node = scene->GetNodeFromLink(child);
 		dNodeInfo* const info = scene->GetInfoFromNode(node);
 		if (info->IsType(dSceneNodeInfo::GetRttiType())) {
 			new ndDemoEntity (world, scene, node, meshCache, entityDictionary, this);

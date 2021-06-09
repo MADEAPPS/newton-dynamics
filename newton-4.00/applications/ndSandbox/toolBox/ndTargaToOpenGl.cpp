@@ -40,7 +40,7 @@ class ndTextureCache: public dTree<ndTextureEntry, dUnsigned64>
 		_strlwr(name);
 		dUnsigned64 crc = dCRC64(name);
 
-		dTreeNode* node = Find(crc);
+		dNode* node = Find(crc);
 		if (node) 
 		{
 			node->GetInfo().AddRef();
@@ -86,7 +86,7 @@ class ndTextureCache: public dTree<ndTextureEntry, dUnsigned64>
 		}
 	}
 
-	dTreeNode* FindById (GLuint id) const
+	dNode* FindById (GLuint id) const
 	{
 		Iterator iter (*this);
 		for (iter.Begin(); iter; iter ++) 
@@ -297,7 +297,7 @@ void ReleaseTexture (GLuint texture)
 const char* FindTextureById (GLuint textureID)
 {
 	ndTextureCache& cache = ndTextureCache::GetChache();	
-	ndTextureCache::dTreeNode* const node = cache.FindById (textureID);
+	ndTextureCache::dNode* const node = cache.FindById (textureID);
 	if (node) 
 	{
 		return node->GetInfo().m_textureName.GetStr();
@@ -308,7 +308,7 @@ const char* FindTextureById (GLuint textureID)
 GLuint AddTextureRef (GLuint texture)
 {
 	ndTextureCache& cache = ndTextureCache::GetChache();	
-	ndTextureCache::dTreeNode* const node = cache.FindById (texture);
+	ndTextureCache::dNode* const node = cache.FindById (texture);
 	if (node) 
 	{
 		node->GetInfo().AddRef();

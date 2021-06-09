@@ -30,7 +30,7 @@ dSoundManager::dSoundChannel::~dSoundChannel()
 	dAssert (alGetError() == AL_NO_ERROR);
 }
 
-void dSoundManager::dSoundChannel::LinkAsset( dTree<dSoundAsset, dUnsigned64>::dTreeNode* const assetNode)
+void dSoundManager::dSoundChannel::LinkAsset( dTree<dSoundAsset, dUnsigned64>::dNode* const assetNode)
 {
 	m_myAssetNode = assetNode;
 	dSoundAsset& asset = m_myAssetNode->GetInfo();
@@ -280,7 +280,7 @@ void* dSoundManager::CreateSound (const char* const fileName)
 		dGetWorkingFileName (fileName, path);
 
 		dUnsigned64 code = dCRC64 (path);
-		dSoundAssetList::dTreeNode* assetNode = m_assets.Find(code);
+		dSoundAssetList::dNode* assetNode = m_assets.Find(code);
 		if (!assetNode) {
 			assetNode = m_assets.Insert (code);
 			LoadWaveFile(&assetNode->GetInfo(), path);
@@ -295,7 +295,7 @@ void* dSoundManager::CreateSound (const char* const fileName)
 void dSoundManager::DestroySound(void* const soundAssetHandle)
 {
 	if (m_device) {
-		dSoundAssetList::dTreeNode* const node = (dSoundAssetList::dTreeNode*)soundAssetHandle;
+		dSoundAssetList::dNode* const node = (dSoundAssetList::dNode*)soundAssetHandle;
 		dAssert (node);
 
 		dSoundAsset& asset = node->GetInfo();
@@ -320,7 +320,7 @@ void dSoundManager::DestroyAllSound()
 dFloat dSoundManager::GetSoundlength (void* const soundAssetHandle)
 {
 	if (m_device) {
-		dSoundAssetList::dTreeNode* const node = (dSoundAssetList::dTreeNode*)soundAssetHandle;
+		dSoundAssetList::dNode* const node = (dSoundAssetList::dNode*)soundAssetHandle;
 		dSoundAsset& asset = node->GetInfo();
 		return 	asset.m_lenght;
 	}
@@ -331,11 +331,11 @@ dFloat dSoundManager::GetSoundlength (void* const soundAssetHandle)
 void* dSoundManager::CreatePlayChannel (void* const soundAssetHandle) 
 {
 	if (m_device) {
-		dSoundAssetList::dTreeNode* const node = (dSoundAssetList::dTreeNode*)soundAssetHandle;
+		dSoundAssetList::dNode* const node = (dSoundAssetList::dNode*)soundAssetHandle;
 		dAssert (node);
 
 		dSoundAsset& asset = node->GetInfo();
-		dSoundChannelList::dListNode* const channelNode = asset.Append();
+		dSoundChannelList::dNode* const channelNode = asset.Append();
 		dSoundChannel& channel = channelNode->GetInfo();
 		channel.LinkAsset (node);
 		return channelNode;
@@ -354,7 +354,7 @@ void dSoundManager::DestroyChannel(void* const channelHandle)
 void* dSoundManager::GetAsset(void* const channelHandle) const
 {
 	if (m_device) {
-		dSoundChannelList::dListNode* const node = (dSoundChannelList::dListNode*)channelHandle;
+		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
 		dSoundChannel& channel = node->GetInfo();
 		return channel.m_myAssetNode;
 	}
@@ -365,7 +365,7 @@ void* dSoundManager::GetAsset(void* const channelHandle) const
 void dSoundManager::PlayChannel (void* const channelHandle)
 {
 	if (m_device) {
-		dSoundChannelList::dListNode* const node = (dSoundChannelList::dListNode*)channelHandle;
+		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
 		dSoundChannel& channel = node->GetInfo();
 		if (!channel.IsPlaying()) {
 			channel.Play();
@@ -377,7 +377,7 @@ void dSoundManager::PlayChannel (void* const channelHandle)
 void dSoundManager::StopChannel (void* const channelHandle)
 {
 	if (m_device) {
-		dSoundChannelList::dListNode* const node = (dSoundChannelList::dListNode*)channelHandle;
+		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
 		dSoundChannel& channel = node->GetInfo();
 		channel.Stop();
 	}
@@ -386,7 +386,7 @@ void dSoundManager::StopChannel (void* const channelHandle)
 dFloat dSoundManager::GetChannelVolume(void* const channelHandle) const
 {
 	if (m_device) {
-		dSoundChannelList::dListNode* const node = (dSoundChannelList::dListNode*)channelHandle;
+		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
 		dSoundChannel& channel = node->GetInfo();
 		return channel.GetVolume();
 	}
@@ -396,7 +396,7 @@ dFloat dSoundManager::GetChannelVolume(void* const channelHandle) const
 void dSoundManager::SetChannelVolume(void* const channelHandle, dFloat volume)
 {
 	if (m_device) {
-		dSoundChannelList::dListNode* const node = (dSoundChannelList::dListNode*)channelHandle;
+		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
 		dSoundChannel& channel = node->GetInfo();
 		channel.SetVolume(volume);
 	}
@@ -406,7 +406,7 @@ void dSoundManager::SetChannelVolume(void* const channelHandle, dFloat volume)
 void dSoundManager::SetChannelLoopMode (void* const channelHandle, bool mode)
 {
 	if (m_device) {
-		dSoundChannelList::dListNode* const node = (dSoundChannelList::dListNode*)channelHandle;
+		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
 		dSoundChannel& channel = node->GetInfo();
 		channel.SetLoop(mode);
 	}
@@ -415,7 +415,7 @@ void dSoundManager::SetChannelLoopMode (void* const channelHandle, bool mode)
 void dSoundManager::SetChannelPitch(void* const channelHandle, dFloat pitch)
 {
 	if (m_device) {
-		dSoundChannelList::dListNode* const node = (dSoundChannelList::dListNode*)channelHandle;
+		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
 		dSoundChannel& channel = node->GetInfo();
 		channel.SetPitch(pitch);
 	}
@@ -424,7 +424,7 @@ void dSoundManager::SetChannelPitch(void* const channelHandle, dFloat pitch)
 dFloat dSoundManager::GetChannelGetPosition(void* const channelHandle) const
 {
 	if (m_device) {
-		dSoundChannelList::dListNode* const node = (dSoundChannelList::dListNode*)channelHandle;
+		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
 		dSoundChannel& channel = node->GetInfo();
 		return channel.GetSecPosition();
 	}
@@ -434,9 +434,9 @@ dFloat dSoundManager::GetChannelGetPosition(void* const channelHandle) const
 void dSoundManager::Update()
 {
 	if (m_device) {
-		dSoundChannelPlaying::dListNode* next;
-		for (dSoundChannelPlaying::dListNode* node = m_channelPlaying.GetFirst(); node; node = next) {
-			dSoundChannelList::dListNode* const channelNode = node->GetInfo();
+		dSoundChannelPlaying::dNode* next;
+		for (dSoundChannelPlaying::dNode* node = m_channelPlaying.GetFirst(); node; node = next) {
+			dSoundChannelList::dNode* const channelNode = node->GetInfo();
 			next = node->GetNext();
 
 			dSoundChannel& channel = channelNode->GetInfo();

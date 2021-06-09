@@ -224,7 +224,7 @@ void ndDemoMeshIntance::RenderBatch(dInt32 start, ndDemoEntityManager* const sce
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 	glActiveTexture(GL_TEXTURE0);
-	for (dListNode* node = GetFirst(); node; node = node->GetNext())
+	for (dNode* node = GetFirst(); node; node = node->GetNext())
 	{
 		ndDemoSubMesh& segment = node->GetInfo();
 		if (!segment.m_hasTranparency)

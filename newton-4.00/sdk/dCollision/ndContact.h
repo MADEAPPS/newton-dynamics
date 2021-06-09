@@ -117,7 +117,7 @@ class ndContact
 	ndContactPointList m_contacPointsList;
 	ndBodyKinematic* m_body0;
 	ndBodyKinematic* m_body1;
-	dList<ndContact, dContainersFreeListAlloc<ndContact>>::dListNode* m_linkNode;
+	dList<ndContact, dContainersFreeListAlloc<ndContact>>::dNode* m_linkNode;
 	ndMaterial m_material;
 	dFloat32 m_timeOfImpact;
 	dFloat32 m_separationDistance;

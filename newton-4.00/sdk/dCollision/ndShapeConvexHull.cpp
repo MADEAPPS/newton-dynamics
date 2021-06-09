@@ -179,7 +179,7 @@ bool ndShapeConvexHull::Create(dInt32 count, dInt32 strideInBytes, const dFloat3
 
 		dStack<dInt8> mask(convexHull->GetVertexCount());
 		memset(&mask[0], 1, mask.GetSizeInBytes());
-		for (dConvexHull3d::dListNode* node = convexHull->GetFirst(); node; node = node->GetNext()) 
+		for (dConvexHull3d::dNode* node = convexHull->GetFirst(); node; node = node->GetNext()) 
 		{
 			dConvexHull3dFace& face = node->GetInfo();
 			const dBigVector& p0 = hullVertexArray[face.m_index[0]];
@@ -243,7 +243,7 @@ bool ndShapeConvexHull::Create(dInt32 count, dInt32 strideInBytes, const dFloat3
 	const dBigVector* const hullVertexArray = convexHull->GetVertexPool();
 	dPolyhedra polyhedra;
 	polyhedra.BeginFace();
-	for (dConvexHull3d::dListNode* node = convexHull->GetFirst(); node; node = node->GetNext()) 
+	for (dConvexHull3d::dNode* node = convexHull->GetFirst(); node; node = node->GetNext()) 
 	{
 		dConvexHull3dFace& face = node->GetInfo();
 		polyhedra.AddFace(face.m_index[0], face.m_index[1], face.m_index[2]);
@@ -348,7 +348,7 @@ bool ndShapeConvexHull::Create(dInt32 count, dInt32 strideInBytes, const dFloat3
 		// create a face structure for support vertex
 		dStack<ndConvexBox> boxTree(vertexCount);
 		dTree<dVector, dInt32> sortTree;
-		dStack<dTree<dVector, dInt32>::dTreeNode*> vertexNodeList(vertexCount);
+		dStack<dTree<dVector, dInt32>::dNode*> vertexNodeList(vertexCount);
 		
 		dVector boxP0(dFloat32(1.0e15f));
 		dVector boxP1(-dFloat32(1.0e15f));
@@ -511,7 +511,7 @@ bool ndShapeConvexHull::Create(dInt32 count, dInt32 strideInBytes, const dFloat3
 		for (dInt32 i = 0; i < m_edgeCount; i++) 
 		{
 			ndConvexSimplexEdge* const ptr = &m_simplex[i];
-			dTree<dVector, dInt32>::dTreeNode* const node = sortTree.Find(ptr->m_vertex);
+			dTree<dVector, dInt32>::dNode* const node = sortTree.Find(ptr->m_vertex);
 			dInt32 index = dInt32(node->GetInfo().m_w);
 			ptr->m_vertex = dInt16(index);
 		}

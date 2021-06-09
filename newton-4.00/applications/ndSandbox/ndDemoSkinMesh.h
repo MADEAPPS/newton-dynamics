@@ -30,7 +30,7 @@ class ndDemoSkinMesh: public ndDemoMeshInterface
 	};
 
 	ndDemoSkinMesh(const ndDemoSkinMesh& clone, ndDemoEntity* const owner);
-	//ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<ndDemoEntity*, dScene::dTreeNode*>& boneMap, const ndShaderPrograms& shaderCache);
+	//ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, dScene::dNode* const meshNode, const dTree<ndDemoEntity*, dScene::dNode*>& boneMap, const ndShaderPrograms& shaderCache);
 	~ndDemoSkinMesh();
 
 	void Render (ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
@@ -40,7 +40,7 @@ class ndDemoSkinMesh: public ndDemoMeshInterface
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner);
 	dInt32 CalculateMatrixPalette(dMatrix* const bindMatrix) const;
 	void ConvertToGlMatrix(dInt32 count, const dMatrix* const bindMatrix, GLfloat* const glMatrices) const;
-	//dGeometryNodeSkinClusterInfo* FindSkinModifier(dScene* const scene, dScene::dTreeNode* const meshNode) const;
+	//dGeometryNodeSkinClusterInfo* FindSkinModifier(dScene* const scene, dScene::dNode* const meshNode) const;
 	void OptimizeForRender(const ndDemoSubMesh& segment, const dVector* const pointWeights, const dWeightBoneIndex* const pointSkinBone) const;
 
 	ndDemoMesh* m_mesh;

@@ -46,7 +46,7 @@ class ndBodyParticleSet: public ndBody
 
 	protected:
 	dArray<dVector> m_posit;
-	ndBodyParticleSetList::dListNode* m_listNode;
+	ndBodyParticleSetList::dNode* m_listNode;
 	dFloat32 m_radius;
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32 ;

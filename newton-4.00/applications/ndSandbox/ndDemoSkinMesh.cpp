@@ -18,7 +18,7 @@
 #include "ndDemoEntityManager.h"
 
 /*
-ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<ndDemoEntity*, dScene::dTreeNode*>& boneMap, const ndShaderPrograms& shaderCache)
+ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, dScene::dNode* const meshNode, const dTree<ndDemoEntity*, dScene::dNode*>& boneMap, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,m_mesh((ndDemoMesh*)owner->GetMesh()->Clone(nullptr))
 	,m_entity(owner)
@@ -35,9 +35,9 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 	dAssert (meshInfo->GetTypeId() == dMeshNodeInfo::GetRttiType());
 
 	dTree<const dGeometryNodeSkinClusterInfo*, ndDemoEntity*> nodeClusterEnumerator;
-	dTree<ndDemoEntity*, dScene::dTreeNode*>::Iterator iter (boneMap);
+	dTree<ndDemoEntity*, dScene::dNode*>::Iterator iter (boneMap);
 	for (iter.Begin(); iter; iter++) {
-		dScene::dTreeNode* const boneNode = iter.GetKey();
+		dScene::dNode* const boneNode = iter.GetKey();
 		const dGeometryNodeSkinClusterInfo* const cluster = FindSkinModifier(scene, boneNode);
 		if (cluster) {
 			ndDemoEntity* const boneEntity = iter.GetNode()->GetInfo();
@@ -74,7 +74,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 		bindMatrix[entityCount] = shapeBindMatrix * boneMatrix.Inverse();
 		dAssert (entityCount < 2048);
 
-		dTree<const dGeometryNodeSkinClusterInfo*, ndDemoEntity*>::dTreeNode* const clusterNode = nodeClusterEnumerator.Find(entity);
+		dTree<const dGeometryNodeSkinClusterInfo*, ndDemoEntity*>::dNode* const clusterNode = nodeClusterEnumerator.Find(entity);
 		if (clusterNode) {
 			const dGeometryNodeSkinClusterInfo* const cluster = nodeClusterEnumerator.Find(entity)->GetInfo();
 			dAssert (boneClusterRemapIndex[cluster->GetNodeID()] == -1);
@@ -102,7 +102,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 
 	dInt32 vCount = 0;
 	for (iter.Begin(); iter; iter++) {
-		dScene::dTreeNode* const boneNode = iter.GetKey();
+		dScene::dNode* const boneNode = iter.GetKey();
 		const dGeometryNodeSkinClusterInfo* const cluster = FindSkinModifier(scene, boneNode);
 		if (cluster) {
 			dInt32 boneIndex = boneClusterRemapIndex[cluster->GetNodeID()];
@@ -172,7 +172,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 		}
 	}
 
-	for (dList<dInt32>::dListNode* ptr = pendingVertices.GetFirst(); ptr; ptr = ptr->GetNext()) {
+	for (dList<dInt32>::dNode* ptr = pendingVertices.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		dInt32 i = ptr->GetInfo();
 		dVector p (m_mesh->m_vertex[i * 3 + 0], m_mesh->m_vertex[i * 3 + 1], m_mesh->m_vertex[i * 3 + 2], 0.0f);
 		for (dInt32 j = 0; j < m_mesh->m_vertexCount; j ++) {
@@ -188,7 +188,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 		}
 	}
 
-	for (ndDemoMesh::dListNode* node = m_mesh->GetFirst(); node; node = node->GetNext()) {
+	for (ndDemoMesh::dNode* node = m_mesh->GetFirst(); node; node = node->GetNext()) {
 		ndDemoSubMesh& segment = node->GetInfo();
 		segment.m_shader = m_shader;
 	}
@@ -205,7 +205,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 
 	m_mesh->m_optimizedOpaqueDiplayList = glGenLists(1);
 	glNewList(m_mesh->m_optimizedOpaqueDiplayList, GL_COMPILE);
-	for (ndDemoMesh::dListNode* node = m_mesh->GetFirst(); node; node = node->GetNext()) {
+	for (ndDemoMesh::dNode* node = m_mesh->GetFirst(); node; node = node->GetNext()) {
 		const ndDemoSubMesh& segment = node->GetInfo();
 		OptimizeForRender(segment, &pointWeights[0], &pointSkinBone[0]);
 	}
@@ -337,10 +337,10 @@ void ndDemoSkinMesh::ConvertToGlMatrix(dInt32 count, const dMatrix* const bindMa
 }
 
 /*
-dGeometryNodeSkinClusterInfo* ndDemoSkinMesh::FindSkinModifier(dScene* const scene, dScene::dTreeNode* const node) const
+dGeometryNodeSkinClusterInfo* ndDemoSkinMesh::FindSkinModifier(dScene* const scene, dScene::dNode* const node) const
 {
 	for (void* modifierChild = scene->GetFirstChildLink(node); modifierChild; modifierChild = scene->GetNextChildLink(node, modifierChild)) {
-		dScene::dTreeNode* const modifierNode = scene->GetNodeFromLink(modifierChild);
+		dScene::dNode* const modifierNode = scene->GetNodeFromLink(modifierChild);
 		dGeometryNodeSkinClusterInfo* const modifierInfo = (dGeometryNodeSkinClusterInfo*)scene->GetInfoFromNode(modifierNode);
 		if (modifierInfo->GetTypeId() == dGeometryNodeSkinClusterInfo::GetRttiType()) {
 			return modifierInfo;

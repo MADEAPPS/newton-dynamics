@@ -177,7 +177,7 @@ dFloat64 ndScene::ndFitnessList::TotalCost() const
 {
 	D_TRACKTIME();
 	dFloat64 cost = dFloat32(0.0f);
-	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+	for (dNode* node = GetFirst(); node; node = node->GetNext()) {
 		ndSceneNode* const box = node->GetInfo();
 		cost += box->m_surfaceArea;
 	}
@@ -270,7 +270,7 @@ bool ndScene::AddBody(ndBodyKinematic* const body)
 {
 	if ((body->m_scene == nullptr) && (body->m_sceneNode == nullptr))
 	{
-		ndBodyList::dListNode* const node = m_bodyList.Append(body);
+		ndBodyList::dNode* const node = m_bodyList.Append(body);
 		body->SetSceneNodes(this, node);
 		m_contactNotifyCallback->OnBodyAdded(body);
 		return true;
@@ -634,7 +634,7 @@ dFloat64 ndScene::ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const root
 	else
 	{
 		dInt32 count = 0;
-		ndFitnessList::dListNode* node = fitness.m_currentNode;
+		ndFitnessList::dNode* node = fitness.m_currentNode;
 		for ( ;node && count < 64; node = node->GetNext())
 		{
 			count++;
@@ -677,7 +677,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndScen
 				ndSceneNode** const leafArray = dAlloca(ndSceneNode*, fitness.GetCount() * 2 + 16);
 
 				dInt32 leafNodesCount = 0;
-				for (ndFitnessList::dListNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) 
+				for (ndFitnessList::dNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) 
 				{
 					ndSceneNode* const node = nodePtr->GetInfo();
 					ndSceneNode* const leftNode = node->GetLeft();
@@ -712,7 +712,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndScen
 					}
 				}
 				
-				ndFitnessList::dListNode* nodePtr = fitness.GetFirst();
+				ndFitnessList::dNode* nodePtr = fitness.GetFirst();
 				dSortIndirect(leafArray, leafNodesCount, CompareNodes);
 				
 				*root = BuildTopDownBig(leafArray, 0, leafNodesCount - 1, &nodePtr);
@@ -726,7 +726,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndScen
 	}
 }
 
-ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dListNode** const nextNode)
+ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dNode** const nextNode)
 {
 	dAssert(firstBox >= 0);
 	dAssert(lastBox >= 0);
@@ -754,7 +754,7 @@ ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBo
 	}
 }
 
-ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dListNode** const nextNode)
+ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dNode** const nextNode)
 {
 	if (lastBox == firstBox) 
 	{
@@ -1016,9 +1016,9 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 
 	dInt32 count = 0;
 	dVector cachePosition[D_MAX_CONTATCS];
-	ndContactPointList::dListNode* nodes[D_MAX_CONTATCS];
+	ndContactPointList::dNode* nodes[D_MAX_CONTATCS];
 	ndContactPointList& list = contact->m_contacPointsList;
-	for (ndContactPointList::dListNode* contactNode = list.GetFirst(); contactNode; contactNode = contactNode->GetNext()) 
+	for (ndContactPointList::dNode* contactNode = list.GetFirst(); contactNode; contactNode = contactNode->GetNext()) 
 	{
 		nodes[count] = contactNode;
 		cachePosition[count] = contactNode->GetInfo().m_point;
@@ -1069,7 +1069,7 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 	{
 		dInt32 index = -1;
 		dFloat32 min = dFloat32(1.0e20f);
-		ndContactPointList::dListNode* contactNode = nullptr;
+		ndContactPointList::dNode* contactNode = nullptr;
 		for (dInt32 j = 0; j < count; j++) 
 		{
 			dVector v(cachePosition[j] - contactArray[i].m_point);
@@ -1346,7 +1346,7 @@ ndJointBilateralConstraint* ndScene::FindBilateralJoint(ndBodyKinematic* const b
 {
 	if (body0->m_jointList.GetCount() <= body1->m_jointList.GetCount())
 	{
-		for (ndJointList::dListNode* node = body0->m_jointList.GetFirst(); node; node = node->GetNext())
+		for (ndJointList::dNode* node = body0->m_jointList.GetFirst(); node; node = node->GetNext())
 		{
 			ndJointBilateralConstraint* const joint = node->GetInfo();
 			if ((joint->GetBody0() == body1) || (joint->GetBody1() == body1))
@@ -1357,7 +1357,7 @@ ndJointBilateralConstraint* ndScene::FindBilateralJoint(ndBodyKinematic* const b
 	}
 	else
 	{
-		for (ndJointList::dListNode* node = body1->m_jointList.GetFirst(); node; node = node->GetNext())
+		for (ndJointList::dNode* node = body1->m_jointList.GetFirst(); node; node = node->GetNext())
 		{
 			ndJointBilateralConstraint* const joint = node->GetInfo();
 			if ((joint->GetBody0() == body0) || (joint->GetBody1() == body0))
@@ -1411,7 +1411,7 @@ void ndScene::BuildBodyArray()
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThreadId();
 
-			ndBodyList::dListNode* node = m_owner->m_bodyList.GetFirst();
+			ndBodyList::dNode* node = m_owner->m_bodyList.GetFirst();
 			for (dInt32 i = 0; i < threadIndex; i++)
 			{
 				node = node ? node->GetNext() : nullptr;
@@ -1732,7 +1732,7 @@ void ndScene::BuildContactArray()
 	D_TRACKTIME();
 	dInt32 count = 0;
 	m_activeConstraintArray.SetCount(m_contactList.GetCount());
-	for (ndContactList::dListNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
+	for (ndContactList::dNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
 	{
 		ndContact* const contact = &node->GetInfo();
 		dAssert(contact->m_isAttached);

@@ -65,7 +65,7 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 		//dInt32 brush = 0;
 		//dMatrix matrix(collisionInfo.m_offsetMatrix);
 		//dgCollisionCompound* const compoundCollision = (dgCollisionCompound*)collision->GetChildShape();
-		//for (dTree<dgCollisionCompound::dgNodeBase*, dInt32>::dTreeNode* node = compoundCollision->GetFirstNode(); node; node = compoundCollision->GetNextNode(node)) {
+		//for (dTree<dgCollisionCompound::dgNodeBase*, dInt32>::dNode* node = compoundCollision->GetFirstNode(); node; node = compoundCollision->GetNextNode(node)) {
 		//	builder.m_brush = brush;
 		//	brush++;
 		//	dgCollisionInstance* const childShape = compoundCollision->GetCollisionFromNode(node);

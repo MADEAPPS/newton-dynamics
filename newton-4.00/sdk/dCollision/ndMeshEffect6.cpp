@@ -249,7 +249,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 				dList<dEdge*> stack(m_mesh->GetAllocator());
 				stack.Append(face);
 				while (stack.GetCount()) {
-					dList<dEdge*>::dListNode* const node = stack.GetFirst();
+					dList<dEdge*>::dNode* const node = stack.GetFirst();
 					dEdge* const face = node->GetInfo();
 					stack.Remove (node);
 					if (face->m_mark != mark) {

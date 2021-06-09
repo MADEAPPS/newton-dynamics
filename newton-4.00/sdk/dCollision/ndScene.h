@@ -79,7 +79,7 @@ class ndScene
 		void RemoveNode(ndSceneTreeNode* const node);
 		
 		dFloat64 m_currentCost;
-		dListNode* m_currentNode;
+		dNode* m_currentNode;
 		dInt32 m_index;
 	};
 
@@ -133,8 +133,8 @@ class ndScene
 	dFloat64 ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const root);
 	void ImproveNodeFitness(ndSceneTreeNode* const node, ndSceneNode** const root);
 	static dInt32 CompareNodes(const ndSceneNode* const nodeA, const ndSceneNode* const nodeB, void* const);
-	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dListNode** const nextNode);
-	ndSceneNode* BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dListNode** const nextNode);
+	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dNode** const nextNode);
+	ndSceneNode* BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dNode** const nextNode);
 
 	const ndContactList& GetContactList() const;
 

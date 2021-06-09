@@ -402,7 +402,7 @@ dEdge* dPolyhedra::AddFace (dInt32 count, const dInt32* const index, const dInt6
 	bool state;
 	dgPairKey code (i0, i1);
 	dEdge tmpEdge (i0, m_faceSecuence, udata0);
-	dTreeNode* const node = Insert (tmpEdge, code.GetVal(), state); 
+	dNode* const node = Insert (tmpEdge, code.GetVal(), state); 
 	dAssert (!state);
 	dEdge* edge0 = &node->GetInfo();
 	dEdge* const first = edge0;
@@ -416,7 +416,7 @@ dEdge* dPolyhedra::AddFace (dInt32 count, const dInt32* const index, const dInt6
 
 		dgPairKey code1 (i0, i1);
 		dEdge tmpEdge1 (i0, m_faceSecuence, udata0);
-		dTreeNode* const node1 = Insert (tmpEdge1, code1.GetVal(), state); 
+		dNode* const node1 = Insert (tmpEdge1, code1.GetVal(), state); 
 		dAssert (!state);
 
 		dEdge* const edge1 = &node1->GetInfo();
@@ -465,7 +465,7 @@ bool dPolyhedra::EndFace ()
 			dPolyhedra::dgPairKey code (edge->m_next->m_incidentVertex, edge->m_incidentVertex);
 			dEdge tmpEdge (edge->m_next->m_incidentVertex, -1);
 			tmpEdge.m_incidentFace = -1; 
-			dPolyhedra::dTreeNode* const node = Insert (tmpEdge, code.GetVal(), state); 
+			dPolyhedra::dNode* const node = Insert (tmpEdge, code.GetVal(), state); 
 			dAssert (!state);
 			edge->m_twin = &node->GetInfo();
 			edge->m_twin->m_twin = edge; 
@@ -557,7 +557,7 @@ dEdge* dPolyhedra::AddHalfEdge (dInt32 v0, dInt32 v1)
 		dgPairKey pairKey (v0, v1);
 		dEdge tmpEdge (v0, -1);
 
-		dTreeNode* node = Insert (tmpEdge, pairKey.GetVal()); 
+		dNode* node = Insert (tmpEdge, pairKey.GetVal()); 
 		return node ? &node->GetInfo() : nullptr;
 	}
 	else 
@@ -575,8 +575,8 @@ void dPolyhedra::DeleteEdge (dEdge* const edge)
 	edge->m_next->m_prev = twin->m_prev;
 	twin->m_prev->m_next = edge->m_next;
 
-	dTreeNode *const nodeA = GetNodeFromInfo (*edge);
-	dTreeNode *const nodeB = GetNodeFromInfo (*twin);
+	dNode *const nodeA = GetNodeFromInfo (*edge);
+	dNode *const nodeB = GetNodeFromInfo (*twin);
 
 	dAssert (&nodeA->GetInfo() == edge);
 	dAssert (&nodeB->GetInfo() == twin);
@@ -680,7 +680,7 @@ dEdge* dPolyhedra::SpliteEdge (dInt32 newIndex,	dEdge* const edge)
 
 bool dPolyhedra::FlipEdge (dEdge* const edge)
 {
-	//	dTreeNode *node;
+	//	dNode *node;
 	if (edge->m_next->m_next->m_next != edge) {
 		return false;
 	}
@@ -811,7 +811,7 @@ void dPolyhedra::ChangeEdgeIncidentVertex (dEdge* const edge, dInt32 newIndex)
 {
 	dEdge* ptr = edge;
 	do {
-		dTreeNode* node = GetNodeFromInfo(*ptr);
+		dNode* node = GetNodeFromInfo(*ptr);
 		dgPairKey Key0 (newIndex, ptr->m_twin->m_incidentVertex);
 		ReplaceKey (node, Key0.GetVal());
 
@@ -835,10 +835,10 @@ void dPolyhedra::DeleteDegenerateFaces (const dFloat64* const pool, dInt32 strid
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dAssert (SanityCheck ());
 #endif
-	dStack <dPolyhedra::dTreeNode*> faceArrayPool(GetCount() / 2 + 100);
+	dStack <dPolyhedra::dNode*> faceArrayPool(GetCount() / 2 + 100);
 
 	dInt32 count = 0;
-	dPolyhedra::dTreeNode** const faceArray = &faceArrayPool[0];
+	dPolyhedra::dNode** const faceArray = &faceArrayPool[0];
 	dInt32 mark = IncLRU();
 	Iterator iter (*this);
 	for (iter.Begin(); iter; iter ++) 
@@ -862,7 +862,7 @@ void dPolyhedra::DeleteDegenerateFaces (const dFloat64* const pool, dInt32 strid
 
 	for (dInt32 i = 0; i < count; i ++) 
 	{
-		dPolyhedra::dTreeNode* const faceNode = faceArray[i];
+		dPolyhedra::dNode* const faceNode = faceArray[i];
 		dEdge* const edge = &faceNode->GetInfo();
 
 		dBigVector normal (FaceNormal (edge, pool, strideInBytes));
@@ -1000,7 +1000,7 @@ dEdge* dPolyhedra::CollapseEdge(dEdge* const edge)
 	do {
 		dPolyhedra::dgPairKey pairKey (v0, ptr->m_twin->m_incidentVertex);
 
-		dPolyhedra::dTreeNode* node = Find (pairKey.GetVal());
+		dPolyhedra::dNode* node = Find (pairKey.GetVal());
 		if (node) {
 			if (&node->GetInfo() == ptr) {
 				dPolyhedra::dgPairKey key (v1, ptr->m_twin->m_incidentVertex);
@@ -1033,7 +1033,7 @@ void dPolyhedra::RemoveHalfEdge (dEdge* const edge)
 		handle->m_edge = nullptr;
 	}
 
-	dPolyhedra::dTreeNode* const node = GetNodeFromInfo(*edge);
+	dPolyhedra::dNode* const node = GetNodeFromInfo(*edge);
 	dAssert (node);
 	Remove (node);
 }
@@ -1310,7 +1310,7 @@ void dPolyhedra::RefineTriangulation (const dFloat64* const vertex, dInt32 strid
 	for (dInt32 i = 1; i <= perimeterCount; i ++) {
 		dEdge* const last = perimeter[i - 1];
 		for (dEdge* ptr = perimeter[i]->m_prev; ptr != last; ptr = ptr->m_twin->m_prev) {
-			dList<dgDiagonalEdge>::dListNode* node = dignonals.GetFirst();
+			dList<dgDiagonalEdge>::dNode* node = dignonals.GetFirst();
 			for (; node; node = node->GetNext()) {
 				const dgDiagonalEdge& key = node->GetInfo();
 				if (((key.m_i0 == ptr->m_incidentVertex) && (key.m_i1 == ptr->m_twin->m_incidentVertex)) ||
@@ -1353,7 +1353,7 @@ void dPolyhedra::RefineTriangulation (const dFloat64* const vertex, dInt32 strid
 	dInt32 maxCount = dignonals.GetCount() * dignonals.GetCount();
 	while (dignonals.GetCount() && maxCount) {
 		maxCount --;
-		dList<dgDiagonalEdge>::dListNode* const node = dignonals.GetFirst();
+		dList<dgDiagonalEdge>::dNode* const node = dignonals.GetFirst();
 		dgDiagonalEdge key (node->GetInfo());
 		dignonals.Remove(node);
 		dEdge* const edge = FindEdge(key.m_i0, key.m_i1);
@@ -1996,7 +1996,7 @@ dEdge* dPolyhedra::OptimizeCollapseEdge (dEdge* const edge)
 
 #ifdef _DEBUG
 	dPolyhedra::dgPairKey TwinKey (v1, v0);
-	dPolyhedra::dTreeNode* const node = Find (TwinKey.GetVal());
+	dPolyhedra::dNode* const node = Find (TwinKey.GetVal());
 	dEdge* const twin1 = node ? &node->GetInfo() : nullptr;
 	dAssert (twin1);
 	dAssert (edge->m_twin == twin1);
@@ -2074,7 +2074,7 @@ dEdge* dPolyhedra::OptimizeCollapseEdge (dEdge* const edge)
 	dEdge* remapPtr = retEdge;
 	do {
 		dPolyhedra::dgPairKey pairKey (v0, remapPtr->m_twin->m_incidentVertex);
-		dPolyhedra::dTreeNode* const pairEdgeNode = Find (pairKey.GetVal());
+		dPolyhedra::dNode* const pairEdgeNode = Find (pairKey.GetVal());
 		if (pairEdgeNode) {
 			if (&pairEdgeNode->GetInfo() == remapPtr) {
 				dPolyhedra::dgPairKey key (v1, remapPtr->m_twin->m_incidentVertex);
@@ -2084,7 +2084,7 @@ dEdge* dPolyhedra::OptimizeCollapseEdge (dEdge* const edge)
 		}
 
 		dPolyhedra::dgPairKey twinKey1 (remapPtr->m_twin->m_incidentVertex, v0);
-		dPolyhedra::dTreeNode* const pairTwinNode = Find (twinKey1.GetVal());
+		dPolyhedra::dNode* const pairTwinNode = Find (twinKey1.GetVal());
 		if (pairTwinNode) {
 			if (&pairTwinNode->GetInfo() == remapPtr->m_twin) {
 				dPolyhedra::dgPairKey key (remapPtr->m_twin->m_incidentVertex, v1);
@@ -2239,7 +2239,7 @@ bool dPolyhedra::Optimize (const dFloat64* const array, dInt32 strideInBytes, dF
 
 	dList <dEdgeCollapseEdgeHandle> edgeHandleList;
 	dStack<char> heapPool (2 * edgeCount * dInt32 (sizeof (dFloat64) + sizeof (dEdgeCollapseEdgeHandle*) + sizeof (dInt32))); 
-	dUpHeap<dList <dEdgeCollapseEdgeHandle>::dListNode* , dFloat64> bigHeapArray(&heapPool[0], heapPool.GetSizeInBytes());
+	dUpHeap<dList <dEdgeCollapseEdgeHandle>::dNode* , dFloat64> bigHeapArray(&heapPool[0], heapPool.GetSizeInBytes());
 
 	for (dInt32 i = 0; i < maxVertexIndex; i ++) 
 	{
@@ -2270,7 +2270,7 @@ bool dPolyhedra::Optimize (const dFloat64* const array, dInt32 strideInBytes, dF
 		dFloat64 edgePenalty = EdgePenalty (&vertexPool[0], edge, distTol);
 		dAssert (edgePenalty >= dFloat32 (0.0f));
 		dEdgeCollapseEdgeHandle handle (edge);
-		dList <dEdgeCollapseEdgeHandle>::dListNode* handleNodePtr = edgeHandleList.Addtop (handle);
+		dList <dEdgeCollapseEdgeHandle>::dNode* handleNodePtr = edgeHandleList.Addtop (handle);
 		bigHeapArray.Push (handleNodePtr, faceCost + edgePenalty);
 	}
 
@@ -2279,7 +2279,7 @@ bool dPolyhedra::Optimize (const dFloat64* const array, dInt32 strideInBytes, dF
 	dInt32 faceCount = GetFaceCount();
 	while (bigHeapArray.GetCount() && (bigHeapArray.Value() < maxCost) && ((bigHeapArray.Value() < tol2) || (faceCount > maxFaceCount)) && progress ) 
 	{
-		dList <dEdgeCollapseEdgeHandle>::dListNode* const handleNodePtr = bigHeapArray[0];
+		dList <dEdgeCollapseEdgeHandle>::dNode* const handleNodePtr = bigHeapArray[0];
 
 		dEdge* edge = handleNodePtr->GetInfo().m_edge;
 		bigHeapArray.Pop();
@@ -2302,7 +2302,7 @@ bool dPolyhedra::Optimize (const dFloat64* const array, dInt32 strideInBytes, dF
 				{
 					for(dInt32 i = bigHeapArray.GetCount() - 1; i >= 0; i --) 
 					{
-						dList <dEdgeCollapseEdgeHandle>::dListNode* const emptyHandle = bigHeapArray[i];
+						dList <dEdgeCollapseEdgeHandle>::dNode* const emptyHandle = bigHeapArray[i];
 						if (!emptyHandle->GetInfo().m_edge) 
 						{
 							bigHeapArray.Remove(i);
@@ -2351,7 +2351,7 @@ bool dPolyhedra::Optimize (const dFloat64* const array, dInt32 strideInBytes, dF
 						dFloat64 edgePenalty = EdgePenalty (&vertexPool[0], ptr, distTol);
 						dAssert (edgePenalty >= dFloat32 (0.0f));
 						dEdgeCollapseEdgeHandle handle (ptr);
-						dList <dEdgeCollapseEdgeHandle>::dListNode* handleNodePtr1 = edgeHandleList.Addtop (handle);
+						dList <dEdgeCollapseEdgeHandle>::dNode* handleNodePtr1 = edgeHandleList.Addtop (handle);
 						bigHeapArray.Push (handleNodePtr1, faceCost + edgePenalty);
 
 						ptr = ptr->m_twin->m_next;
@@ -2379,7 +2379,7 @@ bool dPolyhedra::Optimize (const dFloat64* const array, dInt32 strideInBytes, dF
 								dFloat64 edgePenalty = EdgePenalty (&vertexPool[0], ptr1, distTol);
 								dAssert (edgePenalty >= dFloat32 (0.0f));
 								dEdgeCollapseEdgeHandle handle (ptr1);
-								dList <dEdgeCollapseEdgeHandle>::dListNode* handleNodePtr1 = edgeHandleList.Addtop (handle);
+								dList <dEdgeCollapseEdgeHandle>::dNode* handleNodePtr1 = edgeHandleList.Addtop (handle);
 								bigHeapArray.Push (handleNodePtr1, faceCost + edgePenalty);
 							}
 
@@ -2392,7 +2392,7 @@ bool dPolyhedra::Optimize (const dFloat64* const array, dInt32 strideInBytes, dF
 								dFloat64 edgePenalty = EdgePenalty (&vertexPool[0], ptr1->m_twin, distTol);
 								dAssert (edgePenalty >= dFloat32 (0.0f));
 								dEdgeCollapseEdgeHandle handle (ptr1->m_twin);
-								dList <dEdgeCollapseEdgeHandle>::dListNode* handleNodePtr1 = edgeHandleList.Addtop (handle);
+								dList <dEdgeCollapseEdgeHandle>::dNode* handleNodePtr1 = edgeHandleList.Addtop (handle);
 								bigHeapArray.Push (handleNodePtr1, faceCost + edgePenalty);
 							}
 
@@ -2669,8 +2669,8 @@ bool dPolyhedra::PolygonizeFace(dEdge* const face, const dFloat64* const pool, d
 				{
 					dgPairKey key0 (edge1->m_incidentVertex, 0);
 					dgPairKey key1 (edge1->m_twin->m_incidentVertex, 0);
-					dTreeNode* const node0 = FindGreater (key0.GetVal());
-					dTreeNode* const node1 = FindGreater (key1.GetVal());
+					dNode* const node0 = FindGreater (key0.GetVal());
+					dNode* const node1 = FindGreater (key1.GetVal());
 					dAssert (node0);
 					dAssert (node1);
 					dEdge* e0 = &node0->GetInfo();
@@ -2942,7 +2942,7 @@ dMatrix dPolyhedra::CalculateSphere(dBigVector& size, const dFloat64* const vert
 	{
 		dStack<dInt32> triangleList(convexHull.GetCount() * 3);
 		dInt32 trianglesCount = 0;
-		for (dConvexHull3d::dListNode* node = convexHull.GetFirst(); node; node = node->GetNext()) 
+		for (dConvexHull3d::dNode* node = convexHull.GetFirst(); node; node = node->GetNext()) 
 		{
 			dConvexHull3dFace* const face = &node->GetInfo();
 			triangleList[trianglesCount * 3 + 0] = face->m_index[0];

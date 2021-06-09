@@ -54,7 +54,7 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh&, const ndShaderPrograms&)
 	//AllocVertexData(mesh.m_vertexCount);
 	//memcpy (m_points, mesh.m_points, m_vertexCount * sizeof (ndMeshPointUV));
 	//
-	//for (dListNode* nodes = mesh.GetFirst(); nodes; nodes = nodes->GetNext()) 
+	//for (dNode* nodes = mesh.GetFirst(); nodes; nodes = nodes->GetNext()) 
 	//{
 	//	ndDemoSubMesh* const segment = AddSubMesh();
 	//	ndDemoSubMesh& srcSegment = nodes->GetInfo();
@@ -380,7 +380,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 
 		if (hasTrasnparency)
 		{
-			for (dListNode* node = GetFirst(); node; node = node->GetNext())
+			for (dNode* node = GetFirst(); node; node = node->GetNext())
 			{
 				ndDemoSubMesh& segment = node->GetInfo();
 				hasTrasnparency = hasTrasnparency & segment.m_hasTranparency;
@@ -418,7 +418,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 			glActiveTexture(GL_TEXTURE0);
-			for (dListNode* node = GetFirst(); node; node = node->GetNext())
+			for (dNode* node = GetFirst(); node; node = node->GetNext())
 			{
 				ndDemoSubMesh& segment = node->GetInfo();
 				if (!segment.m_hasTranparency)
@@ -463,7 +463,7 @@ void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const dMatrix&
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 	glActiveTexture(GL_TEXTURE0);
-	for (dListNode* node = GetFirst(); node; node = node->GetNext())
+	for (dNode* node = GetFirst(); node; node = node->GetNext())
 	{
 		ndDemoSubMesh& segment = node->GetInfo();
 		if (segment.m_hasTranparency)

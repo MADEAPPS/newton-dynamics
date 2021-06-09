@@ -36,7 +36,7 @@ class dDelaunayTetrahedralization: public dConvexHull4d
 
 	protected:
 	D_CORE_API void SortVertexArray();
-	D_CORE_API virtual void DeleteFace (dListNode* const node) ;
+	D_CORE_API virtual void DeleteFace (dNode* const node) ;
 
 	static dInt32 CompareVertexByIndex(const dConvexHull4dVector* const  A, const dConvexHull4dVector* const B, void* const context);
 };

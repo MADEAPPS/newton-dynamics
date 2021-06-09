@@ -159,7 +159,7 @@ class dgBooleanMeshClipper: public ndMeshEffect::dMeshBVH
 		{
 		}
 		
-		dList<dTree<dgPoint, dFloat64>::dTreeNode*> m_links;
+		dList<dTree<dgPoint, dFloat64>::dNode*> m_links;
 		dInt32 m_lru;
 	};
 
@@ -177,10 +177,10 @@ class dgBooleanMeshClipper: public ndMeshEffect::dMeshBVH
 		{
 		}
 
-		dTreeNode* AddVertex(const dBigVector& point, dgMemoryAllocator* const allocator)
+		dNode* AddVertex(const dBigVector& point, dgMemoryAllocator* const allocator)
 		{
 			dFloat64 key = ((point.m_z * dFloat64 (1024.0f) + point.m_y) * dFloat64 (1024.0f)) + point.m_x;
-			dTreeNode* node = Find(key);
+			dNode* node = Find(key);
 			if (!node) {
 				dgPoint entry (point, allocator);
 				node = Insert(entry, key);
@@ -279,14 +279,14 @@ class dgBooleanMeshClipper: public ndMeshEffect::dMeshBVH
 			return -1.0f;
 		}
 
-		void AddPoint (ndMeshEffect* const edgeOwnerMesh, dEdge* const edgeStart, ndMeshEffect* const faceOwnerMesh, dEdge* const face, const dgHugeVector& plane, dTreeNode** nodes, dInt32& index)
+		void AddPoint (ndMeshEffect* const edgeOwnerMesh, dEdge* const edgeStart, ndMeshEffect* const faceOwnerMesh, dEdge* const face, const dgHugeVector& plane, dNode** nodes, dInt32& index)
 		{
 			dEdge* edge = edgeStart;
 			do {
 				dFloat64 param = ClipEdgeFace(edgeOwnerMesh, edge, faceOwnerMesh, face, plane);
 				if (param > 0.0f) {
 					dgPoint point(edgeOwnerMesh, edge, param, faceOwnerMesh, face);
-					dTreeNode* node = Find(dgNodeKey(edge, param));
+					dNode* node = Find(dgNodeKey(edge, param));
 					if (!node) {
 						node = Insert(point, dgNodeKey(edge, param));
 					}
@@ -307,7 +307,7 @@ class dgBooleanMeshClipper: public ndMeshEffect::dMeshBVH
 			dgHugeVector planeB (CalculateFaceNormal (m_meshB, faceB));
 
 			dInt32 index = 0;
-			dTreeNode* nodes[16];
+			dNode* nodes[16];
 			AddPoint (m_meshA, faceA, m_meshB, faceB, planeB, nodes, index);
 			AddPoint (m_meshB, faceB, m_meshA, faceA, planeA, nodes, index);
 			dAssert ((index == 0) || (index == 2));
@@ -319,21 +319,21 @@ class dgBooleanMeshClipper: public ndMeshEffect::dMeshBVH
 			}
 		}
 
-		void GetCurve (dList<dTreeNode*>& curve, dTreeNode* const node)
+		void GetCurve (dList<dNode*>& curve, dNode* const node)
 		{
 			dInt32 stack = 1;
-			dTreeNode* pool[64];
+			dNode* pool[64];
 
 			pool[0] = node;
 			while (stack) {
 				stack --;
-				dTreeNode* const ptr = pool[stack];
+				dNode* const ptr = pool[stack];
 				dgPoint& point = ptr->GetInfo();
 				if (point.m_lru != m_lru) {
 					point.m_lru = m_lru;
 					curve.Append(ptr);
-					for (dList<dTree<dgPoint, dgNodeKey>::dTreeNode*>::dListNode* ptrPoint = point.m_links.GetFirst(); ptrPoint; ptrPoint = ptrPoint->GetNext()) {
-						dTreeNode* const nextnode = ptrPoint->GetInfo();
+					for (dList<dTree<dgPoint, dgNodeKey>::dNode*>::dNode* ptrPoint = point.m_links.GetFirst(); ptrPoint; ptrPoint = ptrPoint->GetNext()) {
+						dNode* const nextnode = ptrPoint->GetInfo();
 						dgPoint& nextPoint = nextnode->GetInfo();
 						if (nextPoint.m_lru != m_lru) {
 							pool[stack] = nextnode;
@@ -344,14 +344,14 @@ class dgBooleanMeshClipper: public ndMeshEffect::dMeshBVH
 			}
 		}
 
-		void EmbedCurveToSingleFace (dList<dTreeNode*>& curve, ndMeshEffect* const mesh)
+		void EmbedCurveToSingleFace (dList<dNode*>& curve, ndMeshEffect* const mesh)
 		{
 			dEdge* const face = curve.GetFirst()->GetInfo()->GetInfo().m_face;
 
 			dInt32 indexBase = mesh->GetVertexCount();
 			dInt32 indexAttribBase = mesh->GetPropertiesCount();
 
-			for (dList<dTreeNode*>::dListNode* node = curve.GetFirst(); node; node = node->GetNext()) {
+			for (dList<dNode*>::dNode* node = curve.GetFirst(); node; node = node->GetNext()) {
 				dgPoint& point = node->GetInfo()->GetInfo();
 				dAssert (point.m_face == face);
 				ndMeshEffect::dgVertexAtribute attribute(mesh->InterpolateVertex(point.m_posit, face));
@@ -381,7 +381,7 @@ class dgBooleanMeshClipper: public ndMeshEffect::dMeshBVH
 
 			list.Append(list.GetFirst()->GetInfo());
 			list.Addtop(list.GetLast()->GetInfo());
-			for (dList<dEdge*>::dListNode* node = list.GetFirst()->GetNext(); node != list.GetLast(); node = node->GetNext()) {
+			for (dList<dEdge*>::dNode* node = list.GetFirst()->GetNext(); node != list.GetLast(); node = node->GetNext()) {
 				dEdge* const edge = node->GetInfo();
 
 				dEdge* const prev = node->GetPrev()->GetInfo();
@@ -414,9 +414,9 @@ class dgBooleanMeshClipper: public ndMeshEffect::dMeshBVH
 			mesh->PolygonizeFace(glueEdge, mesh->GetVertexPool(), sizeof (dBigVector));
 		}
 
-		void EmbedCurveToMulipleFaces (dList<dTreeNode*>& curve, ndMeshEffect* const mesh)
+		void EmbedCurveToMulipleFaces (dList<dNode*>& curve, ndMeshEffect* const mesh)
 		{
-			for (dList<dTreeNode*>::dListNode* node = curve.GetFirst(); node; node = node->GetNext()) {
+			for (dList<dNode*>::dNode* node = curve.GetFirst(); node; node = node->GetNext()) {
 				dgPoint& point = node->GetInfo()->GetInfo();
 				if (point.m_edgeOwnerMesh == mesh) {
 					dEdge* const edge = point.m_edge;
@@ -435,11 +435,11 @@ class dgBooleanMeshClipper: public ndMeshEffect::dMeshBVH
 		}
 
 
-		void AddCurveToMesh (dList<dTreeNode*>& curve, ndMeshEffect* const mesh)
+		void AddCurveToMesh (dList<dNode*>& curve, ndMeshEffect* const mesh)
 		{
 			bool isIscribedInFace = true; 
 			dEdge* const face = curve.GetFirst()->GetInfo()->GetInfo().m_face;
-			for (dList<dTreeNode*>::dListNode* node = curve.GetFirst(); isIscribedInFace && node; node = node->GetNext()) {
+			for (dList<dNode*>::dNode* node = curve.GetFirst(); isIscribedInFace && node; node = node->GetNext()) {
 				dgPoint& point = node->GetInfo()->GetInfo();
 				isIscribedInFace = isIscribedInFace && (point.m_face == face);
 				isIscribedInFace = isIscribedInFace && (point.m_faceOwnerMesh == mesh);
@@ -459,7 +459,7 @@ class dgBooleanMeshClipper: public ndMeshEffect::dMeshBVH
 			for (iter.Begin(); iter; iter ++) {
 				dgPoint& point = iter.GetNode()->GetInfo();
 				if (point.m_lru != m_lru) {
-					dList<dTreeNode*> curve (GetAllocator());
+					dList<dNode*> curve (GetAllocator());
 					GetCurve (curve, iter.GetNode());
 					AddCurveToMesh (curve, m_meshB);
 					AddCurveToMesh (curve, m_meshA);
@@ -525,8 +525,8 @@ class dgBooleanMeshClipper: public ndMeshEffect::dMeshBVH
 		{
 			dAssert (0);
 /*
-			dgCurvesNetwork::dTreeNode* const node0 = m_curveNetwork.AddVertex (segment[0], GetAllocator());
-			dgCurvesNetwork::dTreeNode* const node1 = m_curveNetwork.AddVertex (segment[1], GetAllocator());
+			dgCurvesNetwork::dNode* const node0 = m_curveNetwork.AddVertex (segment[0], GetAllocator());
+			dgCurvesNetwork::dNode* const node1 = m_curveNetwork.AddVertex (segment[1], GetAllocator());
 
 			dgPoint& pointA = node0->GetInfo();
 			dgPoint& pointB = node1->GetInfo();
@@ -549,7 +549,7 @@ class dgBooleanMeshClipper: public ndMeshEffect::dMeshBVH
 
 		void ClipMeshesFaces(dEdge* const faceA, const ndMeshEffect* const meshB, dEdge* const faceB, const dBigVector& planeB, const dBigVector* const segment)
 		{
-			dTreeNode* node = Find (faceA);
+			dNode* node = Find (faceA);
 			if (!node) {
 				dgClippedFace tmp (m_parentMesh->GetAllocator());
 				node = Insert (tmp, faceA);
@@ -1073,7 +1073,7 @@ dInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* cons
 			}
 		}
 
-		for (dList<dEdge*>::dListNode* node = faceList.GetFirst(); node; node = node->GetNext())
+		for (dList<dEdge*>::dNode* node = faceList.GetFirst(); node; node = node->GetNext())
 		{
 			dEdge* const face = node->GetInfo();
 			DeleteFace(face);
@@ -1097,7 +1097,7 @@ dInt32 ndMeshEffect::PlaneClip(const ndMeshEffect& convexMesh, const dEdge* cons
 		}
 
 		const dInt32 capAttribute = convexMesh.m_attrib.m_materialChannel.GetCount() ? convexMesh.m_attrib.m_materialChannel[dInt32(convexFace->m_userData)] : 0;
-		for (dList<dEdge*>::dListNode* node = faceList.GetFirst(); node; node = node->GetNext())
+		for (dList<dEdge*>::dNode* node = faceList.GetFirst(); node; node = node->GetNext())
 		{
 			dEdge* const face = node->GetInfo();
 

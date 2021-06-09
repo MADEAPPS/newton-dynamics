@@ -56,7 +56,7 @@ class dConvexHull4dTetraherum
 	{
 		public:
 		dInt32 m_index[4];
-		dList<dConvexHull4dTetraherum>::dListNode* m_twin;
+		dList<dConvexHull4dTetraherum>::dNode* m_twin;
 	};
 
 
@@ -95,7 +95,7 @@ class dConvexHull4dTetraherum
 class dConvexHull4d: public dList<dConvexHull4dTetraherum>
 {
 	public:
-	class ndTempList: public dList<dListNode*, dContainersFreeListAlloc<dListNode*>>
+	class ndTempList: public dList<dNode*, dContainersFreeListAlloc<dNode*>>
 	{
 	};
 
@@ -121,16 +121,16 @@ class dConvexHull4d: public dList<dConvexHull4dTetraherum>
 	virtual dInt32 AddVertex (const dBigVector& vertex);
 	virtual dInt32 InitVertexArray(dConvexHull4dVector* const points, const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, void* const memoryPool, dInt32 maxMemSize);
 	
-	virtual dListNode* AddFace (dInt32 i0, dInt32 i1, dInt32 i2, dInt32 i3);
-	virtual void DeleteFace (dListNode* const node);
+	virtual dNode* AddFace (dInt32 i0, dInt32 i1, dInt32 i2, dInt32 i3);
+	virtual void DeleteFace (dNode* const node);
 
-	dListNode* FindFacingNode(const dBigVector& vertex);
+	dNode* FindFacingNode(const dBigVector& vertex);
 	
-	void InsertNewVertex(dInt32 vertexIndex, dListNode* const frontFace, ndTempList& deletedFaces, ndTempList& newFaces);
+	void InsertNewVertex(dInt32 vertexIndex, dNode* const frontFace, ndTempList& deletedFaces, ndTempList& newFaces);
 	dInt32 SupportVertex (dConvexHull4dAABBTreeNode** const tree, const dConvexHull4dVector* const points, const dBigVector& dir, const bool removeEntry = true) const;
 	
 	void CalculateConvexHull (dConvexHull4dAABBTreeNode* vertexTree, dConvexHull4dVector* const points, dInt32 count, dFloat64 distTol);
-	void LinkSibling (dListNode* node0, dListNode* node1)	const;
+	void LinkSibling (dNode* node0, dNode* node1)	const;
 	bool Sanity() const;
 	dConvexHull4dAABBTreeNode* BuildTree (dConvexHull4dAABBTreeNode* const parent, dConvexHull4dVector* const points, dInt32 count, dInt32 baseIndex, dInt8** const memoryPool, dInt32& maxMemSize) const;
 

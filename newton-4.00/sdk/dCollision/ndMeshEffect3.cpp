@@ -87,7 +87,7 @@ class dgHACDCluster: public dList<dHACDClusterFace>
 	bool IsCoplanar(const dBigPlane& plane, const ndMeshEffect& mesh, dFloat64 tolerance) const
 	{
 		const dBigVector* const points = (dBigVector*) mesh.GetVertexPool();
-		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+		for (dNode* node = GetFirst(); node; node = node->GetNext()) {
 			const dHACDClusterFace& info = node->GetInfo();
 			dEdge* ptr = info.m_edge;
 			do {
@@ -423,10 +423,10 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 					m_left = nullptr;
 					m_right = nullptr;
 			} else {
-				for (dList<dEdge*>::dListNode* node = m_left->m_faceList.GetFirst(); node; node = node->GetNext()) {
+				for (dList<dEdge*>::dNode* node = m_left->m_faceList.GetFirst(); node; node = node->GetNext()) {
 					m_faceList.Append(node->GetInfo());
 				}
-				for (dList<dEdge*>::dListNode* node = m_right->m_faceList.GetFirst(); node; node = node->GetNext()) {
+				for (dList<dEdge*>::dNode* node = m_right->m_faceList.GetFirst(); node; node = node->GetNext()) {
 					m_faceList.Append(node->GetInfo());
 				}
 			}
@@ -534,8 +534,8 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 		{
 		}
 
-		dListNode* m_nodeA;
-		dListNode* m_nodeB;
+		dNode* m_nodeA;
+		dNode* m_nodeB;
 		dInt32 m_hierachicalClusterIndexA;
 		dInt32 m_hierachicalClusterIndexB;
 		dFloat64 m_area;
@@ -551,7 +551,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 			,m_clusterA(nullptr)
 			,m_graph(graph)
 		{
-			for (dListNode* clusterNode = graph->GetFirst(); clusterNode; clusterNode = clusterNode->GetNext()) {
+			for (dNode* clusterNode = graph->GetFirst(); clusterNode; clusterNode = clusterNode->GetNext()) {
 				dgHACDCluster& cluster = clusterNode->GetInfo().m_nodeData;
 				dHACDClusterFace& face = cluster.GetFirst()->GetInfo();
 				dEdge* const edge = face.m_edge;
@@ -574,7 +574,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 			return param;
 		}
 
-		void CastBackFace (dListNode* const clusterNodeA, const dBigVector& p0, const dBigVector& p1, const dBigVector& p2, dFloat32 distanceThreshold)
+		void CastBackFace (dNode* const clusterNodeA, const dBigVector& p0, const dBigVector& p1, const dBigVector& p2, dFloat32 distanceThreshold)
 		{
 			dAssert(0);
 			/*
@@ -621,8 +621,8 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 
 					if (!isAdjacent) {
 						isAdjacent = false;
-						dgHACDClusterGraph::dListNode* const clusterNodeB = m_graph->GetNodeFromNodeData (clusterB);
-						for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dListNode* edgeNode = clusterNodeA->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+						dgHACDClusterGraph::dNode* const clusterNodeB = m_graph->GetNodeFromNodeData (clusterB);
+						for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dNode* edgeNode = clusterNodeA->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
 							if (edgeNode->GetInfo().m_node == clusterNodeB) {
 								isAdjacent = true;
 								break;
@@ -630,8 +630,8 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 						}
 
 						if (!isAdjacent) {
-							dgGraphNode<dgHACDCluster, dgHACDEdge>::dListNode* const edgeNodeAB = clusterNodeA->GetInfo().AddEdge (clusterNodeB);
-							dgGraphNode<dgHACDCluster, dgHACDEdge>::dListNode* const edgeNodeBA = clusterNodeB->GetInfo().AddEdge (clusterNodeA);
+							dgGraphNode<dgHACDCluster, dgHACDEdge>::dNode* const edgeNodeAB = clusterNodeA->GetInfo().AddEdge (clusterNodeB);
+							dgGraphNode<dgHACDCluster, dgHACDEdge>::dNode* const edgeNodeBA = clusterNodeB->GetInfo().AddEdge (clusterNodeA);
 
 							dgHACDEdge& edgeAB = edgeNodeAB->GetInfo().m_edgeData;
 							dgHACDEdge& edgeBA = edgeNodeBA->GetInfo().m_edgeData;
@@ -692,7 +692,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 			dEdge* const edge = &(*iter);
 			if ((edge->m_mark != meshMask) && (edge->m_incidentFace > 0)) {
 
-				dListNode* const clusterNode = AddNode ();
+				dNode* const clusterNode = AddNode ();
 				dgHACDCluster& cluster = clusterNode->GetInfo().m_nodeData;
 				cluster.SetAllocator(mesh.GetAllocator());
 
@@ -728,7 +728,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 		}
 
 		// add all link adjacent faces links
-		for (dListNode* clusterNode = GetFirst(); clusterNode; clusterNode = clusterNode->GetNext()) {
+		for (dNode* clusterNode = GetFirst(); clusterNode; clusterNode = clusterNode->GetNext()) {
 
 			dgHACDCluster& cluster = clusterNode->GetInfo().m_nodeData;
 			dHACDClusterFace& face = cluster.GetFirst()->GetInfo();
@@ -737,11 +737,11 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 			do {
 				if (ptr->m_twin->m_incidentFace > 0) {
 					dAssert (ptr->m_twin->m_userData);
-					dListNode* const twinClusterNode = (dListNode*) ptr->m_twin->m_userData;
+					dNode* const twinClusterNode = (dNode*) ptr->m_twin->m_userData;
 					dAssert (twinClusterNode);
 
 					bool doubleEdge = false;
-					for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dListNode* edgeNode = clusterNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
+					for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dNode* edgeNode = clusterNode->GetInfo().GetFirst(); edgeNode; edgeNode = edgeNode->GetNext()) {
 						if (edgeNode->GetInfo().m_node == twinClusterNode) {
 							doubleEdge = true;
 							break;
@@ -770,7 +770,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 		dgBackFaceFinder backFaces(&mesh, this);
 		dFloat32 distanceThreshold = rayDiagonalLength * backFaceDistanceFactor;
 		dAssert (distanceThreshold >= dFloat32 (0.0f));
-		for (dListNode* clusterNodeA = GetFirst(); clusterNodeA; clusterNodeA = clusterNodeA->GetNext()) {
+		for (dNode* clusterNodeA = GetFirst(); clusterNodeA; clusterNodeA = clusterNodeA->GetNext()) {
 
 			dgHACDCluster& clusterA = clusterNodeA->GetInfo().m_nodeData;
 			dHACDClusterFace& faceA = clusterA.GetFirst()->GetInfo();
@@ -818,15 +818,15 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 	void Trace() const
 	{
 #if 0
-		for (dListNode* clusterNodeA = GetFirst(); clusterNodeA; clusterNodeA = clusterNodeA->GetNext()) {
+		for (dNode* clusterNodeA = GetFirst(); clusterNodeA; clusterNodeA = clusterNodeA->GetNext()) {
 			dgHACDCluster& clusterA = clusterNodeA->GetInfo().m_nodeData;
 			//dHACDClusterFace& faceA = clusterA.GetFirst()->GetInfo();
 			//dEdge* const edgeA = faceA.m_edge;
 
 			dTrace (("cluster node: %d\n", clusterA.m_color));
 			dTrace (("            links: "));
-			for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dListNode* edgeNodeA = clusterNodeA->GetInfo().GetFirst(); edgeNodeA; edgeNodeA = edgeNodeA->GetNext()) {
-				dListNode* const clusterNodeB = edgeNodeA->GetInfo().m_node;
+			for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dNode* edgeNodeA = clusterNodeA->GetInfo().GetFirst(); edgeNodeA; edgeNodeA = edgeNodeA->GetNext()) {
+				dNode* const clusterNodeB = edgeNodeA->GetInfo().m_node;
 				dgHACDCluster& clusterB = clusterNodeB->GetInfo().m_nodeData;
 				dTrace (("%d ", clusterB.m_color));
 			}
@@ -859,11 +859,11 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 
 		dInt32 layer = 0;
 		convexPartionMesh->BeginBuild();
-		for (dList<dgHACDConvacityLookAheadTree*>::dListNode* clusterNode = m_convexProximation.GetFirst(); clusterNode; clusterNode = clusterNode->GetNext()) {
+		for (dList<dgHACDConvacityLookAheadTree*>::dNode* clusterNode = m_convexProximation.GetFirst(); clusterNode; clusterNode = clusterNode->GetNext()) {
 			dgHACDConvacityLookAheadTree* const cluster = clusterNode->GetInfo();
 
 			dInt32 vertexCount = 0;
-			for (dList<dEdge*>::dListNode* faceNode = cluster->m_faceList.GetFirst(); faceNode; faceNode = faceNode->GetNext()) {
+			for (dList<dEdge*>::dNode* faceNode = cluster->m_faceList.GetFirst(); faceNode; faceNode = faceNode->GetNext()) {
 				dEdge* const edge = faceNode->GetInfo();
 				dEdge* ptr = edge;
 				do {
@@ -906,16 +906,16 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 	void SubmitInitialEdgeCosts (ndMeshEffect& mesh) 
 	{
 		m_mark ++;
-		for (dListNode* clusterNodeA = GetFirst(); clusterNodeA; clusterNodeA = clusterNodeA->GetNext()) {
+		for (dNode* clusterNodeA = GetFirst(); clusterNodeA; clusterNodeA = clusterNodeA->GetNext()) {
 			// call the progress callback
-			for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dListNode* edgeNodeAB = clusterNodeA->GetInfo().GetFirst(); edgeNodeAB; edgeNodeAB = edgeNodeAB->GetNext()) {
+			for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dNode* edgeNodeAB = clusterNodeA->GetInfo().GetFirst(); edgeNodeAB; edgeNodeAB = edgeNodeAB->GetNext()) {
 				dgHACDEdge& edgeAB = edgeNodeAB->GetInfo().m_edgeData;
 				dFloat64 weight = edgeAB.m_backFaceHandicap; 
 				if (edgeAB.m_mark != m_mark) {
 					edgeAB.m_mark = m_mark;
-					dListNode* const clusterNodeB = edgeNodeAB->GetInfo().m_node;
-					for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dListNode* edgeNodeBA = clusterNodeB->GetInfo().GetFirst(); edgeNodeBA; edgeNodeBA = edgeNodeBA->GetNext()) {
-						dListNode* const clusterNode = edgeNodeBA->GetInfo().m_node;
+					dNode* const clusterNodeB = edgeNodeAB->GetInfo().m_node;
+					for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dNode* edgeNodeBA = clusterNodeB->GetInfo().GetFirst(); edgeNodeBA; edgeNodeBA = edgeNodeBA->GetNext()) {
+						dNode* const clusterNode = edgeNodeBA->GetInfo().m_node;
 						if (clusterNode == clusterNodeA) {
 							dgHACDEdge& edgeBA = edgeNodeBA->GetInfo().m_edgeData;
 							edgeBA.m_mark = m_mark;
@@ -923,7 +923,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 							dAssert (!edgeBA.m_proxyListNode);
 
 							dAssert (edgeBA.m_backFaceHandicap == weight);
-							dList<dgPairProxy>::dListNode* const proxyNode = SubmitEdgeCost (mesh, clusterNodeA, clusterNodeB, weight * edgeBA.m_backFaceHandicap);
+							dList<dgPairProxy>::dNode* const proxyNode = SubmitEdgeCost (mesh, clusterNodeA, clusterNodeB, weight * edgeBA.m_backFaceHandicap);
 							edgeAB.m_proxyListNode = proxyNode;
 							edgeBA.m_proxyListNode = proxyNode;
 							break;
@@ -939,7 +939,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 		dInt32 count = start;
 
 		const dBigVector* const points = (dBigVector*) mesh.GetVertexPool();
-		for (dList<dHACDClusterFace>::dListNode* node = cluster.GetFirst(); node; node = node->GetNext()) {
+		for (dList<dHACDClusterFace>::dNode* node = cluster.GetFirst(); node; node = node->GetNext()) {
 			const dHACDClusterFace& clusterFace = node->GetInfo();
 			dEdge* edge = clusterFace.m_edge;
 			do {
@@ -959,7 +959,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 	void MarkInteriorClusterEdges (ndMeshEffect& mesh, dInt32 mark, const dgHACDCluster& cluster, dInt32 colorA, dInt32 colorB) const
 	{
 		dAssert (colorA != colorB);
-		for (dList<dHACDClusterFace>::dListNode* node = cluster.GetFirst(); node; node = node->GetNext()) {
+		for (dList<dHACDClusterFace>::dNode* node = cluster.GetFirst(); node; node = node->GetNext()) {
 			dHACDClusterFace& clusterFace = node->GetInfo();
 			dEdge* edge = clusterFace.m_edge;
 			do {
@@ -977,7 +977,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 		dAssert (colorA != colorB);
 		dFloat64 perimeter = dFloat64 (0.0f);
 		const dBigVector* const points = (dBigVector*) mesh.GetVertexPool();
-		for (dList<dHACDClusterFace>::dListNode* node = cluster.GetFirst(); node; node = node->GetNext()) {
+		for (dList<dHACDClusterFace>::dNode* node = cluster.GetFirst(); node; node = node->GetNext()) {
 			dHACDClusterFace& clusterFace = node->GetInfo();
 			dEdge* edge = clusterFace.m_edge;
 			do {
@@ -997,7 +997,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 	{
 		if ((m_priorityHeap.GetCount() + 20) > m_priorityHeap.GetMaxCount()) {
 			for (dInt32 i = m_priorityHeap.GetCount() - 1; i >= 0; i--) {
-				dList<dgPairProxy>::dListNode* const emptyNode = m_priorityHeap[i];
+				dList<dgPairProxy>::dNode* const emptyNode = m_priorityHeap[i];
 				dgPairProxy& emptyPair = emptyNode->GetInfo();
 				if ((emptyPair.m_nodeA == nullptr) && (emptyPair.m_nodeB == nullptr)) {
 					m_priorityHeap.Remove(i);
@@ -1012,7 +1012,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 		dFloat64 concavity = dFloat32(0.0f);
 
 		const dBigVector* const points = (dBigVector*) mesh.GetVertexPool();
-		for (dList<dHACDClusterFace>::dListNode* node = cluster.GetFirst(); node; node = node->GetNext()) {
+		for (dList<dHACDClusterFace>::dNode* node = cluster.GetFirst(); node; node = node->GetNext()) {
 			dHACDClusterFace& clusterFace = node->GetInfo();
 			dEdge* edge = clusterFace.m_edge;
 			dInt32 i0 = edge->m_incidentVertex;
@@ -1036,7 +1036,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 	}
 
 
-	dList<dgPairProxy>::dListNode* SubmitEdgeCost (ndMeshEffect& mesh, dListNode* const clusterNodeA, dListNode* const clusterNodeB, dFloat64 perimeterHandicap)
+	dList<dgPairProxy>::dNode* SubmitEdgeCost (ndMeshEffect& mesh, dNode* const clusterNodeA, dNode* const clusterNodeB, dFloat64 perimeterHandicap)
 	{
 		dgHACDCluster& clusterA = clusterNodeA->GetInfo().m_nodeData;
 		dgHACDCluster& clusterB = clusterNodeB->GetInfo().m_nodeData;
@@ -1056,7 +1056,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 			flatStrip = clusterB.IsCoplanar(plane, mesh, tol);
 		}
 
-		dList<dgPairProxy>::dListNode* pairNode = nullptr;
+		dList<dgPairProxy>::dNode* pairNode = nullptr;
 		if (!flatStrip) {
 			m_vertexMark ++;
 			dInt32 vertexCount = CopyVertexToPool(mesh, clusterA, 0);
@@ -1082,7 +1082,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 				HeapCollectGarbage ();
 
 				// add a new pair to the heap
-				dList<dgPairProxy>::dListNode* pairNode1 = m_proxyList.Append();
+				dList<dgPairProxy>::dNode* pairNode1 = m_proxyList.Append();
 				dgPairProxy& pair = pairNode1->GetInfo();
 				pair.m_nodeA = clusterNodeA;
 				pair.m_nodeB = clusterNodeB;
@@ -1101,9 +1101,9 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 	}
 
 
-	bool CollapseEdge (dList<dgPairProxy>::dListNode* const pairNode, ndMeshEffect& mesh, dFloat64 concavity)
+	bool CollapseEdge (dList<dgPairProxy>::dNode* const pairNode, ndMeshEffect& mesh, dFloat64 concavity)
 	{
-		dListNode* adjacentNodes[1024];
+		dNode* adjacentNodes[1024];
 		dgPairProxy& pair = pairNode->GetInfo();
 
 		dgMemoryAllocator* const allocator = mesh.GetAllocator();
@@ -1114,8 +1114,8 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 			// call the progress callback
 			continueColapsing = ReportProgress();
 
-			dListNode* const clusterNodeA = pair.m_nodeA;
-			dListNode* const clusterNodeB = pair.m_nodeB;
+			dNode* const clusterNodeA = pair.m_nodeA;
+			dNode* const clusterNodeB = pair.m_nodeB;
 			dAssert (clusterNodeA != clusterNodeB);
 
 			dgHACDCluster& clusterA = clusterNodeA->GetInfo().m_nodeData;
@@ -1142,7 +1142,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 			// merge two clusters
 			while (clusterB.GetCount()) {
 
-				dgHACDCluster::dListNode* const nodeB = clusterB.GetFirst();
+				dgHACDCluster::dNode* const nodeB = clusterB.GetFirst();
 				clusterB.Unlink(nodeB);
 	
 				// now color code all faces of the merged cluster
@@ -1160,9 +1160,9 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 			// invalidate all proxies that are still in the heap
 			dInt32 adjacentCount = 1;
 			adjacentNodes[0] = clusterNodeA;
-			for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dListNode* edgeNodeAB = clusterNodeA->GetInfo().GetFirst(); edgeNodeAB; edgeNodeAB = edgeNodeAB->GetNext()) {
+			for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dNode* edgeNodeAB = clusterNodeA->GetInfo().GetFirst(); edgeNodeAB; edgeNodeAB = edgeNodeAB->GetNext()) {
 				dgHACDEdge& edgeAB = edgeNodeAB->GetInfo().m_edgeData;
-				dList<dgPairProxy>::dListNode* const proxyNode = (dList<dgPairProxy>::dListNode*) edgeAB.m_proxyListNode;
+				dList<dgPairProxy>::dNode* const proxyNode = (dList<dgPairProxy>::dNode*) edgeAB.m_proxyListNode;
 				if (proxyNode) {
 					dgPairProxy& pairProxy = proxyNode->GetInfo();
 					dAssert ((edgeNodeAB->GetInfo().m_node == pairProxy.m_nodeA) || (edgeNodeAB->GetInfo().m_node == pairProxy.m_nodeB));
@@ -1176,9 +1176,9 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 				dAssert (adjacentCount < sizeof (adjacentNodes)/ sizeof (adjacentNodes[0]));
 			}
 
-			for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dListNode* edgeNodeBA = clusterNodeB->GetInfo().GetFirst(); edgeNodeBA; edgeNodeBA = edgeNodeBA->GetNext()) {
+			for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dNode* edgeNodeBA = clusterNodeB->GetInfo().GetFirst(); edgeNodeBA; edgeNodeBA = edgeNodeBA->GetNext()) {
 				dgHACDEdge& edgeBA = edgeNodeBA->GetInfo().m_edgeData;
-				dList<dgPairProxy>::dListNode* const proxyNode = (dList<dgPairProxy>::dListNode*) edgeBA.m_proxyListNode;
+				dList<dgPairProxy>::dNode* const proxyNode = (dList<dgPairProxy>::dNode*) edgeBA.m_proxyListNode;
 				if (proxyNode) {
 					dgPairProxy& pairProxy = proxyNode->GetInfo();
 					pairProxy.m_nodeA = nullptr;
@@ -1187,7 +1187,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 				}
 
 				bool alreadyLinked = false;
-				dListNode* const node = edgeNodeBA->GetInfo().m_node;
+				dNode* const node = edgeNodeBA->GetInfo().m_node;
 				for (dInt32 i = 0; i < adjacentCount; i ++) {
 					if (node == adjacentNodes[i]) {
 						alreadyLinked = true;
@@ -1202,15 +1202,15 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 			DeleteNode (clusterNodeB);
 
 			// submit all new costs for each edge connecting this new node to any other node 
-			for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dListNode* edgeNodeAB = clusterNodeA->GetInfo().GetFirst(); edgeNodeAB; edgeNodeAB = edgeNodeAB->GetNext()) {
+			for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dNode* edgeNodeAB = clusterNodeA->GetInfo().GetFirst(); edgeNodeAB; edgeNodeAB = edgeNodeAB->GetNext()) {
 				dgHACDEdge& edgeAB = edgeNodeAB->GetInfo().m_edgeData;
 				dFloat64 weigh = edgeAB.m_backFaceHandicap;
-				dListNode* const clusterNodeB1 = edgeNodeAB->GetInfo().m_node;
-				for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dListNode* edgeNodeBA = clusterNodeB1->GetInfo().GetFirst(); edgeNodeBA; edgeNodeBA = edgeNodeBA->GetNext()) {
-					dListNode* const clusterNode = edgeNodeBA->GetInfo().m_node;
+				dNode* const clusterNodeB1 = edgeNodeAB->GetInfo().m_node;
+				for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dNode* edgeNodeBA = clusterNodeB1->GetInfo().GetFirst(); edgeNodeBA; edgeNodeBA = edgeNodeBA->GetNext()) {
+					dNode* const clusterNode = edgeNodeBA->GetInfo().m_node;
 					if (clusterNode == clusterNodeA) {
 						dgHACDEdge& edgeBA = edgeNodeBA->GetInfo().m_edgeData;
-						dList<dgPairProxy>::dListNode* const proxyNode = SubmitEdgeCost (mesh, clusterNodeA, clusterNodeB1, weigh * edgeBA.m_backFaceHandicap);
+						dList<dgPairProxy>::dNode* const proxyNode = SubmitEdgeCost (mesh, clusterNodeA, clusterNodeB1, weigh * edgeBA.m_backFaceHandicap);
 						if (proxyNode) {
 							edgeBA.m_proxyListNode = proxyNode;
 							edgeAB.m_proxyListNode = proxyNode;
@@ -1230,7 +1230,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 		bool collapseEdgeState = true;
 		while (m_priorityHeap.GetCount() && collapseEdgeState) {
 			dFloat64 concavity =  m_priorityHeap.Value();
-			dList<dgPairProxy>::dListNode* const pairNode = m_priorityHeap[0];
+			dList<dgPairProxy>::dNode* const pairNode = m_priorityHeap[0];
 			m_priorityHeap.Pop();
 			collapseEdgeState = CollapseEdge (pairNode, mesh, concavity);
 		}
@@ -1303,7 +1303,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 	dList<dgPairProxy> m_proxyList;
 	dgHACDConvacityLookAheadTree** m_concavityTreeArray;	
 	dList<dgHACDConvacityLookAheadTree*> m_convexProximation;
-	dUpHeap<dList<dgPairProxy>::dListNode*, dFloat64> m_priorityHeap;
+	dUpHeap<dList<dgPairProxy>::dNode*, dFloat64> m_priorityHeap;
 	dgReportProgress m_reportProgressCallback;
     void* m_reportProgressUserData;
 };

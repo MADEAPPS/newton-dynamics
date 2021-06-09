@@ -222,7 +222,7 @@ void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene,
 	ndWorld* const world = scene->GetWorld();
 	world->UpdateTransformsLock();
 
-	for (ndDemoEntityManager::dListNode* node = scene->GetFirst(); node; node = node->GetNext()) 
+	for (ndDemoEntityManager::dNode* node = scene->GetFirst(); node; node = node->GetNext()) 
 	{
 		ndDemoEntity* const entity = node->GetInfo();
 		entity->InterpolateMatrix(param);

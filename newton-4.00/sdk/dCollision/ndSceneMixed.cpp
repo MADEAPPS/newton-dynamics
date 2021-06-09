@@ -358,7 +358,7 @@ dFloat32 ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& q0, con
 
 void ndSceneMixed::DebugScene(ndSceneTreeNotiFy* const notify)
 {
-	for (ndFitnessList::dListNode* node = m_fitness.GetFirst(); node; node = node->GetNext())
+	for (ndFitnessList::dNode* node = m_fitness.GetFirst(); node; node = node->GetNext())
 	{
 		//notify->OnDebugNode(node->GetInfo());
 		if (node->GetInfo()->GetLeft()->GetAsSceneBodyNode())

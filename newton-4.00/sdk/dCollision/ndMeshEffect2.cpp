@@ -260,7 +260,7 @@ class dgTetraIsoSufaceStuffing
 				dBigVector p2(points[tetra[2]]);
 				dBigVector p3(points[tetra[3]]);
 
-				for (dList<dMeshBVH::dgMeshBVHNode*>::dListNode* node = overlapNodes.GetFirst(); node; node = node->GetNext()) {
+				for (dList<dMeshBVH::dgMeshBVHNode*>::dNode* node = overlapNodes.GetFirst(); node; node = node->GetNext()) {
 					dEdge* const edge = node->GetInfo()->m_face;
 					dBigVector point(m_mesh->GetVertex(edge->m_incidentVertex));
 					dBigVector closestPoint(dgPointToTetrahedrumDistance(point, p0, p1, p2, p3));
@@ -665,7 +665,7 @@ class dgTetraIsoSufaceStuffing
 		dgDelaunayTetrahedralization delaunayTetrahedras(m_points.GetAllocator(), &m_points[0].m_x, m_pointCount, sizeof (dBigVector), dFloat32(0.0f));
 		delaunayTetrahedras.RemoveUpperHull();
 
-		for (dgDelaunayTetrahedralization::dListNode* node = delaunayTetrahedras.GetFirst(); node; node = node->GetNext()) {
+		for (dgDelaunayTetrahedralization::dNode* node = delaunayTetrahedras.GetFirst(); node; node = node->GetNext()) {
 			dgTetrahedra stuffingTetra;
 			dgConvexHull4dTetraherum& delaunayTetra = node->GetInfo();
 			
@@ -1023,7 +1023,7 @@ dAssert(0);
 		dAssert (overlapNodes.GetCount());
 
 		bool weightFound = false;
-		for (dList<dMeshBVH::dgMeshBVHNode*>::dListNode* node = overlapNodes.GetFirst(); node; node = node->GetNext()) {
+		for (dList<dMeshBVH::dgMeshBVHNode*>::dNode* node = overlapNodes.GetFirst(); node; node = node->GetNext()) {
 			dEdge* const edge = node->GetInfo()->m_face;
 
 			dInt32 i0 = edge->m_incidentVertex;
@@ -1172,12 +1172,12 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const dArray<dVecto
 	//	delaunayTetrahedras.Save("xxx0.txt");
 	dInt32 tetraCount = delaunayTetrahedras.GetCount();
 	dStack<dBigVector> voronoiPoints(tetraCount + 32);
-	dStack<dDelaunayTetrahedralization::dListNode*> tetradrumNode(tetraCount);
+	dStack<dDelaunayTetrahedralization::dNode*> tetradrumNode(tetraCount);
 	dTree<dList<dInt32>, dInt32> delaunayNodes;
 	
 	dInt32 index = 0;
 	const dConvexHull4dVector* const convexHulPoints = delaunayTetrahedras.GetHullVertexArray();
-	for (dDelaunayTetrahedralization::dListNode* node = delaunayTetrahedras.GetFirst(); node; node = node->GetNext()) 
+	for (dDelaunayTetrahedralization::dNode* node = delaunayTetrahedras.GetFirst(); node; node = node->GetNext()) 
 	{
 		dConvexHull4dTetraherum& tetra = node->GetInfo();
 		voronoiPoints[index] = tetra.CircumSphereCenter(convexHulPoints);
@@ -1185,7 +1185,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const dArray<dVecto
 	
 		for (dInt32 i = 0; i < 4; i++) 
 		{
-			dTree<dList<dInt32>, dInt32>::dTreeNode* header = delaunayNodes.Find(tetra.m_faces[0].m_index[i]);
+			dTree<dList<dInt32>, dInt32>::dNode* header = delaunayNodes.Find(tetra.m_faces[0].m_index[i]);
 			if (!header) 
 			{
 				dList<dInt32> list;
@@ -1203,7 +1203,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const dArray<dVecto
 	dTree<dList<dInt32>, dInt32>::Iterator iter(delaunayNodes);
 	for (iter.Begin(); iter; iter++) 
 	{
-		dTree<dList<dInt32>, dInt32>::dTreeNode* const nodeNode = iter.GetNode();
+		dTree<dList<dInt32>, dInt32>::dNode* const nodeNode = iter.GetNode();
 		const dList<dInt32>& list = nodeNode->GetInfo();
 		dInt32 key = nodeNode->GetKey();
 	
@@ -1213,7 +1213,7 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const dArray<dVecto
 			dInt32 indexArray[512];
 	
 			dInt32 count1 = 0;
-			for (dList<dInt32>::dListNode* ptr = list.GetFirst(); ptr; ptr = ptr->GetNext()) 
+			for (dList<dInt32>::dNode* ptr = list.GetFirst(); ptr; ptr = ptr->GetNext()) 
 			{
 				dInt32 i = ptr->GetInfo();
 				pointArray[count1] = voronoiPoints[i];
