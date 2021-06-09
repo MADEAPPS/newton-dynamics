@@ -741,8 +741,10 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 				cannonTargetAngle = -1000.0f;
 			}
 		}
-		m_cannonHinge->SetTargetAngle(cannonTargetAngle);
-		dTrace(("errorAngle:%f  cannonAngle:%f\n", cannonErrorAngle * dRadToDegree, m_cannonHinge->GetAngle() * dRadToDegree));
+		//m_cannonHinge->SetTargetAngle(cannonTargetAngle);
+		m_cannonHinge->SetTargetAngle(-15.0f * dDegreeToRad);
+		dTrace(("angle:%f  cannonAngle:%f\n", euler0.m_x * dRadToDegree, m_cannonHinge->GetAngle() * dRadToDegree));
+		//dTrace(("errorAngle:%f  cannonAngle:%f\n", cannonErrorAngle * dRadToDegree, m_cannonHinge->GetAngle() * dRadToDegree));
 	}
 
 	void Update(ndWorld* const world, dFloat32 timestep)
