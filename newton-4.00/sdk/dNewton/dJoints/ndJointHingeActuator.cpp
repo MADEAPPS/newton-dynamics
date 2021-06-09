@@ -84,7 +84,6 @@ void ndJointHingeActuator::SetTargetAngle(dFloat32 angle)
 	if (dAbs (angle - m_targetAngle) > dFloat32 (1.0e-3f))
 	{
 		//ndBodyKinematicSetSleepState(m_body0, 0);
-		//m_targetAngle = dClamp (angle, m_minLimit, m_maxLimit);
 		m_targetAngle = angle;
 	}
 }

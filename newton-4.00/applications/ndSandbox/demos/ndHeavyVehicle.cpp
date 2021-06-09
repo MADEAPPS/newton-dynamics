@@ -146,6 +146,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		,m_cannonHinge(nullptr)
 		,m_turretAngle(0.0f)
 		,m_turretAngle0(0.0f)
+		,m_cannonAngle(0.0f)
 		,m_cannonAngle0(0.0f)
 	{
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
@@ -230,21 +231,20 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		ndWorld* const world = scene->GetWorld();
 
 		//turrect servo controller actuator
-		ndBodyDynamic* const turretBody = MakeChildPart(scene, m_chassis, "turret", m_configuration.m_chassisMass * 0.1f);
+		ndBodyDynamic* const turretBody = MakeChildPart(scene, m_chassis, "turret", m_configuration.m_chassisMass * 0.05f);
 		dMatrix turretMatrix(m_localFrame * turretBody->GetMatrix());
 		m_turretHinge = new ndJointHingeActuator(turretMatrix, 1.5f, -1000.0f * dDegreeToRad, 1000.0f * dDegreeToRad, turretBody, m_chassis);
 		world->AddJoint(m_turretHinge);
 		m_turretAngle0 = dAtan2(turretMatrix[2][0], turretMatrix[2][2]);
 
 		//cannon servo controller actuator
-		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.05f);
+		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.025f);
 		dMatrix cannonMatrix(m_localFrame * canonBody->GetMatrix());
-		m_cannonHinge = new ndJointHingeActuator(cannonMatrix, 1.5f, -30.0f * dDegreeToRad, 10.0f * dDegreeToRad, canonBody, turretBody);
+		m_cannonHinge = new ndJointHingeActuator(cannonMatrix, 1.5f, -45.0f * dDegreeToRad, 5.0f * dDegreeToRad, canonBody, turretBody);
 		world->AddJoint(m_cannonHinge);
 		dFloat32 y = cannonMatrix[1][1];
 		dFloat32 x = dSqrt (cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
 		m_cannonAngle0 = dAtan2(y, x);
-		m_cannonAngle0 += 10.0f * dDegreeToRad;
 	}
 
 	void CreateEightWheelTruck (ndDemoEntityManager* const scene)
@@ -708,7 +708,6 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
 		dFloat32 turretAngle = dAtan2(turretMatrix[2][0], turretMatrix[2][2]);
 		dFloat32 turretErrorAngle = AnglesAdd(turretAngle, - m_turretAngle0 - m_turretAngle);
-
 		dFloat32 turretTargetAngle = m_turretHinge->GetAngle();
 		if (dAbs(turretErrorAngle) > (1.0f * dDegreeToRad))
 		{
@@ -728,7 +727,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		dFloat32 y = cannonMatrix[1][1];
 		dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
 		dFloat32 cannonAngle = dAtan2(y, x);
-		dFloat32 cannonErrorAngle = AnglesAdd(cannonAngle, - m_cannonAngle0);
+		dFloat32 cannonErrorAngle = AnglesAdd(cannonAngle, - m_cannonAngle - m_cannonAngle0);
 		
 		dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
 		if (dAbs(cannonErrorAngle) > (1.0f * dDegreeToRad))
@@ -742,7 +741,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 				cannonTargetAngle = -1000.0f;
 			}
 		}
-		m_cannonHinge->SetTargetAngle(cannonTargetAngle);
+		m_cannonHinge->SetTargetAngle(-cannonTargetAngle);
 		//dTrace(("errorAngle:%f  cannonAngle:%f\n", cannonErrorAngle * dRadToDegree, cannonAngle * dRadToDegree));
 
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
@@ -759,16 +758,20 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 			m_turretAngle -= 5.0e-3f;
 		}
 
-		//if (buttons[3])
-		//{
-		//	dAssert(0);
-		//}
-		//else if (buttons[0])
+		//if (buttons[0])
 		//{
 		//	m_cannonAngle += 1.0e-3f;
 		//	if (m_cannonAngle > m_cannonHinge->GetMaxAngularLimit())
 		//	{
 		//		m_cannonAngle = m_cannonHinge->GetMaxAngularLimit();
+		//	}
+		//}
+		//else if (buttons[3])
+		//{
+		//	m_cannonAngle -= 1.0e-3f;
+		//	if (m_cannonAngle < m_cannonHinge->GetMinAngularLimit())
+		//	{
+		//		m_cannonAngle = m_cannonHinge->GetMinAngularLimit();
 		//	}
 		//}
 	}
@@ -793,6 +796,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 	ndJointHingeActuator* m_cannonHinge;
 	dFloat32 m_turretAngle;
 	dFloat32 m_turretAngle0;
+	dFloat32 m_cannonAngle;
 	dFloat32 m_cannonAngle0;
 };
 
