@@ -20,7 +20,7 @@ class ndDemoEntityManager;
 class ndDemoDebriEntityRoot;
 class ndDemoDebrisRootEntity;
 
-class ndConvexFracture
+class ndConvexFracture : public dClassAlloc
 {
 	class ndDebrisNotify : public ndDemoEntityNotify
 	{
