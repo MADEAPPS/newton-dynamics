@@ -45,17 +45,19 @@
 #endif
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || (defined (_MSC_VER ) && defined (_ARM_VER)) )
-	#include <io.h> 
+	#include <io.h>
 	#include <stdint.h>
-	#include <direct.h> 
+	#include <direct.h>
 	#include <malloc.h>
 	#include <stdarg.h>
 	#include <process.h>
 
-	#pragma warning (push, 3) 
+	#pragma warning (push, 3)
 		#include <windows.h>
 		#include <crtdbg.h>
-	#pragma warning (pop) 
+	#pragma warning (pop)
+#else
+  #include <sys/stat.h>
 #endif
 
 #include <new>
