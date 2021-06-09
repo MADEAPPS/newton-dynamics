@@ -66,7 +66,6 @@
 #include <thread>
 #include <chrono>
 #include <math.h>
-#include <float.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -77,24 +76,28 @@
 #include <immintrin.h>
 #include <condition_variable>
 
+// we need _clearfp() and _controlfp() from float.h which are excluded if __STRICT_ANSI__ is defined
+// weird workaround but i'm not sure how a global compiler flag would affect the rest of the code
+// probably useless since this functionality will not be used/implemented but to avoid compiler errors
+#if defined(__STRICT_ANSI__) && (defined (__MINGW32__) || defined (__MINGW64__))
+	#pragma push_macro("__STRICT_ANSI__")
+	#undef __STRICT_ANSI__
+#endif
+
+// include without __STRICT_ANSI__
+#include <float.h>
+// restore __STRICT_ANSI__ back
+#if (defined (__MINGW32__) || defined (__MINGW64__))
+	#pragma pop_macro("__STRICT_ANSI__")
+#endif
+
 #if (defined (__MINGW32__) || defined (__MINGW64__))
 	#include <io.h> 
 	#include <direct.h> 
 	#include <malloc.h>
-	#include <float.h>
 	#include <windows.h>
 	#include <process.h>
 #endif
-
-//#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-//	#include <intrin.h>
-//	#include <emmintrin.h> 
-//	#include <pmmintrin.h>
-//	#ifdef D_USE_VECTOR_AVX
-//		#include <immintrin.h>
-//	#endif
-//#endif
-
 
 #if (defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (__MINGW32__) || defined (__MINGW64__))
   // CMake defines NDEBUG for _not_ debug builds. Therefore, set

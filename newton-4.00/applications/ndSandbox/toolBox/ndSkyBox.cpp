@@ -83,7 +83,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	glUseProgram(0);
 }
 
-void ndSkyBox::LoadCubeTexture(GLenum face, char* const filename)
+void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 {
 	#pragma pack(1)
 	struct TGAHEADER

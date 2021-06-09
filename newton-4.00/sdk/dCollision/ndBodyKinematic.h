@@ -27,6 +27,7 @@
 #include "ndBodyList.h"
 #include "ndJointList.h"
 
+class ndScene;
 class ndSceneBodyNode;
 class ndSceneAggregate;
 class ndSkeletonContainer;

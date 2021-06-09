@@ -9,17 +9,12 @@
 * freely
 */
 
-
-// RenderPrimitive.cpp: implementation of the RenderPrimitive class.
-//
-//////////////////////////////////////////////////////////////////////
 #ifdef _WIN32 
 #include <windows.h>
 #include <commdlg.h>
 #endif
 
 #include "ndFileBrowser.h"
-
 
 bool dGetOpenFileNamePLY(char* const fileName, int maxSize)
 {
@@ -40,9 +35,9 @@ bool dGetOpenFileNamePLY(char* const fileName, int maxSize)
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
 	ofn.nMaxFile = maxSize;
-	ofn.lpstrFilter = (char*)"import file *.ply\0*.ply\0";
+	ofn.lpstrFilter = const_cast<LPSTR>("import file *.ply\0*.ply\0");
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFileTitle = (char*)"Newton Dynamics demos";
+	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics demos");
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = appPath;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
@@ -73,9 +68,9 @@ bool dGetOpenFileNameNgd (char* const fileName, int maxSize)
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
 	ofn.nMaxFile = maxSize;
-	ofn.lpstrFilter = (char*)"newton xml files *.ngd\0*.ngd\0";
+	ofn.lpstrFilter = const_cast<LPSTR>("newton xml files *.ngd\0*.ngd\0");
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFileTitle = (char*)"Newton Dynamics demos";
+	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics demos");
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = appPath;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
@@ -105,9 +100,9 @@ bool dGetOpenFileNameSerialization(char* const fileName, int maxSize)
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
 	ofn.nMaxFile = maxSize;
-	ofn.lpstrFilter = (char*)"newton serialized file *.bin\0*.bin\0";
+	ofn.lpstrFilter = const_cast<LPSTR>("newton serialized file *.bin\0*.bin\0");
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFileTitle = (char*)"Newton Dynamics demos";
+	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics demos");
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = appPath;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
@@ -138,9 +133,9 @@ bool dGetSaveFileNameNgd(char* const fileName, int maxSize)
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
 	ofn.nMaxFile = maxSize;
-	ofn.lpstrFilter = (char*)"newton xml files *.ngd\0*.ngd\0";
+	ofn.lpstrFilter = const_cast<LPSTR>("newton xml files *.ngd\0*.ngd\0");
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFileTitle = (char*)"Newton Dynamics demos";
+	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics demos");
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = appPath;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
@@ -178,9 +173,9 @@ bool dGetSaveFileNameSerialization(char* const fileName, int maxSize)
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
 	ofn.nMaxFile = maxSize;
-	ofn.lpstrFilter = (char*)"newton serialized file *.bin\0*.bin\0";
+	ofn.lpstrFilter = const_cast<LPSTR>("newton serialized file *.bin\0*.bin\0");
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFileTitle = (char*)"Newton Dynamics demos";
+	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics demos");
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = appPath;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;

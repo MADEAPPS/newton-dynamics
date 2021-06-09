@@ -728,7 +728,7 @@ class dVector
 			dBigVector temp(Floor());
 			union 
 			{
-				__m128i tmp;
+				__m128i m;
 				struct  
 				{
 					dInt32 m_x;
@@ -736,8 +736,8 @@ class dVector
 					dInt32 m_z;
 					dInt32 m_w;
 				};
-			};
-			tmp = _mm256_cvttpd_epi32(temp.m_type);
+			} tmp;
+			tmp.m = _mm256_cvttpd_epi32(temp.m_type);
 			return dBigVector(m_x, m_y, m_z, m_w);
 		}
 
