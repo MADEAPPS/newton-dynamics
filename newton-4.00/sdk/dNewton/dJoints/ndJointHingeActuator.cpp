@@ -128,7 +128,8 @@ void ndJointHingeActuator::JacobianDerivative(ndConstraintDescritor& desc)
 	const dVector pin(m_body0->GetMatrix().RotateVector(m_localMatrix0.m_front));
 	
 	AddAngularRowJacobian(desc, pin, dFloat32 (0.0f));
-	dFloat32 accel = GetMotorZeroAcceleration(desc) + currentSpeed * desc.m_invTimestep;
+	//dFloat32 accel = GetMotorZeroAcceleration(desc) + currentSpeed * desc.m_invTimestep;
+	dFloat32 accel = GetMotorZeroAcceleration(desc) + dFloat32(0.3f) * currentSpeed * desc.m_invTimestep;
 	SetMotorAcceleration(desc, accel);
 	if (m_jointAngle > GetMaxAngularLimit())
 	{

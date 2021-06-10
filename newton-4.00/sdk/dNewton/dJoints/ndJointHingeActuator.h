@@ -37,14 +37,12 @@ class ndJointHingeActuator: public ndJointHinge
 	
     D_NEWTON_API dFloat32 GetMaxTorque() const;
     D_NEWTON_API void SetMaxTorque(dFloat32 torque);
-	//
+	
 	//protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	//D_NEWTON_API virtual void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat32 timestep);
 	
 	dFloat32 m_targetAngle;
 	dFloat32 m_motorSpeed;
-	//dAngleArithmetic m_targetAngle;
 	dFloat32 m_maxTorque;
 };
 
