@@ -30,6 +30,7 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 	ndVehicleDectriptorLav25()
 		:ndVehicleDectriptor("lav_25.fbx")
 	{
+		m_chassisMass = 2000.0f;
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
 
 		dFloat32 fuelInjectionRate = 10.0f;
