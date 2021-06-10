@@ -104,8 +104,8 @@ void ndJointHingeActuator::JacobianDerivative(ndConstraintDescritor& desc)
 
 	dAssert(m_motorSpeed >= 0.0f);
 	dFloat32 step = m_motorSpeed * desc.m_timestep;
+
 	dFloat32 currentSpeed = 0.0f;
-	
 	if (m_jointAngle < (m_targetAngle - step))
 	{
 		currentSpeed = m_motorSpeed;
@@ -120,7 +120,7 @@ void ndJointHingeActuator::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 	else if (m_jointAngle > m_targetAngle)
 	{
-		currentSpeed = 0.3f * (m_targetAngle - m_jointAngle) * desc.m_invTimestep;
+		currentSpeed = dFloat32(0.3f) * (m_targetAngle - m_jointAngle) * desc.m_invTimestep;
 	}
 
 	const dVector pin(m_body0->GetMatrix().RotateVector(m_localMatrix0.m_front));
