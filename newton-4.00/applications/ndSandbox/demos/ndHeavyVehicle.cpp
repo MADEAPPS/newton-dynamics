@@ -375,6 +375,27 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		world->AddJoint(new ndJointGear(tireRatio, pin0.m_front.Scale(-1.0f), body0, pin1.m_front, body1));
 	}
 
+	void CreateTractorBucket(ndDemoEntityManager* const scene)
+	{
+		ndWorld* const world = scene->GetWorld();
+
+		//turret servo controller actuator
+		ndBodyDynamic* const frontBucketArmBody = MakeChildPart(scene, m_chassis, "arms", m_configuration.m_chassisMass * 0.05f);
+		dMatrix turretMatrix(m_localFrame * frontBucketArmBody->GetMatrix());
+		m_turretHinge = new ndJointHingeActuator(turretMatrix, 1.5f, -10.0f * dDegreeToRad, 55.0f * dDegreeToRad, frontBucketArmBody, m_chassis);
+		world->AddJoint(m_turretHinge);
+		m_turretAngle0 = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+
+		//cannon servo controller actuator
+		//ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.025f);
+		//dMatrix cannonMatrix(m_localFrame * canonBody->GetMatrix());
+		//m_cannonHinge = new ndJointHingeActuator(cannonMatrix, 1.5f, -45.0f * dDegreeToRad, 5.0f * dDegreeToRad, canonBody, turretBody);
+		//world->AddJoint(m_cannonHinge);
+		//dFloat32 y = cannonMatrix[1][1];
+		//dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
+		//m_cannonAngle0 = -dAtan2(y, x);
+	}
+
 	void CreateTractor(ndDemoEntityManager* const scene)
 	{
 		// 2- each tire to the model, 
@@ -454,6 +475,8 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		//torsionBar->AddAxel(rl_tire0->GetBody0(), rr_tire0->GetBody0());
 		//torsionBar->AddAxel(fl_tire0->GetBody0(), fr_tire0->GetBody0());
 		//torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
+
+		CreateTractorBucket(scene);
 	}
 
 	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, dFloat32 mass)
@@ -763,12 +786,52 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		//dTrace(("errorAngle:%f  cannonAngle:%f\n", cannonErrorAngle * dRadToDegree, cannonAngle * dRadToDegree));
 	}
 
+	void TractorControl(ndWorld* const world)
+	{
+		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+		dFixSizeBuffer<char, 32> buttons;
+		scene->GetJoystickButtons(buttons);
+
+		if (buttons[2])
+		{
+			m_turretAngle += 5.0e-3f;
+			if (m_turretAngle > m_turretHinge->GetMaxAngularLimit())
+			{
+				m_turretAngle = m_turretHinge->GetMaxAngularLimit();
+			}
+		}
+		else if (buttons[1])
+		{
+			m_turretAngle -= 5.0e-3f;
+			if (m_turretAngle < m_turretHinge->GetMinAngularLimit())
+			{
+				m_turretAngle = m_turretHinge->GetMinAngularLimit();
+			}
+		}
+
+		//const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
+		//dFloat32 turretAngle = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+		//dFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turretAngle0), -turretAngle);
+		//dFloat32 turretTargetAngle = m_turretHinge->GetAngle();
+		//if (dAbs(turretErrorAngle) > (0.25f * dDegreeToRad))
+		//{
+		//	turretTargetAngle += turretErrorAngle;
+		//}
+		m_turretHinge->SetTargetAngle(m_turretAngle + m_turretAngle0);
+		//dTrace(("errorAngle:%f  turretAngle:%f\n", turretErrorAngle * dRadToDegree, turretAngle * dRadToDegree));
+
+	}
+
 	void Update(ndWorld* const world, dFloat32 timestep)
 	{
 		ndBasicVehicle::Update(world, timestep);
 		if (!strcmp(m_configuration.m_name, "lav_25.fbx"))
 		{
 			MillitaryControl(world);
+		}
+		else if (!strcmp(m_configuration.m_name, "tractor.fbx"))
+		{
+			TractorControl(world);
 		}
 	}
 	
@@ -792,8 +855,8 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	// build a floor
 	//BuildFloorBox(scene);
 	//BuildFlatPlane(scene, true);
-	BuildStaticMesh(scene, "track.fbx", true);
-	//BuildStaticMesh(scene, "playerarena.fbx", true);
+	//BuildStaticMesh(scene, "track.fbx", true);
+	BuildStaticMesh(scene, "playerarena.fbx", true);
 
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
 
@@ -804,8 +867,8 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndVehicleSelector* const controls = new ndVehicleSelector();
 	scene->GetWorld()->AddModel(controls);
 
-	//ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, tractorDesc, matrix);
-	ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix);
+	ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, tractorDesc, matrix);
+	//ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
@@ -819,7 +882,7 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	//}
 	
 	matrix.m_posit.m_x += 15.0f;
-	AddPlanks(scene, matrix.m_posit, 300.0f);
+	//AddPlanks(scene, matrix.m_posit, 300.0f);
 
 	scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle);
 
