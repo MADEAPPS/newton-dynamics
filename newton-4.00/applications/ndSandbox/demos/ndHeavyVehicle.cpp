@@ -808,8 +808,8 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	// build a floor
 	//BuildFloorBox(scene);
 	//BuildFlatPlane(scene, true);
-	BuildStaticMesh(scene, "track.fbx", true);
-	//BuildStaticMesh(scene, "playerarena.fbx", true);
+	//BuildStaticMesh(scene, "track.fbx", true);
+	BuildStaticMesh(scene, "playerarena.fbx", true);
 
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
 
@@ -835,7 +835,7 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	//}
 	
 	matrix.m_posit.m_x += 15.0f;
-	AddPlanks(scene, matrix.m_posit, 300.0f);
+	//AddPlanks(scene, matrix.m_posit, 300.0f);
 
 	scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle);
 
