@@ -724,8 +724,6 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 			{
 				m_cannonAngle = m_cannonHinge->GetMaxAngularLimit();
 			}
-
-			dTrace(("cannonAngle:%f  turretAngle:%f, error:%f\n", m_cannonAngle * dRadToDegree, m_cannonHinge->GetAngle() * dRadToDegree, (m_cannonHinge->GetAngle() - m_cannonAngle) * dRadToDegree));
 		}
 		else if (buttons[3])
 		{
@@ -734,24 +732,16 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 			{
 				m_cannonAngle = m_cannonHinge->GetMinAngularLimit();
 			}
-			dTrace(("cannonAngle:%f  turretAngle:%f, error:%f\n", m_cannonAngle * dRadToDegree, m_cannonHinge->GetAngle() * dRadToDegree, (m_cannonHinge->GetAngle() - m_cannonAngle) * dRadToDegree));
 		}
 
 		// apply inputs to actuators joint
 		const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
 		dFloat32 turretAngle = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
-		dFloat32 turretErrorAngle = AnglesAdd(m_turretAngle0 + m_turretAngle, - turretAngle);
+		dFloat32 turretErrorAngle = AnglesAdd(AnglesAdd (m_turretAngle, m_turretAngle0), - turretAngle);
 		dFloat32 turretTargetAngle = m_turretHinge->GetAngle();
 		if (dAbs(turretErrorAngle) > (0.25f * dDegreeToRad))
 		{
-			if (turretErrorAngle > 0.0f)
-			{
-				turretTargetAngle = 1000.0f;
-			}
-			else
-			{
-				turretTargetAngle = -1000.0f;
-			}
+			turretTargetAngle += turretErrorAngle;
 		}
 		m_turretHinge->SetTargetAngle(turretTargetAngle);
 		//dTrace(("errorAngle:%f  turretAngle:%f\n", turretErrorAngle * dRadToDegree, turretAngle * dRadToDegree));
@@ -760,20 +750,13 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		dFloat32 y = cannonMatrix[1][1];
 		dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
 		dFloat32 cannonAngle = -dAtan2(y, x);
-		dFloat32 cannonErrorAngle = AnglesAdd(m_cannonAngle + m_cannonAngle0, -cannonAngle);
+		dFloat32 cannonErrorAngle = AnglesAdd(AnglesAdd(m_cannonAngle, m_cannonAngle0), -cannonAngle);
 		
 		dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
 		const dFloat32 error = 0.125f * dDegreeToRad;
 		if (dAbs(cannonErrorAngle) > error)
 		{
-			if (cannonErrorAngle > 0.0f)
-			{
-				cannonTargetAngle = 1000.0f;
-			}
-			else
-			{
-				cannonTargetAngle = -1000.0f;
-			}
+			cannonTargetAngle += cannonErrorAngle;
 		}
 		m_cannonHinge->SetTargetAngle(cannonTargetAngle);
 		//dTrace(("errorAngle:%f  cannonAngle:%f\n", cannonErrorAngle * dRadToDegree, cannonAngle * dRadToDegree));
@@ -808,8 +791,8 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	// build a floor
 	//BuildFloorBox(scene);
 	//BuildFlatPlane(scene, true);
-	//BuildStaticMesh(scene, "track.fbx", true);
-	BuildStaticMesh(scene, "playerarena.fbx", true);
+	BuildStaticMesh(scene, "track.fbx", true);
+	//BuildStaticMesh(scene, "playerarena.fbx", true);
 
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
 
@@ -835,7 +818,7 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	//}
 	
 	matrix.m_posit.m_x += 15.0f;
-	//AddPlanks(scene, matrix.m_posit, 300.0f);
+	AddPlanks(scene, matrix.m_posit, 300.0f);
 
 	scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle);
 
