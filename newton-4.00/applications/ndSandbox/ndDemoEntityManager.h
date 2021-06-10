@@ -152,8 +152,8 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool IsShiftKeyDown () const;
 	bool IsControlKeyDown () const;
 	bool GetKeyState(dInt32 key) const;
-	dInt32 GetJoystickAxis (dFloat32* const axisValues, dInt32 maxAxis = 8);
-	dInt32 GetJoystickButtons (char* const axisbuttons, dInt32 maxButton = 32);
+	dInt32 GetJoystickAxis (dFixSizeBuffer<dFloat32, 8>& axisValues);
+	dInt32 GetJoystickButtons (dFixSizeBuffer<char, 32>& axisbuttons);
 
 	bool GetCaptured () const;
 	bool GetMouseKeyState (dInt32 button ) const;

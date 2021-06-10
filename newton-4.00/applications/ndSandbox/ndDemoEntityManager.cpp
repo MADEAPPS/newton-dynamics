@@ -386,10 +386,10 @@ void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback,
 	m_updateCameraContext = context;
 }
 
-dInt32 ndDemoEntityManager::GetJoystickAxis (dFloat32* const axisValues, dInt32 maxAxis)
+dInt32 ndDemoEntityManager::GetJoystickAxis (dFixSizeBuffer<dFloat32, 8>& axisValues)
 {
 	dInt32 axisCount = 0;
-	for (dInt32 i = 0; i < maxAxis; i++)
+	for (dInt32 i = 0; i < axisValues.GetSize(); i++)
 	{
 		axisValues[i] = dFloat32(0.0f);
 	}
@@ -405,7 +405,7 @@ dInt32 ndDemoEntityManager::GetJoystickAxis (dFloat32* const axisValues, dInt32 
 	if (m_hasJoytick) 
 	{
 		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
-		axisCount = dMin (axisCount, maxAxis);
+		axisCount = dMin (axisCount, axisValues.GetSize());
 		for (dInt32 i = 0; i < axisCount; i ++) 
 		{
 			axisValues[i] = axis[i];
@@ -415,10 +415,10 @@ dInt32 ndDemoEntityManager::GetJoystickAxis (dFloat32* const axisValues, dInt32 
 	return axisCount;
 }
 
-dInt32 ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, dInt32 maxButton)
+dInt32 ndDemoEntityManager::GetJoystickButtons(dFixSizeBuffer<char, 32>& axisbuttons)
 {
 	dInt32 buttonsCount = 0;
-	memset(axisbuttons, 0, maxButton);
+	memset(&axisbuttons[0], 0, axisbuttons.GetSize());
 
 	if (!m_hasJoytick)
 	{
@@ -428,7 +428,7 @@ dInt32 ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, dInt32 
 	if (m_hasJoytick) 
 	{
 		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
-		buttonsCount = dMin (buttonsCount, maxButton);
+		buttonsCount = dMin (buttonsCount, axisbuttons.GetSize());
 		for (dInt32 i = 0; i < buttonsCount; i ++) 
 		{
 			axisbuttons[i] = buttons[i];
