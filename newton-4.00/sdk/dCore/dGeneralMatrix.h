@@ -27,7 +27,6 @@
 #include "dTypes.h"
 #include "dGeneralVector.h"
 
-//#define D_LCP_MAX_VALUE dFloat32 (1.0e10f)
 #define D_LCP_MAX_VALUE dFloat32 (1.0e15f)
 
 template<class T>

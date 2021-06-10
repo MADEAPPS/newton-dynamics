@@ -101,19 +101,22 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		SetHighFriction(desc, m_brakeTorque);
 	}
 	// add suspension limits alone the vertical axis 
-	const dFloat32 x = m_posit + m_speed * desc.m_timestep;
-	if (x < m_info.m_minLimit)
+	if (desc.m_rowsCount < 6)
 	{
-		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
-		SetLowerFriction(desc, dFloat32(0.0f));
-		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-		SetMotorAcceleration(desc, stopAccel);
-	}
-	else if (x > m_info.m_maxLimit)
-	{
-		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
-		SetHighFriction(desc, dFloat32(0.0f));
-		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-		SetMotorAcceleration(desc, stopAccel);
+		const dFloat32 x = m_posit + m_speed * desc.m_timestep;
+		if (x < m_info.m_minLimit)
+		{
+			AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
+			SetLowerFriction(desc, dFloat32(0.0f));
+			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			SetMotorAcceleration(desc, stopAccel);
+		}
+		else if (x > m_info.m_maxLimit)
+		{
+			AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
+			SetHighFriction(desc, dFloat32(0.0f));
+			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			SetMotorAcceleration(desc, stopAccel);
+		}
 	}
 }
