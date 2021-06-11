@@ -851,6 +851,16 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 				m_turretAngle = m_turretHinge->GetMinAngularLimit();
 			}
 		}
+		const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
+		dFloat32 turretAngle = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+		dFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turretAngle0), -turretAngle);
+		dFloat32 turretTargetAngle = m_turretHinge->GetAngle();
+		if (dAbs(turretErrorAngle) > (0.25f * dDegreeToRad))
+		{
+			turretTargetAngle += turretErrorAngle;
+		}
+		m_turretHinge->SetTargetAngle(m_turretAngle + m_turretAngle0);
+
 
 		if (buttons[0])
 		{
@@ -868,17 +878,6 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 				m_cannonAngle = m_cannonHinge->GetMinAngularLimit();
 			}
 		}
-
-		const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
-		dFloat32 turretAngle = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
-		dFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turretAngle0), -turretAngle);
-		dFloat32 turretTargetAngle = m_turretHinge->GetAngle();
-		if (dAbs(turretErrorAngle) > (0.25f * dDegreeToRad))
-		{
-			turretTargetAngle += turretErrorAngle;
-		}
-		m_turretHinge->SetTargetAngle(m_turretAngle + m_turretAngle0);
-
 		const dMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
 		dFloat32 y = cannonMatrix[1][1];
 		dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
