@@ -395,7 +395,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		world->AddJoint(new ndJointGear(tireRatio, pin0.m_front.Scale(-1.0f), body0, pin1.m_front, body1));
 	}
 
-	void AddHydrolic(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, const char* const name0, const char* const name1, ndBodyDynamic* const attachmentBody, const char* const attachement) const
+	void AddHydraulic(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, const char* const name0, const char* const name1, ndBodyDynamic* const attachmentBody, const char* const attachement) const
 	{
 		ndWorld* const world = scene->GetWorld();
 		ndBodyDynamic* const body0 = MakeChildPart(scene, parentBody, name0, m_configuration.m_chassisMass * 0.01f);
@@ -426,17 +426,17 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		world->AddJoint(m_turretHinge);
 		m_turretAngle0 = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
 
-		AddHydrolic(scene, m_chassis, "armHydraulicPiston_left", "armHydraulic_left", frontBucketArmBody, "attach0_left");
-		AddHydrolic(scene, m_chassis, "armHydraulicPiston_right", "armHydraulic_right", frontBucketArmBody, "attach0_right");
+		AddHydraulic(scene, m_chassis, "armHydraulicPiston_left", "armHydraulic_left", frontBucketArmBody, "attach0_left");
+		AddHydraulic(scene, m_chassis, "armHydraulicPiston_right", "armHydraulic_right", frontBucketArmBody, "attach0_right");
 
 		//cannon servo controller actuator
-		//ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.025f);
-		//dMatrix cannonMatrix(m_localFrame * canonBody->GetMatrix());
-		//m_cannonHinge = new ndJointHingeActuator(cannonMatrix, 1.5f, -45.0f * dDegreeToRad, 5.0f * dDegreeToRad, canonBody, turretBody);
-		//world->AddJoint(m_cannonHinge);
-		//dFloat32 y = cannonMatrix[1][1];
-		//dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
-		//m_cannonAngle0 = -dAtan2(y, x);
+		ndBodyDynamic* const frontBucketBody = MakeChildPart(scene, frontBucketArmBody, "frontBucket", m_configuration.m_chassisMass * 0.025f);
+		dMatrix frontBucketMatrix(m_localFrame * frontBucketBody->GetMatrix());
+		m_cannonHinge = new ndJointHingeActuator(frontBucketMatrix, 2.5f, -10.0f * dDegreeToRad, 110.0f * dDegreeToRad, frontBucketBody, frontBucketArmBody);
+		world->AddJoint(m_cannonHinge);
+		dFloat32 y = frontBucketMatrix[1][1];
+		dFloat32 x = dSqrt(frontBucketMatrix[1][0] * frontBucketMatrix[1][0] + frontBucketMatrix[1][2] * frontBucketMatrix[1][2] + 1.0e-6f);
+		m_cannonAngle0 = -dAtan2(y, x);
 	}
 
 	void CreateTractor(ndDemoEntityManager* const scene)
@@ -852,16 +852,45 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 			}
 		}
 
-		//const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
-		//dFloat32 turretAngle = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
-		//dFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turretAngle0), -turretAngle);
-		//dFloat32 turretTargetAngle = m_turretHinge->GetAngle();
-		//if (dAbs(turretErrorAngle) > (0.25f * dDegreeToRad))
-		//{
-		//	turretTargetAngle += turretErrorAngle;
-		//}
+		if (buttons[0])
+		{
+			m_cannonAngle += 5.0e-3f;
+			if (m_cannonAngle > m_cannonHinge->GetMaxAngularLimit())
+			{
+				m_cannonAngle = m_cannonHinge->GetMaxAngularLimit();
+			}
+		}
+		else if (buttons[3])
+		{
+			m_cannonAngle -= 5.0e-3f;
+			if (m_cannonAngle < m_cannonHinge->GetMinAngularLimit())
+			{
+				m_cannonAngle = m_cannonHinge->GetMinAngularLimit();
+			}
+		}
+
+		const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
+		dFloat32 turretAngle = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+		dFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turretAngle0), -turretAngle);
+		dFloat32 turretTargetAngle = m_turretHinge->GetAngle();
+		if (dAbs(turretErrorAngle) > (0.25f * dDegreeToRad))
+		{
+			turretTargetAngle += turretErrorAngle;
+		}
 		m_turretHinge->SetTargetAngle(m_turretAngle + m_turretAngle0);
-		//dTrace(("errorAngle:%f  turretAngle:%f\n", turretErrorAngle * dRadToDegree, turretAngle * dRadToDegree));
+
+		const dMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
+		dFloat32 y = cannonMatrix[1][1];
+		dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
+		dFloat32 cannonAngle = -dAtan2(y, x);
+		dFloat32 cannonErrorAngle = AnglesAdd(AnglesAdd(m_cannonAngle, m_cannonAngle0), -cannonAngle);
+		dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
+		const dFloat32 error = 0.125f * dDegreeToRad;
+		if (dAbs(cannonErrorAngle) > error)
+		{
+			cannonTargetAngle += cannonErrorAngle;
+		}
+		m_cannonHinge->SetTargetAngle(cannonTargetAngle);
 	}
 
 	void Update(ndWorld* const world, dFloat32 timestep)
