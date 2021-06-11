@@ -388,7 +388,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		
 		ndShapeInfo rearInfo(body0->GetCollisionShape().GetShapeInfo());
 		ndShapeInfo frontInfo(body1->GetCollisionShape().GetShapeInfo());
-		dFloat32 tireRatio = frontInfo.m_scale.m_y / rearInfo.m_scale.m_y;
+		dFloat32 tireRatio = rearInfo.m_scale.m_y / frontInfo.m_scale.m_y;
 
 		dMatrix pin0(tire0->GetLocalMatrix0() * body0->GetMatrix());
 		dMatrix pin1(tire1->GetLocalMatrix0() * body1->GetMatrix());
