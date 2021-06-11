@@ -192,7 +192,8 @@ void ndVehicleSelector::PostUpdate(ndWorld* const world, dFloat32)
 		for (ndModelList::dNode* node = modelList.GetFirst(); node; node = node->GetNext())
 		{
 			ndModel* const model = node->GetInfo();
-			if (!strcmp(model->GetClassName(), "ndBasicVehicle"))
+			//if (!strcmp(model->ClassName(), "ndBasicVehicle"))
+			if (model->GetAsMultiBodyVehicle())
 			{
 				vehicleArray[vehiclesCount] = (ndBasicVehicle*)model->GetAsMultiBodyVehicle();
 				vehiclesCount++;

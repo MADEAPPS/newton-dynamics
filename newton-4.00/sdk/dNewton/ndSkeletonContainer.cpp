@@ -396,7 +396,7 @@ ndSkeletonContainer::ndNode* ndSkeletonContainer::AddChild(ndJointBilateralConst
 #ifdef _DEBUG
 	if (node->m_body->GetInvMass() == dFloat32(0.0f))
 	{
-		dTrace(("%s (%d %f) (%d %f)\n", joint->GetClassName(), 
+		dTrace(("%s (%d %f) (%d %f)\n", joint->ClassName(), 
 			joint->GetBody0()->GetId(), joint->GetBody0()->GetInvMass(), 
 			joint->GetBody1()->GetId(), joint->GetBody1()->GetInvMass()));
 	}

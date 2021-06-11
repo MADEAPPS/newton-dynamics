@@ -324,7 +324,7 @@ class dBigVector;
 #endif
 
 #define D_CLASS_RELECTION(Class)	\
-	virtual const char* GetClassName() const {return #Class;} 
+	virtual const char* ClassName() const {return #Class;} 
 
 
 //typedef void (*dDeserialize) (void* const userData, void* buffer, dInt32 size);
