@@ -10,10 +10,6 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
-if (NEWTON_CREATE_C_INTERFACE)
-	add_subdirectory(dNewtonC)
-endif()
-
 if (NEWTON_BUILD_PROFILER)
 	add_subdirectory(dProfiler)
 endif()
