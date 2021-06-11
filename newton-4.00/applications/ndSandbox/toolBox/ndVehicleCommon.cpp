@@ -13,21 +13,6 @@
 #include "ndPhysicsWorld.h"
 #include "ndVehicleCommon.h"
 
-ndTireNotifyNotify::ndTireNotifyNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parent)
-	:ndDemoEntityNotify(manager, entity)
-	,m_parent(parent)
-{
-}
-
-void ndTireNotifyNotify::OnTranform(dInt32, const dMatrix& matrix)
-{
-	dMatrix parentMatrix(m_parent->GetMatrix());
-	dMatrix localMatrix(matrix * parentMatrix.Inverse());
-
-	dQuaternion rot(localMatrix);
-	m_entity->SetMatrix(rot, localMatrix.m_posit);
-}
-
 ndVehicleDectriptor::ndEngineTorqueCurve::ndEngineTorqueCurve()
 {
 	// take from the data sheet of a 2005 dodge viper, 

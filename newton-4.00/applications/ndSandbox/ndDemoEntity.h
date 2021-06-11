@@ -22,7 +22,7 @@ class ndDemoMeshInterface;
 class ndDemoEntityNotify: public ndBodyNotify
 {
 	public:
-	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, dFloat32 gravity = DEMO_GRAVITY);
+	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody = nullptr, dFloat32 gravity = DEMO_GRAVITY);
 	virtual ~ndDemoEntityNotify();
 
 	void* GetUserData() const
@@ -35,6 +35,7 @@ class ndDemoEntityNotify: public ndBodyNotify
 	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep);
 
 	ndDemoEntity* m_entity;
+	ndBodyDynamic* m_parentBody;
 	ndDemoEntityManager* m_manager;
 };
 

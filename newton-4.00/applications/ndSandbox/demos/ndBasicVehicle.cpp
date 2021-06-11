@@ -400,7 +400,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		matrix.m_posit += chassisMatrix.m_up.Scale (definition.m_verticalOffset);
 
 		ndBodyDynamic* const tireBody = new ndBodyDynamic();
-		tireBody->SetNotifyCallback(new ndTireNotifyNotify(scene, tireEntity, chassis));
+		tireBody->SetNotifyCallback(new ndDemoEntityNotify(scene, tireEntity, chassis));
 		tireBody->SetMatrix(matrix);
 		tireBody->SetCollisionShape(tireCollision);
 		tireBody->SetMassMatrix(definition.m_mass, tireCollision);

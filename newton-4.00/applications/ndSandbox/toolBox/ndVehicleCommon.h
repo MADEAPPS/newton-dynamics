@@ -17,15 +17,6 @@
 
 #define AUTOMATION_TRANSMISSION_FRAME_DELAY 120
 
-class ndTireNotifyNotify : public ndDemoEntityNotify
-{
-	public:
-	ndTireNotifyNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parent);
-	void OnTranform(dInt32, const dMatrix& matrix);
-
-	ndBodyDynamic* m_parent;
-};
-
 class ndVehicleDectriptor
 {
 	public:

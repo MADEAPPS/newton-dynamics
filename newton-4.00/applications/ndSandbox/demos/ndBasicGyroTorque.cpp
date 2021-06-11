@@ -72,7 +72,7 @@ static void DzhanibekovEffect(ndDemoEntityManager* const scene, dFloat32 mass, d
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(mesh, dGetIdentityMatrix());
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity, 0.0f));
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity, nullptr, 0.0f));
 
 	body->SetOmega(omega);
 	body->SetMatrix(matrix);

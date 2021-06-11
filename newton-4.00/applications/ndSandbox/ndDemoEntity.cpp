@@ -13,9 +13,10 @@
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 
-ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, dFloat32 gravity)
+ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody, dFloat32 gravity)
 	:ndBodyNotify(dVector (dFloat32 (0.0f), gravity, dFloat32(0.0f), dFloat32(0.0f)))
 	,m_entity(entity)
+	,m_parentBody(parentBody)
 	,m_manager(manager)
 {
 }
@@ -55,10 +56,19 @@ void ndDemoEntityNotify::OnTranform(dInt32, const dMatrix& matrix)
 	// apply this transformation matrix to the application user data.
 	if (m_entity)
 	{
-		ndBody* const body = GetBody();
-		dQuaternion rot(body->GetRotation());
-
-		m_entity->SetMatrix(rot, matrix.m_posit);
+		const ndBody* const body = GetBody();
+		if (!m_parentBody)
+		{
+			const dQuaternion rot(body->GetRotation());
+			m_entity->SetMatrix(rot, matrix.m_posit);
+		}
+		else
+		{
+			const dMatrix parentMatrix(m_parentBody->GetMatrix());
+			const dMatrix localMatrix(matrix * parentMatrix.Inverse());
+			const dQuaternion rot(localMatrix);
+			m_entity->SetMatrix(rot, localMatrix.m_posit);
+		}
 	}
 }
 

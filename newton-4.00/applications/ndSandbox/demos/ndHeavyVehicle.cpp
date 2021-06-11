@@ -585,7 +585,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		matrix.m_posit += chassisMatrix.m_up.Scale (definition.m_verticalOffset);
 
 		ndBodyDynamic* const tireBody = new ndBodyDynamic();
-		tireBody->SetNotifyCallback(new ndTireNotifyNotify(scene, tireEntity, parentBody));
+		tireBody->SetNotifyCallback(new ndDemoEntityNotify(scene, tireEntity, parentBody));
 		tireBody->SetMatrix(matrix);
 		tireBody->SetCollisionShape(tireCollision);
 		tireBody->SetMassMatrix(definition.m_mass, tireCollision);
@@ -604,7 +604,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 		ndBodyDynamic* const vehBody = new ndBodyDynamic();
 		const dMatrix matrix(vehPart->CalculateGlobalMatrix(nullptr));
-		vehBody->SetNotifyCallback(new ndTireNotifyNotify(scene, vehPart, parentBody));
+		vehBody->SetNotifyCallback(new ndDemoEntityNotify(scene, vehPart, parentBody));
 		vehBody->SetMatrix(matrix);
 		vehBody->SetCollisionShape(*vehCollision);
 		vehBody->SetMassMatrix(mass, *vehCollision);
