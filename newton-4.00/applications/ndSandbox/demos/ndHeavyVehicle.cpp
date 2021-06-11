@@ -24,6 +24,25 @@
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"
 
+class ndHydraulicAttachement : public ndJointBilateralConstraint
+{
+	public:
+	ndHydraulicAttachement(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+		:ndJointBilateralConstraint(2, child, parent, pinAndPivotFrame)
+	{
+		SetSolverModel(m_jointkinematicCloseLoop);
+	}
+	
+	void JacobianDerivative(ndConstraintDescritor& desc)
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
+		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
+	}
+};
+
 class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 {
 	public:
@@ -84,6 +103,7 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		:ndVehicleDectriptor("tractor.fbx")
 	{
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
+		m_chassisMass = 2000.0f;
 
 		dFloat32 fuelInjectionRate = 10.0f;
 		dFloat32 idleTorquePoundFoot = 250.0f;
@@ -113,7 +133,7 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		m_frontTire.m_laterialStiffeness = 500.0f / 1000.0f;
 		m_frontTire.m_longitudinalStiffeness = 500.0f / 1000.0f;
 
-		m_rearTire.m_mass = 100.0f;
+		m_rearTire.m_mass = 200.0f;
 		m_rearTire.m_steeringAngle = 0.0f;
 		m_rearTire.m_springK = 1000.0f;
 		m_rearTire.m_damperC = 25.0f;
@@ -375,6 +395,26 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		world->AddJoint(new ndJointGear(tireRatio, pin0.m_front.Scale(-1.0f), body0, pin1.m_front, body1));
 	}
 
+	void AddHydrolic(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, const char* const name0, const char* const name1, ndBodyDynamic* const attachmentBody, const char* const attachement) const
+	{
+		ndWorld* const world = scene->GetWorld();
+		ndBodyDynamic* const body0 = MakeChildPart(scene, parentBody, name0, m_configuration.m_chassisMass * 0.01f);
+		dMatrix matrix0(m_localFrame * body0->GetMatrix());
+		ndJointHinge* const hinge = new ndJointHinge(matrix0, body0, m_chassis);
+		world->AddJoint(hinge);
+
+		ndBodyDynamic* const body1 = MakeChildPart(scene, body0, name1, m_configuration.m_chassisMass * 0.01f);
+		dMatrix matrix1(m_localFrame * body1->GetMatrix());
+		ndJointSlider* const slider = new ndJointSlider(matrix1, body1, body0);
+		world->AddJoint(slider);
+		
+		ndDemoEntity* const parentEntity = (ndDemoEntity*)m_chassis->GetNotifyCallback()->GetUserData();
+		ndDemoEntity* const attachementNode = parentEntity->Find(attachement);
+		const dMatrix attachementMatrix(attachementNode->CalculateGlobalMatrix(nullptr));
+		ndHydraulicAttachement* const attachmnetJoint = new ndHydraulicAttachement(attachementMatrix, body1, attachmentBody);
+		world->AddJoint(attachmnetJoint);
+	}
+
 	void CreateTractorBucket(ndDemoEntityManager* const scene)
 	{
 		ndWorld* const world = scene->GetWorld();
@@ -385,6 +425,9 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		m_turretHinge = new ndJointHingeActuator(turretMatrix, 1.5f, -10.0f * dDegreeToRad, 55.0f * dDegreeToRad, frontBucketArmBody, m_chassis);
 		world->AddJoint(m_turretHinge);
 		m_turretAngle0 = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+
+		AddHydrolic(scene, m_chassis, "armHydraulicPiston_left", "armHydraulic_left", frontBucketArmBody, "attach0_left");
+		AddHydrolic(scene, m_chassis, "armHydraulicPiston_right", "armHydraulic_right", frontBucketArmBody, "attach0_right");
 
 		//cannon servo controller actuator
 		//ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.025f);
@@ -819,7 +862,6 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		//}
 		m_turretHinge->SetTargetAngle(m_turretAngle + m_turretAngle0);
 		//dTrace(("errorAngle:%f  turretAngle:%f\n", turretErrorAngle * dRadToDegree, turretAngle * dRadToDegree));
-
 	}
 
 	void Update(ndWorld* const world, dFloat32 timestep)
