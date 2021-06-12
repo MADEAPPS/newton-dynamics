@@ -972,50 +972,6 @@ dInt32 ndContactSolver::CompoundContacts()
 
 dInt32 ndContactSolver::CalculatePairContacts()
 {
-	//ndContact* const contact = pair->m_contact;
-	//dgBody* const body0 = contact->m_body0;
-	//dgBody* const body1 = contact->m_body1;
-	//const ntContactMaterial* const material = contact->m_material;
-	//dgCollisionParamProxy proxy(contact, pair->m_contactBuffer, threadIndex, ccdMode, intersectionTestOnly);
-	//
-	//pair->m_flipContacts = false;
-	//proxy.m_timestep = pair->m_timestep;
-	//proxy.m_maxContacts = DG_MAX_CONTATCS;
-	//proxy.m_skinThickness = material->m_skinThickness;
-
-	//if (body1->m_collision->IsType(dgCollision::dgCollisionScene_RTTI)) 
-	//{
-	//	dAssert(contact->m_body1->GetInvMass().m_w == dFloat32(0.0f));
-	//	SceneContacts(pair, proxy);
-	//}
-	//else if (body0->m_collision->IsType(dgCollision::dgCollisionScene_RTTI)) 
-	//{
-	//	contact->SwapBodies();
-	//	pair->m_flipContacts = -1;
-	//	dAssert(contact->m_body1->GetInvMass().m_w == dFloat32(0.0f));
-	//	SceneContacts(pair, proxy);
-	//}
-	//else if (body0->m_collision->IsType(dgCollision::dgCollisionCompound_RTTI)) 
-	//{
-	//	CompoundContacts(pair, proxy);
-	//}
-	//else if (body1->m_collision->IsType(dgCollision::dgCollisionCompound_RTTI)) 
-	//{
-	//	contact->SwapBodies();
-	//	pair->m_flipContacts = -1;
-	//	CompoundContacts(pair, proxy);
-	//}
-	//else if (body0->m_collision->IsType(dgCollision::ndShapeConvexShape_RTTI)) 
-	//{
-	//	ConvexContacts(pair, proxy);
-	//}
-	//else if (body1->m_collision->IsType(dgCollision::ndShapeConvexShape_RTTI)) 
-	//{
-	//	contact->SwapBodies();
-	//	pair->m_flipContacts = -1;
-	//	ConvexContacts(pair, proxy);
-	//}
-
 	dInt32 count = 0;
 	if (m_instance0.GetShape()->GetAsShapeCompoundConvex() || m_instance1.GetShape()->GetAsShapeCompoundConvex())
 	{

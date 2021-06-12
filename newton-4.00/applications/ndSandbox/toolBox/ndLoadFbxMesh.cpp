@@ -189,16 +189,16 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNoceM
 	const ofbx::Object* const rootNode = fbxScene->getRoot();
 	dAssert(rootNode);
 
-	fbxDemoEntity* entity = nullptr;
+	fbxDemoEntity* rootEntity = nullptr;
 	if (rootNode) 
 	{
 		stack = GetChildrenNodes(rootNode, buffer);
-		entity = (stack > 1) ? new fbxDemoEntity(nullptr) : nullptr;
+		rootEntity = (stack > 1) ? new fbxDemoEntity(nullptr) : nullptr;
 
 		for (dInt32 i = 0; i < stack; i++)
 		{
 			ofbx::Object* const child = buffer[stack - i - 1];
-			nodeStack[i] = fbxImportStackData(child, entity);
+			nodeStack[i] = fbxImportStackData(child, rootEntity);
 		}
 	}
 
@@ -208,9 +208,9 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNoceM
 		fbxImportStackData data(nodeStack[stack]);
 
 		fbxDemoEntity* const node = new fbxDemoEntity(data.m_parentNode);
-		if (!entity)
+		if (!rootEntity)
 		{
-			entity = node;
+			rootEntity = node;
 		}
 
 		dMatrix localMatrix(ofbxMatrix2dMatrix(data.m_fbxNode->getLocalTransform()));
@@ -228,7 +228,7 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNoceM
 			dAssert(stack < dInt32(sizeof(nodeStack) / sizeof(nodeStack[0])));
 		}
 	}
-	return entity;
+	return rootEntity;
 }
 
 static void ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const mesh)

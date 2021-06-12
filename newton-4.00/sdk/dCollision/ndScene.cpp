@@ -297,7 +297,6 @@ bool ndScene::RemoveBody(ndBodyKinematic* const body)
 	return false;
 }
 
-
 dFloat32 ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const
 {
 	dFloat32 maxParam = dFloat32(1.2f);
@@ -453,7 +452,8 @@ void ndScene::RotateLeft(ndSceneTreeNode* const node, ndSceneNode** const root)
 		node->m_surfaceArea = parent->m_surfaceArea;
 
 		ndSceneTreeNode* const grandParent = (ndSceneTreeNode*)parent->m_parent;
-		if (grandParent) {
+		if (grandParent) 
+		{
 			if (grandParent->m_left == parent) 
 			{
 				grandParent->m_left = node;
@@ -926,15 +926,6 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 		dAssert(!body0->GetAsBodyTriggerVolume());
 		dAssert(!body0->GetCollisionShape().GetShape()->GetAsShapeNull());
 		dAssert(!body1->GetCollisionShape().GetShape()->GetAsShapeNull());
-
-		//if (body0->GetCollisionShape().GetShape()->GetAsShapeCompoundConvex() && body1->GetCollisionShape().GetShape()->GetAsShapeCompoundConvex())
-		//{
-		//	body0->GetCollisionShape().GetShape()->GetAsShapeCompoundConvex();
-		//}
-		//if (body0->GetCollisionShape().GetShape()->GetAsShapeCompoundConvex())
-		//{
-		//	body0->GetCollisionShape().GetShape()->GetAsShapeCompoundConvex();
-		//}
 			
 		ndContactPoint contactBuffer[D_MAX_CONTATCS];
 		ndContactSolver contactSolver(contact, this);
@@ -1168,16 +1159,20 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 			dVector tangentDir(relReloc - contactPoint->m_normal.Scale(impulse));
 			dAssert(tangentDir.m_w == dFloat32(0.0f));
 			diff = tangentDir.DotProduct(tangentDir).GetScalar();
-			if (diff > dFloat32(1.0e-2f)) {
+			if (diff > dFloat32(1.0e-2f)) 
+			{
 				dAssert(tangentDir.m_w == dFloat32(0.0f));
 				//contactPoint->m_dir0 = tangentDir.Scale (dgRsqrt (diff));
 				contactPoint->m_dir0 = tangentDir.Normalize();
 			}
-			else {
-				if (dAbs(contactPoint->m_normal.m_z) > dFloat32(0.577f)) {
+			else 
+			{
+				if (dAbs(contactPoint->m_normal.m_z) > dFloat32(0.577f)) 
+				{
 					tangentDir = dVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_z, dFloat32(0.0f), dFloat32(0.0f));
 				}
-				else {
+				else 
+				{
 					tangentDir = dVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_x, dFloat32(0.0f), dFloat32(0.0f));
 				}
 				contactPoint->m_dir0 = contactPoint->m_normal.CrossProduct(tangentDir);
@@ -1339,7 +1334,9 @@ bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKin
 	//	}
 	//}
 	//return ret;
-	return dOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
+
+	bool test = body0->GetCollisionShape().GetCollisionMode() & body1->GetCollisionShape().GetCollisionMode();
+	return test && dOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
 }
 
 ndJointBilateralConstraint* ndScene::FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const
@@ -1391,6 +1388,7 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 	if (!contact) 
 	{
 		const ndJointBilateralConstraint* const bilateral = FindBilateralJoint(body0, body1);
+
 		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
 		if (isCollidable) 
 		{
@@ -1761,7 +1759,6 @@ void ndScene::DeleteDeadContact()
 			m_contactList.DeleteContact(contact);
 			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
 		}
-		//else if (!contact->m_active || !contact->m_maxDOF)
 		else if (!contact->IsActive() || !contact->m_maxDOF)
 		{
 			activeCount--;
