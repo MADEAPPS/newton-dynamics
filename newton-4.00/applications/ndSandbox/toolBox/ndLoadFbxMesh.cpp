@@ -17,6 +17,8 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 
+using namespace ofbx;
+
 fbxDemoEntity::fbxDemoEntity(ndDemoEntity* const parent)
 	:ndDemoEntity(dGetIdentityMatrix(), parent)
 	,m_fbxMeshEffect(nullptr)
@@ -108,7 +110,7 @@ void fbxDemoEntity::ApplyTransform(const dMatrix& transform)
 	}
 }
 
-class fbxGlobalNoceMap : public dTree<fbxDemoEntity*, const ofbx::Object*>
+class fbxGlobalNodeMap : public dTree<fbxDemoEntity*, const ofbx::Object*>
 {
 };
 
@@ -181,7 +183,7 @@ static dMatrix ofbxMatrix2dMatrix(const ofbx::Matrix& fbxMatrix)
 	return matrix;
 }
 
-static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNoceMap& nodeMap)
+static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNodeMap& nodeMap)
 {
 	dInt32 stack = 0;
 	ofbx::Object* buffer[1024];
@@ -291,7 +293,7 @@ static void ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const
 	}
 }
 
-static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMap)
+static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMap)
 {
 	const ofbx::Mesh* const fbxMesh = (ofbx::Mesh*)fbxNode;
 
@@ -466,10 +468,10 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 
 static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 {
-	fbxGlobalNoceMap nodeMap;
+	fbxGlobalNodeMap nodeMap;
 	fbxDemoEntity* const entity = LoadHierarchy(fbxScene, nodeMap);
 
-	fbxGlobalNoceMap::Iterator iter(nodeMap);
+	fbxGlobalNodeMap::Iterator iter(nodeMap);
 	for (iter.Begin(); iter; iter++) 
 	{
 		ofbx::Object* const fbxNode = (ofbx::Object*)iter.GetKey();

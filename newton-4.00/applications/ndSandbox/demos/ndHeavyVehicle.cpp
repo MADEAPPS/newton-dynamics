@@ -922,8 +922,8 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	// build a floor
 	//BuildFloorBox(scene);
 	//BuildFlatPlane(scene, true);
-	//BuildStaticMesh(scene, "track.fbx", true);
-	BuildStaticMesh(scene, "playerarena.fbx", true);
+	BuildStaticMesh(scene, "track.fbx", true);
+	//BuildStaticMesh(scene, "playerarena.fbx", true);
 
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
 
@@ -934,14 +934,14 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndVehicleSelector* const controls = new ndVehicleSelector();
 	scene->GetWorld()->AddModel(controls);
 
-	ndHeavyMultiBodyVehicle* const vehicle = new ndTractorVehicle(scene, tractorDesc, matrix);
-	//ndHeavyMultiBodyVehicle* const vehicle = new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix);
+	//ndHeavyMultiBodyVehicle* const vehicle = new ndTractorVehicle(scene, tractorDesc, matrix);
+	ndHeavyMultiBodyVehicle* const vehicle = new ndLav25Vehicle(scene, lav25Desc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
 	matrix.m_posit.m_x += 8.0f;
 	matrix.m_posit.m_z += 2.0f;
-	//scene->GetWorld()->AddModel(new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix));
+	scene->GetWorld()->AddModel(new ndTractorVehicle(scene, tractorDesc, matrix));
 	//for (dInt32 i = 0; i < 10; i++)
 	//{
 	//	matrix.m_posit.m_y += 4.0f;
@@ -949,7 +949,7 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	//}
 	
 	matrix.m_posit.m_x += 15.0f;
-	//AddPlanks(scene, matrix.m_posit, 300.0f);
+	AddPlanks(scene, matrix.m_posit, 300.0f);
 
 	scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle);
 
