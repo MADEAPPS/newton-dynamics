@@ -515,7 +515,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		//cannon servo controller actuator
 		ndBodyDynamic* const frontBucketBody = MakeChildPart(scene, frontBucketArmBody, "frontBucket", m_configuration.m_chassisMass * 0.025f);
 		dMatrix frontBucketMatrix(m_localFrame * frontBucketBody->GetMatrix());
-		m_cannonHinge = new ndJointHingeActuator(frontBucketMatrix, 2.5f, -10.0f * dDegreeToRad, 110.0f * dDegreeToRad, frontBucketBody, frontBucketArmBody);
+		m_cannonHinge = new ndJointHingeActuator(frontBucketMatrix, 2.5f, -75.0f * dDegreeToRad, 80.0f * dDegreeToRad, frontBucketBody, frontBucketArmBody);
 		world->AddJoint(m_cannonHinge);
 		dFloat32 y = frontBucketMatrix[1][1];
 		dFloat32 x = dSqrt(frontBucketMatrix[1][0] * frontBucketMatrix[1][0] + frontBucketMatrix[1][2] * frontBucketMatrix[1][2] + 1.0e-6f);
