@@ -25,7 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_MINIMUM_SLIP_OMEGA dFloat32 (10.0f)
+#define D_MINIMUM_SLIP_OMEGA dFloat32 (2.0f)
 
 class ndMultiBodyVehicleDifferential : public ndJointBilateralConstraint
 {

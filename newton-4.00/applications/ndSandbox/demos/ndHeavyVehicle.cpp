@@ -780,7 +780,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 
 		// slip differential with hight slip ratio 
 		ndMultiBodyVehicleDifferential* const differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential, frontDifferential);
-		differential->SetSlipOmega(100.0f);
+		differential->SetSlipOmega(2.0f * differential->GetSlipOmega());
 
 		// add the gear box
 		AddGearBox(world, m_motor, differential);
@@ -818,12 +818,11 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		matrix0.m_posit = attachmentNode->CalculateGlobalMatrix(nullptr).m_posit;
 		world->AddJoint(new ndHydraulicAttachement(matrix0, body1, attachmentBody));
 
-
 		// For now let these part collide and make sure the shape to no intersect.
-		// a further optimization si to make these part non collidable,
-		// but them the part will not collide with anything.
-		// a better way is to to add collision flags and filter collision, 
-		// but this is outside the scope of the demo.
+		// a further optimization is to make these part non collidable,
+		// but them the parts will not collide with anything.
+		// a better way is to to add collision flags and filter collision 
+		// with the vehicle parts, but this is outside the scope of the demo.
 		//body0->GetCollisionShape().SetCollisionMode(false);
 		//body1->GetCollisionShape().SetCollisionMode(false);
 	}
