@@ -14,10 +14,6 @@ if (NEWTON_BUILD_TEST)
 	add_subdirectory(ndTest)
 endif()
 
-if (NEWTON_CREATE_C_INTERFACE)
-	add_subdirectory(ndTestC)
-endif()
-
 if (NEWTON_BUILD_SANDBOX_DEMOS)
 	add_subdirectory(ndSandbox)
 	

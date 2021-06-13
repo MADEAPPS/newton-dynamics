@@ -28,7 +28,7 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 {
 	public:
 	ndVehicleDectriptorViper()
-		:ndVehicleDectriptor("viper1.fbx")
+		:ndVehicleDectriptor("viper.fbx")
 	{
 		m_comDisplacement = dVector(0.25f, -0.35f, 0.0f, 0.0f);
 
