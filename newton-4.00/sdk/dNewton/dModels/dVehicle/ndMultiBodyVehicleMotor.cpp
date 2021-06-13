@@ -75,8 +75,8 @@ void ndMultiBodyVehicleMotor::SetStart(bool startkey)
 
 void ndMultiBodyVehicleMotor::SetRpmLimits(dFloat32 idleRpm, dFloat32 redLineRpm)
 {
-	m_idleOmega = dAbs(idleRpm / dFloat32(9.55f));
-	m_maxOmega = dMax(redLineRpm / dFloat32(9.55f), m_idleOmega);
+	m_idleOmega = dAbs(idleRpm / dRadPerSecToRpm);
+	m_maxOmega = dMax(redLineRpm / dRadPerSecToRpm, m_idleOmega);
 }
 
 void ndMultiBodyVehicleMotor::SetTorque(dFloat32 torqueInNewtonMeters)

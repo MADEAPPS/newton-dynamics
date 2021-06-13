@@ -128,6 +128,7 @@ class ndVehicleDectriptor
 
 	dFloat32 m_differentialMass;
 	dFloat32 m_differentialRadius;
+	dFloat32 m_slipDifferentialRmpLock;
 	ndDifferentialType m_differentialType;
 
 	dFloat32 m_torsionBarSpringK;

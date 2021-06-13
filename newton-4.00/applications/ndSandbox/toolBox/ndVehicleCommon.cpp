@@ -134,22 +134,23 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_transmission.m_lockedClutchTorque = 1.0e5f;
 
 	m_frontTire.m_mass = 20.0f;
-	m_frontTire.m_steeringAngle = 35.0f;
 	m_frontTire.m_springK = 1000.0f;
 	m_frontTire.m_damperC = 20.0f;
 	m_frontTire.m_regularizer = 0.1f;
 	m_frontTire.m_upperStop = -0.05f;
 	m_frontTire.m_lowerStop = 0.2f;
+	m_frontTire.m_steeringAngle = 35.0f;
 	m_frontTire.m_verticalOffset = 0.0f;
 	m_frontTire.m_laterialStiffeness = 100.0f / 1000.0f;
 	m_frontTire.m_longitudinalStiffeness = 600.0f / 1000.0f;
 
-	m_rearTire.m_steeringAngle = 0.0f;
+	m_rearTire.m_mass = 20.0f;
 	m_rearTire.m_springK = 1000.0f;
 	m_rearTire.m_damperC = 20.0f;
 	m_rearTire.m_regularizer = 0.1f;
 	m_rearTire.m_upperStop = -0.05f;
 	m_rearTire.m_lowerStop = 0.2f;
+	m_rearTire.m_steeringAngle = 0.0f;
 	m_frontTire.m_verticalOffset = 0.0f;
 	m_rearTire.m_laterialStiffeness = 100.0f / 1000.0f;
 	m_rearTire.m_longitudinalStiffeness = 600.0f / 1000.0f;
@@ -162,6 +163,7 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 
 	m_differentialMass = 20.0f;
 	m_differentialRadius = 0.25f;
+	m_slipDifferentialRmpLock = 30.0f;
 	m_frictionCoefficientScale = 1.5f;
 
 	m_torsionBarSpringK = 100.0f;
@@ -346,7 +348,7 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 			m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 		}
 
-		const dFloat32 omega = m_motor->GetRpm() / 9.55f;
+		const dFloat32 omega = m_motor->GetRpm() / dRadPerSecToRpm;
 		if (!m_isManualTransmission && (m_autoGearShiftTimer < 0))
 		{
 			if (m_currentGear < m_configuration.m_transmission.m_gearsCount)
@@ -408,7 +410,7 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 
 		m_motor->SetThrottle(throttle);
 		m_motor->SetFuelRate(m_configuration.m_engine.GetFuelRate());
-		m_motor->SetTorque(m_configuration.m_engine.GetTorque(m_motor->GetRpm() / 9.55f));
+		m_motor->SetTorque(m_configuration.m_engine.GetTorque(m_motor->GetRpm() / dRadPerSecToRpm));
 	}
 
 	if (m_isParked)

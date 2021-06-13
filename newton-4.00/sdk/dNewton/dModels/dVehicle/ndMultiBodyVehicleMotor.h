@@ -70,7 +70,7 @@ inline bool ndMultiBodyVehicleMotor::GetStart() const
 
 inline dFloat32 ndMultiBodyVehicleMotor::GetRpm() const
 {
-	return m_omega * dFloat32(9.55f);
+	return m_omega * dRadPerSecToRpm;
 }
 
 #endif

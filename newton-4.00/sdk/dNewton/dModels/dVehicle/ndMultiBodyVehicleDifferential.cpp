@@ -23,10 +23,11 @@
 #include "ndNewtonStdafx.h"
 #include "ndMultiBodyVehicleDifferential.h"
 
-ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(ndBodyKinematic* const differential, ndBodyKinematic* const chassis)
+ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(ndBodyKinematic* const differential, ndBodyKinematic* const chassis, dFloat32 slipOmegaLock)
 	:ndJointBilateralConstraint(2, differential, chassis, differential->GetMatrix())
-	,m_limitedSlipOmega(D_MINIMUM_SLIP_OMEGA * dFloat32 (1.0f))
+	,m_limitedSlipOmega(slipOmegaLock)
 {
+	dAssert(slipOmegaLock >= 0.0f);
 }
 
 void ndMultiBodyVehicleDifferential::AlignMatrix()

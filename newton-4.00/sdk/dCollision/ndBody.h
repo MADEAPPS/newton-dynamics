@@ -73,7 +73,6 @@ class ndBody: public dClassAlloc
 
 	D_COLLISION_API dVector GetVelocityAtPoint(const dVector& point) const;
 
-
 	protected:
 	D_COLLISION_API static const nd::TiXmlNode* FindNode(const nd::TiXmlNode* const rootNode, const char* const name);
 	D_COLLISION_API virtual nd::TiXmlElement* CreateRootElement(nd::TiXmlElement* const rootNode, const char* const name, dInt32 nodeid) const;
