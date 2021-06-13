@@ -15,6 +15,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
+#include "ndDemoSplinePathMesh.h"
 
 ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene)
 {
@@ -197,4 +198,67 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 
 	entity->CleanIntermediate();
 	return body;
+}
+
+ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* const meshName, bool optimized)
+{
+	dFloat64 knots[] = { 0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f };
+	dBigVector control[] =
+	{
+		dBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
+		dBigVector(-36.0f, 1.0f,   4.0f, 1.0f),
+		dBigVector(  4.0f, 1.0f,  15.0f, 1.0f),
+		dBigVector( 44.0f, 1.0f,   4.0f, 1.0f),
+		dBigVector(  4.0f, 1.0f, -22.0f, 1.0f),
+		dBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
+	};
+
+	dBezierSpline spline;
+	spline.CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
+
+	// recreate the spline from sample points at equally spaced distance 
+	//ndPhysicsWorld* const world = scene->GetWorld();
+
+	dMatrix matrix(dGetIdentityMatrix());
+	ndDemoSplinePathMesh* const splineMesh = new ndDemoSplinePathMesh(spline, scene->GetShaderCache(), 500);
+	splineMesh->SetColor(dVector(1.0f, 0.0f, 0.0f, 1.0f));
+	ndDemoEntity* const splineEntity = new ndDemoEntity(matrix, nullptr);
+	scene->AddEntity(splineEntity);
+	splineEntity->SetMesh(splineMesh, dGetIdentityMatrix());
+	splineMesh->SetVisible(true);
+	splineMesh->Release();
+
+	{
+		// try different degrees
+		//dBigVector points[4];
+		//points[0] = dBigVector(-16.0f, 1.0f, -10.0f, 1.0f);
+		//points[1] = dBigVector(-36.0f, 1.0f, 4.0f, 1.0f);
+		//points[2] = dBigVector(4.0f, 1.0f, 15.0f, 1.0f);
+		//points[3] = dBigVector(44.0f, 1.0f, 4.0f, 1.0f);
+		dInt32 size = sizeof(control) / sizeof(control[0]);
+
+		dBigVector derivP0(control[1] - control[size-1]);
+		dBigVector derivP1(control[0] - control[size - 2]);
+
+		dBezierSpline spline1;
+		spline1.GlobalCubicInterpolation(size, control, derivP0, derivP1);
+
+		//dFloat64 u = (knots[1] + knots[2]) * 0.5f;
+		//spline.InsertKnot(u);
+		//spline.InsertKnot(u);
+		//spline.InsertKnot(u);
+		//spline.InsertKnot(u);
+		//spline.InsertKnot(u);
+		//spline.RemoveKnot(u, 1.0e-3f);
+		ndDemoSplinePathMesh* const splineMesh1 = new ndDemoSplinePathMesh(spline1, scene->GetShaderCache(), 500);
+		splineMesh1->SetColor(dVector(0.0f, 1.0f, 0.0f, 1.0f));
+		ndDemoEntity* const splineEntity1 = new ndDemoEntity(matrix, nullptr);
+		scene->AddEntity(splineEntity1);
+		splineEntity1->SetMesh(splineMesh1, dGetIdentityMatrix());
+		splineMesh1->SetVisible(true);
+		splineMesh1->Release();
+	}
+
+
+	return BuildStaticMesh(scene, meshName, optimized);
 }

@@ -566,7 +566,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//BuildFloorBox(scene);
 	//BuildFlatPlane(scene, true);
 	//BuildStaticMesh(scene, "track.fbx", true);
-	BuildStaticMesh(scene, "playerarena.fbx", true);
+	//BuildStaticMesh(scene, "playerarena.fbx", true);
+	BuildSplineTrack(scene, "playerarena.fbx", true);
 
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
 

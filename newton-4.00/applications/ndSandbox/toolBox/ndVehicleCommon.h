@@ -74,6 +74,7 @@ class ndVehicleDectriptor
 		dFloat32 m_lockedClutchTorque;
 		dFloat32 m_crownGearRatio;
 		dFloat32 m_torqueConverter;
+		bool m_manual;
 	};
 
 	class ndTireDefinition

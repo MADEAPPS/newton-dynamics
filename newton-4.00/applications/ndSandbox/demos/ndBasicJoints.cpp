@@ -17,8 +17,8 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
-#include "ndDemoSplinePathMesh.h"
 #include "ndDemoEntityManager.h"
+#include "ndDemoSplinePathMesh.h"
 #include "ndDemoInstanceEntity.h"
 
 class ndFollowSplinePath : public ndJointFollowPath

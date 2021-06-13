@@ -16,10 +16,10 @@
 #include "ndDemoSplinePathMesh.h"
 #include "ndDemoEntityManager.h"
 
-
 ndDemoSplinePathMesh::ndDemoSplinePathMesh(const dBezierSpline& curve, const ndShaderPrograms& shaderCache, dInt32 resolution)
 	:ndDemoMeshInterface()
 	,m_curve(curve)
+	,m_color(1.0f)
 	,m_renderResolution(0)
 {
 	m_isVisible = false;
@@ -43,6 +43,11 @@ ndDemoSplinePathMesh::~ndDemoSplinePathMesh()
 dInt32 ndDemoSplinePathMesh::GetRenderResolution() const
 {
 	return m_renderResolution;
+}
+
+void ndDemoSplinePathMesh::SetColor(const dVector& color)
+{
+	m_color = color;
 }
 
 void ndDemoSplinePathMesh::SetRenderResolution(dInt32 breaks)
@@ -95,10 +100,10 @@ void ndDemoSplinePathMesh::Render(ndDemoEntityManager* const scene, const dMatri
 		dMatrix viewProjectionMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 
 		GLfloat color[4];
-		color[0] = 1.0f;
-		color[1] = 1.0f;
-		color[2] = 1.0f;
-		color[3] = 1.0f;
+		color[0] = m_color.m_x;
+		color[1] = m_color.m_y;
+		color[2] = m_color.m_z;
+		color[3] = m_color.m_w;
 
 		glUseProgram(m_shader);
 		glUniform4fv(m_shadeColorLocation, 1, color);

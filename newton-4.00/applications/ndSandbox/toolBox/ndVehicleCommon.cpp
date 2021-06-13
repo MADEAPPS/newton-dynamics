@@ -132,6 +132,7 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_transmission.m_torqueConverter = 1000.0f;
 	m_transmission.m_idleClutchTorque = 200.0f;
 	m_transmission.m_lockedClutchTorque = 1.0e5f;
+	m_transmission.m_manual = true;
 
 	m_frontTire.m_mass = 20.0f;
 	m_frontTire.m_springK = 1000.0f;
@@ -233,7 +234,7 @@ ndBasicVehicle::ndBasicVehicle(const ndVehicleDectriptor& desc)
 	,m_autoGearShiftTimer(0)
 	,m_isPlayer(false)
 	,m_isParked(true)
-	,m_isManualTransmission(false)
+	,m_isManualTransmission(desc.m_transmission.m_manual)
 {
 }
 
