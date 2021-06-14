@@ -154,7 +154,7 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 	{
 	}
 
-	void OnTranform(dInt32, const dMatrix&)
+	void OnTransform(dInt32, const dMatrix&)
 	{
 		ndBodySphFluid* const fluid = GetBody()->GetAsBodySphFluid();
 		dAssert(fluid);

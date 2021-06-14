@@ -27,7 +27,7 @@
 
 
 #define	D_VIRTUAL_MACHINE_NAME			"nvm"
-#define	D_VIRTUAL_MACHINE_DESCRIPTION	"Newton Virtual Machine, 32 litle indian, 32 int registers, 32 double precision floating point registers"
+#define	D_VIRTUAL_MACHINE_DESCRIPTION	"Newton Virtual Machine, 32 litle endian, 32 int registers, 32 double precision floating point registers"
 
 
 #define D_OPCODE_FIELD					7

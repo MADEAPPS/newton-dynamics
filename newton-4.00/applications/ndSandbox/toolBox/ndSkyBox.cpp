@@ -113,7 +113,7 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 	size_t ret = fread(&tgaHeader, 18, 1, pFile);
 	ret = 0;
 	
-	// Do byte swap for big vs little Indian
+	// Do byte swap for big vs little endian
 	tgaHeader.colorMapStart = SWAP_INT16(tgaHeader.colorMapStart);
 	tgaHeader.colorMapLength = SWAP_INT16(tgaHeader.colorMapLength);
 	tgaHeader.xstart = SWAP_INT16(tgaHeader.xstart);

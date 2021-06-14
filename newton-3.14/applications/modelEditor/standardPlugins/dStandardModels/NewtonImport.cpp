@@ -60,7 +60,7 @@ bool NewtonImport::Import (const char* const fileName, dScene* const scene, dUnd
 
 void NewtonImport::DeserializeFile (void* const serializeHandle, void* const buffer, int size)
 {
-	// check that each chunk is a multiple of 4 bytes, this is useful for easy little to big Indian conversion
+	// check that each chunk is a multiple of 4 bytes, this is useful for easy endian conversion
 	_ASSERTE ((size & 0x03) == 0);
 	fread (buffer, size, 1, (FILE*) serializeHandle);
 }

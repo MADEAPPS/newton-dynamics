@@ -40,7 +40,7 @@ class ndBodyNotify: public dClassAlloc
 	dVector GetGravity() const;
 	void SetGravity(const dVector& defualtGravity);
 
-	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix);
+	virtual void OnTransform(dInt32 threadIndex, const dMatrix& matrix);
 
 	D_COLLISION_API virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep);
 	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath) const;
@@ -89,7 +89,7 @@ inline void* ndBodyNotify::GetUserData() const
 	return nullptr;
 }
 
-inline void ndBodyNotify::OnTranform(dInt32, const dMatrix&)
+inline void ndBodyNotify::OnTransform(dInt32, const dMatrix&)
 {
 }
 

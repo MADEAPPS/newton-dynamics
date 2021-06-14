@@ -28,7 +28,7 @@
 //	{
 //	}
 //
-//	//void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
+//	//void OnTransform(dInt32 threadIndex, const dMatrix& matrix)
 //	//{
 //	//	dMatrix parentMatrix(m_chassis->GetMatrix());
 //	//	dMatrix localMatrix(matrix * parentMatrix.Inverse());

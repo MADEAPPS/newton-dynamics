@@ -10,7 +10,7 @@
 */
 
 #ifndef __D_JOINT_PLANE_H__
-#define __D_JOINT_PLANR_H__
+#define __D_JOINT_PLANE_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"

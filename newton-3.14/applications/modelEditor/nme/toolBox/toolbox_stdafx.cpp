@@ -29,7 +29,7 @@ unsigned dRand ()
 
 
 
-	// little Indian/big Indian conversion
+	// endian conversion
 #ifdef __ppc__
 	unsigned short SWAP_INT16(unsigned short x)
 	{
