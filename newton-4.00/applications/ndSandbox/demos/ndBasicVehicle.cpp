@@ -564,8 +564,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFloorBox(scene);
-	//BuildFlatPlane(scene, true);
-	BuildStaticMesh(scene, "track.fbx", true);
+	BuildFlatPlane(scene, false);
+	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
 
@@ -583,15 +583,15 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
-	matrix.m_posit.m_x += 8.0f;
-	matrix.m_posit.m_z += 6.0f;
-	scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix));
-
-	matrix.m_posit.m_z -= 14.0f;
-	scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix));
-
-	matrix.m_posit.m_x += 15.0f;
-	AddPlanks(scene, matrix.m_posit, 60.0f);
+	//matrix.m_posit.m_x += 8.0f;
+	//matrix.m_posit.m_z += 6.0f;
+	//scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix));
+	//
+	//matrix.m_posit.m_z -= 14.0f;
+	//scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix));
+	//
+	//matrix.m_posit.m_x += 15.0f;
+	//AddPlanks(scene, matrix.m_posit, 60.0f);
 
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 

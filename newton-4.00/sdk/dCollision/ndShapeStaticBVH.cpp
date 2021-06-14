@@ -140,7 +140,8 @@ dIntersectStatus ndShapeStaticBVH::ShowDebugPolygon(void* const context, const d
 	{
 		dVector p(&polygon[indexArray[i] * stride]);
 		poly[i] = data.m_matrix.TransformVector(p & dVector::m_triplexMask);
-		edgeType[i] = ndShapeDebugCallback::m_shared;
+		dInt32 edgeIndexType = (indexArray[i + indexCount + 2]) & D_CONCAVE_EDGE_MASK;
+		edgeType[i] = edgeIndexType ? ndShapeDebugCallback::m_open : ndShapeDebugCallback::m_shared;
 	}
 	//dAssert(0);
 	data.m_callback->DrawPolygon(indexCount, poly, edgeType);

@@ -247,10 +247,10 @@ class dAabbPolygonSoup::dgSpliteInfo
 
 dAabbPolygonSoup::dAabbPolygonSoup ()
 	:dPolygonSoupDatabase()
+	,m_aabb(nullptr)
+	,m_indices____(nullptr)
 	,m_nodesCount(0)
 	,m_indexCount(0)
-	,m_aabb(nullptr)
-	,m_indices(nullptr)
 {
 }
 
@@ -259,7 +259,7 @@ dAabbPolygonSoup::~dAabbPolygonSoup ()
 	if (m_aabb) 
 	{
 		dMemory::Free(m_aabb);
-		dMemory::Free(m_indices);
+		dMemory::Free(m_indices____);
 	}
 }
 
@@ -570,11 +570,10 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 				}
 				if (maxDist1 < dFloat32(1.0e-3f))
 				{
-					dAssert(offsetIndex0 != -1);
-					dAssert(offsetIndex1 != -1);
+					dAssert(offsetIndex0 >= 0);
+					dAssert(offsetIndex1 >= 0);
 					indexArray0[indexCount0 + 2 + offsetIndex0] = indexArray1[indexCount1 + 1];
 					indexArray1[indexCount1 + 2 + offsetIndex1] = indexArray0[indexCount0 + 1];
-					maxDist1 *= 1;
 				}
 			}
 		}
@@ -593,7 +592,7 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 			if (vCount) 
 			{
 				dInt32 index = dInt32 (node->m_left.GetIndex());
-				dInt32* const face = &m_indices[index];
+				dInt32* const face = &m_indices____[index];
 	
 				dInt32 j0 = 2 * (vCount + 1) - 1;
 				dVector normal (&vertexArray[face[vCount + 1]].m_x);
@@ -606,7 +605,7 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 					dInt32 j1 = vCount + 2 + j;
 					dVector q1 (&vertexArray[face[j]].m_x);
 					q1 = q1 & dVector::m_triplexMask;
-					if (face[j0] == -1) 
+					if (face[j0] & D_CONCAVE_EDGE_MASK)
 					{
 						dVector e (q1 - q0);
 						dVector n (e.CrossProduct(normal).Normalize());
@@ -614,7 +613,8 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 						pool[normalCount].m_x = n.m_x;
 						pool[normalCount].m_y = n.m_y;
 						pool[normalCount].m_z = n.m_z;
-						face[j0] = -normalCount - 1;
+						//face[j0] = -normalCount - 1;
+						face[j0] = normalCount | D_CONCAVE_EDGE_MASK;
 						normalCount ++;
 					}
 					q0 = q1;
@@ -623,11 +623,13 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 			}
 		}
 	
-		if (node->m_right.IsLeaf()) {
+		if (node->m_right.IsLeaf()) 
+		{
 			dInt32 vCount = dInt32 (node->m_right.GetCount());
-			if (vCount) {
+			if (vCount) 
+			{
 				dInt32 index = dInt32 (node->m_right.GetIndex());
-				dInt32* const face = &m_indices[index];
+				dInt32* const face = &m_indices____[index];
 	
 				dInt32 j0 = 2 * (vCount + 1) - 1;
 				dVector normal (&vertexArray[face[vCount + 1]].m_x);
@@ -635,18 +637,21 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 				dAssert (dAbs (normal.DotProduct(normal).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
 				dVector q0 (&vertexArray[face[vCount - 1]].m_x);
 				q0 = q0 & dVector::m_triplexMask;
-				for (dInt32 j = 0; j < vCount; j ++) {
+				for (dInt32 j = 0; j < vCount; j ++) 
+				{
 					dInt32 j1 = vCount + 2 + j;
 					dVector q1 (&vertexArray[face[j]].m_x);
 					q1 = q1 & dVector::m_triplexMask;
-					if (face[j0] == -1) {
+					if (face[j0] & D_CONCAVE_EDGE_MASK)
+					{
 						dVector e (q1 - q0);
 						dVector n (e.CrossProduct(normal).Normalize());
 						dAssert (dAbs (n.DotProduct(n).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
 						pool[normalCount].m_x = n.m_x;
 						pool[normalCount].m_y = n.m_y;
 						pool[normalCount].m_z = n.m_z;
-						face[j0] = -normalCount - 1;
+						//face[j0] = -normalCount - 1;
+						face[j0] = normalCount | D_CONCAVE_EDGE_MASK;
 						normalCount ++;
 					}
 					q0 = q1;
@@ -677,16 +682,21 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 			{
 				dInt32 vCount = dInt32 (node->m_left.GetCount());
 				dInt32 index = dInt32 (node->m_left.GetIndex());
-				dInt32* const face = &m_indices[index];
+				dInt32* const face = &m_indices____[index];
 				for (dInt32 j = 0; j < vCount; j ++) 
 				{
-					if (face[vCount + 2 + j] < 0) 
+					dInt32 edgeIndexNormal = face[vCount + 2 + j];
+					//if (face[vCount + 2 + j] < 0) 
+					if (edgeIndexNormal & D_CONCAVE_EDGE_MASK)
 					{
-						dInt32 k = -1 - face[vCount + 2 + j];
-						face[vCount + 2 + j] = indexArray[k] + oldCount;
+						//dInt32 k = -1 - face[vCount + 2 + j];
+						//face[vCount + 2 + j] = indexArray[k] + oldCount;
+						dInt32 k = edgeIndexNormal & (~D_CONCAVE_EDGE_MASK);
+						face[vCount + 2 + j] = (indexArray[k] + oldCount) | D_CONCAVE_EDGE_MASK;
 					}
 					#ifdef _DEBUG	
-						dVector normal (&vertexArray1[face[vCount + 2 + j]].m_x);
+						//dVector normal (&vertexArray1[face[vCount + 2 + j]].m_x);
+						dVector normal (&vertexArray1[face[vCount + 2 + j] & (~D_CONCAVE_EDGE_MASK)].m_x);
 						normal = normal & dVector::m_triplexMask;
 						dAssert (dAbs (normal.DotProduct(normal).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
 					#endif
@@ -697,17 +707,22 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 			{
 				dInt32 vCount = dInt32 (node->m_right.GetCount());
 				dInt32 index = dInt32 (node->m_right.GetIndex());
-				dInt32* const face = &m_indices[index];
+				dInt32* const face = &m_indices____[index];
 				for (dInt32 j = 0; j < vCount; j ++) 
 				{
-					if (face[vCount + 2 + j] < 0) 
+					dInt32 edgeIndexNormal = face[vCount + 2 + j];
+					//if (face[vCount + 2 + j] < 0) 
+					if (edgeIndexNormal & D_CONCAVE_EDGE_MASK)
 					{
-						dInt32 k = -1 - face[vCount + 2 + j];
-						face[vCount + 2 + j] = indexArray[k] + oldCount;
+						//dInt32 k = -1 - face[vCount + 2 + j];
+						//face[vCount + 2 + j] = indexArray[k] + oldCount;
+						dInt32 k = edgeIndexNormal & (~D_CONCAVE_EDGE_MASK);
+						face[vCount + 2 + j] = (indexArray[k] + oldCount) | D_CONCAVE_EDGE_MASK;
 					}
 	
 					#ifdef _DEBUG	
-						dVector normal (&vertexArray1[face[vCount + 2 + j]].m_x);
+						//dVector normal (&vertexArray1[face[vCount + 2 + j]].m_x);
+						dVector normal(&vertexArray1[face[vCount + 2 + j] & (~D_CONCAVE_EDGE_MASK)].m_x);
 						normal = normal & dVector::m_triplexMask;
 						dAssert (dAbs (normal.DotProduct(normal).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
 					#endif
@@ -715,53 +730,6 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 			}
 		}
 	}
-}
-
-dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormalsOld (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32)
-{
-	dInt32 stride = dInt32 (strideInBytes / sizeof (dFloat32));
-
-	AdjacentdFace adjacentFaces;
-	adjacentFaces.m_count = indexCount;
-	adjacentFaces.m_index = (dInt32*) indexArray;
-
-	dVector n (&polygon[indexArray[indexCount + 1] * stride]);
-	dVector p (&polygon[indexArray[0] * stride]);
-	n = n & dVector::m_triplexMask;
-	p = p & dVector::m_triplexMask;
-	adjacentFaces.m_normal = dPlane (n, - n.DotProduct(p).GetScalar());
-
-	dAssert (indexCount < dInt32 (sizeof (adjacentFaces.m_edgeMap) / sizeof (adjacentFaces.m_edgeMap[0])));
-
-	dInt32 edgeIndex = indexCount - 1;
-	dInt32 i0 = indexArray[indexCount - 1];
-	dVector p0 ( dFloat32 (1.0e15f),  dFloat32 (1.0e15f),  dFloat32 (1.0e15f), dFloat32 (0.0f)); 
-	dVector p1 (-dFloat32 (1.0e15f), -dFloat32 (1.0e15f), -dFloat32 (1.0e15f), dFloat32 (0.0f)); 
-	for (dInt32 i = 0; i < indexCount; i ++) 
-	{
-		dInt32 i1 = indexArray[i];
-		dInt32 index = i1 * stride;
-		dVector point (&polygon[index]);
-		point = point & dVector::m_triplexMask;
-		p0 = p0.GetMin(point);
-		p1 = p1.GetMax(point);
-		adjacentFaces.m_edgeMap[edgeIndex] = (dInt64 (i1) << 32) + i0;
-		edgeIndex = i;
-		i0 = i1;
-	}
-
-	dFloat32 padding = dFloat32 (1.0f/16.0f);
-	p0.m_x -= padding;
-	p0.m_y -= padding;
-	p0.m_z -= padding;
-	p1.m_x += padding;
-	p1.m_y += padding;
-	p1.m_z += padding;
-
-	dAabbPolygonSoup* const me = (dAabbPolygonSoup*) context;
-	dFastAabbInfo box (p0, p1);
-	me->ForAllSectors (box, dVector::m_zero, dFloat32 (1.0f), CalculateDisjointedFaceEdgeNormals, &adjacentFaces);
-	return t_ContinueSearh;
 }
 
 dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormals(void* const context, const dFloat32* const, dInt32, const dInt32* const indexArray, dInt32 indexCount, dFloat32)
@@ -929,7 +897,8 @@ void dAabbPolygonSoup::Create (const dPolygonSoupBuilder& builder)
 	{
 		m_indexCount *= 2;
 	}
-	m_indices = (dInt32*) dMemory::Malloc (sizeof (dInt32) * m_indexCount);
+
+	m_indices____ = (dInt32*) dMemory::Malloc (sizeof (dInt32) * m_indexCount);
 	dStack<dVector> tmpVertexArrayCont(builder.m_vertexPoints.GetCount() + builder.m_normalPoints.GetCount() + builder.m_faceVertexCount.GetCount() * 2 + 4);
 
 	dVector* const tmpVertexArray = &tmpVertexArrayCont[0];
@@ -1096,16 +1065,16 @@ void dAabbPolygonSoup::Create (const dPolygonSoupBuilder& builder)
 			// index format i0, i1, i2, ... , id, normal, e0Normal, e1Normal, e2Normal, ..., faceSize
 			for (dInt32 j = 0; j < node->m_indexCount; j ++) 
 			{
-				m_indices[indexMap + j] = node->m_faceIndices[j];
-				m_indices[indexMap + j + node->m_indexCount + 2] = -1;
+				m_indices____[indexMap + j] = node->m_faceIndices[j];
+				m_indices____[indexMap + j + node->m_indexCount + 2] = D_CONCAVE_EDGE_MASK | 0xffffffff;
 			}
 
 			// face attribute
-			m_indices[indexMap + node->m_indexCount] = node->m_faceIndices[node->m_indexCount];
+			m_indices____[indexMap + node->m_indexCount] = node->m_faceIndices[node->m_indexCount];
 			// face normal
-			m_indices[indexMap + node->m_indexCount + 1] = builder.m_vertexPoints.GetCount() + builder.m_normalIndex[node->m_faceIndex];
+			m_indices____[indexMap + node->m_indexCount + 1] = builder.m_vertexPoints.GetCount() + builder.m_normalIndex[node->m_faceIndex];
 			// face size
-			m_indices[indexMap + node->m_indexCount * 2 + 2] = dInt32 (CalculateFaceMaxSize (&tmpVertexArray[0], node->m_indexCount, node->m_faceIndices));
+			m_indices____[indexMap + node->m_indexCount * 2 + 2] = dInt32 (CalculateFaceMaxSize (&tmpVertexArray[0], node->m_indexCount, node->m_faceIndices));
 
 			indexMap += node->m_indexCount * 2 + 3;
 		}
@@ -1160,7 +1129,7 @@ void dAabbPolygonSoup::Serialize (const char* const path) const
 		if (m_aabb)
 		{
 			fwrite(m_localVertex, sizeof(dTriplex) * m_vertexCount, 1, file);
-			fwrite(m_indices, sizeof(dInt32) * m_indexCount, 1, file);
+			fwrite(m_indices____, sizeof(dInt32) * m_indexCount, 1, file);
 			fwrite(m_aabb, sizeof(dNode) * m_nodesCount, 1, file);
 		}
 		fclose(file);
@@ -1173,9 +1142,6 @@ void dAabbPolygonSoup::Deserialize (const char* const path)
 	if (file)
 	{
 		m_strideInBytes = sizeof(dTriplex);
-		//callback(userData, &m_vertexCount, sizeof(dInt32));
-		//callback(userData, &m_indexCount, sizeof(dInt32));
-		//callback(userData, &m_nodesCount, sizeof(dInt32));
 		fread(&m_vertexCount, sizeof(dInt32), 1, file);
 		fread(&m_indexCount, sizeof(dInt32), 1, file);
 		fread(&m_nodesCount, sizeof(dInt32), 1, file);
@@ -1183,20 +1149,17 @@ void dAabbPolygonSoup::Deserialize (const char* const path)
 		if (m_vertexCount) 
 		{
 			m_localVertex = (dFloat32*)dMemory::Malloc(sizeof(dTriplex) * m_vertexCount);
-			m_indices = (dInt32*)dMemory::Malloc(sizeof(dInt32) * m_indexCount);
+			m_indices____ = (dInt32*)dMemory::Malloc(sizeof(dInt32) * m_indexCount);
 			m_aabb = (dNode*)dMemory::Malloc(sizeof(dNode) * m_nodesCount);
 
-			//callback(userData, m_localVertex, dInt32(sizeof(dTriplex) * m_vertexCount));
-			//callback(userData, m_indices, dInt32(sizeof(dInt32) * m_indexCount));
-			//callback(userData, m_aabb, dInt32(sizeof(dNode) * m_nodesCount));
 			fread(m_localVertex, sizeof(dTriplex) * m_vertexCount, 1, file);
-			fread(m_indices, sizeof(dInt32) * m_indexCount, 1, file);
+			fread(m_indices____, sizeof(dInt32) * m_indexCount, 1, file);
 			fread(m_aabb, sizeof(dNode) * m_nodesCount, 1, file);
 		}
 		else 
 		{
 			m_localVertex = nullptr;
-			m_indices = nullptr;
+			m_indices____ = nullptr;
 			m_aabb = nullptr;
 		}
 
@@ -1240,7 +1203,7 @@ dVector dAabbPolygonSoup::ForAllSectorsSupportVectex (const dVector& dir) const
 					dVector vertex (dFloat32 (0.0f));
 					for (dInt32 j = 0; j < vCount; j ++) 
 					{
-						dInt32 i0 = m_indices[index + j] * dInt32 (sizeof (dTriplex) / sizeof (dFloat32));
+						dInt32 i0 = m_indices____[index + j] * dInt32 (sizeof (dTriplex) / sizeof (dFloat32));
 						dVector p (&boxArray[i0].m_x);
 						p = p & dVector::m_triplexMask;
 						dFloat32 dist = p.DotProduct(dir).GetScalar();
@@ -1281,7 +1244,7 @@ dVector dAabbPolygonSoup::ForAllSectorsSupportVectex (const dVector& dir) const
 					dVector vertex (dFloat32 (0.0f));
 					for (dInt32 j = 0; j < vCount; j ++) 
 					{
-						dInt32 i0 = m_indices[index + j] * dInt32 (sizeof (dTriplex) / sizeof (dFloat32));
+						dInt32 i0 = m_indices____[index + j] * dInt32 (sizeof (dTriplex) / sizeof (dFloat32));
 						dVector p (&boxArray[i0].m_x);
 						p = p & dVector::m_triplexMask;
 						dFloat32 dist = p.DotProduct(dir).GetScalar();
@@ -1380,7 +1343,7 @@ void dAabbPolygonSoup::ForAllSectorsRayHit (const dFastRayTest& raySrc, dFloat32
 				if (vCount > 0) 
 				{
 					dInt32 index = dInt32 (me->m_left.GetIndex());
-					dFloat32 param = callback(context, &vertexArray[0].m_x, sizeof (dTriplex), &m_indices[index], vCount);
+					dFloat32 param = callback(context, &vertexArray[0].m_x, sizeof (dTriplex), &m_indices____[index], vCount);
 					dAssert (param >= dFloat32 (0.0f));
 					if (param < maxParam) 
 					{
@@ -1418,7 +1381,7 @@ void dAabbPolygonSoup::ForAllSectorsRayHit (const dFastRayTest& raySrc, dFloat32
 				if (vCount > 0) 
 				{
 					dInt32 index = dInt32 (me->m_right.GetIndex());
-					dFloat32 param = callback(context, &vertexArray[0].m_x, sizeof (dTriplex), &m_indices[index], vCount);
+					dFloat32 param = callback(context, &vertexArray[0].m_x, sizeof (dTriplex), &m_indices____[index], vCount);
 					dAssert (param >= dFloat32 (0.0f));
 					if (param < maxParam) 
 					{
@@ -1493,7 +1456,7 @@ void dAabbPolygonSoup::ForAllSectors (const dFastAabbInfo& obbAabbInfo, const dV
 						dInt32 vCount = dInt32 (me->m_left.GetCount());
 						if (vCount > 0) 
 						{
-							const dInt32* const indices = &m_indices[index];
+							const dInt32* const indices = &m_indices____[index];
 							dInt32 normalIndex = indices[vCount + 1];
 							dVector faceNormal (&vertexArray[normalIndex].m_x);
 							faceNormal = faceNormal & dVector::m_triplexMask;
@@ -1542,7 +1505,7 @@ void dAabbPolygonSoup::ForAllSectors (const dFastAabbInfo& obbAabbInfo, const dV
 						dInt32 vCount = dInt32 (me->m_right.GetCount());
 						if (vCount > 0) 
 						{
-							const dInt32* const indices = &m_indices[index];
+							const dInt32* const indices = &m_indices____[index];
 							dInt32 normalIndex = indices[vCount + 1];
 							dVector faceNormal (&vertexArray[normalIndex].m_x);
 							faceNormal = faceNormal & dVector::m_triplexMask;
@@ -1608,7 +1571,7 @@ void dAabbPolygonSoup::ForAllSectors (const dFastAabbInfo& obbAabbInfo, const dV
 						dInt32 vCount = dInt32 (me->m_left.GetCount());
 						if (vCount > 0) 
 						{
-							const dInt32* const indices = &m_indices[index];
+							const dInt32* const indices = &m_indices____[index];
 							dInt32 normalIndex = indices[vCount + 1];
 							dVector faceNormal (&vertexArray[normalIndex].m_x);
 							faceNormal = faceNormal & dVector::m_triplexMask;
@@ -1648,7 +1611,7 @@ void dAabbPolygonSoup::ForAllSectors (const dFastAabbInfo& obbAabbInfo, const dV
 						dInt32 vCount = dInt32 (me->m_right.GetCount());
 						if (vCount > 0) 
 						{
-							const dInt32* const indices = &m_indices[index];
+							const dInt32* const indices = &m_indices____[index];
 							dInt32 normalIndex = indices[vCount + 1];
 							dVector faceNormal (&vertexArray[normalIndex].m_x);
 							faceNormal = faceNormal & dVector::m_triplexMask;
@@ -1688,8 +1651,6 @@ void dAabbPolygonSoup::ForAllSectors (const dFastAabbInfo& obbAabbInfo, const dV
 
 void dAabbPolygonSoup::ForThisSector(const dAabbPolygonSoup::dNode* const node, const dFastAabbInfo& obbAabbInfo, const dVector& boxDistanceTravel, dFloat32, dAaabbIntersectCallback callback, void* const context) const
 {
-	//ForAllSectors(obbAabbInfo, boxDistanceTravel, maxT, callback, context);
-
 	dAssert(dAbs(dAbs(obbAabbInfo[0][0]) - obbAabbInfo.m_absDir[0][0]) < dFloat32(1.0e-4f));
 	dAssert(dAbs(dAbs(obbAabbInfo[1][1]) - obbAabbInfo.m_absDir[1][1]) < dFloat32(1.0e-4f));
 	dAssert(dAbs(dAbs(obbAabbInfo[2][2]) - obbAabbInfo.m_absDir[2][2]) < dFloat32(1.0e-4f));
@@ -1719,7 +1680,7 @@ void dAabbPolygonSoup::ForThisSector(const dAabbPolygonSoup::dNode* const node, 
 					dInt32 vCount = dInt32(node->m_left.GetCount());
 					if (vCount > 0)
 					{
-						const dInt32* const indices = &m_indices[index];
+						const dInt32* const indices = &m_indices____[index];
 						dInt32 normalIndex = indices[vCount + 1];
 						dVector faceNormal(&vertexArray[normalIndex].m_x);
 						faceNormal = faceNormal & dVector::m_triplexMask;
@@ -1739,7 +1700,7 @@ void dAabbPolygonSoup::ForThisSector(const dAabbPolygonSoup::dNode* const node, 
 					dInt32 vCount = dInt32(node->m_right.GetCount());
 					if (vCount > 0)
 					{
-						const dInt32* const indices = &m_indices[index];
+						const dInt32* const indices = &m_indices____[index];
 						dInt32 normalIndex = indices[vCount + 1];
 						dVector faceNormal(&vertexArray[normalIndex].m_x);
 						faceNormal = faceNormal & dVector::m_triplexMask;

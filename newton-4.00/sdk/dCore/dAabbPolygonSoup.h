@@ -29,6 +29,9 @@
 
 class dPolygonSoupBuilder;
 
+// index format: i0, i1, i2, ... , id, normal, e0Normal, e1Normal, e2Normal, ..., faceSize
+#define D_CONCAVE_EDGE_MASK	(1<<31)
+
 class dAabbPolygonSoup: public dPolygonSoupDatabase
 {
 	public:
@@ -233,14 +236,13 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	dgNodeBuilder* BuildTopDown (dgNodeBuilder* const leafArray, dInt32 firstBox, dInt32 lastBox, dgNodeBuilder** const allocator) const;
 	dFloat32 CalculateFaceMaxSize (const dVector* const vertex, dInt32 indexCount, const dInt32* const indexArray) const;
 	static dIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
-	static dIntersectStatus CalculateAllFaceEdgeNormalsOld (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 	static dIntersectStatus CalculateAllFaceEdgeNormals(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 	void ImproveNodeFitness (dgNodeBuilder* const node) const;
 
+	dNode* m_aabb;
+	dInt32* m_indices____;
 	dInt32 m_nodesCount;
 	dInt32 m_indexCount;
-	dNode* m_aabb;
-	dInt32* m_indices;
 	friend class ndContactSolver;
 };
 

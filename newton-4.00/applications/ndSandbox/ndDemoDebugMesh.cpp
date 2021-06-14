@@ -28,7 +28,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 		{
 		}
 
-		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex, const ndEdgeType* const edgeType)
+		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex, const ndEdgeType* const)
 		{
 			dVector p0(faceVertex[0]);
 			dVector p1(faceVertex[1]);
@@ -161,6 +161,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 		ndDrawShape()
 			:ndShapeDebugCallback()
 			,m_lines(1024)
+			,m_edgeType(1024)
 		{
 		}
 
@@ -180,11 +181,14 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 				point.m_z = faceVertex[i].m_z;
 				m_lines.PushBack(point);
 
+				m_edgeType.PushBack(edgeType[i0]);
+
 				i0 = i;
 			}
 		}
 
 		dArray<ndMeshVector> m_lines;
+		dArray<ndEdgeType> m_edgeType;
 	};
 
 	ndDrawShape drawShapes;
@@ -194,6 +198,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 	m_lines.SetCount(drawShapes.m_lines.GetCount());
 	dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_lines[0].m_x, sizeof(ndMeshVector), sizeof(ndMeshVector), 0, drawShapes.m_lines.GetCount(), &m_lines[0], dFloat32(1.0e-6f));
 
+	dTrace(("xxxxxxxxxxxxxxxxx\n"));
 	m_indexCount = m_lines.GetCount();
 	dTree<dUnsigned64, dUnsigned64> filter;
 	for (dInt32 i = m_lines.GetCount() - 1; i >= 0; i -= 2)

@@ -35,6 +35,7 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 		dgMeshEffectBuilder()
 			:m_vertex(256)
 			,m_faceIndexCount(256)
+			//,m_edgeType(256)
 			,m_brush(0)
 		{
 		}
@@ -46,11 +47,13 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 			{
 				dBigVector point(faceVertex[i].m_x, faceVertex[i].m_y, faceVertex[i].m_z, dFloat32(m_brush));
 				m_vertex.PushBack(point);
+				//m_edgeType.PushBack(edgeType[i]);
 			}
 		}
 	
 		dArray<dBigVector> m_vertex;
 		dArray<dInt32> m_faceIndexCount;
+		//dArray<ndEdgeType> m_edgeType;
 		dInt32 m_brush;
 	};
 	dgMeshEffectBuilder builder;
