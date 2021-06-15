@@ -285,26 +285,29 @@ ndWireFrameDebugMesh::~ndWireFrameDebugMesh()
 
 void ndWireFrameDebugMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
-	ndDemoCamera* const camera = scene->GetCamera();
-	dMatrix projectionViewModelMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
+	if (m_shader)
+	{
+		ndDemoCamera* const camera = scene->GetCamera();
+		dMatrix projectionViewModelMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//glDepthFunc(GL_LESS);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//glDepthFunc(GL_LESS);
 
-	glUseProgram(m_shader);
-	glUniform4fv(m_shadeColorLocation, 1, &m_color.m_x);
-	glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &projectionViewModelMatrix[0][0]);
+		glUseProgram(m_shader);
+		glUniform4fv(m_shadeColorLocation, 1, &m_color.m_x);
+		glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &projectionViewModelMatrix[0][0]);
 
-	glBindVertexArray(m_vertextArrayBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_lineIndexBuffer);
+		glBindVertexArray(m_vertextArrayBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_lineIndexBuffer);
 
-	glDrawElements(GL_LINES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
+		glDrawElements(GL_LINES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	glUseProgram(0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		glUseProgram(0);
 
-	//glDepthFunc(GL_EQUAL);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		//glDepthFunc(GL_EQUAL);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 }
 
