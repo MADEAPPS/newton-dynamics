@@ -469,8 +469,13 @@ void ndDemoEntityManager::Cleanup ()
 	while (m_debugShapeCache.GetRoot())
 	{
 		ndDebugMeshCache::dNode* const root = m_debugShapeCache.GetRoot();
-		root->GetInfo().m_wireFrame->Release();
-		root->GetInfo().m_flatShaded->Release();
+		ndDebuMesh& debugMesh = root->GetInfo();
+		debugMesh.m_flatShaded->Release();
+		debugMesh.m_wireFrameShareEdge->Release();
+		if (debugMesh.m_wireFrameOpenEdge)
+		{
+			debugMesh.m_wireFrameOpenEdge->Release();
+		}
 		m_debugShapeCache.Remove(root);
 	}
 
@@ -1259,7 +1264,12 @@ void ndDemoEntityManager::DrawDebugShapes()
 
 				ndDebuMesh debugMesh;
 				debugMesh.m_flatShaded = new ndFlatShadedDebugMesh(m_shaderCache, &shape);
-				debugMesh.m_wireFrame = new ndWireFrameDebugMesh(m_shaderCache, &shape);
+				debugMesh.m_wireFrameShareEdge = new ndWireFrameDebugMesh(m_shaderCache, &shape);
+				if (shape.GetShape()->GetAsShapeStaticBVH())
+				{
+					debugMesh.m_wireFrameOpenEdge = new ndWireFrameDebugMesh(m_shaderCache, &shape, ndShapeDebugCallback::ndEdgeType::m_open);
+					debugMesh.m_wireFrameOpenEdge->SetColor(dVector(1.0f, 0.0f, 1.0f, 1.0f));
+				}
 				shapeNode = m_debugShapeCache.Insert(debugMesh, key);
 			}
 
@@ -1269,12 +1279,15 @@ void ndDemoEntityManager::DrawDebugShapes()
 
 			if (m_collisionDisplayMode >= 2)
 			{
-				ndWireFrameDebugMesh* const mesh = shapeNode->GetInfo().m_wireFrame;
-				mesh->SetColor(color);
-				mesh->Render(this, matrix);
-				//ndShapeInstance shape(body->GetCollisionShape());
-				//ndWireFrameDebugMesh debugMesh (m_shaderCache, &shape);
-				//debugMesh.Render(this, matrix);
+				ndWireFrameDebugMesh* const sharedEdgeMesh = shapeNode->GetInfo().m_wireFrameShareEdge;
+				sharedEdgeMesh->SetColor(color);
+				sharedEdgeMesh->Render(this, matrix);
+
+				if (shapeNode->GetInfo().m_wireFrameOpenEdge)
+				{
+					ndWireFrameDebugMesh* const openEdgeMesh = shapeNode->GetInfo().m_wireFrameOpenEdge;
+					openEdgeMesh->Render(this, matrix);
+				}
 			}
 			else
 			{

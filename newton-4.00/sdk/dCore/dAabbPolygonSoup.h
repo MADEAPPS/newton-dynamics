@@ -240,7 +240,7 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	void ImproveNodeFitness (dgNodeBuilder* const node) const;
 
 	dNode* m_aabb;
-	dInt32* m_indices____;
+	dInt32* m_indices;
 	dInt32 m_nodesCount;
 	dInt32 m_indexCount;
 	friend class ndContactSolver;

@@ -329,7 +329,7 @@ bool ndShapeConvexPolygon::BeamClipping(const dVector& origin, dFloat32 dist, co
 		clippedFace[j + 0].m_twin = &clippedFace[j + 1];
 		clippedFace[j + 0].m_next = &clippedFace[j + 2];
 		clippedFace[j + 0].m_incidentVertex = i;
-		clippedFace[j + 0].m_incidentNormal = m_adjacentFaceEdgeNormalIndex[i];
+		clippedFace[j + 0].m_incidentNormal = m_adjacentFaceEdgeNormalIndex[i] & (~D_CONCAVE_EDGE_MASK);
 
 		clippedFace[j + 1].m_twin = &clippedFace[j + 0];
 		clippedFace[j + 1].m_next = &clippedFace[j - 2];
@@ -407,7 +407,7 @@ bool ndShapeConvexPolygon::BeamClipping(const dVector& origin, dFloat32 dist, co
 					newEdge->m_twin = newEdge + 1;
 					newEdge->m_twin->m_twin = newEdge;
 
-					newEdge->m_twin->m_incidentNormal = ptr->m_incidentNormal;;
+					newEdge->m_twin->m_incidentNormal = ptr->m_incidentNormal;
 					newEdge->m_incidentNormal = ptr->m_incidentNormal;
 
 					newEdge->m_incidentVertex = indexCount;
@@ -442,12 +442,12 @@ bool ndShapeConvexPolygon::BeamClipping(const dVector& origin, dFloat32 dist, co
 			newEdge->m_twin = newEdge + 1;
 			newEdge->m_twin->m_twin = newEdge;
 
-			newEdge->m_incidentNormal = m_faceNormalIndex;;
+			newEdge->m_incidentNormal = m_faceNormalIndex;
 			newEdge->m_incidentVertex = connect[0]->m_next->m_incidentVertex;
 			newEdge->m_twin->m_next = connect[0]->m_next;
 			connect[0]->m_next = newEdge;
 
-			newEdge->m_twin->m_incidentNormal = m_faceNormalIndex;;
+			newEdge->m_twin->m_incidentNormal = m_faceNormalIndex;
 			newEdge->m_twin->m_incidentVertex = connect[1]->m_next->m_incidentVertex;
 			newEdge->m_next = connect[1]->m_next;
 			connect[1]->m_next = newEdge->m_twin;

@@ -52,7 +52,7 @@ class ndFlatShadedDebugMesh: public ndDemoMeshInterface
 class ndWireFrameDebugMesh: public ndDemoMeshInterface
 {
 	public:
-	ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision);
+	ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, ndShapeDebugCallback::ndEdgeType edgeType = ndShapeDebugCallback::ndEdgeType::m_shared);
 	~ndWireFrameDebugMesh();
 
 	void SetColor(const dVector& color)
