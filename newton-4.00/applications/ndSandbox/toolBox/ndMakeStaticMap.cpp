@@ -173,7 +173,7 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 					} while (ptr != edge);
 	
 					dInt32 materialIndex = ent->m_fbxMeshEffect->GetFaceMaterial(edge);
-if (materialIndex==3)
+//if (materialIndex==3)
 					meshBuilder.AddFace(&face[0].m_x, sizeof(dVector), 3, materialIndex);
 				}
 			}
@@ -241,7 +241,8 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		dBigVector derivP1(control[0] - control[size - 2]);
 
 		dBezierSpline spline1;
-		spline1.GlobalCubicInterpolation(size, control, derivP0, derivP1);
+		//spline1.GlobalCubicInterpolation(size, control, derivP0, derivP1);
+		spline1.GlobalCubicInterpolation(size, control, derivP0, derivP0);
 
 		//dFloat64 u = (knots[1] + knots[2]) * 0.5f;
 		//spline.InsertKnot(u);

@@ -67,7 +67,7 @@ dInt32 dBezierSpline::GetDegree () const
 	return m_degree;
 }
 
-void dBezierSpline::CreateFromKnotVectorAndControlPoints (dInt32 degree, dInt32 knotCount, const dFloat64* const knotVector, const dBigVector* const controlPointss)
+void dBezierSpline::CreateFromKnotVectorAndControlPoints (dInt32 degree, dInt32 knotCount, const dFloat64* const knotVector, const dBigVector* const controlPoints)
 {
 	Clear();
 	dAssert (knotCount);
@@ -82,7 +82,7 @@ void dBezierSpline::CreateFromKnotVectorAndControlPoints (dInt32 degree, dInt32 
 
 	for (dInt32 i = 0; i < m_controlPointsCount; i++) 
 	{
-		m_controlPoints[i] = controlPointss[i];
+		m_controlPoints[i] = controlPoints[i];
 	}
 	
 	for (dInt32 i = 0; i < m_degree; i ++) 
@@ -349,32 +349,52 @@ dInt32 dBezierSpline::CurveAllDerivatives (dFloat64 u, dBigVector* const derivat
 	return m_degree + 1;
 }
 
-void dBezierSpline::GlobalCubicInterpolation (dInt32 count, const dBigVector* const Points, const dBigVector& firstTangent, const dBigVector& lastTangent)
+void dBezierSpline::GlobalCubicInterpolation (dInt32 count, const dBigVector* const points, const dBigVector& firstTangent, const dBigVector& lastTangent)
 {
-	CreateCubicKnotVector (count, Points);
-	CreateCubicControlPoints (count, Points, firstTangent, lastTangent);
+	CreateCubicKnotVector (count, points);
+	CreateCubicControlPoints (count, points, firstTangent, lastTangent);
 }
 
-void dBezierSpline::CreateCubicKnotVector(dInt32 count, const dBigVector* const Pointss)
+void dBezierSpline::CreateCubicKnotVector(dInt32 count, const dBigVector* const points)
 {
-	dFloat64 d = dFloat32 (0.0f);
 	dAssert (count >= 2);
 
 	dFloat64* const u = dAlloca(dFloat64, m_knotsCount + 32);
+#if 0
 	u[0] = dFloat32 (0.0f);
+	dFloat64 d = dFloat32(0.0f);
 	for (dInt32 i = 1; i < count; i ++) 
 	{
-		dBigVector step (Pointss[i] - Pointss[i - 1]);
+		dBigVector step (points[i] - points[i - 1]);
 		dAssert(step.m_w == dFloat32 (0.0f));
 		dFloat64 len = dSqrt (step.DotProduct(step).GetScalar());
 		u[i] = dSqrt (len); 
 		d += u[i];
 	}
-
+	
 	for (dInt32 i = 1; i < count; i ++) 
 	{
 		u[i] = u[i-1] + u[i] / d;
 	}
+
+#else
+
+	dFloat64 d = dFloat32(0.0f);
+	for (dInt32 i = 1; i < count; i++)
+	{
+		dBigVector step(points[i] - points[i - 1]);
+		dAssert(step.m_w == dFloat32(0.0f));
+		d += dSqrt(step.DotProduct(step).GetScalar());
+		u[i] = d;
+	}
+
+	d = dFloat32(1.0f) / d;
+	for (dInt32 i = 0; i < count; i++)
+	{
+		u[i] *= d;
+	}
+#endif
+
 	u[0] = dFloat64 (dFloat32 (0.0f));
 	u[count - 1] = dFloat64(dFloat32 (1.0f));
 
@@ -399,7 +419,7 @@ void dBezierSpline::CreateCubicKnotVector(dInt32 count, const dBigVector* const 
 	}
 }
 
-void dBezierSpline::CreateCubicControlPoints(dInt32 count, const dBigVector* const Points, const dBigVector& firstTangent, const dBigVector& lastTangent)
+void dBezierSpline::CreateCubicControlPoints(dInt32 count, const dBigVector* const points, const dBigVector& firstTangent, const dBigVector& lastTangent)
 {
 	dFloat64 abc[4];
 	if ((m_knotsCount - 2 * (m_degree - 1)) != m_controlPointsCount) 
@@ -408,15 +428,15 @@ void dBezierSpline::CreateCubicControlPoints(dInt32 count, const dBigVector* con
 	}
 
 	m_controlPoints.SetCount(m_controlPointsCount);
-	m_controlPoints[0] = Points[0];
-	m_controlPoints[m_controlPointsCount - 1] = Points[count - 1];
+	m_controlPoints[0] = points[0];
+	m_controlPoints[m_controlPointsCount - 1] = points[count - 1];
 
 	m_controlPoints[1] = m_controlPoints[0] + firstTangent.Scale (m_knotVector[m_degree + 1] / 3.0f);
 	m_controlPoints[m_controlPointsCount - 2] = m_controlPoints[m_controlPointsCount - 1] - lastTangent.Scale ((dFloat32 (1.0f) - m_knotVector[m_knotsCount - m_degree - 2]) / 3.0f);
 	if (count == 3) 
 	{
 		BasicsFunctions (m_knotVector[m_degree + 1], m_degree + 1, abc);
-		m_controlPoints[2]  = Points[1] - m_controlPoints[1].Scale (abc[0]) - m_controlPoints[3].Scale (abc[2]);
+		m_controlPoints[2]  = points[1] - m_controlPoints[1].Scale (abc[0]) - m_controlPoints[3].Scale (abc[2]);
 		m_controlPoints[2] = m_controlPoints[2].Scale (dFloat32 (1.0f) / abc[1]);
 	} 
 	else 
@@ -424,19 +444,19 @@ void dBezierSpline::CreateCubicControlPoints(dInt32 count, const dBigVector* con
 		dFloat64* const dd = dAlloca(dFloat64, m_knotsCount + 32);
 		BasicsFunctions (m_knotVector[m_degree + 1], m_degree + 1, abc);
 		dFloat64 den = abc[1];
-		m_controlPoints[2]  = (Points[1] - m_controlPoints[1].Scale (abc[0])).Scale (dFloat32 (1.0f) / den);
+		m_controlPoints[2]  = (points[1] - m_controlPoints[1].Scale (abc[0])).Scale (dFloat32 (1.0f) / den);
 		for (dInt32 i = 3; i < (count - 1); i ++) 
 		{
 			dd[i + 1] = abc[2] / den;
 			BasicsFunctions (m_knotVector[i + 2], i + 2, abc);
 			den = abc[1] - abc[0] * dd[i + 1];
-			m_controlPoints[i]  = (Points[i - 1] - m_controlPoints[i - 1].Scale (abc[0])).Scale (dFloat32 (1.0f) / den);
+			m_controlPoints[i]  = (points[i - 1] - m_controlPoints[i - 1].Scale (abc[0])).Scale (dFloat32 (1.0f) / den);
 		}
 
 		dd[count] = abc[2] / den;
 		BasicsFunctions (m_knotVector[count + 1], count + 1, abc);
 		den = abc[1] - abc[0] * dd[count];
-		m_controlPoints[count - 1] = (Points[count - 2] - m_controlPoints[count].Scale (abc[2]) - m_controlPoints[count - 2].Scale (abc[0])).Scale (dFloat32 (1.0f) / den);
+		m_controlPoints[count - 1] = (points[count - 2] - m_controlPoints[count].Scale (abc[2]) - m_controlPoints[count - 2].Scale (abc[0])).Scale (dFloat32 (1.0f) / den);
 
 		for (dInt32 i = count - 2; i >= 2; i --) 
 		{
