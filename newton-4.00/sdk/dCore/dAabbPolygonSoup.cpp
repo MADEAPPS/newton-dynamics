@@ -640,9 +640,11 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 
 			bool edgeIsConvex = (maxDist0 <= dFloat32(1.0e-3f));
 			edgeIsConvex = edgeIsConvex && (maxDist1 <= dFloat32(1.0e-3f));
-			//edgeIsConvex = edgeIsConvex || (n0.DotProduct(n1).GetScalar() > dFloat32(0.9991f));
-			edgeIsConvex = edgeIsConvex || (n0.DotProduct(n1).GetScalar() > dFloat32(0.5f));
-			edgeIsConvex = true;
+			edgeIsConvex = edgeIsConvex || (n0.DotProduct(n1).GetScalar() > dFloat32(0.9991f));
+
+			//hacks for testing adjacency
+			//edgeIsConvex = edgeIsConvex || (n0.DotProduct(n1).GetScalar() > dFloat32(0.5f));
+			//edgeIsConvex = true;
 			if (edgeIsConvex)
 			{
 				dAssert(offsetIndex0 >= 0);

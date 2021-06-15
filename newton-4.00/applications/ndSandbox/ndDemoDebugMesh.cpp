@@ -177,7 +177,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 			dInt32 i0 = vertexCount - 1;
 			for (dInt32 i = 0; i < vertexCount; i++)
 			{
-//				if (edgeType[i0] == m_edgeType)
+				if (edgeType[i0] == m_edgeType)
 				{
 					ndMeshVector point;
 					point.m_x = faceVertex[i0].m_x;

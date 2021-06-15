@@ -1271,7 +1271,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 				if (shape.GetShape()->GetAsShapeStaticBVH())
 				{
 					debugMesh.m_wireFrameOpenEdge = new ndWireFrameDebugMesh(m_shaderCache, &shape, ndShapeDebugCallback::ndEdgeType::m_open);
-					//debugMesh.m_wireFrameOpenEdge->SetColor(dVector(1.0f, 0.0f, 1.0f, 1.0f));
+					debugMesh.m_wireFrameOpenEdge->SetColor(dVector(1.0f, 0.0f, 1.0f, 1.0f));
 				}
 				shapeNode = m_debugShapeCache.Insert(debugMesh, key);
 			}
@@ -1291,7 +1291,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 					ndWireFrameDebugMesh* const openEdgeMesh = shapeNode->GetInfo().m_wireFrameOpenEdge;
 					dVector color1(m_showConcaveEdge ? dVector(1.0f, 0.0f, 1.0f, 1.0f) : color);
 					openEdgeMesh->SetColor(color1);
-					//openEdgeMesh->Render(this, matrix);
+					openEdgeMesh->Render(this, matrix);
 				}
 			}
 			else
