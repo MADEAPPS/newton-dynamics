@@ -505,7 +505,88 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 		dEdge* const edge = &(*iter);
 		if ((edge->m_mark != mark) && (edge->m_incidentFace >= 0) && (edge->m_twin->m_incidentFace >= 0))
 		{
+			#if 0
+			{
+				dInt32 indexCount0 = 0;
+				dEdge* ptr = edge;
+				do
+				{
+					indexCount0++;
+					ptr = ptr->m_next;
+				} while (ptr != edge);
+
+				dInt32* const indexArray0 = (dInt32*)edge->m_userData;
+				dVector n0(&vertexArray[indexArray0[indexCount0 + 1]].m_x);
+				dVector q0(&vertexArray[indexArray0[0]].m_x);
+				n0 = n0 & dVector::m_triplexMask;
+				q0 = q0 & dVector::m_triplexMask;
+
+				dInt32 indexCount1 = 0;
+				ptr = edge->m_twin;
+				do
+				{
+					indexCount1++;
+					ptr = ptr->m_next;
+				} while (ptr != edge->m_twin);
+
+				dInt32* const indexArray1 = (dInt32*)edge->m_twin->m_userData;
+				dVector n1(&vertexArray[indexArray1[indexCount1 + 1]].m_x);
+				dVector q1(&vertexArray[indexArray1[0]].m_x);
+				n1 = n1 & dVector::m_triplexMask;
+				q1 = q1 & dVector::m_triplexMask;
+
+				dPlane plane0(n0, -n0.DotProduct(q0).GetScalar());
+				dFloat32 maxDist0 = dFloat32(-1.0f);
+				dInt32 offsetIndex1 = -1;
+				for (dInt32 i = 0; i < indexCount1; i++)
+				{
+					if (edge->m_twin->m_incidentVertex == indexArray1[i])
+					{
+						offsetIndex1 = i;
+					}
+					dVector point(&vertexArray[indexArray1[i]].m_x);
+					dFloat32 dist(plane0.Evalue(point & dVector::m_triplexMask));
+					if (dist > maxDist0)
+					{
+						maxDist0 = dist;
+					}
+				}
+				if (maxDist0 < dFloat32(1.0e-3f))
+				{
+					dPlane plane1(n1, -n1.DotProduct(q1).GetScalar());
+					dFloat32 maxDist1 = dFloat32(-1.0f);
+					dInt32 offsetIndex0 = -1;
+					for (dInt32 i = 0; i < indexCount0; i++)
+					{
+						if (edge->m_incidentVertex == indexArray0[i])
+						{
+							offsetIndex0 = i;
+						}
+
+						dVector point(&vertexArray[indexArray0[i]].m_x);
+						dFloat32 dist(plane1.Evalue(point & dVector::m_triplexMask));
+						if (dist > maxDist1)
+						{
+							maxDist1 = dist;
+						}
+					}
+					if (maxDist1 < dFloat32(1.0e-3f))
+					{
+						dAssert(offsetIndex0 >= 0);
+						dAssert(offsetIndex1 >= 0);
+						indexArray0[indexCount0 + 2 + offsetIndex0] = indexArray1[indexCount1 + 1];
+						indexArray1[indexCount1 + 2 + offsetIndex1] = indexArray0[indexCount0 + 1];
+					}
+				}
+			}
+			#endif
+
 			dInt32 indexCount0 = 0;
+			dInt32 indexCount1 = 0;
+			dInt32 offsetIndex0 = -1;
+			dInt32 offsetIndex1 = -1;
+			dInt32* const indexArray0 = (dInt32*)edge->m_userData;
+			dInt32* const indexArray1 = (dInt32*)edge->m_twin->m_userData;
 			dEdge* ptr = edge;
 			do
 			{
@@ -513,13 +594,6 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 				ptr = ptr->m_next;
 			} while (ptr != edge);
 
-			dInt32* const indexArray0 = (dInt32*)edge->m_userData;
-			dVector n0(&vertexArray[indexArray0[indexCount0 + 1]].m_x);
-			dVector q0(&vertexArray[indexArray0[0]].m_x);
-			n0 = n0 & dVector::m_triplexMask;
-			q0 = q0 & dVector::m_triplexMask;
-
-			dInt32 indexCount1 = 0;
 			ptr = edge->m_twin;
 			do
 			{
@@ -527,15 +601,20 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 				ptr = ptr->m_next;
 			} while (ptr != edge->m_twin);
 
-			dInt32* const indexArray1 = (dInt32*)edge->m_twin->m_userData;
+			dVector n0(&vertexArray[indexArray0[indexCount0 + 1]].m_x);
+			dVector q0(&vertexArray[indexArray0[0]].m_x);
+			n0 = n0 & dVector::m_triplexMask;
+			q0 = q0 & dVector::m_triplexMask;
+
 			dVector n1(&vertexArray[indexArray1[indexCount1 + 1]].m_x);
 			dVector q1(&vertexArray[indexArray1[0]].m_x);
 			n1 = n1 & dVector::m_triplexMask;
 			q1 = q1 & dVector::m_triplexMask;
 
 			dPlane plane0(n0, -n0.DotProduct(q0).GetScalar());
-			dFloat32 maxDist0 = dFloat32 (-1.0f);
-			dInt32 offsetIndex1 = -1;
+			dPlane plane1(n1, -n1.DotProduct(q1).GetScalar());
+
+			dFloat32 maxDist0 = dFloat32(-1.0f);
 			for (dInt32 i = 0; i < indexCount1; i++)
 			{
 				if (edge->m_twin->m_incidentVertex == indexArray1[i])
@@ -544,37 +623,32 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 				}
 				dVector point(&vertexArray[indexArray1[i]].m_x);
 				dFloat32 dist(plane0.Evalue(point & dVector::m_triplexMask));
-				if (dist > maxDist0)
-				{
-					maxDist0 = dist;
-				}
+				maxDist0 = dMax(maxDist0, dist);
 			}
-			if (maxDist0 < dFloat32 (1.0e-3f))
-			{
-				dPlane plane1(n1, -n1.DotProduct(q1).GetScalar());
-				dFloat32 maxDist1 = dFloat32(-1.0f);
-				dInt32 offsetIndex0 = -1;
-				for (dInt32 i = 0; i < indexCount0; i++)
-				{
-					if (edge->m_incidentVertex == indexArray0[i])
-					{
-						offsetIndex0 = i;
-					}
 
-					dVector point(&vertexArray[indexArray0[i]].m_x);
-					dFloat32 dist(plane1.Evalue(point & dVector::m_triplexMask));
-					if (dist > maxDist1)
-					{
-						maxDist1 = dist;
-					}
-				}
-				if (maxDist1 < dFloat32(1.0e-3f))
+			dFloat32 maxDist1 = dFloat32(-1.0f);
+			for (dInt32 i = 0; i < indexCount0; i++)
+			{
+				if (edge->m_incidentVertex == indexArray0[i])
 				{
-					dAssert(offsetIndex0 >= 0);
-					dAssert(offsetIndex1 >= 0);
-					indexArray0[indexCount0 + 2 + offsetIndex0] = indexArray1[indexCount1 + 1];
-					indexArray1[indexCount1 + 2 + offsetIndex1] = indexArray0[indexCount0 + 1];
+					offsetIndex0 = i;
 				}
+				dVector point(&vertexArray[indexArray0[i]].m_x);
+				dFloat32 dist(plane1.Evalue(point & dVector::m_triplexMask));
+				maxDist1 = dMax(maxDist1, dist);
+			}
+
+			bool edgeIsConvex = (maxDist0 <= dFloat32(1.0e-3f));
+			edgeIsConvex = edgeIsConvex && (maxDist1 <= dFloat32(1.0e-3f));
+			//edgeIsConvex = edgeIsConvex || (n0.DotProduct(n1).GetScalar() > dFloat32(0.9991f));
+			edgeIsConvex = edgeIsConvex || (n0.DotProduct(n1).GetScalar() > dFloat32(0.5f));
+			edgeIsConvex = true;
+			if (edgeIsConvex)
+			{
+				dAssert(offsetIndex0 >= 0);
+				dAssert(offsetIndex1 >= 0);
+				indexArray0[indexCount0 + 2 + offsetIndex0] = indexArray1[indexCount1 + 1];
+				indexArray1[indexCount1 + 2 + offsetIndex1] = indexArray0[indexCount0 + 1];
 			}
 		}
 		edge->m_mark = mark;
@@ -613,7 +687,6 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 						pool[normalCount].m_x = n.m_x;
 						pool[normalCount].m_y = n.m_y;
 						pool[normalCount].m_z = n.m_z;
-						//face[j0] = -normalCount - 1;
 						face[j0] = normalCount | D_CONCAVE_EDGE_MASK;
 						normalCount ++;
 					}
@@ -650,7 +723,6 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 						pool[normalCount].m_x = n.m_x;
 						pool[normalCount].m_y = n.m_y;
 						pool[normalCount].m_z = n.m_z;
-						//face[j0] = -normalCount - 1;
 						face[j0] = normalCount | D_CONCAVE_EDGE_MASK;
 						normalCount ++;
 					}

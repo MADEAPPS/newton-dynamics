@@ -249,7 +249,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showAABB = true;
 	//m_hideVisualMeshes = true;
 	//m_showScene = true;
-	//m_showConcaveEdge = true;
+	m_showConcaveEdge = true;
 	//m_autoSleepMode = false;
 	//m_solverMode = ndWorld::ndOpenclSolver;
 	m_solverMode = ndWorld::ndStandardSolver;
@@ -1291,7 +1291,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 					ndWireFrameDebugMesh* const openEdgeMesh = shapeNode->GetInfo().m_wireFrameOpenEdge;
 					dVector color1(m_showConcaveEdge ? dVector(1.0f, 0.0f, 1.0f, 1.0f) : color);
 					openEdgeMesh->SetColor(color1);
-					openEdgeMesh->Render(this, matrix);
+					//openEdgeMesh->Render(this, matrix);
 				}
 			}
 			else

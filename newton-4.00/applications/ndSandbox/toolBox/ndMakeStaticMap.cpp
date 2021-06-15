@@ -91,7 +91,7 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 		{ 100.0f, 0.0f,  100.0f, 1.0f },
 		{ 100.0f, 0.0f, -100.0f, 1.0f },
 		{ -100.0f, 0.0f, -100.0f, 1.0f },
-		{ -100.0f, 0.01f,  100.0f, 1.0f },
+		{ -100.0f, 0.1f,  100.0f, 1.0f },
 	};
 	dInt32 index[][3] = { { 0, 1, 2 },{ 0, 2, 3 } };
 
@@ -147,7 +147,6 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 	
 		if (ent->m_fbxMeshEffect)
 		{
-			//dInt32 vertexCount = ent->m_fbxMeshEffect->GetVertexCount();
 			dInt32 vertexStride = ent->m_fbxMeshEffect->GetVertexStrideInByte() / sizeof (dFloat64);
 			const dFloat64* const vertexData = ent->m_fbxMeshEffect->GetVertexPool();
 	
@@ -174,6 +173,7 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 					} while (ptr != edge);
 	
 					dInt32 materialIndex = ent->m_fbxMeshEffect->GetFaceMaterial(edge);
+if (materialIndex==3)
 					meshBuilder.AddFace(&face[0].m_x, sizeof(dVector), 3, materialIndex);
 				}
 			}
