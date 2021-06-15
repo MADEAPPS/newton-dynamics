@@ -27,8 +27,6 @@ class ndDemoSplinePathMesh: public ndDemoMeshInterface
 	~ndDemoSplinePathMesh();
 
 	void SetColor(const dVector& color);
-	
-	
 	dInt32 GetRenderResolution() const;
 	void SetRenderResolution(dInt32 breaks);
 

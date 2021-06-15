@@ -123,7 +123,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 		ndFlatShadedDebugMesh* m_flatShaded;
 		ndWireFrameDebugMesh* m_wireFrameOpenEdge;
 		ndWireFrameDebugMesh* m_wireFrameShareEdge;
-		
 	};
 
 	class ndDebugMeshCache: public dTree<ndDebuMesh, const ndShape*>
