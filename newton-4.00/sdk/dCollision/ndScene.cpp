@@ -810,7 +810,7 @@ void ndScene::UpdateTransformNotify(dInt32 threadIndex, ndBodyKinematic* const b
 		ndBodyNotify* const notify = body->GetNotifyCallback();
 		if (notify)
 		{
-			notify->OnTranform(threadIndex, body->GetMatrix());
+			notify->OnTransform(threadIndex, body->GetMatrix());
 		}
 	}
 }

@@ -99,7 +99,7 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 	#endif
 }
 
-	// little Indian/big Indian conversion
+	// endian conversion
 #ifdef __ppc__
 	unsigned short SWAP_INT16(unsigned short x)
 	{

@@ -51,7 +51,7 @@ void ndDemoEntityNotify::OnApplyExternalForce(dInt32, dFloat32)
 	}
 }
 
-void ndDemoEntityNotify::OnTranform(dInt32, const dMatrix& matrix)
+void ndDemoEntityNotify::OnTransform(dInt32, const dMatrix& matrix)
 {
 	// apply this transformation matrix to the application user data.
 	if (m_entity)

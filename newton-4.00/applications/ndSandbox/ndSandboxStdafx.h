@@ -159,7 +159,7 @@ inline dInt32 dTwosPower (dInt32 x)
 //void GetAplicationDirectory (char* const aplicationDir);
 void dGetWorkingFileName (const char* const name, char* const outPathName);
 
-// little Indian/big Indian conversion
+// endian conversion
 dUnsigned32 SWAP_INT32(dUnsigned32 x);
 dUnsigned16 SWAP_INT16(dUnsigned16 x);
 void SWAP_FLOAT32_ARRAY (void* const array, dInt32 count);

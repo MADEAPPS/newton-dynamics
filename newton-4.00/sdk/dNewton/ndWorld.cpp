@@ -250,7 +250,7 @@ void ndWorld::UpdateTransforms()
 	for (ndBodyParticleSetList::dNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyParticleSet* const particleSet = node->GetInfo();
-		particleSet->GetNotifyCallback()->OnTranform(0, particleSet->GetMatrix());
+		particleSet->GetNotifyCallback()->OnTransform(0, particleSet->GetMatrix());
 	}
 
 	m_scene->UpdateTransform();

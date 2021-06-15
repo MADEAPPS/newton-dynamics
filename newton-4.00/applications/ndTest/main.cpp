@@ -89,7 +89,7 @@ class ndDemoEntityNotify: public ndBodyNotify
 		}
 	}
 
-	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
+	virtual void OnTransform(dInt32 threadIndex, const dMatrix& matrix)
 	{
 		// apply this transformation matrix to the application user data.
 		//dAssert(0);

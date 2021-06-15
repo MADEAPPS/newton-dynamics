@@ -209,7 +209,7 @@ unsigned dRand ();
 
 
 
-// little Indian/big Indian conversion
+// endian conversion
 unsigned SWAP_INT32(unsigned x);
 unsigned short SWAP_INT16(unsigned short x);
 void SWAP_FLOAT32_ARRAY (void* const array, dInt32 count);
