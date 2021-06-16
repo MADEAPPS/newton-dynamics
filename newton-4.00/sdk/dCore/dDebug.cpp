@@ -19,40 +19,26 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_DEBUG_H__
-#define __D_DEBUG_H__
 
 #include "dCoreStdafx.h"
-#include "dTypes.h"
-
-#ifdef _MSC_VER 
-	#ifdef _DEBUG 
-		#define DG_TRACE
-	#endif
-#endif
+#include "dDebug.h"
 
 #ifdef DG_TRACE
-	void dgExpandTraceMessage(const char* const fmt, ...);
-	#define dTrace(x)	dgExpandTraceMessage x;
-#else
-	#define dTrace(x);
+void dgExpandTraceMessage(const char* const fmt, ...)
+{
+	va_list v_args;
+	char text[4096];
+
+	text[0] = 0;
+	va_start(v_args, fmt);
+	vsprintf(text, fmt, v_args);
+	va_end(v_args);
+
+#if defined (_WIN_32_VER) || defined (_WIN_64_VER)
+	OutputDebugStringA(text);
+#else 
+	printf("%s\n", text);
 #endif
+}
 
-
-#ifdef _DEBUG
-	inline void TraceFuntionName (const char *name)
-	{
-		//	static dInt32 trace;
-		//	dTrace (("%d %s\n", trace, name));
-		dTrace (("%s\n", name));
-	}
-
-	//#define TRACE_FUNCTION(name) TraceFuntionName (name)
-	#define TRACE_FUNCTION(name)
-#else
-	#define TRACE_FUNCTION(name)
 #endif
-
-	
-#endif
-
