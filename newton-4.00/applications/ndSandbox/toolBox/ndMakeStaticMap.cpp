@@ -45,42 +45,81 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene)
 	return body;
 }
 
-void BuildFlatPlane1(ndDemoEntityManager* const, bool)
+ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene)
 {
 	ndMeshEffect meshEffect;
 
+	dFloat32 size = 100.0f;
 	dVector floor[] =
 	{
-		{ 100.0f, 0.0f,  100.0f, 1.0f },
-		{ 100.0f, 0.0f, -100.0f, 1.0f },
-		{ -100.0f, 0.0f, -100.0f, 1.0f },
-		{ -100.0f, 0.0f,  100.0f, 1.0f },
+		{ size, 0.0f,  size, 1.0f },
+		{ size, 0.0f, -size, 1.0f },
+		{ -size, 0.0f, -size, 1.0f },
+		{ -size, 0.0f,  size, 1.0f },
 	};
 	dInt32 index[][3] = { { 0, 1, 2 },{ 0, 2, 3 } };
 
 	meshEffect.BeginBuild();
-	for (dInt32 i = 0; i < 2; i++)
-	{
-		meshEffect.BeginBuildFace();
-		for (dInt32 j = 0; j < 3; j++)
+	dVector fridSize(size * 2.0f, 0.0f, size * 2.0f, 0.0f);
+	for (dInt32 i0 = 0; i0 < 8; i0++)
+	{ 
+		dFloat32 x0 = floor[0].m_x + size * 2.0f * i0 / 8;
+		for (dInt32 j0 = 0; j0 < 8; j0++)
 		{
-			dFloat64 x = floor[index[i][j]].m_x;
-			dFloat64 y = floor[index[i][j]].m_y;
-			dFloat64 z = floor[index[i][j]].m_z;
-			meshEffect.AddPoint(x, y, z);
+			dFloat32 z0 = floor[0].m_z + size * 2.0f * j0 / 8;
+			for (dInt32 i = 0; i < 2; i++)
+			{
+				meshEffect.BeginBuildFace();
+				for (dInt32 j = 0; j < 3; j++)
+				{
+					dFloat64 x = floor[index[i][j]].m_x + x0;
+					dFloat64 y = floor[index[i][j]].m_y;
+					dFloat64 z = floor[index[i][j]].m_z + z0;
+					meshEffect.AddPoint(x, y, z);
 
-			// you can add these other face attributes
-			//AddLayer(dInt32 layer);
-			//AddMaterial(dInt32 materialIndex);
-			//AddNormal(dFloat32 x, dFloat32 y, dFloat32 z);
-			//AddBinormal(dFloat32 x, dFloat32 y, dFloat32 z);
-			//AddVertexColor(dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w);
-			//AddUV0(dFloat32 u, dFloat32 v);
-			//AddUV1(dFloat32 u, dFloat32 v);
+					// you can add these other face attributes
+					//AddLayer(dInt32 layer);
+					//AddMaterial(dInt32 materialIndex);
+					//AddNormal(dFloat32 x, dFloat32 y, dFloat32 z);
+					//AddBinormal(dFloat32 x, dFloat32 y, dFloat32 z);
+					//AddVertexColor(dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w);
+					//AddUV0(dFloat32 u, dFloat32 v);
+					//AddUV1(dFloat32 u, dFloat32 v);
+				}
+				meshEffect.EndBuildFace();
+			}
 		}
-		meshEffect.EndBuildFace();
 	}
 	meshEffect.EndBuild(0.0f);
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+	dPolygonSoupBuilder meshBuilder;
+	meshBuilder.Begin();
+	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[0][0], 3);
+	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[1][0], 3);
+	meshBuilder.End(false);
+
+	ndShapeInstance plane(new ndShapeStaticBVH(meshBuilder));
+	dMatrix uvMatrix(dGetIdentityMatrix());
+	uvMatrix[0][0] *= 0.025f;
+	uvMatrix[1][1] *= 0.025f;
+	uvMatrix[2][2] *= 0.025f;
+	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &plane, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	entity->SetMesh(geometry, dGetIdentityMatrix());
+
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(plane);
+
+	world->AddBody(body);
+
+	scene->AddEntity(entity);
+	geometry->Release();
+	return body;
 }
 
 ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized)
@@ -91,7 +130,7 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 		{ 100.0f, 0.0f,  100.0f, 1.0f },
 		{ 100.0f, 0.0f, -100.0f, 1.0f },
 		{ -100.0f, 0.0f, -100.0f, 1.0f },
-		{ -100.0f, 0.1f,  100.0f, 1.0f },
+		{ -100.0f, 0.0f,  100.0f, 1.0f },
 	};
 	dInt32 index[][3] = { { 0, 1, 2 },{ 0, 2, 3 } };
 
@@ -101,12 +140,12 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[1][0], 3);
 	meshBuilder.End(optimized);
 
-	ndShapeInstance box(new ndShapeStaticBVH(meshBuilder));
+	ndShapeInstance plane(new ndShapeStaticBVH(meshBuilder));
 	dMatrix uvMatrix(dGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
-	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
+	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &plane, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
@@ -115,7 +154,7 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
-	body->SetCollisionShape(box);
+	body->SetCollisionShape(plane);
 
 	world->AddBody(body);
 

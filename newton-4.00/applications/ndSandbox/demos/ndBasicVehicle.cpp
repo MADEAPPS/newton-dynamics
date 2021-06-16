@@ -564,8 +564,9 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFloorBox(scene);
-	//BuildFlatPlane(scene, false);
-	BuildStaticMesh(scene, "track.fbx", true);
+	//BuildGridPlane(scene);
+	BuildFlatPlane(scene, true);
+	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
 
