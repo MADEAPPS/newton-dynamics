@@ -49,11 +49,6 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, 
 {
 	dVector floor[] =
 	{
-		//{  gridSize, 0.0f,  gridSize, 1.0f },
-		//{  gridSize, 0.0f, -gridSize, 1.0f },
-		//{ -gridSize, 0.0f, -gridSize, 1.0f },
-		//{ -gridSize, 0.0f,  gridSize, 1.0f },
-
 		{  0.0f,     0.0f,  0.0f    , 1.0f },
 		{  0.0f,     0.0f,  gridSize, 1.0f },
 		{  gridSize, 0.0f,  gridSize, 1.0f },
@@ -62,12 +57,14 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, 
 	dInt32 index[][3] = { { 0, 1, 2 }, { 0, 2, 3 } };
 	dVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
 
-	dArray<dFloat32> highs;
+	dArray<dVector> points;
 	for (dInt32 iz = 0; iz <= grids; iz++)
 	{
+		dFloat32 z0 = origin.m_z + iz * gridSize;
 		for (dInt32 ix = 0; ix <= grids; ix++)
 		{
-			highs.PushBack(dGaussianRandom(perturbation));
+			dFloat32 x0 = origin.m_x + ix * gridSize;
+			points.PushBack(dVector(x0, dGaussianRandom(perturbation), z0, 1.0f));
 		}
 	}
 
@@ -75,22 +72,25 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, 
 	meshEffect.BeginBuild();
 	for (dInt32 iz = 0; iz < grids; iz++)
 	{ 
-		dFloat32 z0 = origin.m_z + iz * gridSize;
 		for (dInt32 ix = 0; ix < grids; ix++)
 		{
-			dFloat32 x0 = origin.m_x + ix * gridSize;
-			for (dInt32 i = 0; i < 2; i++)
-			{
-				meshEffect.BeginBuildFace();
-				for (dInt32 j = 0; j < 3; j++)
-				{
-					dFloat64 x = floor[index[i][j]].m_x + x0;
-					dFloat64 y = highs[iz * (grids + 1) + ix];
-					dFloat64 z = floor[index[i][j]].m_z + z0;
-					meshEffect.AddPoint(x, y, z);
-				}
-				meshEffect.EndBuildFace();
-			}
+			dVector p0(points[(ix + 0) * (grids + 1) + iz + 0]);
+			dVector p1(points[(ix + 1) * (grids + 1) + iz + 0]);
+			dVector p2(points[(ix + 1) * (grids + 1) + iz + 1]);
+			dVector p3(points[(ix + 0) * (grids + 1) + iz + 1]);
+
+			meshEffect.BeginBuildFace();
+			meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
+			meshEffect.AddPoint(p1.m_x, p1.m_y, p1.m_z);
+			meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);
+			meshEffect.EndBuildFace();
+
+			meshEffect.BeginBuildFace();
+			meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
+			meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);
+			meshEffect.AddPoint(p3.m_x, p3.m_y, p3.m_z);
+			meshEffect.EndBuildFace();
+
 		}
 	}
 	meshEffect.EndBuild(0.0f);
