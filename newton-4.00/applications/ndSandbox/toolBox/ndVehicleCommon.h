@@ -89,6 +89,8 @@ class ndVehicleDectriptor
 		dFloat32 m_lowerStop;
 		dFloat32 m_verticalOffset;
 		dFloat32 m_laterialStiffeness;
+		dFloat32 m_brakeTorque;
+		dFloat32 m_handBrakeTorque;
 		dFloat32 m_longitudinalStiffeness;
 	};
 
@@ -120,8 +122,8 @@ class ndVehicleDectriptor
 	ndTireDefinition m_frontTire;
 	ndTireDefinition m_rearTire;
 
-	dFloat32 m_brakeTorque;
-	dFloat32 m_handBrakeTorque;
+	//dFloat32 m_brakeTorque;
+	//dFloat32 m_handBrakeTorque;
 	dFloat32 m_frictionCoefficientScale;
 
 	dFloat32 m_motorMass;

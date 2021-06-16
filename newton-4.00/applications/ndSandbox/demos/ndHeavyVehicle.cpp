@@ -82,13 +82,13 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_verticalOffset = -0.1f;
+		m_rearTire.m_brakeTorque = 2500.0f;
+		m_rearTire.m_handBrakeTorque = 2500.0f;
+
 		m_rearTire.m_laterialStiffeness = 10.0f / 1000.0f;
 		m_rearTire.m_longitudinalStiffeness = 50.0f / 1000.0f;
 
 		m_transmission.m_crownGearRatio = 20.0f;
-		
-		m_brakeTorque = 2500.0f;
-		m_handBrakeTorque = 1000.0f;
 		m_frictionCoefficientScale = 1.3f;
 		
 		m_torsionBarType = m_fourWheelAxle;
@@ -130,6 +130,8 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		m_frontTire.m_upperStop = -0.05f;
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_verticalOffset = -0.1f;
+		m_frontTire.m_brakeTorque = 1000.0f;
+		m_frontTire.m_handBrakeTorque = 0.0f;
 		m_frontTire.m_laterialStiffeness = 500.0f / 1000.0f;
 		m_frontTire.m_longitudinalStiffeness = 500.0f / 1000.0f;
 
@@ -141,13 +143,13 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_verticalOffset = -0.1f;
+		m_rearTire.m_brakeTorque = 2500.0f;
+		m_rearTire.m_handBrakeTorque = 2000.0f;
 		m_rearTire.m_laterialStiffeness = 500.0f / 1000.0f;
 		m_rearTire.m_longitudinalStiffeness = 500.0f / 1000.0f;
 
 		m_transmission.m_crownGearRatio = 20.0f;
 
-		m_brakeTorque = 2500.0f;
-		m_handBrakeTorque = 1000.0f;
 		m_frictionCoefficientScale = 1.3f;
 
 		m_torsionBarType = m_fourWheelAxle;

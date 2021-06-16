@@ -72,6 +72,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_frontTire.m_upperStop = -0.05f;
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_verticalOffset = -0.15f;
+		m_rearTire.m_brakeTorque = 1000.0f;
+		m_rearTire.m_handBrakeTorque = 0.0f;
 		m_frontTire.m_laterialStiffeness = 1.0f / 1000.0f;
 		m_frontTire.m_longitudinalStiffeness = 50.0f / 1000.0f;
 
@@ -85,9 +87,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_verticalOffset = -0.15f;
 		m_rearTire.m_laterialStiffeness = 1.0f / 1000.0f;
 		m_rearTire.m_longitudinalStiffeness = 50.0f / 1000.0f;
-
-		m_brakeTorque = 5000.0f;
-		m_handBrakeTorque = 5000.0f;
+		m_rearTire.m_brakeTorque = 2000.0f;
+		m_rearTire.m_handBrakeTorque = 2000.0f;
 		
 		m_frictionCoefficientScale = 1.3f;
 		
@@ -122,7 +123,9 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 		m_frontTire.m_regularizer = 0.2f;
 		m_frontTire.m_upperStop = -0.05f;
 		m_frontTire.m_lowerStop = 0.4f;
-		m_rearTire.m_verticalOffset = 0.0f;
+		m_frontTire.m_verticalOffset = 0.0f;
+		m_frontTire.m_brakeTorque = 1000.0f;
+		m_frontTire.m_handBrakeTorque = 0.0f;
 		m_frontTire.m_laterialStiffeness = 1.0f / 1000.0f;
 		m_frontTire.m_longitudinalStiffeness = 50.0f / 1000.0f;
 
@@ -134,13 +137,13 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_verticalOffset = 0.0f;
+		m_rearTire.m_brakeTorque = 2000.0f;
+		m_rearTire.m_handBrakeTorque = 2000.0f;
 		m_rearTire.m_laterialStiffeness = 1.0f / 1000.0f;
 		m_rearTire.m_longitudinalStiffeness = 50.0f / 1000.0f;
 		
-		m_brakeTorque = 5000.0f;
-		m_handBrakeTorque = 5000.0f;
 		m_frictionCoefficientScale = 1.3f;
-		
+	
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 	}

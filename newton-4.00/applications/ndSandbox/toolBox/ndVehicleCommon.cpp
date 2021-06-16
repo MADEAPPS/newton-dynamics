@@ -142,6 +142,8 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_frontTire.m_lowerStop = 0.2f;
 	m_frontTire.m_steeringAngle = 35.0f;
 	m_frontTire.m_verticalOffset = 0.0f;
+	m_frontTire.m_brakeTorque = 1500.0f;
+	m_frontTire.m_handBrakeTorque = 0.0f;
 	m_frontTire.m_laterialStiffeness = 100.0f / 1000.0f;
 	m_frontTire.m_longitudinalStiffeness = 600.0f / 1000.0f;
 
@@ -152,12 +154,11 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_rearTire.m_upperStop = -0.05f;
 	m_rearTire.m_lowerStop = 0.2f;
 	m_rearTire.m_steeringAngle = 0.0f;
-	m_frontTire.m_verticalOffset = 0.0f;
+	m_rearTire.m_verticalOffset = 0.0f;
+	m_rearTire.m_brakeTorque = 1500.0f;
+	m_rearTire.m_handBrakeTorque = 1500.0f;
 	m_rearTire.m_laterialStiffeness = 100.0f / 1000.0f;
 	m_rearTire.m_longitudinalStiffeness = 600.0f / 1000.0f;
-
-	m_brakeTorque = 1500.0f;
-	m_handBrakeTorque = 1500.0f;
 
 	m_motorMass = 20.0f;
 	m_motorRadius = 0.25f;
@@ -268,13 +269,14 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 		scene->GetJoystickAxis(axis);
 		scene->GetJoystickButtons(buttons);
 
-		dFloat32 brake = m_configuration.m_brakeTorque * dFloat32(scene->GetKeyState('S'));
-		if (brake == 0.0f)
-		{
-			dFloat32 val = (axis[4] + 1.0f) * 0.5f;
-			brake = m_configuration.m_brakeTorque * val * val * val;
-			//dTrace(("brake %f\n", brake));
-		}
+		dTrace(("remenber to fix the brakes\n"));
+		//dFloat32 brake = m_configuration.m_brakeTorque * dFloat32(scene->GetKeyState('S'));
+		//if (brake == 0.0f)
+		//{
+		//	dFloat32 val = (axis[4] + 1.0f) * 0.5f;
+		//	brake = m_configuration.m_brakeTorque * val * val * val;
+		//	//dTrace(("brake %f\n", brake));
+		//}
 
 		dFloat32 throttle = dFloat32(scene->GetKeyState('W')) ? 1.0f : 0.0f;
 		if (throttle == 0.0f)
@@ -290,7 +292,8 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 		}
 		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
 
-		dFloat32 handBrake = m_configuration.m_handBrakeTorque * dFloat32(scene->GetKeyState(' ') || buttons[4]);
+		dTrace(("remenber to fix the hand brakes\n"));
+		//dFloat32 handBrake = m_configuration.m_handBrakeTorque * dFloat32(scene->GetKeyState(' ') || buttons[4]);
 
 		if (m_parking.Update(scene->GetKeyState('P') || buttons[6]))
 		{
@@ -396,8 +399,9 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 			m_gearBox->SetRatio(gearGain);
 		}
 
-		SetBrakeTorque(brake);
-		SetHandBrakeTorque(handBrake);
+		dTrace(("remenber to fix the hand brakes\n"));
+		//SetBrakeTorque(brake);
+		//SetHandBrakeTorque(handBrake);
 		SetSteeringAngle(m_steerAngle * dDegreeToRad);
 
 		if (omega <= (m_configuration.m_engine.GetIdleRadPerSec() * 1.01f))
@@ -416,8 +420,9 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 
 	if (m_isParked)
 	{
-		dFloat32 brake = m_configuration.m_brakeTorque;
-		SetBrakeTorque(brake);
+		dTrace(("remenber to fix the hand brakes\n"));
+		//dFloat32 brake = m_configuration.m_brakeTorque;
+		//SetBrakeTorque(brake);
 	}
 
 	ndMultiBodyVehicle::Update(world, timestep);
