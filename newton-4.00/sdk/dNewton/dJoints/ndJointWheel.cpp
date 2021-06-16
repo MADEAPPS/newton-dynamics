@@ -19,7 +19,7 @@ ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 	,m_info(info)
 	,m_posit(dFloat32 (0.0f))
 	,m_speed(dFloat32(0.0f))
-	,m_brakeTorque(dFloat32(0.0f))
+	,m_normalizedBrakeTorque(dFloat32(0.0f))
 {
 }
 
@@ -27,9 +27,9 @@ ndJointWheel::~ndJointWheel()
 {
 }
 
-void ndJointWheel::SetBrakeTorque(dFloat32 torque)
+void ndJointWheel::SetBrake(dFloat32 normalizedTorque)
 {
-	m_brakeTorque = torque;
+	m_normalizedBrakeTorque = dClamp (normalizedTorque, dFloat32 (0.0f), dFloat32 (1.0f));
 }
 
 void ndJointWheel::SetSteeringAngle(dFloat32 steeringAngle)
@@ -88,7 +88,7 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	SetMassSpringDamperAcceleration(desc, m_info.m_regularizer, m_info.m_springK, m_info.m_damperC);
 
 	// set tire rotation axle joint, break or load transfer
-	if (m_brakeTorque > dFloat32(0.0f))
+	if (m_normalizedBrakeTorque > dFloat32(0.0f))
 	{
 		AddAngularRowJacobian(desc, matrix1.m_front, dFloat32(0.0f));
 		const dVector tireOmega(m_body0->GetOmega());
@@ -97,8 +97,8 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		dFloat32 rpm = relOmega.DotProduct(matrix1.m_front).GetScalar();
 		SetMotorAcceleration(desc, -rpm * desc.m_invTimestep);
 
-		SetLowerFriction(desc, -m_brakeTorque);
-		SetHighFriction(desc, m_brakeTorque);
+		SetLowerFriction(desc, -m_normalizedBrakeTorque * m_info.m_brakeTorque);
+		SetHighFriction(desc, m_normalizedBrakeTorque * m_info.m_brakeTorque);
 	}
 	// add suspension limits alone the vertical axis 
 	if (desc.m_rowsCount < 6)

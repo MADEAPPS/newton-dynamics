@@ -46,9 +46,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 	,m_handBrakeTires()
 	,m_steeringTires()
 	,m_differentials()
-	,m_brakeTorque(dFloat32(0.0f))
 	,m_steeringAngle(dFloat32 (0.0f))
-	,m_handBrakeTorque(dFloat32(0.0f))
 	,m_steeringAngleMemory(dFloat32(0.0f))
 {
 	m_tireShape->AddRef();
@@ -67,9 +65,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode)
 	,m_handBrakeTires()
 	,m_steeringTires()
 	,m_gravityMag(dFloat32(0.0f))
-	,m_brakeTorque(dFloat32(0.0f))
 	,m_steeringAngle(dFloat32(0.0f))
-	,m_handBrakeTorque(dFloat32(0.0f))
 	,m_steeringAngleMemory(dFloat32(0.0f))
 {
 	m_tireShape->AddRef();
@@ -93,15 +89,15 @@ void ndMultiBodyVehicle::AddChassis(ndBodyDynamic* const chassis, dFloat32 gravi
 	m_gravityMag = dAbs(gravityMag);
 }
 
-void ndMultiBodyVehicle::SetBrakeTorque(dFloat32 brakeToqrue)
-{
-	m_brakeTorque = dAbs(brakeToqrue);
-}
-
-void ndMultiBodyVehicle::SetHandBrakeTorque(dFloat32 brakeToqrue)
-{
-	m_handBrakeTorque = dAbs(brakeToqrue);
-}
+//void ndMultiBodyVehicle::SetBrakeTorque(dFloat32 brakeToqrue)
+//{
+//	m_brakeTorque = dAbs(brakeToqrue);
+//}
+//
+//void ndMultiBodyVehicle::SetHandBrakeTorque(dFloat32 brakeToqrue)
+//{
+//	m_handBrakeTorque = dAbs(brakeToqrue);
+//}
 
 void ndMultiBodyVehicle::SetSteeringAngle(dFloat32 angleInRadians)
 {
@@ -409,30 +405,30 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	context.DrawFrame(chassisMatrix);
 }
 
-void ndMultiBodyVehicle::ApplyBrakes()
-{
-	for (dList<ndJointWheel*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
-	{
-		ndJointWheel* const tire = node->GetInfo();
-		tire->SetBrakeTorque(dFloat32 (0.0f));
-	}
-
-	for (dList<ndJointWheel*>::dNode* node = m_brakeTires.GetFirst(); node; node = node->GetNext())
-	{
-		ndJointWheel* const tire = node->GetInfo();
-		tire->SetBrakeTorque(m_brakeTorque);
-	}
-
-	if (m_brakeTorque == dFloat32(0.0f))
-	{
-		for (dList<ndJointWheel*>::dNode* node = m_handBrakeTires.GetFirst(); node; node = node->GetNext())
-		{
-			ndJointWheel* const tire = node->GetInfo();
-
-			tire->SetBrakeTorque(m_handBrakeTorque);
-		}
-	}
-}
+//void ndMultiBodyVehicle::ApplyBrakes()
+//{
+//	for (dList<ndJointWheel*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+//	{
+//		ndJointWheel* const tire = node->GetInfo();
+//		tire->SetBrakeTorque(dFloat32 (0.0f));
+//	}
+//
+//	//for (dList<ndJointWheel*>::dNode* node = m_brakeTires.GetFirst(); node; node = node->GetNext())
+//	//{
+//	//	ndJointWheel* const tire = node->GetInfo();
+//	//	tire->SetBrakeTorque(m_brakeTorque);
+//	//}
+//	//
+//	//if (m_brakeTorque == dFloat32(0.0f))
+//	//{
+//	//	for (dList<ndJointWheel*>::dNode* node = m_handBrakeTires.GetFirst(); node; node = node->GetNext())
+//	//	{
+//	//		ndJointWheel* const tire = node->GetInfo();
+//	//
+//	//		tire->SetBrakeTorque(m_handBrakeTorque);
+//	//	}
+//	//}
+//}
 
 void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContactMaterial& contactPoint) const
 {
@@ -460,8 +456,8 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 	const dFloat32 u = longitudialSlip * den;
 
 	const ndWheelDescriptor& info = tire->GetInfo();
-	const dFloat32 cz = info.m_laterialStiffeness * v;
-	const dFloat32 cx = info.m_longitudinalStiffeness * u;
+	const dFloat32 cz = info.m_laterialStiffness  * v;
+	const dFloat32 cx = info.m_longitudinalStiffness  * u;
 	const dFloat32 gamma = dSqrt(cx * cx + cz * cz) + dFloat32 (1.0e-3f);
 
 	const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
@@ -561,7 +557,6 @@ void ndMultiBodyVehicle::Update(ndWorld* const, dFloat32)
 	}
 
 	ApplyAligmentAndBalancing();
-	ApplyBrakes();
 	ApplySteering();
 	ApplyTiremodel();
 }

@@ -87,11 +87,10 @@ class ndVehicleDectriptor
 		dFloat32 m_regularizer;
 		dFloat32 m_upperStop;
 		dFloat32 m_lowerStop;
-		dFloat32 m_verticalOffset;
-		dFloat32 m_laterialStiffeness;
 		dFloat32 m_brakeTorque;
-		dFloat32 m_handBrakeTorque;
-		dFloat32 m_longitudinalStiffeness;
+		dFloat32 m_verticalOffset;
+		dFloat32 m_laterialStiffness;
+		dFloat32 m_longitudinalStiffness ;
 	};
 
 	enum ndDifferentialType
@@ -122,8 +121,6 @@ class ndVehicleDectriptor
 	ndTireDefinition m_frontTire;
 	ndTireDefinition m_rearTire;
 
-	//dFloat32 m_brakeTorque;
-	//dFloat32 m_handBrakeTorque;
 	dFloat32 m_frictionCoefficientScale;
 
 	dFloat32 m_motorMass;
@@ -154,6 +151,8 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 	protected:
 	void Update(ndWorld* const world, dFloat32 timestep);
 	dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const;
+
+	void ReleaseBrakes();
 
 	ndVehicleDectriptor m_configuration;
 	dFloat32 m_steerAngle;

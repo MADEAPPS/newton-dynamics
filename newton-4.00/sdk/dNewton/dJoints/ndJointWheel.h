@@ -24,8 +24,9 @@ class ndWheelDescriptor
 		,m_minLimit(dFloat32(-0.1f))
 		,m_maxLimit(dFloat32(0.2f))
 		,m_regularizer(dFloat32(0.1f))
-		,m_laterialStiffeness(dFloat32(0.5f))
-		,m_longitudinalStiffeness(dFloat32(0.5f))
+		,m_brakeTorque(dFloat32(0.0f))
+		,m_laterialStiffness (dFloat32(0.5f))
+		,m_longitudinalStiffness (dFloat32(0.5f))
 	{
 	}
 
@@ -34,8 +35,9 @@ class ndWheelDescriptor
 	dFloat32 m_minLimit;
 	dFloat32 m_maxLimit;
 	dFloat32 m_regularizer;
-	dFloat32 m_laterialStiffeness;
-	dFloat32 m_longitudinalStiffeness;
+	dFloat32 m_brakeTorque;
+	dFloat32 m_laterialStiffness;
+	dFloat32 m_longitudinalStiffness;
 };
 
 class ndJointWheel: public ndJointBilateralConstraint
@@ -46,7 +48,7 @@ class ndJointWheel: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& desc);
 	D_NEWTON_API virtual ~ndJointWheel();
 
-	D_NEWTON_API void SetBrakeTorque(dFloat32 torque);
+	D_NEWTON_API void SetBrake(dFloat32 normalizedTorque);
 	D_NEWTON_API void SetSteeringAngle(dFloat32 steeringAngle);
 
 	const ndWheelDescriptor& GetInfo() const
@@ -59,9 +61,6 @@ class ndJointWheel: public ndJointBilateralConstraint
 		m_info = info;
 	}
 	
-	private:
-	//void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
-
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
@@ -69,7 +68,7 @@ class ndJointWheel: public ndJointBilateralConstraint
 	ndWheelDescriptor m_info;
 	dFloat32 m_posit;
 	dFloat32 m_speed;
-	dFloat32 m_brakeTorque;
+	dFloat32 m_normalizedBrakeTorque;
 };
 
 #endif 

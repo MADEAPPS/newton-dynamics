@@ -71,8 +71,9 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 		m_frontTire.m_upperStop = -0.05f;
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_verticalOffset = -0.1f;
-		m_frontTire.m_laterialStiffeness = 1.0f / 1000.0f;
-		m_frontTire.m_longitudinalStiffeness = 50.0f / 1000.0f;
+		m_frontTire.m_brakeTorque = 1000.0f;
+		m_frontTire.m_laterialStiffness  = 1.0f / 1000.0f;
+		m_frontTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 
 		m_rearTire.m_mass = 100.0f;
 		m_rearTire.m_steeringAngle = 0.0f;
@@ -83,10 +84,8 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_verticalOffset = -0.1f;
 		m_rearTire.m_brakeTorque = 2500.0f;
-		m_rearTire.m_handBrakeTorque = 2500.0f;
-
-		m_rearTire.m_laterialStiffeness = 10.0f / 1000.0f;
-		m_rearTire.m_longitudinalStiffeness = 50.0f / 1000.0f;
+		m_rearTire.m_laterialStiffness  = 10.0f / 1000.0f;
+		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 
 		m_transmission.m_crownGearRatio = 20.0f;
 		m_frictionCoefficientScale = 1.3f;
@@ -131,9 +130,8 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_verticalOffset = -0.1f;
 		m_frontTire.m_brakeTorque = 1000.0f;
-		m_frontTire.m_handBrakeTorque = 0.0f;
-		m_frontTire.m_laterialStiffeness = 500.0f / 1000.0f;
-		m_frontTire.m_longitudinalStiffeness = 500.0f / 1000.0f;
+		m_frontTire.m_laterialStiffness  = 500.0f / 1000.0f;
+		m_frontTire.m_longitudinalStiffness  = 500.0f / 1000.0f;
 
 		m_rearTire.m_mass = 200.0f;
 		m_rearTire.m_steeringAngle = 0.0f;
@@ -144,9 +142,8 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_verticalOffset = -0.1f;
 		m_rearTire.m_brakeTorque = 2500.0f;
-		m_rearTire.m_handBrakeTorque = 2000.0f;
-		m_rearTire.m_laterialStiffeness = 500.0f / 1000.0f;
-		m_rearTire.m_longitudinalStiffeness = 500.0f / 1000.0f;
+		m_rearTire.m_laterialStiffness  = 500.0f / 1000.0f;
+		m_rearTire.m_longitudinalStiffness  = 500.0f / 1000.0f;
 
 		m_transmission.m_crownGearRatio = 20.0f;
 
@@ -521,8 +518,8 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		tireInfo.m_regularizer = m_configuration.m_rearTire.m_regularizer;
 		tireInfo.m_minLimit = m_configuration.m_rearTire.m_upperStop;
 		tireInfo.m_maxLimit = m_configuration.m_rearTire.m_lowerStop;
-		tireInfo.m_laterialStiffeness = m_configuration.m_rearTire.m_laterialStiffeness;
-		tireInfo.m_longitudinalStiffeness = m_configuration.m_rearTire.m_longitudinalStiffeness;
+		tireInfo.m_laterialStiffness  = m_configuration.m_rearTire.m_laterialStiffness ;
+		tireInfo.m_longitudinalStiffness  = m_configuration.m_rearTire.m_longitudinalStiffness ;
 		ndJointWheel* const rr_tire0 = AddTire(world, tireInfo, rr_tire0_body);
 		ndJointWheel* const rl_tire0 = AddTire(world, tireInfo, rl_tire0_body);
 		ndJointWheel* const rr_tire1 = AddTire(world, tireInfo, rr_tire1_body);
@@ -533,8 +530,8 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		tireInfo.m_regularizer = m_configuration.m_frontTire.m_regularizer;
 		tireInfo.m_minLimit = m_configuration.m_frontTire.m_upperStop;
 		tireInfo.m_maxLimit = m_configuration.m_frontTire.m_lowerStop;
-		tireInfo.m_laterialStiffeness = m_configuration.m_frontTire.m_laterialStiffeness;
-		tireInfo.m_longitudinalStiffeness = m_configuration.m_frontTire.m_longitudinalStiffeness;
+		tireInfo.m_laterialStiffness  = m_configuration.m_frontTire.m_laterialStiffness ;
+		tireInfo.m_longitudinalStiffness  = m_configuration.m_frontTire.m_longitudinalStiffness ;
 		ndJointWheel* const fr_tire0 = AddTire(world, tireInfo, fr_tire0_body);
 		ndJointWheel* const fl_tire0 = AddTire(world, tireInfo, fl_tire0_body);
 		ndJointWheel* const fr_tire1 = AddTire(world, tireInfo, fr_tire1_body);
@@ -740,8 +737,8 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		tireInfo.m_regularizer = m_configuration.m_rearTire.m_regularizer;
 		tireInfo.m_minLimit = m_configuration.m_rearTire.m_upperStop;
 		tireInfo.m_maxLimit = m_configuration.m_rearTire.m_lowerStop;
-		tireInfo.m_laterialStiffeness = m_configuration.m_rearTire.m_laterialStiffeness;
-		tireInfo.m_longitudinalStiffeness = m_configuration.m_rearTire.m_longitudinalStiffeness;
+		tireInfo.m_laterialStiffness  = m_configuration.m_rearTire.m_laterialStiffness ;
+		tireInfo.m_longitudinalStiffness  = m_configuration.m_rearTire.m_longitudinalStiffness ;
 		ndJointWheel* const rr_tire0 = AddTire(world, tireInfo, rr_tire0_body);
 		ndJointWheel* const rl_tire0 = AddTire(world, tireInfo, rl_tire0_body);
 
@@ -750,8 +747,8 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		tireInfo.m_regularizer = m_configuration.m_frontTire.m_regularizer;
 		tireInfo.m_minLimit = m_configuration.m_frontTire.m_upperStop;
 		tireInfo.m_maxLimit = m_configuration.m_frontTire.m_lowerStop;
-		tireInfo.m_laterialStiffeness = m_configuration.m_frontTire.m_laterialStiffeness;
-		tireInfo.m_longitudinalStiffeness = m_configuration.m_frontTire.m_longitudinalStiffeness;
+		tireInfo.m_laterialStiffness  = m_configuration.m_frontTire.m_laterialStiffness ;
+		tireInfo.m_longitudinalStiffness  = m_configuration.m_frontTire.m_longitudinalStiffness ;
 		ndJointWheel* const fr_tire0 = AddAxleTire(world, tireInfo, fr_tire0_body, frontAxel_body);
 		ndJointWheel* const fl_tire0 = AddAxleTire(world, tireInfo, fl_tire0_body, frontAxel_body);
 

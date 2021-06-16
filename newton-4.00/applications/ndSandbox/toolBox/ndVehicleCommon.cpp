@@ -143,9 +143,8 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_frontTire.m_steeringAngle = 35.0f;
 	m_frontTire.m_verticalOffset = 0.0f;
 	m_frontTire.m_brakeTorque = 1500.0f;
-	m_frontTire.m_handBrakeTorque = 0.0f;
-	m_frontTire.m_laterialStiffeness = 100.0f / 1000.0f;
-	m_frontTire.m_longitudinalStiffeness = 600.0f / 1000.0f;
+	m_frontTire.m_laterialStiffness  = 100.0f / 1000.0f;
+	m_frontTire.m_longitudinalStiffness  = 600.0f / 1000.0f;
 
 	m_rearTire.m_mass = 20.0f;
 	m_rearTire.m_springK = 1000.0f;
@@ -156,9 +155,8 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_rearTire.m_steeringAngle = 0.0f;
 	m_rearTire.m_verticalOffset = 0.0f;
 	m_rearTire.m_brakeTorque = 1500.0f;
-	m_rearTire.m_handBrakeTorque = 1500.0f;
-	m_rearTire.m_laterialStiffeness = 100.0f / 1000.0f;
-	m_rearTire.m_longitudinalStiffeness = 600.0f / 1000.0f;
+	m_rearTire.m_laterialStiffness  = 100.0f / 1000.0f;
+	m_rearTire.m_longitudinalStiffness  = 600.0f / 1000.0f;
 
 	m_motorMass = 20.0f;
 	m_motorRadius = 0.25f;
@@ -258,6 +256,15 @@ dFloat32 ndBasicVehicle::GetFrictionCoeficient(const ndJointWheel* const, const 
 	return m_configuration.m_frictionCoefficientScale;
 }
 
+void ndBasicVehicle::ReleaseBrakes()
+{
+	for (dList<ndJointWheel*>::dNode* node = m_brakeTires.GetFirst(); node; node = node->GetNext())
+	{
+		ndJointWheel* const tire = node->GetInfo();
+		tire->SetBrake(dFloat32(0.0f));
+	}
+}
+
 void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 {
 	if (m_isPlayer && m_motor)
@@ -314,6 +321,7 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 		if (m_forwardGearUp.Update(scene->GetKeyState('>') || scene->GetKeyState('.') || buttons[11]))
 		{
 			m_isParked = false;
+			ReleaseBrakes();
 			if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
 			{
 				m_currentGear = 0;
@@ -335,6 +343,7 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 		if (m_forwardGearDown.Update(scene->GetKeyState('<') || scene->GetKeyState(',') || buttons[13]))
 		{
 			m_isParked = false;
+			ReleaseBrakes();
 			if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
 			{
 				m_currentGear = 0;
@@ -392,6 +401,7 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 		if (m_reverseGear.Update(scene->GetKeyState('R') || buttons[12]))
 		{
 			m_isParked = false;
+			ReleaseBrakes();
 			m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]);
 
 			//m_gearBox->SetRatio(-40.0f);
@@ -420,9 +430,11 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 
 	if (m_isParked)
 	{
-		dTrace(("remenber to fix the hand brakes\n"));
-		//dFloat32 brake = m_configuration.m_brakeTorque;
-		//SetBrakeTorque(brake);
+		for (dList<ndJointWheel*>::dNode* node = m_brakeTires.GetFirst(); node; node = node->GetNext())
+		{
+			ndJointWheel* const tire = node->GetInfo();
+			tire->SetBrake(dFloat32(1.0f));
+		}
 	}
 
 	ndMultiBodyVehicle::Update(world, timestep);

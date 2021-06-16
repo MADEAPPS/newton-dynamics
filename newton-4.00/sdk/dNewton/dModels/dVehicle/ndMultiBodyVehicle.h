@@ -66,8 +66,6 @@ class ndMultiBodyVehicle: public ndModel
 	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const;
 
 	D_NEWTON_API dFloat32 GetSpeed() const;
-	D_NEWTON_API void SetBrakeTorque(dFloat32 brakeToqrue);
-	D_NEWTON_API void SetHandBrakeTorque(dFloat32 brakeToqrue);
 	D_NEWTON_API void SetSteeringAngle(dFloat32 angleInRadians);
 
 	D_NEWTON_API ndShapeInstance CreateTireShape(dFloat32 radius, dFloat32 width) const;
@@ -86,7 +84,6 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API void SetAsSteering(ndJointWheel* const tire);
 
 	private:
-	void ApplyBrakes();
 	void ApplySteering();
 	void ApplyTiremodel();
 	void ApplyAligmentAndBalancing();
@@ -113,9 +110,7 @@ class ndMultiBodyVehicle: public ndModel
 	dList<ndMultiBodyVehicleDifferential*> m_differentials;
 	ndDownForce m_downForce;
 	dFloat32 m_gravityMag;
-	dFloat32 m_brakeTorque;
 	dFloat32 m_steeringAngle;
-	dFloat32 m_handBrakeTorque;
 	dFloat32 m_steeringAngleMemory;
 	
 	friend class ndMultiBodyVehicleMotor;
