@@ -155,12 +155,12 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	//dArray<dInt32> indices(indexCount);
-	//dArray<ndMeshPointUV> points(vertexCount);
-	//points.SetCount(vertexCount);
-	//indices.SetCount(indexCount);
-	dInt32* const indices = dAlloca(dInt32, indexCount);
-	ndMeshPointUV* const points = dAlloca(ndMeshPointUV, vertexCount);
+	dArray<dInt32> indices(indexCount);
+	dArray<ndMeshPointUV> points(vertexCount);
+	points.SetCount(vertexCount);
+	indices.SetCount(indexCount);
+	//dInt32* const indices = dAlloca(dInt32, indexCount);
+	//ndMeshPointUV* const points = dAlloca(ndMeshPointUV, vertexCount);
 
 	mesh.GetVertexChannel(sizeof(ndMeshPointUV), &points[0].m_posit.m_x);
 	mesh.GetNormalChannel(sizeof(ndMeshPointUV), &points[0].m_normal.m_x);

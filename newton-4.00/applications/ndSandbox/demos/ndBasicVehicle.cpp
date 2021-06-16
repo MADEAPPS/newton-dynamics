@@ -564,8 +564,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFloorBox(scene);
-	//BuildGridPlane(scene);
-	BuildFlatPlane(scene, true);
+	//BuildFlatPlane(scene, true);
+	BuildGridPlane(scene, 40, 4.0f, 0.000f);
 	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
@@ -576,13 +576,14 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	matrix.m_posit = location;
 
 	// add a model for general controls
-	//ndVehicleSelector* const controls = new ndVehicleSelector();
-	//scene->GetWorld()->AddModel(controls);
-	//
+	ndVehicleSelector* const controls = new ndVehicleSelector();
+	scene->GetWorld()->AddModel(controls);
+	
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, viperDesc, matrix);
-	////ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix);
-	//scene->GetWorld()->AddModel(vehicle);
-	//vehicle->SetAsPlayer(scene);
+	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix);
+	scene->GetWorld()->AddModel(vehicle);
+	vehicle->SetAsPlayer(scene);
+	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
 	//matrix.m_posit.m_x += 8.0f;
 	//matrix.m_posit.m_z += 6.0f;
@@ -594,7 +595,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//matrix.m_posit.m_x += 15.0f;
 	//AddPlanks(scene, matrix.m_posit, 60.0f);
 
-	//scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
+	
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);

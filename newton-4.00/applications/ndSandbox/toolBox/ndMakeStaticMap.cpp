@@ -45,35 +45,42 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene)
 	return body;
 }
 
-ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene)
+ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, dFloat32 gridSize, dFloat32 perturbation)
 {
-	ndMeshEffect meshEffect;
-
-	dFloat32 size = 100.0f;
 	dVector floor[] =
 	{
-		{ size, 0.0f,  size, 1.0f },
-		{ size, 0.0f, -size, 1.0f },
-		{ -size, 0.0f, -size, 1.0f },
-		{ -size, 0.0f,  size, 1.0f },
+		{  gridSize, 0.0f,  gridSize, 1.0f },
+		{  gridSize, 0.0f, -gridSize, 1.0f },
+		{ -gridSize, 0.0f, -gridSize, 1.0f },
+		{ -gridSize, 0.0f,  gridSize, 1.0f },
 	};
 	dInt32 index[][3] = { { 0, 1, 2 },{ 0, 2, 3 } };
+	dVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
 
-	meshEffect.BeginBuild();
-	dVector fridSize(size * 2.0f, 0.0f, size * 2.0f, 0.0f);
-	for (dInt32 i0 = 0; i0 < 8; i0++)
-	{ 
-		dFloat32 x0 = floor[0].m_x + size * 2.0f * i0 / 8;
-		for (dInt32 j0 = 0; j0 < 8; j0++)
+	dArray<dFloat32> highs;
+	for (dInt32 iz = 0; iz <= grids; iz++)
+	{
+		for (dInt32 ix = 0; ix <= grids; ix++)
 		{
-			dFloat32 z0 = floor[0].m_z + size * 2.0f * j0 / 8;
+			highs.PushBack(dGaussianRandom(perturbation));
+		}
+	}
+
+	ndMeshEffect meshEffect;
+	meshEffect.BeginBuild();
+	for (dInt32 iz = 0; iz < grids; iz++)
+	{ 
+		dFloat32 z0 = origin.m_z + iz * gridSize;
+		for (dInt32 ix = 0; ix < grids; ix++)
+		{
+			dFloat32 x0 = origin.m_x + ix * gridSize;
 			for (dInt32 i = 0; i < 2; i++)
 			{
 				meshEffect.BeginBuildFace();
 				for (dInt32 j = 0; j < 3; j++)
 				{
 					dFloat64 x = floor[index[i][j]].m_x + x0;
-					dFloat64 y = floor[index[i][j]].m_y;
+					dFloat64 y = highs[iz * (grids + 1) + ix];
 					dFloat64 z = floor[index[i][j]].m_z + z0;
 					meshEffect.AddPoint(x, y, z);
 
@@ -95,16 +102,45 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene)
 	ndPhysicsWorld* const world = scene->GetWorld();
 	dPolygonSoupBuilder meshBuilder;
 	meshBuilder.Begin();
-	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[0][0], 3);
-	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[1][0], 3);
+
+	dInt32 vertexStride = meshEffect.GetVertexStrideInByte() / sizeof(dFloat64);
+	const dFloat64* const vertexData = meshEffect.GetVertexPool();
+
+	dInt32 mark = meshEffect.IncLRU();
+
+	dVector face[16];
+	dPolyhedra::Iterator iter(meshEffect);
+	for (iter.Begin(); iter; iter++)
+	{
+		dEdge* const edge = &(*iter);
+		if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark))
+		{
+			dInt32 count = 0;
+			dEdge* ptr = edge;
+			do
+			{
+				dInt32 i = ptr->m_incidentVertex * vertexStride;
+				dVector point(dFloat32(vertexData[i + 0]), dFloat32(vertexData[i + 1]), dFloat32(vertexData[i + 2]), dFloat32(1.0f));
+				face[count] = point;
+				count++;
+				ptr->m_mark = mark;
+				ptr = ptr->m_next;
+			} while (ptr != edge);
+
+			dInt32 materialIndex = meshEffect.GetFaceMaterial(edge);
+			meshBuilder.AddFace(&face[0].m_x, sizeof(dVector), 3, materialIndex);
+		}
+	}
 	meshBuilder.End(false);
+
+	dFloat32 uvScale = 1.0 / 16.0f;
 
 	ndShapeInstance plane(new ndShapeStaticBVH(meshBuilder));
 	dMatrix uvMatrix(dGetIdentityMatrix());
-	uvMatrix[0][0] *= 0.025f;
-	uvMatrix[1][1] *= 0.025f;
-	uvMatrix[2][2] *= 0.025f;
-	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &plane, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
+	uvMatrix[0][0] *= uvScale;
+	uvMatrix[1][1] *= uvScale;
+	uvMatrix[2][2] *= uvScale;
+	ndDemoMesh* const geometry = new ndDemoMesh("plane", scene->GetShaderCache(), &plane, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);

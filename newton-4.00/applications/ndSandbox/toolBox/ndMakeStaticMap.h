@@ -16,10 +16,9 @@
 class ndDemoEntityManager;
 
 ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene);
-ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene);
 ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized);
 ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized);
-
 ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* const meshName, bool optimized);
+ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, dFloat32 gridSize, dFloat32 perturbation);
 
 #endif
