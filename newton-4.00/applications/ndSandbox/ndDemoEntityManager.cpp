@@ -1212,17 +1212,6 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glPopAttrib();
 }
 
-/*
-void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep)
-{
-	ndDemoEntityManager* const scene = (ndDemoEntityManager*) NewtonWorldGetUserData(world);
-	scene->m_cameraManager->FixUpdate(scene->GetWorld(), timestep);
-	if (scene->m_updateCamera) {
-		scene->m_updateCamera(scene, scene->m_updateCameraContext, timestep);
-	}
-}
-*/
-
 void ndDemoEntityManager::DrawDebugShapes()
 {
 	const dVector awakeColor(1.0f, 1.0f, 1.0f, 1.0f);

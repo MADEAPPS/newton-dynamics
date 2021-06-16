@@ -973,9 +973,9 @@ void dAabbPolygonSoup::Create (const dPolygonSoupBuilder& builder)
 	}
 
 	m_indices = (dInt32*) dMemory::Malloc (sizeof (dInt32) * m_indexCount);
-	dStack<dVector> tmpVertexArrayCont(builder.m_vertexPoints.GetCount() + builder.m_normalPoints.GetCount() + builder.m_faceVertexCount.GetCount() * 2 + 4);
+	dStack<dVector> tmpVertexArrayCount(builder.m_vertexPoints.GetCount() + builder.m_normalPoints.GetCount() + builder.m_faceVertexCount.GetCount() * 2 + 4);
 
-	dVector* const tmpVertexArray = &tmpVertexArrayCont[0];
+	dVector* const tmpVertexArray = &tmpVertexArrayCount[0];
 	for (dInt32 i = 0; i < builder.m_vertexPoints.GetCount(); i ++) 
 	{
 		tmpVertexArray[i] = builder.m_vertexPoints[i];

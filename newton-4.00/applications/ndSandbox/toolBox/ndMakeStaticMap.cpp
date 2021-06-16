@@ -49,12 +49,17 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, 
 {
 	dVector floor[] =
 	{
+		//{  gridSize, 0.0f,  gridSize, 1.0f },
+		//{  gridSize, 0.0f, -gridSize, 1.0f },
+		//{ -gridSize, 0.0f, -gridSize, 1.0f },
+		//{ -gridSize, 0.0f,  gridSize, 1.0f },
+
+		{  0.0f,     0.0f,  0.0f    , 1.0f },
+		{  0.0f,     0.0f,  gridSize, 1.0f },
 		{  gridSize, 0.0f,  gridSize, 1.0f },
-		{  gridSize, 0.0f, -gridSize, 1.0f },
-		{ -gridSize, 0.0f, -gridSize, 1.0f },
-		{ -gridSize, 0.0f,  gridSize, 1.0f },
+		{  gridSize, 0.0f,  0.0f,     1.0f },
 	};
-	dInt32 index[][3] = { { 0, 1, 2 },{ 0, 2, 3 } };
+	dInt32 index[][3] = { { 0, 1, 2 }, { 0, 2, 3 } };
 	dVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
 
 	dArray<dFloat32> highs;
@@ -83,15 +88,6 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, 
 					dFloat64 y = highs[iz * (grids + 1) + ix];
 					dFloat64 z = floor[index[i][j]].m_z + z0;
 					meshEffect.AddPoint(x, y, z);
-
-					// you can add these other face attributes
-					//AddLayer(dInt32 layer);
-					//AddMaterial(dInt32 materialIndex);
-					//AddNormal(dFloat32 x, dFloat32 y, dFloat32 z);
-					//AddBinormal(dFloat32 x, dFloat32 y, dFloat32 z);
-					//AddVertexColor(dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w);
-					//AddUV0(dFloat32 u, dFloat32 v);
-					//AddUV1(dFloat32 u, dFloat32 v);
 				}
 				meshEffect.EndBuildFace();
 			}
