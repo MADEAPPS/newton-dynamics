@@ -59,7 +59,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		dFloat32 horsePower = 400.0f;
 		dFloat32 rpm0 = 5000.0f;
 		dFloat32 rpm1 = 6200.0f;
-		dFloat32 horsePowerAtRedLine = 100.0f;
+		dFloat32 horsePowerAtRedLine = 400.0f;
 		dFloat32 redLineRpm = 8000.0f;
 		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
@@ -84,7 +84,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_verticalOffset = -0.15f;
-		m_rearTire.m_laterialStiffness  = 1.0f / 1000.0f;
+		m_rearTire.m_laterialStiffness  = 0.3f / 1000.0f;
 		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 		m_rearTire.m_brakeTorque = 2000.0f;
 		
@@ -566,7 +566,6 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	// build a floor
 	//BuildFloorBox(scene);
 	//BuildFlatPlane(scene, true);
-	//BuildGridPlane(scene, 80, 4.0f, 0.5f);
 	BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
