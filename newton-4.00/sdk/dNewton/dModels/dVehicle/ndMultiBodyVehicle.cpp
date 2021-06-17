@@ -459,6 +459,7 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 		const dMatrix tireMatrix (tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());
 		const ndBodyKinematic::ndContactMap& contactMap = tire->GetBody0()->GetContactMap();
 		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
+		int xxxxx = 0;
 		for (it.Begin(); it; it++)
 		{
 			ndContact* const contact = *it;
@@ -469,15 +470,19 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 				{
 					ndContactMaterial& contactPoint = contactNode->GetInfo();
 					const dVector fronDir(contactPoint.m_normal.CrossProduct(tireMatrix.m_front));
+
+					xxxxx++;
 					if (fronDir.DotProduct(fronDir).GetScalar() > dFloat32(1.0e-3f))
 					{
 						contactPoint.m_dir1 = fronDir.Normalize();
 						contactPoint.m_dir0 = contactPoint.m_dir1.CrossProduct(contactPoint.m_normal);
 						BrushTireModel(tire, contactPoint);
+						
 					}
 				}
 			}
 		}
+		dAssert(xxxxx <= 1);
 	}
 }
 

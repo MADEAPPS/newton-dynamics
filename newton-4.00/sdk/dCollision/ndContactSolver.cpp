@@ -3038,7 +3038,14 @@ dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDes
 		}
 	}
 
-	//contactJoint->m_separationDistance = closestDist;
+#if 0
+if (count > 1)
+{
+	count = 1;
+}
+#endif
+
+
 	m_separationDistance = closestDist;
 	
 	if (count) 

@@ -539,7 +539,7 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 
 	if (penetration < -(D_PENETRATION_TOL * dFloat32(5.0f)))
 	{
-return 0;
+		return 0;
 	}
 
 	dVector p1(hullMatrix.TransformVector(hull->SupportVertex(normalInHull)));
@@ -633,22 +633,6 @@ return 0;
 			}
 		}
 	}
-
-
-#if 0
-ndContactPoint* const xxxxxxx = proxy.m_contactBuffer;
-static dFloat32 xxxx;
-for (dInt32 i = 0; i < count; i++)
-{
-	if (xxxxxxx[i].m_penetration > xxxx)
-	{
-		xxxx = xxxxxxx[i].m_penetration;
-		dTrace(("%f\n", xxxxxxx[i].m_penetration));
-	}
-
-	dAssert(xxxxxxx[i].m_normal.DotProduct(xxxxxxx[i].m_normal).GetScalar() > 0.9999f);
-}
-#endif
 
 	return count;
 }
