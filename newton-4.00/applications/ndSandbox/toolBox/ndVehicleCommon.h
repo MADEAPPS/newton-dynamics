@@ -152,7 +152,8 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 	void Update(ndWorld* const world, dFloat32 timestep);
 	dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const;
 
-	void ReleaseBrakes();
+	void ApplyBrakes(dFloat32 param);
+	void ApplyHandBrakes(dFloat32 param);
 
 	ndVehicleDectriptor m_configuration;
 	dFloat32 m_steerAngle;
