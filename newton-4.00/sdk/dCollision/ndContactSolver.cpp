@@ -2316,7 +2316,7 @@ dInt32 ndContactSolver::PruneContacts(dInt32 count, dInt32 maxCount) const
 	}
 	else if (eigen[0] > eigenValueError) 
 	{
-		// is a 1d or 1d convex hull
+		// is a line or a point convex hull
 		if (count > 2) 
 		{
 			dFloat32 maxValue = dFloat32(-1.0e10f);
@@ -2341,8 +2341,18 @@ dInt32 ndContactSolver::PruneContacts(dInt32 count, dInt32 maxCount) const
 			ndContactPoint c1(contactArray[j1]);
 			contactArray[0] = c0;
 			contactArray[1] = c1;
+			count = 2;
 		}
-		return 2;
+		if (count == 2)
+		{
+			dVector segment(contactArray[1].m_point - contactArray[0].m_point);
+			dFloat32 dist2 = segment.DotProduct(segment).GetScalar();
+			if (dist2 < dFloat32(5.0e-3f * 5.0e-3f))
+			{
+				count = 1;
+			}
+		}
+		return count;
 	}
 	return 1;
 }
@@ -3038,64 +3048,8 @@ dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDes
 		}
 	}
 
-#if 0
-if (count > 1)
-{
-	count = 1;
-}
-#endif
-
-
-	m_separationDistance = closestDist;
-	
-	if (count) 
-	{
-	//	switch (proxy.m_instance0->GetCollisionPrimityType())
-	//	{
-	//	case m_sphereCollision:
-	//	case m_capsuleCollision:
-	//	case m_chamferCylinderCollision:
-	//		proxy.m_instance0->CalculateImplicitContacts(count, contactOut);
-	//		break;
-	//
-	//	default:
-	//	{
-	//		bool contactsValid = true;
-	//
-	//		for (dInt32 i = 0; (i < count) && contactsValid; i++) {
-	//			const dVector& normal = contactOut[i].m_normal;
-	//			for (dInt32 j = i + 1; (j < count) && contactsValid; j++) {
-	//				const dFloat32 project = (normal.DotProduct(contactOut[j].m_normal)).GetScalar();
-	//				contactsValid = contactsValid && (project > dFloat32(-0.1f));
-	//			}
-	//		}
-	//
-	//		if (!contactsValid) {
-	//			dgCollisionContactCloud contactCloud(GetAllocator(), count, contactOut);
-	//			ndShapeInstance cloudInstance(*polySoupInstance, &contactCloud);
-	//			cloudInstance.m_globalMatrix = dgGetIdentityMatrix();
-	//			cloudInstance.SetScale(dVector::m_one);
-	//			bool saveintersectionTestOnly = proxy.m_intersectionTestOnly;
-	//			proxy.m_instance1 = &cloudInstance;
-	//			proxy.m_intersectionTestOnly = true;
-	//			dgContactSolver contactSolver(&proxy);
-	//			contactSolver.CalculateConvexToConvexContacts();
-	//			dVector normal(contactSolver.GetNormal() * dVector::m_negOne);
-	//			for (dInt32 i = 0; i < count; i++) {
-	//				contactOut[i].m_normal = normal;
-	//			}
-	//
-	//			proxy.m_intersectionTestOnly = saveintersectionTestOnly;
-	//			cloudInstance.m_material.m_userData = NULL;
-	//		}
-	//	}
-	//	}
-	}
-
-	// restore the pointer
-	//polyInstance.m_material.m_userData = NULL;
-
 	m_contactBuffer = contactOut;
+	m_separationDistance = closestDist;
 	m_instance1.m_shape = polySoupInstance.m_shape;
 	m_instance1 = polySoupInstance;
 
