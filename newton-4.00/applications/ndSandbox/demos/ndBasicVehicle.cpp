@@ -567,7 +567,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//BuildFloorBox(scene);
 	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 80, 4.0f, 0.5f);
-	BuildGridPlane(scene, 80, 4.0f, 0.0f);
+	BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
@@ -596,8 +596,6 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//
 	//matrix.m_posit.m_x += 15.0f;
 	//AddPlanks(scene, matrix.m_posit, 60.0f);
-
-	
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
