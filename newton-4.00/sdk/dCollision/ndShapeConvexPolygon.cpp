@@ -634,6 +634,8 @@ return 0;
 		}
 	}
 
+
+#if 0
 ndContactPoint* const xxxxxxx = proxy.m_contactBuffer;
 static dFloat32 xxxx;
 for (dInt32 i = 0; i < count; i++)
@@ -646,6 +648,7 @@ for (dInt32 i = 0; i < count; i++)
 
 	dAssert(xxxxxxx[i].m_normal.DotProduct(xxxxxxx[i].m_normal).GetScalar() > 0.9999f);
 }
+#endif
 
 	return count;
 }
