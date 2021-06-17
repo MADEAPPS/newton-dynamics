@@ -88,8 +88,6 @@ class ndMultiBodyVehicle: public ndModel
 	void ApplyTiremodel();
 	void ApplyAligmentAndBalancing();
 	void BrushTireModel(const ndJointWheel* const tire, ndContactMaterial& contactPoint) const;
-
-	private:
 	ndBodyDynamic* CreateInternalBodyPart(ndWorld* const world, dFloat32 mass, dFloat32 radius) const;
 
 	protected:

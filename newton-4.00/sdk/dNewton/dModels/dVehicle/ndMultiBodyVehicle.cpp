@@ -33,6 +33,8 @@
 #include "ndMultiBodyVehicleDifferential.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
 
+#define D_MAX_CONTACT_PENETRATION dFloat32 (5.0e-3f)
+
 ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& upDir)
 	:ndModel()
 	,m_localFrame(dGetIdentityMatrix())
@@ -405,31 +407,6 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	context.DrawFrame(chassisMatrix);
 }
 
-//void ndMultiBodyVehicle::ApplyBrakes()
-//{
-//	for (dList<ndJointWheel*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
-//	{
-//		ndJointWheel* const tire = node->GetInfo();
-//		tire->SetBrakeTorque(dFloat32 (0.0f));
-//	}
-//
-//	//for (dList<ndJointWheel*>::dNode* node = m_brakeTires.GetFirst(); node; node = node->GetNext())
-//	//{
-//	//	ndJointWheel* const tire = node->GetInfo();
-//	//	tire->SetBrakeTorque(m_brakeTorque);
-//	//}
-//	//
-//	//if (m_brakeTorque == dFloat32(0.0f))
-//	//{
-//	//	for (dList<ndJointWheel*>::dNode* node = m_handBrakeTires.GetFirst(); node; node = node->GetNext())
-//	//	{
-//	//		ndJointWheel* const tire = node->GetInfo();
-//	//
-//	//		tire->SetBrakeTorque(m_handBrakeTorque);
-//	//	}
-//	//}
-//}
-
 void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContactMaterial& contactPoint) const
 {
 	// calculate longitudinal slip ratio
@@ -465,9 +442,7 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 	const dFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
 	//dTrace(("%f %f\n", sideSpeed, lateralFrictionCoefficient));
 
-	//contactPoint.m_material.m_flags |= m_isSoftContact;
-	//contactPoint.m_material.m_skinThickness = dFloat32 (0.25f);
-
+	contactPoint.m_penetration = dMin(contactPoint.m_penetration, D_MAX_CONTACT_PENETRATION);
 	contactPoint.m_material.m_restitution = dFloat32 (0.1f);
 	contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
 	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;

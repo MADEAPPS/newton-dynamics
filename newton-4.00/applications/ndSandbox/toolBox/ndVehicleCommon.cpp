@@ -416,7 +416,6 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 			m_gearBox->SetRatio(gearGain);
 		}
 
-		dTrace(("remenber to fix the hand brakes\n"));
 		ApplyBrakes(brake);
 		ApplyHandBrakes(handBrake);
 		SetSteeringAngle(m_steerAngle * dDegreeToRad);

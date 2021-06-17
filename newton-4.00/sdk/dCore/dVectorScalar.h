@@ -285,8 +285,6 @@ class dVector
 	D_INLINE dVector Normalize () const
 	{
 		dAssert (m_w == dFloat32 (0.0f));
-		//return *this * dVector (dRsqrt (DotProduct(*this).m_x));
-		//return Scale (dRsqrt (DotProduct(*this).GetScalar()));
 		const dVector& me = *this; 
 		return me * InvMagSqrt();
 	}
