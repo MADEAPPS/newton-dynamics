@@ -793,13 +793,13 @@ dInt32 ndContactSolver::CalculateConvexToSaticMeshContacts()
 
 dInt32 ndContactSolver::ConvexContacts()
 {
-	dVector origin0(m_instance0.m_globalMatrix.m_posit);
-	dVector origin1(m_instance1.m_globalMatrix.m_posit);
+	const dVector origin0(m_instance0.m_globalMatrix.m_posit);
+	const dVector origin1(m_instance1.m_globalMatrix.m_posit);
 	m_instance0.m_globalMatrix.m_posit = dVector::m_wOne;
 	m_instance1.m_globalMatrix.m_posit -= (origin0 & dVector::m_triplexMask);
 
 	// handle rare case of two shapes located exactly at the same origin
-	dVector error(m_instance1.m_globalMatrix.m_posit - m_instance0.m_globalMatrix.m_posit);
+	const dVector error(m_instance1.m_globalMatrix.m_posit - m_instance0.m_globalMatrix.m_posit);
 	if (error.DotProduct(error).GetScalar() < dFloat32(1.0e-6f))
 	{
 		m_instance1.m_globalMatrix.m_posit.m_y += dFloat32(1.0e-3f);
@@ -830,7 +830,7 @@ dInt32 ndContactSolver::ConvexContacts()
 		count = PruneContacts(count, 16);
 	}
 
-	dVector offset = (origin0 & dVector::m_triplexMask);
+	const dVector offset (origin0 & dVector::m_triplexMask);
 	m_closestPoint0 += offset;
 	m_closestPoint1 += offset;
 
@@ -2352,11 +2352,12 @@ dInt32 ndContactSolver::PruneContacts(dInt32 count, dInt32 maxCount) const
 				count = 1;
 			}
 		}
+		//dAssert(count <= 1);
 		return count;
 	}
+
 	return 1;
 }
-
 
 dFloat32 ndContactSolver::RayCast(const dVector& localP0, const dVector& localP1, ndContactPoint& contactOut)
 {
@@ -2980,7 +2981,8 @@ dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDes
 	const dMatrix polySoupGlobalMatrix = polySoupInstance.m_globalMatrix;
 	const dMatrix polySoupGlobalAligmentMatrix = polySoupInstance.m_aligmentMatrix;
 	
-	dMatrix polySoupScaledMatrix(polySoupGlobalAligmentMatrix[0] * polygonInstanceScale,
+	dMatrix polySoupScaledMatrix(
+		polySoupGlobalAligmentMatrix[0] * polygonInstanceScale,
 		polySoupGlobalAligmentMatrix[1] * polygonInstanceScale,
 		polySoupGlobalAligmentMatrix[2] * polygonInstanceScale,
 		polySoupGlobalAligmentMatrix[3]);

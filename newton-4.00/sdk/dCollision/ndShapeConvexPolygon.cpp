@@ -27,7 +27,8 @@
 #include "ndShapeConvexPolygon.h"
 
 //#define D_CONVEX_POLYGON_SKIRT_LENGTH dFloat32 (0.025f)
-#define D_CONVEX_POLYGON_SKIRT_LENGTH dFloat32 (0.1f)
+//#define D_CONVEX_POLYGON_SKIRT_LENGTH dFloat32 (0.1f)
+#define D_CONVEX_POLYGON_SKIRT_LENGTH dFloat32 (0.25f)
 
 ndShapeConvexPolygon::ndShapeConvexPolygon ()
 	:ndShapeConvex(m_polygonCollision)
@@ -486,6 +487,7 @@ bool ndShapeConvexPolygon::BeamClipping(const dVector& origin, dFloat32 dist, co
 
 	if (m_count >= 3) 
 	{
+		const dVector skirt(D_CONVEX_POLYGON_SKIRT_LENGTH);
 		dInt32 i0 = m_count - 1;
 		for (dInt32 i = 0; i < m_count; i++) 
 		{
@@ -496,7 +498,8 @@ bool ndShapeConvexPolygon::BeamClipping(const dVector& origin, dFloat32 dist, co
 			const dInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[i0];
 			const dVector localAdjacentNormal(&m_vertex[adjacentNormalIndex * m_stride]);
 			const dVector adjacentNormal(CalculateGlobalNormal(parentMesh, localAdjacentNormal & dVector::m_triplexMask));
-			const dVector edgeSkirt(edge.CrossProduct(adjacentNormal).Scale(D_CONVEX_POLYGON_SKIRT_LENGTH));
+			dAssert(edge.DotProduct(adjacentNormal).GetScalar() < dFloat32(1.0e-3f));
+			const dVector edgeSkirt(edge.CrossProduct(adjacentNormal) * skirt);
 
 			m_localPoly[count + 0] = m_localPoly[i] + edgeSkirt;
 			m_localPoly[count + 1] = m_localPoly[i0] + edgeSkirt;
