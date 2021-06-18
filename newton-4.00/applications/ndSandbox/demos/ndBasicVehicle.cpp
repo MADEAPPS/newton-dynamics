@@ -71,8 +71,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_frontTire.m_regularizer = 0.2f;
 		m_frontTire.m_upperStop = -0.05f;
 		m_frontTire.m_lowerStop = 0.4f;
+		m_frontTire.m_brakeTorque = 1500.0f;
 		m_frontTire.m_verticalOffset = -0.15f;
-		m_rearTire.m_brakeTorque = 1000.0f;
 		m_frontTire.m_laterialStiffness  = 1.0f / 1000.0f;
 		m_frontTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 
@@ -83,10 +83,11 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_regularizer = 0.2f;
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
+		m_rearTire.m_brakeTorque = 3000.0f;
 		m_rearTire.m_verticalOffset = -0.15f;
 		m_rearTire.m_laterialStiffness  = 0.3f / 1000.0f;
 		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
-		m_rearTire.m_brakeTorque = 2000.0f;
+		
 		
 		m_frictionCoefficientScale = 1.3f;
 		

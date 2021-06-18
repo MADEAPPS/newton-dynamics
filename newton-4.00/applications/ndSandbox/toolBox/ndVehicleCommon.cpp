@@ -417,7 +417,11 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 		}
 
 		ApplyBrakes(brake);
-		ApplyHandBrakes(handBrake);
+		if (handBrake)
+		{
+			ApplyHandBrakes(handBrake);
+		}
+
 		SetSteeringAngle(m_steerAngle * dDegreeToRad);
 
 		if (omega <= (m_configuration.m_engine.GetIdleRadPerSec() * 1.01f))
