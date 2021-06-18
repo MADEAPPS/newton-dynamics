@@ -100,6 +100,7 @@ class ndContact
 	virtual void JacobianDerivative(ndConstraintDescritor& desc);
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
 
+	ndContactPointList& GetContactPoints();
 	const ndContactPointList& GetContactPoints() const;
 
 	//bool IsActive() const;
@@ -164,6 +165,11 @@ inline ndBodyKinematic* ndContact::GetBody0() const
 inline ndBodyKinematic* ndContact::GetBody1() const
 {
 	return m_body1;
+}
+
+inline ndContactPointList& ndContact::GetContactPoints()
+{
+	return m_contacPointsList;
 }
 
 inline const ndContactPointList& ndContact::GetContactPoints() const

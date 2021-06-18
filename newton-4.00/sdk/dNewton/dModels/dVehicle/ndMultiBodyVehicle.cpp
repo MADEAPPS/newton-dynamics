@@ -464,7 +464,33 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 			ndContact* const contact = *it;
 			if (contact->IsActive())
 			{
-				const ndContactPointList& contactPoints = contact->GetContactPoints();
+				ndContactPointList& contactPoints = contact->GetContactPoints();
+				if (contactPoints.GetCount() >= 2)
+				{
+					const ndBodyKinematic* const otherBody = contact->GetBody1();
+					dAssert(otherBody != tire->GetBody0());
+					ndShape* const shape = (ndShape*)otherBody->GetCollisionShape().GetShape();
+					if (shape->GetAsShapeStaticMeshShape())
+					{
+						for (ndContactPointList::dNode* contactNode0 = contactPoints.GetFirst(); contactNode0; contactNode0 = contactNode0->GetNext())
+						{
+							const dVector contactPoint0 (contactNode0->GetInfo().m_point);
+							ndContactPointList::dNode* nextContactNode;
+							for (ndContactPointList::dNode* contactNode1 = contactNode0->GetNext(); contactNode1; contactNode1 = nextContactNode)
+							{
+								nextContactNode = contactNode1->GetNext();
+								const dVector contactPoint1(contactNode1->GetInfo().m_point);
+								const dVector error(contactPoint1 - contactPoint0);
+								dFloat32 err2 = error.DotProduct(error).GetScalar();
+								if (err2 < dFloat32 (5.0e-2f * 5.0e-2f))
+								{
+									contactPoints.Remove(contactNode1);
+								}
+							}
+						}
+					}
+				}
+
 				for (ndContactPointList::dNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 				{
 					ndContactMaterial& contactPoint = contactNode->GetInfo();
@@ -475,7 +501,6 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 						contactPoint.m_dir1 = fronDir.Normalize();
 						contactPoint.m_dir0 = contactPoint.m_dir1.CrossProduct(contactPoint.m_normal);
 						BrushTireModel(tire, contactPoint);
-						
 					}
 				}
 			}
