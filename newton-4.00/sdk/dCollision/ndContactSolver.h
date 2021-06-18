@@ -58,17 +58,14 @@ D_MSV_NEWTON_ALIGN_32
 class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>  
 {
 	public: 
-	//ndContactSolver(const ndContactSolver& src);
 	ndContactSolver(ndContact* const contact, ndScene* const scene);
 	ndContactSolver(ndShapeInstance* const instance, ndScene* const scene);
-
 	ndContactSolver(const ndContactSolver& src, const ndShapeInstance& instance0, const ndShapeInstance& instance1);
-	//ndContactSolver(dCollisionParamProxy* const proxy);
+
 	//dInt32 CalculateConvexCastContacts();
 	//const dVector& GetNormal() const {return m_normal;}
 	//const dVector& GetPoint0() const {return m_closestPoint0;}
 	//const dVector& GetPoint1() const {return m_closestPoint1;}
-
 	//void CalculateContacts(ntPair* const pair, dInt32 threadIndex, bool ccdMode, bool intersectionTestOnly);
 
 	dInt32 ConvexContacts();
@@ -103,11 +100,6 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	D_INLINE void PushFace(ndMinkFace* const face);
 	D_INLINE void DeleteFace(ndMinkFace* const face);
 	D_INLINE ndMinkFace* AddFace(dInt32 v0, dInt32 v1, dInt32 v2);
-	
-	//D_INLINE void TranslateSimplex(const dVector& step);
-	//D_INLINE dgPerimenterEdge* OldReduceContacts(dgPerimenterEdge* poly, dInt32 maxCount) const;
-	//
-	//bool SanityCheck() const;
 
 	dInt32 CalculateClosestSimplex();
 	bool CalculateClosestPoints();
@@ -131,8 +123,6 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	D_INLINE void SupportVertex(const dVector& dir, dInt32 vertexIndex);
 
 	D_INLINE void CalculateContactFromFeacture(dInt32 featureType);
-
-	//static dInt32 CalculatePointOnsurface(const ndShapeInstance* const shape, const dMatrix& matrix, const dVector& point, dVector& pointOnsurface);
 
 	ndShapeInstance m_instance0;
 	ndShapeInstance m_instance1;
