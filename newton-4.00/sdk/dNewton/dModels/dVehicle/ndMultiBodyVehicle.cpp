@@ -23,12 +23,12 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndJointHinge.h"
-#include "ndJointWheel.h"
 #include "ndBodyDynamic.h"
 #include "ndMultiBodyVehicle.h"
 #include "ndJointDoubleHinge.h"
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
+#include "ndMultiBodyVehicleTireJoint.h"
 #include "ndMultiBodyVehicleTorsionBar.h"
 #include "ndMultiBodyVehicleDifferential.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
@@ -106,7 +106,7 @@ void ndMultiBodyVehicle::SetSteeringAngle(dFloat32 angleInRadians)
 	m_steeringAngle = angleInRadians;
 }
 
-ndJointWheel* ndMultiBodyVehicle::AddAxleTire(ndWorld* const world, const ndWheelDescriptor& desc, ndBodyDynamic* const tire, ndBodyDynamic* const axleBody)
+ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(ndWorld* const world, const ndWheelDescriptor& desc, ndBodyDynamic* const tire, ndBodyDynamic* const axleBody)
 {
 	dMatrix tireFrame(dGetIdentityMatrix());
 	tireFrame.m_front = dVector(0.0f, 0.0f, 1.0f, 0.0f);
@@ -123,7 +123,7 @@ ndJointWheel* ndMultiBodyVehicle::AddAxleTire(ndWorld* const world, const ndWhee
 	inertia.m_z = maxInertia;
 	tire->SetMassMatrix(inertia);
 
-	ndJointWheel* const tireJoint = new ndJointWheel(matrix, tire, axleBody, desc);
+	ndMultiBodyVehicleTireJoint* const tireJoint = new ndMultiBodyVehicleTireJoint(matrix, tire, axleBody, desc);
 	m_tireList.Append(tireJoint);
 	world->AddJoint(tireJoint);
 
@@ -131,7 +131,7 @@ ndJointWheel* ndMultiBodyVehicle::AddAxleTire(ndWorld* const world, const ndWhee
 	return tireJoint;
 }
 
-ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, const ndWheelDescriptor& desc, ndBodyDynamic* const tire)
+ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddTire(ndWorld* const world, const ndWheelDescriptor& desc, ndBodyDynamic* const tire)
 {
 	return AddAxleTire(world, desc, tire, m_chassis);
 }
@@ -152,7 +152,7 @@ ndBodyDynamic* ndMultiBodyVehicle::CreateInternalBodyPart(ndWorld* const world, 
 	return body;
 }
 
-ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndJointWheel* const leftTire, ndJointWheel* const rightTire, dFloat32 slipOmegaLock)
+ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndMultiBodyVehicleTireJoint* const leftTire, ndMultiBodyVehicleTireJoint* const rightTire, dFloat32 slipOmegaLock)
 {
 	ndBodyDynamic* const differentialBody = CreateInternalBodyPart(world, mass, radius);
 
@@ -229,17 +229,17 @@ ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 wi
 	return tireCollision;
 }
 
-void ndMultiBodyVehicle::SetAsSteering(ndJointWheel* const tire)
+void ndMultiBodyVehicle::SetAsSteering(ndMultiBodyVehicleTireJoint* const tire)
 {
 	m_steeringTires.Append(tire);
 }
 
-void ndMultiBodyVehicle::SetAsBrake(ndJointWheel* const tire)
+void ndMultiBodyVehicle::SetAsBrake(ndMultiBodyVehicleTireJoint* const tire)
 {
 	m_brakeTires.Append(tire);
 }
 
-void ndMultiBodyVehicle::SetAsHandBrake(ndJointWheel* const tire)
+void ndMultiBodyVehicle::SetAsHandBrake(ndMultiBodyVehicleTireJoint* const tire)
 {
 	m_handBrakeTires.Append(tire);
 }
@@ -249,9 +249,9 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 {
 	const dVector chassisOmega(m_chassis->GetOmega());
 	const dVector upDir(m_chassis->GetMatrix().RotateVector(m_localFrame.m_up));
-	for (dList<ndJointWheel*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
-		ndJointWheel* const tire = node->GetInfo();
+		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 
 		ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
 		dAssert(tireBody != m_chassis);
@@ -304,9 +304,9 @@ void ndMultiBodyVehicle::ApplySteering()
 	if (dAbs(m_steeringAngleMemory - m_steeringAngle) > dFloat32(1.0e-3f))
 	{
 		m_steeringAngleMemory = m_steeringAngle;
-		for (dList<ndJointWheel*>::dNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext())
+		for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_steeringTires.GetFirst(); node; node = node->GetNext())
 		{
-			ndJointWheel* const tire = node->GetInfo();
+			ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 			tire->SetSteeringAngle(m_steeringAngle);
 		}
 	}
@@ -347,9 +347,9 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	dVector longitudinalColor(dFloat32(0.7f), dFloat32(0.3f), dFloat32(0.0f), dFloat32(0.0f));
 	context.DrawLine(chassisMatrix.m_posit, chassisMatrix.m_posit + weight, forceColor);
 
-	for (dList<ndJointWheel*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
-		ndJointWheel* const tireJoint = node->GetInfo();
+		ndMultiBodyVehicleTireJoint* const tireJoint = node->GetInfo();
 		ndBodyDynamic* const tireBody = tireJoint->GetBody0()->GetAsBodyDynamic();
 
 		// show tire center of mass;
@@ -407,7 +407,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	context.DrawFrame(chassisMatrix);
 }
 
-void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContactMaterial& contactPoint) const
+void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
 {
 	// calculate longitudinal slip ratio
 	const ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
@@ -452,9 +452,9 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 
 void ndMultiBodyVehicle::ApplyTiremodel()
 {
-	for (dList<ndJointWheel*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
-		ndJointWheel* const tire = node->GetInfo();
+		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 
 		const dMatrix tireMatrix (tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());
 		const ndBodyKinematic::ndContactMap& contactMap = tire->GetBody0()->GetContactMap();
@@ -465,31 +465,44 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 			if (contact->IsActive())
 			{
 				ndContactPointList& contactPoints = contact->GetContactPoints();
-				if (contactPoints.GetCount() >= 2)
+				const ndBodyKinematic* const otherBody = contact->GetBody1();
+				dAssert(otherBody != tire->GetBody0());
+				ndShape* const shape = (ndShape*)otherBody->GetCollisionShape().GetShape();
+				if (shape->GetAsShapeStaticMeshShape())
 				{
-					const ndBodyKinematic* const otherBody = contact->GetBody1();
-					dAssert(otherBody != tire->GetBody0());
-					ndShape* const shape = (ndShape*)otherBody->GetCollisionShape().GetShape();
-					if (shape->GetAsShapeStaticMeshShape())
+					// for mesh collsion need to dos some contact post processing
+					// first remove any contact dumplicate, these are contact produce by tow or more poligon
+					// but that so are that can general ill formed rows in the solver mass matrix
+					dFloat32 maxPenetration = dFloat32(0.0f);
+					for (ndContactPointList::dNode* contactNode0 = contactPoints.GetFirst(); contactNode0; contactNode0 = contactNode0->GetNext())
 					{
-						for (ndContactPointList::dNode* contactNode0 = contactPoints.GetFirst(); contactNode0; contactNode0 = contactNode0->GetNext())
+						const dVector contactPoint0 (contactNode0->GetInfo().m_point);
+						maxPenetration = dMax(contactNode0->GetInfo().m_penetration, maxPenetration);
+						ndContactPointList::dNode* nextContactNode;
+						for (ndContactPointList::dNode* contactNode1 = contactNode0->GetNext(); contactNode1; contactNode1 = nextContactNode)
 						{
-							const dVector contactPoint0 (contactNode0->GetInfo().m_point);
-							ndContactPointList::dNode* nextContactNode;
-							for (ndContactPointList::dNode* contactNode1 = contactNode0->GetNext(); contactNode1; contactNode1 = nextContactNode)
+							nextContactNode = contactNode1->GetNext();
+							const dVector contactPoint1(contactNode1->GetInfo().m_point);
+							const dVector error(contactPoint1 - contactPoint0);
+							dFloat32 err2 = error.DotProduct(error).GetScalar();
+							if (err2 < dFloat32 (5.0e-2f * 5.0e-2f))
 							{
-								nextContactNode = contactNode1->GetNext();
-								const dVector contactPoint1(contactNode1->GetInfo().m_point);
-								const dVector error(contactPoint1 - contactPoint0);
-								dFloat32 err2 = error.DotProduct(error).GetScalar();
-								if (err2 < dFloat32 (5.0e-2f * 5.0e-2f))
-								{
-									contactPoints.Remove(contactNode1);
-								}
+								contactPoints.Remove(contactNode1);
 							}
 						}
 					}
+
+					if (maxPenetration > D_MAX_CONTACT_PENETRATION)
+					{
+						// if the max penetartion is too much, 
+						// do a convex cast to find the tire location over the mesh 
+						// and teleport the tire to that location.
+						//dAssert(0);
+
+					}
+
 				}
+
 
 				for (ndContactPointList::dNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 				{

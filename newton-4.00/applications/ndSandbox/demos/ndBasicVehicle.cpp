@@ -190,8 +190,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		tireInfo.m_brakeTorque = m_configuration.m_rearTire.m_brakeTorque;
 		tireInfo.m_laterialStiffness  = m_configuration.m_rearTire.m_laterialStiffness;
 		tireInfo.m_longitudinalStiffness  = m_configuration.m_rearTire.m_longitudinalStiffness ;
-		ndJointWheel* const rr_tire = AddTire(world, tireInfo, rr_tire_body);
-		ndJointWheel* const rl_tire = AddTire(world, tireInfo, rl_tire_body);
+		ndMultiBodyVehicleTireJoint* const rr_tire = AddTire(world, tireInfo, rr_tire_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire = AddTire(world, tireInfo, rl_tire_body);
 
 		tireInfo.m_springK = m_configuration.m_frontTire.m_springK;
 		tireInfo.m_damperC = m_configuration.m_frontTire.m_damperC;
@@ -201,8 +201,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		tireInfo.m_brakeTorque = m_configuration.m_frontTire.m_brakeTorque;
 		tireInfo.m_laterialStiffness  = m_configuration.m_frontTire.m_laterialStiffness ;
 		tireInfo.m_longitudinalStiffness  = m_configuration.m_frontTire.m_longitudinalStiffness ;
-		ndJointWheel* const fr_tire = AddTire(world, tireInfo, fr_tire_body);
-		ndJointWheel* const fl_tire = AddTire(world, tireInfo, fl_tire_body);
+		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(world, tireInfo, fr_tire_body);
+		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(world, tireInfo, fl_tire_body);
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1] = 0;

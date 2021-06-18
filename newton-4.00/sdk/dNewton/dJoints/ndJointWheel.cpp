@@ -14,7 +14,7 @@
 #include "ndJointWheel.h"
 
 ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info)
-	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
+	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 	,m_baseFrame(m_localMatrix1)
 	,m_info(info)
 	,m_posit(dFloat32 (0.0f))
@@ -100,9 +100,9 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		SetLowerFriction(desc, -m_normalizedBrakeTorque * m_info.m_brakeTorque);
 		SetHighFriction(desc, m_normalizedBrakeTorque * m_info.m_brakeTorque);
 	}
-	// add suspension limits alone the vertical axis 
-	if (desc.m_rowsCount < 6)
-	{
+	else
+	{ 
+		// add suspension limits alone the vertical axis 
 		const dFloat32 x = m_posit + m_speed * desc.m_timestep;
 		if (x < m_info.m_minLimit)
 		{
@@ -119,4 +119,5 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 			SetMotorAcceleration(desc, stopAccel);
 		}
 	}
+	dAssert(desc.m_rowsCount <= 6);
 }

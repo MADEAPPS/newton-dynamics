@@ -251,25 +251,25 @@ bool ndBasicVehicle::IsPlayer() const
 	return m_isPlayer;
 }
 
-dFloat32 ndBasicVehicle::GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const
+dFloat32 ndBasicVehicle::GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const
 {
 	return m_configuration.m_frictionCoefficientScale;
 }
 
 void ndBasicVehicle::ApplyBrakes(dFloat32 param)
 {
-	for (dList<ndJointWheel*>::dNode* node = m_brakeTires.GetFirst(); node; node = node->GetNext())
+	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_brakeTires.GetFirst(); node; node = node->GetNext())
 	{
-		ndJointWheel* const tire = node->GetInfo();
+		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 		tire->SetBrake(param);
 	}
 }
 
 void ndBasicVehicle::ApplyHandBrakes(dFloat32 param)
 {
-	for (dList<ndJointWheel*>::dNode* node = m_handBrakeTires.GetFirst(); node; node = node->GetNext())
+	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_handBrakeTires.GetFirst(); node; node = node->GetNext())
 	{
-		ndJointWheel* const tire = node->GetInfo();
+		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 		tire->SetBrake(param);
 	}
 }

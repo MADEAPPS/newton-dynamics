@@ -520,10 +520,10 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		tireInfo.m_maxLimit = m_configuration.m_rearTire.m_lowerStop;
 		tireInfo.m_laterialStiffness  = m_configuration.m_rearTire.m_laterialStiffness ;
 		tireInfo.m_longitudinalStiffness  = m_configuration.m_rearTire.m_longitudinalStiffness ;
-		ndJointWheel* const rr_tire0 = AddTire(world, tireInfo, rr_tire0_body);
-		ndJointWheel* const rl_tire0 = AddTire(world, tireInfo, rl_tire0_body);
-		ndJointWheel* const rr_tire1 = AddTire(world, tireInfo, rr_tire1_body);
-		ndJointWheel* const rl_tire1 = AddTire(world, tireInfo, rl_tire1_body);
+		ndMultiBodyVehicleTireJoint* const rr_tire0 = AddTire(world, tireInfo, rr_tire0_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire0 = AddTire(world, tireInfo, rl_tire0_body);
+		ndMultiBodyVehicleTireJoint* const rr_tire1 = AddTire(world, tireInfo, rr_tire1_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire1 = AddTire(world, tireInfo, rl_tire1_body);
 
 		tireInfo.m_springK = m_configuration.m_frontTire.m_springK;
 		tireInfo.m_damperC = m_configuration.m_frontTire.m_damperC;
@@ -532,10 +532,10 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		tireInfo.m_maxLimit = m_configuration.m_frontTire.m_lowerStop;
 		tireInfo.m_laterialStiffness  = m_configuration.m_frontTire.m_laterialStiffness ;
 		tireInfo.m_longitudinalStiffness  = m_configuration.m_frontTire.m_longitudinalStiffness ;
-		ndJointWheel* const fr_tire0 = AddTire(world, tireInfo, fr_tire0_body);
-		ndJointWheel* const fl_tire0 = AddTire(world, tireInfo, fl_tire0_body);
-		ndJointWheel* const fr_tire1 = AddTire(world, tireInfo, fr_tire1_body);
-		ndJointWheel* const fl_tire1 = AddTire(world, tireInfo, fl_tire1_body);
+		ndMultiBodyVehicleTireJoint* const fr_tire0 = AddTire(world, tireInfo, fr_tire0_body);
+		ndMultiBodyVehicleTireJoint* const fl_tire0 = AddTire(world, tireInfo, fl_tire0_body);
+		ndMultiBodyVehicleTireJoint* const fr_tire1 = AddTire(world, tireInfo, fr_tire1_body);
+		ndMultiBodyVehicleTireJoint* const fl_tire1 = AddTire(world, tireInfo, fl_tire1_body);
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1] = 0;
@@ -630,7 +630,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		m_cannonAngle0 = -dAtan2(y, x);
 	}
 
-	void LinkTires(ndWorld* const world, const ndJointWheel* const tire0, const ndJointWheel* const tire1) const
+	void LinkTires(ndWorld* const world, const ndMultiBodyVehicleTireJoint* const tire0, const ndMultiBodyVehicleTireJoint* const tire1) const
 	{
 		ndBodyKinematic* const body0 = tire0->GetBody0();
 		ndBodyKinematic* const body1 = tire1->GetBody0();
@@ -739,8 +739,8 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		tireInfo.m_maxLimit = m_configuration.m_rearTire.m_lowerStop;
 		tireInfo.m_laterialStiffness  = m_configuration.m_rearTire.m_laterialStiffness ;
 		tireInfo.m_longitudinalStiffness  = m_configuration.m_rearTire.m_longitudinalStiffness ;
-		ndJointWheel* const rr_tire0 = AddTire(world, tireInfo, rr_tire0_body);
-		ndJointWheel* const rl_tire0 = AddTire(world, tireInfo, rl_tire0_body);
+		ndMultiBodyVehicleTireJoint* const rr_tire0 = AddTire(world, tireInfo, rr_tire0_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire0 = AddTire(world, tireInfo, rl_tire0_body);
 
 		tireInfo.m_springK = m_configuration.m_frontTire.m_springK;
 		tireInfo.m_damperC = m_configuration.m_frontTire.m_damperC;
@@ -749,8 +749,8 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		tireInfo.m_maxLimit = m_configuration.m_frontTire.m_lowerStop;
 		tireInfo.m_laterialStiffness  = m_configuration.m_frontTire.m_laterialStiffness ;
 		tireInfo.m_longitudinalStiffness  = m_configuration.m_frontTire.m_longitudinalStiffness ;
-		ndJointWheel* const fr_tire0 = AddAxleTire(world, tireInfo, fr_tire0_body, frontAxel_body);
-		ndJointWheel* const fl_tire0 = AddAxleTire(world, tireInfo, fl_tire0_body, frontAxel_body);
+		ndMultiBodyVehicleTireJoint* const fr_tire0 = AddAxleTire(world, tireInfo, fr_tire0_body, frontAxel_body);
+		ndMultiBodyVehicleTireJoint* const fl_tire0 = AddAxleTire(world, tireInfo, fl_tire0_body, frontAxel_body);
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1] = 0;

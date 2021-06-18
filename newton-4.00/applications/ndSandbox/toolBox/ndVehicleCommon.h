@@ -150,7 +150,7 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 
 	protected:
 	void Update(ndWorld* const world, dFloat32 timestep);
-	dFloat32 GetFrictionCoeficient(const ndJointWheel* const, const ndContactMaterial&) const;
+	dFloat32 GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const;
 
 	void ApplyBrakes(dFloat32 param);
 	void ApplyHandBrakes(dFloat32 param);
