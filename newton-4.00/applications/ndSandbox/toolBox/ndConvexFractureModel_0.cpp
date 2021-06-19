@@ -69,7 +69,7 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 		}
 
 		dPlane m_plane;
-		dFixSizeBuffer<dVector, 16> m_polygon;
+		dFixSizeArray<dVector, 16> m_polygon;
 		dInt32 m_count;
 	};
 
@@ -84,7 +84,7 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 	{
 		ndFaceInfo& face = m_polygons[m_count];
 		face.m_count = vertexCount;
-		dAssert(vertexCount <= face.m_polygon.GetSize());
+		dAssert(vertexCount <= face.m_polygon.GetCapacity());
 		for (dInt32 i = 0; i < vertexCount; i++)
 		{
 			face.m_polygon[i] = faceArray[i];
@@ -103,7 +103,7 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 		face.m_plane = dPlane(normal, -normal.DotProduct(faceArray[0]).GetScalar());
 		//dTrace(("%f %f %f %f\n", face.m_plane.m_x, face.m_plane.m_y, face.m_plane.m_z, face.m_plane.m_w));
 		m_count++;
-		dAssert(m_count < m_polygons.GetSize());
+		dAssert(m_count < m_polygons.GetCapacity());
 	}
 
 	bool IsFaceContact(ndShapeInstance* const shape)
@@ -142,7 +142,7 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 		return false;
 	}
 
-	dFixSizeBuffer<ndFaceInfo, 128> m_polygons;
+	dFixSizeArray<ndFaceInfo, 128> m_polygons;
 	dFloat32 m_sign;
 	dInt32 m_count;
 };

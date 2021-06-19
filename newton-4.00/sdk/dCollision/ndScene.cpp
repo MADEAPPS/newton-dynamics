@@ -931,11 +931,11 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 		ndContactSolver contactSolver(contact, this);
 		contactSolver.m_separatingVector = contact->m_separatingVector;
 		contactSolver.m_timestep = m_timestep;
-		contactSolver.m_ccdMode = 0;
+		//contactSolver.m_ccdMode = 0;
 		contactSolver.m_contactBuffer = contactBuffer;
 		contactSolver.m_intersectionTestOnly = body0->m_contactTestOnly | body1->m_contactTestOnly;
 		
-		dInt32 count = contactSolver.CalculatePairContacts();
+		dInt32 count = contactSolver.CalculateContactsDiscrete ();
 		if (count)
 		{
 			if (contactSolver.m_intersectionTestOnly)

@@ -117,16 +117,12 @@ void ndPolygonMeshDesc::SortFaceArray()
 #endif
 }
 
-ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, void* const)
+ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)
 	:dFastAabbInfo()
 	,m_boxDistanceTravelInMeshSpace(dVector::m_zero)
-	//,m_threadNumber(proxy.m_threadIndex)
 	,m_faceCount(0)
 	,m_vertexStrideInBytes(0)
 	,m_skinThickness(proxy.m_skinThickness)
-	//,m_userData (userData)
-	//,m_objBody (proxy.m_body0)
-	//,m_polySoupBody(proxy.m_body1)
 	,m_convexInstance(&proxy.m_instance0)
 	,m_polySoupInstance(&proxy.m_instance1)
 	,m_vertex(nullptr)
@@ -135,7 +131,7 @@ ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, void* const)
 	,m_faceIndexStart(nullptr)
 	,m_hitDistance(nullptr)
 	,m_maxT(dFloat32 (1.0f))
-	,m_doContinuesCollisionTest(proxy.m_ccdMode)
+	,m_doContinuesCollisionTest(ccdMode)
 {
 	const dMatrix& hullMatrix = m_convexInstance->GetGlobalMatrix();
 	const dMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();

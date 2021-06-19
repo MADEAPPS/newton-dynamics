@@ -650,15 +650,15 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 		#define D_SCRATCH_BUFFER_SIZE		(1024 * 24 / sizeof (ndGridHash))
 		#define D_SCRATCH_BUFFER_SIZE_PADD	(32)
 
-		class ndHashCacheBuffer : public dFixSizeBuffer<ndGridHash, D_SCRATCH_BUFFER_SIZE + D_SCRATCH_BUFFER_SIZE_PADD>
+		class ndHashCacheBuffer : public dFixSizeArray<ndGridHash, D_SCRATCH_BUFFER_SIZE + D_SCRATCH_BUFFER_SIZE_PADD>
 		{
 			public:
 			ndHashCacheBuffer()
-				:dFixSizeBuffer<ndGridHash, D_SCRATCH_BUFFER_SIZE + D_SCRATCH_BUFFER_SIZE_PADD>()
+				:dFixSizeArray<ndGridHash, D_SCRATCH_BUFFER_SIZE + D_SCRATCH_BUFFER_SIZE_PADD>()
 				, m_size(0)
 			{
 				// check the local scratch buffer is smaller than level one cache
-				dAssert(GetSize() * sizeof(ndGridHash) < 32 * 1024);
+				dAssert(GetCapacity() * sizeof(ndGridHash) < 32 * 1024);
 			}
 
 			void PushBack(const ndGridHash& element)
@@ -926,22 +926,23 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 		#define D_SCRATCH_PAIR_BUFFER_SIZE		(1024 * 24 / sizeof (ndParticlePair))
 		#define D_SCRATCH_PAIR_BUFFER_SIZE_PADD (256)
 
-		class ndParticlePairCacheBuffer : public dFixSizeBuffer<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>
+		class ndParticlePairCacheBuffer : public dFixSizeArray<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>
 		{
 			public:
 			ndParticlePairCacheBuffer()
-				:dFixSizeBuffer<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>()
+				:dFixSizeArray<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>()
 				, m_size(0)
 			{
 				// check the local scratch buffer is smaller than level one cache
-				dAssert(GetSize() * sizeof(ndParticlePair) < 32 * 1024);
+				dAssert(GetCapacity() * sizeof(ndParticlePair) < 32 * 1024);
 			}
 
 			void PushBack(dInt32 m0, dInt32 m1)
 			{
+				dAssert(0);
 				dInt32 index = m_size;
 				m_size++;
-				dAssert(m_size < GetSize());
+				dAssert(m_size < GetCapacity());
 				ndParticlePair& pair = (*this)[index];
 				pair.m_m0 = m0;
 				pair.m_m1 = m1;

@@ -649,7 +649,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		ndBasicVehicle::Update(world, timestep);
 
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-		dFixSizeBuffer<char, 32> buttons;
+		dFixSizeArray<char, 32> buttons;
 		scene->GetJoystickButtons(buttons);
 		if (buttons[2])
 		{
@@ -857,7 +857,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		ndBasicVehicle::Update(world, timestep);
 
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-		dFixSizeBuffer<char, 32> buttons;
+		dFixSizeArray<char, 32> buttons;
 		scene->GetJoystickButtons(buttons);
 		if (buttons[2])
 		{

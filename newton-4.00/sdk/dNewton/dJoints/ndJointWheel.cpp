@@ -53,6 +53,13 @@ void ndJointWheel::SetSteeringAngle(dFloat32 steeringAngle)
 	m_body0->SetMatrix(tireBodyMatrix);
 }
 
+dMatrix ndJointWheel::CalculateUpperBumperMatrix() const
+{
+	dMatrix matrix(m_localMatrix1 * m_body1->GetMatrix());
+	matrix.m_posit += matrix.m_up.Scale(m_info.m_maxLimit);
+	return matrix;
+}
+
 void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;

@@ -33,7 +33,8 @@
 #include "ndMultiBodyVehicleDifferential.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
 
-#define D_MAX_CONTACT_PENETRATION dFloat32 (5.0e-3f)
+#define D_MAX_CONTACT_PENETRATION	  dFloat32 (5.0e-3f)
+#define D_MIN_CONTACT_CLOSE_DISTANCE2 dFloat32 (5.0e-2f * 5.0e-2f)
 
 ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& upDir)
 	:ndModel()
@@ -352,6 +353,9 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 		ndMultiBodyVehicleTireJoint* const tireJoint = node->GetInfo();
 		ndBodyDynamic* const tireBody = tireJoint->GetBody0()->GetAsBodyDynamic();
 
+		// dawr upper bumper
+		context.DrawFrame(tireJoint->CalculateUpperBumperMatrix());
+
 		// show tire center of mass;
 		dMatrix tireFrame(tireBody->GetMatrix());
 		dVector com(tireBody->GetCentreOfMass());
@@ -455,6 +459,7 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
+		dAssert(((ndShape*)tire->GetBody0()->GetCollisionShape().GetShape())->GetAsShapeChamferCylinder());
 
 		const dMatrix tireMatrix (tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());
 		const ndBodyKinematic::ndContactMap& contactMap = tire->GetBody0()->GetContactMap();
@@ -466,13 +471,12 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 			{
 				ndContactPointList& contactPoints = contact->GetContactPoints();
 				const ndBodyKinematic* const otherBody = contact->GetBody1();
-				dAssert(otherBody != tire->GetBody0());
-				ndShape* const shape = (ndShape*)otherBody->GetCollisionShape().GetShape();
-				if (shape->GetAsShapeStaticMeshShape())
+				if (((ndShape*)otherBody->GetCollisionShape().GetShape())->GetAsShapeStaticMeshShape())
 				{
-					// for mesh collsion need to dos some contact post processing
-					// first remove any contact dumplicate, these are contact produce by tow or more poligon
-					// but that so are that can general ill formed rows in the solver mass matrix
+					// for mesh collision need to dos some contact post processing
+					// first remove any contact duplicate, these are contact produce by tow or 
+					// more polygons, but this so are close that they can generate ill 
+					// formed rows in the solver mass matrix
 					dFloat32 maxPenetration = dFloat32(0.0f);
 					for (ndContactPointList::dNode* contactNode0 = contactPoints.GetFirst(); contactNode0; contactNode0 = contactNode0->GetNext())
 					{
@@ -485,7 +489,7 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 							const dVector contactPoint1(contactNode1->GetInfo().m_point);
 							const dVector error(contactPoint1 - contactPoint0);
 							dFloat32 err2 = error.DotProduct(error).GetScalar();
-							if (err2 < dFloat32 (5.0e-2f * 5.0e-2f))
+							if (err2 < D_MIN_CONTACT_CLOSE_DISTANCE2)
 							{
 								contactPoints.Remove(contactNode1);
 							}
@@ -494,15 +498,19 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 
 					if (maxPenetration > D_MAX_CONTACT_PENETRATION)
 					{
-						// if the max penetartion is too much, 
-						// do a convex cast to find the tire location over the mesh 
-						// and teleport the tire to that location.
+						// if the max penetration is too much, 
+						// do a convex cast to find the tire location 
+						// over the mesh and teleport the tire to that location.
+						
+						dFixSizeArray<ndContactPoint, 8> closestHit;
+						const ndWheelDescriptor& info = tire->GetInfo();
+						const dMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
+						const dVector dest(tireUpperBumperMatrix.m_posit + tireUpperBumperMatrix.m_up.Scale(info.m_maxLimit - info.m_minLimit));
+						//dFloat32 param = ndContactSolver::ConvexCast(tireBody->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix(), closestHit);
+
 						//dAssert(0);
-
 					}
-
 				}
-
 
 				for (ndContactPointList::dNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 				{

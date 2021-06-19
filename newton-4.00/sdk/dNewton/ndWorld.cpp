@@ -33,11 +33,11 @@
 #include "ndDynamicsUpdateOpencl.h"
 #include "ndJointBilateralConstraint.h"
 
-class ndSkeletonQueue : public dFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>
+class ndSkeletonQueue : public dFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>
 {
 	public:
 	ndSkeletonQueue()
-		:dFixSizeBuffer<ndSkeletonContainer::ndNode*, 1024 * 4>()
+		:dFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>()
 		, m_mod(sizeof(m_array) / sizeof(m_array[0]))
 	{
 		m_lastIndex = 0;

@@ -61,27 +61,28 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	ndContactSolver(ndContact* const contact, ndScene* const scene);
 	ndContactSolver(ndShapeInstance* const instance, ndScene* const scene);
 	ndContactSolver(const ndContactSolver& src, const ndShapeInstance& instance0, const ndShapeInstance& instance1);
+	ndContactSolver(const ndShapeInstance& instance0, const dMatrix& matrix0, 
+					const ndShapeInstance& instance1, const dMatrix& matrix1);
 
-	//dInt32 CalculateConvexCastContacts();
-	//const dVector& GetNormal() const {return m_normal;}
-	//const dVector& GetPoint0() const {return m_closestPoint0;}
-	//const dVector& GetPoint1() const {return m_closestPoint1;}
-	//void CalculateContacts(ntPair* const pair, dInt32 threadIndex, bool ccdMode, bool intersectionTestOnly);
-
-	dInt32 ConvexContacts();
-	dInt32 CompoundContacts();
-	dInt32 CalculatePairContacts();
-	dInt32 CalculateConvexToConvexContacts();
-	dInt32 CalculateConvexToCompoundContacts();
-	dInt32 CalculateCompoundToConvexContacts();
-	dInt32 CalculateConvexToSaticMeshContacts();
-	dInt32 CalculateCompoundToCompoundContacts();
-	dInt32 CalculateCompoundToShapeStaticBvhContacts();
-	dInt32 CalculateConvexToSaticStaticBvhContactsNode(const dAabbPolygonSoup::dNode* const node);
+	dInt32 CalculateContactsDiscrete();
+	dInt32 CalculateContactsContinue(const dVector& veloc0, const dVector& veloc1, dFloat32 timestep);
 
 	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, ndContactPoint& contactOut);
+
+
+	static dFloat32 ConvexCast(const ndShapeInstance& castingInstance, const dMatrix& globalOrigin, const dVector& globalDest, const ndShapeInstance& castShape, const dMatrix& castMatrix, dFixSizeArray<ndContactPoint, 8>& contactOut);
 	
 	private:
+	dInt32 ConvexContactsDiscrete();
+	dInt32 CompoundContactsDiscrete();
+	dInt32 ConvexToCompoundContactsDiscrete();
+	dInt32 CompoundToConvexContactsDiscrete();
+	dInt32 CompoundToCompoundContactsDiscrete();
+	dInt32 CompoundToShapeStaticBvhContactsDiscrete();
+	dInt32 ConvexToSaticStaticBvhContactsNodeDescrete(const dAabbPolygonSoup::dNode* const node);
+
+	dInt32 ConvexContactsContinue(const dVector& veloc0, const dVector& veloc1);
+
 	class dgPerimenterEdge
 	{
 		public:
@@ -101,10 +102,12 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	D_INLINE void DeleteFace(ndMinkFace* const face);
 	D_INLINE ndMinkFace* AddFace(dInt32 v0, dInt32 v1, dInt32 v2);
 
-	dInt32 CalculateClosestSimplex();
 	bool CalculateClosestPoints();
+	dInt32 CalculateClosestSimplex();
 	dInt32 ConvexToConvexContacts();
 	dInt32 ConvexToStaticMeshContacts();
+
+	dInt32 ConvexToSaticMeshContactsContinue(const dVector& veloc0, const dVector& veloc1);
 
 	dInt32 CalculateIntersectingPlane(dInt32 count);
 	dInt32 PruneContacts(dInt32 count, dInt32 maxCount) const;
@@ -151,7 +154,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 
 	dInt32 m_maxCount;
 	dInt32 m_vertexIndex;
-	dUnsigned32 m_ccdMode				: 1;
+	//dUnsigned32 m_ccdMode				: 1;
 	dUnsigned32 m_pruneContacts			: 1;
 	dUnsigned32 m_intersectionTestOnly	: 1;
 	

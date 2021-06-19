@@ -51,6 +51,8 @@ class ndJointWheel: public ndJointBilateralConstraint
 	D_NEWTON_API void SetBrake(dFloat32 normalizedTorque);
 	D_NEWTON_API void SetSteeringAngle(dFloat32 steeringAngle);
 
+	D_NEWTON_API dMatrix CalculateUpperBumperMatrix() const;
+
 	const ndWheelDescriptor& GetInfo() const
 	{
 		return m_info;

@@ -249,7 +249,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showAABB = true;
 	//m_hideVisualMeshes = true;
 	//m_showScene = true;
-	m_showConcaveEdge = true;
+	//m_showConcaveEdge = true;
 	//m_autoSleepMode = false;
 	//m_solverMode = ndWorld::ndOpenclSolver;
 	m_solverMode = ndWorld::ndStandardSolver;
@@ -388,10 +388,10 @@ void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback,
 	m_updateCameraContext = context;
 }
 
-dInt32 ndDemoEntityManager::GetJoystickAxis (dFixSizeBuffer<dFloat32, 8>& axisValues)
+dInt32 ndDemoEntityManager::GetJoystickAxis (dFixSizeArray<dFloat32, 8>& axisValues)
 {
 	dInt32 axisCount = 0;
-	for (dInt32 i = 0; i < axisValues.GetSize(); i++)
+	for (dInt32 i = 0; i < axisValues.GetCapacity(); i++)
 	{
 		axisValues[i] = dFloat32(0.0f);
 	}
@@ -407,7 +407,7 @@ dInt32 ndDemoEntityManager::GetJoystickAxis (dFixSizeBuffer<dFloat32, 8>& axisVa
 	if (m_hasJoytick) 
 	{
 		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
-		axisCount = dMin (axisCount, axisValues.GetSize());
+		axisCount = dMin (axisCount, axisValues.GetCapacity());
 		for (dInt32 i = 0; i < axisCount; i ++) 
 		{
 			axisValues[i] = axis[i];
@@ -417,10 +417,10 @@ dInt32 ndDemoEntityManager::GetJoystickAxis (dFixSizeBuffer<dFloat32, 8>& axisVa
 	return axisCount;
 }
 
-dInt32 ndDemoEntityManager::GetJoystickButtons(dFixSizeBuffer<char, 32>& axisbuttons)
+dInt32 ndDemoEntityManager::GetJoystickButtons(dFixSizeArray<char, 32>& axisbuttons)
 {
 	dInt32 buttonsCount = 0;
-	memset(&axisbuttons[0], 0, axisbuttons.GetSize());
+	memset(&axisbuttons[0], 0, axisbuttons.GetCapacity());
 
 	if (!m_hasJoytick)
 	{
@@ -430,7 +430,7 @@ dInt32 ndDemoEntityManager::GetJoystickButtons(dFixSizeBuffer<char, 32>& axisbut
 	if (m_hasJoytick) 
 	{
 		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
-		buttonsCount = dMin (buttonsCount, axisbuttons.GetSize());
+		buttonsCount = dMin (buttonsCount, axisbuttons.GetCapacity());
 		for (dInt32 i = 0; i < buttonsCount; i ++) 
 		{
 			axisbuttons[i] = buttons[i];

@@ -625,7 +625,7 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 	else
 	{
 		m_vertexCount = dUnsigned16(m_count);
-		count = proxy.CalculateConvexToConvexContacts();
+		count = proxy.ConvexToConvexContacts();
 		dAssert(proxy.m_intersectionTestOnly || (count >= 0));
 		if (count >= 1)
 		{

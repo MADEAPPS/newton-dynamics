@@ -55,7 +55,7 @@ class ndRayCastNotify
 
 	protected:
 	const ndScene* m_scene;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
 class ndRayCastClosestHitCallback: public ndRayCastNotify

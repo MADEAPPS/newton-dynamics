@@ -555,10 +555,10 @@ void ndBodyPlayerCapsuleContactSolver::CalculateContacts()
 			contactSolver.m_instance1.SetGlobalMatrix(contactSolver.m_instance1.GetLocalMatrix() * body1->GetMatrix());
 			contactSolver.m_separatingVector = srcContact->m_separatingVector;
 			contactSolver.m_timestep = dFloat32 (1.0f);
-			contactSolver.m_ccdMode = 0;
+			//contactSolver.m_ccdMode = 0;
 			contactSolver.m_intersectionTestOnly = 0;
 			contactSolver.m_contactBuffer = contactBuffer;
-			const dInt32 count = contactSolver.CalculatePairContacts();
+			const dInt32 count = contactSolver.CalculateContactsDiscrete ();
 			for (dInt32 i = 0; i < count; i++)
 			{
 				m_contactBuffer[m_contactCount] = contactBuffer[i];

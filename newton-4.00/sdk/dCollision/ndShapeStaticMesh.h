@@ -58,7 +58,7 @@ class ndPolygonMeshDesc: public dFastAabbInfo
 	{
 	}
 
-	ndPolygonMeshDesc(ndContactSolver& proxy, void* const userData);
+	ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode);
 
 	void SortFaceArray();
 	dFloat32 GetSeparetionDistance() const;

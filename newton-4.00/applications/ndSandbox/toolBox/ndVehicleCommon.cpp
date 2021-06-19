@@ -182,7 +182,7 @@ ndVehicleSelector::ndVehicleSelector()
 
 void ndVehicleSelector::PostUpdate(ndWorld* const world, dFloat32)
 {
-	dFixSizeBuffer<char, 32> buttons;
+	dFixSizeArray<char, 32> buttons;
 	ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 	scene->GetJoystickButtons(buttons);
 	if (m_changeVehicle.Update(scene->GetKeyState('C') || buttons[5]))
@@ -277,8 +277,8 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 {
 	if (m_isPlayer && m_motor)
 	{
-		dFixSizeBuffer<dFloat32, 8> axis;
-		dFixSizeBuffer<char, 32> buttons;
+		dFixSizeArray<dFloat32, 8> axis;
+		dFixSizeArray<char, 32> buttons;
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 
 		scene->GetJoystickAxis(axis);

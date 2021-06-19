@@ -50,12 +50,12 @@
 #include <dQuaternion.h>
 #include <dPerlinNoise.h>
 #include <dTinyXmlGlue.h>
+#include <dFixSizeArray.h>
 #include <dConvexHull2d.h>
 #include <dConvexHull3d.h>
 #include <dConvexHull4d.h>
 #include <dBezierSpline.h>
 #include <dNodeHierarchy.h>
-#include <dFixSizeBuffer.h>
 #include <dIntersections.h>
 #include <dSpatialMatrix.h>
 #include <dGeneralVector.h>

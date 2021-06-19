@@ -19,7 +19,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndContact.h"
@@ -277,7 +276,6 @@ void ndShapeConvex::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) co
 dFloat32 ndShapeConvex::RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32, const ndBody* const body, ndContactPoint& contactOut) const
 {
 	ndBodyKinematic* const kinBody = ((ndBodyKinematic*)body)->GetAsBodyKinematic();
-	//ndContactSolver rayCaster(&kinBody->GetCollisionShape(), (ndShape*)this);
 	ndShapeInstance tempInstance (kinBody->GetCollisionShape(), (ndShape*)this);
 	ndContactSolver rayCaster(&tempInstance, kinBody->GetScene());
 	return rayCaster.RayCast(localP0, localP1, contactOut);

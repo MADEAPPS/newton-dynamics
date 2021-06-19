@@ -299,17 +299,6 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				t = m_shape->RayCast(callback, localP0, localP1, dFloat32(1.0f), body, contactOut);
 				if (t < dFloat32 (1.0f)) 
 				{
-					//dAssert(((ndShape*)m_shape)->GetAsShapeBox() || ((ndShape*)m_shape)->GetAsShapeSphere());
-				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
-				//	{
-				//		contactOut.m_shapeId0 = GetUserDataID();
-				//		contactOut.m_shapeId1 = GetUserDataID();
-				//	}
-				//	if (!m_shape->IsType(dgCollision::dgCollisionCompound_RTTI)) 
-				//	{
-				//		contactOut.m_collision0 = this;
-				//		contactOut.m_collision1 = this;
-				//	}
 					contactOut.m_shapeInstance0 = this;
 					contactOut.m_shapeInstance1 = this;
 				}
@@ -324,16 +313,6 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				if (t < dFloat32(1.0f))
 				{
 					dAssert(!((ndShape*)m_shape)->GetAsShapeCompoundConvex());
-				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
-				//	{
-				//		contactOut.m_shapeId0 = GetUserDataID();
-				//		contactOut.m_shapeId1 = GetUserDataID();
-				//	}
-				//	if (!m_shape->IsType(dgCollision::dgCollisionCompound_RTTI)) 
-				//	{
-				//		contactOut.m_collision0 = this;
-				//		contactOut.m_collision1 = this;
-				//	}
 					contactOut.m_shapeInstance0 = this;
 					contactOut.m_shapeInstance1 = this;
 				}
@@ -348,19 +327,6 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				if (t < dFloat32(1.0f))
 				{
 					dAssert(!((ndShape*)m_shape)->GetAsShapeCompoundConvex());
-				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
-				//	{
-				//		contactOut.m_shapeId0 = GetUserDataID();
-				//		contactOut.m_shapeId1 = GetUserDataID();
-				//		dVector n(m_invScale * contactOut.m_normal);
-				//		contactOut.m_normal = n.Normalize();
-				//	}
-				//	if (!m_shape->IsType(dgCollision::dgCollisionCompound_RTTI)) 
-				//	{
-				//		contactOut.m_collision0 = this;
-				//		contactOut.m_collision1 = this;
-				//	}
-
 					dVector normal(m_invScale * contactOut.m_normal);
 					contactOut.m_normal = normal.Normalize();
 					contactOut.m_shapeInstance0 = this;
@@ -378,19 +344,6 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				if (t < dFloat32(1.0f))
 				{
 					dAssert(!((ndShape*)m_shape)->GetAsShapeCompoundConvex());
-				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
-				//	{
-				//		contactOut.m_shapeId0 = GetUserDataID();
-				//		contactOut.m_shapeId1 = GetUserDataID();
-				//		dVector n(m_aligmentMatrix.RotateVector(m_invScale * contactOut.m_normal));
-				//		contactOut.m_normal = n.Normalize();
-				//	}
-				//	if (!(m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
-				//	{
-				//		contactOut.m_collision0 = this;
-				//		contactOut.m_collision1 = this;
-				//	}
-
 					dVector normal(m_aligmentMatrix.RotateVector(m_invScale * contactOut.m_normal));
 					contactOut.m_normal = normal.Normalize();
 					contactOut.m_shapeInstance0 = this;
