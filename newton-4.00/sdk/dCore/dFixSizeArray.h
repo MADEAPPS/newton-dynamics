@@ -80,9 +80,9 @@ const T& dFixSizeArray<T, maxSize>::operator[] (dInt32 i) const
 template<class T, dInt32 maxSize>
 void dFixSizeArray<T, maxSize>::PushBack(const T& element)
 {
-	dAssert(m_size <= m_capacity);
-	(*this)[m_size] = element;
-	m_size++;
+	dAssert(m_count <= maxSize);
+	(*this)[m_count] = element;
+	m_count++;
 }
 
 #endif

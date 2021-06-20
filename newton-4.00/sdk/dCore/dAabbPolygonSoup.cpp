@@ -1626,8 +1626,8 @@ void dAabbPolygonSoup::ForAllSectors (const dFastAabbInfo& obbAabbInfo, const dV
 		} 
 		else 
 		{
-			dFastRayTest ray (dVector (dFloat32 (0.0f)), boxDistanceTravel);
-			dFastRayTest obbRay (dVector (dFloat32 (0.0f)), obbAabbInfo.UnrotateVector(boxDistanceTravel));
+			dFastRayTest ray (dVector::m_zero, boxDistanceTravel);
+			dFastRayTest obbRay (dVector::m_zero, obbAabbInfo.UnrotateVector(boxDistanceTravel));
 			dInt32 stack = 1;
 			stackPool[0] = m_aabb;
 			distance [0] = m_aabb->BoxIntersect (ray, obbRay, obbAabbInfo, vertexArray);

@@ -21,6 +21,7 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
+#include "ndScene.h"
 #include "ndContact.h"
 #include "ndShapeNull.h"
 #include "ndShapeConvex.h"
@@ -277,7 +278,7 @@ dFloat32 ndShapeConvex::RayCast(ndRayCastNotify&, const dVector& localP0, const 
 {
 	ndBodyKinematic* const kinBody = ((ndBodyKinematic*)body)->GetAsBodyKinematic();
 	ndShapeInstance tempInstance (kinBody->GetCollisionShape(), (ndShape*)this);
-	ndContactSolver rayCaster(&tempInstance, kinBody->GetScene());
+	ndContactSolver rayCaster(&tempInstance, kinBody->GetScene()->GetContactNotify(), dFloat32 (1.0f));
 	return rayCaster.RayCast(localP0, localP1, contactOut);
 }
 

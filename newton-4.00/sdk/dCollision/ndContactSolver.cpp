@@ -62,17 +62,18 @@ dInt32 ndContactSolver::m_rayCastSimplex[4][4] =
 	{ 1, 0, 3, 2 },
 };
 
-ndContactSolver::ndContactSolver(ndShapeInstance* const instance, ndScene* const scene)
+ndContactSolver::ndContactSolver(ndShapeInstance* const instance, ndContactNotify* const notification, dFloat32 timestep)
 	:dDownHeap<ndMinkFace*, dFloat32>(m_heapBuffer, sizeof (m_heapBuffer))
-	,m_instance0(*instance)
-	,m_instance1(*instance)
+	,m_instance0(*instance, (ndShape*)instance->GetShape())
+	,m_instance1(*instance, (ndShape*)instance->GetShape())
 	,m_separatingVector(ndContact::m_initialSeparatingVector)
-	,m_scene(scene)
 	,m_contact(nullptr)
+	,m_freeFace(nullptr)
+	,m_notification(notification)
 	,m_contactBuffer(nullptr)
-	,m_timestep(dFloat32(1.0e10f))
-	,m_separationDistance(dFloat32(0.0f))
+	,m_timestep(timestep)
 	,m_skinThickness(dFloat32(0.0f))
+	,m_separationDistance(dFloat32(0.0f))
 	,m_maxCount(D_MAX_CONTATCS)
 	,m_vertexIndex(0)
 	,m_pruneContacts(1)
@@ -80,40 +81,20 @@ ndContactSolver::ndContactSolver(ndShapeInstance* const instance, ndScene* const
 {
 }
 
-ndContactSolver::ndContactSolver(const ndShapeInstance& instance0, const dMatrix& matrix0,
-	const ndShapeInstance& instance1, const dMatrix& matrix1)
-	:dDownHeap<ndMinkFace*, dFloat32>(m_heapBuffer, sizeof(m_heapBuffer))
-	,m_instance0(instance0, (ndShape*)instance0.GetShape())
-	,m_instance1(instance1, (ndShape*)instance1.GetShape())
-	,m_separatingVector(ndContact::m_initialSeparatingVector)
-	,m_scene(nullptr)
-	,m_contact(nullptr)
-	,m_contactBuffer(nullptr)
-	,m_timestep(dFloat32(1.0e10f))
-	,m_separationDistance(dFloat32(0.0f))
-	,m_skinThickness(dFloat32(0.0f))
-	,m_maxCount(D_MAX_CONTATCS)
-	,m_vertexIndex(0)
-	,m_pruneContacts(1)
-	,m_intersectionTestOnly(0)
-{
-	m_instance0.SetGlobalMatrix(matrix0);
-	m_instance1.SetGlobalMatrix(matrix1);
-}
-
-ndContactSolver::ndContactSolver(ndContact* const contact, ndScene* const scene)
+ndContactSolver::ndContactSolver(ndContact* const contact, ndContactNotify* const notification, dFloat32 timestep)
 	:dDownHeap<ndMinkFace*, dFloat32>(m_heapBuffer, sizeof(m_heapBuffer))
 	,m_instance0(contact->GetBody0()->GetCollisionShape(), contact->GetBody0()->GetCollisionShape().GetShape())
 	,m_instance1(contact->GetBody1()->GetCollisionShape(), contact->GetBody1()->GetCollisionShape().GetShape())
 	,m_closestPoint0(dVector::m_zero)
 	,m_closestPoint1(dVector::m_zero)
 	,m_separatingVector(ndContact::m_initialSeparatingVector)
-	,m_scene(scene)
 	,m_contact(contact)
+	,m_freeFace(nullptr)
+	,m_notification(notification)
 	,m_contactBuffer(nullptr)
-	,m_timestep(dFloat32 (1.0e10f))
-	,m_separationDistance(dFloat32(0.0f))
+	,m_timestep(timestep)
 	,m_skinThickness(dFloat32(0.0f))
+	,m_separationDistance(dFloat32(0.0f))
 	,m_maxCount(D_MAX_CONTATCS)
 	,m_vertexIndex(0)
 	,m_pruneContacts(1)
@@ -128,12 +109,13 @@ ndContactSolver::ndContactSolver(const ndContactSolver& src, const ndShapeInstan
 	,m_closestPoint0(dVector::m_zero)
 	,m_closestPoint1(dVector::m_zero)
 	,m_separatingVector(src.m_separatingVector)
-	,m_scene(src.m_scene)
 	,m_contact(src.m_contact)
+	,m_freeFace(nullptr)
+	,m_notification(src.m_notification)
 	,m_contactBuffer(src.m_contactBuffer)
 	,m_timestep(src.m_timestep)
-	,m_separationDistance(src.m_separationDistance)
 	,m_skinThickness(src.m_skinThickness)
+	,m_separationDistance(src.m_separationDistance)
 	,m_maxCount(D_MAX_CONTATCS)
 	,m_vertexIndex(0)
 	,m_pruneContacts(src.m_pruneContacts)
@@ -149,7 +131,6 @@ dInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 	ndContactPoint* const contacts = m_contactBuffer;
 	ndBodyKinematic* const otherBody = contactJoint->GetBody0();
 	ndBodyKinematic* const compoundBody = contactJoint->GetBody1();
-	ndContactNotify* const notification = m_scene->GetContactNotify();
 	ndShapeInstance* const otherInstance = &otherBody->GetCollisionShape();
 	ndShapeInstance* const compoundInstance = &compoundBody->GetCollisionShape();
 
@@ -168,7 +149,7 @@ dInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 	dInt32 contactCount = 0;
 	stackPool[0] = compoundShape->m_root;
 
-	const dFloat32 timestep = m_scene->GetTimestep();
+	//const dFloat32 timestep = m_scene->GetTimestep();
 	dFloat32 closestDist = dFloat32(1.0e10f);
 
 	while (stack)
@@ -184,7 +165,7 @@ dInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 				ndShapeInstance* const subShape = node->GetShape();
 				if (subShape->GetCollisionMode())
 				{
-					bool processContacts = notification->OnCompoundSubShapeOverlap(contactJoint, timestep, otherInstance, subShape);
+					bool processContacts = m_notification->OnCompoundSubShapeOverlap(contactJoint, m_timestep, otherInstance, subShape);
 					if (processContacts)
 					{
 						ndShapeInstance childInstance(*subShape, subShape->GetShape());
@@ -249,7 +230,6 @@ dInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 	ndContactPoint* const contacts = m_contactBuffer;
 	ndBodyKinematic* const otherBody = contactJoint->GetBody1();
 	ndBodyKinematic* const compoundBody = contactJoint->GetBody0();
-	ndContactNotify* const notification = m_scene->GetContactNotify();
 	ndShapeInstance* const otherInstance = &otherBody->GetCollisionShape();
 	ndShapeInstance* const compoundInstance = &compoundBody->GetCollisionShape();
 
@@ -269,8 +249,8 @@ dInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 	stackPool[0] = compoundShape->m_root;
 
 	//dAssert((contacts != nullptr) ^ proxy.m_intersectionTestOnly);
+	//const dFloat32 timestep = m_scene->GetTimestep();
 
-	const dFloat32 timestep = m_scene->GetTimestep();
 	dFloat32 closestDist = dFloat32(1.0e10f);
 	while (stack) 
 	{
@@ -285,7 +265,7 @@ dInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 				ndShapeInstance* const subShape = me->GetShape();
 				if (subShape->GetCollisionMode()) 
 				{
-					bool processContacts = notification->OnCompoundSubShapeOverlap(contactJoint, timestep, subShape, otherInstance);
+					bool processContacts = m_notification->OnCompoundSubShapeOverlap(contactJoint, m_timestep, subShape, otherInstance);
 					if (processContacts) 
 					{
 						ndShapeInstance childInstance(*subShape, subShape->GetShape());
@@ -355,7 +335,6 @@ dInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 	ndContactPoint* const contacts = m_contactBuffer;
 	ndBodyKinematic* const compoundBody0 = contactJoint->GetBody0();
 	ndBodyKinematic* const compoundBody1 = contactJoint->GetBody1();
-	ndContactNotify* const notification = m_scene->GetContactNotify();
 	ndShapeInstance* const compoundInstance0 = &compoundBody0->GetCollisionShape();
 	ndShapeInstance* const compoundInstance1 = &compoundBody1->GetCollisionShape();
 
@@ -375,7 +354,7 @@ dInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 	stackPool[0].m_node1 = compoundShape1->m_root;
 	
 	dFloat32 closestDist = dFloat32(1.0e10f);
-	const dFloat32 timestep = m_scene->GetTimestep();
+	//const dFloat32 timestep = m_scene->GetTimestep();
 	
 	while (stack)
 	{
@@ -394,7 +373,7 @@ dInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 				
 				if (subShape0->GetCollisionMode() & subShape1->GetCollisionMode())
 				{
-					bool processContacts = notification->OnCompoundSubShapeOverlap(contactJoint, timestep, subShape0, subShape1);
+					bool processContacts = m_notification->OnCompoundSubShapeOverlap(contactJoint, m_timestep, subShape0, subShape1);
 					if (processContacts)
 					{
 						ndShapeInstance childInstance0(*subShape0, subShape0->GetShape());
@@ -511,7 +490,6 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 	ndContactPoint* const contacts = m_contactBuffer;
 	ndBodyKinematic* const compoundBody = contactJoint->GetBody0();
 	ndBodyKinematic* const bvhTreeBody = contactJoint->GetBody1();
-	ndContactNotify* const notification = m_scene->GetContactNotify();
 	ndShapeInstance* const compoundInstance = &compoundBody->GetCollisionShape();
 	ndShapeInstance* const bvhTreeInstance = &bvhTreeBody->GetCollisionShape();
 	ndShapeStaticBVH* const bvhTreeCollision = m_instance1.GetShape()->GetAsShapeStaticBVH();
@@ -532,7 +510,7 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 	stackPool[0].m_collisionTreeNode = bvhTreeCollision->GetRootNode();
 	
 	dFloat32 closestDist = dFloat32(1.0e10f);
-	const dFloat32 timestep = m_scene->GetTimestep();
+	//const dFloat32 timestep = m_scene->GetTimestep();
 
 	const dVector treeScale (bvhTreeInstance->GetScale());
 	
@@ -566,7 +544,7 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 				ndShapeInstance* const subShape = compoundNode->GetShape();
 				if (subShape->GetCollisionMode())
 				{
-					bool processContacts = notification->OnCompoundSubShapeOverlap(contactJoint, timestep, subShape, bvhTreeInstance);
+					bool processContacts = m_notification->OnCompoundSubShapeOverlap(contactJoint, m_timestep, subShape, bvhTreeInstance);
 					if (processContacts)
 					{
 						ndShapeInstance childInstance(*subShape, subShape->GetShape());
@@ -785,15 +763,14 @@ dInt32 ndContactSolver::ConvexContactsDiscrete()
 	if (m_instance1.GetShape()->GetAsShapeConvex())
 	{
 		dAssert(m_instance0.GetShape()->GetAsShapeConvex());
-		count = ConvexToConvexContacts();
+		count = ConvexToConvexContactsDiscrete();
 	}
 	else
 	{
 		ndShapeStaticMesh* const meshShape = m_instance1.GetShape()->GetAsShapeStaticMeshShape();
 		if (meshShape)
 		{
-			//count = CalculateConvexToSaticMeshContacts();
-			count = ConvexToStaticMeshContacts();
+			count = ConvexToStaticMeshContactsDiscrete();
 		}
 		else
 		{
@@ -825,7 +802,7 @@ dInt32 ndContactSolver::ConvexContactsDiscrete()
 	return count;
 }
 
-dInt32 ndContactSolver::ConvexContactsContinue(const dVector& veloc0, const dVector& veloc1)
+dInt32 ndContactSolver::ConvexContactsContinue()
 {
 	const dVector origin0(m_instance0.m_globalMatrix.m_posit);
 	const dVector origin1(m_instance1.m_globalMatrix.m_posit);
@@ -851,8 +828,7 @@ dInt32 ndContactSolver::ConvexContactsContinue(const dVector& veloc0, const dVec
 		ndShapeStaticMesh* const meshShape = m_instance1.GetShape()->GetAsShapeStaticMeshShape();
 		if (meshShape)
 		{
-			dAssert(0);
-			//count = CalculateConvexToSaticMeshContacts();
+			count = ConvexToStaticMeshContactsContinue();
 		}
 		else
 		{
@@ -1016,10 +992,9 @@ dInt32 ndContactSolver::CalculateContactsDiscrete ()
 	return count;
 }
 
-dInt32 ndContactSolver::CalculateContactsContinue(const dVector& veloc0, const dVector& veloc1, dFloat32 timestep)
+dInt32 ndContactSolver::CalculateContactsContinue()
 {
 	dInt32 count = 0;
-	m_timestep = timestep;
 	if (m_instance0.GetShape()->GetAsShapeCompoundConvex() || m_instance1.GetShape()->GetAsShapeCompoundConvex())
 	{
 		dAssert(0);
@@ -1027,7 +1002,7 @@ dInt32 ndContactSolver::CalculateContactsContinue(const dVector& veloc0, const d
 	}
 	else if (m_instance0.GetShape()->GetAsShapeConvex())
 	{
-		count = ConvexContactsContinue(veloc0, veloc1);
+		count = ConvexContactsContinue();
 	}
 	else
 	{
@@ -1042,7 +1017,64 @@ dInt32 ndContactSolver::CalculateContactsContinue(const dVector& veloc0, const d
 	return count;
 }
 
-dInt32 ndContactSolver::ConvexToConvexContacts()
+dInt32 ndContactSolver::ConvexToConvexContactsContinue()
+{
+	dAssert(0);
+	return 0;
+	//dAssert(m_instance0.GetConvexVertexCount() && m_instance1.GetConvexVertexCount());
+	//dAssert(m_instance0.GetShape()->GetAsShapeConvex());
+	//dAssert(m_instance1.GetShape()->GetAsShapeConvex());
+	//dAssert(!m_instance0.GetShape()->GetAsShapeNull());
+	//dAssert(!m_instance1.GetShape()->GetAsShapeNull());
+	//
+	//dInt32 count = 0;
+	//bool colliding = CalculateClosestPoints();
+	//dFloat32 penetration = m_separatingVector.DotProduct(m_closestPoint1 - m_closestPoint0).GetScalar() - m_skinThickness - D_PENETRATION_TOL;
+	//if (m_intersectionTestOnly) 
+	//{
+	//	m_separationDistance = penetration;
+	//	count = (penetration <= dFloat32(0.0f)) ? 1 : 0;
+	//}
+	//else 
+	//{
+	//	if (colliding) 
+	//	{
+	//		if (penetration <= dFloat32(1.0e-5f)) 
+	//		{
+	//			if (m_instance0.GetCollisionMode() & m_instance1.GetCollisionMode()) 
+	//			{
+	//				count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_separatingVector * dVector::m_negOne);
+	//			}
+	//		}
+	//
+	//		m_separationDistance = penetration;
+	//
+	//		penetration = -penetration;
+	//		count = dMin(m_maxCount, count);
+	//		ndContactPoint* const contactOut = m_contactBuffer;
+	//
+	//		ndBodyKinematic* const body0 = m_contact->GetBody0();
+	//		ndBodyKinematic* const body1 = m_contact->GetBody1();
+	//		ndShapeInstance* const instance0 = &body0->GetCollisionShape();
+	//		ndShapeInstance* const instance1 = &body1->GetCollisionShape();
+	//
+	//		dVector normal(m_separatingVector * dVector::m_negOne);
+	//		for (dInt32 i = count - 1; i >= 0; i--)
+	//		{
+	//			contactOut[i].m_point = m_buffer[i];
+	//			contactOut[i].m_normal = normal;
+	//			contactOut[i].m_body0 = body0;
+	//			contactOut[i].m_body1 = body1;
+	//			contactOut[i].m_shapeInstance0 = instance0;
+	//			contactOut[i].m_shapeInstance1 = instance1;
+	//			contactOut[i].m_penetration = penetration;
+	//		}
+	//	}
+	//}
+	//return count;
+}
+
+dInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 {
 	dAssert(m_instance0.GetConvexVertexCount() && m_instance1.GetConvexVertexCount());
 	dAssert(m_instance0.GetShape()->GetAsShapeConvex());
@@ -1053,18 +1085,18 @@ dInt32 ndContactSolver::ConvexToConvexContacts()
 	dInt32 count = 0;
 	bool colliding = CalculateClosestPoints();
 	dFloat32 penetration = m_separatingVector.DotProduct(m_closestPoint1 - m_closestPoint0).GetScalar() - m_skinThickness - D_PENETRATION_TOL;
-	if (m_intersectionTestOnly) 
+	if (m_intersectionTestOnly)
 	{
 		m_separationDistance = penetration;
 		count = (penetration <= dFloat32(0.0f)) ? 1 : 0;
 	}
-	else 
+	else
 	{
-		if (colliding) 
+		if (colliding)
 		{
-			if (penetration <= dFloat32(1.0e-5f)) 
+			if (penetration <= dFloat32(1.0e-5f))
 			{
-				if (m_instance0.GetCollisionMode() & m_instance1.GetCollisionMode()) 
+				if (m_instance0.GetCollisionMode() & m_instance1.GetCollisionMode())
 				{
 					count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_separatingVector * dVector::m_negOne);
 				}
@@ -1097,7 +1129,7 @@ dInt32 ndContactSolver::ConvexToConvexContacts()
 	return count;
 }
 
-dInt32 ndContactSolver::ConvexToStaticMeshContacts()
+dInt32 ndContactSolver::ConvexToStaticMeshContactsDiscrete()
 {
 	dAssert(m_instance0.GetConvexVertexCount());
 	dAssert(!m_instance0.GetShape()->GetAsShapeNull());
@@ -1134,7 +1166,7 @@ dInt32 ndContactSolver::ConvexToStaticMeshContacts()
 	return count;
 }
 
-dInt32 ndContactSolver::ConvexToSaticMeshContactsContinue(const dVector& veloc0, const dVector& veloc1)
+dInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 {
 	dAssert(m_instance0.GetConvexVertexCount());
 	dAssert(!m_instance0.GetShape()->GetAsShapeNull());
@@ -1143,12 +1175,31 @@ dInt32 ndContactSolver::ConvexToSaticMeshContactsContinue(const dVector& veloc0,
 
 	dInt32 count = 0;
 	ndPolygonMeshDesc data(*this, true);
+
+	//const dgVector& hullVeloc = data.m_objBody->m_veloc;
+	//const dgVector& hullOmega = data.m_objBody->m_omega;
+
+	dVector relVeloc(m_contact->m_body0->GetVelocity() - m_contact->m_body1->GetVelocity());
+	dFloat32 baseLinearSpeed = dSqrt(relVeloc.DotProduct(relVeloc).GetScalar());
+	if (baseLinearSpeed > dFloat32(1.0e-6f)) 
+	{
+		//const dFloat32 minRadius = m_instance0.GetBoxMinRadius();
+		//const dFloat32 maxRadius = m_instance0.GetBoxMaxRadius();
+		//dFloat32 maxAngularSpeed = dSqrt(hullOmega.DotProduct(hullOmega).GetScalar());
+		//dFloat32 maxAngularSpeed = dFloat32 (0.0f);
+		//dFloat32 angularSpeedBound = maxAngularSpeed * (maxRadius - minRadius);
+		//dFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
+		dFloat32 upperBoundSpeed = baseLinearSpeed;
+		dVector upperBoundVeloc(relVeloc.Scale(m_timestep * upperBoundSpeed / baseLinearSpeed));
+		data.SetDistanceTravel(upperBoundVeloc);
+	}
+
 	ndShapeStaticMesh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticMeshShape();
 	polysoup->GetCollidingFaces(&data);
 
 	if (data.m_faceCount)
 	{
-		count = CalculatePolySoupToHullContactsDescrete(data);
+		count = CalculatePolySoupToHullContactsContinue(data);
 	}
 
 	ndBodyKinematic* const body0 = m_contact->GetBody0();
@@ -1336,7 +1387,6 @@ D_INLINE dBigVector ndContactSolver::ReduceTetrahedrum(dInt32& indexOut)
 	// this is a degenerated tetra. this should never happens.
 	// it seems this does happens about once per several millions calls, 
 	// I will assume is acceptable. No fall back needed
-	//dAssert (0);
 	return dBigVector::m_zero;
 }
 
@@ -2471,7 +2521,6 @@ dFloat32 ndContactSolver::RayCast(const dVector& localP0, const dVector& localP1
 			cycling++;
 			if (cycling > 4) 
 			{
-				//dAssert (0);
 				index = -1;
 				break;
 			}
@@ -2588,11 +2637,36 @@ dFloat32 ndContactSolver::RayCast(const dVector& localP0, const dVector& localP1
 
 dFloat32 ndContactSolver::ConvexCast(const ndShapeInstance& castingInstance, const dMatrix& globalOrigin, const dVector& globalDest, const ndShapeInstance& castShape, const dMatrix& castMatrix, dFixSizeArray<ndContactPoint, 8>& contactOut)
 {
-	ndContactSolver contactSolver(castingInstance, globalOrigin, castShape, castMatrix);
-	dVector veloc0(globalDest - globalOrigin.m_posit);
-	dFloat32 lenght = dSqrt(veloc0.DotProduct(veloc0).GetScalar());
-	dFloat32 param = contactSolver.CalculateContactsContinue(veloc0, dVector::m_zero, lenght);
-	return param;
+	ndContact contact;
+	ndBodyKinematic body0;
+	ndBodyKinematic body1;
+	ndContactNotify notify;
+	
+	body0.SetCollisionShape(castingInstance);
+	body1.SetCollisionShape(castShape);
+	
+	body0.SetMatrix(globalOrigin);
+	body1.SetMatrix(castMatrix);
+	body0.SetMassMatrix(dVector::m_one);
+	body0.SetVelocity(globalDest - globalOrigin.m_posit);
+
+	contact.SetBodies(&body0, &body1);
+	
+	ndShapeInstance& shape0 = body0.GetCollisionShape();
+	ndShapeInstance& shape1 = body1.GetCollisionShape();
+	shape0.SetGlobalMatrix(shape0.GetLocalMatrix() * body0.GetMatrix());
+	shape1.SetGlobalMatrix(shape1.GetLocalMatrix() * body1.GetMatrix());
+
+	ndContactPoint contactBuffer[D_MAX_CONTATCS];
+	ndContactSolver contactSolver(&contact, &notify, dFloat32 (1.0f));
+	contactSolver.m_contactBuffer = contactBuffer;
+	const dInt32 count = dMin (contactSolver.CalculateContactsContinue(), contactOut.GetCapacity());
+
+	for (dInt32 i = 0; i < count; i++)
+	{
+		contactOut.PushBack(contactBuffer[i]);
+	}
+	return contactSolver.m_timestep;
 }
 
 D_INLINE ndMinkFace* ndContactSolver::NewFace()
@@ -3121,6 +3195,124 @@ dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDes
 				count = 1;
 				break;
 			}
+		}
+	}
+
+	m_contactBuffer = contactOut;
+	m_separationDistance = closestDist;
+	m_instance1.m_shape = polySoupInstance.m_shape;
+	m_instance1 = polySoupInstance;
+
+	return count;
+}
+
+dInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDesc& data)
+{
+	dAssert(data.m_faceCount);
+
+	ndShapeConvexPolygon polygon;
+	ndShapeInstance polySoupInstance(m_instance1);
+	m_instance1.m_shape = &polygon;
+	m_instance1.SetScale(dVector::m_one);
+	m_instance1.m_localMatrix = dGetIdentityMatrix();
+	m_instance1.m_globalMatrix = dGetIdentityMatrix();
+
+	polygon.m_vertex = data.m_vertex;
+	polygon.m_stride = dInt32(data.m_vertexStrideInBytes / sizeof(dFloat32));
+
+	dInt32 count = 0;
+	dInt32 maxContacts = m_maxCount;
+	dInt32 countleft = maxContacts;
+	dInt32 maxReduceLimit = maxContacts - 16;
+
+	const dVector& polygonInstanceScale = polySoupInstance.GetScale();
+	const dMatrix polySoupGlobalMatrix = polySoupInstance.m_globalMatrix;
+	const dMatrix polySoupGlobalAligmentMatrix = polySoupInstance.m_aligmentMatrix;
+
+	dMatrix polySoupScaledMatrix(
+		polySoupGlobalAligmentMatrix[0] * polygonInstanceScale,
+		polySoupGlobalAligmentMatrix[1] * polygonInstanceScale,
+		polySoupGlobalAligmentMatrix[2] * polygonInstanceScale,
+		polySoupGlobalAligmentMatrix[3]);
+	polySoupScaledMatrix = polySoupScaledMatrix * polySoupGlobalMatrix;
+
+	dAssert(m_contact);
+	dVector separatingVector(m_instance0.m_globalMatrix.m_up);
+
+	const dInt32 stride = polygon.m_stride;
+	const dFloat32* const vertex = polygon.m_vertex;
+	dAssert(m_instance1.m_scaleType == ndShapeInstance::m_unit);
+	
+	ndContactPoint* const contactOut = m_contactBuffer;
+	ndContact* const contactJoint = m_contact;
+	dInt32* const indexArray = (dInt32*)data.m_faceVertexIndex;
+	data.SortFaceArray();
+
+	dVector n(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
+	dVector p(dVector::m_zero);
+	dVector q(dVector::m_zero);
+	dFloat32 closestDist = dFloat32(1.0e10f);
+	dFloat32 minTimeStep = m_timestep;
+
+	dFloat32 timeNormalizer = m_timestep;
+	dFloat32 epsilon = dFloat32(-1.0e-3f) * m_timestep;
+	
+	for (dInt32 i = 0; (i < data.m_faceCount) && (m_timestep >= (data.m_hitDistance[i] * timeNormalizer)); i++) 
+	{
+		dInt32 address = data.m_faceIndexStart[i];
+		const dInt32* const localIndexArray = &indexArray[address];
+		polygon.m_vertexIndex = localIndexArray;
+		polygon.m_count = data.m_faceIndexCount[i];
+		polygon.m_paddedCount = polygon.m_count;
+		polygon.m_adjacentFaceEdgeNormalIndex = data.GetAdjacentFaceEdgeNormalArray(localIndexArray, polygon.m_count);
+		polygon.m_faceId = data.GetFaceId(localIndexArray, polygon.m_count);
+		polygon.m_faceClipSize = data.GetFaceSize(localIndexArray, polygon.m_count);
+		polygon.m_faceNormalIndex = data.GetNormalIndex(localIndexArray, polygon.m_count);
+		polygon.m_normal = polygon.CalculateGlobalNormal(&polySoupInstance, dVector(&vertex[polygon.m_faceNormalIndex * stride]) & dVector::m_triplexMask);
+		dAssert(polygon.m_normal.m_w == dFloat32(0.0f));
+		for (dInt32 j = 0; j < polygon.m_count; j++)
+		{
+			polygon.m_localPoly[j] = polySoupScaledMatrix.TransformVector(dVector(&vertex[localIndexArray[j] * stride]) & dVector::m_triplexMask);
+		}
+
+		contactJoint->m_separatingVector = separatingVector;
+		m_maxCount = countleft;
+		m_vertexIndex = 0;
+		m_contactBuffer = &contactOut[count];
+		dInt32 count1 = polygon.CalculateContactToConvexHullContinue(&polySoupInstance, *this);
+		
+		if (count1 > 0)
+		{
+			dFloat32 error = m_timestep - minTimeStep;
+			if (error < epsilon) 
+			{
+				count = 0;
+				countleft = maxContacts;
+				for (dInt32 j = 0; j < count1; j++) 
+				{
+					contactOut[j] = m_contactBuffer[j];
+				}
+			}
+			count += count1;
+			countleft -= count1;
+			dAssert(countleft >= 0);
+			if (count >= maxReduceLimit) 
+			{
+				dAssert(0);
+				//count = PruneContacts(count, contactOut, dFloat32(1.0e-2f), 16);
+				//countleft = maxContacts - count;
+				//dAssert(countleft >= 0);
+				//proxy.m_maxContacts = countleft;
+			}
+		}
+
+		closestDist = dMin(closestDist, contactJoint->m_separationDistance);
+		if (m_timestep <= minTimeStep) 
+		{
+			minTimeStep = m_timestep;
+			n = m_separatingVector;
+			p = m_closestPoint0;
+			q = m_closestPoint1;
 		}
 	}
 

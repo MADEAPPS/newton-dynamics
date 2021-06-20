@@ -48,8 +48,7 @@ class ndShapeConvexPolygon: public ndShapeConvex
 
 	dVector CalculateGlobalNormal(const ndShapeInstance* const parentMesh, const dVector& localNormal) const;
 	dInt32 CalculateContactToConvexHullDescrete(const ndShapeInstance* const parentMesh, ndContactSolver& proxy);
-
-	//dInt32 CalculateContactToConvexHullContinue (const dgWorld* const world, const ndShapeInstance* const parentMesh, dgCollisionParamProxy& proxy);
+	dInt32 CalculateContactToConvexHullContinue(const ndShapeInstance* const parentMesh, ndContactSolver& proxy);
 
 	virtual dFloat32 GetVolume() const;
 	virtual dFloat32 GetBoxMinRadius() const;
@@ -63,12 +62,13 @@ class ndShapeConvexPolygon: public ndShapeConvex
 	dVector m_normal;
 	dVector m_localPoly[D_CONVEX_POLYGON_MAX_VERTEX_COUNT];
 	dInt32 m_clippEdgeNormal[D_CONVEX_POLYGON_MAX_VERTEX_COUNT];
+	dFloat32 m_faceClipSize;
 	dInt32 m_count;
 	dInt32 m_paddedCount;
 	dInt32 m_faceId;
 	dInt32 m_stride;
 	dInt32 m_faceNormalIndex;
-	dFloat32 m_faceClipSize; 
+	
 	const dFloat32* m_vertex;
 	const dInt32* m_vertexIndex;
 	const dInt32* m_adjacentFaceEdgeNormalIndex;

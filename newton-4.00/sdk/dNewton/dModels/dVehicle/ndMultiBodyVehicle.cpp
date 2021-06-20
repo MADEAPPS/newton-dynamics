@@ -505,8 +505,8 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 						dFixSizeArray<ndContactPoint, 8> closestHit;
 						const ndWheelDescriptor& info = tire->GetInfo();
 						const dMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
-						const dVector dest(tireUpperBumperMatrix.m_posit + tireUpperBumperMatrix.m_up.Scale(info.m_maxLimit - info.m_minLimit));
-						//dFloat32 param = ndContactSolver::ConvexCast(tireBody->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix(), closestHit);
+						const dVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_maxLimit - info.m_minLimit));
+						//dFloat32 param = ndContactSolver::ConvexCast(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix(), closestHit);
 
 						//dAssert(0);
 					}

@@ -22,6 +22,7 @@
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndBody.h"
+#include "ndScene.h"
 #include "ndContact.h"
 #include "ndShapeCapsule.h"
 #include "ndContactSolver.h"
@@ -550,11 +551,12 @@ void ndBodyPlayerCapsuleContactSolver::CalculateContacts()
 			contact.SetBodies(body0, body1);
 
 			ndContactPoint contactBuffer[D_MAX_CONTATCS];
-			ndContactSolver contactSolver(&contact, scene);
+			//ndContactSolver contactSolver(&contact, scene);
+			ndContactSolver contactSolver(&contact, scene->GetContactNotify(), dFloat32(1.0f));
 			contactSolver.m_instance0.SetGlobalMatrix(contactSolver.m_instance0.GetLocalMatrix() * body0->GetMatrix());
 			contactSolver.m_instance1.SetGlobalMatrix(contactSolver.m_instance1.GetLocalMatrix() * body1->GetMatrix());
 			contactSolver.m_separatingVector = srcContact->m_separatingVector;
-			contactSolver.m_timestep = dFloat32 (1.0f);
+			//contactSolver.m_timestep = dFloat32 (1.0f);
 			//contactSolver.m_ccdMode = 0;
 			contactSolver.m_intersectionTestOnly = 0;
 			contactSolver.m_contactBuffer = contactBuffer;
