@@ -505,46 +505,53 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 						const dMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
 						const dVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_maxLimit - info.m_minLimit));
 						dFloat32 param = ndContactSolver::ConvexCast(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix(), closestHit);
-
-						ndBodyKinematic* const tireBody = tire->GetBody0();
-						dMatrix tireMatrix(tire->GetLocalMatrix0() * tireBody->GetMatrix());
-						tireMatrix.m_posit = tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(param * (info.m_maxLimit - info.m_minLimit));
-						tireBody->SetMatrix(tire->GetLocalMatrix0().Inverse() * tireMatrix);
-
-						if (closestHit.GetCount())
+						if (param > dFloat32(0.0f))
 						{
-							for (dInt32 i = closestHit.GetCount() - 1; i > 0; i--)
+							ndBodyKinematic* const tireBody = tire->GetBody0();
+							dMatrix tireMatrix(tire->GetLocalMatrix0() * tireBody->GetMatrix());
+							dFloat32 tirePosition = tireUpperBumperMatrix.m_up.DotProduct(tireUpperBumperMatrix.m_posit - tireMatrix.m_posit).GetScalar();
+							dFloat32 tireNewPosition = param * (info.m_maxLimit - info.m_minLimit);
+							dFloat32 positionError = dMin(tirePosition - tireNewPosition, D_MAX_CONTACT_PENETRATION);
+							dAssert(positionError >= 0.0f);
+							tirePosition -= positionError;
+							tireMatrix.m_posit = tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(tirePosition);
+							tireBody->SetMatrix(tire->GetLocalMatrix0().Inverse() * tireMatrix);
+
+							if (closestHit.GetCount())
 							{
-								for (dInt32 j = i - 1; j >= 0; j--)
+								for (dInt32 i = closestHit.GetCount() - 1; i > 0; i--)
 								{
-									const dVector error(closestHit[i].m_point - closestHit[j].m_point);
-									dFloat32 err2 = error.DotProduct(error).GetScalar();
-									if (err2 < D_MIN_CONTACT_CLOSE_DISTANCE2)
+									for (dInt32 j = i - 1; j >= 0; j--)
 									{
-										closestHit.SetCount(closestHit.GetCount() - 1);
-										break;
+										const dVector error(closestHit[i].m_point - closestHit[j].m_point);
+										dFloat32 err2 = error.DotProduct(error).GetScalar();
+										if (err2 < D_MIN_CONTACT_CLOSE_DISTANCE2)
+										{
+											closestHit.SetCount(closestHit.GetCount() - 1);
+											break;
+										}
 									}
 								}
-							}
 
-							// repopulate the contact array
-							contactPoints.RemoveAll();
-							for (dInt32 i = closestHit.GetCount() - 1; i >= 0; i--)
-							{
-								ndContactMaterial* const contactPoint = &contactPoints.Append()->GetInfo();
+								// repopulate the contact array
+								contactPoints.RemoveAll();
+								for (dInt32 i = closestHit.GetCount() - 1; i >= 0; i--)
+								{
+									ndContactMaterial* const contactPoint = &contactPoints.Append()->GetInfo();
 
-								const dMatrix normalBase(closestHit[i].m_normal);
-								contactPoint->m_point = closestHit[i].m_point;
-								contactPoint->m_normal = normalBase.m_front;
-								contactPoint->m_dir0 = normalBase.m_up;
-								contactPoint->m_dir1 = normalBase.m_right;
-								contactPoint->m_penetration = closestHit[i].m_penetration;
-								contactPoint->m_body0 = tireBody;
-								contactPoint->m_body1 = otherBody;
-								contactPoint->m_shapeInstance0 = &contactPoint->m_body0->GetCollisionShape();
-								contactPoint->m_shapeInstance1 = &contactPoint->m_body1->GetCollisionShape();
-								contactPoint->m_shapeId0 = closestHit[i].m_shapeId0;
-								contactPoint->m_shapeId1 = closestHit[i].m_shapeId1;
+									const dMatrix normalBase(closestHit[i].m_normal);
+									contactPoint->m_point = closestHit[i].m_point;
+									contactPoint->m_normal = normalBase.m_front;
+									contactPoint->m_dir0 = normalBase.m_up;
+									contactPoint->m_dir1 = normalBase.m_right;
+									contactPoint->m_penetration = closestHit[i].m_penetration;
+									contactPoint->m_body0 = tireBody;
+									contactPoint->m_body1 = otherBody;
+									contactPoint->m_shapeInstance0 = &contactPoint->m_body0->GetCollisionShape();
+									contactPoint->m_shapeInstance1 = &contactPoint->m_body1->GetCollisionShape();
+									contactPoint->m_shapeId0 = closestHit[i].m_shapeId0;
+									contactPoint->m_shapeId1 = closestHit[i].m_shapeId1;
+								}
 							}
 						}
 					}
