@@ -461,7 +461,6 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 		dAssert(((ndShape*)tire->GetBody0()->GetCollisionShape().GetShape())->GetAsShapeChamferCylinder());
 
-		const dMatrix tireMatrix (tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());
 		const ndBodyKinematic::ndContactMap& contactMap = tire->GetBody0()->GetContactMap();
 		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
 		for (it.Begin(); it; it++)
@@ -482,16 +481,15 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 					{
 						const dVector contactPoint0 (contactNode0->GetInfo().m_point);
 						maxPenetration = dMax(contactNode0->GetInfo().m_penetration, maxPenetration);
-						ndContactPointList::dNode* nextContactNode;
-						for (ndContactPointList::dNode* contactNode1 = contactNode0->GetNext(); contactNode1; contactNode1 = nextContactNode)
+						for (ndContactPointList::dNode* contactNode1 = contactNode0->GetNext(); contactNode1; contactNode1 = contactNode1->GetNext())
 						{
-							nextContactNode = contactNode1->GetNext();
 							const dVector contactPoint1(contactNode1->GetInfo().m_point);
 							const dVector error(contactPoint1 - contactPoint0);
 							dFloat32 err2 = error.DotProduct(error).GetScalar();
 							if (err2 < D_MIN_CONTACT_CLOSE_DISTANCE2)
 							{
 								contactPoints.Remove(contactNode1);
+								break;
 							}
 						}
 					}
@@ -506,12 +504,53 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 						const ndWheelDescriptor& info = tire->GetInfo();
 						const dMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
 						const dVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_maxLimit - info.m_minLimit));
-						//dFloat32 param = ndContactSolver::ConvexCast(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix(), closestHit);
+						dFloat32 param = ndContactSolver::ConvexCast(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix(), closestHit);
 
-						//dAssert(0);
+						ndBodyKinematic* const tireBody = tire->GetBody0();
+						dMatrix tireMatrix(tire->GetLocalMatrix0() * tireBody->GetMatrix());
+						tireMatrix.m_posit = tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(param * (info.m_maxLimit - info.m_minLimit));
+						tireBody->SetMatrix(tire->GetLocalMatrix0().Inverse() * tireMatrix);
+
+						if (closestHit.GetCount())
+						{
+							for (dInt32 i = closestHit.GetCount() - 1; i > 0; i--)
+							{
+								for (dInt32 j = i - 1; j >= 0; j--)
+								{
+									const dVector error(closestHit[i].m_point - closestHit[j].m_point);
+									dFloat32 err2 = error.DotProduct(error).GetScalar();
+									if (err2 < D_MIN_CONTACT_CLOSE_DISTANCE2)
+									{
+										closestHit.SetCount(closestHit.GetCount() - 1);
+										break;
+									}
+								}
+							}
+
+							// repopulate the contact array
+							contactPoints.RemoveAll();
+							for (dInt32 i = closestHit.GetCount() - 1; i >= 0; i--)
+							{
+								ndContactMaterial* const contactPoint = &contactPoints.Append()->GetInfo();
+
+								const dMatrix normalBase(closestHit[i].m_normal);
+								contactPoint->m_point = closestHit[i].m_point;
+								contactPoint->m_normal = normalBase.m_front;
+								contactPoint->m_dir0 = normalBase.m_up;
+								contactPoint->m_dir1 = normalBase.m_right;
+								contactPoint->m_penetration = closestHit[i].m_penetration;
+								contactPoint->m_body0 = tireBody;
+								contactPoint->m_body1 = otherBody;
+								contactPoint->m_shapeInstance0 = &contactPoint->m_body0->GetCollisionShape();
+								contactPoint->m_shapeInstance1 = &contactPoint->m_body1->GetCollisionShape();
+								contactPoint->m_shapeId0 = closestHit[i].m_shapeId0;
+								contactPoint->m_shapeId1 = closestHit[i].m_shapeId1;
+							}
+						}
 					}
 				}
 
+				const dMatrix tireMatrix (tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());
 				for (ndContactPointList::dNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 				{
 					ndContactMaterial& contactPoint = contactNode->GetInfo();

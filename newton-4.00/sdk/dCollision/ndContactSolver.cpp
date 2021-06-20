@@ -1019,7 +1019,7 @@ dInt32 ndContactSolver::CalculateContactsContinue()
 
 dInt32 ndContactSolver::ConvexToConvexContactsContinue()
 {
-	dAssert(0);
+	//dAssert(0);
 	return 0;
 	//dAssert(m_instance0.GetConvexVertexCount() && m_instance1.GetConvexVertexCount());
 	//dAssert(m_instance0.GetShape()->GetAsShapeConvex());

@@ -31,6 +31,8 @@ class dFixSizeArray: public dClassAlloc
 	dFixSizeArray();
 
 	dInt32 GetCount() const;
+	void SetCount(dInt32 count);
+
 	dInt32 GetCapacity() const;
 
 	T& operator[] (dInt32 i);
@@ -60,6 +62,13 @@ dInt32 dFixSizeArray<T, maxSize>::GetCount() const
 {
 	return m_count;
 }
+
+template<class T, dInt32 maxSize>
+void dFixSizeArray<T, maxSize>::SetCount(dInt32 count)
+{
+	m_count = dClamp (count, 0, maxSize);
+}
+
 
 template<class T, dInt32 maxSize>
 T& dFixSizeArray<T, maxSize>::operator[] (dInt32 i)
