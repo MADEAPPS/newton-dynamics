@@ -15,17 +15,20 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointWheel.h"
 
-
 class ndMultiBodyVehicleTireJoint: public ndJointWheel
 {
 	public:
 	D_CLASS_RELECTION(ndMultiBodyVehicleTireJoint);
-	D_NEWTON_API ndMultiBodyVehicleTireJoint(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& desc);
+	D_NEWTON_API ndMultiBodyVehicleTireJoint(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& desc, ndMultiBodyVehicle* const vehicle);
 	D_NEWTON_API virtual ~ndMultiBodyVehicleTireJoint();
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+
+	ndMultiBodyVehicle* m_vehicle;
+
 };
+
 
 #endif 
 

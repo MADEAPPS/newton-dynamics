@@ -19,7 +19,9 @@ ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 	,m_info(info)
 	,m_posit(dFloat32 (0.0f))
 	,m_speed(dFloat32(0.0f))
-	,m_normalizedBrakeTorque(dFloat32(0.0f))
+	,m_normalizedBrake(dFloat32(0.0f))
+	,m_normalidedSteering(dFloat32(0.0f))
+	,m_normalizedHandBrake(dFloat32(0.0f))
 {
 }
 
@@ -27,19 +29,29 @@ ndJointWheel::~ndJointWheel()
 {
 }
 
-void ndJointWheel::SetBrake(dFloat32 normalizedTorque)
+void ndJointWheel::SetBrake(dFloat32 normalizedBrake)
 {
-	m_normalizedBrakeTorque = dClamp (normalizedTorque, dFloat32 (0.0f), dFloat32 (1.0f));
+	m_normalizedBrake = dClamp (normalizedBrake, dFloat32 (0.0f), dFloat32 (1.0f));
 }
 
-void ndJointWheel::SetSteeringAngle(dFloat32 steeringAngle)
+void ndJointWheel::SetHandBrake(dFloat32 normalizedBrake)
 {
-	dMatrix tireMatrix;
-	dMatrix chassisMatrix;
+	m_normalizedHandBrake = dClamp(normalizedBrake, dFloat32(0.0f), dFloat32(1.0f));
+}
 
-	const dMatrix steeringMatrix(dYawMatrix(steeringAngle));
+void ndJointWheel::SetSteering(dFloat32 normalidedSteering)
+{
+	m_normalidedSteering = dClamp(normalidedSteering, dFloat32(-1.0f), dFloat32(1.0f));
+}
+
+
+void ndJointWheel::SetSteeringAngle()
+{
+	const dMatrix steeringMatrix(dYawMatrix(m_normalidedSteering * m_info.m_steeringAngle));
 	m_localMatrix1 = steeringMatrix * m_baseFrame;
 
+	dMatrix tireMatrix;
+	dMatrix chassisMatrix;
 	CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 
 	const dVector relPosit(tireMatrix.m_posit - chassisMatrix.m_posit);
@@ -64,6 +76,8 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
+
+	SetSteeringAngle();
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
@@ -95,7 +109,8 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	SetMassSpringDamperAcceleration(desc, m_info.m_regularizer, m_info.m_springK, m_info.m_damperC);
 
 	// set tire rotation axle joint, break or load transfer
-	if (m_normalizedBrakeTorque > dFloat32(0.0f))
+	dFloat32 brake = dMax(m_normalizedBrake * m_info.m_brakeTorque, m_normalizedHandBrake * m_info.m_handBrakeTorque);
+	if (brake > dFloat32(0.0f))
 	{
 		AddAngularRowJacobian(desc, matrix1.m_front, dFloat32(0.0f));
 		const dVector tireOmega(m_body0->GetOmega());
@@ -104,8 +119,8 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		dFloat32 rpm = relOmega.DotProduct(matrix1.m_front).GetScalar();
 		SetMotorAcceleration(desc, -rpm * desc.m_invTimestep);
 
-		SetLowerFriction(desc, -m_normalizedBrakeTorque * m_info.m_brakeTorque);
-		SetHighFriction(desc, m_normalizedBrakeTorque * m_info.m_brakeTorque);
+		SetLowerFriction(desc, -brake);
+		SetHighFriction(desc, brake);
 	}
 	else
 	{ 

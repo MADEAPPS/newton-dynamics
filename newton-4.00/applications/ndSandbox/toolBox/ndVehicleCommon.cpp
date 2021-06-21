@@ -140,9 +140,10 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_frontTire.m_regularizer = 0.1f;
 	m_frontTire.m_upperStop = -0.05f;
 	m_frontTire.m_lowerStop = 0.2f;
-	m_frontTire.m_steeringAngle = 35.0f;
 	m_frontTire.m_verticalOffset = 0.0f;
 	m_frontTire.m_brakeTorque = 1500.0f;
+	m_frontTire.m_handBrakeTorque = 0.0f;
+	m_frontTire.m_steeringAngle = 35.0f * dDegreeToRad;
 	m_frontTire.m_laterialStiffness  = 100.0f / 1000.0f;
 	m_frontTire.m_longitudinalStiffness  = 600.0f / 1000.0f;
 
@@ -155,6 +156,7 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_rearTire.m_steeringAngle = 0.0f;
 	m_rearTire.m_verticalOffset = 0.0f;
 	m_rearTire.m_brakeTorque = 1500.0f;
+	m_rearTire.m_handBrakeTorque = 1000.0f;
 	m_rearTire.m_laterialStiffness  = 100.0f / 1000.0f;
 	m_rearTire.m_longitudinalStiffness  = 600.0f / 1000.0f;
 
@@ -256,23 +258,6 @@ dFloat32 ndBasicVehicle::GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint
 	return m_configuration.m_frictionCoefficientScale;
 }
 
-void ndBasicVehicle::ApplyBrakes(dFloat32 param)
-{
-	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_brakeTires.GetFirst(); node; node = node->GetNext())
-	{
-		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-		tire->SetBrake(param);
-	}
-}
-
-void ndBasicVehicle::ApplyHandBrakes(dFloat32 param)
-{
-	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_handBrakeTires.GetFirst(); node; node = node->GetNext())
-	{
-		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-		tire->SetBrake(param);
-	}
-}
 void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 {
 	if (m_isPlayer && m_motor)
@@ -283,7 +268,6 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 
 		scene->GetJoystickAxis(axis);
 		scene->GetJoystickButtons(buttons);
-
 		
 		dFloat32 brake = scene->GetKeyState('S') ? dFloat32 (1.0f) : dFloat32 (0.0f);
 		if (brake == 0.0f)
@@ -300,14 +284,14 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 			throttle = throttle * throttle * throttle;
 		}
 
-		dFloat32 steerAngle = m_configuration.m_frontTire.m_steeringAngle * (dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D')));
+		dFloat32 steerAngle = dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D'));
 		if (dAbs(steerAngle) == 0.0f)
 		{
-			steerAngle = -m_configuration.m_frontTire.m_steeringAngle * (axis[0] * axis[0] * axis[0]);
+			steerAngle = - axis[0] * axis[0] * axis[0];
 		}
 		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
 
-		dFloat32 handBrake = (scene->GetKeyState(' ') || buttons[4]) ? 1.0f : 0.0f;;
+		dFloat32 handBrake = (scene->GetKeyState(' ') || buttons[4]) ? 1.0f : 0.0f;
 
 		if (m_parking.Update(scene->GetKeyState('P') || buttons[6]))
 		{
@@ -328,7 +312,6 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 		if (m_forwardGearUp.Update(scene->GetKeyState('>') || scene->GetKeyState('.') || buttons[11]))
 		{
 			m_isParked = false;
-			ApplyBrakes(dFloat32(0.0f));
 			if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
 			{
 				m_currentGear = 0;
@@ -350,7 +333,6 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 		if (m_forwardGearDown.Update(scene->GetKeyState('<') || scene->GetKeyState(',') || buttons[13]))
 		{
 			m_isParked = false;
-			ApplyBrakes(dFloat32(0.0f));
 			if (m_currentGear > m_configuration.m_transmission.m_gearsCount)
 			{
 				m_currentGear = 0;
@@ -408,21 +390,24 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 		if (m_reverseGear.Update(scene->GetKeyState('R') || buttons[12]))
 		{
 			m_isParked = false;
-			ApplyBrakes(dFloat32(0.0f));
 			m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]);
 
-			//m_gearBox->SetRatio(-40.0f);
 			dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
 			m_gearBox->SetRatio(gearGain);
 		}
 
-		ApplyBrakes(brake);
-		if (handBrake)
+		if (m_isParked)
 		{
-			ApplyHandBrakes(handBrake);
+			brake = 1.0f;
 		}
 
-		SetSteeringAngle(m_steerAngle * dDegreeToRad);
+		for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+		{
+			ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
+			tire->SetSteering(m_steerAngle);
+			tire->SetBrake(brake);
+			tire->SetHandBrake(handBrake);
+		}
 
 		if (omega <= (m_configuration.m_engine.GetIdleRadPerSec() * 1.01f))
 		{
@@ -436,11 +421,6 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 		m_motor->SetThrottle(throttle);
 		m_motor->SetFuelRate(m_configuration.m_engine.GetFuelRate());
 		m_motor->SetTorque(m_configuration.m_engine.GetTorque(m_motor->GetRpm() / dRadPerSecToRpm));
-	}
-
-	if (m_isParked)
-	{
-		ApplyBrakes(dFloat32 (1.0f));
 	}
 
 	ndMultiBodyVehicle::Update(world, timestep);

@@ -89,6 +89,7 @@ class ndVehicleDectriptor
 		dFloat32 m_lowerStop;
 		dFloat32 m_brakeTorque;
 		dFloat32 m_verticalOffset;
+		dFloat32 m_handBrakeTorque;
 		dFloat32 m_laterialStiffness;
 		dFloat32 m_longitudinalStiffness ;
 	};
@@ -151,9 +152,6 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 	protected:
 	void Update(ndWorld* const world, dFloat32 timestep);
 	dFloat32 GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const;
-
-	void ApplyBrakes(dFloat32 param);
-	void ApplyHandBrakes(dFloat32 param);
 
 	ndVehicleDectriptor m_configuration;
 	dFloat32 m_steerAngle;

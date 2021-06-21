@@ -65,13 +65,14 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_frontTire.m_mass = 100.0f;
-		m_frontTire.m_steeringAngle = 35.0f;
+		m_frontTire.m_steeringAngle = 35.0f * dDegreeToRad;
 		m_frontTire.m_springK = 500.0f;
 		m_frontTire.m_damperC = 50.0f;
 		m_frontTire.m_regularizer = 0.2f;
 		m_frontTire.m_upperStop = -0.05f;
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_brakeTorque = 1500.0f;
+		m_rearTire.m_handBrakeTorque = 0.0f;
 		m_frontTire.m_verticalOffset = -0.15f;
 		m_frontTire.m_laterialStiffness  = 1.0f / 1000.0f;
 		m_frontTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
@@ -84,6 +85,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_brakeTorque = 3000.0f;
+		m_rearTire.m_handBrakeTorque = 1000.0f;
 		m_rearTire.m_verticalOffset = -0.15f;
 		m_rearTire.m_laterialStiffness  = 0.3f / 1000.0f;
 		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
@@ -116,7 +118,7 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_frontTire.m_mass = 100.0f;
-		m_frontTire.m_steeringAngle = 35.0f;
+		m_frontTire.m_steeringAngle = 35.0f * dDegreeToRad;
 		m_frontTire.m_springK = 500.0f;
 		m_frontTire.m_damperC = 50.0f;
 		m_frontTire.m_regularizer = 0.2f;
@@ -124,6 +126,7 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_verticalOffset = 0.0f;
 		m_frontTire.m_brakeTorque = 1000.0f;
+		m_frontTire.m_handBrakeTorque = 0.0f;
 		m_frontTire.m_laterialStiffness  = 1.0f / 1000.0f;
 		m_frontTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 
@@ -136,6 +139,7 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_verticalOffset = 0.0f;
 		m_rearTire.m_brakeTorque = 2000.0f;
+		m_rearTire.m_handBrakeTorque = 1000.0f;
 		m_rearTire.m_laterialStiffness  = 1.0f / 1000.0f;
 		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 		
@@ -185,23 +189,27 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		ndWheelDescriptor tireInfo;
 		tireInfo.m_springK = m_configuration.m_rearTire.m_springK;
 		tireInfo.m_damperC = m_configuration.m_rearTire.m_damperC;
-		tireInfo.m_regularizer = m_configuration.m_rearTire.m_regularizer;
 		tireInfo.m_minLimit = m_configuration.m_rearTire.m_upperStop;
 		tireInfo.m_maxLimit = m_configuration.m_rearTire.m_lowerStop;
 		tireInfo.m_brakeTorque = m_configuration.m_rearTire.m_brakeTorque;
+		tireInfo.m_regularizer = m_configuration.m_rearTire.m_regularizer;
+		tireInfo.m_steeringAngle = m_configuration.m_rearTire.m_steeringAngle;
+		tireInfo.m_handBrakeTorque = m_configuration.m_rearTire.m_handBrakeTorque;
 		tireInfo.m_laterialStiffness  = m_configuration.m_rearTire.m_laterialStiffness;
-		tireInfo.m_longitudinalStiffness  = m_configuration.m_rearTire.m_longitudinalStiffness ;
+		tireInfo.m_longitudinalStiffness  = m_configuration.m_rearTire.m_longitudinalStiffness;
 		ndMultiBodyVehicleTireJoint* const rr_tire = AddTire(world, tireInfo, rr_tire_body);
 		ndMultiBodyVehicleTireJoint* const rl_tire = AddTire(world, tireInfo, rl_tire_body);
 
 		tireInfo.m_springK = m_configuration.m_frontTire.m_springK;
 		tireInfo.m_damperC = m_configuration.m_frontTire.m_damperC;
-		tireInfo.m_regularizer = m_configuration.m_frontTire.m_regularizer;
 		tireInfo.m_minLimit = m_configuration.m_frontTire.m_upperStop;
 		tireInfo.m_maxLimit = m_configuration.m_frontTire.m_lowerStop;
 		tireInfo.m_brakeTorque = m_configuration.m_frontTire.m_brakeTorque;
-		tireInfo.m_laterialStiffness  = m_configuration.m_frontTire.m_laterialStiffness ;
-		tireInfo.m_longitudinalStiffness  = m_configuration.m_frontTire.m_longitudinalStiffness ;
+		tireInfo.m_regularizer = m_configuration.m_frontTire.m_regularizer;
+		tireInfo.m_steeringAngle = m_configuration.m_frontTire.m_steeringAngle;
+		tireInfo.m_handBrakeTorque = m_configuration.m_frontTire.m_handBrakeTorque;
+		tireInfo.m_laterialStiffness  = m_configuration.m_frontTire.m_laterialStiffness;
+		tireInfo.m_longitudinalStiffness  = m_configuration.m_frontTire.m_longitudinalStiffness;
 		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(world, tireInfo, fr_tire_body);
 		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(world, tireInfo, fl_tire_body);
 
@@ -212,20 +220,6 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			m_gearMap[i] = i + 2;
 		}
 		m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1;
-
-		// configure vehicle steering
-		SetAsSteering(fr_tire);
-		SetAsSteering(fl_tire);
-
-		// configure the tires brake
-		SetAsBrake(rr_tire);
-		SetAsBrake(rl_tire);
-		SetAsBrake(fr_tire);
-		SetAsBrake(fl_tire);
-
-		// configure the tires hand brake
-		SetAsHandBrake(rr_tire);
-		SetAsHandBrake(rl_tire);
 
 		// add the slip differential
 		ndMultiBodyVehicleDifferential* differential = nullptr;

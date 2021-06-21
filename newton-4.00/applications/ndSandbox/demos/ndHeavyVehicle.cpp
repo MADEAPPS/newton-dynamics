@@ -64,7 +64,7 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_frontTire.m_mass = 100.0f;
-		m_frontTire.m_steeringAngle = 25.0f;
+		m_frontTire.m_steeringAngle = 25.0f * dDegreeToRad;
 		m_frontTire.m_springK = 500.0f;
 		m_frontTire.m_damperC = 50.0f;
 		m_frontTire.m_regularizer = 0.2f;
@@ -122,7 +122,7 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		m_transmission.m_fowardRatios[1] = 3.0f;
 
 		m_frontTire.m_mass = 100.0f;
-		m_frontTire.m_steeringAngle = 25.0f;
+		m_frontTire.m_steeringAngle = 25.0f * dDegreeToRad;
 		m_frontTire.m_springK = 1000.0f;
 		m_frontTire.m_damperC = 25.0f;
 		m_frontTire.m_regularizer = 0.01f;
@@ -545,27 +545,28 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		}
 		m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1;
 
-		// configure vehicle steering
-		SetAsSteering(fr_tire0);
-		SetAsSteering(fl_tire0);
-		SetAsSteering(fr_tire1);
-		SetAsSteering(fl_tire1);
-
-		// configure the tires brake
-		SetAsBrake(rr_tire0);
-		SetAsBrake(rl_tire0);
-		SetAsBrake(fr_tire0);
-		SetAsBrake(fl_tire0);
-		SetAsBrake(rr_tire1);
-		SetAsBrake(rl_tire1);
-		SetAsBrake(fr_tire1);
-		SetAsBrake(fl_tire1);
-
-		// configure the tires hand brake
-		SetAsHandBrake(rr_tire0);
-		SetAsHandBrake(rl_tire0);
-		SetAsHandBrake(rr_tire1);
-		SetAsHandBrake(rl_tire1);
+		dAssert(0);
+		//// configure vehicle steering
+		//SetAsSteering(fr_tire0);
+		//SetAsSteering(fl_tire0);
+		//SetAsSteering(fr_tire1);
+		//SetAsSteering(fl_tire1);
+		//
+		//// configure the tires brake
+		//SetAsBrake(rr_tire0);
+		//SetAsBrake(rl_tire0);
+		//SetAsBrake(fr_tire0);
+		//SetAsBrake(fl_tire0);
+		//SetAsBrake(rr_tire1);
+		//SetAsBrake(rl_tire1);
+		//SetAsBrake(fr_tire1);
+		//SetAsBrake(fl_tire1);
+		//
+		//// configure the tires hand brake
+		//SetAsHandBrake(rr_tire0);
+		//SetAsHandBrake(rl_tire0);
+		//SetAsHandBrake(rr_tire1);
+		//SetAsHandBrake(rl_tire1);
 
 		// add the slip differential
 		#if 1
@@ -760,15 +761,16 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		}
 		m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1;
 
-		// configure vehicle steering
-		SetAsSteering(fr_tire0);
-		SetAsSteering(fl_tire0);
-
-		// configure the tires brake
-		SetAsBrake(rr_tire0);
-		SetAsBrake(rl_tire0);
-		SetAsBrake(fr_tire0);
-		SetAsBrake(fl_tire0);
+		dAssert(0);
+		//// configure vehicle steering
+		//SetAsSteering(fr_tire0);
+		//SetAsSteering(fl_tire0);
+		//
+		//// configure the tires brake
+		//SetAsBrake(rr_tire0);
+		//SetAsBrake(rl_tire0);
+		//SetAsBrake(fr_tire0);
+		//SetAsBrake(fl_tire0);
 
 		// add a motor
 		ndMultiBodyVehicleMotor* const motor = AddMotor(world, m_configuration.m_motorMass, m_configuration.m_motorRadius);

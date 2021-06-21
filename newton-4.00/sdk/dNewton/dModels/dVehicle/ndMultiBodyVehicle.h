@@ -46,13 +46,14 @@ class ndMultiBodyVehicle: public ndModel
 			public:
 			dFloat32 m_speed;
 			dFloat32 m_forceFactor;
+
 			private:
-			dFloat32 m_aerodynamicsConst;
+			dFloat32 m_aerodynamicDownforceConstant;
 			friend class ndDownForce;
 		};
 
-		D_NEWTON_API ndDownForce();
-		D_NEWTON_API dFloat32 GetDownforceFactor(dFloat32 speed) const;
+		ndDownForce();
+		dFloat32 GetDownforceFactor(dFloat32 speed) const;
 		
 		ndSpeedForcePair m_downForceTable[3];
 	};
@@ -66,8 +67,6 @@ class ndMultiBodyVehicle: public ndModel
 	virtual dFloat32 GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const;
 
 	D_NEWTON_API dFloat32 GetSpeed() const;
-	D_NEWTON_API void SetSteeringAngle(dFloat32 angleInRadians);
-
 	D_NEWTON_API ndShapeInstance CreateTireShape(dFloat32 radius, dFloat32 width) const;
 
 	D_NEWTON_API void AddChassis(ndBodyDynamic* const chassis, dFloat32 gravityMag);
@@ -79,14 +78,12 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndMultiBodyVehicleDifferential* const leftDifferential, ndMultiBodyVehicleDifferential* const rightDifferential, dFloat32 slipOmegaLock);
 	D_NEWTON_API ndMultiBodyVehicleTorsionBar* AddTorsionBar(ndWorld* const world);
 
-	D_NEWTON_API void SetAsBrake(ndMultiBodyVehicleTireJoint* const tire);
-	D_NEWTON_API void SetAsHandBrake(ndMultiBodyVehicleTireJoint* const tire);
-	D_NEWTON_API void SetAsSteering(ndMultiBodyVehicleTireJoint* const tire);
-
 	private:
 	void ApplySteering();
 	void ApplyTiremodel();
+	void ApplyAerodynamics();
 	void ApplyAligmentAndBalancing();
+	
 	void BrushTireModel(const ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
 	ndBodyDynamic* CreateInternalBodyPart(ndWorld* const world, dFloat32 mass, dFloat32 radius) const;
 
@@ -102,14 +99,10 @@ class ndMultiBodyVehicle: public ndModel
 	ndMultiBodyVehicleGearBox* m_gearBox;
 	ndMultiBodyVehicleTorsionBar* m_torsionBar;
 	dList<ndMultiBodyVehicleTireJoint*> m_tireList;
-	dList<ndMultiBodyVehicleTireJoint*> m_brakeTires;
-	dList<ndMultiBodyVehicleTireJoint*> m_handBrakeTires;
-	dList<ndMultiBodyVehicleTireJoint*> m_steeringTires;
 	dList<ndMultiBodyVehicleDifferential*> m_differentials;
 	ndDownForce m_downForce;
 	dFloat32 m_gravityMag;
-	dFloat32 m_steeringAngle;
-	dFloat32 m_steeringAngleMemory;
+	dFloat32 m_suspensionStiffnessScale;
 	
 	friend class ndMultiBodyVehicleMotor;
 	friend class ndMultiBodyVehicleGearBox;
