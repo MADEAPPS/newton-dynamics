@@ -76,6 +76,7 @@ class ndJointWheel: public ndJointBilateralConstraint
 	ndWheelDescriptor m_info;
 	dFloat32 m_posit;
 	dFloat32 m_speed;
+	dFloat32 m_regularizer;
 	dFloat32 m_normalizedBrake;
 	dFloat32 m_normalidedSteering;
 	dFloat32 m_normalizedHandBrake;

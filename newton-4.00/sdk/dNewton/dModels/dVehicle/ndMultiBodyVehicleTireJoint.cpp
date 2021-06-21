@@ -26,5 +26,6 @@ ndMultiBodyVehicleTireJoint::~ndMultiBodyVehicleTireJoint()
 
 void ndMultiBodyVehicleTireJoint::JacobianDerivative(ndConstraintDescritor& desc)
 {
+	m_regularizer = m_info.m_regularizer * m_vehicle->m_suspensionStiffnessModifier;
 	ndJointWheel::JacobianDerivative(desc);
 }

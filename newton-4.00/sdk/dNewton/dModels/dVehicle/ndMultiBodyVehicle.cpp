@@ -46,7 +46,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 	,m_torsionBar(nullptr)
 	,m_tireList()
 	,m_differentials()
-	,m_suspensionStiffnessScale(dFloat32(0.0f))
+	,m_suspensionStiffnessModifier(dFloat32(1.0f))
 {
 	m_tireShape->AddRef();
 	m_localFrame.m_front = frontDir & dVector::m_triplexMask;
@@ -62,7 +62,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode)
 	,m_tireShape(new ndShapeChamferCylinder(dFloat32(0.75f), dFloat32(0.5f)))
 	,m_tireList()
 	,m_gravityMag(dFloat32(0.0f))
-	,m_suspensionStiffnessScale(dFloat32(0.0f))
+	,m_suspensionStiffnessModifier(dFloat32(1.0f))
 {
 	m_tireShape->AddRef();
 }
@@ -211,14 +211,16 @@ ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 wi
 void ndMultiBodyVehicle::ApplyAerodynamics()
 {
 	dFloat32 downForceFactor = m_downForce.GetDownforceFactor(GetSpeed());
-	m_suspensionStiffnessScale = dFloat32(1.0f);
+	m_suspensionStiffnessModifier = dFloat32(1.0f);
 	if (downForceFactor > dFloat32(0.0f))
 	{
 		const dVector up(m_chassis->GetMatrix().RotateVector(m_localFrame.m_up));
-		dVector downForce(up.Scale(-m_gravityMag * downForceFactor * m_chassis->GetMassMatrix().m_w));
-		m_chassis->SetForce(m_chassis->GetForce() + downForce);
+		const dVector weight(m_chassis->GetForce());
+		const dVector downForce(up.Scale(-m_gravityMag * downForceFactor * m_chassis->GetMassMatrix().m_w));
+		m_chassis->SetForce(weight + downForce);
+		m_suspensionStiffnessModifier = up.DotProduct(weight).GetScalar() / up.DotProduct(weight + downForce).GetScalar();
+		//dTrace(("%f\n", m_suspensionStiffnessModifier));
 	}
-
 }
 
 void ndMultiBodyVehicle::ApplyAligmentAndBalancing()

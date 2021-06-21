@@ -26,7 +26,6 @@ class ndMultiBodyVehicleTireJoint: public ndJointWheel
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
 	ndMultiBodyVehicle* m_vehicle;
-
 };
 
 

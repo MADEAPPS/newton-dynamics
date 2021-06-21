@@ -102,10 +102,11 @@ class ndMultiBodyVehicle: public ndModel
 	dList<ndMultiBodyVehicleDifferential*> m_differentials;
 	ndDownForce m_downForce;
 	dFloat32 m_gravityMag;
-	dFloat32 m_suspensionStiffnessScale;
+	dFloat32 m_suspensionStiffnessModifier;
 	
 	friend class ndMultiBodyVehicleMotor;
 	friend class ndMultiBodyVehicleGearBox;
+	friend class ndMultiBodyVehicleTireJoint;
 	friend class ndMultiBodyVehicleTorsionBar;
 };
 

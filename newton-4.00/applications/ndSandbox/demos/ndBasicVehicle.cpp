@@ -68,7 +68,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_frontTire.m_steeringAngle = 35.0f * dDegreeToRad;
 		m_frontTire.m_springK = 500.0f;
 		m_frontTire.m_damperC = 50.0f;
-		m_frontTire.m_regularizer = 0.2f;
+		m_frontTire.m_regularizer = 0.3f;
 		m_frontTire.m_upperStop = -0.05f;
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_brakeTorque = 1500.0f;
@@ -81,7 +81,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_steeringAngle = 0.0f;
 		m_rearTire.m_springK = 500.0f;
 		m_rearTire.m_damperC = 50.0f;
-		m_rearTire.m_regularizer = 0.2f;
+		m_rearTire.m_regularizer = 0.3f;
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_brakeTorque = 3000.0f;

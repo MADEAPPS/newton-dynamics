@@ -19,6 +19,7 @@ ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 	,m_info(info)
 	,m_posit(dFloat32 (0.0f))
 	,m_speed(dFloat32(0.0f))
+	,m_regularizer(info.m_regularizer)
 	,m_normalizedBrake(dFloat32(0.0f))
 	,m_normalidedSteering(dFloat32(0.0f))
 	,m_normalizedHandBrake(dFloat32(0.0f))
@@ -106,7 +107,7 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	
 	// add suspension spring damper row
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
-	SetMassSpringDamperAcceleration(desc, m_info.m_regularizer, m_info.m_springK, m_info.m_damperC);
+	SetMassSpringDamperAcceleration(desc, m_regularizer, m_info.m_springK, m_info.m_damperC);
 
 	// set tire rotation axle joint, break or load transfer
 	dFloat32 brake = dMax(m_normalizedBrake * m_info.m_brakeTorque, m_normalizedHandBrake * m_info.m_handBrakeTorque);
