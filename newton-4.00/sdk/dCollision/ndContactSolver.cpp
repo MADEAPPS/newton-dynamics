@@ -1017,16 +1017,25 @@ dInt32 ndContactSolver::CalculateContactsContinue()
 	return count;
 }
 
+D_INLINE void ndContactSolver::TranslateSimplex(const dVector& step)
+{
+	m_instance1.m_globalMatrix.m_posit -= step;
+	for (dInt32 i = 0; i < m_vertexIndex; i++) 
+	{
+		m_hullSum[i] -= step;
+		m_hullDiff[i] += step;
+	}
+}
+
 dInt32 ndContactSolver::ConvexToConvexContactsContinue()
 {
-	//dAssert(0);
-	return 0;
-	//dAssert(m_instance0.GetConvexVertexCount() && m_instance1.GetConvexVertexCount());
-	//dAssert(m_instance0.GetShape()->GetAsShapeConvex());
-	//dAssert(m_instance1.GetShape()->GetAsShapeConvex());
-	//dAssert(!m_instance0.GetShape()->GetAsShapeNull());
-	//dAssert(!m_instance1.GetShape()->GetAsShapeNull());
-	//
+	dAssert(0);
+	dAssert(m_instance0.GetConvexVertexCount() && m_instance1.GetConvexVertexCount());
+	dAssert(m_instance0.GetShape()->GetAsShapeConvex());
+	dAssert(m_instance1.GetShape()->GetAsShapeConvex());
+	dAssert(!m_instance0.GetShape()->GetAsShapeNull());
+	dAssert(!m_instance1.GetShape()->GetAsShapeNull());
+	
 	//dInt32 count = 0;
 	//bool colliding = CalculateClosestPoints();
 	//dFloat32 penetration = m_separatingVector.DotProduct(m_closestPoint1 - m_closestPoint0).GetScalar() - m_skinThickness - D_PENETRATION_TOL;
@@ -1072,6 +1081,94 @@ dInt32 ndContactSolver::ConvexToConvexContactsContinue()
 	//	}
 	//}
 	//return count;
+
+
+
+	const dVector savedPosition1(m_instance1.m_globalMatrix.m_posit);
+	const ndBodyKinematic* const body0 = m_contact->m_body0;
+	const ndBodyKinematic* const body1 = m_contact->m_body1;
+	const dVector relVeloc(body0->GetVelocity() - body1->GetVelocity());
+
+	dInt32 iter = 0;
+	dInt32 count = 0;
+	dFloat32 tacc = dFloat32(0.0f);
+	dFloat32 timestep = m_timestep;
+	m_contact->m_separationDistance = dFloat32(1.0e10f);
+	do 
+	{
+		bool state = CalculateClosestPoints();
+		if (!state) 
+		{
+			break;
+		}
+		dAssert(m_separatingVector.m_w == dFloat32(0.0f));
+		dFloat32 den = m_separatingVector.DotProduct(relVeloc).GetScalar();
+		if (den <= dFloat32(1.0e-6f)) 
+		{
+			// bodies are residing from each other, even if they are touching 
+			// they are not considered to be colliding because the motion will 
+			// move them apart get the closet point and the normal at contact point
+			m_timestep = dFloat32(1.0e10f);
+			m_separatingVector = m_separatingVector * dVector::m_negOne;
+			break;
+		}
+		
+		dFloat32 num = m_separatingVector.DotProduct(m_closestPoint1 - m_closestPoint0).GetScalar() - m_skinThickness;
+		if ((num <= dFloat32(1.0e-5f)) && (tacc <= timestep)) 
+		{
+			// bodies collide at time tacc, but we do not set it yet
+			dVector step(relVeloc.Scale(tacc));
+			m_timestep = tacc;
+			//m_closestPointBody0 = m_closestPoint0 + step;
+			//m_closestPointBody1 = m_closestPoint1 + step;
+			//m_proxy->m_normal = m_normal.Scale(dFloat32(-1.0f));
+			m_separatingVector = m_separatingVector * dVector::m_negOne;
+			//m_contact->m_separationDistance = m_separatingVector.DotProduct(m_closestPoint0 - m_closestPoint1).GetScalar();
+			dFloat32 penetration = dMax(num * dFloat32(-1.0f) + D_PENETRATION_TOL, dFloat32(0.0f));
+			m_contact->m_separationDistance = penetration;
+			if (m_contactBuffer && !m_intersectionTestOnly) 
+			{
+				if (m_instance0.GetCollisionMode() & m_instance1.GetCollisionMode()) 
+				{
+					//m_normal = m_normal.Scale(dFloat32(-1.0f));
+					//m_proxy->m_contactJoint->m_isActive = 1;
+					count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_separatingVector);
+					if (count) 
+					{
+						count = dMin(m_maxCount, count);
+						ndContactPoint* const contactOut = m_contactBuffer;
+			
+						for (int i = 0; i < count; i++) 
+						{
+							contactOut[i].m_point = m_hullDiff[i] + step;
+							contactOut[i].m_normal = m_separatingVector;
+							contactOut[i].m_penetration = penetration;
+						}
+					}
+				}
+			}
+			break;
+		}
+		
+		dAssert(den > dFloat32(0.0f));
+		dFloat32 dt = num / den;
+		if ((tacc + dt) >= timestep) 
+		{
+			// object do not collide on this timestep
+			m_timestep = tacc + dt;
+			m_separatingVector = m_separatingVector * dVector::m_negOne;
+			break;
+		}
+		
+		tacc += dt;
+		dVector step(relVeloc.Scale(dt));
+		TranslateSimplex(step);
+		
+		iter++;
+	} while (iter < D_SEPARATION_PLANES_ITERATIONS);
+
+	m_instance1.m_globalMatrix.m_posit = savedPosition1;
+	return count;
 }
 
 dInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
@@ -1176,8 +1273,8 @@ dInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 	dInt32 count = 0;
 	ndPolygonMeshDesc data(*this, true);
 
-	//const dgVector& hullVeloc = data.m_objBody->m_veloc;
-	//const dgVector& hullOmega = data.m_objBody->m_omega;
+	//const dVector& hullVeloc = data.m_objBody->m_veloc;
+	//const dVector& hullOmega = data.m_objBody->m_omega;
 
 	dVector relVeloc(m_contact->m_body0->GetVelocity() - m_contact->m_body1->GetVelocity());
 	dFloat32 baseLinearSpeed = dSqrt(relVeloc.DotProduct(relVeloc).GetScalar());
@@ -1402,7 +1499,6 @@ dInt32 ndContactSolver::CalculateClosestSimplex()
 	} 
 	else 
 	{
-		dAssert(0);
 		switch (m_vertexIndex) 
 		{
 			case 1:

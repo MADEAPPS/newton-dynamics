@@ -129,6 +129,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	D_INLINE dBigVector ReduceTetrahedrum (dInt32& indexOut);
 	D_INLINE void SupportVertex(const dVector& dir, dInt32 vertexIndex);
 
+	D_INLINE void TranslateSimplex(const dVector& step);
 	D_INLINE void CalculateContactFromFeacture(dInt32 featureType);
 
 	ndShapeInstance m_instance0;

@@ -33,7 +33,7 @@
 #include "ndMultiBodyVehicleDifferential.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
 
-#define D_MAX_CONTACT_PENETRATION	  dFloat32 (5.0e-3f)
+#define D_MAX_CONTACT_PENETRATION	  dFloat32 (1.0e-2f)
 #define D_MIN_CONTACT_CLOSE_DISTANCE2 dFloat32 (5.0e-2f * 5.0e-2f)
 
 ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& upDir)
@@ -446,7 +446,7 @@ void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const
 	const dFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
 	//dTrace(("%f %f\n", sideSpeed, lateralFrictionCoefficient));
 
-	contactPoint.m_penetration = dMin(contactPoint.m_penetration, D_MAX_CONTACT_PENETRATION);
+	//contactPoint.m_penetration = dMin(contactPoint.m_penetration, D_MAX_CONTACT_PENETRATION);
 	contactPoint.m_material.m_restitution = dFloat32 (0.1f);
 	contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
 	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
@@ -494,8 +494,10 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 						}
 					}
 
+					maxPenetration = 0;
 					if (maxPenetration > D_MAX_CONTACT_PENETRATION)
 					{
+						dAssert(0);
 						// if the max penetration is too much, 
 						// do a convex cast to find the tire location 
 						// over the mesh and teleport the tire to that location.
