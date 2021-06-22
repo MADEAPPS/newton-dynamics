@@ -427,6 +427,32 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
+		if (tire->xxxx == 3)
+		{
+			
+			const ndBodyKinematic::ndContactMap& contactMap = tire->GetBody0()->GetContactMap();
+			ndBodyKinematic::ndContactMap::Iterator it(contactMap);
+			for (it.Begin(); it; it++)
+			{
+				ndContact* const contact = *it;
+				ndContactPointList& contactPoints = contact->GetContactPoints();
+				const ndBodyKinematic* const otherBody = contact->GetBody1();
+				if (((ndShape*)otherBody->GetCollisionShape().GetShape())->GetAsShapeStaticMeshShape())
+				{
+					dFloat32 maxPenetration = 0;
+					for (ndContactPointList::dNode* contactNode0 = contactPoints.GetFirst(); contactNode0; contactNode0 = contactNode0->GetNext())
+					{
+						const ndContactPoint& contactPoint0 = contactNode0->GetInfo();
+						maxPenetration = dMax(contactNode0->GetInfo().m_penetration, maxPenetration);
+					}
+					if (maxPenetration > 0.1f)
+					{
+						maxPenetration *= 1;
+					}
+				}
+			}
+		}
+
 		dAssert(((ndShape*)tire->GetBody0()->GetCollisionShape().GetShape())->GetAsShapeChamferCylinder());
 
 		const ndBodyKinematic::ndContactMap& contactMap = tire->GetBody0()->GetContactMap();
@@ -447,12 +473,11 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 					dFloat32 maxPenetration = dFloat32(0.0f);
 					for (ndContactPointList::dNode* contactNode0 = contactPoints.GetFirst(); contactNode0; contactNode0 = contactNode0->GetNext())
 					{
-						const ndContactMaterial& contactPoint0 = contactNode0->GetInfo();
+						const ndContactPoint& contactPoint0 = contactNode0->GetInfo();
 						maxPenetration = dMax(contactNode0->GetInfo().m_penetration, maxPenetration);
 						for (ndContactPointList::dNode* contactNode1 = contactNode0->GetNext(); contactNode1; contactNode1 = contactNode1->GetNext())
 						{
-							//const dVector contactPoint1(contactNode1->GetInfo().m_point);
-							const ndContactMaterial& contactPoint1 = contactNode1->GetInfo();
+							const ndContactPoint& contactPoint1 = contactNode1->GetInfo();
 							const dVector error(contactPoint1.m_point - contactPoint0.m_point);
 							dFloat32 err2 = error.DotProduct(error).GetScalar();
 							if (err2 < D_MIN_CONTACT_CLOSE_DISTANCE2)

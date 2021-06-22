@@ -28,7 +28,6 @@
 #include "ndShapeConvexPolygon.h"
 
 //#define D_CONVEX_POLYGON_SKIRT_LENGTH dFloat32 (0.025f)
-//#define D_CONVEX_POLYGON_SKIRT_LENGTH dFloat32 (0.1f)
 #define D_CONVEX_POLYGON_SKIRT_LENGTH dFloat32 (0.25f)
 
 ndShapeConvexPolygon::ndShapeConvexPolygon ()
