@@ -26,7 +26,12 @@
 #include "ndDemoCameraManager.h"
 #include "ndHighResolutionTimer.h"
 
+
+//#define READ_JOYTICK
+//#define RECORD_JOYTICK
+
 #define PROJECTILE_INITIAL_SPEED	20.0f
+
 
 //#define DEFAULT_SCENE	0		// setting basic rigidbody
 //#define DEFAULT_SCENE	1		// setting gpu basic rigidbody
@@ -414,6 +419,26 @@ dInt32 ndDemoEntityManager::GetJoystickAxis (dFixSizeArray<dFloat32, 8>& axisVal
 			//if (axis[i] && axis[i] > -1.0f) dTrace(("%d %f\n", i, axis[i]));
 		}
 	}
+
+
+#if defined (RECORD_JOYTICK) || defined (READ_JOYTICK)
+	#ifdef RECORD_JOYTICK
+		static FILE* file = fopen("log0.bin", "wb");
+		if (file)
+		{
+			fwrite(&axisCount, sizeof(axisCount), 1, file);
+			fwrite(&axisValues[0], sizeof(dFloat32) * axisValues.GetCapacity(), 1, file);
+			fflush(file);
+		}
+	#else 
+		static FILE* file = fopen("log0.bin", "rb");
+		if (file)
+		{
+			fread(&axisCount, sizeof(axisCount), 1, file);
+			fread(&axisValues[0], sizeof(dFloat32) * axisValues.GetCapacity(), 1, file);
+		}
+	#endif
+#endif
 	return axisCount;
 }
 
@@ -437,6 +462,26 @@ dInt32 ndDemoEntityManager::GetJoystickButtons(dFixSizeArray<char, 32>& axisbutt
 			//if (buttons[i]) dTrace(("%d %d\n", i, buttons[i]));
 		}
 	}
+
+#if defined (RECORD_JOYTICK) || defined (READ_JOYTICK)
+	#ifdef RECORD_JOYTICK
+		static FILE* file = fopen("log1.bin", "wb");
+		if (file)
+		{
+			fwrite(&buttonsCount, sizeof(buttonsCount), 1, file);
+			fwrite(&axisbuttons[0], axisbuttons.GetCapacity(), 1, file);
+			fflush(file);
+		}
+	#else 
+		static FILE* file = fopen("log1.bin", "rb");
+		if (file)
+		{
+			fread(&buttonsCount, sizeof(buttonsCount), 1, file);
+			fread(&axisbuttons[0], axisbuttons.GetCapacity(), 1, file);
+		}
+	#endif
+#endif
+
 	return buttonsCount;
 }
 
