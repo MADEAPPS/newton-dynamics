@@ -317,14 +317,17 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 		ndMultiBodyVehicleTireJoint* const tireJoint = node->GetInfo();
 		ndBodyDynamic* const tireBody = tireJoint->GetBody0()->GetAsBodyDynamic();
 
-		// dawr upper bumper
-		context.DrawFrame(tireJoint->CalculateUpperBumperMatrix());
+		// draw upper bumper
+		dMatrix upperBumberMatrix(tireJoint->CalculateUpperBumperMatrix());
+		//context.DrawFrame(tireJoint->CalculateUpperBumperMatrix());
 
 		// show tire center of mass;
 		dMatrix tireFrame(tireBody->GetMatrix());
-		dVector com(tireBody->GetCentreOfMass());
-		tireFrame.m_posit = tireFrame.TransformVector(tireBody->GetCentreOfMass());
-		context.DrawFrame(tireFrame);
+		//dVector com(tireBody->GetCentreOfMass());
+		//tireFrame.m_posit = tireFrame.TransformVector(tireBody->GetCentreOfMass());
+		//context.DrawFrame(tireFrame);
+		upperBumberMatrix.m_posit = tireFrame.m_posit;
+		context.DrawFrame(upperBumberMatrix);
 
 		totalMass += tireBody->GetMassMatrix().m_w;
 		effectiveCom += tireFrame.m_posit.Scale(tireBody->GetMassMatrix().m_w);
@@ -334,6 +337,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 		//context.DrawArrow(tireBody->GetMatrix(), color, -1.0f);
 
 		// draw tire forces
+		const dFloat32 tireForceScale = dFloat32 (4.0f);
 		const ndBodyKinematic::ndContactMap& contactMap = tireBody->GetContactMap();
 		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
 		for (it.Begin(); it; it++)
@@ -354,15 +358,15 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 					//context.DrawFrame(frame);
 
 					// normal force
-					dFloat32 normalForce = dFloat32 (2.0f) * contactPoint.m_normal_Force.m_force / scale;
+					dFloat32 normalForce = tireForceScale * contactPoint.m_normal_Force.m_force / scale;
 					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_normal.Scale (normalForce), forceColor);
 
 					// lateral force
-					dFloat32 lateralForce = -dFloat32(2.0f) * contactPoint.m_dir0_Force.m_force / scale;
+					dFloat32 lateralForce = -tireForceScale * contactPoint.m_dir0_Force.m_force / scale;
 					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir0.Scale(lateralForce), lateralColor);
 
 					// longitudinal force
-					dFloat32 longitudinalForce = -dFloat32(2.0f) * contactPoint.m_dir1_Force.m_force / scale;
+					dFloat32 longitudinalForce = -tireForceScale * contactPoint.m_dir1_Force.m_force / scale;
 					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir1.Scale(longitudinalForce), longitudinalColor);
 				}
 			}

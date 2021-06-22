@@ -116,12 +116,22 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		AddAngularRowJacobian(desc, matrix1.m_front, dFloat32(0.0f));
 		const dVector tireOmega(m_body0->GetOmega());
 		const dVector chassisOmega(m_body1->GetOmega());
-		dVector relOmega(tireOmega - chassisOmega);
-		dFloat32 rpm = relOmega.DotProduct(matrix1.m_front).GetScalar();
-		SetMotorAcceleration(desc, -rpm * desc.m_invTimestep);
 
-		SetLowerFriction(desc, -brake);
+		//dVector relOmega(tireOmega - chassisOmega);
+		//dFloat32 rpm1 = relOmega.DotProduct(matrix1.m_front).GetScalar();
+
+		ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
+		ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
+		jacobian1.m_angular = jacobian1.m_angular.Scale(0.25f);
+
+		dFloat32 w0 = tireOmega.DotProduct(jacobian0.m_angular).GetScalar();
+		dFloat32 w1 = chassisOmega.DotProduct(jacobian1.m_angular).GetScalar();
+		dFloat32 rpm = w0 + w1;
+
+		SetMotorAcceleration(desc, -rpm * desc.m_invTimestep);
+		
 		SetHighFriction(desc, brake);
+		SetLowerFriction(desc, -brake);
 	}
 	else
 	{ 

@@ -575,8 +575,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndVehicleSelector* const controls = new ndVehicleSelector();
 	scene->GetWorld()->AddModel(controls);
 	
-	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, viperDesc, matrix);
-	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix);
+	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, viperDesc, matrix);
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
