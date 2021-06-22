@@ -71,15 +71,13 @@ class ndContactMaterial: public ndContactPoint
 	ndMaterial m_material;
 } D_GCC_NEWTON_ALIGN_32;
 
-class ndContactPointList: public dList<ndContactMaterial, dContainersFreeListAlloc<ndContactPoint>>
+//class ndContactPointList: public dList<ndContactMaterial, dContainersFreeListAlloc<ndContactPoint>>
+class ndContactPointList : public dList<ndContactMaterial, dContainersFreeListAlloc<ndContactMaterial>>
 {
-	public:
 };
 
 D_MSV_NEWTON_ALIGN_32 
-class ndContact
-	:public ndConstraint
-	,public dContainersFreeListAlloc<ndContact*>
+class ndContact: public ndConstraint, public dContainersFreeListAlloc<ndContact*>
 {
 	public:
 	D_COLLISION_API ndContact();
