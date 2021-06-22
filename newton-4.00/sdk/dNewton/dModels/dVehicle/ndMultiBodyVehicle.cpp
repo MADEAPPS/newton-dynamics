@@ -312,6 +312,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	dVector longitudinalColor(dFloat32(0.7f), dFloat32(0.3f), dFloat32(0.0f), dFloat32(0.0f));
 	context.DrawLine(chassisMatrix.m_posit, chassisMatrix.m_posit + weight, forceColor);
 
+	const dFloat32 tireForceScale = dFloat32(3.0f);
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const tireJoint = node->GetInfo();
@@ -337,7 +338,6 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 		//context.DrawArrow(tireBody->GetMatrix(), color, -1.0f);
 
 		// draw tire forces
-		const dFloat32 tireForceScale = dFloat32 (4.0f);
 		const ndBodyKinematic::ndContactMap& contactMap = tireBody->GetContactMap();
 		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
 		for (it.Begin(); it; it++)
