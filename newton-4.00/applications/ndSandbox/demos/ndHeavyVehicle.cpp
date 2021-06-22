@@ -645,9 +645,9 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		world->AddJoint(new ndJointGear(tireRatio, pin0.m_front.Scale(-1.0f), body0, pin1.m_front, body1));
 	}
 
-	void Update(ndWorld* const world, dFloat32 timestep)
+	void ApplyInputs(ndWorld* const world, dFloat32 timestep)
 	{
-		ndBasicVehicle::Update(world, timestep);
+		ndBasicVehicle::ApplyInputs(world, timestep);
 
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 		dFixSizeArray<char, 32> buttons;
@@ -854,9 +854,9 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		AddHydraulic(scene, frontBucketArmBody, "frontBucketHydraulic002", "frontBucketHydraulicPiston002", frontBucketBody, "attachment_frontBucket002");
 	}
 
-	void Update(ndWorld* const world, dFloat32 timestep)
+	void ApplyInputs(ndWorld* const world, dFloat32 timestep)
 	{
-		ndBasicVehicle::Update(world, timestep);
+		ndBasicVehicle::ApplyInputs(world, timestep);
 
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 		dFixSizeArray<char, 32> buttons;

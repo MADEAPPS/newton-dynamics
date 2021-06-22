@@ -258,7 +258,7 @@ dFloat32 ndBasicVehicle::GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint
 	return m_configuration.m_frictionCoefficientScale;
 }
 
-void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
+void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 {
 	if (m_isPlayer && m_motor)
 	{
@@ -422,6 +422,4 @@ void ndBasicVehicle::Update(ndWorld* const world, dFloat32 timestep)
 		m_motor->SetFuelRate(m_configuration.m_engine.GetFuelRate());
 		m_motor->SetTorque(m_configuration.m_engine.GetTorque(m_motor->GetRpm() / dRadPerSecToRpm));
 	}
-
-	ndMultiBodyVehicle::Update(world, timestep);
 }

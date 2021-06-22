@@ -447,12 +447,13 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 					dFloat32 maxPenetration = dFloat32(0.0f);
 					for (ndContactPointList::dNode* contactNode0 = contactPoints.GetFirst(); contactNode0; contactNode0 = contactNode0->GetNext())
 					{
-						const dVector contactPoint0 (contactNode0->GetInfo().m_point);
+						const ndContactMaterial& contactPoint0 = contactNode0->GetInfo();
 						maxPenetration = dMax(contactNode0->GetInfo().m_penetration, maxPenetration);
 						for (ndContactPointList::dNode* contactNode1 = contactNode0->GetNext(); contactNode1; contactNode1 = contactNode1->GetNext())
 						{
-							const dVector contactPoint1(contactNode1->GetInfo().m_point);
-							const dVector error(contactPoint1 - contactPoint0);
+							//const dVector contactPoint1(contactNode1->GetInfo().m_point);
+							const ndContactMaterial& contactPoint1 = contactNode1->GetInfo();
+							const dVector error(contactPoint1.m_point - contactPoint0.m_point);
 							dFloat32 err2 = error.DotProduct(error).GetScalar();
 							if (err2 < D_MIN_CONTACT_CLOSE_DISTANCE2)
 							{
@@ -584,8 +585,13 @@ dFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(dFloat32 speed) con
 	return m_downForceTable[2].m_aerodynamicDownforceConstant;
 }
 
-void ndMultiBodyVehicle::Update(ndWorld* const, dFloat32)
+void ndMultiBodyVehicle::Update(ndWorld* const world, dFloat32 timestep)
 {
+	ApplyInputs(world, timestep);
+
+	// Apply Vehicle Dynamics controls
+	// no implemented yet
+
 	// apply down force
 	ApplyAligmentAndBalancing();
 	ApplyAerodynamics();
