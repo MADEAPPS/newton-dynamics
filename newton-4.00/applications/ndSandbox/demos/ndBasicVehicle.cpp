@@ -85,7 +85,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_upperStop = -0.05f;
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_brakeTorque = 3000.0f;
-		m_rearTire.m_handBrakeTorque = 1000.0f;
+		m_rearTire.m_handBrakeTorque = 4000.0f;
 		m_rearTire.m_verticalOffset = -0.15f;
 		m_rearTire.m_laterialStiffness  = 0.3f / 1000.0f;
 		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
@@ -139,7 +139,7 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_verticalOffset = 0.0f;
 		m_rearTire.m_brakeTorque = 2000.0f;
-		m_rearTire.m_handBrakeTorque = 1000.0f;
+		m_rearTire.m_handBrakeTorque = 3000.0f;
 		m_rearTire.m_laterialStiffness  = 1.0f / 1000.0f;
 		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 		
