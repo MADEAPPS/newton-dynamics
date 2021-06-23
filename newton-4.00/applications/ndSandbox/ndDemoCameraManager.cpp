@@ -16,6 +16,11 @@
 #include "ndPhysicsUtils.h"
 #include "ndDemoCameraManager.h"
 
+//#define D_ENABLE_CAMERA_REPLAY
+#ifdef D_ENABLE_CAMERA_REPLAY
+	#define D_RECORD_CAMERA
+#endif
+
 class ndDemoCameraPickBodyJoint: public ndJointKinematicController
 {
 	public:
@@ -161,7 +166,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	dVector p0(m_camera->ScreenToWorld(dVector(mouseX, mouseY, 0.0f, 0.0f)));
 	dVector p1(m_camera->ScreenToWorld(dVector(mouseX, mouseY, 1.0f, 0.0f)));
 
-#if 0
+#ifdef D_ENABLE_CAMERA_REPLAY
 	struct ndReplay
 	{
 		dVector m_p0;
@@ -170,19 +175,19 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	};
 	ndReplay replay;
 
-	#if 1
+	#ifdef D_RECORD_CAMERA
 		replay.m_p0 = p0;
 		replay.m_p1 = p1;
 		replay.m_mouseState = mouseState ? 1 : 0;
 
-		static FILE* file = fopen("log.bin", "wb");
+		static FILE* file = fopen("cameraLog.bin", "wb");
 		if (file) 
 		{
 			fwrite(&replay, sizeof(ndReplay), 1, file);
 			fflush(file);
 		}
 	#else 
-		static FILE* file = fopen("log.bin", "rb");
+		static FILE* file = fopen("cameraLog.bin", "rb");
 		if (file) 
 		{
 			fread(&replay, sizeof(ndReplay), 1, file);

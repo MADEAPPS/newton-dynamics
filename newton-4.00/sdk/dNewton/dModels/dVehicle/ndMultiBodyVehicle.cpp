@@ -324,18 +324,12 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 
 		// show tire center of mass;
 		dMatrix tireFrame(tireBody->GetMatrix());
-		//dVector com(tireBody->GetCentreOfMass());
-		//tireFrame.m_posit = tireFrame.TransformVector(tireBody->GetCentreOfMass());
 		//context.DrawFrame(tireFrame);
 		upperBumberMatrix.m_posit = tireFrame.m_posit;
 		context.DrawFrame(upperBumberMatrix);
 
 		totalMass += tireBody->GetMassMatrix().m_w;
 		effectiveCom += tireFrame.m_posit.Scale(tireBody->GetMassMatrix().m_w);
-
-		//tire->DebugJoint(context);
-		//dVector color(1.0f, 1.0f, 1.0f, 0.0f);
-		//context.DrawArrow(tireBody->GetMatrix(), color, -1.0f);
 
 		// draw tire forces
 		const ndBodyKinematic::ndContactMap& contactMap = tireBody->GetContactMap();
@@ -355,7 +349,6 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 					dFloat32 offset = (localPosit.m_z > dFloat32(0.0f)) ? dFloat32(0.2f) : dFloat32(-0.2f);
 					frame.m_posit += contactPoint.m_dir0.Scale(offset);
 					frame.m_posit += contactPoint.m_normal.Scale(0.1f);
-					//context.DrawFrame(frame);
 
 					// normal force
 					dFloat32 normalForce = tireForceScale * contactPoint.m_normal_Force.m_force / scale;

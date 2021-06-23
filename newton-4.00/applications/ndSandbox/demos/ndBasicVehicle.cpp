@@ -51,7 +51,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 	ndVehicleDectriptorJeep()
 		:ndVehicleDectriptor("jeep.fbx")
 	{
-		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
+//		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
+m_comDisplacement = dVector(0.0f, -2.0f, 0.0f, 0.0f);
 
 		dFloat32 fuelInjectionRate = 10.0f;
 		dFloat32 idleTorquePoundFoot = 200.0f;
@@ -74,6 +75,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_frontTire.m_brakeTorque = 1500.0f;
 		m_rearTire.m_handBrakeTorque = 0.0f;
 		m_frontTire.m_verticalOffset = -0.15f;
+m_frontTire.m_verticalOffset = -0.5f;
 		m_frontTire.m_laterialStiffness  = 1.0f / 1000.0f;
 		m_frontTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 
@@ -86,13 +88,12 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_lowerStop = 0.4f;
 		m_rearTire.m_brakeTorque = 3000.0f;
 		m_rearTire.m_handBrakeTorque = 4000.0f;
-		m_rearTire.m_verticalOffset = -0.15f;
+//		m_rearTire.m_verticalOffset = -0.15f;
+m_rearTire.m_verticalOffset = -0.5f;
 		m_rearTire.m_laterialStiffness  = 0.3f / 1000.0f;
 		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 		
-		
 		m_frictionCoefficientScale = 1.3f;
-		
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 	}
