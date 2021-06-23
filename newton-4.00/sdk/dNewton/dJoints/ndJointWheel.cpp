@@ -24,7 +24,8 @@ ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 	,m_normalidedSteering(dFloat32(0.0f))
 	,m_normalizedHandBrake(dFloat32(0.0f))
 {
-m_normalizedHandBrake = 1.0f;
+// Dave check here
+//m_normalizedHandBrake = 1.0f;
 }
 
 ndJointWheel::~ndJointWheel()
@@ -109,26 +110,27 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 	SetMassSpringDamperAcceleration(desc, m_regularizer, m_info.m_springK, m_info.m_damperC);
 
-	// set tire rotation axle joint, break or load transfer
-	dFloat32 brake = dMax(m_normalizedBrake * m_info.m_brakeTorque, m_normalizedHandBrake * m_info.m_handBrakeTorque);
-	if (brake > dFloat32(0.0f))
+	const dFloat32 brakeFrictionTorque = dMax(m_normalizedBrake * m_info.m_brakeTorque, m_normalizedHandBrake * m_info.m_handBrakeTorque);
+	if (brakeFrictionTorque > dFloat32(0.0f))
 	{
+		const dFloat32 brakesToChassisInfluence = dFloat32 (0.25f);
+		//const dFloat32 brakesToChassisInfluence = dFloat32(1.0f);
 		AddAngularRowJacobian(desc, matrix1.m_front, dFloat32(0.0f));
 		const dVector tireOmega(m_body0->GetOmega());
 		const dVector chassisOmega(m_body1->GetOmega());
 
 		ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
 		ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
-		jacobian1.m_angular = jacobian1.m_angular.Scale(0.25f);
+		jacobian1.m_angular = jacobian1.m_angular.Scale(brakesToChassisInfluence);
 
 		dFloat32 w0 = tireOmega.DotProduct(jacobian0.m_angular).GetScalar();
 		dFloat32 w1 = chassisOmega.DotProduct(jacobian1.m_angular).GetScalar();
-		dFloat32 rpm = w0 + w1;
+		dFloat32 rpm = (w0 + w1) * dFloat32 (0.35f);
 
 		SetMotorAcceleration(desc, -rpm * desc.m_invTimestep);
 		
-		SetHighFriction(desc, brake);
-		SetLowerFriction(desc, -brake);
+		SetHighFriction(desc, brakeFrictionTorque);
+		SetLowerFriction(desc, -brakeFrictionTorque);
 	}
 	else
 	{ 
