@@ -68,8 +68,10 @@ class ndJointWheel: public ndJointBilateralConstraint
 		m_info = info;
 	}
 	
+	private:
+	void CalculateSteeringAngleMatrix();
+
 	protected:
-	void SetSteeringAngle();
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
 	dMatrix m_baseFrame;

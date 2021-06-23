@@ -443,7 +443,7 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 					for (ndContactPointList::dNode* contactNode0 = contactPoints.GetFirst(); contactNode0; contactNode0 = contactNode0->GetNext())
 					{
 						const ndContactPoint& contactPoint0 = contactNode0->GetInfo();
-						maxPenetration = dMax(contactNode0->GetInfo().m_penetration, maxPenetration);
+						maxPenetration = dMax(contactPoint0.m_penetration, maxPenetration);
 					}
 					if (maxPenetration > 0.1f)
 					{

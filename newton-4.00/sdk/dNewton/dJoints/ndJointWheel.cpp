@@ -24,6 +24,7 @@ ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 	,m_normalidedSteering(dFloat32(0.0f))
 	,m_normalizedHandBrake(dFloat32(0.0f))
 {
+m_normalizedHandBrake = 1.0f;
 }
 
 ndJointWheel::~ndJointWheel()
@@ -45,8 +46,7 @@ void ndJointWheel::SetSteering(dFloat32 normalidedSteering)
 	m_normalidedSteering = dClamp(normalidedSteering, dFloat32(-1.0f), dFloat32(1.0f));
 }
 
-
-void ndJointWheel::SetSteeringAngle()
+void ndJointWheel::CalculateSteeringAngleMatrix()
 {
 	const dMatrix steeringMatrix(dYawMatrix(m_normalidedSteering * m_info.m_steeringAngle));
 	m_localMatrix1 = steeringMatrix * m_baseFrame;
@@ -78,7 +78,7 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-	SetSteeringAngle();
+	CalculateSteeringAngleMatrix();
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
@@ -116,9 +116,6 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		AddAngularRowJacobian(desc, matrix1.m_front, dFloat32(0.0f));
 		const dVector tireOmega(m_body0->GetOmega());
 		const dVector chassisOmega(m_body1->GetOmega());
-
-		//dVector relOmega(tireOmega - chassisOmega);
-		//dFloat32 rpm1 = relOmega.DotProduct(matrix1.m_front).GetScalar();
 
 		ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
 		ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;

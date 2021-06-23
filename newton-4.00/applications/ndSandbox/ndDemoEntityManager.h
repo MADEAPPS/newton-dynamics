@@ -265,6 +265,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	ndLightSource m_directionalLight;
 	ndDebugMeshCache m_debugShapeCache;
 
+	FILE* m_replayLogFile;
 	static SDKDemos m_demosSelection[];
 	friend class ndPhysicsWorld;
 };

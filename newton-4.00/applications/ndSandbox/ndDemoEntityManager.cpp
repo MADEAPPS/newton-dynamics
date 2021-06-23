@@ -27,8 +27,11 @@
 #include "ndHighResolutionTimer.h"
 
 
-//#define READ_JOYTICK
-//#define RECORD_JOYTICK
+//#define ENABLE_REPLAY
+
+#ifdef ENABLE_REPLAY
+	#define REPLAY_RECORD
+#endif
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
@@ -167,6 +170,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_solverMode(ndWorld::ndSimdSoaSolver)
 	//,m_directionalLight(0.0f, 1.0f, 0.0f, 0.0f)
 	,m_debugShapeCache()
+	,m_replayLogFile(nullptr)
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -277,6 +281,14 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 	m_shaderCache.CreateAllEffects();
 
+#ifdef ENABLE_REPLAY
+	#ifdef REPLAY_RECORD
+		m_replayLogFile = fopen("replayLog.bin", "wb");
+	#else 
+		m_replayLogFile = fopen("replayLog.bin", "rb");
+	#endif
+#endif
+
 /*
 	dFloat32 A[2][2];
 	dFloat32 x[2];
@@ -321,8 +333,12 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 ndDemoEntityManager::~ndDemoEntityManager ()
 {
-	Cleanup ();
+	if (m_replayLogFile)
+	{
+		fclose(m_replayLogFile);
+	}
 
+	Cleanup ();
 	// destroy the empty world
 	if (m_world) 
 	{
@@ -420,23 +436,14 @@ dInt32 ndDemoEntityManager::GetJoystickAxis (dFixSizeArray<dFloat32, 8>& axisVal
 		}
 	}
 
-
-#if defined (RECORD_JOYTICK) || defined (READ_JOYTICK)
-	#ifdef RECORD_JOYTICK
-		static FILE* file = fopen("log0.bin", "wb");
-		if (file)
-		{
-			fwrite(&axisCount, sizeof(axisCount), 1, file);
-			fwrite(&axisValues[0], sizeof(dFloat32) * axisValues.GetCapacity(), 1, file);
-			fflush(file);
-		}
+#ifdef ENABLE_REPLAY
+	#ifdef REPLAY_RECORD
+		fwrite(&axisCount, sizeof(axisCount), 1, m_replayLogFile);
+		fwrite(&axisValues[0], sizeof(dFloat32) * axisValues.GetCapacity(), 1, m_replayLogFile);
+		fflush(m_replayLogFile);
 	#else 
-		static FILE* file = fopen("log0.bin", "rb");
-		if (file)
-		{
-			fread(&axisCount, sizeof(axisCount), 1, file);
-			fread(&axisValues[0], sizeof(dFloat32) * axisValues.GetCapacity(), 1, file);
-		}
+		fread(&axisCount, sizeof(axisCount), 1, m_replayLogFile);
+		fread(&axisValues[0], sizeof(dFloat32) * axisValues.GetCapacity(), 1, m_replayLogFile);
 	#endif
 #endif
 	return axisCount;
@@ -463,22 +470,14 @@ dInt32 ndDemoEntityManager::GetJoystickButtons(dFixSizeArray<char, 32>& axisbutt
 		}
 	}
 
-#if defined (RECORD_JOYTICK) || defined (READ_JOYTICK)
-	#ifdef RECORD_JOYTICK
-		static FILE* file = fopen("log1.bin", "wb");
-		if (file)
-		{
-			fwrite(&buttonsCount, sizeof(buttonsCount), 1, file);
-			fwrite(&axisbuttons[0], axisbuttons.GetCapacity(), 1, file);
-			fflush(file);
-		}
+#ifdef ENABLE_REPLAY
+	#ifdef REPLAY_RECORD
+		fwrite(&buttonsCount, sizeof(buttonsCount), 1, m_replayLogFile);
+		fwrite(&axisbuttons[0], axisbuttons.GetCapacity(), 1, m_replayLogFile);
+		fflush(m_replayLogFile);
 	#else 
-		static FILE* file = fopen("log1.bin", "rb");
-		if (file)
-		{
-			fread(&buttonsCount, sizeof(buttonsCount), 1, file);
-			fread(&axisbuttons[0], axisbuttons.GetCapacity(), 1, file);
-		}
+		fread(&buttonsCount, sizeof(buttonsCount), 1, m_replayLogFile);
+		fread(&axisbuttons[0], axisbuttons.GetCapacity(), 1, m_replayLogFile);
 	#endif
 #endif
 

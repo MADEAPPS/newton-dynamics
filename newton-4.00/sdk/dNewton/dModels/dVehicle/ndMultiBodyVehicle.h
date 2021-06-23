@@ -83,16 +83,13 @@ class ndMultiBodyVehicle: public ndModel
 	void ApplyTiremodel();
 	void ApplyAerodynamics();
 	void ApplyAligmentAndBalancing();
-	
-	void BrushTireModel(const ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
+	void PostUpdate(ndWorld* const, dFloat32);
 	ndBodyDynamic* CreateInternalBodyPart(ndWorld* const world, dFloat32 mass, dFloat32 radius) const;
-
-	private:
-	void Update(ndWorld* const world, dFloat32 timestep);
-	void PostUpdate(ndWorld* const, dFloat32) {}
+	void BrushTireModel(const ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
 
 	protected:
 	virtual void ApplyInputs(ndWorld* const world, dFloat32 timestep);
+	D_NEWTON_API virtual void Update(ndWorld* const world, dFloat32 timestep);
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 
 	dMatrix m_localFrame;
@@ -112,6 +109,10 @@ class ndMultiBodyVehicle: public ndModel
 	friend class ndMultiBodyVehicleTireJoint;
 	friend class ndMultiBodyVehicleTorsionBar;
 };
+
+inline void ndMultiBodyVehicle::PostUpdate(ndWorld* const, dFloat32)
+{
+}
 
 inline void ndMultiBodyVehicle::ApplyInputs(ndWorld* const, dFloat32)
 {

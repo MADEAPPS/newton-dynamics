@@ -74,6 +74,11 @@ class ndContactMaterial: public ndContactPoint
 //class ndContactPointList: public dList<ndContactMaterial, dContainersFreeListAlloc<ndContactPoint>>
 class ndContactPointList : public dList<ndContactMaterial, dContainersFreeListAlloc<ndContactMaterial>>
 {
+	public:
+	ndContactPointList()
+		:dList<ndContactMaterial, dContainersFreeListAlloc<ndContactMaterial>>()
+	{
+	}
 };
 
 D_MSV_NEWTON_ALIGN_32 
