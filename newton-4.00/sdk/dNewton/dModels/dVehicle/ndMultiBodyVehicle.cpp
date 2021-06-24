@@ -346,9 +346,9 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 					dMatrix frame(contactPoint.m_normal, contactPoint.m_dir0, contactPoint.m_dir1, contactPoint.m_point);
 
 					dVector localPosit(m_localFrame.UntransformVector(chassisMatrix.UntransformVector(contactPoint.m_point)));
-					dFloat32 offset = (localPosit.m_z > dFloat32(0.0f)) ? dFloat32(0.2f) : dFloat32(-0.2f);
-					frame.m_posit += contactPoint.m_dir0.Scale(offset);
-					frame.m_posit += contactPoint.m_normal.Scale(0.1f);
+					//dFloat32 offset = (localPosit.m_z > dFloat32(0.0f)) ? dFloat32(0.2f) : dFloat32(-0.2f);
+					//frame.m_posit += contactPoint.m_dir0.Scale(offset);
+					//frame.m_posit += contactPoint.m_normal.Scale(0.1f);
 
 					// normal force
 					dFloat32 normalForce = tireForceScale * contactPoint.m_normal_Force.m_force / scale;
@@ -407,12 +407,11 @@ void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const
 	const dFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
 	//dTrace(("%f %f\n", sideSpeed, lateralFrictionCoefficient));
 
-	//contactPoint.m_penetration = dMin(contactPoint.m_penetration, D_MAX_CONTACT_PENETRATION);
 	contactPoint.m_material.m_restitution = dFloat32 (0.1f);
 	contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
 	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
 	contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
-	contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
+	contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient * 10.0f;
 }
 
 void ndMultiBodyVehicle::ApplyTiremodel()

@@ -91,11 +91,11 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_laterialStiffness  = 0.3f / 1000.0f;
 		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 
-#if 0
+#if 1
 // Dave check here
 m_comDisplacement.m_y = -2.0f;
-m_frontTire.m_verticalOffset = -0.5f;
-m_rearTire.m_verticalOffset = -0.5f;
+m_frontTire.m_verticalOffset = -1.0f;
+m_rearTire.m_verticalOffset = -1.0f;
 #endif
 		
 		m_frictionCoefficientScale = 1.3f;
@@ -584,7 +584,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, viperDesc, matrix);
 	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
-	vehicle->SetAsPlayer(scene);
+	//vehicle->SetAsPlayer(scene);
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
 	//matrix.m_posit.m_x += 8.0f;

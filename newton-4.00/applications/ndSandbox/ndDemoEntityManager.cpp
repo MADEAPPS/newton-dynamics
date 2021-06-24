@@ -269,11 +269,11 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
 	//m_showNormalForces = true;
-	//m_showContactPoints = true;
+	m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
 	m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 2;	
-	//m_collisionDisplayMode = 3;		// solid wire frame
+	m_collisionDisplayMode = 3;		// solid wire frame
 	//m_synchronousPhysicsUpdate = false;
 
 	Cleanup();
@@ -1456,10 +1456,6 @@ void ndDemoEntityManager::RenderScene()
 	//if (m_showRaycastHit) {
 	//	RenderRayCastHit(m_world);
 	//}
-	//
-	//if (m_showBodyFrame) {
-	//	RenderBodyFrame(m_world);
-	//}
 
 	if (m_showJointDebugInfo) 
 	{
@@ -1469,6 +1465,11 @@ void ndDemoEntityManager::RenderScene()
 	if (m_showModelsDebugInfo)
 	{
 		RenderModelsDebugInfo(this);
+	}
+
+	if (m_showBodyFrame)
+	{
+		RenderBodyFrame(this);
 	}
 
 	if (m_showCenterOfMass) 

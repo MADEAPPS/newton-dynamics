@@ -200,6 +200,7 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 			{
 				const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
 				dVector point(viewProjectionMatrix.TransformVector1x4(contactPoint.m_point));
+//point += contactPoint.m_normal.Scale(0.5f);
 				dFloat32 zDist = point.m_w;
 				point = point.Scale(1.0f / zDist);
 
@@ -216,6 +217,63 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
+void RenderBodyFrame(ndDemoEntityManager* const scene)
+{
+	ndWorld* const world = scene->GetWorld();
+	GLuint shader = scene->GetShaderCache().m_wireFrame;
+
+	ndDemoCamera* const camera = scene->GetCamera();
+	dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+
+	glUseProgram(shader);
+
+	dInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	dInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+
+	ndMeshVector line[2];
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), line);
+
+	const ndBodyList& bodyList = world->GetBodyList();
+	for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	{
+		ndBodyKinematic* const body = bodyNode->GetInfo();
+
+		dMatrix matrix(body->GetMatrix());
+		dVector o(matrix.m_posit);
+		line[0].m_x = o.m_x;
+		line[0].m_y = o.m_y;
+		line[0].m_z = o.m_z;
+
+		dVector x(o + matrix.RotateVector(dVector(0.5f, 0.0f, 0.0f, 0.0f)));
+		line[1].m_x = x.m_x;
+		line[1].m_y = x.m_y;
+		line[1].m_z = x.m_z;
+		dVector color(1.0f, 0.0f, 0.0f, 0.0f);
+		glUniform4fv(shadeColorLocation, 1, &color.m_x);
+		glDrawArrays(GL_LINES, 0, 2);
+
+		x = o + matrix.RotateVector(dVector(0.0f, 0.5f, 0.0f, 0.0f));
+		line[1].m_x = x.m_x;
+		line[1].m_y = x.m_y;
+		line[1].m_z = x.m_z;
+		color = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+		glUniform4fv(shadeColorLocation, 1, &color.m_x);
+		glDrawArrays(GL_LINES, 0, 2);
+
+		x = o + matrix.RotateVector(dVector(0.0f, 0.0f, 0.5f, 0.0f));
+		line[1].m_x = x.m_x;
+		line[1].m_y = x.m_y;
+		line[1].m_z = x.m_z;
+		color = dVector(0.0f, 0.0f, 1.0f, 0.0f);
+		glUniform4fv(shadeColorLocation, 1, &color.m_x);
+		glDrawArrays(GL_LINES, 0, 2);
+	}
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glUseProgram(0);
+}
 void RenderCenterOfMass(ndDemoEntityManager* const scene)
 {
 	ndWorld* const world = scene->GetWorld();

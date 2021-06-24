@@ -41,6 +41,7 @@ void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const 
 void RenderParticles(ndDemoEntityManager* const scene);
 void RenderWorldScene(ndDemoEntityManager* const scene);
 void RenderBodiesAABB(ndDemoEntityManager* const scene);
+void RenderBodyFrame(ndDemoEntityManager* const scene);
 void RenderCenterOfMass(ndDemoEntityManager* const scene);
 void RenderContactPoints(ndDemoEntityManager* const scene);
 void RenderJointsDebugInfo(ndDemoEntityManager* const scene);
