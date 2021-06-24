@@ -93,7 +93,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 
 #if 1
 // Dave check here
-m_comDisplacement.m_y = -2.0f;
+//m_comDisplacement.m_y = -2.0f;
+m_comDisplacement.m_y = -0.55f;
 m_frontTire.m_verticalOffset = -1.0f;
 m_rearTire.m_verticalOffset = -1.0f;
 #endif
