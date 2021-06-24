@@ -25,7 +25,7 @@ ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 	,m_normalizedHandBrake(dFloat32(0.0f))
 {
 // Dave check here
-m_normalizedHandBrake = 1.0f;
+//m_normalizedHandBrake = 1.0f;
 }
 
 ndJointWheel::~ndJointWheel()
