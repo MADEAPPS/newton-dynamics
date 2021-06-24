@@ -305,7 +305,6 @@ class ndMeshEffect: public dPolyhedra
 	};
 
 	public:
-	D_MSV_NEWTON_ALIGN_16
 	class dMaterial
 	{
 		public:
@@ -325,7 +324,7 @@ class ndMeshEffect: public dPolyhedra
 		dFloat32 m_opacity;
 		dFloat32 m_shiness;
 		char m_textureName[32];
-	}D_GCC_NEWTON_ALIGN_16;
+	};
 
 	class dMeshVertexFormat
 	{

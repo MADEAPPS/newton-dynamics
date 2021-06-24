@@ -100,10 +100,10 @@ void ndDemoSplinePathMesh::Render(ndDemoEntityManager* const scene, const dMatri
 		dMatrix viewProjectionMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 
 		GLfloat color[4];
-		color[0] = m_color.m_x;
-		color[1] = m_color.m_y;
-		color[2] = m_color.m_z;
-		color[3] = m_color.m_w;
+		color[0] = GLfloat(m_color.m_x);
+		color[1] = GLfloat(m_color.m_y);
+		color[2] = GLfloat(m_color.m_z);
+		color[3] = GLfloat(m_color.m_w);
 
 		glUseProgram(m_shader);
 		glUniform4fv(m_shadeColorLocation, 1, color);

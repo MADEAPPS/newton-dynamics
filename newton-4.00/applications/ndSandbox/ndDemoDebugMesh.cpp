@@ -39,28 +39,28 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 			for (dInt32 i = 2; i < vertexCount; i++)
 			{
 				ndPointNormal point;
-				point.m_posit.m_x = faceVertex[0].m_x;
-				point.m_posit.m_y = faceVertex[0].m_y;
-				point.m_posit.m_z = faceVertex[0].m_z;
-				point.m_normal.m_x = normal.m_x;
-				point.m_normal.m_y = normal.m_y;
-				point.m_normal.m_z = normal.m_z;
+				point.m_posit.m_x = GLfloat(faceVertex[0].m_x);
+				point.m_posit.m_y = GLfloat(faceVertex[0].m_y);
+				point.m_posit.m_z = GLfloat(faceVertex[0].m_z);
+				point.m_normal.m_x = GLfloat(normal.m_x);
+				point.m_normal.m_y = GLfloat(normal.m_y);
+				point.m_normal.m_z = GLfloat(normal.m_z);
 				m_triangles.PushBack(point);
 
-				point.m_posit.m_x = faceVertex[i - 1].m_x;
-				point.m_posit.m_y = faceVertex[i - 1].m_y;
-				point.m_posit.m_z = faceVertex[i - 1].m_z;
-				point.m_normal.m_x = normal.m_x;
-				point.m_normal.m_y = normal.m_y;
-				point.m_normal.m_z = normal.m_z;
+				point.m_posit.m_x = GLfloat(faceVertex[i - 1].m_x);
+				point.m_posit.m_y = GLfloat(faceVertex[i - 1].m_y);
+				point.m_posit.m_z = GLfloat(faceVertex[i - 1].m_z);
+				point.m_normal.m_x = GLfloat(normal.m_x);
+				point.m_normal.m_y = GLfloat(normal.m_y);
+				point.m_normal.m_z = GLfloat(normal.m_z);
 				m_triangles.PushBack(point);
 
-				point.m_posit.m_x = faceVertex[i].m_x;
-				point.m_posit.m_y = faceVertex[i].m_y;
-				point.m_posit.m_z = faceVertex[i].m_z;
-				point.m_normal.m_x = normal.m_x;
-				point.m_normal.m_y = normal.m_y;
-				point.m_normal.m_z = normal.m_z;
+				point.m_posit.m_x = GLfloat(faceVertex[i].m_x);
+				point.m_posit.m_y = GLfloat(faceVertex[i].m_y);
+				point.m_posit.m_z = GLfloat(faceVertex[i].m_z);
+				point.m_normal.m_x = GLfloat(normal.m_x);
+				point.m_normal.m_y = GLfloat(normal.m_y);
+				point.m_normal.m_z = GLfloat(normal.m_z);
 				m_triangles.PushBack(point);
 			}
 		}
@@ -180,14 +180,14 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 				if (edgeType[i0] == m_edgeType)
 				{
 					ndMeshVector point;
-					point.m_x = faceVertex[i0].m_x;
-					point.m_y = faceVertex[i0].m_y;
-					point.m_z = faceVertex[i0].m_z;
+					point.m_x = GLfloat(faceVertex[i0].m_x);
+					point.m_y = GLfloat(faceVertex[i0].m_y);
+					point.m_z = GLfloat(faceVertex[i0].m_z);
 					m_lines.PushBack(point);
 
-					point.m_x = faceVertex[i].m_x;
-					point.m_y = faceVertex[i].m_y;
-					point.m_z = faceVertex[i].m_z;
+					point.m_x = GLfloat(faceVertex[i].m_x);
+					point.m_y = GLfloat(faceVertex[i].m_y);
+					point.m_z = GLfloat(faceVertex[i].m_z);
 					m_lines.PushBack(point);
 				}
 

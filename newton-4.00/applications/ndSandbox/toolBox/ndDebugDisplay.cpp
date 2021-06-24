@@ -242,30 +242,30 @@ void RenderBodyFrame(ndDemoEntityManager* const scene)
 
 		dMatrix matrix(body->GetMatrix());
 		dVector o(matrix.m_posit);
-		line[0].m_x = o.m_x;
-		line[0].m_y = o.m_y;
-		line[0].m_z = o.m_z;
+		line[0].m_x = GLfloat(o.m_x);
+		line[0].m_y = GLfloat(o.m_y);
+		line[0].m_z = GLfloat(o.m_z);
 
 		dVector x(o + matrix.RotateVector(dVector(0.5f, 0.0f, 0.0f, 0.0f)));
-		line[1].m_x = x.m_x;
-		line[1].m_y = x.m_y;
-		line[1].m_z = x.m_z;
+		line[1].m_x = GLfloat(x.m_x);
+		line[1].m_y = GLfloat(x.m_y);
+		line[1].m_z = GLfloat(x.m_z);
 		dVector color(1.0f, 0.0f, 0.0f, 0.0f);
 		glUniform4fv(shadeColorLocation, 1, &color.m_x);
 		glDrawArrays(GL_LINES, 0, 2);
 
 		x = o + matrix.RotateVector(dVector(0.0f, 0.5f, 0.0f, 0.0f));
-		line[1].m_x = x.m_x;
-		line[1].m_y = x.m_y;
-		line[1].m_z = x.m_z;
+		line[1].m_x = GLfloat(x.m_x);
+		line[1].m_y = GLfloat(x.m_y);
+		line[1].m_z = GLfloat(x.m_z);
 		color = dVector(0.0f, 1.0f, 0.0f, 0.0f);
 		glUniform4fv(shadeColorLocation, 1, &color.m_x);
 		glDrawArrays(GL_LINES, 0, 2);
 
 		x = o + matrix.RotateVector(dVector(0.0f, 0.0f, 0.5f, 0.0f));
-		line[1].m_x = x.m_x;
-		line[1].m_y = x.m_y;
-		line[1].m_z = x.m_z;
+		line[1].m_x = GLfloat(x.m_x);
+		line[1].m_y = GLfloat(x.m_y);
+		line[1].m_z = GLfloat(x.m_z);
 		color = dVector(0.0f, 0.0f, 1.0f, 0.0f);
 		glUniform4fv(shadeColorLocation, 1, &color.m_x);
 		glDrawArrays(GL_LINES, 0, 2);
@@ -301,30 +301,30 @@ void RenderCenterOfMass(ndDemoEntityManager* const scene)
 		dVector com(body->GetCentreOfMass());
 		
 		dVector o(matrix.TransformVector(com));
-		line[0].m_x = o.m_x;
-		line[0].m_y = o.m_y;
-		line[0].m_z = o.m_z;
+		line[0].m_x = GLfloat(o.m_x);
+		line[0].m_y = GLfloat(o.m_y);
+		line[0].m_z = GLfloat(o.m_z);
 
 		dVector x(o + matrix.RotateVector(dVector(0.5f, 0.0f, 0.0f, 0.0f)));
-		line[1].m_x = x.m_x;
-		line[1].m_y = x.m_y;
-		line[1].m_z = x.m_z;
+		line[1].m_x = GLfloat(x.m_x);
+		line[1].m_y = GLfloat(x.m_y);
+		line[1].m_z = GLfloat(x.m_z);
 		dVector color(1.0f, 0.0f, 0.0f, 0.0f);
 		glUniform4fv(shadeColorLocation, 1, &color.m_x);
 		glDrawArrays(GL_LINES, 0, 2);
 
 		x = o + matrix.RotateVector(dVector(0.0f, 0.5f, 0.0f, 0.0f));
-		line[1].m_x = x.m_x;
-		line[1].m_y = x.m_y;
-		line[1].m_z = x.m_z;
+		line[1].m_x = GLfloat(x.m_x);
+		line[1].m_y = GLfloat(x.m_y);
+		line[1].m_z = GLfloat(x.m_z);
 		color = dVector(0.0f, 1.0f, 0.0f, 0.0f);
 		glUniform4fv(shadeColorLocation, 1, &color.m_x);
 		glDrawArrays(GL_LINES, 0, 2);
 
 		x = o + matrix.RotateVector(dVector(0.0f, 0.0f, 0.5f, 0.0f));
-		line[1].m_x = x.m_x;
-		line[1].m_y = x.m_y;
-		line[1].m_z = x.m_z;
+		line[1].m_x = GLfloat(x.m_x);
+		line[1].m_y = GLfloat(x.m_y);
+		line[1].m_z = GLfloat(x.m_z);
 		color = dVector (0.0f, 0.0f, 1.0f, 0.0f);
 		glUniform4fv(shadeColorLocation, 1, &color.m_x);
 		glDrawArrays(GL_LINES, 0, 2);
@@ -419,12 +419,12 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 
 		void DrawLine(const dVector& p0, const dVector& p1, const dVector& color)
 		{
-			m_line[0].m_x = p0.m_x;
-			m_line[0].m_y = p0.m_y;
-			m_line[0].m_z = p0.m_z;
-			m_line[1].m_x = p1.m_x;
-			m_line[1].m_y = p1.m_y;
-			m_line[1].m_z = p1.m_z;
+			m_line[0].m_x = GLfloat(p0.m_x);
+			m_line[0].m_y = GLfloat(p0.m_y);
+			m_line[0].m_z = GLfloat(p0.m_z);
+			m_line[1].m_x = GLfloat(p1.m_x);
+			m_line[1].m_y = GLfloat(p1.m_y);
+			m_line[1].m_z = GLfloat(p1.m_z);
 			glUniform4fv(m_shadeColorLocation, 1, &color.m_x);
 			glDrawArrays(GL_LINES, 0, 2);
 		}
@@ -475,12 +475,12 @@ void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 		
 		void DrawLine(const dVector& p0, const dVector& p1, const dVector& color)
 		{
-			m_line[0].m_x = p0.m_x;
-			m_line[0].m_y = p0.m_y;
-			m_line[0].m_z = p0.m_z;
-			m_line[1].m_x = p1.m_x;
-			m_line[1].m_y = p1.m_y;
-			m_line[1].m_z = p1.m_z;
+			m_line[0].m_x = GLfloat(p0.m_x);
+			m_line[0].m_y = GLfloat(p0.m_y);
+			m_line[0].m_z = GLfloat(p0.m_z);
+			m_line[1].m_x = GLfloat(p1.m_x);
+			m_line[1].m_y = GLfloat(p1.m_y);
+			m_line[1].m_z = GLfloat(p1.m_z);
 			glUniform4fv(m_shadeColorLocation, 1, &color.m_x);
 			glDrawArrays(GL_LINES, 0, 2);
 		}

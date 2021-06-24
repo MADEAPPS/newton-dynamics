@@ -1088,6 +1088,14 @@ class dVector
 		{
 		}
 
+		D_INLINE dBigVector(const dFloat64* const baseAddr, const dInt64* const index)
+			:m_x(baseAddr[index[0]])
+			,m_y(baseAddr[index[1]])
+			,m_z(baseAddr[index[2]])
+			,m_w(baseAddr[index[3]])
+		{
+		}
+
 	#ifdef D_NEWTON_USE_DOUBLE
 		D_INLINE dBigVector (const dFloat32* const ptr)
 			:m_typeLow(_mm_loadu_pd(ptr))
@@ -1253,6 +1261,11 @@ class dVector
 		D_INLINE dBigVector InvSqrt() const
 		{
 			return Sqrt().Reciproc();
+		}
+
+		D_INLINE dBigVector InvMagSqrt() const
+		{
+			return DotProduct(*this).InvSqrt();
 		}
 
 		D_INLINE dBigVector Normalize() const

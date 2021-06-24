@@ -109,25 +109,25 @@ class ndHeightfieldMesh : public ndDemoMesh
 			dAssert(normal.m_w == dFloat32(0.0f));
 			normal = normal.Normalize();
 
-			points[i0].m_normal.m_x += normal.m_x;
-			points[i0].m_normal.m_y += normal.m_y;
-			points[i0].m_normal.m_z += normal.m_z;
+			points[i0].m_normal.m_x += GLfloat(normal.m_x);
+			points[i0].m_normal.m_y += GLfloat(normal.m_y);
+			points[i0].m_normal.m_z += GLfloat(normal.m_z);
 
-			points[i1].m_normal.m_x += normal.m_x;
-			points[i1].m_normal.m_y += normal.m_y;
-			points[i1].m_normal.m_z += normal.m_z;
+			points[i1].m_normal.m_x += GLfloat(normal.m_x);
+			points[i1].m_normal.m_y += GLfloat(normal.m_y);
+			points[i1].m_normal.m_z += GLfloat(normal.m_z);
 
-			points[i2].m_normal.m_x += normal.m_x;
-			points[i2].m_normal.m_y += normal.m_y;
-			points[i2].m_normal.m_z += normal.m_z;
+			points[i2].m_normal.m_x += GLfloat(normal.m_x);
+			points[i2].m_normal.m_y += GLfloat(normal.m_y);
+			points[i2].m_normal.m_z += GLfloat(normal.m_z);
 		}
 
 		for (dInt32 i = 0; i < points.GetCount(); i++)
 		{
 			dVector normal(points[i].m_normal.m_x, points[i].m_normal.m_y, points[i].m_normal.m_z, dFloat32(0.0f));
 			normal = normal.Normalize();
-			points[i].m_posit = ndMeshVector(heightfield[i].m_x, heightfield[i].m_y, heightfield[i].m_z);
-			points[i].m_normal = ndMeshVector(normal.m_x, normal.m_y, normal.m_z);
+			points[i].m_posit = ndMeshVector(GLfloat(heightfield[i].m_x), GLfloat(heightfield[i].m_y), GLfloat(heightfield[i].m_z));
+			points[i].m_normal = ndMeshVector(GLfloat(normal.m_x), GLfloat(normal.m_y), GLfloat(normal.m_z));
 			points[i].m_uv.m_u = dFloat32(0.0f);
 			points[i].m_uv.m_v = dFloat32(0.0f);
 		}

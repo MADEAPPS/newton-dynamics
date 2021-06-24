@@ -177,10 +177,19 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 		char z[64];
 		sscanf(&data[start], "%[^ ] %[^ ] %[^ ]", x, y, z);
 		start += strlen(x) + strlen(y) + strlen(z) + 3;
+
+		dFloat64 fx;
+		dFloat64 fy;
+		dFloat64 fz;
 		
-		sscanf(x, "%f", &point.m_x);
-		sscanf(y, "%f", &point.m_y);
-		sscanf(z, "%f", &point.m_z);
+		sscanf(x, "%lf", &fx);
+		sscanf(y, "%lf", &fy);
+		sscanf(z, "%lf", &fz);
+
+		point.m_x = dFloat32(fx);
+		point.m_y = dFloat32(fy);
+		point.m_z = dFloat32(fz);
+
 		array[i] = point;
 	}
 }
@@ -192,8 +201,15 @@ D_CORE_API dVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char
 
 	const char* const positData = element->Attribute("float3");
 
+	dFloat64 fx;
+	dFloat64 fy;
+	dFloat64 fz;
+	sscanf(positData, "%lf %lf %lf", &fx, &fy, &fz);
+
 	dVector posit(dVector::m_zero);
-	sscanf(positData, "%f %f %f", &posit.m_x, &posit.m_y, &posit.m_z);
+	posit.m_x = dFloat32(fx);
+	posit.m_y = dFloat32(fy);
+	posit.m_z = dFloat32(fz);
 	return posit;
 }
 
@@ -208,8 +224,20 @@ dMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name
 	dVector posit(dVector::m_one);
 	dVector euler(dVector::m_zero);
 
-	sscanf(positData, "%f %f %f", &posit.m_x, &posit.m_y, &posit.m_z);
-	sscanf(angleData, "%f %f %f", &euler.m_x, &euler.m_y, &euler.m_z);
+	dFloat64 fx;
+	dFloat64 fy;
+	dFloat64 fz;
+	//sscanf(positData, "%f %f %f", &posit.m_x, &posit.m_y, &posit.m_z);
+	sscanf(positData, "%lf %lf %lf", &fx, &fy, &fz);
+	posit.m_x = dFloat32(fx);
+	posit.m_y = dFloat32(fy);
+	posit.m_z = dFloat32(fz);
+
+	//sscanf(angleData, "%f %f %f", &euler.m_x, &euler.m_y, &euler.m_z);
+	sscanf(angleData, "%lf %lf %lf", &fx, &fy, &fz);
+	euler.m_x = dFloat32(fx);
+	euler.m_y = dFloat32(fy);
+	euler.m_z = dFloat32(fz);
 	euler = euler.Scale(dDegreeToRad);
 
 	dMatrix matrix (dPitchMatrix(euler.m_x) * dYawMatrix(euler.m_y) * dRollMatrix(euler.m_z));
