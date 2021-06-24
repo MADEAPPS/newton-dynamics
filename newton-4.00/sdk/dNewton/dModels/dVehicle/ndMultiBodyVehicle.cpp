@@ -411,7 +411,7 @@ void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const
 	contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
 	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
 	contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
-	contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient * 10.0f;
+	contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
 }
 
 void ndMultiBodyVehicle::ApplyTiremodel()
