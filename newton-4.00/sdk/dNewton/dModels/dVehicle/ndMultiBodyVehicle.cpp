@@ -348,7 +348,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 					dVector localPosit(m_localFrame.UntransformVector(chassisMatrix.UntransformVector(contactPoint.m_point)));
 					//dFloat32 offset = (localPosit.m_z > dFloat32(0.0f)) ? dFloat32(0.2f) : dFloat32(-0.2f);
 					//frame.m_posit += contactPoint.m_dir0.Scale(offset);
-					//frame.m_posit += contactPoint.m_normal.Scale(0.1f);
+					frame.m_posit += contactPoint.m_normal.Scale(0.1f);
 
 					// normal force
 					dFloat32 normalForce = tireForceScale * contactPoint.m_normal_Force.m_force / scale;
@@ -356,11 +356,11 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 
 					// lateral force
 					dFloat32 lateralForce = -tireForceScale * contactPoint.m_dir0_Force.m_force / scale;
-//					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir0.Scale(lateralForce), lateralColor);
+					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir0.Scale(lateralForce), lateralColor);
 
 					// longitudinal force
 					dFloat32 longitudinalForce = -tireForceScale * contactPoint.m_dir1_Force.m_force / scale;
-//					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir1.Scale(longitudinalForce), longitudinalColor);
+					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir1.Scale(longitudinalForce), longitudinalColor);
 				}
 			}
 		}
