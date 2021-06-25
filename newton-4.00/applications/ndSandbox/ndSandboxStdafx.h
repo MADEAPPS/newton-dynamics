@@ -118,6 +118,34 @@ inline void glMaterialParam (GLenum face, GLenum pname, const dFloat32 *params)
 #define glGetFloat(x,y) glGetFloatv(x, (GLfloat*)y) 
 #endif
 
+
+class glVector : public dFixSizeArray<GLfloat, 4>
+{
+	public:
+	glVector(const dVector& v)
+	{
+		(*this)[0] = GLfloat(v[0]);
+		(*this)[1] = GLfloat(v[1]);
+		(*this)[2] = GLfloat(v[2]);
+		(*this)[3] = GLfloat(v[3]);
+	}
+};
+
+class glMatrix : public dFixSizeArray<GLfloat, 16>
+{
+	public:
+	glMatrix(const dMatrix& matrix)
+	{
+		for (dInt32 i = 0; i < 4; i++) 
+		{
+			for (int j = 0; j < 4; j++) 
+			{
+				(*this)[i * 4 + j] = GLfloat(matrix[i][j]);
+			}
+		}
+	}
+};
+
 #ifndef _MSC_VER
 	#ifndef stricmp
 		#define stricmp strcasecmp

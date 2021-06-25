@@ -165,8 +165,8 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	GLuint shader = scene->GetShaderCache().m_wireFrame;
 
 	ndDemoCamera* const camera = scene->GetCamera();
-	dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
-	dMatrix invViewProjectionMatrix(camera->GetProjectionMatrix().Inverse4x4() * camera->GetViewMatrix().Inverse());
+	const dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+	const dMatrix invViewProjectionMatrix(camera->GetProjectionMatrix().Inverse4x4() * camera->GetViewMatrix().Inverse());
 
 	ndMeshVector4 color;
 	color.m_x = 1.0f;
@@ -178,9 +178,9 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 
 	dInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
 	dInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
-
 	glUniform4fv(shadeColorLocation, 1, &color.m_x);
-	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+	const glMatrix viewProjMatrix(viewProjectionMatrix);
+	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjMatrix[0]);
 
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
@@ -200,7 +200,6 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 			{
 				const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
 				dVector point(viewProjectionMatrix.TransformVector1x4(contactPoint.m_point));
-//point += contactPoint.m_normal.Scale(0.5f);
 				dFloat32 zDist = point.m_w;
 				point = point.Scale(1.0f / zDist);
 
@@ -398,14 +397,14 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 		ndJoindDebug(ndDemoEntityManager* const scene)
 		{
 			ndDemoCamera* const camera = scene->GetCamera();
-			dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+			const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
 			m_shader = scene->GetShaderCache().m_wireFrame;
 
 			glUseProgram(m_shader);
 
 			m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
 			m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
-			glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+			glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0]);
 
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), m_line);
@@ -425,7 +424,9 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 			m_line[1].m_x = GLfloat(p1.m_x);
 			m_line[1].m_y = GLfloat(p1.m_y);
 			m_line[1].m_z = GLfloat(p1.m_z);
-			glUniform4fv(m_shadeColorLocation, 1, &color.m_x);
+
+			glVector c(color);
+			glUniform4fv(m_shadeColorLocation, 1, &c[0]);
 			glDrawArrays(GL_LINES, 0, 2);
 		}
 
@@ -454,14 +455,14 @@ void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 		ndJoindDebug(ndDemoEntityManager* const scene)
 		{
 			ndDemoCamera* const camera = scene->GetCamera();
-			dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+			const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
 			m_shader = scene->GetShaderCache().m_wireFrame;
 
 			glUseProgram(m_shader);
 
 			m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
 			m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
-			glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+			glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0]);
 
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), m_line);
@@ -481,7 +482,9 @@ void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 			m_line[1].m_x = GLfloat(p1.m_x);
 			m_line[1].m_y = GLfloat(p1.m_y);
 			m_line[1].m_z = GLfloat(p1.m_z);
-			glUniform4fv(m_shadeColorLocation, 1, &color.m_x);
+			glVector c(color);
+
+			glUniform4fv(m_shadeColorLocation, 1, &c[0]);
 			glDrawArrays(GL_LINES, 0, 2);
 		}
 
