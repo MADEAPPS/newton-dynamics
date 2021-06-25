@@ -90,19 +90,6 @@
 // SDK includes
 #include <ndNewton.h>
 
-/*
-#ifdef _NEWTON_USE_DOUBLE
-	#define glMultMatrix(x) glMultMatrixd(x)
-	#define glLoadMatrix(x) glMultMatrixd(x)
-	#define glGetFloat(x,y) glGetDoublev(x,(GLdouble *)y) 
-#else
-	#define glMultMatrix(x) glMultMatrixf(x)
-	#define glLoadMatrix(x) glMultMatrixf(x)
-	#define glGetFloat(x,y) glGetFloatv(x,(dFloat32  *)y) 
-#endif
-*/
-
-
 #ifndef _MSC_VER
 	#ifndef stricmp
 		#define stricmp strcasecmp
