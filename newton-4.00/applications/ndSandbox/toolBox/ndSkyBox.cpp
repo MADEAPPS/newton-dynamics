@@ -16,6 +16,7 @@
 
 ndSkyBox::ndSkyBox(GLuint shader)
 	:ndDemoEntity(dGetIdentityMatrix(), nullptr)
+	,m_textureMatrix(dGetIdentityMatrix())
 	,m_shader(shader)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
@@ -47,10 +48,11 @@ ndSkyBox::ndSkyBox(GLuint shader)
 		20,21,22,  22,23,20     // v4-v7-v6, v6-v5-v4 (back)
 	};
 
-	m_textureMatrix = dGetIdentityMatrix();
 
-	m_textureMatrix[1][1] = -1.0f;
-	m_textureMatrix[1][3] = size;
+	dMatrix texMatrix(dGetIdentityMatrix());
+	texMatrix[1][1] = -1.0f;
+	texMatrix[1][3] = size;
+	m_textureMatrix = glMatrix(texMatrix);
 		
 	SetupCubeMap();
 
@@ -229,11 +231,11 @@ void ndSkyBox::Render(dFloat32, ndDemoEntityManager* const scene, const dMatrix&
 	skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, 0.0f, 1.0f));
 
 	//dMatrix viewModelMatrix(skyMatrix * camera->GetViewMatrix());
-	dMatrix projectionViewModelMatrix(skyMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
+	const glMatrix projectionViewModelMatrix(skyMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 	
 	glUseProgram(m_shader);
-	glUniformMatrix4fv(m_textureMatrixLocation, 1, false, &m_textureMatrix[0][0]);
-	glUniformMatrix4fv(m_matrixUniformLocation, 1, false, &projectionViewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_textureMatrixLocation, 1, false, &m_textureMatrix[0]);
+	glUniformMatrix4fv(m_matrixUniformLocation, 1, false, &projectionViewModelMatrix[0]);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_texturecubemap);

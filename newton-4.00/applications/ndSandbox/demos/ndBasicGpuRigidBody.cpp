@@ -146,7 +146,8 @@
 //	geometry->Release();
 //}
 
-void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
+//void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
+void ndBasicGpuRigidBody(ndDemoEntityManager* const)
 {
 	// build a floor
 	//BuildFloorBox(scene);
