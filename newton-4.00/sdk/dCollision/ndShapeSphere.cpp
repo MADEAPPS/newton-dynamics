@@ -117,7 +117,7 @@ void ndShapeSphere::Init(dFloat32 radius)
 		TesselateTriangle(index, p5, p3, p1, count, tmpVectex);
 		TesselateTriangle(index, p5, p0, p3, count, tmpVectex);
 
-		dInt32 vertexCount = dVertexListToIndexList(&tmpVectex[0].m_x, sizeof(dVector), 3 * sizeof(dFloat32), 0, count, indexList, 0.001f);
+		dInt32 vertexCount = dVertexListToIndexList(&tmpVectex[0].m_x, sizeof(dVector), 3, count, indexList, 0.001f);
 
 		dAssert(vertexCount == D_SPHERE_VERTEX_COUNT);
 		for (dInt32 i = 0; i < vertexCount; i++) 

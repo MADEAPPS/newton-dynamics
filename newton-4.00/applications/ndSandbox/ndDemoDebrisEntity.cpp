@@ -96,7 +96,7 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const m
 		dInt32 subIndexCount = meshNode->GetMaterialIndexCount(geometryHandle, handle);
 		meshNode->GetMaterialGetIndexStream(geometryHandle, handle, &indices[segmentStart]);
 
-		dFloat32 blend = materialCount ? 0.0f : 1.0f;
+		GLfloat blend = materialCount ? 0.0f : 1.0f;
 		for (dInt32 i = 0; i < subIndexCount; i++)
 		{
 			dInt32 index = indices[segmentStart + i] + offsetBase;

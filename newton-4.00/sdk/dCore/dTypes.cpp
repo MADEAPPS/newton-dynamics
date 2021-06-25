@@ -365,40 +365,6 @@ static dInt32 QuickSortVertices(dFloat64* const vertList, dInt32 stride, dInt32 
 	return count;
 }
 
-dInt32 dVertexListToIndexList(dFloat32* const vertList, dInt32 strideInBytes, dInt32 floatSizeInBytes, dInt32 , dInt32 vertexCount, dInt32* const indexList, dFloat32 tolerance)
-{
-	dInt32 stride = dInt32(strideInBytes / sizeof(dFloat32));
-
-	//dAssert(!unsignedSizeInBytes);
-	dStack<dFloat64> pool(vertexCount * stride);
-
-	dInt32 floatCount = dInt32(floatSizeInBytes / sizeof(dFloat32));
-
-	dFloat64* const data = &pool[0];
-	for (dInt32 i = 0; i < vertexCount; i++) 
-	{
-		dFloat64* const dst = &data[i * stride];
-		dFloat32* const src = &vertList[i * stride];
-		for (dInt32 j = 0; j < stride; j++) 
-		{
-			dst[j] = src[j];
-		}
-	}
-
-	dInt32 count = dVertexListToIndexList(data, dInt32(stride * sizeof(dFloat64)), floatCount, vertexCount, indexList, dFloat64(tolerance));
-	for (dInt32 i = 0; i < count; i++) 
-	{
-		dFloat64* const src = &data[i * stride];
-		dFloat32* const dst = &vertList[i * stride];
-		for (dInt32 j = 0; j < stride; j++) 
-		{
-			dst[j] = dFloat32(src[j]);
-		}
-	}
-
-	return count;
-}
-
 dInt32 dVertexListToIndexList(dFloat64* const vertList, dInt32 strideInBytes, dInt32 compareCount, dInt32 vertexCount, dInt32* const indexListOut, dFloat64 tolerance)
 {
 	dSetPrecisionDouble precision;
@@ -454,7 +420,6 @@ dInt32 dVertexListToIndexList(dFloat64* const vertList, dInt32 strideInBytes, dI
 	}
 	return count;
 }
-
 
 void dSpinLock::Delay(dInt32& exp)
 {

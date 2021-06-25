@@ -689,8 +689,38 @@ class dScopeSpinLock
 	dSpinLock& m_spinLock;
 };
 
-D_CORE_API dInt32 dVertexListToIndexList (dFloat64* const vertexList, dInt32 strideInBytes, dInt32 compareCount,     dInt32 vertexCount,         dInt32* const indexListOut, dFloat64 tolerance = dEpsilon);
-D_CORE_API dInt32 dVertexListToIndexList (dFloat32* const vertexList, dInt32 strideInBytes, dInt32 floatSizeInBytes, dInt32 unsignedSizeInBytes, dInt32 vertexCount, dInt32* const indexListOut, dFloat32 tolerance = dEpsilon);
+D_CORE_API dInt32 dVertexListToIndexList(dFloat64* const vertexList, dInt32 strideInBytes, dInt32 compareCount, dInt32 vertexCount, dInt32* const indexListOut, dFloat64 tolerance = dEpsilon);
+
+template <class T>
+dInt32 dVertexListToIndexList(T* const vertexList, dInt32 strideInBytes, dInt32 compareCount, dInt32 vertexCount, dInt32* const indexListOut, T tolerance = dEpsilon)
+{
+	dInt32 stride = dInt32(strideInBytes / sizeof(T));
+	dStack<dFloat64> pool(vertexCount * stride);
+
+	dFloat64* const data = &pool[0];
+	for (dInt32 i = 0; i < vertexCount; i++)
+	{
+		dFloat64* const dst = &data[i * stride];
+		const T* const src = &vertexList[i * stride];
+		for (dInt32 j = 0; j < stride; j++)
+		{
+			dst[j] = src[j];
+		}
+	}
+
+	dInt32 count = dVertexListToIndexList(data, dInt32(stride * sizeof(dFloat64)), compareCount, vertexCount, indexListOut, dFloat64(tolerance));
+	for (dInt32 i = 0; i < count; i++)
+	{
+		const dFloat64* const src = &data[i * stride];
+		T* const dst = &vertexList[i * stride];
+		for (dInt32 j = 0; j < stride; j++)
+		{
+			dst[j] = T(src[j]);
+		}
+	}
+
+	return count;
+}
 
 /// Set cpu floating point exceptions, the original exception state is restored when the destructor is called.
 class dFloatExceptions

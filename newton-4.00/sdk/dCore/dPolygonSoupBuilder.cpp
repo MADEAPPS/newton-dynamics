@@ -314,7 +314,7 @@ void dPolygonSoupBuilder::PackArray()
 	dAssert(0);
 	dStack<dInt32> indexMapPool (m_vertexPoints.GetCount());
 	dInt32* const indexMap = &indexMapPool[0];
-	dInt32 vertexCount = dVertexListToIndexList (&m_vertexPoints[0].m_x, sizeof (dBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], dFloat32 (1.0e-6f));
+	dInt32 vertexCount = dVertexListToIndexList(&m_vertexPoints[0].m_x, sizeof (dBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], dFloat32 (1.0e-6f));
 
 	dInt32 k = 0;
 	for (dInt32 i = 0; i < m_faceVertexCount.GetCount(); i ++)
@@ -344,7 +344,7 @@ void dPolygonSoupBuilder::Finalize()
 		dStack<dInt32> indexMapPool(m_vertexIndex.GetCount());
 
 		dInt32* const indexMap = &indexMapPool[0];
-		dInt32 vertexCount = dVertexListToIndexList (&m_vertexPoints[0].m_x, sizeof (dBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], dFloat32 (1.0e-4f));
+		dInt32 vertexCount = dVertexListToIndexList(&m_vertexPoints[0].m_x, sizeof (dBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], dFloat32 (1.0e-4f));
 		dAssert(vertexCount <= m_vertexPoints.GetCount());
 		m_vertexPoints.SetCount(vertexCount);
 

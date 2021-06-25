@@ -73,7 +73,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 
 	dArray<dInt32> m_triangles(drawShapes.m_triangles.GetCount());
 	m_triangles.SetCount(drawShapes.m_triangles.GetCount());
-	dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(ndPointNormal), sizeof(ndPointNormal), 0, drawShapes.m_triangles.GetCount(), &m_triangles[0], dFloat32(1.0e-6f));
+	dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(ndPointNormal), 6, drawShapes.m_triangles.GetCount(), &m_triangles[0], GLfloat(1.0e-6f));
 	
 	m_shader = shaderCache.m_flatShaded;
 	m_indexCount = m_triangles.GetCount();
@@ -210,7 +210,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 	{
 		dArray<dInt32> m_lines(drawShapes.m_lines.GetCount());
 		m_lines.SetCount(drawShapes.m_lines.GetCount());
-		dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_lines[0].m_x, sizeof(ndMeshVector), sizeof(ndMeshVector), 0, drawShapes.m_lines.GetCount(), &m_lines[0], dFloat32(1.0e-6f));
+		dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_lines[0].m_x, sizeof(ndMeshVector), 3, drawShapes.m_lines.GetCount(), &m_lines[0], GLfloat(1.0e-6f));
 
 		m_indexCount = m_lines.GetCount();
 		dTree<dUnsigned64, dUnsigned64> filter;

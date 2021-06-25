@@ -15,7 +15,7 @@
 
 #include "ndSandboxStdafx.h"
 
-#ifdef _NEWTON_USE_DOUBLE
+#ifdef D_NEWTON_USE_DOUBLE
 	inline void glMaterialParam(GLenum face, GLenum pname, const dFloat32 *params)
 	{
 		GLfloat tmp[4] = { GLfloat(params[0]), GLfloat(params[1]), GLfloat(params[2]), GLfloat(params[3]) };
