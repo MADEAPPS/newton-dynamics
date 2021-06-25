@@ -244,6 +244,9 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 			const dFloat32 distance = relPosit.DotProduct(upDir).GetScalar();
 			const dFloat32 spinAngle = -tire->CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
 
+			//dAssert(distance > tire->GetInfo().m_minLimit);
+			//dAssert(distance < tire->GetInfo().m_maxLimit);
+
 			dMatrix newTireMatrix(dPitchMatrix(spinAngle) * chassisMatrix);
 			newTireMatrix.m_posit = chassisMatrix.m_posit + upDir.Scale(distance);
 

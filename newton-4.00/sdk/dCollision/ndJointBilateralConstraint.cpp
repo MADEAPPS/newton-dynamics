@@ -137,8 +137,8 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 		const dVector& omega1 = m_body1->m_omega;
 		const dVector& gyroAlpha0 = m_body0->m_gyroAlpha;
 		const dVector& gyroAlpha1 = m_body1->m_gyroAlpha;
-		const dVector& centripetal0(omega0.CrossProduct(omega0.CrossProduct(m_r0[index])));
-		const dVector& centripetal1(omega1.CrossProduct(omega1.CrossProduct(m_r1[index])));
+		const dVector centripetal0(omega0.CrossProduct(omega0.CrossProduct(m_r0[index])));
+		const dVector centripetal1(omega1.CrossProduct(omega1.CrossProduct(m_r1[index])));
 	
 		const dFloat32 relGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 		const dFloat32 relCentr = -(jacobian0.m_linear * centripetal0 + jacobian1.m_linear * centripetal1).AddHorizontal().GetScalar();
@@ -286,8 +286,8 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 				const ndJacobianPair& Jt = row[k].m_Jt;
 
 				//calculate internal centripetal each sub step 
-				const dVector& centripetal0(bodyOmega0.CrossProduct(bodyOmega0.CrossProduct(m_r0[k])));
-				const dVector& centripetal1(bodyOmega1.CrossProduct(bodyOmega1.CrossProduct(m_r1[k])));
+				const dVector centripetal0(bodyOmega0.CrossProduct(bodyOmega0.CrossProduct(m_r0[k])));
+				const dVector centripetal1(bodyOmega1.CrossProduct(bodyOmega1.CrossProduct(m_r1[k])));
 
 				const dVector relVeloc(
 					Jt.m_jacobianM0.m_linear * bodyVeloc0 + Jt.m_jacobianM0.m_angular * bodyOmega0 +
