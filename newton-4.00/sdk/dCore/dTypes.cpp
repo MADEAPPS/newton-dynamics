@@ -459,18 +459,27 @@ dInt32 dVertexListToIndexList(dFloat64* const vertList, dInt32 strideInBytes, dI
 void dSpinLock::Delay(dInt32& exp)
 {
 	#if defined (_WIN_32_VER) || defined (_WIN_64_VER)
-	// adding exponential pause delay
-	for (dInt32 i = 0; i < exp; i++)
-	{
-		_mm_pause();
-		_mm_pause();
-		_mm_pause();
-		_mm_pause();
-	}
-	exp = dMin(exp * 2, 64);
+		// adding exponential pause delay
+		for (dInt32 i = 0; i < exp; i++)
+		{
+			_mm_pause();
+			_mm_pause();
+			//_mm_pause();
+			//_mm_pause();
+		}
+		exp = dMin(exp * 2, 64);
 	#else
-	// use standard thread yield on non x86 platforms 
-	std::this_thread::yield();
+		// use standard thread yield on non x86 platforms 
+		//std::this_thread::yield();
+		volatile dInt32 acc = 0;
+		for (dInt32 i = 0; i < exp; i++)
+		{
+			acc++;
+			acc++;
+			//acc++;
+			//acc++;
+		}
+		exp = dMin(exp * 2, 64);
 	#endif
 }
 

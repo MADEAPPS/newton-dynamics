@@ -135,12 +135,15 @@ void ndFlatShadedDebugMesh::Render(ndDemoEntityManager* const scene, const dMatr
 
 	const dMatrix& viewMatrix = camera->GetViewMatrix();
 	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
-	dMatrix viewModelMatrix(modelMatrix * viewMatrix);
+	const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
 
-	glUniform4fv(m_shadeColorLocation, 1, &m_color.m_x);
-	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
-	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	const glMatrix projMatrix(projectionMatrix);
+	const glVector color(m_color);
+
+	glUniform4fv(m_shadeColorLocation, 1, &color[0]);
+	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projMatrix[0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0]);
 
 	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
@@ -288,14 +291,16 @@ void ndWireFrameDebugMesh::Render(ndDemoEntityManager* const scene, const dMatri
 	if (m_shader)
 	{
 		ndDemoCamera* const camera = scene->GetCamera();
-		dMatrix projectionViewModelMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
+		const glMatrix projectionViewModelMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		//glDepthFunc(GL_LESS);
 
+		const glVector color(m_color);
+
 		glUseProgram(m_shader);
-		glUniform4fv(m_shadeColorLocation, 1, &m_color.m_x);
-		glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &projectionViewModelMatrix[0][0]);
+		glUniform4fv(m_shadeColorLocation, 1, &color[0]);
+		glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &projectionViewModelMatrix[0]);
 
 		glBindVertexArray(m_vertextArrayBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_lineIndexBuffer);

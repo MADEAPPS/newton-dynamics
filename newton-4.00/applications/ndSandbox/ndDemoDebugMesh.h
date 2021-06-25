@@ -29,14 +29,12 @@ class ndFlatShadedDebugMesh: public ndDemoMeshInterface
 
 	void SetColor(const dVector& color)
 	{
-		m_color.m_x = GLfloat(color.m_x);
-		m_color.m_y = GLfloat(color.m_y);
-		m_color.m_z = GLfloat(color.m_z);
-		m_color.m_w = GLfloat(color.m_w);
+		m_color = color;
 	}
 	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 
-	ndMeshVector4 m_color;
+	//ndMeshVector4 m_color;
+	dVector m_color;
 	dInt32 m_indexCount;
 	dInt32 m_shadeColorLocation;
 	dInt32 m_normalMatrixLocation;
@@ -57,15 +55,12 @@ class ndWireFrameDebugMesh: public ndDemoMeshInterface
 
 	void SetColor(const dVector& color)
 	{
-		m_color.m_x = GLfloat(color.m_x);
-		m_color.m_y = GLfloat(color.m_y);
-		m_color.m_z = GLfloat(color.m_z);
-		m_color.m_w = GLfloat(color.m_w);
+		m_color = color;
 	}
 
 	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 
-	ndMeshVector4 m_color;
+	dVector m_color;
 	dInt32 m_indexCount;
 	dInt32 m_shadeColorLocation;
 	dInt32 m_projectionViewModelMatrixLocation;

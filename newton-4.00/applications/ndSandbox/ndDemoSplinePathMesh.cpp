@@ -97,17 +97,18 @@ void ndDemoSplinePathMesh::Render(ndDemoEntityManager* const scene, const dMatri
 	if (m_isVisible)
 	{
 		ndDemoCamera* const camera = scene->GetCamera();
-		dMatrix viewProjectionMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
+		const glMatrix viewProjectionMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 
-		GLfloat color[4];
-		color[0] = GLfloat(m_color.m_x);
-		color[1] = GLfloat(m_color.m_y);
-		color[2] = GLfloat(m_color.m_z);
-		color[3] = GLfloat(m_color.m_w);
+		//GLfloat color[4];
+		//color[0] = GLfloat(m_color.m_x);
+		//color[1] = GLfloat(m_color.m_y);
+		//color[2] = GLfloat(m_color.m_z);
+		//color[3] = GLfloat(m_color.m_w);
+		const glVector color(m_color);
 
 		glUseProgram(m_shader);
-		glUniform4fv(m_shadeColorLocation, 1, color);
-		glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+		glUniform4fv(m_shadeColorLocation, 1, &color[0]);
+		glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0]);
 
 		//ndMeshVector m_line[2];
 		//glEnableClientState(GL_VERTEX_ARRAY);
