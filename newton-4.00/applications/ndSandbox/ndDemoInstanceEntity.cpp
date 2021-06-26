@@ -65,17 +65,38 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	dArray<dInt32> indices(indexCount);
-	dArray<ndMeshPointUV> points(vertexCount);
-	dArray<ndMeshMatrix> offsets(m_maxInstanceCount);
+	struct dTmpData
+	{
+		dFloat32 m_posit[3];
+		dFloat32 m_normal[3];
+		dFloat32 m_uv[2];
+	};
 
+	dArray<dTmpData> tmp;
+	dArray<dInt32> indices;
+	dArray<ndMeshPointUV> points;
+	dArray<ndMeshMatrix> offsets;
+
+	tmp.SetCount(vertexCount);
 	points.SetCount(vertexCount);
 	indices.SetCount(indexCount);
 	offsets.SetCount(m_maxInstanceCount);
+	
+	mesh.GetVertexChannel(sizeof(dTmpData), &tmp[0].m_posit[0]);
+	mesh.GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
+	mesh.GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
 
-	mesh.GetVertexChannel(sizeof(ndMeshPointUV), &points[0].m_posit.m_x);
-	mesh.GetNormalChannel(sizeof(ndMeshPointUV), &points[0].m_normal.m_x);
-	mesh.GetUV0Channel(sizeof(ndMeshPointUV), &points[0].m_uv.m_u);
+	for (dInt32 i = 0; i < vertexCount; i++)
+	{
+		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
+		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
+		points[i].m_posit.m_z = GLfloat(tmp[i].m_posit[2]);
+		points[i].m_normal.m_x = GLfloat(tmp[i].m_normal[0]);
+		points[i].m_normal.m_y = GLfloat(tmp[i].m_normal[1]);
+		points[i].m_normal.m_z = GLfloat(tmp[i].m_normal[2]);
+		points[i].m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
+		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
+	}
 
 	dInt32 segmentStart = 0;
 	bool hasTransparency = false;
@@ -193,7 +214,7 @@ void ndDemoMeshIntance::RenderBatch(dInt32 start, ndDemoEntityManager* const sce
 	{
 		dMatrix matrix(m_offsets[base + i]);
 		const dFloat32* const src = &matrix[0][0];
-		dFloat32* const dst = &matrixBuffer[i].m_array[0].m_x;
+		GLfloat* const dst = &matrixBuffer[i].m_array[0].m_x;
 		for (dInt32 j = 0; j < 16; j++) 
 		{
 			dst[j] = GLfloat(src[j]);
@@ -209,15 +230,15 @@ void ndDemoMeshIntance::RenderBatch(dInt32 start, ndDemoEntityManager* const sce
 	ndDemoCamera* const camera = scene->GetCamera();
 
 	const dMatrix& viewMatrix = camera->GetViewMatrix();
-	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
-	dMatrix viewModelMatrix(modelMatrix * viewMatrix);
-	dVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+	const glMatrix& projectionMatrix (camera->GetProjectionMatrix());
+	const glMatrix viewModelMatrix (modelMatrix * viewMatrix);
+	const glVector directionaLight (viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
 
 	glUniform1i(m_textureLocation, 0);
 	glUniform1f(m_transparencyLocation, 1.0f);
-	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight.m_x);
-	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
-	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight[0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0]);
 
 	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);

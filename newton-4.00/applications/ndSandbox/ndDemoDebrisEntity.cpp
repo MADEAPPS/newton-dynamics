@@ -85,11 +85,11 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const m
 		dInt32 materialIndex = meshNode->GetMaterialID(geometryHandle, handle);
 		const ndMeshEffect::dMaterial& material = materialArray[materialIndex];
 
-		m_material[materialCount].m_ambient = material.m_ambient;
-		m_material[materialCount].m_diffuse = material.m_diffuse;
-		m_material[materialCount].m_specular = material.m_specular;
-		m_material[materialCount].m_opacity = material.m_opacity;
-		m_material[materialCount].m_shiness = material.m_shiness;
+		m_material[materialCount].m_ambient = glVector (material.m_ambient);
+		m_material[materialCount].m_diffuse = glVector(material.m_diffuse);
+		m_material[materialCount].m_specular = glVector(material.m_specular);
+		m_material[materialCount].m_opacity = GLfloat(material.m_opacity);
+		m_material[materialCount].m_shiness = GLfloat(material.m_shiness);
 		strcpy(m_material[materialCount].m_textureName, material.m_textureName);
 		m_material[materialCount].m_textureHandle = LoadTexture(material.m_textureName);
 
@@ -138,10 +138,10 @@ void ndDemoDebrisMesh::Render(ndDemoEntityManager* const scene, const dMatrix& m
 	ndDemoCamera* const camera = scene->GetCamera();
 
 	const dMatrix& viewMatrix = camera->GetViewMatrix();
-	dMatrix viewModelMatrix(modelMatrix * viewMatrix);
+	const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
 
-	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
@@ -154,9 +154,36 @@ ndDemoDebrisEntity::ndDemoDebrisEntity(ndMeshEffect* const meshNode, dArray<Debr
 
 	dInt32 const vertexOffsetBase = vertexArray.GetCount();
 	vertexArray.SetCount(vertexOffsetBase + vertexCount);
-	meshNode->GetVertexChannel(sizeof(DebrisPoint), &vertexArray[vertexOffsetBase].m_posit.m_x);
-	meshNode->GetNormalChannel(sizeof(DebrisPoint), &vertexArray[vertexOffsetBase].m_normal.m_x);
-	meshNode->GetUV0Channel(sizeof(DebrisPoint), &vertexArray[vertexOffsetBase].m_uv.m_u);
+
+	struct dTmpData
+	{
+		dFloat32 m_posit[4];
+		dFloat32 m_normal[3];
+		dFloat32 m_uv[2];
+	};
+
+	dArray<dTmpData> tmp;
+	tmp.SetCount(vertexCount);
+
+	//meshNode->GetVertexChannel(sizeof(DebrisPoint), &vertexArray[vertexOffsetBase].m_posit.m_x);
+	//meshNode->GetNormalChannel(sizeof(DebrisPoint), &vertexArray[vertexOffsetBase].m_normal.m_x);
+	//meshNode->GetUV0Channel(sizeof(DebrisPoint), &vertexArray[vertexOffsetBase].m_uv.m_u);
+	meshNode->GetVertexChannel(sizeof(dTmpData), &tmp[0].m_posit[0]);
+	meshNode->GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
+	meshNode->GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
+
+	for (dInt32 i = 0; i < vertexCount; i++)
+	{
+		vertexArray[vertexOffsetBase + i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
+		vertexArray[vertexOffsetBase + i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
+		vertexArray[vertexOffsetBase + i].m_posit.m_z = GLfloat(tmp[i].m_posit[2]);
+		vertexArray[vertexOffsetBase + i].m_posit.m_w = GLfloat(tmp[i].m_posit[3]);
+		vertexArray[vertexOffsetBase + i].m_normal.m_x = GLfloat(tmp[i].m_normal[0]);
+		vertexArray[vertexOffsetBase + i].m_normal.m_y = GLfloat(tmp[i].m_normal[1]);
+		vertexArray[vertexOffsetBase + i].m_normal.m_z = GLfloat(tmp[i].m_normal[2]);
+		vertexArray[vertexOffsetBase + i].m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
+		vertexArray[vertexOffsetBase + i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
+	}
 
 	ndDemoDebrisMesh* const mesh = new ndDemoDebrisMesh("fracture", meshNode, shaderCache, vertexOffsetBase, vertexArray);
 	SetMesh(mesh, dGetIdentityMatrix());
@@ -212,14 +239,14 @@ void ndDemoDebrisRootEntity::Render(dFloat32 timestep, ndDemoEntityManager* cons
 
 	ndDemoCamera* const camera = scene->GetCamera();
 	const dMatrix& viewMatrix = camera->GetViewMatrix();
-	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
-	const dVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+	const glMatrix projectionMatrix (camera->GetProjectionMatrix());
+	const glVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
 
 	glUniform1i(shaderMesh->m_textureLocation, 0);
 	glUniform1i(shaderMesh->m_textureLocation1, 1);
 	glUniform1f(shaderMesh->m_transparencyLocation, 1.0f);
-	glUniform4fv(shaderMesh->m_directionalLightDirLocation, 1, &directionaLight.m_x);
-	glUniformMatrix4fv(shaderMesh->m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+	glUniform4fv(shaderMesh->m_directionalLightDirLocation, 1, &directionaLight[0]);
+	glUniformMatrix4fv(shaderMesh->m_projectMatrixLocation, 1, false, &projectionMatrix[0]);
 
 	glUniform3fv(shaderMesh->m_materialAmbientLocation, 1, &shaderMesh->m_material[0].m_ambient[0]);
 	glUniform3fv(shaderMesh->m_materialDiffuseLocation, 1, &shaderMesh->m_material[0].m_diffuse[0]);

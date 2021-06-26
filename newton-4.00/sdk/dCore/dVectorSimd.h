@@ -522,13 +522,13 @@ class dVector
 		{
 		}
 
-		//D_INLINE dBigVector(const __m128 typeLow, const __m128 typeHigh)
-		//	: m_typeGen(_mm256_setr_m128(typeLow, typeHigh))
-		//{
-		//}
-
 		D_INLINE dBigVector(const dFloat64 a)
 			:m_type(_mm256_set1_pd(a))
+		{
+		}
+
+		D_INLINE dBigVector(const dFloat64* const baseAddr, const dInt64* const index)
+			:m_type(_mm256_i64gather_pd(baseAddr, *((__m256i*)index), 4))
 		{
 		}
 
@@ -688,9 +688,13 @@ class dVector
 			return Sqrt().Reciproc();
 		}
 
+		D_INLINE dBigVector InvMagSqrt() const
+		{
+			return DotProduct(*this).InvSqrt();
+		}
+
 		D_INLINE dBigVector Normalize() const
 		{
-			dAssert(m_w == dFloat32(0.0f));
 			dFloat64 mag2 = DotProduct(*this).GetScalar();
 			return Scale(dFloat64(1.0f) / sqrt(mag2));
 		}
@@ -868,7 +872,7 @@ class dVector
 			dst3 = _mm256_blend_pd(tmp1, dst3.m_type, 12);
 		}
 
-		// return dot 4d dot product
+		// return 4d dot product
 		D_INLINE dBigVector DotProduct(const dBigVector &A) const
 		{
 			const dBigVector tmp(_mm256_mul_pd(m_type, A.m_type));
@@ -970,13 +974,14 @@ class dVector
 		}
 
 #ifdef D_NEWTON_USE_DOUBLE
-		//#define PURMUT_MASK2(y, x)		_MM_SHUFFLE2(x, y)
 		D_INLINE dSpatialVector(const dVector& low, const dVector& high)
-			//:m_d0(low.m_typeLow)
-			//,m_d1(_mm_shuffle_pd(low.m_typeHigh, high.m_typeLow, PURMUT_MASK2(0, 0)))
-			//,m_d2(_mm_shuffle_pd(high.m_typeLow, high.m_typeHigh, PURMUT_MASK2(1, 0)))
+			:m_d0(low.m_type)
 		{
-			dAssert(0);
+			m_f[3] = high.m_x;
+			m_f[4] = high.m_y;
+			m_f[5] = high.m_z;
+			m_f[6] = dFloat64(0.0f);
+			m_f[7] = dFloat64(0.0f);
 		}
 #else 
 		D_INLINE dSpatialVector(const dVector& low, const dVector& high)
@@ -1270,7 +1275,6 @@ class dVector
 
 		D_INLINE dBigVector Normalize() const
 		{
-			dAssert (m_w == dFloat32 (0.0f));
 			dFloat64 mag2 = DotProduct(*this).GetScalar();
 			return Scale(dFloat64 (1.0f) / sqrt (mag2));
 		}

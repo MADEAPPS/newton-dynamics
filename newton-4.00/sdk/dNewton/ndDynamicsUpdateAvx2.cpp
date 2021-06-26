@@ -29,139 +29,304 @@
 
 #define D_AVX_WORD_GROUP_SIZE	8 
 
-D_MSV_NEWTON_ALIGN_32
-class ndAvxFloat
-{
-	public:
-	D_INLINE ndAvxFloat()
+#ifdef D_NEWTON_USE_DOUBLE
+	D_MSV_NEWTON_ALIGN_32
+	class ndAvxFloat
 	{
-	}
+		public:
+		D_INLINE ndAvxFloat()
+		{
+		}
 
-	D_INLINE ndAvxFloat(const dFloat32 val)
-		:m_type(_mm256_set1_ps(val))
+		D_INLINE ndAvxFloat(const dFloat32 val)
+			:m_low(_mm256_set1_pd(val))
+			,m_high(_mm256_set1_pd(val))
+		{
+		}
+
+		D_INLINE ndAvxFloat(const __m256d low, const __m256d high)
+			:m_low(low)
+			,m_high(high)
+		{
+		}
+
+		D_INLINE ndAvxFloat(const ndAvxFloat& copy)
+			:m_low(copy.m_low)
+			,m_high(copy.m_high)
+		{
+		}
+
+		#ifdef D_USE_VECTOR_AVX
+			D_INLINE ndAvxFloat(const dVector& low, const dVector& high)
+				:m_low(low.m_type)
+				,m_high(high.m_type)
+			{
+			}
+		#else
+			D_INLINE ndAvxFloat(const dVector& low, const dVector& high)
+				:m_low(_mm256_set_m128d(low.m_typeHigh, low.m_typeLow))
+				,m_high(_mm256_set_m128d(high.m_typeHigh, high.m_typeLow))
+			{
+			}
+		#endif
+
+		D_INLINE ndAvxFloat(const ndAvxFloat* const baseAddr, const ndAvxFloat& index)
+			:m_low(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_lowInt, 8))
+			,m_high(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_highInt, 8))
+		{
+		}
+
+		D_INLINE dFloat32& operator[] (dInt32 i)
+		{
+			dAssert(i < D_AVX_WORD_GROUP_SIZE);
+			dAssert(i >= 0);
+			//return m_f[i];
+			dFloat32* const ptr = (dFloat32*)&m_low;
+			return ptr[i];
+		}
+
+		D_INLINE const dFloat32& operator[] (dInt32 i) const
+		{
+			dAssert(i < D_AVX_WORD_GROUP_SIZE);
+			dAssert(i >= 0);
+			//return m_f[i];
+			const dFloat32* const ptr = (dFloat32*)&m_low;
+			return ptr[i];
+		}
+
+		D_INLINE ndAvxFloat operator+ (const ndAvxFloat& A) const
+		{
+			return ndAvxFloat(_mm256_add_pd(m_low, A.m_low), _mm256_add_pd(m_high, A.m_high));
+		}
+
+		D_INLINE ndAvxFloat operator- (const ndAvxFloat& A) const
+		{
+			return ndAvxFloat(_mm256_sub_pd(m_low, A.m_low), _mm256_sub_pd(m_high, A.m_high));
+		}
+
+		D_INLINE ndAvxFloat operator* (const ndAvxFloat& A) const
+		{
+			return ndAvxFloat(_mm256_mul_pd(m_low, A.m_low), _mm256_mul_pd(m_high, A.m_high));
+		}
+
+		D_INLINE ndAvxFloat MulAdd(const ndAvxFloat& A, const ndAvxFloat& B) const
+		{
+			return ndAvxFloat(_mm256_fmadd_pd(A.m_low, B.m_low, m_low), _mm256_fmadd_pd(A.m_high, B.m_high, m_high));
+		}
+
+		D_INLINE ndAvxFloat MulSub(const ndAvxFloat& A, const ndAvxFloat& B) const
+		{
+			return ndAvxFloat(_mm256_fnmadd_pd(A.m_low, B.m_low, m_low), _mm256_fnmadd_pd(A.m_high, B.m_high, m_high));
+		}
+
+		D_INLINE ndAvxFloat operator> (const ndAvxFloat& A) const
+		{
+			return ndAvxFloat(_mm256_cmp_pd(m_low, A.m_low, _CMP_GT_OQ), _mm256_cmp_pd(m_high, A.m_high, _CMP_GT_OQ));
+		}
+
+		D_INLINE ndAvxFloat operator< (const ndAvxFloat& A) const
+		{
+			return ndAvxFloat(_mm256_cmp_pd(m_low, A.m_low, _CMP_LT_OQ), _mm256_cmp_pd(m_high, A.m_high, _CMP_LT_OQ));
+		}
+
+		D_INLINE ndAvxFloat operator| (const ndAvxFloat& A) const
+		{
+			return ndAvxFloat(_mm256_or_pd(m_low, A.m_low), _mm256_or_pd(m_high, A.m_high));
+		}
+
+		D_INLINE ndAvxFloat operator& (const ndAvxFloat& A) const
+		{
+			return ndAvxFloat(_mm256_and_pd(m_low, A.m_low), _mm256_and_pd(m_high, A.m_high));
+		}
+
+		D_INLINE ndAvxFloat GetMin(const ndAvxFloat& A) const
+		{
+			return ndAvxFloat(_mm256_min_pd(m_low, A.m_low), _mm256_min_pd(m_high, A.m_high));
+		}
+
+		D_INLINE ndAvxFloat GetMax(const ndAvxFloat& A) const
+		{
+			return ndAvxFloat(_mm256_max_pd(m_low, A.m_low), _mm256_max_pd(m_high, A.m_high));
+		}
+
+		D_INLINE ndAvxFloat Select(const ndAvxFloat& data, const ndAvxFloat& mask) const
+		{
+			// (((b ^ a) & mask)^a)
+			//return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
+			//return  _mm256_xor_ps(m_type, _mm256_and_ps(mask.m_type, _mm256_xor_ps(m_type, data.m_type)));
+			__m256d low (_mm256_xor_pd(m_low, _mm256_and_pd(mask.m_low, _mm256_xor_pd(m_low, data.m_low))));
+			__m256d high(_mm256_xor_pd(m_high, _mm256_and_pd(mask.m_high, _mm256_xor_pd(m_high, data.m_high))));
+			return ndAvxFloat(low, high);
+		}
+
+
+		D_INLINE dFloat32 AddHorizontal() const
+		{
+			//__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
+			//__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
+			//__m256 tmp2(_mm256_hadd_ps(tmp1, tmp1));
+			//return *((dFloat32*)&tmp2);
+			__m256d tmp0(_mm256_add_pd(m_low, m_high));
+			__m256d tmp1(_mm256_hadd_pd(tmp0, tmp0));
+			__m256d tmp2(_mm256_add_pd(tmp1, _mm256_permute2f128_pd(tmp1, tmp1, 1)));
+			return *((dFloat32*)&tmp2);
+		}
+
+		static D_INLINE void FlushRegisters()
+		{
+			_mm256_zeroall();
+		}
+
+		union
+		{
+			struct
+			{
+				__m256d m_low;
+				__m256d m_high;
+			};
+			struct
+			{
+				__m256i m_lowInt;
+				__m256i m_highInt;
+			};
+		};
+	} D_GCC_NEWTON_ALIGN_32;
+
+#else
+	D_MSV_NEWTON_ALIGN_32
+	class ndAvxFloat
 	{
-	}
+		public:
+		D_INLINE ndAvxFloat()
+		{
+		}
 
-	D_INLINE ndAvxFloat(const __m256 type)
-		: m_type(type)
-	{
-	}
+		D_INLINE ndAvxFloat(const dFloat32 val)
+			:m_type(_mm256_set1_ps(val))
+		{
+		}
 
-	D_INLINE ndAvxFloat(const ndAvxFloat& copy)
-		: m_type(copy.m_type)
-	{
-	}
+		D_INLINE ndAvxFloat(const __m256 type)
+			: m_type(type)
+		{
+		}
 
-	D_INLINE ndAvxFloat(const dVector& low, const dVector& high)
-		: m_type(_mm256_set_m128(high.m_type, low.m_type))
-	{
-	}
+		D_INLINE ndAvxFloat(const ndAvxFloat& copy)
+			: m_type(copy.m_type)
+		{
+		}
 
-	D_INLINE ndAvxFloat(const ndAvxFloat* const baseAddr, const ndAvxFloat& index)
-		: m_type(_mm256_i32gather_ps(&(*baseAddr)[0], index.m_typeInt, 4))
-	{
-	}
+		D_INLINE ndAvxFloat(const dVector& low, const dVector& high)
+			: m_type(_mm256_set_m128(high.m_type, low.m_type))
+		{
+		}
 
-	D_INLINE dFloat32& operator[] (dInt32 i)
-	{
-		dAssert(i < D_AVX_WORD_GROUP_SIZE);
-		dAssert(i >= 0);
-		//return m_f[i];
-		dFloat32* const ptr = (dFloat32*)&m_type;
-		return ptr[i];
-	}
+		D_INLINE ndAvxFloat(const ndAvxFloat* const baseAddr, const ndAvxFloat& index)
+			: m_type(_mm256_i32gather_ps(&(*baseAddr)[0], index.m_typeInt, 4))
+		{
+		}
 
-	D_INLINE const dFloat32& operator[] (dInt32 i) const
-	{
-		dAssert(i < D_AVX_WORD_GROUP_SIZE);
-		dAssert(i >= 0);
-		//return m_f[i];
-		const dFloat32* const ptr = (dFloat32*)&m_type;
-		return ptr[i];
-	}
+		D_INLINE dFloat32& operator[] (dInt32 i)
+		{
+			dAssert(i < D_AVX_WORD_GROUP_SIZE);
+			dAssert(i >= 0);
+			//return m_f[i];
+			dFloat32* const ptr = (dFloat32*)&m_type;
+			return ptr[i];
+		}
 
-	D_INLINE ndAvxFloat operator+ (const ndAvxFloat& A) const
-	{
-		return _mm256_add_ps(m_type, A.m_type);
-	}
+		D_INLINE const dFloat32& operator[] (dInt32 i) const
+		{
+			dAssert(i < D_AVX_WORD_GROUP_SIZE);
+			dAssert(i >= 0);
+			//return m_f[i];
+			const dFloat32* const ptr = (dFloat32*)&m_type;
+			return ptr[i];
+		}
 
-	D_INLINE ndAvxFloat operator- (const ndAvxFloat& A) const
-	{
-		return _mm256_sub_ps(m_type, A.m_type);
-	}
+		D_INLINE ndAvxFloat operator+ (const ndAvxFloat& A) const
+		{
+			return _mm256_add_ps(m_type, A.m_type);
+		}
 
-	D_INLINE ndAvxFloat operator* (const ndAvxFloat& A) const
-	{
-		return _mm256_mul_ps(m_type, A.m_type);
-	}
+		D_INLINE ndAvxFloat operator- (const ndAvxFloat& A) const
+		{
+			return _mm256_sub_ps(m_type, A.m_type);
+		}
 
-	D_INLINE ndAvxFloat MulAdd(const ndAvxFloat& A, const ndAvxFloat& B) const
-	{
-		return _mm256_fmadd_ps(A.m_type, B.m_type, m_type);
-	}
+		D_INLINE ndAvxFloat operator* (const ndAvxFloat& A) const
+		{
+			return _mm256_mul_ps(m_type, A.m_type);
+		}
 
-	D_INLINE ndAvxFloat MulSub(const ndAvxFloat& A, const ndAvxFloat& B) const
-	{
-		return _mm256_fnmadd_ps(A.m_type, B.m_type, m_type);
-	}
+		D_INLINE ndAvxFloat MulAdd(const ndAvxFloat& A, const ndAvxFloat& B) const
+		{
+			return _mm256_fmadd_ps(A.m_type, B.m_type, m_type);
+		}
 
-	D_INLINE ndAvxFloat operator> (const ndAvxFloat& A) const
-	{
-		return _mm256_cmp_ps(m_type, A.m_type, _CMP_GT_OQ);
-	}
+		D_INLINE ndAvxFloat MulSub(const ndAvxFloat& A, const ndAvxFloat& B) const
+		{
+			return _mm256_fnmadd_ps(A.m_type, B.m_type, m_type);
+		}
 
-	D_INLINE ndAvxFloat operator< (const ndAvxFloat& A) const
-	{
-		return _mm256_cmp_ps(m_type, A.m_type, _CMP_LT_OQ);
-	}
+		D_INLINE ndAvxFloat operator> (const ndAvxFloat& A) const
+		{
+			return _mm256_cmp_ps(m_type, A.m_type, _CMP_GT_OQ);
+		}
 
-	D_INLINE ndAvxFloat operator| (const ndAvxFloat& A) const
-	{
-		return _mm256_or_ps(m_type, A.m_type);
-	}
+		D_INLINE ndAvxFloat operator< (const ndAvxFloat& A) const
+		{
+			return _mm256_cmp_ps(m_type, A.m_type, _CMP_LT_OQ);
+		}
 
-	D_INLINE ndAvxFloat operator& (const ndAvxFloat& A) const
-	{
-		return _mm256_and_ps(m_type, A.m_type);
-	}
+		D_INLINE ndAvxFloat operator| (const ndAvxFloat& A) const
+		{
+			return _mm256_or_ps(m_type, A.m_type);
+		}
 
-	D_INLINE ndAvxFloat GetMin(const ndAvxFloat& A) const
-	{
-		return _mm256_min_ps(m_type, A.m_type);
-	}
+		D_INLINE ndAvxFloat operator& (const ndAvxFloat& A) const
+		{
+			return _mm256_and_ps(m_type, A.m_type);
+		}
 
-	D_INLINE ndAvxFloat GetMax(const ndAvxFloat& A) const
-	{
-		return _mm256_max_ps(m_type, A.m_type);
-	}
+		D_INLINE ndAvxFloat GetMin(const ndAvxFloat& A) const
+		{
+			return _mm256_min_ps(m_type, A.m_type);
+		}
 
-	D_INLINE ndAvxFloat Select(const ndAvxFloat& data, const ndAvxFloat& mask) const
-	{
-		// (((b ^ a) & mask)^a)
-		//return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
-		return  _mm256_xor_ps(m_type, _mm256_and_ps(mask.m_type, _mm256_xor_ps(m_type, data.m_type)));
-	}
+		D_INLINE ndAvxFloat GetMax(const ndAvxFloat& A) const
+		{
+			return _mm256_max_ps(m_type, A.m_type);
+		}
+
+		D_INLINE ndAvxFloat Select(const ndAvxFloat& data, const ndAvxFloat& mask) const
+		{
+			// (((b ^ a) & mask)^a)
+			//return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
+			return  _mm256_xor_ps(m_type, _mm256_and_ps(mask.m_type, _mm256_xor_ps(m_type, data.m_type)));
+		}
 
 
-	D_INLINE dFloat32 AddHorizontal() const
-	{
-		__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
-		__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
-		__m256 tmp2(_mm256_hadd_ps(tmp1, tmp1));
-		return *((dFloat32*)&tmp2);
-	}
+		D_INLINE dFloat32 AddHorizontal() const
+		{
+			__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
+			__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
+			__m256 tmp2(_mm256_hadd_ps(tmp1, tmp1));
+			return *((dFloat32*)&tmp2);
+		}
 
-	static D_INLINE void FlushRegisters()
-	{
-		_mm256_zeroall();
-	}
+		static D_INLINE void FlushRegisters()
+		{
+			_mm256_zeroall();
+		}
 
-	union
-	{
-		__m256 m_type;
-		__m256i m_typeInt;
-	};
-} D_GCC_NEWTON_ALIGN_32;
+		union
+		{
+			__m256 m_type;
+			__m256i m_typeInt;
+		};
+	} D_GCC_NEWTON_ALIGN_32;
+#endif
 
 D_MSV_NEWTON_ALIGN_32
 class ndAvxVector3
@@ -1362,7 +1527,6 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
 			const ndLeftHandSide* const leftHandSide = &me->GetLeftHandSide()[0];
 			const ndRightHandSide* const rightHandSide = &me->GetRightHandSide()[0];
-			//dArray<ndSoaMatrixElement>& massMatrix = me->m_soaMassMatrix;
 			dArray<ndSoaMatrixElement>& massMatrix = *(dArray<ndSoaMatrixElement>*)me->m_soaMassMatrixArray;
 
 			const dInt32 mask = -dInt32(D_AVX_WORD_GROUP_SIZE);
@@ -1524,7 +1688,12 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 						row.m_JMinv.m_jacobianM1.m_angular.m_y = ndAvxFloat(tmp[1], tmp[5]);
 						row.m_JMinv.m_jacobianM1.m_angular.m_z = ndAvxFloat(tmp[2], tmp[6]);
 					
-						dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
+						#ifdef D_NEWTON_USE_DOUBLE
+							dInt64* const normalIndex = (dInt64*)&row.m_normalForceIndex[0];
+						#else
+							dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
+						#endif
+
 						for (dInt32 k = 0; k < D_AVX_WORD_GROUP_SIZE; k++)
 						{
 							const ndConstraint* const soaJoint = jointArray[index + k];
@@ -1577,7 +1746,12 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 						row.m_coordenateAccel = zero;
 						row.m_lowerBoundFrictionCoefficent = zero;
 						row.m_upperBoundFrictionCoefficent = zero;
-						dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
+
+						#ifdef D_NEWTON_USE_DOUBLE
+							dInt64* const normalIndex = (dInt64*)&row.m_normalForceIndex[0];
+						#else
+							dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
+						#endif
 						for (dInt32 k = 0; k < D_AVX_WORD_GROUP_SIZE; k++)
 						{
 							normalIndex[k] = k;
@@ -1628,7 +1802,12 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 								row.m_lowerBoundFrictionCoefficent[j] = rhs->m_lowerBoundFrictionCoefficent;
 								row.m_upperBoundFrictionCoefficent[j] = rhs->m_upperBoundFrictionCoefficent;
 					
-								dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
+								#ifdef D_NEWTON_USE_DOUBLE
+									dInt64* const normalIndex = (dInt64*)&row.m_normalForceIndex[0];
+								#else
+									dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
+								#endif
+
 								normalIndex[j] = (rhs->m_normalForceIndex + 1) * D_AVX_WORD_GROUP_SIZE + j;
 							}
 						}
@@ -1918,7 +2097,6 @@ void ndDynamicsUpdateAvx2::IntegrateBodiesVelocity()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - me->m_unConstrainedBodyCount;
-			//const dFloat32 timestep = m_timestep;
 
 			const dVector timestep4(me->m_timestepRK);
 			const dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));

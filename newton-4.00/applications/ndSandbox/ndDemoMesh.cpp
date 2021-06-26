@@ -162,12 +162,13 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		dFloat32 m_uv[2];
 	};
 
-	dArray<dInt32> indices(indexCount);
 	dArray<dTmpData> tmp;
-	dArray<ndMeshPointUV> points(vertexCount);
+	dArray<dInt32> indices;
+	dArray<ndMeshPointUV> points;
+
+	tmp.SetCount(vertexCount);
 	points.SetCount(vertexCount);
 	indices.SetCount(indexCount);
-	tmp.SetCount(vertexCount);
 
 	mesh.GetVertexChannel(sizeof(dTmpData), &tmp[0].m_posit[0]);
 	mesh.GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
@@ -244,9 +245,10 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 		dFloat32 m_uv[2];
 	};
 
-	dArray<dInt32> indices;
 	dArray<dTmpData> tmp;
+	dArray<dInt32> indices;
 	dArray<ndMeshPointUV> points;
+
 	indices.SetCount(indexCount);
 	points.SetCount(vertexCount);
 	tmp.SetCount(vertexCount);
