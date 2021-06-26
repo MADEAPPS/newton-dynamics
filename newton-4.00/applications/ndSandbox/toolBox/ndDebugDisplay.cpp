@@ -117,11 +117,6 @@ void RenderWorldScene(ndDemoEntityManager* const scene)
 	ndDemoCamera* const camera = scene->GetCamera();
 	const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
 
-	//ndMeshVector4 color;
-	//color.m_x = 1.0f;
-	//color.m_y = 1.0f;
-	//color.m_z = 0.0f;
-	//color.m_w = 1.0f;
 	glVector color(dVector(1.0f, 1.0f, 0.0f, 1.0f));
 
 	glUseProgram(shader);
@@ -169,11 +164,6 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	const dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
 	const dMatrix invViewProjectionMatrix(camera->GetProjectionMatrix().Inverse4x4() * camera->GetViewMatrix().Inverse());
 
-	//ndMeshVector4 color;
-	//color.m_x = 1.0f;
-	//color.m_y = 0.0f;
-	//color.m_z = 0.0f;
-	//color.m_w = 1.0f;
 	glVector color(dVector(1.0f, 0.0f, 0.0f, 1.0f));
 
 	glUseProgram(shader);

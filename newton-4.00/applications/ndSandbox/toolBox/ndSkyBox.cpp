@@ -48,7 +48,6 @@ ndSkyBox::ndSkyBox(GLuint shader)
 		20,21,22,  22,23,20     // v4-v7-v6, v6-v5-v4 (back)
 	};
 
-
 	dMatrix texMatrix(dGetIdentityMatrix());
 	texMatrix[1][1] = -1.0f;
 	texMatrix[1][3] = size;

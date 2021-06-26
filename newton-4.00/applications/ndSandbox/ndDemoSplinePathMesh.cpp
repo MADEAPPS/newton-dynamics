@@ -99,11 +99,6 @@ void ndDemoSplinePathMesh::Render(ndDemoEntityManager* const scene, const dMatri
 		ndDemoCamera* const camera = scene->GetCamera();
 		const glMatrix viewProjectionMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 
-		//GLfloat color[4];
-		//color[0] = GLfloat(m_color.m_x);
-		//color[1] = GLfloat(m_color.m_y);
-		//color[2] = GLfloat(m_color.m_z);
-		//color[3] = GLfloat(m_color.m_w);
 		const glVector color(m_color);
 
 		glUseProgram(m_shader);

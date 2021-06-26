@@ -74,7 +74,6 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_frontTire.m_brakeTorque = 1500.0f;
 		m_rearTire.m_handBrakeTorque = 0.0f;
 		m_frontTire.m_verticalOffset = -0.15f;
-
 		m_frontTire.m_laterialStiffness  = 1.0f / 1000.0f;
 		m_frontTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 

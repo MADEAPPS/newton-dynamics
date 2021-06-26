@@ -33,7 +33,6 @@ class ndFlatShadedDebugMesh: public ndDemoMeshInterface
 	}
 	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 
-	//ndMeshVector4 m_color;
 	dVector m_color;
 	dInt32 m_indexCount;
 	dInt32 m_shadeColorLocation;

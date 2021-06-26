@@ -9,9 +9,8 @@
 * freely
 */
 	
-
-#if !defined(AFX_OPENGLUTIL_H_H)
-#define AFX_OPENGLUTIL_H_H
+#ifndef __OPENGLUTIL_H__
+#define __OPENGLUTIL_H__
 
 #include "ndSandboxStdafx.h"
 

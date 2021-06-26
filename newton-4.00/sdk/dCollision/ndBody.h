@@ -23,6 +23,7 @@
 #define _D_BODY_H_
 
 #include "ndCollisionStdafx.h"
+#include "ndSetData.h"
 #include "ndShapeInstance.h"
 
 class ndContact;
