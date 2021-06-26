@@ -229,9 +229,9 @@ void ndDemoMeshIntance::RenderBatch(dInt32 start, ndDemoEntityManager* const sce
 		ndDemoSubMesh& segment = node->GetInfo();
 		if (!segment.m_hasTranparency)
 		{
-			glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient.m_x);
-			glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse.m_x);
-			glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular.m_x);
+			glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient[0]);
+			glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse[0]);
+			glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
 
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);

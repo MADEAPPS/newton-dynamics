@@ -155,16 +155,35 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
 
+	struct dTmpData
+	{
+		dFloat32 m_posit[3];
+		dFloat32 m_normal[3];
+		dFloat32 m_uv[2];
+	};
+
 	dArray<dInt32> indices(indexCount);
+	dArray<dTmpData> tmp;
 	dArray<ndMeshPointUV> points(vertexCount);
 	points.SetCount(vertexCount);
 	indices.SetCount(indexCount);
-	//dInt32* const indices = dAlloca(dInt32, indexCount);
-	//ndMeshPointUV* const points = dAlloca(ndMeshPointUV, vertexCount);
+	tmp.SetCount(vertexCount);
 
-	mesh.GetVertexChannel(sizeof(ndMeshPointUV), &points[0].m_posit.m_x);
-	mesh.GetNormalChannel(sizeof(ndMeshPointUV), &points[0].m_normal.m_x);
-	mesh.GetUV0Channel(sizeof(ndMeshPointUV), &points[0].m_uv.m_u);
+	mesh.GetVertexChannel(sizeof(dTmpData), &tmp[0].m_posit[0]);
+	mesh.GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
+	mesh.GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
+
+	for (dInt32 i = 0; i < vertexCount; i++)
+	{
+		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
+		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
+		points[i].m_posit.m_z = GLfloat(tmp[i].m_posit[2]);
+		points[i].m_normal.m_x = GLfloat(tmp[i].m_normal[0]);
+		points[i].m_normal.m_y = GLfloat(tmp[i].m_normal[1]);
+		points[i].m_normal.m_z = GLfloat(tmp[i].m_normal[2]);
+		points[i].m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
+		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
+	}
 
 	dInt32 segmentStart = 0;
 	bool hasTransparency = false;
@@ -218,16 +237,35 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 		indexCount += meshNode->GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	//dInt32* const indices = dAlloca(dInt32, indexCount);
-	//ndMeshPointUV* const points = dAlloca(ndMeshPointUV, vertexCount);
+	struct dTmpData
+	{
+		dFloat32 m_posit[3];
+		dFloat32 m_normal[3];
+		dFloat32 m_uv[2];
+	};
+
 	dArray<dInt32> indices;
+	dArray<dTmpData> tmp;
 	dArray<ndMeshPointUV> points;
 	indices.SetCount(indexCount);
 	points.SetCount(vertexCount);
+	tmp.SetCount(vertexCount);
 
-	meshNode->GetVertexChannel(sizeof(ndMeshPointUV), &points[0].m_posit.m_x);
-	meshNode->GetNormalChannel(sizeof(ndMeshPointUV), &points[0].m_normal.m_x);
-	meshNode->GetUV0Channel(sizeof(ndMeshPointUV), &points[0].m_uv.m_u);
+	meshNode->GetVertexChannel(sizeof(dTmpData), &tmp[0].m_posit[0]);
+	meshNode->GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
+	meshNode->GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
+
+	for (dInt32 i = 0; i < vertexCount; i++)
+	{
+		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
+		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
+		points[i].m_posit.m_z = GLfloat(tmp[i].m_posit[2]);
+		points[i].m_normal.m_x = GLfloat(tmp[i].m_normal[0]);
+		points[i].m_normal.m_y = GLfloat(tmp[i].m_normal[1]);
+		points[i].m_normal.m_z = GLfloat(tmp[i].m_normal[2]);
+		points[i].m_uv.m_u = GLfloat(tmp[i].m_uv[0]);
+		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
+	}
 
 	dInt32 segmentStart = 0;
 	bool hasTransparency = false;
@@ -238,11 +276,11 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 		ndDemoSubMesh* const segment = AddSubMesh();
 		
 		const ndMeshEffect::dMaterial& material = materialArray[materialIndex];
-		segment->m_material.m_ambient = material.m_ambient;
-		segment->m_material.m_diffuse = material.m_diffuse;
-		segment->m_material.m_specular = material.m_specular;
-		segment->m_material.m_opacity = material.m_opacity;
-		segment->m_material.m_shiness = material.m_shiness;
+		segment->m_material.m_ambient = glVector(material.m_ambient);
+		segment->m_material.m_diffuse = glVector(material.m_diffuse);
+		segment->m_material.m_specular = glVector(material.m_specular);
+		segment->m_material.m_opacity = GLfloat(material.m_opacity);
+		segment->m_material.m_shiness = GLfloat(material.m_shiness);
 		strcpy(segment->m_material.m_textureName, material.m_textureName);
 		//segment->m_material.m_textureHandle = (GLuint)material.m_textureHandle;
 		segment->m_material.m_textureHandle = LoadTexture(material.m_textureName);
@@ -395,16 +433,16 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 			ndDemoCamera* const camera = scene->GetCamera();
 
 			const dMatrix& viewMatrix = camera->GetViewMatrix();
-			const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
-			dMatrix viewModelMatrix(modelMatrix * viewMatrix);
-			dVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+			const glMatrix& projectionMatrix (camera->GetProjectionMatrix());
+			const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
+			const glVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
 
 			glUniform1i(m_textureLocation, 0);
 			glUniform1f(m_transparencyLocation, 1.0f);
-			glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight.m_x);
-			glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-			glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
-			glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+			glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight[0]);
+			glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0]);
+			glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0]);
+			glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0]);
 
 			//float k1 = 7.0 / 120.0;
 			//float k2 = 1.0 / 240.0;
@@ -423,9 +461,9 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 				ndDemoSubMesh& segment = node->GetInfo();
 				if (!segment.m_hasTranparency)
 				{
-					glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient.m_x);
-					glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse.m_x);
-					glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular.m_x);
+					glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient[0]);
+					glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse[0]);
+					glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
 
 					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 					glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
@@ -449,15 +487,15 @@ void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const dMatrix&
 	ndDemoCamera* const camera = scene->GetCamera();
 
 	const dMatrix& viewMatrix = camera->GetViewMatrix();
-	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
-	dMatrix viewModelMatrix(modelMatrix * viewMatrix);
-	dVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+	const glMatrix& projectionMatrix (camera->GetProjectionMatrix());
+	const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
+	const glVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
 
 	glUniform1i(m_textureLocation, 0);
-	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight.m_x);
-	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
-	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight[0]);
+	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0]);
 
 	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
@@ -474,9 +512,9 @@ void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const dMatrix&
 			//glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_material.m_diffuse.m_x);
 			//glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_material.m_shiness));
 
-			glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse.m_x);
-			glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient.m_x);
-			glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_ambient.m_x);
+			glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse[0]);
+			glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient[0]);
+			glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_ambient[0]);
 
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 

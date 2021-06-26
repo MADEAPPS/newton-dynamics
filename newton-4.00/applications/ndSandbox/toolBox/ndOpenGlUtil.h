@@ -33,6 +33,22 @@
 class glVector
 {
 	public:
+	glVector()
+	{
+		m_data[0] = GLfloat(0.0f);
+		m_data[1] = GLfloat(0.0f);
+		m_data[2] = GLfloat(0.0f);
+		m_data[3] = GLfloat(0.0f);
+	}
+
+	glVector(dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
+	{
+		m_data[0] = GLfloat(x);
+		m_data[1] = GLfloat(y);
+		m_data[2] = GLfloat(z);
+		m_data[3] = GLfloat(w);
+	}
+
 	glVector(const dVector& v)
 	{
 		m_data[0] = GLfloat(v[0]);
@@ -88,6 +104,53 @@ class glMatrix
 
 	GLfloat m_data[16];
 };
+
+class ndMeshVector
+{
+	public:
+	ndMeshVector() {}
+	ndMeshVector(GLfloat x, GLfloat y, GLfloat z)
+		:m_x(x), m_y(y), m_z(z)
+	{
+	}
+
+	GLfloat m_x;
+	GLfloat m_y;
+	GLfloat m_z;
+};
+
+class ndMeshVector4 : public ndMeshVector
+{
+	public:
+	GLfloat m_w;
+};
+
+class ndMeshMatrix
+{
+	public:
+	ndMeshVector4 m_array[4];
+};
+
+class ndMeshUV
+{
+	public:
+	GLfloat m_u;
+	GLfloat m_v;
+};
+
+class ndPointNormal
+{
+	public:
+	ndMeshVector m_posit;
+	ndMeshVector m_normal;
+};
+
+class ndMeshPointUV : public ndPointNormal
+{
+	public:
+	ndMeshUV m_uv;
+};
+
 
 class dMOUSE_POINT
 {

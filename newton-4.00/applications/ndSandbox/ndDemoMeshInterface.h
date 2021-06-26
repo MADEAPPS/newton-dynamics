@@ -13,55 +13,10 @@
 #define _D_MESH_INTERFACE_H_
 
 #include "ndSandboxStdafx.h"
+#include "ndOpenGlUtil.h"
 
 class ndDemoEntity;
 class ndDemoEntityManager;
-
-class ndMeshVector
-{
-	public:
-	ndMeshVector() {}
-	ndMeshVector(GLfloat x, GLfloat y, GLfloat z)
-		:m_x(x), m_y(y), m_z(z)
-	{
-	}
-
-	GLfloat m_x;
-	GLfloat m_y;
-	GLfloat m_z;
-};
-
-class ndMeshVector4: public ndMeshVector
-{
-	public:
-	GLfloat m_w;
-};
-
-class ndMeshMatrix
-{
-	public:
-	ndMeshVector4 m_array[4];
-};
-
-class ndMeshUV
-{
-	public:
-	GLfloat m_u;
-	GLfloat m_v;
-};
-
-class ndPointNormal
-{
-	public:
-	ndMeshVector m_posit;
-	ndMeshVector m_normal;
-};
-
-class ndMeshPointUV: public ndPointNormal
-{
-	public:
-	ndMeshUV m_uv;
-};
 
 class ndDemoSubMeshMaterial
 {
@@ -69,12 +24,12 @@ class ndDemoSubMeshMaterial
 	ndDemoSubMeshMaterial();
 	~ndDemoSubMeshMaterial();
 
-	dVector m_ambient;
-	dVector m_diffuse;
-	dVector m_specular;
-	dFloat32 m_opacity;
-	dFloat32 m_shiness;
-	dUnsigned32 m_textureHandle;
+	glVector m_ambient;
+	glVector m_diffuse;
+	glVector m_specular;
+	GLfloat m_opacity;
+	GLfloat m_shiness;
+	GLint m_textureHandle;
 	char  m_textureName[32];
 };
 

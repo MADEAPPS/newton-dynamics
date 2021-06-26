@@ -78,10 +78,10 @@ ndDemoSubMesh::~ndDemoSubMesh ()
 
 void ndDemoSubMesh::SetOpacity(dFloat32 opacity)
 {
-	m_material.m_opacity = opacity;
-	m_material.m_ambient.m_w = opacity;
-	m_material.m_diffuse.m_w = opacity;
-	m_material.m_specular.m_w = opacity;
+	m_material.m_opacity = GLfloat(opacity);
+	m_material.m_ambient[3] = GLfloat(opacity);
+	m_material.m_diffuse[3] = GLfloat(opacity);
+	m_material.m_specular[3] = GLfloat(opacity);
 	m_hasTranparency = (opacity <= 0.99f) ? true : false;
 }
 

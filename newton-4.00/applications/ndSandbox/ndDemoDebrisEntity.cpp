@@ -221,9 +221,9 @@ void ndDemoDebrisRootEntity::Render(dFloat32 timestep, ndDemoEntityManager* cons
 	glUniform4fv(shaderMesh->m_directionalLightDirLocation, 1, &directionaLight.m_x);
 	glUniformMatrix4fv(shaderMesh->m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
 
-	glUniform3fv(shaderMesh->m_materialAmbientLocation, 1, &shaderMesh->m_material[0].m_ambient.m_x);
-	glUniform3fv(shaderMesh->m_materialDiffuseLocation, 1, &shaderMesh->m_material[0].m_diffuse.m_x);
-	glUniform3fv(shaderMesh->m_materialSpecularLocation, 1, &shaderMesh->m_material[0].m_specular.m_x);
+	glUniform3fv(shaderMesh->m_materialAmbientLocation, 1, &shaderMesh->m_material[0].m_ambient[0]);
+	glUniform3fv(shaderMesh->m_materialDiffuseLocation, 1, &shaderMesh->m_material[0].m_diffuse[0]);
+	glUniform3fv(shaderMesh->m_materialSpecularLocation, 1, &shaderMesh->m_material[0].m_specular[0]);
 
 	// these call make the font display wrong
 	glActiveTexture(GL_TEXTURE1);
