@@ -18,33 +18,6 @@
 #include "ndOpenGlUtil.h"
 #include "ndTargaToOpenGl.h"
 
-
-#ifdef _MSC_VER
-#if (_MSC_VER < 1300) 
-		//VC7 or later, building with pre-VC7 runtime libraries
-		//defined by VC6 C libs
-		extern "C" long _ftol (double); 
-		extern "C" long _ftol2( double dblSource ) 
-		{ 
-			return long( dblSource ); 
-		}
-#endif
-
-#if (_MSC_VER < 1400) 
-		extern "C" long _ftol2_sse() 
-		{ 
-			long val;
-			_asm fistp qword ptr val;
-			return val; 
-		}
-#endif
-#endif
-
-
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 	
 static dMOUSE_POINT mouse0;
 
@@ -53,7 +26,6 @@ void GetCursorPos(dMOUSE_POINT& point)
 	point = mouse0;
 }
 
-//void ShowMousePicking (const dVector& p0, const dVector& p1, const dVector& originColor, const dVector& lineColor)
 void ShowMousePicking(const dVector&, const dVector&, const dVector&, const dVector&)
 {
 	dTrace((__FUNCTION__));

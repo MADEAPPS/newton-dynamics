@@ -30,19 +30,35 @@
 	#define glGetFloat(x,y) glGetFloatv(x, (GLfloat*)y) 
 #endif
 
-class glVector : public dFixSizeArray<GLfloat, 4>
+class glVector
 {
 	public:
 	glVector(const dVector& v)
 	{
-		(*this)[0] = GLfloat(v[0]);
-		(*this)[1] = GLfloat(v[1]);
-		(*this)[2] = GLfloat(v[2]);
-		(*this)[3] = GLfloat(v[3]);
+		m_data[0] = GLfloat(v[0]);
+		m_data[1] = GLfloat(v[1]);
+		m_data[2] = GLfloat(v[2]);
+		m_data[3] = GLfloat(v[3]);
 	}
+
+	GLfloat& operator[] (dInt32 i)
+	{
+		dAssert(i >= 0);
+		dAssert(i < sizeof m_data / sizeof(m_data[0]));
+		return m_data[i];
+	}
+
+	const GLfloat& operator[] (dInt32 i) const
+	{
+		dAssert(i >= 0);
+		dAssert(i < sizeof m_data / sizeof(m_data[0]));
+		return m_data[i];
+	}
+
+	GLfloat m_data[4];
 };
 
-class glMatrix : public dFixSizeArray<GLfloat, 16>
+class glMatrix
 {
 	public:
 	glMatrix(const dMatrix& matrix)
@@ -51,10 +67,26 @@ class glMatrix : public dFixSizeArray<GLfloat, 16>
 		{
 			for (int j = 0; j < 4; j++)
 			{
-				(*this)[i * 4 + j] = GLfloat(matrix[i][j]);
+				m_data[i * 4 + j] = GLfloat(matrix[i][j]);
 			}
 		}
 	}
+
+	GLfloat& operator[] (dInt32 i)
+	{
+		dAssert(i >= 0);
+		dAssert(i < sizeof m_data / sizeof(m_data[0]));
+		return m_data[i];
+	}
+
+	const GLfloat& operator[] (dInt32 i) const
+	{
+		dAssert(i >= 0);
+		dAssert(i < sizeof m_data/sizeof (m_data[0]));
+		return m_data[i];
+	}
+
+	GLfloat m_data[16];
 };
 
 class dMOUSE_POINT
@@ -64,10 +96,8 @@ class dMOUSE_POINT
 	dInt32 y;
 };
 
-void ShowMousePicking (const dVector& p0, const dVector& p1, const dVector& originColor = dVector (1.0f, 1.0f, 0.0f, 0.0f), const dVector& lineColor =  dVector (1.0f, 1.0f, 1.0f, 0.0f)); 
-void HandleResize(dInt32 width, dInt32 height);
-dInt32 dGetKeyState(dInt32 key);
 void GetCursorPos(dMOUSE_POINT& point);
+void ShowMousePicking (const dVector& p0, const dVector& p1, const dVector& originColor = dVector (1.0f, 1.0f, 0.0f, 0.0f), const dVector& lineColor =  dVector (1.0f, 1.0f, 1.0f, 0.0f)); 
 
 #endif 
 
