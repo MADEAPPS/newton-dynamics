@@ -76,6 +76,7 @@ endif(APPLE)
 
 #check for UNIX
 if(UNIX)
+    set(CMAKE_POLICY_DEFAULT_CMP0072 NEW)
 	if(NOT NEWTON_BUILD_SHARED_LIBS)
 		add_compile_options(-fPIC)
 	endif()
