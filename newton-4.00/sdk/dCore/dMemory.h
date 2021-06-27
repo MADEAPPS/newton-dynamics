@@ -24,7 +24,6 @@
 
 #include "dCoreStdafx.h"
 #include "dTypes.h"
-//#include "dUtils.h"
 
 typedef void* (*dMemAllocCallback) (size_t size);
 typedef void (*dMemFreeCallback) (void* const ptr);

@@ -227,16 +227,16 @@
 
 		D_INLINE dFloat32& operator[] (dInt32 i)
 		{
-			dAssert(i < D_AVX_WORD_GROUP_SIZE);
 			dAssert(i >= 0);
+			dAssert(i < D_AVX_WORD_GROUP_SIZE);
 			dFloat32* const ptr = (dFloat32*)&m_type;
 			return ptr[i];
 		}
 
 		D_INLINE const dFloat32& operator[] (dInt32 i) const
 		{
-			dAssert(i < D_AVX_WORD_GROUP_SIZE);
 			dAssert(i >= 0);
+			dAssert(i < D_AVX_WORD_GROUP_SIZE);
 			const dFloat32* const ptr = (dFloat32*)&m_type;
 			return ptr[i];
 		}

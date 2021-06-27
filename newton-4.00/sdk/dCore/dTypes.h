@@ -262,7 +262,7 @@ typedef double dFloat64;
 	typedef float dFloat32;
 #endif
 
-#define dPi		 		dFloat32 (3.141592f)
+#define dPi		 	dFloat32 (3.141592f)
 #define dEXP		 	dFloat32 (2.71828f)
 #define dEpsilon	  	dFloat32 (1.0e-5f)
 #define dDegreeToRad	dFloat32 (dPi / 180.0f)
@@ -283,12 +283,6 @@ typedef double dFloat64;
 #define dRsqrt(x)		(dFloat32 (1.0f) / dSqrt(x))
 #define dClearFP()		_clearfp() 
 #define dControlFP(x,y)	_controlfp(x,y)
-
-//class dMatrix;
-//class dBigVector;
-//#ifndef D_NEWTON_USE_DOUBLE
-//	class dVector;
-//#endif 
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	#define dCheckFloat(x) (_finite(x) && !_isnan(x))
