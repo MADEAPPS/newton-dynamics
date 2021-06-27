@@ -921,7 +921,6 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - me->m_unConstrainedBodyCount;
-			//const dFloat32 timestep = m_timestep;
 
 			const dVector timestep4(me->m_timestepRK);
 			const dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));

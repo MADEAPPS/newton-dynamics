@@ -1131,162 +1131,90 @@ D_INLINE void ndSkeletonContainer::UpdateForces(ndJacobian* const internalForces
 void ndSkeletonContainer::SolveLcp(dInt32 stride, dInt32 size, const dFloat32* const matrix, const dFloat32* const x0, dFloat32* const x, const dFloat32* const b, const dFloat32* const low, const dFloat32* const high, const dInt32* const normalIndex) const
 {
 	D_TRACKTIME();
-	//if (m_world->GetCurrentPlugin()) 
-	if (0)
+	const dFloat32 sor = dFloat32(1.125f);
+	const dFloat32 tol2 = dFloat32(0.25f);
+	const dInt32 maxIterCount = 64;
+
+	dFloat32* const invDiag1 = dAlloca(dFloat32, size);
+	dFloat32* const residual = dAlloca(dFloat32, size);
+
+	dInt32 rowStart = 0;
+	for (dInt32 i = 0; i < size; i++)
 	{
-		dAssert(0);
-		//dgWorldPlugin* const plugin = m_world->GetCurrentPlugin()->GetInfo().m_plugin;
-		//plugin->SolveDenseLcp(stride, size, matrix, x0, x, b, low, high, normalIndex);
+		const dInt32 index = normalIndex[i];
+		const dInt32 mask = index >> 31;
+		const dInt32 index0 = i + index;
+		const dInt32 index1 = (~mask & size) | (mask & index0);
+		const dFloat32 coefficient = x[index1] + x0[index1];
+
+		const dFloat32 l = low[i] * coefficient - x0[i];
+		const dFloat32 h = high[i] * coefficient - x0[i];
+		x[i] = dClamp(dFloat32(0.0f), l, h);
+		invDiag1[i] = dFloat32(1.0f) / matrix[rowStart + i];
+		rowStart += stride;
 	}
-	else 
+
+	dInt32 base = 0;
+	for (dInt32 i = 0; i < size; i++)
 	{
-#if 0
-		// sequential Sidle iteration
-		const dFloat32 sor = dFloat32(1.125f);
-		const dFloat32 tol2 = dFloat32(0.25f);
-		const dInt32 maxIterCount = 64;
+		const dFloat32* const row = &matrix[base];
+		residual[i] = b[i] - dDotProduct(size, row, x);
+		base += stride;
+	}
 
-		dFloat32* const invDiag1 = dAlloca(dFloat32, size);
-
-		dInt32 rowStart = 0;
-		for (dInt32 i = 0; i < size; i++) 
+	dInt32 iterCount = 0;
+	dFloat32 tolerance(tol2 * dFloat32(2.0f));
+	const dFloat32* const invDiag = invDiag1;
+	for (dInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); k++)
+	{
+		base = 0;
+		iterCount++;
+		tolerance = dFloat32(0.0f);
+		for (dInt32 i = 0; i < size; i++)
 		{
+			const dFloat32 r = residual[i];
 			const dInt32 index = normalIndex[i];
-			const dFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
-			const dFloat32 l = low[i] * coefficient - x0[i];
-			const dFloat32 h = high[i] * coefficient - x0[i];;
-			x[i] = dClamp(dFloat32(0.0f), l, h);
-			invDiag1[i] = dFloat32(1.0f) / matrix[rowStart + i];
-			rowStart += stride;
-		}
 
-		dFloat32 tolerance(tol2 * dFloat32(2.0f));
-		const dFloat32* const invDiag = invDiag1;
-
-		dInt32 iterCount = 0;
-		for (dInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); k++) {
-			iterCount++;
-			dInt32 base = 0;
-			tolerance = dFloat32(0.0f);
-			for (dInt32 i = 0; i < size; i++) 
-			{
-				const dFloat32* const row = &matrix[base];
-				dFloat32 r = b[i] - dDotProduct(size, row, x);
-
-				const dInt32 index = normalIndex[i];
-				const dFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : dFloat32(1.0f);
-				const dFloat32 l = low[i] * coefficient - x0[i];
-				const dFloat32 h = high[i] * coefficient - x0[i];
-
-				dFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
-				if (f > h) 
-				{
-					f = h;
-				}
-				else if (f < l) 
-				{
-					f = l;
-				}
-				else 
-				{
-					tolerance += r * r;
-				}
-				x[i] = f;
-				base += stride;
-			}
-		}
-#else
-		// ready for parallelization
-		const dFloat32 sor = dFloat32(1.125f);
-		const dFloat32 tol2 = dFloat32(0.25f);
-		const dInt32 maxIterCount = 64;
-
-		dFloat32* const invDiag1 = dAlloca(dFloat32, size);
-		dFloat32* const residual = dAlloca(dFloat32, size);
-
-		dInt32 rowStart = 0;
-		for (dInt32 i = 0; i < size; i++) 
-		{
-			const dInt32 index = normalIndex[i];
-			//const dFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
-
-			const dInt32 mask = index>>31;
+			const dInt32 mask = index >> 31;
 			const dInt32 index0 = i + index;
 			const dInt32 index1 = (~mask & size) | (mask & index0);
 			const dFloat32 coefficient = x[index1] + x0[index1];
 
 			const dFloat32 l = low[i] * coefficient - x0[i];
 			const dFloat32 h = high[i] * coefficient - x0[i];
-			x[i] = dClamp(dFloat32(0.0f), l, h);
-			invDiag1[i] = dFloat32(1.0f) / matrix[rowStart + i];
-			rowStart += stride;
-		}
 
-		dInt32 base = 0;
-		for (dInt32 i = 0; i < size; i++) 
-		{
 			const dFloat32* const row = &matrix[base];
-			residual[i] = b[i] - dDotProduct(size, row, x);
+#if 0
+			dFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
+			if (f > h)
+			{
+				f = h;
+			}
+			else if (f < l)
+			{
+				f = l;
+			}
+			else
+			{
+				tolerance += r * r;
+			}
+			const dFloat32 dx = f - x[i];
+#else
+			const dFloat32 f = dClamp(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, l, h);
+			const dFloat32 dx = f - x[i];
+			const dFloat32 dr = dx * row[i];
+			tolerance += dr * dr;
+#endif
+			x[i] = f;
+			if (dAbs(dx) > dFloat32(1.0e-6f))
+			{
+				for (dInt32 j = 0; j < size; j++)
+				{
+					residual[j] -= row[j] * dx;
+				}
+			}
 			base += stride;
 		}
-
-		dInt32 iterCount = 0;
-		dFloat32 tolerance(tol2 * dFloat32(2.0f));
-		const dFloat32* const invDiag = invDiag1;
-		//const dFloat32 one = dFloat32(1.0f);
-		for (dInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); k++) 
-		{
-			base = 0;
-			iterCount++;
-			tolerance = dFloat32(0.0f);
-			for (dInt32 i = 0; i < size; i++) 
-			{
-				const dFloat32 r = residual[i];
-				const dInt32 index = normalIndex[i];
-				//const dFloat32 coefficient = index ? x[i + index] + x0[i + index] : one;
-
-				const dInt32 mask = index >> 31;
-				const dInt32 index0 = i + index;
-				const dInt32 index1 = (~mask & size) | (mask & index0);
-				const dFloat32 coefficient = x[index1] + x0[index1];
-
-				const dFloat32 l = low[i] * coefficient - x0[i];
-				const dFloat32 h = high[i] * coefficient - x0[i];
-
-				const dFloat32* const row = &matrix[base];
-#if 0
-				dFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
-				if (f > h) 
-				{
-					f = h;
-				}
-				else if (f < l) 
-				{
-					f = l;
-				}
-				else 
-				{
-					tolerance += r * r;
-				}
-				const dFloat32 dx = f - x[i];
-#else
-				const dFloat32 f = dClamp(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, l, h);
-				const dFloat32 dx = f - x[i];
-				const dFloat32 dr = dx * row[i];
-				tolerance += dr * dr;
-#endif
-				x[i] = f;
-				if (dAbs(dx) > dFloat32(1.0e-6f)) 
-				{
-					for (dInt32 j = 0; j < size; j++) 
-					{
-						residual[j] -= row[j] * dx;
-					}
-				}
-				base += stride;
-			}
-		}
-#endif
 	}
 }
 
