@@ -150,6 +150,10 @@
 #define MINIZ_NO_TIME
 #endif
 
+#if defined(__GNUC__)
+#define _LARGEFILE64_SOURCE 1
+#endif
+
 #include <stddef.h>
 
 #if !defined(MINIZ_NO_TIME) && !defined(MINIZ_NO_ARCHIVE_APIS)
