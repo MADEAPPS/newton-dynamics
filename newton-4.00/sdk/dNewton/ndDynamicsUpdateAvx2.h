@@ -62,7 +62,6 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	static dInt32 CompareIslands(const ndIsland* const A, const ndIsland* const B, void* const context);
 
 	dArray<dInt32> m_soaJointRows;
-	//dArray<ndAvx2::ndSoaMatrixElement> m_soaMassMatrix;
 	void* m_soaMassMatrixArray;
 
 } D_GCC_NEWTON_ALIGN_32;

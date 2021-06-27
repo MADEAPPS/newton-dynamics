@@ -78,18 +78,16 @@
 
 		D_INLINE dFloat32& operator[] (dInt32 i)
 		{
-			dAssert(i < D_AVX_WORD_GROUP_SIZE);
 			dAssert(i >= 0);
-			//return m_f[i];
+			dAssert(i < D_AVX_WORD_GROUP_SIZE);
 			dFloat32* const ptr = (dFloat32*)&m_low;
 			return ptr[i];
 		}
 
 		D_INLINE const dFloat32& operator[] (dInt32 i) const
 		{
-			dAssert(i < D_AVX_WORD_GROUP_SIZE);
 			dAssert(i >= 0);
-			//return m_f[i];
+			dAssert(i < D_AVX_WORD_GROUP_SIZE);
 			const dFloat32* const ptr = (dFloat32*)&m_low;
 			return ptr[i];
 		}
@@ -189,6 +187,7 @@
 				__m256i m_lowInt;
 				__m256i m_highInt;
 			};
+			dInt64 m_ints[D_AVX_WORD_GROUP_SIZE];
 		};
 	} D_GCC_NEWTON_ALIGN_32;
 
@@ -230,7 +229,6 @@
 		{
 			dAssert(i < D_AVX_WORD_GROUP_SIZE);
 			dAssert(i >= 0);
-			//return m_f[i];
 			dFloat32* const ptr = (dFloat32*)&m_type;
 			return ptr[i];
 		}
@@ -239,7 +237,6 @@
 		{
 			dAssert(i < D_AVX_WORD_GROUP_SIZE);
 			dAssert(i >= 0);
-			//return m_f[i];
 			const dFloat32* const ptr = (dFloat32*)&m_type;
 			return ptr[i];
 		}
@@ -324,6 +321,7 @@
 		{
 			__m256 m_type;
 			__m256i m_typeInt;
+			dInt32 m_ints[D_AVX_WORD_GROUP_SIZE];
 		};
 	} D_GCC_NEWTON_ALIGN_32;
 #endif
@@ -1532,8 +1530,15 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			const dInt32 mask = -dInt32(D_AVX_WORD_GROUP_SIZE);
 			const dInt32 soaJointCount = ((jointCount + D_AVX_WORD_GROUP_SIZE - 1) & mask) / D_AVX_WORD_GROUP_SIZE;
 			const dInt32* const soaJointRows = &me->m_soaJointRows[0];
-
+			
+			ndAvxFloat tmpOrdinals;
+			for (dInt32 i = 0; i < D_AVX_WORD_GROUP_SIZE; i++)
+			{
+				tmpOrdinals.m_ints[i] = i;
+			}
+			
 			const ndAvxFloat zero(dFloat32(0.0f));
+			const ndAvxFloat ordinals(tmpOrdinals);
 			for (dInt32 i = threadIndex; i < soaJointCount; i += threadCount)
 			{
 				const dInt32 index = i * D_AVX_WORD_GROUP_SIZE;
@@ -1693,7 +1698,6 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 						#else
 							dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
 						#endif
-
 						for (dInt32 k = 0; k < D_AVX_WORD_GROUP_SIZE; k++)
 						{
 							const ndConstraint* const soaJoint = jointArray[index + k];
@@ -1702,9 +1706,9 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 							row.m_diagDamp[k] = rhs->m_diagDamp;
 							row.m_invJinvMJt[k] = rhs->m_invJinvMJt;
 							row.m_coordenateAccel[k] = rhs->m_coordenateAccel;
+							normalIndex[k] = (rhs->m_normalForceIndex + 1) * D_AVX_WORD_GROUP_SIZE + k;
 							row.m_lowerBoundFrictionCoefficent[k] = rhs->m_lowerBoundFrictionCoefficent;
 							row.m_upperBoundFrictionCoefficent[k] = rhs->m_upperBoundFrictionCoefficent;
-							normalIndex[k] = (rhs->m_normalForceIndex + 1) * D_AVX_WORD_GROUP_SIZE + k;
 						}
 					}
 				}
@@ -1744,18 +1748,9 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 						row.m_diagDamp = zero;
 						row.m_invJinvMJt = zero;
 						row.m_coordenateAccel = zero;
+						row.m_normalForceIndex = ordinals;
 						row.m_lowerBoundFrictionCoefficent = zero;
 						row.m_upperBoundFrictionCoefficent = zero;
-
-						#ifdef D_NEWTON_USE_DOUBLE
-							dInt64* const normalIndex = (dInt64*)&row.m_normalForceIndex[0];
-						#else
-							dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
-						#endif
-						for (dInt32 k = 0; k < D_AVX_WORD_GROUP_SIZE; k++)
-						{
-							normalIndex[k] = k;
-						}
 					}
 					
 					for (dInt32 j = 0; j < D_AVX_WORD_GROUP_SIZE; j++)
@@ -1799,16 +1794,15 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 								row.m_diagDamp[j] = rhs->m_diagDamp;
 								row.m_invJinvMJt[j] = rhs->m_invJinvMJt;
 								row.m_coordenateAccel[j] = rhs->m_coordenateAccel;
-								row.m_lowerBoundFrictionCoefficent[j] = rhs->m_lowerBoundFrictionCoefficent;
-								row.m_upperBoundFrictionCoefficent[j] = rhs->m_upperBoundFrictionCoefficent;
-					
+			
 								#ifdef D_NEWTON_USE_DOUBLE
 									dInt64* const normalIndex = (dInt64*)&row.m_normalForceIndex[0];
 								#else
 									dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
 								#endif
-
 								normalIndex[j] = (rhs->m_normalForceIndex + 1) * D_AVX_WORD_GROUP_SIZE + j;
+								row.m_lowerBoundFrictionCoefficent[j] = rhs->m_lowerBoundFrictionCoefficent;
+								row.m_upperBoundFrictionCoefficent[j] = rhs->m_upperBoundFrictionCoefficent;
 							}
 						}
 					}

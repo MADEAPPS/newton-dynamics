@@ -101,6 +101,7 @@ class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 	void GetJacobianDerivatives(ndConstraint* const joint);
 	static dInt32 CompareIslands(const ndIsland* const A, const ndIsland* const B, void* const context);
 
+	dVector m_ordinals;
 	dArray<dInt32> m_soaJointRows;
 	dArray<ndSoa::ndSoaMatrixElement> m_soaMassMatrix;
 

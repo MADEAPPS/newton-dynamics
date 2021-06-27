@@ -33,6 +33,10 @@ ndDynamicsUpdateSoa::ndDynamicsUpdateSoa(ndWorld* const world)
 	:ndDynamicsUpdate(world)
 	,m_soaJointRows(D_DEFAULT_BUFFER_SIZE * 4)
 {
+	m_ordinals.m_i[0] = 0;
+	m_ordinals.m_i[1] = 1;
+	m_ordinals.m_i[2] = 2;
+	m_ordinals.m_i[3] = 3;
 }
 
 ndDynamicsUpdateSoa::~ndDynamicsUpdateSoa()
@@ -1191,6 +1195,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 			const dInt32* const soaJointRows = &me->m_soaJointRows[0];
 
 			const dVector zero(dVector::m_zero);
+			const dVector ordinals(me->m_ordinals);
 			for (dInt32 i = threadIndex; i < soaJointCount; i += threadCount)
 			{
 				const dInt32 index = i * D_SOA_WORD_GROUP_SIZE;
@@ -1318,9 +1323,9 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 							row.m_diagDamp[k] = rhs->m_diagDamp;
 							row.m_invJinvMJt[k] = rhs->m_invJinvMJt;
 							row.m_coordenateAccel[k] = rhs->m_coordenateAccel;
+							normalIndex[k] = (rhs->m_normalForceIndex + 1) * D_SOA_WORD_GROUP_SIZE + k;
 							row.m_lowerBoundFrictionCoefficent[k] = rhs->m_lowerBoundFrictionCoefficent;
 							row.m_upperBoundFrictionCoefficent[k] = rhs->m_upperBoundFrictionCoefficent;
-							normalIndex[k] = (rhs->m_normalForceIndex + 1) * D_SOA_WORD_GROUP_SIZE + k;
 						}
 					}
 				}
@@ -1360,19 +1365,9 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 						row.m_diagDamp = zero;
 						row.m_invJinvMJt = zero;
 						row.m_coordenateAccel = zero;
+						row.m_normalForceIndex = ordinals;
 						row.m_lowerBoundFrictionCoefficent = zero;
 						row.m_upperBoundFrictionCoefficent = zero;
-
-						#ifdef D_NEWTON_USE_DOUBLE
-							dInt64* const normalIndex = (dInt64*)&row.m_normalForceIndex[0];
-						#else
-							dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
-						#endif
-
-						for (dInt32 k = 0; k < D_SOA_WORD_GROUP_SIZE; k++)
-						{
-							normalIndex[k] = k;
-						}
 					}
 					
 					for (dInt32 j = 0; j < D_SOA_WORD_GROUP_SIZE; j++)
@@ -1416,16 +1411,15 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 								row.m_diagDamp[j] = rhs->m_diagDamp;
 								row.m_invJinvMJt[j] = rhs->m_invJinvMJt;
 								row.m_coordenateAccel[j] = rhs->m_coordenateAccel;
-								row.m_lowerBoundFrictionCoefficent[j] = rhs->m_lowerBoundFrictionCoefficent;
-								row.m_upperBoundFrictionCoefficent[j] = rhs->m_upperBoundFrictionCoefficent;
-					
-								//dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
+			
 								#ifdef D_NEWTON_USE_DOUBLE
 									dInt64* const normalIndex = (dInt64*)&row.m_normalForceIndex[0];
 								#else
 									dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
 								#endif
 								normalIndex[j] = (rhs->m_normalForceIndex + 1) * D_SOA_WORD_GROUP_SIZE + j;
+								row.m_lowerBoundFrictionCoefficent[j] = rhs->m_lowerBoundFrictionCoefficent;
+								row.m_upperBoundFrictionCoefficent[j] = rhs->m_upperBoundFrictionCoefficent;
 							}
 						}
 					}
