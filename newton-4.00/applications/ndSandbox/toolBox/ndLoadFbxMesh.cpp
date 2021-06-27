@@ -602,11 +602,12 @@ fbxDemoEntity* LoadFbxMesh(const char* const meshName)
 		return nullptr;
 	}
 
+	size_t readBytes = 0;
 	fseek(fp, 0, SEEK_END);
 	long file_size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 	ofbx::u8* content = new ofbx::u8[file_size];
-	fread(content, 1, file_size, fp);
+	readBytes = fread(content, 1, file_size, fp);
 	ofbx::IScene* const fbxScene = ofbx::load((ofbx::u8*)content, file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
 
 	dMatrix convertMatrix(GetCoordinateSystemMatrix(fbxScene));

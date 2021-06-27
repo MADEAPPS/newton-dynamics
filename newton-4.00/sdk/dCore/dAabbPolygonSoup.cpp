@@ -1215,10 +1215,11 @@ void dAabbPolygonSoup::Deserialize (const char* const path)
 	FILE* const file = fopen(path, "rb");
 	if (file)
 	{
+		size_t readValues = 0; 
 		m_strideInBytes = sizeof(dTriplex);
-		fread(&m_vertexCount, sizeof(dInt32), 1, file);
-		fread(&m_indexCount, sizeof(dInt32), 1, file);
-		fread(&m_nodesCount, sizeof(dInt32), 1, file);
+		readValues = fread(&m_vertexCount, sizeof(dInt32), 1, file);
+		readValues = fread(&m_indexCount, sizeof(dInt32), 1, file);
+		readValues = fread(&m_nodesCount, sizeof(dInt32), 1, file);
 
 		if (m_vertexCount) 
 		{
@@ -1226,9 +1227,9 @@ void dAabbPolygonSoup::Deserialize (const char* const path)
 			m_indices = (dInt32*)dMemory::Malloc(sizeof(dInt32) * m_indexCount);
 			m_aabb = (dNode*)dMemory::Malloc(sizeof(dNode) * m_nodesCount);
 
-			fread(m_localVertex, sizeof(dTriplex) * m_vertexCount, 1, file);
-			fread(m_indices, sizeof(dInt32) * m_indexCount, 1, file);
-			fread(m_aabb, sizeof(dNode) * m_nodesCount, 1, file);
+			readValues = fread(m_localVertex, sizeof(dTriplex) * m_vertexCount, 1, file);
+			readValues = fread(m_indices, sizeof(dInt32) * m_indexCount, 1, file);
+			readValues = fread(m_aabb, sizeof(dNode) * m_nodesCount, 1, file);
 		}
 		else 
 		{
