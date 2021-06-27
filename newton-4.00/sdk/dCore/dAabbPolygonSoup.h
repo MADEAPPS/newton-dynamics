@@ -24,6 +24,7 @@
 
 #include "dCoreStdafx.h"
 #include "dTypes.h"
+#include "dUtils.h"
 #include "dIntersections.h"
 #include "dPolygonSoupDatabase.h"
 

@@ -20,6 +20,8 @@
 */
 
 #include "dCoreStdafx.h"
+#include "dTypes.h"
+#include "dUtils.h"
 #include "dThread.h"
 #include "dProfiler.h"
 

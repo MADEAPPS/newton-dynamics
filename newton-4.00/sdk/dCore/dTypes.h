@@ -194,7 +194,6 @@
 	#endif
 #endif
 
-
 #if defined(_MSC_VER)
 	#define	D_GCC_NEWTON_ALIGN_16 	 
 	#define	D_MSV_NEWTON_ALIGN_16	__declspec(align(16))
@@ -263,16 +262,7 @@ typedef double dFloat64;
 	typedef float dFloat32;
 #endif
 
-class dTriplex
-{
-	public:
-	dFloat32 m_x;
-	dFloat32 m_y;
-	dFloat32 m_z;
-};
-
 #define dPi		 		dFloat32 (3.141592f)
-//#define dPi2		 	dFloat32 (dPi * 2.0f)
 #define dEXP		 	dFloat32 (2.71828f)
 #define dEpsilon	  	dFloat32 (1.0e-5f)
 #define dDegreeToRad	dFloat32 (dPi / 180.0f)
@@ -294,11 +284,11 @@ class dTriplex
 #define dClearFP()		_clearfp() 
 #define dControlFP(x,y)	_controlfp(x,y)
 
-class dMatrix;
-class dBigVector;
-#ifndef D_NEWTON_USE_DOUBLE
-	class dVector;
-#endif 
+//class dMatrix;
+//class dBigVector;
+//#ifndef D_NEWTON_USE_DOUBLE
+//	class dVector;
+//#endif 
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	#define dCheckFloat(x) (_finite(x) && !_isnan(x))
@@ -310,140 +300,6 @@ class dBigVector;
 
 #define D_CLASS_RELECTION(Class)	\
 	virtual const char* ClassName() const {return #Class;} 
-
-
-//typedef void (*dDeserialize) (void* const userData, void* buffer, dInt32 size);
-//typedef void (*dSerialize) (void* const userData, const void* const buffer, dInt32 size);
-//typedef bool (*dReportProgress) (dFloat32 progressNormalzedPercent, void* const userData);
-
-// assume this function returns memory aligned to 16 bytes
-#define dAlloca(type, count) (type*) alloca (sizeof (type) * (count))
-
-D_INLINE dInt32 dExp2 (dInt32 x)
-{
-	dInt32 exp;
-	for (exp = -1; x; x >>= 1) 
-	{
-		exp ++;
-	}
-	return exp;
-}
-
-D_INLINE dInt32 dBitReversal(dInt32 v, dInt32 base)
-{
-	dInt32 x = 0;
-	dInt32 power = dExp2 (base) - 1;
-	do 
-	{
-		x += (v & 1) << power;
-		v >>= 1;
-		power--;
-	} while (v);
-	dAssert(x < base);
-	return x;
-}
-
-template <class T>
-T dMod(T val, T mod)
-{
-	return T(fmod(T(val), T(mod)));
-}
-
-template <class T> 
-D_INLINE T dMin(T A, T B)
-{
-	return (A < B) ? A : B; 
-}
-
-template <class T> 
-D_INLINE T dMax(T A, T B)
-{
-	return (A > B) ? A : B; 
-}
-
-template <class T>
-D_INLINE T dMin(T A, T B, T C)
-{
-	return dMin(dMin (A, B), C);
-}
-
-template <class T>
-D_INLINE T dMax(T A, T B, T C)
-{
-	return dMax(dMax (A, B), C);
-}
-
-template <class T>
-D_INLINE T dClamp(T val, T min, T max)
-{
-	return dMax (min, dMin (max, val));
-}
-
-template <class T> 
-D_INLINE void dSwap(T& A, T& B)
-{
-	T tmp (A);
-	A = B;
-	B = tmp;
-}	
-
-template <class T>
-D_INLINE T dAbs(T A)
-{
-	// according to Intel this is better because is does not read after write
-	return (A >= T(0)) ? A : -A;
-}
-
-template <class T>
-D_INLINE T dSign(T A)
-{
-	return (A >= T(0)) ? T(1) : T(-1);
-}
-
-template <class T> 
-D_INLINE bool dAreEqual(T A, T B, T tol)
-{
-	// deal with too small and de normal values.
-	if ((dAbs(A) < tol) && (dAbs(B) < tol)) 
-	{
-		return true;
-	}
-
-	dInt32 exp0;
-	dFloat64 mantissa0 = frexp(dFloat64 (A), &exp0);
-	
-	dInt32 exp1;
-	dFloat64 mantissa1 = frexp(dFloat64(B), &exp1);
-	if (dAbs(exp0 - exp1) > 1)
-	{
-		return false;
-	}
-	if (exp0 != exp1)
-	{
-		if (exp0 > exp1)
-		{
-			mantissa0 *= dFloat32(2.0f);
-		}
-		else
-		{
-			mantissa1 *= dFloat32(2.0f);
-		}
-	}
-	return dAbs(mantissa0 - mantissa1) < tol;
-}
-
-template <class T>
-D_INLINE T AnglesAdd (T angleInRadiand1, T angleInRadiand0)
-{
-	T s1 = T(dSin(angleInRadiand1));
-	T c1 = T(dCos(angleInRadiand1));
-	T s0 = T(dSin(angleInRadiand0));
-	T c0 = T(dCos(angleInRadiand0));
-
-	T s = s1 * c0 + s0 * c1;
-	T c = c1 * c0 - s0 * s1;
-	return T(dAtan2(s, c));
-}
 
 #ifdef D_NEWTON_USE_DOUBLE
 	union dFloatSign
@@ -478,6 +334,14 @@ union dDoubleInt
 	dFloat64 m_float;
 };
 
+class dTriplex
+{
+	public:
+	dFloat32 m_x;
+	dFloat32 m_y;
+	dFloat32 m_z;
+};
+
 #define PointerToInt(x) ((size_t)x)
 #define IntToPointer(x) ((void*)(size_t(x)))
 
@@ -485,158 +349,85 @@ union dDoubleInt
 	#define _stricmp(x,y) strcasecmp(x,y)
 #endif
 
-/// Returns the time in micro seconds since application started 
-D_CORE_API dUnsigned64 dGetTimeInMicrosenconds();
-
-/// Round a 64 bit float to a 32 bit float by truncating the mantissa a 24 bit 
-/// \param dFloat64 val: 64 bit float 
-/// \return a 64 bit double precision with a 32 bit mantissa
-D_CORE_API dFloat64 dRoundToFloat(dFloat64 val);
-
-/*
-class dAngleArithmetic
-{
-	public:
-	dAngleArithmetic()
-	{
-		SetAngle(0.0f);
-	}
-
-	dAngleArithmetic(dFloat32 angle)
-	{
-		SetAngle(angle);
-	}
-
-	dFloat32 GetAngle() const
-	{
-		return m_angle;
-	}
-
-	void SetAngle(dFloat32 angle)
-	{
-		m_angle = angle;
-		m_sinJointAngle = dSin(angle);
-		m_cosJointAngle = dCos(angle);
-	}
-
-	dFloat32 Update(dFloat32 newAngleCos, dFloat32 newAngleSin)
-	{
-		dFloat32 sin_da = newAngleSin * m_cosJointAngle - newAngleCos * m_sinJointAngle;
-		dFloat32 cos_da = newAngleCos * m_cosJointAngle + newAngleSin * m_sinJointAngle;
-
-		m_angle += dAtan2(sin_da, cos_da);
-		m_cosJointAngle = newAngleCos;
-		m_sinJointAngle = newAngleSin;
-		return m_angle;
-	}
-
-	dAngleArithmetic operator+ (const dAngleArithmetic& angle) const
-	{
-		dFloat32 sin_da = angle.m_sinJointAngle * m_cosJointAngle + angle.m_cosJointAngle * m_sinJointAngle;
-		dFloat32 cos_da = angle.m_cosJointAngle * m_cosJointAngle - angle.m_sinJointAngle * m_sinJointAngle;
-		dFloat32 angle_da = dAtan2(sin_da, cos_da);
-		return dAngleArithmetic(m_angle + angle_da);
-	}
-
-	dAngleArithmetic operator- (const dAngleArithmetic& angle) const
-	{
-		dFloat32 sin_da = angle.m_sinJointAngle * m_cosJointAngle - angle.m_cosJointAngle * m_sinJointAngle;
-		dFloat32 cos_da = angle.m_cosJointAngle * m_cosJointAngle + angle.m_sinJointAngle * m_sinJointAngle;
-		dFloat32 angle_da = dAtan2(sin_da, cos_da);
-		return dAngleArithmetic(angle_da);
-		}
-
-	dFloat32 Update(dFloat32 angle)
-	{
-		return Update(dCos(angle), dSin(angle));
-	}
-
-	private:
-	dFloat32 m_angle;
-	dFloat32 m_sinJointAngle;
-	dFloat32 m_cosJointAngle;
-	};
-*/
-
 #ifdef D_USE_THREAD_EMULATION
-	/// wrapper over standard atomic operations
-	template<class T>
-	class dAtomic
+/// wrapper over standard atomic operations
+template<class T>
+class dAtomic
+{
+public:
+	dAtomic<T>()
+		: m_val(T(val))
 	{
-		public:
-		dAtomic<T>()
-			: m_val(T(val))
-		{
-		}
+	}
 
-		dAtomic<T>(T val)
-			: m_val(val)
-		{
-		}
+	dAtomic<T>(T val)
+		: m_val(val)
+	{
+	}
 
-		T load() const
-		{
-			return m_val;
-		}
+	T load() const
+	{
+		return m_val;
+	}
 
-		void store(T val)
-		{
-			m_val = val;
-		}
+	void store(T val)
+	{
+		m_val = val;
+	}
 
-		T exchange(T val)
-		{
-			dSwap(val, m_val);
-			return val;
-		}
+	T exchange(T val)
+	{
+		dSwap(val, m_val);
+		return val;
+	}
 
-		T fetch_add(T val)
-		{
-			m_val += val;
-			return m_val - val;
-		}
+	T fetch_add(T val)
+	{
+		m_val += val;
+		return m_val - val;
+	}
 
-		T fetch_sub(T val)
-		{
-			m_val -= val;
-			return m_val + val;
-		}
+	T fetch_sub(T val)
+	{
+		m_val -= val;
+		return m_val + val;
+	}
 
-		private:
-		T m_val;
-	};
+private:
+	T m_val;
+};
 #else
-	/// wrapper over standard atomic operations
-	template<class T>
-	class dAtomic: public std::atomic<T>
+/// wrapper over standard atomic operations
+template<class T>
+class dAtomic : public std::atomic<T>
+{
+public:
+	dAtomic<T>()
+		: std::atomic<T>(T(0))
 	{
-		public: 
-		dAtomic<T>()
-			:std::atomic<T>(T(0))
-		{
-		}
+	}
 
-		dAtomic<T>(T val)
-			:std::atomic<T>(val)
-		{
-		}
+	dAtomic<T>(T val)
+		: std::atomic<T>(val)
+	{
+	}
 
-		dAtomic<T>(const dAtomic<T>& copy)
-			:std::atomic<T>(copy)
-		{
-		}
+	dAtomic<T>(const dAtomic<T>& copy)
+		: std::atomic<T>(copy)
+	{
+	}
 
-		T operator=(T value)
-		{
-			return std::atomic<T>::operator=(value);
-		}
-	};
+	T operator=(T value)
+	{
+		return std::atomic<T>::operator=(value);
+	}
+};
 #endif
 
 /// Simple spin lock for synchronizing threads for very short period of time.
 class dSpinLock
 {
-	public:
+public:
 	dSpinLock()
 		#ifndef D_USE_THREAD_EMULATION	
 		:m_lock(0)
@@ -647,7 +438,6 @@ class dSpinLock
 	void Lock()
 	{
 		#ifndef D_USE_THREAD_EMULATION	
-
 		dInt32 exp = 1;
 		for (dUnsigned32 test = 0; !m_lock.compare_exchange_weak(test, 1); test = 0)
 		{
@@ -689,69 +479,7 @@ class dScopeSpinLock
 	dSpinLock& m_spinLock;
 };
 
-D_CORE_API dInt32 dVertexListToIndexList(dFloat64* const vertexList, dInt32 strideInBytes, dInt32 compareCount, dInt32 vertexCount, dInt32* const indexListOut, dFloat64 tolerance = dEpsilon);
 
-template <class T>
-dInt32 dVertexListToIndexList(T* const vertexList, dInt32 strideInBytes, dInt32 compareCount, dInt32 vertexCount, dInt32* const indexListOut, T tolerance = dEpsilon)
-{
-	dInt32 stride = dInt32(strideInBytes / sizeof(T));
-	dStack<dFloat64> pool(vertexCount * stride);
-
-	dFloat64* const data = &pool[0];
-	for (dInt32 i = 0; i < vertexCount; i++)
-	{
-		dFloat64* const dst = &data[i * stride];
-		const T* const src = &vertexList[i * stride];
-		for (dInt32 j = 0; j < stride; j++)
-		{
-			dst[j] = src[j];
-		}
-	}
-
-	dInt32 count = dVertexListToIndexList(data, dInt32(stride * sizeof(dFloat64)), compareCount, vertexCount, indexListOut, dFloat64(tolerance));
-	for (dInt32 i = 0; i < count; i++)
-	{
-		const dFloat64* const src = &data[i * stride];
-		T* const dst = &vertexList[i * stride];
-		for (dInt32 j = 0; j < stride; j++)
-		{
-			dst[j] = T(src[j]);
-		}
-	}
-
-	return count;
-}
-
-/// Set cpu floating point exceptions, the original exception state is restored when the destructor is called.
-class dFloatExceptions
-{
-	public:
-	#ifdef _MSC_VER
-		#define D_FLOAT_EXECTIONS_MASK	(EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
-	#else 
-		#define D_FLOAT_EXECTIONS_MASK	0
-	#endif
-
-	dFloatExceptions(dUnsigned32 mask = D_FLOAT_EXECTIONS_MASK);
-	~dFloatExceptions();
-
-	private:
-	//#if (defined (_MSC_VER) && defined (_WIN_32_VER))
-	#if defined (_MSC_VER)
-		dUnsigned32 m_mask;
-	#endif
-};
-
-/// Set cpu floating point precision mode, the original mode is restored when the destructor is called.
-class dSetPrecisionDouble 
-{
-	public:
-	dSetPrecisionDouble();
-	~dSetPrecisionDouble();
-	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
-	dInt32 m_mask; 
-	#endif
-};
 
 #endif
 

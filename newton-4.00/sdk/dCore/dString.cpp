@@ -10,6 +10,8 @@
 */
 
 #include "dCoreStdafx.h"
+#include "dTypes.h"
+#include "dUtils.h"
 #include "dString.h"
 #include "dMemory.h"
 

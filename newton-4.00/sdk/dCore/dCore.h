@@ -29,6 +29,7 @@
 #include <dHeap.h>
 #include <dSort.h>
 #include <dTypes.h>
+#include <dUtils.h>
 #include <dArray.h>
 #include <dStack.h>
 #include <dDebug.h>

@@ -23,6 +23,8 @@
 #define __D_MEMORY_H__
 
 #include "dCoreStdafx.h"
+#include "dTypes.h"
+//#include "dUtils.h"
 
 typedef void* (*dMemAllocCallback) (size_t size);
 typedef void (*dMemFreeCallback) (void* const ptr);
