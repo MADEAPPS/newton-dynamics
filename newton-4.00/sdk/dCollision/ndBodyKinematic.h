@@ -102,6 +102,7 @@ class ndBodyKinematic: public ndBody
 	dVector GetGyroAlpha() const;
 
 	bool GetSleepState() const;
+	void RestoreSleepState(bool state);
 	D_COLLISION_API void SetSleepState(bool state);
 
 	bool GetAutoSleep() const;
@@ -390,6 +391,11 @@ inline bool ndBodyKinematic::GetAutoSleep() const
 inline bool ndBodyKinematic::GetSleepState() const
 {
 	return m_equilibrium ? true : false;
+}
+
+inline void ndBodyKinematic::RestoreSleepState(bool state)
+{
+	m_equilibrium = state ? 1 : 0;
 }
 
 inline void ndBodyKinematic::SetAutoSleep(bool state)

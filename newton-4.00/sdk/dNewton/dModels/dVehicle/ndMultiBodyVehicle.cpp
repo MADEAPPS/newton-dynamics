@@ -228,47 +228,49 @@ void ndMultiBodyVehicle::ApplyAerodynamics()
 void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 {
 #if 0
-	const dVector chassisOmega(m_chassis->GetOmega());
-	const dVector upDir(m_chassis->GetMatrix().RotateVector(m_localFrame.m_up));
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-		
 		ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
-		dAssert(tireBody != m_chassis);
-		if (!tireBody->GetSleepState())
-		{
-			dMatrix tireMatrix;
-			dMatrix chassisMatrix;
-			tire->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
+		ndBodyDynamic* const chassisBody = tire->GetBody1()->GetAsBodyDynamic();
+
+		dMatrix tireMatrix;
+		dMatrix chassisMatrix;
+		tire->CalculateTireSteeringMatrix();
+		tire->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 		
-			// align tire matrix 
-			const dVector relPosit(tireMatrix.m_posit - chassisMatrix.m_posit);
-			const dFloat32 distance = relPosit.DotProduct(upDir).GetScalar();
-			const dFloat32 spinAngle = -tire->CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
+		// align tire matrix 
+		const dVector relPosit(tireMatrix.m_posit - chassisMatrix.m_posit);
+		const dFloat32 distance = relPosit.DotProduct(chassisMatrix.m_up).GetScalar();
+		const dFloat32 spinAngle = -tire->CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
 		
-			//dAssert(distance > tire->GetInfo().m_minLimit);
-			//dAssert(distance < tire->GetInfo().m_maxLimit);
+		dMatrix newTireMatrix(dPitchMatrix(spinAngle) * chassisMatrix);
+		newTireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(distance);
+		const dMatrix tireBodyMatrix(tire->GetLocalMatrix0().Inverse() * newTireMatrix);
 		
-			dMatrix newTireMatrix(dPitchMatrix(spinAngle) * chassisMatrix);
-			newTireMatrix.m_posit = chassisMatrix.m_posit + upDir.Scale(distance);
+		// align tire velocity
+		const dVector chassiVelocity(chassisBody->GetVelocityAtPoint(tireBodyMatrix.m_posit));
+		const dVector relVeloc(tireBody->GetVelocity() - chassiVelocity);
+		const dFloat32 speed = relVeloc.DotProduct(chassisMatrix.m_up).GetScalar();
+		const dVector tireVelocity(chassiVelocity + chassisMatrix.m_up.Scale(speed));
 		
-			dMatrix tireBodyMatrix(tire->GetLocalMatrix0().Inverse() * newTireMatrix);
-			tireBody->SetMatrix(tireBodyMatrix);
-		
-			// align tire velocity
-			const dVector chassiVelocity(m_chassis->GetVelocityAtPoint(tireBodyMatrix.m_posit));
-			const dVector relVeloc(tireBody->GetVelocity() - chassiVelocity);
-			const dFloat32 speed = relVeloc.DotProduct(upDir).GetScalar();
-			const dVector tireVelocity(chassiVelocity + upDir.Scale(speed));
-			tireBody->SetVelocity(tireVelocity);
-		
-			// align tire angular velocity
-			const dVector relOmega(tireBody->GetOmega() - chassisOmega);
-			const dFloat32 rpm = relOmega.DotProduct(chassisMatrix.m_front).GetScalar();
-			const dVector tireOmega(chassisOmega + chassisMatrix.m_front.Scale(rpm));
-			tireBody->SetOmega(tireOmega);
-		}
+		// align tire angular velocity
+		const dVector chassisOmega(chassisBody->GetOmega());
+		const dVector relOmega(tireBody->GetOmega() - chassisOmega);
+		const dFloat32 rpm = relOmega.DotProduct(chassisMatrix.m_front).GetScalar();
+		const dVector tireOmega(chassisOmega + chassisMatrix.m_front.Scale(rpm));
+
+		bool savedSleepState = tireBody->GetSleepState();
+		tireBody->SetOmega(tireOmega);
+		tireBody->SetVelocity(tireVelocity);
+		tireBody->SetMatrix(tireBodyMatrix);
+		tireBody->RestoreSleepState(savedSleepState);
+	}
+#else
+	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	{
+		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
+		tire->UpdateTireSteeringAngleMatrix();
 	}
 #endif
 
@@ -588,7 +590,7 @@ dFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(dFloat32 speed) con
 
 void ndMultiBodyVehicle::PostUpdate(ndWorld* const, dFloat32)
 {
-
+	ApplyAligmentAndBalancing();
 }
 
 void ndMultiBodyVehicle::Update(ndWorld* const world, dFloat32 timestep)
@@ -605,7 +607,7 @@ xxxxx *= 1;
 	// no implemented yet
 
 	// apply down force
-	ApplyAligmentAndBalancing();
+	//ApplyAligmentAndBalancing();
 	ApplyAerodynamics();
 	ApplyTiremodel();
 }

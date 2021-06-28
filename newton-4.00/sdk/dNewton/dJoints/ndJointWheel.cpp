@@ -47,13 +47,18 @@ void ndJointWheel::SetSteering(dFloat32 normalidedSteering)
 	m_normalidedSteering = dClamp(normalidedSteering, dFloat32(-1.0f), dFloat32(1.0f));
 }
 
-void ndJointWheel::CalculateSteeringAngleMatrix()
+void ndJointWheel::CalculateTireSteeringMatrix()
 {
 	const dMatrix steeringMatrix(dYawMatrix(m_normalidedSteering * m_info.m_steeringAngle));
 	m_localMatrix1 = steeringMatrix * m_baseFrame;
+}
 
+void ndJointWheel::UpdateTireSteeringAngleMatrix()
+{
 	dMatrix tireMatrix;
 	dMatrix chassisMatrix;
+
+	CalculateTireSteeringMatrix();
 	CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 
 	const dVector relPosit(tireMatrix.m_posit - chassisMatrix.m_posit);
@@ -79,7 +84,7 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-	CalculateSteeringAngleMatrix();
+	//CalculateSteeringAngleMatrix();
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
