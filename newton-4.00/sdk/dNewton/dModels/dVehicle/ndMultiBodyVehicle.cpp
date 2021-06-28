@@ -569,7 +569,7 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 ndMultiBodyVehicle::ndDownForce::ndDownForce()
 {
 	m_downForceTable[0].m_speed = dFloat32(5.0f) * dFloat32(0.27f);
-	m_downForceTable[0].m_forceFactor = 0.5f;
+	m_downForceTable[0].m_forceFactor = 0.0f;
 	m_downForceTable[0].m_aerodynamicDownforceConstant = dFloat32(0.0f);
 
 	m_downForceTable[1].m_speed = dFloat32(60.0f) * dFloat32(0.27f);

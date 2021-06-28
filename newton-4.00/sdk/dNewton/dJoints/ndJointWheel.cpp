@@ -24,8 +24,6 @@ ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 	,m_normalidedSteering(dFloat32(0.0f))
 	,m_normalizedHandBrake(dFloat32(0.0f))
 {
-// Dave check here
-//m_normalizedHandBrake = 1.0f;
 }
 
 ndJointWheel::~ndJointWheel()
@@ -134,6 +132,9 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		dFloat32 wRel = (w0 + w1) * dFloat32 (0.35f);
 
 		SetMotorAcceleration(desc, -wRel * desc.m_invTimestep);
+
+		SetHighFriction(desc, brakeFrictionTorque);
+		SetLowerFriction(desc, -brakeFrictionTorque);
 	}
 	else
 	{ 
