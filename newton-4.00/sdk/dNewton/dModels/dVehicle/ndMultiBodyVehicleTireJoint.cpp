@@ -18,9 +18,6 @@ ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const dMatrix& pinAndPi
 	:ndJointWheel(pinAndPivotFrame, child, parent, info)
 	,m_vehicle(vehicle)
 {
-	static int xxxxx;
-	xxxx = xxxxx;
-	xxxxx++;
 }
 
 ndMultiBodyVehicleTireJoint::~ndMultiBodyVehicleTireJoint()

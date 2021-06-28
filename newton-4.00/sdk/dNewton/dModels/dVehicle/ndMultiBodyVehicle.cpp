@@ -36,6 +36,8 @@
 #define D_MAX_CONTACT_PENETRATION	  dFloat32 (1.0e-2f)
 #define D_MIN_CONTACT_CLOSE_DISTANCE2 dFloat32 (5.0e-2f * 5.0e-2f)
 
+static int xxxxx;
+
 ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& upDir)
 	:ndModel()
 	,m_localFrame(dGetIdentityMatrix())
@@ -415,39 +417,16 @@ void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const
 	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
 	contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
 	contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
+
+//dTrace(("(%d %f) ", tireBody->GetId(), contactPoint.m_normal_Force.m_force));
 }
 
 void ndMultiBodyVehicle::ApplyTiremodel()
 {
+//dTrace(("\nnormal forces %d: ", xxxxx));
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-		if (tire->xxxx == 3)
-		{
-			
-			const ndBodyKinematic::ndContactMap& contactMap = tire->GetBody0()->GetContactMap();
-			ndBodyKinematic::ndContactMap::Iterator it(contactMap);
-			for (it.Begin(); it; it++)
-			{
-				ndContact* const contact = *it;
-				ndContactPointList& contactPoints = contact->GetContactPoints();
-				const ndBodyKinematic* const otherBody = contact->GetBody1();
-				if (((ndShape*)otherBody->GetCollisionShape().GetShape())->GetAsShapeStaticMeshShape())
-				{
-					dFloat32 maxPenetration = 0;
-					for (ndContactPointList::dNode* contactNode0 = contactPoints.GetFirst(); contactNode0; contactNode0 = contactNode0->GetNext())
-					{
-						const ndContactPoint& contactPoint0 = contactNode0->GetInfo();
-						maxPenetration = dMax(contactPoint0.m_penetration, maxPenetration);
-					}
-					if (maxPenetration > 0.1f)
-					{
-						maxPenetration *= 1;
-					}
-				}
-			}
-		}
-
 		dAssert(((ndShape*)tire->GetBody0()->GetCollisionShape().GetShape())->GetAsShapeChamferCylinder());
 
 		const ndBodyKinematic::ndContactMap& contactMap = tire->GetBody0()->GetContactMap();
@@ -465,11 +444,11 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 					// first remove any contact duplicate, these are contact produce by tow or 
 					// more polygons, but this so are close that they can generate ill 
 					// formed rows in the solver mass matrix
-					dFloat32 maxPenetration = dFloat32(0.0f);
+					//dFloat32 maxPenetration = dFloat32(0.0f);
 					for (ndContactPointList::dNode* contactNode0 = contactPoints.GetFirst(); contactNode0; contactNode0 = contactNode0->GetNext())
 					{
 						const ndContactPoint& contactPoint0 = contactNode0->GetInfo();
-						maxPenetration = dMax(contactNode0->GetInfo().m_penetration, maxPenetration);
+						//maxPenetration = dMax(contactNode0->GetInfo().m_penetration, maxPenetration);
 						for (ndContactPointList::dNode* contactNode1 = contactNode0->GetNext(); contactNode1; contactNode1 = contactNode1->GetNext())
 						{
 							const ndContactPoint& contactPoint1 = contactNode1->GetInfo();
@@ -483,68 +462,68 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 						}
 					}
 
-					maxPenetration = 0;
-					if (maxPenetration > D_MAX_CONTACT_PENETRATION)
-					{
-						dAssert(0);
-						// if the max penetration is too much, 
-						// do a convex cast to find the tire location 
-						// over the mesh and teleport the tire to that location.
-						
-						dFixSizeArray<ndContactPoint, 8> closestHit;
-						const ndWheelDescriptor& info = tire->GetInfo();
-						const dMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
-						const dVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_maxLimit - info.m_minLimit));
-						dFloat32 param = ndContactSolver::ConvexCast(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix(), closestHit);
-						if (param > dFloat32(0.0f))
-						{
-							ndBodyKinematic* const tireBody = tire->GetBody0();
-							dMatrix tireMatrix(tire->GetLocalMatrix0() * tireBody->GetMatrix());
-							dFloat32 tirePosition = tireUpperBumperMatrix.m_up.DotProduct(tireUpperBumperMatrix.m_posit - tireMatrix.m_posit).GetScalar();
-							dFloat32 tireNewPosition = param * (info.m_maxLimit - info.m_minLimit);
-							dFloat32 positionError = dMin(tirePosition - tireNewPosition, D_MAX_CONTACT_PENETRATION);
-							dAssert(positionError >= 0.0f);
-							tirePosition -= positionError;
-							tireMatrix.m_posit = tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(tirePosition);
-							tireBody->SetMatrix(tire->GetLocalMatrix0().Inverse() * tireMatrix);
-
-							dAssert(closestHit.GetCount());
-							for (dInt32 i = closestHit.GetCount() - 1; i > 0; i--)
-							{
-								// remove duplicates.
-								for (dInt32 j = i - 1; j >= 0; j--)
-								{
-									const dVector error(closestHit[i].m_point - closestHit[j].m_point);
-									dFloat32 err2 = error.DotProduct(error).GetScalar();
-									if (err2 < D_MIN_CONTACT_CLOSE_DISTANCE2)
-									{
-										closestHit.SetCount(closestHit.GetCount() - 1);
-										break;
-									}
-								}
-							}
-
-							// repopulate the contact array
-							contactPoints.RemoveAll();
-							for (dInt32 i = closestHit.GetCount() - 1; i >= 0; i--)
-							{
-								ndContactMaterial* const contactPoint = &contactPoints.Append()->GetInfo();
-
-								const dMatrix normalBase(closestHit[i].m_normal);
-								contactPoint->m_point = closestHit[i].m_point;
-								contactPoint->m_normal = normalBase.m_front;
-								contactPoint->m_dir0 = normalBase.m_up;
-								contactPoint->m_dir1 = normalBase.m_right;
-								contactPoint->m_penetration = closestHit[i].m_penetration;
-								contactPoint->m_body0 = tireBody;
-								contactPoint->m_body1 = otherBody;
-								contactPoint->m_shapeInstance0 = &contactPoint->m_body0->GetCollisionShape();
-								contactPoint->m_shapeInstance1 = &contactPoint->m_body1->GetCollisionShape();
-								contactPoint->m_shapeId0 = closestHit[i].m_shapeId0;
-								contactPoint->m_shapeId1 = closestHit[i].m_shapeId1;
-							}
-						}
-					}
+					//maxPenetration = 0;
+					//if (maxPenetration > D_MAX_CONTACT_PENETRATION)
+					//{
+					//	dAssert(0);
+					//	// if the max penetration is too much, 
+					//	// do a convex cast to find the tire location 
+					//	// over the mesh and teleport the tire to that location.
+					//	
+					//	dFixSizeArray<ndContactPoint, 8> closestHit;
+					//	const ndWheelDescriptor& info = tire->GetInfo();
+					//	const dMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
+					//	const dVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_maxLimit - info.m_minLimit));
+					//	dFloat32 param = ndContactSolver::ConvexCast(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix(), closestHit);
+					//	if (param > dFloat32(0.0f))
+					//	{
+					//		ndBodyKinematic* const tireBody = tire->GetBody0();
+					//		dMatrix tireMatrix(tire->GetLocalMatrix0() * tireBody->GetMatrix());
+					//		dFloat32 tirePosition = tireUpperBumperMatrix.m_up.DotProduct(tireUpperBumperMatrix.m_posit - tireMatrix.m_posit).GetScalar();
+					//		dFloat32 tireNewPosition = param * (info.m_maxLimit - info.m_minLimit);
+					//		dFloat32 positionError = dMin(tirePosition - tireNewPosition, D_MAX_CONTACT_PENETRATION);
+					//		dAssert(positionError >= 0.0f);
+					//		tirePosition -= positionError;
+					//		tireMatrix.m_posit = tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(tirePosition);
+					//		tireBody->SetMatrix(tire->GetLocalMatrix0().Inverse() * tireMatrix);
+					//
+					//		dAssert(closestHit.GetCount());
+					//		for (dInt32 i = closestHit.GetCount() - 1; i > 0; i--)
+					//		{
+					//			// remove duplicates.
+					//			for (dInt32 j = i - 1; j >= 0; j--)
+					//			{
+					//				const dVector error(closestHit[i].m_point - closestHit[j].m_point);
+					//				dFloat32 err2 = error.DotProduct(error).GetScalar();
+					//				if (err2 < D_MIN_CONTACT_CLOSE_DISTANCE2)
+					//				{
+					//					closestHit.SetCount(closestHit.GetCount() - 1);
+					//					break;
+					//				}
+					//			}
+					//		}
+					//
+					//		// repopulate the contact array
+					//		contactPoints.RemoveAll();
+					//		for (dInt32 i = closestHit.GetCount() - 1; i >= 0; i--)
+					//		{
+					//			ndContactMaterial* const contactPoint = &contactPoints.Append()->GetInfo();
+					//
+					//			const dMatrix normalBase(closestHit[i].m_normal);
+					//			contactPoint->m_point = closestHit[i].m_point;
+					//			contactPoint->m_normal = normalBase.m_front;
+					//			contactPoint->m_dir0 = normalBase.m_up;
+					//			contactPoint->m_dir1 = normalBase.m_right;
+					//			contactPoint->m_penetration = closestHit[i].m_penetration;
+					//			contactPoint->m_body0 = tireBody;
+					//			contactPoint->m_body1 = otherBody;
+					//			contactPoint->m_shapeInstance0 = &contactPoint->m_body0->GetCollisionShape();
+					//			contactPoint->m_shapeInstance1 = &contactPoint->m_body1->GetCollisionShape();
+					//			contactPoint->m_shapeId0 = closestHit[i].m_shapeId0;
+					//			contactPoint->m_shapeId1 = closestHit[i].m_shapeId1;
+					//		}
+					//	}
+					//}
 				}
 
 				const dMatrix tireMatrix (tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());
@@ -587,26 +566,32 @@ ndMultiBodyVehicle::ndDownForce::ndDownForce()
 dFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(dFloat32 speed) const
 {
 	dAssert(speed >= dFloat32(0.0f));
+	dFloat32 downForceFactor = m_downForceTable[2].m_forceFactor;
 	if (speed < m_downForceTable[0].m_speed)
 	{
-		return m_downForceTable[0].m_forceFactor;
+		downForceFactor = m_downForceTable[0].m_forceFactor;
 	}
 	else if (speed < m_downForceTable[1].m_speed)
 	{
 		dFloat32 deltaSpeed = speed - m_downForceTable[0].m_forceFactor;
-		return m_downForceTable[0].m_forceFactor + m_downForceTable[1].m_aerodynamicDownforceConstant * deltaSpeed * deltaSpeed;
+		downForceFactor = m_downForceTable[0].m_forceFactor + m_downForceTable[1].m_aerodynamicDownforceConstant * deltaSpeed * deltaSpeed;
 	}
 	else if (speed < m_downForceTable[2].m_speed)
 	{
 		dFloat32 deltaSpeed = speed - m_downForceTable[1].m_forceFactor;
-		return m_downForceTable[1].m_forceFactor + m_downForceTable[2].m_aerodynamicDownforceConstant * deltaSpeed * deltaSpeed;
+		downForceFactor = m_downForceTable[1].m_forceFactor + m_downForceTable[2].m_aerodynamicDownforceConstant * deltaSpeed * deltaSpeed;
 	}
-	//return m_downForceTable[2].m_speed;
-	return m_downForceTable[2].m_aerodynamicDownforceConstant;
+	return downForceFactor;
 }
 
 void ndMultiBodyVehicle::Update(ndWorld* const world, dFloat32 timestep)
 {
+xxxxx++;
+//if (xxxxx > 4874)
+if (xxxxx > 4890)
+xxxxx *= 1;
+//dTrace(("%d\n", xxxxx));
+
 	ApplyInputs(world, timestep);
 
 	// Apply Vehicle Dynamics controls

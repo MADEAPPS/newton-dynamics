@@ -110,11 +110,12 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 	SetMassSpringDamperAcceleration(desc, m_regularizer, m_info.m_springK, m_info.m_damperC);
 
+//m_normalizedBrake = 1.0f;
 	const dFloat32 brakeFrictionTorque = dMax(m_normalizedBrake * m_info.m_brakeTorque, m_normalizedHandBrake * m_info.m_handBrakeTorque);
 	if (brakeFrictionTorque > dFloat32(0.0f))
 	{
 		const dFloat32 brakesToChassisInfluence = dFloat32 (0.25f);
-		//const dFloat32 brakesToChassisInfluence = dFloat32(1.0f);
+
 		AddAngularRowJacobian(desc, matrix1.m_front, dFloat32(0.0f));
 		const dVector tireOmega(m_body0->GetOmega());
 		const dVector chassisOmega(m_body1->GetOmega());
@@ -125,12 +126,15 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 
 		dFloat32 w0 = tireOmega.DotProduct(jacobian0.m_angular).GetScalar();
 		dFloat32 w1 = chassisOmega.DotProduct(jacobian1.m_angular).GetScalar();
-		dFloat32 rpm = (w0 + w1) * dFloat32 (0.35f);
+		dFloat32 wRel = (w0 + w1) * dFloat32 (0.35f);
 
-		SetMotorAcceleration(desc, -rpm * desc.m_invTimestep);
-		
+		SetMotorAcceleration(desc, -wRel * desc.m_invTimestep);
+
+#ifdef USE_LCP_SKEL
 		SetHighFriction(desc, brakeFrictionTorque);
 		SetLowerFriction(desc, -brakeFrictionTorque);
+#endif
+
 	}
 	else
 	{ 

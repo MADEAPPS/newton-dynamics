@@ -185,13 +185,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		AddChassis(chassis, DEMO_GRAVITY);
 
 		// 2- each tire to the model, 
-		// this function will create the tire as a normal rigid body
-		// and attach them to the chassis with the tire joints
-		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rr_tire");
-		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rl_tire");
-		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fr_tire");
-		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fl_tire");
-
+		// create the tire as a normal rigid body
+		// and attach them to the chassis with a tire joints
 		ndWheelDescriptor tireInfo;
 		tireInfo.m_springK = m_configuration.m_rearTire.m_springK;
 		tireInfo.m_damperC = m_configuration.m_rearTire.m_damperC;
@@ -203,7 +198,10 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		tireInfo.m_handBrakeTorque = m_configuration.m_rearTire.m_handBrakeTorque;
 		tireInfo.m_laterialStiffness  = m_configuration.m_rearTire.m_laterialStiffness;
 		tireInfo.m_longitudinalStiffness  = m_configuration.m_rearTire.m_longitudinalStiffness;
+		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rr_tire");
 		ndMultiBodyVehicleTireJoint* const rr_tire = AddTire(world, tireInfo, rr_tire_body);
+
+		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rl_tire");
 		ndMultiBodyVehicleTireJoint* const rl_tire = AddTire(world, tireInfo, rl_tire_body);
 
 		tireInfo.m_springK = m_configuration.m_frontTire.m_springK;
@@ -216,7 +214,10 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		tireInfo.m_handBrakeTorque = m_configuration.m_frontTire.m_handBrakeTorque;
 		tireInfo.m_laterialStiffness  = m_configuration.m_frontTire.m_laterialStiffness;
 		tireInfo.m_longitudinalStiffness  = m_configuration.m_frontTire.m_longitudinalStiffness;
+		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fr_tire");
 		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(world, tireInfo, fr_tire_body);
+
+		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fl_tire");
 		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(world, tireInfo, fl_tire_body);
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 0] = 1;
@@ -566,10 +567,10 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFloorBox(scene);
-	//BuildFlatPlane(scene, true);
+	BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
-	BuildStaticMesh(scene, "playerarena.fbx", true);
+	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
 
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
