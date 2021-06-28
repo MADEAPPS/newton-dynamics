@@ -22,8 +22,6 @@
 #ifndef __D_TYPES_H__
 #define __D_TYPES_H__
 
-#define USE_LCP_SKEL
-
 #ifdef _MSC_VER 
     #if defined (_M_ARM) || defined (_M_ARM64)
 		#ifndef _ARM_VER

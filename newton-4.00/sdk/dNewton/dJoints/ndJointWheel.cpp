@@ -134,12 +134,6 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		dFloat32 wRel = (w0 + w1) * dFloat32 (0.35f);
 
 		SetMotorAcceleration(desc, -wRel * desc.m_invTimestep);
-
-#ifdef USE_LCP_SKEL
-		SetHighFriction(desc, brakeFrictionTorque);
-		SetLowerFriction(desc, -brakeFrictionTorque);
-#endif
-
 	}
 	else
 	{ 

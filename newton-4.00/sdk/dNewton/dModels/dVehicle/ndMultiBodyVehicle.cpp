@@ -36,8 +36,6 @@
 #define D_MAX_CONTACT_PENETRATION	  dFloat32 (1.0e-2f)
 #define D_MIN_CONTACT_CLOSE_DISTANCE2 dFloat32 (5.0e-2f * 5.0e-2f)
 
-static int xxxxx;
-
 ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& upDir)
 	:ndModel()
 	,m_localFrame(dGetIdentityMatrix())
@@ -435,7 +433,6 @@ void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const
 
 void ndMultiBodyVehicle::ApplyTiremodel()
 {
-//dTrace(("\nnormal forces %d: ", xxxxx));
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
@@ -603,19 +600,12 @@ void ndMultiBodyVehicle::PostUpdate(ndWorld* const, dFloat32)
 
 void ndMultiBodyVehicle::Update(ndWorld* const world, dFloat32 timestep)
 {
-xxxxx++;
-//if (xxxxx > 4874)
-if (xxxxx > 4890)
-xxxxx *= 1;
-//dTrace(("%d\n", xxxxx));
-
 	ApplyInputs(world, timestep);
 
 	// Apply Vehicle Dynamics controls
 	// no implemented yet
 
 	// apply down force
-	//ApplyAligmentAndBalancing();
 	ApplyAerodynamics();
 	ApplyTiremodel();
 }

@@ -30,9 +30,6 @@
 
 dInt64 ndSkeletonContainer::ndNode::m_ordinalInit = 0x0706050403020100ll;
 
-
-static int xxxxx[4];
-
 ndSkeletonContainer::ndNode::ndNode()
 	:m_body(nullptr)
 	,m_joint(nullptr)
@@ -886,7 +883,6 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 		const dInt32 primaryDof = node->m_dof;
 		const dInt32 first = joint->m_rowStart;
 
-xxxxx[i] = 0;
 		for (dInt32 j = 0; j < primaryDof; j++) 
 		{
 			const dInt32 index = node->m_sourceJacobianIndex[j];
@@ -894,10 +890,6 @@ xxxxx[i] = 0;
 			m_pairs[primaryIndex].m_m1 = m1;
 			m_frictionIndex[primaryIndex] = 0;
 			m_matrixRowsIndex[primaryIndex] = first + index;
-#ifndef USE_LCP_SKEL
-if (j == 5)
-xxxxx[i] = primaryIndex;
-#endif
 			primaryIndex++;
 		}
 
@@ -909,12 +901,6 @@ xxxxx[i] = primaryIndex;
 
 			m_pairs[auxiliaryIndex + primaryCount].m_m0 = m0;
 			m_pairs[auxiliaryIndex + primaryCount].m_m1 = m1;
-
-#ifdef USE_LCP_SKEL
-if (auxiliaryIndex < 4)
-xxxxx[auxiliaryIndex] = auxiliaryIndex + primaryCount;
-#endif
-
 			m_frictionIndex[auxiliaryIndex + primaryCount] = 0;
 			m_matrixRowsIndex[auxiliaryIndex + primaryCount] = first + index;
 			const dInt32 boundIndex = (rhs->m_lowerBoundFrictionCoefficent <= dFloat32(-D_MAX_SKELETON_LCP_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= dFloat32(D_MAX_SKELETON_LCP_VALUE)) ? 1 : 0;
@@ -1152,7 +1138,6 @@ void ndSkeletonContainer::SolveLcp(dInt32 stride, dInt32 size, const dFloat32* c
 	dFloat32* const invDiag1 = dAlloca(dFloat32, size);
 	dFloat32* const residual = dAlloca(dFloat32, size);
 
-	//dInt32 rowStart = 0;
 	dInt32 base = 0;
 	for (dInt32 i = 0; i < size; i++)
 	{
@@ -1278,7 +1263,6 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 	dFloat32* const high = dAlloca(dFloat32, m_auxiliaryRowCount);
 	dFloat32* const u = dAlloca(dFloat32, m_auxiliaryRowCount + 1);
 	dFloat32* const u0 = dAlloca(dFloat32, m_auxiliaryRowCount + 1);
-	//dInt32* const normalIndex = dAlloca(dInt32, m_auxiliaryRowCount);
 
 	dInt32 primaryIndex = 0;
 	const dInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
@@ -1317,7 +1301,6 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 			row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
 		b[i] = rhs->m_coordenateAccel - acc.AddHorizontal().GetScalar();
 
-		//normalIndex[i] = m_frictionIndex[primaryCount + i];
 		u0[i] = rhs->m_force;
 		low[i] = rhs->m_lowerBoundFrictionCoefficent;
 		high[i] = rhs->m_upperBoundFrictionCoefficent;
@@ -1356,28 +1339,6 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 		internalForces[m1].m_linear += row->m_Jt.m_jacobianM1.m_linear * jointForce;
 		internalForces[m1].m_angular += row->m_Jt.m_jacobianM1.m_angular * jointForce;
 	}
-/*
-static int xxxxxxxxx;
-dTrace(("brake Torque %d: ", xxxxxxxxx));
-for (dInt32 i = 0; i < 4; i++)
-{
-	dTrace(("%f ", f[xxxxx[i]]));
-}
-
-for (dInt32 i = 0; i < m_auxiliaryRowCount; i++)
-{
-	if (normalIndex[i] < 0)
-	{
-		dTrace(("%f ", u[i]));
-	}
-}
-
-
-xxxxxxxxx++;
-if (xxxxxxxxx >= 3465)
-xxxxxxxxx *= 1;
-dTrace(("\n"));
-*/
 }
 
 void ndSkeletonContainer::CalculateJointForce(const ndBodyKinematic** const, ndJacobian* const internalForces)
