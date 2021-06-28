@@ -23,11 +23,6 @@
 #define __D_SKELETON_CONTAINER_H__
 
 #include "ndNewtonStdafx.h"
-//#include "dgConstraint.h"
-//#include "dgContact.h"
-//#include "ndJointBilateralConstraint.h"
-
-//class ndBodyKinematic;
 
 class ndJointBilateralConstraint;
 

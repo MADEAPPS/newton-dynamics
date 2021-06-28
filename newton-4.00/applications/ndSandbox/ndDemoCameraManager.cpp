@@ -16,7 +16,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndDemoCameraManager.h"
 
-//#define D_ENABLE_CAMERA_REPLAY
+#define D_ENABLE_CAMERA_REPLAY
 
 #ifdef D_ENABLE_CAMERA_REPLAY
 	#define D_RECORD_CAMERA
@@ -272,10 +272,10 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 
 					dVector mass(m_targetPicked->GetMassMatrix());
 
-					// change this to make the grabbing stronger or weaker
+					//change this to make the grabbing stronger or weaker
 					//const dFloat32 angularFritionAccel = 10.0f;
-					const dFloat32 angularFritionAccel = 100.0f;
-					const dFloat32 linearFrictionAccel = 400.0f * dMax(dAbs(DEMO_GRAVITY), dFloat32(10.0f));
+					const dFloat32 angularFritionAccel = 10.0f;
+					const dFloat32 linearFrictionAccel = 40.0f * dMax(dAbs(DEMO_GRAVITY), dFloat32(10.0f));
 					const dFloat32 inertia = dMax(mass.m_z, dMax(mass.m_x, mass.m_y));
 
 					m_pickJoint = new ndDemoCameraPickBodyJoint(body, scene->GetWorld()->GetSentinelBody(), posit, this);
