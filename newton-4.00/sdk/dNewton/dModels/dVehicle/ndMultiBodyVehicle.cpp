@@ -406,10 +406,18 @@ void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const
 
 	// calculate side slip ratio
 	const dFloat32 sideSpeed = dAbs(relVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
-	const dFloat32 lateralSleep = sideSpeed / (relSpeed + dFloat32 (0.01f));
+	const dFloat32 lateralSlip = sideSpeed / (relSpeed + dFloat32 (0.01f));
+
+	//const dFloat32 lateralKinetiFrictionFactor = lateralSlip >= dFloat32(1.0f) ? dFloat32(0.6f) : dFloat32(1.0f);
+	//const dFloat32 longitudinalKinetiFrictionFactor = longitudialSlip >= dFloat32 (1.0f) ? dFloat32(0.6f) : dFloat32(1.0f);
+	const dFloat32 lateralKinetiFrictionFactor = dFloat32(1.0f);
+	const dFloat32 longitudinalKinetiFrictionFactor = dFloat32(1.0f);
+
+//if (lateralSlip > 10.0f)
+//dTrace(("(id=%d longSlip(%f) sizegSlip(%f)\n", tireBody->GetId(), longitudialSlip, lateralSlip));
 
 	const dFloat32 den = dFloat32(1.0f) / (dFloat32(1.0f) + longitudialSlip);
-	const dFloat32 v = lateralSleep * den;
+	const dFloat32 v = lateralSlip * den;
 	const dFloat32 u = longitudialSlip * den;
 
 	const ndWheelDescriptor& info = tire->GetInfo();
@@ -420,13 +428,15 @@ void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const
 	const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
 	const dFloat32 lateralFrictionCoefficient = frictionCoefficient * cz / gamma;
 	const dFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
-	//dTrace(("%f %f\n", sideSpeed, lateralFrictionCoefficient));
+
+//dTrace(("(id=%d longSlip(%f) sizegSlip(%f)\n", tireBody->GetId(), longitudinalFrictionCoefficient, lateralFrictionCoefficient));
 
 	contactPoint.m_material.m_restitution = dFloat32 (0.1f);
 	contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
-	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
 	contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
-	contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
+
+	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient * lateralKinetiFrictionFactor;
+	contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient * longitudinalKinetiFrictionFactor;
 
 //dTrace(("(%d %f) ", tireBody->GetId(), contactPoint.m_normal_Force.m_force));
 }
