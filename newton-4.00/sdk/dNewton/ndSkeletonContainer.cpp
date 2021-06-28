@@ -1152,7 +1152,8 @@ void ndSkeletonContainer::SolveLcp(dInt32 stride, dInt32 size, const dFloat32* c
 	dFloat32* const invDiag1 = dAlloca(dFloat32, size);
 	dFloat32* const residual = dAlloca(dFloat32, size);
 
-	dInt32 rowStart = 0;
+	//dInt32 rowStart = 0;
+	dInt32 base = 0;
 	for (dInt32 i = 0; i < size; i++)
 	{
 		const dInt32 index = normalIndex[i];
@@ -1164,11 +1165,11 @@ void ndSkeletonContainer::SolveLcp(dInt32 stride, dInt32 size, const dFloat32* c
 		const dFloat32 l = low[i] * coefficient - x0[i];
 		const dFloat32 h = high[i] * coefficient - x0[i];
 		x[i] = dClamp(dFloat32(0.0f), l, h);
-		invDiag1[i] = dFloat32(1.0f) / matrix[rowStart + i];
-		rowStart += stride;
+		invDiag1[i] = dFloat32(1.0f) / matrix[base + i];
+		base += stride;
 	}
 
-	dInt32 base = 0;
+	base = 0;
 	for (dInt32 i = 0; i < size; i++)
 	{
 		const dFloat32* const row = &matrix[base];
