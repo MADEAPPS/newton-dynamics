@@ -227,7 +227,7 @@ void ndMultiBodyVehicle::ApplyAerodynamics()
 
 void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 {
-#if 0
+#if 1
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
@@ -240,30 +240,38 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 		tire->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 		
 		// align tire matrix 
-		const dVector relPosit(tireMatrix.m_posit - chassisMatrix.m_posit);
-		const dFloat32 distance = relPosit.DotProduct(chassisMatrix.m_up).GetScalar();
+		const ndWheelDescriptor& info = tire->GetInfo();
 		const dFloat32 spinAngle = -tire->CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
-		
-		dMatrix newTireMatrix(dPitchMatrix(spinAngle) * chassisMatrix);
-		newTireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(distance);
-		const dMatrix tireBodyMatrix(tire->GetLocalMatrix0().Inverse() * newTireMatrix);
-		
+		dVector localPosit(chassisMatrix.UntransformVector(tireMatrix.m_posit));
+		localPosit.m_x = dFloat32(0.0f);
+		localPosit.m_z = dFloat32(0.0f);
+		localPosit.m_y = dClamp(localPosit.m_y, info.m_minLimit, info.m_maxLimit);
+		tireMatrix = dPitchMatrix(spinAngle) * chassisMatrix;
+		tireMatrix.m_posit = chassisMatrix.TransformVector(localPosit);
+
 		// align tire velocity
-		const dVector chassiVelocity(chassisBody->GetVelocityAtPoint(tireBodyMatrix.m_posit));
+		const dVector chassiVelocity(chassisBody->GetVelocityAtPoint(tireMatrix.m_posit));
 		const dVector relVeloc(tireBody->GetVelocity() - chassiVelocity);
-		const dFloat32 speed = relVeloc.DotProduct(chassisMatrix.m_up).GetScalar();
-		const dVector tireVelocity(chassiVelocity + chassisMatrix.m_up.Scale(speed));
+
+		dVector localVeloc(chassisMatrix.UnrotateVector(relVeloc));
+		localVeloc.m_x = dFloat32(0.0f);
+		localVeloc.m_z = dFloat32(0.0f);
+		const dVector tireVelocity(chassiVelocity + chassisMatrix.RotateVector(localVeloc));
 		
 		// align tire angular velocity
 		const dVector chassisOmega(chassisBody->GetOmega());
 		const dVector relOmega(tireBody->GetOmega() - chassisOmega);
-		const dFloat32 rpm = relOmega.DotProduct(chassisMatrix.m_front).GetScalar();
-		const dVector tireOmega(chassisOmega + chassisMatrix.m_front.Scale(rpm));
+		dVector localOmega(chassisMatrix.UnrotateVector(relOmega));
+		localOmega.m_y = dFloat32(0.0f);
+		localOmega.m_z = dFloat32(0.0f);
+		const dVector tireOmega(chassisOmega + chassisMatrix.RotateVector(localOmega));
+
+		tireMatrix = tire->GetLocalMatrix0().Inverse() * tireMatrix;
 
 		bool savedSleepState = tireBody->GetSleepState();
 		tireBody->SetOmega(tireOmega);
 		tireBody->SetVelocity(tireVelocity);
-		tireBody->SetMatrix(tireBodyMatrix);
+		tireBody->SetMatrix(tireMatrix);
 		tireBody->RestoreSleepState(savedSleepState);
 	}
 #else
