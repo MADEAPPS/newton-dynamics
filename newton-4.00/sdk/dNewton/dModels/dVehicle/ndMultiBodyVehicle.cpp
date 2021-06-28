@@ -227,7 +227,7 @@ void ndMultiBodyVehicle::ApplyAerodynamics()
 
 void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 {
-#if 1
+#if 0
 	const dVector chassisOmega(m_chassis->GetOmega());
 	const dVector upDir(m_chassis->GetMatrix().RotateVector(m_localFrame.m_up));
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
