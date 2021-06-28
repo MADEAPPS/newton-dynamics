@@ -227,12 +227,13 @@ void ndMultiBodyVehicle::ApplyAerodynamics()
 
 void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 {
+#if 1
 	const dVector chassisOmega(m_chassis->GetOmega());
 	const dVector upDir(m_chassis->GetMatrix().RotateVector(m_localFrame.m_up));
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-
+		
 		ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
 		dAssert(tireBody != m_chassis);
 		if (!tireBody->GetSleepState())
@@ -240,28 +241,28 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 			dMatrix tireMatrix;
 			dMatrix chassisMatrix;
 			tire->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
-
+		
 			// align tire matrix 
 			const dVector relPosit(tireMatrix.m_posit - chassisMatrix.m_posit);
 			const dFloat32 distance = relPosit.DotProduct(upDir).GetScalar();
 			const dFloat32 spinAngle = -tire->CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
-
+		
 			//dAssert(distance > tire->GetInfo().m_minLimit);
 			//dAssert(distance < tire->GetInfo().m_maxLimit);
-
+		
 			dMatrix newTireMatrix(dPitchMatrix(spinAngle) * chassisMatrix);
 			newTireMatrix.m_posit = chassisMatrix.m_posit + upDir.Scale(distance);
-
+		
 			dMatrix tireBodyMatrix(tire->GetLocalMatrix0().Inverse() * newTireMatrix);
 			tireBody->SetMatrix(tireBodyMatrix);
-
+		
 			// align tire velocity
 			const dVector chassiVelocity(m_chassis->GetVelocityAtPoint(tireBodyMatrix.m_posit));
 			const dVector relVeloc(tireBody->GetVelocity() - chassiVelocity);
 			const dFloat32 speed = relVeloc.DotProduct(upDir).GetScalar();
 			const dVector tireVelocity(chassiVelocity + upDir.Scale(speed));
 			tireBody->SetVelocity(tireVelocity);
-
+		
 			// align tire angular velocity
 			const dVector relOmega(tireBody->GetOmega() - chassisOmega);
 			const dFloat32 rpm = relOmega.DotProduct(chassisMatrix.m_front).GetScalar();
@@ -269,6 +270,7 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 			tireBody->SetOmega(tireOmega);
 		}
 	}
+#endif
 
 	for (dList<ndMultiBodyVehicleDifferential*>::dNode* node = m_differentials.GetFirst(); node; node = node->GetNext())
 	{
@@ -584,6 +586,11 @@ dFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(dFloat32 speed) con
 	return downForceFactor;
 }
 
+void ndMultiBodyVehicle::PostUpdate(ndWorld* const, dFloat32)
+{
+
+}
+
 void ndMultiBodyVehicle::Update(ndWorld* const world, dFloat32 timestep)
 {
 xxxxx++;
@@ -600,6 +607,5 @@ xxxxx *= 1;
 	// apply down force
 	ApplyAligmentAndBalancing();
 	ApplyAerodynamics();
-	//ApplySteering();
 	ApplyTiremodel();
 }

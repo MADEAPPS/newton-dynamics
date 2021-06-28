@@ -30,7 +30,7 @@
 //#define ENABLE_REPLAY
 
 #ifdef ENABLE_REPLAY
-	#define REPLAY_RECORD
+	//#define REPLAY_RECORD
 #endif
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
