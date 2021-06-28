@@ -270,7 +270,7 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 
 		bool savedSleepState = tireBody->GetSleepState();
 		tireBody->SetOmega(tireOmega);
-		tireBody->SetVelocity(tireVelocity);
+		//tireBody->SetVelocity(tireVelocity);
 		tireBody->SetMatrix(tireMatrix);
 		tireBody->RestoreSleepState(savedSleepState);
 	}
