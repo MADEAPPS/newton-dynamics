@@ -218,8 +218,16 @@ void ndMultiBodyVehicle::ApplyAerodynamics()
 		const dVector weight(m_chassis->GetForce());
 		const dVector downForce(up.Scale(-m_gravityMag * downForceFactor * m_chassis->GetMassMatrix().m_w));
 		m_chassis->SetForce(weight + downForce);
-		m_suspensionStiffnessModifier = up.DotProduct(weight).GetScalar() / up.DotProduct(weight + downForce).GetScalar();
-		//dTrace(("%f\n", m_suspensionStiffnessModifier));
+		//m_suspensionStiffnessModifier = up.DotProduct(weight).GetScalar() / up.DotProduct(weight + downForce).GetScalar();
+
+		for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+		{
+			ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
+			ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
+			const dVector tireWeight(tireBody->GetForce());
+			const dVector tireDownForce(up.Scale(-m_gravityMag * downForceFactor * tireBody->GetMassMatrix().m_w));
+			tireBody->SetForce(tireWeight + tireDownForce);
+		}
 	}
 }
 
@@ -599,7 +607,7 @@ ndMultiBodyVehicle::ndDownForce::ndDownForce()
 {
 	m_downForceTable[0].m_speed = dFloat32(5.0f) * dFloat32(0.27f);
 	//m_downForceTable[0].m_forceFactor = 0.0f;
-        m_downForceTable[0].m_forceFactor = 0.5f;
+    m_downForceTable[0].m_forceFactor = 0.5f;
 	m_downForceTable[0].m_aerodynamicDownforceConstant = dFloat32(0.0f);
 
 	m_downForceTable[1].m_speed = dFloat32(60.0f) * dFloat32(0.27f);
