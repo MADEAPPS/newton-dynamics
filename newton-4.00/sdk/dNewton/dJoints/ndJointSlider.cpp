@@ -13,6 +13,9 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointSlider.h"
 
+#define D_PENETRATION_LIMIT			 dFloat32 (0.2f) 
+#define D_PENETRATION_RECOVERY_SPEED dFloat32 (0.1f) 
+
 ndJointSlider::ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 	,m_posit(dFloat32 (0.0f))
@@ -75,12 +78,19 @@ void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dM
 		{
 			dVector p1(matrix1.m_posit + matrix1.m_front.Scale (m_minLimit));
 			AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
+			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const dFloat32 penetration = x - m_minLimit;
+			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetLowerFriction(desc, -m_friction); 
 		}
 		else if (x > m_maxLimit)
 		{
-			//dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_maxLimit));
 			AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1.m_front);
+			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const dFloat32 penetration = x - m_maxLimit;
+			const dFloat32 recoveringAceel = desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetHighFriction(desc, m_friction);
 		}
 		else if (m_friction > dFloat32 (0.0f)) 
@@ -104,17 +114,21 @@ void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& des
 	{
 		const dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_minLimit));
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
-		SetLowerFriction(desc, dFloat32 (0.0f));
 		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-		SetMotorAcceleration(desc, stopAccel);
+		const dFloat32 penetration = x - m_minLimit;
+		const dFloat32 recoveringAceel = -desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+		SetLowerFriction(desc, dFloat32(0.0f));
 	}
 	else if (x > m_maxLimit)
 	{
 		const dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_maxLimit));
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
-		SetHighFriction(desc, dFloat32(0.0f));
 		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-		SetMotorAcceleration(desc, stopAccel);
+		const dFloat32 penetration = x - m_maxLimit;
+		const dFloat32 recoveringAceel = desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+		SetHighFriction(desc, dFloat32(0.0f));
 	}
 }
 
@@ -143,34 +157,14 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[1]);
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[2]);
 
-	const dFloat32 angleError = m_maxAngleError;
 	const dFloat32 angle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
 	AddAngularRowJacobian(desc, matrix1.m_front, angle0);
-	if (dAbs(angle0) > angleError) 
-	{
-		dAssert(0);
-	//	const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle0 / (timestep * timestep);
-	//	NewtonUserJointSetRowAcceleration(m_joint, alpha);
-	}
 	
 	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	AddAngularRowJacobian(desc, matrix1.m_up, angle1);
-	if (dAbs(angle1) > angleError) 
-	{
-		dAssert(0);
-	//	const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle1 / (timestep * timestep);
-	//	NewtonUserJointSetRowAcceleration(m_joint, alpha);
-	}
 	
 	const dFloat32 angle2 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle2);
-	//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	if (dAbs(angle2) > angleError) 
-	{
-		dAssert(0);
-	//	const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle2 / (timestep * timestep);
-	//	NewtonUserJointSetRowAcceleration(m_joint, alpha);
-	}
 
 	if (m_hasLimits)
 	{

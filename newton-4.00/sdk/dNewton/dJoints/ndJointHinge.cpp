@@ -68,7 +68,6 @@ void ndJointHinge::SubmitConstraintLimits(ndConstraintDescritor& desc, const dMa
 	if ((m_minLimit > dFloat32 (-1.e-4f)) && (m_maxLimit < dFloat32(1.e-4f)))
 	{
 		AddAngularRowJacobian(desc, &matrix1.m_front[0], -m_jointAngle);
-		//NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 	}
 	else 
 	{
@@ -150,24 +149,11 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	m_jointSpeed = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
 
 	// two rows to restrict rotation around around the parent coordinate system
-	//const dFloat32 angleError = m_maxLimitError;
 	const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	AddAngularRowJacobian(desc, matrix1.m_up, angle0);
-	//if (dAbs(angle0) > angleError) 
-	//{
-	//	dAssert(0);
-	//	//const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle0 / (timestep * timestep);
-	//	//NewtonUserJointSetRowAcceleration(m_joint, alpha);
-	//}
 
 	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
-	//if (dAbs(angle1) > angleError) 
-	//{
-	//	dAssert(0);
-	//	//const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle1 / (timestep * timestep);
-	//	//NewtonUserJointSetRowAcceleration(m_joint, alpha);
-	//}
 
 	if (m_hasLimits)
 	{

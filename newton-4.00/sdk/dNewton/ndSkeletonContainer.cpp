@@ -379,7 +379,6 @@ void ndSkeletonContainer::Init(ndBodyKinematic* const rootBody)
 	m_skeleton->m_body = rootBody;
 	if (rootBody->GetInvMass() != dFloat32(0.0f))
 	{
-		//rootBody->SetSkeleton(this);
 		m_skeleton->m_body->SetSkeleton(this);
 	}
 }
