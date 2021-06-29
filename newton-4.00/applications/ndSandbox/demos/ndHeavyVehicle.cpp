@@ -184,7 +184,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		chassis->SetCentreOfMass(com);
 
 		// 1- add chassis to the vehicle mode 
-		AddChassis(chassis, DEMO_GRAVITY);
+		AddChassis(chassis);
 	}
 
 	~ndHeavyMultiBodyVehicle()

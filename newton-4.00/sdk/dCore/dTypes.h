@@ -22,6 +22,9 @@
 #ifndef __D_TYPES_H__
 #define __D_TYPES_H__
 
+extern int xxxxx;
+#define TEST_SOLVER
+
 #ifdef _MSC_VER 
     #if defined (_M_ARM) || defined (_M_ARM64)
 		#ifndef _ARM_VER

@@ -36,9 +36,6 @@
 #define D_MAX_CONTACT_PENETRATION	  dFloat32 (1.0e-2f)
 #define D_MIN_CONTACT_CLOSE_DISTANCE2 dFloat32 (5.0e-2f * 5.0e-2f)
 
-
-static int xxxxx;
-
 ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& upDir)
 	:ndModel()
 	,m_localFrame(dGetIdentityMatrix())
@@ -64,7 +61,6 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode)
 	,m_chassis(nullptr)
 	,m_tireShape(new ndShapeChamferCylinder(dFloat32(0.75f), dFloat32(0.5f)))
 	,m_tireList()
-	,m_gravityMag(dFloat32(0.0f))
 	,m_suspensionStiffnessModifier(dFloat32(1.0f))
 {
 	m_tireShape->AddRef();
@@ -82,10 +78,9 @@ dFloat32 ndMultiBodyVehicle::GetSpeed() const
 	return speed;
 }
 
-void ndMultiBodyVehicle::AddChassis(ndBodyDynamic* const chassis, dFloat32 gravityMag)
+void ndMultiBodyVehicle::AddChassis(ndBodyDynamic* const chassis)
 {
 	m_chassis = chassis;
-	m_gravityMag = dAbs(gravityMag);
 }
 
 ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(ndWorld* const world, const ndWheelDescriptor& desc, ndBodyDynamic* const tire, ndBodyDynamic* const axleBody)
@@ -217,18 +212,19 @@ void ndMultiBodyVehicle::ApplyAerodynamics()
 	m_suspensionStiffnessModifier = dFloat32(1.0f);
 	if (downForceFactor > dFloat32(0.0f))
 	{
-		const dVector up(m_chassis->GetMatrix().RotateVector(m_localFrame.m_up));
+		//const dVector up(m_chassis->GetMatrix().RotateVector(m_localFrame.m_up));
 		const dVector weight(m_chassis->GetForce());
-		const dVector downForce(up.Scale(-m_gravityMag * downForceFactor * m_chassis->GetMassMatrix().m_w));
+		const dVector downForce(m_downForce.m_gravity.Scale (downForceFactor * m_chassis->GetMassMatrix().m_w));
 		m_chassis->SetForce(weight + downForce);
 		//m_suspensionStiffnessModifier = up.DotProduct(weight).GetScalar() / up.DotProduct(weight + downForce).GetScalar();
-
+		
 		for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 		{
 			ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 			ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
 			const dVector tireWeight(tireBody->GetForce());
-			const dVector tireDownForce(up.Scale(-m_gravityMag * downForceFactor * tireBody->GetMassMatrix().m_w));
+		//	const dVector tireDownForce(up.Scale(-m_gravityMag * downForceFactor * tireBody->GetMassMatrix().m_w));
+			const dVector tireDownForce(m_downForce.m_gravity.Scale(downForceFactor * tireBody->GetMassMatrix().m_w));
 			tireBody->SetForce(tireWeight + tireDownForce);
 		}
 	}
@@ -607,6 +603,7 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 }
 
 ndMultiBodyVehicle::ndDownForce::ndDownForce()
+	:m_gravity(dFloat32(0.0f), dFloat32(-10.0f), dFloat32(0.0f), dFloat32(0.0f))
 {
 	m_downForceTable[0].m_speed = dFloat32(5.0f) * dFloat32(0.27f);
 	//m_downForceTable[0].m_forceFactor = 0.0f;
@@ -655,7 +652,7 @@ void ndMultiBodyVehicle::PostUpdate(ndWorld* const, dFloat32)
 void ndMultiBodyVehicle::Update(ndWorld* const world, dFloat32 timestep)
 {
 xxxxx++;
-if (xxxxx > 1900)
+if (xxxxx > 40)
 xxxxx *= 1;
 
 	ApplyInputs(world, timestep);

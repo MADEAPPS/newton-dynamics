@@ -132,8 +132,13 @@ class ndSkeletonContainer
 	void CalculateLoopMassMatrixCoefficients(dFloat32* const diagDamp);
 	void FactorizeMatrix(dInt32 size, dInt32 stride, dFloat32* const matrix, dFloat32* const diagDamp) const;
 	void SolveAuxiliary(ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
+#ifdef TEST_SOLVER
+	void SolveBlockLcp(dInt32 size, dInt32 blockSize, dFloat32* const x, dFloat32* const b, const dFloat32* const low, const dFloat32* const high, const dInt32* const normalIndex) const;
+	void SolveLcp(dInt32 stride, dInt32 size, const dFloat32* const matrix, dFloat32* const x, const dFloat32* const b, const dFloat32* const low, const dFloat32* const high, const dInt32* const normalIndex) const;
+#else
 	void SolveBlockLcp(dInt32 size, dInt32 blockSize, const dFloat32* const x0, dFloat32* const x, dFloat32* const b, const dFloat32* const low, const dFloat32* const high, const dInt32* const normalIndex) const;
 	void SolveLcp(dInt32 stride, dInt32 size, const dFloat32* const matrix, const dFloat32* const x0, dFloat32* const x, const dFloat32* const b, const dFloat32* const low, const dFloat32* const high, const dInt32* const normalIndex) const;
+#endif
 
 	D_INLINE void SolveBackward(ndForcePair* const force) const;
 	D_INLINE void CalculateForce(ndForcePair* const force, const ndForcePair* const accel) const;

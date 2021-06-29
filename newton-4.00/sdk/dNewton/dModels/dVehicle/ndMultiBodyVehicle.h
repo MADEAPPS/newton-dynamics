@@ -54,7 +54,8 @@ class ndMultiBodyVehicle: public ndModel
 
 		ndDownForce();
 		dFloat32 GetDownforceFactor(dFloat32 speed) const;
-		
+	
+		dVector m_gravity;
 		ndSpeedForcePair m_downForceTable[3];
 	};
 
@@ -69,7 +70,7 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API dFloat32 GetSpeed() const;
 	D_NEWTON_API ndShapeInstance CreateTireShape(dFloat32 radius, dFloat32 width) const;
 
-	D_NEWTON_API void AddChassis(ndBodyDynamic* const chassis, dFloat32 gravityMag);
+	D_NEWTON_API void AddChassis(ndBodyDynamic* const chassis);
 	D_NEWTON_API ndMultiBodyVehicleMotor* AddMotor(ndWorld* const world, dFloat32 mass, dFloat32 radius);
 	D_NEWTON_API ndMultiBodyVehicleTireJoint* AddTire(ndWorld* const world, const ndWheelDescriptor& desc, ndBodyDynamic* const tire);
 	D_NEWTON_API ndMultiBodyVehicleTireJoint* AddAxleTire(ndWorld* const world, const ndWheelDescriptor& desc, ndBodyDynamic* const tire, ndBodyDynamic* const axleBody);
@@ -101,7 +102,6 @@ class ndMultiBodyVehicle: public ndModel
 	dList<ndMultiBodyVehicleTireJoint*> m_tireList;
 	dList<ndMultiBodyVehicleDifferential*> m_differentials;
 	ndDownForce m_downForce;
-	dFloat32 m_gravityMag;
 	dFloat32 m_suspensionStiffnessModifier;
 	
 	friend class ndMultiBodyVehicleMotor;
