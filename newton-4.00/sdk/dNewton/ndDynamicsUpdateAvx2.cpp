@@ -216,7 +216,11 @@
 		}
 
 		D_INLINE ndAvxFloat(const dVector& low, const dVector& high)
-			: m_type(_mm256_set_m128(high.m_type, low.m_type))
+			#ifdef D_SCALAR_VECTOR_CLASS
+			:m_type(_mm256_set_m128(_mm_set_ps(low.m_w, low.m_y, low.m_z, low.m_x), _mm_set_ps(high.m_w, high.m_y, high.m_z, high.m_x)))
+			#else
+			:m_type(_mm256_set_m128(high.m_type, low.m_type))
+			#endif
 		{
 		}
 

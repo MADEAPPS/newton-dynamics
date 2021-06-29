@@ -47,13 +47,24 @@ class dVector
 	D_INLINE dVector (const dVector& v)
 		:m_x(v.m_x), m_y(v.m_y), m_z(v.m_z), m_w(v.m_w)
 	{
-		//dAssert (dCheckVector ((*this)));
 	}
 
 	D_INLINE dVector (const dFloat32* const ptr)
-		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (ptr[3])
+		:m_x(ptr[0])
+		,m_y(ptr[1])
+		,m_z(ptr[2])
+		,m_w(ptr[3])
 	{
 		dAssert (dCheckVector ((*this)));
+	}
+
+	// emulate gather instruction
+	D_INLINE dVector(const dFloat32* const baseAddr, const dInt32* const index)
+		:m_x(baseAddr[index[0]])
+		,m_y(baseAddr[index[1]])
+		,m_z(baseAddr[index[2]])
+		,m_w(baseAddr[index[3]])
+	{
 	}
 
 #ifndef	D_NEWTON_USE_DOUBLE
@@ -454,20 +465,20 @@ class dVector
 		};
 	};
 
-	static dVector m_zero;
-	static dVector m_one;
-	static dVector m_wOne;
-	static dVector m_half;
-	static dVector m_two;
-	static dVector m_three;
-	static dVector m_negOne;
-	static dVector m_xMask;
-	static dVector m_yMask;
-	static dVector m_zMask;
-	static dVector m_wMask;
-	static dVector m_epsilon;
-	static dVector m_signMask;
-	static dVector m_triplexMask;
+	D_CORE_API static dVector m_zero;
+	D_CORE_API static dVector m_one;
+	D_CORE_API static dVector m_wOne;
+	D_CORE_API static dVector m_half;
+	D_CORE_API static dVector m_two;
+	D_CORE_API static dVector m_three;
+	D_CORE_API static dVector m_negOne;
+	D_CORE_API static dVector m_xMask;
+	D_CORE_API static dVector m_yMask;
+	D_CORE_API static dVector m_zMask;
+	D_CORE_API static dVector m_wMask;
+	D_CORE_API static dVector m_epsilon;
+	D_CORE_API static dVector m_signMask;
+	D_CORE_API static dVector m_triplexMask;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #endif

@@ -22,7 +22,7 @@
 #ifndef __D_VECTOR_X86_SIMD_H__
 #define __D_VECTOR_X86_SIMD_H__
 
-#ifndef DG_SCALAR_VECTOR_CLASS
+#ifndef D_SCALAR_VECTOR_CLASS
 
 #ifdef D_NEWTON_USE_DOUBLE
 	#define dVector dBigVector
