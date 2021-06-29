@@ -19,7 +19,7 @@
 #define D_ENABLE_CAMERA_REPLAY
 
 #ifdef D_ENABLE_CAMERA_REPLAY
-	#define D_RECORD_CAMERA
+	//#define D_RECORD_CAMERA
 #endif
 
 class ndDemoCameraPickBodyJoint: public ndJointKinematicController

@@ -36,6 +36,9 @@
 #define D_MAX_CONTACT_PENETRATION	  dFloat32 (1.0e-2f)
 #define D_MIN_CONTACT_CLOSE_DISTANCE2 dFloat32 (5.0e-2f * 5.0e-2f)
 
+
+static int xxxxx;
+
 ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& upDir)
 	:ndModel()
 	,m_localFrame(dGetIdentityMatrix())
@@ -651,6 +654,10 @@ void ndMultiBodyVehicle::PostUpdate(ndWorld* const, dFloat32)
 
 void ndMultiBodyVehicle::Update(ndWorld* const world, dFloat32 timestep)
 {
+xxxxx++;
+if (xxxxx > 1900)
+xxxxx *= 1;
+
 	ApplyInputs(world, timestep);
 
 	// Apply Vehicle Dynamics controls
