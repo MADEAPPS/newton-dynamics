@@ -226,6 +226,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			m_gearMap[i] = i + 2;
 		}
 		m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1;
+return;
 
 		// add the slip differential
 		ndMultiBodyVehicleDifferential* differential = nullptr;
@@ -584,7 +585,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, viperDesc, matrix);
 	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
-	vehicle->SetAsPlayer(scene);
+	//vehicle->SetAsPlayer(scene);
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
 	//matrix.m_posit.m_x += 8.0f;
