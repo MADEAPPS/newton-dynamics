@@ -574,9 +574,15 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
 
-	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
+	//dVector location(0.0f, 2.0f, 0.0f, 1.0f);
+	//
+	//dMatrix matrix(dGetIdentityMatrix());
+	//matrix.m_posit = location;
 
+	dVector location(0.0f, 1.75f, 0.0f, 1.0f);
 	dMatrix matrix(dGetIdentityMatrix());
+	matrix = dYawMatrix(180.0f * dDegreeToRad);
+	matrix = matrix * dRollMatrix(-70.0f * dDegreeToRad);
 	matrix.m_posit = location;
 
 	// add a model for general controls

@@ -112,7 +112,8 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	SetMassSpringDamperAcceleration(desc, m_regularizer, m_info.m_springK, m_info.m_damperC);
 
 m_normalizedBrake = 1.0f;
-	const dFloat32 brakeFrictionTorque = dMax(m_normalizedBrake * m_info.m_brakeTorque, m_normalizedHandBrake * m_info.m_handBrakeTorque);
+//	const dFloat32 brakeFrictionTorque = dMax(m_normalizedBrake * m_info.m_brakeTorque, m_normalizedHandBrake * m_info.m_handBrakeTorque);
+dFloat32 brakeFrictionTorque = 5000000.0f;
 	if (brakeFrictionTorque > dFloat32(0.0f))
 	{
 		const dFloat32 brakesToChassisInfluence = dFloat32 (0.25f);
