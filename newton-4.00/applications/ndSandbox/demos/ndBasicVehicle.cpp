@@ -64,7 +64,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
-		m_frontTire.m_mass = 50.0f;
+		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_steeringAngle = 35.0f * dDegreeToRad;
 		m_frontTire.m_springK = 500.0f;
 		m_frontTire.m_damperC = 50.0f;
@@ -77,7 +77,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_frontTire.m_laterialStiffness  = 1.0f / 1000.0f;
 		m_frontTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 
-		m_rearTire.m_mass = 50.0f;
+		m_rearTire.m_mass = 100.0f;
 		m_rearTire.m_steeringAngle = 0.0f;
 		m_rearTire.m_springK = 500.0f;
 		m_rearTire.m_damperC = 50.0f;
@@ -92,7 +92,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 
 #if 1
 // Dave check here
-m_comDisplacement.m_y = -1.25f;
+//m_comDisplacement.m_y = -2.0f;
+m_comDisplacement.m_y = -0.55f;
 m_frontTire.m_verticalOffset = -1.0f;
 m_rearTire.m_verticalOffset = -1.0f;
 #endif

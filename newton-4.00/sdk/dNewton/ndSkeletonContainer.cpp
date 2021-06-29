@@ -882,7 +882,6 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 		const dInt32 m1 = joint->GetBody1()->m_index;
 		const dInt32 primaryDof = node->m_dof;
 		const dInt32 first = joint->m_rowStart;
-
 		for (dInt32 j = 0; j < primaryDof; j++) 
 		{
 			const dInt32 index = node->m_sourceJacobianIndex[j];
