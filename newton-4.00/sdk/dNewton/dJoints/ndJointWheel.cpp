@@ -132,8 +132,8 @@ m_normalizedBrake = 1.0f;
 
 		SetMotorAcceleration(desc, -wRel * desc.m_invTimestep);
 
-		//SetHighFriction(desc, brakeFrictionTorque);
-		//SetLowerFriction(desc, -brakeFrictionTorque);
+		SetHighFriction(desc, brakeFrictionTorque);
+		SetLowerFriction(desc, -brakeFrictionTorque);
 	}
 	else
 	{ 
