@@ -1557,6 +1557,12 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			//const dInt32 activejointCount = me->m_activeJointCount;
 			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
 
+			static int xxx;
+			if (xxx >= 12)
+				xxx *= 1;
+			xxx++;
+
+
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
 			m_outputForces = &me->m_internalForces[bodyCount * (threadIndex + 1)];
