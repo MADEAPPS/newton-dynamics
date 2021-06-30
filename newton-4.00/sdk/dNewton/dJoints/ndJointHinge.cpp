@@ -13,15 +13,22 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointHinge.h"
 
+#define D_PENETRATION_LIMIT			 dFloat32 (10.0f * dDegreeToRad) 
+#define D_PENETRATION_RECOVERY_SPEED dFloat32 (0.1f) 
+
+
 ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
+	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	,m_jointAngle(dFloat32(0.0f))
 	,m_jointSpeed(dFloat32(0.0f))
+	,m_springK(dFloat32(0.0f))
+	,m_damperC(dFloat32(0.0f))
 	,m_minLimit(dFloat32(0.0f))
 	,m_maxLimit(dFloat32(0.0f))
 	,m_friction(dFloat32(0.0f))
+	,m_springDamperRegularizer(dFloat32(0.1f))
 	,m_hasLimits(false)
-	,m_limitReached(false)
+	,m_isSpringDamper(false)
 {
 }
 
@@ -49,7 +56,7 @@ void ndJointHinge::EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimit
 
 	// adding one extra dof, this makes the mass matrix ill conditioned, 
 	// but it could work with the direct solver
-	m_maxDof = (m_hasLimits) ? 7 : 6;
+	m_maxDof = (m_isSpringDamper && m_hasLimits) ? 7 : 6;
 }
 
 void ndJointHinge::SetFriction(dFloat32 frictionTorque)
@@ -62,70 +69,80 @@ dFloat32 ndJointHinge::GetFriction() const
 	return m_friction;
 }
 
+void ndJointHinge::SetAsSpringDamper(bool state, dFloat32 regularizer, dFloat32 spring, dFloat32 damper)
+{
+	m_springK = dAbs(spring);
+	m_damperC = dAbs(damper);
+	m_springDamperRegularizer = dClamp(regularizer, dFloat32(1.0e-2f), dFloat32(0.99f));
+	m_isSpringDamper = state;
+
+	// adding one extra dof, this makes the mass matrix ill conditioned, 
+	// but it could work with the direct solver
+	m_maxDof = (m_isSpringDamper && m_hasLimits) ? 7 : 6;
+}
+
 void ndJointHinge::SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
 {
-	m_limitReached = true;
 	if ((m_minLimit > dFloat32 (-1.e-4f)) && (m_maxLimit < dFloat32(1.e-4f)))
 	{
 		AddAngularRowJacobian(desc, &matrix1.m_front[0], -m_jointAngle);
 	}
 	else 
 	{
-		//dFloat32 restoringOmega = 0.25f;
-		const dFloat32 step = dMax(dAbs(m_jointSpeed * desc.m_timestep), dFloat32(3.0f * dDegreeToRad));
-		const dFloat32 angle = m_jointAngle;
-		if (angle <= m_minLimit) 
-		{
-			dAssert(0);
-		//	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-		//	const dFloat32 invtimestep = 1.0f / timestep;
-		//	const dFloat32 error0 = angle - m_minLimit;
-		//	const dFloat32 error1 = error0 + restoringOmega * timestep;
-		//	if (error1 > 0.0f) {
-		//		restoringOmega = -error0 * invtimestep;
-		//	}
-		//	const dFloat32 stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + restoringOmega * invtimestep;
-		//	NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-		//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		//	NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
-		}
-		else if (angle >= m_maxLimit) 
-		{
-			dAssert(0);
-		//	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-		//	const dFloat32 invtimestep = 1.0f / timestep;
-		//	const dFloat32 error0 = angle - m_maxLimit;
-		//	const dFloat32 error1 = error0 - restoringOmega * timestep;
-		//	if (error1 < 0.0f) {
-		//		restoringOmega = error0 * invtimestep;
-		//	}
-		//	const dFloat32 stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) - restoringOmega / timestep;
-		//	NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-		//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		//	NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
-		}
-		else if ((angle - step) <= m_minLimit) 
+		const dFloat32 angle = m_jointAngle + m_jointSpeed * desc.m_timestep;
+		if (angle < m_minLimit)
 		{
 			AddAngularRowJacobian(desc, &matrix0.m_front[0], dFloat32(0.0f));
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-			SetMotorAcceleration(desc, stopAccel);
+			const dFloat32 penetration = angle - m_minLimit;
+			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetLowerFriction(desc, -m_friction);
 		}
-		else if ((angle + step) >= m_maxLimit) 
+		else if (angle > m_maxLimit)
 		{
-			AddAngularRowJacobian(desc, &matrix0.m_front[0], dFloat32 (0.0f));
+			AddAngularRowJacobian(desc, &matrix0.m_front[0], dFloat32(0.0f));
+			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const dFloat32 penetration = angle - m_maxLimit;
+			const dFloat32 recoveringAceel = desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			SetHighFriction(desc, m_friction);
+		}
+		else if (m_friction > dFloat32(0.0f))
+		{
+			AddAngularRowJacobian(desc, matrix0.m_front, dFloat32(0.0f));
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			SetMotorAcceleration(desc, stopAccel);
-			SetHighFriction(desc, m_friction);
-		}
-		else if (m_friction != 0.0f) 
-		{
-			m_limitReached = false;
-			AddAngularRowJacobian(desc, &matrix0.m_front[0], dFloat32(0.0f));
-			SetMotorAcceleration(desc, -m_jointSpeed * desc.m_invTimestep);
 			SetLowerFriction(desc, -m_friction);
 			SetHighFriction(desc, m_friction);
 		}
+	}
+}
+
+void ndJointHinge::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& )
+{
+	// add spring damper row
+	AddAngularRowJacobian(desc, matrix0.m_front, -m_jointAngle);
+	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
+
+	const dFloat32 angle = m_jointAngle + m_jointSpeed * desc.m_timestep;
+	if (angle < m_minLimit)
+	{
+		AddAngularRowJacobian(desc, &matrix0.m_front[0], dFloat32(0.0f));
+		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		const dFloat32 penetration = angle - m_minLimit;
+		const dFloat32 recoveringAceel = -desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+		SetLowerFriction(desc, -m_friction);
+	}
+	else if (angle > m_maxLimit)
+	{
+		AddAngularRowJacobian(desc, &matrix0.m_front[0], dFloat32(0.0f));
+		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		const dFloat32 penetration = angle - m_maxLimit;
+		const dFloat32 recoveringAceel = desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+		SetHighFriction(desc, m_friction);
 	}
 }
 
@@ -157,12 +174,29 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 
 	if (m_hasLimits)
 	{
-		SubmitConstraintLimits(desc, matrix0, matrix1);
+		//SubmitConstraintLimits(desc, matrix0, matrix1);
+
+		if (m_isSpringDamper)
+		{
+			// spring damper with limits
+			SubmitConstraintLimitSpringDamper(desc, matrix0, matrix1);
+		}
+		else
+		{
+			// only hard limits
+			SubmitConstraintLimits(desc, matrix0, matrix1);
+		}
 	}
-	else if (m_friction != dFloat32 (0.0f)) 
+	else if (m_isSpringDamper)
 	{
-		AddAngularRowJacobian(desc, &matrix0.m_front[0], dFloat32(0.0f));
-		SetMotorAcceleration(desc, -m_jointSpeed * desc.m_invTimestep);
+		AddAngularRowJacobian(desc, matrix0.m_front, -m_jointAngle);
+		SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
+	}
+	else
+	{
+		AddAngularRowJacobian(desc, matrix0.m_front, dFloat32(0.0f));
+		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		SetMotorAcceleration(desc, stopAccel);
 		SetLowerFriction(desc, -m_friction);
 		SetHighFriction(desc, m_friction);
 	}

@@ -24,23 +24,31 @@ class ndJointHinge: public ndJointBilateralConstraint
 
 	D_NEWTON_API dFloat32 GetAngle() const;
 	D_NEWTON_API dFloat32 GetOmega() const;
-
 	D_NEWTON_API dFloat32 GetFriction() const;
+
 	D_NEWTON_API void SetFriction(dFloat32 frictionTorque);
 	D_NEWTON_API void EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimit);
+	D_NEWTON_API void SetAsSpringDamper(bool state, dFloat32 regularizer, dFloat32 spring, dFloat32 damper);
 
+	private:
+	void SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
+	void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
+	
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
+
 
 	dFloat32 m_jointAngle;
-	//dAngleArithmetic m_jointAngle;
 	dFloat32 m_jointSpeed;
+	dFloat32 m_springK;
+	dFloat32 m_damperC;
 	dFloat32 m_minLimit;
 	dFloat32 m_maxLimit;
 	dFloat32 m_friction;
+	dFloat32 m_springDamperRegularizer;
+
 	bool m_hasLimits;
-	bool m_limitReached;
+	bool m_isSpringDamper;
 };
 
 #endif 

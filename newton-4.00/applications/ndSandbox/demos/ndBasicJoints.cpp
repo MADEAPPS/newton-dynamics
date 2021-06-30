@@ -158,8 +158,9 @@ static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin,
 	ndJointSlider* const joint = new ndJointSlider(matrix, body, fixBody);
 
 	dFloat32 regularizer = diameter > 0.5f ? 0.9f : 0.1f;
-	joint->SetAsSpringDamper(true, regularizer, 500.0f, 0.05f);
+	joint->SetAsSpringDamper(true, regularizer, 100.0f, 0.05f);
 	joint->EnableLimits(true, -1.0f, 1.0f);
+	joint->SetFriction(50.0f);
 	world->AddJoint(joint);
 
 	mesh->Release();
@@ -185,9 +186,9 @@ static void BuildHinge(ndDemoEntityManager* const scene, const dVector& origin, 
 	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 
 	ndJointHinge* const joint = new ndJointHinge(matrix, body, fixBody);
-	//joint->SetAsSpringDamper(true, 500.0f, 5.0f);
-	//joint->SetFriction(mass * 10.0f * 2.0f);
-	//joint->EnableLimits(true, -1.0f, 1.0f);
+	//joint->SetAsSpringDamper(true, 0.1f, 500.0f, 5.0f);
+	joint->SetFriction(2.0f);
+	joint->EnableLimits(true, -10.0f, 15.0f);
 	world->AddJoint(joint);
 
 	mesh->Release();
@@ -344,11 +345,11 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 
 	//BuildBallSocket(scene, dVector(0.0f, 0.0f, 1.0f, 0.0f));
 	//BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	//BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 0.5f);
+	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 0.5f);
 	//BuildRollingFriction(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
-	//BuildSlider(scene, dVector(0.0f, 0.0f, 2.5f, 1.0f), 10.0f, 0.5f);
+	BuildSlider(scene, dVector(0.0f, 0.0f, 2.5f, 1.0f), 10.0f, 0.5f);
 	BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
-	//AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
+	AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	dQuaternion rot;
 	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);

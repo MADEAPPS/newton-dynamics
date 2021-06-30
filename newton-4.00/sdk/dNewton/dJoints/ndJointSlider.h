@@ -23,6 +23,10 @@ class ndJointSlider: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointSlider();
 
+	D_NEWTON_API dFloat32 GetSpeed() const;
+	D_NEWTON_API dFloat32 GetPosit() const;
+	D_NEWTON_API dFloat32 GetFriction() const;
+
 	D_NEWTON_API void SetFriction(dFloat32 friction);
 	D_NEWTON_API void EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimit);
 	D_NEWTON_API void SetAsSpringDamper(bool state, dFloat32 regularizer, dFloat32 spring, dFloat32 damper);
@@ -44,7 +48,7 @@ class ndJointSlider: public ndJointBilateralConstraint
 	dFloat32 m_springDamperRegularizer;
 
 	bool m_hasLimits;
-	bool m_isStringDamper;
+	bool m_isSpringDamper;
 };
 
 #endif 
