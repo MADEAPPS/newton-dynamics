@@ -661,6 +661,6 @@ xxxxx *= 1;
 	// no implemented yet
 
 	// apply down force
-	ApplyAerodynamics();
+	//ApplyAerodynamics();
 	ApplyTiremodel();
 }
