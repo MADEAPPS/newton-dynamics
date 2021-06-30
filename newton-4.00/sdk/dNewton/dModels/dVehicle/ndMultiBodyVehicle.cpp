@@ -430,7 +430,7 @@ void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const
 	const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
 	const dFloat32 lateralFrictionCoefficient = frictionCoefficient * cz / gamma;
 	const dFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
-	//dTrace(("%f %f\n", sideSpeed, lateralFrictionCoefficient));
+dTrace(("(%d %f %f) ", tireBody->GetId(), lateralFrictionCoefficient, longitudinalFrictionCoefficient));
 
 	contactPoint.m_material.m_restitution = dFloat32(0.1f);
 	contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
@@ -599,6 +599,8 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 			}
 		}
 	}
+
+	dTrace(("\n"));
 }
 
 ndMultiBodyVehicle::ndDownForce::ndDownForce()
