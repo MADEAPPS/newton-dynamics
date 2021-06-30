@@ -14,7 +14,7 @@
 #include "ndJointWheel.h"
 
 ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info)
-	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
+	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	,m_baseFrame(m_localMatrix1)
 	,m_info(info)
 	,m_posit(dFloat32 (0.0f))
@@ -131,29 +131,24 @@ dFloat32 brakeFrictionTorque = 10000000.0f;
 		dFloat32 wRel = (w0 + w1) * dFloat32 (0.35f);
 
 		SetMotorAcceleration(desc, -wRel * desc.m_invTimestep);
-#if 1
 		SetHighFriction(desc, brakeFrictionTorque);
 		SetLowerFriction(desc, -brakeFrictionTorque);
-#endif
 	}
-	else
-	{ 
-		// add suspension limits alone the vertical axis 
-		const dFloat32 x = m_posit + m_speed * desc.m_timestep;
-		if (x < m_info.m_minLimit)
-		{
-			AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
-			SetLowerFriction(desc, dFloat32(0.0f));
-			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-			SetMotorAcceleration(desc, stopAccel);
-		}
-		else if (x > m_info.m_maxLimit)
-		{
-			AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
-			SetHighFriction(desc, dFloat32(0.0f));
-			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-			SetMotorAcceleration(desc, stopAccel);
-		}
-	}
-	dAssert(desc.m_rowsCount <= 6);
+
+	// add suspension limits alone the vertical axis 
+	//const dFloat32 x = m_posit + m_speed * desc.m_timestep;
+	//if (x < m_info.m_minLimit)
+	//{
+	//	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
+	//	const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+	//	SetMotorAcceleration(desc, stopAccel);
+	//	SetLowerFriction(desc, dFloat32(0.0f));
+	//}
+	//else if (x > m_info.m_maxLimit)
+	//{
+	//	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
+	//	const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+	//	SetMotorAcceleration(desc, stopAccel);
+	//	SetHighFriction(desc, dFloat32(0.0f));
+	//}
 }
