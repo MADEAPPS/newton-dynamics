@@ -55,7 +55,6 @@ class ndMultiBodyVehicle: public ndModel
 		ndDownForce();
 		dFloat32 GetDownforceFactor(dFloat32 speed) const;
 	
-		//dVector m_gravity;
 		dFloat32 m_gravity;
 		ndSpeedForcePair m_downForceTable[3];
 	};

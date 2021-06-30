@@ -214,7 +214,7 @@ void ndMultiBodyVehicle::ApplyAerodynamics()
 	{
 		const dVector up(m_chassis->GetMatrix().RotateVector(m_localFrame.m_up));
 		const dVector weight(m_chassis->GetForce());
-		const dVector downForce(up.Scale (m_downForce.m_gravity * m_chassis->GetMassMatrix().m_w));
+		const dVector downForce(up.Scale(m_downForce.m_gravity * downForceFactor * m_chassis->GetMassMatrix().m_w));
 		m_chassis->SetForce(weight + downForce);
 		//m_suspensionStiffnessModifier = up.DotProduct(weight).GetScalar() / up.DotProduct(weight + downForce).GetScalar();
 		
@@ -224,7 +224,6 @@ void ndMultiBodyVehicle::ApplyAerodynamics()
 			ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
 			const dVector tireWeight(tireBody->GetForce());
 			const dVector tireDownForce(up.Scale(m_downForce.m_gravity * downForceFactor * tireBody->GetMassMatrix().m_w));
-			//const dVector tireDownForce(m_downForce.m_gravity.Scale(downForceFactor * tireBody->GetMassMatrix().m_w));
 			tireBody->SetForce(tireWeight + tireDownForce);
 		}
 	}
@@ -651,10 +650,6 @@ void ndMultiBodyVehicle::PostUpdate(ndWorld* const, dFloat32)
 
 void ndMultiBodyVehicle::Update(ndWorld* const world, dFloat32 timestep)
 {
-xxxxx++;
-if (xxxxx > 40)
-xxxxx *= 1;
-
 	ApplyInputs(world, timestep);
 
 	// Apply Vehicle Dynamics controls

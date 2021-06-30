@@ -21,5 +21,3 @@
 
 #include "dCoreStdafx.h"
 #include "dTypes.h"
-
-int xxxxx;
