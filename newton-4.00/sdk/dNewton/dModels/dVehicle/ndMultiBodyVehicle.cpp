@@ -405,80 +405,89 @@ void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const
 	dAssert((tireBody == contactPoint.m_body0) || (tireBody == contactPoint.m_body1));
 
 	const dVector tireVeloc(tireBody->GetVelocity());
-	const dVector contactVeloc0(tireBody->GetVelocityAtPoint(contactPoint.m_point));
-	const dVector contactVeloc1(otherBody->GetVelocityAtPoint(contactPoint.m_point));
-	const dVector relVeloc(contactVeloc0 - contactVeloc1);
+#if 0
+	const dFloat32 tireSpeed = dAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
+	if (dAbs(tireSpeed) > dFloat32(0.44f))
+#else
+	const dFloat32 tireSpeed = dMax(dAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar()), dFloat32(0.1f));
+#endif
+	{
+		// apply brush tire model only when center travels faster that 10 miles per hours
+		const dVector contactVeloc0(tireBody->GetVelocityAtPoint(contactPoint.m_point) - tireBody->GetVelocity() + tireVeloc);
+		const dVector contactVeloc1(otherBody->GetVelocityAtPoint(contactPoint.m_point));
+		const dVector relVeloc(contactVeloc0 - contactVeloc1);
 
-	const dFloat32 relSpeed = dAbs (relVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
-	const dFloat32 tireSpeed = dMax (dAbs (tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar()), dFloat32 (0.1f));
-	const dFloat32 longitudialSlip = relSpeed / tireSpeed;
+		const dFloat32 relSpeed = dAbs(relVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
+		const dFloat32 longitudialSlip = relSpeed / tireSpeed;
 
 #if 1
-	// calculate side slip ratio
-	const dFloat32 sideSpeed = dAbs(relVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
-	const dFloat32 lateralSlip = sideSpeed / (relSpeed + dFloat32(0.01f));
+		// calculate side slip ratio
+		const dFloat32 sideSpeed = dAbs(relVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
+		const dFloat32 lateralSlip = sideSpeed / (relSpeed + dFloat32(0.01f));
 
-	const dFloat32 den = dFloat32(1.0f) / (dFloat32(1.0f) + longitudialSlip);
-	const dFloat32 v = lateralSlip * den;
-	const dFloat32 u = longitudialSlip * den;
+		const dFloat32 den = dFloat32(1.0f) / (dFloat32(1.0f) + longitudialSlip);
+		const dFloat32 v = lateralSlip * den;
+		const dFloat32 u = longitudialSlip * den;
 
-	const ndWheelDescriptor& info = tire->GetInfo();
-	const dFloat32 cz = info.m_laterialStiffness  * v;
-	const dFloat32 cx = info.m_longitudinalStiffness  * u;
-	const dFloat32 gamma = dSqrt(cx * cx + cz * cz) + dFloat32(1.0e-3f);
+		const ndWheelDescriptor& info = tire->GetInfo();
+		const dFloat32 cz = info.m_laterialStiffness  * v;
+		const dFloat32 cx = info.m_longitudinalStiffness  * u;
+		const dFloat32 gamma = dSqrt(cx * cx + cz * cz) + dFloat32(1.0e-3f);
 
-	const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
-	const dFloat32 lateralFrictionCoefficient = frictionCoefficient * cz / gamma;
-	const dFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
-dTrace(("(%d %f %f) ", tireBody->GetId(), lateralFrictionCoefficient, longitudinalFrictionCoefficient));
+		const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
+		const dFloat32 lateralFrictionCoefficient = frictionCoefficient * cz / gamma;
+		const dFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
+		dTrace(("(%d %f %f) ", tireBody->GetId(), lateralFrictionCoefficient, longitudinalFrictionCoefficient));
 
-	contactPoint.m_material.m_restitution = dFloat32(0.1f);
-	contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
-	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
-	contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
-	contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
+		contactPoint.m_material.m_restitution = dFloat32(0.1f);
+		contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
+		contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
+		contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
+		contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
 
 #else
-	//dTrace(("(%d %f) ", tireBody->GetId(), contactPoint.m_normal_Force.m_force));
+		//dTrace(("(%d %f) ", tireBody->GetId(), contactPoint.m_normal_Force.m_force));
 
-	const dFloat32 longitudialSlip = relSpeed / tireSpeed;
-	
-	// calculate side slip ratio
-	const dFloat32 sideSpeed = dAbs(relVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
-	const dFloat32 lateralSlip = sideSpeed / (relSpeed + dFloat32 (0.01f));
-	
-	//const dFloat32 lateralKinetiFrictionFactor = lateralSlip >= dFloat32(1.0f) ? dFloat32(0.6f) : dFloat32(1.0f);
-	//const dFloat32 longitudinalKinetiFrictionFactor = longitudialSlip >= dFloat32 (1.0f) ? dFloat32(0.6f) : dFloat32(1.0f);
-	const dFloat32 lateralKinetiFrictionFactor = dFloat32(1.0f);
-	const dFloat32 longitudinalKinetiFrictionFactor = dFloat32(1.0f);
-	
-	//if (lateralSlip > 10.0f)
-	//dTrace(("(id=%d longSlip(%f) sizegSlip(%f)\n", tireBody->GetId(), longitudialSlip, lateralSlip));
-	
-	const dFloat32 den = dFloat32(1.0f) / (dFloat32(1.0f) + longitudialSlip);
-	const dFloat32 v = lateralSlip * den;
-	const dFloat32 u = longitudialSlip * den;
-	
-	const ndWheelDescriptor& info = tire->GetInfo();
-	const dFloat32 cz = info.m_laterialStiffness  * v;
-	const dFloat32 cx = info.m_longitudinalStiffness  * u;
-	const dFloat32 gamma = dSqrt(cx * cx + cz * cz) + dFloat32 (1.0e-3f);
-	
-	const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
-	const dFloat32 lateralFrictionCoefficient = frictionCoefficient * cz / gamma;
-	const dFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
-	
-	//dTrace(("(id=%d longSlip(%f) sizegSlip(%f)\n", tireBody->GetId(), longitudinalFrictionCoefficient, lateralFrictionCoefficient));
-	
-	contactPoint.m_material.m_restitution = dFloat32 (0.1f);
-	contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
-	contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
-	
-	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient * lateralKinetiFrictionFactor;
-	contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient * longitudinalKinetiFrictionFactor;
-	
-	//dTrace(("(%d %f) ", tireBody->GetId(), contactPoint.m_normal_Force.m_force));
+		const dFloat32 longitudialSlip = relSpeed / tireSpeed;
+
+		// calculate side slip ratio
+		const dFloat32 sideSpeed = dAbs(relVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
+		const dFloat32 lateralSlip = sideSpeed / (relSpeed + dFloat32(0.01f));
+
+		//const dFloat32 lateralKinetiFrictionFactor = lateralSlip >= dFloat32(1.0f) ? dFloat32(0.6f) : dFloat32(1.0f);
+		//const dFloat32 longitudinalKinetiFrictionFactor = longitudialSlip >= dFloat32 (1.0f) ? dFloat32(0.6f) : dFloat32(1.0f);
+		const dFloat32 lateralKinetiFrictionFactor = dFloat32(1.0f);
+		const dFloat32 longitudinalKinetiFrictionFactor = dFloat32(1.0f);
+
+		//if (lateralSlip > 10.0f)
+		//dTrace(("(id=%d longSlip(%f) sizegSlip(%f)\n", tireBody->GetId(), longitudialSlip, lateralSlip));
+
+		const dFloat32 den = dFloat32(1.0f) / (dFloat32(1.0f) + longitudialSlip);
+		const dFloat32 v = lateralSlip * den;
+		const dFloat32 u = longitudialSlip * den;
+
+		const ndWheelDescriptor& info = tire->GetInfo();
+		const dFloat32 cz = info.m_laterialStiffness  * v;
+		const dFloat32 cx = info.m_longitudinalStiffness  * u;
+		const dFloat32 gamma = dSqrt(cx * cx + cz * cz) + dFloat32(1.0e-3f);
+
+		const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
+		const dFloat32 lateralFrictionCoefficient = frictionCoefficient * cz / gamma;
+		const dFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
+
+		//dTrace(("(id=%d longSlip(%f) sizegSlip(%f)\n", tireBody->GetId(), longitudinalFrictionCoefficient, lateralFrictionCoefficient));
+
+		contactPoint.m_material.m_restitution = dFloat32(0.1f);
+		contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
+		contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
+
+		contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient * lateralKinetiFrictionFactor;
+		contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient * longitudinalKinetiFrictionFactor;
+
+		//dTrace(("(%d %f) ", tireBody->GetId(), contactPoint.m_normal_Force.m_force));
+
 #endif
+	}
 }
 
 void ndMultiBodyVehicle::ApplyTiremodel()
@@ -587,10 +596,12 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 				for (ndContactPointList::dNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 				{
 					ndContactMaterial& contactPoint = contactNode->GetInfo();
-					const dVector fronDir(contactPoint.m_normal.CrossProduct(tireMatrix.m_front));
-
-					if (fronDir.DotProduct(fronDir).GetScalar() > dFloat32(1.0e-3f))
+					dFloat32 contactPathLocation = dAbs (contactPoint.m_normal.DotProduct(tireMatrix.m_front).GetScalar());
+					if (contactPathLocation < dFloat32 (0.71f))
 					{
+						// contact are consider on the contact patch only if the are less than 
+						// 45 degree angle from the tire axle
+						const dVector fronDir(contactPoint.m_normal.CrossProduct(tireMatrix.m_front));
 						contactPoint.m_dir1 = fronDir.Normalize();
 						contactPoint.m_dir0 = contactPoint.m_dir1.CrossProduct(contactPoint.m_normal);
 						BrushTireModel(tire, contactPoint);

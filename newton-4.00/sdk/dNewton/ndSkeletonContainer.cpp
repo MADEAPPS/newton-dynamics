@@ -1126,6 +1126,7 @@ D_INLINE void ndSkeletonContainer::UpdateForces(ndJacobian* const internalForces
 	}
 }
 
+/*
 void ndSkeletonContainer::SolveLcp0(dInt32 stride, dInt32 size, const dFloat32* const matrix, const dFloat32* const x0, dFloat32* const x, const dFloat32* const b, const dFloat32* const low, const dFloat32* const high, const dInt32* const normalIndex) const
 {
 	D_TRACKTIME();
@@ -1215,8 +1216,9 @@ void ndSkeletonContainer::SolveLcp0(dInt32 stride, dInt32 size, const dFloat32* 
 		}
 	}
 }
+*/
 
-void ndSkeletonContainer::SolveLcp1(dInt32 stride, dInt32 size, const dFloat32* const matrix, const dFloat32* const x0, dFloat32* const x, const dFloat32* const b, const dFloat32* const low, const dFloat32* const high, const dInt32* const normalIndex) const
+void ndSkeletonContainer::SolveLcp(dInt32 stride, dInt32 size, const dFloat32* const matrix, const dFloat32* const x0, dFloat32* const x, const dFloat32* const b, const dFloat32* const low, const dFloat32* const high, const dInt32* const normalIndex) const
 {
 	D_TRACKTIME();
 	const dFloat32 sor = dFloat32(1.125f);
@@ -1270,27 +1272,11 @@ void ndSkeletonContainer::SolveLcp1(dInt32 stride, dInt32 size, const dFloat32* 
 			const dFloat32 h = high[i] * coefficient - x0[i];
 
 			const dFloat32* const row = &matrix[base];
-#if 0
-			dFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
-			if (f > h)
-			{
-				f = h;
-			}
-			else if (f < l)
-			{
-				f = l;
-			}
-			else
-			{
-				tolerance += r * r;
-			}
-			const dFloat32 dx = f - x[i];
-#else
 			const dFloat32 f = dClamp(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, l, h);
 			const dFloat32 dx = f - x[i];
 			const dFloat32 dr = dx * row[i];
 			tolerance += dr * dr;
-#endif
+
 			x[i] = f;
 			if (dAbs(dx) > dFloat32(1.0e-6f))
 			{
@@ -1302,21 +1288,6 @@ void ndSkeletonContainer::SolveLcp1(dInt32 stride, dInt32 size, const dFloat32* 
 			base += stride;
 		}
 	}
-}
-
-void ndSkeletonContainer::SolveLcp(dInt32 stride, dInt32 size, const dFloat32* const matrix, const dFloat32* const x0, dFloat32* const x, const dFloat32* const b, const dFloat32* const low, const dFloat32* const high, const dInt32* const normalIndex) const
-{
-	//dFloat32* const u = dAlloca(dFloat32, size + 1);
-	//u[size] = dFloat32(1.0f);
-	//SolveLcp0(stride, size, matrix, x0, u, b, low, high, normalIndex);
-
-	SolveLcp1(stride, size, matrix, x0, x, b, low, high, normalIndex);
-
-	//for (dInt32 i = 0; i < size; i++)
-	//{
-	//	dFloat32 err(u[i] - x[i]);
-	//	dAssert(dAbs(err) < dFloat32 (1.0e-5f));
-	//}
 }
 
 void ndSkeletonContainer::SolveBlockLcp(dInt32 size, dInt32 blockSize, const dFloat32* const x0, dFloat32* const x, dFloat32* const b, const dFloat32* const low, const dFloat32* const high, const dInt32* const normalIndex) const
