@@ -344,7 +344,7 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene);
 
 	//BuildBallSocket(scene, dVector(0.0f, 0.0f, 1.0f, 0.0f));
-	//BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
 	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 0.5f);
 	//BuildRollingFriction(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
 	BuildSlider(scene, dVector(0.0f, 0.0f, 2.5f, 1.0f), 10.0f, 0.5f);
