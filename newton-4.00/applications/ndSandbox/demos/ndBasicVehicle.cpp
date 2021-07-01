@@ -227,7 +227,6 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			m_gearMap[i] = i + 2;
 		}
 		m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1;
-return;
 
 		// add the slip differential
 		ndMultiBodyVehicleDifferential* differential = nullptr;
@@ -574,16 +573,16 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
 
-	//dVector location(0.0f, 2.0f, 0.0f, 1.0f);
-	//
-	//dMatrix matrix(dGetIdentityMatrix());
-	//matrix.m_posit = location;
-
-	dVector location(0.0f, 1.75f, 0.0f, 1.0f);
+	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
+	
 	dMatrix matrix(dGetIdentityMatrix());
-	matrix = dYawMatrix(180.0f * dDegreeToRad);
-	matrix = matrix * dRollMatrix(-70.0f * dDegreeToRad);
 	matrix.m_posit = location;
+
+	//dVector location(0.0f, 1.75f, 0.0f, 1.0f);
+	//dMatrix matrix(dGetIdentityMatrix());
+	//matrix = dYawMatrix(180.0f * dDegreeToRad);
+	//matrix = matrix * dRollMatrix(-70.0f * dDegreeToRad);
+	//matrix.m_posit = location;
 
 	// add a model for general controls
 	ndVehicleSelector* const controls = new ndVehicleSelector();
@@ -592,7 +591,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, viperDesc, matrix);
 	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
-	//vehicle->SetAsPlayer(scene);
+	vehicle->SetAsPlayer(scene);
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
 	//matrix.m_posit.m_x += 8.0f;
