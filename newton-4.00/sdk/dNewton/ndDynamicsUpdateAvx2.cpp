@@ -2502,7 +2502,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
-			m_outputForces = &me->m_internalForces[bodyCount * (threadIndex + 1)];
+			m_outputForces = &m_internalForces[bodyCount * (threadIndex + 1)];
 			m_jointArray = &jointArray[0];
 
 			const dInt32* const soaJointRows = &me->m_soaJointRows[0];
@@ -2567,7 +2567,14 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			}
 			else
 			{
-				memcpy(&internalForces[0], &internalForces[bodyCount], bodyCount * sizeof(ndJacobian));
+				ndAvxFloat* const dst = (ndAvxFloat*)internalForces;
+				const ndAvxFloat* const src = (ndAvxFloat*)&internalForces[bodyCount];
+				// this will override src by 1 entry, but that' ok.
+				for (dInt32 i = 0; i < bodyCount; i+=2)
+				{
+					dst[i + 0] = src[i + 0];
+					dst[i + 1] = src[i + 1];
+				}
 			}
 		}
 	};

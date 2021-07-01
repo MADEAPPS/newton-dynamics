@@ -2114,7 +2114,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
-			m_outputForces = &me->m_internalForces[bodyCount * (threadIndex + 1)];
+			m_outputForces = &m_internalForces[bodyCount * (threadIndex + 1)];
 			m_jointArray = &jointArray[0];
 
 			const dInt32* const soaJointRows = &me->m_soaJointRows[0];
@@ -2125,6 +2125,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			const dInt32 mask = -dInt32(D_SOA_WORD_GROUP_SIZE);
 			const dInt32 soaJointCount = ((jointCount + D_SOA_WORD_GROUP_SIZE - 1) & mask) / D_SOA_WORD_GROUP_SIZE;
 			me->ClearJacobianBuffer(bodyCount, m_outputForces);
+
 			for (dInt32 i = threadIndex; i < soaJointCount; i += threadCount)
 			{
 				accNorm += JointForce(i * D_SOA_WORD_GROUP_SIZE, &soaMassMatrix[soaJointRows[i]]);
@@ -2177,7 +2178,13 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			}
 			else
 			{
-				memcpy(&internalForces[0], &internalForces[bodyCount], bodyCount * sizeof(ndJacobian));
+				const ndJacobian* const sourceForces = &internalForces[bodyCount];
+				// this will override sourceForces by 1 entry, but that' ok.
+				for (dInt32 i = 0; i < bodyCount; i += 2)
+				{
+					internalForces[i + 0] = sourceForces[i + 0];
+					internalForces[i + 1] = sourceForces[i + 1];
+				}
 			}
 		}
 	};

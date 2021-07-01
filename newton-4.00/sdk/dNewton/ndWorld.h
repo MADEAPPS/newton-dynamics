@@ -46,10 +46,10 @@ class ndWorld: public dClassAlloc
 	public:
 	enum ndSolverModes
 	{	
+		ndStandardSolver,
 		ndSimdSoaSolver,
 		ndSimdAvx2Solver,
 		ndOpenclSolver,
-		ndStandardSolver,
 	};
 
 	D_NEWTON_API ndWorld();

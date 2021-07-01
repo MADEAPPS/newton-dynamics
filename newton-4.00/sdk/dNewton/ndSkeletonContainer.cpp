@@ -1404,7 +1404,7 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 		const dInt32 m0 = m_pairs[i].m_m0;
 		const dInt32 m1 = m_pairs[i].m_m1;
 
-		rhs->m_force += f[i];
+		//rhs->m_force += f[i];
 		dVector jointForce(f[i]);
 		internalForces[m0].m_linear += row->m_Jt.m_jacobianM0.m_linear * jointForce;
 		internalForces[m0].m_angular += row->m_Jt.m_jacobianM0.m_angular * jointForce;

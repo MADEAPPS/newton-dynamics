@@ -261,6 +261,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showConcaveEdge = true;
 	//m_autoSleepMode = false;
 	//m_solverMode = ndWorld::ndOpenclSolver;
+	//m_solverMode = ndWorld::ndSimdSoaSolver;
 	m_solverMode = ndWorld::ndStandardSolver;
 	//m_sceneType = 1;
 	//m_solverPasses = 4;

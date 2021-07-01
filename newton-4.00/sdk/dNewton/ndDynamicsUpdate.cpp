@@ -1554,20 +1554,13 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
 			dFloat32 accNorm = dFloat32(0.0f);
 			const dInt32 jointCount = jointArray.GetCount();
-			//const dInt32 activejointCount = me->m_activeJointCount;
 			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
-
-			static int xxx;
-			if (xxx >= 12)
-				xxx *= 1;
-			xxx++;
-
 
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
-			m_outputForces = &me->m_internalForces[bodyCount * (threadIndex + 1)];
-
+			m_outputForces = &m_internalForces[bodyCount * (threadIndex + 1)];
 			me->ClearJacobianBuffer(bodyCount, m_outputForces);
+
 			for (dInt32 i = threadIndex; i < jointCount; i += threadCount)
 			{
 				ndConstraint* const joint = jointArray[i];
@@ -1616,7 +1609,14 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			}
 			else
 			{
-				memcpy(&internalForces[0], &internalForces[bodyCount], bodyCount * sizeof(ndJacobian));
+				const ndJacobian* const sourceForces = &internalForces[bodyCount];
+
+				// this will override sourceForces by 1 entry, but that' ok.
+				for (dInt32 i = 0; i < bodyCount; i+=2)
+				{
+					internalForces[i + 0] = sourceForces[i + 0];
+					internalForces[i + 1] = sourceForces[i + 1];
+				}
 			}
 		}
 	};
