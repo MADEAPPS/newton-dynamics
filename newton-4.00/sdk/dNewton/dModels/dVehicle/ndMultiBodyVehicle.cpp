@@ -314,12 +314,12 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	// draw front direction for side slip angle reference
 	dVector p0(chassisMatrix.m_posit + m_localFrame.m_up.Scale(1.0f));
 	dVector p1(p0 + chassisMatrix.RotateVector(m_localFrame.m_front).Scale(0.5f));
-//	context.DrawLine(p0, p1, dVector(1.0f, 1.0f, 1.0f, 0.0f));
+	context.DrawLine(p0, p1, dVector(1.0f, 1.0f, 1.0f, 0.0f));
 
 	// draw velocity vector
 	dVector veloc(m_chassis->GetVelocity());
 	dVector p2(p0 + veloc.Scale (0.25f));
-//	context.DrawLine(p0, p2, dVector(1.0f, 1.0f, 0.0f, 0.0f));
+	context.DrawLine(p0, p2, dVector(1.0f, 1.0f, 0.0f, 0.0f));
 
 	// draw body acceleration
 	//dVector accel(m_chassis->GetAccel());
@@ -334,7 +334,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	dVector forceColor(dFloat32 (0.8f), dFloat32(0.8f), dFloat32(0.8f), dFloat32(0.0f));
 	dVector lateralColor(dFloat32(0.3f), dFloat32(0.7f), dFloat32(0.0f), dFloat32(0.0f));
 	dVector longitudinalColor(dFloat32(0.7f), dFloat32(0.3f), dFloat32(0.0f), dFloat32(0.0f));
-//	context.DrawLine(chassisMatrix.m_posit, chassisMatrix.m_posit + weight, forceColor);
+	context.DrawLine(chassisMatrix.m_posit, chassisMatrix.m_posit + weight, forceColor);
 
 	const dFloat32 tireForceScale = dFloat32(3.0f);
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
@@ -350,7 +350,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 		dMatrix tireFrame(tireBody->GetMatrix());
 		//context.DrawFrame(tireFrame);
 		upperBumberMatrix.m_posit = tireFrame.m_posit;
-//		context.DrawFrame(upperBumberMatrix);
+		context.DrawFrame(upperBumberMatrix);
 
 		totalMass += tireBody->GetMassMatrix().m_w;
 		effectiveCom += tireFrame.m_posit.Scale(tireBody->GetMassMatrix().m_w);
@@ -393,7 +393,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	effectiveCom = effectiveCom.Scale(dFloat32(1.0f) / totalMass);
 	chassisMatrix.m_posit = effectiveCom;
 	chassisMatrix.m_posit.m_w = dFloat32(1.0f);
-//	context.DrawFrame(chassisMatrix);
+	context.DrawFrame(chassisMatrix);
 }
 
 void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
