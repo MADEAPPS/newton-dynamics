@@ -63,6 +63,8 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
+		m_transmission.m_torqueConverter = 10000.0f;
+
 		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_steeringAngle = 25.0f * dDegreeToRad;
 		m_frontTire.m_springK = 500.0f;
@@ -518,6 +520,9 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		tireInfo.m_regularizer = m_configuration.m_rearTire.m_regularizer;
 		tireInfo.m_minLimit = m_configuration.m_rearTire.m_upperStop;
 		tireInfo.m_maxLimit = m_configuration.m_rearTire.m_lowerStop;
+		tireInfo.m_brakeTorque = m_configuration.m_rearTire.m_brakeTorque;
+		tireInfo.m_regularizer = m_configuration.m_rearTire.m_regularizer;
+		tireInfo.m_handBrakeTorque = m_configuration.m_rearTire.m_handBrakeTorque;
 		tireInfo.m_laterialStiffness  = m_configuration.m_rearTire.m_laterialStiffness ;
 		tireInfo.m_longitudinalStiffness  = m_configuration.m_rearTire.m_longitudinalStiffness ;
 		ndMultiBodyVehicleTireJoint* const rr_tire0 = AddTire(world, tireInfo, rr_tire0_body);
@@ -527,9 +532,12 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 
 		tireInfo.m_springK = m_configuration.m_frontTire.m_springK;
 		tireInfo.m_damperC = m_configuration.m_frontTire.m_damperC;
-		tireInfo.m_regularizer = m_configuration.m_frontTire.m_regularizer;
 		tireInfo.m_minLimit = m_configuration.m_frontTire.m_upperStop;
 		tireInfo.m_maxLimit = m_configuration.m_frontTire.m_lowerStop;
+		tireInfo.m_brakeTorque = m_configuration.m_frontTire.m_brakeTorque;
+		tireInfo.m_regularizer = m_configuration.m_frontTire.m_regularizer;
+		tireInfo.m_steeringAngle = m_configuration.m_frontTire.m_steeringAngle;
+		tireInfo.m_handBrakeTorque = m_configuration.m_frontTire.m_handBrakeTorque;
 		tireInfo.m_laterialStiffness  = m_configuration.m_frontTire.m_laterialStiffness ;
 		tireInfo.m_longitudinalStiffness  = m_configuration.m_frontTire.m_longitudinalStiffness ;
 		ndMultiBodyVehicleTireJoint* const fr_tire0 = AddTire(world, tireInfo, fr_tire0_body);
@@ -544,29 +552,6 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 			m_gearMap[i] = i + 2;
 		}
 		m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1;
-
-		dAssert(0);
-		//// configure vehicle steering
-		//SetAsSteering(fr_tire0);
-		//SetAsSteering(fl_tire0);
-		//SetAsSteering(fr_tire1);
-		//SetAsSteering(fl_tire1);
-		//
-		//// configure the tires brake
-		//SetAsBrake(rr_tire0);
-		//SetAsBrake(rl_tire0);
-		//SetAsBrake(fr_tire0);
-		//SetAsBrake(fl_tire0);
-		//SetAsBrake(rr_tire1);
-		//SetAsBrake(rl_tire1);
-		//SetAsBrake(fr_tire1);
-		//SetAsBrake(fl_tire1);
-		//
-		//// configure the tires hand brake
-		//SetAsHandBrake(rr_tire0);
-		//SetAsHandBrake(rl_tire0);
-		//SetAsHandBrake(rr_tire1);
-		//SetAsHandBrake(rl_tire1);
 
 		// add the slip differential
 		#if 1
@@ -943,12 +928,12 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 
 	matrix.m_posit.m_x += 8.0f;
 	matrix.m_posit.m_z += 2.0f;
-	scene->GetWorld()->AddModel(new ndTractorVehicle(scene, tractorDesc, matrix));
-	//for (dInt32 i = 0; i < 10; i++)
-	//{
-	//	matrix.m_posit.m_y += 4.0f;
-	//	scene->GetWorld()->AddModel(new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix));
-	//}
+	//scene->GetWorld()->AddModel(new ndTractorVehicle(scene, tractorDesc, matrix));
+	////for (dInt32 i = 0; i < 10; i++)
+	////{
+	////	matrix.m_posit.m_y += 4.0f;
+	////	scene->GetWorld()->AddModel(new ndHeavyMultiBodyVehicle(scene, lav25Desc, matrix));
+	////}
 	
 	matrix.m_posit.m_x += 15.0f;
 	AddPlanks(scene, matrix.m_posit, 300.0f);

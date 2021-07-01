@@ -192,7 +192,7 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 		AddAngularRowJacobian(desc, matrix0.m_front, -m_jointAngle);
 		SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 	}
-	else
+	else if (m_friction > dFloat32 (0.0f))
 	{
 		AddAngularRowJacobian(desc, matrix0.m_front, dFloat32(0.0f));
 		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
