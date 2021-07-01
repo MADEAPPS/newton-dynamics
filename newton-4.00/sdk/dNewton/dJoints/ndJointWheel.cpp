@@ -111,12 +111,10 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 	SetMassSpringDamperAcceleration(desc, m_regularizer, m_info.m_springK, m_info.m_damperC);
 
-//m_normalizedBrake = 1.0f;
 	const dFloat32 brakeFrictionTorque = dMax(m_normalizedBrake * m_info.m_brakeTorque, m_normalizedHandBrake * m_info.m_handBrakeTorque);
-//dFloat32 brakeFrictionTorque = 10000000.0f;
 	if (brakeFrictionTorque > dFloat32(0.0f))
 	{
-		const dFloat32 brakesToChassisInfluence = dFloat32 (0.25f);
+		const dFloat32 brakesToChassisInfluence = dFloat32 (0.125f);
 
 		AddAngularRowJacobian(desc, matrix1.m_front, dFloat32(0.0f));
 		const dVector tireOmega(m_body0->GetOmega());
