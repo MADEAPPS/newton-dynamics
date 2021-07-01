@@ -136,19 +136,19 @@ dFloat32 brakeFrictionTorque = 10000000.0f;
 	}
 
 	// add suspension limits alone the vertical axis 
-	//const dFloat32 x = m_posit + m_speed * desc.m_timestep;
-	//if (x < m_info.m_minLimit)
-	//{
-	//	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
-	//	const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-	//	SetMotorAcceleration(desc, stopAccel);
-	//	SetLowerFriction(desc, dFloat32(0.0f));
-	//}
-	//else if (x > m_info.m_maxLimit)
-	//{
-	//	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
-	//	const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-	//	SetMotorAcceleration(desc, stopAccel);
-	//	SetHighFriction(desc, dFloat32(0.0f));
-	//}
+	const dFloat32 x = m_posit + m_speed * desc.m_timestep;
+	if (x < m_info.m_minLimit)
+	{
+		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
+		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		SetMotorAcceleration(desc, stopAccel);
+		SetLowerFriction(desc, dFloat32(0.0f));
+	}
+	else if (x > m_info.m_maxLimit)
+	{
+		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
+		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		SetMotorAcceleration(desc, stopAccel);
+		SetHighFriction(desc, dFloat32(0.0f));
+	}
 }
