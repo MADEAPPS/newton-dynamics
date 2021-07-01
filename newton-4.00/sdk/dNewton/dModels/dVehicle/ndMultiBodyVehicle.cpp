@@ -396,7 +396,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	context.DrawFrame(chassisMatrix);
 }
 
-void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
+void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const
 {
 	// calculate longitudinal slip ratio
 	const ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
@@ -419,11 +419,16 @@ void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const
 #if 1
 		// calculate side slip ratio
 		const dFloat32 sideSpeed = dAbs(relVeloc.DotProduct(contactPoint.m_dir0).GetScalar());
-		const dFloat32 lateralSlip = sideSpeed / (relSpeed + dFloat32(0.01f));
+		const dFloat32 lateralSlip = sideSpeed / (relSpeed + dFloat32(1.0f));
 
 		const dFloat32 den = dFloat32(1.0f) / (dFloat32(1.0f) + longitudialSlip);
 		const dFloat32 v = lateralSlip * den;
 		const dFloat32 u = longitudialSlip * den;
+
+		//if (u > 0.5f || v > 0.5f)
+		//dTrace(("(%d %f %f)\n", tireBody->GetId(), u, v));
+		tire->m_lateralSideSlip = dMax (tire->m_lateralSideSlip, v);
+		tire->m_longitidinalSideSlip = dMax(tire->m_longitidinalSideSlip, u);
 
 		const ndWheelDescriptor& info = tire->GetInfo();
 		const dFloat32 cz = info.m_laterialStiffness  * v;
@@ -501,6 +506,9 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 	{
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 		dAssert(((ndShape*)tire->GetBody0()->GetCollisionShape().GetShape())->GetAsShapeChamferCylinder());
+
+		tire->m_lateralSideSlip = dFloat32(0.0f);
+		tire->m_longitidinalSideSlip = dFloat32(0.0f);
 
 		const ndBodyKinematic::ndContactMap& contactMap = tire->GetBody0()->GetContactMap();
 		ndBodyKinematic::ndContactMap::Iterator it(contactMap);

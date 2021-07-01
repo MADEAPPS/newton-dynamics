@@ -17,11 +17,23 @@
 ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info, ndMultiBodyVehicle* const vehicle)
 	:ndJointWheel(pinAndPivotFrame, child, parent, info)
 	,m_vehicle(vehicle)
+	,m_lateralSideSlip(dFloat32 (0.0f))
+	,m_longitidinalSideSlip(dFloat32(0.0f))
 {
 }
 
 ndMultiBodyVehicleTireJoint::~ndMultiBodyVehicleTireJoint()
 {
+}
+
+dFloat32 ndMultiBodyVehicleTireJoint::GetSideSlip() const
+{
+	return m_lateralSideSlip;
+}
+
+dFloat32 ndMultiBodyVehicleTireJoint::GetLongitudinalSlip() const
+{
+	return m_longitidinalSideSlip;
 }
 
 void ndMultiBodyVehicleTireJoint::JacobianDerivative(ndConstraintDescritor& desc)

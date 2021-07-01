@@ -30,9 +30,20 @@ ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const moto
 	:ndJointGear(dFloat32 (1.0f), motor->GetMatrix().m_front, differential,	motor->GetMatrix().m_front, motor)
 	,m_chassis(chassis)
 	,m_clutchTorque(dFloat32 (1.0e5f))
+	,m_driveTrainResistanceTorque(dFloat32(1000.0f))
 {
 	SetRatio(dFloat32(0.0f));
 	SetSolverModel(m_jointkinematicCloseLoop);
+}
+
+void ndMultiBodyVehicleGearBox::SetClutchTorque(dFloat32 torqueInNewtonMeters)
+{
+	m_clutchTorque = dAbs(torqueInNewtonMeters);
+}
+
+void ndMultiBodyVehicleGearBox::SetInternalLosesTorque(dFloat32 torqueInNewtonMeters)
+{
+	m_driveTrainResistanceTorque = dAbs(torqueInNewtonMeters);
 }
 
 void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
@@ -68,8 +79,16 @@ void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 		const dFloat32 w = (w0 + w1) * dFloat32(0.5f);
 		SetMotorAcceleration(desc, -w * desc.m_invTimestep);
 
-		SetHighFriction(desc, m_clutchTorque);
-		SetLowerFriction(desc, -m_clutchTorque);
+		if (m_gearRatio > dFloat32 (0.0f))
+		{
+			SetHighFriction(desc, m_clutchTorque);
+			SetLowerFriction(desc, -m_driveTrainResistanceTorque);
+		}
+		else
+		{
+			SetHighFriction(desc, m_driveTrainResistanceTorque);
+			SetLowerFriction(desc, -m_clutchTorque);
+		}
 	}
 }
 

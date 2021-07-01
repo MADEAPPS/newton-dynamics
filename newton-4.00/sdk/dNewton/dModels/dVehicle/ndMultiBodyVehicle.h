@@ -85,7 +85,7 @@ class ndMultiBodyVehicle: public ndModel
 	void ApplyAerodynamics();
 	void ApplyAligmentAndBalancing();
 	ndBodyDynamic* CreateInternalBodyPart(ndWorld* const world, dFloat32 mass, dFloat32 radius) const;
-	void BrushTireModel(const ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
+	void BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
 
 	protected:
 	virtual void ApplyInputs(ndWorld* const world, dFloat32 timestep);

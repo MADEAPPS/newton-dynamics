@@ -409,6 +409,8 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 			tire->SetHandBrake(handBrake);
 		}
 
+		// set the transmission Torque converter when the power reverses.
+		m_gearBox->SetInternalLosesTorque(m_configuration.m_transmission.m_torqueConverter);
 		if (omega <= (m_configuration.m_engine.GetIdleRadPerSec() * 1.01f))
 		{
 			m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_idleClutchTorque);

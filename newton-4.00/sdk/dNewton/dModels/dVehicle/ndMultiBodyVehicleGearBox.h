@@ -33,7 +33,8 @@ class ndMultiBodyVehicleGearBox : public ndJointGear
 	D_CLASS_RELECTION(ndMultiBodyVehicleGearBox);
 	D_NEWTON_API ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, const ndMultiBodyVehicle* const chassis);
 
-	void SetClutchTorque(dFloat32 torqueInNewtonMeters);
+	D_NEWTON_API void SetClutchTorque(dFloat32 torqueInNewtonMeters);
+	D_NEWTON_API void SetInternalLosesTorque(dFloat32 torqueInNewtonMeters);
 
 	protected:
 	void DebugJoint(ndConstraintDebugCallback&) const {}
@@ -41,11 +42,7 @@ class ndMultiBodyVehicleGearBox : public ndJointGear
 
 	const ndMultiBodyVehicle* m_chassis;
 	dFloat32 m_clutchTorque;
+	dFloat32 m_driveTrainResistanceTorque;
 };
-
-inline void ndMultiBodyVehicleGearBox::SetClutchTorque(dFloat32 torqueInNewtonMeters)
-{
-	m_clutchTorque = dAbs(torqueInNewtonMeters);
-}
 
 #endif
