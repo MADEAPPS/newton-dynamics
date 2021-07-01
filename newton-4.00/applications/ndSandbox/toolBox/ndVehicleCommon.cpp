@@ -129,9 +129,9 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_transmission.m_fowardRatios[1] = 1.60f;
 	m_transmission.m_fowardRatios[2] = 1.10f;
 	m_transmission.m_fowardRatios[3] = 0.80f;
-	m_transmission.m_torqueConverter = 1000.0f;
+	m_transmission.m_torqueConverter = 2000.0f;
 	m_transmission.m_idleClutchTorque = 200.0f;
-	m_transmission.m_lockedClutchTorque = 1.0e5f;
+	m_transmission.m_lockedClutchTorque = 1.0e6f;
 	m_transmission.m_manual = true;
 
 	m_frontTire.m_mass = 20.0f;
