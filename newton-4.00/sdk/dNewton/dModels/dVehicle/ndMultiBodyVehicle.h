@@ -56,7 +56,7 @@ class ndMultiBodyVehicle: public ndModel
 		dFloat32 GetDownforceFactor(dFloat32 speed) const;
 	
 		dFloat32 m_gravity;
-		ndSpeedForcePair m_downForceTable[3];
+		ndSpeedForcePair m_downForceTable[5];
 	};
 
 	D_NEWTON_API ndMultiBodyVehicle(const dVector& frontDir, const dVector& upDir);

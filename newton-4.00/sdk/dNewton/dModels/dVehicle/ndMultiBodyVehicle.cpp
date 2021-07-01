@@ -405,12 +405,8 @@ void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const
 	dAssert((tireBody == contactPoint.m_body0) || (tireBody == contactPoint.m_body1));
 
 	const dVector tireVeloc(tireBody->GetVelocity());
-#if 0
 	const dFloat32 tireSpeed = dAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar());
 	if (dAbs(tireSpeed) > dFloat32(0.44f))
-#else
-	const dFloat32 tireSpeed = dMax(dAbs(tireVeloc.DotProduct(contactPoint.m_dir1).GetScalar()), dFloat32(0.1f));
-#endif
 	{
 		// apply brush tire model only when center travels faster that 10 miles per hours
 		const dVector contactVeloc0(tireBody->GetVelocityAtPoint(contactPoint.m_point) - tireBody->GetVelocity() + tireVeloc);
@@ -437,7 +433,7 @@ void ndMultiBodyVehicle::BrushTireModel(const ndMultiBodyVehicleTireJoint* const
 		const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
 		const dFloat32 lateralFrictionCoefficient = frictionCoefficient * cz / gamma;
 		const dFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
-		dTrace(("(%d %f %f) ", tireBody->GetId(), lateralFrictionCoefficient, longitudinalFrictionCoefficient));
+		//dTrace(("(%d %f %f) ", tireBody->GetId(), lateralFrictionCoefficient, longitudinalFrictionCoefficient));
 
 		contactPoint.m_material.m_restitution = dFloat32(0.1f);
 		contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
@@ -610,49 +606,63 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 			}
 		}
 	}
-
-	dTrace(("\n"));
+	//dTrace(("\n"));
 }
 
 ndMultiBodyVehicle::ndDownForce::ndDownForce()
 	:m_gravity(dFloat32(-10.0f))
 {
-	m_downForceTable[0].m_speed = dFloat32(5.0f) * dFloat32(0.27f);
-	//m_downForceTable[0].m_forceFactor = 0.0f;
-    m_downForceTable[0].m_forceFactor = 0.5f;
+	m_downForceTable[0].m_speed = dFloat32(0.0f) * dFloat32(0.27f);
+	m_downForceTable[0].m_forceFactor = 0.0f;
 	m_downForceTable[0].m_aerodynamicDownforceConstant = dFloat32(0.0f);
 
-	m_downForceTable[1].m_speed = dFloat32(60.0f) * dFloat32(0.27f);
-	m_downForceTable[1].m_forceFactor = 1.0f;
-	dFloat32 num = m_downForceTable[1].m_forceFactor - m_downForceTable[0].m_forceFactor;
-	dFloat32 den = m_downForceTable[1].m_speed - m_downForceTable[0].m_speed;
-	m_downForceTable[1].m_aerodynamicDownforceConstant = num / (den * den);
+	m_downForceTable[1].m_speed = dFloat32(10.0f) * dFloat32(0.27f);
+	m_downForceTable[1].m_forceFactor = 0.0f;
+	m_downForceTable[1].m_aerodynamicDownforceConstant = dFloat32(0.0f);
 
-	m_downForceTable[2].m_speed = dFloat32(200.0f) * dFloat32(0.27f);
-	m_downForceTable[2].m_forceFactor = 3.0f;
-	num = m_downForceTable[2].m_forceFactor - m_downForceTable[1].m_forceFactor;
-	den = m_downForceTable[2].m_speed - m_downForceTable[1].m_speed;
+	m_downForceTable[2].m_speed = dFloat32(60.0f) * dFloat32(0.27f);
+	m_downForceTable[2].m_forceFactor = 1.0f;
+	dFloat32 num = m_downForceTable[2].m_forceFactor - m_downForceTable[1].m_forceFactor;
+	dFloat32 den = m_downForceTable[2].m_speed - m_downForceTable[1].m_speed;
 	m_downForceTable[2].m_aerodynamicDownforceConstant = num / (den * den);
+	
+	m_downForceTable[3].m_speed = dFloat32(140.0f) * dFloat32(0.27f);
+	m_downForceTable[3].m_forceFactor = 2.5f;
+	num = m_downForceTable[3].m_forceFactor - m_downForceTable[2].m_forceFactor;
+	den = m_downForceTable[3].m_speed - m_downForceTable[2].m_speed;
+	m_downForceTable[3].m_aerodynamicDownforceConstant = num / (den * den);
+
+	m_downForceTable[4].m_speed = dFloat32(1000.0f) * dFloat32(0.27f);
+	m_downForceTable[4].m_forceFactor = 2.5f;
+	num = m_downForceTable[4].m_forceFactor - m_downForceTable[3].m_forceFactor;
+	den = m_downForceTable[4].m_speed - m_downForceTable[3].m_speed;
+	m_downForceTable[4].m_aerodynamicDownforceConstant = num / (den * den);
+
+	//dFloat32 speed = 0;
+	//for (dInt32 i = 0; i < 100; i++)
+	//{
+	//	dTrace(("%f %f\n", speed/ 0.27f, GetDownforceFactor(speed)));
+	//	speed += (150.0f / 100.0f) * 0.27f;
+	//}
 }
 
 dFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(dFloat32 speed) const
 {
 	dAssert(speed >= dFloat32(0.0f));
-	dFloat32 downForceFactor = m_downForceTable[2].m_forceFactor;
-	if (speed < m_downForceTable[0].m_speed)
+
+
+	dInt32 index = 0;
+	for (dInt32 i = sizeof(m_downForceTable) / sizeof(m_downForceTable[0]) - 1; i ; i--)
 	{
-		downForceFactor = m_downForceTable[0].m_forceFactor;
+		if (m_downForceTable[i].m_speed <= speed)
+		{
+			index = i;
+			break;
+		}
 	}
-	else if (speed < m_downForceTable[1].m_speed)
-	{
-		dFloat32 deltaSpeed = speed - m_downForceTable[0].m_forceFactor;
-		downForceFactor = m_downForceTable[0].m_forceFactor + m_downForceTable[1].m_aerodynamicDownforceConstant * deltaSpeed * deltaSpeed;
-	}
-	else if (speed < m_downForceTable[2].m_speed)
-	{
-		dFloat32 deltaSpeed = speed - m_downForceTable[1].m_forceFactor;
-		downForceFactor = m_downForceTable[1].m_forceFactor + m_downForceTable[2].m_aerodynamicDownforceConstant * deltaSpeed * deltaSpeed;
-	}
+
+	dFloat32 deltaSpeed = speed - m_downForceTable[index].m_speed;
+	dFloat32 downForceFactor = m_downForceTable[index].m_forceFactor + m_downForceTable[index + 1].m_aerodynamicDownforceConstant * deltaSpeed * deltaSpeed;
 	return downForceFactor;
 }
 
