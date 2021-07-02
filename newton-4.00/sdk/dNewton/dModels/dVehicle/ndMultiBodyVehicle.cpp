@@ -231,42 +231,30 @@ void ndMultiBodyVehicle::ApplyAerodynamics()
 
 void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
 {
-	ndJointBilateralSolverModel tireMode = hardJoint ? ndJointBilateralSolverModel::m_jointkinematicOpenLoop : ndJointBilateralSolverModel::m_jointIterativeSoft;
-	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
-	{
-		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-		tire->SetSolverModel(tireMode);
-	}
+	ndJointBilateralSolverModel openLoopMode = hardJoint ? m_jointkinematicOpenLoop : m_jointIterativeSoft;
 
-	ndJointBilateralSolverModel driveTrainMode = hardJoint ? ndJointBilateralSolverModel::m_jointkinematicCloseLoop : ndJointBilateralSolverModel::m_jointIterativeSoft;
-	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	dAssert(m_chassis);
+	const ndJointList& chassisJoints = m_chassis->GetJointList();
+	for (ndJointList::dNode* node = chassisJoints.GetFirst(); node; node = node->GetNext())
 	{
-		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-		const ndJointList& joints = tire->GetBody0()->GetJointList();
-		for (ndJointList::dNode* tireNode = joints.GetFirst(); tireNode; tireNode = tireNode->GetNext())
-		{
-			ndJointBilateralConstraint* const joint = tireNode->GetInfo();
-			if (!strcmp(joint->ClassName(), "ndMultiBodyVehicleDifferentialAxle"))
-			{
-				joint->SetSolverModel(driveTrainMode);
-			}
-		}
+		ndJointBilateralConstraint* const joint = node->GetInfo();
+		joint->SetSolverModel(openLoopMode);
 	}
-		
+	
+	ndJointBilateralSolverModel driveTrainMode = hardJoint ? m_jointkinematicCloseLoop : m_jointIterativeSoft;
 	for (dList<ndMultiBodyVehicleDifferential*>::dNode* node = m_differentials.GetFirst(); node; node = node->GetNext())
 	{
-		ndMultiBodyVehicleDifferential* const diff = node->GetInfo();
-		diff->SetSolverModel(driveTrainMode);
-	}
-
-	if (m_motor)
-	{
-		m_motor->SetSolverModel(driveTrainMode);
-	}
-
-	if (m_gearBox)
-	{
-		m_gearBox->SetSolverModel(driveTrainMode);
+		ndJointBilateralConstraint* const joint = node->GetInfo();
+		const ndJointList& jointList = joint->GetBody0()->GetJointList();
+		for (ndJointList::dNode* node1 = jointList.GetFirst(); node1; node1 = node1->GetNext())
+		{
+			ndJointBilateralConstraint* const axle = node1->GetInfo();
+			const char* const clasName = axle->ClassName();
+			if (strcmp(clasName, "ndMultiBodyVehicleDifferential"))
+			{
+				axle->SetSolverModel(driveTrainMode);
+			}
+		}
 	}
 }
 

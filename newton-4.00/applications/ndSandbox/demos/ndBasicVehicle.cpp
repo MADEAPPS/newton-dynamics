@@ -30,6 +30,8 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 	ndVehicleDectriptorViper()
 		:ndVehicleDectriptor("viper.fbx")
 	{
+		//m_useHardSolverMode = true;
+		m_useHardSolverMode = false;
 		m_comDisplacement = dVector(0.25f, -0.35f, 0.0f, 0.0f);
 
 		dFloat32 fuelInjectionRate = 10.0f;
@@ -51,9 +53,9 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 	ndVehicleDectriptorJeep()
 		:ndVehicleDectriptor("jeep.fbx")
 	{
-		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
-
+		//m_useHardSolverMode = true;
 		m_useHardSolverMode = false;
+		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
 
 		dFloat32 fuelInjectionRate = 10.0f;
 		dFloat32 idleTorquePoundFoot = 200.0f;
