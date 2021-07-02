@@ -234,7 +234,13 @@ void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
 	for (ndJointList::dNode* node = chassisJoints.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = node->GetInfo();
-		joint->SetSolverModel(openLoopMode);
+		const char* const className = joint->ClassName();
+		if (!strcmp(className, "ndMultiBodyVehicleTireJoint") ||
+			!strcmp(className, "ndMultiBodyVehicleDifferential") ||
+			!strcmp(className, "ndMultiBodyVehicleMotor"))
+		{
+			joint->SetSolverModel(openLoopMode);
+		}
 	}
 	
 	ndJointBilateralSolverModel driveTrainMode = hardJoint ? m_jointkinematicCloseLoop : m_jointIterativeSoft;
@@ -251,6 +257,11 @@ void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
 				axle->SetSolverModel(driveTrainMode);
 			}
 		}
+	}
+
+	if (m_torsionBar)
+	{
+		m_torsionBar->SetSolverModel(driveTrainMode);
 	}
 }
 
