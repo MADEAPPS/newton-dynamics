@@ -498,7 +498,7 @@ bool ndShapeConvexPolygon::BeamClipping(const dVector& origin, dFloat32 dist, co
 			const dInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[i0];
 			const dVector localAdjacentNormal(&m_vertex[adjacentNormalIndex * m_stride]);
 			const dVector adjacentNormal(CalculateGlobalNormal(parentMesh, localAdjacentNormal & dVector::m_triplexMask));
-			dAssert(edge.DotProduct(adjacentNormal).GetScalar() < dFloat32(1.0e-3f));
+			dAssert(edge.DotProduct(adjacentNormal).GetScalar() < dFloat32(1.0e-2f));
 			const dVector edgeSkirt(edge.CrossProduct(adjacentNormal) * skirt);
 
 			m_localPoly[count + 0] = m_localPoly[i] + edgeSkirt;
