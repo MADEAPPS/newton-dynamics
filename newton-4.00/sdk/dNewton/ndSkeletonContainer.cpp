@@ -1106,10 +1106,10 @@ D_INLINE void ndSkeletonContainer::UpdateForces(ndJacobian* const internalForces
 		for (dInt32 j = 0; j < count; j++) 
 		{
 			const dInt32 k = node->m_sourceJacobianIndex[j];
-			ndRightHandSide* const rhs = &m_rightHandSide[first + k];
 			const ndLeftHandSide* const row = &m_leftHandSide[first + k];
 
-			rhs->m_force += dFloat32(f[j]);
+			//ndRightHandSide* const rhs = &m_rightHandSide[first + k];
+			//rhs->m_force += dFloat32(f[j]);
 			dVector jointForce = dFloat32(f[j]);
 			y0.m_linear += row->m_Jt.m_jacobianM0.m_linear * jointForce;
 			y0.m_angular += row->m_Jt.m_jacobianM0.m_angular * jointForce;
@@ -1399,13 +1399,13 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 	for (dInt32 i = 0; i < m_rowCount; i++) 
 	{
 		dInt32 index = m_matrixRowsIndex[i];
-		ndRightHandSide* const rhs = &m_rightHandSide[index];
 		const ndLeftHandSide* const row = &m_leftHandSide[index];
+		//ndRightHandSide* const rhs = &m_rightHandSide[index];
+		//rhs->m_force += f[i];
+
+		dVector jointForce(f[i]);
 		const dInt32 m0 = m_pairs[i].m_m0;
 		const dInt32 m1 = m_pairs[i].m_m1;
-
-		//rhs->m_force += f[i];
-		dVector jointForce(f[i]);
 		internalForces[m0].m_linear += row->m_Jt.m_jacobianM0.m_linear * jointForce;
 		internalForces[m0].m_angular += row->m_Jt.m_jacobianM0.m_angular * jointForce;
 		internalForces[m1].m_linear += row->m_Jt.m_jacobianM1.m_linear * jointForce;

@@ -79,6 +79,8 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndMultiBodyVehicleDifferential* const leftDifferential, ndMultiBodyVehicleDifferential* const rightDifferential, dFloat32 slipOmegaLock);
 	D_NEWTON_API ndMultiBodyVehicleTorsionBar* AddTorsionBar(ndWorld* const world);
 
+	D_NEWTON_API void SetVehicleSolverModel(bool hardJoint);
+
 	private:
 	void ApplySteering();
 	void ApplyTiremodel();

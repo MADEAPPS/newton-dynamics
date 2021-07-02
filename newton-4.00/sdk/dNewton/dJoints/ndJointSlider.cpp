@@ -111,7 +111,6 @@ void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dM
 		else if (m_friction > dFloat32 (0.0f)) 
 		{
 			AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1.m_front);
-			//SetMotorAcceleration(desc, -m_speed * desc.m_invTimestep);
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			SetMotorAcceleration(desc, stopAccel);
 			SetLowerFriction(desc, -m_friction);

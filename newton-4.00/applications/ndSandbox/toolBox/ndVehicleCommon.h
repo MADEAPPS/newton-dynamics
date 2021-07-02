@@ -136,6 +136,8 @@ class ndVehicleDectriptor
 	dFloat32 m_torsionBarDamperC;
 	dFloat32 m_torsionBarRegularizer;
 	ndTorsionBarType m_torsionBarType;
+
+	bool m_useHardSolverMode;
 };
 
 class ndBasicVehicle : public ndMultiBodyVehicle

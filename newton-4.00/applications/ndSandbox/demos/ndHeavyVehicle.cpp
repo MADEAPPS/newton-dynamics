@@ -52,6 +52,8 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 		m_chassisMass = 2000.0f;
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
 
+		m_useHardSolverMode = false;
+
 		dFloat32 fuelInjectionRate = 10.0f;
 		dFloat32 idleTorquePoundFoot = 250.0f;
 		dFloat32 idleRmp = 600.0f;
@@ -105,6 +107,8 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 	{
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
 		m_chassisMass = 2000.0f;
+
+		m_useHardSolverMode = false;
 
 		dFloat32 fuelInjectionRate = 10.0f;
 		dFloat32 idleTorquePoundFoot = 250.0f;
@@ -593,6 +597,9 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 
 		// add vehicle turret
 		CreateEightWheelTurret(scene);
+
+		// set a soft or hard mode
+		SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);
 	}
 
 	void CreateEightWheelTurret(ndDemoEntityManager* const scene)
@@ -772,7 +779,11 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		// add the gear box
 		AddGearBox(world, m_motor, differential);
 
+		// add the bucket joints
 		CreateTractorBucket(scene);
+
+		// set a soft of hard mode
+		SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);
 	}
 
 	ndBodyDynamic* MakeFronAxel(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis)

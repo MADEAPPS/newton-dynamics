@@ -53,6 +53,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 	{
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
 
+		m_useHardSolverMode = false;
+
 		dFloat32 fuelInjectionRate = 10.0f;
 		dFloat32 idleTorquePoundFoot = 200.0f;
 		dFloat32 idleRmp = 800.0f;
@@ -294,6 +296,9 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 				break;
 			}
 		}
+
+		// set a soft or hard mode
+		SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);
 	}
 
 	~ndBasicMultiBodyVehicle()
