@@ -261,69 +261,38 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 	{
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 		ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
+		ndBodyDynamic* const chassisBody = tire->GetBody1()->GetAsBodyDynamic();
+
 		bool savedSleepState = tireBody->GetSleepState();
 		tire->UpdateTireSteeringAngleMatrix();
-
-		//ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-		//ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
-		//ndBodyDynamic* const chassisBody = tire->GetBody1()->GetAsBodyDynamic();
-		//
-		//dMatrix tireMatrix;
-		//dMatrix chassisMatrix;
-		//tire->CalculateTireSteeringMatrix();
-		//tire->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
-		//
-		//// align tire matrix 
-		//const dFloat32 spinAngle = -tire->CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
-		//dVector localPosit(chassisMatrix.UntransformVector(tireMatrix.m_posit));
-		//
-		//bool applyProjection = (localPosit.m_x * localPosit.m_x + localPosit.m_z * localPosit.m_z) > (dFloat32(0.01f) * dFloat32(0.01f));
-		//localPosit.m_x = dFloat32(0.0f);
-		//localPosit.m_z = dFloat32(0.0f);
-		////const ndWheelDescriptor& info = tire->GetInfo();
-		////localPosit.m_y = dClamp(localPosit.m_y, info.m_minLimit, info.m_maxLimit);
-		//tireMatrix = dPitchMatrix(spinAngle) * chassisMatrix;
-		//tireMatrix.m_posit = chassisMatrix.TransformVector(localPosit);
-		//
-		////tire->UpdateTireSteeringAngleMatrix();
-		////dMatrix xxxx(tire->GetLocalMatrix0() * tireBody->GetMatrix());
-		////dMatrix xxxx1(tireMatrix.Inverse() * xxxx);
-		////dAssert((dAbs(xxxx1[0][0]) - 1.0f) < 1.0e-4f);
-		////dAssert((dAbs(xxxx1[1][1]) - 1.0f) < 1.0e-4f);
-		////dAssert((dAbs(xxxx1[2][2]) - 1.0f) < 1.0e-4f);
-		////xxxx1.m_posit.m_w = 0.0f;
-		////dAssert(xxxx1.m_posit.DotProduct(xxxx1.m_posit).GetScalar() < 1.0e-6f);
-		//
-		//// align tire velocity
-		//const dVector chassiVelocity(chassisBody->GetVelocityAtPoint(tireMatrix.m_posit));
-		//const dVector relVeloc(tireBody->GetVelocity() - chassiVelocity);
-		//dVector localVeloc(chassisMatrix.UnrotateVector(relVeloc));
-		//
-		//dTrace(("v(%f %f) ", localVeloc.m_x, localVeloc.m_z));
-		//localVeloc.m_x = dFloat32(0.0f);
-		//localVeloc.m_z = dFloat32(0.0f);
-		//const dVector tireVelocity(chassiVelocity + chassisMatrix.RotateVector(localVeloc));
-		//
-		//// align tire angular velocity
-		//const dVector chassisOmega(chassisBody->GetOmega());
-		//const dVector relOmega(tireBody->GetOmega() - chassisOmega);
-		//dVector localOmega(chassisMatrix.UnrotateVector(relOmega));
-		//dTrace(("w(%f %f  %f)\n", localOmega.m_x, localOmega.m_y, localOmega.m_z));
-		//localOmega.m_y = dFloat32(0.0f);
-		//localOmega.m_z = dFloat32(0.0f);
-		//const dVector tireOmega(chassisOmega + chassisMatrix.RotateVector(localOmega));
-		//
-		//tireMatrix = tire->GetLocalMatrix0().Inverse() * tireMatrix;
-		//
-		//bool savedSleepState = tireBody->GetSleepState();
-		//if (applyProjection)
-		//{
-		//	//tireBody->SetOmega(tireOmega);
-		//	//tireBody->SetVelocity(tireVelocity);
-		//	//tireBody->SetMatrix(tireMatrix);
-		//}
-		//tireBody->RestoreSleepState(savedSleepState);
-
+		
+		dMatrix tireMatrix;
+		dMatrix chassisMatrix;
+		tire->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
+		
+		// align tire velocity
+		const dVector chassisVelocity(chassisBody->GetVelocityAtPoint(tireMatrix.m_posit));
+		const dVector relVeloc(tireBody->GetVelocity() - chassisVelocity);
+		dVector localVeloc(chassisMatrix.UnrotateVector(relVeloc));
+		bool applyProjection = (localVeloc.m_x * localVeloc.m_x + localVeloc.m_z * localVeloc.m_z) > (dFloat32(0.05f) * dFloat32(0.05f));
+		localVeloc.m_x *= dFloat32(0.3f);
+		localVeloc.m_z *= dFloat32(0.3f);
+		const dVector tireVelocity(chassisVelocity + chassisMatrix.RotateVector(localVeloc));
+		
+		// align tire angular velocity
+		const dVector chassisOmega(chassisBody->GetOmega());
+		const dVector relOmega(tireBody->GetOmega() - chassisOmega);
+		dVector localOmega(chassisMatrix.UnrotateVector(relOmega));
+		applyProjection = applyProjection || (localOmega.m_y * localOmega.m_y + localOmega.m_z * localOmega.m_z) > (dFloat32(0.05f) * dFloat32(0.05f));
+		localOmega.m_y *= dFloat32(0.3f);
+		localOmega.m_z *= dFloat32(0.3f);
+		const dVector tireOmega(chassisOmega + chassisMatrix.RotateVector(localOmega));
+		
+		if (applyProjection)
+		{
+			tireBody->SetOmega(tireOmega);
+			tireBody->SetVelocity(tireVelocity);
+		}
 		tireBody->RestoreSleepState(savedSleepState);
 	}
 #else
