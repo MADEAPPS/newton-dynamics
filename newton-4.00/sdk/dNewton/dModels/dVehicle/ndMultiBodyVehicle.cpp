@@ -46,6 +46,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 	,m_torsionBar(nullptr)
 	,m_tireList()
 	,m_differentials()
+	,m_suspensionStiffnessModifier(dFloat32(1.0f))
 {
 	m_tireShape->AddRef();
 	m_localFrame.m_front = frontDir & dVector::m_triplexMask;
@@ -60,6 +61,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode)
 	,m_chassis(nullptr)
 	,m_tireShape(new ndShapeChamferCylinder(dFloat32(0.75f), dFloat32(0.5f)))
 	,m_tireList()
+	,m_suspensionStiffnessModifier(dFloat32(1.0f))
 {
 	m_tireShape->AddRef();
 }
@@ -206,6 +208,7 @@ ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 wi
 
 void ndMultiBodyVehicle::ApplyAerodynamics()
 {
+	m_suspensionStiffnessModifier = dFloat32(1.0f);
 	dFloat32 gravity = m_downForce.GetDownforceFactor(GetSpeed());
 	if (dAbs (gravity) > dFloat32(1.0e-2f))
 	{
@@ -213,6 +216,8 @@ void ndMultiBodyVehicle::ApplyAerodynamics()
 		const dVector weight(m_chassis->GetForce());
 		const dVector downForce(up.Scale(gravity * m_chassis->GetMassMatrix().m_w));
 		m_chassis->SetForce(weight + downForce);
+		m_suspensionStiffnessModifier = up.DotProduct(weight).GetScalar() / up.DotProduct(weight + downForce.Scale (0.5f)).GetScalar();
+		//dTrace(("%f\n", m_suspensionStiffnessModifier));
 		
 		for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 		{
@@ -694,19 +699,19 @@ ndMultiBodyVehicle::ndDownForce::ndDownForce()
 
 	m_downForceTable[1].m_speed = dFloat32(30.0f) * dFloat32(0.27f);
 	m_downForceTable[1].m_forceFactor = 1.0f;
-	m_downForceTable[1].m_aerodynamicDownforceConstant = CalcuateFactor(&m_downForceTable[0]);
+	m_downForceTable[1].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[0]);
 
 	m_downForceTable[2].m_speed = dFloat32(60.0f) * dFloat32(0.27f);
 	m_downForceTable[2].m_forceFactor = 1.6f;
-	m_downForceTable[2].m_aerodynamicDownforceConstant = CalcuateFactor(&m_downForceTable[1]);
+	m_downForceTable[2].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[1]);
 	
 	m_downForceTable[3].m_speed = dFloat32(140.0f) * dFloat32(0.27f);
 	m_downForceTable[3].m_forceFactor = 3.0f;
-	m_downForceTable[3].m_aerodynamicDownforceConstant = CalcuateFactor(&m_downForceTable[2]);
+	m_downForceTable[3].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[2]);
 
 	m_downForceTable[4].m_speed = dFloat32(1000.0f) * dFloat32(0.27f);
 	m_downForceTable[4].m_forceFactor = 3.0f;
-	m_downForceTable[4].m_aerodynamicDownforceConstant = CalcuateFactor(&m_downForceTable[3]);
+	m_downForceTable[4].m_aerodynamicDownforceConstant = CalculateFactor(&m_downForceTable[3]);
 
 #if 0
 	dFloat32 speed = 0;
@@ -718,7 +723,7 @@ ndMultiBodyVehicle::ndDownForce::ndDownForce()
 #endif
 }
 
-dFloat32 ndMultiBodyVehicle::ndDownForce::CalcuateFactor(const ndSpeedForcePair* const entry0) const
+dFloat32 ndMultiBodyVehicle::ndDownForce::CalculateFactor(const ndSpeedForcePair* const entry0) const
 {
 	const ndSpeedForcePair* const entry1 = entry0 + 1;
 	dFloat32 num = dMax(entry1->m_forceFactor - entry0->m_forceFactor, dFloat32 (0.0f));

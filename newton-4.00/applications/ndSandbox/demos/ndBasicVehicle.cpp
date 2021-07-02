@@ -94,10 +94,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_laterialStiffness  = 0.3f / 1000.0f;
 		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 
-#if 1
+#if 0
 // Dave check here
-//m_comDisplacement.m_y = -2.0f;
-//m_comDisplacement.m_y = -0.55f;
 m_comDisplacement.m_y = -1.0f;
 m_frontTire.m_verticalOffset = -1.0f;
 m_rearTire.m_verticalOffset = -1.0f;

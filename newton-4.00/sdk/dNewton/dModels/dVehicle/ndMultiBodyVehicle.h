@@ -56,7 +56,7 @@ class ndMultiBodyVehicle: public ndModel
 		dFloat32 GetDownforceFactor(dFloat32 speed) const;
 
 		private:
-		dFloat32 CalcuateFactor(const ndSpeedForcePair* const entry) const;
+		dFloat32 CalculateFactor(const ndSpeedForcePair* const entry) const;
 	
 		dFloat32 m_gravity;
 		ndSpeedForcePair m_downForceTable[5];
@@ -107,6 +107,7 @@ class ndMultiBodyVehicle: public ndModel
 	dList<ndMultiBodyVehicleTireJoint*> m_tireList;
 	dList<ndMultiBodyVehicleDifferential*> m_differentials;
 	ndDownForce m_downForce;
+	dFloat32 m_suspensionStiffnessModifier;
 	
 	friend class ndMultiBodyVehicleMotor;
 	friend class ndMultiBodyVehicleGearBox;
