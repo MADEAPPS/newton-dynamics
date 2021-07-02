@@ -68,9 +68,6 @@ class ndJointWheel: public ndJointBilateralConstraint
 	{
 		m_info = info;
 	}
-	
-	private:
-	void CalculateTireSteeringMatrix();
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);

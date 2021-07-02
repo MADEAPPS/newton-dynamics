@@ -45,18 +45,12 @@ void ndJointWheel::SetSteering(dFloat32 normalidedSteering)
 	m_normalidedSteering = dClamp(normalidedSteering, dFloat32(-1.0f), dFloat32(1.0f));
 }
 
-void ndJointWheel::CalculateTireSteeringMatrix()
-{
-	const dMatrix steeringMatrix(dYawMatrix(m_normalidedSteering * m_info.m_steeringAngle));
-	m_localMatrix1 = steeringMatrix * m_baseFrame;
-}
-
 void ndJointWheel::UpdateTireSteeringAngleMatrix()
 {
 	dMatrix tireMatrix;
 	dMatrix chassisMatrix;
+	m_localMatrix1 = dYawMatrix(m_normalidedSteering * m_info.m_steeringAngle) * m_baseFrame;
 
-	CalculateTireSteeringMatrix();
 	CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 
 	const dVector relPosit(tireMatrix.m_posit - chassisMatrix.m_posit);

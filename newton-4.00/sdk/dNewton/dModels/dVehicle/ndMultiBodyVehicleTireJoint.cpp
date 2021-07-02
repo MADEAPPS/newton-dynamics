@@ -38,6 +38,5 @@ dFloat32 ndMultiBodyVehicleTireJoint::GetLongitudinalSlip() const
 
 void ndMultiBodyVehicleTireJoint::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	m_regularizer = m_info.m_regularizer * m_vehicle->m_suspensionStiffnessModifier;
 	ndJointWheel::JacobianDerivative(desc);
 }

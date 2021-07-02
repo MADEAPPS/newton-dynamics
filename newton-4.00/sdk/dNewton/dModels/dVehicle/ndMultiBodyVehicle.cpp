@@ -46,7 +46,6 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 	,m_torsionBar(nullptr)
 	,m_tireList()
 	,m_differentials()
-	,m_suspensionStiffnessModifier(dFloat32(1.0f))
 {
 	m_tireShape->AddRef();
 	m_localFrame.m_front = frontDir & dVector::m_triplexMask;
@@ -61,7 +60,6 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode)
 	,m_chassis(nullptr)
 	,m_tireShape(new ndShapeChamferCylinder(dFloat32(0.75f), dFloat32(0.5f)))
 	,m_tireList()
-	,m_suspensionStiffnessModifier(dFloat32(1.0f))
 {
 	m_tireShape->AddRef();
 }
@@ -208,22 +206,20 @@ ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 wi
 
 void ndMultiBodyVehicle::ApplyAerodynamics()
 {
-	dFloat32 downForceFactor = m_downForce.GetDownforceFactor(GetSpeed());
-	m_suspensionStiffnessModifier = dFloat32(1.0f);
-	if (downForceFactor > dFloat32(0.0f))
+	dFloat32 gravity = m_downForce.GetDownforceFactor(GetSpeed());
+	if (dAbs (gravity) > dFloat32(1.0e-2f))
 	{
 		const dVector up(m_chassis->GetMatrix().RotateVector(m_localFrame.m_up));
 		const dVector weight(m_chassis->GetForce());
-		const dVector downForce(up.Scale(m_downForce.m_gravity * downForceFactor * m_chassis->GetMassMatrix().m_w));
+		const dVector downForce(up.Scale(gravity * m_chassis->GetMassMatrix().m_w));
 		m_chassis->SetForce(weight + downForce);
-		//m_suspensionStiffnessModifier = up.DotProduct(weight).GetScalar() / up.DotProduct(weight + downForce).GetScalar();
 		
 		for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 		{
 			ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 			ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
 			const dVector tireWeight(tireBody->GetForce());
-			const dVector tireDownForce(up.Scale(m_downForce.m_gravity * downForceFactor * tireBody->GetMassMatrix().m_w));
+			const dVector tireDownForce(up.Scale(gravity * tireBody->GetMassMatrix().m_w));
 			tireBody->SetForce(tireWeight + tireDownForce);
 		}
 	}
@@ -260,51 +256,74 @@ void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
 
 void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 {
-#if 0
+#if 1
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 		ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
-		ndBodyDynamic* const chassisBody = tire->GetBody1()->GetAsBodyDynamic();
-
-		dMatrix tireMatrix;
-		dMatrix chassisMatrix;
-		tire->CalculateTireSteeringMatrix();
-		tire->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
-		
-		// align tire matrix 
-		const ndWheelDescriptor& info = tire->GetInfo();
-		const dFloat32 spinAngle = -tire->CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
-		dVector localPosit(chassisMatrix.UntransformVector(tireMatrix.m_posit));
-		localPosit.m_x = dFloat32(0.0f);
-		localPosit.m_z = dFloat32(0.0f);
-		localPosit.m_y = dClamp(localPosit.m_y, info.m_minLimit, info.m_maxLimit);
-		tireMatrix = dPitchMatrix(spinAngle) * chassisMatrix;
-		tireMatrix.m_posit = chassisMatrix.TransformVector(localPosit);
-
-		// align tire velocity
-		const dVector chassiVelocity(chassisBody->GetVelocityAtPoint(tireMatrix.m_posit));
-		const dVector relVeloc(tireBody->GetVelocity() - chassiVelocity);
-
-		dVector localVeloc(chassisMatrix.UnrotateVector(relVeloc));
-		localVeloc.m_x = dFloat32(0.0f);
-		localVeloc.m_z = dFloat32(0.0f);
-		const dVector tireVelocity(chassiVelocity + chassisMatrix.RotateVector(localVeloc));
-		
-		// align tire angular velocity
-		const dVector chassisOmega(chassisBody->GetOmega());
-		const dVector relOmega(tireBody->GetOmega() - chassisOmega);
-		dVector localOmega(chassisMatrix.UnrotateVector(relOmega));
-		localOmega.m_y = dFloat32(0.0f);
-		localOmega.m_z = dFloat32(0.0f);
-		const dVector tireOmega(chassisOmega + chassisMatrix.RotateVector(localOmega));
-
-		tireMatrix = tire->GetLocalMatrix0().Inverse() * tireMatrix;
-
 		bool savedSleepState = tireBody->GetSleepState();
-		tireBody->SetOmega(tireOmega);
-		//tireBody->SetVelocity(tireVelocity);
-		tireBody->SetMatrix(tireMatrix);
+		tire->UpdateTireSteeringAngleMatrix();
+
+		//ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
+		//ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
+		//ndBodyDynamic* const chassisBody = tire->GetBody1()->GetAsBodyDynamic();
+		//
+		//dMatrix tireMatrix;
+		//dMatrix chassisMatrix;
+		//tire->CalculateTireSteeringMatrix();
+		//tire->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
+		//
+		//// align tire matrix 
+		//const dFloat32 spinAngle = -tire->CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
+		//dVector localPosit(chassisMatrix.UntransformVector(tireMatrix.m_posit));
+		//
+		//bool applyProjection = (localPosit.m_x * localPosit.m_x + localPosit.m_z * localPosit.m_z) > (dFloat32(0.01f) * dFloat32(0.01f));
+		//localPosit.m_x = dFloat32(0.0f);
+		//localPosit.m_z = dFloat32(0.0f);
+		////const ndWheelDescriptor& info = tire->GetInfo();
+		////localPosit.m_y = dClamp(localPosit.m_y, info.m_minLimit, info.m_maxLimit);
+		//tireMatrix = dPitchMatrix(spinAngle) * chassisMatrix;
+		//tireMatrix.m_posit = chassisMatrix.TransformVector(localPosit);
+		//
+		////tire->UpdateTireSteeringAngleMatrix();
+		////dMatrix xxxx(tire->GetLocalMatrix0() * tireBody->GetMatrix());
+		////dMatrix xxxx1(tireMatrix.Inverse() * xxxx);
+		////dAssert((dAbs(xxxx1[0][0]) - 1.0f) < 1.0e-4f);
+		////dAssert((dAbs(xxxx1[1][1]) - 1.0f) < 1.0e-4f);
+		////dAssert((dAbs(xxxx1[2][2]) - 1.0f) < 1.0e-4f);
+		////xxxx1.m_posit.m_w = 0.0f;
+		////dAssert(xxxx1.m_posit.DotProduct(xxxx1.m_posit).GetScalar() < 1.0e-6f);
+		//
+		//// align tire velocity
+		//const dVector chassiVelocity(chassisBody->GetVelocityAtPoint(tireMatrix.m_posit));
+		//const dVector relVeloc(tireBody->GetVelocity() - chassiVelocity);
+		//dVector localVeloc(chassisMatrix.UnrotateVector(relVeloc));
+		//
+		//dTrace(("v(%f %f) ", localVeloc.m_x, localVeloc.m_z));
+		//localVeloc.m_x = dFloat32(0.0f);
+		//localVeloc.m_z = dFloat32(0.0f);
+		//const dVector tireVelocity(chassiVelocity + chassisMatrix.RotateVector(localVeloc));
+		//
+		//// align tire angular velocity
+		//const dVector chassisOmega(chassisBody->GetOmega());
+		//const dVector relOmega(tireBody->GetOmega() - chassisOmega);
+		//dVector localOmega(chassisMatrix.UnrotateVector(relOmega));
+		//dTrace(("w(%f %f  %f)\n", localOmega.m_x, localOmega.m_y, localOmega.m_z));
+		//localOmega.m_y = dFloat32(0.0f);
+		//localOmega.m_z = dFloat32(0.0f);
+		//const dVector tireOmega(chassisOmega + chassisMatrix.RotateVector(localOmega));
+		//
+		//tireMatrix = tire->GetLocalMatrix0().Inverse() * tireMatrix;
+		//
+		//bool savedSleepState = tireBody->GetSleepState();
+		//if (applyProjection)
+		//{
+		//	//tireBody->SetOmega(tireOmega);
+		//	//tireBody->SetVelocity(tireVelocity);
+		//	//tireBody->SetMatrix(tireMatrix);
+		//}
+		//tireBody->RestoreSleepState(savedSleepState);
+
 		tireBody->RestoreSleepState(savedSleepState);
 	}
 #else
@@ -529,7 +548,7 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 	}
 }
 
-void ndMultiBodyVehicle::ApplyTiremodel()
+void ndMultiBodyVehicle::ApplyTireModel()
 {
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
@@ -634,19 +653,40 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 					//}
 				}
 
-				const dMatrix tireMatrix (tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());
+				dMatrix tireBasisMatrix (tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());
+				tireBasisMatrix.m_posit = tire->GetBody0()->GetMatrix().m_posit;
 				for (ndContactPointList::dNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 				{
 					ndContactMaterial& contactPoint = contactNode->GetInfo();
-					dFloat32 contactPathLocation = dAbs (contactPoint.m_normal.DotProduct(tireMatrix.m_front).GetScalar());
+					dFloat32 contactPathLocation = dAbs (contactPoint.m_normal.DotProduct(tireBasisMatrix.m_front).GetScalar());
+					// contact are consider on the contact patch strip only if the are less than 
+					// 45 degree angle from the tire axle
 					if (contactPathLocation < dFloat32 (0.71f))
 					{
-						// contact are consider on the contact patch only if the are less than 
-						// 45 degree angle from the tire axle
-						const dVector fronDir(contactPoint.m_normal.CrossProduct(tireMatrix.m_front));
+						// align tire friction direction
+						const dVector fronDir(contactPoint.m_normal.CrossProduct(tireBasisMatrix.m_front));
 						contactPoint.m_dir1 = fronDir.Normalize();
 						contactPoint.m_dir0 = contactPoint.m_dir1.CrossProduct(contactPoint.m_normal);
-						BrushTireModel(tire, contactPoint);
+						
+						// check if the contact is in the contact patch,
+						// the is the 45 degree point around the tire vehicle axis. 
+						dVector dir(contactPoint.m_point - tireBasisMatrix.m_posit);
+						dAssert(dir.DotProduct(dir).GetScalar() > dFloat32(0.0f));
+						dFloat32 contactPatch = tireBasisMatrix.m_up.DotProduct(dir.Normalize()).GetScalar();
+						if (contactPatch < dFloat32(-0.71f))
+						{
+							BrushTireModel(tire, contactPoint);
+						}
+						else
+						{
+							const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
+							contactPoint.m_material.m_restitution = dFloat32(0.1f);
+							contactPoint.m_material.m_staticFriction0 = frictionCoefficient;
+							contactPoint.m_material.m_staticFriction1 = frictionCoefficient;
+
+							contactPoint.m_material.m_dynamicFriction0 = frictionCoefficient;
+							contactPoint.m_material.m_dynamicFriction1 = frictionCoefficient;
+						}
 					}
 					else
 					{
@@ -672,41 +712,43 @@ ndMultiBodyVehicle::ndDownForce::ndDownForce()
 	m_downForceTable[0].m_forceFactor = 0.0f;
 	m_downForceTable[0].m_aerodynamicDownforceConstant = dFloat32(0.0f);
 
-	m_downForceTable[1].m_speed = dFloat32(10.0f) * dFloat32(0.27f);
-	m_downForceTable[1].m_forceFactor = 0.0f;
-	m_downForceTable[1].m_aerodynamicDownforceConstant = dFloat32(0.0f);
+	m_downForceTable[1].m_speed = dFloat32(30.0f) * dFloat32(0.27f);
+	m_downForceTable[1].m_forceFactor = 1.0f;
+	m_downForceTable[1].m_aerodynamicDownforceConstant = CalcuateFactor(&m_downForceTable[0]);
 
 	m_downForceTable[2].m_speed = dFloat32(60.0f) * dFloat32(0.27f);
-	m_downForceTable[2].m_forceFactor = 1.0f;
-	dFloat32 num = m_downForceTable[2].m_forceFactor - m_downForceTable[1].m_forceFactor;
-	dFloat32 den = m_downForceTable[2].m_speed - m_downForceTable[1].m_speed;
-	m_downForceTable[2].m_aerodynamicDownforceConstant = num / (den * den);
+	m_downForceTable[2].m_forceFactor = 1.6f;
+	m_downForceTable[2].m_aerodynamicDownforceConstant = CalcuateFactor(&m_downForceTable[1]);
 	
 	m_downForceTable[3].m_speed = dFloat32(140.0f) * dFloat32(0.27f);
-	m_downForceTable[3].m_forceFactor = 2.5f;
-	num = m_downForceTable[3].m_forceFactor - m_downForceTable[2].m_forceFactor;
-	den = m_downForceTable[3].m_speed - m_downForceTable[2].m_speed;
-	m_downForceTable[3].m_aerodynamicDownforceConstant = num / (den * den);
+	m_downForceTable[3].m_forceFactor = 3.0f;
+	m_downForceTable[3].m_aerodynamicDownforceConstant = CalcuateFactor(&m_downForceTable[2]);
 
 	m_downForceTable[4].m_speed = dFloat32(1000.0f) * dFloat32(0.27f);
-	m_downForceTable[4].m_forceFactor = 2.5f;
-	num = m_downForceTable[4].m_forceFactor - m_downForceTable[3].m_forceFactor;
-	den = m_downForceTable[4].m_speed - m_downForceTable[3].m_speed;
-	m_downForceTable[4].m_aerodynamicDownforceConstant = num / (den * den);
+	m_downForceTable[4].m_forceFactor = 3.0f;
+	m_downForceTable[4].m_aerodynamicDownforceConstant = CalcuateFactor(&m_downForceTable[3]);
 
-	//dFloat32 speed = 0;
-	//for (dInt32 i = 0; i < 100; i++)
-	//{
-	//	dTrace(("%f %f\n", speed/ 0.27f, GetDownforceFactor(speed)));
-	//	speed += (150.0f / 100.0f) * 0.27f;
-	//}
+#if 0
+	dFloat32 speed = 0;
+	for (dInt32 i = 0; i < 100; i++)
+	{
+		dTrace(("%f %f\n", speed, GetDownforceFactor(speed)/m_gravity));
+		speed += (150.0f / 100.0f) * 0.27f;
+	}
+#endif
+}
+
+dFloat32 ndMultiBodyVehicle::ndDownForce::CalcuateFactor(const ndSpeedForcePair* const entry0) const
+{
+	const ndSpeedForcePair* const entry1 = entry0 + 1;
+	dFloat32 num = dMax(entry1->m_forceFactor - entry0->m_forceFactor, dFloat32 (0.0f));
+	dFloat32 den = dMax (dAbs (entry1->m_speed - entry0->m_speed), 1.0f);
+	return num / (den * den);
 }
 
 dFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(dFloat32 speed) const
 {
 	dAssert(speed >= dFloat32(0.0f));
-
-
 	dInt32 index = 0;
 	for (dInt32 i = sizeof(m_downForceTable) / sizeof(m_downForceTable[0]) - 1; i ; i--)
 	{
@@ -719,7 +761,7 @@ dFloat32 ndMultiBodyVehicle::ndDownForce::GetDownforceFactor(dFloat32 speed) con
 
 	dFloat32 deltaSpeed = speed - m_downForceTable[index].m_speed;
 	dFloat32 downForceFactor = m_downForceTable[index].m_forceFactor + m_downForceTable[index + 1].m_aerodynamicDownforceConstant * deltaSpeed * deltaSpeed;
-	return downForceFactor;
+	return downForceFactor * m_gravity;
 }
 
 void ndMultiBodyVehicle::PostUpdate(ndWorld* const, dFloat32)
@@ -736,5 +778,5 @@ void ndMultiBodyVehicle::Update(ndWorld* const world, dFloat32 timestep)
 
 	// apply down force
 	ApplyAerodynamics();
-	ApplyTiremodel();
+	ApplyTireModel();
 }

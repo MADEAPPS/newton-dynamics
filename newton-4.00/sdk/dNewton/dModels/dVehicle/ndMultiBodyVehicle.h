@@ -54,6 +54,9 @@ class ndMultiBodyVehicle: public ndModel
 
 		ndDownForce();
 		dFloat32 GetDownforceFactor(dFloat32 speed) const;
+
+		private:
+		dFloat32 CalcuateFactor(const ndSpeedForcePair* const entry) const;
 	
 		dFloat32 m_gravity;
 		ndSpeedForcePair m_downForceTable[5];
@@ -83,7 +86,7 @@ class ndMultiBodyVehicle: public ndModel
 
 	private:
 	void ApplySteering();
-	void ApplyTiremodel();
+	void ApplyTireModel();
 	void ApplyAerodynamics();
 	void ApplyAligmentAndBalancing();
 	ndBodyDynamic* CreateInternalBodyPart(ndWorld* const world, dFloat32 mass, dFloat32 radius) const;
@@ -104,7 +107,6 @@ class ndMultiBodyVehicle: public ndModel
 	dList<ndMultiBodyVehicleTireJoint*> m_tireList;
 	dList<ndMultiBodyVehicleDifferential*> m_differentials;
 	ndDownForce m_downForce;
-	dFloat32 m_suspensionStiffnessModifier;
 	
 	friend class ndMultiBodyVehicleMotor;
 	friend class ndMultiBodyVehicleGearBox;
