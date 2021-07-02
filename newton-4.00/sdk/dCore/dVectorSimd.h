@@ -28,10 +28,6 @@
 	#define dVector dBigVector
 #else
 
-#ifdef D_USE_SSE3
-	//#define D_USE_SSE3
-#endif
-
 class dBigVector;
 // *****************************************************************************************
 //
@@ -1062,7 +1058,7 @@ class dVector
 	D_MSV_NEWTON_ALIGN_32
 	class dBigVector
 	{
-		#define PERMUT_MASK_DOUBLE(y, x)	_MM_SHUFFLE2 (y, x)
+		#define PERMUT_MASK_DOUBLE(y, x) _MM_SHUFFLE2 (y, x)
 
 		public:
 		D_INLINE dBigVector()

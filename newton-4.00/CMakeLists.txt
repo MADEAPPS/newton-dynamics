@@ -162,7 +162,7 @@ if (MSVC)
 
 	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 		message("for visual studio compiler we assume sse3 at a minimum") 
-		add_definitions(-DD_USE_SSE3)
+		#add_definitions(-DD_USE_SSE3)
 
 		if (NEWTON_ENABLE_AVX)
 			message("using avx explicitly only for studio compiler") 
