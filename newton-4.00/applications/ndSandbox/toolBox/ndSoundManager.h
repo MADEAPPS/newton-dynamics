@@ -23,7 +23,7 @@ class dSoundChannel: public dRefCounter<dSoundChannel>
 	dSoundChannel();
 	virtual ~dSoundChannel();
 
-	//void Play();
+	void Play();
 	//void Stop();
 	//
 	//void SetLoop(bool mode);
@@ -37,6 +37,7 @@ class dSoundChannel: public dRefCounter<dSoundChannel>
 	private:
 	dInt32 m_source;
 	ndSoundAsset* m_asset;
+	ndSoundManager* m_manager;
 	friend class ndSoundManager;
 };
 
@@ -91,8 +92,8 @@ class ndSoundManager: public ndModel
 	//void* GetAsset(void* const channelHandle) const;
 	//dFloat32 GetChannelVolume(void* const channelHandle) const;
 	//dFloat32 GetChannelGetPosition(void* const channelHandle) const;
-	//
-	//void PlayChannel (void* const channelHandle);
+	
+	//void PlayChannel (dSoundChannel* const channel);
 	//void StopChannel (void* const channelHandle);
 	//
 	//void SetChannelVolume(void* const channelHandle, dFloat32 volume);

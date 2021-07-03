@@ -313,10 +313,10 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		for (int i = 0; i < sizeof(engineSounds) / sizeof(engineSounds[0]); i++)
 		{
 			dSoundChannel* const channel = soundManager->CreateSoundChannel(engineSounds[i]);
-			//	soundManager->PlayChannel(soundChannel);
+			channel->Play();
 			//	//m_engineSounds[i] = sound;
+			break;
 		}
-
 	}
 
 	~ndBasicMultiBodyVehicle()

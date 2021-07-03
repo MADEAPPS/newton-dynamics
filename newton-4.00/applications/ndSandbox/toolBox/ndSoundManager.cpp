@@ -98,19 +98,6 @@ void* ndSoundManager::GetAsset(void* const channelHandle) const
 	return nullptr;
 }
 
-void ndSoundManager::PlayChannel(void* const channelHandle)
-{
-	if (m_device)
-	{
-		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
-		dSoundChannel& channel = node->GetInfo();
-		if (!channel.IsPlaying())
-		{
-			channel.Play();
-			m_channelPlaying.Append(node);
-		}
-	}
-}
 
 void ndSoundManager::StopChannel(void* const channelHandle)
 {
@@ -183,17 +170,6 @@ dFloat32 ndSoundManager::GetChannelGetPosition(void* const channelHandle) const
 
 
 
-void ndSoundManager::dSoundChannel::Play ()
-{
-	// set some default values
-	alSourcef(m_source, AL_GAIN, 1);
-	alSource3f(m_source, AL_POSITION, 0, 0, 0);
-	alSource3f(m_source, AL_VELOCITY, 0, 0, 0);
-	alSourcei(m_source, AL_LOOPING, AL_FALSE);
-
-	alSourcePlay(m_source);
-	dAssert (alGetError() == AL_NO_ERROR);
-}
 
 void ndSoundManager::dSoundChannel::Stop ()
 {
@@ -241,6 +217,7 @@ dFloat32 ndSoundManager::dSoundChannel::GetVolume() const
 dSoundChannel::dSoundChannel()
 	:m_source(0)
 	,m_asset(nullptr)
+	,m_manager(nullptr)
 {
 	alGenSources(1, (ALuint*)&m_source);
 	dAssert(m_source);
@@ -252,6 +229,19 @@ dSoundChannel::~dSoundChannel()
 	alDeleteSources(1, (ALuint*)&m_source);
 	dAssert(alGetError() == AL_NO_ERROR);
 }
+
+void dSoundChannel::Play()
+{
+	// set some default values
+	alSourcef(m_source, AL_GAIN, 1);
+	alSource3f(m_source, AL_POSITION, 0, 0, 0);
+	alSource3f(m_source, AL_VELOCITY, 0, 0, 0);
+	alSourcei(m_source, AL_LOOPING, AL_FALSE);
+
+	alSourcePlay(m_source);
+	dAssert(alGetError() == AL_NO_ERROR);
+}
+
 
 ndSoundAsset::ndSoundAsset()
 	:dSoundChannelList()
@@ -440,8 +430,8 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 }
 void ndSoundManager::PostUpdate(ndWorld* const, dFloat32)
 {
-	//if (m_device)
-	//{
+	if (m_device)
+	{
 	//	dSoundChannelPlaying::dNode* next;
 	//	for (dSoundChannelPlaying::dNode* node = m_channelPlaying.GetFirst(); node; node = next)
 	//	{
@@ -457,7 +447,7 @@ void ndSoundManager::PostUpdate(ndWorld* const, dFloat32)
 	//		{
 	//		}
 	//	}
-	//}
+	}
 }
 
 ndSoundAsset* ndSoundManager::CreateSoundAsset(const char* const fileName)
@@ -491,8 +481,21 @@ dSoundChannel* ndSoundManager::CreateSoundChannel(const char* const fileName)
 		channel = &channelNode->GetInfo();
 
 		channel->m_asset = &asset;
+		channel->m_manager = this;
 		alSourcei(channel->m_source, AL_BUFFER, asset.m_buffer);
 		dAssert(alGetError() == AL_NO_ERROR);
 	}
 	return channel;
 }
+
+//void ndSoundManager::PlayChannel(dSoundChannel* const channel)
+//{
+//	//if (m_device)
+//	//{
+//	//	//if (!channel.IsPlaying())
+//	//	{
+//	//		channel.Play();
+//	//		//m_channelPlaying.Append(node);
+//	//	//}
+//	//}
+//}
