@@ -164,6 +164,14 @@ static ndVehicleDectriptorJeep jeepDesc;
 static ndVehicleDectriptorViper viperDesc;
 static ndVehicleDectriptorMonsterTruck monterTruckDesc;
 
+static char* engineSounds[] =
+{
+	"engine_start.wav",
+	"engine_rpm.wav",
+	"tire_skid.wav",
+};
+
+
 class ndBasicMultiBodyVehicle : public ndBasicVehicle
 {
 	public:
@@ -300,6 +308,16 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 		// set a soft or hard mode
 		SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);
+
+		// load all engine sound channels
+		ndSoundManager* const soundManager = scene->GetSoundManager();
+		for (int i = 0; i < sizeof(engineSounds) / sizeof(engineSounds[0]); i++)
+		{
+			dSoundChannel* const channel = soundManager->CreateSoundChannel(engineSounds[i]);
+			//	soundManager->PlayChannel(soundChannel);
+			//	//m_engineSounds[i] = sound;
+		}
+
 	}
 
 	~ndBasicMultiBodyVehicle()
@@ -592,14 +610,9 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//matrix.m_posit = location;
 
 	ndSoundManager* const soundManager = scene->GetSoundManager();
-
-	static char* engineSounds[] = { "engine_start.wav", "engine_rpm.wav", "tire_skid.wav" };
-	for (int i = 0; i < sizeof(engineSounds) / sizeof(engineSounds[0]); i++) 
+	for (int i = 0; i < sizeof(engineSounds) / sizeof(engineSounds[0]); i++)
 	{
-		dSoundAssetList::dNode* const soundAsset = soundManager->CreateSoundAsset(engineSounds[i]);
-	//	void* const soundChannel = soundManager->CreatePlayChannel(soundAsset);
-	//	soundManager->PlayChannel(soundChannel);
-	//	//m_engineSounds[i] = sound;
+		soundManager->CreateSoundAsset(engineSounds[i]);
 	}
 
 	// add a model for general controls

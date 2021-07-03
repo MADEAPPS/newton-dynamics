@@ -41,10 +41,10 @@ void ndSoundManager::DestroySound(void* const soundAssetHandle)
 	dAssert(0);
 	if (m_device)
 	{
-		dSoundAssetList::dNode* const node = (dSoundAssetList::dNode*)soundAssetHandle;
+		ndSoundAssetList::dNode* const node = (ndSoundAssetList::dNode*)soundAssetHandle;
 		dAssert(node);
 
-		dSoundAsset& asset = node->GetInfo();
+		ndSoundAsset& asset = node->GetInfo();
 		dAssert(asset.GetRef() > 1);
 		asset.Release();
 
@@ -69,28 +69,13 @@ dFloat32 ndSoundManager::GetSoundlength(void* const soundAssetHandle)
 	dAssert(0);
 	if (m_device)
 	{
-		dSoundAssetList::dNode* const node = (dSoundAssetList::dNode*)soundAssetHandle;
-		dSoundAsset& asset = node->GetInfo();
+		ndSoundAssetList::dNode* const node = (ndSoundAssetList::dNode*)soundAssetHandle;
+		ndSoundAsset& asset = node->GetInfo();
 		return 	asset.m_lenght;
 	}
 	return 0;
 }
 
-void* ndSoundManager::CreatePlayChannel(void* const soundAssetHandle)
-{
-	if (m_device)
-	{
-		dSoundAssetList::dNode* const node = (dSoundAssetList::dNode*)soundAssetHandle;
-		dAssert(node);
-
-		dSoundAsset& asset = node->GetInfo();
-		dSoundChannelList::dNode* const channelNode = asset.Append();
-		dSoundChannel& channel = channelNode->GetInfo();
-		channel.LinkAsset(node);
-		return channelNode;
-	}
-	return nullptr;
-}
 
 void ndSoundManager::DestroyChannel(void* const channelHandle)
 {
@@ -197,14 +182,6 @@ dFloat32 ndSoundManager::GetChannelGetPosition(void* const channelHandle) const
 
 
 
-void ndSoundManager::dSoundChannel::LinkAsset( dTree<dSoundAsset, dUnsigned64>::dNode* const assetNode)
-{
-	m_myAssetNode = assetNode;
-	dSoundAsset& asset = m_myAssetNode->GetInfo();
-	alSourcei (m_source, AL_BUFFER, asset.m_buffer);
-	int xxxx = alGetError();
-	dAssert (alGetError() == AL_NO_ERROR);
-}
 
 void ndSoundManager::dSoundChannel::Play ()
 {
@@ -262,38 +239,38 @@ dFloat32 ndSoundManager::dSoundChannel::GetVolume() const
 #endif
 
 dSoundChannel::dSoundChannel()
-	//:m_source(0)
-	//,m_myAssetNode(nullptr)
+	:m_source(0)
+	,m_asset(nullptr)
 {
-	//alGenSources(1, (ALuint*)&m_source);
-	//dAssert(m_source);
-	//int xxxx = alGetError();
-	//xxxx = alGetError();
-	//dAssert(alGetError() == AL_NO_ERROR);
+	alGenSources(1, (ALuint*)&m_source);
+	dAssert(m_source);
+	dAssert(alGetError() == AL_NO_ERROR);
 }
 
 dSoundChannel::~dSoundChannel()
 {
-	//alDeleteSources(1, (ALuint*)&m_source);
-	//dAssert(alGetError() == AL_NO_ERROR);
+	alDeleteSources(1, (ALuint*)&m_source);
+	dAssert(alGetError() == AL_NO_ERROR);
 }
 
-dSoundAsset::dSoundAsset()
+ndSoundAsset::ndSoundAsset()
 	:dSoundChannelList()
 	,m_buffer(0)
 	,m_lenght(0)
 	,m_frequecy(0)
+	,m_node(nullptr)
 {
 	alGenBuffers(1, (ALuint*)&m_buffer);
 	dAssert(m_buffer);
 	dAssert(alGetError() == AL_NO_ERROR);
 }
 
-dSoundAsset::dSoundAsset(const dSoundAsset& copy)
+ndSoundAsset::ndSoundAsset(const ndSoundAsset& copy)
 	:dSoundChannelList()
 	,m_buffer(copy.m_buffer)
 	,m_lenght(copy.m_lenght)
 	,m_frequecy(copy.m_frequecy)
+	,m_node(nullptr)
 {
 	alGenBuffers(1, (ALuint*)&m_buffer);
 	dAssert(m_buffer);
@@ -301,7 +278,7 @@ dSoundAsset::dSoundAsset(const dSoundAsset& copy)
 	dAssert(copy.GetCount() == 0);
 }
 
-dSoundAsset::~dSoundAsset()
+ndSoundAsset::~ndSoundAsset()
 {
 	RemoveAll();
 	alDeleteBuffers(1, (ALuint *)&m_buffer);
@@ -355,50 +332,12 @@ ndSoundManager::~ndSoundManager()
 	}
 }
 
-void ndSoundManager::PostUpdate(ndWorld* const, dFloat32)
+void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const fileName)
 {
-	//if (m_device)
-	//{
-	//	dSoundChannelPlaying::dNode* next;
-	//	for (dSoundChannelPlaying::dNode* node = m_channelPlaying.GetFirst(); node; node = next)
-	//	{
-	//		dSoundChannelList::dNode* const channelNode = node->GetInfo();
-	//		next = node->GetNext();
-	//
-	//		dSoundChannel& channel = channelNode->GetInfo();
-	//		if (!channel.IsPlaying())
-	//		{
-	//			m_channelPlaying.Remove(node);
-	//		}
-	//		else
-	//		{
-	//		}
-	//	}
-	//}
-}
+	char path[2048];
+	dGetWorkingFileName(fileName, path);
 
-dSoundAssetList::dNode* ndSoundManager::CreateSoundAsset(const char* const fileName)
-{
-	dSoundAssetList::dNode* assetNode = nullptr;
-	if (m_device)
-	{
-		char path[2048];
-		dGetWorkingFileName(fileName, path);
-	
-		dUnsigned64 code = dCRC64(path);
-		assetNode = m_assets.Find(code);
-		if (!assetNode)
-		{
-			assetNode = m_assets.Insert(code);
-			LoadWaveFile(&assetNode->GetInfo(), path);
-		}
-	}
-	return assetNode;
-}
-
-void ndSoundManager::LoadWaveFile(dSoundAsset* const asset, const char* const fileName)
-{
-	FILE* const wave = fopen(fileName, "rb");
+	FILE* const wave = fopen(path, "rb");
 	if (wave)
 	{
 		char xbuffer[5];
@@ -422,7 +361,7 @@ void ndSoundManager::LoadWaveFile(dSoundAsset* const asset, const char* const fi
 					short audioFormat;
 					short blockAlign;
 					short bitsPerSample;
-					
+
 					fread(&audioFormat, sizeof(short), 1, wave);
 					fread(&channels, sizeof(short), 1, wave);
 					fread(&sampleRate, sizeof(dInt32), 1, wave);
@@ -433,16 +372,16 @@ void ndSoundManager::LoadWaveFile(dSoundAsset* const asset, const char* const fi
 					{
 						fread(xbuffer, sizeof(char), 1, wave);
 					}
-					
+
 					#define WAVE_FORMAT_PCM 0x0001
 					//0x0003 WAVE_FORMAT_IEEE_FLOAT IEEE float 
 					//0x0006 WAVE_FORMAT_ALAW 8-bit ITU-T G.711 A-law 
 					//0x0007 WAVE_FORMAT_MULAW 8-bit ITU-T G.711 µ-law 
 					//0xFFFE WAVE_FORMAT_EXTENSIBLE Determined by SubFormat 
-					
+
 					// I only parse WAVE_FORMAT_PCM format
 					dAssert(audioFormat == WAVE_FORMAT_PCM);
-					
+
 					fread(xbuffer, sizeof(char), 4, wave);
 					if (!strcmp(xbuffer, "fact"))
 					{
@@ -452,7 +391,7 @@ void ndSoundManager::LoadWaveFile(dSoundAsset* const asset, const char* const fi
 						fread(&samplesPerChannels, sizeof(dInt32), 1, wave);
 						fread(xbuffer, sizeof(char), 4, wave);
 					}
-					
+
 					if (!strcmp(xbuffer, "data"))
 					{
 						dInt32 size;
@@ -461,7 +400,7 @@ void ndSoundManager::LoadWaveFile(dSoundAsset* const asset, const char* const fi
 						dArray<char> data;
 						data.SetCount(size);
 						fread(&data[0], sizeof(char), size, wave);
-					
+
 						dInt32 waveFormat = AL_FORMAT_MONO8;
 						if (channels == 1)
 						{
@@ -488,7 +427,7 @@ void ndSoundManager::LoadWaveFile(dSoundAsset* const asset, const char* const fi
 								waveFormat = AL_FORMAT_STEREO16;
 							}
 						}
-					
+
 						asset->m_lenght = dFloat32(size) / byteRate;
 						asset->m_frequecy = dFloat32(sampleRate);
 						alBufferData(asset->m_buffer, waveFormat, &data[0], size, sampleRate);
@@ -498,4 +437,62 @@ void ndSoundManager::LoadWaveFile(dSoundAsset* const asset, const char* const fi
 		}
 		fclose(wave);
 	}
+}
+void ndSoundManager::PostUpdate(ndWorld* const, dFloat32)
+{
+	//if (m_device)
+	//{
+	//	dSoundChannelPlaying::dNode* next;
+	//	for (dSoundChannelPlaying::dNode* node = m_channelPlaying.GetFirst(); node; node = next)
+	//	{
+	//		dSoundChannelList::dNode* const channelNode = node->GetInfo();
+	//		next = node->GetNext();
+	//
+	//		dSoundChannel& channel = channelNode->GetInfo();
+	//		if (!channel.IsPlaying())
+	//		{
+	//			m_channelPlaying.Remove(node);
+	//		}
+	//		else
+	//		{
+	//		}
+	//	}
+	//}
+}
+
+ndSoundAsset* ndSoundManager::CreateSoundAsset(const char* const fileName)
+{
+	ndSoundAssetList::dNode* assetNode = nullptr;
+	if (m_device)
+	{
+		dUnsigned64 code = dCRC64(fileName);
+		assetNode = m_assets.Find(code);
+		if (!assetNode)
+		{
+			assetNode = m_assets.Insert(code);
+			LoadWaveFile(&assetNode->GetInfo(), fileName);
+			assetNode->GetInfo().m_node = assetNode;
+		}
+	}
+	return &assetNode->GetInfo();
+}
+
+dSoundChannel* ndSoundManager::CreateSoundChannel(const char* const fileName)
+{
+	dSoundChannel* channel = nullptr;
+	if (m_device)
+	{
+		dUnsigned64 code = dCRC64(fileName);
+		ndSoundAssetList::dNode* const assetNode = m_assets.Find(code);
+		dAssert(assetNode);
+	
+		ndSoundAsset& asset = assetNode->GetInfo();
+		dSoundChannelList::dNode* const channelNode = asset.Append();
+		channel = &channelNode->GetInfo();
+
+		channel->m_asset = &asset;
+		alSourcei(channel->m_source, AL_BUFFER, asset.m_buffer);
+		dAssert(alGetError() == AL_NO_ERROR);
+	}
+	return channel;
 }

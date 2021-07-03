@@ -15,6 +15,8 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntity.h"
 
+class ndSoundAsset;
+
 class dSoundChannel: public dRefCounter<dSoundChannel>
 {
 	public:
@@ -31,41 +33,38 @@ class dSoundChannel: public dRefCounter<dSoundChannel>
 	//bool IsPlaying() const;
 	//dFloat32 GetVolume() const;
 	//dFloat32 GetSecPosition() const;
-	//
-	//private:
-	//void LinkAsset (dTree<dSoundAsset, dUnsigned64>::dNode* const assetNode);
-	//
-	//dInt32 m_source;
-	//dTree<dSoundAsset, dUnsigned64>::dNode* m_myAssetNode;
-	//friend class ndSoundManager;
+
+	private:
+	dInt32 m_source;
+	ndSoundAsset* m_asset;
+	friend class ndSoundManager;
 };
 
 class dSoundChannelList: public dList<dSoundChannel>
 {
 };
 
-class dSoundAsset: public dSoundChannelList
+class ndSoundAsset: public dSoundChannelList
 {
 	public:
-	dSoundAsset();
-	dSoundAsset(const dSoundAsset& copy);
-	virtual ~dSoundAsset();
-
-	//using dRefCounter::operator new;
-	//using dRefCounter::operator delete;
+	ndSoundAsset();
+	ndSoundAsset(const ndSoundAsset& copy);
+	virtual ~ndSoundAsset();
 
 	dInt32 m_buffer;
 	dFloat32 m_lenght;
 	dFloat32 m_frequecy;
+	dTree<ndSoundAsset, dUnsigned64>::dNode* m_node;
+	friend class ndSoundManager;
 };
 
-class dSoundAssetList: public dTree<dSoundAsset, dUnsigned64>
+class ndSoundAssetList: public dTree<ndSoundAsset, dUnsigned64>
 {
 };
 
 class ndSoundManager: public ndModel
 {
-	//class dSoundAsset;
+	//class ndSoundAsset;
 	//class dSoundChannel;
 	//typedef void (*dEvenCallback) (void* const channelHandle, void* const userData, void* const evenHandle);
 	
@@ -80,13 +79,13 @@ class ndSoundManager: public ndModel
 	//void DestroyAllSound();
 	//
 	//// sound clip asset manager
-	dSoundAssetList::dNode* CreateSoundAsset (const char* const fileName);
+	ndSoundAsset* CreateSoundAsset (const char* const fileName);
 	//void DestroySound(void* const soundAssetHandle);
 	//
 	//dFloat32 GetSoundlength (void* const soundAssetHandle);
 	//
-	//// sound play tracks or channels 
-	//void* CreatePlayChannel (void* const soundAssetHandle);
+	// sound play tracks or channels 
+	dSoundChannel* CreateSoundChannel(const char* const fileName);
 	//void DestroyChannel(void* const channelHandle);
 	//
 	//void* GetAsset(void* const channelHandle) const;
@@ -105,12 +104,12 @@ class ndSoundManager: public ndModel
 	//
 	//private:
 	//void UpdateListener(const dVector& position, const dVector& velocity, const dVector& heading, const dVector& upDir);
-	//void LoadWaveFile(dSoundAsset* const asset, const char* const fileName);
+	//void LoadWaveFile(ndSoundAsset* const asset, const char* const fileName);
 	//
 	//ALCdevice* m_device;
 	//ALCcontext* m_context;
 	//
-	//dSoundAssetList m_assets;
+	//ndSoundAssetList m_assets;
 	//dSoundChannelPlaying m_channelPlaying;
 	//dMatrix m_coordinateSystem;
 
@@ -118,11 +117,11 @@ class ndSoundManager: public ndModel
 	void Update(ndWorld* const, dFloat32) {}
 	void PostUpdate(ndWorld* const world, dFloat32);
 
-	void LoadWaveFile(dSoundAsset* const asset, const char* const fileName);
+	void LoadWaveFile(ndSoundAsset* const asset, const char* const fileName);
 
 	ALCdevice* m_device;
 	ALCcontext* m_context;
-	dSoundAssetList m_assets;
+	ndSoundAssetList m_assets;
 	//dMatrix m_coordinateSystem;
 };
 
