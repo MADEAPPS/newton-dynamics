@@ -591,20 +591,16 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//matrix = matrix * dRollMatrix(-70.0f * dDegreeToRad);
 	//matrix.m_posit = location;
 
-	// add a dound manager
-	//dSoundManager* const soundManager = new dSoundManager();
-	//scene->GetWorld()->AddModel(soundManager);
-	//
-	//static char* engineSounds[] = { "engine_start.wav", "engine_rpm.wav", "tire_skid.wav" };
-	////dSoundManager& soundManager = scene->GetSoundManager();
-	//for (int i = 0; i < sizeof(engineSounds) / sizeof(engineSounds[0]); i++) 
-	//{
-	//	void* const soundAsset = soundManager->CreateSound(engineSounds[i]);
+	ndSoundManager* const soundManager = scene->GetSoundManager();
+
+	static char* engineSounds[] = { "engine_start.wav", "engine_rpm.wav", "tire_skid.wav" };
+	for (int i = 0; i < sizeof(engineSounds) / sizeof(engineSounds[0]); i++) 
+	{
+		dSoundAssetList::dNode* const soundAsset = soundManager->CreateSoundAsset(engineSounds[i]);
 	//	void* const soundChannel = soundManager->CreatePlayChannel(soundAsset);
 	//	soundManager->PlayChannel(soundChannel);
 	//	//m_engineSounds[i] = sound;
-	//	break;
-	//}
+	}
 
 	// add a model for general controls
 	ndVehicleSelector* const controls = new ndVehicleSelector();

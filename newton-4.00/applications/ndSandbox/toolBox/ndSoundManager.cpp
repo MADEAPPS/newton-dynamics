@@ -34,132 +34,7 @@ void ndSoundManager::UpdateListener(const dVector& position, const dVector& velo
 	*/
 }
 
-void ndSoundManager::LoadWaveFile(dSoundAsset* const asset, const char* const fileName)
-{
-	FILE* const wave = fopen(fileName, "rb");
-	if (wave) 
-	{
-		char xbuffer[5];
-		memset(xbuffer, 0, sizeof(xbuffer));
-		fread(xbuffer, sizeof(char), 4, wave);
-		if (!strcmp(xbuffer, "RIFF")) 
-		{
-			dInt32 chunkSize;
-			fread(&chunkSize, sizeof(dInt32), 1, wave);
-			fread(xbuffer, sizeof(char), 4, wave);
-			if (!strcmp(xbuffer, "WAVE")) 
-			{
-				fread(xbuffer, sizeof(char), 4, wave);
-				if (!strcmp(xbuffer, "fmt ")) 
-				{
-					fread(&chunkSize, sizeof(dInt32), 1, wave);
 
-					dInt32 sampleRate;
-					dInt32 byteRate;
-					short channels;
-					short audioFormat;
-					short blockAlign;
-					short bitsPerSample;
-
-					fread(&audioFormat, sizeof(short), 1, wave);
-					fread(&channels, sizeof(short), 1, wave);
-					fread(&sampleRate, sizeof(dInt32), 1, wave);
-					fread(&byteRate, sizeof(dInt32), 1, wave);
-					fread(&blockAlign, sizeof(short), 1, wave);
-					fread(&bitsPerSample, sizeof(short), 1, wave);
-					for (dInt32 i = 0; i < (chunkSize - 16); i++) 
-					{
-						fread(xbuffer, sizeof(char), 1, wave);
-					}
-
-					#define WAVE_FORMAT_PCM 0x0001
-					//0x0003 WAVE_FORMAT_IEEE_FLOAT IEEE float 
-					//0x0006 WAVE_FORMAT_ALAW 8-bit ITU-T G.711 A-law 
-					//0x0007 WAVE_FORMAT_MULAW 8-bit ITU-T G.711 µ-law 
-					//0xFFFE WAVE_FORMAT_EXTENSIBLE Determined by SubFormat 
-
-					// I only parse WAVE_FORMAT_PCM format
-					dAssert(audioFormat == WAVE_FORMAT_PCM);
-
-					fread(xbuffer, sizeof(char), 4, wave);
-					if (!strcmp(xbuffer, "fact")) 
-					{
-						dInt32 size;
-						dInt32 samplesPerChannels;
-						fread(&size, sizeof(dInt32), 1, wave);
-						fread(&samplesPerChannels, sizeof(dInt32), 1, wave);
-						fread(xbuffer, sizeof(char), 4, wave);
-					}
-
-					if (!strcmp(xbuffer, "data")) 
-					{
-						dInt32 size;
-						fread(&size, sizeof(dInt32), 1, wave);
-
-						char* const data = new char[size];
-						fread(data, sizeof(char), size, wave);
-
-
-						dInt32 waveFormat = AL_FORMAT_MONO8;
-						if (channels == 1) 
-						{
-							if (bitsPerSample == 8) 
-							{
-								waveFormat = AL_FORMAT_MONO8;
-							}
-							else 
-							{
-								dAssert(bitsPerSample == 16);
-								waveFormat = AL_FORMAT_MONO16;
-							}
-						}
-						else 
-						{
-							dAssert(channels == 2);
-							if (bitsPerSample == 8) 
-							{
-								waveFormat = AL_FORMAT_STEREO8;
-							}
-							else 
-							{
-								dAssert(bitsPerSample == 16);
-								waveFormat = AL_FORMAT_STEREO16;
-							}
-						}
-
-						asset->m_lenght = dFloat32(size) / byteRate;
-						asset->m_frequecy = dFloat32(sampleRate);
-						alBufferData(asset->m_buffer, waveFormat, data, size, sampleRate);
-
-						delete[] data;
-					}
-				}
-			}
-		}
-		fclose(wave);
-	}
-}
-
-void* ndSoundManager::CreateSound(const char* const fileName)
-{
-	dAssert(0);
-	//if (m_device)
-	//{
-	//	char path[2048];
-	//	dGetWorkingFileName(fileName, path);
-	//
-	//	dUnsigned64 code = dCRC64(path);
-	//	dSoundAssetList::dNode* assetNode = m_assets.Find(code);
-	//	if (!assetNode)
-	//	{
-	//		assetNode = m_assets.Insert(code);
-	//		LoadWaveFile(&assetNode->GetInfo(), path);
-	//	}
-	//	assetNode->GetInfo().AddRef();
-	//	return assetNode;
-	//}
-	return nullptr;
-}
 
 void ndSoundManager::DestroySound(void* const soundAssetHandle)
 {
@@ -321,22 +196,6 @@ dFloat32 ndSoundManager::GetChannelGetPosition(void* const channelHandle) const
 }
 
 
-ndSoundManager::dSoundChannel::dSoundChannel()
-	:m_source(0)
-	,m_myAssetNode(nullptr)
-{
-	alGenSources(1, (ALuint*)&m_source);
-	dAssert (m_source);
-	int xxxx = alGetError();
-	xxxx = alGetError();
-	dAssert (alGetError() == AL_NO_ERROR);
-}
-
-ndSoundManager::dSoundChannel::~dSoundChannel()
-{
-	alDeleteSources(1, (ALuint*)&m_source);
-	dAssert (alGetError() == AL_NO_ERROR);
-}
 
 void ndSoundManager::dSoundChannel::LinkAsset( dTree<dSoundAsset, dUnsigned64>::dNode* const assetNode)
 {
@@ -400,27 +259,54 @@ dFloat32 ndSoundManager::dSoundChannel::GetVolume() const
 	alGetSourcef(m_source, AL_GAIN, &volume);
 	return volume;
 }
+#endif
 
-ndSoundManager::dSoundAsset::dSoundAsset()
-	:dRefCounter()
+dSoundChannel::dSoundChannel()
+	//:m_source(0)
+	//,m_myAssetNode(nullptr)
+{
+	//alGenSources(1, (ALuint*)&m_source);
+	//dAssert(m_source);
+	//int xxxx = alGetError();
+	//xxxx = alGetError();
+	//dAssert(alGetError() == AL_NO_ERROR);
+}
+
+dSoundChannel::~dSoundChannel()
+{
+	//alDeleteSources(1, (ALuint*)&m_source);
+	//dAssert(alGetError() == AL_NO_ERROR);
+}
+
+dSoundAsset::dSoundAsset()
+	:dSoundChannelList()
 	,m_buffer(0)
 	,m_lenght(0)
 	,m_frequecy(0)
 {
 	alGenBuffers(1, (ALuint*)&m_buffer);
-	dAssert (m_buffer);
-	dAssert (alGetError() == AL_NO_ERROR);
+	dAssert(m_buffer);
+	dAssert(alGetError() == AL_NO_ERROR);
 }
 
-ndSoundManager::dSoundAsset::~dSoundAsset()
+dSoundAsset::dSoundAsset(const dSoundAsset& copy)
+	:dSoundChannelList()
+	,m_buffer(copy.m_buffer)
+	,m_lenght(copy.m_lenght)
+	,m_frequecy(copy.m_frequecy)
+{
+	alGenBuffers(1, (ALuint*)&m_buffer);
+	dAssert(m_buffer);
+	dAssert(alGetError() == AL_NO_ERROR);
+	dAssert(copy.GetCount() == 0);
+}
+
+dSoundAsset::~dSoundAsset()
 {
 	RemoveAll();
 	alDeleteBuffers(1, (ALuint *)&m_buffer);
-	dAssert (alGetError() == AL_NO_ERROR);
+	dAssert(alGetError() == AL_NO_ERROR);
 }
-
-#endif
-
 
 ndSoundManager::ndSoundManager()
 	:ndModel()
@@ -463,6 +349,7 @@ ndSoundManager::~ndSoundManager()
 {
 	if (m_device)
 	{
+		m_assets.RemoveAll();
 		alcDestroyContext(m_context);
 		alcCloseDevice(m_device);
 	}
@@ -488,4 +375,127 @@ void ndSoundManager::PostUpdate(ndWorld* const, dFloat32)
 	//		}
 	//	}
 	//}
+}
+
+dSoundAssetList::dNode* ndSoundManager::CreateSoundAsset(const char* const fileName)
+{
+	dSoundAssetList::dNode* assetNode = nullptr;
+	if (m_device)
+	{
+		char path[2048];
+		dGetWorkingFileName(fileName, path);
+	
+		dUnsigned64 code = dCRC64(path);
+		assetNode = m_assets.Find(code);
+		if (!assetNode)
+		{
+			assetNode = m_assets.Insert(code);
+			LoadWaveFile(&assetNode->GetInfo(), path);
+		}
+	}
+	return assetNode;
+}
+
+void ndSoundManager::LoadWaveFile(dSoundAsset* const asset, const char* const fileName)
+{
+	FILE* const wave = fopen(fileName, "rb");
+	if (wave)
+	{
+		char xbuffer[5];
+		memset(xbuffer, 0, sizeof(xbuffer));
+		fread(xbuffer, sizeof(char), 4, wave);
+		if (!strcmp(xbuffer, "RIFF"))
+		{
+			dInt32 chunkSize;
+			fread(&chunkSize, sizeof(dInt32), 1, wave);
+			fread(xbuffer, sizeof(char), 4, wave);
+			if (!strcmp(xbuffer, "WAVE"))
+			{
+				fread(xbuffer, sizeof(char), 4, wave);
+				if (!strcmp(xbuffer, "fmt "))
+				{
+					fread(&chunkSize, sizeof(dInt32), 1, wave);
+
+					dInt32 sampleRate;
+					dInt32 byteRate;
+					short channels;
+					short audioFormat;
+					short blockAlign;
+					short bitsPerSample;
+					
+					fread(&audioFormat, sizeof(short), 1, wave);
+					fread(&channels, sizeof(short), 1, wave);
+					fread(&sampleRate, sizeof(dInt32), 1, wave);
+					fread(&byteRate, sizeof(dInt32), 1, wave);
+					fread(&blockAlign, sizeof(short), 1, wave);
+					fread(&bitsPerSample, sizeof(short), 1, wave);
+					for (dInt32 i = 0; i < (chunkSize - 16); i++)
+					{
+						fread(xbuffer, sizeof(char), 1, wave);
+					}
+					
+					#define WAVE_FORMAT_PCM 0x0001
+					//0x0003 WAVE_FORMAT_IEEE_FLOAT IEEE float 
+					//0x0006 WAVE_FORMAT_ALAW 8-bit ITU-T G.711 A-law 
+					//0x0007 WAVE_FORMAT_MULAW 8-bit ITU-T G.711 µ-law 
+					//0xFFFE WAVE_FORMAT_EXTENSIBLE Determined by SubFormat 
+					
+					// I only parse WAVE_FORMAT_PCM format
+					dAssert(audioFormat == WAVE_FORMAT_PCM);
+					
+					fread(xbuffer, sizeof(char), 4, wave);
+					if (!strcmp(xbuffer, "fact"))
+					{
+						dInt32 size;
+						dInt32 samplesPerChannels;
+						fread(&size, sizeof(dInt32), 1, wave);
+						fread(&samplesPerChannels, sizeof(dInt32), 1, wave);
+						fread(xbuffer, sizeof(char), 4, wave);
+					}
+					
+					if (!strcmp(xbuffer, "data"))
+					{
+						dInt32 size;
+						fread(&size, sizeof(dInt32), 1, wave);
+
+						dArray<char> data;
+						data.SetCount(size);
+						fread(&data[0], sizeof(char), size, wave);
+					
+						dInt32 waveFormat = AL_FORMAT_MONO8;
+						if (channels == 1)
+						{
+							if (bitsPerSample == 8)
+							{
+								waveFormat = AL_FORMAT_MONO8;
+							}
+							else
+							{
+								dAssert(bitsPerSample == 16);
+								waveFormat = AL_FORMAT_MONO16;
+							}
+						}
+						else
+						{
+							dAssert(channels == 2);
+							if (bitsPerSample == 8)
+							{
+								waveFormat = AL_FORMAT_STEREO8;
+							}
+							else
+							{
+								dAssert(bitsPerSample == 16);
+								waveFormat = AL_FORMAT_STEREO16;
+							}
+						}
+					
+						asset->m_lenght = dFloat32(size) / byteRate;
+						asset->m_frequecy = dFloat32(sampleRate);
+						alBufferData(asset->m_buffer, waveFormat, &data[0], size, sampleRate);
+					}
+				}
+			}
+		}
+		fclose(wave);
+	}
 }

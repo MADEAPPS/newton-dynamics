@@ -15,59 +15,60 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntity.h"
 
+class dSoundChannel: public dRefCounter<dSoundChannel>
+{
+	public:
+	dSoundChannel();
+	virtual ~dSoundChannel();
+
+	//void Play();
+	//void Stop();
+	//
+	//void SetLoop(bool mode);
+	//void SetPitch(dFloat32 pitch);
+	//void SetVolume(dFloat32 volumne);
+	//
+	//bool IsPlaying() const;
+	//dFloat32 GetVolume() const;
+	//dFloat32 GetSecPosition() const;
+	//
+	//private:
+	//void LinkAsset (dTree<dSoundAsset, dUnsigned64>::dNode* const assetNode);
+	//
+	//dInt32 m_source;
+	//dTree<dSoundAsset, dUnsigned64>::dNode* m_myAssetNode;
+	//friend class ndSoundManager;
+};
+
+class dSoundChannelList: public dList<dSoundChannel>
+{
+};
+
+class dSoundAsset: public dSoundChannelList
+{
+	public:
+	dSoundAsset();
+	dSoundAsset(const dSoundAsset& copy);
+	virtual ~dSoundAsset();
+
+	//using dRefCounter::operator new;
+	//using dRefCounter::operator delete;
+
+	dInt32 m_buffer;
+	dFloat32 m_lenght;
+	dFloat32 m_frequecy;
+};
+
+class dSoundAssetList: public dTree<dSoundAsset, dUnsigned64>
+{
+};
+
 class ndSoundManager: public ndModel
 {
 	//class dSoundAsset;
 	//class dSoundChannel;
 	//typedef void (*dEvenCallback) (void* const channelHandle, void* const userData, void* const evenHandle);
-
-	//class dSoundChannel: public dRefCounter<dSoundChannel>
-	//{
-	//	public:
-	//	dSoundChannel();
-	//	virtual ~dSoundChannel();
-	//
-	//	void Play();
-	//	void Stop();
-	//
-	//	void SetLoop(bool mode);
-	//	void SetPitch(dFloat32 pitch);
-	//	void SetVolume(dFloat32 volumne);
-	//
-	//	bool IsPlaying() const;
-	//	dFloat32 GetVolume() const;
-	//	dFloat32 GetSecPosition() const;
-	//
-	//	private:
-	//	void LinkAsset (dTree<dSoundAsset, dUnsigned64>::dNode* const assetNode);
-	//
-	//	dInt32 m_source;
-	//	dTree<dSoundAsset, dUnsigned64>::dNode* m_myAssetNode;
-	//	friend class ndSoundManager;
-	//};
-	//
-	//class dSoundChannelList: public dList<dSoundChannel>
-	//{
-	//};
-	//
-	//class dSoundAsset: public dSoundChannelList, public dRefCounter<dSoundAsset>
-	//{
-	//	public:
-	//	dSoundAsset();
-	//	virtual ~dSoundAsset();
-	//
-	//	//using dRefCounter::operator new;
-	//	//using dRefCounter::operator delete;
-	//
-	//	dInt32 m_buffer;
-	//	dFloat32 m_lenght;
-	//	dFloat32 m_frequecy;
-	//};
-	//
-	//class dSoundAssetList: public dTree<dSoundAsset, dUnsigned64>
-	//{
-	//};
-	//
+	
 	//class dSoundChannelPlaying: public dList<dSoundChannelList::dNode*>
 	//{
 	//};
@@ -79,7 +80,7 @@ class ndSoundManager: public ndModel
 	//void DestroyAllSound();
 	//
 	//// sound clip asset manager
-	//void* CreateSound (const char* const fileName);
+	dSoundAssetList::dNode* CreateSoundAsset (const char* const fileName);
 	//void DestroySound(void* const soundAssetHandle);
 	//
 	//dFloat32 GetSoundlength (void* const soundAssetHandle);
@@ -117,8 +118,11 @@ class ndSoundManager: public ndModel
 	void Update(ndWorld* const, dFloat32) {}
 	void PostUpdate(ndWorld* const world, dFloat32);
 
+	void LoadWaveFile(dSoundAsset* const asset, const char* const fileName);
+
 	ALCdevice* m_device;
 	ALCcontext* m_context;
+	dSoundAssetList m_assets;
 	//dMatrix m_coordinateSystem;
 };
 

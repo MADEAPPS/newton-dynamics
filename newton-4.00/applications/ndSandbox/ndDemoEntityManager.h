@@ -143,6 +143,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	dInt32 GetHeight() const;
 
 	ndPhysicsWorld* GetWorld() const;
+	ndSoundManager* GetSoundManager() const;
 
 	void CreateSkyBox();
 	void ResetTimer();
@@ -276,6 +277,11 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 inline ndPhysicsWorld* ndDemoEntityManager::GetWorld() const
 {
 	return m_world;
+}
+
+inline ndSoundManager* ndDemoEntityManager::GetSoundManager() const
+{
+	return m_soundManager;
 }
 
 inline dInt32 ndDemoEntityManager::GetWidth() const 

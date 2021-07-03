@@ -246,17 +246,18 @@ class dTree
 
 	dNode* GetNodeFromInfo (OBJECT &info) const;
 
+	dNode* Insert(KEY key);
+	dNode* Insert(dNode* const node, KEY key);
+	dNode* Insert(const OBJECT &element, KEY key);
 	dNode* Insert (const OBJECT &element, KEY key, bool& wasFound);
-	dNode* Insert (const OBJECT &element, KEY key);
-	dNode* Insert (dNode* const node, KEY key);
 
 	dNode* Replace (OBJECT &element, KEY key);
 	dNode* ReplaceKey (KEY oldKey, KEY newKey);
 	dNode* ReplaceKey (dNode* const node, KEY key);
 
+	void RemoveAll();
 	void Remove (KEY key);
 	void Remove (dNode* const node);
-	void RemoveAll (); 
 
 	void Unlink (dNode* const node);
 	void SwapInfo (dTree& tree);
@@ -661,6 +662,13 @@ typename dTree<OBJECT, KEY, allocator>::dNode* dTree<OBJECT, KEY, allocator>::In
 		return nullptr;
 	}
 	return node;
+}
+
+template<class OBJECT, class KEY, class allocator>
+typename dTree<OBJECT, KEY, allocator>::dNode* dTree<OBJECT, KEY, allocator>::Insert(KEY key)
+{
+	OBJECT element;
+	return Insert(element, key);
 }
 
 template<class OBJECT, class KEY, class allocator>
