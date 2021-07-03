@@ -45,10 +45,8 @@ include_directories(../../thirdParty/openalRuntime/win32sdk/include)
 add_executable(${projectName} ${CPP_SOURCE})
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
-	#target_link_libraries (${projectName} ndNewton ndCollision ndCore glfw imgui glatter openfbx openal)
 	target_link_libraries (${projectName} ndNewton ndCollision ndCore glfw imgui glatter openfbx)
 else()
-	#target_link_libraries (${projectName} ndNewton glfw imgui glatter openfbx openal)
 	target_link_libraries (${projectName} ndNewton glfw imgui glatter openfbx)
 endif()
 

@@ -171,7 +171,6 @@ static char* engineSounds[] =
 	"tire_skid.wav",
 };
 
-
 class ndBasicMultiBodyVehicle : public ndBasicVehicle
 {
 	public:

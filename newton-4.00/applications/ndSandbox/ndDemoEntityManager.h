@@ -215,7 +215,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	ndPhysicsWorld* m_world;
 	ndSoundManager* m_soundManager;
 	ndDemoCameraManager* m_cameraManager;
-
 	ndShaderPrograms m_shaderCache;
 	void* m_renderUIContext;
 	void* m_updateCameraContext;
