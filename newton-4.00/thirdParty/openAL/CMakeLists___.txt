@@ -13,10 +13,6 @@ cmake_minimum_required(VERSION 3.4.0)
 set (projectName "openal")
 message (${projectName})
 
-if (MSVC)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4018 /wd4244 /wd4389 /wd4458 /wd4505")
-endif()
-
 add_definitions(-DAL_LIBTYPE_STATIC)
 add_definitions(-DAL_ALEXT_PROTOTYPES)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
@@ -24,8 +20,6 @@ add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
 add_definitions(-D_WIN32_WINNT=0x0501)
 add_definitions(-Dstrcasecmp=_stricmp)
 add_definitions(-Dstrncasecmp=_strnicmp)
-#add_definitions(-Dsnprintf=_snprintf)
-
 
 include_directories(./)
 include_directories(include/)
@@ -47,6 +41,12 @@ file(GLOB CPP_SOURCE
 	config.h
 	include/AL/*.h
 	OpenAL32/include/*.h)
+
+if (MSVC)
+	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /W1 /Od")
+	set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELEASE} /Zi /W1 /O2 /fp:fast")
+	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Zi /GS- /W1 /Ox /Oi /Ot /Ob2 /Oy /fp:fast")
+endif()
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 

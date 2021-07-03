@@ -15,6 +15,7 @@
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
 #include "ndLoadFbxMesh.h"
+#include "ndSoundManager.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndVehicleCommon.h"
@@ -30,8 +31,8 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 	ndVehicleDectriptorViper()
 		:ndVehicleDectriptor("viper.fbx")
 	{
-		//m_useHardSolverMode = true;
-		m_useHardSolverMode = false;
+		m_useHardSolverMode = true;
+		//m_useHardSolverMode = false;
 		m_comDisplacement = dVector(0.25f, -0.35f, 0.0f, 0.0f);
 
 		dFloat32 fuelInjectionRate = 10.0f;
@@ -589,6 +590,21 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//matrix = dYawMatrix(180.0f * dDegreeToRad);
 	//matrix = matrix * dRollMatrix(-70.0f * dDegreeToRad);
 	//matrix.m_posit = location;
+
+	// add a dound manager
+	//dSoundManager* const soundManager = new dSoundManager();
+	//scene->GetWorld()->AddModel(soundManager);
+	//
+	//static char* engineSounds[] = { "engine_start.wav", "engine_rpm.wav", "tire_skid.wav" };
+	////dSoundManager& soundManager = scene->GetSoundManager();
+	//for (int i = 0; i < sizeof(engineSounds) / sizeof(engineSounds[0]); i++) 
+	//{
+	//	void* const soundAsset = soundManager->CreateSound(engineSounds[i]);
+	//	void* const soundChannel = soundManager->CreatePlayChannel(soundAsset);
+	//	soundManager->PlayChannel(soundChannel);
+	//	//m_engineSounds[i] = sound;
+	//	break;
+	//}
 
 	// add a model for general controls
 	ndVehicleSelector* const controls = new ndVehicleSelector();

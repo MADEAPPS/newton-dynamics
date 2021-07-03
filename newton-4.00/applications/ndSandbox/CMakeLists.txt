@@ -26,6 +26,8 @@ file(GLOB CPP_SOURCE
 #source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" PREFIX source/ FILES ${CPP_SOURCE})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
+add_definitions(-DAL_LIBTYPE_STATIC)
+
 include_directories(./)
 include_directories(toolBox/)
 include_directories(../../sdk/dCore/)
@@ -39,13 +41,16 @@ include_directories(../../thirdParty/glfw/)
 include_directories(../../thirdParty/imgui/)
 include_directories(../../thirdParty/openFBX/src/)
 include_directories(../../thirdParty/glfw/include/)
+include_directories(../../thirdParty/openAL/include/)
 include_directories(../../thirdParty/glatter/include/glatter/)
 
 add_executable(${projectName} ${CPP_SOURCE})
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
+	#target_link_libraries (${projectName} ndNewton ndCollision ndCore glfw imgui glatter openfbx openal)
 	target_link_libraries (${projectName} ndNewton ndCollision ndCore glfw imgui glatter openfbx)
 else()
+	#target_link_libraries (${projectName} ndNewton glfw imgui glatter openfbx openal)
 	target_link_libraries (${projectName} ndNewton glfw imgui glatter openfbx)
 endif()
 
@@ -65,7 +70,7 @@ if (NEWTON_BUILD_PROFILER)
 endif ()
 
 if(MSVC OR MINGW)
-    target_link_libraries (${projectName} glu32 opengl32)
+    target_link_libraries (${projectName} glu32 opengl32 Winmm.lib)
 
     if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
 		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundSandboxStdafx.h")
