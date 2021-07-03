@@ -116,6 +116,10 @@ class ndSoundManager: public ndModel
 	private:
 	void Update(ndWorld* const, dFloat32) {}
 	void PostUpdate(ndWorld* const world, dFloat32);
+
+	ALCdevice* m_device;
+	ALCcontext* m_context;
+	//dMatrix m_coordinateSystem;
 };
 
 

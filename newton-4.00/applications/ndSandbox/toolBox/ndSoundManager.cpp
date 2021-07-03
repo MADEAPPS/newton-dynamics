@@ -424,47 +424,48 @@ ndSoundManager::dSoundAsset::~dSoundAsset()
 
 ndSoundManager::ndSoundManager()
 	:ndModel()
-	//,m_device(alcOpenDevice(nullptr))
-	//,m_context(nullptr)
+	,m_device(alcOpenDevice(nullptr))
+	,m_context(nullptr)
 	//,m_coordinateSystem(dGetIdentityMatrix())
 {
-	//if (m_device)
-	//{
-	//	m_context = alcCreateContext(m_device, nullptr);
-	//	alcMakeContextCurrent(m_context);
-	//
-	//	// clear error code
-	//	alGetError();
-	//	dAssert(alGetError() == AL_NO_ERROR);
-	//
-	//	ALfloat listenerPos[] = { 0.0,0.0,0.0 };
-	//	alListenerfv(AL_POSITION, listenerPos);
-	//	dAssert(alGetError() == AL_NO_ERROR);
-	//
-	//	ALfloat listenerVel[] = { 0.0,0.0,0.0 };
-	//	alListenerfv(AL_VELOCITY, listenerVel);
-	//	dAssert(alGetError() == AL_NO_ERROR);
-	//
-	//	ALfloat listenerOri[] = { 0.0,0.0,-1.0, 0.0,1.0,0.0 };
-	//	alListenerfv(AL_ORIENTATION, listenerOri);
-	//	dAssert(alGetError() == AL_NO_ERROR);
-	//
-	//	/*
-	//	// fmod coordinate system uses (0,0,1) as from vector
-	//	m_coordinateSystem[0] = dVector (0.0f, 0.0f, 1.0f);
-	//	m_coordinateSystem[1] = dVector (0.0f, 1.0f, 0.0f);
-	//	m_coordinateSystem[2] = dVector (1.0f, 0.0f, 0.0f);
-	//	*/
-	//}
+	dAssert(m_device);
+	if (m_device)
+	{
+		m_context = alcCreateContext(m_device, nullptr);
+		alcMakeContextCurrent(m_context);
+	
+		// clear error code
+		//alGetError();
+		dAssert(alGetError() == AL_NO_ERROR);
+	
+		ALfloat listenerPos[] = { 0.0,0.0,0.0 };
+		alListenerfv(AL_POSITION, listenerPos);
+		dAssert(alGetError() == AL_NO_ERROR);
+	
+		ALfloat listenerVel[] = { 0.0,0.0,0.0 };
+		alListenerfv(AL_VELOCITY, listenerVel);
+		dAssert(alGetError() == AL_NO_ERROR);
+	
+		ALfloat listenerOri[] = { 0.0,0.0,-1.0, 0.0,1.0,0.0 };
+		alListenerfv(AL_ORIENTATION, listenerOri);
+		dAssert(alGetError() == AL_NO_ERROR);
+	
+		/*
+		// fmod coordinate system uses (0,0,1) as from vector
+		m_coordinateSystem[0] = dVector (0.0f, 0.0f, 1.0f);
+		m_coordinateSystem[1] = dVector (0.0f, 1.0f, 0.0f);
+		m_coordinateSystem[2] = dVector (1.0f, 0.0f, 0.0f);
+		*/
+	}
 }
 
 ndSoundManager::~ndSoundManager()
 {
-	//if (m_device)
-	//{
-	//	alcDestroyContext(m_context);
-	//	alcCloseDevice(m_device);
-	//}
+	if (m_device)
+	{
+		alcDestroyContext(m_context);
+		alcCloseDevice(m_device);
+	}
 }
 
 void ndSoundManager::PostUpdate(ndWorld* const, dFloat32)
