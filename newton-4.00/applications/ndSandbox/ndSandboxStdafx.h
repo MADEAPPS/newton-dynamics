@@ -53,11 +53,6 @@
 	#include <imgui.h>
 	#include <GLFW/glfw3.h>
 	#include <GLFW/glfw3native.h>
-
-	// audio library support
-	//#include <AL/al.h>
-	//#include <AL/alc.h>
-
 #endif
 	
 #if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
