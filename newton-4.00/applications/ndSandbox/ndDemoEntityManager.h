@@ -20,6 +20,7 @@ class ndDemoMesh;
 class ndDemoEntity;
 class ndDemoCamera;
 class ndPhysicsWorld;
+class ndSoundManager;
 class ndDemoMeshInterface;
 class ndDemoCameraManager;
 class ndWireFrameDebugMesh;
@@ -211,7 +212,9 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	ndDemoEntity* m_sky;
 	ndPhysicsWorld* m_world;
+	ndSoundManager* m_soundManager;
 	ndDemoCameraManager* m_cameraManager;
+
 	ndShaderPrograms m_shaderCache;
 	void* m_renderUIContext;
 	void* m_updateCameraContext;

@@ -39,8 +39,8 @@ include_directories(../../thirdParty/glfw/)
 include_directories(../../thirdParty/imgui/)
 include_directories(../../thirdParty/openFBX/src/)
 include_directories(../../thirdParty/glfw/include/)
-#include_directories(../../thirdParty/openAL/include/)
 include_directories(../../thirdParty/glatter/include/glatter/)
+include_directories(../../thirdParty/openalRuntime/win32sdk/include)
 
 add_executable(${projectName} ${CPP_SOURCE})
 
@@ -68,6 +68,12 @@ if (NEWTON_BUILD_PROFILER)
 endif ()
 
 if(MSVC OR MINGW)
+	if (PTR_SIZE EQUAL 8)
+		target_link_libraries (${projectName} ${CMAKE_SOURCE_DIR}/thirdParty/openalRuntime/win64sdk/lib/OpenAL32.lib)
+	else()
+		target_link_libraries (${projectName} ${CMAKE_SOURCE_DIR}/thirdParty/openalRuntime/win32sdk/lib/OpenAL32.lib)
+	endif()
+
     target_link_libraries (${projectName} glu32 opengl32)
 
     if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
