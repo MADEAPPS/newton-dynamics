@@ -310,13 +310,16 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 		// load all engine sound channels
 		ndSoundManager* const soundManager = scene->GetSoundManager();
-		for (int i = 0; i < sizeof(engineSounds) / sizeof(engineSounds[0]); i++)
-		{
-			dSoundChannel* const channel = soundManager->CreateSoundChannel(engineSounds[i]);
-			channel->Play();
-			//	//m_engineSounds[i] = sound;
-			break;
-		}
+
+		m_startEngine = false;
+		m_startSound = soundManager->CreateSoundChannel(engineSounds[0]);
+		//for (int i = 0; i < sizeof(engineSounds) / sizeof(engineSounds[0]); i++)
+		//{
+		//	ndSoundChannel* const channel = soundManager->CreateSoundChannel(engineSounds[i]);
+		//	channel->Play();
+		//	//	//m_engineSounds[i] = sound;
+		//	break;
+		//}
 	}
 
 	~ndBasicMultiBodyVehicle()
@@ -579,12 +582,38 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		}
 	}
 
+	void ApplyInputs(ndWorld* const world, dFloat32 timestep)
+	{
+		ndBasicVehicle::ApplyInputs(world, timestep);
+
+		if (m_isPlayer && m_motor)
+		{
+			bool startEngine = m_motor->GetStart();
+			if (m_startEngine ^ startEngine)
+			{
+				m_startEngine = startEngine;
+				if (startEngine)
+				{
+					m_startSound->Play();
+				}
+				else
+				{
+					m_startSound->Stop();
+				}
+			}
+		}
+	}
+
 	GLuint m_gears;
 	GLuint m_odometer;
 	GLuint m_redNeedle;
 	GLuint m_tachometer;
 	GLuint m_greenNeedle;
 	dInt32 m_gearMap[8];
+
+	ndSoundChannel* m_startSound;
+
+	bool m_startEngine;
 };
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)

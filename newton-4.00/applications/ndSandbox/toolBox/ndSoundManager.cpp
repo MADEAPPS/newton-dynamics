@@ -34,8 +34,6 @@ void ndSoundManager::UpdateListener(const dVector& position, const dVector& velo
 	*/
 }
 
-
-
 void ndSoundManager::DestroySound(void* const soundAssetHandle)
 {
 	dAssert(0);
@@ -91,160 +89,123 @@ void* ndSoundManager::GetAsset(void* const channelHandle) const
 	dAssert(0);
 	if (m_device)
 	{
-		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
-		dSoundChannel& channel = node->GetInfo();
+		ndSoundChannelList::dNode* const node = (ndSoundChannelList::dNode*)channelHandle;
+		ndSoundChannel& channel = node->GetInfo();
 		return channel.m_myAssetNode;
 	}
 	return nullptr;
 }
 
-
-void ndSoundManager::StopChannel(void* const channelHandle)
-{
-	dAssert(0);
-	if (m_device)
-	{
-		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
-		dSoundChannel& channel = node->GetInfo();
-		channel.Stop();
-	}
-}
-
-dFloat32 ndSoundManager::GetChannelVolume(void* const channelHandle) const
-{
-	dAssert(0);
-	if (m_device)
-	{
-		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
-		dSoundChannel& channel = node->GetInfo();
-		return channel.GetVolume();
-	}
-	return 0;
-}
-
-void ndSoundManager::SetChannelVolume(void* const channelHandle, dFloat32 volume)
-{
-	dAssert(0);
-	if (m_device)
-	{
-		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
-		dSoundChannel& channel = node->GetInfo();
-		channel.SetVolume(volume);
-	}
-}
-
-void ndSoundManager::SetChannelLoopMode(void* const channelHandle, bool mode)
-{
-	dAssert(0);
-	if (m_device)
-	{
-		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
-		dSoundChannel& channel = node->GetInfo();
-		channel.SetLoop(mode);
-	}
-}
-
-void ndSoundManager::SetChannelPitch(void* const channelHandle, dFloat32 pitch)
-{
-	dAssert(0);
-	if (m_device)
-	{
-		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
-		dSoundChannel& channel = node->GetInfo();
-		channel.SetPitch(pitch);
-	}
-}
-
-dFloat32 ndSoundManager::GetChannelGetPosition(void* const channelHandle) const
-{
-	dAssert(0);
-	if (m_device)
-	{
-		dSoundChannelList::dNode* const node = (dSoundChannelList::dNode*)channelHandle;
-		dSoundChannel& channel = node->GetInfo();
-		return channel.GetSecPosition();
-	}
-	return 0;
-}
-
-
-
-
-
-void ndSoundManager::dSoundChannel::Stop ()
-{
-	alSourceStop (m_source);
-	dAssert (alGetError() == AL_NO_ERROR);
-}
-
-bool ndSoundManager::dSoundChannel::IsPlaying() const
-{
-	ALint state;
-	alGetSourcei(m_source, AL_SOURCE_STATE, &state);
-	return (state == AL_PLAYING) ? true : false;
-}
-
-void ndSoundManager::dSoundChannel::SetLoop(bool mode)
-{
-	alSourcei(m_source, AL_LOOPING, mode ? 1 : 0);
-}
-
-void ndSoundManager::dSoundChannel::SetPitch(dFloat32 pitch)
-{
-	alSourcef(m_source, AL_PITCH, pitch);
-}
-
-void ndSoundManager::dSoundChannel::SetVolume(dFloat32 volume)
-{
-	alSourcef(m_source, AL_GAIN, volume);
-}
-
-dFloat32 ndSoundManager::dSoundChannel::GetSecPosition() const
-{
-	ALfloat position;
-	alGetSourcef(m_source, AL_SEC_OFFSET, &position);
-	return position;
-}
-
-dFloat32 ndSoundManager::dSoundChannel::GetVolume() const
-{
-	ALfloat volume;
-	alGetSourcef(m_source, AL_GAIN, &volume);
-	return volume;
-}
 #endif
 
-dSoundChannel::dSoundChannel()
+ndSoundChannel::ndSoundChannel()
 	:m_source(0)
 	,m_asset(nullptr)
 	,m_manager(nullptr)
+	,m_playingNode(nullptr)
 {
 	alGenSources(1, (ALuint*)&m_source);
 	dAssert(m_source);
 	dAssert(alGetError() == AL_NO_ERROR);
 }
 
-dSoundChannel::~dSoundChannel()
+ndSoundChannel::~ndSoundChannel()
 {
 	alDeleteSources(1, (ALuint*)&m_source);
 	dAssert(alGetError() == AL_NO_ERROR);
 }
 
-void dSoundChannel::Play()
+bool ndSoundChannel::GetLoop() const
 {
-	// set some default values
-	alSourcef(m_source, AL_GAIN, 1);
-	alSource3f(m_source, AL_POSITION, 0, 0, 0);
-	alSource3f(m_source, AL_VELOCITY, 0, 0, 0);
-	alSourcei(m_source, AL_LOOPING, AL_FALSE);
-
-	alSourcePlay(m_source);
-	dAssert(alGetError() == AL_NO_ERROR);
+	ALint state;
+	alGetSourcei(m_source, AL_LOOPING, &state);
+	return state ? true : false;
 }
 
+void ndSoundChannel::SetLoop(bool mode)
+{
+	alSourcei(m_source, AL_LOOPING, mode ? 1 : 0);
+}
+
+bool ndSoundChannel::IsPlaying() const
+{
+	ALint state;
+	alGetSourcei(m_source, AL_SOURCE_STATE, &state);
+	return (state == AL_PLAYING) ? true : false;
+}
+
+void ndSoundChannel::Play()
+{
+	// set some default values
+	if (!IsPlaying())
+	{
+		dAssert(!m_playingNode);
+		alSourcef(m_source, AL_GAIN, 1);
+		alSource3f(m_source, AL_POSITION, 0, 0, 0);
+		alSource3f(m_source, AL_VELOCITY, 0, 0, 0);
+		alSourcei(m_source, AL_LOOPING, AL_FALSE);
+
+		alSourcePlay(m_source);
+		dAssert(alGetError() == AL_NO_ERROR);
+		m_playingNode = m_manager->m_channelPlaying.Append(this);
+	}
+}
+
+void ndSoundChannel::Stop()
+{
+	if (IsPlaying())
+	{
+		alSourceStop(m_source);
+		dAssert(alGetError() == AL_NO_ERROR);
+	}
+	if (m_playingNode)
+	{
+		m_manager->m_channelPlaying.Remove(m_playingNode);
+		m_playingNode = nullptr;
+	}
+}
+
+void ndSoundChannel::SetVolume(dFloat32 volume)
+{
+	ALfloat vol = ALfloat(volume);
+	alSourcef(m_source, AL_GAIN, vol);
+}
+
+dFloat32 ndSoundChannel::GetVolume() const
+{
+	ALfloat volume;
+	alGetSourcef(m_source, AL_GAIN, &volume);
+	return volume;
+}
+
+dFloat32 ndSoundChannel::GetPitch() const
+{
+	ALfloat pitch;
+	alGetSourcef(m_source, AL_PITCH, &pitch);
+	return pitch;
+}
+
+void ndSoundChannel::SetPitch(dFloat32 pitch)
+{
+	ALfloat pit = ALfloat(pitch);
+	alSourcef(m_source, AL_PITCH, pit);
+}
+
+dFloat32 ndSoundChannel::GetLength() const
+{
+	dAssert(0);
+	return 0;
+}
+
+dFloat32 ndSoundChannel::GetSecPosition() const
+{
+	ALfloat position;
+	alGetSourcef(m_source, AL_SEC_OFFSET, &position);
+	return position;
+}
 
 ndSoundAsset::ndSoundAsset()
-	:dSoundChannelList()
+	:ndSoundChannelList()
 	,m_buffer(0)
 	,m_lenght(0)
 	,m_frequecy(0)
@@ -256,7 +217,7 @@ ndSoundAsset::ndSoundAsset()
 }
 
 ndSoundAsset::ndSoundAsset(const ndSoundAsset& copy)
-	:dSoundChannelList()
+	:ndSoundChannelList()
 	,m_buffer(copy.m_buffer)
 	,m_lenght(copy.m_lenght)
 	,m_frequecy(copy.m_frequecy)
@@ -279,6 +240,8 @@ ndSoundManager::ndSoundManager()
 	:ndModel()
 	,m_device(alcOpenDevice(nullptr))
 	,m_context(nullptr)
+	,m_assets()
+	,m_channelPlaying()
 	//,m_coordinateSystem(dGetIdentityMatrix())
 {
 	dAssert(m_device);
@@ -432,21 +395,17 @@ void ndSoundManager::PostUpdate(ndWorld* const, dFloat32)
 {
 	if (m_device)
 	{
-	//	dSoundChannelPlaying::dNode* next;
-	//	for (dSoundChannelPlaying::dNode* node = m_channelPlaying.GetFirst(); node; node = next)
-	//	{
-	//		dSoundChannelList::dNode* const channelNode = node->GetInfo();
-	//		next = node->GetNext();
-	//
-	//		dSoundChannel& channel = channelNode->GetInfo();
-	//		if (!channel.IsPlaying())
-	//		{
-	//			m_channelPlaying.Remove(node);
-	//		}
-	//		else
-	//		{
-	//		}
-	//	}
+		ndSoundChannelPlaying::dNode* next;
+		for (ndSoundChannelPlaying::dNode* node = m_channelPlaying.GetFirst(); node; node = next)
+		{
+			ndSoundChannel* const channel = node->GetInfo();
+			next = node->GetNext();
+
+			if (!channel->IsPlaying())
+			{
+				channel->Stop();
+			}
+		}
 	}
 }
 
@@ -467,9 +426,9 @@ ndSoundAsset* ndSoundManager::CreateSoundAsset(const char* const fileName)
 	return &assetNode->GetInfo();
 }
 
-dSoundChannel* ndSoundManager::CreateSoundChannel(const char* const fileName)
+ndSoundChannel* ndSoundManager::CreateSoundChannel(const char* const fileName)
 {
-	dSoundChannel* channel = nullptr;
+	ndSoundChannel* channel = nullptr;
 	if (m_device)
 	{
 		dUnsigned64 code = dCRC64(fileName);
@@ -477,7 +436,7 @@ dSoundChannel* ndSoundManager::CreateSoundChannel(const char* const fileName)
 		dAssert(assetNode);
 	
 		ndSoundAsset& asset = assetNode->GetInfo();
-		dSoundChannelList::dNode* const channelNode = asset.Append();
+		ndSoundChannelList::dNode* const channelNode = asset.Append();
 		channel = &channelNode->GetInfo();
 
 		channel->m_asset = &asset;
@@ -488,14 +447,3 @@ dSoundChannel* ndSoundManager::CreateSoundChannel(const char* const fileName)
 	return channel;
 }
 
-//void ndSoundManager::PlayChannel(dSoundChannel* const channel)
-//{
-//	//if (m_device)
-//	//{
-//	//	//if (!channel.IsPlaying())
-//	//	{
-//	//		channel.Play();
-//	//		//m_channelPlaying.Append(node);
-//	//	//}
-//	//}
-//}
