@@ -92,6 +92,7 @@ ndSoundChannel::ndSoundChannel()
 
 ndSoundChannel::~ndSoundChannel()
 {
+	Stop();
 	alDeleteSources(1, (ALuint*)&m_source);
 	dAssert(alGetError() == AL_NO_ERROR);
 }
@@ -121,11 +122,6 @@ void ndSoundChannel::Play()
 	if (!IsPlaying())
 	{
 		dAssert(!m_playingNode);
-		alSourcef(m_source, AL_GAIN, 1);
-		alSource3f(m_source, AL_POSITION, 0, 0, 0);
-		alSource3f(m_source, AL_VELOCITY, 0, 0, 0);
-		//alSourcei(m_source, AL_LOOPING, AL_FALSE);
-
 		alSourcePlay(m_source);
 		dAssert(alGetError() == AL_NO_ERROR);
 		m_playingNode = m_manager->m_channelPlaying.Append(this);
@@ -134,11 +130,8 @@ void ndSoundChannel::Play()
 
 void ndSoundChannel::Stop()
 {
-	if (IsPlaying())
-	{
-		alSourceStop(m_source);
-		dAssert(alGetError() == AL_NO_ERROR);
-	}
+	alSourceStop(m_source);
+	dAssert(alGetError() == AL_NO_ERROR);
 	if (m_playingNode)
 	{
 		m_manager->m_channelPlaying.Remove(m_playingNode);
@@ -477,10 +470,10 @@ void ndSoundManager::PostUpdate(ndWorld* const, dFloat32 timestep)
 			}
 		}
 
-		alDopplerFactor(1.0f);
+		//alDopplerFactor(1.0f);
 
-		ndDemoCamera* const camera = m_scene->GetCamera();
 		// get camera matrix in open-al space
+		ndDemoCamera* const camera = m_scene->GetCamera();
 		const dMatrix matrix(camera->GetCurrentMatrix() * m_coordinateSystem);
 
 		// set Listener position
