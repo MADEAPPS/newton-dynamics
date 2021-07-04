@@ -466,7 +466,7 @@ void ndSoundManager::PostUpdate(ndWorld* const, dFloat32 timestep)
 				// test positional sound
 				static dFloat32 xxx;
 				xxx += timestep;
-				dFloat32 axxx = 20.0f * dSin(xxx / 1.0f);
+				dFloat32 axxx = 10.0f * dSin(xxx / 1.1f);
 				dVector xxx1(channel->GetPosition());
 				//dVector xxx1(channel->GetVelocity());
 				xxx1.m_z = axxx;
@@ -476,6 +476,8 @@ void ndSoundManager::PostUpdate(ndWorld* const, dFloat32 timestep)
 				#endif
 			}
 		}
+
+		alDopplerFactor(1.0f);
 
 		ndDemoCamera* const camera = m_scene->GetCamera();
 		// get camera matrix in open-al space

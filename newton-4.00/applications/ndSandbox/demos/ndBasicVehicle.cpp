@@ -583,7 +583,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	{
 		ndBasicVehicle::ApplyInputs(world, timestep);
 
-		if (m_motor)
+		//if (m_motor)
+		if (0)
 		{
 			bool startEngine = m_motor->GetStart();
 			if (m_startEngine ^ startEngine)
@@ -660,6 +661,17 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	{
 		soundManager->CreateSoundAsset(engineSounds[i]);
 	}
+
+
+	soundManager->CreateSoundAsset("ctone.wav");
+	ndSoundChannel* xxxx = soundManager->CreateSoundChannel("ctone.wav");
+	dVector testPosit(20.0f, 0.25f, 0.0f, 1.0f);
+	xxxx->SetPosition(testPosit);
+	xxxx->SetVolume(1.0f);
+	xxxx->SetLoop(true);
+	xxxx->Play();
+	AddBox(scene, testPosit, 0.0f, 4.0f, 0.5f, 5.0f);
+
 
 	// add a model for general controls
 	ndVehicleSelector* const controls = new ndVehicleSelector();
