@@ -313,13 +313,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 		m_startEngine = false;
 		m_startSound = soundManager->CreateSoundChannel(engineSounds[0]);
-		//for (int i = 0; i < sizeof(engineSounds) / sizeof(engineSounds[0]); i++)
-		//{
-		//	ndSoundChannel* const channel = soundManager->CreateSoundChannel(engineSounds[i]);
-		//	channel->Play();
-		//	//	//m_engineSounds[i] = sound;
-		//	break;
-		//}
+		m_engineRpmSound = soundManager->CreateSoundChannel(engineSounds[1]);
+		m_engineRpmSound->SetLoop(true);
 	}
 
 	~ndBasicMultiBodyVehicle()
@@ -586,7 +581,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	{
 		ndBasicVehicle::ApplyInputs(world, timestep);
 
-		if (m_isPlayer && m_motor)
+		if (m_motor)
 		{
 			bool startEngine = m_motor->GetStart();
 			if (m_startEngine ^ startEngine)
@@ -595,12 +590,24 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 				if (startEngine)
 				{
 					m_startSound->Play();
+					m_engineRpmSound->Play();
+					m_engineRpmSound->SetVolume(0.1f);
+					m_engineRpmSound->SetPitch(0.5f);
 				}
 				else
 				{
 					m_startSound->Stop();
+					m_engineRpmSound->Stop();
 				}
 			}
+
+			dFloat32 maxRpm = 9000.0f;
+			dFloat32 rpm = m_motor->GetRpm() / maxRpm;
+			dFloat32 pitchFactor = 0.5f + 0.7f * rpm;
+			m_engineRpmSound->SetPitch(pitchFactor);
+
+			dFloat32 volumeFactor = 0.01f + 0.4f * rpm;
+			m_engineRpmSound->SetVolume(volumeFactor);
 		}
 	}
 
@@ -612,6 +619,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	dInt32 m_gearMap[8];
 
 	ndSoundChannel* m_startSound;
+	ndSoundChannel* m_engineRpmSound;
 
 	bool m_startEngine;
 };
@@ -620,10 +628,10 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFloorBox(scene);
-	//BuildFlatPlane(scene, true);
+	BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
-	BuildStaticMesh(scene, "playerarena.fbx", true);
+	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
 
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);

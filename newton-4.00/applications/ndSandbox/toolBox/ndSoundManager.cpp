@@ -143,7 +143,7 @@ void ndSoundChannel::Play()
 		alSourcef(m_source, AL_GAIN, 1);
 		alSource3f(m_source, AL_POSITION, 0, 0, 0);
 		alSource3f(m_source, AL_VELOCITY, 0, 0, 0);
-		alSourcei(m_source, AL_LOOPING, AL_FALSE);
+		//alSourcei(m_source, AL_LOOPING, AL_FALSE);
 
 		alSourcePlay(m_source);
 		dAssert(alGetError() == AL_NO_ERROR);
