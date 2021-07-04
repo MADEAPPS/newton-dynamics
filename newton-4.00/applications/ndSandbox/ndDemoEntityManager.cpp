@@ -567,7 +567,7 @@ void ndDemoEntityManager::Cleanup ()
 	m_world = new ndPhysicsWorld(this);
 
 	// add a sound manager
-	m_soundManager = new ndSoundManager();
+	m_soundManager = new ndSoundManager(this);
 	m_world->AddModel(m_soundManager);
 	
 	// add the camera manager

@@ -314,7 +314,9 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		m_startEngine = false;
 		m_startSound = soundManager->CreateSoundChannel(engineSounds[0]);
 		m_engineRpmSound = soundManager->CreateSoundChannel(engineSounds[1]);
+		m_skipMarks = soundManager->CreateSoundChannel(engineSounds[2]);
 		m_engineRpmSound->SetLoop(true);
+		m_skipMarks->SetLoop(true);
 	}
 
 	~ndBasicMultiBodyVehicle()
@@ -591,7 +593,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 				{
 					m_startSound->Play();
 					m_engineRpmSound->Play();
-					m_engineRpmSound->SetVolume(0.1f);
+					m_engineRpmSound->SetVolume(1.0f);
 					m_engineRpmSound->SetPitch(0.5f);
 				}
 				else
@@ -606,8 +608,15 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			dFloat32 pitchFactor = 0.5f + 0.7f * rpm;
 			m_engineRpmSound->SetPitch(pitchFactor);
 
-			dFloat32 volumeFactor = 0.01f + 0.4f * rpm;
+			// up to two decibels of volume
+			dFloat32 volumeFactor = 1.0f + 1.0f * rpm;
 			m_engineRpmSound->SetVolume(volumeFactor);
+			//dTrace(("%f\n", volumeFactor));
+
+			// apply positional sound
+			const dMatrix& location = m_chassis->GetMatrix();
+			m_engineRpmSound->SetPosition(location.m_posit);
+			m_engineRpmSound->SetVelocity(m_chassis->GetVelocity());
 		}
 	}
 
@@ -618,6 +627,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	GLuint m_greenNeedle;
 	dInt32 m_gearMap[8];
 
+	ndSoundChannel* m_skipMarks;
 	ndSoundChannel* m_startSound;
 	ndSoundChannel* m_engineRpmSound;
 

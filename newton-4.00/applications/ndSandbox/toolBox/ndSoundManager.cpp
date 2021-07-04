@@ -10,30 +10,11 @@
 */
 
 #include "ndSandboxStdafx.h"
+#include "ndDemoCamera.h"
 #include "ndSoundManager.h"
 #include "ndDemoEntityManager.h"
 
 #if 0
-
-void ndSoundManager::UpdateListener(const dVector& position, const dVector& velocity, const dVector& heading, const dVector& upDir)
-{
-	dAssert(0);
-	/*
-	dVector fposition (m_coordinateSystem.RotateVector(position));
-	dVector fvelocity (m_coordinateSystem.RotateVector(velocity));
-	dVector fheading (m_coordinateSystem.RotateVector(heading));
-	dVector fupDir (m_coordinateSystem.RotateVector(upDir));
-
-	FMOD_VECTOR up = { fupDir.m_x, fupDir.m_y, fupDir.m_z };
-	FMOD_VECTOR pos = { fposition.m_x, fposition.m_y, fposition.m_z };
-	FMOD_VECTOR vel = { fvelocity.m_x, fvelocity.m_y, fvelocity.m_z };
-	FMOD_VECTOR forward = { fheading.m_x, fheading.m_y, fheading.m_z };
-
-	FMOD_RESULT result = FMOD_System_Set3DListenerAttributes(m_system, 0, &pos, &vel, &forward, &up);
-	ERRCHECK(result);
-	*/
-}
-
 void ndSoundManager::DestroySound(void* const soundAssetHandle)
 {
 	dAssert(0);
@@ -169,12 +150,14 @@ void ndSoundChannel::SetVolume(dFloat32 volume)
 {
 	ALfloat vol = ALfloat(volume);
 	alSourcef(m_source, AL_GAIN, vol);
+	dAssert(alGetError() == AL_NO_ERROR);
 }
 
 dFloat32 ndSoundChannel::GetVolume() const
 {
 	ALfloat volume;
 	alGetSourcef(m_source, AL_GAIN, &volume);
+	dAssert(alGetError() == AL_NO_ERROR);
 	return volume;
 }
 
@@ -189,26 +172,67 @@ void ndSoundChannel::SetPitch(dFloat32 pitch)
 {
 	ALfloat pit = ALfloat(pitch);
 	alSourcef(m_source, AL_PITCH, pit);
+	dAssert(alGetError() == AL_NO_ERROR);
 }
 
-dFloat32 ndSoundChannel::GetLength() const
+dFloat32 ndSoundChannel::GetLengthInSeconds() const
 {
-	dAssert(0);
-	return 0;
+	return m_asset->m_durationInSeconds;
 }
 
-dFloat32 ndSoundChannel::GetSecPosition() const
+dFloat32 ndSoundChannel::GetPositionInSeconds() const
 {
 	ALfloat position;
 	alGetSourcef(m_source, AL_SEC_OFFSET, &position);
+	dAssert(alGetError() == AL_NO_ERROR);
 	return position;
+}
+
+const dVector ndSoundChannel::GetPosition() const
+{
+	ALfloat sourcePosition[3];
+	alGetSourcefv(m_source, AL_POSITION, sourcePosition);
+	dAssert(alGetError() == AL_NO_ERROR);
+	const dVector posit(dFloat32 (sourcePosition[0]), dFloat32(sourcePosition[1]), dFloat32(sourcePosition[2]), dFloat32 (1.0f));
+	return m_manager->m_coordinateSystem.UntransformVector(posit);
+}
+
+void ndSoundChannel::SetPosition(const dVector& posit) const
+{
+	const dVector alPosit(m_manager->m_coordinateSystem.TransformVector(posit));
+	ALfloat sourcePosition[3];
+	sourcePosition[0] = ALfloat(alPosit.m_x);
+	sourcePosition[1] = ALfloat(alPosit.m_y);
+	sourcePosition[2] = ALfloat(alPosit.m_z);
+	alSourcefv(m_source, AL_POSITION, sourcePosition);
+	dAssert(alGetError() == AL_NO_ERROR);
+}
+
+const dVector ndSoundChannel::GetVelocity() const
+{
+	ALfloat sourceVeloc[3];
+	alGetSourcefv(m_source, AL_VELOCITY, sourceVeloc);
+	dAssert(alGetError() == AL_NO_ERROR);
+	const dVector veloc(dFloat32(sourceVeloc[0]), dFloat32(sourceVeloc[1]), dFloat32(sourceVeloc[2]), dFloat32(1.0f));
+	return m_manager->m_coordinateSystem.UnrotateVector(veloc);
+}
+
+void ndSoundChannel::SetVelocity(const dVector& velocity) const
+{
+	const dVector alVeloc(m_manager->m_coordinateSystem.RotateVector(velocity));
+	ALfloat sourceVeloc[3];
+	sourceVeloc[0] = ALfloat(alVeloc.m_x);
+	sourceVeloc[1] = ALfloat(alVeloc.m_y);
+	sourceVeloc[2] = ALfloat(alVeloc.m_z);
+	alSourcefv(m_source, AL_VELOCITY, sourceVeloc);
+	dAssert(alGetError() == AL_NO_ERROR);
 }
 
 ndSoundAsset::ndSoundAsset()
 	:ndSoundChannelList()
 	,m_buffer(0)
-	,m_lenght(0)
 	,m_frequecy(0)
+	,m_durationInSeconds(0)
 	,m_node(nullptr)
 {
 	alGenBuffers(1, (ALuint*)&m_buffer);
@@ -219,8 +243,8 @@ ndSoundAsset::ndSoundAsset()
 ndSoundAsset::ndSoundAsset(const ndSoundAsset& copy)
 	:ndSoundChannelList()
 	,m_buffer(copy.m_buffer)
-	,m_lenght(copy.m_lenght)
 	,m_frequecy(copy.m_frequecy)
+	,m_durationInSeconds(copy.m_durationInSeconds)
 	,m_node(nullptr)
 {
 	alGenBuffers(1, (ALuint*)&m_buffer);
@@ -236,42 +260,34 @@ ndSoundAsset::~ndSoundAsset()
 	dAssert(alGetError() == AL_NO_ERROR);
 }
 
-ndSoundManager::ndSoundManager()
+ndSoundManager::ndSoundManager(ndDemoEntityManager* const scene)
 	:ndModel()
 	,m_device(alcOpenDevice(nullptr))
 	,m_context(nullptr)
+	,m_scene(scene)
 	,m_assets()
 	,m_channelPlaying()
-	//,m_coordinateSystem(dGetIdentityMatrix())
+	,m_coordinateSystem(dYawMatrix (90.0f * dDegreeToRad))
+	,m_cameraPreviousPosit(dVector::m_zero)
 {
 	dAssert(m_device);
 	if (m_device)
 	{
 		m_context = alcCreateContext(m_device, nullptr);
 		alcMakeContextCurrent(m_context);
-	
-		// clear error code
-		//alGetError();
 		dAssert(alGetError() == AL_NO_ERROR);
 	
-		ALfloat listenerPos[] = { 0.0,0.0,0.0 };
-		alListenerfv(AL_POSITION, listenerPos);
+		ALfloat listenerPosit[] = { 0.0,0.0,0.0 };
+		alListenerfv(AL_POSITION, listenerPosit);
 		dAssert(alGetError() == AL_NO_ERROR);
 	
-		ALfloat listenerVel[] = { 0.0,0.0,0.0 };
-		alListenerfv(AL_VELOCITY, listenerVel);
+		ALfloat listenerVeloc[] = { 0.0,0.0,0.0 };
+		alListenerfv(AL_VELOCITY, listenerVeloc);
 		dAssert(alGetError() == AL_NO_ERROR);
 	
 		ALfloat listenerOri[] = { 0.0,0.0,-1.0, 0.0,1.0,0.0 };
 		alListenerfv(AL_ORIENTATION, listenerOri);
 		dAssert(alGetError() == AL_NO_ERROR);
-	
-		/*
-		// fmod coordinate system uses (0,0,1) as from vector
-		m_coordinateSystem[0] = dVector (0.0f, 0.0f, 1.0f);
-		m_coordinateSystem[1] = dVector (0.0f, 1.0f, 0.0f);
-		m_coordinateSystem[2] = dVector (1.0f, 0.0f, 0.0f);
-		*/
 	}
 }
 
@@ -381,31 +397,14 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 							}
 						}
 
-						asset->m_lenght = dFloat32(size) / byteRate;
 						asset->m_frequecy = dFloat32(sampleRate);
+						asset->m_durationInSeconds = dFloat32(size) / byteRate;
 						alBufferData(asset->m_buffer, waveFormat, &data[0], size, sampleRate);
 					}
 				}
 			}
 		}
 		fclose(wave);
-	}
-}
-void ndSoundManager::PostUpdate(ndWorld* const, dFloat32)
-{
-	if (m_device)
-	{
-		ndSoundChannelPlaying::dNode* next;
-		for (ndSoundChannelPlaying::dNode* node = m_channelPlaying.GetFirst(); node; node = next)
-		{
-			ndSoundChannel* const channel = node->GetInfo();
-			next = node->GetNext();
-
-			if (!channel->IsPlaying())
-			{
-				channel->Stop();
-			}
-		}
 	}
 }
 
@@ -447,3 +446,70 @@ ndSoundChannel* ndSoundManager::CreateSoundChannel(const char* const fileName)
 	return channel;
 }
 
+void ndSoundManager::PostUpdate(ndWorld* const, dFloat32 timestep)
+{
+	if (m_device)
+	{
+		ndSoundChannelPlaying::dNode* next;
+		for (ndSoundChannelPlaying::dNode* node = m_channelPlaying.GetFirst(); node; node = next)
+		{
+			ndSoundChannel* const channel = node->GetInfo();
+			next = node->GetNext();
+
+			if (!channel->IsPlaying())
+			{
+				channel->Stop();
+			}
+			else
+			{
+				#if 0
+				// test positional sound
+				static dFloat32 xxx;
+				xxx += timestep;
+				dFloat32 axxx = 20.0f * dSin(xxx / 1.0f);
+				dVector xxx1(channel->GetPosition());
+				//dVector xxx1(channel->GetVelocity());
+				xxx1.m_z = axxx;
+				dTrace(("%f\n", axxx));
+				channel->SetPosition(xxx1);
+				//channel->SetVelocity(xxx1);
+				#endif
+			}
+		}
+
+		ndDemoCamera* const camera = m_scene->GetCamera();
+		// get camera matrix in open-al space
+		const dMatrix matrix(camera->GetCurrentMatrix() * m_coordinateSystem);
+
+		// set Listener position
+		ALfloat listenerPosit[3];
+		listenerPosit[0] = matrix.m_posit.m_x;
+		listenerPosit[1] = matrix.m_posit.m_y;
+		listenerPosit[2] = matrix.m_posit.m_z;
+		alListenerfv(AL_POSITION, listenerPosit);
+		dAssert(alGetError() == AL_NO_ERROR);
+
+		// set Listener orientation
+		//{ 0.0, 0.0, -1.0, 0.0, 1.0, 0.0 }
+		ALfloat listenerOrientation[6];
+		listenerOrientation[0] = (ALfloat)matrix.m_front.m_x;
+		listenerOrientation[1] = (ALfloat)matrix.m_front.m_y;
+		listenerOrientation[2] = (ALfloat)matrix.m_front.m_z;
+		listenerOrientation[3] = (ALfloat)matrix.m_up.m_x;
+		listenerOrientation[4] = (ALfloat)matrix.m_up.m_y;
+		listenerOrientation[5] = (ALfloat)matrix.m_up.m_z;
+		alListenerfv(AL_ORIENTATION, listenerOrientation);
+		dAssert(alGetError() == AL_NO_ERROR);
+
+		// estimate listener velocity, by using camera previous location
+		const dVector camVelocity((matrix.m_posit - m_cameraPreviousPosit).Scale (1.0f / timestep));
+		ALfloat listenerVeloc[3];
+		listenerVeloc[0] = camVelocity.m_x;
+		listenerVeloc[1] = camVelocity.m_y;
+		listenerVeloc[2] = camVelocity.m_z;
+		alListenerfv(AL_VELOCITY, listenerVeloc);
+		dAssert(alGetError() == AL_NO_ERROR);
+
+		m_cameraPreviousPosit = matrix.m_posit;
+	}
+}

@@ -13,9 +13,10 @@
 #define __DSOUND_MANAGER_H__
 
 #include "ndSandboxStdafx.h"
-#include "ndDemoEntity.h"
 
 class ndSoundAsset;
+class ndSoundManager;
+class ndDemoEntityManager;
 
 class ndSoundChannel
 {
@@ -37,8 +38,14 @@ class ndSoundChannel
 	dFloat32 GetVolume() const;
 	void SetVolume(dFloat32 volumne);
 
-	dFloat32 GetLength() const;
-	dFloat32 GetSecPosition() const;
+	dFloat32 GetLengthInSeconds() const;
+	dFloat32 GetPositionInSeconds() const;
+
+	const dVector GetPosition() const;
+	void SetPosition(const dVector& posit) const;
+	
+	const dVector GetVelocity() const;
+	void SetVelocity(const dVector& velocity) const;
 
 	private:
 	dInt32 m_source;
@@ -60,8 +67,8 @@ class ndSoundAsset: public ndSoundChannelList
 	virtual ~ndSoundAsset();
 
 	dInt32 m_buffer;
-	dFloat32 m_lenght;
 	dFloat32 m_frequecy;
+	dFloat32 m_durationInSeconds;
 	dTree<ndSoundAsset, dUnsigned64>::dNode* m_node;
 	friend class ndSoundManager;
 };
@@ -77,7 +84,7 @@ class ndSoundManager: public ndModel
 	};
 	
 	public:
-	ndSoundManager();
+	ndSoundManager(ndDemoEntityManager* const scene);
 	~ndSoundManager();
 
 	// sound clip asset manager
@@ -96,13 +103,14 @@ class ndSoundManager: public ndModel
 	void Update(ndWorld* const, dFloat32) {}
 	void PostUpdate(ndWorld* const world, dFloat32);
 	void LoadWaveFile(ndSoundAsset* const asset, const char* const fileName);
-	//void UpdateListener(const dVector& position, const dVector& velocity, const dVector& heading, const dVector& upDir);
 
 	ALCdevice* m_device;
 	ALCcontext* m_context;
+	ndDemoEntityManager* m_scene;
 	ndSoundAssetList m_assets;
 	ndSoundChannelPlaying m_channelPlaying;
-	//dMatrix m_coordinateSystem;
+	dMatrix m_coordinateSystem;
+	dVector m_cameraPreviousPosit;
 
 	friend ndSoundChannel;
 };
