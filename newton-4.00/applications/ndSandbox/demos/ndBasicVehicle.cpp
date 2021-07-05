@@ -670,8 +670,10 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	xxxx->SetPosition(testPosit);
 	xxxx->SetVolume(1.0f);
 	xxxx->SetLoop(true);
+	xxxx->SetAttenuationRefDistance(10.0f, 40.0f, 60.0f);
 	xxxx->Play();
-	AddBox(scene, testPosit, 0.0f, 4.0f, 0.5f, 5.0f);
+	ndBodyKinematic* xxxx1 = AddBox(scene, testPosit, 0.0f, 4.0f, 0.5f, 5.0f);
+	xxxx1->GetCollisionShape().SetCollisionMode(false);
 
 
 	// add a model for general controls

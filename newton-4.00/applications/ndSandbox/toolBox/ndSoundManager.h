@@ -47,6 +47,8 @@ class ndSoundChannel
 	const dVector GetVelocity() const;
 	void SetVelocity(const dVector& velocity) const;
 
+	void SetAttenuationRefDistance(dFloat32 refDist, dFloat32 minDropOffDist, dFloat32 maxDropOffDist);
+
 	private:
 	void ApplyAttenuation(const dVector& listenerPosit);
 
@@ -59,10 +61,11 @@ class ndSoundChannel
 	// them to prevent stuttering 
 	dVector m_posit;
 
-
 	dFloat32 m_gain;
-	dFloat32 m_maxDistance;
-	dFloat32 m_referenceDistance;
+	dFloat32 m_volume;
+	dFloat32 m_minDropOffDist;
+	dFloat32 m_maxDropOffDist;
+
 
 	friend class ndSoundManager;
 };

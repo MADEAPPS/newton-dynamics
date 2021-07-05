@@ -14,6 +14,10 @@
 #include "ndSoundManager.h"
 #include "ndDemoEntityManager.h"
 
+
+//#define DEFAULT_DISTANCE_MODEL AL_NONE
+#define DEFAULT_DISTANCE_MODEL AL_INVERSE_DISTANCE_CLAMPED
+
 #if 0
 void ndSoundManager::DestroySound(void* const soundAssetHandle)
 {
@@ -84,9 +88,10 @@ ndSoundChannel::ndSoundChannel()
 	,m_asset(nullptr)
 	,m_manager(nullptr)
 	,m_playingNode(nullptr)
-	,m_gain(0.0f)
-	,m_maxDistance(60.0f)
-	,m_referenceDistance(40.0f)
+	,m_gain(1.0f)
+	,m_volume(1.0f)
+	,m_minDropOffDist(30.0f)
+	,m_maxDropOffDist(50.0f)
 {
 	alGenSources(1, (ALuint*)&m_source);
 	dAssert(m_source);
@@ -95,6 +100,10 @@ ndSoundChannel::ndSoundChannel()
 	//alSourcef(m_source, AL_ROLLOFF_FACTOR, ALfloat(0.0f));
 	//alSourcef(m_source, AL_REFERENCE_DISTANCE, ALfloat(1000.0f));
 	//dAssert(alGetError() == AL_NO_ERROR);
+
+	ALfloat distanceModel = DEFAULT_DISTANCE_MODEL;
+	alSourcefv(m_source, AL_DISTANCE_MODEL, &distanceModel);
+	dAssert(alGetError() == AL_NO_ERROR);
 
 	ALfloat sourcePosition[3];
 	alGetSourcefv(m_source, AL_POSITION, sourcePosition);
@@ -154,7 +163,7 @@ void ndSoundChannel::Stop()
 void ndSoundChannel::SetVolume(dFloat32 volume)
 {
 	ALfloat vol = ALfloat(volume);
-	m_gain = volume;
+	m_volume = volume;
 	alSourcef(m_source, AL_GAIN, vol);
 	dAssert(alGetError() == AL_NO_ERROR);
 }
@@ -167,21 +176,38 @@ dFloat32 ndSoundChannel::GetVolume() const
 	return volume;
 }
 
+void ndSoundChannel::SetAttenuationRefDistance(dFloat32 dist, dFloat32 minDropOffDist, dFloat32 maxDropOffDist)
+{
+	alSourcef(m_source, AL_REFERENCE_DISTANCE, ALfloat(dist));
+	dAssert(alGetError() == AL_NO_ERROR);
+
+	dAssert(dist < minDropOffDist);
+	dAssert(dist < minDropOffDist);
+	m_minDropOffDist = minDropOffDist;
+	m_maxDropOffDist = maxDropOffDist;
+}
+
 void ndSoundChannel::ApplyAttenuation(const dVector& listenerPosit)
 {
-	// for some reason the attenuation model does not works in open-al
-	// so I am applying manually, according to the formula in the docs
-	
+	dFloat32 gain = dFloat32(1.0f);
 	const dVector dist(m_posit - listenerPosit);
 	dFloat32 distance = dSqrt(dist.DotProduct(dist).GetScalar());
-	distance = dMin(distance, m_maxDistance);
-	distance = dMax(distance, m_referenceDistance);
+	if (distance > m_minDropOffDist)
+	{
+		gain = dFloat32(0.0f);
+		if (distance < m_maxDropOffDist)
+		{
+			gain = dFloat32(1.0f) - ((distance - m_minDropOffDist) / (m_maxDropOffDist - m_minDropOffDist));
+		}
+	}
 
-	dFloat32 ROLLOFF_FACTOR = 1.0f;
-	dFloat32 attenuation = ROLLOFF_FACTOR * (dFloat32 (1.0f) - (distance - m_referenceDistance) / (m_maxDistance - m_referenceDistance));
-	//dTrace(("%f %f\n", attenuation, m_gain));
-	alSourcef(m_source, AL_GAIN, ALfloat(m_gain * attenuation));
-	dAssert(alGetError() == AL_NO_ERROR);
+	gain *= m_volume;
+	if (dAbs(gain - m_gain) > dFloat32(1.0e-3f))
+	{
+		m_gain = gain;
+		alSourcef(m_source, AL_GAIN, ALfloat(m_gain));
+		dAssert(alGetError() == AL_NO_ERROR);
+	}
 }
 
 dFloat32 ndSoundChannel::GetPitch() const
@@ -320,7 +346,7 @@ ndSoundManager::ndSoundManager(ndDemoEntityManager* const scene)
 		alListenerfv(AL_ORIENTATION, listenerOri);
 		dAssert(alGetError() == AL_NO_ERROR);
 
-		alDistanceModel(AL_NONE);
+		alDistanceModel(DEFAULT_DISTANCE_MODEL);
 		dAssert(alGetError() == AL_NO_ERROR);
 	}
 }
@@ -523,6 +549,7 @@ void ndSoundManager::Update(ndWorld* const, dFloat32 timestep)
 			// update camera if is changes more than 2.5 degrees for previous orientation
 			m_upDir = matrix.m_up;
 			m_frontDir = matrix.m_front;
+
 			// set Listener orientation
 			//{ 0.0, 0.0, -1.0, 0.0, 1.0, 0.0 }
 			ALfloat listenerOrientation[6];
