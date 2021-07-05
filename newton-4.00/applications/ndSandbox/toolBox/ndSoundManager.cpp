@@ -298,6 +298,8 @@ ndSoundManager::ndSoundManager(ndDemoEntityManager* const scene)
 	,m_posit(dVector::m_zero)
 	,m_veloc(dVector::m_zero)
 	,m_posit0(dVector::m_zero)
+	,m_upDir(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f))
+	,m_frontDir(dFloat32 (0.0f), dFloat32(0.0f), dFloat32(-1.0f), dFloat32(0.0f))
 {
 	dAssert(m_device);
 	if (m_device)
@@ -514,21 +516,29 @@ void ndSoundManager::Update(ndWorld* const, dFloat32 timestep)
 		}
 		m_posit0 = matrix.m_posit;
 
-		// set Listener orientation
-		//{ 0.0, 0.0, -1.0, 0.0, 1.0, 0.0 }
-		ALfloat listenerOrientation[6];
-		listenerOrientation[0] = (ALfloat)matrix.m_front.m_x;
-		listenerOrientation[1] = (ALfloat)matrix.m_front.m_y;
-		listenerOrientation[2] = (ALfloat)matrix.m_front.m_z;
-		listenerOrientation[3] = (ALfloat)matrix.m_up.m_x;
-		listenerOrientation[4] = (ALfloat)matrix.m_up.m_y;
-		listenerOrientation[5] = (ALfloat)matrix.m_up.m_z;
-		alListenerfv(AL_ORIENTATION, listenerOrientation);
-		dAssert(alGetError() == AL_NO_ERROR);
+		dFloat32 angle0 = matrix.m_up.DotProduct(m_upDir).GetScalar();
+		dFloat32 angle1 = matrix.m_front.DotProduct(m_frontDir).GetScalar();
+		if ((angle0 < dFloat32(0.999f)) || (angle1 < dFloat32(0.999f)))
+		{
+			// update camera if is changes more than 2.5 degrees for previous orientation
+			m_upDir = matrix.m_up;
+			m_frontDir = matrix.m_front;
+			// set Listener orientation
+			//{ 0.0, 0.0, -1.0, 0.0, 1.0, 0.0 }
+			ALfloat listenerOrientation[6];
+			listenerOrientation[0] = (ALfloat)m_frontDir.m_x;
+			listenerOrientation[1] = (ALfloat)m_frontDir.m_y;
+			listenerOrientation[2] = (ALfloat)m_frontDir.m_z;
+			listenerOrientation[3] = (ALfloat)m_upDir.m_x;
+			listenerOrientation[4] = (ALfloat)m_upDir.m_y;
+			listenerOrientation[5] = (ALfloat)m_upDir.m_z;
+			alListenerfv(AL_ORIENTATION, listenerOrientation);
+			dAssert(alGetError() == AL_NO_ERROR);
+		}
 
-		dTrace(("p(%f %f %f)", m_posit[0], m_posit[1], m_posit[2]));
-		dTrace(("v(%f %f %f)", m_veloc[0], m_veloc[1], m_veloc[2]));
-		dTrace(("\n"));
+		//dTrace(("p(%f %f %f)", m_posit[0], m_posit[1], m_posit[2]));
+		//dTrace(("v(%f %f %f)", m_veloc[0], m_veloc[1], m_veloc[2]));
+		//dTrace(("\n"));
 
 		ndSoundChannelPlaying::dNode* next;
 		for (ndSoundChannelPlaying::dNode* node = m_channelPlaying.GetFirst(); node; node = next)

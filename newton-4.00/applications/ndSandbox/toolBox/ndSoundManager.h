@@ -126,6 +126,8 @@ class ndSoundManager: public dClassAlloc
 	dVector m_posit;
 	dVector m_veloc;
 	dVector m_posit0;
+	dVector m_upDir;
+	dVector m_frontDir;
 
 	friend ndSoundChannel;
 };
