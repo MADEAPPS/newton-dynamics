@@ -42,7 +42,7 @@ class ndSoundChannel
 	dFloat32 GetPositionInSeconds() const;
 
 	const dVector GetPosition() const;
-	void SetPosition(const dVector& posit) const;
+	void SetPosition(const dVector& posit);
 	
 	const dVector GetVelocity() const;
 	void SetVelocity(const dVector& velocity) const;
@@ -54,6 +54,12 @@ class ndSoundChannel
 	ndSoundAsset* m_asset;
 	ndSoundManager* m_manager;
 	dList<ndSoundChannel*>::dNode* m_playingNode;
+
+	// since open-al does not check for parameter changes, we have to cache
+	// them to prevent stuttering 
+	dVector m_posit;
+
+
 	dFloat32 m_gain;
 	dFloat32 m_maxDistance;
 	dFloat32 m_referenceDistance;
@@ -83,7 +89,7 @@ class ndSoundAssetList: public dTree<ndSoundAsset, dUnsigned64>
 {
 };
 
-class ndSoundManager: public ndModel
+class ndSoundManager: public dClassAlloc
 {
 	class ndSoundChannelPlaying: public dList<ndSoundChannel*>
 	{
@@ -105,9 +111,9 @@ class ndSoundManager: public ndModel
 	//void DestroyChannel(void* const channelHandle);
 	//void* GetAsset(void* const channelHandle) const;
 
+	void Update(ndWorld* const world, dFloat32 timestep);
+
 	private:
-	void Update(ndWorld* const, dFloat32) {}
-	void PostUpdate(ndWorld* const world, dFloat32);
 	void LoadWaveFile(ndSoundAsset* const asset, const char* const fileName);
 
 	ALCdevice* m_device;
@@ -116,7 +122,10 @@ class ndSoundManager: public ndModel
 	ndSoundAssetList m_assets;
 	ndSoundChannelPlaying m_channelPlaying;
 	dMatrix m_coordinateSystem;
-	dVector m_cameraPreviousPosit;
+
+	dVector m_posit;
+	dVector m_veloc;
+	dVector m_posit0;
 
 	friend ndSoundChannel;
 };

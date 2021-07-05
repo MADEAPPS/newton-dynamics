@@ -264,7 +264,7 @@ IF(MSVC)
     ENDIF()
 
     OPTION(FORCE_STATIC_VCRT "Force /MT for static VC runtimes" OFF)
-	#OPTION(FORCE_STATIC_VCRT "Force /MT for static VC runtimes" ON)
+    #OPTION(FORCE_STATIC_VCRT "Force /MT for static VC runtimes" ON)
     IF(FORCE_STATIC_VCRT)
         FOREACH(flag_var
                 CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE

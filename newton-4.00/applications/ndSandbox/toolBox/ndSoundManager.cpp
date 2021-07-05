@@ -95,6 +95,11 @@ ndSoundChannel::ndSoundChannel()
 	//alSourcef(m_source, AL_ROLLOFF_FACTOR, ALfloat(0.0f));
 	//alSourcef(m_source, AL_REFERENCE_DISTANCE, ALfloat(1000.0f));
 	//dAssert(alGetError() == AL_NO_ERROR);
+
+	ALfloat sourcePosition[3];
+	alGetSourcefv(m_source, AL_POSITION, sourcePosition);
+	dAssert(alGetError() == AL_NO_ERROR);
+	m_posit = dVector (dFloat32(sourcePosition[0]), dFloat32(sourcePosition[1]), dFloat32(sourcePosition[2]), dFloat32(1.0f));
 }
 
 ndSoundChannel::~ndSoundChannel()
@@ -166,19 +171,15 @@ void ndSoundChannel::ApplyAttenuation(const dVector& listenerPosit)
 {
 	// for some reason the attenuation model does not works in open-al
 	// so I am applying manually, according to the formula in the docs
-	ALfloat sourcePosit[3];
-	alGetSourcefv(m_source, AL_POSITION, sourcePosit);
-	dAssert(alGetError() == AL_NO_ERROR);
 	
-	const dVector posit (dFloat32(sourcePosit[0]), dFloat32(sourcePosit[1]), dFloat32(sourcePosit[2]), dFloat32(1.0f));
-	const dVector dist(posit - listenerPosit);
+	const dVector dist(m_posit - listenerPosit);
 	dFloat32 distance = dSqrt(dist.DotProduct(dist).GetScalar());
 	distance = dMin(distance, m_maxDistance);
 	distance = dMax(distance, m_referenceDistance);
 
 	dFloat32 ROLLOFF_FACTOR = 1.0f;
 	dFloat32 attenuation = ROLLOFF_FACTOR * (dFloat32 (1.0f) - (distance - m_referenceDistance) / (m_maxDistance - m_referenceDistance));
-	dTrace(("%f %f\n", attenuation, m_gain));
+	//dTrace(("%f %f\n", attenuation, m_gain));
 	alSourcef(m_source, AL_GAIN, ALfloat(m_gain * attenuation));
 	dAssert(alGetError() == AL_NO_ERROR);
 }
@@ -212,22 +213,27 @@ dFloat32 ndSoundChannel::GetPositionInSeconds() const
 
 const dVector ndSoundChannel::GetPosition() const
 {
-	ALfloat sourcePosition[3];
-	alGetSourcefv(m_source, AL_POSITION, sourcePosition);
-	dAssert(alGetError() == AL_NO_ERROR);
-	const dVector posit(dFloat32 (sourcePosition[0]), dFloat32(sourcePosition[1]), dFloat32(sourcePosition[2]), dFloat32 (1.0f));
-	return m_manager->m_coordinateSystem.UntransformVector(posit);
+	//ALfloat sourcePosition[3];
+	//alGetSourcefv(m_source, AL_POSITION, sourcePosition);
+	//dAssert(alGetError() == AL_NO_ERROR);
+	//const dVector posit(dFloat32 (sourcePosition[0]), dFloat32(sourcePosition[1]), dFloat32(sourcePosition[2]), dFloat32 (1.0f));
+	return m_manager->m_coordinateSystem.UntransformVector(m_posit);
 }
 
-void ndSoundChannel::SetPosition(const dVector& posit) const
+void ndSoundChannel::SetPosition(const dVector& posit)
 {
-	const dVector alPosit(m_manager->m_coordinateSystem.TransformVector(posit));
-	ALfloat sourcePosition[3];
-	sourcePosition[0] = ALfloat(alPosit.m_x);
-	sourcePosition[1] = ALfloat(alPosit.m_y);
-	sourcePosition[2] = ALfloat(alPosit.m_z);
-	alSourcefv(m_source, AL_POSITION, sourcePosition);
-	dAssert(alGetError() == AL_NO_ERROR);
+	const dVector newPosit(m_manager->m_coordinateSystem.TransformVector(posit));
+	const dVector err(newPosit - m_posit);
+	if (err.DotProduct(err).GetScalar() > dFloat32(1.0f))
+	{
+		ALfloat sourcePosition[3];
+		m_posit = newPosit;
+		sourcePosition[0] = ALfloat(newPosit.m_x);
+		sourcePosition[1] = ALfloat(newPosit.m_y);
+		sourcePosition[2] = ALfloat(newPosit.m_z);
+		alSourcefv(m_source, AL_POSITION, sourcePosition);
+		dAssert(alGetError() == AL_NO_ERROR);
+	}
 }
 
 const dVector ndSoundChannel::GetVelocity() const
@@ -282,14 +288,16 @@ ndSoundAsset::~ndSoundAsset()
 }
 
 ndSoundManager::ndSoundManager(ndDemoEntityManager* const scene)
-	:ndModel()
+	:dClassAlloc()
 	,m_device(alcOpenDevice(nullptr))
 	,m_context(nullptr)
 	,m_scene(scene)
 	,m_assets()
 	,m_channelPlaying()
 	,m_coordinateSystem(dYawMatrix (90.0f * dDegreeToRad))
-	,m_cameraPreviousPosit(dVector::m_zero)
+	,m_posit(dVector::m_zero)
+	,m_veloc(dVector::m_zero)
+	,m_posit0(dVector::m_zero)
 {
 	dAssert(m_device);
 	if (m_device)
@@ -470,7 +478,7 @@ ndSoundChannel* ndSoundManager::CreateSoundChannel(const char* const fileName)
 	return channel;
 }
 
-void ndSoundManager::PostUpdate(ndWorld* const, dFloat32 timestep)
+void ndSoundManager::Update(ndWorld* const, dFloat32 timestep)
 {
 	if (m_device)
 	{
@@ -478,13 +486,33 @@ void ndSoundManager::PostUpdate(ndWorld* const, dFloat32 timestep)
 		ndDemoCamera* const camera = m_scene->GetCamera();
 		const dMatrix matrix(camera->GetCurrentMatrix() * m_coordinateSystem);
 
-		// set Listener position
-		ALfloat listenerPosit[3];
-		listenerPosit[0] = matrix.m_posit.m_x;
-		listenerPosit[1] = matrix.m_posit.m_y;
-		listenerPosit[2] = matrix.m_posit.m_z;
-		alListenerfv(AL_POSITION, listenerPosit);
-		dAssert(alGetError() == AL_NO_ERROR);
+		dVector err(matrix.m_posit - m_posit);
+		if (err.DotProduct(err).GetScalar() > dFloat32 (0.25f))
+		{
+			// set Listener position
+			ALfloat listenerPosit[3];
+			m_posit = matrix.m_posit;
+			listenerPosit[0] = matrix.m_posit.m_x;
+			listenerPosit[1] = matrix.m_posit.m_y;
+			listenerPosit[2] = matrix.m_posit.m_z;
+			alListenerfv(AL_POSITION, listenerPosit);
+			dAssert(alGetError() == AL_NO_ERROR);
+		}
+
+		dVector veloc((matrix.m_posit - m_posit0).Scale(1.0f / timestep));
+		err = veloc - m_veloc;
+		if (err.DotProduct(err).GetScalar() > dFloat32(1.0f))
+		{
+			// estimate listener velocity, by using camera previous location
+			m_veloc = veloc;
+			ALfloat listenerVeloc[3];
+			listenerVeloc[0] = veloc.m_x;
+			listenerVeloc[1] = veloc.m_y;
+			listenerVeloc[2] = veloc.m_z;
+			alListenerfv(AL_VELOCITY, listenerVeloc);
+			dAssert(alGetError() == AL_NO_ERROR);
+		}
+		m_posit0 = matrix.m_posit;
 
 		// set Listener orientation
 		//{ 0.0, 0.0, -1.0, 0.0, 1.0, 0.0 }
@@ -498,16 +526,9 @@ void ndSoundManager::PostUpdate(ndWorld* const, dFloat32 timestep)
 		alListenerfv(AL_ORIENTATION, listenerOrientation);
 		dAssert(alGetError() == AL_NO_ERROR);
 
-		// estimate listener velocity, by using camera previous location
-		const dVector camVelocity((matrix.m_posit - m_cameraPreviousPosit).Scale(1.0f / timestep));
-		ALfloat listenerVeloc[3];
-		listenerVeloc[0] = camVelocity.m_x;
-		listenerVeloc[1] = camVelocity.m_y;
-		listenerVeloc[2] = camVelocity.m_z;
-		alListenerfv(AL_VELOCITY, listenerVeloc);
-		dAssert(alGetError() == AL_NO_ERROR);
-
-		m_cameraPreviousPosit = matrix.m_posit;
+		dTrace(("p(%f %f %f)", m_posit[0], m_posit[1], m_posit[2]));
+		dTrace(("v(%f %f %f)", m_veloc[0], m_veloc[1], m_veloc[2]));
+		dTrace(("\n"));
 
 		ndSoundChannelPlaying::dNode* next;
 		for (ndSoundChannelPlaying::dNode* node = m_channelPlaying.GetFirst(); node; node = next)

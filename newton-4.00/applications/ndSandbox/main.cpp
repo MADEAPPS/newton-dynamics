@@ -48,7 +48,7 @@ class CheckMemoryLeaks
 			// Track all memory leaks at the operating system level.
 			// make sure no Newton tool or utility leaves leaks behind.
 			_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
-			//_CrtSetBreakAlloc (2177);
+			//_CrtSetBreakAlloc (1645);
 		#endif
 
 		atexit(CheckMemoryLeaksCallback);

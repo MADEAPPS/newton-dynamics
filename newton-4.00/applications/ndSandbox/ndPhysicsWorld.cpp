@@ -11,6 +11,7 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndPhysicsWorld.h"
+#include "ndSoundManager.h"
 #include "ndContactCallback.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"
@@ -25,6 +26,7 @@
 ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	:ndWorld()
 	,m_manager(manager)
+	,m_soundManager(new ndSoundManager(manager))
 	,m_timeAccumulator(0.0f)
 	,m_deletedBodies()
 	,m_hasPendingObjectToDelete(false)
@@ -36,6 +38,10 @@ ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 
 ndPhysicsWorld::~ndPhysicsWorld()
 {
+	if (m_soundManager)
+	{
+		delete m_soundManager;
+	}
 }
 
 ndDemoEntityManager* ndPhysicsWorld::GetManager() const
@@ -92,12 +98,22 @@ void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
 	}
 }
 
+ndSoundManager* ndPhysicsWorld::GetSoundManager() const
+{
+	return m_soundManager;
+}
+
 void ndPhysicsWorld::OnPostUpdate(dFloat32 timestep)
 {
 	m_manager->m_cameraManager->FixUpdate(m_manager, timestep);
 	if (m_manager->m_updateCamera)
 	{
 		m_manager->m_updateCamera(m_manager, m_manager->m_updateCameraContext, timestep);
+	}
+
+	if (m_soundManager)
+	{
+		m_soundManager->Update(this, timestep);
 	}
 }
 

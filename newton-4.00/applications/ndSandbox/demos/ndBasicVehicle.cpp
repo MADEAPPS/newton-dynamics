@@ -180,7 +180,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
 
-		ndWorld* const world = scene->GetWorld();
+		ndPhysicsWorld* const world = scene->GetWorld();
 
 		// create the vehicle chassis as a normal rigid body
 		ndBodyDynamic* const chassis = CreateChassis(scene, vehicleEntity, m_configuration.m_chassisMass);
@@ -309,7 +309,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);
 
 		// load all engine sound channels
-		ndSoundManager* const soundManager = scene->GetSoundManager();
+		ndSoundManager* const soundManager = world->GetSoundManager();
 
 		m_startEngine = false;
 		m_startSound = soundManager->CreateSoundChannel(engineSounds[0]);
@@ -656,7 +656,9 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//matrix = matrix * dRollMatrix(-70.0f * dDegreeToRad);
 	//matrix.m_posit = location;
 
-	ndSoundManager* const soundManager = scene->GetSoundManager();
+	ndPhysicsWorld* const world = scene->GetWorld();
+	//ndSoundManager* const soundManager = scene->GetSoundManager();
+	ndSoundManager* const soundManager = world->GetSoundManager();
 	for (int i = 0; i < sizeof(engineSounds) / sizeof(engineSounds[0]); i++)
 	{
 		soundManager->CreateSoundAsset(engineSounds[i]);

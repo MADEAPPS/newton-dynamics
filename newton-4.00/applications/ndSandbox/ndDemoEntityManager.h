@@ -20,7 +20,6 @@ class ndDemoMesh;
 class ndDemoEntity;
 class ndDemoCamera;
 class ndPhysicsWorld;
-class ndSoundManager;
 class ndDemoMeshInterface;
 class ndDemoCameraManager;
 class ndWireFrameDebugMesh;
@@ -143,8 +142,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	dInt32 GetHeight() const;
 
 	ndPhysicsWorld* GetWorld() const;
-	ndSoundManager* GetSoundManager() const;
-
+	
 	void CreateSkyBox();
 	void ResetTimer();
 	void ImportPLYfile (const char* const name);
@@ -213,7 +211,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	ndDemoEntity* m_sky;
 	ndPhysicsWorld* m_world;
-	ndSoundManager* m_soundManager;
 	ndDemoCameraManager* m_cameraManager;
 	ndShaderPrograms m_shaderCache;
 	void* m_renderUIContext;
@@ -278,10 +275,6 @@ inline ndPhysicsWorld* ndDemoEntityManager::GetWorld() const
 	return m_world;
 }
 
-inline ndSoundManager* ndDemoEntityManager::GetSoundManager() const
-{
-	return m_soundManager;
-}
 
 inline dInt32 ndDemoEntityManager::GetWidth() const 
 { 

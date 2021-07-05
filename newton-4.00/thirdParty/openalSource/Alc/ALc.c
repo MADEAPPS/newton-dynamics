@@ -791,30 +791,29 @@ static void alc_deinit_safe(void);
 #ifndef AL_LIBTYPE_STATIC
 BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
 {
-    switch(reason)
-    {
-        case DLL_PROCESS_ATTACH:
-            /* Pin the DLL so we won't get unloaded until the process terminates */
-            GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN | GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
-                               (WCHAR*)hModule, &hModule);
-			#ifndef _DELAYED_INITIALIZATION
-            alc_init();
-			#endif
-            break;
+	switch (reason)
+	{
+	case DLL_PROCESS_ATTACH:
+		/* Pin the DLL so we won't get unloaded until the process terminates */
+		GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN | GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, (WCHAR*)hModule, &hModule);
+		#ifndef _DELAYED_INITIALIZATION
+		alc_init();
+		#endif
+		break;
 
-        case DLL_THREAD_DETACH:
-            break;
+	case DLL_THREAD_DETACH:
+		break;
 
-        case DLL_PROCESS_DETACH:
-			#ifndef _DELAYED_INITIALIZATION
-            if(!lpReserved)
-                alc_deinit();
-            else
-                alc_deinit_safe();
-			#endif
-            break;
-    }
-    return TRUE;
+	case DLL_PROCESS_DETACH:
+		#ifndef _DELAYED_INITIALIZATION
+		if (!lpReserved)
+			alc_deinit();
+		else
+			alc_deinit_safe();
+		#endif
+		break;
+	}
+	return TRUE;
 }
 #elif defined(_MSC_VER)
 #pragma section(".CRT$XCU",read)

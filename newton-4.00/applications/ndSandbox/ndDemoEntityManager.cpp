@@ -16,7 +16,6 @@
 #include "ndDemoCamera.h"
 #include "ndFileBrowser.h"
 #include "ndPhysicsWorld.h"
-#include "ndSoundManager.h"
 #include "ndPhysicsUtils.h"
 #include "ndDebugDisplay.h"
 #include "ndDemoDebugMesh.h"
@@ -125,7 +124,6 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_defaultFont(0)
 	,m_sky(nullptr)
 	,m_world(nullptr)
-	,m_soundManager(nullptr)
 	,m_cameraManager(nullptr)
 	,m_renderUIContext(nullptr)
 	,m_updateCameraContext(nullptr)
@@ -565,10 +563,6 @@ void ndDemoEntityManager::Cleanup ()
 
 	// create the newton world
 	m_world = new ndPhysicsWorld(this);
-
-	// add a sound manager
-	m_soundManager = new ndSoundManager(this);
-	m_world->AddModel(m_soundManager);
 	
 	// add the camera manager
 	m_cameraManager = new ndDemoCameraManager(this);

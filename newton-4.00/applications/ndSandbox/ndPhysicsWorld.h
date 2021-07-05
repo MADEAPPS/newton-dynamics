@@ -14,6 +14,8 @@
 #include "ndSandboxStdafx.h"
 
 #define MAX_PHYSICS_FPS			60.0f
+
+class ndSoundManager;
 class ndDemoEntityManager;
 
 class ndPhysicsWorld: public ndWorld
@@ -24,6 +26,7 @@ class ndPhysicsWorld: public ndWorld
 
 	void AdvanceTime(dFloat32 timestep);
 	ndDemoEntityManager* GetManager() const;
+	ndSoundManager* GetSoundManager() const;
 
 	void QueueBodyForDelete(ndBody* const body);
 
@@ -34,6 +37,7 @@ class ndPhysicsWorld: public ndWorld
 	void DeletePendingObjects();
 
 	ndDemoEntityManager* m_manager;
+	ndSoundManager* m_soundManager;
 	dFloat32 m_timeAccumulator;
 	dArray<ndBody*> m_deletedBodies;
 	dAtomic<bool> m_hasPendingObjectToDelete;
