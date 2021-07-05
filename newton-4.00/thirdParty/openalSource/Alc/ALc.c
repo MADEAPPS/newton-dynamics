@@ -45,6 +45,9 @@
 
 #include "backends/base.h"
 
+#if defined(_WIN32) && !defined(AL_LIBTYPE_STATIC)
+	#define _DELAYED_INITIALIZATION
+#endif
 
 /************************************************
  * Backends
@@ -794,17 +797,21 @@ BOOL APIENTRY DllMain(HINSTANCE hModule, DWORD reason, LPVOID lpReserved)
             /* Pin the DLL so we won't get unloaded until the process terminates */
             GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_PIN | GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
                                (WCHAR*)hModule, &hModule);
+			#ifndef _DELAYED_INITIALIZATION
             alc_init();
+			#endif
             break;
 
         case DLL_THREAD_DETACH:
             break;
 
         case DLL_PROCESS_DETACH:
+			#ifndef _DELAYED_INITIALIZATION
             if(!lpReserved)
                 alc_deinit();
             else
                 alc_deinit_safe();
+			#endif
             break;
     }
     return TRUE;
@@ -3246,6 +3253,9 @@ ALC_API ALCdevice* ALC_APIENTRY alcOpenDevice(const ALCchar *deviceName)
     const ALCchar *fmt;
     ALCdevice *device;
     ALCenum err;
+	#ifdef _DELAYED_INITIALIZATION
+	alc_init();
+	#endif
 
     DO_INITCONFIG();
 
@@ -3474,6 +3484,9 @@ ALC_API ALCboolean ALC_APIENTRY alcCloseDevice(ALCdevice *device)
     {
         alcSetError(list, ALC_INVALID_DEVICE);
         UnlockLists();
+		#ifdef _DELAYED_INITIALIZATION
+		alc_deinit_safe();
+		#endif
         return ALC_FALSE;
     }
 
@@ -3501,6 +3514,10 @@ ALC_API ALCboolean ALC_APIENTRY alcCloseDevice(ALCdevice *device)
     device->Flags &= ~DEVICE_RUNNING;
 
     ALCdevice_DecRef(device);
+
+	#ifdef _DELAYED_INITIALIZATION
+	alc_deinit_safe();
+	#endif
 
     return ALC_TRUE;
 }
