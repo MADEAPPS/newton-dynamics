@@ -596,7 +596,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 				m_startEngine = startEngine;
 				if (startEngine)
 				{
-					//m_startSound->Play();
+					m_startSound->Play();
 					m_engineRpmSound->Play();
 					m_engineRpmSound->SetPitch(0.5f);
 					m_engineRpmSound->SetVolume(0.25f);

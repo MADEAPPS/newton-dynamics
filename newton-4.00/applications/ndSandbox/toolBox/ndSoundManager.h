@@ -45,7 +45,7 @@ class ndSoundChannel
 	void SetPosition(const dVector& posit);
 	
 	const dVector GetVelocity() const;
-	void SetVelocity(const dVector& velocity) const;
+	void SetVelocity(const dVector& velocity);
 
 	void SetAttenuationRefDistance(dFloat32 refDist, dFloat32 minDropOffDist, dFloat32 maxDropOffDist);
 
@@ -60,6 +60,7 @@ class ndSoundChannel
 	// since open-al does not check for parameter changes, we have to cache
 	// them to prevent stuttering 
 	dVector m_posit;
+	dVector m_veloc;
 
 	dFloat32 m_gain;
 	dFloat32 m_pitch;

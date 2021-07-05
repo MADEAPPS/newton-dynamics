@@ -100,10 +100,15 @@ ndSoundChannel::ndSoundChannel()
 	alSourcefv(m_source, AL_DISTANCE_MODEL, &distanceModel);
 	dAssert(alGetError() == AL_NO_ERROR);
 
-	ALfloat sourcePosition[3];
-	alGetSourcefv(m_source, AL_POSITION, sourcePosition);
+	ALfloat posit[3];
+	alGetSourcefv(m_source, AL_POSITION, posit);
 	dAssert(alGetError() == AL_NO_ERROR);
-	m_posit = dVector (dFloat32(sourcePosition[0]), dFloat32(sourcePosition[1]), dFloat32(sourcePosition[2]), dFloat32(1.0f));
+	m_posit = dVector (dFloat32(posit[0]), dFloat32(posit[1]), dFloat32(posit[2]), dFloat32(1.0f));
+
+	ALfloat veloc[3];
+	alGetSourcefv(m_source, AL_VELOCITY, veloc);
+	dAssert(alGetError() == AL_NO_ERROR);
+	m_veloc = dVector(dFloat32(veloc[0]), dFloat32(veloc[1]), dFloat32(veloc[2]), dFloat32(0.0f));
 }
 
 ndSoundChannel::~ndSoundChannel()
@@ -234,24 +239,20 @@ dFloat32 ndSoundChannel::GetPositionInSeconds() const
 
 const dVector ndSoundChannel::GetPosition() const
 {
-	//ALfloat sourcePosition[3];
-	//alGetSourcefv(m_source, AL_POSITION, sourcePosition);
-	//dAssert(alGetError() == AL_NO_ERROR);
-	//const dVector posit(dFloat32 (sourcePosition[0]), dFloat32(sourcePosition[1]), dFloat32(sourcePosition[2]), dFloat32 (1.0f));
 	return m_manager->m_coordinateSystem.UntransformVector(m_posit);
 }
 
-void ndSoundChannel::SetPosition(const dVector& posit)
+void ndSoundChannel::SetPosition(const dVector& position)
 {
-	const dVector newPosit(m_manager->m_coordinateSystem.TransformVector(posit));
-	const dVector err(newPosit - m_posit);
+	const dVector posit(m_manager->m_coordinateSystem.TransformVector(position));
+	const dVector err(posit - m_posit);
 	if (err.DotProduct(err).GetScalar() > dFloat32(1.0f))
 	{
 		ALfloat sourcePosition[3];
-		m_posit = newPosit;
-		sourcePosition[0] = ALfloat(newPosit.m_x);
-		sourcePosition[1] = ALfloat(newPosit.m_y);
-		sourcePosition[2] = ALfloat(newPosit.m_z);
+		m_posit = posit;
+		sourcePosition[0] = ALfloat(posit.m_x);
+		sourcePosition[1] = ALfloat(posit.m_y);
+		sourcePosition[2] = ALfloat(posit.m_z);
 		alSourcefv(m_source, AL_POSITION, sourcePosition);
 		dAssert(alGetError() == AL_NO_ERROR);
 	}
@@ -259,22 +260,23 @@ void ndSoundChannel::SetPosition(const dVector& posit)
 
 const dVector ndSoundChannel::GetVelocity() const
 {
-	ALfloat sourceVeloc[3];
-	alGetSourcefv(m_source, AL_VELOCITY, sourceVeloc);
-	dAssert(alGetError() == AL_NO_ERROR);
-	const dVector veloc(dFloat32(sourceVeloc[0]), dFloat32(sourceVeloc[1]), dFloat32(sourceVeloc[2]), dFloat32(1.0f));
-	return m_manager->m_coordinateSystem.UnrotateVector(veloc);
+	return m_manager->m_coordinateSystem.UnrotateVector(m_veloc);
 }
 
-void ndSoundChannel::SetVelocity(const dVector& velocity) const
+void ndSoundChannel::SetVelocity(const dVector& velocity)
 {
-	const dVector alVeloc(m_manager->m_coordinateSystem.RotateVector(velocity));
-	ALfloat sourceVeloc[3];
-	sourceVeloc[0] = ALfloat(alVeloc.m_x);
-	sourceVeloc[1] = ALfloat(alVeloc.m_y);
-	sourceVeloc[2] = ALfloat(alVeloc.m_z);
-	alSourcefv(m_source, AL_VELOCITY, sourceVeloc);
-	dAssert(alGetError() == AL_NO_ERROR);
+	const dVector veloc(m_manager->m_coordinateSystem.RotateVector(velocity));
+	const dVector err(veloc - m_veloc);
+	if (err.DotProduct(err).GetScalar() > dFloat32(0.25f))
+	{
+		m_veloc = veloc & dVector::m_triplexMask;
+		ALfloat sourceVeloc[3];
+		sourceVeloc[0] = ALfloat(veloc.m_x);
+		sourceVeloc[1] = ALfloat(veloc.m_y);
+		sourceVeloc[2] = ALfloat(veloc.m_z);
+		alSourcefv(m_source, AL_VELOCITY, sourceVeloc);
+		dAssert(alGetError() == AL_NO_ERROR);
+	}
 }
 
 ndSoundAsset::ndSoundAsset()
