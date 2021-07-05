@@ -33,11 +33,11 @@ OPTION(ALSOFT_DLOPEN  "Check for the dlopen API for loading optional libs"  ON)
 
 OPTION(ALSOFT_WERROR  "Treat compile warnings as errors"      OFF)
 
-OPTION(ALSOFT_UTILS          "Build and install utility programs"         ON)
+OPTION(ALSOFT_UTILS          "Build and install utility programs"         OFF)
 OPTION(ALSOFT_NO_CONFIG_UTIL "Disable building the alsoft-config utility" OFF)
 
-OPTION(ALSOFT_EXAMPLES  "Build and install example programs"  ON)
-OPTION(ALSOFT_TESTS     "Build and install test programs"     ON)
+OPTION(ALSOFT_EXAMPLES  "Build and install example programs"  OFF)
+OPTION(ALSOFT_TESTS     "Build and install test programs"     OFF)
 
 OPTION(ALSOFT_CONFIG "Install alsoft.conf sample configuration file" ON)
 OPTION(ALSOFT_HRTF_DEFS "Install HRTF definition files" ON)
@@ -49,19 +49,19 @@ CHECK_TYPE_SIZE("void*" PTR_SIZE BUILTIN_TYPES_ONLY)
 
 if(WIN32)
 	if (PTR_SIZE EQUAL 8)
-		set(CMAKE_INSTALL_PREFIX "openAL/win64sdk" CACHE PATH "..." FORCE)
+		set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/../openalRuntime/win64sdk" CACHE PATH "..." FORCE)
 	else()
-		set(CMAKE_INSTALL_PREFIX "openAL/win32sdk" CACHE PATH "..." FORCE)
+		set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/../openalRuntime/win32sdk" CACHE PATH "..." FORCE)
 	endif ()
+	#message ("${CMAKE_INSTALL_PREFIX}")
 endif ()
 
 set(SHARE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share" CACHE STRING "The share install dir")
 
-
 IF(NOT WIN32)
     SET(LIBNAME openal)
 ELSE()
-    SET(LIBNAME OpenAL32)
+    SET(LIBNAME OpenAL_32)
     ADD_DEFINITIONS("-D_WIN32 -D_WIN32_WINNT=0x0502")
 
     # This option is mainly for static linking OpenAL Soft into another project
@@ -263,8 +263,8 @@ IF(MSVC)
         MESSAGE(STATUS "Using DirectX SDK directory: ${DXSDK_DIR}")
     ENDIF()
 
-    #OPTION(FORCE_STATIC_VCRT "Force /MT for static VC runtimes" OFF)
-	OPTION(FORCE_STATIC_VCRT "Force /MT for static VC runtimes" ON)
+    OPTION(FORCE_STATIC_VCRT "Force /MT for static VC runtimes" OFF)
+	#OPTION(FORCE_STATIC_VCRT "Force /MT for static VC runtimes" ON)
     IF(FORCE_STATIC_VCRT)
         FOREACH(flag_var
                 CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE

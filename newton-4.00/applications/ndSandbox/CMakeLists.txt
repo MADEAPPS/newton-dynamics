@@ -67,9 +67,17 @@ endif ()
 
 if(MSVC OR MINGW)
 	if (PTR_SIZE EQUAL 8)
-		target_link_libraries (${projectName} ${CMAKE_SOURCE_DIR}/thirdParty/openalRuntime/win64sdk/lib/OpenAL32.lib)
+		target_link_libraries (${projectName} ${CMAKE_SOURCE_DIR}/thirdParty/openalRuntime/win64sdk/lib/OpenAL_32.lib)
+		add_custom_command(
+			TARGET ${projectName} POST_BUILD
+			COMMAND ${CMAKE_COMMAND}
+			ARGS -E copy ${CMAKE_SOURCE_DIR}/thirdParty/openalRuntime/win64sdk/bin/OpenAL_32.dll ${PROJECT_BINARY_DIR}/applications/ndSandbox/${CMAKE_CFG_INTDIR})
 	else()
-		target_link_libraries (${projectName} ${CMAKE_SOURCE_DIR}/thirdParty/openalRuntime/win32sdk/lib/OpenAL32.lib)
+		target_link_libraries (${projectName} ${CMAKE_SOURCE_DIR}/thirdParty/openalRuntime/win32sdk/lib/OpenAL_32.lib)
+		add_custom_command(
+			TARGET ${projectName} POST_BUILD
+			COMMAND ${CMAKE_COMMAND}
+			ARGS -E copy ${CMAKE_SOURCE_DIR}/thirdParty/openalRuntime/win32sdk/bin/OpenAL_32.dll ${PROJECT_BINARY_DIR}/applications/ndSandbox/${CMAKE_CFG_INTDIR})
 	endif()
 
     target_link_libraries (${projectName} glu32 opengl32)
@@ -97,4 +105,5 @@ if(WIN32)
 endif()
 
 install(DIRECTORY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications")
+
 

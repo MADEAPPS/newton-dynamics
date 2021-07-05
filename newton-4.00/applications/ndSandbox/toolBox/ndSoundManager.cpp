@@ -164,7 +164,6 @@ dFloat32 ndSoundChannel::GetVolume() const
 
 void ndSoundChannel::ApplyAttenuation(const dVector& listenerPosit)
 {
-	//dFloat32 ROLLOFF_FACTOR = 1.0f;
 	// for some reason the attenuation model does not works in open-al
 	// so I am applying manually, according to the formula in the docs
 	ALfloat sourcePosit[3];
@@ -174,13 +173,14 @@ void ndSoundChannel::ApplyAttenuation(const dVector& listenerPosit)
 	const dVector posit (dFloat32(sourcePosit[0]), dFloat32(sourcePosit[1]), dFloat32(sourcePosit[2]), dFloat32(1.0f));
 	const dVector dist(posit - listenerPosit);
 	dFloat32 distance = dSqrt(dist.DotProduct(dist).GetScalar());
-	//distance = dMin(distance, m_maxDistance);
-	//distance = dMax(distance, m_referenceDistance);
-	//
-	//dFloat32 attenuation = ROLLOFF_FACTOR * (dFloat32 (1.0f) - (distance - m_referenceDistance) / (m_maxDistance - m_referenceDistance));
-	//dTrace(("%f %f\n", attenuation, m_gain));
-	//alSourcef(m_source, AL_GAIN, ALfloat(m_gain * attenuation));
-	//dAssert(alGetError() == AL_NO_ERROR);
+	distance = dMin(distance, m_maxDistance);
+	distance = dMax(distance, m_referenceDistance);
+
+	dFloat32 ROLLOFF_FACTOR = 1.0f;
+	dFloat32 attenuation = ROLLOFF_FACTOR * (dFloat32 (1.0f) - (distance - m_referenceDistance) / (m_maxDistance - m_referenceDistance));
+	dTrace(("%f %f\n", attenuation, m_gain));
+	alSourcef(m_source, AL_GAIN, ALfloat(m_gain * attenuation));
+	dAssert(alGetError() == AL_NO_ERROR);
 }
 
 dFloat32 ndSoundChannel::GetPitch() const
@@ -257,29 +257,28 @@ ndSoundAsset::ndSoundAsset()
 	,m_durationInSeconds(0)
 	,m_node(nullptr)
 {
-	alGenBuffers(1, (ALuint*)&m_buffer);
-	dAssert(m_buffer);
-	dAssert(alGetError() == AL_NO_ERROR);
 }
 
-ndSoundAsset::ndSoundAsset(const ndSoundAsset& copy)
+ndSoundAsset::ndSoundAsset(const ndSoundAsset&)
 	:ndSoundChannelList()
-	,m_buffer(copy.m_buffer)
-	,m_frequecy(copy.m_frequecy)
-	,m_durationInSeconds(copy.m_durationInSeconds)
+	,m_buffer(0)
+	,m_frequecy(0)
+	,m_durationInSeconds(0)
 	,m_node(nullptr)
 {
 	alGenBuffers(1, (ALuint*)&m_buffer);
 	dAssert(m_buffer);
 	dAssert(alGetError() == AL_NO_ERROR);
-	dAssert(copy.GetCount() == 0);
 }
 
 ndSoundAsset::~ndSoundAsset()
 {
-	RemoveAll();
-	alDeleteBuffers(1, (ALuint *)&m_buffer);
-	dAssert(alGetError() == AL_NO_ERROR);
+	if (m_buffer)
+	{
+		RemoveAll();
+		alDeleteBuffers(1, (ALuint *)&m_buffer);
+		dAssert(alGetError() == AL_NO_ERROR);
+	}
 }
 
 ndSoundManager::ndSoundManager(ndDemoEntityManager* const scene)
@@ -299,16 +298,19 @@ ndSoundManager::ndSoundManager(ndDemoEntityManager* const scene)
 		alcMakeContextCurrent(m_context);
 		dAssert(alGetError() == AL_NO_ERROR);
 	
-		ALfloat listenerPosit[] = { 0.0,0.0,0.0 };
+		ALfloat listenerPosit[] = { 0.0f, 0.0f, 0.0f };
 		alListenerfv(AL_POSITION, listenerPosit);
 		dAssert(alGetError() == AL_NO_ERROR);
 	
-		ALfloat listenerVeloc[] = { 0.0,0.0,0.0 };
+		ALfloat listenerVeloc[] = { 0.0f, 0.0f, 0.0f };
 		alListenerfv(AL_VELOCITY, listenerVeloc);
 		dAssert(alGetError() == AL_NO_ERROR);
 	
-		ALfloat listenerOri[] = { 0.0,0.0,-1.0, 0.0,1.0,0.0 };
+		ALfloat listenerOri[] = { 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f };
 		alListenerfv(AL_ORIENTATION, listenerOri);
+		dAssert(alGetError() == AL_NO_ERROR);
+
+		alDistanceModel(AL_NONE);
 		dAssert(alGetError() == AL_NO_ERROR);
 	}
 }
