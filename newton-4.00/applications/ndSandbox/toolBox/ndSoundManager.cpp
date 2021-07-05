@@ -14,8 +14,6 @@
 #include "ndSoundManager.h"
 #include "ndDemoEntityManager.h"
 
-
-//#define DEFAULT_DISTANCE_MODEL AL_NONE
 #define DEFAULT_DISTANCE_MODEL AL_INVERSE_DISTANCE_CLAMPED
 
 #if 0
@@ -88,18 +86,15 @@ ndSoundChannel::ndSoundChannel()
 	,m_asset(nullptr)
 	,m_manager(nullptr)
 	,m_playingNode(nullptr)
-	,m_gain(1.0f)
-	,m_volume(1.0f)
-	,m_minDropOffDist(30.0f)
-	,m_maxDropOffDist(50.0f)
+	,m_gain(dFloat32 (1.0f))
+	,m_pitch(dFloat32(1.0f))
+	,m_volume(dFloat32(1.0f))
+	,m_minDropOffDist(dFloat32(30.0f))
+	,m_maxDropOffDist(dFloat32(50.0f))
 {
 	alGenSources(1, (ALuint*)&m_source);
 	dAssert(m_source);
 	dAssert(alGetError() == AL_NO_ERROR);
-
-	//alSourcef(m_source, AL_ROLLOFF_FACTOR, ALfloat(0.0f));
-	//alSourcef(m_source, AL_REFERENCE_DISTANCE, ALfloat(1000.0f));
-	//dAssert(alGetError() == AL_NO_ERROR);
 
 	ALfloat distanceModel = DEFAULT_DISTANCE_MODEL;
 	alSourcefv(m_source, AL_DISTANCE_MODEL, &distanceModel);
@@ -162,18 +157,17 @@ void ndSoundChannel::Stop()
 
 void ndSoundChannel::SetVolume(dFloat32 volume)
 {
-	ALfloat vol = ALfloat(volume);
-	m_volume = volume;
-	alSourcef(m_source, AL_GAIN, vol);
-	dAssert(alGetError() == AL_NO_ERROR);
+	if (dAbs(volume - m_volume) > dFloat32(1.0e-3f))
+	{
+		m_volume = volume;
+		alSourcef(m_source, AL_GAIN, ALfloat(m_volume));
+		dAssert(alGetError() == AL_NO_ERROR);
+	}
 }
 
 dFloat32 ndSoundChannel::GetVolume() const
 {
-	ALfloat volume;
-	alGetSourcef(m_source, AL_GAIN, &volume);
-	dAssert(alGetError() == AL_NO_ERROR);
-	return volume;
+	return m_volume;
 }
 
 void ndSoundChannel::SetAttenuationRefDistance(dFloat32 dist, dFloat32 minDropOffDist, dFloat32 maxDropOffDist)
@@ -212,16 +206,17 @@ void ndSoundChannel::ApplyAttenuation(const dVector& listenerPosit)
 
 dFloat32 ndSoundChannel::GetPitch() const
 {
-	ALfloat pitch;
-	alGetSourcef(m_source, AL_PITCH, &pitch);
-	return pitch;
+	return m_pitch;
 }
 
 void ndSoundChannel::SetPitch(dFloat32 pitch)
 {
-	ALfloat pit = ALfloat(pitch);
-	alSourcef(m_source, AL_PITCH, pit);
-	dAssert(alGetError() == AL_NO_ERROR);
+	if (dAbs(pitch - m_pitch) > dFloat32(1.0e-3f))
+	{
+		m_pitch = pitch;
+		alSourcef(m_source, AL_PITCH, ALfloat(m_pitch));
+		dAssert(alGetError() == AL_NO_ERROR);
+	}
 }
 
 dFloat32 ndSoundChannel::GetLengthInSeconds() const

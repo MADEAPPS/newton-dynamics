@@ -315,6 +315,10 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		m_startSound = soundManager->CreateSoundChannel(engineSounds[0]);
 		m_engineRpmSound = soundManager->CreateSoundChannel(engineSounds[1]);
 		m_skipMarks = soundManager->CreateSoundChannel(engineSounds[2]);
+
+		m_startSound->SetAttenuationRefDistance(20.0f, 40.0f, 50.0f);
+		m_engineRpmSound->SetAttenuationRefDistance(20.0f, 40.0f, 50.0f);
+
 		m_engineRpmSound->SetLoop(true);
 		m_skipMarks->SetLoop(true);
 	}
@@ -583,8 +587,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	{
 		ndBasicVehicle::ApplyInputs(world, timestep);
 
-		//if (m_motor)
-		if (0)
+		if (m_motor)
+		//if (0)
 		{
 			bool startEngine = m_motor->GetStart();
 			if (m_startEngine ^ startEngine)
@@ -592,10 +596,10 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 				m_startEngine = startEngine;
 				if (startEngine)
 				{
-					m_startSound->Play();
+					//m_startSound->Play();
 					m_engineRpmSound->Play();
-					m_engineRpmSound->SetVolume(1.0f);
 					m_engineRpmSound->SetPitch(0.5f);
+					m_engineRpmSound->SetVolume(0.25f);
 				}
 				else
 				{
@@ -610,7 +614,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			m_engineRpmSound->SetPitch(pitchFactor);
 
 			// up to two decibels of volume
-			dFloat32 volumeFactor = 1.0f + 1.0f * rpm;
+			dFloat32 volumeFactor = 0.25f + 0.75f * rpm;
 			m_engineRpmSound->SetVolume(volumeFactor);
 			//dTrace(("%f\n", volumeFactor));
 
@@ -663,7 +667,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 		soundManager->CreateSoundAsset(engineSounds[i]);
 	}
 
-
+#if 1
+	// use a test tone
 	soundManager->CreateSoundAsset("ctone.wav");
 	ndSoundChannel* xxxx = soundManager->CreateSoundChannel("ctone.wav");
 	dVector testPosit(20.0f, 0.25f, 0.0f, 1.0f);
@@ -674,6 +679,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	xxxx->Play();
 	ndBodyKinematic* xxxx1 = AddBox(scene, testPosit, 0.0f, 4.0f, 0.5f, 5.0f);
 	xxxx1->GetCollisionShape().SetCollisionMode(false);
+#endif
 
 
 	// add a model for general controls

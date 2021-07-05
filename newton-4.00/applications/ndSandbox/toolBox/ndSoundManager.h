@@ -62,6 +62,7 @@ class ndSoundChannel
 	dVector m_posit;
 
 	dFloat32 m_gain;
+	dFloat32 m_pitch;
 	dFloat32 m_volume;
 	dFloat32 m_minDropOffDist;
 	dFloat32 m_maxDropOffDist;
