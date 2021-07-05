@@ -48,10 +48,16 @@ class ndSoundChannel
 	void SetVelocity(const dVector& velocity) const;
 
 	private:
+	void ApplyAttenuation(const dVector& listenerPosit);
+
 	dInt32 m_source;
 	ndSoundAsset* m_asset;
 	ndSoundManager* m_manager;
 	dList<ndSoundChannel*>::dNode* m_playingNode;
+	dFloat32 m_gain;
+	dFloat32 m_maxDistance;
+	dFloat32 m_referenceDistance;
+
 	friend class ndSoundManager;
 };
 

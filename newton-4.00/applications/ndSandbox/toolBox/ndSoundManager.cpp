@@ -84,10 +84,17 @@ ndSoundChannel::ndSoundChannel()
 	,m_asset(nullptr)
 	,m_manager(nullptr)
 	,m_playingNode(nullptr)
+	,m_gain(0.0f)
+	,m_maxDistance(60.0f)
+	,m_referenceDistance(40.0f)
 {
 	alGenSources(1, (ALuint*)&m_source);
 	dAssert(m_source);
 	dAssert(alGetError() == AL_NO_ERROR);
+
+	//alSourcef(m_source, AL_ROLLOFF_FACTOR, ALfloat(0.0f));
+	//alSourcef(m_source, AL_REFERENCE_DISTANCE, ALfloat(1000.0f));
+	//dAssert(alGetError() == AL_NO_ERROR);
 }
 
 ndSoundChannel::~ndSoundChannel()
@@ -142,6 +149,7 @@ void ndSoundChannel::Stop()
 void ndSoundChannel::SetVolume(dFloat32 volume)
 {
 	ALfloat vol = ALfloat(volume);
+	m_gain = volume;
 	alSourcef(m_source, AL_GAIN, vol);
 	dAssert(alGetError() == AL_NO_ERROR);
 }
@@ -152,6 +160,27 @@ dFloat32 ndSoundChannel::GetVolume() const
 	alGetSourcef(m_source, AL_GAIN, &volume);
 	dAssert(alGetError() == AL_NO_ERROR);
 	return volume;
+}
+
+void ndSoundChannel::ApplyAttenuation(const dVector& listenerPosit)
+{
+	//dFloat32 ROLLOFF_FACTOR = 1.0f;
+	// for some reason the attenuation model does not works in open-al
+	// so I am applying manually, according to the formula in the docs
+	ALfloat sourcePosit[3];
+	alGetSourcefv(m_source, AL_POSITION, sourcePosit);
+	dAssert(alGetError() == AL_NO_ERROR);
+	
+	const dVector posit (dFloat32(sourcePosit[0]), dFloat32(sourcePosit[1]), dFloat32(sourcePosit[2]), dFloat32(1.0f));
+	const dVector dist(posit - listenerPosit);
+	dFloat32 distance = dSqrt(dist.DotProduct(dist).GetScalar());
+	//distance = dMin(distance, m_maxDistance);
+	//distance = dMax(distance, m_referenceDistance);
+	//
+	//dFloat32 attenuation = ROLLOFF_FACTOR * (dFloat32 (1.0f) - (distance - m_referenceDistance) / (m_maxDistance - m_referenceDistance));
+	//dTrace(("%f %f\n", attenuation, m_gain));
+	//alSourcef(m_source, AL_GAIN, ALfloat(m_gain * attenuation));
+	//dAssert(alGetError() == AL_NO_ERROR);
 }
 
 dFloat32 ndSoundChannel::GetPitch() const
@@ -443,35 +472,6 @@ void ndSoundManager::PostUpdate(ndWorld* const, dFloat32 timestep)
 {
 	if (m_device)
 	{
-		ndSoundChannelPlaying::dNode* next;
-		for (ndSoundChannelPlaying::dNode* node = m_channelPlaying.GetFirst(); node; node = next)
-		{
-			ndSoundChannel* const channel = node->GetInfo();
-			next = node->GetNext();
-
-			if (!channel->IsPlaying())
-			{
-				channel->Stop();
-			}
-			else
-			{
-				#if 0
-				// test positional sound
-				static dFloat32 xxx;
-				xxx += timestep;
-				dFloat32 axxx = 10.0f * dSin(xxx / 1.1f);
-				dVector xxx1(channel->GetPosition());
-				//dVector xxx1(channel->GetVelocity());
-				xxx1.m_z = axxx;
-				dTrace(("%f\n", axxx));
-				channel->SetPosition(xxx1);
-				//channel->SetVelocity(xxx1);
-				#endif
-			}
-		}
-
-		//alDopplerFactor(1.0f);
-
 		// get camera matrix in open-al space
 		ndDemoCamera* const camera = m_scene->GetCamera();
 		const dMatrix matrix(camera->GetCurrentMatrix() * m_coordinateSystem);
@@ -497,7 +497,7 @@ void ndSoundManager::PostUpdate(ndWorld* const, dFloat32 timestep)
 		dAssert(alGetError() == AL_NO_ERROR);
 
 		// estimate listener velocity, by using camera previous location
-		const dVector camVelocity((matrix.m_posit - m_cameraPreviousPosit).Scale (1.0f / timestep));
+		const dVector camVelocity((matrix.m_posit - m_cameraPreviousPosit).Scale(1.0f / timestep));
 		ALfloat listenerVeloc[3];
 		listenerVeloc[0] = camVelocity.m_x;
 		listenerVeloc[1] = camVelocity.m_y;
@@ -506,5 +506,35 @@ void ndSoundManager::PostUpdate(ndWorld* const, dFloat32 timestep)
 		dAssert(alGetError() == AL_NO_ERROR);
 
 		m_cameraPreviousPosit = matrix.m_posit;
+
+		ndSoundChannelPlaying::dNode* next;
+		for (ndSoundChannelPlaying::dNode* node = m_channelPlaying.GetFirst(); node; node = next)
+		{
+			ndSoundChannel* const channel = node->GetInfo();
+			next = node->GetNext();
+
+			if (!channel->IsPlaying())
+			{
+				channel->Stop();
+			}
+			else
+			{
+				channel->ApplyAttenuation(matrix.m_posit);
+				#if 0
+				// test positional sound
+				static dFloat32 xxx;
+				xxx += timestep;
+				dFloat32 axxx = 10.0f * dSin(xxx / 1.1f);
+				dVector xxx1(channel->GetPosition());
+				//dVector xxx1(channel->GetVelocity());
+				xxx1.m_z = axxx;
+				dTrace(("%f\n", axxx));
+				channel->SetPosition(xxx1);
+				//channel->SetVelocity(xxx1);
+				#endif
+			}
+		}
+
+		//alDopplerFactor(1.0f);
 	}
 }
