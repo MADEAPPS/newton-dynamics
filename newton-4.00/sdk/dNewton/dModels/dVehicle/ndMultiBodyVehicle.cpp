@@ -25,7 +25,6 @@
 #include "ndJointHinge.h"
 #include "ndBodyDynamic.h"
 #include "ndMultiBodyVehicle.h"
-#include "ndJointDoubleHinge.h"
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 #include "ndMultiBodyVehicleTireJoint.h"

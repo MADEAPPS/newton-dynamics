@@ -137,7 +137,6 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const dVector
 
 static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 diameter)
 {
-	//ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
@@ -189,6 +188,36 @@ static void BuildHinge(ndDemoEntityManager* const scene, const dVector& origin, 
 	//joint->SetAsSpringDamper(true, 0.1f, 500.0f, 5.0f);
 	joint->SetFriction(2.0f);
 	joint->EnableLimits(true, -10.0f, 15.0f);
+	world->AddJoint(joint);
+
+	mesh->Release();
+}
+
+static void BuildDoubleHinge(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 diameter)
+{
+	ndShapeInstance shape(new ndShapeCylinder(diameter, diameter, diameter * 0.5f));
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+
+	dMatrix matrix(dYawMatrix(90.0f * dDegreeToRad));
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y = floor.m_y;
+
+	matrix.m_posit.m_y += 2.0f;
+
+	ndBodyDynamic* const fixBody = world->GetSentinelBody();
+	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+
+	body->SetOmega(dVector(0.0f, 10.0f, 20.0f, 0.0f));
+
+	ndJointDoubleHinge* const joint = new ndJointDoubleHinge (matrix, body, fixBody);
+	//joint->SetAsSpringDamper(true, 0.1f, 500.0f, 5.0f);
+	//joint->SetFriction(2.0f);
+	//joint->EnableLimits(true, -10.0f, 15.0f);
 	world->AddJoint(joint);
 
 	mesh->Release();
@@ -343,13 +372,14 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene);
 
-	//BuildBallSocket(scene, dVector(0.0f, 0.0f, 1.0f, 0.0f));
+	BuildBallSocket(scene, dVector(0.0f, 0.0f, -6.0f, 1.0f));
 	BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
 	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 0.5f);
-	//BuildRollingFriction(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 2.5f, 1.0f), 10.0f, 0.5f);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 1.0f), 100.0f, 0.75f);
+	BuildSlider(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 100.0f, 0.75f);
+	BuildDoubleHinge(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 100.0f, 0.75f);
+
 	AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
+	//BuildRollingFriction(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
 	
 	dQuaternion rot;
 	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);

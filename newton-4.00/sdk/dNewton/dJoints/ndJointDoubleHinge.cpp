@@ -36,34 +36,39 @@ void ndJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 
-	// save the current joint Omega
+	const dVector frontDir((matrix0.m_front - matrix1.m_up.Scale(matrix0.m_front.DotProduct(matrix1.m_up).GetScalar())).Normalize());
+	const dVector sideDir(frontDir.CrossProduct(matrix1.m_up));
+	const dFloat32 angle = CalculateAngle(matrix0.m_front, frontDir, sideDir);
+	AddAngularRowJacobian(desc, sideDir, angle);
+
+	// not happy with this method because it is a penalty system, 
+	// but is hard for an first order integrator to prevent the side angle from drifting, 
+	// even an implicit one with expanding the Jacobian partial derivatives still has a hard time
+	// nullifying the gyro torque generate by the two angular velocities.
+	const dFloat32 alphaRollError = GetMotorZeroAcceleration(desc) + 0.5f * angle * desc.m_invTimestep * desc.m_invTimestep;
+	SetMotorAcceleration(desc, alphaRollError);
+
+	//// save the current joint Omega
 	dVector omega0(m_body0->GetOmega());
 	dVector omega1(m_body1->GetOmega());
-
-	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	const dFloat32 deltaAngle0 = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_jointAngle0);
+	
+	// calculale joint parameters, angles and omega
+	const dFloat32 deltaAngle0 = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_jointAngle0);
 	m_jointAngle0 += deltaAngle0;
-	m_jointSpeed0 = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
+	m_jointSpeed0 = frontDir.DotProduct(omega0 - omega1).GetScalar();
 
-	// two rows to restrict rotation around around the parent coordinate system
-	const dFloat32 angleError = m_maxAngleError;
-	const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-	AddAngularRowJacobian(desc, matrix1.m_up, angle0);
-	if (dAbs(angle0) > angleError)
-	{
-		dAssert(0);
-		//const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle0 / (timestep * timestep);
-		//NewtonUserJointSetRowAcceleration(m_joint, alpha);
-	}
+	const dFloat32 deltaAngle1 = AnglesAdd(-CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up), -m_jointAngle1);
+	m_jointAngle1 += deltaAngle1;
+	m_jointSpeed1 = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
 
-	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
-	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
-	if (dAbs(angle1) > angleError)
-	{
-		dAssert(0);
-		//const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle1 / (timestep * timestep);
-		//NewtonUserJointSetRowAcceleration(m_joint, alpha);
-	}
+	//dTrace(("%f %f\n", m_jointAngle1 * dRadToDegree, m_jointSpeed1));
+	
+	//// two rows to restrict rotation around around the parent coordinate system
+	//const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+	//AddAngularRowJacobian(desc, matrix1.m_up, angle0);
+	//
+	//const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+	//AddAngularRowJacobian(desc, matrix1.m_right, angle1);
 }
 
 
