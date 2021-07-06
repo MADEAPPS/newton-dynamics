@@ -158,7 +158,7 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 		return;
 	}
 
-	glTexImage2D(face, 0, 4, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, pBits);
+	glTexImage2D(face, 0, 4, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, pBits);
 	//gluBuild2DMipmaps(face, 4, width, height, GL_BGR, GL_UNSIGNED_BYTE, pBits);
 
 	//dAssert(glGetError() == GL_NO_ERROR);
