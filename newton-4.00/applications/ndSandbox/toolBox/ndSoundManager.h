@@ -18,11 +18,11 @@ class ndSoundAsset;
 class ndSoundManager;
 class ndDemoEntityManager;
 
-class ndSoundChannel
+class ndSoundChannel: public dClassAlloc
 {
 	public:
 	ndSoundChannel();
-	virtual ~ndSoundChannel();
+	~ndSoundChannel();
 
 	bool IsPlaying() const;
 
@@ -55,6 +55,7 @@ class ndSoundChannel
 	dInt32 m_source;
 	ndSoundAsset* m_asset;
 	ndSoundManager* m_manager;
+	dList<ndSoundChannel*>::dNode* m_assetNode;
 	dList<ndSoundChannel*>::dNode* m_playingNode;
 
 	// since open-al does not check for parameter changes, we have to cache
@@ -68,11 +69,11 @@ class ndSoundChannel
 	dFloat32 m_minDropOffDist;
 	dFloat32 m_maxDropOffDist;
 
-
+	friend class ndSoundAsset;
 	friend class ndSoundManager;
 };
 
-class ndSoundChannelList: public dList<ndSoundChannel>
+class ndSoundChannelList: public dList<ndSoundChannel*>
 {
 };
 
@@ -110,12 +111,6 @@ class ndSoundManager: public dClassAlloc
 	// sound play tracks or channels 
 	ndSoundChannel* CreateSoundChannel(const char* const fileName);
 
-	//void DestroyAllSound();
-	//void DestroySound(void* const soundAssetHandle);
-	//dFloat32 GetSoundlength (void* const soundAssetHandle);
-	//void DestroyChannel(void* const channelHandle);
-	//void* GetAsset(void* const channelHandle) const;
-
 	void Update(ndWorld* const world, dFloat32 timestep);
 
 	private:
@@ -133,7 +128,6 @@ class ndSoundManager: public dClassAlloc
 	dVector m_posit0;
 	dVector m_upDir;
 	dVector m_frontDir;
-
 	friend ndSoundChannel;
 };
 

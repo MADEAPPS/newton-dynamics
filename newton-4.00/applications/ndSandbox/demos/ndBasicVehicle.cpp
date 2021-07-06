@@ -330,6 +330,10 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		ReleaseTexture(m_redNeedle);
 		ReleaseTexture(m_tachometer);
 		ReleaseTexture(m_greenNeedle);
+
+		delete m_skipMarks;
+		delete m_startSound;
+		delete m_engineRpmSound;
 	}
 
 	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename)

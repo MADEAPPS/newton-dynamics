@@ -550,6 +550,7 @@ void ndDemoEntityManager::Cleanup ()
 		}
 
 		// get serialization call back before destroying the world
+		m_world->CleanUp();
 		delete m_world;
 	}
 

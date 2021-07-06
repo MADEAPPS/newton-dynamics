@@ -149,8 +149,17 @@ ndWorld::ndWorld()
 
 ndWorld::~ndWorld()
 {
-	Sync();
+	CleanUp();
 
+	delete m_sentinelBody;
+	delete m_scene;
+	delete m_solver;
+	ClearCache();
+}
+
+void ndWorld::CleanUp()
+{
+	Sync();
 	while (m_skeletonList.GetFirst())
 	{
 		m_skeletonList.Remove(m_skeletonList.GetFirst());
@@ -186,11 +195,6 @@ ndWorld::~ndWorld()
 	}
 
 	dAssert(!m_scene->GetContactList().GetCount());
-
-	delete m_sentinelBody;
-	delete m_scene;
-	delete m_solver;
-	ClearCache();
 }
 
 void ndWorld::SelectSolver(ndSolverModes solverMode)

@@ -16,75 +16,11 @@
 
 #define DEFAULT_DISTANCE_MODEL AL_INVERSE_DISTANCE_CLAMPED
 
-#if 0
-void ndSoundManager::DestroySound(void* const soundAssetHandle)
-{
-	dAssert(0);
-	if (m_device)
-	{
-		ndSoundAssetList::dNode* const node = (ndSoundAssetList::dNode*)soundAssetHandle;
-		dAssert(node);
-
-		ndSoundAsset& asset = node->GetInfo();
-		dAssert(asset.GetRef() > 1);
-		asset.Release();
-
-		m_assets.Remove(node);
-	}
-}
-
-void ndSoundManager::DestroyAllSound()
-{
-	dAssert(0);
-	if (m_device)
-	{
-		while (m_assets.GetRoot())
-		{
-			DestroySound(m_assets.GetRoot());
-		}
-	}
-}
-
-dFloat32 ndSoundManager::GetSoundlength(void* const soundAssetHandle)
-{
-	dAssert(0);
-	if (m_device)
-	{
-		ndSoundAssetList::dNode* const node = (ndSoundAssetList::dNode*)soundAssetHandle;
-		ndSoundAsset& asset = node->GetInfo();
-		return 	asset.m_lenght;
-	}
-	return 0;
-}
-
-
-void ndSoundManager::DestroyChannel(void* const channelHandle)
-{
-	dAssert(0);
-	if (m_device)
-	{
-		dAssert(0);
-	}
-}
-
-void* ndSoundManager::GetAsset(void* const channelHandle) const
-{
-	dAssert(0);
-	if (m_device)
-	{
-		ndSoundChannelList::dNode* const node = (ndSoundChannelList::dNode*)channelHandle;
-		ndSoundChannel& channel = node->GetInfo();
-		return channel.m_myAssetNode;
-	}
-	return nullptr;
-}
-
-#endif
-
 ndSoundChannel::ndSoundChannel()
 	:m_source(0)
 	,m_asset(nullptr)
 	,m_manager(nullptr)
+	,m_assetNode(nullptr)
 	,m_playingNode(nullptr)
 	,m_gain(dFloat32 (1.0f))
 	,m_pitch(dFloat32(1.0f))
@@ -116,6 +52,9 @@ ndSoundChannel::~ndSoundChannel()
 	Stop();
 	alDeleteSources(1, (ALuint*)&m_source);
 	dAssert(alGetError() == AL_NO_ERROR);
+
+	dAssert(m_asset);
+	m_asset->Remove(m_assetNode);
 }
 
 bool ndSoundChannel::GetLoop() const
@@ -304,7 +243,12 @@ ndSoundAsset::~ndSoundAsset()
 {
 	if (m_buffer)
 	{
-		RemoveAll();
+		while (GetCount())
+		{
+			ndSoundChannel* const channel = GetFirst()->GetInfo();
+			delete channel;
+		}
+
 		alDeleteBuffers(1, (ALuint *)&m_buffer);
 		dAssert(alGetError() == AL_NO_ERROR);
 	}
@@ -492,9 +436,9 @@ ndSoundChannel* ndSoundManager::CreateSoundChannel(const char* const fileName)
 		dAssert(assetNode);
 	
 		ndSoundAsset& asset = assetNode->GetInfo();
-		ndSoundChannelList::dNode* const channelNode = asset.Append();
-		channel = &channelNode->GetInfo();
 
+		channel = new ndSoundChannel;
+		channel->m_assetNode = asset.Append(channel);
 		channel->m_asset = &asset;
 		channel->m_manager = this;
 		alSourcei(channel->m_source, AL_BUFFER, asset.m_buffer);

@@ -55,10 +55,9 @@ class ndWorld: public dClassAlloc
 	D_NEWTON_API ndWorld();
 	D_NEWTON_API virtual ~ndWorld();
 
-	dInt32 GetEngineVersion() 
-	{
-		return D_NEWTON_ENGINE_MAJOR_VERSION * 100 + D_NEWTON_ENGINE_MINOR_VERSION;
-	}
+	D_NEWTON_API virtual void CleanUp();
+
+	dInt32 GetEngineVersion() const;
 
 	void Sync() const;
 	void Update(dFloat32 timestep);
@@ -333,5 +332,11 @@ inline void ndWorld::UpdateTransformsUnlock()
 {
 	m_transformsLock.unlock();
 }
+
+inline dInt32 ndWorld::GetEngineVersion() const
+{
+	return D_NEWTON_ENGINE_MAJOR_VERSION * 100 + D_NEWTON_ENGINE_MINOR_VERSION;
+}
+
 
 #endif
