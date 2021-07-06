@@ -357,6 +357,8 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 	void DrawGage(GLuint gage, GLuint needle, dFloat32 param, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size, dFloat32 minAngle, dFloat32 maxAngle) const
 	{
+dTrace(("**** need a sprite shader for this\n"));
+return;
 		dMatrix origin(dGetIdentityMatrix());
 		origin[1][1] = -1.0f;
 		origin.m_posit = dVector(origin_x, origin_y, 0.0f, 1.0f);
@@ -400,6 +402,9 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 	void DrawGear(dInt32 gear, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size) const
 	{
+dTrace(("**** need a sprite shader for this\n"));
+return;
+
 		dMatrix origin(dGetIdentityMatrix());
 		origin[1][1] = -1.0f;
 		origin.m_posit = dVector(origin_x + size * 0.3f, origin_y - size * 0.25f, 0.0f, 1.0f);

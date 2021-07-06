@@ -467,6 +467,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 	void DrawGage(GLuint gage, GLuint needle, dFloat32 param, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size, dFloat32 minAngle, dFloat32 maxAngle) const
 	{
+dTrace(("**** need a sprite shader for this\n"));
+return;
 		dMatrix origin(dGetIdentityMatrix());
 		origin[1][1] = -1.0f;
 		origin.m_posit = dVector(origin_x, origin_y, 0.0f, 1.0f);
@@ -510,6 +512,9 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 	void DrawGear(dInt32 gear, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size) const
 	{
+dTrace(("**** need a sprite shader for this\n"));
+return;
+
 		dMatrix origin(dGetIdentityMatrix());
 		origin[1][1] = -1.0f;
 		origin.m_posit = dVector(origin_x + size * 0.3f, origin_y - size * 0.25f, 0.0f, 1.0f);
@@ -673,9 +678,9 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 
 #if 1
 	// use a test tone
+	dVector testPosit(20.0f, 0.25f, 0.0f, 1.0f);
 	soundManager->CreateSoundAsset("ctone.wav");
 	ndSoundChannel* xxxx = soundManager->CreateSoundChannel("ctone.wav");
-	dVector testPosit(20.0f, 0.25f, 0.0f, 1.0f);
 	xxxx->SetPosition(testPosit);
 	xxxx->SetVolume(1.0f);
 	xxxx->SetLoop(true);

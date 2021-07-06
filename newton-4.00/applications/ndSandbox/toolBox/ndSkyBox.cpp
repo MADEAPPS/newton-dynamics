@@ -164,7 +164,7 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 	//dAssert(glGetError() == GL_NO_ERROR);
 	for (GLenum err = glGetError(); err != GL_NO_ERROR; err = glGetError())
 	{
-		// it looks like I am loading a texture with an invalid format, I am just ignopring this for now 
+		// it looks like I am loading a texture with an invalid format, I am just ignoring this for now 
 		dTrace(("****** opengl error 0x%x\n", err));
 	}
 	
