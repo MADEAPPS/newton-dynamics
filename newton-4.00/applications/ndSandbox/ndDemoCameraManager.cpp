@@ -71,7 +71,6 @@ ndDemoCameraManager::~ndDemoCameraManager()
 	{
 		ResetPickBody();
 	}
-	//m_camera->Release();
 	delete m_camera;
 }
 

@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_RAYCAST_H__
-#define __D_RAYCAST_H__
+#ifndef __D_RAYCAST_NOTYFY_H__
+#define __D_RAYCAST_NOTYFY_H__
 
 #include "ndCollisionStdafx.h"
 #include "ndBody.h"
@@ -67,23 +67,23 @@ class ndRayCastClosestHitCallback: public ndRayCastNotify
 	{
 	}
 
-	dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
+	dUnsigned32 OnRayPrecastAction(const ndBody* const, const ndShapeInstance* const)
 	{
-		return ((ndBody*)body)->GetAsBodyDynamic() ? 1 : 0;
+		//return ((ndBody*)body)->GetAsBodyKinematic() ? 1 : 0;
+		return 1;
 	}
 
 	dFloat32 OnRayCastAction(const ndContactPoint& contact, dFloat32 intersetParam)
 	{
 		if (intersetParam < m_param)
 		{
-			m_param = intersetParam;
 			m_contact = contact;
+			m_param = intersetParam;
 		}
 		return intersetParam;
 	}
 
 	ndContactPoint m_contact;
-	protected:
 	dFloat32 m_param;
 } D_GCC_NEWTON_ALIGN_32 ;
 

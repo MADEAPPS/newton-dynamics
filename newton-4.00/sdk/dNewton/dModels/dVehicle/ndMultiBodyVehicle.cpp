@@ -551,12 +551,26 @@ void ndMultiBodyVehicle::ApplyTireModel()
 			{
 				ndContactPointList& contactPoints = contact->GetContactPoints();
 				const ndBodyKinematic* const otherBody = contact->GetBody1();
+
+				if (0)
+				{
+					//dFixSizeArray<ndContactPoint, 8> closestHit;
+					const ndWheelDescriptor& info = tire->GetInfo();
+					const dMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
+					const dVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_maxLimit - info.m_minLimit));
+
+					ndConvexCastNotify convexCast(m_chassis->GetScene());
+					//dFloat32 param = ndContactSolver::ConvexCast(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix(), closestHit);
+					convexCast.CastShape(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest);
+					convexCast.m_param = 0.0f;
+				}
+
 				if (((ndShape*)otherBody->GetCollisionShape().GetShape())->GetAsShapeStaticMeshShape())
 				{
-					// for mesh collision need to dos some contact post processing
-					// first remove any contact duplicate, these are contact produce by tow or 
-					// more polygons, but this so are close that they can generate ill 
-					// formed rows in the solver mass matrix
+					// for mesh collision we need to remove contact duplicates, 
+					// these are contact produced by two or more polygons, 
+					// that can produce two contact so are close that they can generate 
+					// ill formed rows in the solver mass matrix
 					for (ndContactPointList::dNode* contactNode0 = contactPoints.GetFirst(); contactNode0; contactNode0 = contactNode0->GetNext())
 					{
 						const ndContactPoint& contactPoint0 = contactNode0->GetInfo();
@@ -572,69 +586,6 @@ void ndMultiBodyVehicle::ApplyTireModel()
 							}
 						}
 					}
-
-					//maxPenetration = 0;
-					//if (maxPenetration > D_MAX_CONTACT_PENETRATION)
-					//{
-					//	dAssert(0);
-					//	// if the max penetration is too much, 
-					//	// do a convex cast to find the tire location 
-					//	// over the mesh and teleport the tire to that location.
-					//	
-					//	dFixSizeArray<ndContactPoint, 8> closestHit;
-					//	const ndWheelDescriptor& info = tire->GetInfo();
-					//	const dMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
-					//	const dVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_maxLimit - info.m_minLimit));
-					//	dFloat32 param = ndContactSolver::ConvexCast(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix(), closestHit);
-					//	if (param > dFloat32(0.0f))
-					//	{
-					//		ndBodyKinematic* const tireBody = tire->GetBody0();
-					//		dMatrix tireMatrix(tire->GetLocalMatrix0() * tireBody->GetMatrix());
-					//		dFloat32 tirePosition = tireUpperBumperMatrix.m_up.DotProduct(tireUpperBumperMatrix.m_posit - tireMatrix.m_posit).GetScalar();
-					//		dFloat32 tireNewPosition = param * (info.m_maxLimit - info.m_minLimit);
-					//		dFloat32 positionError = dMin(tirePosition - tireNewPosition, D_MAX_CONTACT_PENETRATION);
-					//		dAssert(positionError >= 0.0f);
-					//		tirePosition -= positionError;
-					//		tireMatrix.m_posit = tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(tirePosition);
-					//		tireBody->SetMatrix(tire->GetLocalMatrix0().Inverse() * tireMatrix);
-					//
-					//		dAssert(closestHit.GetCount());
-					//		for (dInt32 i = closestHit.GetCount() - 1; i > 0; i--)
-					//		{
-					//			// remove duplicates.
-					//			for (dInt32 j = i - 1; j >= 0; j--)
-					//			{
-					//				const dVector error(closestHit[i].m_point - closestHit[j].m_point);
-					//				dFloat32 err2 = error.DotProduct(error).GetScalar();
-					//				if (err2 < D_MIN_CONTACT_CLOSE_DISTANCE2)
-					//				{
-					//					closestHit.SetCount(closestHit.GetCount() - 1);
-					//					break;
-					//				}
-					//			}
-					//		}
-					//
-					//		// repopulate the contact array
-					//		contactPoints.RemoveAll();
-					//		for (dInt32 i = closestHit.GetCount() - 1; i >= 0; i--)
-					//		{
-					//			ndContactMaterial* const contactPoint = &contactPoints.Append()->GetInfo();
-					//
-					//			const dMatrix normalBase(closestHit[i].m_normal);
-					//			contactPoint->m_point = closestHit[i].m_point;
-					//			contactPoint->m_normal = normalBase.m_front;
-					//			contactPoint->m_dir0 = normalBase.m_up;
-					//			contactPoint->m_dir1 = normalBase.m_right;
-					//			contactPoint->m_penetration = closestHit[i].m_penetration;
-					//			contactPoint->m_body0 = tireBody;
-					//			contactPoint->m_body1 = otherBody;
-					//			contactPoint->m_shapeInstance0 = &contactPoint->m_body0->GetCollisionShape();
-					//			contactPoint->m_shapeInstance1 = &contactPoint->m_body1->GetCollisionShape();
-					//			contactPoint->m_shapeId0 = closestHit[i].m_shapeId0;
-					//			contactPoint->m_shapeId1 = closestHit[i].m_shapeId1;
-					//		}
-					//	}
-					//}
 				}
 
 				dMatrix tireBasisMatrix (tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());

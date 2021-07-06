@@ -297,99 +297,6 @@ bool ndScene::RemoveBody(ndBodyKinematic* const body)
 	return false;
 }
 
-dFloat32 ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const
-{
-	dFloat32 maxParam = dFloat32(1.2f);
-	while (stack) 
-	{
-		stack--;
-		dFloat32 dist = distance[stack];
-		if (dist > maxParam) 
-		{
-			break;
-		}
-		else 
-		{
-			const ndSceneNode* const me = stackPool[stack];
-			dAssert(me);
-			ndBodyKinematic* const body = me->GetBody();
-			if (body) 
-			{
-				dAssert(!me->GetLeft());
-				dAssert(!me->GetRight());
-				dFloat32 param = body->RayCast(callback, ray, maxParam);
-				if (param < maxParam) 
-				{
-					maxParam = param;
-					if (maxParam < dFloat32(1.0e-8f)) 
-					{
-						break;
-					}
-				}
-			}
-			else if (((ndSceneNode*)me)->GetAsSceneAggregate())
-			{
-				dAssert(0);
-		//		ndSceneAggregate* const aggregate = (ndSceneAggregate*)me;
-		//		if (aggregate->m_root) {
-		//			const ndSceneNode* const child = aggregate->m_root;
-		//			dAssert(child);
-		//			dFloat32 dist1 = ray.BoxIntersect(child->m_minBox, child->m_maxBox);
-		//			if (dist1 < maxParam) {
-		//				dInt32 j = stack;
-		//				for (; j && (dist1 > distance[j - 1]); j--) {
-		//					stackPool[j] = stackPool[j - 1];
-		//					distance[j] = distance[j - 1];
-		//				}
-		//				stackPool[j] = child;
-		//				distance[j] = dist1;
-		//				stack++;
-		//				dAssert(stack < D_SCENE_MAX_STACK_DEPTH);
-		//			}
-		//		}
-			}
-			else 
-			{
-				const ndSceneNode* const left = me->GetLeft();
-				dAssert(left);
-				dFloat32 dist1 = ray.BoxIntersect(left->m_minBox, left->m_maxBox);
-				if (dist1 < maxParam) 
-				{
-					dInt32 j = stack;
-					for (; j && (dist1 > distance[j - 1]); j--) 
-					{
-						stackPool[j] = stackPool[j - 1];
-						distance[j] = distance[j - 1];
-					}
-					stackPool[j] = left;
-					distance[j] = dist1;
-					stack++;
-					dAssert(stack < D_SCENE_MAX_STACK_DEPTH);
-				}
-		
-				const ndSceneNode* const right = me->GetRight();
-				dAssert(right);
-				dist1 = ray.BoxIntersect(right->m_minBox, right->m_maxBox);
-				if (dist1 < maxParam) 
-				{
-					dInt32 j = stack;
-					for (; j && (dist1 > distance[j - 1]); j--) 
-					{
-						stackPool[j] = stackPool[j - 1];
-						distance[j] = distance[j - 1];
-					}
-					stackPool[j] = right;
-					distance[j] = dist1;
-					stack++;
-					dAssert(stack < D_SCENE_MAX_STACK_DEPTH);
-				}
-			}
-		}
-	}
-
-	return maxParam;
-}
-
 ndSceneTreeNode* ndScene::InsertNode(ndSceneNode* const root, ndSceneNode* const node)
 {
 	dVector p0;
@@ -1766,4 +1673,103 @@ void ndScene::DeleteDeadContact()
 		}
 	}
 	m_activeConstraintArray.SetCount(activeCount);
+}
+
+dFloat32 ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const
+{
+	dFloat32 maxParam = dFloat32(1.2f);
+	while (stack)
+	{
+		stack--;
+		dFloat32 dist = distance[stack];
+		if (dist > maxParam)
+		{
+			break;
+		}
+		else
+		{
+			const ndSceneNode* const me = stackPool[stack];
+			dAssert(me);
+			ndBodyKinematic* const body = me->GetBody();
+			if (body)
+			{
+				dAssert(!me->GetLeft());
+				dAssert(!me->GetRight());
+				dFloat32 param = body->RayCast(callback, ray, maxParam);
+				if (param < maxParam)
+				{
+					maxParam = param;
+					if (maxParam < dFloat32(1.0e-8f))
+					{
+						break;
+					}
+				}
+			}
+			else if (((ndSceneNode*)me)->GetAsSceneAggregate())
+			{
+				dAssert(0);
+				//		ndSceneAggregate* const aggregate = (ndSceneAggregate*)me;
+				//		if (aggregate->m_root) {
+				//			const ndSceneNode* const child = aggregate->m_root;
+				//			dAssert(child);
+				//			dFloat32 dist1 = ray.BoxIntersect(child->m_minBox, child->m_maxBox);
+				//			if (dist1 < maxParam) {
+				//				dInt32 j = stack;
+				//				for (; j && (dist1 > distance[j - 1]); j--) {
+				//					stackPool[j] = stackPool[j - 1];
+				//					distance[j] = distance[j - 1];
+				//				}
+				//				stackPool[j] = child;
+				//				distance[j] = dist1;
+				//				stack++;
+				//				dAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+				//			}
+				//		}
+			}
+			else
+			{
+				const ndSceneNode* const left = me->GetLeft();
+				dAssert(left);
+				dFloat32 dist1 = ray.BoxIntersect(left->m_minBox, left->m_maxBox);
+				if (dist1 < maxParam)
+				{
+					dInt32 j = stack;
+					for (; j && (dist1 > distance[j - 1]); j--)
+					{
+						stackPool[j] = stackPool[j - 1];
+						distance[j] = distance[j - 1];
+					}
+					stackPool[j] = left;
+					distance[j] = dist1;
+					stack++;
+					dAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+				}
+
+				const ndSceneNode* const right = me->GetRight();
+				dAssert(right);
+				dist1 = ray.BoxIntersect(right->m_minBox, right->m_maxBox);
+				if (dist1 < maxParam)
+				{
+					dInt32 j = stack;
+					for (; j && (dist1 > distance[j - 1]); j--)
+					{
+						stackPool[j] = stackPool[j - 1];
+						distance[j] = distance[j - 1];
+					}
+					stackPool[j] = right;
+					distance[j] = dist1;
+					stack++;
+					dAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+				}
+			}
+		}
+	}
+
+	return maxParam;
+}
+
+dFloat32 ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray, const ndShapeInstance& convexShape, const dVector& velocA, const dVector& velocB) const
+{
+	dAssert(0);
+	return 0;
 }

@@ -26,6 +26,7 @@
 #include "ndScene.h"
 
 class ndRayCastNotify;
+class ndConvexCastNotify;
 
 D_MSV_NEWTON_ALIGN_32
 class ndSceneMixed : public ndScene
@@ -37,7 +38,8 @@ class ndSceneMixed : public ndScene
 	protected:
 	D_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
 	D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
-	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& p0, const dVector& p1) const;
+	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const;
+	D_COLLISION_API virtual dFloat32 ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const;
 	D_COLLISION_API virtual void Cleanup();
 	D_COLLISION_API void BalanceScene();
 

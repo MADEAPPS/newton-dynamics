@@ -274,6 +274,21 @@ void ndSceneMixed::FindCollidinPairs(dInt32, ndBodyKinematic* const body, bool o
 	}
 }
 
+void ndSceneMixed::DebugScene(ndSceneTreeNotiFy* const notify)
+{
+	for (ndFitnessList::dNode* node = m_fitness.GetFirst(); node; node = node->GetNext())
+	{
+		//notify->OnDebugNode(node->GetInfo());
+		if (node->GetInfo()->GetLeft()->GetAsSceneBodyNode())
+		{
+			notify->OnDebugNode(node->GetInfo()->GetLeft());
+		}
+		if (node->GetInfo()->GetRight()->GetAsSceneBodyNode())
+		{
+			notify->OnDebugNode(node->GetInfo()->GetRight());
+		}
+	}
+}
 /*
 void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body)
 {
@@ -330,10 +345,10 @@ void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const 
 }
 */
 
-dFloat32 ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& q0, const dVector& q1) const
+dFloat32 ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const
 {
-	dVector p0(q0 & dVector::m_triplexMask);
-	dVector p1(q1 & dVector::m_triplexMask);
+	dVector p0(globalOrigin & dVector::m_triplexMask);
+	dVector p1(globalDest & dVector::m_triplexMask);
 
 	dFloat32 param = dFloat32(1.2f);
 	if (m_rootNode) 
@@ -341,8 +356,8 @@ dFloat32 ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& q0, con
 		dVector segment(p1 - p0);
 		dAssert(segment.m_w == dFloat32(0.0f));
 		dFloat32 dist2 = segment.DotProduct(segment).GetScalar();
-		if (dist2 > dFloat32(1.0e-8f)) {
-
+		if (dist2 > dFloat32(1.0e-8f)) 
+		{
 			dFloat32 distance[D_SCENE_MAX_STACK_DEPTH];
 			const ndSceneNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
 
@@ -356,18 +371,36 @@ dFloat32 ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& q0, con
 	return param;
 }
 
-void ndSceneMixed::DebugScene(ndSceneTreeNotiFy* const notify)
+dFloat32 ndSceneMixed::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const
 {
-	for (ndFitnessList::dNode* node = m_fitness.GetFirst(); node; node = node->GetNext())
+	dInt32 totalCount = 0;
+	if (m_rootNode) 
 	{
-		//notify->OnDebugNode(node->GetInfo());
-		if (node->GetInfo()->GetLeft()->GetAsSceneBodyNode())
-		{
-			notify->OnDebugNode(node->GetInfo()->GetLeft());
-		}
-		if (node->GetInfo()->GetRight()->GetAsSceneBodyNode())
-		{
-			notify->OnDebugNode(node->GetInfo()->GetRight());
-		}
+		dVector boxP0;
+		dVector boxP1;
+		dAssert(globalOrigin.TestOrthogonal());
+		convexShape.CalculateAABB(globalOrigin, boxP0, boxP1);
+	
+		dFloat32 distance[D_SCENE_MAX_STACK_DEPTH];
+		const ndSceneNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
+	
+		dVector velocA((globalDest - globalOrigin.m_posit) & dVector::m_triplexMask);
+		dVector velocB(dVector::m_zero);
+		//dgFastRayTest ray(dVector(dgFloat32(0.0f)), velocA);
+		dFastRayTest ray(dVector::m_zero, velocA);
+	
+		dVector minBox(m_rootNode->m_minBox - boxP1);
+		dVector maxBox(m_rootNode->m_maxBox - boxP0);
+		stackPool[0] = m_rootNode;
+		distance[0] = ray.BoxIntersect(minBox, maxBox);
+	
+		//*param = dFloat32(1.0f);
+		//totalCount = dgBroadPhase::ConvexCast(stackPool, distance, 1, velocA, velocB, ray, shape, matrix, target, param, prefilter, userData, info, maxContacts, threadIndex);
+		//totalCount = ndScene::ConvexCast(callback, stackPool, distance, 1, ray, convexShape, velocA, velocB);
+		ndScene::ConvexCast(callback, stackPool, distance, 1, ray, convexShape, velocA, velocB);
 	}
+	
+	//return totalCount;
+	return 0;
 }
+

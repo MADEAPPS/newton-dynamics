@@ -35,6 +35,7 @@ class ndScene;
 class ndContact;
 class ndRayCastNotify;
 class ndContactNotify;
+class ndConvexCastNotify;
 class ndJointBilateralConstraint;
 
 D_MSV_NEWTON_ALIGN_32
@@ -164,8 +165,11 @@ class ndScene
 	void SubmitPairs(ndSceneNode* const leaftNode, ndSceneNode* const node);
 
 	D_COLLISION_API void BuildContactArray();
-	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& p0, const dVector& p1) const = 0;
+	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const = 0;
+	D_COLLISION_API virtual dFloat32 ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const = 0;
+
 	dFloat32 RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const;
+	dFloat32 ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray, const ndShapeInstance& convexShape, const dVector& velocA, const dVector& velocB) const;
 	
 	ndBodyList m_bodyList;
 	ndContactList m_contactList;
@@ -185,6 +189,7 @@ class ndScene
 
 	friend class ndWorld;
 	friend class ndRayCastNotify;
+	friend class ndConvexCastNotify;
 	friend class ndSkeletonContainer;
 } D_GCC_NEWTON_ALIGN_32 ;
 

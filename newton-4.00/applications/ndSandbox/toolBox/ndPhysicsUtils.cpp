@@ -64,7 +64,6 @@ ndBodyKinematic* MousePickBody(ndWorld* const world, const dVector& origin, cons
 	return nullptr;
 }
 
-
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& shape,
 	dFloat32 mass, const dVector& origin, const dFloat32 high, dInt32 count)

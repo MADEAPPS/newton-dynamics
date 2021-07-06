@@ -687,7 +687,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	xxxx->SetAttenuationRefDistance(10.0f, 40.0f, 60.0f);
 	xxxx->Play();
 	ndBodyKinematic* xxxx1 = AddBox(scene, testPosit, 0.0f, 4.0f, 0.5f, 5.0f);
-	xxxx1->GetCollisionShape().SetCollisionMode(false);
+	//xxxx1->GetCollisionShape().SetCollisionMode(false);
 #endif
 
 
