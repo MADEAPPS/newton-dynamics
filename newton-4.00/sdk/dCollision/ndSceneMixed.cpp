@@ -371,9 +371,9 @@ dFloat32 ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& globalO
 	return param;
 }
 
-dFloat32 ndSceneMixed::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const
+bool ndSceneMixed::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const
 {
-	dInt32 totalCount = 0;
+	bool state = false;
 	if (m_rootNode) 
 	{
 		dVector boxP0;
@@ -386,21 +386,15 @@ dFloat32 ndSceneMixed::ConvexCast(ndConvexCastNotify& callback, const ndShapeIns
 	
 		dVector velocA((globalDest - globalOrigin.m_posit) & dVector::m_triplexMask);
 		dVector velocB(dVector::m_zero);
-		//dgFastRayTest ray(dVector(dgFloat32(0.0f)), velocA);
 		dFastRayTest ray(dVector::m_zero, velocA);
 	
 		dVector minBox(m_rootNode->m_minBox - boxP1);
 		dVector maxBox(m_rootNode->m_maxBox - boxP0);
 		stackPool[0] = m_rootNode;
 		distance[0] = ray.BoxIntersect(minBox, maxBox);
-	
-		//*param = dFloat32(1.0f);
-		//totalCount = dgBroadPhase::ConvexCast(stackPool, distance, 1, velocA, velocB, ray, shape, matrix, target, param, prefilter, userData, info, maxContacts, threadIndex);
-		//totalCount = ndScene::ConvexCast(callback, stackPool, distance, 1, ray, convexShape, velocA, velocB);
-		ndScene::ConvexCast(callback, stackPool, distance, 1, ray, convexShape, globalOrigin, globalDest, velocA, velocB);
+		state = ndScene::ConvexCast(callback, stackPool, distance, 1, ray, convexShape, globalOrigin, globalDest);
 	}
 	
-	//return totalCount;
-	return 0;
+	return state;
 }
 

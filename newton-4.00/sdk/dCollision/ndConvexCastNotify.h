@@ -36,13 +36,12 @@ D_MSV_NEWTON_ALIGN_32
 class ndConvexCastNotify
 {
 	public: 
-	ndConvexCastNotify(const ndScene* const scene)
+	ndConvexCastNotify()
 		:m_normal(dVector::m_zero)
 		,m_closetPoint0(dVector::m_zero)
 		,m_closetPoint1(dVector::m_zero)
 		,m_contacts()
 		,m_param(dFloat32 (1.2f))
-		,m_scene(scene)
 	{
 	}
 
@@ -63,47 +62,13 @@ class ndConvexCastNotify
 		return 0;
 	}
 
-	D_COLLISION_API dFloat32 CastShape(const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest);
-	
+	D_COLLISION_API bool CastShape(const ndShapeInstance& castingInstance, const dMatrix& globalOrigin, const dVector& globalDest, const ndShapeInstance& targetShape, const dMatrix& targetMatrix);
+
 	dVector m_normal;
 	dVector m_closetPoint0;
 	dVector m_closetPoint1;
 	dFixSizeArray<ndContactPoint, 8> m_contacts;
 	dFloat32 m_param;
-
-	protected:
-	const ndScene* m_scene;
 } D_GCC_NEWTON_ALIGN_32;
-
-//D_MSV_NEWTON_ALIGN_32
-//class ndRayCastClosestHitCallback: public ndConvexCastNotify
-//{
-//	public:
-//	ndRayCastClosestHitCallback(const ndScene* const scene)
-//		:ndConvexCastNotify(scene)
-//		,m_param(dFloat32(1.2f))
-//	{
-//	}
-//
-//	dUnsigned32 OnRayPrecastAction(const ndBody* const, const ndShapeInstance* const)
-//	{
-//		//return ((ndBody*)body)->GetAsBodyKinematic() ? 1 : 0;
-//		return 1;
-//	}
-//
-//	dFloat32 OnRayCastAction(const ndContactPoint& contact, dFloat32 intersetParam)
-//	{
-//		if (intersetParam < m_param)
-//		{
-//			m_contact = contact;
-//			m_param = intersetParam;
-//		}
-//		return intersetParam;
-//	}
-//
-//	ndContactPoint m_contact;
-//	dFloat32 m_param;
-//} D_GCC_NEWTON_ALIGN_32 ;
-
 
 #endif

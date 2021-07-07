@@ -554,16 +554,15 @@ void ndMultiBodyVehicle::ApplyTireModel()
 
 				if (0)
 				{
-					//dFixSizeArray<ndContactPoint, 8> closestHit;
+					// test convex cast
 					const ndWheelDescriptor& info = tire->GetInfo();
 					const dMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
 					const dVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_maxLimit - info.m_minLimit));
-
 					class ndConvexCastNotifyTest : public ndConvexCastNotify
 					{
 						public:
-						ndConvexCastNotifyTest(const ndScene* const scene)
-							:ndConvexCastNotify(scene)
+						ndConvexCastNotifyTest()
+							:ndConvexCastNotify()
 						{
 						}
 
@@ -576,11 +575,12 @@ void ndMultiBodyVehicle::ApplyTireModel()
 						ndBodyKinematic* m_chassis;
 					};
 
-					ndConvexCastNotifyTest convexCast(m_chassis->GetScene());
+					ndConvexCastNotifyTest convexCast;
 					convexCast.m_tire = tire->GetBody0();
 					convexCast.m_chassis = m_chassis;
-					//dFloat32 param = ndContactSolver::ConvexCast(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix(), closestHit);
-					convexCast.CastShape(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest);
+
+					//convexCast.CastShape(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix());
+					m_chassis->GetScene()->ConvexCast(convexCast, tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest);
 					convexCast.m_param = 0.0f;
 				}
 

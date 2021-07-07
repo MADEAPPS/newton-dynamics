@@ -59,10 +59,6 @@ D_MSV_NEWTON_ALIGN_32
 class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>  
 {
 	public: 
-	//ndContactSolver(ndContact* const contact, ndScene* const scene);
-	//ndContactSolver(ndShapeInstance* const instance, ndScene* const scene);
-	//ndContactSolver(const ndShapeInstance& instance0, const ndShapeInstance& instance1);
-
 	ndContactSolver(ndContact* const contact, ndContactNotify* const notification, dFloat32 timestep);
 	ndContactSolver(ndShapeInstance* const instance, ndContactNotify* const notification, dFloat32 timestep);
 	ndContactSolver(const ndContactSolver& src, const ndShapeInstance& instance0, const ndShapeInstance& instance1);
@@ -71,9 +67,6 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 CalculateContactsContinue();
 
 	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, ndContactPoint& contactOut);
-
-
-	static dFloat32 ConvexCast(const ndShapeInstance& castingInstance, const dMatrix& globalOrigin, const dVector& globalDest, const ndShapeInstance& castShape, const dMatrix& castMatrix, dFixSizeArray<ndContactPoint, 8>& contactOut);
 	
 	private:
 	dInt32 ConvexContactsDiscrete();
@@ -176,6 +169,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	friend class ndScene;
 	friend class ndShapeInstance;
 	friend class ndPolygonMeshDesc;
+	friend class ndConvexCastNotify;
 	friend class ndShapeConvexPolygon;
 	friend class ndBodyPlayerCapsuleContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;

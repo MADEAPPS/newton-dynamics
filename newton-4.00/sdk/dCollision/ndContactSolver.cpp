@@ -2681,40 +2681,6 @@ dFloat32 ndContactSolver::RayCast(const dVector& localP0, const dVector& localP1
 	return param;
 }
 
-dFloat32 ndContactSolver::ConvexCast(const ndShapeInstance& castingInstance, const dMatrix& globalOrigin, const dVector& globalDest, const ndShapeInstance& castShape, const dMatrix& castMatrix, dFixSizeArray<ndContactPoint, 8>& contactOut)
-{
-	ndContact contact;
-	ndBodyKinematic body0;
-	ndBodyKinematic body1;
-	ndContactNotify notify;
-	
-	body0.SetCollisionShape(castingInstance);
-	body1.SetCollisionShape(castShape);
-	
-	body0.SetMatrix(globalOrigin);
-	body1.SetMatrix(castMatrix);
-	body0.SetMassMatrix(dVector::m_one);
-	body0.SetVelocity(globalDest - globalOrigin.m_posit);
-
-	contact.SetBodies(&body0, &body1);
-	
-	ndShapeInstance& shape0 = body0.GetCollisionShape();
-	ndShapeInstance& shape1 = body1.GetCollisionShape();
-	shape0.SetGlobalMatrix(shape0.GetLocalMatrix() * body0.GetMatrix());
-	shape1.SetGlobalMatrix(shape1.GetLocalMatrix() * body1.GetMatrix());
-
-	ndContactPoint contactBuffer[D_MAX_CONTATCS];
-	ndContactSolver contactSolver(&contact, &notify, dFloat32 (1.0f));
-	contactSolver.m_contactBuffer = contactBuffer;
-	const dInt32 count = dMin (contactSolver.CalculateContactsContinue(), contactOut.GetCapacity());
-
-	for (dInt32 i = 0; i < count; i++)
-	{
-		contactOut.PushBack(contactBuffer[i]);
-	}
-	return contactSolver.m_timestep;
-}
-
 D_INLINE ndMinkFace* ndContactSolver::NewFace()
 {
 	ndMinkFace* face = (ndMinkFace*)m_freeFace;

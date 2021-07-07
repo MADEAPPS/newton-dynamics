@@ -676,7 +676,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 		soundManager->CreateSoundAsset(engineSounds[i]);
 	}
 
-#if 1
+#if 0
 	// use a test tone
 	dVector testPosit(20.0f, 0.25f, 0.0f, 1.0f);
 	soundManager->CreateSoundAsset("ctone.wav");

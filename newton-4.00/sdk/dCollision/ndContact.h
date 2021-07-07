@@ -141,6 +141,7 @@ class ndContact: public ndConstraint, public dContainersFreeListAlloc<ndContact*
 	friend class ndBodyKinematic;
 	friend class ndContactSolver;
 	friend class ndShapeInstance;
+	friend class ndConvexCastNotify;
 	friend class ndShapeConvexPolygon;
 	friend class ndBodyPlayerCapsuleContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;

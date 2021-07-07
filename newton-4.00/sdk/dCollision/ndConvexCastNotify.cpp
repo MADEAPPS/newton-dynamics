@@ -21,17 +21,50 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
-#include "ndBody.h"
-#include "ndContact.h"
 #include "ndScene.h"
+#include "ndContact.h"
+#include "ndBodyKinematic.h"
 #include "ndShapeInstance.h"
 #include "ndConvexCastNotify.h"
 
-dFloat32 ndConvexCastNotify::CastShape(const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest)
+bool ndConvexCastNotify::CastShape(const ndShapeInstance& castingInstance, const dMatrix& globalOrigin, const dVector& globalDest, const ndShapeInstance& targetShape, const dMatrix& targetMatrix)
 {
-	m_param = dFloat32(1.0f);
+	ndContact contact;
+	ndBodyKinematic body0;
+	ndBodyKinematic body1;
+	ndContactNotify notify;
+	
+	body0.SetCollisionShape(castingInstance);
+	body1.SetCollisionShape(targetShape);
+	body0.SetMatrix(globalOrigin);
+	body1.SetMatrix(targetMatrix);
+	body0.SetMassMatrix(dVector::m_one);
+	body0.SetVelocity(globalDest - globalOrigin.m_posit);
+
+	contact.SetBodies(&body0, &body1);
+
+	ndShapeInstance& shape0 = body0.GetCollisionShape();
+	ndShapeInstance& shape1 = body1.GetCollisionShape();
+	shape0.SetGlobalMatrix(shape0.GetLocalMatrix() * body0.GetMatrix());
+	shape1.SetGlobalMatrix(shape1.GetLocalMatrix() * body1.GetMatrix());
+
 	m_contacts.SetCount(0);
-	return m_scene->ConvexCast(*this, convexShape, globalOrigin, globalDest);
+	ndContactPoint contactBuffer[D_MAX_CONTATCS];
+	ndContactSolver contactSolver(&contact, &notify, dFloat32(1.0f));
+	contactSolver.m_contactBuffer = contactBuffer;
+
+	m_param = dFloat32(1.2f);
+	const dInt32 count = dMin(contactSolver.CalculateContactsContinue(), m_contacts.GetCapacity());
+	if (count)
+	{
+		for (dInt32 i = 0; i < count; i++)
+		{
+			m_contacts.PushBack(contactBuffer[i]);
+		}
+		m_param = contactSolver.m_timestep;
+		m_normal = contactSolver.m_separatingVector;
+		m_closetPoint0 = contactSolver.m_closestPoint0;
+		m_closetPoint1 = contactSolver.m_closestPoint1;
+	}
+	return count > 0;
 }
-
-

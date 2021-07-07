@@ -115,6 +115,7 @@ class ndScene
 	D_COLLISION_API void SetContactNotify(ndContactNotify* const notify);
 
 	virtual void DebugScene(ndSceneTreeNotiFy* const notify) = 0;
+	virtual bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const = 0;
 
 	private:
 	bool ValidateContactCache(ndContact* const contact, const dVector& timestep) const;
@@ -166,10 +167,9 @@ class ndScene
 
 	D_COLLISION_API void BuildContactArray();
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const = 0;
-	D_COLLISION_API virtual dFloat32 ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const = 0;
-
+	
 	dFloat32 RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const;
-	dFloat32 ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest, const dVector& velocA, const dVector& velocB) const;
+	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const;
 	
 	ndBodyList m_bodyList;
 	ndContactList m_contactList;
