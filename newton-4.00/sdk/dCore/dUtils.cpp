@@ -420,6 +420,7 @@ dInt32 dVertexListToIndexList(dFloat64* const vertList, dInt32 strideInBytes, dI
 	return count;
 }
 
+#ifndef D_USE_THREAD_EMULATION
 void dSpinLock::Delay(dInt32& exp)
 {
 	#if defined (_WIN_32_VER) || defined (_WIN_64_VER)
@@ -446,4 +447,4 @@ void dSpinLock::Delay(dInt32& exp)
 		exp = dMin(exp * 2, 64);
 	#endif
 }
-
+#endif

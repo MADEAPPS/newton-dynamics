@@ -348,7 +348,7 @@ class dTriplex
 template<class T>
 class dAtomic
 {
-public:
+	public:
 	dAtomic<T>()
 		: m_val(T(val))
 	{
@@ -357,6 +357,11 @@ public:
 	dAtomic<T>(T val)
 		: m_val(val)
 	{
+	}
+
+	operator T() const
+	{
+		return m_val;
 	}
 
 	T load() const
@@ -387,7 +392,17 @@ public:
 		return m_val + val;
 	}
 
-private:
+	bool compare_exchange_weak(T oldValue, T newValue)
+	{
+		if (m_val == oldValue)
+		{
+			m_val = newValue;
+			return true;
+		}
+		return false;
+	}
+
+	private:
 	T m_val;
 };
 #else
@@ -395,7 +410,7 @@ private:
 template<class T>
 class dAtomic : public std::atomic<T>
 {
-public:
+	public:
 	dAtomic<T>()
 		: std::atomic<T>(T(0))
 	{
@@ -421,7 +436,7 @@ public:
 /// Simple spin lock for synchronizing threads for very short period of time.
 class dSpinLock
 {
-public:
+	public:
 	dSpinLock()
 		#ifndef D_USE_THREAD_EMULATION	
 		:m_lock(0)
