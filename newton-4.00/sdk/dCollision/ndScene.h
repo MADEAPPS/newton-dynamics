@@ -115,6 +115,8 @@ class ndScene
 	D_COLLISION_API void SetContactNotify(ndContactNotify* const notify);
 
 	virtual void DebugScene(ndSceneTreeNotiFy* const notify) = 0;
+
+	virtual bool RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const = 0;
 	virtual bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const = 0;
 
 	private:
@@ -166,9 +168,8 @@ class ndScene
 	void SubmitPairs(ndSceneNode* const leaftNode, ndSceneNode* const node);
 
 	D_COLLISION_API void BuildContactArray();
-	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const = 0;
 	
-	dFloat32 RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const;
+	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const;
 	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const;
 	
 	ndBodyList m_bodyList;

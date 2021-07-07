@@ -34,8 +34,8 @@ void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)
 	class ndCastTriggerPlane : public ndRayCastClosestHitCallback
 	{
 		public:
-		ndCastTriggerPlane(const ndScene* const scene)
-			:ndRayCastClosestHitCallback(scene)
+		ndCastTriggerPlane()
+			:ndRayCastClosestHitCallback()
 		{
 		}
 
@@ -53,17 +53,13 @@ void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)
 	p0.m_y += 30.0f;
 	p1.m_y -= 30.0f;
 
-	ndCastTriggerPlane rayCaster(body->GetScene());
-	dFloat32 param = rayCaster.TraceRay(p0, p1);
-	param = rayCaster.TraceRay(p0, p1);
-	bool hasPlane = false;
-	if (param < 1.0f)
-	{
-		hasPlane = true;
+	ndCastTriggerPlane rayCaster;
+	m_hasPlane = body->GetScene()->RayCast(rayCaster, p0, p1);
+	if (m_hasPlane)
+	{ 
 		dFloat32 dist = -rayCaster.m_contact.m_normal.DotProduct(rayCaster.m_contact.m_point).GetScalar();
 		m_plane = dPlane(rayCaster.m_contact.m_normal, dist);
 	}
-	m_hasPlane = hasPlane;
 }
 
 void ndArchimedesBuoyancyVolume::OnTriggerEnter(ndBodyKinematic* const body, dFloat32)

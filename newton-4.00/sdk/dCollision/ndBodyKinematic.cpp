@@ -306,11 +306,12 @@ void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 #endif
 }
 
-dFloat32 ndBodyKinematic::RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, dFloat32 maxT) const
+bool ndBodyKinematic::RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, dFloat32 maxT) const
 {
 	dVector l0(ray.m_p0);
 	dVector l1(ray.m_p0 + ray.m_diff.Scale(dMin(maxT, dFloat32(1.0f))));
 
+	bool state = false;
 	if (dRayBoxClip(l0, l1, m_minAABB, m_maxAABB))
 	{
 		const dMatrix& globalMatrix = m_shapeInstance.GetGlobalMatrix();
@@ -337,13 +338,14 @@ dFloat32 ndBodyKinematic::RayCast(ndRayCastNotify& callback, const dFastRayTest&
 						contactOut.m_body1 = this;
 						contactOut.m_point = p;
 						contactOut.m_normal = globalMatrix.RotateVector(contactOut.m_normal);
-						maxT = callback.OnRayCastAction(contactOut, t);
+						callback.OnRayCastAction(contactOut, t);
+						state = true;
 					}
 				}
 			}
 		}
 	}
-	return maxT;
+	return state;
 }
 
 void ndBodyKinematic::UpdateCollisionMatrix()

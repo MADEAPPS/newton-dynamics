@@ -23,17 +23,17 @@
 #define __D_RAYCAST_NOTYFY_H__
 
 #include "ndCollisionStdafx.h"
-#include "ndBody.h"
+//#include "ndBody.h"
 #include "ndContact.h"
-#include "ndScene.h"
-#include "ndShapeInstance.h"
+//#include "ndScene.h"
+//#include "ndShapeInstance.h"
 
 D_MSV_NEWTON_ALIGN_32
 class ndRayCastNotify
 {
 	public: 
-	ndRayCastNotify(const ndScene* const scene)
-		:m_scene(scene)
+	ndRayCastNotify()
+		:m_param(dFloat32 (1.0f))
 	{
 	}
 
@@ -41,10 +41,12 @@ class ndRayCastNotify
 	{
 	}
 
-	dFloat32 TraceRay(const dVector& p0, const dVector& p1)
-	{
-		return m_scene->RayCast(*this, p0, p1);
-	}
+	//dFloat32 TraceRay(const dVector& p0, const dVector& p1)
+	//{
+	//	return m_scene->RayCast(*this, p0, p1);
+	//}
+
+	D_COLLISION_API bool TraceShape(const dVector& globalOrigin, const dVector& globalDestination, const ndShapeInstance& shapeInstance, const dMatrix& shapeGlobal);
 
 	virtual dUnsigned32 OnRayPrecastAction(const ndBody* const, const ndShapeInstance* const)
 	{
@@ -53,17 +55,17 @@ class ndRayCastNotify
 
 	virtual dFloat32 OnRayCastAction(const ndContactPoint& contact, dFloat32 intersetParam) = 0;
 
-	protected:
-	const ndScene* m_scene;
+
+	ndContactPoint m_contact;
+	dFloat32 m_param;
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
 class ndRayCastClosestHitCallback: public ndRayCastNotify
 {
 	public:
-	ndRayCastClosestHitCallback(const ndScene* const scene)
-		:ndRayCastNotify(scene)
-		,m_param(dFloat32(1.2f))
+	ndRayCastClosestHitCallback()
+		:ndRayCastNotify()
 	{
 	}
 
@@ -82,9 +84,6 @@ class ndRayCastClosestHitCallback: public ndRayCastNotify
 		}
 		return intersetParam;
 	}
-
-	ndContactPoint m_contact;
-	dFloat32 m_param;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 

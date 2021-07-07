@@ -56,7 +56,7 @@ class ndBody: public dClassAlloc
 	void GetAABB(dVector& p0, dVector& p1) const;
 
 	virtual dFloat32 GetInvMass() const;
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const = 0;
+	virtual bool RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const = 0;
 
 	const dVector& GetCentreOfMass() const;
 	D_COLLISION_API void SetCentreOfMass(const dVector& com);

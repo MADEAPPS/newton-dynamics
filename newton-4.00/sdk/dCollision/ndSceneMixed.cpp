@@ -19,12 +19,13 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndBodyKinematic.h"
 #include "ndSceneNode.h"
 #include "ndSceneMixed.h"
+#include "ndRayCastNotify.h"
+#include "ndConvexCastNotify.h"
 
 ndSceneMixed::ndSceneMixed()
 	:ndScene()
@@ -289,91 +290,11 @@ void ndSceneMixed::DebugScene(ndSceneTreeNotiFy* const notify)
 		}
 	}
 }
-/*
-void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body)
-{
-	ndSceneNode* const leafNode = body->GetSceneBodyNode();
-
-	if (m_fullScan)
-	{
-		ndSceneAggregate* const aggregateNode = leafNode->GetAsSceneAggregate();
-		if (aggregateNode)
-		{
-			dAssert(0);
-			//aggregateNode->SubmitSelfPairs(timestep, threadID);
-		}
-
-		for (ndSceneNode* ptr = leafNode; ptr->m_parent; ptr = ptr->m_parent)
-		{
-			ndSceneTreeNode* const parent = ptr->m_parent->GetAsSceneTreeNode();
-			dAssert(!parent->GetAsSceneBodyNode());
-			ndSceneNode* const sibling = parent->m_right;
-			if (sibling != ptr)
-			{
-				//SubmitPairs(bodyNode, sibling, timestep, 0, threadIndex);
-				SubmitPairs(leafNode, sibling);
-			}
-		}
-	}
-	else
-	{
-		dAssert(0);
-		//const dgBodyInfo* const bodyArray = &m_world->m_bodiesMemory[0];
-		//const dInt32 bodyCount = descriptor->m_atomicPendingBodiesCount;
-		//dInt32* const atomicIndex = &descriptor->m_atomicIndex;
-		//
-		//for (dInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-		//	ndSceneNode* const sceneNode = bodyArray[i].m_body->GetSceneNode();
-		//	dAssert(sceneNode->ndSceneBodyNode());
-		//	dAssert(!sceneNode->GetBody() || (sceneNode->GetBody()->GetSceneNode() == sceneNode));
-		//
-		//	for (ndSceneNode* ptr = sceneNode; ptr->m_parent; ptr = ptr->m_parent) {
-		//		ndSceneTreeNode* const parent = (ndSceneTreeNode*)ptr->m_parent;
-		//		if (!parent->IsAggregate()) {
-		//			dAssert(!parent->ndSceneBodyNode());
-		//			ndSceneNode* const rightSibling = parent->m_right;
-		//			if (rightSibling != ptr) {
-		//				SubmitPairs(sceneNode, rightSibling, timestep, threadCount, threadID);
-		//			}
-		//			else {
-		//				SubmitPairs(sceneNode, parent->m_left, timestep, threadCount, threadID);
-		//			}
-		//		}
-		//	}
-		//}
-	}
-}
-*/
-
-dFloat32 ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const
-{
-	dVector p0(globalOrigin & dVector::m_triplexMask);
-	dVector p1(globalDest & dVector::m_triplexMask);
-
-	dFloat32 param = dFloat32(1.2f);
-	if (m_rootNode) 
-	{
-		dVector segment(p1 - p0);
-		dAssert(segment.m_w == dFloat32(0.0f));
-		dFloat32 dist2 = segment.DotProduct(segment).GetScalar();
-		if (dist2 > dFloat32(1.0e-8f)) 
-		{
-			dFloat32 distance[D_SCENE_MAX_STACK_DEPTH];
-			const ndSceneNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
-
-			dFastRayTest ray(p0, p1);
-
-			stackPool[0] = m_rootNode;
-			distance[0] = ray.BoxIntersect(m_rootNode->m_minBox, m_rootNode->m_maxBox);
-			param = ndScene::RayCast(callback, stackPool, distance, 1, ray);
-		}
-	}
-	return param;
-}
 
 bool ndSceneMixed::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const
 {
 	bool state = false;
+	callback.m_param = dFloat32(1.2f);
 	if (m_rootNode) 
 	{
 		dVector boxP0;
@@ -394,7 +315,32 @@ bool ndSceneMixed::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstanc
 		distance[0] = ray.BoxIntersect(minBox, maxBox);
 		state = ndScene::ConvexCast(callback, stackPool, distance, 1, ray, convexShape, globalOrigin, globalDest);
 	}
+	return state;
+}
+
+bool ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const
+{
+	const dVector p0(globalOrigin & dVector::m_triplexMask);
+	const dVector p1(globalDest & dVector::m_triplexMask);
 	
+	bool state = false;
+	callback.m_param = dFloat32(1.2f);
+	if (m_rootNode)
+	{
+		const dVector segment(p1 - p0);
+		dFloat32 dist2 = segment.DotProduct(segment).GetScalar();
+		if (dist2 > dFloat32(1.0e-8f))
+		{
+			dFloat32 distance[D_SCENE_MAX_STACK_DEPTH];
+			const ndSceneNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
+	
+			dFastRayTest ray(p0, p1);
+	
+			stackPool[0] = m_rootNode;
+			distance[0] = ray.BoxIntersect(m_rootNode->m_minBox, m_rootNode->m_maxBox);
+			state = ndScene::RayCast(callback, stackPool, distance, 1, ray);
+		}
+	}
 	return state;
 }
 

@@ -23,10 +23,7 @@
 #define __D_CONVEXCAST_NOTIFY_H__
 
 #include "ndCollisionStdafx.h"
-//#include "ndBody.h"
 #include "ndContact.h"
-//#include "ndScene.h"
-//#include "ndShapeInstance.h"
 
 class ndBody;
 class ndScene;

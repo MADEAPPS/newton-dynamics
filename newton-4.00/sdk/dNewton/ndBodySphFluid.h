@@ -47,7 +47,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 
 	protected:
 	D_NEWTON_API virtual void Update(const ndWorld* const world, dFloat32 timestep);
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
+	virtual bool RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
 
 	private:
 	enum ndGridType
@@ -161,9 +161,9 @@ class ndBodySphFluid: public ndBodyParticleSet
 	dIsoSurface m_isoSurcase;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-inline dFloat32 ndBodySphFluid::RayCast(ndRayCastNotify&, const dFastRayTest&, const dFloat32) const
+inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const dFastRayTest&, const dFloat32) const
 {
-	return dFloat32(1.2f);
+	return false;
 }
 
 inline ndBodySphFluid* ndBodySphFluid::GetAsBodySphFluid()

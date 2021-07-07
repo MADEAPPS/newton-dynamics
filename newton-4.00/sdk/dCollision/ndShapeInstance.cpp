@@ -21,6 +21,7 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
+#include "ndScene.h"
 #include "ndContact.h"
 #include "ndShapeInstance.h"
 #include "ndRayCastNotify.h"

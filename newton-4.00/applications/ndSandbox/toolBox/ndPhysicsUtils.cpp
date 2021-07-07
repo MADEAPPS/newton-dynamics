@@ -26,9 +26,12 @@ dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist)
 	dVector p0(origin);
 	dVector p1(origin - dVector(0.0f, dAbs(dist), 0.0f, 0.0f));
 
-	ndRayCastClosestHitCallback rayCaster(world.GetScene());
-	dFloat32 param = rayCaster.TraceRay(p0, p1);
-	return (param < 1.0f) ? rayCaster.m_contact.m_point : p0;
+	ndRayCastClosestHitCallback rayCaster;
+	if (world.GetScene()->RayCast(rayCaster, p0, p1))
+	{
+		return rayCaster.m_contact.m_point;
+	}
+	return p0;
 }
 
 ndBodyKinematic* MousePickBody(ndWorld* const world, const dVector& origin, const dVector& end, dFloat32& paramterOut, dVector& positionOut, dVector& normalOut)
@@ -36,8 +39,8 @@ ndBodyKinematic* MousePickBody(ndWorld* const world, const dVector& origin, cons
 	class ndRayPickingCallback: public ndRayCastClosestHitCallback
 	{
 		public: 
-		ndRayPickingCallback(const ndScene* const scene)
-			:ndRayCastClosestHitCallback(scene)
+		ndRayPickingCallback()
+			:ndRayCastClosestHitCallback()
 		{
 		}
 
@@ -51,11 +54,13 @@ ndBodyKinematic* MousePickBody(ndWorld* const world, const dVector& origin, cons
 		}
 	};
 
-	ndRayPickingCallback rayCaster(world->GetScene());
-	dFloat32 param = rayCaster.TraceRay(origin, end);
-	if (param < 1.0f)
+	ndRayPickingCallback rayCaster;
+	world->GetScene()->RayCast(rayCaster, origin, end);
+	//dFloat32 param = rayCaster.TraceRay(origin, end);
+	//if (param < 1.0f)
+	if (world->GetScene()->RayCast(rayCaster, origin, end))
 	{
-		paramterOut = param;
+		paramterOut = rayCaster.m_param;
 		positionOut = rayCaster.m_contact.m_point;
 		normalOut = rayCaster.m_contact.m_normal;
 		return (ndBodyKinematic* )rayCaster.m_contact.m_body0;

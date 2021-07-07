@@ -133,7 +133,6 @@ class dFastRayTest
 
 		dAssert (m_diff.DotProduct(m_diff).GetScalar() > dFloat32 (0.0f));
 		m_isParallel = (m_diff.Abs() < dVector(1.0e-8f));
-		//m_dpInv = (((dVector(dFloat32(1.0e-20)) & m_isParallel) | m_diff.AndNot(m_isParallel)).Reciproc()) & dVector::m_triplexMask;
 		m_dpInv = m_diff.Select (dVector(dFloat32(1.0e-20f)), m_isParallel).Reciproc() & dVector::m_triplexMask;
 		m_unitDir = m_diff.Normalize();
 	}
