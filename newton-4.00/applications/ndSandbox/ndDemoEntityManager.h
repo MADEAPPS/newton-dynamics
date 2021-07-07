@@ -275,7 +275,6 @@ inline ndPhysicsWorld* ndDemoEntityManager::GetWorld() const
 	return m_world;
 }
 
-
 inline dInt32 ndDemoEntityManager::GetWidth() const 
 { 
 	ImGuiIO& io = ImGui::GetIO();

@@ -27,7 +27,7 @@ dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist)
 	dVector p1(origin - dVector(0.0f, dAbs(dist), 0.0f, 0.0f));
 
 	ndRayCastClosestHitCallback rayCaster;
-	if (world.GetScene()->RayCast(rayCaster, p0, p1))
+	if (world.RayCast(rayCaster, p0, p1))
 	{
 		return rayCaster.m_contact.m_point;
 	}
@@ -55,10 +55,7 @@ ndBodyKinematic* MousePickBody(ndWorld* const world, const dVector& origin, cons
 	};
 
 	ndRayPickingCallback rayCaster;
-	world->GetScene()->RayCast(rayCaster, origin, end);
-	//dFloat32 param = rayCaster.TraceRay(origin, end);
-	//if (param < 1.0f)
-	if (world->GetScene()->RayCast(rayCaster, origin, end))
+	if (world->RayCast(rayCaster, origin, end))
 	{
 		paramterOut = rayCaster.m_param;
 		positionOut = rayCaster.m_contact.m_point;

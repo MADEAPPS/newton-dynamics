@@ -1111,3 +1111,13 @@ void ndWorld::UpdateSkeletons()
 		skeleton->ClearSelfCollision();
 	}
 }
+
+bool ndWorld::RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const
+{
+	return m_scene->RayCast(callback, globalOrigin, globalDest);
+}
+
+bool ndWorld::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const
+{
+	return m_scene->ConvexCast(callback, convexShape, globalOrigin, globalDest);
+}

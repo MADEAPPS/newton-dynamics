@@ -31,7 +31,9 @@
 class ndWorld;
 class ndModel;
 class ndBodyDynamic;
+class ndRayCastNotify;
 class ndDynamicsUpdate;
+class ndConvexCastNotify;
 class ndJointBilateralConstraint;
 
 #define D_NEWTON_ENGINE_MAJOR_VERSION 4
@@ -118,6 +120,9 @@ class ndWorld: public dClassAlloc
 	void DebugScene(ndSceneTreeNotiFy* const notify);
 
 	D_NEWTON_API void ClearCache();
+
+	D_NEWTON_API bool RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const;
+	D_NEWTON_API bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const;
 
 	private:
 	void ThreadFunction();
