@@ -61,6 +61,7 @@
 #include <ndConvexCastNotify.h>
 #include <ndBodyPlayerCapsule.h>
 #include <ndBodyTriggerVolume.h>
+#include <ndBodiesInAabbNotify.h>
 #include <ndShapeConvexPolygon.h>
 #include <ndShapeCompoundConvex.h>
 #include <ndShapeChamferCylinder.h>

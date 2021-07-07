@@ -26,6 +26,7 @@
 #include "ndSceneMixed.h"
 #include "ndRayCastNotify.h"
 #include "ndConvexCastNotify.h"
+#include "ndBodiesInAabbNotify.h"
 
 ndSceneMixed::ndSceneMixed()
 	:ndScene()
@@ -344,3 +345,14 @@ bool ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& globalOrigi
 	return state;
 }
 
+void ndSceneMixed::BodiesInAabb(ndBodiesInAabbNotify& callback) const
+{
+	callback.m_bodyArray.SetCount(0);
+
+	if (m_rootNode)
+	{
+		const ndSceneNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
+		stackPool[0] = m_rootNode;
+		ndScene::BodiesInAabb(callback, stackPool, 1);
+	}
+}

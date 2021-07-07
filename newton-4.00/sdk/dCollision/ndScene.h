@@ -36,6 +36,7 @@ class ndContact;
 class ndRayCastNotify;
 class ndContactNotify;
 class ndConvexCastNotify;
+class ndBodiesInAabbNotify;
 class ndJointBilateralConstraint;
 
 D_MSV_NEWTON_ALIGN_32
@@ -116,6 +117,7 @@ class ndScene
 
 	virtual void DebugScene(ndSceneTreeNotiFy* const notify) = 0;
 
+	virtual void BodiesInAabb(ndBodiesInAabbNotify& callback) const = 0;
 	virtual bool RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const = 0;
 	virtual bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const = 0;
 
@@ -169,6 +171,7 @@ class ndScene
 
 	D_COLLISION_API void BuildContactArray();
 	
+	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, dInt32 stack) const;
 	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const;
 	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const;
 	

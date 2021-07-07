@@ -30,6 +30,7 @@
 #include "ndRayCastNotify.h"
 #include "ndConvexCastNotify.h"
 #include "ndBodyTriggerVolume.h"
+#include "ndBodiesInAabbNotify.h"
 #include "ndShapeCompoundConvex.h"
 #include "ndJointBilateralConstraint.h"
 
@@ -1830,14 +1831,9 @@ bool ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, 
 				dAssert(!me->GetRight());
 
 				//callback.TraceShape(ray.m_p0, ray.m_p1, body->GetCollisionShape(), body->GetMatrix());
-				//dFloat32 savedParam = callback.m_param;
-				//dFloat32 param = body->RayCast(callback, ray, callback.m_param);
-				//if (param < callback.m_param)
 				if (body->RayCast(callback, ray, callback.m_param))
 				{
 					state = true;
-					//callback.m_param = param;
-					//if (param < dFloat32(1.0e-8f))
 					if (callback.m_param < dFloat32(1.0e-8f))
 					{
 						break;
@@ -1903,7 +1899,41 @@ bool ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, 
 			}
 		}
 	}
-	
-	//return maxParam;
 	return state;
+}
+
+void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, dInt32 stack) const
+{
+	callback.m_bodyArray.SetCount(0);
+	while (stack)
+	{
+		stack--;
+		
+		const ndSceneNode* const me = stackPool[stack];
+		dAssert(me);
+		ndBodyKinematic* const body = me->GetBody();
+		if (body)
+		{
+			dAssert(!me->GetLeft());
+			dAssert(!me->GetRight());
+			if (callback.OnOverlap(body))
+			{
+				callback.m_bodyArray.PushBack(body);
+			}
+		}
+		else
+		{
+			const ndSceneNode* const left = me->GetLeft();
+			dAssert(left);
+			stackPool[stack] = left;
+			stack++;
+			dAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+
+			const ndSceneNode* const right = me->GetRight();
+			dAssert(right);
+			stackPool[stack] = right;
+			stack++;
+			dAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+		}
+	}
 }

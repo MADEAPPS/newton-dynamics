@@ -1121,3 +1121,8 @@ bool ndWorld::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& co
 {
 	return m_scene->ConvexCast(callback, convexShape, globalOrigin, globalDest);
 }
+
+void ndWorld::BodiesInAabb(ndBodiesInAabbNotify& callback) const
+{
+	m_scene->BodiesInAabb(callback);
+}

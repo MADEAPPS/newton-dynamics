@@ -23,10 +23,7 @@
 #define __D_RAYCAST_NOTYFY_H__
 
 #include "ndCollisionStdafx.h"
-//#include "ndBody.h"
 #include "ndContact.h"
-//#include "ndScene.h"
-//#include "ndShapeInstance.h"
 
 D_MSV_NEWTON_ALIGN_32
 class ndRayCastNotify
@@ -40,11 +37,6 @@ class ndRayCastNotify
 	virtual ~ndRayCastNotify()
 	{
 	}
-
-	//dFloat32 TraceRay(const dVector& p0, const dVector& p1)
-	//{
-	//	return m_scene->RayCast(*this, p0, p1);
-	//}
 
 	D_COLLISION_API bool TraceShape(const dVector& globalOrigin, const dVector& globalDestination, const ndShapeInstance& shapeInstance, const dMatrix& shapeGlobal);
 
