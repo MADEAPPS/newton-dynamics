@@ -397,7 +397,7 @@ dFloat32 ndSceneMixed::ConvexCast(ndConvexCastNotify& callback, const ndShapeIns
 		//*param = dFloat32(1.0f);
 		//totalCount = dgBroadPhase::ConvexCast(stackPool, distance, 1, velocA, velocB, ray, shape, matrix, target, param, prefilter, userData, info, maxContacts, threadIndex);
 		//totalCount = ndScene::ConvexCast(callback, stackPool, distance, 1, ray, convexShape, velocA, velocB);
-		ndScene::ConvexCast(callback, stackPool, distance, 1, ray, convexShape, velocA, velocB);
+		ndScene::ConvexCast(callback, stackPool, distance, 1, ray, convexShape, globalOrigin, globalDest, velocA, velocB);
 	}
 	
 	//return totalCount;

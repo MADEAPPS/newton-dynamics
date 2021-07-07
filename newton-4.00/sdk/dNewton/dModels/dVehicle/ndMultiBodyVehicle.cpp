@@ -559,7 +559,26 @@ void ndMultiBodyVehicle::ApplyTireModel()
 					const dMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
 					const dVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_maxLimit - info.m_minLimit));
 
-					ndConvexCastNotify convexCast(m_chassis->GetScene());
+					class ndConvexCastNotifyTest : public ndConvexCastNotify
+					{
+						public:
+						ndConvexCastNotifyTest(const ndScene* const scene)
+							:ndConvexCastNotify(scene)
+						{
+						}
+
+						virtual dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
+						{
+							return !((body == m_chassis) || (body == m_tire));
+						}
+
+						ndBodyKinematic* m_tire; 
+						ndBodyKinematic* m_chassis;
+					};
+
+					ndConvexCastNotifyTest convexCast(m_chassis->GetScene());
+					convexCast.m_tire = tire->GetBody0();
+					convexCast.m_chassis = m_chassis;
 					//dFloat32 param = ndContactSolver::ConvexCast(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix(), closestHit);
 					convexCast.CastShape(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest);
 					convexCast.m_param = 0.0f;

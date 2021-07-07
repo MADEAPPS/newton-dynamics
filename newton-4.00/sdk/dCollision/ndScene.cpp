@@ -27,6 +27,7 @@
 #include "ndBodyKinematic.h"
 #include "ndContactNotify.h"
 #include "ndContactSolver.h"
+#include "ndConvexCastNotify.h"
 #include "ndBodyTriggerVolume.h"
 #include "ndShapeCompoundConvex.h"
 #include "ndJointBilateralConstraint.h"
@@ -1768,8 +1769,150 @@ dFloat32 ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPo
 	return maxParam;
 }
 
-dFloat32 ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray, const ndShapeInstance& convexShape, const dVector& velocA, const dVector& velocB) const
+dFloat32 ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest, const dVector& velocA, const dVector& velocB) const
 {
+	dVector boxP0;
+	dVector boxP1;
+	//dgTriplex points[DG_CONVEX_CAST_POOLSIZE];
+	//dgTriplex normals[DG_CONVEX_CAST_POOLSIZE];
+	//dFloat32 penetration[DG_CONVEX_CAST_POOLSIZE];
+	//dgInt64 attributeA[DG_CONVEX_CAST_POOLSIZE];
+	//dgInt64 attributeB[DG_CONVEX_CAST_POOLSIZE];
+	//dInt32 totalCount = 0;
+
+	dAssert(globalOrigin.TestOrthogonal());
+	convexShape.CalculateAABB(globalOrigin, boxP0, boxP1);
+	
+	//maxContacts = dgMin(maxContacts, DG_CONVEX_CAST_POOLSIZE);
+	//dAssert(!maxContacts || (maxContacts && info));
+	//dFloat32 maxParam = *param;
+	//dFloat32 timeToImpact = *param;
+	while (stack) 
+	{
+		stack--;
+		dFloat32 dist = distance[stack];
+		
+		if (dist > callback.m_param)
+		{
+			break;
+		}
+		else 
+		{
+			const ndSceneNode* const me = stackPool[stack];
+		
+			ndBody* const body = me->GetBody();
+			if (body) 
+			{
+				if (callback.OnRayPrecastAction (body, &convexShape)) 
+				{
+					//dInt32 count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, timeToImpact, points, normals, penetration, attributeA, attributeB, maxContacts, threadIndex);
+					dFixSizeArray<ndContactPoint, 8> closestHit;
+					ndBodyKinematic* const kinBody = body->GetAsBodyKinematic();
+					dFloat32 param = ndContactSolver::ConvexCast(convexShape, globalOrigin, globalDest, kinBody->GetCollisionShape(), kinBody->GetMatrix(), closestHit);
+					
+					//if (timeToImpact < maxParam) {
+					//	if ((timeToImpact - maxParam) < dFloat32(-1.0e-3f)) {
+					//		totalCount = 0;
+					//	}
+					//	maxParam = timeToImpact;
+					//	if (count >= (maxContacts - totalCount)) {
+					//		count = maxContacts - totalCount;
+					//	}
+					//
+					//	for (dInt32 i = 0; i < count; i++) {
+					//		info[totalCount].m_point[0] = points[i].m_x;
+					//		info[totalCount].m_point[1] = points[i].m_y;
+					//		info[totalCount].m_point[2] = points[i].m_z;
+					//		info[totalCount].m_point[3] = dFloat32(0.0f);
+					//		info[totalCount].m_normal[0] = normals[i].m_x;
+					//		info[totalCount].m_normal[1] = normals[i].m_y;
+					//		info[totalCount].m_normal[2] = normals[i].m_z;
+					//		info[totalCount].m_normal[3] = dFloat32(0.0f);
+					//		info[totalCount].m_penetration = penetration[i];
+					//		info[totalCount].m_contaID = attributeB[i];
+					//
+					//		info[totalCount].m_hitBody = body;
+					//		totalCount++;
+					//	}
+					//}
+					//if (maxParam < 1.0e-8f) {
+					//	break;
+					//}
+				}
+			}
+			else if (((ndSceneNode*)me)->GetAsSceneAggregate())
+			{
+				dAssert(0);
+				//dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*)me;
+				//const dgBroadPhaseNode* const node = aggregate->m_root;
+				//if (node) {
+				//	dVector minBox(node->m_minBox - boxP1);
+				//	dVector maxBox(node->m_maxBox - boxP0);
+				//	dFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
+				//	if (dist1 < maxParam) {
+				//		dInt32 j = stack;
+				//		for (; j && (dist1 > distance[j - 1]); j--) {
+				//			stackPool[j] = stackPool[j - 1];
+				//			distance[j] = distance[j - 1];
+				//		}
+				//		stackPool[j] = node;
+				//		distance[j] = dist1;
+				//		stack++;
+				//		dAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+				//	}
+				//}
+			}
+			else 
+			{
+				{
+					const ndSceneNode* const left = me->GetLeft();
+					dAssert(left);
+					const dVector minBox(left->m_minBox - boxP1);
+					const dVector maxBox(left->m_maxBox - boxP0);
+					dFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
+					if (dist1 < callback.m_param)
+					{
+						dInt32 j = stack;
+						for (; j && (dist1 > distance[j - 1]); j--)
+						{
+							stackPool[j] = stackPool[j - 1];
+							distance[j] = distance[j - 1];
+						}
+						stackPool[j] = left;
+						distance[j] = dist1;
+						stack++;
+						dAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+					}
+				}
+		
+				{
+					//const dgBroadPhaseNode* const right = node->m_right;
+					const ndSceneNode* const right = me->GetRight();
+					dAssert(right);
+					const dVector minBox(right->m_minBox - boxP1);
+					const dVector maxBox = right->m_maxBox - boxP0;
+					dFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
+					if (dist1 < callback.m_param)
+					{
+						dInt32 j = stack;
+						for (; j && (dist1 > distance[j - 1]); j--) 
+						{
+							stackPool[j] = stackPool[j - 1];
+							distance[j] = distance[j - 1];
+						}
+						stackPool[j] = right;
+						distance[j] = dist1;
+						stack++;
+						dAssert(stack < D_SCENE_MAX_STACK_DEPTH);
+					}
+				}
+			}
+		}
+	}
+	//*param = maxParam;
+	//return totalCount;
+
+
 	dAssert(0);
 	return 0;
 }
