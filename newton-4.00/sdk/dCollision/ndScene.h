@@ -125,13 +125,13 @@ class ndScene
 	bool ValidateContactCache(ndContact* const contact, const dVector& timestep) const;
 	dFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, dVector& minBox, dVector& maxBox) const;
 
-	D_COLLISION_API virtual void FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body, bool oneWay);
-	D_COLLISION_API void AddNode(ndSceneNode* const newNode);
-	D_COLLISION_API void RemoveNode(ndSceneNode* const newNode);
+	virtual void FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body, bool oneWay);
+	void AddNode(ndSceneNode* const newNode);
+	void RemoveNode(ndSceneNode* const newNode);
 
-	D_COLLISION_API virtual void UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body);
-	D_COLLISION_API virtual void UpdateTransformNotify(dInt32 threadIndex, ndBodyKinematic* const body);
-	D_COLLISION_API virtual void CalculateContacts(dInt32 threadIndex, ndContact* const contact); 
+	virtual void UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body);
+	virtual void UpdateTransformNotify(dInt32 threadIndex, ndBodyKinematic* const body);
+	virtual void CalculateContacts(dInt32 threadIndex, ndContact* const contact); 
 
 	void CalculateJointContacts(dInt32 threadIndex, ndContact* const contact);
 	void ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContactSolver* const contactSolver);
@@ -144,9 +144,21 @@ class ndScene
 	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dNode** const nextNode);
 	ndSceneNode* BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dNode** const nextNode);
 
+	void CollisionOnlyUpdate();
 	const ndContactList& GetContactList() const;
 
-	D_COLLISION_API void CollisionOnlyUpdate();
+	ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
+	ndContact* FindContactJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
+	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
+
+	void UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndSceneNode** const root);
+	void AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
+	bool TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const;
+	void SubmitPairs(ndSceneNode* const leaftNode, ndSceneNode* const node);
+
+	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, dInt32 stack) const;
+	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const;
+	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const;
 
 	protected:
 	D_COLLISION_API ndScene();
@@ -154,33 +166,13 @@ class ndScene
 	D_COLLISION_API void UpdateAabb();
 	D_COLLISION_API void BuildBodyArray();
 	D_COLLISION_API void UpdateTransform();
+	D_COLLISION_API void BuildContactArray();
 	D_COLLISION_API void CalculateContacts();
 	D_COLLISION_API void DeleteDeadContact();
 	D_COLLISION_API void FindCollidingPairs();
-
 	D_COLLISION_API virtual void BalanceScene();
 	D_COLLISION_API virtual void ThreadFunction();
-
-	D_COLLISION_API ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
-	void UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndSceneNode** const root);
-
-	ndContact* FindContactJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
-	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
-
-	void AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
-	bool TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const;
-	void SubmitPairs(ndSceneNode* const leaftNode, ndSceneNode* const node);
-
-	D_COLLISION_API void BuildContactArray();
 	
-	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, dInt32 stack) const;
-	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const;
-	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const;
-
-	private:
-	
-
-	protected:
 	ndBodyList m_bodyList;
 	ndContactList m_contactList;
 	dArray<ndBodyKinematic*> m_activeBodyArray;
@@ -193,8 +185,6 @@ class ndScene
 	dFloat32 m_timestep;
 	dUnsigned32 m_sleepBodies;
 	dUnsigned32 m_lru;
-
-
 	bool m_fullScan;
 
 	static dVector m_velocTol;
