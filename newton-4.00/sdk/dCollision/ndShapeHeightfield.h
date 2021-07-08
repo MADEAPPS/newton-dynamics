@@ -28,7 +28,22 @@
 class ndShapeHeightfield: public ndShapeStaticMesh
 {
 	public:
-	D_COLLISION_API ndShapeHeightfield();
+	enum ndGridConstruction
+	{
+		m_normalDiagonals = 0,
+		m_invertedDiagonals,
+		m_alternateOddRowsDiagonals,
+		m_alternateEvenRowsDiagonals,
+		m_alternateOddColumsDiagonals,
+		m_alternateEvenColumsDiagonals,
+		m_starDiagonals,
+		m_starInvertexDiagonals,
+	};
+
+	D_COLLISION_API ndShapeHeightfield(
+		dInt32 width, dInt32 height, ndGridConstruction contructionMode,
+		dFloat32 verticalScale, dFloat32 horizontalScale_x, dFloat32 horizontalScale_z);
+
 	D_COLLISION_API ndShapeHeightfield(const nd::TiXmlNode* const xmlNode, const char* const assetPath);
 	D_COLLISION_API virtual ~ndShapeHeightfield();
 
@@ -46,8 +61,16 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	//static dIntersectStatus GetPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 
 	private: 
-	
-	dInt32 m_trianglesCount;
+	void CalculateAABB();
+
+	dArray<dInt8> m_atributeMap;
+	dArray<dInt16> m_elevationMap;
+	dFloat32 m_verticalScale;
+	dFloat32 m_horizontalScale_x;
+	dFloat32 m_horizontalScale_z;
+	dInt32 m_width;
+	dInt32 m_height;
+	ndGridConstruction m_diagonalMode;
 
 	friend class ndContactSolver;
 };

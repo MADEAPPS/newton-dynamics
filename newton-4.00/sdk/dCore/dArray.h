@@ -130,9 +130,6 @@ void dArray<T>::PushBack(const T& element)
 	{
 		Resize(m_capacity * 2);
 	}
-	//dInt32 index = m_size;
-	//m_size++;
-	//(*this)[index] = element;
 	m_array[m_size] = element;
 	m_size++;
 }

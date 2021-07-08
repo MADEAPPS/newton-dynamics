@@ -26,11 +26,29 @@
 #include "ndShapeInstance.h"
 #include "ndShapeHeightfield.h"
 
-ndShapeHeightfield::ndShapeHeightfield()
+ndShapeHeightfield::ndShapeHeightfield(
+	dInt32 width, dInt32 height, ndGridConstruction constructionMode,
+	dFloat32 verticalScale, dFloat32 horizontalScale_x, dFloat32 horizontalScale_z)
 	:ndShapeStaticMesh(m_heightField)
-	,m_trianglesCount(0)
+	,m_atributeMap(width * height)
+	,m_elevationMap(width * height)
+	,m_verticalScale(verticalScale)
+	,m_horizontalScale_x(horizontalScale_x)
+	,m_horizontalScale_z(horizontalScale_z)
+	,m_width(width)
+	,m_height(height)
+	,m_diagonalMode(constructionMode)
+	//,m_trianglesCount(0)
 {
+	dAssert(width >= 2);
+	dAssert(height >= 2);
 	dAssert(0);
+	m_atributeMap.SetCount(width * height);
+	m_elevationMap.SetCount(width * height);
+
+	memset(&m_atributeMap[0], 0, sizeof(dInt8) * m_atributeMap.GetCount());
+	memset(&m_elevationMap[0], 0, sizeof(dInt16) * m_elevationMap.GetCount());
+
 	//Create(builder);
 	//CalculateAdjacendy();
 	//
@@ -49,11 +67,166 @@ ndShapeHeightfield::ndShapeHeightfield()
 	//dFastAabbInfo box(dGetIdentityMatrix(), dVector(dFloat32(1.0e15f)));
 	//ForAllSectors(box, zero, dFloat32(1.0f), GetTriangleCount, &data);
 	//m_trianglesCount = data.m_triangleCount;
+
+
+
+	//dInt32 attibutePaddedMapSize = (m_width * m_height + 4) & -4;
+	//m_diagonals = (dInt8 *)dgMallocStack(attibutePaddedMapSize * sizeof(dInt8));
+	//switch (m_diagonalMode)
+	//{
+	//	case m_normalDiagonals:
+	//	{
+	//		memset(m_diagonals, 0, m_width * m_height * sizeof(dInt8));
+	//		break;
+	//	}
+	//	case m_invertedDiagonals:
+	//	{
+	//		memset(m_diagonals, 1, m_width * m_height * sizeof(dInt8));
+	//		break;
+	//	}
+	//
+	//	case m_alternateOddRowsDiagonals:
+	//	{
+	//		for (dInt32 j = 0; j < m_height; j += 2) {
+	//			dInt32 index = j * m_width;
+	//			for (dInt32 i = 0; i < m_width; i++) {
+	//				m_diagonals[index + i] = 0;
+	//			}
+	//		}
+	//
+	//		for (dInt32 j = 1; j < m_height; j += 2) {
+	//			dInt32 index = j * m_width;
+	//			for (dInt32 i = 0; i < m_width; i++) {
+	//				m_diagonals[index + i] = 1;
+	//			}
+	//		}
+	//		break;
+	//	}
+	//
+	//	case m_alternateEvenRowsDiagonals:
+	//	{
+	//		for (dInt32 j = 0; j < m_height; j += 2) {
+	//			dInt32 index = j * m_width;
+	//			for (dInt32 i = 0; i < m_width; i++) {
+	//				m_diagonals[index + i] = 1;
+	//			}
+	//		}
+	//
+	//		for (dInt32 j = 1; j < m_height; j += 2) {
+	//			dInt32 index = j * m_width;
+	//			for (dInt32 i = 0; i < m_width; i++) {
+	//				m_diagonals[index + i] = 0;
+	//			}
+	//		}
+	//		break;
+	//	}
+	//
+	//
+	//	case m_alternateOddColumsDiagonals:
+	//	{
+	//		for (dInt32 j = 0; j < m_height; j++) {
+	//			dInt32 index = j * m_width;
+	//			for (dInt32 i = 0; i < m_width; i += 2) {
+	//				m_diagonals[index + i] = 0;
+	//			}
+	//
+	//			for (dInt32 i = 1; i < m_width; i += 2) {
+	//				m_diagonals[index + i] = 1;
+	//			}
+	//		}
+	//		break;
+	//	}
+	//
+	//	case m_alternateEvenColumsDiagonals:
+	//	{
+	//		for (dInt32 j = 0; j < m_height; j++) {
+	//			dInt32 index = j * m_width;
+	//			for (dInt32 i = 0; i < m_width; i += 2) {
+	//				m_diagonals[index + i] = 1;
+	//			}
+	//
+	//			for (dInt32 i = 1; i < m_width; i += 2) {
+	//				m_diagonals[index + i] = 0;
+	//			}
+	//		}
+	//		break;
+	//	}
+	//
+	//	case m_starDiagonals:
+	//	{
+	//		for (dInt32 j = 0; j < m_height; j += 2) {
+	//			dInt32 index = j * m_width;
+	//			for (dInt32 i = 0; i < m_width; i += 2) {
+	//				m_diagonals[index + i] = 0;
+	//			}
+	//			for (dInt32 i = 1; i < m_width; i += 2) {
+	//				m_diagonals[index + i] = 1;
+	//			}
+	//		}
+	//
+	//		for (dInt32 j = 1; j < m_height; j += 2) {
+	//			dInt32 index = j * m_width;
+	//			for (dInt32 i = 0; i < m_width; i += 2) {
+	//				m_diagonals[index + i] = 1;
+	//			}
+	//			for (dInt32 i = 1; i < m_width; i += 2) {
+	//				m_diagonals[index + i] = 0;
+	//			}
+	//		}
+	//		break;
+	//	}
+	//
+	//	case m_starInvertexDiagonals:
+	//	{
+	//		for (dInt32 j = 0; j < m_height; j += 2) {
+	//			dInt32 index = j * m_width;
+	//			for (dInt32 i = 0; i < m_width; i += 2) {
+	//				m_diagonals[index + i] = 1;
+	//			}
+	//			for (dInt32 i = 1; i < m_width; i += 2) {
+	//				m_diagonals[index + i] = 0;
+	//			}
+	//		}
+	//
+	//		for (dInt32 j = 1; j < m_height; j += 2) {
+	//			dInt32 index = j * m_width;
+	//			for (dInt32 i = 0; i < m_width; i += 2) {
+	//				m_diagonals[index + i] = 0;
+	//			}
+	//			for (dInt32 i = 1; i < m_width; i += 2) {
+	//				m_diagonals[index + i] = 1;
+	//			}
+	//		}
+	//
+	//		break;
+	//	}
+	//
+	//	default:
+	//		dAssert(0);
+	//
+	//}
+
+	//dgTree<void*, unsigned>::dgTreeNode* nodeData = world->m_perInstanceData.Find(DG_HIGHTFIELD_DATA_ID);
+	//if (!nodeData) {
+	//	m_instanceData = (dgPerIntanceData*) new dgPerIntanceData();
+	//	m_instanceData->m_refCount = 0;
+	//	m_instanceData->m_world = world;
+	//	for (dInt32 i = 0; i < DG_MAX_THREADS_HIVE_COUNT; i++) {
+	//		m_instanceData->m_vertex[i] = NULL;
+	//		m_instanceData->m_vertexCount[i] = 0;
+	//		m_instanceData->m_vertex[i].SetAllocator(world->GetAllocator());
+	//		AllocateVertex(world, i);
+	//	}
+	//	nodeData = world->m_perInstanceData.Insert(m_instanceData, DG_HIGHTFIELD_DATA_ID);
+	//}
+	//m_instanceData = (dgPerIntanceData*)nodeData->GetInfo();
+	//m_instanceData->m_refCount++;
+	CalculateAABB();
 }
 
-ndShapeHeightfield::ndShapeHeightfield(const nd::TiXmlNode* const xmlNode, const char* const assetPath)
+//ndShapeHeightfield::ndShapeHeightfield(const nd::TiXmlNode* const xmlNode, const char* const assetPath)
+ndShapeHeightfield::ndShapeHeightfield(const nd::TiXmlNode* const, const char* const)
 	:ndShapeStaticMesh(m_heightField)
-	,m_trianglesCount(0)
 {
 	dAssert(0);
 	//D_CORE_API const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name);
@@ -83,7 +256,8 @@ ndShapeHeightfield::~ndShapeHeightfield(void)
 {
 }
 
-void ndShapeHeightfield::Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const
+//void ndShapeHeightfield::Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const
+void ndShapeHeightfield::Save(nd::TiXmlElement* const, const char* const, dInt32) const
 {
 	dAssert(0);
 	//nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeHeightfield");
@@ -108,6 +282,24 @@ ndShapeInfo ndShapeHeightfield::GetShapeInfo() const
 	//info.m_bvhCollision.m_indexCount = m_trianglesCount * 3;
 	return info;
 }
+
+void ndShapeHeightfield::CalculateAABB()
+{
+	dInt16 y0 = dInt16(0x7fff);
+	dInt16 y1 = dInt16 (-0x7fff);
+	for (dInt32 i = m_elevationMap.GetCount()-1; i >= 0; i--)
+	{
+		y0 = dMin(y0, m_elevationMap[i]);
+		y1 = dMax(y1, m_elevationMap[i]);
+	}
+
+	dVector p0 (dFloat32(dFloat32(0.0f)), dFloat32 (y0) * m_verticalScale, dFloat32(0.0f), dFloat32(0.0f));
+	dVector p1 (dFloat32(m_width - 1) * m_horizontalScale_x, dFloat32(y1) * m_verticalScale, dFloat32(m_height - 1) * m_horizontalScale_z, dFloat32(0.0f));
+
+	m_boxSize = (p1 - p0) * dVector::m_half;
+	m_boxOrigin = (p1 + p0) * dVector::m_half;
+}
+
 
 /*
 dIntersectStatus ndShapeHeightfield::GetTriangleCount(void* const context, const dFloat32* const, dInt32, const dInt32* const, dInt32 indexCount, dFloat32)
@@ -161,7 +353,8 @@ dFloat32 ndShapeHeightfield::RayHit(void* const context, const dFloat32* const p
 }
 */
 
-void ndShapeHeightfield::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+//void ndShapeHeightfield::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+void ndShapeHeightfield::DebugShape(const dMatrix&, ndShapeDebugCallback&) const
 {
 	dAssert(0);
 	//ndCollisionBVHShowPolyContext context;
@@ -174,8 +367,8 @@ void ndShapeHeightfield::DebugShape(const dMatrix& matrix, ndShapeDebugCallback&
 	//ForAllSectors(box, dVector::m_zero, dFloat32(1.0f), ShowDebugPolygon, &context);
 }
 
-
-dFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
+//dFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify&, const dVector&, const dVector&, dFloat32, const ndBody* const, ndContactPoint&) const
 {
 	dAssert(0);
 	return 0;
@@ -233,7 +426,8 @@ dIntersectStatus ndShapeHeightfield::GetPolygon(void* const context, const dFloa
 }
 */
 
-void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
+//void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
+void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const) const
 {
 	dAssert(0);
 	//data->m_me = this;
