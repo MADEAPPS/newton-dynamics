@@ -23,6 +23,7 @@
 #define __D_RAYCAST_NOTYFY_H__
 
 #include "ndCollisionStdafx.h"
+#include "ndBody.h"
 #include "ndContact.h"
 
 D_MSV_NEWTON_ALIGN_32
@@ -61,10 +62,10 @@ class ndRayCastClosestHitCallback: public ndRayCastNotify
 	{
 	}
 
-	dUnsigned32 OnRayPrecastAction(const ndBody* const, const ndShapeInstance* const)
+	dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
 	{
-		//return ((ndBody*)body)->GetAsBodyKinematic() ? 1 : 0;
-		return 1;
+		// do not let player capsule picking
+		return ((ndBody*)body)->GetAsBodyPlayerCapsule() ? 0 : 1;
 	}
 
 	dFloat32 OnRayCastAction(const ndContactPoint& contact, dFloat32 intersetParam)

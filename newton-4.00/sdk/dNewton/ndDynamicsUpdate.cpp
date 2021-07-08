@@ -531,27 +531,25 @@ void ndDynamicsUpdate::InitBodyArray()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - me->m_unConstrainedBodyCount;
-			//const dFloat32 timestep = m_timestep;
 
 			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{
-				ndBodyKinematic* const body = bodyArray[i]->GetAsBodyDynamic();
-				ndBodyDynamic* const kinBody = body->GetAsBodyDynamic();
-				if (kinBody)
+				ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
+				if (body)
 				{
-					dAssert(kinBody->m_bodyIsConstrained);
-					kinBody->UpdateInvInertiaMatrix();
-					kinBody->AddDampingAcceleration(m_timestep);
+					dAssert(body->m_bodyIsConstrained);
+					body->UpdateInvInertiaMatrix();
+					body->AddDampingAcceleration(m_timestep);
 
-					const dVector localOmega(kinBody->m_matrix.UnrotateVector(kinBody->m_omega));
-					const dVector localAngularMomentum(kinBody->m_mass * localOmega);
-					const dVector angularMomentum(kinBody->m_matrix.RotateVector(localAngularMomentum));
+					const dVector localOmega(body->m_matrix.UnrotateVector(body->m_omega));
+					const dVector localAngularMomentum(body->m_mass * localOmega);
+					const dVector angularMomentum(body->m_matrix.RotateVector(localAngularMomentum));
 
-					kinBody->m_accel = kinBody->m_veloc;
-					kinBody->m_alpha = kinBody->m_omega;
-					kinBody->m_gyroRotation = kinBody->m_rotation;
-					kinBody->m_gyroTorque = kinBody->m_omega.CrossProduct(angularMomentum);
-					kinBody->m_gyroAlpha = kinBody->m_invWorldInertiaMatrix.RotateVector(kinBody->m_gyroTorque);
+					body->m_accel = body->m_veloc;
+					body->m_alpha = body->m_omega;
+					body->m_gyroRotation = body->m_rotation;
+					body->m_gyroTorque = body->m_omega.CrossProduct(angularMomentum);
+					body->m_gyroAlpha = body->m_invWorldInertiaMatrix.RotateVector(body->m_gyroTorque);
 				}
 			}
 		}
@@ -928,23 +926,23 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 			const dArray<ndJacobian>& internalForces = me->m_internalForces;
 			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{
-				ndBodyKinematic* const body = bodyArray[i];
-				ndBodyDynamic* const dynBody = body->GetAsBodyDynamic();
-				if (dynBody)
+				//ndBodyKinematic* const kinBody = bodyArray[i];
+				ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
+				if (body)
 				{
-					dAssert(dynBody->m_bodyIsConstrained);
-					const dInt32 index = dynBody->m_index;
+					dAssert(body->m_bodyIsConstrained);
+					const dInt32 index = body->m_index;
 					const ndJacobian& forceAndTorque = internalForces[index];
-					const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
-					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
+					const dVector force(body->GetForce() + forceAndTorque.m_linear);
+					const dVector torque(body->GetTorque() + forceAndTorque.m_angular);
 
-					ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
+					ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
 
 					if (!body->m_resting)
 					{
 						body->m_veloc += velocStep.m_linear;
 						body->m_omega += velocStep.m_angular;
-						dynBody->IntegrateGyroSubstep(timestep4);
+						body->IntegrateGyroSubstep(timestep4);
 					}
 					else
 					{
@@ -1260,7 +1258,6 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 			for (dInt32 i = 0; i < count; i++)
 			{
 				ndBodyDynamic* const body = bodyIslands[i]->GetAsBodyDynamic();
-				dAssert(body);
 				if (body)
 				{
 					body->m_sleepingCounter = 0;
