@@ -229,7 +229,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	dInt32 m_currentPlugin;
 	dInt32 m_solverPasses;
 	dInt32 m_solverSubSteps;
-	dInt32 m_sceneType;
 	dInt32 m_workerThreads;
 	dInt32 m_debugDisplayMode;
 	dInt32 m_collisionDisplayMode;

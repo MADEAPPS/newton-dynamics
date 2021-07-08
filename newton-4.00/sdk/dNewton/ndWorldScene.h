@@ -40,11 +40,11 @@ class ndWorldScene: public scene
 	ndWorld* m_world;
 };
 
-class ndWorldMixedScene: public ndWorldScene<ndSceneMixed>
+class ndWorldDefaultScene: public ndWorldScene<ndScene>
 {
 	public:
-	ndWorldMixedScene(ndWorld* const world)
-		:ndWorldScene<ndSceneMixed>(world)
+	ndWorldDefaultScene(ndWorld* const world)
+		:ndWorldScene<ndScene>(world)
 	{
 	}
 
@@ -54,19 +54,19 @@ class ndWorldMixedScene: public ndWorldScene<ndSceneMixed>
 	}
 };
 
-class ndWorldSegregatedScene: public ndWorldScene<ndSceneMixed>
-{
-	public:
-		ndWorldSegregatedScene(ndWorld* const world)
-		:ndWorldScene<ndSceneMixed>(world)
-	{
-	}
-
-	void ThreadFunction()
-	{
-		m_world->ThreadFunction();
-	}
-};
+//class ndWorldSegregatedScene: public ndWorldScene<ndSceneMixed>
+//{
+//	public:
+//		ndWorldSegregatedScene(ndWorld* const world)
+//		:ndWorldScene<ndSceneMixed>(world)
+//	{
+//	}
+//
+//	void ThreadFunction()
+//	{
+//		m_world->ThreadFunction();
+//	}
+//};
 
 
 

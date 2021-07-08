@@ -111,8 +111,7 @@ ndWorld::ndWorld()
 	,m_collisionUpdate(true)
 {
 	// start the engine thread;
-	//m_scene = new ndSceneMixed();
-	m_scene = new ndWorldMixedScene(this);
+	m_scene = new ndWorldDefaultScene(this);
 	m_solver = new ndDynamicsUpdate(this);
 
 	dInt32 steps = 1;

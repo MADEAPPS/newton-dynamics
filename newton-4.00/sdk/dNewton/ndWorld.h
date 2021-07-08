@@ -195,7 +195,7 @@ class ndWorld: public dClassAlloc
 
 	friend class ndScene;
 	friend class ndDynamicsUpdate;
-	friend class ndWorldMixedScene;
+	friend class ndWorldDefaultScene;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateOpencl;

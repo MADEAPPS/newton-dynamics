@@ -36,14 +36,14 @@
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 
-//#define DEFAULT_SCENE	0		// setting basic rigidbody
+#define DEFAULT_SCENE	0		// setting basic rigidbody
 //#define DEFAULT_SCENE	1		// setting gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// setting friction ramp
 //#define DEFAULT_SCENE	3		// setting basic Stacks
 //#define DEFAULT_SCENE	4		// setting basic Trigger
 //#define DEFAULT_SCENE	5		// setting basic player
 //#define DEFAULT_SCENE	6		// setting particle fluid
-#define DEFAULT_SCENE	7		// static mesh collision 
+//#define DEFAULT_SCENE	7		// static mesh collision 
 //#define DEFAULT_SCENE	8		// setting basic joints
 //#define DEFAULT_SCENE	9		// setting basic vehicle
 //#define DEFAULT_SCENE	10		// setting heavy vehicle
@@ -139,7 +139,6 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_currentPlugin(0)
 	,m_solverPasses(4)
 	,m_solverSubSteps(2)
-	,m_sceneType(0)
 	,m_workerThreads(1)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
@@ -263,7 +262,6 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_solverMode = ndWorld::ndOpenclSolver;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
 	m_solverMode = ndWorld::ndStandardSolver;
-	//m_sceneType = 1;
 	//m_solverPasses = 4;
 	//m_workerThreads = 3;
 	//m_solverSubSteps = 2;
@@ -740,10 +738,6 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::SliderInt("##intera", &m_solverPasses, 4, 64);
 			ImGui::Text("worker threads");
 			ImGui::SliderInt("##worker", &m_workerThreads, 1, D_MAX_THREADS_COUNT);
-			ImGui::Separator();
-
-			ImGui::RadioButton("default broad phase", &m_sceneType, 0);
-			ImGui::RadioButton("persistence broad phase", &m_sceneType, 1);
 			ImGui::Separator();
 
 			ImGui::RadioButton("hide collision Mesh", &m_collisionDisplayMode, 0);

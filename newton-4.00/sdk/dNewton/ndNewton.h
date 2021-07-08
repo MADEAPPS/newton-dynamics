@@ -43,7 +43,6 @@
 #include <ndConstraint.h>
 #include <ndJointHinge.h>
 #include <ndBodyNotify.h>
-#include <ndSceneMixed.h>
 #include <ndJointWheel.h>
 #include <ndJointSlider.h>
 #include <ndJointPulley.h>

@@ -109,23 +109,25 @@ class ndScene
 	D_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
 	D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
 
-	D_COLLISION_API virtual void Cleanup() = 0;
+	D_COLLISION_API virtual void Cleanup();
 	D_COLLISION_API void Update(dFloat32 timestep);
 
 	D_COLLISION_API ndContactNotify* GetContactNotify() const;
 	D_COLLISION_API void SetContactNotify(ndContactNotify* const notify);
 
-	virtual void DebugScene(ndSceneTreeNotiFy* const notify) = 0;
+	D_COLLISION_API virtual void DebugScene(ndSceneTreeNotiFy* const notify);
 
-	virtual void BodiesInAabb(ndBodiesInAabbNotify& callback) const = 0;
-	virtual bool RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const = 0;
-	virtual bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const = 0;
+	virtual void BodiesInAabb(ndBodiesInAabbNotify& callback) const;
+	virtual bool RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const;
+	virtual bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const;
 
 	private:
 	bool ValidateContactCache(ndContact* const contact, const dVector& timestep) const;
 	dFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, dVector& minBox, dVector& maxBox) const;
 
-	virtual void FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body, bool oneWay) = 0;
+	D_COLLISION_API virtual void FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body, bool oneWay);
+	D_COLLISION_API void AddNode(ndSceneNode* const newNode);
+	D_COLLISION_API void RemoveNode(ndSceneNode* const newNode);
 
 	D_COLLISION_API virtual void UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body);
 	D_COLLISION_API virtual void UpdateTransformNotify(dInt32 threadIndex, ndBodyKinematic* const body);
@@ -156,8 +158,8 @@ class ndScene
 	D_COLLISION_API void DeleteDeadContact();
 	D_COLLISION_API void FindCollidingPairs();
 
+	D_COLLISION_API virtual void BalanceScene();
 	D_COLLISION_API virtual void ThreadFunction();
-	virtual void BalanceScene() = 0;
 
 	D_COLLISION_API ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
 	void UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndSceneNode** const root);
@@ -174,7 +176,11 @@ class ndScene
 	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, dInt32 stack) const;
 	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const;
 	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const;
+
+	private:
 	
+
+	protected:
 	ndBodyList m_bodyList;
 	ndContactList m_contactList;
 	dArray<ndBodyKinematic*> m_activeBodyArray;
@@ -182,9 +188,13 @@ class ndScene
 	dSpinLock m_contactLock;
 	ndSceneNode* m_rootNode;
 	ndContactNotify* m_contactNotifyCallback;
+	dFloat64 m_treeEntropy;
+	ndFitnessList m_fitness;
 	dFloat32 m_timestep;
 	dUnsigned32 m_sleepBodies;
 	dUnsigned32 m_lru;
+
+
 	bool m_fullScan;
 
 	static dVector m_velocTol;

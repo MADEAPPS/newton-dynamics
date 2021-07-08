@@ -39,7 +39,6 @@
 #include <ndShapeCone.h>
 #include <ndSceneNode.h>
 #include <ndJointList.h>
-#include <ndSceneMixed.h>
 #include <ndConstraint.h>
 #include <ndBodyNotify.h>
 #include <ndMeshEffect.h>
