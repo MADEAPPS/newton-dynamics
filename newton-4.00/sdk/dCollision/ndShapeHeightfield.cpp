@@ -83,7 +83,7 @@ ndShapeHeightfield::~ndShapeHeightfield(void)
 {
 }
 
-D_COLLISION_API void ndShapeHeightfield::Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const
+void ndShapeHeightfield::Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const
 {
 	dAssert(0);
 	//nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeHeightfield");

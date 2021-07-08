@@ -379,7 +379,7 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	BuildDoubleHinge(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 100.0f, 0.75f);
 
 	AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
-	//BuildRollingFriction(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
+	BuildRollingFriction(scene, dVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
 	
 	dQuaternion rot;
 	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
