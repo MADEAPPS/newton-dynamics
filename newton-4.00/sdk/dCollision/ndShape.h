@@ -40,6 +40,7 @@ class ndRayCastNotify;
 class ndShapeInstance;
 class ndShapeStaticBVH;
 class ndShapeStaticMesh;
+class ndShapeHeightfield;
 class ndShapeConvexPolygon;
 class ndShapeDebugCallback;
 class ndShapeCompoundConvex;
@@ -63,9 +64,10 @@ enum ndShapeID
 	// special and non convex collisions.
 	m_pointCollision,
 	m_nullCollision,
-	m_boundingBoxHierachy,
+	m_heightField,
 	m_compoundConvex,
-	//m_heightField,
+	m_boundingBoxHierachy,
+	
 	//m_deformableClothPatch,
 	//m_deformableSolidMesh,
 	//m_userMesh,
@@ -240,6 +242,7 @@ class ndShape: public dClassAlloc
 	virtual ndShapeCapsule* GetAsShapeCapsule() { return nullptr; }
 	virtual ndShapeCylinder* GetAsShapeCylinder() { return nullptr; }
 	virtual ndShapeStaticBVH* GetAsShapeStaticBVH() { return nullptr; }
+	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return nullptr; }
 	virtual ndShapeStaticMesh* GetAsShapeStaticMeshShape() { return nullptr; }
 	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon() { return nullptr; }
 	virtual ndShapeCompoundConvex* GetAsShapeCompoundConvex() { return nullptr; }

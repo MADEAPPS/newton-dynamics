@@ -26,12 +26,31 @@
 #include "ndShapeInstance.h"
 #include "ndShapeStaticBVH.h"
 
-struct dgCollisionBVHShowPolyContext
+class ndCollisionBVHShowPolyContext
 {
+	public:
 	dMatrix m_matrix;
 	void* m_userData;
 	ndShapeDebugCallback* m_callback;
 };
+
+D_MSV_NEWTON_ALIGN_32 
+class ndBvhRay: public dFastRayTest 
+{
+	public:
+	ndBvhRay(const dVector& l0, const dVector& l1)
+		:dFastRayTest (l0, l1)
+	{
+	}
+
+	dMatrix m_matrix;
+	dVector m_normal;
+	dUnsigned32 m_id;
+	dFloat32 m_t;
+	ndRayCastNotify* m_callback;
+	const ndBodyKinematic* m_myBody;
+	const ndShapeStaticBVH* m_me;
+} D_GCC_NEWTON_ALIGN_32;
 
 ndShapeStaticBVH::ndShapeStaticBVH(const dPolygonSoupBuilder& builder)
 	:ndShapeStaticMesh(m_boundingBoxHierachy)
@@ -90,7 +109,7 @@ ndShapeStaticBVH::~ndShapeStaticBVH(void)
 {
 }
 
-D_COLLISION_API void ndShapeStaticBVH::Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const
+void ndShapeStaticBVH::Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeStaticBVH");
 	xmlNode->LinkEndChild(paramNode);
@@ -135,7 +154,7 @@ dIntersectStatus ndShapeStaticBVH::ShowDebugPolygon(void* const context, const d
 
 	dInt32 stride = dInt32(strideInBytes / sizeof(dFloat32));
 
-	dgCollisionBVHShowPolyContext& data = *(dgCollisionBVHShowPolyContext*)context;
+	ndCollisionBVHShowPolyContext& data = *(ndCollisionBVHShowPolyContext*)context;
 	for (dInt32 i = 0; i < indexCount; i++) 
 	{
 		dVector p(&polygon[indexArray[i] * stride]);
@@ -150,7 +169,7 @@ dIntersectStatus ndShapeStaticBVH::ShowDebugPolygon(void* const context, const d
 
 void ndShapeStaticBVH::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
-	dgCollisionBVHShowPolyContext context;
+	ndCollisionBVHShowPolyContext context;
 
 	context.m_matrix = matrix;
 	context.m_userData = (void*)this;

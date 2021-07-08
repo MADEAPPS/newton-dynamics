@@ -58,6 +58,7 @@
 #include <ndContactOptions.h>
 #include <ndShapeConvexHull.h>
 #include <ndShapeStaticMesh.h>
+#include <ndShapeHeightfield.h>
 #include <ndConvexCastNotify.h>
 #include <ndBodyPlayerCapsule.h>
 #include <ndBodyTriggerVolume.h>

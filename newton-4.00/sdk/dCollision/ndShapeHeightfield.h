@@ -19,30 +19,30 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_SHAPE_STATIC_BVH__
-#define __D_SHAPE_STATIC_BVH__
+#ifndef __D_SHAPE_HEIGHT_FIELD__
+#define __D_SHAPE_HEIGHT_FIELD__
 
 #include "ndCollisionStdafx.h"
 #include "ndShapeStaticMesh.h"
 
-class ndShapeStaticBVH: public ndShapeStaticMesh, public dAabbPolygonSoup
+class ndShapeHeightfield: public ndShapeStaticMesh
 {
 	public:
-	D_COLLISION_API ndShapeStaticBVH(const dPolygonSoupBuilder& builder);
-	D_COLLISION_API ndShapeStaticBVH(const nd::TiXmlNode* const xmlNode, const char* const assetPath);
-	D_COLLISION_API virtual ~ndShapeStaticBVH();
+	D_COLLISION_API ndShapeHeightfield();
+	D_COLLISION_API ndShapeHeightfield(const nd::TiXmlNode* const xmlNode, const char* const assetPath);
+	D_COLLISION_API virtual ~ndShapeHeightfield();
 
 	protected:
 	virtual ndShapeInfo GetShapeInfo() const;
-	virtual ndShapeStaticBVH* GetAsShapeStaticBVH() { return this; }
+	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return this; }
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
 	
-	static dFloat32 RayHit(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount);
-	static dIntersectStatus ShowDebugPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
-	static dIntersectStatus GetTriangleCount(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
-	static dIntersectStatus GetPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
+	//static dFloat32 RayHit(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount);
+	//static dIntersectStatus ShowDebugPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
+	//static dIntersectStatus GetTriangleCount(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
+	//static dIntersectStatus GetPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 
 	private: 
 	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
