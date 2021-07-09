@@ -10,12 +10,13 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndTargaToOpenGl.h"
 #include "ndDemoMesh.h"
-#include "ndDemoEntityManager.h"
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndDebugDisplay.h"
+#include "ndPhysicsWorld.h"
+#include "ndTargaToOpenGl.h"
+#include "ndDemoEntityManager.h"
 #include "ndHeightFieldPrimitive.h"
 
 //#define D_TERRAIN_WIDTH			1024 * 4
@@ -183,9 +184,7 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_y = -30.0f;
 
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	scene->AddEntity(entity);
 	entity->SetMesh(mesh, dGetIdentityMatrix());
-	mesh->Release();
 
 	// create the height field collision and rigid body
 	ndShapeInstance heighfieldInstance(new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,
@@ -227,54 +226,16 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene)
 	entMatrix.m_posit.m_w = 1.0f;
 
 	//SetMatrix (matrix);
-	entity->ResetMatrix (entMatrix);
-/*
-	// create the terrainBody rigid body
-	NewtonBody* const terrainBody = NewtonCreateDynamicBody(scene->GetWorld(), collision, &matrix[0][0]);
+	//entity->ResetMatrix (entMatrix);
 
-	// release the collision tree (this way the application does not have to do book keeping of Newton objects
-	NewtonDestroyCollision (collision);
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(heighfieldInstance);
 
-	// in newton 300 collision are instance, you need to ready it after you create a body, if you want to male call on the instance
-	collision = NewtonBodyGetCollision(terrainBody);
-	#if 0
-	// uncomment this to test horizontal displacement
-	unsigned short* const horizontalDisplacemnet = new unsigned short[size * size];
-	for (dInt32 i = 0; i < size * size; i++) {
-	horizontalDisplacemnet[i] = dRand();
-	}
-	NewtonHeightFieldSetHorizontalDisplacement(collision, horizontalDisplacemnet, 0.02f);
-	delete horizontalDisplacemnet;
-	#endif
-
-	// save the pointer to the graphic object with the body.
-	NewtonBodySetUserData (terrainBody, entity);
-
-	// set the global position of this body
-	//	NewtonBodySetMatrix (m_terrainBody, &matrix[0][0]);
-
-	// set the destructor for this object
-	//NewtonBodySetDestructorCallback (terrainBody, Destructor);
-
-	// get the position of the aabb of this geometry
-	//NewtonCollisionCalculateAABB (collision, &matrix[0][0], &boxP0.m_x, &boxP1.m_x);
-
-	#ifdef USE_TEST_ALL_FACE_USER_RAYCAST_CALLBACK
-	// set a ray cast callback for all face ray cast
-	NewtonTreeCollisionSetUserRayCastCallback (collision, AllRayHitCallback);
-
-	dVector p0 (0,  100, 0, 0);
-	dVector p1 (0, -100, 0, 0);
-	dVector normal;
-	dLong id;
-	dFloat32 parameter;
-	parameter = NewtonCollisionRayCast (collision, &p0[0], &p1[0], &normal[0], &id);
-	#endif
-
-	delete[] attibutes;
-	delete[] elevation;
-	return terrainBody;
-	*/
-
-	return nullptr;
+	world->AddBody(body);
+	scene->AddEntity(entity);
+	mesh->Release();
+	return body;
 }

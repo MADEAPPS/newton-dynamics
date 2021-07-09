@@ -77,6 +77,8 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	dInt32 m_height;
 	ndGridConstruction m_diagonalMode;
 
+	static dInt32 m_cellIndices[][4];
+
 	friend class ndContactSolver;
 };
 

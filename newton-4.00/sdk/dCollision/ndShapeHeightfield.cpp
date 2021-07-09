@@ -26,6 +26,12 @@
 #include "ndShapeInstance.h"
 #include "ndShapeHeightfield.h"
 
+dInt32 ndShapeHeightfield::m_cellIndices[][4] =
+{
+	{ 0, 1, 2, 3 },
+	{ 1, 3, 0, 2 }
+};
+
 ndShapeHeightfield::ndShapeHeightfield(
 	dInt32 width, dInt32 height, ndGridConstruction constructionMode,
 	dFloat32 verticalScale, dFloat32 horizontalScale_x, dFloat32 horizontalScale_z)
@@ -360,18 +366,53 @@ dFloat32 ndShapeHeightfield::RayHit(void* const context, const dFloat32* const p
 }
 */
 
-//void ndShapeHeightfield::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
-void ndShapeHeightfield::DebugShape(const dMatrix&, ndShapeDebugCallback&) const
+void ndShapeHeightfield::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
-	dAssert(0);
-	//ndCollisionBVHShowPolyContext context;
-	//
-	//context.m_matrix = matrix;
-	//context.m_userData = (void*)this;
-	//context.m_callback = &debugCallback;
-	//
-	//dFastAabbInfo box(dGetIdentityMatrix(), dVector(1.0e15f));
-	//ForAllSectors(box, dVector::m_zero, dFloat32(1.0f), ShowDebugPolygon, &context);
+	dVector points[4];
+	dVector triangle[3];
+
+	ndShapeDebugCallback::ndEdgeType edgeType[4];
+	memset(edgeType, ndShapeDebugCallback::m_shared, sizeof(edgeType));
+
+	//const dInt32* const indirectIndex = &m_cellIndices[dInt32(m_diagonals[z * m_width + x])][0];
+	const dInt32* const indirectIndex = &m_cellIndices[(m_diagonalMode == m_normalDiagonals) ? 0 : 1][0];
+	const dInt32 i0 = indirectIndex[0];
+	const dInt32 i1 = indirectIndex[1];
+	const dInt32 i2 = indirectIndex[2];
+	const dInt32 i3 = indirectIndex[3];
+
+	dInt32 base = 0;
+	for (dInt32 z = 0; z < m_height - 1; z++) 
+	{
+		const dVector p0 ((0 + 0) * m_horizontalScale_x, m_verticalScale * dFloat32(m_elevationMap[base + 0]),               (z + 0) * m_horizontalScale_z, dFloat32(0.0f));
+		const dVector p1 ((0 + 0) * m_horizontalScale_x, m_verticalScale * dFloat32(m_elevationMap[base + 0 + m_width + 0]), (z + 1) * m_horizontalScale_z, dFloat32(0.0f));
+
+		points[0 * 2 + 0] = matrix.TransformVector(p0);
+		points[1 * 2 + 0] = matrix.TransformVector(p1);
+
+		for (dInt32 x = 0; x < m_width - 1; x++) 
+		{
+			const dVector p2 ((x + 1) * m_horizontalScale_x, m_verticalScale * dFloat32(m_elevationMap[base + x + 1]),			(z + 0) * m_horizontalScale_z, dFloat32(0.0f));
+			const dVector p3 ((x + 1) * m_horizontalScale_x, m_verticalScale * dFloat32(m_elevationMap[base + x + m_width + 1]), (z + 1) * m_horizontalScale_z, dFloat32(0.0f));
+
+			points[0 * 2 + 1] = matrix.TransformVector(p2);
+			points[1 * 2 + 1] = matrix.TransformVector(p3);
+
+			triangle[0] = points[i1];
+			triangle[1] = points[i0];
+			triangle[2] = points[i2];
+			debugCallback.DrawPolygon(3, triangle, edgeType);
+
+			triangle[0] = points[i1];
+			triangle[1] = points[i2];
+			triangle[2] = points[i3];
+			debugCallback.DrawPolygon(3, triangle, edgeType);
+
+			points[0 * 2 + 0] = points[0 * 2 + 1];
+			points[1 * 2 + 0] = points[1 * 2 + 1];
+		}
+		base += m_width;
+	}
 }
 
 //dFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
