@@ -188,40 +188,47 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene)
 	mesh->Release();
 
 	// create the height field collision and rigid body
+	ndShapeInstance heighfieldInstance(new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,
+		ndShapeHeightfield::m_invertedDiagonals,
+		1.0f / 100.0f, D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
 
-	// create the attribute map
-	//dInt32 width = size;
-	//dInt32 height = size;
-	//char* const attibutes = new char [D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT];
-	dArray<char> attibutes;
-	attibutes.SetCount(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
-	memset (&attibutes[0], 0, attibutes.GetCount() * sizeof (char));
-	//NewtonCollision* collision = NewtonCreateHeightFieldCollision (scene->GetWorld(), width, height, 1, 0, elevation, attibutes, 1.0f, cellSize, cellSize, 0);
+	//#ifdef USE_STATIC_MESHES_DEBUG_COLLISION
+	//NewtonStaticCollisionSetDebugCallback (collision, ShowMeshCollidingFaces);
+	//#endif
 
-/*
-	#ifdef USE_STATIC_MESHES_DEBUG_COLLISION
-	NewtonStaticCollisionSetDebugCallback (collision, ShowMeshCollidingFaces);
-	#endif
+	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
+	dArray<dInt16>& hightMap = shape->GetElevationMap();
+	dAssert(hightMap.GetCount() == heightfield.GetCount());
+	//ndShapeInfo hightInfo(heighfieldInstance.GetShapeInfo());
+	//dInt16* const highMap = hightInfo.m_heightfield.m_elevation;
+	for (int i = 0; i < heightfield.GetCount(); i++)
+	{
+		dFloat32 high = heightfield[i].m_y * 100.0f;
+		dAssert(high < dFloat32(1 << 15));
+		dAssert(high > dFloat32(-1 << 15));
+		hightMap[i] = dInt16(high);
+	}
 
-	NewtonCollisionInfoRecord collisionInfo;
-	// keep the compiler happy
-	memset (&collisionInfo, 0, sizeof (NewtonCollisionInfoRecord));
-	NewtonCollisionGetInfo (collision, &collisionInfo);
+	shape->UpdateElevationMapAabb();
 
-	width = collisionInfo.m_heightField.m_width;
-	height = collisionInfo.m_heightField.m_height;
+	//width = collisionInfo.m_heightField.m_width;
+	//height = collisionInfo.m_heightField.m_height;
 	//elevations = collisionInfo.m_heightField.m_elevation;
 
 	dVector boxP0;
 	dVector boxP1;
 	// get the position of the aabb of this geometry
-	dMatrix matrix (entity->GetCurrentMatrix());
-	NewtonCollisionCalculateAABB (collision, &matrix[0][0], &boxP0.m_x, &boxP1.m_x);
-	matrix.m_posit = (boxP0 + boxP1).Scale (-0.5f);
-	matrix.m_posit.m_w = 1.0f;
-	//SetMatrix (matrix);
-	entity->ResetMatrix (*scene, matrix);
+	dMatrix entMatrix (entity->GetCurrentMatrix());
 
+	//NewtonCollisionCalculateAABB (collision, &matrix[0][0], &boxP0.m_x, &boxP1.m_x);
+	heighfieldInstance.CalculateAABB(entMatrix, boxP0, boxP1);
+
+	entMatrix.m_posit = (boxP0 + boxP1).Scale (-0.5f);
+	entMatrix.m_posit.m_w = 1.0f;
+
+	//SetMatrix (matrix);
+	entity->ResetMatrix (entMatrix);
+/*
 	// create the terrainBody rigid body
 	NewtonBody* const terrainBody = NewtonCreateDynamicBody(scene->GetWorld(), collision, &matrix[0][0]);
 

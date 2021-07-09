@@ -38,11 +38,9 @@ ndShapeHeightfield::ndShapeHeightfield(
 	,m_width(width)
 	,m_height(height)
 	,m_diagonalMode(constructionMode)
-	//,m_trianglesCount(0)
 {
 	dAssert(width >= 2);
 	dAssert(height >= 2);
-	dAssert(0);
 	m_atributeMap.SetCount(width * height);
 	m_elevationMap.SetCount(width * height);
 
@@ -277,9 +275,15 @@ ndShapeInfo ndShapeHeightfield::GetShapeInfo() const
 {
 	ndShapeInfo info(ndShapeStaticMesh::GetShapeInfo());
 
-	dAssert(0);
-	//info.m_bvhCollision.m_vertexCount = GetVertexCount();
-	//info.m_bvhCollision.m_indexCount = m_trianglesCount * 3;
+	info.m_heightfield.m_width = m_width;
+	info.m_heightfield.m_height = m_height;
+	info.m_heightfield.m_gridsDiagonals = m_diagonalMode;
+	info.m_heightfield.m_verticalScale = m_verticalScale;
+	info.m_heightfield.m_horizonalScale_x = m_horizontalScale_x;
+	info.m_heightfield.m_horizonalScale_z = m_horizontalScale_z;
+	info.m_heightfield.m_elevation = (dInt16*)&m_elevationMap[0];
+	info.m_heightfield.m_atributes = (dInt8*)&m_atributeMap[0];
+
 	return info;
 }
 
@@ -294,13 +298,16 @@ void ndShapeHeightfield::CalculateAABB()
 	}
 
 	dVector p0 (dFloat32(dFloat32(0.0f)), dFloat32 (y0) * m_verticalScale, dFloat32(0.0f), dFloat32(0.0f));
-	dVector p1 (dFloat32(m_width - 1) * m_horizontalScale_x, dFloat32(y1) * m_verticalScale, dFloat32(m_height - 1) * m_horizontalScale_z, dFloat32(0.0f));
+	dVector p1 (dFloat32(m_width) * m_horizontalScale_x, dFloat32(y1) * m_verticalScale, dFloat32(m_height) * m_horizontalScale_z, dFloat32(0.0f));
 
 	m_boxSize = (p1 - p0) * dVector::m_half;
 	m_boxOrigin = (p1 + p0) * dVector::m_half;
 }
 
-
+void ndShapeHeightfield::UpdateElevationMapAabb()
+{
+	CalculateAABB();
+}
 /*
 dIntersectStatus ndShapeHeightfield::GetTriangleCount(void* const context, const dFloat32* const, dInt32, const dInt32* const, dInt32 indexCount, dFloat32)
 {

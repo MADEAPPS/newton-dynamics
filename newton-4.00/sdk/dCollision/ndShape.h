@@ -105,50 +105,50 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeInfo
 {
 	public:
-	struct dgBoxData
+	struct ndBoxInfo
 	{
 		dFloat32 m_x;
 		dFloat32 m_y;
 		dFloat32 m_z;
 	};
 
-	struct dgPointData
+	struct ndPointInfo
 	{
 		dFloat32 m_noUsed;
 	};
 
-	struct dgSphereData
+	struct ndSphereInfo
 	{
 		dFloat32 m_radius;
 	};
 
-	struct dgCylinderData
+	struct ndCylinderInfo
 	{
 		dFloat32 m_radio0;
 		dFloat32 m_radio1;
 		dFloat32 m_height;
 	};
 
-	struct dgCapsuleData
+	struct ndCapsuleInfo
 	{
 		dFloat32 m_radio0;
 		dFloat32 m_radio1;
 		dFloat32 m_height;
 	};
 
-	struct dgConeData
+	struct ndConeInfo
 	{
 		dFloat32 m_radius;
 		dFloat32 m_height;
 	};
 
-	struct dgChamferCylinderData
+	struct ndChamferCylinderInfo
 	{
 		dFloat32 m_r;
 		dFloat32 m_height;
 	};
 
-	struct dgConvexHullData
+	struct ndConvexHullInfo
 	{
 		dInt32 m_vertexCount;
 		dInt32 m_strideInBytes;
@@ -156,48 +156,28 @@ class ndShapeInfo
 		dVector* m_vertex;
 	};
 
-	struct dgConvexModifierData
-	{
-		ndShape* m_child;
-	};
-
-	struct dgCoumpountCollisionData
+	struct ndCoumpoundInfo
 	{
 		dInt32 m_chidrenCount;
 		//dgCollision** m_chidren;
 	};
 
-	struct dgCollisionBvhData
+	struct ndCollisionBvhInfo
 	{
 		dInt32 m_vertexCount;
 		dInt32 m_indexCount;
 	};
 
-	struct dgDeformableMeshData
-	{
-		dInt32 m_vertexCount;
-		dInt32 m_triangleCount;
-		dInt32 m_vertexStrideInBytes;
-		dUnsigned16* m_indexList;
-		dFloat32* m_vertexList;
-	};
-
-	struct dgHeightMapCollisionData
+	struct ndHeighfieldInfo
 	{
 		dInt32 m_width;
 		dInt32 m_height;
 		dInt32 m_gridsDiagonals;
-		dInt32 m_elevationDataType;		// 0 = 32 bit floats, 1 = unsigned 16 bit intergers
 		dFloat32 m_verticalScale;
 		dFloat32 m_horizonalScale_x;
 		dFloat32 m_horizonalScale_z;
-		void* m_elevation;
+		dInt16* m_elevation;
 		dInt8* m_atributes;
-	};
-
-	struct dgSceneData
-	{
-		dInt32 m_childrenProxyCount;
 	};
 
 	dMatrix m_offsetMatrix;
@@ -206,20 +186,18 @@ class ndShapeInfo
 	ndShapeID m_collisionType;
 	union
 	{
-		dgBoxData m_box;
-		dgConeData m_cone;
-		dgPointData m_point;
-		dgSphereData m_sphere;
-		dgCapsuleData m_capsule;
-		dgCylinderData m_cylinder;
-		dgChamferCylinderData m_chamferCylinder;
-		dgConvexHullData m_convexHull;
-		dgDeformableMeshData m_deformableMesh;
-		dgConvexModifierData m_convexModifierData;
-		dgCoumpountCollisionData m_compoundCollision;
-		dgCollisionBvhData m_bvhCollision;
-		dgHeightMapCollisionData m_heightFieldCollision;
-		dgSceneData m_sceneCollision;
+		ndBoxInfo m_box;
+		ndConeInfo m_cone;
+		ndPointInfo m_point;
+		ndSphereInfo m_sphere;
+		ndCapsuleInfo m_capsule;
+		ndCollisionBvhInfo m_bvh;
+		ndCylinderInfo m_cylinder;
+		ndCoumpoundInfo m_compound;
+		ndConvexHullInfo m_convexhull;
+		ndHeighfieldInfo m_heightfield;
+		ndChamferCylinderInfo m_chamferCylinder;
+		
 		dFloat32 m_paramArray[32];
 	};
 } D_GCC_NEWTON_ALIGN_32;

@@ -926,10 +926,10 @@ ndShapeInfo ndShapeConvexHull::GetShapeInfo() const
 {
 	ndShapeInfo info(ndShapeConvex::GetShapeInfo());
 
-	info.m_convexHull.m_vertexCount = m_vertexCount;
-	info.m_convexHull.m_strideInBytes = sizeof(dVector);
-	info.m_convexHull.m_faceCount = m_faceCount;
-	info.m_convexHull.m_vertex = &m_vertex[0];
+	info.m_convexhull.m_vertexCount = m_vertexCount;
+	info.m_convexhull.m_strideInBytes = sizeof(dVector);
+	info.m_convexhull.m_faceCount = m_faceCount;
+	info.m_convexhull.m_vertex = &m_vertex[0];
 	return info;
 }
 

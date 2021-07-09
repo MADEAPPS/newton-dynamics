@@ -32,12 +32,12 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	{
 		m_normalDiagonals = 0,
 		m_invertedDiagonals,
-		m_alternateOddRowsDiagonals,
-		m_alternateEvenRowsDiagonals,
-		m_alternateOddColumsDiagonals,
-		m_alternateEvenColumsDiagonals,
-		m_starDiagonals,
-		m_starInvertexDiagonals,
+		//m_alternateOddRowsDiagonals,
+		//m_alternateEvenRowsDiagonals,
+		//m_alternateOddColumsDiagonals,
+		//m_alternateEvenColumsDiagonals,
+		//m_starDiagonals,
+		//m_starInvertexDiagonals,
 	};
 
 	D_COLLISION_API ndShapeHeightfield(
@@ -46,6 +46,11 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 
 	D_COLLISION_API ndShapeHeightfield(const nd::TiXmlNode* const xmlNode, const char* const assetPath);
 	D_COLLISION_API virtual ~ndShapeHeightfield();
+
+	dArray<dInt16>& GetElevationMap();
+	const dArray<dInt16>& GetElevationMap() const;
+	D_COLLISION_API void UpdateElevationMapAabb();
+	
 
 	protected:
 	virtual ndShapeInfo GetShapeInfo() const;
@@ -74,6 +79,16 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 
 	friend class ndContactSolver;
 };
+
+inline dArray<dInt16>& ndShapeHeightfield::GetElevationMap()
+{
+	return m_elevationMap;
+}
+
+inline const dArray<dInt16>& ndShapeHeightfield::GetElevationMap() const
+{
+	return m_elevationMap;
+}
 
 
 #endif

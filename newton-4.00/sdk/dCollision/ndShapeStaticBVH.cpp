@@ -142,8 +142,8 @@ ndShapeInfo ndShapeStaticBVH::GetShapeInfo() const
 {
 	ndShapeInfo info(ndShapeStaticMesh::GetShapeInfo());
 
-	info.m_bvhCollision.m_vertexCount = GetVertexCount();
-	info.m_bvhCollision.m_indexCount = m_trianglesCount * 3;
+	info.m_bvh.m_vertexCount = GetVertexCount();
+	info.m_bvh.m_indexCount = m_trianglesCount * 3;
 	return info;
 }
 
