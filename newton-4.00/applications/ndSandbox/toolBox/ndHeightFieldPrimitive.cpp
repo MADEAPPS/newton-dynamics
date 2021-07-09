@@ -31,7 +31,8 @@
 #define D_TERRAIN_NOISE_GRID_SCALE  (1.0f / 500.0f)
 
 #define D_TERRAIN_GRID_SIZE			4.0f
-#define D_TERRAIN_ELEVATION_SCALE	150.0f
+//#define D_TERRAIN_ELEVATION_SCALE	150.0f
+#define D_TERRAIN_ELEVATION_SCALE	64.0f
 
 #define D_TERRAIN_TILE_SIZE			128
 
@@ -181,7 +182,7 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene)
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_z = -200.0f;
 	matrix.m_posit.m_x = -200.0f;
-	matrix.m_posit.m_y = -30.0f;
+	matrix.m_posit.m_y = 0.0f;
 
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(mesh, dGetIdentityMatrix());
@@ -190,10 +191,6 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene)
 	ndShapeInstance heighfieldInstance(new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,
 		ndShapeHeightfield::m_invertedDiagonals,
 		1.0f / 100.0f, D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
-
-	//#ifdef USE_STATIC_MESHES_DEBUG_COLLISION
-	//NewtonStaticCollisionSetDebugCallback (collision, ShowMeshCollidingFaces);
-	//#endif
 
 	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
 	dArray<dInt16>& hightMap = shape->GetElevationMap();
@@ -209,10 +206,6 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene)
 	}
 
 	shape->UpdateElevationMapAabb();
-
-	//width = collisionInfo.m_heightField.m_width;
-	//height = collisionInfo.m_heightField.m_height;
-	//elevations = collisionInfo.m_heightField.m_elevation;
 
 	dVector boxP0;
 	dVector boxP1;

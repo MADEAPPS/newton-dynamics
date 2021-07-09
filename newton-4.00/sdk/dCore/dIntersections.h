@@ -268,13 +268,27 @@ class dFastAabbInfo : public dMatrix
 		dAssert(m_posit.m_w == dFloat32(1.0f));
 	}
 
+	D_INLINE const dVector& GetOrigin() const
+	{
+		return m_p0;
+	}
+
+	D_INLINE const dVector& GetTarget() const
+	{
+		return m_p1;
+	}
+
+	D_INLINE void SetSeparatingDistance(const dFloat32 distance)
+	{
+		m_separationDistance = distance;
+	}
+
 	D_INLINE void SetTransposeAbsMatrix (const dMatrix& matrix)
 	{
 		m_absDir = matrix.Transpose();
 		m_absDir[0] = m_absDir[0].Abs();
 		m_absDir[1] = m_absDir[1].Abs();
 		m_absDir[2] = m_absDir[2].Abs();
-		//m_absDir[3] = dVector::m_wOne;
 	}
 
 	D_INLINE dFloat32 PolygonBoxRayDistance (const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, const dFastRayTest& ray) const

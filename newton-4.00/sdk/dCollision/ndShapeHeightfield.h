@@ -32,12 +32,6 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	{
 		m_normalDiagonals = 0,
 		m_invertedDiagonals,
-		//m_alternateOddRowsDiagonals,
-		//m_alternateEvenRowsDiagonals,
-		//m_alternateOddColumsDiagonals,
-		//m_alternateEvenColumsDiagonals,
-		//m_starDiagonals,
-		//m_starInvertexDiagonals,
 	};
 
 	D_COLLISION_API ndShapeHeightfield(
@@ -50,7 +44,6 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	dArray<dInt16>& GetElevationMap();
 	const dArray<dInt16>& GetElevationMap() const;
 	D_COLLISION_API void UpdateElevationMapAabb();
-	
 
 	protected:
 	virtual ndShapeInfo GetShapeInfo() const;
@@ -66,11 +59,25 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	//static dIntersectStatus GetPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 
 	private: 
+	class ndLocalThreadData
+	{
+		public:
+		ndLocalThreadData()
+			:m_threadId()
+		{
+		}
+
+		dArray<dVector> m_vertex;
+		std::thread::id m_threadId;
+	};
+
 	void CalculateAABB();
 	dInt32 FastInt(dFloat32 x) const;
 	const dInt32* GetIndexList() const;
 	void CalculateMinExtend2d(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
+	void CalculateMinExtend3d(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
 	dFloat32 RayCastCell(const dFastRayTest& ray, dInt32 xIndex0, dInt32 zIndex0, dVector& normalOut, dFloat32 maxT) const;
+	void CalculateMinAndMaxElevation(dInt32 x0, dInt32 x1, dInt32 z0, dInt32 z1, dFloat32& minHeight, dFloat32& maxHeight) const;
 
 	dVector m_minBox;
 	dVector m_maxBox;
@@ -84,11 +91,15 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	dInt32 m_width;
 	dInt32 m_height;
 	ndGridConstruction m_diagonalMode;
+	mutable dList<ndLocalThreadData> m_localData;
 
 	static dVector m_yMask;
 	static dVector m_padding;
 	static dVector m_elevationPadding;
 	static dInt32 m_cellIndices[][4];
+	static dInt32 m_verticalEdgeMap[][7];
+	static dInt32 m_horizontalEdgeMap[][7];
+
 
 	friend class ndContactSolver;
 };
