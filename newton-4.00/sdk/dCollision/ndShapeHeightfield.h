@@ -67,16 +67,27 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 
 	private: 
 	void CalculateAABB();
+	dInt32 FastInt(dFloat32 x) const;
+	const dInt32* GetIndexList() const;
+	void CalculateMinExtend2d(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
+	dFloat32 RayCastCell(const dFastRayTest& ray, dInt32 xIndex0, dInt32 zIndex0, dVector& normalOut, dFloat32 maxT) const;
 
+	dVector m_minBox;
+	dVector m_maxBox;
 	dArray<dInt8> m_atributeMap;
 	dArray<dInt16> m_elevationMap;
 	dFloat32 m_verticalScale;
 	dFloat32 m_horizontalScale_x;
 	dFloat32 m_horizontalScale_z;
+	dFloat32 m_horizontalScaleInv_x;
+	dFloat32 m_horizontalScaleInv_z;
 	dInt32 m_width;
 	dInt32 m_height;
 	ndGridConstruction m_diagonalMode;
 
+	static dVector m_yMask;
+	static dVector m_padding;
+	static dVector m_elevationPadding;
 	static dInt32 m_cellIndices[][4];
 
 	friend class ndContactSolver;
@@ -92,5 +103,14 @@ inline const dArray<dInt16>& ndShapeHeightfield::GetElevationMap() const
 	return m_elevationMap;
 }
 
+inline dInt32 ndShapeHeightfield::FastInt(dFloat32 x) const
+{
+	dInt32 i = dInt32(x);
+	if (dFloat32(i) > x) 
+	{
+		i--;
+	}
+	return i;
+}
 
 #endif

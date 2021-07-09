@@ -26,6 +26,10 @@
 #include "ndShapeInstance.h"
 #include "ndShapeHeightfield.h"
 
+dVector ndShapeHeightfield::m_yMask(0xffffffff, 0, 0xffffffff, 0);
+dVector ndShapeHeightfield::m_padding(dFloat32(0.25f), dFloat32(0.25f), dFloat32(0.25f), dFloat32(0.0f));
+dVector ndShapeHeightfield::m_elevationPadding(dFloat32(0.0f), dFloat32(1.0e10f), dFloat32(0.0f), dFloat32(0.0f));
+
 dInt32 ndShapeHeightfield::m_cellIndices[][4] =
 {
 	{ 0, 1, 2, 3 },
@@ -36,11 +40,16 @@ ndShapeHeightfield::ndShapeHeightfield(
 	dInt32 width, dInt32 height, ndGridConstruction constructionMode,
 	dFloat32 verticalScale, dFloat32 horizontalScale_x, dFloat32 horizontalScale_z)
 	:ndShapeStaticMesh(m_heightField)
+	,m_minBox(dVector::m_zero)
+	,m_maxBox(dVector::m_zero)
 	,m_atributeMap(width * height)
 	,m_elevationMap(width * height)
 	,m_verticalScale(verticalScale)
 	,m_horizontalScale_x(horizontalScale_x)
 	,m_horizontalScale_z(horizontalScale_z)
+	,m_horizontalScaleInv_x(dFloat32(1.0f) / horizontalScale_x)
+	,m_horizontalScaleInv_z(dFloat32(1.0f) / horizontalScale_z)
+
 	,m_width(width)
 	,m_height(height)
 	,m_diagonalMode(constructionMode)
@@ -53,178 +62,6 @@ ndShapeHeightfield::ndShapeHeightfield(
 	memset(&m_atributeMap[0], 0, sizeof(dInt8) * m_atributeMap.GetCount());
 	memset(&m_elevationMap[0], 0, sizeof(dInt16) * m_elevationMap.GetCount());
 
-	//Create(builder);
-	//CalculateAdjacendy();
-	//
-	//dVector p0;
-	//dVector p1;
-	//GetAABB(p0, p1);
-	//m_boxSize = (p1 - p0) * dVector::m_half;
-	//m_boxOrigin = (p1 + p0) * dVector::m_half;
-	//
-	//ndMeshVertexListIndexList data;
-	//data.m_indexList = nullptr;
-	//data.m_userDataList = nullptr;
-	//data.m_maxIndexCount = 1000000000;
-	//data.m_triangleCount = 0;
-	//dVector zero(dVector::m_zero);
-	//dFastAabbInfo box(dGetIdentityMatrix(), dVector(dFloat32(1.0e15f)));
-	//ForAllSectors(box, zero, dFloat32(1.0f), GetTriangleCount, &data);
-	//m_trianglesCount = data.m_triangleCount;
-
-
-
-	//dInt32 attibutePaddedMapSize = (m_width * m_height + 4) & -4;
-	//m_diagonals = (dInt8 *)dgMallocStack(attibutePaddedMapSize * sizeof(dInt8));
-	//switch (m_diagonalMode)
-	//{
-	//	case m_normalDiagonals:
-	//	{
-	//		memset(m_diagonals, 0, m_width * m_height * sizeof(dInt8));
-	//		break;
-	//	}
-	//	case m_invertedDiagonals:
-	//	{
-	//		memset(m_diagonals, 1, m_width * m_height * sizeof(dInt8));
-	//		break;
-	//	}
-	//
-	//	case m_alternateOddRowsDiagonals:
-	//	{
-	//		for (dInt32 j = 0; j < m_height; j += 2) {
-	//			dInt32 index = j * m_width;
-	//			for (dInt32 i = 0; i < m_width; i++) {
-	//				m_diagonals[index + i] = 0;
-	//			}
-	//		}
-	//
-	//		for (dInt32 j = 1; j < m_height; j += 2) {
-	//			dInt32 index = j * m_width;
-	//			for (dInt32 i = 0; i < m_width; i++) {
-	//				m_diagonals[index + i] = 1;
-	//			}
-	//		}
-	//		break;
-	//	}
-	//
-	//	case m_alternateEvenRowsDiagonals:
-	//	{
-	//		for (dInt32 j = 0; j < m_height; j += 2) {
-	//			dInt32 index = j * m_width;
-	//			for (dInt32 i = 0; i < m_width; i++) {
-	//				m_diagonals[index + i] = 1;
-	//			}
-	//		}
-	//
-	//		for (dInt32 j = 1; j < m_height; j += 2) {
-	//			dInt32 index = j * m_width;
-	//			for (dInt32 i = 0; i < m_width; i++) {
-	//				m_diagonals[index + i] = 0;
-	//			}
-	//		}
-	//		break;
-	//	}
-	//
-	//
-	//	case m_alternateOddColumsDiagonals:
-	//	{
-	//		for (dInt32 j = 0; j < m_height; j++) {
-	//			dInt32 index = j * m_width;
-	//			for (dInt32 i = 0; i < m_width; i += 2) {
-	//				m_diagonals[index + i] = 0;
-	//			}
-	//
-	//			for (dInt32 i = 1; i < m_width; i += 2) {
-	//				m_diagonals[index + i] = 1;
-	//			}
-	//		}
-	//		break;
-	//	}
-	//
-	//	case m_alternateEvenColumsDiagonals:
-	//	{
-	//		for (dInt32 j = 0; j < m_height; j++) {
-	//			dInt32 index = j * m_width;
-	//			for (dInt32 i = 0; i < m_width; i += 2) {
-	//				m_diagonals[index + i] = 1;
-	//			}
-	//
-	//			for (dInt32 i = 1; i < m_width; i += 2) {
-	//				m_diagonals[index + i] = 0;
-	//			}
-	//		}
-	//		break;
-	//	}
-	//
-	//	case m_starDiagonals:
-	//	{
-	//		for (dInt32 j = 0; j < m_height; j += 2) {
-	//			dInt32 index = j * m_width;
-	//			for (dInt32 i = 0; i < m_width; i += 2) {
-	//				m_diagonals[index + i] = 0;
-	//			}
-	//			for (dInt32 i = 1; i < m_width; i += 2) {
-	//				m_diagonals[index + i] = 1;
-	//			}
-	//		}
-	//
-	//		for (dInt32 j = 1; j < m_height; j += 2) {
-	//			dInt32 index = j * m_width;
-	//			for (dInt32 i = 0; i < m_width; i += 2) {
-	//				m_diagonals[index + i] = 1;
-	//			}
-	//			for (dInt32 i = 1; i < m_width; i += 2) {
-	//				m_diagonals[index + i] = 0;
-	//			}
-	//		}
-	//		break;
-	//	}
-	//
-	//	case m_starInvertexDiagonals:
-	//	{
-	//		for (dInt32 j = 0; j < m_height; j += 2) {
-	//			dInt32 index = j * m_width;
-	//			for (dInt32 i = 0; i < m_width; i += 2) {
-	//				m_diagonals[index + i] = 1;
-	//			}
-	//			for (dInt32 i = 1; i < m_width; i += 2) {
-	//				m_diagonals[index + i] = 0;
-	//			}
-	//		}
-	//
-	//		for (dInt32 j = 1; j < m_height; j += 2) {
-	//			dInt32 index = j * m_width;
-	//			for (dInt32 i = 0; i < m_width; i += 2) {
-	//				m_diagonals[index + i] = 0;
-	//			}
-	//			for (dInt32 i = 1; i < m_width; i += 2) {
-	//				m_diagonals[index + i] = 1;
-	//			}
-	//		}
-	//
-	//		break;
-	//	}
-	//
-	//	default:
-	//		dAssert(0);
-	//
-	//}
-
-	//dgTree<void*, unsigned>::dgTreeNode* nodeData = world->m_perInstanceData.Find(DG_HIGHTFIELD_DATA_ID);
-	//if (!nodeData) {
-	//	m_instanceData = (dgPerIntanceData*) new dgPerIntanceData();
-	//	m_instanceData->m_refCount = 0;
-	//	m_instanceData->m_world = world;
-	//	for (dInt32 i = 0; i < DG_MAX_THREADS_HIVE_COUNT; i++) {
-	//		m_instanceData->m_vertex[i] = NULL;
-	//		m_instanceData->m_vertexCount[i] = 0;
-	//		m_instanceData->m_vertex[i].SetAllocator(world->GetAllocator());
-	//		AllocateVertex(world, i);
-	//	}
-	//	nodeData = world->m_perInstanceData.Insert(m_instanceData, DG_HIGHTFIELD_DATA_ID);
-	//}
-	//m_instanceData = (dgPerIntanceData*)nodeData->GetInfo();
-	//m_instanceData->m_refCount++;
 	CalculateAABB();
 }
 
@@ -233,27 +70,6 @@ ndShapeHeightfield::ndShapeHeightfield(const nd::TiXmlNode* const, const char* c
 	:ndShapeStaticMesh(m_heightField)
 {
 	dAssert(0);
-	//D_CORE_API const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name);
-	//const char* const assetName = xmlGetString(xmlNode, "assetName");
-	//char pathCopy[1024];
-	//sprintf(pathCopy, "%s/%s", assetPath, assetName);
-	//Deserialize(pathCopy);
-	//
-	//dVector p0;
-	//dVector p1;
-	//GetAABB(p0, p1);
-	//m_boxSize = (p1 - p0) * dVector::m_half;
-	//m_boxOrigin = (p1 + p0) * dVector::m_half;
-	//
-	//ndMeshVertexListIndexList data;
-	//data.m_indexList = nullptr;
-	//data.m_userDataList = nullptr;
-	//data.m_maxIndexCount = 1000000000;
-	//data.m_triangleCount = 0;
-	//dVector zero(dVector::m_zero);
-	//dFastAabbInfo box(dGetIdentityMatrix(), dVector(dFloat32(1.0e15f)));
-	//ForAllSectors(box, zero, dFloat32(1.0f), GetTriangleCount, &data);
-	//m_trianglesCount = data.m_triangleCount;
 }
 
 ndShapeHeightfield::~ndShapeHeightfield(void)
@@ -264,17 +80,6 @@ ndShapeHeightfield::~ndShapeHeightfield(void)
 void ndShapeHeightfield::Save(nd::TiXmlElement* const, const char* const, dInt32) const
 {
 	dAssert(0);
-	//nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeHeightfield");
-	//xmlNode->LinkEndChild(paramNode);
-	//
-	//paramNode->SetAttribute("nodeId", nodeid);
-	//
-	//char pathCopy[1024];
-	//sprintf(pathCopy, "%s/asset%d.bin", assetPath, nodeid);
-	//Serialize(pathCopy);
-	//
-	//sprintf(pathCopy, "asset%d.bin", nodeid);
-	//xmlSaveParam(paramNode, "assetName", "string", pathCopy);
 }
 
 ndShapeInfo ndShapeHeightfield::GetShapeInfo() const
@@ -303,11 +108,11 @@ void ndShapeHeightfield::CalculateAABB()
 		y1 = dMax(y1, m_elevationMap[i]);
 	}
 
-	dVector p0 (dFloat32(dFloat32(0.0f)), dFloat32 (y0) * m_verticalScale, dFloat32(0.0f), dFloat32(0.0f));
-	dVector p1 (dFloat32(m_width) * m_horizontalScale_x, dFloat32(y1) * m_verticalScale, dFloat32(m_height) * m_horizontalScale_z, dFloat32(0.0f));
+	m_minBox = dVector(dFloat32(dFloat32(0.0f)), dFloat32 (y0) * m_verticalScale, dFloat32(0.0f), dFloat32(0.0f));
+	m_maxBox = dVector(dFloat32(m_width) * m_horizontalScale_x, dFloat32(y1) * m_verticalScale, dFloat32(m_height) * m_horizontalScale_z, dFloat32(0.0f));
 
-	m_boxSize = (p1 - p0) * dVector::m_half;
-	m_boxOrigin = (p1 + p0) * dVector::m_half;
+	m_boxSize = (m_maxBox - m_minBox) * dVector::m_half;
+	m_boxOrigin = (m_maxBox + m_minBox) * dVector::m_half;
 }
 
 void ndShapeHeightfield::UpdateElevationMapAabb()
@@ -366,6 +171,11 @@ dFloat32 ndShapeHeightfield::RayHit(void* const context, const dFloat32* const p
 }
 */
 
+const dInt32* ndShapeHeightfield::GetIndexList() const
+{
+	return &m_cellIndices[(m_diagonalMode == m_normalDiagonals) ? 0 : 1][0];
+}
+
 void ndShapeHeightfield::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
 	dVector points[4];
@@ -374,8 +184,7 @@ void ndShapeHeightfield::DebugShape(const dMatrix& matrix, ndShapeDebugCallback&
 	ndShapeDebugCallback::ndEdgeType edgeType[4];
 	memset(edgeType, ndShapeDebugCallback::m_shared, sizeof(edgeType));
 
-	//const dInt32* const indirectIndex = &m_cellIndices[dInt32(m_diagonals[z * m_width + x])][0];
-	const dInt32* const indirectIndex = &m_cellIndices[(m_diagonalMode == m_normalDiagonals) ? 0 : 1][0];
+	const dInt32* const indirectIndex = GetIndexList();
 	const dInt32 i0 = indirectIndex[0];
 	const dInt32 i1 = indirectIndex[1];
 	const dInt32 i2 = indirectIndex[2];
@@ -415,28 +224,226 @@ void ndShapeHeightfield::DebugShape(const dMatrix& matrix, ndShapeDebugCallback&
 	}
 }
 
-//dFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
-dFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify&, const dVector&, const dVector&, dFloat32, const ndBody* const, ndContactPoint&) const
+void ndShapeHeightfield::CalculateMinExtend2d(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const
 {
-	dAssert(0);
-	return 0;
-	//ndBvhRay ray(localP0, localP1);
-	//ray.m_t = dFloat32(1.0f);
-	//ray.m_me = this;
-	//ray.m_myBody = ((ndBody*)body)->GetAsBodyKinematic();
-	//ray.m_callback = &callback;
-	//dFloat32 t = dFloat32 (1.2f);
-	//ForAllSectorsRayHit(ray, maxT, RayHit, &ray);
-	//if (ray.m_t < maxT)
-	//{
-	//	t = ray.m_t;
-	//	dAssert(ray.m_normal.m_w == dFloat32(0.0f));
-	//	dAssert(ray.m_normal.DotProduct(ray.m_normal).GetScalar() > dFloat32(0.0f));
-	//	contactOut.m_normal = ray.m_normal.Normalize();
-	//	contactOut.m_shapeId0 = ray.m_id;
-	//	contactOut.m_shapeId1 = ray.m_id;
-	//}
-	//return t;
+	dVector scale(m_horizontalScale_x, dFloat32(0.0f), m_horizontalScale_z, dFloat32(0.0f));
+	dVector q0(p0.GetMin(p1) - m_padding);
+	dVector q1(p0.GetMax(p1) + scale + m_padding);
+
+	dVector invScale(m_horizontalScaleInv_x, dFloat32(0.0f), m_horizontalScaleInv_z, dFloat32(0.0f));
+	boxP0 = (((q0 * invScale).Floor() * scale)         & m_yMask) - m_elevationPadding;
+	boxP1 = (((q1 * invScale).Floor() * scale + scale) & m_yMask) + m_elevationPadding;
+	dAssert(boxP0.m_w == dFloat32(0.0f));
+	dAssert(boxP1.m_w == dFloat32(0.0f));
+
+	dVector minBox(boxP0.Select(m_minBox, m_yMask));
+	dVector maxBox(boxP1.Select(m_maxBox, m_yMask));
+
+	boxP0 = boxP0.GetMax(minBox);
+	boxP1 = boxP1.GetMin(maxBox);
+}
+
+dFloat32 ndShapeHeightfield::RayCastCell(const dFastRayTest& ray, dInt32 xIndex0, dInt32 zIndex0, dVector& normalOut, dFloat32 maxT) const
+{
+	dVector points[4];
+	dInt32 triangle[3];
+
+	// get the 3d point at the corner of the cell
+	if ((xIndex0 < 0) || (zIndex0 < 0) || (xIndex0 >= (m_width - 1)) || (zIndex0 >= (m_height - 1))) 
+	{
+		return dFloat32(1.2f);
+	}
+
+	dAssert(maxT <= 1.0);
+
+	dInt32 base = zIndex0 * m_width + xIndex0;
+
+	//const dFloat32* const elevation = (dFloat32*)m_elevationMap;
+	points[0 * 2 + 0] = dVector((xIndex0 + 0) * m_horizontalScale_x, m_verticalScale * dFloat32 (m_elevationMap[base + 0]),			  (zIndex0 + 0) * m_horizontalScale_z, dFloat32(0.0f));
+	points[0 * 2 + 1] = dVector((xIndex0 + 1) * m_horizontalScale_x, m_verticalScale * dFloat32 (m_elevationMap[base + 1]),			  (zIndex0 + 0) * m_horizontalScale_z, dFloat32(0.0f));
+	points[1 * 2 + 1] = dVector((xIndex0 + 1) * m_horizontalScale_x, m_verticalScale * dFloat32 (m_elevationMap[base + m_width + 1]), (zIndex0 + 1) * m_horizontalScale_z, dFloat32(0.0f));
+	points[1 * 2 + 0] = dVector((xIndex0 + 0) * m_horizontalScale_x, m_verticalScale * dFloat32 (m_elevationMap[base + m_width + 0]), (zIndex0 + 1) * m_horizontalScale_z, dFloat32(0.0f));
+
+	dFloat32 t = dFloat32(1.2f);
+	//if (!m_diagonals[base]) 
+	if (m_diagonalMode == m_normalDiagonals)
+	{
+		triangle[0] = 1;
+		triangle[1] = 2;
+		triangle[2] = 3;
+
+		dVector e10(points[2] - points[1]);
+		dVector e20(points[3] - points[1]);
+		dVector normal(e10.CrossProduct(e20));
+		normal = normal.Normalize();
+		t = ray.PolygonIntersect(normal, maxT, &points[0].m_x, sizeof(dVector), triangle, 3);
+		if (t < maxT) 
+		{
+			normalOut = normal;
+			return t;
+		}
+
+		triangle[0] = 1;
+		triangle[1] = 0;
+		triangle[2] = 2;
+
+		dVector e30(points[0] - points[1]);
+		normal = e30.CrossProduct(e10);
+		normal = normal.Normalize();
+		t = ray.PolygonIntersect(normal, maxT, &points[0].m_x, sizeof(dVector), triangle, 3);
+		if (t < maxT) 
+		{
+			normalOut = normal;
+			return t;
+		}
+	}
+	else 
+	{
+		triangle[0] = 0;
+		triangle[1] = 2;
+		triangle[2] = 3;
+
+		dVector e10(points[2] - points[0]);
+		dVector e20(points[3] - points[0]);
+		dVector normal(e10.CrossProduct(e20));
+		normal = normal.Normalize();
+		t = ray.PolygonIntersect(normal, maxT, &points[0].m_x, sizeof(dVector), triangle, 3);
+		if (t < maxT) 
+		{
+			normalOut = normal;
+			return t;
+		}
+
+		triangle[0] = 0;
+		triangle[1] = 3;
+		triangle[2] = 1;
+
+		dVector e30(points[1] - points[0]);
+		normal = e20.CrossProduct(e30);
+		normal = normal.Normalize();
+		t = ray.PolygonIntersect(normal, maxT, &points[0].m_x, sizeof(dVector), triangle, 3);
+		if (t < maxT) 
+		{
+			normalOut = normal;
+			return t;
+		}
+	}
+	return t;
+}
+
+
+//dFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const, ndContactPoint& contactOut) const
+{
+	dVector boxP0;
+	dVector boxP1;
+
+	// calculate the ray bounding box
+	CalculateMinExtend2d(localP0, localP1, boxP0, boxP1);
+
+	dVector p0(localP0);
+	dVector p1(localP1);
+	
+	// clip the line against the bounding box
+	if (dRayBoxClip(p0, p1, boxP0, boxP1)) 
+	{
+		dVector dp(p1 - p0);
+		dVector normalOut(dVector::m_zero);
+	
+		dFloat32 scale_x = m_horizontalScale_x;
+		dFloat32 invScale_x = m_horizontalScaleInv_x;
+		dFloat32 scale_z = m_horizontalScale_z;
+		dFloat32 invScale_z = m_horizontalScaleInv_z;
+		dInt32 ix0 = FastInt(p0.m_x * invScale_x);
+		dInt32 iz0 = FastInt(p0.m_z * invScale_z);
+	
+		// implement a 3ddda line algorithm 
+		dInt32 xInc;
+		dFloat32 tx;
+		dFloat32 stepX;
+		if (dp.m_x > dFloat32(0.0f)) 
+		{
+			xInc = 1;
+			dFloat32 val = dFloat32(1.0f) / dp.m_x;
+			stepX = scale_x * val;
+			tx = (scale_x * (ix0 + dFloat32(1.0f)) - p0.m_x) * val;
+		}
+		else if (dp.m_x < dFloat32(0.0f)) 
+		{
+			xInc = -1;
+			dFloat32 val = -dFloat32(1.0f) / dp.m_x;
+			stepX = scale_x * val;
+			tx = -(scale_x * ix0 - p0.m_x) * val;
+		}
+		else 
+		{
+			xInc = 0;
+			stepX = dFloat32(0.0f);
+			tx = dFloat32(1.0e10f);
+		}
+	
+		dInt32 zInc;
+		dFloat32 tz;
+		dFloat32 stepZ;
+		if (dp.m_z > dFloat32(0.0f)) 
+		{
+			zInc = 1;
+			dFloat32 val = dFloat32(1.0f) / dp.m_z;
+			stepZ = scale_z * val;
+			tz = (scale_z * (iz0 + dFloat32(1.0f)) - p0.m_z) * val;
+		}
+		else if (dp.m_z < dFloat32(0.0f)) 
+		{
+			zInc = -1;
+			dFloat32 val = -dFloat32(1.0f) / dp.m_z;
+			stepZ = scale_z * val;
+			tz = -(scale_z * iz0 - p0.m_z) * val;
+		}
+		else 
+		{
+			zInc = 0;
+			stepZ = dFloat32(0.0f);
+			tz = dFloat32(1.0e10f);
+		}
+	
+		dFloat32 txAcc = tx;
+		dFloat32 tzAcc = tz;
+		dInt32 xIndex0 = ix0;
+		dInt32 zIndex0 = iz0;
+		dFastRayTest ray(localP0, localP1);
+	
+		// for each cell touched by the line
+		do 
+		{
+			dFloat32 t = RayCastCell(ray, xIndex0, zIndex0, normalOut, maxT);
+			if (t < maxT) 
+			{
+				// bail out at the first intersection and copy the data into the descriptor
+				dAssert(normalOut.m_w == dFloat32(0.0f));
+				contactOut.m_normal = normalOut.Normalize();
+				contactOut.m_shapeId0 = m_atributeMap[zIndex0 * m_width + xIndex0];
+				contactOut.m_shapeId1 = m_atributeMap[zIndex0 * m_width + xIndex0];
+	
+				return t;
+			}
+	
+			if (txAcc < tzAcc) 
+			{
+				xIndex0 += xInc;
+				tx = txAcc;
+				txAcc += stepX;
+			}
+			else 
+			{
+				zIndex0 += zInc;
+				tz = tzAcc;
+				tzAcc += stepZ;
+			}
+		} while ((tx <= dFloat32(1.0f)) || (tz <= dFloat32(1.0f)));
+	}
+	
+	// if no cell was hit, return a large value
+	return dFloat32(1.2f);
 }
 
 /*
@@ -478,16 +485,5 @@ dIntersectStatus ndShapeHeightfield::GetPolygon(void* const context, const dFloa
 void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const) const
 {
 	dAssert(0);
-	//data->m_me = this;
-	//data->m_vertex = GetLocalVertexPool();
-	//data->m_vertexStrideInBytes = GetStrideInBytes();
-	//
-	//data->m_faceCount = 0;
-	//data->m_globalIndexCount = 0;
-	//data->m_faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
-	//data->m_faceIndexStart = data->m_meshData.m_globalFaceIndexStart;
-	//data->m_faceVertexIndex = data->m_globalFaceVertexIndex;
-	//data->m_hitDistance = data->m_meshData.m_globalHitDistance;
-	//ForAllSectors(*data, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
 
