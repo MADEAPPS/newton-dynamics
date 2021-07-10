@@ -53,11 +53,6 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
 	virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
 
-	//static dFloat32 RayHit(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount);
-	//static dIntersectStatus ShowDebugPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
-	//static dIntersectStatus GetTriangleCount(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
-	//static dIntersectStatus GetPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
-
 	private: 
 	class ndLocalThreadData
 	{
@@ -99,8 +94,6 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	static dInt32 m_cellIndices[][4];
 	static dInt32 m_verticalEdgeMap[][7];
 	static dInt32 m_horizontalEdgeMap[][7];
-
-
 	friend class ndContactSolver;
 };
 

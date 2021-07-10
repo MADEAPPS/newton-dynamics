@@ -131,57 +131,6 @@ void ndShapeHeightfield::UpdateElevationMapAabb()
 {
 	CalculateAABB();
 }
-/*
-dIntersectStatus ndShapeHeightfield::GetTriangleCount(void* const context, const dFloat32* const, dInt32, const dInt32* const, dInt32 indexCount, dFloat32)
-{
-	ndMeshVertexListIndexList& data = (*(ndMeshVertexListIndexList*)context);
-
-	if ((data.m_triangleCount + indexCount - 2) * 3 > data.m_maxIndexCount) 
-	{
-		return t_StopSearh;
-	}
-
-	data.m_triangleCount += (indexCount - 2);
-	dAssert((data.m_triangleCount * 3) <= data.m_maxIndexCount);
-	return t_ContinueSearh;
-}
-
-
-dIntersectStatus ndShapeHeightfield::ShowDebugPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32)
-{
-	dVector poly[128];
-	ndShapeDebugCallback::ndEdgeType edgeType[128];
-
-	dInt32 stride = dInt32(strideInBytes / sizeof(dFloat32));
-
-	ndCollisionBVHShowPolyContext& data = *(ndCollisionBVHShowPolyContext*)context;
-	for (dInt32 i = 0; i < indexCount; i++) 
-	{
-		dVector p(&polygon[indexArray[i] * stride]);
-		poly[i] = data.m_matrix.TransformVector(p & dVector::m_triplexMask);
-		dInt32 edgeIndexType = (indexArray[i + indexCount + 2]) & D_CONCAVE_EDGE_MASK;
-		edgeType[i] = edgeIndexType ? ndShapeDebugCallback::m_open : ndShapeDebugCallback::m_shared;
-	}
-	//dAssert(0);
-	data.m_callback->DrawPolygon(indexCount, poly, edgeType);
-	return t_ContinueSearh;
-}
-
-dFloat32 ndShapeHeightfield::RayHit(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount)
-{
-	ndBvhRay& me = *((ndBvhRay*)context);
-	dVector normal(&polygon[indexArray[indexCount + 1] * (strideInBytes / sizeof(dFloat32))]);
-	normal = normal & dVector::m_triplexMask;
-	dFloat32 t = me.PolygonIntersect(normal, me.m_t, polygon, strideInBytes, indexArray, indexCount);
-	if (t <= (me.m_t * dFloat32(1.0001f))) 
-	{
-		me.m_t = t;
-		me.m_normal = normal;
-		me.m_id = me.m_me->GetTagId(indexArray, indexCount);
-	}
-	return t;
-}
-*/
 
 const dInt32* ndShapeHeightfield::GetIndexList() const
 {
