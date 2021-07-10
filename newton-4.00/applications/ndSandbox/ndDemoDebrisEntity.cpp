@@ -107,7 +107,7 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const m
 		materialCount++;
 		segmentStart += subIndexCount;
 	}
-	meshNode->MaterialGeomteryEnd(geometryHandle);
+	meshNode->MaterialGeometryEnd(geometryHandle);
 
 
 	glGenBuffers(1, &m_indexBuffer);

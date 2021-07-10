@@ -413,7 +413,7 @@ class ndMeshEffect: public dPolyhedra
 		D_COLLISION_API dInt32 GetMaterialIndexCount(ndIndexArray* const handle, dInt32 materialHandle) const;
 		D_COLLISION_API void GetMaterialGetIndexStream(ndIndexArray* const handle, dInt32 materialHandle, dInt32* const index) const;
 		D_COLLISION_API void GetMaterialGetIndexStreamShort(ndIndexArray* const handle, dInt32 materialHandle, dInt16* const index) const;
-	D_COLLISION_API void MaterialGeomteryEnd(ndIndexArray* const handle);
+	D_COLLISION_API void MaterialGeometryEnd(ndIndexArray* const handle);
 
 	D_COLLISION_API void BeginBuild();
 		D_COLLISION_API void BeginBuildFace();

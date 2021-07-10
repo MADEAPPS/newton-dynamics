@@ -116,7 +116,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 		segmentStart += segment->m_indexCount;
 	}
 
-	mesh.MaterialGeomteryEnd(geometryHandle);
+	mesh.MaterialGeometryEnd(geometryHandle);
 
 	m_hasTransparency = hasTransparency;
 

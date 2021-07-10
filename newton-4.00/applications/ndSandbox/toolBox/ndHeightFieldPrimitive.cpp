@@ -47,27 +47,26 @@ class ndHeightfieldMesh : public ndDemoMesh
 
 		m_shader = shaderCache.m_diffuseEffect;
 
-		BuildTilesArray(indexList);
+		BuildTilesArray(indexList, "texture1.tga");
 		BuildVertexAndNormals(indexList, heightfield, points);
-		//OptimizeForRender(points, indexList);
 		OptimizeForRender(&points[0], points.GetCount(), &indexList[0], indexList.GetCount());
 	}
 
 	private:
-	void BuildTilesArray(dArray<dInt32>& indexList)
+	void BuildTilesArray(dArray<dInt32>& indexList, const char* const texName)
 	{
 		for (dInt32 z = 0; z < D_TERRAIN_HEIGHT - 1; z += D_TERRAIN_TILE_SIZE)
 		{
 			for (dInt32 x = 0; x < D_TERRAIN_WIDTH - 1; x += D_TERRAIN_TILE_SIZE)
 			{
-				BuildTile(indexList, x, z);
+				BuildTile(indexList, x, z, texName);
 			}
 		}
 	}
 
-	void BuildTile(dArray<dInt32>& indexList, dInt32 x0, dInt32 z0)
+	void BuildTile(dArray<dInt32>& indexList, dInt32 x0, dInt32 z0, const char* const texName)
 	{
-		dInt32 start = indexList.GetCount();
+		const dInt32 start = indexList.GetCount();
 		const dInt32 zMax = ((z0 + D_TERRAIN_TILE_SIZE) >= D_TERRAIN_HEIGHT) ? D_TERRAIN_HEIGHT - 1 : z0 + D_TERRAIN_TILE_SIZE;
 		const dInt32 xMax = ((x0 + D_TERRAIN_TILE_SIZE) >= D_TERRAIN_WIDTH) ? D_TERRAIN_WIDTH - 1 : x0 + D_TERRAIN_TILE_SIZE;
 
@@ -86,8 +85,9 @@ class ndHeightfieldMesh : public ndDemoMesh
 		}
 
 		ndDemoSubMesh* const segment = AddSubMesh();
-		//segment->m_material.m_textureHandle = (GLuint)material;
-		segment->m_material.m_textureHandle = (GLuint)1;
+		strcpy(segment->m_material.m_textureName, texName);
+		dInt32 texHandle = LoadTexture("texture1.tga");
+		segment->m_material.m_textureHandle = (GLuint)texHandle;
 
 		segment->SetOpacity(1.0f);
 		segment->m_segmentStart = start;
@@ -127,14 +127,15 @@ class ndHeightfieldMesh : public ndDemoMesh
 			points[i2].m_normal.m_z += GLfloat(normal.m_z);
 		}
 
+		dFloat32 uvScale = 1.0f / 32.0f;
 		for (dInt32 i = 0; i < points.GetCount(); i++)
 		{
 			dVector normal(points[i].m_normal.m_x, points[i].m_normal.m_y, points[i].m_normal.m_z, dFloat32(0.0f));
 			normal = normal.Normalize();
 			points[i].m_posit = ndMeshVector(GLfloat(heightfield[i].m_x), GLfloat(heightfield[i].m_y), GLfloat(heightfield[i].m_z));
 			points[i].m_normal = ndMeshVector(GLfloat(normal.m_x), GLfloat(normal.m_y), GLfloat(normal.m_z));
-			points[i].m_uv.m_u = dFloat32(0.0f);
-			points[i].m_uv.m_v = dFloat32(0.0f);
+			points[i].m_uv.m_u = points[i].m_posit.m_x * uvScale;
+			points[i].m_uv.m_v = points[i].m_posit.m_z * uvScale;
 		}
 	}
 };

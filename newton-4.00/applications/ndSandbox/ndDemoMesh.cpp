@@ -79,7 +79,6 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh&, const ndShaderPrograms&)
 	//OptimizeForRender ();
 }
 
-//ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity, const dMatrix& uvMatrix)
 ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const, const char* const, dFloat32 opacity, const dMatrix& uvMatrix)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
@@ -204,12 +203,11 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		segmentStart += segment->m_indexCount;
 	}
 
-	mesh.MaterialGeomteryEnd(geometryHandle);
+	mesh.MaterialGeometryEnd(geometryHandle);
 
 	m_hasTransparency = hasTransparency;
 
 	// optimize this mesh for hardware buffers if possible
-	//OptimizeForRender(points, indices);
 	OptimizeForRender(&points[0], vertexCount, &indices[0], indexCount);
 }
 
@@ -296,7 +294,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 		segmentStart += segment->m_indexCount;
 	}
 
-	meshNode->MaterialGeomteryEnd(geometryHandle);
+	meshNode->MaterialGeometryEnd(geometryHandle);
 
 	m_hasTransparency = hasTransparency;
 
@@ -340,8 +338,6 @@ void ndDemoMesh::RenderNormals()
 */
 }
 
-
-//void ndDemoMesh::OptimizeForRender(const dArray<ndMeshPointUV>& points, const dArray<dInt32>& indices)
 void ndDemoMesh::OptimizeForRender(
 	const ndMeshPointUV* const points, dInt32 pointCount,
 	const dInt32* const indices, dInt32 indexCount)
@@ -354,7 +350,6 @@ void ndDemoMesh::OptimizeForRender(
 
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	//glBufferData(GL_ARRAY_BUFFER, points.GetCount() * sizeof(ndMeshPointUV), &points[0], GL_STATIC_DRAW);
 	glBufferData(GL_ARRAY_BUFFER, pointCount * sizeof(ndMeshPointUV), &points[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
@@ -374,7 +369,6 @@ void ndDemoMesh::OptimizeForRender(
 
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.GetCount() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
@@ -391,9 +385,6 @@ void ndDemoMesh::OptimizeForRender(
 	m_materialSpecularLocation = glGetUniformLocation(m_shader, "material_specular");
 
 	glUseProgram(0);
-
-	//m_vertexCount = points.GetCount();
-	//m_indexCount = indices.GetCount();
 	m_vertexCount = pointCount;
 	m_indexCount = indexCount;
 }

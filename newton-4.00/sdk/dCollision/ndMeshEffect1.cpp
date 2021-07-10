@@ -3540,7 +3540,7 @@ ndIndexArray* ndMeshEffect::MaterialGeometryBegin()
 	return array;
 }
 
-void ndMeshEffect::MaterialGeomteryEnd(ndIndexArray* const handle)
+void ndMeshEffect::MaterialGeometryEnd(ndIndexArray* const handle)
 {
 	dMemory::Free(handle);
 }
