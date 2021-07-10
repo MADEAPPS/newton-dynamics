@@ -794,16 +794,17 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		case 2:
 		{
 			// open Scene
-			m_currentScene = -1;
-			char fileName[1024];
-			Cleanup();
-			if (dGetOpenFileNameNgd(fileName, 1024)) 
-			{
-				ApplyMenuOptions();
-				CreateSkyBox();
-				m_world->Load(fileName);
-				ResetTimer();
-			}
+			dAssert(0);
+			//m_currentScene = -1;
+			//char fileName[1024];
+			//Cleanup();
+			//if (dGetOpenFileNameNgd(fileName, 1024)) 
+			//{
+			//	ApplyMenuOptions();
+			//	CreateSkyBox();
+			//	m_world->Load(fileName);
+			//	ResetTimer();
+			//}
 			break;
 		}
 

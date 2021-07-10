@@ -46,7 +46,6 @@ class ndShapeStaticBVH: public ndShapeStaticMesh, public dAabbPolygonSoup
 	static dIntersectStatus GetPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 
 	private: 
-	
 	dInt32 m_trianglesCount;
 
 	friend class ndContactSolver;

@@ -172,20 +172,14 @@ static void MakeNoiseHeightfield(dArray<dVector>& heightfield)
 	}
 }
 
-ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene)
+ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const dMatrix& location)
 {
 	dArray<dVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
 	MakeNoiseHeightfield(heightfield);
 	
 	// create the visual mesh
 	ndDemoMesh* const mesh = new ndHeightfieldMesh(heightfield, scene->GetShaderCache());
-
-	dMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit.m_z = -200.0f;
-	matrix.m_posit.m_x = -200.0f;
-	matrix.m_posit.m_y = 0.0f;
-
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
 	entity->SetMesh(mesh, dGetIdentityMatrix());
 
 	// create the height field collision and rigid body
@@ -219,13 +213,10 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene)
 	entMatrix.m_posit = (boxP0 + boxP1).Scale (-0.5f);
 	entMatrix.m_posit.m_w = 1.0f;
 
-	//SetMatrix (matrix);
-	//entity->ResetMatrix (entMatrix);
-
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(matrix);
+	body->SetMatrix(location);
 	body->SetCollisionShape(heighfieldInstance);
 
 	world->AddBody(body);

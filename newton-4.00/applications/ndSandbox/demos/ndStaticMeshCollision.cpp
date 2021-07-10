@@ -23,9 +23,12 @@
 
 void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
-	// build a floor
+	dMatrix heighfieldLocation (dGetIdentityMatrix());
+	heighfieldLocation.m_posit.m_x = -200.0f;
+	heighfieldLocation.m_posit.m_z = -200.0f;
+
 	//BuildFlatPlane(scene, true);
-	BuildHeightFieldTerrain(scene);
+	BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildStaticMesh(scene, "flatPlane.fbx", false);
 	//BuildStaticMesh(scene, "track.fbx", false);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
