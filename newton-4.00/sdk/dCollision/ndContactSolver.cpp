@@ -30,6 +30,7 @@
 #include "ndContactSolver.h"
 #include "ndShapeStaticBVH.h"
 #include "ndShapeStaticMesh.h"
+#include "ndShapeHeightfield.h"
 #include "ndShapeConvexPolygon.h"
 #include "ndShapeCompoundConvex.h"
 
@@ -134,8 +135,8 @@ dInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 	ndShapeInstance* const otherInstance = &otherBody->GetCollisionShape();
 	ndShapeInstance* const compoundInstance = &compoundBody->GetCollisionShape();
 
-	const dMatrix& myMatrix = compoundInstance->GetGlobalMatrix();
-	dMatrix matrix(otherInstance->GetGlobalMatrix() * myMatrix.Inverse());
+	const dMatrix& compoundMatrix = compoundInstance->GetGlobalMatrix();
+	dMatrix matrix(otherInstance->GetGlobalMatrix() * compoundMatrix.Inverse());
 
 	dVector size;
 	dVector origin;
@@ -169,7 +170,7 @@ dInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 					if (processContacts)
 					{
 						ndShapeInstance childInstance(*subShape, subShape->GetShape());
-						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * myMatrix;
+						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * compoundMatrix;
 
 						ndContactSolver contactSolver(*this, m_instance0, childInstance);
 						contactSolver.m_pruneContacts = 0;
@@ -352,9 +353,7 @@ dInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 
 	stackPool[0].m_node0 = compoundShape0->m_root;
 	stackPool[0].m_node1 = compoundShape1->m_root;
-	
 	dFloat32 closestDist = dFloat32(1.0e10f);
-	//const dFloat32 timestep = m_scene->GetTimestep();
 	
 	while (stack)
 	{
@@ -510,8 +509,6 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 	stackPool[0].m_collisionTreeNode = bvhTreeCollision->GetRootNode();
 	
 	dFloat32 closestDist = dFloat32(1.0e10f);
-	//const dFloat32 timestep = m_scene->GetTimestep();
-
 	const dVector treeScale (bvhTreeInstance->GetScale());
 	
 	ndShapeCompoundConvex::ndNodeBase nodeProxi;
@@ -745,6 +742,148 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 	return contactCount;
 }
 
+dInt32 ndContactSolver::CompoundToStaticHeighfieldContactsDiscrete()
+{
+	//dgContactPoint* const contacts = proxy.m_contacts;
+	//const dgNodeBase* stackPool[DG_COMPOUND_STACK_DEPTH];
+
+	const ndShapeCompoundConvex::ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
+
+	ndContact* const contactJoint = m_contact;
+	ndContactPoint* const contacts = m_contactBuffer;
+	ndBodyKinematic* const heightfieldBody = contactJoint->GetBody1();
+	ndBodyKinematic* const compoundBody = contactJoint->GetBody0();
+	ndShapeInstance* const heightfieldInstance = &heightfieldBody->GetCollisionShape();
+	ndShapeInstance* const compoundInstance = &compoundBody->GetCollisionShape();
+
+	//dInt32 contactCount = 0;
+	//dgContact* const contactJoint = pair->m_contact;
+	//dgBody* const myBody = contactJoint->GetBody0();
+	//dgBody* const terrainBody = contactJoint->GetBody1();
+
+	ndShapeHeightfield* const heightfieldShape = heightfieldInstance->GetShape()->GetAsShapeHeightfield();
+	ndShapeCompoundConvex* const compoundShape = compoundInstance->GetShape()->GetAsShapeCompoundConvex();
+	
+	//dgCollisionInstance* const compoundInstance = myBody->m_collision;
+	//dgCollisionInstance* const terrainInstance = terrainBody->m_collision;
+	//
+	//dgAssert(compoundInstance->GetChildShape() == this);
+	//dgAssert(terrainInstance->IsType(dgCollision::dgCollisionHeightField_RTTI));
+	//dgCollisionHeightField* const heightfieldShape = (dgCollisionHeightField*)terrainInstance->GetChildShape();
+	
+	//proxy.m_body0 = myBody;
+	//proxy.m_body1 = terrainBody;
+	//
+	//proxy.m_instance1 = terrainInstance;
+	//const dgMatrix& compoundMatrix = compoundInstance->GetGlobalMatrix();
+	//const dgMatrix& hieghFieldMatrix = terrainInstance->GetGlobalMatrix();
+	//dgOOBBTestData data(hieghFieldMatrix * compoundMatrix.Inverse());
+	
+	dInt32 stack = 1;
+	dInt32 contactCount = 0;
+	dFloat32 closestDist = dFloat32(1.0e10f);
+	stackPool[0] = compoundShape->m_root;
+	
+	ndShapeCompoundConvex::ndNodeBase nodeProxi;
+	nodeProxi.m_left = nullptr;
+	nodeProxi.m_right = nullptr;
+	//const dgContactMaterial* const material = contactJoint->GetMaterial();
+	//dgAssert((contacts != NULL) ^ proxy.m_intersectionTestOnly);
+	//dgFloat32 timestep = pair->m_timestep;
+	//dgFloat32 closestDist = dgFloat32(1.0e10f);
+	const dVector heighFieldScale(heightfieldInstance->GetScale());
+	const dVector heighFieldInvScale(heightfieldInstance->GetInvScale());
+
+	const dMatrix& compoundMatrix = compoundInstance->GetGlobalMatrix();
+	dMatrix matrix(heightfieldInstance->GetGlobalMatrix() * compoundMatrix.Inverse());
+
+	//dVector heightfieldSize;
+	//dVector heightfieldOrigin;
+	//heightfieldInstance->CalculateObb(heightfieldOrigin, heightfieldSize);
+	//ndShapeCompoundConvex::ndOOBBTestData data(matrix, heightfieldOrigin, heightfieldSize);
+	ndShapeCompoundConvex::ndOOBBTestData data(matrix);
+
+	while (stack) 
+	{
+		stack--;
+		const ndShapeCompoundConvex::ndNodeBase* const node = stackPool[stack];
+		dAssert(node);
+
+		dVector origin(heighFieldInvScale * data.m_matrix.UntransformVector(node->m_origin));
+		dVector size(heighFieldInvScale * data.m_absMatrix.UnrotateVector(node->m_size));
+		dVector p0(origin - size);
+		dVector p1(origin + size);
+		heightfieldShape->GetLocalAABB(p0, p1, nodeProxi.m_p0, nodeProxi.m_p1);
+		nodeProxi.m_p0 *= heighFieldScale;
+		nodeProxi.m_p1 *= heighFieldScale;
+		nodeProxi.m_size = dVector::m_half * (nodeProxi.m_p1 - nodeProxi.m_p0);
+		nodeProxi.m_origin = dVector::m_half * (nodeProxi.m_p1 + nodeProxi.m_p0);
+		if (node->BoxTest(data, &nodeProxi)) 
+		{
+			if (node->m_type == ndShapeCompoundConvex::m_leaf) 
+			{
+				//dAssert(0);
+	//			dgCollisionInstance* const subShape = me->GetShape();
+	//			if (subShape->GetCollisionMode()) {
+	//				bool processContacts = true;
+	//				if (material->m_compoundAABBOverlap) {
+	//					processContacts = material->m_compoundAABBOverlap(*contactJoint, timestep, myBody, me->m_myNode, terrainBody, NULL, proxy.m_threadIndex);
+	//				}
+	//				if (processContacts) {
+	//					dgCollisionInstance childInstance(*subShape, subShape->GetChildShape());
+	//					childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * compoundMatrix;
+	//					proxy.m_instance0 = &childInstance;
+	//
+	//					proxy.m_maxContacts = DG_MAX_CONTATCS - contactCount;
+	//					proxy.m_contacts = contacts ? &contacts[contactCount] : contacts;
+	//
+	//					dInt32 count = 0;
+	//					count += m_world->CalculateConvexToNonConvexContacts(proxy);
+	//					closestDist = dgMin(closestDist, contactJoint->m_closestDistance);
+	//
+	//					if (!proxy.m_intersectionTestOnly) {
+	//						for (dInt32 i = 0; i < count; i++) {
+	//							dgAssert(contacts[contactCount + i].m_collision0 == &childInstance);
+	//							contacts[contactCount + i].m_collision0 = subShape;
+	//						}
+	//						contactCount += count;
+	//
+	//						if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
+	//							contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
+	//						}
+	//					}
+	//					else if (count == -1) {
+	//						contactCount = -1;
+	//						break;
+	//					}
+	//					childInstance.m_material.m_userData = NULL;
+	//					proxy.m_instance0 = NULL;
+	//				}
+	//			}
+			}
+			else 
+			{
+				//dAssert(0);
+	//			dgAssert(me->m_type == m_node);
+	//			stackPool[stack] = me->m_left;
+	//			stack++;
+	//
+	//			stackPool[stack] = me->m_right;
+	//			stack++;
+			}
+		}
+	}
+
+	if (m_pruneContacts && (contactCount > 1))
+	{
+		contactCount = PruneContacts(contactCount, 16);
+	}
+	contactJoint->m_separationDistance = closestDist;
+	return contactCount;
+
+	return 0;
+}
+
 dInt32 ndContactSolver::ConvexContactsDiscrete()
 {
 	const dVector origin0(m_instance0.m_globalMatrix.m_posit);
@@ -941,6 +1080,10 @@ dInt32 ndContactSolver::CompoundContactsDiscrete()
 		else if (m_instance1.GetShape()->GetAsShapeStaticBVH())
 		{
 			return CompoundToShapeStaticBvhContactsDiscrete();
+		}
+		else if (m_instance1.GetShape()->GetAsShapeHeightfield())
+		{
+			return CompoundToStaticHeighfieldContactsDiscrete();
 		}
 		else
 		{

@@ -872,8 +872,6 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 		ndContactPoint contactBuffer[D_MAX_CONTATCS];
 		ndContactSolver contactSolver(contact, m_contactNotifyCallback, m_timestep);
 		contactSolver.m_separatingVector = contact->m_separatingVector;
-		//contactSolver.m_timestep = m_timestep;
-		//contactSolver.m_ccdMode = 0;
 		contactSolver.m_contactBuffer = contactBuffer;
 		contactSolver.m_intersectionTestOnly = body0->m_contactTestOnly | body1->m_contactTestOnly;
 		
@@ -1666,7 +1664,6 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 				CalculateJointContacts(threadIndex, contact);
 				if (contact->m_maxDOF || contact->m_isIntersetionTestOnly)
 				{
-					//contact->m_active = true;
 					contact->SetActive(true);
 					contact->m_timeOfImpact = dFloat32(1.0e10f);
 				}

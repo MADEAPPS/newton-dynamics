@@ -24,6 +24,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"
+#include "ndHeightFieldPrimitive.h"
 
 class ndVehicleDectriptorViper : public ndVehicleDectriptor
 {
@@ -650,18 +651,26 @@ return;
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
-	// build a floor
+	dMatrix heighfieldLocation(dGetIdentityMatrix());
+	heighfieldLocation.m_posit.m_x = -200.0f;
+	heighfieldLocation.m_posit.m_z = -200.0f;
+
 	//BuildFloorBox(scene);
-	BuildFlatPlane(scene, true);
+	//BuildFlatPlane(scene, true);
+	BuildHeightFieldTerrain(scene, heighfieldLocation);
+
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
 
+	ndPhysicsWorld* const world = scene->GetWorld();
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
 	
 	dMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit = location;
+	dVector floor(FindFloor(*world, location + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit = floor;
+	matrix.m_posit.m_y += 0.5f;
 
 	//dVector location(0.0f, 1.75f, 0.0f, 1.0f);
 	//dMatrix matrix(dGetIdentityMatrix());
@@ -669,7 +678,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//matrix = matrix * dRollMatrix(-70.0f * dDegreeToRad);
 	//matrix.m_posit = location;
 
-	ndPhysicsWorld* const world = scene->GetWorld();
+	
 	ndSoundManager* const soundManager = world->GetSoundManager();
 	for (int i = 0; i < sizeof(engineSounds) / sizeof(engineSounds[0]); i++)
 	{

@@ -219,14 +219,40 @@ void ndShapeHeightfield::CalculateMinExtend3d(const dVector& p0, const dVector& 
 
 	boxP0 = q0.Select((q0 * invScale).Floor() * scale, m_yMask);
 	boxP1 = q1.Select((q1 * invScale).Floor() * scale + scale, m_yMask);
-
-	const dVector minBox(boxP0.Select(m_minBox, m_yMask));
-	const dVector maxBox(boxP1.Select(m_maxBox, m_yMask));
-
-	boxP0 = boxP0.GetMax(minBox);
-	boxP1 = boxP1.GetMin(maxBox);
+	
+	//const dVector minBox(boxP0.Select(m_minBox, m_yMask));
+	//const dVector maxBox(boxP1.Select(m_maxBox, m_yMask));
+	//
+	//boxP0 = boxP0.GetMax(minBox);
+	//boxP1 = boxP1.GetMin(maxBox);
+	boxP0 = boxP0.Select(boxP0.GetMax(m_minBox), m_yMask);
+	boxP1 = boxP1.Select(boxP1.GetMin(m_maxBox), m_yMask);
 }
 
+void ndShapeHeightfield::GetLocalAABB(const dVector& q0, const dVector& q1, dVector& boxP0, dVector& boxP1) const
+{
+	// the user data is the pointer to the collision geometry
+	CalculateMinExtend3d(q0, q1, boxP0, boxP1);
+	
+	const dVector p0(boxP0.Scale(m_horizontalScaleInv_x).GetInt());
+	const dVector p1(boxP1.Scale(m_horizontalScaleInv_x).GetInt());
+	
+	dAssert(p0.m_ix == FastInt(boxP0.m_x * m_horizontalScaleInv_x));
+	dAssert(p0.m_iz == FastInt(boxP0.m_z * m_horizontalScaleInv_x));
+	dAssert(p1.m_ix == FastInt(boxP1.m_x * m_horizontalScaleInv_x));
+	dAssert(p1.m_iz == FastInt(boxP1.m_z * m_horizontalScaleInv_x));
+	
+	dInt32 x0 = dInt32(p0.m_ix);
+	dInt32 x1 = dInt32(p1.m_ix);
+	dInt32 z0 = dInt32(p0.m_iz);
+	dInt32 z1 = dInt32(p1.m_iz);
+	
+	dFloat32 minHeight = dFloat32(1.0e10f);
+	dFloat32 maxHeight = dFloat32(-1.0e10f);
+	CalculateMinAndMaxElevation(x0, x1, z0, z1, minHeight, maxHeight);
+	boxP0.m_y = minHeight;
+	boxP1.m_y = maxHeight;
+}
 
 dFloat32 ndShapeHeightfield::RayCastCell(const dFastRayTest& ray, dInt32 xIndex0, dInt32 zIndex0, dVector& normalOut, dFloat32 maxT) const
 {
@@ -317,7 +343,6 @@ dFloat32 ndShapeHeightfield::RayCastCell(const dFastRayTest& ray, dInt32 xIndex0
 }
 
 
-//dFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 dFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const, ndContactPoint& contactOut) const
 {
 	dVector boxP0;
@@ -468,9 +493,9 @@ dIntersectStatus ndShapeHeightfield::GetPolygon(void* const context, const dFloa
 
 void ndShapeHeightfield::CalculateMinAndMaxElevation(dInt32 x0, dInt32 x1, dInt32 z0, dInt32 z1, dFloat32& minHeight, dFloat32& maxHeight) const
 {
-	dInt32 base = z0 * m_width;
 	dInt16 minVal = 0x7fff;
 	dInt16 maxVal = -0x7fff;
+	dInt32 base = z0 * m_width;
 	for (dInt32 z = z0; z <= z1; z++) 
 	{
 		for (dInt32 x = x0; x <= x1; x++) 
@@ -486,7 +511,6 @@ void ndShapeHeightfield::CalculateMinAndMaxElevation(dInt32 x0, dInt32 x1, dInt3
 	maxHeight = maxVal * m_verticalScale;
 }
 
-
 void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 {
 	dVector boxP0;
@@ -499,8 +523,10 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	boxP0 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace < dVector::m_zero);
 	boxP1 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace > dVector::m_zero);
 
-	boxP0 = boxP0.Select(boxP0.GetMax(dVector::m_zero), m_yMask);
-	boxP1 = boxP1.Select(boxP1.GetMax(dVector::m_zero), m_yMask);
+	//boxP0 = boxP0.Select(boxP0.GetMax(dVector::m_zero), m_yMask);
+	//boxP1 = boxP1.Select(boxP1.GetMax(dVector::m_zero), m_yMask);
+	boxP0 = boxP0.Select(boxP0.GetMax(m_minBox), m_yMask);
+	boxP1 = boxP1.Select(boxP1.GetMin(m_maxBox), m_yMask);
 
 	dVector p0(boxP0.Scale(m_horizontalScaleInv_x).GetInt());
 	dVector p1(boxP1.Scale(m_horizontalScaleInv_x).GetInt());
@@ -768,27 +794,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 			data->m_hitDistance = hitDistance;
 			data->m_faceIndexCount = faceIndexCount;
 			data->m_vertexStrideInBytes = sizeof(dVector);
-	
-			//if (GetDebugCollisionCallback()) 
-			//{
-			//	dTriplex triplex[3];
-			//	const dVector scale = data->m_polySoupInstance->GetScale();
-			//	dMatrix matrix(data->m_polySoupInstance->GetLocalMatrix() * data->m_polySoupBody->GetMatrix());
-			//
-			//	for (dInt32 i = 0; i < data->m_faceCount; i++) {
-			//		dInt32 base1 = address[i];
-			//		for (dInt32 j = 0; j < 3; j++) {
-			//			dInt32 index1 = data->m_faceVertexIndex[base1 + j];
-			//			dVector p(matrix.TransformVector(scale * dVector(vertex[index1])));
-			//			triplex[j].m_x = p.m_x;
-			//			triplex[j].m_y = p.m_y;
-			//			triplex[j].m_z = p.m_z;
-			//		}
-			//		GetDebugCollisionCallback() (data->m_polySoupBody, data->m_objBody, data->m_faceVertexIndex[base1 + 4], 3, &triplex[0].m_x, sizeof(dTriplex));
-			//	}
-			//}
 		}
-	
 	}
 }
 
