@@ -90,7 +90,7 @@ if(MSVC OR MINGW)
 endif()
 
 if(UNIX)
-    target_link_libraries (${projectName} GL GLU dl X11 pthread)
+    target_link_libraries (${projectName} GL GLU dl X11 pthread openal)
     set (source "${CMAKE_SOURCE_DIR}/applications/media")
     set (destination "${PROJECT_BINARY_DIR}/applications/media")
     add_custom_command(
