@@ -36,6 +36,8 @@ class ndShapeCompound: public ndShape
 		m_node,
 	};
 
+	class ndNodeBase;
+
 	D_MSV_NEWTON_ALIGN_32
 	class ndOOBBTestData
 	{
@@ -64,11 +66,6 @@ class ndShapeCompound: public ndShape
 		static dVector m_padding;
 	} D_GCC_NEWTON_ALIGN_32;
 
-	protected:
-	class ndNodeBase;
-	class ndSpliteInfo;
-
-	public:
 	class ndTreeArray : public dTree<ndNodeBase*, dInt32, dContainersFreeListAlloc<ndNodeBase*>>
 	{
 		public:
@@ -87,6 +84,7 @@ class ndShapeCompound: public ndShape
 	D_COLLISION_API virtual void EndAddRemove();
 
 	protected:
+	class ndSpliteInfo;
 	ndShapeCompound(const ndShapeCompound& source, const ndShapeInstance* const myInstance);
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;

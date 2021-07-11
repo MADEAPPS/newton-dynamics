@@ -215,11 +215,11 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 	return body;
 }
 
-void AddHeightfield(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance)
+ndShapeInstance* AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance)
 {
 	dMatrix location(dGetIdentityMatrix());
-	location.m_posit.m_x = -200.0f;
-	location.m_posit.m_z = -200.0f;
+	//location.m_posit.m_x = -200.0f;
+	//location.m_posit.m_z = -200.0f;
 
 	dArray<dVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
 	MakeNoiseHeightfield(heightfield);
@@ -241,9 +241,14 @@ void AddHeightfield(ndDemoEntityManager* const scene, ndShapeInstance& sceneInst
 	}
 	shape->UpdateElevationMapAabb();
 
-
-//	ndBodyKinematic* const body = BuildHeightFieldTerrain(scene, location);
+	// save the entity  with the sub shape
+	ndShapeMaterial material(heighfieldInstance.GetMaterial());
+	material.m_userData = entity;
+	heighfieldInstance.SetMaterial(material);
 	
 	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
-	compound->AddCollision(&heighfieldInstance);
+	
+	ndShapeCompound::ndTreeArray::dNode* const node = compound->AddCollision(&heighfieldInstance);
+	ndShapeInstance* const subInstance = node->GetInfo()->GetShape();
+	return subInstance;
 }

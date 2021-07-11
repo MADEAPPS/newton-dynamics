@@ -61,6 +61,7 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 	,m_scale(instance.m_scale)
 	,m_invScale(instance.m_invScale)
 	,m_maxScale(instance.m_maxScale)
+	,m_shapeMaterial(instance.m_shapeMaterial)
 	,m_shape(instance.m_shape->AddRef())
 	,m_ownerBody(instance.m_ownerBody)
 	,m_subCollisionHandle(instance.m_subCollisionHandle)
@@ -75,7 +76,6 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 		m_shape->Release();
 		m_shape = new ndShapeCompound(*compound, this);
 		m_shape->AddRef();
-		dAssert(0);
 	}
 }
 
@@ -87,6 +87,7 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance, ndShape* const
 	,m_scale(instance.m_scale)
 	,m_invScale(instance.m_invScale)
 	,m_maxScale(instance.m_maxScale)
+	,m_shapeMaterial(instance.m_shapeMaterial)
 	,m_shape(shape->AddRef())
 	,m_ownerBody(instance.m_ownerBody)
 	,m_subCollisionHandle(instance.m_subCollisionHandle)

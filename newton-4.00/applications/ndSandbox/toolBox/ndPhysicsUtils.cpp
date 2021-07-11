@@ -31,7 +31,7 @@ dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist)
 	{
 		return rayCaster.m_contact.m_point;
 	}
-	return p0;
+	return p1;
 }
 
 ndBodyKinematic* MousePickBody(ndWorld* const world, const dVector& origin, const dVector& end, dFloat32& paramterOut, dVector& positionOut, dVector& normalOut)

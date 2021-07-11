@@ -1174,10 +1174,10 @@ void ndShapeCompound::EndAddRemove()
 	}
 }
 
-ndShapeCompound::ndTreeArray::dNode* ndShapeCompound::AddCollision(ndShapeInstance* const shape)
+ndShapeCompound::ndTreeArray::dNode* ndShapeCompound::AddCollision(ndShapeInstance* const subInstance)
 {
 	dAssert(m_myInstance);
-	ndNodeBase* const newNode = new ndNodeBase(shape);
+	ndNodeBase* const newNode = new ndNodeBase(subInstance);
 	m_array.AddNode(newNode, m_idIndex, m_myInstance);
 
 	m_idIndex++;

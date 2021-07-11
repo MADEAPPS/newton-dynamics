@@ -57,7 +57,7 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 
 	//AddCapsulesStacks(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 	
-	AddBox(scene, dVector(10.0f, 1.0f, 0.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
+	//AddBox(scene, dVector(10.0f, 1.0f, 0.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
 	//AddBox(scene, dVector(10.0f, 1.5f, 1.125f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
 	//AddBox(scene, dVector(10.0f, 2.0f, 1.250f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
 	//

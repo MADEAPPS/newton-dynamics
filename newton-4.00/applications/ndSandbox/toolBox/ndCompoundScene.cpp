@@ -11,28 +11,30 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntity.h"
-//#include "ndDemoMesh.h"
-//#include "ndDemoCamera.h"
-//#include "ndPhysicsUtils.h"
-//#include "ndDebugDisplay.h"
 #include "ndPhysicsWorld.h"
-//#include "ndTargaToOpenGl.h"
 #include "ndCompoundScene.h"
 #include "ndDemoEntityManager.h"
 #include "ndHeightFieldPrimitive.h"
 
 
-//ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const dMatrix& location)
-ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const dMatrix& )
+ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const dMatrix& location)
 {
 	ndShapeInstance sceneInstance (new ndShapeCompound());
 
 	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
 	compound->BeginAddRemove();
 
-	AddHeightfield(scene, sceneInstance);
+	ndShapeInstance* const subShape = AddHeightfieldSubShape(scene, sceneInstance);
 
 	compound->EndAddRemove();
 
-	return nullptr;
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, nullptr));
+	body->SetMatrix(location);
+	body->SetCollisionShape(sceneInstance);
+
+	world->AddBody(body);
+	return body;
 }
