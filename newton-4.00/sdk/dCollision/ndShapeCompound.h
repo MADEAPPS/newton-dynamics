@@ -19,15 +19,15 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_SHAPE_COMPOUND_CONVEX_H__
-#define __D_SHAPE_COMPOUND_CONVEX_H__
+#ifndef __D_SHAPE_COMPOUND_H__
+#define __D_SHAPE_COMPOUND_H__
 
 #include "ndCollisionStdafx.h"
 #include "ndShape.h"
 
 #define D_COMPOUND_STACK_DEPTH	256
 
-class ndShapeCompoundConvex: public ndShape
+class ndShapeCompound: public ndShape
 {
 	public:
 	enum ndNodeType
@@ -76,9 +76,9 @@ class ndShapeCompoundConvex: public ndShape
 		void AddNode(ndNodeBase* const node, dInt32 index, const ndShapeInstance* const parent);
 	};
 
-	D_COLLISION_API ndShapeCompoundConvex();
-	D_COLLISION_API ndShapeCompoundConvex(const nd::TiXmlNode* const xmlNode);
-	D_COLLISION_API virtual ~ndShapeCompoundConvex();
+	D_COLLISION_API ndShapeCompound();
+	D_COLLISION_API ndShapeCompound(const nd::TiXmlNode* const xmlNode);
+	D_COLLISION_API virtual ~ndShapeCompound();
 
 	void SetOwner(const ndShapeInstance* const myInstance);
 
@@ -87,7 +87,7 @@ class ndShapeCompoundConvex: public ndShape
 	D_COLLISION_API virtual void EndAddRemove();
 
 	protected:
-	ndShapeCompoundConvex(const ndShapeCompoundConvex& source, const ndShapeInstance* const myInstance);
+	ndShapeCompound(const ndShapeCompound& source, const ndShapeInstance* const myInstance);
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
@@ -96,7 +96,7 @@ class ndShapeCompoundConvex: public ndShape
 	virtual dFloat32 GetBoxMinRadius() const;
 	virtual dFloat32 GetBoxMaxRadius() const;
 
-	virtual ndShapeCompoundConvex* GetAsShapeCompoundConvex();
+	virtual ndShapeCompound* GetAsShapeCompound();
 	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
@@ -131,18 +131,18 @@ class ndShapeCompoundConvex: public ndShape
 	friend class ndContactSolver;
 };
 
-inline ndShapeCompoundConvex* ndShapeCompoundConvex::GetAsShapeCompoundConvex()
+inline ndShapeCompound* ndShapeCompound::GetAsShapeCompound()
 { 
 	return this; 
 }
 
-inline void ndShapeCompoundConvex::SetOwner(const ndShapeInstance* const instance)
+inline void ndShapeCompound::SetOwner(const ndShapeInstance* const instance)
 {
 	m_myInstance = instance;
 }
 
 
-class ndShapeCompoundConvex::ndNodeBase: public dClassAlloc
+class ndShapeCompound::ndNodeBase: public dClassAlloc
 {
 	public:
 	ndNodeBase();
@@ -181,7 +181,7 @@ class ndShapeCompoundConvex::ndNodeBase: public dClassAlloc
 	ndTreeArray::dNode* m_myNode;
 };
 
-inline ndShapeCompoundConvex::ndNodeBase::ndNodeBase()
+inline ndShapeCompound::ndNodeBase::ndNodeBase()
 	:dClassAlloc()
 	,m_type(m_node)
 	,m_left(nullptr)
@@ -192,7 +192,7 @@ inline ndShapeCompoundConvex::ndNodeBase::ndNodeBase()
 {
 }
 
-inline ndShapeCompoundConvex::ndNodeBase::ndNodeBase(const ndNodeBase& copyFrom)
+inline ndShapeCompound::ndNodeBase::ndNodeBase(const ndNodeBase& copyFrom)
 	:dClassAlloc()
 	,m_p0(copyFrom.m_p0)
 	,m_p1(copyFrom.m_p1)
@@ -209,7 +209,7 @@ inline ndShapeCompoundConvex::ndNodeBase::ndNodeBase(const ndNodeBase& copyFrom)
 	dAssert(!copyFrom.m_shape);
 }
 
-inline ndShapeCompoundConvex::ndNodeBase::ndNodeBase(ndShapeInstance* const instance)
+inline ndShapeCompound::ndNodeBase::ndNodeBase(ndShapeInstance* const instance)
 	:dClassAlloc()
 	,m_type(m_leaf)
 	,m_left(nullptr)
@@ -221,7 +221,7 @@ inline ndShapeCompoundConvex::ndNodeBase::ndNodeBase(ndShapeInstance* const inst
 	CalculateAABB();
 }
 
-inline ndShapeCompoundConvex::ndNodeBase::ndNodeBase(ndNodeBase* const left, ndNodeBase* const right)
+inline ndShapeCompound::ndNodeBase::ndNodeBase(ndNodeBase* const left, ndNodeBase* const right)
 	:dClassAlloc()
 	,m_type(m_node)
 	,m_left(left)
@@ -238,12 +238,12 @@ inline ndShapeCompoundConvex::ndNodeBase::ndNodeBase(ndNodeBase* const left, ndN
 	SetBox(p0, p1);
 }
 
-inline ndShapeInstance* ndShapeCompoundConvex::ndNodeBase::GetShape() const
+inline ndShapeInstance* ndShapeCompound::ndNodeBase::GetShape() const
 {
 	return m_shape;
 }
 
-inline void ndShapeCompoundConvex::ndNodeBase::CalculateAABB()
+inline void ndShapeCompound::ndNodeBase::CalculateAABB()
 {
 	dVector p0;
 	dVector p1;
@@ -251,7 +251,7 @@ inline void ndShapeCompoundConvex::ndNodeBase::CalculateAABB()
 	SetBox(p0, p1);
 }
 
-inline void ndShapeCompoundConvex::ndNodeBase::SetBox(const dVector& p0, const dVector& p1)
+inline void ndShapeCompound::ndNodeBase::SetBox(const dVector& p0, const dVector& p1)
 {
 	m_p0 = p0;
 	m_p1 = p1;

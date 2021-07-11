@@ -43,7 +43,7 @@ class ndShapeStaticMesh;
 class ndShapeHeightfield;
 class ndShapeConvexPolygon;
 class ndShapeDebugCallback;
-class ndShapeCompoundConvex;
+class ndShapeCompound;
 class ndShapeChamferCylinder;
 
 #ifdef _DEBUG
@@ -219,11 +219,11 @@ class ndShape: public dClassAlloc
 	virtual ndShapeSphere* GetAsShapeSphere() { return nullptr; }
 	virtual ndShapeCapsule* GetAsShapeCapsule() { return nullptr; }
 	virtual ndShapeCylinder* GetAsShapeCylinder() { return nullptr; }
+	virtual ndShapeCompound* GetAsShapeCompound() { return nullptr; }
 	virtual ndShapeStaticBVH* GetAsShapeStaticBVH() { return nullptr; }
 	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return nullptr; }
 	virtual ndShapeStaticMesh* GetAsShapeStaticMeshShape() { return nullptr; }
 	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon() { return nullptr; }
-	virtual ndShapeCompoundConvex* GetAsShapeCompoundConvex() { return nullptr; }
 	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return nullptr; }
 
 	virtual dInt32 GetConvexVertexCount() const;

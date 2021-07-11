@@ -78,9 +78,13 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const dMat
 	heighfieldLocation.m_posit.m_x = -200.0f;
 	heighfieldLocation.m_posit.m_z = -200.0f;
 
-	//BuildFloorBox(scene);
-	//BuildFlatPlane(scene, true);
+	ndShapeInstance sceneInstance (new ndShapeCompound());
+
+	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
+	compound->BeginAddRemove();
+
 	ndBodyKinematic* const body = BuildHeightFieldTerrain(scene, heighfieldLocation);
 
+	compound->EndAddRemove();
 	return body;
 }

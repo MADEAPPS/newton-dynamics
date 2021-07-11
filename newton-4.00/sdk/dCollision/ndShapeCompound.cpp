@@ -25,13 +25,13 @@
 #include "ndShapeInstance.h"
 #include "ndContactSolver.h"
 #include "ndBodyKinematic.h"
-#include "ndShapeCompoundConvex.h"
+#include "ndShapeCompound.h"
 
 #define D_MAX_MIN_VOLUME	dFloat32 (1.0e-3f)
-dVector ndShapeCompoundConvex::ndOOBBTestData::m_padding(dFloat32(1.0e-3f));
-dVector ndShapeCompoundConvex::ndOOBBTestData::m_maxDist(dFloat32(1.0e10f));
+dVector ndShapeCompound::ndOOBBTestData::m_padding(dFloat32(1.0e-3f));
+dVector ndShapeCompound::ndOOBBTestData::m_maxDist(dFloat32(1.0e10f));
 
-ndShapeCompoundConvex::ndOOBBTestData::ndOOBBTestData(const dMatrix& matrix)
+ndShapeCompound::ndOOBBTestData::ndOOBBTestData(const dMatrix& matrix)
 	:m_matrix(matrix)
 	,m_separatingDistance(dFloat32(1.0e10f))
 {
@@ -69,7 +69,7 @@ ndShapeCompoundConvex::ndOOBBTestData::ndOOBBTestData(const dMatrix& matrix)
 	dVector::Transpose4x4(m_crossAxisDotAbs[6], m_crossAxisDotAbs[7], m_crossAxisDotAbs[8], tmp, m_crossAxisDotAbs[8], m_crossAxisDotAbs[8], m_crossAxisDotAbs[8], m_crossAxisDotAbs[8]);
 }
 
-ndShapeCompoundConvex::ndOOBBTestData::ndOOBBTestData(const dMatrix& matrix, const dVector& localOrigin, const dVector& localSize)
+ndShapeCompound::ndOOBBTestData::ndOOBBTestData(const dMatrix& matrix, const dVector& localOrigin, const dVector& localSize)
 	:m_matrix(matrix)
 	,m_origin(localOrigin)
 	,m_size(localSize)
@@ -132,7 +132,7 @@ ndShapeCompoundConvex::ndOOBBTestData::ndOOBBTestData(const dMatrix& matrix, con
 	dVector::Transpose4x4(m_extendsMinX[2], m_extendsMaxX[2], tmp, tmp, extends[8], extends[8], extends[8], extends[8]);
 }
 
-dFloat32 ndShapeCompoundConvex::ndOOBBTestData::UpdateSeparatingDistance(const dVector& box0Min, const dVector& box0Max, const dVector& box1Min, const dVector& box1Max) const
+dFloat32 ndShapeCompound::ndOOBBTestData::UpdateSeparatingDistance(const dVector& box0Min, const dVector& box0Max, const dVector& box1Min, const dVector& box1Max) const
 {
 	const dVector minBox(box0Min - box1Max);
 	const dVector maxBox(box0Max - box1Min);
@@ -147,7 +147,7 @@ dFloat32 ndShapeCompoundConvex::ndOOBBTestData::UpdateSeparatingDistance(const d
 	return dist.GetScalar();
 }
 
-ndShapeCompoundConvex::ndNodeBase::~ndNodeBase()
+ndShapeCompound::ndNodeBase::~ndNodeBase()
 {
 	if (m_shape) 
 	{
@@ -164,7 +164,7 @@ ndShapeCompoundConvex::ndNodeBase::~ndNodeBase()
 	}
 }
 
-//void ndShapeCompoundConvex::ndNodeBase::Sanity(int level = 0)
+//void ndShapeCompound::ndNodeBase::Sanity(int level = 0)
 //{
 //	char space[256];
 //	for (int i = 0; i < level; i++)
@@ -186,7 +186,7 @@ ndShapeCompoundConvex::ndNodeBase::~ndNodeBase()
 //	}
 //}
 
-bool ndShapeCompoundConvex::ndNodeBase::BoxTest(const ndOOBBTestData& data) const
+bool ndShapeCompound::ndNodeBase::BoxTest(const ndOOBBTestData& data) const
 {
 	dFloat32 separatingDistance = data.UpdateSeparatingDistance(data.m_aabbP0, data.m_aabbP1, m_p0, m_p1);
 	if (dOverlapTest(data.m_aabbP0, data.m_aabbP1, m_p0, m_p1)) 
@@ -228,7 +228,7 @@ bool ndShapeCompoundConvex::ndNodeBase::BoxTest(const ndOOBBTestData& data) cons
 	return false;
 }
 	
-bool ndShapeCompoundConvex::ndNodeBase::BoxTest(const ndOOBBTestData& data, const ndNodeBase* const otherNode) const
+bool ndShapeCompound::ndNodeBase::BoxTest(const ndOOBBTestData& data, const ndNodeBase* const otherNode) const
 {
 	dVector otherOrigin(data.m_matrix.TransformVector(otherNode->m_origin));
 	dVector otherSize(data.m_absMatrix.RotateVector(otherNode->m_size));
@@ -287,7 +287,7 @@ bool ndShapeCompoundConvex::ndNodeBase::BoxTest(const ndOOBBTestData& data, cons
 	return false;
 }
 
-class ndShapeCompoundConvex::ndSpliteInfo
+class ndShapeCompound::ndSpliteInfo
 {
 	public:
 	ndSpliteInfo(ndNodeBase** const boxArray, dInt32 boxCount)
@@ -396,12 +396,12 @@ class ndShapeCompoundConvex::ndSpliteInfo
 	dVector m_p1;
 };
 
-ndShapeCompoundConvex::ndTreeArray::ndTreeArray()
+ndShapeCompound::ndTreeArray::ndTreeArray()
 	:dTree<ndNodeBase*, dInt32, dContainersFreeListAlloc<ndNodeBase*>>()
 {
 }
 
-void ndShapeCompoundConvex::ndTreeArray::AddNode(ndNodeBase* const node, dInt32 index, const ndShapeInstance* const parent)
+void ndShapeCompound::ndTreeArray::AddNode(ndNodeBase* const node, dInt32 index, const ndShapeInstance* const parent)
 {
 	ndTreeArray::dNode* const myNode = Insert(node, index);
 	node->m_myNode = myNode;
@@ -409,7 +409,7 @@ void ndShapeCompoundConvex::ndTreeArray::AddNode(ndNodeBase* const node, dInt32 
 	node->m_shape->m_subCollisionHandle = myNode;
 }
 
-ndShapeCompoundConvex::ndShapeCompoundConvex()
+ndShapeCompound::ndShapeCompound()
 	:ndShape(m_compoundConvex)
 	,m_array()
 	,m_treeEntropy(dFloat32(0.0f))
@@ -421,7 +421,7 @@ ndShapeCompoundConvex::ndShapeCompoundConvex()
 {
 }
 
-ndShapeCompoundConvex::ndShapeCompoundConvex(const ndShapeCompoundConvex& source, const ndShapeInstance* const myInstance)
+ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeInstance* const myInstance)
 	:ndShape(source)
 	,m_array()
 	,m_treeEntropy(dFloat32(0.0f))
@@ -520,7 +520,7 @@ ndShapeCompoundConvex::ndShapeCompoundConvex(const ndShapeCompoundConvex& source
 	}
 }
 
-ndShapeCompoundConvex::ndShapeCompoundConvex(const nd::TiXmlNode* const xmlNode)
+ndShapeCompound::ndShapeCompound(const nd::TiXmlNode* const xmlNode)
 	:ndShape(m_compoundConvex)
 	,m_array()
 	,m_treeEntropy(dFloat32 (0.0f))
@@ -534,7 +534,7 @@ ndShapeCompoundConvex::ndShapeCompoundConvex(const nd::TiXmlNode* const xmlNode)
 	xmlGetInt(xmlNode, "xxxx");
 }
 
-ndShapeCompoundConvex::~ndShapeCompoundConvex()
+ndShapeCompound::~ndShapeCompound()
 {
 	if (m_root) 
 	{
@@ -543,7 +543,7 @@ ndShapeCompoundConvex::~ndShapeCompoundConvex()
 }
 
 /*
-void ndShapeCompoundConvex::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const
+void ndShapeCompound::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const
 {
 	dAssert(0);
 	dVector origin(matrix.TransformVector(m_boxOrigin));
@@ -554,8 +554,8 @@ void ndShapeCompoundConvex::CalcAABB(const dMatrix& matrix, dVector &p0, dVector
 }
 
 
-//dInt32 ndShapeCompoundConvex::CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 stride, const dPlane& localPlane, dVector* const contactsOut) const
-dInt32 ndShapeCompoundConvex::CalculatePlaneIntersection(const dFloat32* const, const dInt32* const, dInt32, dInt32, const dPlane&, dVector* const) const
+//dInt32 ndShapeCompound::CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 stride, const dPlane& localPlane, dVector* const contactsOut) const
+dInt32 ndShapeCompound::CalculatePlaneIntersection(const dFloat32* const, const dInt32* const, dInt32, dInt32, const dPlane&, dVector* const) const
 {
 	dAssert(0);
 	return 0;
@@ -606,7 +606,7 @@ dInt32 ndShapeCompoundConvex::CalculatePlaneIntersection(const dFloat32* const, 
 }
 */
 
-ndShapeInfo ndShapeCompoundConvex::GetShapeInfo() const
+ndShapeInfo ndShapeCompound::GetShapeInfo() const
 {
 	ndShapeInfo info(ndShape::GetShapeInfo());
 
@@ -614,7 +614,7 @@ ndShapeInfo ndShapeCompoundConvex::GetShapeInfo() const
 	return info;
 }
 
-void ndShapeCompoundConvex::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+void ndShapeCompound::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
 	ndTreeArray::Iterator iter(m_array);
 	for (iter.Begin(); iter; iter++) 
@@ -624,25 +624,25 @@ void ndShapeCompoundConvex::DebugShape(const dMatrix& matrix, ndShapeDebugCallba
 	}
 }
 
-dFloat32 ndShapeCompoundConvex::GetVolume() const
+dFloat32 ndShapeCompound::GetVolume() const
 {
 	dAssert(0);
 	return dFloat32(0.0f);
 }
 
-dFloat32 ndShapeCompoundConvex::GetBoxMinRadius() const
+dFloat32 ndShapeCompound::GetBoxMinRadius() const
 {
 	dAssert(0);
 	return dFloat32(0.0f);
 }
 
-dFloat32 ndShapeCompoundConvex::GetBoxMaxRadius() const
+dFloat32 ndShapeCompound::GetBoxMaxRadius() const
 {
 	dAssert(0);
 	return dFloat32(0.0f);
 }
 
-void ndShapeCompoundConvex::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
+void ndShapeCompound::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
 {
 	if (m_root) 
 	{
@@ -658,38 +658,38 @@ void ndShapeCompoundConvex::CalcAABB(const dMatrix& matrix, dVector& p0, dVector
 	}
 }
 
-dVector ndShapeCompoundConvex::SupportVertex(const dVector&, dInt32* const) const
+dVector ndShapeCompound::SupportVertex(const dVector&, dInt32* const) const
 {
 	dAssert(0);
 	return dVector::m_zero;
 }
 
-//dVector ndShapeCompoundConvex::SupportVertexSpecialProjectPoint(const dVector& point, const dVector&) const
-dVector ndShapeCompoundConvex::SupportVertexSpecialProjectPoint(const dVector&, const dVector&) const
+//dVector ndShapeCompound::SupportVertexSpecialProjectPoint(const dVector& point, const dVector&) const
+dVector ndShapeCompound::SupportVertexSpecialProjectPoint(const dVector&, const dVector&) const
 { 
 	dAssert(0);
 	return dVector::m_zero;
 }
 
-dVector ndShapeCompoundConvex::SupportVertexSpecial(const dVector& dir, dFloat32, dInt32* const vertexIndex) const
+dVector ndShapeCompound::SupportVertexSpecial(const dVector& dir, dFloat32, dInt32* const vertexIndex) const
 {
 	dAssert(0);
 	return SupportVertex(dir, vertexIndex);
 }
 
-dInt32 ndShapeCompoundConvex::CalculatePlaneIntersection(const dVector&, const dVector&, dVector* const) const
+dInt32 ndShapeCompound::CalculatePlaneIntersection(const dVector&, const dVector&, dVector* const) const
 {
 	dAssert(0);
 	return 0;
 }
 
-dVector ndShapeCompoundConvex::CalculateVolumeIntegral(const dMatrix&, const dVector&, const ndShapeInstance&) const
+dVector ndShapeCompound::CalculateVolumeIntegral(const dMatrix&, const dVector&, const ndShapeInstance&) const
 {
 	dAssert(0);
 	return dVector::m_zero;
 }
 
-dFloat32 ndShapeCompoundConvex::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
 	if (!m_root) 
 	{
@@ -778,12 +778,12 @@ dFloat32 ndShapeCompoundConvex::RayCast(ndRayCastNotify& callback, const dVector
 	return maxT;
 }
 
-void ndShapeCompoundConvex::BeginAddRemove()
+void ndShapeCompound::BeginAddRemove()
 {
 	dAssert(m_myInstance);
 }
 
-dFloat32 ndShapeCompoundConvex::CalculateSurfaceArea(ndNodeBase* const node0, ndNodeBase* const node1, dVector& minBox, dVector& maxBox) const
+dFloat32 ndShapeCompound::CalculateSurfaceArea(ndNodeBase* const node0, ndNodeBase* const node1, dVector& minBox, dVector& maxBox) const
 {
 	minBox = node0->m_p0.GetMin(node1->m_p0);
 	maxBox = node0->m_p1.GetMax(node1->m_p1);
@@ -792,7 +792,7 @@ dFloat32 ndShapeCompoundConvex::CalculateSurfaceArea(ndNodeBase* const node0, nd
 }
 
 
-void ndShapeCompoundConvex::ImproveNodeFitness(ndNodeBase* const node) const
+void ndShapeCompound::ImproveNodeFitness(ndNodeBase* const node) const
 {
 	dAssert(node->m_left);
 	dAssert(node->m_right);
@@ -964,7 +964,7 @@ void ndShapeCompoundConvex::ImproveNodeFitness(ndNodeBase* const node) const
 	}
 }
 
-dFloat64 ndShapeCompoundConvex::CalculateEntropy(dInt32 count, ndNodeBase** array)
+dFloat64 ndShapeCompound::CalculateEntropy(dInt32 count, ndNodeBase** array)
 {
 	dFloat64 cost0 = dFloat32(1.0e20f);
 	dFloat64 cost1 = cost0;
@@ -989,7 +989,7 @@ dFloat64 ndShapeCompoundConvex::CalculateEntropy(dInt32 count, ndNodeBase** arra
 	return cost0;
 }
 
-dInt32 ndShapeCompoundConvex::CompareNodes(const ndNodeBase* const nodeA, const ndNodeBase* const nodeB, void*)
+dInt32 ndShapeCompound::CompareNodes(const ndNodeBase* const nodeA, const ndNodeBase* const nodeB, void*)
 {
 	dFloat32 areaA = nodeA->m_area;
 	dFloat32 areaB = nodeB->m_area;
@@ -1004,7 +1004,7 @@ dInt32 ndShapeCompoundConvex::CompareNodes(const ndNodeBase* const nodeA, const 
 	return 0;
 }
 
-ndShapeCompoundConvex::ndNodeBase* ndShapeCompoundConvex::BuildTopDown(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory, dInt32& rootIndex)
+ndShapeCompound::ndNodeBase* ndShapeCompound::BuildTopDown(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory, dInt32& rootIndex)
 {
 	dAssert(lastBox >= 0);
 	dAssert(firstBox >= 0);
@@ -1030,7 +1030,7 @@ ndShapeCompoundConvex::ndNodeBase* ndShapeCompoundConvex::BuildTopDown(ndNodeBas
 	return parent;
 }
 
-ndShapeCompoundConvex::ndNodeBase* ndShapeCompoundConvex::BuildTopDownBig(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory, dInt32& rootIndex)
+ndShapeCompound::ndNodeBase* ndShapeCompound::BuildTopDownBig(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory, dInt32& rootIndex)
 {
 	if (lastBox == firstBox) 
 	{
@@ -1080,7 +1080,7 @@ ndShapeCompoundConvex::ndNodeBase* ndShapeCompoundConvex::BuildTopDownBig(ndNode
 	return parent;
 }
 
-void ndShapeCompoundConvex::EndAddRemove()
+void ndShapeCompound::EndAddRemove()
 {
 	if (m_root) 
 	{
@@ -1174,7 +1174,7 @@ void ndShapeCompoundConvex::EndAddRemove()
 	}
 }
 
-ndShapeCompoundConvex::ndTreeArray::dNode* ndShapeCompoundConvex::AddCollision(ndShapeInstance* const shape)
+ndShapeCompound::ndTreeArray::dNode* ndShapeCompound::AddCollision(ndShapeInstance* const shape)
 {
 	dAssert(m_myInstance);
 	ndNodeBase* const newNode = new ndNodeBase(shape);
@@ -1251,7 +1251,7 @@ ndShapeCompoundConvex::ndTreeArray::dNode* ndShapeCompoundConvex::AddCollision(n
 	return newNode->m_myNode;
 }
 
-void ndShapeCompoundConvex::MassProperties()
+void ndShapeCompound::MassProperties()
 {
 #ifdef _DEBUG
 	//	dVector origin_ (dVector::m_zero);
@@ -1296,7 +1296,7 @@ void ndShapeCompoundConvex::MassProperties()
 	ndShape::MassProperties();
 }
 
-void ndShapeCompoundConvex::SetSubShapeOwner(ndBodyKinematic* const body)
+void ndShapeCompound::SetSubShapeOwner(ndBodyKinematic* const body)
 {
 	ndTreeArray::Iterator iter(m_array);
 	for (iter.Begin(); iter; iter++)
@@ -1307,7 +1307,7 @@ void ndShapeCompoundConvex::SetSubShapeOwner(ndBodyKinematic* const body)
 	}
 }
 
-void ndShapeCompoundConvex::ApplyScale(const dVector& scale)
+void ndShapeCompound::ApplyScale(const dVector& scale)
 {
 	ndTreeArray::Iterator iter(m_array);
 	for (iter.Begin(); iter; iter++) 
@@ -1320,7 +1320,7 @@ void ndShapeCompoundConvex::ApplyScale(const dVector& scale)
 	EndAddRemove();
 }
 
-dFloat32 ndShapeCompoundConvex::CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const
+dFloat32 ndShapeCompound::CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const
 {
 	class ndCalculateMassProperties: public ndShapeDebugCallback
 	{
@@ -1339,7 +1339,7 @@ dFloat32 ndShapeCompoundConvex::CalculateMassProperties(const dMatrix& offset, d
 	return massPropretiesCalculator.m_localData.MassProperties(centerOfMass, inertia, crossInertia);
 }
 
-dMatrix ndShapeCompoundConvex::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const
+dMatrix ndShapeCompound::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const
 {
 	dVector inertiaII;
 	dVector crossInertia;

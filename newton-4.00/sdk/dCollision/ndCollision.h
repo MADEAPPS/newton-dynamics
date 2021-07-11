@@ -53,6 +53,7 @@
 #include <ndShapeInstance.h>
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
+#include <ndShapeCompound.h>
 #include <ndShapeStaticBVH.h>
 #include <ndContactOptions.h>
 #include <ndShapeConvexHull.h>
@@ -63,7 +64,6 @@
 #include <ndBodyTriggerVolume.h>
 #include <ndBodiesInAabbNotify.h>
 #include <ndShapeConvexPolygon.h>
-#include <ndShapeCompoundConvex.h>
 #include <ndShapeChamferCylinder.h>
 #include <ndJointBilateralConstraint.h>
 #include <ndShapeInstanceMeshBuilder.h>

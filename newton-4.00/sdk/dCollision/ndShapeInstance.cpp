@@ -26,7 +26,7 @@
 #include "ndShapeInstance.h"
 #include "ndRayCastNotify.h"
 #include "ndBodyKinematic.h"
-#include "ndShapeCompoundConvex.h"
+#include "ndShapeCompound.h"
 
 dVector ndShapeInstance::m_padding(D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, dFloat32(0.0f));
 
@@ -46,6 +46,11 @@ ndShapeInstance::ndShapeInstance(ndShape* const shape)
 	,m_scaleType(m_unit)
 	,m_collisionMode(true)
 {
+	ndShapeCompound* const compound = shape->GetAsShapeCompound();
+	if (compound)
+	{
+		compound->SetOwner(this);
+	}
 }
 
 ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
@@ -64,25 +69,13 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 	,m_scaleType(instance.m_scaleType)
 	,m_collisionMode(instance.m_collisionMode)
 {
-	if (((ndShape*)m_shape)->GetAsShapeCompoundConvex())
+	ndShapeCompound* const compound = ((ndShape*)m_shape)->GetAsShapeCompound();
+	if (compound)
 	{
-		//if (m_childShape->IsType(dgCollision::dgCollisionCompoundBreakable_RTTI)) 
-		//{
-		//	dgCollisionCompoundFractured* const compound = (dgCollisionCompoundFractured*)m_childShape;
-		//	m_childShape = new (m_world->GetAllocator()) dgCollisionCompoundFractured(*compound, this);
-		//}
-		//else if (m_childShape->IsType(dgCollision::dgCollisionScene_RTTI)) 
-		//{
-		//	dgCollisionScene* const scene = (dgCollisionScene*)m_childShape;
-		//	m_childShape = new (m_world->GetAllocator()) dgCollisionScene(*scene, this);
-		//}
-		//else 
-		{
-			m_shape->Release();
-			ndShapeCompoundConvex* const convexShape = ((ndShape*)m_shape)->GetAsShapeCompoundConvex();
-			m_shape = new ndShapeCompoundConvex(*convexShape, this);
-			m_shape->AddRef();
-		}
+		m_shape->Release();
+		m_shape = new ndShapeCompound(*compound, this);
+		m_shape->AddRef();
+		dAssert(0);
 	}
 }
 
@@ -186,7 +179,7 @@ ndShapeInfo ndShapeInstance::GetShapeInfo() const
 dMatrix ndShapeInstance::CalculateInertia() const
 {
 	ndShape* const shape = (ndShape*)m_shape;
-	if (shape->GetAsShapeNull() || !(shape->GetAsShapeConvex() || shape->GetAsShapeCompoundConvex()))
+	if (shape->GetAsShapeNull() || !(shape->GetAsShapeConvex() || shape->GetAsShapeCompound()))
 	{
 		return dGetZeroMatrix();
 	}
@@ -313,7 +306,7 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				t = m_shape->RayCast(callback, p0, p1, dFloat32(1.0f), body, contactOut);
 				if (t < dFloat32(1.0f))
 				{
-					dAssert(!((ndShape*)m_shape)->GetAsShapeCompoundConvex());
+					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 					contactOut.m_shapeInstance0 = this;
 					contactOut.m_shapeInstance1 = this;
 				}
@@ -327,7 +320,7 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				t = m_shape->RayCast(callback, p0, p1, dFloat32(1.0f), body, contactOut);
 				if (t < dFloat32(1.0f))
 				{
-					dAssert(!((ndShape*)m_shape)->GetAsShapeCompoundConvex());
+					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 					dVector normal(m_invScale * contactOut.m_normal);
 					contactOut.m_normal = normal.Normalize();
 					contactOut.m_shapeInstance0 = this;
@@ -344,7 +337,7 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				t = m_shape->RayCast(callback, p0, p1, dFloat32(1.0f), body, contactOut);
 				if (t < dFloat32(1.0f))
 				{
-					dAssert(!((ndShape*)m_shape)->GetAsShapeCompoundConvex());
+					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 					dVector normal(m_aligmentMatrix.RotateVector(m_invScale * contactOut.m_normal));
 					contactOut.m_normal = normal.Normalize();
 					contactOut.m_shapeInstance0 = this;
@@ -416,10 +409,10 @@ void ndShapeInstance::SetScale(const dVector& scale)
 	dAssert(scaleZ > dFloat32(0.0f));
 
 	//if (IsType(dgCollision::dgCollisionCompound_RTTI)) 
-	if (((ndShape*)m_shape)->GetAsShapeCompoundConvex())
+	if (((ndShape*)m_shape)->GetAsShapeCompound())
 	{
 		dAssert(m_scaleType == m_unit);
-		ndShapeCompoundConvex* const compound = ((ndShape*)m_shape)->GetAsShapeCompoundConvex();
+		ndShapeCompound* const compound = ((ndShape*)m_shape)->GetAsShapeCompound();
 		compound->ApplyScale(scale);
 	}
 	else if ((dAbs(scaleX - scaleY) < dFloat32(1.0e-4f)) && (dAbs(scaleX - scaleZ) < dFloat32(1.0e-4f))) 

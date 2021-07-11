@@ -56,7 +56,7 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 	dgMeshEffectBuilder builder;
 
 	Init();
-	if (((ndShape*)instance.GetShape())->GetAsShapeCompoundConvex())
+	if (((ndShape*)instance.GetShape())->GetAsShapeCompound())
 	{
 		dAssert(0);
 		//dgCollisionInfo collisionInfo;
