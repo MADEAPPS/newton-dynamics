@@ -18,6 +18,7 @@
 #include "ndSoundManager.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
+#include "ndCompoundScene.h"
 #include "ndVehicleCommon.h"
 #include "ndMakeStaticMap.h"
 #include "ndTargaToOpenGl.h"
@@ -656,13 +657,13 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	heighfieldLocation.m_posit.m_z = -200.0f;
 
 	//BuildFloorBox(scene);
+	 BuildCompoundScene(scene);
 	//BuildFlatPlane(scene, true);
-	BuildHeightFieldTerrain(scene, heighfieldLocation);
-
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
+	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);

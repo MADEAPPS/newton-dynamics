@@ -9,18 +9,12 @@
 * freely
 */
 
-
-#ifndef _USER_PLANE_COLLISION_H 
-#define _USER_PLANE_COLLISION_H 
+#ifndef __SceneCompoundCollision_h__
+#define __SceneCompoundCollision_h__
 
 #include "ndSandboxStdafx.h"
 
-
 class ndDemoEntityManager;
+ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const dMatrix& location = dGetIdentityMatrix());
+#endif 
 
-#if 0
-ndDemoMesh* CreateVisualPlaneMesh (const dVector& plane, ndDemoEntityManager* const scene);
-NewtonCollision* CreateInfinitePlane (NewtonWorld* const world, const dVector& planeEquation);
-#endif
-
-#endif
