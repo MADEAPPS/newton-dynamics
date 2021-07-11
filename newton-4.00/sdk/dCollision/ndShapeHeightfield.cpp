@@ -220,11 +220,6 @@ void ndShapeHeightfield::CalculateMinExtend3d(const dVector& p0, const dVector& 
 	boxP0 = q0.Select((q0 * invScale).Floor() * scale, m_yMask);
 	boxP1 = q1.Select((q1 * invScale).Floor() * scale + scale, m_yMask);
 	
-	//const dVector minBox(boxP0.Select(m_minBox, m_yMask));
-	//const dVector maxBox(boxP1.Select(m_maxBox, m_yMask));
-	//
-	//boxP0 = boxP0.GetMax(minBox);
-	//boxP1 = boxP1.GetMin(maxBox);
 	boxP0 = boxP0.Select(boxP0.GetMax(m_minBox), m_yMask);
 	boxP1 = boxP1.Select(boxP1.GetMin(m_maxBox), m_yMask);
 }
@@ -523,8 +518,6 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	boxP0 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace < dVector::m_zero);
 	boxP1 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace > dVector::m_zero);
 
-	//boxP0 = boxP0.Select(boxP0.GetMax(dVector::m_zero), m_yMask);
-	//boxP1 = boxP1.Select(boxP1.GetMax(dVector::m_zero), m_yMask);
 	boxP0 = boxP0.Select(boxP0.GetMax(m_minBox), m_yMask);
 	boxP1 = boxP1.Select(boxP1.GetMin(m_maxBox), m_yMask);
 

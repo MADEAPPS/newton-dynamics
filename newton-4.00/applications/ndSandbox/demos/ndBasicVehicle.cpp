@@ -678,7 +678,6 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//matrix = matrix * dRollMatrix(-70.0f * dDegreeToRad);
 	//matrix.m_posit = location;
 
-	
 	ndSoundManager* const soundManager = world->GetSoundManager();
 	for (int i = 0; i < sizeof(engineSounds) / sizeof(engineSounds[0]); i++)
 	{
