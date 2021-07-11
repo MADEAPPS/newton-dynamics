@@ -165,7 +165,7 @@ static ndVehicleDectriptorJeep jeepDesc;
 static ndVehicleDectriptorViper viperDesc;
 static ndVehicleDectriptorMonsterTruck monterTruckDesc;
 
-static char* engineSounds[] =
+static const char* engineSounds[] =
 {
 	"engine_start.wav",
 	"engine_rpm.wav",
