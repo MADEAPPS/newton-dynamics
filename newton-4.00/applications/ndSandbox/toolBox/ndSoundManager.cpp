@@ -312,18 +312,18 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 	{
 		char xbuffer[5];
 		memset(xbuffer, 0, sizeof(xbuffer));
-		fread(xbuffer, sizeof(char), 4, wave);
+		size_t bytesRead = fread(xbuffer, sizeof(char), 4, wave);
 		if (!strcmp(xbuffer, "RIFF"))
 		{
 			dInt32 chunkSize;
-			fread(&chunkSize, sizeof(dInt32), 1, wave);
-			fread(xbuffer, sizeof(char), 4, wave);
+			bytesRead = fread(&chunkSize, sizeof(dInt32), 1, wave);
+			bytesRead = fread(xbuffer, sizeof(char), 4, wave);
 			if (!strcmp(xbuffer, "WAVE"))
 			{
-				fread(xbuffer, sizeof(char), 4, wave);
+				bytesRead = fread(xbuffer, sizeof(char), 4, wave);
 				if (!strcmp(xbuffer, "fmt "))
 				{
-					fread(&chunkSize, sizeof(dInt32), 1, wave);
+					bytesRead = fread(&chunkSize, sizeof(dInt32), 1, wave);
 
 					dInt32 sampleRate;
 					dInt32 byteRate;
@@ -332,15 +332,15 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 					short blockAlign;
 					short bitsPerSample;
 
-					fread(&audioFormat, sizeof(short), 1, wave);
-					fread(&channels, sizeof(short), 1, wave);
-					fread(&sampleRate, sizeof(dInt32), 1, wave);
-					fread(&byteRate, sizeof(dInt32), 1, wave);
-					fread(&blockAlign, sizeof(short), 1, wave);
-					fread(&bitsPerSample, sizeof(short), 1, wave);
+					bytesRead = fread(&audioFormat, sizeof(short), 1, wave);
+					bytesRead = fread(&channels, sizeof(short), 1, wave);
+					bytesRead = fread(&sampleRate, sizeof(dInt32), 1, wave);
+					bytesRead = fread(&byteRate, sizeof(dInt32), 1, wave);
+					bytesRead = fread(&blockAlign, sizeof(short), 1, wave);
+					bytesRead = fread(&bitsPerSample, sizeof(short), 1, wave);
 					for (dInt32 i = 0; i < (chunkSize - 16); i++)
 					{
-						fread(xbuffer, sizeof(char), 1, wave);
+						bytesRead = fread(xbuffer, sizeof(char), 1, wave);
 					}
 
 					#define WAVE_FORMAT_PCM 0x0001
@@ -352,24 +352,24 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 					// I only parse WAVE_FORMAT_PCM format
 					dAssert(audioFormat == WAVE_FORMAT_PCM);
 
-					fread(xbuffer, sizeof(char), 4, wave);
+					bytesRead = fread(xbuffer, sizeof(char), 4, wave);
 					if (!strcmp(xbuffer, "fact"))
 					{
 						dInt32 size;
 						dInt32 samplesPerChannels;
-						fread(&size, sizeof(dInt32), 1, wave);
-						fread(&samplesPerChannels, sizeof(dInt32), 1, wave);
-						fread(xbuffer, sizeof(char), 4, wave);
+						bytesRead = fread(&size, sizeof(dInt32), 1, wave);
+						bytesRead = fread(&samplesPerChannels, sizeof(dInt32), 1, wave);
+						bytesRead = fread(xbuffer, sizeof(char), 4, wave);
 					}
 
 					if (!strcmp(xbuffer, "data"))
 					{
 						dInt32 size;
-						fread(&size, sizeof(dInt32), 1, wave);
+						bytesRead = fread(&size, sizeof(dInt32), 1, wave);
 
 						dArray<char> data;
 						data.SetCount(size);
-						fread(&data[0], sizeof(char), size, wave);
+						bytesRead = fread(&data[0], sizeof(char), size, wave);
 
 						dInt32 waveFormat = AL_FORMAT_MONO8;
 						if (channels == 1)
