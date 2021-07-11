@@ -30,13 +30,13 @@
 
 
 ndShapeCapsule::ndShapeCapsule(dFloat32 radius0, dFloat32 radius1, dFloat32 height)
-	:ndShapeConvex(m_capsuleCollision)
+	:ndShapeConvex(m_capsule)
 {
 	Init(radius0, radius1, height);
 }
 
 ndShapeCapsule::ndShapeCapsule(const nd::TiXmlNode* const xmlNode)
-	: ndShapeConvex(m_capsuleCollision)
+	: ndShapeConvex(m_capsule)
 {
 	dFloat32 radius0 = xmlGetFloat(xmlNode, "radius0");
 	dFloat32 radius1 = xmlGetFloat(xmlNode, "radius1");

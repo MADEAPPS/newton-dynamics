@@ -34,13 +34,13 @@ ndShapeConvex::ndConvexSimplexEdge ndShapeSphere::m_edgeArray[D_SPHERE_EDGE_COUN
 
 
 ndShapeSphere::ndShapeSphere(dFloat32 radius)
-	:ndShapeConvex(m_sphereCollision)
+	:ndShapeConvex(m_sphere)
 {
 	Init(radius);
 }
 
 ndShapeSphere::ndShapeSphere(const nd::TiXmlNode* const xmlNode)
-	: ndShapeConvex(m_sphereCollision)
+	: ndShapeConvex(m_sphere)
 {
 	dFloat32 radius = xmlGetFloat(xmlNode, "radius");
 	Init(radius);

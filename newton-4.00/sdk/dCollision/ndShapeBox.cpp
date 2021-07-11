@@ -44,13 +44,13 @@ dVector ndShapeBox::m_indexMark(dFloat32(1.0f), dFloat32(2.0f), dFloat32(4.0f), 
 dVector ndShapeBox::m_penetrationTol(D_PENETRATION_TOL, D_PENETRATION_TOL, D_PENETRATION_TOL, dFloat32(0.0f));
 
 ndShapeBox::ndShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
-	:ndShapeConvex(m_boxCollision)
+	:ndShapeConvex(m_box)
 {
 	Init(size_x, size_y, size_z);
 }
 
 ndShapeBox::ndShapeBox(const nd::TiXmlNode* const xmlNode)
-	:ndShapeConvex(m_boxCollision)
+	:ndShapeConvex(m_box)
 {
 	dFloat32 size_x = xmlGetFloat(xmlNode, "size_x");
 	dFloat32 size_y = xmlGetFloat(xmlNode, "size_y");

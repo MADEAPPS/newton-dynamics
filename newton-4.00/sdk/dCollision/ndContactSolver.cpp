@@ -874,7 +874,7 @@ dInt32 ndContactSolver::ConvexContactsDiscrete()
 	}
 	else
 	{
-		if (m_instance1.GetShape()->GetAsShapeStaticMeshShape())
+		if (m_instance1.GetShape()->GetAsShapeStaticMesh())
 		{
 			count = ConvexToStaticMeshContactsDiscrete();
 		}
@@ -930,7 +930,7 @@ dInt32 ndContactSolver::ConvexContactsContinue()
 	}
 	else
 	{
-		ndShapeStaticMesh* const meshShape = m_instance1.GetShape()->GetAsShapeStaticMeshShape();
+		ndShapeStaticMesh* const meshShape = m_instance1.GetShape()->GetAsShapeStaticMesh();
 		if (meshShape)
 		{
 			count = ConvexToStaticMeshContactsContinue();
@@ -1291,11 +1291,11 @@ dInt32 ndContactSolver::ConvexToStaticMeshContactsDiscrete()
 	dAssert(m_instance0.GetConvexVertexCount());
 	dAssert(!m_instance0.GetShape()->GetAsShapeNull());
 	dAssert(m_instance0.GetShape()->GetAsShapeConvex());
-	dAssert(m_instance1.GetShape()->GetAsShapeStaticMeshShape());
+	dAssert(m_instance1.GetShape()->GetAsShapeStaticMesh());
 
 	dInt32 count = 0;
 	ndPolygonMeshDesc data(*this, false);
-	ndShapeStaticMesh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticMeshShape();
+	ndShapeStaticMesh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticMesh();
 	polysoup->GetCollidingFaces(&data);
 
 	if (data.m_faceCount) 
@@ -1328,7 +1328,7 @@ dInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 	dAssert(m_instance0.GetConvexVertexCount());
 	dAssert(!m_instance0.GetShape()->GetAsShapeNull());
 	dAssert(m_instance0.GetShape()->GetAsShapeConvex());
-	dAssert(m_instance1.GetShape()->GetAsShapeStaticMeshShape());
+	dAssert(m_instance1.GetShape()->GetAsShapeStaticMesh());
 
 	dInt32 count = 0;
 	ndPolygonMeshDesc data(*this, true);
@@ -1351,7 +1351,7 @@ dInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 		data.SetDistanceTravel(upperBoundVeloc);
 	}
 
-	ndShapeStaticMesh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticMeshShape();
+	ndShapeStaticMesh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticMesh();
 	polysoup->GetCollidingFaces(&data);
 
 	if (data.m_faceCount)

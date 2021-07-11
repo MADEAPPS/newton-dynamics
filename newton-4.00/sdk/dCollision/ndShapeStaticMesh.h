@@ -123,7 +123,7 @@ class ndShapeStaticMesh: public ndShape
 	virtual dFloat32 GetVolume() const;
 	virtual dFloat32 GetBoxMinRadius() const;
 	virtual dFloat32 GetBoxMaxRadius() const;
-	virtual ndShapeStaticMesh* GetAsShapeStaticMeshShape();
+	virtual ndShapeStaticMesh* GetAsShapeStaticMesh();
 	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
@@ -189,7 +189,7 @@ inline dVector ndShapeStaticMesh::CalculateVolumeIntegral(const dMatrix&, const 
 	return dVector::m_zero;
 }
 
-inline ndShapeStaticMesh* ndShapeStaticMesh::GetAsShapeStaticMeshShape()
+inline ndShapeStaticMesh* ndShapeStaticMesh::GetAsShapeStaticMesh()
 { 
 	return this; 
 }

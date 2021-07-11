@@ -657,13 +657,13 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	heighfieldLocation.m_posit.m_z = -200.0f;
 
 	//BuildFloorBox(scene);
-	 BuildCompoundScene(scene);
+	//BuildCompoundScene(scene);
 	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
-	//BuildHeightFieldTerrain(scene, heighfieldLocation);
+	BuildHeightFieldTerrain(scene, heighfieldLocation);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);

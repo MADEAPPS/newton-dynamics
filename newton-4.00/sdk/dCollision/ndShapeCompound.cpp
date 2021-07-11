@@ -410,7 +410,7 @@ void ndShapeCompound::ndTreeArray::AddNode(ndNodeBase* const node, dInt32 index,
 }
 
 ndShapeCompound::ndShapeCompound()
-	:ndShape(m_compoundConvex)
+	:ndShape(m_compound)
 	,m_array()
 	,m_treeEntropy(dFloat32(0.0f))
 	,m_boxMinRadius(dFloat32(0.0f))
@@ -521,7 +521,7 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeIns
 }
 
 ndShapeCompound::ndShapeCompound(const nd::TiXmlNode* const xmlNode)
-	:ndShape(m_compoundConvex)
+	:ndShape(m_compound)
 	,m_array()
 	,m_treeEntropy(dFloat32 (0.0f))
 	,m_boxMinRadius(dFloat32(0.0f))
@@ -1273,27 +1273,32 @@ void ndShapeCompound::MassProperties()
 	dVector inertiaII(dVector::m_zero);
 	dVector inertiaIJ(dVector::m_zero);
 	ndTreeArray::Iterator iter(m_array);
+	bool hasVolume = true;
 	for (iter.Begin(); iter; iter++) 
 	{
 		ndShapeInstance* const collision = iter.GetNode()->GetInfo()->GetShape();
 		dMatrix shapeInertia(collision->CalculateInertia());
 		dFloat32 shapeVolume = collision->GetVolume();
 
+		hasVolume = hasVolume && (collision->GetShape()->GetAsShapeStaticMesh() != nullptr);
 		volume += shapeVolume;
 		origin += shapeInertia.m_posit.Scale(shapeVolume);
 		inertiaII += dVector(shapeInertia[0][0], shapeInertia[1][1], shapeInertia[2][2], dFloat32(0.0f)).Scale(shapeVolume);
 		inertiaIJ += dVector(shapeInertia[1][2], shapeInertia[0][2], shapeInertia[0][1], dFloat32(0.0f)).Scale(shapeVolume);
 	}
-	if (volume > dFloat32(0.0f)) 
+
+	m_inertia = dVector::m_zero;
+	m_crossInertia = dVector::m_zero;
+	m_centerOfMass = dVector::m_zero;
+	if (hasVolume && (volume > dFloat32(0.0f)))
 	{
 		dFloat32 invVolume = dFloat32(1.0f) / volume;
 		m_inertia = inertiaII.Scale(invVolume);
 		m_crossInertia = inertiaIJ.Scale(invVolume);
 		m_centerOfMass = origin.Scale(invVolume);
 		m_centerOfMass.m_w = volume;
+		ndShape::MassProperties();
 	}
-
-	ndShape::MassProperties();
 }
 
 void ndShapeCompound::SetSubShapeOwner(ndBodyKinematic* const body)

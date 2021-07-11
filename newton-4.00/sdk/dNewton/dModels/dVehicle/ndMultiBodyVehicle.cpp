@@ -584,7 +584,7 @@ void ndMultiBodyVehicle::ApplyTireModel()
 					convexCast.m_param = 0.0f;
 				}
 
-				if (((ndShape*)otherBody->GetCollisionShape().GetShape())->GetAsShapeStaticMeshShape())
+				if (((ndShape*)otherBody->GetCollisionShape().GetShape())->GetAsShapeStaticMesh())
 				{
 					// for mesh collision we need to remove contact duplicates, 
 					// these are contact produced by two or more polygons, 

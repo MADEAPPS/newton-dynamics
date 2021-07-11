@@ -53,30 +53,26 @@ class ndShapeChamferCylinder;
 enum ndShapeID
 {
 	// do not change the order of these enum
-	m_sphereCollision = 0,
-	m_capsuleCollision,
-	m_cylinderCollision,
-	m_chamferCylinderCollision,
-	m_boxCollision,
-	m_coneCollision,
+	m_box = 0,
+	m_cone,
+	m_sphere,
+	m_capsule,
+	m_cylinder,
+	m_chamferCylinder,
 	m_convexHull, // this must be the last convex shape ID
 
 	// special and non convex collisions.
-	m_pointCollision,
-	m_nullCollision,
+	m_compound,
 	m_heightField,
-	m_compoundConvex,
+	m_nullCollision,
+	m_pointCollision,
+	m_polygonCollision,
 	m_boundingBoxHierachy,
 	
 	//m_deformableClothPatch,
 	//m_deformableSolidMesh,
-	//m_userMesh,
-	//m_sceneCollision,
-	//m_compoundFracturedCollision,
-
 	// these are for internal use only	
 	//m_contactCloud,
-	m_polygonCollision,
 	//m_lumpedMassCollision
 };
 
@@ -221,8 +217,8 @@ class ndShape: public dClassAlloc
 	virtual ndShapeCylinder* GetAsShapeCylinder() { return nullptr; }
 	virtual ndShapeCompound* GetAsShapeCompound() { return nullptr; }
 	virtual ndShapeStaticBVH* GetAsShapeStaticBVH() { return nullptr; }
+	virtual ndShapeStaticMesh* GetAsShapeStaticMesh() { return nullptr; }
 	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return nullptr; }
-	virtual ndShapeStaticMesh* GetAsShapeStaticMeshShape() { return nullptr; }
 	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon() { return nullptr; }
 	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return nullptr; }
 

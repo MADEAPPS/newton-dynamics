@@ -33,14 +33,14 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 	ndShapeInfo info(collision->GetShapeInfo());
 	switch (info.m_collisionType)
 	{
-		case ndShapeID::m_sphereCollision:
-		case ndShapeID::m_capsuleCollision:
+		case ndShapeID::m_sphere:
+		case ndShapeID::m_capsule:
 		{
 			mesh.SphericalMapping(LoadTexture(texture0), &aligmentUV[0][0]);
 			break;
 		}
 
-		case ndShapeID::m_boxCollision:
+		case ndShapeID::m_box:
 		{
 			dInt32 tex0 = LoadTexture(texture0);
 			mesh.UniformBoxMapping(tex0, aligmentUV);

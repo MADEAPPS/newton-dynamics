@@ -29,13 +29,13 @@ dInt32 ndShapeCylinder::m_shapeRefCount = 0;
 ndShapeConvex::ndConvexSimplexEdge ndShapeCylinder::m_edgeArray[D_TAPED_CYLINDER_SEGMENTS * 2 * 3];
 
 ndShapeCylinder::ndShapeCylinder(dFloat32 radius0, dFloat32 radius1, dFloat32 height)
-	:ndShapeConvex(m_cylinderCollision)
+	:ndShapeConvex(m_cylinder)
 {
 	Init(radius0, radius1, height);
 }
 
 ndShapeCylinder::ndShapeCylinder(const nd::TiXmlNode* const xmlNode)
-	: ndShapeConvex(m_cylinderCollision)
+	: ndShapeConvex(m_cylinder)
 {
 	dFloat32 radius0 = xmlGetFloat(xmlNode, "radius0");
 	dFloat32 radius1 = xmlGetFloat(xmlNode, "radius1");

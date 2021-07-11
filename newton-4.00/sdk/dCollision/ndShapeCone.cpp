@@ -29,13 +29,13 @@ dInt32 ndShapeCone::m_shapeRefCount = 0;
 ndShapeConvex::ndConvexSimplexEdge ndShapeCone::m_edgeArray[D_CONE_SEGMENTS * 4];
 
 ndShapeCone::ndShapeCone(dFloat32 radius, dFloat32 height)
-	:ndShapeConvex(m_coneCollision)
+	:ndShapeConvex(m_cone)
 {
 	Init(radius, height);
 }
 
 ndShapeCone::ndShapeCone(const nd::TiXmlNode* const xmlNode)
-	: ndShapeConvex(m_coneCollision)
+	: ndShapeConvex(m_cone)
 {
 	dFloat32 radius = xmlGetFloat(xmlNode, "radius");
 	dFloat32 height = xmlGetFloat(xmlNode, "height");

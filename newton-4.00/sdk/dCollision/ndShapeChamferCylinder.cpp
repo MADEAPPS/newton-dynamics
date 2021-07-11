@@ -31,13 +31,13 @@ dVector ndShapeChamferCylinder::m_shapesDirs[DG_MAX_CHAMFERCYLINDER_DIR_COUNT];
 ndShapeConvex::ndConvexSimplexEdge ndShapeChamferCylinder::m_edgeArray[(4 * DG_CHAMFERCYLINDER_SLICES + 2)* DG_CHAMFERCYLINDER_BRAKES];
 
 ndShapeChamferCylinder::ndShapeChamferCylinder(dFloat32 radius, dFloat32 height)
-	:ndShapeConvex(m_chamferCylinderCollision)
+	:ndShapeConvex(m_chamferCylinder)
 {
 	Init (radius, height);
 }
 
 ndShapeChamferCylinder::ndShapeChamferCylinder(const nd::TiXmlNode* const xmlNode)
-	:ndShapeConvex(m_chamferCylinderCollision)
+	:ndShapeConvex(m_chamferCylinder)
 {
 	dVector size;
 	dFloat32 radius = xmlGetFloat(xmlNode, "radius");

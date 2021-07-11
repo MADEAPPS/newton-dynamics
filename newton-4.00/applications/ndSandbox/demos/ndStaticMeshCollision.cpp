@@ -15,6 +15,7 @@
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
+#include "ndCompoundScene.h"
 #include "ndTargaToOpenGl.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
@@ -28,7 +29,8 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	heighfieldLocation.m_posit.m_z = -200.0f;
 
 	//BuildFlatPlane(scene, true);
-	BuildHeightFieldTerrain(scene, heighfieldLocation);
+	BuildCompoundScene(scene);
+	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildStaticMesh(scene, "flatPlane.fbx", false);
 	//BuildStaticMesh(scene, "track.fbx", false);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
