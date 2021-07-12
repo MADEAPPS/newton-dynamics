@@ -26,9 +26,7 @@
 #include "ndDemoCameraManager.h"
 #include "ndHighResolutionTimer.h"
 
-
 //#define ENABLE_REPLAY
-
 #ifdef ENABLE_REPLAY
 	//#define REPLAY_RECORD
 #endif
