@@ -3742,16 +3742,16 @@ ndMeshEffect::ndMeshEffect(const dFloat64* const vertexCloud, dInt32 count, dInt
 
 ndMeshEffect::ndMeshEffect(const ndShapeInstance& shape)
 	:dPolyhedra()
-	, m_name()
-	, m_points()
-	, m_attrib()
-	, m_materials()
-	, m_vertexBaseCount(0)
-	, m_constructionIndex(0)
+	,m_name()
+	,m_points()
+	,m_attrib()
+	,m_materials()
+	,m_vertexBaseCount(0)
+	,m_constructionIndex(0)
 {
 	class ndMeshEffectBuilder : public ndShapeDebugCallback
 	{
-	public:
+		public:
 		ndMeshEffectBuilder()
 			:ndShapeDebugCallback()
 			, m_vertex(1024)

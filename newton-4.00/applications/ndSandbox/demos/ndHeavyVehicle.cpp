@@ -357,8 +357,6 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 	void DrawGage(GLuint gage, GLuint needle, dFloat32 param, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size, dFloat32 minAngle, dFloat32 maxAngle) const
 	{
-dTrace(("**** need a sprite shader for this\n"));
-return;
 		dMatrix origin(dGetIdentityMatrix());
 		origin[1][1] = -1.0f;
 		origin.m_posit = dVector(origin_x, origin_y, 0.0f, 1.0f);
@@ -369,11 +367,11 @@ return;
 		glPushMatrix();
 		glMultMatrix(&origin[0][0]);
 		glBindTexture(GL_TEXTURE_2D, gage);
-		glBegin(GL_QUADS);
+		glBegin(GL_TRIANGLE_STRIP);
 		glTexCoord2f(0.0f, 1.0f); glVertex3f(GLfloat(-size), GLfloat(size), 0.0f);
 		glTexCoord2f(0.0f, 0.0f); glVertex3f(GLfloat(-size), GLfloat(-size), 0.0f);
-		glTexCoord2f(1.0f, 0.0f); glVertex3f(GLfloat(size), GLfloat(-size), 0.0f);
 		glTexCoord2f(1.0f, 1.0f); glVertex3f(GLfloat(size), GLfloat(size), 0.0f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(GLfloat(size), GLfloat(-size), 0.0f);
 		glEnd();
 
 		// render needle
@@ -389,11 +387,11 @@ return;
 		glPushMatrix();
 		glMultMatrix(&needleMatrix[0][0]);
 		glBindTexture(GL_TEXTURE_2D, needle);
-		glBegin(GL_QUADS);
+		glBegin(GL_TRIANGLE_STRIP);
 		glTexCoord2f(0.0f, 1.0f); glVertex3f(GLfloat(-x), GLfloat(y), 0.0f);
 		glTexCoord2f(0.0f, 0.0f); glVertex3f(GLfloat(-x), GLfloat(-y), 0.0f);
-		glTexCoord2f(1.0f, 0.0f); glVertex3f(GLfloat(x), GLfloat(-y), 0.0f);
 		glTexCoord2f(1.0f, 1.0f); glVertex3f(GLfloat(x), GLfloat(y), 0.0f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(GLfloat(x), GLfloat(-y), 0.0f);
 		glEnd();
 
 		glPopMatrix();
@@ -402,9 +400,6 @@ return;
 
 	void DrawGear(dInt32 gear, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size) const
 	{
-dTrace(("**** need a sprite shader for this\n"));
-return;
-
 		dMatrix origin(dGetIdentityMatrix());
 		origin[1][1] = -1.0f;
 		origin.m_posit = dVector(origin_x + size * 0.3f, origin_y - size * 0.25f, 0.0f, 1.0f);
@@ -420,11 +415,11 @@ return;
 		dFloat32 y1 = 10.0f;
 		glColor4f(1, 1, 0, 1);
 		glBindTexture(GL_TEXTURE_2D, m_gears);
-		glBegin(GL_QUADS);
+		glBegin(GL_TRIANGLE_STRIP);
 		glTexCoord2f(GLfloat(u0), 1.0f); glVertex3f(GLfloat(-x1), GLfloat(y1), 0.0f);
 		glTexCoord2f(GLfloat(u0), 0.0f); glVertex3f(GLfloat(-x1), GLfloat(-y1), 0.0f);
-		glTexCoord2f(GLfloat(u1), 0.0f); glVertex3f(GLfloat(x1), GLfloat(-y1), 0.0f);
 		glTexCoord2f(GLfloat(u1), 1.0f); glVertex3f(GLfloat(x1), GLfloat(y1), 0.0f);
+		glTexCoord2f(GLfloat(u1), 0.0f); glVertex3f(GLfloat(x1), GLfloat(-y1), 0.0f);
 		glEnd();
 
 		glPopMatrix();

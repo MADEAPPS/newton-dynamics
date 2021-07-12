@@ -307,8 +307,6 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 	entity->m_fbxMeshEffect = mesh;
 
 	const ofbx::Geometry* const geom = fbxMesh->getGeometry();
-
-	
 	const ofbx::Vec3* const vertices = geom->getVertices();
 	dInt32 indexCount = geom->getIndexCount();
 	dInt32* const indexArray = new dInt32 [indexCount];

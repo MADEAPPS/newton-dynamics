@@ -40,10 +40,8 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	virtual void RenderNormals();
 	virtual void Render (ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 	virtual void RenderTransparency(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
-	//void OptimizeForRender(const dArray<ndMeshPointUV>& points, const dArray<dInt32>& indices);
 	void OptimizeForRender(const ndMeshPointUV* const points, dInt32 pointCount,
 						   const dInt32* const indices, dInt32 indexCount);
-
 	void GetVertexArray(dArray<dVector>& points) const;
 
 	protected:

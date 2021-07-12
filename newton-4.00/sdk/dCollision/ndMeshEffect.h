@@ -436,7 +436,6 @@ class ndMeshEffect: public dPolyhedra
 
 	ndMeshEffect* GetFirstLayer();
 	ndMeshEffect* GetNextLayer(ndMeshEffect* const layer);
-
 	
 	D_COLLISION_API void FlipWinding();
 	D_COLLISION_API bool HasOpenEdges() const;
