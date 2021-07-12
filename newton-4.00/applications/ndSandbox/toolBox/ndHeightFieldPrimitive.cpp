@@ -176,6 +176,7 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 	dArray<dVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
 	MakeNoiseHeightfield(heightfield);
 
+	// create the visual mesh
 	ndDemoMesh* const mesh = new ndHeightfieldMesh(heightfield, scene->GetShaderCache());
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
 	entity->SetMesh(mesh, dGetIdentityMatrix());

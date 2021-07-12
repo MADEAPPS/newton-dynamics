@@ -34,6 +34,7 @@ class ndShapeConvex;
 class ndShapeSphere;
 class ndShapeCapsule;
 class ndContactPoint;
+class ndShapeCompound;
 class ndShapeCylinder;
 class ndShapeCompound;
 class ndRayCastNotify;
@@ -43,7 +44,6 @@ class ndShapeStaticMesh;
 class ndShapeHeightfield;
 class ndShapeConvexPolygon;
 class ndShapeDebugCallback;
-class ndShapeCompound;
 class ndShapeChamferCylinder;
 
 #ifdef _DEBUG

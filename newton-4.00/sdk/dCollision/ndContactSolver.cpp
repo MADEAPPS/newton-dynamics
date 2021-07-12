@@ -34,7 +34,6 @@
 #include "ndShapeHeightfield.h"
 #include "ndShapeConvexPolygon.h"
 
-
 dVector ndContactSolver::m_pruneUpDir(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f));
 dVector ndContactSolver::m_pruneSupportX(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
 
@@ -752,8 +751,8 @@ dInt32 ndContactSolver::CompoundToStaticHeighfieldContactsDiscrete()
 	ndShapeInstance* const compoundInstance = &compoundBody->GetCollisionShape();
 	ndShapeInstance* const heightfieldInstance = &heightfieldBody->GetCollisionShape();
 
-	ndShapeHeightfield* const heightfieldShape = heightfieldInstance->GetShape()->GetAsShapeHeightfield();
 	ndShapeCompound* const compoundShape = compoundInstance->GetShape()->GetAsShapeCompound();
+	ndShapeHeightfield* const heightfieldShape = heightfieldInstance->GetShape()->GetAsShapeHeightfield();
 	
 	dInt32 stack = 1;
 	dInt32 contactCount = 0;
