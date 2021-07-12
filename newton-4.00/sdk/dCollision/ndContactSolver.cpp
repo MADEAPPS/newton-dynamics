@@ -150,8 +150,6 @@ dInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 	dInt32 stack = 1;
 	dInt32 contactCount = 0;
 	stackPool[0] = compoundShape->m_root;
-
-	//const dFloat32 timestep = m_scene->GetTimestep();
 	dFloat32 closestDist = dFloat32(1.0e10f);
 
 	while (stack)

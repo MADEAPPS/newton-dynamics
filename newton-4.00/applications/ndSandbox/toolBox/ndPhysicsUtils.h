@@ -12,8 +12,8 @@
 #ifndef __PHYSICS_UTIL__
 #define __PHYSICS_UTIL__
 
-//#define DEMO_GRAVITY  dFloat32(-10.0f)
-#define DEMO_GRAVITY  dFloat32(0.0f)
+#define DEMO_GRAVITY  dFloat32(-10.0f)
+//#define DEMO_GRAVITY  dFloat32(0.0f)
 
 class ndDemoEntityManager;
 
@@ -27,6 +27,5 @@ ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const dVector& 
 
 void AddPlanks(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass);
 void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 radius0, dFloat32 radius1, dFloat32 high, dInt32 rows_x, dInt32 rows_z, dInt32 columHigh);
-
 
 #endif

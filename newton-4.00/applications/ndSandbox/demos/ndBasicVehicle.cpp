@@ -469,7 +469,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 	void DrawGage(GLuint gage, GLuint needle, dFloat32 param, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size, dFloat32 minAngle, dFloat32 maxAngle) const
 	{
-dTrace(("**** need a sprite shader for this\n"));
+//dTrace(("**** need a sprite shader for this\n"));
 return;
 		dMatrix origin(dGetIdentityMatrix());
 		origin[1][1] = -1.0f;
@@ -514,7 +514,7 @@ return;
 
 	void DrawGear(dInt32 gear, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size) const
 	{
-dTrace(("**** need a sprite shader for this\n"));
+//dTrace(("**** need a sprite shader for this\n"));
 return;
 
 		dMatrix origin(dGetIdentityMatrix());
@@ -657,13 +657,13 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	heighfieldLocation.m_posit.m_z = -200.0f;
 
 	//BuildFloorBox(scene);
-	//BuildCompoundScene(scene);
 	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
+	BuildCompoundScene(scene, heighfieldLocation);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
-	BuildHeightFieldTerrain(scene, heighfieldLocation);
+	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);

@@ -171,22 +171,16 @@ static void MakeNoiseHeightfield(dArray<dVector>& heightfield)
 	}
 }
 
-static ndDemoEntity* MakeHeightfieldEntity(const dMatrix& location, const dArray<dVector>& heightfield, ndDemoEntityManager* const scene)
-{
-	ndDemoMesh* const mesh = new ndHeightfieldMesh(heightfield, scene->GetShaderCache());
-	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
-	entity->SetMesh(mesh, dGetIdentityMatrix());
-	mesh->Release();
-	scene->AddEntity(entity);
-	return entity;
-}
-
 ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const dMatrix& location)
 {
 	dArray<dVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
 	MakeNoiseHeightfield(heightfield);
 
-	ndDemoEntity* entity = MakeHeightfieldEntity(location, heightfield, scene);
+	ndDemoMesh* const mesh = new ndHeightfieldMesh(heightfield, scene->GetShaderCache());
+	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
+	entity->SetMesh(mesh, dGetIdentityMatrix());
+	mesh->Release();
+	scene->AddEntity(entity);
 
 	// create the height field collision and rigid body
 	ndShapeInstance heighfieldInstance(new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,
@@ -215,15 +209,15 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 	return body;
 }
 
-ndShapeInstance* AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance)
+void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity)
 {
-	dMatrix location(dGetIdentityMatrix());
-	//location.m_posit.m_x = -200.0f;
-	//location.m_posit.m_z = -200.0f;
-
 	dArray<dVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
 	MakeNoiseHeightfield(heightfield);
-	ndDemoEntity* const entity = MakeHeightfieldEntity(location, heightfield, scene);
+
+	ndDemoMesh* const mesh = new ndHeightfieldMesh(heightfield, scene->GetShaderCache());
+	ndDemoEntity* const entity = new ndDemoEntity(dGetIdentityMatrix(), rootEntity);
+	entity->SetMesh(mesh, dGetIdentityMatrix());
+	mesh->Release();
 
 	ndShapeInstance heighfieldInstance(new ndShapeHeightfield(D_TERRAIN_WIDTH, D_TERRAIN_WIDTH,
 		ndShapeHeightfield::m_invertedDiagonals,
@@ -247,8 +241,8 @@ ndShapeInstance* AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShap
 	heighfieldInstance.SetMaterial(material);
 	
 	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
-	
-	ndShapeCompound::ndTreeArray::dNode* const node = compound->AddCollision(&heighfieldInstance);
-	ndShapeInstance* const subInstance = node->GetInfo()->GetShape();
-	return subInstance;
+	compound->AddCollision(&heighfieldInstance);
+	//ndShapeCompound::ndTreeArray::dNode* const node = compound->AddCollision(&heighfieldInstance);
+	//ndShapeInstance* const subInstance = node->GetInfo()->GetShape();
+	//return subInstance;
 }
