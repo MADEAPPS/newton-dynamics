@@ -48,7 +48,7 @@ void ndMultiBodyVehicleTorsionBar::SetTorsionTorque(dFloat32 springK, dFloat32 d
 
 void ndMultiBodyVehicleTorsionBar::AddAxel(const ndBodyKinematic* const leftTire, const ndBodyKinematic* const rightTire)
 {
-	if (m_axeldCount < sizeof(m_axles) / sizeof(m_axles[0]))
+	if (m_axeldCount < dInt32 (sizeof(m_axles) / sizeof(m_axles[0])))
 	{
 		m_axles[m_axeldCount].m_axleAngle = dFloat32(0.0f);
 		m_axles[m_axeldCount].m_leftTire = leftTire;

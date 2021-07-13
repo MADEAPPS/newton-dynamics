@@ -821,7 +821,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		
 		ndDemoEntity* const parentEntity = (ndDemoEntity*)m_chassis->GetNotifyCallback()->GetUserData();
 		ndDemoEntity* const attachmentNode = parentEntity->Find(attachement);
-		const dMatrix attachmentMatrix(attachmentNode->CalculateGlobalMatrix(nullptr));
+		//const dMatrix attachmentMatrix(attachmentNode->CalculateGlobalMatrix(nullptr));
 		matrix0.m_posit = attachmentNode->CalculateGlobalMatrix(nullptr).m_posit;
 		world->AddJoint(new ndHydraulicAttachement(matrix0, body1, attachmentBody));
 

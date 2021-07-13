@@ -401,7 +401,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 					const ndContactMaterial& contactPoint = contactNode->GetInfo();
 					dMatrix frame(contactPoint.m_normal, contactPoint.m_dir0, contactPoint.m_dir1, contactPoint.m_point);
 
-					dVector localPosit(m_localFrame.UntransformVector(chassisMatrix.UntransformVector(contactPoint.m_point)));
+					//dVector localPosit(m_localFrame.UntransformVector(chassisMatrix.UntransformVector(contactPoint.m_point)));
 					//dFloat32 offset = (localPosit.m_z > dFloat32(0.0f)) ? dFloat32(0.2f) : dFloat32(-0.2f);
 					//frame.m_posit += contactPoint.m_dir0.Scale(offset);
 					frame.m_posit += contactPoint.m_normal.Scale(0.1f);

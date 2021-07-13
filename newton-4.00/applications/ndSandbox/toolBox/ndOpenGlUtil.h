@@ -60,14 +60,14 @@ class glVector
 	GLfloat& operator[] (dInt32 i)
 	{
 		dAssert(i >= 0);
-		dAssert(i < sizeof m_data / sizeof(m_data[0]));
+		dAssert(i < dInt32 (sizeof (m_data) / sizeof(m_data[0])));
 		return m_data[i];
 	}
 
 	const GLfloat& operator[] (dInt32 i) const
 	{
 		dAssert(i >= 0);
-		dAssert(i < sizeof m_data / sizeof(m_data[0]));
+		dAssert(i < dInt32 (sizeof (m_data) / sizeof(m_data[0])));
 		return m_data[i];
 	}
 
@@ -91,14 +91,14 @@ class glMatrix
 	GLfloat& operator[] (dInt32 i)
 	{
 		dAssert(i >= 0);
-		dAssert(i < sizeof m_data / sizeof(m_data[0]));
+		dAssert(i < dInt32 (sizeof (m_data) / sizeof(m_data[0])));
 		return m_data[i];
 	}
 
 	const GLfloat& operator[] (dInt32 i) const
 	{
 		dAssert(i >= 0);
-		dAssert(i < sizeof m_data/sizeof (m_data[0]));
+		dAssert(i < dInt32(sizeof (m_data)/sizeof (m_data[0])));
 		return m_data[i];
 	}
 
