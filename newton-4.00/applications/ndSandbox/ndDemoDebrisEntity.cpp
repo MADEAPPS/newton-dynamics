@@ -47,10 +47,10 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMeshconst, const d
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(DebrisPoint), (void*)0);
 	
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DebrisPoint), (void*)sizeof(ndMeshVector4));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DebrisPoint), (void*)sizeof(glVector4));
 	
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(DebrisPoint), (void*)(sizeof(ndMeshVector4) + sizeof(ndMeshVector)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(DebrisPoint), (void*)(sizeof(glVector4) + sizeof(glVector3)));
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 	glBindVertexArray(0);
@@ -85,9 +85,9 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const m
 		dInt32 materialIndex = meshNode->GetMaterialID(geometryHandle, handle);
 		const ndMeshEffect::dMaterial& material = materialArray[materialIndex];
 
-		m_material[materialCount].m_ambient = glVector (material.m_ambient);
-		m_material[materialCount].m_diffuse = glVector(material.m_diffuse);
-		m_material[materialCount].m_specular = glVector(material.m_specular);
+		m_material[materialCount].m_ambient = glVector4 (material.m_ambient);
+		m_material[materialCount].m_diffuse = glVector4(material.m_diffuse);
+		m_material[materialCount].m_specular = glVector4(material.m_specular);
 		m_material[materialCount].m_opacity = GLfloat(material.m_opacity);
 		m_material[materialCount].m_shiness = GLfloat(material.m_shiness);
 		strcpy(m_material[materialCount].m_textureName, material.m_textureName);
@@ -140,8 +140,8 @@ void ndDemoDebrisMesh::Render(ndDemoEntityManager* const scene, const dMatrix& m
 	const dMatrix& viewMatrix = camera->GetViewMatrix();
 	const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
 
-	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0]);
-	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0]);
+	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
@@ -240,13 +240,13 @@ void ndDemoDebrisRootEntity::Render(dFloat32 timestep, ndDemoEntityManager* cons
 	ndDemoCamera* const camera = scene->GetCamera();
 	const dMatrix& viewMatrix = camera->GetViewMatrix();
 	const glMatrix projectionMatrix (camera->GetProjectionMatrix());
-	const glVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+	const glVector4 directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
 
 	glUniform1i(shaderMesh->m_textureLocation, 0);
 	glUniform1i(shaderMesh->m_textureLocation1, 1);
 	glUniform1f(shaderMesh->m_transparencyLocation, 1.0f);
 	glUniform4fv(shaderMesh->m_directionalLightDirLocation, 1, &directionaLight[0]);
-	glUniformMatrix4fv(shaderMesh->m_projectMatrixLocation, 1, false, &projectionMatrix[0]);
+	glUniformMatrix4fv(shaderMesh->m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
 
 	glUniform3fv(shaderMesh->m_materialAmbientLocation, 1, &shaderMesh->m_material[0].m_ambient[0]);
 	glUniform3fv(shaderMesh->m_materialDiffuseLocation, 1, &shaderMesh->m_material[0].m_diffuse[0]);

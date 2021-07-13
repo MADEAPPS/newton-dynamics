@@ -38,7 +38,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 			normal = normal.Normalize();
 			for (dInt32 i = 2; i < vertexCount; i++)
 			{
-				ndPointNormal point;
+				glPositionNormal point;
 				point.m_posit.m_x = GLfloat(faceVertex[0].m_x);
 				point.m_posit.m_y = GLfloat(faceVertex[0].m_y);
 				point.m_posit.m_z = GLfloat(faceVertex[0].m_z);
@@ -65,7 +65,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 			}
 		}
 				
-		dArray<ndPointNormal> m_triangles;
+		dArray<glPositionNormal> m_triangles;
 	};
 
 	ndDrawShape drawShapes;
@@ -73,7 +73,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 
 	dArray<dInt32> m_triangles(drawShapes.m_triangles.GetCount());
 	m_triangles.SetCount(drawShapes.m_triangles.GetCount());
-	dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(ndPointNormal), 6, drawShapes.m_triangles.GetCount(), &m_triangles[0], GLfloat(1.0e-6f));
+	dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(glPositionNormal), 6, drawShapes.m_triangles.GetCount(), &m_triangles[0], GLfloat(1.0e-6f));
 	
 	m_shader = shaderCache.m_flatShaded;
 	m_indexCount = m_triangles.GetCount();
@@ -89,13 +89,13 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
-	glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(ndPointNormal), &drawShapes.m_triangles[0].m_posit.m_x, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(glPositionNormal), &drawShapes.m_triangles[0].m_posit.m_x, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndPointNormal), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)0);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndPointNormal), (void*)sizeof(ndMeshVector));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)sizeof(glVector3));
 
 	glGenBuffers(1, &m_triangleIndexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
@@ -138,12 +138,12 @@ void ndFlatShadedDebugMesh::Render(ndDemoEntityManager* const scene, const dMatr
 	const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
 
 	const glMatrix projMatrix(projectionMatrix);
-	const glVector color(m_color);
+	const glVector4 color(m_color);
 
 	glUniform4fv(m_shadeColorLocation, 1, &color[0]);
-	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0]);
-	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projMatrix[0]);
-	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0]);
+	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 
 	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
@@ -182,7 +182,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 			{
 				if (edgeType[i0] == m_edgeType)
 				{
-					ndMeshVector point;
+					glVector3 point;
 					point.m_x = GLfloat(faceVertex[i0].m_x);
 					point.m_y = GLfloat(faceVertex[i0].m_y);
 					point.m_z = GLfloat(faceVertex[i0].m_z);
@@ -198,7 +198,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 			}
 		}
 
-		dArray<ndMeshVector> m_lines;
+		dArray<glVector3> m_lines;
 		ndEdgeType m_edgeType;
 	};
 
@@ -210,7 +210,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 	{
 		dArray<dInt32> m_lines(drawShapes.m_lines.GetCount());
 		m_lines.SetCount(drawShapes.m_lines.GetCount());
-		dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_lines[0].m_x, sizeof(ndMeshVector), 3, drawShapes.m_lines.GetCount(), &m_lines[0], GLfloat(1.0e-6f));
+		dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_lines[0].m_x, sizeof(glVector3), 3, drawShapes.m_lines.GetCount(), &m_lines[0], GLfloat(1.0e-6f));
 
 		m_indexCount = m_lines.GetCount();
 		dTree<dUnsigned64, dUnsigned64> filter;
@@ -253,10 +253,10 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 		glGenBuffers(1, &m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
-		glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(ndMeshVector), &drawShapes.m_lines[0].m_x, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(glVector3), &drawShapes.m_lines[0].m_x, GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshVector), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glVector3), (void*)0);
 
 		glGenBuffers(1, &m_lineIndexBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_lineIndexBuffer);
@@ -296,11 +296,11 @@ void ndWireFrameDebugMesh::Render(ndDemoEntityManager* const scene, const dMatri
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		//glDepthFunc(GL_LESS);
 
-		const glVector color(m_color);
+		const glVector4 color(m_color);
 
 		glUseProgram(m_shader);
 		glUniform4fv(m_shadeColorLocation, 1, &color[0]);
-		glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &projectionViewModelMatrix[0]);
+		glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &projectionViewModelMatrix[0][0]);
 
 		glBindVertexArray(m_vertextArrayBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_lineIndexBuffer);

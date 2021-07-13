@@ -27,6 +27,371 @@
 #include "ndBasicPlayerCapsule.h"
 #include "ndHeightFieldPrimitive.h"
 
+class ndVehicleUI: public dClassAlloc
+{
+	public:
+	const GLchar* vertex_shader =
+		"in vec3 Position;\n"
+		"in vec2 UV;\n"
+		"out vec2 Frag_UV;\n"
+		"out vec4 Frag_Color;\n"
+		"uniform mat4 ProjMtx;\n"
+		"uniform mat4 ModMtx;\n"
+		"uniform float ptsize;\n"
+		"uniform vec4 color;\n"
+		"void main()\n"
+		"{\n"
+		"	Frag_UV = UV;\n"
+		"	Frag_Color = color;\n"
+		"	gl_Position = ProjMtx * ModMtx * vec4(Position.xy * ptsize,0.0,1.0);\n"
+		"}\n";
+
+	const GLchar* fragment_shader =
+		"uniform sampler2D UIText;\n"
+		"in vec2 Frag_UV;\n"
+		"in vec4 Frag_Color;\n"
+		"out vec4 Out_Color;\n"
+		"void main()\n"
+		"{\n"
+		"	Out_Color = Frag_Color * texture(UIText, Frag_UV.st);\n"
+		"}\n";
+
+	const GLchar* vertex_shader_with_version[2] = { "#version 330 core\n", vertex_shader };
+	const GLchar* fragment_shader_with_version[2] = { "#version 330 core\n", fragment_shader };
+
+	ndVehicleUI()
+		:dClassAlloc()
+		,m_Vbo(0)
+		,m_Vao(0)
+		,m_Ibo(0)/*, m_Vbodyn(0), m_Vaodyn(0), m_Ibodyn(0)*/
+		,m_shaderHandle(0)
+	{
+	};
+
+	~ndVehicleUI() 
+	{
+		if (m_shaderHandle)
+		{
+			glDeleteProgram(m_shaderHandle);
+		}
+
+		if (m_Ibo)
+		{
+			glDeleteBuffers(1, &m_Ibo);
+		}
+
+		if (m_Vbo)
+		{
+			glDeleteBuffers(1, &m_Vbo);
+		}
+
+		if (m_Vao)
+		{
+			glDeleteVertexArrays(1, &m_Vao);
+		}
+	};
+	
+	void CreateBufferUI()
+	{
+		if (!m_Vao) 
+		{
+			m_shaderHandle = glCreateProgram();
+		
+			GLuint m_vertHandle = glCreateShader(GL_VERTEX_SHADER);
+			GLuint m_fragHandle = glCreateShader(GL_FRAGMENT_SHADER);
+		
+			GLint Result = GL_FALSE;
+			dInt32 InfoLogLength = 0;
+
+			glShaderSource(m_vertHandle, 2, vertex_shader_with_version, NULL);
+			glCompileShader(m_vertHandle);
+			// Check Vertex Shader
+			glGetShaderiv(m_vertHandle, GL_COMPILE_STATUS, &Result);
+			glGetShaderiv(m_vertHandle, GL_INFO_LOG_LENGTH, &InfoLogLength);
+			if (InfoLogLength > 0) 
+			{
+				printf("Vertex shader error! \n");
+				//	std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
+				//	glGetShaderInfoLog(g_VertHandle3D, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
+				//	printf("Vertex %s\n", &VertexShaderErrorMessage[0]);
+			}
+			glShaderSource(m_fragHandle, 2, fragment_shader_with_version, NULL);
+			glCompileShader(m_fragHandle);
+			
+			// Check Fragment Shader
+			glGetShaderiv(m_fragHandle, GL_COMPILE_STATUS, &Result);
+			glGetShaderiv(m_fragHandle, GL_INFO_LOG_LENGTH, &InfoLogLength);
+			if (InfoLogLength > 0) 
+			{
+				printf("Fragment shader error! \n");
+				//	std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
+				//	glGetShaderInfoLog(g_FragHandle3D, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
+				//	printf("Fragment %s\n", &FragmentShaderErrorMessage[0]);
+			}
+
+			glAttachShader(m_shaderHandle, m_vertHandle);
+			glAttachShader(m_shaderHandle, m_fragHandle);
+			
+			glLinkProgram(m_shaderHandle);
+
+			glDetachShader(m_shaderHandle, m_vertHandle);
+			glDetachShader(m_shaderHandle, m_fragHandle);
+
+			glDeleteShader(m_vertHandle);
+			glDeleteShader(m_fragHandle);
+
+			//glPositionUV vert[4]{};
+			//unsigned int indx[6]{};
+
+			m_vert[0].m_posit.m_x = -1.0f;
+			m_vert[0].m_posit.m_y = -1.0f;
+			m_vert[0].m_posit.m_z = 0.0f;
+			m_vert[0].m_uv.m_u = 0.0f;
+			m_vert[0].m_uv.m_v = 0.0f;
+			//
+			m_vert[1].m_posit.m_x = -1.0f;
+			m_vert[1].m_posit.m_y = 1.0f;
+			m_vert[1].m_posit.m_z = 0.0f;
+			m_vert[1].m_uv.m_u = 0.0f;
+			m_vert[1].m_uv.m_v = 1.0f;
+
+			m_vert[2].m_posit.m_x = 1.0f;
+			m_vert[2].m_posit.m_y = 1.0f;
+			m_vert[2].m_posit.m_z = 0.0f;
+			m_vert[2].m_uv.m_u = -1.0f;
+			m_vert[2].m_uv.m_v = 1.0f;
+
+			m_vert[3].m_posit.m_x = 1.0f;
+			m_vert[3].m_posit.m_y = -1.0f;
+			m_vert[3].m_posit.m_z = 0.0f;
+			m_vert[3].m_uv.m_u = -1.0f;
+			m_vert[3].m_uv.m_v = 0.0f;
+
+			m_indx[0] = 0;
+			m_indx[1] = 1;
+			m_indx[2] = 2;
+			m_indx[3] = 2;
+			m_indx[4] = 3;
+			m_indx[5] = 0;
+
+			glGenVertexArrays(1, &m_Vao);
+			glBindVertexArray(m_Vao);
+
+			glGenBuffers(1, &m_Vbo);
+			glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(m_vert), &m_vert[0], GL_DYNAMIC_DRAW);
+
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)0);
+
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)(offsetof(glPositionUV, glPositionUV::m_uv)));
+
+			glGenBuffers(1, &m_Ibo);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ibo);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indx), &m_indx[0], GL_STATIC_DRAW);
+
+			glDisableVertexAttribArray(1);
+			glDisableVertexAttribArray(0);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+			glBindVertexArray(0);
+
+			// Gear dynamic buffer
+			/*
+			memcpy(m_vert2, vert, sizeof(vert));
+			memcpy(m_indx2, indx, sizeof(indx));
+			//
+			//
+			glGenVertexArrays(1, &m_Vaodyn);
+			glBindVertexArray(m_Vaodyn);
+			//
+			glGenBuffers(1, &m_Vbodyn);
+			glBindBuffer(GL_ARRAY_BUFFER, m_Vbodyn);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(m_vert2), &m_vert2[0], GL_DYNAMIC_DRAW);
+			//
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)0);
+			//
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)(offsetof(glPositionUV, glPositionUV::uv)));
+
+			glGenBuffers(1, &m_Ibodyn);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ibodyn);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indx2), &m_indx2[0], GL_STATIC_DRAW);
+			//
+			glDisableVertexAttribArray(1);
+			glDisableVertexAttribArray(0);
+			//
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			//
+			glBindVertexArray(0);
+			*/
+		}
+	};
+
+	void RenderGageUI(ndDemoEntityManager* const uscene, const GLuint tex1, const dFloat32 origin_x, const dFloat32 origin_y, const dFloat32 ptsize, dFloat32 cparam, dFloat32 minAngle, dFloat32 maxAngle)
+	{
+		if (m_Vao) 
+		{
+			dFloat32 sizeX = (dFloat32)(1.0f * uscene->GetWidth());
+			dFloat32 sizeY = (dFloat32)(1.0f * uscene->GetHeight());
+			dFloat32 L = origin_x;
+			dFloat32 R = origin_x + sizeX;
+			dFloat32 T = origin_y;
+			dFloat32 B = origin_y + sizeY;
+
+			const dFloat32 ortho_projection[4][4] =
+			{
+				{ 2.0f / (R - L), 0.0f,   0.0f, 0.0f },
+				{ 0.0f,   2.0f / (T - B), 0.0f, 0.0f },
+				{ 0.0f,   0.0f,          -1.0f, 0.0f },
+				{(R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f },
+			};
+
+			minAngle *= -dDegreeToRad;
+			maxAngle *= -dDegreeToRad;
+			//
+			dFloat32 angle = minAngle + (maxAngle - minAngle) * cparam;
+
+			dMatrix modm(dRollMatrix(-angle));
+			dVector color(1.0f, 1.0f, 1.0f, 1.0f);
+
+			glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ProjMtx"), 1, GL_FALSE, &ortho_projection[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ModMtx"), 1, GL_FALSE, &modm[0][0]);
+			glUniform1f(glGetUniformLocation(m_shaderHandle, "ptsize"), ptsize);
+			glUniform4fv(glGetUniformLocation(m_shaderHandle, "color"), 1, &color[0]);
+
+			glBindVertexArray(m_Vao);
+
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+
+			glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
+
+			m_vert[0].m_uv.m_u = 0.0f;
+			m_vert[1].m_uv.m_u = 0.0f;
+
+			m_vert[2].m_uv.m_u = -1.0f;
+			m_vert[3].m_uv.m_u = -1.0f;
+
+			// all other render pass
+			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_vert), &m_vert[0]);
+
+			if (tex1) 
+			{
+				glBindTexture(GL_TEXTURE_2D, tex1);
+			}
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ibo);
+
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+			glDisableVertexAttribArray(1);
+			glDisableVertexAttribArray(0);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+		}
+	};
+	
+	void RenderGearUI(ndDemoEntityManager* const uscene, const dInt32 gearid, GLuint tex1, dFloat32 origin_x, dFloat32 origin_y, dFloat32 ptsize)
+	{
+		if (m_Vao)
+		{
+			dFloat32 sizeX = (dFloat32)(1.0f * uscene->GetWidth());
+			dFloat32 sizeY = (dFloat32)(1.0f * uscene->GetHeight());
+			//
+			dFloat32 L = origin_x;
+			dFloat32 R = origin_x + sizeX;
+			dFloat32 T = origin_y;
+			dFloat32 B = origin_y + sizeY;
+
+			const dFloat32 ortho_projection[4][4] =
+			{
+				{ 2.0f / (R - L), 0.0f,   0.0f, 0.0f },
+				{ 0.0f,   2.0f / (T - B), 0.0f, 0.0f },
+				{ 0.0f,   0.0f,          -1.0f, 0.0f },
+				{(R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f },
+			};
+
+			dMatrix origin(dGetIdentityMatrix());
+			origin[1][1] = -1.0f;
+			origin.m_posit = dVector(origin_x + ptsize * 1.9f, 50.0f, 0.0f, 1.0f);
+
+			dFloat32 uwith = 0.1f;
+			dFloat32 u0 = uwith * gearid;
+			dFloat32 u1 = u0 + uwith;
+			dFloat32 xy1 = 10.0f;
+
+			dVector color;
+			if (gearid == 0)
+			{
+				color = dVector(1.0f, 0.5f, 0.0f, 1.0f);
+			}
+			else if (gearid == 1) 
+			{
+			  color = dVector(1.0f, 1.0f, 0.0f, 1.0f);
+			} 
+			else 
+			{
+			  color = dVector(0.0f, 1.0f, 0.0f, 1.0f);
+			}
+
+			glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ProjMtx"), 1, GL_FALSE, &ortho_projection[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ModMtx"), 1, GL_FALSE, &origin[0][0]);
+			glUniform1f(glGetUniformLocation(m_shaderHandle, "ptsize"), xy1);
+			glUniform4fv(glGetUniformLocation(m_shaderHandle, "color"), 1, &color[0]);
+
+			glBindVertexArray(m_Vao);
+
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+
+			glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
+
+			m_vert[0].m_uv.m_u = u0;
+			m_vert[1].m_uv.m_u = u0;
+			
+			m_vert[2].m_uv.m_u = u1;
+			m_vert[3].m_uv.m_u = u1;
+
+			// all other render pass
+			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_vert), &m_vert[0]);
+
+			if (tex1) 
+			{
+				glBindTexture(GL_TEXTURE_2D, tex1);
+			}
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ibo);
+
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+			glDisableVertexAttribArray(1);
+			glDisableVertexAttribArray(0);
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindVertexArray(0);
+		}
+	};
+	//
+	GLuint m_shaderHandle;
+	private:
+	GLuint m_Vbo;
+	GLuint m_Vao;
+	GLuint m_Ibo;
+	//GLuint m_Vbodyn;
+	//GLuint m_Vaodyn;
+	//GLuint m_Ibodyn;
+	glPositionUV m_vert[4]{};
+	dUnsigned32 m_indx[6]{};
+};
+
 class ndVehicleDectriptorViper : public ndVehicleDectriptor
 {
 	public:
@@ -58,7 +423,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 	{
 		//m_useHardSolverMode = true;
 		m_useHardSolverMode = false;
-		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
+		//m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
+		m_comDisplacement = dVector(0.0f, -0.35f, 0.0f, 0.0f);
 
 		dFloat32 fuelInjectionRate = 10.0f;
 		dFloat32 idleTorquePoundFoot = 200.0f;
@@ -73,7 +439,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 
 		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_steeringAngle = 35.0f * dDegreeToRad;
-		m_frontTire.m_springK = 500.0f;
+		m_frontTire.m_springK = 800.0f;
 		m_frontTire.m_damperC = 50.0f;
 		m_frontTire.m_regularizer = 0.3f;
 		m_frontTire.m_upperStop = -0.05f;
@@ -86,7 +452,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 
 		m_rearTire.m_mass = 100.0f;
 		m_rearTire.m_steeringAngle = 0.0f;
-		m_rearTire.m_springK = 500.0f;
+		m_rearTire.m_springK = 800.0f;
 		m_rearTire.m_damperC = 50.0f;
 		m_rearTire.m_regularizer = 0.3f;
 		m_rearTire.m_upperStop = -0.05f;
@@ -96,15 +462,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_rearTire.m_verticalOffset = -0.15f;
 		m_rearTire.m_laterialStiffness  = 0.3f / 1000.0f;
 		m_rearTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
-
-#if 0
-// Dave check here
-m_comDisplacement.m_y = -1.0f;
-m_frontTire.m_verticalOffset = -1.0f;
-m_rearTire.m_verticalOffset = -1.0f;
-#endif
 		
-		m_frictionCoefficientScale = 1.3f;
+		m_frictionCoefficientScale = 1.2f;
 		m_torsionBarType = m_fourWheelAxle;
 		m_differentialType = m_fourWheeldrive;
 	}
@@ -178,7 +537,11 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	public:
 	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const dMatrix& matrix)
 		:ndBasicVehicle(desc)
+	   , UIVehicle(nullptr)
 	{
+		UIVehicle = new ndVehicleUI();
+		UIVehicle->CreateBufferUI();
+
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
 
@@ -264,6 +627,12 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 				differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential, frontDifferential, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
 				break;
 			}
+
+			case ndVehicleDectriptor::m_eightWheeldrive:
+			{
+				dAssert(0);
+				break;
+			}
 		}
 
 		// add a motor
@@ -336,6 +705,9 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		delete m_skipMarks;
 		delete m_startSound;
 		delete m_engineRpmSound;
+
+		if (UIVehicle)
+		  delete UIVehicle;
 	}
 
 	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename)
@@ -512,6 +884,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		camera->SetNextMatrix(camMatrix, camOrigin);
 	}
 
+	/*
 	void DrawGage(GLuint gage, GLuint needle, dFloat32 param, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size, dFloat32 minAngle, dFloat32 maxAngle) const
 	{
 		dMatrix origin(dGetIdentityMatrix());
@@ -552,7 +925,9 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 		glPopMatrix();
 	}
+	*/
 
+	/*
 	void DrawGear(dInt32 gear, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size) const
 	{
 		dMatrix origin(dGetIdentityMatrix());
@@ -579,6 +954,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 		glPopMatrix();
 	}
+	*/
 
 	void RenderHelp(ndDemoEntityManager* const scene)
 	{
@@ -617,25 +993,33 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			dFloat32 x = gageSize / 2 + 20.0f;
 			dFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm;
 			maxRpm += 500.0f;
-			dFloat32 rpm = motor->GetRpm() / maxRpm;
-			DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 90.0f);
+			//printf("%.3f \n", m_configuration.m_transmission.m_fowardRatios[m_currentGear]);
+			//dFloat32 rpm = (motor->GetRpm() / maxRpm) * m_configuration.m_transmission.m_fowardRatios[m_currentGear]; 
+			dFloat32 rpm = (motor->GetRpm() / maxRpm) * 2.85f;
+			//
+			if (UIVehicle) {
+				if (UIVehicle->m_shaderHandle) {
+					glUseProgram(UIVehicle->m_shaderHandle);
+					//
+					glActiveTexture(GL_TEXTURE0);
+					//
+					UIVehicle->RenderGageUI(scene, m_tachometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
 
-			// draw the odometer
+					dFloat32 s = gageSize * 0.7f;
+					UIVehicle->RenderGageUI(scene, m_redNeedle, -x, -y, s * 0.5f, rpm, -0.0f, 90.0f);
+					//
 			x += gageSize;
-			dFloat32 speed = GetSpeed() / 100.0f;
-			DrawGage(m_odometer, m_greenNeedle, dAbs(speed), x, y, gageSize, -180.0f, 90.0f);
+					UIVehicle->RenderGageUI(scene, m_odometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
+
+					dFloat32 speed = (GetSpeed() / 100.0f) * 2.85f;
+					UIVehicle->RenderGageUI(scene, m_greenNeedle, -x, -y, s * 0.5f, dAbs(speed), -0.0f, 90.0f);
 
 			// draw the current gear
-			DrawGear(m_gearMap[m_currentGear], x, y + 98, gageSize);
+					UIVehicle->RenderGearUI(scene, m_gearMap[m_currentGear], m_gears, -x, -y, gageSize);
 
-			// glBegin/glEnd is not supported after 3.1 but still supported 
-			// by some drivers while going and error.
-			// for now I will simply clear open gl error stack, 
-			for (GLenum err = glGetError(); err != GL_NO_ERROR; err = glGetError())
-			{
-				//dTrace(("****** opengl error 0x%x\n", err));
+					glUseProgram(0);
+				}
 			}
-
 		}
 	}
 
@@ -692,6 +1076,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	ndSoundChannel* m_startSound;
 	ndSoundChannel* m_engineRpmSound;
 	bool m_startEngine;
+	ndVehicleUI* UIVehicle;
 };
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
@@ -724,7 +1109,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//matrix.m_posit = location;
 
 	ndSoundManager* const soundManager = world->GetSoundManager();
-	for (int i = 0; i < sizeof(engineSounds) / sizeof(engineSounds[0]); i++)
+	for (int i = 0; i < dInt32 (sizeof(engineSounds) / sizeof(engineSounds[0])); i++)
 	{
 		soundManager->CreateSoundAsset(engineSounds[i]);
 	}

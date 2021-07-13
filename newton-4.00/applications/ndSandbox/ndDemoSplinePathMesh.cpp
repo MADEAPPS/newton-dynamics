@@ -62,11 +62,11 @@ void ndDemoSplinePathMesh::SetRenderResolution(dInt32 breaks)
 		}
 
 		dFloat64 scale = 1.0f / m_renderResolution;
-		dArray<ndMeshVector> points(m_renderResolution + 1);
+		dArray<glVector3> points(m_renderResolution + 1);
 		for (dInt32 i = 0; i < m_renderResolution; i++)
 		{
 			dBigVector p(m_curve.CurvePoint(i * scale));
-			points.PushBack(ndMeshVector(GLfloat(p.m_x), GLfloat(p.m_y), GLfloat(p.m_z)));
+			points.PushBack(glVector3(GLfloat(p.m_x), GLfloat(p.m_y), GLfloat(p.m_z)));
 		}
 		points.PushBack(points[0]);
 
@@ -75,10 +75,10 @@ void ndDemoSplinePathMesh::SetRenderResolution(dInt32 breaks)
 
 		glGenBuffers(1, &m_vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, (m_renderResolution + 1) * sizeof(ndMeshVector), &points[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, (m_renderResolution + 1) * sizeof(glVector3), &points[0], GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshVector), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glVector3), (void*)0);
 
 		glBindVertexArray(0);
 		glDisableVertexAttribArray(0);
@@ -99,11 +99,11 @@ void ndDemoSplinePathMesh::Render(ndDemoEntityManager* const scene, const dMatri
 		ndDemoCamera* const camera = scene->GetCamera();
 		const glMatrix viewProjectionMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 
-		const glVector color(m_color);
+		const glVector4 color(m_color);
 
 		glUseProgram(m_shader);
 		glUniform4fv(m_shadeColorLocation, 1, &color[0]);
-		glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0]);
+		glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
 
 		//ndMeshVector m_line[2];
 		//glEnableClientState(GL_VERTEX_ARRAY);

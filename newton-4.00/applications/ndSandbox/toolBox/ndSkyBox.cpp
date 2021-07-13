@@ -233,8 +233,8 @@ void ndSkyBox::Render(dFloat32, ndDemoEntityManager* const scene, const dMatrix&
 	const glMatrix projectionViewModelMatrix(skyMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 	
 	glUseProgram(m_shader);
-	glUniformMatrix4fv(m_textureMatrixLocation, 1, false, &m_textureMatrix[0]);
-	glUniformMatrix4fv(m_matrixUniformLocation, 1, false, &projectionViewModelMatrix[0]);
+	glUniformMatrix4fv(m_textureMatrixLocation, 1, false, &m_textureMatrix[0][0]);
+	glUniformMatrix4fv(m_matrixUniformLocation, 1, false, &projectionViewModelMatrix[0][0]);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_texturecubemap);

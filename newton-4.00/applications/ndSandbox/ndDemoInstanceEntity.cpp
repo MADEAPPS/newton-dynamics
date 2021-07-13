@@ -74,8 +74,8 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 
 	dArray<dTmpData> tmp;
 	dArray<dInt32> indices;
-	dArray<ndMeshPointUV> points;
-	dArray<ndMeshMatrix> offsets;
+	dArray<glPositionNormalUV> points;
+	dArray<glMatrix> offsets;
 
 	tmp.SetCount(vertexCount);
 	points.SetCount(vertexCount);
@@ -132,38 +132,38 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, points.GetCount() * sizeof(ndMeshPointUV), &points[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, points.GetCount() * sizeof(glPositionNormalUV), &points[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)0);
 
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)sizeof(ndMeshVector));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)sizeof(glVector3));
 
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)(2 * sizeof(ndMeshVector)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionNormalUV), (void*)(2 * sizeof(glVector3)));
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 
 	// set vertex buffer for matrix instances
 	glGenBuffers(1, &m_matrixOffsetBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_matrixOffsetBuffer);
-	glBufferData(GL_ARRAY_BUFFER, m_maxInstanceCount * sizeof(ndMeshMatrix), &offsets[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_maxInstanceCount * sizeof(glMatrix), &offsets[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*) (0 * sizeof(ndMeshVector4)));
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glMatrix), (void*) (0 * sizeof(glVector4)));
 	glVertexAttribDivisor(3, 1);
 	
 	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(1 * sizeof(ndMeshVector4)));
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glMatrix), (void*)(1 * sizeof(glVector4)));
 	glVertexAttribDivisor(4, 1);
 	
 	glEnableVertexAttribArray(5);
-	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(2 * sizeof(ndMeshVector4)));
+	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glMatrix), (void*)(2 * sizeof(glVector4)));
 	glVertexAttribDivisor(5, 1);
 	
 	glEnableVertexAttribArray(6);
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(3 * sizeof(ndMeshVector4)));
+	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glMatrix), (void*)(3 * sizeof(glVector4)));
 	glVertexAttribDivisor(6, 1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -206,7 +206,7 @@ void ndDemoMeshIntance::RenderBatch(dInt32 start, ndDemoEntityManager* const sce
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_matrixOffsetBuffer);
 
-	ndMeshMatrix* const matrixBuffer = (ndMeshMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	glMatrix* const matrixBuffer = (glMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 
 	const dInt32 base = start * m_maxInstanceCount;
 	const dInt32 count = ((base + m_maxInstanceCount) > m_instanceCount) ? m_instanceCount - base : m_maxInstanceCount;
@@ -214,7 +214,7 @@ void ndDemoMeshIntance::RenderBatch(dInt32 start, ndDemoEntityManager* const sce
 	{
 		dMatrix matrix(m_offsets[base + i]);
 		const dFloat32* const src = &matrix[0][0];
-		GLfloat* const dst = &matrixBuffer[i].m_array[0].m_x;
+		GLfloat* const dst = &matrixBuffer[i][0][0];
 		for (dInt32 j = 0; j < 16; j++) 
 		{
 			dst[j] = GLfloat(src[j]);
@@ -232,13 +232,13 @@ void ndDemoMeshIntance::RenderBatch(dInt32 start, ndDemoEntityManager* const sce
 	const dMatrix& viewMatrix = camera->GetViewMatrix();
 	const glMatrix& projectionMatrix (camera->GetProjectionMatrix());
 	const glMatrix viewModelMatrix (modelMatrix * viewMatrix);
-	const glVector directionaLight (viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+	const glVector4 directionaLight (viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
 
 	glUniform1i(m_textureLocation, 0);
 	glUniform1f(m_transparencyLocation, 1.0f);
 	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight[0]);
-	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0]);
-	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 
 	glBindVertexArray(m_vertextArrayBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);

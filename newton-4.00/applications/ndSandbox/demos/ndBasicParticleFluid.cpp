@@ -42,7 +42,7 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 		m_hasTransparency = true;
 	}
 
-	void UpdateBuffers(const dArray<ndMeshPointUV>& points, const dArray<dInt32>& indexList)
+	void UpdateBuffers(const dArray<glPositionNormalUV>& points, const dArray<dInt32>& indexList)
 	{
 		//OptimizeForRender(points, indexList);
 		OptimizeForRender(&points[0], points.GetCount(), &indexList[0], indexList.GetCount());
@@ -118,8 +118,8 @@ class ndWaterVolumeEntity : public ndDemoEntity
 			const dVector* const normals = isoSurface.GetNormals();
 			for (dInt32 i = 0; i < isoSurface.GetVertexCount(); i++)
 			{
-				m_points[i].m_posit = ndMeshVector(GLfloat(points[i].m_x), GLfloat(points[i].m_y), GLfloat(points[i].m_z));
-				m_points[i].m_normal = ndMeshVector(GLfloat(normals[i].m_x), GLfloat(normals[i].m_y), GLfloat(normals[i].m_z));
+				m_points[i].m_posit = glVector3(GLfloat(points[i].m_x), GLfloat(points[i].m_y), GLfloat(points[i].m_z));
+				m_points[i].m_normal = glVector3(GLfloat(normals[i].m_x), GLfloat(normals[i].m_y), GLfloat(normals[i].m_z));
 				m_points[i].m_uv.m_u = GLfloat(0.0f);
 				m_points[i].m_uv.m_v = GLfloat(0.0f);
 			}
@@ -139,7 +139,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 
 	ndBodySphFluid* m_fluidBody;
 	dArray<dInt32> m_indexList;
-	dArray<ndMeshPointUV> m_points;
+	dArray<glPositionNormalUV> m_points;
 	mutable bool m_hasNewMesh;
 	mutable dSpinLock m_lock;
 	mutable ndIsoSurfaceMesh* m_isoSurfaceMesh0;
