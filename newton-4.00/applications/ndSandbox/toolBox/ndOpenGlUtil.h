@@ -30,10 +30,66 @@
 	#define glGetFloat(x,y) glGetFloatv(x, (GLfloat*)y) 
 #endif
 
-class glVector
+class glUV
 {
 	public:
-	glVector()
+	GLfloat m_u;
+	GLfloat m_v;
+};
+
+class glVector3
+{
+	public:
+	glVector3()
+	{
+		m_data[0] = GLfloat(0.0f);
+		m_data[1] = GLfloat(0.0f);
+		m_data[2] = GLfloat(0.0f);
+	}
+
+	glVector3(dFloat32 x, dFloat32 y, dFloat32 z)
+	{
+		m_data[0] = GLfloat(x);
+		m_data[1] = GLfloat(y);
+		m_data[2] = GLfloat(z);
+	}
+
+	glVector3(const dVector& v)
+	{
+		m_data[0] = GLfloat(v[0]);
+		m_data[1] = GLfloat(v[1]);
+		m_data[2] = GLfloat(v[2]);
+	}
+
+	GLfloat& operator[] (dInt32 i)
+	{
+		dAssert(i >= 0);
+		dAssert(i < dInt32(sizeof(m_data) / sizeof(m_data[0])));
+		return m_data[i];
+	}
+
+	const GLfloat& operator[] (dInt32 i) const
+	{
+		dAssert(i >= 0);
+		dAssert(i < dInt32(sizeof(m_data) / sizeof(m_data[0])));
+		return m_data[i];
+	}
+	union
+	{
+		struct
+		{
+			GLfloat m_x;
+			GLfloat m_y;
+			GLfloat m_z;
+		};
+		GLfloat m_data[3];
+	};
+};
+
+class glVector4
+{
+	public:
+	glVector4()
 	{
 		m_data[0] = GLfloat(0.0f);
 		m_data[1] = GLfloat(0.0f);
@@ -41,7 +97,7 @@ class glVector
 		m_data[3] = GLfloat(0.0f);
 	}
 
-	glVector(dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
+	glVector4(dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
 	{
 		m_data[0] = GLfloat(x);
 		m_data[1] = GLfloat(y);
@@ -49,7 +105,7 @@ class glVector
 		m_data[3] = GLfloat(w);
 	}
 
-	glVector(const dVector& v)
+	glVector4(const dVector& v)
 	{
 		m_data[0] = GLfloat(v[0]);
 		m_data[1] = GLfloat(v[1]);
@@ -71,7 +127,17 @@ class glVector
 		return m_data[i];
 	}
 
-	GLfloat m_data[4];
+	union
+	{
+		struct
+		{
+			GLfloat m_x;
+			GLfloat m_y;
+			GLfloat m_z;
+			GLfloat m_w;
+		};
+		GLfloat m_data[4];
+	};
 };
 
 class glMatrix
@@ -81,76 +147,46 @@ class glMatrix
 	{
 		for (dInt32 i = 0; i < 4; i++)
 		{
-			for (int j = 0; j < 4; j++)
-			{
-				m_data[i * 4 + j] = GLfloat(matrix[i][j]);
-			}
+			m_data[i] = matrix[i];
 		}
 	}
 
-	GLfloat& operator[] (dInt32 i)
+	glVector4& operator[] (dInt32 i)
 	{
 		dAssert(i >= 0);
 		dAssert(i < dInt32 (sizeof (m_data) / sizeof(m_data[0])));
 		return m_data[i];
 	}
 
-	const GLfloat& operator[] (dInt32 i) const
+	const glVector4& operator[] (dInt32 i) const
 	{
 		dAssert(i >= 0);
 		dAssert(i < dInt32(sizeof (m_data)/sizeof (m_data[0])));
 		return m_data[i];
 	}
 
-	GLfloat m_data[16];
+	glVector4 m_data[4];
 };
 
-class ndMeshVector
+class glPositionNormal
 {
 	public:
-	ndMeshVector() {}
-	ndMeshVector(GLfloat x, GLfloat y, GLfloat z)
-		:m_x(x), m_y(y), m_z(z)
-	{
-	}
-
-	GLfloat m_x;
-	GLfloat m_y;
-	GLfloat m_z;
+	glVector3 m_posit;
+	glVector3 m_normal;
 };
 
-class ndMeshVector4 : public ndMeshVector
+class glPositionUV
 {
 	public:
-	GLfloat m_w;
+	glVector3 m_posit;
+	glUV m_uv;
 };
 
-class ndMeshMatrix
+class glPositionNormalUV : public glPositionNormal
 {
 	public:
-	ndMeshVector4 m_array[4];
+	glUV m_uv;
 };
-
-class ndMeshUV
-{
-	public:
-	GLfloat m_u;
-	GLfloat m_v;
-};
-
-class ndPointNormal
-{
-	public:
-	ndMeshVector m_posit;
-	ndMeshVector m_normal;
-};
-
-class ndMeshPointUV : public ndPointNormal
-{
-	public:
-	ndMeshUV m_uv;
-};
-
 
 class dMOUSE_POINT
 {

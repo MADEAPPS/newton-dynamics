@@ -24,9 +24,9 @@ class ndDemoSubMeshMaterial
 	ndDemoSubMeshMaterial();
 	~ndDemoSubMeshMaterial();
 
-	glVector m_ambient;
-	glVector m_diffuse;
-	glVector m_specular;
+	glVector4 m_ambient;
+	glVector4 m_diffuse;
+	glVector4 m_specular;
 	GLfloat m_opacity;
 	GLfloat m_shiness;
 	GLint m_textureHandle;

@@ -19,9 +19,9 @@
 class DebrisPoint
 {
 	public:
-	ndMeshVector4 m_posit;
-	ndMeshVector m_normal;
-	ndMeshUV m_uv;
+	glVector4 m_posit;
+	glVector3 m_normal;
+	glUV m_uv;
 };
 
 class ndDemoDebrisRootEntity;

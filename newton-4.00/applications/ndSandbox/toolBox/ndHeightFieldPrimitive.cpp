@@ -41,7 +41,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 	ndHeightfieldMesh(const dArray<dVector>& heightfield, const ndShaderPrograms& shaderCache)
 		:ndDemoMesh ("heightfield")
 	{
-		dArray<ndMeshPointUV> points(heightfield.GetCount());
+		dArray<glPositionNormalUV> points(heightfield.GetCount());
 		dArray<dInt32> indexList(6 * D_TERRAIN_WIDTH * D_TERRAIN_WIDTH + 1024);
 
 		m_shader = shaderCache.m_diffuseEffect;
@@ -93,10 +93,10 @@ class ndHeightfieldMesh : public ndDemoMesh
 		segment->m_indexCount = indexList.GetCount() - start;
 	}
 
-	void BuildVertexAndNormals(const dArray<dInt32>& indexList, const dArray<dVector>& heightfield, dArray<ndMeshPointUV>& points)
+	void BuildVertexAndNormals(const dArray<dInt32>& indexList, const dArray<dVector>& heightfield, dArray<glPositionNormalUV>& points)
 	{
 		points.SetCount(heightfield.GetCount());
-		memset(&points[0], 0, heightfield.GetCount() * sizeof(ndMeshPointUV));
+		memset(&points[0], 0, heightfield.GetCount() * sizeof(glPositionNormalUV));
 
 		for (dInt32 i = 0; i < indexList.GetCount(); i += 3)
 		{
@@ -131,8 +131,8 @@ class ndHeightfieldMesh : public ndDemoMesh
 		{
 			dVector normal(points[i].m_normal.m_x, points[i].m_normal.m_y, points[i].m_normal.m_z, dFloat32(0.0f));
 			normal = normal.Normalize();
-			points[i].m_posit = ndMeshVector(GLfloat(heightfield[i].m_x), GLfloat(heightfield[i].m_y), GLfloat(heightfield[i].m_z));
-			points[i].m_normal = ndMeshVector(GLfloat(normal.m_x), GLfloat(normal.m_y), GLfloat(normal.m_z));
+			points[i].m_posit = glVector3(GLfloat(heightfield[i].m_x), GLfloat(heightfield[i].m_y), GLfloat(heightfield[i].m_z));
+			points[i].m_normal = glVector3(GLfloat(normal.m_x), GLfloat(normal.m_y), GLfloat(normal.m_z));
 			points[i].m_uv.m_u = points[i].m_posit.m_x * uvScale;
 			points[i].m_uv.m_v = points[i].m_posit.m_z * uvScale;
 		}
