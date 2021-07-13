@@ -13,13 +13,12 @@ cmake_minimum_required(VERSION 3.4.0)
 set (projectName "glatter")
 message (${projectName})
 
-if (NOT MSVC)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4201")
-endif()
-
 # low level core
 include_directories(include/)
 file(GLOB source src/glatter/glatter.c)
 
 add_library(${projectName} STATIC ${source})
+
+target_compile_options(${projectName} PUBLIC
+  $<$<COMPILE_LANGUAGE:CXX>:$<$<CXX_COMPILER_ID:MSVC>:/wd4201>>>)
 
