@@ -472,6 +472,14 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 			// draw the current gear
 			DrawGear(m_gearMap[m_currentGear], x, y + 98, gageSize);
+
+			// glBegin/glEnd is not supported after 3.1 but still supported 
+			// by some drivers while going and error.
+			// for now I will simply clear open gl error stack, 
+			for (GLenum err = glGetError(); err != GL_NO_ERROR; err = glGetError())
+			{
+				//dTrace(("****** opengl error 0x%x\n", err));
+			}
 		}
 	}
 

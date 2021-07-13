@@ -143,7 +143,6 @@ static GLuint LoadTargaImage(const char* const cacheName, const char* const buff
 	glGenTextures(1, &texture);
 	if (texture)
 	{
-		//GLenum errr = glGetError ();
 		glBindTexture(GL_TEXTURE_2D, texture);
 
 		// select modulate to mix texture with color for shading
