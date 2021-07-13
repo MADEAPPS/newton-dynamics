@@ -1074,6 +1074,52 @@ dInt32 ndContactSolver::CompoundContactsDiscrete()
 	return 0;
 }
 
+dInt32 ndContactSolver::CompoundContactsContinue()
+{
+	if (!m_instance1.GetShape()->GetAsShapeCompound())
+	{
+		dAssert(0);
+	//	dAssert(m_instance0.GetShape()->GetAsShapeCompound());
+	//	if (m_instance1.GetShape()->GetAsShapeConvex())
+	//	{
+	//		return CompoundToConvexContactsDiscrete();
+	//	}
+	//	else if (m_instance1.GetShape()->GetAsShapeStaticBVH())
+	//	{
+	//		return CompoundToShapeStaticBvhContactsDiscrete();
+	//	}
+	//	else if (m_instance1.GetShape()->GetAsShapeHeightfield())
+	//	{
+	//		return CompoundToStaticHeighfieldContactsDiscrete();
+	//	}
+	//	else
+	//	{
+	//		dAssert(0);
+	//	}
+	}
+	else if (!m_instance0.GetShape()->GetAsShapeCompound())
+	{
+		dAssert(m_instance1.GetShape()->GetAsShapeCompound());
+		if (m_instance0.GetShape()->GetAsShapeConvex())
+		{
+			dAssert(0);
+			//return ConvexToCompoundContactsDiscrete();
+			return 0;
+		}
+		else
+		{
+			dAssert(0);
+		}
+	}
+	else
+	{
+		dAssert(0);
+	//	dAssert(m_instance0.GetShape()->GetAsShapeCompound() && m_instance1.GetShape()->GetAsShapeCompound());
+	//	return CompoundToCompoundContactsDiscrete();
+	}
+	return 0;
+}
+
 dInt32 ndContactSolver::CalculateContactsDiscrete ()
 {
 	dInt32 count = 0;
@@ -1103,8 +1149,7 @@ dInt32 ndContactSolver::CalculateContactsContinue()
 	dInt32 count = 0;
 	if (m_instance0.GetShape()->GetAsShapeCompound() || m_instance1.GetShape()->GetAsShapeCompound())
 	{
-		dAssert(0);
-		//count = CompoundContacts();
+		count = CompoundContactsContinue();
 	}
 	else if (m_instance0.GetShape()->GetAsShapeConvex())
 	{

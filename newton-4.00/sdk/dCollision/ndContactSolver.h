@@ -81,6 +81,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 ConvexToSaticStaticBvhContactsNodeDescrete(const dAabbPolygonSoup::dNode* const node);
 
 	dInt32 ConvexContactsContinue();
+	dInt32 CompoundContactsContinue();
 	dInt32 ConvexToConvexContactsContinue();
 	dInt32 ConvexToStaticMeshContactsContinue();
 
