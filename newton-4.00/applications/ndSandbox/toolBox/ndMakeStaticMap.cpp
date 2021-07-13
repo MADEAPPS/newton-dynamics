@@ -47,14 +47,14 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene)
 
 ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, dFloat32 gridSize, dFloat32 perturbation)
 {
-	dVector floor[] =
-	{
-		{  0.0f,     0.0f,  0.0f    , 1.0f },
-		{  0.0f,     0.0f,  gridSize, 1.0f },
-		{  gridSize, 0.0f,  gridSize, 1.0f },
-		{  gridSize, 0.0f,  0.0f,     1.0f },
-	};
-	dInt32 index[][3] = { { 0, 1, 2 }, { 0, 2, 3 } };
+	//dVector floor[] =
+	//{
+	//	{  0.0f,     0.0f,  0.0f    , 1.0f },
+	//	{  0.0f,     0.0f,  gridSize, 1.0f },
+	//	{  gridSize, 0.0f,  gridSize, 1.0f },
+	//	{  gridSize, 0.0f,  0.0f,     1.0f },
+	//};
+	//dInt32 index[][3] = { { 0, 1, 2 }, { 0, 2, 3 } };
 	dVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
 
 	dArray<dVector> points;
@@ -90,7 +90,6 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, 
 			meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);
 			meshEffect.AddPoint(p3.m_x, p3.m_y, p3.m_z);
 			meshEffect.EndBuildFace();
-
 		}
 	}
 	meshEffect.EndBuild(0.0f);
@@ -309,7 +308,7 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		dInt32 size = sizeof(control) / sizeof(control[0]);
 
 		dBigVector derivP0(control[1] - control[size-1]);
-		dBigVector derivP1(control[0] - control[size - 2]);
+		//dBigVector derivP1(control[0] - control[size - 2]);
 
 		dBezierSpline spline1;
 		//spline1.GlobalCubicInterpolation(size, control, derivP0, derivP1);

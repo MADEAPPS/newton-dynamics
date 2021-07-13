@@ -415,12 +415,12 @@ dInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 				stackPool[stack].m_node0 = node0;
 				stackPool[stack].m_node1 = node1->m_left;
 				stack++;
-				dAssert(stack < (sizeof (stackPool)/sizeof (stackPool[0])));
+				dAssert(stack < dInt32(sizeof (stackPool)/sizeof (stackPool[0])));
 
 				stackPool[stack].m_node0 = node0;
 				stackPool[stack].m_node1 = node1->m_right;
 				stack++;
-				dAssert(stack < (sizeof (stackPool)/sizeof (stackPool[0])));
+				dAssert(stack < dInt32(sizeof (stackPool)/sizeof (stackPool[0])));
 			}
 			else if (node1->m_type == ndShapeCompound::m_leaf)
 			{
@@ -429,12 +429,12 @@ dInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 				stackPool[stack].m_node0 = node0->m_left;
 				stackPool[stack].m_node1 = node1;
 				stack++;
-				dAssert(stack < (sizeof (stackPool)/sizeof (stackPool[0])));
+				dAssert(stack < dInt32(sizeof (stackPool)/sizeof (stackPool[0])));
 
 				stackPool[stack].m_node0 = node0->m_right;
 				stackPool[stack].m_node1 = node1;
 				stack++;
-				dAssert(stack < (sizeof (stackPool)/sizeof (stackPool[0])));
+				dAssert(stack < dInt32(sizeof (stackPool)/sizeof (stackPool[0])));
 			}
 			else
 			{
@@ -444,22 +444,22 @@ dInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 				stackPool[stack].m_node0 = node0->m_left;
 				stackPool[stack].m_node1 = node1->m_left;
 				stack++;
-				dAssert(stack < (sizeof (stackPool)/sizeof (stackPool[0])));
+				dAssert(stack < dInt32(sizeof (stackPool)/sizeof (stackPool[0])));
 
 				stackPool[stack].m_node0 = node0->m_left;
 				stackPool[stack].m_node1 = node1->m_right;
 				stack++;
-				dAssert(stack < (sizeof (stackPool)/sizeof (stackPool[0])));
+				dAssert(stack < dInt32(sizeof (stackPool)/sizeof (stackPool[0])));
 
 				stackPool[stack].m_node0 = node0->m_right;
 				stackPool[stack].m_node1 = node1->m_left;
 				stack++;
-				dAssert(stack < (sizeof (stackPool)/sizeof (stackPool[0])));
+				dAssert(stack < dInt32(sizeof (stackPool)/sizeof (stackPool[0])));
 
 				stackPool[stack].m_node0 = node0->m_right;
 				stackPool[stack].m_node1 = node1->m_right;
 				stack++;
-				dAssert(stack < (sizeof (stackPool)/sizeof (stackPool[0])));
+				dAssert(stack < dInt32(sizeof (stackPool)/sizeof (stackPool[0])));
 			}
 		}
 	}
@@ -586,13 +586,13 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 					stackPool[stack].m_collisionTreeNode = backNode;
 					stackPool[stack].m_treeNodeIsLeaf = 0;
 					stack++;
-					dAssert(stack < (sizeof(stackPool) / sizeof(stackPool[0])));
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 					
 					stackPool[stack].m_compoundNode = compoundNode;
 					stackPool[stack].m_collisionTreeNode = frontNode;
 					stackPool[stack].m_treeNodeIsLeaf = 0;
 					stack++;
-					dAssert(stack < (sizeof(stackPool) / sizeof(stackPool[0])));
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 				}
 				else if (backNode && !frontNode)
 				{
@@ -600,13 +600,13 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 					stackPool[stack].m_collisionTreeNode = backNode;
 					stackPool[stack].m_treeNodeIsLeaf = 0;
 					stack++;
-					dAssert(stack < (sizeof(stackPool) / sizeof(stackPool[0])));
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 
 					stackPool[stack].m_compoundNode = compoundNode;
 					stackPool[stack].m_collisionTreeNode = collisionTreeNode;
 					stackPool[stack].m_treeNodeIsLeaf = 1;
 					stack++;
-					dAssert(stack < (sizeof(stackPool) / sizeof(stackPool[0])));
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 				}
 				else if (!backNode && frontNode)
 				{
@@ -614,13 +614,13 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 					stackPool[stack].m_collisionTreeNode = frontNode;
 					stackPool[stack].m_treeNodeIsLeaf = 0;
 					stack++;
-					dAssert(stack < (sizeof(stackPool) / sizeof(stackPool[0])));
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 
 					stackPool[stack].m_compoundNode = compoundNode;
 					stackPool[stack].m_collisionTreeNode = collisionTreeNode;
 					stackPool[stack].m_treeNodeIsLeaf = 1;
 					stack++;
-					dAssert(stack < (sizeof(stackPool) / sizeof(stackPool[0])));
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 				}
 				else
 				{
@@ -628,7 +628,7 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 					stackPool[stack].m_collisionTreeNode = collisionTreeNode;
 					stackPool[stack].m_treeNodeIsLeaf = 1;
 					stack++;
-					dAssert(stack < (sizeof(stackPool) / sizeof(stackPool[0])));
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 				}
 			}
 			else if (treeNodeIsLeaf)
@@ -639,13 +639,13 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 				stackPool[stack].m_collisionTreeNode = collisionTreeNode;
 				stackPool[stack].m_treeNodeIsLeaf = 1;
 				stack++;
-				dAssert(stack < (sizeof(stackPool) / sizeof(stackPool[0])));
+				dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 				
 				stackPool[stack].m_compoundNode = compoundNode->m_right;
 				stackPool[stack].m_collisionTreeNode = collisionTreeNode;
 				stackPool[stack].m_treeNodeIsLeaf = 1;
 				stack++;
-				dAssert(stack < (sizeof(stackPool) / sizeof(stackPool[0])));
+				dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 			}
 			else if (nodeProxi.m_area > compoundNode->m_area)
 			{
@@ -661,13 +661,13 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 					stackPool[stack].m_collisionTreeNode = backNode;
 					stackPool[stack].m_treeNodeIsLeaf = 0;
 					stack++;
-					dAssert(stack < (sizeof(stackPool) / sizeof(stackPool[0])));
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 					
 					stackPool[stack].m_compoundNode = compoundNode;
 					stackPool[stack].m_collisionTreeNode = frontNode;
 					stackPool[stack].m_treeNodeIsLeaf = 0;
 					stack++;
-					dAssert(stack < (sizeof(stackPool) / sizeof(stackPool[0])));
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 				}
 				else if (backNode && !frontNode)
 				{
@@ -675,16 +675,19 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 					stackPool[stack].m_collisionTreeNode = backNode;
 					stackPool[stack].m_treeNodeIsLeaf = 0;
 					stack++;
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 
 					stackPool[stack].m_compoundNode = compoundNode->m_left;
 					stackPool[stack].m_collisionTreeNode = collisionTreeNode;
 					stackPool[stack].m_treeNodeIsLeaf = 1;
 					stack++;
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 
 					stackPool[stack].m_compoundNode = compoundNode->m_right;
 					stackPool[stack].m_collisionTreeNode = collisionTreeNode;
 					stackPool[stack].m_treeNodeIsLeaf = 1;
 					stack++;
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 				}
 				else if (!backNode && frontNode)
 				{
@@ -692,16 +695,19 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 					stackPool[stack].m_collisionTreeNode = frontNode;
 					stackPool[stack].m_treeNodeIsLeaf = 0;
 					stack++;
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 
 					stackPool[stack].m_compoundNode = compoundNode->m_left;
 					stackPool[stack].m_collisionTreeNode = collisionTreeNode;
 					stackPool[stack].m_treeNodeIsLeaf = 1;
 					stack++;
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 
 					stackPool[stack].m_compoundNode = compoundNode->m_right;
 					stackPool[stack].m_collisionTreeNode = collisionTreeNode;
 					stackPool[stack].m_treeNodeIsLeaf = 1;
 					stack++;
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 				}
 				else
 				{
@@ -709,7 +715,7 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 					stackPool[stack].m_collisionTreeNode = collisionTreeNode;
 					stackPool[stack].m_treeNodeIsLeaf = 1;
 					stack++;
-					dAssert(stack < (sizeof(stackPool) / sizeof(stackPool[0])));
+					dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 				}
 			}
 			else
@@ -721,13 +727,13 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 				stackPool[stack].m_collisionTreeNode = collisionTreeNode;
 				stackPool[stack].m_treeNodeIsLeaf = 0;
 				stack++;
-				dAssert(stack < (sizeof(stackPool) / sizeof(stackPool[0])));
+				dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 
 				stackPool[stack].m_compoundNode = compoundNode->m_right;
 				stackPool[stack].m_collisionTreeNode = collisionTreeNode;
 				stackPool[stack].m_treeNodeIsLeaf = 0;
 				stack++;
-				dAssert(stack < (sizeof(stackPool) / sizeof(stackPool[0])));
+				dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0])));
 			}
 		}
 	}

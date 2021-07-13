@@ -1112,11 +1112,11 @@ void ndShapeCompound::EndAddRemove()
 
 				stackBuffer[stack] = node->m_right;
 				stack++;
-				dAssert(stack < sizeof(stackBuffer) / sizeof(stackBuffer[0]));
+				dAssert(stack < dInt32 (sizeof(stackBuffer) / sizeof(stackBuffer[0])));
 
 				stackBuffer[stack] = node->m_left;
 				stack++;
-				dAssert(stack < sizeof(stackBuffer) / sizeof(stackBuffer[0]));
+				dAssert(stack < dInt32(sizeof(stackBuffer) / sizeof(stackBuffer[0])));
 			}
 		}
 		

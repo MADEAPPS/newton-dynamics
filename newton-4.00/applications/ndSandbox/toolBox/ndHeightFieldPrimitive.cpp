@@ -194,8 +194,8 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 	for (int i = 0; i < heightfield.GetCount(); i++)
 	{
 		dFloat32 high = heightfield[i].m_y * 100.0f;
-		dAssert(high < dFloat32(1 << 15));
-		dAssert(high > dFloat32(-1 << 15));
+		dAssert(high <  dFloat32(1 << 15));
+		dAssert(high > -dFloat32(1 << 15));
 		hightMap[i] = dInt16(high);
 	}
 	shape->UpdateElevationMapAabb();
@@ -230,8 +230,8 @@ void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& s
 	for (int i = 0; i < heightfield.GetCount(); i++)
 	{
 		dFloat32 high = heightfield[i].m_y * 100.0f;
-		dAssert(high < dFloat32(1 << 15));
-		dAssert(high > dFloat32(-1 << 15));
+		dAssert(high <  dFloat32(1 << 15));
+		dAssert(high > -dFloat32(1 << 15));
 		hightMap[i] = dInt16(high);
 	}
 	shape->UpdateElevationMapAabb();
