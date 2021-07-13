@@ -61,9 +61,12 @@ class ndVehicleUI: public dClassAlloc
 
 	ndVehicleUI()
 		:dClassAlloc()
-		,m_Vbo(0)
-		,m_Vao(0)
-		,m_Ibo(0)/*, m_Vbodyn(0), m_Vaodyn(0), m_Ibodyn(0)*/
+		,m_VboDyn(0)
+		,m_VaoDyn(0)
+		,m_IboDyn(0)
+		,m_VboSta(0)
+		,m_VaoSta(0)
+		,m_IboSta(0)
 		,m_shaderHandle(0)
 	{
 	};
@@ -75,25 +78,53 @@ class ndVehicleUI: public dClassAlloc
 			glDeleteProgram(m_shaderHandle);
 		}
 
-		if (m_Ibo)
+		if (m_IboSta)
 		{
-			glDeleteBuffers(1, &m_Ibo);
+			glDeleteBuffers(1, &m_IboSta);
 		}
 
-		if (m_Vbo)
+		if (m_VboSta)
 		{
-			glDeleteBuffers(1, &m_Vbo);
+			glDeleteBuffers(1, &m_VboSta);
 		}
 
-		if (m_Vao)
+		if (m_VaoSta)
 		{
-			glDeleteVertexArrays(1, &m_Vao);
+			glDeleteVertexArrays(1, &m_VaoSta);
+		}
+		if (m_IboDyn)
+		{
+			glDeleteBuffers(1, &m_IboDyn);
+		}
+
+		if (m_VboDyn)
+		{
+			glDeleteBuffers(1, &m_VboDyn);
+		}
+
+		if (m_VaoDyn)
+		{
+			glDeleteVertexArrays(1, &m_VaoDyn);
 		}
 	};
 	
+	void CreateOrthoViewMatrix(ndDemoEntityManager* const uscene, dFloat32 origin_x, const dFloat32 origin_y, dMatrix& projmatrix)
+	{
+		dFloat32 sizeX = (dFloat32)(1.0f * uscene->GetWidth());
+		dFloat32 sizeY = (dFloat32)(1.0f * uscene->GetHeight());
+		dFloat32 L = origin_x;
+		dFloat32 R = origin_x + sizeX;
+		dFloat32 T = origin_y;
+		dFloat32 B = origin_y + sizeY;
+		projmatrix = dMatrix({ 2.0f / (R - L), 0.0f,   0.0f, 0.0f },
+			                 { 0.0f,   2.0f / (T - B), 0.0f, 0.0f },
+			                 { 0.0f,   0.0f,          -1.0f, 0.0f },
+			                 { (R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f });
+	}
+	
 	void CreateBufferUI()
 	{
-		if (!m_Vao) 
+		if (!m_VaoDyn)
 		{
 			m_shaderHandle = glCreateProgram();
 		
@@ -140,46 +171,43 @@ class ndVehicleUI: public dClassAlloc
 			glDeleteShader(m_vertHandle);
 			glDeleteShader(m_fragHandle);
 
-			//glPositionUV vert[4]{};
-			//unsigned int indx[6]{};
-
-			m_vert[0].m_posit.m_x = -1.0f;
-			m_vert[0].m_posit.m_y = -1.0f;
-			m_vert[0].m_posit.m_z = 0.0f;
-			m_vert[0].m_uv.m_u = 0.0f;
-			m_vert[0].m_uv.m_v = 0.0f;
+			m_vertDyn[0].m_posit.m_x = -1.0f;
+			m_vertDyn[0].m_posit.m_y = -1.0f;
+			m_vertDyn[0].m_posit.m_z = 0.0f;
+			m_vertDyn[0].m_uv.m_u = 0.0f;
+			m_vertDyn[0].m_uv.m_v = 0.0f;
 			//
-			m_vert[1].m_posit.m_x = -1.0f;
-			m_vert[1].m_posit.m_y = 1.0f;
-			m_vert[1].m_posit.m_z = 0.0f;
-			m_vert[1].m_uv.m_u = 0.0f;
-			m_vert[1].m_uv.m_v = 1.0f;
+			m_vertDyn[1].m_posit.m_x = -1.0f;
+			m_vertDyn[1].m_posit.m_y = 1.0f;
+			m_vertDyn[1].m_posit.m_z = 0.0f;
+			m_vertDyn[1].m_uv.m_u = 0.0f;
+			m_vertDyn[1].m_uv.m_v = 1.0f;
 
-			m_vert[2].m_posit.m_x = 1.0f;
-			m_vert[2].m_posit.m_y = 1.0f;
-			m_vert[2].m_posit.m_z = 0.0f;
-			m_vert[2].m_uv.m_u = -1.0f;
-			m_vert[2].m_uv.m_v = 1.0f;
+			m_vertDyn[2].m_posit.m_x = 1.0f;
+			m_vertDyn[2].m_posit.m_y = 1.0f;
+			m_vertDyn[2].m_posit.m_z = 0.0f;
+			m_vertDyn[2].m_uv.m_u = -1.0f;
+			m_vertDyn[2].m_uv.m_v = 1.0f;
 
-			m_vert[3].m_posit.m_x = 1.0f;
-			m_vert[3].m_posit.m_y = -1.0f;
-			m_vert[3].m_posit.m_z = 0.0f;
-			m_vert[3].m_uv.m_u = -1.0f;
-			m_vert[3].m_uv.m_v = 0.0f;
+			m_vertDyn[3].m_posit.m_x = 1.0f;
+			m_vertDyn[3].m_posit.m_y = -1.0f;
+			m_vertDyn[3].m_posit.m_z = 0.0f;
+			m_vertDyn[3].m_uv.m_u = -1.0f;
+			m_vertDyn[3].m_uv.m_v = 0.0f;
 
-			m_indx[0] = 0;
-			m_indx[1] = 1;
-			m_indx[2] = 2;
-			m_indx[3] = 2;
-			m_indx[4] = 3;
-			m_indx[5] = 0;
+			m_indxDyn[0] = 0;
+			m_indxDyn[1] = 1;
+			m_indxDyn[2] = 2;
+			m_indxDyn[3] = 2;
+			m_indxDyn[4] = 3;
+			m_indxDyn[5] = 0;
 
-			glGenVertexArrays(1, &m_Vao);
-			glBindVertexArray(m_Vao);
+			glGenVertexArrays(1, &m_VaoDyn);
+			glBindVertexArray(m_VaoDyn);
 
-			glGenBuffers(1, &m_Vbo);
-			glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(m_vert), &m_vert[0], GL_DYNAMIC_DRAW);
+			glGenBuffers(1, &m_VboDyn);
+			glBindBuffer(GL_ARRAY_BUFFER, m_VboDyn);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertDyn), &m_vertDyn[0], GL_DYNAMIC_DRAW);
 
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)0);
@@ -187,71 +215,62 @@ class ndVehicleUI: public dClassAlloc
 			glEnableVertexAttribArray(1);
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)(offsetof(glPositionUV, glPositionUV::m_uv)));
 
-			glGenBuffers(1, &m_Ibo);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ibo);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indx), &m_indx[0], GL_STATIC_DRAW);
+			glGenBuffers(1, &m_IboDyn);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IboDyn);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indxDyn), &m_indxDyn[0], GL_STATIC_DRAW);
 
 			glDisableVertexAttribArray(1);
 			glDisableVertexAttribArray(0);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			// Don't unbind this buffer, Let's it in opengl memory.
+			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+			// remove this buffer from memory because it is updated in runtime.
+			// you need to bind this buffer at any render pass.
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 			glBindVertexArray(0);
 
 			// Gear dynamic buffer
-			/*
-			memcpy(m_vert2, vert, sizeof(vert));
-			memcpy(m_indx2, indx, sizeof(indx));
+			memcpy(m_vertSta, m_vertDyn, sizeof(m_vertDyn));
+			memcpy(m_indxSta, m_indxDyn, sizeof(m_indxDyn));
 			//
 			//
-			glGenVertexArrays(1, &m_Vaodyn);
-			glBindVertexArray(m_Vaodyn);
+			glGenVertexArrays(1, &m_VaoSta);
+			glBindVertexArray(m_VaoSta);
 			//
-			glGenBuffers(1, &m_Vbodyn);
-			glBindBuffer(GL_ARRAY_BUFFER, m_Vbodyn);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(m_vert2), &m_vert2[0], GL_DYNAMIC_DRAW);
+			glGenBuffers(1, &m_VboSta);
+			glBindBuffer(GL_ARRAY_BUFFER, m_VboSta);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertSta), &m_vertSta[0], GL_STATIC_DRAW);
 			//
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)0);
 			//
 			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)(offsetof(glPositionUV, glPositionUV::uv)));
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)(offsetof(glPositionUV, glPositionUV::m_uv)));
 
-			glGenBuffers(1, &m_Ibodyn);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ibodyn);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indx2), &m_indx2[0], GL_STATIC_DRAW);
+			glGenBuffers(1, &m_IboSta);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IboSta);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indxSta), &m_indxSta[0], GL_STATIC_DRAW);
 			//
 			glDisableVertexAttribArray(1);
 			glDisableVertexAttribArray(0);
 			//
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			// Static buffer, Let's it in opengl memory.
+			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			//glBindBuffer(GL_ARRAY_BUFFER, 0);
 			//
 			glBindVertexArray(0);
-			*/
 		}
 	};
 
 	void RenderGageUI(ndDemoEntityManager* const uscene, const GLuint tex1, const dFloat32 origin_x, const dFloat32 origin_y, const dFloat32 ptsize, dFloat32 cparam, dFloat32 minAngle, dFloat32 maxAngle)
 	{
-		if (m_Vao) 
+		if (m_VaoSta)
 		{
-			dFloat32 sizeX = (dFloat32)(1.0f * uscene->GetWidth());
-			dFloat32 sizeY = (dFloat32)(1.0f * uscene->GetHeight());
-			dFloat32 L = origin_x;
-			dFloat32 R = origin_x + sizeX;
-			dFloat32 T = origin_y;
-			dFloat32 B = origin_y + sizeY;
-
-			const dFloat32 ortho_projection[4][4] =
-			{
-				{ 2.0f / (R - L), 0.0f,   0.0f, 0.0f },
-				{ 0.0f,   2.0f / (T - B), 0.0f, 0.0f },
-				{ 0.0f,   0.0f,          -1.0f, 0.0f },
-				{(R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f },
-			};
-
+			dMatrix aprojm(dGetIdentityMatrix());
+			CreateOrthoViewMatrix(uscene, origin_x, origin_y, aprojm);
+			//
 			minAngle *= -dDegreeToRad;
 			maxAngle *= -dDegreeToRad;
 			//
@@ -260,63 +279,47 @@ class ndVehicleUI: public dClassAlloc
 			dMatrix modm(dRollMatrix(-angle));
 			dVector color(1.0f, 1.0f, 1.0f, 1.0f);
 
-			glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ProjMtx"), 1, GL_FALSE, &ortho_projection[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ProjMtx"), 1, GL_FALSE, &aprojm[0][0]);
 			glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ModMtx"), 1, GL_FALSE, &modm[0][0]);
 			glUniform1f(glGetUniformLocation(m_shaderHandle, "ptsize"), ptsize);
 			glUniform4fv(glGetUniformLocation(m_shaderHandle, "color"), 1, &color[0]);
 
-			glBindVertexArray(m_Vao);
+			glBindVertexArray(m_VaoSta);
 
 			glEnableVertexAttribArray(0);
 			glEnableVertexAttribArray(1);
 
-			glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
-
-			m_vert[0].m_uv.m_u = 0.0f;
-			m_vert[1].m_uv.m_u = 0.0f;
-
-			m_vert[2].m_uv.m_u = -1.0f;
-			m_vert[3].m_uv.m_u = -1.0f;
-
-			// all other render pass
-			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_vert), &m_vert[0]);
+			// This buffer is already in the opengl memory.
+			// Don't need to bind it again.
+			//glBindBuffer(GL_ARRAY_BUFFER, m_VboSta);
 
 			if (tex1) 
 			{
 				glBindTexture(GL_TEXTURE_2D, tex1);
 			}
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ibo);
+			// This buffer is already in the memory.
+			// Don't need to bind it again.
+			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IboSta);
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 			glDisableVertexAttribArray(1);
 			glDisableVertexAttribArray(0);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			// Don't unbind this buffers from the opengl memory.
+			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			//glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindVertexArray(0);
 		}
 	};
 	
 	void RenderGearUI(ndDemoEntityManager* const uscene, const dInt32 gearid, GLuint tex1, dFloat32 origin_x, dFloat32 origin_y, dFloat32 ptsize)
 	{
-		if (m_Vao)
+		if (m_VaoDyn)
 		{
-			dFloat32 sizeX = (dFloat32)(1.0f * uscene->GetWidth());
-			dFloat32 sizeY = (dFloat32)(1.0f * uscene->GetHeight());
-			//
-			dFloat32 L = origin_x;
-			dFloat32 R = origin_x + sizeX;
-			dFloat32 T = origin_y;
-			dFloat32 B = origin_y + sizeY;
-
-			const dFloat32 ortho_projection[4][4] =
-			{
-				{ 2.0f / (R - L), 0.0f,   0.0f, 0.0f },
-				{ 0.0f,   2.0f / (T - B), 0.0f, 0.0f },
-				{ 0.0f,   0.0f,          -1.0f, 0.0f },
-				{(R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f },
-			};
+			dMatrix aprojm(dGetIdentityMatrix());
+			CreateOrthoViewMatrix(uscene, origin_x, origin_y, aprojm);
 
 			dMatrix origin(dGetIdentityMatrix());
 			origin[1][1] = -1.0f;
@@ -341,40 +344,44 @@ class ndVehicleUI: public dClassAlloc
 			  color = dVector(0.0f, 1.0f, 0.0f, 1.0f);
 			}
 
-			glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ProjMtx"), 1, GL_FALSE, &ortho_projection[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ProjMtx"), 1, GL_FALSE, &aprojm[0][0]);
 			glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ModMtx"), 1, GL_FALSE, &origin[0][0]);
 			glUniform1f(glGetUniformLocation(m_shaderHandle, "ptsize"), xy1);
 			glUniform4fv(glGetUniformLocation(m_shaderHandle, "color"), 1, &color[0]);
 
-			glBindVertexArray(m_Vao);
+			glBindVertexArray(m_VaoDyn);
 
 			glEnableVertexAttribArray(0);
 			glEnableVertexAttribArray(1);
 
-			glBindBuffer(GL_ARRAY_BUFFER, m_Vbo);
+			//
+			glBindBuffer(GL_ARRAY_BUFFER, m_VboDyn);
 
-			m_vert[0].m_uv.m_u = u0;
-			m_vert[1].m_uv.m_u = u0;
+			m_vertDyn[0].m_uv.m_u = u0;
+			m_vertDyn[1].m_uv.m_u = u0;
 			
-			m_vert[2].m_uv.m_u = u1;
-			m_vert[3].m_uv.m_u = u1;
+			m_vertDyn[2].m_uv.m_u = u1;
+			m_vertDyn[3].m_uv.m_u = u1;
 
-			// all other render pass
-			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_vert), &m_vert[0]);
+			// Bind and update the dynamic buffer uv data 
+			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_vertDyn), &m_vertDyn[0]);
 
 			if (tex1) 
 			{
 				glBindTexture(GL_TEXTURE_2D, tex1);
 			}
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Ibo);
+			// This buffer is static, Don't need to bind it again.
+			// The buffer is already bind in the opengl memory.
+			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IboDyn);
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 			glDisableVertexAttribArray(1);
 			glDisableVertexAttribArray(0);
 
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+			// Don't unbind this buffer to let's it in opengl memory.
+			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindVertexArray(0);
 		}
@@ -382,14 +389,16 @@ class ndVehicleUI: public dClassAlloc
 	//
 	GLuint m_shaderHandle;
 	private:
-	GLuint m_Vbo;
-	GLuint m_Vao;
-	GLuint m_Ibo;
-	//GLuint m_Vbodyn;
-	//GLuint m_Vaodyn;
-	//GLuint m_Ibodyn;
-	glPositionUV m_vert[4]{};
-	dUnsigned32 m_indx[6]{};
+	GLuint m_VboDyn;
+	GLuint m_VboSta;
+	GLuint m_VaoDyn;
+	GLuint m_VaoSta;
+	GLuint m_IboDyn;
+	GLuint m_IboSta;
+	glPositionUV m_vertDyn[4];
+	glPositionUV m_vertSta[4];
+	dUnsigned32 m_indxDyn[6];
+	dUnsigned32 m_indxSta[6];
 };
 
 class ndVehicleDectriptorViper : public ndVehicleDectriptor
@@ -537,10 +546,10 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	public:
 	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const dMatrix& matrix)
 		:ndBasicVehicle(desc)
-	   , UIVehicle(nullptr)
+		,m_vehicleUI(nullptr)
 	{
-		UIVehicle = new ndVehicleUI();
-		UIVehicle->CreateBufferUI();
+		m_vehicleUI = new ndVehicleUI();
+		m_vehicleUI->CreateBufferUI();
 
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
@@ -706,8 +715,10 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		delete m_startSound;
 		delete m_engineRpmSound;
 
-		if (UIVehicle)
-		  delete UIVehicle;
+		if (m_vehicleUI)
+		{
+			delete m_vehicleUI;
+		}
 	}
 
 	ndDemoEntity* LoadMeshModel(ndDemoEntityManager* const scene, const char* const filename)
@@ -997,25 +1008,27 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			//dFloat32 rpm = (motor->GetRpm() / maxRpm) * m_configuration.m_transmission.m_fowardRatios[m_currentGear]; 
 			dFloat32 rpm = (motor->GetRpm() / maxRpm) * 2.85f;
 			//
-			if (UIVehicle) {
-				if (UIVehicle->m_shaderHandle) {
-					glUseProgram(UIVehicle->m_shaderHandle);
+			if (m_vehicleUI) 
+			{
+				if (m_vehicleUI->m_shaderHandle) 
+				{
+					glUseProgram(m_vehicleUI->m_shaderHandle);
 					//
 					glActiveTexture(GL_TEXTURE0);
 					//
-					UIVehicle->RenderGageUI(scene, m_tachometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
+					m_vehicleUI->RenderGageUI(scene, m_tachometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
 
 					dFloat32 s = gageSize * 0.7f;
-					UIVehicle->RenderGageUI(scene, m_redNeedle, -x, -y, s * 0.5f, rpm, -0.0f, 90.0f);
+					m_vehicleUI->RenderGageUI(scene, m_redNeedle, -x, -y, s * 0.5f, rpm, -0.0f, 90.0f);
 					//
-			x += gageSize;
-					UIVehicle->RenderGageUI(scene, m_odometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
+					x += gageSize;
+					m_vehicleUI->RenderGageUI(scene, m_odometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
 
 					dFloat32 speed = (GetSpeed() / 100.0f) * 2.85f;
-					UIVehicle->RenderGageUI(scene, m_greenNeedle, -x, -y, s * 0.5f, dAbs(speed), -0.0f, 90.0f);
+					m_vehicleUI->RenderGageUI(scene, m_greenNeedle, -x, -y, s * 0.5f, dAbs(speed), -0.0f, 90.0f);
 
-			// draw the current gear
-					UIVehicle->RenderGearUI(scene, m_gearMap[m_currentGear], m_gears, -x, -y, gageSize);
+					// draw the current gear
+					m_vehicleUI->RenderGearUI(scene, m_gearMap[m_currentGear], m_gears, -x, -y, gageSize);
 
 					glUseProgram(0);
 				}
@@ -1076,7 +1089,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	ndSoundChannel* m_startSound;
 	ndSoundChannel* m_engineRpmSound;
 	bool m_startEngine;
-	ndVehicleUI* UIVehicle;
+	ndVehicleUI* m_vehicleUI;
 };
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)

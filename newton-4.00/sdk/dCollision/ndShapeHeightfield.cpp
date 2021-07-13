@@ -742,21 +742,22 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	
 		if (data->m_doContinuesCollisionTest) 
 		{
-			dAssert(0);
-	//		dgFastRayTest ray(dVector(dFloat32(0.0f)), data->m_boxDistanceTravelInMeshSpace);
-	//		for (dInt32 i = 0; i < faceCount; i++) {
-	//			const dInt32* const indexArray = &indices[faceIndexCount1];
-	//			const dVector& faceNormal = vertex[indexArray[4]];
-	//			dFloat32 dist = data->PolygonBoxRayDistance(faceNormal, 3, indexArray, stride, &vertex[0].m_x, ray);
-	//			if (dist < dFloat32(1.0f)) {
-	//				hitDistance[faceCount0] = dist;
-	//				address[faceCount0] = faceIndexCount0;
-	//				memcpy(&indices[faceIndexCount0], indexArray, 9 * sizeof(dInt32));
-	//				faceCount0++;
-	//				faceIndexCount0 += 9;
-	//			}
-	//			faceIndexCount1 += 9;
-	//		}
+			dFastRayTest ray(dVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
+			for (dInt32 i = 0; i < faceCount; i++) 
+			{
+				const dInt32* const indexArray = &indices[faceIndexCount1];
+				const dVector& faceNormal = vertex[indexArray[4]];
+				dFloat32 dist = data->PolygonBoxRayDistance(faceNormal, 3, indexArray, stride, &vertex[0].m_x, ray);
+				if (dist < dFloat32(1.0f)) 
+				{
+					hitDistance[faceCount0] = dist;
+					address[faceCount0] = faceIndexCount0;
+					memcpy(&indices[faceIndexCount0], indexArray, 9 * sizeof(dInt32));
+					faceCount0++;
+					faceIndexCount0 += 9;
+				}
+				faceIndexCount1 += 9;
+			}
 		}
 		else 
 		{

@@ -83,6 +83,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 ConvexContactsContinue();
 	dInt32 CompoundContactsContinue();
 	dInt32 ConvexToConvexContactsContinue();
+	dInt32 ConvexToCompoundContactsContinue();
 	dInt32 ConvexToStaticMeshContactsContinue();
 
 	class dgPerimenterEdge
