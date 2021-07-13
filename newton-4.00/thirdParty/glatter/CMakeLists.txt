@@ -20,5 +20,5 @@ file(GLOB source src/glatter/glatter.c)
 add_library(${projectName} STATIC ${source})
 
 target_compile_options(${projectName} PUBLIC
-  $<$<COMPILE_LANGUAGE:CXX>:$<$<CXX_COMPILER_ID:MSVC>:/wd4201>>>)
+  $<$<COMPILE_LANGUAGE:CXX>:$<$<CXX_COMPILER_ID:MSVC>:/wd4201>>)
 
