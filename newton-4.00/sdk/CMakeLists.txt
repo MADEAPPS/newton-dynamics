@@ -39,15 +39,15 @@ else()
 		add_definitions(-DCL_KERNEL_PATH="${CMAKE_CURRENT_SOURCE_DIR}/dOpencl/")
 		include_directories(dOpencl/)
 
-		if(NEWTON_BUILD_SHARED_LIBS STREQUAL "ON")
-			if (BUILD_64)
+		if(NEWTON_BUILD_SHARED_LIBS)
+			if(BUILD_64)
 				#link_libraries ("$(NEWTON_OPENCL_RUNTIME)/lib/x64/OpenCL.lib")
 				link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dOpencl/CL/lib/x64/OpenCL.lib")
 			else(BUILD_64)
 				#link_libraries ("$(NEWTON_OPENCL_RUNTIME)/lib/x86/OpenCL.lib")
 				link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dOpencl/CL/lib/x86/OpenCL.lib")
 			endif(BUILD_64)
-		endif ()
+		endif()
 	endif(NEWTON_ENABLE_GPU_SOLVER)
 
 	# source and header files
@@ -80,7 +80,7 @@ else()
 
 	add_definitions(-D_D_SINGLE_LIBRARY)
 
-	if(NEWTON_BUILD_SHARED_LIBS STREQUAL "ON")
+	if(NEWTON_BUILD_SHARED_LIBS)
 		add_definitions(-D_D_CORE_EXPORT_DLL)
 		add_definitions(-D_D_COLLISION_EXPORT_DLL)
 		add_definitions(-D_D_NEWTON_EXPORT_DLL)
