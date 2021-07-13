@@ -221,6 +221,107 @@ dInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 	return contactCount;
 }
 
+dInt32 ndContactSolver::ConvexToCompoundContactsContinue()
+{
+	const ndShapeCompound::ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
+
+	ndContact* const contactJoint = m_contact;
+	ndContactPoint* const contacts = m_contactBuffer;
+	ndBodyKinematic* const convexBody = contactJoint->GetBody0();
+	ndBodyKinematic* const compoundBody = contactJoint->GetBody1();
+	ndShapeInstance* const convexInstance = &convexBody->GetCollisionShape();
+	ndShapeInstance* const compoundInstance = &compoundBody->GetCollisionShape();
+
+	const dMatrix& compoundMatrix = compoundInstance->GetGlobalMatrix();
+	const dMatrix matrix(convexInstance->GetGlobalMatrix() * compoundMatrix.Inverse());
+
+	ndShapeCompound* const compoundShape = m_instance1.GetShape()->GetAsShapeCompound();
+	dAssert(compoundShape);
+
+	dInt32 stack = 1;
+	dInt32 contactCount = 0;
+	stackPool[0] = compoundShape->m_root;
+	dFloat32 closestDist = dFloat32(1.0e10f);
+
+	dVector boxP0;
+	dVector boxP1;
+	convexInstance->CalculateAABB(matrix, boxP0, boxP1);
+	dVector relVeloc(matrix.UnrotateVector(convexBody->GetVelocity() - compoundBody->GetVelocity()));
+	dFastRayTest ray(dVector::m_zero, relVeloc);
+
+	while (stack)
+	{
+		stack--;
+		const ndShapeCompound::ndNodeBase* const node = stackPool[stack];
+		dAssert(node);
+
+		const dVector minBox(node->m_p0 - boxP1);
+		const dVector maxBox(node->m_p1 - boxP0);
+		if (ray.BoxTest(minBox, maxBox))
+		{
+			//if (node->BoxTest(data))
+			if (node->m_type == ndShapeCompound::m_leaf)
+			{
+				ndShapeInstance* const subShape = node->GetShape();
+				if (subShape->GetCollisionMode())
+				{
+					bool processContacts = m_notification->OnCompoundSubShapeOverlap(contactJoint, m_timestep, convexInstance, subShape);
+					if (processContacts)
+					{
+						ndShapeInstance childInstance(*subShape, subShape->GetShape());
+						childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * compoundMatrix;
+
+						ndContactSolver contactSolver(*this, m_instance0, childInstance);
+						contactSolver.m_pruneContacts = 0;
+						contactSolver.m_maxCount = D_MAX_CONTATCS - contactCount;
+						contactSolver.m_contactBuffer += contactCount;
+
+						dInt32 count = contactSolver.ConvexContactsContinue();
+
+						closestDist = dMin(closestDist, contactSolver.m_separationDistance);
+						if (!m_intersectionTestOnly)
+						{
+							for (dInt32 i = 0; i < count; i++)
+							{
+								contacts[contactCount].m_shapeInstance0 = subShape;
+							}
+							contactCount += count;
+							if (contactCount > (D_MAX_CONTATCS - 2 * (D_CONSTRAINT_MAX_ROWS / 3)))
+							{
+								contactCount = PruneContacts(contactCount, 16);
+							}
+						}
+						else if (count == -1)
+						{
+							dAssert(0);
+							contactCount = -1;
+							break;
+						}
+					}
+				}
+			}
+			else
+			{
+				dAssert(node->m_type == ndShapeCompound::m_node);
+				stackPool[stack] = node->m_left;
+				stack++;
+				dAssert(stack < dInt32(sizeof(stackPool) / sizeof(ndShapeCompound::ndNodeBase*)));
+
+				stackPool[stack] = node->m_right;
+				stack++;
+				dAssert(stack < dInt32(sizeof(stackPool) / sizeof(ndShapeCompound::ndNodeBase*)));
+			}
+		}
+	}
+
+	if (m_pruneContacts && (contactCount > 1))
+	{
+		contactCount = PruneContacts(contactCount, 16);
+	}
+	contactJoint->m_separationDistance = closestDist;
+	return contactCount;
+}
+
 dInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 {
 	const ndShapeCompound::ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
@@ -246,9 +347,6 @@ dInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 	dInt32 stack = 1;
 	dInt32 contactCount = 0;
 	stackPool[0] = compoundShape->m_root;
-
-	//dAssert((contacts != nullptr) ^ proxy.m_intersectionTestOnly);
-	//const dFloat32 timestep = m_scene->GetTimestep();
 
 	dFloat32 closestDist = dFloat32(1.0e10f);
 	while (stack) 
@@ -1108,9 +1206,7 @@ dInt32 ndContactSolver::CompoundContactsContinue()
 		dAssert(m_instance1.GetShape()->GetAsShapeCompound());
 		if (m_instance0.GetShape()->GetAsShapeConvex())
 		{
-			dAssert(0);
-			//return ConvexToCompoundContactsDiscrete();
-			return 0;
+			return ConvexToCompoundContactsContinue();
 		}
 		else
 		{
@@ -1380,9 +1476,6 @@ dInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 
 	dInt32 count = 0;
 	ndPolygonMeshDesc data(*this, true);
-
-	//const dVector& hullVeloc = data.m_objBody->m_veloc;
-	//const dVector& hullOmega = data.m_objBody->m_omega;
 
 	dVector relVeloc(m_contact->m_body0->GetVelocity() - m_contact->m_body1->GetVelocity());
 	dFloat32 baseLinearSpeed = dSqrt(relVeloc.DotProduct(relVeloc).GetScalar());
