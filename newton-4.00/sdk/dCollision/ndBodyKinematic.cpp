@@ -269,13 +269,13 @@ void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 		dFloat32 Iyy = dAbs(inertia[1][1]);
 		dFloat32 Izz = dAbs(inertia[2][2]);
 
-		dFloat32 Ixx1 = dClamp(Ixx, dFloat32(0.001f) * mass, dFloat32(1000.0f) * mass);
-		dFloat32 Iyy1 = dClamp(Iyy, dFloat32(0.001f) * mass, dFloat32(1000.0f) * mass);
-		dFloat32 Izz1 = dClamp(Izz, dFloat32(0.001f) * mass, dFloat32(1000.0f) * mass);
+		dFloat32 Ixx1 = dClamp(Ixx, dFloat32(0.0001f) * mass, dFloat32(10000.0f) * mass);
+		dFloat32 Iyy1 = dClamp(Iyy, dFloat32(0.0001f) * mass, dFloat32(10000.0f) * mass);
+		dFloat32 Izz1 = dClamp(Izz, dFloat32(0.0001f) * mass, dFloat32(10000.0f) * mass);
 
-		dAssert(Ixx > dFloat32(0.0f));
-		dAssert(Iyy > dFloat32(0.0f));
-		dAssert(Izz > dFloat32(0.0f));
+		dAssert(Ixx1 > dFloat32(0.0f));
+		dAssert(Iyy1 > dFloat32(0.0f));
+		dAssert(Izz1 > dFloat32(0.0f));
 
 		m_mass.m_x = Ixx1;
 		m_mass.m_y = Iyy1;
