@@ -33,7 +33,9 @@ bool ndConvexCastNotify::CastShape(const ndShapeInstance& castingInstance, const
 	ndBodyKinematic body0;
 	ndBodyKinematic body1;
 	ndContactNotify notify;
-	
+	dFixSizeArray<ndContactPoint, D_MAX_CONTATCS> contactBuffer;
+	contactBuffer.SetCount(D_MAX_CONTATCS);
+
 	body0.SetCollisionShape(castingInstance);
 	body1.SetCollisionShape(targetShape);
 	body0.SetMatrix(globalOrigin);
@@ -49,9 +51,8 @@ bool ndConvexCastNotify::CastShape(const ndShapeInstance& castingInstance, const
 	shape1.SetGlobalMatrix(shape1.GetLocalMatrix() * body1.GetMatrix());
 
 	m_contacts.SetCount(0);
-	ndContactPoint contactBuffer[D_MAX_CONTATCS];
 	ndContactSolver contactSolver(&contact, &notify, dFloat32(1.0f));
-	contactSolver.m_contactBuffer = contactBuffer;
+	contactSolver.m_contactBuffer = &contactBuffer[0];
 
 	m_param = dFloat32(1.2f);
 	const dInt32 count = dMin(contactSolver.CalculateContactsContinue(), m_contacts.GetCapacity());
@@ -63,8 +64,8 @@ bool ndConvexCastNotify::CastShape(const ndShapeInstance& castingInstance, const
 		}
 		m_param = contactSolver.m_timestep;
 		m_normal = contactSolver.m_separatingVector;
-		m_closetPoint0 = contactSolver.m_closestPoint0;
-		m_closetPoint1 = contactSolver.m_closestPoint1;
+		m_closestPoint0 = contactSolver.m_closestPoint0;
+		m_closestPoint1 = contactSolver.m_closestPoint1;
 	}
 	return count > 0;
 }

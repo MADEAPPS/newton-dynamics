@@ -512,21 +512,20 @@ bool ndShapeConvexPolygon::BeamClipping(const dVector& origin, dFloat32 dist, co
 	return (m_count >= 3);
 }
 
-dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeInstance* const parentMesh, ndContactSolver& proxy)
+dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeInstance* const parentMesh, ndContactSolver& contactSolver)
 {
-	dAssert(proxy.m_instance0.GetShape()->GetAsShapeConvex());
-	dAssert(proxy.m_instance1.GetShape()->GetAsShapeAsConvexPolygon());
-	dAssert(proxy.m_instance1.GetGlobalMatrix().TestIdentity());
-	dAssert(this == proxy.m_instance1.GetShape());
+	dAssert(contactSolver.m_instance0.GetShape()->GetAsShapeConvex());
+	dAssert(contactSolver.m_instance1.GetShape()->GetAsShapeAsConvexPolygon());
+	dAssert(contactSolver.m_instance1.GetGlobalMatrix().TestIdentity());
+	dAssert(this == contactSolver.m_instance1.GetShape());
 	dAssert(m_count);
 	dAssert(m_count < dInt32(sizeof(m_localPoly) / sizeof(m_localPoly[0])));
 
-	const dMatrix& hullMatrix = proxy.m_instance0.m_globalMatrix;
-	ndContact* const contactJoint = proxy.m_contact;
-	const ndShapeInstance* const hull = &proxy.m_instance0;
+	const dMatrix& hullMatrix = contactSolver.m_instance0.m_globalMatrix;
+	const ndShapeInstance* const hull = &contactSolver.m_instance0;
 
 	dAssert(m_normal.m_w == dFloat32(0.0f));
-	const dVector obbOrigin(hullMatrix.TransformVector(proxy.m_instance0.GetShape()->GetObbOrigin()));
+	const dVector obbOrigin(hullMatrix.TransformVector(contactSolver.m_instance0.GetShape()->GetObbOrigin()));
 	const dFloat32 shapeSide = m_normal.DotProduct(obbOrigin - m_localPoly[0]).GetScalar();
 	if (shapeSide < dFloat32(0.0f))
 	{
@@ -534,22 +533,27 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 		return 0;
 	}
 
-	dVector normalInHull(hullMatrix.UnrotateVector(m_normal));
-	dVector pointInHull(hull->SupportVertex(normalInHull.Scale(dFloat32(-1.0f))));
-	dVector p0(hullMatrix.TransformVector(pointInHull));
+	const dVector normalInHull(hullMatrix.UnrotateVector(m_normal));
+	const dVector pointInHull(hull->SupportVertex(normalInHull.Scale(dFloat32(-1.0f))));
+	const dVector p0(hullMatrix.TransformVector(pointInHull));
 
-	dFloat32 penetration = m_normal.DotProduct(m_localPoly[0] - p0).GetScalar() + proxy.m_skinThickness;
-
+	dFloat32 penetration = m_normal.DotProduct(m_localPoly[0] - p0).GetScalar() + contactSolver.m_skinThickness;
 	if (penetration < -(D_PENETRATION_TOL * dFloat32(5.0f)))
 	{
+		contactSolver.m_separatingVector = m_normal;
+		contactSolver.m_closestPoint0 = p0;
+		contactSolver.m_closestPoint1 = p0 + m_normal.Scale(penetration);
+		contactSolver.m_separationDistance____ = -penetration;
 		return 0;
 	}
 
-	dVector p1(hullMatrix.TransformVector(hull->SupportVertex(normalInHull)));
-	contactJoint->m_separationDistance = dFloat32(0.0f);
+	const dVector p1(hullMatrix.TransformVector(hull->SupportVertex(normalInHull)));
+
+	//contactJoint->m_separationDistance = dFloat32(0.0f);
 	dFloat32 distance = m_normal.DotProduct(m_localPoly[0] - p1).GetScalar();
 	if (distance >= dFloat32(0.0f))
 	{
+		//contactSolver.m_separationDistance = dFloat32 (0.0f);
 		return 0;
 	}
 
@@ -574,6 +578,7 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 
 		if ((centerDist + supportDist) < dFloat32(0.0f))
 		{
+			//contactSolver.m_separationDistance = dFloat32(0.0f);
 			return 0;
 		}
 
@@ -602,17 +607,22 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 
 	dInt32 count = 0;
 	const dInt64 hullId = hull->GetUserDataID();
-	if (inside & !proxy.m_intersectionTestOnly)
+	if (inside & !contactSolver.m_intersectionTestOnly)
 	{
+		contactSolver.m_separationDistance____ = -penetration;
+		contactSolver.m_separatingVector = m_normal;
+		contactSolver.m_closestPoint0 = p0;
+		contactSolver.m_closestPoint1 = p0 + m_normal.Scale(penetration);
+
 		penetration = dMax(dFloat32(0.0f), penetration);
 		dAssert(penetration >= dFloat32(0.0f));
 		dVector contactPoints[128];
 		dVector point(pointInHull + normalInHull.Scale(penetration - D_PENETRATION_TOL));
 
 		count = hull->CalculatePlaneIntersection(normalInHull.Scale(dFloat32(-1.0f)), point, contactPoints);
-		dVector step(normalInHull.Scale((proxy.m_skinThickness - penetration) * dFloat32(0.5f)));
+		dVector step(normalInHull.Scale((contactSolver.m_skinThickness - penetration) * dFloat32(0.5f)));
 
-		ndContactPoint* const contactsOut = proxy.m_contactBuffer;
+		ndContactPoint* const contactsOut = contactSolver.m_contactBuffer;
 		for (dInt32 i = 0; i < count; i++)
 		{
 			contactsOut[i].m_point = hullMatrix.TransformVector(contactPoints[i] + step);
@@ -625,11 +635,11 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 	else
 	{
 		m_vertexCount = dUnsigned16(m_count);
-		count = proxy.ConvexToConvexContactsDiscrete();
-		dAssert(proxy.m_intersectionTestOnly || (count >= 0));
+		count = contactSolver.ConvexToConvexContactsDiscrete();
+		dAssert(contactSolver.m_intersectionTestOnly || (count >= 0));
 		if (count >= 1)
 		{
-			ndContactPoint* const contactsOut = proxy.m_contactBuffer;
+			ndContactPoint* const contactsOut = contactSolver.m_contactBuffer;
 			for (dInt32 i = 0; i < count; i++)
 			{
 				contactsOut[i].m_shapeId0 = hullId;
@@ -668,7 +678,8 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeI
 	}
 
 	ndContact* const contactJoint = proxy.m_contact;
-	contactJoint->m_separationDistance = dFloat32(1.0e10f);
+	dAssert(0);
+	contactJoint->m_separationDistance____ = dFloat32(1.0e10f);
 	
 	dMatrix polygonMatrix;
 	dVector right(m_localPoly[1] - m_localPoly[0]);
@@ -763,7 +774,8 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeI
 			if (timetoImpact <= proxy.m_timestep) 
 			{
 				dVector contactPoints[64];
-				contactJoint->m_separationDistance = penetration;
+				dAssert(0);
+				contactJoint->m_separationDistance____ = penetration;
 				proxy.m_timestep = timetoImpact;
 				proxy.m_separatingVector = m_normal;
 				proxy.m_closestPoint0 = p0;

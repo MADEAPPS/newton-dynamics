@@ -35,8 +35,8 @@ class ndConvexCastNotify
 	public: 
 	ndConvexCastNotify()
 		:m_normal(dVector::m_zero)
-		,m_closetPoint0(dVector::m_zero)
-		,m_closetPoint1(dVector::m_zero)
+		,m_closestPoint0(dVector::m_zero)
+		,m_closestPoint1(dVector::m_zero)
 		,m_contacts()
 		,m_param(dFloat32 (1.2f))
 	{
@@ -62,8 +62,8 @@ class ndConvexCastNotify
 	D_COLLISION_API bool CastShape(const ndShapeInstance& castingInstance, const dMatrix& globalOrigin, const dVector& globalDest, const ndShapeInstance& targetShape, const dMatrix& targetMatrix);
 
 	dVector m_normal;
-	dVector m_closetPoint0;
-	dVector m_closetPoint1;
+	dVector m_closestPoint0;
+	dVector m_closestPoint1;
 	dFixSizeArray<ndContactPoint, 8> m_contacts;
 	dFloat32 m_param;
 } D_GCC_NEWTON_ALIGN_32;

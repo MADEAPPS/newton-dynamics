@@ -93,26 +93,26 @@ D_INLINE void dMovingAABB (dVector& p0, dVector& p1, const dVector& veloc, const
 	p1 = r1.GetMax (q1) & dVector::m_triplexMask;
 }
 
-D_INLINE dFloat32 dBoxPenetration (const dVector& minBox, const dVector& maxBox)
-{
-	dAssert(maxBox.m_x >= minBox.m_x);
-	dAssert(maxBox.m_y >= minBox.m_y);
-	dAssert(maxBox.m_z >= minBox.m_z);
-
-	dVector mask ((minBox * maxBox) < dVector::m_zero);
-	dVector dist (maxBox.GetMin (minBox.Abs()) & mask);
-	dist = dist.GetMin(dist.ShiftTripleRight());
-	dist = dist.GetMin(dist.ShiftTripleRight());
-	return dist.GetScalar();
-}
+//D_INLINE dFloat32 dBoxPenetration (const dVector& minBox, const dVector& maxBox)
+//{
+//	dAssert(maxBox.m_x >= minBox.m_x);
+//	dAssert(maxBox.m_y >= minBox.m_y);
+//	dAssert(maxBox.m_z >= minBox.m_z);
+//
+//	dVector mask ((minBox * maxBox) < dVector::m_zero);
+//	dVector dist (maxBox.GetMin (minBox.Abs()) & mask);
+//	dist = dist.GetMin(dist.ShiftTripleRight());
+//	dist = dist.GetMin(dist.ShiftTripleRight());
+//	return dist.GetScalar();
+//}
 
 D_INLINE dFloat32 dBoxDistanceToOrigin2 (const dVector& minBox, const dVector& maxBox)
 {
 	dAssert(maxBox.m_x >= minBox.m_x);
 	dAssert(maxBox.m_y >= minBox.m_y);
 	dAssert(maxBox.m_z >= minBox.m_z);
-	dVector mask ((minBox * maxBox) > dVector::m_zero);
-	dVector dist (maxBox.Abs().GetMin (minBox.Abs()) & mask);
+	const dVector mask (((minBox * maxBox) > dVector::m_zero) & dVector::m_triplexMask);
+	const dVector dist (maxBox.Abs().GetMin (minBox.Abs()) & mask);
 	return dist.DotProduct(dist).GetScalar();
 }
 

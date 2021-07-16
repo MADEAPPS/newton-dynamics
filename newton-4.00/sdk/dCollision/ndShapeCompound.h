@@ -45,8 +45,6 @@ class ndShapeCompound: public ndShape
 		ndOOBBTestData(const dMatrix& matrix);
 		ndOOBBTestData(const dMatrix& matrix, const dVector& origin, const dVector& size);
 
-		dFloat32 UpdateSeparatingDistance(const dVector& box0Min, const dVector& box0Max, const dVector& box1Min, const dVector& box1Max) const;
-
 		dMatrix m_matrix;
 		dMatrix m_absMatrix;
 		dVector m_origin;
@@ -61,7 +59,6 @@ class ndShapeCompound: public ndShape
 		dVector m_crossAxisDotAbs[9];
 		dVector m_extendsMinX[3];
 		dVector m_extendsMaxX[3];
-		mutable dFloat32 m_separatingDistance;
 		static dVector m_maxDist;
 		static dVector m_padding;
 	} D_GCC_NEWTON_ALIGN_32;
@@ -153,9 +150,9 @@ class ndShapeCompound::ndNodeBase: public dClassAlloc
 	void CalculateAABB();
 	void SetBox(const dVector& p0, const dVector& p1);
 
-	bool BoxTest(const ndOOBBTestData& data) const;
-	bool BoxTest(const ndOOBBTestData& data, const ndNodeBase* const otherNode) const;
-	//dFloat32 RayBoxDistance(const ndOOBBTestData& data, const dgFastRayTest& myRay, const dgFastRayTest& otherRay, const ndNodeBase* const otherNode) const;
+	dFloat32 BoxTest(const ndOOBBTestData& data) const;
+	dFloat32 BoxTestOld(const ndOOBBTestData&, const ndNodeBase* const) const { dAssert(0); return 0; }
+	dFloat32 BoxTest___(const ndOOBBTestData& data, const ndNodeBase* const otherNode) const;
 
 	ndShapeInstance* GetShape() const;
 

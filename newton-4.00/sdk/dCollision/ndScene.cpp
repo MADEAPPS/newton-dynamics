@@ -1640,7 +1640,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 			contact->m_positAcc = dVector::m_zero;
 			contact->m_rotationAcc = dQuaternion();
 
-			dFloat32 distance = contact->m_separationDistance;
+			dFloat32 distance = contact->m_separationDistance____;
 			if (distance >= D_NARROW_PHASE_DIST)
 			{
 				const dVector veloc0(body0->GetVelocity());
@@ -1657,7 +1657,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 				const dFloat32 speed = velocMag.AddHorizontal().GetScalar() + dFloat32(0.5f);
 				
 				distance -= speed * m_timestep;
-				contact->m_separationDistance = distance;
+				contact->m_separationDistance____ = distance;
 			}
 			if (distance < D_NARROW_PHASE_DIST)
 			{
@@ -1802,8 +1802,8 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 							callback.m_contacts.PushBack(castShape.m_contacts[i]);
 						}
 						callback.m_normal = castShape.m_normal;
-						callback.m_closetPoint0 = castShape.m_closetPoint0;
-						callback.m_closetPoint1 = castShape.m_closetPoint1;
+						callback.m_closestPoint0 = castShape.m_closestPoint0;
+						callback.m_closestPoint1 = castShape.m_closestPoint1;
 					}
 					if (callback.m_param < dFloat32 (1.0e-8f)) 
 					{
@@ -2214,12 +2214,12 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& co
 		dFloat32 distance[D_SCENE_MAX_STACK_DEPTH];
 		const ndSceneNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
 
-		dVector velocA((globalDest - globalOrigin.m_posit) & dVector::m_triplexMask);
-		dVector velocB(dVector::m_zero);
+		const dVector velocB(dVector::m_zero);
+		const dVector velocA((globalDest - globalOrigin.m_posit) & dVector::m_triplexMask);
+		const dVector minBox(m_rootNode->m_minBox - boxP1);
+		const dVector maxBox(m_rootNode->m_maxBox - boxP0);
 		dFastRayTest ray(dVector::m_zero, velocA);
 
-		dVector minBox(m_rootNode->m_minBox - boxP1);
-		dVector maxBox(m_rootNode->m_maxBox - boxP0);
 		stackPool[0] = m_rootNode;
 		distance[0] = ray.BoxIntersect(minBox, maxBox);
 		state = ConvexCast(callback, stackPool, distance, 1, ray, convexShape, globalOrigin, globalDest);

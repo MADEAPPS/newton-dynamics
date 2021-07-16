@@ -244,7 +244,4 @@ void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& s
 	
 	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
 	compound->AddCollision(&heighfieldInstance);
-	//ndShapeCompound::ndTreeArray::dNode* const node = compound->AddCollision(&heighfieldInstance);
-	//ndShapeInstance* const subInstance = node->GetInfo()->GetShape();
-	//return subInstance;
 }

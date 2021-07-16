@@ -33,7 +33,6 @@ dVector ndShapeCompound::ndOOBBTestData::m_maxDist(dFloat32(1.0e10f));
 
 ndShapeCompound::ndOOBBTestData::ndOOBBTestData(const dMatrix& matrix)
 	:m_matrix(matrix)
-	,m_separatingDistance(dFloat32(1.0e10f))
 {
 	m_absMatrix[0] = m_matrix[0].Abs();
 	m_absMatrix[1] = m_matrix[1].Abs();
@@ -75,7 +74,6 @@ ndShapeCompound::ndOOBBTestData::ndOOBBTestData(const dMatrix& matrix, const dVe
 	,m_size(localSize)
 	,m_localP0(localOrigin - localSize)
 	,m_localP1(localOrigin + localSize)
-	,m_separatingDistance(dFloat32(1.0e10f))
 {
 	m_absMatrix[0] = m_matrix[0].Abs();
 	m_absMatrix[1] = m_matrix[1].Abs();
@@ -132,26 +130,10 @@ ndShapeCompound::ndOOBBTestData::ndOOBBTestData(const dMatrix& matrix, const dVe
 	dVector::Transpose4x4(m_extendsMinX[2], m_extendsMaxX[2], tmp, tmp, extends[8], extends[8], extends[8], extends[8]);
 }
 
-dFloat32 ndShapeCompound::ndOOBBTestData::UpdateSeparatingDistance(const dVector& box0Min, const dVector& box0Max, const dVector& box1Min, const dVector& box1Max) const
-{
-	const dVector minBox(box0Min - box1Max);
-	const dVector maxBox(box0Max - box1Min);
-	const dVector mask((minBox * maxBox) < dVector::m_zero);
-	const dVector boxDist((maxBox.Abs()).GetMin(minBox.Abs()));
-
-	//dVector dist((mask & m_maxDist) | boxDist.AndNot(mask));
-	dVector dist(boxDist.Select(m_maxDist, mask));
-
-	dist = dist.GetMin(dist.ShiftTripleRight());
-	dist = dist.GetMin(dist.ShiftTripleRight());
-	return dist.GetScalar();
-}
-
 ndShapeCompound::ndNodeBase::~ndNodeBase()
 {
 	if (m_shape) 
 	{
-		//m_shape->Release();
 		delete m_shape;
 	}
 	if (m_left) 
@@ -164,127 +146,109 @@ ndShapeCompound::ndNodeBase::~ndNodeBase()
 	}
 }
 
-//void ndShapeCompound::ndNodeBase::Sanity(int level = 0)
-//{
-//	char space[256];
-//	for (int i = 0; i < level; i++)
-//	{
-//		space[i] = ' ';
-//	}
-//	space[level] = 0;
-//
-//	dTrace(("%s%d\n", space, xxxxxx_));
-//
-//	if (m_left)
-//	{
-//		m_left->Sanity(level + 1);
-//	}
-//
-//	if (m_right)
-//	{
-//		m_right->Sanity(level + 1);
-//	}
-//}
-
-bool ndShapeCompound::ndNodeBase::BoxTest(const ndOOBBTestData& data) const
+dFloat32 ndShapeCompound::ndNodeBase::BoxTest(const ndOOBBTestData& data) const
 {
-	dFloat32 separatingDistance = data.UpdateSeparatingDistance(data.m_aabbP0, data.m_aabbP1, m_p0, m_p1);
-	if (dOverlapTest(data.m_aabbP0, data.m_aabbP1, m_p0, m_p1)) 
+	const dVector minBox(data.m_aabbP0 - m_p1);
+	const dVector maxBox(data.m_aabbP1 - m_p0);
+	dFloat32 separatingDistance2 = dBoxDistanceToOrigin2(minBox, maxBox);
+	if (separatingDistance2 == dFloat32 (0.0f))
 	{
-		// this assert is in fact a bug
-		//dgAssert (separatingDistance > dFloat32 (1000.0f));
-		dVector origin(data.m_matrix.UntransformVector(m_origin));
-		dVector size(data.m_absMatrix.UnrotateVector(m_size));
-		dVector p0(origin - size);
-		dVector p1(origin + size);
-		data.m_separatingDistance = dMin(data.m_separatingDistance, data.UpdateSeparatingDistance(p0, p1, data.m_localP0, data.m_localP1));
-		if (dOverlapTest(p0, p1, data.m_localP0, data.m_localP1)) 
+		dAssert(dOverlapTest(data.m_aabbP0, data.m_aabbP1, m_p0, m_p1));
+		const dVector origin(data.m_matrix.UntransformVector(m_origin));
+		const dVector size(data.m_absMatrix.UnrotateVector(m_size));
+		const dVector p0(origin - size);
+		const dVector p1(origin + size);
+		const dVector minBox1(p0 - data.m_localP1);
+		const dVector maxBox1(p1 - data.m_localP0);
+		separatingDistance2 = dBoxDistanceToOrigin2(minBox1, maxBox1);
+		if (separatingDistance2 == dFloat32(0.0f))
 		{
-			dVector size_x(m_size.m_x);
-			dVector size_y(m_size.m_y);
-			dVector size_z(m_size.m_z);
+			dAssert(dOverlapTest(p0, p1, data.m_localP0, data.m_localP1));
+			const dVector size_x(m_size.m_x);
+			const dVector size_y(m_size.m_y);
+			const dVector size_z(m_size.m_z);
+			const dVector origin_x(m_origin.m_x);
+			const dVector origin_y(m_origin.m_y);
+			const dVector origin_z(m_origin.m_z);
 
-			dVector origin_x(m_origin.m_x);
-			dVector origin_y(m_origin.m_y);
-			dVector origin_z(m_origin.m_z);
-
-			bool ret = true;
-			for (dInt32 i = 0; (i < 3) && ret; i++) 
+			for (dInt32 i = 0; i < 3; i++)
 			{
 				const dInt32 j = i * 3;
-				dVector c(origin_x * data.m_crossAxis[j + 0] + origin_y * data.m_crossAxis[j + 1] + origin_z * data.m_crossAxis[j + 2]);
-				dVector d(size_x * data.m_crossAxisAbs[j + 0] + size_y * data.m_crossAxisAbs[j + 1] + size_z * data.m_crossAxisAbs[j + 2] + ndOOBBTestData::m_padding);
-				dVector x0(c - d);
-				dVector x1(c + d);
-				dVector box0(x0 - data.m_extendsMaxX[i]);
-				dVector box1(x1 - data.m_extendsMinX[i]);
-				dVector test(box0 * box1);
-				ret = (test.GetSignMask() & 0x0f) == 0x0f;
+				const dVector c(origin_x * data.m_crossAxis[j + 0] + origin_y * data.m_crossAxis[j + 1] + origin_z * data.m_crossAxis[j + 2]);
+				const dVector d(size_x * data.m_crossAxisAbs[j + 0] + size_y * data.m_crossAxisAbs[j + 1] + size_z * data.m_crossAxisAbs[j + 2] + ndOOBBTestData::m_padding);
+				const dVector x0(c - d);
+				const dVector x1(c + d);
+				const dVector box0(x0 - data.m_extendsMaxX[i]);
+				const dVector box1(x1 - data.m_extendsMinX[i]);
+				separatingDistance2 = dMax (separatingDistance2, dBoxDistanceToOrigin2(box0, box1));
 			}
-			return ret;
+			dAssert(separatingDistance2 < dFloat32(1.0e10f));
 		}
 	}
-	data.m_separatingDistance = dMin(data.m_separatingDistance, separatingDistance);
-	return false;
+	return separatingDistance2;
 }
-	
-bool ndShapeCompound::ndNodeBase::BoxTest(const ndOOBBTestData& data, const ndNodeBase* const otherNode) const
+
+dFloat32 ndShapeCompound::ndNodeBase::BoxTest___(const ndOOBBTestData& data, const ndNodeBase* const otherNode) const
 {
-	dVector otherOrigin(data.m_matrix.TransformVector(otherNode->m_origin));
-	dVector otherSize(data.m_absMatrix.RotateVector(otherNode->m_size));
-	dVector otherP0((otherOrigin - otherSize) & dVector::m_triplexMask);
-	dVector otherP1((otherOrigin + otherSize) & dVector::m_triplexMask);
+	const dVector otherOrigin(data.m_matrix.TransformVector(otherNode->m_origin));
+	const dVector otherSize(data.m_absMatrix.RotateVector(otherNode->m_size));
+	const dVector otherP0((otherOrigin - otherSize) & dVector::m_triplexMask);
+	const dVector otherP1((otherOrigin + otherSize) & dVector::m_triplexMask);
+	const dVector minBox(otherP0 - m_p1);
+	const dVector maxBox(otherP1 - m_p0);
+	dFloat32 separatingDistance2 = dBoxDistanceToOrigin2(minBox, maxBox);
+	if (separatingDistance2 == dFloat32(0.0f))
+	{ 
+		dAssert(dOverlapTest(m_p0, m_p1, otherP0, otherP1));
+		const dVector origin(data.m_matrix.UntransformVector(m_origin));
+		const dVector size(data.m_absMatrix.UnrotateVector(m_size));
+		const dVector p0(origin - size);
+		const dVector p1(origin + size);
+		const dVector minBox1(p0 - otherNode->m_p1);
+		const dVector maxBox1(p1 - otherNode->m_p0);
+		separatingDistance2 = dBoxDistanceToOrigin2(minBox1, maxBox1);
 
-	dFloat32 separatingDistance = data.UpdateSeparatingDistance(m_p0, m_p1, otherP0, otherP1);
-	if (dOverlapTest(m_p0, m_p1, otherP0, otherP1)) 
-	{
-		dAssert(separatingDistance > dFloat32(1000.0f));
-		dVector origin(data.m_matrix.UntransformVector(m_origin));
-		dVector size(data.m_absMatrix.UnrotateVector(m_size));
-		dVector p0(origin - size);
-		dVector p1(origin + size);
-		data.m_separatingDistance = dMin(data.m_separatingDistance, data.UpdateSeparatingDistance(p0, p1, otherNode->m_p0, otherNode->m_p1));
-		if (dOverlapTest(p0, p1, otherNode->m_p0, otherNode->m_p1)) 
+		//if (dOverlapTest(p0, p1, otherNode->m_p0, otherNode->m_p1)) 
+		if (separatingDistance2 == dFloat32(0.0f))
 		{
-			dVector size0_x(m_size.m_x);
-			dVector size0_y(m_size.m_y);
-			dVector size0_z(m_size.m_z);
-
-			dVector origin0_x(m_origin.m_x);
-			dVector origin0_y(m_origin.m_y);
-			dVector origin0_z(m_origin.m_z);
-
-			dVector size1_x(otherNode->m_size.m_x);
-			dVector size1_y(otherNode->m_size.m_y);
-			dVector size1_z(otherNode->m_size.m_z);
-
-			dVector origin1_x(otherOrigin.m_x);
-			dVector origin1_y(otherOrigin.m_y);
-			dVector origin1_z(otherOrigin.m_z);
-
-			bool ret = true;
-			for (dInt32 j = 0; (j < 9) && ret; j += 3) 
+			dAssert(dOverlapTest(p0, p1, otherNode->m_p0, otherNode->m_p1));
+			const dVector size0_x(m_size.m_x);
+			const dVector size0_y(m_size.m_y);
+			const dVector size0_z(m_size.m_z);
+			const dVector origin0_x(m_origin.m_x);
+			const dVector origin0_y(m_origin.m_y);
+			const dVector origin0_z(m_origin.m_z);
+			const dVector size1_x(otherNode->m_size.m_x);
+			const dVector size1_y(otherNode->m_size.m_y);
+			const dVector size1_z(otherNode->m_size.m_z);
+			const dVector origin1_x(otherOrigin.m_x);
+			const dVector origin1_y(otherOrigin.m_y);
+			const dVector origin1_z(otherOrigin.m_z);
+	
+			for (dInt32 i = 0; i < 3; i++)
 			{
-				dVector c0(origin0_x * data.m_crossAxis[j + 0] + origin0_y * data.m_crossAxis[j + 1] + origin0_z * data.m_crossAxis[j + 2]);
-				dVector d0(size0_x * data.m_crossAxisAbs[j + 0] + size0_y * data.m_crossAxisAbs[j + 1] + size0_z * data.m_crossAxisAbs[j + 2] + ndOOBBTestData::m_padding);
-				dVector x0(c0 - d0);
-				dVector x1(c0 + d0);
-
-				dVector c1(origin1_x * data.m_crossAxis[j + 0] + origin1_y * data.m_crossAxis[j + 1] + origin1_z * data.m_crossAxis[j + 2]);
-				dVector d1(size1_x * data.m_crossAxisDotAbs[j + 0] + size1_y * data.m_crossAxisDotAbs[j + 1] + size1_z * data.m_crossAxisDotAbs[j + 2] + ndOOBBTestData::m_padding);
-				dVector z0(c1 - d1);
-				dVector z1(c1 + d1);
-
-				dVector box0(x0 - z1);
-				dVector box1(x1 - z0);
-				dVector test(box0 * box1);
-				ret = (test.GetSignMask() & 0x0f) == 0x0f;
+				const dInt32 j = i * 3;
+				const dVector c0(origin0_x * data.m_crossAxis[j + 0] + origin0_y * data.m_crossAxis[j + 1] + origin0_z * data.m_crossAxis[j + 2]);
+				const dVector d0(size0_x * data.m_crossAxisAbs[j + 0] + size0_y * data.m_crossAxisAbs[j + 1] + size0_z * data.m_crossAxisAbs[j + 2] + ndOOBBTestData::m_padding);
+				const dVector x0(c0 - d0);
+				const dVector x1(c0 + d0);
+	
+				const dVector c1(origin1_x * data.m_crossAxis[j + 0] + origin1_y * data.m_crossAxis[j + 1] + origin1_z * data.m_crossAxis[j + 2]);
+				const dVector d1(size1_x * data.m_crossAxisDotAbs[j + 0] + size1_y * data.m_crossAxisDotAbs[j + 1] + size1_z * data.m_crossAxisDotAbs[j + 2] + ndOOBBTestData::m_padding);
+				const dVector z0(c1 - d1);
+				const dVector z1(c1 + d1);
+	
+				const dVector box0(x0 - z1);
+				const dVector box1(x1 - z0);
+	//			dVector test(box0 * box1);
+	//			ret = (test.GetSignMask() & 0x0f) == 0x0f;
+				separatingDistance2 = dMax(separatingDistance2, dBoxDistanceToOrigin2(box0, box1));
 			}
-			return ret;
+	//		return ret;
+			dAssert(separatingDistance2 < dFloat32(1.0e10f));
 		}
 	}
-	data.m_separatingDistance = dMin(data.m_separatingDistance, separatingDistance);
-	return false;
+	return separatingDistance2;
 }
 
 class ndShapeCompound::ndSpliteInfo
@@ -632,14 +596,12 @@ dFloat32 ndShapeCompound::GetVolume() const
 
 dFloat32 ndShapeCompound::GetBoxMinRadius() const
 {
-	dAssert(0);
-	return dFloat32(0.0f);
+	return m_boxMinRadius;
 }
 
 dFloat32 ndShapeCompound::GetBoxMaxRadius() const
 {
-	dAssert(0);
-	return dFloat32(0.0f);
+	return m_boxMaxRadius;
 }
 
 void ndShapeCompound::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const

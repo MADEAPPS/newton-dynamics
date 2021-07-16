@@ -1007,7 +1007,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			//printf("%.3f \n", m_configuration.m_transmission.m_fowardRatios[m_currentGear]);
 			//dFloat32 rpm = (motor->GetRpm() / maxRpm) * m_configuration.m_transmission.m_fowardRatios[m_currentGear]; 
 			dFloat32 rpm = (motor->GetRpm() / maxRpm) * 2.85f;
-			//
+			
 			if (m_vehicleUI) 
 			{
 				if (m_vehicleUI->m_shaderHandle) 

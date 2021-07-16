@@ -47,14 +47,6 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene)
 
 ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, dFloat32 gridSize, dFloat32 perturbation)
 {
-	//dVector floor[] =
-	//{
-	//	{  0.0f,     0.0f,  0.0f    , 1.0f },
-	//	{  0.0f,     0.0f,  gridSize, 1.0f },
-	//	{  gridSize, 0.0f,  gridSize, 1.0f },
-	//	{  gridSize, 0.0f,  0.0f,     1.0f },
-	//};
-	//dInt32 index[][3] = { { 0, 1, 2 }, { 0, 2, 3 } };
 	dVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
 
 	dArray<dVector> points;

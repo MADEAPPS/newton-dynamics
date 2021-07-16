@@ -69,15 +69,16 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, ndContactPoint& contactOut);
 	
 	private:
-	dInt32 ConvexContactsDiscrete();
-	dInt32 CompoundContactsDiscrete();
-	dInt32 ConvexToConvexContactsDiscrete();
-	dInt32 ConvexToCompoundContactsDiscrete();
-	dInt32 CompoundToConvexContactsDiscrete();
-	dInt32 ConvexToStaticMeshContactsDiscrete();
-	dInt32 CompoundToCompoundContactsDiscrete();
+	dInt32 ConvexContactsDiscrete(); //
+	dInt32 CompoundContactsDiscrete(); //
+	dInt32 ConvexToConvexContactsDiscrete(); //
+	dInt32 ConvexToCompoundContactsDiscrete(); //
+	dInt32 CompoundToConvexContactsDiscrete(); //
+	dInt32 ConvexToStaticMeshContactsDiscrete(); //
+	dInt32 CompoundToCompoundContactsDiscrete(); //
 	dInt32 CompoundToShapeStaticBvhContactsDiscrete();
 	dInt32 CompoundToStaticHeighfieldContactsDiscrete();
+	dInt32 CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDesc& data); //
 	dInt32 ConvexToSaticStaticBvhContactsNodeDescrete(const dAabbPolygonSoup::dNode* const node);
 
 	dInt32 ConvexContactsContinue();
@@ -117,7 +118,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 ConvexPolygonsIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dInt32 maxContacts) const;
 	dInt32 ConvexPolygonToLineIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dVector* const mem) const;
 
-	dInt32 CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDesc& data);
+
 	dInt32 CalculatePolySoupToHullContactsContinue(ndPolygonMeshDesc& data);
 
 	D_INLINE dBigVector ReduceLine(dInt32& indexOut);
@@ -149,7 +150,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	ndContactPoint* m_contactBuffer;
 	dFloat32 m_timestep;
 	dFloat32 m_skinThickness;
-	dFloat32 m_separationDistance;
+	dFloat32 m_separationDistance____;
 
 	dInt32 m_maxCount;
 	dInt32 m_vertexIndex;

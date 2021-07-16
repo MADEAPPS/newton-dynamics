@@ -10,11 +10,40 @@
 */
 
 #include "ndSandboxStdafx.h"
+#include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 #include "ndPhysicsWorld.h"
 #include "ndCompoundScene.h"
 #include "ndDemoEntityManager.h"
 #include "ndHeightFieldPrimitive.h"
+
+static void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const dMatrix& location)
+{
+	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
+	dMatrix uvMatrix(dGetIdentityMatrix());
+	uvMatrix[0][0] *= 0.025f;
+	uvMatrix[1][1] *= 0.025f;
+	uvMatrix[2][2] *= 0.025f;
+	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit.m_y = -0.5f;
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
+	entity->SetMesh(geometry, location);
+	geometry->Release();
+
+	ndShapeMaterial material(box.GetMaterial());
+	material.m_userData = entity;
+	box.SetMaterial(material);
+
+	box.SetLocalMatrix(location);
+	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
+	compound->AddCollision(&box);
+
+	//ndShapeCompound::ndTreeArray::dNode* const node = compound->AddCollision(&heighfieldInstance);
+	//ndShapeInstance* const subInstance = node->GetInfo()->GetShape();
+	//return subInstance;
+}
 
 ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const dMatrix& location)
 {
@@ -25,8 +54,16 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const dMat
 	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
 	compound->BeginAddRemove();
 
-	AddHeightfieldSubShape(scene, sceneInstance, rootEntity);
+	dMatrix boxLocation(location);
+	boxLocation.m_posit = boxLocation.m_posit.Scale(-1.0f);
+	boxLocation.m_posit.m_w = 1.0f;
+	AddBoxSubShape(scene, sceneInstance, rootEntity, boxLocation);
 
+	//boxLocation.m_posit.m_y -= 1.0f;
+	//AddBoxSubShape(scene, sceneInstance, rootEntity, boxLocation);
+
+	//AddHeightfieldSubShape(scene, sceneInstance, rootEntity);
+	
 	compound->EndAddRemove();
 
 	ndPhysicsWorld* const world = scene->GetWorld();

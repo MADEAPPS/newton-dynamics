@@ -106,7 +106,6 @@ class ndContact: public ndConstraint, public dContainersFreeListAlloc<ndContact*
 	ndContactPointList& GetContactPoints();
 	const ndContactPointList& GetContactPoints() const;
 
-	//bool IsActive() const;
 	bool IsSkeletonSelftCollision() const;
 	bool IsSkeletonIntraCollision() const;
 	
@@ -115,6 +114,7 @@ class ndContact: public ndConstraint, public dContainersFreeListAlloc<ndContact*
 	void CalculatePointDerivative(dInt32 index, ndConstraintDescritor& desc, const dVector& dir, const dgPointParam& param) const;
 	void JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, dInt32 normalIndex, dInt32& frictionIndex);
 
+int xxxxx;
 	dVector m_positAcc;
 	dQuaternion m_rotationAcc;
 	dVector m_separatingVector;
@@ -124,11 +124,10 @@ class ndContact: public ndConstraint, public dContainersFreeListAlloc<ndContact*
 	dList<ndContact, dContainersFreeListAlloc<ndContact>>::dNode* m_linkNode;
 	ndMaterial m_material;
 	dFloat32 m_timeOfImpact;
-	dFloat32 m_separationDistance;
+	dFloat32 m_separationDistance____;
 	dFloat32 m_contactPruningTolereance;
 	dUnsigned32 m_maxDOF;
 	dUnsigned32 m_sceneLru;
-	//dUnsigned32 m_active : 1;
 	dUnsigned32 m_isDead : 1;
 	dUnsigned32 m_isAttached : 1;
 	dUnsigned32 m_isIntersetionTestOnly : 1;
