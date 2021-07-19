@@ -21,8 +21,7 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const dMatrix& 
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	//ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
-	ndShapeInstance box(new ndShapeBox(10.0f, 1.0f, 10.f));
+	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
 	dMatrix uvMatrix(dGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;

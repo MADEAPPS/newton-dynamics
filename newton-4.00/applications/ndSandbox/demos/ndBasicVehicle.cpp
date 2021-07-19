@@ -1095,8 +1095,6 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	dMatrix sceneLocation(dGetIdentityMatrix());
-	//sceneLocation.m_posit.m_x = -200.0f;
-	//sceneLocation.m_posit.m_z = -200.0f;
 
 	//BuildFloorBox(scene, sceneLocation);
 	//BuildFlatPlane(scene, true);

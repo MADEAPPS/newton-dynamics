@@ -19,8 +19,7 @@
 
 static void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const dMatrix& location)
 {
-	//ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
-	ndShapeInstance box(new ndShapeBox(10.0f, 1.0f, 10.f));
+	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
 	dMatrix uvMatrix(dGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
@@ -57,14 +56,14 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const dMat
 	//subShapeLocation.m_posit = subShapeLocation.m_posit.Scale(-1.0f);
 	//subShapeLocation.m_posit.m_w = 1.0f;
 	//subShapeLocation.m_posit.m_x = 90.0f;
-	AddBoxSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
+	//AddBoxSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
+	//
+	//subShapeLocation.m_posit.m_y -= 1.0f;
+	//AddBoxSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
 
-	subShapeLocation.m_posit.m_y -= 1.0f;
-	AddBoxSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
-
-	//subShapeLocation.m_posit.m_x = -100.0f;
-	//subShapeLocation.m_posit.m_z = -100.0f;
-	//AddHeightfieldSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
+	subShapeLocation.m_posit.m_x = -200.0f;
+	subShapeLocation.m_posit.m_z = -200.0f;
+	AddHeightfieldSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
 	
 	compound->EndAddRemove();
 
