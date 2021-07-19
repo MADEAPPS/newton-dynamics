@@ -65,7 +65,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	ndContactSolver(const ndContactSolver& src, const ndShapeInstance& instance0, const ndShapeInstance& instance1);
 
 	dInt32 CalculateContactsDiscrete(); // done
-	dInt32 CalculateContactsContinue();
+	dInt32 CalculateContactsContinue(); // done
 
 	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, ndContactPoint& contactOut);
 	

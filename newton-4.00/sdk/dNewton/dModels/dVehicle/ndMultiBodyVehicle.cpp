@@ -514,38 +514,6 @@ void ndMultiBodyVehicle::ApplyTireModel()
 				ndContactPointList& contactPoints = contact->GetContactPoints();
 				const ndBodyKinematic* const otherBody = contact->GetBody1();
 
-				if (0)
-				{
-					// test convex cast
-					const ndWheelDescriptor& info = tire->GetInfo();
-					const dMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
-					const dVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_maxLimit - info.m_minLimit));
-					class ndConvexCastNotifyTest : public ndConvexCastNotify
-					{
-						public:
-						ndConvexCastNotifyTest()
-							:ndConvexCastNotify()
-						{
-						}
-
-						virtual dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
-						{
-							return !((body == m_chassis) || (body == m_tire));
-						}
-
-						ndBodyKinematic* m_tire; 
-						ndBodyKinematic* m_chassis;
-					};
-
-					ndConvexCastNotifyTest convexCast;
-					convexCast.m_tire = tire->GetBody0();
-					convexCast.m_chassis = m_chassis;
-
-					//convexCast.CastShape(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix());
-					m_chassis->GetScene()->ConvexCast(convexCast, tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest);
-					convexCast.m_param = 0.0f;
-				}
-
 				if (((ndShape*)otherBody->GetCollisionShape().GetShape())->GetAsShapeStaticMesh())
 				{
 					// for mesh collision we need to remove contact duplicates, 

@@ -18,6 +18,50 @@
 #include "ndVehicleUI.h"
 #include "ndDemoEntityManager.h"
 
+//ndDemoMesh* CreateDialMesh(ndDemoEntityManager* const scene, const char* const texName)
+//{
+//	ndMeshEffect mesh;
+//
+//	dArray<ndMeshEffect::dMaterial>& materialArray = mesh.GetMaterials();
+//	ndMeshEffect::dMaterial material;
+//	strcpy(material.m_textureName, texName);
+//	materialArray.PushBack(material);
+//
+//	dFloat32 gageSize = 100.0f;
+//	mesh.BeginBuild();
+//	mesh.BeginBuildFace();
+//	mesh.AddPoint(-gageSize, gageSize, 0.0f);
+//	mesh.AddUV0(0.0f, 1.0f);
+//	mesh.AddMaterial(0);
+//
+//	mesh.AddPoint(-gageSize, -gageSize, 0.0f);
+//	mesh.AddUV0(0.0f, 0.0f);
+//	mesh.AddMaterial(0);
+//
+//	mesh.AddPoint(gageSize, -gageSize, 0.0f);
+//	mesh.AddUV0(1.0f, 0.0f);
+//	mesh.AddMaterial(0);
+//	mesh.EndBuildFace();
+//
+//	mesh.BeginBuildFace();
+//	mesh.AddPoint(-gageSize, gageSize, 0.0f);
+//	mesh.AddUV0(0.0f, 1.0f);
+//	mesh.AddMaterial(0);
+//
+//	mesh.AddPoint(gageSize, -gageSize, 0.0f);
+//	mesh.AddUV0(1.0f, 0.0f);
+//	mesh.AddMaterial(0);
+//
+//	mesh.AddPoint(gageSize, gageSize, 0.0f);
+//	mesh.AddUV0(1.0f, 1.0f);
+//	mesh.AddMaterial(0);
+//	mesh.EndBuildFace();
+//
+//	mesh.EndBuild(0.0f);
+//	return new ndDemoMesh("dialMesh", &mesh, scene->GetShaderCache());
+//}
+
+
 const GLchar* ndVehicleUI::m_vertexShader =
 	"in vec3 Position;\n"
 	"in vec2 UV;\n"

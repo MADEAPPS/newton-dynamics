@@ -359,53 +359,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		m_tachometer = LoadTexture("rpm_dial.tga");
 		m_redNeedle = LoadTexture("needle_red.tga");
 		m_greenNeedle = LoadTexture("needle_green.tga");
-
-		//CreateDialMesh(scene, "rpm_dial.tga");
-
 		return vehicleEntity;
-	}
-
-	ndDemoMesh* CreateDialMesh(ndDemoEntityManager* const scene, const char* const texName)
-	{
-		ndMeshEffect mesh;
-
-		dArray<ndMeshEffect::dMaterial>& materialArray = mesh.GetMaterials();
-		ndMeshEffect::dMaterial material;
-		strcpy(material.m_textureName, texName);
-		materialArray.PushBack(material);
-
-		dFloat32 gageSize = 100.0f;
-		mesh.BeginBuild();
-			mesh.BeginBuildFace();
-				mesh.AddPoint(-gageSize, gageSize, 0.0f);
-				mesh.AddUV0(0.0f, 1.0f);
-				mesh.AddMaterial(0);
-
-				mesh.AddPoint(-gageSize, -gageSize, 0.0f);
-				mesh.AddUV0(0.0f, 0.0f);
-				mesh.AddMaterial(0);
-
-				mesh.AddPoint(gageSize, -gageSize, 0.0f);
-				mesh.AddUV0(1.0f, 0.0f);
-				mesh.AddMaterial(0);
-			mesh.EndBuildFace();
-
-			mesh.BeginBuildFace();
-				mesh.AddPoint(-gageSize, gageSize, 0.0f);
-				mesh.AddUV0(0.0f, 1.0f);
-				mesh.AddMaterial(0);
-				
-				mesh.AddPoint(gageSize, -gageSize, 0.0f);
-				mesh.AddUV0(1.0f, 0.0f);
-				mesh.AddMaterial(0);
-
-				mesh.AddPoint(gageSize, gageSize, 0.0f);
-				mesh.AddUV0(1.0f, 1.0f);
-				mesh.AddMaterial(0);
-			mesh.EndBuildFace();
-
-		mesh.EndBuild(0.0f);
-		return new ndDemoMesh("dialMesh", &mesh, scene->GetShaderCache());
 	}
 
 	void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true)
@@ -521,78 +475,6 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		camera->SetNextMatrix(camMatrix, camOrigin);
 	}
 
-	/*
-	void DrawGage(GLuint gage, GLuint needle, dFloat32 param, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size, dFloat32 minAngle, dFloat32 maxAngle) const
-	{
-		dMatrix origin(dGetIdentityMatrix());
-		origin[1][1] = -1.0f;
-		origin.m_posit = dVector(origin_x, origin_y, 0.0f, 1.0f);
-
-		size *= 0.5f;
-
-		// render dial
-		glPushMatrix();
-		glMultMatrix(&origin[0][0]);
-		glBindTexture(GL_TEXTURE_2D, gage);
-		glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(0.0f, 1.0f); glVertex3f(GLfloat(-size), GLfloat(size), 0.0f);
-		glTexCoord2f(0.0f, 0.0f); glVertex3f(GLfloat(-size), GLfloat(-size), 0.0f);
-		glTexCoord2f(1.0f, 1.0f); glVertex3f(GLfloat(size), GLfloat(size), 0.0f);
-		glTexCoord2f(1.0f, 0.0f); glVertex3f(GLfloat(size), GLfloat(-size), 0.0f);
-		glEnd();
-
-		// render needle
-		minAngle *= -dDegreeToRad;
-		maxAngle *= -dDegreeToRad;
-		dFloat32 angle = minAngle + (maxAngle - minAngle) * param;
-		dMatrix needleMatrix(dRollMatrix(angle));
-		dFloat32 x = size * 0.7f;
-		dFloat32 y = size * 0.7f;
-
-		glPushMatrix();
-		glMultMatrix(&needleMatrix[0][0]);
-		glBindTexture(GL_TEXTURE_2D, needle);
-		glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(0.0f, 1.0f); glVertex3f(GLfloat(-x), GLfloat(y), 0.0f);
-		glTexCoord2f(0.0f, 0.0f); glVertex3f(GLfloat(-x), GLfloat(-y), 0.0f);
-		glTexCoord2f(1.0f, 1.0f); glVertex3f(GLfloat(x), GLfloat(y), 0.0f);
-		glTexCoord2f(1.0f, 0.0f); glVertex3f(GLfloat(x), GLfloat(-y), 0.0f);
-		glEnd();
-		glPopMatrix();
-
-		glPopMatrix();
-	}
-	*/
-
-	/*
-	void DrawGear(dInt32 gear, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size) const
-	{
-		dMatrix origin(dGetIdentityMatrix());
-		origin[1][1] = -1.0f;
-		origin.m_posit = dVector(origin_x + size * 0.3f, origin_y - size * 0.25f, 0.0f, 1.0f);
-
-		glPushMatrix();
-		glMultMatrix(&origin[0][0]);
-
-		dFloat32 uwith = 0.1f;
-		dFloat32 u0 = uwith * gear;
-		dFloat32 u1 = u0 + uwith;
-
-		dFloat32 x1 = 10.0f;
-		dFloat32 y1 = 10.0f;
-		glColor4f(1, 1, 0, 1);
-		glBindTexture(GL_TEXTURE_2D, m_gears);
-		glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(GLfloat(u0), 1.0f); glVertex3f(GLfloat(-x1), GLfloat(y1), 0.0f);
-		glTexCoord2f(GLfloat(u0), 0.0f); glVertex3f(GLfloat(-x1), GLfloat(-y1), 0.0f);
-		glTexCoord2f(GLfloat(u1), 1.0f); glVertex3f(GLfloat(x1), GLfloat(y1), 0.0f);
-		glTexCoord2f(GLfloat(u1), 0.0f); glVertex3f(GLfloat(x1), GLfloat(-y1), 0.0f);
-		glEnd();
-
-		glPopMatrix();
-	}
-	*/
-
 	void RenderHelp(ndDemoEntityManager* const scene)
 	{
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
@@ -667,7 +549,6 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		ndBasicVehicle::ApplyInputs(world, timestep);
 
 		if (m_motor)
-		//if (0)
 		{
 			bool startEngine = m_motor->GetStart();
 			if (m_startEngine ^ startEngine)
@@ -702,6 +583,45 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			m_engineRpmSound->SetPosition(location.m_posit);
 			m_engineRpmSound->SetVelocity(m_chassis->GetVelocity());
 		}
+
+		// test convex cast for now
+		if (0)
+		{
+			// test convex cast
+			ndMultiBodyVehicleTireJoint* const tire = m_tireList.GetCount() ? m_tireList.GetFirst()->GetInfo() : nullptr;
+			if (tire)
+			{
+				const ndWheelDescriptor& info = tire->GetInfo();
+				const dMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
+				const dVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_maxLimit - info.m_minLimit));
+				class ndConvexCastNotifyTest : public ndConvexCastNotify
+				{
+					public:
+					ndConvexCastNotifyTest()
+						:ndConvexCastNotify()
+					{
+					}
+
+					virtual dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
+					{
+						return !((body == m_chassis) || (body == m_tire));
+					}
+
+					ndBodyKinematic* m_tire;
+					ndBodyKinematic* m_chassis;
+				};
+
+				ndConvexCastNotifyTest convexCast;
+				convexCast.m_tire = tire->GetBody0();
+				convexCast.m_chassis = m_chassis;
+
+				//convexCast.CastShape(tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest, otherBody->GetCollisionShape(), otherBody->GetMatrix());
+				m_chassis->GetScene()->ConvexCast(convexCast, tire->GetBody0()->GetCollisionShape(), tireUpperBumperMatrix, dest);
+				convexCast.m_param = 0.0f;
+			}
+		}
+
+
 	}
 
 	GLuint m_gears;
@@ -722,16 +642,16 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	dMatrix sceneLocation(dGetIdentityMatrix());
 
-	//BuildFloorBox(scene, sceneLocation);
+	BuildFloorBox(scene, sceneLocation);
 	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildCompoundScene(scene, sceneLocation);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
-	sceneLocation.m_posit.m_x = -200.0f;
-	sceneLocation.m_posit.m_z = -200.0f;
-	BuildHeightFieldTerrain(scene, sceneLocation);
+	//sceneLocation.m_posit.m_x = -200.0f;
+	//sceneLocation.m_posit.m_z = -200.0f;
+	//BuildHeightFieldTerrain(scene, sceneLocation);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);

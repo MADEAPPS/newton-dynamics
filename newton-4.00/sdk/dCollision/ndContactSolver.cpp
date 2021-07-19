@@ -639,30 +639,6 @@ dInt32 ndContactSolver::CompoundContactsContinue()
 	return 0;
 }
 
-dInt32 ndContactSolver::CalculateContactsContinue()
-{
-	dInt32 count = 0;
-	if (m_instance0.GetShape()->GetAsShapeCompound() || m_instance1.GetShape()->GetAsShapeCompound())
-	{
-		count = CompoundContactsContinue();
-	}
-	else if (m_instance0.GetShape()->GetAsShapeConvex())
-	{
-		count = ConvexContactsContinue();
-	}
-	else
-	{
-		//dTrace(("!!!!!Fix compound contact\n"));
-		dAssert(0);
-	}
-
-	m_contact->m_timeOfImpact = m_timestep;
-	m_contact->m_separatingVector = m_separatingVector;
-	dAssert(0);
-	m_contact->m_separationDistance = m_separationDistance;
-	return count;
-}
-
 D_INLINE void ndContactSolver::TranslateSimplex(const dVector& step)
 {
 	m_instance1.m_globalMatrix.m_posit -= step;
@@ -2814,9 +2790,9 @@ bool ndContactSolver::CalculateClosestPoints()
 	return simplexPointCount >= 0;
 }
 
-//********************************************
-// calculate proper separation distance.
-//********************************************
+//*************************************************************
+// calculate proper separation distance for discrete collision.
+//*************************************************************
 dInt32 ndContactSolver::CalculateContactsDiscrete()
 {
 	dInt32 count = 0;
@@ -3893,4 +3869,32 @@ dInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 	dAssert(closestDist < dFloat32(1.0e6f));
 	m_separationDistance = dSqrt(closestDist);
 	return contactCount;
+}
+
+
+//*************************************************************
+// calculate proper separation distance for continue collision.
+//*************************************************************
+dInt32 ndContactSolver::CalculateContactsContinue()
+{
+	dInt32 count = 0;
+	if (m_instance0.GetShape()->GetAsShapeCompound() || m_instance1.GetShape()->GetAsShapeCompound())
+	{
+		count = CompoundContactsContinue();
+	}
+	else if (m_instance0.GetShape()->GetAsShapeConvex())
+	{
+		count = ConvexContactsContinue();
+	}
+	else
+	{
+		//dTrace(("!!!!!Fix compound contact\n"));
+		dAssert(0);
+	}
+
+	m_contact->m_timeOfImpact = m_timestep;
+	m_contact->m_separatingVector = m_separatingVector;
+	dAssert(0);
+	m_contact->m_separationDistance = m_separationDistance;
+	return count;
 }
