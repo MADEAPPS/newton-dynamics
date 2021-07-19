@@ -45,6 +45,8 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	const dArray<dInt16>& GetElevationMap() const;
 	D_COLLISION_API void UpdateElevationMapAabb();
 
+	void GetLocalAabb(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
+
 	protected:
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return this; }
@@ -69,7 +71,6 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	void CalculateAABB();
 	dInt32 FastInt(dFloat32 x) const;
 	const dInt32* GetIndexList() const;
-	void GetLocalAABB(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
 	void CalculateMinExtend2d(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
 	void CalculateMinExtend3d(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
 	dFloat32 RayCastCell(const dFastRayTest& ray, dInt32 xIndex0, dInt32 zIndex0, dVector& normalOut, dFloat32 maxT) const;

@@ -370,7 +370,7 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 void ndBasicJoints (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene);
+	BuildFloorBox(scene, dGetIdentityMatrix());
 
 	BuildBallSocket(scene, dVector(0.0f, 0.0f, -7.0f, 1.0f));
 	BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);

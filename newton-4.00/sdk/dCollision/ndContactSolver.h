@@ -59,27 +59,28 @@ D_MSV_NEWTON_ALIGN_32
 class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>  
 {
 	public: 
+	class ndBoxBoxDistance2;
 	ndContactSolver(ndContact* const contact, ndContactNotify* const notification, dFloat32 timestep);
 	ndContactSolver(ndShapeInstance* const instance, ndContactNotify* const notification, dFloat32 timestep);
 	ndContactSolver(const ndContactSolver& src, const ndShapeInstance& instance0, const ndShapeInstance& instance1);
 
-	dInt32 CalculateContactsDiscrete();
+	dInt32 CalculateContactsDiscrete(); // done
 	dInt32 CalculateContactsContinue();
 
 	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, ndContactPoint& contactOut);
 	
 	private:
-	dInt32 ConvexContactsDiscrete(); //
-	dInt32 CompoundContactsDiscrete(); //
-	dInt32 ConvexToConvexContactsDiscrete(); //
-	dInt32 ConvexToCompoundContactsDiscrete(); //
-	dInt32 CompoundToConvexContactsDiscrete(); //
-	dInt32 ConvexToStaticMeshContactsDiscrete(); //
-	dInt32 CompoundToCompoundContactsDiscrete(); //
-	dInt32 CompoundToShapeStaticBvhContactsDiscrete();
-	dInt32 CompoundToStaticHeighfieldContactsDiscrete();
-	dInt32 CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDesc& data); //
-	dInt32 ConvexToSaticStaticBvhContactsNodeDescrete(const dAabbPolygonSoup::dNode* const node);
+	dInt32 ConvexContactsDiscrete(); // done
+	dInt32 CompoundContactsDiscrete(); // done
+	dInt32 ConvexToConvexContactsDiscrete(); // done
+	dInt32 ConvexToCompoundContactsDiscrete(); // done
+	dInt32 CompoundToConvexContactsDiscrete(); // done
+	dInt32 CompoundToCompoundContactsDiscrete(); // done
+	dInt32 ConvexToStaticMeshContactsDiscrete(); // done
+	dInt32 CompoundToShapeStaticBvhContactsDiscrete(); // done
+	dInt32 CompoundToStaticHeightfieldContactsDiscrete(); // done
+	dInt32 CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDesc& data); // done
+	dInt32 ConvexToSaticStaticBvhContactsNodeDescrete(const dAabbPolygonSoup::dNode* const node); // done
 
 	dInt32 ConvexContactsContinue();
 	dInt32 CompoundContactsContinue();
@@ -118,7 +119,6 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 ConvexPolygonsIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dInt32 maxContacts) const;
 	dInt32 ConvexPolygonToLineIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dVector* const mem) const;
 
-
 	dInt32 CalculatePolySoupToHullContactsContinue(ndPolygonMeshDesc& data);
 
 	D_INLINE dBigVector ReduceLine(dInt32& indexOut);
@@ -150,7 +150,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	ndContactPoint* m_contactBuffer;
 	dFloat32 m_timestep;
 	dFloat32 m_skinThickness;
-	dFloat32 m_separationDistance____;
+	dFloat32 m_separationDistance;
 
 	dInt32 m_maxCount;
 	dInt32 m_vertexIndex;
@@ -176,7 +176,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	friend class ndConvexCastNotify;
 	friend class ndShapeConvexPolygon;
 	friend class ndBodyPlayerCapsuleContactSolver;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_ALIGN_32;
 
 #endif 
 

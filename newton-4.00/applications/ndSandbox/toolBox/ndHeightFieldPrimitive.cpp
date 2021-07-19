@@ -31,8 +31,8 @@
 #define D_TERRAIN_NOISE_GRID_SCALE  (1.0f / 500.0f)
 
 #define D_TERRAIN_GRID_SIZE			4.0f
-#define D_TERRAIN_ELEVATION_SCALE	0.0f
-//#define D_TERRAIN_ELEVATION_SCALE	64.0f
+//#define D_TERRAIN_ELEVATION_SCALE	0.0f
+#define D_TERRAIN_ELEVATION_SCALE	64.0f
 
 #define D_TERRAIN_TILE_SIZE			128
 
@@ -211,13 +211,13 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 	return body;
 }
 
-void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity)
+void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const dMatrix& matrix)
 {
 	dArray<dVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
 	MakeNoiseHeightfield(heightfield);
 
 	ndDemoMesh* const mesh = new ndHeightfieldMesh(heightfield, scene->GetShaderCache());
-	ndDemoEntity* const entity = new ndDemoEntity(dGetIdentityMatrix(), rootEntity);
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
 	entity->SetMesh(mesh, dGetIdentityMatrix());
 	mesh->Release();
 
@@ -241,6 +241,7 @@ void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& s
 	ndShapeMaterial material(heighfieldInstance.GetMaterial());
 	material.m_userData = entity;
 	heighfieldInstance.SetMaterial(material);
+	heighfieldInstance.SetLocalMatrix(matrix);
 	
 	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
 	compound->AddCollision(&heighfieldInstance);

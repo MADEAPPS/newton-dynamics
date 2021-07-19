@@ -224,7 +224,7 @@ void ndShapeHeightfield::CalculateMinExtend3d(const dVector& p0, const dVector& 
 	boxP1 = boxP1.Select(boxP1.GetMin(m_maxBox), m_yMask);
 }
 
-void ndShapeHeightfield::GetLocalAABB(const dVector& q0, const dVector& q1, dVector& boxP0, dVector& boxP1) const
+void ndShapeHeightfield::GetLocalAabb(const dVector& q0, const dVector& q1, dVector& boxP0, dVector& boxP1) const
 {
 	// the user data is the pointer to the collision geometry
 	CalculateMinExtend3d(q0, q1, boxP0, boxP1);

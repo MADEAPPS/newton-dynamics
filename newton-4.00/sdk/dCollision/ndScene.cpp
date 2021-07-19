@@ -1640,7 +1640,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 			contact->m_positAcc = dVector::m_zero;
 			contact->m_rotationAcc = dQuaternion();
 
-			dFloat32 distance = contact->m_separationDistance____;
+			dFloat32 distance = contact->m_separationDistance;
 			if (distance >= D_NARROW_PHASE_DIST)
 			{
 				const dVector veloc0(body0->GetVelocity());
@@ -1657,7 +1657,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 				const dFloat32 speed = velocMag.AddHorizontal().GetScalar() + dFloat32(0.5f);
 				
 				distance -= speed * m_timestep;
-				contact->m_separationDistance____ = distance;
+				contact->m_separationDistance = distance;
 			}
 			if (distance < D_NARROW_PHASE_DIST)
 			{

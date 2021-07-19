@@ -109,7 +109,7 @@ location.m_posit.m_y += 2.0f;
 void ndBasicFracture_4(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene);
+	BuildFloorBox(scene, dGetIdentityMatrix());
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndConvexFractureModel_4* const fractureManager = new ndConvexFractureModel_4(scene);

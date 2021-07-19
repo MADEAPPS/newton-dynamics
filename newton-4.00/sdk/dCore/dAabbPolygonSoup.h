@@ -207,26 +207,24 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	D_CORE_API virtual void ForAllSectors (const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
 	D_CORE_API virtual void ForThisSector(const dAabbPolygonSoup::dNode* const node, const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
 
+	public:
 	inline dNode* GetRootNode() const
 	{
 		return m_aabb;
 	}
 
-	inline dNode* GetBackNode(const void* const root) const
+	inline dNode* GetBackNode(const dNode* const node) const
 	{
-		dNode* const node = (dNode*) root;
 		return node->m_left.IsLeaf() ? nullptr : node->m_left.GetNode(m_aabb);
 	}
 
-	inline dNode* GetFrontNode(const void* const root) const
+	inline dNode* GetFrontNode(const dNode* const node) const
 	{
-		dNode* const node = (dNode*) root;
 		return node->m_right.IsLeaf() ? nullptr : node->m_right.GetNode(m_aabb);
 	}
 
-	inline void GetNodeAABB(const void* const root, dVector& p0, dVector& p1) const 
+	inline void GetNodeAabb(const dNode* const node, dVector& p0, dVector& p1) const
 	{
-		const dNode* const node = (dNode*)root;
 		p0 = dVector (&((dTriplex*)m_localVertex)[node->m_indexBox0].m_x);
 		p1 = dVector (&((dTriplex*)m_localVertex)[node->m_indexBox1].m_x);
 		p0 = p0 & dVector::m_triplexMask;
@@ -246,7 +244,6 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	dInt32 m_indexCount;
 	friend class ndContactSolver;
 };
-
 
 #endif
 

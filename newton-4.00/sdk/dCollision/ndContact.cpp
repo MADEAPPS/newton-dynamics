@@ -46,7 +46,7 @@ ndContact::ndContact()
 	,m_linkNode(nullptr)
 	,m_material()
 	,m_timeOfImpact(dFloat32(1.0e10f))
-	,m_separationDistance____(dFloat32(0.0f))
+	,m_separationDistance(dFloat32(0.0f))
 	,m_contactPruningTolereance(D_PRUNE_CONTACT_TOLERANCE)
 	,m_maxDOF(0)
 	,m_sceneLru(0)
@@ -56,10 +56,9 @@ ndContact::ndContact()
 	,m_skeletonIntraCollision(1)
 	,m_skeletonSelftCollision(1)
 {
-	static int xxxxxx;
-	xxxxx = xxxxxx;
-	xxxxxx++;
-
+	//static int xxxxxx;
+	//xxxxx = xxxxxx;
+	//xxxxxx++;
 	m_active = false;
 }
 

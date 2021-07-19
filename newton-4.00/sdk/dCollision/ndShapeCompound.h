@@ -37,32 +37,6 @@ class ndShapeCompound: public ndShape
 	};
 
 	class ndNodeBase;
-
-	D_MSV_NEWTON_ALIGN_32
-	class ndOOBBTestData
-	{
-		public:
-		ndOOBBTestData(const dMatrix& matrix);
-		ndOOBBTestData(const dMatrix& matrix, const dVector& origin, const dVector& size);
-
-		dMatrix m_matrix;
-		dMatrix m_absMatrix;
-		dVector m_origin;
-		dVector m_size;
-		dVector m_localP0;
-		dVector m_localP1;
-		dVector m_aabbP0;
-		dVector m_aabbP1;
-
-		dVector m_crossAxis[9];
-		dVector m_crossAxisAbs[9];
-		dVector m_crossAxisDotAbs[9];
-		dVector m_extendsMinX[3];
-		dVector m_extendsMaxX[3];
-		static dVector m_maxDist;
-		static dVector m_padding;
-	} D_GCC_NEWTON_ALIGN_32;
-
 	class ndTreeArray : public dTree<ndNodeBase*, dInt32, dContainersFreeListAlloc<ndNodeBase*>>
 	{
 		public:
@@ -148,20 +122,8 @@ class ndShapeCompound::ndNodeBase: public dClassAlloc
 
 	//void Sanity(int level = 0);
 	void CalculateAABB();
-	void SetBox(const dVector& p0, const dVector& p1);
-
-	dFloat32 BoxTest(const ndOOBBTestData& data) const;
-	dFloat32 BoxTestOld(const ndOOBBTestData&, const ndNodeBase* const) const { dAssert(0); return 0; }
-	dFloat32 BoxTest___(const ndOOBBTestData& data, const ndNodeBase* const otherNode) const;
-
 	ndShapeInstance* GetShape() const;
-
-	//DG_INLINE dInt32 BoxIntersect(const dgFastRayTest& ray, const dVector& boxP0, const dVector& boxP1) const
-	//{
-	//	dVector minBox(m_p0 - boxP1);
-	//	dVector maxBox(m_p1 - boxP0);
-	//	return ray.BoxTest(minBox, maxBox);
-	//}
+	void SetBox(const dVector& p0, const dVector& p1);
 
 	dVector m_p0;
 	dVector m_p1;
@@ -257,7 +219,6 @@ inline void ndShapeCompound::ndNodeBase::SetBox(const dVector& p0, const dVector
 	m_area = m_size.DotProduct(m_size.ShiftTripleRight()).m_x;
 }
 
-//bool BoxTest(const dgOOBBTestData& data) const;
 
 
 

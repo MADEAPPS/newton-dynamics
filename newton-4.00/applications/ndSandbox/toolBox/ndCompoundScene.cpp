@@ -19,16 +19,15 @@
 
 static void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const dMatrix& location)
 {
-	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
+	//ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
+	ndShapeInstance box(new ndShapeBox(10.0f, 1.0f, 10.f));
 	dMatrix uvMatrix(dGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
 	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
 
-	dMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit.m_y = -0.5f;
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
+	ndDemoEntity* const entity = new ndDemoEntity(location, rootEntity);
 	entity->SetMesh(geometry, location);
 	geometry->Release();
 
@@ -54,15 +53,18 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const dMat
 	ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
 	compound->BeginAddRemove();
 
-	dMatrix boxLocation(location);
-	boxLocation.m_posit = boxLocation.m_posit.Scale(-1.0f);
-	boxLocation.m_posit.m_w = 1.0f;
-	AddBoxSubShape(scene, sceneInstance, rootEntity, boxLocation);
+	dMatrix subShapeLocation(dGetIdentityMatrix());
+	//subShapeLocation.m_posit = subShapeLocation.m_posit.Scale(-1.0f);
+	//subShapeLocation.m_posit.m_w = 1.0f;
+	//subShapeLocation.m_posit.m_x = 90.0f;
+	AddBoxSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
 
-	//boxLocation.m_posit.m_y -= 1.0f;
-	//AddBoxSubShape(scene, sceneInstance, rootEntity, boxLocation);
+	subShapeLocation.m_posit.m_y -= 1.0f;
+	AddBoxSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
 
-	//AddHeightfieldSubShape(scene, sceneInstance, rootEntity);
+	//subShapeLocation.m_posit.m_x = -100.0f;
+	//subShapeLocation.m_posit.m_z = -100.0f;
+	//AddHeightfieldSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
 	
 	compound->EndAddRemove();
 

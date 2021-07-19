@@ -114,7 +114,6 @@ class ndContact: public ndConstraint, public dContainersFreeListAlloc<ndContact*
 	void CalculatePointDerivative(dInt32 index, ndConstraintDescritor& desc, const dVector& dir, const dgPointParam& param) const;
 	void JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, dInt32 normalIndex, dInt32& frictionIndex);
 
-int xxxxx;
 	dVector m_positAcc;
 	dQuaternion m_rotationAcc;
 	dVector m_separatingVector;
@@ -124,7 +123,7 @@ int xxxxx;
 	dList<ndContact, dContainersFreeListAlloc<ndContact>>::dNode* m_linkNode;
 	ndMaterial m_material;
 	dFloat32 m_timeOfImpact;
-	dFloat32 m_separationDistance____;
+	dFloat32 m_separationDistance;
 	dFloat32 m_contactPruningTolereance;
 	dUnsigned32 m_maxDOF;
 	dUnsigned32 m_sceneLru;

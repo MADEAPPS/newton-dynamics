@@ -85,7 +85,7 @@ class ndConvexFractureBox: public ndConvexFracture
 void ndBasicFracture_0(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene);
+	BuildFloorBox(scene, dGetIdentityMatrix());
 
 	ndConvexFractureBox fractureBox(scene);
 

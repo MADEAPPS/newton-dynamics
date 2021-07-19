@@ -120,7 +120,6 @@ class dVector
 		dMemory::Free(ptr);
 	}
 
-
 	D_INLINE dFloat32 GetScalar () const
 	{
 		//return m_x;

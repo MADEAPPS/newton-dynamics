@@ -112,7 +112,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 void ndBasicFrictionRamp (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene);
+	BuildFloorBox(scene, dGetIdentityMatrix());
 
 	BuildFrictionRamp(scene);
 

@@ -61,12 +61,12 @@ class ndVehicleUI: public dClassAlloc
 
 	ndVehicleUI()
 		:dClassAlloc()
-		,m_VboDyn(0)
-		,m_VaoDyn(0)
-		,m_IboDyn(0)
-		,m_VboSta(0)
-		,m_VaoSta(0)
-		,m_IboSta(0)
+		,m_vboDyn(0)
+		,m_vaoDyn(0)
+		,m_iboDyn(0)
+		,m_vboSta(0)
+		,m_vaoSta(0)
+		,m_iboSta(0)
 		,m_shaderHandle(0)
 	{
 	};
@@ -78,33 +78,33 @@ class ndVehicleUI: public dClassAlloc
 			glDeleteProgram(m_shaderHandle);
 		}
 
-		if (m_IboSta)
+		if (m_iboSta)
 		{
-			glDeleteBuffers(1, &m_IboSta);
+			glDeleteBuffers(1, &m_iboSta);
 		}
 
-		if (m_VboSta)
+		if (m_vboSta)
 		{
-			glDeleteBuffers(1, &m_VboSta);
+			glDeleteBuffers(1, &m_vboSta);
 		}
 
-		if (m_VaoSta)
+		if (m_vaoSta)
 		{
-			glDeleteVertexArrays(1, &m_VaoSta);
+			glDeleteVertexArrays(1, &m_vaoSta);
 		}
-		if (m_IboDyn)
+		if (m_iboDyn)
 		{
-			glDeleteBuffers(1, &m_IboDyn);
-		}
-
-		if (m_VboDyn)
-		{
-			glDeleteBuffers(1, &m_VboDyn);
+			glDeleteBuffers(1, &m_iboDyn);
 		}
 
-		if (m_VaoDyn)
+		if (m_vboDyn)
 		{
-			glDeleteVertexArrays(1, &m_VaoDyn);
+			glDeleteBuffers(1, &m_vboDyn);
+		}
+
+		if (m_vaoDyn)
+		{
+			glDeleteVertexArrays(1, &m_vaoDyn);
 		}
 	};
 	
@@ -124,7 +124,7 @@ class ndVehicleUI: public dClassAlloc
 	
 	void CreateBufferUI()
 	{
-		if (!m_VaoDyn)
+		if (!m_vaoDyn)
 		{
 			m_shaderHandle = glCreateProgram();
 		
@@ -202,11 +202,11 @@ class ndVehicleUI: public dClassAlloc
 			m_indxDyn[4] = 3;
 			m_indxDyn[5] = 0;
 
-			glGenVertexArrays(1, &m_VaoDyn);
-			glBindVertexArray(m_VaoDyn);
+			glGenVertexArrays(1, &m_vaoDyn);
+			glBindVertexArray(m_vaoDyn);
 
-			glGenBuffers(1, &m_VboDyn);
-			glBindBuffer(GL_ARRAY_BUFFER, m_VboDyn);
+			glGenBuffers(1, &m_vboDyn);
+			glBindBuffer(GL_ARRAY_BUFFER, m_vboDyn);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertDyn), &m_vertDyn[0], GL_DYNAMIC_DRAW);
 
 			glEnableVertexAttribArray(0);
@@ -215,8 +215,8 @@ class ndVehicleUI: public dClassAlloc
 			glEnableVertexAttribArray(1);
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)(offsetof(glPositionUV, glPositionUV::m_uv)));
 
-			glGenBuffers(1, &m_IboDyn);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IboDyn);
+			glGenBuffers(1, &m_iboDyn);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboDyn);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indxDyn), &m_indxDyn[0], GL_STATIC_DRAW);
 
 			glDisableVertexAttribArray(1);
@@ -236,11 +236,11 @@ class ndVehicleUI: public dClassAlloc
 			memcpy(m_indxSta, m_indxDyn, sizeof(m_indxDyn));
 			//
 			//
-			glGenVertexArrays(1, &m_VaoSta);
-			glBindVertexArray(m_VaoSta);
+			glGenVertexArrays(1, &m_vaoSta);
+			glBindVertexArray(m_vaoSta);
 			//
-			glGenBuffers(1, &m_VboSta);
-			glBindBuffer(GL_ARRAY_BUFFER, m_VboSta);
+			glGenBuffers(1, &m_vboSta);
+			glBindBuffer(GL_ARRAY_BUFFER, m_vboSta);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertSta), &m_vertSta[0], GL_STATIC_DRAW);
 			//
 			glEnableVertexAttribArray(0);
@@ -249,8 +249,8 @@ class ndVehicleUI: public dClassAlloc
 			glEnableVertexAttribArray(1);
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)(offsetof(glPositionUV, glPositionUV::m_uv)));
 
-			glGenBuffers(1, &m_IboSta);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IboSta);
+			glGenBuffers(1, &m_iboSta);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboSta);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_indxSta), &m_indxSta[0], GL_STATIC_DRAW);
 			//
 			glDisableVertexAttribArray(1);
@@ -266,7 +266,7 @@ class ndVehicleUI: public dClassAlloc
 
 	void RenderGageUI(ndDemoEntityManager* const uscene, const GLuint tex1, const dFloat32 origin_x, const dFloat32 origin_y, const dFloat32 ptsize, dFloat32 cparam, dFloat32 minAngle, dFloat32 maxAngle)
 	{
-		if (m_VaoSta)
+		if (m_vaoSta)
 		{
 			dMatrix aprojm(dGetIdentityMatrix());
 			CreateOrthoViewMatrix(uscene, origin_x, origin_y, aprojm);
@@ -284,14 +284,14 @@ class ndVehicleUI: public dClassAlloc
 			glUniform1f(glGetUniformLocation(m_shaderHandle, "ptsize"), ptsize);
 			glUniform4fv(glGetUniformLocation(m_shaderHandle, "color"), 1, &color[0]);
 
-			glBindVertexArray(m_VaoSta);
+			glBindVertexArray(m_vaoSta);
 
 			glEnableVertexAttribArray(0);
 			glEnableVertexAttribArray(1);
 
 			// This buffer is already in the opengl memory.
 			// Don't need to bind it again.
-			//glBindBuffer(GL_ARRAY_BUFFER, m_VboSta);
+			//glBindBuffer(GL_ARRAY_BUFFER, m_vboSta);
 
 			if (tex1) 
 			{
@@ -300,7 +300,7 @@ class ndVehicleUI: public dClassAlloc
 
 			// This buffer is already in the memory.
 			// Don't need to bind it again.
-			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IboSta);
+			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboSta);
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -316,7 +316,7 @@ class ndVehicleUI: public dClassAlloc
 	
 	void RenderGearUI(ndDemoEntityManager* const uscene, const dInt32 gearid, GLuint tex1, dFloat32 origin_x, dFloat32 origin_y, dFloat32 ptsize)
 	{
-		if (m_VaoDyn)
+		if (m_vaoDyn)
 		{
 			dMatrix aprojm(dGetIdentityMatrix());
 			CreateOrthoViewMatrix(uscene, origin_x, origin_y, aprojm);
@@ -349,13 +349,13 @@ class ndVehicleUI: public dClassAlloc
 			glUniform1f(glGetUniformLocation(m_shaderHandle, "ptsize"), xy1);
 			glUniform4fv(glGetUniformLocation(m_shaderHandle, "color"), 1, &color[0]);
 
-			glBindVertexArray(m_VaoDyn);
+			glBindVertexArray(m_vaoDyn);
 
 			glEnableVertexAttribArray(0);
 			glEnableVertexAttribArray(1);
 
 			//
-			glBindBuffer(GL_ARRAY_BUFFER, m_VboDyn);
+			glBindBuffer(GL_ARRAY_BUFFER, m_vboDyn);
 
 			m_vertDyn[0].m_uv.m_u = u0;
 			m_vertDyn[1].m_uv.m_u = u0;
@@ -373,7 +373,7 @@ class ndVehicleUI: public dClassAlloc
 
 			// This buffer is static, Don't need to bind it again.
 			// The buffer is already bind in the opengl memory.
-			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IboDyn);
+			//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboDyn);
 
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -389,12 +389,12 @@ class ndVehicleUI: public dClassAlloc
 	//
 	GLuint m_shaderHandle;
 	private:
-	GLuint m_VboDyn;
-	GLuint m_VboSta;
-	GLuint m_VaoDyn;
-	GLuint m_VaoSta;
-	GLuint m_IboDyn;
-	GLuint m_IboSta;
+	GLuint m_vboDyn;
+	GLuint m_vboSta;
+	GLuint m_vaoDyn;
+	GLuint m_vaoSta;
+	GLuint m_iboDyn;
+	GLuint m_iboSta;
 	glPositionUV m_vertDyn[4];
 	glPositionUV m_vertSta[4];
 	dUnsigned32 m_indxDyn[6];
@@ -1094,18 +1094,20 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
-	dMatrix heighfieldLocation(dGetIdentityMatrix());
-	heighfieldLocation.m_posit.m_x = -200.0f;
-	heighfieldLocation.m_posit.m_z = -200.0f;
+	dMatrix sceneLocation(dGetIdentityMatrix());
+	//sceneLocation.m_posit.m_x = -200.0f;
+	//sceneLocation.m_posit.m_z = -200.0f;
 
-	//BuildFloorBox(scene);
+	//BuildFloorBox(scene, sceneLocation);
 	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
-	BuildCompoundScene(scene, heighfieldLocation);
+	//BuildCompoundScene(scene, sceneLocation);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
-	//BuildHeightFieldTerrain(scene, heighfieldLocation);
+	sceneLocation.m_posit.m_x = -200.0f;
+	sceneLocation.m_posit.m_z = -200.0f;
+	BuildHeightFieldTerrain(scene, sceneLocation);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);

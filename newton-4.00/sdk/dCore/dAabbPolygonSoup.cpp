@@ -476,7 +476,7 @@ void dAabbPolygonSoup::GetAABB (dVector& p0, dVector& p1) const
 {
 	if (m_aabb) 
 	{ 
-		GetNodeAABB (m_aabb, p0, p1);
+		GetNodeAabb (m_aabb, p0, p1);
 	} 
 	else 
 	{
@@ -1009,52 +1009,53 @@ void dAabbPolygonSoup::Create (const dPolygonSoupBuilder& builder)
 	dgNodeBuilder* root = BuildTopDown (&constructor[0], 0, allocatorIndex - 1, &contructorAllocator);
 
 	dAssert (root);
-	if (root->m_left) 
-	{
-		dAssert (root->m_right);
-		dList<dgNodeBuilder*> list;
-		dList<dgNodeBuilder*> stack;
-		stack.Append(root);
-		while (stack.GetCount()) 
-		{
-			dList<dgNodeBuilder*>::dNode* const stackNode = stack.GetLast();
-			dgNodeBuilder* const node = stackNode->GetInfo();
-			stack.Remove(stackNode);
-
-			if (node->m_left) 
-			{
-				dAssert (node->m_right);
-				list.Append(node);
-				stack.Append(node->m_right);
-				stack.Append(node->m_left);
-			} 
-		}
-
-		dFloat64 newCost = dFloat32 (1.0e20f);
-		dFloat64 prevCost = newCost;
-		do 
-		{
-			prevCost = newCost;
-			for (dList<dgNodeBuilder*>::dNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) 
-			{
-				dgNodeBuilder* const node = listNode->GetInfo();
-				ImproveNodeFitness (node);
-			}
-
-			newCost = dFloat32 (0.0f);
-			for (dList<dgNodeBuilder*>::dNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) 
-			{
-				dgNodeBuilder* const node = listNode->GetInfo();
-				newCost += node->m_area;
-			}
-		} while (newCost < (prevCost * dFloat32 (0.9999f)));
-
-		root = list.GetLast()->GetInfo();
-		while (root->m_parent) 
-		{
-			root = root->m_parent;
-		}
-	}
+	dTrace(("*****->this is broken\n"));
+	//if (root->m_left) 
+	//{
+	//	dAssert (root->m_right);
+	//	dList<dgNodeBuilder*> list;
+	//	dList<dgNodeBuilder*> stack;
+	//	stack.Append(root);
+	//	while (stack.GetCount()) 
+	//	{
+	//		dList<dgNodeBuilder*>::dNode* const stackNode = stack.GetLast();
+	//		dgNodeBuilder* const node = stackNode->GetInfo();
+	//		stack.Remove(stackNode);
+	//
+	//		if (node->m_left) 
+	//		{
+	//			dAssert (node->m_right);
+	//			list.Append(node);
+	//			stack.Append(node->m_right);
+	//			stack.Append(node->m_left);
+	//		} 
+	//	}
+	//
+	//	dFloat64 newCost = dFloat32 (1.0e20f);
+	//	dFloat64 prevCost = newCost;
+	//	do 
+	//	{
+	//		prevCost = newCost;
+	//		for (dList<dgNodeBuilder*>::dNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) 
+	//		{
+	//			dgNodeBuilder* const node = listNode->GetInfo();
+	//			ImproveNodeFitness (node);
+	//		}
+	//
+	//		newCost = dFloat32 (0.0f);
+	//		for (dList<dgNodeBuilder*>::dNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) 
+	//		{
+	//			dgNodeBuilder* const node = listNode->GetInfo();
+	//			newCost += node->m_area;
+	//		}
+	//	} while (newCost < (prevCost * dFloat32 (0.9999f)));
+	//
+	//	root = list.GetLast()->GetInfo();
+	//	while (root->m_parent) 
+	//	{
+	//		root = root->m_parent;
+	//	}
+	//}
 
 	dList<dgNodeBuilder*> list;
 	list.Append(root);
@@ -1116,7 +1117,6 @@ void dAabbPolygonSoup::Create (const dPolygonSoupBuilder& builder)
 			aabbNode.m_indexBox1 = aabbBase + vertexIndex + 1;
 
 			vertexIndex += 2;
-
 		}
 		else
 		{

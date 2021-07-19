@@ -543,7 +543,7 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 		contactSolver.m_separatingVector = m_normal;
 		contactSolver.m_closestPoint0 = p0;
 		contactSolver.m_closestPoint1 = p0 + m_normal.Scale(penetration);
-		contactSolver.m_separationDistance____ = -penetration;
+		contactSolver.m_separationDistance = -penetration;
 		return 0;
 	}
 
@@ -609,7 +609,7 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 	const dInt64 hullId = hull->GetUserDataID();
 	if (inside & !contactSolver.m_intersectionTestOnly)
 	{
-		contactSolver.m_separationDistance____ = -penetration;
+		contactSolver.m_separationDistance = -penetration;
 		contactSolver.m_separatingVector = m_normal;
 		contactSolver.m_closestPoint0 = p0;
 		contactSolver.m_closestPoint1 = p0 + m_normal.Scale(penetration);
@@ -679,7 +679,7 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeI
 
 	ndContact* const contactJoint = proxy.m_contact;
 	dAssert(0);
-	contactJoint->m_separationDistance____ = dFloat32(1.0e10f);
+	contactJoint->m_separationDistance = dFloat32(1.0e10f);
 	
 	dMatrix polygonMatrix;
 	dVector right(m_localPoly[1] - m_localPoly[0]);
@@ -775,7 +775,7 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeI
 			{
 				dVector contactPoints[64];
 				dAssert(0);
-				contactJoint->m_separationDistance____ = penetration;
+				contactJoint->m_separationDistance = penetration;
 				proxy.m_timestep = timetoImpact;
 				proxy.m_separatingVector = m_normal;
 				proxy.m_closestPoint0 = p0;

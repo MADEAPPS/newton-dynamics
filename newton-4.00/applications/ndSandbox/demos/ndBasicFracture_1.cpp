@@ -185,7 +185,7 @@ static void AddCylinderEffect(ndConvexFractureModel_1* const manager, const dMat
 void ndBasicFracture_1(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene);
+	BuildFloorBox(scene, dGetIdentityMatrix());
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndConvexFractureModel_1* const fractureManager = new ndConvexFractureModel_1(scene);

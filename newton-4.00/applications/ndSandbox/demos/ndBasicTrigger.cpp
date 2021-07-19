@@ -87,7 +87,7 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origi
 void ndBasicTrigger (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene);
+	BuildFloorBox(scene, dGetIdentityMatrix());
 
 	// build a floor
 	AddTrigger(scene);

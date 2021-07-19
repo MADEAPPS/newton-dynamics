@@ -186,7 +186,7 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const dVector& origi
 void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene);
+	BuildFloorBox(scene, dGetIdentityMatrix());
 
 	DzhanibekovEffect(scene, 10.0f, 5.0f, dVector(0.0f, 0.0f, -2.0f, 0.0f));
 	DzhanibekovEffect(scene, 10.0f, -5.0f, dVector(0.0f, 0.0f, 0.0f, 0.0f));
