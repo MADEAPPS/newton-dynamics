@@ -585,7 +585,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		}
 
 		// test convex cast for now
-		if (0)
+		if (1)
 		{
 			// test convex cast
 			ndMultiBodyVehicleTireJoint* const tire = m_tireList.GetCount() ? m_tireList.GetFirst()->GetInfo() : nullptr;
