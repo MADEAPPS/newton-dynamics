@@ -86,7 +86,8 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 CompoundContactsContinue(); // done
 	dInt32 ConvexToConvexContactsContinue(); // done
 	dInt32 ConvexToCompoundContactsContinue(); // done
-	dInt32 ConvexToStaticMeshContactsContinue();
+	dInt32 ConvexToStaticMeshContactsContinue(); // done
+	dInt32 CalculatePolySoupToHullContactsContinue(ndPolygonMeshDesc& data); // done
 
 	class dgPerimenterEdge
 	{
@@ -118,8 +119,6 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 Prune3dContacts(const dMatrix& matrix, dInt32 count, ndContactPoint* const contactArray, dInt32 maxCount) const;
 	dInt32 ConvexPolygonsIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dInt32 maxContacts) const;
 	dInt32 ConvexPolygonToLineIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dVector* const mem) const;
-
-	dInt32 CalculatePolySoupToHullContactsContinue(ndPolygonMeshDesc& data);
 
 	D_INLINE dBigVector ReduceLine(dInt32& indexOut);
 	D_INLINE dBigVector ReduceTriangle (dInt32& indexOut);

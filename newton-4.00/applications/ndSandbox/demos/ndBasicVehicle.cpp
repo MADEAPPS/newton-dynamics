@@ -643,10 +643,10 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	dMatrix sceneLocation(dGetIdentityMatrix());
 
 	//BuildFloorBox(scene, sceneLocation);
-	//BuildFlatPlane(scene, true);
+	BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
-	BuildCompoundScene(scene, sceneLocation);
+	//BuildCompoundScene(scene, sceneLocation);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
 	//sceneLocation.m_posit.m_x = -200.0f;

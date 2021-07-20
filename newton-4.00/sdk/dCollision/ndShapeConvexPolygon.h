@@ -40,7 +40,6 @@ class ndShapeConvexPolygon: public ndShapeConvex
 		dInt32 m_incidentVertex;
 	};
 
-	public:
 	ndShapeConvexPolygon ();
 	~ndShapeConvexPolygon ();
 
@@ -58,6 +57,8 @@ class ndShapeConvexPolygon: public ndShapeConvex
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+
+	virtual dInt32 Release() const;
 
 	dVector m_normal;
 	dVector m_localPoly[D_CONVEX_POLYGON_MAX_VERTEX_COUNT];

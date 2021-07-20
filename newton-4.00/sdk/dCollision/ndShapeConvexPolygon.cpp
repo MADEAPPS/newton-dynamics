@@ -47,6 +47,12 @@ ndShapeConvexPolygon::~ndShapeConvexPolygon ()
 {
 }
 
+dInt32 ndShapeConvexPolygon::Release() const
+{
+	dInt32 count = m_refCount.fetch_add(-1);
+	return count;
+}
+
 dInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const dVector& normalIn, const dVector& origin, dVector* const contactsOut) const
 {
 	dAssert (normalIn.m_w == dFloat32 (0.0f));
@@ -677,10 +683,6 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeI
 		return 0;
 	}
 
-	ndContact* const contactJoint = proxy.m_contact;
-	dAssert(0);
-	contactJoint->m_separationDistance = dFloat32(1.0e10f);
-	
 	dMatrix polygonMatrix;
 	dVector right(m_localPoly[1] - m_localPoly[0]);
 	polygonMatrix[0] = right.Normalize();
@@ -774,8 +776,6 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeI
 			if (timetoImpact <= proxy.m_timestep) 
 			{
 				dVector contactPoints[64];
-				dAssert(0);
-				contactJoint->m_separationDistance = penetration;
 				proxy.m_timestep = timetoImpact;
 				proxy.m_separatingVector = m_normal;
 				proxy.m_closestPoint0 = p0;

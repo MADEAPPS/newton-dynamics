@@ -2235,126 +2235,6 @@ dInt32 ndContactSolver::CalculateIntersectingPlane(dInt32 count)
 	return -1;
 }
 
-dInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDesc& data)
-{
-	dAssert(data.m_faceCount);
-
-	ndShapeConvexPolygon polygon;
-	ndShapeInstance polySoupInstance(m_instance1);
-	m_instance1.m_shape = &polygon;
-	m_instance1.SetScale(dVector::m_one);
-	m_instance1.m_localMatrix = dGetIdentityMatrix();
-	m_instance1.m_globalMatrix = dGetIdentityMatrix();
-
-	polygon.m_vertex = data.m_vertex;
-	polygon.m_stride = dInt32(data.m_vertexStrideInBytes / sizeof(dFloat32));
-
-	dInt32 count = 0;
-	dInt32 maxContacts = m_maxCount;
-	dInt32 countleft = maxContacts;
-	dInt32 maxReduceLimit = maxContacts - 16;
-
-	const dVector& polygonInstanceScale = polySoupInstance.GetScale();
-	const dMatrix polySoupGlobalMatrix = polySoupInstance.m_globalMatrix;
-	const dMatrix polySoupGlobalAligmentMatrix = polySoupInstance.m_aligmentMatrix;
-
-	dMatrix polySoupScaledMatrix(
-		polySoupGlobalAligmentMatrix[0] * polygonInstanceScale,
-		polySoupGlobalAligmentMatrix[1] * polygonInstanceScale,
-		polySoupGlobalAligmentMatrix[2] * polygonInstanceScale,
-		polySoupGlobalAligmentMatrix[3]);
-	polySoupScaledMatrix = polySoupScaledMatrix * polySoupGlobalMatrix;
-
-	dAssert(m_contact);
-	dVector separatingVector(m_instance0.m_globalMatrix.m_up);
-
-	const dInt32 stride = polygon.m_stride;
-	const dFloat32* const vertex = polygon.m_vertex;
-	dAssert(m_instance1.m_scaleType == ndShapeInstance::m_unit);
-	
-	ndContactPoint* const contactOut = m_contactBuffer;
-	ndContact* const contactJoint = m_contact;
-	dInt32* const indexArray = (dInt32*)data.m_faceVertexIndex;
-	data.SortFaceArray();
-
-	dVector n(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
-	dVector p(dVector::m_zero);
-	dVector q(dVector::m_zero);
-	dFloat32 closestDist = dFloat32(1.0e10f);
-	dFloat32 minTimeStep = m_timestep;
-
-	dFloat32 timeNormalizer = m_timestep;
-	dFloat32 epsilon = dFloat32(-1.0e-3f) * m_timestep;
-	
-	for (dInt32 i = 0; (i < data.m_faceCount) && (m_timestep >= (data.m_hitDistance[i] * timeNormalizer)); i++) 
-	{
-		dInt32 address = data.m_faceIndexStart[i];
-		const dInt32* const localIndexArray = &indexArray[address];
-		polygon.m_vertexIndex = localIndexArray;
-		polygon.m_count = data.m_faceIndexCount[i];
-		polygon.m_paddedCount = polygon.m_count;
-		polygon.m_adjacentFaceEdgeNormalIndex = data.GetAdjacentFaceEdgeNormalArray(localIndexArray, polygon.m_count);
-		polygon.m_faceId = data.GetFaceId(localIndexArray, polygon.m_count);
-		polygon.m_faceClipSize = data.GetFaceSize(localIndexArray, polygon.m_count);
-		polygon.m_faceNormalIndex = data.GetNormalIndex(localIndexArray, polygon.m_count);
-		polygon.m_normal = polygon.CalculateGlobalNormal(&polySoupInstance, dVector(&vertex[polygon.m_faceNormalIndex * stride]) & dVector::m_triplexMask);
-		dAssert(polygon.m_normal.m_w == dFloat32(0.0f));
-		for (dInt32 j = 0; j < polygon.m_count; j++)
-		{
-			polygon.m_localPoly[j] = polySoupScaledMatrix.TransformVector(dVector(&vertex[localIndexArray[j] * stride]) & dVector::m_triplexMask);
-		}
-
-		contactJoint->m_separatingVector = separatingVector;
-		m_maxCount = countleft;
-		m_vertexIndex = 0;
-		m_contactBuffer = &contactOut[count];
-		dInt32 count1 = polygon.CalculateContactToConvexHullContinue(&polySoupInstance, *this);
-		
-		if (count1 > 0)
-		{
-			dFloat32 error = m_timestep - minTimeStep;
-			if (error < epsilon) 
-			{
-				count = 0;
-				countleft = maxContacts;
-				for (dInt32 j = 0; j < count1; j++) 
-				{
-					contactOut[j] = m_contactBuffer[j];
-				}
-			}
-			count += count1;
-			countleft -= count1;
-			dAssert(countleft >= 0);
-			if (count >= maxReduceLimit) 
-			{
-				dAssert(0);
-				//count = PruneContacts(count, contactOut, dFloat32(1.0e-2f), 16);
-				//countleft = maxContacts - count;
-				//dAssert(countleft >= 0);
-				//proxy.m_maxContacts = countleft;
-			}
-		}
-
-		dAssert(0);
-		closestDist = dMin(closestDist, contactJoint->m_separationDistance);
-		if (m_timestep <= minTimeStep) 
-		{
-			minTimeStep = m_timestep;
-			n = m_separatingVector;
-			p = m_closestPoint0;
-			q = m_closestPoint1;
-		}
-	}
-
-	m_contactBuffer = contactOut;
-	dAssert(0);
-	m_separationDistance = closestDist;
-	m_instance1.m_shape = polySoupInstance.m_shape;
-	m_instance1 = polySoupInstance;
-
-	return count;
-}
-
 bool ndContactSolver::CalculateClosestPoints()
 {
 	dInt32 simplexPointCount = CalculateClosestSimplex();
@@ -3633,9 +3513,6 @@ dInt32 ndContactSolver::ConvexToConvexContactsContinue()
 			closestPoint1 = m_closestPoint1 + step;
 			m_separatingVector = m_separatingVector * dVector::m_negOne;
 			dFloat32 penetration = dMax(num * dFloat32(-1.0f) + D_PENETRATION_TOL, dFloat32(0.0f));
-			//dAssert(0);
-			//m_contact->m_separationDistance = penetration;
-			//m_separationDistance = penetration;
 			if (m_contactBuffer && !m_intersectionTestOnly)
 			{
 				if (m_instance0.GetCollisionMode() & m_instance1.GetCollisionMode())
@@ -3854,6 +3731,127 @@ dInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 	return contactCount;
 }
 
+dInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDesc& data)
+{
+	dAssert(data.m_faceCount);
+
+	ndShapeConvexPolygon polygon;
+	ndShapeInstance polySoupInstance(m_instance1);
+	m_instance1.m_shape->Release();
+	m_instance1.m_shape = polygon.AddRef();
+	m_instance1.SetScale(dVector::m_one);
+	m_instance1.m_localMatrix = dGetIdentityMatrix();
+	m_instance1.m_globalMatrix = dGetIdentityMatrix();
+
+	polygon.m_vertex = data.m_vertex;
+	polygon.m_stride = dInt32(data.m_vertexStrideInBytes / sizeof(dFloat32));
+
+	dInt32 count = 0;
+	dInt32 maxContacts = m_maxCount;
+	dInt32 countleft = maxContacts;
+	dInt32 maxReduceLimit = maxContacts - 16;
+
+	const dVector& polygonInstanceScale = polySoupInstance.GetScale();
+	const dMatrix polySoupGlobalMatrix = polySoupInstance.m_globalMatrix;
+	const dMatrix polySoupGlobalAligmentMatrix = polySoupInstance.m_aligmentMatrix;
+
+	dMatrix polySoupScaledMatrix(
+		polySoupGlobalAligmentMatrix[0] * polygonInstanceScale,
+		polySoupGlobalAligmentMatrix[1] * polygonInstanceScale,
+		polySoupGlobalAligmentMatrix[2] * polygonInstanceScale,
+		polySoupGlobalAligmentMatrix[3]);
+	polySoupScaledMatrix = polySoupScaledMatrix * polySoupGlobalMatrix;
+
+	//dAssert(m_contact);
+	//dVector separatingVector(m_instance0.m_globalMatrix.m_up);
+
+	const dInt32 stride = polygon.m_stride;
+	const dFloat32* const vertex = polygon.m_vertex;
+	dAssert(m_instance1.m_scaleType == ndShapeInstance::m_unit);
+
+	ndContactPoint* const contactOut = m_contactBuffer;
+	//ndContact* const contactJoint = m_contact;
+	dInt32* const indexArray = (dInt32*)data.m_faceVertexIndex;
+	data.SortFaceArray();
+
+	dVector separatingVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
+	dVector closestPoint0(dVector::m_zero);
+	dVector closestPoint1(dVector::m_zero);
+	dFloat32 minTimeStep = m_timestep;
+	dFloat32 savedTimestep = m_timestep;
+	dFloat32 epsilon = dFloat32(-1.0e-3f) * m_timestep;
+
+	for (dInt32 i = 0; (i < data.m_faceCount) && (m_timestep >= (data.m_hitDistance[i] * savedTimestep)); i++)
+	{
+		dInt32 address = data.m_faceIndexStart[i];
+		const dInt32* const localIndexArray = &indexArray[address];
+		polygon.m_vertexIndex = localIndexArray;
+		polygon.m_count = data.m_faceIndexCount[i];
+		polygon.m_paddedCount = polygon.m_count;
+		polygon.m_adjacentFaceEdgeNormalIndex = data.GetAdjacentFaceEdgeNormalArray(localIndexArray, polygon.m_count);
+		polygon.m_faceId = data.GetFaceId(localIndexArray, polygon.m_count);
+		polygon.m_faceClipSize = data.GetFaceSize(localIndexArray, polygon.m_count);
+		polygon.m_faceNormalIndex = data.GetNormalIndex(localIndexArray, polygon.m_count);
+		polygon.m_normal = polygon.CalculateGlobalNormal(&polySoupInstance, dVector(&vertex[polygon.m_faceNormalIndex * stride]) & dVector::m_triplexMask);
+		dAssert(polygon.m_normal.m_w == dFloat32(0.0f));
+		for (dInt32 j = 0; j < polygon.m_count; j++)
+		{
+			polygon.m_localPoly[j] = polySoupScaledMatrix.TransformVector(dVector(&vertex[localIndexArray[j] * stride]) & dVector::m_triplexMask);
+		}
+
+		m_vertexIndex = 0;
+		m_maxCount = countleft;
+		m_contactBuffer = &contactOut[count];
+		dInt32 count1 = polygon.CalculateContactToConvexHullContinue(&polySoupInstance, *this);
+
+		if (count1 > 0)
+		{
+			dFloat32 error = m_timestep - minTimeStep;
+			if (error < epsilon)
+			{
+				count = 0;
+				countleft = maxContacts;
+				for (dInt32 j = 0; j < count1; j++)
+				{
+					contactOut[j] = m_contactBuffer[j];
+				}
+			}
+			count += count1;
+			countleft -= count1;
+			dAssert(countleft >= 0);
+			if (count >= maxReduceLimit)
+			{
+				dAssert(0);
+				//count = PruneContacts(count, contactOut, dFloat32(1.0e-2f), 16);
+				//countleft = maxContacts - count;
+				//dAssert(countleft >= 0);
+				//proxy.m_maxContacts = countleft;
+			}
+		}
+
+		if (m_timestep < minTimeStep)
+		{
+			minTimeStep = m_timestep;
+			closestPoint0 = m_closestPoint0;
+			closestPoint1 = m_closestPoint1;
+			separatingVector = m_separatingVector;
+		}
+	}
+
+	m_contactBuffer = contactOut;
+	m_instance1 = polySoupInstance;
+	if (minTimeStep < savedTimestep)
+	{
+		m_timestep = minTimeStep;
+		m_closestPoint0 = closestPoint0;
+		m_closestPoint1 = closestPoint1;
+		m_separatingVector = separatingVector;
+		m_separationDistance = m_separatingVector.DotProduct(m_closestPoint0 - m_closestPoint1).GetScalar();
+	}
+
+	return count;
+}
+
 dInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 {
 	dAssert(m_instance0.GetConvexVertexCount());
@@ -3884,6 +3882,7 @@ dInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 
 	if (data.m_faceCount)
 	{
+		m_separationDistance = dSqrt(relVeloc.DotProduct(relVeloc).GetScalar()) * m_timestep;
 		count = CalculatePolySoupToHullContactsContinue(data);
 	}
 
