@@ -72,7 +72,7 @@ class ndShapeCompound: public ndShape
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 	virtual dVector CalculateVolumeIntegral(const dMatrix& globalMatrix, const dVector& plane, const ndShapeInstance& parentScale) const;
 	
-	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
+	D_COLLISION_API virtual void CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	//D_COLLISION_API dInt32 CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 strideInFloat, const dPlane& localPlane, dVector* const contactsOut) const;
 
 	virtual void MassProperties();
@@ -204,7 +204,7 @@ inline void ndShapeCompound::ndNodeBase::CalculateAABB()
 {
 	dVector p0;
 	dVector p1;
-	m_shape->CalculateAABB(m_shape->GetLocalMatrix(), p0, p1);
+	m_shape->CalculateAabb(m_shape->GetLocalMatrix(), p0, p1);
 	SetBox(p0, p1);
 }
 

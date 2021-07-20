@@ -58,7 +58,7 @@ ndConvexFractureModel_4::ndEffect::ndEffect(ndConvexFractureModel_4* const manag
 {
 	dVector pMin;
 	dVector pMax;
-	desc.m_outerShape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
+	desc.m_outerShape->CalculateAabb(dGetIdentityMatrix(), pMin, pMax);
 	//dVector size(pMax - pMin);
 
 	// Get the volume of the original mesh

@@ -265,7 +265,7 @@ dMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatri
 	}
 }
 
-void ndShapeConvex::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
+void ndShapeConvex::CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const
 {
 	dVector origin(matrix.TransformVector(m_boxOrigin));
 	dVector size(matrix.m_front.Abs().Scale(m_boxSize.m_x) + matrix.m_up.Abs().Scale(m_boxSize.m_y) + matrix.m_right.Abs().Scale(m_boxSize.m_z));

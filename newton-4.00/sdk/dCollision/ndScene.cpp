@@ -1256,8 +1256,8 @@ bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKin
 	//			dVector box1_p0;
 	//			dVector box1_p1;
 	//
-	//			instance0->CalcAABB(instance0->GetGlobalMatrix(), box0_p0, box0_p1);
-	//			instance1->CalcAABB(instance1->GetGlobalMatrix(), box1_p0, box1_p1);
+	//			instance0->CalculateAabb(instance0->GetGlobalMatrix(), box0_p0, box0_p1);
+	//			instance1->CalculateAabb(instance1->GetGlobalMatrix(), box1_p0, box1_p1);
 	//
 	//			dVector boxp0(box0_p0 - box1_p1);
 	//			dVector boxp1(box0_p1 - box1_p0);
@@ -1759,7 +1759,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 	dVector boxP1;
 
 	dAssert(globalOrigin.TestOrthogonal());
-	convexShape.CalculateAABB(globalOrigin, boxP0, boxP1);
+	convexShape.CalculateAabb(globalOrigin, boxP0, boxP1);
 
 	callback.m_contacts.SetCount(0);
 	callback.m_param = dFloat32(1.2f);
@@ -2209,7 +2209,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& co
 		dVector boxP0;
 		dVector boxP1;
 		dAssert(globalOrigin.TestOrthogonal());
-		convexShape.CalculateAABB(globalOrigin, boxP0, boxP1);
+		convexShape.CalculateAabb(globalOrigin, boxP0, boxP1);
 
 		dFloat32 distance[D_SCENE_MAX_STACK_DEPTH];
 		const ndSceneNode* stackPool[D_SCENE_MAX_STACK_DEPTH];

@@ -178,9 +178,9 @@ ndShapeInfo ndShapeChamferCylinder::GetShapeInfo() const
 	return info;
 }
 
-void ndShapeChamferCylinder::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
+void ndShapeChamferCylinder::CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const
 {
-	ndShapeConvex::CalcAABB(matrix, p0, p1);
+	ndShapeConvex::CalculateAabb(matrix, p0, p1);
 
 //	dAssert(0);
 	//dVector size0(m_radius0);

@@ -175,12 +175,12 @@ ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)
 	}
 	
 	dMatrix fullMatrix (convexMatrix * matrix);
-	m_convexInstance->CalculateAABB(fullMatrix, m_p0, m_p1);
+	m_convexInstance->CalculateAabb(fullMatrix, m_p0, m_p1);
 	
 	dVector p0;
 	dVector p1;
 	SetTransposeAbsMatrix(matrix);
-	m_convexInstance->CalculateAABB(convexMatrix, p0, p1);
+	m_convexInstance->CalculateAabb(convexMatrix, p0, p1);
 	m_size = dVector::m_half * (p1 - p0);
 	m_posit = matrix.TransformVector(dVector::m_half * (p1 + p0));
 	dAssert (m_posit.m_w == dFloat32 (1.0f));
@@ -195,7 +195,7 @@ ndShapeStaticMesh::~ndShapeStaticMesh()
 {
 }
 
-void ndShapeStaticMesh::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const
+void ndShapeStaticMesh::CalculateAabb(const dMatrix& matrix, dVector &p0, dVector &p1) const
 {
 	dVector origin(matrix.TransformVector(m_boxOrigin));
 	dVector size(matrix.m_front.Abs().Scale(m_boxSize.m_x) + matrix.m_up.Abs().Scale(m_boxSize.m_y) + matrix.m_right.Abs().Scale(m_boxSize.m_z));

@@ -111,7 +111,7 @@ class ndShapeInstance: public dClassAlloc
 
 	D_COLLISION_API dMatrix CalculateInertia() const;
 	D_COLLISION_API void CalculateObb(dVector& origin, dVector& size) const;
-	D_COLLISION_API void CalculateAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
+	D_COLLISION_API void CalculateAabb(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	D_COLLISION_API void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	D_COLLISION_API dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const;
 

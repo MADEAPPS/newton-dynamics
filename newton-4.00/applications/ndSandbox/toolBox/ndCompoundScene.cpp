@@ -53,17 +53,14 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const dMat
 	compound->BeginAddRemove();
 
 	dMatrix subShapeLocation(dGetIdentityMatrix());
-	//subShapeLocation.m_posit = subShapeLocation.m_posit.Scale(-1.0f);
-	//subShapeLocation.m_posit.m_w = 1.0f;
-	//subShapeLocation.m_posit.m_x = 90.0f;
-	//AddBoxSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
-	//
+	AddBoxSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
+	
 	//subShapeLocation.m_posit.m_y -= 1.0f;
 	//AddBoxSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
 
-	subShapeLocation.m_posit.m_x = -200.0f;
-	subShapeLocation.m_posit.m_z = -200.0f;
-	AddHeightfieldSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
+	//subShapeLocation.m_posit.m_x = -200.0f;
+	//subShapeLocation.m_posit.m_z = -200.0f;
+	//AddHeightfieldSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
 	
 	compound->EndAddRemove();
 

@@ -83,9 +83,9 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 ConvexToSaticStaticBvhContactsNodeDescrete(const dAabbPolygonSoup::dNode* const node); // done
 
 	dInt32 ConvexContactsContinue(); // done
-	dInt32 CompoundContactsContinue();
+	dInt32 CompoundContactsContinue(); // done
 	dInt32 ConvexToConvexContactsContinue(); // done
-	dInt32 ConvexToCompoundContactsContinue();
+	dInt32 ConvexToCompoundContactsContinue(); // done
 	dInt32 ConvexToStaticMeshContactsContinue();
 
 	class dgPerimenterEdge

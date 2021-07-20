@@ -301,7 +301,7 @@ ndShapeCompound::~ndShapeCompound()
 }
 
 /*
-void ndShapeCompound::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const
+void ndShapeCompound::CalculateAabb(const dMatrix& matrix, dVector &p0, dVector &p1) const
 {
 	dAssert(0);
 	dVector origin(matrix.TransformVector(m_boxOrigin));
@@ -398,7 +398,7 @@ dFloat32 ndShapeCompound::GetBoxMaxRadius() const
 	return m_boxMaxRadius;
 }
 
-void ndShapeCompound::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
+void ndShapeCompound::CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const
 {
 	if (m_root) 
 	{

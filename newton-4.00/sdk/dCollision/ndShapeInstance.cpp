@@ -190,9 +190,9 @@ dMatrix ndShapeInstance::CalculateInertia() const
 	}
 }
 
-void ndShapeInstance::CalculateAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
+void ndShapeInstance::CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const
 {
-	m_shape->CalcAABB(matrix, p0, p1);
+	m_shape->CalculateAabb(matrix, p0, p1);
 	switch (m_scaleType)
 	{
 		case m_unit:
@@ -228,7 +228,7 @@ void ndShapeInstance::CalculateAABB(const dMatrix& matrix, dVector& p0, dVector&
 			//matrix1[0] = matrix1[0].Scale(m_scale.m_x);
 			//matrix1[1] = matrix1[1].Scale(m_scale.m_y);
 			//matrix1[2] = matrix1[2].Scale(m_scale.m_z);
-			//m_shape->CalcAABB(m_aligmentMatrix * matrix1, p0, p1);
+			//m_shape->CalculateAabb(m_aligmentMatrix * matrix1, p0, p1);
 			//p0 -= m_padding;
 			//p1 += m_padding;
 			break;
@@ -265,13 +265,13 @@ void ndShapeInstance::CalculateObb(dVector& origin, dVector& size) const
 			//matrix1[0] = matrix1[0].Scale(m_scale.m_x);
 			//matrix1[1] = matrix1[1].Scale(m_scale.m_y);
 			//matrix1[2] = matrix1[2].Scale(m_scale.m_z);
-			//m_shape->CalcAABB (m_aligmentMatrix * matrix1, p0, p1);
+			//m_shape->CalculateAabb (m_aligmentMatrix * matrix1, p0, p1);
 			//p0 -= m_padding;
 			//p1 += m_padding;
 
 			dVector p0;
 			dVector p1;
-			m_shape->CalcAABB(m_aligmentMatrix, p0, p1);
+			m_shape->CalculateAabb(m_aligmentMatrix, p0, p1);
 			size = (dVector::m_half * (p1 - p0) * m_scale + m_padding) & dVector::m_triplexMask;
 			origin = (dVector::m_half * (p1 + p0) * m_scale) & dVector::m_triplexMask;;
 			break;

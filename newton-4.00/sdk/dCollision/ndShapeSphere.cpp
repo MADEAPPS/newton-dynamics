@@ -181,7 +181,7 @@ void ndShapeSphere::MassProperties()
 	m_centerOfMass.m_w = volume;
 }
 
-void ndShapeSphere::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const
+void ndShapeSphere::CalculateAabb(const dMatrix& matrix, dVector &p0, dVector &p1) const
 {
 	//dMatrix transp(matrix.Transpose4X4());
 	////dVector size(matrix.m_front.Abs().Scale(m_radius) + matrix.m_up.Abs().Scale(m_radius) + matrix.m_right.Abs().Scale(m_radius));

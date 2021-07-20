@@ -360,9 +360,9 @@ dInt32 ndShapeCone::CalculatePlaneIntersection(const dVector& normal, const dVec
 	return count;
 }
 
-void ndShapeCone::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
+void ndShapeCone::CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const
 {
-	ndShapeConvex::CalcAABB(matrix, p0, p1);
+	ndShapeConvex::CalculateAabb(matrix, p0, p1);
 }
 
 void ndShapeCone::Save( nd::TiXmlElement* const xmlNode, const char* const, dInt32 nodeid ) const

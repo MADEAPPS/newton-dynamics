@@ -50,7 +50,7 @@ void ndShapePoint::MassProperties()
 	//m_centerOfMass.m_w = volume;
 }
 
-void ndShapePoint::CalcAABB(const dMatrix&, dVector &, dVector &) const
+void ndShapePoint::CalculateAabb(const dMatrix&, dVector &, dVector &) const
 {
 	dAssert(0);
 	//dVector size(m_radius);

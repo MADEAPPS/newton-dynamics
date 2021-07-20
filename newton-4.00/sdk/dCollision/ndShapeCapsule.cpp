@@ -493,10 +493,8 @@ dInt32 ndShapeCapsule::CalculatePlaneIntersection(const dVector& direction, cons
 	return count;
 }
 
-void ndShapeCapsule::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
+void ndShapeCapsule::CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const
 {
-	//ndShapeConvex::CalcAABB(matrix, p0, p1);
-
 	dVector size0(m_radius0);
 	dVector size1(m_radius1);
 	dVector q0(matrix.m_posit - matrix.m_front.Scale(m_height));

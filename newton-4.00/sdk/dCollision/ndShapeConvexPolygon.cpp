@@ -595,7 +595,7 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 	{
 		dVector boxP0;
 		dVector boxP1;
-		hull->CalculateAABB(hullMatrix, boxP0, boxP1);
+		hull->CalculateAabb(hullMatrix, boxP0, boxP1);
 		dVector origin(dVector::m_half * (boxP1 + boxP1));
 
 		if (!BeamClipping(origin, convexSphapeUmbra, parentMesh))
@@ -702,7 +702,7 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeI
 	dVector hullBoxP0;
 	dVector hullBoxP1;
 	dMatrix hullMatrix(proxy.m_instance0.m_globalMatrix * polygonMatrix.Inverse());
-	proxy.m_instance0.CalculateAABB(hullMatrix, hullBoxP0, hullBoxP1);
+	proxy.m_instance0.CalculateAabb(hullMatrix, hullBoxP0, hullBoxP1);
 	dVector minBox(polyBoxP0 - hullBoxP1);
 	dVector maxBox(polyBoxP1 - hullBoxP0);
 	

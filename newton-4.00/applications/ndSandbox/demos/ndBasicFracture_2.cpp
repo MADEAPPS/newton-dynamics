@@ -24,7 +24,7 @@ static dVector CalculateLocation(ndConvexFractureModel_2* const manager, const d
 {
 	dVector minBox;
 	dVector maxBox;
-	shape.CalculateAABB(dGetIdentityMatrix(), minBox, maxBox);
+	shape.CalculateAabb(dGetIdentityMatrix(), minBox, maxBox);
 
 	ndWorld* const world = manager->m_scene->GetWorld();
 	dVector floor(FindFloor(*world, dVector(matrix.m_posit.m_x, 100.0f, matrix.m_posit.m_z, dFloat32(0.0f)), 2.0f * 100.0f));
@@ -38,7 +38,7 @@ static void makePointCloud(ndConvexFractureModel_2::ndDesc& desc)
 {
 	dVector pMin;
 	dVector pMax;
-	desc.m_shape->CalculateAABB(dGetIdentityMatrix(), pMin, pMax);
+	desc.m_shape->CalculateAabb(dGetIdentityMatrix(), pMin, pMax);
 	dVector size(pMax - pMin);
 
 	const dInt32 count = 100;

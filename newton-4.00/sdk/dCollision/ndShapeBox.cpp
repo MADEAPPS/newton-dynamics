@@ -176,7 +176,7 @@ void ndShapeBox::MassProperties()
 	m_centerOfMass.m_w = volume;
 }
 
-void ndShapeBox::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const
+void ndShapeBox::CalculateAabb(const dMatrix& matrix, dVector &p0, dVector &p1) const
 {
 	dVector size(matrix[0].Abs().Scale(m_size[0].m_x) + matrix[1].Abs().Scale(m_size[0].m_y) + matrix[2].Abs().Scale(m_size[0].m_z));
 	p0 = (matrix[3] - size) & dVector::m_triplexMask;

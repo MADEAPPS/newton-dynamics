@@ -37,7 +37,7 @@ class ndShapeNull : public ndShape
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual dFloat32 GetBoxMinRadius() const;
 	virtual dFloat32 GetBoxMaxRadius() const;
-	virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
+	virtual void CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
@@ -81,7 +81,7 @@ inline void ndShapeNull::DebugShape(const dMatrix&, ndShapeDebugCallback&) const
 {
 }
 
-inline void ndShapeNull::CalcAABB(const dMatrix&, dVector& p0, dVector& p1) const
+inline void ndShapeNull::CalculateAabb(const dMatrix&, dVector& p0, dVector& p1) const
 {
 	p0 = dVector::m_zero;
 	p1 = dVector::m_zero;
