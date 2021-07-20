@@ -1481,7 +1481,7 @@ void ndMeshEffect::GetWeightIndexChannel(dInt32 strideInByte, dInt32* const buff
 
 dgCollisionInstance* ndMeshEffect::CreateCollisionTree(dgWorld* const world, dInt32 shapeID) const
 {
-	ndShapeStaticBVH* const collision = new  (GetAllocator()) ndShapeStaticBVH(world);
+	ndShapeStaticBvh* const collision = new  (GetAllocator()) ndShapeStaticBvh(world);
 
 	collision->BeginBuild();
 

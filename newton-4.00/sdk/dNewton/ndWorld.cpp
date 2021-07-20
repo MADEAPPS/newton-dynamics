@@ -588,9 +588,9 @@ void ndWorld::LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShap
 		{
 			shape = new ndShapeConvexHull(node);
 		}
-		else if (!strcmp(name, "ndShapeStaticBVH"))
+		else if (!strcmp(name, "ndShapeStaticBvh"))
 		{
-			shape = new ndShapeStaticBVH(node, assetPath);
+			shape = new ndShapeStaticBvh(node, assetPath);
 		}
 		else
 		{

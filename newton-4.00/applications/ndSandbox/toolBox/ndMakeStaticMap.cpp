@@ -120,7 +120,7 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, 
 
 	dFloat32 uvScale = 1.0 / 16.0f;
 
-	ndShapeInstance plane(new ndShapeStaticBVH(meshBuilder));
+	ndShapeInstance plane(new ndShapeStaticBvh(meshBuilder));
 	dMatrix uvMatrix(dGetIdentityMatrix());
 	uvMatrix[0][0] *= uvScale;
 	uvMatrix[1][1] *= uvScale;
@@ -161,7 +161,7 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[1][0], 3);
 	meshBuilder.End(optimized);
 
-	ndShapeInstance plane(new ndShapeStaticBVH(meshBuilder));
+	ndShapeInstance plane(new ndShapeStaticBvh(meshBuilder));
 	dMatrix uvMatrix(dGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
@@ -247,7 +247,7 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 		}
 	}
 	meshBuilder.End(optimized);
-	ndShapeInstance shape(new ndShapeStaticBVH(meshBuilder));
+	ndShapeInstance shape(new ndShapeStaticBvh(meshBuilder));
 
 	dMatrix matrix(entity->GetCurrentMatrix());
 	ndBodyDynamic* const body = new ndBodyDynamic();

@@ -39,7 +39,7 @@ class ndShapeCylinder;
 class ndShapeCompound;
 class ndRayCastNotify;
 class ndShapeInstance;
-class ndShapeStaticBVH;
+class ndShapeStaticBvh;
 class ndShapeStaticMesh;
 class ndShapeHeightfield;
 class ndShapeConvexPolygon;
@@ -216,7 +216,7 @@ class ndShape: public dClassAlloc
 	virtual ndShapeCapsule* GetAsShapeCapsule() { return nullptr; }
 	virtual ndShapeCylinder* GetAsShapeCylinder() { return nullptr; }
 	virtual ndShapeCompound* GetAsShapeCompound() { return nullptr; }
-	virtual ndShapeStaticBVH* GetAsShapeStaticBVH() { return nullptr; }
+	virtual ndShapeStaticBvh* GetAsShapeStaticBVH() { return nullptr; }
 	virtual ndShapeStaticMesh* GetAsShapeStaticMesh() { return nullptr; }
 	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return nullptr; }
 	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon() { return nullptr; }

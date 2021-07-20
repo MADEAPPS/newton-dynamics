@@ -29,7 +29,7 @@
 #include "ndShapeCompound.h"
 #include "ndBodyKinematic.h"
 #include "ndContactSolver.h"
-#include "ndShapeStaticBVH.h"
+#include "ndShapeStaticBvh.h"
 #include "ndShapeStaticMesh.h"
 #include "ndShapeHeightfield.h"
 #include "ndShapeConvexPolygon.h"
@@ -241,7 +241,7 @@ D_INLINE static void PushStackEntry(
 	dInt32& stack,
 	ndStackBvhStackEntry* const stackPool,
 	const ndShapeCompound::ndNodeBase* const compoundNode,
-	ndShapeStaticBVH* const bvhTreeCollision,
+	ndShapeStaticBvh* const bvhTreeCollision,
 	dInt32 treeNodeType,
 	const dAabbPolygonSoup::dNode* const treeNode)
 {
@@ -384,59 +384,6 @@ D_INLINE void ndContactSolver::TranslateSimplex(const dVector& step)
 		m_hullSum[i] -= step;
 		m_hullDiff[i] += step;
 	}
-}
-
-dInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
-{
-	dAssert(m_instance0.GetConvexVertexCount());
-	dAssert(!m_instance0.GetShape()->GetAsShapeNull());
-	dAssert(m_instance0.GetShape()->GetAsShapeConvex());
-	dAssert(m_instance1.GetShape()->GetAsShapeStaticMesh());
-
-	dInt32 count = 0;
-	ndPolygonMeshDesc data(*this, true);
-
-	dVector relVeloc(m_contact->m_body0->GetVelocity() - m_contact->m_body1->GetVelocity());
-	dFloat32 baseLinearSpeed = dSqrt(relVeloc.DotProduct(relVeloc).GetScalar());
-	if (baseLinearSpeed > dFloat32(1.0e-6f)) 
-	{
-		//const dFloat32 minRadius = m_instance0.GetBoxMinRadius();
-		//const dFloat32 maxRadius = m_instance0.GetBoxMaxRadius();
-		//dFloat32 maxAngularSpeed = dSqrt(hullOmega.DotProduct(hullOmega).GetScalar());
-		//dFloat32 maxAngularSpeed = dFloat32 (0.0f);
-		//dFloat32 angularSpeedBound = maxAngularSpeed * (maxRadius - minRadius);
-		//dFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
-		dFloat32 upperBoundSpeed = baseLinearSpeed;
-		dVector upperBoundVeloc(relVeloc.Scale(m_timestep * upperBoundSpeed / baseLinearSpeed));
-		data.SetDistanceTravel(upperBoundVeloc);
-	}
-
-	ndShapeStaticMesh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticMesh();
-	polysoup->GetCollidingFaces(&data);
-
-	if (data.m_faceCount)
-	{
-		count = CalculatePolySoupToHullContactsContinue(data);
-	}
-
-	ndBodyKinematic* const body0 = m_contact->GetBody0();
-	ndBodyKinematic* const body1 = m_contact->GetBody1();
-	ndShapeInstance* const instance0 = &body0->GetCollisionShape();
-	ndShapeInstance* const instance1 = &body1->GetCollisionShape();
-
-	if (!m_intersectionTestOnly)
-	{
-		ndContactPoint* const contactOut = m_contactBuffer;
-		for (dInt32 i = count - 1; i >= 0; i--)
-		{
-			contactOut[i].m_body0 = body0;
-			contactOut[i].m_body1 = body1;
-			contactOut[i].m_shapeInstance0 = instance0;
-			contactOut[i].m_shapeInstance1 = instance1;
-		}
-	}
-
-	return count;
 }
 
 D_INLINE void ndContactSolver::SupportVertex(const dVector& dir0, dInt32 vertexIndex)
@@ -3146,7 +3093,7 @@ dInt32 ndContactSolver::ConvexToSaticStaticBvhContactsNodeDescrete(const dAabbPo
 
 	dAssert(m_instance1.GetShape()->GetAsShapeStaticBVH());
 
-	ndShapeStaticBVH* const polysoup = m_instance1.GetShape()->GetAsShapeStaticBVH();
+	ndShapeStaticBvh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticBVH();
 	dAssert(polysoup);
 
 	ndPolygonMeshDesc data(*this, false);
@@ -3215,7 +3162,7 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 	ndBodyKinematic* const bvhTreeBody = contactJoint->GetBody1();
 	ndShapeInstance* const compoundInstance = &compoundBody->GetCollisionShape();
 	ndShapeInstance* const bvhTreeInstance = &bvhTreeBody->GetCollisionShape();
-	ndShapeStaticBVH* const bvhTreeCollision = m_instance1.GetShape()->GetAsShapeStaticBVH();
+	ndShapeStaticBvh* const bvhTreeCollision = m_instance1.GetShape()->GetAsShapeStaticBVH();
 	ndShapeCompound* const compoundShape = m_instance0.GetShape()->GetAsShapeCompound();
 
 	dAssert(compoundShape);
@@ -3511,7 +3458,6 @@ dInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 	return contactCount;
 }
 
-
 //*************************************************************
 // calculate proper separation distance for continue collision.
 //*************************************************************
@@ -3771,10 +3717,10 @@ dInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 
 	dInt32 stack = 1;
 	dInt32 contactCount = 0;
-	stackPool[0] = compoundShape->m_root;
-	impactTime[0] = ray.BoxIntersect(rootMinBox, rootMaxBox);
 	dFloat32 minTimeStep = m_timestep;
 
+	stackPool[0] = compoundShape->m_root;
+	impactTime[0] = ray.BoxIntersect(rootMinBox, rootMaxBox);
 	while (stack)
 	{
 		stack--;
@@ -3850,7 +3796,7 @@ dInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 				const dVector minBox(left->m_p0 - boxP1);
 				const dVector maxBox(left->m_p1 - boxP0);
 				dFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
-				if (dist1 < minTimeStep)
+				if (dist1 <= dFloat32 (1.0f))
 				{
 					dInt32 j = stack;
 					for (; j && (dist1 > impactTime[j - 1]); j--)
@@ -3871,7 +3817,7 @@ dInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 				const dVector minBox(right->m_p0 - boxP1);
 				const dVector maxBox = right->m_p1 - boxP0;
 				dFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
-				if (dist1 < minTimeStep)
+				if (dist1 <= dFloat32(1.0f))
 				{
 					dInt32 j = stack;
 					for (; j && (dist1 > impactTime[j - 1]); j--)
@@ -3906,4 +3852,57 @@ dInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 		m_separationDistance = dSqrt(relVeloc.DotProduct(relVeloc).GetScalar()) * minTimeStep;
 	}
 	return contactCount;
+}
+
+dInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
+{
+	dAssert(m_instance0.GetConvexVertexCount());
+	dAssert(!m_instance0.GetShape()->GetAsShapeNull());
+	dAssert(m_instance0.GetShape()->GetAsShapeConvex());
+	dAssert(m_instance1.GetShape()->GetAsShapeStaticMesh());
+
+	dInt32 count = 0;
+	ndPolygonMeshDesc data(*this, true);
+
+	dVector relVeloc(m_contact->m_body0->GetVelocity() - m_contact->m_body1->GetVelocity());
+	dFloat32 baseLinearSpeed = dSqrt(relVeloc.DotProduct(relVeloc).GetScalar());
+	if (baseLinearSpeed > dFloat32(1.0e-6f))
+	{
+		//const dFloat32 minRadius = m_instance0.GetBoxMinRadius();
+		//const dFloat32 maxRadius = m_instance0.GetBoxMaxRadius();
+		//dFloat32 maxAngularSpeed = dSqrt(hullOmega.DotProduct(hullOmega).GetScalar());
+		//dFloat32 maxAngularSpeed = dFloat32 (0.0f);
+		//dFloat32 angularSpeedBound = maxAngularSpeed * (maxRadius - minRadius);
+		//dFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
+		dFloat32 upperBoundSpeed = baseLinearSpeed;
+		dVector upperBoundVeloc(relVeloc.Scale(m_timestep * upperBoundSpeed / baseLinearSpeed));
+		data.SetDistanceTravel(upperBoundVeloc);
+	}
+
+	ndShapeStaticMesh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticMesh();
+	polysoup->GetCollidingFaces(&data);
+
+	if (data.m_faceCount)
+	{
+		count = CalculatePolySoupToHullContactsContinue(data);
+	}
+
+	ndBodyKinematic* const body0 = m_contact->GetBody0();
+	ndBodyKinematic* const body1 = m_contact->GetBody1();
+	ndShapeInstance* const instance0 = &body0->GetCollisionShape();
+	ndShapeInstance* const instance1 = &body1->GetCollisionShape();
+
+	if (!m_intersectionTestOnly)
+	{
+		ndContactPoint* const contactOut = m_contactBuffer;
+		for (dInt32 i = count - 1; i >= 0; i--)
+		{
+			contactOut[i].m_body0 = body0;
+			contactOut[i].m_body1 = body1;
+			contactOut[i].m_shapeInstance0 = instance0;
+			contactOut[i].m_shapeInstance1 = instance1;
+		}
+	}
+
+	return count;
 }
