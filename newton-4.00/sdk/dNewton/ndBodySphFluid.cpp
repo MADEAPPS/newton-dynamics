@@ -964,10 +964,10 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			const dInt32 start = threadId * size;
 			const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
 			const ndGridHash* const srcArray = &fluid->m_hashGridMap[0];
-			const dVector* const positions = &fluid->m_posit[0];
-			
-			const dFloat32 diameter = dFloat32(2.0f) * fluid->m_radius;
-			const dFloat32 diameter2 = diameter * diameter;
+
+			//const dVector* const positions = &fluid->m_posit[0];
+			//const dFloat32 diameter = dFloat32(2.0f) * fluid->m_radius;
+			//const dFloat32 diameter2 = diameter * diameter;
 			
 			ndParticlePairCacheBuffer buffer;
 			for (dInt32 i = 0; i < batchSize; i++)
@@ -982,20 +982,19 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 					if (cell0.m_cellType == ndHomeGrid)
 					{
 						const dInt32 m0 = cell0.m_particleIndex;
-						const dVector& posit0 = positions[m0];
-
+						//const dVector& posit0 = positions[m0];
 			
 						for (dInt32 k = j - 1; k >= 0; k--)
 						{
 							const ndGridHash& cell1 = ptr[k];
 							const dInt32 m1 = cell1.m_particleIndex;
-							const dVector& posit1 = positions[m1];
-							const dVector dist(posit1 - posit0);
-
-							dFloat32 dist2 = dist.DotProduct(dist).GetScalar();
 							bool test = (cell1.m_cellType == ndHomeGrid);
-							test = test | (cell0.m_particleIndex <= cell1.m_gridHash);
-							test = test & (dist2 <= diameter2);
+							dAssert(0);
+							//const dVector& posit1 = positions[m1];
+							//const dVector dist(posit1 - posit0);
+							//dFloat32 dist2 = dist.DotProduct(dist).GetScalar();
+							//test = test | (cell0.m_particleIndex <= cell1.m_gridHash);
+							//test = test & (dist2 <= diameter2);
 							if (test)
 							{
 								buffer.PushBack(m0, m1);

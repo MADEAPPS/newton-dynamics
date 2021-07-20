@@ -95,13 +95,13 @@ const GLchar* ndVehicleUI::m_fragmentShaderWithVersion[2] = { "#version 330 core
 
 ndVehicleUI::ndVehicleUI()
 	:dClassAlloc()
-	,m_vboDyn(0)
-	,m_vaoDyn(0)
-	,m_iboDyn(0)
-	,m_vboSta(0)
-	,m_vaoSta(0)
-	,m_iboSta(0)
 	,m_shaderHandle(0)
+	,m_vboDyn(0)
+	,m_vboSta(0)
+	,m_vaoDyn(0)
+	,m_vaoSta(0)
+	,m_iboDyn(0)
+	,m_iboSta(0)
 {
 };
 
@@ -247,7 +247,7 @@ void ndVehicleUI::CreateBufferUI()
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)0);
 
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)(offsetof(glPositionUV, glPositionUV::m_uv)));
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)(offsetof(glPositionUV, m_uv)));
 
 		glGenBuffers(1, &m_iboDyn);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboDyn);
@@ -281,7 +281,7 @@ void ndVehicleUI::CreateBufferUI()
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)0);
 		//
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)(offsetof(glPositionUV, glPositionUV::m_uv)));
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glPositionUV), (void*)(offsetof(glPositionUV, m_uv)));
 
 		glGenBuffers(1, &m_iboSta);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboSta);

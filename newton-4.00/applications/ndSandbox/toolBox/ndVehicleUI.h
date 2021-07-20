@@ -34,8 +34,8 @@ class ndVehicleUI: public dClassAlloc
 	void RenderGearUI(ndDemoEntityManager* const uscene, const dInt32 gearid, GLuint tex1, dFloat32 origin_x, dFloat32 origin_y, dFloat32 ptsize);
 	void RenderGageUI(ndDemoEntityManager* const uscene, const GLuint tex1, const dFloat32 origin_x, const dFloat32 origin_y, const dFloat32 ptsize, dFloat32 cparam, dFloat32 minAngle, dFloat32 maxAngle);
 
+	
 	GLuint m_shaderHandle;
-
 	static const GLchar* m_vertexShader;
 	static const GLchar* m_fragmentShader;
 	static const GLchar* m_vertexShaderWithVersion[2];
