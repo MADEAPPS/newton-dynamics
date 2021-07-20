@@ -25,16 +25,16 @@
 #include "ndCollisionStdafx.h"
 #include "ndShapeStaticMesh.h"
 
-class ndShapeStaticBvh: public ndShapeStaticMesh, public dAabbPolygonSoup
+class ndShapeStatic_bvh: public ndShapeStaticMesh, public dAabbPolygonSoup
 {
 	public:
-	D_COLLISION_API ndShapeStaticBvh(const dPolygonSoupBuilder& builder);
-	D_COLLISION_API ndShapeStaticBvh(const nd::TiXmlNode* const xmlNode, const char* const assetPath);
-	D_COLLISION_API virtual ~ndShapeStaticBvh();
+	D_COLLISION_API ndShapeStatic_bvh(const dPolygonSoupBuilder& builder);
+	D_COLLISION_API ndShapeStatic_bvh(const nd::TiXmlNode* const xmlNode, const char* const assetPath);
+	D_COLLISION_API virtual ~ndShapeStatic_bvh();
 
 	protected:
 	virtual ndShapeInfo GetShapeInfo() const;
-	virtual ndShapeStaticBvh* GetAsShapeStaticBVH() { return this; }
+	virtual ndShapeStatic_bvh* GetAsShapeStaticBVH() { return this; }
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;

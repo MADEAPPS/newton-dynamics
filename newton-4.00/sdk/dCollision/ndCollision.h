@@ -54,8 +54,8 @@
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
 #include <ndShapeCompound.h>
-#include <ndShapeStaticBvh______________________.h>
 #include <ndContactOptions.h>
+#include <ndShapeStatic_bvh.h>
 #include <ndShapeConvexHull.h>
 #include <ndShapeStaticMesh.h>
 #include <ndShapeHeightfield.h>

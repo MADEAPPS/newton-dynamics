@@ -29,7 +29,7 @@
 #include "ndShapeCompound.h"
 #include "ndBodyKinematic.h"
 #include "ndContactSolver.h"
-#include "ndShapeStaticBvh______________________.h"
+#include "ndShapeStatic_bvh.h"
 #include "ndShapeStaticMesh.h"
 #include "ndShapeHeightfield.h"
 #include "ndShapeConvexPolygon.h"
@@ -241,7 +241,7 @@ D_INLINE static void PushStackEntry(
 	dInt32& stack,
 	ndStackBvhStackEntry* const stackPool,
 	const ndShapeCompound::ndNodeBase* const compoundNode,
-	ndShapeStaticBvh* const bvhTreeCollision,
+	ndShapeStatic_bvh* const bvhTreeCollision,
 	dInt32 treeNodeType,
 	const dAabbPolygonSoup::dNode* const treeNode)
 {
@@ -3093,7 +3093,7 @@ dInt32 ndContactSolver::ConvexToSaticStaticBvhContactsNodeDescrete(const dAabbPo
 
 	dAssert(m_instance1.GetShape()->GetAsShapeStaticBVH());
 
-	ndShapeStaticBvh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticBVH();
+	ndShapeStatic_bvh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticBVH();
 	dAssert(polysoup);
 
 	ndPolygonMeshDesc data(*this, false);
@@ -3162,7 +3162,7 @@ dInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 	ndBodyKinematic* const bvhTreeBody = contactJoint->GetBody1();
 	ndShapeInstance* const compoundInstance = &compoundBody->GetCollisionShape();
 	ndShapeInstance* const bvhTreeInstance = &bvhTreeBody->GetCollisionShape();
-	ndShapeStaticBvh* const bvhTreeCollision = m_instance1.GetShape()->GetAsShapeStaticBVH();
+	ndShapeStatic_bvh* const bvhTreeCollision = m_instance1.GetShape()->GetAsShapeStaticBVH();
 	ndShapeCompound* const compoundShape = m_instance0.GetShape()->GetAsShapeCompound();
 
 	dAssert(compoundShape);
