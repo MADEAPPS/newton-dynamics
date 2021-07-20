@@ -24,9 +24,9 @@
 #include "ndContact.h"
 #include "ndBodyKinematic.h"
 #include "ndShapeInstance.h"
-#include "ndShapeStaticBvh.h"
+#include "ndShapeStaticBvh______________________.h"
 
-class ndCollisionBVHShowPolyContext
+class ndCollisionBvhShowPolyContext
 {
 	public:
 	dMatrix m_matrix;
@@ -154,7 +154,7 @@ dIntersectStatus ndShapeStaticBvh::ShowDebugPolygon(void* const context, const d
 
 	dInt32 stride = dInt32(strideInBytes / sizeof(dFloat32));
 
-	ndCollisionBVHShowPolyContext& data = *(ndCollisionBVHShowPolyContext*)context;
+	ndCollisionBvhShowPolyContext& data = *(ndCollisionBvhShowPolyContext*)context;
 	for (dInt32 i = 0; i < indexCount; i++) 
 	{
 		dVector p(&polygon[indexArray[i] * stride]);
@@ -169,7 +169,7 @@ dIntersectStatus ndShapeStaticBvh::ShowDebugPolygon(void* const context, const d
 
 void ndShapeStaticBvh::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
-	ndCollisionBVHShowPolyContext context;
+	ndCollisionBvhShowPolyContext context;
 
 	context.m_matrix = matrix;
 	context.m_userData = (void*)this;

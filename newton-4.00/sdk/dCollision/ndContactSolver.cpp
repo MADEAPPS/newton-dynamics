@@ -29,7 +29,7 @@
 #include "ndShapeCompound.h"
 #include "ndBodyKinematic.h"
 #include "ndContactSolver.h"
-#include "ndShapeStaticBvh.h"
+#include "ndShapeStaticBvh______________________.h"
 #include "ndShapeStaticMesh.h"
 #include "ndShapeHeightfield.h"
 #include "ndShapeConvexPolygon.h"
