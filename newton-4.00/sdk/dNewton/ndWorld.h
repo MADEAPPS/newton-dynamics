@@ -133,6 +133,7 @@ class ndWorld: public dClassAlloc
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();
 	D_NEWTON_API virtual void UpdateTransforms();
+	D_NEWTON_API virtual void PostModelTransform();
 	D_NEWTON_API virtual void ApplyExternalForces();
 
 	private:

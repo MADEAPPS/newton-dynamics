@@ -315,7 +315,6 @@ void ndDemoEntity::InterpolateMatrix(dFloat32 param)
 	}
 }
 
-
 const dMatrix& ndDemoEntity::GetRenderMatrix () const
 {
 	return m_matrix;

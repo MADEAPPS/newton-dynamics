@@ -314,6 +314,14 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		// set a soft or hard mode
 		SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);
 
+		// prepare data for animating suspension
+		m_rearAxlePivot = vehicleEntity->Find("rearAxlePivot");
+		m_frontAxlePivot = vehicleEntity->Find("frontAxlePivot");
+		m_rr_tire = rr_tire;
+		m_rl_tire = rl_tire;
+		m_fr_tire = fr_tire;
+		m_fl_tire = fl_tire;
+
 		// load all engine sound channels
 		ndSoundManager* const soundManager = world->GetSoundManager();
 
@@ -620,8 +628,32 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 				convexCast.m_param = 0.0f;
 			}
 		}
+	}
 
+	void PostTrasnsformUpdate(ndWorld* const, dFloat32)
+	{
+		// play body part animations
+		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)m_chassis->GetNotifyCallback();
 
+		const dMatrix rearPivotMatrix((m_rearAxlePivot->CalculateGlobalMatrix(notify->m_entity) * m_chassis->GetMatrix()).Inverse());
+		const dMatrix rearLeftTireMatrix (m_rl_tire->GetBody0()->GetMatrix() * rearPivotMatrix);
+		const dMatrix rearRightTireMatrix (m_rr_tire->GetBody0()->GetMatrix() * rearPivotMatrix);
+		const dVector rearOrigin(dVector::m_half * (rearRightTireMatrix.m_posit + rearLeftTireMatrix.m_posit));
+		const dVector rearStep(rearRightTireMatrix.m_posit - rearLeftTireMatrix.m_posit);
+		
+		dFloat32 rearAxleAngle = dAtan2(-rearStep.m_y, rearStep.m_z);
+		dQuaternion rearAxelRotation(dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)), rearAxleAngle);
+		m_rearAxlePivot->GetChild()->SetNextMatrix(rearAxelRotation, rearOrigin);
+
+		const dMatrix frontPivotMatrix((m_frontAxlePivot->CalculateGlobalMatrix(notify->m_entity) * m_chassis->GetMatrix()).Inverse());
+		const dMatrix frontLeftTireMatrix(m_fl_tire->GetBody0()->GetMatrix() * frontPivotMatrix);
+		const dMatrix frontRightTireMatrix(m_fr_tire->GetBody0()->GetMatrix() * frontPivotMatrix);
+		const dVector frontOrigin(dVector::m_half * (frontRightTireMatrix.m_posit + frontLeftTireMatrix.m_posit));
+		const dVector frontStep(frontRightTireMatrix.m_posit - frontLeftTireMatrix.m_posit);
+
+		dFloat32 frontAxleAngle = dAtan2(-frontStep.m_y, frontStep.m_z);
+		dQuaternion frontAxelRotation(dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)), frontAxleAngle);
+		m_frontAxlePivot->GetChild()->SetNextMatrix(frontAxelRotation, frontOrigin);
 	}
 
 	GLuint m_gears;
@@ -636,6 +668,15 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	ndSoundChannel* m_engineRpmSound;
 	bool m_startEngine;
 	ndVehicleUI* m_vehicleUI;
+
+	ndDemoEntity* m_rearAxlePivot;
+	ndDemoEntity* m_frontAxlePivot;
+	ndMultiBodyVehicleTireJoint* m_rr_tire;
+	ndMultiBodyVehicleTireJoint* m_rl_tire;
+
+	ndMultiBodyVehicleTireJoint* m_fr_tire;
+	ndMultiBodyVehicleTireJoint* m_fl_tire;
+
 };
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)

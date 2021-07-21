@@ -690,6 +690,7 @@ void ndWorld::ThreadFunction()
 		
 		UpdateTransformsLock();
 		UpdateTransforms();
+		PostModelTransform();
 		m_inUpdate = false;
 		PostUpdate(m_timestep);
 		UpdateTransformsUnlock();
@@ -841,6 +842,42 @@ void ndWorld::ModelPostUpdate()
 	};
 	m_scene->SubmitJobs<ndModelPostUpdate>();
 }
+
+void ndWorld::PostModelTransform()
+{
+	D_TRACKTIME();
+	class ndPostModelTransform: public ndScene::ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadId = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			const dFloat32 timestep = m_timestep;
+			ndWorld* const world = m_owner->GetWorld();
+			ndModelList& modelList = world->m_modelList;
+			ndModelList::dNode* node = modelList.GetFirst();
+			for (dInt32 i = 0; i < threadId; i++)
+			{
+				node = node ? node->GetNext() : nullptr;
+			}
+
+			while (node)
+			{
+				ndModel* const model = node->GetInfo();
+				model->PostTrasnsformUpdate(world, timestep);
+
+				for (dInt32 i = 0; i < threadCount; i++)
+				{
+					node = node ? node->GetNext() : nullptr;
+				}
+			}
+		}
+	};
+	m_scene->SubmitJobs<ndPostModelTransform>();
+}
+
 
 bool ndWorld::SkeletonJointTest(ndJointBilateralConstraint* const constraint) const
 {

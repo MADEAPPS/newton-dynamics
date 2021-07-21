@@ -43,8 +43,9 @@ class ndModel: public dClassAlloc
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 
 	protected:
-	virtual void Update(ndWorld* const world, dFloat32 timestep) = 0;
-	virtual void PostUpdate(ndWorld* const world, dFloat32 timestep) = 0;
+	virtual void Update(ndWorld* const world, dFloat32 timestep);
+	virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
+	virtual void PostTrasnsformUpdate(ndWorld* const world, dFloat32 timestep);
 
 	ndModelList::dNode* m_node;
 
@@ -73,6 +74,18 @@ inline ndMultiBodyVehicle* ndModel::GetAsMultiBodyVehicle()
 }
 
 inline void ndModel::Debug(ndConstraintDebugCallback&) const
+{
+}
+
+inline void ndModel::Update(ndWorld* const, dFloat32)
+{
+}
+
+inline void ndModel::PostUpdate(ndWorld* const, dFloat32)
+{
+}
+
+inline void ndModel::PostTrasnsformUpdate(ndWorld* const, dFloat32)
 {
 }
 
