@@ -271,7 +271,6 @@ void ndMultiBodyVehicle::SetVehicleSolverModel(bool hardJoint)
 
 void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 {
-#if 1
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
@@ -310,16 +309,6 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 		}
 		tireBody->RestoreSleepState(savedSleepState);
 	}
-#else
-	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
-	{
-		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
-		ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
-		bool savedSleepState = tireBody->GetSleepState();
-		tire->UpdateTireSteeringAngleMatrix();
-		tireBody->RestoreSleepState(savedSleepState);
-	}
-#endif
 
 	for (dList<ndMultiBodyVehicleDifferential*>::dNode* node = m_differentials.GetFirst(); node; node = node->GetNext())
 	{
