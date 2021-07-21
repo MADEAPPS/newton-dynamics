@@ -27,7 +27,6 @@
 class ndBodyKinematic;
 class ndSceneBodyNode;
 class ndSceneTreeNode;
-class ndSceneAggregate;
 
 D_MSV_NEWTON_ALIGN_32
 class ndSceneNode: public dClassAlloc
@@ -53,19 +52,7 @@ class ndSceneNode: public dClassAlloc
 	virtual ndSceneNode* GetAsSceneNode() { return this; }
 	virtual ndSceneBodyNode* GetAsSceneBodyNode() { return nullptr; }
 	virtual ndSceneTreeNode* GetAsSceneTreeNode() { return nullptr; }
-	virtual ndSceneAggregate* GetAsSceneAggregate() { return nullptr; }
 
-/*
-	virtual bool IsSegregatedRoot() const
-	{
-		return false;
-	}
-
-	virtual bool IsAggregate() const
-	{
-		return false;
-	}
-*/
 	virtual ndBodyKinematic* GetBody() const
 	{
 		return nullptr;

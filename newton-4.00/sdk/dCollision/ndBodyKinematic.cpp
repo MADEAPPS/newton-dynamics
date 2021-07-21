@@ -101,7 +101,6 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_islandParent(nullptr)
 	,m_sceneNode(nullptr)
 	,m_sceneBodyBodyNode(nullptr)
-	,m_sceneAggregateNode(nullptr)
 	,m_skeletonContainer(nullptr)
 	,m_maxAngleStep(dFloat32 (90.0f) * dDegreeToRad)
 	,m_maxLinearSpeed(dFloat32 (100.0f))
@@ -133,7 +132,6 @@ ndBodyKinematic::ndBodyKinematic(const nd::TiXmlNode* const xmlNode, const dTree
 	,m_islandParent(nullptr)
 	,m_sceneNode(nullptr)
 	,m_sceneBodyBodyNode(nullptr)
-	,m_sceneAggregateNode(nullptr)
 	,m_skeletonContainer(nullptr)
 	,m_weigh(dFloat32(0.0f))
 	,m_rank(0)
@@ -184,16 +182,6 @@ void ndBodyKinematic::SetCollisionShape(const ndShapeInstance& shapeInstance)
 	{
 		m_shapeInstance.GetShape()->GetAsShapeCompound()->SetSubShapeOwner(this);
 	}
-}
-
-ndSceneAggregate* ndBodyKinematic::GetSceneAggregate() const
-{
-	return m_sceneAggregateNode;
-}
-
-void ndBodyKinematic::SetSceneAggregate(ndSceneAggregate* const node)
-{
-	m_sceneAggregateNode = node;
 }
 
 void ndBodyKinematic::ReleaseMemory()

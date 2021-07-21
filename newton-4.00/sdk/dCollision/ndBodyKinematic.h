@@ -29,7 +29,6 @@
 
 class ndScene;
 class ndSceneBodyNode;
-class ndSceneAggregate;
 class ndSkeletonContainer;
 class ndJointBilateralConstraint;
 
@@ -171,10 +170,6 @@ class ndBodyKinematic: public ndBody
 
 	ndSceneBodyNode* GetSceneBodyNode() const;
 	void SetSceneBodyNode(ndSceneBodyNode* const node);
-
-	ndSceneAggregate* GetSceneAggregate() const;
-	void SetSceneAggregate(ndSceneAggregate* const node);
-
 	virtual void AddDampingAcceleration(dFloat32 timestep);
 	
 	dMatrix m_invWorldInertiaMatrix;
@@ -194,7 +189,6 @@ class ndBodyKinematic: public ndBody
 	ndBodyKinematic* m_islandParent;
 	ndBodyList::dNode* m_sceneNode;
 	ndSceneBodyNode* m_sceneBodyBodyNode;
-	ndSceneAggregate* m_sceneAggregateNode;
 	ndSkeletonContainer* m_skeletonContainer;
 
 	dFloat32 m_maxAngleStep;

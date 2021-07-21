@@ -625,24 +625,12 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndScen
 						leafArray[leafNodesCount] = leftNode;
 						leafNodesCount++;
 					}
-					else if (leftNode->GetAsSceneAggregate()) 
-					{
-						dAssert(0);
-						leafArray[leafNodesCount] = leftNode;
-						leafNodesCount++;
-					}
 
 					ndSceneNode* const rightNode = node->GetRight();
 					ndBodyKinematic* const rightBody = rightNode->GetBody();
 					if (rightBody) 
 					{
 						rightNode->SetAABB(rightBody->m_minAABB, rightBody->m_maxAABB);
-						leafArray[leafNodesCount] = rightNode;
-						leafNodesCount++;
-					}
-					else if (rightNode->GetAsSceneAggregate()) 
-					{
-						dAssert(0);
 						leafArray[leafNodesCount] = rightNode;
 						leafNodesCount++;
 					}
@@ -766,19 +754,9 @@ void ndScene::UpdateAabb(dInt32, ndBodyKinematic* const body)
 	dAssert(!bodyNode->GetRight());
 	dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
 
-	if (body->GetSceneAggregate()) 
-	{
-		dAssert(0);
-		//ndSceneAggregate* const aggregate = body1->GetSceneAggregate();
-		//dgScopeSpinPause lock(&aggregate->m_criticalSectionLock);
-		//aggregate->m_isInEquilibrium = body1->m_equilibrium;
-	}
-
 	const dInt32 test = dBoxInclusionTest(body->m_minAABB, body->m_maxAABB, bodyNode->m_minBox, bodyNode->m_maxBox);
 	if (!test) 
 	{
-		dAssert(!bodyNode->GetAsSceneAggregate());
-
 		body->m_broaphaseEquilibrium = 0;
 		bodyNode->SetAABB(body->m_minAABB, body->m_maxAABB);
 
@@ -789,27 +767,16 @@ void ndScene::UpdateAabb(dInt32, ndBodyKinematic* const body)
 			for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent) 
 			{
 				dScopeSpinLock lock(parent->m_lock);
-				if (!parent->GetAsSceneAggregate()) 
+				dVector minBox;
+				dVector maxBox;
+				dFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
+				if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox)) 
 				{
-					dVector minBox;
-					dVector maxBox;
-					dFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
-					if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox)) 
-					{
-						break;
-					}
-					parent->m_minBox = minBox;
-					parent->m_maxBox = maxBox;
-					parent->m_surfaceArea = area;
+					break;
 				}
-				else 
-				{
-					dAssert(0);
-					//ndSceneAggregate* const aggregate = parent->GetAsSceneAggregate();
-					//aggregate->m_minBox = aggregate->m_root->m_minBox;
-					//aggregate->m_maxBox = aggregate->m_root->m_maxBox;
-					//aggregate->m_surfaceArea = aggregate->m_root->m_surfaceArea;
-				}
+				parent->m_minBox = minBox;
+				parent->m_maxBox = maxBox;
+				parent->m_surfaceArea = area;
 			}
 		}
 	}
@@ -1176,29 +1143,6 @@ void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
 							}
 						}
 					}
-					else 
-					{
-						dAssert(0);
-						//dAssert(rootNode->GetAsSceneAggregate());
-						//ndSceneAggregate* const aggregate = (ndSceneAggregate*)rootNode;
-						//aggregate->SummitPairs(body0, timestep, threadID);
-					}
-				}
-				else 
-				{
-					//ndSceneAggregate* const aggregate = leafNode->GetAsSceneAggregate();
-					//dAssert(aggregate);
-					if (body1) 
-					{
-						dAssert(0);
-						//aggregate->SummitPairs(body1, timestep, threadID);
-					}
-					else 
-					{
-						dAssert(0);
-						dAssert(rootNode->GetAsSceneAggregate());
-						//aggregate->SummitPairs((ndSceneAggregate*)rootNode, timestep, threadID);
-					}
 				}
 			}
 			else 
@@ -1230,9 +1174,6 @@ bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKin
 	//
 	//dAssert(!body0->GetCollision()->IsType(dgCollision::dgCollisionnullptr_RTTI));
 	//dAssert(!body1->GetCollision()->IsType(dgCollision::dgCollisionnullptr_RTTI));
-	//
-	//const ndSceneAggregate* const agreggate0 = body0->GetSceneAggregate();
-	//const ndSceneAggregate* const agreggate1 = body1->GetSceneAggregate();
 	//
 	//bool tier1 = true;
 	//bool tier2 = !(body0->m_sleeping & body1->m_sleeping);
@@ -1496,20 +1437,12 @@ void ndScene::FindCollidinPairs(dInt32, ndBodyKinematic* const body, bool oneWay
 	ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
 	body->m_broaphaseEquilibrium = 1;
 
-	ndSceneAggregate* const aggregateNode = bodyNode->GetAsSceneAggregate();
-	if (aggregateNode)
-	{
-		dAssert(0);
-		//aggregateNode->SubmitSelfPairs(timestep, threadID);
-	}
-
 	if (oneWay)
 	{
 		for (ndSceneNode* ptr = bodyNode; ptr->m_parent; ptr = ptr->m_parent)
 		{
 			ndSceneTreeNode* const parent = ptr->m_parent->GetAsSceneTreeNode();
 			dAssert(!parent->GetAsSceneBodyNode());
-			dAssert(!parent->GetAsSceneAggregate());
 			ndSceneNode* const sibling = parent->m_right;
 			if (sibling != ptr)
 			{
@@ -1523,7 +1456,6 @@ void ndScene::FindCollidinPairs(dInt32, ndBodyKinematic* const body, bool oneWay
 		{
 			ndSceneTreeNode* const parent = ptr->m_parent->GetAsSceneTreeNode();
 			dAssert(!parent->GetAsSceneBodyNode());
-			dAssert(!parent->GetAsSceneAggregate());
 			ndSceneNode* const rightSibling = parent->m_right;
 			if (rightSibling != ptr)
 			{
@@ -1807,32 +1739,9 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 					}
 					if (callback.m_param < dFloat32 (1.0e-8f)) 
 					{
-						dAssert(0);
-					//	break;
+						break;
 					}
 				}
-			}
-			else if (((ndSceneNode*)me)->GetAsSceneAggregate())
-			{
-				dAssert(0);
-				//dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*)me;
-				//const dgBroadPhaseNode* const node = aggregate->m_root;
-				//if (node) {
-				//	dVector minBox(node->m_minBox - boxP1);
-				//	dVector maxBox(node->m_maxBox - boxP0);
-				//	dFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
-				//	if (dist1 < maxParam) {
-				//		dInt32 j = stack;
-				//		for (; j && (dist1 > stackDistance[j - 1]); j--) {
-				//			stackPool[j] = stackPool[j - 1];
-				//			stackDistance[j] = stackDistance[j - 1];
-				//		}
-				//		stackPool[j] = node;
-				//		stackDistance[j] = dist1;
-				//		stack++;
-				//		dAssert(stack < D_SCENE_MAX_STACK_DEPTH);
-				//	}
-				//}
 			}
 			else 
 			{
@@ -1914,27 +1823,6 @@ bool ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, 
 						break;
 					}
 				}
-			}
-			else if (((ndSceneNode*)me)->GetAsSceneAggregate())
-			{
-				dAssert(0);
-				//ndSceneAggregate* const aggregate = (ndSceneAggregate*)me;
-				//if (aggregate->m_root) {
-				//	const ndSceneNode* const child = aggregate->m_root;
-				//	dAssert(child);
-				//	dFloat32 dist1 = ray.BoxIntersect(child->m_minBox, child->m_maxBox);
-				//	if (dist1 < maxParam) {
-				//		dInt32 j = stack;
-				//		for (; j && (dist1 > stackDistance[j - 1]); j--) {
-				//			stackPool[j] = stackPool[j - 1];
-				//			stackDistance[j] = stackDistance[j - 1];
-				//		}
-				//		stackPool[j] = child;
-				//		stackDistance[j] = dist1;
-				//		stack++;
-				//		dAssert(stack < D_SCENE_MAX_STACK_DEPTH);
-				//	}
-				//}
 			}
 			else
 			{
@@ -2052,120 +1940,68 @@ void ndScene::RemoveNode(ndSceneNode* const node)
 {
 	if (node->m_parent)
 	{
-		if (!node->m_parent->GetAsSceneAggregate())
+		ndSceneTreeNode* const parent = (ndSceneTreeNode*)node->m_parent;
+		if (parent->m_parent)
 		{
-			ndSceneTreeNode* const parent = (ndSceneTreeNode*)node->m_parent;
-			if (parent->m_parent)
+			ndSceneTreeNode* const grandParent = (ndSceneTreeNode*)parent->m_parent;
+			if (grandParent->m_left == parent)
 			{
-				ndSceneAggregate* const aggregate = parent->m_parent->GetAsSceneAggregate();
-				if (aggregate)
+				if (parent->m_right == node)
 				{
-					dAssert(0);
-					#if 0
-					if (parent->m_left == node)
-					{
-						dAssert(parent->m_right);
-						aggregate->m_root = parent->m_right;
-						parent->m_right->m_parent = aggregate;
-						parent->m_right = nullptr;
-					}
-					else
-					{
-						dAssert(parent->m_right == node);
-						aggregate->m_root = parent->m_left;
-						parent->m_left->m_parent = aggregate;
-						parent->m_left = nullptr;
-					}
+					grandParent->m_left = parent->m_left;
+					parent->m_left->m_parent = grandParent;
+					parent->m_left = nullptr;
 					parent->m_parent = nullptr;
-					#endif
 				}
 				else
 				{
-					ndSceneTreeNode* const grandParent = (ndSceneTreeNode*)parent->m_parent;
-					if (grandParent->m_left == parent)
-					{
-						if (parent->m_right == node)
-						{
-							grandParent->m_left = parent->m_left;
-							parent->m_left->m_parent = grandParent;
-							parent->m_left = nullptr;
-							parent->m_parent = nullptr;
-						}
-						else
-						{
-							grandParent->m_left = parent->m_right;
-							parent->m_right->m_parent = grandParent;
-							parent->m_right = nullptr;
-							parent->m_parent = nullptr;
-						}
-					}
-					else
-					{
-						if (parent->m_right == node)
-						{
-							grandParent->m_right = parent->m_left;
-							parent->m_left->m_parent = grandParent;
-							parent->m_left = nullptr;
-							parent->m_parent = nullptr;
-						}
-						else
-						{
-							grandParent->m_right = parent->m_right;
-							parent->m_right->m_parent = grandParent;
-							parent->m_right = nullptr;
-							parent->m_parent = nullptr;
-						}
-					}
+					grandParent->m_left = parent->m_right;
+					parent->m_right->m_parent = grandParent;
+					parent->m_right = nullptr;
+					parent->m_parent = nullptr;
 				}
 			}
 			else
 			{
-				dAssert(!node->m_parent->GetAsSceneBodyNode());
-				ndSceneTreeNode* const parent1 = node->m_parent->GetAsSceneTreeNode();
-				if (parent1->m_right == node)
+				if (parent->m_right == node)
 				{
-					m_rootNode = parent1->m_left;
-					m_rootNode->m_parent = nullptr;
-					parent1->m_left = nullptr;
+					grandParent->m_right = parent->m_left;
+					parent->m_left->m_parent = grandParent;
+					parent->m_left = nullptr;
+					parent->m_parent = nullptr;
 				}
 				else
 				{
-					m_rootNode = parent1->m_right;
-					m_rootNode->m_parent = nullptr;
-					parent1->m_right = nullptr;
+					grandParent->m_right = parent->m_right;
+					parent->m_right->m_parent = grandParent;
+					parent->m_right = nullptr;
+					parent->m_parent = nullptr;
 				}
 			}
-
-			if (parent->m_fitnessNode)
-			{
-				ndBodyKinematic* const body = node->GetBody();
-				if (body && body->GetSceneAggregate())
-				{
-					dAssert(0);
-					//body->GetSceneAggregate()->m_fitnessList.Remove(parent->m_fitnessNode);
-					//body->SetSceneAggregate(nullptr);
-				}
-				else
-				{
-					m_fitness.RemoveNode(parent);
-				}
-			}
-			delete parent;
 		}
 		else
 		{
-			dAssert(0);
-			#if 0
-			ndSceneAggregate* const aggregate = (ndSceneAggregate*)node->m_parent;
-			dBody* const body = node->GetBody();
-			dAssert(body);
-			dAssert(body->GetSceneAggregate() == aggregate);
-			body->SetSceneAggregate(nullptr);
-			aggregate->m_root = nullptr;
-			node->m_parent = nullptr;
-			delete node;
-			#endif
+			dAssert(!node->m_parent->GetAsSceneBodyNode());
+			ndSceneTreeNode* const parent1 = node->m_parent->GetAsSceneTreeNode();
+			if (parent1->m_right == node)
+			{
+				m_rootNode = parent1->m_left;
+				m_rootNode->m_parent = nullptr;
+				parent1->m_left = nullptr;
+			}
+			else
+			{
+				m_rootNode = parent1->m_right;
+				m_rootNode->m_parent = nullptr;
+				parent1->m_right = nullptr;
+			}
 		}
+
+		if (parent->m_fitnessNode)
+		{
+			m_fitness.RemoveNode(parent);
+		}
+		delete parent;
 	}
 	else
 	{
