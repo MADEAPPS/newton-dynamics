@@ -121,7 +121,7 @@ void ndShapeHeightfield::CalculateAABB()
 	}
 
 	m_minBox = dVector(dFloat32(dFloat32(0.0f)), dFloat32 (y0) * m_verticalScale, dFloat32(0.0f), dFloat32(0.0f));
-	m_maxBox = dVector(dFloat32(m_width) * m_horizontalScale_x, dFloat32(y1) * m_verticalScale, dFloat32(m_height) * m_horizontalScale_z, dFloat32(0.0f));
+	m_maxBox = dVector(dFloat32(m_width-1) * m_horizontalScale_x, dFloat32(y1) * m_verticalScale, dFloat32(m_height-1) * m_horizontalScale_z, dFloat32(0.0f));
 
 	m_boxSize = (m_maxBox - m_minBox) * dVector::m_half;
 	m_boxOrigin = (m_maxBox + m_minBox) * dVector::m_half;
