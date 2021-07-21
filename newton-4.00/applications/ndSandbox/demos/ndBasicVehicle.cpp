@@ -684,15 +684,15 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	dMatrix sceneLocation(dGetIdentityMatrix());
 
 	//BuildFloorBox(scene, sceneLocation);
-	BuildFlatPlane(scene, true);
+	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildCompoundScene(scene, sceneLocation);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
-	//sceneLocation.m_posit.m_x = -200.0f;
-	//sceneLocation.m_posit.m_z = -200.0f;
-	//BuildHeightFieldTerrain(scene, sceneLocation);
+	sceneLocation.m_posit.m_x = -200.0f;
+	sceneLocation.m_posit.m_z = -200.0f;
+	BuildHeightFieldTerrain(scene, sceneLocation);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);

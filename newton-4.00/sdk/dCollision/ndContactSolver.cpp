@@ -450,7 +450,7 @@ D_INLINE dBigVector ndContactSolver::ReduceTriangle(dInt32& indexOut)
 
 	const dFloat64 det = a00 * a11 - a01 * a01;
 	dAssert(det >= dFloat32(0.0f));
-	if (dAbs(det) > dFloat32(1.0e-24f)) 
+	if (dAbs(det) > dFloat32(1.0e-16f)) 
 	{
 		const dFloat64 b0 = -e10.DotProduct(p0).GetScalar();
 		const dFloat64 b1 = -e20.DotProduct(p0).GetScalar();
@@ -478,6 +478,34 @@ D_INLINE dBigVector ndContactSolver::ReduceTriangle(dInt32& indexOut)
 		}
 		indexOut = 2;
 		return ReduceLine(indexOut);
+	}
+	else
+	{
+		dInt32 count = 3;
+		for (dInt32 i = 2; i >= 0; i--)
+		{
+			for (dInt32 j = i - 1; j >= 0; j--)
+			{
+				dVector dist(m_hullDiff[i] - m_hullDiff[j]);
+				dFloat32 mag2 = dist.DotProduct(dist).GetScalar();
+				if (mag2 < dFloat32(1.0e-12f))
+				{
+					count--;
+					m_hullSum[j] = m_hullSum[count];
+					m_hullDiff[j] = m_hullDiff[count];
+					break;
+				}
+			}
+		}
+		if (count == 2)
+		{
+			return ReduceLine(indexOut);
+		}
+		else if (count == 1)
+		{
+			indexOut = 1;
+			return m_hullDiff[0];
+		}
 	}
 	// this is a degenerated triangle. this should never happens
 	dAssert(0);
@@ -3483,8 +3511,6 @@ dInt32 ndContactSolver::ConvexToConvexContactsContinue()
 	dInt32 count = 0;
 	dFloat32 tacc = dFloat32(0.0f);
 	dFloat32 timestep = m_timestep;
-	//m_contact->m_separationDistance = dFloat32(1.0e10f);
-	//m_separationDistance = dFloat32(1.0e10f);
 	do
 	{
 		bool state = CalculateClosestPoints();
@@ -3762,15 +3788,11 @@ dInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDes
 		polySoupGlobalAligmentMatrix[3]);
 	polySoupScaledMatrix = polySoupScaledMatrix * polySoupGlobalMatrix;
 
-	//dAssert(m_contact);
-	//dVector separatingVector(m_instance0.m_globalMatrix.m_up);
-
 	const dInt32 stride = polygon.m_stride;
 	const dFloat32* const vertex = polygon.m_vertex;
 	dAssert(m_instance1.m_scaleType == ndShapeInstance::m_unit);
 
 	ndContactPoint* const contactOut = m_contactBuffer;
-	//ndContact* const contactJoint = m_contact;
 	dInt32* const indexArray = (dInt32*)data.m_faceVertexIndex;
 	data.SortFaceArray();
 
