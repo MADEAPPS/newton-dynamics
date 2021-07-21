@@ -47,14 +47,13 @@ void ndVehicleDectriptor::ndEngineTorqueCurve::Init(
 	power = horsePower * 746.0f;
 	omegaInRadPerSec = rpm1 * 0.105f;
 	torqueInPoundFood = (power / omegaInRadPerSec) / 1.36f;
-	m_torqueCurve[3] = ndTorqueTap(rpm0, torqueInPoundFood);
+	m_torqueCurve[3] = ndTorqueTap(rpm1, torqueInPoundFood);
 	
 	power = horsePowerAtRedLine * 746.0f;
 	omegaInRadPerSec = redLineRpm * 0.105f;
 	torqueInPoundFood = (power / omegaInRadPerSec) / 1.36f;
 	m_torqueCurve[4] = ndTorqueTap(redLineRpm, torqueInPoundFood);
 }
-
 
 dFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetFuelRate() const
 {
@@ -125,10 +124,16 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_transmission.m_neutral = 0.0f;
 	m_transmission.m_crownGearRatio = 10.0f;
 	m_transmission.m_reverseRatio = -3.0f;
-	m_transmission.m_fowardRatios[0] = 2.25f;
-	m_transmission.m_fowardRatios[1] = 1.60f;
+	//m_transmission.m_fowardRatios[0] = 2.25f;
+	//m_transmission.m_fowardRatios[1] = 1.60f;
+	//m_transmission.m_fowardRatios[2] = 1.10f;
+	//m_transmission.m_fowardRatios[3] = 0.80f;
+
+	m_transmission.m_fowardRatios[0] = 3.0f;
+	m_transmission.m_fowardRatios[1] = 1.50f;
 	m_transmission.m_fowardRatios[2] = 1.10f;
 	m_transmission.m_fowardRatios[3] = 0.80f;
+
 	m_transmission.m_torqueConverter = 2000.0f;
 	m_transmission.m_idleClutchTorque = 200.0f;
 	m_transmission.m_lockedClutchTorque = 1.0e6f;
