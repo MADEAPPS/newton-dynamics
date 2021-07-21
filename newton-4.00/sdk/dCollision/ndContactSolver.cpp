@@ -482,7 +482,7 @@ D_INLINE dBigVector ndContactSolver::ReduceTriangle(dInt32& indexOut)
 	else
 	{
 		dInt32 count = 3;
-		for (dInt32 i = 2; i >= 0; i--)
+		for (dInt32 i = 2; i > 0; i--)
 		{
 			for (dInt32 j = i - 1; j >= 0; j--)
 			{
