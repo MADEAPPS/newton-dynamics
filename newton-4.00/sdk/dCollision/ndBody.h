@@ -86,8 +86,8 @@ class ndBody: public dClassAlloc
 	dVector m_omega;
 	dVector m_localCentreOfMass;
 	dVector m_globalCentreOfMass;
-	dVector m_minAABB;
-	dVector m_maxAABB;
+	dVector m_minAabb;
+	dVector m_maxAabb;
 	dQuaternion m_rotation;
 	ndBodyNotify* m_notifyCallback;
 
@@ -110,7 +110,7 @@ class ndBody: public dClassAlloc
 			dUnsigned32 m_bodyIsConstrained : 1;
 			dUnsigned32 m_equilibriumOverride : 1;
 			dUnsigned32 m_broaphaseEquilibrium : 1;
-			dUnsigned32 m_collideWithLinkedBodies : 1;
+			//dUnsigned32 m_collideWithLinkedBodies : 1;
 		};
 	};
 
@@ -145,8 +145,8 @@ inline dVector ndBody::GetOmega() const
 
 inline void ndBody::GetAABB(dVector& p0, dVector& p1) const
 {
-	p0 = m_minAABB;
-	p1 = m_maxAABB;
+	p0 = m_minAabb;
+	p1 = m_maxAabb;
 }
 
 inline const dVector& ndBody::GetCentreOfMass() const

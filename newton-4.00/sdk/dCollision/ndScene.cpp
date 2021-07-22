@@ -621,7 +621,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndScen
 					ndBodyKinematic* const leftBody = leftNode->GetBody();
 					if (leftBody) 
 					{
-						node->SetAabb(leftBody->m_minAABB, leftBody->m_maxAABB);
+						node->SetAabb(leftBody->m_minAabb, leftBody->m_maxAabb);
 						leafArray[leafNodesCount] = leftNode;
 						leafNodesCount++;
 					}
@@ -630,7 +630,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndScen
 					ndBodyKinematic* const rightBody = rightNode->GetBody();
 					if (rightBody) 
 					{
-						rightNode->SetAabb(rightBody->m_minAABB, rightBody->m_maxAABB);
+						rightNode->SetAabb(rightBody->m_minAabb, rightBody->m_maxAabb);
 						leafArray[leafNodesCount] = rightNode;
 						leafNodesCount++;
 					}
@@ -754,11 +754,11 @@ void ndScene::UpdateAabb(dInt32, ndBodyKinematic* const body)
 	dAssert(!bodyNode->GetRight());
 	dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
 
-	const dInt32 test = dBoxInclusionTest(body->m_minAABB, body->m_maxAABB, bodyNode->m_minBox, bodyNode->m_maxBox);
+	const dInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
 	if (!test) 
 	{
 		body->m_broaphaseEquilibrium = 0;
-		bodyNode->SetAabb(body->m_minAABB, body->m_maxAABB);
+		bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
 
 		if (!m_rootNode->GetAsSceneBodyNode()) 
 		{
@@ -820,13 +820,13 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 	
 	dAssert(body0->GetScene() == this);
 	dAssert(body1->GetScene() == this);
-	if (!(body0->m_collideWithLinkedBodies & body1->m_collideWithLinkedBodies)) 
-	{
-		dAssert(0);
-	//	if (world->AreBodyConnectedByJoints(body0, body1)) {
-	//		return;
-	//	}
-	}
+	//if (!(body0->m_collideWithLinkedBodies & body1->m_collideWithLinkedBodies)) 
+	//{
+	//	dAssert(0);
+	////	if (world->AreBodyConnectedByJoints(body0, body1)) {
+	////		return;
+	////	}
+	//}
 
 	dAssert(m_contactNotifyCallback);
 	bool processContacts = m_contactNotifyCallback->OnAabbOverlap(contact, m_timestep);
@@ -1110,14 +1110,14 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 
 void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
 {
+	ndBodyKinematic* const body0 = leafNode->GetBody() ? leafNode->GetBody() : nullptr;
+	const dVector boxP0(body0 ? body0->m_minAabb : leafNode->m_minBox);
+	const dVector boxP1(body0 ? body0->m_maxAabb : leafNode->m_maxBox);
+	const bool test0 = body0 ? (body0->m_invMass.m_w != dFloat32(0.0f)) : true;
+
+	dInt32 stack = 1;
 	ndSceneNode* pool[D_SCENE_MAX_STACK_DEPTH];
 	pool[0] = node;
-	dInt32 stack = 1;
-	
-	ndBodyKinematic* const body0 = leafNode->GetBody() ? leafNode->GetBody() : nullptr;
-	const dVector boxP0(body0 ? body0->m_minAABB : leafNode->m_minBox);
-	const dVector boxP1(body0 ? body0->m_maxAABB : leafNode->m_maxBox);
-	const bool test0 = body0 ? (body0->m_invMass.m_w != dFloat32(0.0f)) : true;
 
 	while (stack) 
 	{
@@ -1207,17 +1207,17 @@ bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKin
 	//			ret = (distance < dFloat32(1.0f));
 	//		}
 	//		else {
-	//			ret = dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? 1 : 0;
+	//			ret = dgOverlapTest(body0->m_minAabb, body0->m_maxAabb, body1->m_minAabb, body1->m_maxAabb) ? 1 : 0;
 	//		}
 	//	}
 	//	else {
-	//		ret = dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? 1 : 0;
+	//		ret = dgOverlapTest(body0->m_minAabb, body0->m_maxAabb, body1->m_minAabb, body1->m_maxAabb) ? 1 : 0;
 	//	}
 	//}
 	//return ret;
 
 	bool test = body0->GetCollisionShape().GetCollisionMode() & body1->GetCollisionShape().GetCollisionMode();
-	return test && dOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
+	return test && dOverlapTest(body0->m_minAabb, body0->m_maxAabb, body1->m_minAabb, body1->m_maxAabb) ? true : false;
 }
 
 ndJointBilateralConstraint* ndScene::FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const
@@ -1504,7 +1504,6 @@ void ndScene::FindCollidingPairs()
 			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{
 				ndBodyKinematic* const body = bodyArray[i];
-				//if (!body->m_equilibrium)
 				if (!body->m_broaphaseEquilibrium)
 				{
 					m_owner->FindCollidinPairs(threadIndex, body, false);

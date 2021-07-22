@@ -72,6 +72,7 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	dVector GetTorqueBody1() const;
 
 	bool IsCollidable() const;
+	void SetCollidable(bool state);
 	void SetSkeletonFlag(bool flag);
 	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const;
 	dFloat32 GetMotorZeroAcceleration(ndConstraintDescritor& desc) const;
@@ -238,6 +239,11 @@ inline void ndJointBilateralConstraint::SetSkeletonFlag(bool flag)
 inline bool ndJointBilateralConstraint::IsCollidable() const
 {
 	return m_enableCollision ? true : false;
+}
+
+inline void ndJointBilateralConstraint::SetCollidable(bool state)
+{
+	m_enableCollision = state ? 1 : 0;
 }
 
 inline dVector ndJointBilateralConstraint::GetForceBody0() const

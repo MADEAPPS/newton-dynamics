@@ -35,7 +35,7 @@ ndSceneBodyNode::ndSceneBodyNode(ndBodyKinematic* const body)
 	:ndSceneNode(nullptr)
 	,m_body(body)
 {
-	SetAabb(body->m_minAABB, body->m_maxAABB);
+	SetAabb(body->m_minAabb, body->m_maxAabb);
 	m_body->SetSceneBodyNode(this);
 }
 

@@ -33,8 +33,8 @@ ndBody::ndBody()
 	,m_omega(dVector::m_zero)
 	,m_localCentreOfMass(dVector::m_wOne)
 	,m_globalCentreOfMass(dVector::m_wOne)
-	,m_minAABB(dVector::m_wOne)
-	,m_maxAABB(dVector::m_wOne)
+	,m_minAabb(dVector::m_wOne)
+	,m_maxAabb(dVector::m_wOne)
 	,m_rotation()
 	,m_notifyCallback(nullptr)
 	,m_flags(0)
@@ -42,7 +42,7 @@ ndBody::ndBody()
 {
 	m_autoSleep = 1;
 	m_transformIsDirty = 1;
-	m_collideWithLinkedBodies = 1;
+	//m_collideWithLinkedBodies = 1;
 	m_uniqueIdCount++;
 }
 
@@ -52,8 +52,8 @@ ndBody::ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, d
 	,m_omega(dVector::m_zero)
 	,m_localCentreOfMass(dVector::m_wOne)
 	,m_globalCentreOfMass(dVector::m_wOne)
-	,m_minAABB(dVector::m_wOne)
-	,m_maxAABB(dVector::m_wOne)
+	,m_minAabb(dVector::m_wOne)
+	,m_maxAabb(dVector::m_wOne)
 	,m_rotation()
 	,m_notifyCallback(nullptr)
 	,m_flags(0)
@@ -67,8 +67,7 @@ ndBody::ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, d
 	m_omega = xmlGetVector3(xmlNode, "omega");
 	m_localCentreOfMass = xmlGetVector3(xmlNode, "centreOfMass");
 	m_autoSleep = xmlGetInt(xmlNode, "autoSleep") ? 1 : 0;
-	//m_gyroTorqueOn = xmlGetInt(xmlNode, "useGyroTorque") ? 1 : 0;
-	m_collideWithLinkedBodies = xmlGetInt(xmlNode, "collideWithLinkedBodies") ? 1 : 0;
+	//m_collideWithLinkedBodies = xmlGetInt(xmlNode, "collideWithLinkedBodies") ? 1 : 0;
 
 	SetMatrix(matrix);
 	const nd::TiXmlNode* const notifyNode = xmlNode->FirstChild("ndBodyNotify");
@@ -165,8 +164,7 @@ void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath,
 	xmlSaveParam(paramNode, "omega", m_omega);
 	xmlSaveParam(paramNode, "centreOfMass", m_localCentreOfMass);
 	xmlSaveParam(paramNode, "autoSleep", m_autoSleep ? 1 : 0);
-	//xmlSaveParam(paramNode, "useGyroTorque", m_gyroTorqueOn ? 1 : 0);
-	xmlSaveParam(paramNode, "collideWithLinkedBodies", m_collideWithLinkedBodies ? 1 : 0);
+	//xmlSaveParam(paramNode, "collideWithLinkedBodies", m_collideWithLinkedBodies ? 1 : 0);
 
 	if (m_notifyCallback)
 	{

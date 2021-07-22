@@ -300,7 +300,7 @@ bool ndBodyKinematic::RayCast(ndRayCastNotify& callback, const dFastRayTest& ray
 	dVector l1(ray.m_p0 + ray.m_diff.Scale(dMin(maxT, dFloat32(1.0f))));
 
 	bool state = false;
-	if (dRayBoxClip(l0, l1, m_minAABB, m_maxAABB))
+	if (dRayBoxClip(l0, l1, m_minAabb, m_maxAabb))
 	{
 		const dMatrix& globalMatrix = m_shapeInstance.GetGlobalMatrix();
 		dVector localP0(globalMatrix.UntransformVector(l0) & dVector::m_triplexMask);
@@ -339,7 +339,7 @@ void ndBodyKinematic::UpdateCollisionMatrix()
 {
 	m_transformIsDirty = 1;
 	m_shapeInstance.SetGlobalMatrix(m_shapeInstance.GetLocalMatrix() * m_matrix);
-	m_shapeInstance.CalculateAabb(m_shapeInstance.GetGlobalMatrix(), m_minAABB, m_maxAABB);
+	m_shapeInstance.CalculateAabb(m_shapeInstance.GetGlobalMatrix(), m_minAabb, m_maxAabb);
 }
 
 dMatrix ndBodyKinematic::CalculateInvInertiaMatrix() const
