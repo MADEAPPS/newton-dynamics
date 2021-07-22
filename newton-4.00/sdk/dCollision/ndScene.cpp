@@ -887,31 +887,15 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 	contact->m_positAcc = dVector::m_zero;
 	contact->m_rotationAcc = dQuaternion();
 
-//	PopulateContacts(pair, threadIndex);
-
 	ndBodyKinematic* const body0 = contact->m_body0;
 	ndBodyKinematic* const body1 = contact->m_body1;
 	dAssert(body0);
 	dAssert(body1);
 	dAssert(body0 != body1);
 
-	//ndMaterial material(m_contactNotifyCallback->GetMaterial(contact, body0->GetCollisionShape(), body1->GetCollisionShape()));
 	contact->m_material = m_contactNotifyCallback->GetMaterial(contact, body0->GetCollisionShape(), body1->GetCollisionShape());
 	const ndContactPoint* const contactArray = contactSolver->m_contactBuffer;
 	
-	//if (material->m_flags & ndContactMaterial::m_resetSkeletonSelfCollision) {
-	//	contact->ResetSkeletonSelftCollision();
-	//}
-	//
-	//if (material->m_flags & ndContactMaterial::m_resetSkeletonIntraCollision) {
-	//	contact->ResetSkeletonIntraCollision();
-	//}
-	//
-	//dInt32 contactCount = pair->m_contactCount;
-	//dList<ndContactMaterial>& list = *contact;
-	//
-	//contact->m_timeOfImpact = pair->m_timestep;
-
 	dInt32 count = 0;
 	dVector cachePosition[D_MAX_CONTATCS];
 	ndContactPointList::dNode* nodes[D_MAX_CONTATCS];
@@ -1014,15 +998,6 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		contactPoint->m_shapeInstance1 = contactArray[i].m_shapeInstance1;
 		contactPoint->m_shapeId0 = contactArray[i].m_shapeId0;
 		contactPoint->m_shapeId1 = contactArray[i].m_shapeId1;
-
-		//contactPoint->m_softness = material->m_softness;
-		//contactPoint->m_skinThickness = material->m_skinThickness;
-		//contactPoint->m_staticFriction0 = material->m_staticFriction0;
-		//contactPoint->m_staticFriction1 = material->m_staticFriction1;
-		//contactPoint->m_dynamicFriction0 = material->m_dynamicFriction0;
-		//contactPoint->m_dynamicFriction1 = material->m_dynamicFriction1;
-		//contactPoint->m_flags = ndContactMaterial::m_collisionEnable | (material->m_flags & (ndContactMaterial::m_friction0Enable | ndContactMaterial::m_friction1Enable));
-		//contactPoint->m_userData = material->m_userData;
 		contactPoint->m_material = contact->m_material;
 	
 		if (staticMotion) 
@@ -1069,7 +1044,6 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 			if (diff > dFloat32(1.0e-2f)) 
 			{
 				dAssert(tangentDir.m_w == dFloat32(0.0f));
-				//contactPoint->m_dir0 = tangentDir.Scale (dgRsqrt (diff));
 				contactPoint->m_dir0 = tangentDir.Normalize();
 			}
 			else 
