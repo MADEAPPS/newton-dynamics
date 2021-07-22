@@ -141,7 +141,7 @@ void RenderWorldScene(ndDemoEntityManager* const scene)
 		{
 			dVector p0;
 			dVector p1;
-			node->GetAABB(p0, p1);
+			node->GetAabb(p0, p1);
 			DrawBox(p0, p1, m_box);
 		}
 

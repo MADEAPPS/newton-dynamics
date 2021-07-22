@@ -621,7 +621,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndScen
 					ndBodyKinematic* const leftBody = leftNode->GetBody();
 					if (leftBody) 
 					{
-						node->SetAABB(leftBody->m_minAABB, leftBody->m_maxAABB);
+						node->SetAabb(leftBody->m_minAABB, leftBody->m_maxAABB);
 						leafArray[leafNodesCount] = leftNode;
 						leafNodesCount++;
 					}
@@ -630,7 +630,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndScen
 					ndBodyKinematic* const rightBody = rightNode->GetBody();
 					if (rightBody) 
 					{
-						rightNode->SetAABB(rightBody->m_minAABB, rightBody->m_maxAABB);
+						rightNode->SetAabb(rightBody->m_minAABB, rightBody->m_maxAABB);
 						leafArray[leafNodesCount] = rightNode;
 						leafNodesCount++;
 					}
@@ -673,7 +673,7 @@ ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBo
 		parent->m_parent = nullptr;
 		*nextNode = (*nextNode)->GetNext();
 
-		parent->SetAABB(info.m_p0, info.m_p1);
+		parent->SetAabb(info.m_p0, info.m_p1);
 
 		parent->m_left = BuildTopDown(leafArray, firstBox, firstBox + info.m_axis - 1, nextNode);
 		parent->m_left->m_parent = parent;
@@ -726,7 +726,7 @@ ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firs
 
 		dVector minP(parent->m_left->m_minBox.GetMin(parent->m_right->m_minBox));
 		dVector maxP(parent->m_left->m_maxBox.GetMax(parent->m_right->m_maxBox));
-		parent->SetAABB(minP, maxP);
+		parent->SetAabb(minP, maxP);
 
 		return parent;
 	}
@@ -758,7 +758,7 @@ void ndScene::UpdateAabb(dInt32, ndBodyKinematic* const body)
 	if (!test) 
 	{
 		body->m_broaphaseEquilibrium = 0;
-		bodyNode->SetAABB(body->m_minAABB, body->m_maxAABB);
+		bodyNode->SetAabb(body->m_minAABB, body->m_maxAABB);
 
 		if (!m_rootNode->GetAsSceneBodyNode()) 
 		{

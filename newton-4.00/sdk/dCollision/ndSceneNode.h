@@ -46,8 +46,8 @@ class ndSceneNode: public dClassAlloc
 	{
 	}
 
-	void GetAABB(dVector& minBox, dVector& maxBox) const;
-	void SetAABB(const dVector& minBox, const dVector& maxBox);
+	void GetAabb(dVector& minBox, dVector& maxBox) const;
+	void SetAabb(const dVector& minBox, const dVector& maxBox);
 
 	virtual ndSceneNode* GetAsSceneNode() { return this; }
 	virtual ndSceneBodyNode* GetAsSceneBodyNode() { return nullptr; }
@@ -119,13 +119,13 @@ class ndSceneTreeNode: public ndSceneNode
 } D_GCC_NEWTON_ALIGN_32;
 
 
-inline void ndSceneNode::GetAABB(dVector& minBox, dVector& maxBox) const
+inline void ndSceneNode::GetAabb(dVector& minBox, dVector& maxBox) const
 {
 	minBox = m_minBox;
 	maxBox = m_maxBox;
 }
 
-inline void ndSceneNode::SetAABB(const dVector& minBox, const dVector& maxBox)
+inline void ndSceneNode::SetAabb(const dVector& minBox, const dVector& maxBox)
 {
 	dAssert(minBox.m_x <= maxBox.m_x);
 	dAssert(minBox.m_y <= maxBox.m_y);
