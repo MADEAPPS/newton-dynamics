@@ -866,7 +866,7 @@ void ndWorld::PostModelTransform()
 			while (node)
 			{
 				ndModel* const model = node->GetInfo();
-				model->PostTrasnsformUpdate(world, timestep);
+				model->PostTransformUpdate(world, timestep);
 
 				for (dInt32 i = 0; i < threadCount; i++)
 				{

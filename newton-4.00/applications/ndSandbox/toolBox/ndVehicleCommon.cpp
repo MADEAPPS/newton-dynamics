@@ -120,6 +120,7 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 	m_chassisMass = 1000.0f;
+	m_chassisAngularDrag = 0.25f;
 	m_transmission.m_gearsCount = 4;
 	m_transmission.m_neutral = 0.0f;
 	m_transmission.m_crownGearRatio = 10.0f;

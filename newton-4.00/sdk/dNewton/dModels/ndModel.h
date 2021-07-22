@@ -45,7 +45,7 @@ class ndModel: public dClassAlloc
 	protected:
 	virtual void Update(ndWorld* const world, dFloat32 timestep);
 	virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
-	virtual void PostTrasnsformUpdate(ndWorld* const world, dFloat32 timestep);
+	virtual void PostTransformUpdate(ndWorld* const world, dFloat32 timestep);
 
 	ndModelList::dNode* m_node;
 
@@ -85,7 +85,7 @@ inline void ndModel::PostUpdate(ndWorld* const, dFloat32)
 {
 }
 
-inline void ndModel::PostTrasnsformUpdate(ndWorld* const, dFloat32)
+inline void ndModel::PostTransformUpdate(ndWorld* const, dFloat32)
 {
 }
 

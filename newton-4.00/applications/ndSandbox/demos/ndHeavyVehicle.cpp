@@ -11,8 +11,8 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndSkyBox.h"
-
 #include "ndDemoMesh.h"
+#include "ndVehicleUI.h"
 #include "ndDemoCamera.h"
 #include "ndLoadFbxMesh.h"
 #include "ndSoundManager.h"
@@ -51,6 +51,7 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 		:ndVehicleDectriptor("lav_25.fbx")
 	{
 		m_chassisMass = 2000.0f;
+		m_chassisAngularDrag = 0.25f;
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
 
 		m_useHardSolverMode = false;
@@ -108,6 +109,7 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 	{
 		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
 		m_chassisMass = 2000.0f;
+		m_chassisAngularDrag = 0.25f;
 
 		m_useHardSolverMode = false;
 
@@ -175,13 +177,18 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		,m_turretAngle0(0.0f)
 		,m_cannonAngle(0.0f)
 		,m_cannonAngle0(0.0f)
+		,m_vehicleUI(nullptr)
 	{
+		m_vehicleUI = new ndVehicleUI();
+		m_vehicleUI->CreateBufferUI();
+
 		ndDemoEntity* const vehicleEntity = LoadMeshModel(scene, desc.m_name);
 
 		vehicleEntity->ResetMatrix(vehicleEntity->CalculateGlobalMatrix() * matrix);
 
 		// create the vehicle chassis as a normal rigid body
 		ndBodyDynamic* const chassis = CreateChassis(scene, vehicleEntity, m_configuration.m_chassisMass);
+		chassis->SetAngularDamping(dVector(m_configuration.m_chassisAngularDrag));
 
 		// lower vehicle com;
 		dVector com(chassis->GetCentreOfMass());
@@ -196,6 +203,11 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 	~ndHeavyMultiBodyVehicle()
 	{
+		if (m_vehicleUI)
+		{
+			delete m_vehicleUI;
+		}
+
 		ReleaseTexture(m_gears);
 		ReleaseTexture(m_odometer);
 		ReleaseTexture(m_redNeedle);
@@ -355,76 +367,6 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		camera->SetNextMatrix(camMatrix, camOrigin);
 	}
 
-	void DrawGage(GLuint gage, GLuint needle, dFloat32 param, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size, dFloat32 minAngle, dFloat32 maxAngle) const
-	{
-		dMatrix origin(dGetIdentityMatrix());
-		origin[1][1] = -1.0f;
-		origin.m_posit = dVector(origin_x, origin_y, 0.0f, 1.0f);
-
-		size *= 0.5f;
-
-		// render dial
-		glPushMatrix();
-		glMultMatrix(&origin[0][0]);
-		glBindTexture(GL_TEXTURE_2D, gage);
-		glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(0.0f, 1.0f); glVertex3f(GLfloat(-size), GLfloat(size), 0.0f);
-		glTexCoord2f(0.0f, 0.0f); glVertex3f(GLfloat(-size), GLfloat(-size), 0.0f);
-		glTexCoord2f(1.0f, 1.0f); glVertex3f(GLfloat(size), GLfloat(size), 0.0f);
-		glTexCoord2f(1.0f, 0.0f); glVertex3f(GLfloat(size), GLfloat(-size), 0.0f);
-		glEnd();
-
-		// render needle
-		minAngle *= -dDegreeToRad;
-		maxAngle *= -dDegreeToRad;
-		//param = 1.0f;
-		dFloat32 angle = minAngle + (maxAngle - minAngle) * param;
-		dMatrix needleMatrix(dRollMatrix(angle));
-
-		dFloat32 x = size * 0.7f;
-		dFloat32 y = size * 0.7f;
-
-		glPushMatrix();
-		glMultMatrix(&needleMatrix[0][0]);
-		glBindTexture(GL_TEXTURE_2D, needle);
-		glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(0.0f, 1.0f); glVertex3f(GLfloat(-x), GLfloat(y), 0.0f);
-		glTexCoord2f(0.0f, 0.0f); glVertex3f(GLfloat(-x), GLfloat(-y), 0.0f);
-		glTexCoord2f(1.0f, 1.0f); glVertex3f(GLfloat(x), GLfloat(y), 0.0f);
-		glTexCoord2f(1.0f, 0.0f); glVertex3f(GLfloat(x), GLfloat(-y), 0.0f);
-		glEnd();
-
-		glPopMatrix();
-		glPopMatrix();
-	}
-
-	void DrawGear(dInt32 gear, dFloat32 origin_x, dFloat32 origin_y, dFloat32 size) const
-	{
-		dMatrix origin(dGetIdentityMatrix());
-		origin[1][1] = -1.0f;
-		origin.m_posit = dVector(origin_x + size * 0.3f, origin_y - size * 0.25f, 0.0f, 1.0f);
-
-		glPushMatrix();
-		glMultMatrix(&origin[0][0]);
-
-		dFloat32 uwith = 0.1f;
-		dFloat32 u0 = uwith * gear;
-		dFloat32 u1 = u0 + uwith;
-
-		dFloat32 x1 = 10.0f;
-		dFloat32 y1 = 10.0f;
-		glColor4f(1, 1, 0, 1);
-		glBindTexture(GL_TEXTURE_2D, m_gears);
-		glBegin(GL_TRIANGLE_STRIP);
-		glTexCoord2f(GLfloat(u0), 1.0f); glVertex3f(GLfloat(-x1), GLfloat(y1), 0.0f);
-		glTexCoord2f(GLfloat(u0), 0.0f); glVertex3f(GLfloat(-x1), GLfloat(-y1), 0.0f);
-		glTexCoord2f(GLfloat(u1), 1.0f); glVertex3f(GLfloat(x1), GLfloat(y1), 0.0f);
-		glTexCoord2f(GLfloat(u1), 0.0f); glVertex3f(GLfloat(x1), GLfloat(-y1), 0.0f);
-		glEnd();
-
-		glPopMatrix();
-	}
-
 	void RenderHelp(ndDemoEntityManager* const scene)
 	{
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
@@ -460,25 +402,36 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 			// draw the tachometer
 			dFloat32 x = gageSize / 2 + 20.0f;
-			dFloat32 maxRpm = 9000.0f;
-			dFloat32 rpm = motor->GetRpm() / maxRpm;
+			dFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm;
+			maxRpm += 500.0f;
+			//printf("%.3f \n", m_configuration.m_transmission.m_fowardRatios[m_currentGear]);
+			//dFloat32 rpm = (motor->GetRpm() / maxRpm) * m_configuration.m_transmission.m_fowardRatios[m_currentGear]; 
+			dFloat32 rpm = (motor->GetRpm() / maxRpm) * 2.85f;
 
-			DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 90.0f);
-
-			// draw the odometer
-			x += gageSize;
-			dFloat32 speed = GetSpeed() / 100.0f;
-			DrawGage(m_odometer, m_greenNeedle, dAbs(speed), x, y, gageSize, -180.0f, 90.0f);
-
-			// draw the current gear
-			DrawGear(m_gearMap[m_currentGear], x, y + 98, gageSize);
-
-			// glBegin/glEnd is not supported after 3.1 but still supported 
-			// by some drivers while going and error.
-			// for now I will simply clear open gl error stack, 
-			for (GLenum err = glGetError(); err != GL_NO_ERROR; err = glGetError())
+			if (m_vehicleUI)
 			{
-				//dTrace(("****** opengl error 0x%x\n", err));
+				if (m_vehicleUI->m_shaderHandle)
+				{
+					glUseProgram(m_vehicleUI->m_shaderHandle);
+					//
+					glActiveTexture(GL_TEXTURE0);
+					//
+					m_vehicleUI->RenderGageUI(scene, m_tachometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
+
+					dFloat32 s = gageSize * 0.7f;
+					m_vehicleUI->RenderGageUI(scene, m_redNeedle, -x, -y, s * 0.5f, rpm, -0.0f, 90.0f);
+
+					x += gageSize;
+					m_vehicleUI->RenderGageUI(scene, m_odometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
+
+					dFloat32 speed = (GetSpeed() / 100.0f) * 2.85f;
+					m_vehicleUI->RenderGageUI(scene, m_greenNeedle, -x, -y, s * 0.5f, dAbs(speed), -0.0f, 90.0f);
+
+					// draw the current gear
+					m_vehicleUI->RenderGearUI(scene, m_gearMap[m_currentGear], m_gears, -x, -y, gageSize);
+
+					glUseProgram(0);
+				}
 			}
 		}
 	}
@@ -497,6 +450,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 	dFloat32 m_turretAngle0;
 	dFloat32 m_cannonAngle;
 	dFloat32 m_cannonAngle0;
+	ndVehicleUI* m_vehicleUI;
 };
 
 class ndLav25Vehicle : public ndHeavyMultiBodyVehicle

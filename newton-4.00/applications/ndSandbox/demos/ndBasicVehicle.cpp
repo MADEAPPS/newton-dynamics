@@ -184,6 +184,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 		// create the vehicle chassis as a normal rigid body
 		ndBodyDynamic* const chassis = CreateChassis(scene, vehicleEntity, m_configuration.m_chassisMass);
+		chassis->SetAngularDamping(dVector(m_configuration.m_chassisAngularDrag));
 
 		// lower vehicle com;
 		dVector com(chassis->GetCentreOfMass());
@@ -536,7 +537,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 					dFloat32 s = gageSize * 0.7f;
 					m_vehicleUI->RenderGageUI(scene, m_redNeedle, -x, -y, s * 0.5f, rpm, -0.0f, 90.0f);
-					//
+					
 					x += gageSize;
 					m_vehicleUI->RenderGageUI(scene, m_odometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
 
@@ -630,7 +631,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		}
 	}
 
-	void PostTrasnsformUpdate(ndWorld* const, dFloat32)
+	void PostTransformUpdate(ndWorld* const, dFloat32)
 	{
 		// play body part animations
 		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)m_chassis->GetNotifyCallback();

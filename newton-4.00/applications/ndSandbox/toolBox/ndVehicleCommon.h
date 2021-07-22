@@ -117,6 +117,7 @@ class ndVehicleDectriptor
 	char m_name[32];
 
 	dFloat32 m_chassisMass;
+	dFloat32 m_chassisAngularDrag;
 	ndEngineTorqueCurve m_engine;
 	ndGearBox m_transmission;
 	ndTireDefinition m_frontTire;
