@@ -1491,7 +1491,7 @@ void ndScene::FindCollidingPairs()
 	for (dInt32 i = 0; i < m_activeBodyArray.GetCount(); i++)
 	{
 		ndBodyKinematic* const body = m_activeBodyArray[i];
-		if (!body->m_equilibrium)
+		if (!(body->m_equilibrium & body->m_autoSleep))
 		{
 			m_sceneBodyArray[index] = body;
 			index++;
