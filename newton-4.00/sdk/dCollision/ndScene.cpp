@@ -819,13 +819,6 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 	
 	dAssert(body0->GetScene() == this);
 	dAssert(body1->GetScene() == this);
-	//if (!(body0->m_collideWithLinkedBodies & body1->m_collideWithLinkedBodies)) 
-	//{
-	//	dAssert(0);
-	////	if (world->AreBodyConnectedByJoints(body0, body1)) {
-	////		return;
-	////	}
-	//}
 
 	dAssert(m_contactNotifyCallback);
 	bool processContacts = m_contactNotifyCallback->OnAabbOverlap(contact, m_timestep);
