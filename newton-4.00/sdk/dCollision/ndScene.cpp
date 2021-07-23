@@ -1500,6 +1500,7 @@ void ndScene::FindCollidingPairs()
 	m_sceneBodyArray.SetCount(index);
 
 	bool fullScan = (3 * index) > m_activeBodyArray.GetCount();
+	//fullScan = true;
 	if (fullScan)
 	{
 		SubmitJobs<ndFindCollidindPairs>();
