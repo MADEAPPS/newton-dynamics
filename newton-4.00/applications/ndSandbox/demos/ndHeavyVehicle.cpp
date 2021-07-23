@@ -167,7 +167,8 @@ class ndVehicleDectriptorBigRig : public ndVehicleDectriptor
 {
 	public:
 	ndVehicleDectriptorBigRig()
-		:ndVehicleDectriptor("bigRigCabin.fbx")
+		//:ndVehicleDectriptor("bigRigCabin.fbx")
+		:ndVehicleDectriptor("truck.fbx")
 	{
 		m_chassisMass = 2000.0f;
 		m_chassisAngularDrag = 0.25f;
