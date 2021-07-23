@@ -63,6 +63,7 @@ class dContainersFreeListAlloc
 
 	void *operator new (size_t size)
 	{
+		dScopeSpinLock lock(m_lock);
 		FreeList** const freeList = GetFreeList();
 		if (*freeList) 
 		{
@@ -79,6 +80,7 @@ class dContainersFreeListAlloc
 
 	void operator delete (void* ptr)
 	{
+		dScopeSpinLock lock(m_lock);
 		FreeList** const freeList = GetFreeList();
 		FreeList* const self = (FreeList*)ptr;
 		self->m_next = *freeList;
@@ -106,11 +108,14 @@ class dContainersFreeListAlloc
 		static FreeList* freeList = nullptr;
 		return &freeList;
 	}
+	static dSpinLock m_lock;
 	static dUnsigned32 m_size;
 };
 
 template<class T>
-dUnsigned32 dContainersFreeListAlloc<T>::m_size = 0;
+dSpinLock dContainersFreeListAlloc<T>::m_lock;
 
+template<class T>
+dUnsigned32 dContainersFreeListAlloc<T>::m_size = 0;
 
 #endif

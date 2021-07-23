@@ -28,7 +28,11 @@
 
 ndContact* ndContactList::CreateContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 {
-	dNode* const node = Append();
+	dNode* node;
+	{
+		dScopeSpinLock lock(m_lock);
+		node = Append();
+	}
 	ndContact* const contact = &node->GetInfo();
 	contact->SetBodies(body0, body1);
 	contact->m_linkNode = node;

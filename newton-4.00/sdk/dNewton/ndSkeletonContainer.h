@@ -155,6 +155,7 @@ class ndSkeletonContainer
 	ndNodeList m_nodeList;
 	dArray<ndConstraint*> m_loopingJoints;
 	dArray<dInt8> m_auxiliaryMemoryBuffer;
+	dSpinLock m_lock;
 	dInt32 m_blockSize;
 	dInt16 m_rowCount;
 	dInt16 m_loopRowCount;

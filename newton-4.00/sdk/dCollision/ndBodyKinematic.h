@@ -184,7 +184,7 @@ class ndBodyKinematic: public ndBody
 
 	ndJointList m_jointList;
 	ndContactMap m_contactList;
-	dSpinLock m_lock;
+	mutable dSpinLock m_lock;
 	ndScene* m_scene;
 	ndBodyKinematic* m_islandParent;
 	ndBodyList::dNode* m_sceneNode;

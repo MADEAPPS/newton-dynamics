@@ -125,7 +125,9 @@ class ndScene
 	bool ValidateContactCache(ndContact* const contact, const dVector& timestep) const;
 	dFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, dVector& minBox, dVector& maxBox) const;
 
-	virtual void FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body, bool oneWay);
+	virtual void FindCollidingPairs(ndBodyKinematic* const body);
+	virtual void FindCollidingPairsForward(ndBodyKinematic* const body);
+	virtual void FindCollidingPairsBackward(ndBodyKinematic* const body);
 	void AddNode(ndSceneNode* const newNode);
 	void RemoveNode(ndSceneNode* const newNode);
 

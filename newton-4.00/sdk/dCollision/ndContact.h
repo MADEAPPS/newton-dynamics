@@ -71,7 +71,6 @@ class ndContactMaterial: public ndContactPoint
 	ndMaterial m_material;
 } D_GCC_NEWTON_ALIGN_32;
 
-//class ndContactPointList: public dList<ndContactMaterial, dContainersFreeListAlloc<ndContactPoint>>
 class ndContactPointList : public dList<ndContactMaterial, dContainersFreeListAlloc<ndContactMaterial>>
 {
 	public:

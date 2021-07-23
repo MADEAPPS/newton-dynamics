@@ -899,8 +899,8 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 	dInt32 count = 0;
 	dVector cachePosition[D_MAX_CONTATCS];
 	ndContactPointList::dNode* nodes[D_MAX_CONTATCS];
-	ndContactPointList& list = contact->m_contacPointsList;
-	for (ndContactPointList::dNode* contactNode = list.GetFirst(); contactNode; contactNode = contactNode->GetNext()) 
+	ndContactPointList& contactPointList = contact->m_contacPointsList;
+	for (ndContactPointList::dNode* contactNode = contactPointList.GetFirst(); contactNode; contactNode = contactNode->GetNext()) 
 	{
 		nodes[count] = contactNode;
 		cachePosition[count] = contactNode->GetInfo().m_point;
@@ -974,8 +974,8 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		}
 		else 
 		{
-			dScopeSpinLock lock(m_contactLock);
-			contactNode = list.Append();
+			//dScopeSpinLock lock(m_contactLock);
+			contactNode = contactPointList.Append();
 		}
 
 		ndContactMaterial* const contactPoint = &contactNode->GetInfo();
@@ -1071,14 +1071,14 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 	
 	if (count) 
 	{
-		dScopeSpinLock lock(m_contactLock);
+		//dScopeSpinLock lock(m_contactLock);
 		for (dInt32 i = 0; i < count; i++) 
 		{
-			list.Remove(nodes[i]);
+			contactPointList.Remove(nodes[i]);
 		}
 	}
 	
-	contact->m_maxDOF = dUnsigned32(3 * list.GetCount());
+	contact->m_maxDOF = dUnsigned32(3 * contactPointList.GetCount());
 	m_contactNotifyCallback->OnContactCallback(threadIndex, contact, m_timestep);
 }
 
@@ -1238,7 +1238,9 @@ ndContact* ndScene::FindContactJoint(ndBodyKinematic* const body0, ndBodyKinemat
 
 void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 {
+#ifdef D_USE_GLOBAL_LOCK
 	dScopeSpinLock lock(m_contactLock);
+#endif
 	ndContact* const contact = FindContactJoint(body0, body1);
 	if (!contact) 
 	{
@@ -1406,39 +1408,50 @@ void ndScene::UpdateAabb()
 	}
 }
 
-void ndScene::FindCollidinPairs(dInt32, ndBodyKinematic* const body, bool oneWay)
+void ndScene::FindCollidingPairs(ndBodyKinematic* const body)
 {
-	ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
 	body->m_broaphaseEquilibrium = 1;
-
-	if (oneWay)
+	ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
+	for (ndSceneNode* ptr = bodyNode; ptr->m_parent; ptr = ptr->m_parent)
 	{
-		for (ndSceneNode* ptr = bodyNode; ptr->m_parent; ptr = ptr->m_parent)
+		ndSceneTreeNode* const parent = ptr->m_parent->GetAsSceneTreeNode();
+		dAssert(!parent->GetAsSceneBodyNode());
+		ndSceneNode* const sibling = parent->m_right;
+		if (sibling != ptr)
 		{
-			ndSceneTreeNode* const parent = ptr->m_parent->GetAsSceneTreeNode();
-			dAssert(!parent->GetAsSceneBodyNode());
-			ndSceneNode* const sibling = parent->m_right;
-			if (sibling != ptr)
-			{
-				SubmitPairs(bodyNode, sibling);
-			}
+			SubmitPairs(bodyNode, sibling);
 		}
 	}
-	else
+}
+
+void ndScene::FindCollidingPairsForward(ndBodyKinematic* const body)
+{
+	body->m_broaphaseEquilibrium = 1;
+	ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
+	for (ndSceneNode* ptr = bodyNode; ptr->m_parent; ptr = ptr->m_parent)
 	{
-		for (ndSceneNode* ptr = bodyNode; ptr->m_parent; ptr = ptr->m_parent)
+		ndSceneTreeNode* const parent = ptr->m_parent->GetAsSceneTreeNode();
+		dAssert(!parent->GetAsSceneBodyNode());
+		ndSceneNode* const sibling = parent->m_right;
+		if (sibling != ptr)
 		{
-			ndSceneTreeNode* const parent = ptr->m_parent->GetAsSceneTreeNode();
-			dAssert(!parent->GetAsSceneBodyNode());
-			ndSceneNode* const rightSibling = parent->m_right;
-			if (rightSibling != ptr)
-			{
-				SubmitPairs(bodyNode, rightSibling);
-			}
-			else
-			{
-				SubmitPairs(bodyNode, parent->m_left);
-			}
+			SubmitPairs(bodyNode, sibling);
+		}
+	}
+}
+
+void ndScene::FindCollidingPairsBackward(ndBodyKinematic* const body)
+{
+	body->m_broaphaseEquilibrium = 1;
+	ndSceneBodyNode* const bodyNode = body->GetSceneBodyNode();
+	for (ndSceneNode* ptr = bodyNode; ptr->m_parent; ptr = ptr->m_parent)
+	{
+		ndSceneTreeNode* const parent = ptr->m_parent->GetAsSceneTreeNode();
+		dAssert(!parent->GetAsSceneBodyNode());
+		ndSceneNode* const sibling = parent->m_left;
+		if (sibling != ptr)
+		{
+			SubmitPairs(bodyNode, sibling);
 		}
 	}
 }
@@ -1446,7 +1459,7 @@ void ndScene::FindCollidinPairs(dInt32, ndBodyKinematic* const body, bool oneWay
 void ndScene::FindCollidingPairs()
 {
 	D_TRACKTIME();
-	class ndFindCollidindPairsFullScan : public ndBaseJob
+	class ndFindCollidindPairs : public ndBaseJob
 	{
 		public:
 		virtual void Execute()
@@ -1459,12 +1472,12 @@ void ndScene::FindCollidingPairs()
 			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{
 				ndBodyKinematic* const body = bodyArray[i];
-				m_owner->FindCollidinPairs(threadIndex, body, true);
+				m_owner->FindCollidingPairs(body);
 			}
 		}
 	};
 
-	class ndFindCollidindPairsTwoWays : public ndBaseJob
+	class ndFindCollidindPairsForward : public ndBaseJob
 	{
 		public:
 		virtual void Execute()
@@ -1480,20 +1493,46 @@ void ndScene::FindCollidingPairs()
 				ndBodyKinematic* const body = bodyArray[i];
 				if (!body->m_broaphaseEquilibrium)
 				{
-					m_owner->FindCollidinPairs(threadIndex, body, false);
+					dAssert(0);
+//					m_owner->FindCollidingPairsForward(body);
+				}
+			}
+		}
+	};
+
+	class ndFindCollidindPairsBackward : public ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+			const dInt32 threadIndex = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			const dInt32 bodyCount = bodyArray.GetCount() - 1;
+			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
+			{
+				ndBodyKinematic* const body = bodyArray[i];
+				if (!body->m_broaphaseEquilibrium)
+				{
+					dAssert(0);
+					//m_owner->FindCollidingPairsBackward(body);
 				}
 			}
 		}
 	};
 
 	m_fullScan = (3 * m_sleepBodies) < (2 * dUnsigned32(m_activeBodyArray.GetCount()));
+m_fullScan = 1;
 	if (m_fullScan)
 	{
-		SubmitJobs<ndFindCollidindPairsFullScan>();
+		SubmitJobs<ndFindCollidindPairs>();
 	}
 	else
 	{
-		SubmitJobs<ndFindCollidindPairsTwoWays>();
+		SubmitJobs<ndFindCollidindPairsForward>();
+		SubmitJobs<ndFindCollidindPairsBackward>();
 	}
 }
 
