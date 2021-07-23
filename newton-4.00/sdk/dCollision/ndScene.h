@@ -177,17 +177,16 @@ class ndScene
 	
 	ndBodyList m_bodyList;
 	ndContactList m_contactList;
-	dArray<ndBodyKinematic*> m_activeBodyArray;
 	ndConstraintArray m_activeConstraintArray;
+	dArray<ndBodyKinematic*> m_sceneBodyArray;
+	dArray<ndBodyKinematic*> m_activeBodyArray;
 	dSpinLock m_contactLock;
 	ndSceneNode* m_rootNode;
 	ndContactNotify* m_contactNotifyCallback;
 	dFloat64 m_treeEntropy;
 	ndFitnessList m_fitness;
 	dFloat32 m_timestep;
-	dUnsigned32 m_sleepBodies;
 	dUnsigned32 m_lru;
-	bool m_fullScan;
 
 	static dVector m_velocTol;
 	static dVector m_linearContactError2;
