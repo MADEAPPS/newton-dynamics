@@ -77,21 +77,16 @@ class ndVehicleDectriptor
 		bool m_manual;
 	};
 
-	class ndTireDefinition
+	class ndTireDefinition: public ndWheelDescriptor
 	{
 		public:
 		dFloat32 m_mass;
-		dFloat32 m_steeringAngle;
-		dFloat32 m_springK;
-		dFloat32 m_damperC;
-		dFloat32 m_regularizer;
-		dFloat32 m_upperStop;
-		dFloat32 m_lowerStop;
-		dFloat32 m_brakeTorque;
+		//dFloat32 m_upperStop;
+		//dFloat32 m_lowerStop;
 		dFloat32 m_verticalOffset;
-		dFloat32 m_handBrakeTorque;
-		dFloat32 m_laterialStiffness;
-		dFloat32 m_longitudinalStiffness ;
+
+		//dFloat32 m_minLimit;
+		//dFloat32 m_maxLimit;
 	};
 
 	enum ndDifferentialType
@@ -155,6 +150,9 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 	protected:
 	void ApplyInputs(ndWorld* const world, dFloat32 timestep);
 	dFloat32 GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const;
+
+	void CalculateTireDimensions(const char* const tireName, dFloat32& width, dFloat32& radius, ndDemoEntity* const vehEntity) const;
+	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, const ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const;
 
 	ndVehicleDectriptor m_configuration;
 	dFloat32 m_steerAngle;

@@ -10,6 +10,7 @@
 */
 
 #include "ndSandboxStdafx.h"
+#include "ndDemoMesh.h"
 #include "ndPhysicsWorld.h"
 #include "ndVehicleCommon.h"
 
@@ -264,6 +265,60 @@ bool ndBasicVehicle::IsPlayer() const
 dFloat32 ndBasicVehicle::GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const
 {
 	return m_configuration.m_frictionCoefficientScale;
+}
+
+void ndBasicVehicle::CalculateTireDimensions(const char* const tireName, dFloat32& width, dFloat32& radius, ndDemoEntity* const vehEntity) const
+{
+	// find the the tire visual mesh 
+	ndDemoEntity* const tirePart = vehEntity->Find(tireName);
+	dAssert(tirePart);
+
+	// make a convex hull collision shape to assist in calculation of the tire shape size
+	ndDemoMesh* const tireMesh = (ndDemoMesh*)tirePart->GetMesh();
+
+	const dMatrix matrix(tirePart->GetMeshMatrix());
+
+	dArray<dVector> temp;
+	tireMesh->GetVertexArray(temp);
+
+	dVector minVal(1.0e10f);
+	dVector maxVal(-1.0e10f);
+	for (dInt32 i = 0; i < temp.GetCount(); i++)
+	{
+		dVector p(matrix.TransformVector(temp[i]));
+		minVal = minVal.GetMin(p);
+		maxVal = maxVal.GetMax(p);
+	}
+
+	dVector size(maxVal - minVal);
+	width = size.m_x;
+	radius = size.m_y * 0.5f;
+}
+
+ndBodyDynamic* ndBasicVehicle::CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, const ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const
+{
+	dFloat32 width;
+	dFloat32 radius;
+	ndWorld* const world = scene->GetWorld();
+	ndDemoEntity* const parentEntity = (ndDemoEntity*)parentBody->GetNotifyCallback()->GetUserData();
+	CalculateTireDimensions(tireName, width, radius, parentEntity);
+
+	ndShapeInstance tireCollision(CreateTireShape(radius, width));
+
+	ndDemoEntity* const tireEntity = parentEntity->Find(tireName);
+	dMatrix matrix(tireEntity->CalculateGlobalMatrix(nullptr));
+
+	const dMatrix chassisMatrix(m_localFrame * m_chassis->GetMatrix());
+	matrix.m_posit += chassisMatrix.m_up.Scale(definition.m_verticalOffset);
+
+	ndBodyDynamic* const tireBody = new ndBodyDynamic();
+	tireBody->SetNotifyCallback(new ndDemoEntityNotify(scene, tireEntity, parentBody));
+	tireBody->SetMatrix(matrix);
+	tireBody->SetCollisionShape(tireCollision);
+	tireBody->SetMassMatrix(definition.m_mass, tireCollision);
+
+	world->AddBody(tireBody);
+	return tireBody;
 }
 
 void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)

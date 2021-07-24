@@ -21,8 +21,8 @@ class ndWheelDescriptor
 	ndWheelDescriptor()
 		:m_springK(dFloat32(1.0f))
 		,m_damperC(dFloat32(0.0f))
-		,m_minLimit(dFloat32(-0.1f))
-		,m_maxLimit(dFloat32(0.2f))
+		,m_upperStop(dFloat32(-0.1f))
+		,m_lowerStop(dFloat32(0.2f))
 		,m_regularizer(dFloat32(0.1f))
 		,m_brakeTorque(dFloat32(0.0f))
 		,m_handBrakeTorque(dFloat32(0.0f))
@@ -34,8 +34,8 @@ class ndWheelDescriptor
 	
 	dFloat32 m_springK;
 	dFloat32 m_damperC;
-	dFloat32 m_minLimit;
-	dFloat32 m_maxLimit;
+	dFloat32 m_upperStop;
+	dFloat32 m_lowerStop;
 	dFloat32 m_regularizer;
 	dFloat32 m_brakeTorque;
 	dFloat32 m_handBrakeTorque;

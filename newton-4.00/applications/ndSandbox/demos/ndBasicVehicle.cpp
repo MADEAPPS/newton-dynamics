@@ -202,8 +202,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		ndWheelDescriptor tireInfo;
 		tireInfo.m_springK = m_configuration.m_rearTire.m_springK;
 		tireInfo.m_damperC = m_configuration.m_rearTire.m_damperC;
-		tireInfo.m_minLimit = m_configuration.m_rearTire.m_upperStop;
-		tireInfo.m_maxLimit = m_configuration.m_rearTire.m_lowerStop;
+		tireInfo.m_upperStop = m_configuration.m_rearTire.m_upperStop;
+		tireInfo.m_lowerStop = m_configuration.m_rearTire.m_lowerStop;
 		tireInfo.m_brakeTorque = m_configuration.m_rearTire.m_brakeTorque;
 		tireInfo.m_regularizer = m_configuration.m_rearTire.m_regularizer;
 		tireInfo.m_steeringAngle = m_configuration.m_rearTire.m_steeringAngle;
@@ -218,8 +218,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 		tireInfo.m_springK = m_configuration.m_frontTire.m_springK;
 		tireInfo.m_damperC = m_configuration.m_frontTire.m_damperC;
-		tireInfo.m_minLimit = m_configuration.m_frontTire.m_upperStop;
-		tireInfo.m_maxLimit = m_configuration.m_frontTire.m_lowerStop;
+		tireInfo.m_upperStop = m_configuration.m_frontTire.m_upperStop;
+		tireInfo.m_lowerStop = m_configuration.m_frontTire.m_lowerStop;
 		tireInfo.m_brakeTorque = m_configuration.m_frontTire.m_brakeTorque;
 		tireInfo.m_regularizer = m_configuration.m_frontTire.m_regularizer;
 		tireInfo.m_steeringAngle = m_configuration.m_frontTire.m_steeringAngle;
@@ -409,60 +409,6 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		return body;
 	}
 
-	void CalculateTireDimensions(const char* const tireName, dFloat32& width, dFloat32& radius, ndDemoEntity* const vehEntity)
-	{
-		// find the the tire visual mesh 
-		ndDemoEntity* const tirePart = vehEntity->Find(tireName);
-		dAssert(tirePart);
-
-		// make a convex hull collision shape to assist in calculation of the tire shape size
-		ndDemoMesh* const tireMesh = (ndDemoMesh*)tirePart->GetMesh();
-
-		const dMatrix matrix(tirePart->GetMeshMatrix());
-
-		dArray<dVector> temp;
-		tireMesh->GetVertexArray(temp);
-
-		dVector minVal(1.0e10f);
-		dVector maxVal(-1.0e10f);
-		for (dInt32 i = 0; i < temp.GetCount(); i++)
-		{
-			dVector p(matrix.TransformVector(temp[i]));
-			minVal = minVal.GetMin(p);
-			maxVal = maxVal.GetMax(p);
-		}
-
-		dVector size(maxVal - minVal);
-		width = size.m_x;
-		radius = size.m_y * 0.5f;
-	}
-
-	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, const ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName)
-	{
-		dFloat32 width;
-		dFloat32 radius;
-		ndWorld* const world = scene->GetWorld();
-		ndDemoEntity* const chassisEntity = (ndDemoEntity*)chassis->GetNotifyCallback()->GetUserData();
-		CalculateTireDimensions(tireName, width, radius, chassisEntity);
-
-		ndShapeInstance tireCollision(CreateTireShape(radius, width));
-
-		ndDemoEntity* const tireEntity = chassisEntity->Find(tireName);
-		dMatrix matrix(tireEntity->CalculateGlobalMatrix(nullptr));
-
-		const dMatrix chassisMatrix(m_localFrame * m_chassis->GetMatrix());
-		matrix.m_posit += chassisMatrix.m_up.Scale (definition.m_verticalOffset);
-
-		ndBodyDynamic* const tireBody = new ndBodyDynamic();
-		tireBody->SetNotifyCallback(new ndDemoEntityNotify(scene, tireEntity, chassis));
-		tireBody->SetMatrix(matrix);
-		tireBody->SetCollisionShape(tireCollision);
-		tireBody->SetMassMatrix(definition.m_mass, tireCollision);
-
-		world->AddBody(tireBody);
-		return tireBody;
-	}
-
 	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, dFloat32 timestep)
 	{
 		ndBasicMultiBodyVehicle* const me = (ndBasicMultiBodyVehicle*)context;
@@ -602,7 +548,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			{
 				const ndWheelDescriptor& info = tire->GetInfo();
 				const dMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
-				const dVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_maxLimit - info.m_minLimit));
+				const dVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_lowerStop - info.m_upperStop));
 				class ndConvexCastNotifyTest : public ndConvexCastNotify
 				{
 					public:
