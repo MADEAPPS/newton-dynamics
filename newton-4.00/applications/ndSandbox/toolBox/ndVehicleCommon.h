@@ -81,12 +81,7 @@ class ndVehicleDectriptor
 	{
 		public:
 		dFloat32 m_mass;
-		//dFloat32 m_upperStop;
-		//dFloat32 m_lowerStop;
 		dFloat32 m_verticalOffset;
-
-		//dFloat32 m_minLimit;
-		//dFloat32 m_maxLimit;
 	};
 
 	enum ndDifferentialType
