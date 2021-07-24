@@ -579,61 +579,64 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 	{
 		ndBasicVehicle::ApplyInputs(world, timestep);
 
-		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-		dFixSizeArray<char, 32> buttons;
-		scene->GetJoystickButtons(buttons);
-		if (buttons[2])
+		if (m_isPlayer)
 		{
-			m_turretAngle += 5.0e-3f;
-		}
-		else if (buttons[1])
-		{
-			m_turretAngle -= 5.0e-3f;
-		}
-
-		if (buttons[0])
-		{
-			m_cannonAngle += 1.0e-3f;
-			if (m_cannonAngle > m_cannonHinge->GetMaxAngularLimit())
+			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+			dFixSizeArray<char, 32> buttons;
+			scene->GetJoystickButtons(buttons);
+			if (buttons[2])
 			{
-				m_cannonAngle = m_cannonHinge->GetMaxAngularLimit();
+				m_turretAngle += 5.0e-3f;
 			}
-		}
-		else if (buttons[3])
-		{
-			m_cannonAngle -= 1.0e-3f;
-			if (m_cannonAngle < m_cannonHinge->GetMinAngularLimit())
+			else if (buttons[1])
 			{
-				m_cannonAngle = m_cannonHinge->GetMinAngularLimit();
+				m_turretAngle -= 5.0e-3f;
 			}
-		}
 
-		// apply inputs to actuators joint
-		const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
-		dFloat32 turretAngle = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
-		dFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turrectAngle0), -turretAngle);
-		dFloat32 turretTargetAngle = m_turretHinge->GetAngle();
-		if (dAbs(turretErrorAngle) > (0.25f * dDegreeToRad))
-		{
-			turretTargetAngle += turretErrorAngle;
-		}
-		m_turretHinge->SetTargetAngle(turretTargetAngle);
-		//dTrace(("errorAngle:%f  turretAngle:%f\n", turretErrorAngle * dRadToDegree, turretAngle * dRadToDegree));
+			if (buttons[0])
+			{
+				m_cannonAngle += 1.0e-3f;
+				if (m_cannonAngle > m_cannonHinge->GetMaxAngularLimit())
+				{
+					m_cannonAngle = m_cannonHinge->GetMaxAngularLimit();
+				}
+			}
+			else if (buttons[3])
+			{
+				m_cannonAngle -= 1.0e-3f;
+				if (m_cannonAngle < m_cannonHinge->GetMinAngularLimit())
+				{
+					m_cannonAngle = m_cannonHinge->GetMinAngularLimit();
+				}
+			}
 
-		const dMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
-		dFloat32 y = cannonMatrix[1][1];
-		dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
-		dFloat32 cannonAngle = -dAtan2(y, x);
-		dFloat32 cannonErrorAngle = AnglesAdd(AnglesAdd(m_cannonAngle, m_cannonAngle0), -cannonAngle);
+			// apply inputs to actuators joint
+			const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
+			dFloat32 turretAngle = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+			dFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turrectAngle0), -turretAngle);
+			dFloat32 turretTargetAngle = m_turretHinge->GetAngle();
+			if (dAbs(turretErrorAngle) > (0.25f * dDegreeToRad))
+			{
+				turretTargetAngle += turretErrorAngle;
+			}
+			m_turretHinge->SetTargetAngle(turretTargetAngle);
+			//dTrace(("errorAngle:%f  armAngle:%f\n", armErrorAngle * dRadToDegree, armAngle * dRadToDegree));
 
-		dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
-		const dFloat32 error = 0.125f * dDegreeToRad;
-		if (dAbs(cannonErrorAngle) > error)
-		{
-			cannonTargetAngle += cannonErrorAngle;
+			const dMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
+			dFloat32 y = cannonMatrix[1][1];
+			dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
+			dFloat32 cannonAngle = -dAtan2(y, x);
+			dFloat32 cannonErrorAngle = AnglesAdd(AnglesAdd(m_cannonAngle, m_cannonAngle0), -cannonAngle);
+
+			dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
+			const dFloat32 error = 0.125f * dDegreeToRad;
+			if (dAbs(cannonErrorAngle) > error)
+			{
+				cannonTargetAngle += cannonErrorAngle;
+			}
+			m_cannonHinge->SetTargetAngle(cannonTargetAngle);
+			//dTrace(("errorAngle:%f  cannonAngle:%f\n", cannonErrorAngle * dRadToDegree, cannonAngle * dRadToDegree));
 		}
-		m_cannonHinge->SetTargetAngle(cannonTargetAngle);
-		//dTrace(("errorAngle:%f  cannonAngle:%f\n", cannonErrorAngle * dRadToDegree, cannonAngle * dRadToDegree));
 	}
 
 	ndJointHingeActuator* m_turretHinge;
@@ -750,7 +753,6 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 	{
 		ndWorld* const world = scene->GetWorld();
 
-		//turret servo controller actuator
 		ndBodyDynamic* const frontBucketArmBody = MakeChildPart(scene, m_chassis, "arms", m_configuration.m_chassisMass * 0.05f);
 		dMatrix turretMatrix(m_localFrame * frontBucketArmBody->GetMatrix());
 		m_armHinge = new ndJointHingeActuator(turretMatrix, 1.5f, -10.0f * dDegreeToRad, 55.0f * dDegreeToRad, frontBucketArmBody, m_chassis);
@@ -774,64 +776,56 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 	void ApplyInputs(ndWorld* const world, dFloat32 timestep)
 	{
 		ndBasicVehicle::ApplyInputs(world, timestep);
-		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-		dFixSizeArray<char, 32> buttons;
-		scene->GetJoystickButtons(buttons);
-		if (buttons[2])
+		if (m_isPlayer)
 		{
-			m_armAngle += 5.0e-3f;
-			if (m_armAngle > m_armHinge->GetMaxAngularLimit())
-			{
-				m_armAngle = m_armHinge->GetMaxAngularLimit();
-			}
-		}
-		else if (buttons[1])
-		{
-			m_armAngle -= 5.0e-3f;
-			if (m_armAngle < m_armHinge->GetMinAngularLimit())
-			{
-				m_armAngle = m_armHinge->GetMinAngularLimit();
-			}
-		}
-		const dMatrix turretMatrix(m_armHinge->GetLocalMatrix0() * m_armHinge->GetBody0()->GetMatrix());
-		dFloat32 turretAngle = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
-		dFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_armAngle, m_armAngle), -turretAngle);
-		dFloat32 turretTargetAngle = m_armHinge->GetAngle();
-		if (dAbs(turretErrorAngle) > (0.25f * dDegreeToRad))
-		{
-			turretTargetAngle += turretErrorAngle;
-		}
-		m_armHinge->SetTargetAngle(m_armAngle + m_armAngle);
+			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+			dFixSizeArray<char, 32> buttons;
 
+			bool wakeUpVehicle = false;
+			scene->GetJoystickButtons(buttons);
+			if (buttons[0])
+			{
+				wakeUpVehicle = true;
+				m_armAngle = dMin(m_armAngle + 5.0e-3f, m_armHinge->GetMaxAngularLimit());
+				m_armHinge->SetTargetAngle(m_armAngle);
+			}
+			else if (buttons[3])
+			{
+				wakeUpVehicle = true;
+				m_armAngle = dMax(m_armAngle - 5.0e-3f, m_armHinge->GetMinAngularLimit());
+				m_armHinge->SetTargetAngle(m_armAngle);
+			}
 
-		if (buttons[0])
-		{
-			m_bucketAngle += 5.0e-3f;
-			if (m_bucketAngle > m_bucketHinge->GetMaxAngularLimit())
+			if (buttons[1])
 			{
-				m_bucketAngle = m_bucketHinge->GetMaxAngularLimit();
+				wakeUpVehicle = true;
+				m_bucketAngle = dMin(m_bucketAngle + 5.0e-3f, m_bucketHinge->GetMaxAngularLimit());
+				m_bucketHinge->SetTargetAngle(m_bucketAngle);
+			}
+			else if (buttons[2])
+			{
+				wakeUpVehicle = true;
+				m_bucketAngle = dMax(m_bucketAngle - 5.0e-3f, m_bucketHinge->GetMinAngularLimit());
+				m_bucketHinge->SetTargetAngle(m_bucketAngle);
+			}
+			const dMatrix bucketMatrix(m_bucketHinge->GetLocalMatrix0() * m_bucketHinge->GetBody0()->GetMatrix());
+			dFloat32 y = bucketMatrix[1][1];
+			dFloat32 x = dSqrt(bucketMatrix[1][0] * bucketMatrix[1][0] + bucketMatrix[1][2] * bucketMatrix[1][2] + 1.0e-6f);
+			dFloat32 bucketAngle = -dAtan2(y, x);
+			dFloat32 bucketErrorAngle = AnglesAdd(AnglesAdd(m_bucketAngle, m_bucketAngle), -bucketAngle);
+			dFloat32 bucketTargetAngle = m_bucketHinge->GetAngle();
+			const dFloat32 error = 0.125f * dDegreeToRad;
+			if (dAbs(bucketErrorAngle) > error)
+			{
+				bucketTargetAngle += bucketErrorAngle;
+			}
+			m_bucketHinge->SetTargetAngle(bucketTargetAngle);
+
+			if (wakeUpVehicle)
+			{
+				m_chassis->SetSleepState(false);
 			}
 		}
-		else if (buttons[3])
-		{
-			m_bucketAngle -= 5.0e-3f;
-			if (m_bucketAngle < m_bucketHinge->GetMinAngularLimit())
-			{
-				m_bucketAngle = m_bucketHinge->GetMinAngularLimit();
-			}
-		}
-		const dMatrix cannonMatrix(m_bucketHinge->GetLocalMatrix0() * m_bucketHinge->GetBody0()->GetMatrix());
-		dFloat32 y = cannonMatrix[1][1];
-		dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
-		dFloat32 cannonAngle = -dAtan2(y, x);
-		dFloat32 cannonErrorAngle = AnglesAdd(AnglesAdd(m_bucketAngle, m_bucketAngle), -cannonAngle);
-		dFloat32 cannonTargetAngle = m_bucketHinge->GetAngle();
-		const dFloat32 error = 0.125f * dDegreeToRad;
-		if (dAbs(cannonErrorAngle) > error)
-		{
-			cannonTargetAngle += cannonErrorAngle;
-		}
-		m_bucketHinge->SetTargetAngle(cannonTargetAngle);
 	}
 
 	ndJointHingeActuator* m_armHinge;
