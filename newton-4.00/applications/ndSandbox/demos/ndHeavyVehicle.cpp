@@ -584,17 +584,21 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 			dFixSizeArray<char, 32> buttons;
 			scene->GetJoystickButtons(buttons);
+			bool wakeUpVehicle = false;
 			if (buttons[2])
 			{
+				wakeUpVehicle = true;
 				m_turretAngle += 5.0e-3f;
 			}
 			else if (buttons[1])
 			{
+				wakeUpVehicle = true;
 				m_turretAngle -= 5.0e-3f;
 			}
 
 			if (buttons[0])
 			{
+				wakeUpVehicle = true;
 				m_cannonAngle += 1.0e-3f;
 				if (m_cannonAngle > m_cannonHinge->GetMaxAngularLimit())
 				{
@@ -603,6 +607,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 			}
 			else if (buttons[3])
 			{
+				wakeUpVehicle = true;
 				m_cannonAngle -= 1.0e-3f;
 				if (m_cannonAngle < m_cannonHinge->GetMinAngularLimit())
 				{
@@ -620,7 +625,6 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 				turretTargetAngle += turretErrorAngle;
 			}
 			m_turretHinge->SetTargetAngle(turretTargetAngle);
-			//dTrace(("errorAngle:%f  armAngle:%f\n", armErrorAngle * dRadToDegree, armAngle * dRadToDegree));
 
 			const dMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
 			dFloat32 y = cannonMatrix[1][1];
@@ -635,7 +639,11 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 				cannonTargetAngle += cannonErrorAngle;
 			}
 			m_cannonHinge->SetTargetAngle(cannonTargetAngle);
-			//dTrace(("errorAngle:%f  cannonAngle:%f\n", cannonErrorAngle * dRadToDegree, cannonAngle * dRadToDegree));
+
+			if (wakeUpVehicle)
+			{
+				m_chassis->SetSleepState(false);
+			}
 		}
 	}
 
