@@ -951,19 +951,17 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 		// 2- each tire to the model, 
 		// this function will create the tire as a normal rigid body
 		// and attach them to the chassis with the tire joints
-	return;
+	
 		ndWorld* const world = scene->GetWorld();
 		ndBodyDynamic* const chassis = m_chassis;
 
-		ndBodyDynamic* const rr_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rtire_3");
-		ndBodyDynamic* const rl_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "ltire_3");
-		ndBodyDynamic* const rr_tire1_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rtire_2");
-		ndBodyDynamic* const rl_tire1_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "ltire_2");
+		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "fl_tire");
+		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "fr_tire");
 
-		ndBodyDynamic* const fr_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "rtire_0");
-		ndBodyDynamic* const fl_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "ltire_0");
-		ndBodyDynamic* const fr_tire1_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "rtire_1");
-		ndBodyDynamic* const fl_tire1_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "ltire_1");
+		ndBodyDynamic* const rl_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "rl_midle_tire");
+		ndBodyDynamic* const rr_tire0_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "rr_midle_tire");
+		ndBodyDynamic* const rl_tire1_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "rl_tire");
+		ndBodyDynamic* const rr_tire1_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "rr_tire");
 
 		ndWheelDescriptor tireInfo;
 		tireInfo.m_springK = m_configuration.m_rearTire.m_springK;
@@ -991,11 +989,9 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 		tireInfo.m_handBrakeTorque = m_configuration.m_frontTire.m_handBrakeTorque;
 		tireInfo.m_laterialStiffness = m_configuration.m_frontTire.m_laterialStiffness;
 		tireInfo.m_longitudinalStiffness = m_configuration.m_frontTire.m_longitudinalStiffness;
-		ndMultiBodyVehicleTireJoint* const fr_tire0 = AddTire(world, tireInfo, fr_tire0_body);
-		ndMultiBodyVehicleTireJoint* const fl_tire0 = AddTire(world, tireInfo, fl_tire0_body);
-		ndMultiBodyVehicleTireJoint* const fr_tire1 = AddTire(world, tireInfo, fr_tire1_body);
-		ndMultiBodyVehicleTireJoint* const fl_tire1 = AddTire(world, tireInfo, fl_tire1_body);
-
+		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(world, tireInfo, fr_tire_body);
+		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(world, tireInfo, fl_tire_body);
+/*
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1] = 0;
 		for (int i = 0; i < m_configuration.m_transmission.m_gearsCount; i++)
@@ -1044,7 +1040,7 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 
 		// add vehicle turret
 		CreateEightWheelTurret(scene);
-
+*/
 		// set a soft or hard mode
 		SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);
 	}
