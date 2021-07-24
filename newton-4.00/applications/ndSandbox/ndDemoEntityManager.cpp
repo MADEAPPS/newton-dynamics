@@ -43,8 +43,8 @@
 //#define DEFAULT_SCENE	6		// setting particle fluid
 //#define DEFAULT_SCENE	7		// static mesh collision 
 //#define DEFAULT_SCENE	8		// setting basic joints
-//#define DEFAULT_SCENE	9		// setting basic vehicle
-#define DEFAULT_SCENE	10		// setting heavy vehicle
+#define DEFAULT_SCENE	9		// setting basic vehicle
+//#define DEFAULT_SCENE	10		// setting heavy vehicle
 //#define DEFAULT_SCENE	11		// conservation of angular momentum 
 //#define DEFAULT_SCENE	12		// basic voronoi fracture
 //#define DEFAULT_SCENE	13		// simple voronoi fracture

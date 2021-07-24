@@ -556,28 +556,31 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 	void PostTransformUpdate(ndWorld* const, dFloat32)
 	{
-		// play body part animations
-		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)m_chassis->GetNotifyCallback();
+		if (m_rearAxlePivot && m_frontAxlePivot)
+		{
+			// play moving part animations, ex suspension nodes.
+			ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)m_chassis->GetNotifyCallback();
 
-		const dMatrix rearPivotMatrix((m_rearAxlePivot->CalculateGlobalMatrix(notify->m_entity) * m_chassis->GetMatrix()).Inverse());
-		const dMatrix rearLeftTireMatrix (m_rl_tire->GetBody0()->GetMatrix() * rearPivotMatrix);
-		const dMatrix rearRightTireMatrix (m_rr_tire->GetBody0()->GetMatrix() * rearPivotMatrix);
-		const dVector rearOrigin(dVector::m_half * (rearRightTireMatrix.m_posit + rearLeftTireMatrix.m_posit));
-		const dVector rearStep(rearRightTireMatrix.m_posit - rearLeftTireMatrix.m_posit);
-		
-		dFloat32 rearAxleAngle = dAtan2(-rearStep.m_y, rearStep.m_z);
-		dQuaternion rearAxelRotation(dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)), rearAxleAngle);
-		m_rearAxlePivot->GetChild()->SetNextMatrix(rearAxelRotation, rearOrigin);
+			const dMatrix rearPivotMatrix((m_rearAxlePivot->CalculateGlobalMatrix(notify->m_entity) * m_chassis->GetMatrix()).Inverse());
+			const dMatrix rearLeftTireMatrix(m_rl_tire->GetBody0()->GetMatrix() * rearPivotMatrix);
+			const dMatrix rearRightTireMatrix(m_rr_tire->GetBody0()->GetMatrix() * rearPivotMatrix);
+			const dVector rearOrigin(dVector::m_half * (rearRightTireMatrix.m_posit + rearLeftTireMatrix.m_posit));
+			const dVector rearStep(rearRightTireMatrix.m_posit - rearLeftTireMatrix.m_posit);
 
-		const dMatrix frontPivotMatrix((m_frontAxlePivot->CalculateGlobalMatrix(notify->m_entity) * m_chassis->GetMatrix()).Inverse());
-		const dMatrix frontLeftTireMatrix(m_fl_tire->GetBody0()->GetMatrix() * frontPivotMatrix);
-		const dMatrix frontRightTireMatrix(m_fr_tire->GetBody0()->GetMatrix() * frontPivotMatrix);
-		const dVector frontOrigin(dVector::m_half * (frontRightTireMatrix.m_posit + frontLeftTireMatrix.m_posit));
-		const dVector frontStep(frontRightTireMatrix.m_posit - frontLeftTireMatrix.m_posit);
+			dFloat32 rearAxleAngle = dAtan2(-rearStep.m_y, rearStep.m_z);
+			dQuaternion rearAxelRotation(dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)), rearAxleAngle);
+			m_rearAxlePivot->GetChild()->SetNextMatrix(rearAxelRotation, rearOrigin);
 
-		dFloat32 frontAxleAngle = dAtan2(-frontStep.m_y, frontStep.m_z);
-		dQuaternion frontAxelRotation(dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)), frontAxleAngle);
-		m_frontAxlePivot->GetChild()->SetNextMatrix(frontAxelRotation, frontOrigin);
+			const dMatrix frontPivotMatrix((m_frontAxlePivot->CalculateGlobalMatrix(notify->m_entity) * m_chassis->GetMatrix()).Inverse());
+			const dMatrix frontLeftTireMatrix(m_fl_tire->GetBody0()->GetMatrix() * frontPivotMatrix);
+			const dMatrix frontRightTireMatrix(m_fr_tire->GetBody0()->GetMatrix() * frontPivotMatrix);
+			const dVector frontOrigin(dVector::m_half * (frontRightTireMatrix.m_posit + frontLeftTireMatrix.m_posit));
+			const dVector frontStep(frontRightTireMatrix.m_posit - frontLeftTireMatrix.m_posit);
+
+			dFloat32 frontAxleAngle = dAtan2(-frontStep.m_y, frontStep.m_z);
+			dQuaternion frontAxelRotation(dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)), frontAxleAngle);
+			m_frontAxlePivot->GetChild()->SetNextMatrix(frontAxelRotation, frontOrigin);
+		}
 	}
 
 	GLuint m_gears;
@@ -608,7 +611,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	dMatrix sceneLocation(dGetIdentityMatrix());
 
 	//BuildFloorBox(scene, sceneLocation);
-	//BuildFlatPlane(scene, true);
+	BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
 	//BuildCompoundScene(scene, sceneLocation);
@@ -616,7 +619,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
 	sceneLocation.m_posit.m_x = -200.0f;
 	sceneLocation.m_posit.m_z = -200.0f;
-	BuildHeightFieldTerrain(scene, sceneLocation);
+	//BuildHeightFieldTerrain(scene, sceneLocation);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
@@ -658,7 +661,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(controls);
 	
 	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, viperDesc, matrix);
-	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix);
+	//ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, jeepDesc, matrix);
+	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
