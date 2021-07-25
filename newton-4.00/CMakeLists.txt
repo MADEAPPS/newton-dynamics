@@ -20,6 +20,7 @@ option("NEWTON_ENABLE_GPU_SOLVER" "enable gpu solver" OFF)
 option("NEWTON_BUILD_SINGLE_THREADED" "multi threaded" OFF)
 option("NEWTON_DOUBLE_PRECISION" "generate double precision" OFF)
 option("NEWTON_STATIC_RUNTIME_LIBRARIES" "use windows static libraries" OFF)
+option("NEWTON_USE_DEFAULT_NEW_AND_DELETE" "overload new and delete when building dll" OFF)
 
 set(CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo Release)
 set(CMAKE_DEBUG_POSTFIX "_d")

@@ -10,6 +10,10 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
+if (NEWTON_USE_DEFAULT_NEW_AND_DELETE)
+	add_definitions(-DD_USE_DEFAULT_NEW_AND_DELETE)
+endif()
+
 if (NEWTON_BUILD_PROFILER)
 	add_subdirectory(dProfiler)
 endif()

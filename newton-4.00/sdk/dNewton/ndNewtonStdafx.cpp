@@ -24,6 +24,7 @@
 
 #if defined (_D_NEWTON_DLL) && !defined (_D_SINGLE_LIBRARY)
 
+	#ifndef D_USE_DEFAULT_NEW_AND_DELETE
 	void *operator new (size_t size)
 	{
 		// this should not happens on this test
@@ -37,6 +38,7 @@
 		dAssert(0);
 		dMemory::Free(ptr);
 	}
+	#endif
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	BOOL APIENTRY DllMain(HMODULE, DWORD  ul_reason_for_call, LPVOID )
