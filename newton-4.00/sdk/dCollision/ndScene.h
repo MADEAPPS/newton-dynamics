@@ -117,23 +117,23 @@ class ndScene
 
 	D_COLLISION_API virtual void DebugScene(ndSceneTreeNotiFy* const notify);
 
-	virtual void BodiesInAabb(ndBodiesInAabbNotify& callback) const;
-	virtual bool RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const;
-	virtual bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const;
+	D_COLLISION_API virtual void BodiesInAabb(ndBodiesInAabbNotify& callback) const;
+	D_COLLISION_API virtual bool RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const;
+	D_COLLISION_API virtual bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const;
 
 	private:
 	bool ValidateContactCache(ndContact* const contact, const dVector& timestep) const;
 	dFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, dVector& minBox, dVector& maxBox) const;
 
-	virtual void FindCollidingPairs(ndBodyKinematic* const body);
-	virtual void FindCollidingPairsForward(ndBodyKinematic* const body);
-	virtual void FindCollidingPairsBackward(ndBodyKinematic* const body);
+	D_COLLISION_API virtual void FindCollidingPairs(ndBodyKinematic* const body);
+	D_COLLISION_API virtual void FindCollidingPairsForward(ndBodyKinematic* const body);
+	D_COLLISION_API virtual void FindCollidingPairsBackward(ndBodyKinematic* const body);
 	void AddNode(ndSceneNode* const newNode);
 	void RemoveNode(ndSceneNode* const newNode);
 
-	virtual void UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body);
-	virtual void UpdateTransformNotify(dInt32 threadIndex, ndBodyKinematic* const body);
-	virtual void CalculateContacts(dInt32 threadIndex, ndContact* const contact); 
+	D_COLLISION_API virtual void UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body);
+	D_COLLISION_API virtual void UpdateTransformNotify(dInt32 threadIndex, ndBodyKinematic* const body);
+	D_COLLISION_API virtual void CalculateContacts(dInt32 threadIndex, ndContact* const contact);
 
 	void CalculateJointContacts(dInt32 threadIndex, ndContact* const contact);
 	void ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContactSolver* const contactSolver);
@@ -146,7 +146,7 @@ class ndScene
 	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dNode** const nextNode);
 	ndSceneNode* BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dNode** const nextNode);
 
-	void CollisionOnlyUpdate();
+	D_COLLISION_API void CollisionOnlyUpdate();
 	const ndContactList& GetContactList() const;
 
 	ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
