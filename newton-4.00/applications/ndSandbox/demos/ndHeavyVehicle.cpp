@@ -554,7 +554,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		//cannon servo controller actuator
 		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.025f);
 		dMatrix cannonMatrix(m_localFrame * canonBody->GetMatrix());
-		m_cannonHinge = new ndJointHingeActuator(cannonMatrix, 1.5f, -5.0f * dDegreeToRad, 45.0f * dDegreeToRad, canonBody, turretBody);
+		m_cannonHinge = new ndJointHingeActuator(cannonMatrix, 1.5f, -45.0f * dDegreeToRad, 5.0f * dDegreeToRad, canonBody, turretBody);
 		world->AddJoint(m_cannonHinge);
 		dFloat32 y = cannonMatrix[1][1];
 		dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
@@ -584,56 +584,62 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 			dFixSizeArray<char, 32> buttons;
 			scene->GetJoystickButtons(buttons);
+
 			bool wakeUpVehicle = false;
 			if (buttons[2])
 			{
 				wakeUpVehicle = true;
 				m_turretAngle += 5.0e-3f;
-				m_turretHinge->SetTargetAngle(m_turretAngle);
 			}
 			else if (buttons[1])
 			{
 				wakeUpVehicle = true;
 				m_turretAngle -= 5.0e-3f;
-				m_turretHinge->SetTargetAngle(m_turretAngle);
 			}
 
 			if (buttons[0])
 			{
 				wakeUpVehicle = true;
-				m_cannonAngle = dMax(m_cannonAngle - 5.0e-3f, m_cannonHinge->GetMinAngularLimit());
-				m_cannonHinge->SetTargetAngle(m_cannonAngle);
+				m_cannonAngle += 1.0e-3f;
+				if (m_cannonAngle > m_cannonHinge->GetMaxAngularLimit())
+				{
+					m_cannonAngle = m_cannonHinge->GetMaxAngularLimit();
+				}
 			}
 			else if (buttons[3])
 			{
 				wakeUpVehicle = true;
-				m_cannonAngle = dMin(m_cannonAngle + 5.0e-3f, m_cannonHinge->GetMaxAngularLimit());
-				m_cannonHinge->SetTargetAngle(m_cannonAngle);
+				m_cannonAngle -= 1.0e-3f;
+				if (m_cannonAngle < m_cannonHinge->GetMinAngularLimit())
+				{
+					m_cannonAngle = m_cannonHinge->GetMinAngularLimit();
+				}
 			}
 
-			//const dMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
-			//dFloat32 y = cannonMatrix[1][1];
-			//dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
-			//dFloat32 cannonAngle = -dAtan2(y, x);
-			//dFloat32 cannonErrorAngle = AnglesAdd(AnglesAdd(m_cannonAngle, m_cannonAngle0), -cannonAngle);
-			//dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
-			//const dFloat32 error = 0.125f * dDegreeToRad;
-			//if (dAbs(cannonErrorAngle) > error)
-			//{
-			//	cannonTargetAngle += cannonErrorAngle;
-			//}
-			//m_cannonHinge->SetTargetAngle(cannonTargetAngle);
-
 			// apply inputs to actuators joint
-			//const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
-			//dFloat32 turretAngle = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
-			//dFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turrectAngle0), -turretAngle);
-			//dFloat32 turretTargetAngle = m_turretHinge->GetAngle();
-			//if (dAbs(turretErrorAngle) > (0.25f * dDegreeToRad))
-			//{
-			//	turretTargetAngle += turretErrorAngle;
-			//}
-			//m_turretHinge->SetTargetAngle(turretTargetAngle);
+			const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
+			dFloat32 turretAngle = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+			dFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turrectAngle0), -turretAngle);
+			dFloat32 turretTargetAngle = m_turretHinge->GetAngle();
+			if (dAbs(turretErrorAngle) > (0.25f * dDegreeToRad))
+			{
+				turretTargetAngle += turretErrorAngle;
+			}
+			m_turretHinge->SetTargetAngle(turretTargetAngle);
+
+			const dMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
+			dFloat32 y = cannonMatrix[1][1];
+			dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
+			dFloat32 cannonAngle = -dAtan2(y, x);
+			dFloat32 cannonErrorAngle = AnglesAdd(AnglesAdd(m_cannonAngle, m_cannonAngle0), -cannonAngle);
+
+			dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
+			const dFloat32 error = 0.125f * dDegreeToRad;
+			if (dAbs(cannonErrorAngle) > error)
+			{
+				cannonTargetAngle += cannonErrorAngle;
+			}
+			m_cannonHinge->SetTargetAngle(cannonTargetAngle);
 
 			if (wakeUpVehicle)
 			{
@@ -906,9 +912,9 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 {
 	dMatrix sceneLocation(dGetIdentityMatrix());
 	//BuildFloorBox(scene, sceneLocation);
-	BuildFlatPlane(scene, true);
+	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
-	//BuildStaticMesh(scene, "track.fbx", true);
+	BuildStaticMesh(scene, "track.fbx", true);
 	//BuildCompoundScene(scene, sceneLocation);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
@@ -925,21 +931,21 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	ndVehicleSelector* const controls = new ndVehicleSelector();
 	scene->GetWorld()->AddModel(controls);
 
-	ndHeavyMultiBodyVehicle* const vehicle = new ndTractorVehicle(scene, tractorDesc, matrix);
+	//ndHeavyMultiBodyVehicle* const vehicle = new ndTractorVehicle(scene, tractorDesc, matrix);
 	//ndHeavyMultiBodyVehicle* const vehicle = new ndLav25Vehicle(scene, lav25Desc, matrix);
-	//ndHeavyMultiBodyVehicle* const vehicle = new ndBigRigVehicle(scene, bigRigDesc, matrix);
+	ndHeavyMultiBodyVehicle* const vehicle = new ndBigRigVehicle(scene, bigRigDesc, matrix);
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 
 	matrix.m_posit.m_x += 6.0f;
 	matrix.m_posit.m_z += 6.0f;
-	//scene->GetWorld()->AddModel(new ndLav25Vehicle(scene, lav25Desc, matrix));
+	scene->GetWorld()->AddModel(new ndLav25Vehicle(scene, lav25Desc, matrix));
 
 	matrix.m_posit.m_z -= 12.0f;
-	//scene->GetWorld()->AddModel(new ndTractorVehicle(scene, tractorDesc, matrix));
-
+	scene->GetWorld()->AddModel(new ndTractorVehicle(scene, tractorDesc, matrix));
+	
 	matrix.m_posit.m_x += 15.0f;
-	matrix.m_posit.m_z += 10.0f;
+	matrix.m_posit.m_z += 6.0f;
 	AddPlanks(scene, matrix.m_posit, 300.0f);
 
 	scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle);
