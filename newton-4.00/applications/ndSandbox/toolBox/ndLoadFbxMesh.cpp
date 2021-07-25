@@ -393,25 +393,22 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 		format.m_uv0.m_strideInBytes = sizeof(dVector);
 	}
 
-	mesh->BuildFromIndexList(&format);
-	//mesh->RepairTJoints();
-
 	// import skin if there is any
-	//dInt32 deformerCount = fbxMesh->GetDeformerCount(FbxDeformer::eSkin);
 	if (geom->getSkin())
+	//if (0)
 	{
-		dAssert(0);
-		#if 0
-		FbxSkin* const skin = geom->getSkin();
-		for (dInt32 i = 0; i < deformerCount; i++)
+		const ofbx::Skin* const skin = geom->getSkin();
+		dInt32 clusterCount = skin->getClusterCount();
+
+		dTree <const ofbx::Cluster*, const Object*> clusterBoneMap;
+		for (dInt32 i = 0; i < clusterCount; i++) 
 		{
-			// count the number of weights
-			dInt32 skinVertexDataCount = 0;
-			dInt32 clusterCount = skin->GetClusterCount();
-			for (dInt32 i = 0; i < clusterCount; i++) {
-				FbxCluster* cluster = skin->GetCluster(i);
-				skinVertexDataCount += cluster->GetControlPointIndicesCount();
-			}
+			const ofbx::Cluster* const cluster = skin->getCluster(i);
+			const ofbx::Object* const link = cluster->getLink();
+			clusterBoneMap.Insert(cluster, link);
+		}
+		
+/*
 			dGeometryNodeSkinModifierInfo::dBoneVertexWeightData* const skinVertexData = new dGeometryNodeSkinModifierInfo::dBoneVertexWeightData[skinVertexDataCount];
 				
 			dInt32 actualSkinVertexCount = 0;
@@ -420,8 +417,8 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 				FbxCluster* const cluster = skin->GetCluster(i);
 				FbxNode* const fbxBone = cluster->GetLink(); // Get a reference to the bone's node
 				
-																//char xxx[256];
-																//sprintf (xxx, "%s", fbxBone->GetName());
+				//char xxx[256];
+				//sprintf (xxx, "%s", fbxBone->GetName());
 				GlobalNoceMap::dNode* const boneNode = nodeMap.Find(fbxBone);
 				if (boneNode) {
 					dPluginScene::dNode* const bone = boneNode->GetInfo();
@@ -444,19 +441,45 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 						dAssert(actualSkinVertexCount <= skinVertexDataCount);
 					}
 				}
+*/
+//			}
+
+		for (int i = 0; i < clusterCount; i++)
+		{
+			const ofbx::Cluster* const fbxCluster = skin->getCluster(i);
+			const ofbx::Object* const fbxBone = fbxCluster->getLink();
+			if (nodeMap.Find(fbxBone))
+			{
+				dMatrix parentBoneMatrix(dGetIdentityMatrix());
+				if (clusterBoneMap.Find(fbxBone->getParent()))
+				{
+					const ofbx::Cluster* const parentCluster = clusterBoneMap.Find(fbxBone->getParent())->GetInfo();
+					const ofbx::Matrix parentTransformMatrix(parentCluster->getTransformLinkMatrix());
+					parentBoneMatrix = ofbxMatrix2dMatrix(parentTransformMatrix);
+				}
+
+				const ofbx::Matrix transformMatrix(fbxCluster->getTransformLinkMatrix());
+				const dMatrix boneMatrix(ofbxMatrix2dMatrix(transformMatrix));
+				const dMatrix bindingMatrix (boneMatrix * parentBoneMatrix.Inverse4x4());
+				ndMeshEffect::dVertexCluster* const cluster = mesh->CreateCluster(fbxBone->name);
+				cluster->m_bindMatrix = bindingMatrix;
+
+				dAssert(fbxCluster->getIndicesCount() == fbxCluster->getWeightsCount());
+
+				dInt32 clusterIndexCount = fbxCluster->getIndicesCount();
+				const dInt32* const indices = fbxCluster->getIndices();
+				const double* const weights = fbxCluster->getWeights();
+				for (dInt32 j = 0; j < clusterIndexCount; j++)
+				{
+					cluster->m_vertexIndex.PushBack(indices[j]);
+					cluster->m_vertexWeigh.PushBack(dFloat32 (weights[j]));
+				}
 			}
-				
-			char skinName[256];
-			sprintf(skinName, "%s_skin", fbxMeshNode->GetName());
-			dPluginScene::dNode* const skinNode = ngdScene->CreateSkinModifierNode(meshNode);
-			dGeometryNodeSkinModifierInfo* const info = (dGeometryNodeSkinModifierInfo*)ngdScene->GetInfoFromNode(skinNode);
-			info->SetName(skinName);
-			info->SkinMesh(skinNode, ngdScene, skinVertexData, actualSkinVertexCount);
-				
-			delete[] skinVertexData;
 		}
-		#endif
 	}
+
+	mesh->BuildFromIndexList(&format);
+	//mesh->RepairTJoints();
 
 	delete[] faceMaterialArray;
 	delete[] faceIndexArray;
@@ -485,13 +508,18 @@ static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 			{
 				break;
 			}
-		
+
+			case ofbx::Object::Type::LIMB_NODE:
+			{
+				break;
+			}
+
 			//case FbxNodeAttribute::eSkeleton:
 			//{
 			//	ImportSkeleton(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
 			//	break;
 			//}
-			//
+
 			//case FbxNodeAttribute::eLine:
 			//{
 			//	ImportLineShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
@@ -504,7 +532,6 @@ static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 			//	break;
 			//}
 
-			//
 			//case FbxNodeAttribute::eMarker:
 			//case FbxNodeAttribute::eNurbs:
 			//case FbxNodeAttribute::ePatch:

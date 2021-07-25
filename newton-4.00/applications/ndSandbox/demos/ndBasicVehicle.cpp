@@ -81,7 +81,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		m_frontTire.m_upperStop = -0.05f;
 		m_frontTire.m_lowerStop = 0.4f;
 		m_frontTire.m_brakeTorque = 1500.0f;
-		m_rearTire.m_handBrakeTorque = 0.0f;
+		m_frontTire.m_handBrakeTorque = 0.0f;
 		m_frontTire.m_laterialStiffness  = 1.0f / 1000.0f;
 		m_frontTire.m_longitudinalStiffness  = 50.0f / 1000.0f;
 
@@ -602,7 +602,6 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 	ndMultiBodyVehicleTireJoint* m_fr_tire;
 	ndMultiBodyVehicleTireJoint* m_fl_tire;
-
 };
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)

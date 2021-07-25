@@ -2938,39 +2938,6 @@ void dgMeshEffect::GetVertexChannel(dgInt32 strideInByte, dgFloat32* const buffe
 	}
 }
 
-/*
-void dgMeshEffect::GetWeightBlendChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const
-{
-	dgInt8* const buffer = (dgInt8*)bufferOut;
-	for (dgInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i++) {
-		const dgInt32 j = i * strideInByte;
-		dgFloat32* const ptr = (dgFloat32*)&buffer[j];
-
-		const dgInt32 index = m_attrib.m_pointChannel[i];
-		const dgFloat32* const p = &m_points.m_weights[index].m_weightBlends[0];
-		ptr[0] = dgFloat32(p[0]);
-		ptr[1] = dgFloat32(p[1]);
-		ptr[2] = dgFloat32(p[2]);
-		ptr[3] = dgFloat32(p[3]);
-	}
-}
-
-void dgMeshEffect::GetWeightIndexChannel(dgInt32 strideInByte, dgInt32* const bufferOut) const
-{
-	dgInt8* const buffer = (dgInt8*)bufferOut;
-	for (dgInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i++) {
-		const dgInt32 j = i * strideInByte;
-		dgInt32* const ptr = (dgInt32*)&buffer[j];
-		const dgInt32 index = m_attrib.m_pointChannel[i];
-		const dgInt32* const p = &m_points.m_weights[index].m_controlIndex[0];
-		ptr[0] = p[0];
-		ptr[1] = p[1];
-		ptr[2] = p[2];
-		ptr[3] = p[3];
-	}
-}
-*/
-
 void dgMeshEffect::GetNormalChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const
 {
 	dgInt32 stride = strideInByte / sizeof (dgFloat32);
@@ -4014,3 +3981,51 @@ void dgMeshEffect::RepairTJoints ()
 	dgAssert (Sanity ());
 }
 
+/*
+void dgMeshEffect::GetWeightBlendChannel(dgInt32 strideInByte, dgFloat32* const bufferOut) const
+{
+	dgInt8* const buffer = (dgInt8*)bufferOut;
+	for (dgInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i++) {
+		const dgInt32 j = i * strideInByte;
+		dgFloat32* const ptr = (dgFloat32*)&buffer[j];
+
+		const dgInt32 index = m_attrib.m_pointChannel[i];
+		const dgFloat32* const p = &m_points.m_weights[index].m_weightBlends[0];
+		ptr[0] = dgFloat32(p[0]);
+		ptr[1] = dgFloat32(p[1]);
+		ptr[2] = dgFloat32(p[2]);
+		ptr[3] = dgFloat32(p[3]);
+	}
+}
+
+void dgMeshEffect::GetWeightIndexChannel(dgInt32 strideInByte, dgInt32* const bufferOut) const
+{
+	dgInt8* const buffer = (dgInt8*)bufferOut;
+	for (dgInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i++) {
+		const dgInt32 j = i * strideInByte;
+		dgInt32* const ptr = (dgInt32*)&buffer[j];
+		const dgInt32 index = m_attrib.m_pointChannel[i];
+		const dgInt32* const p = &m_points.m_weights[index].m_controlIndex[0];
+		ptr[0] = p[0];
+		ptr[1] = p[1];
+		ptr[2] = p[2];
+		ptr[3] = p[3];
+	}
+}
+*/
+
+dgMeshEffect::dVertexCluster* dgMeshEffect::FindCluster(const char* const name) const
+{
+	dAssert(0);
+	return nullptr;
+}
+
+dgMeshEffect::dVertexCluster* dgMeshEffect::CreateCluster(const char* const name)
+{
+	dTree<dVertexCluster, const dString>::dNode* node = FindCluster(name);
+	if (node)
+	{
+		node = m_clusters.Insert(name);
+	}
+	return &node->GetInfo();
+}

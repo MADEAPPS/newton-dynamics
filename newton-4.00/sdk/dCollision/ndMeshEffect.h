@@ -365,6 +365,18 @@ class ndMeshEffect: public dPolyhedra
 		dFloatData m_uv1;
 		dFloatData m_vertexColor;
 	};
+
+	class dVertexCluster
+	{
+		public:
+		dVertexCluster()
+			:m_bindMatrix(dGetIdentityMatrix())
+		{
+		}
+		dMatrix m_bindMatrix;
+		dArray<dInt32> m_vertexIndex;
+		dArray<dFloat32> m_vertexWeigh;
+	};
 	
 	D_COLLISION_API ndMeshEffect();
 	D_COLLISION_API ndMeshEffect(const ndMeshEffect& source);
@@ -388,6 +400,9 @@ class ndMeshEffect: public dPolyhedra
 
 	dInt32 GetFaceMaterial(dEdge* const faceEdge) const;
 
+	D_COLLISION_API dVertexCluster* CreateCluster(const char* const name);
+	D_COLLISION_API dVertexCluster* FindCluster(const char* const name) const;
+
 	D_COLLISION_API dFloat64 CalculateVolume() const;
 	D_COLLISION_API dMatrix CalculateOOBB(dBigVector& size) const;
 	D_COLLISION_API void CalculateAABB(dBigVector& min, dBigVector& max) const;
@@ -403,8 +418,6 @@ class ndMeshEffect: public dPolyhedra
 	D_COLLISION_API void GetUV0Channel(dInt32 strideInByte, dFloat32* const bufferOut) const;
 	D_COLLISION_API void GetUV1Channel(dInt32 strideInByte, dFloat32* const bufferOut) const;
 	D_COLLISION_API void GetVertexColorChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
-	//	void GetWeightBlendChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
-	//	void GetWeightIndexChannel(dInt32 strideInByte, dInt32* const bufferOut) const;
 
 	D_COLLISION_API ndIndexArray* MaterialGeometryBegin();
 		D_COLLISION_API dInt32 GetFirstMaterial(ndIndexArray* const handle) const;
@@ -471,6 +484,7 @@ class ndMeshEffect: public dPolyhedra
 	dPointFormat m_points;
 	dAttibutFormat m_attrib;
 	dArray<dMaterial> m_materials;
+	dTree<dVertexCluster, const dString> m_clusters;
 	dInt32 m_vertexBaseCount;
 	dInt32 m_constructionIndex;
 };

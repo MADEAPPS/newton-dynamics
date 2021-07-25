@@ -149,7 +149,7 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_frontTire.m_lowerStop = 0.2f;
 	m_frontTire.m_verticalOffset = 0.0f;
 	m_frontTire.m_brakeTorque = 1500.0f;
-	m_frontTire.m_handBrakeTorque = 0.0f;
+	m_frontTire.m_handBrakeTorque = 1500.0f;
 	m_frontTire.m_steeringAngle = 35.0f * dDegreeToRad;
 	m_frontTire.m_laterialStiffness  = 100.0f / 1000.0f;
 	m_frontTire.m_longitudinalStiffness  = 600.0f / 1000.0f;
