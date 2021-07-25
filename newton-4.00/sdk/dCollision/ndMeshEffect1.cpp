@@ -4285,7 +4285,11 @@ void dgMeshEffect::GetWeightIndexChannel(dgInt32 strideInByte, dgInt32* const bu
 
 ndMeshEffect::dVertexCluster* ndMeshEffect::FindCluster(const char* const name) const
 {
-	dAssert(0);
+	dTree<dVertexCluster, const dString>::dNode* const node = m_clusters.Find(name);
+	if (node)
+	{
+		return &node->GetInfo();
+	}
 	return nullptr;
 }
 

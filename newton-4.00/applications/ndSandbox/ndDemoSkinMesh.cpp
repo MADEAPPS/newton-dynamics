@@ -222,16 +222,16 @@ ndDemoSkinMesh::ndDemoSkinMesh(const ndDemoSkinMesh& clone, ndDemoEntity* const 
 	,m_shader(clone.m_shader)
 {
 	dAssert(0);
-	memcpy(m_bindingMatrixArray, clone.m_bindingMatrixArray, clone.m_nodeCount * sizeof(dMatrix));
+	//memcpy(m_bindingMatrixArray, clone.m_bindingMatrixArray, clone.m_nodeCount * sizeof(dMatrix));
 }
 
 ndDemoSkinMesh::~ndDemoSkinMesh()
 {
 	m_mesh->Release();
-	if (m_bindingMatrixArray) 
-	{
-		delete[] m_bindingMatrixArray; 
-	}
+	//if (m_bindingMatrixArray) 
+	//{
+	//	delete[] m_bindingMatrixArray; 
+	//}
 }
 
 ndDemoMeshInterface* ndDemoSkinMesh::Clone(ndDemoEntity* const owner)
@@ -350,10 +350,10 @@ dGeometryNodeSkinClusterInfo* ndDemoSkinMesh::FindSkinModifier(dScene* const sce
 }
 */
 
-//void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
-void ndDemoSkinMesh::Render(ndDemoEntityManager* const, const dMatrix&)
+void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+//void ndDemoSkinMesh::Render(ndDemoEntityManager* const, const dMatrix&)
 {
-	dAssert(0);
+	//dAssert(0);
 	//dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
 	//dInt32 count = CalculateMatrixPalette(bindMatrix);
 	//GLfloat* const glMatrixPallete = dAlloca(GLfloat, 16 * count);
@@ -363,6 +363,15 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const, const dMatrix&)
 	//dInt32 matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
 	//glUniformMatrix4fv(matrixPalette, count, GL_FALSE, glMatrixPallete);
 	//glCallList(m_mesh->m_optimizedOpaqueDiplayList);
+	m_mesh->Render(scene, modelMatrix);
 }
 
-
+ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
+	:ndDemoMeshInterface()
+	,m_mesh(new ndDemoMesh(name, meshNode, shaderCache))
+	,m_entity(owner)
+	,m_bindingMatrixArray()
+{
+	m_name = name;
+	m_shader = shaderCache.m_diffuseEffect;
+}

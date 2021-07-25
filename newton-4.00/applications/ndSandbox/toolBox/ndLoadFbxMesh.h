@@ -29,8 +29,8 @@ class fbxDemoEntity : public ndDemoEntity
 	}
 
 	void CleanIntermediate();
-	void BuildRenderMeshes(ndDemoEntityManager* const scene);
 	void ApplyTransform(const dMatrix& cordinateSystem);
+	void BuildRenderMeshes(ndDemoEntityManager* const scene);
 
 	ndMeshEffect* m_fbxMeshEffect;
 };

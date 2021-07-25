@@ -400,6 +400,7 @@ class ndMeshEffect: public dPolyhedra
 
 	dInt32 GetFaceMaterial(dEdge* const faceEdge) const;
 
+	const dTree<dVertexCluster, const dString>& GetCluster() const;
 	D_COLLISION_API dVertexCluster* CreateCluster(const char* const name);
 	D_COLLISION_API dVertexCluster* FindCluster(const char* const name) const;
 
@@ -719,5 +720,9 @@ inline ndMeshEffect* ndMeshEffect::GetNextLayer(ndMeshEffect* const layerSegment
 	return GetNextLayer(layerSegment->IncLRU() - 1);
 }
 
+inline const dTree<ndMeshEffect::dVertexCluster, const dString>& ndMeshEffect::GetCluster() const
+{
+	return m_clusters;
+}
 
 #endif

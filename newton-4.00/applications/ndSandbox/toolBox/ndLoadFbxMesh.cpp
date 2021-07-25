@@ -13,6 +13,7 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoMesh.h"
 #include "ndLoadFbxMesh.h"
+#include "ndDemoSkinMesh.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
@@ -59,7 +60,15 @@ void fbxDemoEntity::BuildRenderMeshes(ndDemoEntityManager* const scene)
 	
 		if (ent->m_fbxMeshEffect)
 		{
-			ndDemoMesh* const mesh = new ndDemoMesh(ent->GetName().GetStr(), ent->m_fbxMeshEffect, scene->GetShaderCache());
+			ndDemoMeshInterface* mesh;
+			if (ent->m_fbxMeshEffect->GetCluster().GetCount())
+			{
+				mesh = new ndDemoSkinMesh(this, ent->GetName().GetStr(), ent->m_fbxMeshEffect, scene->GetShaderCache());
+			}
+			else
+			{
+				mesh = new ndDemoMesh(ent->GetName().GetStr(), ent->m_fbxMeshEffect, scene->GetShaderCache());
+			}
 			ent->SetMesh(mesh, ent->GetMeshMatrix());
 			mesh->Release();
 
@@ -407,42 +416,6 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 			const ofbx::Object* const link = cluster->getLink();
 			clusterBoneMap.Insert(cluster, link);
 		}
-		
-/*
-			dGeometryNodeSkinModifierInfo::dBoneVertexWeightData* const skinVertexData = new dGeometryNodeSkinModifierInfo::dBoneVertexWeightData[skinVertexDataCount];
-				
-			dInt32 actualSkinVertexCount = 0;
-			for (dInt32 i = 0; i < clusterCount; i++)
-			{
-				FbxCluster* const cluster = skin->GetCluster(i);
-				FbxNode* const fbxBone = cluster->GetLink(); // Get a reference to the bone's node
-				
-				//char xxx[256];
-				//sprintf (xxx, "%s", fbxBone->GetName());
-				GlobalNoceMap::dNode* const boneNode = nodeMap.Find(fbxBone);
-				if (boneNode) {
-					dPluginScene::dNode* const bone = boneNode->GetInfo();
-				
-					// Get the bind pose
-					//FbxAMatrix bindPoseMatrix;
-					//cluster->GetTransformLinkMatrix(bindPoseMatrix);
-				
-					dInt32 *boneVertexIndices = cluster->GetControlPointIndices();
-					double *boneVertexWeights = cluster->GetControlPointWeights();
-					// Iterate through all the vertices, which are affected by the bone
-					dInt32 numBoneVertexIndices = cluster->GetControlPointIndicesCount();
-					for (dInt32 j = 0; j < numBoneVertexIndices; j++) {
-						dInt32 boneVertexIndex = boneVertexIndices[j];
-						float boneWeight = (float)boneVertexWeights[j];
-						skinVertexData[actualSkinVertexCount].m_vertexIndex = boneVertexIndex;
-						skinVertexData[actualSkinVertexCount].m_weight = boneWeight;
-						skinVertexData[actualSkinVertexCount].m_boneNode = bone;
-						actualSkinVertexCount++;
-						dAssert(actualSkinVertexCount <= skinVertexDataCount);
-					}
-				}
-*/
-//			}
 
 		for (int i = 0; i < clusterCount; i++)
 		{
@@ -514,24 +487,16 @@ static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 				break;
 			}
 
-			//case FbxNodeAttribute::eSkeleton:
-			//{
-			//	ImportSkeleton(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
-			//	break;
-			//}
-
 			//case FbxNodeAttribute::eLine:
 			//{
 			//	ImportLineShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
 			//	break;
 			//}
-			//
 			//case FbxNodeAttribute::eNurbsCurve:
 			//{
 			//	ImportNurbCurveShape(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials);
 			//	break;
 			//}
-
 			//case FbxNodeAttribute::eMarker:
 			//case FbxNodeAttribute::eNurbs:
 			//case FbxNodeAttribute::ePatch:
@@ -541,7 +506,6 @@ static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 			//case FbxNodeAttribute::eLight:
 			//case FbxNodeAttribute::eOpticalReference:
 			//case FbxNodeAttribute::eOpticalMarker:
-			//
 			//case FbxNodeAttribute::eTrimNurbsSurface:
 			//case FbxNodeAttribute::eBoundary:
 			//case FbxNodeAttribute::eNurbsSurface:
@@ -556,22 +520,6 @@ static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 		}
 	}
 
-	//UsedMaterials::Iterator iter1(usedMaterials);
-	//for (iter1.Begin(); iter1; iter1++) {
-	//	dInt32 count = iter1.GetNode()->GetInfo();
-	//	if (!count) {
-	//		dScene::dNode* const materiaCacheNode = ngdScene->FindGetMaterialCacheNode();
-	//		dScene::dNode* const materialNode = iter1.GetKey();
-	//		void* nextLink;
-	//		for (void* link = ngdScene->GetFirstParentLink(materialNode); link; link = nextLink) {
-	//			nextLink = ngdScene->GetNextParentLink(materialNode, link);
-	//			dScene::dNode* const parentNode = ngdScene->GetNodeFromLink(link);
-	//			if (parentNode != materiaCacheNode) {
-	//				ngdScene->RemoveReference(parentNode, materialNode);
-	//			}
-	//		}
-	//	}
-	//}
 	return entity;
 }
 

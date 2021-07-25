@@ -29,6 +29,7 @@ class ndDemoSkinMesh: public ndDemoMeshInterface
 		dInt32 m_boneIndex[4];
 	};
 
+	ndDemoSkinMesh(ndDemoEntity* const owner, const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
 	ndDemoSkinMesh(const ndDemoSkinMesh& clone, ndDemoEntity* const owner);
 	//ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, dScene::dNode* const meshNode, const dTree<ndDemoEntity*, dScene::dNode*>& boneMap, const ndShaderPrograms& shaderCache);
 	~ndDemoSkinMesh();
@@ -45,7 +46,8 @@ class ndDemoSkinMesh: public ndDemoMeshInterface
 
 	ndDemoMesh* m_mesh;
 	ndDemoEntity* m_entity; 
-	dMatrix* m_bindingMatrixArray;
+	//dMatrix* m_bindingMatrixArray;
+	dArray<dMatrix> m_bindingMatrixArray;
 	dInt32 m_nodeCount; 
 	dInt32 m_shader;
 };
