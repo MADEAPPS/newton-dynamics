@@ -144,7 +144,7 @@ static dMatrix GetCoordinateSystemMatrix(ofbx::IScene* const fbxScene)
 
 	dMatrix axisMatrix(dGetZeroMatrix());
 	axisMatrix.m_up[globalSettings->UpAxis] = dFloat32(globalSettings->UpAxisSign);
-	axisMatrix.m_front[globalSettings->FrontAxis] = dFloat32(globalSettings->FrontAxisSign);
+	axisMatrix.m_front[globalSettings->FrontAxis] = dFloat32(globalSettings->FrontAxisSign * -1.0f);
 	axisMatrix.m_right = axisMatrix.m_front.CrossProduct(axisMatrix.m_up);
 	axisMatrix = axisMatrix.Transpose();
 	
