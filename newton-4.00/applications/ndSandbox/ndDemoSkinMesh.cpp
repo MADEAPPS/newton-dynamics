@@ -24,7 +24,6 @@ class glSkinVertex : public glPositionNormalUV
 	GLint m_boneIndex[4];
 };
 
-
 ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
 	:ndDemoMesh(owner->GetName().GetStr())
 	,m_entity(owner)
@@ -226,7 +225,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	m_hasTransparency = hasTransparency;
 
 	// optimize this mesh for hardware buffers if possible
-	OptimizeForRender(&points[0], vertexCount, &indices[0], indexCount);
+	CreateRenderMesh(&points[0], vertexCount, &indices[0], indexCount);
 }
 
 ndDemoSkinMesh::~ndDemoSkinMesh()
@@ -241,8 +240,8 @@ ndDemoMeshInterface* ndDemoSkinMesh::Clone(ndDemoEntity* const)
 	return nullptr;
 }
 
-//void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
-void ndDemoSkinMesh::Render(ndDemoEntityManager* const, const dMatrix&)
+void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+//void ndDemoSkinMesh::Render(ndDemoEntityManager* const, const dMatrix&)
 {
 	//dAssert(0);
 	//dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
@@ -256,54 +255,53 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const, const dMatrix&)
 	//glCallList(m_mesh->m_optimizedOpaqueDiplayList);
 	//m_mesh->Render(scene, modelMatrix);
 
-	//ndDemoMesh::Render(scene, modelMatrix);
+	ndDemoMesh::Render(scene, modelMatrix);
 }
 
-/*
-//void ndDemoSkinMesh::OptimizeForRender(const ndDemoSubMesh& segment, const dVector* const pointWeights, const dWeightBoneIndex* const pointSkinBone) const
-void ndDemoSkinMesh::OptimizeForRender(const ndDemoSubMesh&, const dVector* const, const dWeightBoneIndex* const) const
+void ndDemoSkinMesh::CreateRenderMesh(
+	const glSkinVertex* const points, dInt32 pointCount,
+	const dInt32* const indices, dInt32 indexCount)
 {
-	dAssert(0);
-
-	glUniform1i(glGetUniformLocation(segment.m_shader, "texture"), 0);
-
-	glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_ambient.m_x);
-	glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_diffuse.m_x);
-	glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_specular.m_x);
-	glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_shiness));
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	if (segment.m_textureHandle) {
-		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, GLuint(segment.m_textureHandle));
-	}
-	else {
-		glDisable(GL_TEXTURE_2D);
-	}
-
-	glBindAttribLocation(m_shader, 10, "boneIndices");
-	glBindAttribLocation(m_shader, 11, "boneWeights");
-
-	dInt32 boneIndices = glGetAttribLocation(m_shader, "boneIndices");
-	dInt32 boneWeights = glGetAttribLocation(m_shader, "boneWeights");
-
-	glBegin(GL_TRIANGLES);
-	const dFloat32* const uv = m_mesh->m_uv;
-	const dFloat32* const normal = m_mesh->m_normal;
-	const dFloat32* const vertex = m_mesh->m_vertex;
-	for (dInt32 i = 0; i < segment.m_indexCount; i++)
-	{
-		dInt32 index = segment.m_indexes[i];
-
-		const dVector& weights = pointWeights[index];
-		const dWeightBoneIndex& boneIndex = pointSkinBone[index];
-		glTexCoord2f(GLfloat(uv[index * 2 + 0]), GLfloat(uv[index * 2 + 1]));
-		glVertexAttrib4f(boneWeights, GLfloat(weights[0]), GLfloat(weights[1]), GLfloat(weights[2]), GLfloat(weights[3]));
-		glVertexAttrib4f(boneIndices, GLfloat(boneIndex.m_boneIndex[0]), GLfloat(boneIndex.m_boneIndex[1]), GLfloat(boneIndex.m_boneIndex[2]), GLfloat(boneIndex.m_boneIndex[3]));
-		glNormal3f(GLfloat(normal[index * 3 + 0]), GLfloat(normal[index * 3 + 1]), GLfloat(normal[index * 3 + 2]));
-		glVertex3f(GLfloat(vertex[index * 3 + 0]), GLfloat(vertex[index * 3 + 1]), GLfloat(vertex[index * 3 + 2]));
-	}
-	glEnd();
+	glGenVertexArrays(1, &m_vertextArrayBuffer);
+	glBindVertexArray(m_vertextArrayBuffer);
+	
+	glGenBuffers(1, &m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, pointCount * sizeof(glSkinVertex), &points[0], GL_STATIC_DRAW);
+	
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glSkinVertex), (void*)offsetof(glSkinVertex, m_posit));
+	
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glSkinVertex), (void*)offsetof(glSkinVertex, m_normal));
+	
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glSkinVertex), (void*)offsetof(glSkinVertex, m_uv));
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
+	glBindVertexArray(0);
+	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+	
+	glGenBuffers(1, &m_indexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	
+	glUseProgram(m_shader);
+	m_textureLocation = glGetUniformLocation(m_shader, "texture");
+	m_transparencyLocation = glGetUniformLocation(m_shader, "transparency");
+	m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+	m_directionalLightDirLocation = glGetUniformLocation(m_shader, "directionalLightDir");
+	
+	m_materialAmbientLocation = glGetUniformLocation(m_shader, "material_ambient");
+	m_materialDiffuseLocation = glGetUniformLocation(m_shader, "material_diffuse");
+	m_materialSpecularLocation = glGetUniformLocation(m_shader, "material_specular");
+	
 	glUseProgram(0);
+	m_vertexCount = pointCount;
+	m_indexCount = indexCount;
 }
-*/
-

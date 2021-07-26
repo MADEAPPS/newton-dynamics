@@ -16,7 +16,7 @@
 #include "ndDemoEntity.h"
 
 
-class DebrisPoint
+class glDebrisPoint
 {
 	public:
 	glVector4 m_posit;
@@ -29,8 +29,8 @@ class ndDemoDebrisRootEntity;
 class ndDemoDebrisMesh : public ndDemoMesh
 {
 	public:
-	ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMesh, const dArray<DebrisPoint>& vertexArray);
-	ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase, dArray<DebrisPoint>& vertexArray);
+	ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMesh, const dArray<glDebrisPoint>& vertexArray);
+	ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase, dArray<glDebrisPoint>& vertexArray);
 
 	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 
@@ -48,7 +48,7 @@ class ndDemoDebrisRootEntity: public ndDemoEntity
 	ndDemoDebrisRootEntity(const ndDemoDebrisRootEntity& copyFrom);
 	virtual ~ndDemoDebrisRootEntity(void);
 
-	void FinalizeConstruction(const dArray<DebrisPoint>& vertexArray);
+	void FinalizeConstruction(const dArray<glDebrisPoint>& vertexArray);
 
 	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
 
@@ -61,7 +61,7 @@ class ndDemoDebrisRootEntity: public ndDemoEntity
 class ndDemoDebrisEntity : public ndDemoEntity
 {
 	public:
-	ndDemoDebrisEntity(ndMeshEffect* const meshNode, dArray<DebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache);
+	ndDemoDebrisEntity(ndMeshEffect* const meshNode, dArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache);
 	ndDemoDebrisEntity(const ndDemoDebrisEntity& copyFrom);
 	virtual ~ndDemoDebrisEntity();
 	dNodeBaseHierarchy* CreateClone() const;

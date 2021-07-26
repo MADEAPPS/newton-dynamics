@@ -16,7 +16,7 @@
 #include "ndDemoEntityManager.h"
 
 
-ndDemoDebrisMesh::ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMeshconst, const dArray<DebrisPoint>& vertexArray)
+ndDemoDebrisMesh::ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMeshconst, const dArray<glDebrisPoint>& vertexArray)
 	:ndDemoMesh("vertexBufferMesh")
 {
 	m_shader = srcMeshconst->m_shader;
@@ -41,16 +41,16 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMeshconst, const d
 	
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, m_vertexCount * sizeof(DebrisPoint), &vertexArray[0].m_posit.m_x, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_vertexCount * sizeof(glDebrisPoint), &vertexArray[0].m_posit.m_x, GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(DebrisPoint), (void*)0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(glDebrisPoint), (void*)offsetof(glDebrisPoint, m_posit));
 	
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DebrisPoint), (void*)sizeof(glVector4));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glDebrisPoint), (void*)offsetof(glDebrisPoint, m_normal));
 	
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(DebrisPoint), (void*)(sizeof(glVector4) + sizeof(glVector3)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glDebrisPoint), (void*)offsetof(glDebrisPoint, m_uv));
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 	glBindVertexArray(0);
@@ -59,7 +59,7 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMeshconst, const d
 	glDisableVertexAttribArray(0);
 }
 
-ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase, dArray<DebrisPoint>& vertexArray)
+ndDemoDebrisMesh::ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase, dArray<glDebrisPoint>& vertexArray)
 	:ndDemoMesh(name)
 {
 	m_name = name;
@@ -147,7 +147,7 @@ void ndDemoDebrisMesh::Render(ndDemoEntityManager* const scene, const dMatrix& m
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 }
 
-ndDemoDebrisEntity::ndDemoDebrisEntity(ndMeshEffect* const meshNode, dArray<DebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache)
+ndDemoDebrisEntity::ndDemoDebrisEntity(ndMeshEffect* const meshNode, dArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache)
 	:ndDemoEntity(dGetIdentityMatrix(), parent)
 {
 	dInt32 vertexCount = meshNode->GetPropertiesCount();
@@ -165,9 +165,9 @@ ndDemoDebrisEntity::ndDemoDebrisEntity(ndMeshEffect* const meshNode, dArray<Debr
 	dArray<dTmpData> tmp;
 	tmp.SetCount(vertexCount);
 
-	//meshNode->GetVertexChannel(sizeof(DebrisPoint), &vertexArray[vertexOffsetBase].m_posit.m_x);
-	//meshNode->GetNormalChannel(sizeof(DebrisPoint), &vertexArray[vertexOffsetBase].m_normal.m_x);
-	//meshNode->GetUV0Channel(sizeof(DebrisPoint), &vertexArray[vertexOffsetBase].m_uv.m_u);
+	//meshNode->GetVertexChannel(sizeof(glDebrisPoint), &vertexArray[vertexOffsetBase].m_posit.m_x);
+	//meshNode->GetNormalChannel(sizeof(glDebrisPoint), &vertexArray[vertexOffsetBase].m_normal.m_x);
+	//meshNode->GetUV0Channel(sizeof(glDebrisPoint), &vertexArray[vertexOffsetBase].m_uv.m_u);
 	meshNode->GetVertexChannel(sizeof(dTmpData), &tmp[0].m_posit[0]);
 	meshNode->GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
 	meshNode->GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
@@ -225,7 +225,7 @@ ndDemoDebrisRootEntity::~ndDemoDebrisRootEntity(void)
 {
 }
 
-void ndDemoDebrisRootEntity::FinalizeConstruction(const dArray<DebrisPoint>& vertexArray)
+void ndDemoDebrisRootEntity::FinalizeConstruction(const dArray<glDebrisPoint>& vertexArray)
 {
 	ndDemoDebrisMesh* const shaderMesh = (ndDemoDebrisMesh*)GetChild()->GetMesh();
 	m_mesh = new ndDemoDebrisMesh(shaderMesh, vertexArray);

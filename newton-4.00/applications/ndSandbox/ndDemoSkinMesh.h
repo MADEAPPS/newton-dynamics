@@ -17,6 +17,7 @@
 
 class ndDemoMesh;
 class ndDemoEntity;
+class glSkinVertex;
 class ndShaderPrograms;
 class ndDemoEntityManager;
 
@@ -34,6 +35,9 @@ class ndDemoSkinMesh: public ndDemoMesh
 	protected: 
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner);
 	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+	void CreateRenderMesh(
+		const glSkinVertex* const points, dInt32 pointCount,
+		const dInt32* const indices, dInt32 indexCount);
 
 	ndDemoEntity* m_entity; 
 	dArray<glMatrix> m_bindingMatrixArray;

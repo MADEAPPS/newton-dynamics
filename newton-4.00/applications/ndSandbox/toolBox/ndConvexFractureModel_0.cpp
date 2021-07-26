@@ -179,7 +179,7 @@ class ndConvexFractureRootEntity : public ndDemoDebrisRootEntity
 class ndConvexFractureEntity: public ndDemoDebrisEntity
 {
 	public:
-	ndConvexFractureEntity(ndMeshEffect* const meshNode, dArray<DebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache, ndShapeInstance* const collision, dInt32 enumerator)
+	ndConvexFractureEntity(ndMeshEffect* const meshNode, dArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache, ndShapeInstance* const collision, dInt32 enumerator)
 		:ndDemoDebrisEntity(meshNode, vertexArray, parent, shaderCache)
 		,m_collision(collision)
 		,m_drebriBody(nullptr)
@@ -295,7 +295,7 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 {
 	ndMeshEffect* const debrisMeshPieces = m_singleManifoldMesh->CreateVoronoiConvexDecomposition(m_pointCloud, m_interiorMaterialIndex, &m_textureMatrix[0][0]);
 
-	dArray<DebrisPoint> vertexArray;
+	dArray<glDebrisPoint> vertexArray;
 	m_debriRootEnt = new ndConvexFractureRootEntity(m_singleManifoldMesh, m_mass);
 
 	dInt32 enumerator = 0;

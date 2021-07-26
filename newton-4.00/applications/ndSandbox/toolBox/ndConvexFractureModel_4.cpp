@@ -136,7 +136,7 @@ ndConvexFractureModel_4::ndEffect::ndEffect(ndConvexFractureModel_4* const manag
 	dFloat32 volume = dFloat32(outerMesh.CalculateVolume());
 	ndDemoEntityManager* const scene = manager->m_scene;
 
-	dArray<DebrisPoint> vertexArray;
+	dArray<glDebrisPoint> vertexArray;
 	m_debrisRootEnt = new ndDemoDebrisRootEntity;
 	for (dList<ndMeshEffect*>::dNode* node = rawConvexPieces.GetFirst(); node; node = node->GetNext())
 	{

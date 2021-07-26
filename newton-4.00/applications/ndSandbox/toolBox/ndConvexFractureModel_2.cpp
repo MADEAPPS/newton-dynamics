@@ -93,7 +93,7 @@ ndConvexFractureModel_2::ndEffect::ndEffect(ndConvexFractureModel_2* const manag
 	dFloat32 volume = dFloat32(mesh.CalculateVolume());
 	ndDemoEntityManager* const scene = manager->m_scene;
 
-	dArray<DebrisPoint> vertexArray;
+	dArray<glDebrisPoint> vertexArray;
 	m_debrisRootEnt = new ndDemoDebrisRootEntity;
 	for (ndMeshEffect* debri = debrisMeshPieces->GetFirstLayer(); debri; debri = nextDebris)
 	{
