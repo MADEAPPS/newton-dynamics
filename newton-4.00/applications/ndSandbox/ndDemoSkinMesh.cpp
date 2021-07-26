@@ -240,24 +240,6 @@ ndDemoMeshInterface* ndDemoSkinMesh::Clone(ndDemoEntity* const)
 	return nullptr;
 }
 
-void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
-//void ndDemoSkinMesh::Render(ndDemoEntityManager* const, const dMatrix&)
-{
-	//dAssert(0);
-	//dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
-	//dInt32 count = CalculateMatrixPalette(bindMatrix);
-	//GLfloat* const glMatrixPallete = dAlloca(GLfloat, 16 * count);
-	//ConvertToGlMatrix(count, bindMatrix, glMatrixPallete);
-	//
-	//glUseProgram(m_shader);
-	//dInt32 matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
-	//glUniformMatrix4fv(matrixPalette, count, GL_FALSE, glMatrixPallete);
-	//glCallList(m_mesh->m_optimizedOpaqueDiplayList);
-	//m_mesh->Render(scene, modelMatrix);
-
-	ndDemoMesh::Render(scene, modelMatrix);
-}
-
 void ndDemoSkinMesh::CreateRenderMesh(
 	const glSkinVertex* const points, dInt32 pointCount,
 	const dInt32* const indices, dInt32 indexCount)
@@ -313,4 +295,61 @@ void ndDemoSkinMesh::CreateRenderMesh(
 	glUseProgram(0);
 	m_vertexCount = pointCount;
 	m_indexCount = indexCount;
+}
+
+dInt32 ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
+{
+	int stack = 1;
+	ndDemoEntity* pool[128];
+	dMatrix parentMatrix[128];
+
+	ndDemoEntity* root = m_entity;
+	while (root->GetParent()) 
+	{
+		root = root->GetParent();
+	}
+
+	int count = 0;
+	pool[0] = root;
+	parentMatrix[0] = dGetIdentityMatrix();
+	dMatrix shapeBindMatrix((m_entity->GetMeshMatrix() * m_entity->CalculateGlobalMatrix()).Inverse());
+	while (stack) 
+	{
+		stack--;
+		ndDemoEntity* const entity = pool[stack];
+		dMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix[stack]);
+		bindMatrix[count] = m_bindingMatrixArray[count] * boneMatrix * shapeBindMatrix;
+
+		count++;
+		dAssert(count <= 128);
+		dAssert(count <= m_nodeCount);
+		for (ndDemoEntity* node = entity->GetChild(); node; node = node->GetSibling()) 
+		{
+			pool[stack] = node;
+			parentMatrix[stack] = boneMatrix;
+			stack++;
+		}
+	}
+	return count;
+}
+
+void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+//void ndDemoSkinMesh::Render(ndDemoEntityManager* const, const dMatrix&)
+{
+	//dAssert(0);
+	dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
+	dInt32 count = CalculateMatrixPalette(bindMatrix);
+	glMatrix* const glMatrixPallete = dAlloca(glMatrix, count);
+	for (dInt32 i = 0; i < count; i++)
+	{
+		glMatrixPallete[i] = bindMatrix[i];
+	}
+
+	//glUseProgram(m_shader);
+	//dInt32 matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
+	//glUniformMatrix4fv(matrixPalette, count, GL_FALSE, glMatrixPallete);
+	//glCallList(m_mesh->m_optimizedOpaqueDiplayList);
+	//m_mesh->Render(scene, modelMatrix);
+
+	ndDemoMesh::Render(scene, modelMatrix);
 }

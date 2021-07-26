@@ -39,8 +39,10 @@ class ndDemoSkinMesh: public ndDemoMesh
 		const glSkinVertex* const points, dInt32 pointCount,
 		const dInt32* const indices, dInt32 indexCount);
 
+	dInt32 CalculateMatrixPalette(dMatrix* const bindMatrix) const;
+
 	ndDemoEntity* m_entity; 
-	dArray<glMatrix> m_bindingMatrixArray;
+	dArray<dMatrix> m_bindingMatrixArray;
 	dInt32 m_nodeCount; 
 };
 
