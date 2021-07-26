@@ -277,9 +277,18 @@ void ndDemoSkinMesh::CreateRenderMesh(
 	
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glSkinVertex), (void*)offsetof(glSkinVertex, m_uv));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glSkinVertex), (void*)offsetof(glSkinVertex, m_weighs));
+
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 4, GL_INT, GL_FALSE, sizeof(glSkinVertex), (void*)offsetof(glSkinVertex, m_boneIndex));
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
 	glBindVertexArray(0);
+
+	glDisableVertexAttribArray(4);
+	glDisableVertexAttribArray(3);
 	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
