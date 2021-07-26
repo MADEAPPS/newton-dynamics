@@ -13,15 +13,14 @@
 #define _D_DEMO_SKIN_MESH_H_
 
 #include "ndSandboxStdafx.h"
-#include "ndDemoMeshInterface.h"
+#include "ndDemoMesh.h"
 
 class ndDemoMesh;
 class ndDemoEntity;
 class ndShaderPrograms;
 class ndDemoEntityManager;
 
-
-class ndDemoSkinMesh: public ndDemoMeshInterface
+class ndDemoSkinMesh: public ndDemoMesh
 {
 	public:
 	struct dWeightBoneIndex
@@ -29,8 +28,8 @@ class ndDemoSkinMesh: public ndDemoMeshInterface
 		dInt32 m_boneIndex[4];
 	};
 
-	ndDemoSkinMesh(ndDemoEntity* const owner, const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
-	ndDemoSkinMesh(const ndDemoSkinMesh& clone, ndDemoEntity* const owner);
+	ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
+	//ndDemoSkinMesh(const ndDemoSkinMesh& clone, ndDemoEntity* const owner);
 	//ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, dScene::dNode* const meshNode, const dTree<ndDemoEntity*, dScene::dNode*>& boneMap, const ndShaderPrograms& shaderCache);
 	~ndDemoSkinMesh();
 
@@ -42,14 +41,12 @@ class ndDemoSkinMesh: public ndDemoMeshInterface
 	dInt32 CalculateMatrixPalette(dMatrix* const bindMatrix) const;
 	void ConvertToGlMatrix(dInt32 count, const dMatrix* const bindMatrix, GLfloat* const glMatrices) const;
 	//dGeometryNodeSkinClusterInfo* FindSkinModifier(dScene* const scene, dScene::dNode* const meshNode) const;
-	void OptimizeForRender(const ndDemoSubMesh& segment, const dVector* const pointWeights, const dWeightBoneIndex* const pointSkinBone) const;
+	//void OptimizeForRender(const ndDemoSubMesh& segment, const dVector* const pointWeights, const dWeightBoneIndex* const pointSkinBone) const;
 
-	ndDemoMesh* m_mesh;
 	ndDemoEntity* m_entity; 
-	//dMatrix* m_bindingMatrixArray;
 	dArray<dMatrix> m_bindingMatrixArray;
 	dInt32 m_nodeCount; 
-	dInt32 m_shader;
+	//dInt32 m_shader;
 };
 
 #endif 

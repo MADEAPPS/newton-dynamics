@@ -370,12 +370,14 @@ class ndMeshEffect: public dPolyhedra
 	{
 		public:
 		dVertexCluster()
-			:m_bindMatrix(dGetIdentityMatrix())
 		{
 		}
-		dMatrix m_bindMatrix;
 		dArray<dInt32> m_vertexIndex;
 		dArray<dFloat32> m_vertexWeigh;
+	};
+
+	class dClusterMap: public dTree<dVertexCluster, const dString>
+	{
 	};
 	
 	D_COLLISION_API ndMeshEffect();
@@ -400,7 +402,7 @@ class ndMeshEffect: public dPolyhedra
 
 	dInt32 GetFaceMaterial(dEdge* const faceEdge) const;
 
-	const dTree<dVertexCluster, const dString>& GetCluster() const;
+	const dClusterMap& GetCluster() const;
 	D_COLLISION_API dVertexCluster* CreateCluster(const char* const name);
 	D_COLLISION_API dVertexCluster* FindCluster(const char* const name) const;
 
@@ -412,6 +414,7 @@ class ndMeshEffect: public dPolyhedra
 	D_COLLISION_API void CalculateNormals(dFloat64 angleInRadians);
 	D_COLLISION_API void BuildFromIndexList(const dMeshVertexFormat* const format);
 	
+	D_COLLISION_API void GetVertexIndexChannel(dInt32* const bufferOut) const;
 	D_COLLISION_API void GetVertexChannel64(dInt32 strideInByte, dFloat64* const bufferOut) const;
 	D_COLLISION_API void GetVertexChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
 	D_COLLISION_API void GetNormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
@@ -484,8 +487,8 @@ class ndMeshEffect: public dPolyhedra
 	dString m_name;
 	dPointFormat m_points;
 	dAttibutFormat m_attrib;
+	dClusterMap m_clusters;
 	dArray<dMaterial> m_materials;
-	dTree<dVertexCluster, const dString> m_clusters;
 	dInt32 m_vertexBaseCount;
 	dInt32 m_constructionIndex;
 };
@@ -720,7 +723,7 @@ inline ndMeshEffect* ndMeshEffect::GetNextLayer(ndMeshEffect* const layerSegment
 	return GetNextLayer(layerSegment->IncLRU() - 1);
 }
 
-inline const dTree<ndMeshEffect::dVertexCluster, const dString>& ndMeshEffect::GetCluster() const
+inline const ndMeshEffect::dClusterMap& ndMeshEffect::GetCluster() const
 {
 	return m_clusters;
 }

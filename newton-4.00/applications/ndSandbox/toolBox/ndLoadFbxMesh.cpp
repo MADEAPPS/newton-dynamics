@@ -61,13 +61,13 @@ void fbxDemoEntity::BuildRenderMeshes(ndDemoEntityManager* const scene)
 		if (ent->m_fbxMeshEffect)
 		{
 			ndDemoMeshInterface* mesh;
-			if (ent->m_fbxMeshEffect->GetCluster().GetCount())
+			if (!ent->m_fbxMeshEffect->GetCluster().GetCount())
 			{
-				mesh = new ndDemoSkinMesh(this, ent->GetName().GetStr(), ent->m_fbxMeshEffect, scene->GetShaderCache());
+				mesh = new ndDemoMesh(ent->GetName().GetStr(), ent->m_fbxMeshEffect, scene->GetShaderCache());
 			}
 			else
 			{
-				mesh = new ndDemoMesh(ent->GetName().GetStr(), ent->m_fbxMeshEffect, scene->GetShaderCache());
+				mesh = new ndDemoSkinMesh(ent, ent->m_fbxMeshEffect, scene->GetShaderCache());
 			}
 			ent->SetMesh(mesh, ent->GetMeshMatrix());
 			mesh->Release();
@@ -423,22 +423,21 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 			const ofbx::Object* const fbxBone = fbxCluster->getLink();
 			if (nodeMap.Find(fbxBone))
 			{
-				dMatrix parentBoneMatrix(dGetIdentityMatrix());
-				if (clusterBoneMap.Find(fbxBone->getParent()))
-				{
-					const ofbx::Cluster* const parentCluster = clusterBoneMap.Find(fbxBone->getParent())->GetInfo();
-					const ofbx::Matrix parentTransformMatrix(parentCluster->getTransformLinkMatrix());
-					parentBoneMatrix = ofbxMatrix2dMatrix(parentTransformMatrix);
-				}
-
-				const ofbx::Matrix transformMatrix(fbxCluster->getTransformLinkMatrix());
-				const dMatrix boneMatrix(ofbxMatrix2dMatrix(transformMatrix));
-				const dMatrix bindingMatrix (boneMatrix * parentBoneMatrix.Inverse4x4());
 				ndMeshEffect::dVertexCluster* const cluster = mesh->CreateCluster(fbxBone->name);
-				cluster->m_bindMatrix = bindingMatrix;
+
+				//dMatrix parentBoneMatrix(dGetIdentityMatrix());
+				//if (clusterBoneMap.Find(fbxBone->getParent()))
+				//{
+				//	const ofbx::Cluster* const parentCluster = clusterBoneMap.Find(fbxBone->getParent())->GetInfo();
+				//	const ofbx::Matrix parentTransformMatrix(parentCluster->getTransformLinkMatrix());
+				//	parentBoneMatrix = ofbxMatrix2dMatrix(parentTransformMatrix);
+				//}
+				//const ofbx::Matrix transformMatrix(fbxCluster->getTransformLinkMatrix());
+				//const dMatrix boneMatrix(ofbxMatrix2dMatrix(transformMatrix));
+				//const dMatrix bindingMatrix (boneMatrix * parentBoneMatrix.Inverse4x4());
+				//cluster->m_bindMatrix = bindingMatrix;
 
 				dAssert(fbxCluster->getIndicesCount() == fbxCluster->getWeightsCount());
-
 				dInt32 clusterIndexCount = fbxCluster->getIndicesCount();
 				const dInt32* const indices = fbxCluster->getIndices();
 				const double* const weights = fbxCluster->getWeights();

@@ -2008,6 +2008,7 @@ ndMeshEffect::ndMeshEffect()
 	,m_name()
 	,m_points()
 	,m_attrib()
+	,m_clusters()
 	,m_materials()
 	,m_vertexBaseCount(-1)
 	,m_constructionIndex(0)
@@ -2019,10 +2020,16 @@ ndMeshEffect::ndMeshEffect(dPolyhedra& mesh, const ndMeshEffect& source)
 	:dPolyhedra(mesh)
 	,m_points(source.m_points)
 	,m_attrib(source.m_attrib)
+	,m_clusters()
 	,m_materials(source.m_materials)
 	,m_vertexBaseCount(-1)
 	,m_constructionIndex(0)
 {
+	if (source.m_clusters.GetCount())
+	{
+		// remember to copy the clusters
+		dAssert(0);
+	}
 	Init();
 }
 
@@ -2030,10 +2037,16 @@ ndMeshEffect::ndMeshEffect(const ndMeshEffect& source)
 	:dPolyhedra(source)
 	,m_points(source.m_points)
 	,m_attrib(source.m_attrib)
+	,m_clusters()
 	,m_materials(source.m_materials)
 	,m_vertexBaseCount(-1)
 	,m_constructionIndex(0)
 {
+	if (source.m_clusters.GetCount())
+	{
+		// remember to copy the clusters
+		dAssert(0);
+	}
 	Init();
 }
 
@@ -3387,6 +3400,14 @@ void ndMeshEffect::RepairTJoints()
 	dAssert(Sanity());
 }
 
+void ndMeshEffect::GetVertexIndexChannel(dInt32* const bufferOut) const
+{
+	for (dInt32 i = 0; i < m_attrib.m_pointChannel.GetCount(); i++)
+	{
+		const dInt32 index = m_attrib.m_pointChannel[i];
+		bufferOut[i] = index;
+	}
+}
 
 void ndMeshEffect::GetVertexChannel64(dInt32 strideInByte, dFloat64* const bufferOut) const
 {
@@ -3705,6 +3726,7 @@ ndMeshEffect::ndMeshEffect(const dFloat64* const vertexCloud, dInt32 count, dInt
 	,m_name()
 	,m_points()
 	,m_attrib()
+	,m_clusters()
 	,m_materials()
 	,m_vertexBaseCount(0)
 	,m_constructionIndex(0)
@@ -3745,6 +3767,7 @@ ndMeshEffect::ndMeshEffect(const ndShapeInstance& shape)
 	,m_name()
 	,m_points()
 	,m_attrib()
+	,m_clusters()
 	,m_materials()
 	,m_vertexBaseCount(0)
 	,m_constructionIndex(0)

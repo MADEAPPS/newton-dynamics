@@ -69,6 +69,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	bool m_hasTransparency;
 
 	friend class ndDemoEntity;
+	friend class ndDemoSkinMesh;
 	friend class ndDemoDebrisRootEntity;
 };
 
