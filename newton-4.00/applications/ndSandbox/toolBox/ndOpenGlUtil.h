@@ -14,6 +14,11 @@
 
 #include "ndSandboxStdafx.h"
 
+#ifndef offsetof
+#define offsetof(s,m) ((size_t)&(((s*)0)->m))
+#endif
+
+
 #ifdef D_NEWTON_USE_DOUBLE
 	inline void glMaterialParam(GLenum face, GLenum pname, const dFloat32 *params)
 	{
