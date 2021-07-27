@@ -335,8 +335,6 @@ dInt32 ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 
 void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
-
-
 	dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
 	dInt32 count = CalculateMatrixPalette(bindMatrix);
 	glMatrix* const glMatrixPallete = dAlloca(glMatrix, count);

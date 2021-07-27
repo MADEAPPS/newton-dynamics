@@ -32,6 +32,9 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	//fbxDemoEntity* const ragdoll = LoadFbxMesh("skinTest0.fbx");
 
 	ragdoll->BuildRenderMeshes(scene);
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit.m_y = 0.5f;
+	ragdoll->ResetMatrix(matrix);
 	scene->AddEntity(ragdoll);
 
 	dQuaternion rot;
