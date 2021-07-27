@@ -35,8 +35,8 @@ void main()
 
 	vec4 weightedNormal = vec4 (0.0, 0.0, 0.0, 0.0);	
 	vec4 weightedVertex = vec4 (0.0, 0.0, 0.0, 1.0);	
+	vec4 pointNormal = vec4(in_normal, 0.0);
 	vec4 pointVertex = vec4(in_position, 1.0);
-	vec4 pointNormal = vec4(gl_Normal.x, gl_Normal.y, gl_Normal.z, 0.0);
 	for (int i = 0; i < 4; i++) 
 	{
 		int matrixIndex = int (in_boneIndices[i]);
@@ -46,11 +46,12 @@ void main()
 	weightedVertex.w = 1.0;
 	weightedNormal = normalize (weightedNormal);
 
-	posit = vec3 (viewModelMatrix * pointVertex);
-	normal = vec3 (normalize (normalMatrix * pointNormal));
-
-	//posit = vec3 (viewModelMatrix * weightedVertex);
-	//normal = vec3 (normalize (normalMatrix * weightedNormal));
+#if 1
+	weightedNormal = pointNormal;	
+	weightedVertex = pointVertex;
+#endif
+	normal = vec3 (normalMatrix * weightedNormal);
+	posit = vec3 (viewModelMatrix * weightedVertex);
 
 	uv = in_uv;
 	gl_Position = projectionMatrix * vec4(posit, 1.0);
