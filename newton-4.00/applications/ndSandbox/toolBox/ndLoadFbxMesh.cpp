@@ -199,18 +199,19 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNodeM
 	fbxImportStackData nodeStack[1024];
 	const ofbx::Object* const rootNode = fbxScene->getRoot();
 	dAssert(rootNode);
+	stack = GetChildrenNodes(rootNode, buffer);
 
 	fbxDemoEntity* rootEntity = nullptr;
-	if (rootNode) 
+	if (stack > 1)
 	{
-		stack = GetChildrenNodes(rootNode, buffer);
-		rootEntity = (stack > 1) ? new fbxDemoEntity(nullptr) : nullptr;
+		rootEntity = new fbxDemoEntity(nullptr);
+		rootEntity->SetName("dommyRoot");
+	}
 
-		for (dInt32 i = 0; i < stack; i++)
-		{
-			ofbx::Object* const child = buffer[stack - i - 1];
-			nodeStack[i] = fbxImportStackData(child, rootEntity);
-		}
+	for (dInt32 i = 0; i < stack; i++)
+	{
+		ofbx::Object* const child = buffer[stack - i - 1];
+		nodeStack[i] = fbxImportStackData(child, rootEntity);
 	}
 
 	while (stack)

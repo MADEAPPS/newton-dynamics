@@ -28,8 +28,8 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
-	//fbxDemoEntity* const ragdoll = LoadFbxMesh("whiteMan.fbx");
-	fbxDemoEntity* const ragdoll = LoadFbxMesh("skinTest0.fbx");
+	fbxDemoEntity* const ragdoll = LoadFbxMesh("whiteMan.fbx");
+	//fbxDemoEntity* const ragdoll = LoadFbxMesh("skinTest0.fbx");
 
 	ragdoll->BuildRenderMeshes(scene);
 	scene->AddEntity(ragdoll);
