@@ -38,8 +38,10 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 		bool m_jump;
 	};
 
-	ndBasicPlayerCapsule(ndDemoEntityManager* const scene, const dMatrix& localAxis, 
-		const dMatrix& location, dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight, bool isPlayer = false);
+	ndBasicPlayerCapsule(
+		ndDemoEntityManager* const scene, const ndDemoEntity* const modelEntity,
+		const dMatrix& localAxis, const dMatrix& location, 
+		dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight, bool isPlayer = false);
 
 	ndBasicPlayerCapsule(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache, ndPhysicsWorld* const world);
 	void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;

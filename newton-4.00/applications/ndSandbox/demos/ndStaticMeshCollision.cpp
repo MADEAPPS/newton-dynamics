@@ -13,6 +13,7 @@
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
+#include "ndLoadFbxMesh.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndCompoundScene.h"
@@ -44,16 +45,18 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	localAxis[1] = dVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
+	fbxDemoEntity* const man = scene->LoadFbxMesh("whiteMan.fbx");
+
 	dFloat32 height = 1.9f;
 	dFloat32 radio = 0.5f;
 	dFloat32 mass = 100.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height/4.0f, true);
+	new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height/4.0f, true);
 	
 	location.m_posit.m_z += 2.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height / 4.0f);
 	
 	location.m_posit.m_z += 2.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height / 4.0f);
 
 	//AddCapsulesStacks(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 	
@@ -65,6 +68,7 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	//AddConvexHull(scene, dVector(7.0f, 1.0f, -3.0f, 0.0f), 10.0f, 0.7f, 1.0f, 10);
 	//AddConvexHull(scene, dVector(6.0f, 1.0f, -3.0f, 0.0f), 10.0f, 0.5f, 1.2f, 6);
 
+	delete man;
 	dQuaternion rot;
 	dVector origin(-5.0f, 4.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);

@@ -30,24 +30,27 @@
 #endif
 
 
-ndBasicPlayerCapsule::ndBasicPlayerCapsule(ndDemoEntityManager* const scene, const dMatrix& localAxis, const dMatrix& location__,
+ndBasicPlayerCapsule::ndBasicPlayerCapsule(
+	ndDemoEntityManager* const scene, const ndDemoEntity* const modelEntity,
+	const dMatrix& localAxis, const dMatrix& location,
 	dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight, bool isPlayer)
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 	,m_scene(scene)
 	,m_isPlayer(isPlayer)
 {
-	dMatrix matrix(location__);
+	dMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y + 1.0f;
 
 	SetMatrix(matrix);
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 
-	const ndShapeInstance& shape = GetCollisionShape();
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "smilli.tga", "marble.tga", "marble.tga");
-	entity->SetMesh(mesh, dGetIdentityMatrix());
-	mesh->Release();
+	//ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	//const ndShapeInstance& shape = GetCollisionShape();
+	//ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "smilli.tga", "marble.tga", "marble.tga");
+	//entity->SetMesh(mesh, dGetIdentityMatrix());
+	//mesh->Release();
+	ndDemoEntity* const entity = (ndDemoEntity*)modelEntity->CreateClone();
 	
 	world->AddBody(this);
 	scene->AddEntity(entity);

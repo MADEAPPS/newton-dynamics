@@ -13,6 +13,7 @@
 #include "ndSkyBox.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
+#include "ndLoadFbxMesh.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndTargaToOpenGl.h"
@@ -37,7 +38,8 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	dFloat32 height = 1.9f;
 	dFloat32 radio = 0.5f;
 	dFloat32 mass = 100.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height/4.0f, true);
+	ndDemoEntity* const entity = scene->LoadFbxMesh("whiteMan.fbx");
+	new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height/4.0f, true);
 	
 	location.m_posit.m_z += 2.0f;
 	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
@@ -50,6 +52,7 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	AddBox(scene, dVector(10.0f, 0.5f, 1.125f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
 	AddBox(scene, dVector(10.0f, 1.0f, 1.250f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
 
+	delete entity;
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
