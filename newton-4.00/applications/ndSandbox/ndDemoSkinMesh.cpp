@@ -17,11 +17,13 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
+//#define USE_SKIN_SHADER
+
 class glSkinVertex : public glPositionNormalUV
 {
 	public:
 	glVector4 m_weighs;
-	GLint m_boneIndex[4];
+	glVector4 m_boneIndex;
 };
 
 ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
@@ -29,8 +31,11 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	,m_entity(owner)
 	,m_bindingMatrixArray()
 {
-	//m_name = owner->GetName();
+#ifdef USE_SKIN_SHADER	
+	m_shader = shaderCache.m_skinningDiffuseEffect;
+#else
 	m_shader = shaderCache.m_diffuseEffect;
+#endif
 
 	ndDemoEntity* root = owner;
 	while (root->GetParent()) 
@@ -191,7 +196,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 		for (dInt32 j = 0; j < 4; j++)
 		{
 			points[i].m_weighs[j] = GLfloat(weight[k][j]);
-			points[i].m_boneIndex[j] = GLint (skinBone[k].m_boneIndex[j]);
+			points[i].m_boneIndex[j] = GLfloat(skinBone[k].m_boneIndex[j]);
 		}
 	}
 	
@@ -264,7 +269,7 @@ void ndDemoSkinMesh::CreateRenderMesh(
 	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glSkinVertex), (void*)offsetof(glSkinVertex, m_weighs));
 
 	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(4, 4, GL_INT, GL_FALSE, sizeof(glSkinVertex), (void*)offsetof(glSkinVertex, m_boneIndex));
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glSkinVertex), (void*)offsetof(glSkinVertex, m_boneIndex));
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -291,6 +296,9 @@ void ndDemoSkinMesh::CreateRenderMesh(
 	m_materialAmbientLocation = glGetUniformLocation(m_shader, "material_ambient");
 	m_materialDiffuseLocation = glGetUniformLocation(m_shader, "material_diffuse");
 	m_materialSpecularLocation = glGetUniformLocation(m_shader, "material_specular");
+#ifdef USE_SKIN_SHADER	
+	m_matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
+#endif
 	
 	glUseProgram(0);
 	m_vertexCount = pointCount;
@@ -334,9 +342,8 @@ dInt32 ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 }
 
 void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
-//void ndDemoSkinMesh::Render(ndDemoEntityManager* const, const dMatrix&)
 {
-	//dAssert(0);
+#ifdef USE_SKIN_SHADER	
 	dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
 	dInt32 count = CalculateMatrixPalette(bindMatrix);
 	glMatrix* const glMatrixPallete = dAlloca(glMatrix, count);
@@ -344,12 +351,7 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& mod
 	{
 		glMatrixPallete[i] = bindMatrix[i];
 	}
-
-	//glUseProgram(m_shader);
-	//dInt32 matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
-	//glUniformMatrix4fv(matrixPalette, count, GL_FALSE, glMatrixPallete);
-	//glCallList(m_mesh->m_optimizedOpaqueDiplayList);
-	//m_mesh->Render(scene, modelMatrix);
-
+	glUniformMatrix4fv(m_matrixPalette, count, GL_FALSE, &glMatrixPallete[0][0][0]);
+#endif
 	ndDemoMesh::Render(scene, modelMatrix);
 }

@@ -44,6 +44,7 @@ class ndDemoSkinMesh: public ndDemoMesh
 	ndDemoEntity* m_entity; 
 	dArray<dMatrix> m_bindingMatrixArray;
 	dInt32 m_nodeCount; 
+	dInt32 m_matrixPalette;
 };
 
 #endif 

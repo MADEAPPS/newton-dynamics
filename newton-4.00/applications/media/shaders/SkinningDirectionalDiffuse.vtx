@@ -8,15 +8,20 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#version 120
+#version 330 core
 
 uniform sampler2D texture;
 
-varying vec3 normal;
-varying vec3 position;
+//varying vec3 normal;
+//varying vec3 position;
+layout(location = 0) in vec3 in_position;
+layout(location = 1) in vec3 in_normal;
+layout(location = 2) in vec2 in_uv;
+layout(location = 3) in vec4 in_boneWeights;
+layout(location = 3) in vec4 in_boneIndices;
 
-attribute vec4 boneWeights;
-attribute vec4 boneIndices;
+//attribute vec4 boneWeights;
+//attribute vec4 boneIndices;
 uniform mat4 matrixPallete[128];
 
 void main()
@@ -26,7 +31,8 @@ void main()
 
 	vec4 pointVertex = gl_Vertex;
 	vec4 pointNormal = vec4(gl_Normal.x, gl_Normal.y, gl_Normal.z, 0.0);
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) 
+	{
 		int matrixIndex = int (boneIndices[i]);
 		weightedVertex += matrixPallete[matrixIndex] * pointVertex * boneWeights[i];
 		weightedNormal += vec3 (matrixPallete[matrixIndex] * pointNormal * boneWeights[i]);
