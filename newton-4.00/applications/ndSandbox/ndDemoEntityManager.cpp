@@ -379,16 +379,16 @@ void ndDemoEntityManager::OpenMessageCallback(GLenum source,
 	const GLchar* message,
 	const void* userParam)
 {
-	dAssert(0);
 	if (userParam)
 	{
-		if (id == 131185)
+		switch(id)
 		{
-			return;
+			case 131185:  // nvidia driver report will use VIDEO memory as the source for buffer object operations
+				return;
 		}
-		fprintf(stderr, "GL CALLBACK: %s source = 0x%x, type = 0x%x, id = %d, severity = 0x%x, message = %s, length = %d \n",
-			(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-			source, type, id, severity, message, length);
+		dAssert(0);
+		dTrace(("GL CALLBACK: %s source = 0x%x, type = 0x%x, id = %d, severity = 0x%x, message = %s, length = %d \n",
+			(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), source, type, id, severity, message, length));
 	}
 }
 
