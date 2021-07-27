@@ -18,9 +18,9 @@
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
-#include "ndConvexFractureModel_1.h"
+#include "ndExplodeConvexShapeModel.h"
 
-static void makePointCloud(ndConvexFractureModel_1::ndDesc& desc)
+static void makePointCloud(ndExplodeConvexShapeModel::ndDesc& desc)
 {
 	//dVector pMin;
 	//dVector pMax;
@@ -69,7 +69,7 @@ static void makePointCloud(ndConvexFractureModel_1::ndDesc& desc)
 	}
 }
 
-static dVector CalculateLocation(ndConvexFractureModel_1* const manager, const dMatrix& matrix, const ndShapeInstance& shape)
+static dVector CalculateLocation(ndExplodeConvexShapeModel* const manager, const dMatrix& matrix, const ndShapeInstance& shape)
 {
 	dVector minBox;
 	dVector maxBox;
@@ -83,9 +83,9 @@ static dVector CalculateLocation(ndConvexFractureModel_1* const manager, const d
 	return floor;
 }
 
-static void AddBoxEffect(ndConvexFractureModel_1* const manager, const dMatrix& matrix)
+static void AddBoxEffect(ndExplodeConvexShapeModel* const manager, const dMatrix& matrix)
 {
-	ndConvexFractureModel_1::ndDesc desc;
+	ndExplodeConvexShapeModel::ndDesc desc;
 
 	// first make a collision shape that we want to brake to pieces
 	ndShapeInstance shape(new ndShapeBox(3.0f, 0.5f, 0.5f));
@@ -99,7 +99,7 @@ static void AddBoxEffect(ndConvexFractureModel_1* const manager, const dMatrix& 
 
 	// now with make a template effect that we can place 
 	// in the scene many time.
-	ndConvexFractureModel_1::ndEffect effect(manager, desc);
+	ndExplodeConvexShapeModel::ndEffect effect(manager, desc);
 
 	// get a location in the scene
 	dMatrix location(matrix);
@@ -120,9 +120,9 @@ static void AddBoxEffect(ndConvexFractureModel_1* const manager, const dMatrix& 
 	}
 }
 
-static void AddCapsuleEffect(ndConvexFractureModel_1* const manager, const dMatrix& matrix)
+static void AddCapsuleEffect(ndExplodeConvexShapeModel* const manager, const dMatrix& matrix)
 {
-	ndConvexFractureModel_1::ndDesc desc;
+	ndExplodeConvexShapeModel::ndDesc desc;
 
 	ndShapeInstance shape(new ndShapeCapsule(0.25f, 0.25f, 4.0f));
 
@@ -135,7 +135,7 @@ static void AddCapsuleEffect(ndConvexFractureModel_1* const manager, const dMatr
 	location.m_posit = CalculateLocation(manager, matrix, shape);
 
 	makePointCloud(desc);
-	ndConvexFractureModel_1::ndEffect effect(manager, desc);
+	ndExplodeConvexShapeModel::ndEffect effect(manager, desc);
 
 	const dInt32 count = 5;
 	const dFloat32 z0 = location.m_posit.m_z;
@@ -151,9 +151,9 @@ static void AddCapsuleEffect(ndConvexFractureModel_1* const manager, const dMatr
 	}
 }
 
-static void AddCylinderEffect(ndConvexFractureModel_1* const manager, const dMatrix& matrix)
+static void AddCylinderEffect(ndExplodeConvexShapeModel* const manager, const dMatrix& matrix)
 {
-	ndConvexFractureModel_1::ndDesc desc;
+	ndExplodeConvexShapeModel::ndDesc desc;
 
 	ndShapeInstance shape(new ndShapeCylinder(0.25f, 0.25f, 4.0f));
 
@@ -166,7 +166,7 @@ static void AddCylinderEffect(ndConvexFractureModel_1* const manager, const dMat
 	location.m_posit = CalculateLocation(manager, matrix, shape);
 
 	makePointCloud(desc);
-	ndConvexFractureModel_1::ndEffect effect(manager, desc);
+	ndExplodeConvexShapeModel::ndEffect effect(manager, desc);
 
 	const dInt32 count = 5;
 	const dFloat32 z0 = location.m_posit.m_z;
@@ -182,13 +182,13 @@ static void AddCylinderEffect(ndConvexFractureModel_1* const manager, const dMat
 	}
 }
 
-void ndBasicFracture_1(ndDemoEntityManager* const scene)
+void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndConvexFractureModel_1* const fractureManager = new ndConvexFractureModel_1(scene);
+	ndExplodeConvexShapeModel* const fractureManager = new ndExplodeConvexShapeModel(scene);
 	world->AddModel(fractureManager);
 
 	dMatrix matrix(dGetIdentityMatrix());

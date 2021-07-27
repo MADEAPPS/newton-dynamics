@@ -43,12 +43,12 @@
 //#define DEFAULT_SCENE	6		// setting particle fluid
 //#define DEFAULT_SCENE	7		// static mesh collision 
 //#define DEFAULT_SCENE	8		// setting basic joints
-#define DEFAULT_SCENE	9		// setting basic rag doll
+//#define DEFAULT_SCENE	9		// setting basic rag doll
 //#define DEFAULT_SCENE	10		// setting basic vehicle
 //#define DEFAULT_SCENE	11		// setting heavy vehicle
 //#define DEFAULT_SCENE	12		// conservation of angular momentum 
-//#define DEFAULT_SCENE	13		// basic voronoi fracture
-//#define DEFAULT_SCENE	14		// simple voronoi fracture
+#define DEFAULT_SCENE	13		// simple voronoi fracture
+//#define DEFAULT_SCENE	14		// basic voronoi fracture
 //#define DEFAULT_SCENE	15		// linked voronoi fracture
 //#define DEFAULT_SCENE	16		// skin peel voronoi fracture
 						 
@@ -66,10 +66,10 @@ void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
 void ndBasicFracture_4(ndDemoEntityManager* const scene);
 void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
-void ndBasicFracture_0(ndDemoEntityManager* const scene);
-void ndBasicFracture_1(ndDemoEntityManager* const scene);
-void ndBasicFracture_2(ndDemoEntityManager* const scene);
-void ndBasicFracture_4(ndDemoEntityManager* const scene);
+void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene);
+//void ndBasicFracture_0(ndDemoEntityManager* const scene);
+//void ndBasicFracture_2(ndDemoEntityManager* const scene);
+//void ndBasicFracture_4(ndDemoEntityManager* const scene);
 void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
 
@@ -88,10 +88,10 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic vehicle", ndBasicVehicle },
 	{ "heavy vehicle", ndHeavyVehicle },
 	{ "angular momentum", ndBasicAngularMomentum },
-	{ "basic convex fracture", ndBasicFracture_0 },
-	{ "simple convex fracture", ndBasicFracture_1 },
-	{ "linked convex fracture", ndBasicFracture_2 },
-	{ "simple skin peeling fracture", ndBasicFracture_4 },
+	{ "simple convex fracture", ndBasicExplodeConvexShape },
+	//{ "basic convex fracture", ndBasicFracture_0 },
+	//{ "linked convex fracture", ndBasicFracture_2 },
+	//{ "simple skin peeling fracture", ndBasicFracture_4 },
 };
 
 ndDemoEntityManager::ButtonKey::ButtonKey (bool state)

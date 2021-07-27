@@ -19,9 +19,9 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoDebrisEntity.h"
 #include "ndDemoEntityManager.h"
-#include "ndConvexFractureModel_1.h"
+#include "ndExplodeConvexShapeModel.h"
 
-ndConvexFractureModel_1::ndAtom::ndAtom()
+ndExplodeConvexShapeModel::ndAtom::ndAtom()
 	:m_centerOfMass(0.0f)
 	,m_momentOfInertia(0.0f)
 	,m_mesh(nullptr)
@@ -30,7 +30,7 @@ ndConvexFractureModel_1::ndAtom::ndAtom()
 {
 }
 
-ndConvexFractureModel_1::ndAtom::ndAtom(const ndAtom& atom)
+ndExplodeConvexShapeModel::ndAtom::ndAtom(const ndAtom& atom)
 	:m_centerOfMass(atom.m_centerOfMass)
 	,m_momentOfInertia(atom.m_momentOfInertia)
 	,m_mesh(nullptr)
@@ -39,7 +39,7 @@ ndConvexFractureModel_1::ndAtom::ndAtom(const ndAtom& atom)
 {
 }
 
-ndConvexFractureModel_1::ndAtom::~ndAtom()
+ndExplodeConvexShapeModel::ndAtom::~ndAtom()
 {
 	if (m_collision)
 	{
@@ -47,7 +47,7 @@ ndConvexFractureModel_1::ndAtom::~ndAtom()
 	}
 }
 
-ndConvexFractureModel_1::ndEffect::ndEffect(ndConvexFractureModel_1* const manager, const ndDesc& desc)
+ndExplodeConvexShapeModel::ndEffect::ndEffect(ndExplodeConvexShapeModel* const manager, const ndDesc& desc)
 	:dList<ndAtom>()
 	,m_body(nullptr)
 	,m_shape(new ndShapeInstance(*desc.m_shape))
@@ -139,7 +139,7 @@ ndConvexFractureModel_1::ndEffect::ndEffect(ndConvexFractureModel_1* const manag
 	delete debrisMeshPieces;
 }
 
-ndConvexFractureModel_1::ndEffect::ndEffect(const ndEffect& effect)
+ndExplodeConvexShapeModel::ndEffect::ndEffect(const ndEffect& effect)
 	:m_body(new ndBodyDynamic())
 	,m_shape(nullptr)
 	,m_visualMesh(nullptr)
@@ -159,7 +159,7 @@ ndConvexFractureModel_1::ndEffect::ndEffect(const ndEffect& effect)
 	}
 }
 
-ndConvexFractureModel_1::ndEffect::~ndEffect()
+ndExplodeConvexShapeModel::ndEffect::~ndEffect()
 {
 	if (m_visualMesh)
 	{
@@ -177,7 +177,7 @@ ndConvexFractureModel_1::ndEffect::~ndEffect()
 	}
 }
 
-ndConvexFractureModel_1::ndConvexFractureModel_1(ndDemoEntityManager* const scene)
+ndExplodeConvexShapeModel::ndExplodeConvexShapeModel(ndDemoEntityManager* const scene)
 	:ndModel()
 	,m_effectList()
 	,m_pendingEffect()
@@ -186,12 +186,12 @@ ndConvexFractureModel_1::ndConvexFractureModel_1(ndDemoEntityManager* const scen
 {
 }
 
-ndConvexFractureModel_1::~ndConvexFractureModel_1()
+ndExplodeConvexShapeModel::~ndExplodeConvexShapeModel()
 {
 }
 
-//void ndConvexFractureModel_1::Update(ndWorld* const world, dFloat32 timestep)
-void ndConvexFractureModel_1::Update(ndWorld* const, dFloat32)
+//void ndExplodeConvexShapeModel::Update(ndWorld* const world, dFloat32 timestep)
+void ndExplodeConvexShapeModel::Update(ndWorld* const, dFloat32)
 {
 	dList<ndEffect>::dNode* nextNody;
 	for (dList<ndEffect>::dNode* node = m_effectList.GetFirst(); node; node = nextNody)
@@ -230,8 +230,8 @@ void ndConvexFractureModel_1::Update(ndWorld* const, dFloat32)
 	}
 }
 
-//void ndConvexFractureModel_1::PostUpdate(ndWorld* const world, dFloat32 timestep)
-void ndConvexFractureModel_1::PostUpdate(ndWorld* const world, dFloat32)
+//void ndExplodeConvexShapeModel::PostUpdate(ndWorld* const world, dFloat32 timestep)
+void ndExplodeConvexShapeModel::PostUpdate(ndWorld* const world, dFloat32)
 {
 	if (m_pendingEffect.GetCount())
 	{
@@ -250,7 +250,7 @@ void ndConvexFractureModel_1::PostUpdate(ndWorld* const world, dFloat32)
 	}
 }
 
-void ndConvexFractureModel_1::AddEffect(const ndEffect& effect, dFloat32 mass, const dMatrix& location)
+void ndExplodeConvexShapeModel::AddEffect(const ndEffect& effect, dFloat32 mass, const dMatrix& location)
 {
 	ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
 
@@ -266,7 +266,7 @@ void ndConvexFractureModel_1::AddEffect(const ndEffect& effect, dFloat32 mass, c
 	body->SetMassMatrix(mass, *effect.m_shape);
 }
 
-void ndConvexFractureModel_1::UpdateEffect(ndWorld* const world, ndEffect& effect)
+void ndExplodeConvexShapeModel::UpdateEffect(ndWorld* const world, ndEffect& effect)
 {
 	D_TRACKTIME();
 	dVector omega(effect.m_body->GetOmega());

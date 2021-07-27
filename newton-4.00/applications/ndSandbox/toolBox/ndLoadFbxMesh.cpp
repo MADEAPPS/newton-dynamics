@@ -404,7 +404,6 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 
 	// import skin if there is any
 	if (geom->getSkin())
-	//if (0)
 	{
 		const ofbx::Skin* const skin = geom->getSkin();
 		dInt32 clusterCount = skin->getClusterCount();

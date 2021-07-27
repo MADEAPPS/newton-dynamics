@@ -20,7 +20,7 @@ class ndDemoEntityManager;
 class ndDemoDebriEntityRoot;
 class ndDemoDebrisRootEntity;
 
-class ndConvexFractureModel_1: public ndModel
+class ndExplodeConvexShapeModel: public ndModel
 {
 	class ndAtom
 	{
@@ -59,7 +59,7 @@ class ndConvexFractureModel_1: public ndModel
 	class ndEffect : public dList<ndAtom>
 	{
 		public:
-		ndEffect(ndConvexFractureModel_1* const manager, const ndDesc& desc);
+		ndEffect(ndExplodeConvexShapeModel* const manager, const ndDesc& desc);
 		ndEffect(const ndEffect& effect);
 		~ndEffect();
 
@@ -70,12 +70,12 @@ class ndConvexFractureModel_1: public ndModel
 		ndDemoDebrisRootEntity* m_debrisRootEnt;
 		dFloat32 m_breakImpactSpeed;
 
-		friend ndConvexFractureModel_1;
+		friend ndExplodeConvexShapeModel;
 	};
 
 	public:
-	ndConvexFractureModel_1(ndDemoEntityManager* const scene);
-	~ndConvexFractureModel_1();
+	ndExplodeConvexShapeModel(ndDemoEntityManager* const scene);
+	~ndExplodeConvexShapeModel();
 
 	void AddEffect(const ndEffect& effect, dFloat32 mass, const dMatrix& location);
 
