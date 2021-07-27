@@ -11,6 +11,7 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndDemoMesh.h"
+#include "ndDemoEntity.h"
 #include "ndLoadFbxMesh.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
@@ -186,8 +187,7 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 
 ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized)
 {
-	fbxDemoEntity* const entity = LoadFbxMesh(meshName);
-	entity->BuildRenderMeshes(scene);
+	fbxDemoEntity* const entity = scene->LoadFbxMesh(meshName);
 	scene->AddEntity(entity);
 
 	dPolygonSoupBuilder meshBuilder;

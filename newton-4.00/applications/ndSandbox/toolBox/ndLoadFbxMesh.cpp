@@ -26,12 +26,23 @@ fbxDemoEntity::fbxDemoEntity(ndDemoEntity* const parent)
 {
 }
 
+fbxDemoEntity::fbxDemoEntity(const fbxDemoEntity& source)
+	:ndDemoEntity(source)
+	,m_fbxMeshEffect(nullptr)
+{
+}
+
 fbxDemoEntity::~fbxDemoEntity()
 {
 	if (m_fbxMeshEffect)
 	{
 		delete m_fbxMeshEffect;
 	}
+}
+
+ndDemoEntity* fbxDemoEntity::CreateClone() const
+{
+	return new fbxDemoEntity(*this);
 }
 
 void fbxDemoEntity::CleanIntermediate()

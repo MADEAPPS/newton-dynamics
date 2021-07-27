@@ -21,6 +21,7 @@ class fbxDemoEntity : public ndDemoEntity
 {
 	public:
 	fbxDemoEntity(ndDemoEntity* const parent);
+	fbxDemoEntity(const fbxDemoEntity& source);
 	~fbxDemoEntity();
 
 	void SetRenderMatrix(const dMatrix& matrix)
@@ -29,6 +30,7 @@ class fbxDemoEntity : public ndDemoEntity
 	}
 
 	void CleanIntermediate();
+	ndDemoEntity* CreateClone() const;
 	void ApplyTransform(const dMatrix& cordinateSystem);
 	void BuildRenderMeshes(ndDemoEntityManager* const scene);
 

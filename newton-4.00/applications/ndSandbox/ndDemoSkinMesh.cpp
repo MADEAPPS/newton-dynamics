@@ -25,10 +25,15 @@ class glSkinVertex : public glPositionNormalUV
 };
 
 ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
-	:ndDemoMesh(owner->GetName().GetStr())
-	,m_entity(owner)
+	:ndDemoMeshInterface()
+	,m_shareMesh(new ndDemoMesh(owner->GetName().GetStr()))
+	,m_ownerEntity(owner)
 	,m_bindingMatrixArray()
+	,m_shader(0)
+	,m_nodeCount(0)
+	,m_matrixPalette(0)
 {
+	m_name = owner->GetName();
 	m_shader = shaderCache.m_skinningDiffuseEffect;
 
 	ndDemoEntity* root = owner;
@@ -45,7 +50,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 
 	pool[0] = root;
 	parentMatrix[0] = dGetIdentityMatrix();
-	dMatrix shapeBindMatrix(m_entity->GetMeshMatrix() * m_entity->CalculateGlobalMatrix());
+	dMatrix shapeBindMatrix(m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix());
 
 	dTree<dInt32, dString> boneClusterRemapIndex;
 	const ndMeshEffect::dClusterMap& clusterMap = meshNode->GetCluster();
@@ -200,7 +205,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
 	{
 		dInt32 materialIndex = meshNode->GetMaterialID(geometryHandle, handle);
-		ndDemoSubMesh* const segment = AddSubMesh();
+		ndDemoSubMesh* const segment = m_shareMesh->AddSubMesh();
 	
 		const ndMeshEffect::dMaterial& material = materialArray[materialIndex];
 		segment->m_material.m_ambient = glVector4(material.m_ambient);
@@ -221,33 +226,44 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 		segmentStart += segment->m_indexCount;
 	}
 	meshNode->MaterialGeometryEnd(geometryHandle);
-	m_hasTransparency = hasTransparency;
+	m_shareMesh->m_hasTransparency = hasTransparency;
 
 	// optimize this mesh for hardware buffers if possible
 	CreateRenderMesh(&points[0], vertexCount, &indices[0], indexCount);
 }
 
-ndDemoSkinMesh::~ndDemoSkinMesh()
+ndDemoSkinMesh::ndDemoSkinMesh(const ndDemoSkinMesh& source, ndDemoEntity* const owner)
+	:ndDemoMeshInterface()
+	,m_shareMesh((ndDemoMesh*)source.m_shareMesh->AddRef())
+	,m_ownerEntity(owner)
+	,m_bindingMatrixArray()
+	,m_shader(source.m_shader)
+	,m_nodeCount(source.m_nodeCount)
+	,m_matrixPalette(source.m_matrixPalette)
 {
+	m_bindingMatrixArray.SetCount(source.m_bindingMatrixArray.GetCount());
+	memcpy(&m_bindingMatrixArray[0], &source.m_bindingMatrixArray[0], source.m_bindingMatrixArray.GetCount() * sizeof(dMatrix));
 }
 
-//ndDemoMeshInterface* ndDemoSkinMesh::Clone(ndDemoEntity* const owner)
-ndDemoMeshInterface* ndDemoSkinMesh::Clone(ndDemoEntity* const)
+ndDemoSkinMesh::~ndDemoSkinMesh()
 {
-	dAssert(0);
-	//return (ndDemoSkinMesh*)new ndDemoSkinMesh(*this, owner);
-	return nullptr;
+	m_shareMesh->Release();
+}
+
+ndDemoMeshInterface* ndDemoSkinMesh::Clone(ndDemoEntity* const owner)
+{
+	return (ndDemoSkinMesh*)new ndDemoSkinMesh(*this, owner);
 }
 
 void ndDemoSkinMesh::CreateRenderMesh(
 	const glSkinVertex* const points, dInt32 pointCount,
 	const dInt32* const indices, dInt32 indexCount)
 {
-	glGenVertexArrays(1, &m_vertextArrayBuffer);
-	glBindVertexArray(m_vertextArrayBuffer);
+	glGenVertexArrays(1, &m_shareMesh->m_vertextArrayBuffer);
+	glBindVertexArray(m_shareMesh->m_vertextArrayBuffer);
 	
-	glGenBuffers(1, &m_vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glGenBuffers(1, &m_shareMesh->m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_shareMesh->m_vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, pointCount * sizeof(glSkinVertex), &points[0], GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
@@ -274,27 +290,27 @@ void ndDemoSkinMesh::CreateRenderMesh(
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 	
-	glGenBuffers(1, &m_indexBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	glGenBuffers(1, &m_shareMesh->m_indexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_shareMesh->m_indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	
 	glUseProgram(m_shader);
-	m_textureLocation = glGetUniformLocation(m_shader, "texture");
-	m_transparencyLocation = glGetUniformLocation(m_shader, "transparency");
-	m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
-	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
-	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
-	m_directionalLightDirLocation = glGetUniformLocation(m_shader, "directionalLightDir");
+	m_shareMesh->m_textureLocation = glGetUniformLocation(m_shader, "texture");
+	m_shareMesh->m_transparencyLocation = glGetUniformLocation(m_shader, "transparency");
+	m_shareMesh->m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+	m_shareMesh->m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+	m_shareMesh->m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+	m_shareMesh->m_directionalLightDirLocation = glGetUniformLocation(m_shader, "directionalLightDir");
 	
-	m_materialAmbientLocation = glGetUniformLocation(m_shader, "material_ambient");
-	m_materialDiffuseLocation = glGetUniformLocation(m_shader, "material_diffuse");
-	m_materialSpecularLocation = glGetUniformLocation(m_shader, "material_specular");
+	m_shareMesh->m_materialAmbientLocation = glGetUniformLocation(m_shader, "material_ambient");
+	m_shareMesh->m_materialDiffuseLocation = glGetUniformLocation(m_shader, "material_diffuse");
+	m_shareMesh->m_materialSpecularLocation = glGetUniformLocation(m_shader, "material_specular");
 	m_matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
 	
 	glUseProgram(0);
-	m_vertexCount = pointCount;
-	m_indexCount = indexCount;
+	m_shareMesh->m_vertexCount = pointCount;
+	m_shareMesh->m_indexCount = indexCount;
 }
 
 dInt32 ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
@@ -303,7 +319,7 @@ dInt32 ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 	ndDemoEntity* pool[128];
 	dMatrix parentMatrix[128];
 
-	ndDemoEntity* root = m_entity;
+	ndDemoEntity* root = m_ownerEntity;
 	while (root->GetParent()) 
 	{
 		root = root->GetParent();
@@ -312,7 +328,7 @@ dInt32 ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 	int count = 0;
 	pool[0] = root;
 	parentMatrix[0] = dGetIdentityMatrix();
-	dMatrix shapeBindMatrix((m_entity->GetMeshMatrix() * m_entity->CalculateGlobalMatrix()).Inverse());
+	dMatrix shapeBindMatrix((m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix()).Inverse());
 	while (stack) 
 	{
 		stack--;
@@ -352,26 +368,26 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& mod
 	const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
 	const glVector4 directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
 
-	glUniform1i(m_textureLocation, 0);
-	glUniform1f(m_transparencyLocation, 1.0f);
-	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight[0]);
-	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
-	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniform1i(m_shareMesh->m_textureLocation, 0);
+	glUniform1f(m_shareMesh->m_transparencyLocation, 1.0f);
+	glUniform4fv(m_shareMesh->m_directionalLightDirLocation, 1, &directionaLight[0]);
+	glUniformMatrix4fv(m_shareMesh->m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_shareMesh->m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+	glUniformMatrix4fv(m_shareMesh->m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 	glUniformMatrix4fv(m_matrixPalette, count, GL_FALSE, &glMatrixPallete[0][0][0]);
 
-	glBindVertexArray(m_vertextArrayBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	glBindVertexArray(m_shareMesh->m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_shareMesh->m_indexBuffer);
 
 	glActiveTexture(GL_TEXTURE0);
-	for (dNode* node = GetFirst(); node; node = node->GetNext())
+	for (ndDemoMesh::dNode* node = m_shareMesh->GetFirst(); node; node = node->GetNext())
 	{
 		ndDemoSubMesh& segment = node->GetInfo();
 		if (!segment.m_hasTranparency)
 		{
-			glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient[0]);
-			glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse[0]);
-			glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
+			glUniform3fv(m_shareMesh->m_materialAmbientLocation, 1, &segment.m_material.m_ambient[0]);
+			glUniform3fv(m_shareMesh->m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse[0]);
+			glUniform3fv(m_shareMesh->m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
 
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);

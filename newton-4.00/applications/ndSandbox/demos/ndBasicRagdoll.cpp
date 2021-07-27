@@ -54,10 +54,12 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
-	fbxDemoEntity* const ragdoll = LoadFbxMesh("whiteMan.fbx");
+	fbxDemoEntity* const ragdoll1 = scene->LoadFbxMesh("whiteMan.fbx");
 	//fbxDemoEntity* const ragdoll = LoadFbxMesh("skinTest0.fbx");
+	fbxDemoEntity* const ragdoll = (fbxDemoEntity*)ragdoll1->CreateClone();
+	delete ragdoll1;
 
-	ragdoll->BuildRenderMeshes(scene);
+	
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
 	ragdoll->ResetMatrix(matrix);

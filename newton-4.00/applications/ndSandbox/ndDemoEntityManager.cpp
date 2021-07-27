@@ -14,6 +14,7 @@
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 #include "ndDemoCamera.h"
+#include "ndLoadFbxMesh.h"
 #include "ndFileBrowser.h"
 #include "ndPhysicsWorld.h"
 #include "ndPhysicsUtils.h"
@@ -919,6 +920,13 @@ void ndDemoEntityManager::ErrorCallback(dInt32 error, const char* description)
 	dTrace (("Error %d: %s\n", error, description));
 	fprintf(stderr, "Error %d: %s\n", error, description);
 	dAssert (0);
+}
+
+fbxDemoEntity* ndDemoEntityManager::LoadFbxMesh(const char* const meshName)
+{
+	fbxDemoEntity* const entity = ::LoadFbxMesh(meshName);
+	entity->BuildRenderMeshes(this);
+	return entity;
 }
 
 void ndDemoEntityManager::MouseButtonCallback(GLFWwindow*, dInt32 button, dInt32 action, dInt32)

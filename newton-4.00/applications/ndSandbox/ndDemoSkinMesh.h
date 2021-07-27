@@ -21,7 +21,8 @@ class glSkinVertex;
 class ndShaderPrograms;
 class ndDemoEntityManager;
 
-class ndDemoSkinMesh: public ndDemoMesh
+//class ndDemoSkinMesh: public ndDemoMesh
+class ndDemoSkinMesh: public ndDemoMeshInterface
 {
 	public:
 	struct dWeightBoneIndex
@@ -29,6 +30,7 @@ class ndDemoSkinMesh: public ndDemoMesh
 		dInt32 m_boneIndex[4];
 	};
 
+	ndDemoSkinMesh(const ndDemoSkinMesh& source, ndDemoEntity* const owner);
 	ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
 	~ndDemoSkinMesh();
 
@@ -41,8 +43,10 @@ class ndDemoSkinMesh: public ndDemoMesh
 
 	dInt32 CalculateMatrixPalette(dMatrix* const bindMatrix) const;
 
-	ndDemoEntity* m_entity; 
+	ndDemoMesh* m_shareMesh;
+	ndDemoEntity* m_ownerEntity; 
 	dArray<dMatrix> m_bindingMatrixArray;
+	GLuint m_shader;
 	dInt32 m_nodeCount; 
 	dInt32 m_matrixPalette;
 };

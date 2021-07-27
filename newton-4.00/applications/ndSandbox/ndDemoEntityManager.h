@@ -19,6 +19,7 @@ struct ImDrawData;
 class ndDemoMesh;
 class ndDemoEntity;
 class ndDemoCamera;
+class fbxDemoEntity;
 class ndPhysicsWorld;
 class ndDemoMeshInterface;
 class ndDemoCameraManager;
@@ -170,6 +171,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	void SetDebugDisplay(dInt32 mode) const;
 
 	const ndShaderPrograms& GetShaderCache() const;  
+	fbxDemoEntity* LoadFbxMesh(const char* const meshName);
 	
 	private:
 	void BeginFrame();
@@ -186,8 +188,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	void CalculateFPS(dFloat32 timestep);
 	
 	void ShowMainMenuBar();
-	//void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
-
 	void ToggleProfiler();
 
 	static void RenderDrawListsCallback(ImDrawData* const draw_data);
