@@ -17,8 +17,6 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
-#define USE_SKIN_SHADER
-
 class glSkinVertex : public glPositionNormalUV
 {
 	public:
@@ -31,11 +29,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	,m_entity(owner)
 	,m_bindingMatrixArray()
 {
-#ifdef USE_SKIN_SHADER	
 	m_shader = shaderCache.m_skinningDiffuseEffect;
-#else
-	m_shader = shaderCache.m_diffuseEffect;
-#endif
 
 	ndDemoEntity* root = owner;
 	while (root->GetParent()) 
@@ -296,9 +290,7 @@ void ndDemoSkinMesh::CreateRenderMesh(
 	m_materialAmbientLocation = glGetUniformLocation(m_shader, "material_ambient");
 	m_materialDiffuseLocation = glGetUniformLocation(m_shader, "material_diffuse");
 	m_materialSpecularLocation = glGetUniformLocation(m_shader, "material_specular");
-#ifdef USE_SKIN_SHADER	
 	m_matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
-#endif
 	
 	glUseProgram(0);
 	m_vertexCount = pointCount;
@@ -343,7 +335,8 @@ dInt32 ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 
 void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
-#ifdef USE_SKIN_SHADER	
+
+
 	dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
 	dInt32 count = CalculateMatrixPalette(bindMatrix);
 	glMatrix* const glMatrixPallete = dAlloca(glMatrix, count);
@@ -351,7 +344,44 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& mod
 	{
 		glMatrixPallete[i] = bindMatrix[i];
 	}
+
+	glUseProgram(m_shader);
+
+	ndDemoCamera* const camera = scene->GetCamera();
+
+	const dMatrix& viewMatrix = camera->GetViewMatrix();
+	const glMatrix& projectionMatrix(camera->GetProjectionMatrix());
+	const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
+	const glVector4 directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+
+	glUniform1i(m_textureLocation, 0);
+	glUniform1f(m_transparencyLocation, 1.0f);
+	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight[0]);
+	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 	glUniformMatrix4fv(m_matrixPalette, count, GL_FALSE, &glMatrixPallete[0][0][0]);
-#endif
-	ndDemoMesh::Render(scene, modelMatrix);
+
+	glBindVertexArray(m_vertextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+
+	glActiveTexture(GL_TEXTURE0);
+	for (dNode* node = GetFirst(); node; node = node->GetNext())
+	{
+		ndDemoSubMesh& segment = node->GetInfo();
+		if (!segment.m_hasTranparency)
+		{
+			glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient[0]);
+			glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse[0]);
+			glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular[0]);
+
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
+			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+		}
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
 }

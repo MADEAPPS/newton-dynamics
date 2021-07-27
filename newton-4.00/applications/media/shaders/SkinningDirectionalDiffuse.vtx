@@ -46,10 +46,6 @@ void main()
 	weightedVertex.w = 1.0;
 	weightedNormal = normalize (weightedNormal);
 
-#if 1
-	weightedNormal = pointNormal;	
-	weightedVertex = pointVertex;
-#endif
 	normal = vec3 (normalMatrix * weightedNormal);
 	posit = vec3 (viewModelMatrix * weightedVertex);
 
