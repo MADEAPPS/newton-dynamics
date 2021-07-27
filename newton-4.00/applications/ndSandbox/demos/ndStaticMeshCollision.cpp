@@ -29,8 +29,8 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	heighfieldLocation.m_posit.m_z = -200.0f;
 
 	//BuildFlatPlane(scene, true);
-	BuildCompoundScene(scene, heighfieldLocation);
-	//BuildHeightFieldTerrain(scene, heighfieldLocation);
+	//BuildCompoundScene(scene, heighfieldLocation);
+	BuildHeightFieldTerrain(scene, heighfieldLocation);
 	//BuildStaticMesh(scene, "flatPlane.fbx", false);
 	//BuildStaticMesh(scene, "track.fbx", false);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
@@ -44,16 +44,16 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	localAxis[1] = dVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
-	//dFloat32 height = 1.9f;
-	//dFloat32 radio = 0.5f;
-	//dFloat32 mass = 100.0f;
-	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height/4.0f, true);
-	//
-	//location.m_posit.m_z += 2.0f;
-	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	dFloat32 height = 1.9f;
+	dFloat32 radio = 0.5f;
+	dFloat32 mass = 100.0f;
+	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height/4.0f, true);
 	
-	//location.m_posit.m_z += 2.0f;
-	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	location.m_posit.m_z += 2.0f;
+	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	
+	location.m_posit.m_z += 2.0f;
+	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
 
 	//AddCapsulesStacks(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 	
