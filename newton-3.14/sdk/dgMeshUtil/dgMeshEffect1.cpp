@@ -4013,19 +4013,3 @@ void dgMeshEffect::GetWeightIndexChannel(dgInt32 strideInByte, dgInt32* const bu
 	}
 }
 */
-
-dgMeshEffect::dVertexCluster* dgMeshEffect::FindCluster(const char* const name) const
-{
-	dAssert(0);
-	return nullptr;
-}
-
-dgMeshEffect::dVertexCluster* dgMeshEffect::CreateCluster(const char* const name)
-{
-	dTree<dVertexCluster, const dString>::dNode* node = FindCluster(name);
-	if (node)
-	{
-		node = m_clusters.Insert(name);
-	}
-	return &node->GetInfo();
-}
