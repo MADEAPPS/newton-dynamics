@@ -21,6 +21,32 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+class ndRagDollModel : public ndModel
+{
+	public:
+	ndRagDollModel()
+	{
+	}
+
+	void Update(ndWorld* const, dFloat32) 
+	{
+	}
+
+	//void PostUpdate(ndWorld* const world, dFloat32)
+	void PostUpdate(ndWorld* const, dFloat32)
+	{
+	}
+
+	//void PostTransformUpdate(ndWorld* const world, dFloat32 timestep)
+	void PostTransformUpdate(ndWorld* const, dFloat32)
+	{
+
+	}
+
+	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
+};
+
+
 void ndBasicRagdoll (ndDemoEntityManager* const scene)
 {
 	// build a floor
