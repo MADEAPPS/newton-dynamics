@@ -33,7 +33,6 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-
 //#define DEFAULT_SCENE	0		// setting basic rigidbody
 //#define DEFAULT_SCENE	1		// setting gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// setting friction ramp
@@ -179,6 +178,10 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
+#if defined (_DEBUG)
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#endif
+
 	m_hasJoytick = glfwJoystickPresent(0) ?  true : false;
 
 	char version[256];
@@ -202,6 +205,12 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 	// attach myself to the main frame
 	glfwSetWindowUserPointer(m_mainFrame, this);
+
+#if defined (_DEBUG)
+	glDebugMessageCallback((GLDEBUGPROC)OpenMessageCallback, m_mainFrame);
+	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+#endif
 
 	// Setup ImGui binding
 	ImGuiIO& io = ImGui::GetIO();
@@ -359,6 +368,27 @@ ndDemoEntityManager::~ndDemoEntityManager ()
 
 	ImGui::Shutdown();
 	glfwTerminate();
+}
+
+void ndDemoEntityManager::OpenMessageCallback(GLenum source,
+	GLenum type,
+	GLuint id,
+	GLenum severity,
+	GLsizei length,
+	const GLchar* message,
+	const void* userParam)
+{
+	dAssert(0);
+	if (userParam)
+	{
+		if (id == 131185)
+		{
+			return;
+		}
+		fprintf(stderr, "GL CALLBACK: %s source = 0x%x, type = 0x%x, id = %d, severity = 0x%x, message = %s, length = %d \n",
+			(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+			source, type, id, severity, message, length);
+	}
 }
 
 ndDemoCamera* ndDemoEntityManager::GetCamera() const

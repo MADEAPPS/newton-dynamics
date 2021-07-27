@@ -198,7 +198,10 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	static void MouseScrollCallback (GLFWwindow* const window, double x, double y);
 	static void MouseButtonCallback(GLFWwindow* const window, dInt32 button, dInt32 action, dInt32 mods);
 	static void ErrorCallback(dInt32 error, const char* const description);
-	//static void PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep);
+	static void OpenMessageCallback(
+		GLenum source, GLenum type, GLuint id, GLenum severity,
+		GLsizei length, const GLchar* message, const void* userParam);
+	
 
 	void ApplyMenuOptions();
 	void LoadDemo(dInt32 menu);
