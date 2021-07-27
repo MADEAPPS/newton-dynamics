@@ -44,13 +44,13 @@ ndDemoDebrisMesh::ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMeshconst, const d
 	glBufferData(GL_ARRAY_BUFFER, m_vertexCount * sizeof(glDebrisPoint), &vertexArray[0].m_posit.m_x, GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(glDebrisPoint), (void*)offsetof(glDebrisPoint, m_posit));
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(glDebrisPoint), (void*)OFFSETOF(glDebrisPoint, m_posit));
 	
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glDebrisPoint), (void*)offsetof(glDebrisPoint, m_normal));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glDebrisPoint), (void*)OFFSETOF(glDebrisPoint, m_normal));
 	
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glDebrisPoint), (void*)offsetof(glDebrisPoint, m_uv));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glDebrisPoint), (void*)OFFSETOF(glDebrisPoint, m_uv));
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 	glBindVertexArray(0);

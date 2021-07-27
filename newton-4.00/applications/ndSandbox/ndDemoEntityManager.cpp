@@ -1254,7 +1254,7 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 
 	// Render command lists
 	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
-	#define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
+	//#define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
 	for (dInt32 n = 0; n < draw_data->CmdListsCount; n++)
 	{
 		const ImDrawList* cmd_list = draw_data->CmdLists[n];
