@@ -17,7 +17,7 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
-//#define USE_SKIN_SHADER
+#define USE_SKIN_SHADER
 
 class glSkinVertex : public glPositionNormalUV
 {
