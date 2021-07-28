@@ -42,16 +42,11 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndPhysicsWorld* const world = scene->GetWorld();
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y + 1.0f;
+	
+	ndDemoEntity* const entity = (ndDemoEntity*)modelEntity->CreateClone();
+	entity->ResetMatrix(matrix);
 
 	SetMatrix(matrix);
-
-	//ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	//const ndShapeInstance& shape = GetCollisionShape();
-	//ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "smilli.tga", "marble.tga", "marble.tga");
-	//entity->SetMesh(mesh, dGetIdentityMatrix());
-	//mesh->Release();
-	ndDemoEntity* const entity = (ndDemoEntity*)modelEntity->CreateClone();
-	
 	world->AddBody(this);
 	scene->AddEntity(entity);
 	SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
