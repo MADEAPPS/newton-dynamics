@@ -52,10 +52,11 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	dFloat32 mass = 100.0f;
 	new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height/4.0f, true);
 	
-	location.m_posit.m_z += 2.0f;
+	location.m_posit.m_x += 8.0f;
+	location.m_posit.m_z -= 2.0f;
 	new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height / 4.0f);
 	
-	location.m_posit.m_z += 2.0f;
+	location.m_posit.m_z += 4.0f;
 	new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height / 4.0f);
 
 	//AddCapsulesStacks(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
