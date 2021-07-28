@@ -602,7 +602,291 @@ fbxDemoEntity* LoadFbxMesh(const char* const meshName)
 	return entity;
 }
 
-static void LoadAnimationCurve(ofbx::IScene* const fbxScene, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer)
+class dFbxAnimationTrack
+{
+	public:
+	class dCurveValue
+	{
+		public:
+		dFloat32 m_x;
+		dFloat32 m_y;
+		dFloat32 m_z;
+		dFloat32 m_time;
+	};
+
+	class dCurve : public dList <dCurveValue>
+	{
+		public:
+		dCurve()
+			:dList <dCurveValue>()
+		{
+		}
+
+		//dCurveValue Evaluate(dFloat32 t)
+		//{
+		//	for (dNode* ptr = GetFirst(); ptr->GetNext(); ptr = ptr->GetNext()) {
+		//		dCurveValue& info1 = ptr->GetNext()->GetInfo();
+		//		if (info1.m_time >= t) {
+		//			dCurveValue& info0 = ptr->GetInfo();
+		//			dCurveValue val;
+		//			dFloat32 param = (t - info0.m_time) / (info1.m_time - info0.m_time);
+		//			val.m_x = info0.m_x + (info1.m_x - info0.m_x) * param;
+		//			val.m_y = info0.m_y + (info1.m_y - info0.m_y) * param;
+		//			val.m_z = info0.m_z + (info1.m_z - info0.m_z) * param;
+		//			val.m_time = info0.m_time + (info1.m_time - info0.m_time) * param;
+		//			return val;
+		//		}
+		//	}
+		//	dAssert(0);
+		//	return dCurveValue();
+		//}
+	};
+
+	dFbxAnimationTrack()
+	{
+	}
+
+	~dFbxAnimationTrack()
+	{
+	}
+
+	//const dList<dCurveValue>& GetScales() const;
+	//const dList<dCurveValue>& GetPositions() const;
+	//const dList<dCurveValue>& GetRotations() const;
+	//
+	void AddKeyframe(dFloat32 time, const dMatrix& matrix)
+	{
+		dVector scale;
+		dVector euler0;
+		dVector euler1;
+		dMatrix transform;
+		dMatrix eigenScaleAxis;
+		matrix.PolarDecomposition(transform, scale, eigenScaleAxis);
+		transform.CalcPitchYawRoll(euler0, euler1);
+
+		AddScale(time, scale.m_x, scale.m_y, scale.m_z);
+		AddPosition(time, matrix.m_posit.m_x, matrix.m_posit.m_y, matrix.m_posit.m_z);
+		AddRotation(time, euler0.m_x, euler0.m_y, euler0.m_z);
+	}
+
+	void OptimizeCurves()
+	{
+		if (m_scale.GetCount()) 
+		{
+			OptimizeCurve(m_scale);
+		}
+		if (m_position.GetCount()) 
+		{
+			OptimizeCurve(m_position);
+		}
+		if (m_rotation.GetCount()) 
+		{
+			for (dCurve::dNode* node = m_rotation.GetFirst(); node->GetNext(); node = node->GetNext()) 
+			{
+				const dCurveValue& value0 = node->GetInfo();
+				dCurveValue& value1 = node->GetNext()->GetInfo();
+				value1.m_x = FixAngleAlias(value0.m_x, value1.m_x);
+				value1.m_y = FixAngleAlias(value0.m_y, value1.m_y);
+				value1.m_z = FixAngleAlias(value0.m_z, value1.m_z);
+				//dTrace(("%d %f %f %f\n", m_rotation.GetCount(), value0.m_x * dRadToDegree, value0.m_y * dRadToDegree, value0.m_z * dRadToDegree));
+			}
+
+			OptimizeCurve(m_rotation);
+		}
+	}
+
+	private:
+	void AddScale(dFloat32 time, dFloat32 x, dFloat32 y, dFloat32 z)
+	{
+		dCurveValue& value = m_scale.Append()->GetInfo();
+		value.m_x = x;
+		value.m_y = y;
+		value.m_z = z;
+		value.m_time = time;
+	}
+
+	void AddPosition(dFloat32 time, dFloat32 x, dFloat32 y, dFloat32 z)
+	{
+		dCurveValue& value = m_position.Append()->GetInfo();
+		value.m_x = x;
+		value.m_y = y;
+		value.m_z = z;
+		value.m_time = time;
+	}
+
+	void AddRotation(dFloat32 time, dFloat32 x, dFloat32 y, dFloat32 z)
+	{
+		dCurveValue& value = m_rotation.Append()->GetInfo();
+		value.m_x = x;
+		value.m_y = y;
+		value.m_z = z;
+		value.m_time = time;
+	}
+
+	dFloat32 FixAngleAlias(dFloat32 angleA, dFloat32 angleB) const
+	{
+		dFloat32 sinA = dSin(angleA);
+		dFloat32 cosA = dCos(angleA);
+		dFloat32 sinB = dSin(angleB);
+		dFloat32 cosB = dCos(angleB);
+
+		dFloat32 num = sinB * cosA - cosB * sinA;
+		dFloat32 den = cosA * cosB + sinA * sinB;
+		angleB = angleA + dAtan2(num, den);
+		return angleB;
+	}
+
+	dFloat32 Interpolate(dFloat32 x0, dFloat32 t0, dFloat32 x1, dFloat32 t1, dFloat32 t) const
+	{
+		return x0 + (x1 - x0) * (t - t0) / (t1 - t0);
+	}
+
+	void OptimizeCurve(dList<dCurveValue>& curve)
+	{
+		const dFloat32 tol = 5.0e-5f;
+		const dFloat32 tol2 = tol * tol;
+		for (dCurve::dNode* node0 = curve.GetFirst(); node0->GetNext(); node0 = node0->GetNext()) 
+		{
+			const dCurveValue& value0 = node0->GetInfo();
+			for (dCurve::dNode* node1 = node0->GetNext()->GetNext(); node1; node1 = node1->GetNext()) 
+			{
+				const dCurveValue& value1 = node1->GetPrev()->GetInfo();
+				const dCurveValue& value2 = node1->GetInfo();
+				dVector p1(value1.m_x, value1.m_y, value1.m_z, dFloat32(0.0f));
+				dVector p2(value2.m_x, value2.m_y, value2.m_z, dFloat32(0.0f));
+		
+				dFloat32 dist_x = value1.m_x - Interpolate(value0.m_x, value0.m_time, value2.m_x, value2.m_time, value1.m_time);
+				dFloat32 dist_y = value1.m_y - Interpolate(value0.m_y, value0.m_time, value2.m_y, value2.m_time, value1.m_time);
+				dFloat32 dist_z = value1.m_z - Interpolate(value0.m_z, value0.m_time, value2.m_z, value2.m_time, value1.m_time);
+		
+				dVector err(dist_x, dist_y, dist_z, 0.0f);
+				dFloat32 mag2 = err.DotProduct(err).GetScalar();
+				if (mag2 > tol2) 
+				{
+					break;
+				}
+				curve.Remove(node1->GetPrev());
+			}
+		}
+	}
+
+	//virtual void FreezeScale(const dMatrix& matrix);
+	//
+	//protected:
+	//void ResampleAnimation();
+	//virtual void BakeTransform(const dMatrix& matrix);
+	//virtual void Serialize(TiXmlElement* const rootNode);
+	//virtual bool Deserialize(const dScene* const scene, TiXmlElement* const rootNode);
+	
+	dCurve m_scale;
+	dCurve m_position;
+	dCurve m_rotation;
+};
+
+class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
+{
+	public:
+	dFbxAnimation()
+	{
+	}
+
+	void OptimizeCurves()
+	{
+		Iterator iter(*this);
+		for (iter.Begin(); iter; iter++)
+		{
+			dFbxAnimationTrack& track = iter.GetNode()->GetInfo();
+			track.OptimizeCurves();
+		}
+	}
+
+	void FreezeScale()
+	{
+		dMatrix parentMatrix(dGetIdentityMatrix());
+		//dList<dTreeNode*> nodeStack;
+		//dList<dMatrix> parentMatrixStack;
+		//dList<dMatrix> parentSkinMatrixStack;
+		//
+		//dTreeNode* const rootNode0 = GetRootNode();
+		//for (void* link0 = GetFirstChildLink(rootNode0); link0; link0 = GetNextChildLink(rootNode0, link0)) {
+		//	dTreeNode* const node0 = GetNodeFromLink(link0);
+		//	dNodeInfo* const nodeInfo0 = GetInfoFromNode(node0);
+		//	if (nodeInfo0->IsType(dSceneNodeInfo::GetRttiType())) {
+		//		nodeStack.Append(node0);
+		//		parentMatrixStack.Append(dGetIdentityMatrix());
+		//		parentSkinMatrixStack.Append(dGetIdentityMatrix());
+		//	}
+		//}
+		//
+		//dTree<dGeometryNodeInfo*, dGeometryNodeInfo*> geoFilter;
+		//while (nodeStack.GetCount()) {
+		//	dTreeNode* const rootNode = nodeStack.GetLast()->GetInfo();
+		//	dMatrix parentMatrix(parentMatrixStack.GetLast()->GetInfo());
+		//	dMatrix parentSkinMatrix(parentSkinMatrixStack.GetLast()->GetInfo());
+		//
+		//	nodeStack.Remove(nodeStack.GetLast());
+		//	parentMatrixStack.Remove(parentMatrixStack.GetLast());
+		//	parentSkinMatrixStack.Remove(parentSkinMatrixStack.GetLast());
+		//
+		//	dSceneNodeInfo* const sceneNodeInfo = (dSceneNodeInfo*)GetInfoFromNode(rootNode);
+		//	dAssert(sceneNodeInfo->IsType(dSceneNodeInfo::GetRttiType()));
+		//	dMatrix transform(sceneNodeInfo->GetTransform() * parentMatrix);
+		//
+		//	dMatrix matrix;
+		//	dMatrix stretchAxis;
+		//	dVector scale(0.0f);
+		//	transform.PolarDecomposition(matrix, scale, stretchAxis);
+		//	sceneNodeInfo->SetTransform(matrix);
+		//
+		//	for (void* link = GetFirstChildLink(rootNode); link; link = GetNextChildLink(rootNode, link)) {
+		//		dTreeNode* const node = GetNodeFromLink(link);
+		//		dNodeInfo* const nodeInfo = GetInfoFromNode(node);
+		//		if (nodeInfo->IsType(dAnimationTrack::GetRttiType())) {
+		//			((dAnimationTrack*)nodeInfo)->FreezeScale(parentMatrix);
+		//		}
+		//	}
+		//
+		//	dMatrix scaleMatrix(dGetIdentityMatrix(), scale, stretchAxis);
+		//	sceneNodeInfo->SetGeometryTransform(sceneNodeInfo->GetGeometryTransform() * scaleMatrix);
+		//
+		//	dMatrix skinTransform(sceneNodeInfo->GetTransform() * parentSkinMatrix);
+		//
+		//	dMatrix scaleSkinMatrix(dGetIdentityMatrix(), scale, stretchAxis);
+		//	for (void* link = GetFirstChildLink(rootNode); link; link = GetNextChildLink(rootNode, link)) {
+		//		dTreeNode* const node = GetNodeFromLink(link);
+		//		dNodeInfo* const nodeInfo = GetInfoFromNode(node);
+		//		if (nodeInfo->IsType(dGeometryNodeSkinClusterInfo::GetRttiType())) {
+		//			dMatrix skinMatrix;
+		//			dMatrix skinStretchAxis;
+		//			dVector skinScale(0.0f);
+		//			dGeometryNodeSkinClusterInfo* const skinCluster = (dGeometryNodeSkinClusterInfo*)nodeInfo;
+		//			skinTransform = skinCluster->m_basePoseMatrix * parentSkinMatrix;
+		//			skinTransform.PolarDecomposition(skinMatrix, skinScale, skinStretchAxis);
+		//			skinCluster->m_basePoseMatrix = skinMatrix;
+		//			break;
+		//		}
+		//	}
+		//
+		//	for (void* link = GetFirstChildLink(rootNode); link; link = GetNextChildLink(rootNode, link)) {
+		//		dTreeNode* const node = GetNodeFromLink(link);
+		//		dNodeInfo* const nodeInfo = GetInfoFromNode(node);
+		//
+		//		if (nodeInfo->IsType(dSceneNodeInfo::GetRttiType())) {
+		//			nodeStack.Append(node);
+		//			parentMatrixStack.Append(scaleMatrix);
+		//			parentSkinMatrixStack.Append(scaleSkinMatrix);
+		//		}
+		//	}
+		//}
+	}
+
+	void ApplyTransform(const dMatrix& transform)
+	{
+
+	}
+};
+
+static void LoadAnimationCurve(ofbx::IScene* const fbxScene, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, dFbxAnimation& animation)
 {
 	const ofbx::TakeInfo* const animationInfo = fbxScene->getTakeInfo(0);
 	const ofbx::AnimationCurveNode* const scaleNode = animLayer->getCurveNode(*bone, "Lcl Scaling");
@@ -613,7 +897,9 @@ static void LoadAnimationCurve(ofbx::IScene* const fbxScene, const ofbx::Object*
 	dFloat32 period = dFloat32(animationInfo->local_time_to - animationInfo->local_time_from);
 	dInt32 frames = dInt32((animationInfo->local_time_to - animationInfo->local_time_from) / timestep) + 1;
 	timestep = period / frames;
-	
+
+	dFbxAnimationTrack& track = animation.Insert(bone->name)->GetInfo();
+
 	Vec3 scale;
 	Vec3 rotation;
 	Vec3 translation;
@@ -647,13 +933,16 @@ static void LoadAnimationCurve(ofbx::IScene* const fbxScene, const ofbx::Object*
 		{
 			translation = translationNode->getNodeLocalTransform(timeAcc);
 		}
-		dMatrix localMatrix(ofbxMatrix2dMatrix(bone->evalLocal(translation, rotation, scale)));
+		dMatrix matrix(ofbxMatrix2dMatrix(bone->evalLocal(translation, rotation, scale)));
+		track.AddKeyframe(timeAcc, matrix);
 
 		timeAcc += timestep;
 	}
+
+//	track.OptimizeCurves();
 }
 
-static void LoadAnimationLayer(ofbx::IScene* const fbxScene, const ofbx::AnimationLayer* const animLayer)
+static void LoadAnimationLayer(ofbx::IScene* const fbxScene, const ofbx::AnimationLayer* const animLayer, dFbxAnimation& animation)
 {
 	dInt32 stack = 0;
 	ofbx::Object* stackPool[1024];
@@ -665,14 +954,14 @@ static void LoadAnimationLayer(ofbx::IScene* const fbxScene, const ofbx::Animati
 	{
 		stack--;
 		ofbx::Object* const bone = stackPool[stack];
-		LoadAnimationCurve(fbxScene, bone, animLayer);
+		LoadAnimationCurve(fbxScene, bone, animLayer, animation);
 
 		stack += GetChildrenNodes(bone, &stackPool[stack]);
 		dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0]) - 64));
 	}
 }
 
-static void LoadAnimation(ofbx::IScene* const fbxScene)
+static void LoadAnimation(ofbx::IScene* const fbxScene, dFbxAnimation& animation)
 {
 	dInt32 animationCount = fbxScene->getAnimationStackCount();
 	for (int i = 0; i < animationCount; i++)
@@ -682,7 +971,7 @@ static void LoadAnimation(ofbx::IScene* const fbxScene)
 		dInt32 layerCount = 0;
 		while (const ofbx::AnimationLayer* const animLayer = animStack->getLayer(layerCount))
 		{
-			LoadAnimationLayer(fbxScene, animLayer);
+			LoadAnimationLayer(fbxScene, animLayer, animation);
 			layerCount++;
 		}
 	}
@@ -709,10 +998,12 @@ void LoadFbxAnimation(const char* const meshName)
 
 	dMatrix convertMatrix(GetCoordinateSystemMatrix(fbxScene));
 
-	LoadAnimation(fbxScene);
-	//fbxDemoEntity* const entity = FbxToEntity(fbxScene);
-	//FreezeScale(entity);
-	//entity->ApplyTransform(convertMatrix);
+	dFbxAnimation animation;
+	LoadAnimation(fbxScene, animation);
+
+	animation.FreezeScale();
+	animation.ApplyTransform(convertMatrix);
+	animation.OptimizeCurves();
 
 	fbxScene->destroy();
 	delete[] content;
