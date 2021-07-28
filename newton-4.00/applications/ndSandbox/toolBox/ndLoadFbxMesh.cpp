@@ -602,3 +602,198 @@ fbxDemoEntity* LoadFbxMesh(const char* const meshName)
 	return entity;
 }
 
+static void LoadAnimationLayer(ofbx::IScene* const fbxScene, const ofbx::AnimationLayer* const animLayer)
+{
+
+	//dScene::dTreeNode* const animationTakeNode = ngdScene->CreateAnimationTake();
+	//dAnimationTake* const animationTake = (dAnimationTake*)ngdScene->GetInfoFromNode(animationTakeNode);
+	//animationTake->SetName(animStackName);
+	//
+	//FbxTime start(takeInfo->mLocalTimeSpan.GetStart());
+	//FbxTime end(takeInfo->mLocalTimeSpan.GetStop());
+	//
+	//dFloat t0 = dFloat(start.GetSecondDouble());
+	//dFloat t1 = dFloat(end.GetSecondDouble());
+	//dFloat period = t1 - t0;
+	//animationTake->SetPeriod(period);
+	//
+	//const FbxLongLong firstFrameIndex = start.GetFrameCount(FbxTime::eDefaultMode);
+	//const FbxLongLong lastFrameIndex = end.GetFrameCount(FbxTime::eDefaultMode);
+	//
+	//dList <ImportStackData> nodeStack;
+	//FbxNode* const rootNode = fbxScene->GetRootNode();
+	//if (rootNode) {
+	//	int count = rootNode->GetChildCount();
+	//	for (int i = 0; i < count; i++) {
+	//		nodeStack.Append(ImportStackData(dGetIdentityMatrix(), rootNode->GetChild(count - i - 1), NULL));
+	//	}
+	//}
+	//
+	//while (nodeStack.GetCount()) {
+	//	ImportStackData data(nodeStack.GetLast()->GetInfo());
+	//	nodeStack.Remove(nodeStack.GetLast());
+	//
+	//	dScene::dTreeNode* const ngdNode = nodeMap.Find(data.m_fbxNode)->GetInfo();
+	//	dSceneNodeInfo* const ngdInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(ngdNode);
+	//
+	//	dScene::dTreeNode* const trackNode = ngdScene->CreateAnimationTrack(animationTakeNode);
+	//	dAnimationTrack* const animationTrack = (dAnimationTrack*)ngdScene->GetInfoFromNode(trackNode);
+	//
+	//	animationTrack->SetName(ngdInfo->GetName());
+	//	ngdScene->AddReference(ngdNode, trackNode);
+	//
+	//	FbxLongLong j = firstFrameIndex;
+	//	do {
+	//		FbxTime fbxTime;
+	//		fbxTime.SetFrame(j, FbxTime::eDefaultMode);
+	//		dMatrix localMatrix(data.m_fbxNode->EvaluateLocalTransform(fbxTime));
+	//
+	//		dFloat t = dFloat(fbxTime.GetSecondDouble());
+	//		animationTrack->AddKeyframe(t, localMatrix);
+	//
+	//		j++;
+	//	} while (j <= lastFrameIndex);
+	//
+	//	animationTrack->OptimizeCurves();
+	//
+	//	int count = data.m_fbxNode->GetChildCount();
+	//	for (int i = 0; i < count; i++) {
+	//		nodeStack.Append(ImportStackData(dGetIdentityMatrix(), data.m_fbxNode->GetChild(count - i - 1), NULL));
+	//	}
+	//}
+
+	//dInt32 curvesCount = 0;
+	//while (const ofbx::AnimationCurveNode* const curveNode = animLayer->getCurveNode(curvesCount))
+	//{
+	//	//LoadAnimationLayer(fbxScene, animLayer);
+	//	//layerCount++;
+	//	const ofbx::Object* const bone = curveNode->getBone();
+	//	const ofbx::AnimationCurve* const curve = curveNode->getCurve(0);
+	//	const ofbx::AnimationCurve* const curve1 = curveNode->getCurve(1);
+	//	const ofbx::AnimationCurve* const curve2 = curveNode->getCurve(2);
+	//	
+	//	//virtual Vec3 getNodeLocalTransform(double time) const = 0;
+	//	
+	//
+	//
+	//	curvesCount++;
+	//}
+
+	//dInt32 objectCount = fbxScene->getAllObjectCount();
+	//const Object* const* objectArray = fbxScene->getAllObjects();
+	//for (dInt32 i = 0; i < objectCount; i++)
+	//{
+	//	const Object* const bone = objectArray[i];
+	//	const ofbx::AnimationCurveNode* const curveNode = animLayer->getCurveNode(*bone, "T");
+	//	const ofbx::AnimationCurveNode* const curveNode1 = animLayer->getCurveNode(*bone, "T");
+	//}
+
+	dInt32 stack = 0;
+	ofbx::Object* stackPool[1024];
+	const ofbx::Object* const rootNode = fbxScene->getRoot();
+	dAssert(rootNode);
+	stack = GetChildrenNodes(rootNode, stackPool);
+
+	const ofbx::TakeInfo* const animationInfo = fbxScene->getTakeInfo(0);
+
+	while (stack)
+	{
+		stack--;
+		ofbx::Object* const bone = stackPool[stack];
+		//dMatrix localMatrix(ofbxMatrix2dMatrix(data.m_fbxNode->getLocalTransform()));
+		//node->SetName(data.m_fbxNode->name);
+		//node->SetRenderMatrix(localMatrix);
+		const ofbx::AnimationCurveNode* const scaleNode = animLayer->getCurveNode(*bone, "Lcl Scaling");
+		const ofbx::AnimationCurveNode* const rotationNode = animLayer->getCurveNode(*bone, "Lcl Rotation");
+		const ofbx::AnimationCurveNode* const translationNode = animLayer->getCurveNode(*bone, "Lcl Translation");
+
+		//const AnimationCurve* curve0 = rotationNode->getCurve(0);
+		//int xxx0 = curve0->getKeyCount();
+		//const i64* xxx1 = curve0->getKeyTime();
+		//const float* xxx2 = curve0->getKeyValue();
+
+		Vec3 scale;
+		Vec3 rotation;
+		Vec3 translation;
+		scale.x = 1.0f;
+		scale.y = 1.0f;
+		scale.z = 1.0f;
+		rotation.x = 0.0f;
+		rotation.y = 0.0f;
+		rotation.z = 0.0f;
+		translation.x = 0.0f;
+		translation.y = 0.0f;
+		translation.z = 0.0f;
+
+		if (scaleNode)
+		{
+			scale = scaleNode->getNodeLocalTransform(1.0);
+		}
+		if (rotationNode)
+		{
+			rotation = rotationNode->getNodeLocalTransform(1.0);
+		}
+		if (translationNode)
+		{
+			translation = translationNode->getNodeLocalTransform(1.0);
+		}
+		Matrix matrix (bone->evalLocal(translation, rotation, scale));
+		dMatrix localMatrix(ofbxMatrix2dMatrix(matrix));
+
+		stack += GetChildrenNodes(bone, &stackPool[stack]);
+		dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0]) - 64));
+	}
+}
+
+static void LoadAnimation(ofbx::IScene* const fbxScene)
+{
+	dInt32 animationCount = fbxScene->getAnimationStackCount();
+	//	const int animationCount = fbxScene->GetSrcObjectCount<FbxAnimStack>();
+	//	const int nodeCount = fbxScene->GetNodeCount();
+	for (int i = 0; i < animationCount; i++)
+	{
+		//FbxAnimStack* const animStack = fbxScene->GetSrcObject<FbxAnimStack>(i);
+		//const char* const animStackName = animStack->GetName();
+		//fbxScene->SetCurrentAnimationStack(animStack);
+		//FbxTakeInfo* const takeInfo = fbxScene->GetTakeInfo(animStackName);
+
+		const ofbx::AnimationStack* const animStack = fbxScene->getAnimationStack(i);
+		
+		dInt32 layerCount = 0;
+		while (const ofbx::AnimationLayer* const animLayer = animStack->getLayer(layerCount))
+		{
+			LoadAnimationLayer(fbxScene, animLayer);
+			layerCount++;
+		}
+	}
+}
+
+void LoadFbxAnimation(const char* const meshName)
+{
+	char outPathName[1024];
+	dGetWorkingFileName(meshName, outPathName);
+
+	FILE* fp = fopen(outPathName, "rb");
+	if (!fp)
+	{
+		dAssert(0);
+	}
+
+	size_t readBytes = 0;
+	fseek(fp, 0, SEEK_END);
+	long file_size = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	ofbx::u8* content = new ofbx::u8[file_size];
+	readBytes = fread(content, 1, file_size, fp);
+	ofbx::IScene* const fbxScene = ofbx::load((ofbx::u8*)content, file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
+
+	dMatrix convertMatrix(GetCoordinateSystemMatrix(fbxScene));
+
+	LoadAnimation(fbxScene);
+	//fbxDemoEntity* const entity = FbxToEntity(fbxScene);
+	//FreezeScale(entity);
+	//entity->ApplyTransform(convertMatrix);
+
+	fbxScene->destroy();
+	delete[] content;
+}

@@ -37,6 +37,9 @@ class fbxDemoEntity : public ndDemoEntity
 	ndMeshEffect* m_fbxMeshEffect;
 };
 
+void LoadFbxAnimation(const char* const meshName);
 fbxDemoEntity* LoadFbxMesh(const char* const meshName);
+
+
 
 #endif

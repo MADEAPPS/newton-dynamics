@@ -519,6 +519,9 @@ namespace ofbx
 		virtual void destroy() = 0;
 		virtual const IElement* getRootElement() const = 0;
 		virtual const Object* getRoot() const = 0;
+
+		virtual const int getTakeInfoCount() const = 0;
+		virtual const TakeInfo* getTakeInfo(int index) const = 0;
 		virtual const TakeInfo* getTakeInfo(const char* name) const = 0;
 		virtual int getMeshCount() const = 0;
 		virtual float getSceneFrameRate() const = 0;

@@ -45,6 +45,8 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	localAxis[1] = dVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
+	LoadFbxAnimation("whiteMan_idle.fbx");
+
 	fbxDemoEntity* const man = scene->LoadFbxMesh("whiteMan.fbx");
 
 	dFloat32 height = 1.9f;
