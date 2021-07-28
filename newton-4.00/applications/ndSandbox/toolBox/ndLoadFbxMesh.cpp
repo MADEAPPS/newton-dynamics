@@ -592,7 +592,7 @@ fbxDemoEntity* LoadFbxMesh(const char* const meshName)
 	readBytes = fread(content, 1, file_size, fp);
 	ofbx::IScene* const fbxScene = ofbx::load((ofbx::u8*)content, file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
 
-	dMatrix convertMatrix(GetCoordinateSystemMatrix(fbxScene));
+	const dMatrix convertMatrix(GetCoordinateSystemMatrix(fbxScene));
 	fbxDemoEntity* const entity = FbxToEntity(fbxScene);
 	FreezeScale(entity);
 	entity->ApplyTransform(convertMatrix);
@@ -996,7 +996,7 @@ void LoadFbxAnimation(const char* const meshName)
 	readBytes = fread(content, 1, file_size, fp);
 	ofbx::IScene* const fbxScene = ofbx::load((ofbx::u8*)content, file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
 
-	dMatrix convertMatrix(GetCoordinateSystemMatrix(fbxScene));
+	const dMatrix convertMatrix(GetCoordinateSystemMatrix(fbxScene));
 
 	dFbxAnimation animation;
 	LoadAnimation(fbxScene, animation);
