@@ -52,7 +52,7 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	dFloat32 height = 1.9f;
 	dFloat32 radio = 0.5f;
 	dFloat32 mass = 100.0f;
-	new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height/4.0f, true);
+	//new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height/4.0f, true);
 	
 	location.m_posit.m_x += 8.0f;
 	location.m_posit.m_z -= 2.0f;

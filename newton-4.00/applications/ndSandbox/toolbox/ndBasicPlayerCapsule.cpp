@@ -56,7 +56,14 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 			ndDemoEntity* const entity = (ndDemoEntity*)keyFrame.m_userData;
 			//dTrace (("%s\n", entity->GetName().GetStr()));
 
-			if (entity->GetName() == "mixamorig:Hips")
+			//if ((entity->GetName() == "mixamorig:Hips") ||
+			//	(entity->GetName() == "mixamorig:LeftUpLeg") ||
+			//	(entity->GetName() == "mixamorig:RightUpLeg") ||
+			//	(entity->GetName() == "mixamorig:Spine"))
+
+			if ((entity->GetName() == "mixamorig:LeftUpLeg") ||
+				(entity->GetName() == "mixamorig:LeftLeg"))
+				
 			entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
 		}
 	}
