@@ -19,15 +19,18 @@ file(GLOB CPP_SOURCE
 	*.cpp
 	demos/*.h
 	demos/*.cpp
-	toolBox/*.h
-	toolBox/*.cpp 
+	toolbox__/*.h
+	toolbox__/*.cpp 
+	animation/*.h
+	animation/*.cpp 
 )
 
 #source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" PREFIX source/ FILES ${CPP_SOURCE})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(./)
-include_directories(toolBox/)
+include_directories(toolbox__/)
+include_directories(animation/)
 include_directories(../../sdk/dCore/)
 include_directories(../../sdk/dNewton/)
 include_directories(../../sdk/dTinyxml/)
@@ -85,7 +88,7 @@ if(MSVC OR MINGW)
     if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
 		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundSandboxStdafx.h")
 		set_source_files_properties(ndSandboxStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndSandboxStdafx.h")
-		set_source_files_properties(toolBox/ndFileBrowser.cpp PROPERTIES COMPILE_FLAGS "/Y-")
+		set_source_files_properties(toolbox__/ndFileBrowser.cpp PROPERTIES COMPILE_FLAGS "/Y-")
     endif()
 endif()
 
