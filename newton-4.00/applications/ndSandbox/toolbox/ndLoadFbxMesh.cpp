@@ -437,18 +437,6 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 			{
 				ndMeshEffect::dVertexCluster* const cluster = mesh->CreateCluster(fbxBone->name);
 
-				//dMatrix parentBoneMatrix(dGetIdentityMatrix());
-				//if (clusterBoneMap.Find(fbxBone->getParent()))
-				//{
-				//	const ofbx::Cluster* const parentCluster = clusterBoneMap.Find(fbxBone->getParent())->GetInfo();
-				//	const ofbx::Matrix parentTransformMatrix(parentCluster->getTransformLinkMatrix());
-				//	parentBoneMatrix = ofbxMatrix2dMatrix(parentTransformMatrix);
-				//}
-				//const ofbx::Matrix transformMatrix(fbxCluster->getTransformLinkMatrix());
-				//const dMatrix boneMatrix(ofbxMatrix2dMatrix(transformMatrix));
-				//const dMatrix bindingMatrix (boneMatrix * parentBoneMatrix.Inverse4x4());
-				//cluster->m_bindMatrix = bindingMatrix;
-
 				dAssert(fbxCluster->getIndicesCount() == fbxCluster->getWeightsCount());
 				dInt32 clusterIndexCount = fbxCluster->getIndicesCount();
 				const dInt32* const indices = fbxCluster->getIndices();
@@ -961,12 +949,15 @@ class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
 			ndAnimationKeyFramesTrack* const track = sequence->AddTrack();
 
 			track->m_name = iter.GetKey();
+			//dTrace(("name: %s\n", track->m_name.GetStr()));
+
 			const dFbxAnimationTrack::dCurve& position = fbxTrack.m_position;
 			for (dFbxAnimationTrack::dCurve::dNode* node = position.GetFirst(); node; node = node->GetNext())
 			{
 				dFbxAnimationTrack::dCurveValue& keyFrame = node->GetInfo();
 				track->m_position.m_time.PushBack(keyFrame.m_time);
 				track->m_position.PushBack(dVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, dFloat32(1.0f)));
+				//dTrace(("%f %f %f %f\n", keyFrame.m_time, keyFrame.m_x, keyFrame.m_y, keyFrame.m_z));
 			}
 
 			const dFbxAnimationTrack::dCurve& rotation = fbxTrack.m_rotation;
@@ -979,6 +970,7 @@ class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
 				dAssert(quat.DotProduct(quat).GetScalar() > 0.999f);
 				dAssert(quat.DotProduct(quat).GetScalar() < 1.001f);
 				track->m_rotation.PushBack(quat);
+				//dTrace(("%f %f %f %f %f\n", keyFrame.m_time, quat.m_x, quat.m_y, quat.m_z, quat.m_w));
 			}
 		}
 
@@ -1007,6 +999,16 @@ static void LoadAnimationCurve(ofbx::IScene* const fbxScene, const ofbx::Object*
 	Vec3 rotation;
 	Vec3 translation;
 	dFloat32 timeAcc = 0.0f;
+
+	dVector scale1;
+	dVector euler0;
+	dVector euler1;
+	dMatrix transform;
+	dMatrix eigenScaleAxis;
+	dMatrix boneMatrix(ofbxMatrix2dMatrix(bone->getLocalTransform()));
+	boneMatrix.PolarDecomposition(transform, scale1, eigenScaleAxis);
+	transform.CalcPitchYawRoll(euler0, euler1);
+
 	for (dInt32 i = 0; i < frames; i++)
 	{
 		//const AnimationCurve* curve0 = rotationNode->getCurve(0);
@@ -1014,15 +1016,15 @@ static void LoadAnimationCurve(ofbx::IScene* const fbxScene, const ofbx::Object*
 		//const i64* xxx1 = curve0->getKeyTime();
 		//const float* xxx2 = curve0->getKeyValue();
 
-		scale.x = 1.0f;
-		scale.y = 1.0f;
-		scale.z = 1.0f;
-		rotation.x = 0.0f;
-		rotation.y = 0.0f;
-		rotation.z = 0.0f;
-		translation.x = 0.0f;
-		translation.y = 0.0f;
-		translation.z = 0.0f;
+		scale.x = scale1.m_x;
+		scale.y = scale1.m_y;
+		scale.z = scale1.m_z;
+		rotation.x = euler0.m_x;
+		rotation.y = euler0.m_y;
+		rotation.z = euler0.m_z;
+		translation.x = transform.m_posit.m_x;
+		translation.y = transform.m_posit.m_y;
+		translation.z = transform.m_posit.m_z;
 
 		if (scaleNode)
 		{
