@@ -31,6 +31,35 @@
 	#define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 #endif
 
+class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
+{
+	public:
+	ndBasicPlayerCapsuleNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity)
+		:ndDemoEntityNotify(manager, entity)
+	{
+	}
+
+	void OnTransform(dInt32 thread, const dMatrix& matrix)
+	{
+		ndDemoEntityNotify::OnTransform(thread, matrix);
+
+		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
+		//ndDemoEntity* const playerEntity = (ndBasicPlayerCapsule*)m_entity;
+		ndWorld* const word = m_manager->GetWorld();
+
+		dFloat32 timestep = word->GetScene()->GetTimestep();
+		player->m_animBlendTree->Evaluate(player->m_output, timestep);
+
+		for (int i = 0; i < player->m_output.GetCount(); i++)
+		{
+			const ndAnimKeyframe& keyFrame = player->m_output[i];
+			ndDemoEntity* const entity = (ndDemoEntity*)keyFrame.m_userData;
+
+			//dTrace (("%s\n", entity->GetName().GetStr()));
+			entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
+		}
+	}
+};
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndDemoEntityManager* const scene, const ndDemoEntity* const modelEntity,
@@ -53,7 +82,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	SetMatrix(matrix);
 	world->AddBody(this);
 	scene->AddEntity(entity);
-	SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	SetNotifyCallback(new ndBasicPlayerCapsuleNotify(scene, entity));
 
 	if (isPlayer)
 	{

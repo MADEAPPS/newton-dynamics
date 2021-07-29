@@ -935,9 +935,8 @@ class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
 					stack++;
 				}
 			}
+			deltaTimeAcc += deltaTime;
 		}
-
-		deltaTimeAcc += deltaTime;
 	}
 
 	void ApplyTransform(const dMatrix& transform)
@@ -975,8 +974,11 @@ class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
 			{
 				dFbxAnimationTrack::dCurveValue& keyFrame = node->GetInfo();
 				track->m_rotation.m_time.PushBack(keyFrame.m_time);
-				dMatrix transform(dPitchMatrix(keyFrame.m_x) * dYawMatrix(keyFrame.m_y) * dRollMatrix(keyFrame.m_z));
-				track->m_rotation.PushBack(transform);
+				const dMatrix transform(dPitchMatrix(keyFrame.m_x) * dYawMatrix(keyFrame.m_y) * dRollMatrix(keyFrame.m_z));
+				const dQuaternion quat(transform);
+				dAssert(quat.DotProduct(quat).GetScalar() > 0.999f);
+				dAssert(quat.DotProduct(quat).GetScalar() < 1.001f);
+				track->m_rotation.PushBack(quat);
 			}
 		}
 
