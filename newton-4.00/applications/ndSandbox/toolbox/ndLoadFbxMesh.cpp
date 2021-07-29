@@ -837,6 +837,8 @@ class dFbxAnimationTrack
 	dCurve m_scale;
 	dCurve m_position;
 	dCurve m_rotation;
+
+	friend class dFbxAnimation;
 };
 
 class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
@@ -956,7 +958,26 @@ class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
 		Iterator iter(*this);
 		for (iter.Begin(); iter; iter++)
 		{
+			const dFbxAnimationTrack& fbxTrack = iter.GetNode()->GetInfo();
 			ndAnimationKeyFramesTrack* const track = sequence->AddTrack();
+
+			track->m_name = iter.GetKey();
+			const dFbxAnimationTrack::dCurve& position = fbxTrack.m_position;
+			for (dFbxAnimationTrack::dCurve::dNode* node = position.GetFirst(); node; node = node->GetNext())
+			{
+				dFbxAnimationTrack::dCurveValue& keyFrame = node->GetInfo();
+				track->m_position.m_time.PushBack(keyFrame.m_time);
+				track->m_position.PushBack(dVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, dFloat32(1.0f)));
+			}
+
+			const dFbxAnimationTrack::dCurve& rotation = fbxTrack.m_rotation;
+			for (dFbxAnimationTrack::dCurve::dNode* node = rotation.GetFirst(); node; node = node->GetNext())
+			{
+				dFbxAnimationTrack::dCurveValue& keyFrame = node->GetInfo();
+				track->m_rotation.m_time.PushBack(keyFrame.m_time);
+				dMatrix transform(dPitchMatrix(keyFrame.m_x) * dYawMatrix(keyFrame.m_y) * dRollMatrix(keyFrame.m_z));
+				track->m_rotation.PushBack(transform);
+			}
 		}
 
 		return sequence;
