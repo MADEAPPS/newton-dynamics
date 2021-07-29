@@ -109,7 +109,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	}
 
 	// create an animation blend tree
-	ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
+	//ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
+	ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
 	//ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
 	//ndAnimationSequence* const runSequence = scene->GetAnimationSequence("whiteman_run.fbx");
 
