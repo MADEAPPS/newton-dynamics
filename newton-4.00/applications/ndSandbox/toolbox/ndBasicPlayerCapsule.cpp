@@ -54,8 +54,9 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		{
 			const ndAnimKeyframe& keyFrame = player->m_output[i];
 			ndDemoEntity* const entity = (ndDemoEntity*)keyFrame.m_userData;
-
 			//dTrace (("%s\n", entity->GetName().GetStr()));
+
+			if (entity->GetName() == "mixamorig:Hips")
 			entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
 		}
 	}
@@ -103,8 +104,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 
 	// create an animation blend tree
 	ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
-	ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
-	ndAnimationSequence* const runSequence = scene->GetAnimationSequence("whiteman_run.fbx");
+	//ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
+	//ndAnimationSequence* const runSequence = scene->GetAnimationSequence("whiteman_run.fbx");
 
 	ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
 	//ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
