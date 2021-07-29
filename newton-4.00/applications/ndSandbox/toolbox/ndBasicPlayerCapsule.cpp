@@ -18,6 +18,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndAnimationSequence.h"
 #include "ndBasicPlayerCapsule.h"
+#include "ndAnimationSequencePlayer.h"
 
 #define PLAYER_WALK_SPEED				8.0f
 #define PLAYER_JUMP_SPEED				5.0f
@@ -74,13 +75,13 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
 	ndAnimationSequence* const runSequence = scene->GetAnimationSequence("whiteman_run.fbx");
 
-	////dAnimationSequencePlayer* const Idle = new dAnimationSequencePlayer(idleSequence);
-	//dAnimationSequencePlayer* const walk = new dAnimationSequencePlayer(walkSequence);
-	//dAnimationSequencePlayer* const run = new dAnimationSequencePlayer(runSequence);
-	//
+	ndAnimationSequencePlayer* const Idle = new ndAnimationSequencePlayer(idleSequence);
+	ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
+	//ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
+	
 	////dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
-	//dFloat scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
-	//dAnimationTwoWayBlend* const walkRunBlend = new dAnimationTwoWayBlend(walk, run);
+	//dFloat32 scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
+	//ndAnimationTwoWayBlend* const walkRunBlend = new dAnimationTwoWayBlend(walk, run);
 	//
 	//walkRunBlend->SetTimeDilation1(scale1);
 	//walkRunBlend->SetParam(0.5f);
