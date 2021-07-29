@@ -39,6 +39,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 	,m_scene(scene)
 	,m_isPlayer(isPlayer)
+	,m_output()
+	,m_animBlendTree(nullptr)
 {
 	dMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
@@ -75,8 +77,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
 	ndAnimationSequence* const runSequence = scene->GetAnimationSequence("whiteman_run.fbx");
 
-	ndAnimationSequencePlayer* const Idle = new ndAnimationSequencePlayer(idleSequence);
-	ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
+	ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
+	//ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
 	//ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
 	
 	////dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
@@ -87,6 +89,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	//walkRunBlend->SetParam(0.5f);
 	//
 	//m_animBlendTree = walkRunBlend;
+
+	m_animBlendTree = idle;
 }
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache, ndPhysicsWorld* const world)
@@ -107,6 +111,14 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(const nd::TiXmlNode* const xmlNode, c
 
 	m_scene->AddEntity(entity);
 	SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
+}
+
+ndBasicPlayerCapsule::~ndBasicPlayerCapsule()
+{
+	if (m_animBlendTree)
+	{
+		delete m_animBlendTree;
+	}
 }
 
 void ndBasicPlayerCapsule::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const

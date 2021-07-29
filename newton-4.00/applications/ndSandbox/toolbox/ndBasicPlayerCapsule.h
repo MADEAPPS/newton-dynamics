@@ -19,6 +19,7 @@ class ndDemoMesh;
 class ndDemoEntity;
 class ndPhysicsWorld;
 class ndDemoEntityManager;
+class ndAnimationBlendTreeNode;
 
 class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 {
@@ -44,6 +45,8 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 		const dMatrix& localAxis, const dMatrix& location, 
 		dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight, bool isPlayer = false);
 
+	~ndBasicPlayerCapsule();
+
 	ndBasicPlayerCapsule(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache, ndPhysicsWorld* const world);
 	void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
@@ -58,6 +61,7 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 	bool m_isPlayer;
 
 	ndAnimationPose m_output;
+	ndAnimationBlendTreeNode* m_animBlendTree;
 };
 
 #endif
