@@ -10,33 +10,33 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "dAnimationPose.h"
-#include "dAnimationSequence.h"
+#include "ndAnimationPose.h"
+#include "ndAnimationSequence.h"
 
-dAnimationSequence::dAnimationSequence()
+ndAnimationSequence::ndAnimationSequence()
 	:m_tracks()
 	,m_period(1.0f)
 {
 }
 
-dAnimationSequence::~dAnimationSequence()
+ndAnimationSequence::~ndAnimationSequence()
 {
 }
 
-dAnimimationKeyFramesTrack* dAnimationSequence::AddTrack()
+ndAnimationKeyFramesTrack* ndAnimationSequence::AddTrack()
 {
-	dList<dAnimimationKeyFramesTrack>::dNode* const node = m_tracks.Append();
+	dList<ndAnimationKeyFramesTrack>::dNode* const node = m_tracks.Append();
 	return &node->GetInfo();
 }
 
-void dAnimationSequence::CalculatePose(dAnimationPose& output, dFloat32 t) const
+void ndAnimationSequence::CalculatePose(ndAnimationPose& output, dFloat32 t) const
 {
 	int index = 0;
-	dAnimKeyframe* const keyFrames = &output[0];
-	for (dList<dAnimimationKeyFramesTrack>::dNode* srcNode = m_tracks.GetFirst(); srcNode; srcNode = srcNode->GetNext()) 
+	ndAnimKeyframe* const keyFrames = &output[0];
+	for (dList<ndAnimationKeyFramesTrack>::dNode* srcNode = m_tracks.GetFirst(); srcNode; srcNode = srcNode->GetNext()) 
 	{
-		const dAnimimationKeyFramesTrack& track = srcNode->GetInfo();
-		dAnimKeyframe& keyFrame = keyFrames[index];
+		const ndAnimationKeyFramesTrack& track = srcNode->GetInfo();
+		ndAnimKeyframe& keyFrame = keyFrames[index];
 		track.InterpolatePosition(t, keyFrame.m_posit);
 		track.InterpolateRotation(t, keyFrame.m_rotation);
 		dAssert(keyFrame.m_rotation.DotProduct(keyFrame.m_rotation).GetScalar() > 0.999f);
@@ -46,8 +46,8 @@ void dAnimationSequence::CalculatePose(dAnimationPose& output, dFloat32 t) const
 	}
 }
 
-//void dAnimationSequence::Load(const char* const fileName)
-void dAnimationSequence::Load(const char* const)
+//void ndAnimationSequence::Load(const char* const fileName)
+void ndAnimationSequence::Load(const char* const)
 {
 	dAssert(0);
 	//char* const oldloc = setlocale(LC_ALL, 0);
@@ -61,7 +61,7 @@ void dAnimationSequence::Load(const char* const)
 	//	fscanf(file, "period %f\n", &m_period);
 	//	fscanf(file, "tracksCount %d\n", &tracksCount);
 	//	for (int i = 0; i < tracksCount; i++) {
-	//		dAnimimationKeyFramesTrack* const track = AddTrack();
+	//		ndAnimationKeyFramesTrack* const track = AddTrack();
 	//		track->Load(file);
 	//	}
 	//	fclose(file);
@@ -71,8 +71,8 @@ void dAnimationSequence::Load(const char* const)
 	//setlocale(LC_ALL, oldloc);
 }
 
-//void dAnimationSequence::Save(const char* const fileName)
-void dAnimationSequence::Save(const char* const)
+//void ndAnimationSequence::Save(const char* const fileName)
+void ndAnimationSequence::Save(const char* const)
 {
 	dAssert(0);
 	//char* const oldloc = setlocale(LC_ALL, 0);
@@ -82,8 +82,8 @@ void dAnimationSequence::Save(const char* const)
 	//if (file) {
 	//	fprintf(file, "period %f\n", m_period);
 	//	fprintf(file, "tracksCount %d\n", m_tracks.GetCount());
-	//	for (dList<dAnimimationKeyFramesTrack>::dNode* trackNode = m_tracks.GetFirst(); trackNode; trackNode = trackNode->GetNext()) {
-	//		dAnimimationKeyFramesTrack& track = trackNode->GetInfo();
+	//	for (dList<ndAnimationKeyFramesTrack>::dNode* trackNode = m_tracks.GetFirst(); trackNode; trackNode = trackNode->GetNext()) {
+	//		ndAnimationKeyFramesTrack& track = trackNode->GetInfo();
 	//		track.Save(file);
 	//	}
 	//	fclose(file);

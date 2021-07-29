@@ -13,40 +13,42 @@
 #define __D_ANIMIMATION_SEQUENCE_h__
 
 #include "ndSandboxStdafx.h"
-#include "dAnimationKeyframesTrack.h"
+#include "ndAnimationKeyframesTrack.h"
 
-class dAnimationSequence: public dClassAlloc
+class ndAnimationPose;
+
+class ndAnimationSequence: public dClassAlloc
 {
 	public:
-	dAnimationSequence();
-	~dAnimationSequence();
+	ndAnimationSequence();
+	~ndAnimationSequence();
 
-	dAnimimationKeyFramesTrack* AddTrack();
+	ndAnimationKeyFramesTrack* AddTrack();
 
 	void Load(const char* const fileName);
 	void Save(const char* const fileName);
 
 	dFloat32 GetPeriod() const;
 	void SetPeriod(dFloat32 period);
-	dList<dAnimimationKeyFramesTrack>& GetTracks();
+	dList<ndAnimationKeyFramesTrack>& GetTracks();
 	
-	void CalculatePose(dAnimationPose& output, dFloat32 t) const;
+	void CalculatePose(ndAnimationPose& output, dFloat32 t) const;
 	
-	dList<dAnimimationKeyFramesTrack> m_tracks;
+	dList<ndAnimationKeyFramesTrack> m_tracks;
 	dFloat32 m_period;
 };
 
-inline dFloat32 dAnimationSequence::GetPeriod() const
+inline dFloat32 ndAnimationSequence::GetPeriod() const
 { 
 	return m_period; 
 }
 
-void dAnimationSequence::SetPeriod(dFloat32 period) 
+inline void ndAnimationSequence::SetPeriod(dFloat32 period) 
 { 
 	m_period = period; 
 }
 
-dList<dAnimimationKeyFramesTrack>& dAnimationSequence::GetTracks() 
+inline dList<ndAnimationKeyFramesTrack>& ndAnimationSequence::GetTracks() 
 { 
 	return m_tracks; 
 }

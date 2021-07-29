@@ -12,7 +12,7 @@
 #ifndef __D_ANIMATION_KEYFRAMES_TRACK_h__
 #define __D_ANIMATION_KEYFRAMES_TRACK_h__
 
-class dAnimimationKeyFramesTrack
+class ndAnimationKeyFramesTrack
 {
 	public:
 	class dPositionKey
@@ -75,13 +75,13 @@ class dAnimimationKeyFramesTrack
 		}
 	};
 
-	dAnimimationKeyFramesTrack()
+	ndAnimationKeyFramesTrack()
 		:m_position()
 		,m_rotation()
 	{
 	}
 
-	~dAnimimationKeyFramesTrack()
+	~ndAnimationKeyFramesTrack()
 	{
 	}
 

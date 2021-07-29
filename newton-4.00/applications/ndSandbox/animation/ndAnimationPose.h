@@ -14,7 +14,7 @@
 
 #include "ndSandboxStdafx.h"
 
-class dAnimKeyframe
+class ndAnimKeyframe
 {
 	public:
 	dVector m_posit;
@@ -22,22 +22,22 @@ class dAnimKeyframe
 	void* m_userData;
 };
 
-class dAnimationPose: public dArray<dAnimKeyframe>
+class ndAnimationPose: public dArray<ndAnimKeyframe>
 {
 	public:
-	dAnimationPose();
-	dAnimationPose(const dAnimationPose& source);
+	ndAnimationPose();
+	ndAnimationPose(const ndAnimationPose& source);
 
 	void Clear();
-	void CopySource(const dAnimationPose& source);
+	void CopySource(const ndAnimationPose& source);
 };
 
-class dAnimationLocalPose: public dAnimationPose
+class dAnimationLocalPose: public ndAnimationPose
 {
 	public:
-	//dAnimationLocalPose(dAnimKeyframe* const buffer)
-		dAnimationLocalPose(dAnimKeyframe* const)
-		:dAnimationPose()
+	//dAnimationLocalPose(ndAnimKeyframe* const buffer)
+		dAnimationLocalPose(ndAnimKeyframe* const)
+		:ndAnimationPose()
 	{
 		dAssert(0);
 		//m_capacity = 0x7fffffff;

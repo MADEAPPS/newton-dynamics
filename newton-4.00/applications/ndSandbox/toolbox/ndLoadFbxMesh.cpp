@@ -17,6 +17,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
+#include "ndAnimationSequence.h"
 
 using namespace ofbx;
 
@@ -947,6 +948,21 @@ class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
 		}
 	}
 
+	ndAnimationSequence* CreateSequence() const
+	{
+		ndAnimationSequence* const sequence = new ndAnimationSequence;
+		sequence->m_period = m_length;
+
+		Iterator iter(*this);
+		for (iter.Begin(); iter; iter++)
+		{
+			ndAnimationKeyFramesTrack* const track = sequence->AddTrack();
+		}
+
+		return sequence;
+	}
+
+
 	dFloat32 m_length;
 };
 
@@ -1044,7 +1060,7 @@ static void LoadAnimation(ofbx::IScene* const fbxScene, dFbxAnimation& animation
 	animation.OptimizeCurves();
 }
 
-void LoadFbxAnimation(const char* const meshName)
+ndAnimationSequence* LoadFbxAnimation(const char* const meshName)
 {
 	char outPathName[1024];
 	dGetWorkingFileName(meshName, outPathName);
@@ -1053,6 +1069,7 @@ void LoadFbxAnimation(const char* const meshName)
 	if (!fp)
 	{
 		dAssert(0);
+		return nullptr;
 	}
 
 	size_t readBytes = 0;
@@ -1073,4 +1090,6 @@ void LoadFbxAnimation(const char* const meshName)
 
 	delete entity;
 	fbxScene->destroy();
+
+	return newAnimation.CreateSequence();
 }

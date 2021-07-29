@@ -21,6 +21,7 @@ class ndDemoEntity;
 class ndDemoCamera;
 class fbxDemoEntity;
 class ndPhysicsWorld;
+class ndAnimationSequence;
 class ndDemoMeshInterface;
 class ndDemoCameraManager;
 class ndWireFrameDebugMesh;
@@ -129,7 +130,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	class ndDebugMeshCache: public dTree<ndDebuMesh, const ndShape*>
 	{
 	};
-	
 
 	ndDemoEntityManager ();
 	~ndDemoEntityManager ();
@@ -172,6 +172,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	const ndShaderPrograms& GetShaderCache() const;  
 	fbxDemoEntity* LoadFbxMesh(const char* const meshName);
+	ndAnimationSequence* GetAnimationSequence(const char* const meshName);
 	
 	private:
 	void BeginFrame();
@@ -224,6 +225,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	dUnsigned64 m_microsecunds;
 	TransparentHeap m_tranparentHeap;
+	dTree<ndAnimationSequence*, dString> m_animationCache;
 
 	dInt32 m_currentScene;
 	dInt32 m_lastCurrentScene;

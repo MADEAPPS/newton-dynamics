@@ -16,6 +16,7 @@
 #include "ndDemoEntity.h"
 
 class ndDemoEntityManager;
+class ndAnimationSequence;
 
 class fbxDemoEntity : public ndDemoEntity
 {
@@ -37,9 +38,7 @@ class fbxDemoEntity : public ndDemoEntity
 	ndMeshEffect* m_fbxMeshEffect;
 };
 
-void LoadFbxAnimation(const char* const meshName);
 fbxDemoEntity* LoadFbxMesh(const char* const meshName);
-
-
+ndAnimationSequence* LoadFbxAnimation(const char* const meshName);
 
 #endif

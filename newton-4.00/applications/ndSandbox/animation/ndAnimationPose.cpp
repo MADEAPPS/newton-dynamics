@@ -10,33 +10,33 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "dAnimationPose.h"
+#include "ndAnimationPose.h"
 
-dAnimationPose::dAnimationPose()
-	:dArray<dAnimKeyframe>()
+ndAnimationPose::ndAnimationPose()
+	:dArray<ndAnimKeyframe>()
 {
 }
 
-//dAnimationPose::dAnimationPose(const dAnimationPose& source)
-dAnimationPose::dAnimationPose(const dAnimationPose&)
-	:dArray<dAnimKeyframe>()
+//ndAnimationPose::ndAnimationPose(const ndAnimationPose& source)
+ndAnimationPose::ndAnimationPose(const ndAnimationPose&)
+	:dArray<ndAnimKeyframe>()
 {
 	dAssert(0);
 }
 
-void dAnimationPose::Clear() 
+void ndAnimationPose::Clear() 
 { 
 //	RemoveAll(); 
 }
 
-//void dAnimationPose::CopySource(const dAnimationPose& source)
-void dAnimationPose::CopySource(const dAnimationPose&)
+//void ndAnimationPose::CopySource(const ndAnimationPose& source)
+void ndAnimationPose::CopySource(const ndAnimationPose&)
 {
 	dAssert(0);
 //	dListNode* destNode = GetFirst();
 //	for (dListNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext()) {
-//		const dAnimKeyframe& srcFrame = sourceNode->GetInfo();
-//		dAnimKeyframe& dstFrame = destNode->GetInfo();
+//		const ndAnimKeyframe& srcFrame = sourceNode->GetInfo();
+//		ndAnimKeyframe& dstFrame = destNode->GetInfo();
 //		dAssert(srcFrame.m_userData == dstFrame.m_userData);
 //		dstFrame.m_rotation = srcFrame.m_rotation;
 //		dstFrame.m_posit = srcFrame.m_posit;

@@ -3170,12 +3170,17 @@ static bool parseObjects(const Element& root, Scene* scene, u64 flags, Allocator
 		}
 	}
 
-	(*job_processor)([](void* ptr){
-		ParseGeometryJob* job = (ParseGeometryJob*)ptr;
-		job->is_error = parseGeometry(*job->element, job->triangulate, job->geom).isError();
-	}, job_user_ptr, &parse_geom_jobs[0], (u32)sizeof(parse_geom_jobs[0]), (u32)parse_geom_jobs.size());
+	if (parse_geom_jobs.size())
+	{
+		(*job_processor)([](void* ptr)
+		{
+			ParseGeometryJob* job = (ParseGeometryJob*)ptr;
+			job->is_error = parseGeometry(*job->element, job->triangulate, job->geom).isError();
+		}, job_user_ptr, &parse_geom_jobs[0], (u32)sizeof(parse_geom_jobs[0]), (u32)parse_geom_jobs.size());
+	}
 
-	for (const ParseGeometryJob& job : parse_geom_jobs) {
+	for (const ParseGeometryJob& job : parse_geom_jobs) 
+	{
 		if (job.is_error) return false;
 		scene->m_object_map[job.id].object = job.geom;
 		if (job.geom) {

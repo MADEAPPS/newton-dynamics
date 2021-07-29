@@ -10,10 +10,9 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "dAnimationKeyframesTrack.h"
+#include "ndAnimationKeyframesTrack.h"
 
-
-const void dAnimimationKeyFramesTrack::InterpolatePosition(dFloat32 t, dVector& posit) const
+const void ndAnimationKeyFramesTrack::InterpolatePosition(dFloat32 t, dVector& posit) const
 {
 	if (m_position.GetCount()) 
 	{
@@ -27,7 +26,7 @@ const void dAnimimationKeyFramesTrack::InterpolatePosition(dFloat32 t, dVector& 
 	}
 }
 
-const void dAnimimationKeyFramesTrack::InterpolateRotation(dFloat32 t, dQuaternion& rotation) const
+const void ndAnimationKeyFramesTrack::InterpolateRotation(dFloat32 t, dQuaternion& rotation) const
 {
 	if (m_rotation.GetCount()) 
 	{
@@ -41,8 +40,8 @@ const void dAnimimationKeyFramesTrack::InterpolateRotation(dFloat32 t, dQuaterni
 	}
 }
 
-//void dAnimimationKeyFramesTrack::Save(FILE* const file) const
-void dAnimimationKeyFramesTrack::Save(FILE* const) const
+//void ndAnimationKeyFramesTrack::Save(FILE* const file) const
+void ndAnimationKeyFramesTrack::Save(FILE* const) const
 {
 	dAssert(0);
 	//fprintf(file, "\ttrackName: %s\n", m_name.GetStr());
@@ -59,8 +58,8 @@ void dAnimimationKeyFramesTrack::Save(FILE* const) const
 	//}
 }
 
-//void dAnimimationKeyFramesTrack::Load(FILE* const file)
-void dAnimimationKeyFramesTrack::Load(FILE* const)
+//void ndAnimationKeyFramesTrack::Load(FILE* const file)
+void ndAnimationKeyFramesTrack::Load(FILE* const)
 {
 	dAssert(0);
 	//char name[1024];

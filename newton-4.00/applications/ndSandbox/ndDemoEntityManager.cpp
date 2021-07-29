@@ -25,6 +25,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"
 #include "ndDemoCameraManager.h"
+#include "ndAnimationSequence.h"
 #include "ndHighResolutionTimer.h"
 
 //#define ENABLE_REPLAY
@@ -133,6 +134,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_updateCamera(nullptr)
 	,m_microsecunds(0)
 	,m_tranparentHeap()
+	,m_animationCache()
 	,m_currentScene(DEFAULT_SCENE)
 	,m_lastCurrentScene(DEFAULT_SCENE)
 	,m_framesCount(0)
@@ -403,6 +405,20 @@ bool ndDemoEntityManager::GetKeyState(dInt32 key) const
 	return io.KeysDown[key];
 }
 
+ndAnimationSequence* ndDemoEntityManager::GetAnimationSequence(const char* const fileName)
+{
+	dTree<ndAnimationSequence*, dString>::dNode* node = m_animationCache.Find(fileName);
+	if (!node)
+	{
+		ndAnimationSequence* const sequence = LoadFbxAnimation(fileName);
+		if (sequence)
+		{
+			node = m_animationCache.Insert(sequence, fileName);
+		}
+	}
+	return node ? node->GetInfo() : nullptr;
+}
+
 bool ndDemoEntityManager::IsShiftKeyDown () const
 {
 	const ImGuiIO& io = ImGui::GetIO();
@@ -543,6 +559,12 @@ void ndDemoEntityManager::Cleanup ()
 	if (m_world) 
 	{
 		m_world->Sync();
+	}
+
+	dTree<ndAnimationSequence*, dString>::Iterator iter(m_animationCache);
+	for (iter.Begin(); iter; iter++)
+	{
+		delete *iter;
 	}
 
 	while (m_debugShapeCache.GetRoot())
