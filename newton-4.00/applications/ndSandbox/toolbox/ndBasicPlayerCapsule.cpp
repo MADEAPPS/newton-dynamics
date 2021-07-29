@@ -57,6 +57,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 	}
 
+	// create bind pose to animation sequences.
 	ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
 	const dList<ndAnimationKeyFramesTrack>& tracks = sequence->m_tracks;
 	for (dList<ndAnimationKeyFramesTrack>::dNode* node = tracks.GetFirst(); node; node = node->GetNext()) 
@@ -67,6 +68,24 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 		keyFrame.m_userData = ent;
 		m_output.PushBack(keyFrame);
 	}
+
+	// create an animation blend tree
+	ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
+	ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
+	ndAnimationSequence* const runSequence = scene->GetAnimationSequence("whiteman_run.fbx");
+
+	////dAnimationSequencePlayer* const Idle = new dAnimationSequencePlayer(idleSequence);
+	//dAnimationSequencePlayer* const walk = new dAnimationSequencePlayer(walkSequence);
+	//dAnimationSequencePlayer* const run = new dAnimationSequencePlayer(runSequence);
+	//
+	////dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
+	//dFloat scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
+	//dAnimationTwoWayBlend* const walkRunBlend = new dAnimationTwoWayBlend(walk, run);
+	//
+	//walkRunBlend->SetTimeDilation1(scale1);
+	//walkRunBlend->SetParam(0.5f);
+	//
+	//m_animBlendTree = walkRunBlend;
 }
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache, ndPhysicsWorld* const world)
