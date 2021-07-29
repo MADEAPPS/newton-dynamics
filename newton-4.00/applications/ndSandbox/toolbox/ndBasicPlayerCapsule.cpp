@@ -16,6 +16,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
+#include "ndAnimationSequence.h"
 #include "ndBasicPlayerCapsule.h"
 
 #define PLAYER_WALK_SPEED				8.0f
@@ -54,6 +55,17 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	if (isPlayer)
 	{
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
+	}
+
+	ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
+	const dList<ndAnimationKeyFramesTrack>& tracks = sequence->m_tracks;
+	for (dList<ndAnimationKeyFramesTrack>::dNode* node = tracks.GetFirst(); node; node = node->GetNext()) 
+	{
+		ndAnimationKeyFramesTrack& track = node->GetInfo();
+		ndDemoEntity* const ent = entity->Find(track.GetName().GetStr());
+		ndAnimKeyframe keyFrame;
+		keyFrame.m_userData = ent;
+		m_output.PushBack(keyFrame);
 	}
 }
 

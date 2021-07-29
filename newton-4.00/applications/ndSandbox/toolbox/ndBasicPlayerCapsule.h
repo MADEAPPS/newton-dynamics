@@ -13,6 +13,7 @@
 #define _D_BASIC_PLAYER_CAPSULE_H_
 
 #include "ndSandboxStdafx.h"
+#include "ndAnimationPose.h"
 
 class ndDemoMesh;
 class ndDemoEntity;
@@ -55,6 +56,8 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 	ndDemoEntityManager* m_scene;
 	PlayerInputs m_playerInput;
 	bool m_isPlayer;
+
+	ndAnimationPose m_output;
 };
 
 #endif

@@ -23,6 +23,8 @@
 #include "ndBasicPlayerCapsule.h"
 #include "ndHeightFieldPrimitive.h"
 
+
+
 void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
 	dMatrix heighfieldLocation (dGetIdentityMatrix());
@@ -44,8 +46,6 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	localAxis[0] = dVector(0.0, 1.0f, 0.0f, 0.0f);
 	localAxis[1] = dVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
-
-	ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
 
 	fbxDemoEntity* const man = scene->LoadFbxMesh("whiteMan.fbx");
 
