@@ -24,8 +24,12 @@
 class ndRagDollModel : public ndModel
 {
 	public:
-	ndRagDollModel()
+	ndRagDollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const dMatrix& matrix)
 	{
+		ndDemoEntity* const entity = ragdollMesh->CreateClone();
+		entity->ResetMatrix(matrix);
+		scene->AddEntity(entity);
+
 	}
 
 	void Update(ndWorld* const, dFloat32) 
@@ -46,25 +50,22 @@ class ndRagDollModel : public ndModel
 	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
 };
 
-
 void ndBasicRagdoll (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
-	fbxDemoEntity* const ragdoll1 = scene->LoadFbxMesh("whiteMan.fbx");
-	//fbxDemoEntity* const ragdoll = LoadFbxMesh("skinTest0.fbx");
-	fbxDemoEntity* const ragdoll = (fbxDemoEntity*)ragdoll1->CreateClone();
-	delete ragdoll1;
+	fbxDemoEntity* const ragdollMesh = scene->LoadFbxMesh("whiteMan.fbx");
 
-	
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
-	ragdoll->ResetMatrix(matrix);
-	scene->AddEntity(ragdoll);
+	ndRagDollModel* const ragdoll = new ndRagDollModel(scene, ragdollMesh, matrix);
+	scene->GetWorld()->AddModel(ragdoll);
 
+	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
+
+	delete ragdollMesh;
 	dQuaternion rot;
 	dVector origin(-10.0f, 1.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
