@@ -48,8 +48,8 @@ class ndAnimationKeyFramesTrack
 		m_name = name; 
 	}
 
-	const void InterpolatePosition(dFloat32 time, dFloat32 length, dVector &positOut) const;
-	const void InterpolateRotation(dFloat32 time, dFloat32 length, dQuaternion& rotationOut) const;
+	void InterpolatePosition(dFloat32 time, dFloat32 length, dVector &positOut) const;
+	void InterpolateRotation(dFloat32 time, dFloat32 length, dQuaternion& rotationOut) const;
 
 	dString m_name;
 	dKeyFramesArray<dVector> m_position;

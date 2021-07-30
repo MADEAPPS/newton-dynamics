@@ -16,7 +16,7 @@ template<class OBJECT>
 dInt32 ndAnimationKeyFramesTrack::dKeyFramesArray<OBJECT>::GetIndex(dFloat32 time) const
 {
 	dAssert(time >= 0.0f);
-	dInt32 index = GetCount() - 1;
+	dInt32 index = dArray<OBJECT>::GetCount() - 1;
 	if (time < m_time[index])
 	{
 		dInt32 i0 = 0;
@@ -46,7 +46,7 @@ dInt32 ndAnimationKeyFramesTrack::dKeyFramesArray<OBJECT>::GetIndex(dFloat32 tim
 	return index;
 }
 
-const void ndAnimationKeyFramesTrack::InterpolatePosition(dFloat32 time, dFloat32 length, dVector& posit) const
+void ndAnimationKeyFramesTrack::InterpolatePosition(dFloat32 time, dFloat32 length, dVector& posit) const
 {
 	//if (m_name != "mixamorig:Hips")
 	//{
@@ -86,7 +86,7 @@ const void ndAnimationKeyFramesTrack::InterpolatePosition(dFloat32 time, dFloat3
 	}
 }
 
-const void ndAnimationKeyFramesTrack::InterpolateRotation(dFloat32 time, dFloat32 length, dQuaternion& rotation) const
+void ndAnimationKeyFramesTrack::InterpolateRotation(dFloat32 time, dFloat32 length, dQuaternion& rotation) const
 {
 	//if (m_name != "mixamorig:LeftLeg")
 	//{

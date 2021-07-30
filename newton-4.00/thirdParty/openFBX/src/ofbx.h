@@ -520,7 +520,7 @@ namespace ofbx
 		virtual const IElement* getRootElement() const = 0;
 		virtual const Object* getRoot() const = 0;
 
-		virtual const int getTakeInfoCount() const = 0;
+		virtual int getTakeInfoCount() const = 0;
 		virtual const TakeInfo* getTakeInfo(int index) const = 0;
 		virtual const TakeInfo* getTakeInfo(const char* name) const = 0;
 		virtual int getMeshCount() const = 0;

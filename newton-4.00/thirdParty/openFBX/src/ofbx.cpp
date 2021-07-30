@@ -1618,12 +1618,12 @@ struct Scene : IScene
 		return m_meshes[index];
 	}
 
-	const int getTakeInfoCount() const
+	int getTakeInfoCount() const override
 	{
 		return int (m_take_infos.size());
 	}
 
-	virtual const TakeInfo* getTakeInfo(int index) const
+	virtual const TakeInfo* getTakeInfo(int index) const override
 	{
 		return &m_take_infos[index];
 	}
