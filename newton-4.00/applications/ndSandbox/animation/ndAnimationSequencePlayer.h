@@ -26,15 +26,8 @@ class ndAnimationSequencePlayer: public ndAnimationBlendTreeNode
 
 	virtual void Evaluate(ndAnimationPose& output, dFloat32 timestep);
 
-	void SetFrame(dFloat32 timestep)
-	{
-		m_time = timestep;
-	}
-
-	void AdvanceFrame(dFloat32 timestep)
-	{
-		SetFrame (dMod(m_time + timestep, m_sequence->m_period));
-	}
+	void SetFrame(dFloat32 timestep);
+	void AdvanceFrame(dFloat32 timestep);
 
 	dFloat32 GetFrame() const 
 	{
@@ -51,5 +44,8 @@ class ndAnimationSequencePlayer: public ndAnimationBlendTreeNode
 	dFloat32 m_time;
 };
 
-
+inline void ndAnimationSequencePlayer::AdvanceFrame(dFloat32 timestep)
+{
+	SetFrame(m_time + timestep);
+}
 #endif

@@ -21,6 +21,8 @@
 
 using namespace ofbx;
 
+#define D_ANIM_BASE_FREQ dFloat32 (30.0f)
+
 fbxDemoEntity::fbxDemoEntity(ndDemoEntity* const parent)
 	:ndDemoEntity(dGetIdentityMatrix(), parent)
 	,m_fbxMeshEffect(nullptr)
@@ -835,12 +837,16 @@ class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
 	dFbxAnimation()
 		:dTree <dFbxAnimationTrack, dString>()
 		,m_length(0.0f)
+		,m_timestep(0.0f)
+		,m_framesCount(0)
 	{
 	}
 
 	dFbxAnimation(const dFbxAnimation& source, fbxDemoEntity* const entity, const dMatrix& matrix)
 		:dTree <dFbxAnimationTrack, dString>()
 		,m_length(source.m_length)
+		,m_timestep(source.m_timestep)
+		,m_framesCount(source.m_framesCount)
 	{
 		Iterator iter(source);
 		for (iter.Begin(); iter; iter++)
@@ -863,16 +869,13 @@ class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
 		}
 	}
 
-	//void FreezeScale(fbxDemoEntity* const entity, dFbxAnimation& output)
 	void FreezeScale(fbxDemoEntity* const entity, const dFbxAnimation& source)
 	{
 		dMatrix parentMatrixStack[1024];
 		fbxDemoEntity* stackPool[1024];
 
-		dInt32 steps = dInt32 (m_length * 60.0f);
-		dFloat32 deltaTime = m_length / steps;
-		dFloat32 deltaTimeAcc = 0.0f;
-		for (dInt32 i = 0; i < steps; i++)
+		dFloat32 deltaTimeAcc = dFloat32 (0.0f);
+		for (dInt32 i = 0; i < m_framesCount; i++)
 		{
 			for (fbxDemoEntity* node = (fbxDemoEntity*)entity->GetFirst(); node; node = (fbxDemoEntity*)node->GetNext())
 			{
@@ -881,7 +884,6 @@ class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
 				{
 					const dFbxAnimationTrack& track = aniNode->GetInfo();
 					const dMatrix matrix(track.GetKeyframe(deltaTimeAcc));
-					//node->ResetMatrix(matrix);
 					node->SetMeshMatrix(matrix);
 				}
 			}
@@ -906,7 +908,6 @@ class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
 				scaledAxis[0][0] = scale[0];
 				scaledAxis[1][1] = scale[1];
 				scaledAxis[2][2] = scale[2];
-				//dMatrix xxxx(stretchAxis * scaledAxis * matrix);
 				dMatrix newParentMatrix(stretchAxis * scaledAxis);
 
 				dFbxAnimation::dNode* const aniNode = Find(rootNode->GetName());
@@ -923,7 +924,7 @@ class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
 					stack++;
 				}
 			}
-			deltaTimeAcc += deltaTime;
+			deltaTimeAcc += m_timestep;
 		}
 	}
 
@@ -937,9 +938,10 @@ class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
 		}
 	}
 
-	ndAnimationSequence* CreateSequence() const
+	ndAnimationSequence* CreateSequence(const char* const name) const
 	{
 		ndAnimationSequence* const sequence = new ndAnimationSequence;
+		sequence->SetName(name);
 		sequence->m_period = m_length;
 
 		Iterator iter(*this);
@@ -977,28 +979,25 @@ class dFbxAnimation : public dTree <dFbxAnimationTrack, dString>
 		return sequence;
 	}
 
-
 	dFloat32 m_length;
+	dFloat32 m_timestep;
+	dInt32 m_framesCount;
 };
 
-static void LoadAnimationCurve(ofbx::IScene* const fbxScene, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, dFbxAnimation& animation)
+static void LoadAnimationCurve(ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, dFbxAnimation& animation)
 {
-	const ofbx::TakeInfo* const animationInfo = fbxScene->getTakeInfo(0);
 	const ofbx::AnimationCurveNode* const scaleNode = animLayer->getCurveNode(*bone, "Lcl Scaling");
 	const ofbx::AnimationCurveNode* const rotationNode = animLayer->getCurveNode(*bone, "Lcl Rotation");
 	const ofbx::AnimationCurveNode* const translationNode = animLayer->getCurveNode(*bone, "Lcl Translation");
-
-	dFloat32 timestep = 1.0f / 60.0f;
-	dFloat32 period = dFloat32(animationInfo->local_time_to - animationInfo->local_time_from);
-	dInt32 frames = dInt32((animationInfo->local_time_to - animationInfo->local_time_from) / timestep) + 1;
-	timestep = period / frames;
 
 	dFbxAnimationTrack& track = animation.Insert(bone->name)->GetInfo();
 
 	Vec3 scale;
 	Vec3 rotation;
 	Vec3 translation;
+
 	dFloat32 timeAcc = 0.0f;
+	dFloat32 timestep = animation.m_timestep;
 
 	dVector scale1;
 	dVector euler0;
@@ -1008,14 +1007,8 @@ static void LoadAnimationCurve(ofbx::IScene* const fbxScene, const ofbx::Object*
 	dMatrix boneMatrix(ofbxMatrix2dMatrix(bone->getLocalTransform()));
 	boneMatrix.PolarDecomposition(transform, scale1, eigenScaleAxis);
 	transform.CalcPitchYawRoll(euler0, euler1);
-
-	for (dInt32 i = 0; i < frames; i++)
+	for (dInt32 i = 0; i < animation.m_framesCount; i++)
 	{
-		//const AnimationCurve* curve0 = rotationNode->getCurve(0);
-		//int xxx0 = curve0->getKeyCount();
-		//const i64* xxx1 = curve0->getKeyTime();
-		//const float* xxx2 = curve0->getKeyValue();
-
 		scale.x = scale1.m_x;
 		scale.y = scale1.m_y;
 		scale.z = scale1.m_z;
@@ -1054,7 +1047,18 @@ static void LoadAnimationLayer(ofbx::IScene* const fbxScene, const ofbx::Animati
 	stack = GetChildrenNodes(rootNode, stackPool);
 
 	const ofbx::TakeInfo* const animationInfo = fbxScene->getTakeInfo(0);
-	animation.m_length = dFloat32(animationInfo->local_time_to - animationInfo->local_time_from);
+	//animation.m_length = dFloat32(animationInfo->local_time_to - animationInfo->local_time_from);
+
+	dFloat32 period = dFloat32(animationInfo->local_time_to - animationInfo->local_time_from);
+	dFloat32 framesFloat = period * D_ANIM_BASE_FREQ;
+
+	dInt32 frames = dInt32(dFloor(framesFloat));
+	dAssert(frames > 0);
+	dFloat32 timestep = period / frames;
+
+	animation.m_length = period;
+	animation.m_timestep = timestep;
+	animation.m_framesCount = frames;
 
 	while (stack)
 	{
@@ -1085,10 +1089,10 @@ static void LoadAnimation(ofbx::IScene* const fbxScene, dFbxAnimation& animation
 	animation.OptimizeCurves();
 }
 
-ndAnimationSequence* LoadFbxAnimation(const char* const meshName)
+ndAnimationSequence* LoadFbxAnimation(const char* const fileName)
 {
 	char outPathName[1024];
-	dGetWorkingFileName(meshName, outPathName);
+	dGetWorkingFileName(fileName, outPathName);
 
 	FILE* fp = fopen(outPathName, "rb");
 	if (!fp)
@@ -1116,5 +1120,5 @@ ndAnimationSequence* LoadFbxAnimation(const char* const meshName)
 	delete entity;
 	fbxScene->destroy();
 
-	return newAnimation.CreateSequence();
+	return newAnimation.CreateSequence(fileName);
 }

@@ -25,18 +25,29 @@ class ndAnimationSequence: public dClassAlloc
 
 	ndAnimationKeyFramesTrack* AddTrack();
 
-	void Load(const char* const fileName);
-	void Save(const char* const fileName);
-
 	dFloat32 GetPeriod() const;
 	void SetPeriod(dFloat32 period);
 	dList<ndAnimationKeyFramesTrack>& GetTracks();
 	
+	const dString& GetName() const;
+	void SetName(const char* const name);
 	void CalculatePose(ndAnimationPose& output, dFloat32 t) const;
 	
+	dString m_name;
 	dList<ndAnimationKeyFramesTrack> m_tracks;
 	dFloat32 m_period;
 };
+
+inline const dString& ndAnimationSequence::GetName() const
+{
+	return m_name;
+}
+
+inline void ndAnimationSequence::SetName(const char* const name)
+{
+	m_name = name;
+}
+
 
 inline dFloat32 ndAnimationSequence::GetPeriod() const
 { 

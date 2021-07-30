@@ -200,14 +200,10 @@ dQuaternion dQuaternion::Slerp (const dQuaternion &q1, dFloat32 t) const
 	}
 
 	dot = q0.DotProduct (q0).GetScalar();
-	if ((dot) < dFloat32(1.0f - dEpsilon * 10.0f) ) 
+	if (dAbs (dot - dFloat32(1.0f)) > dEpsilon) 
 	{
-		//dot = dFloat32(1.0f) / dSqrt (dot);
 		dot = dRsqrt (dot);
-		q0.m_w *= dot;
-		q0.m_x *= dot;
-		q0.m_y *= dot;
-		q0.m_z *= dot;
+		q0 = q0.Scale(dot);
 	}
 	return q0;
 }

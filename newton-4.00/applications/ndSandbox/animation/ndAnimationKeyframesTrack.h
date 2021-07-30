@@ -16,49 +16,14 @@ class ndAnimationKeyFramesTrack
 {
 	public:
 	template<class OBJECT>
-	class dAnimimationKeyFramesArray: public dArray<OBJECT>
+	class dKeyFramesArray: public dArray<OBJECT>
 	{
 		public:
-		dAnimimationKeyFramesArray()
+		dKeyFramesArray()
 			:dArray<OBJECT>()
 		{
 		}
-
-		int GetIndex(dFloat32 t) const
-		{
-			dAssert(t >= 0.0f);
-			const int size = GetCount();
-			//const dAnimimationKeyFramesArray& me = *this;
-			if (t > m_time[size - 1])
-			{
-				t = m_time[size - 1];
-			}
-
-			int i0 = 0;
-			int i1 = size - 1;
-
-			while ((i1 - i0) > 8) 
-			{
-				const int mid = (i1 + i0) / 2;
-				if (t < m_time[mid])
-				{
-					i1 = mid;
-				} 
-				else 
-				{
-					i0 = mid;
-				}
-			}
-			dAssert(m_time[i0] <= t);
-			for (int i = i0 + 1; i < size; i++) 
-			{
-				if (m_time[i] >= t)
-				{
-					return i - 1;
-				}
-			}
-			return i0;
-		}
+		dInt32 GetIndex(dFloat32 time) const;
 
 		dArray<dFloat32> m_time;
 	};
@@ -83,12 +48,12 @@ class ndAnimationKeyFramesTrack
 		m_name = name; 
 	}
 
-	const void InterpolatePosition(dFloat32 t, dVector &positOut) const;
-	const void InterpolateRotation(dFloat32 t, dQuaternion& rotationOut) const;
+	const void InterpolatePosition(dFloat32 time, dFloat32 length, dVector &positOut) const;
+	const void InterpolateRotation(dFloat32 time, dFloat32 length, dQuaternion& rotationOut) const;
 
 	dString m_name;
-	dAnimimationKeyFramesArray<dVector> m_position;
-	dAnimimationKeyFramesArray<dQuaternion> m_rotation;
+	dKeyFramesArray<dVector> m_position;
+	dKeyFramesArray<dQuaternion> m_rotation;
 };
 
 #endif

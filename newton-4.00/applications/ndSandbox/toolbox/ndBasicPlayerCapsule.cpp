@@ -48,7 +48,8 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
 
 		dFloat32 timestep = word->GetScene()->GetTimestep();
-		timestep *= 0.125f;
+		//timestep *= 0.25f;
+		//timestep = 1.0f/(30.0f * 4.0f);
 		player->m_animBlendTree->Evaluate(player->m_output, timestep);
 
 		for (int i = 0; i < player->m_output.GetCount(); i++)
@@ -118,6 +119,10 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	idleMoveBlend->SetParam(1.0f);
 	//walkRunBlend->SetTimeDilation1(scale1);
 	m_animBlendTree = idleMoveBlend;
+
+	// evaluate twice that interpolation is reset
+	m_animBlendTree->Evaluate(m_output, dFloat32(0.0f));
+	m_animBlendTree->Evaluate(m_output, dFloat32(0.0f));
 }
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache, ndPhysicsWorld* const world)
