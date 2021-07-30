@@ -48,7 +48,7 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
 
 		dFloat32 timestep = word->GetScene()->GetTimestep();
-		timestep *= 0.25f;
+		timestep *= 0.125f;
 		player->m_animBlendTree->Evaluate(player->m_output, timestep);
 
 		for (int i = 0; i < player->m_output.GetCount(); i++)
