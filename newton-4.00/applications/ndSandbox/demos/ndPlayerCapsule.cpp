@@ -42,12 +42,12 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height/4.0f, true);
 	
 	location.m_posit.m_z += 2.0f;
-	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
 	
 	location.m_posit.m_z += 2.0f;
-	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
 
-	AddCapsulesStacks(scene, dVector (32.0f, 0.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
+	//AddCapsulesStacks(scene, dVector (32.0f, 0.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 	AddBox(scene, dVector(10.0f, 0.0f, 0.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
 	AddBox(scene, dVector(10.0f, 0.5f, 1.125f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
 	AddBox(scene, dVector(10.0f, 1.0f, 1.250f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);

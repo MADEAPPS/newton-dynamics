@@ -373,6 +373,7 @@ ndDemoEntityManager::~ndDemoEntityManager ()
 	glfwTerminate();
 }
 
+#ifdef _DEBUG
 void ndDemoEntityManager::OpenMessageCallback(GLenum source,
 	GLenum type,
 	GLuint id,
@@ -393,6 +394,7 @@ void ndDemoEntityManager::OpenMessageCallback(GLenum source,
 			(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), source, type, id, severity, message, length));
 	}
 }
+#endif
 
 ndDemoCamera* ndDemoEntityManager::GetCamera() const
 {
@@ -566,6 +568,7 @@ void ndDemoEntityManager::Cleanup ()
 	{
 		delete *iter;
 	}
+	m_animationCache.RemoveAll();
 
 	while (m_debugShapeCache.GetRoot())
 	{
