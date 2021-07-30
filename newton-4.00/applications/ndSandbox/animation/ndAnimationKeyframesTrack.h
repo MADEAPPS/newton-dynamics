@@ -25,6 +25,10 @@ class ndAnimationKeyFramesTrack
 		}
 		dInt32 GetIndex(dFloat32 time) const;
 
+		private:
+		dInt32 GetIndexDebug(dFloat32 time) const;
+
+		public:
 		dArray<dFloat32> m_time;
 	};
 
