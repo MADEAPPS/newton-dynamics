@@ -18,6 +18,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndAnimationSequence.h"
 #include "ndBasicPlayerCapsule.h"
+#include "ndAnimationTwoWayBlend.h"
 #include "ndAnimationSequencePlayer.h"
 
 #define PLAYER_WALK_SPEED				8.0f
@@ -43,9 +44,8 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 	{
 		ndDemoEntityNotify::OnTransform(thread, matrix);
 
-		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
-		//ndDemoEntity* const playerEntity = (ndBasicPlayerCapsule*)m_entity;
 		ndWorld* const word = m_manager->GetWorld();
+		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
 
 		dFloat32 timestep = word->GetScene()->GetTimestep();
 		player->m_animBlendTree->Evaluate(player->m_output, timestep);
@@ -54,15 +54,6 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		{
 			const ndAnimKeyframe& keyFrame = player->m_output[i];
 			ndDemoEntity* const entity = (ndDemoEntity*)keyFrame.m_userData;
-
-			//dTrace (("%s\n", entity->GetName().GetStr()));
-			//if ((entity->GetName() == "mixamorig:Hips") ||
-			//	(entity->GetName() == "mixamorig:LeftUpLeg") ||
-			//	(entity->GetName() == "mixamorig:RightUpLeg") ||
-			//	(entity->GetName() == "mixamorig:Spine"))
-			//if ((entity->GetName() == "mixamorig:RightUpLeg") ||
-			//	(entity->GetName() == "mixamorig:RightLeg"))
-				
 			entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
 		}
 	}
@@ -109,26 +100,23 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	}
 
 	// create an animation blend tree
-	//ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
-	ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("whiteMan_walk.fbx");
-	//ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("whiteMan_walkSlow.fbx");
-	//ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
-	//ndAnimationSequence* const runSequence = scene->GetAnimationSequence("whiteman_run.fbx");
+	ndAnimationSequence* const idleSequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
+	ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
+	ndAnimationSequence* const runSequence = scene->GetAnimationSequence("whiteman_run.fbx");
 
 	ndAnimationSequencePlayer* const idle = new ndAnimationSequencePlayer(idleSequence);
-	//ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
-	//ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
+	ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
+	ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
 	
 	////dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
 	//dFloat32 scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
-	//ndAnimationTwoWayBlend* const walkRunBlend = new dAnimationTwoWayBlend(walk, run);
-	//
+	ndAnimationTwoWayBlend* const walkRunBlend = new ndAnimationTwoWayBlend(walk, run);
+	ndAnimationTwoWayBlend* const idleMoveBlend = new ndAnimationTwoWayBlend(idle, walkRunBlend);
+	
+	walkRunBlend->SetParam(1.0f);
+	idleMoveBlend->SetParam(1.0f);
 	//walkRunBlend->SetTimeDilation1(scale1);
-	//walkRunBlend->SetParam(0.5f);
-	//
-	//m_animBlendTree = walkRunBlend;
-
-	m_animBlendTree = idle;
+	m_animBlendTree = idleMoveBlend;
 }
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache, ndPhysicsWorld* const world)

@@ -57,8 +57,6 @@ class dArray
 
 	protected:
 	T* m_array;
-
-	private:
 	dInt32 m_size;
 	dInt32 m_capacity;
 };

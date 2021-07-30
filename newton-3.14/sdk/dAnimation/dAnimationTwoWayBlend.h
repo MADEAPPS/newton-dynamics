@@ -10,7 +10,7 @@
 */
 
 #ifndef __D_ANIMATION_TWO_WAY_h__
-#define __D_ANIMATION_EFFECTOR_BLEND_TWO_WAY_h__
+#define __D_ANIMATION_TWO_WAY_h__
 
 #include "dAnimationBlendTreeNode.h"
 

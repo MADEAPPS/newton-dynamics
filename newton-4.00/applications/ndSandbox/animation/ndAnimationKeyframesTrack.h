@@ -15,19 +15,6 @@
 class ndAnimationKeyFramesTrack
 {
 	public:
-	//class dPositionKey
-	//{
-	//	public:
-	//	dVector m_posit;
-	//	dFloat32 m_time;
-	//};
-	//class dRotationKey
-	//{
-	//	public:
-	//	dQuaternion m_rotation;
-	//	dFloat32 m_time;
-	//};
-
 	template<class OBJECT>
 	class dAnimimationKeyFramesArray: public dArray<OBJECT>
 	{

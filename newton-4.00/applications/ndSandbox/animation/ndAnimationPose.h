@@ -32,22 +32,20 @@ class ndAnimationPose: public dArray<ndAnimKeyframe>
 	void CopySource(const ndAnimationPose& source);
 };
 
-class dAnimationLocalPose: public ndAnimationPose
+class ndAnimationLocalPose: public ndAnimationPose
 {
 	public:
-	//dAnimationLocalPose(ndAnimKeyframe* const buffer)
-		dAnimationLocalPose(ndAnimKeyframe* const)
+	ndAnimationLocalPose(ndAnimKeyframe* const buffer)
 		:ndAnimationPose()
 	{
-		dAssert(0);
-		//m_capacity = 0x7fffffff;
-		//m_data = buffer;
+		m_array = buffer;
+		m_capacity = 0x7fffffff;
 	}
 
-	~dAnimationLocalPose()
+	~ndAnimationLocalPose()
 	{
-		//m_capacity = 0;
-		//m_data = NULL;
+		m_capacity = 0;
+		m_array = nullptr;
 	}
 };
 
