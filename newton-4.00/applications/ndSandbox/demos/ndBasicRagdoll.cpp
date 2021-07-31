@@ -86,7 +86,7 @@ class ndRagdollEntityNotify : public ndDemoEntityNotify
 	void OnApplyExternalForce(dInt32 thread, dFloat32 timestep)
 	{
 		//ndDemoEntityNotify::OnApplyExternalForce(thread, timestep);
-		// rember to check and clamp huge angular velocities
+		// remember to check and clamp huge angular velocities
 	}
 
 	dMatrix m_bindMatrix;
@@ -248,29 +248,28 @@ class ndRagDollModel : public ndModel
 
 	void ConnectBodyParts(ndWorld* const world, ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const dJointDefinition& definition) const
 	{
-		ndJointFix6dof* const joint = new ndJointFix6dof(childBody, parentBody);
-		world->AddJoint(joint);
+		//ndJointFix6dof* const joint = new ndJointFix6dof(childBody, parentBody);
 
-		//dMatrix matrix;
-		//NewtonBodyGetMatrix(childBody, &matrix[0][0]);
-		//
-		//dJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
-		//dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad));
+		dMatrix matrix(childBody->GetMatrix());
+		dJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
+		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
 		//pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
-		//
+		
 		//dMatrix parentRollMatrix(dGetIdentityMatrix() * pinAndPivotInGlobalSpace);
-		//
 		//dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 		//dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, parentRollMatrix, childBody, parentBody);
-		//
+		ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinAndPivotInGlobalSpace, childBody, parentBody);
+	
 		//dFloat32 friction = definition.m_friction * 0.25f;
 		//joint->EnableCone(true);
 		//joint->SetConeFriction(friction);
 		//joint->SetConeLimits(jointLimits.m_coneAngle * dDegreeToRad);
-		//
+		
 		//joint->EnableTwist(true);
 		//joint->SetTwistFriction(friction);
 		//joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
+
+		world->AddJoint(joint);
 	}
 
 
