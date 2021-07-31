@@ -19,9 +19,6 @@ ndJointFix6dof::ndJointFix6dof(ndBodyKinematic* const body0, ndBodyKinematic* co
 	,m_maxForce(D_MAX_BOUND)
 	,m_maxTorque(D_MAX_BOUND)
 {
-m_maxForce = 2000.0f;
-m_maxTorque = 500.0f;
-
 	const dVector posit0(body0->GetMatrix().TransformVector(body0->GetCentreOfMass()));
 	const dVector posit1(body1->GetMatrix().TransformVector(body1->GetCentreOfMass()));
 	const dVector pivot((posit1 + posit0).Scale (dFloat32 (0.5f)));

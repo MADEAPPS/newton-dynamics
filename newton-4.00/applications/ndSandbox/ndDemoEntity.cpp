@@ -372,21 +372,26 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 	
 		if (strstr (name, "sphere")) 
 		{
-			dAssert(0);
-			//ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
-			////dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
-			//dFloat32* const array = mesh->m_vertex;
-			//dVector extremes(0.0f);
-			//for (dInt32 i = 0; i < mesh->m_vertexCount; i++) {
-			//	extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
-			//	extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
-			//	extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
-			//}
-			//
-			//dMatrix matrix(child->GetCurrentMatrix());
-			//shapeArray[count] = NewtonCreateSphere(world, extremes.m_x, 0, &matrix[0][0]);
-			//count++;
-			//dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
+			dArray<dVector> points;
+			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+			mesh->GetVertexArray(points);
+
+			dVector minP(dFloat32(1.0e10f));
+			dVector maxP(dFloat32(-1.0e10f));
+			for (dInt32 i = 0; i < mesh->m_vertexCount; i++)
+			{
+				minP = minP.GetMin(points[i]);
+				maxP = maxP.GetMax(points[i]);
+			}
+			dVector size(dVector::m_half * (maxP - minP));
+			dMatrix alighMatrix(dGetIdentityMatrix());
+			alighMatrix.m_posit = dVector::m_half * (maxP + minP);
+			alighMatrix.m_posit.m_w = dFloat32(1.0f);
+			const dMatrix matrix(alighMatrix * child->GetMeshMatrix() * child->GetCurrentMatrix());
+			shapeArray[count] = new ndShapeInstance(new ndShapeSphere(size.m_x));
+			shapeArray[count]->SetLocalMatrix(matrix);
+			count++;
+			dAssert(count < sizeof(shapeArray) / sizeof(shapeArray[0]));
 		} 
 		else if (strstr (name, "box")) 
 		{
@@ -413,23 +418,28 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 		} 
 		else if (strstr (name, "capsule")) 
 		{
-			dAssert(0);
-			//ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
-			////dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
-			//dFloat32* const array = mesh->m_vertex;
-			//dVector extremes(0.0f);
-			//for (dInt32 i = 0; i < mesh->m_vertexCount; i++) {
-			//	extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
-			//	extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
-			//	extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
-			//}
-			//dFloat32 high = 2.0f * dMax (extremes.m_y - extremes.m_x, dFloat32 (0.0f));
-			//
-			//dMatrix alighMatrix(dRollMatrix(90.0f * dDegreeToRad));
-			//dMatrix matrix (alighMatrix * child->GetCurrentMatrix());
-			//shapeArray[count] = NewtonCreateCapsule(world, extremes.m_x, extremes.m_x, high, 0, &matrix[0][0]);
-			//count++;
-			//dAssert(count < sizeof(shapeArray)/ sizeof (shapeArray[0]));
+			dArray<dVector> points;
+			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+			mesh->GetVertexArray(points);
+
+			dVector minP(dFloat32(1.0e10f));
+			dVector maxP(dFloat32(-1.0e10f));
+			for (dInt32 i = 0; i < mesh->m_vertexCount; i++)
+			{
+				minP = minP.GetMin(points[i]);
+				maxP = maxP.GetMax(points[i]);
+			}
+			dVector size(dVector::m_half * (maxP - minP));
+			dVector origin(dVector::m_half * (maxP + minP));
+			dFloat32 high = dMax (size.m_y - size.m_x, dFloat32 (0.05f));
+			dMatrix alighMatrix(dRollMatrix(90.0f * dDegreeToRad));
+			alighMatrix.m_posit = origin;
+			alighMatrix.m_posit.m_w = dFloat32(1.0f);
+			const dMatrix matrix (alighMatrix * child->GetMeshMatrix() * child->GetCurrentMatrix());
+			shapeArray[count] = new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high));
+			shapeArray[count]->SetLocalMatrix(matrix);
+			count++;
+			dAssert(count < sizeof(shapeArray)/ sizeof (shapeArray[0]));
 		} 
 		else if (strstr(name, "convexhull")) 
 		{

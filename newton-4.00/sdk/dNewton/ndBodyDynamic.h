@@ -61,7 +61,6 @@ class ndBodyDynamic: public ndBodyKinematic
 
 	D_NEWTON_API dVector GetAngularDamping() const;
 	D_NEWTON_API void SetAngularDamping(const dVector& angularDamp);
-	
 
 	virtual dVector GetForce() const;
 	virtual dVector GetTorque() const;
