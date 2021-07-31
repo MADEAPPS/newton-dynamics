@@ -83,6 +83,12 @@ class ndRagdollEntityNotify : public ndDemoEntityNotify
 		}
 	}
 
+	void OnApplyExternalForce(dInt32 thread, dFloat32 timestep)
+	{
+		//ndDemoEntityNotify::OnApplyExternalForce(thread, timestep);
+		// rember to check and clamp huge angular velocities
+	}
+
 	dMatrix m_bindMatrix;
 };
 
