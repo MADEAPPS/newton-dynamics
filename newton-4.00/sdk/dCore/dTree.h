@@ -144,7 +144,6 @@ class dTree
 			return m_info;
 		}
 
-
 		private:
 		OBJECT m_info;
 		KEY m_key; 

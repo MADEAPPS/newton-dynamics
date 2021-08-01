@@ -23,8 +23,6 @@
 #include "ndBasicPlayerCapsule.h"
 #include "ndHeightFieldPrimitive.h"
 
-
-
 void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
 	dMatrix heighfieldLocation (dGetIdentityMatrix());
