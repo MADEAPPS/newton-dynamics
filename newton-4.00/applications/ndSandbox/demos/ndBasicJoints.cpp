@@ -223,6 +223,53 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const dVector& or
 	mesh->Release();
 }
 
+void BuildFixJoints(ndDemoEntityManager* const scene, const dVector& origin)
+{
+	ndShapeInstance shape(new ndShapeSphere(0.25f));
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+
+	dMatrix matrix(dGetIdentityMatrix());
+
+	ndBodyDynamic* bodies[8];
+
+	matrix.m_posit = origin + dVector(0.0f, 4.0f, 0.0f, 0.0f);
+	bodies[0] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	matrix.m_posit = origin + dVector(2.0f, 4.0f, 0.0f, 0.0f);
+	bodies[1] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	matrix.m_posit = origin + dVector(2.0f, 4.0f, 2.0f, 0.0f);
+	bodies[2] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	matrix.m_posit = origin + dVector(0.0f, 4.0f, 2.0f, 0.0f);
+	bodies[3] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	matrix.m_posit = origin + dVector(0.0f, 6.0f, 0.0f, 0.0f);
+	bodies[4] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	matrix.m_posit = origin + dVector(2.0f, 6.0f, 0.0f, 0.0f);
+	bodies[5] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	matrix.m_posit = origin + dVector(2.0f, 6.0f, 2.0f, 0.0f);
+	bodies[6] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	matrix.m_posit = origin + dVector(0.0f, 6.0f, 2.0f, 0.0f);
+	bodies[7] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
+
+	ndWorld* world = scene->GetWorld();
+	for (dInt32 i = 0; i < 8; i++)
+	{
+		ndBodyDynamic* const body0 = bodies[i];
+		for (dInt32 j = i + 1; j < 8; j++)
+		{
+			ndBodyDynamic* const body1 = bodies[j];
+			world->AddJoint(new ndJointFixDistance(body0->GetMatrix().m_posit, body1->GetMatrix().m_posit, body0, body1));
+		}
+	}
+
+	mesh->Release();
+}
+
 static void BuildGear(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
@@ -366,7 +413,6 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 	}
 }
 
-
 void ndBasicJoints (ndDemoEntityManager* const scene)
 {
 	// build a floor
@@ -377,6 +423,7 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
 	BuildSlider(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 100.0f, 0.75f);
 	BuildDoubleHinge(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 100.0f, 0.75f);
+	BuildFixJoints(scene, dVector(10.0f, 0.0f, -5.0f, 1.0f));
 
 	AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
 	BuildRollingFriction(scene, dVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);

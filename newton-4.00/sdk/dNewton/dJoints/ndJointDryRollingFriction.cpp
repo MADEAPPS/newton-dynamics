@@ -20,7 +20,7 @@ ndJointDryRollingFriction::ndJointDryRollingFriction(ndBodyKinematic* const body
 	,m_contactTrail(dFloat32 (0.1f))
 {
 	dMatrix matrix(body0->GetMatrix());
-	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix0);
+	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
 
 	SetSolverModel(m_jointIterativeSoft);
 }

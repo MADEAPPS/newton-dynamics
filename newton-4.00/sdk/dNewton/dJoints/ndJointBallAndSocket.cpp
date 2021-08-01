@@ -172,36 +172,6 @@ void ndJointBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) 
 	}
 }
 
-void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
-{
-	dMatrix matrix0;
-	dMatrix matrix1;
-	CalculateGlobalMatrix(matrix0, matrix1);
-
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
-
-	dFloat32 deltaTwist = m_maxTwistAngle - m_minTwistAngle;
-	bool hasAngleRows = deltaTwist > dFloat32(1.0e-3f);
-	hasAngleRows = hasAngleRows && (deltaTwist < dFloat32(2.0f) * dPi);
-	hasAngleRows = hasAngleRows || (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_CONE_ANGLE);
-	if (hasAngleRows)
-	{
-		dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
-		if (cosAngleCos >= dFloat32(0.998f)) 
-		{
-			// special case where the front axis are almost aligned
-			// solve by using Cartesian approximation
-			SubmitAngularAxisCartisianApproximation(matrix0, matrix1, desc);
-		}
-		else 
-		{
-			SubmitAngularAxis(matrix0, matrix1, desc);
-		}
-	}
-}
-
 void ndJointBallAndSocket::SubmitAngularAxisCartisianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
@@ -286,4 +256,34 @@ void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 	dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 	dFloat32 pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
+}
+
+void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
+
+	dFloat32 deltaTwist = m_maxTwistAngle - m_minTwistAngle;
+	bool hasAngleRows = deltaTwist > dFloat32(1.0e-3f);
+	hasAngleRows = hasAngleRows && (deltaTwist < dFloat32(2.0f) * dPi);
+	hasAngleRows = hasAngleRows || (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_CONE_ANGLE);
+	if (hasAngleRows)
+	{
+		dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
+		if (cosAngleCos >= dFloat32(0.998f))
+		{
+			// special case where the front axis are almost aligned
+			// solve by using Cartesian approximation
+			SubmitAngularAxisCartisianApproximation(matrix0, matrix1, desc);
+		}
+		else
+		{
+			SubmitAngularAxis(matrix0, matrix1, desc);
+		}
+	}
 }
