@@ -115,11 +115,12 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& origin, 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);
 
+	dFloat32 spacing = 2.0f;
 	for (dInt32 i = 0; i < rows_x; i++)
 	{
 		for (dInt32 j = 0; j < rows_z; j++)
 		{
-			dVector location((j - rows_x / 2) * 4.0f, 0.0f, (i - rows_z / 2) * 4.0f, 0.0f);
+			dVector location((j - rows_x / 2) * spacing, 0.0f, (i - rows_z / 2) * spacing, 0.0f);
 			AddShape(scene, rootEntity, shape, mass, location + origin, high, columHigh);
 		}
 	}

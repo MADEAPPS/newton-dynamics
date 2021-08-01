@@ -118,7 +118,6 @@ dInt32 ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 	return m_state ? 1 : 0;
 }
 
-
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 ndDemoEntityManager::ndDemoEntityManager ()
@@ -283,10 +282,10 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showCenterOfMass = false;
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
-	m_showJointDebugInfo = true;
+	//m_showJointDebugInfo = true;
 	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 2;	
-	m_collisionDisplayMode = 3;		// solid wire frame
+	//m_collisionDisplayMode = 3;		// solid wire frame
 	//m_synchronousPhysicsUpdate = false;
 
 	Cleanup();

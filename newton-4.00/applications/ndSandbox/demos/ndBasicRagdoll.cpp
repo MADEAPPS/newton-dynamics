@@ -96,21 +96,21 @@ static dJointDefinition jointsDefinition[] =
 {
 	{ "mixamorig:Hips", 1, 16 },
 	
-	{ "mixamorig:Spine", 2, 16, 100.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine1", 4, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine2", 8, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Neck", 16, 31, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine", 2, 16, 10.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine1", 4, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine2", 8, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Neck", 16, 31, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 
-	{ "mixamorig:RightUpLeg", 16, 31, 100.0f,{ -45.0f, 45.0f, 120.0f },{ 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightLeg", 16, 31, 10.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 90.0f, 90.0f } },
+	{ "mixamorig:RightUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 
-	{ "mixamorig:LeftUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:LeftUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 	{ "mixamorig:LeftLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-
-	{ "mixamorig:RightArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+	
+	{ "mixamorig:RightArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
 	{ "mixamorig:RightForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
-
-	{ "mixamorig:LeftArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+	
+	{ "mixamorig:LeftArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
 	{ "mixamorig:LeftForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
 };
 
@@ -133,7 +133,6 @@ class ndRagDollModel : public ndModel
 		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);
 		rootEntity->ResetMatrix(rootEntity->GetCurrentMatrix() * matrix);
 		ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
-		world->AddJoint (new ndJointFix6dof(rootBody->GetMatrix(), rootBody, world->GetSentinelBody()));
 
 		//NewtonCollisionMaterial collisionMaterial;
 		//NewtonCollisionGetMaterial(NewtonBodyGetCollision(rootBody), &collisionMaterial);
@@ -143,7 +142,6 @@ class ndRagDollModel : public ndModel
 		//NewtonCollisionSetMaterial(NewtonBodyGetCollision(rootBody), &collisionMaterial);
 
 		dInt32 stack = 0;
-		//const int definitionCount = 0;
 		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
 		
 		ndBodyDynamic* parentBones[32];
@@ -200,6 +198,16 @@ class ndRagDollModel : public ndModel
 		}
 		
 		SetModelMass(100.0f, bodyCount, bodyArray);
+
+		for (dInt32 i = 0; i < bodyCount; i++)
+		{
+			ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
+			if (ent->GetName() == "mixamorig:Neck") 
+			{
+				//world->AddJoint(new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody()));
+				break;
+			}
+		}
 	}
 
 	void SetModelMass(dFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray) const
@@ -245,34 +253,17 @@ class ndRagDollModel : public ndModel
 
 	void ConnectBodyParts(ndWorld* const world, ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const dJointDefinition& definition) const
 	{
-		if (definition.m_jointLimits.m_coneAngle != 0.0f)
-		{
-			// start doing hinges first
-			ndJointFix6dof* const joint = new ndJointFix6dof(childBody->GetMatrix(), childBody, parentBody);
-			world->AddJoint(joint);
-			return;
-		}
-
 		dMatrix matrix(childBody->GetMatrix());
 		dJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
-		//pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
-		
-		//dMatrix parentRollMatrix(dGetIdentityMatrix() * pinAndPivotInGlobalSpace);
-		//
-		//dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, parentRollMatrix, childBody, parentBody);
 		ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinAndPivotInGlobalSpace, childBody, parentBody);
 	
 		dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-		//dFloat32 friction = definition.m_friction * 0.25f;
-		//joint->EnableCone(true);
-		//joint->SetConeFriction(friction);
-		joint->SetMaxConeAngle(jointLimits.m_coneAngle * dDegreeToRad);
+		joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
+		joint->SetConeFriction(0.05f, definition.m_friction);
 		
-		//joint->EnableTwist(true);
-		//joint->SetTwistFriction(friction);
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
-		joint->SetTwistFriction(0.1f, definition.m_friction);
+		joint->SetTwistFriction(0.05f, definition.m_friction);
 
 		world->AddJoint(joint);
 	}
@@ -308,7 +299,15 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	ndRagDollModel* const ragdoll = new ndRagDollModel(scene, ragdollMesh, matrix);
 	scene->GetWorld()->AddModel(ragdoll);
 
-	//AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
+	matrix.m_posit.m_x += 2.0f;
+	matrix.m_posit.m_z -= 2.0f;
+	scene->GetWorld()->AddModel(new ndRagDollModel(scene, ragdollMesh, matrix));
+
+	matrix.m_posit.m_z = 2.0f;
+	scene->GetWorld()->AddModel(new ndRagDollModel(scene, ragdollMesh, matrix));
+
+	origin1.m_x += 20.0f;
+	AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 
 	delete ragdollMesh;
 	dQuaternion rot;

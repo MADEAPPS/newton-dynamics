@@ -24,7 +24,8 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	D_NEWTON_API virtual ~ndJointBallAndSocket();
 
 	D_NEWTON_API dFloat32 GetMaxConeAngle() const;
-	D_NEWTON_API void SetMaxConeAngle(dFloat32 maxConeAngle);
+	D_NEWTON_API void SetConeLimit(dFloat32 maxConeAngle);
+	D_NEWTON_API void SetConeFriction(dFloat32 regularizer, dFloat32 viscousFriction);
 
 	D_NEWTON_API void SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle);
 	D_NEWTON_API void GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const;
@@ -39,37 +40,12 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
-#if 0
-	D_NEWTON_API ndJointBallAndSocket(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API void EnableTwist(bool state);
-
-	D_NEWTON_API void SetTwistFriction (dFloat32 frictionTorque);
-	D_NEWTON_API dFloat32 GetTwistFriction (dFloat32 frictionTorque) const;
-
-	D_NEWTON_API void SetConeFriction(dFloat32 frictionTorque);
-	D_NEWTON_API dFloat32 GetConeFriction(dFloat32 frictionTorque) const;
-
-	D_NEWTON_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
-	
-	protected:
-	D_NEWTON_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
-	D_NEWTON_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
-	D_NEWTON_API virtual void SubmitConstraints (dFloat32 timestep, dInt32 threadIndex);
-
-	void SubmitTwistAngle(const dVector& pin, dFloat32 pitchAngle, dFloat32 timestep);
-	void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, dFloat32 timestep);
-	void SubmitAngularAxisCartisianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, dFloat32 timestep);
-
-	dAngularIntegration m_twistAngle;
 	dFloat32 m_maxConeAngle;
 	dFloat32 m_coneFriction;
-	dFloat32 m_twistFriction;
-#endif
-
-	dFloat32 m_maxConeAngle;
 	dFloat32 m_minTwistAngle;
 	dFloat32 m_maxTwistAngle;
 	dFloat32 m_twistFriction;
+	dFloat32 m_coneFrictionRegularizer;
 	dFloat32 m_twistFrictionRegularizer;
 };
 
