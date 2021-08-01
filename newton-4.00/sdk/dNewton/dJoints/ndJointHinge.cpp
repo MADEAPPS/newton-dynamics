@@ -16,7 +16,6 @@
 #define D_PENETRATION_LIMIT			 dFloat32 (10.0f * dDegreeToRad) 
 #define D_PENETRATION_RECOVERY_SPEED dFloat32 (0.1f) 
 
-
 ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	,m_jointAngle(dFloat32(0.0f))

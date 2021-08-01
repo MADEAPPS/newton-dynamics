@@ -431,7 +431,7 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 	};
 
 	ndJoindDebug debugJoint(scene);
-	debugJoint.SetScale(0.25f);
+	debugJoint.SetScale(0.2f);
 	ndWorld* const workd = scene->GetWorld();
 	const ndJointList& jointList = workd->GetJointList();
 	for (ndJointList::dNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())

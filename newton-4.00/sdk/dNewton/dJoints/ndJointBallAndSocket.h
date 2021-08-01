@@ -28,6 +28,11 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 
 	D_NEWTON_API void SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle);
 	D_NEWTON_API void GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const;
+	D_NEWTON_API void SetTwistFriction(dFloat32 regularizer, dFloat32 viscousFriction);
+
+	private:
+	void SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
+	void SubmitAngularAxisCartisianApproximation(const dMatrix& matrix07, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
@@ -63,6 +68,8 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	dFloat32 m_maxConeAngle;
 	dFloat32 m_minTwistAngle;
 	dFloat32 m_maxTwistAngle;
+	dFloat32 m_twistFriction;
+	dFloat32 m_twistFrictionRegularizer;
 };
 
 #endif 

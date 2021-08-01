@@ -13,19 +13,16 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBallAndSocket.h"
 
+#define D_PENETRATION_RECOVERY_SPEED dFloat32 (0.1f) 
 #define D_BALL_AND_SOCKED_MAX_CONE_ANGLE dFloat32 (120.0f * dDegreeToRad)
 
 ndJointBallAndSocket::ndJointBallAndSocket(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
-	//,m_twistAngle(0.0f)
-	//,m_minTwistAngle(-180.0f * dDegreeToRad)
-	//,m_maxTwistAngle(180.0f * dDegreeToRad)
-	//,m_maxConeAngle(D_BALL_AND_SOCKED_MAX_CONE_ANGLE)
-	//,m_coneFriction(0.0f)
-	//,m_twistFriction(0.0f)
 	,m_maxConeAngle( dFloat32 (1.0e10f))
 	,m_minTwistAngle(-dFloat32(1.0e10f))
 	,m_maxTwistAngle( dFloat32(1.0e10f))
+	,m_twistFriction(dFloat32 (0.0f))
+	,m_twistFrictionRegularizer(dFloat32(0.0f))
 {
 	//CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
@@ -104,90 +101,7 @@ dFloat32 ndJointBallAndSocket::GetConeFriction(dFloat32 frictionTorque) const
 }
 
 
-void ndJointBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat32 angle, dFloat32 timestep)
-{
-	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * dDegreeToRad)) {
-		NewtonUserJointAddAngularRow(m_joint, -angle, &pin[0]);
-	} else {
-		dFloat32 restoringOmega = 0.25f;
-		const dFloat32 step = dMax(dAbs(angle * timestep), dFloat32(5.0f * dDegreeToRad));
-		if (angle < m_minTwistAngle) {
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
-			const dFloat32 invtimestep = 1.0f / timestep;
-			const dFloat32 error0 = angle - m_minTwistAngle;
-			const dFloat32 error1 = error0 + restoringOmega * timestep;
-			if (error1 > 0.0f) {
-				restoringOmega = -error0 * invtimestep;
-			}
-			const dFloat32 stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + restoringOmega * invtimestep;
-			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_twistFriction);
-		} else if (angle >= m_maxTwistAngle) {
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
-			const dFloat32 invtimestep = 1.0f / timestep;
-			const dFloat32 error0 = angle - m_maxTwistAngle;
-			const dFloat32 error1 = error0 - restoringOmega * timestep;
-			if (error1 < 0.0f) {
-				restoringOmega = error0 * invtimestep;
-			}
-			const dFloat32 stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) - restoringOmega / timestep;
-			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
-		} else if ((angle - step) <= m_minTwistAngle) {
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
-			const dFloat32 stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
-			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_twistFriction);
-		} else if ((angle + step) >= m_maxTwistAngle) {
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
-			const dFloat32 stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
-			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
-		} else if (m_twistFriction > 0.0f) {
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
-			const dFloat32 stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
-			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_twistFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
-		}
-	}
-}
 
-void ndJointBallAndSocket::SubmitAngularAxisCartisianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, dFloat32 timestep)
-{
-	if (m_options.m_option4) {
-		// two rows to restrict rotation around around the parent coordinate system
-		//dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct3(matrix0.m_front), dFloat32(-1.0f), dFloat32(1.0f)));
-		const dFloat32 angleError = GetMaxAngleError();
-		dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-		NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		//NewtonUserJointSetRowStiffness(m_joint, m_coneStiffness);
-		if (dAbs(angle0) > angleError) {
-			const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle0 / (timestep * timestep);
-			NewtonUserJointSetRowAcceleration(m_joint, alpha);
-		}
-
-		dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
-		NewtonUserJointAddAngularRow(m_joint, angle1, &matrix1.m_right[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		//NewtonUserJointSetRowStiffness(m_joint, m_coneStiffness);
-		if (dAbs(angle1) > angleError) {
-			const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle1 / (timestep * timestep);
-			NewtonUserJointSetRowAcceleration(m_joint, alpha);
-		}
-	}
-
-	if (m_options.m_option3) {
-		dFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
-		SubmitTwistAngle(matrix0.m_front, pitchAngle, timestep);
-	}
-}
 
 void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, dFloat32 timestep)
 {
@@ -278,12 +192,17 @@ void ndJointBallAndSocket::SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle)
 	m_maxTwistAngle = dAbs(maxAngle);
 }
 
+void ndJointBallAndSocket::SetTwistFriction(dFloat32 regularizer, dFloat32 viscousFriction)
+{
+	m_twistFriction = dAbs(viscousFriction);
+	m_twistFrictionRegularizer = dMax(dAbs(regularizer), dFloat32(0.01f));
+}
+
 void ndJointBallAndSocket::GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const
 {
 	minAngle = m_minTwistAngle;
 	maxAngle = m_maxTwistAngle;
 }
-
 
 dFloat32 ndJointBallAndSocket::GetMaxConeAngle() const
 {
@@ -392,6 +311,78 @@ void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
+
+	dFloat32 deltaTwist = m_maxTwistAngle - m_minTwistAngle;
+	bool hasAngleRows = deltaTwist > dFloat32(1.0e-3f);
+	hasAngleRows = hasAngleRows && (deltaTwist < dFloat32(2.0f) * dPi);
+	hasAngleRows = hasAngleRows || (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_CONE_ANGLE);
+	if (hasAngleRows)
+	{
+		dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
+		if (cosAngleCos >= dFloat32(0.998f)) 
+		{
+			// special case where the front axis are almost aligned
+			// solve by using Cartesian approximation
+			SubmitAngularAxisCartisianApproximation(matrix0, matrix1, desc);
+		}
+		else 
+		{
+			dAssert(0);
+			//SubmitAngularAxis(matrix0, matrix1, timestep);
+		}
+	}
 }
 
+void ndJointBallAndSocket::SubmitAngularAxisCartisianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+{
+	//if (m_options.m_option4) 
 
+	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
+	if (coneAngle > m_maxConeAngle)
+	{
+		// two rows to restrict rotation around around the parent coordinate system
+		dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+		AddAngularRowJacobian(desc, matrix1.m_up, angle0);
+
+		dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+		AddAngularRowJacobian(desc, matrix1.m_right, angle1);
+	}
+
+	dFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
+	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
+}
+
+void ndJointBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc)
+{
+	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * dDegreeToRad)) 
+	{
+		dAssert(0);
+		//NewtonUserJointAddAngularRow(m_joint, -angle, &pin[0]);
+	}
+	else 
+	{
+		if (angle < m_minTwistAngle) 
+		{
+			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
+			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const dFloat32 penetration = angle - m_minTwistAngle;
+			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			SetLowerFriction(desc, dFloat32 (0.0f));
+		}
+		else if (angle >= m_maxTwistAngle) 
+		{
+			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
+			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const dFloat32 penetration = angle - m_maxTwistAngle;
+			const dFloat32 recoveringAceel = desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			SetHighFriction(desc, dFloat32 (0.0f));
+		}
+		else if (m_twistFriction > dFloat32(0.0f))
+		{
+			AddAngularRowJacobian(desc, pin, angle);
+			SetMassSpringDamperAcceleration(desc, m_twistFrictionRegularizer, dFloat32 (0.0f), m_twistFriction);
+		}
+	}
+}
