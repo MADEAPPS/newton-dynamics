@@ -103,66 +103,6 @@ dFloat32 ndJointBallAndSocket::GetConeFriction(dFloat32 frictionTorque) const
 
 
 
-void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, dFloat32 timestep)
-{
-	dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
-	dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
-	lateralDir = lateralDir.Normalize();
-	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct3(matrix0.m_front), dFloat32(-1.0f), dFloat32(1.0f)));
-	dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
-
-	if (m_options.m_option4) {
-		const dFloat32 step = dMax(dAbs(coneAngle * timestep), dFloat32(5.0f * dDegreeToRad));
-		if (coneAngle > m_maxConeAngle) {
-			dFloat32 restoringOmega = 0.25f;
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
-			const dFloat32 invtimestep = 1.0f / timestep;
-			const dFloat32 error0 = coneAngle - m_maxConeAngle;
-			const dFloat32 error1 = error0 - restoringOmega * timestep;
-			if (error1 < 0.0f) {
-				restoringOmega = error0 * invtimestep;
-			}
-			const dFloat32 stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) - restoringOmega / timestep;
-			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			//NewtonUserJointSetRowStiffness(m_joint, m_coneStiffness);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
-
-			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
-
-		} else if ((coneAngle + step) >= m_maxConeAngle) {
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
-			const dFloat32 stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
-			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			//NewtonUserJointSetRowStiffness(m_joint, m_coneStiffness);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
-
-			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
-		} else if (m_coneFriction > 0.0f) {
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
-			const dFloat32 stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
-			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			//NewtonUserJointSetRowStiffness(m_joint, m_coneStiffness);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
-
-			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
-		}
-	}
-
-	if (m_options.m_option3) {
-		dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
-		dFloat32 pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
-		SubmitTwistAngle(matrix0.m_front, pitchAngle, timestep);
-	}
-}
 
 void ndJointBallAndSocket::SubmitConstraints(dFloat32 timestep, dInt32 threadIndex)
 {
@@ -327,8 +267,7 @@ void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 		}
 		else 
 		{
-			dAssert(0);
-			//SubmitAngularAxis(matrix0, matrix1, timestep);
+			SubmitAngularAxis(matrix0, matrix1, desc);
 		}
 	}
 }
@@ -385,4 +324,34 @@ void ndJointBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat32 angle, 
 			SetMassSpringDamperAcceleration(desc, m_twistFrictionRegularizer, dFloat32 (0.0f), m_twistFriction);
 		}
 	}
+}
+
+void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+{
+	dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
+	lateralDir = lateralDir.Normalize();
+	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
+	dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+	
+	if (coneAngle > m_maxConeAngle)
+	{ 
+		AddAngularRowJacobian(desc, lateralDir, 0.0f);
+		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		const dFloat32 penetration = coneAngle - m_maxConeAngle;
+		const dFloat32 recoveringAceel = desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+		SetHighFriction(desc, dFloat32(0.0f));
+
+		dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+		AddAngularRowJacobian(desc, sideDir, 0.0f);
+	}
+	else
+	{
+		dAssert(0);
+	}
+
+	dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+	dFloat32 pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
+	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }

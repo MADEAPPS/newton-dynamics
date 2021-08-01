@@ -32,6 +32,7 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 
 	private:
 	void SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
+	void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularAxisCartisianApproximation(const dMatrix& matrix07, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
 	protected:
