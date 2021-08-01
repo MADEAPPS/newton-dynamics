@@ -85,7 +85,7 @@ class ndRagdollEntityNotify : public ndDemoEntityNotify
 
 	void OnApplyExternalForce(dInt32 thread, dFloat32 timestep)
 	{
-		//ndDemoEntityNotify::OnApplyExternalForce(thread, timestep);
+		ndDemoEntityNotify::OnApplyExternalForce(thread, timestep);
 		// remember to check and clamp huge angular velocities
 	}
 
