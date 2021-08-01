@@ -58,6 +58,11 @@ class ndConstraintDebugCallback: public dClassAlloc
 		m_debugScale = scale;
 	}
 
+	virtual dFloat32 GetScale() const
+	{
+		return m_debugScale;
+	}
+
 	virtual void DrawFrame(const dMatrix& matrix)
 	{
 		dVector x(matrix.m_posit + matrix.RotateVector(dVector(m_debugScale, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f))));

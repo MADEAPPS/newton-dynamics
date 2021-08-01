@@ -96,22 +96,22 @@ static dJointDefinition jointsDefinition[] =
 {
 	{ "mixamorig:Hips", 1, 16 },
 	
-	{ "mixamorig:Spine", 2, 16, 100.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine1", 4, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine2", 8, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Neck", 16, 31, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:Spine", 2, 16, 100.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:Spine1", 4, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:Spine2", 8, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:Neck", 16, 31, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 
 	{ "mixamorig:LeftUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 	{ "mixamorig:LeftLeg", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 	
-	{ "mixamorig:RightUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightLeg", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-
-	{ "mixamorig:LeftArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftForeArm", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-	
-	{ "mixamorig:RightArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightForeArm", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
+	//{ "mixamorig:RightUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:RightLeg", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+	//
+	//{ "mixamorig:LeftArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:LeftForeArm", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+	//
+	//{ "mixamorig:RightArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:RightForeArm", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
 };
 
 class ndRagDollModel : public ndModel
@@ -122,40 +122,42 @@ class ndRagDollModel : public ndModel
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = ragdollMesh->CreateClone();
 		scene->AddEntity(entity);
-		
 		ndWorld* const world = scene->GetWorld();
-		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
 		
 		// find the floor location 
 		dMatrix matrix(location);
 		dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y + 1.0f;
 
-		// add the root bone
+		// add the root body
 		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);
 		rootEntity->ResetMatrix(rootEntity->GetCurrentMatrix() * matrix);
-		ndBodyDynamic* const rootBone = CreateBodyPart(scene, rootEntity, nullptr);
+		ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
+		world->AddJoint (new ndJointFix6dof(rootBody->GetMatrix(), rootBody, world->GetSentinelBody()));
 
 		//NewtonCollisionMaterial collisionMaterial;
-		//NewtonCollisionGetMaterial(NewtonBodyGetCollision(rootBone), &collisionMaterial);
-		//collisionMaterial.m_userData.m_ptr = rootBone;
+		//NewtonCollisionGetMaterial(NewtonBodyGetCollision(rootBody), &collisionMaterial);
+		//collisionMaterial.m_userData.m_ptr = rootBody;
 		//collisionMaterial.m_userParam[0].m_int = jointsDefinition[0].m_type;
 		//collisionMaterial.m_userParam[1].m_int = jointsDefinition[0].m_typeMask;
-		//NewtonCollisionSetMaterial(NewtonBodyGetCollision(rootBone), &collisionMaterial);
+		//NewtonCollisionSetMaterial(NewtonBodyGetCollision(rootBody), &collisionMaterial);
 
-		int stack = 0;
+		dInt32 stack = 0;
+		//const int definitionCount = 0;
+		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
+		
 		ndBodyDynamic* parentBones[32];
 		ndDemoEntity* childEntities[32];
 		for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) 
 		{
 			childEntities[stack] = child;
-			parentBones[stack] = rootBone;
+			parentBones[stack] = rootBody;
 			stack++;
 		}
 		
 		dInt32 bodyCount = 1;
 		ndBodyDynamic* bodyArray[1024];
-		bodyArray[0] = rootBone;
+		bodyArray[0] = rootBody;
 
 		// walk model hierarchic adding all children designed as rigid body bones. 
 		while (stack) 
@@ -179,7 +181,7 @@ class ndRagDollModel : public ndModel
 					//// save the controller as the collision user data, for collision culling
 					//NewtonCollisionMaterial collisionMaterial;
 					//NewtonCollisionGetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
-					//collisionMaterial.m_userData.m_ptr = rootBone;
+					//collisionMaterial.m_userData.m_ptr = rootBody;
 					//collisionMaterial.m_userParam[0].m_int = jointsDefinition[i].m_type;
 					//collisionMaterial.m_userParam[1].m_int = jointsDefinition[i].m_typeMask;
 					//NewtonCollisionSetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
@@ -221,29 +223,24 @@ class ndRagDollModel : public ndModel
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
 	{
 		ndWorld* const world = scene->GetWorld();
-		ndBodyDynamic* const bone = new ndBodyDynamic();
 		ndShapeInstance* const shape = entityPart->CreateCollisionFromchildren(world);
-		
 		dAssert(shape);
 
-		// create the rigid body that will make this bone
+		// create the rigid body that will make this body
 		dMatrix matrix(entityPart->CalculateGlobalMatrix());
-		bone->SetMatrix(matrix);
-		bone->SetCollisionShape(*shape);
-		bone->SetMassMatrix(1.0f, *shape);
-		bone->SetNotifyCallback(new ndRagdollEntityNotify(scene, entityPart, parentBone));
 
-		world->AddBody(bone);
+		ndBodyDynamic* const body = new ndBodyDynamic();
+		body->SetMatrix(matrix);
+		body->SetCollisionShape(*shape);
+		body->SetMassMatrix(1.0f, *shape);
+		body->SetNotifyCallback(new ndRagdollEntityNotify(scene, entityPart, parentBone));
+		world->AddBody(body);
+
+		// assign the material for early collision culling
+		//NewtonBodySetMaterialGroupID(body, m_material);
+
 		delete shape;
-
-		//// assign the material for early collision culling
-		//NewtonBodySetMaterialGroupID(bone, m_material);
-		//
-		//// set the bod part force and torque call back to the gravity force, skip the transform callback
-		////NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
-		//NewtonBodySetForceAndTorqueCallback(bone, ClampAngularVelocity);
-
-		return bone;
+		return body;
 	}
 
 	void ConnectBodyParts(ndWorld* const world, ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const dJointDefinition& definition) const
@@ -251,7 +248,7 @@ class ndRagDollModel : public ndModel
 		if (definition.m_jointLimits.m_coneAngle != 0.0f)
 		{
 			// start doing hinges first
-			ndJointFix6dof* const joint = new ndJointFix6dof(childBody, parentBody);
+			ndJointFix6dof* const joint = new ndJointFix6dof(childBody->GetMatrix(), childBody, parentBody);
 			world->AddJoint(joint);
 			return;
 		}
@@ -262,22 +259,22 @@ class ndRagDollModel : public ndModel
 		//pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
 		
 		//dMatrix parentRollMatrix(dGetIdentityMatrix() * pinAndPivotInGlobalSpace);
-		//dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
+		//
 		//dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, parentRollMatrix, childBody, parentBody);
 		ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinAndPivotInGlobalSpace, childBody, parentBody);
 	
+		dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 		//dFloat32 friction = definition.m_friction * 0.25f;
 		//joint->EnableCone(true);
 		//joint->SetConeFriction(friction);
-		//joint->SetConeLimits(jointLimits.m_coneAngle * dDegreeToRad);
+		joint->SetMaxConeAngle(jointLimits.m_coneAngle * dDegreeToRad);
 		
 		//joint->EnableTwist(true);
 		//joint->SetTwistFriction(friction);
-		//joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
+		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
 
 		world->AddJoint(joint);
 	}
-
 
 	void Update(ndWorld* const, dFloat32) 
 	{

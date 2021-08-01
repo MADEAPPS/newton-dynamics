@@ -13,22 +13,22 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointFix6dof.h"
 
-ndJointFix6dof::ndJointFix6dof(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
-	:ndJointBilateralConstraint(6, body0, body1, dGetIdentityMatrix())
+ndJointFix6dof::ndJointFix6dof(const dMatrix& frameInGlbalSpace, ndBodyKinematic* const body0, ndBodyKinematic* const body1)
+	:ndJointBilateralConstraint(6, body0, body1, frameInGlbalSpace)
 	,m_softness(dFloat32(0.0f))
 	,m_maxForce(D_MAX_BOUND)
 	,m_maxTorque(D_MAX_BOUND)
 {
-	const dVector posit0(body0->GetMatrix().TransformVector(body0->GetCentreOfMass()));
-	const dVector posit1(body1->GetMatrix().TransformVector(body1->GetCentreOfMass()));
-	const dVector pivot((posit1 + posit0).Scale (dFloat32 (0.5f)));
-	const dVector dir(posit1 - posit0);
-	dAssert(dir.DotProduct(dir).GetScalar() > dFloat32(1.0e-3f));
-	
-	dMatrix matrix(dir);
-	matrix.m_posit = pivot;
-	matrix.m_posit.m_w = 1.0f;
-	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
+	//const dVector posit0(body0->GetMatrix().TransformVector(body0->GetCentreOfMass()));
+	//const dVector posit1(body1->GetMatrix().TransformVector(body1->GetCentreOfMass()));
+	//const dVector pivot((posit1 + posit0).Scale (dFloat32 (0.5f)));
+	//const dVector dir(posit1 - posit0);
+	//dAssert(dir.DotProduct(dir).GetScalar() > dFloat32(1.0e-3f));
+	//
+	//dMatrix matrix(dir);
+	//matrix.m_posit = pivot;
+	//matrix.m_posit.m_w = 1.0f;
+	//CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
 }
 
 ndJointFix6dof::~ndJointFix6dof()
@@ -51,15 +51,15 @@ void ndJointFix6dof::JacobianDerivative(ndConstraintDescritor& desc)
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-for (dInt32 i = 0; i < 3; i++)
-{
-	if ((dAbs(m_jointForce[i + 0].m_force) >= m_maxForce * 0.99f) ||
-		(dAbs(m_jointForce[i + 3].m_force) >= m_maxTorque * 0.99f))
-	{
-		SetActive(false);
-		return;
-	}
-}
+//for (dInt32 i = 0; i < 3; i++)
+//{
+//	if ((dAbs(m_jointForce[i + 0].m_force) >= m_maxForce * 0.99f) ||
+//		(dAbs(m_jointForce[i + 3].m_force) >= m_maxTorque * 0.99f))
+//	{
+//		SetActive(false);
+//		return;
+//	}
+//}
 
 
 	dAssert(IsActive());

@@ -23,18 +23,19 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointBallAndSocket(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointBallAndSocket();
 
+	D_NEWTON_API dFloat32 GetMaxConeAngle() const;
+	D_NEWTON_API void SetMaxConeAngle(dFloat32 maxConeAngle);
+
+	D_NEWTON_API void SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle);
+	D_NEWTON_API void GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const;
+
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 #if 0
 	D_NEWTON_API ndJointBallAndSocket(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API void EnableTwist(bool state);
-	D_NEWTON_API void SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle);
-	D_NEWTON_API void GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const;
-
-	D_NEWTON_API void EnableCone(bool state);
-	D_NEWTON_API dFloat32 GetConeLimits() const;
-	D_NEWTON_API void SetConeLimits(dFloat32 maxAngle);
 
 	D_NEWTON_API void SetTwistFriction (dFloat32 frictionTorque);
 	D_NEWTON_API dFloat32 GetTwistFriction (dFloat32 frictionTorque) const;
@@ -54,12 +55,14 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	void SubmitAngularAxisCartisianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, dFloat32 timestep);
 
 	dAngularIntegration m_twistAngle;
-	dFloat32 m_minTwistAngle;
-	dFloat32 m_maxTwistAngle;
 	dFloat32 m_maxConeAngle;
 	dFloat32 m_coneFriction;
 	dFloat32 m_twistFriction;
 #endif
+
+	dFloat32 m_maxConeAngle;
+	dFloat32 m_minTwistAngle;
+	dFloat32 m_maxTwistAngle;
 };
 
 #endif 
