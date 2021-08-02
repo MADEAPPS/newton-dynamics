@@ -40,6 +40,7 @@
 #include <ndModelList.h>
 #include <ndSceneNode.h>
 #include <ndJointGear.h>
+#include <ndCharacter.h>
 #include <ndConstraint.h>
 #include <ndJointHinge.h>
 #include <ndBodyNotify.h>
