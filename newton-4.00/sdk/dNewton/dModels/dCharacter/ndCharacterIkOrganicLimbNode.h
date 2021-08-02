@@ -19,40 +19,21 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CHARACTER_IK_NODE_H__
-#define __D_CHARACTER_IK_NODE_H__
+#ifndef __D_CHARACTER_IK_ORGANIC_LIMB_NODE_H__
+#define __D_CHARACTER_IK_ORGANIC_LIMB_NODE_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndModel.h"
+#include "ndCharacterIkNode.h"
+#include "ndJointBallAndSocketActuator.h"
 
-class ndCharacter;
-class ndLimbJoint;
-
-class ndWorld;
-
-class ndCharacterIkNode: public dNodeHierarchy<ndCharacterIkNode>
+class ndCharacterIkOrganicLimbNode: public ndCharacterIkNode, public ndJointBallAndSocketActuator
 {
 	public:
-	D_CLASS_RELECTION(ndCharacterIkNode);
+	D_CLASS_RELECTION(ndCharacterIkOrganicLimbNode);
 
-	D_NEWTON_API ndCharacterIkNode(ndCharacter* const owner, ndBodyDynamic* const body);
-	D_NEWTON_API virtual ~ndCharacterIkNode ();
-
-	ndCharacter* GetOwner() const;
-	ndBodyDynamic* GetBody() const;
-
-	ndCharacter* m_owner;
-	ndBodyDynamic* m_body;
+	D_NEWTON_API ndCharacterIkOrganicLimbNode(ndBodyDynamic* const body, ndCharacterIkNode* const parent);
+	D_NEWTON_API virtual ~ndCharacterIkOrganicLimbNode ();
 };
 
-inline ndCharacter* ndCharacterIkNode::GetOwner() const
-{
-	return m_owner;
-}
-
-inline ndBodyDynamic* ndCharacterIkNode::GetBody() const
-{
-	return m_body;
-}
 
 #endif

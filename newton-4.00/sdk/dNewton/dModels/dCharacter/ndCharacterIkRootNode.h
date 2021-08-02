@@ -30,7 +30,7 @@ class ndCharacterIkRootNode: public ndCharacterIkNode
 	public:
 	D_CLASS_RELECTION(ndCharacterIkRootNode);
 
-	D_NEWTON_API ndCharacterIkRootNode(ndCharacter* const owner, ndBodyDynamic* const body);
+	D_NEWTON_API ndCharacterIkRootNode(ndBodyDynamic* const body, ndCharacterIkNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterIkRootNode ();
 };
 
