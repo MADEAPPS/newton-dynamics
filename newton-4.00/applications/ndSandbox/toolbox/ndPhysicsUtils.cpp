@@ -130,15 +130,10 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& origin, 
 
 ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const dMatrix& origin, dFloat32 mass)
 {
-	//dMatrix matrix(dGetIdentityMatrix());
-	//matrix.m_posit = origin;
-	//matrix.m_posit.m_w = 1.0f;
-
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	dMatrix matrix(origin);
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 500.0f, 0.0f, 0.0f), 1000.0f));
-	//matrix.m_posit.m_y += floor.m_y;
 	matrix.m_posit.m_y = dMax (floor.m_y + 1.0f, matrix.m_posit.m_y);
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
