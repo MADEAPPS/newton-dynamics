@@ -21,7 +21,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-class dJointDefinition
+class dActiveJointDefinition
 {
 	public:
 	enum dCollsionMask
@@ -54,10 +54,10 @@ class dJointDefinition
 	dFrameMatrix m_frameBasics;
 };
 
-class ndRagdollEntityNotify : public ndDemoEntityNotify
+class ndActiveRagdollEntityNotify : public ndDemoEntityNotify
 {
 	public:
-	ndRagdollEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody)
+	ndActiveRagdollEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody)
 		:ndDemoEntityNotify(manager, entity, parentBody)
 		,m_bindMatrix(dGetIdentityMatrix())
 	{
@@ -92,32 +92,32 @@ class ndRagdollEntityNotify : public ndDemoEntityNotify
 	dMatrix m_bindMatrix;
 };
 
-static dJointDefinition jointsDefinition[] =
+static dActiveJointDefinition jointsDefinition[] =
 {
 	{ "mixamorig:Hips", 1, 16 },
 	
-	{ "mixamorig:Spine", 2, 16, 10.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine1", 4, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine2", 8, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Neck", 16, 31, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:Spine", 2, 16, 10.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:Spine1", 4, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:Spine2", 8, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:Neck", 16, 31, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 
 	{ "mixamorig:RightUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 	{ "mixamorig:RightLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 
-	{ "mixamorig:LeftUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-	
-	{ "mixamorig:RightArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
-	
-	{ "mixamorig:LeftArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+	//{ "mixamorig:LeftUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:LeftLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+	//
+	//{ "mixamorig:RightArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:RightForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
+	//
+	//{ "mixamorig:LeftArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:LeftForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
 };
 
-class ndRagdollModel : public ndModel
+class ndActiveRagdollModel : public ndModel
 {
 	public:
-	ndRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const dMatrix& location)
+	ndActiveRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const dMatrix& location)
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = ragdollMesh->CreateClone();
@@ -202,9 +202,9 @@ class ndRagdollModel : public ndModel
 		for (dInt32 i = 0; i < bodyCount; i++)
 		{
 			ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
-			if (ent->GetName() == "mixamorig:Neck") 
+			if (ent->GetName() == "mixamorig:Hips") 
 			{
-				//world->AddJoint(new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody()));
+				world->AddJoint(new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody()));
 				break;
 			}
 		}
@@ -241,7 +241,7 @@ class ndRagdollModel : public ndModel
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(*shape);
 		body->SetMassMatrix(1.0f, *shape);
-		body->SetNotifyCallback(new ndRagdollEntityNotify(scene, entityPart, parentBone));
+		body->SetNotifyCallback(new ndActiveRagdollEntityNotify(scene, entityPart, parentBone));
 		world->AddBody(body);
 
 		// assign the material for early collision culling
@@ -251,14 +251,14 @@ class ndRagdollModel : public ndModel
 		return body;
 	}
 
-	void ConnectBodyParts(ndWorld* const world, ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const dJointDefinition& definition) const
+	void ConnectBodyParts(ndWorld* const world, ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const dActiveJointDefinition& definition) const
 	{
 		dMatrix matrix(childBody->GetMatrix());
-		dJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
+		dActiveJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
 		ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinAndPivotInGlobalSpace, childBody, parentBody);
 	
-		dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
+		dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 		joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
 		joint->SetConeFriction(0.05f, definition.m_friction);
 		
@@ -286,7 +286,7 @@ class ndRagdollModel : public ndModel
 	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
 };
 
-void ndBasicRagdoll (ndDemoEntityManager* const scene)
+void ndActiveRagdoll (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
@@ -296,18 +296,18 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
-	ndRagdollModel* const ragdoll = new ndRagdollModel(scene, ragdollMesh, matrix);
+	ndActiveRagdollModel* const ragdoll = new ndActiveRagdollModel(scene, ragdollMesh, matrix);
 	scene->GetWorld()->AddModel(ragdoll);
 
 	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_z -= 2.0f;
-	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
+	//scene->GetWorld()->AddModel(new ndActiveRagdollModel(scene, ragdollMesh, matrix));
 
 	matrix.m_posit.m_z = 2.0f;
-	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
+	//scene->GetWorld()->AddModel(new ndActiveRagdollModel(scene, ragdollMesh, matrix));
 
 	origin1.m_x += 20.0f;
-	AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
+	//AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 
 	delete ragdollMesh;
 	dQuaternion rot;

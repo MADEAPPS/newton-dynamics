@@ -40,18 +40,19 @@
 //#define DEFAULT_SCENE	2		// setting friction ramp
 //#define DEFAULT_SCENE	3		// setting basic Stacks
 //#define DEFAULT_SCENE	4		// setting basic Trigger
-#define DEFAULT_SCENE	5		// setting basic player
+//#define DEFAULT_SCENE	5		// setting basic player
 //#define DEFAULT_SCENE	6		// setting particle fluid
 //#define DEFAULT_SCENE	7		// static mesh collision 
 //#define DEFAULT_SCENE	8		// setting basic joints
 //#define DEFAULT_SCENE	9		// setting basic rag doll
-//#define DEFAULT_SCENE	10		// setting basic vehicle
-//#define DEFAULT_SCENE	11		// setting heavy vehicle
-//#define DEFAULT_SCENE	12		// conservation of angular momentum 
-//#define DEFAULT_SCENE	13		// simple voronoi fracture
-//#define DEFAULT_SCENE	14		// basic voronoi fracture
-//#define DEFAULT_SCENE	15		// linked voronoi fracture
-//#define DEFAULT_SCENE	16		// skin peel voronoi fracture
+#define DEFAULT_SCENE	10		// setting active rag doll
+//#define DEFAULT_SCENE	11		// setting basic vehicle
+//#define DEFAULT_SCENE	12		// setting heavy vehicle
+//#define DEFAULT_SCENE	13		// conservation of angular momentum 
+//#define DEFAULT_SCENE	14		// simple voronoi fracture
+//#define DEFAULT_SCENE	15		// basic voronoi fracture
+//#define DEFAULT_SCENE	16		// linked voronoi fracture
+//#define DEFAULT_SCENE	17		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndBasicStacks(ndDemoEntityManager* const scene);
@@ -60,6 +61,7 @@ void ndBasicRagdoll(ndDemoEntityManager* const scene);
 void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndHeavyVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
+void ndActiveRagdoll(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
@@ -86,6 +88,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "static mesh", ndStaticMeshCollisionDemo },
 	{ "basic joints", ndBasicJoints },
 	{ "basic ragdoll", ndBasicRagdoll },
+	{ "active ragdoll", ndActiveRagdoll },
 	{ "basic vehicle", ndBasicVehicle },
 	{ "heavy vehicle", ndHeavyVehicle },
 	{ "angular momentum", ndBasicAngularMomentum },
