@@ -13,9 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBallAndSocket.h"
 
-#define D_PENETRATION_RECOVERY_SPEED dFloat32 (0.1f) 
-#define D_BALL_AND_SOCKED_MAX_CONE_ANGLE dFloat32 (120.0f * dDegreeToRad)
-
 ndJointBallAndSocket::ndJointBallAndSocket(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 	,m_maxConeAngle( dFloat32 (1.0e10f))
@@ -149,7 +146,7 @@ void ndJointBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) 
 	}
 	
 	// show cone angle limits
-	if ((m_maxConeAngle > dFloat32 (0.0f)) && (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_CONE_ANGLE)) 
+	if ((m_maxConeAngle > dFloat32 (0.0f)) && (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_ANGLE)) 
 	{
 		dVector color(dFloat32(0.3f), dFloat32(0.8f), dFloat32(0.0f), dFloat32(0.0f));
 		dVector point(radius * dCos(m_maxConeAngle), radius * dSin(m_maxConeAngle), 0.0f, 0.0f);
@@ -203,7 +200,7 @@ void ndJointBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat32 angle, 
 			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const dFloat32 penetration = angle - m_minTwistAngle;
-			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_MAX_ANGLE), dFloat32(1.0f));
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetLowerFriction(desc, dFloat32 (0.0f));
 		}
@@ -212,7 +209,7 @@ void ndJointBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat32 angle, 
 			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const dFloat32 penetration = angle - m_maxTwistAngle;
-			const dFloat32 recoveringAceel = desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+			const dFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_MAX_ANGLE), dFloat32(1.0f));
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetHighFriction(desc, dFloat32 (0.0f));
 		}
@@ -238,7 +235,7 @@ void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 		AddAngularRowJacobian(desc, lateralDir, 0.0f);
 		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		const dFloat32 penetration = coneAngle - m_maxConeAngle;
-		const dFloat32 recoveringAceel = desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+		const dFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_MAX_ANGLE), dFloat32(1.0f));
 		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 		SetHighFriction(desc, dFloat32(0.0f));
 	
@@ -271,7 +268,7 @@ void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 	dFloat32 deltaTwist = m_maxTwistAngle - m_minTwistAngle;
 	bool hasAngleRows = deltaTwist > dFloat32(1.0e-3f);
 	hasAngleRows = hasAngleRows && (deltaTwist < dFloat32(2.0f) * dPi);
-	hasAngleRows = hasAngleRows || (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_CONE_ANGLE);
+	hasAngleRows = hasAngleRows || (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_ANGLE);
 	if (hasAngleRows)
 	{
 		dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();

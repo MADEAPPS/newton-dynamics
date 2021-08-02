@@ -76,6 +76,7 @@
 #include <ndJointKinematicController.h>
 #include <ndMultiBodyVehicleTireJoint.h>
 #include <ndMultiBodyVehicleTorsionBar.h>
+#include <ndJointBallAndSocketActuator.h>
 #include <ndMultiBodyVehicleDifferential.h>
 #include <ndMultiBodyVehicleDifferentialAxle.h>
 

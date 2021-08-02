@@ -13,9 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointSlider.h"
 
-#define D_PENETRATION_LIMIT			 dFloat32 (0.2f) 
-#define D_PENETRATION_RECOVERY_SPEED dFloat32 (0.1f) 
-
 ndJointSlider::ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 	,m_posit(dFloat32 (0.0f))
@@ -95,7 +92,7 @@ void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dM
 			AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const dFloat32 penetration = x - m_minLimit;
-			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_SLIDER_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_SLIDER_PENETRATION_LIMIT), dFloat32(1.0f));
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetLowerFriction(desc, -m_friction); 
 		}
@@ -104,7 +101,7 @@ void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dM
 			AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1.m_front);
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const dFloat32 penetration = x - m_maxLimit;
-			const dFloat32 recoveringAceel = desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+			const dFloat32 recoveringAceel = desc.m_invTimestep * D_SLIDER_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_SLIDER_PENETRATION_LIMIT), dFloat32(1.0f));
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetHighFriction(desc, m_friction);
 		}
@@ -132,7 +129,7 @@ void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& des
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
 		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		const dFloat32 penetration = x - m_minLimit;
-		const dFloat32 recoveringAceel = -desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+		const dFloat32 recoveringAceel = -desc.m_invTimestep * D_SLIDER_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_SLIDER_PENETRATION_LIMIT), dFloat32(1.0f));
 		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 		SetLowerFriction(desc, dFloat32(0.0f));
 	}
@@ -142,7 +139,7 @@ void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& des
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
 		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		const dFloat32 penetration = x - m_maxLimit;
-		const dFloat32 recoveringAceel = desc.m_invTimestep * D_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PENETRATION_RECOVERY_SPEED), dFloat32(1.0f));
+		const dFloat32 recoveringAceel = desc.m_invTimestep * D_SLIDER_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_SLIDER_PENETRATION_LIMIT), dFloat32(1.0f));
 		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 		SetHighFriction(desc, dFloat32(0.0f));
 	}

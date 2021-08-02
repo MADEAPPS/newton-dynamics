@@ -15,6 +15,9 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
+#define D_BALL_AND_SOCKED_MAX_ANGLE	dFloat32 (120.0f * dDegreeToRad)
+#define D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED dFloat32 (0.1f) 
+
 class ndJointBallAndSocket: public ndJointBilateralConstraint
 {
 	public:

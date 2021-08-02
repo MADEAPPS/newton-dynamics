@@ -13,20 +13,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointHingeActuator.h"
 
-/*
-ndJointHingeActuator::ndJointHingeActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:dCustomHinge (pinAndPivotFrame, child, parent)
-	,m_targetAngle(0.0f)
-	,m_maxTorque(D_CUSTOM_LARGE_VALUE)
-{
-	m_friction = 0.0f;
-	dAssert(m_options.m_value == 0);
-	SetAngularRate(dPi);
-	SetMinAngularLimit(-180.0f * dDegreeToRad);
-	SetMaxAngularLimit(180.0f * dDegreeToRad);
-}
-*/
-
 ndJointHingeActuator::ndJointHingeActuator(const dMatrix& pinAndPivotFrame, dFloat32 angularRate, dFloat32 minAngle, dFloat32 maxAngle, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointHinge(pinAndPivotFrame, child, parent)
 	,m_targetAngle(0.0f)
@@ -35,7 +21,6 @@ ndJointHingeActuator::ndJointHingeActuator(const dMatrix& pinAndPivotFrame, dFlo
 {
 	m_friction = dFloat32 (0.0f);
 	SetAngularRate(angularRate);
-	//EnableLimits(true, minAngle, maxAngle);
 	EnableLimits(false, minAngle, maxAngle);
 }
 

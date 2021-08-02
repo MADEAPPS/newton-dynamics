@@ -15,6 +15,9 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
+#define D_HINGE_PENETRATION_RECOVERY_SPEED	dFloat32 (0.1f) 
+#define D_HINGE_PENETRATION_LIMIT			dFloat32 (10.0f * dDegreeToRad) 
+
 class ndJointHinge: public ndJointBilateralConstraint
 {
 	public:

@@ -15,6 +15,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
+#define D_SLIDER_PENETRATION_LIMIT			dFloat32 (0.2f) 
+#define D_SLIDER_PENETRATION_RECOVERY_SPEED dFloat32 (0.1f) 
 
 class ndJointSlider: public ndJointBilateralConstraint
 {
