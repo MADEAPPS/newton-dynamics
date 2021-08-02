@@ -31,6 +31,24 @@ ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 {
 }
 
+ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotInChild, const dMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+	:ndJointBilateralConstraint(7, child, parent, pinAndPivotInChild)
+	,m_jointAngle(dFloat32(0.0f))
+	,m_jointSpeed(dFloat32(0.0f))
+	,m_springK(dFloat32(0.0f))
+	,m_damperC(dFloat32(0.0f))
+	,m_minLimit(dFloat32(0.0f))
+	,m_maxLimit(dFloat32(0.0f))
+	,m_friction(dFloat32(0.0f))
+	,m_springDamperRegularizer(dFloat32(0.1f))
+	,m_hasLimits(false)
+	,m_isSpringDamper(false)
+{
+	dMatrix tmp;
+	CalculateLocalMatrix(pinAndPivotInChild, m_localMatrix0, tmp);
+	CalculateLocalMatrix(pinAndPivotInParent, tmp, m_localMatrix1);
+}
+
 ndJointHinge::~ndJointHinge()
 {
 }

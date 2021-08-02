@@ -194,8 +194,9 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 	meshBuilder.Begin();
 	
 	dInt32 stack = 1;
-	fbxDemoEntity* entBuffer[1024];
 	dMatrix matrixBuffer[1024];
+	fbxDemoEntity* entBuffer[1024];
+	
 	entBuffer[0] = entity;
 	matrixBuffer[0] = entity->GetCurrentMatrix().Inverse();
 
@@ -233,7 +234,6 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 					} while (ptr != edge);
 	
 					dInt32 materialIndex = ent->m_fbxMeshEffect->GetFaceMaterial(edge);
-//if (materialIndex==3)
 					meshBuilder.AddFace(&face[0].m_x, sizeof(dVector), 3, materialIndex);
 				}
 			}
@@ -255,6 +255,156 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
 	scene->GetWorld()->AddBody(body);
+
+	entity->CleanIntermediate();
+	return body;
+}
+
+ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
+{
+	fbxDemoEntity* const entity = scene->LoadFbxMesh("playerarena.fbx");
+	scene->AddEntity(entity);
+
+	dPolygonSoupBuilder meshBuilder;
+	meshBuilder.Begin();
+
+	dInt32 stack = 1;
+	dMatrix matrixBuffer[1024];
+	fbxDemoEntity* entBuffer[1024];
+
+	entBuffer[0] = entity;
+	matrixBuffer[0] = entity->GetCurrentMatrix().Inverse();
+
+	while (stack)
+	{
+		stack--;
+		fbxDemoEntity* const ent = entBuffer[stack];
+		dMatrix matrix(ent->GetCurrentMatrix() * matrixBuffer[stack]);
+
+		if (ent->m_fbxMeshEffect)
+		{
+			dInt32 vertexStride = ent->m_fbxMeshEffect->GetVertexStrideInByte() / sizeof(dFloat64);
+			const dFloat64* const vertexData = ent->m_fbxMeshEffect->GetVertexPool();
+
+			dInt32 mark = ent->m_fbxMeshEffect->IncLRU();
+			dPolyhedra::Iterator iter(*ent->m_fbxMeshEffect);
+
+			dVector face[256];
+			dMatrix worldMatrix(ent->GetMeshMatrix() * matrix);
+			for (iter.Begin(); iter; iter++)
+			{
+				dEdge* const edge = &(*iter);
+				if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark))
+				{
+					dInt32 count = 0;
+					dEdge* ptr = edge;
+					do
+					{
+						dInt32 i = ptr->m_incidentVertex * vertexStride;
+						dVector point(dFloat32(vertexData[i + 0]), dFloat32(vertexData[i + 1]), dFloat32(vertexData[i + 2]), dFloat32(1.0f));
+						face[count] = worldMatrix.TransformVector(point);
+						count++;
+						ptr->m_mark = mark;
+						ptr = ptr->m_next;
+					} while (ptr != edge);
+
+					dInt32 materialIndex = ent->m_fbxMeshEffect->GetFaceMaterial(edge);
+					meshBuilder.AddFace(&face[0].m_x, sizeof(dVector), 3, materialIndex);
+				}
+			}
+		}
+
+		for (fbxDemoEntity* child = (fbxDemoEntity*)ent->GetChild(); child; child = (fbxDemoEntity*)child->GetSibling())
+		{
+			entBuffer[stack] = child;
+			matrixBuffer[stack] = matrix;
+			stack++;
+		}
+	}
+	meshBuilder.End(true);
+	ndShapeInstance shape(new ndShapeStatic_bvh(meshBuilder));
+
+	dMatrix matrix(entity->GetCurrentMatrix());
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(shape);
+	scene->GetWorld()->AddBody(body);
+
+	ndDemoEntity* const pivot0 = entity->Find("pivot1");
+	ndDemoEntity* const pivot1 = entity->Find("pivot0");
+
+	dMatrix matrix0(pivot0->CalculateGlobalMatrix());
+	dMatrix matrix1(pivot1->CalculateGlobalMatrix());
+	dVector dir(matrix1.m_posit - matrix0.m_posit);
+	dFloat32 lenght = dSqrt (dir.DotProduct(dir).GetScalar());
+
+	const dInt32 plankCount = 30;
+	dFloat32 sizex = 10.0f;
+	dFloat32 sizey = 0.25f;
+	dFloat32 sizez = lenght / plankCount;
+	dFloat32 deflection = 0.02f;
+
+	matrix = matrix0;
+	matrix.m_posit.m_y -= sizey * 0.5f;
+	matrix.m_posit.m_z += sizez * 0.5f;
+
+	ndShapeInstance plankShape(new ndShapeBox(sizex, sizey, sizez + deflection ));
+
+	dFixSizeArray<ndBodyKinematic*, plankCount> array;
+	for (dInt32 i = 0; i < plankCount; i ++)
+	{
+		array.PushBack(CreateBody(scene, plankShape, matrix, 20.0f));
+		matrix.m_posit.m_z += sizez;
+	}
+
+	for (dInt32 i = 1; i < plankCount; i++)
+	{
+		ndBodyKinematic* body0 = array[i - 1];
+		ndBodyKinematic* body1 = array[i];
+		dMatrix linkMatrix(body0->GetMatrix());
+		linkMatrix.m_posit = dVector::m_half * (body0->GetMatrix().m_posit + body1->GetMatrix().m_posit);
+		linkMatrix.m_posit.m_y += sizey * 0.5f;
+		dMatrix matrix_0(linkMatrix);
+		dMatrix matrix_1(linkMatrix);
+		matrix_0.m_posit.m_z += deflection  * 0.5f;
+		matrix_1.m_posit.m_z -= deflection  * 0.5f;
+		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
+		hinge->SetAsSpringDamper(true, 0.02f, 0.0f, 20.0f);
+		scene->GetWorld()->AddJoint(hinge);
+	}
+
+	{
+		ndBodyKinematic* body0 = array[0];
+		ndBodyKinematic* body1 = body;
+		dMatrix linkMatrix(body0->GetMatrix());
+		linkMatrix.m_posit = body0->GetMatrix().m_posit;
+		linkMatrix.m_posit.m_z -= (sizez + deflection ) * 0.5f;
+		linkMatrix.m_posit.m_y += sizey * 0.5f;
+		dMatrix matrix_0(linkMatrix);
+		dMatrix matrix_1(linkMatrix);
+		matrix_0.m_posit.m_z += deflection  * 0.5f;
+		matrix_1.m_posit.m_z -= deflection  * 0.5f;
+		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
+		hinge->SetAsSpringDamper(true, 0.02f, 0.0f, 20.0f);
+		scene->GetWorld()->AddJoint(hinge);
+	}
+
+	{
+		ndBodyKinematic* body0 = array[plankCount-1];
+		ndBodyKinematic* body1 = body;
+		dMatrix linkMatrix(body0->GetMatrix());
+		linkMatrix.m_posit = body0->GetMatrix().m_posit;
+		linkMatrix.m_posit.m_z += (sizez + deflection ) * 0.5f;
+		linkMatrix.m_posit.m_y += sizey * 0.5f;
+		dMatrix matrix_0(linkMatrix);
+		dMatrix matrix_1(linkMatrix);
+		matrix_0.m_posit.m_z += deflection  * 0.5f;
+		matrix_1.m_posit.m_z -= deflection  * 0.5f;
+		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
+		hinge->SetAsSpringDamper(true, 0.02f, 0.0f, 20.0f);
+		scene->GetWorld()->AddJoint(hinge);
+	}
 
 	entity->CleanIntermediate();
 	return body;

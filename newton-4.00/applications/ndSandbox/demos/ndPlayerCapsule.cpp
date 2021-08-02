@@ -25,7 +25,8 @@
 void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix());
+	BuildPlayArena(scene);
+	//BuildFloorBox(scene, dGetIdentityMatrix());
 
 	dMatrix location(dGetIdentityMatrix());
 	location.m_posit.m_y += 2.0f;

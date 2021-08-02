@@ -128,16 +128,18 @@ void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& origin, 
 	instanceMesh->Release();
 }
 
-static ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const dVector& origin, dFloat32 mass)
+ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const dMatrix& origin, dFloat32 mass)
 {
-	dMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
+	//dMatrix matrix(dGetIdentityMatrix());
+	//matrix.m_posit = origin;
+	//matrix.m_posit.m_w = 1.0f;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
+	dMatrix matrix(origin);
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 500.0f, 0.0f, 0.0f), 1000.0f));
-	matrix.m_posit.m_y += floor.m_y;
+	//matrix.m_posit.m_y += floor.m_y;
+	matrix.m_posit.m_y = dMax (floor.m_y + 1.0f, matrix.m_posit.m_y);
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
@@ -158,22 +160,34 @@ static ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndSha
 
 ndBodyKinematic* AddBox(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 sizex, dFloat32 sizey, dFloat32 sizez)
 {
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
 	ndShapeInstance shape(new ndShapeBox(sizex, sizey, sizez));
-	ndBodyKinematic* const body = CreateBody(scene, shape, origin, mass);
+	ndBodyKinematic* const body = CreateBody(scene, shape, matrix, mass);
 	return body;
 }
 
 ndBodyKinematic* AddSphere(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 radius)
 {
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
 	ndShapeInstance shape(new ndShapeSphere(radius));
-	ndBodyKinematic* const body = CreateBody(scene, shape, origin, mass);
+	ndBodyKinematic* const body = CreateBody(scene, shape, matrix, mass);
 	return body;
 }
 
 ndBodyKinematic* AddCapsule(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 radius0, dFloat32 radius1, dFloat32 high)
 {
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
 	ndShapeInstance shape(new ndShapeCapsule(radius0, radius1, high));
-	ndBodyKinematic* const body = CreateBody(scene, shape, origin, mass);
+	ndBodyKinematic* const body = CreateBody(scene, shape, matrix, mass);
 	return body;
 }
 
@@ -193,7 +207,11 @@ ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const dVector& 
 		dAssert(count < dInt32 (sizeof(points) / sizeof(points[0])));
 	}
 
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
 	ndShapeInstance shape(new ndShapeConvexHull(count, sizeof(dVector), 0.0f, &points[0].m_x));
-	ndBodyKinematic* const body = CreateBody(scene, shape, origin, mass);
+	ndBodyKinematic* const body = CreateBody(scene, shape, matrix, mass);
 	return body;
 }
