@@ -32,7 +32,16 @@ class ndCharacterIkRootNode: public ndCharacterIkNode
 
 	D_NEWTON_API ndCharacterIkRootNode(ndBodyDynamic* const body, ndCharacterIkNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterIkRootNode ();
+
+	virtual ndBodyDynamic* GetBody() const;
+
+	protected:
+	ndBodyDynamic* m_body;
 };
 
+inline ndBodyDynamic* ndCharacterIkRootNode::GetBody() const
+{
+	return m_body;
+}
 
 #endif

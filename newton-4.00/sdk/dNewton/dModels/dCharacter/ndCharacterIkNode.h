@@ -35,14 +35,14 @@ class ndCharacterIkNode: public dNodeHierarchy<ndCharacterIkNode>
 	public:
 	D_CLASS_RELECTION(ndCharacterIkNode);
 
-	D_NEWTON_API ndCharacterIkNode(ndCharacter* const owner, ndBodyDynamic* const body);
+	D_NEWTON_API ndCharacterIkNode(ndCharacter* const owner);
 	D_NEWTON_API virtual ~ndCharacterIkNode ();
 
 	ndCharacter* GetOwner() const;
-	ndBodyDynamic* GetBody() const;
+	virtual ndBodyDynamic* GetBody() const;
 
+	protected:
 	ndCharacter* m_owner;
-	ndBodyDynamic* m_body;
 };
 
 inline ndCharacter* ndCharacterIkNode::GetOwner() const
@@ -52,7 +52,7 @@ inline ndCharacter* ndCharacterIkNode::GetOwner() const
 
 inline ndBodyDynamic* ndCharacterIkNode::GetBody() const
 {
-	return m_body;
+	return nullptr;
 }
 
 #endif

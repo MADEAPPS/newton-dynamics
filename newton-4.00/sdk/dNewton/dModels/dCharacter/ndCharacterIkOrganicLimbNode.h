@@ -33,7 +33,16 @@ class ndCharacterIkOrganicLimbNode: public ndCharacterIkNode, public ndJointBall
 
 	D_NEWTON_API ndCharacterIkOrganicLimbNode(ndBodyDynamic* const body, ndCharacterIkNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterIkOrganicLimbNode ();
+
+	virtual ndBodyDynamic* GetBody() const;
+
+	protected:
+	ndBodyDynamic* m_body;
 };
 
+inline ndBodyDynamic* ndCharacterIkOrganicLimbNode::GetBody() const
+{
+	return m_body;
+}
 
 #endif

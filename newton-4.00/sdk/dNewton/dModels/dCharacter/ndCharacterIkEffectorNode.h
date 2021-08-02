@@ -19,17 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dCoreStdafx.h"
+#ifndef __D_CHARACTER_IK_EFFECTOR_NODE_H__
+#define __D_CHARACTER_IK_EFFECTOR_NODE_H__
+
 #include "ndNewtonStdafx.h"
-#include "ndWorld.h"
 #include "ndCharacterIkNode.h"
 
-ndCharacterIkNode::ndCharacterIkNode(ndCharacter* const owner)
-	:dNodeHierarchy<ndCharacterIkNode>()
-	,m_owner(owner)
+class ndCharacterIkEffectorNode: public ndCharacterIkNode
 {
-}
+	public:
+	D_CLASS_RELECTION(ndCharacterIkEffectorNode);
 
-ndCharacterIkNode::~ndCharacterIkNode()
-{
-}
+	D_NEWTON_API ndCharacterIkEffectorNode(ndCharacterIkNode* const parent);
+	D_NEWTON_API virtual ~ndCharacterIkEffectorNode ();
+};
+
+
+#endif

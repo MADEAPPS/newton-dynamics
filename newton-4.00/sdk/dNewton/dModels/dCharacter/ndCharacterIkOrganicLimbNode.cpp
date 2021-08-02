@@ -26,8 +26,9 @@
 #include "ndCharacterIkOrganicLimbNode.h"
 
 ndCharacterIkOrganicLimbNode::ndCharacterIkOrganicLimbNode(ndBodyDynamic* const body, ndCharacterIkNode* const parent)
-	:ndCharacterIkNode(parent->GetOwner(), body)
+	:ndCharacterIkNode(parent->GetOwner())
 	,ndJointBallAndSocketActuator(dGetIdentityMatrix(), body, parent->GetBody())
+	,m_body(body)
 {
 }
 
