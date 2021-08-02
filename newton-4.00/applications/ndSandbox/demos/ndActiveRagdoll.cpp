@@ -101,8 +101,8 @@ static dActiveJointDefinition jointsDefinition[] =
 	//{ "mixamorig:Spine2", 8, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 	//{ "mixamorig:Neck", 16, 31, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 
-	{ "mixamorig:RightUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+	//{ "mixamorig:RightUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:RightLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 
 	//{ "mixamorig:LeftUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 	//{ "mixamorig:LeftLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
@@ -114,7 +114,8 @@ static dActiveJointDefinition jointsDefinition[] =
 	//{ "mixamorig:LeftForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
 };
 
-class ndActiveRagdollModel : public ndModel
+//class ndActiveRagdollModel : public ndModel
+class ndActiveRagdollModel : public ndCharacter
 {
 	public:
 	ndActiveRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const dMatrix& location)
@@ -132,82 +133,68 @@ class ndActiveRagdollModel : public ndModel
 		// add the root body
 		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);
 		rootEntity->ResetMatrix(rootEntity->GetCurrentMatrix() * matrix);
-		ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
-
-		//NewtonCollisionMaterial collisionMaterial;
-		//NewtonCollisionGetMaterial(NewtonBodyGetCollision(rootBody), &collisionMaterial);
-		//collisionMaterial.m_userData.m_ptr = rootBody;
-		//collisionMaterial.m_userParam[0].m_int = jointsDefinition[0].m_type;
-		//collisionMaterial.m_userParam[1].m_int = jointsDefinition[0].m_typeMask;
-		//NewtonCollisionSetMaterial(NewtonBodyGetCollision(rootBody), &collisionMaterial);
+		//ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
+		ndCharacterIkRootNode* const rootNode = CreateRoot(CreateBodyPart(scene, rootEntity, nullptr));
 
 		dInt32 stack = 0;
 		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
 		
-		ndBodyDynamic* parentBones[32];
-		ndDemoEntity* childEntities[32];
-		for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) 
-		{
-			childEntities[stack] = child;
-			parentBones[stack] = rootBody;
-			stack++;
-		}
-		
-		dInt32 bodyCount = 1;
-		ndBodyDynamic* bodyArray[1024];
-		bodyArray[0] = rootBody;
+		//ndBodyDynamic* parentBones[32];
+		//ndDemoEntity* childEntities[32];
+		//for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) 
+		//{
+		//	childEntities[stack] = child;
+		//	parentBones[stack] = rootBody;
+		//	stack++;
+		//}
+		//
+		//dInt32 bodyCount = 1;
+		//ndBodyDynamic* bodyArray[1024];
+		//bodyArray[0] = rootBody;
+		//
+		//// walk model hierarchic adding all children designed as rigid body bones. 
+		//while (stack) 
+		//{
+		//	stack--;
+		//	ndBodyDynamic* parentBone = parentBones[stack];
+		//	ndDemoEntity* const childEntity = childEntities[stack];
+		//	const char* const name = childEntity->GetName().GetStr();
+		//	//dTrace(("name: %s\n", name));
+		//	for (dInt32 i = 0; i < definitionCount; i++) 
+		//	{
+		//		if (!strcmp(jointsDefinition[i].m_boneName, name)) 
+		//		{
+		//			ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
+		//			bodyArray[bodyCount] = childBody;
+		//			bodyCount++;
+		//
+		//			// connect this body part to its parentBody with a ragdoll joint
+		//			ConnectBodyParts(world, childBody, parentBone, jointsDefinition[i]);
 
-		// walk model hierarchic adding all children designed as rigid body bones. 
-		while (stack) 
-		{
-			stack--;
-			ndBodyDynamic* parentBone = parentBones[stack];
-			ndDemoEntity* const childEntity = childEntities[stack];
-			const char* const name = childEntity->GetName().GetStr();
-			//dTrace(("name: %s\n", name));
-			for (dInt32 i = 0; i < definitionCount; i++) 
-			{
-				if (!strcmp(jointsDefinition[i].m_boneName, name)) 
-				{
-					ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
-					bodyArray[bodyCount] = childBody;
-					bodyCount++;
-
-					// connect this body part to its parentBody with a ragdoll joint
-					ConnectBodyParts(world, childBody, parentBone, jointsDefinition[i]);
-
-					//// save the controller as the collision user data, for collision culling
-					//NewtonCollisionMaterial collisionMaterial;
-					//NewtonCollisionGetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
-					//collisionMaterial.m_userData.m_ptr = rootBody;
-					//collisionMaterial.m_userParam[0].m_int = jointsDefinition[i].m_type;
-					//collisionMaterial.m_userParam[1].m_int = jointsDefinition[i].m_typeMask;
-					//NewtonCollisionSetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
-
-					parentBone = childBody;
-					break;
-				}
-			}
-		
-			for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
-			{
-				childEntities[stack] = child;
-				parentBones[stack] = parentBone;
-				stack++;
-			}
-		}
-		
-		SetModelMass(100.0f, bodyCount, bodyArray);
-
-		for (dInt32 i = 0; i < bodyCount; i++)
-		{
-			ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
-			if (ent->GetName() == "mixamorig:Hips") 
-			{
-				world->AddJoint(new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody()));
-				break;
-			}
-		}
+		//			parentBone = childBody;
+		//			break;
+		//		}
+		//	}
+		//
+		//	for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
+		//	{
+		//		childEntities[stack] = child;
+		//		parentBones[stack] = parentBone;
+		//		stack++;
+		//	}
+		//}
+		//
+		//SetModelMass(100.0f, bodyCount, bodyArray);
+		//
+		//for (dInt32 i = 0; i < bodyCount; i++)
+		//{
+		//	ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
+		//	if (ent->GetName() == "mixamorig:Hips") 
+		//	{
+		//		world->AddJoint(new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody()));
+		//		break;
+		//	}
+		//}
 	}
 
 	void SetModelMass(dFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray) const
@@ -243,9 +230,6 @@ class ndActiveRagdollModel : public ndModel
 		body->SetMassMatrix(1.0f, *shape);
 		body->SetNotifyCallback(new ndActiveRagdollEntityNotify(scene, entityPart, parentBone));
 		world->AddBody(body);
-
-		// assign the material for early collision culling
-		//NewtonBodySetMaterialGroupID(body, m_material);
 
 		delete shape;
 		return body;

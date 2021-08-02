@@ -23,6 +23,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndCharacter.h"
+#include "ndCharacterIkNode.h"
+#include "ndCharacterIkRootNode.h"
 
 ndCharacter::ndCharacter()
 	:ndModel()
@@ -37,20 +39,27 @@ ndCharacter::ndCharacter(const nd::TiXmlNode* const xmlNode)
 
 ndCharacter::~ndCharacter()
 {
+	if (m_rootNode)
+	{
+		delete m_rootNode;
+	}
+}
+
+ndCharacterIkRootNode* ndCharacter::CreateRoot(ndBodyDynamic* const body)
+{
+	m_rootNode = new ndCharacterIkRootNode(this, body);
+	return m_rootNode;
 }
 
 //void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 void ndCharacter::Debug(ndConstraintDebugCallback&) const
 {
-
 }
 
 void ndCharacter::PostUpdate(ndWorld* const, dFloat32)
 {
-//	ApplyAligmentAndBalancing();
 }
 
-//void ndCharacter::Update(ndWorld* const world, dFloat32 timestep)
 void ndCharacter::Update(ndWorld* const, dFloat32)
 {
 }

@@ -30,14 +30,21 @@ class ndCharacterIkRootNode: public ndCharacterIkNode
 	public:
 	D_CLASS_RELECTION(ndCharacterIkRootNode);
 
-	D_NEWTON_API ndCharacterIkRootNode(ndBodyDynamic* const body, ndCharacterIkNode* const parent);
+	D_NEWTON_API ndCharacterIkRootNode(ndCharacter* const owner, ndBodyDynamic* const body);
 	D_NEWTON_API virtual ~ndCharacterIkRootNode ();
 
+	ndCharacter* GetOwner() const;
 	virtual ndBodyDynamic* GetBody() const;
 
 	protected:
+	ndCharacter* m_owner;
 	ndBodyDynamic* m_body;
 };
+
+inline ndCharacter* ndCharacterIkRootNode::GetOwner() const
+{
+	return m_owner;
+}
 
 inline ndBodyDynamic* ndCharacterIkRootNode::GetBody() const
 {

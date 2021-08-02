@@ -35,20 +35,14 @@ class ndCharacterIkNode: public dNodeHierarchy<ndCharacterIkNode>
 	public:
 	D_CLASS_RELECTION(ndCharacterIkNode);
 
-	D_NEWTON_API ndCharacterIkNode(ndCharacter* const owner);
+	D_NEWTON_API ndCharacterIkNode(ndCharacterIkNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterIkNode ();
 
-	ndCharacter* GetOwner() const;
 	virtual ndBodyDynamic* GetBody() const;
 
 	protected:
-	ndCharacter* m_owner;
+	D_NEWTON_API dNodeBaseHierarchy* CreateClone() const;
 };
-
-inline ndCharacter* ndCharacterIkNode::GetOwner() const
-{
-	return m_owner;
-}
 
 inline ndBodyDynamic* ndCharacterIkNode::GetBody() const
 {

@@ -24,12 +24,21 @@
 #include "ndWorld.h"
 #include "ndCharacterIkNode.h"
 
-ndCharacterIkNode::ndCharacterIkNode(ndCharacter* const owner)
+ndCharacterIkNode::ndCharacterIkNode(ndCharacterIkNode* const parent)
 	:dNodeHierarchy<ndCharacterIkNode>()
-	,m_owner(owner)
 {
+	if (parent)
+	{
+		Attach(parent);
+	}
 }
 
 ndCharacterIkNode::~ndCharacterIkNode()
 {
+}
+
+dNodeBaseHierarchy* ndCharacterIkNode::CreateClone() const
+{
+	dAssert(0);
+	return nullptr;
 }

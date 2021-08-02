@@ -24,8 +24,9 @@
 #include "ndCharacter.h"
 #include "ndCharacterIkRootNode.h"
 
-ndCharacterIkRootNode::ndCharacterIkRootNode(ndBodyDynamic* const body, ndCharacterIkNode* const parent)
-	:ndCharacterIkNode(parent->GetOwner())
+ndCharacterIkRootNode::ndCharacterIkRootNode(ndCharacter* const owner, ndBodyDynamic* const body)
+	:ndCharacterIkNode(nullptr)
+	,m_owner(owner)
 	,m_body(body)
 {
 }

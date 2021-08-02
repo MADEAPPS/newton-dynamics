@@ -25,7 +25,7 @@
 #include "ndCharacterIkEffectorNode.h"
 
 ndCharacterIkEffectorNode::ndCharacterIkEffectorNode(ndCharacterIkNode* const parent)
-	:ndCharacterIkNode(parent->GetOwner())
+	:ndCharacterIkNode(parent)
 {
 }
 

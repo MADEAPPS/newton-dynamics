@@ -134,13 +134,6 @@ class ndRagdollModel : public ndModel
 		rootEntity->ResetMatrix(rootEntity->GetCurrentMatrix() * matrix);
 		ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
 
-		//NewtonCollisionMaterial collisionMaterial;
-		//NewtonCollisionGetMaterial(NewtonBodyGetCollision(rootBody), &collisionMaterial);
-		//collisionMaterial.m_userData.m_ptr = rootBody;
-		//collisionMaterial.m_userParam[0].m_int = jointsDefinition[0].m_type;
-		//collisionMaterial.m_userParam[1].m_int = jointsDefinition[0].m_typeMask;
-		//NewtonCollisionSetMaterial(NewtonBodyGetCollision(rootBody), &collisionMaterial);
-
 		dInt32 stack = 0;
 		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
 		
@@ -175,14 +168,6 @@ class ndRagdollModel : public ndModel
 
 					// connect this body part to its parentBody with a ragdoll joint
 					ConnectBodyParts(world, childBody, parentBone, jointsDefinition[i]);
-
-					//// save the controller as the collision user data, for collision culling
-					//NewtonCollisionMaterial collisionMaterial;
-					//NewtonCollisionGetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
-					//collisionMaterial.m_userData.m_ptr = rootBody;
-					//collisionMaterial.m_userParam[0].m_int = jointsDefinition[i].m_type;
-					//collisionMaterial.m_userParam[1].m_int = jointsDefinition[i].m_typeMask;
-					//NewtonCollisionSetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
 
 					parentBone = childBody;
 					break;
@@ -243,9 +228,6 @@ class ndRagdollModel : public ndModel
 		body->SetMassMatrix(1.0f, *shape);
 		body->SetNotifyCallback(new ndRagdollEntityNotify(scene, entityPart, parentBone));
 		world->AddBody(body);
-
-		// assign the material for early collision culling
-		//NewtonBodySetMaterialGroupID(body, m_material);
 
 		delete shape;
 		return body;
