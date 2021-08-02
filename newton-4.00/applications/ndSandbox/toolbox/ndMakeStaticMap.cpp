@@ -349,6 +349,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_y -= sizey * 0.5f;
 	matrix.m_posit.m_z += sizez * 0.5f;
 
+#if 1
 	ndShapeInstance plankShape(new ndShapeBox(sizex, sizey, sizez + deflection ));
 
 	dFixSizeArray<ndBodyKinematic*, plankCount> array;
@@ -405,7 +406,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 		hinge->SetAsSpringDamper(true, 0.02f, 0.0f, 20.0f);
 		scene->GetWorld()->AddJoint(hinge);
 	}
-
+#endif
 	entity->CleanIntermediate();
 	return body;
 }

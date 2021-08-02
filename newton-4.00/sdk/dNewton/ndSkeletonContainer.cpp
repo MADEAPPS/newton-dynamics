@@ -526,6 +526,19 @@ void ndSkeletonContainer::CheckSleepState()
 		equilibrium &= (node->m_body->m_equilibrium ? true : false);
 	}
 
+	if (equilibrium)
+	{
+		const dInt32 loopCount = m_loopCount + m_dynamicsLoopCount;
+		for (dInt32 i = 0; i < loopCount; i++)
+		{
+			const ndConstraint* const joint = m_loopingJoints[i];
+			ndBodyKinematic* const body0 = joint->GetBody0();
+			ndBodyKinematic* const body1 = joint->GetBody1();
+			equilibrium &= (body0->m_equilibrium ? true : false);
+			equilibrium &= (body1->m_equilibrium ? true : false);
+		}
+	}
+
 	if (!equilibrium)
 	{
 		for (dInt32 i = m_nodeList.GetCount() - 1; i >= 0; --i)
@@ -534,6 +547,19 @@ void ndSkeletonContainer::CheckSleepState()
 			if (node->m_body->GetInvMass() > dFloat32(0.0f))
 			{
 				node->m_body->m_equilibrium = 0;
+			}
+		}
+
+		const dInt32 loopCount = m_loopCount + m_dynamicsLoopCount;
+		for (dInt32 i = 0; i < loopCount; i++)
+		{
+			const ndConstraint* const joint = m_loopingJoints[i];
+			ndBodyKinematic* const body0 = joint->GetBody0();
+			ndBodyKinematic* const body1 = joint->GetBody1();
+			body0->m_equilibrium = 0;
+			if (body1->GetInvMass() > dFloat32(0.0f))
+			{
+				body1->m_equilibrium = 0;
 			}
 		}
 	}

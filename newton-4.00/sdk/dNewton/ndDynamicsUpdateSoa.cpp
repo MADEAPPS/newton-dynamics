@@ -313,7 +313,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 		ndSkeletonContainer* const skeleton = &node->GetInfo();
 		skeleton->CheckSleepState();
 	}
-	
+
 	const ndJointList& jointList = m_world->GetJointList();
 	ndConstraintArray& jointArray = scene->GetActiveContactArray();
 
@@ -505,9 +505,17 @@ void ndDynamicsUpdateSoa::SortJoints()
 		}
 	#endif
 
+	const dInt32 mask = -dInt32(D_SOA_WORD_GROUP_SIZE);
+	const dInt32 jointCount = jointArray.GetCount();
+	const dInt32 soaJointCount = (jointCount + D_SOA_WORD_GROUP_SIZE - 1) & mask;
+	dAssert(jointArray.GetCapacity() > soaJointCount);
+	for (dInt32 i = jointCount; i < soaJointCount; i++)
+	{
+		jointPtr[i] = nullptr;
+	}
+
 	if (m_activeJointCount - jointArray.GetCount())
 	{
-		const dInt32 mask = -dInt32(D_SOA_WORD_GROUP_SIZE);
 		const dInt32 base = m_activeJointCount & mask;
 		const dInt32 count = jointPtr[base + D_SOA_WORD_GROUP_SIZE - 1] ? D_SOA_WORD_GROUP_SIZE : jointArray.GetCount() - base;
 		dAssert(count <= D_SOA_WORD_GROUP_SIZE);
@@ -522,15 +530,6 @@ void ndDynamicsUpdateSoa::SortJoints()
 			}
 			array[slot] = joint;
 		}
-	}
-
-	const dInt32 mask = -dInt32(D_SOA_WORD_GROUP_SIZE);
-	const dInt32 jointCount = jointArray.GetCount();
-	const dInt32 soaJointCount = (jointCount + D_SOA_WORD_GROUP_SIZE - 1) & mask;
-	dAssert(jointArray.GetCapacity() > soaJointCount);
-	for (dInt32 i = jointCount; i < soaJointCount; i++)
-	{
-		jointPtr[i] = nullptr;
 	}
 
 	dInt32 soaJointRowCount = 0;

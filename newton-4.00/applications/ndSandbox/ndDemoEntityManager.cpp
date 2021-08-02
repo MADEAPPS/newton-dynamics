@@ -403,7 +403,19 @@ ndDemoCamera* ndDemoEntityManager::GetCamera() const
 bool ndDemoEntityManager::GetKeyState(dInt32 key) const
 {
 	const ImGuiIO& io = ImGui::GetIO();
-	return io.KeysDown[key];
+	bool state = io.KeysDown[key];
+#ifdef ENABLE_REPLAY
+	#ifdef REPLAY_RECORD
+		dInt32 value = state;
+		fwrite(&value, sizeof(dInt32), 1, m_replayLogFile);
+		fflush(m_replayLogFile);
+	#else
+		dInt32 value;
+		fread(&value, sizeof(dInt32), 1, m_replayLogFile);
+		state = value ? 1 : 0;
+	#endif	
+#endif
+	return state;
 }
 
 ndAnimationSequence* ndDemoEntityManager::GetAnimationSequence(const char* const fileName)

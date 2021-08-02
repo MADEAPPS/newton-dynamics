@@ -274,7 +274,6 @@ void ndDynamicsUpdate::SortJoints()
 
 	#ifdef _DEBUG
 		dAssert(m_activeJointCount <= jointArray.GetCount());
-		//const dInt32 maxRowCount = m_leftHandSide.GetCount();
 		for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 		{
 			ndConstraint* const joint = jointArray[i];

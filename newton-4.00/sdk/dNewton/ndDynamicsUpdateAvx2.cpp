@@ -845,9 +845,17 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		}
 	#endif
 
+	const dInt32 mask = -dInt32(D_AVX_WORD_GROUP_SIZE);
+	const dInt32 jointCount = jointArray.GetCount();
+	const dInt32 soaJointCount = (jointCount + D_AVX_WORD_GROUP_SIZE - 1) & mask;
+	dAssert(jointArray.GetCapacity() > soaJointCount);
+	for (dInt32 i = jointCount; i < soaJointCount; i++)
+	{
+		jointPtr[i] = nullptr;
+	}
+
 	if (m_activeJointCount - jointArray.GetCount())
 	{
-		const dInt32 mask = -dInt32(D_AVX_WORD_GROUP_SIZE);
 		const dInt32 base = m_activeJointCount & mask;
 		const dInt32 count = jointPtr[base + D_AVX_WORD_GROUP_SIZE - 1] ? D_AVX_WORD_GROUP_SIZE : jointArray.GetCount() - base;
 		dAssert(count <= D_AVX_WORD_GROUP_SIZE);
@@ -864,15 +872,6 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		}
 	}
 
-	const dInt32 mask = -dInt32(D_AVX_WORD_GROUP_SIZE);
-	const dInt32 jointCount = jointArray.GetCount();
-	const dInt32 soaJointCount = (jointCount + D_AVX_WORD_GROUP_SIZE - 1) & mask;
-	dAssert(jointArray.GetCapacity() > soaJointCount);
-	for (dInt32 i = jointCount; i < soaJointCount; i++)
-	{
-		jointPtr[i] = nullptr;
-	}
-
 	dInt32 soaJointRowCount = 0;
 	const dInt32 soaJointCountBatches = soaJointCount / D_AVX_WORD_GROUP_SIZE;
 	m_soaJointRows.SetCount(soaJointCountBatches);
@@ -883,9 +882,9 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		soaJointRowCount += joint->m_rowCount;
 	}
 
-	dArray<ndSoaMatrixElement>& m_soaMassMatrix = *(dArray<ndSoaMatrixElement>*)m_soaMassMatrixArray;
-	m_soaMassMatrix.SetCount(soaJointRowCount);
-
+	dArray<ndSoaMatrixElement>& soaMassMatrix = *(dArray<ndSoaMatrixElement>*)m_soaMassMatrixArray;
+	soaMassMatrix.SetCount(soaJointRowCount);
+	
 	dInt32 rowCount = 0;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
