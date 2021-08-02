@@ -21,16 +21,14 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndWorld.h"
-#include "ndCharacterIkNode.h"
+#include "ndCharacter.h"
+#include "ndCharacterIkRootNode.h"
 
-ndCharacterIkNode::ndCharacterIkNode(ndCharacter* const owner, ndBodyDynamic* const body)
-	:dNodeHierarchy<ndCharacterIkNode>()
-	,m_owner(owner)
-	,m_body(body)
+ndCharacterIkRootNode::ndCharacterIkRootNode(ndCharacter* const owner, ndBodyDynamic* const body)
+	:ndCharacterIkNode(owner, body)
 {
 }
 
-ndCharacterIkNode::~ndCharacterIkNode()
+ndCharacterIkRootNode::~ndCharacterIkRootNode()
 {
 }

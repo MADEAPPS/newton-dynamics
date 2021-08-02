@@ -27,6 +27,7 @@
 
 class ndWorld;
 class ndCharacterIkNode;
+class ndCharacterIkRootNode;
 
 class ndCharacter: public ndModel
 {
@@ -44,7 +45,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API virtual void Update(ndWorld* const world, dFloat32 timestep);
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
 
-	ndCharacterIkNode* m_rootNode;
+	ndCharacterIkRootNode* m_rootNode;
 };
 
 inline ndCharacter* ndCharacter::GetAsCharacter()

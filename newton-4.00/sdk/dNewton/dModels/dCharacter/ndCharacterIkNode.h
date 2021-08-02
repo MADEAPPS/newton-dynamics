@@ -35,11 +35,10 @@ class ndCharacterIkNode: public dNodeHierarchy<ndCharacterIkNode>
 	public:
 	D_CLASS_RELECTION(ndCharacterIkNode);
 
-	D_NEWTON_API ndCharacterIkNode(ndCharacter* const owner);
+	D_NEWTON_API ndCharacterIkNode(ndCharacter* const owner, ndBodyDynamic* const body);
 	D_NEWTON_API virtual ~ndCharacterIkNode ();
 
 	ndCharacter* m_owner;
-	ndLimbJoint* m_joint;
 	ndBodyDynamic* m_body;
 };
 
