@@ -19,37 +19,19 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CHARACTER_H__
-#define __D_CHARACTER_H__
-
+#include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndModel.h"
+#include "ndWorld.h"
+#include "ndCharacterIkNode.h"
 
-class ndWorld;
-class ndCharacterIkNode;
-
-class ndCharacter: public ndModel
+ndCharacterIkNode::ndCharacterIkNode(ndCharacter* const owner)
+	:dNodeHierarchy<ndCharacterIkNode>()
+	,m_owner(owner)
+	,m_joint(nullptr)
+	,m_body(nullptr)
 {
-	public:
-	D_CLASS_RELECTION(ndCharacter);
-
-	D_NEWTON_API ndCharacter();
-	D_NEWTON_API ndCharacter(const nd::TiXmlNode* const xmlNode);
-	D_NEWTON_API virtual ~ndCharacter ();
-	
-	ndCharacter* GetAsCharacter();
-
-	protected:
-	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
-	D_NEWTON_API virtual void Update(ndWorld* const world, dFloat32 timestep);
-	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
-
-	ndCharacterIkNode* m_rootNode;
-};
-
-inline ndCharacter* ndCharacter::GetAsCharacter()
-{
-	return this;
 }
 
-#endif
+ndCharacterIkNode::~ndCharacterIkNode()
+{
+}

@@ -24,11 +24,9 @@
 #include "ndWorld.h"
 #include "ndCharacter.h"
 
-//#define D_MAX_CONTACT_PENETRATION	  dFloat32 (1.0e-2f)
-//#define D_MIN_CONTACT_CLOSE_DISTANCE2 dFloat32 (5.0e-2f * 5.0e-2f)
-
-ndCharacter::ndCharacter(const dVector& frontDir, const dVector& upDir)
+ndCharacter::ndCharacter()
 	:ndModel()
+	,m_rootNode(nullptr)
 {
 }
 
@@ -41,7 +39,8 @@ ndCharacter::~ndCharacter()
 {
 }
 
-void ndCharacter::Debug(ndConstraintDebugCallback& context) const
+//void ndCharacter::Debug(ndConstraintDebugCallback& context) const
+void ndCharacter::Debug(ndConstraintDebugCallback&) const
 {
 
 }
@@ -51,6 +50,7 @@ void ndCharacter::PostUpdate(ndWorld* const, dFloat32)
 //	ApplyAligmentAndBalancing();
 }
 
-void ndCharacter::Update(ndWorld* const world, dFloat32 timestep)
+//void ndCharacter::Update(ndWorld* const world, dFloat32 timestep)
+void ndCharacter::Update(ndWorld* const, dFloat32)
 {
 }

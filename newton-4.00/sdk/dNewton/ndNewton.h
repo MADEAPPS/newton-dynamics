@@ -61,6 +61,7 @@
 #include <ndDynamicsUpdate.h>
 #include <ndBodyParticleSet.h>
 #include <ndJointFollowPath.h>
+#include <ndCharacterIkNode.h>
 #include <ndJointDoubleHinge.h>
 #include <ndJointFixDistance.h>
 #include <ndMultiBodyVehicle.h>
