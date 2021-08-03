@@ -23,30 +23,9 @@ class ndJointPidActuator: public ndJointBallAndSocket
 	D_NEWTON_API ndJointPidActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointPidActuator();
 
-	//D_NEWTON_API dFloat32 GetMaxConeAngle() const;
-	//D_NEWTON_API void SetConeLimit(dFloat32 maxConeAngle);
-	//D_NEWTON_API void SetConeFriction(dFloat32 regularizer, dFloat32 viscousFriction);
-	//
-	//D_NEWTON_API void SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle);
-	//D_NEWTON_API void GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const;
-	//D_NEWTON_API void SetTwistFriction(dFloat32 regularizer, dFloat32 viscousFriction);
-
-	private:
-	//void SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
-	//void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
-	//void SubmitAngularAxisCartisianApproximation(const dMatrix& matrix07, const dMatrix& matrix1, ndConstraintDescritor& desc);
-
 	protected:
-	//D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	//D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
+	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
-	//dFloat32 m_maxConeAngle;
-	//dFloat32 m_coneFriction;
-	//dFloat32 m_minTwistAngle;
-	//dFloat32 m_maxTwistAngle;
-	//dFloat32 m_twistFriction;
-	//dFloat32 m_coneFrictionRegularizer;
-	//dFloat32 m_twistFrictionRegularizer;
 };
 
 #endif 

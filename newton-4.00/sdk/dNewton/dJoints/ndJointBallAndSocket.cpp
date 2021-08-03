@@ -151,7 +151,7 @@ void ndJointBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) 
 	}
 }
 
-void ndJointBallAndSocket::SubmitAngularAxisCartisianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointBallAndSocket::SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
 	if (coneAngle > m_maxConeAngle)
@@ -258,7 +258,7 @@ void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 		{
 			// special case where the front axis are almost aligned
 			// solve by using Cartesian approximation
-			SubmitAngularAxisCartisianApproximation(matrix0, matrix1, desc);
+			SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
 		}
 		else
 		{

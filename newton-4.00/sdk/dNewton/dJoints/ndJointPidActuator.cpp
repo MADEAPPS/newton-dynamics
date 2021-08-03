@@ -22,3 +22,7 @@ ndJointPidActuator::~ndJointPidActuator()
 {
 }
 
+void ndJointPidActuator::JacobianDerivative(ndConstraintDescritor& desc)
+{
+	ndJointBallAndSocket::JacobianDerivative(desc);
+}
