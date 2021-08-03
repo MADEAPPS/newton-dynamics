@@ -134,8 +134,8 @@ class ndHeightfieldMesh : public ndDemoMesh
 			normal = normal.Normalize();
 			points[i].m_posit = glVector3(GLfloat(heightfield[i].m_x), GLfloat(heightfield[i].m_y), GLfloat(heightfield[i].m_z));
 			points[i].m_normal = glVector3(GLfloat(normal.m_x), GLfloat(normal.m_y), GLfloat(normal.m_z));
-			points[i].m_uv.m_u = points[i].m_posit.m_x * uvScale;
-			points[i].m_uv.m_v = points[i].m_posit.m_z * uvScale;
+			points[i].m_uv.m_u = GLfloat(points[i].m_posit.m_x * uvScale);
+			points[i].m_uv.m_v = GLfloat(points[i].m_posit.m_z * uvScale);
 		}
 	}
 };

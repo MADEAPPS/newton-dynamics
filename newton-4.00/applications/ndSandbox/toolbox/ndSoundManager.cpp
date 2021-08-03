@@ -461,9 +461,9 @@ void ndSoundManager::Update(ndWorld* const, dFloat32 timestep)
 			// set Listener position
 			ALfloat listenerPosit[3];
 			m_posit = matrix.m_posit;
-			listenerPosit[0] = matrix.m_posit.m_x;
-			listenerPosit[1] = matrix.m_posit.m_y;
-			listenerPosit[2] = matrix.m_posit.m_z;
+			listenerPosit[0] = ALfloat(matrix.m_posit.m_x);
+			listenerPosit[1] = ALfloat(matrix.m_posit.m_y);
+			listenerPosit[2] = ALfloat(matrix.m_posit.m_z);
 			alListenerfv(AL_POSITION, listenerPosit);
 			dAssert(alGetError() == AL_NO_ERROR);
 		}
@@ -475,9 +475,9 @@ void ndSoundManager::Update(ndWorld* const, dFloat32 timestep)
 			// estimate listener velocity, by using camera previous location
 			m_veloc = veloc;
 			ALfloat listenerVeloc[3];
-			listenerVeloc[0] = veloc.m_x;
-			listenerVeloc[1] = veloc.m_y;
-			listenerVeloc[2] = veloc.m_z;
+			listenerVeloc[0] = ALfloat(veloc.m_x);
+			listenerVeloc[1] = ALfloat(veloc.m_y);
+			listenerVeloc[2] = ALfloat(veloc.m_z);
 			alListenerfv(AL_VELOCITY, listenerVeloc);
 			dAssert(alGetError() == AL_NO_ERROR);
 		}

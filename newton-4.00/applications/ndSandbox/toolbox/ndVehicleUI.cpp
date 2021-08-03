@@ -307,15 +307,17 @@ void ndVehicleUI::RenderGageUI(ndDemoEntityManager* const uscene, const GLuint t
 		//
 		minAngle *= -dDegreeToRad;
 		maxAngle *= -dDegreeToRad;
-		//
+		
 		dFloat32 angle = minAngle + (maxAngle - minAngle) * cparam;
 
 		dMatrix modm(dRollMatrix(-angle));
-		dVector color(1.0f, 1.0f, 1.0f, 1.0f);
+		glVector4 color(GLfloat(1.0f), GLfloat(1.0f), GLfloat(1.0f), GLfloat(1.0f));
 
-		glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ProjMtx"), 1, GL_FALSE, &aprojm[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ModMtx"), 1, GL_FALSE, &modm[0][0]);
-		glUniform1f(glGetUniformLocation(m_shaderHandle, "ptsize"), ptsize);
+		glMatrix glModm(modm);
+		glMatrix glAprojm(aprojm);
+		glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ProjMtx"), 1, GL_FALSE, &glAprojm[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ModMtx"), 1, GL_FALSE, &glModm[0][0]);
+		glUniform1f(glGetUniformLocation(m_shaderHandle, "ptsize"), GLfloat(ptsize));
 		glUniform4fv(glGetUniformLocation(m_shaderHandle, "color"), 1, &color[0]);
 
 		glBindVertexArray(m_vaoSta);
@@ -364,7 +366,7 @@ void ndVehicleUI::RenderGearUI(ndDemoEntityManager* const uscene, const dInt32 g
 		dFloat32 u1 = u0 + uwith;
 		dFloat32 xy1 = 10.0f;
 
-		dVector color;
+		glVector4 color;
 		if (gearid == 0)
 		{
 			color = dVector(1.0f, 0.5f, 0.0f, 1.0f);
@@ -378,9 +380,11 @@ void ndVehicleUI::RenderGearUI(ndDemoEntityManager* const uscene, const dInt32 g
 			color = dVector(0.0f, 1.0f, 0.0f, 1.0f);
 		}
 
-		glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ProjMtx"), 1, GL_FALSE, &aprojm[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ModMtx"), 1, GL_FALSE, &origin[0][0]);
-		glUniform1f(glGetUniformLocation(m_shaderHandle, "ptsize"), xy1);
+		glMatrix glOrigin(origin);
+		glMatrix glAprojm(aprojm);
+		glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ProjMtx"), 1, GL_FALSE, &glAprojm[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(m_shaderHandle, "ModMtx"), 1, GL_FALSE, &glOrigin[0][0]);
+		glUniform1f(glGetUniformLocation(m_shaderHandle, "ptsize"), GLfloat(xy1));
 		glUniform4fv(glGetUniformLocation(m_shaderHandle, "color"), 1, &color[0]);
 
 		glBindVertexArray(m_vaoDyn);
@@ -391,11 +395,11 @@ void ndVehicleUI::RenderGearUI(ndDemoEntityManager* const uscene, const dInt32 g
 		//
 		glBindBuffer(GL_ARRAY_BUFFER, m_vboDyn);
 
-		m_vertDyn[0].m_uv.m_u = u0;
-		m_vertDyn[1].m_uv.m_u = u0;
+		m_vertDyn[0].m_uv.m_u = GLfloat(u0);
+		m_vertDyn[1].m_uv.m_u = GLfloat(u0);
 
-		m_vertDyn[2].m_uv.m_u = u1;
-		m_vertDyn[3].m_uv.m_u = u1;
+		m_vertDyn[2].m_uv.m_u = GLfloat(u1);
+		m_vertDyn[3].m_uv.m_u = GLfloat(u1);
 
 		// Bind and update the dynamic buffer uv data 
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(m_vertDyn), &m_vertDyn[0]);
