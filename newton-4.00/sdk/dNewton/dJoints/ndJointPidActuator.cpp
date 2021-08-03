@@ -273,7 +273,14 @@ dFloat32 regularizer = 0.005f;
 		pin = pin.Scale(dFloat32(1.0f) / dirMag);
 		dFloat32 angle = dFloat32(2.0f) * dAtan2(dirMag, dq.m_w);
 
-		AddAngularRowJacobian(desc, pin, angle);
+		dMatrix basis(pin);
+		AddAngularRowJacobian(desc, basis[0], angle);
+		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+
+		AddAngularRowJacobian(desc, basis[1], dFloat32 (0.0f));
+		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+
+		AddAngularRowJacobian(desc, basis[2], dFloat32(0.0f));
 		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
 	}
 	else
