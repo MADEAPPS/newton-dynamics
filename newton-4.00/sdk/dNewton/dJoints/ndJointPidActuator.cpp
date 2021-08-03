@@ -304,9 +304,9 @@ void ndJointPidActuator::JacobianDerivative(ndConstraintDescritor& desc)
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-m_targetPitch = 30.0f * dDegreeToRad;
-m_targetYaw = 35.0f * dDegreeToRad;
-m_targetRoll = 45.0f * dDegreeToRad;
+//m_targetPitch = 30.0f * dDegreeToRad;
+//m_targetYaw = 35.0f * dDegreeToRad;
+//m_targetRoll = 45.0f * dDegreeToRad;
 
 	m_localMatrix0 = m_baseMatrix * dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll);
 	CalculateGlobalMatrix(matrix0, matrix1);
