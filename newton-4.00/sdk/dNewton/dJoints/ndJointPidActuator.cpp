@@ -153,7 +153,8 @@ void ndJointPidActuator::SubmitAngularAxisCartesianApproximation(const dMatrix& 
 	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
 	if (coneAngle > m_maxConeAngle)
 	{
-		// two rows to restrict rotation around around the parent coordinate system
+		dAssert(m_maxConeAngle == dFloat32(0.0f));
+		// two rows to restrict rotation around the parent coordinate system
 		dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 		AddAngularRowJacobian(desc, matrix1.m_up, angle0);
 
