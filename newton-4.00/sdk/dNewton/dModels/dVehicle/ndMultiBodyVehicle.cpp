@@ -615,7 +615,7 @@ dFloat32 ndMultiBodyVehicle::ndDownForce::CalculateFactor(const ndSpeedForcePair
 {
 	const ndSpeedForcePair* const entry1 = entry0 + 1;
 	dFloat32 num = dMax(entry1->m_forceFactor - entry0->m_forceFactor, dFloat32 (0.0f));
-	dFloat32 den = dMax (dAbs (entry1->m_speed - entry0->m_speed), 1.0f);
+	dFloat32 den = dMax (dAbs (entry1->m_speed - entry0->m_speed), dFloat32 (1.0f));
 	return num / (den * den);
 }
 

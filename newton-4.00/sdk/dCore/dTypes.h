@@ -342,14 +342,16 @@ class dAtomic
 
 	T fetch_add(T val)
 	{
+		T ret = m_val;
 		m_val += val;
-		return m_val - val;
+		return ret;
 	}
 
 	T fetch_sub(T val)
 	{
+		T ret = m_val;
 		m_val -= val;
-		return m_val + val;
+		return ret;
 	}
 
 	bool compare_exchange_weak(T oldValue, T newValue)
