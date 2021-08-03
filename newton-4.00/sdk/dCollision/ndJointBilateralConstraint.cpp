@@ -368,35 +368,9 @@ void ndJointBilateralConstraint::SetMassSpringDamperAcceleration(ndConstraintDes
 
 	const dFloat32 relPosit = desc.m_penetration[index];
 	const dFloat32 relVeloc = -(veloc0.DotProduct(jacobian0.m_linear) + veloc1.DotProduct(jacobian1.m_linear) + omega0.DotProduct(jacobian0.m_angular) + omega1.DotProduct(jacobian1.m_angular)).GetScalar();
-#if 0	
-	const dMatrix& invInertia0 = m_body0->m_invWorldInertiaMatrix;
-	const dMatrix& invInertia1 = m_body1->m_invWorldInertiaMatrix;
-	const dVector invMass0(m_body0->m_invMass[3]);
-	const dVector invMass1(m_body1->m_invMass[3]);
 
-	ndJacobian jacobian0InvMass;
-	ndJacobian jacobian1InvMass;
-	jacobian0InvMass.m_linear = jacobian0.m_linear * invMass0;
-	jacobian0InvMass.m_angular = invInertia0.RotateVector(jacobian0.m_angular);
-	jacobian1InvMass.m_linear = jacobian1.m_linear * invMass1;
-	jacobian1InvMass.m_angular = invInertia1.RotateVector(jacobian1.m_angular);
-	const dVector tmpDiag(
-		jacobian0InvMass.m_linear * jacobian0.m_linear + jacobian0InvMass.m_angular * jacobian0.m_angular +
-		jacobian1InvMass.m_linear * jacobian1.m_linear + jacobian1InvMass.m_angular * jacobian1.m_angular);
-	const dFloat32 diag = tmpDiag.AddHorizontal().GetScalar();
-
-	//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
-	const dFloat32 dt = desc.m_timestep;
-	const dFloat32 ks = dAbs(spring);
-	const dFloat32 kd = dAbs(damper);
-	const dFloat32 ksd = dt * ks;
-	const dFloat32 den = dt * (kd + ksd);
-	const dFloat32 r = diag / den;
-	const dFloat32 accel = ks * relPosit + kd * relVeloc + ksd * relVeloc;
-#else
 	const dFloat32 r = dClamp(regularizer, dFloat32(1.e-3f), dFloat32(0.99f));
 	const dFloat32 accel = -CalculateSpringDamperAcceleration(desc.m_timestep, spring, relPosit, damper, relVeloc);
-#endif
 	
 	desc.m_diagonalRegularizer[index] = r;
 	SetMotorAcceleration(desc, accel);

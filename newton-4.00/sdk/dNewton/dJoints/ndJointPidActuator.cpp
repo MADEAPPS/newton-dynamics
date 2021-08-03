@@ -14,7 +14,8 @@
 #include "ndJointPidActuator.h"
 
 ndJointPidActuator::ndJointPidActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
+	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
+	,m_targetRotation()
 	,m_maxConeAngle(dFloat32(1.0e10f))
 	,m_minTwistAngle(-dFloat32(1.0e10f))
 	,m_maxTwistAngle(dFloat32(1.0e10f))
@@ -151,8 +152,15 @@ void ndJointPidActuator::DebugJoint(ndConstraintDebugCallback& debugCallback) co
 void ndJointPidActuator::SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
-	if (coneAngle > m_maxConeAngle)
+	if (coneAngle >= m_maxConeAngle)
+	//if (coneAngle >= dFloat32 (0.0f))
 	{
+		//this is a hinge joint
+		dFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
+		AddAngularRowJacobian(desc, matrix0.m_front, pitchAngle);
+		SetMassSpringDamperAcceleration(desc, 0.1f, dFloat32(100.0f), 10.0f);
+
+		// apply cone limits
 		dAssert(m_maxConeAngle == dFloat32(0.0f));
 		// two rows to restrict rotation around the parent coordinate system
 		dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
@@ -160,6 +168,10 @@ void ndJointPidActuator::SubmitAngularAxisCartesianApproximation(const dMatrix& 
 
 		dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 		AddAngularRowJacobian(desc, matrix1.m_right, angle1);
+	}
+	else
+	{
+		dAssert(0);
 	}
 
 	dFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
@@ -193,11 +205,6 @@ void ndJointPidActuator::SubmitTwistAngle(const dVector& pin, dFloat32 angle, nd
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetHighFriction(desc, dFloat32(0.0f));
 		}
-		//else if (m_twistFriction > dFloat32(0.0f))
-		//{
-		//	AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
-		//	SetMassSpringDamperAcceleration(desc, m_twistFrictionRegularizer, dFloat32(0.0f), m_twistFriction);
-		//}
 	}
 }
 
@@ -220,15 +227,9 @@ void ndJointPidActuator::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix
 		SetHighFriction(desc, dFloat32(0.0f));
 
 		AddAngularRowJacobian(desc, sideDir, 0.0f);
+		SetHighFriction(desc, dFloat32(1.0e10f));
+		SetLowerFriction(desc, dFloat32(-1.0e10f));
 	}
-	//else
-	//{
-	//	AddAngularRowJacobian(desc, lateralDir, dFloat32(0.0f));
-	//	SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, dFloat32(0.0f), m_coneFriction);
-	//
-	//	AddAngularRowJacobian(desc, sideDir, 0.0f);
-	//	SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, dFloat32(0.0f), m_coneFriction);
-	//}
 
 	dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 	dFloat32 pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);

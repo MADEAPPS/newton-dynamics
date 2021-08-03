@@ -43,16 +43,11 @@ protected:
 	void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix07, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
+	dQuaternion m_targetRotation;
 	dFloat32 m_maxConeAngle;
-	//dFloat32 m_coneFriction;
 	dFloat32 m_minTwistAngle;
 	dFloat32 m_maxTwistAngle;
-	//dFloat32 m_twistFriction;
-	//dFloat32 m_coneFrictionRegularizer;
-	//dFloat32 m_twistFrictionRegularizer;
 };
-
-
 
 #endif 
 

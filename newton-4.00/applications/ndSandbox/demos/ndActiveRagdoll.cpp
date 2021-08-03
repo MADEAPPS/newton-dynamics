@@ -102,7 +102,7 @@ static dActiveJointDefinition jointsDefinition[] =
 	//{ "mixamorig:Neck", 16, 31, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 
 	{ "mixamorig:RightUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+	//{ "mixamorig:RightLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 
 	//{ "mixamorig:LeftUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 	//{ "mixamorig:LeftLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
@@ -243,7 +243,8 @@ class ndActiveRagdollModel : public ndCharacter
 		dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 		ndJointPidActuator* const joint = jointNode->GetJoint();
 
-		joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
+		//joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
+		joint->SetConeLimit(0.0f);
 		joint->SetConeFriction(0.05f, definition.m_friction);
 		
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
