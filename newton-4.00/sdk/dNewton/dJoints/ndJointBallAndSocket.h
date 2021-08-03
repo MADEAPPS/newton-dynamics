@@ -38,9 +38,9 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
-	virtual void SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
-	virtual void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
-	virtual void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix07, const dMatrix& matrix1, ndConstraintDescritor& desc);
+	void SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
+	void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
+	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix07, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
 	dFloat32 m_maxConeAngle;
 	dFloat32 m_coneFriction;
