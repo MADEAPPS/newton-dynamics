@@ -481,6 +481,7 @@ class dVector
 	D_CORE_API static dVector m_yMask;
 	D_CORE_API static dVector m_zMask;
 	D_CORE_API static dVector m_wMask;
+	D_CORE_API static dVector m_xyzwMask;
 	D_CORE_API static dVector m_epsilon;
 	D_CORE_API static dVector m_signMask;
 	D_CORE_API static dVector m_triplexMask;
@@ -949,6 +950,7 @@ class dVector
 		D_CORE_API static dBigVector m_yMask;
 		D_CORE_API static dBigVector m_zMask;
 		D_CORE_API static dBigVector m_wMask;
+		D_CORE_API static dBigVector m_xyzwMask;
 		D_CORE_API static dBigVector m_epsilon;
 		D_CORE_API static dBigVector m_signMask;
 		D_CORE_API static dBigVector m_triplexMask;
@@ -1352,7 +1354,7 @@ class dVector
 		{
 			// (((b ^ a) & mask)^a)
 			return  dBigVector(_mm_xor_pd(m_typeLow, _mm_and_pd(mask.m_typeLow, _mm_xor_pd(m_typeLow, data.m_typeLow))),
-								_mm_xor_pd(m_typeHigh, _mm_and_pd(mask.m_typeHigh, _mm_xor_pd(m_typeHigh, data.m_typeHigh))));
+							   _mm_xor_pd(m_typeHigh, _mm_and_pd(mask.m_typeHigh, _mm_xor_pd(m_typeHigh, data.m_typeHigh))));
 		}
 
 		D_INLINE dBigVector ShiftRight() const
@@ -1496,6 +1498,7 @@ class dVector
 		D_CORE_API static dBigVector m_yMask;
 		D_CORE_API static dBigVector m_zMask;
 		D_CORE_API static dBigVector m_wMask;
+		D_CORE_API static dBigVector m_xyzwMask;
 		D_CORE_API static dBigVector m_epsilon;
 		D_CORE_API static dBigVector m_signMask;
 		D_CORE_API static dBigVector m_triplexMask;

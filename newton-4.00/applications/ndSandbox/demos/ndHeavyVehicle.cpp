@@ -932,21 +932,21 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 
 	//ndHeavyMultiBodyVehicle* const vehicle = new ndTractorVehicle(scene, tractorDesc, matrix);
 	//ndHeavyMultiBodyVehicle* const vehicle = new ndLav25Vehicle(scene, lav25Desc, matrix);
-	//ndHeavyMultiBodyVehicle* const vehicle = new ndBigRigVehicle(scene, bigRigDesc, matrix);
-	//scene->GetWorld()->AddModel(vehicle);
-	//vehicle->SetAsPlayer(scene);
-	//scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle);
+	ndHeavyMultiBodyVehicle* const vehicle = new ndBigRigVehicle(scene, bigRigDesc, matrix);
+	scene->GetWorld()->AddModel(vehicle);
+	vehicle->SetAsPlayer(scene);
+	scene->Set2DDisplayRenderFunction(ndHeavyMultiBodyVehicle::RenderHelp, ndHeavyMultiBodyVehicle::RenderUI, vehicle);
 	
-	//matrix.m_posit.m_x += 6.0f;
-	//matrix.m_posit.m_z += 6.0f;
-	//scene->GetWorld()->AddModel(new ndLav25Vehicle(scene, lav25Desc, matrix));
-	//
-	//matrix.m_posit.m_z -= 12.0f;
-	//scene->GetWorld()->AddModel(new ndTractorVehicle(scene, tractorDesc, matrix));
+	matrix.m_posit.m_x += 6.0f;
+	matrix.m_posit.m_z += 6.0f;
+	scene->GetWorld()->AddModel(new ndLav25Vehicle(scene, lav25Desc, matrix));
+	
+	matrix.m_posit.m_z -= 12.0f;
+	scene->GetWorld()->AddModel(new ndTractorVehicle(scene, tractorDesc, matrix));
 	
 	matrix.m_posit.m_x += 15.0f;
 	matrix.m_posit.m_z += 6.0f;
-	AddPlanks(scene, matrix.m_posit, 300.0f, 1);
+	AddPlanks(scene, matrix.m_posit, 300.0f, 5);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);

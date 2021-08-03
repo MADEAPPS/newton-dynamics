@@ -44,6 +44,12 @@
 		{
 		}
 
+		D_INLINE ndAvxFloat(const dInt32 val)
+			:m_low(_mm256_castsi256_pd(_mm256_set1_epi64x(dInt64(val))))
+			,m_high(_mm256_castsi256_pd(_mm256_set1_epi64x(dInt64(val))))
+		{
+		}
+				
 		D_INLINE ndAvxFloat(const __m256d low, const __m256d high)
 			:m_low(low)
 			,m_high(high)
@@ -204,6 +210,12 @@
 			:m_type(_mm256_set1_ps(val))
 		{
 		}
+
+		D_INLINE ndAvxFloat(const dInt32 val)
+			:m_type(_mm256_castsi256_ps(_mm256_set1_epi32(val)))
+		{
+		}
+
 
 		D_INLINE ndAvxFloat(const __m256 type)
 			: m_type(type)
@@ -885,7 +897,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	dArray<ndSoaMatrixElement>& soaMassMatrix = *(dArray<ndSoaMatrixElement>*)m_soaMassMatrixArray;
 	soaMassMatrix.SetCount(soaJointRowCount);
 	
-	dInt32 rowCount = 0;
+	dInt32 rowCount = 1;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = jointArray[i];
@@ -2024,11 +2036,9 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 			const dInt32 jointCount = jointArray.GetCount();
 			const dInt32 mask = -dInt32(D_AVX_WORD_GROUP_SIZE);
 			const dInt32* const soaJointRows = &me->m_soaJointRows[0];
-			//const dInt32 soaJointCountBatches = soaJointCount / D_AVX_WORD_GROUP_SIZE;
 			const dInt32 soaJointCountBatches = ((jointCount + D_AVX_WORD_GROUP_SIZE - 1) & mask) / D_AVX_WORD_GROUP_SIZE;
 
 			const ndConstraint* const * jointArrayPtr = &jointArray[0];
-			//ndSoaMatrixElement* const massMatrix = &me->m_soaMassMatrix[0];
 			dArray<ndSoaMatrixElement>& massMatrix = *(dArray<ndSoaMatrixElement>*)me->m_soaMassMatrixArray;
 			for (dInt32 i = threadIndex; i < soaJointCountBatches; i += threadCount)
 			{
@@ -2505,12 +2515,10 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			m_jointArray = &jointArray[0];
 
 			const dInt32* const soaJointRows = &me->m_soaJointRows[0];
-			//ndSoaMatrixElement* const soaMassMatrix = &me->m_soaMassMatrix[0];
 			dArray<ndSoaMatrixElement>& soaMassMatrixArray = *(dArray<ndSoaMatrixElement>*)me->m_soaMassMatrixArray;
 			ndSoaMatrixElement* const soaMassMatrix = &soaMassMatrixArray[0];
 
-			dInt32 temp = -1;
-			m_mask = ndAvxFloat(*(dFloat32*)(&temp));
+			m_mask = ndAvxFloat(dInt32(-1));
 			const dInt32 mask = -dInt32(D_AVX_WORD_GROUP_SIZE);
 			const dInt32 soaJointCount = ((jointCount + D_AVX_WORD_GROUP_SIZE - 1) & mask) / D_AVX_WORD_GROUP_SIZE;
 			me->ClearJacobianBuffer(bodyCount, m_outputForces);

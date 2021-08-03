@@ -221,12 +221,6 @@ void ndBodyDynamic::IntegrateGyroSubstep(const dVector& timestep)
 		const dMatrix matrix(m_gyroRotation, dVector::m_wOne);
 
 		const dVector localOmega(matrix.UnrotateVector(m_omega));
-		//const dVector localAngularMomentum(m_mass * localOmega);
-		//const dVector angularMomentum(matrix.RotateVector(localAngularMomentum));
-		//
-		//m_gyroTorque = m_omega.CrossProduct(angularMomentum);
-		//m_gyroAlpha = m_invWorldInertiaMatrix.RotateVector(m_gyroTorque);
-
 		const dVector localGyroTorque(localOmega.CrossProduct(m_mass * localOmega));
 		m_gyroTorque = matrix.RotateVector(localGyroTorque);
 		m_gyroAlpha = matrix.RotateVector(localGyroTorque * m_invMass);

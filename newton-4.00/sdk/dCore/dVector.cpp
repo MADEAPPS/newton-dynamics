@@ -30,6 +30,7 @@
 	dVector dVector::m_yMask(dInt32(0), dInt32(-1), dInt32(0), dInt32(0));
 	dVector dVector::m_zMask(dInt32(0), dInt32(0), dInt32(-1), dInt32(0));
 	dVector dVector::m_wMask(dInt32(0), dInt32(0), dInt32(0), dInt32(-1));
+	dVector dVector::m_xyzwMask(dInt32(-1), dInt32(-1), dInt32(-1), dInt32(-1));
 	dVector dVector::m_triplexMask(dInt32(-1), dInt32(-1), dInt32(-1), dInt32(0));
 	dVector dVector::m_signMask(dVector(dInt32(-1), dInt32(-1), dInt32(-1), dInt32(-1)).ShiftRightLogical(1));
 
@@ -58,6 +59,7 @@ dBigVector dBigVector::m_xMask (dInt32 (-1), dInt32 ( 0),	dInt32 ( 0), dInt32 ( 
 dBigVector dBigVector::m_yMask (dInt32 ( 0), dInt32 (-1),	dInt32 ( 0), dInt32 ( 0));
 dBigVector dBigVector::m_zMask (dInt32 ( 0), dInt32 ( 0),	dInt32 (-1), dInt32 ( 0));
 dBigVector dBigVector::m_wMask (dInt32 ( 0), dInt32 ( 0),	dInt32 ( 0), dInt32 (-1));
+dBigVector dBigVector::m_xyzwMask (dInt32(-1), dInt32(-1), dInt32(-1), dInt32(-1));
 
 dSpatialVector dSpatialVector::m_zero (dFloat32 (0.0f));
 

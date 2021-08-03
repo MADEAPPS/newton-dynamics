@@ -543,7 +543,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 	}
 	m_soaMassMatrix.SetCount(soaJointRowCount);
 
-	dInt32 rowCount = 0;
+	dInt32 rowCount = 1;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = jointArray[i];
@@ -1637,7 +1637,6 @@ void ndDynamicsUpdateSoa::CalculateJointsAcceleration()
 			const dInt32 jointCount = jointArray.GetCount();
 			const dInt32 mask = -dInt32(D_SOA_WORD_GROUP_SIZE);
 			const dInt32* const soaJointRows = &me->m_soaJointRows[0];
-			//const dInt32 soaJointCountBatches = soaJointCount / D_SOA_WORD_GROUP_SIZE;
 			const dInt32 soaJointCountBatches = ((jointCount + D_SOA_WORD_GROUP_SIZE - 1) & mask) / D_SOA_WORD_GROUP_SIZE;
 
 			const ndConstraint* const * jointArrayPtr = &jointArray[0];
@@ -2119,8 +2118,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			const dInt32* const soaJointRows = &me->m_soaJointRows[0];
 			ndSoaMatrixElement* const soaMassMatrix = &me->m_soaMassMatrix[0];
 
-			dInt32 temp = -1;
-			m_mask = dVector(*(dFloat32*)(&temp));
+			m_mask = dVector::m_xyzwMask;
 			const dInt32 mask = -dInt32(D_SOA_WORD_GROUP_SIZE);
 			const dInt32 soaJointCount = ((jointCount + D_SOA_WORD_GROUP_SIZE - 1) & mask) / D_SOA_WORD_GROUP_SIZE;
 			me->ClearJacobianBuffer(bodyCount, m_outputForces);
@@ -2238,6 +2236,9 @@ void ndDynamicsUpdateSoa::Update()
 {
 	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
+
+static int xxxxx;
+xxxxx++;
 
 	BuildIsland();
 	if (m_islands.GetCount())
