@@ -101,8 +101,8 @@ static dActiveJointDefinition jointsDefinition[] =
 	//{ "mixamorig:Spine2", 8, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 	//{ "mixamorig:Neck", 16, 31, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 
-	//{ "mixamorig:RightUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	//{ "mixamorig:RightLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+	{ "mixamorig:RightUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 
 	//{ "mixamorig:LeftUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 	//{ "mixamorig:LeftLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
@@ -139,62 +139,60 @@ class ndActiveRagdollModel : public ndCharacter
 		dInt32 stack = 0;
 		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
 		
-		//ndBodyDynamic* parentBones[32];
-		//ndDemoEntity* childEntities[32];
-		//for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) 
-		//{
-		//	childEntities[stack] = child;
-		//	parentBones[stack] = rootBody;
-		//	stack++;
-		//}
-		//
-		//dInt32 bodyCount = 1;
-		//ndBodyDynamic* bodyArray[1024];
-		//bodyArray[0] = rootBody;
-		//
-		//// walk model hierarchic adding all children designed as rigid body bones. 
-		//while (stack) 
-		//{
-		//	stack--;
-		//	ndBodyDynamic* parentBone = parentBones[stack];
-		//	ndDemoEntity* const childEntity = childEntities[stack];
-		//	const char* const name = childEntity->GetName().GetStr();
-		//	//dTrace(("name: %s\n", name));
-		//	for (dInt32 i = 0; i < definitionCount; i++) 
-		//	{
-		//		if (!strcmp(jointsDefinition[i].m_boneName, name)) 
-		//		{
-		//			ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
-		//			bodyArray[bodyCount] = childBody;
-		//			bodyCount++;
-		//
-		//			// connect this body part to its parentBody with a ragdoll joint
-		//			ConnectBodyParts(world, childBody, parentBone, jointsDefinition[i]);
-
-		//			parentBone = childBody;
-		//			break;
-		//		}
-		//	}
-		//
-		//	for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
-		//	{
-		//		childEntities[stack] = child;
-		//		parentBones[stack] = parentBone;
-		//		stack++;
-		//	}
-		//}
-		//
-		//SetModelMass(100.0f, bodyCount, bodyArray);
-		//
-		//for (dInt32 i = 0; i < bodyCount; i++)
-		//{
-		//	ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
-		//	if (ent->GetName() == "mixamorig:Hips") 
-		//	{
-		//		world->AddJoint(new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody()));
-		//		break;
-		//	}
-		//}
+		ndDemoEntity* childEntities[32];
+		ndCharacterIkNode* parentBones[32];
+		for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) 
+		{
+			childEntities[stack] = child;
+			parentBones[stack] = rootNode;
+			stack++;
+		}
+		
+		dInt32 bodyCount = 1;
+		ndBodyDynamic* bodyArray[1024];
+		bodyArray[0] = rootNode->GetBody();
+		
+		// walk model hierarchic adding all children designed as rigid body bones. 
+		while (stack) 
+		{
+			stack--;
+			ndCharacterIkNode* parentBone = parentBones[stack];
+			ndDemoEntity* const childEntity = childEntities[stack];
+			const char* const name = childEntity->GetName().GetStr();
+			//dTrace(("name: %s\n", name));
+			for (dInt32 i = 0; i < definitionCount; i++) 
+			{
+				if (!strcmp(jointsDefinition[i].m_boneName, name)) 
+				{
+					ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone->GetBody());
+					bodyArray[bodyCount] = childBody;
+					bodyCount++;
+		
+					// connect this body part to its parentBody with a ragdoll joint
+					parentBone = ConnectBodyParts(world, childBody, parentBone, jointsDefinition[i]);
+					break;
+				}
+			}
+		
+			for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
+			{
+				childEntities[stack] = child;
+				parentBones[stack] = parentBone;
+				stack++;
+			}
+		}
+		
+		SetModelMass(100.0f, bodyCount, bodyArray);
+		
+		for (dInt32 i = 0; i < bodyCount; i++)
+		{
+			ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
+			if (ent->GetName() == "mixamorig:Hips") 
+			{
+				world->AddJoint(new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody()));
+				break;
+			}
+		}
 	}
 
 	void SetModelMass(dFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray) const
@@ -235,14 +233,16 @@ class ndActiveRagdollModel : public ndCharacter
 		return body;
 	}
 
-	void ConnectBodyParts(ndWorld* const world, ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const dActiveJointDefinition& definition) const
+	ndCharacterIkNode* ConnectBodyParts(ndWorld* const world, ndBodyDynamic* const childBody, ndCharacterIkNode* const parentNode, const dActiveJointDefinition& definition)
 	{
 		dMatrix matrix(childBody->GetMatrix());
 		dActiveJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
-		ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinAndPivotInGlobalSpace, childBody, parentBody);
+		ndCharacterIkOrganicLimbNode* const jointNode = CreateOrganicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
 	
 		dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
+		ndJointBallAndSocketActuator* const joint = jointNode->GetJoint();
+
 		joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
 		joint->SetConeFriction(0.05f, definition.m_friction);
 		
@@ -250,6 +250,7 @@ class ndActiveRagdollModel : public ndCharacter
 		joint->SetTwistFriction(0.05f, definition.m_friction);
 
 		world->AddJoint(joint);
+		return jointNode;
 	}
 
 	void Update(ndWorld* const, dFloat32) 

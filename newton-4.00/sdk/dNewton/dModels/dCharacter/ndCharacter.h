@@ -28,6 +28,7 @@
 class ndWorld;
 class ndCharacterIkNode;
 class ndCharacterIkRootNode;
+class ndCharacterIkOrganicLimbNode;
 
 class ndCharacter: public ndModel
 {
@@ -39,7 +40,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API virtual ~ndCharacter ();
 
 	D_NEWTON_API ndCharacterIkRootNode* CreateRoot(ndBodyDynamic* const body);
-	
+	D_NEWTON_API ndCharacterIkOrganicLimbNode* CreateOrganicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterIkNode* const parent);
 	
 	ndCharacter* GetAsCharacter();
 

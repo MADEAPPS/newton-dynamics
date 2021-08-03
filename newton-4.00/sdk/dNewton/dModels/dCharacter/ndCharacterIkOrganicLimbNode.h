@@ -26,23 +26,30 @@
 #include "ndCharacterIkNode.h"
 #include "ndJointBallAndSocketActuator.h"
 
-class ndCharacterIkOrganicLimbNode: public ndCharacterIkNode, public ndJointBallAndSocketActuator
+class ndCharacterIkOrganicLimbNode: public ndCharacterIkNode 
 {
 	public:
 	D_CLASS_RELECTION(ndCharacterIkOrganicLimbNode);
 
-	D_NEWTON_API ndCharacterIkOrganicLimbNode(ndBodyDynamic* const body, ndCharacterIkNode* const parent);
+	D_NEWTON_API ndCharacterIkOrganicLimbNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterIkNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterIkOrganicLimbNode ();
 
 	virtual ndBodyDynamic* GetBody() const;
+	virtual ndJointBallAndSocketActuator* GetJoint() const;
 
 	protected:
 	ndBodyDynamic* m_body;
+	ndJointBallAndSocketActuator* m_joint;
 };
 
 inline ndBodyDynamic* ndCharacterIkOrganicLimbNode::GetBody() const
 {
 	return m_body;
+}
+
+inline ndJointBallAndSocketActuator* ndCharacterIkOrganicLimbNode::GetJoint() const
+{
+	return m_joint;
 }
 
 #endif

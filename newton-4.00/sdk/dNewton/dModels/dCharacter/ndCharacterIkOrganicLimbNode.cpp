@@ -25,9 +25,9 @@
 #include "ndBodyDynamic.h"
 #include "ndCharacterIkOrganicLimbNode.h"
 
-ndCharacterIkOrganicLimbNode::ndCharacterIkOrganicLimbNode(ndBodyDynamic* const body, ndCharacterIkNode* const parent)
+ndCharacterIkOrganicLimbNode::ndCharacterIkOrganicLimbNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterIkNode* const parent)
 	:ndCharacterIkNode(parent)
-	,ndJointBallAndSocketActuator(dGetIdentityMatrix(), body, parent->GetBody())
+	,m_joint(new ndJointBallAndSocketActuator(matrixInGlobalScape, body, parent->GetBody()))
 	,m_body(body)
 {
 }

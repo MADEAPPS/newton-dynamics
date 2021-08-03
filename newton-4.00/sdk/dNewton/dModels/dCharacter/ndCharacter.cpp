@@ -25,6 +25,7 @@
 #include "ndCharacter.h"
 #include "ndCharacterIkNode.h"
 #include "ndCharacterIkRootNode.h"
+#include "ndCharacterIkOrganicLimbNode.h"
 
 ndCharacter::ndCharacter()
 	:ndModel()
@@ -49,6 +50,12 @@ ndCharacterIkRootNode* ndCharacter::CreateRoot(ndBodyDynamic* const body)
 {
 	m_rootNode = new ndCharacterIkRootNode(this, body);
 	return m_rootNode;
+}
+
+ndCharacterIkOrganicLimbNode* ndCharacter::CreateOrganicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterIkNode* const parent)
+{
+	ndCharacterIkOrganicLimbNode* const limb = new ndCharacterIkOrganicLimbNode(matrixInGlobalScape, body, parent);
+	return limb;
 }
 
 //void ndCharacter::Debug(ndConstraintDebugCallback& context) const

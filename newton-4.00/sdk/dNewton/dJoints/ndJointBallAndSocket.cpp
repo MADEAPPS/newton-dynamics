@@ -23,29 +23,11 @@ ndJointBallAndSocket::ndJointBallAndSocket(const dMatrix& pinAndPivotFrame, ndBo
 	,m_coneFrictionRegularizer(dFloat32(0.0f))
 	,m_twistFrictionRegularizer(dFloat32(0.0f))
 {
-	//CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
 ndJointBallAndSocket::~ndJointBallAndSocket()
 {
 }
-
-#if 0
-ndJointBallAndSocket::ndJointBallAndSocket(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	//:dCustomJoint(6, child, parent)
-	,m_twistAngle(0.0f)
-	,m_minTwistAngle(-180.0f * dDegreeToRad)
-	,m_maxTwistAngle(180.0f * dDegreeToRad)
-	,m_maxConeAngle(D_BALL_AND_SOCKED_MAX_CONE_ANGLE)
-	,m_coneFriction(0.0f)
-	,m_twistFriction(0.0f)
-{
-	dMatrix	dummy;
-	CalculateLocalMatrix(pinAndPivotFrame0, m_localMatrix0, dummy);
-	CalculateLocalMatrix(pinAndPivotFrame1, dummy, m_localMatrix1);
-}
-
-#endif
 
 void ndJointBallAndSocket::SetConeFriction(dFloat32 regularizer, dFloat32 viscousFriction)
 {
