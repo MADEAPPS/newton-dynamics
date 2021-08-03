@@ -27,9 +27,6 @@
 #include <float.h>
 #include <ctype.h>
 
-#define USE_STATIC_MESHES_DEBUG_COLLISION
-//#define USE_TEST_ALL_FACE_USER_RAYCAST_CALLBACK
-
 #ifdef _WIN32
 	#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 
@@ -60,7 +57,7 @@
 
 #endif
 	
-#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
+#if defined (__linux__ )
 	#include <stdlib.h>
 	#include <unistd.h>
 	#include <time.h>
@@ -76,7 +73,7 @@
 	#include <AL/alc.h>
 #endif
 
-#ifdef _MACOSX_VER
+#if defined (__APPLE__)
 	#include <CoreFoundation/CoreFoundation.h> 
 	#include <unistd.h>
 	#include <GL/glew.h>
@@ -88,7 +85,7 @@
 	#include <OpenAl/alc.h>
 #endif
 
-// some thierd party lib includes
+// some third party libraries includes here
 #include <ofbx.h>
 
 // SDK includes
@@ -113,8 +110,6 @@
 	#endif
 #endif
 
-
-//#define DEMO_CHECK_ASYN_UPDATE
 #define dRAND_MAX		0x00ffffff
 
 dFloat32 dRand();
@@ -127,7 +122,6 @@ inline dInt32 dTwosPower (dInt32 x)
 	for (; rval < x; rval *= 2);
 	return rval;
 }
-
 
 // for some reason specifying a relative does not seem to work in Linus
 // and i have to specify a absolute path

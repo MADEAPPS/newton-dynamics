@@ -47,6 +47,7 @@ protected:
 	dFloat32 m_maxConeAngle;
 	dFloat32 m_minTwistAngle;
 	dFloat32 m_maxTwistAngle;
+	dFloat32 m_integralError;
 };
 
 #endif 

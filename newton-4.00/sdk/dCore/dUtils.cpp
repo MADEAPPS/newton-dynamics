@@ -54,16 +54,16 @@ dFloatExceptions::dFloatExceptions(dUnsigned32 mask)
 	dControlFP(m_mask & ~mask, _MCW_EM);
 #endif
 
-#ifdef _MACOSX_VER
+#if defined (__APPLE__)
 	#ifndef IOS
 		fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
 	#endif
-#elif (defined (_WIN_64_VER) || defined (_WIN_32_VER))
+#elif defined (WIN32)
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 	dInt32 crs = _mm_getcsr();
 	dInt32 sseDenormalMask = _MM_FLUSH_ZERO_MASK | _MM_MASK_DENORM;
 	_mm_setcsr(crs | sseDenormalMask);
-#elif defined (_ARM_VER)
+#elif (defined (_M_ARM) || defined (_M_ARM64))
 	//_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 	#pragma message ("warning!!! do not forget to set flush to zero for arm cpus")
 #endif
@@ -423,7 +423,7 @@ dInt32 dVertexListToIndexList(dFloat64* const vertList, dInt32 strideInBytes, dI
 #ifndef D_USE_THREAD_EMULATION
 void dSpinLock::Delay(dInt32& exp)
 {
-	#if defined (_WIN_32_VER) || defined (_WIN_64_VER)
+	#if defined (WIN32)
 		// adding exponential pause delay
 		for (dInt32 i = 0; i < exp; i++)
 		{

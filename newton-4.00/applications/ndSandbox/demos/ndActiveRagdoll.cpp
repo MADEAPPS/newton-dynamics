@@ -243,8 +243,8 @@ class ndActiveRagdollModel : public ndCharacter
 		dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 		ndJointPidActuator* const joint = jointNode->GetJoint();
 
-		//joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
-		joint->SetConeLimit(0.0f);
+		joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
+		//joint->SetConeLimit(0.0f);
 		joint->SetConeFriction(0.05f, definition.m_friction);
 		
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);

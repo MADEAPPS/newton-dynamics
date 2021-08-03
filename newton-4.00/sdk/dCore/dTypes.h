@@ -23,28 +23,12 @@
 #define __D_TYPES_H__
 
 #ifdef _MSC_VER 
-    #if defined (_M_ARM) || defined (_M_ARM64)
-		#ifndef _ARM_VER
-			#define _ARM_VER
-		#endif
-	#elif defined (_M_X64)
-		#ifndef _WIN_64_VER
-			#define _WIN_64_VER
-		#endif
-	#elif defined (_M_IX86)
-		#ifndef _WIN_32_VER
-			#define _WIN_32_VER
-		#endif
-	#else 
-		#error target platform not defined
-	#endif
-
 	#if _MSC_VER >= 1400
 		#define HAVE_STRUCT_TIMESPEC
 	#endif
 #endif
 
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || (defined (_MSC_VER ) && defined (_ARM_VER)) )
+#if (defined (WIN32) || defined (_M_ARM) || defined (_M_ARM64))
 	#include <io.h>
 	#include <stdint.h>
 	#include <direct.h>
@@ -99,7 +83,7 @@
 	#include <process.h>
 #endif
 
-#if (defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (__MINGW32__) || defined (__MINGW64__))
+#if (defined (__linux__ ) || defined (__MINGW32__) || defined (__MINGW64__))
   // CMake defines NDEBUG for _not_ debug builds. Therefore, set
   // Newton's _DEBUG flag only when NDEBUG is not defined.
 
@@ -120,7 +104,7 @@
 	#endif
 #endif
 
-#ifdef _MACOSX_VER
+#if defined (__APPLE__)
 	#include <unistd.h>
 	#include <sys/sysctl.h>
     #include <assert.h> 
@@ -154,7 +138,7 @@
 // if the and application want to control threading at the application level 
 //#define D_USE_THREAD_EMULATION
 
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+#if defined (WIN32)
 	#if _MSC_VER < 1700
 		#ifndef D_USE_THREAD_EMULATION
 			#define D_USE_THREAD_EMULATION
@@ -166,9 +150,7 @@
 #ifdef D_DISABLE_ASSERT
 	#define dAssert(x)
 #else 
-	#if defined (_WIN_32_VER) || defined (_WIN_64_VER) 
-		#define dAssert(x) _ASSERTE(x)
-	#elif defined (_MSC_VER ) && defined (_ARM_VER) 
+	#if (defined (WIN32) || defined (_M_ARM) || defined (_M_ARM64))
 		#define dAssert(x) _ASSERTE(x)
 	#else
 		#ifdef _DEBUG
@@ -226,43 +208,23 @@
 	#define D_CORE_API 
 #endif
 
-#if ((defined (_WIN_32_VER) || defined (_WIN_64_VER)) && (_MSC_VER  >= 1600))
-	typedef int8_t dInt8;
-	typedef uint8_t dUnsigned8;
-
-	typedef int16_t dInt16;
-	typedef uint16_t dUnsigned16;
-
-	typedef int32_t dInt32;
-	typedef uint32_t dUnsigned32;
-
-	typedef int64_t dInt64;
-	typedef uint64_t dUnsigned64;
-#else
-	typedef char dInt8;
-	typedef unsigned char dUnsigned8;
-
-	typedef short dInt16;
-	typedef unsigned short dUnsigned16;
-
-	typedef int dInt32;
-	typedef unsigned dUnsigned32;
-	typedef unsigned int dUnsigned32;
-
-	typedef long long dInt64;
-	typedef unsigned long long dUnsigned64;
-	typedef double dFloat64;
-#endif
+typedef int8_t dInt8;
+typedef uint8_t dUnsigned8;
+typedef int16_t dInt16;
+typedef uint16_t dUnsigned16;
+typedef int32_t dInt32;
+typedef uint32_t dUnsigned32;
+typedef int64_t dInt64;
+typedef uint64_t dUnsigned64;
 
 typedef double dFloat64;
-
 #ifdef D_NEWTON_USE_DOUBLE
 	typedef double dFloat32;
 #else
 	typedef float dFloat32;
 #endif
 
-#define dPi		 	dFloat32 (3.141592f)
+#define dPi		 		dFloat32 (3.141592f)
 #define dEXP		 	dFloat32 (2.71828f)
 #define dEpsilon	  	dFloat32 (1.0e-5f)
 #define dDegreeToRad	dFloat32 (dPi / 180.0f)
@@ -284,12 +246,10 @@ typedef double dFloat64;
 #define dClearFP()		_clearfp() 
 #define dControlFP(x,y)	_controlfp(x,y)
 
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+#if (defined (WIN32) || defined (_M_ARM) || defined (_M_ARM64))
 	#define dCheckFloat(x) (_finite(x) && !_isnan(x))
-//	#define dCheckFloat(x) 1
 #else
 	#define dCheckFloat(x) (isfinite(x) && !isnan(x))
-//		#define dCheckFloat(x) 1
 #endif
 
 #define D_CLASS_RELECTION(Class)	\

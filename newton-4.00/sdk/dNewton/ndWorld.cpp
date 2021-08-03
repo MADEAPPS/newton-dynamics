@@ -454,7 +454,7 @@ void ndWorld::Save(const char* const path) const
 		ext = name;
 	}
 	ext[0] = 0;
-#if defined (_WIN_32_VER) || defined (_WIN_64_VER)
+#if defined (WIN32)
 	_mkdir(assetPath);
 #else
 	mkdir(assetPath, S_IRWXU);

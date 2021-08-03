@@ -131,7 +131,7 @@ void ndJointBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) 
 	if ((m_maxConeAngle > dFloat32 (0.0f)) && (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_ANGLE)) 
 	{
 		dVector color(dFloat32(0.3f), dFloat32(0.8f), dFloat32(0.0f), dFloat32(0.0f));
-		dVector point(radius * dCos(m_maxConeAngle), radius * dSin(m_maxConeAngle), 0.0f, 0.0f);
+		dVector point(radius * dCos(m_maxConeAngle), radius * dSin(m_maxConeAngle), dFloat32 (0.0f), dFloat32(0.0f));
 		dFloat32 angleStep = dPi * dFloat32(2.0f) / subdiv;
 	
 		dFloat32 angle0 = dFloat32 (0.0f);
@@ -208,19 +208,18 @@ void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 	dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
 	lateralDir = lateralDir.Normalize();
-	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
-	dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
-	
-	dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+	const dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
+	const dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+	const dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
 	if (coneAngle > m_maxConeAngle)
 	{ 
-		AddAngularRowJacobian(desc, lateralDir, 0.0f);
+		AddAngularRowJacobian(desc, lateralDir, dFloat32 (0.0f));
 		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		const dFloat32 penetration = coneAngle - m_maxConeAngle;
 		const dFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), dFloat32(1.0f));
 		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 		SetHighFriction(desc, dFloat32(0.0f));
-	
+		
 		AddAngularRowJacobian(desc, sideDir, dFloat32 (0.0f));
 	}
 	else
@@ -232,8 +231,8 @@ void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 		SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, dFloat32(0.0f), m_coneFriction);
 	}
 
-	dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
-	dFloat32 pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
+	const dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+	const dFloat32 pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
 
