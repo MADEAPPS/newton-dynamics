@@ -24,7 +24,7 @@
 
 #include "ndNewtonStdafx.h"
 #include "ndCharacterIkNode.h"
-#include "ndJointBallAndSocketActuator.h"
+#include "ndJointPidActuator.h"
 
 class ndCharacterIkOrganicLimbNode: public ndCharacterIkNode 
 {
@@ -35,11 +35,11 @@ class ndCharacterIkOrganicLimbNode: public ndCharacterIkNode
 	D_NEWTON_API virtual ~ndCharacterIkOrganicLimbNode ();
 
 	virtual ndBodyDynamic* GetBody() const;
-	virtual ndJointBallAndSocketActuator* GetJoint() const;
+	virtual ndJointPidActuator* GetJoint() const;
 
 	protected:
 	ndBodyDynamic* m_body;
-	ndJointBallAndSocketActuator* m_joint;
+	ndJointPidActuator* m_joint;
 };
 
 inline ndBodyDynamic* ndCharacterIkOrganicLimbNode::GetBody() const
@@ -47,7 +47,7 @@ inline ndBodyDynamic* ndCharacterIkOrganicLimbNode::GetBody() const
 	return m_body;
 }
 
-inline ndJointBallAndSocketActuator* ndCharacterIkOrganicLimbNode::GetJoint() const
+inline ndJointPidActuator* ndCharacterIkOrganicLimbNode::GetJoint() const
 {
 	return m_joint;
 }

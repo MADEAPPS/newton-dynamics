@@ -15,13 +15,13 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBallAndSocket.h"
 
-class ndJointBallAndSocketActuator: public ndJointBallAndSocket
+class ndJointPidActuator: public ndJointBallAndSocket
 {
 	public:
-	D_CLASS_RELECTION(ndJointBallAndSocketActuator);
+	D_CLASS_RELECTION(ndJointPidActuator);
 
-	D_NEWTON_API ndJointBallAndSocketActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API virtual ~ndJointBallAndSocketActuator();
+	D_NEWTON_API ndJointPidActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndJointPidActuator();
 
 	//D_NEWTON_API dFloat32 GetMaxConeAngle() const;
 	//D_NEWTON_API void SetConeLimit(dFloat32 maxConeAngle);

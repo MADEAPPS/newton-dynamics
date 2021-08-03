@@ -241,7 +241,7 @@ class ndActiveRagdollModel : public ndCharacter
 		ndCharacterIkOrganicLimbNode* const jointNode = CreateOrganicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
 	
 		dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-		ndJointBallAndSocketActuator* const joint = jointNode->GetJoint();
+		ndJointPidActuator* const joint = jointNode->GetJoint();
 
 		joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
 		joint->SetConeFriction(0.05f, definition.m_friction);

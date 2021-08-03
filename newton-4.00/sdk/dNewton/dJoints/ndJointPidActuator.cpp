@@ -11,14 +11,14 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointBallAndSocketActuator.h"
+#include "ndJointPidActuator.h"
 
-ndJointBallAndSocketActuator::ndJointBallAndSocketActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointPidActuator::ndJointPidActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBallAndSocket(pinAndPivotFrame, child, parent)
 {
 }
 
-ndJointBallAndSocketActuator::~ndJointBallAndSocketActuator()
+ndJointPidActuator::~ndJointPidActuator()
 {
 }
 

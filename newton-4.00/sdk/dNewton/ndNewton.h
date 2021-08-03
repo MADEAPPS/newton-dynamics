@@ -59,11 +59,11 @@
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
 #include <ndDynamicsUpdate.h>
-
 #include <ndBodyParticleSet.h>
 #include <ndJointFollowPath.h>
 #include <ndCharacterIkNode.h>
 #include <ndJointDoubleHinge.h>
+#include <ndJointPidActuator.h>
 #include <ndJointFixDistance.h>
 #include <ndMultiBodyVehicle.h>
 #include <ndSkeletonContainer.h>
@@ -81,7 +81,6 @@
 #include <ndJointKinematicController.h>
 #include <ndMultiBodyVehicleTireJoint.h>
 #include <ndMultiBodyVehicleTorsionBar.h>
-#include <ndJointBallAndSocketActuator.h>
 #include <ndCharacterIkOrganicLimbNode.h>
 #include <ndMultiBodyVehicleDifferential.h>
 #include <ndMultiBodyVehicleDifferentialAxle.h>
