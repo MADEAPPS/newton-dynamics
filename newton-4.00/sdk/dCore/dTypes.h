@@ -310,7 +310,7 @@ class dAtomic
 {
 	public:
 	dAtomic<T>()
-		: m_val(T(val))
+		: m_val(T(0))
 	{
 	}
 
