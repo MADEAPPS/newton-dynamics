@@ -45,9 +45,9 @@
 //#define DEFAULT_SCENE	7		// static mesh collision 
 //#define DEFAULT_SCENE	8		// setting basic joints
 //#define DEFAULT_SCENE	9		// setting basic rag doll
-#define DEFAULT_SCENE	10		// setting active rag doll
+//#define DEFAULT_SCENE	10		// setting active rag doll
 //#define DEFAULT_SCENE	11		// setting basic vehicle
-//#define DEFAULT_SCENE	12		// setting heavy vehicle
+#define DEFAULT_SCENE	12		// setting heavy vehicle
 //#define DEFAULT_SCENE	13		// conservation of angular momentum 
 //#define DEFAULT_SCENE	14		// simple voronoi fracture
 //#define DEFAULT_SCENE	15		// basic voronoi fracture

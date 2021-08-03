@@ -671,7 +671,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//scene->GetWorld()->AddModel(new ndBasicMultiBodyVehicle(scene, monterTruckDesc, matrix));
 	//
 	//matrix.m_posit.m_x += 15.0f;
-	//AddPlanks(scene, matrix.m_posit, 60.0f);
+	//AddPlanks(scene, matrix.m_posit, 60.0f, 5);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
