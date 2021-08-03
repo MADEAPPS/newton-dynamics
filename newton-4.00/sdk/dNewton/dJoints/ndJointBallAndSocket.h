@@ -17,6 +17,7 @@
 
 #define D_BALL_AND_SOCKED_MAX_ANGLE	dFloat32 (120.0f * dDegreeToRad)
 #define D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED dFloat32 (0.1f) 
+#define D_BALL_AND_SOCKED_PENETRATION_LIMIT dFloat32 (10.0f * dDegreeToRad) 
 
 class ndJointBallAndSocket: public ndJointBilateralConstraint
 {

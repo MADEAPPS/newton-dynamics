@@ -17,6 +17,7 @@
 
 #define D_PID_MAX_ANGLE	dFloat32 (120.0f * dDegreeToRad)
 #define D_PID_PENETRATION_RECOVERY_SPEED dFloat32 (0.1f) 
+#define D_PID_PENETRATION_LIMIT dFloat32 (10.0f * dDegreeToRad) 
 
 class ndJointPidActuator : public ndJointBilateralConstraint
 {
@@ -43,12 +44,12 @@ protected:
 	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix07, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
 	dFloat32 m_maxConeAngle;
-	dFloat32 m_coneFriction;
+	//dFloat32 m_coneFriction;
 	dFloat32 m_minTwistAngle;
 	dFloat32 m_maxTwistAngle;
-	dFloat32 m_twistFriction;
-	dFloat32 m_coneFrictionRegularizer;
-	dFloat32 m_twistFrictionRegularizer;
+	//dFloat32 m_twistFriction;
+	//dFloat32 m_coneFrictionRegularizer;
+	//dFloat32 m_twistFrictionRegularizer;
 };
 
 

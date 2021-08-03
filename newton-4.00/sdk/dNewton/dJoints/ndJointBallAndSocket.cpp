@@ -60,7 +60,7 @@ dFloat32 ndJointBallAndSocket::GetMaxConeAngle() const
 
 void ndJointBallAndSocket::SetConeLimit(dFloat32 maxConeAngle)
 {
-	m_maxConeAngle = dAbs (maxConeAngle);
+	m_maxConeAngle = dMin (dAbs (maxConeAngle), D_BALL_AND_SOCKED_MAX_ANGLE * dFloat32 (0.999f));
 }
 
 void ndJointBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) const
@@ -182,7 +182,7 @@ void ndJointBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat32 angle, 
 			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const dFloat32 penetration = angle - m_minTwistAngle;
-			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_MAX_ANGLE), dFloat32(1.0f));
+			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), dFloat32(1.0f));
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetLowerFriction(desc, dFloat32 (0.0f));
 		}
@@ -191,7 +191,7 @@ void ndJointBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat32 angle, 
 			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const dFloat32 penetration = angle - m_maxTwistAngle;
-			const dFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_MAX_ANGLE), dFloat32(1.0f));
+			const dFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), dFloat32(1.0f));
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetHighFriction(desc, dFloat32 (0.0f));
 		}
@@ -217,18 +217,18 @@ void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 		AddAngularRowJacobian(desc, lateralDir, 0.0f);
 		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		const dFloat32 penetration = coneAngle - m_maxConeAngle;
-		const dFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_MAX_ANGLE), dFloat32(1.0f));
+		const dFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), dFloat32(1.0f));
 		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 		SetHighFriction(desc, dFloat32(0.0f));
 	
-		AddAngularRowJacobian(desc, sideDir, 0.0f);
+		AddAngularRowJacobian(desc, sideDir, dFloat32 (0.0f));
 	}
 	else
 	{
 		AddAngularRowJacobian(desc, lateralDir, dFloat32 (0.0f));
 		SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, dFloat32(0.0f), m_coneFriction);
 
-		AddAngularRowJacobian(desc, sideDir, 0.0f);
+		AddAngularRowJacobian(desc, sideDir, dFloat32 (0.0f));
 		SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, dFloat32(0.0f), m_coneFriction);
 	}
 

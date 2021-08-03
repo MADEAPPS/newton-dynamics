@@ -15,13 +15,9 @@
 
 ndJointPidActuator::ndJointPidActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
-	, m_maxConeAngle(dFloat32(1.0e10f))
-	, m_coneFriction(dFloat32(1.0e10f))
-	, m_minTwistAngle(-dFloat32(1.0e10f))
-	, m_maxTwistAngle(dFloat32(1.0e10f))
-	, m_twistFriction(dFloat32(0.0f))
-	, m_coneFrictionRegularizer(dFloat32(0.0f))
-	, m_twistFrictionRegularizer(dFloat32(0.0f))
+	,m_maxConeAngle(dFloat32(1.0e10f))
+	,m_minTwistAngle(-dFloat32(1.0e10f))
+	,m_maxTwistAngle(dFloat32(1.0e10f))
 {
 }
 
@@ -29,10 +25,11 @@ ndJointPidActuator::~ndJointPidActuator()
 {
 }
 
-void ndJointPidActuator::SetConeFriction(dFloat32 regularizer, dFloat32 viscousFriction)
+//void ndJointPidActuator::SetConeFriction(dFloat32 regularizer, dFloat32 viscousFriction)
+void ndJointPidActuator::SetConeFriction(dFloat32, dFloat32)
 {
-	m_coneFriction = dAbs(viscousFriction);
-	m_coneFrictionRegularizer = dMax(dAbs(regularizer), dFloat32(0.01f));
+	//m_coneFriction = dAbs(viscousFriction);
+	//m_coneFrictionRegularizer = dMax(dAbs(regularizer), dFloat32(0.01f));
 }
 
 void ndJointPidActuator::SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle)
@@ -41,10 +38,10 @@ void ndJointPidActuator::SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle)
 	m_maxTwistAngle = dAbs(maxAngle);
 }
 
-void ndJointPidActuator::SetTwistFriction(dFloat32 regularizer, dFloat32 viscousFriction)
+void ndJointPidActuator::SetTwistFriction(dFloat32, dFloat32)
 {
-	m_twistFriction = dAbs(viscousFriction);
-	m_twistFrictionRegularizer = dMax(dAbs(regularizer), dFloat32(0.01f));
+	//m_twistFriction = dAbs(viscousFriction);
+	//m_twistFrictionRegularizer = dMax(dAbs(regularizer), dFloat32(0.01f));
 }
 
 void ndJointPidActuator::GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const
@@ -60,7 +57,7 @@ dFloat32 ndJointPidActuator::GetMaxConeAngle() const
 
 void ndJointPidActuator::SetConeLimit(dFloat32 maxConeAngle)
 {
-	m_maxConeAngle = dAbs(maxConeAngle);
+	m_maxConeAngle = dMin (dAbs(maxConeAngle), D_PID_MAX_ANGLE * dFloat32 (0.999f));
 }
 
 void ndJointPidActuator::DebugJoint(ndConstraintDebugCallback& debugCallback) const
@@ -182,7 +179,7 @@ void ndJointPidActuator::SubmitTwistAngle(const dVector& pin, dFloat32 angle, nd
 			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const dFloat32 penetration = angle - m_minTwistAngle;
-			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PID_MAX_ANGLE), dFloat32(1.0f));
+			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PID_PENETRATION_LIMIT), dFloat32(1.0f));
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetLowerFriction(desc, dFloat32(0.0f));
 		}
@@ -191,15 +188,15 @@ void ndJointPidActuator::SubmitTwistAngle(const dVector& pin, dFloat32 angle, nd
 			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const dFloat32 penetration = angle - m_maxTwistAngle;
-			const dFloat32 recoveringAceel = desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PID_MAX_ANGLE), dFloat32(1.0f));
+			const dFloat32 recoveringAceel = desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PID_PENETRATION_LIMIT), dFloat32(1.0f));
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetHighFriction(desc, dFloat32(0.0f));
 		}
-		else if (m_twistFriction > dFloat32(0.0f))
-		{
-			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
-			SetMassSpringDamperAcceleration(desc, m_twistFrictionRegularizer, dFloat32(0.0f), m_twistFriction);
-		}
+		//else if (m_twistFriction > dFloat32(0.0f))
+		//{
+		//	AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
+		//	SetMassSpringDamperAcceleration(desc, m_twistFrictionRegularizer, dFloat32(0.0f), m_twistFriction);
+		//}
 	}
 }
 
@@ -217,20 +214,20 @@ void ndJointPidActuator::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix
 		AddAngularRowJacobian(desc, lateralDir, 0.0f);
 		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		const dFloat32 penetration = coneAngle - m_maxConeAngle;
-		const dFloat32 recoveringAceel = desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PID_MAX_ANGLE), dFloat32(1.0f));
+		const dFloat32 recoveringAceel = desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PID_PENETRATION_LIMIT), dFloat32(1.0f));
 		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 		SetHighFriction(desc, dFloat32(0.0f));
 
 		AddAngularRowJacobian(desc, sideDir, 0.0f);
 	}
-	else
-	{
-		AddAngularRowJacobian(desc, lateralDir, dFloat32(0.0f));
-		SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, dFloat32(0.0f), m_coneFriction);
-
-		AddAngularRowJacobian(desc, sideDir, 0.0f);
-		SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, dFloat32(0.0f), m_coneFriction);
-	}
+	//else
+	//{
+	//	AddAngularRowJacobian(desc, lateralDir, dFloat32(0.0f));
+	//	SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, dFloat32(0.0f), m_coneFriction);
+	//
+	//	AddAngularRowJacobian(desc, sideDir, 0.0f);
+	//	SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, dFloat32(0.0f), m_coneFriction);
+	//}
 
 	dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 	dFloat32 pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
