@@ -15,7 +15,10 @@
 
 ndJointPidActuator::ndJointPidActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
-	,m_targetRotation()
+	,m_baseMatrix(m_localMatrix0)
+	,m_targetPitch(dFloat32 (0.0f))
+	,m_targetYaw(dFloat32(0.0f))
+	,m_targetRoll(dFloat32(0.0f))
 	,m_maxConeAngle(dFloat32(1.0e10f))
 	,m_minTwistAngle(-dFloat32(1.0e10f))
 	,m_maxTwistAngle(dFloat32(1.0e10f))
@@ -165,9 +168,9 @@ void ndJointPidActuator::SubmitAngularAxisCartesianApproximation(const dMatrix& 
 		dFloat32 kd = 30.0f;
 		dFloat32 ks = m_integralError * ki + kp;
 		//dFloat32 ks = kp;
-		dTrace(("ks=%f kd=%f\n", ks, kd));
+		//dTrace(("ks=%f kd=%f\n", ks, kd));
 		AddAngularRowJacobian(desc, matrix0.m_front, pitchAngle);
-		SetMassSpringDamperAcceleration(desc, 0.1f, ks, kd);
+		SetMassSpringDamperAcceleration(desc, 0.005f, ks, kd);
 
 		// apply cone limits
 		// two rows to restrict rotation around the parent coordinate system
@@ -179,7 +182,7 @@ void ndJointPidActuator::SubmitAngularAxisCartesianApproximation(const dMatrix& 
 	}
 	else
 	{
-		//dAssert(0);
+		SubmitPidRotation(matrix0, matrix1, desc);
 	}
 
 	dFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
@@ -223,6 +226,9 @@ void ndJointPidActuator::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix
 	lateralDir = lateralDir.Normalize();
 	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
 	dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+
+SubmitPidRotation(matrix0, matrix1, desc);
+
 	if (coneAngle > m_maxConeAngle)
 	{
 		AddAngularRowJacobian(desc, lateralDir, 0.0f);
@@ -243,10 +249,55 @@ void ndJointPidActuator::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix
 	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
 
+void ndJointPidActuator::SubmitPidRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+{
+	dQuaternion q0(matrix0);
+	dQuaternion q1(matrix1);
+	if (q1.DotProduct(q0).GetScalar() < dFloat32(0.0f))
+	{
+		q0 = q0.Scale (dFloat32 (-1.0f));
+	}
+
+	dQuaternion dq(q0.Inverse() * q1);
+	dVector pin(dq.m_x, dq.m_y, dq.m_z, dFloat32(0.0f));
+
+dFloat32 ks = 1000.0f;
+dFloat32 kd = 100.0f;
+dFloat32 regularizer = 0.005f;
+
+	dFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
+	if (dirMag2 > dFloat32(dFloat32(1.0e-7f)))
+	{
+		dFloat32 dirMag = dSqrt(dirMag2);
+		pin = pin.Scale(dFloat32(1.0f) / dirMag);
+		dFloat32 angle = dFloat32(2.0f) * dAtan2(dirMag, dq.m_w);
+
+		AddAngularRowJacobian(desc, pin, angle);
+		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+	}
+	else
+	{
+		dFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
+		AddAngularRowJacobian(desc, matrix1[0], pitchAngle);
+		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+		
+		dFloat32 yawAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[1]);
+		AddAngularRowJacobian(desc, matrix1[1], yawAngle);
+		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+		
+		dFloat32 rollAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[2]);
+		AddAngularRowJacobian(desc, matrix1[2], rollAngle);
+		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+	}
+}
+
 void ndJointPidActuator::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
+
+m_targetYaw = -45.0f * dDegreeToRad;
+	m_localMatrix0 = dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll) * m_baseMatrix;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);

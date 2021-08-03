@@ -376,7 +376,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 
 void ndJointKinematicController::CheckSleep() const
 {
-GetBody0()->SetSleepState(false);
+	GetBody0()->SetSleepState(false);
 
 	//dAssert(0);
 	//dMatrix matrix0;

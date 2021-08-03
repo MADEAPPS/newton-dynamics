@@ -41,9 +41,13 @@ protected:
 
 	void SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
 	void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
-	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix07, const dMatrix& matrix1, ndConstraintDescritor& desc);
+	void SubmitPidRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
+	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
-	dQuaternion m_targetRotation;
+	dMatrix m_baseMatrix;
+	dFloat32 m_targetPitch;
+	dFloat32 m_targetYaw;
+	dFloat32 m_targetRoll;
 	dFloat32 m_maxConeAngle;
 	dFloat32 m_minTwistAngle;
 	dFloat32 m_maxTwistAngle;
