@@ -222,13 +222,13 @@ void ndJointPidActuator::SubmitTwistAngle(const dVector& pin, dFloat32 angle, nd
 
 void ndJointPidActuator::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
+	SubmitPidRotation(matrix0, matrix1, desc);
+
 	dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
 	lateralDir = lateralDir.Normalize();
 	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
 	dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
-
-SubmitPidRotation(matrix0, matrix1, desc);
 
 	if (coneAngle > m_maxConeAngle)
 	{
@@ -238,11 +238,6 @@ SubmitPidRotation(matrix0, matrix1, desc);
 		const dFloat32 recoveringAceel = desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PID_PENETRATION_LIMIT), dFloat32(1.0f));
 		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 		SetHighFriction(desc, dFloat32(0.0f));
-
-		//dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
-		//AddAngularRowJacobian(desc, sideDir, 0.0f);
-		//SetHighFriction(desc, dFloat32(1.0e10f));
-		//SetLowerFriction(desc, dFloat32(-1.0e10f));
 	}
 
 	dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
