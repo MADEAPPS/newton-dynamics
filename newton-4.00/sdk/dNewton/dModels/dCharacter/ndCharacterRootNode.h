@@ -19,19 +19,36 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dCoreStdafx.h"
+#ifndef __D_CHARACTER_ROOT_NODE_H__
+#define __D_CHARACTER_ROOT_NODE_H__
+
 #include "ndNewtonStdafx.h"
-#include "ndCharacter.h"
-#include "ndBodyDynamic.h"
-#include "ndCharacterIkOrganicLimbNode.h"
+#include "ndCharacterLimbNode.h"
 
-ndCharacterIkOrganicLimbNode::ndCharacterIkOrganicLimbNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterIkNode* const parent)
-	:ndCharacterIkNode(parent)
-	,m_joint(new ndJointPid3dofActuator(matrixInGlobalScape, body, parent->GetBody()))
-	,m_body(body)
+class ndCharacterRootNode: public ndCharacterLimbNode
 {
+	public:
+	D_CLASS_RELECTION(ndCharacterRootNode);
+
+	D_NEWTON_API ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body);
+	D_NEWTON_API virtual ~ndCharacterRootNode ();
+
+	ndCharacter* GetOwner() const;
+	virtual ndBodyDynamic* GetBody() const;
+
+	protected:
+	ndCharacter* m_owner;
+	ndBodyDynamic* m_body;
+};
+
+inline ndCharacter* ndCharacterRootNode::GetOwner() const
+{
+	return m_owner;
 }
 
-ndCharacterIkOrganicLimbNode::~ndCharacterIkOrganicLimbNode()
+inline ndBodyDynamic* ndCharacterRootNode::GetBody() const
 {
+	return m_body;
 }
+
+#endif

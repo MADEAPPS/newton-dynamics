@@ -117,13 +117,13 @@ static dActiveJointDefinition jointsDefinition[] =
 	{ "mixamorig:LeftArm", dActiveJointDefinition::fowardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
 	{ "mixamorig:LeftForeArm", dActiveJointDefinition::fowardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
 	
-	{ "mixamorig:RightUpLeg", dActiveJointDefinition::fowardKinematic,{ -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightLeg", dActiveJointDefinition::fowardKinematic,{ -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-	{ "mixamorig:RightFoot", dActiveJointDefinition::fowardKinematic,{ 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightUpLeg", dActiveJointDefinition::inverseKinematic, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightLeg", dActiveJointDefinition::inverseKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+	{ "mixamorig:RightFoot", dActiveJointDefinition::inverseKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
 	
-	{ "mixamorig:LeftUpLeg", dActiveJointDefinition::fowardKinematic, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftLeg", dActiveJointDefinition::fowardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-	{ "mixamorig:LeftFoot", dActiveJointDefinition::fowardKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:LeftUpLeg", dActiveJointDefinition::inverseKinematic, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:LeftLeg", dActiveJointDefinition::inverseKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+	{ "mixamorig:LeftFoot", dActiveJointDefinition::inverseKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
 };
 
 class ndActiveRagdollModel : public ndCharacter
@@ -144,13 +144,13 @@ class ndActiveRagdollModel : public ndCharacter
 		// add the root body
 		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);
 		rootEntity->ResetMatrix(rootEntity->GetCurrentMatrix() * matrix);
-		ndCharacterIkRootNode* const rootNode = CreateRoot(CreateBodyPart(scene, rootEntity, nullptr));
+		ndCharacterRootNode* const rootNode = CreateRoot(CreateBodyPart(scene, rootEntity, nullptr));
 
 		dInt32 stack = 0;
 		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
 		
 		ndDemoEntity* childEntities[32];
-		ndCharacterIkNode* parentBones[32];
+		ndCharacterLimbNode* parentBones[32];
 		for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) 
 		{
 			childEntities[stack] = child;
@@ -166,7 +166,7 @@ class ndActiveRagdollModel : public ndCharacter
 		while (stack) 
 		{
 			stack--;
-			ndCharacterIkNode* parentBone = parentBones[stack];
+			ndCharacterLimbNode* parentBone = parentBones[stack];
 			ndDemoEntity* const childEntity = childEntities[stack];
 			const char* const name = childEntity->GetName().GetStr();
 			//dTrace(("name: %s\n", name));
@@ -243,25 +243,47 @@ class ndActiveRagdollModel : public ndCharacter
 		return body;
 	}
 
-	ndCharacterIkNode* ConnectBodyParts(ndWorld* const world, ndBodyDynamic* const childBody, ndCharacterIkNode* const parentNode, const dActiveJointDefinition& definition)
+	ndCharacterLimbNode* ConnectBodyParts(ndWorld* const world, ndBodyDynamic* const childBody, ndCharacterLimbNode* const parentNode, const dActiveJointDefinition& definition)
 	{
 		dMatrix matrix(childBody->GetMatrix());
 		dActiveJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
-		ndCharacterIkOrganicLimbNode* const jointNode = CreateOrganicFowardKinematicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
-	
-		dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-		ndJointPid3dofActuator* const joint = (ndJointPid3dofActuator*)jointNode->GetJoint();
 
-		joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
-		//joint->SetConeLimit(0.0f);
-		//joint->SetConeFriction(0.05f, definition.m_friction);
-		
-		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
-		//joint->SetTwistFriction(0.05f, definition.m_friction);
+		if (definition.m_limbType == dActiveJointDefinition::fowardKinematic)
+		{
+			ndCharacterFowardDynamicNode* const jointNode = CreateFowardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
 
-		world->AddJoint(joint);
-		return jointNode;
+			dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
+			ndJointPid3dofActuator* const joint = (ndJointPid3dofActuator*)jointNode->GetJoint();
+
+			joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
+			//joint->SetConeLimit(0.0f);
+			//joint->SetConeFriction(0.05f, definition.m_friction);
+
+			joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
+			//joint->SetTwistFriction(0.05f, definition.m_friction);
+
+			world->AddJoint(joint);
+			return jointNode;
+		}
+		else
+		{
+			ndCharacterFowardDynamicNode* const jointNode = CreateInverseDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
+
+			dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
+			ndJointPid3dofActuator* const joint = (ndJointPid3dofActuator*)jointNode->GetJoint();
+
+			joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
+			//joint->SetConeLimit(0.0f);
+			//joint->SetConeFriction(0.05f, definition.m_friction);
+
+			joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
+			//joint->SetTwistFriction(0.05f, definition.m_friction);
+
+			world->AddJoint(joint);
+			return jointNode;
+		}
+
 	}
 
 	void Update(ndWorld* const, dFloat32) 

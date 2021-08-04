@@ -1005,14 +1005,14 @@ class dVector
 
 		D_INLINE dFloat64& operator[] (dInt32 i)
 		{
-			dAssert(i < 6);
+			dAssert(i < 8);
 			dAssert(i >= 0);
 			return m_f[i];
 		}
 
 		D_INLINE const dFloat64& operator[] (dInt32 i) const
 		{
-			dAssert(i < 6);
+			dAssert(i < 8);
 			dAssert(i >= 0);
 			return m_f[i];
 		}

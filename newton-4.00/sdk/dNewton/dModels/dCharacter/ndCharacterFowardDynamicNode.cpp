@@ -22,13 +22,16 @@
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndCharacter.h"
-#include "ndCharacterIkEffectorNode.h"
+#include "ndBodyDynamic.h"
+#include "ndCharacterFowardDynamicNode.h"
 
-ndCharacterIkEffectorNode::ndCharacterIkEffectorNode(ndCharacterIkNode* const parent)
-	:ndCharacterIkNode(parent)
+ndCharacterFowardDynamicNode::ndCharacterFowardDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
+	:ndCharacterLimbNode(parent)
+	,m_joint(new ndJointPid3dofActuator(matrixInGlobalScape, body, parent->GetBody()))
+	,m_body(body)
 {
 }
 
-ndCharacterIkEffectorNode::~ndCharacterIkEffectorNode()
+ndCharacterFowardDynamicNode::~ndCharacterFowardDynamicNode()
 {
 }

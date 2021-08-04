@@ -26,9 +26,9 @@
 #include "ndModel.h"
 
 class ndWorld;
-class ndCharacterIkNode;
-class ndCharacterIkRootNode;
-class ndCharacterIkOrganicLimbNode;
+class ndCharacterLimbNode;
+class ndCharacterRootNode;
+class ndCharacterFowardDynamicNode;
 
 class ndCharacter: public ndModel
 {
@@ -39,8 +39,10 @@ class ndCharacter: public ndModel
 	D_NEWTON_API ndCharacter(const nd::TiXmlNode* const xmlNode);
 	D_NEWTON_API virtual ~ndCharacter ();
 
-	D_NEWTON_API ndCharacterIkRootNode* CreateRoot(ndBodyDynamic* const body);
-	D_NEWTON_API ndCharacterIkOrganicLimbNode* CreateOrganicFowardKinematicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterIkNode* const parent);
+	D_NEWTON_API ndCharacterRootNode* CreateRoot(ndBodyDynamic* const body);
+	D_NEWTON_API ndCharacterFowardDynamicNode* CreateFowardDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
+	D_NEWTON_API ndCharacterFowardDynamicNode* CreateInverseDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
+
 	
 	ndCharacter* GetAsCharacter();
 
@@ -49,7 +51,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API virtual void Update(ndWorld* const world, dFloat32 timestep);
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
 
-	ndCharacterIkRootNode* m_rootNode;
+	ndCharacterRootNode* m_rootNode;
 };
 
 inline ndCharacter* ndCharacter::GetAsCharacter()

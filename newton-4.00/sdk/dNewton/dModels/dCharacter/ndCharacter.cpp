@@ -23,9 +23,9 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndCharacter.h"
-#include "ndCharacterIkNode.h"
-#include "ndCharacterIkRootNode.h"
-#include "ndCharacterIkOrganicLimbNode.h"
+#include "ndCharacterLimbNode.h"
+#include "ndCharacterRootNode.h"
+#include "ndCharacterFowardDynamicNode.h"
 
 ndCharacter::ndCharacter()
 	:ndModel()
@@ -46,15 +46,21 @@ ndCharacter::~ndCharacter()
 	}
 }
 
-ndCharacterIkRootNode* ndCharacter::CreateRoot(ndBodyDynamic* const body)
+ndCharacterRootNode* ndCharacter::CreateRoot(ndBodyDynamic* const body)
 {
-	m_rootNode = new ndCharacterIkRootNode(this, body);
+	m_rootNode = new ndCharacterRootNode(this, body);
 	return m_rootNode;
 }
 
-ndCharacterIkOrganicLimbNode* ndCharacter::CreateOrganicFowardKinematicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterIkNode* const parent)
+ndCharacterFowardDynamicNode* ndCharacter::CreateFowardDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
 {
-	ndCharacterIkOrganicLimbNode* const limb = new ndCharacterIkOrganicLimbNode(matrixInGlobalScape, body, parent);
+	ndCharacterFowardDynamicNode* const limb = new ndCharacterFowardDynamicNode(matrixInGlobalScape, body, parent);
+	return limb;
+}
+
+ndCharacterFowardDynamicNode* ndCharacter::CreateInverseDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
+{
+	ndCharacterFowardDynamicNode* const limb = new ndCharacterFowardDynamicNode(matrixInGlobalScape, body, parent);
 	return limb;
 }
 

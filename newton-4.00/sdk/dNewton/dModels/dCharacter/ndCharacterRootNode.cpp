@@ -21,24 +21,16 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndWorld.h"
-#include "ndCharacterIkNode.h"
+#include "ndCharacter.h"
+#include "ndCharacterRootNode.h"
 
-ndCharacterIkNode::ndCharacterIkNode(ndCharacterIkNode* const parent)
-	:dNodeHierarchy<ndCharacterIkNode>()
-{
-	if (parent)
-	{
-		Attach(parent);
-	}
-}
-
-ndCharacterIkNode::~ndCharacterIkNode()
+ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body)
+	:ndCharacterLimbNode(nullptr)
+	,m_owner(owner)
+	,m_body(body)
 {
 }
 
-dNodeBaseHierarchy* ndCharacterIkNode::CreateClone() const
+ndCharacterRootNode::~ndCharacterRootNode()
 {
-	dAssert(0);
-	return nullptr;
 }

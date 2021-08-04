@@ -22,15 +22,13 @@
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndCharacter.h"
-#include "ndCharacterIkRootNode.h"
+#include "ndCharacterEffectorNode.h"
 
-ndCharacterIkRootNode::ndCharacterIkRootNode(ndCharacter* const owner, ndBodyDynamic* const body)
-	:ndCharacterIkNode(nullptr)
-	,m_owner(owner)
-	,m_body(body)
+ndCharacterEffectorNode::ndCharacterEffectorNode(ndCharacterLimbNode* const parent)
+	:ndCharacterLimbNode(parent)
 {
 }
 
-ndCharacterIkRootNode::~ndCharacterIkRootNode()
+ndCharacterEffectorNode::~ndCharacterEffectorNode()
 {
 }

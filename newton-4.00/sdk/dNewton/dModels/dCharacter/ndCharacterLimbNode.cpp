@@ -19,36 +19,26 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CHARACTER_IK_ROOT_NODE_H__
-#define __D_CHARACTER_IK_ROOT_NODE_H__
-
+#include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndCharacterIkNode.h"
+#include "ndWorld.h"
+#include "ndCharacterLimbNode.h"
 
-class ndCharacterIkRootNode: public ndCharacterIkNode
+ndCharacterLimbNode::ndCharacterLimbNode(ndCharacterLimbNode* const parent)
+	:dNodeHierarchy<ndCharacterLimbNode>()
 {
-	public:
-	D_CLASS_RELECTION(ndCharacterIkRootNode);
-
-	D_NEWTON_API ndCharacterIkRootNode(ndCharacter* const owner, ndBodyDynamic* const body);
-	D_NEWTON_API virtual ~ndCharacterIkRootNode ();
-
-	ndCharacter* GetOwner() const;
-	virtual ndBodyDynamic* GetBody() const;
-
-	protected:
-	ndCharacter* m_owner;
-	ndBodyDynamic* m_body;
-};
-
-inline ndCharacter* ndCharacterIkRootNode::GetOwner() const
-{
-	return m_owner;
+	if (parent)
+	{
+		Attach(parent);
+	}
 }
 
-inline ndBodyDynamic* ndCharacterIkRootNode::GetBody() const
+ndCharacterLimbNode::~ndCharacterLimbNode()
 {
-	return m_body;
 }
 
-#endif
+dNodeBaseHierarchy* ndCharacterLimbNode::CreateClone() const
+{
+	dAssert(0);
+	return nullptr;
+}

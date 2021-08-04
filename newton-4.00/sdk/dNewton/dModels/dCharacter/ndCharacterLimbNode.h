@@ -19,20 +19,34 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CHARACTER_IK_EFFECTOR_NODE_H__
-#define __D_CHARACTER_IK_EFFECTOR_NODE_H__
+#ifndef __D_CHARACTER_LIMB_NODE_H__
+#define __D_CHARACTER_LIMB_NODE_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndCharacterIkNode.h"
+#include "ndModel.h"
 
-class ndCharacterIkEffectorNode: public ndCharacterIkNode
+class ndCharacter;
+class ndLimbJoint;
+
+class ndWorld;
+
+class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 {
 	public:
-	D_CLASS_RELECTION(ndCharacterIkEffectorNode);
+	D_CLASS_RELECTION(ndCharacterLimbNode);
 
-	D_NEWTON_API ndCharacterIkEffectorNode(ndCharacterIkNode* const parent);
-	D_NEWTON_API virtual ~ndCharacterIkEffectorNode ();
+	D_NEWTON_API ndCharacterLimbNode(ndCharacterLimbNode* const parent);
+	D_NEWTON_API virtual ~ndCharacterLimbNode ();
+
+	virtual ndBodyDynamic* GetBody() const;
+
+	protected:
+	D_NEWTON_API dNodeBaseHierarchy* CreateClone() const;
 };
 
+inline ndBodyDynamic* ndCharacterLimbNode::GetBody() const
+{
+	return nullptr;
+}
 
 #endif
