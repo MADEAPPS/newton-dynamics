@@ -32,6 +32,12 @@ file(GLOB HEADERS *.h dJoints/*.h)
 file(GLOB HEADERS *.h dModels/*.h)
 file(GLOB HEADERS *.h dModels/dVehicle/*.h)
 
+# exclude AVX files when disabled
+if(NOT NEWTON_ENABLE_AVX)
+	list(FILTER HEADERS EXCLUDE REGEX "(Avx)")
+	list(FILTER CPP_SOURCE EXCLUDE REGEX "(Avx)")
+endif()
+
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(./)
