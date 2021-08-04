@@ -23,6 +23,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacter.h"
 #include "ndBodyDynamic.h"
+#include "ndJointPid3dofActuator.h"
 #include "ndCharacterFowardDynamicNode.h"
 
 ndCharacterFowardDynamicNode::ndCharacterFowardDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)

@@ -270,7 +270,7 @@ class ndActiveRagdollModel : public ndCharacter
 		}
 		else
 		{
-			ndCharacterFowardDynamicNode* const jointNode = CreateInverseDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
+			ndCharacterInverseDynamicNode* const jointNode = CreateInverseDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
 
 			dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 			ndJointPid3dofActuator* const joint = (ndJointPid3dofActuator*)jointNode->GetJoint();

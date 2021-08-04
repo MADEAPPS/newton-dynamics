@@ -83,6 +83,7 @@
 #include <ndMultiBodyVehicleTireJoint.h>
 #include <ndMultiBodyVehicleTorsionBar.h>
 #include <ndCharacterFowardDynamicNode.h>
+#include <ndCharacterInverseDynamicNode.h>
 #include <ndMultiBodyVehicleDifferential.h>
 #include <ndMultiBodyVehicleDifferentialAxle.h>
 

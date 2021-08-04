@@ -19,21 +19,19 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CHARACTER_FORWARD_DYNAMICS_NODE_H__
-#define __D_CHARACTER_FORWARD_DYNAMICS_NODE_H__
+#ifndef __D_CHARACTER_INVERSE_DYNAMICS_NODE_H__
+#define __D_CHARACTER_INVERSE_DYNAMICS_NODE_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndCharacterLimbNode.h"
-//#include "ndJointPid3dofActuator.h"
 
-
-class ndCharacterFowardDynamicNode: public ndCharacterLimbNode 
+class ndCharacterInverseDynamicNode: public ndCharacterLimbNode 
 {
 	public:
-	D_CLASS_RELECTION(ndCharacterFowardDynamicNode);
+	D_CLASS_RELECTION(ndCharacterInverseDynamicNode);
 
-	D_NEWTON_API ndCharacterFowardDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
-	D_NEWTON_API virtual ~ndCharacterFowardDynamicNode ();
+	D_NEWTON_API ndCharacterInverseDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
+	D_NEWTON_API virtual ~ndCharacterInverseDynamicNode ();
 
 	virtual ndBodyDynamic* GetBody() const;
 	virtual ndJointBilateralConstraint* GetJoint() const;
@@ -43,12 +41,12 @@ class ndCharacterFowardDynamicNode: public ndCharacterLimbNode
 	ndJointBilateralConstraint* m_joint;
 };
 
-inline ndBodyDynamic* ndCharacterFowardDynamicNode::GetBody() const
+inline ndBodyDynamic* ndCharacterInverseDynamicNode::GetBody() const
 {
 	return m_body;
 }
 
-inline ndJointBilateralConstraint* ndCharacterFowardDynamicNode::GetJoint() const
+inline ndJointBilateralConstraint* ndCharacterInverseDynamicNode::GetJoint() const
 {
 	return m_joint;
 }

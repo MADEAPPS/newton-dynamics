@@ -25,10 +25,10 @@
 #include "ndNewtonStdafx.h"
 #include "ndModel.h"
 
+class ndWorld;
 class ndCharacter;
 class ndLimbJoint;
-
-class ndWorld;
+class ndJointBilateralConstraint;
 
 class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 {
@@ -39,12 +39,18 @@ class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 	D_NEWTON_API virtual ~ndCharacterLimbNode ();
 
 	virtual ndBodyDynamic* GetBody() const;
+	virtual ndJointBilateralConstraint* GetJoint() const;
 
 	protected:
 	D_NEWTON_API dNodeBaseHierarchy* CreateClone() const;
 };
 
 inline ndBodyDynamic* ndCharacterLimbNode::GetBody() const
+{
+	return nullptr;
+}
+
+inline ndJointBilateralConstraint* ndCharacterLimbNode::GetJoint() const
 {
 	return nullptr;
 }

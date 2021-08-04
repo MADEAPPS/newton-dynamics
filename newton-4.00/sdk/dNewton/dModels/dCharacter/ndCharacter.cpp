@@ -26,6 +26,7 @@
 #include "ndCharacterLimbNode.h"
 #include "ndCharacterRootNode.h"
 #include "ndCharacterFowardDynamicNode.h"
+#include "ndCharacterInverseDynamicNode.h"
 
 ndCharacter::ndCharacter()
 	:ndModel()
@@ -58,9 +59,9 @@ ndCharacterFowardDynamicNode* ndCharacter::CreateFowardDynamicLimb(const dMatrix
 	return limb;
 }
 
-ndCharacterFowardDynamicNode* ndCharacter::CreateInverseDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
+ndCharacterInverseDynamicNode* ndCharacter::CreateInverseDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
 {
-	ndCharacterFowardDynamicNode* const limb = new ndCharacterFowardDynamicNode(matrixInGlobalScape, body, parent);
+	ndCharacterInverseDynamicNode* const limb = new ndCharacterInverseDynamicNode(matrixInGlobalScape, body, parent);
 	return limb;
 }
 
