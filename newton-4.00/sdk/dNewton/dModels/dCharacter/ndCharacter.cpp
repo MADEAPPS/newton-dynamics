@@ -52,7 +52,7 @@ ndCharacterIkRootNode* ndCharacter::CreateRoot(ndBodyDynamic* const body)
 	return m_rootNode;
 }
 
-ndCharacterIkOrganicLimbNode* ndCharacter::CreateOrganicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterIkNode* const parent)
+ndCharacterIkOrganicLimbNode* ndCharacter::CreateOrganicFowardKinematicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterIkNode* const parent)
 {
 	ndCharacterIkOrganicLimbNode* const limb = new ndCharacterIkOrganicLimbNode(matrixInGlobalScape, body, parent);
 	return limb;

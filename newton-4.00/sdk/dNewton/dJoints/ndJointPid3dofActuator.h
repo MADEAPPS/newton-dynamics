@@ -9,23 +9,23 @@
 * freely
 */
 
-#ifndef __D_JOINT_PID_ACTUATOR_H__
-#define __D_JOINT_PID_ACTUATOR_H__
+#ifndef __D_JOINT_PID_3DOF_ACTUATOR_H__
+#define __D_JOINT_PID_3DOF_ACTUATOR_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
 #define D_PID_MAX_ANGLE	dFloat32 (120.0f * dDegreeToRad)
-#define D_PID_PENETRATION_RECOVERY_SPEED dFloat32 (0.1f) 
-#define D_PID_PENETRATION_LIMIT dFloat32 (10.0f * dDegreeToRad) 
+#define D_PID_PENETRATION_RECOVERY_ANGULAR_SPEED dFloat32 (0.1f) 
+#define D_PID_PENETRATION_ANGULAR_LIMIT dFloat32 (10.0f * dDegreeToRad) 
 
-class ndJointPidActuator : public ndJointBilateralConstraint
+class ndJointPid3dofActuator : public ndJointBilateralConstraint
 {
 	public:
-	D_CLASS_RELECTION(ndJointPidActuator);
+	D_CLASS_RELECTION(ndJointPid3dofActuator);
 
-	D_NEWTON_API ndJointPidActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API virtual ~ndJointPidActuator();
+	D_NEWTON_API ndJointPid3dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndJointPid3dofActuator();
 
 	D_NEWTON_API dFloat32 GetMaxConeAngle() const;
 	D_NEWTON_API void SetConeLimit(dFloat32 maxConeAngle);
@@ -35,13 +35,14 @@ class ndJointPidActuator : public ndJointBilateralConstraint
 	D_NEWTON_API void GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const;
 	D_NEWTON_API void SetTwistFriction(dFloat32 regularizer, dFloat32 viscousFriction);
 
-protected:
+	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	void SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
 	void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitPidRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
+	virtual void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
 	dMatrix m_baseMatrix;

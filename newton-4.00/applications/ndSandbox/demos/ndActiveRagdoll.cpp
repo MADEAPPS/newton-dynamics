@@ -24,12 +24,23 @@
 class dActiveJointDefinition
 {
 	public:
-	enum dCollsionMask
+	enum dLimbType
 	{
-		m_type0,
-		m_type1,
-		m_type2,
-		m_type3,
+		fowardKinematic,
+		inverseKinematic,
+	};
+
+	struct dJointPidData
+	{
+		dJointPidData()
+			:m_spring(1000.0f)
+			,m_damper(40.0f)
+			,m_regularizer(0.005f)
+		{
+		}
+		dFloat32 m_spring;
+		dFloat32 m_damper;
+		dFloat32 m_regularizer;
 	};
 
 	struct dJointLimit
@@ -47,11 +58,10 @@ class dActiveJointDefinition
 	};
 
 	char m_boneName[32];
-	dInt32 m_type;
-	dInt32 m_typeMask;
-	dFloat32 m_friction;
+	dLimbType m_limbType;
 	dJointLimit m_jointLimits;
 	dFrameMatrix m_frameBasics;
+	dJointPidData m_jointData;
 };
 
 class ndActiveRagdollEntityNotify : public ndDemoEntityNotify
@@ -94,26 +104,26 @@ class ndActiveRagdollEntityNotify : public ndDemoEntityNotify
 
 static dActiveJointDefinition jointsDefinition[] =
 {
-	{ "mixamorig:Hips", 1, 16 },
+	{ "mixamorig:Hips", dActiveJointDefinition::fowardKinematic},
 	
-	{ "mixamorig:Spine", 2, 16, 10.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine1", 4, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine2", 8, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Neck", 16, 31, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-
-	{ "mixamorig:RightUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-	{ "mixamorig:RightFoot", 16, 31, 10.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
-
-	{ "mixamorig:LeftUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-	{ "mixamorig:LeftFoot", 16, 31, 10.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine", dActiveJointDefinition::fowardKinematic, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine1", dActiveJointDefinition::fowardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine2", dActiveJointDefinition::fowardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Neck", dActiveJointDefinition::fowardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 	
-	{ "mixamorig:RightArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
+	{ "mixamorig:RightArm", dActiveJointDefinition::fowardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightForeArm", dActiveJointDefinition::fowardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
 	
-	{ "mixamorig:LeftArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+	{ "mixamorig:LeftArm", dActiveJointDefinition::fowardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:LeftForeArm", dActiveJointDefinition::fowardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+	
+	{ "mixamorig:RightUpLeg", dActiveJointDefinition::fowardKinematic,{ -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightLeg", dActiveJointDefinition::fowardKinematic,{ -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+	{ "mixamorig:RightFoot", dActiveJointDefinition::fowardKinematic,{ 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
+	
+	{ "mixamorig:LeftUpLeg", dActiveJointDefinition::fowardKinematic, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:LeftLeg", dActiveJointDefinition::fowardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+	{ "mixamorig:LeftFoot", dActiveJointDefinition::fowardKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
 };
 
 class ndActiveRagdollModel : public ndCharacter
@@ -238,17 +248,17 @@ class ndActiveRagdollModel : public ndCharacter
 		dMatrix matrix(childBody->GetMatrix());
 		dActiveJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
-		ndCharacterIkOrganicLimbNode* const jointNode = CreateOrganicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
+		ndCharacterIkOrganicLimbNode* const jointNode = CreateOrganicFowardKinematicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
 	
 		dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-		ndJointPidActuator* const joint = jointNode->GetJoint();
+		ndJointPid3dofActuator* const joint = (ndJointPid3dofActuator*)jointNode->GetJoint();
 
 		joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
 		//joint->SetConeLimit(0.0f);
-		joint->SetConeFriction(0.05f, definition.m_friction);
+		//joint->SetConeFriction(0.05f, definition.m_friction);
 		
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
-		joint->SetTwistFriction(0.05f, definition.m_friction);
+		//joint->SetTwistFriction(0.05f, definition.m_friction);
 
 		world->AddJoint(joint);
 		return jointNode;

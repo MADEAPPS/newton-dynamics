@@ -11,9 +11,9 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointPidActuator.h"
+#include "ndJointPid3dofActuator.h"
 
-ndJointPidActuator::ndJointPidActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointPid3dofActuator::ndJointPid3dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
 	,m_baseMatrix(m_localMatrix0)
 	,m_targetPitch(dFloat32 (0.0f))
@@ -26,46 +26,46 @@ ndJointPidActuator::ndJointPidActuator(const dMatrix& pinAndPivotFrame, ndBodyKi
 {
 }
 
-ndJointPidActuator::~ndJointPidActuator()
+ndJointPid3dofActuator::~ndJointPid3dofActuator()
 {
 }
 
-//void ndJointPidActuator::SetConeFriction(dFloat32 regularizer, dFloat32 viscousFriction)
-void ndJointPidActuator::SetConeFriction(dFloat32, dFloat32)
+//void ndJointPid3dofActuator::SetConeFriction(dFloat32 regularizer, dFloat32 viscousFriction)
+void ndJointPid3dofActuator::SetConeFriction(dFloat32, dFloat32)
 {
 	//m_coneFriction = dAbs(viscousFriction);
 	//m_coneFrictionRegularizer = dMax(dAbs(regularizer), dFloat32(0.01f));
 }
 
-void ndJointPidActuator::SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle)
+void ndJointPid3dofActuator::SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle)
 {
 	m_minTwistAngle = -dAbs(minAngle);
 	m_maxTwistAngle = dAbs(maxAngle);
 }
 
-void ndJointPidActuator::SetTwistFriction(dFloat32, dFloat32)
+void ndJointPid3dofActuator::SetTwistFriction(dFloat32, dFloat32)
 {
 	//m_twistFriction = dAbs(viscousFriction);
 	//m_twistFrictionRegularizer = dMax(dAbs(regularizer), dFloat32(0.01f));
 }
 
-void ndJointPidActuator::GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const
+void ndJointPid3dofActuator::GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const
 {
 	minAngle = m_minTwistAngle;
 	maxAngle = m_maxTwistAngle;
 }
 
-dFloat32 ndJointPidActuator::GetMaxConeAngle() const
+dFloat32 ndJointPid3dofActuator::GetMaxConeAngle() const
 {
 	return m_maxConeAngle;
 }
 
-void ndJointPidActuator::SetConeLimit(dFloat32 maxConeAngle)
+void ndJointPid3dofActuator::SetConeLimit(dFloat32 maxConeAngle)
 {
 	m_maxConeAngle = dMin (dAbs(maxConeAngle), D_PID_MAX_ANGLE * dFloat32 (0.999f));
 }
 
-void ndJointPidActuator::DebugJoint(ndConstraintDebugCallback& debugCallback) const
+void ndJointPid3dofActuator::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -154,7 +154,7 @@ void ndJointPidActuator::DebugJoint(ndConstraintDebugCallback& debugCallback) co
 	}
 }
 
-void ndJointPidActuator::SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointPid3dofActuator::SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
 	if (coneAngle >= m_maxConeAngle)
@@ -190,7 +190,7 @@ void ndJointPidActuator::SubmitAngularAxisCartesianApproximation(const dMatrix& 
 	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
 
-void ndJointPidActuator::SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc)
+void ndJointPid3dofActuator::SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc)
 {
 	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * dDegreeToRad))
 	{
@@ -205,7 +205,7 @@ void ndJointPidActuator::SubmitTwistAngle(const dVector& pin, dFloat32 angle, nd
 			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const dFloat32 penetration = angle - m_minTwistAngle;
-			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PID_PENETRATION_LIMIT), dFloat32(1.0f));
+			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_PID_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetLowerFriction(desc, dFloat32(0.0f));
 		}
@@ -214,14 +214,14 @@ void ndJointPidActuator::SubmitTwistAngle(const dVector& pin, dFloat32 angle, nd
 			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const dFloat32 penetration = angle - m_maxTwistAngle;
-			const dFloat32 recoveringAceel = desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PID_PENETRATION_LIMIT), dFloat32(1.0f));
+			const dFloat32 recoveringAceel = desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_PID_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetHighFriction(desc, dFloat32(0.0f));
 		}
 	}
 }
 
-void ndJointPidActuator::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointPid3dofActuator::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	SubmitPidRotation(matrix0, matrix1, desc);
 
@@ -236,7 +236,7 @@ void ndJointPidActuator::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix
 		AddAngularRowJacobian(desc, lateralDir, 0.0f);
 		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		const dFloat32 penetration = coneAngle - m_maxConeAngle;
-		const dFloat32 recoveringAceel = desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_PID_PENETRATION_LIMIT), dFloat32(1.0f));
+		const dFloat32 recoveringAceel = desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_PID_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
 		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 		SetHighFriction(desc, dFloat32(0.0f));
 	}
@@ -246,7 +246,7 @@ void ndJointPidActuator::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix
 	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
 
-void ndJointPidActuator::SubmitPidRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointPid3dofActuator::SubmitPidRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	dQuaternion q0(matrix0);
 	dQuaternion q1(matrix1);
@@ -295,7 +295,14 @@ dFloat32 regularizer = 0.005f;
 	}
 }
 
-void ndJointPidActuator::JacobianDerivative(ndConstraintDescritor& desc)
+void ndJointPid3dofActuator::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+{
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
+}
+
+void ndJointPid3dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -307,26 +314,17 @@ void ndJointPidActuator::JacobianDerivative(ndConstraintDescritor& desc)
 	m_localMatrix0 = m_baseMatrix * dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll);
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
+	SubmitLinearLimits(matrix0, matrix1, desc);
 
-	dFloat32 deltaTwist = m_maxTwistAngle - m_minTwistAngle;
-	bool hasAngleRows = deltaTwist > dFloat32(1.0e-3f);
-	hasAngleRows = hasAngleRows && (deltaTwist < dFloat32(2.0f) * dPi);
-	hasAngleRows = hasAngleRows || (m_maxConeAngle < D_PID_MAX_ANGLE);
-	if (hasAngleRows)
+	dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
+	if (cosAngleCos >= dFloat32(0.998f))
 	{
-		dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
-		if (cosAngleCos >= dFloat32(0.998f))
-		{
-			// special case where the front axis are almost aligned
-			// solve by using Cartesian approximation
-			SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
-		}
-		else
-		{
-			SubmitAngularAxis(matrix0, matrix1, desc);
-		}
+		// special case where the front axis are almost aligned
+		// solve by using Cartesian approximation
+		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
+	}
+	else
+	{
+		SubmitAngularAxis(matrix0, matrix1, desc);
 	}
 }

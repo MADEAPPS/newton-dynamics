@@ -63,7 +63,6 @@
 #include <ndJointFollowPath.h>
 #include <ndCharacterIkNode.h>
 #include <ndJointDoubleHinge.h>
-#include <ndJointPidActuator.h>
 #include <ndJointFixDistance.h>
 #include <ndMultiBodyVehicle.h>
 #include <ndSkeletonContainer.h>
@@ -74,6 +73,8 @@
 #include <ndCharacterIkRootNode.h>
 #include <ndBodyParticleSetList.h>
 #include <ndDynamicsUpdateOpencl.h>
+#include <ndJointPid3dofActuator.h>
+#include <ndJointPid6dofActuator.h>
 #include <ndMultiBodyVehicleMotor.h>
 #include <ndCharacterIkEffectorNode.h>
 #include <ndMultiBodyVehicleGearBox.h>

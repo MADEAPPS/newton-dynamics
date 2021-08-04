@@ -27,7 +27,7 @@
 
 ndCharacterIkOrganicLimbNode::ndCharacterIkOrganicLimbNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterIkNode* const parent)
 	:ndCharacterIkNode(parent)
-	,m_joint(new ndJointPidActuator(matrixInGlobalScape, body, parent->GetBody()))
+	,m_joint(new ndJointPid3dofActuator(matrixInGlobalScape, body, parent->GetBody()))
 	,m_body(body)
 {
 }
