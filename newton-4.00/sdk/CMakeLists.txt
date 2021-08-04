@@ -84,11 +84,17 @@ else()
 		dNewton/dModels/dCharacter/*.h
 		dNewton/dModels/dCharacter/*.cpp)
 
-	if(MSVC)
-		 set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
+	# exclude AVX files when disabled
+	if(NOT NEWTON_ENABLE_AVX)
+		list(FILTER HEADERS EXCLUDE REGEX "(Avx)")
+		list(FILTER CPP_SOURCE EXCLUDE REGEX "(Avx)")
+	endif()
+
+	if(MSVC AND NEWTON_ENABLE_AVX)
+		set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
 	endif(MSVC)
 
-	if(UNIX)
+	if(UNIX AND NEWTON_ENABLE_AVX)
 		set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " -march=haswell " )
 	endif(UNIX)
 

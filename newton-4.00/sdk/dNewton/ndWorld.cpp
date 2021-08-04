@@ -207,12 +207,12 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateSoa(this);
 				break;
-
+#ifdef _USE_VECTOR_AVX
 			case ndSimdAvx2Solver:
 				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateAvx2(this);
 				break;
-
+#endif // _USE_VECTOR_AVX
 			case ndOpenclSolver:
 				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateOpencl(this);
