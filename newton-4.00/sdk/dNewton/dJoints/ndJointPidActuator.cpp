@@ -194,8 +194,9 @@ void ndJointPidActuator::SubmitTwistAngle(const dVector& pin, dFloat32 angle, nd
 {
 	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * dDegreeToRad))
 	{
-		dAssert(0);
-		//NewtonUserJointAddAngularRow(m_joint, -angle, &pin[0]);
+		AddAngularRowJacobian(desc, pin, -angle);
+		// force this limit to be bound
+		SetLowerFriction(desc, D_LCP_MAX_VALUE * dFloat32 (0.1f));
 	}
 	else
 	{

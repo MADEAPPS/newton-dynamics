@@ -172,8 +172,8 @@ void ndJointBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat32 angle, 
 {
 	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * dDegreeToRad)) 
 	{
-		dAssert(0);
-		//NewtonUserJointAddAngularRow(m_joint, -angle, &pin[0]);
+		dAssert(desc.m_rowsCount < 6);
+		AddAngularRowJacobian(desc, pin, -angle);
 	}
 	else 
 	{

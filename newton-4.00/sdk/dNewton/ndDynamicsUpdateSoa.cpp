@@ -2237,9 +2237,6 @@ void ndDynamicsUpdateSoa::Update()
 	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
 
-static int xxxxx;
-xxxxx++;
-
 	BuildIsland();
 	if (m_islands.GetCount())
 	{
