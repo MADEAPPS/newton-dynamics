@@ -28,7 +28,7 @@
 	#endif
 #endif
 
-#if (defined (WIN32) || defined (_M_ARM) || defined (_M_ARM64))
+#if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
 	#include <io.h>
 	#include <stdint.h>
 	#include <direct.h>
@@ -138,7 +138,7 @@
 // if the and application want to control threading at the application level 
 //#define D_USE_THREAD_EMULATION
 
-#if defined (WIN32)
+#if (defined(WIN32) || defined(_WIN32))
 	#if _MSC_VER < 1700
 		#ifndef D_USE_THREAD_EMULATION
 			#define D_USE_THREAD_EMULATION
@@ -150,7 +150,7 @@
 #ifdef D_DISABLE_ASSERT
 	#define dAssert(x)
 #else 
-	#if (defined (WIN32) || defined (_M_ARM) || defined (_M_ARM64))
+	#if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
 		#define dAssert(x) _ASSERTE(x)
 	#else
 		#ifdef _DEBUG
@@ -246,7 +246,7 @@ typedef double dFloat64;
 #define dClearFP()		_clearfp() 
 #define dControlFP(x,y)	_controlfp(x,y)
 
-#if (defined (WIN32) || defined (_M_ARM) || defined (_M_ARM64))
+#if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
 	#define dCheckFloat(x) (_finite(x) && !_isnan(x))
 #else
 	#define dCheckFloat(x) (isfinite(x) && !isnan(x))

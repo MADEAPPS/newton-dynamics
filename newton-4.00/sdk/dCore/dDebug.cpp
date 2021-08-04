@@ -34,7 +34,7 @@ void dgExpandTraceMessage(const char* const fmt, ...)
 	vsprintf(text, fmt, v_args);
 	va_end(v_args);
 
-#if defined (WIN32)
+#if (defined(WIN32) || defined(_WIN32))
 	OutputDebugStringA(text);
 #else 
 	printf("%s\n", text);

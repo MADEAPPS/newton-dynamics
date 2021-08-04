@@ -48,7 +48,8 @@ dUnsigned64 dGetTimeInMicrosenconds()
 
 dFloatExceptions::dFloatExceptions(dUnsigned32 mask)
 {
-#if defined (_MSC_VER)
+//#if defined (_MSC_VER)
+#if	(defined(WIN32) || defined(_WIN32))
 	dClearFP();
 	m_mask = dControlFP(0, 0);
 	dControlFP(m_mask & ~mask, _MCW_EM);
@@ -58,7 +59,7 @@ dFloatExceptions::dFloatExceptions(dUnsigned32 mask)
 	#ifndef IOS
 		fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
 	#endif
-#elif defined (WIN32)
+#elif (defined(WIN32) || defined(_WIN32))
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 	dInt32 crs = _mm_getcsr();
 	dInt32 sseDenormalMask = _MM_FLUSH_ZERO_MASK | _MM_MASK_DENORM;
@@ -423,7 +424,7 @@ dInt32 dVertexListToIndexList(dFloat64* const vertList, dInt32 strideInBytes, dI
 #ifndef D_USE_THREAD_EMULATION
 void dSpinLock::Delay(dInt32& exp)
 {
-	#if defined (WIN32)
+	#if (defined(WIN32) || defined(_WIN32))
 		// adding exponential pause delay
 		for (dInt32 i = 0; i < exp; i++)
 		{

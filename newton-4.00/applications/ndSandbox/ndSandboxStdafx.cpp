@@ -55,7 +55,7 @@ dFloat32 dGaussianRandom (dFloat32 amp)
 // Windows user assets path
 void dGetWorkingFileName (const char* const name, char* const outPathName)
 {
-	#if defined(_WIN32)
+	#if (defined(WIN32) || defined(_WIN32))
 		char appPath [256];
 		GetModuleFileNameA(nullptr, appPath, sizeof (appPath));
 		_strlwr (appPath);

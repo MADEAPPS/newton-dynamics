@@ -863,54 +863,6 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			break;
 		}
 
-		case 2:
-		{
-			// open Scene
-			dAssert(0);
-			//m_currentScene = -1;
-			//char fileName[1024];
-			//Cleanup();
-			//if (dGetOpenFileNameNgd(fileName, 1024)) 
-			//{
-			//	ApplyMenuOptions();
-			//	CreateSkyBox();
-			//	m_world->Load(fileName);
-			//	ResetTimer();
-			//}
-			break;
-		}
-
-		case 3:
-		{
-			//m_currentScene = -1;
-			char fileName[1024];
-			if (dGetSaveFileNameNgd(fileName, 1024)) 
-			{
-				_strlwr(fileName);
-				char* name = strrchr(fileName, '/');
-				if (!name)
-				{
-					name = strrchr(fileName, '\\');
-				}
-				if (!name)
-				{
-					name = fileName;
-				}
-
-				char* ext = strrchr(name, '.');
-				if (!ext)
-				{
-					strcat(fileName, ".ngd");
-				} 
-				else if (strcmp(ext, ".ngd"))
-				{
-					strcpy(ext, ".ngd");
-				}
-				m_world->Save(fileName);
-			}
-			break;
-		}
-
 		case 4:
 		{
 			// open Scene

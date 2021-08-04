@@ -39,7 +39,7 @@
 	}
 	#endif
 
-#if defined (WIN32)
+#if (defined(WIN32) || defined(_WIN32))
 	BOOL APIENTRY DllMain(HMODULE, DWORD  ul_reason_for_call, LPVOID)
 	{
 		switch (ul_reason_for_call)

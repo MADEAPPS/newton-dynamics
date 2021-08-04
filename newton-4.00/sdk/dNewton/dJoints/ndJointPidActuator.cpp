@@ -164,11 +164,11 @@ void ndJointPidActuator::SubmitAngularAxisCartesianApproximation(const dMatrix& 
 		dFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
 		pitchAngle -= -0.0f * dDegreeToRad;
 		m_integralError = dMax (m_integralError + pitchAngle * desc.m_timestep, dFloat32(0.0f));
-		dFloat32 kp = 1000.0f;
-		dFloat32 ki = 1000.0f;
-		dFloat32 kd = 30.0f;
-		dFloat32 ks = m_integralError * ki + kp;
-		//dFloat32 ks = kp;
+		//dFloat32 kp = 10.0f;
+		//dFloat32 ki = 1000.0f;
+		dFloat32 kd = 10.0f;
+		//dFloat32 ks = m_integralError * ki + kp;
+		dFloat32 ks = 100.0f;
 		//dTrace(("ks=%f kd=%f\n", ks, kd));
 		AddAngularRowJacobian(desc, matrix0.m_front, pitchAngle);
 		SetMassSpringDamperAcceleration(desc, 0.005f, ks, kd);
