@@ -92,11 +92,11 @@ else()
 
 	if(MSVC AND NEWTON_ENABLE_AVX)
 		set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
-	endif(MSVC)
+	endif()
 
 	if(UNIX AND NEWTON_ENABLE_AVX)
 		set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " -march=haswell " )
-	endif(UNIX)
+	endif()
 
 	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
