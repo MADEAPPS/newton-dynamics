@@ -113,9 +113,11 @@ static dActiveJointDefinition jointsDefinition[] =
 	
 	{ "mixamorig:RightArm", dActiveJointDefinition::fowardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
 	{ "mixamorig:RightForeArm", dActiveJointDefinition::fowardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
+	{ "mixamorig:RightHand", dActiveJointDefinition::fowardKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
 	
 	{ "mixamorig:LeftArm", dActiveJointDefinition::fowardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
 	{ "mixamorig:LeftForeArm", dActiveJointDefinition::fowardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+	{ "mixamorig:LeftHand", dActiveJointDefinition::fowardKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
 	
 	{ "mixamorig:RightUpLeg", dActiveJointDefinition::inverseKinematic, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 	{ "mixamorig:RightLeg", dActiveJointDefinition::inverseKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
