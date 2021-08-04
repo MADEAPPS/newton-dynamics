@@ -273,7 +273,7 @@ class ndActiveRagdollModel : public ndCharacter
 			ndCharacterInverseDynamicNode* const jointNode = CreateInverseDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
 
 			dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-			ndJointPid3dofActuator* const joint = (ndJointPid3dofActuator*)jointNode->GetJoint();
+			ndJointBallAndSocket* const joint = (ndJointBallAndSocket*)jointNode->GetJoint();
 
 			joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
 			//joint->SetConeLimit(0.0f);

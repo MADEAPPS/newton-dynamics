@@ -15,8 +15,8 @@
 
 ndJointBallAndSocket::ndJointBallAndSocket(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
-	,m_maxConeAngle( dFloat32 (1.0e10f))
-	,m_coneFriction(dFloat32(1.0e10f))
+	,m_maxConeAngle(dFloat32 (1.0e10f))
+	,m_coneFriction(dFloat32(0.0))
 	,m_minTwistAngle(-dFloat32(1.0e10f))
 	,m_maxTwistAngle( dFloat32(1.0e10f))
 	,m_twistFriction(dFloat32 (0.0f))
@@ -222,7 +222,7 @@ void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 		
 		AddAngularRowJacobian(desc, sideDir, dFloat32 (0.0f));
 	}
-	else
+	else if (m_coneFriction > dFloat32 (0.0f))
 	{
 		AddAngularRowJacobian(desc, lateralDir, dFloat32 (0.0f));
 		SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, dFloat32(0.0f), m_coneFriction);

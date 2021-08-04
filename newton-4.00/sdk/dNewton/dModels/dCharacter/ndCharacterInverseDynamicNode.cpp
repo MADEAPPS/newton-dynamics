@@ -23,12 +23,13 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacter.h"
 #include "ndBodyDynamic.h"
-#include "ndJointPid3dofActuator.h"
+//#include "ndJointPid3dofActuator.h"
+#include "ndJointBallAndSocket.h"
 #include "ndCharacterInverseDynamicNode.h"
 
 ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
 	:ndCharacterLimbNode(parent)
-	,m_joint(new ndJointPid3dofActuator(matrixInGlobalScape, body, parent->GetBody()))
+	,m_joint(new ndJointBallAndSocket(matrixInGlobalScape, body, parent->GetBody()))
 	,m_body(body)
 {
 }

@@ -24,8 +24,6 @@
 
 #include "ndNewtonStdafx.h"
 #include "ndCharacterLimbNode.h"
-//#include "ndJointPid3dofActuator.h"
-
 
 class ndCharacterFowardDynamicNode: public ndCharacterLimbNode 
 {
