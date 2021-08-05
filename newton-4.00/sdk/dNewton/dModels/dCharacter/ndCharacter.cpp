@@ -76,7 +76,37 @@ ndCharacterEffectorNode* ndCharacter::CreateInverseDynamicEffector(const dMatrix
 
 dVector ndCharacter::CalculateCom() const
 {
-	return dVector::m_wOne;
+	dInt32 stack = 1;
+	ndCharacterLimbNode* nodePool[32];
+	
+	nodePool[0] = m_rootNode;
+
+	dFloat32 mass = dFloat32(0.0f);
+	dVector com(dVector::m_zero);
+
+	while (stack)
+	{
+		stack--;
+		ndCharacterLimbNode* const node = nodePool[stack];
+		ndBodyDynamic* const body = node->GetBody();
+		if (body)
+		{
+			dFloat32 partMass = body->GetMassMatrix().m_w;
+			mass += partMass;
+			dMatrix bodyMatrix(body->GetMatrix());
+			com += bodyMatrix.TransformVector(body->GetCentreOfMass()).Scale (partMass);
+		}
+
+		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
+		{
+			nodePool[stack] = child;
+			stack++;
+		}
+	}
+	com = com.Scale(dFloat32(1.0f) / mass);
+	com.m_w = dFloat32 (1.0f);
+
+	return com;
 }
 
 void ndCharacter::Debug(ndConstraintDebugCallback& context) const
@@ -87,7 +117,7 @@ void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 	// show character center of mass.
 	dFloat32 scale = context.GetScale();
 	context.SetScale(scale * 0.5f);
-	//matrix.m_posit = CalculateCom();
+	matrix.m_posit = CalculateCom();
 	context.DrawFrame(matrix);
 
 	context.SetScale(scale);
