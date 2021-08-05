@@ -29,11 +29,12 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 
 	D_NEWTON_API dFloat32 GetMaxConeAngle() const;
 	D_NEWTON_API void SetConeLimit(dFloat32 maxConeAngle);
-	D_NEWTON_API void SetConeFriction(dFloat32 regularizer, dFloat32 viscousFriction);
-
+	
 	D_NEWTON_API void SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle);
 	D_NEWTON_API void GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const;
-	D_NEWTON_API void SetTwistFriction(dFloat32 regularizer, dFloat32 viscousFriction);
+	
+	D_NEWTON_API void GetAngularSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const;
+	D_NEWTON_API void SetAngularSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer = dFloat32(5.0e-3f));
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
@@ -42,8 +43,9 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 	void SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
 	void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitPidRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
-	virtual void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
+
+	virtual void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
 	dMatrix m_baseMatrix;
 	dFloat32 m_targetPitch;
@@ -52,7 +54,10 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 	dFloat32 m_maxConeAngle;
 	dFloat32 m_minTwistAngle;
 	dFloat32 m_maxTwistAngle;
-	dFloat32 m_integralError;
+
+	dFloat32 m_angularSpring;
+	dFloat32 m_angularDamper;
+	dFloat32 m_angularRegularizer;
 };
 
 #endif 

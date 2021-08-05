@@ -23,8 +23,15 @@ class ndJointPid6dofActuator : public ndJointPid3dofActuator
 	D_NEWTON_API ndJointPid6dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointPid6dofActuator();
 
+	D_NEWTON_API void GetLinearSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const;
+	D_NEWTON_API void SetLinearSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer = dFloat32 (5.0e-3f));
+
 	protected:
 	virtual void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
+
+	dFloat32 m_linearSpring;
+	dFloat32 m_linearDamper;
+	dFloat32 m_linearRegularizer;
 };
 
 #endif 

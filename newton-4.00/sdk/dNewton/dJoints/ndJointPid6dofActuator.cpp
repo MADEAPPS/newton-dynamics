@@ -17,7 +17,24 @@
 
 ndJointPid6dofActuator::ndJointPid6dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointPid3dofActuator(pinAndPivotFrame, child, parent)
+	,m_linearSpring(dFloat32 (1000.0f))
+	,m_linearDamper(dFloat32(50.0f))
+	,m_linearRegularizer(dFloat32(5.0e-3f))
 {
+}
+
+void ndJointPid6dofActuator::GetLinearSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const
+{
+	spring = m_linearSpring;
+	damper = m_linearDamper;
+	regularizer = m_linearRegularizer;
+}
+
+void ndJointPid6dofActuator::SetLinearSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer)
+{
+	m_linearSpring = dMax(spring, dFloat32(0.0f));
+	m_linearDamper = dMax(damper, dFloat32(0.0f));
+	m_linearRegularizer = dMax (regularizer, dFloat32 (1.0e-4f));
 }
 
 ndJointPid6dofActuator::~ndJointPid6dofActuator()
@@ -27,22 +44,17 @@ ndJointPid6dofActuator::~ndJointPid6dofActuator()
 void ndJointPid6dofActuator::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	const dVector step (matrix0.m_posit - matrix1.m_posit);
-
-dFloat32 ks = 1000.0f;
-dFloat32 kd = 100.0f;
-dFloat32 regularizer = 0.005f;
-
 	if (step.DotProduct(step).GetScalar() <= D_SMALL_DISTANCE_ERROR2)
 	{
 		// Cartesian motion
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
-		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 	}
 	else
 	{
@@ -50,7 +62,7 @@ dFloat32 regularizer = 0.005f;
 		
 		// move alone the diagonal;
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, basis[0]);
-		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 
 		AddLinearRowJacobian(desc, matrix1.m_posit, matrix1.m_posit, basis[1]);
 		AddLinearRowJacobian(desc, matrix1.m_posit, matrix1.m_posit, basis[2]);

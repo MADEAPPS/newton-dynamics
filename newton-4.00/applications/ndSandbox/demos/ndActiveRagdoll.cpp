@@ -177,23 +177,26 @@ class ndActiveRagdollModel : public ndCharacter
 			//dTrace(("name: %s\n", name));
 			for (dInt32 i = 0; i < definitionCount; i++) 
 			{
-				if (!strcmp(jointsDefinition[i].m_boneName, name)) 
+				const dActiveJointDefinition& definition = jointsDefinition[i];
+				if (!strcmp(definition.m_boneName, name))
 				{
-					if (jointsDefinition[i].m_limbType != dActiveJointDefinition::effector)
+					if (definition.m_limbType != dActiveJointDefinition::effector)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone->GetBody());
 						bodyArray[bodyCount] = childBody;
 						bodyCount++;
 
 						// connect this body part to its parentBody with a ragdoll joint
-						parentBone = ConnectBodyParts(world, childBody, parentBone, jointsDefinition[i]);
+						parentBone = ConnectBodyParts(world, childBody, parentBone, definition);
 					}
 					else
 					{
 						ndCharacterLimbNode* const referenceNode = parentBone->GetParent()->GetParent()->GetParent();
 						dMatrix effectorMatrix(childEntity->GetCurrentMatrix() * parentBone->GetBody()->GetMatrix());
 						ndCharacterEffectorNode* const effectorNode = CreateInverseDynamicEffector(effectorMatrix, parentBone, referenceNode);
-						ndJointBilateralConstraint* const effectorJoint = effectorNode->GetJoint();
+						ndJointPid6dofActuator* const effectorJoint = (ndJointPid6dofActuator*)effectorNode->GetJoint();
+						effectorJoint->SetLinearSpringDamperRegularizer(definition.m_jointData.m_spring, definition.m_jointData.m_damper, definition.m_jointData.m_regularizer);
+
 						world->AddJoint(effectorJoint);
 					}
 					break;
@@ -273,11 +276,8 @@ class ndActiveRagdollModel : public ndCharacter
 			ndJointPid3dofActuator* const joint = (ndJointPid3dofActuator*)jointNode->GetJoint();
 
 			joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
-			//joint->SetConeLimit(0.0f);
-			//joint->SetConeFriction(0.05f, definition.m_friction);
-
 			joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
-			//joint->SetTwistFriction(0.05f, definition.m_friction);
+			joint->SetAngularSpringDamperRegularizer(definition.m_jointData.m_spring, definition.m_jointData.m_damper, definition.m_jointData.m_regularizer);
 
 			world->AddJoint(joint);
 			return jointNode;
@@ -290,11 +290,9 @@ class ndActiveRagdollModel : public ndCharacter
 			ndJointBallAndSocket* const joint = (ndJointBallAndSocket*)jointNode->GetJoint();
 
 			joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
-			//joint->SetConeLimit(0.0f);
-			//joint->SetConeFriction(0.05f, definition.m_friction);
-
 			joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
-			//joint->SetTwistFriction(0.05f, definition.m_friction);
+			joint->SetConeFriction(dFloat32(0.0f), dFloat32(0.0f));
+			joint->SetTwistFriction(dFloat32(0.0f), dFloat32(0.0f));
 
 			world->AddJoint(joint);
 			return jointNode;

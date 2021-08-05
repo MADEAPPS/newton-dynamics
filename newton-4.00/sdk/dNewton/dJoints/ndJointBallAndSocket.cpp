@@ -32,7 +32,7 @@ ndJointBallAndSocket::~ndJointBallAndSocket()
 void ndJointBallAndSocket::SetConeFriction(dFloat32 regularizer, dFloat32 viscousFriction)
 {
 	m_coneFriction = dAbs(viscousFriction);
-	m_coneFrictionRegularizer = dMax(dAbs(regularizer), dFloat32(0.01f));
+	m_coneFrictionRegularizer = dMax(dAbs(regularizer), dFloat32(0.0f));
 }
 
 void ndJointBallAndSocket::SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle)
@@ -44,7 +44,7 @@ void ndJointBallAndSocket::SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle)
 void ndJointBallAndSocket::SetTwistFriction(dFloat32 regularizer, dFloat32 viscousFriction)
 {
 	m_twistFriction = dAbs(viscousFriction);
-	m_twistFrictionRegularizer = dMax(dAbs(regularizer), dFloat32(0.01f));
+	m_twistFrictionRegularizer = dMax(dAbs(regularizer), dFloat32(0.0f));
 }
 
 void ndJointBallAndSocket::GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const

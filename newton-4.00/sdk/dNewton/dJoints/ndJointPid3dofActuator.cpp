@@ -22,7 +22,9 @@ ndJointPid3dofActuator::ndJointPid3dofActuator(const dMatrix& pinAndPivotFrame, 
 	,m_maxConeAngle(dFloat32(1.0e10f))
 	,m_minTwistAngle(-dFloat32(1.0e10f))
 	,m_maxTwistAngle(dFloat32(1.0e10f))
-	,m_integralError(dFloat32 (0.0f))
+	,m_angularSpring(dFloat32(1000.0f))
+	,m_angularDamper(dFloat32(50.0f))
+	,m_angularRegularizer(dFloat32(5.0e-3f))
 {
 }
 
@@ -30,23 +32,25 @@ ndJointPid3dofActuator::~ndJointPid3dofActuator()
 {
 }
 
-//void ndJointPid3dofActuator::SetConeFriction(dFloat32 regularizer, dFloat32 viscousFriction)
-void ndJointPid3dofActuator::SetConeFriction(dFloat32, dFloat32)
+void ndJointPid3dofActuator::GetAngularSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const
 {
-	//m_coneFriction = dAbs(viscousFriction);
-	//m_coneFrictionRegularizer = dMax(dAbs(regularizer), dFloat32(0.01f));
+	spring = m_angularSpring;
+	damper = m_angularDamper;
+	regularizer = m_angularRegularizer;
 }
+
+void ndJointPid3dofActuator::SetAngularSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer)
+{
+	m_angularSpring = dMax(spring, dFloat32(0.0f));
+	m_angularDamper = dMax(damper, dFloat32(0.0f));
+	m_angularRegularizer = dMax(regularizer, dFloat32(1.0e-4f));
+}
+
 
 void ndJointPid3dofActuator::SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle)
 {
 	m_minTwistAngle = -dAbs(minAngle);
 	m_maxTwistAngle = dAbs(maxAngle);
-}
-
-void ndJointPid3dofActuator::SetTwistFriction(dFloat32, dFloat32)
-{
-	//m_twistFriction = dAbs(viscousFriction);
-	//m_twistFrictionRegularizer = dMax(dAbs(regularizer), dFloat32(0.01f));
 }
 
 void ndJointPid3dofActuator::GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const
@@ -163,15 +167,14 @@ void ndJointPid3dofActuator::SubmitAngularAxisCartesianApproximation(const dMatr
 		//this is a hinge joint
 		dFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
 		pitchAngle -= -0.0f * dDegreeToRad;
-		m_integralError = dMax (m_integralError + pitchAngle * desc.m_timestep, dFloat32(0.0f));
 		//dFloat32 kp = 10.0f;
 		//dFloat32 ki = 1000.0f;
-		dFloat32 kd = 10.0f;
+		///dFloat32 kd = 10.0f;
 		//dFloat32 ks = m_integralError * ki + kp;
-		dFloat32 ks = 100.0f;
+		//dFloat32 ks = 100.0f;
 		//dTrace(("ks=%f kd=%f\n", ks, kd));
 		AddAngularRowJacobian(desc, matrix0.m_front, pitchAngle);
-		SetMassSpringDamperAcceleration(desc, 0.005f, ks, kd);
+		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 
 		// apply cone limits
 		// two rows to restrict rotation around the parent coordinate system
@@ -258,9 +261,9 @@ void ndJointPid3dofActuator::SubmitPidRotation(const dMatrix& matrix0, const dMa
 	dQuaternion dq(q0.Inverse() * q1);
 	dVector pin(dq.m_x, dq.m_y, dq.m_z, dFloat32(0.0f));
 
-dFloat32 ks = 1000.0f;
-dFloat32 kd = 100.0f;
-dFloat32 regularizer = 0.005f;
+//dFloat32 ks = 1000.0f;
+//dFloat32 kd = 100.0f;
+//dFloat32 regularizer = 0.005f;
 
 	dFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
 	if (dirMag2 > dFloat32(dFloat32(1.0e-7f)))
@@ -271,27 +274,27 @@ dFloat32 regularizer = 0.005f;
 
 		dMatrix basis(pin);
 		AddAngularRowJacobian(desc, basis[0], angle);
-		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 
 		AddAngularRowJacobian(desc, basis[1], dFloat32 (0.0f));
-		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 
 		AddAngularRowJacobian(desc, basis[2], dFloat32(0.0f));
-		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 	}
 	else
 	{
 		dFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
 		AddAngularRowJacobian(desc, matrix1[0], pitchAngle);
-		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 		
 		dFloat32 yawAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[1]);
 		AddAngularRowJacobian(desc, matrix1[1], yawAngle);
-		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 		
 		dFloat32 rollAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[2]);
 		AddAngularRowJacobian(desc, matrix1[2], rollAngle);
-		SetMassSpringDamperAcceleration(desc, regularizer, ks, kd);
+		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 	}
 }
 
@@ -306,10 +309,6 @@ void ndJointPid3dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
-
-//m_targetPitch = 30.0f * dDegreeToRad;
-//m_targetYaw = 35.0f * dDegreeToRad;
-//m_targetRoll = 45.0f * dDegreeToRad;
 
 	m_localMatrix0 = m_baseMatrix * dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll);
 	CalculateGlobalMatrix(matrix0, matrix1);
