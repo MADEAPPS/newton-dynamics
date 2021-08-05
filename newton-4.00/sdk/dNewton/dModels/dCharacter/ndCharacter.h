@@ -40,6 +40,7 @@ class ndCharacter: public ndModel
 		public:
 		dVector m_centerOfMass;
 		dVector m_centerOfMassVeloc;
+		dVector m_centerOfMassOmega;
 		dFloat32 m_mass;
 	};
 
