@@ -329,6 +329,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
+	dMatrix playerMatrix(matrix);
 	ndActiveRagdollModel* const ragdoll = new ndActiveRagdollModel(scene, ragdollMesh, matrix);
 	scene->GetWorld()->AddModel(ragdoll);
 
@@ -343,7 +344,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 
 	delete ragdollMesh;
-	dQuaternion rot;
-	dVector origin(-5.0f, 1.0f, 0.0f, 0.0f);
+	dQuaternion rot(dYawMatrix (90.0f * dDegreeToRad) * playerMatrix);
+	dVector origin(playerMatrix.m_posit + dVector (0.0f, 1.0f, 4.0f, 0.0f));
 	scene->SetCameraMatrix(rot, origin);
 }
