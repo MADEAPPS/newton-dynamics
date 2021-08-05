@@ -387,7 +387,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 			dMatrix alighMatrix(dGetIdentityMatrix());
 			alighMatrix.m_posit = dVector::m_half * (maxP + minP);
 			alighMatrix.m_posit.m_w = dFloat32(1.0f);
-			const dMatrix matrix(alighMatrix * child->GetMeshMatrix() * child->GetCurrentMatrix());
+			const dMatrix matrix(child->GetMeshMatrix() * alighMatrix * child->GetCurrentMatrix());
 			shapeArray[count] = new ndShapeInstance(new ndShapeSphere(size.m_x));
 			shapeArray[count]->SetLocalMatrix(matrix);
 			count++;
@@ -410,8 +410,11 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 			shapeArray[count] = new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z));
 
 			dVector origin((maxP + minP).Scale (dFloat32 (0.5f)));
-			dMatrix matrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
+
+			dMatrix matrix(child->GetMeshMatrix());
 			matrix.m_posit += origin;
+			matrix = matrix * child->GetCurrentMatrix();
+			
 			shapeArray[count]->SetLocalMatrix(matrix);
 			count++;
 			dAssert(count < dInt32(sizeof(shapeArray) / sizeof(shapeArray[0])));
@@ -436,6 +439,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 			alighMatrix.m_posit = origin;
 			alighMatrix.m_posit.m_w = dFloat32(1.0f);
 			const dMatrix matrix (alighMatrix * child->GetMeshMatrix() * child->GetCurrentMatrix());
+
 			shapeArray[count] = new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high));
 			shapeArray[count]->SetLocalMatrix(matrix);
 			count++;
