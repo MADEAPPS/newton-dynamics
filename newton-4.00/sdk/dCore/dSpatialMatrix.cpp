@@ -26,10 +26,12 @@
 
 dSpatialMatrix dSpatialMatrix::Inverse(dInt32 rows) const
 {
-	dSpatialMatrix tmp(*this);
-	dSpatialMatrix inv(dFloat64(0.0f));
+	dSpatialMatrix tmp;
+	dSpatialMatrix inv;
 	for (dInt32 i = 0; i < rows; i++) 
 	{
+		tmp[i] = (*this)[i];
+		inv[i] = dSpatialVector::m_zero;
 		inv[i][i] = dFloat32(1.0f);
 	}
 
@@ -49,16 +51,6 @@ dSpatialMatrix dSpatialMatrix::Inverse(dInt32 rows) const
 			}
 			dAssert(pivot > dFloat32(0.0f));
 			dAssert((pivot > dFloat32(1.0e-6f)) || (dConditionNumber(rows, 6, (dFloat64*)&m_rows[0]) < dFloat32(1.0e5f)));
-			//if (!((pivot > dFloat32(1.0e-6f)) || (dConditionNumber(rows, 6, (dFloat64*)&m_rows[0]) < dFloat32(1.0e5f))))
-			//{
-			//	for (dInt32 m = 0; m < rows; m++) {
-			//		for (dInt32 n = 0; n < rows; n++) {
-			//			dTrace(("%f ", m_rows[m][n]));
-			//		}
-			//		dTrace(("\n"));
-			//	}
-			//	dAssert(0);
-			//}
 
 			if (permute != i) 
 			{

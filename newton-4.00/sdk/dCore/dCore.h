@@ -58,6 +58,7 @@
 #include <dBezierSpline.h>
 #include <dNodeHierarchy.h>
 #include <dIntersections.h>
+#include <dSpatialVector.h>
 #include <dSpatialMatrix.h>
 #include <dGeneralVector.h>
 #include <dGeneralMatrix.h>

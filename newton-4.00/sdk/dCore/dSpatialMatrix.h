@@ -25,6 +25,7 @@
 #include "dCoreStdafx.h"
 #include "dTypes.h"
 #include "dVector.h"
+#include "dSpatialVector.h"
 
 class dSpatialMatrix
 {
