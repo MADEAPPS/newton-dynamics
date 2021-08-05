@@ -73,8 +73,7 @@ ndCharacterEffectorNode* ndCharacter::CreateInverseDynamicEffector(const dMatrix
 	return effector;
 }
 
-
-dVector ndCharacter::CalculateCom() const
+ndCharacter::ndLinearState ndCharacter::CalculateCom() const
 {
 	dInt32 stack = 1;
 	ndCharacterLimbNode* nodePool[32];
@@ -83,6 +82,7 @@ dVector ndCharacter::CalculateCom() const
 
 	dFloat32 mass = dFloat32(0.0f);
 	dVector com(dVector::m_zero);
+	dVector veloc(dVector::m_zero);
 
 	while (stack)
 	{
@@ -95,6 +95,7 @@ dVector ndCharacter::CalculateCom() const
 			mass += partMass;
 			dMatrix bodyMatrix(body->GetMatrix());
 			com += bodyMatrix.TransformVector(body->GetCentreOfMass()).Scale (partMass);
+			veloc += body->GetVelocity().Scale(partMass);
 		}
 
 		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
@@ -103,10 +104,18 @@ dVector ndCharacter::CalculateCom() const
 			stack++;
 		}
 	}
-	com = com.Scale(dFloat32(1.0f) / mass);
-	com.m_w = dFloat32 (1.0f);
 
-	return com;
+	
+	com = com.Scale(dFloat32(1.0f) / mass);
+	veloc = veloc.Scale(dFloat32(1.0f) / mass);
+	com.m_w = dFloat32 (1.0f);
+	veloc.m_w = dFloat32(0.0f);
+
+	ndLinearState state;
+	state.m_mass = mass;
+	state.m_centerOfMass = com;
+	state.m_centerOfMassVeloc = veloc;
+	return state;
 }
 
 void ndCharacter::Debug(ndConstraintDebugCallback& context) const
@@ -117,7 +126,9 @@ void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 	// show character center of mass.
 	dFloat32 scale = context.GetScale();
 	context.SetScale(scale * 0.5f);
-	matrix.m_posit = CalculateCom();
+
+	ndLinearState state(CalculateCom());
+	matrix.m_posit = state.m_centerOfMass;
 	context.DrawFrame(matrix);
 
 	context.SetScale(scale);
