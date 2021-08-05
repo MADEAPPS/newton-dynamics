@@ -53,6 +53,8 @@ class ndCharacter: public ndModel
 	D_NEWTON_API virtual void Update(ndWorld* const world, dFloat32 timestep);
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
 
+	dVector CalculateCom() const;
+
 	ndCharacterRootNode* m_rootNode;
 };
 

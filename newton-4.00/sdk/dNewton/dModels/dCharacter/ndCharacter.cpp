@@ -23,6 +23,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndCharacter.h"
+#include "ndBodyDynamic.h"
 #include "ndCharacterLimbNode.h"
 #include "ndCharacterRootNode.h"
 #include "ndCharacterEffectorNode.h"
@@ -72,8 +73,24 @@ ndCharacterEffectorNode* ndCharacter::CreateInverseDynamicEffector(const dMatrix
 	return effector;
 }
 
-void ndCharacter::Debug(ndConstraintDebugCallback&) const
+
+dVector ndCharacter::CalculateCom() const
 {
+	return dVector::m_wOne;
+}
+
+void ndCharacter::Debug(ndConstraintDebugCallback& context) const
+{
+	ndBodyDynamic* const hip = m_rootNode->GetBody();
+	dMatrix matrix(hip->GetMatrix());
+	
+	// show character center of mass.
+	dFloat32 scale = context.GetScale();
+	context.SetScale(scale * 0.5f);
+	//matrix.m_posit = CalculateCom();
+	context.DrawFrame(matrix);
+
+	context.SetScale(scale);
 }
 
 void ndCharacter::PostUpdate(ndWorld* const, dFloat32)
