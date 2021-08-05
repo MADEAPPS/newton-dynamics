@@ -108,24 +108,13 @@ D_INLINE void ndSkeletonContainer::ndNode::GetJacobians(const ndLeftHandSide* co
 			jointMass[i] = zero;
 			jointMass[i][i] = -rhs->m_diagDamp;
 
-			//bodyJt[i] = dSpatialVector(row->m_Jt.m_jacobianM0.m_linear * dVector::m_negOne, row->m_Jt.m_jacobianM0.m_angular * dVector::m_negOne);
-			//jointJ[i] = dSpatialVector(row->m_Jt.m_jacobianM1.m_linear * dVector::m_negOne, row->m_Jt.m_jacobianM1.m_angular * dVector::m_negOne);
-			dVector bodyLinear(row->m_Jt.m_jacobianM0.m_linear * dVector::m_negOne);
-			dVector bodyAngular(row->m_Jt.m_jacobianM0.m_angular * dVector::m_negOne);
-			dVector jointLinear(row->m_Jt.m_jacobianM1.m_linear * dVector::m_negOne);
-			dVector jointAngular(row->m_Jt.m_jacobianM1.m_angular * dVector::m_negOne);
-
-			for (dInt32 j = 0; j < 3; j++)
+			bodyJt[i] = dSpatialVector(row->m_Jt.m_jacobianM0.m_linear * dVector::m_negOne, row->m_Jt.m_jacobianM0.m_angular * dVector::m_negOne);
+			jointJ[i] = dSpatialVector(row->m_Jt.m_jacobianM1.m_linear * dVector::m_negOne, row->m_Jt.m_jacobianM1.m_angular * dVector::m_negOne);
+			for (dInt32 j = 0; j < 4; j++)
 			{
-				bodyJt[i][j + 0] = bodyLinear[j];
-				bodyJt[i][j + 3] = bodyAngular[j];
-				jointJ[i][j + 0] = jointLinear[j];
-				jointJ[i][j + 3] = jointAngular[j];
+				bodyJt[i][3 + j] = bodyJt[i][4 + j];
+				jointJ[i][3 + j] = jointJ[i][4 + j];
 			}
-			bodyJt[i][6] = dFloat32(0.0f);
-			bodyJt[i][7] = dFloat32(0.0f);
-			jointJ[i][6] = dFloat32(0.0f);
-			jointJ[i][7] = dFloat32(0.0f);
 		}
 	}
 	else 
@@ -138,24 +127,13 @@ D_INLINE void ndSkeletonContainer::ndNode::GetJacobians(const ndLeftHandSide* co
 			jointMass[i] = zero;
 			jointMass[i][i] = -rhs->m_diagDamp;
 
-			//bodyJt[i] = dSpatialVector(row->m_Jt.m_jacobianM1.m_linear * dVector::m_negOne, row->m_Jt.m_jacobianM1.m_angular * dVector::m_negOne);
-			//jointJ[i] = dSpatialVector(row->m_Jt.m_jacobianM0.m_linear * dVector::m_negOne, row->m_Jt.m_jacobianM0.m_angular * dVector::m_negOne);
-			dVector bodyLinear(row->m_Jt.m_jacobianM1.m_linear * dVector::m_negOne);
-			dVector bodyAngular(row->m_Jt.m_jacobianM1.m_angular * dVector::m_negOne);
-			dVector jointLinear(row->m_Jt.m_jacobianM0.m_linear * dVector::m_negOne);
-			dVector jointAngular(row->m_Jt.m_jacobianM0.m_angular * dVector::m_negOne);
-
-			for (dInt32 j = 0; j < 3; j++)
+			jointJ[i] = dSpatialVector(row->m_Jt.m_jacobianM0.m_linear * dVector::m_negOne, row->m_Jt.m_jacobianM0.m_angular * dVector::m_negOne);
+			bodyJt[i] = dSpatialVector(row->m_Jt.m_jacobianM1.m_linear * dVector::m_negOne, row->m_Jt.m_jacobianM1.m_angular * dVector::m_negOne);
+			for (dInt32 j = 0; j < 4; j++)
 			{
-				bodyJt[i][j + 0] = bodyLinear[j];
-				bodyJt[i][j + 3] = bodyAngular[j];
-				jointJ[i][j + 0] = jointLinear[j];
-				jointJ[i][j + 3] = jointAngular[j];
+				bodyJt[i][3 + j] = bodyJt[i][4 + j];
+				jointJ[i][3 + j] = jointJ[i][4 + j];
 			}
-			bodyJt[i][6] = dFloat32(0.0f);
-			bodyJt[i][7] = dFloat32(0.0f);
-			jointJ[i][6] = dFloat32(0.0f);
-			jointJ[i][7] = dFloat32(0.0f);
 		}
 	}
 }
