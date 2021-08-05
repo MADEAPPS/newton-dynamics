@@ -62,7 +62,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
 
 	ndLinearState CalculateCom() const;
-
+	
 	ndCharacterRootNode* m_rootNode;
 };
 

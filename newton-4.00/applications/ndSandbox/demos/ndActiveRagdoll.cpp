@@ -150,6 +150,10 @@ class ndActiveRagdollModel : public ndCharacter
 		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);
 		rootEntity->ResetMatrix(rootEntity->GetCurrentMatrix() * matrix);
 		ndCharacterRootNode* const rootNode = CreateRoot(CreateBodyPart(scene, rootEntity, nullptr));
+		dMatrix bodyMatrix(rootNode->GetBody()->GetMatrix());
+		ndDemoEntity* const characterFrame = (ndDemoEntity*)entity->Find("referenceFrame");
+		dMatrix bodyFrame(characterFrame->CalculateGlobalMatrix());
+		rootNode->SetLocalFrame(bodyFrame);
 
 		dInt32 stack = 0;
 		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);

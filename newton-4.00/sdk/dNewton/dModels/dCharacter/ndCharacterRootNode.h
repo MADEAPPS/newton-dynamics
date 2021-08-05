@@ -36,9 +36,13 @@ class ndCharacterRootNode: public ndCharacterLimbNode
 	ndCharacter* GetOwner() const;
 	virtual ndBodyDynamic* GetBody() const;
 
+	const dMatrix& GetLocalFrame() const;
+	D_NEWTON_API void SetLocalFrame(const dMatrix& frameInGlobalSpace);
+
 	protected:
 	ndCharacter* m_owner;
 	ndBodyDynamic* m_body;
+	dMatrix m_localFrame;
 };
 
 inline ndCharacter* ndCharacterRootNode::GetOwner() const
@@ -49,6 +53,11 @@ inline ndCharacter* ndCharacterRootNode::GetOwner() const
 inline ndBodyDynamic* ndCharacterRootNode::GetBody() const
 {
 	return m_body;
+}
+
+inline const dMatrix& ndCharacterRootNode::GetLocalFrame() const
+{
+	return m_localFrame;
 }
 
 #endif

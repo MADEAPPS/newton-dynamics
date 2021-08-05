@@ -121,7 +121,8 @@ ndCharacter::ndLinearState ndCharacter::CalculateCom() const
 void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 {
 	ndBodyDynamic* const hip = m_rootNode->GetBody();
-	dMatrix matrix(hip->GetMatrix());
+
+	dMatrix matrix(m_rootNode->GetLocalFrame() * hip->GetMatrix());
 	
 	// show character center of mass.
 	dFloat32 scale = context.GetScale();

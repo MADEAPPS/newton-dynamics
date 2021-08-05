@@ -22,15 +22,24 @@
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndCharacter.h"
+#include "ndBodyDynamic.h"
 #include "ndCharacterRootNode.h"
 
 ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body)
 	:ndCharacterLimbNode(nullptr)
 	,m_owner(owner)
 	,m_body(body)
+	,m_localFrame(dGetIdentityMatrix())
 {
+	SetLocalFrame(m_body->GetMatrix());
 }
 
 ndCharacterRootNode::~ndCharacterRootNode()
 {
+}
+
+void ndCharacterRootNode::SetLocalFrame(const dMatrix& frameInGlobalSpace)
+{
+	dMatrix matrix(m_body->GetMatrix());
+	m_localFrame = frameInGlobalSpace * matrix.Inverse();
 }
