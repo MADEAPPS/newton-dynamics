@@ -345,6 +345,6 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 
 	delete ragdollMesh;
 	dQuaternion rot(dYawMatrix (90.0f * dDegreeToRad) * playerMatrix);
-	dVector origin(playerMatrix.m_posit + dVector (0.0f, 1.0f, 4.0f, 0.0f));
+	dVector origin(playerMatrix.m_posit + dVector (0.0f, 1.0f, 2.5f, 0.0f));
 	scene->SetCameraMatrix(rot, origin);
 }
