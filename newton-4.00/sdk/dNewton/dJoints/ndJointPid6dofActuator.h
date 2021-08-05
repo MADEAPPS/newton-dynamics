@@ -15,9 +15,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointPid3dofActuator.h"
 
-//#define D_PID_PENETRATION_RECOVERY_LINEAR_SPEED dFloat32 (0.1f) 
-//#define D_PID_PENETRATION_LINEAR_LIMIT dFloat32 (10.0f * dDegreeToRad) 
-
 class ndJointPid6dofActuator : public ndJointPid3dofActuator
 {
 	public:
