@@ -185,6 +185,15 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	origin.m_x += 4.0f;
 	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 20);
 
+	origin.m_x += 4.0f;
+	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 20);
+
+	origin.m_x += 4.0f;
+	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 20);
+
+	origin.m_x += 4.0f;
+	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 20);
+
 	dQuaternion rot(dYawMatrix (90.0f * dDegreeToRad));
 	dVector origin1(20.0f, 5.0f, 30.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin1);
