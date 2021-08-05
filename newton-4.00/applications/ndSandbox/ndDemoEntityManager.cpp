@@ -38,20 +38,20 @@
 //#define DEFAULT_SCENE	0		// setting basic rigidbody
 //#define DEFAULT_SCENE	1		// setting gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// setting friction ramp
-//#define DEFAULT_SCENE	3		// setting basic Stacks
-//#define DEFAULT_SCENE	4		// setting basic Trigger
-//#define DEFAULT_SCENE	5		// setting basic player
-//#define DEFAULT_SCENE	6		// setting particle fluid
-//#define DEFAULT_SCENE	7		// static mesh collision 
-//#define DEFAULT_SCENE	8		// setting basic joints
-//#define DEFAULT_SCENE	9		// setting basic rag doll
-#define DEFAULT_SCENE	10		// setting active rag doll
-//#define DEFAULT_SCENE	11		// setting basic vehicle
-//#define DEFAULT_SCENE	12		// setting heavy vehicle
-//#define DEFAULT_SCENE	13		// conservation of angular momentum 
-//#define DEFAULT_SCENE	14		// simple voronoi fracture
-//#define DEFAULT_SCENE	15		// basic voronoi fracture
-//#define DEFAULT_SCENE	16		// linked voronoi fracture
+//#define DEFAULT_SCENE	3		// conservation of momentum 
+//#define DEFAULT_SCENE	4		// setting basic Stacks
+//#define DEFAULT_SCENE	5		// setting basic Trigger
+//#define DEFAULT_SCENE	6		// setting basic player
+//#define DEFAULT_SCENE	7		// setting particle fluid
+//#define DEFAULT_SCENE	8		// static mesh collision 
+//#define DEFAULT_SCENE	9		// setting basic joints
+//#define DEFAULT_SCENE	10		// setting basic rag doll
+#define DEFAULT_SCENE	11		// setting active rag doll
+//#define DEFAULT_SCENE	12		// setting basic vehicle
+//#define DEFAULT_SCENE	14		// setting heavy vehicle
+//#define DEFAULT_SCENE	15		// simple voronoi fracture
+//#define DEFAULT_SCENE	16		// basic voronoi fracture
+//#define DEFAULT_SCENE	17		// linked voronoi fracture
 //#define DEFAULT_SCENE	17		// skin peel voronoi fracture
 						 
 // demos forward declaration 
@@ -81,6 +81,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic rigidbody", ndBasicRigidBody },
 	{ "basic gpu rigidbody", ndBasicGpuRigidBody },
 	{ "basic friction ramp", ndBasicFrictionRamp },
+	{ "basic conservation of momentum", ndBasicAngularMomentum },
 	{ "basic stack", ndBasicStacks },
 	{ "basic trigger", ndBasicTrigger },
 	{ "basic player", ndPlayerCapsuleDemo },
@@ -91,7 +92,6 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "active ragdoll", ndActiveRagdoll },
 	{ "basic vehicle", ndBasicVehicle },
 	{ "heavy vehicle", ndHeavyVehicle },
-	{ "angular momentum", ndBasicAngularMomentum },
 	{ "simple convex fracture", ndBasicExplodeConvexShape },
 	//{ "basic convex fracture", ndBasicFracture_0 },
 	//{ "linked convex fracture", ndBasicFracture_2 },

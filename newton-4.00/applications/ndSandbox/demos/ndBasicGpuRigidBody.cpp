@@ -146,16 +146,14 @@
 //	geometry->Release();
 //}
 
-//void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
-void ndBasicGpuRigidBody(ndDemoEntityManager* const)
+void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
 {
 	// build a floor
-	//BuildFloorBox(scene);
+	BuildFloorBox(scene, dGetIdentityMatrix());
 
-	dAssert(0);
-	//AddBox(scene, dVector(0.0f, 0.0f, -3.0f, 1.0f), 0.6f);
-	//
-	//dQuaternion rot;
-	//dVector origin(-160.0f, 5.0f, 0.0f, 0.0f);
-	//scene->SetCameraMatrix(rot, origin);
+	AddBox(scene, dVector(0.0f, 0.0f, -3.0f, 1.0f), 0.6f, 5.0f, 0.5f, 3.0f);
+
+	dQuaternion rot;
+	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
+	scene->SetCameraMatrix(rot, origin);
 }

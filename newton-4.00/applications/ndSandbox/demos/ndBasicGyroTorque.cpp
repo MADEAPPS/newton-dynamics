@@ -126,8 +126,8 @@ static void RattleBack(ndDemoEntityManager* const scene, dFloat32 mass, const dV
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	//dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y += 0.25f;
+	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y += floor.m_y + 0.4f;
 
 	dMatrix shapeMatrix(dYawMatrix(5.0f * dDegreeToRad));
 
@@ -188,13 +188,13 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
-	DzhanibekovEffect(scene, 10.0f, 5.0f, dVector(0.0f, 0.0f, -2.0f, 0.0f));
-	DzhanibekovEffect(scene, 10.0f, -5.0f, dVector(0.0f, 0.0f, 0.0f, 0.0f));
-	DzhanibekovEffect(scene, 10.0f, 10.0f, dVector(0.0f, 0.0f, 2.0f, 0.0f));
+	DzhanibekovEffect(scene, 10.0f, 5.0f, dVector(15.0f, 0.0f, -4.0f, 0.0f));
+	DzhanibekovEffect(scene, 10.0f, -5.0f, dVector(15.0f, 0.0f, 0.0f, 0.0f));
+	DzhanibekovEffect(scene, 10.0f, 10.0f, dVector(15.0f, 0.0f, 4.0f, 0.0f));
 
-	Phitop(scene, 10.0f, 25.0f, dVector(10.0f, 0.0f, -4.0f, 0.0f));
+	Phitop(scene, 10.0f,  25.0f, dVector(10.0f, 0.0f, -6.0f, 0.0f));
 	Phitop(scene, 10.0f, -25.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
-	Phitop(scene, 10.0f, 35.0f, dVector(10.0f, 0.0f, 4.0f, 0.0f));
+	Phitop(scene, 10.0f,  35.0f, dVector(10.0f, 0.0f, 6.0f, 0.0f));
 
 	PrecessingTop(scene, dVector(5.0f, 0.0f, -4.0f, 0.0f));
 	PrecessingTop(scene, dVector(5.0f, 0.0f, 0.0f, 0.0f));
@@ -202,7 +202,7 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 
 	RattleBack(scene, 10.0f, dVector(0.0f, 0.0f, -4.0f, 0.0f));
 	RattleBack(scene, 10.0f, dVector(0.0f, 0.0f, 0.0f, 0.0f));
-	RattleBack(scene, 10.0f, dVector(0.0f, 0.0f, 4.0f, 0.0f));
+	RattleBack(scene, 10.0f, dVector(0.0f, 0.0f,  4.0f, 0.0f));
 	
 	scene->GetCameraManager()->SetPickMode(true);
 
