@@ -299,19 +299,19 @@ class ndActiveRagdollModel : public ndCharacter
 		}
 	}
 
-	void Update(ndWorld* const, dFloat32) 
+	void Update(ndWorld* const world, dFloat32 timestep) 
 	{
+		ndCharacter::Update(world, timestep);
 	}
 
-	//void PostUpdate(ndWorld* const world, dFloat32)
-	void PostUpdate(ndWorld* const, dFloat32)
+	void PostUpdate(ndWorld* const world, dFloat32 timestep)
 	{
+		ndCharacter::PostUpdate(world, timestep);
 	}
 
-	//void PostTransformUpdate(ndWorld* const world, dFloat32 timestep)
-	void PostTransformUpdate(ndWorld* const, dFloat32)
+	void PostTransformUpdate(ndWorld* const world, dFloat32 timestep)
 	{
-
+		ndCharacter::PostTransformUpdate(world, timestep);
 	}
 
 	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
