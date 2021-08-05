@@ -25,6 +25,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacterLimbNode.h"
 
+class ndJointPid3dofActuator;
+
 class ndCharacterFowardDynamicNode: public ndCharacterLimbNode 
 {
 	public:
@@ -38,7 +40,7 @@ class ndCharacterFowardDynamicNode: public ndCharacterLimbNode
 
 	protected:
 	ndBodyDynamic* m_body;
-	ndJointBilateralConstraint* m_joint;
+	ndJointPid3dofActuator* m_joint;
 };
 
 inline ndBodyDynamic* ndCharacterFowardDynamicNode::GetBody() const
@@ -48,7 +50,7 @@ inline ndBodyDynamic* ndCharacterFowardDynamicNode::GetBody() const
 
 inline ndJointBilateralConstraint* ndCharacterFowardDynamicNode::GetJoint() const
 {
-	return m_joint;
+	return (ndJointBilateralConstraint*)m_joint;
 }
 
 #endif

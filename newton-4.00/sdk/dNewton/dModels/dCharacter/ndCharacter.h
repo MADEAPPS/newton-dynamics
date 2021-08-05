@@ -28,6 +28,7 @@
 class ndWorld;
 class ndCharacterLimbNode;
 class ndCharacterRootNode;
+class ndCharacterEffectorNode;
 class ndCharacterFowardDynamicNode;
 class ndCharacterInverseDynamicNode;
 
@@ -43,7 +44,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API ndCharacterRootNode* CreateRoot(ndBodyDynamic* const body);
 	D_NEWTON_API ndCharacterFowardDynamicNode* CreateFowardDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
 	D_NEWTON_API ndCharacterInverseDynamicNode* CreateInverseDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
-
+	D_NEWTON_API ndCharacterEffectorNode* CreateInverseDynamicEffector(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const child, ndCharacterLimbNode* const parent);
 	
 	ndCharacter* GetAsCharacter();
 

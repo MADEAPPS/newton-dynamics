@@ -23,7 +23,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacter.h"
 #include "ndBodyDynamic.h"
-//#include "ndJointPid3dofActuator.h"
 #include "ndJointBallAndSocket.h"
 #include "ndCharacterInverseDynamicNode.h"
 

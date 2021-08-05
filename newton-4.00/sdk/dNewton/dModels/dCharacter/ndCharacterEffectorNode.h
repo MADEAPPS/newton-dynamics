@@ -25,14 +25,27 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacterLimbNode.h"
 
+class ndJointPid6dofActuator;
+class ndJointBilateralConstraint;
+
 class ndCharacterEffectorNode: public ndCharacterLimbNode
 {
 	public:
 	D_CLASS_RELECTION(ndCharacterEffectorNode);
 
-	D_NEWTON_API ndCharacterEffectorNode(ndCharacterLimbNode* const parent);
+	D_NEWTON_API ndCharacterEffectorNode(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const child, ndCharacterLimbNode* const referenceNode);
 	D_NEWTON_API virtual ~ndCharacterEffectorNode ();
+
+	virtual ndJointBilateralConstraint* GetJoint() const;
+
+	protected:
+	ndJointPid6dofActuator* m_effector;
+	ndCharacterLimbNode* m_referenceNode;
 };
 
+inline ndJointBilateralConstraint* ndCharacterEffectorNode::GetJoint() const
+{
+	return (ndJointBilateralConstraint*)m_effector;
+}
 
 #endif

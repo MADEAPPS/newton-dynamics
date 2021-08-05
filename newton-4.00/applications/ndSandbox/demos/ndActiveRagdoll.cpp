@@ -28,6 +28,7 @@ class dActiveJointDefinition
 	{
 		fowardKinematic,
 		inverseKinematic,
+		effector,
 	};
 
 	struct dJointPidData
@@ -122,10 +123,12 @@ static dActiveJointDefinition jointsDefinition[] =
 	{ "mixamorig:RightUpLeg", dActiveJointDefinition::inverseKinematic, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 	{ "mixamorig:RightLeg", dActiveJointDefinition::inverseKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 	{ "mixamorig:RightFoot", dActiveJointDefinition::inverseKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "rightFoot_effector", dActiveJointDefinition::effector },
 	
 	{ "mixamorig:LeftUpLeg", dActiveJointDefinition::inverseKinematic, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 	{ "mixamorig:LeftLeg", dActiveJointDefinition::inverseKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 	{ "mixamorig:LeftFoot", dActiveJointDefinition::inverseKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "leftFoot_effector", dActiveJointDefinition::effector },
 };
 
 class ndActiveRagdollModel : public ndCharacter
@@ -141,7 +144,7 @@ class ndActiveRagdollModel : public ndCharacter
 		// find the floor location 
 		dMatrix matrix(location);
 		dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		matrix.m_posit.m_y = floor.m_y + 1.0f;
+		matrix.m_posit.m_y = floor.m_y + 0.1f;
 
 		// add the root body
 		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);
@@ -176,12 +179,23 @@ class ndActiveRagdollModel : public ndCharacter
 			{
 				if (!strcmp(jointsDefinition[i].m_boneName, name)) 
 				{
-					ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone->GetBody());
-					bodyArray[bodyCount] = childBody;
-					bodyCount++;
-		
-					// connect this body part to its parentBody with a ragdoll joint
-					parentBone = ConnectBodyParts(world, childBody, parentBone, jointsDefinition[i]);
+					if (jointsDefinition[i].m_limbType != dActiveJointDefinition::effector)
+					{
+						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone->GetBody());
+						bodyArray[bodyCount] = childBody;
+						bodyCount++;
+
+						// connect this body part to its parentBody with a ragdoll joint
+						parentBone = ConnectBodyParts(world, childBody, parentBone, jointsDefinition[i]);
+					}
+					else
+					{
+						ndCharacterLimbNode* const referenceNode = parentBone->GetParent()->GetParent()->GetParent();
+						dMatrix effectorMatrix(childEntity->GetCurrentMatrix() * parentBone->GetBody()->GetMatrix());
+						ndCharacterEffectorNode* const effectorNode = CreateInverseDynamicEffector(effectorMatrix, parentBone, referenceNode);
+						ndJointBilateralConstraint* const effectorJoint = effectorNode->GetJoint();
+						world->AddJoint(effectorJoint);
+					}
 					break;
 				}
 			}
@@ -285,7 +299,6 @@ class ndActiveRagdollModel : public ndCharacter
 			world->AddJoint(joint);
 			return jointNode;
 		}
-
 	}
 
 	void Update(ndWorld* const, dFloat32) 

@@ -25,6 +25,7 @@
 #include "ndCharacter.h"
 #include "ndCharacterLimbNode.h"
 #include "ndCharacterRootNode.h"
+#include "ndCharacterEffectorNode.h"
 #include "ndCharacterFowardDynamicNode.h"
 #include "ndCharacterInverseDynamicNode.h"
 
@@ -65,7 +66,12 @@ ndCharacterInverseDynamicNode* ndCharacter::CreateInverseDynamicLimb(const dMatr
 	return limb;
 }
 
-//void ndCharacter::Debug(ndConstraintDebugCallback& context) const
+ndCharacterEffectorNode* ndCharacter::CreateInverseDynamicEffector(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const child, ndCharacterLimbNode* const referenceNode)
+{
+	ndCharacterEffectorNode* const effector = new ndCharacterEffectorNode(matrixInGlobalScape, child, referenceNode);
+	return effector;
+}
+
 void ndCharacter::Debug(ndConstraintDebugCallback&) const
 {
 }
