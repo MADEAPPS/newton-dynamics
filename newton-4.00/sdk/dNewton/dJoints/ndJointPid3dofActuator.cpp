@@ -15,7 +15,7 @@
 
 ndJointPid3dofActuator::ndJointPid3dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
-	,m_baseMatrix(m_localMatrix0)
+	,m_referenceFrameBody0(m_localMatrix0)
 	,m_targetPitch(dFloat32 (0.0f))
 	,m_targetYaw(dFloat32(0.0f))
 	,m_targetRoll(dFloat32(0.0f))
@@ -74,7 +74,7 @@ void ndJointPid3dofActuator::DebugJoint(ndConstraintDebugCallback& debugCallback
 	dMatrix matrix0;
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
-	matrix0 = m_baseMatrix * m_body0->GetMatrix();
+	matrix0 = m_referenceFrameBody0 * m_body0->GetMatrix();
 
 	debugCallback.DrawFrame(matrix0);
 	debugCallback.DrawFrame(matrix1);
@@ -166,13 +166,6 @@ void ndJointPid3dofActuator::SubmitAngularAxisCartesianApproximation(const dMatr
 		dAssert(m_maxConeAngle == dFloat32(0.0f));
 		//this is a hinge joint
 		dFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
-		pitchAngle -= -0.0f * dDegreeToRad;
-		//dFloat32 kp = 10.0f;
-		//dFloat32 ki = 1000.0f;
-		///dFloat32 kd = 10.0f;
-		//dFloat32 ks = m_integralError * ki + kp;
-		//dFloat32 ks = 100.0f;
-		//dTrace(("ks=%f kd=%f\n", ks, kd));
 		AddAngularRowJacobian(desc, matrix0.m_front, pitchAngle);
 		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 
@@ -190,10 +183,10 @@ void ndJointPid3dofActuator::SubmitAngularAxisCartesianApproximation(const dMatr
 	}
 
 	dFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
-	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
+	SubmitTwistLimits(matrix0.m_front, pitchAngle, desc);
 }
 
-void ndJointPid3dofActuator::SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc)
+void ndJointPid3dofActuator::SubmitTwistLimits(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc)
 {
 	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * dDegreeToRad))
 	{
@@ -246,7 +239,7 @@ void ndJointPid3dofActuator::SubmitAngularAxis(const dMatrix& matrix0, const dMa
 
 	dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 	dFloat32 pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
-	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
+	SubmitTwistLimits(matrix0.m_front, pitchAngle, desc);
 }
 
 void ndJointPid3dofActuator::SubmitPidRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
@@ -306,7 +299,10 @@ void ndJointPid3dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-	m_localMatrix0 = m_baseMatrix * dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll);
+if (m_maxConeAngle == 0.0f)
+m_targetPitch = 60.0f * dDegreeToRad;
+
+	m_localMatrix0 = dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll) * m_referenceFrameBody0;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	SubmitLinearLimits(matrix0, matrix1, desc);
