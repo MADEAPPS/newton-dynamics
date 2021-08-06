@@ -30,21 +30,30 @@
 #include "ndCharacterPoseController.h"
 #include "ndCharacterForwardDynamicNode.h"
 #include "ndCharacterInverseDynamicNode.h"
+#include "ndCharacterInvertedPendulumPoseController.h"
 
 ndCharacter::ndCharacter()
 	:ndModel()
 	,m_rootNode(nullptr)
 	,m_controller(nullptr)
+	,m_defaultController(nullptr)
 {
+	m_controller = new ndCharacterInvertedPendulumPoseController(this);
+	m_defaultController = m_controller;
 }
 
 ndCharacter::ndCharacter(const nd::TiXmlNode* const xmlNode)
 	:ndModel(xmlNode)
 {
+	dAssert(0);
 }
 
 ndCharacter::~ndCharacter()
 {
+	if (m_defaultController)
+	{
+		delete m_defaultController;
+	}
 	if (m_rootNode)
 	{
 		delete m_rootNode;
@@ -195,10 +204,8 @@ void ndCharacter::PostUpdate(ndWorld* const, dFloat32)
 void ndCharacter::Update(ndWorld* const world, dFloat32 timestep)
 {
 	ndCentreOfMassState comState(CalculateCentreOfMassState());
-	if (m_controller)
-	{
-		m_controller->Evaluate(world, timestep);
-	}
+	dAssert(m_controller);
+	m_controller->Evaluate(world, timestep);
 	UpdateGlobalPose(world, timestep);
 	CalculateLocalPose(world, timestep);
 }

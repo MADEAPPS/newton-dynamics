@@ -68,6 +68,7 @@ class ndCharacter: public ndModel
 	
 	ndCharacterRootNode* m_rootNode;
 	ndCharacterPoseController* m_controller;
+	ndCharacterPoseController* m_defaultController;
 };
 
 inline ndCharacter* ndCharacter::GetAsCharacter()

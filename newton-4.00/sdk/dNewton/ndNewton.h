@@ -87,6 +87,7 @@
 #include <ndCharacterInverseDynamicNode.h>
 #include <ndMultiBodyVehicleDifferential.h>
 #include <ndMultiBodyVehicleDifferentialAxle.h>
+#include <ndCharacterInvertedPendulumPoseController.h>
 
 #endif 
 

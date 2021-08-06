@@ -19,27 +19,22 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CHARACTER_POSE_CONTROLLER_H__
-#define __D_CHARACTER_POSE_CONTROLLER_H__
-
+#include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndModel.h"
+#include "ndWorld.h"
+#include "ndCharacterInvertedPendulumPoseController.h"
 
-class ndWorld;
-class ndCharacter;
-
-class ndCharacterPoseController: public dClassAlloc
+ndCharacterInvertedPendulumPoseController::ndCharacterInvertedPendulumPoseController(ndCharacter* const owner)
+	:ndCharacterPoseController(owner)
 {
-	public:
-	D_CLASS_RELECTION(ndCharacterPoseController);
+}
 
-	D_NEWTON_API ndCharacterPoseController(ndCharacter* const owner);
-	D_NEWTON_API virtual ~ndCharacterPoseController ();
+ndCharacterInvertedPendulumPoseController::~ndCharacterInvertedPendulumPoseController()
+{
+}
 
-	virtual bool Evaluate(ndWorld* const world, dFloat32 timestep) = 0;
+bool ndCharacterInvertedPendulumPoseController::Evaluate(ndWorld* const world, dFloat32 timestep)
+{
+	return true;
+}
 
-	protected:
-	ndCharacter* m_owner;
-};
-
-#endif
