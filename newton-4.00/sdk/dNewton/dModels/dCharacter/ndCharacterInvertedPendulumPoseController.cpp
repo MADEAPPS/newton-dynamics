@@ -22,6 +22,7 @@
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
+#include "ndCharacter.h"
 #include "ndCharacterInvertedPendulumPoseController.h"
 
 ndCharacterInvertedPendulumPoseController::ndCharacterInvertedPendulumPoseController(ndCharacter* const owner)
@@ -35,6 +36,9 @@ ndCharacterInvertedPendulumPoseController::~ndCharacterInvertedPendulumPoseContr
 
 bool ndCharacterInvertedPendulumPoseController::Evaluate(ndWorld* const world, dFloat32 timestep)
 {
+	ndCharacter::ndCentreOfMassState comState(m_owner->CalculateCentreOfMassState());
+	m_owner->UpdateGlobalPose(world, timestep);
+	m_owner->CalculateLocalPose(world, timestep);
 	return true;
 }
 

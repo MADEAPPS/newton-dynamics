@@ -13,7 +13,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointPid6dofActuator.h"
 
-#define D_SMALL_DISTANCE_ERROR2 (dFloat32 (1.0e-3f) * dFloat32 (1.0e-3f))
+#define D_SMALL_DISTANCE_ERROR dFloat32 (1.0e-2f)
+#define D_SMALL_DISTANCE_ERROR2 (D_SMALL_DISTANCE_ERROR * D_SMALL_DISTANCE_ERROR)
 
 ndJointPid6dofActuator::ndJointPid6dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointPid3dofActuator(pinAndPivotFrame, child, parent)
@@ -45,6 +46,7 @@ void ndJointPid6dofActuator::SubmitLinearLimits(const dMatrix& matrix0, const dM
 {
 	const dVector step (matrix0.m_posit - matrix1.m_posit);
 	if (step.DotProduct(step).GetScalar() <= D_SMALL_DISTANCE_ERROR2)
+	//if (1)
 	{
 		// Cartesian motion
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);

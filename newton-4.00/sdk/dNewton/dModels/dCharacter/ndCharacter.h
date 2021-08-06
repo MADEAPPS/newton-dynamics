@@ -56,15 +56,14 @@ class ndCharacter: public ndModel
 	D_NEWTON_API ndCharacterEffectorNode* CreateInverseDynamicEffector(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const child, ndCharacterLimbNode* const parent);
 	
 	ndCharacter* GetAsCharacter();
+	ndCentreOfMassState CalculateCentreOfMassState() const;
+	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
+	void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
 
 	protected:
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	D_NEWTON_API virtual void Update(ndWorld* const world, dFloat32 timestep);
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
-
-	ndCentreOfMassState CalculateCentreOfMassState() const;
-	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
-	void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
 	
 	ndCharacterRootNode* m_rootNode;
 	ndCharacterPoseController* m_controller;

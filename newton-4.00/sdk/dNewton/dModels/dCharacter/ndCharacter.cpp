@@ -203,9 +203,6 @@ void ndCharacter::PostUpdate(ndWorld* const, dFloat32)
 
 void ndCharacter::Update(ndWorld* const world, dFloat32 timestep)
 {
-	ndCentreOfMassState comState(CalculateCentreOfMassState());
 	dAssert(m_controller);
 	m_controller->Evaluate(world, timestep);
-	UpdateGlobalPose(world, timestep);
-	CalculateLocalPose(world, timestep);
 }
