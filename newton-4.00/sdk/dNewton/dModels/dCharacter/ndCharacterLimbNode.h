@@ -42,6 +42,7 @@ class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 	virtual ndJointBilateralConstraint* GetJoint() const;
 
 	virtual void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
+	virtual void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
 
 	protected:
 	D_NEWTON_API dNodeBaseHierarchy* CreateClone() const;
@@ -58,6 +59,10 @@ inline ndJointBilateralConstraint* ndCharacterLimbNode::GetJoint() const
 }
 
 inline void ndCharacterLimbNode::UpdateGlobalPose(ndWorld* const, dFloat32)
+{
+}
+
+inline void ndCharacterLimbNode::CalculateLocalPose(ndWorld* const, dFloat32)
 {
 }
 

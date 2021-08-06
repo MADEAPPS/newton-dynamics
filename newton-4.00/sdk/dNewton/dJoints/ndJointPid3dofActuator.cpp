@@ -261,10 +261,6 @@ void ndJointPid3dofActuator::SubmitPidRotation(const dMatrix& matrix0, const dMa
 	dQuaternion dq(q0.Inverse() * q1);
 	dVector pin(dq.m_x, dq.m_y, dq.m_z, dFloat32(0.0f));
 
-//dFloat32 ks = 1000.0f;
-//dFloat32 kd = 100.0f;
-//dFloat32 regularizer = 0.005f;
-
 	dFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
 	if (dirMag2 > dFloat32(dFloat32(1.0e-7f)))
 	{

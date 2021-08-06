@@ -73,7 +73,7 @@ ndCharacterEffectorNode* ndCharacter::CreateInverseDynamicEffector(const dMatrix
 	return effector;
 }
 
-ndCharacter::ndLinearState ndCharacter::CalculateCom() const
+ndCharacter::ndCentreOfMassState ndCharacter::CalculateCentreOfMassState() const
 {
 	dInt32 stack = 1;
 	ndCharacterLimbNode* nodePool[32];
@@ -121,7 +121,7 @@ ndCharacter::ndLinearState ndCharacter::CalculateCom() const
 	//omega.m_w = dFloat32(0.0f);
 	veloc.m_w = dFloat32(0.0f);
 
-	ndLinearState state;
+	ndCentreOfMassState state;
 	state.m_mass = mass;
 	state.m_centerOfMass = com;
 	state.m_centerOfMassVeloc = veloc;
@@ -139,7 +139,7 @@ void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 	dFloat32 scale = context.GetScale();
 	context.SetScale(scale * 0.25f);
 
-	ndLinearState state(CalculateCom());
+	ndCentreOfMassState state(CalculateCentreOfMassState());
 	matrix.m_posit = state.m_centerOfMass;
 	context.DrawFrame(matrix);
 
@@ -166,11 +166,34 @@ void ndCharacter::UpdateGlobalPose(ndWorld* const world, dFloat32 timestep)
 	}
 }
 
+void ndCharacter::CalculateLocalPose(ndWorld* const world, dFloat32 timestep)
+{
+	dInt32 stack = 1;
+	ndCharacterLimbNode* nodePool[32];
+	nodePool[0] = m_rootNode;
+
+	while (stack)
+	{
+		stack--;
+		ndCharacterLimbNode* const node = nodePool[stack];
+		node->CalculateLocalPose(world, timestep);
+
+		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
+		{
+			nodePool[stack] = child;
+			stack++;
+		}
+	}
+}
+
 void ndCharacter::PostUpdate(ndWorld* const, dFloat32)
 {
 }
 
 void ndCharacter::Update(ndWorld* const world, dFloat32 timestep)
 {
+	ndCentreOfMassState comState(CalculateCentreOfMassState());
 	UpdateGlobalPose(world, timestep);
+	CalculateLocalPose(world, timestep);
+
 }

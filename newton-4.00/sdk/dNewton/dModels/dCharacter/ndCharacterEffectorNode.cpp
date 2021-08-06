@@ -40,7 +40,7 @@ ndCharacterEffectorNode::~ndCharacterEffectorNode()
 {
 }
 
-void ndCharacterEffectorNode::UpdateGlobalPose(ndWorld* const world, dFloat32 timestep)
+void ndCharacterEffectorNode::UpdateGlobalPose(ndWorld* const, dFloat32)
 {
 	// for now just; 
 	ndBodyDynamic* const body = m_effector->GetBody0()->GetAsBodyDynamic();
