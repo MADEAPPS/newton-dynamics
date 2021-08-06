@@ -19,20 +19,38 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dCoreStdafx.h"
+#ifndef __D_CHARACTER_FORWARD_DYNAMICS_NODE_H__
+#define __D_CHARACTER_FORWARD_DYNAMICS_NODE_H__
+
 #include "ndNewtonStdafx.h"
-#include "ndCharacter.h"
-#include "ndBodyDynamic.h"
-#include "ndJointPid3dofActuator.h"
-#include "ndCharacterFowardDynamicNode.h"
+#include "ndCharacterLimbNode.h"
 
-ndCharacterFowardDynamicNode::ndCharacterFowardDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
-	:ndCharacterLimbNode(parent)
-	,m_joint(new ndJointPid3dofActuator(matrixInGlobalScape, body, parent->GetBody()))
-	,m_body(body)
+class ndJointPid3dofActuator;
+
+class ndCharacterForwardDynamicNode: public ndCharacterLimbNode 
 {
+	public:
+	D_CLASS_RELECTION(ndCharacterForwardDynamicNode);
+
+	D_NEWTON_API ndCharacterForwardDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
+	D_NEWTON_API virtual ~ndCharacterForwardDynamicNode ();
+
+	virtual ndBodyDynamic* GetBody() const;
+	virtual ndJointBilateralConstraint* GetJoint() const;
+
+	protected:
+	ndBodyDynamic* m_body;
+	ndJointPid3dofActuator* m_joint;
+};
+
+inline ndBodyDynamic* ndCharacterForwardDynamicNode::GetBody() const
+{
+	return m_body;
 }
 
-ndCharacterFowardDynamicNode::~ndCharacterFowardDynamicNode()
+inline ndJointBilateralConstraint* ndCharacterForwardDynamicNode::GetJoint() const
 {
+	return (ndJointBilateralConstraint*)m_joint;
 }
+
+#endif

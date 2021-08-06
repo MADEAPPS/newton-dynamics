@@ -127,8 +127,8 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		m_transmission.m_gearsCount = 2;
 		m_transmission.m_crownGearRatio = 20.0f;
 		m_transmission.m_reverseRatio = -3.0f;
-		m_transmission.m_fowardRatios[0] = 4.0f;
-		m_transmission.m_fowardRatios[1] = 3.0f;
+		m_transmission.m_forwardRatios[0] = 4.0f;
+		m_transmission.m_forwardRatios[1] = 3.0f;
 
 		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_steeringAngle = 25.0f * dDegreeToRad;
@@ -402,8 +402,8 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 			dFloat32 x = gageSize / 2 + 20.0f;
 			dFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm;
 			maxRpm += 500.0f;
-			//printf("%.3f \n", m_configuration.m_transmission.m_fowardRatios[m_currentGear]);
-			//dFloat32 rpm = (motor->GetRpm() / maxRpm) * m_configuration.m_transmission.m_fowardRatios[m_currentGear]; 
+			//printf("%.3f \n", m_configuration.m_transmission.m_forwardRatios[m_currentGear]);
+			//dFloat32 rpm = (motor->GetRpm() / maxRpm) * m_configuration.m_transmission.m_forwardRatios[m_currentGear]; 
 			dFloat32 rpm = (motor->GetRpm() / maxRpm) * 2.85f;
 
 			if (m_vehicleUI)
@@ -486,13 +486,13 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		ndMultiBodyVehicleTireJoint* const fr_tire1 = AddTire(world, m_configuration.m_frontTire, fr_tire1_body);
 		ndMultiBodyVehicleTireJoint* const fl_tire1 = AddTire(world, m_configuration.m_frontTire, fl_tire1_body);
 
-		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 0] = 1;
-		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1] = 0;
+		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
+		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
 		for (int i = 0; i < m_configuration.m_transmission.m_gearsCount; i++)
 		{
 			m_gearMap[i] = i + 2;
 		}
-		m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1;
+		m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
 
 		// add the slip differential
 		#if 1
@@ -688,13 +688,13 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		ndMultiBodyVehicleTireJoint* const fr_tire0 = AddAxleTire(world, m_configuration.m_frontTire, fr_tire0_body, frontAxel_body);
 		ndMultiBodyVehicleTireJoint* const fl_tire0 = AddAxleTire(world, m_configuration.m_frontTire, fl_tire0_body, frontAxel_body);
 
-		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 0] = 1;
-		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1] = 0;
+		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
+		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
 		for (int i = 0; i < m_configuration.m_transmission.m_gearsCount; i++)
 		{
 			m_gearMap[i] = i + 2;
 		}
-		m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1;
+		m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
 
 		// add a motor
 		ndMultiBodyVehicleMotor* const motor = AddMotor(world, m_configuration.m_motorMass, m_configuration.m_motorRadius);
@@ -877,13 +877,13 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 		ndMultiBodyVehicleTireJoint* const rr_tire1 = AddTire(world, rearTireInfo, rr_tire1_body);
 		ndMultiBodyVehicleTireJoint* const rl_tire1 = AddTire(world, rearTireInfo, rl_tire1_body);
 
-		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 0] = 1;
-		m_gearMap[sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1] = 0;
+		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
+		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
 		for (int i = 0; i < m_configuration.m_transmission.m_gearsCount; i++)
 		{
 			m_gearMap[i] = i + 2;
 		}
-		m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1;
+		m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
 
 		// add the slip differential
 		ndMultiBodyVehicleDifferential* const rearDifferential0 = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);

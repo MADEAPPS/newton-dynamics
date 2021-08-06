@@ -27,7 +27,7 @@
 #include "ndCharacterLimbNode.h"
 #include "ndCharacterRootNode.h"
 #include "ndCharacterEffectorNode.h"
-#include "ndCharacterFowardDynamicNode.h"
+#include "ndCharacterForwardDynamicNode.h"
 #include "ndCharacterInverseDynamicNode.h"
 
 ndCharacter::ndCharacter()
@@ -55,9 +55,9 @@ ndCharacterRootNode* ndCharacter::CreateRoot(ndBodyDynamic* const body)
 	return m_rootNode;
 }
 
-ndCharacterFowardDynamicNode* ndCharacter::CreateFowardDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
+ndCharacterForwardDynamicNode* ndCharacter::CreateForwardDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
 {
-	ndCharacterFowardDynamicNode* const limb = new ndCharacterFowardDynamicNode(matrixInGlobalScape, body, parent);
+	ndCharacterForwardDynamicNode* const limb = new ndCharacterForwardDynamicNode(matrixInGlobalScape, body, parent);
 	return limb;
 }
 

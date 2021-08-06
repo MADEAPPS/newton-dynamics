@@ -82,7 +82,7 @@
 #include <ndJointKinematicController.h>
 #include <ndMultiBodyVehicleTireJoint.h>
 #include <ndMultiBodyVehicleTorsionBar.h>
-#include <ndCharacterFowardDynamicNode.h>
+#include <ndCharacterForwardDynamicNode.h>
 #include <ndCharacterInverseDynamicNode.h>
 #include <ndMultiBodyVehicleDifferential.h>
 #include <ndMultiBodyVehicleDifferentialAxle.h>

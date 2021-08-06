@@ -126,15 +126,15 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_transmission.m_neutral = 0.0f;
 	m_transmission.m_crownGearRatio = 10.0f;
 	m_transmission.m_reverseRatio = -3.0f;
-	//m_transmission.m_fowardRatios[0] = 2.25f;
-	//m_transmission.m_fowardRatios[1] = 1.60f;
-	//m_transmission.m_fowardRatios[2] = 1.10f;
-	//m_transmission.m_fowardRatios[3] = 0.80f;
+	//m_transmission.m_forwardRatios[0] = 2.25f;
+	//m_transmission.m_forwardRatios[1] = 1.60f;
+	//m_transmission.m_forwardRatios[2] = 1.10f;
+	//m_transmission.m_forwardRatios[3] = 0.80f;
 
-	m_transmission.m_fowardRatios[0] = 3.0f;
-	m_transmission.m_fowardRatios[1] = 1.50f;
-	m_transmission.m_fowardRatios[2] = 1.10f;
-	m_transmission.m_fowardRatios[3] = 0.80f;
+	m_transmission.m_forwardRatios[0] = 3.0f;
+	m_transmission.m_forwardRatios[1] = 1.50f;
+	m_transmission.m_forwardRatios[2] = 1.10f;
+	m_transmission.m_forwardRatios[3] = 0.80f;
 
 	m_transmission.m_torqueConverter = 2000.0f;
 	m_transmission.m_idleClutchTorque = 200.0f;
@@ -387,7 +387,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 					m_currentGear = m_configuration.m_transmission.m_gearsCount - 1;
 				}
 			}
-			dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
+			dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
 			m_gearBox->SetRatio(gearGain);
 			m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 		}
@@ -408,7 +408,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 					m_currentGear = 0;
 				}
 			}
-			dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
+			dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
 			m_gearBox->SetRatio(gearGain);
 			m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 		}
@@ -423,7 +423,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 					if (m_currentGear > 0)
 					{
 						m_currentGear--;
-						dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
+						dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
 						m_gearBox->SetRatio(gearGain);
 						m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 					}
@@ -433,7 +433,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 					if (m_currentGear < (m_configuration.m_transmission.m_gearsCount - 1))
 					{
 						m_currentGear++;
-						dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
+						dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
 						m_gearBox->SetRatio(gearGain);
 						m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 					}
@@ -445,7 +445,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 		// neural gear
 		if (m_neutralGear.Update(scene->GetKeyState('N') || buttons[10]))
 		{
-			m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]) + 1;
+			m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1;
 			m_gearBox->SetRatio(0.0f);
 		}
 
@@ -453,9 +453,9 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 		if (m_reverseGear.Update(scene->GetKeyState('R') || buttons[12]))
 		{
 			m_isParked = false;
-			m_currentGear = sizeof(m_configuration.m_transmission.m_fowardRatios) / sizeof(m_configuration.m_transmission.m_fowardRatios[0]);
+			m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]);
 
-			dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_fowardRatios[m_currentGear];
+			dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
 			m_gearBox->SetRatio(gearGain);
 		}
 

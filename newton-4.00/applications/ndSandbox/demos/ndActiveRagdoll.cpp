@@ -26,7 +26,7 @@ class dActiveJointDefinition
 	public:
 	enum dLimbType
 	{
-		fowardKinematic,
+		forwardKinematic,
 		inverseKinematic,
 		effector,
 	};
@@ -105,20 +105,20 @@ class ndActiveRagdollEntityNotify : public ndDemoEntityNotify
 
 static dActiveJointDefinition jointsDefinition[] =
 {
-	{ "mixamorig:Hips", dActiveJointDefinition::fowardKinematic},
+	{ "mixamorig:Hips", dActiveJointDefinition::forwardKinematic},
 	
-	{ "mixamorig:Spine", dActiveJointDefinition::fowardKinematic, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine1", dActiveJointDefinition::fowardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine2", dActiveJointDefinition::fowardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Neck", dActiveJointDefinition::fowardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine1", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Spine2", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:Neck", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 	
-	{ "mixamorig:RightArm", dActiveJointDefinition::fowardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightForeArm", dActiveJointDefinition::fowardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
-	//{ "mixamorig:RightHand", dActiveJointDefinition::fowardKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightArm", dActiveJointDefinition::forwardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:RightForeArm", dActiveJointDefinition::forwardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
+	//{ "mixamorig:RightHand", dActiveJointDefinition::forwardKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
 	
-	{ "mixamorig:LeftArm", dActiveJointDefinition::fowardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftForeArm", dActiveJointDefinition::fowardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-	//{ "mixamorig:LeftHand", dActiveJointDefinition::fowardKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:LeftArm", dActiveJointDefinition::forwardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "mixamorig:LeftForeArm", dActiveJointDefinition::forwardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+	//{ "mixamorig:LeftHand", dActiveJointDefinition::forwardKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f } },
 	
 	//{ "mixamorig:RightUpLeg", dActiveJointDefinition::inverseKinematic, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 	//{ "mixamorig:RightLeg", dActiveJointDefinition::inverseKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
@@ -272,9 +272,9 @@ class ndActiveRagdollModel : public ndCharacter
 		dActiveJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
 
-		if (definition.m_limbType == dActiveJointDefinition::fowardKinematic)
+		if (definition.m_limbType == dActiveJointDefinition::forwardKinematic)
 		{
-			ndCharacterFowardDynamicNode* const jointNode = CreateFowardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
+			ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
 
 			dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 			ndJointPid3dofActuator* const joint = (ndJointPid3dofActuator*)jointNode->GetJoint();

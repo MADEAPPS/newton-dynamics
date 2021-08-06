@@ -221,15 +221,15 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 		// clip player velocity along the high contacts
 		dMatrix coodinateMatrix(m_localFrame * startMatrix);
 		dFloat32 scaleSpeedFactor = 1.5f;
-		dFloat32 fowardSpeed = m_forwardSpeed * scaleSpeedFactor;
+		dFloat32 forwardSpeed = m_forwardSpeed * scaleSpeedFactor;
 		dFloat32 lateralSpeed = m_lateralSpeed * scaleSpeedFactor;
-		dFloat32 maxSpeed = dMax(dAbs(fowardSpeed), dAbs(lateralSpeed));
+		dFloat32 maxSpeed = dMax(dAbs(forwardSpeed), dAbs(lateralSpeed));
 		dFloat32 stepFriction = 1.0f + m_mass * maxSpeed;
 		
 		SetVelocity(savedVeloc);
 		impulseSolver.Reset(this);
 		dInt32 index = impulseSolver.AddLinearRow(coodinateMatrix[0], dVector::m_zero, dFloat32 (0.0f), dFloat32(0.0f), dFloat32(1.0e12f));
-		impulseSolver.AddLinearRow(coodinateMatrix[1], dVector::m_zero, -fowardSpeed, -stepFriction, stepFriction, index);
+		impulseSolver.AddLinearRow(coodinateMatrix[1], dVector::m_zero, -forwardSpeed, -stepFriction, stepFriction, index);
 		impulseSolver.AddLinearRow(coodinateMatrix[2], dVector::m_zero, lateralSpeed, -stepFriction, stepFriction, index);
 		dVector veloc(savedVeloc + impulseSolver.CalculateImpulse().Scale(m_invMass));
 		

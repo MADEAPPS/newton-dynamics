@@ -63,7 +63,7 @@ class ndVehicleDectriptor
 		{
 			struct
 			{
-				dFloat32 m_fowardRatios[5];
+				dFloat32 m_forwardRatios[5];
 				dFloat32 m_reverseRatio;
 				dFloat32 m_neutral;
 			};
