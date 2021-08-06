@@ -27,12 +27,14 @@
 #include "ndCharacterLimbNode.h"
 #include "ndCharacterRootNode.h"
 #include "ndCharacterEffectorNode.h"
+#include "ndCharacterPoseController.h"
 #include "ndCharacterForwardDynamicNode.h"
 #include "ndCharacterInverseDynamicNode.h"
 
 ndCharacter::ndCharacter()
 	:ndModel()
 	,m_rootNode(nullptr)
+	,m_controller(nullptr)
 {
 }
 
@@ -193,7 +195,10 @@ void ndCharacter::PostUpdate(ndWorld* const, dFloat32)
 void ndCharacter::Update(ndWorld* const world, dFloat32 timestep)
 {
 	ndCentreOfMassState comState(CalculateCentreOfMassState());
+	if (m_controller)
+	{
+		m_controller->Evaluate(world, timestep);
+	}
 	UpdateGlobalPose(world, timestep);
 	CalculateLocalPose(world, timestep);
-
 }

@@ -77,6 +77,7 @@
 #include <ndJointPid6dofActuator.h>
 #include <ndMultiBodyVehicleMotor.h>
 #include <ndCharacterEffectorNode.h>
+#include <ndCharacterPoseController.h>
 #include <ndMultiBodyVehicleGearBox.h>
 #include <ndJointDryRollingFriction.h>
 #include <ndJointKinematicController.h>

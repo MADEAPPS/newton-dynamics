@@ -29,6 +29,7 @@ class ndWorld;
 class ndCharacterLimbNode;
 class ndCharacterRootNode;
 class ndCharacterEffectorNode;
+class ndCharacterPoseController;
 class ndCharacterForwardDynamicNode;
 class ndCharacterInverseDynamicNode;
 
@@ -66,6 +67,7 @@ class ndCharacter: public ndModel
 	void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
 	
 	ndCharacterRootNode* m_rootNode;
+	ndCharacterPoseController* m_controller;
 };
 
 inline ndCharacter* ndCharacter::GetAsCharacter()
