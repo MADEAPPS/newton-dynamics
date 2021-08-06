@@ -39,8 +39,12 @@ class ndCharacterEffectorNode: public ndCharacterLimbNode
 	virtual ndJointBilateralConstraint* GetJoint() const;
 
 	protected:
+	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
+
 	ndJointPid6dofActuator* m_effector;
 	ndCharacterLimbNode* m_referenceNode;
+
+	dMatrix m_globalPose;
 };
 
 inline ndJointBilateralConstraint* ndCharacterEffectorNode::GetJoint() const

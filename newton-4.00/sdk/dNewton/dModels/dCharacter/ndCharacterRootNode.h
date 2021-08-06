@@ -40,9 +40,12 @@ class ndCharacterRootNode: public ndCharacterLimbNode
 	D_NEWTON_API void SetLocalFrame(const dMatrix& frameInGlobalSpace);
 
 	protected:
+	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
+
 	ndCharacter* m_owner;
 	ndBodyDynamic* m_body;
 	dMatrix m_localFrame;
+	dMatrix m_globalPose;
 };
 
 inline ndCharacter* ndCharacterRootNode::GetOwner() const

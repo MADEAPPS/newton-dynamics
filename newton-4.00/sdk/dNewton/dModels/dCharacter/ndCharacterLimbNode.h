@@ -41,6 +41,8 @@ class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 	virtual ndBodyDynamic* GetBody() const;
 	virtual ndJointBilateralConstraint* GetJoint() const;
 
+	virtual void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
+
 	protected:
 	D_NEWTON_API dNodeBaseHierarchy* CreateClone() const;
 };
@@ -53,6 +55,10 @@ inline ndBodyDynamic* ndCharacterLimbNode::GetBody() const
 inline ndJointBilateralConstraint* ndCharacterLimbNode::GetJoint() const
 {
 	return nullptr;
+}
+
+inline void ndCharacterLimbNode::UpdateGlobalPose(ndWorld* const, dFloat32)
+{
 }
 
 #endif

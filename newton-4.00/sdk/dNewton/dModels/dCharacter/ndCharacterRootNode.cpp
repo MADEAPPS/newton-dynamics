@@ -30,6 +30,7 @@ ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic
 	,m_owner(owner)
 	,m_body(body)
 	,m_localFrame(dGetIdentityMatrix())
+	,m_globalPose(dGetIdentityMatrix())
 {
 	SetLocalFrame(m_body->GetMatrix());
 }
@@ -42,4 +43,10 @@ void ndCharacterRootNode::SetLocalFrame(const dMatrix& frameInGlobalSpace)
 {
 	dMatrix matrix(m_body->GetMatrix());
 	m_localFrame = frameInGlobalSpace * matrix.Inverse();
+}
+
+void ndCharacterRootNode::UpdateGlobalPose(ndWorld* const world, dFloat32 timestep)
+{
+	// for now just; 
+	m_globalPose = m_body->GetMatrix();
 }

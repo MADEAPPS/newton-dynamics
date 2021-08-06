@@ -35,12 +35,20 @@ class ndCharacterInverseDynamicNode;
 class ndCharacter: public ndModel
 {
 	public:
+	//class ndLinearState
+	//{
+	//	public:
+	//	dVector m_centerOfMass;
+	//	dVector m_centerOfMassVeloc;
+	//	dVector m_centerOfMassOmega;
+	//	dFloat32 m_mass;
+	//};
+
 	class ndLinearState
 	{
 		public:
 		dVector m_centerOfMass;
 		dVector m_centerOfMassVeloc;
-		dVector m_centerOfMassOmega;
 		dFloat32 m_mass;
 	};
 
@@ -63,6 +71,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
 
 	ndLinearState CalculateCom() const;
+	inline void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 	
 	ndCharacterRootNode* m_rootNode;
 };

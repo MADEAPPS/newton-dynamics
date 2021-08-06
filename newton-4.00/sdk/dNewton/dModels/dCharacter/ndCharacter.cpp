@@ -80,10 +80,10 @@ ndCharacter::ndLinearState ndCharacter::CalculateCom() const
 	
 	nodePool[0] = m_rootNode;
 
-	dMatrix inertia(dGetZeroMatrix());
+	//dMatrix inertia(dGetZeroMatrix());
 	dVector com(dVector::m_zero);
 	dVector veloc(dVector::m_zero);
-	dVector omega(dVector::m_zero);
+	//dVector omega(dVector::m_zero);
 	dFloat32 mass = dFloat32(0.0f);
 
 	while (stack)
@@ -97,14 +97,13 @@ ndCharacter::ndLinearState ndCharacter::CalculateCom() const
 			mass += partMass;
 			dMatrix bodyMatrix(body->GetMatrix());
 			com += bodyMatrix.TransformVector(body->GetCentreOfMass()).Scale (partMass);
-
-			dMatrix inertiaPart(body->CalculateInertiaMatrix());
-			inertia.m_front += inertiaPart.m_front;
-			inertia.m_up += inertiaPart.m_up;
-			inertia.m_right += inertiaPart.m_right;
-
 			veloc += body->GetVelocity().Scale(partMass);
-			omega += inertiaPart.RotateVector(body->GetOmega());
+
+			//dMatrix inertiaPart(body->CalculateInertiaMatrix());
+			//inertia.m_front += inertiaPart.m_front;
+			//inertia.m_up += inertiaPart.m_up;
+			//inertia.m_right += inertiaPart.m_right;
+			//omega += inertiaPart.RotateVector(body->GetOmega());
 		}
 
 		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
@@ -113,20 +112,20 @@ ndCharacter::ndLinearState ndCharacter::CalculateCom() const
 			stack++;
 		}
 	}
-	inertia.m_posit.m_w = dFloat32(1.0f);
+	//inertia.m_posit.m_w = dFloat32(1.0f);
 	dVector invMass (dFloat32(1.0f) / mass);
 	com = com * invMass;
 	veloc = veloc * invMass;
-	omega = inertia.Inverse4x4().RotateVector(omega);
+	//omega = inertia.Inverse4x4().RotateVector(omega);
 	com.m_w = dFloat32(1.0f);
-	omega.m_w = dFloat32(0.0f);
+	//omega.m_w = dFloat32(0.0f);
 	veloc.m_w = dFloat32(0.0f);
 
 	ndLinearState state;
 	state.m_mass = mass;
 	state.m_centerOfMass = com;
 	state.m_centerOfMassVeloc = veloc;
-	state.m_centerOfMassOmega = omega;
+	//state.m_centerOfMassOmega = omega;
 	return state;
 }
 
@@ -138,7 +137,7 @@ void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 	
 	// show character center of mass.
 	dFloat32 scale = context.GetScale();
-	context.SetScale(scale * 0.5f);
+	context.SetScale(scale * 0.25f);
 
 	ndLinearState state(CalculateCom());
 	matrix.m_posit = state.m_centerOfMass;
@@ -147,10 +146,31 @@ void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 	context.SetScale(scale);
 }
 
+void ndCharacter::UpdateGlobalPose(ndWorld* const world, dFloat32 timestep)
+{
+	dInt32 stack = 1;
+	ndCharacterLimbNode* nodePool[32];
+	nodePool[0] = m_rootNode;
+
+	while (stack)
+	{
+		stack--;
+		ndCharacterLimbNode* const node = nodePool[stack];
+		node->UpdateGlobalPose(world, timestep);
+
+		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
+		{
+			nodePool[stack] = child;
+			stack++;
+		}
+	}
+}
+
 void ndCharacter::PostUpdate(ndWorld* const, dFloat32)
 {
 }
 
-void ndCharacter::Update(ndWorld* const, dFloat32)
+void ndCharacter::Update(ndWorld* const world, dFloat32 timestep)
 {
+	UpdateGlobalPose(world, timestep);
 }
