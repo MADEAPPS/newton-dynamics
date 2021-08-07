@@ -42,7 +42,7 @@ class dSpatialVector
 	}
 
 	D_INLINE dSpatialVector(const dBigVector& low, const dBigVector& high)
-        :m{low, high}
+		:m{low, high}
 	{
 	}
 
@@ -84,22 +84,22 @@ class dSpatialVector
 		return dSpatialVector(m.low * tmp, m.high * tmp);
 	}
 
-    struct Bisect
-    {
-        D_INLINE Bisect() = default;
-        D_INLINE Bisect(const dBigVector & l, const dBigVector & h)
-            :low(l), high(h)
-        {
-        }
+	struct Bisect
+	{
+		D_INLINE Bisect() = default;
+		D_INLINE Bisect(const dBigVector & l, const dBigVector & h)
+			:low(l), high(h)
+		{
+		}
 
-        dBigVector low;
-        dBigVector high;
-    };
+		dBigVector low;
+		dBigVector high;
+	};
 
 	union
 	{
 		dFloat64 m_f[8];
-        Bisect m;
+		Bisect m;
 	};
 
 	D_CORE_API static dSpatialVector m_zero;
