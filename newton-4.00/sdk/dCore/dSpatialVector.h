@@ -29,9 +29,9 @@ D_MSV_NEWTON_ALIGN_32
 class dSpatialVector
 {
 	public:
-    D_INLINE dSpatialVector()
-    {
-    }
+	D_INLINE dSpatialVector()
+	{
+	}
 
 	D_INLINE dSpatialVector(const dFloat64 a)
 		:m(a, a)
