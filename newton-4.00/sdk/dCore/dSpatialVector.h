@@ -29,74 +29,77 @@ D_MSV_NEWTON_ALIGN_32
 class dSpatialVector
 {
 	public:
-	D_INLINE dSpatialVector()
-	{
-	}
+	D_INLINE dSpatialVector() = default;
 
 	D_INLINE dSpatialVector(const dFloat64 a)
-		:m_low(a)
-		,m_high(a)
+		:m{a, a}
 	{
 	}
 
 	D_INLINE dSpatialVector(const dSpatialVector& copy)
-		:m_low(copy.m_low)
-		,m_high(copy.m_high)
+		:m{copy.m.low, copy.m.high}
 	{
 	}
 
 	D_INLINE dSpatialVector(const dBigVector& low, const dBigVector& high)
-		:m_low(low)
-		,m_high(high)
+        :m{low, high}
 	{
 	}
 
 	D_INLINE dFloat64& operator[] (dInt32 i)
 	{
 		dAssert(i >= 0);
-		dAssert(i < sizeof (m_f) / sizeof (m_f[0]));
+		dAssert(i < sizeof (m.f) / sizeof (m.f[0]));
 		return ((dFloat64*)&m_f)[i];
 	}
 
 	D_INLINE const dFloat64& operator[] (dInt32 i) const
 	{
 		dAssert(i >= 0);
-		dAssert(i < sizeof(m_f) / sizeof(m_f[0]));
+		dAssert(i < sizeof(m.f) / sizeof(m.f[0]));
 		return ((dFloat64*)&m_f)[i];
 	}
 
 	D_INLINE dSpatialVector operator+ (const dSpatialVector& A) const
 	{
-		return dSpatialVector(m_low + A.m_low, m_high + A.m_high);
+		return dSpatialVector(m.low + A.m.low, m.high + A.m.high);
 	}
 
 	D_INLINE dSpatialVector operator*(const dSpatialVector& A) const
 	{
-		return dSpatialVector(m_low * A.m_low, m_high * A.m_high);
+		return dSpatialVector(m.low * A.m.low, m.high * A.m.high);
 	}
 
 	D_INLINE dFloat64 DotProduct(const dSpatialVector& v) const
 	{
-		dAssert(m_f[6] == dFloat32(0.0f));
-		dAssert(m_f[7] == dFloat32(0.0f));
-		dBigVector tmp(m_low * v.m_low + m_high * v.m_high);
+		dAssert(m.f[6] == dFloat32(0.0f));
+		dAssert(m.f[7] == dFloat32(0.0f));
+		dBigVector tmp(m.low * v.m.low + m.high * v.m.high);
 		return tmp.AddHorizontal().GetScalar();
 	}
 
 	D_INLINE dSpatialVector Scale(dFloat64 s) const
 	{
 		dBigVector tmp(s);
-		return dSpatialVector(m_low * tmp, m_high * tmp);
+		return dSpatialVector(m.low * tmp, m.high * tmp);
 	}
+
+    struct Bisect
+    {
+        D_INLINE Bisect() = default;
+        D_INLINE Bisect(const dBigVector & l, const dBigVector & h)
+            :low(l), high(h)
+        {
+        }
+
+        dBigVector low;
+        dBigVector high;
+    };
 
 	union
 	{
 		dFloat64 m_f[8];
-		struct
-		{
-			dBigVector m_low;
-			dBigVector m_high;
-		};
+        Bisect m;
 	};
 
 	D_CORE_API static dSpatialVector m_zero;
