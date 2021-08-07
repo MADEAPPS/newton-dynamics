@@ -28,8 +28,8 @@
 
 ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
 	:ndCharacterLimbNode(parent)
-	,m_joint(new ndJointPid3dofActuator(matrixInGlobalScape, body, parent->GetBody()))
 	,m_body(body)
+	,m_joint(new ndJointPid3dofActuator(matrixInGlobalScape, body, parent->GetBody()))
 {
 }
 

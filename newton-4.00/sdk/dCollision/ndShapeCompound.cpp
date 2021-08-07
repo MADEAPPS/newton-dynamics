@@ -367,6 +367,7 @@ dInt32 ndShapeCompound::CalculatePlaneIntersection(const dFloat32* const, const 
 ndShapeInfo ndShapeCompound::GetShapeInfo() const
 {
 	ndShapeInfo info(ndShape::GetShapeInfo());
+	info.m_compound.m_noUsed = 0;
 	return info;
 }
 

@@ -94,7 +94,7 @@ class ndRagdollEntityNotify : public ndDemoEntityNotify
 
 static dJointDefinition jointsDefinition[] =
 {
-	{ "mixamorig:Hips", 1, 16 },
+	{ "mixamorig:Hips", 1, 16, 0, {}, {}},
 	
 	{ "mixamorig:Spine", 2, 16, 10.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
 	{ "mixamorig:Spine1", 4, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },

@@ -28,8 +28,8 @@
 
 ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
 	:ndCharacterLimbNode(parent)
-	,m_joint(new ndJointBallAndSocket(matrixInGlobalScape, body, parent->GetBody()))
 	,m_body(body)
+	,m_joint(new ndJointBallAndSocket(matrixInGlobalScape, body, parent->GetBody()))
 {
 }
 

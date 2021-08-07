@@ -19,23 +19,26 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CHARACTER_INVERTED_PENDULUM_POSE_CONTROLLER_H__
-#define __D_CHARACTER_INVERTED_PENDULUM_POSE_CONTROLLER_H__
-
+#include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndCharacterPoseController.h"
+#include "ndWorld.h"
+#include "ndCharacter.h"
+#include "ndCharacterBipedPoseController.h"
 
-class ndCharacterInvertedPendulumPoseController: public ndCharacterPoseController
+ndCharacterBipedPoseController::ndCharacterBipedPoseController(ndCharacter* const owner)
+	:ndCharacterPoseController(owner)
 {
-	public:
-	D_CLASS_RELECTION(ndCharacterInvertedPendulumPoseController);
+}
 
-	D_NEWTON_API ndCharacterInvertedPendulumPoseController(ndCharacter* const owner);
-	D_NEWTON_API virtual ~ndCharacterInvertedPendulumPoseController ();
+ndCharacterBipedPoseController::~ndCharacterBipedPoseController()
+{
+}
 
-	virtual bool Evaluate(ndWorld* const world, dFloat32 timestep);
+bool ndCharacterBipedPoseController::Evaluate(ndWorld* const world, dFloat32 timestep)
+{
+	//ndCharacter::ndCentreOfMassState comState(m_owner->CalculateCentreOfMassState());
+	m_owner->UpdateGlobalPose(world, timestep);
+	m_owner->CalculateLocalPose(world, timestep);
+	return true;
+}
 
-};
-
-
-#endif

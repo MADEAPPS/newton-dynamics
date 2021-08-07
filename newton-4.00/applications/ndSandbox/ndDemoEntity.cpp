@@ -391,7 +391,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 			shapeArray[count] = new ndShapeInstance(new ndShapeSphere(size.m_x));
 			shapeArray[count]->SetLocalMatrix(matrix);
 			count++;
-			dAssert(count < sizeof(shapeArray) / sizeof(shapeArray[0]));
+			dAssert(count < dInt32 (sizeof(shapeArray) / sizeof(shapeArray[0])));
 		} 
 		else if (strstr (name, "box")) 
 		{
@@ -443,7 +443,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
 			shapeArray[count] = new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high));
 			shapeArray[count]->SetLocalMatrix(matrix);
 			count++;
-			dAssert(count < sizeof(shapeArray)/ sizeof (shapeArray[0]));
+			dAssert(count < dInt32 (sizeof(shapeArray)/ sizeof (shapeArray[0])));
 		} 
 		else if (strstr(name, "convexhull")) 
 		{

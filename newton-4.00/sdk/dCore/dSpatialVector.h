@@ -54,14 +54,14 @@ class dSpatialVector
 	D_INLINE dFloat64& operator[] (dInt32 i)
 	{
 		dAssert(i >= 0);
-		dAssert(i < sizeof (m_f) / sizeof (m_f[0]));
+		dAssert(i < dInt32(sizeof(m_f) / sizeof(m_f[0])));
 		return ((dFloat64*)&m_f)[i];
 	}
 
 	D_INLINE const dFloat64& operator[] (dInt32 i) const
 	{
 		dAssert(i >= 0);
-		dAssert(i < sizeof(m_f) / sizeof(m_f[0]));
+		dAssert(i < dInt32 (sizeof(m_f) / sizeof(m_f[0])));
 		return ((dFloat64*)&m_f)[i];
 	}
 

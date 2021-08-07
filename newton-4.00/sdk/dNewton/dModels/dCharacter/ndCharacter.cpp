@@ -30,7 +30,7 @@
 #include "ndCharacterPoseController.h"
 #include "ndCharacterForwardDynamicNode.h"
 #include "ndCharacterInverseDynamicNode.h"
-#include "ndCharacterInvertedPendulumPoseController.h"
+#include "ndCharacterBipedPoseController.h"
 
 ndCharacter::ndCharacter()
 	:ndModel()
@@ -38,7 +38,7 @@ ndCharacter::ndCharacter()
 	,m_controller(nullptr)
 	,m_defaultController(nullptr)
 {
-	m_controller = new ndCharacterInvertedPendulumPoseController(this);
+	m_controller = new ndCharacterBipedPoseController(this);
 	m_defaultController = m_controller;
 }
 
