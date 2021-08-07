@@ -35,20 +35,17 @@ class dSpatialVector
 	}
 
 	D_INLINE dSpatialVector(const dFloat64 a)
-		:m_low(a)
-		,m_high(a)
+		:m_data(a)
 	{
 	}
 
 	D_INLINE dSpatialVector(const dSpatialVector& copy)
-		:m_low(copy.m_low)
-		,m_high(copy.m_high)
+		:m_data(copy.m_data)
 	{
 	}
 
 	D_INLINE dSpatialVector(const dBigVector& low, const dBigVector& high)
-		:m_low(low)
-		,m_high(high)
+		:m_data(low, high)
 	{
 	}
 
@@ -68,36 +65,56 @@ class dSpatialVector
 
 	D_INLINE dSpatialVector operator+ (const dSpatialVector& A) const
 	{
-		return dSpatialVector(m_low + A.m_low, m_high + A.m_high);
+		return dSpatialVector(m_data.m_low + A.m_data.m_low, m_data.m_high + A.m_data.m_high);
 	}
 
 	D_INLINE dSpatialVector operator*(const dSpatialVector& A) const
 	{
-		return dSpatialVector(m_low * A.m_low, m_high * A.m_high);
+		return dSpatialVector(m_data.m_low * A.m_data.m_low, m_data.m_high * A.m_data.m_high);
 	}
 
 	D_INLINE dFloat64 DotProduct(const dSpatialVector& v) const
 	{
 		dAssert(m_f[6] == dFloat32(0.0f));
 		dAssert(m_f[7] == dFloat32(0.0f));
-		dBigVector tmp(m_low * v.m_low + m_high * v.m_high);
+		dBigVector tmp(m_data.m_low * v.m_data.m_low + m_data.m_high * v.m_data.m_high);
 		return tmp.AddHorizontal().GetScalar();
 	}
 
 	D_INLINE dSpatialVector Scale(dFloat64 s) const
 	{
 		dBigVector tmp(s);
-		return dSpatialVector(m_low * tmp, m_high * tmp);
+		return dSpatialVector(m_data.m_low * tmp, m_data.m_high * tmp);
 	}
+
+	struct ndData
+	{
+		D_INLINE ndData(const dFloat64 a)
+			:m_low(a)
+			,m_high(a)
+		{
+		}
+
+		D_INLINE ndData(const ndData& data)
+			:m_low(data.m_low)
+			,m_high(data.m_high)
+		{
+		}
+
+		D_INLINE ndData(const dBigVector& low, const dBigVector& high)
+			:m_low(low)
+			,m_high(high)
+		{
+		}
+
+		dBigVector m_low;
+		dBigVector m_high;
+	};
 
 	union
 	{
 		dFloat64 m_f[8];
-		struct
-		{
-			dBigVector m_low;
-			dBigVector m_high;
-		};
+		ndData m_data;
 	};
 
 	D_CORE_API static dSpatialVector m_zero;
