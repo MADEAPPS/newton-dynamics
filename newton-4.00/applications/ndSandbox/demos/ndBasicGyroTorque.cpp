@@ -200,45 +200,32 @@ static void CreateFlyWheel(ndDemoEntityManager* const scene, const dVector& orig
 	compound->AddCollision(&wheel);
 	compound->EndAddRemove();
 
-	dMatrix matrix(dGetIdentityMatrix());
+	dMatrix matrix(dRollMatrix(tiltAnsgle * dDegreeToRad));
 	matrix.m_posit = origin;
-	matrix.m_posit.m_x += lenght * 0.5f;
 	matrix.m_posit.m_y += 5.0f;
 	matrix.m_posit.m_w = 1.0f;
 
+	ndDemoEntity* const entity = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
 	ndDemoMesh* const geometry = new ndDemoMesh("primitive", scene->GetShaderCache(), &flyWheelShape, "smilli.tga", "smilli.tga", "smilli.tga");
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 	geometry->Release();
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
-
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(flyWheelShape);
 	body->SetMassMatrix(mass, flyWheelShape);
 
-	dVector omega(speed, 0.0f, 0.0f, 0.0f);
+	dVector omega(matrix.m_front.Scale (speed));
 	body->SetOmega(omega);
 
-	matrix.m_posit.m_x -= lenght * 0.5f;
-
-	//dMatrix matrix(body->GetMatrix());
-	//dVector omega(speed, 0.0f, 0.0f);
-	//dMatrix rotation(dRollMatrix(tiltAnsgle * dDegreeToRad));
-	//NewtonBodyGetOmega(flyWheel, &omega[0]);
-	//omega = rotation.RotateVector(omega);
-	//matrix = rotation * matrix;
-	//NewtonBodySetMatrix(flyWheel, &matrix[0][0]);
-	//NewtonBodySetOmega(flyWheel, &omega[0]);
-	//matrix.m_posit -= matrix.m_front.Scale(lenght * 0.5f);
+	matrix.m_posit -= matrix.m_front.Scale(lenght * 0.5f);
 	ndJointBallAndSocket* const joint = new ndJointBallAndSocket(matrix, body, world->GetSentinelBody());
 
-	world->AddJoint(joint);
 	world->AddBody(body);
+	world->AddJoint(joint);
 	scene->AddEntity(entity);
 }
-
 
 void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 {
@@ -246,10 +233,10 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, dGetIdentityMatrix()); 
 
 	// should spins very slowly, with a tilt angle of 30 degrees
-	CreateFlyWheel(scene, dVector(15.0f, 0.0f, -12.0f, 0.0f), 10.0f, 50.0f, 0.6f, 0.3f, 30.0f);
-	CreateFlyWheel(scene, dVector(15.0f, 0.0f, -10.0f, 0.0f), 10.0f, 100.0f, 0.6f, 0.3f, 0.0f);
-	CreateFlyWheel(scene, dVector(15.0f, 0.0f,  -8.0f, 0.0f), 10.0f, -30.0f, 0.6f, 0.3f, 0.0f);
-
+	CreateFlyWheel(scene, dVector(15.0f, 0.0f, -12.0f, 0.0f), 10.0f, 50.0f, 0.6f, 0.5f, 30.0f);
+	CreateFlyWheel(scene, dVector(15.0f, 0.0f, -10.0f, 0.0f), 10.0f, 100.0f, 0.6f, 0.5f, 0.0f);
+	CreateFlyWheel(scene, dVector(15.0f, 0.0f,  -8.0f, 0.0f), 10.0f, -30.0f, 0.6f, 0.5f, 0.0f);
+	
 	DzhanibekovEffect(scene, 10.0f, 5.0f, dVector(15.0f, 0.0f, -4.0f, 0.0f));
 	DzhanibekovEffect(scene, 10.0f, -5.0f, dVector(15.0f, 0.0f, 0.0f, 0.0f));
 	DzhanibekovEffect(scene, 10.0f, 10.0f, dVector(15.0f, 0.0f, 4.0f, 0.0f));
