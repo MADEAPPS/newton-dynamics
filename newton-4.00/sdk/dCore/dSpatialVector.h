@@ -24,6 +24,7 @@
 
 #include "dCoreStdafx.h"
 #include "dTypes.h"
+#include "dVector.h"
 
 D_MSV_NEWTON_ALIGN_32
 class dSpatialVector
