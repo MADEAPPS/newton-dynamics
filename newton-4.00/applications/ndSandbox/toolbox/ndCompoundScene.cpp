@@ -46,6 +46,37 @@ static void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sc
 	//return subInstance;
 }
 
+static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const dMatrix& location, dInt32 count)
+{
+	ndShapeInstance capsule(new ndShapeCapsule(0.75f, 0.75f, 10.0f));
+	dMatrix uvMatrix(dGetIdentityMatrix());
+	uvMatrix[0][0] *= 0.025f;
+	uvMatrix[1][1] *= 0.025f;
+	uvMatrix[2][2] *= 0.025f;
+	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &capsule, "Concrete_011_COLOR.tga", "Concrete_011_COLOR.tga", "Concrete_011_COLOR.tga", 1.0f, uvMatrix);
+
+	dFloat32 spacing = 3.0f;
+	dMatrix matrix(location);
+	matrix.m_posit.m_y += -0.6f;
+	matrix.m_posit.m_z -= (count/2) * spacing;
+	ndShapeMaterial material(capsule.GetMaterial());
+	for (dInt32 i = 0; i < count; i++)
+	{
+		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
+		entity->SetMesh(geometry, dGetIdentityMatrix());
+
+		material.m_userData = entity;
+		capsule.SetMaterial(material);
+		capsule.SetLocalMatrix(matrix);
+
+		ndShapeCompound* const compound = sceneInstance.GetShape()->GetAsShapeCompound();
+		compound->AddCollision(&capsule);
+
+		matrix.m_posit.m_z += spacing;
+	}
+	geometry->Release();
+}
+
 static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const dMatrix& location)
 {
 	fbxDemoEntity* const entity = scene->LoadFbxMesh(meshName);
@@ -133,6 +164,8 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const dMat
 	AddStaticMesh(scene, "playerarena.fbx", sceneInstance, rootEntity, subShapeLocation);
 
 	subShapeLocation.m_posit.m_x += 10.0f;
+	AddSpeedBumpsSubShape(scene, sceneInstance, rootEntity, subShapeLocation, 14);
+	
 	subShapeLocation.m_posit.m_z -= 15.0f;
 	AddBoxSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
 	

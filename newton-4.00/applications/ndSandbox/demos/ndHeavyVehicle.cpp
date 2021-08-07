@@ -945,7 +945,7 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z -= 12.0f;
 	scene->GetWorld()->AddModel(new ndTractorVehicle(scene, tractorDesc, matrix));
 	
-	matrix.m_posit.m_x += 15.0f;
+	matrix.m_posit.m_x += 25.0f;
 	matrix.m_posit.m_z += 6.0f;
 	AddPlanks(scene, matrix.m_posit, 300.0f, 5);
 
