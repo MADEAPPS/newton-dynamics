@@ -21,6 +21,7 @@
 #include "ndVehicleCommon.h"
 #include "ndMakeStaticMap.h"
 #include "ndTargaToOpenGl.h"
+#include "ndCompoundScene.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"
@@ -913,8 +914,8 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	//BuildFloorBox(scene, sceneLocation);
 	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
-	BuildStaticMesh(scene, "track.fbx", true);
-	//BuildCompoundScene(scene, sceneLocation);
+	//BuildStaticMesh(scene, "track.fbx", true);
+	BuildCompoundScene(scene, sceneLocation);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
 	//sceneLocation.m_posit.m_x = -200.0f;
