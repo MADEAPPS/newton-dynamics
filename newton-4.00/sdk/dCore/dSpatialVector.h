@@ -32,17 +32,17 @@ class dSpatialVector
 	D_INLINE dSpatialVector() = default;
 
 	D_INLINE dSpatialVector(const dFloat64 a)
-		:m{a, a}
+		:m(a, a)
 	{
 	}
 
 	D_INLINE dSpatialVector(const dSpatialVector& copy)
-		:m{copy.m.low, copy.m.high}
+		:m(copy.m.low, copy.m.high)
 	{
 	}
 
 	D_INLINE dSpatialVector(const dBigVector& low, const dBigVector& high)
-		:m{low, high}
+		:m(low, high)
 	{
 	}
 
