@@ -154,8 +154,7 @@ class ndShapeInfo
 
 	struct ndCoumpoundInfo
 	{
-		dInt32 m_chidrenCount;
-		//dgCollision** m_chidren;
+		dInt32 m_noUsed;
 	};
 
 	struct ndCollisionBvhInfo

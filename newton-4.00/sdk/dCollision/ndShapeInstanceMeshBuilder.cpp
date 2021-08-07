@@ -24,6 +24,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndShape.h"
 #include "ndShapeInstance.h"
+#include "ndShapeCompound.h"
 #include "ndShapeInstanceMeshBuilder.h"
 
 ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& instance)
@@ -58,19 +59,18 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 	Init();
 	if (((ndShape*)instance.GetShape())->GetAsShapeCompound())
 	{
-		dAssert(0);
-		//dgCollisionInfo collisionInfo;
-		//collision->GetCollisionInfo(&collisionInfo);
-		//
-		//dInt32 brush = 0;
-		//dMatrix matrix(collisionInfo.m_offsetMatrix);
-		//dgCollisionCompound* const compoundCollision = (dgCollisionCompound*)collision->GetChildShape();
-		//for (dTree<dgCollisionCompound::dgNodeBase*, dInt32>::dNode* node = compoundCollision->GetFirstNode(); node; node = compoundCollision->GetNextNode(node)) {
-		//	builder.m_brush = brush;
-		//	brush++;
-		//	dgCollisionInstance* const childShape = compoundCollision->GetCollisionFromNode(node);
-		//	childShape->DebugCollision(matrix, (dgCollision::OnDebugCollisionMeshCallback) dgMeshEffectBuilder::GetShapeFromCollision, &builder);
-		//}
+		dInt32 brush = 0;
+		dMatrix matrix(instance.GetLocalMatrix());
+		const ndShapeCompound* const compound = ((ndShape*)instance.GetShape())->GetAsShapeCompound();
+		const ndShapeCompound::ndTreeArray& array = compound->GetTree();
+		ndShapeCompound::ndTreeArray::Iterator iter(array);
+		for (iter.Begin(); iter; iter++) 
+		{
+			ndShapeInstance* const childInstance = iter.GetNode()->GetInfo()->GetShape();
+			builder.m_brush = brush;
+			brush++;
+			childInstance->DebugShape(matrix, builder);
+		}
 	}
 	else 
 	{

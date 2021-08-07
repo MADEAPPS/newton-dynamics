@@ -166,8 +166,6 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const dVector& origi
 	ndDemoMesh* const geometry = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
-
-	//dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y += 1.0f;
 
 	const dFloat32 mass = 1.0f;
@@ -179,27 +177,91 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const dVector& origi
 	body->SetOmega(matrix.m_up.Scale(40.0f));
 
 	world->AddBody(body);
-	scene->AddEntity(entity);
 	geometry->Release();
+	scene->AddEntity(entity);
 }
+
+static void CreateFlyWheel(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 speed, dFloat32 radius, dFloat32 lenght, dFloat32 tiltAnsgle)
+{
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	dFloat32 smallRadius = 0.0625f;
+	ndShapeInstance rod(new ndShapeCapsule(smallRadius * 0.5f, smallRadius * 0.5f, lenght));
+	ndShapeInstance wheel(new ndShapeCylinder(radius, radius, 0.125f));
+
+	dMatrix offset(dGetIdentityMatrix());
+	offset.m_posit.m_x = lenght * 0.5f;
+	wheel.SetLocalMatrix(offset);
+
+	ndShapeInstance flyWheelShape(new ndShapeCompound());
+	ndShapeCompound* const compound = flyWheelShape.GetShape()->GetAsShapeCompound();
+	compound->BeginAddRemove();
+	compound->AddCollision(&rod);
+	compound->AddCollision(&wheel);
+	compound->EndAddRemove();
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_x += lenght * 0.5f;
+	matrix.m_posit.m_y += 5.0f;
+	matrix.m_posit.m_w = 1.0f;
+
+	ndDemoMesh* const geometry = new ndDemoMesh("primitive", scene->GetShaderCache(), &flyWheelShape, "smilli.tga", "smilli.tga", "smilli.tga");
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	entity->SetMesh(geometry, dGetIdentityMatrix());
+	geometry->Release();
+
+	ndBodyDynamic* const body = new ndBodyDynamic();
+
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(flyWheelShape);
+	body->SetMassMatrix(mass, flyWheelShape);
+
+	dVector omega(speed, 0.0f, 0.0f, 0.0f);
+	body->SetOmega(omega);
+
+	matrix.m_posit.m_x -= lenght * 0.5f;
+
+	//dMatrix matrix(body->GetMatrix());
+	//dVector omega(speed, 0.0f, 0.0f);
+	//dMatrix rotation(dRollMatrix(tiltAnsgle * dDegreeToRad));
+	//NewtonBodyGetOmega(flyWheel, &omega[0]);
+	//omega = rotation.RotateVector(omega);
+	//matrix = rotation * matrix;
+	//NewtonBodySetMatrix(flyWheel, &matrix[0][0]);
+	//NewtonBodySetOmega(flyWheel, &omega[0]);
+	//matrix.m_posit -= matrix.m_front.Scale(lenght * 0.5f);
+	ndJointBallAndSocket* const joint = new ndJointBallAndSocket(matrix, body, world->GetSentinelBody());
+
+	world->AddJoint(joint);
+	world->AddBody(body);
+	scene->AddEntity(entity);
+}
+
 
 void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene, dGetIdentityMatrix());
+	BuildFloorBox(scene, dGetIdentityMatrix()); 
+
+	// should spins very slowly, with a tilt angle of 30 degrees
+	CreateFlyWheel(scene, dVector(15.0f, 0.0f, -12.0f, 0.0f), 10.0f, 50.0f, 0.6f, 0.3f, 30.0f);
+	CreateFlyWheel(scene, dVector(15.0f, 0.0f, -10.0f, 0.0f), 10.0f, 100.0f, 0.6f, 0.3f, 0.0f);
+	CreateFlyWheel(scene, dVector(15.0f, 0.0f,  -8.0f, 0.0f), 10.0f, -30.0f, 0.6f, 0.3f, 0.0f);
 
 	DzhanibekovEffect(scene, 10.0f, 5.0f, dVector(15.0f, 0.0f, -4.0f, 0.0f));
 	DzhanibekovEffect(scene, 10.0f, -5.0f, dVector(15.0f, 0.0f, 0.0f, 0.0f));
 	DzhanibekovEffect(scene, 10.0f, 10.0f, dVector(15.0f, 0.0f, 4.0f, 0.0f));
-
+	
 	Phitop(scene, 10.0f,  25.0f, dVector(10.0f, 0.0f, -6.0f, 0.0f));
 	Phitop(scene, 10.0f, -25.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
 	Phitop(scene, 10.0f,  35.0f, dVector(10.0f, 0.0f, 6.0f, 0.0f));
-
+	
 	PrecessingTop(scene, dVector(5.0f, 0.0f, -4.0f, 0.0f));
 	PrecessingTop(scene, dVector(5.0f, 0.0f, 0.0f, 0.0f));
 	PrecessingTop(scene, dVector(5.0f, 0.0f, 4.0f, 0.0f));
-
+	
 	RattleBack(scene, 10.0f, dVector(0.0f, 0.0f, -4.0f, 0.0f));
 	RattleBack(scene, 10.0f, dVector(0.0f, 0.0f, 0.0f, 0.0f));
 	RattleBack(scene, 10.0f, dVector(0.0f, 0.0f,  4.0f, 0.0f));

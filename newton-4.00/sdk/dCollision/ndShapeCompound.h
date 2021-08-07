@@ -25,6 +25,8 @@
 #include "ndCollisionStdafx.h"
 #include "ndShape.h"
 
+class ndBodyKinematic;
+
 #define D_COMPOUND_STACK_DEPTH	256
 
 class ndShapeCompound: public ndShape
@@ -49,6 +51,8 @@ class ndShapeCompound: public ndShape
 	D_COLLISION_API virtual ~ndShapeCompound();
 
 	void SetOwner(const ndShapeInstance* const myInstance);
+
+	const ndTreeArray& GetTree() const;
 
 	D_COLLISION_API virtual void BeginAddRemove();
 	D_COLLISION_API virtual ndTreeArray::dNode* AddCollision(ndShapeInstance* const part);
@@ -109,7 +113,6 @@ inline void ndShapeCompound::SetOwner(const ndShapeInstance* const instance)
 {
 	m_myInstance = instance;
 }
-
 
 class ndShapeCompound::ndNodeBase: public dClassAlloc
 {
@@ -219,10 +222,10 @@ inline void ndShapeCompound::ndNodeBase::SetBox(const dVector& p0, const dVector
 	m_area = m_size.DotProduct(m_size.ShiftTripleRight()).m_x;
 }
 
-
-
-
-
+inline const ndShapeCompound::ndTreeArray& ndShapeCompound::GetTree() const
+{
+	return m_array;
+}
 
 #endif 
 

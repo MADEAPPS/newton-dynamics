@@ -220,12 +220,6 @@ static NewtonBody* CreateFlyWheel (DemoEntityManager* const scene, const dVector
 	NewtonBodySetGyroscopicTorque(wheelBody, 1);
 	NewtonBodySetMassProperties(wheelBody, 10.0f, flyWheelShape);
 
-	dFloat m;
-	dFloat x;
-	dFloat y;
-	dFloat z;
-	NewtonBodyGetMass(wheelBody, &m, &x, &y, &z);
-
 	dVector damp(0.0f);
 	NewtonBodySetLinearDamping(wheelBody, 0.0f);
 	NewtonBodySetAngularDamping(wheelBody, &damp[0]);
@@ -245,7 +239,7 @@ static NewtonBody* CreateFlyWheel (DemoEntityManager* const scene, const dVector
 
 static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght, dFloat tiltAnsgle)
 {
-	speed *= -1.0f;
+	//speed *= -1.0f;
 	NewtonBody* const flyWheel = CreateFlyWheel(scene, posit, speed, radius, lenght);
 
 	dMatrix matrix(dGetIdentityMatrix());
@@ -366,8 +360,8 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.6f);
 
 	//// should spins very slowly, with a tilt angle of 30 degrees
-	//CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -8.0f, 1.0f), 100.0f, 0.6f, 0.3f, 30.0f);
-	//
+	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -8.0f, 1.0f), 50.0f, 0.6f, 0.3f, 0.0f);
+
 	//// should spins slowly, twice precession speed.
 	//CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -6.0f, 1.0f), 50.0f, 0.6f, 0.3f, 0.0f);
 	//
