@@ -222,7 +222,7 @@ class ndActiveRagdollModel : public ndCharacter
 			ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
 			if (ent->GetName() == "mixamorig:Hips") 
 			{
-				world->AddJoint(new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody()));
+				//world->AddJoint(new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody()));
 				break;
 			}
 		}
