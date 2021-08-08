@@ -31,16 +31,37 @@ ndCharacterWalkCycleGenerator::ndCharacterWalkCycleGenerator(ndCharacterBipedPos
 {
 }
 
+void ndCharacterWalkCycleGenerator::MoveFoot(ndCharacterEffectorNode* const footEffector, dFloat32 angle)
+{
+	const dFloat32 hipHigh = dFloat32(0.5f * 0.125f);
+	const dFloat32 strideHigh = dFloat32(0.5f * 0.125f);
+	const dFloat32 radius = 0.9f;
+
+	angle = dMod(angle, dFloat32(2.0f) * dPi);
+	dFloat32 y = hipHigh;
+	dFloat32 x = m_stride * dSin(angle);
+	if ((angle <= dFloat32 (0.5f) * dFloat32(dPi)) || (angle > dFloat32 (1.5f) * dFloat32(dPi)))
+	{
+		//y += strideHigh * dCos(angle);
+		y += 0.25 * strideHigh * dCos(angle);
+	} 
+
+	dVector posit (x, y, dFloat32(0.0f), dFloat32(1.0f));
+	footEffector->SetTargetMatrix(posit);
+}
+
 void ndCharacterWalkCycleGenerator::Update(dFloat32 timestep)
 {
-	//ndCharacterEffectorNode* const leftFootEffector, ndCharacterEffectorNode* const rightFootEffector,
-	dFloat32 leftX = m_stride * dSin(m_angle + dFloat32(0.0f));
-	dFloat32 rightX = m_stride * dSin(m_angle + dPi);
-	
-	dFloat32 high = dFloat32(0.5f * 0.125f);
-	m_owner->m_leftFootEffector->SetTargetMatrix(dVector(leftX, high, dFloat32(0.0f), dFloat32(1.0f)));
-	m_owner->m_rightFootEffector->SetTargetMatrix(dVector(rightX, high, dFloat32(0.0f), dFloat32(1.0f)));
-	
-	m_angle += dMod(timestep * 2.0f, dFloat32(2.0f) * dPi);
+	if (m_owner->m_rightFootEffector)
+	{
+		MoveFoot(m_owner->m_rightFootEffector, m_angle + dFloat32(0.0f) * dPi);
+	}
+
+	if (m_owner->m_leftFootEffector)
+	{
+		MoveFoot(m_owner->m_leftFootEffector, m_angle + dFloat32(1.0f) * dPi);
+	}
+
+	m_angle = dMod(m_angle + timestep * 2.0f, dFloat32(2.0f) * dPi);
 }
 

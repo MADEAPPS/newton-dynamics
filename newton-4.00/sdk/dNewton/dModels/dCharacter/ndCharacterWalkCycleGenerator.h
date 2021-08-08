@@ -35,6 +35,8 @@ class ndCharacterWalkCycleGenerator : public ndCharacterPoseGenerator
 	protected:
 	void Update(dFloat32 timestep);
 
+	void MoveFoot(ndCharacterEffectorNode* const footEffector, dFloat32 angle);
+
 	dFloat32 m_high;
 	dFloat32 m_angle;
 	dFloat32 m_stride;
