@@ -36,6 +36,17 @@ ndCharacterBipedPoseController::~ndCharacterBipedPoseController()
 {
 }
 
+void ndCharacterBipedPoseController::SetLeftFootEffector(ndCharacterEffectorNode* const node)
+{
+	m_leftFootEffector = node;
+}
+
+void ndCharacterBipedPoseController::SetRightFootEffector(ndCharacterEffectorNode* const node)
+{
+	m_rightFootEffector = node;
+}
+
+
 bool ndCharacterBipedPoseController::Evaluate(ndWorld* const world, dFloat32 timestep)
 {
 	//ndCharacter::ndCentreOfMassState comState(m_owner->CalculateCentreOfMassState());
