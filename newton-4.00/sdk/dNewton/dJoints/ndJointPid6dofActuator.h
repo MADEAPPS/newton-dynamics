@@ -26,7 +26,8 @@ class ndJointPid6dofActuator : public ndJointPid3dofActuator
 	D_NEWTON_API void GetLinearSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const;
 	D_NEWTON_API void SetLinearSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer = dFloat32 (5.0e-3f));
 
-	D_NEWTON_API void SetTargetPosition(const dVector& posit);
+	dVector GetTargetPosition() const;
+	void SetTargetPosition(const dVector& posit);
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
@@ -36,6 +37,16 @@ class ndJointPid6dofActuator : public ndJointPid3dofActuator
 	dFloat32 m_linearDamper;
 	dFloat32 m_linearRegularizer;
 };
+
+inline dVector ndJointPid6dofActuator::GetTargetPosition() const
+{
+	return m_targetPosition;
+}
+
+inline void ndJointPid6dofActuator::SetTargetPosition(const dVector& posit)
+{
+	m_targetPosition = posit;
+}
 
 #endif 
 

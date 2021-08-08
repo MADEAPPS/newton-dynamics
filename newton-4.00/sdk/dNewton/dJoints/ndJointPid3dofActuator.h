@@ -36,6 +36,9 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 	D_NEWTON_API void GetAngularSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const;
 	D_NEWTON_API void SetAngularSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer = dFloat32(5.0e-3f));
 
+	void SetTargetRotation(dFloat32 pitch, dFloat32 yaw, dFloat32 roll);
+	void GetTargetRotation(dFloat32& pitch, dFloat32& yaw, dFloat32& roll) const;
+
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
@@ -60,6 +63,21 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 	dFloat32 m_angularDamper;
 	dFloat32 m_angularRegularizer;
 };
+
+inline void ndJointPid3dofActuator::SetTargetRotation(dFloat32 pitch, dFloat32 yaw, dFloat32 roll)
+{
+	m_targetPitch = pitch;
+	m_targetYaw = yaw;
+	m_targetRoll = roll;
+}
+
+inline void ndJointPid3dofActuator::GetTargetRotation(dFloat32& pitch, dFloat32& yaw, dFloat32& roll) const 
+{
+	pitch = m_targetPitch;
+	yaw = m_targetYaw;
+	roll = m_targetRoll;
+}
+
 
 #endif 
 

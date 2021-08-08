@@ -42,11 +42,6 @@ ndJointPid6dofActuator::~ndJointPid6dofActuator()
 {
 }
 
-void ndJointPid6dofActuator::SetTargetPosition(const dVector& posit)
-{
-	m_targetPosition = posit;
-}
-
 void ndJointPid6dofActuator::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	const dVector step (matrix0.m_posit - matrix1.m_posit);
