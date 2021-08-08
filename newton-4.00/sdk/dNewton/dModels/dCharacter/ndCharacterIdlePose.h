@@ -19,39 +19,32 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dCoreStdafx.h"
+#ifndef __D_CHARACTER_IDLE_POSE_H__
+#define __D_CHARACTER_IDLE_POSE_H__
+
 #include "ndNewtonStdafx.h"
-#include "ndWorld.h"
-#include "ndCharacter.h"
-#include "ndCharacterEffectorNode.h"
-#include "ndCharacterBipedPoseController.h"
+#include "ndCharacterPoseGenerator.h"
 
-ndCharacterBipedPoseController::ndCharacterBipedPoseController()
-	:ndCharacterPoseController(nullptr)
-	,m_config()
-	,m_idleCycle(this)
-	,m_walkCycle(this)
+class ndCharacterEffectorNode;
+class ndCharacterBipedPoseController;
+
+class ndCharacterIdlePose : public ndCharacterPoseGenerator
 {
-}
+	public:
+	ndCharacterIdlePose(ndCharacterBipedPoseController* const owner);
 
-ndCharacterBipedPoseController::~ndCharacterBipedPoseController()
-{
-}
+	protected:
+	void Update(dFloat32 timestep);
 
-void ndCharacterBipedPoseController::Init(ndCharacter* const owner, const ndBipedControllerConfig& config)
-{
-	m_owner = owner;
-	m_config = config;
-}
+	void MoveFoot(ndCharacterEffectorNode* const footEffector, dFloat32 angle);
 
-//bool ndCharacterBipedPoseController::Evaluate(ndWorld* const world, dFloat32 timestep)
-bool ndCharacterBipedPoseController::Evaluate(ndWorld* const , dFloat32 timestep)
-{
-	//ndCharacter::ndCentreOfMassState comState(m_owner->CalculateCentreOfMassState());
-	//m_owner->UpdateGlobalPose(world, timestep);
-	//m_owner->CalculateLocalPose(world, timestep);
-	m_walkCycle.Update(timestep);
-	return true;
-}
+	dFloat32 m_high;
+	dFloat32 m_angle;
+	dFloat32 m_stride;
+	ndCharacterBipedPoseController* m_owner;
+
+	friend class ndCharacterBipedPoseController;
+};
 
 
+#endif

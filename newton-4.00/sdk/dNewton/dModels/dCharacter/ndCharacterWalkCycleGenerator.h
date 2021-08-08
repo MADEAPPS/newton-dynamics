@@ -25,6 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacterPoseGenerator.h"
 
+class ndCharacterEffectorNode;
 class ndCharacterBipedPoseController;
 
 class ndCharacterWalkCycleGenerator : public ndCharacterPoseGenerator

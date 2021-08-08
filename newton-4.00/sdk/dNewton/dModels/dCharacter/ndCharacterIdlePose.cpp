@@ -21,12 +21,12 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
+#include "ndCharacterIdlePose.h"
 #include "ndCharacterEffectorNode.h"
 #include "ndCharacterPoseGenerator.h"
-#include "ndCharacterWalkCycleGenerator.h"
 #include "ndCharacterBipedPoseController.h"
 
-ndCharacterWalkCycleGenerator::ndCharacterWalkCycleGenerator(ndCharacterBipedPoseController* const owner)
+ndCharacterIdlePose::ndCharacterIdlePose(ndCharacterBipedPoseController* const owner)
 	:m_owner(owner)
 {
 	m_angle = dFloat32(0.0f);
@@ -34,7 +34,7 @@ ndCharacterWalkCycleGenerator::ndCharacterWalkCycleGenerator(ndCharacterBipedPos
 	m_stride = dFloat32(0.25f);
 }
 
-void ndCharacterWalkCycleGenerator::MoveFoot(ndCharacterEffectorNode* const footEffector, dFloat32 angle)
+void ndCharacterIdlePose::MoveFoot(ndCharacterEffectorNode* const footEffector, dFloat32 angle)
 {
 	const dFloat32 hipHigh = dFloat32(0.5f * 0.125f);
 	const dFloat32 strideHigh = dFloat32(0.5f * 0.125f);
@@ -53,7 +53,7 @@ void ndCharacterWalkCycleGenerator::MoveFoot(ndCharacterEffectorNode* const foot
 	footEffector->SetTargetMatrix(posit);
 }
 
-void ndCharacterWalkCycleGenerator::Update(dFloat32 timestep)
+void ndCharacterIdlePose::Update(dFloat32 timestep)
 {
 	const ndBipedControllerConfig& config = m_owner->GetConfig();
 	if (config.m_rightFootEffector)

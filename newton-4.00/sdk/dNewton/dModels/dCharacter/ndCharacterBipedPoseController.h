@@ -23,6 +23,7 @@
 #define __D_CHARACTER_INVERTED_PENDULUM_POSE_CONTROLLER_H__
 
 #include "ndNewtonStdafx.h"
+#include "ndCharacterIdlePose.h"
 #include "ndCharacterPoseController.h"
 #include "ndCharacterWalkCycleGenerator.h"
 
@@ -51,15 +52,18 @@ class ndCharacterBipedPoseController: public ndCharacterPoseController
 
 	D_NEWTON_API void Init(ndCharacter* const owner, const ndBipedControllerConfig& config);
 
+	const ndBipedControllerConfig& GetConfig() const;
 	virtual bool Evaluate(ndWorld* const world, dFloat32 timestep);
 
 	protected:
-	ndCharacterEffectorNode* m_leftFootEffector;
-	ndCharacterEffectorNode* m_rightFootEffector;
-
+	ndBipedControllerConfig m_config;
+	ndCharacterIdlePose m_idleCycle;
 	ndCharacterWalkCycleGenerator m_walkCycle;
-
-	friend class ndCharacterWalkCycleGenerator;
 };
+
+inline const ndBipedControllerConfig& ndCharacterBipedPoseController::GetConfig() const
+{
+	return m_config;
+}
 
 #endif

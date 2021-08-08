@@ -65,6 +65,7 @@
 #include <ndJointDoubleHinge.h>
 #include <ndJointFixDistance.h>
 #include <ndMultiBodyVehicle.h>
+#include <ndCharacterIdlePose.h>
 #include <ndCharacterRootNode.h>
 #include <ndSkeletonContainer.h>
 #include <ndDynamicsUpdateSoa.h>
