@@ -36,24 +36,18 @@ ndCharacterIdlePose::ndCharacterIdlePose(ndCharacterBipedPoseController* const o
 
 void ndCharacterIdlePose::MoveFoot(ndCharacterEffectorNode* const footEffector, dFloat32 angle)
 {
-	const dFloat32 hipHigh = dFloat32(0.5f * 0.125f);
-	const dFloat32 strideHigh = dFloat32(0.5f * 0.125f);
-	const dFloat32 radius = 0.9f;
+	const dFloat32 hipHigh = dFloat32(0.03f);
 
-	angle = dMod(angle, dFloat32(2.0f) * dPi);
 	dFloat32 y = hipHigh;
+	angle = dMod(angle, dFloat32(2.0f) * dPi);
 	dFloat32 x = m_stride * dSin(angle);
-	if ((angle <= dFloat32 (0.5f) * dFloat32(dPi)) || (angle > dFloat32 (1.5f) * dFloat32(dPi)))
-	{
-		//y += strideHigh * dCos(angle);
-		y += 0.25f * strideHigh * dCos(angle);
-	} 
 
 	dVector posit (x, y, dFloat32(0.0f), dFloat32(1.0f));
 	footEffector->SetTargetMatrix(posit);
 }
 
-void ndCharacterIdlePose::Update(dFloat32 timestep)
+//void ndCharacterIdlePose::Update(dFloat32 timestep)
+void ndCharacterIdlePose::Update(dFloat32)
 {
 	const ndBipedControllerConfig& config = m_owner->GetConfig();
 	if (config.m_rightFootEffector)
@@ -65,6 +59,7 @@ void ndCharacterIdlePose::Update(dFloat32 timestep)
 	{
 		MoveFoot(config.m_leftFootEffector, m_angle + dFloat32(1.0f) * dPi);
 	}
-	m_angle = dMod(m_angle + timestep * 2.0f, dFloat32(2.0f) * dPi);
+	//m_angle = dMod(m_angle + timestep * 2.0f, dFloat32(2.0f) * dPi);
+	m_angle = 20.0f * dDegreeToRad;
 }
 

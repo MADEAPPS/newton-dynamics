@@ -44,13 +44,14 @@ void ndCharacterBipedPoseController::Init(ndCharacter* const owner, const ndBipe
 	m_config = config;
 }
 
-//bool ndCharacterBipedPoseController::Evaluate(ndWorld* const world, dFloat32 timestep)
 bool ndCharacterBipedPoseController::Evaluate(ndWorld* const , dFloat32 timestep)
 {
 	//ndCharacter::ndCentreOfMassState comState(m_owner->CalculateCentreOfMassState());
 	//m_owner->UpdateGlobalPose(world, timestep);
 	//m_owner->CalculateLocalPose(world, timestep);
-	m_walkCycle.Update(timestep);
+
+	//m_walkCycle.Update(timestep);
+	m_idleCycle.Update(timestep);
 	return true;
 }
 
