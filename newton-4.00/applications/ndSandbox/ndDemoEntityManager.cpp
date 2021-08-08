@@ -172,7 +172,6 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_showRaycastHit(false)
 	,m_profilerMode(false)
 	,m_solverMode(ndWorld::ndSimdSoaSolver)
-	//,m_directionalLight(0.0f, 1.0f, 0.0f, 0.0f)
 	,m_debugShapeCache()
 	,m_replayLogFile(nullptr)
 {
@@ -284,7 +283,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
 	//m_showNormalForces = true;
-	//m_showContactPoints = true;
+	m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
 	m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 2;	
