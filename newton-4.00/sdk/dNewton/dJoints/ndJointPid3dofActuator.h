@@ -48,6 +48,7 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 	virtual void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
 	dMatrix m_referenceFrameBody1;
+	dVector m_targetPosition;
 	dFloat32 m_targetPitch;
 	dFloat32 m_targetYaw;
 	dFloat32 m_targetRoll;

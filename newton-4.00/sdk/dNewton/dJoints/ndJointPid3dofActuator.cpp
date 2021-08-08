@@ -16,6 +16,7 @@
 ndJointPid3dofActuator::ndJointPid3dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
 	,m_referenceFrameBody1(m_localMatrix1)
+	,m_targetPosition(dVector::m_zero)
 	,m_targetPitch(dFloat32 (0.0f))
 	,m_targetYaw(dFloat32(0.0f))
 	,m_targetRoll(dFloat32(0.0f))
@@ -301,7 +302,9 @@ void ndJointPid3dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
 if (m_maxConeAngle == 0.0f)
 m_targetPitch = -60.0f * dDegreeToRad;
 
-	m_localMatrix1 = dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll) * m_referenceFrameBody1;
+	dMatrix controlMatrix(dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll));
+	controlMatrix.m_posit = m_targetPosition;
+	m_localMatrix1 = controlMatrix * m_referenceFrameBody1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	SubmitLinearLimits(matrix0, matrix1, desc);
