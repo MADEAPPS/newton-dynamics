@@ -36,10 +36,7 @@ ndCharacter::ndCharacter()
 	:ndModel()
 	,m_rootNode(nullptr)
 	,m_controller(nullptr)
-	,m_defaultController(nullptr)
 {
-	m_defaultController = new ndCharacterBipedPoseController(this);
-	m_controller = m_defaultController;
 }
 
 ndCharacter::ndCharacter(const nd::TiXmlNode* const xmlNode)
@@ -50,10 +47,6 @@ ndCharacter::ndCharacter(const nd::TiXmlNode* const xmlNode)
 
 ndCharacter::~ndCharacter()
 {
-	if (m_defaultController)
-	{
-		delete m_defaultController;
-	}
 	if (m_rootNode)
 	{
 		delete m_rootNode;
@@ -203,6 +196,8 @@ void ndCharacter::PostUpdate(ndWorld* const, dFloat32)
 
 void ndCharacter::Update(ndWorld* const world, dFloat32 timestep)
 {
-	dAssert(m_controller);
-	m_controller->Evaluate(world, timestep);
+	if (m_controller)
+	{
+		m_controller->Evaluate(world, timestep);
+	}
 }

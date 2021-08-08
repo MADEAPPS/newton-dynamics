@@ -45,8 +45,6 @@ class ndCharacterEffectorNode: public ndCharacterLimbNode
 
 	ndJointPid6dofActuator* m_effector;
 	ndCharacterLimbNode* m_referenceNode;
-
-	//dMatrix m_globalPose;
 };
 
 inline ndJointBilateralConstraint* ndCharacterEffectorNode::GetJoint() const

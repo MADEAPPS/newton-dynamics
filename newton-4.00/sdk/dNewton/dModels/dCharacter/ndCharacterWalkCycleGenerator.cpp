@@ -19,47 +19,28 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CHARACTER_ROOT_NODE_H__
-#define __D_CHARACTER_ROOT_NODE_H__
-
+#include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndCharacterLimbNode.h"
+#include "ndCharacterPoseGenerator.h"
+#include "ndCharacterEffectorNode.h"
+#include "ndCharacterWalkCycleGenerator.h"
+#include "ndCharacterBipedPoseController.h"
 
-class ndCharacterRootNode: public ndCharacterLimbNode
+ndCharacterWalkCycleGenerator::ndCharacterWalkCycleGenerator(ndCharacterBipedPoseController* const owner)
+	:m_owner(owner)
 {
-	public:
-	D_CLASS_RELECTION(ndCharacterRootNode);
-
-	D_NEWTON_API ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body);
-	D_NEWTON_API virtual ~ndCharacterRootNode ();
-
-	ndCharacter* GetOwner() const;
-	virtual ndBodyDynamic* GetBody() const;
-
-	const dMatrix& GetLocalFrame() const;
-	D_NEWTON_API void SetLocalFrame(const dMatrix& frameInGlobalSpace);
-
-	protected:
-	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
-
-	ndCharacter* m_owner;
-	ndBodyDynamic* m_body;
-	dMatrix m_localFrame;
-};
-
-inline ndCharacter* ndCharacterRootNode::GetOwner() const
-{
-	return m_owner;
 }
 
-inline ndBodyDynamic* ndCharacterRootNode::GetBody() const
+void ndCharacterWalkCycleGenerator::Update(dFloat32 timestep)
 {
-	return m_body;
+	//ndCharacterEffectorNode* const leftFootEffector, ndCharacterEffectorNode* const rightFootEffector,
+	dFloat32 leftX = m_stride * dSin(m_angle + dFloat32(0.0f));
+	dFloat32 rightX = m_stride * dSin(m_angle + dPi);
+	
+	dFloat32 high = dFloat32(0.5f * 0.125f);
+	m_owner->m_leftFootEffector->SetTargetMatrix(dVector(leftX, high, dFloat32(0.0f), dFloat32(1.0f)));
+	m_owner->m_rightFootEffector->SetTargetMatrix(dVector(rightX, high, dFloat32(0.0f), dFloat32(1.0f)));
+	
+	m_angle += dMod(timestep * 2.0f, dFloat32(2.0f) * dPi);
 }
 
-inline const dMatrix& ndCharacterRootNode::GetLocalFrame() const
-{
-	return m_localFrame;
-}
-
-#endif

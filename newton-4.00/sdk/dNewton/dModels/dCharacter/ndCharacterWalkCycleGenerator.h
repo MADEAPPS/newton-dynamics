@@ -19,47 +19,29 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CHARACTER_ROOT_NODE_H__
-#define __D_CHARACTER_ROOT_NODE_H__
+#ifndef __D_CHARACTER_WALK_CYCLE_GENERATOR_H__
+#define __D_CHARACTER_WALK_CYCLE_GENERATOR_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndCharacterLimbNode.h"
+#include "ndCharacterPoseGenerator.h"
 
-class ndCharacterRootNode: public ndCharacterLimbNode
+class ndCharacterBipedPoseController;
+
+class ndCharacterWalkCycleGenerator : public ndCharacterPoseGenerator
 {
 	public:
-	D_CLASS_RELECTION(ndCharacterRootNode);
-
-	D_NEWTON_API ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body);
-	D_NEWTON_API virtual ~ndCharacterRootNode ();
-
-	ndCharacter* GetOwner() const;
-	virtual ndBodyDynamic* GetBody() const;
-
-	const dMatrix& GetLocalFrame() const;
-	D_NEWTON_API void SetLocalFrame(const dMatrix& frameInGlobalSpace);
+	ndCharacterWalkCycleGenerator(ndCharacterBipedPoseController* const owner);
 
 	protected:
-	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
+	void Update(dFloat32 timestep);
 
-	ndCharacter* m_owner;
-	ndBodyDynamic* m_body;
-	dMatrix m_localFrame;
+	dFloat32 m_high;
+	dFloat32 m_angle;
+	dFloat32 m_stride;
+	ndCharacterBipedPoseController* m_owner;
+
+	friend class ndCharacterBipedPoseController;
 };
 
-inline ndCharacter* ndCharacterRootNode::GetOwner() const
-{
-	return m_owner;
-}
-
-inline ndBodyDynamic* ndCharacterRootNode::GetBody() const
-{
-	return m_body;
-}
-
-inline const dMatrix& ndCharacterRootNode::GetLocalFrame() const
-{
-	return m_localFrame;
-}
 
 #endif

@@ -24,33 +24,42 @@
 
 #include "ndNewtonStdafx.h"
 #include "ndCharacterPoseController.h"
+#include "ndCharacterWalkCycleGenerator.h"
+
+class ndCharacterEffectorNode;
+
+class ndBipedControllerConfig
+{
+	public:
+	ndBipedControllerConfig()
+		:m_leftFootEffector(nullptr)
+		,m_rightFootEffector(nullptr)
+	{
+	}
+
+	ndCharacterEffectorNode* m_leftFootEffector;
+	ndCharacterEffectorNode* m_rightFootEffector;
+};
 
 class ndCharacterBipedPoseController: public ndCharacterPoseController
 {
 	public:
 	D_CLASS_RELECTION(ndCharacterBipedPoseController);
 
-	D_NEWTON_API ndCharacterBipedPoseController(ndCharacter* const owner);
+	D_NEWTON_API ndCharacterBipedPoseController();
 	D_NEWTON_API virtual ~ndCharacterBipedPoseController ();
 
-	D_NEWTON_API void SetLeftFootEffector(ndCharacterEffectorNode* const node);
-	D_NEWTON_API void SetRightFootEffector(ndCharacterEffectorNode* const node);
+	D_NEWTON_API void Init(ndCharacter* const owner, const ndBipedControllerConfig& config);
+
 	virtual bool Evaluate(ndWorld* const world, dFloat32 timestep);
 
 	protected:
-	class ndProceduralWalk
-	{
-		public:
-		dFloat32 m_angle;
-		dFloat32 m_high;
-		dFloat32 m_stride;
-
-		void Update(ndCharacterEffectorNode* const leftFootEffector, ndCharacterEffectorNode* const rightFootEffector, dFloat32 timestep);
-	};
-
-	ndProceduralWalk m_walkCycle;
 	ndCharacterEffectorNode* m_leftFootEffector;
 	ndCharacterEffectorNode* m_rightFootEffector;
+
+	ndCharacterWalkCycleGenerator m_walkCycle;
+
+	friend class ndCharacterWalkCycleGenerator;
 };
 
 #endif

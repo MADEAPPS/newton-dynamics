@@ -32,7 +32,6 @@ class ndCharacterEffectorNode;
 class ndCharacterPoseController;
 class ndCharacterForwardDynamicNode;
 class ndCharacterInverseDynamicNode;
-class ndCharacterBipedPoseController;
 
 class ndCharacter: public ndModel
 {
@@ -57,7 +56,8 @@ class ndCharacter: public ndModel
 	D_NEWTON_API ndCharacterEffectorNode* CreateInverseDynamicEffector(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const child, ndCharacterLimbNode* const parent);
 	
 	ndCharacter* GetAsCharacter();
-	ndCharacterBipedPoseController* GetBipedController() const;
+	ndCharacterPoseController* GetController() const;
+	void SetController(ndCharacterPoseController* const controller);
 
 	ndCentreOfMassState CalculateCentreOfMassState() const;
 	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
@@ -70,7 +70,6 @@ class ndCharacter: public ndModel
 	
 	ndCharacterRootNode* m_rootNode;
 	ndCharacterPoseController* m_controller;
-	ndCharacterBipedPoseController* m_defaultController;
 };
 
 inline ndCharacter* ndCharacter::GetAsCharacter()
@@ -78,9 +77,14 @@ inline ndCharacter* ndCharacter::GetAsCharacter()
 	return this;
 }
 
-inline ndCharacterBipedPoseController* ndCharacter::GetBipedController() const
+inline ndCharacterPoseController* ndCharacter::GetController() const
 {
-	return m_defaultController;
+	return m_controller;
+}
+
+inline void ndCharacter::SetController(ndCharacterPoseController* const controller)
+{
+	m_controller = controller;
 }
 
 #endif

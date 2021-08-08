@@ -169,7 +169,8 @@ class ndActiveRagdollModel : public ndCharacter
 		dInt32 bodyCount = 1;
 		ndBodyDynamic* bodyArray[1024];
 		bodyArray[0] = rootNode->GetBody();
-		
+
+		ndBipedControllerConfig bipedConfig;
 		// walk model hierarchic adding all children designed as rigid body bones. 
 		while (stack) 
 		{
@@ -203,11 +204,11 @@ class ndActiveRagdollModel : public ndCharacter
 
 						if (strstr(name, "right"))
 						{
-							GetBipedController()->SetRightFootEffector(effectorNode);
+							bipedConfig.m_rightFootEffector = effectorNode;
 						}
 						else if (strstr(name, "left"))
 						{
-							GetBipedController()->SetLeftFootEffector(effectorNode);
+							bipedConfig.m_leftFootEffector = effectorNode;
 						}
 					}
 					break;
@@ -223,6 +224,10 @@ class ndActiveRagdollModel : public ndCharacter
 		}
 		
 		SetModelMass(100.0f, bodyCount, bodyArray);
+
+		// initialize a biped controller and set to the model
+		m_bipedController.Init(this, bipedConfig);
+		SetController(&m_bipedController);
 		
 		for (dInt32 i = 0; i < bodyCount; i++)
 		{
@@ -325,7 +330,7 @@ class ndActiveRagdollModel : public ndCharacter
 		ndCharacter::PostTransformUpdate(world, timestep);
 	}
 
-	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
+	ndCharacterBipedPoseController m_bipedController;
 };
 
 void ndActiveRagdoll (ndDemoEntityManager* const scene)

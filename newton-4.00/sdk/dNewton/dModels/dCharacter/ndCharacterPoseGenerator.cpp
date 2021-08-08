@@ -19,47 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CHARACTER_ROOT_NODE_H__
-#define __D_CHARACTER_ROOT_NODE_H__
-
+#include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndCharacterLimbNode.h"
+#include "ndCharacterPoseGenerator.h"
 
-class ndCharacterRootNode: public ndCharacterLimbNode
-{
-	public:
-	D_CLASS_RELECTION(ndCharacterRootNode);
 
-	D_NEWTON_API ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body);
-	D_NEWTON_API virtual ~ndCharacterRootNode ();
-
-	ndCharacter* GetOwner() const;
-	virtual ndBodyDynamic* GetBody() const;
-
-	const dMatrix& GetLocalFrame() const;
-	D_NEWTON_API void SetLocalFrame(const dMatrix& frameInGlobalSpace);
-
-	protected:
-	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
-
-	ndCharacter* m_owner;
-	ndBodyDynamic* m_body;
-	dMatrix m_localFrame;
-};
-
-inline ndCharacter* ndCharacterRootNode::GetOwner() const
-{
-	return m_owner;
-}
-
-inline ndBodyDynamic* ndCharacterRootNode::GetBody() const
-{
-	return m_body;
-}
-
-inline const dMatrix& ndCharacterRootNode::GetLocalFrame() const
-{
-	return m_localFrame;
-}
-
-#endif

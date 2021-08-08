@@ -266,8 +266,6 @@ class ndRagdollModel : public ndModel
 	{
 
 	}
-
-	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
 };
 
 void ndBasicRagdoll (ndDemoEntityManager* const scene)

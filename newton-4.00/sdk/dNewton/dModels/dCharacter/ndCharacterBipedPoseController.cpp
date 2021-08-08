@@ -26,40 +26,27 @@
 #include "ndCharacterEffectorNode.h"
 #include "ndCharacterBipedPoseController.h"
 
-ndCharacterBipedPoseController::ndCharacterBipedPoseController(ndCharacter* const owner)
-	:ndCharacterPoseController(owner)
+ndCharacterBipedPoseController::ndCharacterBipedPoseController()
+	:ndCharacterPoseController(nullptr)
 	,m_leftFootEffector(nullptr)
 	,m_rightFootEffector(nullptr)
+	,m_walkCycle(this)
 {
-	m_walkCycle.m_angle = dFloat32(0.0f);
-	m_walkCycle.m_stride = dFloat32(0.25f);
-	m_walkCycle.m_high = dFloat32(1.0f);
 }
 
 ndCharacterBipedPoseController::~ndCharacterBipedPoseController()
 {
 }
 
-void ndCharacterBipedPoseController::SetLeftFootEffector(ndCharacterEffectorNode* const node)
+void ndCharacterBipedPoseController::Init(ndCharacter* const owner, const ndBipedControllerConfig& config)
 {
-	m_leftFootEffector = node;
-}
+	m_owner = owner;
+	m_leftFootEffector = config.m_leftFootEffector;
+	m_rightFootEffector = config.m_rightFootEffector;
 
-void ndCharacterBipedPoseController::SetRightFootEffector(ndCharacterEffectorNode* const node)
-{
-	m_rightFootEffector = node;
-}
-
-void ndCharacterBipedPoseController::ndProceduralWalk::Update(ndCharacterEffectorNode* const leftFootEffector, ndCharacterEffectorNode* const rightFootEffector, dFloat32 timestep)
-{
-	dFloat32 leftX = m_stride * dSin(m_angle + dFloat32 (0.0f));
-	dFloat32 rightX = m_stride * dSin(m_angle + dPi);
-
-	dFloat32 high = dFloat32(0.5f * 0.125f);
-	leftFootEffector->SetTargetMatrix(dVector (leftX, high, dFloat32(0.0f), dFloat32(1.0f)));
-	rightFootEffector->SetTargetMatrix(dVector(rightX, high, dFloat32(0.0f), dFloat32(1.0f)));
-
-	m_angle += dMod (timestep * 2.0f, dFloat32(2.0f) * dPi);
+	m_walkCycle.m_angle = dFloat32(0.0f);
+	m_walkCycle.m_stride = dFloat32(0.25f);
+	m_walkCycle.m_high = dFloat32(1.0f);
 }
 
 //bool ndCharacterBipedPoseController::Evaluate(ndWorld* const world, dFloat32 timestep)
@@ -68,7 +55,7 @@ bool ndCharacterBipedPoseController::Evaluate(ndWorld* const , dFloat32 timestep
 	//ndCharacter::ndCentreOfMassState comState(m_owner->CalculateCentreOfMassState());
 	//m_owner->UpdateGlobalPose(world, timestep);
 	//m_owner->CalculateLocalPose(world, timestep);
-	m_walkCycle.Update(m_leftFootEffector, m_rightFootEffector, timestep);
+	m_walkCycle.Update(timestep);
 	return true;
 }
 
