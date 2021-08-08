@@ -94,6 +94,10 @@ else()
 		set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
 	endif()
 
+	if(MINGW AND NEWTON_ENABLE_AVX2_SOLVER)
+		set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " -mavx2 -mfma  " )
+	endif()
+
 	if(UNIX AND NEWTON_ENABLE_AVX2_SOLVER)
 		set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " -march=haswell " )
 	endif()
