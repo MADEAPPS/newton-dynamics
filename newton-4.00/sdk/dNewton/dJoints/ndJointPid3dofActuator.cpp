@@ -16,7 +16,7 @@
 ndJointPid3dofActuator::ndJointPid3dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
 	,m_referenceFrameBody1(m_localMatrix1)
-	,m_targetPosition(dVector::m_zero)
+	,m_targetPosition(dVector::m_wOne)
 	,m_targetPitch(dFloat32 (0.0f))
 	,m_targetYaw(dFloat32(0.0f))
 	,m_targetRoll(dFloat32(0.0f))

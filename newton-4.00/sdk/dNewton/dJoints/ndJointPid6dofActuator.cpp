@@ -78,7 +78,7 @@ void ndJointPid6dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	m_targetPosition = dVector(dFloat32(0.0f), dFloat32(0.5f * 0.125f), dFloat32(0.0f), dFloat32 (1.0));
 
-m_targetPosition.m_x = 0.2f * dSin(xxxx);
+m_targetPosition.m_x = 0.25f * dSin(xxxx);
 xxxx -= desc.m_timestep * 2.0f;
 
 	ndJointPid3dofActuator::JacobianDerivative(desc);
