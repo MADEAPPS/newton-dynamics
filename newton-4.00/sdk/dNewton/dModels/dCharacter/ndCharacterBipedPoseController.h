@@ -38,6 +38,17 @@ class ndCharacterBipedPoseController: public ndCharacterPoseController
 	virtual bool Evaluate(ndWorld* const world, dFloat32 timestep);
 
 	protected:
+	class ndProceduralWalk
+	{
+		public:
+		dFloat32 m_angle;
+		dFloat32 m_high;
+		dFloat32 m_stride;
+
+		void Update(ndCharacterEffectorNode* const leftFootEffector, ndCharacterEffectorNode* const rightFootEffector, dFloat32 timestep);
+	};
+
+	ndProceduralWalk m_walkCycle;
 	ndCharacterEffectorNode* m_leftFootEffector;
 	ndCharacterEffectorNode* m_rightFootEffector;
 };

@@ -22,9 +22,6 @@ ndJointPid6dofActuator::ndJointPid6dofActuator(const dMatrix& pinAndPivotFrame, 
 	,m_linearDamper(dFloat32(50.0f))
 	,m_linearRegularizer(dFloat32(5.0e-3f))
 {
-	static dFloat32 xxxxxx = 0.0f;
-	xxxx = xxxxxx;
-	xxxxxx += dPi;
 }
 
 void ndJointPid6dofActuator::GetLinearSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const
@@ -43,6 +40,11 @@ void ndJointPid6dofActuator::SetLinearSpringDamperRegularizer(dFloat32 spring, d
 
 ndJointPid6dofActuator::~ndJointPid6dofActuator()
 {
+}
+
+void ndJointPid6dofActuator::SetTargetPosition(const dVector& posit)
+{
+	m_targetPosition = posit;
 }
 
 void ndJointPid6dofActuator::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
@@ -76,10 +78,5 @@ void ndJointPid6dofActuator::SubmitLinearLimits(const dMatrix& matrix0, const dM
 
 void ndJointPid6dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	m_targetPosition = dVector(dFloat32(0.0f), dFloat32(0.5f * 0.125f), dFloat32(0.0f), dFloat32 (1.0));
-
-m_targetPosition.m_x = 0.25f * dSin(xxxx);
-xxxx -= desc.m_timestep * 2.0f;
-
 	ndJointPid3dofActuator::JacobianDerivative(desc);
 }

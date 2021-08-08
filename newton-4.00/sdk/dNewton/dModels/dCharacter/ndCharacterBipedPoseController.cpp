@@ -23,6 +23,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndCharacter.h"
+#include "ndCharacterEffectorNode.h"
 #include "ndCharacterBipedPoseController.h"
 
 ndCharacterBipedPoseController::ndCharacterBipedPoseController(ndCharacter* const owner)
@@ -30,6 +31,9 @@ ndCharacterBipedPoseController::ndCharacterBipedPoseController(ndCharacter* cons
 	,m_leftFootEffector(nullptr)
 	,m_rightFootEffector(nullptr)
 {
+	m_walkCycle.m_angle = dFloat32(0.0f);
+	m_walkCycle.m_stride = dFloat32(0.25f);
+	m_walkCycle.m_high = dFloat32(1.0f);
 }
 
 ndCharacterBipedPoseController::~ndCharacterBipedPoseController()
@@ -46,12 +50,26 @@ void ndCharacterBipedPoseController::SetRightFootEffector(ndCharacterEffectorNod
 	m_rightFootEffector = node;
 }
 
+void ndCharacterBipedPoseController::ndProceduralWalk::Update(ndCharacterEffectorNode* const leftFootEffector, ndCharacterEffectorNode* const rightFootEffector, dFloat32 timestep)
+{
+	dFloat32 leftX = m_stride * dSin(m_angle + dFloat32 (0.0f));
+	dFloat32 rightX = m_stride * dSin(m_angle + dPi);
 
-bool ndCharacterBipedPoseController::Evaluate(ndWorld* const world, dFloat32 timestep)
+	dFloat32 high = dFloat32(0.5f * 0.125f);
+	leftFootEffector->SetTargetMatrix(dVector (leftX, high, dFloat32(0.0f), dFloat32(1.0f)));
+	rightFootEffector->SetTargetMatrix(dVector(rightX, high, dFloat32(0.0f), dFloat32(1.0f)));
+
+	m_angle += dMod (timestep * 2.0f, dFloat32(2.0f) * dPi);
+}
+
+//bool ndCharacterBipedPoseController::Evaluate(ndWorld* const world, dFloat32 timestep)
+bool ndCharacterBipedPoseController::Evaluate(ndWorld* const , dFloat32 timestep)
 {
 	//ndCharacter::ndCentreOfMassState comState(m_owner->CalculateCentreOfMassState());
-	m_owner->UpdateGlobalPose(world, timestep);
-	m_owner->CalculateLocalPose(world, timestep);
+	//m_owner->UpdateGlobalPose(world, timestep);
+	//m_owner->CalculateLocalPose(world, timestep);
+	m_walkCycle.Update(m_leftFootEffector, m_rightFootEffector, timestep);
 	return true;
 }
+
 

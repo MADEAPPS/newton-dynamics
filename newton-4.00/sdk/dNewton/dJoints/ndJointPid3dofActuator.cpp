@@ -299,8 +299,8 @@ void ndJointPid3dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-if (m_maxConeAngle == 0.0f)
-m_targetPitch = -60.0f * dDegreeToRad;
+//if (m_maxConeAngle == 0.0f)
+//m_targetPitch = -60.0f * dDegreeToRad;
 
 	dMatrix controlMatrix(dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll));
 	controlMatrix.m_posit = m_targetPosition;
