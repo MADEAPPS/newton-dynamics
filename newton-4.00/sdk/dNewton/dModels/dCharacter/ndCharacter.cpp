@@ -38,8 +38,8 @@ ndCharacter::ndCharacter()
 	,m_controller(nullptr)
 	,m_defaultController(nullptr)
 {
-	m_controller = new ndCharacterBipedPoseController(this);
-	m_defaultController = m_controller;
+	m_defaultController = new ndCharacterBipedPoseController(this);
+	m_controller = m_defaultController;
 }
 
 ndCharacter::ndCharacter(const nd::TiXmlNode* const xmlNode)

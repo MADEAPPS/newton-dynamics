@@ -27,6 +27,8 @@
 
 ndCharacterBipedPoseController::ndCharacterBipedPoseController(ndCharacter* const owner)
 	:ndCharacterPoseController(owner)
+	,m_leftFootEffector(nullptr)
+	,m_rightFootEffector(nullptr)
 {
 }
 

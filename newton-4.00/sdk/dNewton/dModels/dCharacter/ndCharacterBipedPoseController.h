@@ -33,9 +33,23 @@ class ndCharacterBipedPoseController: public ndCharacterPoseController
 	D_NEWTON_API ndCharacterBipedPoseController(ndCharacter* const owner);
 	D_NEWTON_API virtual ~ndCharacterBipedPoseController ();
 
+	void SetLeftFootEffector(ndCharacterEffectorNode* const node);
+	void SetRightFootEffector(ndCharacterEffectorNode* const node);
 	virtual bool Evaluate(ndWorld* const world, dFloat32 timestep);
 
+	protected:
+	ndCharacterEffectorNode* m_leftFootEffector;
+	ndCharacterEffectorNode* m_rightFootEffector;
 };
 
+inline void ndCharacterBipedPoseController::SetLeftFootEffector(ndCharacterEffectorNode* const node)
+{
+	m_leftFootEffector = node;
+}
+
+inline void ndCharacterBipedPoseController::SetRightFootEffector(ndCharacterEffectorNode* const node)
+{
+	m_rightFootEffector = node;
+}
 
 #endif

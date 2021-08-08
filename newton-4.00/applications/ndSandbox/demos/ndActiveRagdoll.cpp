@@ -200,8 +200,16 @@ class ndActiveRagdollModel : public ndCharacter
 						ndCharacterEffectorNode* const effectorNode = CreateInverseDynamicEffector(effectorMatrix, parentBone, referenceNode);
 						ndJointPid6dofActuator* const effectorJoint = (ndJointPid6dofActuator*)effectorNode->GetJoint();
 						effectorJoint->SetLinearSpringDamperRegularizer(definition.m_jointData.m_spring, definition.m_jointData.m_damper, definition.m_jointData.m_regularizer);
-
 						world->AddJoint(effectorJoint);
+
+						if (strstr(name, "right"))
+						{
+							GetBipedController()->SetRightFootEffector(effectorNode);
+						}
+						else if (strstr(name, "left"))
+						{
+							GetBipedController()->SetLeftFootEffector(effectorNode);
+						}
 					}
 					break;
 				}
