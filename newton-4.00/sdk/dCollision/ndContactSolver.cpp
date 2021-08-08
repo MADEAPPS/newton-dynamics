@@ -1558,7 +1558,6 @@ dInt32 ndContactSolver::Prune3dContacts(const dMatrix& matrix, dInt32 count, ndC
 dInt32 ndContactSolver::PruneContacts(dInt32 count, dInt32 maxCount) const
 {
 	ndContactPoint* const contactArray = m_contactBuffer;
-	//dFloat32 distTolerenace = m_contact->GetPruningTolerance();
 	dVector origin(dVector::m_zero);
 	for (dInt32 i = 0; i < count; i++) 
 	{

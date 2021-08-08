@@ -107,18 +107,18 @@ static dActiveJointDefinition jointsDefinition[] =
 {
 	{ "mixamorig:Hips", dActiveJointDefinition::forwardKinematic, {}, {}, {} },
 	
-	//{ "mixamorig:Spine", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f }, {} },
-	//{ "mixamorig:Spine1", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
-	//{ "mixamorig:Spine2", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
-	//{ "mixamorig:Neck", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
-	//
-	//{ "mixamorig:RightArm", dActiveJointDefinition::forwardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
-	//{ "mixamorig:RightForeArm", dActiveJointDefinition::forwardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f }, {}  },
-	//{ "mixamorig:RightHand", dActiveJointDefinition::forwardKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
-	//
-	//{ "mixamorig:LeftArm", dActiveJointDefinition::forwardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
-	//{ "mixamorig:LeftForeArm", dActiveJointDefinition::forwardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f }, {}  },
-	//{ "mixamorig:LeftHand", dActiveJointDefinition::forwardKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
+	{ "mixamorig:Spine", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f }, {} },
+	{ "mixamorig:Spine1", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
+	{ "mixamorig:Spine2", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
+	{ "mixamorig:Neck", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
+	
+	{ "mixamorig:RightArm", dActiveJointDefinition::forwardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
+	{ "mixamorig:RightForeArm", dActiveJointDefinition::forwardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f }, {}  },
+	{ "mixamorig:RightHand", dActiveJointDefinition::forwardKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
+	
+	{ "mixamorig:LeftArm", dActiveJointDefinition::forwardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
+	{ "mixamorig:LeftForeArm", dActiveJointDefinition::forwardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f }, {}  },
+	{ "mixamorig:LeftHand", dActiveJointDefinition::forwardKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
 	
 	{ "mixamorig:RightUpLeg", dActiveJointDefinition::inverseKinematic, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f }, {} },
 	{ "mixamorig:RightLeg", dActiveJointDefinition::inverseKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
