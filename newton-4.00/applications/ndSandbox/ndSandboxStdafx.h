@@ -96,8 +96,8 @@
 		#define stricmp strcasecmp
 	#endif
 
-	#ifndef _strlwr
-		inline char* _strlwr (char* const ptr) 
+	#if !defined(_strlwr) && (!defined(__MINGW32__) || !defined(__MINGW64__))
+		inline char* _strlwr (char* const ptr)
 		{ 
 			char* ret = ptr; 
 			while (*ret != '\0')
