@@ -70,8 +70,3 @@ void ndJointPid6dofActuator::SubmitLinearLimits(const dMatrix& matrix0, const dM
 		AddLinearRowJacobian(desc, matrix1.m_posit, matrix1.m_posit, basis[2]);
 	}
 }
-
-void ndJointPid6dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
-{
-	ndJointPid3dofActuator::JacobianDerivative(desc);
-}

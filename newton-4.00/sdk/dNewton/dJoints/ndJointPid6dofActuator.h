@@ -30,7 +30,6 @@ class ndJointPid6dofActuator : public ndJointPid3dofActuator
 	void SetTargetPosition(const dVector& posit);
 
 	protected:
-	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	virtual void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
 	dFloat32 m_linearSpring;
