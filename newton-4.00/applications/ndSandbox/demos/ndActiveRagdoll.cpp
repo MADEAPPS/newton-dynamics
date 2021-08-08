@@ -34,9 +34,9 @@ class dActiveJointDefinition
 	struct dJointPidData
 	{
 		dJointPidData()
-			:m_spring(1000.0f)
+			:m_spring(1500.0f)
 			,m_damper(40.0f)
-			,m_regularizer(0.005f)
+			,m_regularizer(0.001f)
 		{
 		}
 		dFloat32 m_spring;
