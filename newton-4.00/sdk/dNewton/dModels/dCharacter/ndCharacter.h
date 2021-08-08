@@ -56,6 +56,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API ndCharacterEffectorNode* CreateInverseDynamicEffector(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const child, ndCharacterLimbNode* const parent);
 	
 	ndCharacter* GetAsCharacter();
+	ndCharacterRootNode* GetRootNode() const;
 	ndCharacterPoseController* GetController() const;
 	void SetController(ndCharacterPoseController* const controller);
 
@@ -85,6 +86,11 @@ inline ndCharacterPoseController* ndCharacter::GetController() const
 inline void ndCharacter::SetController(ndCharacterPoseController* const controller)
 {
 	m_controller = controller;
+}
+
+inline ndCharacterRootNode* ndCharacter::GetRootNode() const
+{
+	return m_rootNode;
 }
 
 #endif

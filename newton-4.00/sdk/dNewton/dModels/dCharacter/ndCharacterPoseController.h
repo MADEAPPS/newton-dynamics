@@ -36,10 +36,15 @@ class ndCharacterPoseController: public dClassAlloc
 	D_NEWTON_API ndCharacterPoseController(ndCharacter* const owner);
 	D_NEWTON_API virtual ~ndCharacterPoseController ();
 
+	virtual void Debug(ndConstraintDebugCallback& context) const;
 	virtual bool Evaluate(ndWorld* const world, dFloat32 timestep) = 0;
 
 	protected:
 	ndCharacter* m_owner;
 };
+
+inline void ndCharacterPoseController::Debug(ndConstraintDebugCallback&) const
+{
+}
 
 #endif

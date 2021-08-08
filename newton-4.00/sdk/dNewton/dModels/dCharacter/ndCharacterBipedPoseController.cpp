@@ -23,6 +23,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndCharacter.h"
+#include "ndBodyDynamic.h"
+#include "ndCharacterRootNode.h"
 #include "ndCharacterEffectorNode.h"
 #include "ndCharacterBipedPoseController.h"
 
@@ -42,6 +44,35 @@ void ndCharacterBipedPoseController::Init(ndCharacter* const owner, const ndBipe
 {
 	m_owner = owner;
 	m_config = config;
+}
+
+void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) const
+{
+	ndCharacterRootNode* const rootNode = m_owner->GetRootNode();
+	ndBodyDynamic* const hip = rootNode->GetBody();
+	
+	dMatrix matrix(rootNode->GetLocalFrame() * hip->GetMatrix());
+	
+	// show character center of mass.
+	ndCharacter::ndCentreOfMassState state(m_owner->CalculateCentreOfMassState());
+	matrix.m_posit = state.m_centerOfMass;
+	context.DrawFrame(matrix);
+
+	ndBodyKinematic* const leftFootBody = m_config.m_leftFootEffector->GetJoint()->GetBody0();
+	ndBodyKinematic* const rightFootBody = m_config.m_rightFootEffector->GetJoint()->GetBody0();
+	dVector leftFootCenter(leftFootBody->GetMatrix().TransformVector(leftFootBody->GetCentreOfMass()));
+	dVector rightFootCenter(rightFootBody->GetMatrix().TransformVector(rightFootBody->GetCentreOfMass()));
+	context.DrawLine(leftFootCenter, rightFootCenter, dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(1.0f)));
+
+	dVector xxxx(matrix.m_posit);
+	xxxx.m_y -= 0.9f;
+	context.DrawLine(matrix.m_posit, xxxx, dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f)));
+
+	dVector xxxxx0(matrix.m_posit);
+	xxxxx0.m_y -= 0.91f;
+	dVector xxxxx1(xxxxx0);
+	xxxxx1.m_y -= 0.002f;
+	context.DrawLine(xxxxx0, xxxxx1, dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(1.0f)), dFloat32 (8.0f));
 }
 
 bool ndCharacterBipedPoseController::Evaluate(ndWorld* const , dFloat32 timestep)

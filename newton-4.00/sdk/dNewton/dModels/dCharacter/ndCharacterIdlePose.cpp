@@ -50,6 +50,9 @@ void ndCharacterIdlePose::MoveFoot(ndCharacterEffectorNode* const footEffector, 
 void ndCharacterIdlePose::Update(dFloat32)
 {
 	const ndBipedControllerConfig& config = m_owner->GetConfig();
+
+#if 1
+	// this stay up
 	if (config.m_rightFootEffector)
 	{
 		MoveFoot(config.m_rightFootEffector, m_angle + dFloat32(1.0f) * dPi);
@@ -59,6 +62,19 @@ void ndCharacterIdlePose::Update(dFloat32)
 	{
 		MoveFoot(config.m_leftFootEffector, m_angle + dFloat32(0.0f) * dPi);
 	}
+#else
+	// this fall ove the side
+	if (config.m_rightFootEffector)
+	{
+		MoveFoot(config.m_rightFootEffector, m_angle + dFloat32(0.0f) * dPi);
+	}
+
+	if (config.m_leftFootEffector)
+	{
+		MoveFoot(config.m_leftFootEffector, m_angle + dFloat32(1.0f) * dPi);
+	}
+#endif
+
 	//m_angle = dMod(m_angle + timestep * 2.0f, dFloat32(2.0f) * dPi);
 	m_angle = 20.0f * dDegreeToRad;
 }

@@ -135,19 +135,13 @@ ndCharacter::ndCentreOfMassState ndCharacter::CalculateCentreOfMassState() const
 
 void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 {
-	ndBodyDynamic* const hip = m_rootNode->GetBody();
-
-	dMatrix matrix(m_rootNode->GetLocalFrame() * hip->GetMatrix());
-	
-	// show character center of mass.
-	dFloat32 scale = context.GetScale();
-	context.SetScale(scale * 0.25f);
-
-	ndCentreOfMassState state(CalculateCentreOfMassState());
-	matrix.m_posit = state.m_centerOfMass;
-	context.DrawFrame(matrix);
-
-	context.SetScale(scale);
+	if (m_controller)
+	{
+		dFloat32 scale = context.GetScale();
+		context.SetScale(scale * 0.25f);
+		m_controller->Debug(context);
+		context.SetScale(scale);
+	}
 }
 
 void ndCharacter::UpdateGlobalPose(ndWorld* const world, dFloat32 timestep)
