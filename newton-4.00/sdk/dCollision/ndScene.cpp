@@ -859,14 +859,16 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 		}
 		else
 		{
-			if (contact->m_isIntersetionTestOnly)
+			//if (contact->m_isIntersetionTestOnly)
+			if (contactSolver.m_intersectionTestOnly)
 			{
 				ndBodyTriggerVolume* const trigger = body1->GetAsBodyTriggerVolume();
 				if (trigger)
 				{
 					body1->GetAsBodyTriggerVolume()->OnTriggerExit(body0, m_timestep);
 				}
-				contact->m_isIntersetionTestOnly = 0;
+				//contact->m_isIntersetionTestOnly = 0;
+				contact->m_isIntersetionTestOnly = 1;
 			}
 			contact->m_maxDOF = 0;
 		}
@@ -1557,7 +1559,6 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 		}
 		else
 		{
-			//contact->m_active = false;
 			contact->SetActive(false);
 			contact->m_positAcc = dVector::m_zero;
 			contact->m_rotationAcc = dQuaternion();

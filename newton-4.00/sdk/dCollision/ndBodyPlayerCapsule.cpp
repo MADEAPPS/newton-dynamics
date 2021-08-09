@@ -783,7 +783,7 @@ void ndBodyPlayerCapsule::IntegrateExternalForce(dFloat32 timestep)
 	matrix.m_posit = m_matrix.m_posit;
 	SetMatrix(matrix);
 
-	//// set play desired velocity
+	// set play desired velocity
 	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
 	SetVelocity(veloc);
 

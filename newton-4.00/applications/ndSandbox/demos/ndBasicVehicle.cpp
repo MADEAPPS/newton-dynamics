@@ -611,7 +611,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
-	BuildCompoundScene(scene, sceneLocation);
+	BuildCompoundScene(scene, dGetIdentityMatrix());
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
 	sceneLocation.m_posit.m_x = -200.0f;

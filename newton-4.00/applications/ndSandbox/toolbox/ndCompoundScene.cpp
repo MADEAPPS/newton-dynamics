@@ -162,6 +162,7 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const dMat
 
 	dMatrix subShapeLocation(dGetIdentityMatrix());
 	AddStaticMesh(scene, "playerarena.fbx", sceneInstance, rootEntity, subShapeLocation);
+	//AddStaticMesh(scene, "flatplane.fbx", sceneInstance, rootEntity, subShapeLocation);
 
 	subShapeLocation.m_posit.m_x += 10.0f;
 	AddSpeedBumpsSubShape(scene, sceneInstance, rootEntity, subShapeLocation, 14);
@@ -171,7 +172,7 @@ ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const dMat
 	
 	subShapeLocation.m_posit.m_z += 30.0f;
 	AddBoxSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
-
+	
 	subShapeLocation.m_posit.m_z += 5.0f;
 	AddBoxSubShape(scene, sceneInstance, rootEntity, subShapeLocation);
 
