@@ -603,6 +603,21 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	ndMultiBodyVehicleTireJoint* m_fl_tire;
 };
 
+void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const dMatrix& location)
+{
+	dMatrix localAxis(dGetIdentityMatrix());
+	localAxis[0] = dVector(0.0, 1.0f, 0.0f, 0.0f);
+	localAxis[1] = dVector(1.0, 0.0f, 0.0f, 0.0f);
+	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
+
+	dFloat32 height = 1.9f;
+	dFloat32 radio = 0.5f;
+	dFloat32 mass = 100.0f;
+	ndDemoEntity* const entity = scene->LoadFbxMesh("whiteMan.fbx");
+	new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
+	delete entity;
+}
+
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	dMatrix sceneLocation(dGetIdentityMatrix());
@@ -662,6 +677,9 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(vehicle);
 	vehicle->SetAsPlayer(scene);
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
+
+	matrix.m_posit.m_x += 5.0f;
+	TestPlayerCapsuleInteaction(scene, matrix);
 
 	//matrix.m_posit.m_x += 8.0f;
 	//matrix.m_posit.m_z += 6.0f;
