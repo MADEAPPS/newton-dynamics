@@ -247,13 +247,13 @@ class ndActiveRagdollModel : public ndCharacter
 	void SetModelMass(dFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray, const dFloat32* const massWeight) const
 	{
 		dFloat32 volume = 0.0f;
-		for (int i = 0; i < bodyCount; i++) 
+		for (dInt32 i = 0; i < bodyCount; i++) 
 		{
 			volume += bodyArray[i]->GetCollisionShape().GetVolume() * massWeight[i];
 		}
 		dFloat32 density = mass / volume;
 
-		for (int i = 0; i < bodyCount; i++) 
+		for (dInt32 i = 0; i < bodyCount; i++) 
 		{
 			ndBodyDynamic* const body = bodyArray[i];
 			dFloat32 scale = density * body->GetCollisionShape().GetVolume() * massWeight[i];
