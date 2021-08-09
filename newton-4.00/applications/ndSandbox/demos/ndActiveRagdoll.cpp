@@ -60,6 +60,7 @@ class dActiveJointDefinition
 
 	char m_boneName[32];
 	dLimbType m_limbType;
+	dFloat32 m_massWeight;
 	dJointLimit m_jointLimits;
 	dFrameMatrix m_frameBasics;
 	dJointPidData m_jointData;
@@ -105,30 +106,30 @@ class ndActiveRagdollEntityNotify : public ndDemoEntityNotify
 
 static dActiveJointDefinition jointsDefinition[] =
 {
-	{ "mixamorig:Hips", dActiveJointDefinition::forwardKinematic, {}, {}, {} },
+	{ "mixamorig:Hips", dActiveJointDefinition::forwardKinematic, 1.0f, {}, {}, {} },
 	
-	{ "mixamorig:Spine", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f }, {} },
-	{ "mixamorig:Spine1", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
-	{ "mixamorig:Spine2", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
-	{ "mixamorig:Neck", dActiveJointDefinition::forwardKinematic, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
+	{ "mixamorig:Spine", dActiveJointDefinition::forwardKinematic, 1.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f }, {} },
+	{ "mixamorig:Spine1", dActiveJointDefinition::forwardKinematic, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
+	{ "mixamorig:Spine2", dActiveJointDefinition::forwardKinematic, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
+	{ "mixamorig:Neck", dActiveJointDefinition::forwardKinematic, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
 	
-	{ "mixamorig:RightArm", dActiveJointDefinition::forwardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
-	{ "mixamorig:RightForeArm", dActiveJointDefinition::forwardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f }, {}  },
-	{ "mixamorig:RightHand", dActiveJointDefinition::forwardKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
+	{ "mixamorig:RightArm", dActiveJointDefinition::forwardKinematic, 1.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
+	{ "mixamorig:RightForeArm", dActiveJointDefinition::forwardKinematic, 1.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f }, {}  },
+	{ "mixamorig:RightHand", dActiveJointDefinition::forwardKinematic, 2.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
 	
-	{ "mixamorig:LeftArm", dActiveJointDefinition::forwardKinematic, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
-	{ "mixamorig:LeftForeArm", dActiveJointDefinition::forwardKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f }, {}  },
-	{ "mixamorig:LeftHand", dActiveJointDefinition::forwardKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
+	{ "mixamorig:LeftArm", dActiveJointDefinition::forwardKinematic, 1.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
+	{ "mixamorig:LeftForeArm", dActiveJointDefinition::forwardKinematic, 1.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f }, {}  },
+	{ "mixamorig:LeftHand", dActiveJointDefinition::forwardKinematic, 2.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
 	
-	{ "mixamorig:RightUpLeg", dActiveJointDefinition::inverseKinematic, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f }, {} },
-	{ "mixamorig:RightLeg", dActiveJointDefinition::inverseKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
-	{ "mixamorig:RightFoot", dActiveJointDefinition::inverseKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
-	{ "rightFoot_effector", dActiveJointDefinition::effector, {}, {}, {} },
+	{ "mixamorig:RightUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f }, {} },
+	{ "mixamorig:RightLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
+	{ "mixamorig:RightFoot", dActiveJointDefinition::inverseKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
+	{ "rightFoot_effector", dActiveJointDefinition::effector, 0.0f, {}, {}, {} },
 	
-	{ "mixamorig:LeftUpLeg", dActiveJointDefinition::inverseKinematic, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f }, {} },
-	{ "mixamorig:LeftLeg", dActiveJointDefinition::inverseKinematic, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
-	{ "mixamorig:LeftFoot", dActiveJointDefinition::inverseKinematic, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
-	{ "leftFoot_effector", dActiveJointDefinition::effector, {}, {}, {} },
+	{ "mixamorig:LeftUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f }, {} },
+	{ "mixamorig:LeftLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
+	{ "mixamorig:LeftFoot", dActiveJointDefinition::inverseKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
+	{ "leftFoot_effector", dActiveJointDefinition::effector, 0.0f, {}, {}, {} },
 };
 
 class ndActiveRagdollModel : public ndCharacter
@@ -167,7 +168,9 @@ class ndActiveRagdollModel : public ndCharacter
 		}
 		
 		dInt32 bodyCount = 1;
+		dFloat32 massWeight[1024];
 		ndBodyDynamic* bodyArray[1024];
+		massWeight[0] = 1.0f;
 		bodyArray[0] = rootNode->GetBody();
 
 		ndBipedControllerConfig bipedConfig;
@@ -188,6 +191,7 @@ class ndActiveRagdollModel : public ndCharacter
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone->GetBody());
 						bodyArray[bodyCount] = childBody;
+						massWeight[bodyCount] = definition.m_massWeight;
 						bodyCount++;
 
 						// connect this body part to its parentBody with a ragdoll joint
@@ -223,7 +227,7 @@ class ndActiveRagdollModel : public ndCharacter
 			}
 		}
 		
-		SetModelMass(100.0f, bodyCount, bodyArray);
+		SetModelMass(100.0f, bodyCount, bodyArray, massWeight);
 
 		// initialize a biped controller and set to the model
 		m_bipedController.Init(this, bipedConfig);
@@ -240,19 +244,19 @@ class ndActiveRagdollModel : public ndCharacter
 		}
 	}
 
-	void SetModelMass(dFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray) const
+	void SetModelMass(dFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray, const dFloat32* const massWeight) const
 	{
 		dFloat32 volume = 0.0f;
 		for (int i = 0; i < bodyCount; i++) 
 		{
-			volume += bodyArray[i]->GetCollisionShape().GetVolume();
+			volume += bodyArray[i]->GetCollisionShape().GetVolume() * massWeight[i];
 		}
 		dFloat32 density = mass / volume;
 
 		for (int i = 0; i < bodyCount; i++) 
 		{
 			ndBodyDynamic* const body = bodyArray[i];
-			dFloat32 scale = density * body->GetCollisionShape().GetVolume();
+			dFloat32 scale = density * body->GetCollisionShape().GetVolume() * massWeight[i];
 			dVector inertia(body->GetMassMatrix().Scale (scale));
 			body->SetMassMatrix(inertia);
 		}
