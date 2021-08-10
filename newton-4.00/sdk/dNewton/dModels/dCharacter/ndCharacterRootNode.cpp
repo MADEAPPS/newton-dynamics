@@ -27,9 +27,10 @@
 
 ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body)
 	:ndCharacterLimbNode(nullptr)
+	,m_localFrame(dGetIdentityMatrix())
+	,m_gravityDir(dFloat32 (0.0f), dFloat32(-1.0f), dFloat32(0.0f), dFloat32(0.0f))
 	,m_owner(owner)
 	,m_body(body)
-	,m_localFrame(dGetIdentityMatrix())
 {
 	SetLocalFrame(m_body->GetMatrix());
 }

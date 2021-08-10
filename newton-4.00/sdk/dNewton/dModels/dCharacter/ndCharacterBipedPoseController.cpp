@@ -53,14 +53,14 @@ ndCharacterBipedPoseController::ndPointPair ndCharacterBipedPoseController::Calc
 	const dVector leftFootCenter(leftFootBody->GetMatrix().TransformVector(leftFootBody->GetCentreOfMass()));
 	const dVector rightFootCenter(rightFootBody->GetMatrix().TransformVector(rightFootBody->GetCentreOfMass()));
 
-	dVector gravityDir(0.0f, -1.0f, 0.0f, 0.0f);
+	const dVector gravityDir(m_owner->GetRootNode()->GetGravityDir());
 	const dVector p0(comInGlobalSpace);
 	const dVector p1(comInGlobalSpace + gravityDir.Scale (dFloat32 (5.0f)));
 
 	ndPointPair points;
-	dVector p0Out;
-	dVector p1Out;
 	dRayToRayDistance(p0, p1, leftFootCenter, rightFootCenter, points.m_p0, points.m_p1);
+//dVector xxxxx(points.m_p1 - points.m_p0);
+//dFloat32 xxxx = dSqrt(xxxxx.DotProduct(xxxxx).GetScalar());
 	return points;
 }
 

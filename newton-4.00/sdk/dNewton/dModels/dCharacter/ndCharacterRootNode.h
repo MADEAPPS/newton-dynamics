@@ -36,15 +36,19 @@ class ndCharacterRootNode: public ndCharacterLimbNode
 	ndCharacter* GetOwner() const;
 	virtual ndBodyDynamic* GetBody() const;
 
+	const dVector& GetGravityDir() const;
+	void SetGravityDir(const dVector& dir);
+
 	const dMatrix& GetLocalFrame() const;
 	D_NEWTON_API void SetLocalFrame(const dMatrix& frameInGlobalSpace);
 
 	protected:
 	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 
+	dMatrix m_localFrame;
+	dVector m_gravityDir;
 	ndCharacter* m_owner;
 	ndBodyDynamic* m_body;
-	dMatrix m_localFrame;
 };
 
 inline ndCharacter* ndCharacterRootNode::GetOwner() const
@@ -61,5 +65,16 @@ inline const dMatrix& ndCharacterRootNode::GetLocalFrame() const
 {
 	return m_localFrame;
 }
+
+inline const dVector& ndCharacterRootNode::GetGravityDir() const
+{
+	return m_gravityDir;
+}
+
+inline void ndCharacterRootNode::SetGravityDir(const dVector& dir)
+{
+	m_gravityDir = dir;
+}
+
 
 #endif

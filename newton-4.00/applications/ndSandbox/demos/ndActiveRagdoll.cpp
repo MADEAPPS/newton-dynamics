@@ -358,11 +358,14 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z = 2.0f;
 	//scene->GetWorld()->AddModel(new ndActiveRagdollModel(scene, ragdollMesh, matrix));
 
+	delete ragdollMesh;
+
 	origin1.m_x += 20.0f;
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 
-	delete ragdollMesh;
-	dQuaternion rot(dYawMatrix (90.0f * dDegreeToRad) * playerMatrix);
-	dVector origin(playerMatrix.m_posit + dVector (0.0f, 1.0f, 2.5f, 0.0f));
-	scene->SetCameraMatrix(rot, origin);
+	dFloat32 angle = dFloat32(90.0f * dDegreeToRad);
+	playerMatrix = dYawMatrix(angle) * playerMatrix;
+	dVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-2.5f));
+	origin.m_y += 1.0f;
+	scene->SetCameraMatrix(playerMatrix, origin);
 }
