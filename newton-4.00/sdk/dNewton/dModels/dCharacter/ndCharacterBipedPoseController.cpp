@@ -46,7 +46,7 @@ void ndCharacterBipedPoseController::Init(ndCharacter* const owner, const ndBipe
 	m_config = config;
 }
 
-ndCharacterBipedPoseController::ndPointPair ndCharacterBipedPoseController::CalculateSupportPoint(const dVector& comInGlobalSpace) const
+dFastRayTest ndCharacterBipedPoseController::CalculateSupportPoint(const dVector& comInGlobalSpace) const
 {
 	ndBodyKinematic* const leftFootBody = m_config.m_leftFootEffector->GetJoint()->GetBody0();
 	ndBodyKinematic* const rightFootBody = m_config.m_rightFootEffector->GetJoint()->GetBody0();
@@ -57,11 +57,12 @@ ndCharacterBipedPoseController::ndPointPair ndCharacterBipedPoseController::Calc
 	const dVector p0(comInGlobalSpace);
 	const dVector p1(comInGlobalSpace + gravityDir.Scale (dFloat32 (5.0f)));
 
-	ndPointPair points;
-	dRayToRayDistance(p0, p1, leftFootCenter, rightFootCenter, points.m_p0, points.m_p1);
-//dVector xxxxx(points.m_p1 - points.m_p0);
+	dFastRayTest supportSegment(p0, p1);
+//dFastRayTest intersectSegment(supportSegment.RayDistance(leftFootCenter, rightFootCenter));
+//dRayToRayDistance(p0, p1, leftFootCenter, rightFootCenter, points.m_p0, points.m_p1);
+//dVector intersectSegment(points.m_p1 - points.m_p0);
 //dFloat32 xxxx = dSqrt(xxxxx.DotProduct(xxxxx).GetScalar());
-	return points;
+	return supportSegment.RayDistance(leftFootCenter, rightFootCenter);
 }
 
 void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) const
@@ -76,7 +77,7 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 	comMatrixInGlobalSpace.m_posit = state.m_centerOfMass;
 	context.DrawFrame(comMatrixInGlobalSpace);
 
-	const ndPointPair suportPoint(CalculateSupportPoint(comMatrixInGlobalSpace.m_posit));
+	const dFastRayTest suportPoint(CalculateSupportPoint(comMatrixInGlobalSpace.m_posit));
 	
 	ndBodyKinematic* const leftFootBody = m_config.m_leftFootEffector->GetJoint()->GetBody0();
 	ndBodyKinematic* const rightFootBody = m_config.m_rightFootEffector->GetJoint()->GetBody0();

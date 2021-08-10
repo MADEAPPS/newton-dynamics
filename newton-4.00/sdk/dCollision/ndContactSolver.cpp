@@ -977,10 +977,12 @@ dInt32 ndContactSolver::CalculateContacts(const dVector& point0, const dVector& 
 				else 
 				{
 					count = 1;
-					dVector c0;
-					dVector c1;
-					dRayToRayDistance(p0, p1, q0, q1, c0, c1);
-					contactsOut[0] = (c0 + c1).Scale(dFloat32(0.5f));
+					//dVector c0;
+					//dVector c1;
+					//dRayToRayDistance(p0, p1, q0, q1, c0, c1);
+					const dFastRayTest ray(p0, p1);
+					const dFastRayTest intesect(ray.RayDistance(q0, q1));
+					contactsOut[0] = (intesect.m_p0 + intesect.m_p1).Scale(dFloat32(0.5f));
 				}
 			}
 			else 

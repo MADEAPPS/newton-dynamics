@@ -48,9 +48,9 @@ D_CORE_API dBigVector dPointToTriangleDistance (const dBigVector& point, const d
 D_CORE_API dBigVector dPointToTetrahedrumDistance (const dBigVector& point, const dBigVector& p0, const dBigVector& p1, const dBigVector& p2, const dBigVector& p3);
 
 D_CORE_API bool dRayBoxClip (dVector& ray_p0, dVector& ray_p1, const dVector& boxP0, const dVector& boxP1); 
-D_CORE_API void dRayToRayDistance (const dVector& ray_p0, const dVector& ray_p1, const dVector& ray_q0, const dVector& ray_q1, dVector& p0Out, dVector& p1Out); 
 D_CORE_API dFloat32 dRayCastBox (const dVector& p0, const dVector& p1, const dVector& boxP0, const dVector& boxP1, dVector& normalOut);
 D_CORE_API dFloat32 dRayCastSphere (const dVector& p0, const dVector& p1, const dVector& origin, dFloat32 radius);
+//D_CORE_API void dRayToRayDistance(const dVector& ray_p0, const dVector& ray_p1, const dVector& ray_q0, const dVector& ray_q1, dVector& p0Out, dVector& p1Out);
 
 D_INLINE dInt32 dOverlapTest (const dVector& p0, const dVector& p1, const dVector& q0, const dVector& q1)
 {
@@ -121,9 +121,9 @@ class dFastRayTest
 {
 	public:
 	D_INLINE dFastRayTest(const dVector& l0, const dVector& l1)
-		:m_p0(l0)
-		,m_p1(l1)
-		,m_diff((l1 - l0) & dVector::m_triplexMask)
+		:m_p0(l0 & dVector::m_triplexMask)
+		,m_p1(l1 & dVector::m_triplexMask)
+		,m_diff(m_p1 - m_p0)
 		,m_minT(dFloat32(0.0f))
 		,m_maxT(dFloat32(1.0f))
 	{
@@ -136,8 +136,6 @@ class dFastRayTest
 		m_dpInv = m_diff.Select (dVector(dFloat32(1.0e-20f)), m_isParallel).Reciproc() & dVector::m_triplexMask;
 		m_unitDir = m_diff.Normalize();
 	}
-
-	D_CORE_API dFloat32 PolygonIntersect(const dVector& normal, dFloat32 maxT, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount) const;
 
 	D_INLINE dInt32 BoxTest(const dVector& minBox, const dVector& maxBox) const
 	{
@@ -220,6 +218,9 @@ class dFastRayTest
 		dAssert((mask.GetSignMask() & 1) == (t0.m_x < dFloat32(1.0f)));
 		return t0.GetScalar();
 	}
+
+	D_CORE_API dFastRayTest RayDistance(const dVector& ray_p0, const dVector& ray_p1) const;
+	D_CORE_API dFloat32 PolygonIntersect(const dVector& normal, dFloat32 maxT, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount) const;
 
 	const dVector m_p0;
 	const dVector m_p1;

@@ -176,7 +176,8 @@ dFloat32 dFastRayTest::PolygonIntersect (const dVector& faceNormal, dFloat32 max
 		{
 			dBigVector p (p0 + diff.Scale (tOut));
 			dBigVector unitDir(m_unitDir);
-			for (dInt32 i = 0; i < indexCount; i++) {
+			for (dInt32 i = 0; i < indexCount; i++) 
+			{
 				dInt32 i2 = indexArray[i] * stride;
 				dBigVector v1(dVector(&polygon[i2]) & dVector::m_triplexMask);
 
@@ -195,6 +196,108 @@ dFloat32 dFastRayTest::PolygonIntersect (const dVector& faceNormal, dFloat32 max
 	}
 
 	return dFloat32 (1.2f);
+}
+
+//void dRayToRayDistance(const dVector& ray_p0, const dVector& ray_p1, const dVector& ray_q0, const dVector& ray_q1, dVector& pOut, dVector& qOut)
+dFastRayTest dFastRayTest::RayDistance(const dVector& ray_q0, const dVector& ray_q1) const
+{
+	//dVector u(ray_p1 - ray_p0);
+	const dVector u(m_diff);
+	const dVector v(dVector::m_triplexMask & (ray_q1 - ray_q0));
+	const dVector w(dVector::m_triplexMask & (m_p0 - ray_q0));
+	dAssert(u.m_w == dFloat32(0.0f));
+	dAssert(v.m_w == dFloat32(0.0f));
+	dAssert(w.m_w == dFloat32(0.0f));
+	
+	const dFloat32 a = u.DotProduct(u).GetScalar();
+	const dFloat32 b = u.DotProduct(v).GetScalar();
+	const dFloat32 c = v.DotProduct(v).GetScalar();
+	const dFloat32 d = u.DotProduct(w).GetScalar();
+	const dFloat32 e = v.DotProduct(w).GetScalar();
+	const dFloat32 D = a*c - b*b;
+
+	dFloat32 sD = D;
+	dFloat32 tD = D;
+	dFloat32 sN;
+	dFloat32 tN;
+
+	// compute the line parameters of the two closest points
+	if (D < dFloat32(1.0e-8f))
+	{
+		sN = dFloat32(0.0f);
+		sD = dFloat32(1.0f);
+		tN = e;
+		tD = c;
+	}
+	else
+	{
+		// get the closest points on the infinite lines
+		sN = (b*e - c*d);
+		tN = (a*e - b*d);
+		if (sN < dFloat32(0.0f))
+		{
+			// sc < 0 => the s=0 edge is visible
+			sN = dFloat32(0.0f);
+			tN = e;
+			tD = c;
+		}
+		else if (sN > sD)
+		{
+			// sc > 1 => the s=1 edge is visible
+			sN = sD;
+			tN = e + b;
+			tD = c;
+		}
+	}
+	
+	if (tN < dFloat32(0.0f))
+	{
+		// tc < 0 => the t=0 edge is visible
+		tN = dFloat32(0.0f);
+		// recompute sc for this edge
+		if (-d < dFloat32(0.0f))
+		{
+			sN = dFloat32(0.0f);
+		}
+		else if (-d > a)
+		{
+			sN = sD;
+		}
+		else
+		{
+			sN = -d;
+			sD = a;
+		}
+	}
+	else if (tN > tD)
+	{
+		// tc > 1 => the t=1 edge is visible
+		tN = tD;
+		// recompute sc for this edge
+		if ((-d + b) < dFloat32(0.0f))
+		{
+			sN = dFloat32(0.0f);
+		}
+		else if ((-d + b) > a)
+		{
+			sN = sD;
+		}
+		else
+		{
+			sN = (-d + b);
+			sD = a;
+		}
+	}
+	
+	// finally do the division to get sc and tc
+	dFloat32 sc = (dAbs(sN) < dFloat32(1.0e-8f) ? dFloat32(0.0f) : sN / sD);
+	dFloat32 tc = (dAbs(tN) < dFloat32(1.0e-8f) ? dFloat32(0.0f) : tN / tD);
+	
+	dAssert(u.m_w == dFloat32(0.0f));
+	dAssert(v.m_w == dFloat32(0.0f));
+	//pOut = ray_p0 + u.Scale(sc);
+	//qOut = ray_q0 + v.Scale(tc);
+	return dFastRayTest(m_p0 + u.Scale(sc), ray_q0 + v.Scale(tc));
 }
 
 bool dRayBoxClip (dVector& p0, dVector& p1, const dVector& boxP0, const dVector& boxP1) 
@@ -359,105 +462,6 @@ dBigVector dPointToTetrahedrumDistance (const dBigVector& point, const dBigVecto
 	// this is a degenerated tetra. this should never happens
 	dAssert(0);
 	return p0;
-}
-
-void dRayToRayDistance (const dVector& ray_p0, const dVector& ray_p1, const dVector& ray_q0, const dVector& ray_q1, dVector& pOut, dVector& qOut)
-{
-	dFloat32 sN;
-	dFloat32 tN;
-
-	dVector u (ray_p1 - ray_p0);
-	dVector v (ray_q1 - ray_q0);
-	dVector w (ray_p0 - ray_q0);
-	dAssert (u.m_w == dFloat32 (0.0f));
-	dAssert (v.m_w == dFloat32 (0.0f));
-	dAssert (w.m_w == dFloat32 (0.0f));
-
-	dFloat32 a = u.DotProduct(u).GetScalar();        
-	dFloat32 b = u.DotProduct(v).GetScalar();
-	dFloat32 c = v.DotProduct(v).GetScalar();        
-	dFloat32 d = u.DotProduct(w).GetScalar();
-	dFloat32 e = v.DotProduct(w).GetScalar();
-	dFloat32 D = a*c - b*b;   
-	dFloat32 sD = D;			
-	dFloat32 tD = D;			
-
-	// compute the line parameters of the two closest points
-	if (D < dFloat32 (1.0e-8f)) 
-	{ 
-		sN = dFloat32 (0.0f);        
-		sD = dFloat32 (1.0f);        
-		tN = e;
-		tD = c;
-	} 
-	else 
-	{
-		// get the closest points on the infinite lines
-		sN = (b*e - c*d);
-		tN = (a*e - b*d);
-		if (sN < dFloat32 (0.0f)) 
-		{
-			// sc < 0 => the s=0 edge is visible
-			sN = dFloat32 (0.0f);
-			tN = e;
-			tD = c;
-		} 
-		else if (sN > sD) 
-		{
-			// sc > 1 => the s=1 edge is visible
-			sN = sD;
-			tN = e + b;
-			tD = c;
-		}
-	}
-
-	if (tN < dFloat32 (0.0f)) 
-	{
-		// tc < 0 => the t=0 edge is visible
-		tN = dFloat32 (0.0f);
-		// recompute sc for this edge
-		if (-d < dFloat32 (0.0f)) 
-		{
-			sN = dFloat32 (0.0f);
-		} 
-		else if (-d > a) 
-		{
-			sN = sD;
-		} 
-		else 
-		{
-			sN = -d;
-			sD = a;
-		}
-	} 
-	else if (tN > tD) 
-	{
-		// tc > 1 => the t=1 edge is visible
-		tN = tD;
-		// recompute sc for this edge
-		if ((-d + b) < dFloat32 (0.0f)) 
-		{
-			sN = dFloat32 (0.0f);
-		} 
-		else if ((-d + b) > a) 
-		{
-			sN = sD;
-		} 
-		else 
-		{
-			sN = (-d + b);
-			sD = a;
-		}
-	}
-
-	// finally do the division to get sc and tc
-	dFloat32 sc = (dAbs(sN) < dFloat32(1.0e-8f) ? dFloat32 (0.0f) : sN / sD);
-	dFloat32 tc = (dAbs(tN) < dFloat32(1.0e-8f) ? dFloat32 (0.0f) : tN / tD);
-
-	dAssert (u.m_w == dFloat32 (0.0f));
-	dAssert (v.m_w == dFloat32 (0.0f));
-	pOut = ray_p0 + u.Scale (sc);
-	qOut = ray_q0 + v.Scale (tc);
 }
 
 dFloat32 dRayCastSphere (const dVector& p0, const dVector& p1, const dVector& origin, dFloat32 radius)

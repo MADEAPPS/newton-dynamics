@@ -55,17 +55,10 @@ class ndCharacterBipedPoseController: public ndCharacterPoseController
 	const ndBipedControllerConfig& GetConfig() const;
 
 	protected:
-	class ndPointPair
-	{
-		public:
-		dVector m_p0;
-		dVector m_p1;
-	};
-
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 	virtual bool Evaluate(ndWorld* const world, dFloat32 timestep);
 
-	ndPointPair CalculateSupportPoint(const dVector& comInGlobalSpace) const;
+	dFastRayTest CalculateSupportPoint(const dVector& comInGlobalSpace) const;
 
 	ndBipedControllerConfig m_config;
 	ndCharacterIdlePose m_idleCycle;
