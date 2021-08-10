@@ -87,6 +87,52 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 	context.DrawLine(leftFootCenter, rightFootCenter, dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(1.0f)));
 	context.DrawLine(comMatrixInGlobalSpace.m_posit, suportPoint.m_p0, dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f)));
 	context.DrawLine(suportPoint.m_p0, suportPoint.m_p1, dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(1.0f)), dFloat32(2.0f));
+
+	dFixSizeArray<dVector, 32> supportPolygon;
+	{
+		ndBodyKinematic::ndContactMap::Iterator iter(leftFootBody->GetContactMap());
+		for (iter.Begin(); iter; iter ++)
+		{
+			const ndContact* const contact = iter.GetNode()->GetInfo();
+			if (contact->IsActive())
+			{
+				const ndContactPointList& points = contact->GetContactPoints();
+				for (ndContactPointList::dNode* node = points.GetFirst(); node; node = node->GetNext())
+				{
+					supportPolygon.PushBack(node->GetInfo().m_point);
+				}
+			}
+		}
+	}
+
+	{
+		ndBodyKinematic::ndContactMap::Iterator iter(rightFootBody->GetContactMap());
+		for (iter.Begin(); iter; iter++)
+		{
+			const ndContact* const contact = iter.GetNode()->GetInfo();
+			if (contact->IsActive())
+			{
+				const ndContactPointList& points = contact->GetContactPoints();
+				for (ndContactPointList::dNode* node = points.GetFirst(); node; node = node->GetNext())
+				{
+					supportPolygon.PushBack(node->GetInfo().m_point);
+				}
+			}
+		}
+	}
+
+	dInt32 hullCount = dConvexHull2d(supportPolygon.GetCount(), &supportPolygon[0]);
+	if (hullCount)
+	{
+		dVector offset(m_owner->GetRootNode()->GetGravityDir().Scale(dFloat32(0.01f)));
+		dVector p0(supportPolygon[hullCount - 1] - offset);
+		for (dInt32 i = 0; i < hullCount; i++)
+		{
+			dVector p1(supportPolygon[i] - offset);
+			context.DrawLine(p0, p1, dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f)));
+			p0 = p1;
+		}
+	}
 }
 
 bool ndCharacterBipedPoseController::Evaluate(ndWorld* const , dFloat32 timestep)
