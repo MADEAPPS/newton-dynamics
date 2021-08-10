@@ -38,7 +38,7 @@ void ndCharacterWalkCycleGenerator::MoveFoot(ndCharacterEffectorNode* const foot
 {
 	const dFloat32 hipHigh = dFloat32(0.5f * 0.125f);
 	const dFloat32 strideHigh = dFloat32(0.5f * 0.125f);
-	const dFloat32 radius = 0.9f;
+	//const dFloat32 radius = 0.9f;
 
 	angle = dMod(angle, dFloat32(2.0f) * dPi);
 	dFloat32 y = hipHigh;
