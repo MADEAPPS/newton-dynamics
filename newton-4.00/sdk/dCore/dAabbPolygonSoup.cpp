@@ -490,7 +490,7 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 	dVector p0;
 	dVector p1;
 	GetAABB (p0, p1);
-	dFastAabbInfo box (p0, p1);
+	dFastAabb box (p0, p1);
 
 	dPolyhedra adjacenyMesh;
 	adjacenyMesh.BeginFace();
@@ -1490,7 +1490,7 @@ void dAabbPolygonSoup::ForAllSectorsRayHit (const dFastRay& raySrc, dFloat32 max
 	}
 }
 
-void dAabbPolygonSoup::ForAllSectors (const dFastAabbInfo& obbAabbInfo, const dVector& boxDistanceTravel, dFloat32, dAaabbIntersectCallback callback, void* const context) const
+void dAabbPolygonSoup::ForAllSectors (const dFastAabb& obbAabbInfo, const dVector& boxDistanceTravel, dFloat32, dAaabbIntersectCallback callback, void* const context) const
 {
 	dAssert (dAbs(dAbs(obbAabbInfo[0][0]) - obbAabbInfo.m_absDir[0][0]) < dFloat32 (1.0e-4f));
 	dAssert (dAbs(dAbs(obbAabbInfo[1][1]) - obbAabbInfo.m_absDir[1][1]) < dFloat32 (1.0e-4f));
@@ -1724,7 +1724,7 @@ void dAabbPolygonSoup::ForAllSectors (const dFastAabbInfo& obbAabbInfo, const dV
 	}
 }
 
-void dAabbPolygonSoup::ForThisSector(const dAabbPolygonSoup::dNode* const node, const dFastAabbInfo& obbAabbInfo, const dVector& boxDistanceTravel, dFloat32, dAaabbIntersectCallback callback, void* const context) const
+void dAabbPolygonSoup::ForThisSector(const dAabbPolygonSoup::dNode* const node, const dFastAabb& obbAabbInfo, const dVector& boxDistanceTravel, dFloat32, dAaabbIntersectCallback callback, void* const context) const
 {
 	dAssert(dAbs(dAbs(obbAabbInfo[0][0]) - obbAabbInfo.m_absDir[0][0]) < dFloat32(1.0e-4f));
 	dAssert(dAbs(dAbs(obbAabbInfo[1][1]) - obbAabbInfo.m_absDir[1][1]) < dFloat32(1.0e-4f));

@@ -118,7 +118,7 @@ void ndPolygonMeshDesc::SortFaceArray()
 }
 
 ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)
-	:dFastAabbInfo()
+	:dFastAabb()
 	,m_boxDistanceTravelInMeshSpace(dVector::m_zero)
 	,m_faceCount(0)
 	,m_vertexStrideInBytes(0)

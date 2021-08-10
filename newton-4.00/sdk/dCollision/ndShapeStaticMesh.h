@@ -38,7 +38,7 @@ typedef void (*dgCollisionMeshCollisionCallback) (const ndBodyKinematic* const b
 												  dInt32 vertexCount, const dFloat32* const vertex, dInt32 vertexStrideInBytes); 
 
 D_MSV_NEWTON_ALIGN_32 
-class ndPolygonMeshDesc: public dFastAabbInfo
+class ndPolygonMeshDesc: public dFastAabb
 {
 	public:
 	class dgMesh
@@ -51,7 +51,7 @@ class ndPolygonMeshDesc: public dFastAabbInfo
 
 	// colliding box in polygonSoup local space
 	ndPolygonMeshDesc()
-		:dFastAabbInfo()
+		:dFastAabb()
 		,m_boxDistanceTravelInMeshSpace(dFloat32 (0.0f))
 		,m_maxT(dFloat32 (1.0f))
 		,m_doContinuesCollisionTest(false)

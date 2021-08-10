@@ -26,6 +26,7 @@
 #include "dTypes.h"
 #include "dUtils.h"
 #include "dFastRay.h"
+#include "dFastAabb.h"
 #include "dIntersections.h"
 #include "dPolygonSoupDatabase.h"
 
@@ -110,7 +111,7 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 			return ray.BoxIntersect(minBox, maxBox);
 		}
 
-		inline dFloat32 BoxPenetration (const dFastAabbInfo& obb, const dTriplex* const vertexArray) const
+		inline dFloat32 BoxPenetration (const dFastAabb& obb, const dTriplex* const vertexArray) const
 		{
 			dVector p0 (&vertexArray[m_indexBox0].m_x);
 			dVector p1 (&vertexArray[m_indexBox1].m_x);
@@ -156,7 +157,7 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 			return	dist.GetScalar();
 		}
 
-		inline dFloat32 BoxIntersect (const dFastRay& ray, const dFastRay& obbRay, const dFastAabbInfo& obb, const dTriplex* const vertexArray) const
+		inline dFloat32 BoxIntersect (const dFastRay& ray, const dFastRay& obbRay, const dFastAabb& obb, const dTriplex* const vertexArray) const
 		{
 			dVector p0 (&vertexArray[m_indexBox0].m_x);
 			dVector p1 (&vertexArray[m_indexBox1].m_x);
@@ -205,8 +206,8 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	D_CORE_API void CalculateAdjacendy ();
 	D_CORE_API virtual dVector ForAllSectorsSupportVectex(const dVector& dir) const;
 	D_CORE_API virtual void ForAllSectorsRayHit (const dFastRay& ray, dFloat32 maxT, dRayIntersectCallback callback, void* const context) const;
-	D_CORE_API virtual void ForAllSectors (const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
-	D_CORE_API virtual void ForThisSector(const dAabbPolygonSoup::dNode* const node, const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
+	D_CORE_API virtual void ForAllSectors (const dFastAabb& obbAabb, const dVector& boxDistanceTravel, dFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
+	D_CORE_API virtual void ForThisSector(const dAabbPolygonSoup::dNode* const node, const dFastAabb& obbAabb, const dVector& boxDistanceTravel, dFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
 
 	public:
 	inline dNode* GetRootNode() const
