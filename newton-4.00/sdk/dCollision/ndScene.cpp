@@ -948,7 +948,7 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		ndContactPointList::dNode* contactNode = nullptr;
 		for (dInt32 j = 0; j < count; j++) 
 		{
-			dVector v(cachePosition[j] - contactArray[i].m_point);
+			dVector v(dVector::m_triplexMask & (cachePosition[j] - contactArray[i].m_point));
 			dAssert(v.m_w == dFloat32(0.0f));
 			diff = v.DotProduct(v).GetScalar();
 			if (diff < min) 
@@ -1170,7 +1170,7 @@ bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKin
 	//
 	//			dVector boxp0(box0_p0 - box1_p1);
 	//			dVector boxp1(box0_p1 - box1_p0);
-	//			dFastRayTest ray(dVector::m_zero, velRelative.Scale(timestep * dFloat32(4.0f)));
+	//			dFastRay ray(dVector::m_zero, velRelative.Scale(timestep * dFloat32(4.0f)));
 	//			dFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
 	//			ret = (distance < dFloat32(1.0f));
 	//		}
@@ -1676,7 +1676,7 @@ void ndScene::DeleteDeadContact()
 	m_activeConstraintArray.SetCount(activeCount);
 }
 
-bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const stackDistance, dInt32 stack, const dFastRayTest& ray, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const
+bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const stackDistance, dInt32 stack, const dFastRay& ray, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const
 {
 	dVector boxP0;
 	dVector boxP1;
@@ -1784,7 +1784,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 	return callback.m_contacts.GetCount() > 0;
 }
 
-bool ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const stackDistance, dInt32 stack, const dFastRayTest& ray) const
+bool ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const stackDistance, dInt32 stack, const dFastRay& ray) const
 {
 	bool state = false;
 	while (stack)
@@ -2017,7 +2017,7 @@ bool ndScene::RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, co
 			dFloat32 distance[D_SCENE_MAX_STACK_DEPTH];
 			const ndSceneNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
 
-			dFastRayTest ray(p0, p1);
+			dFastRay ray(p0, p1);
 
 			stackPool[0] = m_rootNode;
 			distance[0] = ray.BoxIntersect(m_rootNode->m_minBox, m_rootNode->m_maxBox);
@@ -2045,7 +2045,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& co
 		const dVector velocA((globalDest - globalOrigin.m_posit) & dVector::m_triplexMask);
 		const dVector minBox(m_rootNode->m_minBox - boxP1);
 		const dVector maxBox(m_rootNode->m_maxBox - boxP0);
-		dFastRayTest ray(dVector::m_zero, velocA);
+		dFastRay ray(dVector::m_zero, velocA);
 
 		stackPool[0] = m_rootNode;
 		distance[0] = ray.BoxIntersect(minBox, maxBox);

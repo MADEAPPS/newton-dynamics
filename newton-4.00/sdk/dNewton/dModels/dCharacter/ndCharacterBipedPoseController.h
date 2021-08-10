@@ -58,7 +58,7 @@ class ndCharacterBipedPoseController: public ndCharacterPoseController
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 	virtual bool Evaluate(ndWorld* const world, dFloat32 timestep);
 
-	dFastRayTest CalculateSupportPoint(const dVector& comInGlobalSpace) const;
+	dFastRay CalculateSupportPoint(const dVector& comInGlobalSpace) const;
 
 	ndBipedControllerConfig m_config;
 	ndCharacterIdlePose m_idleCycle;

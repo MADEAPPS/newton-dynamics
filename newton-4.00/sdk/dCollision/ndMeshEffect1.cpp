@@ -808,7 +808,7 @@ void ndMeshEffect::dMeshBVH::FaceRayCast(const dBigVector& p0, const dBigVector&
 	dVector l1(p1);
 	l0 = l0 & dVector::m_triplexMask;
 	l1 = l1 & dVector::m_triplexMask;
-	dFastRayTest ray(l0, l1);
+	dFastRay ray(l0, l1);
 	while (stack) {
 		stack--;
 		dgMeshBVHNode* const me = stackPool[stack];

@@ -455,7 +455,7 @@ dFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const dVector& loca
 	const ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
 
 //	dFloat32 maxParam = maxT;
-	dFastRayTest ray (localP0, localP1);
+	dFastRay ray (localP0, localP1);
 
 	dInt32 stack = 1;
 	stackPool[0] = m_root;

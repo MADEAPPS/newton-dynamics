@@ -303,7 +303,7 @@ void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 #endif
 }
 
-bool ndBodyKinematic::RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, dFloat32 maxT) const
+bool ndBodyKinematic::RayCast(ndRayCastNotify& callback, const dFastRay& ray, dFloat32 maxT) const
 {
 	dVector l0(ray.m_p0);
 	dVector l1(ray.m_p0 + ray.m_diff.Scale(dMin(maxT, dFloat32(1.0f))));

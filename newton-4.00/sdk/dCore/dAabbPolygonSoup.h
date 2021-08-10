@@ -25,6 +25,7 @@
 #include "dCoreStdafx.h"
 #include "dTypes.h"
 #include "dUtils.h"
+#include "dFastRay.h"
 #include "dIntersections.h"
 #include "dPolygonSoupDatabase.h"
 
@@ -100,7 +101,7 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 		{
 		}
 
-		inline dFloat32 RayDistance (const dFastRayTest& ray, const dTriplex* const vertexArray) const
+		inline dFloat32 RayDistance (const dFastRay& ray, const dTriplex* const vertexArray) const
 		{
 			dVector minBox (&vertexArray[m_indexBox0].m_x);
 			dVector maxBox (&vertexArray[m_indexBox1].m_x);
@@ -155,7 +156,7 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 			return	dist.GetScalar();
 		}
 
-		inline dFloat32 BoxIntersect (const dFastRayTest& ray, const dFastRayTest& obbRay, const dFastAabbInfo& obb, const dTriplex* const vertexArray) const
+		inline dFloat32 BoxIntersect (const dFastRay& ray, const dFastRay& obbRay, const dFastAabbInfo& obb, const dTriplex* const vertexArray) const
 		{
 			dVector p0 (&vertexArray[m_indexBox0].m_x);
 			dVector p1 (&vertexArray[m_indexBox1].m_x);
@@ -203,7 +204,7 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	D_CORE_API void Create (const dPolygonSoupBuilder& builder);
 	D_CORE_API void CalculateAdjacendy ();
 	D_CORE_API virtual dVector ForAllSectorsSupportVectex(const dVector& dir) const;
-	D_CORE_API virtual void ForAllSectorsRayHit (const dFastRayTest& ray, dFloat32 maxT, dRayIntersectCallback callback, void* const context) const;
+	D_CORE_API virtual void ForAllSectorsRayHit (const dFastRay& ray, dFloat32 maxT, dRayIntersectCallback callback, void* const context) const;
 	D_CORE_API virtual void ForAllSectors (const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
 	D_CORE_API virtual void ForThisSector(const dAabbPolygonSoup::dNode* const node, const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
 

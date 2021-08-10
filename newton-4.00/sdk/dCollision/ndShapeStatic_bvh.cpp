@@ -35,11 +35,11 @@ class ndCollisionBvhShowPolyContext
 };
 
 D_MSV_NEWTON_ALIGN_32 
-class ndBvhRay: public dFastRayTest 
+class ndBvhRay: public dFastRay 
 {
 	public:
 	ndBvhRay(const dVector& l0, const dVector& l1)
-		:dFastRayTest (l0, l1)
+		:dFastRay (l0, l1)
 	{
 	}
 

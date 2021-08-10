@@ -980,8 +980,8 @@ dInt32 ndContactSolver::CalculateContacts(const dVector& point0, const dVector& 
 					//dVector c0;
 					//dVector c1;
 					//dRayToRayDistance(p0, p1, q0, q1, c0, c1);
-					const dFastRayTest ray(p0, p1);
-					const dFastRayTest intesect(ray.RayDistance(q0, q1));
+					const dFastRay ray(p0, p1);
+					const dFastRay intesect(ray.RayDistance(q0, q1));
 					contactsOut[0] = (intesect.m_p0 + intesect.m_p1).Scale(dFloat32(0.5f));
 				}
 			}
@@ -3607,7 +3607,7 @@ dInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 	dVector boxP1;
 	convexInstance->CalculateAabb(matrix, boxP0, boxP1);
 	const dVector relVeloc(matrix.UnrotateVector(convexBody->GetVelocity() - compoundBody->GetVelocity()));
-	dFastRayTest ray(dVector::m_zero, relVeloc);
+	dFastRay ray(dVector::m_zero, relVeloc);
 
 	const dVector rootMinBox(compoundShape->m_root->m_p0 - boxP1);
 	const dVector rootMaxBox(compoundShape->m_root->m_p1 - boxP0);

@@ -28,6 +28,7 @@
 #include "dMatrix.h"
 
 class dPlane;
+class dFastRay;
 
 enum dIntersectStatus
 {
@@ -43,6 +44,7 @@ typedef dFloat32 (*dRayIntersectCallback) (void* const context,
 										   const dFloat32* const polygon, dInt32 strideInBytes,
 										   const dInt32* const indexArray, dInt32 indexCount);
 
+D_CORE_API dInt32 dConvexHull2d(dInt32 count, dVector* const pointArray);
 D_CORE_API dBigVector dPointToRayDistance (const dBigVector& point, const dBigVector& ray_p0, const dBigVector& ray_p1); 
 D_CORE_API dBigVector dPointToTriangleDistance (const dBigVector& point, const dBigVector& p0, const dBigVector& p1, const dBigVector& p2);
 D_CORE_API dBigVector dPointToTetrahedrumDistance (const dBigVector& point, const dBigVector& p0, const dBigVector& p1, const dBigVector& p2, const dBigVector& p3);
@@ -116,122 +118,6 @@ D_INLINE dFloat32 dBoxDistanceToOrigin2 (const dVector& minBox, const dVector& m
 	return dist.DotProduct(dist).GetScalar();
 }
 
-D_MSV_NEWTON_ALIGN_32
-class dFastRayTest
-{
-	public:
-	D_INLINE dFastRayTest(const dVector& l0, const dVector& l1)
-		:m_p0(l0 & dVector::m_triplexMask)
-		,m_p1(l1 & dVector::m_triplexMask)
-		,m_diff(m_p1 - m_p0)
-		,m_minT(dFloat32(0.0f))
-		,m_maxT(dFloat32(1.0f))
-	{
-		dAssert(m_p0.m_w == dFloat32(0.0f));
-		dAssert(m_p1.m_w == dFloat32(0.0f));
-		dAssert(m_diff.m_w == dFloat32(0.0f));
-
-		dAssert (m_diff.DotProduct(m_diff).GetScalar() > dFloat32 (0.0f));
-		m_isParallel = (m_diff.Abs() < dVector(1.0e-8f));
-		m_dpInv = m_diff.Select (dVector(dFloat32(1.0e-20f)), m_isParallel).Reciproc() & dVector::m_triplexMask;
-		m_unitDir = m_diff.Normalize();
-	}
-
-	D_INLINE dInt32 BoxTest(const dVector& minBox, const dVector& maxBox) const
-	{
-#if 1
-		dVector test(((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
-		if (test.GetSignMask() & 0x07) {
-			return 0;
-		}
-
-		dVector tt0(m_dpInv * (minBox - m_p0));
-		dVector tt1(m_dpInv * (maxBox - m_p0));
-
-		dVector t0(m_minT.GetMax(tt0.GetMin(tt1)));
-		dVector t1(m_maxT.GetMin(tt0.GetMax(tt1)));
-		t0 = t0.GetMax(t0.ShiftTripleRight());
-		t1 = t1.GetMin(t1.ShiftTripleRight());
-		t0 = t0.GetMax(t0.ShiftTripleRight());
-		t1 = t1.GetMin(t1.ShiftTripleRight());
-		return ((t0 < t1).GetSignMask() & 1);
-
-#else
-
-		dFloat32 tmin = 0.0f;
-		dFloat32 tmax = 1.0f;
-
-		for (dInt32 i = 0; i < 3; i++) 
-		{
-			if (m_isParallel[i]) 
-			{
-				if (m_p0[i] <= minBox[i] || m_p0[i] >= maxBox[i]) 
-				{
-					return 0;
-				}
-			} 
-			else 
-			{
-				dFloat32 t1 = (minBox[i] - m_p0[i]) * m_dpInv[i];
-				dFloat32 t2 = (maxBox[i] - m_p0[i]) * m_dpInv[i];
-
-				if (t1 > t2) 
-				{
-					dSwap(t1, t2);
-				}
-				if (t1 > tmin) 
-				{
-					tmin = t1;
-				}
-				if (t2 < tmax) 
-				{
-					tmax = t2;
-				}
-				if (tmin > tmax) 
-				{
-					return 0;
-				}
-			}
-		}
-		return 0x1;
-#endif
-	}
-
-	D_INLINE dFloat32 BoxIntersect(const dVector& minBox, const dVector& maxBox) const
-	{
-		dVector test(((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
-		if (test.GetSignMask() & 0x07) 
-		{
-			return dFloat32(1.2f);
-		}
-		dVector tt0(m_dpInv * (minBox - m_p0));
-		dVector tt1(m_dpInv * (maxBox - m_p0));
-		dVector t0(m_minT.GetMax(tt0.GetMin(tt1)));
-		dVector t1(m_maxT.GetMin(tt0.GetMax(tt1)));
-		t0 = t0.GetMax(t0.ShiftTripleRight());
-		t1 = t1.GetMin(t1.ShiftTripleRight());
-		t0 = t0.GetMax(t0.ShiftTripleRight());
-		t1 = t1.GetMin(t1.ShiftTripleRight());
-		dVector mask(t0 < t1);
-		dVector maxDist(dFloat32(1.2f));
-		t0 = maxDist.Select(t0, mask);
-		dAssert((mask.GetSignMask() & 1) == (t0.m_x < dFloat32(1.0f)));
-		return t0.GetScalar();
-	}
-
-	D_CORE_API dFastRayTest RayDistance(const dVector& ray_p0, const dVector& ray_p1) const;
-	D_CORE_API dFloat32 PolygonIntersect(const dVector& normal, dFloat32 maxT, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount) const;
-
-	const dVector m_p0;
-	const dVector m_p1;
-	const dVector m_diff;
-	dVector m_dpInv;
-	dVector m_minT;
-	dVector m_maxT;
-	dVector m_unitDir;
-	dVector m_isParallel;
-} D_GCC_NEWTON_ALIGN_32 ;
-
 D_MSV_NEWTON_ALIGN_32 
 class dFastAabbInfo : public dMatrix
 {
@@ -293,7 +179,7 @@ class dFastAabbInfo : public dMatrix
 	}
 
 	dFloat32 PolygonBoxDistance(const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const;
-	dFloat32 PolygonBoxRayDistance(const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, const dFastRayTest& ray) const;
+	dFloat32 PolygonBoxRayDistance(const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, const dFastRay& ray) const;
 
 	private:
 	dMatrix MakeFaceMatrix(const dVector& faceNormal, dInt32, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const;

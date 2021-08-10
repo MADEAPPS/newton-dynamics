@@ -709,7 +709,7 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeI
 	dVector maxBox(polyBoxP1 - hullBoxP0);
 	
 	dVector relStep(relativeVelocity.Scale(dMax(contactSolver.m_timestep, dFloat32(1.0e-12f))));
-	dFastRayTest ray(dVector::m_zero, polygonMatrix.UnrotateVector(relStep));
+	dFastRay ray(dVector::m_zero, polygonMatrix.UnrotateVector(relStep));
 	dFloat32 distance = ray.BoxIntersect(minBox, maxBox);
 	
 	dFloat32 relStepSpeed = m_normal.DotProduct(relStep).GetScalar();

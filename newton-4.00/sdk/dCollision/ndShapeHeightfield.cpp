@@ -249,7 +249,7 @@ void ndShapeHeightfield::GetLocalAabb(const dVector& q0, const dVector& q1, dVec
 	boxP1.m_y = maxHeight;
 }
 
-dFloat32 ndShapeHeightfield::RayCastCell(const dFastRayTest& ray, dInt32 xIndex0, dInt32 zIndex0, dVector& normalOut, dFloat32 maxT) const
+dFloat32 ndShapeHeightfield::RayCastCell(const dFastRay& ray, dInt32 xIndex0, dInt32 zIndex0, dVector& normalOut, dFloat32 maxT) const
 {
 	dVector points[4];
 	dInt32 triangle[3];
@@ -415,7 +415,7 @@ dFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify&, const dVector& localP0, c
 		dFloat32 tzAcc = tz;
 		dInt32 xIndex0 = ix0;
 		dInt32 zIndex0 = iz0;
-		dFastRayTest ray(localP0, localP1);
+		dFastRay ray(localP0, localP1);
 	
 		// for each cell touched by the line
 		do 
@@ -742,7 +742,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	
 		if (data->m_doContinuesCollisionTest) 
 		{
-			dFastRayTest ray(dVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
+			dFastRay ray(dVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
 			for (dInt32 i = 0; i < faceCount; i++) 
 			{
 				const dInt32* const indexArray = &indices[faceIndexCount1];

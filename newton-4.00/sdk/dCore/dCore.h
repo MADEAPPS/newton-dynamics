@@ -40,6 +40,7 @@
 #include <dMemory.h>
 #include <dGoogol.h>
 #include <dString.h>
+#include <dFastRay.h>
 #include <dProfiler.h>
 #include <dPolyhedra.h>
 #include <dSyncMutex.h>

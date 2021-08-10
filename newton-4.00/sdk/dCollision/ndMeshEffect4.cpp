@@ -563,11 +563,11 @@ class dgHACDClusterGraph
 		dFloat64 m_distanceConcavity;
 	};
 
-	class dgHACDRayCasterContext: public dFastRayTest
+	class dgHACDRayCasterContext: public dFastRay
 	{
 		public:
 		dgHACDRayCasterContext (const dVector& l0, const dVector& l1, dgHACDClusterGraph* const me, dInt32 mycolor)
-			:dFastRayTest (l0, l1)
+			:dFastRay (l0, l1)
 			,m_myColor(mycolor)
 			,m_colorHit(-1)
 			,m_param (1.0f) 
