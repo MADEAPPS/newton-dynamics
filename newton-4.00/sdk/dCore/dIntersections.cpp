@@ -428,7 +428,8 @@ dInt32 dConvexHull2d(dInt32 count, dVector* const pointArray)
 		dSort(array2d, count, CompareVector32);
 
 		dVector* const convexHull = dAlloca(dVector, count);
-		// Build lower hull
+
+		// build upper hull in the plane
 		dInt32 hullCount = 0;
 		for (dInt32 i = 0; i < count; i++)
 		{
@@ -440,6 +441,7 @@ dInt32 dConvexHull2d(dInt32 count, dVector* const pointArray)
 			hullCount++;
 		}
 
+		// build lower hull in the plane
 		dInt32 base = hullCount + 1;
 		for (dInt32 i = count - 1; i > 0; i--)
 		{
@@ -451,7 +453,6 @@ dInt32 dConvexHull2d(dInt32 count, dVector* const pointArray)
 			hullCount++;
 		}
 
-
 		for (dInt32 i = 0; i < hullCount; i++)
 		{
 			pointArray[i] = covariance.TransformVector(convexHull[i]);
@@ -460,49 +461,34 @@ dInt32 dConvexHull2d(dInt32 count, dVector* const pointArray)
 	}
 	else if (eigen[0] > eigenValueError)
 	{
-		dAssert(0);
-		//	// is a line or a point convex hull
-		//	if (count > 2)
-		//	{
-		//		dFloat32 maxValue = dFloat32(-1.0e10f);
-		//		dFloat32 minValue = dFloat32(-1.0e10f);
-		//		dInt32 j0 = 0;
-		//		dInt32 j1 = 0;
-		//		for (dInt32 i = 0; i < count; i++)
-		//		{
-		//			dFloat32 dist = contactArray[i].m_point.DotProduct(covariance.m_front).GetScalar();
-		//			if (dist > maxValue)
-		//			{
-		//				j0 = i;
-		//				maxValue = dist;
-		//			}
-		//			if (-dist > minValue)
-		//			{
-		//				j1 = i;
-		//				minValue = -dist;
-		//			}
-		//		}
-		//		ndContactPoint c0(contactArray[j0]);
-		//		ndContactPoint c1(contactArray[j1]);
-		//		contactArray[0] = c0;
-		//		contactArray[1] = c1;
-		//		count = 2;
-		//	}
-		//	if (count == 2)
-		//	{
-		//		dVector segment(contactArray[1].m_point - contactArray[0].m_point);
-		//		dFloat32 dist2 = segment.DotProduct(segment).GetScalar();
-		//		if (dist2 < dFloat32(5.0e-3f * 5.0e-3f))
-		//		{
-		//			count = 1;
-		//		}
-		//	}
-		//	//dAssert(count <= 1);
-		//	return count;
+		// is a line or a point convex hull
+		dFloat32 maxValue = dFloat32(-1.0e10f);
+		dFloat32 minValue = dFloat32(-1.0e10f);
+		dInt32 j0 = 0;
+		dInt32 j1 = 0;
+		for (dInt32 i = 0; i < count; i++)
+		{
+			dFloat32 dist = pointArray[i].DotProduct(covariance.m_front).GetScalar();
+			if (dist > maxValue)
+			{
+				j0 = i;
+				maxValue = dist;
+			}
+			if (-dist > minValue)
+			{
+				j1 = i;
+				minValue = -dist;
+			}
+		}
+		const dVector c0(pointArray[j0]);
+		const dVector c1(pointArray[j1]);
+		pointArray[0] = c0;
+		pointArray[1] = c1;
+		count = 2;
 	}
 	else
 	{
-		dAssert(0);
+		count = 1;
 	}
 
 	return count;
