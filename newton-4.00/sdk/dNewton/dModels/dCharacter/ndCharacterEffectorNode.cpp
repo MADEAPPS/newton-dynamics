@@ -44,6 +44,11 @@ void ndCharacterEffectorNode::SetTargetMatrix(const dVector& posit)
 	m_effector->SetTargetPosition(posit);
 }
 
+dMatrix ndCharacterEffectorNode::CalculateGlobalTargetMatrix() const
+{
+	return m_effector->CalculateGlobalTargetMatrix();
+}
+
 void ndCharacterEffectorNode::UpdateGlobalPose(ndWorld* const, dFloat32)
 {
 	// for now just; 

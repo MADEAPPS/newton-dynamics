@@ -35,7 +35,7 @@ class ndCharacterIdlePose : public ndCharacterPoseGenerator
 
 	protected:
 	void Update(dFloat32 timestep);
-
+	void BalanceCentreOfMass(dFloat32 timestep);
 	void MoveFoot(ndCharacterEffectorNode* const footEffector, dFloat32 angle);
 
 	dFloat32 m_high;

@@ -21,10 +21,16 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
+#include "ndCharacter.h"
+#include "ndBodyDynamic.h"
+#include "ndCharacterRootNode.h"
 #include "ndCharacterIdlePose.h"
 #include "ndCharacterEffectorNode.h"
 #include "ndCharacterPoseGenerator.h"
 #include "ndCharacterBipedPoseController.h"
+
+#define D_MIN_DISTANCE_TO_SUPPORT dFloat32 (0.01f)
+#define D_MIN_DISTANCE_TO_SUPPORT2 (D_MIN_DISTANCE_TO_SUPPORT * D_MIN_DISTANCE_TO_SUPPORT)
 
 ndCharacterIdlePose::ndCharacterIdlePose(ndCharacterBipedPoseController* const owner)
 	:m_owner(owner)
@@ -46,8 +52,26 @@ void ndCharacterIdlePose::MoveFoot(ndCharacterEffectorNode* const footEffector, 
 	footEffector->SetTargetMatrix(posit);
 }
 
-//void ndCharacterIdlePose::Update(dFloat32 timestep)
-void ndCharacterIdlePose::Update(dFloat32)
+//void ndCharacterIdlePose::BalanceCentreOfMass(dFloat32 timestep)
+void ndCharacterIdlePose::BalanceCentreOfMass(dFloat32)
+{
+	const ndCharacter* const character = m_owner->GetCharacter();
+	ndCharacter::ndCentreOfMassState state(character->CalculateCentreOfMassState());
+	const dRay supportPoint(m_owner->CalculateSupportPoint(state.m_centerOfMass));
+	dVector step(supportPoint.m_p0 - supportPoint.m_p1);
+	dFloat32 dist2 = step.DotProduct(step).GetScalar();
+	if (dist2 > D_MIN_DISTANCE_TO_SUPPORT2)
+	{
+		const ndBipedControllerConfig& config = m_owner->GetConfig();
+		const dMatrix leftFootMatrix(config.m_leftFootEffector->CalculateGlobalTargetMatrix());
+		const dMatrix rightFootMatrix(config.m_rightFootEffector->CalculateGlobalTargetMatrix());
+		dMatrix hipMatrix(character->GetRootNode()->GetBody()->GetMatrix());
+
+		dMatrix hipMatrix11(character->GetRootNode()->GetBody()->GetMatrix());
+	}
+}
+
+void ndCharacterIdlePose::Update(dFloat32 timestep)
 {
 	const ndBipedControllerConfig& config = m_owner->GetConfig();
 
@@ -65,7 +89,7 @@ void ndCharacterIdlePose::Update(dFloat32)
 #else
 	// this fall ove the side
 	if (config.m_rightFootEffector)
-	{
+*	{
 		MoveFoot(config.m_rightFootEffector, m_angle + dFloat32(0.0f) * dPi);
 	}
 
@@ -74,6 +98,8 @@ void ndCharacterIdlePose::Update(dFloat32)
 		MoveFoot(config.m_leftFootEffector, m_angle + dFloat32(1.0f) * dPi);
 	}
 #endif
+
+	BalanceCentreOfMass(timestep);
 
 	//m_angle = dMod(m_angle + timestep * 2.0f, dFloat32(2.0f) * dPi);
 	m_angle = 20.0f * dDegreeToRad;

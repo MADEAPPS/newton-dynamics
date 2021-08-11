@@ -39,6 +39,8 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 	void SetTargetRotation(dFloat32 pitch, dFloat32 yaw, dFloat32 roll);
 	void GetTargetRotation(dFloat32& pitch, dFloat32& yaw, dFloat32& roll) const;
 
+	D_NEWTON_API dMatrix CalculateGlobalTargetMatrix() const;
+
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;

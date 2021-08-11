@@ -92,7 +92,8 @@ inline dInt32 dFastRay::BoxTest(const dVector& minBox, const dVector& maxBox) co
 {
 #if 1
 	dVector test(((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
-	if (test.GetSignMask() & 0x07) {
+	if (test.GetSignMask() & 0x07) 
+	{
 		return 0;
 	}
 

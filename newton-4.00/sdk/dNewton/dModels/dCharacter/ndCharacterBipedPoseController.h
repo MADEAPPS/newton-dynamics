@@ -53,12 +53,13 @@ class ndCharacterBipedPoseController: public ndCharacterPoseController
 	D_NEWTON_API void Init(ndCharacter* const owner, const ndBipedControllerConfig& config);
 
 	const ndBipedControllerConfig& GetConfig() const;
+	dRay CalculateSupportPoint(const dVector& comInGlobalSpace) const;
 
 	protected:
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 	virtual bool Evaluate(ndWorld* const world, dFloat32 timestep);
 
-	dRay CalculateSupportPoint(const dVector& comInGlobalSpace) const;
+	
 
 	ndBipedControllerConfig m_config;
 	ndCharacterIdlePose m_idleCycle;

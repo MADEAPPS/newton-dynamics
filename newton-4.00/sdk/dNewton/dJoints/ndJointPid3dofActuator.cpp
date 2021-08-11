@@ -294,13 +294,17 @@ void ndJointPid3dofActuator::SubmitLinearLimits(const dMatrix& matrix0, const dM
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 }
 
+dMatrix ndJointPid3dofActuator::CalculateGlobalTargetMatrix() const
+{
+	dMatrix controlMatrix(dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll));
+	controlMatrix.m_posit = m_targetPosition;
+	return controlMatrix * m_referenceFrameBody1 * m_body1->GetMatrix();
+}
+
 void ndJointPid3dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
-
-//if (m_maxConeAngle == 0.0f)
-//m_targetPitch = -60.0f * dDegreeToRad;
 
 	dMatrix controlMatrix(dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll));
 	controlMatrix.m_posit = m_targetPosition;
