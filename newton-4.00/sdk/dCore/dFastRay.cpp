@@ -65,7 +65,7 @@ dFloat32 dFastRay::PolygonIntersect (const dVector& faceNormal, dFloat32 maxT, c
 	return dFloat32 (1.2f);
 }
 
-dFastRay dFastRay::RayDistance(const dVector& ray_q0, const dVector& ray_q1) const
+dRay dFastRay::RayDistance(const dVector& ray_q0, const dVector& ray_q1) const
 {
 	const dVector u(m_diff);
 	const dVector v(dVector::m_triplexMask & (ray_q1 - ray_q0));
@@ -160,5 +160,5 @@ dFastRay dFastRay::RayDistance(const dVector& ray_q0, const dVector& ray_q1) con
 	
 	dAssert(u.m_w == dFloat32(0.0f));
 	dAssert(v.m_w == dFloat32(0.0f));
-	return dFastRay(m_p0 + u.Scale(sc), ray_q0 + v.Scale(tc));
+	return dRay(m_p0 + u.Scale(sc), ray_q0 + v.Scale(tc));
 }

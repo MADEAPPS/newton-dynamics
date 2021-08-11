@@ -950,6 +950,7 @@ dInt32 ndContactSolver::CalculateContacts(const dVector& point0, const dVector& 
 				dFloat32 dot = q10.DotProduct(p10).GetScalar();
 				if (dAbs(dot) > dFloat32(0.998f)) 
 				{
+					// segment are collinear, the contact points is the overlapping segment
 					dFloat32 pl0 = p0.DotProduct(p10).GetScalar();
 					dFloat32 pl1 = p1.DotProduct(p10).GetScalar();
 					dFloat32 ql0 = q0.DotProduct(p10).GetScalar();
@@ -976,12 +977,10 @@ dInt32 ndContactSolver::CalculateContacts(const dVector& point0, const dVector& 
 				}
 				else 
 				{
+					// only on contact at the closest distance segment
 					count = 1;
-					//dVector c0;
-					//dVector c1;
-					//dRayToRayDistance(p0, p1, q0, q1, c0, c1);
 					const dFastRay ray(p0, p1);
-					const dFastRay intesect(ray.RayDistance(q0, q1));
+					const dRay intesect(ray.RayDistance(q0, q1));
 					contactsOut[0] = (intesect.m_p0 + intesect.m_p1).Scale(dFloat32(0.5f));
 				}
 			}

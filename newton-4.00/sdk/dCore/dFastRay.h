@@ -27,19 +27,35 @@
 #include "dVector.h"
 
 D_MSV_NEWTON_ALIGN_32
-class dFastRay
+class dRay
 {
 	public:
-	dFastRay(const dVector& l0, const dVector& l1);
-	dInt32 BoxTest(const dVector& minBox, const dVector& maxBox) const;
-	dFloat32 BoxIntersect(const dVector& minBox, const dVector& maxBox) const;
-
-	dFastRay PointDistance(const dVector& point) const;
-	D_CORE_API dFastRay RayDistance(const dVector& ray_p0, const dVector& ray_p1) const;
-	D_CORE_API dFloat32 PolygonIntersect(const dVector& normal, dFloat32 maxT, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount) const;
+	dRay(const dVector& l0, const dVector& l1)
+		:m_p0(l0 & dVector::m_triplexMask)
+		,m_p1(l1 & dVector::m_triplexMask)
+	{
+	}
 
 	const dVector m_p0;
 	const dVector m_p1;
+} D_GCC_NEWTON_ALIGN_32;
+
+
+D_MSV_NEWTON_ALIGN_32
+class dFastRay: public dRay
+{
+	public:
+	dFastRay(const dVector& l0, const dVector& l1);
+
+	dInt32 BoxTest(const dVector& minBox, const dVector& maxBox) const;
+	dFloat32 BoxIntersect(const dVector& minBox, const dVector& maxBox) const;
+
+	dRay PointDistance(const dVector& point) const;
+	D_CORE_API dRay RayDistance(const dVector& ray_p0, const dVector& ray_p1) const;
+	D_CORE_API dFloat32 PolygonIntersect(const dVector& normal, dFloat32 maxT, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount) const;
+
+	//const dVector m_p0;
+	//const dVector m_p1;
 	const dVector m_diff;
 	dVector m_dpInv;
 	dVector m_minT;
@@ -49,8 +65,7 @@ class dFastRay
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline dFastRay::dFastRay(const dVector& l0, const dVector& l1)
-	:m_p0(l0 & dVector::m_triplexMask)
-	,m_p1(l1 & dVector::m_triplexMask)
+	:dRay(l0, l1)
 	,m_diff(m_p1 - m_p0)
 	,m_minT(dFloat32(0.0f))
 	,m_maxT(dFloat32(1.0f))
@@ -65,12 +80,12 @@ inline dFastRay::dFastRay(const dVector& l0, const dVector& l1)
 	m_unitDir = m_diff.Normalize();
 }
 
-inline dFastRay dFastRay::PointDistance(const dVector& point) const
+inline dRay dFastRay::PointDistance(const dVector& point) const
 {
 	//dBigVector dp(ray_p1 - ray_p0);
 	//dAssert(dp.m_w == dFloat32(0.0f));
 	dFloat32 t = dClamp(m_diff.DotProduct(point - m_p0).GetScalar() / m_diff.DotProduct(m_diff).GetScalar(), dFloat32(0.0f), dFloat32(1.0f));
-	return dFastRay (m_p0 + m_diff.Scale(t), point);
+	return dRay (m_p0 + m_diff.Scale(t), point);
 }
 
 inline dInt32 dFastRay::BoxTest(const dVector& minBox, const dVector& maxBox) const

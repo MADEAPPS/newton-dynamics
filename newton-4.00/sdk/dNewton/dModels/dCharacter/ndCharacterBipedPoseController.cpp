@@ -46,7 +46,7 @@ void ndCharacterBipedPoseController::Init(ndCharacter* const owner, const ndBipe
 	m_config = config;
 }
 
-dFastRay ndCharacterBipedPoseController::CalculateSupportPoint(const dVector& comInGlobalSpace) const
+dRay ndCharacterBipedPoseController::CalculateSupportPoint(const dVector& comInGlobalSpace) const
 {
 	ndBodyKinematic* const leftFootBody = m_config.m_leftFootEffector->GetJoint()->GetBody0();
 	ndBodyKinematic* const rightFootBody = m_config.m_rightFootEffector->GetJoint()->GetBody0();
@@ -77,7 +77,7 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 	comMatrixInGlobalSpace.m_posit = state.m_centerOfMass;
 	context.DrawFrame(comMatrixInGlobalSpace);
 
-	const dFastRay suportPoint(CalculateSupportPoint(comMatrixInGlobalSpace.m_posit));
+	const dRay suportPoint(CalculateSupportPoint(comMatrixInGlobalSpace.m_posit));
 	
 	ndBodyKinematic* const leftFootBody = m_config.m_leftFootEffector->GetJoint()->GetBody0();
 	ndBodyKinematic* const rightFootBody = m_config.m_rightFootEffector->GetJoint()->GetBody0();
