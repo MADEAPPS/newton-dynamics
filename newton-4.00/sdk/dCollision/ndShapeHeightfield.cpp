@@ -451,41 +451,6 @@ dFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify&, const dVector& localP0, c
 	return dFloat32(1.2f);
 }
 
-/*
-dIntersectStatus ndShapeHeightfield::GetPolygon(void* const context, const dFloat32* const, dInt32, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
-{
-	ndPolygonMeshDesc& data = (*(ndPolygonMeshDesc*)context);
-	if (data.m_faceCount >= D_MAX_COLLIDING_FACES) 
-	{
-		dTrace(("buffer Over float, try using a lower resolution mesh for collision\n"));
-		return t_StopSearh;
-	}
-	if ((data.m_globalIndexCount + indexCount * 2 + 3) >= D_MAX_COLLIDING_INDICES) 
-	{
-		dTrace(("buffer Over float, try using a lower resolution mesh for collision\n"));
-		return t_StopSearh;
-	}
-
-	dInt32 count = indexCount * 2 + 3;
-
-	data.m_faceIndexCount[data.m_faceCount] = indexCount;
-	data.m_faceIndexStart[data.m_faceCount] = data.m_globalIndexCount;
-	data.m_hitDistance[data.m_faceCount] = hitDistance;
-	data.m_faceCount++;
-	dInt32* const dst = &data.m_faceVertexIndex[data.m_globalIndexCount];
-
-	//the docks say memcpy is an intrinsic function but as usual this is another Microsoft lied
-	for (dInt32 i = 0; i < count; i++) 
-	{
-		dst[i] = indexArray[i];
-	}
-
-	data.m_globalIndexCount += count;
-
-	return t_ContinueSearh;
-}
-*/
-
 void ndShapeHeightfield::CalculateMinAndMaxElevation(dInt32 x0, dInt32 x1, dInt32 z0, dInt32 z1, dFloat32& minHeight, dFloat32& maxHeight) const
 {
 	dInt16 minVal = 0x7fff;
