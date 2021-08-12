@@ -59,8 +59,6 @@ class ndCharacterBipedPoseController: public ndCharacterPoseController
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 	virtual bool Evaluate(ndWorld* const world, dFloat32 timestep);
 
-	
-
 	ndBipedControllerConfig m_config;
 	ndCharacterIdlePose m_idleCycle;
 	ndCharacterWalkCycleGenerator m_walkCycle;
