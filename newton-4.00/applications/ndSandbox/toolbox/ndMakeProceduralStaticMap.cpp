@@ -21,13 +21,15 @@
 class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 {
 	public:
-	ndRegularProceduralGrid(dFloat32 sizex, dFloat32 sizey, dFloat32 sizez, const dVector& planeEquation)
+	ndRegularProceduralGrid(dFloat32 gridSize, dFloat32 sizex, dFloat32 sizey, dFloat32 sizez, const dVector& planeEquation)
 		:ndShapeStaticProceduralMesh(sizex, sizey, sizez)
 		,m_planeEquation(planeEquation)
+		,m_gridSize(gridSize)
+		,m_invGridSize(dFloat32 (1.0f)/ m_gridSize)
 	{
 	}
 
-	virtual dFloat32 RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const, ndContactPoint& contactOut) const
+	virtual dFloat32 RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32, const ndBody* const, ndContactPoint& contactOut) const
 	{
 		dVector segment(dVector::m_triplexMask & (localP1 - localP0));
 		dFloat32 den = m_planeEquation.DotProduct(segment).GetScalar();
@@ -40,10 +42,43 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 
 	virtual void GetCollidingFaces(const dVector& minBox, const dVector& maxBox, dArray<dVector>& vertex, dArray<dInt32>& faceList, dArray<dInt32>& faceMaterial, dArray<dInt32>& indexListList) const
 	{
-		//dAssert(0);
+		// generate the point cloud
+		dVector p0(minBox.Scale(m_invGridSize).Floor());
+		dVector p1(maxBox.Scale(m_invGridSize).Floor() + dVector::m_one);
+		dVector origin(p0.Scale(m_gridSize) & dVector::m_triplexMask);
+		dInt32 count_x = dInt32(p1.m_x - p0.m_x);
+		dInt32 count_z = dInt32(p1.m_z - p0.m_z);
+
+		for (dInt32 iz = 0; iz <= count_z; iz++)
+		{
+			dVector point(origin);
+			for (dInt32 ix = 0; ix <= count_x; ix++)
+			{
+				vertex.PushBack(point);
+				point.m_x += m_gridSize;
+			}
+			origin.m_z += m_gridSize;
+		}
+
+		// generate the face array
+		for (dInt32 iz = 0; iz <= count_z; iz++)
+		{
+			for (dInt32 ix = 0; ix <= count_x; ix++)
+			{
+				faceList.PushBack(4);
+				indexListList.PushBack((iz + 0) * count_x + ix + 0);
+				indexListList.PushBack((iz + 1) * count_x + ix + 0);
+				indexListList.PushBack((iz + 1) * count_x + ix + 1);
+				indexListList.PushBack((iz + 0) * count_x + ix + 1);
+
+				faceMaterial.PushBack(0);
+			}
+		}
 	}
 
 	dVector m_planeEquation;
+	dFloat32 m_gridSize;
+	dFloat32 m_invGridSize;
 };
 
 ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, dInt32 grids, dFloat32 gridSize, dFloat32 perturbation)
@@ -216,7 +251,7 @@ ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, dInt32 gri
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
 #else
 	dPlane planeEquation(dVector(0.0f, 1.0f, 0.0f, 0.0f));
-	ndShapeInstance plane(new ndRegularProceduralGrid(2.0f * grids * gridSize, 1.0f, 2.0f * grids * gridSize, planeEquation));
+	ndShapeInstance plane(new ndRegularProceduralGrid(gridSize, 2.0f * grids * gridSize, 1.0f, 2.0f * grids * gridSize, planeEquation));
 #endif
 
 	dMatrix matrix(dGetIdentityMatrix());
