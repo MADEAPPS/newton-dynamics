@@ -68,7 +68,7 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 		std::thread::id m_threadId;
 	};
 
-	void CalculateAABB();
+	void CalculateLocalObb();
 	dInt32 FastInt(dFloat32 x) const;
 	const dInt32* GetIndexList() const;
 	void CalculateMinExtend2d(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;

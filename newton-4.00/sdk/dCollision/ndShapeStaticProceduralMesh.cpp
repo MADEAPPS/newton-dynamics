@@ -53,33 +53,13 @@
 //	dFloat32 verticalScale, dFloat32 horizontalScale_x, dFloat32 horizontalScale_z)
 ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(dFloat32 sizex, dFloat32 sizey, dFloat32 sizez)
 	:ndShapeStaticMesh(m_staticProceduralMesh)
-	//,m_minBox(dVector::m_zero)
-	//,m_maxBox(dVector::m_zero)
-	//,m_atributeMap(width * height)
-	//,m_elevationMap(width * height)
-	//,m_verticalScale(verticalScale)
-	//,m_horizontalScale_x(horizontalScale_x)
-	//,m_horizontalScale_z(horizontalScale_z)
-	//,m_horizontalScaleInv_x(dFloat32(1.0f) / horizontalScale_x)
-	//,m_horizontalScaleInv_z(dFloat32(1.0f) / horizontalScale_z)
-	//,m_width(width)
-	//,m_height(height)
-	//,m_diagonalMode(constructionMode)
-	//,m_localData()
+	,m_minBox(dVector::m_negOne * dVector::m_half * dVector(sizex, sizey, sizez, dFloat32(0.0f)))
+	,m_maxBox(dVector::m_half * dVector(sizex, sizey, sizez, dFloat32(0.0f)))
+	,m_localData()
 {
-	dAssert(0);
-	//dAssert(width >= 2);
-	//dAssert(height >= 2);
-	//m_atributeMap.SetCount(width * height);
-	//m_elevationMap.SetCount(width * height);
-	//
-	//memset(&m_atributeMap[0], 0, sizeof(dInt8) * m_atributeMap.GetCount());
-	//memset(&m_elevationMap[0], 0, sizeof(dInt16) * m_elevationMap.GetCount());
-	//
-	//CalculateAABB();
+	CalculateLocalObb();
 }
 
-//ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const nd::TiXmlNode* const xmlNode, const char* const assetPath)
 ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const nd::TiXmlNode* const, const char* const)
 	:ndShapeStaticMesh(m_staticProceduralMesh)
 {
@@ -113,27 +93,15 @@ ndShapeInfo ndShapeStaticProceduralMesh::GetShapeInfo() const
 	return info;
 }
 
-void ndShapeStaticProceduralMesh::CalculateAABB()
+void ndShapeStaticProceduralMesh::CalculateLocalObb()
 {
-	dAssert(0);
-	//dInt16 y0 = dInt16(0x7fff);
-	//dInt16 y1 = dInt16 (-0x7fff);
-	//for (dInt32 i = m_elevationMap.GetCount()-1; i >= 0; i--)
-	//{
-	//	y0 = dMin(y0, m_elevationMap[i]);
-	//	y1 = dMax(y1, m_elevationMap[i]);
-	//}
-	//
-	//m_minBox = dVector(dFloat32(dFloat32(0.0f)), dFloat32 (y0) * m_verticalScale, dFloat32(0.0f), dFloat32(0.0f));
-	//m_maxBox = dVector(dFloat32(m_width-1) * m_horizontalScale_x, dFloat32(y1) * m_verticalScale, dFloat32(m_height-1) * m_horizontalScale_z, dFloat32(0.0f));
-	//
-	//m_boxSize = (m_maxBox - m_minBox) * dVector::m_half;
-	//m_boxOrigin = (m_maxBox + m_minBox) * dVector::m_half;
+	m_boxSize = (m_maxBox - m_minBox) * dVector::m_half;
+	m_boxOrigin = (m_maxBox + m_minBox) * dVector::m_half;
 }
 
 //void ndShapeStaticProceduralMesh::UpdateElevationMapAabb()
 //{
-//	CalculateAABB();
+//	CalculateLocalObb();
 //}
 //
 //const dInt32* ndShapeStaticProceduralMesh::GetIndexList() const
@@ -342,121 +310,6 @@ void ndShapeStaticProceduralMesh::DebugShape(const dMatrix& matrix, ndShapeDebug
 //	return t;
 //}
 
-
-dFloat32 ndShapeStaticProceduralMesh::RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const, ndContactPoint& contactOut) const
-{
-dAssert(0);
-return 1.2;
-	//dVector boxP0;
-	//dVector boxP1;
-	//
-	//// calculate the ray bounding box
-	//CalculateMinExtend2d(localP0, localP1, boxP0, boxP1);
-	//
-	//dVector p0(localP0);
-	//dVector p1(localP1);
-	//
-	//// clip the line against the bounding box
-	//if (dRayBoxClip(p0, p1, boxP0, boxP1)) 
-	//{
-	//	dVector dp(p1 - p0);
-	//	dVector normalOut(dVector::m_zero);
-	//
-	//	dFloat32 scale_x = m_horizontalScale_x;
-	//	dFloat32 invScale_x = m_horizontalScaleInv_x;
-	//	dFloat32 scale_z = m_horizontalScale_z;
-	//	dFloat32 invScale_z = m_horizontalScaleInv_z;
-	//	dInt32 ix0 = FastInt(p0.m_x * invScale_x);
-	//	dInt32 iz0 = FastInt(p0.m_z * invScale_z);
-	//
-	//	// implement a 3ddda line algorithm 
-	//	dInt32 xInc;
-	//	dFloat32 tx;
-	//	dFloat32 stepX;
-	//	if (dp.m_x > dFloat32(0.0f)) 
-	//	{
-	//		xInc = 1;
-	//		dFloat32 val = dFloat32(1.0f) / dp.m_x;
-	//		stepX = scale_x * val;
-	//		tx = (scale_x * (ix0 + dFloat32(1.0f)) - p0.m_x) * val;
-	//	}
-	//	else if (dp.m_x < dFloat32(0.0f)) 
-	//	{
-	//		xInc = -1;
-	//		dFloat32 val = -dFloat32(1.0f) / dp.m_x;
-	//		stepX = scale_x * val;
-	//		tx = -(scale_x * ix0 - p0.m_x) * val;
-	//	}
-	//	else 
-	//	{
-	//		xInc = 0;
-	//		stepX = dFloat32(0.0f);
-	//		tx = dFloat32(1.0e10f);
-	//	}
-	//
-	//	dInt32 zInc;
-	//	dFloat32 tz;
-	//	dFloat32 stepZ;
-	//	if (dp.m_z > dFloat32(0.0f)) 
-	//	{
-	//		zInc = 1;
-	//		dFloat32 val = dFloat32(1.0f) / dp.m_z;
-	//		stepZ = scale_z * val;
-	//		tz = (scale_z * (iz0 + dFloat32(1.0f)) - p0.m_z) * val;
-	//	}
-	//	else if (dp.m_z < dFloat32(0.0f)) 
-	//	{
-	//		zInc = -1;
-	//		dFloat32 val = -dFloat32(1.0f) / dp.m_z;
-	//		stepZ = scale_z * val;
-	//		tz = -(scale_z * iz0 - p0.m_z) * val;
-	//	}
-	//	else 
-	//	{
-	//		zInc = 0;
-	//		stepZ = dFloat32(0.0f);
-	//		tz = dFloat32(1.0e10f);
-	//	}
-	//
-	//	dFloat32 txAcc = tx;
-	//	dFloat32 tzAcc = tz;
-	//	dInt32 xIndex0 = ix0;
-	//	dInt32 zIndex0 = iz0;
-	//	dFastRay ray(localP0, localP1);
-	//
-	//	// for each cell touched by the line
-	//	do 
-	//	{
-	//		dFloat32 t = RayCastCell(ray, xIndex0, zIndex0, normalOut, maxT);
-	//		if (t < maxT) 
-	//		{
-	//			// bail out at the first intersection and copy the data into the descriptor
-	//			dAssert(normalOut.m_w == dFloat32(0.0f));
-	//			contactOut.m_normal = normalOut.Normalize();
-	//			contactOut.m_shapeId0 = m_atributeMap[zIndex0 * m_width + xIndex0];
-	//			contactOut.m_shapeId1 = m_atributeMap[zIndex0 * m_width + xIndex0];
-	//
-	//			return t;
-	//		}
-	//
-	//		if (txAcc < tzAcc) 
-	//		{
-	//			xIndex0 += xInc;
-	//			tx = txAcc;
-	//			txAcc += stepX;
-	//		}
-	//		else 
-	//		{
-	//			zIndex0 += zInc;
-	//			tz = tzAcc;
-	//			tzAcc += stepZ;
-	//		}
-	//	} while ((tx <= dFloat32(1.0f)) || (tz <= dFloat32(1.0f)));
-	//}
-	//
-	//// if no cell was hit, return a large value
-	//return dFloat32(1.2f);
-}
 
 //void ndShapeStaticProceduralMesh::CalculateMinAndMaxElevation(dInt32 x0, dInt32 x1, dInt32 z0, dInt32 z1, dFloat32& minHeight, dFloat32& maxHeight) const
 //{

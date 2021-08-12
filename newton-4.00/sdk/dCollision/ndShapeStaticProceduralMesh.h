@@ -42,15 +42,15 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	//const dArray<dInt16>& GetElevationMap() const;
 	//D_COLLISION_API void UpdateElevationMapAabb();
 	//void GetLocalAabb(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
-
-	protected:
-	virtual ndShapeInfo GetShapeInfo() const;
 	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return this; }
 
-	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
-	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
-	virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
+	protected:
+	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const = 0;
+
+	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
+	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
+	D_COLLISION_API virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
+	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
 
 	private: 
 	class ndLocalThreadData
@@ -65,7 +65,7 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 		std::thread::id m_threadId;
 	};
 
-	void CalculateAABB();
+	void CalculateLocalObb();
 	//dInt32 FastInt(dFloat32 x) const;
 	//const dInt32* GetIndexList() const;
 	//void CalculateMinExtend2d(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
@@ -75,16 +75,6 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 
 	dVector m_minBox;
 	dVector m_maxBox;
-	//dArray<dInt8> m_atributeMap;
-	//dArray<dInt16> m_elevationMap;
-	//dFloat32 m_verticalScale;
-	//dFloat32 m_horizontalScale_x;
-	//dFloat32 m_horizontalScale_z;
-	//dFloat32 m_horizontalScaleInv_x;
-	//dFloat32 m_horizontalScaleInv_z;
-	//dInt32 m_width;
-	//dInt32 m_height;
-	//ndGridConstruction m_diagonalMode;
 	mutable dList<ndLocalThreadData> m_localData;
 
 	//static dVector m_yMask;

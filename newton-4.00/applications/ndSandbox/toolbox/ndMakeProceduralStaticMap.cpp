@@ -18,6 +18,21 @@
 #include "ndDemoEntityManager.h"
 #include "ndMakeProceduralStaticMap.h"
 
+class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
+{
+	public:
+	ndRegularProceduralGrid(dFloat32 sizex, dFloat32 sizey, dFloat32 sizez)
+		:ndShapeStaticProceduralMesh(sizex, sizey, sizez)
+	{
+	}
+
+	dFloat32 RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const, ndContactPoint& contactOut) const
+	{
+		dAssert(0);
+		return 0;
+	}
+};
+
 ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, dInt32 grids, dFloat32 gridSize, dFloat32 perturbation)
 {
 	dVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
@@ -112,8 +127,9 @@ ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, dInt32 grids, 
 
 ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, dInt32 grids, dFloat32 gridSize, dFloat32 perturbation)
 {
+#if 1
 	dVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
-
+	
 	dArray<dVector> points;
 	for (dInt32 iz = 0; iz <= grids; iz++)
 	{
@@ -124,7 +140,7 @@ ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, dInt32 gri
 			points.PushBack(dVector(x0, dGaussianRandom(perturbation), z0, 1.0f));
 		}
 	}
-
+	
 	ndMeshEffect meshEffect;
 	meshEffect.BeginBuild();
 	for (dInt32 iz = 0; iz < grids; iz++)
@@ -135,13 +151,13 @@ ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, dInt32 gri
 			dVector p1(points[(ix + 1) * (grids + 1) + iz + 0]);
 			dVector p2(points[(ix + 1) * (grids + 1) + iz + 1]);
 			dVector p3(points[(ix + 0) * (grids + 1) + iz + 1]);
-
+	
 			meshEffect.BeginBuildFace();
 			meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
 			meshEffect.AddPoint(p1.m_x, p1.m_y, p1.m_z);
 			meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);
 			meshEffect.EndBuildFace();
-
+	
 			meshEffect.BeginBuildFace();
 			meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
 			meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);
@@ -150,16 +166,16 @@ ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, dInt32 gri
 		}
 	}
 	meshEffect.EndBuild(0.0f);
-
-	ndPhysicsWorld* const world = scene->GetWorld();
+	
+	
 	dPolygonSoupBuilder meshBuilder;
 	meshBuilder.Begin();
-
+	
 	dInt32 vertexStride = meshEffect.GetVertexStrideInByte() / sizeof(dFloat64);
 	const dFloat64* const vertexData = meshEffect.GetVertexPool();
-
+	
 	dInt32 mark = meshEffect.IncLRU();
-
+	
 	dVector face[16];
 	dPolyhedra::Iterator iter(meshEffect);
 	for (iter.Begin(); iter; iter++)
@@ -178,15 +194,19 @@ ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, dInt32 gri
 				ptr->m_mark = mark;
 				ptr = ptr->m_next;
 			} while (ptr != edge);
-
+	
 			dInt32 materialIndex = meshEffect.GetFaceMaterial(edge);
 			meshBuilder.AddFace(&face[0].m_x, sizeof(dVector), 3, materialIndex);
 		}
 	}
 	meshBuilder.End(false);
+	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
+#else
+	ndShapeInstance plane(new ndRegularProceduralGrid(2.0f * grids * gridSize, 1.0f, 2.0f * grids * gridSize));
+#endif
 
 	dMatrix matrix(dGetIdentityMatrix());
-	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
+	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetMatrix(matrix);

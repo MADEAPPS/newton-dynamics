@@ -74,7 +74,7 @@ ndShapeHeightfield::ndShapeHeightfield(
 	memset(&m_atributeMap[0], 0, sizeof(dInt8) * m_atributeMap.GetCount());
 	memset(&m_elevationMap[0], 0, sizeof(dInt16) * m_elevationMap.GetCount());
 
-	CalculateAABB();
+	CalculateLocalObb();
 }
 
 //ndShapeHeightfield::ndShapeHeightfield(const nd::TiXmlNode* const xmlNode, const char* const assetPath)
@@ -110,7 +110,7 @@ ndShapeInfo ndShapeHeightfield::GetShapeInfo() const
 	return info;
 }
 
-void ndShapeHeightfield::CalculateAABB()
+void ndShapeHeightfield::CalculateLocalObb()
 {
 	dInt16 y0 = dInt16(0x7fff);
 	dInt16 y1 = dInt16 (-0x7fff);
@@ -129,7 +129,7 @@ void ndShapeHeightfield::CalculateAABB()
 
 void ndShapeHeightfield::UpdateElevationMapAabb()
 {
-	CalculateAABB();
+	CalculateLocalObb();
 }
 
 const dInt32* ndShapeHeightfield::GetIndexList() const
