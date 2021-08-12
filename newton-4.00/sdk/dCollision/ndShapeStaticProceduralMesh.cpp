@@ -26,36 +26,34 @@
 #include "ndShapeInstance.h"
 #include "ndShapeStaticProceduralMesh.h"
 
-//dVector ndShapeStaticProceduralMesh::m_yMask(0xffffffff, 0, 0xffffffff, 0);
-//dVector ndShapeStaticProceduralMesh::m_padding(dFloat32(0.25f), dFloat32(0.25f), dFloat32(0.25f), dFloat32(0.0f));
-//dVector ndShapeStaticProceduralMesh::m_elevationPadding(dFloat32(0.0f), dFloat32(1.0e10f), dFloat32(0.0f), dFloat32(0.0f));
-//
-//dInt32 ndShapeStaticProceduralMesh::m_cellIndices[][4] =
-//{
-//	{ 0, 1, 2, 3 },
-//	{ 1, 3, 0, 2 }
-//};
-//
-//dInt32 ndShapeStaticProceduralMesh::m_horizontalEdgeMap[][7] =
-//{
-//	{ 1 * 9 + 0, 2 * 9 + 1, 1 * 9 + 4, 1 * 9 + 7, 2 * 9 + 7, 1 * 9 + 4, 2 * 9 + 4 },
-//	{ 0 * 9 + 1, 3 * 9 + 0, 0 * 9 + 4, 0 * 9 + 6, 3 * 9 + 6, 0 * 9 + 4, 3 * 9 + 4 }
-//};
-//
-//dInt32 ndShapeStaticProceduralMesh::m_verticalEdgeMap[][7] =
-//{
-//	{ 1 * 9 + 1, 0 * 9 + 0, 1 * 9 + 4, 1 * 9 + 6, 0 * 9 + 6, 1 * 9 + 4, 0 * 9 + 4 },
-//	{ 1 * 9 + 0, 0 * 9 + 1, 1 * 9 + 4, 1 * 9 + 7, 0 * 9 + 7, 1 * 9 + 4, 0 * 9 + 4 }
-//};
+template<class T>
+class dTempArray : public dArray<T>
+{
+	public:
+	dTempArray(dInt32 maxSize, T* const buffer) 
+		:dArray<T>()
+		,m_buffer(buffer)
+	{
+		m_array = buffer;
+		m_capacity = maxSize;
+		//SetCount(maxSize);
+	}
 
-//ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(
-//	dInt32 width, dInt32 height, ndGridConstruction constructionMode,
-//	dFloat32 verticalScale, dFloat32 horizontalScale_x, dFloat32 horizontalScale_z)
+	~dTempArray()
+	{
+		m_array = nullptr;
+	}
+
+	T* m_buffer;
+};
+
 ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(dFloat32 sizex, dFloat32 sizey, dFloat32 sizez)
 	:ndShapeStaticMesh(m_staticProceduralMesh)
 	,m_minBox(dVector::m_negOne * dVector::m_half * dVector(sizex, sizey, sizez, dFloat32(0.0f)))
 	,m_maxBox(dVector::m_half * dVector(sizex, sizey, sizez, dFloat32(0.0f)))
 	,m_localData()
+	,m_maxVertexCount(256)
+	,m_maxFaceCount(64)
 {
 	CalculateLocalObb();
 }
@@ -68,6 +66,12 @@ ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const nd::TiXmlNode* co
 
 ndShapeStaticProceduralMesh::~ndShapeStaticProceduralMesh(void)
 {
+}
+
+void ndShapeStaticProceduralMesh::SetMaxVertexAndFaces(dInt32 maxVertex, dInt32 maxFaces)
+{
+	m_maxVertexCount = maxVertex;
+	m_maxFaceCount = maxFaces;
 }
 
 //void ndShapeStaticProceduralMesh::Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const
@@ -339,9 +343,17 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	//	const dVector q0(p0.GetMin(p1) - m_padding);
 	//	const dVector q1(p0.GetMax(p1) + scale + m_padding);
 
-	dArray<dVector> vertex;
-	dArray<dVector> indexList;
-	GetCollidingFaces(data->GetOrigin(), data->GetTarget(), vertex, indexList);
+	dVector* const vertexBuffer = dAlloca(dVector, m_maxVertexCount);
+	dInt32* const faceBuffer = dAlloca(dInt32, m_maxFaceCount);
+	dInt32* const materialBuffer = dAlloca(dInt32, m_maxFaceCount);
+	dInt32* const indexListBuffer = dAlloca(dInt32, m_maxFaceCount * 4);
+
+	dTempArray<dVector> vertex(m_maxVertexCount, vertexBuffer);
+	dTempArray<dInt32> faceList(m_maxFaceCount, faceBuffer);
+	dTempArray<dInt32> faceMaterial(m_maxFaceCount, materialBuffer);
+	dTempArray<dInt32> indexList(m_maxFaceCount * 4, indexListBuffer);
+
+	GetCollidingFaces(data->GetOrigin(), data->GetTarget(), vertex, faceList, faceMaterial, indexList);
 
 
 	//boxP0 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace < dVector::m_zero);

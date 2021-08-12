@@ -33,11 +33,11 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	D_COLLISION_API virtual ~ndShapeStaticProceduralMesh();
 
 	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return this; }
-
-	virtual void GetCollidingFaces(const dVector& minBox, const dVector& maxBox, dArray<dVector>& vertex, dArray<dVector>& indexList) const = 0;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const = 0;
+	virtual void GetCollidingFaces(const dVector& minBox, const dVector& maxBox, dArray<dVector>& vertex, dArray<dInt32>& faceList, dArray<dInt32>& faceMaterial, dArray<dInt32>& indexListList) const = 0;
 
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
+	D_COLLISION_API void SetMaxVertexAndFaces(dInt32 maxVertex, dInt32 maxFaces);
 	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
 
 	private:
@@ -57,44 +57,16 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	};
 
 	void CalculateLocalObb();
-	//dInt32 FastInt(dFloat32 x) const;
-	//const dInt32* GetIndexList() const;
-	//void CalculateMinExtend2d(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
-	//void CalculateMinExtend3d(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
-	//dFloat32 RayCastCell(const dFastRay& ray, dInt32 xIndex0, dInt32 zIndex0, dVector& normalOut, dFloat32 maxT) const;
-	//void CalculateMinAndMaxElevation(dInt32 x0, dInt32 x1, dInt32 z0, dInt32 z1, dFloat32& minHeight, dFloat32& maxHeight) const;
 
 	dVector m_minBox;
 	dVector m_maxBox;
 	mutable dList<ndLocalThreadData> m_localData;
+	dInt32 m_maxVertexCount;
+	dInt32 m_maxFaceCount;
 
-	//static dVector m_yMask;
-	//static dVector m_padding;
-	//static dVector m_elevationPadding;
-	//static dInt32 m_cellIndices[][4];
-	//static dInt32 m_verticalEdgeMap[][7];
-	//static dInt32 m_horizontalEdgeMap[][7];
+
 	friend class ndContactSolver;
 };
 
-//inline dArray<dInt16>& ndShapeStaticProceduralMesh::GetElevationMap()
-//{
-//	return m_elevationMap;
-//}
-//
-//inline const dArray<dInt16>& ndShapeStaticProceduralMesh::GetElevationMap() const
-//{
-//	return m_elevationMap;
-//}
-//
-//inline dInt32 ndShapeStaticProceduralMesh::FastInt(dFloat32 x) const
-//{
-//	dInt32 i = dInt32(x);
-//	if (dFloat32(i) > x) 
-//	{
-//		i--;
-//	}
-//	return i;
-//}
 
 #endif

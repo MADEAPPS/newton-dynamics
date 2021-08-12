@@ -38,7 +38,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 		return dClamp (t, dFloat32 (0.0f), dFloat32 (1.2f));
 	}
 
-	virtual void GetCollidingFaces(const dVector& minBox, const dVector& maxBox, dArray<dVector>& vertex, dArray<dVector>& indexList) const
+	virtual void GetCollidingFaces(const dVector& minBox, const dVector& maxBox, dArray<dVector>& vertex, dArray<dInt32>& faceList, dArray<dInt32>& faceMaterial, dArray<dInt32>& indexListList) const
 	{
 		//dAssert(0);
 	}
