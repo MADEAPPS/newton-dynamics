@@ -45,6 +45,7 @@ class ndShapeHeightfield;
 class ndShapeConvexPolygon;
 class ndShapeDebugCallback;
 class ndShapeChamferCylinder;
+class ndShapeStaticProceduralMesh;
 
 #ifdef _DEBUG
 //	#define DG_DEBUG_AABB
@@ -64,6 +65,7 @@ enum ndShapeID
 	// special and non convex collisions.
 	m_compound,
 	m_heightField,
+	m_staticProceduralMesh,
 	m_nullCollision,
 	m_pointCollision,
 	m_polygonCollision,
@@ -220,6 +222,7 @@ class ndShape: public dClassAlloc
 	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return nullptr; }
 	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon() { return nullptr; }
 	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return nullptr; }
+	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return nullptr; }
 
 	virtual dInt32 GetConvexVertexCount() const;
 
