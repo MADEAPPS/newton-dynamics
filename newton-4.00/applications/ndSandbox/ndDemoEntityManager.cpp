@@ -44,15 +44,16 @@
 //#define DEFAULT_SCENE	6		// setting basic player
 //#define DEFAULT_SCENE	7		// setting particle fluid
 //#define DEFAULT_SCENE	8		// static mesh collision 
-//#define DEFAULT_SCENE	9		// setting basic joints
-//#define DEFAULT_SCENE	10		// setting basic rag doll
-#define DEFAULT_SCENE	11		// setting active rag doll
-//#define DEFAULT_SCENE	12		// setting basic vehicle
-//#define DEFAULT_SCENE	14		// setting heavy vehicle
-//#define DEFAULT_SCENE	15		// simple voronoi fracture
-//#define DEFAULT_SCENE	16		// basic voronoi fracture
-//#define DEFAULT_SCENE	17		// linked voronoi fracture
-//#define DEFAULT_SCENE	17		// skin peel voronoi fracture
+#define DEFAULT_SCENE	9		// static user mesh collision 
+//#define DEFAULT_SCENE	10		// setting basic joints
+//#define DEFAULT_SCENE	11		// setting basic rag doll
+//#define DEFAULT_SCENE	12		// setting active rag doll
+//#define DEFAULT_SCENE	14		// setting basic vehicle
+//#define DEFAULT_SCENE	15		// setting heavy vehicle
+//#define DEFAULT_SCENE	16		// simple voronoi fracture
+//#define DEFAULT_SCENE	17		// basic voronoi fracture
+//#define DEFAULT_SCENE	18		// linked voronoi fracture
+//#define DEFAULT_SCENE	19		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndBasicStacks(ndDemoEntityManager* const scene);
@@ -75,6 +76,7 @@ void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene);
 //void ndBasicFracture_4(ndDemoEntityManager* const scene);
 void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
+void ndStaticUserMeshCollisionDemo(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
@@ -87,6 +89,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic player", ndPlayerCapsuleDemo },
 	{ "basic particle fluid", ndBasicParticleFluid },
 	{ "static mesh", ndStaticMeshCollisionDemo },
+	{ "static user mesh", ndStaticUserMeshCollisionDemo },
 	{ "basic joints", ndBasicJoints },
 	{ "basic ragdoll", ndBasicRagdoll },
 	{ "active ragdoll", ndActiveRagdoll },
@@ -287,7 +290,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showJointDebugInfo = true;
 	m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 2;	
-	m_collisionDisplayMode = 3;		// solid wire frame
+	//m_collisionDisplayMode = 3;		// solid wire frame
 	//m_synchronousPhysicsUpdate = false;
 
 	Cleanup();
