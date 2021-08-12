@@ -21,16 +21,29 @@
 class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 {
 	public:
-	ndRegularProceduralGrid(dFloat32 sizex, dFloat32 sizey, dFloat32 sizez)
+	ndRegularProceduralGrid(dFloat32 sizex, dFloat32 sizey, dFloat32 sizez, const dVector& planeEquation)
 		:ndShapeStaticProceduralMesh(sizex, sizey, sizez)
+		,m_planeEquation(planeEquation)
 	{
 	}
 
-	dFloat32 RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const, ndContactPoint& contactOut) const
+	virtual dFloat32 RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const, ndContactPoint& contactOut) const
 	{
-		dAssert(0);
-		return 0;
+		dVector segment(dVector::m_triplexMask & (localP1 - localP0));
+		dFloat32 den = m_planeEquation.DotProduct(segment).GetScalar();
+		dFloat32 num = m_planeEquation.DotProduct(localP0).GetScalar() + m_planeEquation.m_w;
+		dFloat32 t = -num / den;
+		contactOut.m_point = localP0 + segment.Scale(t);
+		contactOut.m_normal = m_planeEquation;
+		return dClamp (t, dFloat32 (0.0f), dFloat32 (1.2f));
 	}
+
+	virtual void GetCollidingFaces(const dVector& minBox, const dVector& maxBox, dArray<dVector>& vertex, dArray<dVector>& indexList) const
+	{
+		//dAssert(0);
+	}
+
+	dVector m_planeEquation;
 };
 
 ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, dInt32 grids, dFloat32 gridSize, dFloat32 perturbation)
@@ -127,7 +140,7 @@ ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, dInt32 grids, 
 
 ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, dInt32 grids, dFloat32 gridSize, dFloat32 perturbation)
 {
-#if 1
+#if 0
 	dVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
 	
 	dArray<dVector> points;
@@ -202,7 +215,8 @@ ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, dInt32 gri
 	meshBuilder.End(false);
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
 #else
-	ndShapeInstance plane(new ndRegularProceduralGrid(2.0f * grids * gridSize, 1.0f, 2.0f * grids * gridSize));
+	dPlane planeEquation(dVector(0.0f, 1.0f, 0.0f, 0.0f));
+	ndShapeInstance plane(new ndRegularProceduralGrid(2.0f * grids * gridSize, 1.0f, 2.0f * grids * gridSize, planeEquation));
 #endif
 
 	dMatrix matrix(dGetIdentityMatrix());

@@ -28,31 +28,22 @@
 class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 {
 	public:
-	//enum ndGridConstruction
-	//{
-	//	m_normalDiagonals = 0,
-	//	m_invertedDiagonals,
-	//};
-
 	D_COLLISION_API ndShapeStaticProceduralMesh(dFloat32 sizex, dFloat32 sizey, dFloat32 sizez);
 	D_COLLISION_API ndShapeStaticProceduralMesh(const nd::TiXmlNode* const xmlNode, const char* const assetPath);
 	D_COLLISION_API virtual ~ndShapeStaticProceduralMesh();
 
-	//dArray<dInt16>& GetElevationMap();
-	//const dArray<dInt16>& GetElevationMap() const;
-	//D_COLLISION_API void UpdateElevationMapAabb();
-	//void GetLocalAabb(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
 	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return this; }
 
-	protected:
+	virtual void GetCollidingFaces(const dVector& minBox, const dVector& maxBox, dArray<dVector>& vertex, dArray<dVector>& indexList) const = 0;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const = 0;
 
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
-	D_COLLISION_API virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
 
-	private: 
+	private:
+	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
+	D_COLLISION_API virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
+
 	class ndLocalThreadData
 	{
 		public:

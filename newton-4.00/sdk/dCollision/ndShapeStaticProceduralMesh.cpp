@@ -333,14 +333,17 @@ void ndShapeStaticProceduralMesh::DebugShape(const dMatrix& matrix, ndShapeDebug
 
 void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 {
-	dAssert(0);
-	//dVector boxP0;
-	//dVector boxP1;
-	//
-	////dgWorld* const world = data->m_objBody->GetWorld();
-	//
-	//// the user data is the pointer to the collision geometry
+	//dgWorld* const world = data->m_objBody->GetWorld();
+	// the user data is the pointer to the collision geometry
 	//CalculateMinExtend3d(data->GetOrigin(), data->GetTarget(), boxP0, boxP1);
+	//	const dVector q0(p0.GetMin(p1) - m_padding);
+	//	const dVector q1(p0.GetMax(p1) + scale + m_padding);
+
+	dArray<dVector> vertex;
+	dArray<dVector> indexList;
+	GetCollidingFaces(data->GetOrigin(), data->GetTarget(), vertex, indexList);
+
+
 	//boxP0 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace < dVector::m_zero);
 	//boxP1 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace > dVector::m_zero);
 	//

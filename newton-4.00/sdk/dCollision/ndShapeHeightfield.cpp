@@ -271,7 +271,6 @@ dFloat32 ndShapeHeightfield::RayCastCell(const dFastRay& ray, dInt32 xIndex0, dI
 	points[1 * 2 + 0] = dVector((xIndex0 + 0) * m_horizontalScale_x, m_verticalScale * dFloat32 (m_elevationMap[base + m_width + 0]), (zIndex0 + 1) * m_horizontalScale_z, dFloat32(0.0f));
 
 	dFloat32 t = dFloat32(1.2f);
-	//if (!m_diagonals[base]) 
 	if (m_diagonalMode == m_normalDiagonals)
 	{
 		triangle[0] = 1;
@@ -336,7 +335,6 @@ dFloat32 ndShapeHeightfield::RayCastCell(const dFastRay& ray, dInt32 xIndex0, dI
 	}
 	return t;
 }
-
 
 dFloat32 ndShapeHeightfield::RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const, ndContactPoint& contactOut) const
 {
