@@ -42,25 +42,25 @@ void ndStaticUserMeshCollisionDemo (ndDemoEntityManager* const scene)
 
 	fbxDemoEntity* const man = scene->LoadFbxMesh("whiteMan.fbx");
 
-	//dFloat32 height = 1.9f;
-	//dFloat32 radio = 0.5f;
-	//dFloat32 mass = 100.0f;
-	//new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height/4.0f, true);
+	dFloat32 height = 1.9f;
+	dFloat32 radio = 0.5f;
+	dFloat32 mass = 100.0f;
+	new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height/4.0f, true);
 	
 	location.m_posit.m_x += 8.0f;
 	location.m_posit.m_z -= 2.0f;
-	//new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height / 4.0f);
+	new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height / 4.0f);
 	
 	location.m_posit.m_z += 4.0f;
-	//new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height / 4.0f);
+	new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height / 4.0f);
 
 	AddBox(scene, dVector(10.0f, 1.0f, 0.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
-	//AddBox(scene, dVector(10.0f, 1.5f, 1.125f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
-	//AddBox(scene, dVector(10.0f, 2.0f, 1.250f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
-	//AddConvexHull(scene, dVector(8.0f, 1.0f, -3.0f, 0.0f), 10.0f, 0.6f, 1.0f, 15);
-	//AddConvexHull(scene, dVector(7.0f, 1.0f, -3.0f, 0.0f), 10.0f, 0.7f, 1.0f, 10);
-	//AddConvexHull(scene, dVector(6.0f, 1.0f, -3.0f, 0.0f), 10.0f, 0.5f, 1.2f, 6);
-	//AddCapsulesStacks(scene, dVector(45.0f, 0.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
+	AddBox(scene, dVector(10.0f, 1.5f, 1.125f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddBox(scene, dVector(10.0f, 2.0f, 1.250f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddConvexHull(scene, dVector(8.0f, 1.0f, -3.0f, 0.0f), 10.0f, 0.6f, 1.0f, 15);
+	AddConvexHull(scene, dVector(7.0f, 1.0f, -3.0f, 0.0f), 10.0f, 0.7f, 1.0f, 10);
+	AddConvexHull(scene, dVector(6.0f, 1.0f, -3.0f, 0.0f), 10.0f, 0.5f, 1.2f, 6);
+	AddCapsulesStacks(scene, dVector(45.0f, 0.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 
 	delete man;
 	dQuaternion rot;

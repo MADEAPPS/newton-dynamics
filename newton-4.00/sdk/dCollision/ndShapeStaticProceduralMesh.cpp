@@ -115,7 +115,6 @@ void ndShapeStaticProceduralMesh::CalculateLocalObb()
 //void ndShapeStaticProceduralMesh::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 void ndShapeStaticProceduralMesh::DebugShape(const dMatrix&, ndShapeDebugCallback&) const
 {
-	dAssert(0);
 	//dVector points[4];
 	//dVector triangle[3];
 	//

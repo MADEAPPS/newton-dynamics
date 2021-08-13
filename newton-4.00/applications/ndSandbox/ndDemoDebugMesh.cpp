@@ -18,6 +18,15 @@
 
 ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision)
 	:ndDemoMeshInterface()
+	,m_indexCount(0)
+	,m_shadeColorLocation(0)
+	,m_normalMatrixLocation(0)
+	,m_projectMatrixLocation(0)
+	,m_viewModelMatrixLocation(0)
+	,m_shader(0)
+	,m_vertexBuffer(0)
+	,m_vertextArrayBuffer(0)
+	,m_triangleIndexBuffer(0)
 {
 	class ndDrawShape : public ndShapeDebugCallback
 	{
@@ -70,51 +79,53 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 
 	ndDrawShape drawShapes;
 	collision->DebugShape(dGetIdentityMatrix(), drawShapes);
+	if (drawShapes.m_triangles.GetCount())
+	{
+		dArray<dInt32> m_triangles(drawShapes.m_triangles.GetCount());
+		m_triangles.SetCount(drawShapes.m_triangles.GetCount());
+		dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(glPositionNormal), 6, drawShapes.m_triangles.GetCount(), &m_triangles[0], GLfloat(1.0e-6f));
 
-	dArray<dInt32> m_triangles(drawShapes.m_triangles.GetCount());
-	m_triangles.SetCount(drawShapes.m_triangles.GetCount());
-	dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(glPositionNormal), 6, drawShapes.m_triangles.GetCount(), &m_triangles[0], GLfloat(1.0e-6f));
-	
-	m_shader = shaderCache.m_flatShaded;
-	m_indexCount = m_triangles.GetCount();
+		m_shader = shaderCache.m_flatShaded;
+		m_indexCount = m_triangles.GetCount();
 
-	m_color.m_x = 1.0f;
-	m_color.m_y = 1.0f;
-	m_color.m_z = 1.0f;
-	m_color.m_w = 1.0f;
+		m_color.m_x = 1.0f;
+		m_color.m_y = 1.0f;
+		m_color.m_z = 1.0f;
+		m_color.m_w = 1.0f;
 
-	glGenVertexArrays(1, &m_vertextArrayBuffer);
-	glBindVertexArray(m_vertextArrayBuffer);
+		glGenVertexArrays(1, &m_vertextArrayBuffer);
+		glBindVertexArray(m_vertextArrayBuffer);
 
-	glGenBuffers(1, &m_vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+		glGenBuffers(1, &m_vertexBuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
-	glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(glPositionNormal), &drawShapes.m_triangles[0].m_posit.m_x, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(glPositionNormal), &drawShapes.m_triangles[0].m_posit.m_x, GL_STATIC_DRAW);
 
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_posit));
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_posit));
 
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_normal));
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glPositionNormal), (void*)OFFSETOF(glPositionNormal, m_normal));
 
-	glGenBuffers(1, &m_triangleIndexBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * sizeof(GLuint), &m_triangles[0], GL_STATIC_DRAW);
-	
-	glBindVertexArray(0);
-	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glGenBuffers(1, &m_triangleIndexBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * sizeof(GLuint), &m_triangles[0], GL_STATIC_DRAW);
 
-	glUseProgram(m_shader);
-	m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
-	m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
-	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
-	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+		glBindVertexArray(0);
 
-	glUseProgram(0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glUseProgram(m_shader);
+		m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
+		m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+		m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+		m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+
+		glUseProgram(0);
+	}
 }
 
 ndFlatShadedDebugMesh::~ndFlatShadedDebugMesh()
@@ -129,30 +140,33 @@ ndFlatShadedDebugMesh::~ndFlatShadedDebugMesh()
 
 void ndFlatShadedDebugMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
-	glUseProgram(m_shader);
+	if (m_shader)
+	{
+		glUseProgram(m_shader);
 
-	ndDemoCamera* const camera = scene->GetCamera();
+		ndDemoCamera* const camera = scene->GetCamera();
 
-	const dMatrix& viewMatrix = camera->GetViewMatrix();
-	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
-	const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
+		const dMatrix& viewMatrix = camera->GetViewMatrix();
+		const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
+		const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
 
-	const glMatrix projMatrix(projectionMatrix);
-	const glVector4 color(m_color);
+		const glMatrix projMatrix(projectionMatrix);
+		const glVector4 color(m_color);
 
-	glUniform4fv(m_shadeColorLocation, 1, &color[0]);
-	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projMatrix[0][0]);
-	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+		glUniform4fv(m_shadeColorLocation, 1, &color[0]);
+		glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+		glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projMatrix[0][0]);
+		glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 
-	glBindVertexArray(m_vertextArrayBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
+		glBindVertexArray(m_vertextArrayBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
 
-	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
+		glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	glUseProgram(0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		glUseProgram(0);
+	}
 }
 
 ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, ndShapeDebugCallback::ndEdgeType edgeTypefilter)
