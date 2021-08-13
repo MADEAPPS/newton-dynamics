@@ -33,17 +33,18 @@ class ndCharacterPoseController;
 class ndCharacterForwardDynamicNode;
 class ndCharacterInverseDynamicNode;
 
+class ndCharacterCentreOfMassState
+{
+	public:
+	dVector m_centerOfMass;
+	dVector m_centerOfMassVeloc;
+	dFloat32 m_mass;
+};
+
+
 class ndCharacter: public ndModel
 {
 	public:
-	class ndCentreOfMassState
-	{
-		public:
-		dVector m_centerOfMass;
-		dVector m_centerOfMassVeloc;
-		dFloat32 m_mass;
-	};
-
 	D_CLASS_RELECTION(ndCharacter);
 
 	D_NEWTON_API ndCharacter();
@@ -60,7 +61,7 @@ class ndCharacter: public ndModel
 	ndCharacterPoseController* GetController() const;
 	void SetController(ndCharacterPoseController* const controller);
 
-	ndCentreOfMassState CalculateCentreOfMassState() const;
+	ndCharacterCentreOfMassState CalculateCentreOfMassState() const;
 	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 	void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
 

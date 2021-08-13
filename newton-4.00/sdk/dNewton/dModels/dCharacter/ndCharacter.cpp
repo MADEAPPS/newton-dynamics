@@ -77,7 +77,7 @@ ndCharacterEffectorNode* ndCharacter::CreateInverseDynamicEffector(const dMatrix
 	return effector;
 }
 
-ndCharacter::ndCentreOfMassState ndCharacter::CalculateCentreOfMassState() const
+ndCharacterCentreOfMassState ndCharacter::CalculateCentreOfMassState() const
 {
 	dInt32 stack = 1;
 	ndCharacterLimbNode* nodePool[32];
@@ -125,7 +125,7 @@ ndCharacter::ndCentreOfMassState ndCharacter::CalculateCentreOfMassState() const
 	//omega.m_w = dFloat32(0.0f);
 	veloc.m_w = dFloat32(0.0f);
 
-	ndCentreOfMassState state;
+	ndCharacterCentreOfMassState state;
 	state.m_mass = mass;
 	state.m_centerOfMass = com;
 	state.m_centerOfMassVeloc = veloc;

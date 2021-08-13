@@ -40,7 +40,7 @@ ndCharacterIdlePose::ndCharacterIdlePose(ndCharacterBipedPoseController* const o
 	m_stride = dFloat32(0.25f);
 }
 
-void ndCharacterIdlePose::MoveFoot(ndCharacterEffectorNode* const footEffector, dFloat32 angle)
+void ndCharacterIdlePose::MoveFoot(const ndCharacterCentreOfMassState& state, ndCharacterEffectorNode* const footEffector, dFloat32 angle)
 {
 	const dFloat32 hipHigh = dFloat32(0.03f);
 
@@ -52,39 +52,42 @@ void ndCharacterIdlePose::MoveFoot(ndCharacterEffectorNode* const footEffector, 
 	footEffector->SetTargetMatrix(posit);
 }
 
-//void ndCharacterIdlePose::BalanceCentreOfMass(dFloat32 timestep)
-void ndCharacterIdlePose::BalanceCentreOfMass(dFloat32)
-{
-	const ndCharacter* const character = m_owner->GetCharacter();
-	ndCharacter::ndCentreOfMassState state(character->CalculateCentreOfMassState());
-	const dRay supportPoint(m_owner->CalculateSupportPoint(state.m_centerOfMass));
-	dVector step(supportPoint.m_p0 - supportPoint.m_p1);
-	dFloat32 dist2 = step.DotProduct(step).GetScalar();
-	if (dist2 > D_MIN_DISTANCE_TO_SUPPORT2)
-	{
-		const ndBipedControllerConfig& config = m_owner->GetConfig();
-		const dMatrix leftFootMatrix(config.m_leftFootEffector->CalculateGlobalTargetMatrix());
-		const dMatrix rightFootMatrix(config.m_rightFootEffector->CalculateGlobalTargetMatrix());
-		dMatrix hipMatrix(character->GetRootNode()->GetBody()->GetMatrix());
-
-		dMatrix hipMatrix11(character->GetRootNode()->GetBody()->GetMatrix());
-	}
-}
+////void ndCharacterIdlePose::BalanceCentreOfMass(dFloat32 timestep)
+//void ndCharacterIdlePose::BalanceCentreOfMass(dFloat32)
+//{
+//	const ndCharacter* const character = m_owner->GetCharacter();
+//	ndCharacter::ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
+//	const dRay supportPoint(m_owner->CalculateSupportPoint(state.m_centerOfMass));
+//	dVector step(supportPoint.m_p0 - supportPoint.m_p1);
+//	dFloat32 dist2 = step.DotProduct(step).GetScalar();
+//	if (dist2 > D_MIN_DISTANCE_TO_SUPPORT2)
+//	{
+//		const ndBipedControllerConfig& config = m_owner->GetConfig();
+//		const dMatrix leftFootMatrix(config.m_leftFootEffector->CalculateGlobalTargetMatrix());
+//		const dMatrix rightFootMatrix(config.m_rightFootEffector->CalculateGlobalTargetMatrix());
+//		dMatrix hipMatrix(character->GetRootNode()->GetBody()->GetMatrix());
+//
+//		dMatrix hipMatrix11(character->GetRootNode()->GetBody()->GetMatrix());
+//	}
+//}
 
 void ndCharacterIdlePose::Update(dFloat32 timestep)
 {
 	const ndBipedControllerConfig& config = m_owner->GetConfig();
 
+	const ndCharacter* const character = m_owner->GetCharacter();
+	ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
+
 #if 1
 	// this stay up
 	if (config.m_rightFootEffector)
 	{
-		MoveFoot(config.m_rightFootEffector, m_angle + dFloat32(1.0f) * dPi);
+		MoveFoot(state, config.m_rightFootEffector, m_angle + dFloat32(1.0f) * dPi);
 	}
 
 	if (config.m_leftFootEffector)
 	{
-		MoveFoot(config.m_leftFootEffector, m_angle + dFloat32(0.0f) * dPi);
+		MoveFoot(state, config.m_leftFootEffector, m_angle + dFloat32(0.0f) * dPi);
 	}
 #else
 	// this fall ove the side
@@ -99,9 +102,7 @@ void ndCharacterIdlePose::Update(dFloat32 timestep)
 	}
 #endif
 
-	BalanceCentreOfMass(timestep);
-
-	//m_angle = dMod(m_angle + timestep * 2.0f, dFloat32(2.0f) * dPi);
 	m_angle = 20.0f * dDegreeToRad;
+m_angle = 0.0f;
 }
 

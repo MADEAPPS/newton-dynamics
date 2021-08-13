@@ -44,10 +44,10 @@
 //#define DEFAULT_SCENE	6		// setting basic player
 //#define DEFAULT_SCENE	7		// setting particle fluid
 //#define DEFAULT_SCENE	8		// static mesh collision 
-#define DEFAULT_SCENE	9		// static user mesh collision 
+//#define DEFAULT_SCENE	9		// static user mesh collision 
 //#define DEFAULT_SCENE	10		// setting basic joints
 //#define DEFAULT_SCENE	11		// setting basic rag doll
-//#define DEFAULT_SCENE	12		// setting active rag doll
+#define DEFAULT_SCENE	12		// setting active rag doll
 //#define DEFAULT_SCENE	14		// setting basic vehicle
 //#define DEFAULT_SCENE	15		// setting heavy vehicle
 //#define DEFAULT_SCENE	16		// simple voronoi fracture

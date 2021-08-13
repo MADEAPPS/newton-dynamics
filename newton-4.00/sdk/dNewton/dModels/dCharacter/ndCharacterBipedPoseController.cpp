@@ -73,7 +73,7 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 	dMatrix comMatrixInGlobalSpace(rootNode->GetLocalFrame() * hip->GetMatrix());
 	
 	// show character center of mass.
-	ndCharacter::ndCentreOfMassState state(m_owner->CalculateCentreOfMassState());
+	ndCharacterCentreOfMassState state(m_owner->CalculateCentreOfMassState());
 	comMatrixInGlobalSpace.m_posit = state.m_centerOfMass;
 	context.DrawFrame(comMatrixInGlobalSpace);
 
@@ -137,7 +137,7 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 
 bool ndCharacterBipedPoseController::Evaluate(ndWorld* const , dFloat32 timestep)
 {
-	//ndCharacter::ndCentreOfMassState comState(m_owner->CalculateCentreOfMassState());
+	//ndCharacter::ndCharacterCentreOfMassState comState(m_owner->CalculateCentreOfMassState());
 	//m_owner->UpdateGlobalPose(world, timestep);
 	//m_owner->CalculateLocalPose(world, timestep);
 
