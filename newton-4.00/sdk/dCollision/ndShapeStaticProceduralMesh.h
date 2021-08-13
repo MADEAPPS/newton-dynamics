@@ -31,25 +31,10 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	class ndEdge
 	{
 		public:
-		ndEdge()
-		{
-		}
-
-		ndEdge(dUnsigned64 key)
-			:m_key(key)
-		{
-		}
-
-		bool operator< (const ndEdge& edge) const
-		{
-			return m_key < edge.m_key;
-		}
-
-		bool operator> (const ndEdge& edge) const
-		{
-			return m_key > edge.m_key;
-		}
-
+		ndEdge();
+		ndEdge(dUnsigned64 key);
+		bool operator< (const ndEdge& edge) const;
+		bool operator> (const ndEdge& edge) const;
 		union
 		{
 			dUnsigned64 m_key;
@@ -64,10 +49,7 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	class ndEdgeMap : public dTree<dInt32, ndEdge, dContainersFreeListAlloc<dInt32>>
 	{
 		public:
-		ndEdgeMap()
-			:dTree<dInt32, ndEdge, dContainersFreeListAlloc<dInt32>>()
-		{
-		}
+		ndEdgeMap();
 	};
 
 	D_COLLISION_API ndShapeStaticProceduralMesh(dFloat32 sizex, dFloat32 sizey, dFloat32 sizez);
@@ -75,6 +57,8 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	D_COLLISION_API virtual ~ndShapeStaticProceduralMesh();
 
 	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return this; }
+
+	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const = 0;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const = 0;
 	virtual void GetCollidingFaces(const dVector& minBox, const dVector& maxBox, dArray<dVector>& vertex, dArray<dInt32>& faceList, dArray<dInt32>& faceMaterial, dArray<dInt32>& indexListList) const = 0;
 
@@ -84,7 +68,6 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 
 	private:
 	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
-	D_COLLISION_API virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 
 	class ndLocalThreadData
 	{
@@ -109,5 +92,29 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	friend class ndContactSolver;
 };
 
+
+inline ndShapeStaticProceduralMesh::ndEdge::ndEdge()
+{
+}
+
+inline ndShapeStaticProceduralMesh::ndEdge::ndEdge(dUnsigned64 key)
+	:m_key(key)
+{
+}
+
+inline bool ndShapeStaticProceduralMesh::ndEdge::operator< (const ndEdge& edge) const
+{
+	return m_key < edge.m_key;
+}
+
+inline bool ndShapeStaticProceduralMesh::ndEdge::operator> (const ndEdge& edge) const
+{
+	return m_key > edge.m_key;
+}
+
+inline ndShapeStaticProceduralMesh::ndEdgeMap::ndEdgeMap()
+	:dTree<dInt32, ndEdge, dContainersFreeListAlloc<dInt32>>()
+{
+}
 
 #endif

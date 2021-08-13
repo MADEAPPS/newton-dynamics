@@ -29,6 +29,11 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 	{
 	}
 
+	virtual void DebugShape(const dMatrix&, ndShapeDebugCallback&) const
+	{
+		// do nothing since it depends on the application implementation.
+	}
+
 	virtual dFloat32 RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32, const ndBody* const, ndContactPoint& contactOut) const
 	{
 		dVector segment(dVector::m_triplexMask & (localP1 - localP0));

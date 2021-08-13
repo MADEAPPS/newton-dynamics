@@ -159,6 +159,11 @@ class ndShapeInfo
 		dInt32 m_noUsed;
 	};
 
+	struct ndProceduralInfoInfo
+	{
+		dInt32 m_noUsed;
+	};
+
 	struct ndCollisionBvhInfo
 	{
 		dInt32 m_vertexCount;
@@ -193,6 +198,7 @@ class ndShapeInfo
 		ndCoumpoundInfo m_compound;
 		ndConvexHullInfo m_convexhull;
 		ndHeighfieldInfo m_heightfield;
+		ndProceduralInfoInfo m_procedural;
 		ndChamferCylinderInfo m_chamferCylinder;
 		
 		dFloat32 m_paramArray[32];
