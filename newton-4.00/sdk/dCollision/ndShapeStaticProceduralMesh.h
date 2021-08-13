@@ -28,6 +28,39 @@
 class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 {
 	public:
+	class ndEdge
+	{
+		public:
+		bool operator< (const ndEdge& edge) const
+		{
+			return m_key < edge.m_key;
+		}
+
+		bool operator> (const ndEdge& edge) const
+		{
+			return m_key > edge.m_key;
+		}
+
+		union
+		{
+			dUnsigned64 m_key;
+			struct
+			{
+				dInt32 m_i0;
+				dInt32 m_i1;
+			};
+		};
+	};
+
+	class ndEdgeMap : public dTree<dInt32, ndEdge, dContainersFreeListAlloc<dInt32>>
+	{
+		public:
+		ndEdgeMap()
+			:dTree<dInt32, ndEdge, dContainersFreeListAlloc<dInt32>>()
+		{
+		}
+	};
+
 	D_COLLISION_API ndShapeStaticProceduralMesh(dFloat32 sizex, dFloat32 sizey, dFloat32 sizez);
 	D_COLLISION_API ndShapeStaticProceduralMesh(const nd::TiXmlNode* const xmlNode, const char* const assetPath);
 	D_COLLISION_API virtual ~ndShapeStaticProceduralMesh();
@@ -63,7 +96,6 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	mutable dList<ndLocalThreadData> m_localData;
 	dInt32 m_maxVertexCount;
 	dInt32 m_maxFaceCount;
-
 
 	friend class ndContactSolver;
 };

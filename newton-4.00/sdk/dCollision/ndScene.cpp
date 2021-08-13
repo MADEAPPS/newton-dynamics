@@ -33,6 +33,7 @@
 #include "ndBodyTriggerVolume.h"
 #include "ndBodiesInAabbNotify.h"
 #include "ndJointBilateralConstraint.h"
+#include "ndShapeStaticProceduralMesh.h"
 
 #define D_CONTACT_DELAY_FRAMES		4
 #define D_NARROW_PHASE_DIST			dFloat32 (0.2f)
@@ -213,6 +214,7 @@ ndScene::~ndScene()
 	ndContactList::FlushFreeList();
 	ndContactPointList::FlushFreeList();
 	ndShapeCompound::ndTreeArray::FlushFreeList();
+	ndShapeStaticProceduralMesh::ndEdgeMap::FlushFreeList();
 }
 
 void ndScene::CollisionOnlyUpdate()

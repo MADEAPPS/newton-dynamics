@@ -36,7 +36,6 @@ class dTempArray : public dArray<T>
 	{
 		m_array = buffer;
 		m_capacity = maxSize;
-		//SetCount(maxSize);
 	}
 
 	~dTempArray()
@@ -113,7 +112,8 @@ void ndShapeStaticProceduralMesh::CalculateLocalObb()
 //	return &m_cellIndices[(m_diagonalMode == m_normalDiagonals) ? 0 : 1][0];
 //}
 
-void ndShapeStaticProceduralMesh::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+//void ndShapeStaticProceduralMesh::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+void ndShapeStaticProceduralMesh::DebugShape(const dMatrix&, ndShapeDebugCallback&) const
 {
 	dAssert(0);
 	//dVector points[4];
@@ -346,78 +346,94 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	dVector* const vertexBuffer = dAlloca(dVector, m_maxVertexCount);
 	dInt32* const faceBuffer = dAlloca(dInt32, m_maxFaceCount);
 	dInt32* const materialBuffer = dAlloca(dInt32, m_maxFaceCount);
-	dInt32* const indexListBuffer = dAlloca(dInt32, m_maxFaceCount * 4);
+	dInt32* const indexBuffer = dAlloca(dInt32, m_maxFaceCount * 4);
 
-	dTempArray<dVector> vertex(m_maxVertexCount, vertexBuffer);
+	dTempArray<dVector> vertexList(m_maxVertexCount, vertexBuffer);
 	dTempArray<dInt32> faceList(m_maxFaceCount, faceBuffer);
-	dTempArray<dInt32> faceMaterial(m_maxFaceCount, materialBuffer);
-	dTempArray<dInt32> indexList(m_maxFaceCount * 4, indexListBuffer);
+	dTempArray<dInt32> faceMaterialList(m_maxFaceCount, materialBuffer);
+	dTempArray<dInt32> indexList(m_maxFaceCount * 4, indexBuffer);
 
-	GetCollidingFaces(data->GetOrigin(), data->GetTarget(), vertex, faceList, faceMaterial, indexList);
+	GetCollidingFaces(data->GetOrigin(), data->GetTarget(), vertexList, faceList, faceMaterialList, indexList);
+	if (faceList.GetCount() == 0)
+	{
+		return;
+	}
 
-
-	//boxP0 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace < dVector::m_zero);
-	//boxP1 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace > dVector::m_zero);
-	//
-	//boxP0 = boxP0.Select(boxP0.GetMax(m_minBox), m_yMask);
-	//boxP1 = boxP1.Select(boxP1.GetMin(m_maxBox), m_yMask);
-	//
-	//dVector p0(boxP0.Scale(m_horizontalScaleInv_x).GetInt());
-	//dVector p1(boxP1.Scale(m_horizontalScaleInv_x).GetInt());
-	//
-	//dAssert(p0.m_ix == FastInt(boxP0.m_x * m_horizontalScaleInv_x));
-	//dAssert(p0.m_iz == FastInt(boxP0.m_z * m_horizontalScaleInv_x));
-	//dAssert(p1.m_ix == FastInt(boxP1.m_x * m_horizontalScaleInv_x));
-	//dAssert(p1.m_iz == FastInt(boxP1.m_z * m_horizontalScaleInv_x));
-	//
-	//dInt32 x0 = dInt32(p0.m_ix);
-	//dInt32 x1 = dInt32(p1.m_ix);
-	//dInt32 z0 = dInt32(p0.m_iz);
-	//dInt32 z1 = dInt32(p1.m_iz);
-	//
-	//dFloat32 minHeight = dFloat32(1.0e10f);
-	//dFloat32 maxHeight = dFloat32(-1.0e10f);
-	//data->SetSeparatingDistance(dFloat32(0.0f));
-	//CalculateMinAndMaxElevation(x0, x1, z0, z1, minHeight, maxHeight);
-	//
-	//if (!((maxHeight < boxP0.m_y) || (minHeight > boxP1.m_y))) 
-	//{
-	//	std::thread::id threadId = std::this_thread::get_id();
-	//	dList<ndLocalThreadData>::dNode* localDataNode = nullptr;
-	//	for (dList<ndLocalThreadData>::dNode* node = m_localData.GetFirst(); node; node = node->GetNext())
-	//	{
-	//		if (node->GetInfo().m_threadId == threadId)
-	//		{
-	//			localDataNode = node;
-	//			break;
-	//		}
-	//	}
-	//
-	//	if (!localDataNode)
-	//	{
-	//		localDataNode = m_localData.Append();
-	//		localDataNode->GetInfo().m_threadId = threadId;
-	//	}
-	//
+	std::thread::id threadId = std::this_thread::get_id();
+	dList<ndLocalThreadData>::dNode* localDataNode = nullptr;
+	for (dList<ndLocalThreadData>::dNode* node = m_localData.GetFirst(); node; node = node->GetNext())
+	{
+		if (node->GetInfo().m_threadId == threadId)
+		{
+			localDataNode = node;
+			break;
+		}
+	}
+	
+	if (!localDataNode)
+	{
+		localDataNode = m_localData.Append();
+		localDataNode->GetInfo().m_threadId = threadId;
+	}
+	
 	//	// scan the vertices's intersected by the box extend
 	//	dInt32 vertexCount = (z1 - z0 + 1) * (x1 - x0 + 1) + 2 * (z1 - z0) * (x1 - x0);
-	//	dArray<dVector>& vertex = localDataNode->GetInfo().m_vertex;
-	//	vertex.SetCount(vertexCount);
-	//
+	dArray<dVector>& vertex = localDataNode->GetInfo().m_vertex;
+	vertex.SetCount(vertexList.GetCount() + faceList.GetCount());
+	memcpy(&vertex[0], &vertexList[0], vertexList.GetCount() * sizeof(dVector));
+	
+	dInt32 faceStart = 0;
+	ndEdgeMap edgeMap;
+	for (dInt32 i = 0; i < faceList.GetCount(); i++)
+	{
+		dInt32 i0 = indexList[faceStart + 0];
+		dInt32 i1 = indexList[faceStart + 1];
+		dInt32 i2 = indexList[faceStart + 2];
+
+		const dVector edge0(vertex[i1] - vertex[i0]);
+		const dVector edge1(vertex[i2] - vertex[i0]);
+		const dVector normal(edge0.CrossProduct(edge1) & dVector::m_triplexMask);
+
+		dInt32 normalIndex = vertexList.GetCount() + i;
+		vertex[vertexList.GetCount() + i] = normal.Normalize();
+
+		dInt32 j0 = faceList[i] - 1;
+		for (dInt32 j = 0; j < faceList[i]; j++) 
+		{
+			ndEdge edge;
+			edge.m_i0 = indexList[faceStart + j0];
+			edge.m_i1 = indexList[faceStart + j];
+			edgeMap.Insert(normalIndex, edge);
+			j0 = j;
+		}
+		faceStart += faceList[i];
+	}
+
+	faceStart = 0;
+	for (dInt32 i = 0; i < faceList.GetCount(); i++)
+	{
+		dInt32 j0 = faceList[i] - 1;
+		for (dInt32 j = 0; j < faceList[i]; j++)
+		{
+			ndEdge edge;
+			ndEdge twin;
+			edge.m_i0 = indexList[faceStart + j0];
+			edge.m_i1 = indexList[faceStart + j];
+			twin.m_i0 = edge.m_i1;
+			twin.m_i1 = edge.m_i0;
+
+			const ndEdgeMap::dNode* const edgeNode = edgeMap.Find(edge);
+			const ndEdgeMap::dNode* const twinNode = edgeMap.Find(twin);
+
+			j0 = j;
+		}
+		faceStart += faceList[i];
+	}
+
+
 	//	dInt32 vertexIndex = 0;
 	//	dInt32 base = z0 * m_width;
-	//	for (dInt32 z = z0; z <= z1; z++) 
-	//	{
-	//		dFloat32 zVal = m_horizontalScale_z * z;
-	//		for (dInt32 x = x0; x <= x1; x++) 
-	//		{
-	//			vertex[vertexIndex] = dVector(m_horizontalScale_x * x, m_verticalScale * dFloat32(m_elevationMap[base + x]), zVal, dFloat32(0.0f));
-	//			vertexIndex++;
-	//			dAssert(vertexIndex <= vertex.GetCount());
-	//		}
-	//		base += m_width;
-	//	}
-	//
+	
 	//	dInt32 normalBase = vertexIndex;
 	//	vertexIndex = 0;
 	//	dInt32 index = 0;

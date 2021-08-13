@@ -248,6 +248,7 @@ void ndWorld::ClearCache()
 	dIsoSurface::dIsoVertexMap::FlushFreeList();
 	ndBodyKinematic::ndContactMap::FlushFreeList();
 	ndSkeletonContainer::ndNodeList::FlushFreeList();
+	ndShapeStaticProceduralMesh::ndEdgeMap::FlushFreeList();
 }
 
 void ndWorld::UpdateTransforms()

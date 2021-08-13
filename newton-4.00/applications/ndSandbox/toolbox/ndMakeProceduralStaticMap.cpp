@@ -61,15 +61,16 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 		}
 
 		// generate the face array
-		for (dInt32 iz = 0; iz <= count_z; iz++)
+		const dInt32 stride = count_x + 1;
+		for (dInt32 iz = 0; iz < count_z; iz++)
 		{
-			for (dInt32 ix = 0; ix <= count_x; ix++)
+			for (dInt32 ix = 0; ix < count_x; ix++)
 			{
 				faceList.PushBack(4);
-				indexListList.PushBack((iz + 0) * count_x + ix + 0);
-				indexListList.PushBack((iz + 1) * count_x + ix + 0);
-				indexListList.PushBack((iz + 1) * count_x + ix + 1);
-				indexListList.PushBack((iz + 0) * count_x + ix + 1);
+				indexListList.PushBack((iz + 0) * stride + ix + 0);
+				indexListList.PushBack((iz + 1) * stride + ix + 0);
+				indexListList.PushBack((iz + 1) * stride + ix + 1);
+				indexListList.PushBack((iz + 0) * stride + ix + 1);
 
 				faceMaterial.PushBack(0);
 			}
