@@ -376,8 +376,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 		localDataNode->GetInfo().m_threadId = threadId;
 	}
 	
-	//	// scan the vertices's intersected by the box extend
-	//	dInt32 vertexCount = (z1 - z0 + 1) * (x1 - x0 + 1) + 2 * (z1 - z0) * (x1 - x0);
+	// scan the vertices's intersected by the box extend
 	dArray<dVector>& vertex = localDataNode->GetInfo().m_vertex;
 	vertex.SetCount(vertexList.GetCount() + faceList.GetCount());
 	memcpy(&vertex[0], &vertexList[0], vertexList.GetCount() * sizeof(dVector));
@@ -451,7 +450,6 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 		edgeNode->GetInfo() = -1;
 	}
 
-
 	dInt32 faceCount0 = 0;
 	dInt32 faceIndexCount0 = 0;
 	dInt32 faceIndexCount1 = 0;
@@ -510,6 +508,5 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 		data->m_faceIndexCount = faceIndexCount;
 		data->m_vertexStrideInBytes = sizeof(dVector);
 	}
-	
 }
 
