@@ -34,6 +34,12 @@ ndCharacterWalkCycleGenerator::ndCharacterWalkCycleGenerator(ndCharacterBipedPos
 	m_stride = dFloat32(0.25f);
 }
 
+void ndCharacterWalkCycleGenerator::Init()
+{
+	//dAssert(0);
+	dTrace(("********** initialize walk pose\n"));
+}
+
 void ndCharacterWalkCycleGenerator::MoveFoot(ndCharacterEffectorNode* const footEffector, dFloat32 angle)
 {
 	const dFloat32 hipHigh = dFloat32(0.5f * 0.125f);

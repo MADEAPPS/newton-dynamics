@@ -25,8 +25,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacterPoseGenerator.h"
 
-class ndCharacterCentreOfMassState;
 class ndCharacterEffectorNode;
+class ndCharacterCentreOfMassState;
 class ndCharacterBipedPoseController;
 
 class ndCharacterIdlePose : public ndCharacterPoseGenerator
@@ -35,6 +35,8 @@ class ndCharacterIdlePose : public ndCharacterPoseGenerator
 	ndCharacterIdlePose(ndCharacterBipedPoseController* const owner);
 
 	protected:
+	virtual void Init();
+
 	void Update(dFloat32 timestep);
 	//void BalanceCentreOfMass(dFloat32 timestep);
 	void MoveFoot(const ndCharacterCentreOfMassState& state, ndCharacterEffectorNode* const footEffector, dFloat32 angle);
@@ -43,6 +45,7 @@ class ndCharacterIdlePose : public ndCharacterPoseGenerator
 	dFloat32 m_angle;
 	dFloat32 m_stride;
 	ndCharacterBipedPoseController* m_owner;
+	ndCharaterPose m_referencePose;
 
 	friend class ndCharacterBipedPoseController;
 };

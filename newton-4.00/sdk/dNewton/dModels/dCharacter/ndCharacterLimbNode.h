@@ -28,7 +28,11 @@
 class ndWorld;
 class ndCharacter;
 class ndLimbJoint;
+class ndCharacterRootNode;
+class ndCharacterEffectorNode;
 class ndJointBilateralConstraint;
+class ndCharacterForwardDynamicNode;
+class ndCharacterInverseDynamicNode;
 
 class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 {
@@ -40,6 +44,12 @@ class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 
 	virtual ndBodyDynamic* GetBody() const;
 	virtual ndJointBilateralConstraint* GetJoint() const;
+
+	virtual ndCharacterLimbNode* GetAsLimbNode();
+	virtual ndCharacterRootNode* GetAsRootNode();
+	virtual ndCharacterEffectorNode* GetAsEffectorNode();
+	virtual ndCharacterForwardDynamicNode* GetAsForwardDynamicNode();
+	virtual ndCharacterInverseDynamicNode* GetAsInverseDynamicNode();
 
 	virtual void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 	virtual void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
@@ -64,6 +74,35 @@ inline void ndCharacterLimbNode::UpdateGlobalPose(ndWorld* const, dFloat32)
 
 inline void ndCharacterLimbNode::CalculateLocalPose(ndWorld* const, dFloat32)
 {
+}
+
+inline ndCharacterLimbNode* ndCharacterLimbNode::GetAsLimbNode()
+{
+	return this;
+}
+
+inline ndCharacterRootNode* ndCharacterLimbNode::GetAsRootNode()
+{
+	dAssert(0);
+	return nullptr;
+}
+
+inline ndCharacterEffectorNode* ndCharacterLimbNode::GetAsEffectorNode()
+{
+	dAssert(0);
+	return nullptr;
+}
+
+inline ndCharacterInverseDynamicNode* ndCharacterLimbNode::GetAsInverseDynamicNode()
+{
+	dAssert(0);
+	return nullptr;
+}
+
+inline ndCharacterForwardDynamicNode* ndCharacterLimbNode::GetAsForwardDynamicNode()
+{
+	dAssert(0);
+	return nullptr;
 }
 
 #endif

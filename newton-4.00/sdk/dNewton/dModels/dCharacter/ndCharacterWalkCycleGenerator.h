@@ -34,6 +34,7 @@ class ndCharacterWalkCycleGenerator : public ndCharacterPoseGenerator
 	ndCharacterWalkCycleGenerator(ndCharacterBipedPoseController* const owner);
 
 	protected:
+	void Init();
 	void Update(dFloat32 timestep);
 
 	void MoveFoot(ndCharacterEffectorNode* const footEffector, dFloat32 angle);

@@ -33,11 +33,23 @@
 #define D_MIN_DISTANCE_TO_SUPPORT2 (D_MIN_DISTANCE_TO_SUPPORT * D_MIN_DISTANCE_TO_SUPPORT)
 
 ndCharacterIdlePose::ndCharacterIdlePose(ndCharacterBipedPoseController* const owner)
-	:m_owner(owner)
+	:m_angle(dFloat32(0.0f))
+	,m_high(dFloat32(0.0f))
+	,m_stride(dFloat32(0.0f))
+	,m_owner(owner)
+	,m_referencePose()
+{
+}
+
+void ndCharacterIdlePose::Init()
 {
 	m_angle = dFloat32(0.0f);
 	m_high = dFloat32(1.0f);
 	m_stride = dFloat32(0.25f);
+
+	const ndCharacter* const character = m_owner->GetCharacter();
+	ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
+
 }
 
 void ndCharacterIdlePose::MoveFoot(const ndCharacterCentreOfMassState& state, ndCharacterEffectorNode* const footEffector, dFloat32 angle)
@@ -73,6 +85,7 @@ void ndCharacterIdlePose::MoveFoot(const ndCharacterCentreOfMassState& state, nd
 
 void ndCharacterIdlePose::Update(dFloat32 timestep)
 {
+return;
 	const ndBipedControllerConfig& config = m_owner->GetConfig();
 
 	const ndCharacter* const character = m_owner->GetCharacter();

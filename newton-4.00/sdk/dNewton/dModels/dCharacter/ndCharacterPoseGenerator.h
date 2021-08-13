@@ -24,6 +24,24 @@
 
 #include "ndNewtonStdafx.h"
 
+class ndCharacterLimbNode;
+
+class ndCharaterKeyFramePose
+{
+	dFloat32 m_posit_x;
+	dFloat32 m_posit_y;
+	dFloat32 m_posit_z;
+	dFloat32 m_pitch;
+	dFloat32 m_yaw;
+	dFloat32 m_roll;
+	ndCharacterLimbNode* m_node;
+};
+
+class ndCharaterPose : public dList<ndCharaterKeyFramePose>
+{
+
+};
+
 class ndCharacterPoseGenerator
 {
 	public:
@@ -31,6 +49,7 @@ class ndCharacterPoseGenerator
 	{
 	}
 
+	virtual void Init() = 0;
 	virtual void Update(dFloat32 timestep) = 0;
 };
 #endif

@@ -44,6 +44,8 @@ void ndCharacterBipedPoseController::Init(ndCharacter* const owner, const ndBipe
 {
 	m_owner = owner;
 	m_config = config;
+	m_idleCycle.Init();
+	m_walkCycle.Init();
 }
 
 dRay ndCharacterBipedPoseController::CalculateSupportPoint(const dVector& comInGlobalSpace) const
