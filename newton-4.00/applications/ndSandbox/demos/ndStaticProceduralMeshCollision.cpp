@@ -20,10 +20,16 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 #include "ndBasicPlayerCapsule.h"
+#include "ndHeightFieldPrimitive.h"
 #include "ndMakeProceduralStaticMap.h"
+
 
 void ndStaticUserMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
+	//dMatrix heighfieldLocation(dGetIdentityMatrix());
+	//heighfieldLocation.m_posit.m_x = -200.0f;
+	//heighfieldLocation.m_posit.m_z = -200.0f;
+	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 	BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 
 	dMatrix location(dGetIdentityMatrix());
@@ -36,9 +42,9 @@ void ndStaticUserMeshCollisionDemo (ndDemoEntityManager* const scene)
 
 	fbxDemoEntity* const man = scene->LoadFbxMesh("whiteMan.fbx");
 
-	dFloat32 height = 1.9f;
-	dFloat32 radio = 0.5f;
-	dFloat32 mass = 100.0f;
+	//dFloat32 height = 1.9f;
+	//dFloat32 radio = 0.5f;
+	//dFloat32 mass = 100.0f;
 	//new ndBasicPlayerCapsule(scene, man, localAxis, location, mass, radio, height, height/4.0f, true);
 	
 	location.m_posit.m_x += 8.0f;

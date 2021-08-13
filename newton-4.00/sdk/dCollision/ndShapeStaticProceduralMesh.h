@@ -31,6 +31,15 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	class ndEdge
 	{
 		public:
+		ndEdge()
+		{
+		}
+
+		ndEdge(dUnsigned64 key)
+			:m_key(key)
+		{
+		}
+
 		bool operator< (const ndEdge& edge) const
 		{
 			return m_key < edge.m_key;

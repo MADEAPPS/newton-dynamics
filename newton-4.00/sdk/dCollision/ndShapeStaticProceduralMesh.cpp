@@ -382,137 +382,133 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	vertex.SetCount(vertexList.GetCount() + faceList.GetCount());
 	memcpy(&vertex[0], &vertexList[0], vertexList.GetCount() * sizeof(dVector));
 	
-	dInt32 faceStart = 0;
 	ndEdgeMap edgeMap;
+	dInt32 index = 0;
+	dInt32 faceStart = 0;
+	dInt32* const indices = data->m_globalFaceVertexIndex;
+	dInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
+	
 	for (dInt32 i = 0; i < faceList.GetCount(); i++)
 	{
 		dInt32 i0 = indexList[faceStart + 0];
 		dInt32 i1 = indexList[faceStart + 1];
-		dInt32 i2 = indexList[faceStart + 2];
+		dVector area(dVector::m_zero);
+		dVector edge0(vertex[i1] - vertex[i0]);
 
-		const dVector edge0(vertex[i1] - vertex[i0]);
-		const dVector edge1(vertex[i2] - vertex[i0]);
-		const dVector normal(edge0.CrossProduct(edge1) & dVector::m_triplexMask);
+		for (dInt32 j = 2; j < faceList[i]; j++)
+		{
+			dInt32 i2 = indexList[faceStart + j];
+			const dVector edge1(vertex[i2] - vertex[i0]);
+			area += edge0.CrossProduct(edge1);
+			edge0 = edge1;
+		}
 
+		dFloat32 faceSize = dSqrt(area.DotProduct(area).GetScalar());
 		dInt32 normalIndex = vertexList.GetCount() + i;
-		vertex[vertexList.GetCount() + i] = normal.Normalize();
+
+		vertex[normalIndex] = area.Scale (dFloat32 (1.0f) / faceSize);
+
+		indices[index + faceList[i] + 0] = faceMaterialList[i];
+		indices[index + faceList[i] + 1] = normalIndex;
+		indices[index + 2 * faceList[i] + 2] = dInt32(faceSize * dFloat32(0.5f));
 
 		dInt32 j0 = faceList[i] - 1;
+		faceIndexCount[i] = faceList[i];
 		for (dInt32 j = 0; j < faceList[i]; j++) 
 		{
 			ndEdge edge;
 			edge.m_i0 = indexList[faceStart + j0];
 			edge.m_i1 = indexList[faceStart + j];
-			edgeMap.Insert(normalIndex, edge);
+			dInt32 normalEntryIndex = index + j + faceList[i] + 2;
+			edgeMap.Insert(normalEntryIndex, edge);
+
+			indices[index + j] = indexList[faceStart + j];
+			indices[normalEntryIndex] = normalIndex;
+
 			j0 = j;
 		}
-
-		//dInt32* const indices = data->m_globalFaceVertexIndex;
-		//dInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
-		//faceIndexCount[faceCount] = 3;
-		//indices[index + 0 + 0] = i2;
-		//indices[index + 0 + 1] = i1;
-		//indices[index + 0 + 2] = i0;
-		//indices[index + 0 + 3] = m_atributeMap[zStep + x];
-		//indices[index + 0 + 4] = normalIndex0;
-		//indices[index + 0 + 5] = normalIndex0;
-		//indices[index + 0 + 6] = normalIndex0;
-		//indices[index + 0 + 7] = normalIndex0;
-		//indices[index + 0 + 8] = faceSize;
-		//
-		//faceIndexCount[faceCount + 1] = 3;
-		//indices[index + 9 + 0] = i1;
-		//indices[index + 9 + 1] = i2;
-		//indices[index + 9 + 2] = i3;
-		//indices[index + 9 + 3] = m_atributeMap[zStep + x];
-		//indices[index + 9 + 4] = normalIndex1;
-		//indices[index + 9 + 5] = normalIndex1;
-		//indices[index + 9 + 6] = normalIndex1;
-		//indices[index + 9 + 7] = normalIndex1;
-		//indices[index + 9 + 8] = faceSize;
-
 		faceStart += faceList[i];
+		index += faceList[i] * 2 + 3;
 	}
 
-	faceStart = 0;
-	for (dInt32 i = 0; i < faceList.GetCount(); i++)
+	ndEdgeMap::Iterator iter(edgeMap);
+	for (iter.Begin(); iter; iter++)
 	{
-		dInt32 j0 = faceList[i] - 1;
-		for (dInt32 j = 0; j < faceList[i]; j++)
+		ndEdgeMap::dNode* const edgeNode = iter.GetNode();
+		if (edgeNode->GetInfo() != -1)
 		{
-			ndEdge edge;
-			ndEdge twin;
-			edge.m_i0 = indexList[faceStart + j0];
-			edge.m_i1 = indexList[faceStart + j];
-			twin.m_i0 = edge.m_i1;
-			twin.m_i1 = edge.m_i0;
-
-			const ndEdgeMap::dNode* const edgeNode = edgeMap.Find(edge);
-			const ndEdgeMap::dNode* const twinNode = edgeMap.Find(twin);
-
-			j0 = j;
+			ndEdge twin(iter.GetKey());
+			dSwap(twin.m_i0, twin.m_i1);
+			ndEdgeMap::dNode* const twinNode = edgeMap.Find(twin);
+			if (twinNode)
+			{
+				dInt32 i0 = edgeNode->GetInfo();
+				dInt32 i1 = twinNode->GetInfo();
+				dSwap(indices[i0], indices[i1]);
+				twinNode->GetInfo() = -1;
+			}
 		}
-		faceStart += faceList[i];
+		edgeNode->GetInfo() = -1;
 	}
 
-	//	dInt32 stride = sizeof(dVector) / sizeof(dFloat32);
-	//	dInt32 faceCount0 = 0;
-	//	dInt32 faceIndexCount0 = 0;
-	//	dInt32 faceIndexCount1 = 0;
-	//
-	//	dInt32* const address = data->m_meshData.m_globalFaceIndexStart;
-	//	dFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
-	//
+
+	dInt32 faceCount0 = 0;
+	dInt32 faceIndexCount0 = 0;
+	dInt32 faceIndexCount1 = 0;
+	dInt32 stride = sizeof(dVector) / sizeof(dFloat32);
+	
+	dInt32* const address = data->m_meshData.m_globalFaceIndexStart;
+	dFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
 	if (data->m_doContinuesCollisionTest) 
 	{
 		dAssert(0);
-//		dFastRay ray(dVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
-//		for (dInt32 i = 0; i < faceCount; i++) 
-//		{
-//			const dInt32* const indexArray = &indices[faceIndexCount1];
-//			const dVector& faceNormal = vertex[indexArray[4]];
-//			dFloat32 dist = data->PolygonBoxRayDistance(faceNormal, 3, indexArray, stride, &vertex[0].m_x, ray);
-//			if (dist < dFloat32(1.0f)) 
-//			{
-//				hitDistance[faceCount0] = dist;
-//				address[faceCount0] = faceIndexCount0;
-//				memcpy(&indices[faceIndexCount0], indexArray, 9 * sizeof(dInt32));
-//				faceCount0++;
-//				faceIndexCount0 += 9;
-//			}
-//			faceIndexCount1 += 9;
-//		}
+		//dFastRay ray(dVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
+		//for (dInt32 i = 0; i < faceCount; i++) 
+		//{
+		//	const dInt32* const indexArray = &indices[faceIndexCount1];
+		//	const dVector& faceNormal = vertex[indexArray[4]];
+		//	dFloat32 dist = data->PolygonBoxRayDistance(faceNormal, 3, indexArray, stride, &vertex[0].m_x, ray);
+		//	if (dist < dFloat32(1.0f)) 
+		//	{
+		//		hitDistance[faceCount0] = dist;
+		//		address[faceCount0] = faceIndexCount0;
+		//		memcpy(&indices[faceIndexCount0], indexArray, 9 * sizeof(dInt32));
+		//		faceCount0++;
+		//		faceIndexCount0 += 9;
+		//	}
+		//	faceIndexCount1 += 9;
+		//}
 	}
 	else 
 	{
-		//dAssert(0);
-//		for (dInt32 i = 0; i < faceCount; i++) 
-//		{
-//			const dInt32* const indexArray = &indices[faceIndexCount1];
-//			const dVector& faceNormal = vertex[indexArray[4]];
-//			dFloat32 dist = data->PolygonBoxDistance(faceNormal, 3, indexArray, stride, &vertex[0].m_x);
-//			if (dist > dFloat32(0.0f)) 
-//			{
-//				hitDistance[faceCount0] = dist;
-//				address[faceCount0] = faceIndexCount0;
-//				memcpy(&indices[faceIndexCount0], indexArray, 9 * sizeof(dInt32));
-//				faceCount0++;
-//				faceIndexCount0 += 9;
-//			}
-//			faceIndexCount1 += 9;
-//		}
+		for (dInt32 i = 0; i < faceList.GetCount(); i++)
+		{
+			const dInt32 vertexCount = faceIndexCount[i];
+			const dInt32* const indexArray = &indices[faceIndexCount1];
+			const dVector& faceNormal = vertex[indexArray[vertexCount + 1]];
+			dFloat32 dist = data->PolygonBoxDistance(faceNormal, vertexCount, indexArray, stride, &vertex[0].m_x);
+			if (dist > dFloat32(0.0f)) 
+			{
+				hitDistance[faceCount0] = dist;
+				address[faceCount0] = faceIndexCount0;
+				memcpy(&indices[faceIndexCount0], indexArray, (vertexCount * 2 + 3) * sizeof(dInt32));
+				faceCount0++;
+				faceIndexCount0 += vertexCount * 2 + 3;
+			}
+			faceIndexCount1 += vertexCount * 2 + 3;
+		}
 	}
 	
-	//if (faceCount0) 
+	if (faceCount0) 
 	{
-//		// initialize the callback data structure
-//		data->m_faceCount = faceCount0;
-//		data->m_vertex = &vertex[0].m_x;
-//		data->m_faceVertexIndex = indices;
-//		data->m_faceIndexStart = address;
-//		data->m_hitDistance = hitDistance;
-//		data->m_faceIndexCount = faceIndexCount;
-//		data->m_vertexStrideInBytes = sizeof(dVector);
+		// initialize the callback data structure
+		data->m_faceCount = faceCount0;
+		data->m_vertex = &vertex[0].m_x;
+		data->m_faceVertexIndex = indices;
+		data->m_faceIndexStart = address;
+		data->m_hitDistance = hitDistance;
+		data->m_faceIndexCount = faceIndexCount;
+		data->m_vertexStrideInBytes = sizeof(dVector);
 	}
 	
 }

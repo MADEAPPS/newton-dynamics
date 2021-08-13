@@ -49,6 +49,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 		dInt32 count_x = dInt32(p1.m_x - p0.m_x);
 		dInt32 count_z = dInt32(p1.m_z - p0.m_z);
 
+		origin.m_y = 0.0f;
 		for (dInt32 iz = 0; iz <= count_z; iz++)
 		{
 			dVector point(origin);
