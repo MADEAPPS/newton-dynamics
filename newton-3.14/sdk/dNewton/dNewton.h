@@ -78,7 +78,7 @@ class dNewton: public dNewtonAlloc
 	CNEWTON_API virtual void OnContactProcess (dNewtonContactMaterial* const contactMaterial, dFloat timestep, int threadIndex) const;
 
 	CNEWTON_API void ResetTimer();
-	CNEWTON_API dLong GetTimeInMicrosenconds() const; 
+	CNEWTON_API dLong GetTimeInMicroseconds() const; 
 
 	private:
 	CNEWTON_API static void OnCollisionDestructorCallback (const NewtonWorld* const newtonWorld, const NewtonCollision* const collision);
