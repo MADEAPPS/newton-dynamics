@@ -365,7 +365,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 
 	dFloat32 angle = dFloat32(90.0f * dDegreeToRad);
 	playerMatrix = dYawMatrix(angle) * playerMatrix;
-	dVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-2.5f));
+	dVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-5.0f));
 	origin.m_y += 1.0f;
 	scene->SetCameraMatrix(playerMatrix, origin);
 }
