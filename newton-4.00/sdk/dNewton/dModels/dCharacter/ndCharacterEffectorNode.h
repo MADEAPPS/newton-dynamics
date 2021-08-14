@@ -36,7 +36,9 @@ class ndCharacterEffectorNode: public ndCharacterLimbNode
 	D_NEWTON_API ndCharacterEffectorNode(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const child, ndCharacterLimbNode* const referenceNode);
 	D_NEWTON_API virtual ~ndCharacterEffectorNode ();
 
+	virtual ndBodyDynamic* GetBody() const;
 	virtual ndJointBilateralConstraint* GetJoint() const;
+	virtual ndCharacterEffectorNode* GetAsEffectorNode();
 
 	void SetTargetMatrix(const dVector& posit);
 	dMatrix CalculateGlobalTargetMatrix() const;
@@ -51,6 +53,17 @@ class ndCharacterEffectorNode: public ndCharacterLimbNode
 inline ndJointBilateralConstraint* ndCharacterEffectorNode::GetJoint() const
 {
 	return (ndJointBilateralConstraint*)m_effector;
+}
+
+inline ndBodyDynamic* ndCharacterEffectorNode::GetBody() const
+{
+	dAssert(GetJoint()->GetBody0()->GetAsBodyDynamic() == GetParent()->GetBody());
+	return GetParent()->GetBody();
+}
+
+inline ndCharacterEffectorNode* ndCharacterEffectorNode::GetAsEffectorNode()
+{
+	return this;
 }
 
 #endif

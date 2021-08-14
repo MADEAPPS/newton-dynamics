@@ -89,7 +89,6 @@ inline ndCharacterRootNode* ndCharacterLimbNode::GetAsRootNode()
 
 inline ndCharacterEffectorNode* ndCharacterLimbNode::GetAsEffectorNode()
 {
-	dAssert(0);
 	return nullptr;
 }
 

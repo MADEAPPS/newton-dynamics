@@ -50,6 +50,21 @@ void ndCharacterIdlePose::Init()
 	const ndCharacter* const character = m_owner->GetCharacter();
 	ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
 
+	ndCharacterRootNode* const rootNode = character->GetRootNode();
+	dMatrix rootMatrix(rootNode->GetLocalFrame() * rootNode->GetBody()->GetMatrix());
+	//const dMatrix rootMatrix(rootNode->GetBody()->GetMatrix());
+	const dMatrix localRootMatrix(rootMatrix.Inverse());
+	const dVector localCom(rootMatrix.UntransformVector(state.m_centerOfMass));
+
+	const ndBipedControllerConfig& config = m_owner->GetConfig();
+	dMatrix leftFootMatrix(config.m_leftFootEffector->GetBody()->GetMatrix() * localRootMatrix);
+	dMatrix rightFootMatrix(config.m_rightFootEffector->GetBody()->GetMatrix() * localRootMatrix);
+
+	leftFootMatrix.m_posit.m_x = localCom.m_x;
+	rightFootMatrix.m_posit.m_x = localCom.m_x;
+
+	leftFootMatrix = leftFootMatrix * rootNode->GetLocalFrame();
+	rightFootMatrix = rightFootMatrix * rootNode->GetLocalFrame();
 }
 
 void ndCharacterIdlePose::MoveFoot(const ndCharacterCentreOfMassState& state, ndCharacterEffectorNode* const footEffector, dFloat32 angle)

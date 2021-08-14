@@ -94,20 +94,23 @@ ndCharacterCentreOfMassState ndCharacter::CalculateCentreOfMassState() const
 	{
 		stack--;
 		ndCharacterLimbNode* const node = nodePool[stack];
-		ndBodyDynamic* const body = node->GetBody();
-		if (body)
+		if (!node->GetAsEffectorNode())
 		{
-			dFloat32 partMass = body->GetMassMatrix().m_w;
-			mass += partMass;
-			dMatrix bodyMatrix(body->GetMatrix());
-			com += bodyMatrix.TransformVector(body->GetCentreOfMass()).Scale (partMass);
-			veloc += body->GetVelocity().Scale(partMass);
+			ndBodyDynamic* const body = node->GetBody();
+			if (body)
+			{
+				dFloat32 partMass = body->GetMassMatrix().m_w;
+				mass += partMass;
+				dMatrix bodyMatrix(body->GetMatrix());
+				com += bodyMatrix.TransformVector(body->GetCentreOfMass()).Scale(partMass);
+				veloc += body->GetVelocity().Scale(partMass);
 
-			//dMatrix inertiaPart(body->CalculateInertiaMatrix());
-			//inertia.m_front += inertiaPart.m_front;
-			//inertia.m_up += inertiaPart.m_up;
-			//inertia.m_right += inertiaPart.m_right;
-			//omega += inertiaPart.RotateVector(body->GetOmega());
+				//dMatrix inertiaPart(body->CalculateInertiaMatrix());
+				//inertia.m_front += inertiaPart.m_front;
+				//inertia.m_up += inertiaPart.m_up;
+				//inertia.m_right += inertiaPart.m_right;
+				//omega += inertiaPart.RotateVector(body->GetOmega());
+			}
 		}
 
 		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
