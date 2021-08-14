@@ -157,7 +157,7 @@ D_INLINE T AnglesAdd (T angleInRadiand1, T angleInRadiand0)
 }
 
 /// Returns the time in micro seconds since application started 
-D_CORE_API dUnsigned64 dGetTimeInMicrosenconds();
+D_CORE_API dUnsigned64 dGetTimeInMicroseconds();
 
 /// Round a 64 bit float to a 32 bit float by truncating the mantissa a 24 bit 
 /// \param dFloat64 val: 64 bit float 

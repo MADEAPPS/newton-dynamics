@@ -554,7 +554,7 @@ dInt32 ndDemoEntityManager::GetJoystickButtons(dFixSizeArray<char, 32>& axisbutt
 void ndDemoEntityManager::ResetTimer()
 {
 	dResetTimer();
-	m_microsecunds = dGetTimeInMicrosenconds ();
+	m_microsecunds = dGetTimeInMicroseconds ();
 }
 
 void ndDemoEntityManager::AddEntity(ndDemoEntity* const ent)
@@ -1186,7 +1186,7 @@ void ndDemoEntityManager::UpdatePhysics(dFloat32 timestep)
 
 dFloat32 ndDemoEntityManager::CalculateInteplationParam () const
 {
-	dUnsigned64 timeStep = dGetTimeInMicrosenconds () - m_microsecunds;		
+	dUnsigned64 timeStep = dGetTimeInMicroseconds () - m_microsecunds;		
 	dFloat32 param = (dFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
 	dAssert (param >= 0.0f);
 	if (param > 1.0f) {

@@ -38,7 +38,7 @@ dFloat64 dRoundToFloat(dFloat64 val)
 	return val1;
 }
 
-dUnsigned64 dGetTimeInMicrosenconds()
+dUnsigned64 dGetTimeInMicroseconds()
 {
 	static std::chrono::high_resolution_clock::time_point timeStampBase = std::chrono::high_resolution_clock::now();
 	std::chrono::high_resolution_clock::time_point currentTimeStamp = std::chrono::high_resolution_clock::now();

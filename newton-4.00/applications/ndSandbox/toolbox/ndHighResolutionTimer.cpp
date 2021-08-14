@@ -17,13 +17,13 @@ static dUnsigned64 m_prevTime = 0;
 
 void dResetTimer()
 {
-	m_prevTime = dGetTimeInMicrosenconds();
+	m_prevTime = dGetTimeInMicroseconds();
 }
 
 dFloat32 dGetElapsedSeconds()
 {
 	const dFloat64 TICKS2SEC = 1.0e-6f;
-	dUnsigned64 microseconds = dGetTimeInMicrosenconds();
+	dUnsigned64 microseconds = dGetTimeInMicroseconds();
 
 	dFloat32 timeStep = dFloat32 ((microseconds - m_prevTime) * TICKS2SEC);
 	m_prevTime = microseconds;

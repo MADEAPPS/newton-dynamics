@@ -665,7 +665,7 @@ void ndWorld::Load(const nd::TiXmlElement* const rootNode, const char* const ass
 
 void ndWorld::ThreadFunction()
 {
-	dUnsigned64 timeAcc = dGetTimeInMicrosenconds();
+	dUnsigned64 timeAcc = dGetTimeInMicroseconds();
 	const bool collisionUpdate = m_collisionUpdate;
 	m_inUpdate = true;
 
@@ -702,7 +702,7 @@ void ndWorld::ThreadFunction()
 	}
 	
 	m_frameIndex++;
-	m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
+	m_lastExecutionTime = (dGetTimeInMicroseconds() - timeAcc) * dFloat32(1.0e-6f);
 	CalculateAverageUpdateTime();
 }
 
