@@ -62,10 +62,6 @@ dRay ndCharacterBipedPoseController::CalculateSupportPoint(const dVector& comInG
 	const dVector p1(comInGlobalSpace + gravityDir.Scale (dFloat32 (5.0f)));
 
 	dFastRay supportSegment(p0, p1);
-//dFastRay intersectSegment(supportSegment.RayDistance(leftFootCenter, rightFootCenter));
-//dRayToRayDistance(p0, p1, leftFootCenter, rightFootCenter, points.m_p0, points.m_p1);
-//dVector intersectSegment(points.m_p1 - points.m_p0);
-//dFloat32 xxxx = dSqrt(xxxxx.DotProduct(xxxxx).GetScalar());
 	return supportSegment.RayDistance(leftFootCenter, rightFootCenter);
 }
 
@@ -87,8 +83,6 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 	ndBodyKinematic* const rightFootBody = m_config.m_rightFootEffector->GetJoint()->GetBody0();
 	const dVector leftFootCenter(leftFootBody->GetMatrix().TransformVector(leftFootBody->GetCentreOfMass()));
 	const dVector rightFootCenter(rightFootBody->GetMatrix().TransformVector(rightFootBody->GetCentreOfMass()));
-	//const dVector leftFootCenter(leftFootBody->GetMatrix().m_posit);
-	//const dVector rightFootCenter(rightFootBody->GetMatrix().m_posit);
 
 	context.DrawLine(leftFootCenter, rightFootCenter, dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(1.0f)));
 	context.DrawLine(comMatrixInGlobalSpace.m_posit, suportPoint.m_p0, dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f)));

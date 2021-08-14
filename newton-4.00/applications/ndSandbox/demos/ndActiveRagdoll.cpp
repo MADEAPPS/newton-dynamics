@@ -145,7 +145,7 @@ class ndActiveRagdollModel : public ndCharacter
 		// find the floor location 
 		dMatrix matrix(location);
 		dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		matrix.m_posit.m_y = floor.m_y + 0.1f;
+		matrix.m_posit.m_y = floor.m_y + 2.0f;
 
 		// add the root body
 		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);

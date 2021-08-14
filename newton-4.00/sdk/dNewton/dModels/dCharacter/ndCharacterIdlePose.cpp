@@ -56,8 +56,6 @@ void ndCharacterIdlePose::Init()
 	rootMatrix.m_posit = state.m_centerOfMass;
 	const dMatrix invRootMatrix(rootMatrix.Inverse());
 
-	//const dMatrix localFrame(rootNode->GetCoronalFrame());
-	//const dMatrix invLocalFrame(localFrame.Inverse());
 	const dMatrix invLocalFrame(rootNode->GetInvCoronalFrame());
 	const ndBipedControllerConfig& config = m_owner->GetConfig();
 	{
@@ -67,7 +65,7 @@ void ndCharacterIdlePose::Init()
 
 		footMatrix = footMatrix * invLocalFrame;
 		footMatrix.m_posit.m_x = dFloat32 (0.0f);
-		//footMatrix = footMatrix * localFrame;
+		footMatrix.m_posit.m_y += dFloat32(0.0125f);
 		m_referencePose.PushBack(ndCharaterKeyFramePose(effector, footMatrix));
 	}
 
@@ -78,14 +76,11 @@ void ndCharacterIdlePose::Init()
 
 		footMatrix = footMatrix * invLocalFrame;
 		footMatrix.m_posit.m_x = dFloat32(0.0f);
-		//footMatrix = footMatrix * localFrame;
+		footMatrix.m_posit.m_y += dFloat32(0.0125f);
 		m_referencePose.PushBack(ndCharaterKeyFramePose(effector, footMatrix));
 	}
 }
 
-//void ndCharacterIdlePose::MoveFoot(const ndCharacterCentreOfMassState& state, ndCharacterEffectorNode* const footEffector, dFloat32 angle)
-
-////void ndCharacterIdlePose::BalanceCentreOfMass(dFloat32 timestep)
 //void ndCharacterIdlePose::BalanceCentreOfMass(dFloat32)
 //{
 //	const ndCharacter* const character = m_owner->GetCharacter();
@@ -113,8 +108,8 @@ void ndCharacterIdlePose::SetEffectorMatrix(const dVector& localCom, const ndCha
 	ndCharacterRootNode* const rootNode = character->GetRootNode();
 	
 	dMatrix matrix(pose.m_rotation, localCom + pose.m_position);
-matrix.m_posit.m_y += 0.0125f;
-//matrix.m_posit.m_x -= 0.025f;
+	//matrix.m_posit.m_y += 0.0125f;
+	//matrix.m_posit.m_x -= 0.025f;
 
 	matrix = matrix * rootNode->GetCoronalFrame();
 	effector->SetTargetMatrix(matrix);
@@ -123,34 +118,6 @@ matrix.m_posit.m_y += 0.0125f;
 //void ndCharacterIdlePose::Update(dFloat32 timestep)
 void ndCharacterIdlePose::Update(dFloat32)
 {
-//	const ndBipedControllerConfig& config = m_owner->GetConfig();
-//	const ndCharacter* const character = m_owner->GetCharacter();
-//	ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
-
-//#if 1
-//	// this stay up
-//	if (config.m_rightFootEffector)
-//	{
-//		MoveFoot(state, config.m_rightFootEffector, m_angle + dFloat32(1.0f) * dPi);
-//	}
-//
-//	if (config.m_leftFootEffector)
-//	{
-//		MoveFoot(state, config.m_leftFootEffector, m_angle + dFloat32(0.0f) * dPi);
-//	}
-//#else
-//	// this fall ove the side
-//	if (config.m_rightFootEffector)
-//*	{
-//		MoveFoot(config.m_rightFootEffector, m_angle + dFloat32(0.0f) * dPi);
-//	}
-//
-//	if (config.m_leftFootEffector)
-//	{
-//		MoveFoot(config.m_leftFootEffector, m_angle + dFloat32(1.0f) * dPi);
-//	}
-//#endif
-//
 //	m_angle = 20.0f * dDegreeToRad;
 //m_angle = 0.0f;
 
