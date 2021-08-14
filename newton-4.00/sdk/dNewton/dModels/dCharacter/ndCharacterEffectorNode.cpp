@@ -39,16 +39,11 @@ ndCharacterEffectorNode::~ndCharacterEffectorNode()
 {
 }
 
-//void ndCharacterEffectorNode::SetTargetPosition(const dVector& posit)
-//{
-//	dAssert(0);
-//	m_effector->SetTargetPosition(posit);
-//}
-
-void ndCharacterEffectorNode::SetTargetMatrix(const dVector& posit, dFloat32 pitch, dFloat32 yaw, dFloat32 roll)
+void ndCharacterEffectorNode::SetTargetMatrix(const dMatrix& matrix)
 {
-	m_effector->SetTargetPosition(posit);
-	m_effector->SetTargetRotation(pitch, yaw, roll);
+	//m_effector->SetTargetPosition(posit);
+	//m_effector->SetTargetRotation(pitch, yaw, roll);
+	m_effector->SetTargetMatrix(matrix);
 }
 
 //dMatrix ndCharacterEffectorNode::CalculateGlobalTargetMatrix() const

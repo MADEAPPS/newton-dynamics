@@ -23,13 +23,13 @@ ndJointPid3dofActuator::ndJointPid3dofActuator(const dMatrix& pinAndPivotFrame, 
 	,m_angularDamper(dFloat32(50.0f))
 	,m_angularRegularizer(dFloat32(5.0e-3f))
 {
-	dVector euler0;
-	dVector euler1;
-	m_targetPosition = m_localMatrix1.m_posit;
-	m_referenceFrameBody1.CalcPitchYawRoll(euler0, euler1);
-	m_targetPitch = euler0.m_x;
-	m_targetYaw = euler0.m_y;
-	m_targetRoll = euler0.m_z;
+	//dVector euler0;
+	//dVector euler1;
+	//m_targetPosition = m_localMatrix1.m_posit;
+	//m_referenceFrameBody1.CalcPitchYawRoll(euler0, euler1);
+	//m_targetPitch = euler0.m_x;
+	//m_targetYaw = euler0.m_y;
+	//m_targetRoll = euler0.m_z;
 }
 
 ndJointPid3dofActuator::~ndJointPid3dofActuator()
@@ -309,8 +309,8 @@ void ndJointPid3dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-	m_localMatrix1 = dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll);
-	m_localMatrix1.m_posit = m_targetPosition;
+	//m_localMatrix1 = dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll);
+	//m_localMatrix1.m_posit = m_targetPosition;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	SubmitLinearLimits(matrix0, matrix1, desc);

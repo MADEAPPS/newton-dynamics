@@ -27,22 +27,24 @@
 
 ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body)
 	:ndCharacterLimbNode(nullptr)
-	,m_localFrame(dGetIdentityMatrix())
+	,m_coronalFrame(dGetIdentityMatrix())
+	,m_invCoronalFrame(dGetIdentityMatrix())
 	,m_gravityDir(dFloat32 (0.0f), dFloat32(-1.0f), dFloat32(0.0f), dFloat32(0.0f))
 	,m_owner(owner)
 	,m_body(body)
 {
-	SetLocalFrame(m_body->GetMatrix());
+	SetCoronalFrame(m_body->GetMatrix());
 }
 
 ndCharacterRootNode::~ndCharacterRootNode()
 {
 }
 
-void ndCharacterRootNode::SetLocalFrame(const dMatrix& frameInGlobalSpace)
+void ndCharacterRootNode::SetCoronalFrame(const dMatrix& frameInGlobalSpace)
 {
 	dMatrix matrix(m_body->GetMatrix());
-	m_localFrame = frameInGlobalSpace * matrix.Inverse();
+	m_coronalFrame = frameInGlobalSpace * matrix.Inverse();
+	m_invCoronalFrame = m_coronalFrame.Inverse();
 }
 
 void ndCharacterRootNode::UpdateGlobalPose(ndWorld* const, dFloat32)

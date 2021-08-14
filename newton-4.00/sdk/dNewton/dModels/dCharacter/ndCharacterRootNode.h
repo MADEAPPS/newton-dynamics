@@ -39,13 +39,15 @@ class ndCharacterRootNode: public ndCharacterLimbNode
 	const dVector& GetGravityDir() const;
 	void SetGravityDir(const dVector& dir);
 
-	const dMatrix& GetLocalFrame() const;
-	D_NEWTON_API void SetLocalFrame(const dMatrix& frameInGlobalSpace);
+	const dMatrix& GetCoronalFrame() const;
+	const dMatrix& GetInvCoronalFrame() const;
+	D_NEWTON_API void SetCoronalFrame(const dMatrix& sagittalFrameInGlobalSpace);
 
 	protected:
 	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 
-	dMatrix m_localFrame;
+	dMatrix m_coronalFrame;
+	dMatrix m_invCoronalFrame;
 	dVector m_gravityDir;
 	ndCharacter* m_owner;
 	ndBodyDynamic* m_body;
@@ -61,9 +63,14 @@ inline ndBodyDynamic* ndCharacterRootNode::GetBody() const
 	return m_body;
 }
 
-inline const dMatrix& ndCharacterRootNode::GetLocalFrame() const
+inline const dMatrix& ndCharacterRootNode::GetCoronalFrame() const
 {
-	return m_localFrame;
+	return m_coronalFrame;
+}
+
+inline const dMatrix& ndCharacterRootNode::GetInvCoronalFrame() const
+{
+	return m_invCoronalFrame;
 }
 
 inline const dVector& ndCharacterRootNode::GetGravityDir() const

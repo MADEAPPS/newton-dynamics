@@ -23,27 +23,3 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacterPose.h"
 
-ndCharaterKeyFramePose::ndCharaterKeyFramePose()
-	:m_x(dFloat32 (0.0f))
-	,m_y(dFloat32(0.0f))
-	,m_z(dFloat32(0.0f))
-	,m_pitch(dFloat32(0.0f))
-	,m_yaw(dFloat32(0.0f))
-	,m_roll(dFloat32(0.0f))
-	,m_node(nullptr)
-{
-}
-
-ndCharaterKeyFramePose::ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix)
-	:m_x(matrix.m_posit.m_x)
-	,m_y(matrix.m_posit.m_y)
-	,m_z(matrix.m_posit.m_z)
-	,m_node(node)
-{
-	dVector euler0;
-	dVector euler1;
-	matrix.CalcPitchYawRoll(euler0, euler1);
-	m_pitch = euler0.m_x;
-	m_yaw = euler0.m_y;
-	m_roll = euler0.m_z;
-}

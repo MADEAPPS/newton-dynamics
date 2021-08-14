@@ -153,7 +153,7 @@ class ndActiveRagdollModel : public ndCharacter
 		ndCharacterRootNode* const rootNode = CreateRoot(CreateBodyPart(scene, rootEntity, nullptr));
 		ndDemoEntity* const characterFrame = (ndDemoEntity*)entity->Find("referenceFrame");
 		dMatrix bodyFrame(characterFrame->CalculateGlobalMatrix());
-		rootNode->SetLocalFrame(bodyFrame);
+		rootNode->SetCoronalFrame(bodyFrame);
 
 		dInt32 stack = 0;
 		const dInt32 definitionCount = dInt32 (sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
@@ -238,7 +238,7 @@ class ndActiveRagdollModel : public ndCharacter
 			ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
 			if (ent->GetName() == "mixamorig:Hips") 
 			{
-				world->AddJoint(new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody()));
+				//world->AddJoint(new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody()));
 				break;
 			}
 		}

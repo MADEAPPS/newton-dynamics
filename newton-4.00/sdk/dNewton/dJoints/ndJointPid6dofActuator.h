@@ -29,6 +29,9 @@ class ndJointPid6dofActuator : public ndJointPid3dofActuator
 	dVector GetTargetPosition() const;
 	void SetTargetPosition(const dVector& posit);
 
+	dMatrix GetTargetMatrix() const;
+	void SetTargetMatrix(const dMatrix& posit);
+
 	protected:
 	virtual void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
@@ -39,12 +42,23 @@ class ndJointPid6dofActuator : public ndJointPid3dofActuator
 
 inline dVector ndJointPid6dofActuator::GetTargetPosition() const
 {
-	return m_targetPosition;
+	return m_localMatrix1.m_posit;
 }
 
 inline void ndJointPid6dofActuator::SetTargetPosition(const dVector& posit)
 {
-	m_targetPosition = posit;
+	dAssert(posit.m_w == dFloat32(1.0f));
+	m_localMatrix1.m_posit = posit;
+}
+
+inline dMatrix ndJointPid6dofActuator::GetTargetMatrix() const
+{
+	return m_localMatrix1;
+}
+
+inline void ndJointPid6dofActuator::SetTargetMatrix(const dMatrix& matrix)
+{
+	m_localMatrix1 = matrix;
 }
 
 #endif 

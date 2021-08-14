@@ -74,7 +74,7 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 	ndCharacterRootNode* const rootNode = m_owner->GetRootNode();
 	ndBodyDynamic* const hip = rootNode->GetBody();
 	
-	dMatrix comMatrixInGlobalSpace(rootNode->GetLocalFrame() * hip->GetMatrix());
+	dMatrix comMatrixInGlobalSpace(rootNode->GetCoronalFrame() * hip->GetMatrix());
 	
 	// show character center of mass.
 	ndCharacterCentreOfMassState state(m_owner->CalculateCentreOfMassState());

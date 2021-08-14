@@ -37,8 +37,9 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 	D_NEWTON_API void SetAngularSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer = dFloat32(5.0e-3f));
 
 	const dMatrix& GetReferenceMatrix() const;
-	void SetTargetRotation(dFloat32 pitch, dFloat32 yaw, dFloat32 roll);
-	void GetTargetRotation(dFloat32& pitch, dFloat32& yaw, dFloat32& roll) const;
+
+	dMatrix GetTargetRotation() const;
+	void SetTargetRotation(const dMatrix& rotation);
 
 	//D_NEWTON_API dMatrix CalculateGlobalTargetMatrix() const;
 
@@ -54,10 +55,10 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 	virtual void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
 	const dMatrix m_referenceFrameBody1;
-	dVector m_targetPosition;
-	dFloat32 m_targetPitch;
-	dFloat32 m_targetYaw;
-	dFloat32 m_targetRoll;
+	//dVector m_targetPosition;
+	//dFloat32 m_targetPitch;
+	//dFloat32 m_targetYaw;
+	//dFloat32 m_targetRoll;
 	dFloat32 m_maxConeAngle;
 	dFloat32 m_minTwistAngle;
 	dFloat32 m_maxTwistAngle;
@@ -67,18 +68,18 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 	dFloat32 m_angularRegularizer;
 };
 
-inline void ndJointPid3dofActuator::SetTargetRotation(dFloat32 pitch, dFloat32 yaw, dFloat32 roll)
+inline dMatrix ndJointPid3dofActuator::GetTargetRotation() const
 {
-	m_targetYaw = yaw;
-	m_targetRoll = roll;
-	m_targetPitch = pitch;
+	dMatrix tmp(m_localMatrix1);
+	tmp.m_posit = m_referenceFrameBody1.m_posit;
+	return tmp;
 }
 
-inline void ndJointPid3dofActuator::GetTargetRotation(dFloat32& pitch, dFloat32& yaw, dFloat32& roll) const 
+inline void ndJointPid3dofActuator::SetTargetRotation(const dMatrix& matrix)
 {
-	yaw = m_targetYaw;
-	roll = m_targetRoll;
-	pitch = m_targetPitch;
+	dMatrix tmp(matrix);
+	tmp.m_posit = m_localMatrix1.m_posit;
+	m_localMatrix1 = tmp;
 }
 
 inline const dMatrix& ndJointPid3dofActuator::GetReferenceMatrix() const

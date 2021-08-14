@@ -40,10 +40,9 @@ class ndCharacterEffectorNode: public ndCharacterLimbNode
 	virtual ndJointBilateralConstraint* GetJoint() const;
 	virtual ndCharacterEffectorNode* GetAsEffectorNode();
 
-	//void SetTargetPosition(const dVector& posit);
 	//dMatrix CalculateGlobalTargetMatrix() const;
 
-	void SetTargetMatrix(const dVector& posit, dFloat32 pitch, dFloat32 yaw, dFloat32 roll);
+	void SetTargetMatrix(const dMatrix& matrix);
 
 	protected:
 	//void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);

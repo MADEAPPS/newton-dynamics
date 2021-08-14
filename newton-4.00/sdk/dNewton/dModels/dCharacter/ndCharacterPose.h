@@ -29,15 +29,26 @@ class ndCharacterLimbNode;
 class ndCharaterKeyFramePose
 {
 	public:
-	D_NEWTON_API ndCharaterKeyFramePose();
-	D_NEWTON_API ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix);
+	ndCharaterKeyFramePose();
+	ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix);
 
-	dFloat32 m_x;
-	dFloat32 m_y;
-	dFloat32 m_z;
-	dFloat32 m_pitch;
-	dFloat32 m_yaw;
-	dFloat32 m_roll;
+	dVector m_position;
+	dQuaternion m_rotation;
 	ndCharacterLimbNode* m_node;
 };
+
+inline ndCharaterKeyFramePose::ndCharaterKeyFramePose()
+	:m_position(dVector::m_zero)
+	,m_rotation()
+	,m_node(nullptr)
+{
+}
+
+inline ndCharaterKeyFramePose::ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix)
+	:m_position(matrix.m_posit & dVector::m_triplexMask)
+	,m_rotation(matrix)
+	,m_node(node)
+{
+}
+
 #endif
