@@ -102,7 +102,7 @@ dNewton::dNewton()
 	NewtonMaterialSetCollisionCallback (m_world, defaultMaterial, defaultMaterial, OnBodiesAABBOverlap, OnContactProcess);
 
 	// add a hierarchical transform manage to update local transforms
-	dAssert (0);
+//	dAssert (0);
 //	new dNewtonTransformManager (this);
 
 	// set the timer
@@ -237,12 +237,9 @@ void dNewton::ResetTimer()
 
 	//#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
 	#ifdef __linux__
-		dAssert (0);
-		//timespec ts;
-		//clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
-		//baseCount = ts.tv_nsec / 1000;
-		//m_baseCount = dLong (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
-		m_baseCount  = 0;
+		timespec ts;
+		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
+		m_baseCount = (long long)(ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
 	#endif
 
 	#ifdef _MACOSX_VER
@@ -252,10 +249,10 @@ void dNewton::ResetTimer()
 		m_baseCount = microsecunds;
 	#endif
 
-	m_microseconds = GetTimeInMicrosenconds();
+	m_microseconds = GetTimeInMicroseconds();
 }
 
-dLong dNewton::GetTimeInMicrosenconds() const 
+dLong dNewton::GetTimeInMicroseconds() const 
 {
 	#ifdef _WIN32
 		LARGE_INTEGER count;
@@ -264,11 +261,9 @@ dLong dNewton::GetTimeInMicrosenconds() const
 		dLong ticks = count.QuadPart * LONGLONG (1000000) / m_frequency;
 		return ticks;
 	#elif defined(__linux__)
-		dAssert (0);
-        //timespec ts;
-		//clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
-		//return unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - m_baseCount;
-		return 0;
+		timespec ts;
+		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux 
+		return (long long)(ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - m_baseCount;
 	#elif defined(_MACOSX_VER)
 		timeval tp;
 		gettimeofday(&tp, NULL);
@@ -280,7 +275,7 @@ dLong dNewton::GetTimeInMicrosenconds() const
 
 dFloat dNewton::GetInterpolationParam(dFloat timestepInSecunds) const
 {
-	dLong timeStep = GetTimeInMicrosenconds () - m_microseconds;
+	dLong timeStep = GetTimeInMicroseconds () - m_microseconds;
 	dFloat param = (dFloat (timeStep) * 1.0e-6f) / timestepInSecunds;
 	return dClamp (param, dFloat(0.0f), dFloat(1.0f));
 }
@@ -305,13 +300,13 @@ void dNewton::SetNumberOfThreads(int threadCount)
 void dNewton::UpdateOffLine (dFloat timestepInSecunds)
 {
 	NewtonUpdate (m_world, timestepInSecunds);
-	m_microseconds += GetTimeInMicrosenconds ();
+	m_microseconds += GetTimeInMicroseconds ();
 }
 
 void dNewton::Update (dFloat timestepInSecunds)
 {
 	dLong timestepMicrosecunds = (dLong) (double (timestepInSecunds) * 1000000.0f);
-	dLong currentTime = GetTimeInMicrosenconds ();
+	dLong currentTime = GetTimeInMicroseconds ();
 
 	dLong nextTime = currentTime - m_microseconds;
 	int loops = 0;
@@ -326,7 +321,7 @@ void dNewton::Update (dFloat timestepInSecunds)
 void dNewton::UpdateAsync (dFloat timestepInSecunds)
 {
 	dLong timestepMicrosecunds = (dLong) (double (timestepInSecunds) * 1000000.0f);
-	dLong currentTime = GetTimeInMicrosenconds ();
+	dLong currentTime = GetTimeInMicroseconds ();
 
 	dLong nextTime = currentTime - m_microseconds;
 	int loops = 0;
