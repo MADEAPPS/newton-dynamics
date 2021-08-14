@@ -147,45 +147,45 @@ void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 	}
 }
 
-void ndCharacter::UpdateGlobalPose(ndWorld* const world, dFloat32 timestep)
-{
-	dInt32 stack = 1;
-	ndCharacterLimbNode* nodePool[32];
-	nodePool[0] = m_rootNode;
+//void ndCharacter::UpdateGlobalPose(ndWorld* const world, dFloat32 timestep)
+//{
+//	dInt32 stack = 1;
+//	ndCharacterLimbNode* nodePool[32];
+//	nodePool[0] = m_rootNode;
+//
+//	while (stack)
+//	{
+//		stack--;
+//		ndCharacterLimbNode* const node = nodePool[stack];
+//		node->UpdateGlobalPose(world, timestep);
+//
+//		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
+//		{
+//			nodePool[stack] = child;
+//			stack++;
+//		}
+//	}
+//}
 
-	while (stack)
-	{
-		stack--;
-		ndCharacterLimbNode* const node = nodePool[stack];
-		node->UpdateGlobalPose(world, timestep);
-
-		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
-		{
-			nodePool[stack] = child;
-			stack++;
-		}
-	}
-}
-
-void ndCharacter::CalculateLocalPose(ndWorld* const world, dFloat32 timestep)
-{
-	dInt32 stack = 1;
-	ndCharacterLimbNode* nodePool[32];
-	nodePool[0] = m_rootNode;
-
-	while (stack)
-	{
-		stack--;
-		ndCharacterLimbNode* const node = nodePool[stack];
-		node->CalculateLocalPose(world, timestep);
-
-		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
-		{
-			nodePool[stack] = child;
-			stack++;
-		}
-	}
-}
+//void ndCharacter::CalculateLocalPose(ndWorld* const world, dFloat32 timestep)
+//{
+//	dInt32 stack = 1;
+//	ndCharacterLimbNode* nodePool[32];
+//	nodePool[0] = m_rootNode;
+//
+//	while (stack)
+//	{
+//		stack--;
+//		ndCharacterLimbNode* const node = nodePool[stack];
+//		node->CalculateLocalPose(world, timestep);
+//
+//		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
+//		{
+//			nodePool[stack] = child;
+//			stack++;
+//		}
+//	}
+//}
 
 void ndCharacter::PostUpdate(ndWorld* const, dFloat32)
 {

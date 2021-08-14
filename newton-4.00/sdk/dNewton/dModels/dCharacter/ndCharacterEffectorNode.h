@@ -40,11 +40,13 @@ class ndCharacterEffectorNode: public ndCharacterLimbNode
 	virtual ndJointBilateralConstraint* GetJoint() const;
 	virtual ndCharacterEffectorNode* GetAsEffectorNode();
 
-	void SetTargetMatrix(const dVector& posit);
-	dMatrix CalculateGlobalTargetMatrix() const;
+	//void SetTargetPosition(const dVector& posit);
+	//dMatrix CalculateGlobalTargetMatrix() const;
+
+	void SetTargetMatrix(const dVector& posit, dFloat32 pitch, dFloat32 yaw, dFloat32 roll);
 
 	protected:
-	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
+	//void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 
 	ndJointPid6dofActuator* m_effector;
 	ndCharacterLimbNode* m_referenceNode;

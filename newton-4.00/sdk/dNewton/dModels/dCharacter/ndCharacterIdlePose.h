@@ -39,8 +39,9 @@ class ndCharacterIdlePose : public ndCharacterPoseGenerator
 	virtual void Init();
 
 	void Update(dFloat32 timestep);
-	//void BalanceCentreOfMass(dFloat32 timestep);
 	void MoveFoot(const ndCharacterCentreOfMassState& state, ndCharacterEffectorNode* const footEffector, dFloat32 angle);
+
+	void SetEffectorMatrix(const dVector& localCom, const ndCharaterKeyFramePose& pose);
 
 	dFloat32 m_high;
 	dFloat32 m_angle;

@@ -16,10 +16,6 @@
 ndJointPid3dofActuator::ndJointPid3dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
 	,m_referenceFrameBody1(m_localMatrix1)
-	,m_targetPosition(dVector::m_wOne)
-	,m_targetPitch(dFloat32 (0.0f))
-	,m_targetYaw(dFloat32(0.0f))
-	,m_targetRoll(dFloat32(0.0f))
 	,m_maxConeAngle(dFloat32(1.0e10f))
 	,m_minTwistAngle(-dFloat32(1.0e10f))
 	,m_maxTwistAngle(dFloat32(1.0e10f))
@@ -27,6 +23,13 @@ ndJointPid3dofActuator::ndJointPid3dofActuator(const dMatrix& pinAndPivotFrame, 
 	,m_angularDamper(dFloat32(50.0f))
 	,m_angularRegularizer(dFloat32(5.0e-3f))
 {
+	dVector euler0;
+	dVector euler1;
+	m_targetPosition = m_localMatrix1.m_posit;
+	m_referenceFrameBody1.CalcPitchYawRoll(euler0, euler1);
+	m_targetPitch = euler0.m_x;
+	m_targetYaw = euler0.m_y;
+	m_targetRoll = euler0.m_z;
 }
 
 ndJointPid3dofActuator::~ndJointPid3dofActuator()
@@ -294,21 +297,20 @@ void ndJointPid3dofActuator::SubmitLinearLimits(const dMatrix& matrix0, const dM
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 }
 
-dMatrix ndJointPid3dofActuator::CalculateGlobalTargetMatrix() const
-{
-	dMatrix controlMatrix(dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll));
-	controlMatrix.m_posit = m_targetPosition;
-	return controlMatrix * m_referenceFrameBody1 * m_body1->GetMatrix();
-}
+//dMatrix ndJointPid3dofActuator::CalculateGlobalTargetMatrix() const
+//{
+//	dMatrix controlMatrix(dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll));
+//	controlMatrix.m_posit = m_targetPosition;
+//	return controlMatrix * m_referenceFrameBody1 * m_body1->GetMatrix();
+//}
 
 void ndJointPid3dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-	dMatrix controlMatrix(dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll));
-	controlMatrix.m_posit = m_targetPosition;
-	m_localMatrix1 = controlMatrix * m_referenceFrameBody1;
+	m_localMatrix1 = dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll);
+	m_localMatrix1.m_posit = m_targetPosition;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	SubmitLinearLimits(matrix0, matrix1, desc);

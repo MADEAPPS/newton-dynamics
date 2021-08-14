@@ -25,6 +25,7 @@
 #include "ndBodyDynamic.h"
 #include "ndCharacterRootNode.h"
 #include "ndCharacterIdlePose.h"
+#include "ndJointPid6dofActuator.h"
 #include "ndCharacterEffectorNode.h"
 #include "ndCharacterPoseGenerator.h"
 #include "ndCharacterBipedPoseController.h"
@@ -51,38 +52,48 @@ void ndCharacterIdlePose::Init()
 	ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
 
 	ndCharacterRootNode* const rootNode = character->GetRootNode();
-	dMatrix rootMatrix(rootNode->GetLocalFrame() * rootNode->GetBody()->GetMatrix());
+	dMatrix rootMatrix(rootNode->GetBody()->GetMatrix());
 	rootMatrix.m_posit = state.m_centerOfMass;
-	const dMatrix localRootMatrix(rootMatrix.Inverse());
-	
+	const dMatrix invRootMatrix(rootMatrix.Inverse());
+
+	const dMatrix localFrame(rootNode->GetLocalFrame());
+	const dMatrix invLocalFrame(localFrame.Inverse());
 	const ndBipedControllerConfig& config = m_owner->GetConfig();
-	dMatrix leftFootMatrix(config.m_leftFootEffector->GetBody()->GetMatrix());
-	dMatrix rightFootMatrix(config.m_rightFootEffector->GetBody()->GetMatrix());
-	//leftFootMatrix.m_posit = leftFootMatrix.TransformVector(config.m_leftFootEffector->GetBody()->GetCentreOfMass());
-	//rightFootMatrix.m_posit = rightFootMatrix.TransformVector(config.m_rightFootEffector->GetBody()->GetCentreOfMass());
-	leftFootMatrix = leftFootMatrix * localRootMatrix;
-	rightFootMatrix = rightFootMatrix * localRootMatrix;
+	{
+		ndCharacterEffectorNode* const effector = config.m_leftFootEffector;
+		ndJointPid6dofActuator* const joint = ((ndJointPid6dofActuator*)effector->GetJoint());
+		dMatrix footMatrix(joint->GetReferenceMatrix() * joint->GetBody1()->GetMatrix() * invRootMatrix);
 
-	leftFootMatrix.m_posit.m_x = dFloat32 (0.0f);
-	rightFootMatrix.m_posit.m_x = dFloat32(0.0f);
+		footMatrix = footMatrix * invLocalFrame;
+		footMatrix.m_posit.m_x = dFloat32 (0.0f);
+		footMatrix = footMatrix * localFrame;
+		m_referencePose.PushBack(ndCharaterKeyFramePose(effector, footMatrix));
+	}
 
-	leftFootMatrix = leftFootMatrix * rootNode->GetLocalFrame();
-	rightFootMatrix = rightFootMatrix * rootNode->GetLocalFrame();
+	{
+		ndCharacterEffectorNode* const effector = config.m_rightFootEffector;
+		ndJointPid6dofActuator* const joint = ((ndJointPid6dofActuator*)effector->GetJoint());
+		dMatrix footMatrix(joint->GetReferenceMatrix() * joint->GetBody1()->GetMatrix() * invRootMatrix);
 
-	m_referencePose.PushBack(ndCharaterKeyFramePose(config.m_leftFootEffector, leftFootMatrix));
-	m_referencePose.PushBack(ndCharaterKeyFramePose(config.m_rightFootEffector, rightFootMatrix));
+		footMatrix = footMatrix * invLocalFrame;
+		footMatrix.m_posit.m_x = dFloat32(0.0f);
+		footMatrix = footMatrix * localFrame;
+		m_referencePose.PushBack(ndCharaterKeyFramePose(effector, footMatrix));
+	}
 }
 
-void ndCharacterIdlePose::MoveFoot(const ndCharacterCentreOfMassState& state, ndCharacterEffectorNode* const footEffector, dFloat32 angle)
+//void ndCharacterIdlePose::MoveFoot(const ndCharacterCentreOfMassState& state, ndCharacterEffectorNode* const footEffector, dFloat32 angle)
+void ndCharacterIdlePose::MoveFoot(const ndCharacterCentreOfMassState&, ndCharacterEffectorNode* const, dFloat32)
 {
-	const dFloat32 hipHigh = dFloat32(0.03f);
-
-	dFloat32 y = hipHigh;
-	angle = dMod(angle, dFloat32(2.0f) * dPi);
-	dFloat32 x = m_stride * dSin(angle);
-
-	dVector posit (x, y, dFloat32(0.0f), dFloat32(1.0f));
-	footEffector->SetTargetMatrix(posit);
+	dAssert(0);
+	//const dFloat32 hipHigh = dFloat32(0.03f);
+	//
+	//dFloat32 y = hipHigh;
+	//angle = dMod(angle, dFloat32(2.0f) * dPi);
+	//dFloat32 x = m_stride * dSin(angle);
+	//
+	//dVector posit (x, y, dFloat32(0.0f), dFloat32(1.0f));
+	//footEffector->SetTargetMatrix(posit);
 }
 
 ////void ndCharacterIdlePose::BalanceCentreOfMass(dFloat32 timestep)
@@ -104,38 +115,59 @@ void ndCharacterIdlePose::MoveFoot(const ndCharacterCentreOfMassState& state, nd
 //	}
 //}
 
-void ndCharacterIdlePose::Update(dFloat32 timestep)
+void ndCharacterIdlePose::SetEffectorMatrix(const dVector& localCom, const ndCharaterKeyFramePose& pose)
 {
-	const ndBipedControllerConfig& config = m_owner->GetConfig();
+	ndCharacterEffectorNode* const effector = pose.m_node->GetAsEffectorNode();
+	dAssert(effector);
+
+	//dMatrix matrix(dPitchMatrix(pose.m_pitch) * dPitchMatrix(pose.m_yaw) * dPitchMatrix(pose.m_roll));
+	//matrix.m_posit = localCom + dVector(pose.m_x, pose.m_y, pose.m_z, dFloat32(0.0f));
+	dVector posit(localCom + dVector(pose.m_x, pose.m_y, pose.m_z, dFloat32(0.0f)));
+posit.m_x -= 0.025f;
+	effector->SetTargetMatrix(posit, pose.m_pitch, pose.m_yaw, pose.m_roll);
+}
+
+//void ndCharacterIdlePose::Update(dFloat32 timestep)
+void ndCharacterIdlePose::Update(dFloat32)
+{
+//	const ndBipedControllerConfig& config = m_owner->GetConfig();
+//	const ndCharacter* const character = m_owner->GetCharacter();
+//	ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
+
+//#if 1
+//	// this stay up
+//	if (config.m_rightFootEffector)
+//	{
+//		MoveFoot(state, config.m_rightFootEffector, m_angle + dFloat32(1.0f) * dPi);
+//	}
+//
+//	if (config.m_leftFootEffector)
+//	{
+//		MoveFoot(state, config.m_leftFootEffector, m_angle + dFloat32(0.0f) * dPi);
+//	}
+//#else
+//	// this fall ove the side
+//	if (config.m_rightFootEffector)
+//*	{
+//		MoveFoot(config.m_rightFootEffector, m_angle + dFloat32(0.0f) * dPi);
+//	}
+//
+//	if (config.m_leftFootEffector)
+//	{
+//		MoveFoot(config.m_leftFootEffector, m_angle + dFloat32(1.0f) * dPi);
+//	}
+//#endif
+//
+//	m_angle = 20.0f * dDegreeToRad;
+//m_angle = 0.0f;
 
 	const ndCharacter* const character = m_owner->GetCharacter();
 	ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
 
-#if 1
-	// this stay up
-	if (config.m_rightFootEffector)
-	{
-		MoveFoot(state, config.m_rightFootEffector, m_angle + dFloat32(1.0f) * dPi);
-	}
+	ndCharacterRootNode* const rootNode = character->GetRootNode();
+	dVector localCom (rootNode->GetBody()->GetMatrix().UntransformVector(state.m_centerOfMass));
 
-	if (config.m_leftFootEffector)
-	{
-		MoveFoot(state, config.m_leftFootEffector, m_angle + dFloat32(0.0f) * dPi);
-	}
-#else
-	// this fall ove the side
-	if (config.m_rightFootEffector)
-*	{
-		MoveFoot(config.m_rightFootEffector, m_angle + dFloat32(0.0f) * dPi);
-	}
-
-	if (config.m_leftFootEffector)
-	{
-		MoveFoot(config.m_leftFootEffector, m_angle + dFloat32(1.0f) * dPi);
-	}
-#endif
-
-	m_angle = 20.0f * dDegreeToRad;
-m_angle = 0.0f;
+	SetEffectorMatrix(localCom, m_referencePose[0]);
+	SetEffectorMatrix(localCom, m_referencePose[1]);
 }
 

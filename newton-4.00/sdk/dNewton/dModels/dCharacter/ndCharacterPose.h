@@ -32,9 +32,9 @@ class ndCharaterKeyFramePose
 	D_NEWTON_API ndCharaterKeyFramePose();
 	D_NEWTON_API ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix);
 
-	dFloat32 m_posit_x;
-	dFloat32 m_posit_y;
-	dFloat32 m_posit_z;
+	dFloat32 m_x;
+	dFloat32 m_y;
+	dFloat32 m_z;
 	dFloat32 m_pitch;
 	dFloat32 m_yaw;
 	dFloat32 m_roll;

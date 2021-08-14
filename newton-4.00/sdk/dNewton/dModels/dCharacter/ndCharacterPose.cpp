@@ -24,9 +24,9 @@
 #include "ndCharacterPose.h"
 
 ndCharaterKeyFramePose::ndCharaterKeyFramePose()
-	:m_posit_x(dFloat32 (0.0f))
-	,m_posit_y(dFloat32(0.0f))
-	,m_posit_z(dFloat32(0.0f))
+	:m_x(dFloat32 (0.0f))
+	,m_y(dFloat32(0.0f))
+	,m_z(dFloat32(0.0f))
 	,m_pitch(dFloat32(0.0f))
 	,m_yaw(dFloat32(0.0f))
 	,m_roll(dFloat32(0.0f))
@@ -35,9 +35,9 @@ ndCharaterKeyFramePose::ndCharaterKeyFramePose()
 }
 
 ndCharaterKeyFramePose::ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix)
-	:m_posit_x(matrix.m_posit.m_x)
-	,m_posit_y(matrix.m_posit.m_y)
-	,m_posit_z(matrix.m_posit.m_z)
+	:m_x(matrix.m_posit.m_x)
+	,m_y(matrix.m_posit.m_y)
+	,m_z(matrix.m_posit.m_z)
 	,m_node(node)
 {
 	dVector euler0;

@@ -62,8 +62,8 @@ class ndCharacter: public ndModel
 	void SetController(ndCharacterPoseController* const controller);
 
 	ndCharacterCentreOfMassState CalculateCentreOfMassState() const;
-	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
-	void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
+	//void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
+	//void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
 
 	protected:
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;

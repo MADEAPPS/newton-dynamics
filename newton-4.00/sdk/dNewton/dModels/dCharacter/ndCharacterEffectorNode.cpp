@@ -39,19 +39,26 @@ ndCharacterEffectorNode::~ndCharacterEffectorNode()
 {
 }
 
-void ndCharacterEffectorNode::SetTargetMatrix(const dVector& posit)
+//void ndCharacterEffectorNode::SetTargetPosition(const dVector& posit)
+//{
+//	dAssert(0);
+//	m_effector->SetTargetPosition(posit);
+//}
+
+void ndCharacterEffectorNode::SetTargetMatrix(const dVector& posit, dFloat32 pitch, dFloat32 yaw, dFloat32 roll)
 {
 	m_effector->SetTargetPosition(posit);
+	m_effector->SetTargetRotation(pitch, yaw, roll);
 }
 
-dMatrix ndCharacterEffectorNode::CalculateGlobalTargetMatrix() const
-{
-	return m_effector->CalculateGlobalTargetMatrix();
-}
+//dMatrix ndCharacterEffectorNode::CalculateGlobalTargetMatrix() const
+//{
+//	return m_effector->CalculateGlobalTargetMatrix();
+//}
 
-void ndCharacterEffectorNode::UpdateGlobalPose(ndWorld* const, dFloat32)
-{
-	// for now just; 
-	//ndBodyDynamic* const body = m_effector->GetBody0()->GetAsBodyDynamic();
-	//m_globalPose = body->GetMatrix();
-}
+//void ndCharacterEffectorNode::UpdateGlobalPose(ndWorld* const, dFloat32)
+//{
+//	// for now just; 
+//	//ndBodyDynamic* const body = m_effector->GetBody0()->GetAsBodyDynamic();
+//	//m_globalPose = body->GetMatrix();
+//}
