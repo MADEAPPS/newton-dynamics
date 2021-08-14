@@ -19,37 +19,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CHARACTER_IDLE_POSE_H__
-#define __D_CHARACTER_IDLE_POSE_H__
+#ifndef __D_CHARACTER_POSE_H__
+#define __D_CHARACTER_POSE_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndCharacterPose.h"
-#include "ndCharacterPoseGenerator.h"
 
-class ndCharacterEffectorNode;
-class ndCharacterCentreOfMassState;
-class ndCharacterBipedPoseController;
+class ndCharacterLimbNode;
 
-class ndCharacterIdlePose : public ndCharacterPoseGenerator
+class ndCharaterKeyFramePose
 {
 	public:
-	ndCharacterIdlePose(ndCharacterBipedPoseController* const owner);
+	D_NEWTON_API ndCharaterKeyFramePose();
+	D_NEWTON_API ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix);
 
-	protected:
-	virtual void Init();
-
-	void Update(dFloat32 timestep);
-	//void BalanceCentreOfMass(dFloat32 timestep);
-	void MoveFoot(const ndCharacterCentreOfMassState& state, ndCharacterEffectorNode* const footEffector, dFloat32 angle);
-
-	dFloat32 m_high;
-	dFloat32 m_angle;
-	dFloat32 m_stride;
-	ndCharacterBipedPoseController* m_owner;
-	dFixSizeArray<ndCharaterKeyFramePose, 2> m_referencePose;
-
-	friend class ndCharacterBipedPoseController;
+	dFloat32 m_posit_x;
+	dFloat32 m_posit_y;
+	dFloat32 m_posit_z;
+	dFloat32 m_pitch;
+	dFloat32 m_yaw;
+	dFloat32 m_roll;
+	ndCharacterLimbNode* m_node;
 };
-
-
 #endif

@@ -19,37 +19,31 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CHARACTER_IDLE_POSE_H__
-#define __D_CHARACTER_IDLE_POSE_H__
-
+#include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndCharacterPose.h"
-#include "ndCharacterPoseGenerator.h"
 
-class ndCharacterEffectorNode;
-class ndCharacterCentreOfMassState;
-class ndCharacterBipedPoseController;
-
-class ndCharacterIdlePose : public ndCharacterPoseGenerator
+ndCharaterKeyFramePose::ndCharaterKeyFramePose()
+	:m_posit_x(dFloat32 (0.0f))
+	,m_posit_y(dFloat32(0.0f))
+	,m_posit_z(dFloat32(0.0f))
+	,m_pitch(dFloat32(0.0f))
+	,m_yaw(dFloat32(0.0f))
+	,m_roll(dFloat32(0.0f))
+	,m_node(nullptr)
 {
-	public:
-	ndCharacterIdlePose(ndCharacterBipedPoseController* const owner);
+}
 
-	protected:
-	virtual void Init();
-
-	void Update(dFloat32 timestep);
-	//void BalanceCentreOfMass(dFloat32 timestep);
-	void MoveFoot(const ndCharacterCentreOfMassState& state, ndCharacterEffectorNode* const footEffector, dFloat32 angle);
-
-	dFloat32 m_high;
-	dFloat32 m_angle;
-	dFloat32 m_stride;
-	ndCharacterBipedPoseController* m_owner;
-	dFixSizeArray<ndCharaterKeyFramePose, 2> m_referencePose;
-
-	friend class ndCharacterBipedPoseController;
-};
-
-
-#endif
+ndCharaterKeyFramePose::ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix)
+	:m_posit_x(matrix.m_posit.m_x)
+	,m_posit_y(matrix.m_posit.m_y)
+	,m_posit_z(matrix.m_posit.m_z)
+	,m_node(node)
+{
+	dVector euler0;
+	dVector euler1;
+	matrix.CalcPitchYawRoll(euler0, euler1);
+	m_pitch = euler0.m_x;
+	m_yaw = euler0.m_y;
+	m_roll = euler0.m_z;
+}

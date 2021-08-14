@@ -52,8 +52,10 @@ dRay ndCharacterBipedPoseController::CalculateSupportPoint(const dVector& comInG
 {
 	ndBodyKinematic* const leftFootBody = m_config.m_leftFootEffector->GetJoint()->GetBody0();
 	ndBodyKinematic* const rightFootBody = m_config.m_rightFootEffector->GetJoint()->GetBody0();
-	const dVector leftFootCenter(leftFootBody->GetMatrix().TransformVector(leftFootBody->GetCentreOfMass()));
-	const dVector rightFootCenter(rightFootBody->GetMatrix().TransformVector(rightFootBody->GetCentreOfMass()));
+	//const dVector leftFootCenter(leftFootBody->GetMatrix().TransformVector(leftFootBody->GetCentreOfMass()));
+	//const dVector rightFootCenter(rightFootBody->GetMatrix().TransformVector(rightFootBody->GetCentreOfMass()));
+	const dVector leftFootCenter(leftFootBody->GetMatrix().m_posit);
+	const dVector rightFootCenter(rightFootBody->GetMatrix().m_posit);
 
 	const dVector gravityDir(m_owner->GetRootNode()->GetGravityDir());
 	const dVector p0(comInGlobalSpace);
@@ -83,8 +85,10 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 	
 	ndBodyKinematic* const leftFootBody = m_config.m_leftFootEffector->GetJoint()->GetBody0();
 	ndBodyKinematic* const rightFootBody = m_config.m_rightFootEffector->GetJoint()->GetBody0();
-	const dVector leftFootCenter(leftFootBody->GetMatrix().TransformVector(leftFootBody->GetCentreOfMass()));
-	const dVector rightFootCenter(rightFootBody->GetMatrix().TransformVector(rightFootBody->GetCentreOfMass()));
+	//const dVector leftFootCenter(leftFootBody->GetMatrix().TransformVector(leftFootBody->GetCentreOfMass()));
+	//const dVector rightFootCenter(rightFootBody->GetMatrix().TransformVector(rightFootBody->GetCentreOfMass()));
+	const dVector leftFootCenter(leftFootBody->GetMatrix().m_posit);
+	const dVector rightFootCenter(rightFootBody->GetMatrix().m_posit);
 
 	context.DrawLine(leftFootCenter, rightFootCenter, dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(1.0f)));
 	context.DrawLine(comMatrixInGlobalSpace.m_posit, suportPoint.m_p0, dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f)));

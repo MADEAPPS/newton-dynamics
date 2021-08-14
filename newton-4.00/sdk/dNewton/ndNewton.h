@@ -58,6 +58,7 @@
 #include <ndShapeInstance.h>
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
+#include <ndCharacterPose.h>
 #include <ndDynamicsUpdate.h>
 #include <ndBodyParticleSet.h>
 #include <ndJointFollowPath.h>

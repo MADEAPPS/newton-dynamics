@@ -52,19 +52,25 @@ void ndCharacterIdlePose::Init()
 
 	ndCharacterRootNode* const rootNode = character->GetRootNode();
 	dMatrix rootMatrix(rootNode->GetLocalFrame() * rootNode->GetBody()->GetMatrix());
-	//const dMatrix rootMatrix(rootNode->GetBody()->GetMatrix());
+	rootMatrix.m_posit = state.m_centerOfMass;
 	const dMatrix localRootMatrix(rootMatrix.Inverse());
-	const dVector localCom(rootMatrix.UntransformVector(state.m_centerOfMass));
-
+	
 	const ndBipedControllerConfig& config = m_owner->GetConfig();
-	dMatrix leftFootMatrix(config.m_leftFootEffector->GetBody()->GetMatrix() * localRootMatrix);
-	dMatrix rightFootMatrix(config.m_rightFootEffector->GetBody()->GetMatrix() * localRootMatrix);
+	dMatrix leftFootMatrix(config.m_leftFootEffector->GetBody()->GetMatrix());
+	dMatrix rightFootMatrix(config.m_rightFootEffector->GetBody()->GetMatrix());
+	//leftFootMatrix.m_posit = leftFootMatrix.TransformVector(config.m_leftFootEffector->GetBody()->GetCentreOfMass());
+	//rightFootMatrix.m_posit = rightFootMatrix.TransformVector(config.m_rightFootEffector->GetBody()->GetCentreOfMass());
+	leftFootMatrix = leftFootMatrix * localRootMatrix;
+	rightFootMatrix = rightFootMatrix * localRootMatrix;
 
-	leftFootMatrix.m_posit.m_x = localCom.m_x;
-	rightFootMatrix.m_posit.m_x = localCom.m_x;
+	leftFootMatrix.m_posit.m_x = dFloat32 (0.0f);
+	rightFootMatrix.m_posit.m_x = dFloat32(0.0f);
 
 	leftFootMatrix = leftFootMatrix * rootNode->GetLocalFrame();
 	rightFootMatrix = rightFootMatrix * rootNode->GetLocalFrame();
+
+	m_referencePose.PushBack(ndCharaterKeyFramePose(config.m_leftFootEffector, leftFootMatrix));
+	m_referencePose.PushBack(ndCharaterKeyFramePose(config.m_rightFootEffector, rightFootMatrix));
 }
 
 void ndCharacterIdlePose::MoveFoot(const ndCharacterCentreOfMassState& state, ndCharacterEffectorNode* const footEffector, dFloat32 angle)
@@ -100,7 +106,6 @@ void ndCharacterIdlePose::MoveFoot(const ndCharacterCentreOfMassState& state, nd
 
 void ndCharacterIdlePose::Update(dFloat32 timestep)
 {
-return;
 	const ndBipedControllerConfig& config = m_owner->GetConfig();
 
 	const ndCharacter* const character = m_owner->GetCharacter();
