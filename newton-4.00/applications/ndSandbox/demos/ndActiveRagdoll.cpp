@@ -145,7 +145,7 @@ class ndActiveRagdollModel : public ndCharacter
 		// find the floor location 
 		dMatrix matrix(location);
 		dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-		matrix.m_posit.m_y = floor.m_y + 2.0f;
+		matrix.m_posit.m_y = floor.m_y + 0.0f;
 
 		// add the root body
 		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);
@@ -352,12 +352,17 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(ragdoll);
 
 	matrix.m_posit.m_x += 2.0f;
+	matrix.m_posit.m_y += 2.0f;
+	ndBodyKinematic* const reckingBall = AddSphere(scene, matrix.m_posit, 25.0f, 0.25f);
+	reckingBall->SetVelocity(dVector(-5.0f, 0.0f, 0.0f, 0.0f));
+
+
+	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_z -= 2.0f;
 	//scene->GetWorld()->AddModel(new ndActiveRagdollModel(scene, ragdollMesh, matrix));
 
 	matrix.m_posit.m_z = 2.0f;
 	//scene->GetWorld()->AddModel(new ndActiveRagdollModel(scene, ragdollMesh, matrix));
-
 	delete ragdollMesh;
 
 	origin1.m_x += 20.0f;
