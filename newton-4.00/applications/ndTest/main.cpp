@@ -131,7 +131,7 @@ void BuildPyramid(ndWorld& world, dFloat32 mass, const dVector& origin, const dV
 	matrix.m_posit.m_w = 1.0f;
 
 	world.Sync();
-ndShapeInstance xxx(new ndShapeSphere(1.0f));
+	ndShapeInstance xxx(new ndShapeSphere(1.0f));
 	ndShapeInstance box(new ndShapeBox(size.m_x, size.m_y, size.m_z));
 
 	dVector floor(FindFloor(world, dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
@@ -148,8 +148,8 @@ ndShapeInstance xxx(new ndShapeSphere(1.0f));
 	//dFloat32 y0 = matrix.m_posit.m_y + stepy / 2.0f;
 	dFloat32 z0 = matrix.m_posit.m_z - stepz * count / 2;
 
-z0 = 0.0f;
-count = 1;
+	z0 = 0.0f;
+	count = 1;
 	for (int j = 0; j < count; j++) 
 	{
 		matrix.m_posit.m_z = z0;
@@ -184,14 +184,8 @@ void BuildSphere(ndWorld& world, dFloat32 mass, const dVector& origin, const dFl
 	dVector floor(FindFloor(world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f;
 
-matrix.m_posit.m_y += xxxx;
+	matrix.m_posit.m_y += xxxx;
 
-	// get the dimension from shape itself
-	//dVector minP(0.0f);
-	//dVector maxP(0.0f);
-	//sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
-
-//count = 1;
 	for (int i = 0; i < count; i++)
 	{
 		ndBodyDynamic* const body = new ndBodyDynamic();
