@@ -353,8 +353,8 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 
 	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_y += 2.0f;
-	ndBodyKinematic* const reckingBall = AddSphere(scene, matrix.m_posit, 25.0f, 0.25f);
-	reckingBall->SetVelocity(dVector(-5.0f, 0.0f, 0.0f, 0.0f));
+	//ndBodyKinematic* const reckingBall = AddSphere(scene, matrix.m_posit, 25.0f, 0.25f);
+	//reckingBall->SetVelocity(dVector(-5.0f, 0.0f, 0.0f, 0.0f));
 
 
 	matrix.m_posit.m_x += 2.0f;
