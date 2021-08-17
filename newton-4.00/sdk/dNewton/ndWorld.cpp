@@ -1160,8 +1160,7 @@ void ndWorld::SaveBodies(nd::TiXmlNode* const rootNode, const char* const assetP
 			const ndBodyKinematic* const body = it.GetKey();
 
 			dInt32 shapeId = shapesMap.Find(body->GetCollisionShape().GetShape())->GetInfo();
-			dAssert(0);
-			//body->Save(bodiesNode, assetPath, shapeId, nodeId);
+			body->Save(bodiesNode, assetPath, shapeId, nodeId);
 		}
 	}
 }
@@ -1196,7 +1195,7 @@ void ndWorld::SaveScene(const char* const path)
 
 	SaveSceneSetting(worldNode);
 	SaveCollisionShapes(worldNode, assetPath, shapeMap);
-	//SaveBodies(worldNode, assetPath, shapeMap, bodyMap);
+	SaveBodies(worldNode, assetPath, shapeMap, bodyMap);
 
 	asciifile.SaveFile(path);
 	setlocale(LC_ALL, oldloc);

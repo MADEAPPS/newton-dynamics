@@ -23,13 +23,8 @@
 #include "ndHeightFieldPrimitive.h"
 #include "ndMakeProceduralStaticMap.h"
 
-
 void ndStaticUserMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
-	//dMatrix heighfieldLocation(dGetIdentityMatrix());
-	//heighfieldLocation.m_posit.m_x = -200.0f;
-	//heighfieldLocation.m_posit.m_z = -200.0f;
-	//BuildHeightFieldTerrain(scene, heighfieldLocation);
 	BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 
 	dMatrix location(dGetIdentityMatrix());

@@ -510,16 +510,15 @@ dFloat32 ndShapeInstance::CalculateBuoyancyCenterOfPresure(dVector& com, const d
 	return volume;
 }
 
-void ndShapeInstance::Save(nd::TiXmlElement* const rootNode, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+void ndShapeInstance::Save(nd::TiXmlElement* const rootNode, dInt32 shapeNodeId) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeInstance");
 	rootNode->LinkEndChild(paramNode);
 
-	dAssert(shapesCache.Find(m_shape));
 	xmlSaveParam(paramNode, "localMatrix", m_localMatrix);
 	xmlSaveParam(paramNode, "aligmentMatrix", m_aligmentMatrix);
 	xmlSaveParam(paramNode, "scale", m_scale);
-	xmlSaveParam(paramNode, "shapeNodeId", dInt32 (shapesCache.Find(m_shape)->GetInfo()));
+	xmlSaveParam(paramNode, "shapeNodeId", shapeNodeId);
 
 	xmlSaveParam(paramNode, "skinThickness", m_skinThickness);
 	xmlSaveParam(paramNode, "collisionMode", m_collisionMode ? 1 : 0);

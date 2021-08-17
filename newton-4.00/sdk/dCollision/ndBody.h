@@ -40,6 +40,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndBody: public dClassAlloc
 {
 	public:
+	D_CLASS_RELECTION(ndBody);
 	D_COLLISION_API ndBody();
 	D_COLLISION_API ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache);
 	D_COLLISION_API virtual ~ndBody();
@@ -70,13 +71,13 @@ class ndBody: public dClassAlloc
 	D_COLLISION_API dMatrix GetMatrix() const;
 	D_COLLISION_API void SetMatrix(const dMatrix& matrix);
 	D_COLLISION_API dQuaternion GetRotation() const;
-	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId) const;
+	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId, dInt32 bodyId) const;
 
 	D_COLLISION_API dVector GetVelocityAtPoint(const dVector& point) const;
 
 	protected:
 	D_COLLISION_API static const nd::TiXmlNode* FindNode(const nd::TiXmlNode* const rootNode, const char* const name);
-	D_COLLISION_API virtual nd::TiXmlElement* CreateRootElement(nd::TiXmlElement* const rootNode, const char* const name, dInt32 nodeid) const;
+
 	virtual void AttachContact(ndContact* const) {}
 	virtual void DetachContact(ndContact* const) {}
 	virtual ndContact* FindContact(const ndBody* const) const { return nullptr; }

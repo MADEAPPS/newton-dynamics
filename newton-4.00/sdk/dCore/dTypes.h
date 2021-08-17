@@ -253,7 +253,7 @@ typedef double dFloat64;
 #endif
 
 #define D_CLASS_RELECTION(Class)	\
-	virtual const char* ClassName() const {return #Class;} 
+	D_CORE_API static const char* ClassName() {return #Class;} 
 
 #ifdef D_NEWTON_USE_DOUBLE
 	union dFloatSign

@@ -547,16 +547,15 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 	}
 }
 
-void ndBodyKinematic::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId) const
+void ndBodyKinematic::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId, dInt32 bodyId) const
 {
-	ndBody::Save(rootNode, assetPath, shapeId);
-	dAssert(0);
-	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyKinematic", nodeid);
-	//
-	//ndBody::Save(paramNode, assetPath, nodeid, shapesCache);
-	//
-	//m_shapeInstance.Save(paramNode, shapesCache);
-	//xmlSaveParam(paramNode, "invMass", m_invMass.m_w);
-	//dVector invInertia(m_invMass & dVector::m_triplexMask);
-	//xmlSaveParam(paramNode, "invPrincipalInertia", invInertia);
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement(ClassName());
+	rootNode->LinkEndChild(paramNode);
+
+	ndBody::Save(paramNode, assetPath, shapeId, bodyId);
+
+	m_shapeInstance.Save(paramNode, shapeId);
+	xmlSaveParam(paramNode, "invMass", m_invMass.m_w);
+	dVector invInertia(m_invMass & dVector::m_triplexMask);
+	xmlSaveParam(paramNode, "invPrincipalInertia", invInertia);
 }

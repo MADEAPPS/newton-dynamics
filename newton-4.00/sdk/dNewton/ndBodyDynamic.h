@@ -42,6 +42,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndBodyDynamic: public ndBodyKinematic
 {
 	public:
+	D_CLASS_RELECTION(ndBodyDynamic);
 	D_NEWTON_API ndBodyDynamic();
 	D_NEWTON_API ndBodyDynamic(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache);
 	D_NEWTON_API virtual ~ndBodyDynamic ();
@@ -51,7 +52,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API virtual void AddDampingAcceleration(dFloat32 timestep);
 	D_NEWTON_API virtual void IntegrateVelocity(dFloat32 timestep);
 
-	D_NEWTON_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId) const;
+	D_NEWTON_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId, dInt32 bodyId) const;
 
 	D_NEWTON_API void SetForce(const dVector& force);
 	D_NEWTON_API void SetTorque(const dVector& torque);

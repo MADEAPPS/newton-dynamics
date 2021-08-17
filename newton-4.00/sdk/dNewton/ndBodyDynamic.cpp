@@ -232,10 +232,11 @@ void ndBodyDynamic::IntegrateGyroSubstep(const dVector& timestep)
 	}
 }
 
-void ndBodyDynamic::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId) const
+void ndBodyDynamic::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId, dInt32 bodyId) const
 {
-	ndBodyKinematic::Save(rootNode, assetPath, shapeId);
-	dAssert(0);
-	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyDynamic", nodeid);
-	//ndBodyKinematic::Save(paramNode, assetPath, nodeid, shapesCache);
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement(ClassName());
+	rootNode->LinkEndChild(paramNode);
+	ndBodyKinematic::Save(paramNode, assetPath, shapeId, bodyId);
+
+	xmlSaveParam(paramNode, "dampCoef", m_dampCoef);
 }
