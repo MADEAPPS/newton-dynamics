@@ -153,12 +153,13 @@ ndBasicPlayerCapsule::~ndBasicPlayerCapsule()
 	}
 }
 
-void ndBasicPlayerCapsule::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+void ndBasicPlayerCapsule::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId) const
 {
-	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBasicPlayerCapsule", nodeid);
-	ndBodyPlayerCapsule::Save(paramNode, assetPath, nodeid, shapesCache);
-
-	xmlSaveParam(paramNode, "isPlayer", m_isPlayer ? 1 : 0);
+	dAssert(0);
+	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBasicPlayerCapsule", nodeid);
+	//ndBodyPlayerCapsule::Save(paramNode, assetPath, nodeid, shapesCache);
+	//
+	//xmlSaveParam(paramNode, "isPlayer", m_isPlayer ? 1 : 0);
 }
 
 void ndBasicPlayerCapsule::ApplyInputs(dFloat32 timestep)

@@ -58,9 +58,9 @@ ndBodyParticleSet::~ndBodyParticleSet()
 {
 }
 
-void ndBodyParticleSet::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+void ndBodyParticleSet::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId) const
 {
 	dAssert(0);
-	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyParticleSet", nodeid);
-	ndBody::Save(paramNode, assetPath, nodeid, shapesCache);
+	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyParticleSet", nodeid);
+	//ndBody::Save(paramNode, assetPath, nodeid, shapesCache);
 }

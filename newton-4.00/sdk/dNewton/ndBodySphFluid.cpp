@@ -74,11 +74,11 @@ ndBodySphFluid::~ndBodySphFluid()
 {
 }
 
-void ndBodySphFluid::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+void ndBodySphFluid::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId) const
 {
 	dAssert(0);
-	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodySphFluid", nodeid);
-	ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
+	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodySphFluid", nodeid);
+	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
 }
 
 void ndBodySphFluid::AddParticle(const dFloat32, const dVector& position, const dVector&)

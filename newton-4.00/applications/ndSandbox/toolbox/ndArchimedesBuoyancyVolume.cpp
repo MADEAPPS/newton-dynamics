@@ -131,14 +131,15 @@ void ndArchimedesBuoyancyVolume::OnTriggerExit(ndBodyKinematic* const, dFloat32)
 	//dTrace(("exit trigger body: %d\n", body->GetId()));
 }
 
-void ndArchimedesBuoyancyVolume::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+void ndArchimedesBuoyancyVolume::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId) const
 {
-	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndArchimedesBuoyancyVolume", nodeid);
-	ndBodyTriggerVolume::Save(paramNode, assetPath, nodeid, shapesCache);
-
-	xmlSaveParam(paramNode, "planeNormal", m_plane);
-	xmlSaveParam(paramNode, "planeDist", m_plane.m_w);
-	xmlSaveParam(paramNode, "density", m_density);
-	xmlSaveParam(paramNode, "hasPlane", m_hasPlane ? 1 : 0);
+	dAssert(0);
+	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndArchimedesBuoyancyVolume", nodeid);
+	//ndBodyTriggerVolume::Save(paramNode, assetPath, nodeid, shapesCache);
+	//
+	//xmlSaveParam(paramNode, "planeNormal", m_plane);
+	//xmlSaveParam(paramNode, "planeDist", m_plane.m_w);
+	//xmlSaveParam(paramNode, "density", m_density);
+	//xmlSaveParam(paramNode, "hasPlane", m_hasPlane ? 1 : 0);
 }
 

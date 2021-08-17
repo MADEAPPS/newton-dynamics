@@ -39,7 +39,7 @@ class ndBodyTriggerVolume : public ndBodyKinematic
 	virtual void OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep);
 	virtual void OnTriggerExit(ndBodyKinematic* const body, dFloat32 timestep);
 
-	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
+	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId) const;
 
 	private:
 	virtual void IntegrateExternalForce(dFloat32 timestep);

@@ -156,18 +156,20 @@ nd::TiXmlElement* ndBody::CreateRootElement(nd::TiXmlElement* const rootNode, co
 	return paramNode;
 }
 
-void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>&) const
+//void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>&) const
+void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32) const
 {
-	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBody", nodeid);
-	xmlSaveParam(paramNode, "matrix", m_matrix);
-	xmlSaveParam(paramNode, "veloc", m_veloc);
-	xmlSaveParam(paramNode, "omega", m_omega);
-	xmlSaveParam(paramNode, "centreOfMass", m_localCentreOfMass);
-	xmlSaveParam(paramNode, "autoSleep", m_autoSleep ? 1 : 0);
+	dAssert(0);
+	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBody", nodeid);
+	//xmlSaveParam(paramNode, "matrix", m_matrix);
+	//xmlSaveParam(paramNode, "veloc", m_veloc);
+	//xmlSaveParam(paramNode, "omega", m_omega);
+	//xmlSaveParam(paramNode, "centreOfMass", m_localCentreOfMass);
+	//xmlSaveParam(paramNode, "autoSleep", m_autoSleep ? 1 : 0);
 	//xmlSaveParam(paramNode, "collideWithLinkedBodies", m_collideWithLinkedBodies ? 1 : 0);
-
-	if (m_notifyCallback)
-	{
-		m_notifyCallback->Save(paramNode, assetPath);
-	}
+	//
+	//if (m_notifyCallback)
+	//{
+	//	m_notifyCallback->Save(paramNode, assetPath);
+	//}
 }

@@ -232,8 +232,10 @@ void ndBodyDynamic::IntegrateGyroSubstep(const dVector& timestep)
 	}
 }
 
-void ndBodyDynamic::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+void ndBodyDynamic::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId) const
 {
-	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyDynamic", nodeid);
-	ndBodyKinematic::Save(paramNode, assetPath, nodeid, shapesCache);
+	ndBodyKinematic::Save(rootNode, assetPath, shapeId);
+	dAssert(0);
+	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyDynamic", nodeid);
+	//ndBodyKinematic::Save(paramNode, assetPath, nodeid, shapesCache);
 }

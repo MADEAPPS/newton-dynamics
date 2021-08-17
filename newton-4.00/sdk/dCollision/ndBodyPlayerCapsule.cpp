@@ -147,23 +147,24 @@ ndBodyPlayerCapsule::~ndBodyPlayerCapsule()
 {
 }
 
-void ndBodyPlayerCapsule::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+void ndBodyPlayerCapsule::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId) const
 {
-	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyPlayerCapsule", nodeid);
-	ndBodyKinematic::Save(paramNode, assetPath, nodeid, shapesCache);
-
-	xmlSaveParam(paramNode, "localFrame", m_localFrame);
-	xmlSaveParam(paramNode, "mass", m_mass);
-	xmlSaveParam(paramNode, "m_raheight", m_height);
-	xmlSaveParam(paramNode, "height", m_height);
-	xmlSaveParam(paramNode, "radius", m_radius);
-	xmlSaveParam(paramNode, "headingAngle", m_headingAngle);
-	xmlSaveParam(paramNode, "stepHeight", m_stepHeight);
-	xmlSaveParam(paramNode, "weistScale", m_weistScale);
-	xmlSaveParam(paramNode, "crouchScale", m_crouchScale);
-	xmlSaveParam(paramNode, "isAirbone", m_isAirbone ? 1 : 0);
-	xmlSaveParam(paramNode, "isOnFloor", m_isOnFloor ? 1 : 0);
-	xmlSaveParam(paramNode, "isCrouched", m_isCrouched ? 1 : 0);
+	dAssert(0);
+	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyPlayerCapsule", nodeid);
+	//ndBodyKinematic::Save(paramNode, assetPath, nodeid, shapesCache);
+	//
+	//xmlSaveParam(paramNode, "localFrame", m_localFrame);
+	//xmlSaveParam(paramNode, "mass", m_mass);
+	//xmlSaveParam(paramNode, "m_raheight", m_height);
+	//xmlSaveParam(paramNode, "height", m_height);
+	//xmlSaveParam(paramNode, "radius", m_radius);
+	//xmlSaveParam(paramNode, "headingAngle", m_headingAngle);
+	//xmlSaveParam(paramNode, "stepHeight", m_stepHeight);
+	//xmlSaveParam(paramNode, "weistScale", m_weistScale);
+	//xmlSaveParam(paramNode, "crouchScale", m_crouchScale);
+	//xmlSaveParam(paramNode, "isAirbone", m_isAirbone ? 1 : 0);
+	//xmlSaveParam(paramNode, "isOnFloor", m_isOnFloor ? 1 : 0);
+	//xmlSaveParam(paramNode, "isCrouched", m_isCrouched ? 1 : 0);
 }
 
 void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactSolver, dFloat32 timestep)

@@ -40,8 +40,9 @@ ndBodyTriggerVolume::~ndBodyTriggerVolume()
 {
 }
 
-void ndBodyTriggerVolume::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+void ndBodyTriggerVolume::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId) const
 {
-	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyTriggerVolume", nodeid);
-	ndBodyKinematic::Save(paramNode, assetPath, nodeid, shapesCache);
+	dAssert(0);
+	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyTriggerVolume", nodeid);
+	//ndBodyKinematic::Save(paramNode, assetPath, nodeid, shapesCache);
 }

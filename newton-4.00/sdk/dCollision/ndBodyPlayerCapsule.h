@@ -73,7 +73,7 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 	void IntegrateVelocity(dFloat32 timestep);
 
 	protected: 
-	D_COLLISION_API void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
+	D_COLLISION_API void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId) const;
 
 	dMatrix m_localFrame;
 	dVector m_impulse;
