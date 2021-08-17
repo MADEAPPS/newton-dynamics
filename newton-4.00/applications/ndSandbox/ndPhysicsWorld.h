@@ -30,6 +30,8 @@ class ndPhysicsWorld: public ndWorld
 
 	void QueueBodyForDelete(ndBody* const body);
 
+	virtual void SaveSceneSetting(nd::TiXmlNode* const rootNode);
+
 	private:
 	void OnPostUpdate(dFloat32 timestep);
 	ndBody* LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath) const;

@@ -426,243 +426,6 @@ dInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const jo
 	return 0;
 }
 
-void ndWorld::Save(const char* const path) const
-{
-	char* const oldloc = setlocale(LC_ALL, 0);
-	setlocale(LC_ALL, "C");
-
-	nd::TiXmlDocument asciifile;
-	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
-	asciifile.LinkEndChild(decl);
-
-	nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
-	asciifile.LinkEndChild(worldNode);
-
-	char assetPath[1024];
-	strcpy(assetPath, path);
-
-	char* name = strrchr(assetPath, '/');
-	if (!name)
-	{
-		name = strrchr(assetPath, '\\');
-	}
-	if (!name)
-	{
-		name = assetPath;
-	}
-
-	char* ext = strrchr(name, '.');
-	if (!ext)
-	{
-		ext = name;
-	}
-	ext[0] = 0;
-#if (defined(WIN32) || defined(_WIN32))
-	_mkdir(assetPath);
-#else
-	mkdir(assetPath, S_IRWXU);
-#endif
-
-	Save(worldNode, assetPath);
-
-	asciifile.SaveFile(path);
-	setlocale(LC_ALL, oldloc);
-}
-
-void ndWorld::Save(nd::TiXmlElement* const worldNode, const char* const assetPath) const
-{
-	nd::TiXmlElement* const config = new nd::TiXmlElement("settings");
-	worldNode->LinkEndChild(config);
-
-	xmlSaveParam(config, "description", "string", "Newton Dynamics 4.00");
-	xmlSaveParam(config, "revision", "string", "1.00");
-	xmlSaveParam(config, "solverSubsteps", m_subSteps);
-	xmlSaveParam(config, "solverIterations", m_solverIterations);
-
-	dInt32 shapesCount = 0;
-	dTree<dUnsigned32, const ndShape*> uniqueShapes;
-	const ndBodyList& bodyList = GetBodyList();
-	for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
-	{
-		ndBodyKinematic* const body = bodyNode->GetInfo();
-		ndShape* const shape = body->GetCollisionShape().GetShape();
-		if (!uniqueShapes.Find(shape))
-		{
-			uniqueShapes.Insert(shapesCount, shape);
-			shapesCount++;
-		}
-	}
-
-	if (uniqueShapes.GetCount())
-	{
-		nd::TiXmlElement* const shapesNode = new nd::TiXmlElement("ndShapes");
-		worldNode->LinkEndChild(shapesNode);
-
-		dTree<dUnsigned32, const ndShape*>::Iterator it(uniqueShapes);
-		for (it.Begin(); it; it ++)
-		{
-			dInt32 nodeId = *it;
-			const ndShape* const shape = it.GetKey();
-			shape->Save(shapesNode, assetPath, nodeId);
-		}
-	}
-
-	if (bodyList.GetCount())
-	{
-		dInt32 bodyIndex = 0;
-		nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("ndBodies");
-		worldNode->LinkEndChild(bodiesNode);
-
-		for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
-		{
-			ndBodyKinematic* const body = bodyNode->GetInfo();
-			body->Save(bodiesNode, assetPath, bodyIndex, uniqueShapes);
-			bodyIndex++;
-		}
-	}
-}
-
-void ndWorld::Load(const char* const path)
-{
-	char* const oldloc = setlocale(LC_ALL, 0);
-	setlocale(LC_ALL, "C");
-
-	nd::TiXmlDocument doc(path);
-	doc.LoadFile();
-	dAssert(!doc.Error());
-
-	const nd::TiXmlElement* const rootNode = doc.RootElement();
-	if (doc.FirstChild("ndWorld"))
-	{
-		char assetPath[1024];
-		strcpy(assetPath, path);
-
-		char* name = strrchr(assetPath, '/');
-		if (!name)
-		{
-			name = strrchr(assetPath, '\\');
-		}
-		if (!name)
-		{
-			name = assetPath;
-		}
-
-		char* ext = strrchr(name, '.');
-		if (!ext)
-		{
-			ext = name;
-		}
-		ext[0] = 0;
-
-		Load(rootNode, assetPath);
-	}
-
-	setlocale(LC_ALL, oldloc);
-}
-
-void ndWorld::LoadSettings(const nd::TiXmlNode* const)
-{
-	//const nd::TiXmlNode* const settings = rootNode->FirstChild("settings");
-	//dAssert(settings);
-}
-
-void ndWorld::LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath)
-{
-	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndShapes");
-	dAssert(shapes);
-
-	for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
-	{
-		ndShape* shape = nullptr;
-		const char* const name = node->Value();
-		if (!strcmp(name, "ndShapeBox"))
-		{
-			shape = new ndShapeBox(node);
-		}
-		else if (!strcmp(name, "ndShapeSphere"))
-		{
-			shape = new ndShapeSphere(node);
-		}
-		else if (!strcmp(name, "ndShapeCapsule"))
-		{
-			shape = new ndShapeCapsule(node);
-		}
-		else if (!strcmp(name, "ndShapeConvexHull"))
-		{
-			shape = new ndShapeConvexHull(node);
-		}
-		else if (!strcmp(name, "ndShapeStatic_bvh"))
-		{
-			shape = new ndShapeStatic_bvh(node, assetPath);
-		}
-		else
-		{
-			dAssert(0);
-		}
-		if (shape)
-		{
-			dInt32 shapeId;
-			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-			element->Attribute("nodeId", &shapeId);
-			shapesCache.Insert(shape->AddRef(), shapeId);
-		}
-	}
-}
-
-void ndWorld::LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath)
-{
-	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndBodies");
-	dAssert(shapes);
-
-	for (const nd::TiXmlNode* parentNode = shapes->FirstChild(); parentNode; parentNode = parentNode->NextSibling())
-	{
-		ndBody* body = nullptr;
-		const char* const bodyClassName = parentNode->Value();
-		if (!strcmp(bodyClassName, "ndBodyDynamic"))
-		{
-			body = new ndBodyDynamic(parentNode, shapesCache);
-		}
-		else if (!strcmp(bodyClassName, "ndBodyTriggerVolume"))
-		{
-			body = new ndBodyTriggerVolume(parentNode, shapesCache);
-		}
-		else if (!strcmp(bodyClassName, "ndBodyPlayerCapsule"))
-		{
-			body = new ndBodyPlayerCapsule(parentNode, shapesCache);
-		}
-		else
-		{
-			body = LoadUserDefinedBody(parentNode, bodyClassName, shapesCache, assetPath);
-		}
-		if (body)
-		{
-			AddBody(body);
-		}
-	}
-}
-
-ndBody* ndWorld::LoadUserDefinedBody(const nd::TiXmlNode* const, const char* const, dTree<const ndShape*, dUnsigned32>&, const char* const) const
-{
-	dAssert(0);
-	return nullptr;
-}
-
-void ndWorld::Load(const nd::TiXmlElement* const rootNode, const char* const assetPath)
-{
-	dTree<const ndShape*, dUnsigned32> uniqueShapes;
-
-	LoadSettings(rootNode);
-	LoadShapes(rootNode, uniqueShapes, assetPath);
-	LoadBodies(rootNode, uniqueShapes, assetPath);
-
-	while (uniqueShapes.GetRoot())
-	{
-		const ndShape* const shape = uniqueShapes.GetRoot()->GetInfo();
-		shape->Release();
-		uniqueShapes.Remove(uniqueShapes.GetRoot());
-	}
-}
-
 void ndWorld::ThreadFunction()
 {
 	dUnsigned64 timeAcc = dGetTimeInMicroseconds();
@@ -1164,4 +927,313 @@ bool ndWorld::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& co
 void ndWorld::BodiesInAabb(ndBodiesInAabbNotify& callback) const
 {
 	m_scene->BodiesInAabb(callback);
+}
+
+#if 0
+
+void ndWorld::Load(const char* const path)
+{
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+
+	nd::TiXmlDocument doc(path);
+	doc.LoadFile();
+	dAssert(!doc.Error());
+
+	const nd::TiXmlElement* const rootNode = doc.RootElement();
+	if (doc.FirstChild("ndWorld"))
+	{
+		char assetPath[1024];
+		strcpy(assetPath, path);
+
+		char* name = strrchr(assetPath, '/');
+		if (!name)
+		{
+			name = strrchr(assetPath, '\\');
+		}
+		if (!name)
+		{
+			name = assetPath;
+		}
+
+		char* ext = strrchr(name, '.');
+		if (!ext)
+		{
+			ext = name;
+		}
+		ext[0] = 0;
+
+		Load(rootNode, assetPath);
+	}
+
+	setlocale(LC_ALL, oldloc);
+}
+
+void ndWorld::LoadSettings(const nd::TiXmlNode* const)
+{
+	//const nd::TiXmlNode* const settings = rootNode->FirstChild("settings");
+	//dAssert(settings);
+}
+
+void ndWorld::LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath)
+{
+	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndShapes");
+	dAssert(shapes);
+
+	for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
+	{
+		ndShape* shape = nullptr;
+		const char* const name = node->Value();
+		if (!strcmp(name, "ndShapeBox"))
+		{
+			shape = new ndShapeBox(node);
+		}
+		else if (!strcmp(name, "ndShapeSphere"))
+		{
+			shape = new ndShapeSphere(node);
+		}
+		else if (!strcmp(name, "ndShapeCapsule"))
+		{
+			shape = new ndShapeCapsule(node);
+		}
+		else if (!strcmp(name, "ndShapeConvexHull"))
+		{
+			shape = new ndShapeConvexHull(node);
+		}
+		else if (!strcmp(name, "ndShapeStatic_bvh"))
+		{
+			shape = new ndShapeStatic_bvh(node, assetPath);
+		}
+		else
+		{
+			dAssert(0);
+		}
+		if (shape)
+		{
+			dInt32 shapeId;
+			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+			element->Attribute("nodeId", &shapeId);
+			shapesCache.Insert(shape->AddRef(), shapeId);
+		}
+	}
+}
+
+void ndWorld::LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath)
+{
+	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndBodies");
+	dAssert(shapes);
+
+	for (const nd::TiXmlNode* parentNode = shapes->FirstChild(); parentNode; parentNode = parentNode->NextSibling())
+	{
+		ndBody* body = nullptr;
+		const char* const bodyClassName = parentNode->Value();
+		if (!strcmp(bodyClassName, "ndBodyDynamic"))
+		{
+			body = new ndBodyDynamic(parentNode, shapesCache);
+		}
+		else if (!strcmp(bodyClassName, "ndBodyTriggerVolume"))
+		{
+			body = new ndBodyTriggerVolume(parentNode, shapesCache);
+		}
+		else if (!strcmp(bodyClassName, "ndBodyPlayerCapsule"))
+		{
+			body = new ndBodyPlayerCapsule(parentNode, shapesCache);
+		}
+		else
+		{
+			body = LoadUserDefinedBody(parentNode, bodyClassName, shapesCache, assetPath);
+		}
+		if (body)
+		{
+			AddBody(body);
+		}
+	}
+}
+
+ndBody* ndWorld::LoadUserDefinedBody(const nd::TiXmlNode* const, const char* const, dTree<const ndShape*, dUnsigned32>&, const char* const) const
+{
+	dAssert(0);
+	return nullptr;
+}
+
+void ndWorld::Load(const nd::TiXmlElement* const rootNode, const char* const assetPath)
+{
+	dTree<const ndShape*, dUnsigned32> uniqueShapes;
+
+	LoadSettings(rootNode);
+	LoadShapes(rootNode, uniqueShapes, assetPath);
+	LoadBodies(rootNode, uniqueShapes, assetPath);
+
+	while (uniqueShapes.GetRoot())
+	{
+		const ndShape* const shape = uniqueShapes.GetRoot()->GetInfo();
+		shape->Release();
+		uniqueShapes.Remove(uniqueShapes.GetRoot());
+	}
+}
+#endif
+
+
+//void ndWorld::Save(const char* const path) const
+//{
+//	char* const oldloc = setlocale(LC_ALL, 0);
+//	setlocale(LC_ALL, "C");
+//
+//	nd::TiXmlDocument asciifile;
+//	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
+//	asciifile.LinkEndChild(decl);
+//
+//	nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
+//	asciifile.LinkEndChild(worldNode);
+//
+//	char assetPath[1024];
+//	strcpy(assetPath, path);
+//
+//	char* name = strrchr(assetPath, '/');
+//	if (!name)
+//	{
+//		name = strrchr(assetPath, '\\');
+//	}
+//	if (!name)
+//	{
+//		name = assetPath;
+//	}
+//
+//	char* ext = strrchr(name, '.');
+//	if (!ext)
+//	{
+//		ext = name;
+//	}
+//	ext[0] = 0;
+//#if (defined(WIN32) || defined(_WIN32))
+//	_mkdir(assetPath);
+//#else
+//	mkdir(assetPath, S_IRWXU);
+//#endif
+//
+//	Save(worldNode, assetPath);
+//
+//	asciifile.SaveFile(path);
+//	setlocale(LC_ALL, oldloc);
+//}
+
+//void ndWorld::Save(nd::TiXmlElement* const worldNode, const char* const assetPath) const
+//{
+//	nd::TiXmlElement* const config = new nd::TiXmlElement("settings");
+//	worldNode->LinkEndChild(config);
+//
+//	xmlSaveParam(config, "description", "string", "Newton Dynamics 4.00");
+//	xmlSaveParam(config, "revision", "string", "1.00");
+//	xmlSaveParam(config, "solverSubsteps", m_subSteps);
+//	xmlSaveParam(config, "solverIterations", m_solverIterations);
+//
+//	dInt32 shapesCount = 0;
+//	dTree<dUnsigned32, const ndShape*> uniqueShapes;
+//	const ndBodyList& bodyList = GetBodyList();
+//	for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+//	{
+//		ndBodyKinematic* const body = bodyNode->GetInfo();
+//		ndShape* const shape = body->GetCollisionShape().GetShape();
+//		if (!uniqueShapes.Find(shape))
+//		{
+//			uniqueShapes.Insert(shapesCount, shape);
+//			shapesCount++;
+//		}
+//	}
+//
+//	if (uniqueShapes.GetCount())
+//	{
+//		nd::TiXmlElement* const shapesNode = new nd::TiXmlElement("ndShapes");
+//		worldNode->LinkEndChild(shapesNode);
+//
+//		dTree<dUnsigned32, const ndShape*>::Iterator it(uniqueShapes);
+//		for (it.Begin(); it; it++)
+//		{
+//			dInt32 nodeId = *it;
+//			const ndShape* const shape = it.GetKey();
+//			shape->Save(shapesNode, assetPath, nodeId);
+//		}
+//	}
+//
+//	if (bodyList.GetCount())
+//	{
+//		dInt32 bodyIndex = 0;
+//		nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("ndBodies");
+//		worldNode->LinkEndChild(bodiesNode);
+//
+//		for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+//		{
+//			ndBodyKinematic* const body = bodyNode->GetInfo();
+//			body->Save(bodiesNode, assetPath, bodyIndex, uniqueShapes);
+//			bodyIndex++;
+//		}
+//	}
+//}
+
+void ndWorld::SaveSceneSetting(nd::TiXmlNode* const rootNode)
+{
+	nd::TiXmlElement* const config = new nd::TiXmlElement("settings");
+	rootNode->LinkEndChild(config);
+
+	xmlSaveParam(config, "description", "string", "Newton Dynamics 4.00");
+	xmlSaveParam(config, "revision", "string", "1.00");
+	xmlSaveParam(config, "solverSubsteps", m_subSteps);
+	xmlSaveParam(config, "solverIterations", m_solverIterations);
+}
+
+void ndWorld::SaveScene(const char* const path)
+{
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+
+	nd::TiXmlDocument asciifile;
+	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
+	asciifile.LinkEndChild(decl);
+
+	nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
+	asciifile.LinkEndChild(worldNode);
+
+	//char assetPath[1024];
+	//strcpy(assetPath, path);
+
+	//char* name = strrchr(assetPath, '/');
+	//if (!name)
+	//{
+	//	name = strrchr(assetPath, '\\');
+	//}
+	//if (!name)
+	//{
+	//	name = assetPath;
+	//}
+	//
+	//char* ext = strrchr(name, '.');
+	//if (!ext)
+	//{
+	//	ext = name;
+	//}
+	//
+	//ext[0] = 0;
+	//#if (defined(WIN32) || defined(_WIN32))
+	//	_mkdir(assetPath);
+	//#else
+	//	mkdir(assetPath, S_IRWXU);
+	//#endif
+
+	char fileNameExt[1024];
+	strcpy(fileNameExt, path);
+
+	char* const ext = strrchr(fileNameExt, '.');
+	if (ext) 
+	{
+		*ext = 0;
+	}
+	strcat(fileNameExt, ".nd");
+
+//	Save(worldNode, assetPath);
+	SaveSceneSetting(worldNode);
+
+
+
+	asciifile.SaveFile(path);
+	setlocale(LC_ALL, oldloc);
 }

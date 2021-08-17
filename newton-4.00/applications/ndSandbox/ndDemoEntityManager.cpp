@@ -35,7 +35,7 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0		// setting basic rigidbody
+#define DEFAULT_SCENE	0		// setting basic rigidbody
 //#define DEFAULT_SCENE	1		// setting gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// setting friction ramp
 //#define DEFAULT_SCENE	3		// conservation of momentum 
@@ -47,7 +47,7 @@
 //#define DEFAULT_SCENE	9		// static user mesh collision 
 //#define DEFAULT_SCENE	10		// setting basic joints
 //#define DEFAULT_SCENE	11		// setting basic rag doll
-#define DEFAULT_SCENE	12		// setting active rag doll
+//#define DEFAULT_SCENE	12		// setting active rag doll
 //#define DEFAULT_SCENE	14		// setting basic vehicle
 //#define DEFAULT_SCENE	15		// setting heavy vehicle
 //#define DEFAULT_SCENE	16		// simple voronoi fracture

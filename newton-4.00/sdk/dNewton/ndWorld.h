@@ -90,12 +90,20 @@ class ndWorld: public dClassAlloc
 	D_NEWTON_API virtual void AddModel(ndModel* const model);
 	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
 
-	D_NEWTON_API void Load(const char* const path);
-	D_NEWTON_API void Load(const nd::TiXmlElement* const rootNode, const char* const assetPath);
-	D_NEWTON_API virtual ndBody* LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath) const;
+	
+	D_NEWTON_API void SaveScene(const char* const path);
+	D_NEWTON_API virtual void SaveSceneSetting(nd::TiXmlNode* const rootNode);
 
-	D_NEWTON_API void Save(const char* const path) const;
-	D_NEWTON_API void Save(nd::TiXmlElement* const rootNode, const char* const assetPath) const;
+	//void LoadSettings(const nd::TiXmlNode* const rootNode);
+	//void LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
+	//void LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
+	//
+	//D_NEWTON_API void Load(const char* const path);
+	//D_NEWTON_API void Load(const nd::TiXmlElement* const rootNode, const char* const assetPath);
+	//D_NEWTON_API virtual ndBody* LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath) const;
+	//
+	//D_NEWTON_API void Save(const char* const path) const;
+	//D_NEWTON_API void Save(nd::TiXmlElement* const rootNode, const char* const assetPath) const;
 
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
@@ -159,9 +167,6 @@ class ndWorld: public dClassAlloc
 	void ParticleUpdate();
 	void CalculateAverageUpdateTime();
 	void SubStepUpdate(dFloat32 timestep);
-	void LoadSettings(const nd::TiXmlNode* const rootNode);
-	void LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
-	void LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
 
 	bool SkeletonJointTest(ndJointBilateralConstraint* const jointA) const;
 	static dInt32 CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void* notUsed);
