@@ -26,16 +26,31 @@ file(GLOB CPP_SOURCE
 	dJoints/*.h
 	dJoints/*.cpp
 	dModels/dVehicle*.h	
-	dModels/dVehicle/*.cpp)
+	dModels/dVehicle/*.cpp
+	dModels/dCharacter/*.h
+	dModels/dCharacter/*.cpp)
 
 file(GLOB HEADERS *.h dJoints/*.h)
 file(GLOB HEADERS *.h dModels/*.h)
 file(GLOB HEADERS *.h dModels/dVehicle/*.h)
+file(GLOB HEADERS *.h dModels/dCharacter/*.h)
 
 # exclude AVX files when disabled
-if(NOT NEWTON_ENABLE_AVX)
-	list(FILTER HEADERS EXCLUDE REGEX "(Avx)")
-	list(FILTER CPP_SOURCE EXCLUDE REGEX "(Avx)")
+#if(NOT NEWTON_ENABLE_AVX)
+#	list(FILTER HEADERS EXCLUDE REGEX "(Avx)")
+#	list(FILTER CPP_SOURCE EXCLUDE REGEX "(Avx)")
+#endif()
+
+if(MSVC AND NEWTON_ENABLE_AVX2_SOLVER)
+	set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
+endif()
+
+if(MINGW AND NEWTON_ENABLE_AVX2_SOLVER)
+	set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " -mavx2 -mfma  " )
+endif()
+
+if(UNIX AND NEWTON_ENABLE_AVX2_SOLVER)
+	set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " -march=haswell " )
 endif()
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})

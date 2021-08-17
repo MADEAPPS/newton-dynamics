@@ -42,6 +42,25 @@ distribution.
 #include <assert.h>
 #include <string.h>
 
+#if defined(_MSC_VER)
+	#define D_TINYXML_EXPORT __declspec(dllexport)
+	#define D_TINYXML_IMPORT __declspec(dllimport)
+#else
+	#define D_TINYXML_EXPORT __attribute__((visibility("default")))
+	#define D_TINYXML_IMPORT __attribute__((visibility("default")))
+#endif
+
+#ifdef _D_TINY_DLL
+	#ifdef _D_TINYXML_EXPORT_DLL
+		#define D_TINY_API D_TINYXML_EXPORT
+	#else
+		#define D_TINY_API D_TINYXML_IMPORT
+	#endif
+#else
+	#define D_TINY_API
+#endif
+
+
 /*	The support for explicit isn't that universal, and it isn't really
 	required - it is used to check that the TiXmlString class isn't incorrectly
 	used. Be nice to old compilers and macro it here:
@@ -65,7 +84,7 @@ namespace nd
    The buffer allocation is made by a simplistic power of 2 like mechanism : if we increase
    a string and there's no more room, we allocate a buffer twice as big as we need.
 */
-class TiXmlString
+class D_TINY_API TiXmlString
 {
   public :
 	// The size type used

@@ -41,8 +41,8 @@ class dFastAabb : public dMatrix
 	void SetSeparatingDistance(const dFloat32 distance);
 	void SetTransposeAbsMatrix(const dMatrix& matrix);
 
-	dFloat32 PolygonBoxDistance(const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const;
-	dFloat32 PolygonBoxRayDistance(const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, const dFastRay& ray) const;
+	D_CORE_API dFloat32 PolygonBoxDistance(const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const;
+	D_CORE_API dFloat32 PolygonBoxRayDistance(const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, const dFastRay& ray) const;
 
 	private:
 	dMatrix MakeFaceMatrix(const dVector& faceNormal, dInt32, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const;
