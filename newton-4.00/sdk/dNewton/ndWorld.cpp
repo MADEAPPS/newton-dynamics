@@ -1045,7 +1045,7 @@ void ndWorld::LoadCollisionShapes(
 	for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
 	{
 		const char* const name = node->Value();
-		ndShape* const shape = LOADCLASS (ndShape, name, node);
+		ndShape* const shape = LOADCLASS (ndShape, name, node, assetPath);
 		dAssert(shape);
 		if (shape)
 		{

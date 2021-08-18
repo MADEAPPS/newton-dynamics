@@ -29,7 +29,7 @@ class ndShapeCapsule : public ndShapeConvex
 {
 	public:
 	D_CLASS_REFLECTION(ndShapeCapsule);
-	D_COLLISION_API ndShapeCapsule(const nd::TiXmlNode* const xmlNode);
+	D_COLLISION_API ndShapeCapsule(const nd::TiXmlNode* const xmlNode, const char* const assetPath);
 	D_COLLISION_API ndShapeCapsule (dFloat32 radio0, dFloat32 radio1, dFloat32 height);
 
 	virtual ndShapeCapsule* GetAsShapeCapsule() { return this; }

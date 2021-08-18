@@ -36,8 +36,8 @@ ndShapeCapsule::ndShapeCapsule(dFloat32 radius0, dFloat32 radius1, dFloat32 heig
 	Init(radius0, radius1, height);
 }
 
-ndShapeCapsule::ndShapeCapsule(const nd::TiXmlNode* const xmlNode)
-	: ndShapeConvex(m_capsule)
+ndShapeCapsule::ndShapeCapsule(const nd::TiXmlNode* const xmlNode, const char* const)
+	:ndShapeConvex(m_capsule)
 {
 	dFloat32 radius0 = xmlGetFloat(xmlNode, "radius0");
 	dFloat32 radius1 = xmlGetFloat(xmlNode, "radius1");

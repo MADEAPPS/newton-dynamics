@@ -47,7 +47,7 @@ void RegisterLoaderClass(const char* const className, dClassLoaderBase* const lo
 	factory.PushBack(entry);
 }
 
-void* LoadClass(const char* const className, const nd::TiXmlNode* const xmlNode)
+void* LoadClass(const char* const className, const nd::TiXmlNode* const xmlNode, const char* const assetPath)
 {
 	dUnsigned64 classNameHash = dCRC64(className);
 
@@ -56,7 +56,7 @@ void* LoadClass(const char* const className, const nd::TiXmlNode* const xmlNode)
 	{
 		if (factory[i].m_classNameHash == classNameHash)
 		{
-			return factory[i].m_loader->CreateClass(xmlNode);
+			return factory[i].m_loader->CreateClass(xmlNode, assetPath);
 		}
 	}
 	return nullptr;

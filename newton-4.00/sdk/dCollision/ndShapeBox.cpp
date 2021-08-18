@@ -51,7 +51,7 @@ ndShapeBox::ndShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 	Init(size_x, size_y, size_z);
 }
 
-ndShapeBox::ndShapeBox(const nd::TiXmlNode* const xmlNode)
+ndShapeBox::ndShapeBox(const nd::TiXmlNode* const xmlNode, const char* const)
 	:ndShapeConvex(m_box)
 {
 	dFloat32 size_x = xmlGetFloat(xmlNode, "size_x");

@@ -255,7 +255,7 @@ typedef double dFloat64;
 class dClassLoaderBase
 {
 	public:
-	virtual void* CreateClass(const nd::TiXmlNode* const)
+	virtual void* CreateClass(const nd::TiXmlNode* const, const char* const)
 	{
 		dAssert(0);
 		return nullptr;
@@ -263,7 +263,7 @@ class dClassLoaderBase
 };
 
 D_CORE_API void RegisterLoaderClass(const char* const className, dClassLoaderBase* const loaderClass);
-D_CORE_API void* LoadClass(const char* const className, const nd::TiXmlNode* const xmlNode);
+D_CORE_API void* LoadClass(const char* const className, const nd::TiXmlNode* const xmlNode, const char* const assetPath);
 
 template<class T>
 class dClassLoader: public dClassLoaderBase
@@ -274,13 +274,13 @@ class dClassLoader: public dClassLoaderBase
 		RegisterLoaderClass(className, this);
 	}
 
-	virtual void* CreateClass(const nd::TiXmlNode* const xmlNode)
+	virtual void* CreateClass(const nd::TiXmlNode* const xmlNode, const char* const assetPath)
 	{
-		return new T(xmlNode);
+		return new T(xmlNode, assetPath);
 	}
 };
 
-#define LOADCLASS(castType,className,node) (castType*)LoadClass(className, node);
+#define LOADCLASS(castType,className,node,assetPath) (castType*)LoadClass(className, node, assetPath);
 
 #define D_CLASS_REFLECTION(Class)								\
 	D_CORE_API static const char* ClassName() {return #Class;}	\
