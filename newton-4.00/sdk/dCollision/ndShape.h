@@ -47,10 +47,6 @@ class ndShapeDebugCallback;
 class ndShapeChamferCylinder;
 class ndShapeStaticProceduralMesh;
 
-#ifdef _DEBUG
-//	#define DG_DEBUG_AABB
-#endif
-
 enum ndShapeID
 {
 	// do not change the order of these enum
@@ -210,6 +206,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndShape: public dClassAlloc
 {
 	public:
+	D_CLASS_RELECTION(ndShape);
 	dInt32 GetRefCount() const;
 	virtual dInt32 Release() const;
 	virtual const ndShape* AddRef() const;
@@ -256,7 +253,7 @@ class ndShape: public dClassAlloc
 	virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
 	virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
 
-	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
+	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeHash) const;
 
 	protected:
 	D_COLLISION_API ndShape(ndShapeID id);
@@ -326,11 +323,6 @@ inline dVector ndShape::GetObbSize() const
 inline dFloat32 ndShape::GetUmbraClipSize() const
 {
 	return dFloat32(3.0f) * GetBoxMaxRadius();
-}
-
-inline void ndShape::Save( nd::TiXmlElement* const, const char* const, dInt32) const
-{
-	dAssert(0);
 }
 
 #endif 

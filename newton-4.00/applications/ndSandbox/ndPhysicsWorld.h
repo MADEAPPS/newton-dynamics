@@ -30,7 +30,8 @@ class ndPhysicsWorld: public ndWorld
 
 	void QueueBodyForDelete(ndBody* const body);
 
-	virtual void SaveSceneSetting(nd::TiXmlNode* const rootNode);
+	virtual void SaveSceneSettings(nd::TiXmlNode* const rootNode);
+	virtual void LoadSceneSettings(const nd::TiXmlNode* const rootNode);
 
 	private:
 	void OnPostUpdate(dFloat32 timestep);

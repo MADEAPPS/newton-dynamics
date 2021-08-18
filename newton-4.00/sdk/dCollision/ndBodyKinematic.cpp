@@ -191,17 +191,13 @@ void ndBodyKinematic::ReleaseMemory()
 
 ndContact* ndBodyKinematic::FindContact(const ndBody* const otherBody) const
 {
-#ifndef D_USE_GLOBAL_LOCK
 	dScopeSpinLock lock(m_lock);
-#endif
 	return m_contactList.FindContact(this, otherBody);
 }
 
 void ndBodyKinematic::AttachContact(ndContact* const contact)
 {
-#ifndef D_USE_GLOBAL_LOCK
 	dScopeSpinLock lock(m_lock);
-#endif
 	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
 	if (m_invMass.m_w > dFloat32(0.0f))
 	{
@@ -213,9 +209,7 @@ void ndBodyKinematic::AttachContact(ndContact* const contact)
 
 void ndBodyKinematic::DetachContact(ndContact* const contact)
 {
-#ifndef D_USE_GLOBAL_LOCK
 	dScopeSpinLock lock(m_lock);
-#endif
 	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
 	m_equilibrium = contact->m_body0->m_equilibrium & contact->m_body1->m_equilibrium;
 	m_contactList.DetachContact(contact);

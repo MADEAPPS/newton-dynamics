@@ -39,7 +39,5 @@
 	#define D_COLLISION_API 
 #endif
 
-//#define D_USE_GLOBAL_LOCK
-
 #endif 
 

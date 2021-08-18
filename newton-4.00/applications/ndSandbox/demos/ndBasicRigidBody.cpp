@@ -24,7 +24,7 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
-
+	
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 
@@ -33,4 +33,5 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 	scene->SetCameraMatrix(rot, origin);
 
 	scene->GetWorld()->SaveScene("xxxx.nd");
+	//scene->GetWorld()->LoadScene("xxxx.nd");
 }

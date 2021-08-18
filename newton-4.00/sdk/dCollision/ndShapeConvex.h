@@ -33,9 +33,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeConvex: public ndShape
 {
 	public:
-
-	//bool IntesectionTest (dShapeParamProxy& proxy) const;
-
+	D_CLASS_RELECTION(ndShapeConvex);
 	class ndConvexSimplexEdge
 	{
 		public:
@@ -64,6 +62,7 @@ class ndShapeConvex: public ndShape
 	D_COLLISION_API virtual dVector CalculateVolumeIntegral(const dMatrix& globalMatrix, const dVector& globalPlane, const ndShapeInstance& parentScale) const;
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
+	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeHash) const;
 	bool SanityCheck(dPolyhedra& hull) const;
 	bool SanityCheck(dInt32 count, const dVector& normal, dVector* const contactsOut) const;
 	dInt32 RectifyConvexSlice(dInt32 count, const dVector& normal, dVector* const contactsOut) const;
@@ -88,9 +87,6 @@ class ndShapeConvex: public ndShape
 	virtual dFloat32 GetBoxMaxRadius() const;
 
 	dVector CalculateVolumeIntegral(const dPlane& plane) const;
-
-	//virtual void SerializeLow(dgSerialize callback, void* const userData) const;
-	//dInt32 RayCastClosestFace (dVector* tetrahedrum, const dVector& origin, dFloat32& pointDist) const;
 	dInt32 BuildCylinderCapPoly (dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const;
 
 	dVector* m_vertex;

@@ -147,9 +147,8 @@ D_COLLISION_API const nd::TiXmlNode* ndBody::FindNode(const nd::TiXmlNode* const
 	return rootNode->FirstChild(name);
 }
 
-
-//void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>&) const
-void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32,  dInt32 bodyId) const
+//void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeHash, const dTree<dUnsigned32, const ndShape*>&) const
+void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const, dInt32,  dInt32 bodyId) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement(ClassName());
 	rootNode->LinkEndChild(paramNode);

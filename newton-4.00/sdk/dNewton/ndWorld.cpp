@@ -930,94 +930,6 @@ void ndWorld::BodiesInAabb(ndBodiesInAabbNotify& callback) const
 }
 
 #if 0
-
-void ndWorld::Load(const char* const path)
-{
-	char* const oldloc = setlocale(LC_ALL, 0);
-	setlocale(LC_ALL, "C");
-
-	nd::TiXmlDocument doc(path);
-	doc.LoadFile();
-	dAssert(!doc.Error());
-
-	const nd::TiXmlElement* const rootNode = doc.RootElement();
-	if (doc.FirstChild("ndWorld"))
-	{
-		char assetPath[1024];
-		strcpy(assetPath, path);
-
-		char* name = strrchr(assetPath, '/');
-		if (!name)
-		{
-			name = strrchr(assetPath, '\\');
-		}
-		if (!name)
-		{
-			name = assetPath;
-		}
-
-		char* ext = strrchr(name, '.');
-		if (!ext)
-		{
-			ext = name;
-		}
-		ext[0] = 0;
-
-		Load(rootNode, assetPath);
-	}
-
-	setlocale(LC_ALL, oldloc);
-}
-
-void ndWorld::LoadSettings(const nd::TiXmlNode* const)
-{
-	//const nd::TiXmlNode* const settings = rootNode->FirstChild("settings");
-	//dAssert(settings);
-}
-
-void ndWorld::LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath)
-{
-	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndShapes");
-	dAssert(shapes);
-
-	for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
-	{
-		ndShape* shape = nullptr;
-		const char* const name = node->Value();
-		if (!strcmp(name, "ndShapeBox"))
-		{
-			shape = new ndShapeBox(node);
-		}
-		else if (!strcmp(name, "ndShapeSphere"))
-		{
-			shape = new ndShapeSphere(node);
-		}
-		else if (!strcmp(name, "ndShapeCapsule"))
-		{
-			shape = new ndShapeCapsule(node);
-		}
-		else if (!strcmp(name, "ndShapeConvexHull"))
-		{
-			shape = new ndShapeConvexHull(node);
-		}
-		else if (!strcmp(name, "ndShapeStatic_bvh"))
-		{
-			shape = new ndShapeStatic_bvh(node, assetPath);
-		}
-		else
-		{
-			dAssert(0);
-		}
-		if (shape)
-		{
-			dInt32 shapeId;
-			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-			element->Attribute("nodeId", &shapeId);
-			shapesCache.Insert(shape->AddRef(), shapeId);
-		}
-	}
-}
-
 void ndWorld::LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath)
 {
 	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndBodies");
@@ -1073,26 +985,7 @@ void ndWorld::Load(const nd::TiXmlElement* const rootNode, const char* const ass
 }
 #endif
 
-
-
-//void ndWorld::Save(nd::TiXmlElement* const worldNode, const char* const assetPath) const
-//{
-//	if (bodyList.GetCount())
-//	{
-//		dInt32 bodyIndex = 0;
-//		nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("ndBodies");
-//		worldNode->LinkEndChild(bodiesNode);
-//
-//		for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
-//		{
-//			ndBodyKinematic* const body = bodyNode->GetInfo();
-//			body->Save(bodiesNode, assetPath, bodyIndex, uniqueShapes);
-//			bodyIndex++;
-//		}
-//	}
-//}
-
-void ndWorld::SaveSceneSetting(nd::TiXmlNode* const rootNode)
+void ndWorld::SaveSceneSettings(nd::TiXmlNode* const rootNode)
 {
 	nd::TiXmlElement* const config = new nd::TiXmlElement("settings");
 	rootNode->LinkEndChild(config);
@@ -1101,6 +994,15 @@ void ndWorld::SaveSceneSetting(nd::TiXmlNode* const rootNode)
 	xmlSaveParam(config, "revision", "string", "1.00");
 	xmlSaveParam(config, "solverSubsteps", m_subSteps);
 	xmlSaveParam(config, "solverIterations", m_solverIterations);
+}
+
+void ndWorld::LoadSceneSettings(const nd::TiXmlNode* const rootNode)
+{
+	const nd::TiXmlNode* const settings = rootNode->FirstChild("settings");
+	dAssert(settings);
+
+	m_subSteps = xmlGetInt(settings, "solverSubsteps");
+	m_solverIterations = xmlGetInt(settings, "solverIterations");
 }
 
 void ndWorld::SaveCollisionShapes(nd::TiXmlNode* const rootNode, const char* const assetPath, dTree<dUnsigned32, const ndShape*>& shapeMap)
@@ -1133,6 +1035,52 @@ void ndWorld::SaveCollisionShapes(nd::TiXmlNode* const rootNode, const char* con
 	}
 }
 
+void ndWorld::LoadCollisionShapes(
+	const nd::TiXmlNode* const rootNode, const char* const assetPath,
+	dTree<const ndShape*, dUnsigned32>& shapesMap) const
+{
+	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndShapes");
+	dAssert(shapes);
+
+	for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
+	{
+	//	ndShape* shape = nullptr;
+		const char* const name = node->Value();
+
+	//	if (!strcmp(name, "ndShapeBox"))
+	//	{
+	//		shape = new ndShapeBox(node);
+	//	}
+	//	else if (!strcmp(name, "ndShapeSphere"))
+	//	{
+	//		shape = new ndShapeSphere(node);
+	//	}
+	//	else if (!strcmp(name, "ndShapeCapsule"))
+	//	{
+	//		shape = new ndShapeCapsule(node);
+	//	}
+	//	else if (!strcmp(name, "ndShapeConvexHull"))
+	//	{
+	//		shape = new ndShapeConvexHull(node);
+	//	}
+	//	else if (!strcmp(name, "ndShapeStatic_bvh"))
+	//	{
+	//		shape = new ndShapeStatic_bvh(node, assetPath);
+	//	}
+	//	else
+	//	{
+	//		dAssert(0);
+	//	}
+	//	if (shape)
+	//	{
+	//		dInt32 shapeId;
+	//		const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+	//		element->Attribute("nodeId", &shapeId);
+	//		shapesCache.Insert(shape->AddRef(), shapeId);
+	//	}
+	}
+}
+
 void ndWorld::SaveBodies(nd::TiXmlNode* const rootNode, const char* const assetPath,
 	const dTree<dUnsigned32, const ndShape*>& shapesMap,
 	dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap)
@@ -1147,8 +1095,6 @@ void ndWorld::SaveBodies(nd::TiXmlNode* const rootNode, const char* const assetP
 		for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
 			ndBodyKinematic* const body = bodyNode->GetInfo();
-			//dInt32 shapeId = shapesMap.Find(body->GetCollisionShape().GetShape())->GetInfo();
-			//body->Save(bodiesNode, assetPath, shapeId);
 			bodyMap.Insert(bodyIndex, body);
 			bodyIndex++;
 		}
@@ -1186,17 +1132,55 @@ void ndWorld::SaveScene(const char* const path)
 		*ext = 0;
 	}
 	char assetPath[1024];
-	strcpy(assetPath, path);
+	strcpy(assetPath, fileNameExt);
 
 	strcat(fileNameExt, ".nd");
 
 	dTree<dUnsigned32, const ndShape*> shapeMap;
 	dTree<dUnsigned32, const ndBodyKinematic*> bodyMap;
 
-	SaveSceneSetting(worldNode);
+	SaveSceneSettings(worldNode);
 	SaveCollisionShapes(worldNode, assetPath, shapeMap);
 	SaveBodies(worldNode, assetPath, shapeMap, bodyMap);
 
 	asciifile.SaveFile(path);
 	setlocale(LC_ALL, oldloc);
+}
+
+bool ndWorld::LoadScene(const char* const path)
+{
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+	
+	nd::TiXmlDocument doc(path);
+	doc.LoadFile();
+	if (doc.Error()) 
+	{
+		return false;
+	}
+	dAssert(!doc.Error());
+	
+	if (!doc.FirstChild("ndWorld"))
+	{
+		return false;
+	}
+
+	char assetPath[1024];
+	strcpy(assetPath, path);
+
+	char* const ext = strrchr(assetPath, '.');
+	if (ext)
+	{
+		*ext = 0;
+	}
+
+	const nd::TiXmlElement* const worldNode = doc.RootElement();
+
+	dTree<const ndShape*, dUnsigned32> shapesMap;
+
+	LoadSceneSettings(worldNode);
+	LoadCollisionShapes(worldNode, assetPath, shapesMap);
+	
+	setlocale(LC_ALL, oldloc);
+	return true;
 }

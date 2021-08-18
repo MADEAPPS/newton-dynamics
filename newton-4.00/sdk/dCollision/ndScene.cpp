@@ -1234,9 +1234,6 @@ ndContact* ndScene::FindContactJoint(ndBodyKinematic* const body0, ndBodyKinemat
 
 void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 {
-#ifdef D_USE_GLOBAL_LOCK
-	dScopeSpinLock lock(m_contactLock);
-#endif
 	ndContact* const contact = FindContactJoint(body0, body1);
 	if (!contact) 
 	{

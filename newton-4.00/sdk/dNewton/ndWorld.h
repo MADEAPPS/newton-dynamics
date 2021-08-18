@@ -91,7 +91,10 @@ class ndWorld: public dClassAlloc
 	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
 	
 	D_NEWTON_API void SaveScene(const char* const path);
-	D_NEWTON_API virtual void SaveSceneSetting(nd::TiXmlNode* const rootNode);
+	D_NEWTON_API virtual void SaveSceneSettings(nd::TiXmlNode* const rootNode);
+
+	D_NEWTON_API bool LoadScene(const char* const path);
+	D_NEWTON_API virtual void LoadSceneSettings(const nd::TiXmlNode* const rootNode);
 
 	//void LoadSettings(const nd::TiXmlNode* const rootNode);
 	//void LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
@@ -136,7 +139,7 @@ class ndWorld: public dClassAlloc
 	private:
 	void ThreadFunction();
 	void PostUpdate(dFloat32 timestep);
-
+	
 	void SaveCollisionShapes(
 		nd::TiXmlNode* const rootNode, const char* const assetPath, 
 		dTree<dUnsigned32, const ndShape*>& shapesMap);
@@ -144,6 +147,10 @@ class ndWorld: public dClassAlloc
 		nd::TiXmlNode* const rootNode, const char* const assetPath, 
 		const dTree<dUnsigned32, const ndShape*>& shapesMap,
 		dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap);
+
+	void LoadCollisionShapes(
+		const nd::TiXmlNode* const rootNode, const char* const assetPath,
+		dTree<const ndShape*, dUnsigned32>& shapesMap) const;
 	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();
@@ -212,7 +219,6 @@ class ndWorld: public dClassAlloc
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateOpencl;
-	friend class ndWorldSegregatedScene;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline void ndWorld::Sync() const

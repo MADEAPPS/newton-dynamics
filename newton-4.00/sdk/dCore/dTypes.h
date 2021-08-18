@@ -252,8 +252,23 @@ typedef double dFloat64;
 	#define dCheckFloat(x) (isfinite(x) && !isnan(x))
 #endif
 
-#define D_CLASS_RELECTION(Class)	\
-	D_CORE_API static const char* ClassName() {return #Class;} 
+template<class T>
+class dClassLoader
+{
+	public:
+	dClassLoader<T>()
+	{
+	}
+
+	T* CreateClass(const nd::TiXmlNode* const xmlNode)
+	{
+		return new T(xmlNode);
+	}
+};
+
+#define D_CLASS_RELECTION(Class)								\
+	D_CORE_API static const char* ClassName() {return #Class;}	\
+	D_CORE_API static dClassLoader<Class> __classLoader__;
 
 #ifdef D_NEWTON_USE_DOUBLE
 	union dFloatSign

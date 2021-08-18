@@ -53,20 +53,3 @@ class ndWorldDefaultScene: public ndWorldScene<ndScene>
 		m_world->ThreadFunction();
 	}
 };
-
-//class ndWorldSegregatedScene: public ndWorldScene<ndSceneMixed>
-//{
-//	public:
-//		ndWorldSegregatedScene(ndWorld* const world)
-//		:ndWorldScene<ndSceneMixed>(world)
-//	{
-//	}
-//
-//	void ThreadFunction()
-//	{
-//		m_world->ThreadFunction();
-//	}
-//};
-
-
-

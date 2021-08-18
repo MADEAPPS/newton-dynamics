@@ -44,7 +44,7 @@ ndPhysicsWorld::~ndPhysicsWorld()
 	}
 }
 
-void ndPhysicsWorld::SaveSceneSetting(nd::TiXmlNode* const rootNode)
+void ndPhysicsWorld::SaveSceneSettings(nd::TiXmlNode* const rootNode)
 {
 	//here optionally the application can save specific information.
 	nd::TiXmlElement* const config = new nd::TiXmlElement("ndPhysicsWorld");
@@ -52,7 +52,13 @@ void ndPhysicsWorld::SaveSceneSetting(nd::TiXmlNode* const rootNode)
 	xmlSaveParam(config, "description", "string", "this scene was saved form Newton 4.0 sandbox demos");
 
 	// always end by calling base class function
-	ndWorld::SaveSceneSetting(rootNode);
+	ndWorld::SaveSceneSettings(rootNode);
+}
+
+void ndPhysicsWorld::LoadSceneSettings(const nd::TiXmlNode* const rootNode)
+{
+	// always end by calling base class function
+	ndWorld::LoadSceneSettings(rootNode);
 }
 
 ndDemoEntityManager* ndPhysicsWorld::GetManager() const
