@@ -33,7 +33,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeConvex: public ndShape
 {
 	public:
-	D_CLASS_RELECTION(ndShapeConvex);
+	D_CLASS_REFLECTION(ndShapeConvex);
 	class ndConvexSimplexEdge
 	{
 		public:

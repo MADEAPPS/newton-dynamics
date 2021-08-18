@@ -45,7 +45,7 @@ class ndCharacterCentreOfMassState
 class ndCharacter: public ndModel
 {
 	public:
-	D_CLASS_RELECTION(ndCharacter);
+	D_CLASS_REFLECTION(ndCharacter);
 
 	D_NEWTON_API ndCharacter();
 	D_NEWTON_API ndCharacter(const nd::TiXmlNode* const xmlNode);

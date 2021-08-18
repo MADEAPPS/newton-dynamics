@@ -21,7 +21,7 @@
 class ndJointSlider: public ndJointBilateralConstraint
 {
 	public:
-	D_CLASS_RELECTION(ndJointSlider);
+	D_CLASS_REFLECTION(ndJointSlider);
 	D_NEWTON_API ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointSlider();
 

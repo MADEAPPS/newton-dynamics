@@ -30,7 +30,7 @@ class ndJointPid3dofActuator;
 class ndCharacterForwardDynamicNode: public ndCharacterLimbNode 
 {
 	public:
-	D_CLASS_RELECTION(ndCharacterForwardDynamicNode);
+	D_CLASS_REFLECTION(ndCharacterForwardDynamicNode);
 
 	D_NEWTON_API ndCharacterForwardDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterForwardDynamicNode ();

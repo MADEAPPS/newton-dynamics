@@ -40,7 +40,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndBody: public dClassAlloc
 {
 	public:
-	D_CLASS_RELECTION(ndBody);
+	D_CLASS_REFLECTION(ndBody);
 	D_COLLISION_API ndBody();
 	D_COLLISION_API ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache);
 	D_COLLISION_API virtual ~ndBody();

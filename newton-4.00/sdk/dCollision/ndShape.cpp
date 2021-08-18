@@ -99,9 +99,9 @@ ndShapeInfo ndShape::GetShapeInfo() const
 
 void ndShape::Save(nd::TiXmlElement* const rootNode, const char* const, dInt32 nodeHash) const
 {
-	nd::TiXmlElement* const shapeNode = new nd::TiXmlElement("className");
+	nd::TiXmlElement* const shapeNode = new nd::TiXmlElement(ClassName());
 	rootNode->LinkEndChild(shapeNode);
-	shapeNode->SetAttribute(ClassName(), nodeHash);
+	shapeNode->SetAttribute("hashId", nodeHash);
 
 	xmlSaveParam(shapeNode, "inertia", m_inertia);
 	xmlSaveParam(shapeNode, "crossInertia", m_crossInertia);

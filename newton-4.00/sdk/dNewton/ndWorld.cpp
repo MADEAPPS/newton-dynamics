@@ -1044,40 +1044,16 @@ void ndWorld::LoadCollisionShapes(
 
 	for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
 	{
-	//	ndShape* shape = nullptr;
 		const char* const name = node->Value();
-
-	//	if (!strcmp(name, "ndShapeBox"))
-	//	{
-	//		shape = new ndShapeBox(node);
-	//	}
-	//	else if (!strcmp(name, "ndShapeSphere"))
-	//	{
-	//		shape = new ndShapeSphere(node);
-	//	}
-	//	else if (!strcmp(name, "ndShapeCapsule"))
-	//	{
-	//		shape = new ndShapeCapsule(node);
-	//	}
-	//	else if (!strcmp(name, "ndShapeConvexHull"))
-	//	{
-	//		shape = new ndShapeConvexHull(node);
-	//	}
-	//	else if (!strcmp(name, "ndShapeStatic_bvh"))
-	//	{
-	//		shape = new ndShapeStatic_bvh(node, assetPath);
-	//	}
-	//	else
-	//	{
-	//		dAssert(0);
-	//	}
-	//	if (shape)
-	//	{
-	//		dInt32 shapeId;
-	//		const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-	//		element->Attribute("nodeId", &shapeId);
-	//		shapesCache.Insert(shape->AddRef(), shapeId);
-	//	}
+		ndShape* const shape = LOADCLASS (ndShape, name, node);
+		dAssert(shape);
+		if (shape)
+		{
+			dInt32 hashId;
+			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+			element->Attribute("hashId", &hashId);
+			shapesMap.Insert(shape->AddRef(), hashId);
+		}
 	}
 }
 
@@ -1180,6 +1156,12 @@ bool ndWorld::LoadScene(const char* const path)
 
 	LoadSceneSettings(worldNode);
 	LoadCollisionShapes(worldNode, assetPath, shapesMap);
+
+	dTree<const ndShape*, dUnsigned32>::Iterator iter(shapesMap);
+	for (iter.Begin(); iter; iter++)
+	{
+		iter.GetNode()->GetInfo()->Release();
+	}
 	
 	setlocale(LC_ALL, oldloc);
 	return true;

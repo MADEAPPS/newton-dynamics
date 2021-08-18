@@ -26,6 +26,8 @@
 #include "ndShapeBox.h"
 #include "ndContactSolver.h"
 
+D_CLASS_IMPLEMENT_REFLECTION(ndShapeBox)
+
 dInt32 ndShapeBox::m_initSimplex = 0;
 ndShapeConvex::ndConvexSimplexEdge ndShapeBox::m_edgeArray[24];
 ndShapeConvex::ndConvexSimplexEdge* ndShapeBox::m_edgeEdgeMap[12];
@@ -475,9 +477,9 @@ ndShapeInfo ndShapeBox::GetShapeInfo() const
 
 D_COLLISION_API void ndShapeBox::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeHash) const
 {
-	nd::TiXmlElement* const shapeNode = new nd::TiXmlElement("className");
+	nd::TiXmlElement* const shapeNode = new nd::TiXmlElement(ClassName());
 	rootNode->LinkEndChild(shapeNode);
-	shapeNode->SetAttribute(ClassName(), nodeHash);
+	shapeNode->SetAttribute("hashId", nodeHash);
 	ndShapeConvex::Save(shapeNode, assetPath, nodeHash);
 
 	xmlSaveParam(shapeNode, "size_x", m_size[0][0] * dFloat32(2.0f));

@@ -45,7 +45,7 @@ class ndBipedControllerConfig
 class ndCharacterBipedPoseController: public ndCharacterPoseController
 {
 	public:
-	D_CLASS_RELECTION(ndCharacterBipedPoseController);
+	D_CLASS_REFLECTION(ndCharacterBipedPoseController);
 
 	D_NEWTON_API ndCharacterBipedPoseController();
 	D_NEWTON_API virtual ~ndCharacterBipedPoseController ();

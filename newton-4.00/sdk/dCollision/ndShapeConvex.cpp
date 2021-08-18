@@ -1028,9 +1028,9 @@ dInt32 ndShapeConvex::BuildCylinderCapPoly(dFloat32 radius, const dMatrix& trans
 
 void ndShapeConvex::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeHash) const
 {
-	nd::TiXmlElement* const shapeNode = new nd::TiXmlElement("className");
+	nd::TiXmlElement* const shapeNode = new nd::TiXmlElement(ClassName());
 	rootNode->LinkEndChild(shapeNode);
-	shapeNode->SetAttribute(ClassName(), nodeHash);
+	shapeNode->SetAttribute("hashId", nodeHash);
 	ndShape::Save(shapeNode, assetPath, nodeHash);
 
 }

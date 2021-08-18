@@ -18,7 +18,7 @@
 class ndJointPid6dofActuator : public ndJointPid3dofActuator
 {
 	public:
-	D_CLASS_RELECTION(ndJointPid6dofActuator);
+	D_CLASS_REFLECTION(ndJointPid6dofActuator);
 
 	D_NEWTON_API ndJointPid6dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointPid6dofActuator();

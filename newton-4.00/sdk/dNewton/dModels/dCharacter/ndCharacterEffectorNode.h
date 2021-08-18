@@ -31,7 +31,7 @@ class ndJointBilateralConstraint;
 class ndCharacterEffectorNode: public ndCharacterLimbNode
 {
 	public:
-	D_CLASS_RELECTION(ndCharacterEffectorNode);
+	D_CLASS_REFLECTION(ndCharacterEffectorNode);
 
 	D_NEWTON_API ndCharacterEffectorNode(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const child, ndCharacterLimbNode* const referenceNode);
 	D_NEWTON_API virtual ~ndCharacterEffectorNode ();

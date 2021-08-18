@@ -48,7 +48,7 @@ class ndJointWheel: public ndJointBilateralConstraint
 {
 	public:
 
-	D_CLASS_RELECTION(ndJointWheel);
+	D_CLASS_REFLECTION(ndJointWheel);
 	D_NEWTON_API ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& desc);
 	D_NEWTON_API virtual ~ndJointWheel();
 

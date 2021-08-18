@@ -28,6 +28,7 @@
 #define DG_CAPSULE_SEGMENTS		10
 #define DG_CAPSULE_CAP_SEGMENTS	12
 
+D_CLASS_IMPLEMENT_REFLECTION(ndShapeCapsule)
 
 ndShapeCapsule::ndShapeCapsule(dFloat32 radius0, dFloat32 radius1, dFloat32 height)
 	:ndShapeConvex(m_capsule)
@@ -512,9 +513,9 @@ void ndShapeCapsule::CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& 
 
 void ndShapeCapsule::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeHash) const
 {
-	nd::TiXmlElement* const shapeNode = new nd::TiXmlElement("className");
+	nd::TiXmlElement* const shapeNode = new nd::TiXmlElement(ClassName());
 	rootNode->LinkEndChild(shapeNode);
-	shapeNode->SetAttribute(ClassName(), nodeHash);
+	shapeNode->SetAttribute("hashId", nodeHash);
 	ndShapeConvex::Save(shapeNode, assetPath, nodeHash);
 
 	xmlSaveParam(shapeNode, "radius0", m_radius0);

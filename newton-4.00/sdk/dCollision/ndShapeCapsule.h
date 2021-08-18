@@ -28,7 +28,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeCapsule : public ndShapeConvex
 {
 	public:
-	D_CLASS_RELECTION(ndShapeCapsule);
+	D_CLASS_REFLECTION(ndShapeCapsule);
 	D_COLLISION_API ndShapeCapsule(const nd::TiXmlNode* const xmlNode);
 	D_COLLISION_API ndShapeCapsule (dFloat32 radio0, dFloat32 radio1, dFloat32 height);
 

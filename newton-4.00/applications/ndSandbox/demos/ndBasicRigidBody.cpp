@@ -33,5 +33,5 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 	scene->SetCameraMatrix(rot, origin);
 
 	scene->GetWorld()->SaveScene("xxxx.nd");
-	//scene->GetWorld()->LoadScene("xxxx.nd");
+	scene->GetWorld()->LoadScene("xxxx.nd");
 }

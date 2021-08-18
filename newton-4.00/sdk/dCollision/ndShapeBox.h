@@ -28,7 +28,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeBox: public ndShapeConvex
 {
 	public:
-	D_CLASS_RELECTION(ndShapeBox);
+	D_CLASS_REFLECTION(ndShapeBox);
 	D_COLLISION_API ndShapeBox(const nd::TiXmlNode* const xmlNode);
 	D_COLLISION_API ndShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
 	D_COLLISION_API virtual ~ndShapeBox();

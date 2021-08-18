@@ -19,7 +19,7 @@
 class ndJointUpVector: public ndJointBilateralConstraint
 {
 	public:
-	D_CLASS_RELECTION(ndJointUpVector);
+	D_CLASS_REFLECTION(ndJointUpVector);
 
 	D_NEWTON_API ndJointUpVector(const dVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointUpVector();

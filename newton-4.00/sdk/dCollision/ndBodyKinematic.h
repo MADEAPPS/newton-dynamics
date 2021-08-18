@@ -84,7 +84,7 @@ class ndBodyKinematic: public ndBody
 		friend class ndBodyKinematic;
 	};
 
-	D_CLASS_RELECTION(ndBodyKinematic);
+	D_CLASS_REFLECTION(ndBodyKinematic);
 	D_COLLISION_API ndBodyKinematic();
 	D_COLLISION_API ndBodyKinematic(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache);
 	D_COLLISION_API virtual ~ndBodyKinematic();

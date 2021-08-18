@@ -30,7 +30,7 @@
 class ndMultiBodyVehicleDifferential : public ndJointBilateralConstraint
 {
 	public:
-	D_CLASS_RELECTION(ndMultiBodyVehicleDifferential);
+	D_CLASS_REFLECTION(ndMultiBodyVehicleDifferential);
 	D_NEWTON_API ndMultiBodyVehicleDifferential(ndBodyKinematic* const differential, ndBodyKinematic* const chassis, dFloat32 slipOmegaLock);
 
 	dFloat32 GetSlipOmega() const;

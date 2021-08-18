@@ -229,7 +229,7 @@ class ndConstraint
 {
 	public:
 	// add some reflexion to the classes
-	D_CLASS_RELECTION(ndConstraint);
+	D_CLASS_REFLECTION(ndConstraint);
 
 	virtual ~ndConstraint();
 

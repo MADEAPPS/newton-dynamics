@@ -206,7 +206,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndShape: public dClassAlloc
 {
 	public:
-	D_CLASS_RELECTION(ndShape);
+	D_CLASS_REFLECTION(ndShape);
 	dInt32 GetRefCount() const;
 	virtual dInt32 Release() const;
 	virtual const ndShape* AddRef() const;

@@ -31,7 +31,7 @@ class ndCharacter;
 class ndCharacterPoseController: public dClassAlloc
 {
 	public:
-	D_CLASS_RELECTION(ndCharacterPoseController);
+	D_CLASS_REFLECTION(ndCharacterPoseController);
 
 	D_NEWTON_API ndCharacterPoseController(ndCharacter* const owner);
 	D_NEWTON_API virtual ~ndCharacterPoseController ();

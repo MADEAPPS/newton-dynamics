@@ -66,7 +66,7 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode);
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
 
-	D_CLASS_RELECTION(ndMultiBodyVehicle);
+	D_CLASS_REFLECTION(ndMultiBodyVehicle);
 	ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 	virtual dFloat32 GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const;
 

@@ -18,7 +18,7 @@
 class ndJointFixDistance: public ndJointBilateralConstraint
 {
 	public:
-	D_CLASS_RELECTION(ndJointFixDistance);
+	D_CLASS_REFLECTION(ndJointFixDistance);
 	D_NEWTON_API ndJointFixDistance(const dVector& childPivotInGlobalSpace, const dVector& parentPivotInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointFixDistance();
 

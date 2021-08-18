@@ -21,3 +21,43 @@
 
 #include "dCoreStdafx.h"
 #include "dTypes.h"
+#include "dCRC.h"
+#include "dClassAlloc.h"
+#include "dFixSizeArray.h"	
+
+class dLoaderFactory
+{
+	public:
+	dClassLoaderBase* m_loader;
+	dUnsigned64 m_classNameHash;
+};
+
+static dFixSizeArray<dLoaderFactory, 128>& GetFactory()
+{
+	static dFixSizeArray<dLoaderFactory, 128> factory;
+	return factory;
+}
+
+void RegisterLoaderClass(const char* const className, dClassLoaderBase* const loaderClass)
+{
+	dLoaderFactory entry;
+	entry.m_classNameHash = dCRC64(className);
+	entry.m_loader = loaderClass;
+	dFixSizeArray<dLoaderFactory, 128>& factory = GetFactory();
+	factory.PushBack(entry);
+}
+
+void* LoadClass(const char* const className, const nd::TiXmlNode* const xmlNode)
+{
+	dUnsigned64 classNameHash = dCRC64(className);
+
+	const dFixSizeArray<dLoaderFactory, 128>& factory = GetFactory();
+	for (dInt32 i = 0; i < factory.GetCount(); i++)
+	{
+		if (factory[i].m_classNameHash == classNameHash)
+		{
+			return factory[i].m_loader->CreateClass(xmlNode);
+		}
+	}
+	return nullptr;
+}
