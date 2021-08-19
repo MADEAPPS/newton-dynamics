@@ -133,18 +133,3 @@ void ndPhysicsWorld::OnPostUpdate(dFloat32 timestep)
 		m_soundManager->Update(this, timestep);
 	}
 }
-
-//ndBody* ndPhysicsWorld::LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath) const
-ndBody* ndPhysicsWorld::LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const) const
-{
-	if (!strcmp(bodyClassName, "ndArchimedesBuoyancyVolume"))
-	{
-		return new ndArchimedesBuoyancyVolume(parentNode, shapesCache);
-	}
-	else if (!strcmp(bodyClassName, "ndBasicPlayerCapsule"))
-	{
-		return new ndBasicPlayerCapsule(parentNode, shapesCache, (ndPhysicsWorld*)this);
-	}
-
-	return nullptr;
-}

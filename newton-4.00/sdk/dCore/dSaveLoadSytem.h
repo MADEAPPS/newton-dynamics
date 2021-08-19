@@ -26,30 +26,55 @@
 #include "dTypes.h"
 #include "dTree.h"
 
+class ndBody;
 class ndShape;
-class ndBodyKinematic;
 
 class ndShapeLoaderCache : public dTree<const ndShape*, dUnsigned32>
 {
 };
 
-class ndBodyLoaderCache : public dTree<const ndBodyKinematic*, dUnsigned32>
+class ndBodyLoaderCache : public dTree<const ndBody*, dUnsigned32>
 {
 };
 
 class dClassLoaderBase
 {
 	public:
-	virtual void* CreateClass(const nd::TiXmlNode* const, const char* const)
+	class dDesc
+	{
+		public:
+		dDesc()
+			:m_assetPath(nullptr)
+			,m_rootNode(nullptr)
+			,m_shapeMap(nullptr)
+			,m_bodyMap(nullptr)
+		{
+		}
+
+		dDesc(const dDesc& desc)
+			:m_assetPath(desc.m_assetPath)
+			,m_rootNode(desc.m_rootNode->FirstChild())
+			,m_shapeMap(desc.m_shapeMap)
+			,m_bodyMap(desc.m_bodyMap)
+		{
+		}
+
+
+		const char* m_assetPath;
+		const nd::TiXmlNode* m_rootNode;
+		const ndShapeLoaderCache* m_shapeMap;
+		const ndBodyLoaderCache* m_bodyMap;
+	};
+
+	virtual void* CreateClass(const dDesc&)
 	{
 		dAssert(0);
 		return nullptr;
 	}
 };
 
+D_CORE_API void* LoadClass(const char* const className, const dClassLoaderBase::dDesc& desc);
 D_CORE_API void RegisterLoaderClass(const char* const className, dClassLoaderBase* const loaderClass);
-D_CORE_API void* LoadShapeClass(const char* const className, const nd::TiXmlNode* const xmlNode, const char* const assetPath);
-D_CORE_API void* LoadBodyClass(const char* const className, const nd::TiXmlNode* const xmlNode, const char* const assetPath, const ndShapeLoaderCache& shapeMap);
 
 template<class T>
 class dClassLoader: public dClassLoaderBase
@@ -60,9 +85,9 @@ class dClassLoader: public dClassLoaderBase
 		RegisterLoaderClass(className, this);
 	}
 
-	virtual void* CreateClass(const nd::TiXmlNode* const xmlNode, const char* const assetPath)
+	virtual void* CreateClass(const dDesc& desc)
 	{
-		return new T(xmlNode, assetPath);
+		return new T(desc);
 	}
 };
 
@@ -70,17 +95,11 @@ class dClassLoader: public dClassLoaderBase
 	static const char* ClassName() {return #Class;}				\
 	D_CORE_API static dClassLoader<Class> __classLoader__;
 
-#define D_LOAD_SHAPE(castType,className,node,assetPath) \
-	(castType*)LoadShapeClass(className, node, assetPath);
-
-#define D_CLASS_REFLECTION_IMPLEMENT_SHAPE_LOADER(Class) \
+#define D_CLASS_REFLECTION_IMPLEMENT_LOADER(Class) \
 	D_CORE_API dClassLoader<Class> Class::__classLoader__(#Class);
 
-#define D_LOAD_BODY(castType,className,node,assetPath,shapeMap) \
-	(castType*)LoadBodyClass(className, node, assetPath, shapeMap);
-
-#define D_CLASS_REFLECTION_IMPLEMENT_BODY_LOADER(Class) \
-	D_CORE_API dClassLoader<Class> Class::__classLoader__(#Class);
+#define D_CLASS_REFLECTION_LOAD_NODE(castType,className,desc) \
+	(castType*)LoadClass(className, desc);
 
 #endif
 

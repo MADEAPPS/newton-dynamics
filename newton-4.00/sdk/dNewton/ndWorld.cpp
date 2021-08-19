@@ -962,12 +962,6 @@ void ndWorld::LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShap
 	}
 }
 
-ndBody* ndWorld::LoadUserDefinedBody(const nd::TiXmlNode* const, const char* const, dTree<const ndShape*, dUnsigned32>&, const char* const) const
-{
-	dAssert(0);
-	return nullptr;
-}
-
 void ndWorld::Load(const nd::TiXmlElement* const rootNode, const char* const assetPath)
 {
 	dTree<const ndShape*, dUnsigned32> uniqueShapes;
@@ -1042,10 +1036,14 @@ void ndWorld::LoadCollisionShapes(
 	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndShapes");
 	dAssert(shapes);
 
+	dClassLoaderBase::dDesc descriptor;
+	descriptor.m_assetPath = assetPath;
+
 	for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
 	{
 		const char* const name = node->Value();
-		ndShape* const shape = D_LOAD_SHAPE(ndShape, name, node, assetPath);
+		descriptor.m_rootNode = node;
+		ndShape* const shape = D_CLASS_REFLECTION_LOAD_NODE(ndShape, name, descriptor);
 		dAssert(shape);
 		if (shape)
 		{
@@ -1094,19 +1092,21 @@ void ndWorld::LoadRigidBodies(
 	const nd::TiXmlNode* const bodies = rootNode->FirstChild("ndBodies");
 	dAssert(bodies);
 
+	dClassLoaderBase::dDesc descriptor;
+	descriptor.m_assetPath = assetPath;
+	descriptor.m_shapeMap = &shapesMap;
+
 	for (const nd::TiXmlNode* node = bodies->FirstChild(); node; node = node->NextSibling())
 	{
 		const char* const name = node->Value();
-		//ndBody* const body = LOAD__CLASS(ndBody, name, node, assetPath);
-		ndBody* const body = nullptr;
-		//dAssert(body);
+		descriptor.m_rootNode = node;
+		ndBody* const body = D_CLASS_REFLECTION_LOAD_NODE(ndBody, name, descriptor);
 		if (body)
 		{
-			dAssert(0);
-			//dInt32 hashId;
-			//const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-			//element->Attribute("hashId", &hashId);
-			//shapesMap.Insert(shape->AddRef(), hashId);
+			dInt32 hashId;
+			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+			element->Attribute("hashId", &hashId);
+			bodyMap.Insert(body, hashId);
 		}
 	}
 }
@@ -1184,12 +1184,20 @@ bool ndWorld::LoadScene(const char* const path)
 	LoadCollisionShapes(worldNode, assetPath, shapesMap);
 	LoadRigidBodies(worldNode, assetPath, shapesMap, bodyMap);
 
-	dTree<const ndShape*, dUnsigned32>::Iterator iter(shapesMap);
+	ndBodyLoaderCache::Iterator bodyIter(bodyMap);
+	for (bodyIter.Begin(); bodyIter; bodyIter++)
+	{
+		ndBody* const body = (ndBody*)bodyIter.GetNode()->GetInfo();
+		AddBody(body);
+	}
+
+	ndShapeLoaderCache::Iterator iter(shapesMap);
 	for (iter.Begin(); iter; iter++)
 	{
-		iter.GetNode()->GetInfo()->Release();
+		ndShape* const shape = (ndShape*)iter.GetNode()->GetInfo();
+		shape->Release();
 	}
-	
+		
 	setlocale(LC_ALL, oldloc);
 	return true;
 }

@@ -114,8 +114,8 @@ ndBodyKinematic::ndBodyKinematic()
 	SetMassMatrix(dVector::m_zero);
 }
 
-ndBodyKinematic::ndBodyKinematic(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
-	:ndBody(xmlNode->FirstChild("ndBody"), shapesCache)
+ndBodyKinematic::ndBodyKinematic(const dClassLoaderBase::dDesc& desc)
+	:ndBody(dClassLoaderBase::dDesc(desc))
 	,m_invWorldInertiaMatrix(dGetZeroMatrix())
 	,m_shapeInstance(ndDummyCollision::GetNullShape())
 	,m_mass(dVector::m_zero)
@@ -138,10 +138,11 @@ ndBodyKinematic::ndBodyKinematic(const nd::TiXmlNode* const xmlNode, const dTree
 	,m_index(0)
 	,m_sleepingCounter(0)
 {
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	m_invWorldInertiaMatrix[3][3] = dFloat32(1.0f);
-	ndShapeInstance instance(xmlNode->FirstChild("ndShapeInstance"), shapesCache);
+	ndShapeInstance instance(xmlNode->FirstChild("ndShapeInstance"), *desc.m_shapeMap);
 	SetCollisionShape(instance);
-
+	
 	dFloat32 invMass = xmlGetFloat(xmlNode, "invMass");
 	SetMassMatrix(dVector::m_zero);
 	if (invMass > dFloat32 (0.0f))
@@ -151,6 +152,9 @@ ndBodyKinematic::ndBodyKinematic(const nd::TiXmlNode* const xmlNode, const dTree
 		dVector mass (invInertia.Scale(dFloat32(1.0f) / invMass));
 		SetMassMatrix(mass.m_x, mass.m_y, mass.m_z, mass.m_w);
 	}
+
+	m_maxAngleStep = xmlGetFloat(xmlNode, "maxAngleStep");
+	m_maxLinearSpeed = xmlGetFloat(xmlNode, "maxLinearSpeed");
 }
 
 ndBodyKinematic::~ndBodyKinematic()
@@ -547,9 +551,13 @@ void ndBodyKinematic::Save(nd::TiXmlElement* const rootNode, const char* const a
 	rootNode->LinkEndChild(paramNode);
 	paramNode->SetAttribute("hashId", nodeHash);
 	ndBody::Save(paramNode, assetPath, shapeHash, nodeHash);
-
-	m_shapeInstance.Save(paramNode, shapeHash);
+	
 	xmlSaveParam(paramNode, "invMass", m_invMass.m_w);
 	dVector invInertia(m_invMass & dVector::m_triplexMask);
 	xmlSaveParam(paramNode, "invPrincipalInertia", invInertia);
+
+	xmlSaveParam(paramNode, "maxAngleStep", m_maxAngleStep);
+	xmlSaveParam(paramNode, "maxLinearSpeed", m_maxLinearSpeed);
+
+	m_shapeInstance.Save(paramNode, shapeHash);
 }

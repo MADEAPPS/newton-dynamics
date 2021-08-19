@@ -257,9 +257,7 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 				if (notify)
 				{
 					notify->OnObjectPick();
-
 					m_targetPicked = body;
-					//dMatrix matrix (m_targetPicked->GetMatrix());
 
 					m_pickedBodyParam = param;
 					if (m_pickJoint)

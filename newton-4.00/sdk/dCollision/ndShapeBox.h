@@ -29,7 +29,7 @@ class ndShapeBox: public ndShapeConvex
 {
 	public:
 	D_CLASS_REFLECTION(ndShapeBox);
-	D_COLLISION_API ndShapeBox(const nd::TiXmlNode* const xmlNode, const char* const assetPath);
+	D_COLLISION_API ndShapeBox(const dClassLoaderBase::dDesc& desc);
 	D_COLLISION_API ndShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
 	D_COLLISION_API virtual ~ndShapeBox();
 

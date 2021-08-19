@@ -105,7 +105,7 @@ class ndShapeInstance: public dClassAlloc
 
 	D_COLLISION_API ndShapeInstance(ndShape* const shape);
 	D_COLLISION_API ndShapeInstance(const ndShapeInstance& instance);
-	D_COLLISION_API ndShapeInstance(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache);
+	D_COLLISION_API ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndShapeLoaderCache& shapesMap);
 	D_COLLISION_API ~ndShapeInstance();
 	D_COLLISION_API ndShapeInstance& operator=(const ndShapeInstance& src);
 

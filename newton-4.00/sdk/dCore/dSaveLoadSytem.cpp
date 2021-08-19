@@ -48,7 +48,7 @@ void RegisterLoaderClass(const char* const className, dClassLoaderBase* const lo
 	factory.PushBack(entry);
 }
 
-void* LoadShapeClass(const char* const className, const nd::TiXmlNode* const xmlNode, const char* const assetPath)
+void* LoadClass(const char* const className, const dClassLoaderBase::dDesc& descriptor)
 {
 	dUnsigned64 classNameHash = dCRC64(className);
 
@@ -57,15 +57,10 @@ void* LoadShapeClass(const char* const className, const nd::TiXmlNode* const xml
 	{
 		if (factory[i].m_classNameHash == classNameHash)
 		{
-			return factory[i].m_loader->CreateClass(xmlNode, assetPath);
+			return factory[i].m_loader->CreateClass(descriptor);
 		}
 	}
 	//dAssert(0);
 	return nullptr;
 }
 
-void* LoadBodyClass(const char* const className, const nd::TiXmlNode* const xmlNode, const char* const assetPath, const ndShapeLoaderCache& shapeMap)
-{
-	dAssert(0);
-	return nullptr;
-}

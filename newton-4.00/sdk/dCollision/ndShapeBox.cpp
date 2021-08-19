@@ -26,7 +26,7 @@
 #include "ndShapeBox.h"
 #include "ndContactSolver.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_SHAPE_LOADER(ndShapeBox)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeBox)
 
 dInt32 ndShapeBox::m_initSimplex = 0;
 ndShapeConvex::ndConvexSimplexEdge ndShapeBox::m_edgeArray[24];
@@ -51,9 +51,10 @@ ndShapeBox::ndShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 	Init(size_x, size_y, size_z);
 }
 
-ndShapeBox::ndShapeBox(const nd::TiXmlNode* const xmlNode, const char* const)
+ndShapeBox::ndShapeBox(const dClassLoaderBase::dDesc& desc)
 	:ndShapeConvex(m_box)
 {
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	dFloat32 size_x = xmlGetFloat(xmlNode, "size_x");
 	dFloat32 size_y = xmlGetFloat(xmlNode, "size_y");
 	dFloat32 size_z = xmlGetFloat(xmlNode, "size_z");

@@ -98,7 +98,7 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance, ndShape* const
 {
 }
 
-ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
+ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndShapeLoaderCache& shapesCache)
 	:dClassAlloc()
 	,m_globalMatrix(dGetIdentityMatrix())
 	,m_localMatrix(dGetIdentityMatrix())
@@ -114,7 +114,7 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const dTree
 	,m_scaleType(m_unit)
 	,m_collisionMode(true)
 {
-	dInt32 index = xmlGetInt(xmlNode, "shapeNodeId");
+	dInt32 index = xmlGetInt(xmlNode, "shapeHashId");
 	m_shape = shapesCache.Find(index)->GetInfo()->AddRef();
 
 	m_localMatrix = xmlGetMatrix(xmlNode, "localMatrix");

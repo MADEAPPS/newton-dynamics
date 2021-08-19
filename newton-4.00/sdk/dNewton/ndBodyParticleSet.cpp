@@ -39,8 +39,8 @@ ndBodyParticleSet::ndBodyParticleSet()
 	//dAssert(0);
 }
 
-ndBodyParticleSet::ndBodyParticleSet(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
-	:ndBody(xmlNode->FirstChild("ndBodyKinematic"), shapesCache)
+ndBodyParticleSet::ndBodyParticleSet(const dClassLoaderBase::dDesc& desc)
+	:ndBody(desc)
 	//,m_accel(dVector::m_zero)
 	//,m_alpha(dVector::m_zero)
 	//,m_externalForce(dVector::m_zero)
@@ -50,6 +50,7 @@ ndBodyParticleSet::ndBodyParticleSet(const nd::TiXmlNode* const xmlNode, const d
 	//,m_savedExternalForce(dVector::m_zero)
 	//,m_savedExternalTorque(dVector::m_zero)
 {
+	//xmlNode->FirstChild("ndBodyKinematic"), shapesCache
 	// nothing was saved
 	dAssert(0);
 }

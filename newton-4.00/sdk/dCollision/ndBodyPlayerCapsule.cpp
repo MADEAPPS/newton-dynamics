@@ -115,32 +115,34 @@ ndBodyPlayerCapsule::ndBodyPlayerCapsule(const dMatrix& localAxis, dFloat32 mass
 	m_stepHeight = dMax(stepHeight, m_contactPatch * dFloat32(2.0f));
 }
 
-ndBodyPlayerCapsule::ndBodyPlayerCapsule(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
-	:ndBodyKinematic(xmlNode->FirstChild("ndBodyKinematic"), shapesCache)
+ndBodyPlayerCapsule::ndBodyPlayerCapsule(const dClassLoaderBase::dDesc& desc)
+	//:ndBodyKinematic(xmlNode->FirstChild("ndBodyKinematic"), shapesCache)
+	:ndBodyKinematic(desc)
 {
-	m_contactTestOnly = 1;
-	m_impulse = dVector::m_zero;
-	m_headingAngle = dFloat32(0.0f);
-	m_forwardSpeed = dFloat32(0.0f);
-	m_lateralSpeed = dFloat32(0.0f);
-	m_stepHeight = dFloat32(0.0f);
-	m_contactPatch = dFloat32(0.0f);
-
-	m_mass = xmlGetFloat(xmlNode, "mass");
-	m_height = xmlGetFloat(xmlNode, "height");
-	m_radius = xmlGetFloat(xmlNode, "radius");
-	m_weistScale = xmlGetFloat(xmlNode, "weistScale");
-	m_crouchScale = xmlGetFloat(xmlNode, "crouchScale");
-	m_isAirbone = xmlGetFloat(xmlNode, "isAirbone") ? true : false;
-	m_isOnFloor = xmlGetFloat(xmlNode, "isOnFloor") ? true : false;
-	m_isCrouched = xmlGetFloat(xmlNode, "isCrouched") ? true : false;
-	m_localFrame = xmlGetMatrix(xmlNode, "localFrame");
-
-	SetMassMatrix(m_mass, GetCollisionShape());
-	m_invMass = GetInvMass();
-	m_contactPatch = m_radius / m_weistScale;
-	m_stepHeight = xmlGetFloat(xmlNode, "stepHeight");
-	m_headingAngle = xmlGetFloat(xmlNode, "headingAngle");
+	dAssert(0);
+	//m_contactTestOnly = 1;
+	//m_impulse = dVector::m_zero;
+	//m_headingAngle = dFloat32(0.0f);
+	//m_forwardSpeed = dFloat32(0.0f);
+	//m_lateralSpeed = dFloat32(0.0f);
+	//m_stepHeight = dFloat32(0.0f);
+	//m_contactPatch = dFloat32(0.0f);
+	//
+	//m_mass = xmlGetFloat(xmlNode, "mass");
+	//m_height = xmlGetFloat(xmlNode, "height");
+	//m_radius = xmlGetFloat(xmlNode, "radius");
+	//m_weistScale = xmlGetFloat(xmlNode, "weistScale");
+	//m_crouchScale = xmlGetFloat(xmlNode, "crouchScale");
+	//m_isAirbone = xmlGetFloat(xmlNode, "isAirbone") ? true : false;
+	//m_isOnFloor = xmlGetFloat(xmlNode, "isOnFloor") ? true : false;
+	//m_isCrouched = xmlGetFloat(xmlNode, "isCrouched") ? true : false;
+	//m_localFrame = xmlGetMatrix(xmlNode, "localFrame");
+	//
+	//SetMassMatrix(m_mass, GetCollisionShape());
+	//m_invMass = GetInvMass();
+	//m_contactPatch = m_radius / m_weistScale;
+	//m_stepHeight = xmlGetFloat(xmlNode, "stepHeight");
+	//m_headingAngle = xmlGetFloat(xmlNode, "headingAngle");
 }
 
 ndBodyPlayerCapsule::~ndBodyPlayerCapsule()

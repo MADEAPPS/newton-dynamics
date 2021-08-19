@@ -20,7 +20,7 @@ class ndArchimedesBuoyancyVolume : public ndBodyTriggerVolume
 {
 	public:
 	ndArchimedesBuoyancyVolume();
-	ndArchimedesBuoyancyVolume(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache);
+	ndArchimedesBuoyancyVolume(const dClassLoaderBase::dDesc& desc);
 
 	void CalculatePlane(ndBodyKinematic* const body);
 	void OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep);

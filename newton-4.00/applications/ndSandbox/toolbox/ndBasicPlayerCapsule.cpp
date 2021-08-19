@@ -125,24 +125,25 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	m_animBlendTree->Evaluate(m_output, dFloat32(0.0f));
 }
 
-ndBasicPlayerCapsule::ndBasicPlayerCapsule(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache, ndPhysicsWorld* const world)
-	:ndBodyPlayerCapsule(ndBody::FindNode(xmlNode, "ndBodyPlayerCapsule"), shapesCache)
+ndBasicPlayerCapsule::ndBasicPlayerCapsule(const dClassLoaderBase::dDesc& desc)
+	:ndBodyPlayerCapsule(desc)
 {
-	m_isPlayer = xmlGetInt(xmlNode, "isPlayer") ? true : false;
-	m_scene = world->GetManager();
-	if (m_isPlayer)
-	{
-		m_scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
-	}
-
-	ndDemoEntity* const entity = new ndDemoEntity(m_localFrame, nullptr);
-	const ndShapeInstance& shape = GetCollisionShape();
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", m_scene->GetShaderCache(), &shape, "smilli.tga", "marble.tga", "marble.tga");
-	entity->SetMesh(mesh, dGetIdentityMatrix());
-	mesh->Release();
-
-	m_scene->AddEntity(entity);
-	SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
+	dAssert(0);
+	//m_isPlayer = xmlGetInt(xmlNode, "isPlayer") ? true : false;
+	//m_scene = world->GetManager();
+	//if (m_isPlayer)
+	//{
+	//	m_scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
+	//}
+	//
+	//ndDemoEntity* const entity = new ndDemoEntity(m_localFrame, nullptr);
+	//const ndShapeInstance& shape = GetCollisionShape();
+	//ndDemoMesh* const mesh = new ndDemoMesh("shape", m_scene->GetShaderCache(), &shape, "smilli.tga", "marble.tga", "marble.tga");
+	//entity->SetMesh(mesh, dGetIdentityMatrix());
+	//mesh->Release();
+	//
+	//m_scene->AddEntity(entity);
+	//SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
 }
 
 ndBasicPlayerCapsule::~ndBasicPlayerCapsule()

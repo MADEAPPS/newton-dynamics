@@ -46,7 +46,7 @@ ndBody::ndBody()
 	m_uniqueIdCount++;
 }
 
-ndBody::ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>&)
+ndBody::ndBody(const dClassLoaderBase::dDesc& desc)
 	:m_matrix(dGetIdentityMatrix())
 	,m_veloc(dVector::m_zero)
 	,m_omega(dVector::m_zero)
@@ -62,13 +62,14 @@ ndBody::ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, d
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;
 
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
 	dMatrix matrix(xmlGetMatrix(xmlNode, "matrix"));
 	m_veloc = xmlGetVector3(xmlNode, "veloc");
 	m_omega = xmlGetVector3(xmlNode, "omega");
 	m_localCentreOfMass = xmlGetVector3(xmlNode, "centreOfMass");
 	m_autoSleep = xmlGetInt(xmlNode, "autoSleep") ? 1 : 0;
-	//m_collideWithLinkedBodies = xmlGetInt(xmlNode, "collideWithLinkedBodies") ? 1 : 0;
-
+	
 	SetMatrix(matrix);
 	const nd::TiXmlNode* const notifyNode = xmlNode->FirstChild("ndBodyNotify");
 	if (notifyNode)

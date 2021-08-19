@@ -28,7 +28,7 @@
 #define DG_CAPSULE_SEGMENTS		10
 #define DG_CAPSULE_CAP_SEGMENTS	12
 
-D_CLASS_REFLECTION_IMPLEMENT_SHAPE_LOADER(ndShapeCapsule)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeCapsule)
 
 ndShapeCapsule::ndShapeCapsule(dFloat32 radius0, dFloat32 radius1, dFloat32 height)
 	:ndShapeConvex(m_capsule)
@@ -36,9 +36,10 @@ ndShapeCapsule::ndShapeCapsule(dFloat32 radius0, dFloat32 radius1, dFloat32 heig
 	Init(radius0, radius1, height);
 }
 
-ndShapeCapsule::ndShapeCapsule(const nd::TiXmlNode* const xmlNode, const char* const)
+ndShapeCapsule::ndShapeCapsule(const dClassLoaderBase::dDesc& desc)
 	:ndShapeConvex(m_capsule)
 {
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	dFloat32 radius0 = xmlGetFloat(xmlNode, "radius0");
 	dFloat32 radius1 = xmlGetFloat(xmlNode, "radius1");
 	dFloat32 height = xmlGetFloat(xmlNode, "height");

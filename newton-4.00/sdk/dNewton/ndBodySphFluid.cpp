@@ -59,8 +59,8 @@ ndBodySphFluid::ndBodySphFluid()
 {
 }
 
-ndBodySphFluid::ndBodySphFluid(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
-	:ndBodyParticleSet(xmlNode->FirstChild("ndBodyKinematic"), shapesCache)
+ndBodySphFluid::ndBodySphFluid(const dClassLoaderBase::dDesc& desc)
+	:ndBodyParticleSet(desc)
 	,m_box0(dFloat32(-1e10f))
 	,m_box1(dFloat32(1e10f))
 	,m_hashGridMap()

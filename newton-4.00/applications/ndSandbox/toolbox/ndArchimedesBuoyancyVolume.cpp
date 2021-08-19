@@ -20,13 +20,14 @@ ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume()
 {
 }
 
-ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
-	:ndBodyTriggerVolume(ndBody::FindNode(xmlNode, "ndBodyTriggerVolume"), shapesCache)
+ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume(const dClassLoaderBase::dDesc& desc)
+	:ndBodyTriggerVolume(desc)
 {
-	m_plane = xmlGetVector3(xmlNode, "planeNormal");
-	m_plane.m_w = xmlGetFloat(xmlNode, "planeDist");
-	m_density = xmlGetFloat(xmlNode, "density");
-	m_hasPlane = xmlGetInt(xmlNode, "hasPlane") ? true : false;
+	dAssert(0);
+	//m_plane = xmlGetVector3(xmlNode, "planeNormal");
+	//m_plane.m_w = xmlGetFloat(xmlNode, "planeDist");
+	//m_density = xmlGetFloat(xmlNode, "density");
+	//m_hasPlane = xmlGetInt(xmlNode, "hasPlane") ? true : false;
 }
 
 void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)

@@ -24,7 +24,7 @@
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
 
-//D_CLASS_REFLECTION_IMPLEMENT_BODY_LOADER(ndBodyDynamic)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyDynamic)
 
 ndBodyDynamic::ndBodyDynamic()
 	:ndBodyKinematic()
@@ -42,8 +42,8 @@ ndBodyDynamic::ndBodyDynamic()
 {
 }
 
-ndBodyDynamic::ndBodyDynamic(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
-	:ndBodyKinematic(xmlNode->FirstChild("ndBodyKinematic"), shapesCache)
+ndBodyDynamic::ndBodyDynamic(const dClassLoaderBase::dDesc& desc)
+	:ndBodyKinematic(dClassLoaderBase::dDesc(desc))
 	,m_accel(dVector::m_zero)
 	,m_alpha(dVector::m_zero)
 	,m_externalForce(dVector::m_zero)
@@ -56,8 +56,10 @@ ndBodyDynamic::ndBodyDynamic(const nd::TiXmlNode* const xmlNode, const dTree<con
 	,m_cachedDampCoef(dVector::m_zero)
 	,m_cachedTimeStep(dFloat32(0.0f))
 {
-	// nothing was saved
-	//dAssert(0);
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_dampCoef = xmlGetVector3(xmlNode, "angularDampCoef");
+	m_dampCoef.m_w = xmlGetFloat(xmlNode, "linearDampCoef");
 }
 
 ndBodyDynamic::~ndBodyDynamic()

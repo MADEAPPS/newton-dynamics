@@ -34,10 +34,8 @@ class ndPhysicsWorld: public ndWorld
 	virtual void LoadSceneSettings(const nd::TiXmlNode* const rootNode);
 
 	private:
-	void OnPostUpdate(dFloat32 timestep);
-	ndBody* LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath) const;
-
 	void DeletePendingObjects();
+	void OnPostUpdate(dFloat32 timestep);
 
 	ndDemoEntityManager* m_manager;
 	ndSoundManager* m_soundManager;
