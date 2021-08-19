@@ -15,5 +15,8 @@
 
 bool dGetOpenFileNamePLY(char* const fileName, int maxSize);
 
+bool dGetLoadNdFileName(char* const fileName, int maxSize);
+bool dGetSaveNdFileName(char* const fileName, int maxSize);
+
 #endif 
 

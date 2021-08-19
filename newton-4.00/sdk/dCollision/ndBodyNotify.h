@@ -30,6 +30,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndBodyNotify: public dClassAlloc
 {
 	public:  
+	D_CLASS_REFLECTION(ndBodyNotify);
 	ndBodyNotify(const dVector& defualtGravity);
 	D_COLLISION_API ndBodyNotify(const nd::TiXmlNode* const rootNode);
 	virtual ~ndBodyNotify();

@@ -283,7 +283,7 @@ class dClassLoader: public dClassLoaderBase
 #define LOADCLASS(castType,className,node,assetPath) (castType*)LoadClass(className, node, assetPath);
 
 #define D_CLASS_REFLECTION(Class)								\
-	D_CORE_API static const char* ClassName() {return #Class;}	\
+	static const char* ClassName() {return #Class;}				\
 	D_CORE_API static dClassLoader<Class> __classLoader__;
 
 #define D_CLASS_IMPLEMENT_REFLECTION(Class)							\

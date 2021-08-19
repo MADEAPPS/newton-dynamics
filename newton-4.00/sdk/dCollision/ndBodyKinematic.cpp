@@ -541,14 +541,14 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 	}
 }
 
-void ndBodyKinematic::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId, dInt32 bodyId) const
+void ndBodyKinematic::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeHash, dInt32 nodeHash) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement(ClassName());
 	rootNode->LinkEndChild(paramNode);
+	paramNode->SetAttribute("hashId", nodeHash);
+	ndBody::Save(paramNode, assetPath, shapeHash, nodeHash);
 
-	ndBody::Save(paramNode, assetPath, shapeId, bodyId);
-
-	m_shapeInstance.Save(paramNode, shapeId);
+	m_shapeInstance.Save(paramNode, shapeHash);
 	xmlSaveParam(paramNode, "invMass", m_invMass.m_w);
 	dVector invInertia(m_invMass & dVector::m_triplexMask);
 	xmlSaveParam(paramNode, "invPrincipalInertia", invInertia);

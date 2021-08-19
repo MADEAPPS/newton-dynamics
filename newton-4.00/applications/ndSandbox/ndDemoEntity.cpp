@@ -30,6 +30,13 @@ ndDemoEntityNotify::~ndDemoEntityNotify()
 	}
 }
 
+void ndDemoEntityNotify::Save(nd::TiXmlElement* const rootNode, const char* const assetPath) const
+{
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement(ClassName());
+	rootNode->LinkEndChild(paramNode);
+	ndBodyNotify::Save(rootNode, assetPath);
+}
+
 void ndDemoEntityNotify::OnObjectPick() const
 {
 	dTrace(("picked body id: %d\n", GetBody()->GetId()));

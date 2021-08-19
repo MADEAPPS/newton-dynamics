@@ -22,6 +22,7 @@ class ndDemoMeshInterface;
 class ndDemoEntityNotify: public ndBodyNotify
 {
 	public:
+	D_CLASS_REFLECTION(ndDemoEntityNotify);
 	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody = nullptr, dFloat32 gravity = DEMO_GRAVITY);
 	virtual ~ndDemoEntityNotify();
 
@@ -33,6 +34,8 @@ class ndDemoEntityNotify: public ndBodyNotify
 	virtual void OnObjectPick() const;
 	virtual void OnTransform(dInt32 threadIndex, const dMatrix& matrix);
 	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep);
+
+	virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath) const;
 
 	ndDemoEntity* m_entity;
 	ndBodyDynamic* m_parentBody;

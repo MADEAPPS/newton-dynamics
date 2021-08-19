@@ -118,5 +118,86 @@ bool dGetSaveFileNameSerialization(char* const fileName, int maxSize)
 #else
 	return false;
 #endif
+}
 
+bool dGetSaveNdFileName(char* const fileName, int maxSize)
+{
+#if (defined(WIN32) || defined(_WIN32))
+	OPENFILENAME ofn;
+	// open a file name
+	char appPath[256];
+	GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
+	_strlwr(appPath);
+
+	char* const end = strstr(appPath, "applications");
+	end[0] = 0;
+	strcat(appPath, "applications\\ndSandbox");
+
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = nullptr;
+	ofn.lpstrFile = fileName;
+	ofn.lpstrFile[0] = '\0';
+	ofn.nMaxFile = maxSize;
+	ofn.lpstrFilter = const_cast<LPSTR>("newton save file *.nd\0*.nd\0");
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics 4.0 demos");
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = appPath;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	bool state = GetSaveFileName(&ofn) ? true : false;
+	if (state) 
+	{
+		char* const ext = strrchr(fileName, '.');
+		if (!ext) 
+		{
+			strcat(fileName, ".nd");
+		}
+	}
+	return state;
+#else
+	return false;
+#endif
+}
+
+bool dGetLoadNdFileName(char* const fileName, int maxSize)
+{
+#if (defined(WIN32) || defined(_WIN32))
+	OPENFILENAME ofn;
+	// open a file name
+	char appPath[256];
+	GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
+	_strlwr(appPath);
+
+	char* const end = strstr(appPath, "applications");
+	end[0] = 0;
+	strcat(appPath, "applications\\ndSandbox");
+
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = nullptr;
+	ofn.lpstrFile = fileName;
+	ofn.lpstrFile[0] = '\0';
+	ofn.nMaxFile = maxSize;
+	ofn.lpstrFilter = const_cast<LPSTR>("newton load file *.nd\0*.nd\0");
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFileTitle = const_cast<LPSTR>("Newton Dynamics 4.0 demos");
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = appPath;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	bool state = GetOpenFileName(&ofn) ? true : false;
+	if (state)
+	{
+		char* const ext = strrchr(fileName, '.');
+		if (!ext)
+		{
+			strcat(fileName, ".nd");
+		}
+	}
+	return state;
+#else
+	return false;
+#endif
 }

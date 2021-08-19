@@ -717,7 +717,7 @@ void ndDemoEntityManager::ApplyMenuOptions()
 
 void ndDemoEntityManager::ShowMainMenuBar()
 {
-	dInt32 mainMenu = 0;
+	ndMenuSelection menuSelection = m_none;
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File")) 
@@ -732,23 +732,23 @@ void ndDemoEntityManager::ShowMainMenuBar()
 
 			if (ImGui::MenuItem("New", "")) 
 			{
-				mainMenu = 1;
+				menuSelection = m_new;
 			}
 			ImGui::Separator();
 
 			if (ImGui::MenuItem("Open", "")) 
 			{
-				mainMenu = 2;
+				menuSelection = m_load;
 			}
 			if (ImGui::MenuItem("Save", "")) 
 			{
-				mainMenu = 3;
+				menuSelection = m_save;
 			}
 
 			ImGui::Separator();
 			if (ImGui::MenuItem("import ply file", "")) 
 			{
-				mainMenu = 4;
+				//mainMenu = 4;
 			}
 
 			ImGui::Separator();
@@ -796,16 +796,6 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			m_solverMode = ndWorld::ndSolverModes(solverMode);
 			ImGui::Separator();
 
-			//dInt32 index = 0;
-			//ImGui::RadioButton("default solver", &m_currentPlugin, index);
-			//char ids[32][32];
-			//for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
-			//	index++;
-			//	const char* const id = NewtonGetPluginString(m_world, plugin);
-			//	sprintf (&ids[index][0], "%s", id);
-			//	ImGui::RadioButton(&ids[index][0], &m_currentPlugin, index);
-			//}
-			//ImGui::Separator();
 			ImGui::Text("solver sub steps");
 			ImGui::SliderInt("##solv", &m_solverSubSteps, 2, 8);
 			ImGui::Text("iterative solver passes");
@@ -853,9 +843,9 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		}
 	}
 
-	switch (mainMenu)
+	switch (menuSelection)
 	{
-		case 1:
+		case m_new:
 		{
 			// menu new 
 			Cleanup();
@@ -865,17 +855,24 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			break;
 		}
 
-		case 4:
+		case m_load:
 		{
-			// open Scene
 			m_currentScene = -1;
 			char fileName[1024];
-			Cleanup();
-			if (dGetOpenFileNamePLY(fileName, 1024)) 
+			if (dGetLoadNdFileName(fileName, 1024))
 			{
-				ApplyMenuOptions();
-				ImportPLYfile(fileName);
-				ResetTimer();
+				m_world->LoadScene(fileName);
+			}
+			break;
+		}
+
+		case m_save:
+		{
+			m_currentScene = -1;
+			char fileName[1024];
+			if (dGetSaveNdFileName(fileName, 1024))
+			{
+				m_world->SaveScene(fileName);
 			}
 			break;
 		}

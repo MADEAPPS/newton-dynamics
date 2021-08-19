@@ -34,6 +34,14 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	typedef void (*RenderGuiHelpCallback) (ndDemoEntityManager* const manager, void* const context);
 	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, dFloat32 timestep);
 
+	enum ndMenuSelection
+	{
+		m_new,
+		m_load,
+		m_save,
+		m_none,
+	};
+
 	class ndKeyTrigger
 	{
 		public: 
