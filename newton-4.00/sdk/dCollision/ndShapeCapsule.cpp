@@ -28,7 +28,7 @@
 #define DG_CAPSULE_SEGMENTS		10
 #define DG_CAPSULE_CAP_SEGMENTS	12
 
-D_CLASS_IMPLEMENT_REFLECTION(ndShapeCapsule)
+D_CLASS_REFLECTION_IMPLEMENT_SHAPE_LOADER(ndShapeCapsule)
 
 ndShapeCapsule::ndShapeCapsule(dFloat32 radius0, dFloat32 radius1, dFloat32 height)
 	:ndShapeConvex(m_capsule)

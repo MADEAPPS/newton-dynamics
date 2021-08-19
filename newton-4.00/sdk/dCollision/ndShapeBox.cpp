@@ -26,7 +26,7 @@
 #include "ndShapeBox.h"
 #include "ndContactSolver.h"
 
-D_CLASS_IMPLEMENT_REFLECTION(ndShapeBox)
+D_CLASS_REFLECTION_IMPLEMENT_SHAPE_LOADER(ndShapeBox)
 
 dInt32 ndShapeBox::m_initSimplex = 0;
 ndShapeConvex::ndConvexSimplexEdge ndShapeBox::m_edgeArray[24];

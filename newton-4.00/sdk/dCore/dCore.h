@@ -58,6 +58,7 @@
 #include <dConvexHull3d.h>
 #include <dConvexHull4d.h>
 #include <dBezierSpline.h>
+#include <dSaveLoadSytem.h>
 #include <dNodeHierarchy.h>
 #include <dIntersections.h>
 #include <dSpatialVector.h>

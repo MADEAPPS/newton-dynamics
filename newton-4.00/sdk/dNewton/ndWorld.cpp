@@ -1045,7 +1045,7 @@ void ndWorld::LoadCollisionShapes(
 	for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
 	{
 		const char* const name = node->Value();
-		ndShape* const shape = LOADCLASS (ndShape, name, node, assetPath);
+		ndShape* const shape = D_LOAD_SHAPE(ndShape, name, node, assetPath);
 		dAssert(shape);
 		if (shape)
 		{
@@ -1057,7 +1057,7 @@ void ndWorld::LoadCollisionShapes(
 	}
 }
 
-void ndWorld::SaveBodies(nd::TiXmlNode* const rootNode, const char* const assetPath,
+void ndWorld::SaveRididBodies(nd::TiXmlNode* const rootNode, const char* const assetPath,
 	const dTree<dUnsigned32, const ndShape*>& shapesMap,
 	dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap)
 {
@@ -1086,6 +1086,31 @@ void ndWorld::SaveBodies(nd::TiXmlNode* const rootNode, const char* const assetP
 		}
 	}
 }
+
+void ndWorld::LoadRigidBodies(
+	const nd::TiXmlNode* const rootNode, const char* const assetPath,
+	const ndShapeLoaderCache& shapesMap, ndBodyLoaderCache& bodyMap)
+{
+	const nd::TiXmlNode* const bodies = rootNode->FirstChild("ndBodies");
+	dAssert(bodies);
+
+	for (const nd::TiXmlNode* node = bodies->FirstChild(); node; node = node->NextSibling())
+	{
+		const char* const name = node->Value();
+		//ndBody* const body = LOAD__CLASS(ndBody, name, node, assetPath);
+		ndBody* const body = nullptr;
+		//dAssert(body);
+		if (body)
+		{
+			dAssert(0);
+			//dInt32 hashId;
+			//const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+			//element->Attribute("hashId", &hashId);
+			//shapesMap.Insert(shape->AddRef(), hashId);
+		}
+	}
+}
+
 
 void ndWorld::SaveScene(const char* const path)
 {
@@ -1117,7 +1142,7 @@ void ndWorld::SaveScene(const char* const path)
 
 	SaveSceneSettings(worldNode);
 	SaveCollisionShapes(worldNode, assetPath, shapeMap);
-	SaveBodies(worldNode, assetPath, shapeMap, bodyMap);
+	SaveRididBodies(worldNode, assetPath, shapeMap, bodyMap);
 
 	asciifile.SaveFile(path);
 	setlocale(LC_ALL, oldloc);
@@ -1152,10 +1177,12 @@ bool ndWorld::LoadScene(const char* const path)
 
 	const nd::TiXmlElement* const worldNode = doc.RootElement();
 
-	dTree<const ndShape*, dUnsigned32> shapesMap;
+	ndBodyLoaderCache bodyMap;
+	ndShapeLoaderCache shapesMap;
 
 	LoadSceneSettings(worldNode);
 	LoadCollisionShapes(worldNode, assetPath, shapesMap);
+	LoadRigidBodies(worldNode, assetPath, shapesMap, bodyMap);
 
 	dTree<const ndShape*, dUnsigned32>::Iterator iter(shapesMap);
 	for (iter.Begin(); iter; iter++)

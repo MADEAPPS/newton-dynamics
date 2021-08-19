@@ -47,6 +47,7 @@ class ndShapeDebugCallback;
 class ndShapeChamferCylinder;
 class ndShapeStaticProceduralMesh;
 
+
 enum ndShapeID
 {
 	// do not change the order of these enum
@@ -200,7 +201,6 @@ class ndShapeInfo
 		dFloat32 m_paramArray[32];
 	};
 } D_GCC_NEWTON_ALIGN_32;
-
 
 D_MSV_NEWTON_ALIGN_32
 class ndShape: public dClassAlloc

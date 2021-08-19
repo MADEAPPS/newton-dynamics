@@ -24,6 +24,8 @@
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
 
+//D_CLASS_REFLECTION_IMPLEMENT_BODY_LOADER(ndBodyDynamic)
+
 ndBodyDynamic::ndBodyDynamic()
 	:ndBodyKinematic()
 	,m_accel(dVector::m_zero)

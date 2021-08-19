@@ -90,22 +90,11 @@ class ndWorld: public dClassAlloc
 	D_NEWTON_API virtual void AddModel(ndModel* const model);
 	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
 	
-	D_NEWTON_API void SaveScene(const char* const path);
+	D_NEWTON_API virtual void SaveScene(const char* const path);
 	D_NEWTON_API virtual void SaveSceneSettings(nd::TiXmlNode* const rootNode);
 
-	D_NEWTON_API bool LoadScene(const char* const path);
+	D_NEWTON_API virtual bool LoadScene(const char* const path);
 	D_NEWTON_API virtual void LoadSceneSettings(const nd::TiXmlNode* const rootNode);
-
-	//void LoadSettings(const nd::TiXmlNode* const rootNode);
-	//void LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
-	//void LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
-	//
-	//D_NEWTON_API void Load(const char* const path);
-	//D_NEWTON_API void Load(const nd::TiXmlElement* const rootNode, const char* const assetPath);
-	//D_NEWTON_API virtual ndBody* LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath) const;
-	//
-	//D_NEWTON_API void Save(const char* const path) const;
-	//D_NEWTON_API void Save(nd::TiXmlElement* const rootNode, const char* const assetPath) const;
 
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
@@ -143,7 +132,7 @@ class ndWorld: public dClassAlloc
 	void SaveCollisionShapes(
 		nd::TiXmlNode* const rootNode, const char* const assetPath, 
 		dTree<dUnsigned32, const ndShape*>& shapesMap);
-	void SaveBodies(
+	void SaveRididBodies(
 		nd::TiXmlNode* const rootNode, const char* const assetPath, 
 		const dTree<dUnsigned32, const ndShape*>& shapesMap,
 		dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap);
@@ -151,6 +140,10 @@ class ndWorld: public dClassAlloc
 	void LoadCollisionShapes(
 		const nd::TiXmlNode* const rootNode, const char* const assetPath,
 		dTree<const ndShape*, dUnsigned32>& shapesMap) const;
+
+	void LoadRigidBodies(
+		const nd::TiXmlNode* const rootNode, const char* const assetPath,
+		const ndShapeLoaderCache& shapesMap, ndBodyLoaderCache& bodyMap);
 	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();
