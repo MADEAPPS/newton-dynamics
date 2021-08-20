@@ -45,6 +45,10 @@ class ndPhysicsWorldSettings : public ndWordSettings
 		ndWordSettings::Load(childDesc);
 
 		// load application specific settings here
+		dMatrix cameraMatrix(xmlGetMatrix(desc.m_rootNode, "cameraMatrix"));
+		ndPhysicsWorld* const world = (ndPhysicsWorld*)m_owner;
+		ndDemoEntityManager* const manager = world->GetManager();
+		manager->SetCameraMatrix(cameraMatrix, cameraMatrix.m_posit);
 	}
 
 	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const
