@@ -13,11 +13,22 @@
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndDemoEntityNotify)
+
 ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody, dFloat32 gravity)
 	:ndBodyNotify(dVector (dFloat32 (0.0f), gravity, dFloat32(0.0f), dFloat32(0.0f)))
 	,m_entity(entity)
 	,m_parentBody(parentBody)
 	,m_manager(manager)
+{
+}
+
+// member a fill in a post process pass
+ndDemoEntityNotify::ndDemoEntityNotify(const dLoadSaveBase::dDesc& desc)
+	:ndBodyNotify(dLoadSaveBase::dDesc(desc))
+	,m_entity(nullptr)
+	,m_parentBody(nullptr)
+	,m_manager(nullptr)
 {
 }
 
@@ -34,9 +45,8 @@ void ndDemoEntityNotify::Save(nd::TiXmlElement* const rootNode, const char* cons
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement(ClassName());
 	rootNode->LinkEndChild(paramNode);
-
-	xmlSaveParam(paramNode, "comment", "string", "body notification for Netwon 4.0 demos");
 	ndBodyNotify::Save(paramNode, assetPath);
+	xmlSaveParam(paramNode, "comment", "string", "body notification for Netwon 4.0 demos");
 }
 
 void ndDemoEntityNotify::OnObjectPick() const

@@ -32,7 +32,7 @@ class ndBodyNotify: public dClassAlloc
 	public:  
 	D_CLASS_REFLECTION(ndBodyNotify);
 	ndBodyNotify(const dVector& defualtGravity);
-	D_COLLISION_API ndBodyNotify(const nd::TiXmlNode* const rootNode);
+	D_COLLISION_API ndBodyNotify(const dLoadSaveBase::dDesc& desc);
 	virtual ~ndBodyNotify();
 
 	ndBody* GetBody();

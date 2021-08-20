@@ -42,7 +42,7 @@ class ndBody: public dClassAlloc
 	public:
 	D_CLASS_REFLECTION(ndBody);
 	D_COLLISION_API ndBody();
-	D_COLLISION_API ndBody(const dClassLoaderBase::dDesc& desc);
+	D_COLLISION_API ndBody(const dLoadSaveBase::dDesc& desc);
 	D_COLLISION_API virtual ~ndBody();
 
 	virtual ndBody* GetAsBody() { return this;}

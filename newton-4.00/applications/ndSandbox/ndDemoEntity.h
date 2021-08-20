@@ -23,6 +23,7 @@ class ndDemoEntityNotify: public ndBodyNotify
 {
 	public:
 	D_CLASS_REFLECTION(ndDemoEntityNotify);
+	ndDemoEntityNotify(const dLoadSaveBase::dDesc& desc);
 	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody = nullptr, dFloat32 gravity = DEMO_GRAVITY);
 	virtual ~ndDemoEntityNotify();
 

@@ -24,10 +24,13 @@
 #include "ndBodyNotify.h"
 #include "ndBodyKinematic.h"
 
-ndBodyNotify::ndBodyNotify(const nd::TiXmlNode* const rootNode)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyNotify)
+
+ndBodyNotify::ndBodyNotify(const dLoadSaveBase::dDesc& desc)
 	:dClassAlloc()
 	,m_body(nullptr)
 {
+	const nd::TiXmlNode* const rootNode = desc.m_rootNode;
 	m_defualtGravity = xmlGetVector3(rootNode, "gravity");
 }
 

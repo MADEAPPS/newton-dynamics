@@ -59,7 +59,7 @@ ndBodySphFluid::ndBodySphFluid()
 {
 }
 
-ndBodySphFluid::ndBodySphFluid(const dClassLoaderBase::dDesc& desc)
+ndBodySphFluid::ndBodySphFluid(const dLoadSaveBase::dDesc& desc)
 	:ndBodyParticleSet(desc)
 	,m_box0(dFloat32(-1e10f))
 	,m_box1(dFloat32(1e10f))

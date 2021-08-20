@@ -37,7 +37,7 @@ class ndBodyLoaderCache : public dTree<const ndBody*, dUnsigned32>
 {
 };
 
-class dClassLoaderBase
+class dLoadSaveBase
 {
 	public:
 	class dDesc
@@ -73,14 +73,14 @@ class dClassLoaderBase
 	}
 };
 
-D_CORE_API void* LoadClass(const char* const className, const dClassLoaderBase::dDesc& desc);
-D_CORE_API void RegisterLoaderClass(const char* const className, dClassLoaderBase* const loaderClass);
+D_CORE_API void* LoadClass(const char* const className, const dLoadSaveBase::dDesc& desc);
+D_CORE_API void RegisterLoaderClass(const char* const className, dLoadSaveBase* const loaderClass);
 
 template<class T>
-class dClassLoader: public dClassLoaderBase
+class dLoadSaveClass: public dLoadSaveBase
 {
 	public:
-	dClassLoader<T>(const char* const className)
+	dLoadSaveClass<T>(const char* const className)
 	{
 		RegisterLoaderClass(className, this);
 	}
@@ -93,10 +93,10 @@ class dClassLoader: public dClassLoaderBase
 
 #define D_CLASS_REFLECTION(Class)								\
 	static const char* ClassName() {return #Class;}				\
-	D_CORE_API static dClassLoader<Class> __classLoader__;
+	static dLoadSaveClass<Class> __classLoader__;
 
 #define D_CLASS_REFLECTION_IMPLEMENT_LOADER(Class) \
-	D_CORE_API dClassLoader<Class> Class::__classLoader__(#Class);
+	dLoadSaveClass<Class> Class::__classLoader__(#Class);
 
 #define D_CLASS_REFLECTION_LOAD_NODE(castType,className,desc) \
 	(castType*)LoadClass(className, desc);

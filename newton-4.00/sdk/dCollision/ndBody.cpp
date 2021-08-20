@@ -46,7 +46,7 @@ ndBody::ndBody()
 	m_uniqueIdCount++;
 }
 
-ndBody::ndBody(const dClassLoaderBase::dDesc& desc)
+ndBody::ndBody(const dLoadSaveBase::dDesc& desc)
 	:m_matrix(dGetIdentityMatrix())
 	,m_veloc(dVector::m_zero)
 	,m_omega(dVector::m_zero)
@@ -71,10 +71,16 @@ ndBody::ndBody(const dClassLoaderBase::dDesc& desc)
 	m_autoSleep = xmlGetInt(xmlNode, "autoSleep") ? 1 : 0;
 	
 	SetMatrix(matrix);
-	const nd::TiXmlNode* const notifyNode = xmlNode->FirstChild("ndBodyNotify");
+	const nd::TiXmlNode* const notifyNode = xmlNode->FirstChild("bodyNotifyClass");
 	if (notifyNode)
 	{
-		m_notifyCallback = new ndBodyNotify(notifyNode);
+		const nd::TiXmlNode* node = notifyNode->FirstChild();
+		const char* const className = node->Value();
+
+		dLoadSaveBase::dDesc notifyDesc(desc);
+		notifyDesc.m_rootNode = node;
+		//m_notifyCallback = new ndBodyNotify(notifyDesc);
+		m_notifyCallback = D_CLASS_REFLECTION_LOAD_NODE(ndBodyNotify, className, notifyDesc);
 		m_notifyCallback->m_body = this;
 	}
 }
@@ -156,7 +162,9 @@ void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath,
 
 	if (m_notifyCallback)
 	{
-		m_notifyCallback->Save(paramNode, assetPath);
+		nd::TiXmlElement* const notifyNode = new nd::TiXmlElement("bodyNotifyClass");
+		paramNode->LinkEndChild(notifyNode);
+		m_notifyCallback->Save(notifyNode, assetPath);
 	}
 
 	xmlSaveParam(paramNode, "matrix", m_matrix);

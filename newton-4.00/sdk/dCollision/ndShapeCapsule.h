@@ -29,7 +29,7 @@ class ndShapeCapsule : public ndShapeConvex
 {
 	public:
 	D_CLASS_REFLECTION(ndShapeCapsule);
-	D_COLLISION_API ndShapeCapsule(const dClassLoaderBase::dDesc& desc);
+	D_COLLISION_API ndShapeCapsule(const dLoadSaveBase::dDesc& desc);
 	D_COLLISION_API ndShapeCapsule (dFloat32 radio0, dFloat32 radio1, dFloat32 height);
 
 	virtual ndShapeCapsule* GetAsShapeCapsule() { return this; }

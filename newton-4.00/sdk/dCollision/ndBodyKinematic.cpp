@@ -114,8 +114,8 @@ ndBodyKinematic::ndBodyKinematic()
 	SetMassMatrix(dVector::m_zero);
 }
 
-ndBodyKinematic::ndBodyKinematic(const dClassLoaderBase::dDesc& desc)
-	:ndBody(dClassLoaderBase::dDesc(desc))
+ndBodyKinematic::ndBodyKinematic(const dLoadSaveBase::dDesc& desc)
+	:ndBody(dLoadSaveBase::dDesc(desc))
 	,m_invWorldInertiaMatrix(dGetZeroMatrix())
 	,m_shapeInstance(ndDummyCollision::GetNullShape())
 	,m_mass(dVector::m_zero)

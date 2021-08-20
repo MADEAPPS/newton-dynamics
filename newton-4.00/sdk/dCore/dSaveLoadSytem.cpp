@@ -29,7 +29,7 @@
 class dLoaderFactory
 {
 	public:
-	dClassLoaderBase* m_loader;
+	dLoadSaveBase* m_loader;
 	dUnsigned64 m_classNameHash;
 };
 
@@ -39,7 +39,7 @@ static dFixSizeArray<dLoaderFactory, 128>& GetFactory()
 	return factory;
 }
 
-void RegisterLoaderClass(const char* const className, dClassLoaderBase* const loaderClass)
+void RegisterLoaderClass(const char* const className, dLoadSaveBase* const loaderClass)
 {
 	dLoaderFactory entry;
 	entry.m_classNameHash = dCRC64(className);
@@ -48,7 +48,7 @@ void RegisterLoaderClass(const char* const className, dClassLoaderBase* const lo
 	factory.PushBack(entry);
 }
 
-void* LoadClass(const char* const className, const dClassLoaderBase::dDesc& descriptor)
+void* LoadClass(const char* const className, const dLoadSaveBase::dDesc& descriptor)
 {
 	dUnsigned64 classNameHash = dCRC64(className);
 
@@ -60,6 +60,19 @@ void* LoadClass(const char* const className, const dClassLoaderBase::dDesc& desc
 			return factory[i].m_loader->CreateClass(descriptor);
 		}
 	}
+	
+	dLoadSaveBase::dDesc baseClassDesc(descriptor);
+	for (const nd::TiXmlNode* node = descriptor.m_rootNode->FirstChild(); node; node = node->NextSibling())
+	{
+		const char* const name = node->Value();
+		baseClassDesc.m_rootNode = node;
+		void* object = LoadClass(name, baseClassDesc);
+		if (object)
+		{
+			return object;
+		}
+	}
+
 	//dAssert(0);
 	return nullptr;
 }

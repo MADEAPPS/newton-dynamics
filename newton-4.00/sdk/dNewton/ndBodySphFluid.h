@@ -33,7 +33,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 {
 	public:
 	D_NEWTON_API ndBodySphFluid();
-	D_NEWTON_API ndBodySphFluid(const dClassLoaderBase::dDesc& desc);
+	D_NEWTON_API ndBodySphFluid(const dLoadSaveBase::dDesc& desc);
 	D_NEWTON_API virtual ~ndBodySphFluid ();
 
 	virtual ndBodySphFluid* GetAsBodySphFluid();

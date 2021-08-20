@@ -42,8 +42,8 @@ ndBodyDynamic::ndBodyDynamic()
 {
 }
 
-ndBodyDynamic::ndBodyDynamic(const dClassLoaderBase::dDesc& desc)
-	:ndBodyKinematic(dClassLoaderBase::dDesc(desc))
+ndBodyDynamic::ndBodyDynamic(const dLoadSaveBase::dDesc& desc)
+	:ndBodyKinematic(dLoadSaveBase::dDesc(desc))
 	,m_accel(dVector::m_zero)
 	,m_alpha(dVector::m_zero)
 	,m_externalForce(dVector::m_zero)

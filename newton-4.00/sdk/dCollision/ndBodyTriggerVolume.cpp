@@ -29,7 +29,7 @@ ndBodyTriggerVolume::ndBodyTriggerVolume()
 	m_contactTestOnly = 1;
 }
 
-ndBodyTriggerVolume::ndBodyTriggerVolume(const dClassLoaderBase::dDesc& desc)
+ndBodyTriggerVolume::ndBodyTriggerVolume(const dLoadSaveBase::dDesc& desc)
 	:ndBodyKinematic(desc)
 {
 	dAssert(0);
