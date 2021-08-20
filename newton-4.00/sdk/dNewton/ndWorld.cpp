@@ -37,10 +37,10 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndWordSettings);
 
 
-ndWordSettings::ndWordSettings(const dLoadSaveBase::dLoadDescriptor& desc)
+ndWordSettings::ndWordSettings(const dLoadSaveBase::dLoadDescriptor&)
 	:dClassAlloc()
+	,m_owner(nullptr)
 {
-	dAssert(0);
 }
 
 void ndWordSettings::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
@@ -52,6 +52,16 @@ void ndWordSettings::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "revision", "string", "1.00");
 	xmlSaveParam(childNode, "solverSubsteps", m_owner->GetSubSteps());
 	xmlSaveParam(childNode, "solverIterations", m_owner->GetSolverIterations());
+}
+
+void ndWordSettings::Load(const dLoadSaveBase::dLoadDescriptor& desc) const
+{
+	dInt32 subSteps = xmlGetInt(desc.m_rootNode, "solverSubsteps");
+	dInt32 solverIterations = xmlGetInt(desc.m_rootNode, "solverIterations");
+
+	// maybe we should not change the configuration of the world base class 
+	m_owner->SetSubSteps(subSteps);
+	m_owner->SetSolverIterations(solverIterations);
 }
 
 class ndSkeletonQueue : public dFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>
@@ -952,15 +962,6 @@ void ndWorld::BodiesInAabb(ndBodiesInAabbNotify& callback) const
 
 void ndWorld::SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	//ndWordSettings setting((ndWorld*)this);
-	//nd::TiXmlElement* const childNode = new nd::TiXmlElement(setting.ClassName());
-	//desc.m_rootNode->LinkEndChild(childNode);
-	//
-	//xmlSaveParam(childNode, "description", "string", "Newton Dynamics 4.00");
-	//xmlSaveParam(childNode, "revision", "string", "1.00");
-	//xmlSaveParam(childNode, "solverSubsteps", m_subSteps);
-	//xmlSaveParam(childNode, "solverIterations", m_solverIterations);
-
 	ndWordSettings setting((ndWorld*)this);
 	setting.Save(desc);
 }
@@ -977,13 +978,25 @@ void ndWorld::SaveSceneSettings(nd::TiXmlNode* const rootNode, const char* const
 	SaveSceneSettings(descriptor);
 }
 
-void ndWorld::LoadSceneSettings(const nd::TiXmlNode* const rootNode)
+void ndWorld::LoadSceneSettings(const nd::TiXmlNode* const rootNode, const char* const assetPath) const
 {
-	const nd::TiXmlNode* const settings = rootNode->FirstChild("settings");
-	dAssert(settings);
+	const nd::TiXmlNode* const setting = rootNode->FirstChild("ndSettings");
+	dAssert(setting);
 
-	m_subSteps = xmlGetInt(settings, "solverSubsteps");
-	m_solverIterations = xmlGetInt(settings, "solverIterations");
+	const nd::TiXmlNode* node = setting->FirstChild();
+	const char* const className = node->Value();
+
+	dLoadSaveBase::dLoadDescriptor settingDesc;
+	settingDesc.m_rootNode = node;
+	settingDesc.m_assetPath = assetPath;
+
+	ndWordSettings* const worldSetting = D_CLASS_REFLECTION_LOAD_NODE(ndWordSettings, className, settingDesc);
+	worldSetting->m_owner = (ndWorld*) this;
+
+	worldSetting->Load(settingDesc);
+
+	// just delete the class;
+	delete worldSetting;
 }
 
 void ndWorld::SaveCollisionShapes(nd::TiXmlNode* const shapeRootNode, const char* const assetPath, dTree<dUnsigned32, const ndShape*>& shapeMap)
@@ -1169,7 +1182,7 @@ bool ndWorld::LoadScene(const char* const path)
 	ndBodyLoaderCache bodyMap;
 	ndShapeLoaderCache shapesMap;
 
-	LoadSceneSettings(worldNode);
+	LoadSceneSettings(worldNode, assetPath);
 	LoadCollisionShapes(worldNode, assetPath, shapesMap);
 	LoadRigidBodies(worldNode, assetPath, shapesMap, bodyMap);
 

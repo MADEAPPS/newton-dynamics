@@ -59,7 +59,6 @@ class dLoadSaveBase
 		{
 		}
 
-
 		const char* m_assetPath;
 		const nd::TiXmlNode* m_rootNode;
 		const ndBodyLoaderCache* m_bodyMap;

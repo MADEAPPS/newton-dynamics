@@ -49,11 +49,14 @@ class ndWordSettings : public dClassAlloc
 	D_CLASS_REFLECTION(ndWordSettings);
 
 	ndWordSettings(ndWorld* const owner)
-		:m_owner(owner)
+		:dClassAlloc()
+		,m_owner(owner)
 	{
 	}
 
 	D_NEWTON_API ndWordSettings(const dLoadSaveBase::dLoadDescriptor& desc);
+
+	D_NEWTON_API virtual void Load(const dLoadSaveBase::dLoadDescriptor& desc) const;
 	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 	ndWorld* m_owner;
 };
@@ -109,7 +112,6 @@ class ndWorld: public dClassAlloc
 	D_NEWTON_API virtual void SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	D_NEWTON_API virtual bool LoadScene(const char* const path);
-	D_NEWTON_API virtual void LoadSceneSettings(const nd::TiXmlNode* const rootNode);
 
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
@@ -146,7 +148,6 @@ class ndWorld: public dClassAlloc
 
 	void SaveSceneSettings(
 		nd::TiXmlNode* const rootNode, const char* const assetPath) const;
-	
 	void SaveCollisionShapes(
 		nd::TiXmlNode* const rootNode, const char* const assetPath, 
 		dTree<dUnsigned32, const ndShape*>& shapesMap);
@@ -155,10 +156,11 @@ class ndWorld: public dClassAlloc
 		const dTree<dUnsigned32, const ndShape*>& shapesMap,
 		dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap);
 
+	void LoadSceneSettings(
+		const nd::TiXmlNode* const rootNode, const char* const assetPath) const;
 	void LoadCollisionShapes(
 		const nd::TiXmlNode* const rootNode, const char* const assetPath,
 		dTree<const ndShape*, dUnsigned32>& shapesMap) const;
-
 	void LoadRigidBodies(
 		const nd::TiXmlNode* const rootNode, const char* const assetPath,
 		const ndShapeLoaderCache& shapesMap, ndBodyLoaderCache& bodyMap);

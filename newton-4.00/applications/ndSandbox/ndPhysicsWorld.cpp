@@ -34,9 +34,16 @@ class ndPhysicsWorldSettings : public ndWordSettings
 	}
 
 	ndPhysicsWorldSettings(const dLoadSaveBase::dLoadDescriptor& desc)
-		:ndWordSettings (dLoadSaveBase::dLoadDescriptor(desc))
+		:ndWordSettings(dLoadSaveBase::dLoadDescriptor(desc))
 	{
-		dAssert(0);
+	}
+
+	virtual void Load(const dLoadSaveBase::dLoadDescriptor& desc) const
+	{
+		dLoadSaveBase::dLoadDescriptor childDesc(desc);
+		ndWordSettings::Load(childDesc);
+
+		// load application specific settings here
 	}
 
 	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const
@@ -75,12 +82,6 @@ void ndPhysicsWorld::SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& des
 {
 	ndPhysicsWorldSettings setting((ndWorld*)this);
 	setting.Save(desc);
-}
-
-void ndPhysicsWorld::LoadSceneSettings(const nd::TiXmlNode* const rootNode)
-{
-	// always end by calling base class function
-	ndWorld::LoadSceneSettings(rootNode);
 }
 
 ndDemoEntityManager* ndPhysicsWorld::GetManager() const
