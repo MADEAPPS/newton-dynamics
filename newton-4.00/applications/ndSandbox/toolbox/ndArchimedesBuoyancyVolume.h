@@ -26,7 +26,7 @@ class ndArchimedesBuoyancyVolume : public ndBodyTriggerVolume
 	void OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep);
 	void OnTrigger(ndBodyKinematic* const kinBody, dFloat32 timestep);
 	void OnTriggerExit(ndBodyKinematic* const body, dFloat32 timestep);
-	virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeId) const;
+	virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeHash, dInt32 nodeHash) const;
 
 	dPlane m_plane;
 	dFloat32 m_density;

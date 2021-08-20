@@ -129,7 +129,6 @@ class ndBodyKinematic: public ndBody
 
 	D_COLLISION_API void UpdateInvInertiaMatrix();
 	D_COLLISION_API virtual void IntegrateVelocity(dFloat32 timestep);
-
 	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeHash, dInt32 nodeHash) const;
 
 	void SetMassMatrix(dFloat32 mass, const ndShapeInstance& shapeInstance);

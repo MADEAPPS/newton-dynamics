@@ -148,21 +148,20 @@ D_COLLISION_API const nd::TiXmlNode* ndBody::FindNode(const nd::TiXmlNode* const
 	return rootNode->FirstChild(name);
 }
 
-//void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeHash, const dTree<dUnsigned32, const ndShape*>&) const
 void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32, dInt32 nodeHash) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement(ClassName());
 	rootNode->LinkEndChild(paramNode);
 	paramNode->SetAttribute("hashId", nodeHash);
 
+	if (m_notifyCallback)
+	{
+		m_notifyCallback->Save(paramNode, assetPath);
+	}
+
 	xmlSaveParam(paramNode, "matrix", m_matrix);
 	xmlSaveParam(paramNode, "veloc", m_veloc);
 	xmlSaveParam(paramNode, "omega", m_omega);
 	xmlSaveParam(paramNode, "centreOfMass", m_localCentreOfMass);
 	xmlSaveParam(paramNode, "autoSleep", m_autoSleep ? 1 : 0);
-
-	if (m_notifyCallback)
-	{
-		m_notifyCallback->Save(paramNode, assetPath);
-	}
 }

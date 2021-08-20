@@ -34,13 +34,13 @@ class dTempArray : public dArray<T>
 		:dArray<T>()
 		,m_buffer(buffer)
 	{
-		m_array = buffer;
-		m_capacity = maxSize;
+		dArray<T>::m_array = buffer;
+		dArray<T>::m_capacity = maxSize;
 	}
 
 	~dTempArray()
 	{
-		m_array = nullptr;
+		dArray<T>::m_array = nullptr;
 	}
 
 	T* m_buffer;

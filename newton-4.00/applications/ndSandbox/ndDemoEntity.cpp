@@ -34,7 +34,9 @@ void ndDemoEntityNotify::Save(nd::TiXmlElement* const rootNode, const char* cons
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement(ClassName());
 	rootNode->LinkEndChild(paramNode);
-	ndBodyNotify::Save(rootNode, assetPath);
+
+	xmlSaveParam(paramNode, "comment", "string", "body notification for Netwon 4.0 demos");
+	ndBodyNotify::Save(paramNode, assetPath);
 }
 
 void ndDemoEntityNotify::OnObjectPick() const
