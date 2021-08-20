@@ -11,6 +11,7 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndPhysicsWorld.h"
+#include "ndDemoCamera.h"
 #include "ndSoundManager.h"
 #include "ndContactCallback.h"
 #include "ndDemoEntityManager.h"
@@ -52,7 +53,12 @@ class ndPhysicsWorldSettings : public ndWordSettings
 		desc.m_rootNode->LinkEndChild(childNode);
 		ndWordSettings::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 		
-		xmlSaveParam(childNode, "description", "string", "this scene was saved form Newton 4.0 sandbox demos");
+		xmlSaveParam(childNode, "description", "string", "this scene was saved from Newton 4.0 sandbox demos");
+
+		ndPhysicsWorld* const world = (ndPhysicsWorld*)m_owner;
+		ndDemoEntityManager* const manager = world->GetManager();
+		ndDemoCamera* const camera = manager->GetCamera();
+		xmlSaveParam(childNode, "cameraMatrix", camera->GetCurrentMatrix());
 	}
 };
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndPhysicsWorldSettings);
