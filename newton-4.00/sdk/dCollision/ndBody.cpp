@@ -46,7 +46,7 @@ ndBody::ndBody()
 	m_uniqueIdCount++;
 }
 
-ndBody::ndBody(const dLoadSaveBase::dDesc& desc)
+ndBody::ndBody(const dLoadSaveBase::dLoadDescriptor& desc)
 	:m_matrix(dGetIdentityMatrix())
 	,m_veloc(dVector::m_zero)
 	,m_omega(dVector::m_zero)
@@ -77,7 +77,7 @@ ndBody::ndBody(const dLoadSaveBase::dDesc& desc)
 		const nd::TiXmlNode* node = notifyNode->FirstChild();
 		const char* const className = node->Value();
 
-		dLoadSaveBase::dDesc notifyDesc(desc);
+		dLoadSaveBase::dLoadDescriptor notifyDesc(desc);
 		notifyDesc.m_rootNode = node;
 		//m_notifyCallback = new ndBodyNotify(notifyDesc);
 		m_notifyCallback = D_CLASS_REFLECTION_LOAD_NODE(ndBodyNotify, className, notifyDesc);

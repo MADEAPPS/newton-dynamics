@@ -51,7 +51,7 @@ ndShapeBox::ndShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 	Init(size_x, size_y, size_z);
 }
 
-ndShapeBox::ndShapeBox(const dLoadSaveBase::dDesc& desc)
+ndShapeBox::ndShapeBox(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndShapeConvex(m_box)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

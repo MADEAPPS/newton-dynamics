@@ -1036,7 +1036,7 @@ void ndWorld::LoadCollisionShapes(
 	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndShapes");
 	dAssert(shapes);
 
-	dLoadSaveBase::dDesc descriptor;
+	dLoadSaveBase::dLoadDescriptor descriptor;
 	descriptor.m_assetPath = assetPath;
 
 	for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
@@ -1092,7 +1092,7 @@ void ndWorld::LoadRigidBodies(
 	const nd::TiXmlNode* const bodies = rootNode->FirstChild("ndBodies");
 	dAssert(bodies);
 
-	dLoadSaveBase::dDesc descriptor;
+	dLoadSaveBase::dLoadDescriptor descriptor;
 	descriptor.m_assetPath = assetPath;
 	descriptor.m_shapeMap = &shapesMap;
 
@@ -1110,7 +1110,6 @@ void ndWorld::LoadRigidBodies(
 		}
 	}
 }
-
 
 void ndWorld::SaveScene(const char* const path)
 {

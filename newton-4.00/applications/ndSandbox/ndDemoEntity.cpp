@@ -24,8 +24,8 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDem
 }
 
 // member a fill in a post process pass
-ndDemoEntityNotify::ndDemoEntityNotify(const dLoadSaveBase::dDesc& desc)
-	:ndBodyNotify(dLoadSaveBase::dDesc(desc))
+ndDemoEntityNotify::ndDemoEntityNotify(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndBodyNotify(dLoadSaveBase::dLoadDescriptor(desc))
 	,m_entity(nullptr)
 	,m_parentBody(nullptr)
 	,m_manager(nullptr)

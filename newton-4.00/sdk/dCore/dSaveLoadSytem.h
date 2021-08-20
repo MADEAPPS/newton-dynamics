@@ -29,51 +29,76 @@
 class ndBody;
 class ndShape;
 
-class ndShapeLoaderCache : public dTree<const ndShape*, dUnsigned32>
+class ndShapeLoaderCache: public dTree<const ndShape*, dUnsigned32>
 {
 };
 
-class ndBodyLoaderCache : public dTree<const ndBody*, dUnsigned32>
+class ndBodyLoaderCache: public dTree<const ndBody*, dUnsigned32>
 {
 };
 
 class dLoadSaveBase
 {
 	public:
-	class dDesc
+	class dLoadDescriptor
 	{
 		public:
-		dDesc()
+		dLoadDescriptor()
 			:m_assetPath(nullptr)
 			,m_rootNode(nullptr)
-			,m_shapeMap(nullptr)
 			,m_bodyMap(nullptr)
+			,m_shapeMap(nullptr)
 		{
 		}
 
-		dDesc(const dDesc& desc)
+		dLoadDescriptor(const dLoadDescriptor& desc)
 			:m_assetPath(desc.m_assetPath)
 			,m_rootNode(desc.m_rootNode->FirstChild())
-			,m_shapeMap(desc.m_shapeMap)
 			,m_bodyMap(desc.m_bodyMap)
+			,m_shapeMap(desc.m_shapeMap)
 		{
 		}
 
 
 		const char* m_assetPath;
 		const nd::TiXmlNode* m_rootNode;
-		const ndShapeLoaderCache* m_shapeMap;
 		const ndBodyLoaderCache* m_bodyMap;
+		const ndShapeLoaderCache* m_shapeMap;
 	};
 
-	virtual void* CreateClass(const dDesc&)
+	class dSaveDescriptor
+	{
+		public:
+		dSaveDescriptor()
+			:m_assetPath(nullptr)
+			,m_rootNode(nullptr)
+			,m_bodyMap(nullptr)
+			,m_shapeMap(nullptr)
+		{
+		}
+
+		//dSaveDescriptor(const dSaveDescriptor& desc)
+		//	:m_assetPath(desc.m_assetPath)
+		//	,m_rootNode(desc.m_rootNode->FirstChild())
+		//	,m_bodyMap(desc.m_bodyMap)
+		//	,m_shapeMap(desc.m_shapeMap)
+		//{
+		//}
+
+		const char* m_assetPath;
+		nd::TiXmlNode* m_rootNode;
+		ndBodyLoaderCache* m_bodyMap;
+		ndShapeLoaderCache* m_shapeMap;
+	};
+
+	virtual void* CreateClass(const dLoadDescriptor&)
 	{
 		dAssert(0);
 		return nullptr;
 	}
 };
 
-D_CORE_API void* LoadClass(const char* const className, const dLoadSaveBase::dDesc& desc);
+D_CORE_API void* LoadClass(const char* const className, const dLoadSaveBase::dLoadDescriptor& desc);
 D_CORE_API void RegisterLoaderClass(const char* const className, dLoadSaveBase* const loaderClass);
 
 template<class T>
@@ -85,7 +110,7 @@ class dLoadSaveClass: public dLoadSaveBase
 		RegisterLoaderClass(className, this);
 	}
 
-	virtual void* CreateClass(const dDesc& desc)
+	virtual void* CreateClass(const dLoadDescriptor& desc)
 	{
 		return new T(desc);
 	}

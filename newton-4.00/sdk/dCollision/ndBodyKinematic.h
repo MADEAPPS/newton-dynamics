@@ -86,7 +86,7 @@ class ndBodyKinematic: public ndBody
 
 	D_CLASS_REFLECTION(ndBodyKinematic);
 	D_COLLISION_API ndBodyKinematic();
-	D_COLLISION_API ndBodyKinematic(const dLoadSaveBase::dDesc& desc);
+	D_COLLISION_API ndBodyKinematic(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndBodyKinematic();
 
 	ndScene* GetScene() const;

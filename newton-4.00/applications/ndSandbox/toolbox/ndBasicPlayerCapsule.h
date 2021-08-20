@@ -47,7 +47,7 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 
 	~ndBasicPlayerCapsule();
 
-	ndBasicPlayerCapsule(const dLoadSaveBase::dDesc& desc);
+	ndBasicPlayerCapsule(const dLoadSaveBase::dLoadDescriptor& desc);
 	virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeHash, dInt32 nodeHash) const;
 
 	void ApplyInputs(dFloat32 timestep);

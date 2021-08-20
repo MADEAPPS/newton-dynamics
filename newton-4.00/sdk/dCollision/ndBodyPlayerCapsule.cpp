@@ -115,7 +115,7 @@ ndBodyPlayerCapsule::ndBodyPlayerCapsule(const dMatrix& localAxis, dFloat32 mass
 	m_stepHeight = dMax(stepHeight, m_contactPatch * dFloat32(2.0f));
 }
 
-ndBodyPlayerCapsule::ndBodyPlayerCapsule(const dLoadSaveBase::dDesc& desc)
+ndBodyPlayerCapsule::ndBodyPlayerCapsule(const dLoadSaveBase::dLoadDescriptor& desc)
 	//:ndBodyKinematic(xmlNode->FirstChild("ndBodyKinematic"), shapesCache)
 	:ndBodyKinematic(desc)
 {

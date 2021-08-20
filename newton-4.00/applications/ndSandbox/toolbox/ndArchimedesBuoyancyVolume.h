@@ -20,7 +20,7 @@ class ndArchimedesBuoyancyVolume : public ndBodyTriggerVolume
 {
 	public:
 	ndArchimedesBuoyancyVolume();
-	ndArchimedesBuoyancyVolume(const dLoadSaveBase::dDesc& desc);
+	ndArchimedesBuoyancyVolume(const dLoadSaveBase::dLoadDescriptor& desc);
 
 	void CalculatePlane(ndBodyKinematic* const body);
 	void OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep);

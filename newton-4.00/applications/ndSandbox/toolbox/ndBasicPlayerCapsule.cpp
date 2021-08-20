@@ -125,7 +125,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	m_animBlendTree->Evaluate(m_output, dFloat32(0.0f));
 }
 
-ndBasicPlayerCapsule::ndBasicPlayerCapsule(const dLoadSaveBase::dDesc& desc)
+ndBasicPlayerCapsule::ndBasicPlayerCapsule(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndBodyPlayerCapsule(desc)
 {
 	dAssert(0);

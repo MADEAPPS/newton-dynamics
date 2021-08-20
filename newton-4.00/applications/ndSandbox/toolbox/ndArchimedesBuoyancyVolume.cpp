@@ -20,7 +20,7 @@ ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume()
 {
 }
 
-ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume(const dLoadSaveBase::dDesc& desc)
+ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndBodyTriggerVolume(desc)
 {
 	dAssert(0);
