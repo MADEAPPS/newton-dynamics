@@ -545,19 +545,19 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 	}
 }
 
-void ndBodyKinematic::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeHash, dInt32 nodeHash) const
+void ndBodyKinematic::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	nd::TiXmlElement* const paramNode = new nd::TiXmlElement(ClassName());
-	rootNode->LinkEndChild(paramNode);
-	paramNode->SetAttribute("hashId", nodeHash);
-	ndBody::Save(paramNode, assetPath, shapeHash, nodeHash);
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndBody::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 	
-	xmlSaveParam(paramNode, "invMass", m_invMass.m_w);
+	xmlSaveParam(childNode, "invMass", m_invMass.m_w);
 	dVector invInertia(m_invMass & dVector::m_triplexMask);
-	xmlSaveParam(paramNode, "invPrincipalInertia", invInertia);
+	xmlSaveParam(childNode, "invPrincipalInertia", invInertia);
 
-	xmlSaveParam(paramNode, "maxAngleStep", m_maxAngleStep);
-	xmlSaveParam(paramNode, "maxLinearSpeed", m_maxLinearSpeed);
+	xmlSaveParam(childNode, "maxAngleStep", m_maxAngleStep);
+	xmlSaveParam(childNode, "maxLinearSpeed", m_maxLinearSpeed);
 
-	m_shapeInstance.Save(paramNode, shapeHash);
+	m_shapeInstance.Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 }

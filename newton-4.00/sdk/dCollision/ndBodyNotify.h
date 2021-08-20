@@ -43,8 +43,8 @@ class ndBodyNotify: public dClassAlloc
 
 	virtual void OnTransform(dInt32 threadIndex, const dMatrix& matrix);
 
+	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 	D_COLLISION_API virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep);
-	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath) const;
 
 	private:
 	dVector m_defualtGravity;

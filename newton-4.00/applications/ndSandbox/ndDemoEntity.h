@@ -36,7 +36,7 @@ class ndDemoEntityNotify: public ndBodyNotify
 	virtual void OnTransform(dInt32 threadIndex, const dMatrix& matrix);
 	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep);
 
-	virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath) const;
+	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	ndDemoEntity* m_entity;
 	ndBodyDynamic* m_parentBody;

@@ -476,14 +476,14 @@ ndShapeInfo ndShapeBox::GetShapeInfo() const
 	return info;
 }
 
-D_COLLISION_API void ndShapeBox::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeHash) const
+D_COLLISION_API void ndShapeBox::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	nd::TiXmlElement* const shapeNode = new nd::TiXmlElement(ClassName());
-	rootNode->LinkEndChild(shapeNode);
-	shapeNode->SetAttribute("hashId", nodeHash);
-	ndShapeConvex::Save(shapeNode, assetPath, nodeHash);
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeConvex::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
-	xmlSaveParam(shapeNode, "size_x", m_size[0][0] * dFloat32(2.0f));
-	xmlSaveParam(shapeNode, "size_y", m_size[0][1] * dFloat32(2.0f));
-	xmlSaveParam(shapeNode, "size_z", m_size[0][2] * dFloat32(2.0f));
+	xmlSaveParam(childNode, "size_x", m_size[0][0] * dFloat32(2.0f));
+	xmlSaveParam(childNode, "size_y", m_size[0][1] * dFloat32(2.0f));
+	xmlSaveParam(childNode, "size_z", m_size[0][2] * dFloat32(2.0f));
 }

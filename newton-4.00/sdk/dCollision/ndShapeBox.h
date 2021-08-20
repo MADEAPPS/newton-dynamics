@@ -48,7 +48,7 @@ class ndShapeBox: public ndShapeConvex
 
 	const ndConvexSimplexEdge** GetVertexToEdgeMapping() const;
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
-	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeHash) const;
+	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	dVector m_size[2];
 	dVector m_vertex[8];

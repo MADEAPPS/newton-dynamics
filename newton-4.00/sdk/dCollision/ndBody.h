@@ -71,7 +71,7 @@ class ndBody: public dClassAlloc
 	D_COLLISION_API dMatrix GetMatrix() const;
 	D_COLLISION_API void SetMatrix(const dMatrix& matrix);
 	D_COLLISION_API dQuaternion GetRotation() const;
-	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeHash, dInt32 nodeHash) const;
+	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	D_COLLISION_API dVector GetVelocityAtPoint(const dVector& point) const;
 

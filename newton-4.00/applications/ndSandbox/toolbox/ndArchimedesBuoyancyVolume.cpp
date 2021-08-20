@@ -132,7 +132,7 @@ void ndArchimedesBuoyancyVolume::OnTriggerExit(ndBodyKinematic* const, dFloat32)
 	//dTrace(("exit trigger body: %d\n", body->GetId()));
 }
 
-void ndArchimedesBuoyancyVolume::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeHash, dInt32 nodeHash) const
+void ndArchimedesBuoyancyVolume::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
 	dAssert(0);
 	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndArchimedesBuoyancyVolume", nodeid);

@@ -253,7 +253,7 @@ class ndShape: public dClassAlloc
 	virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
 	virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
 
-	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeHash) const;
+	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	protected:
 	D_COLLISION_API ndShape(ndShapeID id);

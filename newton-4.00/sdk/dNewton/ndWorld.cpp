@@ -999,7 +999,7 @@ void ndWorld::LoadSceneSettings(const nd::TiXmlNode* const rootNode)
 	m_solverIterations = xmlGetInt(settings, "solverIterations");
 }
 
-void ndWorld::SaveCollisionShapes(nd::TiXmlNode* const rootNode, const char* const assetPath, dTree<dUnsigned32, const ndShape*>& shapeMap)
+void ndWorld::SaveCollisionShapes(nd::TiXmlNode* const shapeRootNode, const char* const assetPath, dTree<dUnsigned32, const ndShape*>& shapeMap)
 {
 	dInt32 shapesCount = 0;
 	const ndBodyList& bodyList = GetBodyList();
@@ -1016,15 +1016,19 @@ void ndWorld::SaveCollisionShapes(nd::TiXmlNode* const rootNode, const char* con
 	
 	if (shapeMap.GetCount())
 	{
-		nd::TiXmlElement* const shapesNode = new nd::TiXmlElement("ndShapes");
-		rootNode->LinkEndChild(shapesNode);
+		nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndShapes");
+		shapeRootNode->LinkEndChild(rootNode);
 	
+		dLoadSaveBase::dSaveDescriptor descriptor;
+		descriptor.m_assetPath = assetPath;
+		descriptor.m_rootNode = rootNode;
 		dTree<dUnsigned32, const ndShape*>::Iterator it(shapeMap);
 		for (it.Begin(); it; it++)
 		{
 			dInt32 nodeId = *it;
 			const ndShape* const shape = it.GetKey();
-			shape->Save(shapesNode, assetPath, nodeId);
+			descriptor.m_nodeNodeHash = nodeId;
+			shape->Save(descriptor);
 		}
 	}
 }
@@ -1065,22 +1069,21 @@ void ndWorld::SaveRididBodies(nd::TiXmlNode* const rootNode, const char* const a
 		dInt32 bodyIndex = 0;
 		nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("ndBodies");
 		rootNode->LinkEndChild(bodiesNode);
+		dLoadSaveBase::dSaveDescriptor descriptor;
+		descriptor.m_assetPath = assetPath;
+		descriptor.m_rootNode = bodiesNode;
 
 		for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
 			ndBodyKinematic* const body = bodyNode->GetInfo();
-			bodyMap.Insert(bodyIndex, body);
-			bodyIndex++;
-		}
-
-		dTree<dUnsigned32, const ndBodyKinematic*>::Iterator it(bodyMap);
-		for (it.Begin(); it; it++)
-		{
-			dInt32 nodeId = *it;
-			const ndBodyKinematic* const body = it.GetKey();
 
 			dInt32 shapeId = shapesMap.Find(body->GetCollisionShape().GetShape())->GetInfo();
-			body->Save(bodiesNode, assetPath, shapeId, nodeId);
+			descriptor.m_shapeNodeHash = shapeId;
+			descriptor.m_nodeNodeHash = bodyIndex;
+			body->Save(descriptor);
+
+			bodyMap.Insert(bodyIndex, body);
+			bodyIndex++;
 		}
 	}
 }

@@ -48,7 +48,7 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 	~ndBasicPlayerCapsule();
 
 	ndBasicPlayerCapsule(const dLoadSaveBase::dLoadDescriptor& desc);
-	virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeHash, dInt32 nodeHash) const;
+	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	void ApplyInputs(dFloat32 timestep);
 	dFloat32 ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const;

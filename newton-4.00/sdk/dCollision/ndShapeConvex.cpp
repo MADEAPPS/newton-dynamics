@@ -1026,11 +1026,12 @@ dInt32 ndShapeConvex::BuildCylinderCapPoly(dFloat32 radius, const dMatrix& trans
 	return count;
 }
 
-void ndShapeConvex::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeHash) const
+void ndShapeConvex::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	nd::TiXmlElement* const shapeNode = new nd::TiXmlElement(ClassName());
-	rootNode->LinkEndChild(shapeNode);
-	shapeNode->SetAttribute("hashId", nodeHash);
-	ndShape::Save(shapeNode, assetPath, nodeHash);
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShape::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
+	// maybe save some stuff here
 }

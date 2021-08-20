@@ -512,18 +512,18 @@ void ndShapeCapsule::CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& 
 	p1 = max_q0.GetMax(max_q1) & dVector::m_triplexMask;
 }
 
-void ndShapeCapsule::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeHash) const
+void ndShapeCapsule::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	nd::TiXmlElement* const shapeNode = new nd::TiXmlElement(ClassName());
-	rootNode->LinkEndChild(shapeNode);
-	shapeNode->SetAttribute("hashId", nodeHash);
-	ndShapeConvex::Save(shapeNode, assetPath, nodeHash);
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeConvex::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
-	xmlSaveParam(shapeNode, "radius0", m_radius0);
-	xmlSaveParam(shapeNode, "radius1", m_radius0);
-	xmlSaveParam(shapeNode, "height", m_height * dFloat32 (2.0f));
+	xmlSaveParam(childNode, "radius0", m_radius0);
+	xmlSaveParam(childNode, "radius1", m_radius0);
+	xmlSaveParam(childNode, "height", m_height * dFloat32 (2.0f));
 
 
-//__classLoader__.CreateClass(shapeNode);
+//__classLoader__.CreateClass(childNode);
 
 }

@@ -37,7 +37,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	D_NEWTON_API virtual ~ndBodySphFluid ();
 
 	virtual ndBodySphFluid* GetAsBodySphFluid();
-	D_NEWTON_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 shapeHash, dInt32 nodeHash) const;
+	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	D_NEWTON_API virtual void AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity);
 

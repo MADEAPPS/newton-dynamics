@@ -118,9 +118,8 @@ class ndShapeInstance: public dClassAlloc
 	//D_COLLISION_API dInt32 ClosestPoint(const dMatrix& matrix, const dVector& point, dVector& contactPoint) const;
 
 	D_COLLISION_API ndShapeInfo GetShapeInfo() const;
-
+	D_COLLISION_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 	D_COLLISION_API dFloat32 CalculateBuoyancyCenterOfPresure(dVector& com, const dMatrix& matrix, const dVector& fluidPlane) const;
-	D_COLLISION_API void Save(nd::TiXmlElement* const rootNode, dInt32 shapeNodeId) const;
 
 	D_COLLISION_API static dVector GetBoxPadding();
 

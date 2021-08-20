@@ -97,15 +97,15 @@ ndShapeInfo ndShape::GetShapeInfo() const
 	return info;
 }
 
-void ndShape::Save(nd::TiXmlElement* const rootNode, const char* const, dInt32 nodeHash) const
+void ndShape::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	nd::TiXmlElement* const shapeNode = new nd::TiXmlElement(ClassName());
-	rootNode->LinkEndChild(shapeNode);
-	shapeNode->SetAttribute("hashId", nodeHash);
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 
-	xmlSaveParam(shapeNode, "inertia", m_inertia);
-	xmlSaveParam(shapeNode, "crossInertia", m_crossInertia);
-	xmlSaveParam(shapeNode, "centerOfMass", m_centerOfMass);
-	xmlSaveParam(shapeNode, "boxSize", m_boxSize);
-	xmlSaveParam(shapeNode, "boxOrigin", m_boxOrigin);
+	xmlSaveParam(childNode, "inertia", m_inertia);
+	xmlSaveParam(childNode, "crossInertia", m_crossInertia);
+	xmlSaveParam(childNode, "centerOfMass", m_centerOfMass);
+	xmlSaveParam(childNode, "boxSize", m_boxSize);
+	xmlSaveParam(childNode, "boxOrigin", m_boxOrigin);
 }

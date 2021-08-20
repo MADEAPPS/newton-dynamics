@@ -50,10 +50,11 @@ void ndBodyNotify::OnApplyExternalForce(dInt32, dFloat32)
 	}
 }
 
-void ndBodyNotify::Save(nd::TiXmlElement* const rootNode, const char* const) const
+void ndBodyNotify::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	nd::TiXmlElement* const paramNode = new nd::TiXmlElement(ClassName());
-	rootNode->LinkEndChild(paramNode);
+	//nd::TiXmlElement* const rootNode, const char* const
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
 
-	xmlSaveParam(paramNode, "gravity", m_defualtGravity);
+	xmlSaveParam(childNode, "gravity", m_defualtGravity);
 }

@@ -72,23 +72,23 @@ class dLoadSaveBase
 		dSaveDescriptor()
 			:m_assetPath(nullptr)
 			,m_rootNode(nullptr)
-			,m_bodyMap(nullptr)
-			,m_shapeMap(nullptr)
+			,m_nodeNodeHash(0)
+			,m_shapeNodeHash(0)
 		{
 		}
 
-		//dSaveDescriptor(const dSaveDescriptor& desc)
-		//	:m_assetPath(desc.m_assetPath)
-		//	,m_rootNode(desc.m_rootNode->FirstChild())
-		//	,m_bodyMap(desc.m_bodyMap)
-		//	,m_shapeMap(desc.m_shapeMap)
-		//{
-		//}
+		dSaveDescriptor(const dSaveDescriptor& desc, nd::TiXmlNode* const rootNode)
+			:m_assetPath(desc.m_assetPath)
+			,m_rootNode(rootNode)
+			,m_nodeNodeHash(desc.m_nodeNodeHash)
+			,m_shapeNodeHash(desc.m_shapeNodeHash)
+		{
+		}
 
 		const char* m_assetPath;
 		nd::TiXmlNode* m_rootNode;
-		ndBodyLoaderCache* m_bodyMap;
-		ndShapeLoaderCache* m_shapeMap;
+		dInt32 m_nodeNodeHash;
+		dInt32 m_shapeNodeHash;
 	};
 
 	virtual void* CreateClass(const dLoadDescriptor&)

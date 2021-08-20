@@ -41,12 +41,12 @@ ndDemoEntityNotify::~ndDemoEntityNotify()
 	}
 }
 
-void ndDemoEntityNotify::Save(nd::TiXmlElement* const rootNode, const char* const assetPath) const
+void ndDemoEntityNotify::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	nd::TiXmlElement* const paramNode = new nd::TiXmlElement(ClassName());
-	rootNode->LinkEndChild(paramNode);
-	ndBodyNotify::Save(paramNode, assetPath);
-	xmlSaveParam(paramNode, "comment", "string", "body notification for Netwon 4.0 demos");
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	ndBodyNotify::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	xmlSaveParam(childNode, "comment", "string", "body notification for Newton 4.0 demos");
 }
 
 void ndDemoEntityNotify::OnObjectPick() const

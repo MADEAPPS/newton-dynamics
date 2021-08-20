@@ -154,22 +154,22 @@ D_COLLISION_API const nd::TiXmlNode* ndBody::FindNode(const nd::TiXmlNode* const
 	return rootNode->FirstChild(name);
 }
 
-void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32, dInt32 nodeHash) const
+void ndBody::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	nd::TiXmlElement* const paramNode = new nd::TiXmlElement(ClassName());
-	rootNode->LinkEndChild(paramNode);
-	paramNode->SetAttribute("hashId", nodeHash);
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 
 	if (m_notifyCallback)
 	{
 		nd::TiXmlElement* const notifyNode = new nd::TiXmlElement("bodyNotifyClass");
-		paramNode->LinkEndChild(notifyNode);
-		m_notifyCallback->Save(notifyNode, assetPath);
+		childNode->LinkEndChild(notifyNode);
+		m_notifyCallback->Save(dLoadSaveBase::dSaveDescriptor(desc, notifyNode));
 	}
 
-	xmlSaveParam(paramNode, "matrix", m_matrix);
-	xmlSaveParam(paramNode, "veloc", m_veloc);
-	xmlSaveParam(paramNode, "omega", m_omega);
-	xmlSaveParam(paramNode, "centreOfMass", m_localCentreOfMass);
-	xmlSaveParam(paramNode, "autoSleep", m_autoSleep ? 1 : 0);
+	xmlSaveParam(childNode, "matrix", m_matrix);
+	xmlSaveParam(childNode, "veloc", m_veloc);
+	xmlSaveParam(childNode, "omega", m_omega);
+	xmlSaveParam(childNode, "centreOfMass", m_localCentreOfMass);
+	xmlSaveParam(childNode, "autoSleep", m_autoSleep ? 1 : 0);
 }
