@@ -23,6 +23,33 @@
 #define MAX_PHYSICS_FPS				60.0f
 //#define MAX_PHYSICS_RECOVER_STEPS	2
 
+class ndPhysicsWorldSettings : public ndWordSettings
+{
+	public:
+	D_CLASS_REFLECTION(ndPhysicsWorldSettings);
+
+	ndPhysicsWorldSettings(ndWorld* const owner)
+		:ndWordSettings(owner)
+	{
+	}
+
+	ndPhysicsWorldSettings(const dLoadSaveBase::dLoadDescriptor& desc)
+		:ndWordSettings (dLoadSaveBase::dLoadDescriptor(desc))
+	{
+		dAssert(0);
+	}
+
+	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+	{
+		nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+		desc.m_rootNode->LinkEndChild(childNode);
+		ndWordSettings::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+		
+		xmlSaveParam(childNode, "description", "string", "this scene was saved form Newton 4.0 sandbox demos");
+	}
+};
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndPhysicsWorldSettings);
+
 ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	:ndWorld()
 	,m_manager(manager)
@@ -44,15 +71,10 @@ ndPhysicsWorld::~ndPhysicsWorld()
 	}
 }
 
-void ndPhysicsWorld::SaveSceneSettings(nd::TiXmlNode* const rootNode)
+void ndPhysicsWorld::SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	//here optionally the application can save specific information.
-	nd::TiXmlElement* const config = new nd::TiXmlElement("ndPhysicsWorld");
-	rootNode->LinkEndChild(config);
-	xmlSaveParam(config, "description", "string", "this scene was saved form Newton 4.0 sandbox demos");
-
-	// always end by calling base class function
-	ndWorld::SaveSceneSettings(rootNode);
+	ndPhysicsWorldSettings setting((ndWorld*)this);
+	setting.Save(desc);
 }
 
 void ndPhysicsWorld::LoadSceneSettings(const nd::TiXmlNode* const rootNode)

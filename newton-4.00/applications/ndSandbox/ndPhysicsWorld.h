@@ -30,8 +30,8 @@ class ndPhysicsWorld: public ndWorld
 
 	void QueueBodyForDelete(ndBody* const body);
 
-	virtual void SaveSceneSettings(nd::TiXmlNode* const rootNode);
 	virtual void LoadSceneSettings(const nd::TiXmlNode* const rootNode);
+	virtual void SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	private:
 	void DeletePendingObjects();

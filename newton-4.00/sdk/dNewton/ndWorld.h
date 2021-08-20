@@ -42,6 +42,21 @@ class ndJointBilateralConstraint;
 
 #define D_SLEEP_ENTRIES			8
 
+class ndWorld;
+class ndWordSettings : public dClassAlloc
+{
+	public:
+	D_CLASS_REFLECTION(ndWordSettings);
+
+	ndWordSettings(ndWorld* const owner)
+		:m_owner(owner)
+	{
+	}
+
+	D_NEWTON_API ndWordSettings(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	ndWorld* m_owner;
+};
 
 D_MSV_NEWTON_ALIGN_32
 class ndWorld: public dClassAlloc
@@ -91,7 +106,7 @@ class ndWorld: public dClassAlloc
 	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
 	
 	D_NEWTON_API virtual void SaveScene(const char* const path);
-	D_NEWTON_API virtual void SaveSceneSettings(nd::TiXmlNode* const rootNode);
+	D_NEWTON_API virtual void SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	D_NEWTON_API virtual bool LoadScene(const char* const path);
 	D_NEWTON_API virtual void LoadSceneSettings(const nd::TiXmlNode* const rootNode);
@@ -128,6 +143,9 @@ class ndWorld: public dClassAlloc
 	private:
 	void ThreadFunction();
 	void PostUpdate(dFloat32 timestep);
+
+	void SaveSceneSettings(
+		nd::TiXmlNode* const rootNode, const char* const assetPath) const;
 	
 	void SaveCollisionShapes(
 		nd::TiXmlNode* const rootNode, const char* const assetPath, 

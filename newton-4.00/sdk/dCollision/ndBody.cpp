@@ -79,7 +79,6 @@ ndBody::ndBody(const dLoadSaveBase::dLoadDescriptor& desc)
 
 		dLoadSaveBase::dLoadDescriptor notifyDesc(desc);
 		notifyDesc.m_rootNode = node;
-		//m_notifyCallback = new ndBodyNotify(notifyDesc);
 		m_notifyCallback = D_CLASS_REFLECTION_LOAD_NODE(ndBodyNotify, className, notifyDesc);
 		m_notifyCallback->m_body = this;
 	}

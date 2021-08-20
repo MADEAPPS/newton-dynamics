@@ -33,12 +33,33 @@
 #include "ndDynamicsUpdateOpencl.h"
 #include "ndJointBilateralConstraint.h"
 
+
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndWordSettings);
+
+
+ndWordSettings::ndWordSettings(const dLoadSaveBase::dLoadDescriptor& desc)
+	:dClassAlloc()
+{
+	dAssert(0);
+}
+
+void ndWordSettings::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+
+	xmlSaveParam(childNode, "description", "string", "Newton Dynamics 4.00");
+	xmlSaveParam(childNode, "revision", "string", "1.00");
+	xmlSaveParam(childNode, "solverSubsteps", m_owner->GetSubSteps());
+	xmlSaveParam(childNode, "solverIterations", m_owner->GetSolverIterations());
+}
+
 class ndSkeletonQueue : public dFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>
 {
 	public:
 	ndSkeletonQueue()
 		:dFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>()
-		, m_mod(sizeof(m_array) / sizeof(m_array[0]))
+		,m_mod(sizeof(m_array) / sizeof(m_array[0]))
 	{
 		m_lastIndex = 0;
 		m_firstIndex = 0;
@@ -929,65 +950,31 @@ void ndWorld::BodiesInAabb(ndBodiesInAabbNotify& callback) const
 	m_scene->BodiesInAabb(callback);
 }
 
-#if 0
-void ndWorld::LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath)
+void ndWorld::SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndBodies");
-	dAssert(shapes);
+	//ndWordSettings setting((ndWorld*)this);
+	//nd::TiXmlElement* const childNode = new nd::TiXmlElement(setting.ClassName());
+	//desc.m_rootNode->LinkEndChild(childNode);
+	//
+	//xmlSaveParam(childNode, "description", "string", "Newton Dynamics 4.00");
+	//xmlSaveParam(childNode, "revision", "string", "1.00");
+	//xmlSaveParam(childNode, "solverSubsteps", m_subSteps);
+	//xmlSaveParam(childNode, "solverIterations", m_solverIterations);
 
-	for (const nd::TiXmlNode* parentNode = shapes->FirstChild(); parentNode; parentNode = parentNode->NextSibling())
-	{
-		ndBody* body = nullptr;
-		const char* const bodyClassName = parentNode->Value();
-		if (!strcmp(bodyClassName, "ndBodyDynamic"))
-		{
-			body = new ndBodyDynamic(parentNode, shapesCache);
-		}
-		else if (!strcmp(bodyClassName, "ndBodyTriggerVolume"))
-		{
-			body = new ndBodyTriggerVolume(parentNode, shapesCache);
-		}
-		else if (!strcmp(bodyClassName, "ndBodyPlayerCapsule"))
-		{
-			body = new ndBodyPlayerCapsule(parentNode, shapesCache);
-		}
-		else
-		{
-			body = LoadUserDefinedBody(parentNode, bodyClassName, shapesCache, assetPath);
-		}
-		if (body)
-		{
-			AddBody(body);
-		}
-	}
+	ndWordSettings setting((ndWorld*)this);
+	setting.Save(desc);
 }
 
-void ndWorld::Load(const nd::TiXmlElement* const rootNode, const char* const assetPath)
+void ndWorld::SaveSceneSettings(nd::TiXmlNode* const rootNode, const char* const assetPath) const
 {
-	dTree<const ndShape*, dUnsigned32> uniqueShapes;
+	nd::TiXmlElement* const settingsNode = new nd::TiXmlElement("ndSettings");
+	rootNode->LinkEndChild(settingsNode);
 
-	LoadSettings(rootNode);
-	LoadShapes(rootNode, uniqueShapes, assetPath);
-	LoadBodies(rootNode, uniqueShapes, assetPath);
-
-	while (uniqueShapes.GetRoot())
-	{
-		const ndShape* const shape = uniqueShapes.GetRoot()->GetInfo();
-		shape->Release();
-		uniqueShapes.Remove(uniqueShapes.GetRoot());
-	}
-}
-#endif
-
-void ndWorld::SaveSceneSettings(nd::TiXmlNode* const rootNode)
-{
-	nd::TiXmlElement* const config = new nd::TiXmlElement("settings");
-	rootNode->LinkEndChild(config);
-
-	xmlSaveParam(config, "description", "string", "Newton Dynamics 4.00");
-	xmlSaveParam(config, "revision", "string", "1.00");
-	xmlSaveParam(config, "solverSubsteps", m_subSteps);
-	xmlSaveParam(config, "solverIterations", m_solverIterations);
+	dLoadSaveBase::dSaveDescriptor descriptor;
+	descriptor.m_assetPath = assetPath;
+	descriptor.m_rootNode = settingsNode;
+	//ndWorld::SaveSceneSettings(descriptor);
+	SaveSceneSettings(descriptor);
 }
 
 void ndWorld::LoadSceneSettings(const nd::TiXmlNode* const rootNode)
@@ -1142,7 +1129,7 @@ void ndWorld::SaveScene(const char* const path)
 	dTree<dUnsigned32, const ndShape*> shapeMap;
 	dTree<dUnsigned32, const ndBodyKinematic*> bodyMap;
 
-	SaveSceneSettings(worldNode);
+	SaveSceneSettings(worldNode, assetPath);
 	SaveCollisionShapes(worldNode, assetPath, shapeMap);
 	SaveRididBodies(worldNode, assetPath, shapeMap, bodyMap);
 
