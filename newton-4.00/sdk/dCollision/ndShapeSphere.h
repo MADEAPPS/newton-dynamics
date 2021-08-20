@@ -30,8 +30,9 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeSphere: public ndShapeConvex
 {
 	public:
+	D_CLASS_REFLECTION(ndShapeSphere);
 	D_COLLISION_API ndShapeSphere(dFloat32 radius);
-	D_COLLISION_API ndShapeSphere(const nd::TiXmlNode* const xmlNode);
+	D_COLLISION_API ndShapeSphere(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeSphere();
 
 	virtual ndShapeSphere* GetAsShapeSphere() { return this; }
@@ -47,7 +48,7 @@ class ndShapeSphere: public ndShapeConvex
 	D_COLLISION_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 	D_COLLISION_API virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
-	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
+	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 

@@ -154,7 +154,8 @@ ndBasicPlayerCapsule::~ndBasicPlayerCapsule()
 	}
 }
 
-void ndBasicPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+//void ndBasicPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndBasicPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor&) const
 {
 	dAssert(0);
 	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBasicPlayerCapsule", nodeid);

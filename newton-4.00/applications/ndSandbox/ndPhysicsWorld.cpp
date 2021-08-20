@@ -166,3 +166,9 @@ void ndPhysicsWorld::OnPostUpdate(dFloat32 timestep)
 		m_soundManager->Update(this, timestep);
 	}
 }
+
+void ndPhysicsWorld::OnLoadScene(const dLoadSaveBase::dLoadDescriptor& desc)
+{
+	ndWorld::OnLoadScene(desc);
+	// iterate over the loaded data and add visualization
+}

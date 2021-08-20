@@ -42,7 +42,8 @@ ndBodyTriggerVolume::~ndBodyTriggerVolume()
 {
 }
 
-void ndBodyTriggerVolume::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+//void ndBodyTriggerVolume::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndBodyTriggerVolume::Save(const dLoadSaveBase::dSaveDescriptor&) const
 {
 	dAssert(0);
 	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyTriggerVolume", nodeid);

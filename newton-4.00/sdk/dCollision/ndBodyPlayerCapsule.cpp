@@ -149,7 +149,8 @@ ndBodyPlayerCapsule::~ndBodyPlayerCapsule()
 {
 }
 
-void ndBodyPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+//void ndBodyPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndBodyPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor&) const
 {
 	dAssert(0);
 	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyPlayerCapsule", nodeid);

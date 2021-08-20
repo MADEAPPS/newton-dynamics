@@ -1193,6 +1193,10 @@ bool ndWorld::LoadScene(const char* const path)
 		AddBody(body);
 	}
 
+	dLoadSaveBase::dLoadDescriptor afterLoaddesc;
+	afterLoaddesc.m_bodyMap = &bodyMap;
+	OnLoadScene(afterLoaddesc);
+
 	ndShapeLoaderCache::Iterator iter(shapesMap);
 	for (iter.Begin(); iter; iter++)
 	{

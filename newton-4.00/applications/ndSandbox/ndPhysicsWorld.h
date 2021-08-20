@@ -29,6 +29,8 @@ class ndPhysicsWorld: public ndWorld
 	ndSoundManager* GetSoundManager() const;
 
 	void QueueBodyForDelete(ndBody* const body);
+
+	void OnLoadScene(const dLoadSaveBase::dLoadDescriptor& desc);
 	virtual void SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	private:

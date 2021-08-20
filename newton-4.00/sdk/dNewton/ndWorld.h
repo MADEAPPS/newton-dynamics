@@ -107,12 +107,12 @@ class ndWorld: public dClassAlloc
 
 	D_NEWTON_API virtual void AddModel(ndModel* const model);
 	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
-	
-	D_NEWTON_API virtual void SaveScene(const char* const path);
 	D_NEWTON_API virtual void SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
-	D_NEWTON_API virtual bool LoadScene(const char* const path);
+	D_NEWTON_API bool LoadScene(const char* const path);
+	D_NEWTON_API void SaveScene(const char* const path);
 
+	virtual void OnLoadScene(const dLoadSaveBase::dLoadDescriptor& desc);
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
 	const ndModelList& GetModelList() const;
@@ -377,5 +377,8 @@ inline dInt32 ndWorld::GetEngineVersion() const
 	return D_NEWTON_ENGINE_MAJOR_VERSION * 100 + D_NEWTON_ENGINE_MINOR_VERSION;
 }
 
+inline void ndWorld::OnLoadScene(const dLoadSaveBase::dLoadDescriptor&)
+{
+}
 
 #endif
