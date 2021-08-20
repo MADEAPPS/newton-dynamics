@@ -25,6 +25,7 @@
 #include "ndShapeConvexHull.h"
 
 #define D_CONVEX_VERTEX_SPLITE_SIZE	48
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeConvexHull)
 
 D_MSV_NEWTON_ALIGN_32
 class ndShapeConvexHull::ndConvexBox
@@ -60,7 +61,7 @@ ndShapeConvexHull::ndShapeConvexHull (dInt32 count, dInt32 strideInBytes, dFloat
 	Create(count, strideInBytes, vertexArray, tolerance);
 }
 
-ndShapeConvexHull::ndShapeConvexHull(const nd::TiXmlNode* const xmlNode)
+ndShapeConvexHull::ndShapeConvexHull(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndShapeConvex(m_convexHull)
 	,m_supportTree(nullptr)
 	,m_faceArray(nullptr)
@@ -78,6 +79,7 @@ ndShapeConvexHull::ndShapeConvexHull(const nd::TiXmlNode* const xmlNode)
 	m_vertex = nullptr;
 	m_simplex = nullptr;
 
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	dArray<dVector> array;
 	xmlGetFloatArray3(xmlNode, "vextexArray3", array);
 	Create(array.GetCount(), sizeof (dVector), &array[0].m_x, dFloat32 (0.0f));
@@ -955,12 +957,12 @@ void ndShapeConvexHull::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& 
 	}
 }
 
-D_COLLISION_API void ndShapeConvexHull::Save( nd::TiXmlElement* const xmlNode, const char* const, dInt32 nodeid ) const
+void ndShapeConvexHull::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeConvexHull");
-	xmlNode->LinkEndChild(paramNode);
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeConvex::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
-	paramNode->SetAttribute("nodeId", nodeid);
-
-	xmlSaveParam(paramNode, "vextexArray3", m_vertexCount, m_vertex);
+	xmlSaveParam(childNode, "vextexArray3", m_vertexCount, m_vertex);
 }

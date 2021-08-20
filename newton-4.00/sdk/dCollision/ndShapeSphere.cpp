@@ -32,7 +32,6 @@ dInt32 ndShapeSphere::m_shapeRefCount = 0;
 dVector ndShapeSphere::m_unitSphere[D_SPHERE_VERTEX_COUNT];
 ndShapeConvex::ndConvexSimplexEdge ndShapeSphere::m_edgeArray[D_SPHERE_EDGE_COUNT];
 
-
 ndShapeSphere::ndShapeSphere(dFloat32 radius)
 	:ndShapeConvex(m_sphere)
 {

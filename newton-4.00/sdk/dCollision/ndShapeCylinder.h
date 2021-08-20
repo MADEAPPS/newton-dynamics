@@ -30,8 +30,9 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeCylinder : public ndShapeConvex
 {
 	public:
-	D_COLLISION_API ndShapeCylinder(const nd::TiXmlNode* const xmlNode);
-	D_COLLISION_API ndShapeCylinder (dFloat32 radio0, dFloat32 radio1, dFloat32 height);
+	D_CLASS_REFLECTION(ndShapeCylinder);
+	D_COLLISION_API ndShapeCylinder(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndShapeCylinder(dFloat32 radio0, dFloat32 radio1, dFloat32 height);
 	D_COLLISION_API ~ndShapeCylinder();
 
 	virtual ndShapeCylinder* GetAsShapeCylinder() { return this; }
@@ -46,7 +47,7 @@ class ndShapeCylinder : public ndShapeConvex
 	D_COLLISION_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 	D_COLLISION_API virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
-	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
+	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 

@@ -1001,19 +1001,45 @@ void ndWorld::LoadSceneSettings(const nd::TiXmlNode* const rootNode, const char*
 
 void ndWorld::SaveCollisionShapes(nd::TiXmlNode* const shapeRootNode, const char* const assetPath, dTree<dUnsigned32, const ndShape*>& shapeMap)
 {
-	dInt32 shapesCount = 0;
 	const ndBodyList& bodyList = GetBodyList();
+	dArray<dTree<dUnsigned32, const ndShape*>::dNode*> shapeNodeOrder;
+
 	for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
 		ndShape* const shape = body->GetCollisionShape().GetShape();
-		if (!shapeMap.Find(shape))
+		ndShapeCompound* const compound = shape->GetAsShapeCompound();
+		if (compound)
 		{
-			shapeMap.Insert(shapesCount, shape);
-			shapesCount++;
+			ndShapeCompound::ndTreeArray::Iterator iter(compound->GetTree());
+			for (iter.Begin(); iter; iter++)
+			{
+				ndShapeCompound::ndNodeBase* const node = iter.GetNode()->GetInfo();
+				ndShapeInstance* const instance = node->GetShape();
+				ndShape* const subShape = instance->GetShape();
+				if (!shapeMap.Find(subShape))
+				{
+					shapeNodeOrder.PushBack(shapeMap.Insert(shapeNodeOrder.GetCount(), subShape));
+				}
+			}
+		}
+		else if (!shapeMap.Find(shape))
+		{
+			shapeNodeOrder.PushBack(shapeMap.Insert(shapeNodeOrder.GetCount(), shape));
 		}
 	}
-	
+
+	for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	{
+		ndBodyKinematic* const body = bodyNode->GetInfo();
+		ndShape* const shape = body->GetCollisionShape().GetShape();
+		ndShapeCompound* const compound = shape->GetAsShapeCompound();
+		if (compound)
+		{
+			shapeNodeOrder.PushBack(shapeMap.Insert(shapeNodeOrder.GetCount(), shape));
+		}
+	}
+
 	if (shapeMap.GetCount())
 	{
 		nd::TiXmlElement* const rootNode = new nd::TiXmlElement("ndShapes");
@@ -1022,12 +1048,11 @@ void ndWorld::SaveCollisionShapes(nd::TiXmlNode* const shapeRootNode, const char
 		dLoadSaveBase::dSaveDescriptor descriptor;
 		descriptor.m_assetPath = assetPath;
 		descriptor.m_rootNode = rootNode;
-		dTree<dUnsigned32, const ndShape*>::Iterator it(shapeMap);
-		for (it.Begin(); it; it++)
+		descriptor.m_shapeMap = &shapeMap;
+		for (dInt32 hashId = 0; hashId < shapeNodeOrder.GetCount(); hashId++)
 		{
-			dInt32 nodeId = *it;
-			const ndShape* const shape = it.GetKey();
-			descriptor.m_nodeNodeHash = nodeId;
+			descriptor.m_nodeNodeHash = hashId;
+			const ndShape* const shape = shapeNodeOrder[hashId]->GetKey();
 			shape->Save(descriptor);
 		}
 	}

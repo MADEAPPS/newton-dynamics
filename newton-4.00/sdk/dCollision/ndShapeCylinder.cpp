@@ -25,6 +25,8 @@
 #include "ndShapeCylinder.h"
 #include "ndContactSolver.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeCylinder)
+
 dInt32 ndShapeCylinder::m_shapeRefCount = 0;
 ndShapeConvex::ndConvexSimplexEdge ndShapeCylinder::m_edgeArray[D_TAPED_CYLINDER_SEGMENTS * 2 * 3];
 
@@ -34,9 +36,10 @@ ndShapeCylinder::ndShapeCylinder(dFloat32 radius0, dFloat32 radius1, dFloat32 he
 	Init(radius0, radius1, height);
 }
 
-ndShapeCylinder::ndShapeCylinder(const nd::TiXmlNode* const xmlNode)
+ndShapeCylinder::ndShapeCylinder(const dLoadSaveBase::dLoadDescriptor& desc)
 	: ndShapeConvex(m_cylinder)
 {
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	dFloat32 radius0 = xmlGetFloat(xmlNode, "radius0");
 	dFloat32 radius1 = xmlGetFloat(xmlNode, "radius1");
 	dFloat32 height = xmlGetFloat(xmlNode, "height");
@@ -426,14 +429,14 @@ void ndShapeCylinder::CalculateAabb(const dMatrix& matrix, dVector& p0, dVector&
 	ndShapeConvex::CalculateAabb(matrix, p0, p1);
 }
 
-void ndShapeCylinder::Save( nd::TiXmlElement* const xmlNode, const char* const, dInt32 nodeid ) const
+void ndShapeCylinder::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeCylinder");
-	xmlNode->LinkEndChild(paramNode);
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeConvex::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
-	paramNode->SetAttribute("nodeId", nodeid);
-
-	xmlSaveParam(paramNode, "radius0", m_radius0);
-	xmlSaveParam(paramNode, "radius1", m_radius0);
-	xmlSaveParam(paramNode, "height", m_height * dFloat32 (2.0f));
+	xmlSaveParam(childNode, "radius0", m_radius0);
+	xmlSaveParam(childNode, "radius1", m_radius1);
+	xmlSaveParam(childNode, "height", m_height * dFloat32 (2.0f));
 }

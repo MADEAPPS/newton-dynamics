@@ -46,8 +46,9 @@ class ndShapeCompound: public ndShape
 		void AddNode(ndNodeBase* const node, dInt32 index, const ndShapeInstance* const parent);
 	};
 
+	D_CLASS_REFLECTION(ndShapeCompound);
 	D_COLLISION_API ndShapeCompound();
-	D_COLLISION_API ndShapeCompound(const nd::TiXmlNode* const xmlNode);
+	D_COLLISION_API ndShapeCompound(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeCompound();
 
 	void SetOwner(const ndShapeInstance* const myInstance);
@@ -64,6 +65,7 @@ class ndShapeCompound: public ndShape
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	virtual dFloat32 GetVolume() const;
 	virtual dFloat32 GetBoxMinRadius() const;

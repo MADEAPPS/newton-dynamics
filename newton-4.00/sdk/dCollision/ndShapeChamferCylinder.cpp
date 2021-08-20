@@ -25,6 +25,8 @@
 #include "ndContactSolver.h"
 #include "ndShapeChamferCylinder.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeChamferCylinder)
+
 dInt32 ndShapeChamferCylinder::m_shapeRefCount = 0;
 dVector ndShapeChamferCylinder::m_yzMask (0, 0xffffffff, 0xffffffff, 0);
 dVector ndShapeChamferCylinder::m_shapesDirs[DG_MAX_CHAMFERCYLINDER_DIR_COUNT];
@@ -36,10 +38,11 @@ ndShapeChamferCylinder::ndShapeChamferCylinder(dFloat32 radius, dFloat32 height)
 	Init (radius, height);
 }
 
-ndShapeChamferCylinder::ndShapeChamferCylinder(const nd::TiXmlNode* const xmlNode)
+ndShapeChamferCylinder::ndShapeChamferCylinder(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndShapeConvex(m_chamferCylinder)
 {
-	dVector size;
+	//dVector size;
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	dFloat32 radius = xmlGetFloat(xmlNode, "radius");
 	dFloat32 height = xmlGetFloat(xmlNode, "height");
 	Init(radius, height);
@@ -153,20 +156,15 @@ void ndShapeChamferCylinder::Init (dFloat32 radius, dFloat32 height)
 }
 
 
-//void ndShapeChamferCylinder::Serialize(dgSerialize callback, void* const userData) const
-void ndShapeChamferCylinder::Save(nd::TiXmlElement* const xmlNode, const char* const, dInt32 nodeid) const
+void ndShapeChamferCylinder::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	//dVector size(m_radius, m_height * dFloat32(2.0f), dFloat32(0.0f), dFloat32(0.0f));
-	//SerializeLow(callback, userData);
-	//callback(userData, &size, sizeof(dVector));
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeConvex::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
-	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeChamferCylinder");
-	xmlNode->LinkEndChild(paramNode);
-
-	paramNode->SetAttribute("nodeId", nodeid);
-
-	xmlSaveParam(paramNode, "radius", m_radius);
-	xmlSaveParam(paramNode, "height", m_height * dFloat32(2.0f));
+	xmlSaveParam(childNode, "radius", m_radius);
+	xmlSaveParam(childNode, "height", m_height * dFloat32(2.0f));
 }
 
 ndShapeInfo ndShapeChamferCylinder::GetShapeInfo() const

@@ -73,6 +73,7 @@ class dLoadSaveBase
 			,m_rootNode(nullptr)
 			,m_nodeNodeHash(0)
 			,m_shapeNodeHash(0)
+			,m_shapeMap(nullptr)
 		{
 		}
 
@@ -81,6 +82,7 @@ class dLoadSaveBase
 			,m_rootNode(rootNode)
 			,m_nodeNodeHash(desc.m_nodeNodeHash)
 			,m_shapeNodeHash(desc.m_shapeNodeHash)
+			,m_shapeMap(desc.m_shapeMap)
 		{
 		}
 
@@ -88,6 +90,7 @@ class dLoadSaveBase
 		nd::TiXmlNode* m_rootNode;
 		dInt32 m_nodeNodeHash;
 		dInt32 m_shapeNodeHash;
+		dTree<dUnsigned32, const ndShape*>* m_shapeMap;
 	};
 
 	virtual void* CreateClass(const dLoadDescriptor&)

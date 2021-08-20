@@ -28,6 +28,7 @@
 #include "ndShapeCompound.h"
 
 #define D_MAX_MIN_VOLUME	dFloat32 (1.0e-3f)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeCompound)
 
 ndShapeCompound::ndNodeBase::~ndNodeBase()
 {
@@ -237,7 +238,6 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeIns
 			}
 			else 
 			{
-				//ndNodeBase* const node = m_array.Find (sourceNode->m_shape)->GetInfo();
 				ndNodeBase* const node = m_array.Find(sourceNode->m_myNode->GetKey())->GetInfo();
 				dAssert(node);
 				node->m_parent = parents[stack];
@@ -278,7 +278,7 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeIns
 	}
 }
 
-ndShapeCompound::ndShapeCompound(const nd::TiXmlNode* const xmlNode)
+ndShapeCompound::ndShapeCompound(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndShape(m_compound)
 	,m_array()
 	,m_treeEntropy(dFloat32 (0.0f))
@@ -289,7 +289,8 @@ ndShapeCompound::ndShapeCompound(const nd::TiXmlNode* const xmlNode)
 	,m_idIndex(0)
 {
 	dAssert(0);
-	xmlGetInt(xmlNode, "xxxx");
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+//	xmlGetInt(xmlNode, "xxxx");
 }
 
 ndShapeCompound::~ndShapeCompound()
@@ -1132,4 +1133,25 @@ dMatrix ndShapeCompound::CalculateInertiaAndCenterOfMass(const dMatrix& alignMat
 	inertia[2][1] = crossInertia[0];
 	inertia[3] = centerOfMass;
 	return inertia;
+}
+
+void ndShapeCompound::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShape::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	nd::TiXmlElement* const subShapedNode = new nd::TiXmlElement("ndCompoundsSubShaped");
+	childNode->LinkEndChild(subShapedNode);
+	dLoadSaveBase::dSaveDescriptor subShapeDesc(desc);
+	subShapeDesc.m_rootNode = subShapedNode;
+	ndTreeArray::Iterator iter(m_array);
+	for (iter.Begin(); iter; iter++)
+	{
+		ndNodeBase* const node = iter.GetNode()->GetInfo();
+		ndShapeInstance* const instance = node->GetShape();
+		subShapeDesc.m_shapeNodeHash = subShapeDesc.m_shapeMap->Find(instance->GetShape())->GetInfo();
+		instance->Save(subShapeDesc);
+	}
 }
