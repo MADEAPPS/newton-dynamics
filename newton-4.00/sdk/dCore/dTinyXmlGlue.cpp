@@ -143,9 +143,9 @@ dInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name)
 	dAssert(element);
 	const char* const data = element->Attribute("int64");
 
-	dInt64 value;
+	long long int value;
 	sscanf(data, "%lld", &value);
-	return value;
+	return dInt64 (value);
 }
 
 dFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name)
