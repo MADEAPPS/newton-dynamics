@@ -115,10 +115,13 @@ class ndPolygonMeshDesc: public dFastAabb
 class ndShapeStaticMesh: public ndShape
 {
 	public:
+	D_CLASS_REFLECTION(ndShapeStaticMesh);
 	D_COLLISION_API ndShapeStaticMesh(ndShapeID id);
+	D_COLLISION_API ndShapeStaticMesh(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeStaticMesh();
 
-	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const = 0;
+	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
+
 	protected:
 	virtual dFloat32 GetVolume() const;
 	virtual dFloat32 GetBoxMinRadius() const;
@@ -132,6 +135,10 @@ class ndShapeStaticMesh: public ndShape
 
 	D_COLLISION_API virtual void CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	D_COLLISION_API dInt32 CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 strideInFloat, const dPlane& localPlane, dVector* const contactsOut) const;
+	D_COLLISION_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+
+	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
+	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
 	D_MSV_NEWTON_ALIGN_32 
 	class ndMeshVertexListIndexList
@@ -209,6 +216,18 @@ inline void ndPolygonMeshDesc::SetDistanceTravel(const dVector& distanceInGlobal
 	}
 }
 
+inline void ndShapeStaticMesh::DebugShape(const dMatrix&, ndShapeDebugCallback&) const
+{
+}
+
+inline dFloat32 ndShapeStaticMesh::RayCast(ndRayCastNotify&, const dVector&, const dVector&, dFloat32, const ndBody* const, ndContactPoint&) const
+{
+	return dFloat32(1.2f);
+}
+
+inline void ndShapeStaticMesh::GetCollidingFaces(ndPolygonMeshDesc* const) const
+{
+}
 
 #endif 
 

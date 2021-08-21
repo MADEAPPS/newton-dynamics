@@ -35,21 +35,21 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-#define DEFAULT_SCENE	0		// setting basic rigidbody
-//#define DEFAULT_SCENE	1		// setting gpu basic rigidbody
-//#define DEFAULT_SCENE	2		// setting friction ramp
+//#define DEFAULT_SCENE	0		// basic rigidbody
+//#define DEFAULT_SCENE	1		// gpu basic rigidbody
+//#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// conservation of momentum 
-//#define DEFAULT_SCENE	4		// setting basic Stacks
-//#define DEFAULT_SCENE	5		// setting basic Trigger
-//#define DEFAULT_SCENE	6		// setting basic player
-//#define DEFAULT_SCENE	7		// setting particle fluid
+#define DEFAULT_SCENE	4		// basic Stacks
+//#define DEFAULT_SCENE	5		// basic Trigger
+//#define DEFAULT_SCENE	6		// basic player
+//#define DEFAULT_SCENE	7		// particle fluid
 //#define DEFAULT_SCENE	8		// static mesh collision 
 //#define DEFAULT_SCENE	9		// static user mesh collision 
-//#define DEFAULT_SCENE	10		// setting basic joints
-//#define DEFAULT_SCENE	11		// setting basic rag doll
-//#define DEFAULT_SCENE	12		// setting active rag doll
-//#define DEFAULT_SCENE	14		// setting basic vehicle
-//#define DEFAULT_SCENE	15		// setting heavy vehicle
+//#define DEFAULT_SCENE	10		// basic joints
+//#define DEFAULT_SCENE	11		// basic rag doll
+//#define DEFAULT_SCENE	12		// active rag doll
+//#define DEFAULT_SCENE	14		// basic vehicle
+//#define DEFAULT_SCENE	15		// heavy vehicle
 //#define DEFAULT_SCENE	16		// simple voronoi fracture
 //#define DEFAULT_SCENE	17		// basic voronoi fracture
 //#define DEFAULT_SCENE	18		// linked voronoi fracture

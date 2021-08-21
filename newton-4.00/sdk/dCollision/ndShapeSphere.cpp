@@ -39,7 +39,7 @@ ndShapeSphere::ndShapeSphere(dFloat32 radius)
 }
 
 ndShapeSphere::ndShapeSphere(const dLoadSaveBase::dLoadDescriptor& desc)
-	: ndShapeConvex(m_sphere)
+	:ndShapeConvex(m_sphere)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	dFloat32 radius = xmlGetFloat(xmlNode, "radius");

@@ -26,6 +26,8 @@
 #include "ndCollisionStdafx.h"
 #include "ndShapeStaticMesh.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeStaticMesh)
+
 void ndPolygonMeshDesc::SortFaceArray()
 {
 	dInt32 stride = 8;
@@ -191,6 +193,12 @@ ndShapeStaticMesh::ndShapeStaticMesh(ndShapeID id)
 {
 }
 
+ndShapeStaticMesh::ndShapeStaticMesh(const dLoadSaveBase::dLoadDescriptor&)
+	:ndShape(m_staticMesh)
+{
+}
+
+
 ndShapeStaticMesh::~ndShapeStaticMesh()
 {
 }
@@ -254,4 +262,12 @@ dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dFloat32* const, cons
 	//}
 	//
 	//return count;
+}
+
+void ndShapeStaticMesh::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShape::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 }

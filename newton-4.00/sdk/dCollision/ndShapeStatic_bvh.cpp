@@ -26,6 +26,8 @@
 #include "ndShapeInstance.h"
 #include "ndShapeStatic_bvh.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeStatic_bvh)
+
 class ndCollisionBvhShowPolyContext
 {
 	public:
@@ -110,22 +112,6 @@ ndShapeStatic_bvh::ndShapeStatic_bvh(const dLoadSaveBase::dLoadDescriptor& desc)
 
 ndShapeStatic_bvh::~ndShapeStatic_bvh(void)
 {
-}
-
-void ndShapeStatic_bvh::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-{
-	dAssert(0);
-	//nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeStatic_bvh");
-	//xmlNode->LinkEndChild(paramNode);
-	//
-	//paramNode->SetAttribute("nodeId", nodeid);
-	//
-	//char pathCopy[1024];
-	//sprintf(pathCopy, "%s/asset%d.bin", assetPath, nodeid);
-	//Serialize(pathCopy);
-	//
-	//sprintf(pathCopy, "asset%d.bin", nodeid);
-	//xmlSaveParam(paramNode, "assetName", "string", pathCopy);
 }
 
 dIntersectStatus ndShapeStatic_bvh::GetTriangleCount(void* const context, const dFloat32* const, dInt32, const dInt32* const, dInt32 indexCount, dFloat32)
@@ -267,3 +253,17 @@ void ndShapeStatic_bvh::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	ForAllSectors(*data, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
 
+void ndShapeStatic_bvh::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeStaticMesh::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	//char pathCopy[1024];
+	//sprintf(pathCopy, "%s/asset%d.bin", assetPath, nodeid);
+	//Serialize(pathCopy);
+	//
+	//sprintf(pathCopy, "asset%d.bin", nodeid);
+	//xmlSaveParam(paramNode, "assetName", "string", pathCopy);
+}

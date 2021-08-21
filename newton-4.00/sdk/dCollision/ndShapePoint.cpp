@@ -30,7 +30,7 @@ ndShapePoint::ndShapePoint()
 {
 }
 
-ndShapePoint::ndShapePoint(const dLoadSaveBase::dLoadDescriptor& desc)
+ndShapePoint::ndShapePoint(const dLoadSaveBase::dLoadDescriptor&)
 	:ndShapeConvex(m_pointCollision)
 {
 	dAssert(0);
@@ -146,7 +146,7 @@ void ndShapePoint::DebugShape(const dMatrix&, ndShapeDebugCallback&) const
 	//}
 }
 
-void ndShapePoint::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndShapePoint::Save(const dLoadSaveBase::dSaveDescriptor&) const
 {
 	dAssert(0);
 }

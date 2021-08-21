@@ -61,6 +61,7 @@ enum ndShapeID
 
 	// special and non convex collisions.
 	m_compound,
+	m_staticMesh,
 	m_heightField,
 	m_staticProceduralMesh,
 	m_nullCollision,

@@ -57,7 +57,7 @@ ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(dFloat32 sizex, dFloat3
 	CalculateLocalObb();
 }
 
-ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const dLoadSaveBase::dLoadDescriptor& desc)
+ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const dLoadSaveBase::dLoadDescriptor&)
 	:ndShapeStaticMesh(m_staticProceduralMesh)
 {
 	dAssert(0);
@@ -74,7 +74,7 @@ void ndShapeStaticProceduralMesh::SetMaxVertexAndFaces(dInt32 maxVertex, dInt32 
 }
 
 //void ndShapeStaticProceduralMesh::Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const
-void ndShapeStaticProceduralMesh::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndShapeStaticProceduralMesh::Save(const dLoadSaveBase::dSaveDescriptor&) const
 {
 	dAssert(0);
 }
