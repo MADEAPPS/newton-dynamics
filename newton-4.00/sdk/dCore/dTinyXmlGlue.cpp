@@ -70,7 +70,8 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt64 value)
 {
 	char buffer[1024];
-	sprintf(buffer, "%llu", long long int (value));
+	long long x = value;
+	sprintf(buffer, "%llu", x);
 	xmlSaveParam(rootNode, name, "int64", buffer);
 }
 
