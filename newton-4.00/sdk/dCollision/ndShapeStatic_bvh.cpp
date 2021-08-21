@@ -84,30 +84,27 @@ ndShapeStatic_bvh::ndShapeStatic_bvh(const dLoadSaveBase::dLoadDescriptor& desc)
 	,dAabbPolygonSoup()
 	,m_trianglesCount(0)
 {
-	dAssert(0);
-	//const nd::TiXmlNode* const xmlNode, const char* const assetPath
-	 
-	//const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name);
-	//const char* const assetName = xmlGetString(xmlNode, "assetName");
-	//char pathCopy[1024];
-	//sprintf(pathCopy, "%s/%s", assetPath, assetName);
-	//Deserialize(pathCopy);
-	//
-	//dVector p0;
-	//dVector p1;
-	//GetAABB(p0, p1);
-	//m_boxSize = (p1 - p0) * dVector::m_half;
-	//m_boxOrigin = (p1 + p0) * dVector::m_half;
-	//
-	//ndMeshVertexListIndexList data;
-	//data.m_indexList = nullptr;
-	//data.m_userDataList = nullptr;
-	//data.m_maxIndexCount = 1000000000;
-	//data.m_triangleCount = 0;
-	//dVector zero(dVector::m_zero);
-	//dFastAabb box(dGetIdentityMatrix(), dVector(dFloat32(1.0e15f)));
-	//ForAllSectors(box, zero, dFloat32(1.0f), GetTriangleCount, &data);
-	//m_trianglesCount = data.m_triangleCount;
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	const char* const assetName = xmlGetString(xmlNode, "assetName");
+	char pathCopy[1024];
+	sprintf(pathCopy, "%s/%s", desc.m_assetPath, assetName);
+	Deserialize(pathCopy);
+
+	dVector p0;
+	dVector p1;
+	GetAABB(p0, p1);
+	m_boxSize = (p1 - p0) * dVector::m_half;
+	m_boxOrigin = (p1 + p0) * dVector::m_half;
+
+	ndMeshVertexListIndexList data;
+	data.m_indexList = nullptr;
+	data.m_userDataList = nullptr;
+	data.m_maxIndexCount = 1000000000;
+	data.m_triangleCount = 0;
+	dVector zero(dVector::m_zero);
+	dFastAabb box(dGetIdentityMatrix(), dVector(dFloat32(1.0e15f)));
+	ForAllSectors(box, zero, dFloat32(1.0f), GetTriangleCount, &data);
+	m_trianglesCount = data.m_triangleCount;
 }
 
 ndShapeStatic_bvh::~ndShapeStatic_bvh(void)
@@ -260,10 +257,12 @@ void ndShapeStatic_bvh::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 	ndShapeStaticMesh::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
-	//char pathCopy[1024];
-	//sprintf(pathCopy, "%s/asset%d.bin", assetPath, nodeid);
-	//Serialize(pathCopy);
-	//
-	//sprintf(pathCopy, "asset%d.bin", nodeid);
-	//xmlSaveParam(paramNode, "assetName", "string", pathCopy);
+	char fileName[1024];
+	sprintf(fileName, "%s_%d.bin", desc.m_assetName, desc.m_assetIndex);
+	xmlSaveParam(childNode, "assetName", "string", fileName);
+
+	char filePathName[1024];
+	sprintf(filePathName, "%s/%s", desc.m_assetPath, fileName);
+	desc.m_assetIndex++;
+	Serialize(filePathName);
 }

@@ -150,13 +150,13 @@ class ndWorld: public dClassAlloc
 	void ThreadFunction();
 	void PostUpdate(dFloat32 timestep);
 
-	void SaveSceneSettings(
-		nd::TiXmlNode* const rootNode, const char* const assetPath) const;
-	void SaveCollisionShapes(
-		nd::TiXmlNode* const rootNode, const char* const assetPath, 
+	void SaveSceneSettings(nd::TiXmlNode* const rootNode, 
+		const char* const assetPath, const char* const assetName) const;
+	void SaveCollisionShapes(nd::TiXmlNode* const rootNode, 
+		const char* const assetPath, const char* const assetName,
 		dTree<dUnsigned32, const ndShape*>& shapesMap);
-	void SaveRididBodies(
-		nd::TiXmlNode* const rootNode, const char* const assetPath, 
+	void SaveRididBodies(nd::TiXmlNode* const rootNode, 
+		const char* const assetPath, const char* const assetName,
 		const dTree<dUnsigned32, const ndShape*>& shapesMap,
 		dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap);
 

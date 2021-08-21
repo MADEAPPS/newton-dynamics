@@ -26,6 +26,8 @@
 #include "ndShapeInstance.h"
 #include "ndShapeStaticProceduralMesh.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeStaticProceduralMesh)
+
 template<class T>
 class dTempArray : public dArray<T>
 {
@@ -51,16 +53,22 @@ ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(dFloat32 sizex, dFloat3
 	,m_minBox(dVector::m_negOne * dVector::m_half * dVector(sizex, sizey, sizez, dFloat32(0.0f)))
 	,m_maxBox(dVector::m_half * dVector(sizex, sizey, sizez, dFloat32(0.0f)))
 	,m_localData()
-	,m_maxVertexCount(256)
 	,m_maxFaceCount(64)
+	,m_maxVertexCount(256)
 {
 	CalculateLocalObb();
 }
 
-ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const dLoadSaveBase::dLoadDescriptor&)
+ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndShapeStaticMesh(m_staticProceduralMesh)
 {
-	dAssert(0);
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	//CalculateLocalObb();
+	m_minBox = xmlGetVector3(xmlNode, "minBox");
+	m_maxBox = xmlGetVector3(xmlNode, "maxBox");
+	m_maxFaceCount = xmlGetInt(xmlNode, "maxFaceCount");
+	m_maxVertexCount = xmlGetInt(xmlNode, "maxVertexCount");
 }
 
 ndShapeStaticProceduralMesh::~ndShapeStaticProceduralMesh(void)
@@ -69,14 +77,21 @@ ndShapeStaticProceduralMesh::~ndShapeStaticProceduralMesh(void)
 
 void ndShapeStaticProceduralMesh::SetMaxVertexAndFaces(dInt32 maxVertex, dInt32 maxFaces)
 {
-	m_maxVertexCount = maxVertex;
 	m_maxFaceCount = maxFaces;
+	m_maxVertexCount = maxVertex;
 }
 
-//void ndShapeStaticProceduralMesh::Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const
-void ndShapeStaticProceduralMesh::Save(const dLoadSaveBase::dSaveDescriptor&) const
+void ndShapeStaticProceduralMesh::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	dAssert(0);
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeStaticMesh::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "minBox", m_minBox);
+	xmlSaveParam(childNode, "maxBox", m_maxBox);
+	xmlSaveParam(childNode, "maxFaceCount", m_maxFaceCount);
+	xmlSaveParam(childNode, "maxVertexCount", m_maxVertexCount);
 }
 
 ndShapeInfo ndShapeStaticProceduralMesh::GetShapeInfo() const

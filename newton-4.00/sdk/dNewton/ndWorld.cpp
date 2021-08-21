@@ -966,13 +966,14 @@ void ndWorld::SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) cons
 	setting.Save(desc);
 }
 
-void ndWorld::SaveSceneSettings(nd::TiXmlNode* const rootNode, const char* const assetPath) const
+void ndWorld::SaveSceneSettings(nd::TiXmlNode* const rootNode, const char* const assetPath, const char* const assetName) const
 {
 	nd::TiXmlElement* const settingsNode = new nd::TiXmlElement("ndSettings");
 	rootNode->LinkEndChild(settingsNode);
 
 	dLoadSaveBase::dSaveDescriptor descriptor;
 	descriptor.m_assetPath = assetPath;
+	descriptor.m_assetName = assetName;
 	descriptor.m_rootNode = settingsNode;
 	//ndWorld::SaveSceneSettings(descriptor);
 	SaveSceneSettings(descriptor);
@@ -999,7 +1000,9 @@ void ndWorld::LoadSceneSettings(const nd::TiXmlNode* const rootNode, const char*
 	delete worldSetting;
 }
 
-void ndWorld::SaveCollisionShapes(nd::TiXmlNode* const shapeRootNode, const char* const assetPath, dTree<dUnsigned32, const ndShape*>& shapeMap)
+void ndWorld::SaveCollisionShapes(nd::TiXmlNode* const shapeRootNode,
+	const char* const assetPath, const char* const assetName,
+	dTree<dUnsigned32, const ndShape*>& shapeMap)
 {
 	const ndBodyList& bodyList = GetBodyList();
 	dArray<dTree<dUnsigned32, const ndShape*>::dNode*> shapeNodeOrder;
@@ -1047,6 +1050,7 @@ void ndWorld::SaveCollisionShapes(nd::TiXmlNode* const shapeRootNode, const char
 	
 		dLoadSaveBase::dSaveDescriptor descriptor;
 		descriptor.m_assetPath = assetPath;
+		descriptor.m_assetName = assetName;
 		descriptor.m_rootNode = rootNode;
 		descriptor.m_shapeMap = &shapeMap;
 		for (dInt32 hashId = 0; hashId < shapeNodeOrder.GetCount(); hashId++)
@@ -1114,7 +1118,8 @@ void ndWorld::LoadCollisionShapes(
 	}
 }
 
-void ndWorld::SaveRididBodies(nd::TiXmlNode* const rootNode, const char* const assetPath,
+void ndWorld::SaveRididBodies(nd::TiXmlNode* const rootNode, 
+	const char* const assetPath, const char* const assetName,
 	const dTree<dUnsigned32, const ndShape*>& shapesMap,
 	dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap)
 {
@@ -1126,6 +1131,7 @@ void ndWorld::SaveRididBodies(nd::TiXmlNode* const rootNode, const char* const a
 		rootNode->LinkEndChild(bodiesNode);
 		dLoadSaveBase::dSaveDescriptor descriptor;
 		descriptor.m_assetPath = assetPath;
+		descriptor.m_assetName = assetName;
 		descriptor.m_rootNode = bodiesNode;
 
 		for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
@@ -1181,25 +1187,43 @@ void ndWorld::SaveScene(const char* const path)
 	nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
 	asciifile.LinkEndChild(worldNode);
 
+	char assetPath[1024];
+	char assetName[1024];
 	char fileNameExt[1024];
-	strcpy(fileNameExt, path);
 
+	strcpy(fileNameExt, path);
 	char* const ext = strrchr(fileNameExt, '.');
 	if (ext) 
 	{
 		*ext = 0;
 	}
-	char assetPath[1024];
-	strcpy(assetPath, fileNameExt);
 
+	strcpy(assetPath, fileNameExt);
 	strcat(fileNameExt, ".nd");
+
+	char* namePtr = strrchr(assetPath, '/');
+	if (!namePtr)
+	{
+		namePtr = strrchr(assetPath, '\\');
+	}
+	if (namePtr)
+	{
+		strcpy(assetName, namePtr + 1);
+	}
+	else
+	{
+		namePtr = assetPath;
+		strcpy(assetName, namePtr);
+	}
+	namePtr[0] = 0;
+	strcat(assetName, "_asset");
 
 	dTree<dUnsigned32, const ndShape*> shapeMap;
 	dTree<dUnsigned32, const ndBodyKinematic*> bodyMap;
 
-	SaveSceneSettings(worldNode, assetPath);
-	SaveCollisionShapes(worldNode, assetPath, shapeMap);
-	SaveRididBodies(worldNode, assetPath, shapeMap, bodyMap);
+	SaveSceneSettings(worldNode, assetPath, assetName);
+	SaveCollisionShapes(worldNode, assetPath, assetName, shapeMap);
+	SaveRididBodies(worldNode, assetPath, assetName, shapeMap, bodyMap);
 
 	asciifile.SaveFile(path);
 	setlocale(LC_ALL, oldloc);
@@ -1226,11 +1250,12 @@ bool ndWorld::LoadScene(const char* const path)
 	char assetPath[1024];
 	strcpy(assetPath, path);
 
-	char* const ext = strrchr(assetPath, '.');
-	if (ext)
+	char* namePtr = strrchr(assetPath, '/');
+	if (!namePtr)
 	{
-		*ext = 0;
+		namePtr = strrchr(assetPath, '\\');
 	}
+	namePtr[0] = 0;
 
 	const nd::TiXmlElement* const worldNode = doc.RootElement();
 

@@ -30,7 +30,6 @@ class ndBody;
 class ndShape;
 class ndShapeInstance;
 
-//class ndShapeLoaderCache: public dTree<const ndShape*, dUnsigned32>
 class ndShapeLoaderCache : public dTree<const ndShapeInstance, dUnsigned32>
 {
 };
@@ -72,7 +71,9 @@ class dLoadSaveBase
 		public:
 		dSaveDescriptor()
 			:m_assetPath(nullptr)
+			,m_assetName(nullptr)
 			,m_rootNode(nullptr)
+			,m_assetIndex(0)
 			,m_nodeNodeHash(0)
 			,m_shapeNodeHash(0)
 			,m_shapeMap(nullptr)
@@ -81,7 +82,9 @@ class dLoadSaveBase
 
 		dSaveDescriptor(const dSaveDescriptor& desc, nd::TiXmlNode* const rootNode)
 			:m_assetPath(desc.m_assetPath)
+			,m_assetName(desc.m_assetName)
 			,m_rootNode(rootNode)
+			,m_assetIndex(desc.m_assetIndex)
 			,m_nodeNodeHash(desc.m_nodeNodeHash)
 			,m_shapeNodeHash(desc.m_shapeNodeHash)
 			,m_shapeMap(desc.m_shapeMap)
@@ -89,7 +92,9 @@ class dLoadSaveBase
 		}
 
 		const char* m_assetPath;
+		const char* m_assetName;
 		nd::TiXmlNode* m_rootNode;
+		mutable dInt32 m_assetIndex;
 		dInt32 m_nodeNodeHash;
 		dInt32 m_shapeNodeHash;
 		dTree<dUnsigned32, const ndShape*>* m_shapeMap;

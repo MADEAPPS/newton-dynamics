@@ -52,15 +52,14 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 		ndEdgeMap();
 	};
 
+	D_CLASS_REFLECTION(ndShapeStaticProceduralMesh);
 	D_COLLISION_API ndShapeStaticProceduralMesh(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API ndShapeStaticProceduralMesh(dFloat32 sizex, dFloat32 sizey, dFloat32 sizez);
 	D_COLLISION_API virtual ~ndShapeStaticProceduralMesh();
 
 	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return this; }
 
-	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const = 0;
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const = 0;
-	virtual void GetCollidingFaces(const dVector& minBox, const dVector& maxBox, dArray<dVector>& vertex, dArray<dInt32>& faceList, dArray<dInt32>& faceMaterial, dArray<dInt32>& indexListList) const = 0;
+	virtual void GetCollidingFaces(const dVector& minBox, const dVector& maxBox, dArray<dVector>& vertex, dArray<dInt32>& faceList, dArray<dInt32>& faceMaterial, dArray<dInt32>& indexListList) const;
 
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API void SetMaxVertexAndFaces(dInt32 maxVertex, dInt32 maxFaces);
@@ -86,12 +85,16 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	dVector m_minBox;
 	dVector m_maxBox;
 	mutable dList<ndLocalThreadData> m_localData;
-	dInt32 m_maxVertexCount;
 	dInt32 m_maxFaceCount;
+	dInt32 m_maxVertexCount;
 
 	friend class ndContactSolver;
 };
 
+inline void ndShapeStaticProceduralMesh::GetCollidingFaces(const dVector&, const dVector&, dArray<dVector>&, dArray<dInt32>&, dArray<dInt32>&, dArray<dInt32>&) const
+{
+	dAssert(0);
+}
 
 inline ndShapeStaticProceduralMesh::ndEdge::ndEdge()
 {
