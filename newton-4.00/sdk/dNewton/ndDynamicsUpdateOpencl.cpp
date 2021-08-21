@@ -82,7 +82,7 @@ class dOpenclBuffer: public dArray<T>
 	{
 		void* const source = &(*this)[0];
 		cl_int err = clEnqueueReadBuffer(commandQueue, m_gpuBuffer,
-			CL_FALSE, 0, sizeof(T) * GetCount(), source,
+			CL_FALSE, 0, sizeof(T) * dArray<T>::GetCount(), source,
 			0, nullptr, nullptr);
 		dAssert(err == CL_SUCCESS);
 	}
@@ -205,13 +205,15 @@ class OpenclSystem
 		FILE* const fp = fopen(filename, "rb");
 		if (fp)
 		{
+			size_t bytesRead;
 			size_t sourceSize;
+	
 			fseek(fp, 0, SEEK_END);
 			sourceSize = ftell(fp);
 			fseek(fp, 0, SEEK_SET);
 
 			char* const source = dAlloca(char, sourceSize * 256);
-			fread(source, 1, sourceSize, fp);
+			bytesRead = fread(source, 1, sourceSize, fp);
 			fclose(fp);
 
 			int errorCode;
