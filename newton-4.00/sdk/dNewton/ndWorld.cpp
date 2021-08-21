@@ -1060,14 +1060,23 @@ void ndWorld::SaveCollisionShapes(nd::TiXmlNode* const shapeRootNode, const char
 
 void ndWorld::LoadCollisionShapes(
 	const nd::TiXmlNode* const rootNode, const char* const assetPath,
-	dTree<const ndShape*, dUnsigned32>& shapesMap) const
+	ndShapeLoaderCache& shapesMap) const
 {
 	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndShapes");
 	dAssert(shapes);
 
 	dLoadSaveBase::dLoadDescriptor descriptor;
 	descriptor.m_assetPath = assetPath;
+	//descriptor.m_shapeMap = &shapesMap;
 
+	class ndPendingCompounds
+	{
+		public:
+		ndShapeCompound* m_shape;
+		const nd::TiXmlNode* m_subShapeNodes;
+	};
+
+	dArray<ndPendingCompounds> pendingCompounds;
 	for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
 	{
 		const char* const name = node->Value();
@@ -1080,7 +1089,29 @@ void ndWorld::LoadCollisionShapes(
 			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
 			element->Attribute("hashId", &hashId);
 			shapesMap.Insert(shape->AddRef(), hashId);
+			ndShapeCompound* const compound = shape->GetAsShapeCompound();
+			if (compound)
+			{
+				ndPendingCompounds pending;
+				pending.m_shape = shape->GetAsShapeCompound();
+				pending.m_subShapeNodes = element->FirstChild()->NextSibling();
+				pendingCompounds.PushBack(pending);
+			}
 		}
+	}
+
+	for (dInt32 i = 0; i < pendingCompounds.GetCount(); i++)
+	{
+		ndShapeCompound* const compound = pendingCompounds[i].m_shape;
+		ndShapeInstance tmpInstance(compound);
+		pendingCompounds[i].m_shape->BeginAddRemove();
+
+		for (const nd::TiXmlNode* node = pendingCompounds[i].m_subShapeNodes->FirstChild("ndShapeInstance"); node; node = node->NextSibling())
+		{
+			ndShapeInstance instance(node, shapesMap);
+			compound->AddCollision(&instance);
+		}
+		compound->EndAddRemove();
 	}
 }
 

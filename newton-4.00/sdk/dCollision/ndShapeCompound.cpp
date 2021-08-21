@@ -288,9 +288,19 @@ ndShapeCompound::ndShapeCompound(const dLoadSaveBase::dLoadDescriptor& desc)
 	,m_myInstance(nullptr)
 	,m_idIndex(0)
 {
-	dAssert(0);
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-//	xmlGetInt(xmlNode, "xxxx");
+	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	//
+	//dAssert(0);
+	//AddRef();
+	//ndShapeInstance tmpInstance(this);
+	//BeginAddRemove();
+	//for (const nd::TiXmlNode* node = xmlNode->FirstChild("ndCompoundsSubShaped"); node; node = node->NextSibling())
+	//{
+	//	ndShapeInstance instance(node->FirstChild("ndShapeInstance"), *desc.m_shapeMap);
+	//	AddCollision(&instance);
+	//}
+	//EndAddRemove();
+	//Release();
 }
 
 ndShapeCompound::~ndShapeCompound()

@@ -160,7 +160,7 @@ class ndWorld: public dClassAlloc
 		const nd::TiXmlNode* const rootNode, const char* const assetPath) const;
 	void LoadCollisionShapes(
 		const nd::TiXmlNode* const rootNode, const char* const assetPath,
-		dTree<const ndShape*, dUnsigned32>& shapesMap) const;
+		ndShapeLoaderCache& shapesMap) const;
 	void LoadRigidBodies(
 		const nd::TiXmlNode* const rootNode, const char* const assetPath,
 		const ndShapeLoaderCache& shapesMap, ndBodyLoaderCache& bodyMap);
