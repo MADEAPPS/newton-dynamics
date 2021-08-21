@@ -28,8 +28,10 @@
 
 class ndBody;
 class ndShape;
+class ndShapeInstance;
 
-class ndShapeLoaderCache: public dTree<const ndShape*, dUnsigned32>
+//class ndShapeLoaderCache: public dTree<const ndShape*, dUnsigned32>
+class ndShapeLoaderCache : public dTree<const ndShapeInstance, dUnsigned32>
 {
 };
 

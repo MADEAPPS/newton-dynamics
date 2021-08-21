@@ -1088,7 +1088,8 @@ void ndWorld::LoadCollisionShapes(
 			dInt32 hashId;
 			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
 			element->Attribute("hashId", &hashId);
-			shapesMap.Insert(shape->AddRef(), hashId);
+			dAssert(0);
+			//shapesMap.Insert(shape->AddRef(), hashId);
 			ndShapeCompound* const compound = shape->GetAsShapeCompound();
 			if (compound)
 			{
@@ -1253,11 +1254,12 @@ bool ndWorld::LoadScene(const char* const path)
 	afterLoaddesc.m_bodyMap = &bodyMap;
 	OnLoadScene(afterLoaddesc);
 
+	dAssert(0);
 	ndShapeLoaderCache::Iterator iter(shapesMap);
 	for (iter.Begin(); iter; iter++)
 	{
-		ndShape* const shape = (ndShape*)iter.GetNode()->GetInfo();
-		shape->Release();
+		//ndShape* const shape = (ndShape*)iter.GetNode()->GetInfo();
+		//shape->Release();
 	}
 		
 	setlocale(LC_ALL, oldloc);

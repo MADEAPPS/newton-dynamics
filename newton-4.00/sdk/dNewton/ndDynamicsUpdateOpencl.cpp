@@ -30,7 +30,6 @@
 #ifdef _D_NEWTON_OPENCL
 #include <CL/cl.h>
 
-
 template<class T>
 class dOpenclBuffer: public dArray<T>
 {
@@ -673,31 +672,31 @@ void ndDynamicsUpdateOpencl::CopyBodyData()
 	//m_opencl->m_outBodyArray.SyncSize(m_opencl->m_context, m_bodyIslandOrder.GetCount());
 	m_opencl->m_bodyWorkingArray.SyncSize(m_opencl->m_context, m_bodyIslandOrder.GetCount());
 
-	int xxx;
-	xxx = sizeof(ndOpenclBodyProxy);
+	//int xxx;
+	//xxx = sizeof(ndOpenclBodyProxy);
 	
 	for (dInt32 i = 0; i < m_bodyIslandOrder.GetCount(); i++)
 	{
 		ndOpenclBodyProxy& data = m_opencl->m_bodyArray[i];
 		ndBodyKinematic* const body = m_bodyIslandOrder[i];
 
-		data.m_rotation.m_x = body->m_rotation.m_x;
-		data.m_rotation.m_y = body->m_rotation.m_y;
-		data.m_rotation.m_z = body->m_rotation.m_z;
-		data.m_rotation.m_w = body->m_rotation.m_w;
-		data.m_position.m_x = body->m_matrix.m_posit.m_x;
-		data.m_position.m_y = body->m_matrix.m_posit.m_y;
-		data.m_position.m_z = body->m_matrix.m_posit.m_z;
-		data.m_veloc.m_x = body->m_veloc.m_x;
-		data.m_veloc.m_y = body->m_veloc.m_y;
-		data.m_veloc.m_z = body->m_veloc.m_z;
-		data.m_omega.m_x = body->m_omega.m_x;
-		data.m_omega.m_y = body->m_omega.m_y;
-		data.m_omega.m_z = body->m_omega.m_z;
-		data.m_invMass.m_x = body->m_invMass.m_x;
-		data.m_invMass.m_y = body->m_invMass.m_y;
-		data.m_invMass.m_z = body->m_invMass.m_z;
-		data.m_invMass.m_w = body->m_invMass.m_w;
+		data.m_rotation.s[0] = body->m_rotation.m_x;
+		data.m_rotation.s[1] = body->m_rotation.m_y;
+		data.m_rotation.s[2] = body->m_rotation.m_z;
+		data.m_rotation.s[3] = body->m_rotation.m_w;
+		data.m_position.s[0] = body->m_matrix.m_posit.m_x;
+		data.m_position.s[1] = body->m_matrix.m_posit.m_y;
+		data.m_position.s[2] = body->m_matrix.m_posit.m_z;
+		data.m_veloc.s[0] = body->m_veloc.m_x;
+		data.m_veloc.s[1] = body->m_veloc.m_y;
+		data.m_veloc.s[2] = body->m_veloc.m_z;
+		data.m_omega.s[0] = body->m_omega.m_x;
+		data.m_omega.s[1] = body->m_omega.m_y;
+		data.m_omega.s[2] = body->m_omega.m_z;
+		data.m_invMass.s[0] = body->m_invMass.m_x;
+		data.m_invMass.s[1] = body->m_invMass.m_y;
+		data.m_invMass.s[2] = body->m_invMass.m_z;
+		data.m_invMass.s[3] = body->m_invMass.m_w;
 	}
 
 	m_opencl->m_bodyArray.WriteData(m_opencl->m_commandQueue);

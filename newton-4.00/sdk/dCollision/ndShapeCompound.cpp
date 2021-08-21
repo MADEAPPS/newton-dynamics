@@ -278,7 +278,7 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeIns
 	}
 }
 
-ndShapeCompound::ndShapeCompound(const dLoadSaveBase::dLoadDescriptor& desc)
+ndShapeCompound::ndShapeCompound(const dLoadSaveBase::dLoadDescriptor&)
 	:ndShape(m_compound)
 	,m_array()
 	,m_treeEntropy(dFloat32 (0.0f))
@@ -288,19 +288,9 @@ ndShapeCompound::ndShapeCompound(const dLoadSaveBase::dLoadDescriptor& desc)
 	,m_myInstance(nullptr)
 	,m_idIndex(0)
 {
-	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	//
-	//dAssert(0);
-	//AddRef();
-	//ndShapeInstance tmpInstance(this);
-	//BeginAddRemove();
-	//for (const nd::TiXmlNode* node = xmlNode->FirstChild("ndCompoundsSubShaped"); node; node = node->NextSibling())
-	//{
-	//	ndShapeInstance instance(node->FirstChild("ndShapeInstance"), *desc.m_shapeMap);
-	//	AddCollision(&instance);
-	//}
-	//EndAddRemove();
-	//Release();
+	//do nothing here;
+	//sub shapes will be load in a post process pass,
+	//when all sub shape are converted to instanaced.
 }
 
 ndShapeCompound::~ndShapeCompound()
