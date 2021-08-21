@@ -1072,7 +1072,7 @@ void ndWorld::LoadCollisionShapes(
 	class ndPendingCompounds
 	{
 		public:
-		ndShapeCompound* m_shape;
+		ndShapeInstance* m_compoundInstance;
 		const nd::TiXmlNode* m_subShapeNodes;
 	};
 
@@ -1088,13 +1088,12 @@ void ndWorld::LoadCollisionShapes(
 			dInt32 hashId;
 			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
 			element->Attribute("hashId", &hashId);
-			dAssert(0);
-			//shapesMap.Insert(shape->AddRef(), hashId);
-			ndShapeCompound* const compound = shape->GetAsShapeCompound();
+			ndShapeLoaderCache::dNode* const shapeMapNode = shapesMap.Insert(ndShapeInstance(shape), hashId);
+			ndShapeCompound* const compound = ((ndShape*)shapeMapNode->GetInfo().GetShape())->GetAsShapeCompound();
 			if (compound)
 			{
 				ndPendingCompounds pending;
-				pending.m_shape = shape->GetAsShapeCompound();
+				pending.m_compoundInstance = (ndShapeInstance*)&shapeMapNode->GetInfo();
 				pending.m_subShapeNodes = element->FirstChild()->NextSibling();
 				pendingCompounds.PushBack(pending);
 			}
@@ -1103,14 +1102,13 @@ void ndWorld::LoadCollisionShapes(
 
 	for (dInt32 i = 0; i < pendingCompounds.GetCount(); i++)
 	{
-		ndShapeCompound* const compound = pendingCompounds[i].m_shape;
-		ndShapeInstance tmpInstance(compound);
-		pendingCompounds[i].m_shape->BeginAddRemove();
-
+		ndShapeInstance* const instance = pendingCompounds[i].m_compoundInstance;
+		ndShapeCompound* const compound = instance->GetShape()->GetAsShapeCompound();
+		compound->BeginAddRemove();
 		for (const nd::TiXmlNode* node = pendingCompounds[i].m_subShapeNodes->FirstChild("ndShapeInstance"); node; node = node->NextSibling())
 		{
-			ndShapeInstance instance(node, shapesMap);
-			compound->AddCollision(&instance);
+			ndShapeInstance subShapeInstance(node, shapesMap);
+			compound->AddCollision(&subShapeInstance);
 		}
 		compound->EndAddRemove();
 	}
@@ -1253,14 +1251,6 @@ bool ndWorld::LoadScene(const char* const path)
 	dLoadSaveBase::dLoadDescriptor afterLoaddesc;
 	afterLoaddesc.m_bodyMap = &bodyMap;
 	OnLoadScene(afterLoaddesc);
-
-	dAssert(0);
-	ndShapeLoaderCache::Iterator iter(shapesMap);
-	for (iter.Begin(); iter; iter++)
-	{
-		//ndShape* const shape = (ndShape*)iter.GetNode()->GetInfo();
-		//shape->Release();
-	}
 		
 	setlocale(LC_ALL, oldloc);
 	return true;
