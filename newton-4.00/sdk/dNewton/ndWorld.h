@@ -54,6 +54,10 @@ class ndWordSettings : public dClassAlloc
 	{
 	}
 
+	virtual ~ndWordSettings()
+	{
+	}
+
 	D_NEWTON_API ndWordSettings(const dLoadSaveBase::dLoadDescriptor& desc);
 
 	D_NEWTON_API virtual void Load(const dLoadSaveBase::dLoadDescriptor& desc) const;

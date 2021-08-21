@@ -52,8 +52,8 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 		ndEdgeMap();
 	};
 
+	D_COLLISION_API ndShapeStaticProceduralMesh(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API ndShapeStaticProceduralMesh(dFloat32 sizex, dFloat32 sizey, dFloat32 sizez);
-	D_COLLISION_API ndShapeStaticProceduralMesh(const nd::TiXmlNode* const xmlNode, const char* const assetPath);
 	D_COLLISION_API virtual ~ndShapeStaticProceduralMesh();
 
 	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return this; }
@@ -64,7 +64,7 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API void SetMaxVertexAndFaces(dInt32 maxVertex, dInt32 maxFaces);
-	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
+	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	private:
 	D_COLLISION_API virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;

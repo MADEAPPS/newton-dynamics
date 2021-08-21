@@ -30,9 +30,10 @@ ndShapePoint::ndShapePoint()
 {
 }
 
-ndShapePoint::ndShapePoint(const nd::TiXmlNode* const)
-	: ndShapeConvex(m_pointCollision)
+ndShapePoint::ndShapePoint(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndShapeConvex(m_pointCollision)
 {
+	dAssert(0);
 }
 
 ndShapePoint::~ndShapePoint()
@@ -145,12 +146,7 @@ void ndShapePoint::DebugShape(const dMatrix&, ndShapeDebugCallback&) const
 	//}
 }
 
-D_COLLISION_API void ndShapePoint::Save( nd::TiXmlElement* const xmlNode, const char* const, dInt32 nodeid ) const
+void ndShapePoint::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapePoint");
-	xmlNode->LinkEndChild(paramNode);
-
-	paramNode->SetAttribute("nodeId", nodeid);
-
-	//xmlSaveParam(paramNode, "point", m_radius);
+	dAssert(0);
 }

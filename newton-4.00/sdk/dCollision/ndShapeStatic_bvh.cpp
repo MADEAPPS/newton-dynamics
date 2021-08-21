@@ -77,51 +77,55 @@ ndShapeStatic_bvh::ndShapeStatic_bvh(const dPolygonSoupBuilder& builder)
 	m_trianglesCount = data.m_triangleCount;
 }
 
-ndShapeStatic_bvh::ndShapeStatic_bvh(const nd::TiXmlNode* const xmlNode, const char* const assetPath)
+ndShapeStatic_bvh::ndShapeStatic_bvh(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndShapeStaticMesh(m_boundingBoxHierachy)
 	,dAabbPolygonSoup()
 	,m_trianglesCount(0)
 {
-	D_CORE_API const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name);
-	const char* const assetName = xmlGetString(xmlNode, "assetName");
-	char pathCopy[1024];
-	sprintf(pathCopy, "%s/%s", assetPath, assetName);
-	Deserialize(pathCopy);
-
-	dVector p0;
-	dVector p1;
-	GetAABB(p0, p1);
-	m_boxSize = (p1 - p0) * dVector::m_half;
-	m_boxOrigin = (p1 + p0) * dVector::m_half;
-
-	ndMeshVertexListIndexList data;
-	data.m_indexList = nullptr;
-	data.m_userDataList = nullptr;
-	data.m_maxIndexCount = 1000000000;
-	data.m_triangleCount = 0;
-	dVector zero(dVector::m_zero);
-	dFastAabb box(dGetIdentityMatrix(), dVector(dFloat32(1.0e15f)));
-	ForAllSectors(box, zero, dFloat32(1.0f), GetTriangleCount, &data);
-	m_trianglesCount = data.m_triangleCount;
+	dAssert(0);
+	//const nd::TiXmlNode* const xmlNode, const char* const assetPath
+	 
+	//const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name);
+	//const char* const assetName = xmlGetString(xmlNode, "assetName");
+	//char pathCopy[1024];
+	//sprintf(pathCopy, "%s/%s", assetPath, assetName);
+	//Deserialize(pathCopy);
+	//
+	//dVector p0;
+	//dVector p1;
+	//GetAABB(p0, p1);
+	//m_boxSize = (p1 - p0) * dVector::m_half;
+	//m_boxOrigin = (p1 + p0) * dVector::m_half;
+	//
+	//ndMeshVertexListIndexList data;
+	//data.m_indexList = nullptr;
+	//data.m_userDataList = nullptr;
+	//data.m_maxIndexCount = 1000000000;
+	//data.m_triangleCount = 0;
+	//dVector zero(dVector::m_zero);
+	//dFastAabb box(dGetIdentityMatrix(), dVector(dFloat32(1.0e15f)));
+	//ForAllSectors(box, zero, dFloat32(1.0f), GetTriangleCount, &data);
+	//m_trianglesCount = data.m_triangleCount;
 }
 
 ndShapeStatic_bvh::~ndShapeStatic_bvh(void)
 {
 }
 
-void ndShapeStatic_bvh::Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const
+void ndShapeStatic_bvh::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeStatic_bvh");
-	xmlNode->LinkEndChild(paramNode);
-
-	paramNode->SetAttribute("nodeId", nodeid);
-
-	char pathCopy[1024];
-	sprintf(pathCopy, "%s/asset%d.bin", assetPath, nodeid);
-	Serialize(pathCopy);
-
-	sprintf(pathCopy, "asset%d.bin", nodeid);
-	xmlSaveParam(paramNode, "assetName", "string", pathCopy);
+	dAssert(0);
+	//nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeStatic_bvh");
+	//xmlNode->LinkEndChild(paramNode);
+	//
+	//paramNode->SetAttribute("nodeId", nodeid);
+	//
+	//char pathCopy[1024];
+	//sprintf(pathCopy, "%s/asset%d.bin", assetPath, nodeid);
+	//Serialize(pathCopy);
+	//
+	//sprintf(pathCopy, "asset%d.bin", nodeid);
+	//xmlSaveParam(paramNode, "assetName", "string", pathCopy);
 }
 
 dIntersectStatus ndShapeStatic_bvh::GetTriangleCount(void* const context, const dFloat32* const, dInt32, const dInt32* const, dInt32 indexCount, dFloat32)

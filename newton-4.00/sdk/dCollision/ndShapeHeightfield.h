@@ -38,7 +38,7 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 		dInt32 width, dInt32 height, ndGridConstruction contructionMode,
 		dFloat32 verticalScale, dFloat32 horizontalScale_x, dFloat32 horizontalScale_z);
 
-	D_COLLISION_API ndShapeHeightfield(const nd::TiXmlNode* const xmlNode, const char* const assetPath);
+	D_COLLISION_API ndShapeHeightfield(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeHeightfield();
 
 	dArray<dInt16>& GetElevationMap();
@@ -53,7 +53,7 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
-	virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
+	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	private: 
 	class ndLocalThreadData

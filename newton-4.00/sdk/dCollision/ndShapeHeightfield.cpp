@@ -78,7 +78,7 @@ ndShapeHeightfield::ndShapeHeightfield(
 }
 
 //ndShapeHeightfield::ndShapeHeightfield(const nd::TiXmlNode* const xmlNode, const char* const assetPath)
-ndShapeHeightfield::ndShapeHeightfield(const nd::TiXmlNode* const, const char* const)
+ndShapeHeightfield::ndShapeHeightfield(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndShapeStaticMesh(m_heightField)
 {
 	dAssert(0);
@@ -89,7 +89,7 @@ ndShapeHeightfield::~ndShapeHeightfield(void)
 }
 
 //void ndShapeHeightfield::Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const
-void ndShapeHeightfield::Save(nd::TiXmlElement* const, const char* const, dInt32) const
+void ndShapeHeightfield::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
 	dAssert(0);
 }
