@@ -66,9 +66,9 @@ dInt32 dFixSizeArray<T, maxSize>::GetCount() const
 template<class T, dInt32 maxSize>
 void dFixSizeArray<T, maxSize>::SetCount(dInt32 count)
 {
-	m_count = dClamp (count, 0, maxSize);
+	//m_count = dClamp (count, 0, maxSize);
+	m_count = (count < 0) ? 0 : ((count > maxSize) ? maxSize : count);
 }
-
 
 template<class T, dInt32 maxSize>
 T& dFixSizeArray<T, maxSize>::operator[] (dInt32 i)
