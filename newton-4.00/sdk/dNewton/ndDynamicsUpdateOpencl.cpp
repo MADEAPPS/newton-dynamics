@@ -681,23 +681,23 @@ void ndDynamicsUpdateOpencl::CopyBodyData()
 		ndOpenclBodyProxy& data = m_opencl->m_bodyArray[i];
 		ndBodyKinematic* const body = m_bodyIslandOrder[i];
 
-		data.m_rotation.x = body->m_rotation.m_x;
-		data.m_rotation.y = body->m_rotation.m_y;
-		data.m_rotation.z = body->m_rotation.m_z;
-		data.m_rotation.w = body->m_rotation.m_w;
-		data.m_position.x = body->m_matrix.m_posit.m_x;
-		data.m_position.y = body->m_matrix.m_posit.m_y;
-		data.m_position.z = body->m_matrix.m_posit.m_z;
-		data.m_veloc.x = body->m_veloc.m_x;
-		data.m_veloc.y = body->m_veloc.m_y;
-		data.m_veloc.z = body->m_veloc.m_z;
-		data.m_omega.x = body->m_omega.m_x;
-		data.m_omega.y = body->m_omega.m_y;
-		data.m_omega.z = body->m_omega.m_z;
-		data.m_invMass.x = body->m_invMass.m_x;
-		data.m_invMass.y = body->m_invMass.m_y;
-		data.m_invMass.z = body->m_invMass.m_z;
-		data.m_invMass.w = body->m_invMass.m_w;
+		data.m_rotation.m_x = body->m_rotation.m_x;
+		data.m_rotation.m_y = body->m_rotation.m_y;
+		data.m_rotation.m_z = body->m_rotation.m_z;
+		data.m_rotation.m_w = body->m_rotation.m_w;
+		data.m_position.m_x = body->m_matrix.m_posit.m_x;
+		data.m_position.m_y = body->m_matrix.m_posit.m_y;
+		data.m_position.m_z = body->m_matrix.m_posit.m_z;
+		data.m_veloc.m_x = body->m_veloc.m_x;
+		data.m_veloc.m_y = body->m_veloc.m_y;
+		data.m_veloc.m_z = body->m_veloc.m_z;
+		data.m_omega.m_x = body->m_omega.m_x;
+		data.m_omega.m_y = body->m_omega.m_y;
+		data.m_omega.m_z = body->m_omega.m_z;
+		data.m_invMass.m_x = body->m_invMass.m_x;
+		data.m_invMass.m_y = body->m_invMass.m_y;
+		data.m_invMass.m_z = body->m_invMass.m_z;
+		data.m_invMass.m_w = body->m_invMass.m_w;
 	}
 
 	m_opencl->m_bodyArray.WriteData(m_opencl->m_commandQueue);
