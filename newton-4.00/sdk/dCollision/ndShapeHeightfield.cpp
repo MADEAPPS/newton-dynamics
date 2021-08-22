@@ -26,6 +26,8 @@
 #include "ndShapeInstance.h"
 #include "ndShapeHeightfield.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeHeightfield)
+
 dVector ndShapeHeightfield::m_yMask(0xffffffff, 0, 0xffffffff, 0);
 dVector ndShapeHeightfield::m_padding(dFloat32(0.25f), dFloat32(0.25f), dFloat32(0.25f), dFloat32(0.0f));
 dVector ndShapeHeightfield::m_elevationPadding(dFloat32(0.0f), dFloat32(1.0e10f), dFloat32(0.0f), dFloat32(0.0f));
@@ -77,21 +79,86 @@ ndShapeHeightfield::ndShapeHeightfield(
 	CalculateLocalObb();
 }
 
-//ndShapeHeightfield::ndShapeHeightfield(const nd::TiXmlNode* const xmlNode, const char* const assetPath)
 ndShapeHeightfield::ndShapeHeightfield(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndShapeStaticMesh(m_heightField)
+	,m_minBox(dVector::m_zero)
+	,m_maxBox(dVector::m_zero)
+	,m_atributeMap(0)
+	,m_elevationMap(0)
+	,m_verticalScale(dFloat32 (0.0f))
+	,m_horizontalScale_x(dFloat32(0.0f))
+	,m_horizontalScale_z(dFloat32(0.0f))
+	,m_horizontalScaleInv_x(dFloat32(0.0f))
+	,m_horizontalScaleInv_z(dFloat32(0.0f))
+	,m_width(0)
+	,m_height(0)
+	,m_diagonalMode(m_normalDiagonals)
+	,m_localData()
 {
-	dAssert(0);
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	const char* const assetName = xmlGetString(xmlNode, "assetName");
+
+	m_minBox = xmlGetVector3(xmlNode, "minBox");
+	m_maxBox = xmlGetVector3(xmlNode, "maxBox");
+	m_verticalScale = xmlGetFloat(xmlNode, "verticalScale");
+	m_horizontalScale_x = xmlGetFloat(xmlNode, "horizontalScale_x");
+	m_horizontalScale_z = xmlGetFloat(xmlNode, "horizontalScale_z");
+	m_width = xmlGetInt(xmlNode, "width");
+	m_height = xmlGetInt(xmlNode, "height");
+	m_diagonalMode = ndGridConstruction(xmlGetInt(xmlNode, "diagonalMode"));
+
+	m_horizontalScaleInv_x = dFloat32(1.0f) / m_horizontalScale_x;
+	m_horizontalScaleInv_z = dFloat32(1.0f) / m_horizontalScale_z;
+
+	char filePathName[1024];
+	sprintf(filePathName, "%s/%s", desc.m_assetPath, assetName);
+	FILE* const file = fopen(filePathName, "rb");
+	if (file)
+	{
+		dInt64 readBytes;
+		m_elevationMap.SetCount(m_width * m_height);
+		m_atributeMap.SetCount(m_width * m_height);
+		readBytes = fread(&m_elevationMap[0], sizeof(dInt16), m_elevationMap.GetCount(), file);
+		readBytes = fread(&m_atributeMap[0], sizeof(dInt8), m_atributeMap.GetCount(), file);
+		fclose(file);
+	}
+	CalculateLocalObb();
 }
 
 ndShapeHeightfield::~ndShapeHeightfield(void)
 {
 }
 
-//void ndShapeHeightfield::Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const
 void ndShapeHeightfield::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	dAssert(0);
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndShapeStaticMesh::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	char fileName[1024];
+	sprintf(fileName, "%s_%d.bin", desc.m_assetName, desc.m_assetIndex);
+	xmlSaveParam(childNode, "assetName", "string", fileName);
+	xmlSaveParam(childNode, "minBox", m_minBox);
+	xmlSaveParam(childNode, "maxBox", m_maxBox);
+	xmlSaveParam(childNode, "verticalScale", m_verticalScale);
+	xmlSaveParam(childNode, "horizontalScale_x", m_horizontalScale_x);
+	xmlSaveParam(childNode, "horizontalScale_z", m_horizontalScale_z);
+	xmlSaveParam(childNode, "width", m_width);
+	xmlSaveParam(childNode, "height", m_height);
+	xmlSaveParam(childNode, "diagonalMode", dInt32 (m_diagonalMode));
+
+	char filePathName[1024];
+	sprintf(filePathName, "%s/%s", desc.m_assetPath, fileName);
+	desc.m_assetIndex++;
+
+	FILE* const file = fopen(filePathName, "wb");
+	if (file) 
+	{
+		fwrite(&m_elevationMap[0], sizeof(dInt16), m_elevationMap.GetCount(), file);
+		fwrite(&m_atributeMap[0], sizeof(dInt8), m_atributeMap.GetCount(), file);
+		fclose(file);
+	}
 }
 
 ndShapeInfo ndShapeHeightfield::GetShapeInfo() const
