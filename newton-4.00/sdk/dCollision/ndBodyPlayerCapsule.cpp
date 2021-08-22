@@ -36,6 +36,8 @@
 #define D_SLOP_JUMP_ANGLE			dFloat32(0.8f)
 #define D_MAX_COLLISION_PENETRATION	dFloat32 (5.0e-3f)
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyPlayerCapsule)
+
 D_MSV_NEWTON_ALIGN_32
 class ndBodyPlayerCapsuleContactSolver
 {
@@ -76,7 +78,6 @@ class ndBodyPlayerCapsuleImpulseSolver
 	dInt32 m_rowCount;
 } D_GCC_NEWTON_ALIGN_32;
 
-
 ndBodyPlayerCapsule::ndBodyPlayerCapsule(const dMatrix& localAxis, dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight)
 	:ndBodyKinematic()
 {
@@ -116,58 +117,53 @@ ndBodyPlayerCapsule::ndBodyPlayerCapsule(const dMatrix& localAxis, dFloat32 mass
 }
 
 ndBodyPlayerCapsule::ndBodyPlayerCapsule(const dLoadSaveBase::dLoadDescriptor& desc)
-	//:ndBodyKinematic(xmlNode->FirstChild("ndBodyKinematic"), shapesCache)
-	:ndBodyKinematic(desc)
+	:ndBodyKinematic(dLoadSaveBase::dLoadDescriptor(desc))
 {
-	dAssert(0);
-	//m_contactTestOnly = 1;
-	//m_impulse = dVector::m_zero;
-	//m_headingAngle = dFloat32(0.0f);
-	//m_forwardSpeed = dFloat32(0.0f);
-	//m_lateralSpeed = dFloat32(0.0f);
-	//m_stepHeight = dFloat32(0.0f);
-	//m_contactPatch = dFloat32(0.0f);
-	//
-	//m_mass = xmlGetFloat(xmlNode, "mass");
-	//m_height = xmlGetFloat(xmlNode, "height");
-	//m_radius = xmlGetFloat(xmlNode, "radius");
-	//m_weistScale = xmlGetFloat(xmlNode, "weistScale");
-	//m_crouchScale = xmlGetFloat(xmlNode, "crouchScale");
-	//m_isAirbone = xmlGetFloat(xmlNode, "isAirbone") ? true : false;
-	//m_isOnFloor = xmlGetFloat(xmlNode, "isOnFloor") ? true : false;
-	//m_isCrouched = xmlGetFloat(xmlNode, "isCrouched") ? true : false;
-	//m_localFrame = xmlGetMatrix(xmlNode, "localFrame");
-	//
-	//SetMassMatrix(m_mass, GetCollisionShape());
-	//m_invMass = GetInvMass();
-	//m_contactPatch = m_radius / m_weistScale;
-	//m_stepHeight = xmlGetFloat(xmlNode, "stepHeight");
-	//m_headingAngle = xmlGetFloat(xmlNode, "headingAngle");
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	m_contactTestOnly = 1;
+	m_impulse = dVector::m_zero;
+	m_headingAngle = dFloat32(0.0f);
+	m_forwardSpeed = dFloat32(0.0f);
+	m_lateralSpeed = dFloat32(0.0f);
+	m_stepHeight = dFloat32(0.0f);
+	m_contactPatch = dFloat32(0.0f);
+	m_weistScale = dFloat32(3.0f);
+	m_crouchScale = dFloat32(0.5f);
+	m_isAirbone = false;
+	m_isOnFloor = false;
+	m_isCrouched = false;
+
+	m_localFrame = xmlGetMatrix(xmlNode, "localFrame");
+	m_mass = xmlGetFloat(xmlNode, "mass");
+	m_height = xmlGetFloat(xmlNode, "height");
+	m_radius = xmlGetFloat(xmlNode, "radius");
+	m_stepHeight = xmlGetFloat(xmlNode, "stepHeight");
+	m_weistScale = xmlGetFloat(xmlNode, "weistScale");
+	m_crouchScale = xmlGetFloat(xmlNode, "crouchScale");
+	
+	SetMassMatrix(m_mass, GetCollisionShape());
+	m_invMass = GetInvMass();
+	m_contactPatch = m_radius / m_weistScale;
 }
 
 ndBodyPlayerCapsule::~ndBodyPlayerCapsule()
 {
 }
 
-//void ndBodyPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-void ndBodyPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor&) const
+void ndBodyPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	dAssert(0);
-	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyPlayerCapsule", nodeid);
-	//ndBodyKinematic::Save(paramNode, assetPath, nodeid, shapesCache);
-	//
-	//xmlSaveParam(paramNode, "localFrame", m_localFrame);
-	//xmlSaveParam(paramNode, "mass", m_mass);
-	//xmlSaveParam(paramNode, "m_raheight", m_height);
-	//xmlSaveParam(paramNode, "height", m_height);
-	//xmlSaveParam(paramNode, "radius", m_radius);
-	//xmlSaveParam(paramNode, "headingAngle", m_headingAngle);
-	//xmlSaveParam(paramNode, "stepHeight", m_stepHeight);
-	//xmlSaveParam(paramNode, "weistScale", m_weistScale);
-	//xmlSaveParam(paramNode, "crouchScale", m_crouchScale);
-	//xmlSaveParam(paramNode, "isAirbone", m_isAirbone ? 1 : 0);
-	//xmlSaveParam(paramNode, "isOnFloor", m_isOnFloor ? 1 : 0);
-	//xmlSaveParam(paramNode, "isCrouched", m_isCrouched ? 1 : 0);
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndBodyKinematic::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "localFrame", m_localFrame);
+	xmlSaveParam(childNode, "mass", m_mass);
+	xmlSaveParam(childNode, "height", m_height);
+	xmlSaveParam(childNode, "radius", m_radius);
+	xmlSaveParam(childNode, "stepHeight", m_stepHeight);
+	xmlSaveParam(childNode, "weistScale", m_weistScale);
+	xmlSaveParam(childNode, "crouchScale", m_crouchScale);
 }
 
 void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactSolver, dFloat32 timestep)

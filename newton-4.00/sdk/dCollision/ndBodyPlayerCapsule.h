@@ -32,6 +32,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndBodyPlayerCapsule : public ndBodyKinematic
 {
 	public:
+	D_CLASS_REFLECTION(ndBodyPlayerCapsule);
 	D_COLLISION_API ndBodyPlayerCapsule(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API ndBodyPlayerCapsule(const dMatrix& localAxis, dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight);
 	D_COLLISION_API virtual ~ndBodyPlayerCapsule();

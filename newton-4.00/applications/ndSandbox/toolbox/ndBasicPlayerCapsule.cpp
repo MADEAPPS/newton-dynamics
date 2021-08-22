@@ -24,6 +24,8 @@
 #define PLAYER_WALK_SPEED				8.0f
 #define PLAYER_JUMP_SPEED				5.0f
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBasicPlayerCapsule)
+
 //#define PLAYER_FIRST_PERSON	
 
 #ifdef PLAYER_FIRST_PERSON	
@@ -126,9 +128,14 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 }
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndBodyPlayerCapsule(desc)
+	:ndBodyPlayerCapsule(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_scene(nullptr)
+	,m_isPlayer(false)
+	,m_output()
+	,m_animBlendTree(nullptr)
 {
-	dAssert(0);
+	//dAssert(0);
+	//for now do not load the player configuration, we can do that is the postprocess pass. 
 	//m_isPlayer = xmlGetInt(xmlNode, "isPlayer") ? true : false;
 	//m_scene = world->GetManager();
 	//if (m_isPlayer)
@@ -154,13 +161,13 @@ ndBasicPlayerCapsule::~ndBasicPlayerCapsule()
 	}
 }
 
-//void ndBasicPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-void ndBasicPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor&) const
+void ndBasicPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	dAssert(0);
-	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBasicPlayerCapsule", nodeid);
-	//ndBodyPlayerCapsule::Save(paramNode, assetPath, nodeid, shapesCache);
-	//
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndBodyPlayerCapsule::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
 	//xmlSaveParam(paramNode, "isPlayer", m_isPlayer ? 1 : 0);
 }
 
