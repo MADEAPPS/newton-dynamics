@@ -19,7 +19,7 @@ class ndJointPid6dofActuator : public ndJointPid3dofActuator
 {
 	public:
 	D_CLASS_REFLECTION(ndJointPid6dofActuator);
-
+	D_COLLISION_API ndJointPid6dofActuator(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndJointPid6dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointPid6dofActuator();
 
@@ -34,6 +34,7 @@ class ndJointPid6dofActuator : public ndJointPid3dofActuator
 
 	protected:
 	virtual void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
+	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	dFloat32 m_linearSpring;
 	dFloat32 m_linearDamper;

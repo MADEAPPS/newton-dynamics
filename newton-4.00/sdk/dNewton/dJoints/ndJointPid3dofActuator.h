@@ -23,7 +23,7 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointPid3dofActuator);
-
+	D_COLLISION_API ndJointPid3dofActuator(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndJointPid3dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointPid3dofActuator();
 
@@ -41,10 +41,9 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 	dMatrix GetTargetRotation() const;
 	void SetTargetRotation(const dMatrix& rotation);
 
-	//D_NEWTON_API dMatrix CalculateGlobalTargetMatrix() const;
-
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	void SubmitTwistLimits(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
@@ -54,11 +53,7 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 
 	virtual void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
-	const dMatrix m_referenceFrameBody1;
-	//dVector m_targetPosition;
-	//dFloat32 m_targetPitch;
-	//dFloat32 m_targetYaw;
-	//dFloat32 m_targetRoll;
+	dMatrix m_referenceFrameBody1;
 	dFloat32 m_maxConeAngle;
 	dFloat32 m_minTwistAngle;
 	dFloat32 m_maxTwistAngle;

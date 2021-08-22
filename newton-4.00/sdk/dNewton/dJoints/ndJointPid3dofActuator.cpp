@@ -13,6 +13,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointPid3dofActuator.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointPid3dofActuator)
+
 ndJointPid3dofActuator::ndJointPid3dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
 	,m_referenceFrameBody1(m_localMatrix1)
@@ -23,13 +25,27 @@ ndJointPid3dofActuator::ndJointPid3dofActuator(const dMatrix& pinAndPivotFrame, 
 	,m_angularDamper(dFloat32(50.0f))
 	,m_angularRegularizer(dFloat32(5.0e-3f))
 {
-	//dVector euler0;
-	//dVector euler1;
-	//m_targetPosition = m_localMatrix1.m_posit;
-	//m_referenceFrameBody1.CalcPitchYawRoll(euler0, euler1);
-	//m_targetPitch = euler0.m_x;
-	//m_targetYaw = euler0.m_y;
-	//m_targetRoll = euler0.m_z;
+}
+
+ndJointPid3dofActuator::ndJointPid3dofActuator(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_referenceFrameBody1(dGetIdentityMatrix())
+	,m_maxConeAngle(dFloat32(1.0e10f))
+	,m_minTwistAngle(-dFloat32(1.0e10f))
+	,m_maxTwistAngle(dFloat32(1.0e10f))
+	,m_angularSpring(dFloat32(1000.0f))
+	,m_angularDamper(dFloat32(50.0f))
+	,m_angularRegularizer(dFloat32(5.0e-3f))
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_referenceFrameBody1 = xmlGetMatrix(xmlNode, "referenceFrameBody1");
+	m_maxConeAngle = xmlGetFloat (xmlNode, "maxConeAngle");
+	m_minTwistAngle = xmlGetFloat (xmlNode, "minTwistAngle");
+	m_maxTwistAngle = xmlGetFloat (xmlNode, "maxTwistAngle");
+	m_angularSpring = xmlGetFloat (xmlNode, "angularSpring");
+	m_angularDamper = xmlGetFloat (xmlNode, "angularDamper");
+	m_angularRegularizer = xmlGetFloat (xmlNode, "angularRegularizer");
 }
 
 ndJointPid3dofActuator::~ndJointPid3dofActuator()
@@ -297,22 +313,12 @@ void ndJointPid3dofActuator::SubmitLinearLimits(const dMatrix& matrix0, const dM
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 }
 
-//dMatrix ndJointPid3dofActuator::CalculateGlobalTargetMatrix() const
-//{
-//	dMatrix controlMatrix(dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll));
-//	controlMatrix.m_posit = m_targetPosition;
-//	return controlMatrix * m_referenceFrameBody1 * m_body1->GetMatrix();
-//}
-
 void ndJointPid3dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-	//m_localMatrix1 = dPitchMatrix(m_targetPitch) * dYawMatrix(m_targetYaw) * dRollMatrix(m_targetRoll);
-	//m_localMatrix1.m_posit = m_targetPosition;
 	CalculateGlobalMatrix(matrix0, matrix1);
-
 	SubmitLinearLimits(matrix0, matrix1, desc);
 
 	dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
@@ -327,3 +333,20 @@ void ndJointPid3dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
 		SubmitAngularAxis(matrix0, matrix1, desc);
 	}
 }
+
+void ndJointPid3dofActuator::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "referenceFrameBody1", m_referenceFrameBody1);
+	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
+	xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
+	xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
+	xmlSaveParam(childNode, "angularSpring", m_angularSpring);
+	xmlSaveParam(childNode, "angularDamper", m_angularDamper);
+	xmlSaveParam(childNode, "angularRegularizer", m_angularRegularizer);
+}
+
