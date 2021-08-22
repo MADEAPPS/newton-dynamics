@@ -16,9 +16,10 @@
 #include "ndPhysicsUtils.h"
 #include "ndDemoEntityManager.h"
 
-class ndArchimedesBuoyancyVolume : public ndBodyTriggerVolume
+class ndArchimedesBuoyancyVolume: public ndBodyTriggerVolume
 {
 	public:
+	D_CLASS_REFLECTION(ndArchimedesBuoyancyVolume);
 	ndArchimedesBuoyancyVolume();
 	ndArchimedesBuoyancyVolume(const dLoadSaveBase::dLoadDescriptor& desc);
 

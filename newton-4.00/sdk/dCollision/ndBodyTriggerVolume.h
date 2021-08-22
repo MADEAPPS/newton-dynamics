@@ -29,6 +29,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndBodyTriggerVolume : public ndBodyKinematic
 {
 	public:
+	D_CLASS_REFLECTION(ndBodyTriggerVolume);
 	D_COLLISION_API ndBodyTriggerVolume();
 	D_COLLISION_API ndBodyTriggerVolume(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndBodyTriggerVolume();

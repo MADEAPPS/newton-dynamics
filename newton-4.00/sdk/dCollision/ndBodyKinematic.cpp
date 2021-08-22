@@ -30,6 +30,7 @@
 
 #define D_MINIMUM_MASS	dFloat32(1.0e-5f)
 #define D_INFINITE_MASS	dFloat32(1.0e15f)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyKinematic);
 
 class ndDummyCollision: public ndShapeNull
 {
@@ -51,7 +52,6 @@ class ndDummyCollision: public ndShapeNull
 		return &nullShape;
 	}
 };
-
 
 ndBodyKinematic::ndContactMap::ndContactMap()
 	:dTree<ndContact*, ndContactkey, dContainersFreeListAlloc<ndContact*>>()

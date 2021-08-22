@@ -23,6 +23,8 @@
 #include "ndCollisionStdafx.h"
 #include "ndBodyTriggerVolume.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyTriggerVolume)
+
 ndBodyTriggerVolume::ndBodyTriggerVolume()
 	:ndBodyKinematic()
 {
@@ -30,22 +32,21 @@ ndBodyTriggerVolume::ndBodyTriggerVolume()
 }
 
 ndBodyTriggerVolume::ndBodyTriggerVolume(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndBodyKinematic(desc)
+	:ndBodyKinematic(dLoadSaveBase::dLoadDescriptor(desc))
 {
-	dAssert(0);
-	////xmlNode->FirstChild("ndBodyKinematic"), shapesCache
-	//// nothing was saved
-	//m_contactTestOnly = 1;
+	m_contactTestOnly = 1;
 }
 
 ndBodyTriggerVolume::~ndBodyTriggerVolume()
 {
 }
 
-//void ndBodyTriggerVolume::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-void ndBodyTriggerVolume::Save(const dLoadSaveBase::dSaveDescriptor&) const
+void ndBodyTriggerVolume::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	dAssert(0);
-	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyTriggerVolume", nodeid);
-	//ndBodyKinematic::Save(paramNode, assetPath, nodeid, shapesCache);
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndBodyKinematic::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	// nothing to save so far
 }
