@@ -115,8 +115,8 @@ class ndWorld: public dClassAlloc
 
 	D_NEWTON_API bool LoadScene(const char* const path);
 	D_NEWTON_API void SaveScene(const char* const path);
-
 	virtual void OnLoadScene(const dLoadSaveBase::dLoadDescriptor& desc);
+
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
 	const ndModelList& GetModelList() const;
@@ -172,6 +172,9 @@ class ndWorld: public dClassAlloc
 	void LoadRigidBodies(
 		const nd::TiXmlNode* const rootNode, const char* const assetPath,
 		const ndShapeLoaderCache& shapesMap, ndBodyLoaderCache& bodyMap);
+	void LoadJoints(
+		const nd::TiXmlNode* const rootNode, const char* const assetPath,
+		const ndBodyLoaderCache& bodyMap, ndJointLoaderCache& jointMap);
 	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();
@@ -385,8 +388,21 @@ inline dInt32 ndWorld::GetEngineVersion() const
 	return D_NEWTON_ENGINE_MAJOR_VERSION * 100 + D_NEWTON_ENGINE_MINOR_VERSION;
 }
 
-inline void ndWorld::OnLoadScene(const dLoadSaveBase::dLoadDescriptor&)
+inline void ndWorld::OnLoadScene(const dLoadSaveBase::dLoadDescriptor& desc)
 {
+	ndBodyLoaderCache::Iterator bodyIter(*desc.m_bodyMap);
+	for (bodyIter.Begin(); bodyIter; bodyIter++)
+	{
+		ndBody* const body = (ndBody*)bodyIter.GetNode()->GetInfo();
+		AddBody(body);
+	}
+
+	ndJointLoaderCache::Iterator jointIter(*desc.m_jointMap);
+	for (jointIter.Begin(); jointIter; jointIter++)
+	{
+		ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)jointIter.GetNode()->GetInfo();
+		AddJoint(joint);
+	}
 }
 
 #endif

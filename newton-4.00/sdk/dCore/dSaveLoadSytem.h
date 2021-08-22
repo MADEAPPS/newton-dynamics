@@ -29,12 +29,17 @@
 class ndBody;
 class ndShape;
 class ndShapeInstance;
+class ndJointBilateralConstraint;
 
 class ndShapeLoaderCache : public dTree<const ndShapeInstance, dUnsigned32>
 {
 };
 
 class ndBodyLoaderCache: public dTree<const ndBody*, dUnsigned32>
+{
+};
+
+class ndJointLoaderCache: public dTree<const ndJointBilateralConstraint*, dUnsigned32>
 {
 };
 
@@ -49,6 +54,7 @@ class dLoadSaveBase
 			,m_rootNode(nullptr)
 			,m_bodyMap(nullptr)
 			,m_shapeMap(nullptr)
+			,m_jointMap(nullptr)
 		{
 		}
 
@@ -57,6 +63,7 @@ class dLoadSaveBase
 			,m_rootNode(desc.m_rootNode->FirstChild())
 			,m_bodyMap(desc.m_bodyMap)
 			,m_shapeMap(desc.m_shapeMap)
+			,m_jointMap(desc.m_jointMap)
 		{
 		}
 
@@ -64,6 +71,7 @@ class dLoadSaveBase
 		const nd::TiXmlNode* m_rootNode;
 		const ndBodyLoaderCache* m_bodyMap;
 		const ndShapeLoaderCache* m_shapeMap;
+		const ndJointLoaderCache* m_jointMap;
 	};
 
 	class dSaveDescriptor

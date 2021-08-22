@@ -1067,53 +1067,54 @@ void ndWorld::LoadCollisionShapes(
 	ndShapeLoaderCache& shapesMap) const
 {
 	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndShapes");
-	dAssert(shapes);
-
-	dLoadSaveBase::dLoadDescriptor descriptor;
-	descriptor.m_assetPath = assetPath;
-
-	class ndPendingCompounds
+	if (shapes)
 	{
-		public:
-		ndShapeInstance* m_compoundInstance;
-		const nd::TiXmlNode* m_subShapeNodes;
-	};
+		dLoadSaveBase::dLoadDescriptor descriptor;
+		descriptor.m_assetPath = assetPath;
 
-	dArray<ndPendingCompounds> pendingCompounds;
-	for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
-	{
-		const char* const name = node->Value();
-		descriptor.m_rootNode = node;
-		ndShape* const shape = D_CLASS_REFLECTION_LOAD_NODE(ndShape, name, descriptor);
-		dAssert(shape);
-		if (shape)
+		class ndPendingCompounds
 		{
-			dInt32 hashId;
-			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-			element->Attribute("hashId", &hashId);
-			ndShapeLoaderCache::dNode* const shapeMapNode = shapesMap.Insert(ndShapeInstance(shape), hashId);
-			ndShapeCompound* const compound = ((ndShape*)shapeMapNode->GetInfo().GetShape())->GetAsShapeCompound();
-			if (compound)
+			public:
+			ndShapeInstance* m_compoundInstance;
+			const nd::TiXmlNode* m_subShapeNodes;
+		};
+
+		dArray<ndPendingCompounds> pendingCompounds;
+		for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
+		{
+			const char* const name = node->Value();
+			descriptor.m_rootNode = node;
+			ndShape* const shape = D_CLASS_REFLECTION_LOAD_NODE(ndShape, name, descriptor);
+			dAssert(shape);
+			if (shape)
 			{
-				ndPendingCompounds pending;
-				pending.m_compoundInstance = (ndShapeInstance*)&shapeMapNode->GetInfo();
-				pending.m_subShapeNodes = element->FirstChild()->NextSibling();
-				pendingCompounds.PushBack(pending);
+				dInt32 hashId;
+				const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+				element->Attribute("hashId", &hashId);
+				ndShapeLoaderCache::dNode* const shapeMapNode = shapesMap.Insert(ndShapeInstance(shape), hashId);
+				ndShapeCompound* const compound = ((ndShape*)shapeMapNode->GetInfo().GetShape())->GetAsShapeCompound();
+				if (compound)
+				{
+					ndPendingCompounds pending;
+					pending.m_compoundInstance = (ndShapeInstance*)&shapeMapNode->GetInfo();
+					pending.m_subShapeNodes = element->FirstChild()->NextSibling();
+					pendingCompounds.PushBack(pending);
+				}
 			}
 		}
-	}
 
-	for (dInt32 i = 0; i < pendingCompounds.GetCount(); i++)
-	{
-		ndShapeInstance* const instance = pendingCompounds[i].m_compoundInstance;
-		ndShapeCompound* const compound = instance->GetShape()->GetAsShapeCompound();
-		compound->BeginAddRemove();
-		for (const nd::TiXmlNode* node = pendingCompounds[i].m_subShapeNodes->FirstChild("ndShapeInstance"); node; node = node->NextSibling())
+		for (dInt32 i = 0; i < pendingCompounds.GetCount(); i++)
 		{
-			ndShapeInstance subShapeInstance(node, shapesMap);
-			compound->AddCollision(&subShapeInstance);
+			ndShapeInstance* const instance = pendingCompounds[i].m_compoundInstance;
+			ndShapeCompound* const compound = instance->GetShape()->GetAsShapeCompound();
+			compound->BeginAddRemove();
+			for (const nd::TiXmlNode* node = pendingCompounds[i].m_subShapeNodes->FirstChild("ndShapeInstance"); node; node = node->NextSibling())
+			{
+				ndShapeInstance subShapeInstance(node, shapesMap);
+				compound->AddCollision(&subShapeInstance);
+			}
+			compound->EndAddRemove();
 		}
-		compound->EndAddRemove();
 	}
 }
 
@@ -1153,23 +1154,24 @@ void ndWorld::LoadRigidBodies(
 	const ndShapeLoaderCache& shapesMap, ndBodyLoaderCache& bodyMap)
 {
 	const nd::TiXmlNode* const bodies = rootNode->FirstChild("ndBodies");
-	dAssert(bodies);
-
-	dLoadSaveBase::dLoadDescriptor descriptor;
-	descriptor.m_assetPath = assetPath;
-	descriptor.m_shapeMap = &shapesMap;
-
-	for (const nd::TiXmlNode* node = bodies->FirstChild(); node; node = node->NextSibling())
+	if (bodies)
 	{
-		const char* const name = node->Value();
-		descriptor.m_rootNode = node;
-		ndBody* const body = D_CLASS_REFLECTION_LOAD_NODE(ndBody, name, descriptor);
-		if (body)
+		dLoadSaveBase::dLoadDescriptor descriptor;
+		descriptor.m_assetPath = assetPath;
+		descriptor.m_shapeMap = &shapesMap;
+
+		for (const nd::TiXmlNode* node = bodies->FirstChild(); node; node = node->NextSibling())
 		{
-			dInt32 hashId;
-			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-			element->Attribute("hashId", &hashId);
-			bodyMap.Insert(body, hashId);
+			const char* const name = node->Value();
+			descriptor.m_rootNode = node;
+			ndBody* const body = D_CLASS_REFLECTION_LOAD_NODE(ndBody, name, descriptor);
+			if (body)
+			{
+				dInt32 hashId;
+				const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+				element->Attribute("hashId", &hashId);
+				bodyMap.Insert(body, hashId);
+			}
 		}
 	}
 }
@@ -1204,6 +1206,34 @@ void ndWorld::SaveJoints(nd::TiXmlNode* const rootNode,
 		}
 	}
 }
+
+void ndWorld::LoadJoints(const nd::TiXmlNode* const rootNode,
+	const char* const assetPath,
+	const ndBodyLoaderCache& bodyMap, ndJointLoaderCache& jointMap)
+{
+	const nd::TiXmlNode* const joints = rootNode->FirstChild("ndBilateralJoints");
+	if (joints)
+	{
+		dLoadSaveBase::dLoadDescriptor descriptor;
+		descriptor.m_assetPath = assetPath;
+		descriptor.m_bodyMap = &bodyMap;
+		
+		for (const nd::TiXmlNode* node = joints->FirstChild(); node; node = node->NextSibling())
+		{
+			const char* const name = node->Value();
+			descriptor.m_rootNode = node;
+		//	ndBody* const body = D_CLASS_REFLECTION_LOAD_NODE(ndBody, name, descriptor);
+		//	if (body)
+		//	{
+		//		dInt32 hashId;
+		//		const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+		//		element->Attribute("hashId", &hashId);
+		//		bodyMap.Insert(body, hashId);
+		//	}
+		}
+	}
+}
+
 
 void ndWorld::SaveScene(const char* const path)
 {
@@ -1292,21 +1322,19 @@ bool ndWorld::LoadScene(const char* const path)
 	const nd::TiXmlElement* const worldNode = doc.RootElement();
 
 	ndBodyLoaderCache bodyMap;
+	ndJointLoaderCache jointMap;
 	ndShapeLoaderCache shapesMap;
 
 	LoadSceneSettings(worldNode, assetPath);
 	LoadCollisionShapes(worldNode, assetPath, shapesMap);
 	LoadRigidBodies(worldNode, assetPath, shapesMap, bodyMap);
-
-	ndBodyLoaderCache::Iterator bodyIter(bodyMap);
-	for (bodyIter.Begin(); bodyIter; bodyIter++)
-	{
-		ndBody* const body = (ndBody*)bodyIter.GetNode()->GetInfo();
-		AddBody(body);
-	}
+	LoadJoints(worldNode, assetPath, bodyMap, jointMap);
 
 	dLoadSaveBase::dLoadDescriptor afterLoaddesc;
+	afterLoaddesc.m_assetPath = assetPath;
 	afterLoaddesc.m_bodyMap = &bodyMap;
+	afterLoaddesc.m_jointMap = &jointMap;
+	afterLoaddesc.m_shapeMap = &shapesMap;
 	OnLoadScene(afterLoaddesc);
 		
 	setlocale(LC_ALL, oldloc);
