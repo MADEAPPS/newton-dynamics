@@ -29,6 +29,13 @@ ndJointBallAndSocket::ndJointBallAndSocket(const dMatrix& pinAndPivotFrame, ndBo
 
 ndJointBallAndSocket::ndJointBallAndSocket(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_maxConeAngle(dFloat32(1.0e10f))
+	,m_coneFriction(dFloat32(0.0))
+	,m_minTwistAngle(-dFloat32(1.0e10f))
+	,m_maxTwistAngle(dFloat32(1.0e10f))
+	,m_twistFriction(dFloat32(0.0f))
+	,m_coneFrictionRegularizer(dFloat32(0.0f))
+	,m_twistFrictionRegularizer(dFloat32(0.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 

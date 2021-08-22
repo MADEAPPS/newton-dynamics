@@ -69,7 +69,6 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	//dMatrix matrix(dGetIdentityMatrix());
 	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
@@ -419,14 +418,14 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
 	BuildBallSocket(scene, dVector(0.0f, 0.0f, -7.0f, 1.0f));
-	BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
 	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 100.0f, 0.75f);
-	BuildDoubleHinge(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 100.0f, 0.75f);
-	BuildFixJoints(scene, dVector(10.0f, 0.0f, -5.0f, 1.0f));
-
-	AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
-	BuildRollingFriction(scene, dVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
+	//BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	//BuildSlider(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 100.0f, 0.75f);
+	//BuildDoubleHinge(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 100.0f, 0.75f);
+	//BuildFixJoints(scene, dVector(10.0f, 0.0f, -5.0f, 1.0f));
+	//
+	//AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
+	//BuildRollingFriction(scene, dVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
 	
 	dQuaternion rot;
 	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);

@@ -50,6 +50,16 @@ ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotInChild, const dMatrix& pin
 
 ndJointHinge::ndJointHinge(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_jointAngle(dFloat32(0.0f))
+	,m_jointSpeed(dFloat32(0.0f))
+	,m_springK(dFloat32(0.0f))
+	,m_damperC(dFloat32(0.0f))
+	,m_minLimit(dFloat32(0.0f))
+	,m_maxLimit(dFloat32(0.0f))
+	,m_friction(dFloat32(0.0f))
+	,m_springDamperRegularizer(dFloat32(0.1f))
+	,m_hasLimits(false)
+	,m_isSpringDamper(false)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
