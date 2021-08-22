@@ -79,6 +79,11 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(const dLoadSaveBase::dLoa
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	
+	m_mark0 = 0;
+	m_mark1 = 0;
+	m_rowIsMotor = 0;
+	m_isInSkeleton = 0;
+
 	dInt32 body0Hash = xmlGetInt(xmlNode, "body0Hash");
 	dInt32 body1Hash = xmlGetInt(xmlNode, "body1Hash");
 	ndBody* const body0 = (ndBody*)desc.m_bodyMap->Find(body0Hash)->GetInfo();
@@ -94,6 +99,9 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(const dLoadSaveBase::dLoa
 	m_enableCollision = xmlGetInt(xmlNode, "enableCollision");
 	m_solverModel = ndJointBilateralSolverModel(xmlGetInt(xmlNode, "solverModel"));
 	m_defualtDiagonalRegularizer = xmlGetFloat(xmlNode, "defualtDiagonalRegularizer");
+
+	memset(m_jointForce, 0, sizeof(m_jointForce));
+	memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
 }
 
 ndJointBilateralConstraint::~ndJointBilateralConstraint()

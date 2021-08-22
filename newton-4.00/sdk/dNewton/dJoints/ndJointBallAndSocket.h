@@ -35,10 +35,9 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	D_NEWTON_API void GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const;
 	D_NEWTON_API void SetTwistFriction(dFloat32 regularizer, dFloat32 viscousFriction);
 
-	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
-
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	void SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);

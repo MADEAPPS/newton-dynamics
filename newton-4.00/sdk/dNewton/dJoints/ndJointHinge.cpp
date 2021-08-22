@@ -13,6 +13,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointHinge.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointHinge)
+
 ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	,m_jointAngle(dFloat32(0.0f))
@@ -44,6 +46,21 @@ ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotInChild, const dMatrix& pin
 	dMatrix tmp;
 	CalculateLocalMatrix(pinAndPivotInChild, m_localMatrix0, tmp);
 	CalculateLocalMatrix(pinAndPivotInParent, tmp, m_localMatrix1);
+}
+
+ndJointHinge::ndJointHinge(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_springK = xmlGetFloat(xmlNode, "springK");
+	m_damperC = xmlGetFloat(xmlNode, "damperC");
+	m_minLimit = xmlGetFloat(xmlNode, "minLimit");
+	m_maxLimit = xmlGetFloat(xmlNode, "maxLimit");
+	m_friction = xmlGetFloat(xmlNode, "friction");
+	m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
+	m_hasLimits = xmlGetInt(xmlNode, "hasLimits") ? true : false;
+	m_isSpringDamper = xmlGetInt(xmlNode, "isSpringDamper") ? true : false;
 }
 
 ndJointHinge::~ndJointHinge()
@@ -214,4 +231,19 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
+void ndJointHinge::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
+	xmlSaveParam(childNode, "springK", m_springK);
+	xmlSaveParam(childNode, "damperC", m_damperC);
+	xmlSaveParam(childNode, "minLimit", m_minLimit);
+	xmlSaveParam(childNode, "maxLimit", m_maxLimit);
+	xmlSaveParam(childNode, "friction", m_friction);
+	xmlSaveParam(childNode, "springDamperRegularizer", m_springDamperRegularizer);
+	xmlSaveParam(childNode, "hasLimits", m_hasLimits ? 1 : 0);
+	xmlSaveParam(childNode, "isSpringDamper", m_isSpringDamper ? 1 : 0);
+}

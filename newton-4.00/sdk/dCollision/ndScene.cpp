@@ -758,9 +758,7 @@ void ndScene::UpdateAabb(dInt32, ndBodyKinematic* const body)
 	const dInt32 test = dBoxInclusionTest(body->m_minAabb, body->m_maxAabb, bodyNode->m_minBox, bodyNode->m_maxBox);
 	if (!test) 
 	{
-		//body->m_broaphaseEquilibrium = 0;
 		bodyNode->SetAabb(body->m_minAabb, body->m_maxAabb);
-
 		if (!m_rootNode->GetAsSceneBodyNode()) 
 		{
 			const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
