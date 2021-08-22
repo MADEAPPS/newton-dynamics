@@ -42,6 +42,8 @@ D_MSV_NEWTON_ALIGN_32
 class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 {
 	public:
+	D_CLASS_REFLECTION(ndJointBilateralConstraint);
+	D_COLLISION_API ndJointBilateralConstraint(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
 	D_COLLISION_API virtual ~ndJointBilateralConstraint();
 
@@ -59,9 +61,11 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	D_COLLISION_API void AddAngularRowJacobian(ndConstraintDescritor& desc, const dVector& dir, dFloat32 relAngle);
 	D_COLLISION_API void AddLinearRowJacobian(ndConstraintDescritor& desc, const dVector& pivot0, const dVector& pivot1, const dVector& dir);
 
+	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 	D_COLLISION_API virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 	D_COLLISION_API dFloat32 CalculateSpringDamperAcceleration(dFloat32 dt, dFloat32 ks, dFloat32 x, dFloat32 kd, dFloat32 v) const;
 	D_COLLISION_API void SetMassSpringDamperAcceleration(ndConstraintDescritor& desc, dFloat32 regularizer, dFloat32 spring, dFloat32 damper);
+	
 	
 	const dMatrix& GetLocalMatrix0() const;
 	const dMatrix& GetLocalMatrix1() const;
@@ -102,7 +106,6 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	ndJointList::dNode* m_body0Node;
 	ndJointList::dNode* m_body1Node;
 
-	dFloat32 m_maxAngleError;
 	dFloat32 m_defualtDiagonalRegularizer;
 	dUnsigned32 m_maxDof			: 6;
 	dUnsigned32 m_mark0				: 1;

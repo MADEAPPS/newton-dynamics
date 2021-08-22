@@ -26,6 +26,8 @@
 #define D_VEL_DAMP				 (dFloat32(100.0f))
 #define D_POS_DAMP				 (dFloat32(1500.0f))
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointBilateralConstraint)
+
 ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix)
 	:ndConstraint()
 	,dClassAlloc()
@@ -57,12 +59,17 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKine
 	m_isInSkeleton = 0;
 	m_enableCollision = 0;
 	m_solverModel = m_jointkinematicOpenLoop;
-
 	m_defualtDiagonalRegularizer = dFloat32(0.0f);
-	m_maxAngleError = dFloat32(5.0f) * dDegreeToRad;
 	
 	memset(m_jointForce, 0, sizeof(m_jointForce));
 	memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
+}
+
+ndJointBilateralConstraint::ndJointBilateralConstraint(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndConstraint()
+	,dClassAlloc()
+{
+	dAssert(0);
 }
 
 ndJointBilateralConstraint::~ndJointBilateralConstraint()
@@ -374,4 +381,22 @@ void ndJointBilateralConstraint::SetMassSpringDamperAcceleration(ndConstraintDes
 	
 	desc.m_diagonalRegularizer[index] = r;
 	SetMotorAcceleration(desc, accel);
+}
+
+void ndJointBilateralConstraint::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+
+	xmlSaveParam(childNode, "body0Hash", desc.m_body0NodeHash);
+	xmlSaveParam(childNode, "body1Hash", desc.m_body1NodeHash);
+
+	xmlSaveParam(childNode, "localMatrix0", m_localMatrix0);
+	xmlSaveParam(childNode, "localMatrix1", m_localMatrix1);
+
+	xmlSaveParam(childNode, "defualtDiagonalRegularizer", m_defualtDiagonalRegularizer);
+	xmlSaveParam(childNode, "maxDof", dInt32(m_maxDof));
+	xmlSaveParam(childNode, "enableCollision", dInt32(m_enableCollision));
+	xmlSaveParam(childNode, "solverModel", dInt32(m_solverModel));
 }

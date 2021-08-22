@@ -13,6 +13,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBallAndSocket.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointBallAndSocket)
+
 ndJointBallAndSocket::ndJointBallAndSocket(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 	,m_maxConeAngle(dFloat32 (1.0e10f))
@@ -23,6 +25,12 @@ ndJointBallAndSocket::ndJointBallAndSocket(const dMatrix& pinAndPivotFrame, ndBo
 	,m_coneFrictionRegularizer(dFloat32(0.0f))
 	,m_twistFrictionRegularizer(dFloat32(0.0f))
 {
+}
+
+ndJointBallAndSocket::ndJointBallAndSocket(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(desc)
+{
+	dAssert(0);
 }
 
 ndJointBallAndSocket::~ndJointBallAndSocket()
@@ -266,4 +274,20 @@ void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 			SubmitAngularAxis(matrix0, matrix1, desc);
 		}
 	}
+}
+
+void ndJointBallAndSocket::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
+	xmlSaveParam(childNode, "coneFriction", m_coneFriction);
+	xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
+	xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
+	xmlSaveParam(childNode, "twistFriction", m_twistFriction);
+	xmlSaveParam(childNode, "coneFrictionRegularizer", m_coneFrictionRegularizer);
+	xmlSaveParam(childNode, "twistFrictionRegularizer", m_twistFrictionRegularizer);
 }

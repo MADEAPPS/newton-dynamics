@@ -1071,7 +1071,6 @@ void ndWorld::LoadCollisionShapes(
 
 	dLoadSaveBase::dLoadDescriptor descriptor;
 	descriptor.m_assetPath = assetPath;
-	//descriptor.m_shapeMap = &shapesMap;
 
 	class ndPendingCompounds
 	{
@@ -1138,8 +1137,8 @@ void ndWorld::SaveRididBodies(nd::TiXmlNode* const rootNode,
 		{
 			ndBodyKinematic* const body = bodyNode->GetInfo();
 
-			dInt32 shapeId = shapesMap.Find(body->GetCollisionShape().GetShape())->GetInfo();
-			descriptor.m_shapeNodeHash = shapeId;
+			dInt32 shapeHash = shapesMap.Find(body->GetCollisionShape().GetShape())->GetInfo();
+			descriptor.m_shapeNodeHash = shapeHash;
 			descriptor.m_nodeNodeHash = bodyIndex;
 			body->Save(descriptor);
 
@@ -1171,6 +1170,37 @@ void ndWorld::LoadRigidBodies(
 			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
 			element->Attribute("hashId", &hashId);
 			bodyMap.Insert(body, hashId);
+		}
+	}
+}
+
+void ndWorld::SaveJoints(nd::TiXmlNode* const rootNode,
+	const char* const assetPath, const char* const assetName,
+	const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,
+	dTree<dUnsigned32, const ndJointBilateralConstraint*>& jointMap)
+{
+	const ndJointList& jointList = GetJointList();
+	if (jointList.GetCount())
+	{
+		dInt32 jointIndex = 0;
+		nd::TiXmlElement* const jointsNode = new nd::TiXmlElement("ndBilateralJoints");
+		rootNode->LinkEndChild(jointsNode);
+		dLoadSaveBase::dSaveDescriptor descriptor;
+		descriptor.m_assetPath = assetPath;
+		descriptor.m_assetName = assetName;
+		descriptor.m_rootNode = jointsNode;
+	
+		for (ndJointList::dNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+		{
+			ndJointBilateralConstraint* const joint = jointNode->GetInfo();
+			dInt32 bodyHash0 = bodyMap.Find(joint->GetBody0())->GetInfo();
+			dInt32 bodyHash1 = (joint->GetBody1()==GetSentinelBody()) ? 0 : bodyMap.Find(joint->GetBody1())->GetInfo();
+			descriptor.m_body0NodeHash = bodyHash0;
+			descriptor.m_body1NodeHash = bodyHash1;
+			descriptor.m_nodeNodeHash = jointIndex;
+			joint->Save(descriptor);
+			jointMap.Insert(jointIndex, joint);
+			jointIndex++;
 		}
 	}
 }
@@ -1220,10 +1250,12 @@ void ndWorld::SaveScene(const char* const path)
 
 	dTree<dUnsigned32, const ndShape*> shapeMap;
 	dTree<dUnsigned32, const ndBodyKinematic*> bodyMap;
+	dTree<dUnsigned32, const ndJointBilateralConstraint*> jointMap;
 
 	SaveSceneSettings(worldNode, assetPath, assetName);
 	SaveCollisionShapes(worldNode, assetPath, assetName, shapeMap);
 	SaveRididBodies(worldNode, assetPath, assetName, shapeMap, bodyMap);
+	SaveJoints(worldNode, assetPath, assetName, bodyMap, jointMap);
 
 	asciifile.SaveFile(path);
 	setlocale(LC_ALL, oldloc);

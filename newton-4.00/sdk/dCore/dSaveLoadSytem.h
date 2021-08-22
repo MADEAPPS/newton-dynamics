@@ -76,6 +76,8 @@ class dLoadSaveBase
 			,m_assetIndex(0)
 			,m_nodeNodeHash(0)
 			,m_shapeNodeHash(0)
+			,m_body0NodeHash(0)
+			,m_body1NodeHash(0)
 			,m_shapeMap(nullptr)
 		{
 		}
@@ -87,6 +89,8 @@ class dLoadSaveBase
 			,m_assetIndex(desc.m_assetIndex)
 			,m_nodeNodeHash(desc.m_nodeNodeHash)
 			,m_shapeNodeHash(desc.m_shapeNodeHash)
+			,m_body0NodeHash(desc.m_body0NodeHash)
+			,m_body1NodeHash(desc.m_body1NodeHash)
 			,m_shapeMap(desc.m_shapeMap)
 		{
 		}
@@ -97,6 +101,8 @@ class dLoadSaveBase
 		mutable dInt32 m_assetIndex;
 		dInt32 m_nodeNodeHash;
 		dInt32 m_shapeNodeHash;
+		dInt32 m_body0NodeHash;
+		dInt32 m_body1NodeHash;
 		dTree<dUnsigned32, const ndShape*>* m_shapeMap;
 	};
 
