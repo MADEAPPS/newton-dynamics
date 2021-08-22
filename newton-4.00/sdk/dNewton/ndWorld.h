@@ -155,7 +155,7 @@ class ndWorld: public dClassAlloc
 	void SaveCollisionShapes(nd::TiXmlNode* const rootNode, 
 		const char* const assetPath, const char* const assetName,
 		dTree<dUnsigned32, const ndShape*>& shapesMap);
-	void SaveRididBodies(nd::TiXmlNode* const rootNode, 
+	void SaveRigidBodies(nd::TiXmlNode* const rootNode, 
 		const char* const assetPath, const char* const assetName,
 		const dTree<dUnsigned32, const ndShape*>& shapesMap,
 		dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap);

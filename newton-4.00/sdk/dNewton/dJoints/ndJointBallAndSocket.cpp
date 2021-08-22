@@ -28,9 +28,17 @@ ndJointBallAndSocket::ndJointBallAndSocket(const dMatrix& pinAndPivotFrame, ndBo
 }
 
 ndJointBallAndSocket::ndJointBallAndSocket(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
 {
-	dAssert(0);
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_maxConeAngle = xmlGetFloat(xmlNode, "maxConeAngle");
+	m_coneFriction = xmlGetFloat(xmlNode, "coneFriction");
+	m_minTwistAngle = xmlGetFloat(xmlNode, "minTwistAngle");
+	m_maxTwistAngle = xmlGetFloat(xmlNode, "maxTwistAngle");
+	m_twistFriction = xmlGetFloat(xmlNode, "twistFriction");
+	m_coneFrictionRegularizer = xmlGetFloat(xmlNode, "coneFrictionRegularizer");
+	m_twistFrictionRegularizer = xmlGetFloat(xmlNode, "twistFrictionRegularizer");
 }
 
 ndJointBallAndSocket::~ndJointBallAndSocket()

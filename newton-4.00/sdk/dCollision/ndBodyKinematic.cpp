@@ -148,9 +148,7 @@ ndBodyKinematic::ndBodyKinematic(const dLoadSaveBase::dLoadDescriptor& desc)
 	if (invMass > dFloat32 (0.0f))
 	{
 		dVector invInertia(xmlGetVector3(xmlNode, "invPrincipalInertia"));
-		invInertia.m_w = dFloat32 (1.0f);
-		dVector mass (invInertia.Scale(dFloat32(1.0f) / invMass));
-		SetMassMatrix(mass.m_x, mass.m_y, mass.m_z, mass.m_w);
+		SetMassMatrix(dFloat32 (1.0f)/invInertia.m_x, dFloat32(1.0f) / invInertia.m_y, dFloat32(1.0f) / invInertia.m_z, dFloat32(1.0f) / invMass);
 	}
 
 	m_maxAngleStep = xmlGetFloat(xmlNode, "maxAngleStep");

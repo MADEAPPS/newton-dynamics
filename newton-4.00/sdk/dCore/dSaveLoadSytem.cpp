@@ -52,12 +52,22 @@ void* LoadClass(const char* const className, const dLoadSaveBase::dLoadDescripto
 {
 	dUnsigned64 classNameHash = dCRC64(className);
 
+	static dInt32 lastEntry = 0;
 	const dFixSizeArray<dLoaderFactory, 128>& factory = GetFactory();
-	for (dInt32 i = 0; i < factory.GetCount(); i++)
+	
+	if (factory[lastEntry].m_classNameHash == classNameHash)
 	{
-		if (factory[i].m_classNameHash == classNameHash)
+		return factory[lastEntry].m_loader->CreateClass(descriptor);
+	}
+	else
+	{
+		for (dInt32 i = 0; i < factory.GetCount(); i++)
 		{
-			return factory[i].m_loader->CreateClass(descriptor);
+			if (factory[i].m_classNameHash == classNameHash)
+			{
+				lastEntry = i;
+				return factory[i].m_loader->CreateClass(descriptor);
+			}
 		}
 	}
 	

@@ -21,6 +21,7 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
+#include "ndBodyKinematic.h"
 #include "ndJointBilateralConstraint.h"
 
 #define D_VEL_DAMP				 (dFloat32(100.0f))
@@ -68,8 +69,31 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKine
 ndJointBilateralConstraint::ndJointBilateralConstraint(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndConstraint()
 	,dClassAlloc()
+	,m_forceBody0(dVector::m_zero)
+	,m_torqueBody0(dVector::m_zero)
+	,m_forceBody1(dVector::m_zero)
+	,m_torqueBody1(dVector::m_zero)
+	,m_worldNode(nullptr)
+	,m_body0Node(nullptr)
+	,m_body1Node(nullptr)
 {
-	dAssert(0);
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	
+	dInt32 body0Hash = xmlGetInt(xmlNode, "body0Hash");
+	dInt32 body1Hash = xmlGetInt(xmlNode, "body1Hash");
+	ndBody* const body0 = (ndBody*)desc.m_bodyMap->Find(body0Hash)->GetInfo();
+	ndBody* const body1 = (ndBody*)desc.m_bodyMap->Find(body1Hash)->GetInfo();
+
+	m_body0 = body0->GetAsBodyKinematic();
+	m_body1 = body1->GetAsBodyKinematic();
+
+	m_localMatrix0 = xmlGetMatrix(xmlNode, "localMatrix0");
+	m_localMatrix1 = xmlGetMatrix(xmlNode, "localMatrix1");
+	
+	m_maxDof = xmlGetInt(xmlNode, "maxDof");
+	m_enableCollision = xmlGetInt(xmlNode, "enableCollision");
+	m_solverModel = ndJointBilateralSolverModel(xmlGetInt(xmlNode, "solverModel"));
+	m_defualtDiagonalRegularizer = xmlGetFloat(xmlNode, "defualtDiagonalRegularizer");
 }
 
 ndJointBilateralConstraint::~ndJointBilateralConstraint()

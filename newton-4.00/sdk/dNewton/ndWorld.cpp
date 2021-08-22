@@ -1118,7 +1118,7 @@ void ndWorld::LoadCollisionShapes(
 	}
 }
 
-void ndWorld::SaveRididBodies(nd::TiXmlNode* const rootNode, 
+void ndWorld::SaveRigidBodies(nd::TiXmlNode* const rootNode, 
 	const char* const assetPath, const char* const assetName,
 	const dTree<dUnsigned32, const ndShape*>& shapesMap,
 	dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap)
@@ -1126,7 +1126,7 @@ void ndWorld::SaveRididBodies(nd::TiXmlNode* const rootNode,
 	const ndBodyList& bodyList = GetBodyList();
 	if (bodyList.GetCount())
 	{
-		dInt32 bodyIndex = 0;
+		dInt32 bodyIndex = 1;
 		nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("ndBodies");
 		rootNode->LinkEndChild(bodiesNode);
 		dLoadSaveBase::dSaveDescriptor descriptor;
@@ -1214,6 +1214,7 @@ void ndWorld::LoadJoints(const nd::TiXmlNode* const rootNode,
 	const nd::TiXmlNode* const joints = rootNode->FirstChild("ndBilateralJoints");
 	if (joints)
 	{
+		((ndBodyLoaderCache&)bodyMap).Insert(m_sentinelBody, 0);
 		dLoadSaveBase::dLoadDescriptor descriptor;
 		descriptor.m_assetPath = assetPath;
 		descriptor.m_bodyMap = &bodyMap;
@@ -1222,15 +1223,17 @@ void ndWorld::LoadJoints(const nd::TiXmlNode* const rootNode,
 		{
 			const char* const name = node->Value();
 			descriptor.m_rootNode = node;
-		//	ndBody* const body = D_CLASS_REFLECTION_LOAD_NODE(ndBody, name, descriptor);
-		//	if (body)
-		//	{
-		//		dInt32 hashId;
-		//		const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-		//		element->Attribute("hashId", &hashId);
-		//		bodyMap.Insert(body, hashId);
-		//	}
+			ndJointBilateralConstraint* const joint = D_CLASS_REFLECTION_LOAD_NODE(ndJointBilateralConstraint, name, descriptor);
+			if (joint)
+			{
+				dInt32 hashId;
+				const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+				element->Attribute("hashId", &hashId);
+				jointMap.Insert(joint, hashId);
+			}
 		}
+
+		((ndBodyLoaderCache&)bodyMap).Remove(bodyMap.Find(0));
 	}
 }
 
@@ -1284,7 +1287,7 @@ void ndWorld::SaveScene(const char* const path)
 
 	SaveSceneSettings(worldNode, assetPath, assetName);
 	SaveCollisionShapes(worldNode, assetPath, assetName, shapeMap);
-	SaveRididBodies(worldNode, assetPath, assetName, shapeMap, bodyMap);
+	SaveRigidBodies(worldNode, assetPath, assetName, shapeMap, bodyMap);
 	SaveJoints(worldNode, assetPath, assetName, bodyMap, jointMap);
 
 	asciifile.SaveFile(path);
