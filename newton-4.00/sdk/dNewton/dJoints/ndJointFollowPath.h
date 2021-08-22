@@ -20,6 +20,7 @@ class ndJointFollowPath: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointFollowPath);
+	D_COLLISION_API ndJointFollowPath(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndJointFollowPath (const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointFollowPath();
 
@@ -31,6 +32,7 @@ class ndJointFollowPath: public ndJointBilateralConstraint
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 };
 
 #endif

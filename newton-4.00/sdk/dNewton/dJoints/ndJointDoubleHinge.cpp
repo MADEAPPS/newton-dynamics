@@ -13,13 +13,25 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointDoubleHinge.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointDoubleHinge)
+
 ndJointDoubleHinge::ndJointDoubleHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
-	,m_jointAngle0(dFloat32(0.0f))
-	,m_jointSpeed0(dFloat32(0.0f))
-	,m_jointAngle1(dFloat32(0.0f))
-	,m_jointSpeed1(dFloat32(0.0f))
+	,m_angle0(dFloat32(0.0f))
+	,m_omega0(dFloat32(0.0f))
+	,m_angle1(dFloat32(0.0f))
+	,m_omega1(dFloat32(0.0f))
 {
+}
+
+ndJointDoubleHinge::ndJointDoubleHinge(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_angle0(dFloat32(0.0f))
+	,m_omega0(dFloat32(0.0f))
+	,m_angle1(dFloat32(0.0f))
+	,m_omega1(dFloat32(0.0f))
+{
+	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 }
 
 ndJointDoubleHinge::~ndJointDoubleHinge()
@@ -53,15 +65,15 @@ void ndJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	dVector omega1(m_body1->GetOmega());
 	
 	// calculale joint parameters, angles and omega
-	const dFloat32 deltaAngle0 = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_jointAngle0);
-	m_jointAngle0 += deltaAngle0;
-	m_jointSpeed0 = frontDir.DotProduct(omega0 - omega1).GetScalar();
+	const dFloat32 deltaAngle0 = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_angle0);
+	m_angle0 += deltaAngle0;
+	m_omega0 = frontDir.DotProduct(omega0 - omega1).GetScalar();
 
-	const dFloat32 deltaAngle1 = AnglesAdd(-CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up), -m_jointAngle1);
-	m_jointAngle1 += deltaAngle1;
-	m_jointSpeed1 = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
+	const dFloat32 deltaAngle1 = AnglesAdd(-CalculateAngle(frontDir, matrix1.m_front, matrix1.m_up), -m_angle1);
+	m_angle1 += deltaAngle1;
+	m_omega1 = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
 
-	//dTrace(("%f %f\n", m_jointAngle1 * dRadToDegree, m_jointSpeed1));
+	//dTrace(("%f %f\n", m_jointAngle1 * dRadToDegree, m_omega1));
 	
 	//// two rows to restrict rotation around around the parent coordinate system
 	//const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
@@ -71,4 +83,14 @@ void ndJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	//AddAngularRowJacobian(desc, matrix1.m_right, angle1);
 }
 
+void ndJointDoubleHinge::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	// since this joint is not used that much
+	// for now double hinges do not have the hinge functionality
+}
 

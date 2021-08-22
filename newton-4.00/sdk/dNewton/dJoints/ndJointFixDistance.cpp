@@ -13,8 +13,11 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointFixDistance.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointFixDistance)
+
 ndJointFixDistance::ndJointFixDistance(const dVector& pivotInChildInGlobalSpace, const dVector& pivotInParentInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(3, child, parent, dGetIdentityMatrix())
+	,m_distance(dFloat32 (0.0f))
 {
 	dVector dist(pivotInChildInGlobalSpace - pivotInParentInGlobalSpace);
 	m_distance = dSqrt(dist.DotProduct(dist).GetScalar());
@@ -30,6 +33,15 @@ ndJointFixDistance::ndJointFixDistance(const dVector& pivotInChildInGlobalSpace,
 	dMatrix dummy;
 	CalculateLocalMatrix(childMatrix, m_localMatrix0, dummy);
 	CalculateLocalMatrix(parentMatrix, dummy, m_localMatrix1);
+}
+
+ndJointFixDistance::ndJointFixDistance(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_distance(dFloat32(0.0f))
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_distance = xmlGetFloat(xmlNode, "distance");
 }
 
 ndJointFixDistance::~ndJointFixDistance()
@@ -90,4 +102,13 @@ void ndJointFixDistance::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
+void ndJointFixDistance::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "distance", m_distance);
+}
 

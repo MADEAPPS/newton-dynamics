@@ -13,6 +13,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointSlider.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointSlider)
+
 ndJointSlider::ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 	,m_posit(dFloat32 (0.0f))
@@ -26,6 +28,31 @@ ndJointSlider::ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* c
 	,m_hasLimits(false)
 	,m_isSpringDamper(false)
 {
+}
+
+ndJointSlider::ndJointSlider(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_posit(dFloat32(0.0f))
+	,m_speed(dFloat32(0.0f))
+	,m_springK(dFloat32(0.0f))
+	,m_damperC(dFloat32(0.0f))
+	,m_minLimit(dFloat32(0.0f))
+	,m_maxLimit(dFloat32(0.0f))
+	,m_friction(dFloat32(0.0f))
+	,m_springDamperRegularizer(dFloat32(0.1f))
+	,m_hasLimits(false)
+	,m_isSpringDamper(false)
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_springK = xmlGetFloat(xmlNode, "springK");
+	m_damperC = xmlGetFloat(xmlNode, "damperC");
+	m_minLimit = xmlGetFloat(xmlNode, "minLimit");
+	m_maxLimit = xmlGetFloat(xmlNode, "maxLimit");
+	m_friction = xmlGetFloat(xmlNode, "friction");
+	m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
+	m_hasLimits = xmlGetInt(xmlNode, "hasLimits") ? true : false;
+	m_isSpringDamper = xmlGetInt(xmlNode, "isSpringDamper") ? true : false;
 }
 
 ndJointSlider::~ndJointSlider()
@@ -208,4 +235,20 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
+void ndJointSlider::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "springK", m_springK);
+	xmlSaveParam(childNode, "damperC", m_damperC);
+	xmlSaveParam(childNode, "minLimit", m_minLimit);
+	xmlSaveParam(childNode, "maxLimit", m_maxLimit);
+	xmlSaveParam(childNode, "friction", m_friction);
+	xmlSaveParam(childNode, "springDamperRegularizer", m_springDamperRegularizer);
+	xmlSaveParam(childNode, "hasLimits", m_hasLimits ? 1 : 0);
+	xmlSaveParam(childNode, "isSpringDamper", m_isSpringDamper ? 1 : 0);
+}
 

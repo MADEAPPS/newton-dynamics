@@ -14,6 +14,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointFollowPath.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointFollowPath)
+
 ndJointFollowPath::ndJointFollowPath (const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 {
@@ -21,23 +23,15 @@ ndJointFollowPath::ndJointFollowPath (const dMatrix& pinAndPivotFrame, ndBodyKin
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
+ndJointFollowPath::ndJointFollowPath(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+{
+	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+}
+
 ndJointFollowPath::~ndJointFollowPath()
 {
 }
-
-/*
-void ndJointFollowPath::SetPathTarget (const dVector& posit, const dVector& tangent)
-{
-	m_pointOnPath = posit;
-	m_pathTangent = tangent.Scale (1.0f / dSqrt (m_pathTangent % m_pathTangent));
-}
-
-void ndJointFollowPath::GetPathTarget (dVector& posit, dVector& tangent) const 
-{
-	posit = m_pointOnPath;
-	tangent = m_pathTangent;
-}
-*/
 
 void ndJointFollowPath::JacobianDerivative(ndConstraintDescritor& desc)
 {
@@ -71,5 +65,12 @@ void ndJointFollowPath::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, p00, p11, matrix1[2]);
 }
 
+void ndJointFollowPath::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+}
 
 

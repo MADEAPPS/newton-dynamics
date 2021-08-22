@@ -95,22 +95,22 @@ void ndJointHingeActuator::JacobianDerivative(ndConstraintDescritor& desc)
 	dFloat32 step = m_motorSpeed * desc.m_timestep;
 
 	dFloat32 currentSpeed = 0.0f;
-	if (m_jointAngle < (m_targetAngle - step))
+	if (m_angle < (m_targetAngle - step))
 	{
 		currentSpeed = m_motorSpeed;
 	}
-	else if (m_jointAngle > (m_targetAngle + step))
+	else if (m_angle > (m_targetAngle + step))
 	{
 		currentSpeed = -m_motorSpeed;
 	}
-	else if (m_jointAngle < m_targetAngle)
+	else if (m_angle < m_targetAngle)
 	{
-		currentSpeed = dFloat32 (0.3f) * (m_targetAngle - m_jointAngle) * desc.m_invTimestep;
+		currentSpeed = dFloat32 (0.3f) * (m_targetAngle - m_angle) * desc.m_invTimestep;
 		dAssert(dAbs(currentSpeed) < m_motorSpeed);
 	}
-	else if (m_jointAngle > m_targetAngle)
+	else if (m_angle > m_targetAngle)
 	{
-		currentSpeed = dFloat32(0.3f) * (m_targetAngle - m_jointAngle) * desc.m_invTimestep;
+		currentSpeed = dFloat32(0.3f) * (m_targetAngle - m_angle) * desc.m_invTimestep;
 		dAssert(dAbs(currentSpeed) < m_motorSpeed);
 	}
 
@@ -119,11 +119,11 @@ void ndJointHingeActuator::JacobianDerivative(ndConstraintDescritor& desc)
 	AddAngularRowJacobian(desc, pin, dFloat32 (0.0f));
 	dFloat32 accel = GetMotorZeroAcceleration(desc) + dFloat32(0.3f) * currentSpeed * desc.m_invTimestep;
 	SetMotorAcceleration(desc, accel);
-	if (m_jointAngle > GetMaxAngularLimit())
+	if (m_angle > GetMaxAngularLimit())
 	{
 		SetHighFriction(desc, m_maxTorque);
 	}
-	else if (m_jointAngle < GetMinAngularLimit())
+	else if (m_angle < GetMinAngularLimit())
 	{
 		SetLowerFriction(desc, -m_maxTorque);
 	}

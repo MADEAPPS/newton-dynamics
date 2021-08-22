@@ -43,8 +43,8 @@ class ndJointHinge: public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
-	dFloat32 m_jointAngle;
-	dFloat32 m_jointSpeed;
+	dFloat32 m_angle;
+	dFloat32 m_omega;
 	dFloat32 m_springK;
 	dFloat32 m_damperC;
 	dFloat32 m_minLimit;

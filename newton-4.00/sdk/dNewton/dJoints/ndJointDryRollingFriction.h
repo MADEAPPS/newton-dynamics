@@ -16,7 +16,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-
 // this joint is usefully to simulate the rolling friction of a rolling ball over 
 // a flat surface.
 // normally this is not important for non spherical objects, but for games like 
@@ -26,12 +25,13 @@ class ndJointDryRollingFriction: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointDryRollingFriction);
-
+	D_COLLISION_API ndJointDryRollingFriction(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndJointDryRollingFriction(ndBodyKinematic* const body0, ndBodyKinematic* const body1, dFloat32 coefficient);
 	D_NEWTON_API virtual ~ndJointDryRollingFriction();
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	dFloat32 m_coefficient;
 	dFloat32 m_contactTrail;

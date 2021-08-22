@@ -24,6 +24,7 @@
 class ndFollowSplinePath : public ndJointFollowPath
 {
 	public:
+	D_CLASS_REFLECTION(ndFollowSplinePath);
 	ndFollowSplinePath(const dMatrix& pinAndPivotFrame, ndBodyDynamic* const child, ndBodyDynamic* const pathBody)
 		:ndJointFollowPath(pinAndPivotFrame, child, pathBody)
 	{
@@ -44,6 +45,14 @@ class ndFollowSplinePath : public ndJointFollowPath
 		tangent = tangent.Scale(1.0 / dSqrt(tangent.DotProduct(tangent).GetScalar()));
 		positOut = matrix.TransformVector(point);
 		tangentOut = tangent;
+	}
+
+	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+	{
+		nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+		desc.m_rootNode->LinkEndChild(childNode);
+		childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+		ndJointFollowPath::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 	}
 };
 
@@ -222,7 +231,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const dVector& or
 	mesh->Release();
 }
 
-void BuildFixJoints(ndDemoEntityManager* const scene, const dVector& origin)
+void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const dVector& origin)
 {
 	ndShapeInstance shape(new ndShapeSphere(0.25f));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
@@ -419,13 +428,13 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 
 	BuildBallSocket(scene, dVector(0.0f, 0.0f, -7.0f, 1.0f));
 	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
-	//BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	//BuildSlider(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 100.0f, 0.75f);
-	//BuildDoubleHinge(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 100.0f, 0.75f);
-	//BuildFixJoints(scene, dVector(10.0f, 0.0f, -5.0f, 1.0f));
-	//
-	//AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
-	//BuildRollingFriction(scene, dVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
+	BuildSlider(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 100.0f, 0.75f);
+	BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	BuildDoubleHinge(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 100.0f, 0.75f);
+	BuildFixDistanceJoints(scene, dVector(10.0f, 0.0f, -5.0f, 1.0f));
+	BuildRollingFriction(scene, dVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
+	
+	AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	dQuaternion rot;
 	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);

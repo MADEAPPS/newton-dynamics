@@ -13,6 +13,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointGear.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointGear)
+
 ndJointGear::ndJointGear(dFloat32 gearRatio,
 	const dVector& body0Pin, ndBodyKinematic* const body0,
 	const dVector& body1Pin, ndBodyKinematic* const body1)
@@ -35,6 +37,14 @@ ndJointGear::ndJointGear(dFloat32 gearRatio,
 
 	// set as kinematic loop
 	SetSolverModel(m_jointkinematicOpenLoop);
+}
+
+ndJointGear::ndJointGear(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_gearRatio = xmlGetFloat(xmlNode, "gearRatio");
 }
 
 ndJointGear::~ndJointGear()
@@ -65,4 +75,13 @@ void ndJointGear::JacobianDerivative(ndConstraintDescritor& desc)
 	SetMotorAcceleration(desc, -w * desc.m_invTimestep);
 }
 
+void ndJointGear::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "gearRatio", m_gearRatio);
+}
 

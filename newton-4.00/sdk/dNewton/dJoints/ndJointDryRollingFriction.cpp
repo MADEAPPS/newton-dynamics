@@ -13,6 +13,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointDryRollingFriction.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointDryRollingFriction)
 
 ndJointDryRollingFriction::ndJointDryRollingFriction(ndBodyKinematic* const body0, ndBodyKinematic* const body1, dFloat32 coefficient)
 	:ndJointBilateralConstraint(1, body0, body1, dGetIdentityMatrix())
@@ -24,6 +25,16 @@ ndJointDryRollingFriction::ndJointDryRollingFriction(ndBodyKinematic* const body
 
 	SetSolverModel(m_jointIterativeSoft);
 }
+
+ndJointDryRollingFriction::ndJointDryRollingFriction(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_coefficient = xmlGetFloat(xmlNode, "coefficient");
+	m_contactTrail = xmlGetFloat(xmlNode, "contactTrail");
+}
+
 
 ndJointDryRollingFriction::~ndJointDryRollingFriction()
 {
@@ -85,6 +96,17 @@ void ndJointDryRollingFriction::JacobianDerivative(ndConstraintDescritor& desc)
 			m_body0->SetOmega(omega);
 		}
 	}
+}
+
+void ndJointDryRollingFriction::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "coefficient", m_coefficient);
+	xmlSaveParam(childNode, "contactTrail", m_contactTrail);
 }
 
 

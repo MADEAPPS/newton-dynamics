@@ -22,6 +22,7 @@ class ndJointSlider: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointSlider);
+	D_COLLISION_API ndJointSlider(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointSlider();
 
@@ -39,6 +40,7 @@ class ndJointSlider: public ndJointBilateralConstraint
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	dFloat32 m_posit;
 	dFloat32 m_speed;

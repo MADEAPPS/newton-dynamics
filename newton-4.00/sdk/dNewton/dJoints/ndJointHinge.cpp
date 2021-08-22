@@ -17,8 +17,8 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointHinge)
 
 ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
-	,m_jointAngle(dFloat32(0.0f))
-	,m_jointSpeed(dFloat32(0.0f))
+	,m_angle(dFloat32(0.0f))
+	,m_omega(dFloat32(0.0f))
 	,m_springK(dFloat32(0.0f))
 	,m_damperC(dFloat32(0.0f))
 	,m_minLimit(dFloat32(0.0f))
@@ -32,8 +32,8 @@ ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 
 ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotInChild, const dMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotInChild)
-	,m_jointAngle(dFloat32(0.0f))
-	,m_jointSpeed(dFloat32(0.0f))
+	,m_angle(dFloat32(0.0f))
+	,m_omega(dFloat32(0.0f))
 	,m_springK(dFloat32(0.0f))
 	,m_damperC(dFloat32(0.0f))
 	,m_minLimit(dFloat32(0.0f))
@@ -50,8 +50,8 @@ ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotInChild, const dMatrix& pin
 
 ndJointHinge::ndJointHinge(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
-	,m_jointAngle(dFloat32(0.0f))
-	,m_jointSpeed(dFloat32(0.0f))
+	,m_angle(dFloat32(0.0f))
+	,m_omega(dFloat32(0.0f))
 	,m_springK(dFloat32(0.0f))
 	,m_damperC(dFloat32(0.0f))
 	,m_minLimit(dFloat32(0.0f))
@@ -79,12 +79,12 @@ ndJointHinge::~ndJointHinge()
 
 dFloat32 ndJointHinge::GetAngle() const
 {
-	return m_jointAngle;
+	return m_angle;
 }
 
 dFloat32 ndJointHinge::GetOmega() const
 {
-	return m_jointSpeed;
+	return m_omega;
 }
 
 void ndJointHinge::EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimit)
@@ -126,11 +126,11 @@ void ndJointHinge::SubmitConstraintLimits(ndConstraintDescritor& desc, const dMa
 {
 	if ((m_minLimit > dFloat32 (-1.e-4f)) && (m_maxLimit < dFloat32(1.e-4f)))
 	{
-		AddAngularRowJacobian(desc, &matrix1.m_front[0], -m_jointAngle);
+		AddAngularRowJacobian(desc, &matrix1.m_front[0], -m_angle);
 	}
 	else 
 	{
-		const dFloat32 angle = m_jointAngle + m_jointSpeed * desc.m_timestep;
+		const dFloat32 angle = m_angle + m_omega * desc.m_timestep;
 		if (angle < m_minLimit)
 		{
 			AddAngularRowJacobian(desc, &matrix0.m_front[0], dFloat32(0.0f));
@@ -163,10 +163,10 @@ void ndJointHinge::SubmitConstraintLimits(ndConstraintDescritor& desc, const dMa
 void ndJointHinge::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& )
 {
 	// add spring damper row
-	AddAngularRowJacobian(desc, matrix0.m_front, -m_jointAngle);
+	AddAngularRowJacobian(desc, matrix0.m_front, -m_angle);
 	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 
-	const dFloat32 angle = m_jointAngle + m_jointSpeed * desc.m_timestep;
+	const dFloat32 angle = m_angle + m_omega * desc.m_timestep;
 	if (angle < m_minLimit)
 	{
 		AddAngularRowJacobian(desc, &matrix0.m_front[0], dFloat32(0.0f));
@@ -202,9 +202,9 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	dVector omega1(m_body1->GetOmega());
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	const dFloat32 deltaAngle = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_jointAngle);
-	m_jointAngle += deltaAngle;
-	m_jointSpeed = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
+	const dFloat32 deltaAngle = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
+	m_angle += deltaAngle;
+	m_omega = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
 
 	// two rows to restrict rotation around around the parent coordinate system
 	const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
@@ -228,7 +228,7 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 	else if (m_isSpringDamper)
 	{
-		AddAngularRowJacobian(desc, matrix0.m_front, -m_jointAngle);
+		AddAngularRowJacobian(desc, matrix0.m_front, -m_angle);
 		SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 	}
 	else if (m_friction > dFloat32 (0.0f))

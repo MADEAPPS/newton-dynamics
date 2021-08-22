@@ -19,11 +19,13 @@ class ndJointFixDistance: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointFixDistance);
+	D_COLLISION_API ndJointFixDistance(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndJointFixDistance(const dVector& childPivotInGlobalSpace, const dVector& parentPivotInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointFixDistance();
 
 	protected:
 	void JacobianDerivative(ndConstraintDescritor& desc);
+	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	dFloat32 m_distance;
 };
