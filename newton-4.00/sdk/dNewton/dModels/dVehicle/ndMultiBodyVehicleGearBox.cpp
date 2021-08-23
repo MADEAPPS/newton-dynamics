@@ -28,7 +28,7 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleGearBox)
 
-ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, const ndMultiBodyVehicle* const chassis)
+ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, ndMultiBodyVehicle* const chassis)
 	:ndJointGear(dFloat32 (1.0f), motor->GetMatrix().m_front, differential,	motor->GetMatrix().m_front, motor)
 	,m_chassis(chassis)
 	,m_clutchTorque(dFloat32 (1.0e5f))

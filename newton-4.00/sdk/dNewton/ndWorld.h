@@ -402,15 +402,22 @@ inline void ndWorld::OnLoadScene(const dLoadSaveBase::dLoadDescriptor& desc)
 	ndBodyLoaderCache::Iterator bodyIter(*desc.m_bodyMap);
 	for (bodyIter.Begin(); bodyIter; bodyIter++)
 	{
-		ndBody* const body = (ndBody*)bodyIter.GetNode()->GetInfo();
-		AddBody(body);
+		const ndBody* const body = (ndBody*)bodyIter.GetNode()->GetInfo();
+		AddBody((ndBody*)body);
 	}
 
 	ndJointLoaderCache::Iterator jointIter(*desc.m_jointMap);
 	for (jointIter.Begin(); jointIter; jointIter++)
 	{
-		ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)jointIter.GetNode()->GetInfo();
-		AddJoint(joint);
+		const ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)jointIter.GetNode()->GetInfo();
+		AddJoint((ndJointBilateralConstraint*)joint);
+	}
+
+	ndModelLoaderCache::Iterator modelIter(*desc.m_modelMap);
+	for (modelIter.Begin(); modelIter; modelIter++)
+	{
+		const ndModel* const model = modelIter.GetNode()->GetInfo();
+		AddModel((ndModel*)model);
 	}
 }
 

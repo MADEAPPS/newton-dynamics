@@ -350,6 +350,13 @@ void ndWorld::RemoveBody(ndBody* const body)
 	dAssert(kinematicBody != m_sentinelBody);
 	if (kinematicBody)
 	{
+		const ndJointList& jointList = kinematicBody->GetJointList();
+		while (jointList.GetFirst())
+		{
+			ndJointBilateralConstraint* const joint = jointList.GetFirst()->GetInfo();
+			RemoveJoint(joint);
+		}
+
 		m_scene->RemoveBody(kinematicBody);
 	}
 	else if (body->GetAsBodyParticleSet())
@@ -1291,14 +1298,14 @@ void ndWorld::LoadModels(
 		{
 			const char* const name = node->Value();
 			descriptor.m_rootNode = node;
-	//		ndJointBilateralConstraint* const joint = D_CLASS_REFLECTION_LOAD_NODE(ndJointBilateralConstraint, name, descriptor);
-	//		if (joint)
-	//		{
-	//			dInt32 hashId;
-	//			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-	//			element->Attribute("hashId", &hashId);
-	//			jointMap.Insert(joint, hashId);
-	//		}
+			ndModel* const model = D_CLASS_REFLECTION_LOAD_NODE(ndModel, name, descriptor);
+			if (model)
+			{
+				dInt32 hashId;
+				const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+				element->Attribute("hashId", &hashId);
+				modelMap.Insert(model, hashId);
+			}
 		}
 	}
 }

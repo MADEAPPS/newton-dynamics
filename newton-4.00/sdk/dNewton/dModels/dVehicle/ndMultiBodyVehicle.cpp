@@ -71,53 +71,73 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dLoadSaveBase::dLoadDescriptor& des
 	,m_downForce()
 {
 	m_tireShape->AddRef();
-	
-	//xmlSaveParam(xmlNode, "localFrame", m_localFrame);
-	//xmlSaveParam(xmlNode, "chassis", dInt32(desc.m_bodyMap->Find(m_chassis)->GetInfo()));
-	//
-	//// save all wheels
-	//for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	xmlSaveParam(xmlNode, "tire", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
-	//}
-	//
-	//// save all differentials
-	//for (dList<ndMultiBodyVehicleDifferential*>::dNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	xmlSaveParam(xmlNode, "diff", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
-	//}
-	//
-	//// save all axles
-	//for (dList<ndMultiBodyVehicleDifferentialAxle*>::dNode* node = m_axleList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	xmlSaveParam(xmlNode, "axle", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
-	//}
-	//
-	//if (m_motor)
-	//{
-	//	xmlSaveParam(xmlNode, "motor", dInt32(desc.m_jointMap->Find(m_motor)->GetInfo()));
-	//}
-	//
-	//if (m_gearBox)
-	//{
-	//	xmlSaveParam(childNode, "gearBox", dInt32(desc.m_jointMap->Find(m_gearBox)->GetInfo()));
-	//}
-	//
-	//if (m_torsionBar)
-	//{
-	//	xmlSaveParam(childNode, "torsionBar", dInt32(desc.m_jointMap->Find(m_torsionBar)->GetInfo()));
-	//}
-	//
-	//m_downForce.Save(childNode);
 
-	dAssert(0);
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	for (const nd::TiXmlNode* node = xmlNode->FirstChild(); node; node = node->NextSibling())
 	{
 		const char* const partName = node->Value();
-		if (strcmp(partName, "localFrame"))
+
+		if (strcmp(partName, "ndModel") == 0)
+		{
+			// do nothing
+		}
+		else if (strcmp(partName, "localFrame") == 0)
+		{
+			m_localFrame = xmlGetMatrix(xmlNode, "localFrame");
+		} 
+		else if (strcmp(partName, "chassis") == 0)
+		{
+			dInt32 hash = xmlGetInt(xmlNode, "chassis");
+			const ndBody* const body = desc.m_bodyMap->Find(hash)->GetInfo();
+			m_chassis = ((ndBody*)body)->GetAsBodyDynamic();
+		}
+		else if (strcmp(partName, "tire") == 0)
+		{
+			dInt32 hash;
+			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+			element->Attribute("int32", &hash);
+			ndMultiBodyVehicleTireJoint* const tire = (ndMultiBodyVehicleTireJoint*)desc.m_jointMap->Find(hash)->GetInfo();
+			tire->m_vehicle = this;
+			m_tireList.Append(tire);
+		}
+		else if (strcmp(partName, "diff") == 0)
+		{
+			dInt32 hash;
+			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+			element->Attribute("int32", &hash);
+			ndMultiBodyVehicleDifferential* const tire = (ndMultiBodyVehicleDifferential*)desc.m_jointMap->Find(hash)->GetInfo();
+			m_differentialList.Append(tire);
+		}
+		else if (strcmp(partName, "axle") == 0)
+		{
+			dInt32 hash;
+			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+			element->Attribute("int32", &hash);
+			ndMultiBodyVehicleDifferentialAxle* const tire = (ndMultiBodyVehicleDifferentialAxle*)desc.m_jointMap->Find(hash)->GetInfo();
+			m_axleList.Append(tire);
+		}
+		else if (strcmp(partName, "motor") == 0)
+		{
+			dInt32 hash = xmlGetInt(xmlNode, "motor");
+			m_motor = (ndMultiBodyVehicleMotor*)desc.m_jointMap->Find(hash)->GetInfo();
+			m_motor->m_vehicelModel = this;
+		}
+		else if (strcmp(partName, "gearBox") == 0)
+		{
+			dInt32 hash = xmlGetInt(xmlNode, "gearBox");
+			m_gearBox = (ndMultiBodyVehicleGearBox*)desc.m_jointMap->Find(hash)->GetInfo();
+			m_gearBox->m_chassis = this;
+		}
+		else if (strcmp(partName, "torsion") == 0)
 		{
 			dAssert(0);
+			//dInt32 hash = xmlGetInt(xmlNode, "gearBox");
+			//m_gearBox = (ndMultiBodyVehicleGearBox*)desc.m_jointMap->Find(hash)->GetInfo();
+			//m_gearBox->m_chassis = this;
+		}
+		else if (strcmp(partName, "aerodynamics") == 0)
+		{
+			m_downForce.Load(node);
 		}
 		else
 		{
@@ -208,34 +228,18 @@ void ndMultiBodyVehicle::AddToWorld(ndWorld* const world)
 
 void ndMultiBodyVehicle::RemoveFromToWorld(ndWorld* const world)
 {
-	if (m_torsionBar)
-	{
-		world->RemoveJoint(m_torsionBar);
-	}
-	if (m_gearBox)
-	{
-		world->RemoveJoint(m_gearBox);
-	}
 	if (m_motor)
 	{
-		world->RemoveJoint(m_motor);
 		world->RemoveBody(m_motor->GetBody0());
-	}
-	for (dList<ndMultiBodyVehicleDifferentialAxle*>::dNode* node = m_axleList.GetFirst(); node; node = node->GetNext())
-	{
-		ndMultiBodyVehicleDifferentialAxle* const joint = node->GetInfo();
-		world->RemoveJoint(joint);
 	}
 	for (dList<ndMultiBodyVehicleDifferential*>::dNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleDifferential* const joint = node->GetInfo();
-		world->RemoveJoint(joint);
 		world->RemoveBody(joint->GetBody0());
 	}
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleTireJoint* const joint = node->GetInfo();
-		world->RemoveJoint(joint);
 		world->RemoveBody(joint->GetBody0());
 	}
 	world->RemoveBody(m_chassis);
@@ -612,8 +616,8 @@ void ndMultiBodyVehicle::BrushTireModel(ndMultiBodyVehicleTireJoint* const tire,
 
 		//if (u > 0.5f || v > 0.5f)
 		//dTrace(("(%d %f %f)\n", tireBody->GetId(), u, v));
-		tire->m_lateralSideSlip = dMax (tire->m_lateralSideSlip, v);
-		tire->m_longitidinalSideSlip = dMax(tire->m_longitidinalSideSlip, u);
+		tire->m_lateralSlip = dMax (tire->m_lateralSlip, v);
+		tire->m_longitudinalSlip = dMax(tire->m_longitudinalSlip, u);
 
 		const ndWheelDescriptor& info = tire->GetInfo();
 		const dFloat32 cz = info.m_laterialStiffness  * v;
@@ -651,8 +655,8 @@ void ndMultiBodyVehicle::ApplyTireModel()
 		ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 		dAssert(((ndShape*)tire->GetBody0()->GetCollisionShape().GetShape())->GetAsShapeChamferCylinder());
 
-		tire->m_lateralSideSlip = dFloat32(0.0f);
-		tire->m_longitidinalSideSlip = dFloat32(0.0f);
+		tire->m_lateralSlip = dFloat32(0.0f);
+		tire->m_longitudinalSlip = dFloat32(0.0f);
 
 		const ndBodyKinematic::ndContactMap& contactMap = tire->GetBody0()->GetContactMap();
 		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
@@ -707,20 +711,20 @@ void ndMultiBodyVehicle::ApplyTireModel()
 						dVector dir(contactPoint.m_point - tireBasisMatrix.m_posit);
 						dAssert(dir.DotProduct(dir).GetScalar() > dFloat32(0.0f));
 						dFloat32 contactPatch = tireBasisMatrix.m_up.DotProduct(dir.Normalize()).GetScalar();
-if (contactPatch < dFloat32(-0.71f))
-{
-	BrushTireModel(tire, contactPoint);
-}
-else
-{
-	const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
-	contactPoint.m_material.m_restitution = dFloat32(0.1f);
-	contactPoint.m_material.m_staticFriction0 = frictionCoefficient;
-	contactPoint.m_material.m_staticFriction1 = frictionCoefficient;
+						if (contactPatch < dFloat32(-0.71f))
+						{
+							BrushTireModel(tire, contactPoint);
+						}
+						else
+						{
+							const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
+							contactPoint.m_material.m_restitution = dFloat32(0.1f);
+							contactPoint.m_material.m_staticFriction0 = frictionCoefficient;
+							contactPoint.m_material.m_staticFriction1 = frictionCoefficient;
 
-	contactPoint.m_material.m_dynamicFriction0 = frictionCoefficient;
-	contactPoint.m_material.m_dynamicFriction1 = frictionCoefficient;
-}
+							contactPoint.m_material.m_dynamicFriction0 = frictionCoefficient;
+							contactPoint.m_material.m_dynamicFriction1 = frictionCoefficient;
+						}
 					}
 					else
 					{
@@ -814,7 +818,22 @@ void ndMultiBodyVehicle::ndDownForce::Save(nd::TiXmlNode* const parentNode) cons
 
 void ndMultiBodyVehicle::ndDownForce::Load(const nd::TiXmlNode* const xmlNode)
 {
-	dAssert(0);
+	m_gravity = xmlGetFloat(xmlNode, "gravity");
+	const nd::TiXmlNode* node = xmlNode->FirstChild();
+	for (dInt32 i = 0; i < sizeof(m_downForceTable) / sizeof(m_downForceTable[0]); i++)
+	{
+		node = node->NextSibling();
+		const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+		const char* const data = element->Attribute("float3");
+
+		dFloat64 fx;
+		dFloat64 fy;
+		dFloat64 fz;
+		sscanf(data, "%lf %lf %lf", &fx, &fy, &fz);
+		m_downForceTable[i].m_speed = dFloat32(fx);
+		m_downForceTable[i].m_forceFactor = dFloat32(fy);
+		m_downForceTable[i].m_aerodynamicDownforceConstant = dFloat32(fz);
+	}
 }
 
 void ndMultiBodyVehicle::PostUpdate(ndWorld* const, dFloat32)
