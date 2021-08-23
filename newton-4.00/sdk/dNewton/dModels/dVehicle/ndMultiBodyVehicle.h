@@ -47,14 +47,15 @@ class ndMultiBodyVehicle: public ndModel
 			public:
 			dFloat32 m_speed;
 			dFloat32 m_forceFactor;
-
-			private:
 			dFloat32 m_aerodynamicDownforceConstant;
 			friend class ndDownForce;
 		};
 
 		ndDownForce();
 		dFloat32 GetDownforceFactor(dFloat32 speed) const;
+
+		void Load(const nd::TiXmlNode* const xmlNode);
+		void Save(nd::TiXmlNode* const xmlNode) const;
 
 		private:
 		dFloat32 CalculateFactor(const ndSpeedForcePair* const entry) const;
@@ -110,9 +111,8 @@ class ndMultiBodyVehicle: public ndModel
 	ndMultiBodyVehicleGearBox* m_gearBox;
 	ndMultiBodyVehicleTorsionBar* m_torsionBar;
 	dList<ndMultiBodyVehicleTireJoint*> m_tireList;
-	dList<ndMultiBodyVehicleDifferentialAxle*> m_axles;
-	dList<ndMultiBodyVehicleDifferential*> m_differentials;
-
+	dList<ndMultiBodyVehicleDifferentialAxle*> m_axleList;
+	dList<ndMultiBodyVehicleDifferential*> m_differentialList;
 	ndDownForce m_downForce;
 	
 	friend class ndMultiBodyVehicleMotor;

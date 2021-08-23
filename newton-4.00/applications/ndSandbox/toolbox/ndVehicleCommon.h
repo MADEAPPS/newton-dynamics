@@ -170,9 +170,13 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 class ndVehicleSelector : public ndModel
 {
 	public:
+	D_CLASS_REFLECTION(ndVehicleSelector);
 	ndVehicleSelector();
+	ndVehicleSelector(const dLoadSaveBase::dLoadDescriptor& desc);
+
 	void Update(ndWorld* const, dFloat32){}
 	void PostUpdate(ndWorld* const world, dFloat32);
+	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
 };

@@ -14,6 +14,8 @@
 #include "ndPhysicsWorld.h"
 #include "ndVehicleCommon.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndVehicleSelector)
+
 ndVehicleDectriptor::ndEngineTorqueCurve::ndEngineTorqueCurve()
 {
 	// take from the data sheet of a 2005 dodge viper, 
@@ -189,6 +191,20 @@ ndVehicleSelector::ndVehicleSelector()
 	:ndModel()
 	,m_changeVehicle()
 {
+}
+
+ndVehicleSelector::ndVehicleSelector(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndModel(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_changeVehicle()
+{
+}
+
+void ndVehicleSelector::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndModel::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 }
 
 void ndVehicleSelector::PostUpdate(ndWorld* const world, dFloat32)
