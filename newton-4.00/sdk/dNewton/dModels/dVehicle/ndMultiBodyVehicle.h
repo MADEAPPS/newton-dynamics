@@ -32,6 +32,7 @@ class ndMultiBodyVehicleGearBox;
 class ndMultiBodyVehicleTireJoint;
 class ndMultiBodyVehicleTorsionBar;
 class ndMultiBodyVehicleDifferential;
+class ndMultiBodyVehicleDifferentialAxle;
 
 #define dRadPerSecToRpm dFloat32(9.55f)
 
@@ -59,7 +60,10 @@ class ndMultiBodyVehicle: public ndModel
 		dFloat32 CalculateFactor(const ndSpeedForcePair* const entry) const;
 	
 		dFloat32 m_gravity;
+		dFloat32 m_suspensionStiffnessModifier;
 		ndSpeedForcePair m_downForceTable[5];
+		friend class ndMultiBodyVehicle;
+		friend class ndMultiBodyVehicleTireJoint;
 	};
 
 	D_CLASS_REFLECTION(ndMultiBodyVehicle);
@@ -97,6 +101,7 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	D_NEWTON_API virtual void Update(ndWorld* const world, dFloat32 timestep);
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
+	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	dMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
@@ -105,9 +110,10 @@ class ndMultiBodyVehicle: public ndModel
 	ndMultiBodyVehicleGearBox* m_gearBox;
 	ndMultiBodyVehicleTorsionBar* m_torsionBar;
 	dList<ndMultiBodyVehicleTireJoint*> m_tireList;
+	dList<ndMultiBodyVehicleDifferentialAxle*> m_axles;
 	dList<ndMultiBodyVehicleDifferential*> m_differentials;
+
 	ndDownForce m_downForce;
-	dFloat32 m_suspensionStiffnessModifier;
 	
 	friend class ndMultiBodyVehicleMotor;
 	friend class ndMultiBodyVehicleGearBox;
