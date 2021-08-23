@@ -83,8 +83,8 @@ void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 		const dVector& omega0 = m_body0->GetOmega();
 		const dVector& omega1 = m_body1->GetOmega();
 		
+		dAssert(m_chassis->m_motor);
 		ndMultiBodyVehicleMotor* const rotor = m_chassis->m_motor;
-		dAssert(rotor);
 		dFloat32 idleOmega = rotor->m_idleOmega * gearRatio * dFloat32(0.95f);
 
 		dFloat32 w0 = omega0.DotProduct(jacobian0.m_angular).GetScalar();
