@@ -180,6 +180,10 @@ class ndWorld: public dClassAlloc
 	void LoadJoints(
 		const nd::TiXmlNode* const rootNode, const char* const assetPath,
 		const ndBodyLoaderCache& bodyMap, ndJointLoaderCache& jointMap);
+	void LoadModels(
+		const nd::TiXmlNode* const rootNode, const char* const assetPath,
+		const ndBodyLoaderCache& bodyMap, const ndJointLoaderCache& jointMap,
+		ndModelLoaderCache& modelMap);
 	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();

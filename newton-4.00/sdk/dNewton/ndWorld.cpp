@@ -1274,7 +1274,34 @@ void ndWorld::SaveModels(nd::TiXmlNode* const rootNode,
 	}
 }
 
-
+void ndWorld::LoadModels(
+	const nd::TiXmlNode* const rootNode, const char* const assetPath,
+	const ndBodyLoaderCache& bodyMap, const ndJointLoaderCache& jointMap,
+	ndModelLoaderCache& modelMap)
+{
+	const nd::TiXmlNode* const models = rootNode->FirstChild("ndModels");
+	if (models)
+	{
+		dLoadSaveBase::dLoadDescriptor descriptor;
+		descriptor.m_assetPath = assetPath;
+		descriptor.m_bodyMap = &bodyMap;
+		descriptor.m_jointMap = &jointMap;
+	
+		for (const nd::TiXmlNode* node = models->FirstChild(); node; node = node->NextSibling())
+		{
+			const char* const name = node->Value();
+			descriptor.m_rootNode = node;
+	//		ndJointBilateralConstraint* const joint = D_CLASS_REFLECTION_LOAD_NODE(ndJointBilateralConstraint, name, descriptor);
+	//		if (joint)
+	//		{
+	//			dInt32 hashId;
+	//			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+	//			element->Attribute("hashId", &hashId);
+	//			jointMap.Insert(joint, hashId);
+	//		}
+		}
+	}
+}
 
 void ndWorld::SaveScene(const char* const path)
 {
@@ -1367,17 +1394,20 @@ bool ndWorld::LoadScene(const char* const path)
 
 	ndBodyLoaderCache bodyMap;
 	ndJointLoaderCache jointMap;
+	ndModelLoaderCache modelMap;
 	ndShapeLoaderCache shapesMap;
 
 	LoadSceneSettings(worldNode, assetPath);
 	LoadCollisionShapes(worldNode, assetPath, shapesMap);
 	LoadRigidBodies(worldNode, assetPath, shapesMap, bodyMap);
 	LoadJoints(worldNode, assetPath, bodyMap, jointMap);
+	LoadModels(worldNode, assetPath, bodyMap, jointMap, modelMap);
 
 	dLoadSaveBase::dLoadDescriptor afterLoaddesc;
 	afterLoaddesc.m_assetPath = assetPath;
 	afterLoaddesc.m_bodyMap = &bodyMap;
 	afterLoaddesc.m_jointMap = &jointMap;
+	afterLoaddesc.m_modelMap = &modelMap;
 	afterLoaddesc.m_shapeMap = &shapesMap;
 	OnLoadScene(afterLoaddesc);
 		
