@@ -55,6 +55,7 @@ class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 	dFloat32 m_damperC;
 	dFloat32 m_springDamperRegularizer;
 	dInt32 m_axleCount;
+	friend class ndMultiBodyVehicle;
 };
 
 #endif

@@ -128,7 +128,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dLoadSaveBase::dLoadDescriptor& des
 			m_gearBox = (ndMultiBodyVehicleGearBox*)desc.m_jointMap->Find(hash)->GetInfo();
 			m_gearBox->m_chassis = this;
 		}
-		else if (strcmp(partName, "torsion") == 0)
+		else if (strcmp(partName, "torsionBar") == 0)
 		{
 			dAssert(0);
 			//dInt32 hash = xmlGetInt(xmlNode, "gearBox");
@@ -862,39 +862,68 @@ void ndMultiBodyVehicle::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	ndModel::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "localFrame", m_localFrame);
-	xmlSaveParam(childNode, "chassis", dInt32(desc.m_bodyMap->Find(m_chassis)->GetInfo()));
+	//xmlSaveParam(childNode, "chassis", dInt32(desc.m_bodyMap->Find(m_chassis)->GetInfo()));
+	{
+		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("chassis");
+		childNode->LinkEndChild(paramNode);
+		paramNode->SetAttribute("hashId", dInt32(desc.m_bodyMap->Find(m_chassis)->GetInfo()));
+	}
 
 	// save all wheels
 	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 	{
-		xmlSaveParam(childNode, "tire", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
+		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("tire");
+		childNode->LinkEndChild(paramNode);
+		paramNode->SetAttribute("hashId", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
 	}
 
 	// save all differentials
 	for (dList<ndMultiBodyVehicleDifferential*>::dNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())
 	{
-		xmlSaveParam(childNode, "diff", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
+		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("diff");
+		childNode->LinkEndChild(paramNode);
+		paramNode->SetAttribute("hashId", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
 	}
 
 	// save all axles
 	for (dList<ndMultiBodyVehicleDifferentialAxle*>::dNode* node = m_axleList.GetFirst(); node; node = node->GetNext())
 	{
-		xmlSaveParam(childNode, "axle", dInt32 (desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
+		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("axle");
+		childNode->LinkEndChild(paramNode);
+		paramNode->SetAttribute("hashId", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
 	}
 
 	if (m_motor)
 	{
-		xmlSaveParam(childNode, "motor", dInt32(desc.m_jointMap->Find(m_motor)->GetInfo()));
+		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("motor");
+		childNode->LinkEndChild(paramNode);
+		paramNode->SetAttribute("hashId", dInt32(desc.m_jointMap->Find(m_motor)->GetInfo()));
 	}
 
 	if (m_gearBox)
 	{
-		xmlSaveParam(childNode, "gearBox", dInt32(desc.m_jointMap->Find(m_gearBox)->GetInfo()));
+		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("gearBox");
+		childNode->LinkEndChild(paramNode);
+		paramNode->SetAttribute("hashId", dInt32(desc.m_jointMap->Find(m_gearBox)->GetInfo()));
 	}
 
 	if (m_torsionBar)
 	{
-		xmlSaveParam(childNode, "torsionBar", dInt32(desc.m_jointMap->Find(m_torsionBar)->GetInfo()));
+		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("torsionBar");
+		childNode->LinkEndChild(paramNode);
+		paramNode->SetAttribute("hashId", dInt32(desc.m_jointMap->Find(m_torsionBar)->GetInfo()));
+
+		for (dInt32 i = 0; i < m_torsionBar->m_axleCount; i++)
+		{
+			nd::TiXmlElement* const barNode = new nd::TiXmlElement("barAxle");
+			paramNode->LinkEndChild(barNode);
+
+			ndMultiBodyVehicleTorsionBar::ndAxles& axle = m_torsionBar->m_axles[i];
+			dInt32 bodyHash0 = dInt32(desc.m_bodyMap->Find(axle.m_leftTire)->GetInfo());
+			dInt32 bodyHash1 = dInt32(desc.m_bodyMap->Find(axle.m_rightTire)->GetInfo());
+			xmlSaveParam(barNode, "bodyHash0", bodyHash0);
+			xmlSaveParam(barNode, "bodyHash1", bodyHash1);
+		}
 	}
 
 	m_downForce.Save(childNode);
