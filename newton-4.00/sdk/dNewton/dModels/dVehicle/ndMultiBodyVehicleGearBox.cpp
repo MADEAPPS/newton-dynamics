@@ -26,6 +26,8 @@
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleGearBox)
+
 ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, const ndMultiBodyVehicle* const chassis)
 	:ndJointGear(dFloat32 (1.0f), motor->GetMatrix().m_front, differential,	motor->GetMatrix().m_front, motor)
 	,m_chassis(chassis)
@@ -35,6 +37,19 @@ ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const moto
 	SetRatio(dFloat32(0.0f));
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
+
+ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointGear(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_chassis(nullptr)
+	,m_clutchTorque(dFloat32(1.0e5f))
+	,m_driveTrainResistanceTorque(dFloat32(1000.0f))
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_clutchTorque = xmlGetFloat(xmlNode, "clutchTorque");
+	m_driveTrainResistanceTorque = xmlGetFloat(xmlNode, "driveTrainResistanceTorque");
+}
+
 
 void ndMultiBodyVehicleGearBox::SetClutchTorque(dFloat32 torqueInNewtonMeters)
 {
@@ -92,4 +107,17 @@ void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
+void ndMultiBodyVehicleGearBox::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
+	//dInt32 parentBody = desc.m_shapeMap->Find(m_chassis)->GetInfo();
+	//xmlSaveParam(childNode, "limitedSlipOmega", m_limitedSlipOmega);
+	//const ndMultiBodyVehicle* m_chassis;
+
+	xmlSaveParam(childNode, "clutchTorque", m_clutchTorque);
+	xmlSaveParam(childNode, "driveTrainResistanceTorque", m_driveTrainResistanceTorque);
+}

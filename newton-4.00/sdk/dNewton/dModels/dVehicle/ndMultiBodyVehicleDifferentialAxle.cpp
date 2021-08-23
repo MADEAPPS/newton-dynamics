@@ -23,6 +23,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndMultiBodyVehicleDifferentialAxle.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleDifferentialAxle)
+
 ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle(
 	const dVector& pin0, const dVector& upPin, ndBodyKinematic* const differentialBody0,
 	const dVector& pin1, ndBodyKinematic* const body1)
@@ -34,6 +36,11 @@ ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle(
 	CalculateLocalMatrix(matrix0, m_localMatrix0, temp);
 	CalculateLocalMatrix(matrix1, temp, m_localMatrix1);
 	SetSolverModel(m_jointkinematicCloseLoop);
+}
+
+ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+{
 }
 
 void ndMultiBodyVehicleDifferentialAxle::JacobianDerivative(ndConstraintDescritor& desc)
@@ -56,4 +63,12 @@ void ndMultiBodyVehicleDifferentialAxle::JacobianDerivative(ndConstraintDescrito
 	const dVector relOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
 	dFloat32 w = (relOmega.m_x + relOmega.m_y + relOmega.m_z) * dFloat32(0.5f);
 	SetMotorAcceleration(desc, -w * desc.m_invTimestep);
+}
+
+void ndMultiBodyVehicleDifferentialAxle::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 }

@@ -13,6 +13,51 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointWheel.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointWheel)
+
+void ndWheelDescriptor::Load(const nd::TiXmlNode* const xmlNode)
+{
+	const nd::TiXmlNode* childNode = nullptr;
+	for (const nd::TiXmlNode* node = xmlNode->FirstChild(); node; node = node->NextSibling())
+	{
+		const char* const name = node->Value();
+		if (strcmp(name, "ndTireInfo") == 0)
+		{
+			childNode = node;
+			break;
+		}
+	}
+	
+	dAssert(childNode);
+	m_springK = xmlGetFloat(childNode, "springK");
+	m_damperC = xmlGetFloat(childNode, "damperC");
+	m_upperStop = xmlGetFloat(childNode, "upperStop");
+	m_lowerStop = xmlGetFloat(childNode, "lowerStop");
+	m_regularizer = xmlGetFloat(childNode, "regularizer");
+	m_brakeTorque = xmlGetFloat(childNode, "brakeTorque");
+	m_handBrakeTorque = xmlGetFloat(childNode, "handBrakeTorque");
+	m_steeringAngle = xmlGetFloat(childNode, "steeringAngle");
+	m_laterialStiffness = xmlGetFloat(childNode, "laterialStiffness");
+	m_longitudinalStiffness = xmlGetFloat(childNode, "longitudinalStiffness");
+}
+
+void ndWheelDescriptor::Save(nd::TiXmlNode* const xmlNode) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement("ndTireInfo");
+	xmlNode->LinkEndChild(childNode);
+
+	xmlSaveParam(childNode, "springK", m_springK);
+	xmlSaveParam(childNode, "damperC", m_damperC);
+	xmlSaveParam(childNode, "upperStop", m_upperStop);
+	xmlSaveParam(childNode, "lowerStop", m_lowerStop);
+	xmlSaveParam(childNode, "regularizer", m_regularizer);
+	xmlSaveParam(childNode, "brakeTorque", m_brakeTorque);
+	xmlSaveParam(childNode, "handBrakeTorque", m_handBrakeTorque);
+	xmlSaveParam(childNode, "steeringAngle", m_steeringAngle);
+	xmlSaveParam(childNode, "laterialStiffness", m_laterialStiffness);
+	xmlSaveParam(childNode, "longitudinalStiffness", m_longitudinalStiffness);
+}
+
 ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	,m_baseFrame(m_localMatrix1)
@@ -24,6 +69,27 @@ ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 	,m_normalidedSteering(dFloat32(0.0f))
 	,m_normalizedHandBrake(dFloat32(0.0f))
 {
+}
+
+ndJointWheel::ndJointWheel(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_baseFrame(dGetIdentityMatrix())
+	,m_info()
+	,m_posit(dFloat32(0.0f))
+	,m_speed(dFloat32(0.0f))
+	,m_regularizer(0.0f)
+	,m_normalizedBrake(dFloat32(0.0f))
+	,m_normalidedSteering(dFloat32(0.0f))
+	,m_normalizedHandBrake(dFloat32(0.0f))
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_info.Load(desc.m_rootNode);
+	m_baseFrame = xmlGetMatrix(xmlNode, "baseFrame");
+	m_regularizer = xmlGetFloat(xmlNode, "regularizer");
+	m_normalizedBrake = xmlGetFloat(xmlNode, "normalizedBrake");
+	m_normalidedSteering = xmlGetFloat(xmlNode, "normalidedSteering");
+	m_normalizedHandBrake = xmlGetFloat(xmlNode, "normalizedHandBrake");
 }
 
 ndJointWheel::~ndJointWheel()
@@ -142,4 +208,19 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		SetMotorAcceleration(desc, stopAccel);
 		SetHighFriction(desc, dFloat32(0.0f));
 	}
+}
+
+void ndJointWheel::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	m_info.Save(childNode);
+	xmlSaveParam(childNode, "baseFrame", m_baseFrame);
+	xmlSaveParam(childNode, "regularizer", m_regularizer);
+	xmlSaveParam(childNode, "normalizedBrake", m_normalizedBrake);
+	xmlSaveParam(childNode, "normalidedSteering", m_normalidedSteering);
+	xmlSaveParam(childNode, "normalizedHandBrake", m_normalizedHandBrake);
 }

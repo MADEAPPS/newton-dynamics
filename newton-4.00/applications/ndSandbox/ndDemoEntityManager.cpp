@@ -47,13 +47,13 @@
 //#define DEFAULT_SCENE	9		// static user mesh collision 
 //#define DEFAULT_SCENE	10		// basic joints
 //#define DEFAULT_SCENE	11		// basic rag doll
-#define DEFAULT_SCENE	12		// active rag doll
-//#define DEFAULT_SCENE	14		// basic vehicle
-//#define DEFAULT_SCENE	15		// heavy vehicle
-//#define DEFAULT_SCENE	16		// simple voronoi fracture
-//#define DEFAULT_SCENE	17		// basic voronoi fracture
-//#define DEFAULT_SCENE	18		// linked voronoi fracture
-//#define DEFAULT_SCENE	19		// skin peel voronoi fracture
+//#define DEFAULT_SCENE	12		// active rag doll
+#define DEFAULT_SCENE	13		// basic vehicle
+//#define DEFAULT_SCENE	14		// heavy vehicle
+//#define DEFAULT_SCENE	15		// simple voronoi fracture
+//#define DEFAULT_SCENE	16		// basic voronoi fracture
+//#define DEFAULT_SCENE	17		// linked voronoi fracture
+//#define DEFAULT_SCENE	18		// skin peel voronoi fracture
 						 
 // demos forward declaration 
 void ndBasicStacks(ndDemoEntityManager* const scene);

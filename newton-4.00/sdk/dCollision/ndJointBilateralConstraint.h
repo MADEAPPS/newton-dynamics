@@ -231,7 +231,8 @@ inline void ndJointBilateralConstraint::SetHighFriction(ndConstraintDescritor& d
 
 inline void ndJointBilateralConstraint::JacobianDerivative(ndConstraintDescritor&)
 {
-	dAssert(0);
+	//dAssert(0);
+	dTrace(("error: this joint is an ineteface\n"));
 }
 
 inline void ndJointBilateralConstraint::SetSkeletonFlag(bool flag)

@@ -29,12 +29,14 @@ class ndMultiBodyVehicleDifferentialAxle : public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndMultiBodyVehicleDifferentialAxle);
+	D_NEWTON_API ndMultiBodyVehicleDifferentialAxle(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndMultiBodyVehicleDifferentialAxle(
 		const dVector& pin0, const dVector& upPin, ndBodyKinematic* const differentialBody0,
 		const dVector& pin1, ndBodyKinematic* const body1);
 
 	protected:
 	void JacobianDerivative(ndConstraintDescritor& desc);
+	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 	void DebugJoint(ndConstraintDebugCallback&) const {}
 };
 
