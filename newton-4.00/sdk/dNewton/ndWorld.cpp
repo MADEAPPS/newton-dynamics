@@ -1259,10 +1259,6 @@ void ndWorld::SaveModels(nd::TiXmlNode* const rootNode,
 		for (ndModelList::dNode* modelNode = modelList.GetFirst(); modelNode; modelNode = modelNode->GetNext())
 		{
 			ndModel* const model = modelNode->GetInfo();
-			//dInt32 bodyHash0 = bodyMap.Find(joint->GetBody0())->GetInfo();
-			//dInt32 bodyHash1 = (joint->GetBody1() == GetSentinelBody()) ? 0 : bodyMap.Find(joint->GetBody1())->GetInfo();
-			//descriptor.m_body0NodeHash = bodyHash0;
-			//descriptor.m_body1NodeHash = bodyHash1;
 			descriptor.m_nodeNodeHash = modelIndex;
 			model->Save(descriptor);
 			modelMap.Insert(modelIndex, model);

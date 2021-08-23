@@ -70,8 +70,60 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dLoadSaveBase::dLoadDescriptor& des
 	,m_differentialList()
 	,m_downForce()
 {
-	dAssert(0);
 	m_tireShape->AddRef();
+	
+	//xmlSaveParam(xmlNode, "localFrame", m_localFrame);
+	//xmlSaveParam(xmlNode, "chassis", dInt32(desc.m_bodyMap->Find(m_chassis)->GetInfo()));
+	//
+	//// save all wheels
+	//for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	//{
+	//	xmlSaveParam(xmlNode, "tire", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
+	//}
+	//
+	//// save all differentials
+	//for (dList<ndMultiBodyVehicleDifferential*>::dNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())
+	//{
+	//	xmlSaveParam(xmlNode, "diff", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
+	//}
+	//
+	//// save all axles
+	//for (dList<ndMultiBodyVehicleDifferentialAxle*>::dNode* node = m_axleList.GetFirst(); node; node = node->GetNext())
+	//{
+	//	xmlSaveParam(xmlNode, "axle", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
+	//}
+	//
+	//if (m_motor)
+	//{
+	//	xmlSaveParam(xmlNode, "motor", dInt32(desc.m_jointMap->Find(m_motor)->GetInfo()));
+	//}
+	//
+	//if (m_gearBox)
+	//{
+	//	xmlSaveParam(childNode, "gearBox", dInt32(desc.m_jointMap->Find(m_gearBox)->GetInfo()));
+	//}
+	//
+	//if (m_torsionBar)
+	//{
+	//	xmlSaveParam(childNode, "torsionBar", dInt32(desc.m_jointMap->Find(m_torsionBar)->GetInfo()));
+	//}
+	//
+	//m_downForce.Save(childNode);
+
+	dAssert(0);
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	for (const nd::TiXmlNode* node = xmlNode->FirstChild(); node; node = node->NextSibling())
+	{
+		const char* const partName = node->Value();
+		if (strcmp(partName, "localFrame"))
+		{
+			dAssert(0);
+		}
+		else
+		{
+			dAssert(0);
+		}
+	}
 }
 
 ndMultiBodyVehicle::~ndMultiBodyVehicle()
