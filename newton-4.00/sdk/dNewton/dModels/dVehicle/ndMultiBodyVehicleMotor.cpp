@@ -27,6 +27,8 @@
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleGearBox.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleMotor)
+
 ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel)
 	:ndJointBilateralConstraint(3, motor, vehicelModel->m_chassis, motor->GetMatrix())
 	,m_omega(dFloat32(0.0f))
@@ -38,6 +40,23 @@ ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, n
 	,m_startEngine(false)
 {
 }
+
+ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_omega(dFloat32(0.0f))
+	,m_idleOmega(dFloat32(0.0f))
+	,m_throttle(dFloat32(0.0f))
+	,m_engineTorque(dFloat32(0.0f))
+	,m_fuelValveRate(dFloat32(10.0f))
+	,m_vehicelModel(nullptr)
+	,m_startEngine(false)
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	m_maxOmega = xmlGetFloat(xmlNode, "maxOmega");
+	m_idleOmega = xmlGetFloat(xmlNode, "idleOmega");
+	m_fuelValveRate = xmlGetFloat(xmlNode, "fuelValveRate");
+}
+
 
 void ndMultiBodyVehicleMotor::AlignMatrix()
 {
@@ -123,6 +142,7 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	if (m_startEngine)
 	{
 		const ndMultiBodyVehicleGearBox* const gearBox = m_vehicelModel->m_gearBox;
+		dAssert(gearBox);
 		if (gearBox && dAbs(gearBox->GetRatio()) > dFloat32(0.0f))
 		{
 			ndJacobian& jacobian = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
@@ -159,3 +179,14 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
+void ndMultiBodyVehicleMotor::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "maxOmega", m_maxOmega);
+	xmlSaveParam(childNode, "idleOmega", m_idleOmega);
+	xmlSaveParam(childNode, "fuelValveRate", m_fuelValveRate);
+}

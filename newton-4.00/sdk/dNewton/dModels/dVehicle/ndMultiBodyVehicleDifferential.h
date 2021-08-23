@@ -39,9 +39,9 @@ class ndMultiBodyVehicleDifferential : public ndJointBilateralConstraint
 
 	protected:
 	void AlignMatrix();
+	void DebugJoint(ndConstraintDebugCallback&) const {}
 	void JacobianDerivative(ndConstraintDescritor& desc);
 	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
-	void DebugJoint(ndConstraintDebugCallback&) const {}
 
 	friend class ndMultiBodyVehicle;
 	dFloat32 m_limitedSlipOmega;

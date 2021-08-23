@@ -27,16 +27,37 @@
 #include "ndMultiBodyVehicleMotor.h"
 #include "ndMultiBodyVehicleTorsionBar.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleTorsionBar)
+
 ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehicle* const vehicle, ndBodyDynamic* const fixedbody)
 	:ndJointBilateralConstraint(1, vehicle->m_chassis, fixedbody, dGetIdentityMatrix())
 	,m_springK(dFloat32 (10.0f))
 	,m_damperC(dFloat32(1.0f))
 	,m_springDamperRegularizer(dFloat32(0.1f))
-	,m_axeldCount(0)
+	,m_axleCount(0)
 {
 	const dMatrix worldMatrix (vehicle->m_localFrame * vehicle->m_chassis->GetMatrix());
 	CalculateLocalMatrix(worldMatrix, m_localMatrix0, m_localMatrix1);
 	SetSolverModel(m_jointkinematicCloseLoop);
+}
+
+ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_springK(dFloat32(10.0f))
+	,m_damperC(dFloat32(1.0f))
+	,m_springDamperRegularizer(dFloat32(0.1f))
+	,m_axleCount(0)
+
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_springK = xmlGetFloat(xmlNode, "springK");
+	m_damperC = xmlGetFloat(xmlNode, "damperC");
+	m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
+	m_axleCount = xmlGetInt(xmlNode, "axleCount");
+
+	dTrace(("***** for now vehicle are not saving the axel count\n"));
+	m_axleCount = 0;
 }
 
 void ndMultiBodyVehicleTorsionBar::SetTorsionTorque(dFloat32 springK, dFloat32 damperC, dFloat32 springDamperRegularizer)
@@ -48,18 +69,18 @@ void ndMultiBodyVehicleTorsionBar::SetTorsionTorque(dFloat32 springK, dFloat32 d
 
 void ndMultiBodyVehicleTorsionBar::AddAxel(const ndBodyKinematic* const leftTire, const ndBodyKinematic* const rightTire)
 {
-	if (m_axeldCount < dInt32 (sizeof(m_axles) / sizeof(m_axles[0])))
+	if (m_axleCount < dInt32 (sizeof(m_axles) / sizeof(m_axles[0])))
 	{
-		m_axles[m_axeldCount].m_axleAngle = dFloat32(0.0f);
-		m_axles[m_axeldCount].m_leftTire = leftTire;
-		m_axles[m_axeldCount].m_rightTire = rightTire;
-		m_axeldCount++;
+		m_axles[m_axleCount].m_axleAngle = dFloat32(0.0f);
+		m_axles[m_axleCount].m_leftTire = leftTire;
+		m_axles[m_axleCount].m_rightTire = rightTire;
+		m_axleCount++;
 	}
 }
 
 void ndMultiBodyVehicleTorsionBar::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	if (m_axeldCount)
+	if (m_axleCount)
 	{
 		dMatrix matrix0;
 		dMatrix matrix1;
@@ -69,7 +90,7 @@ void ndMultiBodyVehicleTorsionBar::JacobianDerivative(ndConstraintDescritor& des
 	
 		dFloat32 angle = dFloat32(0.0f);
 		dFloat32 omega = dFloat32(0.0f);
-		for (dInt32 i = 0; i < m_axeldCount; i++)
+		for (dInt32 i = 0; i < m_axleCount; i++)
 		{
 			dVector dir(m_axles[i].m_rightTire->GetMatrix().m_posit - m_axles[i].m_leftTire->GetMatrix().m_posit);
 			dir = dir.Normalize();
@@ -77,8 +98,8 @@ void ndMultiBodyVehicleTorsionBar::JacobianDerivative(ndConstraintDescritor& des
 			omega += (angle - m_axles[i].m_axleAngle) * desc.m_invTimestep;
 			m_axles[i].m_axleAngle = angle;
 		}
-		angle = angle / m_axeldCount;
-		omega = omega / m_axeldCount;
+		angle = angle / m_axleCount;
+		omega = omega / m_axleCount;
 		//dTrace(("%f\n", angle * dRadToDegree));
 		AddAngularRowJacobian(desc, matrix0.m_front, dFloat32(0.0f));
 		dFloat32 accel = -CalculateSpringDamperAcceleration(desc.m_timestep, 300.0f, angle, dFloat32(10.0f), omega);
@@ -87,4 +108,15 @@ void ndMultiBodyVehicleTorsionBar::JacobianDerivative(ndConstraintDescritor& des
 	}
 }
 
+void ndMultiBodyVehicleTorsionBar::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
+	xmlSaveParam(childNode, "springK", m_springK);
+	xmlSaveParam(childNode, "damperC", m_damperC);
+	xmlSaveParam(childNode, "springDamperRegularizer", m_springDamperRegularizer);
+	xmlSaveParam(childNode, "axleCount", m_axleCount);
+}

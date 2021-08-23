@@ -31,6 +31,7 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndMultiBodyVehicleMotor);
+	D_NEWTON_API ndMultiBodyVehicleMotor(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel);
 
 	bool GetStart() const;
@@ -48,6 +49,7 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 	void AlignMatrix();
 	void DebugJoint(ndConstraintDebugCallback&) const {}
 	void JacobianDerivative(ndConstraintDescritor& desc);
+	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 	dFloat32 CalculateAcceleration(ndConstraintDescritor& desc);
 
 	protected:
