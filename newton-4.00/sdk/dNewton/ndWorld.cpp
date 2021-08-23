@@ -1237,6 +1237,41 @@ void ndWorld::LoadJoints(const nd::TiXmlNode* const rootNode,
 	}
 }
 
+void ndWorld::SaveModels(nd::TiXmlNode* const rootNode,
+	const char* const assetPath, const char* const assetName,
+	const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,
+	const dTree<dUnsigned32, const ndJointBilateralConstraint*>& jointMap,
+	dTree<dUnsigned32, const ndModel*>& modelMap)
+{
+	const ndModelList& modelList = GetModelList();
+	if (modelList.GetCount())
+	{
+		dInt32 modelIndex = 0;
+		nd::TiXmlElement* const modelsNode = new nd::TiXmlElement("ndModels");
+		rootNode->LinkEndChild(modelsNode);
+		dLoadSaveBase::dSaveDescriptor descriptor;
+		descriptor.m_assetPath = assetPath;
+		descriptor.m_assetName = assetName;
+		descriptor.m_rootNode = modelsNode;
+		descriptor.m_bodyMap = &bodyMap;
+		descriptor.m_jointMap = &jointMap;
+	
+		for (ndModelList::dNode* modelNode = modelList.GetFirst(); modelNode; modelNode = modelNode->GetNext())
+		{
+			ndModel* const model = modelNode->GetInfo();
+			//dInt32 bodyHash0 = bodyMap.Find(joint->GetBody0())->GetInfo();
+			//dInt32 bodyHash1 = (joint->GetBody1() == GetSentinelBody()) ? 0 : bodyMap.Find(joint->GetBody1())->GetInfo();
+			//descriptor.m_body0NodeHash = bodyHash0;
+			//descriptor.m_body1NodeHash = bodyHash1;
+			descriptor.m_nodeNodeHash = modelIndex;
+			model->Save(descriptor);
+			modelMap.Insert(modelIndex, model);
+			modelIndex++;
+		}
+	}
+}
+
+
 
 void ndWorld::SaveScene(const char* const path)
 {
@@ -1282,13 +1317,16 @@ void ndWorld::SaveScene(const char* const path)
 	strcat(assetName, "_asset");
 
 	dTree<dUnsigned32, const ndShape*> shapeMap;
+	dTree<dUnsigned32, const ndModel*> modelMap;
 	dTree<dUnsigned32, const ndBodyKinematic*> bodyMap;
 	dTree<dUnsigned32, const ndJointBilateralConstraint*> jointMap;
+	
 
 	SaveSceneSettings(worldNode, assetPath, assetName);
 	SaveCollisionShapes(worldNode, assetPath, assetName, shapeMap);
 	SaveRigidBodies(worldNode, assetPath, assetName, shapeMap, bodyMap);
 	SaveJoints(worldNode, assetPath, assetName, bodyMap, jointMap);
+	SaveModels(worldNode, assetPath, assetName, bodyMap, jointMap, modelMap);
 
 	asciifile.SaveFile(path);
 	setlocale(LC_ALL, oldloc);

@@ -54,14 +54,15 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 	m_localFrame.m_up = m_localFrame.m_right.CrossProduct(m_localFrame.m_front).Normalize();
 }
 
-ndMultiBodyVehicle::ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode)
-	:ndModel(xmlNode)
+ndMultiBodyVehicle::ndMultiBodyVehicle(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndModel(dLoadSaveBase::dLoadDescriptor(desc))
 	,m_localFrame(dGetIdentityMatrix())
 	,m_chassis(nullptr)
 	,m_tireShape(new ndShapeChamferCylinder(dFloat32(0.75f), dFloat32(0.5f)))
 	,m_tireList()
 	,m_suspensionStiffnessModifier(dFloat32(1.0f))
 {
+	dAssert(0);
 	m_tireShape->AddRef();
 }
 

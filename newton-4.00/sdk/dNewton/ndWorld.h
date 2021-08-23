@@ -163,6 +163,11 @@ class ndWorld: public dClassAlloc
 		const char* const assetPath, const char* const assetName,
 		const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,
 		dTree<dUnsigned32, const ndJointBilateralConstraint*>& jointMap);
+	void SaveModels(nd::TiXmlNode* const rootNode,
+		const char* const assetPath, const char* const assetName,
+		const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,
+		const dTree<dUnsigned32, const ndJointBilateralConstraint*>& jointMap,
+		dTree<dUnsigned32, const ndModel*>& modelMap);
 
 	void LoadSceneSettings(
 		const nd::TiXmlNode* const rootNode, const char* const assetPath) const;

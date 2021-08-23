@@ -62,11 +62,11 @@ class ndMultiBodyVehicle: public ndModel
 		ndSpeedForcePair m_downForceTable[5];
 	};
 
+	D_CLASS_REFLECTION(ndMultiBodyVehicle);
+	D_NEWTON_API ndMultiBodyVehicle(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndMultiBodyVehicle(const dVector& frontDir, const dVector& upDir);
-	D_NEWTON_API ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode);
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
 
-	D_CLASS_REFLECTION(ndMultiBodyVehicle);
 	ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 	virtual dFloat32 GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const;
 

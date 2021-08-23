@@ -39,8 +39,8 @@ ndCharacter::ndCharacter()
 {
 }
 
-ndCharacter::ndCharacter(const nd::TiXmlNode* const xmlNode)
-	:ndModel(xmlNode)
+ndCharacter::ndCharacter(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndModel(dLoadSaveBase::dLoadDescriptor(desc))
 {
 	dAssert(0);
 }

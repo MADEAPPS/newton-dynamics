@@ -28,6 +28,7 @@
 
 class ndBody;
 class ndShape;
+class ndBodyKinematic;
 class ndShapeInstance;
 class ndJointBilateralConstraint;
 
@@ -87,6 +88,8 @@ class dLoadSaveBase
 			,m_body0NodeHash(0)
 			,m_body1NodeHash(0)
 			,m_shapeMap(nullptr)
+			,m_bodyMap(nullptr)
+			,m_jointMap(nullptr)
 		{
 		}
 
@@ -100,6 +103,8 @@ class dLoadSaveBase
 			,m_body0NodeHash(desc.m_body0NodeHash)
 			,m_body1NodeHash(desc.m_body1NodeHash)
 			,m_shapeMap(desc.m_shapeMap)
+			,m_bodyMap(desc.m_bodyMap)
+			,m_jointMap(desc.m_jointMap)
 		{
 		}
 
@@ -112,6 +117,8 @@ class dLoadSaveBase
 		dInt32 m_body0NodeHash;
 		dInt32 m_body1NodeHash;
 		dTree<dUnsigned32, const ndShape*>* m_shapeMap;
+		const dTree<dUnsigned32, const ndBodyKinematic*>* m_bodyMap;
+		const dTree<dUnsigned32, const ndJointBilateralConstraint*>* m_jointMap;
 	};
 
 	virtual void* CreateClass(const dLoadDescriptor&)

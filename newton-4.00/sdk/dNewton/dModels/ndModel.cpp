@@ -24,10 +24,18 @@
 #include "ndWorld.h"
 #include "ndModel.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndModel)
 
-ndModel::ndModel(const nd::TiXmlNode* const)
+ndModel::ndModel(const dLoadSaveBase::dLoadDescriptor& desc)
 	:dClassAlloc()
 	,m_node(nullptr)
 {
 	dAssert(0);
+}
+
+void ndModel::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 }

@@ -48,7 +48,7 @@ class ndCharacter: public ndModel
 	D_CLASS_REFLECTION(ndCharacter);
 
 	D_NEWTON_API ndCharacter();
-	D_NEWTON_API ndCharacter(const nd::TiXmlNode* const xmlNode);
+	D_NEWTON_API ndCharacter(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API virtual ~ndCharacter ();
 
 	D_NEWTON_API ndCharacterRootNode* CreateRoot(ndBodyDynamic* const body);
