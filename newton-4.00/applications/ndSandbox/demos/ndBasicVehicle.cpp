@@ -201,13 +201,13 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		// and attach them to the chassis with a tire joints
 		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rr_tire");
 		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_rearTire, "rl_tire");
-		ndMultiBodyVehicleTireJoint* const rr_tire = AddTire(world, m_configuration.m_rearTire, rr_tire_body);
-		ndMultiBodyVehicleTireJoint* const rl_tire = AddTire(world, m_configuration.m_rearTire, rl_tire_body);
+		ndMultiBodyVehicleTireJoint* const rr_tire = AddTire(m_configuration.m_rearTire, rr_tire_body);
+		ndMultiBodyVehicleTireJoint* const rl_tire = AddTire(m_configuration.m_rearTire, rl_tire_body);
 
 		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fr_tire");
 		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, m_configuration.m_frontTire, "fl_tire");
-		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(world, m_configuration.m_frontTire, fr_tire_body);
-		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(world, m_configuration.m_frontTire, fl_tire_body);
+		ndMultiBodyVehicleTireJoint* const fr_tire = AddTire(m_configuration.m_frontTire, fr_tire_body);
+		ndMultiBodyVehicleTireJoint* const fl_tire = AddTire(m_configuration.m_frontTire, fl_tire_body);
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
@@ -223,21 +223,21 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		{
 			case ndVehicleDectriptor::m_rearWheelDrive:
 			{
-				differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire, rr_tire, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+				differential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire, rr_tire, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
 				break;
 			}
 
 			case ndVehicleDectriptor::m_frontWheelDrive:
 			{
-				differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire, fr_tire, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+				differential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire, fr_tire, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
 				break;
 			}
 
 			case ndVehicleDectriptor::m_fourWheeldrive:
 			{
-				ndMultiBodyVehicleDifferential* const rearDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire, rr_tire, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
-				ndMultiBodyVehicleDifferential* const frontDifferential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire, fr_tire, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
-				differential = AddDifferential(world, m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential, frontDifferential, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+				ndMultiBodyVehicleDifferential* const rearDifferential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire, rr_tire, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+				ndMultiBodyVehicleDifferential* const frontDifferential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire, fr_tire, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
+				differential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential, frontDifferential, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
 				break;
 			}
 
@@ -249,11 +249,11 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		}
 
 		// add a motor
-		ndMultiBodyVehicleMotor* const motor = AddMotor(world, m_configuration.m_motorMass, m_configuration.m_motorRadius);
+		ndMultiBodyVehicleMotor* const motor = AddMotor(m_configuration.m_motorMass, m_configuration.m_motorRadius);
 		motor->SetRpmLimits(m_configuration.m_engine.GetIdleRadPerSec() * 9.55f, m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
 
 		// add the gear box
-		AddGearBox(world, m_motor, differential);
+		AddGearBox(m_motor, differential);
 
 		switch (m_configuration.m_torsionBarType)
 		{
@@ -265,7 +265,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 			case ndVehicleDectriptor::m_rearWheelAxle:
 			{
-				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world);
+				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world->GetSentinelBody());
 				torsionBar->AddAxel(rl_tire->GetBody0(), rr_tire->GetBody0());
 				torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
 				break;
@@ -273,7 +273,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 			case ndVehicleDectriptor::m_frontWheelAxle:
 			{
-				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world);
+				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world->GetSentinelBody());
 				torsionBar->AddAxel(fl_tire->GetBody0(), fr_tire->GetBody0());
 				torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
 				break;
@@ -281,7 +281,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 			case ndVehicleDectriptor::m_fourWheelAxle:
 			{
-				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world);
+				ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world->GetSentinelBody());
 				torsionBar->AddAxel(rl_tire->GetBody0(), rr_tire->GetBody0());
 				torsionBar->AddAxel(fl_tire->GetBody0(), fr_tire->GetBody0());
 				torsionBar->SetTorsionTorque(m_configuration.m_torsionBarSpringK, m_configuration.m_torsionBarDamperC, m_configuration.m_torsionBarRegularizer);
@@ -380,7 +380,6 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		body->SetCollisionShape(*chassisCollision);
 		body->SetMassMatrix(mass, *chassisCollision);
 
-		world->AddBody(body);
 		delete chassisCollision;
 		return body;
 	}

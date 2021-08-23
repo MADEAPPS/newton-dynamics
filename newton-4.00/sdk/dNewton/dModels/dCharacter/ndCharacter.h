@@ -51,6 +51,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API ndCharacter(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API virtual ~ndCharacter ();
 
+	D_NEWTON_API virtual void AddToWorld(ndWorld* const world);
 	D_NEWTON_API ndCharacterRootNode* CreateRoot(ndBodyDynamic* const body);
 	D_NEWTON_API ndCharacterForwardDynamicNode* CreateForwardDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
 	D_NEWTON_API ndCharacterInverseDynamicNode* CreateInverseDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);

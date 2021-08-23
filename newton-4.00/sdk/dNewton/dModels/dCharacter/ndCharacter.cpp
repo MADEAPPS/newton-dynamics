@@ -53,6 +53,11 @@ ndCharacter::~ndCharacter()
 	}
 }
 
+void ndCharacter::AddToWorld(ndWorld* const)
+{
+	dAssert(0);
+}
+
 ndCharacterRootNode* ndCharacter::CreateRoot(ndBodyDynamic* const body)
 {
 	m_rootNode = new ndCharacterRootNode(this, body);

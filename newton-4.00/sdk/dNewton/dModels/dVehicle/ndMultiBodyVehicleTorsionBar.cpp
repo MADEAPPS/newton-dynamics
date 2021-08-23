@@ -47,7 +47,6 @@ ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const dLoadSaveBase::
 	,m_damperC(dFloat32(1.0f))
 	,m_springDamperRegularizer(dFloat32(0.1f))
 	,m_axleCount(0)
-
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 

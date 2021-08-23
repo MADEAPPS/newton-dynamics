@@ -129,6 +129,116 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dLoadSaveBase::dLoadDescriptor& des
 ndMultiBodyVehicle::~ndMultiBodyVehicle()
 {
 	m_tireShape->Release();
+
+	if (m_torsionBar)
+	{
+		delete(m_torsionBar);
+	}
+	if (m_gearBox)
+	{
+		delete(m_gearBox);
+	}
+	if (m_motor)
+	{
+		ndBodyKinematic* const motorBody = m_motor->GetBody0();
+		delete(m_motor);
+		delete(motorBody);
+	}
+	for (dList<ndMultiBodyVehicleDifferentialAxle*>::dNode* node = m_axleList.GetFirst(); node; node = node->GetNext())
+	{
+		ndMultiBodyVehicleDifferentialAxle* const joint = node->GetInfo();
+		delete (joint);
+	}
+	for (dList<ndMultiBodyVehicleDifferential*>::dNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())
+	{
+		ndMultiBodyVehicleDifferential* const joint = node->GetInfo();
+		ndBodyKinematic* const diffBody = joint->GetBody0();
+		delete(joint);
+		delete(diffBody);
+	}
+	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	{
+		ndMultiBodyVehicleTireJoint* const joint = node->GetInfo();
+		ndBodyKinematic* const tireBody = joint->GetBody0();
+		delete(joint);
+		delete(tireBody);
+	}
+	delete(m_chassis);
+}
+
+void ndMultiBodyVehicle::AddToWorld(ndWorld* const world)
+{
+	world->AddBody(m_chassis);
+	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	{
+		ndMultiBodyVehicleTireJoint* const joint = node->GetInfo();
+		world->AddBody(joint->GetBody0());
+		world->AddJoint(joint);
+	}
+
+	for (dList<ndMultiBodyVehicleDifferential*>::dNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())
+	{
+		ndMultiBodyVehicleDifferential* const joint = node->GetInfo();
+		world->AddBody(joint->GetBody0());
+		world->AddJoint(joint);
+	}
+
+	for (dList<ndMultiBodyVehicleDifferentialAxle*>::dNode* node = m_axleList.GetFirst(); node; node = node->GetNext())
+	{
+		ndMultiBodyVehicleDifferentialAxle* const joint = node->GetInfo();
+		world->AddJoint(joint);
+	}
+
+	if (m_motor)
+	{
+		world->AddBody(m_motor->GetBody0());
+		world->AddJoint(m_motor);
+	}
+
+	if (m_gearBox)
+	{
+		world->AddJoint(m_gearBox);
+	}
+
+	if (m_torsionBar)
+	{
+		world->AddJoint(m_torsionBar);
+	}
+}
+
+void ndMultiBodyVehicle::RemoveFromToWorld(ndWorld* const world)
+{
+	if (m_torsionBar)
+	{
+		world->RemoveJoint(m_torsionBar);
+	}
+	if (m_gearBox)
+	{
+		world->RemoveJoint(m_gearBox);
+	}
+	if (m_motor)
+	{
+		world->RemoveJoint(m_motor);
+		world->RemoveBody(m_motor->GetBody0());
+	}
+	for (dList<ndMultiBodyVehicleDifferentialAxle*>::dNode* node = m_axleList.GetFirst(); node; node = node->GetNext())
+	{
+		ndMultiBodyVehicleDifferentialAxle* const joint = node->GetInfo();
+		world->RemoveJoint(joint);
+	}
+	for (dList<ndMultiBodyVehicleDifferential*>::dNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())
+	{
+		ndMultiBodyVehicleDifferential* const joint = node->GetInfo();
+		world->RemoveJoint(joint);
+		world->RemoveBody(joint->GetBody0());
+	}
+	for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+	{
+		ndMultiBodyVehicleTireJoint* const joint = node->GetInfo();
+		world->RemoveJoint(joint);
+		world->RemoveBody(joint->GetBody0());
+	}
+	world->RemoveBody(m_chassis);
 }
 
 dFloat32 ndMultiBodyVehicle::GetSpeed() const
@@ -143,7 +253,7 @@ void ndMultiBodyVehicle::AddChassis(ndBodyDynamic* const chassis)
 	m_chassis = chassis;
 }
 
-ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(ndWorld* const world, const ndWheelDescriptor& desc, ndBodyDynamic* const tire, ndBodyDynamic* const axleBody)
+ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndWheelDescriptor& desc, ndBodyDynamic* const tire, ndBodyDynamic* const axleBody)
 {
 	dMatrix tireFrame(dGetIdentityMatrix());
 	tireFrame.m_front = dVector(0.0f, 0.0f, 1.0f, 0.0f);
@@ -162,18 +272,17 @@ ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(ndWorld* const worl
 
 	ndMultiBodyVehicleTireJoint* const tireJoint = new ndMultiBodyVehicleTireJoint(matrix, tire, axleBody, desc, this);
 	m_tireList.Append(tireJoint);
-	world->AddJoint(tireJoint);
 
 	tire->SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32(2.0f * 360.0f) * dDegreeToRad, dFloat32(100.0f));
 	return tireJoint;
 }
 
-ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddTire(ndWorld* const world, const ndWheelDescriptor& desc, ndBodyDynamic* const tire)
+ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddTire(const ndWheelDescriptor& desc, ndBodyDynamic* const tire)
 {
-	return AddAxleTire(world, desc, tire, m_chassis);
+	return AddAxleTire(desc, tire, m_chassis);
 }
 
-ndBodyDynamic* ndMultiBodyVehicle::CreateInternalBodyPart(ndWorld* const world, dFloat32 mass, dFloat32 radius) const
+ndBodyDynamic* ndMultiBodyVehicle::CreateInternalBodyPart(dFloat32 mass, dFloat32 radius) const
 {
 	ndShapeInstance diffCollision(new ndShapeSphere(radius));
 	diffCollision.SetCollisionMode(false);
@@ -183,18 +292,15 @@ ndBodyDynamic* ndMultiBodyVehicle::CreateInternalBodyPart(ndWorld* const world, 
 	body->SetMatrix(m_localFrame * m_chassis->GetMatrix());
 	body->SetCollisionShape(diffCollision);
 	body->SetMassMatrix(mass, diffCollision);
-	world->AddBody(body);
-
 	body->SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32(2.0f * 360.0f) * dDegreeToRad, dFloat32(100.0f));
 	return body;
 }
 
-ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndMultiBodyVehicleTireJoint* const leftTire, ndMultiBodyVehicleTireJoint* const rightTire, dFloat32 slipOmegaLock)
+ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(dFloat32 mass, dFloat32 radius, ndMultiBodyVehicleTireJoint* const leftTire, ndMultiBodyVehicleTireJoint* const rightTire, dFloat32 slipOmegaLock)
 {
-	ndBodyDynamic* const differentialBody = CreateInternalBodyPart(world, mass, radius);
+	ndBodyDynamic* const differentialBody = CreateInternalBodyPart(mass, radius);
 
 	ndMultiBodyVehicleDifferential* const differential = new ndMultiBodyVehicleDifferential(differentialBody, m_chassis, slipOmegaLock);
-	world->AddJoint(differential);
 	m_differentialList.Append(differential);
 
 	dVector pin0(differentialBody->GetMatrix().RotateVector(differential->GetLocalMatrix0().m_front));
@@ -203,21 +309,18 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndWorld* con
 
 	ndMultiBodyVehicleDifferentialAxle* const leftAxle = new ndMultiBodyVehicleDifferentialAxle(pin0, upPin, differentialBody, leftPin1, leftTire->GetBody0());
 	m_axleList.Append(leftAxle);
-	world->AddJoint(leftAxle);
 
 	ndMultiBodyVehicleDifferentialAxle* const rightAxle = new ndMultiBodyVehicleDifferentialAxle(pin0, upPin.Scale (dFloat32 (-1.0f)), differentialBody, leftPin1, rightTire->GetBody0());
 	m_axleList.Append(rightAxle);
-	world->AddJoint(rightAxle);
 
 	return differential;
 }
 
-ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndMultiBodyVehicleDifferential* const leftDifferential, ndMultiBodyVehicleDifferential* const rightDifferential, dFloat32 slipOmegaLock)
+ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(dFloat32 mass, dFloat32 radius, ndMultiBodyVehicleDifferential* const leftDifferential, ndMultiBodyVehicleDifferential* const rightDifferential, dFloat32 slipOmegaLock)
 {
-	ndBodyDynamic* const differentialBody = CreateInternalBodyPart(world, mass, radius);
+	ndBodyDynamic* const differentialBody = CreateInternalBodyPart(mass, radius);
 
 	ndMultiBodyVehicleDifferential* const differential = new ndMultiBodyVehicleDifferential(differentialBody, m_chassis, slipOmegaLock);
-	world->AddJoint(differential);
 	m_differentialList.Append(differential);
 
 	dVector pin0(differentialBody->GetMatrix().RotateVector(differential->GetLocalMatrix0().m_front));
@@ -227,38 +330,31 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(ndWorld* con
 
 	ndMultiBodyVehicleDifferentialAxle* const leftAxle = new ndMultiBodyVehicleDifferentialAxle(pin0, upPin, differentialBody, leftPin1, leftDifferential->GetBody0());
 	m_axleList.Append(leftAxle);
-	world->AddJoint(leftAxle);
 
 	ndMultiBodyVehicleDifferentialAxle* const rightAxle = new ndMultiBodyVehicleDifferentialAxle(pin0, upPin.Scale(dFloat32(-1.0f)), differentialBody, leftPin1, rightDifferential->GetBody0());
 	m_axleList.Append(rightAxle);
-	world->AddJoint(rightAxle);
 
 	return differential;
 }
 
-ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndWorld* const world, dFloat32 mass, dFloat32 radius)
+ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(dFloat32 mass, dFloat32 radius)
 {
-	//dAssert(0);
-	ndBodyDynamic* const motorBody = CreateInternalBodyPart(world, mass, radius);
-
+	ndBodyDynamic* const motorBody = CreateInternalBodyPart(mass, radius);
 	m_motor = new ndMultiBodyVehicleMotor(motorBody, this);
-	world->AddJoint(m_motor);
-
 	return m_motor;
 }
 
-ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndWorld* const world, ndMultiBodyVehicleMotor* const motor, ndMultiBodyVehicleDifferential* const differential)
+ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleMotor* const motor, ndMultiBodyVehicleDifferential* const differential)
 {
 	dAssert(m_motor == motor);
 	m_gearBox = new ndMultiBodyVehicleGearBox(motor->GetBody0(), differential->GetBody0(), this);
-	world->AddJoint(m_gearBox);
 	return m_gearBox;
 }
 
-ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndWorld* const world)
+ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyDynamic* const sentinel)
 {
-	m_torsionBar = new ndMultiBodyVehicleTorsionBar(this, world->GetSentinelBody());
-	world->AddJoint(m_torsionBar);
+	//m_torsionBar = new ndMultiBodyVehicleTorsionBar(this, world->GetSentinelBody());
+	m_torsionBar = new ndMultiBodyVehicleTorsionBar(this, sentinel);
 	return m_torsionBar;
 }
 

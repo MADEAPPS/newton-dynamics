@@ -315,7 +315,6 @@ ndBodyDynamic* ndBasicVehicle::CreateTireBody(ndDemoEntityManager* const scene, 
 {
 	dFloat32 width;
 	dFloat32 radius;
-	ndWorld* const world = scene->GetWorld();
 	ndDemoEntity* const parentEntity = (ndDemoEntity*)parentBody->GetNotifyCallback()->GetUserData();
 	CalculateTireDimensions(tireName, width, radius, parentEntity);
 
@@ -333,7 +332,6 @@ ndBodyDynamic* ndBasicVehicle::CreateTireBody(ndDemoEntityManager* const scene, 
 	tireBody->SetCollisionShape(tireCollision);
 	tireBody->SetMassMatrix(definition.m_mass, tireCollision);
 
-	world->AddBody(tireBody);
 	return tireBody;
 }
 

@@ -33,9 +33,7 @@
 #include "ndDynamicsUpdateOpencl.h"
 #include "ndJointBilateralConstraint.h"
 
-
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndWordSettings);
-
 
 ndWordSettings::ndWordSettings(const dLoadSaveBase::dLoadDescriptor&)
 	:dClassAlloc()
@@ -195,6 +193,13 @@ void ndWorld::CleanUp()
 		m_skeletonList.Remove(m_skeletonList.GetFirst());
 	}
 
+	while (m_modelList.GetFirst())
+	{
+		ndModel* const model = m_modelList.GetFirst()->GetInfo();
+		RemoveModel(model);
+		delete model;
+	}
+
 	while (m_jointList.GetFirst())
 	{
 		ndJointBilateralConstraint* const joint = m_jointList.GetFirst()->GetInfo();
@@ -207,13 +212,6 @@ void ndWorld::CleanUp()
 		ndBodyParticleSet* const body = m_particleSetList.GetFirst()->GetInfo();
 		RemoveBody(body);
 		delete body;
-	}
-
-	while (m_modelList.GetFirst())
-	{
-		ndModel* const model = m_modelList.GetFirst()->GetInfo();
-		RemoveModel(model);
-		delete model;
 	}
 
 	const ndBodyList& bodyList = GetBodyList();
@@ -421,6 +419,7 @@ void ndWorld::AddModel(ndModel* const model)
 {
 	if (!model->m_node)
 	{
+		model->AddToWorld(this);
 		model->m_node = m_modelList.Append(model);
 	}
 }
@@ -430,6 +429,7 @@ void ndWorld::RemoveModel(ndModel* const model)
 	dAssert(!m_inUpdate);
 	if (model->m_node)
 	{
+		model->RemoveFromToWorld(this);
 		m_modelList.Remove(model->m_node);
 		model->m_node = nullptr;
 	}

@@ -39,6 +39,9 @@ class ndModel: public dClassAlloc
 	virtual ~ndModel ();
 	
 	virtual ndModel* GetAsModel();
+	virtual void AddToWorld(ndWorld* const world);
+	virtual void RemoveFromToWorld(ndWorld* const world);
+
 	virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
 
 	virtual void Debug(ndConstraintDebugCallback& context) const;
@@ -89,6 +92,14 @@ inline void ndModel::PostUpdate(ndWorld* const, dFloat32)
 }
 
 inline void ndModel::PostTransformUpdate(ndWorld* const, dFloat32)
+{
+}
+
+inline void ndModel::AddToWorld(ndWorld* const)
+{
+}
+
+inline void ndModel::RemoveFromToWorld(ndWorld* const)
 {
 }
 
