@@ -54,9 +54,6 @@ ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const dLoadSaveBase::
 	m_damperC = xmlGetFloat(xmlNode, "damperC");
 	m_springDamperRegularizer = xmlGetFloat(xmlNode, "springDamperRegularizer");
 	m_axleCount = xmlGetInt(xmlNode, "axleCount");
-
-	dTrace(("***** for now vehicle are not saving the axel count\n"));
-	m_axleCount = 0;
 }
 
 void ndMultiBodyVehicleTorsionBar::SetTorsionTorque(dFloat32 springK, dFloat32 damperC, dFloat32 springDamperRegularizer)

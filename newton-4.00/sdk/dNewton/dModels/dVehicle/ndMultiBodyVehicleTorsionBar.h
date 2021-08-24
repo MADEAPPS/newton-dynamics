@@ -41,6 +41,12 @@ class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 	class ndAxles
 	{
 		public:
+		ndAxles()
+			:m_leftTire(nullptr)
+			,m_rightTire(nullptr)
+			,m_axleAngle(dFloat32(0.0f))
+		{
+		}
 		const ndBodyKinematic* m_leftTire;
 		const ndBodyKinematic* m_rightTire;
 		dFloat32 m_axleAngle;
