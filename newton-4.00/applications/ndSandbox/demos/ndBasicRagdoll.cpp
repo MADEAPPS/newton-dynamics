@@ -116,10 +116,12 @@ static dJointDefinition jointsDefinition[] =
 	{ "mixamorig:LeftForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
 };
 
-class ndRagdollModel : public ndModel
+//class ndRagdollModel : public ndModel
+class ndRagdollModel : public ndCharacter
 {
 	public:
 	ndRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const dMatrix& location)
+		:ndCharacter()
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = ragdollMesh->CreateClone();
@@ -135,66 +137,67 @@ class ndRagdollModel : public ndModel
 		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);
 		rootEntity->ResetMatrix(rootEntity->GetCurrentMatrix() * matrix);
 		ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
+		ndCharacterRootNode* const rootNode = CreateRoot(rootBody);
 
-		dInt32 stack = 0;
-		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
-		
-		ndBodyDynamic* parentBones[32];
-		ndDemoEntity* childEntities[32];
-		for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) 
-		{
-			childEntities[stack] = child;
-			parentBones[stack] = rootBody;
-			stack++;
-		}
-		
-		dInt32 bodyCount = 1;
-		ndBodyDynamic* bodyArray[1024];
-		bodyArray[0] = rootBody;
-
-		// walk model hierarchic adding all children designed as rigid body bones. 
-		while (stack) 
-		{
-			stack--;
-			ndBodyDynamic* parentBone = parentBones[stack];
-			ndDemoEntity* const childEntity = childEntities[stack];
-			const char* const name = childEntity->GetName().GetStr();
-			//dTrace(("name: %s\n", name));
-			for (dInt32 i = 0; i < definitionCount; i++) 
-			{
-				if (!strcmp(jointsDefinition[i].m_boneName, name)) 
-				{
-					ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
-					bodyArray[bodyCount] = childBody;
-					bodyCount++;
-
-					// connect this body part to its parentBody with a ragdoll joint
-					ConnectBodyParts(world, childBody, parentBone, jointsDefinition[i]);
-
-					parentBone = childBody;
-					break;
-				}
-			}
-		
-			for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
-			{
-				childEntities[stack] = child;
-				parentBones[stack] = parentBone;
-				stack++;
-			}
-		}
-		
-		SetModelMass(100.0f, bodyCount, bodyArray);
-
-		for (dInt32 i = 0; i < bodyCount; i++)
-		{
-			ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
-			if (ent->GetName() == "mixamorig:Neck") 
-			{
-				//world->AddJoint(new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody()));
-				break;
-			}
-		}
+		//dInt32 stack = 0;
+		//const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
+		//
+		//ndBodyDynamic* parentBones[32];
+		//ndDemoEntity* childEntities[32];
+		//for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) 
+		//{
+		//	childEntities[stack] = child;
+		//	parentBones[stack] = rootBody;
+		//	stack++;
+		//}
+		//
+		//dInt32 bodyCount = 1;
+		//ndBodyDynamic* bodyArray[1024];
+		//bodyArray[0] = rootBody;
+		//
+		//// walk model hierarchic adding all children designed as rigid body bones. 
+		//while (stack) 
+		//{
+		//	stack--;
+		//	ndBodyDynamic* parentBone = parentBones[stack];
+		//	ndDemoEntity* const childEntity = childEntities[stack];
+		//	const char* const name = childEntity->GetName().GetStr();
+		//	//dTrace(("name: %s\n", name));
+		//	for (dInt32 i = 0; i < definitionCount; i++) 
+		//	{
+		//		if (!strcmp(jointsDefinition[i].m_boneName, name)) 
+		//		{
+		//			ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
+		//			bodyArray[bodyCount] = childBody;
+		//			bodyCount++;
+		//
+		//			// connect this body part to its parentBody with a ragdoll joint
+		//			ConnectBodyParts(world, childBody, parentBone, jointsDefinition[i]);
+		//
+		//			parentBone = childBody;
+		//			break;
+		//		}
+		//	}
+		//
+		//	for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
+		//	{
+		//		childEntities[stack] = child;
+		//		parentBones[stack] = parentBone;
+		//		stack++;
+		//	}
+		//}
+		//
+		//SetModelMass(100.0f, bodyCount, bodyArray);
+		//
+		//for (dInt32 i = 0; i < bodyCount; i++)
+		//{
+		//	ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
+		//	if (ent->GetName() == "mixamorig:Neck") 
+		//	{
+		//		//world->AddJoint(new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody()));
+		//		break;
+		//	}
+		//}
 	}
 
 	void SetModelMass(dFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray) const
@@ -217,8 +220,8 @@ class ndRagdollModel : public ndModel
 	
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
 	{
-		ndWorld* const world = scene->GetWorld();
-		ndShapeInstance* const shape = entityPart->CreateCollisionFromchildren(world);
+		//ndWorld* const world = scene->GetWorld();
+		ndShapeInstance* const shape = entityPart->CreateCollisionFromchildren();
 		dAssert(shape);
 
 		// create the rigid body that will make this body
@@ -229,7 +232,6 @@ class ndRagdollModel : public ndModel
 		body->SetCollisionShape(*shape);
 		body->SetMassMatrix(1.0f, *shape);
 		body->SetNotifyCallback(new ndRagdollEntityNotify(scene, entityPart, parentBone));
-		world->AddBody(body);
 
 		delete shape;
 		return body;
@@ -283,13 +285,13 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 
 	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_z -= 2.0f;
-	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
+//	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
 
 	matrix.m_posit.m_z = 2.0f;
-	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
+//	scene->GetWorld()->AddModel(new ndRagdollModel(scene, ragdollMesh, matrix));
 
 	origin1.m_x += 20.0f;
-	AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
+//	AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 
 	delete ragdollMesh;
 	dQuaternion rot;

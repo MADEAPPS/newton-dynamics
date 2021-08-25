@@ -49,13 +49,25 @@ ndCharacter::~ndCharacter()
 {
 	if (m_rootNode)
 	{
+		delete m_rootNode->GetBody();
 		delete m_rootNode;
 	}
 }
 
-void ndCharacter::AddToWorld(ndWorld* const)
+void ndCharacter::AddToWorld(ndWorld* const world)
 {
-	dAssert(0);
+	if (m_rootNode)
+	{
+		world->AddBody(m_rootNode->GetBody());
+	}
+}
+
+void ndCharacter::RemoveFromToWorld(ndWorld* const world)
+{
+	if (m_rootNode)
+	{
+		world->RemoveBody(m_rootNode->GetBody());
+	}
 }
 
 ndCharacterRootNode* ndCharacter::CreateRoot(ndBodyDynamic* const body)

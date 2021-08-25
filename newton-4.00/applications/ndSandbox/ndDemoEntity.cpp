@@ -376,8 +376,7 @@ void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, c
 	}
 }
 
-//ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const world) const
-ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const) const
+ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren() const
 {
 	dInt32 count = 1;
 	ndShapeInstance* shapeArray[128];

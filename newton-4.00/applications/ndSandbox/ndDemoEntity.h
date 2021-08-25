@@ -88,8 +88,9 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 	dMatrix CalculateInterpolatedGlobalMatrix (const ndDemoEntity* const root = nullptr) const;
 
 	void RenderBone() const;
+	ndShapeInstance* CreateCollisionFromchildren() const;
+
 	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
-	ndShapeInstance* CreateCollisionFromchildren(ndWorld* const world) const;
 
 	protected:
 	mutable dMatrix m_matrix;			// interpolated matrix

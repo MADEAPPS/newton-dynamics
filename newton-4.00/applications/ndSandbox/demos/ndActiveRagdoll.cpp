@@ -264,8 +264,8 @@ class ndActiveRagdollModel : public ndCharacter
 	
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
 	{
-		ndWorld* const world = scene->GetWorld();
-		ndShapeInstance* const shape = entityPart->CreateCollisionFromchildren(world);
+		dAssert(0);
+		ndShapeInstance* const shape = entityPart->CreateCollisionFromchildren();
 		dAssert(shape);
 
 		// create the rigid body that will make this body
@@ -276,7 +276,6 @@ class ndActiveRagdollModel : public ndCharacter
 		body->SetCollisionShape(*shape);
 		body->SetMassMatrix(1.0f, *shape);
 		body->SetNotifyCallback(new ndActiveRagdollEntityNotify(scene, entityPart, parentBone));
-		world->AddBody(body);
 
 		delete shape;
 		return body;
