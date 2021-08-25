@@ -246,7 +246,7 @@ class ndRagdollModel : public ndCharacter
 		dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 		joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
-		joint->SetAngularSpringDamperRegularizer(0.0f, definition.m_friction, 0.05f);
+		joint->SetAngularSpringDamperRegularizer(0.0f, definition.m_friction, 0.005f);
 
 		return jointNode;
 	}
