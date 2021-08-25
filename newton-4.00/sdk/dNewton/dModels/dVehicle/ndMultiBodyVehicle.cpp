@@ -153,6 +153,22 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dLoadSaveBase::dLoadDescriptor& des
 		{
 			m_downForce.Load(node);
 		}
+		else if (strcmp(partName, "extraBody") == 0)
+		{
+			dInt32 hash;
+			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+			element->Attribute("int32", &hash);
+			const ndBody* const body = desc.m_bodyMap->Find(hash)->GetInfo();
+			m_extraBodiesAttachmentList.Append(((ndBody*)body)->GetAsBodyDynamic());
+		}
+		else if (strcmp(partName, "extraJoint") == 0)
+		{
+			dInt32 hash;
+			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+			element->Attribute("int32", &hash);
+			const ndJointBilateralConstraint* const joint = desc.m_jointMap->Find(hash)->GetInfo();
+			m_extraJointsAttachmentList.Append((ndJointBilateralConstraint*)joint);
+		}
 		else
 		{
 			dAssert(0);
@@ -163,6 +179,18 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dLoadSaveBase::dLoadDescriptor& des
 ndMultiBodyVehicle::~ndMultiBodyVehicle()
 {
 	m_tireShape->Release();
+
+	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointsAttachmentList.GetFirst(); node; node = node->GetNext())
+	{
+		ndJointBilateralConstraint* const joint = node->GetInfo();
+		delete joint;
+	}
+
+	for (dList<ndBodyDynamic*>::dNode* node = m_extraBodiesAttachmentList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyDynamic* const body = node->GetInfo();
+		delete body;
+	}
 
 	if (m_torsionBar)
 	{
@@ -225,14 +253,12 @@ void ndMultiBodyVehicle::AddToWorld(ndWorld* const world)
 
 	for (dList<ndBodyDynamic*>::dNode* node = m_extraBodiesAttachmentList.GetFirst(); node; node = node->GetNext())
 	{
-		dAssert(0);
 		ndBodyDynamic* const body = node->GetInfo();
 		world->AddBody(body);
 	}
 
 	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointsAttachmentList.GetFirst(); node; node = node->GetNext())
 	{
-		dAssert(0);
 		ndJointBilateralConstraint* const joint = node->GetInfo();
 		world->AddJoint(joint);
 	}
@@ -256,23 +282,21 @@ void ndMultiBodyVehicle::AddToWorld(ndWorld* const world)
 
 void ndMultiBodyVehicle::RemoveFromToWorld(ndWorld* const world)
 {
-	if (m_motor)
-	{
-		world->RemoveBody(m_motor->GetBody0());
-	}
-
 	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointsAttachmentList.GetFirst(); node; node = node->GetNext())
 	{
-		dAssert(0);
 		ndJointBilateralConstraint* const joint = node->GetInfo();
 		world->RemoveJoint(joint);
 	}
 
 	for (dList<ndBodyDynamic*>::dNode* node = m_extraBodiesAttachmentList.GetFirst(); node; node = node->GetNext())
 	{
-		dAssert(0);
 		ndBodyDynamic* const body = node->GetInfo();
 		world->RemoveBody(body);
+	}
+
+	if (m_motor)
+	{
+		world->RemoveBody(m_motor->GetBody0());
 	}
 
 	for (dList<ndMultiBodyVehicleDifferential*>::dNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())
@@ -386,16 +410,13 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(dFloat32 mas
 
 void ndMultiBodyVehicle::AddExtraBody(ndBodyDynamic* const body)
 {
-	dAssert(0);
 	m_extraBodiesAttachmentList.Append(body);
 }
 
 void ndMultiBodyVehicle::AddExtraJoint(ndJointBilateralConstraint* const joint)
 {
-	dAssert(0);
 	m_extraJointsAttachmentList.Append(joint);
 }
-
 
 ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(dFloat32 mass, dFloat32 radius)
 {
@@ -952,6 +973,20 @@ void ndMultiBodyVehicle::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("motor");
 		childNode->LinkEndChild(paramNode);
 		paramNode->SetAttribute("int32", dInt32(desc.m_jointMap->Find(m_motor)->GetInfo()));
+	}
+
+	for (dList<ndBodyDynamic*>::dNode* node = m_extraBodiesAttachmentList.GetFirst(); node; node = node->GetNext())
+	{
+		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("extraBody");
+		childNode->LinkEndChild(paramNode);
+		paramNode->SetAttribute("int32", dInt32(desc.m_bodyMap->Find(node->GetInfo())->GetInfo()));
+	}
+
+	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointsAttachmentList.GetFirst(); node; node = node->GetNext())
+	{
+		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("extraJoint");
+		childNode->LinkEndChild(paramNode);
+		paramNode->SetAttribute("int32", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
 	}
 
 	if (m_gearBox)
