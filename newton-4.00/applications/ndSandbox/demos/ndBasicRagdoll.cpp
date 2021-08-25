@@ -97,23 +97,23 @@ static dJointDefinition jointsDefinition[] =
 	{ "mixamorig:Hips", 1, 16, 0, {}, {}},
 	
 	{ "mixamorig:Spine", 2, 16, 10.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine1", 4, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Spine2", 8, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:Neck", 16, 31, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-
-	{ "mixamorig:RightUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-	{ "mixamorig:RightFoot", 16, 31, 10.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
-
-	{ "mixamorig:LeftUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-	{ "mixamorig:LeftFoot", 16, 31, 10.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
-	
-	{ "mixamorig:RightArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:RightForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
-	
-	{ "mixamorig:LeftArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "mixamorig:LeftForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+	//{ "mixamorig:Spine1", 4, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:Spine2", 8, 16, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:Neck", 16, 31, 10.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+	//
+	//{ "mixamorig:RightUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:RightLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+	//{ "mixamorig:RightFoot", 16, 31, 10.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
+	//
+	//{ "mixamorig:LeftUpLeg", 16, 31, 10.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:LeftLeg", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+	//{ "mixamorig:LeftFoot", 16, 31, 10.0f,{ 0.0f, 0.0f, 60.0f },{ 0.0f, 0.0f, 180.0f } },
+	//
+	//{ "mixamorig:RightArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:RightForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
+	//
+	//{ "mixamorig:LeftArm", 16, 27, 10.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "mixamorig:LeftForeArm", 16, 31, 10.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
 };
 
 //class ndRagdollModel : public ndModel
@@ -139,54 +139,53 @@ class ndRagdollModel : public ndCharacter
 		ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
 		ndCharacterRootNode* const rootNode = CreateRoot(rootBody);
 
-		//dInt32 stack = 0;
-		//const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
-		//
+		dInt32 stack = 0;
+		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
+		
 		//ndBodyDynamic* parentBones[32];
-		//ndDemoEntity* childEntities[32];
-		//for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) 
-		//{
-		//	childEntities[stack] = child;
-		//	parentBones[stack] = rootBody;
-		//	stack++;
-		//}
-		//
-		//dInt32 bodyCount = 1;
-		//ndBodyDynamic* bodyArray[1024];
-		//bodyArray[0] = rootBody;
-		//
-		//// walk model hierarchic adding all children designed as rigid body bones. 
-		//while (stack) 
-		//{
-		//	stack--;
-		//	ndBodyDynamic* parentBone = parentBones[stack];
-		//	ndDemoEntity* const childEntity = childEntities[stack];
-		//	const char* const name = childEntity->GetName().GetStr();
-		//	//dTrace(("name: %s\n", name));
-		//	for (dInt32 i = 0; i < definitionCount; i++) 
-		//	{
-		//		if (!strcmp(jointsDefinition[i].m_boneName, name)) 
-		//		{
-		//			ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone);
-		//			bodyArray[bodyCount] = childBody;
-		//			bodyCount++;
-		//
-		//			// connect this body part to its parentBody with a ragdoll joint
-		//			ConnectBodyParts(world, childBody, parentBone, jointsDefinition[i]);
-		//
-		//			parentBone = childBody;
-		//			break;
-		//		}
-		//	}
-		//
-		//	for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
-		//	{
-		//		childEntities[stack] = child;
-		//		parentBones[stack] = parentBone;
-		//		stack++;
-		//	}
-		//}
-		//
+		ndDemoEntity* childEntities[32];
+		ndCharacterLimbNode* parentBones[32];
+		for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) 
+		{
+			childEntities[stack] = child;
+			parentBones[stack] = rootNode;
+			stack++;
+		}
+		
+		dInt32 bodyCount = 1;
+		ndBodyDynamic* bodyArray[1024];
+		bodyArray[0] = rootBody;
+		
+		// walk model hierarchic adding all children designed as rigid body bones. 
+		while (stack) 
+		{
+			stack--;
+			ndCharacterLimbNode* parentBone = parentBones[stack];
+			ndDemoEntity* const childEntity = childEntities[stack];
+			const char* const name = childEntity->GetName().GetStr();
+			//dTrace(("name: %s\n", name));
+			for (dInt32 i = 0; i < definitionCount; i++) 
+			{
+				if (!strcmp(jointsDefinition[i].m_boneName, name)) 
+				{
+					ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone->GetBody());
+					bodyArray[bodyCount] = childBody;
+					bodyCount++;
+		
+					// connect this body part to its parentBody with a ragdoll joint
+					parentBone = ConnectBodyParts(childBody, parentBone, jointsDefinition[i]);
+					break;
+				}
+			}
+		
+			for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
+			{
+				childEntities[stack] = child;
+				parentBones[stack] = parentBone;
+				stack++;
+			}
+		}
+		
 		//SetModelMass(100.0f, bodyCount, bodyArray);
 		//
 		//for (dInt32 i = 0; i < bodyCount; i++)
@@ -220,7 +219,6 @@ class ndRagdollModel : public ndCharacter
 	
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
 	{
-		//ndWorld* const world = scene->GetWorld();
 		ndShapeInstance* const shape = entityPart->CreateCollisionFromchildren();
 		dAssert(shape);
 
@@ -237,21 +235,21 @@ class ndRagdollModel : public ndCharacter
 		return body;
 	}
 
-	void ConnectBodyParts(ndWorld* const world, ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const dJointDefinition& definition) const
+	ndCharacterLimbNode* ConnectBodyParts(ndBodyDynamic* const childBody, ndCharacterLimbNode* const parentBone, const dJointDefinition& definition)
 	{
 		dMatrix matrix(childBody->GetMatrix());
 		dJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
-		ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinAndPivotInGlobalSpace, childBody, parentBody);
-	
+
+		ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentBone);
+		ndJointPid3dofActuator* const joint = (ndJointPid3dofActuator*)jointNode->GetJoint();
+		
 		dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 		joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
-		joint->SetConeFriction(0.05f, definition.m_friction);
-		
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
-		joint->SetTwistFriction(0.05f, definition.m_friction);
+		joint->SetAngularSpringDamperRegularizer(0.0f, definition.m_friction, 0.05f);
 
-		world->AddJoint(joint);
+		return jointNode;
 	}
 
 	void Update(ndWorld* const, dFloat32) 

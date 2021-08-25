@@ -50,6 +50,36 @@ ndCharacter::~ndCharacter()
 	if (m_rootNode)
 	{
 		delete m_rootNode->GetBody();
+
+		dInt32 stack = 0;
+		ndCharacterLimbNode* nodePool[32];
+		for (ndCharacterLimbNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
+		{
+			nodePool[stack] = child;
+			stack++;
+		}
+
+		while (stack)
+		{
+			stack--;
+			ndCharacterLimbNode* const node = nodePool[stack];
+			if (node->GetBody())
+			{
+				delete node->GetBody();
+			}
+
+			if (node->GetJoint())
+			{
+				delete node->GetJoint();
+			}
+
+			for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
+			{
+				nodePool[stack] = child;
+				stack++;
+			}
+		}
+
 		delete m_rootNode;
 	}
 }
@@ -59,6 +89,35 @@ void ndCharacter::AddToWorld(ndWorld* const world)
 	if (m_rootNode)
 	{
 		world->AddBody(m_rootNode->GetBody());
+
+		dInt32 stack = 0;
+		ndCharacterLimbNode* nodePool[32];
+		for (ndCharacterLimbNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
+		{
+			nodePool[stack] = child;
+			stack++;
+		}
+
+		while (stack)
+		{
+			stack--;
+			ndCharacterLimbNode* const node = nodePool[stack];
+			if (node->GetBody())
+			{
+				world->AddBody(node->GetBody());
+			}
+
+			if (node->GetJoint())
+			{
+				world->AddJoint(node->GetJoint());
+			}
+
+			for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
+			{
+				nodePool[stack] = child;
+				stack++;
+			}
+		}
 	}
 }
 
@@ -67,6 +126,35 @@ void ndCharacter::RemoveFromToWorld(ndWorld* const world)
 	if (m_rootNode)
 	{
 		world->RemoveBody(m_rootNode->GetBody());
+
+		dInt32 stack = 0;
+		ndCharacterLimbNode* nodePool[32];
+		for (ndCharacterLimbNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
+		{
+			nodePool[stack] = child;
+			stack++;
+		}
+
+		while (stack)
+		{
+			stack--;
+			ndCharacterLimbNode* const node = nodePool[stack];
+			if (node->GetBody())
+			{
+				world->RemoveBody(node->GetBody());
+			}
+
+			if (node->GetJoint())
+			{
+				world->RemoveJoint(node->GetJoint());
+			}
+
+			for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
+			{
+				nodePool[stack] = child;
+				stack++;
+			}
+		}
 	}
 }
 
