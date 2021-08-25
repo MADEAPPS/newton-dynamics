@@ -74,6 +74,7 @@
 #include <ndDynamicsUpdateAvx2.h>
 #include <ndJointBallAndSocket.h>
 #include <ndBodyParticleSetList.h>
+#include <ndJointAttachmentPoint.h>
 #include <ndDynamicsUpdateOpencl.h>
 #include <ndJointPid3dofActuator.h>
 #include <ndJointPid6dofActuator.h>

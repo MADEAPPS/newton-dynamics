@@ -19,6 +19,7 @@ class ndJointFix6dof: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointFix6dof);
+	D_COLLISION_API ndJointFix6dof(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndJointFix6dof(const dMatrix& frameInGlbalSpace, ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 	D_NEWTON_API virtual ~ndJointFix6dof();
 
@@ -27,6 +28,7 @@ class ndJointFix6dof: public ndJointBilateralConstraint
 
 	private:
 	void JacobianDerivative(ndConstraintDescritor& desc);
+	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	void SubmitAngularAxis(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 	void SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);

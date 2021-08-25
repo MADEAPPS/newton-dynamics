@@ -13,12 +13,27 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointFix6dof.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointFix6dof)
+
 ndJointFix6dof::ndJointFix6dof(const dMatrix& frameInGlbalSpace, ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 	:ndJointBilateralConstraint(6, body0, body1, frameInGlbalSpace)
 	,m_softness(dFloat32(0.0f))
 	,m_maxForce(D_MAX_BOUND)
 	,m_maxTorque(D_MAX_BOUND)
 {
+}
+
+ndJointFix6dof::ndJointFix6dof(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_softness(dFloat32(0.0f))
+	,m_maxForce(D_MAX_BOUND)
+	,m_maxTorque(D_MAX_BOUND)
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	
+	m_softness = xmlGetFloat(xmlNode, "softness");
+	m_maxForce = xmlGetFloat(xmlNode, "maxForce");
+	m_maxTorque = xmlGetFloat(xmlNode, "maxTorque");
 }
 
 ndJointFix6dof::~ndJointFix6dof()
@@ -128,4 +143,16 @@ void ndJointFix6dof::SubmitAngularAxis(ndConstraintDescritor& desc, const dMatri
 	SetHighFriction(desc, m_maxTorque);
 	SetDiagonalRegularizer(desc, m_softness);
 	//dTrace(("%f %f\n", coneAngle * dRadToDegree, pitchAngle * dRadToDegree));
+}
+
+void ndJointFix6dof::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "m_softness", m_softness);
+	xmlSaveParam(childNode, "m_softness", m_maxForce);
+	xmlSaveParam(childNode, "m_softness", m_maxTorque);
 }

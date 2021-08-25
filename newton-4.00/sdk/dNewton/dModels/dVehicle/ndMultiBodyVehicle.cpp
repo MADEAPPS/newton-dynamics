@@ -46,8 +46,10 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 	,m_gearBox(nullptr)
 	,m_torsionBar(nullptr)
 	,m_tireList()
+	,m_extraBodiesAttachmentList()
 	,m_axleList()
 	,m_differentialList()
+	,m_extraJointsAttachmentList()
 	,m_downForce()
 {
 	m_tireShape->AddRef();
@@ -66,8 +68,10 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dLoadSaveBase::dLoadDescriptor& des
 	,m_gearBox(nullptr)
 	,m_torsionBar(nullptr)
 	,m_tireList()
+	,m_extraBodiesAttachmentList()
 	,m_axleList()
 	,m_differentialList()
+	,m_extraJointsAttachmentList()
 	,m_downForce()
 {
 	m_tireShape->AddRef();
@@ -219,6 +223,20 @@ void ndMultiBodyVehicle::AddToWorld(ndWorld* const world)
 		world->AddJoint(joint);
 	}
 
+	for (dList<ndBodyDynamic*>::dNode* node = m_extraBodiesAttachmentList.GetFirst(); node; node = node->GetNext())
+	{
+		dAssert(0);
+		ndBodyDynamic* const body = node->GetInfo();
+		world->AddBody(body);
+	}
+
+	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointsAttachmentList.GetFirst(); node; node = node->GetNext())
+	{
+		dAssert(0);
+		ndJointBilateralConstraint* const joint = node->GetInfo();
+		world->AddJoint(joint);
+	}
+
 	if (m_motor)
 	{
 		world->AddBody(m_motor->GetBody0());
@@ -242,6 +260,21 @@ void ndMultiBodyVehicle::RemoveFromToWorld(ndWorld* const world)
 	{
 		world->RemoveBody(m_motor->GetBody0());
 	}
+
+	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointsAttachmentList.GetFirst(); node; node = node->GetNext())
+	{
+		dAssert(0);
+		ndJointBilateralConstraint* const joint = node->GetInfo();
+		world->RemoveJoint(joint);
+	}
+
+	for (dList<ndBodyDynamic*>::dNode* node = m_extraBodiesAttachmentList.GetFirst(); node; node = node->GetNext())
+	{
+		dAssert(0);
+		ndBodyDynamic* const body = node->GetInfo();
+		world->RemoveBody(body);
+	}
+
 	for (dList<ndMultiBodyVehicleDifferential*>::dNode* node = m_differentialList.GetFirst(); node; node = node->GetNext())
 	{
 		ndMultiBodyVehicleDifferential* const joint = node->GetInfo();
@@ -351,6 +384,19 @@ ndMultiBodyVehicleDifferential* ndMultiBodyVehicle::AddDifferential(dFloat32 mas
 	return differential;
 }
 
+void ndMultiBodyVehicle::AddExtraBody(ndBodyDynamic* const body)
+{
+	dAssert(0);
+	m_extraBodiesAttachmentList.Append(body);
+}
+
+void ndMultiBodyVehicle::AddExtraJoint(ndJointBilateralConstraint* const joint)
+{
+	dAssert(0);
+	m_extraJointsAttachmentList.Append(joint);
+}
+
+
 ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(dFloat32 mass, dFloat32 radius)
 {
 	ndBodyDynamic* const motorBody = CreateInternalBodyPart(mass, radius);
@@ -367,7 +413,6 @@ ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleMoto
 
 ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyDynamic* const sentinel)
 {
-	//m_torsionBar = new ndMultiBodyVehicleTorsionBar(this, world->GetSentinelBody());
 	m_torsionBar = new ndMultiBodyVehicleTorsionBar(this, sentinel);
 	return m_torsionBar;
 }
