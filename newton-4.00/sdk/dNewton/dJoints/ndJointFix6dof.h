@@ -19,7 +19,7 @@ class ndJointFix6dof: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointFix6dof);
-	D_COLLISION_API ndJointFix6dof(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointFix6dof(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndJointFix6dof(const dMatrix& frameInGlbalSpace, ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 	D_NEWTON_API virtual ~ndJointFix6dof();
 

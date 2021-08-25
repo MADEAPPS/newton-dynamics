@@ -13,6 +13,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointUpVector.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointUpVector)
 
 ndJointUpVector::ndJointUpVector(const dVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(2, child, parent, dGetIdentityMatrix())
@@ -21,6 +22,12 @@ ndJointUpVector::ndJointUpVector(const dVector& normal, ndBodyKinematic* const c
 	matrix.m_posit = child->GetMatrix().m_posit;
 
 	CalculateLocalMatrix (matrix, m_localMatrix0, m_localMatrix1);
+}
+
+ndJointUpVector::ndJointUpVector(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+{
+	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 }
 
 ndJointUpVector::~ndJointUpVector()
@@ -33,7 +40,6 @@ void ndJointUpVector::SetPinDir (const dVector& pin)
 	m_localMatrix1 = dMatrix(pin);
 }
 
-//void ndJointUpVector::SubmitConstraints (dFloat32 timestep, int threadIndex)
 void ndJointUpVector::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
@@ -73,3 +79,11 @@ void ndJointUpVector::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
+void ndJointUpVector::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+}

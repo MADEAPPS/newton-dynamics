@@ -23,7 +23,7 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointPid3dofActuator);
-	D_COLLISION_API ndJointPid3dofActuator(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointPid3dofActuator(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndJointPid3dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointPid3dofActuator();
 

@@ -13,6 +13,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointKinematicController.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointKinematicController)
+
 #if 0
 void ndJointKinematicController::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
@@ -171,7 +173,6 @@ void ndJointKinematicController::SubmitConstraints (dFloat32 timestep, dInt32 th
 
 #endif
 
-
 ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const body, ndBodyKinematic* const referenceBody, const dVector& attachmentPointInGlobalSpace)
 	:ndJointBilateralConstraint(6, body, referenceBody, dMatrix(attachmentPointInGlobalSpace))
 {
@@ -187,6 +188,23 @@ ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const re
 	:ndJointBilateralConstraint(6, referenceBody, body, attachmentMatrixInGlobalSpace)
 {
 	Init(attachmentMatrixInGlobalSpace);
+}
+
+ndJointKinematicController::ndJointKinematicController(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	dMatrix attachmentMatrixInGlobalSpace(m_localMatrix0 * GetBody0()->GetMatrix());
+	Init(attachmentMatrixInGlobalSpace);
+
+	m_maxSpeed = xmlGetFloat(xmlNode, "maxSpeed");
+	m_maxOmega = xmlGetFloat(xmlNode, "maxOmega");
+	m_maxLinearFriction = xmlGetFloat(xmlNode, "maxLinearFriction");
+	m_maxAngularFriction = xmlGetFloat(xmlNode, "maxAngularFriction");
+	m_angularFrictionCoefficient = xmlGetFloat(xmlNode, "angularFrictionCoefficient");
+	m_controlMode = ndControlModes(xmlGetInt(xmlNode, "controlMode"));
+	m_autoSleepState = xmlGetInt(xmlNode, "autoSleepState") ? true : false;
+
 }
 
 ndJointKinematicController::~ndJointKinematicController()
@@ -443,3 +461,18 @@ void ndJointKinematicController::CheckSleep() const
 	//}
 }
 
+void ndJointKinematicController::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "maxSpeed", m_maxSpeed);
+	xmlSaveParam(childNode, "maxOmega", m_maxOmega);
+	xmlSaveParam(childNode, "maxLinearFriction", m_maxLinearFriction);
+	xmlSaveParam(childNode, "maxAngularFriction", m_maxAngularFriction);
+	xmlSaveParam(childNode, "angularFrictionCoefficient", m_angularFrictionCoefficient);
+	xmlSaveParam(childNode, "controlMode", dInt32(m_controlMode));
+	xmlSaveParam(childNode, "autoSleepState", dInt32(m_autoSleepState));
+}

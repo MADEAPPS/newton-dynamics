@@ -13,13 +13,14 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointPulley.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointPulley)
+
 ndJointPulley::ndJointPulley(dFloat32 gearRatio,
 	const dVector& body0Pin, ndBodyKinematic* const body0,
 	const dVector& body1Pin, ndBodyKinematic* const body1)
 	:ndJointBilateralConstraint(1, body0, body1, dGetIdentityMatrix())
+	,m_gearRatio(gearRatio)
 {
-	m_gearRatio = gearRatio;
-
 	// calculate the two local matrix of the pivot point
 	dMatrix dommyMatrix;
 
@@ -35,6 +36,15 @@ ndJointPulley::ndJointPulley(dFloat32 gearRatio,
 
 	// set as kinematic loop
 	SetSolverModel(m_jointkinematicCloseLoop);
+}
+
+ndJointPulley::ndJointPulley(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_gearRatio(dFloat32(1.0f))
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_gearRatio = xmlGetFloat(xmlNode, "gearRatio");
 }
 
 ndJointPulley::~ndJointPulley()
@@ -65,4 +75,13 @@ void ndJointPulley::JacobianDerivative(ndConstraintDescritor& desc)
 	SetMotorAcceleration(desc, -w * desc.m_invTimestep);
 }
 
+void ndJointPulley::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "gearRatio", m_gearRatio);
+}
 

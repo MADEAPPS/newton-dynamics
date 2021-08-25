@@ -19,6 +19,7 @@ class ndJointPlane: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointPlane);
+	D_NEWTON_API ndJointPlane(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndJointPlane (const dVector& pivot, const dVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointPlane();
 
@@ -27,10 +28,10 @@ class ndJointPlane: public ndJointBilateralConstraint
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 	
 	bool m_enableControlRotation;
 };
-
 
 inline void ndJointPlane::EnableControlRotation(bool state)
 { 
@@ -41,7 +42,6 @@ inline bool ndJointPlane::GetEnableControlRotation() const
 { 
 	return m_enableControlRotation; 
 }
-
 
 #endif 
 

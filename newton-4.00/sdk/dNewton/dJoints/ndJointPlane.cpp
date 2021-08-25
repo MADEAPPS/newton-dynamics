@@ -13,6 +13,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointPlane.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointPlane)
+
 ndJointPlane::ndJointPlane (const dVector& pivot, const dVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(5, child, parent, dGetIdentityMatrix())
 	,m_enableControlRotation(true)
@@ -22,6 +24,15 @@ ndJointPlane::ndJointPlane (const dVector& pivot, const dVector& normal, ndBodyK
 	pinAndPivotFrame.m_posit.m_w = 1.0f;
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+}
+
+ndJointPlane::ndJointPlane(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_enableControlRotation(true)
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_enableControlRotation = xmlGetInt(xmlNode, "enableControlRotation") ? true : false;
 }
 
 ndJointPlane::~ndJointPlane()
@@ -65,3 +76,12 @@ void ndJointPlane::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
+void ndJointPlane::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "enableControlRotation", m_enableControlRotation ? 1 : 0);
+}

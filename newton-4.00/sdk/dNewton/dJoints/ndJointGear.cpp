@@ -19,8 +19,8 @@ ndJointGear::ndJointGear(dFloat32 gearRatio,
 	const dVector& body0Pin, ndBodyKinematic* const body0,
 	const dVector& body1Pin, ndBodyKinematic* const body1)
 	:ndJointBilateralConstraint(1, body0, body1, dGetIdentityMatrix())
+	,m_gearRatio(gearRatio)
 {
-	m_gearRatio = gearRatio;
 
 	// calculate the two local matrix of the pivot point
 	dMatrix dommyMatrix;
@@ -41,6 +41,7 @@ ndJointGear::ndJointGear(dFloat32 gearRatio,
 
 ndJointGear::ndJointGear(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_gearRatio(dFloat32 (1.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 

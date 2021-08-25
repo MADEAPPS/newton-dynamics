@@ -22,7 +22,7 @@ class ndJointSlider: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointSlider);
-	D_COLLISION_API ndJointSlider(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointSlider(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointSlider();
 

@@ -23,7 +23,7 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointBallAndSocket);
-	D_COLLISION_API ndJointBallAndSocket(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointBallAndSocket(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndJointBallAndSocket(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointBallAndSocket();
 
