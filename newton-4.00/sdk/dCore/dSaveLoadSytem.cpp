@@ -29,8 +29,8 @@
 class dLoaderFactory
 {
 	public:
-	dLoadSaveBase* m_loader;
 	dUnsigned64 m_classNameHash;
+	dLoadSaveBase* m_loader;
 };
 
 static dFixSizeArray<dLoaderFactory, 128>& GetFactory()
@@ -46,30 +46,58 @@ void RegisterLoaderClass(const char* const className, dLoadSaveBase* const loade
 	entry.m_loader = loaderClass;
 	dFixSizeArray<dLoaderFactory, 128>& factory = GetFactory();
 	factory.PushBack(entry);
+	for (dInt32 i = factory.GetCount() - 2; i >= 0; i--)
+	{
+		if (entry.m_classNameHash < factory[i].m_classNameHash)
+		{
+			factory[i + 1] = factory[i];
+			factory[i] = entry;
+		}
+		else
+		{
+			break;
+		}
+	}
 }
 
 void* LoadClass(const char* const className, const dLoadSaveBase::dLoadDescriptor& descriptor)
 {
 	dUnsigned64 classNameHash = dCRC64(className);
 
-	static dInt32 lastEntry = 0;
 	const dFixSizeArray<dLoaderFactory, 128>& factory = GetFactory();
-	
-	if (factory[lastEntry].m_classNameHash == classNameHash)
+
+	dInt32 i0 = 0; 
+	dInt32 i1 = factory.GetCount() - 1;
+	while ((i1 - i0 > 4))
 	{
-		return factory[lastEntry].m_loader->CreateClass(descriptor);
-	}
-	else
-	{
-		for (dInt32 i = 0; i < factory.GetCount(); i++)
+		dInt32 mid = (i1 + i0) / 2;
+		if (factory[mid].m_classNameHash <= classNameHash)
 		{
-			if (factory[i].m_classNameHash == classNameHash)
-			{
-				lastEntry = i;
-				return factory[i].m_loader->CreateClass(descriptor);
-			}
+			i0 = mid;
+		}
+		else
+		{
+			i1 = mid;
 		}
 	}
+
+	for (dInt32 i = i0; i <= i1; i++)
+	{
+		if (factory[i].m_classNameHash == classNameHash)
+		{
+			return factory[i].m_loader->CreateClass(descriptor);
+		}
+	}
+	
+	#ifdef _DEBUG
+	for (dInt32 i = 0; i < factory.GetCount(); i++)
+	{
+		if (factory[i].m_classNameHash == classNameHash)
+		{
+			dAssert (0);
+		}
+	}
+	#endif
 	
 	dLoadSaveBase::dLoadDescriptor baseClassDesc(descriptor);
 	for (const nd::TiXmlNode* node = descriptor.m_rootNode->FirstChild(); node; node = node->NextSibling())

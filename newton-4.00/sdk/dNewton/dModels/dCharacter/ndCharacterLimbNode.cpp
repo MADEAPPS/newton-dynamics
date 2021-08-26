@@ -71,11 +71,7 @@ dNodeBaseHierarchy* ndCharacterLimbNode::CreateClone() const
 
 void ndCharacterLimbNode::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	//nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	//desc.m_rootNode->LinkEndChild(childNode);
-
 	dLoadSaveBase::dSaveDescriptor childDesc(desc);
-	//childDesc.m_rootNode = childNode;
 	for (ndCharacterLimbNode* child = GetChild(); child; child = child->GetSibling())
 	{
 		child->Save(childDesc);
