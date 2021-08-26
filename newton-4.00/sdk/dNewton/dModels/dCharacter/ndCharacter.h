@@ -71,6 +71,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	D_NEWTON_API virtual void Update(ndWorld* const world, dFloat32 timestep);
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
+	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 	
 	ndCharacterRootNode* m_rootNode;
 	ndCharacterPoseController* m_controller;

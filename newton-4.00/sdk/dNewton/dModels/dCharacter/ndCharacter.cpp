@@ -32,6 +32,8 @@
 #include "ndCharacterInverseDynamicNode.h"
 #include "ndCharacterBipedPoseController.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacter)
+
 ndCharacter::ndCharacter()
 	:ndModel()
 	,m_rootNode(nullptr)
@@ -301,5 +303,58 @@ void ndCharacter::Update(ndWorld* const world, dFloat32 timestep)
 	if (m_controller)
 	{
 		m_controller->Evaluate(world, timestep);
+	}
+}
+
+
+void ndCharacter::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndModel::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	if (m_rootNode)
+	{
+		dInt32 rootBoody = dInt32(desc.m_bodyMap->Find(m_rootNode->GetBody())->GetInfo());
+		xmlSaveParam(childNode, "bodyHash", rootBoody);
+
+		dInt32 stack = 0;
+		ndCharacterLimbNode* nodePool[32];
+		nd::TiXmlElement* childNodePool[32];
+		for (ndCharacterLimbNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
+		{
+			nodePool[stack] = child;
+			childNodePool[stack] = childNode;
+			stack++;
+		}
+
+		while (stack)
+		{
+			stack--;
+			ndCharacterLimbNode* const node = nodePool[stack];
+			nd::TiXmlElement* const xmlParent = childNodePool[stack];
+
+			nd::TiXmlElement* const newChildNode = new nd::TiXmlElement("limpNode");
+			xmlParent->LinkEndChild(newChildNode);
+			if (node->GetBody())
+			{
+				dInt32 hash = dInt32(desc.m_bodyMap->Find(node->GetBody())->GetInfo());
+				xmlSaveParam(newChildNode, "bodyHash", hash);
+			}
+		
+			if (node->GetJoint())
+			{
+				dInt32 hash = dInt32(desc.m_jointMap->Find(node->GetJoint())->GetInfo());
+				xmlSaveParam(newChildNode, "jointHash", hash);
+			}
+		
+			for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
+			{
+				nodePool[stack] = child;
+				childNodePool[stack] = newChildNode;
+				stack++;
+			}
+		}
 	}
 }

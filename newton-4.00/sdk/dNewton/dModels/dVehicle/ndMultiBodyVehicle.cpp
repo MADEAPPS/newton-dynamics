@@ -887,8 +887,8 @@ void ndMultiBodyVehicle::ndDownForce::Save(nd::TiXmlNode* const parentNode) cons
 	xmlSaveParam(childNode, "gravity", m_gravity);
 	for (dInt32 i = 0; i < sizeof(m_downForceTable) / sizeof(m_downForceTable[0]); i++)
 	{
-		dVector not(m_downForceTable[i].m_speed, m_downForceTable[i].m_forceFactor, m_downForceTable[i].m_aerodynamicDownforceConstant, dFloat32(0.0f));
-		xmlSaveParam(childNode, "downforceCurve", not);
+		dVector nod(m_downForceTable[i].m_speed, m_downForceTable[i].m_forceFactor, m_downForceTable[i].m_aerodynamicDownforceConstant, dFloat32(0.0f));
+		xmlSaveParam(childNode, "downforceCurve", nod);
 	}
 }
 
