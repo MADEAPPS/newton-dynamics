@@ -97,9 +97,12 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 			if (contact->IsActive())
 			{
 				const ndContactPointList& points = contact->GetContactPoints();
-				for (ndContactPointList::dNode* node = points.GetFirst(); node; node = node->GetNext())
+				if ((supportPolygon.GetCount() + points.GetCount()) < supportPolygon.GetCapacity())
 				{
-					supportPolygon.PushBack(node->GetInfo().m_point);
+					for (ndContactPointList::dNode* node = points.GetFirst(); node; node = node->GetNext())
+					{
+						supportPolygon.PushBack(node->GetInfo().m_point);
+					}
 				}
 			}
 		}
@@ -113,9 +116,12 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 			if (contact->IsActive())
 			{
 				const ndContactPointList& points = contact->GetContactPoints();
-				for (ndContactPointList::dNode* node = points.GetFirst(); node; node = node->GetNext())
+				if ((supportPolygon.GetCount() + points.GetCount()) < supportPolygon.GetCapacity())
 				{
-					supportPolygon.PushBack(node->GetInfo().m_point);
+					for (ndContactPointList::dNode* node = points.GetFirst(); node; node = node->GetNext())
+					{
+						supportPolygon.PushBack(node->GetInfo().m_point);
+					}
 				}
 			}
 		}
