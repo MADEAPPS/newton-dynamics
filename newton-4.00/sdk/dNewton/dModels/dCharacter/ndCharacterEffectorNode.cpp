@@ -26,6 +26,8 @@
 #include "ndJointPid6dofActuator.h"
 #include "ndCharacterEffectorNode.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterEffectorNode)
+
 ndCharacterEffectorNode::ndCharacterEffectorNode(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const child, ndCharacterLimbNode* const referenceNode)
 	:ndCharacterLimbNode(child)
 	,m_referenceNode(referenceNode)
@@ -35,8 +37,24 @@ ndCharacterEffectorNode::ndCharacterEffectorNode(const dMatrix& matrixInGlobalSc
 	m_effector = new ndJointPid6dofActuator(matrixInGlobalScape, body0, body1);
 }
 
+ndCharacterEffectorNode::ndCharacterEffectorNode(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndCharacterLimbNode(desc)
+	,m_referenceNode(m_referenceNode)
+{
+	dAssert(0);
+	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	//dInt32 bodyHash = xmlGetInt(xmlNode, "bodyHash");
+	//dInt32 jointHash = xmlGetInt(xmlNode, "jointHash");
+	//
+	//const ndBody* const body = desc.m_bodyMap->Find(bodyHash)->GetInfo();
+	//const ndJointBilateralConstraint* const joint = desc.m_jointMap->Find(jointHash)->GetInfo();
+	//m_body = (ndBodyDynamic*)body;
+	//m_joint = (ndJointPid3dofActuator*)joint;
+}
+
 ndCharacterEffectorNode::~ndCharacterEffectorNode()
 {
+	delete m_effector;
 }
 
 void ndCharacterEffectorNode::SetTargetMatrix(const dMatrix& matrix)
@@ -57,3 +75,14 @@ void ndCharacterEffectorNode::SetTargetMatrix(const dMatrix& matrix)
 //	//ndBodyDynamic* const body = m_effector->GetBody0()->GetAsBodyDynamic();
 //	//m_globalPose = body->GetMatrix();
 //}
+
+void ndCharacterEffectorNode::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	ndCharacterLimbNode::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	dAssert(0);
+	//xmlSaveParam(childNode, "bodyHash", dInt32(desc.m_bodyMap->Find(m_body)->GetInfo()));
+	//xmlSaveParam(childNode, "jointHash", dInt32(desc.m_jointMap->Find(m_joint)->GetInfo()));
+}

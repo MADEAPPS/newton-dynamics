@@ -32,7 +32,7 @@ class ndCharacterEffectorNode: public ndCharacterLimbNode
 {
 	public:
 	D_CLASS_REFLECTION(ndCharacterEffectorNode);
-
+	D_NEWTON_API ndCharacterEffectorNode(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndCharacterEffectorNode(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const child, ndCharacterLimbNode* const referenceNode);
 	D_NEWTON_API virtual ~ndCharacterEffectorNode ();
 
@@ -45,6 +45,7 @@ class ndCharacterEffectorNode: public ndCharacterLimbNode
 	void SetTargetMatrix(const dMatrix& matrix);
 
 	protected:
+	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 	//void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 
 	ndJointPid6dofActuator* m_effector;
@@ -58,8 +59,9 @@ inline ndJointBilateralConstraint* ndCharacterEffectorNode::GetJoint() const
 
 inline ndBodyDynamic* ndCharacterEffectorNode::GetBody() const
 {
-	dAssert(GetJoint()->GetBody0()->GetAsBodyDynamic() == GetParent()->GetBody());
-	return GetParent()->GetBody();
+	ndBodyDynamic* const body = GetParent()->GetBody();
+	dAssert(GetJoint()->GetBody0()->GetAsBodyDynamic() == body);
+	return body;
 }
 
 inline ndCharacterEffectorNode* ndCharacterEffectorNode::GetAsEffectorNode()

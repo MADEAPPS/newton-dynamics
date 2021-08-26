@@ -35,4 +35,6 @@ ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const dMatrix& matr
 
 ndCharacterInverseDynamicNode::~ndCharacterInverseDynamicNode()
 {
+	delete m_joint;
+	delete m_body;
 }

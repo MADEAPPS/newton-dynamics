@@ -48,9 +48,10 @@ ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const dLoadSaveBase
 	m_joint = (ndJointPid3dofActuator*)joint;
 }
 
-
 ndCharacterForwardDynamicNode::~ndCharacterForwardDynamicNode()
 {
+	delete m_joint;
+	delete m_body;
 }
 
 void ndCharacterForwardDynamicNode::Save(const dLoadSaveBase::dSaveDescriptor& desc) const

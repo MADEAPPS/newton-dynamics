@@ -46,8 +46,8 @@
 //#define DEFAULT_SCENE	8		// static mesh collision 
 //#define DEFAULT_SCENE	9		// static user mesh collision 
 //#define DEFAULT_SCENE	10		// basic joints
-#define DEFAULT_SCENE	11		// basic rag doll
-//#define DEFAULT_SCENE	12		// active rag doll
+//#define DEFAULT_SCENE	11		// basic rag doll
+#define DEFAULT_SCENE	12		// active rag doll
 //#define DEFAULT_SCENE	13		// basic vehicle
 //#define DEFAULT_SCENE	14		// heavy vehicle
 //#define DEFAULT_SCENE	15		// simple voronoi fracture

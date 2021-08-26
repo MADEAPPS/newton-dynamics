@@ -60,6 +60,7 @@ ndCharacterRootNode::ndCharacterRootNode(const dLoadSaveBase::dLoadDescriptor& d
 
 ndCharacterRootNode::~ndCharacterRootNode()
 {
+	delete m_body;
 }
 
 void ndCharacterRootNode::SetCoronalFrame(const dMatrix& frameInGlobalSpace)

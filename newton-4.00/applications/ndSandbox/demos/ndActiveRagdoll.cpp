@@ -195,7 +195,7 @@ class ndActiveRagdollModel : public ndCharacter
 						bodyCount++;
 
 						// connect this body part to its parentBody with a ragdoll joint
-						parentBone = ConnectBodyParts(world, childBody, parentBone, definition);
+						parentBone = ConnectBodyParts(childBody, parentBone, definition);
 					}
 					else
 					{
@@ -204,7 +204,6 @@ class ndActiveRagdollModel : public ndCharacter
 						ndCharacterEffectorNode* const effectorNode = CreateInverseDynamicEffector(effectorMatrix, parentBone, referenceNode);
 						ndJointPid6dofActuator* const effectorJoint = (ndJointPid6dofActuator*)effectorNode->GetJoint();
 						effectorJoint->SetLinearSpringDamperRegularizer(definition.m_jointData.m_spring, definition.m_jointData.m_damper, definition.m_jointData.m_regularizer);
-						world->AddJoint(effectorJoint);
 
 						if (strstr(name, "right"))
 						{
@@ -264,7 +263,6 @@ class ndActiveRagdollModel : public ndCharacter
 	
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
 	{
-		dAssert(0);
 		ndShapeInstance* const shape = entityPart->CreateCollisionFromchildren();
 		dAssert(shape);
 
@@ -281,7 +279,7 @@ class ndActiveRagdollModel : public ndCharacter
 		return body;
 	}
 
-	ndCharacterLimbNode* ConnectBodyParts(ndWorld* const world, ndBodyDynamic* const childBody, ndCharacterLimbNode* const parentNode, const dActiveJointDefinition& definition)
+	ndCharacterLimbNode* ConnectBodyParts(ndBodyDynamic* const childBody, ndCharacterLimbNode* const parentNode, const dActiveJointDefinition& definition)
 	{
 		dMatrix matrix(childBody->GetMatrix());
 		dActiveJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
@@ -298,7 +296,6 @@ class ndActiveRagdollModel : public ndCharacter
 			joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
 			joint->SetAngularSpringDamperRegularizer(definition.m_jointData.m_spring, definition.m_jointData.m_damper, definition.m_jointData.m_regularizer);
 
-			world->AddJoint(joint);
 			return jointNode;
 		}
 		else
@@ -313,7 +310,6 @@ class ndActiveRagdollModel : public ndCharacter
 			joint->SetConeFriction(dFloat32(0.0f), dFloat32(0.0f));
 			joint->SetTwistFriction(dFloat32(0.0f), dFloat32(0.0f));
 
-			world->AddJoint(joint);
 			return jointNode;
 		}
 	}
