@@ -29,7 +29,7 @@ class ndCharacterRootNode: public ndCharacterLimbNode
 {
 	public:
 	D_CLASS_REFLECTION(ndCharacterRootNode);
-
+	D_NEWTON_API ndCharacterRootNode(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body);
 	D_NEWTON_API virtual ~ndCharacterRootNode ();
 
@@ -45,12 +45,14 @@ class ndCharacterRootNode: public ndCharacterLimbNode
 
 	protected:
 	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
+	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	dMatrix m_coronalFrame;
 	dMatrix m_invCoronalFrame;
 	dVector m_gravityDir;
 	ndCharacter* m_owner;
 	ndBodyDynamic* m_body;
+	friend class ndCharacter;
 };
 
 inline ndCharacter* ndCharacterRootNode::GetOwner() const

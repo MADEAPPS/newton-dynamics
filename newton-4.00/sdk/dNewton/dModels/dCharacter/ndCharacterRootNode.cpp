@@ -25,6 +25,8 @@
 #include "ndBodyDynamic.h"
 #include "ndCharacterRootNode.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterRootNode)
+
 ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body)
 	:ndCharacterLimbNode(nullptr)
 	,m_coronalFrame(dGetIdentityMatrix())
@@ -33,6 +35,26 @@ ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic
 	,m_owner(owner)
 	,m_body(body)
 {
+	SetCoronalFrame(m_body->GetMatrix());
+}
+
+ndCharacterRootNode::ndCharacterRootNode(const dLoadSaveBase::dLoadDescriptor& desc)
+	//:ndCharacterLimbNode(dLoadSaveBase::dLoadDescriptor(desc))
+	:ndCharacterLimbNode(desc)
+	,m_coronalFrame(dGetIdentityMatrix())
+	,m_invCoronalFrame(dGetIdentityMatrix())
+	,m_gravityDir(dFloat32(0.0f), dFloat32(-1.0f), dFloat32(0.0f), dFloat32(0.0f))
+	,m_owner(nullptr)
+	,m_body(nullptr)
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	m_coronalFrame = xmlGetMatrix(xmlNode, "coronalFrame");
+	m_gravityDir = xmlGetVector3(xmlNode, "gravityDir");
+
+	dInt32 bodyHash = xmlGetInt(xmlNode, "bodyHash");
+	m_body = (ndBodyDynamic*)desc.m_bodyMap->Find(bodyHash)->GetInfo();
+
 	SetCoronalFrame(m_body->GetMatrix());
 }
 
@@ -50,4 +72,16 @@ void ndCharacterRootNode::SetCoronalFrame(const dMatrix& frameInGlobalSpace)
 void ndCharacterRootNode::UpdateGlobalPose(ndWorld* const, dFloat32)
 {
 	// for now just; 
+}
+
+void ndCharacterRootNode::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	ndCharacterLimbNode::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "coronalFrame", m_coronalFrame);
+	xmlSaveParam(childNode, "gravityDir", m_gravityDir);
+	//xmlSaveParam(childNode, "modelHash", desc.m_nodeNodeHash);
+	xmlSaveParam(childNode, "bodyHash", dInt32(desc.m_bodyMap->Find(GetBody())->GetInfo()));
 }

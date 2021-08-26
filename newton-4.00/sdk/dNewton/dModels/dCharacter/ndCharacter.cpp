@@ -43,8 +43,21 @@ ndCharacter::ndCharacter()
 
 ndCharacter::ndCharacter(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndModel(dLoadSaveBase::dLoadDescriptor(desc))
+	,m_rootNode(nullptr)
+	,m_controller(nullptr)
 {
-	dAssert(0);
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	for (const nd::TiXmlNode* node = xmlNode->FirstChild(); node; node = node->NextSibling())
+	{
+		const char* const partName = node->Value();
+		if (strcmp(partName, "ndCharacterRootNode") == 0)
+		{
+			dLoadSaveBase::dLoadDescriptor rootDesc(desc);
+			rootDesc.m_rootNode = node;
+			m_rootNode = new ndCharacterRootNode(rootDesc);
+			m_rootNode->m_owner = this;
+		}
+	}
 }
 
 ndCharacter::~ndCharacter()
@@ -306,7 +319,6 @@ void ndCharacter::Update(ndWorld* const world, dFloat32 timestep)
 	}
 }
 
-
 void ndCharacter::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
@@ -316,45 +328,8 @@ void ndCharacter::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 
 	if (m_rootNode)
 	{
-		dInt32 rootBoody = dInt32(desc.m_bodyMap->Find(m_rootNode->GetBody())->GetInfo());
-		xmlSaveParam(childNode, "bodyHash", rootBoody);
-
-		dInt32 stack = 0;
-		ndCharacterLimbNode* nodePool[32];
-		nd::TiXmlElement* childNodePool[32];
-		for (ndCharacterLimbNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
-		{
-			nodePool[stack] = child;
-			childNodePool[stack] = childNode;
-			stack++;
-		}
-
-		while (stack)
-		{
-			stack--;
-			ndCharacterLimbNode* const node = nodePool[stack];
-			nd::TiXmlElement* const xmlParent = childNodePool[stack];
-
-			nd::TiXmlElement* const newChildNode = new nd::TiXmlElement("limpNode");
-			xmlParent->LinkEndChild(newChildNode);
-			if (node->GetBody())
-			{
-				dInt32 hash = dInt32(desc.m_bodyMap->Find(node->GetBody())->GetInfo());
-				xmlSaveParam(newChildNode, "bodyHash", hash);
-			}
-		
-			if (node->GetJoint())
-			{
-				dInt32 hash = dInt32(desc.m_jointMap->Find(node->GetJoint())->GetInfo());
-				xmlSaveParam(newChildNode, "jointHash", hash);
-			}
-		
-			for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
-			{
-				nodePool[stack] = child;
-				childNodePool[stack] = newChildNode;
-				stack++;
-			}
-		}
+		dLoadSaveBase::dSaveDescriptor childDesc(desc);
+		childDesc.m_rootNode = childNode;
+		m_rootNode->Save(childDesc);
 	}
 }

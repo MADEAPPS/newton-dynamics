@@ -38,7 +38,7 @@ class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 {
 	public:
 	D_CLASS_REFLECTION(ndCharacterLimbNode);
-
+	D_NEWTON_API ndCharacterLimbNode(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndCharacterLimbNode(ndCharacterLimbNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterLimbNode ();
 
@@ -56,6 +56,7 @@ class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 
 	protected:
 	D_NEWTON_API dNodeBaseHierarchy* CreateClone() const;
+	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 };
 
 inline ndBodyDynamic* ndCharacterLimbNode::GetBody() const

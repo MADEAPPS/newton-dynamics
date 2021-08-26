@@ -24,12 +24,38 @@
 #include "ndWorld.h"
 #include "ndCharacterLimbNode.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterLimbNode)
+
 ndCharacterLimbNode::ndCharacterLimbNode(ndCharacterLimbNode* const parent)
 	:dNodeHierarchy<ndCharacterLimbNode>()
 {
 	if (parent)
 	{
 		Attach(parent);
+	}
+}
+
+ndCharacterLimbNode::ndCharacterLimbNode(const dLoadSaveBase::dLoadDescriptor& desc)
+	:dNodeHierarchy<ndCharacterLimbNode>()
+{
+	if (desc.m_parentModelNode)
+	{
+		Attach((ndCharacterLimbNode*)desc.m_parentModelNode);
+	}
+
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	dLoadSaveBase::dLoadDescriptor childDesc(desc);
+	childDesc.m_parentModelNode = this;
+	for (const nd::TiXmlNode* node = xmlNode->FirstChild(); node; node = node->NextSibling())
+	{
+		const char* const partName = node->Value();
+		//dTrace(("%s\n", partName));
+		if (strstr(partName, "ndCharacter"))
+		{
+			childDesc.m_rootNode = node;
+			D_CLASS_REFLECTION_LOAD_NODE(ndCharacterLimbNode, partName, childDesc);
+		}
 	}
 }
 
@@ -41,4 +67,17 @@ dNodeBaseHierarchy* ndCharacterLimbNode::CreateClone() const
 {
 	dAssert(0);
 	return nullptr;
+}
+
+void ndCharacterLimbNode::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	//nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	//desc.m_rootNode->LinkEndChild(childNode);
+
+	dLoadSaveBase::dSaveDescriptor childDesc(desc);
+	//childDesc.m_rootNode = childNode;
+	for (ndCharacterLimbNode* child = GetChild(); child; child = child->GetSibling())
+	{
+		child->Save(childDesc);
+	}
 }

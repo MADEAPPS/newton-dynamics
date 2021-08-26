@@ -26,6 +26,8 @@
 #include "ndJointPid3dofActuator.h"
 #include "ndCharacterForwardDynamicNode.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterForwardDynamicNode)
+
 ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
 	:ndCharacterLimbNode(parent)
 	,m_body(body)
@@ -33,6 +35,30 @@ ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const dMatrix& matr
 {
 }
 
+ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndCharacterLimbNode(desc)
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	dInt32 bodyHash = xmlGetInt(xmlNode, "bodyHash");
+	dInt32 jointHash = xmlGetInt(xmlNode, "jointHash");
+	
+	const ndBody* const body = desc.m_bodyMap->Find(bodyHash)->GetInfo();
+	const ndJointBilateralConstraint* const joint = desc.m_jointMap->Find(jointHash)->GetInfo();
+	m_body = (ndBodyDynamic*)body;
+	m_joint = (ndJointPid3dofActuator*)joint;
+}
+
+
 ndCharacterForwardDynamicNode::~ndCharacterForwardDynamicNode()
 {
+}
+
+void ndCharacterForwardDynamicNode::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	ndCharacterLimbNode::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "bodyHash", dInt32(desc.m_bodyMap->Find(m_body)->GetInfo()));
+	xmlSaveParam(childNode, "jointHash", dInt32(desc.m_jointMap->Find(m_joint)->GetInfo()));
 }
