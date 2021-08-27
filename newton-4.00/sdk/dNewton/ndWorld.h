@@ -121,16 +121,6 @@ class ndWorld: public dClassAlloc
 	private:
 	void ThreadFunction();
 	void PostUpdate(dFloat32 timestep);
-
-	void SaveJoints(nd::TiXmlNode* const rootNode,
-		const char* const assetPath, const char* const assetName,
-		const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,
-		dTree<dUnsigned32, const ndJointBilateralConstraint*>& jointMap);
-	void SaveModels(nd::TiXmlNode* const rootNode,
-		const char* const assetPath, const char* const assetName,
-		const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,
-		const dTree<dUnsigned32, const ndJointBilateralConstraint*>& jointMap,
-		dTree<dUnsigned32, const ndModel*>& modelMap);
 	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();

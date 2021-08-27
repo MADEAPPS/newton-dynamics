@@ -60,8 +60,6 @@ class ndLoadSave: public dClassAlloc
 	D_NEWTON_API void SaveScene(const char* const path, const ndWorld* const world, const ndWordSettings* const setting);
 
 	private:
-	//D_NEWTON_API virtual void SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const;
-	
 	void SaveSceneSettings(nd::TiXmlNode* const rootNode, const char* const assetPath, const char* const assetName, const ndWordSettings* const setting) const;
 	void SaveCollisionShapes(nd::TiXmlNode* const rootNode, const ndWorld* const world,
 		const char* const assetPath, const char* const assetName,
@@ -70,16 +68,16 @@ class ndLoadSave: public dClassAlloc
 		const char* const assetPath, const char* const assetName,
 		const dTree<dUnsigned32, const ndShape*>& shapesMap,
 		dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap);
-	//void SaveJoints(nd::TiXmlNode* const rootNode,
-	//	const char* const assetPath, const char* const assetName,
-	//	const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,
-	//	dTree<dUnsigned32, const ndJointBilateralConstraint*>& jointMap);
-	//void SaveModels(nd::TiXmlNode* const rootNode,
-	//	const char* const assetPath, const char* const assetName,
-	//	const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,
-	//	const dTree<dUnsigned32, const ndJointBilateralConstraint*>& jointMap,
-	//	dTree<dUnsigned32, const ndModel*>& modelMap);
-	//
+	void SaveJoints(nd::TiXmlNode* const rootNode, const ndWorld* const world,
+		const char* const assetPath, const char* const assetName,
+		const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,
+		dTree<dUnsigned32, const ndJointBilateralConstraint*>& jointMap);
+	void SaveModels(nd::TiXmlNode* const rootNode, const ndWorld* const world,
+		const char* const assetPath, const char* const assetName,
+		const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,
+		const dTree<dUnsigned32, const ndJointBilateralConstraint*>& jointMap,
+		dTree<dUnsigned32, const ndModel*>& modelMap);
+	
 	void LoadSceneSettings(const nd::TiXmlNode* const rootNode, const char* const assetPath);
 	void LoadCollisionShapes(const nd::TiXmlNode* const rootNode, const char* const assetPath, ndShapeLoaderCache& shapesMap);
 	void LoadRigidBodies(const nd::TiXmlNode* const rootNode, const char* const assetPath, const ndShapeLoaderCache& shapesMap);
