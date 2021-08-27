@@ -58,6 +58,7 @@ void ndCharacterForwardDynamicNode::Save(const dLoadSaveBase::dSaveDescriptor& d
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
 	ndCharacterLimbNode::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "bodyHash", dInt32(desc.m_bodyMap->Find(m_body)->GetInfo()));

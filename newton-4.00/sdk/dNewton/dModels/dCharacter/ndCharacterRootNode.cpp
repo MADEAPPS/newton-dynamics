@@ -79,10 +79,10 @@ void ndCharacterRootNode::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
 	ndCharacterLimbNode::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "coronalFrame", m_coronalFrame);
 	xmlSaveParam(childNode, "gravityDir", m_gravityDir);
-	//xmlSaveParam(childNode, "modelHash", desc.m_nodeNodeHash);
 	xmlSaveParam(childNode, "bodyHash", dInt32(desc.m_bodyMap->Find(GetBody())->GetInfo()));
 }

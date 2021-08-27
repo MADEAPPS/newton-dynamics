@@ -26,6 +26,8 @@
 #include "ndJointBallAndSocket.h"
 #include "ndCharacterInverseDynamicNode.h"
 
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterInverseDynamicNode)
+
 ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
 	:ndCharacterLimbNode(parent)
 	,m_body(body)
@@ -33,8 +35,32 @@ ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const dMatrix& matr
 {
 }
 
+ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const dLoadSaveBase::dLoadDescriptor& desc)
+	:ndCharacterLimbNode(desc)
+{
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	dInt32 bodyHash = xmlGetInt(xmlNode, "bodyHash");
+	dInt32 jointHash = xmlGetInt(xmlNode, "jointHash");
+
+	const ndBody* const body = desc.m_bodyMap->Find(bodyHash)->GetInfo();
+	const ndJointBilateralConstraint* const joint = desc.m_jointMap->Find(jointHash)->GetInfo();
+	m_body = (ndBodyDynamic*)body;
+	m_joint = (ndJointBilateralConstraint*)joint;
+}
+
 ndCharacterInverseDynamicNode::~ndCharacterInverseDynamicNode()
 {
 	delete m_joint;
 	delete m_body;
+}
+
+void ndCharacterInverseDynamicNode::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
+	ndCharacterLimbNode::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "bodyHash", dInt32(desc.m_bodyMap->Find(m_body)->GetInfo()));
+	xmlSaveParam(childNode, "jointHash", dInt32(desc.m_jointMap->Find(m_joint)->GetInfo()));
 }

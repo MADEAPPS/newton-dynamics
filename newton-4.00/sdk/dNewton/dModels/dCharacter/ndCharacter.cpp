@@ -297,8 +297,10 @@ void ndCharacter::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 
 	if (m_rootNode)
 	{
+		const dTree<dUnsigned32, const ndCharacterLimbNode*> limbMap;
 		dLoadSaveBase::dSaveDescriptor childDesc(desc);
 		childDesc.m_rootNode = childNode;
+		childDesc.m_limbMap = &limbMap;
 		m_rootNode->Save(childDesc);
 	}
 }

@@ -80,9 +80,9 @@ void ndCharacterEffectorNode::Save(const dLoadSaveBase::dSaveDescriptor& desc) c
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
 	ndCharacterLimbNode::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
-	dAssert(0);
-	//xmlSaveParam(childNode, "bodyHash", dInt32(desc.m_bodyMap->Find(m_body)->GetInfo()));
-	//xmlSaveParam(childNode, "jointHash", dInt32(desc.m_jointMap->Find(m_joint)->GetInfo()));
+	xmlSaveParam(childNode, "jointHash", dInt32(desc.m_jointMap->Find(m_effector)->GetInfo()));
+	xmlSaveParam(childNode, "referenceNodeHash", dInt32(desc.m_limbMap->Find(m_referenceNode)->GetInfo()));
 }

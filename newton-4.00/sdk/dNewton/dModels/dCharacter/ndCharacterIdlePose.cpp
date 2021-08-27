@@ -45,12 +45,17 @@ void ndCharacterIdlePose::Init()
 	ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
 
 	const ndBipedControllerConfig& config = m_owner->GetConfig();
+	if (config.m_leftFootEffector)
+	{
+		dVector leftFeetOffset(dFloat32(0.0f), dFloat32(0.0125f), dFloat32(0.0f), dFloat32(0.0f));
+		m_referencePose.PushBack(CalculateFeetKeyFrame(state.m_centerOfMass, leftFeetOffset, config.m_leftFootEffector));
+	}
 
-	dVector leftFeetOffset(dFloat32(0.0f), dFloat32(0.0125f), dFloat32(0.0f), dFloat32(0.0f));
-	m_referencePose.PushBack(CalculateFeetKeyFrame(state.m_centerOfMass, leftFeetOffset, config.m_leftFootEffector));
-
-	dVector rightFeetOffset(dFloat32(-0.0f), dFloat32(0.0125f), dFloat32(0.0f), dFloat32(0.0f));
-	m_referencePose.PushBack(CalculateFeetKeyFrame(state.m_centerOfMass, rightFeetOffset, config.m_rightFootEffector));
+	if (config.m_rightFootEffector)
+	{
+		dVector rightFeetOffset(dFloat32(-0.0f), dFloat32(0.0125f), dFloat32(0.0f), dFloat32(0.0f));
+		m_referencePose.PushBack(CalculateFeetKeyFrame(state.m_centerOfMass, rightFeetOffset, config.m_rightFootEffector));
+	}
 }
 
 ndCharaterKeyFramePose ndCharacterIdlePose::CalculateFeetKeyFrame(const dVector& centerOfMass, const dVector& keyFrameOffset, ndCharacterEffectorNode* const effector)
@@ -76,17 +81,20 @@ ndCharaterKeyFramePose ndCharacterIdlePose::CalculateFeetKeyFrame(const dVector&
 
 void ndCharacterIdlePose::SetEffectorMatrix(const dVector& localCom, const ndCharaterKeyFramePose& pose)
 {
-	ndCharacterEffectorNode* const effector = pose.m_node->GetAsEffectorNode();
-	dAssert(effector);
+	if (pose.m_node)
+	{
+		ndCharacterEffectorNode* const effector = pose.m_node->GetAsEffectorNode();
+		dAssert(effector);
 
-	const ndCharacter* const character = m_owner->GetCharacter();
-	ndCharacterRootNode* const rootNode = character->GetRootNode();
-	
-	dMatrix matrix(pose.m_rotation, localCom + pose.m_position);
-	//matrix.m_posit.m_y += 0.0125f;
-	//matrix.m_posit.m_x -= 0.025f;
-	matrix = matrix * rootNode->GetCoronalFrame();
-	effector->SetTargetMatrix(matrix);
+		const ndCharacter* const character = m_owner->GetCharacter();
+		ndCharacterRootNode* const rootNode = character->GetRootNode();
+
+		dMatrix matrix(pose.m_rotation, localCom + pose.m_position);
+		//matrix.m_posit.m_y += 0.0125f;
+		//matrix.m_posit.m_x -= 0.025f;
+		matrix = matrix * rootNode->GetCoronalFrame();
+		effector->SetTargetMatrix(matrix);
+	}
 }
 
 //void ndCharacterIdlePose::Update(dFloat32 timestep)
