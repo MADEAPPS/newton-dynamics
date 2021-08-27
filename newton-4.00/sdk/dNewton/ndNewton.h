@@ -36,6 +36,7 @@
 #include <ndModel.h>
 #include <ndContact.h>
 #include <ndShapeBox.h>
+#include <ndLoadSave.h>
 #include <ndShapeNull.h>
 #include <ndModelList.h>
 #include <ndSceneNode.h>

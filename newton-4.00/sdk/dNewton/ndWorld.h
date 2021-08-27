@@ -42,29 +42,6 @@ class ndJointBilateralConstraint;
 
 #define D_SLEEP_ENTRIES			8
 
-class ndWorld;
-class ndWordSettings : public dClassAlloc
-{
-	public:
-	D_CLASS_REFLECTION(ndWordSettings);
-
-	ndWordSettings(ndWorld* const owner)
-		:dClassAlloc()
-		,m_owner(owner)
-	{
-	}
-
-	virtual ~ndWordSettings()
-	{
-	}
-
-	D_NEWTON_API ndWordSettings(const dLoadSaveBase::dLoadDescriptor& desc);
-
-	D_NEWTON_API virtual void Load(const dLoadSaveBase::dLoadDescriptor& desc) const;
-	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
-	ndWorld* m_owner;
-};
-
 D_MSV_NEWTON_ALIGN_32
 class ndWorld: public dClassAlloc
 {
@@ -112,10 +89,7 @@ class ndWorld: public dClassAlloc
 	D_NEWTON_API virtual void AddModel(ndModel* const model);
 	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
 	D_NEWTON_API virtual void SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const;
-
-	D_NEWTON_API bool LoadScene(const char* const path);
 	D_NEWTON_API void SaveScene(const char* const path);
-	virtual void OnLoadScene(const dLoadSaveBase::dLoadDescriptor& desc);
 
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
@@ -168,22 +142,6 @@ class ndWorld: public dClassAlloc
 		const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,
 		const dTree<dUnsigned32, const ndJointBilateralConstraint*>& jointMap,
 		dTree<dUnsigned32, const ndModel*>& modelMap);
-
-	void LoadSceneSettings(
-		const nd::TiXmlNode* const rootNode, const char* const assetPath) const;
-	void LoadCollisionShapes(
-		const nd::TiXmlNode* const rootNode, const char* const assetPath,
-		ndShapeLoaderCache& shapesMap) const;
-	void LoadRigidBodies(
-		const nd::TiXmlNode* const rootNode, const char* const assetPath,
-		const ndShapeLoaderCache& shapesMap, ndBodyLoaderCache& bodyMap);
-	void LoadJoints(
-		const nd::TiXmlNode* const rootNode, const char* const assetPath,
-		const ndBodyLoaderCache& bodyMap, ndJointLoaderCache& jointMap);
-	void LoadModels(
-		const nd::TiXmlNode* const rootNode, const char* const assetPath,
-		const ndBodyLoaderCache& bodyMap, const ndJointLoaderCache& jointMap,
-		ndModelLoaderCache& modelMap);
 	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();
@@ -397,28 +355,5 @@ inline dInt32 ndWorld::GetEngineVersion() const
 	return D_NEWTON_ENGINE_MAJOR_VERSION * 100 + D_NEWTON_ENGINE_MINOR_VERSION;
 }
 
-inline void ndWorld::OnLoadScene(const dLoadSaveBase::dLoadDescriptor& desc)
-{
-	ndBodyLoaderCache::Iterator bodyIter(*desc.m_bodyMap);
-	for (bodyIter.Begin(); bodyIter; bodyIter++)
-	{
-		const ndBody* const body = (ndBody*)bodyIter.GetNode()->GetInfo();
-		AddBody((ndBody*)body);
-	}
-
-	ndJointLoaderCache::Iterator jointIter(*desc.m_jointMap);
-	for (jointIter.Begin(); jointIter; jointIter++)
-	{
-		const ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)jointIter.GetNode()->GetInfo();
-		AddJoint((ndJointBilateralConstraint*)joint);
-	}
-
-	ndModelLoaderCache::Iterator modelIter(*desc.m_modelMap);
-	for (modelIter.Begin(); modelIter; modelIter++)
-	{
-		const ndModel* const model = modelIter.GetNode()->GetInfo();
-		AddModel((ndModel*)model);
-	}
-}
 
 #endif

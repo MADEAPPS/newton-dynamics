@@ -29,8 +29,9 @@ class ndPhysicsWorldSettings : public ndWordSettings
 	public:
 	D_CLASS_REFLECTION(ndPhysicsWorldSettings);
 
-	ndPhysicsWorldSettings(ndWorld* const owner)
-		:ndWordSettings(owner)
+	ndPhysicsWorldSettings()
+		:ndWordSettings()
+		,m_cameraMatrix(dGetIdentityMatrix())
 	{
 	}
 
@@ -39,31 +40,31 @@ class ndPhysicsWorldSettings : public ndWordSettings
 	{
 	}
 
-	virtual void Load(const dLoadSaveBase::dLoadDescriptor& desc) const
+	virtual void Load(const dLoadSaveBase::dLoadDescriptor& desc)
 	{
 		dLoadSaveBase::dLoadDescriptor childDesc(desc);
 		ndWordSettings::Load(childDesc);
-
+		
 		// load application specific settings here
-		dMatrix cameraMatrix(xmlGetMatrix(desc.m_rootNode, "cameraMatrix"));
-		ndPhysicsWorld* const world = (ndPhysicsWorld*)m_owner;
-		ndDemoEntityManager* const manager = world->GetManager();
-		manager->SetCameraMatrix(cameraMatrix, cameraMatrix.m_posit);
+		m_cameraMatrix = xmlGetMatrix(desc.m_rootNode, "cameraMatrix");
 	}
 
 	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	{
-		nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-		desc.m_rootNode->LinkEndChild(childNode);
-		ndWordSettings::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
-		
-		xmlSaveParam(childNode, "description", "string", "this scene was saved from Newton 4.0 sandbox demos");
-
-		ndPhysicsWorld* const world = (ndPhysicsWorld*)m_owner;
-		ndDemoEntityManager* const manager = world->GetManager();
-		ndDemoCamera* const camera = manager->GetCamera();
-		xmlSaveParam(childNode, "cameraMatrix", camera->GetCurrentMatrix());
+		dAssert(0);
+		//nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+		//desc.m_rootNode->LinkEndChild(childNode);
+		//ndWordSettings::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+		//
+		//xmlSaveParam(childNode, "description", "string", "this scene was saved from Newton 4.0 sandbox demos");
+		//
+		//ndPhysicsWorld* const world = (ndPhysicsWorld*)m_owner;
+		//ndDemoEntityManager* const manager = world->GetManager();
+		//ndDemoCamera* const camera = manager->GetCamera();
+		//xmlSaveParam(childNode, "cameraMatrix", camera->GetCurrentMatrix());
 	}
+
+	dMatrix m_cameraMatrix;
 };
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndPhysicsWorldSettings);
 
@@ -90,8 +91,9 @@ ndPhysicsWorld::~ndPhysicsWorld()
 
 void ndPhysicsWorld::SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	ndPhysicsWorldSettings setting((ndWorld*)this);
-	setting.Save(desc);
+	dAssert(0);
+	//ndPhysicsWorldSettings setting((ndWorld*)this);
+	//setting.Save(desc);
 }
 
 ndDemoEntityManager* ndPhysicsWorld::GetManager() const
@@ -167,8 +169,37 @@ void ndPhysicsWorld::OnPostUpdate(dFloat32 timestep)
 	}
 }
 
-void ndPhysicsWorld::OnLoadScene(const dLoadSaveBase::dLoadDescriptor& desc)
+bool ndPhysicsWorld::LoadScene(const char* const path)
 {
-	ndWorld::OnLoadScene(desc);
-	// iterate over the loaded data and add visualization
+	ndLoadSave loadScene;
+	loadScene.LoadScene(path);
+
+	// iterate over the loaded scene and add all objects to the world.
+	dAssert(loadScene.m_setting);
+	ndDemoEntityManager* const manager = GetManager();
+	ndPhysicsWorldSettings* const settings = (ndPhysicsWorldSettings*)loadScene.m_setting;
+	manager->SetCameraMatrix(settings->m_cameraMatrix, settings->m_cameraMatrix.m_posit);
+
+	ndBodyLoaderCache::Iterator bodyIter(loadScene.m_bodyMap);
+	for (bodyIter.Begin(); bodyIter; bodyIter++)
+	{
+		const ndBody* const body = (ndBody*)bodyIter.GetNode()->GetInfo();
+		AddBody((ndBody*)body);
+	}
+	
+	ndJointLoaderCache::Iterator jointIter(loadScene.m_jointMap);
+	for (jointIter.Begin(); jointIter; jointIter++)
+	{
+		const ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)jointIter.GetNode()->GetInfo();
+		AddJoint((ndJointBilateralConstraint*)joint);
+	}
+	
+	ndModelLoaderCache::Iterator modelIter(loadScene.m_modelMap);
+	for (modelIter.Begin(); modelIter; modelIter++)
+	{
+		const ndModel* const model = modelIter.GetNode()->GetInfo();
+		AddModel((ndModel*)model);
+	}
+
+	return true;
 }

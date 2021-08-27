@@ -30,7 +30,7 @@ class ndPhysicsWorld: public ndWorld
 
 	void QueueBodyForDelete(ndBody* const body);
 
-	void OnLoadScene(const dLoadSaveBase::dLoadDescriptor& desc);
+	bool LoadScene(const char* const path);
 	virtual void SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	private:

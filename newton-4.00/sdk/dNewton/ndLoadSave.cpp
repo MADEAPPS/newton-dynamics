@@ -21,18 +21,47 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndWorld.h"
-#include "ndModel.h"
-#include "ndWorldScene.h"
+#include "ndLoadSave.h"
+//#include "ndWorld.h"
+//#include "ndModel.h"
+//#include "ndWorldScene.h"
 #include "ndBodyDynamic.h"
-#include "ndSkeletonList.h"
-#include "ndDynamicsUpdate.h"
-#include "ndBodyParticleSet.h"
-#include "ndDynamicsUpdateSoa.h"
-#include "ndDynamicsUpdateAvx2.h"
-#include "ndDynamicsUpdateOpencl.h"
-#include "ndJointBilateralConstraint.h"
+//#include "ndSkeletonList.h"
+//#include "ndDynamicsUpdate.h"
+//#include "ndBodyParticleSet.h"
+//#include "ndDynamicsUpdateSoa.h"
+//#include "ndDynamicsUpdateAvx2.h"
+//#include "ndDynamicsUpdateOpencl.h"
+//#include "ndJointBilateralConstraint.h"
 
+
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndWordSettings);
+
+ndWordSettings::ndWordSettings(const dLoadSaveBase::dLoadDescriptor&)
+	:dClassAlloc()
+	,m_subSteps(2)
+	,m_solverIterations(4)
+{
+}
+
+//void ndWordSettings::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+//{
+//	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+//	desc.m_rootNode->LinkEndChild(childNode);
+//
+//	xmlSaveParam(childNode, "description", "string", "Newton Dynamics 4.00");
+//	xmlSaveParam(childNode, "revision", "string", "1.00");
+//	xmlSaveParam(childNode, "solverSubsteps", m_owner->GetSubSteps());
+//	xmlSaveParam(childNode, "solverIterations", m_owner->GetSolverIterations());
+//}
+
+void ndWordSettings::Load(const dLoadSaveBase::dLoadDescriptor& desc)
+{
+	m_subSteps = xmlGetInt(desc.m_rootNode, "solverSubsteps");
+	m_solverIterations = xmlGetInt(desc.m_rootNode, "solverIterations");
+}
+
+#if 0
 class ndSkeletonQueue : public dFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>
 {
 	public:
@@ -945,11 +974,10 @@ void ndWorld::BodiesInAabb(ndBodiesInAabbNotify& callback) const
 	m_scene->BodiesInAabb(callback);
 }
 
-void ndWorld::SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor&) const
+void ndWorld::SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
-	dAssert(0);
-//	ndWordSettings setting((ndWorld*)this);
-//	setting.Save(desc);
+	ndWordSettings setting((ndWorld*)this);
+	setting.Save(desc);
 }
 
 void ndWorld::SaveSceneSettings(nd::TiXmlNode* const rootNode, const char* const assetPath, const char* const assetName) const
@@ -964,6 +992,7 @@ void ndWorld::SaveSceneSettings(nd::TiXmlNode* const rootNode, const char* const
 	//ndWorld::SaveSceneSettings(descriptor);
 	SaveSceneSettings(descriptor);
 }
+
 
 void ndWorld::SaveCollisionShapes(nd::TiXmlNode* const shapeRootNode,
 	const char* const assetPath, const char* const assetName,
@@ -1027,6 +1056,7 @@ void ndWorld::SaveCollisionShapes(nd::TiXmlNode* const shapeRootNode,
 	}
 }
 
+
 void ndWorld::SaveRigidBodies(nd::TiXmlNode* const rootNode, 
 	const char* const assetPath, const char* const assetName,
 	const dTree<dUnsigned32, const ndShape*>& shapesMap,
@@ -1057,6 +1087,7 @@ void ndWorld::SaveRigidBodies(nd::TiXmlNode* const rootNode,
 		}
 	}
 }
+
 
 void ndWorld::SaveJoints(nd::TiXmlNode* const rootNode,
 	const char* const assetPath, const char* const assetName,
@@ -1180,3 +1211,202 @@ void ndWorld::SaveScene(const char* const path)
 	setlocale(LC_ALL, oldloc);
 }
 
+#endif
+
+bool ndLoadSave::LoadScene(const char* const path)
+{
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+
+	nd::TiXmlDocument doc(path);
+	doc.LoadFile();
+	if (doc.Error())
+	{
+		return false;
+	}
+	dAssert(!doc.Error());
+
+	if (!doc.FirstChild("ndWorld"))
+	{
+		return false;
+	}
+
+	char assetPath[1024];
+	strcpy(assetPath, path);
+
+	char* namePtr = strrchr(assetPath, '/');
+	if (!namePtr)
+	{
+		namePtr = strrchr(assetPath, '\\');
+	}
+	namePtr[0] = 0;
+
+	const nd::TiXmlElement* const worldNode = doc.RootElement();
+
+	//ndBodyLoaderCache bodyMap;
+	//ndJointLoaderCache jointMap;
+	//ndModelLoaderCache modelMap;
+	ndShapeLoaderCache shapesMap;
+	
+	LoadSceneSettings(worldNode, assetPath);
+	LoadCollisionShapes(worldNode, assetPath, shapesMap);
+	LoadRigidBodies(worldNode, assetPath, shapesMap);
+	LoadJoints(worldNode, assetPath);
+	LoadModels(worldNode, assetPath);
+	setlocale(LC_ALL, oldloc);
+
+	return true;
+}
+
+void ndLoadSave::LoadSceneSettings(const nd::TiXmlNode* const rootNode, const char* const assetPath)
+{
+	const nd::TiXmlNode* const setting = rootNode->FirstChild("ndSettings");
+	dAssert(setting);
+
+	const nd::TiXmlNode* node = setting->FirstChild();
+	const char* const className = node->Value();
+
+	dLoadSaveBase::dLoadDescriptor settingDesc;
+	settingDesc.m_rootNode = node;
+	settingDesc.m_assetPath = assetPath;
+
+	m_setting = D_CLASS_REFLECTION_LOAD_NODE(ndWordSettings, className, settingDesc);
+	m_setting->Load(settingDesc);
+}
+
+void ndLoadSave::LoadCollisionShapes(const nd::TiXmlNode* const rootNode, 
+	const char* const assetPath, ndShapeLoaderCache& shapesMap)
+{
+	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndShapes");
+	if (shapes)
+	{
+		dLoadSaveBase::dLoadDescriptor descriptor;
+		descriptor.m_assetPath = assetPath;
+
+		class ndPendingCompounds
+		{
+			public:
+			ndShapeInstance* m_compoundInstance;
+			const nd::TiXmlNode* m_subShapeNodes;
+		};
+
+		dArray<ndPendingCompounds> pendingCompounds;
+		for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
+		{
+			const char* const name = node->Value();
+			descriptor.m_rootNode = node;
+			ndShape* const shape = D_CLASS_REFLECTION_LOAD_NODE(ndShape, name, descriptor);
+			dAssert(shape);
+			if (shape)
+			{
+				dInt32 hashId;
+				const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+				element->Attribute("hashId", &hashId);
+				ndShapeLoaderCache::dNode* const shapeMapNode = shapesMap.Insert(ndShapeInstance(shape), hashId);
+				ndShapeCompound* const compound = ((ndShape*)shapeMapNode->GetInfo().GetShape())->GetAsShapeCompound();
+				if (compound)
+				{
+					ndPendingCompounds pending;
+					pending.m_compoundInstance = (ndShapeInstance*)&shapeMapNode->GetInfo();
+					pending.m_subShapeNodes = element->FirstChild()->NextSibling();
+					pendingCompounds.PushBack(pending);
+				}
+			}
+		}
+
+		for (dInt32 i = 0; i < pendingCompounds.GetCount(); i++)
+		{
+			ndShapeInstance* const instance = pendingCompounds[i].m_compoundInstance;
+			ndShapeCompound* const compound = instance->GetShape()->GetAsShapeCompound();
+			compound->BeginAddRemove();
+			for (const nd::TiXmlNode* node = pendingCompounds[i].m_subShapeNodes->FirstChild("ndShapeInstance"); node; node = node->NextSibling())
+			{
+				ndShapeInstance subShapeInstance(node, shapesMap);
+				compound->AddCollision(&subShapeInstance);
+			}
+			compound->EndAddRemove();
+		}
+	}
+}
+
+void ndLoadSave::LoadRigidBodies(const nd::TiXmlNode* const rootNode, 
+	const char* const assetPath, const ndShapeLoaderCache& shapesMap)
+{
+	const nd::TiXmlNode* const bodies = rootNode->FirstChild("ndBodies");
+	if (bodies)
+	{
+		dLoadSaveBase::dLoadDescriptor descriptor;
+		descriptor.m_assetPath = assetPath;
+		descriptor.m_shapeMap = &shapesMap;
+
+		for (const nd::TiXmlNode* node = bodies->FirstChild(); node; node = node->NextSibling())
+		{
+			const char* const name = node->Value();
+			descriptor.m_rootNode = node;
+			ndBody* const body = D_CLASS_REFLECTION_LOAD_NODE(ndBody, name, descriptor);
+			if (body)
+			{
+				dInt32 hashId;
+				const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+				element->Attribute("hashId", &hashId);
+				m_bodyMap.Insert(body, hashId);
+			}
+		}
+	}
+}
+
+void ndLoadSave::LoadJoints(const nd::TiXmlNode* const rootNode, const char* const assetPath)
+{
+	const nd::TiXmlNode* const joints = rootNode->FirstChild("ndBilateralJoints");
+	if (joints)
+	{
+		ndBodyDynamic sentinelBody;
+		dInt32 sentinelHash = 0;
+		m_bodyMap.Insert(&sentinelBody, sentinelHash);
+		dLoadSaveBase::dLoadDescriptor descriptor;
+		descriptor.m_assetPath = assetPath;
+		descriptor.m_bodyMap = &m_bodyMap;
+
+		for (const nd::TiXmlNode* node = joints->FirstChild(); node; node = node->NextSibling())
+		{
+			const char* const name = node->Value();
+			descriptor.m_rootNode = node;
+			ndJointBilateralConstraint* const joint = D_CLASS_REFLECTION_LOAD_NODE(ndJointBilateralConstraint, name, descriptor);
+			if (joint)
+			{
+				dInt32 hashId;
+				const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+				element->Attribute("hashId", &hashId);
+				m_jointMap.Insert(joint, hashId);
+			}
+		}
+		
+		m_bodyMap.Remove(sentinelHash);
+	}
+}
+
+void ndLoadSave::LoadModels(const nd::TiXmlNode* const rootNode, const char* const assetPath)
+{
+	const nd::TiXmlNode* const models = rootNode->FirstChild("ndModels");
+	if (models)
+	{
+		dLoadSaveBase::dLoadDescriptor descriptor;
+		descriptor.m_assetPath = assetPath;
+		descriptor.m_bodyMap = &m_bodyMap;
+		descriptor.m_jointMap = &m_jointMap;
+
+		for (const nd::TiXmlNode* node = models->FirstChild(); node; node = node->NextSibling())
+		{
+			const char* const name = node->Value();
+			descriptor.m_rootNode = node;
+			ndModel* const model = D_CLASS_REFLECTION_LOAD_NODE(ndModel, name, descriptor);
+			if (model)
+			{
+				dInt32 hashId;
+				const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+				element->Attribute("hashId", &hashId);
+				m_modelMap.Insert(model, hashId);
+			}
+		}
+	}
+}
