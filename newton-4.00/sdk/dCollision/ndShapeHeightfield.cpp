@@ -110,7 +110,7 @@ ndShapeHeightfield::ndShapeHeightfield(const dLoadSaveBase::dLoadDescriptor& des
 	m_horizontalScaleInv_x = dFloat32(1.0f) / m_horizontalScale_x;
 	m_horizontalScaleInv_z = dFloat32(1.0f) / m_horizontalScale_z;
 
-	char filePathName[1024];
+	char filePathName[1024 * 2];
 	sprintf(filePathName, "%s/%s", desc.m_assetPath, assetName);
 	FILE* const file = fopen(filePathName, "rb");
 	if (file)
@@ -148,7 +148,7 @@ void ndShapeHeightfield::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "height", m_height);
 	xmlSaveParam(childNode, "diagonalMode", dInt32 (m_diagonalMode));
 
-	char filePathName[1024];
+	char filePathName[1024 * 2];
 	sprintf(filePathName, "%s/%s", desc.m_assetPath, fileName);
 	desc.m_assetIndex++;
 

@@ -261,7 +261,7 @@ void ndShapeStatic_bvh::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	sprintf(fileName, "%s_%d.bin", desc.m_assetName, desc.m_assetIndex);
 	xmlSaveParam(childNode, "assetName", "string", fileName);
 
-	char filePathName[1024];
+	char filePathName[2 * 1024];
 	sprintf(filePathName, "%s/%s", desc.m_assetPath, fileName);
 	desc.m_assetIndex++;
 	Serialize(filePathName);
