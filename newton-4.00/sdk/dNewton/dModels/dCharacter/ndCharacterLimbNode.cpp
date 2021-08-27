@@ -69,12 +69,11 @@ dNodeBaseHierarchy* ndCharacterLimbNode::CreateClone() const
 	return nullptr;
 }
 
-void ndCharacterLimbNode::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndCharacterLimbNode::Save(const ndCharacterSaveDescriptor& desc) const
 {
-	dLoadSaveBase::dSaveDescriptor childDesc(desc);
+	ndCharacterSaveDescriptor childDesc(desc);
 
-	dTree<dUnsigned32, const ndCharacterLimbNode*>* limbMap = (dTree<dUnsigned32, const ndCharacterLimbNode*>*)childDesc.m_limbMap;
-	limbMap->Insert(limbMap->GetCount(), (ndCharacterLimbNode*)this);
+	childDesc.m_limbMap->Insert(childDesc.m_limbMap->GetCount(), (ndCharacterLimbNode*)this);
 	for (ndCharacterLimbNode* child = GetChild(); child; child = child->GetSibling())
 	{
 		child->Save(childDesc);

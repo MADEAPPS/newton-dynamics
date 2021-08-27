@@ -39,7 +39,7 @@ class ndCharacterForwardDynamicNode: public ndCharacterLimbNode
 	virtual ndJointBilateralConstraint* GetJoint() const;
 
 	protected:
-	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	void Save(const ndCharacterSaveDescriptor& desc) const;
 
 	ndBodyDynamic* m_body;
 	ndJointPid3dofActuator* m_joint;

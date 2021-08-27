@@ -75,12 +75,12 @@ void ndCharacterRootNode::UpdateGlobalPose(ndWorld* const, dFloat32)
 	// for now just; 
 }
 
-void ndCharacterRootNode::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndCharacterRootNode::Save(const ndCharacterSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
-	ndCharacterLimbNode::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndCharacterLimbNode::Save(ndCharacterSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "coronalFrame", m_coronalFrame);
 	xmlSaveParam(childNode, "gravityDir", m_gravityDir);

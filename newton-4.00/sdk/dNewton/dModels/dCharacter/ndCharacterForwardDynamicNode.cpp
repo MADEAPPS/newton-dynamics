@@ -54,12 +54,12 @@ ndCharacterForwardDynamicNode::~ndCharacterForwardDynamicNode()
 	delete m_body;
 }
 
-void ndCharacterForwardDynamicNode::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndCharacterForwardDynamicNode::Save(const ndCharacterSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
-	ndCharacterLimbNode::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndCharacterLimbNode::Save(ndCharacterSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "bodyHash", dInt32(desc.m_bodyMap->Find(m_body)->GetInfo()));
 	xmlSaveParam(childNode, "jointHash", dInt32(desc.m_jointMap->Find(m_joint)->GetInfo()));

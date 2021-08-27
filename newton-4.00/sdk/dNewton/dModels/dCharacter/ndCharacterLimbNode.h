@@ -34,6 +34,30 @@ class ndJointBilateralConstraint;
 class ndCharacterForwardDynamicNode;
 class ndCharacterInverseDynamicNode;
 
+class ndCharacterSaveDescriptor: public dLoadSaveBase::dSaveDescriptor
+{
+	public:
+	ndCharacterSaveDescriptor()
+		:dLoadSaveBase::dSaveDescriptor()
+		,m_limbMap(nullptr)
+	{
+	}
+
+	ndCharacterSaveDescriptor(const dLoadSaveBase::dSaveDescriptor& desc)
+		:dLoadSaveBase::dSaveDescriptor(desc)
+		,m_limbMap(nullptr)
+	{
+	}
+
+	ndCharacterSaveDescriptor(const ndCharacterSaveDescriptor& desc, nd::TiXmlNode* const rootNode)
+		:dLoadSaveBase::dSaveDescriptor(desc, rootNode)
+		,m_limbMap(desc.m_limbMap)
+	{
+	}
+
+	dTree<dUnsigned32, const ndCharacterLimbNode*>* m_limbMap;
+};
+
 class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 {
 	public:
@@ -56,7 +80,7 @@ class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 
 	protected:
 	D_NEWTON_API dNodeBaseHierarchy* CreateClone() const;
-	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API virtual void Save(const ndCharacterSaveDescriptor& desc) const;
 };
 
 inline ndBodyDynamic* ndCharacterLimbNode::GetBody() const

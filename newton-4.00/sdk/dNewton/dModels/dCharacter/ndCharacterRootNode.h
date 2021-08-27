@@ -45,7 +45,7 @@ class ndCharacterRootNode: public ndCharacterLimbNode
 
 	protected:
 	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
-	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	void Save(const ndCharacterSaveDescriptor& desc) const;
 
 	dMatrix m_coronalFrame;
 	dMatrix m_invCoronalFrame;

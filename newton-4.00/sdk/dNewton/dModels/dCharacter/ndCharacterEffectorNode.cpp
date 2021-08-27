@@ -76,12 +76,12 @@ void ndCharacterEffectorNode::SetTargetMatrix(const dMatrix& matrix)
 //	//m_globalPose = body->GetMatrix();
 //}
 
-void ndCharacterEffectorNode::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndCharacterEffectorNode::Save(const ndCharacterSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
-	ndCharacterLimbNode::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndCharacterLimbNode::Save(ndCharacterSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "jointHash", dInt32(desc.m_jointMap->Find(m_effector)->GetInfo()));
 	xmlSaveParam(childNode, "referenceNodeHash", dInt32(desc.m_limbMap->Find(m_referenceNode)->GetInfo()));

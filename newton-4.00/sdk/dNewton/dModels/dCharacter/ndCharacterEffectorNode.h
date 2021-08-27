@@ -45,7 +45,7 @@ class ndCharacterEffectorNode: public ndCharacterLimbNode
 	void SetTargetMatrix(const dMatrix& matrix);
 
 	protected:
-	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	void Save(const ndCharacterSaveDescriptor& desc) const;
 	//void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 
 	ndJointPid6dofActuator* m_effector;
