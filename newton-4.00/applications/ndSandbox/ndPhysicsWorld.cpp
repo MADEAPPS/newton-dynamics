@@ -29,14 +29,16 @@ class ndPhysicsWorldSettings : public ndWordSettings
 	public:
 	D_CLASS_REFLECTION(ndPhysicsWorldSettings);
 
-	ndPhysicsWorldSettings()
+	ndPhysicsWorldSettings(ndPhysicsWorld* const world)
 		:ndWordSettings()
 		,m_cameraMatrix(dGetIdentityMatrix())
+		,m_world(world)
 	{
 	}
 
 	ndPhysicsWorldSettings(const dLoadSaveBase::dLoadDescriptor& desc)
 		:ndWordSettings(dLoadSaveBase::dLoadDescriptor(desc))
+		,m_world(nullptr)
 	{
 	}
 
@@ -51,21 +53,22 @@ class ndPhysicsWorldSettings : public ndWordSettings
 
 	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	{
-		dAssert(0);
-		//nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-		//desc.m_rootNode->LinkEndChild(childNode);
-		//ndWordSettings::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
-		//
-		//xmlSaveParam(childNode, "description", "string", "this scene was saved from Newton 4.0 sandbox demos");
-		//
-		//ndPhysicsWorld* const world = (ndPhysicsWorld*)m_owner;
-		//ndDemoEntityManager* const manager = world->GetManager();
-		//ndDemoCamera* const camera = manager->GetCamera();
-		//xmlSaveParam(childNode, "cameraMatrix", camera->GetCurrentMatrix());
-	}
+		nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+		desc.m_rootNode->LinkEndChild(childNode);
+		ndWordSettings::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
+		ndDemoEntityManager* const manager = m_world->GetManager();
+		ndDemoCamera* const camera = manager->GetCamera();
+
+		dMatrix cameraMatrix (camera->GetCurrentMatrix());
+		xmlSaveParam(childNode, "description", "string", "this scene was saved from Newton 4.0 sandbox demos");
+		xmlSaveParam(childNode, "cameraMatrix", cameraMatrix);
+	}
+	
 	dMatrix m_cameraMatrix;
+	ndPhysicsWorld* m_world;
 };
+
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndPhysicsWorldSettings);
 
 ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
@@ -87,13 +90,6 @@ ndPhysicsWorld::~ndPhysicsWorld()
 	{
 		delete m_soundManager;
 	}
-}
-
-void ndPhysicsWorld::SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const
-{
-	dAssert(0);
-	//ndPhysicsWorldSettings setting((ndWorld*)this);
-	//setting.Save(desc);
 }
 
 ndDemoEntityManager* ndPhysicsWorld::GetManager() const
@@ -175,10 +171,12 @@ bool ndPhysicsWorld::LoadScene(const char* const path)
 	loadScene.LoadScene(path);
 
 	// iterate over the loaded scene and add all objects to the world.
-	dAssert(loadScene.m_setting);
-	ndDemoEntityManager* const manager = GetManager();
-	ndPhysicsWorldSettings* const settings = (ndPhysicsWorldSettings*)loadScene.m_setting;
-	manager->SetCameraMatrix(settings->m_cameraMatrix, settings->m_cameraMatrix.m_posit);
+	if (loadScene.m_setting && (strcmp("ndPhysicsWorldSettings", loadScene.m_setting->SubClassName()) == 0))
+	{
+		ndPhysicsWorldSettings* const settings = (ndPhysicsWorldSettings*)loadScene.m_setting;
+		ndDemoEntityManager* const manager = GetManager();
+		manager->SetCameraMatrix(settings->m_cameraMatrix, settings->m_cameraMatrix.m_posit);
+	}
 
 	ndBodyLoaderCache::Iterator bodyIter(loadScene.m_bodyMap);
 	for (bodyIter.Begin(); bodyIter; bodyIter++)
@@ -202,4 +200,12 @@ bool ndPhysicsWorld::LoadScene(const char* const path)
 	}
 
 	return true;
+}
+
+void ndPhysicsWorld::SaveScene(const char* const path)
+{
+	ndLoadSave loadScene;
+	ndPhysicsWorldSettings setting(this);
+	
+	loadScene.SaveScene(path, this, &setting);
 }

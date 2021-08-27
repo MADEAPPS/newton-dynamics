@@ -88,9 +88,7 @@ class ndWorld: public dClassAlloc
 
 	D_NEWTON_API virtual void AddModel(ndModel* const model);
 	D_NEWTON_API virtual void RemoveModel(ndModel* const model);
-	D_NEWTON_API virtual void SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const;
-	D_NEWTON_API void SaveScene(const char* const path);
-
+	
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
 	const ndModelList& GetModelList() const;
@@ -124,15 +122,6 @@ class ndWorld: public dClassAlloc
 	void ThreadFunction();
 	void PostUpdate(dFloat32 timestep);
 
-	void SaveSceneSettings(nd::TiXmlNode* const rootNode, 
-		const char* const assetPath, const char* const assetName) const;
-	void SaveCollisionShapes(nd::TiXmlNode* const rootNode, 
-		const char* const assetPath, const char* const assetName,
-		dTree<dUnsigned32, const ndShape*>& shapesMap);
-	void SaveRigidBodies(nd::TiXmlNode* const rootNode, 
-		const char* const assetPath, const char* const assetName,
-		const dTree<dUnsigned32, const ndShape*>& shapesMap,
-		dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap);
 	void SaveJoints(nd::TiXmlNode* const rootNode,
 		const char* const assetPath, const char* const assetName,
 		const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,

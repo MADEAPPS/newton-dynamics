@@ -23,24 +23,6 @@
 #define __D_ND_LOAD_SAVE_H__
 
 #include "ndNewtonStdafx.h"
-//#include "ndJointList.h"
-//#include "ndModelList.h"
-//#include "ndSkeletonList.h"
-//#include "ndBodyParticleSetList.h"
-//
-//class ndWorld;
-//class ndModel;
-//class ndBodyDynamic;
-//class ndRayCastNotify;
-//class ndDynamicsUpdate;
-//class ndConvexCastNotify;
-//class ndBodiesInAabbNotify;
-//class ndJointBilateralConstraint;
-//
-//#define D_NEWTON_ENGINE_MAJOR_VERSION 4
-//#define D_NEWTON_ENGINE_MINOR_VERSION 00
-//
-//#define D_SLEEP_ENTRIES			8
 
 class ndWorld;
 class ndWordSettings : public dClassAlloc
@@ -50,6 +32,8 @@ class ndWordSettings : public dClassAlloc
 
 	ndWordSettings()
 		:dClassAlloc()
+		,m_subSteps(2)
+		,m_solverIterations(4)
 	{
 	}
 
@@ -59,7 +43,7 @@ class ndWordSettings : public dClassAlloc
 
 	D_NEWTON_API ndWordSettings(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API virtual void Load(const dLoadSaveBase::dLoadDescriptor& desc);
-//	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	dInt32 m_subSteps;
 	dInt32 m_solverIterations;
@@ -73,20 +57,19 @@ class ndLoadSave: public dClassAlloc
 	~ndLoadSave();
 
 	D_NEWTON_API bool LoadScene(const char* const path);
-	//D_NEWTON_API void SaveScene(const char* const path);
+	D_NEWTON_API void SaveScene(const char* const path, const ndWorld* const world, const ndWordSettings* const setting);
 
 	private:
 	//D_NEWTON_API virtual void SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const;
-	//
-	//void SaveSceneSettings(nd::TiXmlNode* const rootNode, 
-	//	const char* const assetPath, const char* const assetName) const;
-	//void SaveCollisionShapes(nd::TiXmlNode* const rootNode, 
-	//	const char* const assetPath, const char* const assetName,
-	//	dTree<dUnsigned32, const ndShape*>& shapesMap);
-	//void SaveRigidBodies(nd::TiXmlNode* const rootNode, 
-	//	const char* const assetPath, const char* const assetName,
-	//	const dTree<dUnsigned32, const ndShape*>& shapesMap,
-	//	dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap);
+	
+	void SaveSceneSettings(nd::TiXmlNode* const rootNode, const char* const assetPath, const char* const assetName, const ndWordSettings* const setting) const;
+	void SaveCollisionShapes(nd::TiXmlNode* const rootNode, const ndWorld* const world,
+		const char* const assetPath, const char* const assetName,
+		dTree<dUnsigned32, const ndShape*>& shapesMap);
+	void SaveRigidBodies(nd::TiXmlNode* const rootNode, const ndWorld* const world,
+		const char* const assetPath, const char* const assetName,
+		const dTree<dUnsigned32, const ndShape*>& shapesMap,
+		dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap);
 	//void SaveJoints(nd::TiXmlNode* const rootNode,
 	//	const char* const assetPath, const char* const assetName,
 	//	const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,

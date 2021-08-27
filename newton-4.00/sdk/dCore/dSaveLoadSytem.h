@@ -160,6 +160,7 @@ class dLoadSaveClass: public dLoadSaveBase
 };
 
 #define D_CLASS_REFLECTION(Class)								\
+	const virtual char* SubClassName() {return #Class;}			\
 	static const char* ClassName() {return #Class;}				\
 	static dLoadSaveClass<Class> __classLoader__;
 

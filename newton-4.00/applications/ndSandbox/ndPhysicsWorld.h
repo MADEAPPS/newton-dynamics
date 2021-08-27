@@ -31,7 +31,7 @@ class ndPhysicsWorld: public ndWorld
 	void QueueBodyForDelete(ndBody* const body);
 
 	bool LoadScene(const char* const path);
-	virtual void SaveSceneSettings(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	void SaveScene(const char* const path);
 
 	private:
 	void DeletePendingObjects();
