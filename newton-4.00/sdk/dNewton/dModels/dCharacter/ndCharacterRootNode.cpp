@@ -38,7 +38,7 @@ ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic
 	SetCoronalFrame(m_body->GetMatrix());
 }
 
-ndCharacterRootNode::ndCharacterRootNode(const dLoadSaveBase::dLoadDescriptor& desc)
+ndCharacterRootNode::ndCharacterRootNode(const ndCharacterLoadDescriptor& desc)
 	//:ndCharacterLimbNode(dLoadSaveBase::dLoadDescriptor(desc))
 	:ndCharacterLimbNode(desc)
 	,m_coronalFrame(dGetIdentityMatrix())

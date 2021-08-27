@@ -47,14 +47,17 @@ ndCharacter::ndCharacter(const dLoadSaveBase::dLoadDescriptor& desc)
 	,m_controller(nullptr)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	dTree<const ndCharacterLimbNode*, dUnsigned32> limbMap;
 	for (const nd::TiXmlNode* node = xmlNode->FirstChild(); node; node = node->NextSibling())
 	{
 		const char* const partName = node->Value();
 		if (strcmp(partName, "ndCharacterRootNode") == 0)
 		{
-			dLoadSaveBase::dLoadDescriptor rootDesc(desc);
-			rootDesc.m_rootNode = node;
-			m_rootNode = new ndCharacterRootNode(rootDesc);
+			//dLoadSaveBase::dLoadDescriptor rootDesc(desc);
+			ndCharacterLoadDescriptor loadDesc(desc, &limbMap);
+			loadDesc.m_rootNode = node;
+			m_rootNode = new ndCharacterRootNode(loadDesc);
 			m_rootNode->m_owner = this;
 		}
 	}

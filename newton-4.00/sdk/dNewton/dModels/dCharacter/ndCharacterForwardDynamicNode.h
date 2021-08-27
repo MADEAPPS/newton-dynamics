@@ -31,7 +31,7 @@ class ndCharacterForwardDynamicNode: public ndCharacterLimbNode
 {
 	public:
 	D_CLASS_REFLECTION(ndCharacterForwardDynamicNode);
-	D_NEWTON_API ndCharacterForwardDynamicNode(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndCharacterForwardDynamicNode(const ndCharacterLoadDescriptor& desc);
 	D_NEWTON_API ndCharacterForwardDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterForwardDynamicNode ();
 

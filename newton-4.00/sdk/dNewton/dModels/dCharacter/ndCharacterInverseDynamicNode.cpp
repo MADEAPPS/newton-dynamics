@@ -35,7 +35,7 @@ ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const dMatrix& matr
 {
 }
 
-ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const dLoadSaveBase::dLoadDescriptor& desc)
+ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const ndCharacterLoadDescriptor& desc)
 	:ndCharacterLimbNode(desc)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

@@ -37,19 +37,20 @@ ndCharacterEffectorNode::ndCharacterEffectorNode(const dMatrix& matrixInGlobalSc
 	m_effector = new ndJointPid6dofActuator(matrixInGlobalScape, body0, body1);
 }
 
-ndCharacterEffectorNode::ndCharacterEffectorNode(const dLoadSaveBase::dLoadDescriptor& desc)
+ndCharacterEffectorNode::ndCharacterEffectorNode(const ndCharacterLoadDescriptor& desc)
 	:ndCharacterLimbNode(desc)
-	,m_referenceNode(m_referenceNode)
+	,m_referenceNode(nullptr)
 {
-	dAssert(0);
-	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	//dInt32 bodyHash = xmlGetInt(xmlNode, "bodyHash");
-	//dInt32 jointHash = xmlGetInt(xmlNode, "jointHash");
-	//
-	//const ndBody* const body = desc.m_bodyMap->Find(bodyHash)->GetInfo();
-	//const ndJointBilateralConstraint* const joint = desc.m_jointMap->Find(jointHash)->GetInfo();
-	//m_body = (ndBodyDynamic*)body;
-	//m_joint = (ndJointPid3dofActuator*)joint;
+	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+	dInt32 jointHash = xmlGetInt(xmlNode, "jointHash");
+	dInt32 refHash = xmlGetInt(xmlNode, "referenceNodeHash");
+	
+	const ndJointBilateralConstraint* const joint = desc.m_jointMap->Find(jointHash)->GetInfo();
+	const ndCharacterLimbNode* const reference = desc.m_limbMap->Find(refHash)->GetInfo();
+
+	m_referenceNode = (ndCharacterLimbNode*)reference;
+	m_effector = (ndJointPid6dofActuator*)joint;
 }
 
 ndCharacterEffectorNode::~ndCharacterEffectorNode()

@@ -95,11 +95,11 @@ class dLoadSaveBase
 			:m_assetPath(nullptr)
 			,m_assetName(nullptr)
 			,m_rootNode(nullptr)
-			,m_assetIndex(0)
 			,m_nodeNodeHash(0)
 			,m_shapeNodeHash(0)
 			,m_body0NodeHash(0)
 			,m_body1NodeHash(0)
+			,m_assetIndex(0)
 			,m_shapeMap(nullptr)
 			,m_bodyMap(nullptr)
 			,m_jointMap(nullptr)
@@ -110,11 +110,11 @@ class dLoadSaveBase
 			:m_assetPath(desc.m_assetPath)
 			,m_assetName(desc.m_assetName)
 			,m_rootNode(rootNode)
-			,m_assetIndex(desc.m_assetIndex)
 			,m_nodeNodeHash(desc.m_nodeNodeHash)
 			,m_shapeNodeHash(desc.m_shapeNodeHash)
 			,m_body0NodeHash(desc.m_body0NodeHash)
 			,m_body1NodeHash(desc.m_body1NodeHash)
+			,m_assetIndex(desc.m_assetIndex)
 			,m_shapeMap(desc.m_shapeMap)
 			,m_bodyMap(desc.m_bodyMap)
 			,m_jointMap(desc.m_jointMap)
@@ -124,11 +124,11 @@ class dLoadSaveBase
 		const char* m_assetPath;
 		const char* m_assetName;
 		nd::TiXmlNode* m_rootNode;
-		mutable dInt32 m_assetIndex;
 		dInt32 m_nodeNodeHash;
 		dInt32 m_shapeNodeHash;
 		dInt32 m_body0NodeHash;
 		dInt32 m_body1NodeHash;
+		mutable dInt32 m_assetIndex;
 		dTree<dUnsigned32, const ndShape*>* m_shapeMap;
 		const dTree<dUnsigned32, const ndBodyKinematic*>* m_bodyMap;
 		const dTree<dUnsigned32, const ndJointBilateralConstraint*>* m_jointMap;

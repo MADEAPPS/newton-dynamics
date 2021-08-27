@@ -35,7 +35,7 @@ ndCharacterLimbNode::ndCharacterLimbNode(ndCharacterLimbNode* const parent)
 	}
 }
 
-ndCharacterLimbNode::ndCharacterLimbNode(const dLoadSaveBase::dLoadDescriptor& desc)
+ndCharacterLimbNode::ndCharacterLimbNode(const ndCharacterLoadDescriptor& desc)
 	:dNodeHierarchy<ndCharacterLimbNode>()
 {
 	if (desc.m_parentModelNode)
@@ -45,7 +45,12 @@ ndCharacterLimbNode::ndCharacterLimbNode(const dLoadSaveBase::dLoadDescriptor& d
 
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
-	dLoadSaveBase::dLoadDescriptor childDesc(desc);
+	dInt32 hashId;
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*) xmlNode;
+	element->Attribute("hashId", &hashId);
+	desc.m_limbMap->Insert(this, hashId);
+
+	ndCharacterLoadDescriptor childDesc(desc);
 	childDesc.m_parentModelNode = this;
 	for (const nd::TiXmlNode* node = xmlNode->FirstChild(); node; node = node->NextSibling())
 	{

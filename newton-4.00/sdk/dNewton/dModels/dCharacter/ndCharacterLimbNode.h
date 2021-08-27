@@ -34,6 +34,39 @@ class ndJointBilateralConstraint;
 class ndCharacterForwardDynamicNode;
 class ndCharacterInverseDynamicNode;
 
+class ndCharacterLoadDescriptor: public dLoadSaveBase::dLoadDescriptor
+{
+	public:
+	ndCharacterLoadDescriptor()
+		:dLoadSaveBase::dLoadDescriptor()
+		,m_limbMap(nullptr)
+	{
+	}
+
+	ndCharacterLoadDescriptor(const dLoadSaveBase::dLoadDescriptor& desc)
+		:dLoadDescriptor(desc)
+		,m_limbMap(nullptr)
+	{
+		ndCharacterLoadDescriptor* const modelDesc = (ndCharacterLoadDescriptor*)&desc;
+		m_rootNode = desc.m_rootNode;
+		m_limbMap = modelDesc->m_limbMap;
+	}
+
+	ndCharacterLoadDescriptor(const dLoadSaveBase::dLoadDescriptor& desc, dTree<const ndCharacterLimbNode*, dUnsigned32>* const limbMap)
+		:dLoadDescriptor(desc)
+		,m_limbMap(limbMap)
+	{
+	}
+
+	ndCharacterLoadDescriptor(const ndCharacterLoadDescriptor& desc)
+		:dLoadDescriptor(desc)
+		,m_limbMap(desc.m_limbMap)
+	{
+	}
+
+	dTree<const ndCharacterLimbNode*, dUnsigned32>* m_limbMap;
+};
+
 class ndCharacterSaveDescriptor: public dLoadSaveBase::dSaveDescriptor
 {
 	public:
@@ -62,7 +95,7 @@ class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 {
 	public:
 	D_CLASS_REFLECTION(ndCharacterLimbNode);
-	D_NEWTON_API ndCharacterLimbNode(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndCharacterLimbNode(const ndCharacterLoadDescriptor& desc);
 	D_NEWTON_API ndCharacterLimbNode(ndCharacterLimbNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterLimbNode ();
 

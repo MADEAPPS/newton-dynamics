@@ -29,7 +29,7 @@ class ndCharacterRootNode: public ndCharacterLimbNode
 {
 	public:
 	D_CLASS_REFLECTION(ndCharacterRootNode);
-	D_NEWTON_API ndCharacterRootNode(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndCharacterRootNode(const ndCharacterLoadDescriptor& desc);
 	D_NEWTON_API ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body);
 	D_NEWTON_API virtual ~ndCharacterRootNode ();
 
