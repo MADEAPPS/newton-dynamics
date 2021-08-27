@@ -885,7 +885,7 @@ void ndMultiBodyVehicle::ndDownForce::Save(nd::TiXmlNode* const parentNode) cons
 	parentNode->LinkEndChild(childNode);
 
 	xmlSaveParam(childNode, "gravity", m_gravity);
-	for (dInt32 i = 0; i < sizeof(m_downForceTable) / sizeof(m_downForceTable[0]); i++)
+	for (dInt32 i = 0; i < dInt32 (sizeof(m_downForceTable) / sizeof(m_downForceTable[0])); i++)
 	{
 		dVector nod(m_downForceTable[i].m_speed, m_downForceTable[i].m_forceFactor, m_downForceTable[i].m_aerodynamicDownforceConstant, dFloat32(0.0f));
 		xmlSaveParam(childNode, "downforceCurve", nod);
@@ -896,7 +896,7 @@ void ndMultiBodyVehicle::ndDownForce::Load(const nd::TiXmlNode* const xmlNode)
 {
 	m_gravity = xmlGetFloat(xmlNode, "gravity");
 	const nd::TiXmlNode* node = xmlNode->FirstChild();
-	for (dInt32 i = 0; i < sizeof(m_downForceTable) / sizeof(m_downForceTable[0]); i++)
+	for (dInt32 i = 0; i < dInt32 (sizeof(m_downForceTable) / sizeof(m_downForceTable[0])); i++)
 	{
 		node = node->NextSibling();
 		const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
