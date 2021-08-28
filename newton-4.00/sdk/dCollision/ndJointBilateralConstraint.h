@@ -49,6 +49,8 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 
 	virtual ndBodyKinematic* GetBody0() const;
 	virtual ndBodyKinematic* GetBody1() const;
+	void ReplaceSentinel(ndBodyKinematic* const sentinel);
+
 	virtual dUnsigned32 GetRowsCount() const;
 	virtual ndJointBilateralConstraint* GetAsBilateral() { return this; }
 	virtual void JacobianDerivative(ndConstraintDescritor& desc);
@@ -294,6 +296,11 @@ inline bool ndJointBilateralConstraint::IsSkeleton() const
 	test = test || (mode == m_jointkinematicCloseLoop);
 	//test = test || (mode == m_jointkinematicHintOpenLoop);
 	return test;
+}
+
+inline void ndJointBilateralConstraint::ReplaceSentinel(ndBodyKinematic* const sentinel)
+{
+	m_body1 = sentinel;
 }
 
 #endif

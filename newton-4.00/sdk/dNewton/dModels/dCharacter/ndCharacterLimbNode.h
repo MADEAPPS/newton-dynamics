@@ -88,7 +88,7 @@ class ndCharacterSaveDescriptor: public dLoadSaveBase::dSaveDescriptor
 	{
 	}
 
-	dTree<dUnsigned32, const ndCharacterLimbNode*>* m_limbMap;
+	dTree<dInt32, const ndCharacterLimbNode*>* m_limbMap;
 };
 
 class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>

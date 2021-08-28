@@ -25,6 +25,8 @@
 #include "ndNewtonStdafx.h"
 
 class ndWorld;
+class ndLoadSaveInfo;
+
 class ndWordSettings : public dClassAlloc
 {
 	public:
@@ -57,30 +59,19 @@ class ndLoadSave: public dClassAlloc
 	~ndLoadSave();
 
 	D_NEWTON_API bool LoadScene(const char* const path);
+	D_NEWTON_API void SaveModel(const char* const path, const ndModel* const model);
 	D_NEWTON_API void SaveScene(const char* const path, const ndWorld* const world, const ndWordSettings* const setting);
 
 	private:
-	void SaveSceneSettings(nd::TiXmlNode* const rootNode, const char* const assetPath, const char* const assetName, const ndWordSettings* const setting) const;
-	void SaveCollisionShapes(nd::TiXmlNode* const rootNode, const ndWorld* const world,
-		const char* const assetPath, const char* const assetName,
-		dTree<dUnsigned32, const ndShape*>& shapesMap);
-	void SaveRigidBodies(nd::TiXmlNode* const rootNode, const ndWorld* const world,
-		const char* const assetPath, const char* const assetName,
-		const dTree<dUnsigned32, const ndShape*>& shapesMap,
-		dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap);
-	void SaveJoints(nd::TiXmlNode* const rootNode, const ndWorld* const world,
-		const char* const assetPath, const char* const assetName,
-		const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,
-		dTree<dUnsigned32, const ndJointBilateralConstraint*>& jointMap);
-	void SaveModels(nd::TiXmlNode* const rootNode, const ndWorld* const world,
-		const char* const assetPath, const char* const assetName,
-		const dTree<dUnsigned32, const ndBodyKinematic*>& bodyMap,
-		const dTree<dUnsigned32, const ndJointBilateralConstraint*>& jointMap,
-		dTree<dUnsigned32, const ndModel*>& modelMap);
+	void SaveSceneSettings(ndLoadSaveInfo& info) const;
+	void SaveShapes(ndLoadSaveInfo& info);
+	void SaveBodies(ndLoadSaveInfo& info);
+	void SaveJoints(ndLoadSaveInfo& info);
+	void SaveModels(ndLoadSaveInfo& info);
 	
 	void LoadSceneSettings(const nd::TiXmlNode* const rootNode, const char* const assetPath);
-	void LoadCollisionShapes(const nd::TiXmlNode* const rootNode, const char* const assetPath, ndShapeLoaderCache& shapesMap);
-	void LoadRigidBodies(const nd::TiXmlNode* const rootNode, const char* const assetPath, const ndShapeLoaderCache& shapesMap);
+	void LoadShapes(const nd::TiXmlNode* const rootNode, const char* const assetPath, ndShapeLoaderCache& shapesMap);
+	void LoadBodies(const nd::TiXmlNode* const rootNode, const char* const assetPath, const ndShapeLoaderCache& shapesMap);
 	void LoadJoints(const nd::TiXmlNode* const rootNode, const char* const assetPath);
 	void LoadModels(const nd::TiXmlNode* const rootNode, const char* const assetPath);
 

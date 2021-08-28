@@ -84,5 +84,12 @@ void ndCharacterRootNode::Save(const ndCharacterSaveDescriptor& desc) const
 
 	xmlSaveParam(childNode, "coronalFrame", m_coronalFrame);
 	xmlSaveParam(childNode, "gravityDir", m_gravityDir);
-	xmlSaveParam(childNode, "bodyHash", dInt32(desc.m_bodyMap->Find(GetBody())->GetInfo()));
+
+	dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode = desc.m_bodyMap->Find(m_body);
+	if (!bodyNode)
+	{
+		bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_body);
+	}
+	dAssert(bodyNode);
+	xmlSaveParam(childNode, "bodyHash", bodyNode->GetInfo());
 }

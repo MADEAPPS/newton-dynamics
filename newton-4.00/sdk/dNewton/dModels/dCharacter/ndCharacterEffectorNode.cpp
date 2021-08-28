@@ -84,6 +84,15 @@ void ndCharacterEffectorNode::Save(const ndCharacterSaveDescriptor& desc) const
 	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
 	ndCharacterLimbNode::Save(ndCharacterSaveDescriptor(desc, childNode));
 
-	xmlSaveParam(childNode, "jointHash", dInt32(desc.m_jointMap->Find(m_effector)->GetInfo()));
-	xmlSaveParam(childNode, "referenceNodeHash", dInt32(desc.m_limbMap->Find(m_referenceNode)->GetInfo()));
+	dTree<dInt32, const ndJointBilateralConstraint*>::dNode* jointNode = desc.m_jointMap->Find(m_effector);
+	if (!jointNode)
+	{
+		jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_effector);
+	}
+	dTree<dInt32, const ndCharacterLimbNode*>::dNode* const limbNode = desc.m_limbMap->Find(m_referenceNode);
+	dAssert(jointNode);
+	dAssert(limbNode);
+
+	xmlSaveParam(childNode, "jointHash", jointNode->GetInfo());
+	xmlSaveParam(childNode, "referenceNodeHash", limbNode->GetInfo());
 }

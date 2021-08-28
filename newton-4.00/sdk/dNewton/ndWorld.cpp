@@ -357,7 +357,11 @@ void ndWorld::DeleteBody(ndBody* const body)
 
 void ndWorld::AddJoint(ndJointBilateralConstraint* const joint)
 {
-	//dAssert(joint->m_worldNode == nullptr);
+	// if the second body is nullPtr, replace it the sentinel
+	if (joint->m_body1 == nullptr)
+	{
+		joint->m_body1 = m_sentinelBody;
+	}
 	if (joint->m_worldNode == nullptr)
 	{
 		dAssert(joint->m_body0Node == nullptr);

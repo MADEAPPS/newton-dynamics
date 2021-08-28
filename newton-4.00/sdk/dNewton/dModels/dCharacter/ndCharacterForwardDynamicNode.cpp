@@ -61,6 +61,20 @@ void ndCharacterForwardDynamicNode::Save(const ndCharacterSaveDescriptor& desc) 
 	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
 	ndCharacterLimbNode::Save(ndCharacterSaveDescriptor(desc, childNode));
 
-	xmlSaveParam(childNode, "bodyHash", dInt32(desc.m_bodyMap->Find(m_body)->GetInfo()));
-	xmlSaveParam(childNode, "jointHash", dInt32(desc.m_jointMap->Find(m_joint)->GetInfo()));
+	dTree<dInt32, const ndJointBilateralConstraint*>::dNode* jointNode = desc.m_jointMap->Find(m_joint);
+	if (!jointNode)
+	{
+		jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_joint);
+	}
+
+	dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode = desc.m_bodyMap->Find(m_body);
+	if (!bodyNode)
+	{
+		bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_body);
+	}
+	dAssert(jointNode);
+	dAssert(bodyNode);
+
+	xmlSaveParam(childNode, "bodyHash", dInt32(bodyNode->GetInfo()));
+	xmlSaveParam(childNode, "jointHash", dInt32(jointNode->GetInfo()));
 }
