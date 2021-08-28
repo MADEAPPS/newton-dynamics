@@ -94,6 +94,11 @@ class ndBodyDynamic: public ndBodyKinematic
 	friend class ndDynamicsUpdateOpencl;
 } D_GCC_NEWTON_ALIGN_32 ;
 
+class ndBodySentinel : public ndBodyDynamic
+{
+	ndBodySentinel* GetAsBodySentinel() { return this; }
+};
+
 inline dVector ndBodyDynamic::GetForce() const
 {
 	return m_externalForce;

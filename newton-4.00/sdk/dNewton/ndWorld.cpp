@@ -143,7 +143,7 @@ ndWorld::ndWorld()
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxOmega = 0.1f;
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_steps = steps;
 
-	m_sentinelBody = new ndBodyDynamic;
+	m_sentinelBody = new ndBodySentinel;
 }
 
 ndWorld::~ndWorld()

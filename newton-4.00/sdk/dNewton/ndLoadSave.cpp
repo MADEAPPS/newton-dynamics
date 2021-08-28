@@ -178,9 +178,6 @@ void ndLoadSave::LoadJoints(const nd::TiXmlNode* const rootNode, const char* con
 	const nd::TiXmlNode* const joints = rootNode->FirstChild("ndJoints");
 	if (joints)
 	{
-		ndBodyDynamic sentinelBody;
-		dInt32 sentinelHash = 0;
-		m_bodyMap.Insert(&sentinelBody, sentinelHash);
 		dLoadSaveBase::dLoadDescriptor descriptor;
 		descriptor.m_assetPath = assetPath;
 		descriptor.m_bodyMap = &m_bodyMap;
@@ -196,14 +193,12 @@ void ndLoadSave::LoadJoints(const nd::TiXmlNode* const rootNode, const char* con
 				const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
 				element->Attribute("hashId", &hashId);
 				m_jointMap.Insert(joint, hashId);
-				if (joint->GetBody1() == &sentinelBody)
+				if (joint->GetBody1()->GetAsBodySentinel())
 				{
 					joint->ReplaceSentinel(nullptr);
 				}
 			}
 		}
-		
-		m_bodyMap.Remove(sentinelHash);
 	}
 }
 
@@ -309,15 +304,17 @@ void ndLoadSave::SaveJoints(ndLoadSaveInfo& info)
 	for (ndJointList::dNode* jointNode = info.m_jointList->GetFirst(); jointNode; jointNode = jointNode->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = jointNode->GetInfo();
-		dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode0 = info.m_bodyMap.Find(joint->GetBody0());
+		const ndBodyKinematic* const body0 = joint->GetBody0();
+		dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode0 = info.m_bodyMap.Find(body0);
 		if (!bodyNode0)
 		{
-			bodyNode0 = info.m_bodyMap.Insert(info.m_bodyMap.GetCount(), joint->GetBody0());
+			bodyNode0 = info.m_bodyMap.Insert(info.m_bodyMap.GetCount(), body0);
 		}
-		dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode1 = info.m_bodyMap.Find(joint->GetBody1());
+		const ndBodyKinematic* const body1 = joint->GetBody1()->GetAsBodySentinel() ? nullptr : joint->GetBody1();
+		dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode1 = info.m_bodyMap.Find(body1);
 		if (!bodyNode1)
 		{
-			bodyNode1 = info.m_bodyMap.Insert(info.m_bodyMap.GetCount(), joint->GetBody1());
+			bodyNode1 = info.m_bodyMap.Insert(info.m_bodyMap.GetCount(), body1);
 		}
 
 		descriptor.m_body0NodeHash = bodyNode0->GetInfo();
@@ -343,6 +340,7 @@ void ndLoadSave::SaveModels(ndLoadSaveInfo& info)
 	descriptor.m_bodyMap = &info.m_bodyMap;
 	descriptor.m_jointMap = &info.m_jointMap;
 	
+	//info.m_bodyMap.Insert(0, nullptr);
 	for (ndModelList::dNode* modelNode = info.m_modelList->GetFirst(); modelNode; modelNode = modelNode->GetNext())
 	{
 		ndModel* const model = modelNode->GetInfo();
@@ -383,6 +381,9 @@ bool ndLoadSave::LoadScene(const char* const path)
 
 	const nd::TiXmlElement* const worldNode = doc.RootElement();
 	ndShapeLoaderCache shapesMap;
+
+	ndBodySentinel sentinel;
+	m_bodyMap.Insert(&sentinel, 0);
 
 	LoadSceneSettings(worldNode, assetPath);
 	LoadShapes(worldNode, assetPath, shapesMap);
@@ -446,20 +447,19 @@ void ndLoadSave::SaveScene(const char* const path, const ndWorld* const world, c
 	worldNode->LinkEndChild(info.m_jointsNode);
 	worldNode->LinkEndChild(info.m_modelsNode);
 
-	info.m_bodyMap.Insert(0, world->GetSentinelBody());
-
 	info.m_setting = setting;
 	info.m_bodyList = &world->GetBodyList();
 	info.m_jointList = &world->GetJointList();
 	info.m_modelList = &world->GetModelList();
 
+	info.m_bodyMap.Insert(0, nullptr);
 	SaveSceneSettings(info);
 	SaveModels(info);
 	SaveJoints(info);
 	SaveBodies(info);
 	SaveShapes(info);
-	
-	info.m_bodyMap.Remove(world->GetSentinelBody());
+	info.m_bodyMap.Remove((ndBodyKinematic*)nullptr);
+
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");
 	asciifile.SaveFile(fileNameExt);
@@ -528,12 +528,10 @@ void ndLoadSave::SaveModel(const char* const path, const ndModel* const model)
 	info.m_bodyList = &bodyList;
 	info.m_modelList = &modelList;
 	info.m_jointList = &jointList;
-	
-	SaveSceneSettings(info);
 
 	info.m_bodyMap.Insert(0, nullptr);
+	SaveSceneSettings(info);
 	SaveModels(info);
-	info.m_bodyMap.Remove((ndBodyKinematic*)nullptr);
 
 	dTree<dInt32, const ndJointBilateralConstraint*>::Iterator jointIter(info.m_jointMap);
 	for (jointIter.Begin(); jointIter; jointIter++)
@@ -549,6 +547,7 @@ void ndLoadSave::SaveModel(const char* const path, const ndModel* const model)
 	}
 	SaveBodies(info);
 	SaveShapes(info);
+	info.m_bodyMap.Remove((ndBodyKinematic*)nullptr);
 	
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");

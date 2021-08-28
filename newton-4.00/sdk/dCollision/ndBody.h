@@ -29,6 +29,7 @@
 class ndContact;
 class ndBodyNotify;
 class ndBodyDynamic;
+class ndBodySentinel;
 class ndBodyKinematic;
 class ndRayCastNotify;
 class ndBodySphFluid;
@@ -47,6 +48,7 @@ class ndBody: public dClassAlloc
 
 	virtual ndBody* GetAsBody() { return this;}
 	virtual ndBodyDynamic* GetAsBodyDynamic() { return nullptr; }
+	virtual ndBodySentinel* GetAsBodySentinel() { return nullptr; }
 	virtual ndBodyKinematic* GetAsBodyKinematic() { return nullptr; }
 	virtual ndBodyKinematic* GetAsBodyPlayerCapsule() { return nullptr; }
 	virtual ndBodySphFluid* GetAsBodySphFluid() { return nullptr; }
