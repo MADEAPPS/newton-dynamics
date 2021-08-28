@@ -346,9 +346,6 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	ndActiveRagdollModel* const ragdoll = new ndActiveRagdollModel(scene, ragdollMesh, matrix);
 	scene->GetWorld()->AddModel(ragdoll);
 
-//ndLoadSave loadScene;
-//loadScene.SaveModel("xxxxxx", ragdoll);
-
 	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_y += 2.0f;
 	//ndBodyKinematic* const reckingBall = AddSphere(scene, matrix.m_posit, 25.0f, 0.25f);
@@ -370,4 +367,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	dVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-5.0f));
 	origin.m_y += 1.0f;
 	scene->SetCameraMatrix(playerMatrix, origin);
+
+	ndLoadSave loadScene;
+	loadScene.SaveModel("xxxxxx", ragdoll);
 }

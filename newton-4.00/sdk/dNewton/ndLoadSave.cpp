@@ -466,79 +466,93 @@ void ndLoadSave::SaveScene(const char* const path, const ndWorld* const world, c
 	setlocale(LC_ALL, oldloc);
 }
 
-//void ndLoadSave::SaveModel(const char* const path, const ndModel* const model)
-void ndLoadSave::SaveModel(const char* const, const ndModel* const)
+void ndLoadSave::SaveModel(const char* const path, const ndModel* const model)
 {
-	dAssert(0);
+	nd::TiXmlDocument asciifile;
+	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
+	asciifile.LinkEndChild(decl);
+	
+	nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
+	asciifile.LinkEndChild(worldNode);
+	
+	ndLoadSaveInfo info;
+	char fileNameExt[1024];
+	
+	strcpy(fileNameExt, path);
+	char* const ext = strrchr(fileNameExt, '.');
+	if (ext)
+	{
+		*ext = 0;
+	}
+	
+	strncpy(info.m_assetPath, fileNameExt, sizeof(info.m_assetPath) - 10);
+	strcat(fileNameExt, ".nd");
+	
+	char* namePtr = strrchr(info.m_assetPath, '/');
+	if (!namePtr)
+	{
+		namePtr = strrchr(info.m_assetPath, '\\');
+	}
+	if (namePtr)
+	{
+		strncpy(info.m_assetName, namePtr + 1, sizeof(info.m_assetName) - 16);
+	}
+	else
+	{
+		namePtr = info.m_assetPath;
+		strncpy(info.m_assetName, namePtr, sizeof(info.m_assetName) - 16);
+	}
+	namePtr[0] = 0;
+	strcat(info.m_assetName, "_asset");
+	
+	info.m_worldNode = worldNode;
+	info.m_settingsNode = new nd::TiXmlElement("ndSettings");
+	info.m_shapesNode = new nd::TiXmlElement("ndShapes");
+	info.m_bodiesNode = new nd::TiXmlElement("ndBodies");
+	info.m_jointsNode = new nd::TiXmlElement("ndJoints");
+	info.m_modelsNode = new nd::TiXmlElement("ndModels");
+	
+	worldNode->LinkEndChild(info.m_settingsNode);
+	worldNode->LinkEndChild(info.m_shapesNode);
+	worldNode->LinkEndChild(info.m_bodiesNode);
+	worldNode->LinkEndChild(info.m_jointsNode);
+	worldNode->LinkEndChild(info.m_modelsNode);
+	
+	ndModelList modelList;
+	ndJointList jointList;
+	ndBodyList bodyList;
+	modelList.Append((ndModel*)model);
 
-	//nd::TiXmlDocument asciifile;
-	//nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
-	//asciifile.LinkEndChild(decl);
-	//
-	//nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
-	//asciifile.LinkEndChild(worldNode);
-	//
-	//ndLoadSaveInfo info;
-	//char fileNameExt[1024];
-	//
-	//strcpy(fileNameExt, path);
-	//char* const ext = strrchr(fileNameExt, '.');
-	//if (ext)
-	//{
-	//	*ext = 0;
-	//}
-	//
-	//strncpy(info.m_assetPath, fileNameExt, sizeof(info.m_assetPath) - 10);
-	//strcat(fileNameExt, ".nd");
-	//
-	//char* namePtr = strrchr(info.m_assetPath, '/');
-	//if (!namePtr)
-	//{
-	//	namePtr = strrchr(info.m_assetPath, '\\');
-	//}
-	//if (namePtr)
-	//{
-	//	strncpy(info.m_assetName, namePtr + 1, sizeof(info.m_assetName) - 16);
-	//}
-	//else
-	//{
-	//	namePtr = info.m_assetPath;
-	//	strncpy(info.m_assetName, namePtr, sizeof(info.m_assetName) - 16);
-	//}
-	//namePtr[0] = 0;
-	//strcat(info.m_assetName, "_asset");
-	//
-	//info.m_worldNode = worldNode;
-	//info.m_settingsNode = new nd::TiXmlElement("ndSettings");
-	//info.m_shapesNode = new nd::TiXmlElement("ndShapes");
-	//info.m_bodiesNode = new nd::TiXmlElement("ndBodies");
-	//info.m_jointsNode = new nd::TiXmlElement("ndJoints");
-	//info.m_modelsNode = new nd::TiXmlElement("ndModels");
-	//
-	//worldNode->LinkEndChild(info.m_settingsNode);
-	//worldNode->LinkEndChild(info.m_shapesNode);
-	//worldNode->LinkEndChild(info.m_bodiesNode);
-	//worldNode->LinkEndChild(info.m_jointsNode);
-	//worldNode->LinkEndChild(info.m_modelsNode);
-	//
-	//info.m_bodyMap.Insert(0, world->GetSentinelBody());
-	//
-	//ndWordSettings settings;
-	//info.m_setting = &setting;
-	//info.m_bodyList = &world->GetBodyList();
-	//info.m_jointList = &world->GetJointList();
-	//info.m_modelList = &world->GetModelList();
-	//
-	//SaveSceneSettings(info);
-	//SaveModels(info);
-	//SaveJoints(info);
-	//SaveBodies(info);
-	//SaveShapes(info);
-	//
-	//info.m_bodyMap.Remove(world->GetSentinelBody());
-	//char* const oldloc = setlocale(LC_ALL, 0);
-	//setlocale(LC_ALL, "C");
-	//asciifile.SaveFile(fileNameExt);
-	//setlocale(LC_ALL, oldloc);
+	ndWordSettings settings;
+	info.m_setting = &settings;
+	info.m_bodyList = &bodyList;
+	info.m_modelList = &modelList;
+	info.m_jointList = &jointList;
+	
+	SaveSceneSettings(info);
+
+	info.m_bodyMap.Insert(0, nullptr);
+	SaveModels(info);
+	info.m_bodyMap.Remove((ndBodyKinematic*)nullptr);
+
+	dTree<dInt32, const ndJointBilateralConstraint*>::Iterator jointIter(info.m_jointMap);
+	for (jointIter.Begin(); jointIter; jointIter++)
+	{
+		jointList.Append((ndJointBilateralConstraint*)jointIter.GetKey());
+	}
+	SaveJoints(info);
+
+	dTree<dInt32, const ndBodyKinematic*>::Iterator bodyIter(info.m_bodyMap);
+	for (bodyIter.Begin(); bodyIter; bodyIter++)
+	{
+		bodyList.Append((ndBodyKinematic*)bodyIter.GetKey());
+	}
+	SaveBodies(info);
+	SaveShapes(info);
+	
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+	asciifile.SaveFile(fileNameExt);
+	setlocale(LC_ALL, oldloc);
 }
 
