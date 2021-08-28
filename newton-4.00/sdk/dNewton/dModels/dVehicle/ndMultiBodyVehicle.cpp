@@ -941,7 +941,14 @@ void ndMultiBodyVehicle::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	{
 		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("chassis");
 		childNode->LinkEndChild(paramNode);
-		paramNode->SetAttribute("int32", dInt32(desc.m_bodyMap->Find(m_chassis)->GetInfo()));
+
+		dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode = desc.m_bodyMap->Find(m_chassis);
+		if (!bodyNode)
+		{
+			bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_chassis);
+		}
+		dAssert(bodyNode);
+		paramNode->SetAttribute("int32", bodyNode->GetInfo());
 	}
 
 	// save all wheels
@@ -949,7 +956,20 @@ void ndMultiBodyVehicle::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	{
 		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("tire");
 		childNode->LinkEndChild(paramNode);
-		paramNode->SetAttribute("int32", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
+
+		dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode = desc.m_bodyMap->Find(node->GetInfo()->GetBody0());
+		if (!bodyNode)
+		{
+			bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), node->GetInfo()->GetBody0());
+		}
+
+		dTree<dInt32, const ndJointBilateralConstraint*>::dNode* jointNode = desc.m_jointMap->Find(node->GetInfo());
+		if (!jointNode)
+		{
+			jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), node->GetInfo());
+		}
+		dAssert(jointNode);
+		paramNode->SetAttribute("int32", jointNode->GetInfo());
 	}
 
 	// save all differentials
@@ -957,7 +977,20 @@ void ndMultiBodyVehicle::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	{
 		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("diff");
 		childNode->LinkEndChild(paramNode);
-		paramNode->SetAttribute("int32", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
+
+		dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode = desc.m_bodyMap->Find(node->GetInfo()->GetBody0());
+		if (!bodyNode)
+		{
+			bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), node->GetInfo()->GetBody0());
+		}
+
+		dTree<dInt32, const ndJointBilateralConstraint*>::dNode* jointNode = desc.m_jointMap->Find(node->GetInfo());
+		if (!jointNode)
+		{
+			jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), node->GetInfo());
+		}
+		dAssert(jointNode);
+		paramNode->SetAttribute("int32", jointNode->GetInfo());
 	}
 
 	// save all axles
@@ -965,18 +998,38 @@ void ndMultiBodyVehicle::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	{
 		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("axle");
 		childNode->LinkEndChild(paramNode);
-		paramNode->SetAttribute("int32", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
+		dTree<dInt32, const ndJointBilateralConstraint*>::dNode* jointNode = desc.m_jointMap->Find(node->GetInfo());
+		if (!jointNode)
+		{
+			jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), node->GetInfo());
+		}
+		dAssert(jointNode);
+		paramNode->SetAttribute("int32", jointNode->GetInfo());
 	}
 
 	if (m_motor)
 	{
 		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("motor");
 		childNode->LinkEndChild(paramNode);
-		paramNode->SetAttribute("int32", dInt32(desc.m_jointMap->Find(m_motor)->GetInfo()));
+
+		dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode = desc.m_bodyMap->Find(m_motor->GetBody0());
+		if (!bodyNode)
+		{
+			bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_motor->GetBody0());
+		}
+
+		dTree<dInt32, const ndJointBilateralConstraint*>::dNode* jointNode = desc.m_jointMap->Find(m_motor);
+		if (!jointNode)
+		{
+			jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_motor);
+		}
+		dAssert(jointNode);
+		paramNode->SetAttribute("int32", jointNode->GetInfo());
 	}
 
 	for (dList<ndBodyDynamic*>::dNode* node = m_extraBodiesAttachmentList.GetFirst(); node; node = node->GetNext())
 	{
+		dAssert(0);
 		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("extraBody");
 		childNode->LinkEndChild(paramNode);
 		paramNode->SetAttribute("int32", dInt32(desc.m_bodyMap->Find(node->GetInfo())->GetInfo()));
@@ -984,6 +1037,7 @@ void ndMultiBodyVehicle::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 
 	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointsAttachmentList.GetFirst(); node; node = node->GetNext())
 	{
+		dAssert(0);
 		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("extraJoint");
 		childNode->LinkEndChild(paramNode);
 		paramNode->SetAttribute("int32", dInt32(desc.m_jointMap->Find(node->GetInfo())->GetInfo()));
@@ -993,14 +1047,29 @@ void ndMultiBodyVehicle::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	{
 		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("gearBox");
 		childNode->LinkEndChild(paramNode);
-		paramNode->SetAttribute("int32", dInt32(desc.m_jointMap->Find(m_gearBox)->GetInfo()));
+
+		dTree<dInt32, const ndJointBilateralConstraint*>::dNode* jointNode = desc.m_jointMap->Find(m_gearBox);
+		if (!jointNode)
+		{
+			jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_gearBox);
+		}
+		dAssert(jointNode);
+		paramNode->SetAttribute("int32", jointNode->GetInfo());
 	}
 
 	if (m_torsionBar)
 	{
 		nd::TiXmlElement* const paramNode = new nd::TiXmlElement("torsionBar");
 		childNode->LinkEndChild(paramNode);
-		paramNode->SetAttribute("int32", dInt32(desc.m_jointMap->Find(m_torsionBar)->GetInfo()));
+
+		dAssert(m_torsionBar->GetBody1()->GetAsBodySentinel());
+		dTree<dInt32, const ndJointBilateralConstraint*>::dNode* jointNode = desc.m_jointMap->Find(m_torsionBar);
+		if (!jointNode)
+		{
+			jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_torsionBar);
+		}
+		dAssert(jointNode);
+		paramNode->SetAttribute("int32", jointNode->GetInfo());
 
 		for (dInt32 i = 0; i < m_torsionBar->m_axleCount; i++)
 		{

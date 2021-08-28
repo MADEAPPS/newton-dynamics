@@ -243,13 +243,16 @@ void ndLoadSave::SaveShapes(ndLoadSaveInfo& info)
 	dTree<dInt32, const ndShape*>::Iterator iter (info.m_shapeMap);
 	for (iter.Begin(); iter; iter++)
 	{
-		shapeList.Insert(iter.GetKey(), iter.GetNode()->GetInfo());
+		dInt32 hash = iter.GetNode()->GetInfo();
+		const ndShape* const shape = iter.GetKey();
+		shapeList.Insert(shape, hash);
 	}
 
 	dLoadSaveBase::dSaveDescriptor descriptor;
 	descriptor.m_assetPath = info.m_assetPath;
 	descriptor.m_assetName = info.m_assetName;
 	descriptor.m_rootNode = info.m_shapesNode;
+	descriptor.m_shapeMap = &info.m_shapeMap;
 
 	dTree<const ndShape*, dInt32>::Iterator shapeIter(shapeList);
 	for (shapeIter.Begin(); shapeIter; shapeIter++)
@@ -278,7 +281,18 @@ void ndLoadSave::SaveBodies(ndLoadSaveInfo& info)
 			ndShapeCompound* const compound = shape->GetAsShapeCompound();
 			if (compound)
 			{
-				dAssert(0);
+				ndShapeCompound::ndTreeArray::Iterator iter(compound->GetTree());
+				for (iter.Begin(); iter; iter++)
+				{
+					ndShapeCompound::ndNodeBase* const node = iter.GetNode()->GetInfo();
+					ndShapeInstance* const instance = node->GetShape();
+					ndShape* const subShape = instance->GetShape();
+					dTree<dInt32, const ndShape*>::dNode* subShapeNode = info.m_shapeMap.Find(subShape);
+					if (!subShapeNode)
+					{
+						info.m_shapeMap.Insert(info.m_shapeMap.GetCount(), subShape);
+					}
+				}
 			}
 			shapeNode0 = info.m_shapeMap.Insert(info.m_shapeMap.GetCount(), shape);
 		}
@@ -340,7 +354,6 @@ void ndLoadSave::SaveModels(ndLoadSaveInfo& info)
 	descriptor.m_bodyMap = &info.m_bodyMap;
 	descriptor.m_jointMap = &info.m_jointMap;
 	
-	//info.m_bodyMap.Insert(0, nullptr);
 	for (ndModelList::dNode* modelNode = info.m_modelList->GetFirst(); modelNode; modelNode = modelNode->GetNext())
 	{
 		ndModel* const model = modelNode->GetInfo();
@@ -456,9 +469,10 @@ void ndLoadSave::SaveScene(const char* const path, const ndWorld* const world, c
 	SaveSceneSettings(info);
 	SaveModels(info);
 	SaveJoints(info);
+	info.m_bodyMap.Remove((ndBodyKinematic*)nullptr);
+
 	SaveBodies(info);
 	SaveShapes(info);
-	info.m_bodyMap.Remove((ndBodyKinematic*)nullptr);
 
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");
@@ -540,6 +554,8 @@ void ndLoadSave::SaveModel(const char* const path, const ndModel* const model)
 	}
 	SaveJoints(info);
 
+	info.m_bodyMap.Remove((ndBodyKinematic*)nullptr);
+
 	dTree<dInt32, const ndBodyKinematic*>::Iterator bodyIter(info.m_bodyMap);
 	for (bodyIter.Begin(); bodyIter; bodyIter++)
 	{
@@ -547,7 +563,6 @@ void ndLoadSave::SaveModel(const char* const path, const ndModel* const model)
 	}
 	SaveBodies(info);
 	SaveShapes(info);
-	info.m_bodyMap.Remove((ndBodyKinematic*)nullptr);
 	
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");

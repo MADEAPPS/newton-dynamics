@@ -66,13 +66,13 @@ void ndCharacterForwardDynamicNode::Save(const ndCharacterSaveDescriptor& desc) 
 	{
 		jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_joint);
 	}
+	dAssert(jointNode);
 
 	dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode = desc.m_bodyMap->Find(m_body);
 	if (!bodyNode)
 	{
 		bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_body);
 	}
-	dAssert(jointNode);
 	dAssert(bodyNode);
 
 	xmlSaveParam(childNode, "bodyHash", dInt32(bodyNode->GetInfo()));
