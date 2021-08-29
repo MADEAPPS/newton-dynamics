@@ -1,0 +1,965 @@
+<?xml version="1.0" ?>
+<ndWorld>
+    <ndSettings>
+        <ndWordSettings>
+            <description string="Newton Dynamics 4.00" />
+            <revision string="1.00" />
+            <solverSubsteps int32="2" />
+            <solverIterations int32="4" />
+        </ndWordSettings>
+    </ndSettings>
+    <ndShapes>
+        <ndShapeChamferCylinder hashId="0">
+            <ndShapeConvex hashId="0">
+                <ndShape hashId="0">
+                    <inertia float3="0.448231 0.242808 0.242808" />
+                    <crossInertia float3="-0.0 0.0 0.0" />
+                    <centerOfMass float3="0.0 0.0 0.0" />
+                    <boxSize float3="0.25 1.0 1.0" />
+                    <boxOrigin float3="0.0 0.0 0.0" />
+                </ndShape>
+            </ndShapeConvex>
+            <radius float="0.75" />
+            <height float="0.5" />
+        </ndShapeChamferCylinder>
+        <ndShapeSphere hashId="1">
+            <ndShapeConvex hashId="1">
+                <ndShape hashId="1">
+                    <inertia float3="0.025 0.025 0.025" />
+                    <crossInertia float3="0.0 0.0 0.0" />
+                    <centerOfMass float3="0.0 0.0 0.0" />
+                    <boxSize float3="0.25 0.25 0.25" />
+                    <boxOrigin float3="0.0 0.0 0.0" />
+                </ndShape>
+            </ndShapeConvex>
+            <radius float="0.25" />
+        </ndShapeSphere>
+        <ndShapeSphere hashId="2">
+            <ndShapeConvex hashId="2">
+                <ndShape hashId="2">
+                    <inertia float3="0.025 0.025 0.025" />
+                    <crossInertia float3="0.0 0.0 0.0" />
+                    <centerOfMass float3="0.0 0.0 0.0" />
+                    <boxSize float3="0.25 0.25 0.25" />
+                    <boxOrigin float3="0.0 0.0 0.0" />
+                </ndShape>
+            </ndShapeConvex>
+            <radius float="0.25" />
+        </ndShapeSphere>
+        <ndShapeSphere hashId="3">
+            <ndShapeConvex hashId="3">
+                <ndShape hashId="3">
+                    <inertia float3="0.025 0.025 0.025" />
+                    <crossInertia float3="0.0 0.0 0.0" />
+                    <centerOfMass float3="0.0 0.0 0.0" />
+                    <boxSize float3="0.25 0.25 0.25" />
+                    <boxOrigin float3="0.0 0.0 0.0" />
+                </ndShape>
+            </ndShapeConvex>
+            <radius float="0.25" />
+        </ndShapeSphere>
+        <ndShapeSphere hashId="4">
+            <ndShapeConvex hashId="4">
+                <ndShape hashId="4">
+                    <inertia float3="0.025 0.025 0.025" />
+                    <crossInertia float3="0.0 0.0 0.0" />
+                    <centerOfMass float3="0.0 0.0 0.0" />
+                    <boxSize float3="0.25 0.25 0.25" />
+                    <boxOrigin float3="0.0 0.0 0.0" />
+                </ndShape>
+            </ndShapeConvex>
+            <radius float="0.25" />
+        </ndShapeSphere>
+        <ndShapeConvexHull hashId="5">
+            <ndShapeConvex hashId="5">
+                <ndShape hashId="5">
+                    <inertia float3="8.045615 2.264827 9.308693" />
+                    <crossInertia float3="0.051497 0.030252 -3.262561" />
+                    <centerOfMass float3="-0.924723 -1.76514 0.01809" />
+                    <boxSize float3="0.483886 2.097242 1.324778" />
+                    <boxOrigin float3="-0.825955 -1.759018 0.000585" />
+                </ndShape>
+            </ndShapeConvex>
+            <vextexArray3 count="26" floatArray="-0.664093 0.247937 1.290703 -0.427496 -3.000506 0.617563 -0.633899 0.326026 -0.923634 -1.209674 0.236732 -1.322481 -1.308826 -3.718475 1.236248 -0.816927 -3.801554 -1.29704 -1.148118 0.338224 1.28478 -0.342068 -1.784095 0.0 -0.816927 -3.801554 1.29704 -0.866697 -0.616635 -1.273941 -1.308826 -3.718475 -1.236248 -1.148118 0.338224 -1.28478 -1.309841 0.152265 1.236248 -0.427496 -2.997307 -0.622714 -1.2035 -3.78299 1.325363 -0.71804 -3.730631 -0.612561 -1.2035 -3.78299 -1.324193 -0.721432 0.326026 -1.075028 -1.309841 0.152265 -1.236248 -0.427496 -1.732419 -0.622714 -0.342068 -2.947699 0.0 -1.146322 -3.85626 1.308847 -1.212629 0.227636 1.32365 -1.146322 -3.85626 -1.308847 -1.265423 -3.836008 1.291077 -1.265423 -3.836008 -1.291077" />
+        </ndShapeConvexHull>
+        <ndShapeConvexHull hashId="6">
+            <ndShapeConvex hashId="6">
+                <ndShape hashId="6">
+                    <inertia float3="3.164699 7.361216 9.473446" />
+                    <crossInertia float3="-0.003099 0.005812 3.824043" />
+                    <centerOfMass float3="-1.780769 1.093441 0.001381" />
+                    <boxSize float3="1.304165 0.942617 1.298023" />
+                    <boxOrigin float3="-1.76044 1.082045 0.0" />
+                </ndShape>
+            </ndShapeConvex>
+            <vextexArray3 count="21" floatArray="-0.476484 2.006457 1.221753 -0.456275 1.040929 1.209703 -0.456275 1.999918 -1.212765 -3.046847 1.557897 -1.285558 -3.064604 0.355363 1.273985 -1.86389 2.024662 -0.921316 -1.152326 0.324981 1.298023 -3.06134 1.57239 1.270757 -1.240102 0.229765 -1.298023 -2.690133 1.82466 -0.877731 -1.911293 2.01393 0.948656 -0.456275 1.040929 -1.208533 -0.553376 0.76572 0.751543 -2.411227 0.139428 1.236248 -3.046848 0.337716 -1.278204 -2.6799 1.827476 0.905019 -1.309841 0.152265 1.236248 -0.553376 0.76572 -0.751543 -2.469827 0.229765 1.298023 -2.411227 0.139428 -1.236248 -1.309841 0.152265 -1.236248" />
+        </ndShapeConvexHull>
+        <ndShapeConvexHull hashId="7">
+            <ndShapeConvex hashId="7">
+                <ndShape hashId="7">
+                    <inertia float3="18.090702 2.881925 19.99765" />
+                    <crossInertia float3="0.010588 -0.001965 6.227922" />
+                    <centerOfMass float3="-1.060794 2.942189 -0.001706" />
+                    <boxSize float3="0.708116 1.035045 1.419536" />
+                    <boxOrigin float3="-1.12411 3.027559 -0.003701" />
+                </ndShape>
+            </ndShapeConvex>
+            <vextexArray3 count="41" floatArray="-0.437483 3.370809 1.406609 -0.438887 2.113725 1.295122 -0.415994 3.367482 -1.38652 -0.800065 3.360336 -1.423238 -1.832226 2.053492 0.969135 -0.768045 4.062604 -0.112377 -1.203458 2.446612 1.312075 -0.438879 2.101205 -1.268599 -0.446854 4.030204 0.109629 -0.778677 3.871015 -0.954807 -1.726495 3.621362 0.859434 -0.970646 2.161577 1.29556 -0.914117 1.992513 1.001374 -1.832226 2.053492 -0.969135 -0.438879 2.135427 -1.312519 -0.450378 3.673699 -1.18582 -0.465743 4.002595 -0.555662 -0.77155 3.994779 0.660467 -0.826374 3.356624 1.415835 -1.2824 2.864091 1.280162 -1.632562 3.899632 -0.461406 -0.438828 2.015063 0.957752 -0.844759 2.001175 -0.991029 -1.132351 2.31831 -1.312264 -0.788453 3.684371 -1.196137 -0.457926 3.85931 -0.948522 -0.457926 3.85931 0.945218 -1.736844 3.700396 -0.679116 -0.77155 3.994779 -0.660454 -1.629565 3.935405 0.222394 -0.438828 2.015063 -0.957752 -0.894622 2.140083 -1.295262 -1.285289 2.722198 -1.288986 -0.467624 4.028302 0.44102 -0.788453 3.684371 1.196149 -1.706474 3.635887 -0.866675 -1.629553 3.827059 0.7114 -1.741788 3.803201 0.216931 -0.450378 3.673699 1.182515 -0.778677 3.871015 0.95482 -1.629553 3.827059 -0.714541" />
+        </ndShapeConvexHull>
+        <ndShapeCompound hashId="8">
+            <ndShape hashId="8">
+                <inertia float3="0.0 0.0 0.0" />
+                <crossInertia float3="0.0 0.0 0.0" />
+                <centerOfMass float3="0.0 0.0 0.0" />
+                <boxSize float3="4.021932 1.423768 1.482036" />
+                <boxOrigin float3="-0.0 0.783368 -0.003708" />
+            </ndShape>
+            <ndCompoundsSubShaped>
+                <ndShapeInstance>
+                    <shapeHashId int32="5" />
+                    <localMatrix position="-0.103172 -0.919968 -0.000006" angles="0.000000 -0.000000 -90.000015" />
+                    <aligmentMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <scale float3="1.0 1.0 1.0" />
+                    <skinThickness float="0.0" />
+                    <collisionMode int32="1" />
+                    <materialID int64="0" />
+                    <materialUserData int64="0" />
+                    <intData0 int64="0" />
+                    <intData1 int64="0" />
+                    <intData2 int64="0" />
+                    <intData3 int64="0" />
+                    <intData4 int64="0" />
+                    <intData5 int64="0" />
+                </ndShapeInstance>
+                <ndShapeInstance>
+                    <shapeHashId int32="6" />
+                    <localMatrix position="-0.103172 -0.919968 -0.000006" angles="0.000000 -0.000000 -90.000015" />
+                    <aligmentMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <scale float3="1.0 1.0 1.0" />
+                    <skinThickness float="0.0" />
+                    <collisionMode int32="1" />
+                    <materialID int64="0" />
+                    <materialUserData int64="0" />
+                    <intData0 int64="0" />
+                    <intData1 int64="0" />
+                    <intData2 int64="0" />
+                    <intData3 int64="0" />
+                    <intData4 int64="0" />
+                    <intData5 int64="0" />
+                </ndShapeInstance>
+                <ndShapeInstance>
+                    <shapeHashId int32="7" />
+                    <localMatrix position="-0.103172 -0.919968 -0.000006" angles="0.000000 -0.000000 -90.000015" />
+                    <aligmentMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <scale float3="1.0 1.0 1.0" />
+                    <skinThickness float="0.0" />
+                    <collisionMode int32="1" />
+                    <materialID int64="0" />
+                    <materialUserData int64="0" />
+                    <intData0 int64="0" />
+                    <intData1 int64="0" />
+                    <intData2 int64="0" />
+                    <intData3 int64="0" />
+                    <intData4 int64="0" />
+                    <intData5 int64="0" />
+                </ndShapeInstance>
+            </ndCompoundsSubShaped>
+        </ndShapeCompound>
+    </ndShapes>
+    <ndBodies>
+        <ndBodyDynamic hashId="4">
+            <ndBodyKinematic hashId="4">
+                <ndBody hashId="4">
+                    <bodyNotifyClass>
+                        <ndDemoEntityNotify>
+                            <ndBodyNotify>
+                                <gravity float3="0.0 -10.0 0.0" />
+                            </ndBodyNotify>
+                            <comment string="body notification for Newton 4.0 demos" />
+                        </ndDemoEntityNotify>
+                    </bodyNotifyClass>
+                    <matrix position="-2.116398 0.530375 1.168387" angles="0.067271 90.000000 0.000000" />
+                    <veloc float3="-0.0001 0.000049 -0.00006" />
+                    <omega float3="-0.000113 0.000001 0.000179" />
+                    <centreOfMass float3="0.0 0.0 0.0" />
+                    <autoSleep int32="1" />
+                </ndBody>
+                <invMass float="0.01" />
+                <invPrincipalInertia float3="0.079764 0.079764 0.079764" />
+                <maxAngleStep float="12.566368" />
+                <maxLinearSpeed float="100.0" />
+                <ndShapeInstance>
+                    <shapeHashId int32="0" />
+                    <localMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <aligmentMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <scale float3="0.676854 0.528865 0.528865" />
+                    <skinThickness float="0.0" />
+                    <collisionMode int32="1" />
+                    <materialID int64="0" />
+                    <materialUserData int64="0" />
+                    <intData0 int64="0" />
+                    <intData1 int64="0" />
+                    <intData2 int64="0" />
+                    <intData3 int64="0" />
+                    <intData4 int64="0" />
+                    <intData5 int64="0" />
+                </ndShapeInstance>
+            </ndBodyKinematic>
+            <linearDampCoef float="0.0" />
+            <angularDampCoef float3="0.0 0.0 0.0" />
+        </ndBodyDynamic>
+        <ndBodyDynamic hashId="10">
+            <ndBodyKinematic hashId="10">
+                <ndBody hashId="10">
+                    <matrix position="-0.211406 1.125862 0.000269" angles="0.018248 -0.000711 -0.654515" />
+                    <veloc float3="-0.002483 0.018506 -0.000121" />
+                    <omega float3="-0.000184 0.000005 0.004765" />
+                    <centreOfMass float3="0.0 0.0 0.0" />
+                    <autoSleep int32="1" />
+                </ndBody>
+                <invMass float="0.05" />
+                <invPrincipalInertia float3="2.0 2.0 2.0" />
+                <maxAngleStep float="12.566368" />
+                <maxLinearSpeed float="100.0" />
+                <ndShapeInstance>
+                    <shapeHashId int32="1" />
+                    <localMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <aligmentMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <scale float3="1.0 1.0 1.0" />
+                    <skinThickness float="0.0" />
+                    <collisionMode int32="0" />
+                    <materialID int64="0" />
+                    <materialUserData int64="0" />
+                    <intData0 int64="0" />
+                    <intData1 int64="0" />
+                    <intData2 int64="0" />
+                    <intData3 int64="0" />
+                    <intData4 int64="0" />
+                    <intData5 int64="0" />
+                </ndShapeInstance>
+            </ndBodyKinematic>
+            <linearDampCoef float="0.0" />
+            <angularDampCoef float3="0.0 0.0 0.0" />
+        </ndBodyDynamic>
+        <ndBodyDynamic hashId="3">
+            <ndBodyKinematic hashId="3">
+                <ndBody hashId="3">
+                    <bodyNotifyClass>
+                        <ndDemoEntityNotify>
+                            <ndBodyNotify>
+                                <gravity float3="0.0 -10.0 0.0" />
+                            </ndBodyNotify>
+                            <comment string="body notification for Newton 4.0 demos" />
+                        </ndDemoEntityNotify>
+                    </bodyNotifyClass>
+                    <matrix position="2.446178 0.533412 -1.074775" angles="0.088020 90.000000 0.000000" />
+                    <veloc float3="-0.00011 0.000018 -0.000061" />
+                    <omega float3="-0.000113 0.000001 0.000185" />
+                    <centreOfMass float3="0.0 0.0 0.0" />
+                    <autoSleep int32="1" />
+                </ndBody>
+                <invMass float="0.01" />
+                <invPrincipalInertia float3="0.077824 0.077824 0.077824" />
+                <maxAngleStep float="12.566368" />
+                <maxLinearSpeed float="100.0" />
+                <ndShapeInstance>
+                    <shapeHashId int32="0" />
+                    <localMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <aligmentMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <scale float3="0.682411 0.535418 0.535418" />
+                    <skinThickness float="0.0" />
+                    <collisionMode int32="1" />
+                    <materialID int64="0" />
+                    <materialUserData int64="0" />
+                    <intData0 int64="0" />
+                    <intData1 int64="0" />
+                    <intData2 int64="0" />
+                    <intData3 int64="0" />
+                    <intData4 int64="0" />
+                    <intData5 int64="0" />
+                </ndShapeInstance>
+            </ndBodyKinematic>
+            <linearDampCoef float="0.0" />
+            <angularDampCoef float3="0.0 0.0 0.0" />
+        </ndBodyDynamic>
+        <ndBodyDynamic hashId="2">
+            <ndBodyKinematic hashId="2">
+                <ndBody hashId="2">
+                    <bodyNotifyClass>
+                        <ndDemoEntityNotify>
+                            <ndBodyNotify>
+                                <gravity float3="0.0 -10.0 0.0" />
+                            </ndBodyNotify>
+                            <comment string="body notification for Newton 4.0 demos" />
+                        </ndDemoEntityNotify>
+                    </bodyNotifyClass>
+                    <matrix position="2.446151 0.533422 1.076176" angles="0.088575 90.000000 0.000000" />
+                    <veloc float3="-0.000109 0.000033 -0.000061" />
+                    <omega float3="-0.000113 0.000001 0.000189" />
+                    <centreOfMass float3="0.0 0.0 0.0" />
+                    <autoSleep int32="1" />
+                </ndBody>
+                <invMass float="0.01" />
+                <invPrincipalInertia float3="0.077824 0.077824 0.077824" />
+                <maxAngleStep float="12.566368" />
+                <maxLinearSpeed float="100.0" />
+                <ndShapeInstance>
+                    <shapeHashId int32="0" />
+                    <localMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <aligmentMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <scale float3="0.682411 0.535418 0.535418" />
+                    <skinThickness float="0.0" />
+                    <collisionMode int32="1" />
+                    <materialID int64="0" />
+                    <materialUserData int64="0" />
+                    <intData0 int64="0" />
+                    <intData1 int64="0" />
+                    <intData2 int64="0" />
+                    <intData3 int64="0" />
+                    <intData4 int64="0" />
+                    <intData5 int64="0" />
+                </ndShapeInstance>
+            </ndBodyKinematic>
+            <linearDampCoef float="0.0" />
+            <angularDampCoef float3="0.0 0.0 0.0" />
+        </ndBodyDynamic>
+        <ndBodyDynamic hashId="11">
+            <ndBodyKinematic hashId="11">
+                <ndBody hashId="11">
+                    <matrix position="-0.211406 1.125862 0.000269" angles="0.018248 -0.000711 -0.654515" />
+                    <veloc float3="-0.002483 0.018506 -0.000121" />
+                    <omega float3="-0.000005 -0.000001 0.004765" />
+                    <centreOfMass float3="0.0 0.0 0.0" />
+                    <autoSleep int32="1" />
+                </ndBody>
+                <invMass float="0.05" />
+                <invPrincipalInertia float3="2.0 2.0 2.0" />
+                <maxAngleStep float="12.566368" />
+                <maxLinearSpeed float="100.0" />
+                <ndShapeInstance>
+                    <shapeHashId int32="2" />
+                    <localMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <aligmentMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <scale float3="1.0 1.0 1.0" />
+                    <skinThickness float="0.0" />
+                    <collisionMode int32="0" />
+                    <materialID int64="0" />
+                    <materialUserData int64="0" />
+                    <intData0 int64="0" />
+                    <intData1 int64="0" />
+                    <intData2 int64="0" />
+                    <intData3 int64="0" />
+                    <intData4 int64="0" />
+                    <intData5 int64="0" />
+                </ndShapeInstance>
+            </ndBodyKinematic>
+            <linearDampCoef float="0.0" />
+            <angularDampCoef float3="0.0 0.0 0.0" />
+        </ndBodyDynamic>
+        <ndBodyDynamic hashId="8">
+            <ndBodyKinematic hashId="8">
+                <ndBody hashId="8">
+                    <matrix position="-0.211406 1.125862 0.000269" angles="0.018248 -0.000711 -0.654515" />
+                    <veloc float3="-0.002483 0.018506 -0.000121" />
+                    <omega float3="-0.00018 -0.0 0.004765" />
+                    <centreOfMass float3="0.0 0.0 0.0" />
+                    <autoSleep int32="1" />
+                </ndBody>
+                <invMass float="0.05" />
+                <invPrincipalInertia float3="2.0 2.0 2.0" />
+                <maxAngleStep float="12.566368" />
+                <maxLinearSpeed float="100.0" />
+                <ndShapeInstance>
+                    <shapeHashId int32="3" />
+                    <localMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <aligmentMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <scale float3="1.0 1.0 1.0" />
+                    <skinThickness float="0.0" />
+                    <collisionMode int32="0" />
+                    <materialID int64="0" />
+                    <materialUserData int64="0" />
+                    <intData0 int64="0" />
+                    <intData1 int64="0" />
+                    <intData2 int64="0" />
+                    <intData3 int64="0" />
+                    <intData4 int64="0" />
+                    <intData5 int64="0" />
+                </ndShapeInstance>
+            </ndBodyKinematic>
+            <linearDampCoef float="0.0" />
+            <angularDampCoef float3="0.0 0.0 0.0" />
+        </ndBodyDynamic>
+        <ndBodyDynamic hashId="9">
+            <ndBodyKinematic hashId="9">
+                <ndBody hashId="9">
+                    <matrix position="-0.211406 1.125862 0.000269" angles="0.018248 -0.000711 -0.654515" />
+                    <veloc float3="-0.002483 0.018506 -0.000121" />
+                    <omega float3="-0.000189 -0.0 0.004765" />
+                    <centreOfMass float3="0.0 0.0 0.0" />
+                    <autoSleep int32="1" />
+                </ndBody>
+                <invMass float="0.05" />
+                <invPrincipalInertia float3="2.0 2.0 2.0" />
+                <maxAngleStep float="12.566368" />
+                <maxLinearSpeed float="100.0" />
+                <ndShapeInstance>
+                    <shapeHashId int32="4" />
+                    <localMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <aligmentMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <scale float3="1.0 1.0 1.0" />
+                    <skinThickness float="0.0" />
+                    <collisionMode int32="0" />
+                    <materialID int64="0" />
+                    <materialUserData int64="0" />
+                    <intData0 int64="0" />
+                    <intData1 int64="0" />
+                    <intData2 int64="0" />
+                    <intData3 int64="0" />
+                    <intData4 int64="0" />
+                    <intData5 int64="0" />
+                </ndShapeInstance>
+            </ndBodyKinematic>
+            <linearDampCoef float="0.0" />
+            <angularDampCoef float3="0.0 0.0 0.0" />
+        </ndBodyDynamic>
+        <ndBodyDynamic hashId="7">
+            <ndBodyKinematic hashId="7">
+                <ndBody hashId="7">
+                    <bodyNotifyClass>
+                        <ndDemoEntityNotify>
+                            <ndBodyNotify>
+                                <gravity float3="0.0 -10.0 0.0" />
+                            </ndBodyNotify>
+                            <comment string="body notification for Newton 4.0 demos" />
+                        </ndDemoEntityNotify>
+                    </bodyNotifyClass>
+                    <matrix position="-3.280047 0.530400 -1.167151" angles="0.032892 90.000000 0.000000" />
+                    <veloc float3="-0.000101 0.000018 -0.00006" />
+                    <omega float3="-0.000113 0.000001 0.00019" />
+                    <centreOfMass float3="0.0 0.0 0.0" />
+                    <autoSleep int32="1" />
+                </ndBody>
+                <invMass float="0.01" />
+                <invPrincipalInertia float3="0.079764 0.079764 0.079764" />
+                <maxAngleStep float="12.566368" />
+                <maxLinearSpeed float="100.0" />
+                <ndShapeInstance>
+                    <shapeHashId int32="0" />
+                    <localMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <aligmentMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <scale float3="0.676852 0.528865 0.528865" />
+                    <skinThickness float="0.0" />
+                    <collisionMode int32="1" />
+                    <materialID int64="0" />
+                    <materialUserData int64="0" />
+                    <intData0 int64="0" />
+                    <intData1 int64="0" />
+                    <intData2 int64="0" />
+                    <intData3 int64="0" />
+                    <intData4 int64="0" />
+                    <intData5 int64="0" />
+                </ndShapeInstance>
+            </ndBodyKinematic>
+            <linearDampCoef float="0.0" />
+            <angularDampCoef float3="0.0 0.0 0.0" />
+        </ndBodyDynamic>
+        <ndBodyDynamic hashId="6">
+            <ndBodyKinematic hashId="6">
+                <ndBody hashId="6">
+                    <bodyNotifyClass>
+                        <ndDemoEntityNotify>
+                            <ndBodyNotify>
+                                <gravity float3="0.0 -10.0 0.0" />
+                            </ndBodyNotify>
+                            <comment string="body notification for Newton 4.0 demos" />
+                        </ndDemoEntityNotify>
+                    </bodyNotifyClass>
+                    <matrix position="-3.280077 0.530406 1.168368" angles="0.039986 90.000000 0.000000" />
+                    <veloc float3="-0.000101 0.000027 -0.00006" />
+                    <omega float3="-0.000113 0.000001 0.000188" />
+                    <centreOfMass float3="0.0 0.0 0.0" />
+                    <autoSleep int32="1" />
+                </ndBody>
+                <invMass float="0.01" />
+                <invPrincipalInertia float3="0.079764 0.079764 0.079764" />
+                <maxAngleStep float="12.566368" />
+                <maxLinearSpeed float="100.0" />
+                <ndShapeInstance>
+                    <shapeHashId int32="0" />
+                    <localMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <aligmentMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <scale float3="0.676854 0.528865 0.528865" />
+                    <skinThickness float="0.0" />
+                    <collisionMode int32="1" />
+                    <materialID int64="0" />
+                    <materialUserData int64="0" />
+                    <intData0 int64="0" />
+                    <intData1 int64="0" />
+                    <intData2 int64="0" />
+                    <intData3 int64="0" />
+                    <intData4 int64="0" />
+                    <intData5 int64="0" />
+                </ndShapeInstance>
+            </ndBodyKinematic>
+            <linearDampCoef float="0.0" />
+            <angularDampCoef float3="0.0 0.0 0.0" />
+        </ndBodyDynamic>
+        <ndBodyDynamic hashId="5">
+            <ndBodyKinematic hashId="5">
+                <ndBody hashId="5">
+                    <bodyNotifyClass>
+                        <ndDemoEntityNotify>
+                            <ndBodyNotify>
+                                <gravity float3="0.0 -10.0 0.0" />
+                            </ndBodyNotify>
+                            <comment string="body notification for Newton 4.0 demos" />
+                        </ndDemoEntityNotify>
+                    </bodyNotifyClass>
+                    <matrix position="-2.116369 0.530370 -1.167133" angles="0.066338 90.000000 0.000000" />
+                    <veloc float3="-0.000101 0.000042 -0.00006" />
+                    <omega float3="-0.000113 0.000001 0.000181" />
+                    <centreOfMass float3="0.0 0.0 0.0" />
+                    <autoSleep int32="1" />
+                </ndBody>
+                <invMass float="0.01" />
+                <invPrincipalInertia float3="0.079764 0.079764 0.079764" />
+                <maxAngleStep float="12.566368" />
+                <maxLinearSpeed float="100.0" />
+                <ndShapeInstance>
+                    <shapeHashId int32="0" />
+                    <localMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <aligmentMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <scale float3="0.676852 0.528865 0.528865" />
+                    <skinThickness float="0.0" />
+                    <collisionMode int32="1" />
+                    <materialID int64="0" />
+                    <materialUserData int64="0" />
+                    <intData0 int64="0" />
+                    <intData1 int64="0" />
+                    <intData2 int64="0" />
+                    <intData3 int64="0" />
+                    <intData4 int64="0" />
+                    <intData5 int64="0" />
+                </ndShapeInstance>
+            </ndBodyKinematic>
+            <linearDampCoef float="0.0" />
+            <angularDampCoef float3="0.0 0.0 0.0" />
+        </ndBodyDynamic>
+        <ndBodyDynamic hashId="1">
+            <ndBodyKinematic hashId="1">
+                <ndBody hashId="1">
+                    <bodyNotifyClass>
+                        <ndDemoEntityNotify>
+                            <ndBodyNotify>
+                                <gravity float3="0.0 -10.0 0.0" />
+                            </ndBodyNotify>
+                            <comment string="body notification for Newton 4.0 demos" />
+                        </ndDemoEntityNotify>
+                    </bodyNotifyClass>
+                    <matrix position="-0.211406 1.125862 0.000269" angles="0.018248 -0.000711 -0.654515" />
+                    <veloc float3="-0.002483 0.018506 -0.000121" />
+                    <omega float3="-0.000113 -0.0 0.004765" />
+                    <centreOfMass float3="0.525123 -0.142468 0.005997" />
+                    <autoSleep int32="1" />
+                </ndBody>
+                <invMass float="0.0005" />
+                <invPrincipalInertia float3="0.000455 0.000108 0.000106" />
+                <maxAngleStep float="1.570796" />
+                <maxLinearSpeed float="100.0" />
+                <ndShapeInstance>
+                    <shapeHashId int32="8" />
+                    <localMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <aligmentMatrix position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <scale float3="1.0 1.0 1.0" />
+                    <skinThickness float="0.0" />
+                    <collisionMode int32="1" />
+                    <materialID int64="0" />
+                    <materialUserData int64="0" />
+                    <intData0 int64="0" />
+                    <intData1 int64="0" />
+                    <intData2 int64="0" />
+                    <intData3 int64="0" />
+                    <intData4 int64="0" />
+                    <intData5 int64="0" />
+                </ndShapeInstance>
+            </ndBodyKinematic>
+            <linearDampCoef float="0.0" />
+            <angularDampCoef float3="0.005 0.005 0.005" />
+        </ndBodyDynamic>
+    </ndBodies>
+    <ndJoints>
+        <ndMultiBodyVehicleDifferential hashId="7">
+            <ndJointBilateralConstraint hashId="7">
+                <body0Hash int32="9" />
+                <body1Hash int32="1" />
+                <localMatrix0 position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                <localMatrix1 position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                <defualtDiagonalRegularizer float="0.0" />
+                <maxDof int32="2" />
+                <enableCollision int32="0" />
+                <solverModel int32="1" />
+            </ndJointBilateralConstraint>
+            <limitedSlipOmega float="3.141361" />
+        </ndMultiBodyVehicleDifferential>
+        <ndMultiBodyVehicleMotor hashId="15">
+            <ndJointBilateralConstraint hashId="15">
+                <body0Hash int32="11" />
+                <body1Hash int32="1" />
+                <localMatrix0 position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                <localMatrix1 position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                <defualtDiagonalRegularizer float="0.0" />
+                <maxDof int32="3" />
+                <enableCollision int32="0" />
+                <solverModel int32="1" />
+            </ndJointBilateralConstraint>
+            <maxOmega float="525.0" />
+            <idleOmega float="62.999996" />
+            <fuelValveRate float="10.0" />
+        </ndMultiBodyVehicleMotor>
+        <ndMultiBodyVehicleGearBox hashId="16">
+            <ndJointGear hashId="16">
+                <ndJointBilateralConstraint hashId="16">
+                    <body0Hash int32="10" />
+                    <body1Hash int32="11" />
+                    <localMatrix0 position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <localMatrix1 position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                    <defualtDiagonalRegularizer float="0.0" />
+                    <maxDof int32="1" />
+                    <enableCollision int32="0" />
+                    <solverModel int32="2" />
+                </ndJointBilateralConstraint>
+                <gearRatio float="0.0" />
+            </ndJointGear>
+            <clutchTorque float="200.0" />
+            <driveTrainResistanceTorque float="10000.0" />
+        </ndMultiBodyVehicleGearBox>
+        <ndMultiBodyVehicleDifferentialAxle hashId="12">
+            <ndJointBilateralConstraint hashId="12">
+                <body0Hash int32="9" />
+                <body1Hash int32="6" />
+                <localMatrix0 position="0.223262 -2.794900 0.000270" angles="-180.000046 -0.000000 0.000000" />
+                <localMatrix1 position="1.168069 -2.108415 3.284915" angles="180.000046 -0.000003 180.000046" />
+                <defualtDiagonalRegularizer float="0.0" />
+                <maxDof int32="1" />
+                <enableCollision int32="0" />
+                <solverModel int32="2" />
+            </ndJointBilateralConstraint>
+        </ndMultiBodyVehicleDifferentialAxle>
+        <ndMultiBodyVehicleDifferentialAxle hashId="10">
+            <ndJointBilateralConstraint hashId="10">
+                <body0Hash int32="8" />
+                <body1Hash int32="4" />
+                <localMatrix0 position="0.223262 -2.794900 0.000270" angles="-180.000046 -0.000000 0.000000" />
+                <localMatrix1 position="1.168068 -2.108415 2.121313" angles="180.000046 -0.000003 180.000046" />
+                <defualtDiagonalRegularizer float="0.0" />
+                <maxDof int32="1" />
+                <enableCollision int32="0" />
+                <solverModel int32="2" />
+            </ndJointBilateralConstraint>
+        </ndMultiBodyVehicleDifferentialAxle>
+        <ndMultiBodyVehicleDifferential hashId="8">
+            <ndJointBilateralConstraint hashId="8">
+                <body0Hash int32="10" />
+                <body1Hash int32="1" />
+                <localMatrix0 position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                <localMatrix1 position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                <defualtDiagonalRegularizer float="0.0" />
+                <maxDof int32="2" />
+                <enableCollision int32="0" />
+                <solverModel int32="1" />
+            </ndJointBilateralConstraint>
+            <limitedSlipOmega float="3.141361" />
+        </ndMultiBodyVehicleDifferential>
+        <ndMultiBodyVehicleDifferential hashId="6">
+            <ndJointBilateralConstraint hashId="6">
+                <body0Hash int32="8" />
+                <body1Hash int32="1" />
+                <localMatrix0 position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                <localMatrix1 position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+                <defualtDiagonalRegularizer float="0.0" />
+                <maxDof int32="2" />
+                <enableCollision int32="0" />
+                <solverModel int32="1" />
+            </ndJointBilateralConstraint>
+            <limitedSlipOmega float="3.141361" />
+        </ndMultiBodyVehicleDifferential>
+        <ndMultiBodyVehicleTireJoint hashId="0">
+            <ndJointWheel hashId="0">
+                <ndJointBilateralConstraint hashId="0">
+                    <body0Hash int32="2" />
+                    <body1Hash int32="1" />
+                    <localMatrix0 position="0.000000 0.000000 0.000000" angles="180.000046 -0.000003 180.000046" />
+                    <localMatrix1 position="2.664165 -0.684591 1.076054" angles="-0.000000 -90.000000 0.000000" />
+                    <defualtDiagonalRegularizer float="0.0" />
+                    <maxDof int32="7" />
+                    <enableCollision int32="0" />
+                    <solverModel int32="1" />
+                </ndJointBilateralConstraint>
+                <ndTireInfo>
+                    <springK float="500.0" />
+                    <damperC float="50.0" />
+                    <upperStop float="-0.05" />
+                    <lowerStop float="0.4" />
+                    <regularizer float="0.2" />
+                    <brakeTorque float="1000.0" />
+                    <handBrakeTorque float="1500.0" />
+                    <steeringAngle float="0.436332" />
+                    <laterialStiffness float="0.001" />
+                    <longitudinalStiffness float="0.05" />
+                </ndTireInfo>
+                <baseFrame position="2.664165 -0.684591 1.076054" angles="-0.000000 -90.000000 0.000000" />
+                <regularizer float="0.2" />
+                <normalizedBrake float="1.0" />
+                <normalidedSteering float="0.0" />
+                <normalizedHandBrake float="0.0" />
+            </ndJointWheel>
+            <lateralSlip float="0.0" />
+            <longitudinalSlip float="0.0" />
+        </ndMultiBodyVehicleTireJoint>
+        <ndMultiBodyVehicleTireJoint hashId="1">
+            <ndJointWheel hashId="1">
+                <ndJointBilateralConstraint hashId="1">
+                    <body0Hash int32="3" />
+                    <body1Hash int32="1" />
+                    <localMatrix0 position="0.000000 0.000000 0.000000" angles="180.000046 -0.000003 180.000046" />
+                    <localMatrix1 position="2.664165 -0.684591 -1.074897" angles="-0.000000 -90.000000 0.000000" />
+                    <defualtDiagonalRegularizer float="0.0" />
+                    <maxDof int32="7" />
+                    <enableCollision int32="0" />
+                    <solverModel int32="1" />
+                </ndJointBilateralConstraint>
+                <ndTireInfo>
+                    <springK float="500.0" />
+                    <damperC float="50.0" />
+                    <upperStop float="-0.05" />
+                    <lowerStop float="0.4" />
+                    <regularizer float="0.2" />
+                    <brakeTorque float="1000.0" />
+                    <handBrakeTorque float="1500.0" />
+                    <steeringAngle float="0.436332" />
+                    <laterialStiffness float="0.001" />
+                    <longitudinalStiffness float="0.05" />
+                </ndTireInfo>
+                <baseFrame position="2.664165 -0.684591 -1.074897" angles="-0.000000 -90.000000 0.000000" />
+                <regularizer float="0.2" />
+                <normalizedBrake float="1.0" />
+                <normalidedSteering float="0.0" />
+                <normalizedHandBrake float="0.0" />
+            </ndJointWheel>
+            <lateralSlip float="0.0" />
+            <longitudinalSlip float="0.0" />
+        </ndMultiBodyVehicleTireJoint>
+        <ndMultiBodyVehicleTireJoint hashId="2">
+            <ndJointWheel hashId="2">
+                <ndJointBilateralConstraint hashId="2">
+                    <body0Hash int32="4" />
+                    <body1Hash int32="1" />
+                    <localMatrix0 position="0.000000 0.000000 0.000000" angles="180.000046 -0.000003 180.000046" />
+                    <localMatrix1 position="-1.898052 -0.686486 1.168338" angles="-0.000000 -90.000000 0.000000" />
+                    <defualtDiagonalRegularizer float="0.0" />
+                    <maxDof int32="7" />
+                    <enableCollision int32="0" />
+                    <solverModel int32="1" />
+                </ndJointBilateralConstraint>
+                <ndTireInfo>
+                    <springK float="500.0" />
+                    <damperC float="50.0" />
+                    <upperStop float="-0.05" />
+                    <lowerStop float="0.4" />
+                    <regularizer float="0.2" />
+                    <brakeTorque float="2500.0" />
+                    <handBrakeTorque float="1000.0" />
+                    <steeringAngle float="0.0" />
+                    <laterialStiffness float="0.01" />
+                    <longitudinalStiffness float="0.05" />
+                </ndTireInfo>
+                <baseFrame position="-1.898052 -0.686486 1.168338" angles="-0.000000 -90.000000 0.000000" />
+                <regularizer float="0.2" />
+                <normalizedBrake float="1.0" />
+                <normalidedSteering float="0.0" />
+                <normalizedHandBrake float="0.0" />
+            </ndJointWheel>
+            <lateralSlip float="0.0" />
+            <longitudinalSlip float="0.0" />
+        </ndMultiBodyVehicleTireJoint>
+        <ndMultiBodyVehicleTireJoint hashId="3">
+            <ndJointWheel hashId="3">
+                <ndJointBilateralConstraint hashId="3">
+                    <body0Hash int32="5" />
+                    <body1Hash int32="1" />
+                    <localMatrix0 position="0.000000 0.000000 0.000000" angles="180.000046 -0.000003 180.000046" />
+                    <localMatrix1 position="-1.898052 -0.686486 -1.167181" angles="-0.000000 -90.000000 0.000000" />
+                    <defualtDiagonalRegularizer float="0.0" />
+                    <maxDof int32="7" />
+                    <enableCollision int32="0" />
+                    <solverModel int32="1" />
+                </ndJointBilateralConstraint>
+                <ndTireInfo>
+                    <springK float="500.0" />
+                    <damperC float="50.0" />
+                    <upperStop float="-0.05" />
+                    <lowerStop float="0.4" />
+                    <regularizer float="0.2" />
+                    <brakeTorque float="2500.0" />
+                    <handBrakeTorque float="1000.0" />
+                    <steeringAngle float="0.0" />
+                    <laterialStiffness float="0.01" />
+                    <longitudinalStiffness float="0.05" />
+                </ndTireInfo>
+                <baseFrame position="-1.898052 -0.686486 -1.167181" angles="-0.000000 -90.000000 0.000000" />
+                <regularizer float="0.2" />
+                <normalizedBrake float="1.0" />
+                <normalidedSteering float="0.0" />
+                <normalizedHandBrake float="0.0" />
+            </ndJointWheel>
+            <lateralSlip float="0.0" />
+            <longitudinalSlip float="0.0" />
+        </ndMultiBodyVehicleTireJoint>
+        <ndMultiBodyVehicleTireJoint hashId="4">
+            <ndJointWheel hashId="4">
+                <ndJointBilateralConstraint hashId="4">
+                    <body0Hash int32="6" />
+                    <body1Hash int32="1" />
+                    <localMatrix0 position="0.000000 0.000000 0.000000" angles="180.000046 -0.000003 180.000046" />
+                    <localMatrix1 position="-3.061654 -0.686485 1.168338" angles="-0.000000 -90.000000 0.000000" />
+                    <defualtDiagonalRegularizer float="0.0" />
+                    <maxDof int32="7" />
+                    <enableCollision int32="0" />
+                    <solverModel int32="1" />
+                </ndJointBilateralConstraint>
+                <ndTireInfo>
+                    <springK float="500.0" />
+                    <damperC float="50.0" />
+                    <upperStop float="-0.05" />
+                    <lowerStop float="0.4" />
+                    <regularizer float="0.2" />
+                    <brakeTorque float="2500.0" />
+                    <handBrakeTorque float="1000.0" />
+                    <steeringAngle float="0.0" />
+                    <laterialStiffness float="0.01" />
+                    <longitudinalStiffness float="0.05" />
+                </ndTireInfo>
+                <baseFrame position="-3.061654 -0.686485 1.168338" angles="-0.000000 -90.000000 0.000000" />
+                <regularizer float="0.2" />
+                <normalizedBrake float="1.0" />
+                <normalidedSteering float="0.0" />
+                <normalizedHandBrake float="0.0" />
+            </ndJointWheel>
+            <lateralSlip float="0.0" />
+            <longitudinalSlip float="0.0" />
+        </ndMultiBodyVehicleTireJoint>
+        <ndMultiBodyVehicleTireJoint hashId="5">
+            <ndJointWheel hashId="5">
+                <ndJointBilateralConstraint hashId="5">
+                    <body0Hash int32="7" />
+                    <body1Hash int32="1" />
+                    <localMatrix0 position="0.000000 0.000000 0.000000" angles="180.000046 -0.000003 180.000046" />
+                    <localMatrix1 position="-3.061654 -0.686485 -1.167181" angles="-0.000000 -90.000000 0.000000" />
+                    <defualtDiagonalRegularizer float="0.0" />
+                    <maxDof int32="7" />
+                    <enableCollision int32="0" />
+                    <solverModel int32="1" />
+                </ndJointBilateralConstraint>
+                <ndTireInfo>
+                    <springK float="500.0" />
+                    <damperC float="50.0" />
+                    <upperStop float="-0.05" />
+                    <lowerStop float="0.4" />
+                    <regularizer float="0.2" />
+                    <brakeTorque float="2500.0" />
+                    <handBrakeTorque float="1000.0" />
+                    <steeringAngle float="0.0" />
+                    <laterialStiffness float="0.01" />
+                    <longitudinalStiffness float="0.05" />
+                </ndTireInfo>
+                <baseFrame position="-3.061654 -0.686485 -1.167181" angles="-0.000000 -90.000000 0.000000" />
+                <regularizer float="0.2" />
+                <normalizedBrake float="1.0" />
+                <normalidedSteering float="0.0" />
+                <normalizedHandBrake float="0.0" />
+            </ndJointWheel>
+            <lateralSlip float="0.0" />
+            <longitudinalSlip float="0.0" />
+        </ndMultiBodyVehicleTireJoint>
+        <ndMultiBodyVehicleDifferentialAxle hashId="13">
+            <ndJointBilateralConstraint hashId="13">
+                <body0Hash int32="10" />
+                <body1Hash int32="8" />
+                <localMatrix0 position="0.223262 -2.794900 0.000270" angles="0.000000 -0.000000 0.000000" />
+                <localMatrix1 position="0.223262 -2.794900 0.000270" angles="0.000000 -0.000000 -180.000046" />
+                <defualtDiagonalRegularizer float="0.0" />
+                <maxDof int32="1" />
+                <enableCollision int32="0" />
+                <solverModel int32="2" />
+            </ndJointBilateralConstraint>
+        </ndMultiBodyVehicleDifferentialAxle>
+        <ndMultiBodyVehicleDifferentialAxle hashId="14">
+            <ndJointBilateralConstraint hashId="14">
+                <body0Hash int32="10" />
+                <body1Hash int32="9" />
+                <localMatrix0 position="0.223262 -2.794900 0.000270" angles="-180.000046 -0.000000 0.000000" />
+                <localMatrix1 position="0.223262 -2.794900 0.000270" angles="0.000000 -0.000000 -180.000046" />
+                <defualtDiagonalRegularizer float="0.0" />
+                <maxDof int32="1" />
+                <enableCollision int32="0" />
+                <solverModel int32="2" />
+            </ndJointBilateralConstraint>
+        </ndMultiBodyVehicleDifferentialAxle>
+        <ndMultiBodyVehicleDifferentialAxle hashId="9">
+            <ndJointBilateralConstraint hashId="9">
+                <body0Hash int32="8" />
+                <body1Hash int32="5" />
+                <localMatrix0 position="0.223262 -2.794900 0.000270" angles="0.000000 -0.000000 0.000000" />
+                <localMatrix1 position="-1.167451 -2.108415 2.121313" angles="180.000046 -0.000003 180.000046" />
+                <defualtDiagonalRegularizer float="0.0" />
+                <maxDof int32="1" />
+                <enableCollision int32="0" />
+                <solverModel int32="2" />
+            </ndJointBilateralConstraint>
+        </ndMultiBodyVehicleDifferentialAxle>
+        <ndMultiBodyVehicleDifferentialAxle hashId="11">
+            <ndJointBilateralConstraint hashId="11">
+                <body0Hash int32="9" />
+                <body1Hash int32="7" />
+                <localMatrix0 position="0.223262 -2.794900 0.000270" angles="0.000000 -0.000000 0.000000" />
+                <localMatrix1 position="-1.167451 -2.108415 3.284915" angles="180.000046 -0.000003 180.000046" />
+                <defualtDiagonalRegularizer float="0.0" />
+                <maxDof int32="1" />
+                <enableCollision int32="0" />
+                <solverModel int32="2" />
+            </ndJointBilateralConstraint>
+        </ndMultiBodyVehicleDifferentialAxle>
+    </ndJoints>
+    <ndModels>
+        <ndMultiBodyVehicle hashId="0">
+            <ndModel hashId="0" />
+            <localFrame position="0.000000 0.000000 0.000000" angles="0.000000 -0.000000 0.000000" />
+            <chassis int32="1" />
+            <tire int32="0" />
+            <tire int32="1" />
+            <tire int32="2" />
+            <tire int32="3" />
+            <tire int32="4" />
+            <tire int32="5" />
+            <diff int32="6" />
+            <diff int32="7" />
+            <diff int32="8" />
+            <axle int32="9" />
+            <axle int32="10" />
+            <axle int32="11" />
+            <axle int32="12" />
+            <axle int32="13" />
+            <axle int32="14" />
+            <motor int32="15" />
+            <gearBox int32="16" />
+            <aerodynamics>
+                <gravity float="-10.0" />
+                <downforceCurve float3="0.0 0.0 0.0" />
+                <downforceCurve float3="8.1 1.0 0.015242" />
+                <downforceCurve float3="16.200001 1.6 0.009145" />
+                <downforceCurve float3="37.800003 3.0 0.003001" />
+                <downforceCurve float3="270.0 3.0 0.0" />
+            </aerodynamics>
+        </ndMultiBodyVehicle>
+    </ndModels>
+</ndWorld>

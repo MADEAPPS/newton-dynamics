@@ -31,6 +31,50 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndWordSettings);
 class ndLoadSaveInfo
 {
 	public:
+	void ExtensionAndFilePath(const char* const path)
+	{
+		char fileNameExt[1024];
+		strcpy(fileNameExt, path);
+		// find last slash
+		char* lastSlach = strrchr(fileNameExt, '/');
+		if (!lastSlach)
+		{
+			lastSlach = strrchr(fileNameExt, '\\');
+		}
+		if (!lastSlach)
+		{
+			lastSlach = fileNameExt;
+		}
+
+		char* const ext = strrchr(lastSlach, '.');
+		if (ext)
+		{
+			*ext = 0;
+		}
+
+		strncpy(m_assetPath, fileNameExt, sizeof(m_assetPath) - 10);
+		strcat(fileNameExt, ".nd");
+		
+		char* namePtr = strrchr(m_assetPath, '/');
+		if (!namePtr)
+		{
+			namePtr = strrchr(m_assetPath, '\\');
+		}
+		if (namePtr)
+		{
+			strncpy(m_assetName, namePtr + 1, sizeof(m_assetName) - 16);
+		}
+		else
+		{
+			namePtr = m_assetPath;
+			strncpy(m_assetName, namePtr, sizeof(m_assetName) - 16);
+		}
+		namePtr[0] = 0;
+		strcat(m_assetName, "_asset");
+		strncpy(m_fileName, fileNameExt, sizeof(m_fileName) - 16);
+	}
+
+	char m_fileName[512];
 	char m_assetPath[512];
 	char m_assetName[128];
 
@@ -410,42 +454,15 @@ bool ndLoadSave::LoadScene(const char* const path)
 
 void ndLoadSave::SaveScene(const char* const path, const ndWorld* const world, const ndWordSettings* const setting)
 {
+	ndLoadSaveInfo info;
+	info.ExtensionAndFilePath(path);
+
 	nd::TiXmlDocument asciifile;
 	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
 	asciifile.LinkEndChild(decl);
 
 	nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
 	asciifile.LinkEndChild(worldNode);
-
-	ndLoadSaveInfo info;
-	char fileNameExt[1024];
-
-	strcpy(fileNameExt, path);
-	char* const ext = strrchr(fileNameExt, '.');
-	if (ext)
-	{
-		*ext = 0;
-	}
-
-	strncpy(info.m_assetPath, fileNameExt, sizeof(info.m_assetPath) - 10);
-	strcat(fileNameExt, ".nd");
-
-	char* namePtr = strrchr(info.m_assetPath, '/');
-	if (!namePtr)
-	{
-		namePtr = strrchr(info.m_assetPath, '\\');
-	}
-	if (namePtr)
-	{
-		strncpy(info.m_assetName, namePtr + 1, sizeof(info.m_assetName) - 16);
-	}
-	else
-	{
-		namePtr = info.m_assetPath;
-		strncpy(info.m_assetName, namePtr, sizeof(info.m_assetName) - 16);
-	}
-	namePtr[0] = 0;
-	strcat(info.m_assetName, "_asset");
 
 	info.m_worldNode = worldNode;
 	info.m_settingsNode = new nd::TiXmlElement("ndSettings");
@@ -476,48 +493,21 @@ void ndLoadSave::SaveScene(const char* const path, const ndWorld* const world, c
 
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");
-	asciifile.SaveFile(fileNameExt);
+	asciifile.SaveFile(info.m_fileName);
 	setlocale(LC_ALL, oldloc);
 }
 
 void ndLoadSave::SaveModel(const char* const path, const ndModel* const model)
 {
+	ndLoadSaveInfo info;
+	info.ExtensionAndFilePath(path);
+
 	nd::TiXmlDocument asciifile;
 	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
 	asciifile.LinkEndChild(decl);
 	
 	nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
 	asciifile.LinkEndChild(worldNode);
-	
-	ndLoadSaveInfo info;
-	char fileNameExt[1024];
-	
-	strcpy(fileNameExt, path);
-	char* const ext = strrchr(fileNameExt, '.');
-	if (ext)
-	{
-		*ext = 0;
-	}
-	
-	strncpy(info.m_assetPath, fileNameExt, sizeof(info.m_assetPath) - 10);
-	strcat(fileNameExt, ".nd");
-	
-	char* namePtr = strrchr(info.m_assetPath, '/');
-	if (!namePtr)
-	{
-		namePtr = strrchr(info.m_assetPath, '\\');
-	}
-	if (namePtr)
-	{
-		strncpy(info.m_assetName, namePtr + 1, sizeof(info.m_assetName) - 16);
-	}
-	else
-	{
-		namePtr = info.m_assetPath;
-		strncpy(info.m_assetName, namePtr, sizeof(info.m_assetName) - 16);
-	}
-	namePtr[0] = 0;
-	strcat(info.m_assetName, "_asset");
 	
 	info.m_worldNode = worldNode;
 	info.m_settingsNode = new nd::TiXmlElement("ndSettings");
@@ -565,7 +555,7 @@ void ndLoadSave::SaveModel(const char* const path, const ndModel* const model)
 	
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");
-	asciifile.SaveFile(fileNameExt);
+	asciifile.SaveFile(info.m_fileName);
 	setlocale(LC_ALL, oldloc);
 }
 

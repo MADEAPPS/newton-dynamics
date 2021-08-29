@@ -263,7 +263,6 @@ class ndRagdollModel : public ndCharacter
 	//void PostTransformUpdate(ndWorld* const world, dFloat32 timestep)
 	void PostTransformUpdate(ndWorld* const, dFloat32)
 	{
-
 	}
 };
 
@@ -278,6 +277,7 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
 	ndRagdollModel* const ragdoll = new ndRagdollModel(scene, ragdollMesh, matrix);
+	scene->SetSelectedModel(ragdoll);
 	scene->GetWorld()->AddModel(ragdoll);
 
 	matrix.m_posit.m_x += 2.0f;

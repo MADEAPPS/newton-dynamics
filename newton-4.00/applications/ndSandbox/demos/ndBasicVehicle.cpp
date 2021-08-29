@@ -350,6 +350,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true)
 	{
 		ndBasicVehicle::SetAsPlayer(scene, mode);
+
+		scene->SetSelectedModel(this);
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 		scene->Set2DDisplayRenderFunction(RenderHelp, RenderUI, this);
 	}
