@@ -10,22 +10,13 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
-option("NEWTON_BUILD_TEST" "generate test project" "OFF")
-option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" "ON")
-option("NEWTON_BUILD_PROFILER" "build profiler" OFF)
-option("NEWTON_BUILD_CREATE_SUB_PROJECTS" "generate independent subproject" OFF)
-option("NEWTON_BUILD_SHARED_LIBS" "build shared library" ON)
-option("NEWTON_ENABLE_GPU_SOLVER" "enable gpu solver" OFF)
-option("NEWTON_ENABLE_AVX2_SOLVER" "enable AVX2 solver" ON)
-option("NEWTON_BUILD_SINGLE_THREADED" "single threaded" OFF)
-option("NEWTON_DOUBLE_PRECISION" "generate double precision" OFF)
 option("NEWTON_STATIC_RUNTIME_LIBRARIES" "use windows static libraries" OFF)
 option("NEWTON_USE_DEFAULT_NEW_AND_DELETE" "overload new and delete when building dll" OFF)
 
 set(CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo Release)
 set(CMAKE_DEBUG_POSTFIX "_d")
 
-project(NewtonSDK)
+project(NewtonTools)
 
 # determine if we are compiling for a 32bit or 64bit system
 include(CheckTypeSize)
@@ -38,24 +29,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
-if(NEWTON_DOUBLE_PRECISION)
-	add_definitions(-DD_NEWTON_USE_DOUBLE)
-endif()
-
-if(NEWTON_ENABLE_AVX2_SOLVER)
-	add_definitions(-D_D_USE_AVX2_SOLVER)
-endif()
-
-if(NEWTON_BUILD_SINGLE_THREADED)
-	add_definitions(-DD_USE_THREAD_EMULATION)
-endif()
-
-if(NEWTON_BUILD_SHARED_LIBS)
-    add_definitions(-D_D_CORE_DLL)
-	add_definitions(-D_D_TINY_DLL)
-	add_definitions(-D_D_NEWTON_DLL)
-	add_definitions(-D_D_COLLISION_DLL)
-endif(NEWTON_BUILD_SHARED_LIBS)
 
 #If no build type set, Release as default
 if(NOT CMAKE_BUILD_TYPE)
@@ -106,23 +79,13 @@ if (MSVC)
 		set(CMAKE_INSTALL_PREFIX "win32sdk" CACHE PATH "..." FORCE)
 	endif ()
 
-	if(NEWTON_STATIC_RUNTIME_LIBRARIES)
-		message ("link to static runtime libraries")
-		set(CMAKE_C_FLAGS_DEBUG "/MTd")
-		set(CMAKE_C_FLAGS_RELWITHDEBINFO "/MT")
-		set(CMAKE_C_FLAGS_RELEASE "/MT")
-		set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
-		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/MT")
-		set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-	else()
-		message ("link to dynamic runtime libraries")
-		set(CMAKE_C_FLAGS_DEBUG "/MDd")
-		set(CMAKE_C_FLAGS_RELWITHDEBINFO "/MD")
-		set(CMAKE_C_FLAGS_RELEASE "/MD")
-		set(CMAKE_CXX_FLAGS_DEBUG "/MDd")
-		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/MD")
-		set(CMAKE_CXX_FLAGS_RELEASE "/MD")
-	endif()
+	message ("link to dynamic runtime libraries")
+	set(CMAKE_C_FLAGS_DEBUG "/MDd")
+	set(CMAKE_C_FLAGS_RELWITHDEBINFO "/MD")
+	set(CMAKE_C_FLAGS_RELEASE "/MD")
+	set(CMAKE_CXX_FLAGS_DEBUG "/MDd")
+	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/MD")
+	set(CMAKE_CXX_FLAGS_RELEASE "/MD")
 
 	if(${CMAKE_VS_PLATFORM_NAME} STREQUAL "x64")
 		message ("build 64 bit")
@@ -165,16 +128,7 @@ elseif(MINGW)
 	endif()
 endif()
 
-if(NEWTON_BUILD_PROFILER)
-	add_definitions(-DD_PROFILER)
-endif()
-
-add_subdirectory(sdk)
-add_subdirectory(applications)
-
-if (NEWTON_BUILD_SANDBOX_DEMOS)
-	add_subdirectory(thirdParty)
-endif()
-
-
+message ("${CMAKE_CURRENT_SOURCE_DIR}")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../sdk)
+add_subdirectory(newtonPy)
 
