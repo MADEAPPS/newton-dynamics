@@ -301,7 +301,7 @@ void ndLoadSave::SaveBodies(ndLoadSaveInfo& info)
 		dTree<dInt32, const ndBodyKinematic*>::dNode* bodyHashNode = info.m_bodyMap.Find(body);
 		if (!bodyHashNode)
 		{
-			bodyHashNode = info.m_bodyMap.Insert(info.m_bodyMap.GetCount(), body);
+			bodyHashNode = info.m_bodyMap.Insert(info.m_bodyMap.GetCount() + 1, body);
 		}
 		descriptor.m_nodeNodeHash = bodyHashNode->GetInfo();
 		body->Save(descriptor);
@@ -553,7 +553,6 @@ void ndLoadSave::SaveModel(const char* const path, const ndModel* const model)
 		jointList.Append((ndJointBilateralConstraint*)jointIter.GetKey());
 	}
 	SaveJoints(info);
-
 	info.m_bodyMap.Remove((ndBodyKinematic*)nullptr);
 
 	dTree<dInt32, const ndBodyKinematic*>::Iterator bodyIter(info.m_bodyMap);

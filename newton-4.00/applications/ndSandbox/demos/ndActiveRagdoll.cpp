@@ -368,6 +368,6 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	origin.m_y += 1.0f;
 	scene->SetCameraMatrix(playerMatrix, origin);
 
-	ndLoadSave loadScene;
-	loadScene.SaveModel("xxxxxx", ragdoll);
+	//ndLoadSave loadScene;
+	//loadScene.SaveModel("xxxxxx", ragdoll);
 }

@@ -692,7 +692,6 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
-	ndLoadSave loadScene;
-	loadScene.SaveModel("xxxxxx", vehicle);
-
+	//ndLoadSave loadScene;
+	//loadScene.SaveModel("xxxxxx", vehicle);
 }
