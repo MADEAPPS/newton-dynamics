@@ -449,6 +449,7 @@ bool ndLoadSave::LoadScene(const char* const path)
 	LoadModels(worldNode, assetPath);
 	setlocale(LC_ALL, oldloc);
 
+	m_bodyMap.Remove(0);
 	return true;
 }
 

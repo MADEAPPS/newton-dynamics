@@ -26,7 +26,7 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, dGetIdentityMatrix());
 	
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-//	AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
+	AddCapsulesStacks(scene, origin1, 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
 
 	dQuaternion rot;
 	dVector origin(-60.0f, 5.0f, 0.0f, 0.0f);

@@ -10,8 +10,9 @@
 */
 
 #include "ndSandboxStdafx.h"
-#include "ndPhysicsWorld.h"
+#include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
+#include "ndPhysicsWorld.h"
 #include "ndSoundManager.h"
 #include "ndContactCallback.h"
 #include "ndDemoEntityManager.h"
@@ -165,6 +166,20 @@ void ndPhysicsWorld::OnPostUpdate(dFloat32 timestep)
 	}
 }
 
+void ndPhysicsWorld::SaveScene(const char* const path)
+{
+	ndLoadSave loadScene;
+	ndPhysicsWorldSettings setting(this);
+	
+	loadScene.SaveScene(path, this, &setting);
+}
+
+void ndPhysicsWorld::SaveSceneModel(const char* const path)
+{
+	ndLoadSave loadScene;
+	loadScene.SaveModel(path, m_manager->m_selectedModel);
+}
+
 bool ndPhysicsWorld::LoadScene(const char* const path)
 {
 	ndLoadSave loadScene;
@@ -184,14 +199,14 @@ bool ndPhysicsWorld::LoadScene(const char* const path)
 		const ndBody* const body = (ndBody*)bodyIter.GetNode()->GetInfo();
 		AddBody((ndBody*)body);
 	}
-	
+
 	ndJointLoaderCache::Iterator jointIter(loadScene.m_jointMap);
 	for (jointIter.Begin(); jointIter; jointIter++)
 	{
 		const ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)jointIter.GetNode()->GetInfo();
 		AddJoint((ndJointBilateralConstraint*)joint);
 	}
-	
+
 	ndModelLoaderCache::Iterator modelIter(loadScene.m_modelMap);
 	for (modelIter.Begin(); modelIter; modelIter++)
 	{
@@ -199,19 +214,25 @@ bool ndPhysicsWorld::LoadScene(const char* const path)
 		AddModel((ndModel*)model);
 	}
 
+	// add some visualization
+	dMatrix scale(dGetIdentityMatrix());
+	scale[0][0] = 0.5f;
+	scale[1][1] = 0.5f;
+	scale[2][2] = 0.5f;
+	for (bodyIter.Begin(); bodyIter; bodyIter++)
+	{
+		ndBodyKinematic* const body = (ndBodyKinematic*)bodyIter.GetNode()->GetInfo();
+		dAssert(body->GetAsBodyKinematic());
+		const ndShapeInstance& collision = body->GetCollisionShape();
+
+		ndDemoMesh* const mesh = new ndDemoMesh("importMesh", m_manager->GetShaderCache(), &collision, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, scale);
+		ndDemoEntity* const entity = new ndDemoEntity(body->GetMatrix(), nullptr);
+		entity->SetMesh(mesh, dGetIdentityMatrix());
+		m_manager->AddEntity(entity);
+
+		body->SetNotifyCallback(new ndDemoEntityNotify(m_manager, entity));
+		mesh->Release();
+	}
+
 	return true;
-}
-
-void ndPhysicsWorld::SaveScene(const char* const path)
-{
-	ndLoadSave loadScene;
-	ndPhysicsWorldSettings setting(this);
-	
-	loadScene.SaveScene(path, this, &setting);
-}
-
-void ndPhysicsWorld::SaveSceneModel(const char* const path)
-{
-	ndLoadSave loadScene;
-	loadScene.SaveModel(path, m_manager->m_selectedModel);
 }
