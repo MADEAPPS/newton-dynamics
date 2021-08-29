@@ -209,3 +209,9 @@ void ndPhysicsWorld::SaveScene(const char* const path)
 	
 	loadScene.SaveScene(path, this, &setting);
 }
+
+void ndPhysicsWorld::SaveSceneModel(const char* const path)
+{
+	ndLoadSave loadScene;
+	loadScene.SaveModel(path, m_manager->m_selectedModel);
+}

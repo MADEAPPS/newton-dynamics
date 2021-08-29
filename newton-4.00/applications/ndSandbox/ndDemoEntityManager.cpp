@@ -150,6 +150,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_workerThreads(1)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
+	,m_selectedModel(nullptr)
 	,m_fps(0.0f)
 	,m_timestepAcc(0.0f)
 	,m_currentListenerTimestep(0.0f)
@@ -744,6 +745,10 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			{
 				menuSelection = m_save;
 			}
+			if (ImGui::MenuItem("Save model", ""))
+			{
+				menuSelection = m_saveModel;
+			}
 
 			ImGui::Separator();
 			if (ImGui::MenuItem("import ply file", "")) 
@@ -877,11 +882,23 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			break;
 		}
 
+		case m_saveModel:
+		{
+			m_currentScene = -1;
+			char fileName[1024];
+			if (dGetSaveNdFileName(fileName, 1024))
+			{
+				m_world->SaveSceneModel(fileName);
+			}
+			break;
+		}
+
 		default:
 		{
 			// load a demo 
 			if (m_currentScene != -1) 
 			{
+				m_selectedModel = nullptr;
 				LoadDemo(m_currentScene);
 				m_lastCurrentScene = m_currentScene;
 				m_currentScene = -1;

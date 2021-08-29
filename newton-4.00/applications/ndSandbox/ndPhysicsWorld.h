@@ -32,6 +32,7 @@ class ndPhysicsWorld: public ndWorld
 
 	bool LoadScene(const char* const path);
 	void SaveScene(const char* const path);
+	void SaveSceneModel(const char* const path);
 
 	private:
 	void DeletePendingObjects();
