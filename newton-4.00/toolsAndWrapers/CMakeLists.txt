@@ -129,6 +129,6 @@ elseif(MINGW)
 endif()
 
 message ("${CMAKE_CURRENT_SOURCE_DIR}")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../sdk)
-add_subdirectory(newtonPy)
+add_subdirectory(newton-4.00/sdk)
+#add_subdirectory(newtonPy)
 
