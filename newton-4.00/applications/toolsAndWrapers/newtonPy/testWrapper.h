@@ -19,30 +19,12 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// File : example.i 
-%module newtonPy
-%{
-	#include "testWrapper.h"
-%}
-
-%include "testWrapper.h"
-
-//%include "pyBaseNodeInfo.h"
-//%template(objInfo) pyBaseNodeInfo<dSceneNodeInfo>;
-//%template(meshInfo) pyBaseNodeInfo<dMeshNodeInfo>;
-//%template(texInfo) pyBaseNodeInfo<dTextureNodeInfo>;
-//%template(matInfo) pyBaseNodeInfo<dMaterialNodeInfo>;
-//%template(rigidBidyInfo) pyBaseNodeInfo<dRigidbodyNodeInfo>;
+#ifndef _D_CLASS_ALLOC_H_
+#define _D_CLASS_ALLOC_H_
 
 
-//%include "carrays.i"
-//%include "pyTypes.h"
-//%include "pyMesh.h"
-//%include "pyScene.h"
-//%include "pyObject.h"
-//%include "pyTexture.h"
-//%include "pyMaterial.h"
-//%include "pyRigidBody.h"
-//%array_class(int, intArray);
-//%array_class(double, doubleArray);
+void Test(float a, float b)
+{
+}
 
+#endif

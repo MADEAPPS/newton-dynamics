@@ -10,7 +10,5 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
-
-#add_subdirectory(newton-4.00/sdk)
-#add_subdirectory(newtonPy)
+add_subdirectory(newtonPy)
 
