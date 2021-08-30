@@ -13,13 +13,11 @@ cmake_minimum_required(VERSION 3.4.0)
 set (projectName "newtonPy")
 message (${projectName})
 
-#set (warnings "-w312,325,401,4316")
-set (warnings "-w312,325,401")
+#execute_process(COMMAND ${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe -c++ -python ${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonPy/newtonPy.i)
+
 set (swig "${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe")
 set (script "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonPy/newtonPy.i")
-
-#execute_process(COMMAND ${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe -c++ -python -w312  ${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonPy/newtonPy.i)
-execute_process(COMMAND ${swig} -c++ -python ${warnings} ${script})
+execute_process(COMMAND ${swig} -c++ -python ${script})
 
 # source and header files
 file(GLOB CPP_SOURCE 

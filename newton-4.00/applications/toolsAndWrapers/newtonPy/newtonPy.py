@@ -471,6 +471,161 @@ class ndShapeChamferCylinder(ndShapeConvex):
 # Register ndShapeChamferCylinder in _newtonPy:
 _newtonPy.ndShapeChamferCylinder_swigregister(ndShapeChamferCylinder)
 
+class ndShapeDebugCallback(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+
+    def __init__(self, *args, **kwargs):
+        raise AttributeError("No constructor defined - class is abstract")
+    __repr__ = _swig_repr
+    m_shared = _newtonPy.ndShapeDebugCallback_m_shared
+    m_open = _newtonPy.ndShapeDebugCallback_m_open
+    __swig_destroy__ = _newtonPy.delete_ndShapeDebugCallback
+
+    def DrawPolygon(self, vertexCount, faceArray, edgeType):
+        return _newtonPy.ndShapeDebugCallback_DrawPolygon(self, vertexCount, faceArray, edgeType)
+    m_instance = property(_newtonPy.ndShapeDebugCallback_m_instance_get, _newtonPy.ndShapeDebugCallback_m_instance_set)
+
+# Register ndShapeDebugCallback in _newtonPy:
+_newtonPy.ndShapeDebugCallback_swigregister(ndShapeDebugCallback)
+
+class ndShapeInstance(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_unit = _newtonPy.ndShapeInstance_m_unit
+    m_uniform = _newtonPy.ndShapeInstance_m_uniform
+    m_nonUniform = _newtonPy.ndShapeInstance_m_nonUniform
+    m_global = _newtonPy.ndShapeInstance_m_global
+
+    def __init__(self, *args):
+        _newtonPy.ndShapeInstance_swiginit(self, _newtonPy.new_ndShapeInstance(*args))
+    __swig_destroy__ = _newtonPy.delete_ndShapeInstance
+
+    def Assigment(self, src):
+        return _newtonPy.ndShapeInstance_Assigment(self, src)
+
+    def CalculateInertia(self):
+        return _newtonPy.ndShapeInstance_CalculateInertia(self)
+
+    def CalculateObb(self, origin, size):
+        return _newtonPy.ndShapeInstance_CalculateObb(self, origin, size)
+
+    def CalculateAabb(self, matrix, minP, maxP):
+        return _newtonPy.ndShapeInstance_CalculateAabb(self, matrix, minP, maxP)
+
+    def DebugShape(self, matrix, debugCallback):
+        return _newtonPy.ndShapeInstance_DebugShape(self, matrix, debugCallback)
+
+    def RayCast(self, callback, localP0, localP1, body, contactOut):
+        return _newtonPy.ndShapeInstance_RayCast(self, callback, localP0, localP1, body, contactOut)
+
+    def GetShapeInfo(self):
+        return _newtonPy.ndShapeInstance_GetShapeInfo(self)
+
+    def Save(self, desc):
+        return _newtonPy.ndShapeInstance_Save(self, desc)
+
+    def CalculateBuoyancyCenterOfPresure(self, com, matrix, fluidPlane):
+        return _newtonPy.ndShapeInstance_CalculateBuoyancyCenterOfPresure(self, com, matrix, fluidPlane)
+
+    @staticmethod
+    def GetBoxPadding():
+        return _newtonPy.ndShapeInstance_GetBoxPadding()
+
+    def GetShape(self, *args):
+        return _newtonPy.ndShapeInstance_GetShape(self, *args)
+
+    def SupportVertex(self, dir):
+        return _newtonPy.ndShapeInstance_SupportVertex(self, dir)
+
+    def GetScaledTransform(self, matrix):
+        return _newtonPy.ndShapeInstance_GetScaledTransform(self, matrix)
+
+    def SupportVertexSpecial(self, dir, vertexIndex):
+        return _newtonPy.ndShapeInstance_SupportVertexSpecial(self, dir, vertexIndex)
+
+    def SupportVertexSpecialProjectPoint(self, point, dir):
+        return _newtonPy.ndShapeInstance_SupportVertexSpecialProjectPoint(self, point, dir)
+
+    def GetLocalMatrix(self):
+        return _newtonPy.ndShapeInstance_GetLocalMatrix(self)
+
+    def SetLocalMatrix(self, matrix):
+        return _newtonPy.ndShapeInstance_SetLocalMatrix(self, matrix)
+
+    def GetGlobalMatrix(self):
+        return _newtonPy.ndShapeInstance_GetGlobalMatrix(self)
+
+    def SetGlobalMatrix(self, scale):
+        return _newtonPy.ndShapeInstance_SetGlobalMatrix(self, scale)
+
+    def GetCollisionMode(self):
+        return _newtonPy.ndShapeInstance_GetCollisionMode(self)
+
+    def SetCollisionMode(self, mode):
+        return _newtonPy.ndShapeInstance_SetCollisionMode(self, mode)
+
+    def GetConvexVertexCount(self):
+        return _newtonPy.ndShapeInstance_GetConvexVertexCount(self)
+
+    def GetMaterial(self):
+        return _newtonPy.ndShapeInstance_GetMaterial(self)
+
+    def SetMaterial(self, material):
+        return _newtonPy.ndShapeInstance_SetMaterial(self, material)
+
+    def GetScale(self):
+        return _newtonPy.ndShapeInstance_GetScale(self)
+
+    def GetInvScale(self):
+        return _newtonPy.ndShapeInstance_GetInvScale(self)
+
+    def SetScale(self, scale):
+        return _newtonPy.ndShapeInstance_SetScale(self, scale)
+
+    def SetGlobalScale(self, scale):
+        return _newtonPy.ndShapeInstance_SetGlobalScale(self, scale)
+
+    def CalculatePlaneIntersection(self, normal, point, contactsOut):
+        return _newtonPy.ndShapeInstance_CalculatePlaneIntersection(self, normal, point, contactsOut)
+
+    def GetVolume(self):
+        return _newtonPy.ndShapeInstance_GetVolume(self)
+
+    def GetBoxMinRadius(self):
+        return _newtonPy.ndShapeInstance_GetBoxMinRadius(self)
+
+    def GetBoxMaxRadius(self):
+        return _newtonPy.ndShapeInstance_GetBoxMaxRadius(self)
+
+    def GetScaleType(self):
+        return _newtonPy.ndShapeInstance_GetScaleType(self)
+
+    def GetUmbraClipSize(self):
+        return _newtonPy.ndShapeInstance_GetUmbraClipSize(self)
+
+    def GetUserDataID(self):
+        return _newtonPy.ndShapeInstance_GetUserDataID(self)
+    m_globalMatrix = property(_newtonPy.ndShapeInstance_m_globalMatrix_get, _newtonPy.ndShapeInstance_m_globalMatrix_set)
+    m_localMatrix = property(_newtonPy.ndShapeInstance_m_localMatrix_get, _newtonPy.ndShapeInstance_m_localMatrix_set)
+    m_aligmentMatrix = property(_newtonPy.ndShapeInstance_m_aligmentMatrix_get, _newtonPy.ndShapeInstance_m_aligmentMatrix_set)
+    m_scale = property(_newtonPy.ndShapeInstance_m_scale_get, _newtonPy.ndShapeInstance_m_scale_set)
+    m_invScale = property(_newtonPy.ndShapeInstance_m_invScale_get, _newtonPy.ndShapeInstance_m_invScale_set)
+    m_maxScale = property(_newtonPy.ndShapeInstance_m_maxScale_get, _newtonPy.ndShapeInstance_m_maxScale_set)
+    m_shapeMaterial = property(_newtonPy.ndShapeInstance_m_shapeMaterial_get, _newtonPy.ndShapeInstance_m_shapeMaterial_set)
+    m_shape = property(_newtonPy.ndShapeInstance_m_shape_get, _newtonPy.ndShapeInstance_m_shape_set)
+    m_ownerBody = property(_newtonPy.ndShapeInstance_m_ownerBody_get, _newtonPy.ndShapeInstance_m_ownerBody_set)
+    m_subCollisionHandle = property(_newtonPy.ndShapeInstance_m_subCollisionHandle_get, _newtonPy.ndShapeInstance_m_subCollisionHandle_set)
+    m_parent = property(_newtonPy.ndShapeInstance_m_parent_get, _newtonPy.ndShapeInstance_m_parent_set)
+    m_skinThickness = property(_newtonPy.ndShapeInstance_m_skinThickness_get, _newtonPy.ndShapeInstance_m_skinThickness_set)
+    m_scaleType = property(_newtonPy.ndShapeInstance_m_scaleType_get, _newtonPy.ndShapeInstance_m_scaleType_set)
+    m_collisionMode = property(_newtonPy.ndShapeInstance_m_collisionMode_get, _newtonPy.ndShapeInstance_m_collisionMode_set)
+
+# Register ndShapeInstance in _newtonPy:
+_newtonPy.ndShapeInstance_swigregister(ndShapeInstance)
+
+def ndShapeInstance_GetBoxPadding():
+    return _newtonPy.ndShapeInstance_GetBoxPadding()
+
 class ndBody(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
 

@@ -21,10 +21,11 @@
 
 // File : example.i 
 %module newtonPy
+#pragma SWIG nowarn=312,325,401,4316
 
 %begin 
 %{
-	#pragma warning(disable:4456 4706)
+	#pragma warning(disable:4316 4456 4706)
 %}
 
 %{
@@ -38,6 +39,8 @@
 #define D_MSV_NEWTON_ALIGN_32
 #define D_GCC_NEWTON_ALIGN_32
 #define D_CLASS_REFLECTION(x)
+
+%rename(Assigment) ndShapeInstance::operator=;  
 
 %include "../../../sdk/dCollision/ndShape.h"
 %include "../../../sdk/dCollision/ndShapeBox.h"
@@ -53,8 +56,7 @@
 %include "../../../sdk/dCollision/ndShapeHeightfield.h"
 %include "../../../sdk/dCollision/ndShapeChamferCylinder.h"
 
-// note: this need an opertor to function conversion
-//%include "../../../sdk/dCollision/ndShapeInstance.h"
+%include "../../../sdk/dCollision/ndShapeInstance.h"
 
 %include "../../../sdk/dCollision/ndBody.h"
 %include "../../../sdk/dCollision/ndBodyKinematic.h"

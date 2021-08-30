@@ -32,9 +32,9 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeCompound)
 
 ndShapeCompound::ndNodeBase::~ndNodeBase()
 {
-	if (m_shape) 
+	if (m_shapeInstance) 
 	{
-		delete m_shape;
+		delete m_shapeInstance;
 	}
 	if (m_left) 
 	{
@@ -164,8 +164,8 @@ void ndShapeCompound::ndTreeArray::AddNode(ndNodeBase* const node, dInt32 index,
 {
 	ndTreeArray::dNode* const myNode = Insert(node, index);
 	node->m_myNode = myNode;
-	node->m_shape->m_parent = parent;
-	node->m_shape->m_subCollisionHandle = myNode;
+	node->m_shapeInstance->m_parent = parent;
+	node->m_shapeInstance->m_subCollisionHandle = myNode;
 }
 
 ndShapeCompound::ndShapeCompound()
@@ -822,7 +822,7 @@ ndShapeCompound::ndNodeBase* ndShapeCompound::BuildTopDownBig(ndNodeBase** const
 	for (dInt32 i = 0; i <= count; i++) 
 	{
 		const ndNodeBase* const node = leafArray[firstBox + i];
-		dAssert(node->m_shape);
+		dAssert(node->m_shapeInstance);
 		minP = minP.GetMin(node->m_p0);
 		maxP = maxP.GetMax(node->m_p1);
 	}

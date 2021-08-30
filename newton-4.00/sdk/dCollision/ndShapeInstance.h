@@ -105,8 +105,10 @@ class ndShapeInstance: public dClassAlloc
 
 	D_COLLISION_API ndShapeInstance(ndShape* const shape);
 	D_COLLISION_API ndShapeInstance(const ndShapeInstance& instance);
+	D_COLLISION_API ndShapeInstance(const ndShapeInstance& instance, ndShape* const shape);
 	D_COLLISION_API ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndShapeLoaderCache& shapesMap);
 	D_COLLISION_API ~ndShapeInstance();
+
 	D_COLLISION_API ndShapeInstance& operator=(const ndShapeInstance& src);
 
 	D_COLLISION_API dMatrix CalculateInertia() const;
@@ -122,8 +124,7 @@ class ndShapeInstance: public dClassAlloc
 	D_COLLISION_API dFloat32 CalculateBuoyancyCenterOfPresure(dVector& com, const dMatrix& matrix, const dVector& fluidPlane) const;
 
 	D_COLLISION_API static dVector GetBoxPadding();
-
-	ndShapeInstance(const ndShapeInstance& instance, ndShape* const shape);
+	
 
 	ndShape* GetShape();
 	const ndShape* GetShape() const;
@@ -131,7 +132,6 @@ class ndShapeInstance: public dClassAlloc
 	dMatrix GetScaledTransform(const dMatrix& matrix) const;
 	dVector SupportVertexSpecial(const dVector& dir, dInt32* const vertexIndex) const;
 	dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
-	dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 
 	const dMatrix& GetLocalMatrix() const;
 	void SetLocalMatrix(const dMatrix& matrix);
@@ -150,6 +150,7 @@ class ndShapeInstance: public dClassAlloc
 	const dVector& GetInvScale() const;
 	D_COLLISION_API void SetScale(const dVector& scale);
 	D_COLLISION_API void SetGlobalScale(const dVector& scale);
+	D_COLLISION_API dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 
 	dFloat32 GetVolume() const;
 	dFloat32 GetBoxMinRadius() const;
@@ -176,8 +177,8 @@ class ndShapeInstance: public dClassAlloc
 	ndScaleType m_scaleType;
 	bool m_collisionMode;
 
+	private:
 	static dVector m_padding;
-	friend class ndShapeConvexPolygon;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 D_INLINE ndShape* ndShapeInstance::GetShape()

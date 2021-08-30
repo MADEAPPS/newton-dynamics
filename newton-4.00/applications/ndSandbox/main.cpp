@@ -31,12 +31,14 @@ void *operator new (size_t size)
 	// this should not happens on this test
 	// newton should never use global operator new and delete.
 	//dAssert(0);
-	return PhysicsAlloc(size);
+	void* const ptr = dMemory::Malloc(size);
+	dAssert((dUnsigned64(ptr) & (-32)) == 0);
+	return ptr;
 }
 
 void operator delete (void* ptr) noexcept
 {
-	PhysicsFree(ptr);
+	dMemory::Free(ptr);
 }
 
 class CheckMemoryLeaks

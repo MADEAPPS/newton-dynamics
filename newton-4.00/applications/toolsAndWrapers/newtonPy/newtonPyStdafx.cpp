@@ -11,6 +11,22 @@
 
 #include "newtonPyStdafx.h"
 
+void *operator new (size_t size)
+{
+	// this should not happens on this test
+	// newton should never use global operator new and delete.
+	dAssert(0);
+	void* const ptr = dMemory::Malloc(size);
+	dAssert((dUnsigned64(ptr) & (-32)) == 0);
+	return ptr;
+}
+
+void operator delete (void* ptr) noexcept
+{
+	dAssert(0);
+	dMemory::Free(ptr);
+}
+
 static dUnsigned32 ___dRandSeed___ = 0;
 
 void dSetRandSeed (dUnsigned32 seed)
