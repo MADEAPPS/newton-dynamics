@@ -64,14 +64,14 @@ dBigVector dBigVector::m_xyzwMask (dInt32(-1), dInt32(-1), dInt32(-1), dInt32(-1
 
 dSpatialVector dSpatialVector::m_zero (dFloat32 (0.0f));
 
-dMatrix dMatrix::m_zeroMatrix(
-	dVector(dFloat32(0.0f)),
-	dVector(dFloat32(0.0f)),
-	dVector(dFloat32(0.0f)),
-	dVector(dFloat32(0.0f)));
-
-dMatrix dMatrix::m_identityMatrix(
-	dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)),
-	dVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f)),
-	dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)),
-	dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f)));
+//dMatrix dMatrix::m_zeroMatrix(
+//	dVector(dFloat32(0.0f)),
+//	dVector(dFloat32(0.0f)),
+//	dVector(dFloat32(0.0f)),
+//	dVector(dFloat32(0.0f)));
+//
+//dMatrix dMatrix::m_identityMatrix(
+//	dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)),
+//	dVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f)),
+//	dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)),
+//	dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f)));

@@ -27,12 +27,24 @@
 
 const dMatrix& dGetIdentityMatrix()
 {
-	return dMatrix::m_identityMatrix;
+	//return dMatrix::m_identityMatrix;
+	static dMatrix identityMatrix(
+		dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)),
+		dVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f)),
+		dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)),
+		dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f)));
+	return identityMatrix;
 }
 
 const dMatrix& dGetZeroMatrix ()
 {
-	return dMatrix::m_zeroMatrix;
+	static dMatrix zeroMatrix(
+		dVector(dFloat32(0.0f)),
+		dVector(dFloat32(0.0f)),
+		dVector(dFloat32(0.0f)),
+		dVector(dFloat32(0.0f)));
+	//return dMatrix::m_zeroMatrix;
+	return zeroMatrix;
 }
 
 dMatrix::dMatrix (const dQuaternion &quat, const dVector &position)

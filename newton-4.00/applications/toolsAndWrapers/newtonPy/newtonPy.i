@@ -22,10 +22,11 @@
 // File : example.i 
 %module newtonPy
 #pragma SWIG nowarn=312,325,401,4316
+#pragma SWIG nowarn=509
 
 %begin 
 %{
-	#pragma warning(disable:4316 4456 4706)
+	#pragma warning(disable:4127 4316 4456 4701 4706)
 %}
 
 %{
@@ -36,11 +37,30 @@
 #define D_CORE_API 
 #define D_NEWTON_API
 #define D_COLLISION_API
+#define D_MSV_NEWTON_ALIGN_16
+#define D_GCC_NEWTON_ALIGN_16
 #define D_MSV_NEWTON_ALIGN_32
 #define D_GCC_NEWTON_ALIGN_32
 #define D_CLASS_REFLECTION(x)
 
+%rename(New) dVector::operator new;
+%rename(Delete) dVector::operator delete;
+%rename(NewArray) dVector::operator new[];
+%rename(DeleteArray) dVector::operator delete[];
+%rename(GetElement) dVector::operator[](dInt32 i);
+%rename(GetElement) dVector::operator[](dInt32 i) const;
+
+%rename(GetElement) dBigVector::operator[](dInt32 i);
+%rename(GetElement) dBigVector::operator[](dInt32 i) const;
+
+%rename(GetElement) dMatrix::operator[](dInt32 i);
+%rename(GetElement) dMatrix::operator[](dInt32 i) const;
+
 %rename(Assigment) ndShapeInstance::operator=;  
+
+%include "../../../sdk/dCore/dVectorSimd.h"
+%include "../../../sdk/dCore/dMatrix.h"
+%include "../../../sdk/dCore/dQuaternion.h"
 
 %include "../../../sdk/dCollision/ndShape.h"
 %include "../../../sdk/dCollision/ndShapeBox.h"

@@ -101,8 +101,9 @@ class dMatrix
 	dVector m_right;
 	dVector m_posit;
 
-	static dMatrix m_zeroMatrix;
-	static dMatrix m_identityMatrix;
+	//private:
+	//static dMatrix m_zeroMatrix;
+	//static dMatrix m_identityMatrix;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 D_INLINE dMatrix::dMatrix ()

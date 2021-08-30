@@ -32,7 +32,7 @@ void *operator new (size_t size)
 	// newton should never use global operator new and delete.
 	//dAssert(0);
 	void* const ptr = dMemory::Malloc(size);
-	dAssert((dUnsigned64(ptr) & (-32)) == 0);
+	dAssert((dUnsigned64(ptr) & (32-1)) == 0);
 	return ptr;
 }
 

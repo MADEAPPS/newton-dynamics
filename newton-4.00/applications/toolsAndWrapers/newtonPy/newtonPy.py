@@ -61,6 +61,489 @@ class _SwigNonDynamicMeta(type):
     __setattr__ = _swig_setattr_nondynamic_class_variable(type.__setattr__)
 
 
+class dVector(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def __init__(self, *args):
+        _newtonPy.dVector_swiginit(self, _newtonPy.new_dVector(*args))
+
+    def NewArray(self, size):
+        return _newtonPy.dVector_NewArray(self, size)
+
+    def New(self, size):
+        return _newtonPy.dVector_New(self, size)
+
+    def DeleteArray(self, ptr):
+        return _newtonPy.dVector_DeleteArray(self, ptr)
+
+    def Delete(self, ptr):
+        return _newtonPy.dVector_Delete(self, ptr)
+
+    def GetScalar(self):
+        return _newtonPy.dVector_GetScalar(self)
+
+    def Store(self, dst):
+        return _newtonPy.dVector_Store(self, dst)
+
+    def BroadcastX(self):
+        return _newtonPy.dVector_BroadcastX(self)
+
+    def BroadcastY(self):
+        return _newtonPy.dVector_BroadcastY(self)
+
+    def BroadcastZ(self):
+        return _newtonPy.dVector_BroadcastZ(self)
+
+    def BroadcastW(self):
+        return _newtonPy.dVector_BroadcastW(self)
+
+    def Scale(self, s):
+        return _newtonPy.dVector_Scale(self, s)
+
+    def GetElement(self, *args):
+        return _newtonPy.dVector_GetElement(self, *args)
+
+    def __add__(self, A):
+        return _newtonPy.dVector___add__(self, A)
+
+    def __sub__(self, A):
+        return _newtonPy.dVector___sub__(self, A)
+
+    def __mul__(self, A):
+        return _newtonPy.dVector___mul__(self, A)
+
+    def __iadd__(self, A):
+        return _newtonPy.dVector___iadd__(self, A)
+
+    def __isub__(self, A):
+        return _newtonPy.dVector___isub__(self, A)
+
+    def __imul__(self, A):
+        return _newtonPy.dVector___imul__(self, A)
+
+    def DotProduct(self, A):
+        return _newtonPy.dVector_DotProduct(self, A)
+
+    def CrossProduct(self, *args):
+        return _newtonPy.dVector_CrossProduct(self, *args)
+
+    def Reciproc(self):
+        return _newtonPy.dVector_Reciproc(self)
+
+    def MulAdd(self, A, B):
+        return _newtonPy.dVector_MulAdd(self, A, B)
+
+    def MulSub(self, A, B):
+        return _newtonPy.dVector_MulSub(self, A, B)
+
+    def AddHorizontal(self):
+        return _newtonPy.dVector_AddHorizontal(self)
+
+    def Abs(self):
+        return _newtonPy.dVector_Abs(self)
+
+    def GetMax(self, *args):
+        return _newtonPy.dVector_GetMax(self, *args)
+
+    def GetMin(self, data):
+        return _newtonPy.dVector_GetMin(self, data)
+
+    def GetInt(self):
+        return _newtonPy.dVector_GetInt(self)
+
+    def TestZero(self):
+        return _newtonPy.dVector_TestZero(self)
+
+    def Floor(self):
+        return _newtonPy.dVector_Floor(self)
+
+    def Sqrt(self):
+        return _newtonPy.dVector_Sqrt(self)
+
+    def InvSqrt(self):
+        return _newtonPy.dVector_InvSqrt(self)
+
+    def InvMagSqrt(self):
+        return _newtonPy.dVector_InvMagSqrt(self)
+
+    def Normalize(self):
+        return _newtonPy.dVector_Normalize(self)
+
+    def __gt__(self, data):
+        return _newtonPy.dVector___gt__(self, data)
+
+    def __eq__(self, data):
+        return _newtonPy.dVector___eq__(self, data)
+
+    def __lt__(self, data):
+        return _newtonPy.dVector___lt__(self, data)
+
+    def __ge__(self, data):
+        return _newtonPy.dVector___ge__(self, data)
+
+    def __le__(self, data):
+        return _newtonPy.dVector___le__(self, data)
+
+    def __and__(self, data):
+        return _newtonPy.dVector___and__(self, data)
+
+    def __or__(self, data):
+        return _newtonPy.dVector___or__(self, data)
+
+    def __xor__(self, data):
+        return _newtonPy.dVector___xor__(self, data)
+
+    def AndNot(self, data):
+        return _newtonPy.dVector_AndNot(self, data)
+
+    def Select(self, data, mask):
+        return _newtonPy.dVector_Select(self, data, mask)
+
+    def GetSignMask(self):
+        return _newtonPy.dVector_GetSignMask(self)
+
+    def ShiftRight(self):
+        return _newtonPy.dVector_ShiftRight(self)
+
+    def ShiftTripleRight(self):
+        return _newtonPy.dVector_ShiftTripleRight(self)
+
+    def ShiftTripleLeft(self):
+        return _newtonPy.dVector_ShiftTripleLeft(self)
+
+    def ShiftRightLogical(self, bits):
+        return _newtonPy.dVector_ShiftRightLogical(self, bits)
+
+    @staticmethod
+    def Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3):
+        return _newtonPy.dVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3)
+
+    def Trace(self, arg2):
+        return _newtonPy.dVector_Trace(self, arg2)
+    m_zero = property(_newtonPy.dVector_m_zero_get, _newtonPy.dVector_m_zero_set)
+    m_one = property(_newtonPy.dVector_m_one_get, _newtonPy.dVector_m_one_set)
+    m_wOne = property(_newtonPy.dVector_m_wOne_get, _newtonPy.dVector_m_wOne_set)
+    m_two = property(_newtonPy.dVector_m_two_get, _newtonPy.dVector_m_two_set)
+    m_half = property(_newtonPy.dVector_m_half_get, _newtonPy.dVector_m_half_set)
+    m_three = property(_newtonPy.dVector_m_three_get, _newtonPy.dVector_m_three_set)
+    m_negOne = property(_newtonPy.dVector_m_negOne_get, _newtonPy.dVector_m_negOne_set)
+    m_xMask = property(_newtonPy.dVector_m_xMask_get, _newtonPy.dVector_m_xMask_set)
+    m_yMask = property(_newtonPy.dVector_m_yMask_get, _newtonPy.dVector_m_yMask_set)
+    m_zMask = property(_newtonPy.dVector_m_zMask_get, _newtonPy.dVector_m_zMask_set)
+    m_wMask = property(_newtonPy.dVector_m_wMask_get, _newtonPy.dVector_m_wMask_set)
+    m_xyzwMask = property(_newtonPy.dVector_m_xyzwMask_get, _newtonPy.dVector_m_xyzwMask_set)
+    m_epsilon = property(_newtonPy.dVector_m_epsilon_get, _newtonPy.dVector_m_epsilon_set)
+    m_signMask = property(_newtonPy.dVector_m_signMask_get, _newtonPy.dVector_m_signMask_set)
+    m_triplexMask = property(_newtonPy.dVector_m_triplexMask_get, _newtonPy.dVector_m_triplexMask_set)
+    __swig_destroy__ = _newtonPy.delete_dVector
+
+# Register dVector in _newtonPy:
+_newtonPy.dVector_swigregister(dVector)
+
+def dVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3):
+    return _newtonPy.dVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3)
+cvar = _newtonPy.cvar
+
+class dBigVector(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def __init__(self, *args):
+        _newtonPy.dBigVector_swiginit(self, _newtonPy.new_dBigVector(*args))
+
+    def GetElement(self, *args):
+        return _newtonPy.dBigVector_GetElement(self, *args)
+
+    def GetScalar(self):
+        return _newtonPy.dBigVector_GetScalar(self)
+
+    def __add__(self, A):
+        return _newtonPy.dBigVector___add__(self, A)
+
+    def __sub__(self, A):
+        return _newtonPy.dBigVector___sub__(self, A)
+
+    def __mul__(self, A):
+        return _newtonPy.dBigVector___mul__(self, A)
+
+    def __iadd__(self, A):
+        return _newtonPy.dBigVector___iadd__(self, A)
+
+    def __isub__(self, A):
+        return _newtonPy.dBigVector___isub__(self, A)
+
+    def __imul__(self, A):
+        return _newtonPy.dBigVector___imul__(self, A)
+
+    def MulAdd(self, A, B):
+        return _newtonPy.dBigVector_MulAdd(self, A, B)
+
+    def MulSub(self, A, B):
+        return _newtonPy.dBigVector_MulSub(self, A, B)
+
+    def AddHorizontal(self):
+        return _newtonPy.dBigVector_AddHorizontal(self)
+
+    def BroadcastX(self):
+        return _newtonPy.dBigVector_BroadcastX(self)
+
+    def BroadcastY(self):
+        return _newtonPy.dBigVector_BroadcastY(self)
+
+    def BroadcastZ(self):
+        return _newtonPy.dBigVector_BroadcastZ(self)
+
+    def BroadcastW(self):
+        return _newtonPy.dBigVector_BroadcastW(self)
+
+    def Scale(self, s):
+        return _newtonPy.dBigVector_Scale(self, s)
+
+    def Abs(self):
+        return _newtonPy.dBigVector_Abs(self)
+
+    def Reciproc(self):
+        return _newtonPy.dBigVector_Reciproc(self)
+
+    def Sqrt(self):
+        return _newtonPy.dBigVector_Sqrt(self)
+
+    def InvSqrt(self):
+        return _newtonPy.dBigVector_InvSqrt(self)
+
+    def InvMagSqrt(self):
+        return _newtonPy.dBigVector_InvMagSqrt(self)
+
+    def Normalize(self):
+        return _newtonPy.dBigVector_Normalize(self)
+
+    def GetMax(self, *args):
+        return _newtonPy.dBigVector_GetMax(self, *args)
+
+    def GetMin(self, data):
+        return _newtonPy.dBigVector_GetMin(self, data)
+
+    def GetInt(self):
+        return _newtonPy.dBigVector_GetInt(self)
+
+    def __gt__(self, data):
+        return _newtonPy.dBigVector___gt__(self, data)
+
+    def __eq__(self, data):
+        return _newtonPy.dBigVector___eq__(self, data)
+
+    def __lt__(self, data):
+        return _newtonPy.dBigVector___lt__(self, data)
+
+    def __ge__(self, data):
+        return _newtonPy.dBigVector___ge__(self, data)
+
+    def __le__(self, data):
+        return _newtonPy.dBigVector___le__(self, data)
+
+    def __and__(self, data):
+        return _newtonPy.dBigVector___and__(self, data)
+
+    def __or__(self, data):
+        return _newtonPy.dBigVector___or__(self, data)
+
+    def __xor__(self, data):
+        return _newtonPy.dBigVector___xor__(self, data)
+
+    def AndNot(self, data):
+        return _newtonPy.dBigVector_AndNot(self, data)
+
+    def Select(self, data, mask):
+        return _newtonPy.dBigVector_Select(self, data, mask)
+
+    def ShiftRight(self):
+        return _newtonPy.dBigVector_ShiftRight(self)
+
+    def ShiftTripleRight(self):
+        return _newtonPy.dBigVector_ShiftTripleRight(self)
+
+    def ShiftTripleLeft(self):
+        return _newtonPy.dBigVector_ShiftTripleLeft(self)
+
+    def ShiftRightLogical(self, bits):
+        return _newtonPy.dBigVector_ShiftRightLogical(self, bits)
+
+    def GetSignMask(self):
+        return _newtonPy.dBigVector_GetSignMask(self)
+
+    def Floor(self):
+        return _newtonPy.dBigVector_Floor(self)
+
+    def TestZero(self):
+        return _newtonPy.dBigVector_TestZero(self)
+
+    @staticmethod
+    def Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3):
+        return _newtonPy.dBigVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3)
+
+    def DotProduct(self, A):
+        return _newtonPy.dBigVector_DotProduct(self, A)
+
+    def CrossProduct(self, *args):
+        return _newtonPy.dBigVector_CrossProduct(self, *args)
+    m_zero = property(_newtonPy.dBigVector_m_zero_get, _newtonPy.dBigVector_m_zero_set)
+    m_one = property(_newtonPy.dBigVector_m_one_get, _newtonPy.dBigVector_m_one_set)
+    m_wOne = property(_newtonPy.dBigVector_m_wOne_get, _newtonPy.dBigVector_m_wOne_set)
+    m_two = property(_newtonPy.dBigVector_m_two_get, _newtonPy.dBigVector_m_two_set)
+    m_half = property(_newtonPy.dBigVector_m_half_get, _newtonPy.dBigVector_m_half_set)
+    m_three = property(_newtonPy.dBigVector_m_three_get, _newtonPy.dBigVector_m_three_set)
+    m_negOne = property(_newtonPy.dBigVector_m_negOne_get, _newtonPy.dBigVector_m_negOne_set)
+    m_xMask = property(_newtonPy.dBigVector_m_xMask_get, _newtonPy.dBigVector_m_xMask_set)
+    m_yMask = property(_newtonPy.dBigVector_m_yMask_get, _newtonPy.dBigVector_m_yMask_set)
+    m_zMask = property(_newtonPy.dBigVector_m_zMask_get, _newtonPy.dBigVector_m_zMask_set)
+    m_wMask = property(_newtonPy.dBigVector_m_wMask_get, _newtonPy.dBigVector_m_wMask_set)
+    m_xyzwMask = property(_newtonPy.dBigVector_m_xyzwMask_get, _newtonPy.dBigVector_m_xyzwMask_set)
+    m_epsilon = property(_newtonPy.dBigVector_m_epsilon_get, _newtonPy.dBigVector_m_epsilon_set)
+    m_signMask = property(_newtonPy.dBigVector_m_signMask_get, _newtonPy.dBigVector_m_signMask_set)
+    m_triplexMask = property(_newtonPy.dBigVector_m_triplexMask_get, _newtonPy.dBigVector_m_triplexMask_set)
+    __swig_destroy__ = _newtonPy.delete_dBigVector
+
+# Register dBigVector in _newtonPy:
+_newtonPy.dBigVector_swigregister(dBigVector)
+
+def dBigVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3):
+    return _newtonPy.dBigVector_Transpose4x4(dst0, dst1, dst2, dst3, src0, src1, src2, src3)
+
+
+def dGetZeroMatrix():
+    return _newtonPy.dGetZeroMatrix()
+
+def dGetIdentityMatrix():
+    return _newtonPy.dGetIdentityMatrix()
+class dMatrix(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def GetElement(self, *args):
+        return _newtonPy.dMatrix_GetElement(self, *args)
+
+    def Inverse(self):
+        return _newtonPy.dMatrix_Inverse(self)
+
+    def Inverse4x4(self):
+        return _newtonPy.dMatrix_Inverse4x4(self)
+
+    def Transpose(self):
+        return _newtonPy.dMatrix_Transpose(self)
+
+    def Transpose4X4(self):
+        return _newtonPy.dMatrix_Transpose4X4(self)
+
+    def RotateVector(self, v):
+        return _newtonPy.dMatrix_RotateVector(self, v)
+
+    def UnrotateVector(self, v):
+        return _newtonPy.dMatrix_UnrotateVector(self, v)
+
+    def TransformVector(self, v):
+        return _newtonPy.dMatrix_TransformVector(self, v)
+
+    def UntransformVector(self, v):
+        return _newtonPy.dMatrix_UntransformVector(self, v)
+
+    def TransformPlane(self, localPlane):
+        return _newtonPy.dMatrix_TransformPlane(self, localPlane)
+
+    def UntransformPlane(self, globalPlane):
+        return _newtonPy.dMatrix_UntransformPlane(self, globalPlane)
+
+    def TransformVector1x4(self, v):
+        return _newtonPy.dMatrix_TransformVector1x4(self, v)
+
+    def SolveByGaussianElimination(self, v):
+        return _newtonPy.dMatrix_SolveByGaussianElimination(self, v)
+
+    def TransformBBox(self, p0local, p1local, p0, p1):
+        return _newtonPy.dMatrix_TransformBBox(self, p0local, p1local, p0, p1)
+
+    def CalcPitchYawRoll(self, euler0, euler1):
+        return _newtonPy.dMatrix_CalcPitchYawRoll(self, euler0, euler1)
+
+    def TransformTriplex(self, *args):
+        return _newtonPy.dMatrix_TransformTriplex(self, *args)
+
+    def TestIdentity(self):
+        return _newtonPy.dMatrix_TestIdentity(self)
+
+    def TestSymetric3x3(self):
+        return _newtonPy.dMatrix_TestSymetric3x3(self)
+
+    def TestOrthogonal(self, *args):
+        return _newtonPy.dMatrix_TestOrthogonal(self, *args)
+
+    def Multiply3X3(self, B):
+        return _newtonPy.dMatrix_Multiply3X3(self, B)
+
+    def __mul__(self, B):
+        return _newtonPy.dMatrix___mul__(self, B)
+
+    def EigenVectors(self):
+        return _newtonPy.dMatrix_EigenVectors(self)
+
+    def PolarDecomposition(self, transformMatrix, scale, stretchAxis):
+        return _newtonPy.dMatrix_PolarDecomposition(self, transformMatrix, scale, stretchAxis)
+
+    def __init__(self, *args):
+        _newtonPy.dMatrix_swiginit(self, _newtonPy.new_dMatrix(*args))
+    m_front = property(_newtonPy.dMatrix_m_front_get, _newtonPy.dMatrix_m_front_set)
+    m_up = property(_newtonPy.dMatrix_m_up_get, _newtonPy.dMatrix_m_up_set)
+    m_right = property(_newtonPy.dMatrix_m_right_get, _newtonPy.dMatrix_m_right_set)
+    m_posit = property(_newtonPy.dMatrix_m_posit_get, _newtonPy.dMatrix_m_posit_set)
+    __swig_destroy__ = _newtonPy.delete_dMatrix
+
+# Register dMatrix in _newtonPy:
+_newtonPy.dMatrix_swigregister(dMatrix)
+
+
+def dPitchMatrix(ang):
+    return _newtonPy.dPitchMatrix(ang)
+
+def dYawMatrix(ang):
+    return _newtonPy.dYawMatrix(ang)
+
+def dRollMatrix(ang):
+    return _newtonPy.dRollMatrix(ang)
+class dQuaternion(dVector):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def __init__(self, *args):
+        _newtonPy.dQuaternion_swiginit(self, _newtonPy.new_dQuaternion(*args))
+
+    def Normalize(self):
+        return _newtonPy.dQuaternion_Normalize(self)
+
+    def Scale(self, scale):
+        return _newtonPy.dQuaternion_Scale(self, scale)
+
+    def Inverse(self):
+        return _newtonPy.dQuaternion_Inverse(self)
+
+    def __add__(self, B):
+        return _newtonPy.dQuaternion___add__(self, B)
+
+    def __sub__(self, B):
+        return _newtonPy.dQuaternion___sub__(self, B)
+
+    def __mul__(self, B):
+        return _newtonPy.dQuaternion___mul__(self, B)
+
+    def Slerp(self, q1, t):
+        return _newtonPy.dQuaternion_Slerp(self, q1, t)
+
+    def CalcAverageOmega(self, q1, invdt):
+        return _newtonPy.dQuaternion_CalcAverageOmega(self, q1, invdt)
+    __swig_destroy__ = _newtonPy.delete_dQuaternion
+
+# Register dQuaternion in _newtonPy:
+_newtonPy.dQuaternion_swigregister(dQuaternion)
+
 m_box = _newtonPy.m_box
 m_cone = _newtonPy.m_cone
 m_sphere = _newtonPy.m_sphere
