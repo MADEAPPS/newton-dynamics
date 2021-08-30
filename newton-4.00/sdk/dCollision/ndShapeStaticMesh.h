@@ -58,9 +58,9 @@ class ndPolygonMeshDesc: public dFastAabb
 	{
 	}
 
-	ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode);
+	D_COLLISION_API ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode);
 
-	void SortFaceArray();
+	D_COLLISION_API void SortFaceArray();
 	dFloat32 GetSeparetionDistance() const;
 	void SetDistanceTravel(const dVector& distanceInGlobalSpace);
 

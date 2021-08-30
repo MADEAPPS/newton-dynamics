@@ -43,9 +43,9 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 
 	dArray<dInt16>& GetElevationMap();
 	const dArray<dInt16>& GetElevationMap() const;
-	D_COLLISION_API void UpdateElevationMapAabb();
 
-	void GetLocalAabb(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
+	D_COLLISION_API void UpdateElevationMapAabb();
+	D_COLLISION_API void GetLocalAabb(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
 
 	protected:
 	virtual ndShapeInfo GetShapeInfo() const;
