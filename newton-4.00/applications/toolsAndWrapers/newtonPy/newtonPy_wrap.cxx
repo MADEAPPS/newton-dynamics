@@ -2690,8 +2690,42 @@ SWIGINTERN PyObject *SWIG_PyStaticMethod_New(PyObject *SWIGUNUSEDPARM(self), PyO
 /* -------- TYPES TABLE (BEGIN) -------- */
 
 #define SWIGTYPE_p_char swig_types[0]
-static swig_type_info *swig_types[2];
-static swig_module_info swig_module = {swig_types, 1, 0, 0, 0, 0};
+#define SWIGTYPE_p_dClassAlloc swig_types[1]
+#define SWIGTYPE_p_dFastRay swig_types[2]
+#define SWIGTYPE_p_dFloat32 swig_types[3]
+#define SWIGTYPE_p_dInt32 swig_types[4]
+#define SWIGTYPE_p_dLoadSaveBase__dSaveDescriptor swig_types[5]
+#define SWIGTYPE_p_dMatrix swig_types[6]
+#define SWIGTYPE_p_dQuaternion swig_types[7]
+#define SWIGTYPE_p_dUnsigned32 swig_types[8]
+#define SWIGTYPE_p_dVector swig_types[9]
+#define SWIGTYPE_p_ndBodiesInAabbNotify swig_types[10]
+#define SWIGTYPE_p_ndBody swig_types[11]
+#define SWIGTYPE_p_ndBodyDynamic swig_types[12]
+#define SWIGTYPE_p_ndBodyKinematic swig_types[13]
+#define SWIGTYPE_p_ndBodyList swig_types[14]
+#define SWIGTYPE_p_ndBodyNotify swig_types[15]
+#define SWIGTYPE_p_ndBodyParticleSet swig_types[16]
+#define SWIGTYPE_p_ndBodyParticleSetList swig_types[17]
+#define SWIGTYPE_p_ndBodySentinel swig_types[18]
+#define SWIGTYPE_p_ndBodySphFluid swig_types[19]
+#define SWIGTYPE_p_ndBodyTriggerVolume swig_types[20]
+#define SWIGTYPE_p_ndContactList swig_types[21]
+#define SWIGTYPE_p_ndContactNotify swig_types[22]
+#define SWIGTYPE_p_ndConvexCastNotify swig_types[23]
+#define SWIGTYPE_p_ndJointBilateralConstraint swig_types[24]
+#define SWIGTYPE_p_ndJointList swig_types[25]
+#define SWIGTYPE_p_ndModel swig_types[26]
+#define SWIGTYPE_p_ndModelList swig_types[27]
+#define SWIGTYPE_p_ndRayCastNotify swig_types[28]
+#define SWIGTYPE_p_ndScene swig_types[29]
+#define SWIGTYPE_p_ndSceneTreeNotiFy swig_types[30]
+#define SWIGTYPE_p_ndShapeInstance swig_types[31]
+#define SWIGTYPE_p_ndSkeletonList swig_types[32]
+#define SWIGTYPE_p_ndWorld swig_types[33]
+#define SWIGTYPE_p_void swig_types[34]
+static swig_type_info *swig_types[36];
+static swig_module_info swig_module = {swig_types, 35, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -2795,57 +2829,7 @@ namespace swig {
 }
 
 
-	#include "testWrapper.h"
-
-
-#include <float.h>
-
-
-#include <math.h>
-
-
-/* Getting isfinite working pre C99 across multiple platforms is non-trivial. Users can provide SWIG_isfinite on older platforms. */
-#ifndef SWIG_isfinite
-/* isfinite() is a macro for C99 */
-# if defined(isfinite)
-#  define SWIG_isfinite(X) (isfinite(X))
-# elif defined(__cplusplus) && __cplusplus >= 201103L
-/* Use a template so that this works whether isfinite() is std::isfinite() or
- * in the global namespace.  The reality seems to vary between compiler
- * versions.
- *
- * Make sure namespace std exists to avoid compiler warnings.
- *
- * extern "C++" is required as this fragment can end up inside an extern "C" { } block
- */
-namespace std { }
-extern "C++" template<typename T>
-inline int SWIG_isfinite_func(T x) {
-  using namespace std;
-  return isfinite(x);
-}
-#  define SWIG_isfinite(X) (SWIG_isfinite_func(X))
-# elif defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))
-#  define SWIG_isfinite(X) (__builtin_isfinite(X))
-# elif defined(__clang__) && defined(__has_builtin)
-#  if __has_builtin(__builtin_isfinite)
-#   define SWIG_isfinite(X) (__builtin_isfinite(X))
-#  endif
-# elif defined(_MSC_VER)
-#  define SWIG_isfinite(X) (_finite(X))
-# elif defined(__sun) && defined(__SVR4)
-#  include <ieeefp.h>
-#  define SWIG_isfinite(X) (finite(X))
-# endif
-#endif
-
-
-/* Accept infinite as a valid float value unless we are unable to check if a value is finite */
-#ifdef SWIG_isfinite
-# define SWIG_Float_Overflow_Check(X) ((X < -FLT_MAX || X > FLT_MAX) && SWIG_isfinite(X))
-#else
-# define SWIG_Float_Overflow_Check(X) ((X < -FLT_MAX || X > FLT_MAX))
-#endif
+	#include <ndNewton.h>
 
 
 SWIGINTERN int
@@ -2894,46 +2878,315 @@ SWIG_AsVal_double (PyObject *obj, double *val)
 }
 
 
+#include <float.h>
+
+
+#include <math.h>
+
+
+SWIGINTERNINLINE int
+SWIG_CanCastAsInteger(double *d, double min, double max) {
+  double x = *d;
+  if ((min <= x && x <= max)) {
+   double fx = floor(x);
+   double cx = ceil(x);
+   double rd =  ((x - fx) < 0.5) ? fx : cx; /* simple rint */
+   if ((errno == EDOM) || (errno == ERANGE)) {
+     errno = 0;
+   } else {
+     double summ, reps, diff;
+     if (rd < x) {
+       diff = x - rd;
+     } else if (rd > x) {
+       diff = rd - x;
+     } else {
+       return 1;
+     }
+     summ = rd + x;
+     reps = diff/summ;
+     if (reps < 8*DBL_EPSILON) {
+       *d = rd;
+       return 1;
+     }
+   }
+  }
+  return 0;
+}
+
+
 SWIGINTERN int
-SWIG_AsVal_float (PyObject * obj, float *val)
+SWIG_AsVal_unsigned_SS_long (PyObject *obj, unsigned long *val) 
 {
-  double v;
-  int res = SWIG_AsVal_double (obj, &v);
+#if PY_VERSION_HEX < 0x03000000
+  if (PyInt_Check(obj)) {
+    long v = PyInt_AsLong(obj);
+    if (v >= 0) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      return SWIG_OverflowError;
+    }
+  } else
+#endif
+  if (PyLong_Check(obj)) {
+    unsigned long v = PyLong_AsUnsignedLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      PyErr_Clear();
+      return SWIG_OverflowError;
+    }
+  }
+#ifdef SWIG_PYTHON_CAST_MODE
+  {
+    int dispatch = 0;
+    unsigned long v = PyLong_AsUnsignedLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_AddCast(SWIG_OK);
+    } else {
+      PyErr_Clear();
+    }
+    if (!dispatch) {
+      double d;
+      int res = SWIG_AddCast(SWIG_AsVal_double (obj,&d));
+      if (SWIG_IsOK(res) && SWIG_CanCastAsInteger(&d, 0, ULONG_MAX)) {
+	if (val) *val = (unsigned long)(d);
+	return res;
+      }
+    }
+  }
+#endif
+  return SWIG_TypeError;
+}
+
+
+#include <limits.h>
+#if !defined(SWIG_NO_LLONG_MAX)
+# if !defined(LLONG_MAX) && defined(__GNUC__) && defined (__LONG_LONG_MAX__)
+#   define LLONG_MAX __LONG_LONG_MAX__
+#   define LLONG_MIN (-LLONG_MAX - 1LL)
+#   define ULLONG_MAX (LLONG_MAX * 2ULL + 1ULL)
+# endif
+#endif
+
+
+#if defined(LLONG_MAX) && !defined(SWIG_LONG_LONG_AVAILABLE)
+#  define SWIG_LONG_LONG_AVAILABLE
+#endif
+
+
+#ifdef SWIG_LONG_LONG_AVAILABLE
+SWIGINTERN int
+SWIG_AsVal_unsigned_SS_long_SS_long (PyObject *obj, unsigned long long *val)
+{
+  int res = SWIG_TypeError;
+  if (PyLong_Check(obj)) {
+    unsigned long long v = PyLong_AsUnsignedLongLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      PyErr_Clear();
+      res = SWIG_OverflowError;
+    }
+  } else {
+    unsigned long v;
+    res = SWIG_AsVal_unsigned_SS_long (obj,&v);
+    if (SWIG_IsOK(res)) {
+      if (val) *val = v;
+      return res;
+    }
+  }
+#ifdef SWIG_PYTHON_CAST_MODE
+  {
+    const double mant_max = 1LL << DBL_MANT_DIG;
+    double d;
+    res = SWIG_AsVal_double (obj,&d);
+    if (SWIG_IsOK(res) && !SWIG_CanCastAsInteger(&d, 0, mant_max))
+      return SWIG_OverflowError;
+    if (SWIG_IsOK(res) && SWIG_CanCastAsInteger(&d, 0, mant_max)) {
+      if (val) *val = (unsigned long long)(d);
+      return SWIG_AddCast(res);
+    }
+    res = SWIG_TypeError;
+  }
+#endif
+  return res;
+}
+#endif
+
+
+SWIGINTERNINLINE int
+SWIG_AsVal_size_t (PyObject * obj, size_t *val)
+{
+  int res = SWIG_TypeError;
+#ifdef SWIG_LONG_LONG_AVAILABLE
+  if (sizeof(size_t) <= sizeof(unsigned long)) {
+#endif
+    unsigned long v;
+    res = SWIG_AsVal_unsigned_SS_long (obj, val ? &v : 0);
+    if (SWIG_IsOK(res) && val) *val = static_cast< size_t >(v);
+#ifdef SWIG_LONG_LONG_AVAILABLE
+  } else if (sizeof(size_t) <= sizeof(unsigned long long)) {
+    unsigned long long v;
+    res = SWIG_AsVal_unsigned_SS_long_SS_long (obj, val ? &v : 0);
+    if (SWIG_IsOK(res) && val) *val = static_cast< size_t >(v);
+  }
+#endif
+  return res;
+}
+
+
+SWIGINTERNINLINE PyObject*
+  SWIG_From_bool  (bool value)
+{
+  return PyBool_FromLong(value ? 1 : 0);
+}
+
+
+SWIGINTERNINLINE PyObject*
+  SWIG_From_int  (int value)
+{
+  return PyInt_FromLong((long) value);
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_long (PyObject *obj, long* val)
+{
+#if PY_VERSION_HEX < 0x03000000
+  if (PyInt_Check(obj)) {
+    if (val) *val = PyInt_AsLong(obj);
+    return SWIG_OK;
+  } else
+#endif
+  if (PyLong_Check(obj)) {
+    long v = PyLong_AsLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      PyErr_Clear();
+      return SWIG_OverflowError;
+    }
+  }
+#ifdef SWIG_PYTHON_CAST_MODE
+  {
+    int dispatch = 0;
+    long v = PyInt_AsLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_AddCast(SWIG_OK);
+    } else {
+      PyErr_Clear();
+    }
+    if (!dispatch) {
+      double d;
+      int res = SWIG_AddCast(SWIG_AsVal_double (obj,&d));
+      if (SWIG_IsOK(res) && SWIG_CanCastAsInteger(&d, LONG_MIN, LONG_MAX)) {
+	if (val) *val = (long)(d);
+	return res;
+      }
+    }
+  }
+#endif
+  return SWIG_TypeError;
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_int (PyObject * obj, int *val)
+{
+  long v;
+  int res = SWIG_AsVal_long (obj, &v);
   if (SWIG_IsOK(res)) {
-    if (SWIG_Float_Overflow_Check(v)) {
+    if ((v < INT_MIN || v > INT_MAX)) {
       return SWIG_OverflowError;
     } else {
-      if (val) *val = static_cast< float >(v);
+      if (val) *val = static_cast< int >(v);
     }
   }  
   return res;
 }
 
+
+SWIGINTERN swig_type_info*
+SWIG_pchar_descriptor(void)
+{
+  static int init = 0;
+  static swig_type_info* info = 0;
+  if (!init) {
+    info = SWIG_TypeQuery("_p_char");
+    init = 1;
+  }
+  return info;
+}
+
+
+SWIGINTERNINLINE PyObject *
+SWIG_FromCharPtrAndSize(const char* carray, size_t size)
+{
+  if (carray) {
+    if (size > INT_MAX) {
+      swig_type_info* pchar_descriptor = SWIG_pchar_descriptor();
+      return pchar_descriptor ? 
+	SWIG_InternalNewPointerObj(const_cast< char * >(carray), pchar_descriptor, 0) : SWIG_Py_Void();
+    } else {
+#if PY_VERSION_HEX >= 0x03000000
+#if defined(SWIG_PYTHON_STRICT_BYTE_CHAR)
+      return PyBytes_FromStringAndSize(carray, static_cast< Py_ssize_t >(size));
+#else
+      return PyUnicode_DecodeUTF8(carray, static_cast< Py_ssize_t >(size), "surrogateescape");
+#endif
+#else
+      return PyString_FromStringAndSize(carray, static_cast< Py_ssize_t >(size));
+#endif
+    }
+  } else {
+    return SWIG_Py_Void();
+  }
+}
+
+
+SWIGINTERNINLINE PyObject * 
+SWIG_FromCharPtr(const char *cptr)
+{ 
+  return SWIG_FromCharPtrAndSize(cptr, (cptr ? strlen(cptr) : 0));
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-SWIGINTERN PyObject *_wrap_Test(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_new_dClassAlloc(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  float arg1 ;
-  float arg2 ;
-  float val1 ;
-  int ecode1 = 0 ;
-  float val2 ;
-  int ecode2 = 0 ;
-  PyObject *swig_obj[2] ;
+  dClassAlloc *result = 0 ;
   
-  if (!SWIG_Python_UnpackTuple(args, "Test", 2, 2, swig_obj)) SWIG_fail;
-  ecode1 = SWIG_AsVal_float(swig_obj[0], &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "Test" "', argument " "1"" of type '" "float""'");
-  } 
-  arg1 = static_cast< float >(val1);
-  ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Test" "', argument " "2"" of type '" "float""'");
-  } 
-  arg2 = static_cast< float >(val2);
-  Test(arg1,arg2);
+  if (!SWIG_Python_UnpackTuple(args, "new_dClassAlloc", 0, 0, 0)) SWIG_fail;
+  result = (dClassAlloc *)new dClassAlloc();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dClassAlloc, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_dClassAlloc(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  dClassAlloc *arg1 = (dClassAlloc *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_dClassAlloc, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_dClassAlloc" "', argument " "1"" of type '" "dClassAlloc *""'"); 
+  }
+  arg1 = reinterpret_cast< dClassAlloc * >(argp1);
+  delete arg1;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -2941,9 +3194,2061 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_dClassAlloc_Malloc(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  size_t arg1 ;
+  size_t val1 ;
+  int ecode1 = 0 ;
+  PyObject *swig_obj[1] ;
+  void *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  ecode1 = SWIG_AsVal_size_t(swig_obj[0], &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "dClassAlloc_Malloc" "', argument " "1"" of type '" "size_t""'");
+  } 
+  arg1 = static_cast< size_t >(val1);
+  result = (void *)dClassAlloc::Malloc(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_void, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_dClassAlloc_Free(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  void *arg1 = (void *) (void *)0 ;
+  int res1 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dClassAlloc_Free" "', argument " "1"" of type '" "void *const""'"); 
+  }
+  dClassAlloc::Free(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *dClassAlloc_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!SWIG_Python_UnpackTuple(args, "swigregister", 1, 1, &obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_dClassAlloc, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject *dClassAlloc_swiginit(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  return SWIG_Python_InitShadowInstance(args);
+}
+
+SWIGINTERN PyObject *_wrap_delete_ndBody(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_ndBody" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetAsBody(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndBody *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetAsBody" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = (ndBody *)(arg1)->GetAsBody();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBody, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetAsBodyDynamic(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndBodyDynamic *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetAsBodyDynamic" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = (ndBodyDynamic *)(arg1)->GetAsBodyDynamic();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodyDynamic, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetAsBodySentinel(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndBodySentinel *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetAsBodySentinel" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = (ndBodySentinel *)(arg1)->GetAsBodySentinel();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodySentinel, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetAsBodyKinematic(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndBodyKinematic *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetAsBodyKinematic" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = (ndBodyKinematic *)(arg1)->GetAsBodyKinematic();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodyKinematic, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetAsBodyPlayerCapsule(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndBodyKinematic *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetAsBodyPlayerCapsule" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = (ndBodyKinematic *)(arg1)->GetAsBodyPlayerCapsule();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodyKinematic, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetAsBodySphFluid(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndBodySphFluid *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetAsBodySphFluid" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = (ndBodySphFluid *)(arg1)->GetAsBodySphFluid();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodySphFluid, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetAsBodyParticleSet(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndBodyParticleSet *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetAsBodyParticleSet" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = (ndBodyParticleSet *)(arg1)->GetAsBodyParticleSet();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodyParticleSet, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetAsBodyTriggerVolume(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndBodyTriggerVolume *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetAsBodyTriggerVolume" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = (ndBodyTriggerVolume *)(arg1)->GetAsBodyTriggerVolume();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodyTriggerVolume, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetId(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  dUnsigned32 result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetId" "', argument " "1"" of type '" "ndBody const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = ((ndBody const *)arg1)->GetId();
+  resultobj = SWIG_NewPointerObj((new dUnsigned32(static_cast< const dUnsigned32& >(result))), SWIGTYPE_p_dUnsigned32, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetAABB(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  dVector *arg2 = 0 ;
+  dVector *arg3 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  PyObject *swig_obj[3] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndBody_GetAABB", 3, 3, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetAABB" "', argument " "1"" of type '" "ndBody const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_dVector,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBody_GetAABB" "', argument " "2"" of type '" "dVector &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBody_GetAABB" "', argument " "2"" of type '" "dVector &""'"); 
+  }
+  arg2 = reinterpret_cast< dVector * >(argp2);
+  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_dVector,  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndBody_GetAABB" "', argument " "3"" of type '" "dVector &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBody_GetAABB" "', argument " "3"" of type '" "dVector &""'"); 
+  }
+  arg3 = reinterpret_cast< dVector * >(argp3);
+  ((ndBody const *)arg1)->GetAABB(*arg2,*arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetInvMass(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  dFloat32 result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetInvMass" "', argument " "1"" of type '" "ndBody const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = ((ndBody const *)arg1)->GetInvMass();
+  resultobj = SWIG_NewPointerObj((new dFloat32(static_cast< const dFloat32& >(result))), SWIGTYPE_p_dFloat32, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_RayCast(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  ndRayCastNotify *arg2 = 0 ;
+  dFastRay *arg3 = 0 ;
+  dFloat32 arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 ;
+  int res4 = 0 ;
+  PyObject *swig_obj[4] ;
+  bool result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndBody_RayCast", 4, 4, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_RayCast" "', argument " "1"" of type '" "ndBody const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndRayCastNotify,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBody_RayCast" "', argument " "2"" of type '" "ndRayCastNotify &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBody_RayCast" "', argument " "2"" of type '" "ndRayCastNotify &""'"); 
+  }
+  arg2 = reinterpret_cast< ndRayCastNotify * >(argp2);
+  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_dFastRay,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndBody_RayCast" "', argument " "3"" of type '" "dFastRay const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBody_RayCast" "', argument " "3"" of type '" "dFastRay const &""'"); 
+  }
+  arg3 = reinterpret_cast< dFastRay * >(argp3);
+  {
+    res4 = SWIG_ConvertPtr(swig_obj[3], &argp4, SWIGTYPE_p_dFloat32,  0  | 0);
+    if (!SWIG_IsOK(res4)) {
+      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ndBody_RayCast" "', argument " "4"" of type '" "dFloat32 const""'"); 
+    }  
+    if (!argp4) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBody_RayCast" "', argument " "4"" of type '" "dFloat32 const""'");
+    } else {
+      dFloat32 * temp = reinterpret_cast< dFloat32 * >(argp4);
+      arg4 = *temp;
+      if (SWIG_IsNewObj(res4)) delete temp;
+    }
+  }
+  result = (bool)((ndBody const *)arg1)->RayCast(*arg2,(dFastRay const &)*arg3,arg4);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetCentreOfMass(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  dVector *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetCentreOfMass" "', argument " "1"" of type '" "ndBody const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = (dVector *) &((ndBody const *)arg1)->GetCentreOfMass();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dVector, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_SetCentreOfMass(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  dVector *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndBody_SetCentreOfMass", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_SetCentreOfMass" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_dVector,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBody_SetCentreOfMass" "', argument " "2"" of type '" "dVector const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBody_SetCentreOfMass" "', argument " "2"" of type '" "dVector const &""'"); 
+  }
+  arg2 = reinterpret_cast< dVector * >(argp2);
+  (arg1)->SetCentreOfMass((dVector const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetNotifyCallback(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndBodyNotify *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetNotifyCallback" "', argument " "1"" of type '" "ndBody const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = (ndBodyNotify *)((ndBody const *)arg1)->GetNotifyCallback();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodyNotify, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_SetNotifyCallback(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  ndBodyNotify *arg2 = (ndBodyNotify *) (ndBodyNotify *)0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndBody_SetNotifyCallback", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_SetNotifyCallback" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_ndBodyNotify, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBody_SetNotifyCallback" "', argument " "2"" of type '" "ndBodyNotify *const""'"); 
+  }
+  arg2 = reinterpret_cast< ndBodyNotify * >(argp2);
+  (arg1)->SetNotifyCallback(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetOmega(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  dVector result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetOmega" "', argument " "1"" of type '" "ndBody const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = ((ndBody const *)arg1)->GetOmega();
+  resultobj = SWIG_NewPointerObj((new dVector(static_cast< const dVector& >(result))), SWIGTYPE_p_dVector, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_SetOmega(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  dVector *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndBody_SetOmega", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_SetOmega" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_dVector,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBody_SetOmega" "', argument " "2"" of type '" "dVector const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBody_SetOmega" "', argument " "2"" of type '" "dVector const &""'"); 
+  }
+  arg2 = reinterpret_cast< dVector * >(argp2);
+  (arg1)->SetOmega((dVector const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetVelocity(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  dVector result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetVelocity" "', argument " "1"" of type '" "ndBody const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = ((ndBody const *)arg1)->GetVelocity();
+  resultobj = SWIG_NewPointerObj((new dVector(static_cast< const dVector& >(result))), SWIGTYPE_p_dVector, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_SetVelocity(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  dVector *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndBody_SetVelocity", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_SetVelocity" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_dVector,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBody_SetVelocity" "', argument " "2"" of type '" "dVector const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBody_SetVelocity" "', argument " "2"" of type '" "dVector const &""'"); 
+  }
+  arg2 = reinterpret_cast< dVector * >(argp2);
+  (arg1)->SetVelocity((dVector const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetMatrix(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  dMatrix result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetMatrix" "', argument " "1"" of type '" "ndBody const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = ((ndBody const *)arg1)->GetMatrix();
+  resultobj = SWIG_NewPointerObj((new dMatrix(static_cast< const dMatrix& >(result))), SWIGTYPE_p_dMatrix, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_SetMatrix(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  dMatrix *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndBody_SetMatrix", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_SetMatrix" "', argument " "1"" of type '" "ndBody *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_dMatrix,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBody_SetMatrix" "', argument " "2"" of type '" "dMatrix const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBody_SetMatrix" "', argument " "2"" of type '" "dMatrix const &""'"); 
+  }
+  arg2 = reinterpret_cast< dMatrix * >(argp2);
+  (arg1)->SetMatrix((dMatrix const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetRotation(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  dQuaternion result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetRotation" "', argument " "1"" of type '" "ndBody const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  result = ((ndBody const *)arg1)->GetRotation();
+  resultobj = SWIG_NewPointerObj((new dQuaternion(static_cast< const dQuaternion& >(result))), SWIGTYPE_p_dQuaternion, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_Save(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  dLoadSaveBase::dSaveDescriptor *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndBody_Save", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_Save" "', argument " "1"" of type '" "ndBody const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_dLoadSaveBase__dSaveDescriptor,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBody_Save" "', argument " "2"" of type '" "dLoadSaveBase::dSaveDescriptor const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBody_Save" "', argument " "2"" of type '" "dLoadSaveBase::dSaveDescriptor const &""'"); 
+  }
+  arg2 = reinterpret_cast< dLoadSaveBase::dSaveDescriptor * >(argp2);
+  ((ndBody const *)arg1)->Save((dLoadSaveBase::dSaveDescriptor const &)*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndBody_GetVelocityAtPoint(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndBody *arg1 = (ndBody *) 0 ;
+  dVector *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  dVector result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndBody_GetVelocityAtPoint", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetVelocityAtPoint" "', argument " "1"" of type '" "ndBody const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndBody * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_dVector,  0  | 0);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBody_GetVelocityAtPoint" "', argument " "2"" of type '" "dVector const &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBody_GetVelocityAtPoint" "', argument " "2"" of type '" "dVector const &""'"); 
+  }
+  arg2 = reinterpret_cast< dVector * >(argp2);
+  result = ((ndBody const *)arg1)->GetVelocityAtPoint((dVector const &)*arg2);
+  resultobj = SWIG_NewPointerObj((new dVector(static_cast< const dVector& >(result))), SWIGTYPE_p_dVector, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *ndBody_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!SWIG_Python_UnpackTuple(args, "swigregister", 1, 1, &obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_ndBody, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject *_wrap_new_ndWorld(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *result = 0 ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "new_ndWorld", 0, 0, 0)) SWIG_fail;
+  result = (ndWorld *)new ndWorld();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndWorld, SWIG_POINTER_NEW |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_delete_ndWorld(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, SWIG_POINTER_DISOWN |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_ndWorld" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  delete arg1;
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_CleanUp(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_CleanUp" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  (arg1)->CleanUp();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetEngineVersion(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  dInt32 result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetEngineVersion" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = ((ndWorld const *)arg1)->GetEngineVersion();
+  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_dInt32, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_Sync(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_Sync" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  ((ndWorld const *)arg1)->Sync();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_Update(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  dFloat32 arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_Update", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_Update" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_dFloat32,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_Update" "', argument " "2"" of type '" "dFloat32""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_Update" "', argument " "2"" of type '" "dFloat32""'");
+    } else {
+      dFloat32 * temp = reinterpret_cast< dFloat32 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  (arg1)->Update(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_OnPostUpdate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  dFloat32 arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_OnPostUpdate", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_OnPostUpdate" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_dFloat32,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_OnPostUpdate" "', argument " "2"" of type '" "dFloat32""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_OnPostUpdate" "', argument " "2"" of type '" "dFloat32""'");
+    } else {
+      dFloat32 * temp = reinterpret_cast< dFloat32 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  (arg1)->OnPostUpdate(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_UpdateTransformsLock(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_UpdateTransformsLock" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  (arg1)->UpdateTransformsLock();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_UpdateTransformsUnlock(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_UpdateTransformsUnlock" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  (arg1)->UpdateTransformsUnlock();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetThreadCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  dInt32 result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetThreadCount" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = ((ndWorld const *)arg1)->GetThreadCount();
+  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_dInt32, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_SetThreadCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  dInt32 arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_SetThreadCount", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_SetThreadCount" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_dInt32,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_SetThreadCount" "', argument " "2"" of type '" "dInt32""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_SetThreadCount" "', argument " "2"" of type '" "dInt32""'");
+    } else {
+      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  (arg1)->SetThreadCount(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetSubSteps(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  dInt32 result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetSubSteps" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = ((ndWorld const *)arg1)->GetSubSteps();
+  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_dInt32, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_SetSubSteps(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  dInt32 arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_SetSubSteps", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_SetSubSteps" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_dInt32,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_SetSubSteps" "', argument " "2"" of type '" "dInt32""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_SetSubSteps" "', argument " "2"" of type '" "dInt32""'");
+    } else {
+      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  (arg1)->SetSubSteps(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetSelectedSolver(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndWorld::ndSolverModes result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetSelectedSolver" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = (ndWorld::ndSolverModes)((ndWorld const *)arg1)->GetSelectedSolver();
+  resultobj = SWIG_From_int(static_cast< int >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_SelectSolver(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  ndWorld::ndSolverModes arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_SelectSolver", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_SelectSolver" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndWorld_SelectSolver" "', argument " "2"" of type '" "ndWorld::ndSolverModes""'");
+  } 
+  arg2 = static_cast< ndWorld::ndSolverModes >(val2);
+  (arg1)->SelectSolver(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetSolverString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  char *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetSolverString" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = (char *)((ndWorld const *)arg1)->GetSolverString();
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_AddBody(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  ndBody *arg2 = (ndBody *) (ndBody *)0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  bool result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_AddBody", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_AddBody" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_AddBody" "', argument " "2"" of type '" "ndBody *const""'"); 
+  }
+  arg2 = reinterpret_cast< ndBody * >(argp2);
+  result = (bool)(arg1)->AddBody(arg2);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_RemoveBody(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  ndBody *arg2 = (ndBody *) (ndBody *)0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_RemoveBody", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_RemoveBody" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_RemoveBody" "', argument " "2"" of type '" "ndBody *const""'"); 
+  }
+  arg2 = reinterpret_cast< ndBody * >(argp2);
+  (arg1)->RemoveBody(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_DeleteBody(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  ndBody *arg2 = (ndBody *) (ndBody *)0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_DeleteBody", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_DeleteBody" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_ndBody, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_DeleteBody" "', argument " "2"" of type '" "ndBody *const""'"); 
+  }
+  arg2 = reinterpret_cast< ndBody * >(argp2);
+  (arg1)->DeleteBody(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_AddJoint(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  ndJointBilateralConstraint *arg2 = (ndJointBilateralConstraint *) (ndJointBilateralConstraint *)0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_AddJoint", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_AddJoint" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_ndJointBilateralConstraint, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_AddJoint" "', argument " "2"" of type '" "ndJointBilateralConstraint *const""'"); 
+  }
+  arg2 = reinterpret_cast< ndJointBilateralConstraint * >(argp2);
+  (arg1)->AddJoint(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_RemoveJoint(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  ndJointBilateralConstraint *arg2 = (ndJointBilateralConstraint *) (ndJointBilateralConstraint *)0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_RemoveJoint", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_RemoveJoint" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_ndJointBilateralConstraint, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_RemoveJoint" "', argument " "2"" of type '" "ndJointBilateralConstraint *const""'"); 
+  }
+  arg2 = reinterpret_cast< ndJointBilateralConstraint * >(argp2);
+  (arg1)->RemoveJoint(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_AddModel(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  ndModel *arg2 = (ndModel *) (ndModel *)0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_AddModel", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_AddModel" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_ndModel, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_AddModel" "', argument " "2"" of type '" "ndModel *const""'"); 
+  }
+  arg2 = reinterpret_cast< ndModel * >(argp2);
+  (arg1)->AddModel(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_RemoveModel(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  ndModel *arg2 = (ndModel *) (ndModel *)0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_RemoveModel", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_RemoveModel" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_ndModel, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_RemoveModel" "', argument " "2"" of type '" "ndModel *const""'"); 
+  }
+  arg2 = reinterpret_cast< ndModel * >(argp2);
+  (arg1)->RemoveModel(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetBodyList(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndBodyList *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetBodyList" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = (ndBodyList *) &((ndWorld const *)arg1)->GetBodyList();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodyList, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetJointList(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndJointList *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetJointList" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = (ndJointList *) &((ndWorld const *)arg1)->GetJointList();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndJointList, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetModelList(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndModelList *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetModelList" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = (ndModelList *) &((ndWorld const *)arg1)->GetModelList();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndModelList, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetContactList(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndContactList *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetContactList" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = (ndContactList *) &((ndWorld const *)arg1)->GetContactList();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndContactList, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetSkeletonList(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndSkeletonList *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetSkeletonList" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = (ndSkeletonList *) &((ndWorld const *)arg1)->GetSkeletonList();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndSkeletonList, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetParticleList(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndBodyParticleSetList *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetParticleList" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = (ndBodyParticleSetList *) &((ndWorld const *)arg1)->GetParticleList();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodyParticleSetList, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetSentinelBody(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndBodyDynamic *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetSentinelBody" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = (ndBodyDynamic *)((ndWorld const *)arg1)->GetSentinelBody();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodyDynamic, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetSolverIterations(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  dInt32 result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetSolverIterations" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = ((ndWorld const *)arg1)->GetSolverIterations();
+  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_dInt32, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_SetSolverIterations(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  dInt32 arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_SetSolverIterations", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_SetSolverIterations" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  {
+    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_dInt32,  0  | 0);
+    if (!SWIG_IsOK(res2)) {
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_SetSolverIterations" "', argument " "2"" of type '" "dInt32""'"); 
+    }  
+    if (!argp2) {
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_SetSolverIterations" "', argument " "2"" of type '" "dInt32""'");
+    } else {
+      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
+      arg2 = *temp;
+      if (SWIG_IsNewObj(res2)) delete temp;
+    }
+  }
+  (arg1)->SetSolverIterations(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetScene(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndScene *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetScene" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = (ndScene *)((ndWorld const *)arg1)->GetScene();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndScene, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetUpdateTime(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  dFloat32 result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetUpdateTime" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = ((ndWorld const *)arg1)->GetUpdateTime();
+  resultobj = SWIG_NewPointerObj((new dFloat32(static_cast< const dFloat32& >(result))), SWIGTYPE_p_dFloat32, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetFrameIndex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  dUnsigned32 result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetFrameIndex" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = ((ndWorld const *)arg1)->GetFrameIndex();
+  resultobj = SWIG_NewPointerObj((new dUnsigned32(static_cast< const dUnsigned32& >(result))), SWIGTYPE_p_dUnsigned32, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetAverageUpdateTime(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  dFloat32 result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetAverageUpdateTime" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = ((ndWorld const *)arg1)->GetAverageUpdateTime();
+  resultobj = SWIG_NewPointerObj((new dFloat32(static_cast< const dFloat32& >(result))), SWIGTYPE_p_dFloat32, SWIG_POINTER_OWN |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_GetContactNotify(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  ndContactNotify *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetContactNotify" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  result = (ndContactNotify *)((ndWorld const *)arg1)->GetContactNotify();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndContactNotify, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_SetContactNotify(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  ndContactNotify *arg2 = (ndContactNotify *) (ndContactNotify *)0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_SetContactNotify", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_SetContactNotify" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_ndContactNotify, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_SetContactNotify" "', argument " "2"" of type '" "ndContactNotify *const""'"); 
+  }
+  arg2 = reinterpret_cast< ndContactNotify * >(argp2);
+  (arg1)->SetContactNotify(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_DebugScene(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  ndSceneTreeNotiFy *arg2 = (ndSceneTreeNotiFy *) (ndSceneTreeNotiFy *)0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_DebugScene", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_DebugScene" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_ndSceneTreeNotiFy, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_DebugScene" "', argument " "2"" of type '" "ndSceneTreeNotiFy *const""'"); 
+  }
+  arg2 = reinterpret_cast< ndSceneTreeNotiFy * >(argp2);
+  (arg1)->DebugScene(arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_ClearCache(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_ClearCache" "', argument " "1"" of type '" "ndWorld *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  (arg1)->ClearCache();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_BodiesInAabb(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  ndBodiesInAabbNotify *arg2 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_BodiesInAabb", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_BodiesInAabb" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndBodiesInAabbNotify,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_BodiesInAabb" "', argument " "2"" of type '" "ndBodiesInAabbNotify &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_BodiesInAabb" "', argument " "2"" of type '" "ndBodiesInAabbNotify &""'"); 
+  }
+  arg2 = reinterpret_cast< ndBodiesInAabbNotify * >(argp2);
+  ((ndWorld const *)arg1)->BodiesInAabb(*arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_RayCast(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  ndRayCastNotify *arg2 = 0 ;
+  dVector *arg3 = 0 ;
+  dVector *arg4 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  PyObject *swig_obj[4] ;
+  bool result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_RayCast", 4, 4, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_RayCast" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndRayCastNotify,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_RayCast" "', argument " "2"" of type '" "ndRayCastNotify &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_RayCast" "', argument " "2"" of type '" "ndRayCastNotify &""'"); 
+  }
+  arg2 = reinterpret_cast< ndRayCastNotify * >(argp2);
+  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_dVector,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndWorld_RayCast" "', argument " "3"" of type '" "dVector const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_RayCast" "', argument " "3"" of type '" "dVector const &""'"); 
+  }
+  arg3 = reinterpret_cast< dVector * >(argp3);
+  res4 = SWIG_ConvertPtr(swig_obj[3], &argp4, SWIGTYPE_p_dVector,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ndWorld_RayCast" "', argument " "4"" of type '" "dVector const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_RayCast" "', argument " "4"" of type '" "dVector const &""'"); 
+  }
+  arg4 = reinterpret_cast< dVector * >(argp4);
+  result = (bool)((ndWorld const *)arg1)->RayCast(*arg2,(dVector const &)*arg3,(dVector const &)*arg4);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ndWorld_ConvexCast(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ndWorld *arg1 = (ndWorld *) 0 ;
+  ndConvexCastNotify *arg2 = 0 ;
+  ndShapeInstance *arg3 = 0 ;
+  dMatrix *arg4 = 0 ;
+  dVector *arg5 = 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  void *argp4 = 0 ;
+  int res4 = 0 ;
+  void *argp5 = 0 ;
+  int res5 = 0 ;
+  PyObject *swig_obj[5] ;
+  bool result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "ndWorld_ConvexCast", 5, 5, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndWorld, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_ConvexCast" "', argument " "1"" of type '" "ndWorld const *""'"); 
+  }
+  arg1 = reinterpret_cast< ndWorld * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_ndConvexCastNotify,  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_ConvexCast" "', argument " "2"" of type '" "ndConvexCastNotify &""'"); 
+  }
+  if (!argp2) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_ConvexCast" "', argument " "2"" of type '" "ndConvexCastNotify &""'"); 
+  }
+  arg2 = reinterpret_cast< ndConvexCastNotify * >(argp2);
+  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_ndShapeInstance,  0  | 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndWorld_ConvexCast" "', argument " "3"" of type '" "ndShapeInstance const &""'"); 
+  }
+  if (!argp3) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_ConvexCast" "', argument " "3"" of type '" "ndShapeInstance const &""'"); 
+  }
+  arg3 = reinterpret_cast< ndShapeInstance * >(argp3);
+  res4 = SWIG_ConvertPtr(swig_obj[3], &argp4, SWIGTYPE_p_dMatrix,  0  | 0);
+  if (!SWIG_IsOK(res4)) {
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ndWorld_ConvexCast" "', argument " "4"" of type '" "dMatrix const &""'"); 
+  }
+  if (!argp4) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_ConvexCast" "', argument " "4"" of type '" "dMatrix const &""'"); 
+  }
+  arg4 = reinterpret_cast< dMatrix * >(argp4);
+  res5 = SWIG_ConvertPtr(swig_obj[4], &argp5, SWIGTYPE_p_dVector,  0  | 0);
+  if (!SWIG_IsOK(res5)) {
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "ndWorld_ConvexCast" "', argument " "5"" of type '" "dVector const &""'"); 
+  }
+  if (!argp5) {
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_ConvexCast" "', argument " "5"" of type '" "dVector const &""'"); 
+  }
+  arg5 = reinterpret_cast< dVector * >(argp5);
+  result = (bool)((ndWorld const *)arg1)->ConvexCast(*arg2,(ndShapeInstance const &)*arg3,(dMatrix const &)*arg4,(dVector const &)*arg5);
+  resultobj = SWIG_From_bool(static_cast< bool >(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *ndWorld_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *obj;
+  if (!SWIG_Python_UnpackTuple(args, "swigregister", 1, 1, &obj)) return NULL;
+  SWIG_TypeNewClientData(SWIGTYPE_p_ndWorld, SWIG_NewClientData(obj));
+  return SWIG_Py_Void();
+}
+
+SWIGINTERN PyObject *ndWorld_swiginit(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  return SWIG_Python_InitShadowInstance(args);
+}
+
 static PyMethodDef SwigMethods[] = {
 	 { "SWIG_PyInstanceMethod_New", SWIG_PyInstanceMethod_New, METH_O, NULL},
-	 { "Test", _wrap_Test, METH_VARARGS, NULL},
+	 { "new_dClassAlloc", _wrap_new_dClassAlloc, METH_NOARGS, NULL},
+	 { "delete_dClassAlloc", _wrap_delete_dClassAlloc, METH_O, NULL},
+	 { "dClassAlloc_Malloc", _wrap_dClassAlloc_Malloc, METH_O, NULL},
+	 { "dClassAlloc_Free", _wrap_dClassAlloc_Free, METH_O, NULL},
+	 { "dClassAlloc_swigregister", dClassAlloc_swigregister, METH_O, NULL},
+	 { "dClassAlloc_swiginit", dClassAlloc_swiginit, METH_VARARGS, NULL},
+	 { "delete_ndBody", _wrap_delete_ndBody, METH_O, NULL},
+	 { "ndBody_GetAsBody", _wrap_ndBody_GetAsBody, METH_O, NULL},
+	 { "ndBody_GetAsBodyDynamic", _wrap_ndBody_GetAsBodyDynamic, METH_O, NULL},
+	 { "ndBody_GetAsBodySentinel", _wrap_ndBody_GetAsBodySentinel, METH_O, NULL},
+	 { "ndBody_GetAsBodyKinematic", _wrap_ndBody_GetAsBodyKinematic, METH_O, NULL},
+	 { "ndBody_GetAsBodyPlayerCapsule", _wrap_ndBody_GetAsBodyPlayerCapsule, METH_O, NULL},
+	 { "ndBody_GetAsBodySphFluid", _wrap_ndBody_GetAsBodySphFluid, METH_O, NULL},
+	 { "ndBody_GetAsBodyParticleSet", _wrap_ndBody_GetAsBodyParticleSet, METH_O, NULL},
+	 { "ndBody_GetAsBodyTriggerVolume", _wrap_ndBody_GetAsBodyTriggerVolume, METH_O, NULL},
+	 { "ndBody_GetId", _wrap_ndBody_GetId, METH_O, NULL},
+	 { "ndBody_GetAABB", _wrap_ndBody_GetAABB, METH_VARARGS, NULL},
+	 { "ndBody_GetInvMass", _wrap_ndBody_GetInvMass, METH_O, NULL},
+	 { "ndBody_RayCast", _wrap_ndBody_RayCast, METH_VARARGS, NULL},
+	 { "ndBody_GetCentreOfMass", _wrap_ndBody_GetCentreOfMass, METH_O, NULL},
+	 { "ndBody_SetCentreOfMass", _wrap_ndBody_SetCentreOfMass, METH_VARARGS, NULL},
+	 { "ndBody_GetNotifyCallback", _wrap_ndBody_GetNotifyCallback, METH_O, NULL},
+	 { "ndBody_SetNotifyCallback", _wrap_ndBody_SetNotifyCallback, METH_VARARGS, NULL},
+	 { "ndBody_GetOmega", _wrap_ndBody_GetOmega, METH_O, NULL},
+	 { "ndBody_SetOmega", _wrap_ndBody_SetOmega, METH_VARARGS, NULL},
+	 { "ndBody_GetVelocity", _wrap_ndBody_GetVelocity, METH_O, NULL},
+	 { "ndBody_SetVelocity", _wrap_ndBody_SetVelocity, METH_VARARGS, NULL},
+	 { "ndBody_GetMatrix", _wrap_ndBody_GetMatrix, METH_O, NULL},
+	 { "ndBody_SetMatrix", _wrap_ndBody_SetMatrix, METH_VARARGS, NULL},
+	 { "ndBody_GetRotation", _wrap_ndBody_GetRotation, METH_O, NULL},
+	 { "ndBody_Save", _wrap_ndBody_Save, METH_VARARGS, NULL},
+	 { "ndBody_GetVelocityAtPoint", _wrap_ndBody_GetVelocityAtPoint, METH_VARARGS, NULL},
+	 { "ndBody_swigregister", ndBody_swigregister, METH_O, NULL},
+	 { "new_ndWorld", _wrap_new_ndWorld, METH_NOARGS, NULL},
+	 { "delete_ndWorld", _wrap_delete_ndWorld, METH_O, NULL},
+	 { "ndWorld_CleanUp", _wrap_ndWorld_CleanUp, METH_O, NULL},
+	 { "ndWorld_GetEngineVersion", _wrap_ndWorld_GetEngineVersion, METH_O, NULL},
+	 { "ndWorld_Sync", _wrap_ndWorld_Sync, METH_O, NULL},
+	 { "ndWorld_Update", _wrap_ndWorld_Update, METH_VARARGS, NULL},
+	 { "ndWorld_OnPostUpdate", _wrap_ndWorld_OnPostUpdate, METH_VARARGS, NULL},
+	 { "ndWorld_UpdateTransformsLock", _wrap_ndWorld_UpdateTransformsLock, METH_O, NULL},
+	 { "ndWorld_UpdateTransformsUnlock", _wrap_ndWorld_UpdateTransformsUnlock, METH_O, NULL},
+	 { "ndWorld_GetThreadCount", _wrap_ndWorld_GetThreadCount, METH_O, NULL},
+	 { "ndWorld_SetThreadCount", _wrap_ndWorld_SetThreadCount, METH_VARARGS, NULL},
+	 { "ndWorld_GetSubSteps", _wrap_ndWorld_GetSubSteps, METH_O, NULL},
+	 { "ndWorld_SetSubSteps", _wrap_ndWorld_SetSubSteps, METH_VARARGS, NULL},
+	 { "ndWorld_GetSelectedSolver", _wrap_ndWorld_GetSelectedSolver, METH_O, NULL},
+	 { "ndWorld_SelectSolver", _wrap_ndWorld_SelectSolver, METH_VARARGS, NULL},
+	 { "ndWorld_GetSolverString", _wrap_ndWorld_GetSolverString, METH_O, NULL},
+	 { "ndWorld_AddBody", _wrap_ndWorld_AddBody, METH_VARARGS, NULL},
+	 { "ndWorld_RemoveBody", _wrap_ndWorld_RemoveBody, METH_VARARGS, NULL},
+	 { "ndWorld_DeleteBody", _wrap_ndWorld_DeleteBody, METH_VARARGS, NULL},
+	 { "ndWorld_AddJoint", _wrap_ndWorld_AddJoint, METH_VARARGS, NULL},
+	 { "ndWorld_RemoveJoint", _wrap_ndWorld_RemoveJoint, METH_VARARGS, NULL},
+	 { "ndWorld_AddModel", _wrap_ndWorld_AddModel, METH_VARARGS, NULL},
+	 { "ndWorld_RemoveModel", _wrap_ndWorld_RemoveModel, METH_VARARGS, NULL},
+	 { "ndWorld_GetBodyList", _wrap_ndWorld_GetBodyList, METH_O, NULL},
+	 { "ndWorld_GetJointList", _wrap_ndWorld_GetJointList, METH_O, NULL},
+	 { "ndWorld_GetModelList", _wrap_ndWorld_GetModelList, METH_O, NULL},
+	 { "ndWorld_GetContactList", _wrap_ndWorld_GetContactList, METH_O, NULL},
+	 { "ndWorld_GetSkeletonList", _wrap_ndWorld_GetSkeletonList, METH_O, NULL},
+	 { "ndWorld_GetParticleList", _wrap_ndWorld_GetParticleList, METH_O, NULL},
+	 { "ndWorld_GetSentinelBody", _wrap_ndWorld_GetSentinelBody, METH_O, NULL},
+	 { "ndWorld_GetSolverIterations", _wrap_ndWorld_GetSolverIterations, METH_O, NULL},
+	 { "ndWorld_SetSolverIterations", _wrap_ndWorld_SetSolverIterations, METH_VARARGS, NULL},
+	 { "ndWorld_GetScene", _wrap_ndWorld_GetScene, METH_O, NULL},
+	 { "ndWorld_GetUpdateTime", _wrap_ndWorld_GetUpdateTime, METH_O, NULL},
+	 { "ndWorld_GetFrameIndex", _wrap_ndWorld_GetFrameIndex, METH_O, NULL},
+	 { "ndWorld_GetAverageUpdateTime", _wrap_ndWorld_GetAverageUpdateTime, METH_O, NULL},
+	 { "ndWorld_GetContactNotify", _wrap_ndWorld_GetContactNotify, METH_O, NULL},
+	 { "ndWorld_SetContactNotify", _wrap_ndWorld_SetContactNotify, METH_VARARGS, NULL},
+	 { "ndWorld_DebugScene", _wrap_ndWorld_DebugScene, METH_VARARGS, NULL},
+	 { "ndWorld_ClearCache", _wrap_ndWorld_ClearCache, METH_O, NULL},
+	 { "ndWorld_BodiesInAabb", _wrap_ndWorld_BodiesInAabb, METH_VARARGS, NULL},
+	 { "ndWorld_RayCast", _wrap_ndWorld_RayCast, METH_VARARGS, NULL},
+	 { "ndWorld_ConvexCast", _wrap_ndWorld_ConvexCast, METH_VARARGS, NULL},
+	 { "ndWorld_swigregister", ndWorld_swigregister, METH_O, NULL},
+	 { "ndWorld_swiginit", ndWorld_swiginit, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
 };
 
@@ -2954,16 +5259,158 @@ static PyMethodDef SwigMethods_proxydocs[] = {
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
+static void *_p_ndWorldTo_p_dClassAlloc(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((dClassAlloc *)  ((ndWorld *) x));
+}
+static void *_p_ndBodyTo_p_dClassAlloc(void *x, int *SWIGUNUSEDPARM(newmemory)) {
+    return (void *)((dClassAlloc *)  ((ndBody *) x));
+}
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_dClassAlloc = {"_p_dClassAlloc", "dClassAlloc *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_dFastRay = {"_p_dFastRay", "dFastRay *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_dFloat32 = {"_p_dFloat32", "dFloat32 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_dInt32 = {"_p_dInt32", "dInt32 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_dLoadSaveBase__dSaveDescriptor = {"_p_dLoadSaveBase__dSaveDescriptor", "dLoadSaveBase::dSaveDescriptor *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_dMatrix = {"_p_dMatrix", "dMatrix *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_dQuaternion = {"_p_dQuaternion", "dQuaternion *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_dUnsigned32 = {"_p_dUnsigned32", "dUnsigned32 *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_dVector = {"_p_dVector", "dVector *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndBodiesInAabbNotify = {"_p_ndBodiesInAabbNotify", "ndBodiesInAabbNotify *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndBody = {"_p_ndBody", "ndBody *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndBodyDynamic = {"_p_ndBodyDynamic", "ndBodyDynamic *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndBodyKinematic = {"_p_ndBodyKinematic", "ndBodyKinematic *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndBodyList = {"_p_ndBodyList", "ndBodyList *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndBodyNotify = {"_p_ndBodyNotify", "ndBodyNotify *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndBodyParticleSet = {"_p_ndBodyParticleSet", "ndBodyParticleSet *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndBodyParticleSetList = {"_p_ndBodyParticleSetList", "ndBodyParticleSetList *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndBodySentinel = {"_p_ndBodySentinel", "ndBodySentinel *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndBodySphFluid = {"_p_ndBodySphFluid", "ndBodySphFluid *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndBodyTriggerVolume = {"_p_ndBodyTriggerVolume", "ndBodyTriggerVolume *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndContactList = {"_p_ndContactList", "ndContactList *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndContactNotify = {"_p_ndContactNotify", "ndContactNotify *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndConvexCastNotify = {"_p_ndConvexCastNotify", "ndConvexCastNotify *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndJointBilateralConstraint = {"_p_ndJointBilateralConstraint", "ndJointBilateralConstraint *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndJointList = {"_p_ndJointList", "ndJointList *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndModel = {"_p_ndModel", "ndModel *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndModelList = {"_p_ndModelList", "ndModelList *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndRayCastNotify = {"_p_ndRayCastNotify", "ndRayCastNotify *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndScene = {"_p_ndScene", "ndScene *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndSceneTreeNotiFy = {"_p_ndSceneTreeNotiFy", "ndSceneTreeNotiFy *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndShapeInstance = {"_p_ndShapeInstance", "ndShapeInstance *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndSkeletonList = {"_p_ndSkeletonList", "ndSkeletonList *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ndWorld = {"_p_ndWorld", "ndWorld *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_void = {"_p_void", "void *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_char,
+  &_swigt__p_dClassAlloc,
+  &_swigt__p_dFastRay,
+  &_swigt__p_dFloat32,
+  &_swigt__p_dInt32,
+  &_swigt__p_dLoadSaveBase__dSaveDescriptor,
+  &_swigt__p_dMatrix,
+  &_swigt__p_dQuaternion,
+  &_swigt__p_dUnsigned32,
+  &_swigt__p_dVector,
+  &_swigt__p_ndBodiesInAabbNotify,
+  &_swigt__p_ndBody,
+  &_swigt__p_ndBodyDynamic,
+  &_swigt__p_ndBodyKinematic,
+  &_swigt__p_ndBodyList,
+  &_swigt__p_ndBodyNotify,
+  &_swigt__p_ndBodyParticleSet,
+  &_swigt__p_ndBodyParticleSetList,
+  &_swigt__p_ndBodySentinel,
+  &_swigt__p_ndBodySphFluid,
+  &_swigt__p_ndBodyTriggerVolume,
+  &_swigt__p_ndContactList,
+  &_swigt__p_ndContactNotify,
+  &_swigt__p_ndConvexCastNotify,
+  &_swigt__p_ndJointBilateralConstraint,
+  &_swigt__p_ndJointList,
+  &_swigt__p_ndModel,
+  &_swigt__p_ndModelList,
+  &_swigt__p_ndRayCastNotify,
+  &_swigt__p_ndScene,
+  &_swigt__p_ndSceneTreeNotiFy,
+  &_swigt__p_ndShapeInstance,
+  &_swigt__p_ndSkeletonList,
+  &_swigt__p_ndWorld,
+  &_swigt__p_void,
 };
 
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_dClassAlloc[] = {  {&_swigt__p_dClassAlloc, 0, 0, 0},  {&_swigt__p_ndWorld, _p_ndWorldTo_p_dClassAlloc, 0, 0},  {&_swigt__p_ndBody, _p_ndBodyTo_p_dClassAlloc, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_dFastRay[] = {  {&_swigt__p_dFastRay, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_dFloat32[] = {  {&_swigt__p_dFloat32, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_dInt32[] = {  {&_swigt__p_dInt32, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_dLoadSaveBase__dSaveDescriptor[] = {  {&_swigt__p_dLoadSaveBase__dSaveDescriptor, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_dMatrix[] = {  {&_swigt__p_dMatrix, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_dQuaternion[] = {  {&_swigt__p_dQuaternion, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_dUnsigned32[] = {  {&_swigt__p_dUnsigned32, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_dVector[] = {  {&_swigt__p_dVector, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndBodiesInAabbNotify[] = {  {&_swigt__p_ndBodiesInAabbNotify, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndBody[] = {  {&_swigt__p_ndBody, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndBodyDynamic[] = {  {&_swigt__p_ndBodyDynamic, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndBodyKinematic[] = {  {&_swigt__p_ndBodyKinematic, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndBodyList[] = {  {&_swigt__p_ndBodyList, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndBodyNotify[] = {  {&_swigt__p_ndBodyNotify, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndBodyParticleSet[] = {  {&_swigt__p_ndBodyParticleSet, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndBodyParticleSetList[] = {  {&_swigt__p_ndBodyParticleSetList, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndBodySentinel[] = {  {&_swigt__p_ndBodySentinel, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndBodySphFluid[] = {  {&_swigt__p_ndBodySphFluid, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndBodyTriggerVolume[] = {  {&_swigt__p_ndBodyTriggerVolume, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndContactList[] = {  {&_swigt__p_ndContactList, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndContactNotify[] = {  {&_swigt__p_ndContactNotify, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndConvexCastNotify[] = {  {&_swigt__p_ndConvexCastNotify, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndJointBilateralConstraint[] = {  {&_swigt__p_ndJointBilateralConstraint, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndJointList[] = {  {&_swigt__p_ndJointList, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndModel[] = {  {&_swigt__p_ndModel, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndModelList[] = {  {&_swigt__p_ndModelList, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndRayCastNotify[] = {  {&_swigt__p_ndRayCastNotify, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndScene[] = {  {&_swigt__p_ndScene, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndSceneTreeNotiFy[] = {  {&_swigt__p_ndSceneTreeNotiFy, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndShapeInstance[] = {  {&_swigt__p_ndShapeInstance, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndSkeletonList[] = {  {&_swigt__p_ndSkeletonList, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ndWorld[] = {  {&_swigt__p_ndWorld, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_void[] = {  {&_swigt__p_void, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_char,
+  _swigc__p_dClassAlloc,
+  _swigc__p_dFastRay,
+  _swigc__p_dFloat32,
+  _swigc__p_dInt32,
+  _swigc__p_dLoadSaveBase__dSaveDescriptor,
+  _swigc__p_dMatrix,
+  _swigc__p_dQuaternion,
+  _swigc__p_dUnsigned32,
+  _swigc__p_dVector,
+  _swigc__p_ndBodiesInAabbNotify,
+  _swigc__p_ndBody,
+  _swigc__p_ndBodyDynamic,
+  _swigc__p_ndBodyKinematic,
+  _swigc__p_ndBodyList,
+  _swigc__p_ndBodyNotify,
+  _swigc__p_ndBodyParticleSet,
+  _swigc__p_ndBodyParticleSetList,
+  _swigc__p_ndBodySentinel,
+  _swigc__p_ndBodySphFluid,
+  _swigc__p_ndBodyTriggerVolume,
+  _swigc__p_ndContactList,
+  _swigc__p_ndContactNotify,
+  _swigc__p_ndConvexCastNotify,
+  _swigc__p_ndJointBilateralConstraint,
+  _swigc__p_ndJointList,
+  _swigc__p_ndModel,
+  _swigc__p_ndModelList,
+  _swigc__p_ndRayCastNotify,
+  _swigc__p_ndScene,
+  _swigc__p_ndSceneTreeNotiFy,
+  _swigc__p_ndShapeInstance,
+  _swigc__p_ndSkeletonList,
+  _swigc__p_ndWorld,
+  _swigc__p_void,
 };
 
 
@@ -3699,6 +6146,13 @@ SWIG_init(void) {
   
   SWIG_InstallConstants(d,swig_const_table);
   
+  SWIG_Python_SetConstant(d, "D_NEWTON_ENGINE_MAJOR_VERSION",SWIG_From_int(static_cast< int >(4)));
+  SWIG_Python_SetConstant(d, "D_NEWTON_ENGINE_MINOR_VERSION",SWIG_From_int(static_cast< int >(00)));
+  SWIG_Python_SetConstant(d, "D_SLEEP_ENTRIES",SWIG_From_int(static_cast< int >(8)));
+  SWIG_Python_SetConstant(d, "ndWorld_ndStandardSolver",SWIG_From_int(static_cast< int >(ndWorld::ndStandardSolver)));
+  SWIG_Python_SetConstant(d, "ndWorld_ndSimdSoaSolver",SWIG_From_int(static_cast< int >(ndWorld::ndSimdSoaSolver)));
+  SWIG_Python_SetConstant(d, "ndWorld_ndSimdAvx2Solver",SWIG_From_int(static_cast< int >(ndWorld::ndSimdAvx2Solver)));
+  SWIG_Python_SetConstant(d, "ndWorld_ndOpenclSolver",SWIG_From_int(static_cast< int >(ndWorld::ndOpenclSolver)));
 #if PY_VERSION_HEX >= 0x03000000
   return m;
 #else

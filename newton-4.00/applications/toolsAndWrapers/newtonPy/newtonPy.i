@@ -22,26 +22,26 @@
 // File : example.i 
 %module newtonPy
 %{
-	#include "testWrapper.h"
+	#include <ndNewton.h>
 %}
 
-%include "testWrapper.h"
+#define D_CORE_API 
+#define D_NEWTON_API
+#define D_COLLISION_API
+#define D_MSV_NEWTON_ALIGN_32
+#define D_GCC_NEWTON_ALIGN_32
 
-//%include "pyBaseNodeInfo.h"
+%include "../../../sdk/dCore/dClassAlloc.h"
+%include "../../../sdk/dCollision/ndBody.h"
+%include "../../../sdk/dNewton/ndWorld.h"
+
 //%template(objInfo) pyBaseNodeInfo<dSceneNodeInfo>;
 //%template(meshInfo) pyBaseNodeInfo<dMeshNodeInfo>;
 //%template(texInfo) pyBaseNodeInfo<dTextureNodeInfo>;
 //%template(matInfo) pyBaseNodeInfo<dMaterialNodeInfo>;
 //%template(rigidBidyInfo) pyBaseNodeInfo<dRigidbodyNodeInfo>;
 
-
 //%include "carrays.i"
-//%include "pyTypes.h"
-//%include "pyMesh.h"
-//%include "pyScene.h"
-//%include "pyObject.h"
-//%include "pyTexture.h"
-//%include "pyMaterial.h"
 //%include "pyRigidBody.h"
 //%array_class(int, intArray);
 //%array_class(double, doubleArray);

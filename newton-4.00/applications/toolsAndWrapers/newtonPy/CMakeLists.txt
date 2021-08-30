@@ -39,10 +39,10 @@ set(CMAKE_DEBUG_POSTFIX "")
 add_library(${projectName} SHARED ${CPP_SOURCE})
 
 #message ($ENV{PythonInclude})
-target_include_directories(${projectName} BEFORE PRIVATE "$ENV{PythonInclude}")
+target_include_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Include")
 
-#message ($ENV{PythonLibs})
-target_link_directories(${projectName} BEFORE PRIVATE "$ENV{PythonLibs}")
+#message ("$ENV{Python}")
+target_link_directories(${projectName} BEFORE PRIVATE "$ENV{Python}/Libs")
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndNewton ndCollision ndCore)

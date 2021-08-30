@@ -61,8 +61,257 @@ class _SwigNonDynamicMeta(type):
     __setattr__ = _swig_setattr_nondynamic_class_variable(type.__setattr__)
 
 
+class dClassAlloc(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
 
-def Test(a, b):
-    return _newtonPy.Test(a, b)
+    def __init__(self):
+        _newtonPy.dClassAlloc_swiginit(self, _newtonPy.new_dClassAlloc())
+    __swig_destroy__ = _newtonPy.delete_dClassAlloc
+
+    @staticmethod
+    def Malloc(size):
+        return _newtonPy.dClassAlloc_Malloc(size)
+
+    @staticmethod
+    def Free(ptr):
+        return _newtonPy.dClassAlloc_Free(ptr)
+
+# Register dClassAlloc in _newtonPy:
+_newtonPy.dClassAlloc_swigregister(dClassAlloc)
+
+def dClassAlloc_Malloc(size):
+    return _newtonPy.dClassAlloc_Malloc(size)
+
+def dClassAlloc_Free(ptr):
+    return _newtonPy.dClassAlloc_Free(ptr)
+
+class ndBody(dClassAlloc):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+
+    def __init__(self, *args, **kwargs):
+        raise AttributeError("No constructor defined - class is abstract")
+    __repr__ = _swig_repr
+    __swig_destroy__ = _newtonPy.delete_ndBody
+
+    def GetAsBody(self):
+        return _newtonPy.ndBody_GetAsBody(self)
+
+    def GetAsBodyDynamic(self):
+        return _newtonPy.ndBody_GetAsBodyDynamic(self)
+
+    def GetAsBodySentinel(self):
+        return _newtonPy.ndBody_GetAsBodySentinel(self)
+
+    def GetAsBodyKinematic(self):
+        return _newtonPy.ndBody_GetAsBodyKinematic(self)
+
+    def GetAsBodyPlayerCapsule(self):
+        return _newtonPy.ndBody_GetAsBodyPlayerCapsule(self)
+
+    def GetAsBodySphFluid(self):
+        return _newtonPy.ndBody_GetAsBodySphFluid(self)
+
+    def GetAsBodyParticleSet(self):
+        return _newtonPy.ndBody_GetAsBodyParticleSet(self)
+
+    def GetAsBodyTriggerVolume(self):
+        return _newtonPy.ndBody_GetAsBodyTriggerVolume(self)
+
+    def GetId(self):
+        return _newtonPy.ndBody_GetId(self)
+
+    def GetAABB(self, p0, p1):
+        return _newtonPy.ndBody_GetAABB(self, p0, p1)
+
+    def GetInvMass(self):
+        return _newtonPy.ndBody_GetInvMass(self)
+
+    def RayCast(self, callback, ray, maxT):
+        return _newtonPy.ndBody_RayCast(self, callback, ray, maxT)
+
+    def GetCentreOfMass(self):
+        return _newtonPy.ndBody_GetCentreOfMass(self)
+
+    def SetCentreOfMass(self, com):
+        return _newtonPy.ndBody_SetCentreOfMass(self, com)
+
+    def GetNotifyCallback(self):
+        return _newtonPy.ndBody_GetNotifyCallback(self)
+
+    def SetNotifyCallback(self, notify):
+        return _newtonPy.ndBody_SetNotifyCallback(self, notify)
+
+    def GetOmega(self):
+        return _newtonPy.ndBody_GetOmega(self)
+
+    def SetOmega(self, veloc):
+        return _newtonPy.ndBody_SetOmega(self, veloc)
+
+    def GetVelocity(self):
+        return _newtonPy.ndBody_GetVelocity(self)
+
+    def SetVelocity(self, veloc):
+        return _newtonPy.ndBody_SetVelocity(self, veloc)
+
+    def GetMatrix(self):
+        return _newtonPy.ndBody_GetMatrix(self)
+
+    def SetMatrix(self, matrix):
+        return _newtonPy.ndBody_SetMatrix(self, matrix)
+
+    def GetRotation(self):
+        return _newtonPy.ndBody_GetRotation(self)
+
+    def Save(self, desc):
+        return _newtonPy.ndBody_Save(self, desc)
+
+    def GetVelocityAtPoint(self, point):
+        return _newtonPy.ndBody_GetVelocityAtPoint(self, point)
+
+# Register ndBody in _newtonPy:
+_newtonPy.ndBody_swigregister(ndBody)
+
+D_NEWTON_ENGINE_MAJOR_VERSION = _newtonPy.D_NEWTON_ENGINE_MAJOR_VERSION
+D_NEWTON_ENGINE_MINOR_VERSION = _newtonPy.D_NEWTON_ENGINE_MINOR_VERSION
+D_SLEEP_ENTRIES = _newtonPy.D_SLEEP_ENTRIES
+class ndWorld(dClassAlloc):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    ndStandardSolver = _newtonPy.ndWorld_ndStandardSolver
+    ndSimdSoaSolver = _newtonPy.ndWorld_ndSimdSoaSolver
+    ndSimdAvx2Solver = _newtonPy.ndWorld_ndSimdAvx2Solver
+    ndOpenclSolver = _newtonPy.ndWorld_ndOpenclSolver
+
+    def __init__(self):
+        _newtonPy.ndWorld_swiginit(self, _newtonPy.new_ndWorld())
+    __swig_destroy__ = _newtonPy.delete_ndWorld
+
+    def CleanUp(self):
+        return _newtonPy.ndWorld_CleanUp(self)
+
+    def GetEngineVersion(self):
+        return _newtonPy.ndWorld_GetEngineVersion(self)
+
+    def Sync(self):
+        return _newtonPy.ndWorld_Sync(self)
+
+    def Update(self, timestep):
+        return _newtonPy.ndWorld_Update(self, timestep)
+
+    def OnPostUpdate(self, timestep):
+        return _newtonPy.ndWorld_OnPostUpdate(self, timestep)
+
+    def UpdateTransformsLock(self):
+        return _newtonPy.ndWorld_UpdateTransformsLock(self)
+
+    def UpdateTransformsUnlock(self):
+        return _newtonPy.ndWorld_UpdateTransformsUnlock(self)
+
+    def GetThreadCount(self):
+        return _newtonPy.ndWorld_GetThreadCount(self)
+
+    def SetThreadCount(self, count):
+        return _newtonPy.ndWorld_SetThreadCount(self, count)
+
+    def GetSubSteps(self):
+        return _newtonPy.ndWorld_GetSubSteps(self)
+
+    def SetSubSteps(self, subSteps):
+        return _newtonPy.ndWorld_SetSubSteps(self, subSteps)
+
+    def GetSelectedSolver(self):
+        return _newtonPy.ndWorld_GetSelectedSolver(self)
+
+    def SelectSolver(self, solverMode):
+        return _newtonPy.ndWorld_SelectSolver(self, solverMode)
+
+    def GetSolverString(self):
+        return _newtonPy.ndWorld_GetSolverString(self)
+
+    def AddBody(self, body):
+        return _newtonPy.ndWorld_AddBody(self, body)
+
+    def RemoveBody(self, body):
+        return _newtonPy.ndWorld_RemoveBody(self, body)
+
+    def DeleteBody(self, body):
+        return _newtonPy.ndWorld_DeleteBody(self, body)
+
+    def AddJoint(self, joint):
+        return _newtonPy.ndWorld_AddJoint(self, joint)
+
+    def RemoveJoint(self, joint):
+        return _newtonPy.ndWorld_RemoveJoint(self, joint)
+
+    def AddModel(self, model):
+        return _newtonPy.ndWorld_AddModel(self, model)
+
+    def RemoveModel(self, model):
+        return _newtonPy.ndWorld_RemoveModel(self, model)
+
+    def GetBodyList(self):
+        return _newtonPy.ndWorld_GetBodyList(self)
+
+    def GetJointList(self):
+        return _newtonPy.ndWorld_GetJointList(self)
+
+    def GetModelList(self):
+        return _newtonPy.ndWorld_GetModelList(self)
+
+    def GetContactList(self):
+        return _newtonPy.ndWorld_GetContactList(self)
+
+    def GetSkeletonList(self):
+        return _newtonPy.ndWorld_GetSkeletonList(self)
+
+    def GetParticleList(self):
+        return _newtonPy.ndWorld_GetParticleList(self)
+
+    def GetSentinelBody(self):
+        return _newtonPy.ndWorld_GetSentinelBody(self)
+
+    def GetSolverIterations(self):
+        return _newtonPy.ndWorld_GetSolverIterations(self)
+
+    def SetSolverIterations(self, iterations):
+        return _newtonPy.ndWorld_SetSolverIterations(self, iterations)
+
+    def GetScene(self):
+        return _newtonPy.ndWorld_GetScene(self)
+
+    def GetUpdateTime(self):
+        return _newtonPy.ndWorld_GetUpdateTime(self)
+
+    def GetFrameIndex(self):
+        return _newtonPy.ndWorld_GetFrameIndex(self)
+
+    def GetAverageUpdateTime(self):
+        return _newtonPy.ndWorld_GetAverageUpdateTime(self)
+
+    def GetContactNotify(self):
+        return _newtonPy.ndWorld_GetContactNotify(self)
+
+    def SetContactNotify(self, notify):
+        return _newtonPy.ndWorld_SetContactNotify(self, notify)
+
+    def DebugScene(self, notify):
+        return _newtonPy.ndWorld_DebugScene(self, notify)
+
+    def ClearCache(self):
+        return _newtonPy.ndWorld_ClearCache(self)
+
+    def BodiesInAabb(self, callback):
+        return _newtonPy.ndWorld_BodiesInAabb(self, callback)
+
+    def RayCast(self, callback, globalOrigin, globalDest):
+        return _newtonPy.ndWorld_RayCast(self, callback, globalOrigin, globalDest)
+
+    def ConvexCast(self, callback, convexShape, globalOrigin, globalDest):
+        return _newtonPy.ndWorld_ConvexCast(self, callback, convexShape, globalOrigin, globalDest)
+
+# Register ndWorld in _newtonPy:
+_newtonPy.ndWorld_swigregister(ndWorld)
+
 
 
