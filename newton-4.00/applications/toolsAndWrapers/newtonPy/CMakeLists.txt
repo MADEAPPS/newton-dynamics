@@ -37,7 +37,6 @@ include_directories(../../../sdk/dNewton/dModels)
 include_directories(../../../sdk/dNewton/dModels/dVehicle)
 include_directories(../../../sdk/dNewton/dModels/dCharacter)
 
-set(CMAKE_DEBUG_POSTFIX "")
 add_library(${projectName} SHARED ${CPP_SOURCE})
 
 #message ($ENV{PythonInclude})
@@ -63,11 +62,11 @@ endif()
 #install(FILES ${projectName}.py DESTINATION ${projectName})
 #install(TARGETS ${projectName} RUNTIME DESTINATION ${projectName})
 
-#message ("${CMAKE_CURRENT_SOURCE_DIR}/${projectName}.py")
+message ("${CMAKE_CURRENT_SOURCE_DIR}/${projectName}.py")
 add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
 	ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${projectName}.py ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/${projectName}.py)
 
 add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/_${projectName}.pyd)
+	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/_$<TARGET_FILE_BASE_NAME:${projectName}>.pyd)
