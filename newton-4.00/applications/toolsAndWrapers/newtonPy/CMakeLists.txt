@@ -13,9 +13,6 @@ cmake_minimum_required(VERSION 3.4.0)
 set (projectName "newtonPy")
 message (${projectName})
 
-
-#execute_process(COMMAND ${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe -c++ -python ${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonPy/newtonPy.i)
-
 set (swig "${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe")
 set (script "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonPy/newtonPy.i")
 execute_process(COMMAND ${swig} -c++ -python ${script})
