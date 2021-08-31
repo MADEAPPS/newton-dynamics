@@ -13,6 +13,7 @@ cmake_minimum_required(VERSION 3.4.0)
 set (projectName "newtonPy")
 message (${projectName})
 
+
 #execute_process(COMMAND ${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe -c++ -python ${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonPy/newtonPy.i)
 
 set (swig "${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe")
@@ -62,5 +63,14 @@ if(MSVC OR MINGW)
     endif()
 endif()
 
+#install(FILES ${projectName}.py DESTINATION ${projectName})
+#install(TARGETS ${projectName} RUNTIME DESTINATION ${projectName})
 
+#message ("${CMAKE_CURRENT_SOURCE_DIR}/${projectName}.py")
+add_custom_command(
+	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+	ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${projectName}.py ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/${projectName}.py)
 
+add_custom_command(
+	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/_${projectName}.pyd)

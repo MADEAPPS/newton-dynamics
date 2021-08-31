@@ -30,7 +30,8 @@
 %}
 
 %{
-	#include <ndNewton.h>
+	//#include <ndNewton.h>
+	#include "newtonPyTest.h"
 %}
 
 #define D_INLINE inline
@@ -58,46 +59,48 @@
 
 %rename(Assigment) ndShapeInstance::operator=;  
 
-%include "../../../sdk/dCore/dVectorSimd.h"
-%include "../../../sdk/dCore/dMatrix.h"
-%include "../../../sdk/dCore/dQuaternion.h"
-
-%include "../../../sdk/dCollision/ndShape.h"
-%include "../../../sdk/dCollision/ndShapeBox.h"
-%include "../../../sdk/dCollision/ndShapeCone.h"
-%include "../../../sdk/dCollision/ndShapeConvex.h"
-%include "../../../sdk/dCollision/ndShapeSphere.h"
-%include "../../../sdk/dCollision/ndShapeCapsule.h"
-%include "../../../sdk/dCollision/ndShapeCompound.h"
-%include "../../../sdk/dCollision/ndShapeCylinder.h"
-%include "../../../sdk/dCollision/ndShapeStatic_bvh.h"
-%include "../../../sdk/dCollision/ndShapeStaticMesh.h"
-%include "../../../sdk/dCollision/ndShapeConvexHull.h"
-%include "../../../sdk/dCollision/ndShapeHeightfield.h"
-%include "../../../sdk/dCollision/ndShapeChamferCylinder.h"
-
-%include "../../../sdk/dCollision/ndShapeInstance.h"
-
-%include "../../../sdk/dCollision/ndBody.h"
-%include "../../../sdk/dCollision/ndBodyKinematic.h"
-%include "../../../sdk/dCollision/ndBodyTriggerVolume.h"
-%include "../../../sdk/dCollision/ndBodyPlayerCapsule.h"
-
-%include "../../../sdk/dCollision/ndBodyNotify.h"
-%include "../../../sdk/dCollision/ndContactNotify.h"
-%include "../../../sdk/dCollision/ndRayCastNotify.h"
-%include "../../../sdk/dCollision/ndBodiesInAabbNotify.h"
-
-%include "../../../sdk/dNewton/ndWorld.h"
-
 //%template(objInfo) pyBaseNodeInfo<dSceneNodeInfo>;
 //%template(meshInfo) pyBaseNodeInfo<dMeshNodeInfo>;
 //%template(texInfo) pyBaseNodeInfo<dTextureNodeInfo>;
 //%template(matInfo) pyBaseNodeInfo<dMaterialNodeInfo>;
 //%template(rigidBidyInfo) pyBaseNodeInfo<dRigidbodyNodeInfo>;
-
 //%include "carrays.i"
-//%include "pyRigidBody.h"
 //%array_class(int, intArray);
 //%array_class(double, doubleArray);
+
+
+%include "newtonPyTest.h"
+
+//%include "../../../sdk/dCore/dVectorSimd.h"
+//%include "../../../sdk/dCore/dMatrix.h"
+//%include "../../../sdk/dCore/dQuaternion.h"
+//
+//%include "../../../sdk/dCollision/ndShape.h"
+//%include "../../../sdk/dCollision/ndShapeBox.h"
+//%include "../../../sdk/dCollision/ndShapeCone.h"
+//%include "../../../sdk/dCollision/ndShapeConvex.h"
+//%include "../../../sdk/dCollision/ndShapeSphere.h"
+//%include "../../../sdk/dCollision/ndShapeCapsule.h"
+//%include "../../../sdk/dCollision/ndShapeCompound.h"
+//%include "../../../sdk/dCollision/ndShapeCylinder.h"
+//%include "../../../sdk/dCollision/ndShapeStatic_bvh.h"
+//%include "../../../sdk/dCollision/ndShapeStaticMesh.h"
+//%include "../../../sdk/dCollision/ndShapeConvexHull.h"
+//%include "../../../sdk/dCollision/ndShapeHeightfield.h"
+//%include "../../../sdk/dCollision/ndShapeChamferCylinder.h"
+//
+//%include "../../../sdk/dCollision/ndShapeInstance.h"
+//
+//%include "../../../sdk/dCollision/ndBody.h"
+//%include "../../../sdk/dCollision/ndBodyKinematic.h"
+//%include "../../../sdk/dCollision/ndBodyTriggerVolume.h"
+//%include "../../../sdk/dCollision/ndBodyPlayerCapsule.h"
+//
+//%include "../../../sdk/dCollision/ndBodyNotify.h"
+//%include "../../../sdk/dCollision/ndContactNotify.h"
+//%include "../../../sdk/dCollision/ndRayCastNotify.h"
+//%include "../../../sdk/dCollision/ndBodiesInAabbNotify.h"
+//
+//%include "../../../sdk/dNewton/ndWorld.h"
+
 
