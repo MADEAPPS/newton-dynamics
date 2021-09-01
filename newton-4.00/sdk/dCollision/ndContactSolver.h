@@ -63,6 +63,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	ndContactSolver(ndContact* const contact, ndContactNotify* const notification, dFloat32 timestep);
 	ndContactSolver(ndShapeInstance* const instance, ndContactNotify* const notification, dFloat32 timestep);
 	ndContactSolver(const ndContactSolver& src, const ndShapeInstance& instance0, const ndShapeInstance& instance1);
+	~ndContactSolver() {}
 
 	dInt32 CalculateContactsDiscrete(); // done
 	dInt32 CalculateContactsContinue(); // done

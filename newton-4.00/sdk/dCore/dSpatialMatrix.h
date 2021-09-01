@@ -27,7 +27,7 @@
 #include "dVector.h"
 #include "dSpatialVector.h"
 
-class dSpatialMatrix
+class dSpatialMatrix : public dClassAlloc
 {
 	public:
 	D_INLINE dSpatialMatrix()
@@ -43,6 +43,10 @@ class dSpatialMatrix
 		}
 	}
 
+	D_INLINE ~dSpatialMatrix()
+	{
+	}
+	
 	D_INLINE dSpatialVector& operator[] (dInt32 i)
 	{
 		dAssert(i < 6);

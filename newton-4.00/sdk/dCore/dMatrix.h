@@ -35,13 +35,15 @@ D_CORE_API const dMatrix& dGetZeroMatrix ();
 D_CORE_API const dMatrix& dGetIdentityMatrix();
 
 D_MSV_NEWTON_ALIGN_32
-class dMatrix
+class dMatrix : public dClassAlloc
 {
 	public:
 	dMatrix ();
 	dMatrix (const dFloat32* const array);
 	dMatrix (const dVector &front, const dVector &up, const dVector &right, const dVector &posit);
 	D_CORE_API dMatrix (const dQuaternion &rotation, const dVector &position);
+
+	~dMatrix();
 
 	// create a orthonormal normal vector basis, front become m_front vector, and m_up and m_right are mutualiperpendicular to fron and to each other
 	dMatrix (const dVector &front);
@@ -117,6 +119,10 @@ D_INLINE dMatrix::dMatrix (const dFloat32* const array)
 
 D_INLINE dMatrix::dMatrix (const dVector &front, const dVector &up, const dVector &right, const dVector &posit)
 	:m_front (front), m_up(up), m_right(right), m_posit(posit)
+{
+}
+
+D_INLINE dMatrix::~dMatrix() 
 {
 }
 

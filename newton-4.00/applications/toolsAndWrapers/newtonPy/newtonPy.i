@@ -21,8 +21,12 @@
 
 // File : example.i 
 %module newtonPy
-#pragma SWIG nowarn=312,325,401,4316
-#pragma SWIG nowarn=509
+//#pragma SWIG nowarn=312		//Nested union not supported
+#pragma SWIG nowarn=325		//Nested struct not currently supported 
+#pragma SWIG nowarn=401	//Nothing known about base class
+//#pragma SWIG nowarn=509
+//#pragma SWIG nowarn=4316
+
 
 %begin 
 %{
@@ -30,8 +34,7 @@
 %}
 
 %{
-	//#include <ndNewton.h>
-	#include "newtonPyTest.h"
+	#include <ndNewton.h>
 %}
 
 #define D_INLINE inline
@@ -44,10 +47,14 @@
 #define D_GCC_NEWTON_ALIGN_32
 #define D_CLASS_REFLECTION(x)
 
-%rename(New) dVector::operator new;
-%rename(Delete) dVector::operator delete;
-%rename(NewArray) dVector::operator new[];
-%rename(DeleteArray) dVector::operator delete[];
+typedef float dFloat32;
+typedef double dFloat64;
+
+//%rename(New) dVector::operator new;
+//%rename(Delete) dVector::operator delete;
+//%rename(NewArray) dVector::operator new[];
+//%rename(DeleteArray) dVector::operator delete[];
+
 %rename(GetElement) dVector::operator[](dInt32 i);
 %rename(GetElement) dVector::operator[](dInt32 i) const;
 
@@ -69,38 +76,37 @@
 //%array_class(double, doubleArray);
 
 
-%include "newtonPyTest.h"
 
-//%include "../../../sdk/dCore/dVectorSimd.h"
-//%include "../../../sdk/dCore/dMatrix.h"
-//%include "../../../sdk/dCore/dQuaternion.h"
-//
-//%include "../../../sdk/dCollision/ndShape.h"
-//%include "../../../sdk/dCollision/ndShapeBox.h"
-//%include "../../../sdk/dCollision/ndShapeCone.h"
-//%include "../../../sdk/dCollision/ndShapeConvex.h"
-//%include "../../../sdk/dCollision/ndShapeSphere.h"
-//%include "../../../sdk/dCollision/ndShapeCapsule.h"
-//%include "../../../sdk/dCollision/ndShapeCompound.h"
-//%include "../../../sdk/dCollision/ndShapeCylinder.h"
-//%include "../../../sdk/dCollision/ndShapeStatic_bvh.h"
-//%include "../../../sdk/dCollision/ndShapeStaticMesh.h"
-//%include "../../../sdk/dCollision/ndShapeConvexHull.h"
-//%include "../../../sdk/dCollision/ndShapeHeightfield.h"
-//%include "../../../sdk/dCollision/ndShapeChamferCylinder.h"
-//
-//%include "../../../sdk/dCollision/ndShapeInstance.h"
-//
-//%include "../../../sdk/dCollision/ndBody.h"
-//%include "../../../sdk/dCollision/ndBodyKinematic.h"
-//%include "../../../sdk/dCollision/ndBodyTriggerVolume.h"
-//%include "../../../sdk/dCollision/ndBodyPlayerCapsule.h"
-//
-//%include "../../../sdk/dCollision/ndBodyNotify.h"
-//%include "../../../sdk/dCollision/ndContactNotify.h"
-//%include "../../../sdk/dCollision/ndRayCastNotify.h"
-//%include "../../../sdk/dCollision/ndBodiesInAabbNotify.h"
-//
-//%include "../../../sdk/dNewton/ndWorld.h"
+%include "../../../sdk/dCore/dVectorSimd.h"
+%include "../../../sdk/dCore/dMatrix.h"
+%include "../../../sdk/dCore/dQuaternion.h"
+
+%include "../../../sdk/dCollision/ndShape.h"
+%include "../../../sdk/dCollision/ndShapeBox.h"
+%include "../../../sdk/dCollision/ndShapeCone.h"
+%include "../../../sdk/dCollision/ndShapeConvex.h"
+%include "../../../sdk/dCollision/ndShapeSphere.h"
+%include "../../../sdk/dCollision/ndShapeCapsule.h"
+%include "../../../sdk/dCollision/ndShapeCompound.h"
+%include "../../../sdk/dCollision/ndShapeCylinder.h"
+%include "../../../sdk/dCollision/ndShapeStatic_bvh.h"
+%include "../../../sdk/dCollision/ndShapeStaticMesh.h"
+%include "../../../sdk/dCollision/ndShapeConvexHull.h"
+%include "../../../sdk/dCollision/ndShapeHeightfield.h"
+%include "../../../sdk/dCollision/ndShapeChamferCylinder.h"
+
+%include "../../../sdk/dCollision/ndShapeInstance.h"
+
+%include "../../../sdk/dCollision/ndBody.h"
+%include "../../../sdk/dCollision/ndBodyKinematic.h"
+%include "../../../sdk/dCollision/ndBodyTriggerVolume.h"
+%include "../../../sdk/dCollision/ndBodyPlayerCapsule.h"
+
+%include "../../../sdk/dCollision/ndBodyNotify.h"
+%include "../../../sdk/dCollision/ndContactNotify.h"
+%include "../../../sdk/dCollision/ndRayCastNotify.h"
+%include "../../../sdk/dCollision/ndBodiesInAabbNotify.h"
+
+%include "../../../sdk/dNewton/ndWorld.h"
 
 

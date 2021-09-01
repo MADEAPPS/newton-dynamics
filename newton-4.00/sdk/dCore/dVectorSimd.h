@@ -35,7 +35,7 @@ class dBigVector;
 //
 // *****************************************************************************************
 D_MSV_NEWTON_ALIGN_16
-class dVector
+class dVector : public dClassAlloc
 {
 	#define PERMUTE_MASK(w, z, y, x) _MM_SHUFFLE (w, z, y, x)
 	public:
@@ -100,29 +100,48 @@ class dVector
 	{
 	}
 
-	D_INLINE void *operator new[](size_t size)
+	D_INLINE dFloat32 GetX() const
 	{
-		return dMemory::Malloc(size);
+		return m_x;
 	}
 
-	D_INLINE void *operator new (size_t size)
+	D_INLINE dFloat32 GetY() const
 	{
-		return dMemory::Malloc(size);
+		return m_y;
 	}
 
-	D_INLINE void operator delete[] (void* ptr)
+	D_INLINE dFloat32 GetZ() const
 	{
-		dMemory::Free(ptr);
+		return m_z;
 	}
 
-	D_INLINE void operator delete (void* ptr)
+	D_INLINE dFloat32 GetW() const
 	{
-		dMemory::Free(ptr);
+		return m_w;
+	}
+
+	D_INLINE void SetX(dFloat32 x)
+	{
+		m_x = x;
+	}
+
+	D_INLINE void SetY(dFloat32 x)
+	{
+		m_y = x;
+	}
+
+	D_INLINE void SetZ(dFloat32 x)
+	{
+		m_z = x;
+	}
+
+	D_INLINE void SetW(dFloat32 x)
+	{
+		m_w = x;
 	}
 
 	D_INLINE dFloat32 GetScalar () const
 	{
-		//return m_x;
 		return _mm_cvtss_f32 (m_type);
 	}
 
@@ -574,6 +593,52 @@ class dBigVector
 	{
 	}
 
+	D_INLINE dFloat64 GetX() const
+	{
+		return m_x;
+	}
+
+	D_INLINE dFloat64 GetY() const
+	{
+		return m_y;
+	}
+
+	D_INLINE dFloat64 GetZ() const
+	{
+		return m_z;
+	}
+
+	D_INLINE dFloat64 GetW() const
+	{
+		return m_w;
+	}
+
+	D_INLINE void SetX(dFloat64 x)
+	{
+		m_x = x;
+	}
+
+	D_INLINE void SetY(dFloat64 x)
+	{
+		m_y = x;
+	}
+
+	D_INLINE void SetZ(dFloat64 x)
+	{
+		m_z = x;
+	}
+
+	D_INLINE void SetW(dFloat64 x)
+	{
+		m_w = x;
+	}
+
+	D_INLINE dFloat64 GetScalar() const
+	{
+		//return m_x;
+		return _mm_cvtsd_f64(m_typeLow);
+	}
+
 	D_INLINE dFloat64& operator[] (dInt32 i)
 	{
 		dAssert(i < 4);
@@ -586,12 +651,6 @@ class dBigVector
 		dAssert(i < 4);
 		dAssert(i >= 0);
 		return m_f[i];
-	}
-
-	D_INLINE dFloat64 GetScalar() const
-	{
-		//return m_x;
-		return _mm_cvtsd_f64(m_typeLow);
 	}
 
 	D_INLINE dBigVector operator+ (const dBigVector& A) const

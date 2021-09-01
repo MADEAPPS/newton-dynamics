@@ -29,23 +29,33 @@ class dClassAlloc
 {
 	public:
 	/// Empty
-	dClassAlloc()
+	D_INLINE dClassAlloc()
 	{
 	}
 
 	/// Empty
-	~dClassAlloc() 
+	D_INLINE ~dClassAlloc()
 	{
 	}
 
 	/// Overloaded operator new for any subclass derived from dClassAlloc
-	void *operator new (size_t size)
+	D_INLINE void *operator new (size_t size)
+	{
+		return Malloc(size);
+	}
+
+	D_INLINE void *operator new[](size_t size)
 	{
 		return Malloc(size);
 	}
 
 	/// Overloaded operator delete for any subclass derived from dClassAlloc
-	void operator delete (void* ptr)
+	D_INLINE void operator delete (void* ptr)
+	{
+		Free(ptr);
+	}
+
+	D_INLINE void operator delete[](void* ptr)
 	{
 		Free(ptr);
 	}

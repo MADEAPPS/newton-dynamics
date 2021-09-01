@@ -25,9 +25,10 @@
 #include "dCoreStdafx.h"
 #include "dTypes.h"
 #include "dVector.h"
+#include "dClassAlloc.h"
 
 D_MSV_NEWTON_ALIGN_32
-class dSpatialVector
+class dSpatialVector : public dClassAlloc
 {
 	public:
 	D_INLINE dSpatialVector()
@@ -46,6 +47,10 @@ class dSpatialVector
 
 	D_INLINE dSpatialVector(const dBigVector& low, const dBigVector& high)
 		:m_data(low, high)
+	{
+	}
+
+	D_INLINE ~dSpatialVector()
 	{
 	}
 
