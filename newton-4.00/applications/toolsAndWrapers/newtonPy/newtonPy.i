@@ -21,12 +21,9 @@
 
 // File : example.i 
 %module newtonPy
-//#pragma SWIG nowarn=312		//Nested union not supported
+#pragma SWIG nowarn=312		//Nested union not supported
 #pragma SWIG nowarn=325		//Nested struct not currently supported 
-#pragma SWIG nowarn=401	//Nothing known about base class
-//#pragma SWIG nowarn=509
-//#pragma SWIG nowarn=4316
-
+#pragma SWIG nowarn=401		//Nothing known about base class
 
 %begin 
 %{

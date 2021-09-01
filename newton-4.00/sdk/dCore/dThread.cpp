@@ -26,7 +26,8 @@
 #include "dProfiler.h"
 
 dThread::dThread()
-	:dSemaphore()
+	:dClassAlloc()
+	,dSemaphore()
 #ifndef D_USE_THREAD_EMULATION
 	,dAtomic<bool>(true)
 	,std::condition_variable()

@@ -57,7 +57,7 @@ class dThreadPoolJob
 
 class dThreadPool: public dSyncMutex, public dThread
 {
-	class dWorkerThread: public dClassAlloc, public dThread
+	class dWorkerThread: public dThread
 	{
 		public:
 		D_CORE_API dWorkerThread();

@@ -41,7 +41,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndPolygonMeshDesc: public dFastAabb
 {
 	public:
-	class dgMesh
+	class ndMesh
 	{
 		public:
 		dInt32 m_globalFaceIndexCount[D_MAX_COLLIDING_FACES];
@@ -109,7 +109,7 @@ class ndPolygonMeshDesc: public dFastAabb
 	dFloat32 m_maxT;
 	bool m_doContinuesCollisionTest;
 	dInt32 m_globalFaceVertexIndex[D_MAX_COLLIDING_INDICES];
-	dgMesh m_meshData;
+	ndMesh m_meshData;
 } D_GCC_NEWTON_ALIGN_32;
 
 class ndShapeStaticMesh: public ndShape

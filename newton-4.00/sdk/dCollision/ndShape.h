@@ -85,100 +85,103 @@ class ndShapeMaterial
 	}
 
 	dInt64 m_userId;
-	union
+	union nData
 	{
 		void* m_userData;
 		dUnsigned64 m_alignPad;
-	};
-	union
+	} m_data;
+
+	union dExtraData
 	{
 		dUnsigned64 m_intData;
 		dFloat32 m_floatData;
 	} m_userParam[6];
 };
 
+struct ndBoxInfo
+{
+	dFloat32 m_x;
+	dFloat32 m_y;
+	dFloat32 m_z;
+};
+
+struct ndPointInfo
+{
+	dFloat32 m_noUsed;
+};
+
+struct ndSphereInfo
+{
+	dFloat32 m_radius;
+};
+
+struct ndCylinderInfo
+{
+	dFloat32 m_radio0;
+	dFloat32 m_radio1;
+	dFloat32 m_height;
+};
+
+struct ndCapsuleInfo
+{
+	dFloat32 m_radio0;
+	dFloat32 m_radio1;
+	dFloat32 m_height;
+};
+
+struct ndConeInfo
+{
+	dFloat32 m_radius;
+	dFloat32 m_height;
+};
+
+struct ndChamferCylinderInfo
+{
+	dFloat32 m_r;
+	dFloat32 m_height;
+};
+
+struct ndConvexHullInfo
+{
+	dInt32 m_vertexCount;
+	dInt32 m_strideInBytes;
+	dInt32 m_faceCount;
+	dVector* m_vertex;
+};
+
+struct ndCoumpoundInfo
+{
+	dInt32 m_noUsed;
+};
+
+struct ndProceduralInfoInfo
+{
+	dInt32 m_noUsed;
+};
+
+struct ndCollisionBvhInfo
+{
+	dInt32 m_vertexCount;
+	dInt32 m_indexCount;
+};
+
+struct ndHeighfieldInfo
+{
+	dInt32 m_width;
+	dInt32 m_height;
+	dInt32 m_gridsDiagonals;
+	dFloat32 m_verticalScale;
+	dFloat32 m_horizonalScale_x;
+	dFloat32 m_horizonalScale_z;
+	dInt16* m_elevation;
+	dInt8* m_atributes;
+};
+
 D_MSV_NEWTON_ALIGN_32
 class ndShapeInfo
 {
 	public:
-	struct ndBoxInfo
-	{
-		dFloat32 m_x;
-		dFloat32 m_y;
-		dFloat32 m_z;
-	};
 
-	struct ndPointInfo
-	{
-		dFloat32 m_noUsed;
-	};
-
-	struct ndSphereInfo
-	{
-		dFloat32 m_radius;
-	};
-
-	struct ndCylinderInfo
-	{
-		dFloat32 m_radio0;
-		dFloat32 m_radio1;
-		dFloat32 m_height;
-	};
-
-	struct ndCapsuleInfo
-	{
-		dFloat32 m_radio0;
-		dFloat32 m_radio1;
-		dFloat32 m_height;
-	};
-
-	struct ndConeInfo
-	{
-		dFloat32 m_radius;
-		dFloat32 m_height;
-	};
-
-	struct ndChamferCylinderInfo
-	{
-		dFloat32 m_r;
-		dFloat32 m_height;
-	};
-
-	struct ndConvexHullInfo
-	{
-		dInt32 m_vertexCount;
-		dInt32 m_strideInBytes;
-		dInt32 m_faceCount;
-		dVector* m_vertex;
-	};
-
-	struct ndCoumpoundInfo
-	{
-		dInt32 m_noUsed;
-	};
-
-	struct ndProceduralInfoInfo
-	{
-		dInt32 m_noUsed;
-	};
-
-	struct ndCollisionBvhInfo
-	{
-		dInt32 m_vertexCount;
-		dInt32 m_indexCount;
-	};
-
-	struct ndHeighfieldInfo
-	{
-		dInt32 m_width;
-		dInt32 m_height;
-		dInt32 m_gridsDiagonals;
-		dFloat32 m_verticalScale;
-		dFloat32 m_horizonalScale_x;
-		dFloat32 m_horizonalScale_z;
-		dInt16* m_elevation;
-		dInt8* m_atributes;
-	};
 
 	dMatrix m_offsetMatrix;
 	dVector m_scale;

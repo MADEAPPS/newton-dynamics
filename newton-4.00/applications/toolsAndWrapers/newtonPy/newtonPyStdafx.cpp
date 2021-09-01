@@ -15,9 +15,11 @@ void *operator new (size_t size)
 {
 	// this should not happens on this test
 	// newton should never use global operator new and delete.
-	//dAssert(0);
+	
+	static bool allowStandardThreadAllocation = true;
 	void* const ptr = dMemory::Malloc(size);
-	dAssert((dUnsigned64(ptr) & (-32)) == 0);
+	dAssert(allowStandardThreadAllocation || ((dUnsigned64(ptr) & (0x1f)) == 0));
+	allowStandardThreadAllocation = false;
 	return ptr;
 }
 

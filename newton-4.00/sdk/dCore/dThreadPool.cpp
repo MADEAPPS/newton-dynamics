@@ -44,8 +44,7 @@ void dThreadPool::dThreadLockFreeUpdate::Execute()
 }
 
 dThreadPool::dWorkerThread::dWorkerThread()
-	:dClassAlloc()
-	,dThread()
+	:dThread()
 	,m_job(nullptr)
 	,m_threadIndex(0)
 {

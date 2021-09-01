@@ -239,7 +239,7 @@ void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& s
 
 	// save the entity  with the sub shape
 	ndShapeMaterial material(heighfieldInstance.GetMaterial());
-	material.m_userData = entity;
+	material.m_data.m_userData = entity;
 	heighfieldInstance.SetMaterial(material);
 	heighfieldInstance.SetLocalMatrix(matrix);
 	

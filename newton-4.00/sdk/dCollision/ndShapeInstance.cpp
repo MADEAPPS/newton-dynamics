@@ -124,7 +124,7 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndSha
 	m_skinThickness = xmlGetFloat(xmlNode, "skinThickness");
 	m_collisionMode = xmlGetInt(xmlNode, "collisionMode") ? true : false;
 	m_shapeMaterial.m_userId = xmlGetInt64(xmlNode, "materialID");
-	m_shapeMaterial.m_alignPad = xmlGetInt64(xmlNode, "materialUserData");
+	m_shapeMaterial.m_data.m_alignPad = xmlGetInt64(xmlNode, "materialUserData");
 	
 	for (dInt32 i = 0; i < dInt32 (sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); i++)
 	{
@@ -525,7 +525,7 @@ void ndShapeInstance::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	xmlSaveParam(paramNode, "skinThickness", m_skinThickness);
 	xmlSaveParam(paramNode, "collisionMode", m_collisionMode ? 1 : 0);
 	xmlSaveParam(paramNode, "materialID", m_shapeMaterial.m_userId);
-	xmlSaveParam(paramNode, "materialUserData", dInt64(m_shapeMaterial.m_alignPad));
+	xmlSaveParam(paramNode, "materialUserData", dInt64(m_shapeMaterial.m_data.m_alignPad));
 	for (dInt32 i = 0; i < dInt32 (sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); i++)
 	{
 		char name[64];

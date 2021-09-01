@@ -188,8 +188,7 @@ dFloat64 ndScene::ndFitnessList::TotalCost() const
 }
 	
 ndScene::ndScene()
-	:dClassAlloc()
-	,dThreadPool("newtonWorker")
+	:dThreadPool("newtonWorker")
 	,m_bodyList()
 	,m_contactList()
 	,m_activeConstraintArray()

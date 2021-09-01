@@ -56,9 +56,7 @@ class ndSceneTreeNotiFy
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
-class ndScene
-	:public dClassAlloc
-	,public dThreadPool
+class ndScene : public dThreadPool
 {
 	public: 
 	class ndBaseJob: public dThreadPoolJob

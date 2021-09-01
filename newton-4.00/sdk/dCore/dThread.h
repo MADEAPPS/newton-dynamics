@@ -27,7 +27,8 @@
 #include "dClassAlloc.h"
 
 class dThread
-	:public dSemaphore
+	:public dClassAlloc
+	,public dSemaphore
 #ifndef D_USE_THREAD_EMULATION
 	,public dAtomic<bool>
 	,public std::condition_variable

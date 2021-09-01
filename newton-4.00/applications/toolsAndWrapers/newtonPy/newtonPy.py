@@ -602,10 +602,175 @@ class ndShapeMaterial(object):
     def __init__(self):
         _newtonPy.ndShapeMaterial_swiginit(self, _newtonPy.new_ndShapeMaterial())
     m_userId = property(_newtonPy.ndShapeMaterial_m_userId_get, _newtonPy.ndShapeMaterial_m_userId_set)
+    m_data = property(_newtonPy.ndShapeMaterial_m_data_get, _newtonPy.ndShapeMaterial_m_data_set)
+    m_userParam = property(_newtonPy.ndShapeMaterial_m_userParam_get, _newtonPy.ndShapeMaterial_m_userParam_set)
     __swig_destroy__ = _newtonPy.delete_ndShapeMaterial
 
 # Register ndShapeMaterial in _newtonPy:
 _newtonPy.ndShapeMaterial_swigregister(ndShapeMaterial)
+
+class ndBoxInfo(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_x = property(_newtonPy.ndBoxInfo_m_x_get, _newtonPy.ndBoxInfo_m_x_set)
+    m_y = property(_newtonPy.ndBoxInfo_m_y_get, _newtonPy.ndBoxInfo_m_y_set)
+    m_z = property(_newtonPy.ndBoxInfo_m_z_get, _newtonPy.ndBoxInfo_m_z_set)
+
+    def __init__(self):
+        _newtonPy.ndBoxInfo_swiginit(self, _newtonPy.new_ndBoxInfo())
+    __swig_destroy__ = _newtonPy.delete_ndBoxInfo
+
+# Register ndBoxInfo in _newtonPy:
+_newtonPy.ndBoxInfo_swigregister(ndBoxInfo)
+
+class ndPointInfo(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_noUsed = property(_newtonPy.ndPointInfo_m_noUsed_get, _newtonPy.ndPointInfo_m_noUsed_set)
+
+    def __init__(self):
+        _newtonPy.ndPointInfo_swiginit(self, _newtonPy.new_ndPointInfo())
+    __swig_destroy__ = _newtonPy.delete_ndPointInfo
+
+# Register ndPointInfo in _newtonPy:
+_newtonPy.ndPointInfo_swigregister(ndPointInfo)
+
+class ndSphereInfo(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_radius = property(_newtonPy.ndSphereInfo_m_radius_get, _newtonPy.ndSphereInfo_m_radius_set)
+
+    def __init__(self):
+        _newtonPy.ndSphereInfo_swiginit(self, _newtonPy.new_ndSphereInfo())
+    __swig_destroy__ = _newtonPy.delete_ndSphereInfo
+
+# Register ndSphereInfo in _newtonPy:
+_newtonPy.ndSphereInfo_swigregister(ndSphereInfo)
+
+class ndCylinderInfo(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_radio0 = property(_newtonPy.ndCylinderInfo_m_radio0_get, _newtonPy.ndCylinderInfo_m_radio0_set)
+    m_radio1 = property(_newtonPy.ndCylinderInfo_m_radio1_get, _newtonPy.ndCylinderInfo_m_radio1_set)
+    m_height = property(_newtonPy.ndCylinderInfo_m_height_get, _newtonPy.ndCylinderInfo_m_height_set)
+
+    def __init__(self):
+        _newtonPy.ndCylinderInfo_swiginit(self, _newtonPy.new_ndCylinderInfo())
+    __swig_destroy__ = _newtonPy.delete_ndCylinderInfo
+
+# Register ndCylinderInfo in _newtonPy:
+_newtonPy.ndCylinderInfo_swigregister(ndCylinderInfo)
+
+class ndCapsuleInfo(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_radio0 = property(_newtonPy.ndCapsuleInfo_m_radio0_get, _newtonPy.ndCapsuleInfo_m_radio0_set)
+    m_radio1 = property(_newtonPy.ndCapsuleInfo_m_radio1_get, _newtonPy.ndCapsuleInfo_m_radio1_set)
+    m_height = property(_newtonPy.ndCapsuleInfo_m_height_get, _newtonPy.ndCapsuleInfo_m_height_set)
+
+    def __init__(self):
+        _newtonPy.ndCapsuleInfo_swiginit(self, _newtonPy.new_ndCapsuleInfo())
+    __swig_destroy__ = _newtonPy.delete_ndCapsuleInfo
+
+# Register ndCapsuleInfo in _newtonPy:
+_newtonPy.ndCapsuleInfo_swigregister(ndCapsuleInfo)
+
+class ndConeInfo(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_radius = property(_newtonPy.ndConeInfo_m_radius_get, _newtonPy.ndConeInfo_m_radius_set)
+    m_height = property(_newtonPy.ndConeInfo_m_height_get, _newtonPy.ndConeInfo_m_height_set)
+
+    def __init__(self):
+        _newtonPy.ndConeInfo_swiginit(self, _newtonPy.new_ndConeInfo())
+    __swig_destroy__ = _newtonPy.delete_ndConeInfo
+
+# Register ndConeInfo in _newtonPy:
+_newtonPy.ndConeInfo_swigregister(ndConeInfo)
+
+class ndChamferCylinderInfo(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_r = property(_newtonPy.ndChamferCylinderInfo_m_r_get, _newtonPy.ndChamferCylinderInfo_m_r_set)
+    m_height = property(_newtonPy.ndChamferCylinderInfo_m_height_get, _newtonPy.ndChamferCylinderInfo_m_height_set)
+
+    def __init__(self):
+        _newtonPy.ndChamferCylinderInfo_swiginit(self, _newtonPy.new_ndChamferCylinderInfo())
+    __swig_destroy__ = _newtonPy.delete_ndChamferCylinderInfo
+
+# Register ndChamferCylinderInfo in _newtonPy:
+_newtonPy.ndChamferCylinderInfo_swigregister(ndChamferCylinderInfo)
+
+class ndConvexHullInfo(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_vertexCount = property(_newtonPy.ndConvexHullInfo_m_vertexCount_get, _newtonPy.ndConvexHullInfo_m_vertexCount_set)
+    m_strideInBytes = property(_newtonPy.ndConvexHullInfo_m_strideInBytes_get, _newtonPy.ndConvexHullInfo_m_strideInBytes_set)
+    m_faceCount = property(_newtonPy.ndConvexHullInfo_m_faceCount_get, _newtonPy.ndConvexHullInfo_m_faceCount_set)
+    m_vertex = property(_newtonPy.ndConvexHullInfo_m_vertex_get, _newtonPy.ndConvexHullInfo_m_vertex_set)
+
+    def __init__(self):
+        _newtonPy.ndConvexHullInfo_swiginit(self, _newtonPy.new_ndConvexHullInfo())
+    __swig_destroy__ = _newtonPy.delete_ndConvexHullInfo
+
+# Register ndConvexHullInfo in _newtonPy:
+_newtonPy.ndConvexHullInfo_swigregister(ndConvexHullInfo)
+
+class ndCoumpoundInfo(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_noUsed = property(_newtonPy.ndCoumpoundInfo_m_noUsed_get, _newtonPy.ndCoumpoundInfo_m_noUsed_set)
+
+    def __init__(self):
+        _newtonPy.ndCoumpoundInfo_swiginit(self, _newtonPy.new_ndCoumpoundInfo())
+    __swig_destroy__ = _newtonPy.delete_ndCoumpoundInfo
+
+# Register ndCoumpoundInfo in _newtonPy:
+_newtonPy.ndCoumpoundInfo_swigregister(ndCoumpoundInfo)
+
+class ndProceduralInfoInfo(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_noUsed = property(_newtonPy.ndProceduralInfoInfo_m_noUsed_get, _newtonPy.ndProceduralInfoInfo_m_noUsed_set)
+
+    def __init__(self):
+        _newtonPy.ndProceduralInfoInfo_swiginit(self, _newtonPy.new_ndProceduralInfoInfo())
+    __swig_destroy__ = _newtonPy.delete_ndProceduralInfoInfo
+
+# Register ndProceduralInfoInfo in _newtonPy:
+_newtonPy.ndProceduralInfoInfo_swigregister(ndProceduralInfoInfo)
+
+class ndCollisionBvhInfo(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_vertexCount = property(_newtonPy.ndCollisionBvhInfo_m_vertexCount_get, _newtonPy.ndCollisionBvhInfo_m_vertexCount_set)
+    m_indexCount = property(_newtonPy.ndCollisionBvhInfo_m_indexCount_get, _newtonPy.ndCollisionBvhInfo_m_indexCount_set)
+
+    def __init__(self):
+        _newtonPy.ndCollisionBvhInfo_swiginit(self, _newtonPy.new_ndCollisionBvhInfo())
+    __swig_destroy__ = _newtonPy.delete_ndCollisionBvhInfo
+
+# Register ndCollisionBvhInfo in _newtonPy:
+_newtonPy.ndCollisionBvhInfo_swigregister(ndCollisionBvhInfo)
+
+class ndHeighfieldInfo(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+    m_width = property(_newtonPy.ndHeighfieldInfo_m_width_get, _newtonPy.ndHeighfieldInfo_m_width_set)
+    m_height = property(_newtonPy.ndHeighfieldInfo_m_height_get, _newtonPy.ndHeighfieldInfo_m_height_set)
+    m_gridsDiagonals = property(_newtonPy.ndHeighfieldInfo_m_gridsDiagonals_get, _newtonPy.ndHeighfieldInfo_m_gridsDiagonals_set)
+    m_verticalScale = property(_newtonPy.ndHeighfieldInfo_m_verticalScale_get, _newtonPy.ndHeighfieldInfo_m_verticalScale_set)
+    m_horizonalScale_x = property(_newtonPy.ndHeighfieldInfo_m_horizonalScale_x_get, _newtonPy.ndHeighfieldInfo_m_horizonalScale_x_set)
+    m_horizonalScale_z = property(_newtonPy.ndHeighfieldInfo_m_horizonalScale_z_get, _newtonPy.ndHeighfieldInfo_m_horizonalScale_z_set)
+    m_elevation = property(_newtonPy.ndHeighfieldInfo_m_elevation_get, _newtonPy.ndHeighfieldInfo_m_elevation_set)
+    m_atributes = property(_newtonPy.ndHeighfieldInfo_m_atributes_get, _newtonPy.ndHeighfieldInfo_m_atributes_set)
+
+    def __init__(self):
+        _newtonPy.ndHeighfieldInfo_swiginit(self, _newtonPy.new_ndHeighfieldInfo())
+    __swig_destroy__ = _newtonPy.delete_ndHeighfieldInfo
+
+# Register ndHeighfieldInfo in _newtonPy:
+_newtonPy.ndHeighfieldInfo_swigregister(ndHeighfieldInfo)
 
 class ndShapeInfo(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
