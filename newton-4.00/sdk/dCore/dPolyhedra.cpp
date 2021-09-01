@@ -22,7 +22,6 @@
 #include "dCoreStdafx.h"
 #include "dTypes.h"
 #include "dHeap.h"
-//#include "dgObb.h"
 #include "dPlane.h"
 #include "dDebug.h"
 #include "dStack.h"
@@ -32,7 +31,11 @@
 #include "dConvexHull3d.h"
 #include "dSmallDeterminant.h"
 
-#define DG_LOCAL_BUFFER_SIZE  1024
+#define D_LOCAL_BUFFER_SIZE  1024
+
+#define dPointerToInt(x) ((size_t)x)
+#define dIntToPointer(x) ((void*)(size_t(x)))
+
 
 class dgDiagonalEdge
 {
@@ -57,13 +60,13 @@ struct dEdgeCollapseEdgeHandle
 		:m_edge(dataHandle.m_edge)
 		,m_inList(1)
 	{
-		dEdgeCollapseEdgeHandle* const handle = (dEdgeCollapseEdgeHandle *)IntToPointer (m_edge->m_userData);
+		dEdgeCollapseEdgeHandle* const handle = (dEdgeCollapseEdgeHandle *)dIntToPointer (m_edge->m_userData);
 		if (handle) 
 		{
 			dAssert (handle != this);
 			handle->m_edge = nullptr;
 		}
-		m_edge->m_userData = dUnsigned64 (PointerToInt(this));
+		m_edge->m_userData = dUnsigned64 (dPointerToInt(this));
 	}
 
 	~dEdgeCollapseEdgeHandle ()
@@ -72,10 +75,10 @@ struct dEdgeCollapseEdgeHandle
 		{
 			if (m_edge) 
 			{
-				dEdgeCollapseEdgeHandle* const handle = (dEdgeCollapseEdgeHandle *)IntToPointer (m_edge->m_userData);
+				dEdgeCollapseEdgeHandle* const handle = (dEdgeCollapseEdgeHandle *)dIntToPointer (m_edge->m_userData);
 				if (handle == this) 
 				{
-					m_edge->m_userData = PointerToInt (nullptr);
+					m_edge->m_userData = dPointerToInt (nullptr);
 				}
 			}
 		}
@@ -156,8 +159,8 @@ dPolyhedra::dPolyhedra (const dPolyhedra &polyhedra)
 	,m_edgeMark(0)
 	,m_faceSecuence(0)
 {
-	dStack<dInt32> indexPool (DG_LOCAL_BUFFER_SIZE * 16);
-	dStack<dUnsigned64> userPool (DG_LOCAL_BUFFER_SIZE * 16);
+	dStack<dInt32> indexPool (D_LOCAL_BUFFER_SIZE * 16);
+	dStack<dUnsigned64> userPool (D_LOCAL_BUFFER_SIZE * 16);
 	dInt32* const index = &indexPool[0];
 	dUnsigned64* const user = &userPool[0];
 
@@ -493,7 +496,7 @@ bool dPolyhedra::EndFace ()
 
 void dPolyhedra::DeleteFace(dEdge* const face)
 {
-	dEdge* edgeList[DG_LOCAL_BUFFER_SIZE * 16];
+	dEdge* edgeList[D_LOCAL_BUFFER_SIZE * 16];
 
 	if (face->m_incidentFace > 0) 
 	{
@@ -1028,7 +1031,7 @@ dEdge* dPolyhedra::CollapseEdge(dEdge* const edge)
 
 void dPolyhedra::RemoveHalfEdge (dEdge* const edge)
 {
-	dEdgeCollapseEdgeHandle* const handle = (dEdgeCollapseEdgeHandle *) IntToPointer (edge->m_userData);
+	dEdgeCollapseEdgeHandle* const handle = (dEdgeCollapseEdgeHandle *) dIntToPointer (edge->m_userData);
 	if (handle) { 
 		handle->m_edge = nullptr;
 	}
@@ -1192,10 +1195,10 @@ void dPolyhedra::MarkAdjacentCoplanarFaces (dPolyhedra& polyhedraOut, dEdge* con
 	const dFloat64 normalDeviation = dFloat64 (0.9999f);
 	const dFloat64 distanceFromPlane = dFloat64 (1.0f / 128.0f);
 
-	dInt32 faceIndex[DG_LOCAL_BUFFER_SIZE * 8];
-	dInt64 userIndex[DG_LOCAL_BUFFER_SIZE * 8];
-	dEdge* stack[DG_LOCAL_BUFFER_SIZE * 8];
-	dEdge* deleteEdge[DG_LOCAL_BUFFER_SIZE * 32];
+	dInt32 faceIndex[D_LOCAL_BUFFER_SIZE * 8];
+	dInt64 userIndex[D_LOCAL_BUFFER_SIZE * 8];
+	dEdge* stack[D_LOCAL_BUFFER_SIZE * 8];
+	dEdge* deleteEdge[D_LOCAL_BUFFER_SIZE * 32];
 
 	dInt32 deleteCount = 1;
 	deleteEdge[0] = face;
@@ -1447,7 +1450,7 @@ void dPolyhedra::RefineTriangulation (const dFloat64* const vertex, dInt32 strid
 	dInt32 loopCount = 0;
 	
 	dPolyhedra::Iterator iter (*this);
-	dEdge* edgePerimeters[DG_LOCAL_BUFFER_SIZE * 16];
+	dEdge* edgePerimeters[D_LOCAL_BUFFER_SIZE * 16];
 	dInt32 perimeterCount = 0;
 	dTree<dEdge*, dInt32> filter;
 	for (iter.Begin(); iter && (loopCount <= 1) ; iter ++) {
@@ -1491,8 +1494,8 @@ void dPolyhedra::RefineTriangulation (const dFloat64* const vertex, dInt32 strid
 
 void dPolyhedra::OptimizeTriangulation (const dFloat64* const vertex, dInt32 strideInBytes)
 {
-	dInt32 polygon[DG_LOCAL_BUFFER_SIZE * 8];
-	dInt64 userData[DG_LOCAL_BUFFER_SIZE * 8];
+	dInt32 polygon[D_LOCAL_BUFFER_SIZE * 8];
+	dInt64 userData[D_LOCAL_BUFFER_SIZE * 8];
 	dInt32 stride = dInt32 (strideInBytes / sizeof (dFloat64));
 
 	dPolyhedra leftOver;
@@ -1665,7 +1668,7 @@ bool dPolyhedra::IsFaceConvex(dEdge* const face, const dFloat64* const vertex, d
 
 void dPolyhedra::RemoveOuterColinearEdges (dPolyhedra& flatFace, const dFloat64* const vertex, dInt32 stride)
 {
-	dEdge* edgePerimeters[DG_LOCAL_BUFFER_SIZE];
+	dEdge* edgePerimeters[D_LOCAL_BUFFER_SIZE];
 
 	dInt32 perimeterCount = 0;
 	dInt32 mark = flatFace.IncLRU();
@@ -2231,7 +2234,7 @@ bool dPolyhedra::Optimize (const dFloat64* const array, dInt32 strideInBytes, dF
 #endif
 
 	dFloat32 progressDen = dFloat32 (1.0f / GetEdgeCount());
-	dInt32 edgeCount = GetEdgeCount() * 4 + DG_LOCAL_BUFFER_SIZE * 16;
+	dInt32 edgeCount = GetEdgeCount() * 4 + D_LOCAL_BUFFER_SIZE * 16;
 	dInt32 maxVertexIndex = GetLastVertexIndex();
 	
 	dStack<dBigVector> vertexPool (maxVertexIndex); 
@@ -2421,7 +2424,7 @@ bool dPolyhedra::TriangulateFace(dEdge* const face, const dFloat64* const pool, 
 			ptr->m_mark = mark;
 			ptr = ptr->m_next;
 		} while (ptr != face);
-		char memPool[DG_LOCAL_BUFFER_SIZE * (sizeof (dEdge*)+sizeof (dFloat64))];
+		char memPool[D_LOCAL_BUFFER_SIZE * (sizeof (dEdge*)+sizeof (dFloat64))];
 		dDownHeap<dEdge*, dFloat64> heap(&memPool[0], sizeof (memPool));
 
 		dInt32 stride = dInt32(strideInBytes / sizeof (dFloat64));
@@ -2456,7 +2459,7 @@ dEdge* dPolyhedra::BestEdgePolygonizeFace(const dBigVector& normal, dEdge* const
 bool dPolyhedra::PolygonizeFace(dEdge* const face, const dFloat64* const pool, dInt32 strideInBytes)
 {
 	dPolyhedra flatFace;
-	dEdge* array[DG_LOCAL_BUFFER_SIZE];
+	dEdge* array[D_LOCAL_BUFFER_SIZE];
 
 	dInt32 count = 0;		
 	dEdge* edge = face;
@@ -2472,7 +2475,7 @@ bool dPolyhedra::PolygonizeFace(dEdge* const face, const dFloat64* const pool, d
 
 		array[count] = perimeter;
 		count++;
-		dAssert(count <= DG_LOCAL_BUFFER_SIZE);
+		dAssert(count <= D_LOCAL_BUFFER_SIZE);
 		edge = edge->m_next;
 	} while (edge != face);
 
@@ -2530,8 +2533,8 @@ bool dPolyhedra::PolygonizeFace(dEdge* const face, const dFloat64* const pool, d
 		flatFace.RefineTriangulation(pool, stride);
 
 		//RemoveOuterColinearEdges(*this, vertex, stride);
-		dInt32 polygon[DG_LOCAL_BUFFER_SIZE];
-		dEdge* diagonalsPool[DG_LOCAL_BUFFER_SIZE];
+		dInt32 polygon[D_LOCAL_BUFFER_SIZE];
+		dEdge* diagonalsPool[D_LOCAL_BUFFER_SIZE];
 
 		dInt32 diagonalCount = GetInteriorDiagonals(flatFace, diagonalsPool, sizeof (diagonalsPool) / sizeof (diagonalsPool[0]));
 
@@ -2691,8 +2694,8 @@ bool dPolyhedra::PolygonizeFace(dEdge* const face, const dFloat64* const pool, d
 
 void dPolyhedra::RemoveInteriorEdges (dPolyhedra& buildConvex, const dFloat64* const vertex, dInt32 strideInBytes)
 {
-	dInt32 polygon[DG_LOCAL_BUFFER_SIZE * 8];
-	dEdge* diagonalsPool[DG_LOCAL_BUFFER_SIZE * 8];
+	dInt32 polygon[D_LOCAL_BUFFER_SIZE * 8];
+	dEdge* diagonalsPool[D_LOCAL_BUFFER_SIZE * 8];
 
 	dInt32 stride = dInt32 (strideInBytes / sizeof (dFloat64));
 

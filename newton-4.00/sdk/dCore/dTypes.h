@@ -293,103 +293,100 @@ class dTriplex
 	dFloat32 m_z;
 };
 
-#define PointerToInt(x) ((size_t)x)
-#define IntToPointer(x) ((void*)(size_t(x)))
-
 #ifndef _MSC_VER 
 	#define _stricmp(x,y) strcasecmp(x,y)
 #endif
 
 #ifdef D_USE_THREAD_EMULATION
-/// wrapper over standard atomic operations
-template<class T>
-class dAtomic
-{
-	public:
-	dAtomic<T>()
-		: m_val(T(0))
+	/// wrapper over standard atomic operations
+	template<class T>
+	class dAtomic
 	{
-	}
-
-	dAtomic<T>(T val)
-		: m_val(val)
-	{
-	}
-
-	operator T() const
-	{
-		return m_val;
-	}
-
-	T load() const
-	{
-		return m_val;
-	}
-
-	void store(T val)
-	{
-		m_val = val;
-	}
-
-	T exchange(T val)
-	{
-		dSwap(val, m_val);
-		return val;
-	}
-
-	T fetch_add(T val)
-	{
-		T ret = m_val;
-		m_val += val;
-		return ret;
-	}
-
-	T fetch_sub(T val)
-	{
-		T ret = m_val;
-		m_val -= val;
-		return ret;
-	}
-
-	bool compare_exchange_weak(T oldValue, T newValue)
-	{
-		if (m_val == oldValue)
+		public:
+		dAtomic<T>()
+			: m_val(T(0))
 		{
-			m_val = newValue;
-			return true;
 		}
-		return false;
-	}
 
-	private:
-	T m_val;
-};
+		dAtomic<T>(T val)
+			: m_val(val)
+		{
+		}
+
+		operator T() const
+		{
+			return m_val;
+		}
+
+		T load() const
+		{
+			return m_val;
+		}
+
+		void store(T val)
+		{
+			m_val = val;
+		}
+
+		T exchange(T val)
+		{
+			dSwap(val, m_val);
+			return val;
+		}
+
+		T fetch_add(T val)
+		{
+			T ret = m_val;
+			m_val += val;
+			return ret;
+		}
+
+		T fetch_sub(T val)
+		{
+			T ret = m_val;
+			m_val -= val;
+			return ret;
+		}
+
+		bool compare_exchange_weak(T oldValue, T newValue)
+		{
+			if (m_val == oldValue)
+			{
+				m_val = newValue;
+				return true;
+			}
+			return false;
+		}
+
+		private:
+		T m_val;
+	};
 #else
-/// wrapper over standard atomic operations
-template<class T>
-class dAtomic : public std::atomic<T>
-{
-	public:
-	dAtomic<T>()
-		: std::atomic<T>(T(0))
+	/// wrapper over standard atomic operations
+	template<class T>
+	class dAtomic : public std::atomic<T>
 	{
-	}
+		public:
+		dAtomic<T>()
+			: std::atomic<T>(T(0))
+		{
+		}
 
-	dAtomic<T>(T val)
-		: std::atomic<T>(val)
-	{
-	}
+		dAtomic<T>(T val)
+			: std::atomic<T>(val)
+		{
+		}
 
-	dAtomic<T>(const dAtomic<T>& copy)
-		: std::atomic<T>(copy)
-	{
-	}
+		dAtomic<T>(const dAtomic<T>& copy)
+			: std::atomic<T>(copy)
+		{
+		}
 
-	T operator=(T value)
-	{
-		return std::atomic<T>::operator=(value);
-	}
-};
+		T operator=(T value)
+		{
+			return std::atomic<T>::operator=(value);
+		}
+	};
 #endif
 
 /// Simple spin lock for synchronizing threads for very short period of time.
@@ -446,7 +443,6 @@ class dScopeSpinLock
 
 	dSpinLock& m_spinLock;
 };
-
 
 
 #endif

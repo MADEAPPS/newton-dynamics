@@ -9,10 +9,6 @@
 * freely
 */
 
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-
 
 #ifndef _NEWTON_PY_STDAFX_H_
 #define _NEWTON_PY_STDAFX_H_
@@ -97,9 +93,5 @@ inline dInt32 dTwosPower (dInt32 x)
 //void GetAplicationDirectory (char* const aplicationDir);
 void dGetWorkingFileName (const char* const name, char* const outPathName);
 
-// endian conversion
-dUnsigned32 SWAP_INT32(dUnsigned32 x);
-dUnsigned16 SWAP_INT16(dUnsigned16 x);
-void SWAP_FLOAT32_ARRAY (void* const array, dInt32 count);
 #endif 
 

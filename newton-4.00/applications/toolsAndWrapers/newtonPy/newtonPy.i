@@ -34,18 +34,6 @@
 	#include <ndNewton.h>
 %}
 
-#define D_INLINE inline
-#define D_CORE_API 
-#define D_NEWTON_API
-#define D_COLLISION_API
-#define D_MSV_NEWTON_ALIGN_16
-#define D_GCC_NEWTON_ALIGN_16
-#define D_MSV_NEWTON_ALIGN_32
-#define D_GCC_NEWTON_ALIGN_32
-#define D_CLASS_REFLECTION(x)
-
-typedef float dFloat32;
-typedef double dFloat64;
 
 //%rename(New) dVector::operator new;
 //%rename(Delete) dVector::operator delete;
@@ -73,7 +61,7 @@ typedef double dFloat64;
 //%array_class(double, doubleArray);
 
 
-
+%include "newtonPyConfig.h"
 %include "../../../sdk/dCore/dVectorSimd.h"
 %include "../../../sdk/dCore/dMatrix.h"
 %include "../../../sdk/dCore/dQuaternion.h"
