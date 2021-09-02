@@ -126,6 +126,11 @@ class D_TINY_API TiXmlString
 		quit();
 	}
 
+	void *operator new (size_t size);
+	void *operator new[](size_t size);
+	void operator delete (void* ptr);
+	void operator delete[](void* ptr);
+
 	// = operator
 	TiXmlString& operator = (const char * copy)
 	{
@@ -248,6 +253,9 @@ class D_TINY_API TiXmlString
 		char str[1];
 	};
 
+	void* Malloc(size_type size);
+	void Free(void* ptr);
+
 	void init(size_type sz, size_type cap)
 	{
 		if (cap)
@@ -259,7 +267,8 @@ class D_TINY_API TiXmlString
 			// that are overly picky about structure alignment.
 			const size_type bytesNeeded = sizeof(Rep) + cap;
 			const size_type intsNeeded = ( bytesNeeded + sizeof(int) - 1 ) / sizeof( int ); 
-			rep_ = reinterpret_cast<Rep*>( new int[ intsNeeded ] );
+			//rep_ = reinterpret_cast<Rep*>( new int[ intsNeeded ] );
+			rep_ = reinterpret_cast<Rep*>(Malloc(intsNeeded * sizeof (int)));
 
 			rep_->str[ rep_->size = sz ] = '\0';
 			rep_->capacity = cap;
@@ -276,7 +285,8 @@ class D_TINY_API TiXmlString
 		{
 			// The rep_ is really an array of ints. (see the allocator, above).
 			// Cast it back before delete, so the compiler won't incorrectly call destructors.
-			delete [] ( reinterpret_cast<int*>( rep_ ) );
+			//delete [] ( reinterpret_cast<int*>( rep_ ) );
+			Free(rep_);
 		}
 	}
 

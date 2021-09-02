@@ -133,6 +133,11 @@ class D_TINY_API TiXmlVisitor
 public:
 	virtual ~TiXmlVisitor() {}
 
+	void *operator new (size_t size);
+	void *operator new[](size_t size);
+	void operator delete (void* ptr);
+	void operator delete[](void* ptr);
+
 	/// Visit a document.
 	virtual bool VisitEnter( const TiXmlDocument& /*doc*/ )			{ return true; }
 	/// Visit a document.
@@ -203,6 +208,11 @@ class D_TINY_API TiXmlBase
 public:
 	TiXmlBase()	:	userData(0)		{}
 	virtual ~TiXmlBase()			{}
+
+	void *operator new (size_t size);
+	void *operator new[](size_t size);
+	void operator delete (void* ptr);
+	void operator delete[](void* ptr);
 
 	/**	All TinyXml classes can print themselves to a filestream
 		or the string class (TiXmlString in non-STL mode, std::string
@@ -908,6 +918,11 @@ class D_TINY_API TiXmlAttributeSet
 public:
 	TiXmlAttributeSet();
 	~TiXmlAttributeSet();
+
+	void *operator new (size_t size);
+	void *operator new[](size_t size);
+	void operator delete (void* ptr);
+	void operator delete[](void* ptr);
 
 	void Add( TiXmlAttribute* attribute );
 	void Remove( TiXmlAttribute* attribute );
@@ -1640,6 +1655,12 @@ public:
 	TiXmlHandle( TiXmlNode* _node )					{ this->node = _node; }
 	/// Copy constructor
 	TiXmlHandle( const TiXmlHandle& ref )			{ this->node = ref.node; }
+
+	void *operator new (size_t size);
+	void *operator new[](size_t size);
+	void operator delete (void* ptr);
+	void operator delete[](void* ptr);
+
 	TiXmlHandle operator=( const TiXmlHandle& ref ) { this->node = ref.node; return *this; }
 
 	/// Return a handle to the first child node.

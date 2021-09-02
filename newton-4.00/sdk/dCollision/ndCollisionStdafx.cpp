@@ -29,13 +29,11 @@
 	{
 		// this should not happens on this test
 		// newton should never use global operator new and delete.
-		dAssert(0);
 		return dMemory::Malloc(size);
 	}
 
 	void operator delete (void* ptr)
 	{
-		dAssert(0);
 		dMemory::Free(ptr);
 	}
 	#endif

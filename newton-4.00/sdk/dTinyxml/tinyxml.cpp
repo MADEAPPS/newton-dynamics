@@ -24,6 +24,7 @@ distribution.
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
+#include "dClassAlloc.h"
 
 #include <ctype.h>
 
@@ -36,6 +37,87 @@ distribution.
 
 namespace nd
 {
+
+void *TiXmlVisitor::operator new (size_t size)
+{
+	return dMemory::Malloc(size);
+}
+
+void *TiXmlVisitor::operator new[](size_t size)
+{
+	return dMemory::Malloc(size);
+}
+
+void TiXmlVisitor::operator delete (void* ptr)
+{
+	dMemory::Free(ptr);
+}
+
+void TiXmlVisitor::operator delete[](void* ptr)
+{
+	dMemory::Free(ptr);
+}
+
+void *TiXmlAttributeSet::operator new (size_t size)
+{
+	return dMemory::Malloc(size);
+}
+
+void *TiXmlAttributeSet::operator new[](size_t size)
+{
+	return dMemory::Malloc(size);
+}
+
+void TiXmlAttributeSet::operator delete (void* ptr)
+{
+	dMemory::Free(ptr);
+}
+
+void TiXmlAttributeSet::operator delete[](void* ptr)
+{
+	dMemory::Free(ptr);
+}
+
+void *TiXmlBase::operator new (size_t size)
+{
+	return dMemory::Malloc(size);
+}
+
+void *TiXmlBase::operator new[](size_t size)
+{
+	return dMemory::Malloc(size);
+}
+
+void TiXmlBase::operator delete (void* ptr)
+{
+	dMemory::Free(ptr);
+}
+
+void TiXmlBase::operator delete[](void* ptr)
+{
+	dMemory::Free(ptr);
+}
+
+
+void *TiXmlHandle::operator new (size_t size)
+{
+	return dMemory::Malloc(size);
+}
+
+void *TiXmlHandle::operator new[](size_t size)
+{
+	return dMemory::Malloc(size);
+}
+
+void TiXmlHandle::operator delete (void* ptr)
+{
+	dMemory::Free(ptr);
+}
+
+void TiXmlHandle::operator delete[](void* ptr)
+{
+	dMemory::Free(ptr);
+}
 
 bool TiXmlBase::condenseWhiteSpace = true;
 
@@ -1026,11 +1108,13 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 	}
 	*/
 
-	char* buf = new char[ length+1 ];
+	//char* buf = new char[ length+1 ];
+	char* buf = (char*)dMemory::Malloc((length + 1) * sizeof (char));
 	buf[0] = 0;
 
 	if ( fread( buf, length, 1, file ) != 1 ) {
-		delete [] buf;
+		//delete [] buf;
+		dMemory::Free(buf);
 		SetError( TIXML_ERROR_OPENING_FILE, 0, 0, TIXML_ENCODING_UNKNOWN );
 		return false;
 	}
@@ -1078,7 +1162,8 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 	if ( p-lastPos ) {
 		data.append( lastPos, p-lastPos );
 	}		
-	delete [] buf;
+	//delete [] buf;
+	dMemory::Free(buf);
 	buf = 0;
 
 	Parse( data.c_str(), 0, encoding );

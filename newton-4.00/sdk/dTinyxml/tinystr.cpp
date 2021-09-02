@@ -44,6 +44,37 @@ const TiXmlString::size_type TiXmlString::npos = static_cast< TiXmlString::size_
 TiXmlString::Rep TiXmlString::nullrep_ = { 0, 0, { '\0' } };
 
 
+void *TiXmlString::operator new (size_t size)
+{
+	return dMemory::Malloc(size);
+}
+
+void *TiXmlString::operator new[](size_t size)
+{
+	return dMemory::Malloc(size);
+}
+
+void TiXmlString::operator delete (void* ptr)
+{
+	dMemory::Free(ptr);
+}
+
+void TiXmlString::operator delete[](void* ptr)
+{
+	dMemory::Free(ptr);
+}
+
+void* TiXmlString::Malloc(size_type size)
+{
+	return dMemory::Malloc(size);
+}
+
+void TiXmlString::Free(void* ptr)
+{
+	dMemory::Free(ptr);
+}
+
+
 void TiXmlString::reserve (size_type cap)
 {
 	if (cap > capacity())
