@@ -18,12 +18,23 @@
 #define D_NEWTON_API
 #define D_COLLISION_API
 
+#ifdef D_CLASS_REFLECTION
+	#undef D_CLASS_REFLECTION
+#endif
+
+#ifdef D_MSV_NEWTON_ALIGN_16
+	#undef D_MSV_NEWTON_ALIGN_16
+#endif
+
+#ifdef D_MSV_NEWTON_ALIGN_32
+	#undef D_MSV_NEWTON_ALIGN_32
+#endif
+
+#define D_CLASS_REFLECTION(x)
 #define D_MSV_NEWTON_ALIGN_16
 #define D_GCC_NEWTON_ALIGN_16
 #define D_MSV_NEWTON_ALIGN_32
 #define D_GCC_NEWTON_ALIGN_32
-
-#define D_CLASS_REFLECTION(x)
 
 typedef int8_t dInt8;
 typedef uint8_t dUnsigned8;

@@ -30,11 +30,12 @@
 #include "dCoreStdafx.h"
 #include "dTypes.h"
 #include "dMemory.h"
+#include "dClassAlloc.h"
 
 //#define DG_HEAP_DEBUG_CHECK
 
 template <class OBJECT, class KEY>
-class dHeapBase
+class dHeapBase: public dClassAlloc
 {
 	protected:
 	struct RECORD 
@@ -75,7 +76,7 @@ class dDownHeap: public dHeapBase<OBJECT, KEY>
 	dDownHeap (dInt32 maxElements);
 	dDownHeap (const void * const buffer, dInt32 sizeInBytes);
 
-	void Pop () {Remove (0);}
+	void Pop();
 	void Push (OBJECT &obj, KEY key);
 	void Sort ();
 	void Remove (dInt32 Index);
@@ -89,7 +90,7 @@ class dUpHeap: public dHeapBase<OBJECT, KEY>
 	dUpHeap (dInt32 maxElements);
 	dUpHeap (const void * const buffer, dInt32 sizeInBytes);
 
-	void Pop () {Remove (0);}
+	void Pop();
 	void Push (OBJECT &obj, KEY key);
 	void Sort ();
 	void Remove (dInt32 Index);
@@ -98,7 +99,8 @@ class dUpHeap: public dHeapBase<OBJECT, KEY>
 
 template <class OBJECT, class KEY>
 dHeapBase<OBJECT,KEY>::dHeapBase (dInt32 maxElements)
-	:m_pool((RECORD *)dMemory::Malloc(maxElements * sizeof(RECORD)))
+	:dClassAlloc()
+	,m_pool((RECORD *)dMemory::Malloc(maxElements * sizeof(RECORD)))
 	,m_curCount(0)
 	,m_maxCount(maxElements)
 	,m_bufferIsOwnned(true)
@@ -108,7 +110,8 @@ dHeapBase<OBJECT,KEY>::dHeapBase (dInt32 maxElements)
 
 template <class OBJECT, class KEY>
 dHeapBase<OBJECT,KEY>::dHeapBase (const void * const buffer, dInt32 sizeInBytes)
-	:m_pool((RECORD *)buffer)
+	:dClassAlloc()
+	,m_pool((RECORD *)buffer)
 	,m_curCount(0)
 	,m_maxCount(dInt32(sizeInBytes / sizeof(RECORD)))
 	,m_bufferIsOwnned(false)
@@ -243,6 +246,13 @@ void dDownHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 }
 
 template <class OBJECT, class KEY>
+void dDownHeap<OBJECT, KEY>::Pop()
+{
+	//dDownHeap<OBJECT, KEY>::Remove(0);
+	Remove(0);
+}
+
+template <class OBJECT, class KEY>
 void dDownHeap<OBJECT,KEY>::Remove (dInt32 index)
 {
 	dHeapBase<OBJECT, KEY>::m_curCount--;
@@ -374,7 +384,6 @@ void dUpHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 {
 	dHeapBase<OBJECT,KEY>::m_curCount ++;
 
-	//dInt32 j;
 	dInt32 i = dHeapBase<OBJECT,KEY>::m_curCount;
 	for (dInt32 j = 0; i; i = j)
 	{
@@ -389,6 +398,12 @@ void dUpHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
 	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = obj;
 	dAssert (SanityCheck());
+}
+
+template <class OBJECT, class KEY>
+void dUpHeap<OBJECT, KEY>::Pop()
+{ 
+	Remove(0); 
 }
 
 template <class OBJECT, class KEY>

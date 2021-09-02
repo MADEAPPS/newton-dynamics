@@ -57,7 +57,7 @@ class dEdge
 	dInt32 m_mark;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-class dPolyhedra: public dClassAlloc, public dTree <dEdge, dEdgeKey>
+class dPolyhedra: public dTree <dEdge, dEdgeKey>
 {
 	public:
 	class dgPairKey
@@ -255,8 +255,7 @@ inline dInt32 dPolyhedra::GetEdgeCount() const
 }
 
 inline dPolyhedra::dPolyhedra()
-	:dClassAlloc()
-	,dTree <dEdge, dInt64>()
+	:dTree <dEdge, dInt64>()
 	,m_baseMark(0)
 	,m_edgeMark(0)
 	,m_faceSecuence(0)

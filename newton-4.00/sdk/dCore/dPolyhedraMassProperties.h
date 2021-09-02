@@ -24,8 +24,9 @@
 
 #include "dCoreStdafx.h"
 #include "dTypes.h"
+#include "dClassAlloc.h"
 
-class dPolyhedraMassProperties
+class dPolyhedraMassProperties: public dClassAlloc
 {
 	public:
 	D_CORE_API dPolyhedraMassProperties();

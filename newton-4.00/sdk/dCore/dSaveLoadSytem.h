@@ -25,6 +25,7 @@
 #include "dCoreStdafx.h"
 #include "dTypes.h"
 #include "dTree.h"
+#include "dClassAlloc.h"
 
 class ndBody;
 class ndShape;
@@ -51,7 +52,7 @@ class ndModelLoaderCache: public dTree<const ndModel*, dInt32>
 {
 };
 
-class dLoadSaveBase
+class dLoadSaveBase: public dClassAlloc
 {
 	public:
 	class dLoadDescriptor

@@ -25,6 +25,7 @@
 #include "dPolyhedraMassProperties.h"
 
 dPolyhedraMassProperties::dPolyhedraMassProperties()
+	:dClassAlloc()
 {
 	memset (this, 0, sizeof (dPolyhedraMassProperties));
 	mult[0] = dFloat32 (1.0f/6.0f); 

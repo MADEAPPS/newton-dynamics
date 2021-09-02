@@ -33,8 +33,7 @@ ndDemoSubMeshMaterial::~ndDemoSubMeshMaterial()
 }
 
 ndDemoMeshInterface::ndDemoMeshInterface()
-	:dClassAlloc()
-	,dRefCounter<ndDemoMeshInterface>()
+	:dRefCounter<ndDemoMeshInterface>()
 	,m_name()
 	,m_isVisible(true)
 {

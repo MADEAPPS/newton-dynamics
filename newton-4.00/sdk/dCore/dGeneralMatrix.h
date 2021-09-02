@@ -125,7 +125,8 @@ T dSymmetricConjugateGradientSolver<T>::SolveInternal(dInt32 size, T tolerance, 
 		if ((j % 50) != 49) 
 		{
 			dMulAdd(size, m_r0, m_r0, m_z0, -alpha);
-		} else 
+		} 
+		else 
 		{
 			MatrixTimeVector(m_z0, x);
 			dSub(size, m_r0, b, m_z0);

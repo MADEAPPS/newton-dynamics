@@ -25,13 +25,15 @@
 #include "dCoreStdafx.h"
 #include "dDebug.h"
 #include "dVector.h"
+#include "dClassAlloc.h"
 
 D_MSV_NEWTON_ALIGN_32
-class dRay
+class dRay: public dClassAlloc
 {
 	public:
 	dRay(const dVector& l0, const dVector& l1)
-		:m_p0(l0 & dVector::m_triplexMask)
+		:dClassAlloc()
+		,m_p0(l0 & dVector::m_triplexMask)
 		,m_p1(l1 & dVector::m_triplexMask)
 	{
 	}

@@ -26,6 +26,7 @@
 #include "dTypes.h"
 #include "dUtils.h"
 #include "dMemory.h"
+#include "dClassAlloc.h"
 #include "dContainersAlloc.h"
 
 // Note: this is a low level class for dTree use only
@@ -77,7 +78,7 @@ class dRedBackNode
 };
 
 template<class OBJECT, class KEY, class allocator = dContainersAlloc<OBJECT> >
-class dTree 
+class dTree: public dClassAlloc
 {
 	public:
 	class dNode: public allocator, public dRedBackNode
@@ -324,7 +325,8 @@ inline dUnsigned32 dRedBackNode::IsInTree () const
 
 template<class OBJECT, class KEY, class allocator>
 dTree<OBJECT, KEY, allocator>::dTree ()
-	:m_head(nullptr)
+	:dClassAlloc()
+	,m_head(nullptr)
 	,m_count(0)
 {
 }

@@ -153,8 +153,7 @@ class dVertexCollapseVertexMetric
 };
 
 dPolyhedra::dPolyhedra (const dPolyhedra &polyhedra)
-	:dClassAlloc()
-	,dTree <dEdge, dInt64>()
+	:dTree <dEdge, dInt64>()
 	,m_baseMark(0)
 	,m_edgeMark(0)
 	,m_faceSecuence(0)

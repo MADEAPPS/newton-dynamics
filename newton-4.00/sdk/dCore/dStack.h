@@ -26,8 +26,9 @@
 #include "dTypes.h"
 #include "dDebug.h"
 #include "dMemory.h"
+#include "dClassAlloc.h"
 
-class dStackBase
+class dStackBase : public dClassAlloc
 {
 	protected:
 	dStackBase (size_t size);
@@ -37,7 +38,8 @@ class dStackBase
 };
 
 inline dStackBase::dStackBase (size_t size)
-	:m_ptr (dMemory::Malloc (size_t (size)))
+	:dClassAlloc()
+	,m_ptr (dMemory::Malloc (size_t (size)))
 {
 }
 

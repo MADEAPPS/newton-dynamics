@@ -46,7 +46,7 @@ class ndDemoSubMesh
 	bool m_hasTranparency;
 };
 
-class ndDemoMeshInterface: public dClassAlloc, public dRefCounter<ndDemoMeshInterface>
+class ndDemoMeshInterface: public dRefCounter<ndDemoMeshInterface>
 {
 	public:
 	ndDemoMeshInterface();

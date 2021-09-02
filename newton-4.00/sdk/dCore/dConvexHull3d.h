@@ -57,7 +57,7 @@ class dConvexHull3dFace
 };
 
 D_MSV_NEWTON_ALIGN_32
-class dConvexHull3d: public dClassAlloc, public dList<dConvexHull3dFace>
+class dConvexHull3d: public dList<dConvexHull3dFace>
 {
 #ifdef	D_OLD_CONVEXHULL_3D
 	class dNormalMap;

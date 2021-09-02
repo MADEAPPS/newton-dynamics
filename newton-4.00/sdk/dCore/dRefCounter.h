@@ -13,9 +13,10 @@
 #define __DREF_COUNTER_H__
 
 #include "dCoreStdafx.h"
+#include "dClassAlloc.h"
 
 template<class T>
-class dRefCounter
+class dRefCounter: public dClassAlloc
 {
 	public:
 	dRefCounter();
@@ -33,7 +34,8 @@ class dRefCounter
 
 template<class T>
 dRefCounter<T>::dRefCounter(void)
-	:m_refCount(1)
+	:dClassAlloc()
+	,m_refCount(1)
 {
 }
 
