@@ -110,6 +110,11 @@ else()
 		add_definitions(-D_D_TINYXML_EXPORT_DLL)
 		add_definitions(-D_D_COLLISION_EXPORT_DLL)
 		add_library(${projectName} SHARED ${CPP_SOURCE})
+
+		if(MSVC OR MINGW)
+			target_link_options(${projectName} PUBLIC "/DEBUG") 
+		endif()
+
 	else()
 		add_library(${projectName} STATIC ${CPP_SOURCE})
 	endif()

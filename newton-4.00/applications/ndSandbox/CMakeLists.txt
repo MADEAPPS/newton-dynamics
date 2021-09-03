@@ -25,7 +25,6 @@ file(GLOB CPP_SOURCE
 	animation/*.cpp 
 )
 
-#source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" PREFIX source/ FILES ${CPP_SOURCE})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(./)
@@ -85,6 +84,8 @@ if(MSVC OR MINGW)
 	endif()
 
     target_link_libraries (${projectName} glu32 opengl32)
+
+	target_link_options(${projectName} PUBLIC "/DEBUG") 
 
     if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
 		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundSandboxStdafx.h")
