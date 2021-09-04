@@ -10,21 +10,19 @@
 
 #import bpy
 import newtonPy
-
+dir(newtonPy)
 
 class  Vector1(object):
 	def __init__(self):
-		self.x = 1
-		self.y = 2
-		self.z = 3
-		print ('esto es una mierda') 
+		self.x = 1.0
+		self.y = 2.0
+		self.z = 3.0
 
 	def Show(self):
-		print (self.x, self.y, self.z) 
+		print ('py  vector ', self.x, self.y, self.z) 
 
 xxx = Vector1 ()
-xxx.Show()
+print ('py  vector ', xxx.x, xxx.y, xxx.z) 
 
-#xxx = newtonPy.dVector()
-#xxx.SetX(1)
-#xxx.GetX()
+xxx1 = newtonPy.dVector(1.0, 2.0, 3.0, 4.0)
+print ('cpp vector ',  xxx1.GetX(), xxx1.GetY(), xxx1.GetZ())
