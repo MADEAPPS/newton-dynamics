@@ -20,7 +20,7 @@
 */
 
 // File : example.i 
-%module newtonPy
+%module newton
 #pragma SWIG nowarn=312		//Nested union not supported
 #pragma SWIG nowarn=325		//Nested struct not currently supported 
 #pragma SWIG nowarn=401		//Nothing known about base class
@@ -60,8 +60,7 @@
 //%array_class(int, intArray);
 //%array_class(double, doubleArray);
 
-
-%include "newtonPyConfig.h"
+%include "newtonConfig.h"
 %include "../../../sdk/dCore/dVectorSimd.h"
 %include "../../../sdk/dCore/dMatrix.h"
 %include "../../../sdk/dCore/dQuaternion.h"

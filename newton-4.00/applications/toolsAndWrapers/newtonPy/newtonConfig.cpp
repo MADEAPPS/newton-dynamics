@@ -9,8 +9,8 @@
 * freely
 */
 
-#include "newtonPyStdafx.h"
-#include "newtonPyConfig.h"
+#include "newtonStdafx.h"
+#include "newtonConfig.h"
 
 void *operator new (size_t size)
 {

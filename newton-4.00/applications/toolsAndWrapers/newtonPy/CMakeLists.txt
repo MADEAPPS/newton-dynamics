@@ -14,7 +14,7 @@ set (projectName "newtonPy")
 message (${projectName})
 
 set (swig "${CMAKE_SOURCE_DIR}/thirdParty/swigwin/swigwin-4.0.2/swig.exe")
-set (script "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonPy/newtonPy.i")
+set (script "${CMAKE_SOURCE_DIR}/applications/toolsAndWrapers/newtonPy/newton.i")
 execute_process(COMMAND ${swig} -c++ -python ${script})
 
 # source and header files
@@ -22,6 +22,7 @@ file(GLOB CPP_SOURCE
 	*.h
 	*.cpp
 	*.cxx
+	*.i
 	*.py
 )
 
@@ -54,36 +55,40 @@ endif()
 
 if(MSVC OR MINGW)
     if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
-		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YunewtonPyStdafx.h")
-		set_source_files_properties(newtonPyStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcnewtonPyStdafx.h")
-		set_source_files_properties(newtonPy_wrap.cxx PROPERTIES COMPILE_FLAGS "/Y-")
+		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YunewtonStdafx.h")
+		set_source_files_properties(newtonStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcnewtonStdafx.h")
+		set_source_files_properties(newton_wrap.cxx PROPERTIES COMPILE_FLAGS "/Y-")
     endif()
 endif()
 
 #install(FILES ${projectName}.py DESTINATION ${projectName})
 #install(TARGETS ${projectName} RUNTIME DESTINATION ${projectName})
 
-message ("${CMAKE_CURRENT_SOURCE_DIR}/${projectName}.py")
-add_custom_command(
-	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${projectName}.py ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/${projectName}.py)
+list(APPEND PY_SOURCE 
+	testClass.py
+	newton.py
+	ndbpy.py)
+#list(APPEND PY_SOURCE 
+#	testClass.py
+#	ndbpy.py 
+#	newton.py)
+set (pySrc "${CMAKE_CURRENT_SOURCE_DIR}")
 
+set (pyDst "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}")
+foreach(file IN ZIP_LISTS PY_SOURCE)
+	add_custom_command(
+	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+	ARGS -E copy ${pySrc}/${file_0} ${pyDst}/${file_0})
+endforeach()
 add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/ndbpy.py ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/ndbpy.py)
+	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/_newton.pyd)
 
+foreach(file IN ZIP_LISTS PY_SOURCE)
+	add_custom_command(
+	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+	ARGS -E copy ${pySrc}/${file_0} $ENV{Blender}/2.93/scripts/addons/${projectName}/${file_0})
+endforeach()
 add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/_$<TARGET_FILE_BASE_NAME:${projectName}>.pyd)
-
-add_custom_command(
-	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${projectName}.py $ENV{Blender}/2.93/scripts/addons/${projectName}/${projectName}.py)
-
-add_custom_command(
-	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/ndbpy.py $ENV{Blender}/2.93/scripts/addons/${projectName}/ndbpy.py)
-
-add_custom_command(
-	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy $<TARGET_FILE:${projectName}> $ENV{Blender}/2.93/scripts/addons/${projectName}/_$<TARGET_FILE_BASE_NAME:${projectName}>.pyd)
+	ARGS -E copy $<TARGET_FILE:${projectName}> $ENV{Blender}/2.93/scripts/addons/${projectName}/_newton.pyd)

@@ -2804,16 +2804,16 @@ static swig_module_info swig_module = {swig_types, 99, 0, 0, 0, 0};
 #define SWIG_TypeQuery SWIG_Python_TypeQuery
 
 /*-----------------------------------------------
-              @(target):= _newtonPy.so
+              @(target):= _newton.so
   ------------------------------------------------*/
 #if PY_VERSION_HEX >= 0x03000000
-#  define SWIG_init    PyInit__newtonPy
+#  define SWIG_init    PyInit__newton
 
 #else
-#  define SWIG_init    init_newtonPy
+#  define SWIG_init    init_newton
 
 #endif
-#define SWIG_name    "_newtonPy"
+#define SWIG_name    "_newton"
 
 #define SWIGVERSION 0x040002 
 #define SWIG_VERSION SWIGVERSION

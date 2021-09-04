@@ -8,21 +8,21 @@
 # including commercial applications, and to alter it and redistribute it
 # freely
 
-#import bpy
-import newtonPy
-dir(newtonPy)
 
-class  Vector1(object):
-	def __init__(self):
-		self.x = 1.0
-		self.y = 2.0
-		self.z = 3.0
+import bpy
+import sys
+import os
 
-	def Show(self):
-		print ('py  vector ', self.x, self.y, self.z) 
+dir = os.path.dirname('C:/Program Files/Blender Foundation/Blender 2.93/2.93/scripts/addons/newtonPy')
+if not dir in sys.path:
+    sys.path.append('C:/Program Files/Blender Foundation/Blender 2.93/2.93/scripts/addons/newtonPy')
+	#print (sys.path)
 
-xxx = Vector1 ()
-print ('py  vector ', xxx.x, xxx.y, xxx.z) 
+import newton
+import testClass
 
-xxx1 = newtonPy.dVector(1.0, 2.0, 3.0, 4.0)
-print ('cpp vector ',  xxx1.GetX(), xxx1.GetY(), xxx1.GetZ())
+pyVec = testClass.PythonVector ()
+print ('python vector: ', pyVec.x, pyVec.y, pyVec.z) 
+
+cppVec = newton.dVector(1.0, 2.0, 3.0, 4.0)
+print ('cpp    vector ',  cppVec.GetX(), cppVec.GetY(), cppVec.GetZ())
