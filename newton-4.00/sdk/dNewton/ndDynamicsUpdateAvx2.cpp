@@ -34,55 +34,55 @@
 	class ndAvxFloat
 	{
 		public:
-		D_INLINE ndAvxFloat()
+		inline ndAvxFloat()
 		{
 		}
 
-		D_INLINE ndAvxFloat(const dFloat32 val)
+		inline ndAvxFloat(const dFloat32 val)
 			:m_low(_mm256_set1_pd(val))
 			,m_high(_mm256_set1_pd(val))
 		{
 		}
 
-		D_INLINE ndAvxFloat(const dInt32 val)
+		inline ndAvxFloat(const dInt32 val)
 			:m_low(_mm256_castsi256_pd(_mm256_set1_epi64x(dInt64(val))))
 			,m_high(_mm256_castsi256_pd(_mm256_set1_epi64x(dInt64(val))))
 		{
 		}
 				
-		D_INLINE ndAvxFloat(const __m256d low, const __m256d high)
+		inline ndAvxFloat(const __m256d low, const __m256d high)
 			:m_low(low)
 			,m_high(high)
 		{
 		}
 
-		D_INLINE ndAvxFloat(const ndAvxFloat& copy)
+		inline ndAvxFloat(const ndAvxFloat& copy)
 			:m_low(copy.m_low)
 			,m_high(copy.m_high)
 		{
 		}
 
 		#ifdef D_USE_VECTOR_AVX
-			D_INLINE ndAvxFloat(const dVector& low, const dVector& high)
+			inline ndAvxFloat(const dVector& low, const dVector& high)
 				:m_low(low.m_type)
 				,m_high(high.m_type)
 			{
 			}
 		#else
-			D_INLINE ndAvxFloat(const dVector& low, const dVector& high)
+			inline ndAvxFloat(const dVector& low, const dVector& high)
 				:m_low(_mm256_set_m128d(low.m_typeHigh, low.m_typeLow))
 				,m_high(_mm256_set_m128d(high.m_typeHigh, high.m_typeLow))
 			{
 			}
 		#endif
 
-		D_INLINE ndAvxFloat(const ndAvxFloat* const baseAddr, const ndAvxFloat& index)
+		inline ndAvxFloat(const ndAvxFloat* const baseAddr, const ndAvxFloat& index)
 			:m_low(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_lowInt, 8))
 			,m_high(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_highInt, 8))
 		{
 		}
 
-		D_INLINE dFloat32& operator[] (dInt32 i)
+		inline dFloat32& operator[] (dInt32 i)
 		{
 			dAssert(i >= 0);
 			dAssert(i < D_AVX_WORD_GROUP_SIZE);
@@ -90,7 +90,7 @@
 			return ptr[i];
 		}
 
-		D_INLINE const dFloat32& operator[] (dInt32 i) const
+		inline const dFloat32& operator[] (dInt32 i) const
 		{
 			dAssert(i >= 0);
 			dAssert(i < D_AVX_WORD_GROUP_SIZE);
@@ -98,62 +98,62 @@
 			return ptr[i];
 		}
 
-		D_INLINE ndAvxFloat operator+ (const ndAvxFloat& A) const
+		inline ndAvxFloat operator+ (const ndAvxFloat& A) const
 		{
 			return ndAvxFloat(_mm256_add_pd(m_low, A.m_low), _mm256_add_pd(m_high, A.m_high));
 		}
 
-		D_INLINE ndAvxFloat operator- (const ndAvxFloat& A) const
+		inline ndAvxFloat operator- (const ndAvxFloat& A) const
 		{
 			return ndAvxFloat(_mm256_sub_pd(m_low, A.m_low), _mm256_sub_pd(m_high, A.m_high));
 		}
 
-		D_INLINE ndAvxFloat operator* (const ndAvxFloat& A) const
+		inline ndAvxFloat operator* (const ndAvxFloat& A) const
 		{
 			return ndAvxFloat(_mm256_mul_pd(m_low, A.m_low), _mm256_mul_pd(m_high, A.m_high));
 		}
 
-		D_INLINE ndAvxFloat MulAdd(const ndAvxFloat& A, const ndAvxFloat& B) const
+		inline ndAvxFloat MulAdd(const ndAvxFloat& A, const ndAvxFloat& B) const
 		{
 			return ndAvxFloat(_mm256_fmadd_pd(A.m_low, B.m_low, m_low), _mm256_fmadd_pd(A.m_high, B.m_high, m_high));
 		}
 
-		D_INLINE ndAvxFloat MulSub(const ndAvxFloat& A, const ndAvxFloat& B) const
+		inline ndAvxFloat MulSub(const ndAvxFloat& A, const ndAvxFloat& B) const
 		{
 			return ndAvxFloat(_mm256_fnmadd_pd(A.m_low, B.m_low, m_low), _mm256_fnmadd_pd(A.m_high, B.m_high, m_high));
 		}
 
-		D_INLINE ndAvxFloat operator> (const ndAvxFloat& A) const
+		inline ndAvxFloat operator> (const ndAvxFloat& A) const
 		{
 			return ndAvxFloat(_mm256_cmp_pd(m_low, A.m_low, _CMP_GT_OQ), _mm256_cmp_pd(m_high, A.m_high, _CMP_GT_OQ));
 		}
 
-		D_INLINE ndAvxFloat operator< (const ndAvxFloat& A) const
+		inline ndAvxFloat operator< (const ndAvxFloat& A) const
 		{
 			return ndAvxFloat(_mm256_cmp_pd(m_low, A.m_low, _CMP_LT_OQ), _mm256_cmp_pd(m_high, A.m_high, _CMP_LT_OQ));
 		}
 
-		D_INLINE ndAvxFloat operator| (const ndAvxFloat& A) const
+		inline ndAvxFloat operator| (const ndAvxFloat& A) const
 		{
 			return ndAvxFloat(_mm256_or_pd(m_low, A.m_low), _mm256_or_pd(m_high, A.m_high));
 		}
 
-		D_INLINE ndAvxFloat operator& (const ndAvxFloat& A) const
+		inline ndAvxFloat operator& (const ndAvxFloat& A) const
 		{
 			return ndAvxFloat(_mm256_and_pd(m_low, A.m_low), _mm256_and_pd(m_high, A.m_high));
 		}
 
-		D_INLINE ndAvxFloat GetMin(const ndAvxFloat& A) const
+		inline ndAvxFloat GetMin(const ndAvxFloat& A) const
 		{
 			return ndAvxFloat(_mm256_min_pd(m_low, A.m_low), _mm256_min_pd(m_high, A.m_high));
 		}
 
-		D_INLINE ndAvxFloat GetMax(const ndAvxFloat& A) const
+		inline ndAvxFloat GetMax(const ndAvxFloat& A) const
 		{
 			return ndAvxFloat(_mm256_max_pd(m_low, A.m_low), _mm256_max_pd(m_high, A.m_high));
 		}
 
-		D_INLINE ndAvxFloat Select(const ndAvxFloat& data, const ndAvxFloat& mask) const
+		inline ndAvxFloat Select(const ndAvxFloat& data, const ndAvxFloat& mask) const
 		{
 			// (((b ^ a) & mask)^a)
 			//return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
@@ -164,7 +164,7 @@
 		}
 
 
-		D_INLINE dFloat32 AddHorizontal() const
+		inline dFloat32 AddHorizontal() const
 		{
 			//__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
 			//__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
@@ -176,7 +176,7 @@
 			return *((dFloat32*)&tmp2);
 		}
 
-		static D_INLINE void FlushRegisters()
+		static inline void FlushRegisters()
 		{
 			_mm256_zeroall();
 		}
@@ -202,32 +202,32 @@
 	class ndAvxFloat
 	{
 		public:
-		D_INLINE ndAvxFloat()
+		inline ndAvxFloat()
 		{
 		}
 
-		D_INLINE ndAvxFloat(const dFloat32 val)
+		inline ndAvxFloat(const dFloat32 val)
 			:m_type(_mm256_set1_ps(val))
 		{
 		}
 
-		D_INLINE ndAvxFloat(const dInt32 val)
+		inline ndAvxFloat(const dInt32 val)
 			:m_type(_mm256_castsi256_ps(_mm256_set1_epi32(val)))
 		{
 		}
 
 
-		D_INLINE ndAvxFloat(const __m256 type)
+		inline ndAvxFloat(const __m256 type)
 			: m_type(type)
 		{
 		}
 
-		D_INLINE ndAvxFloat(const ndAvxFloat& copy)
+		inline ndAvxFloat(const ndAvxFloat& copy)
 			: m_type(copy.m_type)
 		{
 		}
 
-		D_INLINE ndAvxFloat(const dVector& low, const dVector& high)
+		inline ndAvxFloat(const dVector& low, const dVector& high)
 			#ifdef D_SCALAR_VECTOR_CLASS
 			:m_type(_mm256_set_m128(_mm_set_ps(low.m_w, low.m_y, low.m_z, low.m_x), _mm_set_ps(high.m_w, high.m_y, high.m_z, high.m_x)))
 			#else
@@ -236,12 +236,12 @@
 		{
 		}
 
-		D_INLINE ndAvxFloat(const ndAvxFloat* const baseAddr, const ndAvxFloat& index)
+		inline ndAvxFloat(const ndAvxFloat* const baseAddr, const ndAvxFloat& index)
 			: m_type(_mm256_i32gather_ps(&(*baseAddr)[0], index.m_typeInt, 4))
 		{
 		}
 
-		D_INLINE dFloat32& operator[] (dInt32 i)
+		inline dFloat32& operator[] (dInt32 i)
 		{
 			dAssert(i >= 0);
 			dAssert(i < D_AVX_WORD_GROUP_SIZE);
@@ -249,7 +249,7 @@
 			return ptr[i];
 		}
 
-		D_INLINE const dFloat32& operator[] (dInt32 i) const
+		inline const dFloat32& operator[] (dInt32 i) const
 		{
 			dAssert(i >= 0);
 			dAssert(i < D_AVX_WORD_GROUP_SIZE);
@@ -257,62 +257,62 @@
 			return ptr[i];
 		}
 
-		D_INLINE ndAvxFloat operator+ (const ndAvxFloat& A) const
+		inline ndAvxFloat operator+ (const ndAvxFloat& A) const
 		{
 			return _mm256_add_ps(m_type, A.m_type);
 		}
 
-		D_INLINE ndAvxFloat operator- (const ndAvxFloat& A) const
+		inline ndAvxFloat operator- (const ndAvxFloat& A) const
 		{
 			return _mm256_sub_ps(m_type, A.m_type);
 		}
 
-		D_INLINE ndAvxFloat operator* (const ndAvxFloat& A) const
+		inline ndAvxFloat operator* (const ndAvxFloat& A) const
 		{
 			return _mm256_mul_ps(m_type, A.m_type);
 		}
 
-		D_INLINE ndAvxFloat MulAdd(const ndAvxFloat& A, const ndAvxFloat& B) const
+		inline ndAvxFloat MulAdd(const ndAvxFloat& A, const ndAvxFloat& B) const
 		{
 			return _mm256_fmadd_ps(A.m_type, B.m_type, m_type);
 		}
 
-		D_INLINE ndAvxFloat MulSub(const ndAvxFloat& A, const ndAvxFloat& B) const
+		inline ndAvxFloat MulSub(const ndAvxFloat& A, const ndAvxFloat& B) const
 		{
 			return _mm256_fnmadd_ps(A.m_type, B.m_type, m_type);
 		}
 
-		D_INLINE ndAvxFloat operator> (const ndAvxFloat& A) const
+		inline ndAvxFloat operator> (const ndAvxFloat& A) const
 		{
 			return _mm256_cmp_ps(m_type, A.m_type, _CMP_GT_OQ);
 		}
 
-		D_INLINE ndAvxFloat operator< (const ndAvxFloat& A) const
+		inline ndAvxFloat operator< (const ndAvxFloat& A) const
 		{
 			return _mm256_cmp_ps(m_type, A.m_type, _CMP_LT_OQ);
 		}
 
-		D_INLINE ndAvxFloat operator| (const ndAvxFloat& A) const
+		inline ndAvxFloat operator| (const ndAvxFloat& A) const
 		{
 			return _mm256_or_ps(m_type, A.m_type);
 		}
 
-		D_INLINE ndAvxFloat operator& (const ndAvxFloat& A) const
+		inline ndAvxFloat operator& (const ndAvxFloat& A) const
 		{
 			return _mm256_and_ps(m_type, A.m_type);
 		}
 
-		D_INLINE ndAvxFloat GetMin(const ndAvxFloat& A) const
+		inline ndAvxFloat GetMin(const ndAvxFloat& A) const
 		{
 			return _mm256_min_ps(m_type, A.m_type);
 		}
 
-		D_INLINE ndAvxFloat GetMax(const ndAvxFloat& A) const
+		inline ndAvxFloat GetMax(const ndAvxFloat& A) const
 		{
 			return _mm256_max_ps(m_type, A.m_type);
 		}
 
-		D_INLINE ndAvxFloat Select(const ndAvxFloat& data, const ndAvxFloat& mask) const
+		inline ndAvxFloat Select(const ndAvxFloat& data, const ndAvxFloat& mask) const
 		{
 			// (((b ^ a) & mask)^a)
 			//return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
@@ -320,7 +320,7 @@
 		}
 
 
-		D_INLINE dFloat32 AddHorizontal() const
+		inline dFloat32 AddHorizontal() const
 		{
 			__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
 			__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
@@ -328,7 +328,7 @@
 			return *((dFloat32*)&tmp2);
 		}
 
-		static D_INLINE void FlushRegisters()
+		static inline void FlushRegisters()
 		{
 			_mm256_zeroall();
 		}

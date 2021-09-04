@@ -35,36 +35,38 @@ class dBigVector;
 //
 // *****************************************************************************************
 D_MSV_NEWTON_ALIGN_16
-class dVector : public dClassAlloc
+class dVector
 {
 	#define PERMUTE_MASK(w, z, y, x) _MM_SHUFFLE (w, z, y, x)
 	public:
-	D_INLINE dVector() 
+	D_OPERATOR_NEW_AND_DELETE
+
+	inline dVector() 
 	{
 	}
 
-	D_INLINE dVector(const __m128i type)
+	inline dVector(const __m128i type)
 		:m_typeInt (type)
 	{
 	}
 
-	D_INLINE dVector(const __m128 type)
+	inline dVector(const __m128 type)
 		: m_type(type)
 	{
 	}
 
-	D_INLINE dVector (const dFloat32 a)
+	inline dVector (const dFloat32 a)
 		:m_type(_mm_set_ps1(a)) 
 	{
 	}
 
-	D_INLINE dVector (const dFloat32* const ptr)
+	inline dVector (const dFloat32* const ptr)
 		:m_type(_mm_loadu_ps (ptr))
 	{
 	}
 
 	// emulate gather instruction
-	D_INLINE dVector(const dFloat32* const baseAddr, const dInt32* const index)
+	inline dVector(const dFloat32* const baseAddr, const dInt32* const index)
 		:m_x(baseAddr[index[0]])
 		,m_y(baseAddr[index[1]])
 		,m_z(baseAddr[index[2]])
@@ -73,166 +75,166 @@ class dVector : public dClassAlloc
 	}
 
 #ifndef	D_NEWTON_USE_DOUBLE
-	D_INLINE dVector(const dFloat64* const ptr)
+	inline dVector(const dFloat64* const ptr)
 		:m_type(_mm_set_ps(dFloat32(ptr[3]), dFloat32(ptr[2]), dFloat32(ptr[1]), dFloat32(ptr[0])))
 	{
 	}
 #endif
 
-	D_INLINE dVector (const dVector& copy)
+	inline dVector (const dVector& copy)
 		:m_type(copy.m_type)
 	{
 	}
 
-	D_INLINE dVector (const dBigVector& copy)
+	inline dVector (const dBigVector& copy)
 		:m_type(_mm_shuffle_ps (_mm_cvtpd_ps (((__m128d*)&copy)[0]), _mm_cvtpd_ps (((__m128d*)&copy)[1]), PERMUTE_MASK(1, 0, 1, 0)))
 	{
 		dAssert (dCheckVector ((*this)));
 	}
 
-	D_INLINE dVector (dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
+	inline dVector (dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
 		:m_type(_mm_set_ps(w, z, y, x))
 	{
 	}
 
-	D_INLINE dVector (dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
+	inline dVector (dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
 		:m_type(_mm_set_ps(*(dFloat32*)&iw, *(dFloat32*)&iz, *(dFloat32*)&iy, *(dFloat32*)&ix))
 	{
 	}
 
-	D_INLINE dFloat32 GetX() const
+	inline dFloat32 GetX() const
 	{
 		return m_x;
 	}
 
-	D_INLINE dFloat32 GetY() const
+	inline dFloat32 GetY() const
 	{
 		return m_y;
 	}
 
-	D_INLINE dFloat32 GetZ() const
+	inline dFloat32 GetZ() const
 	{
 		return m_z;
 	}
 
-	D_INLINE dFloat32 GetW() const
+	inline dFloat32 GetW() const
 	{
 		return m_w;
 	}
 
-	D_INLINE void SetX(dFloat32 x)
+	inline void SetX(dFloat32 x)
 	{
 		m_x = x;
 	}
 
-	D_INLINE void SetY(dFloat32 x)
+	inline void SetY(dFloat32 x)
 	{
 		m_y = x;
 	}
 
-	D_INLINE void SetZ(dFloat32 x)
+	inline void SetZ(dFloat32 x)
 	{
 		m_z = x;
 	}
 
-	D_INLINE void SetW(dFloat32 x)
+	inline void SetW(dFloat32 x)
 	{
 		m_w = x;
 	}
 
-	D_INLINE dFloat32 GetScalar () const
+	inline dFloat32 GetScalar () const
 	{
 		return _mm_cvtss_f32 (m_type);
 	}
 
-	D_INLINE void Store (dFloat32* const dst) const
+	inline void Store (dFloat32* const dst) const
 	{
 		_mm_storeu_ps(dst, m_type);
 	}
 
-	D_INLINE dVector BroadcastX () const
+	inline dVector BroadcastX () const
 	{
 		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(0, 0, 0, 0));
 	}
 
-	D_INLINE dVector BroadcastY () const
+	inline dVector BroadcastY () const
 	{
 		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(1, 1, 1, 1));
 	}
 
-	D_INLINE dVector BroadcastZ () const
+	inline dVector BroadcastZ () const
 	{
 		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(2, 2, 2, 2));
 	}
 
-	D_INLINE dVector BroadcastW () const
+	inline dVector BroadcastW () const
 	{
 		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 3, 3, 3));
 	}
 
-	D_INLINE dVector Scale (dFloat32 s) const
+	inline dVector Scale (dFloat32 s) const
 	{
 		return _mm_mul_ps (m_type, _mm_set_ps1(s));
 	}
 
-	D_INLINE dFloat32& operator[] (dInt32 i)
+	inline dFloat32& operator[] (dInt32 i)
 	{
 		dAssert (i < 4);
 		dAssert (i >= 0);
 		return m_f[i];
 	}
 
-	D_INLINE const dFloat32& operator[] (dInt32 i) const
+	inline const dFloat32& operator[] (dInt32 i) const
 	{
 		dAssert (i < 4);
 		dAssert (i >= 0);
 		return m_f[i];
 	}
 
-	D_INLINE dVector operator+ (const dVector& A) const
+	inline dVector operator+ (const dVector& A) const
 	{
 		return _mm_add_ps (m_type, A.m_type);	
 	}
 
-	D_INLINE dVector operator- (const dVector& A) const 
+	inline dVector operator- (const dVector& A) const 
 	{
 		return _mm_sub_ps (m_type, A.m_type);	
 	}
 
-	D_INLINE dVector operator* (const dVector& A) const
+	inline dVector operator* (const dVector& A) const
 	{
 		return _mm_mul_ps(m_type, A.m_type);
 	}
 
-	D_INLINE dVector& operator+= (const dVector& A)
+	inline dVector& operator+= (const dVector& A)
 	{
 		return (*this = _mm_add_ps (m_type, A.m_type));
 	}
 
-	D_INLINE dVector& operator-= (const dVector& A)
+	inline dVector& operator-= (const dVector& A)
 	{
 		return (*this = _mm_sub_ps (m_type, A.m_type));
 	}
 
-	D_INLINE dVector& operator*= (const dVector& A)
+	inline dVector& operator*= (const dVector& A)
 	{
 		return (*this = _mm_mul_ps(m_type, A.m_type));
 	}
 
 	// return cross product
-	D_INLINE dVector CrossProduct (const dVector& B) const
+	inline dVector CrossProduct (const dVector& B) const
 	{
 		return _mm_sub_ps (_mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 0, 2, 1)), _mm_shuffle_ps (B.m_type, B.m_type, PERMUTE_MASK(3, 1, 0, 2))),
 			   _mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PERMUTE_MASK(3, 0, 2, 1))));
 	}
 
-	D_INLINE dVector DotProduct(const dVector& A) const
+	inline dVector DotProduct(const dVector& A) const
 	{
 		const dVector tmp(_mm_mul_ps(m_type, A.m_type));
 		return tmp.AddHorizontal();
 	}
 
-	D_INLINE dVector CrossProduct (const dVector& A, const dVector& B) const
+	inline dVector CrossProduct (const dVector& A, const dVector& B) const
 	{
 		dFloat32 cofactor[3][3];
 		dFloat32 array[4][4];
@@ -274,22 +276,22 @@ class dVector : public dClassAlloc
 		return normal;
 	}
 
-	D_INLINE dVector Reciproc () const
+	inline dVector Reciproc () const
 	{
 		return _mm_div_ps (m_one.m_type, m_type);
 	}
 
-	D_INLINE dVector MulAdd(const dVector& A, const dVector& B) const
+	inline dVector MulAdd(const dVector& A, const dVector& B) const
 	{
 		return _mm_add_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
 	}
 
-	D_INLINE dVector MulSub(const dVector& A, const dVector& B) const
+	inline dVector MulSub(const dVector& A, const dVector& B) const
 	{
 		return _mm_sub_ps(m_type, _mm_mul_ps(A.m_type, B.m_type));
 	}
 
-	D_INLINE dVector AddHorizontal () const
+	inline dVector AddHorizontal () const
 	{
 		#ifdef D_USE_SSE3
 			__m128 tmp (_mm_hadd_ps (m_type, m_type));
@@ -300,7 +302,7 @@ class dVector : public dClassAlloc
 		#endif	
 	}
 
-	D_INLINE dVector Abs () const
+	inline dVector Abs () const
 	{
 		return _mm_and_ps (m_type, m_signMask.m_type);
 	}
@@ -321,18 +323,18 @@ class dVector : public dClassAlloc
 		return _mm_min_ps (m_type, data.m_type);
 	}
 
-	D_INLINE dVector GetInt () const
+	inline dVector GetInt () const
 	{
 		return dVector(_mm_cvtps_epi32(Floor().m_type));
 	}
 
-	D_INLINE dVector TestZero() const
+	inline dVector TestZero() const
 	{
 		//return dVector (_mm_cmpeq_epi32 (m_typeInt, m_zero.m_typeInt)) & m_negOne;
 		return m_negOne & (*this == m_zero);
 	}
 
-	D_INLINE dVector Floor () const
+	inline dVector Floor () const
 	{
 		dVector truncated (_mm_cvtepi32_ps (_mm_cvttps_epi32 (m_type)));
 		dVector ret (truncated - (dVector::m_one & (*this < truncated)));
@@ -343,107 +345,107 @@ class dVector : public dClassAlloc
 		return ret;
 	}
 
-	D_INLINE dVector Sqrt () const
+	inline dVector Sqrt () const
 	{
 		return _mm_sqrt_ps(m_type);
 	}
 
-	D_INLINE dVector InvSqrt () const
+	inline dVector InvSqrt () const
 	{
 		dVector tmp0 (_mm_rsqrt_ps(m_type));
 		return m_half * tmp0 * (m_three - *this * tmp0 * tmp0);
 	}
 
-	D_INLINE dVector InvMagSqrt () const
+	inline dVector InvMagSqrt () const
 	{
 		return DotProduct(*this).InvSqrt();
 	}
 
-	D_INLINE dVector Normalize () const
+	inline dVector Normalize () const
 	{
 		return Scale(dFloat32(1.0f) / dSqrt(DotProduct(*this).GetScalar()));
 	}
 
 	// relational operators
-	D_INLINE dVector operator> (const dVector& data) const
+	inline dVector operator> (const dVector& data) const
 	{
 		return _mm_cmpgt_ps (m_type, data.m_type);	
 	}
 
-	D_INLINE dVector operator== (const dVector& data) const
+	inline dVector operator== (const dVector& data) const
 	{
 		return _mm_cmpeq_ps (m_type, data.m_type);	
 	}
 
-	D_INLINE dVector operator< (const dVector& data) const
+	inline dVector operator< (const dVector& data) const
 	{
 		return _mm_cmplt_ps (m_type, data.m_type);	
 	}
 
-	D_INLINE dVector operator>= (const dVector& data) const
+	inline dVector operator>= (const dVector& data) const
 	{
 		return _mm_cmpge_ps (m_type, data.m_type);	
 	}
 
-	D_INLINE dVector operator<= (const dVector& data) const
+	inline dVector operator<= (const dVector& data) const
 	{
 		return _mm_cmple_ps (m_type, data.m_type);	
 	}
 
 	// logical operations
-	D_INLINE dVector operator& (const dVector& data) const
+	inline dVector operator& (const dVector& data) const
 	{
 		return _mm_and_ps (m_type, data.m_type);	
 	}
 
-	D_INLINE dVector operator| (const dVector& data) const
+	inline dVector operator| (const dVector& data) const
 	{
 		return _mm_or_ps (m_type, data.m_type);	
 	}
 
-	D_INLINE dVector operator^ (const dVector& data) const
+	inline dVector operator^ (const dVector& data) const
 	{
 		return _mm_xor_ps (m_type, data.m_type);	
 	}
 
-	D_INLINE dVector AndNot(const dVector& data) const
+	inline dVector AndNot(const dVector& data) const
 	{
 		return _mm_andnot_ps(data.m_type, m_type);
 	}
 
-	D_INLINE dVector Select(const dVector& data, const dVector& mask) const
+	inline dVector Select(const dVector& data, const dVector& mask) const
 	{
 		// (((b ^ a) & mask)^a)
 		//return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
 		return  _mm_xor_ps(m_type, _mm_and_ps (mask.m_type, _mm_xor_ps(m_type, data.m_type)));
 	}
 
-	D_INLINE dInt32 GetSignMask() const
+	inline dInt32 GetSignMask() const
 	{
 		return _mm_movemask_ps(m_type);
 	} 
 
-	D_INLINE dVector ShiftRight() const
+	inline dVector ShiftRight() const
 	{
 		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(2, 1, 0, 3));
 	}
 
-	D_INLINE dVector ShiftTripleRight () const
+	inline dVector ShiftTripleRight () const
 	{
 		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(3, 1, 0, 2));
 	}
 
-	D_INLINE dVector ShiftTripleLeft () const
+	inline dVector ShiftTripleLeft () const
 	{
 		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 0, 2, 1));
 	}
 
-	D_INLINE dVector ShiftRightLogical (dInt32 bits) const
+	inline dVector ShiftRightLogical (dInt32 bits) const
 	{
 		return dVector (_mm_srli_epi32(m_typeInt, bits)); 
 	}
 
-	D_INLINE static void Transpose4x4 (dVector& dst0, dVector& dst1, dVector& dst2, dVector& dst3, const dVector& src0, const dVector& src1, const dVector& src2, const dVector& src3)
+	inline static void Transpose4x4 (dVector& dst0, dVector& dst1, dVector& dst2, dVector& dst3, const dVector& src0, const dVector& src1, const dVector& src2, const dVector& src3)
 	{
 		__m128 tmp0 (_mm_unpacklo_ps (src0.m_type, src1.m_type));
 		__m128 tmp1 (_mm_unpacklo_ps (src2.m_type, src3.m_type));
@@ -457,14 +459,14 @@ class dVector : public dClassAlloc
 	}
 
 #ifdef _DEBUG
-	//D_INLINE void Trace(char* const name) const
-	D_INLINE void Trace(char* const) const
+	//inline void Trace(char* const name) const
+	inline void Trace(char* const) const
 	{
 		dAssert(0);
 		//dTrace(("%s %f %f %f %f\n", name, m_x, m_y, m_z, m_w));
 	}
 #else 
-	D_INLINE void Trace(char* const) const {}
+	inline void Trace(char* const) const {}
 #endif
 
 	union 
@@ -519,35 +521,37 @@ class dBigVector
 	#define PERMUT_MASK_DOUBLE(y, x) _MM_SHUFFLE2 (y, x)
 
 	public:
-	D_INLINE dBigVector()
+	D_OPERATOR_NEW_AND_DELETE
+
+	inline dBigVector()
 	{
 	}
 
-	D_INLINE dBigVector(const dBigVector& copy)
+	inline dBigVector(const dBigVector& copy)
 		:m_typeLow(copy.m_typeLow)
 		,m_typeHigh(copy.m_typeHigh)
 	{
 	}
 
-	D_INLINE dBigVector(const __m128d typeLow, const __m128d typeHigh)
+	inline dBigVector(const __m128d typeLow, const __m128d typeHigh)
 		:m_typeLow(typeLow)
 		,m_typeHigh(typeHigh)
 	{
 	}
 
-	D_INLINE dBigVector(const __m128i typeLow, const __m128i typeHigh)
+	inline dBigVector(const __m128i typeLow, const __m128i typeHigh)
 		:m_typeIntLow(typeLow)
 		,m_typeIntHigh(typeHigh)
 	{
 	}
 
-	D_INLINE dBigVector(const dFloat64 a)
+	inline dBigVector(const dFloat64 a)
 		:m_typeLow(_mm_set1_pd(a))
 		,m_typeHigh(_mm_set1_pd(a))
 	{
 	}
 
-	D_INLINE dBigVector(const dFloat64* const baseAddr, const dInt64* const index)
+	inline dBigVector(const dFloat64* const baseAddr, const dInt64* const index)
 		:m_x(baseAddr[index[0]])
 		,m_y(baseAddr[index[1]])
 		,m_z(baseAddr[index[2]])
@@ -556,156 +560,156 @@ class dBigVector
 	}
 
 #ifdef D_NEWTON_USE_DOUBLE
-	D_INLINE dBigVector (const dFloat32* const ptr)
+	inline dBigVector (const dFloat32* const ptr)
 		:m_typeLow(_mm_loadu_pd(ptr))
 		,m_typeHigh(_mm_loadu_pd(&ptr[2]))
 	{
 	}
 #else
 
-	D_INLINE dBigVector(const dVector& v)
+	inline dBigVector(const dVector& v)
 		:m_typeLow(_mm_cvtps_pd (v.m_type))
 		,m_typeHigh(_mm_cvtps_pd (_mm_shuffle_ps (v.m_type, v.m_type, PERMUTE_MASK(3, 2, 3, 2))))
 	{
 		dAssert(dCheckVector((*this)));
 	}
 
-	D_INLINE dBigVector(const dFloat64* const ptr)
+	inline dBigVector(const dFloat64* const ptr)
 		:m_typeLow(_mm_loadu_pd(ptr))
 		,m_typeHigh(_mm_loadu_pd(&ptr[2]))
 	{
 	}
 #endif
 
-	D_INLINE dBigVector(dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w)
+	inline dBigVector(dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w)
 		:m_typeLow(_mm_set_pd(y, x))
 		,m_typeHigh(_mm_set_pd(w, z))
 	{
 	}
 
-	D_INLINE dBigVector(dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
+	inline dBigVector(dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
 		:m_ix(dInt64(ix)), m_iy(dInt64(iy)), m_iz(dInt64(iz)), m_iw(dInt64(iw))
 	{
 	}
 
-	D_INLINE dBigVector(dInt64 ix, dInt64 iy, dInt64 iz, dInt64 iw)
+	inline dBigVector(dInt64 ix, dInt64 iy, dInt64 iz, dInt64 iw)
 		:m_ix(ix), m_iy(iy), m_iz(iz), m_iw(iw)
 	{
 	}
 
-	D_INLINE dFloat64 GetX() const
+	inline dFloat64 GetX() const
 	{
 		return m_x;
 	}
 
-	D_INLINE dFloat64 GetY() const
+	inline dFloat64 GetY() const
 	{
 		return m_y;
 	}
 
-	D_INLINE dFloat64 GetZ() const
+	inline dFloat64 GetZ() const
 	{
 		return m_z;
 	}
 
-	D_INLINE dFloat64 GetW() const
+	inline dFloat64 GetW() const
 	{
 		return m_w;
 	}
 
-	D_INLINE void SetX(dFloat64 x)
+	inline void SetX(dFloat64 x)
 	{
 		m_x = x;
 	}
 
-	D_INLINE void SetY(dFloat64 x)
+	inline void SetY(dFloat64 x)
 	{
 		m_y = x;
 	}
 
-	D_INLINE void SetZ(dFloat64 x)
+	inline void SetZ(dFloat64 x)
 	{
 		m_z = x;
 	}
 
-	D_INLINE void SetW(dFloat64 x)
+	inline void SetW(dFloat64 x)
 	{
 		m_w = x;
 	}
 
-	D_INLINE dFloat64 GetScalar() const
+	inline dFloat64 GetScalar() const
 	{
 		//return m_x;
 		return _mm_cvtsd_f64(m_typeLow);
 	}
 
-	D_INLINE dFloat64& operator[] (dInt32 i)
+	inline dFloat64& operator[] (dInt32 i)
 	{
 		dAssert(i < 4);
 		dAssert(i >= 0);
 		return m_f[i];
 	}
 
-	D_INLINE const dFloat64& operator[] (dInt32 i) const
+	inline const dFloat64& operator[] (dInt32 i) const
 	{
 		dAssert(i < 4);
 		dAssert(i >= 0);
 		return m_f[i];
 	}
 
-	D_INLINE dBigVector operator+ (const dBigVector& A) const
+	inline dBigVector operator+ (const dBigVector& A) const
 	{
 		return dBigVector(_mm_add_pd(m_typeLow, A.m_typeLow), _mm_add_pd(m_typeHigh, A.m_typeHigh));
 	}
 
-	D_INLINE dBigVector operator- (const dBigVector& A) const
+	inline dBigVector operator- (const dBigVector& A) const
 	{
 		return dBigVector(_mm_sub_pd(m_typeLow, A.m_typeLow), _mm_sub_pd(m_typeHigh, A.m_typeHigh));
 	}
 
-	D_INLINE dBigVector operator* (const dBigVector& A) const
+	inline dBigVector operator* (const dBigVector& A) const
 	{
 		return dBigVector(_mm_mul_pd(m_typeLow, A.m_typeLow), _mm_mul_pd(m_typeHigh, A.m_typeHigh));
 	}
 
-	D_INLINE dBigVector& operator+= (const dBigVector& A)
+	inline dBigVector& operator+= (const dBigVector& A)
 	{
 		m_typeLow = _mm_add_pd(m_typeLow, A.m_typeLow);
 		m_typeHigh = _mm_add_pd(m_typeHigh, A.m_typeHigh);
 		return *this;
 	}
 
-	D_INLINE dBigVector& operator-= (const dBigVector& A)
+	inline dBigVector& operator-= (const dBigVector& A)
 	{
 		m_typeLow = _mm_sub_pd(m_typeLow, A.m_typeLow);
 		m_typeHigh = _mm_sub_pd(m_typeHigh, A.m_typeHigh);
 		return *this;
 	}
 
-	D_INLINE dBigVector& operator*= (const dBigVector& A)
+	inline dBigVector& operator*= (const dBigVector& A)
 	{
 		m_typeLow = _mm_mul_pd(m_typeLow, A.m_typeLow);
 		m_typeHigh = _mm_mul_pd(m_typeHigh, A.m_typeHigh);
 		return *this;
 	}
 
-	D_INLINE dBigVector MulAdd(const dBigVector& A, const dBigVector& B) const
+	inline dBigVector MulAdd(const dBigVector& A, const dBigVector& B) const
 	{
 		return *this + A * B;
 	}
 
-	D_INLINE dBigVector MulSub(const dBigVector& A, const dBigVector& B) const
+	inline dBigVector MulSub(const dBigVector& A, const dBigVector& B) const
 	{
 		return *this - A * B;
 	}
 
 	// return cross product
-	D_INLINE dBigVector CrossProduct(const dBigVector& B) const
+	inline dBigVector CrossProduct(const dBigVector& B) const
 	{
 		return dBigVector(m_y * B.m_z - m_z * B.m_y, m_z * B.m_x - m_x * B.m_z, m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
-	D_INLINE dBigVector AddHorizontal() const
+	inline dBigVector AddHorizontal() const
 	{
 		__m128d tmp0(_mm_add_pd(m_typeHigh, m_typeLow));
 		#ifdef D_USE_SSE3
@@ -716,58 +720,58 @@ class dBigVector
 		return dBigVector(tmp1, tmp1);
 	}
 
-	D_INLINE dBigVector BroadcastX() const
+	inline dBigVector BroadcastX() const
 	{
 		return dBigVector(m_x);
 	}
 
-	D_INLINE dBigVector BroadcastY() const
+	inline dBigVector BroadcastY() const
 	{
 		return dBigVector(m_y);
 	}
 
-	D_INLINE dBigVector BroadcastZ() const
+	inline dBigVector BroadcastZ() const
 	{
 		return dBigVector(m_z);
 	}
 
-	D_INLINE dBigVector BroadcastW() const
+	inline dBigVector BroadcastW() const
 	{
 		return dBigVector(m_w);
 	}
 
-	D_INLINE dBigVector Scale(dFloat64 s) const
+	inline dBigVector Scale(dFloat64 s) const
 	{
 		__m128d tmp0(_mm_set1_pd(s));
 		return dBigVector(_mm_mul_pd(m_typeLow, tmp0), _mm_mul_pd(m_typeHigh, tmp0));
 	}
 
-	D_INLINE dBigVector Abs() const
+	inline dBigVector Abs() const
 	{
 		return dBigVector(_mm_and_pd(m_typeLow, m_signMask.m_typeLow), _mm_and_pd(m_typeHigh, m_signMask.m_typeLow));
 	}
 
-	D_INLINE dBigVector Reciproc() const
+	inline dBigVector Reciproc() const
 	{
 		return dBigVector(_mm_div_pd(m_one.m_typeLow, m_typeLow), _mm_div_pd(m_one.m_typeHigh, m_typeHigh));
 	}
 
-	D_INLINE dBigVector Sqrt() const
+	inline dBigVector Sqrt() const
 	{
 		return dBigVector(_mm_sqrt_pd(m_typeLow), _mm_sqrt_pd(m_typeHigh));
 	}
 
-	D_INLINE dBigVector InvSqrt() const
+	inline dBigVector InvSqrt() const
 	{
 		return Sqrt().Reciproc();
 	}
 
-	D_INLINE dBigVector InvMagSqrt() const
+	inline dBigVector InvMagSqrt() const
 	{
 		return DotProduct(*this).InvSqrt();
 	}
 
-	D_INLINE dBigVector Normalize() const
+	inline dBigVector Normalize() const
 	{
 		dFloat64 mag2 = DotProduct(*this).GetScalar();
 		return Scale(dFloat64 (1.0f) / sqrt (mag2));
@@ -790,7 +794,7 @@ class dBigVector
 		return dBigVector(_mm_min_pd(m_typeLow, data.m_typeLow), _mm_min_pd(m_typeHigh, data.m_typeHigh));
 	}
 
-	D_INLINE dBigVector GetInt() const
+	inline dBigVector GetInt() const
 	{
 		dBigVector temp(Floor());
 		dInt64 x = _mm_cvtsd_si32(temp.m_typeLow);
@@ -801,97 +805,97 @@ class dBigVector
 	}
 
 	// relational operators
-	D_INLINE dBigVector operator> (const dBigVector& data) const
+	inline dBigVector operator> (const dBigVector& data) const
 	{
 		return dBigVector(_mm_cmpgt_pd(m_typeLow, data.m_typeLow), _mm_cmpgt_pd(m_typeHigh, data.m_typeHigh));
 	}
 
-	D_INLINE dBigVector operator== (const dBigVector& data) const
+	inline dBigVector operator== (const dBigVector& data) const
 	{
 		return dBigVector(_mm_cmpeq_pd(m_typeLow, data.m_typeLow), _mm_cmpeq_pd(m_typeHigh, data.m_typeHigh));
 	}
 
-	D_INLINE dBigVector operator< (const dBigVector& data) const
+	inline dBigVector operator< (const dBigVector& data) const
 	{
 		return dBigVector(_mm_cmplt_pd(m_typeLow, data.m_typeLow), _mm_cmplt_pd(m_typeHigh, data.m_typeHigh));
 	}
 
-	D_INLINE dBigVector operator>= (const dBigVector& data) const
+	inline dBigVector operator>= (const dBigVector& data) const
 	{
 		return dBigVector(_mm_cmpge_pd(m_typeLow, data.m_typeLow), _mm_cmpge_pd(m_typeHigh, data.m_typeHigh));
 	}
 
-	D_INLINE dBigVector operator<= (const dBigVector& data) const
+	inline dBigVector operator<= (const dBigVector& data) const
 	{
 		return dBigVector(_mm_cmple_pd(m_typeLow, data.m_typeLow), _mm_cmple_pd(m_typeHigh, data.m_typeHigh));
 	}
 
 	// logical operations
-	D_INLINE dBigVector operator& (const dBigVector& data) const
+	inline dBigVector operator& (const dBigVector& data) const
 	{
 		return dBigVector(_mm_and_pd(m_typeLow, data.m_typeLow), _mm_and_pd(m_typeHigh, data.m_typeHigh));
 	}
 
-	D_INLINE dBigVector operator| (const dBigVector& data) const
+	inline dBigVector operator| (const dBigVector& data) const
 	{
 		return dBigVector(_mm_or_pd(m_typeLow, data.m_typeLow), _mm_or_pd(m_typeHigh, data.m_typeHigh));
 	}
 
-	D_INLINE dBigVector operator^ (const dBigVector& data) const
+	inline dBigVector operator^ (const dBigVector& data) const
 	{
 		return dBigVector(_mm_xor_pd(m_typeLow, data.m_typeLow), _mm_xor_pd(m_typeHigh, data.m_typeHigh));
 	}
 
-	D_INLINE dBigVector AndNot(const dBigVector& data) const
+	inline dBigVector AndNot(const dBigVector& data) const
 	{
 		return dBigVector(_mm_andnot_pd(data.m_typeLow, m_typeLow), _mm_andnot_pd(data.m_typeHigh, m_typeHigh));
 	}
 
-	D_INLINE dBigVector Select(const dBigVector& data, const dBigVector& mask) const
+	inline dBigVector Select(const dBigVector& data, const dBigVector& mask) const
 	{
 		// (((b ^ a) & mask)^a)
 		return  dBigVector(_mm_xor_pd(m_typeLow, _mm_and_pd(mask.m_typeLow, _mm_xor_pd(m_typeLow, data.m_typeLow))),
 							_mm_xor_pd(m_typeHigh, _mm_and_pd(mask.m_typeHigh, _mm_xor_pd(m_typeHigh, data.m_typeHigh))));
 	}
 
-	D_INLINE dBigVector ShiftRight() const
+	inline dBigVector ShiftRight() const
 	{
 		//return dBigVector (m_w, m_x, m_y, m_z); 
 		return dBigVector(_mm_shuffle_pd(m_typeHigh, m_typeLow, PERMUT_MASK_DOUBLE(0, 1)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(0, 1)));
 	}
 
-	D_INLINE dBigVector ShiftTripleRight() const
+	inline dBigVector ShiftTripleRight() const
 	{
 		return dBigVector(_mm_shuffle_pd(m_typeHigh, m_typeLow, PERMUT_MASK_DOUBLE(0, 0)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
 	}
 
-	D_INLINE dBigVector ShiftTripleLeft() const
+	inline dBigVector ShiftTripleLeft() const
 	{
 		return dBigVector(_mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(0, 1)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(1, 0)));
 	}
 
-	D_INLINE dBigVector ShiftRightLogical(dInt32 bits) const
+	inline dBigVector ShiftRightLogical(dInt32 bits) const
 	{
 		//return dBigVector(dInt64(dUnsigned64(m_ix) >> bits), dInt64(dUnsigned64(m_iy) >> bits), dInt64(dUnsigned64(m_iz) >> bits), dInt64(dUnsigned64(m_iw) >> bits));
 		return dBigVector(_mm_srli_epi64(m_typeIntLow, bits), _mm_srli_epi64(m_typeIntHigh, bits));
 	}
 
-	D_INLINE dInt32 GetSignMask() const
+	inline dInt32 GetSignMask() const
 	{
 		return _mm_movemask_pd(m_typeLow) | (_mm_movemask_pd(m_typeHigh) << 2);
 	}
 
-	D_INLINE dBigVector Floor() const
+	inline dBigVector Floor() const
 	{
 		return dBigVector(floor(m_x), floor(m_y), floor(m_z), floor(m_w));
 	}
 
-	D_INLINE dBigVector TestZero() const
+	inline dBigVector TestZero() const
 	{
 		return m_negOne & (*this == m_zero);
 	}
 
-	D_INLINE static void Transpose4x4(dBigVector& dst0, dBigVector& dst1, dBigVector& dst2, dBigVector& dst3,
+	inline static void Transpose4x4(dBigVector& dst0, dBigVector& dst1, dBigVector& dst2, dBigVector& dst3,
 		const dBigVector& src0, const dBigVector& src1, const dBigVector& src2, const dBigVector& src3)
 	{
 		dBigVector tmp0(src0);
@@ -906,13 +910,13 @@ class dBigVector
 	}
 
 	// return dot 4d dot product
-	D_INLINE dBigVector DotProduct(const dBigVector &A) const
+	inline dBigVector DotProduct(const dBigVector &A) const
 	{
 		const dBigVector tmp(_mm_mul_pd(m_typeLow, A.m_typeLow), _mm_mul_pd(m_typeHigh, A.m_typeHigh));
 		return tmp.AddHorizontal();
 	}
 
-	D_INLINE dBigVector CrossProduct(const dBigVector& A, const dBigVector& B) const
+	inline dBigVector CrossProduct(const dBigVector& A, const dBigVector& B) const
 	{
 		dFloat64 cofactor[3][3];
 		dFloat64 array[4][4];

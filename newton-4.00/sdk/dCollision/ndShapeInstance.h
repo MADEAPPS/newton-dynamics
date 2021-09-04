@@ -181,42 +181,42 @@ class ndShapeInstance: public dClassAlloc
 	static dVector m_padding;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-D_INLINE ndShape* ndShapeInstance::GetShape()
+inline ndShape* ndShapeInstance::GetShape()
 {
 	return (ndShape*)m_shape;
 }
 
-D_INLINE const ndShape* ndShapeInstance::GetShape() const 
+inline const ndShape* ndShapeInstance::GetShape() const 
 { 
 	return m_shape; 
 }
 
-D_INLINE const dMatrix& ndShapeInstance::GetLocalMatrix() const
+inline const dMatrix& ndShapeInstance::GetLocalMatrix() const
 {
 	return m_localMatrix;
 }
 
-D_INLINE void ndShapeInstance::SetLocalMatrix(const dMatrix& matrix)
+inline void ndShapeInstance::SetLocalMatrix(const dMatrix& matrix)
 {
 	m_localMatrix = matrix;
 }
 
-D_INLINE dInt32 ndShapeInstance::GetConvexVertexCount() const
+inline dInt32 ndShapeInstance::GetConvexVertexCount() const
 {
 	return m_shape->GetConvexVertexCount();
 }
 
-D_INLINE const dMatrix& ndShapeInstance::GetGlobalMatrix() const
+inline const dMatrix& ndShapeInstance::GetGlobalMatrix() const
 {
 	return m_globalMatrix;
 }
 
-D_INLINE void ndShapeInstance::SetGlobalMatrix(const dMatrix& matrix)
+inline void ndShapeInstance::SetGlobalMatrix(const dMatrix& matrix)
 {
 	m_globalMatrix = matrix;
 }
 
-D_INLINE dMatrix ndShapeInstance::GetScaledTransform(const dMatrix& matrix) const
+inline dMatrix ndShapeInstance::GetScaledTransform(const dMatrix& matrix) const
 {
 	dMatrix scaledMatrix(m_localMatrix * matrix);
 	scaledMatrix[0] = scaledMatrix[0].Scale(m_scale[0]);
@@ -225,7 +225,7 @@ D_INLINE dMatrix ndShapeInstance::GetScaledTransform(const dMatrix& matrix) cons
 	return m_aligmentMatrix * scaledMatrix;
 }
 
-D_INLINE dVector ndShapeInstance::SupportVertex(const dVector& dir) const
+inline dVector ndShapeInstance::SupportVertex(const dVector& dir) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-2f));
@@ -256,7 +256,7 @@ D_INLINE dVector ndShapeInstance::SupportVertex(const dVector& dir) const
 	}
 }
 
-D_INLINE dVector ndShapeInstance::SupportVertexSpecial(const dVector& dir, dInt32* const vertexIndex) const
+inline dVector ndShapeInstance::SupportVertexSpecial(const dVector& dir, dInt32* const vertexIndex) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-2f));
@@ -277,7 +277,7 @@ D_INLINE dVector ndShapeInstance::SupportVertexSpecial(const dVector& dir, dInt3
 	}
 }
 
-D_INLINE dVector ndShapeInstance::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const
+inline dVector ndShapeInstance::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-2f));
@@ -313,62 +313,62 @@ D_INLINE dVector ndShapeInstance::SupportVertexSpecialProjectPoint(const dVector
 	}
 }
 
-D_INLINE bool ndShapeInstance::GetCollisionMode() const
+inline bool ndShapeInstance::GetCollisionMode() const
 {
 	return m_collisionMode;
 }
 
-D_INLINE void ndShapeInstance::SetCollisionMode(bool mode)
+inline void ndShapeInstance::SetCollisionMode(bool mode)
 {
 	m_collisionMode = mode;
 }
 
-D_INLINE const dVector& ndShapeInstance::GetScale() const
+inline const dVector& ndShapeInstance::GetScale() const
 {
 	return m_scale;
 }
 
-D_INLINE const dVector& ndShapeInstance::GetInvScale() const
+inline const dVector& ndShapeInstance::GetInvScale() const
 {
 	return m_invScale;
 }
 
-D_INLINE dFloat32 ndShapeInstance::GetBoxMinRadius() const
+inline dFloat32 ndShapeInstance::GetBoxMinRadius() const
 {
 	return m_shape->GetBoxMinRadius() * m_maxScale.m_x;
 }
 
-D_INLINE dFloat32 ndShapeInstance::GetBoxMaxRadius() const
+inline dFloat32 ndShapeInstance::GetBoxMaxRadius() const
 {
 	return m_shape->GetBoxMaxRadius() * m_maxScale.m_x;
 }
 
-D_INLINE dFloat32 ndShapeInstance::GetVolume() const
+inline dFloat32 ndShapeInstance::GetVolume() const
 {
 	return m_shape->GetVolume() * m_scale.m_x * m_scale.m_y * m_scale.m_z;
 }
 
-D_INLINE ndShapeMaterial ndShapeInstance::GetMaterial() const
+inline ndShapeMaterial ndShapeInstance::GetMaterial() const
 {
 	return m_shapeMaterial;
 }
 
-D_INLINE void ndShapeInstance::SetMaterial(const ndShapeMaterial& material)
+inline void ndShapeInstance::SetMaterial(const ndShapeMaterial& material)
 {
 	m_shapeMaterial = material;
 }
 
-D_INLINE ndShapeInstance::ndScaleType ndShapeInstance::GetScaleType() const
+inline ndShapeInstance::ndScaleType ndShapeInstance::GetScaleType() const
 {
 	return m_scaleType;
 }
 
-D_INLINE dFloat32 ndShapeInstance::GetUmbraClipSize() const
+inline dFloat32 ndShapeInstance::GetUmbraClipSize() const
 {
 	return m_shape->GetUmbraClipSize() * m_maxScale.m_x;
 }
 
-D_INLINE dUnsigned64 ndShapeInstance::GetUserDataID() const
+inline dUnsigned64 ndShapeInstance::GetUserDataID() const
 {
 	return m_shapeMaterial.m_userId;
 }

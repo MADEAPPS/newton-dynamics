@@ -13,10 +13,6 @@
 #ifndef _NEWTON_PY_CONFIG_H_
 #define _NEWTON_PY_CONFIG_H_
 
-#ifdef D_INLINE
-	#undef D_INLINE
-#endif
-
 #ifdef D_CLASS_REFLECTION
 	#undef D_CLASS_REFLECTION
 #endif
@@ -29,10 +25,26 @@
 	#undef D_MSV_NEWTON_ALIGN_32
 #endif
 
-#define D_INLINE inline
+#ifdef D_CORE_API 
+	#undef D_CORE_API 
+#endif
+
+#ifdef D_COLLISION_API
+	#undef D_COLLISION_API
+#endif
+
+#ifdef D_NEWTON_API
+	#undef D_NEWTON_API
+#endif
+
+#ifdef D_OPERATOR_NEW_AND_DELETE
+	#undef D_OPERATOR_NEW_AND_DELETE
+#endif
+
 #define D_CORE_API 
 #define D_NEWTON_API
 #define D_COLLISION_API
+#define D_OPERATOR_NEW_AND_DELETE
 
 #define D_CLASS_REFLECTION(x)
 #define D_MSV_NEWTON_ALIGN_16

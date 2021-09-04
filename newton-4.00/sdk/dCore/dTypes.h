@@ -165,17 +165,6 @@
 //#define __ENABLE_D_CONTAINERS_SANITY_CHECK 
 #endif
 
-#ifdef _DEBUG
-	#define D_INLINE inline
-#else
-	#if defined(_MSC_VER)
-		#define D_INLINE __forceinline 
-	#else 
-		#define D_INLINE	inline
-		//#define D_INLINE	 __attribute__((always_inline))
-	#endif
-#endif
-
 #if defined(_MSC_VER)
 	#define	D_GCC_NEWTON_ALIGN_16 	 
 	#define	D_MSV_NEWTON_ALIGN_16	__declspec(align(16))
@@ -292,6 +281,28 @@ class dTriplex
 	dFloat32 m_y;
 	dFloat32 m_z;
 };
+
+
+#define D_OPERATOR_NEW_AND_DELETE			\
+inline void *operator new (size_t size)		\
+{											\
+	return dMemory::Malloc(size);			\
+}											\
+											\
+inline void *operator new[](size_t size) 	\
+{											\
+	return dMemory::Malloc(size);			\
+}											\
+											\
+inline void operator delete (void* ptr)		\
+{											\
+	dMemory::Free(ptr);						\
+}											\
+											\
+inline void operator delete[](void* ptr)	\
+{											\
+	dMemory::Free(ptr);						\
+}
 
 #ifndef _MSC_VER 
 	#define _stricmp(x,y) strcasecmp(x,y)

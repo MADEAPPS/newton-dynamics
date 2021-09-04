@@ -30,7 +30,7 @@
 // assume this function returns memory aligned to 16 bytes
 #define dAlloca(type, count) (type*) alloca (sizeof (type) * (count))
 
-D_INLINE dInt32 dExp2 (dInt32 x)
+inline dInt32 dExp2 (dInt32 x)
 {
 	dInt32 exp;
 	for (exp = -1; x; x >>= 1) 
@@ -40,7 +40,7 @@ D_INLINE dInt32 dExp2 (dInt32 x)
 	return exp;
 }
 
-D_INLINE dInt32 dBitReversal(dInt32 v, dInt32 base)
+inline dInt32 dBitReversal(dInt32 v, dInt32 base)
 {
 	dInt32 x = 0;
 	dInt32 power = dExp2 (base) - 1;
@@ -61,37 +61,37 @@ T dMod(T val, T mod)
 }
 
 template <class T> 
-D_INLINE T dMin(T A, T B)
+inline T dMin(T A, T B)
 {
 	return (A < B) ? A : B; 
 }
 
 template <class T> 
-D_INLINE T dMax(T A, T B)
+inline T dMax(T A, T B)
 {
 	return (A > B) ? A : B; 
 }
 
 template <class T>
-D_INLINE T dMin(T A, T B, T C)
+inline T dMin(T A, T B, T C)
 {
 	return dMin(dMin (A, B), C);
 }
 
 template <class T>
-D_INLINE T dMax(T A, T B, T C)
+inline T dMax(T A, T B, T C)
 {
 	return dMax(dMax (A, B), C);
 }
 
 template <class T>
-D_INLINE T dClamp(T val, T min, T max)
+inline T dClamp(T val, T min, T max)
 {
 	return dMax (min, dMin (max, val));
 }
 
 template <class T> 
-D_INLINE void dSwap(T& A, T& B)
+inline void dSwap(T& A, T& B)
 {
 	T tmp (A);
 	A = B;
@@ -99,20 +99,20 @@ D_INLINE void dSwap(T& A, T& B)
 }	
 
 template <class T>
-D_INLINE T dAbs(T A)
+inline T dAbs(T A)
 {
 	// according to Intel this is better because is does not read after write
 	return (A >= T(0)) ? A : -A;
 }
 
 template <class T>
-D_INLINE T dSign(T A)
+inline T dSign(T A)
 {
 	return (A >= T(0)) ? T(1) : T(-1);
 }
 
 template <class T> 
-D_INLINE bool dAreEqual(T A, T B, T tol)
+inline bool dAreEqual(T A, T B, T tol)
 {
 	// deal with too small and de normal values.
 	if ((dAbs(A) < tol) && (dAbs(B) < tol)) 
@@ -144,7 +144,7 @@ D_INLINE bool dAreEqual(T A, T B, T tol)
 }
 
 template <class T>
-D_INLINE T AnglesAdd (T angleInRadiand1, T angleInRadiand0)
+inline T AnglesAdd (T angleInRadiand1, T angleInRadiand0)
 {
 	T s1 = T(dSin(angleInRadiand1));
 	T c1 = T(dCos(angleInRadiand1));

@@ -50,50 +50,50 @@ class dQuaternion: public dVector
 
 };
 
-D_INLINE dQuaternion::dQuaternion()
+inline dQuaternion::dQuaternion()
 	:dVector(dVector::m_wOne)
 {
 }
 
-D_INLINE dQuaternion::dQuaternion(const dVector& quat)
+inline dQuaternion::dQuaternion(const dVector& quat)
 	:dVector(quat)
 {
 }
 
-D_INLINE dQuaternion::dQuaternion(const dQuaternion& quat)
+inline dQuaternion::dQuaternion(const dQuaternion& quat)
 	:dVector(quat)
 {
 }
 
-D_INLINE dQuaternion::dQuaternion(dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3)
+inline dQuaternion::dQuaternion(dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3)
 	:dVector(q0, q1, q2, q3)
 {
 	*this = Normalize();
 }
 
-D_INLINE dQuaternion dQuaternion::Inverse () const 
+inline dQuaternion dQuaternion::Inverse () const 
 {
 	return dQuaternion (-m_x, -m_y, -m_z, m_w);
 }
 
-D_INLINE dQuaternion dQuaternion::operator+ (const dQuaternion &q) const
+inline dQuaternion dQuaternion::operator+ (const dQuaternion &q) const
 {
 	//return dQuaternion (m_x + q.m_x, m_y + q.m_y, m_z + q.m_z, m_w + q.m_w);
 	return dVector::operator+(q);
 }
 
-D_INLINE dQuaternion dQuaternion::operator- (const dQuaternion &q) const
+inline dQuaternion dQuaternion::operator- (const dQuaternion &q) const
 {
 	//return dQuaternion (m_x - q.m_x, m_y - q.m_y, m_z - q.m_z, m_w - q.m_w);
 	return dVector::operator-(q);
 }
 
-D_INLINE dQuaternion dQuaternion::Normalize() const
+inline dQuaternion dQuaternion::Normalize() const
 {
 	return dVector::Normalize();
 }
 
-D_INLINE dQuaternion dQuaternion::Scale(dFloat32 scale) const
+inline dQuaternion dQuaternion::Scale(dFloat32 scale) const
 {
 	return dVector::Scale(scale);
 }

@@ -34,9 +34,11 @@
 //#define DG_GOOGOL_SIZE	16
 #define DG_GOOGOL_SIZE		4
 
-class dGoogol: public dClassAlloc
+class dGoogol
 {
 	public:
+	D_OPERATOR_NEW_AND_DELETE
+
 	dGoogol(void);
 	dGoogol(dFloat64 value);
 

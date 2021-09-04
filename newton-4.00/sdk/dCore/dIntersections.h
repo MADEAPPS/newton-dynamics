@@ -54,7 +54,7 @@ D_CORE_API dFloat32 dRayCastBox (const dVector& p0, const dVector& p1, const dVe
 D_CORE_API dFloat32 dRayCastSphere (const dVector& p0, const dVector& p1, const dVector& origin, dFloat32 radius);
 //D_CORE_API void dRayToRayDistance(const dVector& ray_p0, const dVector& ray_p1, const dVector& ray_q0, const dVector& ray_q1, dVector& p0Out, dVector& p1Out);
 
-D_INLINE dInt32 dOverlapTest (const dVector& p0, const dVector& p1, const dVector& q0, const dVector& q1)
+inline dInt32 dOverlapTest (const dVector& p0, const dVector& p1, const dVector& q0, const dVector& q1)
 {
 	dVector r0(p0 - q1);
 	dVector r1(p1 - q0);
@@ -63,20 +63,20 @@ D_INLINE dInt32 dOverlapTest (const dVector& p0, const dVector& p1, const dVecto
 	return (mask == 0x07);
 }
 
-D_INLINE dInt32 dBoxInclusionTest (const dVector& p0, const dVector& p1, const dVector& q0, const dVector& q1)
+inline dInt32 dBoxInclusionTest (const dVector& p0, const dVector& p1, const dVector& q0, const dVector& q1)
 {
 	dVector val(dVector::m_negOne & ((p0 >= q0) & (p1 <= q1)));
 	dInt32 mask = val.GetSignMask() & 0x07;
 	return (mask == 0x07);
 }
 
-D_INLINE dInt32 dCompareBox (const dVector& p0, const dVector& p1, const dVector& q0, const dVector& q1)
+inline dInt32 dCompareBox (const dVector& p0, const dVector& p1, const dVector& q0, const dVector& q1)
 {
 	dAssert(0);
 	return (p0.m_x != q0.m_x) || (p0.m_y != q0.m_y) || (p0.m_z != q0.m_z) || (p1.m_x != q1.m_x) || (p1.m_y != q1.m_y) || (p1.m_z != q1.m_z);
 }
 
-D_INLINE void dMovingAABB (dVector& p0, dVector& p1, const dVector& veloc, const dVector& omega, dFloat32 timestep, dFloat32 maxRadius, dFloat32 minRadius)
+inline void dMovingAABB (dVector& p0, dVector& p1, const dVector& veloc, const dVector& omega, dFloat32 timestep, dFloat32 maxRadius, dFloat32 minRadius)
 {
 	dVector linearStep (veloc.Scale (timestep));
 
@@ -95,7 +95,7 @@ D_INLINE void dMovingAABB (dVector& p0, dVector& p1, const dVector& veloc, const
 	p1 = r1.GetMax (q1) & dVector::m_triplexMask;
 }
 
-//D_INLINE dFloat32 dBoxPenetration (const dVector& minBox, const dVector& maxBox)
+//inline dFloat32 dBoxPenetration (const dVector& minBox, const dVector& maxBox)
 //{
 //	dAssert(maxBox.m_x >= minBox.m_x);
 //	dAssert(maxBox.m_y >= minBox.m_y);
@@ -108,7 +108,7 @@ D_INLINE void dMovingAABB (dVector& p0, dVector& p1, const dVector& veloc, const
 //	return dist.GetScalar();
 //}
 
-D_INLINE dFloat32 dBoxDistanceToOrigin2 (const dVector& minBox, const dVector& maxBox)
+inline dFloat32 dBoxDistanceToOrigin2 (const dVector& minBox, const dVector& maxBox)
 {
 	dAssert(maxBox.m_x >= minBox.m_x);
 	dAssert(maxBox.m_y >= minBox.m_y);

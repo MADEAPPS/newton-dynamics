@@ -236,7 +236,7 @@ class ndStackBvhStackEntry
 	dInt32 m_treeNodeIsLeaf;
 };
 
-D_INLINE static void PushStackEntry(
+static void PushStackEntry(
 	ndContactSolver::ndBoxBoxDistance2& data,
 	dInt32& stack,
 	ndStackBvhStackEntry* const stackPool,
@@ -273,7 +273,7 @@ class ndStackEntry
 	dFloat32 m_dist2;
 };
 
-D_INLINE static void PushStackEntry(
+static void PushStackEntry(
 	ndContactSolver::ndBoxBoxDistance2& data,
 	dInt32& stack,
 	ndStackEntry* const stackPool,
@@ -295,7 +295,7 @@ D_INLINE static void PushStackEntry(
 	dAssert(stack < 2 * D_COMPOUND_STACK_DEPTH);
 }
 
-D_INLINE static dFloat32 CalculateFightfieldDist2(const ndContactSolver::ndBoxBoxDistance2& data, const ndShapeCompound::ndNodeBase* const compoundNode, ndShapeInstance* const heightfieldInstance)
+static dFloat32 CalculateHeighfieldDist2(const ndContactSolver::ndBoxBoxDistance2& data, const ndShapeCompound::ndNodeBase* const compoundNode, ndShapeInstance* const heightfieldInstance)
 {
 	const dVector scale(heightfieldInstance->GetScale());
 	const dVector invScale(heightfieldInstance->GetInvScale());
@@ -376,7 +376,7 @@ ndContactSolver::ndContactSolver(const ndContactSolver& src, const ndShapeInstan
 {
 }
 
-D_INLINE void ndContactSolver::TranslateSimplex(const dVector& step)
+void ndContactSolver::TranslateSimplex(const dVector& step)
 {
 	m_instance1.m_globalMatrix.m_posit -= step;
 	for (dInt32 i = 0; i < m_vertexIndex; i++) 
@@ -386,7 +386,7 @@ D_INLINE void ndContactSolver::TranslateSimplex(const dVector& step)
 	}
 }
 
-D_INLINE void ndContactSolver::SupportVertex(const dVector& dir0, dInt32 vertexIndex)
+void ndContactSolver::SupportVertex(const dVector& dir0, dInt32 vertexIndex)
 {
 	dAssert(dir0.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir0.DotProduct(dir0).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
@@ -400,7 +400,7 @@ D_INLINE void ndContactSolver::SupportVertex(const dVector& dir0, dInt32 vertexI
 	m_hullSum[vertexIndex] = p + q;
 }
 
-D_INLINE dBigVector ndContactSolver::ReduceLine(dInt32& indexOut)
+dBigVector ndContactSolver::ReduceLine(dInt32& indexOut)
 {
 	const dBigVector p0(m_hullDiff[0]);
 	const dBigVector p1(m_hullDiff[1]);
@@ -437,7 +437,7 @@ D_INLINE dBigVector ndContactSolver::ReduceLine(dInt32& indexOut)
 	return v;
 }
 
-D_INLINE dBigVector ndContactSolver::ReduceTriangle(dInt32& indexOut)
+dBigVector ndContactSolver::ReduceTriangle(dInt32& indexOut)
 {
 	const dBigVector p0(m_hullDiff[0]);
 	const dBigVector p1(m_hullDiff[1]);
@@ -512,7 +512,7 @@ D_INLINE dBigVector ndContactSolver::ReduceTriangle(dInt32& indexOut)
 	return dBigVector::m_zero;
 }
 
-D_INLINE dBigVector ndContactSolver::ReduceTetrahedrum(dInt32& indexOut)
+dBigVector ndContactSolver::ReduceTetrahedrum(dInt32& indexOut)
 {
 	const dBigVector p0(m_hullDiff[0]);
 	const dBigVector p1(m_hullDiff[1]);
@@ -698,7 +698,7 @@ dInt32 ndContactSolver::CalculateClosestSimplex()
 	return (index < 4) ? index : -4;
 }
 
-D_INLINE void ndContactSolver::CalculateContactFromFeacture(dInt32 featureType)
+void ndContactSolver::CalculateContactFromFeacture(dInt32 featureType)
 {
 	dVector d;
 	dVector s;
@@ -1826,7 +1826,7 @@ dFloat32 ndContactSolver::RayCast(const dVector& localP0, const dVector& localP1
 	return param;
 }
 
-D_INLINE ndMinkFace* ndContactSolver::NewFace()
+inline ndMinkFace* ndContactSolver::NewFace()
 {
 	ndMinkFace* face = (ndMinkFace*)m_freeFace;
 	if (m_freeFace) 
@@ -1849,7 +1849,7 @@ D_INLINE ndMinkFace* ndContactSolver::NewFace()
 	return face;
 }
 
-D_INLINE ndMinkFace* ndContactSolver::AddFace(dInt32 v0, dInt32 v1, dInt32 v2)
+inline ndMinkFace* ndContactSolver::AddFace(dInt32 v0, dInt32 v1, dInt32 v2)
 {
 	ndMinkFace* const face = NewFace();
 	face->m_mark = 0;
@@ -1859,7 +1859,7 @@ D_INLINE ndMinkFace* ndContactSolver::AddFace(dInt32 v0, dInt32 v1, dInt32 v2)
 	return face;
 }
 
-D_INLINE void ndContactSolver::PushFace(ndMinkFace* const face)
+inline void ndContactSolver::PushFace(ndMinkFace* const face)
 {
 	dInt32 i0 = face->m_vertex[0];
 	dInt32 i1 = face->m_vertex[1];
@@ -1880,7 +1880,7 @@ D_INLINE void ndContactSolver::PushFace(ndMinkFace* const face)
 	}
 }
 
-D_INLINE void ndContactSolver::DeleteFace(ndMinkFace* const face)
+inline void ndContactSolver::DeleteFace(ndMinkFace* const face)
 {
 	dgFaceFreeList* const freeFace = (dgFaceFreeList*)face;
 	freeFace->m_next = m_freeFace;
@@ -3268,7 +3268,7 @@ dInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 	dInt32 stack = 1;
 	dInt32 contactCount = 0;
 	stackPool[0] = compoundShape->m_root;
-	stackDistance[0] = CalculateFightfieldDist2(data, compoundShape->m_root, heightfieldInstance);
+	stackDistance[0] = CalculateHeighfieldDist2(data, compoundShape->m_root, heightfieldInstance);
 	dFloat32 closestDist = (stackDistance[0] > dFloat32(0.0f)) ? stackDistance[0] : dFloat32(1.0e10f);
 
 	while (stack)
@@ -3326,7 +3326,7 @@ dInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 			{
 				const ndShapeCompound::ndNodeBase* const left = node->m_left;
 				dAssert(left);
-				dFloat32 subDist2 = CalculateFightfieldDist2(data, left, heightfieldInstance);
+				dFloat32 subDist2 = CalculateHeighfieldDist2(data, left, heightfieldInstance);
 				dInt32 j = stack;
 				for (; j && (subDist2 > stackDistance[j - 1]); j--)
 				{
@@ -3342,7 +3342,7 @@ dInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 			{
 				const ndShapeCompound::ndNodeBase* const right = node->m_right;
 				dAssert(right);
-				dFloat32 subDist2 = CalculateFightfieldDist2(data, right, heightfieldInstance);
+				dFloat32 subDist2 = CalculateHeighfieldDist2(data, right, heightfieldInstance);
 				dInt32 j = stack;
 				for (; j && (subDist2 > stackDistance[j - 1]); j--)
 				{

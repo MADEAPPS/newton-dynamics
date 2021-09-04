@@ -59,7 +59,7 @@ class dFastAabb : public dMatrix
 	friend class dAabbPolygonSoup;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-D_INLINE dFastAabb::dFastAabb()
+inline dFastAabb::dFastAabb()
 	:dMatrix(dGetIdentityMatrix())
 	,m_absDir(dGetIdentityMatrix())
 	,m_p0(dVector::m_zero)
@@ -69,7 +69,7 @@ D_INLINE dFastAabb::dFastAabb()
 {
 }
 
-D_INLINE dFastAabb::dFastAabb(const dMatrix& matrix, const dVector& size)
+inline dFastAabb::dFastAabb(const dMatrix& matrix, const dVector& size)
 	:dMatrix(matrix)
 	,m_separationDistance(dFloat32(1.0e10f))
 {
@@ -79,7 +79,7 @@ D_INLINE dFastAabb::dFastAabb(const dMatrix& matrix, const dVector& size)
 	m_p1 = (matrix[3] + m_size) & dVector::m_triplexMask;
 }
 
-D_INLINE dFastAabb::dFastAabb(const dVector& p0, const dVector& p1)
+inline dFastAabb::dFastAabb(const dVector& p0, const dVector& p1)
 	:dMatrix(dGetIdentityMatrix())
 	,m_absDir(dGetIdentityMatrix())
 	,m_p0(p0)
@@ -92,22 +92,22 @@ D_INLINE dFastAabb::dFastAabb(const dVector& p0, const dVector& p1)
 	dAssert(m_posit.m_w == dFloat32(1.0f));
 }
 
-D_INLINE const dVector& dFastAabb::GetOrigin() const
+inline const dVector& dFastAabb::GetOrigin() const
 {
 	return m_p0;
 }
 
-D_INLINE const dVector& dFastAabb::GetTarget() const
+inline const dVector& dFastAabb::GetTarget() const
 {
 	return m_p1;
 }
 
-D_INLINE void dFastAabb::SetSeparatingDistance(const dFloat32 distance)
+inline void dFastAabb::SetSeparatingDistance(const dFloat32 distance)
 {
 	m_separationDistance = distance;
 }
 
-D_INLINE void dFastAabb::SetTransposeAbsMatrix(const dMatrix& matrix)
+inline void dFastAabb::SetTransposeAbsMatrix(const dMatrix& matrix)
 {
 	m_absDir = matrix.Transpose();
 	m_absDir[0] = m_absDir[0].Abs();

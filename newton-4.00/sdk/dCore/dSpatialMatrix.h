@@ -27,14 +27,16 @@
 #include "dVector.h"
 #include "dSpatialVector.h"
 
-class dSpatialMatrix : public dClassAlloc
+class dSpatialMatrix
 {
 	public:
-	D_INLINE dSpatialMatrix()
+	D_OPERATOR_NEW_AND_DELETE
+
+	inline dSpatialMatrix()
 	{
 	}
 
-	D_INLINE dSpatialMatrix(dFloat32 val)
+	inline dSpatialMatrix(dFloat32 val)
 	{
 		const dSpatialVector row (val);
 		for (dInt32 i = 0; i < 6; i++) 
@@ -43,18 +45,18 @@ class dSpatialMatrix : public dClassAlloc
 		}
 	}
 
-	D_INLINE ~dSpatialMatrix()
+	inline ~dSpatialMatrix()
 	{
 	}
 	
-	D_INLINE dSpatialVector& operator[] (dInt32 i)
+	inline dSpatialVector& operator[] (dInt32 i)
 	{
 		dAssert(i < 6);
 		dAssert(i >= 0);
 		return m_rows[i];
 	}
 
-	D_INLINE const dSpatialVector& operator[] (dInt32 i) const
+	inline const dSpatialVector& operator[] (dInt32 i) const
 	{
 		dAssert(i < 6);
 		dAssert(i >= 0);
@@ -63,7 +65,7 @@ class dSpatialMatrix : public dClassAlloc
 
 	D_CORE_API dSpatialMatrix Inverse(dInt32 rows) const;
 
-	D_INLINE dSpatialVector VectorTimeMatrix(const dSpatialVector& jacobian) const
+	inline dSpatialVector VectorTimeMatrix(const dSpatialVector& jacobian) const
 	{
 		dSpatialVector tmp(m_rows[0].Scale (jacobian[0]));
 		for (dInt32 i = 1; i < 6; i++) 
@@ -73,7 +75,7 @@ class dSpatialMatrix : public dClassAlloc
 		return tmp;
 	}
 
-	D_INLINE dSpatialVector VectorTimeMatrix(const dSpatialVector& jacobian, dInt32 dof) const
+	inline dSpatialVector VectorTimeMatrix(const dSpatialVector& jacobian, dInt32 dof) const
 	{
 		dSpatialVector tmp(dFloat32 (0.0f));
 		for (dInt32 i = 0; i < dof; i++) 

@@ -104,10 +104,10 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 		dgFaceFreeList* m_next;
 	};
 
-	D_INLINE ndMinkFace* NewFace();
-	D_INLINE void PushFace(ndMinkFace* const face);
-	D_INLINE void DeleteFace(ndMinkFace* const face);
-	D_INLINE ndMinkFace* AddFace(dInt32 v0, dInt32 v1, dInt32 v2);
+	inline ndMinkFace* NewFace();
+	inline void PushFace(ndMinkFace* const face);
+	inline void DeleteFace(ndMinkFace* const face);
+	inline ndMinkFace* AddFace(dInt32 v0, dInt32 v1, dInt32 v2);
 
 	bool CalculateClosestPoints();
 	dInt32 CalculateClosestSimplex();
@@ -121,13 +121,13 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 ConvexPolygonsIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dInt32 maxContacts) const;
 	dInt32 ConvexPolygonToLineIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dVector* const mem) const;
 
-	D_INLINE dBigVector ReduceLine(dInt32& indexOut);
-	D_INLINE dBigVector ReduceTriangle (dInt32& indexOut);
-	D_INLINE dBigVector ReduceTetrahedrum (dInt32& indexOut);
-	D_INLINE void SupportVertex(const dVector& dir, dInt32 vertexIndex);
+	dBigVector ReduceLine(dInt32& indexOut);
+	dBigVector ReduceTriangle (dInt32& indexOut);
+	dBigVector ReduceTetrahedrum (dInt32& indexOut);
+	void SupportVertex(const dVector& dir, dInt32 vertexIndex);
 
-	D_INLINE void TranslateSimplex(const dVector& step);
-	D_INLINE void CalculateContactFromFeacture(dInt32 featureType);
+	void TranslateSimplex(const dVector& step);
+	void CalculateContactFromFeacture(dInt32 featureType);
 
 	ndShapeInstance m_instance0;
 	ndShapeInstance m_instance1;

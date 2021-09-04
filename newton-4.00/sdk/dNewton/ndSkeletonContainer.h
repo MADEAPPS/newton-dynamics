@@ -67,19 +67,19 @@ class ndSkeletonContainer
 		~ndNode();
 		dInt32 Factorize(const ndLeftHandSide* const leftHandSide, const ndRightHandSide* const rightHandSide, dSpatialMatrix* const bodyMassArray, dSpatialMatrix* const jointMassArray);
 
-		D_INLINE void CalculateJacobianBlock();
-		D_INLINE void CalculateInertiaMatrix(dSpatialMatrix* const bodyMassArray) const;
-		D_INLINE void CalculateJointDiagonal(const dSpatialMatrix* const bodyMassArray, dSpatialMatrix* const jointMassArray);
-		D_INLINE void CalculateBodyDiagonal(ndNode* const child, dSpatialMatrix* const bodyMassArray, const dSpatialMatrix* const jointMassArray);
-		D_INLINE void GetJacobians(const ndLeftHandSide* const leftHandSide, const ndRightHandSide* const rightHandSide, dSpatialMatrix* const jointMassArray);
+		inline void CalculateJacobianBlock();
+		inline void CalculateInertiaMatrix(dSpatialMatrix* const bodyMassArray) const;
+		inline void CalculateJointDiagonal(const dSpatialMatrix* const bodyMassArray, dSpatialMatrix* const jointMassArray);
+		inline void CalculateBodyDiagonal(ndNode* const child, dSpatialMatrix* const bodyMassArray, const dSpatialMatrix* const jointMassArray);
+		inline void GetJacobians(const ndLeftHandSide* const leftHandSide, const ndRightHandSide* const rightHandSide, dSpatialMatrix* const jointMassArray);
 
-		D_INLINE void BodyDiagInvTimeSolution(ndForcePair& force);
-		D_INLINE void JointDiagInvTimeSolution(ndForcePair& force);
-		D_INLINE void JointJacobianTimeMassForward(ndForcePair& force);
-		D_INLINE void BodyJacobianTimeSolutionBackward(ndForcePair& force) const;
-		D_INLINE dInt32 GetAuxiliaryRows(const ndRightHandSide* const rightHandSide) const;
-		D_INLINE void BodyJacobianTimeMassForward(const ndForcePair& force, ndForcePair& parentForce) const;
-		D_INLINE void JointJacobianTimeSolutionBackward(ndForcePair& force, const ndForcePair& parentForce) const;
+		inline void BodyDiagInvTimeSolution(ndForcePair& force);
+		inline void JointDiagInvTimeSolution(ndForcePair& force);
+		inline void JointJacobianTimeMassForward(ndForcePair& force);
+		inline void BodyJacobianTimeSolutionBackward(ndForcePair& force) const;
+		inline dInt32 GetAuxiliaryRows(const ndRightHandSide* const rightHandSide) const;
+		inline void BodyJacobianTimeMassForward(const ndForcePair& force, ndForcePair& parentForce) const;
+		inline void JointJacobianTimeSolutionBackward(ndForcePair& force, const ndForcePair& parentForce) const;
 
 		ndBodyJointMatrixDataPair m_data;
 		ndBodyKinematic* m_body;
@@ -135,11 +135,11 @@ class ndSkeletonContainer
 	void SolveBlockLcp(dInt32 size, dInt32 blockSize, const dFloat32* const x0, dFloat32* const x, dFloat32* const b, const dFloat32* const low, const dFloat32* const high, const dInt32* const normalIndex) const;
 	void SolveLcp(dInt32 stride, dInt32 size, const dFloat32* const matrix, const dFloat32* const x0, dFloat32* const x, const dFloat32* const b, const dFloat32* const low, const dFloat32* const high, const dInt32* const normalIndex) const;
 
-	D_INLINE void SolveBackward(ndForcePair* const force) const;
-	D_INLINE void CalculateForce(ndForcePair* const force, const ndForcePair* const accel) const;
-	D_INLINE void UpdateForces(ndJacobian* const internalForces, const ndForcePair* const force) const;
-	D_INLINE void CalculateJointAccel(const ndJacobian* const internalForces, ndForcePair* const accel) const;
-	D_INLINE void SolveForward(ndForcePair* const force, const ndForcePair* const accel, dInt32 startNode) const;
+	inline void SolveBackward(ndForcePair* const force) const;
+	inline void CalculateForce(ndForcePair* const force, const ndForcePair* const accel) const;
+	inline void UpdateForces(ndJacobian* const internalForces, const ndForcePair* const force) const;
+	inline void CalculateJointAccel(const ndJacobian* const internalForces, ndForcePair* const accel) const;
+	inline void SolveForward(ndForcePair* const force, const ndForcePair* const accel, dInt32 startNode) const;
 
 	ndNode* m_skeleton;
 	ndNode** m_nodesOrder;
