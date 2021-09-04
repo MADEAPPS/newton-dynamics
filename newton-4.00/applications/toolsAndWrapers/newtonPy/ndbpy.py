@@ -8,15 +8,15 @@
 # including commercial applications, and to alter it and redistribute it
 # freely
 
-
 import bpy
 import sys
 import os
 
-dir = os.path.dirname('C:/Program Files/Blender Foundation/Blender 2.93/2.93/scripts/addons/newtonPy')
-if not dir in sys.path:
-    sys.path.append('C:/Program Files/Blender Foundation/Blender 2.93/2.93/scripts/addons/newtonPy')
-	#print (sys.path)
+blenderPath = os.getenv('Blender') + '/scripts/addons/newtonPy'
+print (blenderPath)
+
+if not blenderPath in sys.path:
+   sys.path.append(blenderPath)
 
 import newton
 import testClass

@@ -68,10 +68,6 @@ list(APPEND PY_SOURCE
 	testClass.py
 	newton.py
 	ndbpy.py)
-#list(APPEND PY_SOURCE 
-#	testClass.py
-#	ndbpy.py 
-#	newton.py)
 set (pySrc "${CMAKE_CURRENT_SOURCE_DIR}")
 
 set (pyDst "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}")
@@ -87,8 +83,8 @@ add_custom_command(
 foreach(file IN ZIP_LISTS PY_SOURCE)
 	add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy ${pySrc}/${file_0} $ENV{Blender}/2.93/scripts/addons/${projectName}/${file_0})
+	ARGS -E copy ${pySrc}/${file_0} $ENV{Blender}/scripts/addons/${projectName}/${file_0})
 endforeach()
 add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy $<TARGET_FILE:${projectName}> $ENV{Blender}/2.93/scripts/addons/${projectName}/_newton.pyd)
+	ARGS -E copy $<TARGET_FILE:${projectName}> $ENV{Blender}/scripts/addons/${projectName}/_newton.pyd)
