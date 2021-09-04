@@ -61,11 +61,8 @@ if(MSVC OR MINGW)
     endif()
 endif()
 
-#install(FILES ${projectName}.py DESTINATION ${projectName})
-#install(TARGETS ${projectName} RUNTIME DESTINATION ${projectName})
 
 list(APPEND PY_SOURCE 
-	testClass.py
 	newton.py
 	ndbpy.py)
 set (pySrc "${CMAKE_CURRENT_SOURCE_DIR}")
