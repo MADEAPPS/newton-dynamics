@@ -22,7 +22,7 @@ file(GLOB CPP_SOURCE
 	*.h
 	*.cpp
 	*.cxx
-	ndbpy.py
+	*.py
 )
 
 #source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" PREFIX source/ FILES ${CPP_SOURCE})
