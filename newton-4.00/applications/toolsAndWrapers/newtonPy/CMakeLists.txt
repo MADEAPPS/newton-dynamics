@@ -22,6 +22,7 @@ file(GLOB CPP_SOURCE
 	*.h
 	*.cpp
 	*.cxx
+	ndbpy.py
 )
 
 #source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" PREFIX source/ FILES ${CPP_SOURCE})
@@ -69,4 +70,20 @@ add_custom_command(
 
 add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+	ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/ndbpy.py ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/ndbpy.py)
+
+add_custom_command(
+	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
 	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/_$<TARGET_FILE_BASE_NAME:${projectName}>.pyd)
+
+add_custom_command(
+	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+	ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${projectName}.py $ENV{Blender}/2.93/scripts/addons/${projectName}/${projectName}.py)
+
+add_custom_command(
+	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+	ARGS -E copy ${CMAKE_CURRENT_SOURCE_DIR}/ndbpy.py $ENV{Blender}/2.93/scripts/addons/${projectName}/ndbpy.py)
+
+add_custom_command(
+	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
+	ARGS -E copy $<TARGET_FILE:${projectName}> $ENV{Blender}/2.93/scripts/addons/${projectName}/_$<TARGET_FILE_BASE_NAME:${projectName}>.pyd)
