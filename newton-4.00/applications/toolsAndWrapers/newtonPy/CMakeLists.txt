@@ -63,8 +63,10 @@ endif()
 
 
 list(APPEND PY_SOURCE 
+	ndbpy.py
 	newton.py
-	ndbpy.py)
+	newtonWorld.py
+)
 set (pySrc "${CMAKE_CURRENT_SOURCE_DIR}")
 
 set (pyDst "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}")
