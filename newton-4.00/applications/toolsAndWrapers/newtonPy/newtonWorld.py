@@ -8,18 +8,12 @@
 # including commercial applications, and to alter it and redistribute it
 # freely
 
-#import os
-#import sys
-#import bpy
-#
-#blenderPath = os.getenv('Blender') + '/scripts/addons/newtonPy'
-#print (blenderPath)
-#
-#if not blenderPath in sys.path:
-#	sys.path.append(blenderPath)
-
+import bpy
 import newton
 
 # create the panel inteface
-class NewtonWorld(newton.ndWorld):
+#class NewtonWorld(newton.ndWorld):
+class NewtonWorld(bpy.types.Object):
     """create and interface to the newton workd"""
+
+
