@@ -15,7 +15,8 @@ bl_info = {
 	"version": (1, 0, 0),
 	"blender": (2, 93, 0),
 	#"location": "Properties > Scene > Blend Info panel",
-    "location": "3D Viewport > Sidebar > Item tab",
+    #"location": "3D Viewport > Sidebar > Item tab",
+    "location": "View3D",
 	"description": "Add Newton Physics to meshes",
 }
 
@@ -29,40 +30,18 @@ print (blenderPath)
 if not blenderPath in sys.path:
 	sys.path.append(blenderPath)
 
-import newton
+
 import newtonWorld
-
-class NewtonWorldCreate(bpy.types.Operator):
-    """Creates a newton world"""
-    bl_idname = 'view3d.newton_world_create'
-    bl_label = 'create newton world'
-
-    def execute(self, context):
-        scene = context.scene
-        #scene.newton_world = newtonWorld.NewtonWorld()
-        scene.newton_world = bpy.data.objects.new('newton_world', None) 
-        #scene.objects.link(scene.newton_world)
-        return {'FINISHED'}
-
-class NewtonWorldDestroy(bpy.types.Operator):
-    """Destroy a newton world"""
-    bl_idname = 'view3d.newton_world_destroy'
-    bl_label = 'delete newton world'
-
-    def execute(self, context):
-        scene = context.scene
-
-        #scene.objects.unlink(scene.newton_world)
-        bpy.data.objects.remove(scene.newton_world) 
-        scene.newton_world = None
-        return {'FINISHED'}
 
 class NewtonWorldPanel(bpy.types.Panel):
     bl_label = "Newton Physics"
     bl_idname = "SCENE_PT_layout"
-    bl_space_type = "PROPERTIES"
-    bl_region_type = "WINDOW"
-    bl_category = "scene"
+    #bl_region_type = "WINDOW"
+    #bl_space_type = "PROPERTIES"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    #bl_category = "scene"
+    bl_category = "newton"
 
     def draw(self, context):
         scene = context.scene
@@ -85,12 +64,10 @@ class NewtonWorldPanel(bpy.types.Panel):
             #row.alignment = 'RIGHT'
 
 
-
-# register classes
 classes = [
-    NewtonWorldCreate,
-    NewtonWorldDestroy,
-    NewtonWorldPanel
+    NewtonWorldPanel,
+    newtonWorld.NewtonWorldCreate,
+    newtonWorld.NewtonWorldDestroy
 ]
 
 def register():
@@ -99,8 +76,7 @@ def register():
 
     bpy.types.Scene.newton_world = bpy.props.PointerProperty(
 		type = bpy.types.Object,
-		name = "newton world",
-	)
+		name = "newton world",)
 
 
 def unregister():
