@@ -35,15 +35,11 @@ class NewtonWorldCreate(bpy.types.Operator):
         # this does no works.
         #scene.newton_world = bpy.data.objects.new('newton_world', None) 
 
-        # this work, but I have to replace an existing scene object
-        world = TestManager(context.active_object)
-
-        #world = bpy.ops.mesh.primitive_cube_add(size=1, enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
-        #context.active_object = world
-        #context.scene.objects.active_object = world
-        #world.data.name = 'newton_world_dummy'
-        #world = TestManager(world)
-        
+        if context.active_object.name != 'newtonHome':
+            print ('please make a dommy object to contain the newton world and name it newtonHome')
+            return {'CANCELLED'}
+            
+        scene.newton_world = TestManager(context.active_object)
         return {'FINISHED'}
 
 class NewtonWorldDestroy(bpy.types.Operator):
@@ -56,6 +52,8 @@ class NewtonWorldDestroy(bpy.types.Operator):
         scene = context.scene
 
         #bpy.data.objects.remove(scene.newton_world) 
-        #scene.newton_world = None
+        if scene.newton_world != None:
+            scene.newton_world.name = 'newtonHome'
+            scene.newton_world = None
         return {'FINISHED'}
 
