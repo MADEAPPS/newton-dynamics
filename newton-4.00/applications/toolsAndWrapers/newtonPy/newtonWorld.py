@@ -20,7 +20,7 @@ class TestManager(bpy.types.Object):
     """create and interface to the newton workd"""
 
     def __init__(self, object):
-        print ("esto es una mierda")
+        #print ("crate managet one once")
         self.name = 'newton_world'
 
 
@@ -32,7 +32,12 @@ class NewtonWorldCreateHomeObject(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene
+        selectedObjec = context.active_object
         bpy.ops.mesh.primitive_cube_add(size=1, enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
+        if selectedObjec == context.active_object:
+            print ('change to [object mode] operator canceled')
+            return {'CANCELLED'}
+
         context.active_object.name = 'newtonHome'
         return {'FINISHED'}
 

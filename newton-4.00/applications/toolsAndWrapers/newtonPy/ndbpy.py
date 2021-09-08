@@ -36,11 +36,8 @@ import newtonWorld
 class NewtonWorldPanel(bpy.types.Panel):
     bl_label = "Newton Physics"
     bl_idname = "SCENE_PT_layout"
-    #bl_region_type = "WINDOW"
-    #bl_space_type = "PROPERTIES"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    #bl_category = "scene"
     bl_category = "newton"
 
     def findHome(self, scene):
@@ -54,16 +51,15 @@ class NewtonWorldPanel(bpy.types.Panel):
     def draw(self, context):
         scene = context.scene
         layout = self.layout
-        #layout.prop(context.scene, "newton_world")
-        #layout.prop(context.scene, "newton_world", text = "xxxxx")
         
         world = scene.newton_world
         if world is None:
             newtonHome = self.findHome(scene)
             if newtonHome is None:
                 layout.operator("view3d.newton_world_create_home")
-
-            layout.operator("view3d.newton_world_create")
+                newtonHome = self.findHome(scene)
+            if newtonHome:
+                layout.operator("view3d.newton_world_create")
         else:
             layout.operator("view3d.newton_world_destroy")
 
