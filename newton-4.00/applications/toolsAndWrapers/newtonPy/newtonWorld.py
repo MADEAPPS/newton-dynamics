@@ -23,6 +23,19 @@ class TestManager(bpy.types.Object):
         print ("esto es una mierda")
         self.name = 'newton_world'
 
+
+class NewtonWorldCreateHomeObject(bpy.types.Operator):
+    """Creates a newton world home"""
+    bl_label = 'create newton world home'
+    bl_idname = 'view3d.newton_world_create_home'
+    bl_description = "create newton world home"
+
+    def execute(self, context):
+        scene = context.scene
+        bpy.ops.mesh.primitive_cube_add(size=1, enter_editmode=False, align='WORLD', location=(0, 0, 0), scale=(1, 1, 1))
+        context.active_object.name = 'newtonHome'
+        return {'FINISHED'}
+
 class NewtonWorldCreate(bpy.types.Operator):
     """Creates a newton world"""
     bl_label = 'create newton world'
@@ -32,13 +45,8 @@ class NewtonWorldCreate(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
 
-        # this does no works.
+        # this does not works.
         #scene.newton_world = bpy.data.objects.new('newton_world', None) 
-
-        if context.active_object.name != 'newtonHome':
-            print ('please make a dommy object to contain the newton world and name it newtonHome')
-            return {'CANCELLED'}
-            
         scene.newton_world = TestManager(context.active_object)
         return {'FINISHED'}
 
@@ -51,9 +59,6 @@ class NewtonWorldDestroy(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
 
-        #bpy.data.objects.remove(scene.newton_world) 
-        if scene.newton_world != None:
-            scene.newton_world.name = 'newtonHome'
-            scene.newton_world = None
+        scene.newton_world.name = 'newtonHome'
+        scene.newton_world = None
         return {'FINISHED'}
-

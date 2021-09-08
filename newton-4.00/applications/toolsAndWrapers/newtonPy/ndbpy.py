@@ -43,6 +43,14 @@ class NewtonWorldPanel(bpy.types.Panel):
     #bl_category = "scene"
     bl_category = "newton"
 
+    def findHome(self, scene):
+        col = bpy.data.collections.get("Collection")
+        if col:
+            for obj in col.objects:
+                if obj.name == 'newtonHome':
+                    return obj
+        return None
+    
     def draw(self, context):
         scene = context.scene
         layout = self.layout
@@ -51,6 +59,10 @@ class NewtonWorldPanel(bpy.types.Panel):
         
         world = scene.newton_world
         if world is None:
+            newtonHome = self.findHome(scene)
+            if newtonHome is None:
+                layout.operator("view3d.newton_world_create_home")
+
             layout.operator("view3d.newton_world_create")
         else:
             layout.operator("view3d.newton_world_destroy")
@@ -67,7 +79,8 @@ class NewtonWorldPanel(bpy.types.Panel):
 classes = [
     NewtonWorldPanel,
     newtonWorld.NewtonWorldCreate,
-    newtonWorld.NewtonWorldDestroy
+    newtonWorld.NewtonWorldDestroy,
+    newtonWorld.NewtonWorldCreateHomeObject
 ]
 
 def register():
