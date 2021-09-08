@@ -26,9 +26,9 @@ class TestManager(bpy.types.Object):
 
 class NewtonWorldCreateHomeObject(bpy.types.Operator):
     """Creates a newton world home"""
-    bl_label = 'create newton world home'
+    bl_label = 'create newton world'
     bl_idname = 'view3d.newton_world_create_home'
-    bl_description = "create newton world home"
+    bl_description = "create newton world"
 
     def execute(self, context):
         scene = context.scene
@@ -39,6 +39,7 @@ class NewtonWorldCreateHomeObject(bpy.types.Operator):
             return {'CANCELLED'}
 
         context.active_object.name = 'newtonHome'
+        scene.newton_world = TestManager(context.active_object)
         return {'FINISHED'}
 
 class NewtonWorldCreate(bpy.types.Operator):

@@ -24,8 +24,11 @@ import os
 import sys
 import bpy
 
+# this should works, but it fail 
+# so I have to add a enviroment variable to set the path blender path
+#blenderPath = 'scripts/addons/newtonPy'
 blenderPath = os.getenv('Blender') + '/scripts/addons/newtonPy'
-print (blenderPath)
+#print (blenderPath)
 
 if not blenderPath in sys.path:
 	sys.path.append(blenderPath)
@@ -57,8 +60,8 @@ class NewtonWorldPanel(bpy.types.Panel):
             newtonHome = self.findHome(scene)
             if newtonHome is None:
                 layout.operator("view3d.newton_world_create_home")
-                newtonHome = self.findHome(scene)
-            if newtonHome:
+                #newtonHome = self.findHome(scene)
+            else:
                 layout.operator("view3d.newton_world_create")
         else:
             layout.operator("view3d.newton_world_destroy")
