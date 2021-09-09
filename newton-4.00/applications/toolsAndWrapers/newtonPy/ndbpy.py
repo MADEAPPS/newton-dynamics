@@ -14,8 +14,6 @@ bl_info = {
 	"author": "Newton Dynamics",
 	"version": (1, 0, 0),
 	"blender": (2, 93, 0),
-	#"location": "Properties > Scene > Blend Info panel",
-    #"location": "3D Viewport > Sidebar > Item tab",
     "location": "View3D",
 	"description": "Add Newton Physics to meshes",
 }
@@ -43,7 +41,7 @@ class NewtonWorldPanel(bpy.types.Panel):
     bl_region_type = "UI"
     bl_category = "newton"
 
-    def findHome(self, scene):
+    def findHome(self):
         col = bpy.data.collections.get("Collection")
         if col:
             for obj in col.objects:
@@ -57,16 +55,16 @@ class NewtonWorldPanel(bpy.types.Panel):
         
         world = scene.newton_world
         if world is None:
-            newtonHome = self.findHome(scene)
+            newtonHome = self.findHome()
             if newtonHome is None:
                 layout.operator("view3d.newton_world_create_home")
-                #newtonHome = self.findHome(scene)
             else:
                 layout.operator("view3d.newton_world_create")
         else:
             worldProperties = scene.newton_world_properties
 
             layout.operator("view3d.newton_world_destroy")
+            
 
             #list engine parameters
             layout.label(text="Engine Configuration")
@@ -74,12 +72,15 @@ class NewtonWorldPanel(bpy.types.Panel):
             layout.prop(worldProperties, "solverSubSteps")
             layout.prop(worldProperties, "solverIterations")
 
+            layout.operator("view3d.newton_world_set_property")
+
 classes = [
-    newtonWorld.NewtonWorldProperties,
+    NewtonWorldPanel,
     newtonWorld.NewtonWorldCreate,
     newtonWorld.NewtonWorldDestroy,
-    newtonWorld.NewtonWorldCreateHomeObject,
-    NewtonWorldPanel
+    newtonWorld.NewtonWorldProperties,
+    newtonWorld.NewtonWorldSetProperty,
+    newtonWorld.NewtonWorldCreateHomeObject
 ]
 
 def register():

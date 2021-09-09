@@ -33,7 +33,12 @@ class NewtonWorld(bpy.types.Object):
         #print ("create manager one once")
         self.name = 'newton_world'
         self.world = newton.ndWorld()
-        self.iterations = self.world.GetSolverIterations()
+
+        #self.iterations = self.world.GetSolverIterations()
+        #self.SetIterations(10)
+
+    def SetIterations (self, iterations):
+        self.world.SetSolverIterations(iterations)
 
 class NewtonWorldCreateHomeObject(bpy.types.Operator):
     """Creates a newton world home"""
@@ -50,7 +55,16 @@ class NewtonWorldCreateHomeObject(bpy.types.Operator):
             return {'CANCELLED'}
 
         context.active_object.name = 'newtonHome'
-        scene.newton_world = NewtonWorld(context.active_object)
+        world = NewtonWorld(context.active_object)
+
+        print ("test calss NewtonWorld")
+        # this line works
+        world.SetIterations(10)
+
+        # this line fail in blender but not in python
+        scene.newton_world = world
+        scene.newton_world.SetIterations(10)
+
         return {'FINISHED'}
 
 class NewtonWorldCreate(bpy.types.Operator):
@@ -64,7 +78,8 @@ class NewtonWorldCreate(bpy.types.Operator):
 
         # this does not works.
         #scene.newton_world = bpy.data.objects.new('newton_world', None) 
-        scene.newton_world = NewtonWorld(context.active_object)
+        world = NewtonWorld(context.active_object)
+        scene.newton_world = world
         return {'FINISHED'}
 
 class NewtonWorldDestroy(bpy.types.Operator):
@@ -78,4 +93,27 @@ class NewtonWorldDestroy(bpy.types.Operator):
 
         scene.newton_world.name = 'newtonHome'
         scene.newton_world = None
+        return {'FINISHED'}
+
+class NewtonWorldSetProperty(bpy.types.Operator):
+    """newton world set engine properties"""
+    bl_label = 'newton world set property'
+    bl_idname = 'view3d.newton_world_set_property'
+    bl_description = "newton world set property"
+
+    def findWorld(self):
+        col = bpy.data.collections.get("Collection")
+        if col:
+            for obj in col.objects:
+                if obj.name == 'newton_world':
+                    print ("esta es una pura mierda 0")
+                    return obj
+        return None
+
+
+    def execute(self, context):
+        scene = context.scene
+        world = self.findWorld()
+        propertyGroup = scene.newton_world_properties
+        world.SetIterations(propertyGroup.solverIterations)
         return {'FINISHED'}
