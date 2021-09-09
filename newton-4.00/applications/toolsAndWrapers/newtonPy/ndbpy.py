@@ -64,36 +64,40 @@ class NewtonWorldPanel(bpy.types.Panel):
             else:
                 layout.operator("view3d.newton_world_create")
         else:
+            worldProperties = scene.newton_world_properties
+
             layout.operator("view3d.newton_world_destroy")
 
             #list engine parameters
             layout.label(text="Engine Configuration")
-            row = layout.row()
-            row.prop(world, "name")
-            #row.prop(scene, "substeps")
-            row.prop(world, "iterations")
-            #row.alignment = 'RIGHT'
-
+            #row = layout.row()
+            layout.prop(worldProperties, "solverSubSteps")
+            layout.prop(worldProperties, "solverIterations")
 
 classes = [
-    NewtonWorldPanel,
+    newtonWorld.NewtonWorldProperties,
     newtonWorld.NewtonWorldCreate,
     newtonWorld.NewtonWorldDestroy,
-    newtonWorld.NewtonWorldCreateHomeObject
+    newtonWorld.NewtonWorldCreateHomeObject,
+    NewtonWorldPanel
 ]
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    bpy.types.Scene.newton_world = bpy.props.PointerProperty(
-		type = bpy.types.Object,
-		name = "newton world",)
+    bpy.types.Scene.newton_world = bpy.props.PointerProperty(type = bpy.types.Object, name = "newton world",)
+    bpy.types.Scene.newton_world_properties = bpy.props.PointerProperty(type = newtonWorld.NewtonWorldProperties)
 
 
 def unregister():
+    del bpy.types.Scene.newton_world
+    del bpy.types.Scene.newton_world_properties
+
     for cls in classes:
         bpy.utils.unregister_class(cls)
+
+
 
 if __name__ == "__main__":
     register()

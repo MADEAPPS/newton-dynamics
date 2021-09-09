@@ -11,6 +11,21 @@
 import bpy
 import newton
 
+class NewtonWorldProperties(bpy.types.PropertyGroup):
+    solverSubSteps: bpy.props.IntProperty(name= "solver substeps", description="number of solver sub step per ticks", default = 2, min=0, max=8)
+    solverIterations: bpy.props.IntProperty(name= "solver iterations", description="Set the number of solver iterations per sub step", default = 4, min=4, max=16)
+    
+    #my_float_vector : bpy.props.FloatVectorProperty(name= "Scale", soft_min= 0, soft_max= 1000, default= (1,1,1))
+    #
+    #my_enum: bpy.props.EnumProperty(
+    #    name= "Enumerator / Dropdown",
+    #    description= "sample text",
+    #    items= [('OP1', "Add Cube", ""),
+    #            ('OP2', "Add Sphere", ""),
+    #            ('OP3', "Add Suzanne", "")
+    #    ]
+    #)
+
 class NewtonWorld(bpy.types.Object):
     """create an interface to the newton workd"""
 
