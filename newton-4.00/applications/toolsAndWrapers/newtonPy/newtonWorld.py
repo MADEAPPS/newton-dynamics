@@ -11,7 +11,7 @@
 import bpy
 import newton
 
-class TestManager(bpy.types.Object):
+class NewtonWorld(bpy.types.Object):
     """create an interface to the newton workd"""
 
     def __init__(self, object):
@@ -19,7 +19,6 @@ class TestManager(bpy.types.Object):
         self.name = 'newton_world'
         self.world = newton.ndWorld()
         self.iterations = self.world.GetSolverIterations()
-        print (self.iterations)
 
 class NewtonWorldCreateHomeObject(bpy.types.Operator):
     """Creates a newton world home"""
@@ -36,7 +35,7 @@ class NewtonWorldCreateHomeObject(bpy.types.Operator):
             return {'CANCELLED'}
 
         context.active_object.name = 'newtonHome'
-        scene.newton_world = TestManager(context.active_object)
+        scene.newton_world = NewtonWorld(context.active_object)
         return {'FINISHED'}
 
 class NewtonWorldCreate(bpy.types.Operator):
@@ -50,7 +49,7 @@ class NewtonWorldCreate(bpy.types.Operator):
 
         # this does not works.
         #scene.newton_world = bpy.data.objects.new('newton_world', None) 
-        scene.newton_world = TestManager(context.active_object)
+        scene.newton_world = NewtonWorld(context.active_object)
         return {'FINISHED'}
 
 class NewtonWorldDestroy(bpy.types.Operator):
