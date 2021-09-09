@@ -34,6 +34,7 @@
 	#include <ndNewton.h>
 %}
 
+%include "newtonConfig.h"
 
 //%rename(New) dVector::operator new;
 //%rename(Delete) dVector::operator delete;
@@ -60,7 +61,7 @@
 //%array_class(int, intArray);
 //%array_class(double, doubleArray);
 
-%include "newtonConfig.h"
+
 %include "../../../sdk/dCore/dVectorSimd.h"
 %include "../../../sdk/dCore/dMatrix.h"
 %include "../../../sdk/dCore/dQuaternion.h"

@@ -71,7 +71,7 @@ class NewtonWorldPanel(bpy.types.Panel):
             row = layout.row()
             row.prop(world, "name")
             #row.prop(scene, "substeps")
-            row.prop(scene, "iterations")
+            #row.prop(world, "iterations")
             #row.alignment = 'RIGHT'
 
 

@@ -13,6 +13,7 @@
 #ifndef _NEWTON_PY_CONFIG_H_
 #define _NEWTON_PY_CONFIG_H_
 
+
 #ifdef D_CLASS_REFLECTION
 	#undef D_CLASS_REFLECTION
 #endif
@@ -52,17 +53,31 @@
 #define D_MSV_NEWTON_ALIGN_32
 #define D_GCC_NEWTON_ALIGN_32
 
-typedef int8_t dInt8;
-typedef uint8_t dUnsigned8;
-typedef int16_t dInt16;
-typedef uint16_t dUnsigned16;
-typedef int32_t dInt32;
-typedef uint32_t dUnsigned32;
-typedef int64_t dInt64;
-typedef uint64_t dUnsigned64;
-typedef float dFloat32;
-typedef double dFloat64;
 
+#define dInt8 signed char
+#define dInt16 signed short
+#define dInt32 signed int
+#define dInt64 signed long long
+
+#define dUnsigned8 unsigned char
+#define dUnsigned16 unsigned short
+#define dUnsigned32 unsigned int
+#define dUnsigned64 unsigned long long
+
+#define dFloat32 float
+#define dFloat64 double
+
+
+
+//class XXXXX
+//{
+//	public:
+//	int xxxxxxxx0;
+//	dInt32 xxxxxxxx1;
+//
+//	int Get0() {return xxxxxxxx0;}
+//	dInt32 Get1() { return xxxxxxxx0; }
+//};
 
 #endif 
 

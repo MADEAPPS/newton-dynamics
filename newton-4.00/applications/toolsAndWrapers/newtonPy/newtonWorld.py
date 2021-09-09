@@ -11,18 +11,16 @@
 import bpy
 import newton
 
-
-#class TestManager(bpy.types.Object, newton.ndWorld):
 class TestManager(bpy.types.Object):
-    """create and interface to the newton workd"""
+#class TestManager(bpy.types.Object, newton.ndWorld):
+    """create an interface to the newton workd"""
 
     def __init__(self, object):
         #print ("create manager one once")
         self.name = 'newton_world'
-        #self.iterations = self.GetSolverIterations(self)
-
-    def XXXX(self):
-        return 1
+        self.world = newton.ndWorld()
+        self.iterations = self.world.GetSolverIterations()
+        print (self.iterations)
 
 class NewtonWorldCreateHomeObject(bpy.types.Operator):
     """Creates a newton world home"""
@@ -40,9 +38,6 @@ class NewtonWorldCreateHomeObject(bpy.types.Operator):
 
         context.active_object.name = 'newtonHome'
         scene.newton_world = TestManager(context.active_object)
-
-        scene.newton_world.XXXX()
-        #scene.newton_world.GetSolverIterations()
         return {'FINISHED'}
 
 class NewtonWorldCreate(bpy.types.Operator):

@@ -2696,8 +2696,8 @@ SWIGINTERN PyObject *SWIG_PyStaticMethod_New(PyObject *SWIGUNUSEDPARM(self), PyO
 #define SWIGTYPE_p___m128d swig_types[1]
 #define SWIGTYPE_p___m128i swig_types[2]
 #define SWIGTYPE_p_char swig_types[3]
-#define SWIGTYPE_p_dArrayT_int16_t_t swig_types[4]
-#define SWIGTYPE_p_dArrayT_ndBody_p_t swig_types[5]
+#define SWIGTYPE_p_dArrayT_ndBody_p_t swig_types[4]
+#define SWIGTYPE_p_dArrayT_short_t swig_types[5]
 #define SWIGTYPE_p_dBigVector swig_types[6]
 #define SWIGTYPE_p_dFastRay swig_types[7]
 #define SWIGTYPE_p_dLoadSaveBase__dLoadDescriptor swig_types[8]
@@ -2709,90 +2709,86 @@ SWIGINTERN PyObject *SWIG_PyStaticMethod_New(PyObject *SWIGUNUSEDPARM(self), PyO
 #define SWIGTYPE_p_dVector swig_types[14]
 #define SWIGTYPE_p_double swig_types[15]
 #define SWIGTYPE_p_float swig_types[16]
-#define SWIGTYPE_p_int16_t swig_types[17]
-#define SWIGTYPE_p_int32_t swig_types[18]
-#define SWIGTYPE_p_int64_t swig_types[19]
-#define SWIGTYPE_p_int8_t swig_types[20]
-#define SWIGTYPE_p_ndBodiesInAabbNotify swig_types[21]
-#define SWIGTYPE_p_ndBody swig_types[22]
-#define SWIGTYPE_p_ndBodyDynamic swig_types[23]
-#define SWIGTYPE_p_ndBodyKinematic swig_types[24]
-#define SWIGTYPE_p_ndBodyKinematic__ndContactMap swig_types[25]
-#define SWIGTYPE_p_ndBodyList swig_types[26]
-#define SWIGTYPE_p_ndBodyNotify swig_types[27]
-#define SWIGTYPE_p_ndBodyParticleSet swig_types[28]
-#define SWIGTYPE_p_ndBodyParticleSetList swig_types[29]
-#define SWIGTYPE_p_ndBodyPlayerCapsule swig_types[30]
-#define SWIGTYPE_p_ndBodySentinel swig_types[31]
-#define SWIGTYPE_p_ndBodySphFluid swig_types[32]
-#define SWIGTYPE_p_ndBodyTriggerVolume swig_types[33]
-#define SWIGTYPE_p_ndBoxInfo swig_types[34]
-#define SWIGTYPE_p_ndCapsuleInfo swig_types[35]
-#define SWIGTYPE_p_ndChamferCylinderInfo swig_types[36]
-#define SWIGTYPE_p_ndCollisionBvhInfo swig_types[37]
-#define SWIGTYPE_p_ndConeInfo swig_types[38]
-#define SWIGTYPE_p_ndContact swig_types[39]
-#define SWIGTYPE_p_ndContactList swig_types[40]
-#define SWIGTYPE_p_ndContactNotify swig_types[41]
-#define SWIGTYPE_p_ndContactPoint swig_types[42]
-#define SWIGTYPE_p_ndContactSolver swig_types[43]
-#define SWIGTYPE_p_ndConvexCastNotify swig_types[44]
-#define SWIGTYPE_p_ndConvexHullInfo swig_types[45]
-#define SWIGTYPE_p_ndCoumpoundInfo swig_types[46]
-#define SWIGTYPE_p_ndCylinderInfo swig_types[47]
-#define SWIGTYPE_p_ndHeighfieldInfo swig_types[48]
-#define SWIGTYPE_p_ndJointBilateralConstraint swig_types[49]
-#define SWIGTYPE_p_ndJointList swig_types[50]
-#define SWIGTYPE_p_ndMaterial swig_types[51]
-#define SWIGTYPE_p_ndModel swig_types[52]
-#define SWIGTYPE_p_ndModelList swig_types[53]
-#define SWIGTYPE_p_ndPointInfo swig_types[54]
-#define SWIGTYPE_p_ndPolygonMeshDesc swig_types[55]
-#define SWIGTYPE_p_ndPolygonMeshDesc__ndMesh swig_types[56]
-#define SWIGTYPE_p_ndProceduralInfoInfo swig_types[57]
-#define SWIGTYPE_p_ndRayCastClosestHitCallback swig_types[58]
-#define SWIGTYPE_p_ndRayCastNotify swig_types[59]
-#define SWIGTYPE_p_ndScene swig_types[60]
-#define SWIGTYPE_p_ndSceneTreeNotiFy swig_types[61]
-#define SWIGTYPE_p_ndShape swig_types[62]
-#define SWIGTYPE_p_ndShapeBox swig_types[63]
-#define SWIGTYPE_p_ndShapeCapsule swig_types[64]
-#define SWIGTYPE_p_ndShapeChamferCylinder swig_types[65]
-#define SWIGTYPE_p_ndShapeCompound swig_types[66]
-#define SWIGTYPE_p_ndShapeCompound__ndTreeArray swig_types[67]
-#define SWIGTYPE_p_ndShapeCompound__ndTreeArray__dNode swig_types[68]
-#define SWIGTYPE_p_ndShapeCone swig_types[69]
-#define SWIGTYPE_p_ndShapeConvex swig_types[70]
-#define SWIGTYPE_p_ndShapeConvexHull swig_types[71]
-#define SWIGTYPE_p_ndShapeConvexPolygon swig_types[72]
-#define SWIGTYPE_p_ndShapeCylinder swig_types[73]
-#define SWIGTYPE_p_ndShapeDebugCallback swig_types[74]
-#define SWIGTYPE_p_ndShapeDebugCallback__ndEdgeType swig_types[75]
-#define SWIGTYPE_p_ndShapeHeightfield swig_types[76]
-#define SWIGTYPE_p_ndShapeInfo swig_types[77]
-#define SWIGTYPE_p_ndShapeInstance swig_types[78]
-#define SWIGTYPE_p_ndShapeLoaderCache swig_types[79]
-#define SWIGTYPE_p_ndShapeMaterial swig_types[80]
-#define SWIGTYPE_p_ndShapeMaterial__dExtraData swig_types[81]
-#define SWIGTYPE_p_ndShapeMaterial__nData swig_types[82]
-#define SWIGTYPE_p_ndShapeNull swig_types[83]
-#define SWIGTYPE_p_ndShapePoint swig_types[84]
-#define SWIGTYPE_p_ndShapeSphere swig_types[85]
-#define SWIGTYPE_p_ndShapeStaticMesh swig_types[86]
-#define SWIGTYPE_p_ndShapeStaticProceduralMesh swig_types[87]
-#define SWIGTYPE_p_ndShapeStatic_bvh swig_types[88]
-#define SWIGTYPE_p_ndSkeletonContainer swig_types[89]
-#define SWIGTYPE_p_ndSkeletonList swig_types[90]
-#define SWIGTYPE_p_ndSphereInfo swig_types[91]
-#define SWIGTYPE_p_ndWorld swig_types[92]
-#define SWIGTYPE_p_nd__TiXmlNode swig_types[93]
-#define SWIGTYPE_p_uint16_t swig_types[94]
-#define SWIGTYPE_p_uint32_t swig_types[95]
-#define SWIGTYPE_p_uint64_t swig_types[96]
-#define SWIGTYPE_p_uint8_t swig_types[97]
-#define SWIGTYPE_p_void swig_types[98]
-static swig_type_info *swig_types[100];
-static swig_module_info swig_module = {swig_types, 99, 0, 0, 0, 0};
+#define SWIGTYPE_p_int swig_types[17]
+#define SWIGTYPE_p_long_long swig_types[18]
+#define SWIGTYPE_p_ndBodiesInAabbNotify swig_types[19]
+#define SWIGTYPE_p_ndBody swig_types[20]
+#define SWIGTYPE_p_ndBodyDynamic swig_types[21]
+#define SWIGTYPE_p_ndBodyKinematic swig_types[22]
+#define SWIGTYPE_p_ndBodyKinematic__ndContactMap swig_types[23]
+#define SWIGTYPE_p_ndBodyList swig_types[24]
+#define SWIGTYPE_p_ndBodyNotify swig_types[25]
+#define SWIGTYPE_p_ndBodyParticleSet swig_types[26]
+#define SWIGTYPE_p_ndBodyParticleSetList swig_types[27]
+#define SWIGTYPE_p_ndBodyPlayerCapsule swig_types[28]
+#define SWIGTYPE_p_ndBodySentinel swig_types[29]
+#define SWIGTYPE_p_ndBodySphFluid swig_types[30]
+#define SWIGTYPE_p_ndBodyTriggerVolume swig_types[31]
+#define SWIGTYPE_p_ndBoxInfo swig_types[32]
+#define SWIGTYPE_p_ndCapsuleInfo swig_types[33]
+#define SWIGTYPE_p_ndChamferCylinderInfo swig_types[34]
+#define SWIGTYPE_p_ndCollisionBvhInfo swig_types[35]
+#define SWIGTYPE_p_ndConeInfo swig_types[36]
+#define SWIGTYPE_p_ndContact swig_types[37]
+#define SWIGTYPE_p_ndContactList swig_types[38]
+#define SWIGTYPE_p_ndContactNotify swig_types[39]
+#define SWIGTYPE_p_ndContactPoint swig_types[40]
+#define SWIGTYPE_p_ndContactSolver swig_types[41]
+#define SWIGTYPE_p_ndConvexCastNotify swig_types[42]
+#define SWIGTYPE_p_ndConvexHullInfo swig_types[43]
+#define SWIGTYPE_p_ndCoumpoundInfo swig_types[44]
+#define SWIGTYPE_p_ndCylinderInfo swig_types[45]
+#define SWIGTYPE_p_ndHeighfieldInfo swig_types[46]
+#define SWIGTYPE_p_ndJointBilateralConstraint swig_types[47]
+#define SWIGTYPE_p_ndJointList swig_types[48]
+#define SWIGTYPE_p_ndMaterial swig_types[49]
+#define SWIGTYPE_p_ndModel swig_types[50]
+#define SWIGTYPE_p_ndModelList swig_types[51]
+#define SWIGTYPE_p_ndPointInfo swig_types[52]
+#define SWIGTYPE_p_ndPolygonMeshDesc swig_types[53]
+#define SWIGTYPE_p_ndPolygonMeshDesc__ndMesh swig_types[54]
+#define SWIGTYPE_p_ndProceduralInfoInfo swig_types[55]
+#define SWIGTYPE_p_ndRayCastClosestHitCallback swig_types[56]
+#define SWIGTYPE_p_ndRayCastNotify swig_types[57]
+#define SWIGTYPE_p_ndScene swig_types[58]
+#define SWIGTYPE_p_ndSceneTreeNotiFy swig_types[59]
+#define SWIGTYPE_p_ndShape swig_types[60]
+#define SWIGTYPE_p_ndShapeBox swig_types[61]
+#define SWIGTYPE_p_ndShapeCapsule swig_types[62]
+#define SWIGTYPE_p_ndShapeChamferCylinder swig_types[63]
+#define SWIGTYPE_p_ndShapeCompound swig_types[64]
+#define SWIGTYPE_p_ndShapeCompound__ndTreeArray swig_types[65]
+#define SWIGTYPE_p_ndShapeCompound__ndTreeArray__dNode swig_types[66]
+#define SWIGTYPE_p_ndShapeCone swig_types[67]
+#define SWIGTYPE_p_ndShapeConvex swig_types[68]
+#define SWIGTYPE_p_ndShapeConvexHull swig_types[69]
+#define SWIGTYPE_p_ndShapeConvexPolygon swig_types[70]
+#define SWIGTYPE_p_ndShapeCylinder swig_types[71]
+#define SWIGTYPE_p_ndShapeDebugCallback swig_types[72]
+#define SWIGTYPE_p_ndShapeDebugCallback__ndEdgeType swig_types[73]
+#define SWIGTYPE_p_ndShapeHeightfield swig_types[74]
+#define SWIGTYPE_p_ndShapeInfo swig_types[75]
+#define SWIGTYPE_p_ndShapeInstance swig_types[76]
+#define SWIGTYPE_p_ndShapeLoaderCache swig_types[77]
+#define SWIGTYPE_p_ndShapeMaterial swig_types[78]
+#define SWIGTYPE_p_ndShapeMaterial__dExtraData swig_types[79]
+#define SWIGTYPE_p_ndShapeMaterial__nData swig_types[80]
+#define SWIGTYPE_p_ndShapeNull swig_types[81]
+#define SWIGTYPE_p_ndShapePoint swig_types[82]
+#define SWIGTYPE_p_ndShapeSphere swig_types[83]
+#define SWIGTYPE_p_ndShapeStaticMesh swig_types[84]
+#define SWIGTYPE_p_ndShapeStaticProceduralMesh swig_types[85]
+#define SWIGTYPE_p_ndShapeStatic_bvh swig_types[86]
+#define SWIGTYPE_p_ndSkeletonContainer swig_types[87]
+#define SWIGTYPE_p_ndSkeletonList swig_types[88]
+#define SWIGTYPE_p_ndSphereInfo swig_types[89]
+#define SWIGTYPE_p_ndWorld swig_types[90]
+#define SWIGTYPE_p_nd__TiXmlNode swig_types[91]
+#define SWIGTYPE_p_short swig_types[92]
+#define SWIGTYPE_p_signed_char swig_types[93]
+#define SWIGTYPE_p_void swig_types[94]
+static swig_type_info *swig_types[96];
+static swig_module_info swig_module = {swig_types, 95, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3011,6 +3007,105 @@ SWIG_AsVal_float (PyObject * obj, float *val)
 }
 
 
+#include <limits.h>
+#if !defined(SWIG_NO_LLONG_MAX)
+# if !defined(LLONG_MAX) && defined(__GNUC__) && defined (__LONG_LONG_MAX__)
+#   define LLONG_MAX __LONG_LONG_MAX__
+#   define LLONG_MIN (-LLONG_MAX - 1LL)
+#   define ULLONG_MAX (LLONG_MAX * 2ULL + 1ULL)
+# endif
+#endif
+
+
+SWIGINTERNINLINE int
+SWIG_CanCastAsInteger(double *d, double min, double max) {
+  double x = *d;
+  if ((min <= x && x <= max)) {
+   double fx = floor(x);
+   double cx = ceil(x);
+   double rd =  ((x - fx) < 0.5) ? fx : cx; /* simple rint */
+   if ((errno == EDOM) || (errno == ERANGE)) {
+     errno = 0;
+   } else {
+     double summ, reps, diff;
+     if (rd < x) {
+       diff = x - rd;
+     } else if (rd > x) {
+       diff = rd - x;
+     } else {
+       return 1;
+     }
+     summ = rd + x;
+     reps = diff/summ;
+     if (reps < 8*DBL_EPSILON) {
+       *d = rd;
+       return 1;
+     }
+   }
+  }
+  return 0;
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_long (PyObject *obj, long* val)
+{
+#if PY_VERSION_HEX < 0x03000000
+  if (PyInt_Check(obj)) {
+    if (val) *val = PyInt_AsLong(obj);
+    return SWIG_OK;
+  } else
+#endif
+  if (PyLong_Check(obj)) {
+    long v = PyLong_AsLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      PyErr_Clear();
+      return SWIG_OverflowError;
+    }
+  }
+#ifdef SWIG_PYTHON_CAST_MODE
+  {
+    int dispatch = 0;
+    long v = PyInt_AsLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_AddCast(SWIG_OK);
+    } else {
+      PyErr_Clear();
+    }
+    if (!dispatch) {
+      double d;
+      int res = SWIG_AddCast(SWIG_AsVal_double (obj,&d));
+      if (SWIG_IsOK(res) && SWIG_CanCastAsInteger(&d, LONG_MIN, LONG_MAX)) {
+	if (val) *val = (long)(d);
+	return res;
+      }
+    }
+  }
+#endif
+  return SWIG_TypeError;
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_int (PyObject * obj, int *val)
+{
+  long v;
+  int res = SWIG_AsVal_long (obj, &v);
+  if (SWIG_IsOK(res)) {
+    if ((v < INT_MIN || v > INT_MAX)) {
+      return SWIG_OverflowError;
+    } else {
+      if (val) *val = static_cast< int >(v);
+    }
+  }  
+  return res;
+}
+
+
   #define SWIG_From_double   PyFloat_FromDouble 
 
 
@@ -3018,6 +3113,13 @@ SWIGINTERNINLINE PyObject *
 SWIG_From_float  (float value)
 {    
   return SWIG_From_double  (value);
+}
+
+
+SWIGINTERNINLINE PyObject*
+  SWIG_From_int  (int value)
+{
+  return PyInt_FromLong((long) value);
 }
 
 
@@ -3146,6 +3248,53 @@ SWIG_AsCharPtrAndSize(PyObject *obj, char** cptr, size_t* psize, int *alloc)
 
 
 
+#if defined(LLONG_MAX) && !defined(SWIG_LONG_LONG_AVAILABLE)
+#  define SWIG_LONG_LONG_AVAILABLE
+#endif
+
+
+#ifdef SWIG_LONG_LONG_AVAILABLE
+SWIGINTERN int
+SWIG_AsVal_long_SS_long (PyObject *obj, long long *val)
+{
+  int res = SWIG_TypeError;
+  if (PyLong_Check(obj)) {
+    long long v = PyLong_AsLongLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      PyErr_Clear();
+      res = SWIG_OverflowError;
+    }
+  } else {
+    long v;
+    res = SWIG_AsVal_long (obj,&v);
+    if (SWIG_IsOK(res)) {
+      if (val) *val = v;
+      return res;
+    }
+  }
+#ifdef SWIG_PYTHON_CAST_MODE
+  {
+    const double mant_max = 1LL << DBL_MANT_DIG;
+    const double mant_min = -mant_max;
+    double d;
+    res = SWIG_AsVal_double (obj,&d);
+    if (SWIG_IsOK(res) && !SWIG_CanCastAsInteger(&d, mant_min, mant_max))
+      return SWIG_OverflowError;
+    if (SWIG_IsOK(res) && SWIG_CanCastAsInteger(&d, mant_min, mant_max)) {
+      if (val) *val = (long long)(d);
+      return SWIG_AddCast(res);
+    }
+    res = SWIG_TypeError;
+  }
+#endif
+  return res;
+}
+#endif
+
+
 SWIGINTERNINLINE PyObject*
   SWIG_From_bool  (bool value)
 {
@@ -3153,110 +3302,14 @@ SWIGINTERNINLINE PyObject*
 }
 
 
-SWIGINTERNINLINE PyObject*
-  SWIG_From_int  (int value)
+#ifdef SWIG_LONG_LONG_AVAILABLE
+SWIGINTERNINLINE PyObject* 
+SWIG_From_long_SS_long  (long long value)
 {
-  return PyInt_FromLong((long) value);
+  return ((value < LONG_MIN) || (value > LONG_MAX)) ?
+    PyLong_FromLongLong(value) : PyInt_FromLong(static_cast< long >(value));
 }
-
-
-#include <limits.h>
-#if !defined(SWIG_NO_LLONG_MAX)
-# if !defined(LLONG_MAX) && defined(__GNUC__) && defined (__LONG_LONG_MAX__)
-#   define LLONG_MAX __LONG_LONG_MAX__
-#   define LLONG_MIN (-LLONG_MAX - 1LL)
-#   define ULLONG_MAX (LLONG_MAX * 2ULL + 1ULL)
-# endif
 #endif
-
-
-SWIGINTERNINLINE int
-SWIG_CanCastAsInteger(double *d, double min, double max) {
-  double x = *d;
-  if ((min <= x && x <= max)) {
-   double fx = floor(x);
-   double cx = ceil(x);
-   double rd =  ((x - fx) < 0.5) ? fx : cx; /* simple rint */
-   if ((errno == EDOM) || (errno == ERANGE)) {
-     errno = 0;
-   } else {
-     double summ, reps, diff;
-     if (rd < x) {
-       diff = x - rd;
-     } else if (rd > x) {
-       diff = rd - x;
-     } else {
-       return 1;
-     }
-     summ = rd + x;
-     reps = diff/summ;
-     if (reps < 8*DBL_EPSILON) {
-       *d = rd;
-       return 1;
-     }
-   }
-  }
-  return 0;
-}
-
-
-SWIGINTERN int
-SWIG_AsVal_long (PyObject *obj, long* val)
-{
-#if PY_VERSION_HEX < 0x03000000
-  if (PyInt_Check(obj)) {
-    if (val) *val = PyInt_AsLong(obj);
-    return SWIG_OK;
-  } else
-#endif
-  if (PyLong_Check(obj)) {
-    long v = PyLong_AsLong(obj);
-    if (!PyErr_Occurred()) {
-      if (val) *val = v;
-      return SWIG_OK;
-    } else {
-      PyErr_Clear();
-      return SWIG_OverflowError;
-    }
-  }
-#ifdef SWIG_PYTHON_CAST_MODE
-  {
-    int dispatch = 0;
-    long v = PyInt_AsLong(obj);
-    if (!PyErr_Occurred()) {
-      if (val) *val = v;
-      return SWIG_AddCast(SWIG_OK);
-    } else {
-      PyErr_Clear();
-    }
-    if (!dispatch) {
-      double d;
-      int res = SWIG_AddCast(SWIG_AsVal_double (obj,&d));
-      if (SWIG_IsOK(res) && SWIG_CanCastAsInteger(&d, LONG_MIN, LONG_MAX)) {
-	if (val) *val = (long)(d);
-	return res;
-      }
-    }
-  }
-#endif
-  return SWIG_TypeError;
-}
-
-
-SWIGINTERN int
-SWIG_AsVal_int (PyObject * obj, int *val)
-{
-  long v;
-  int res = SWIG_AsVal_long (obj, &v);
-  if (SWIG_IsOK(res)) {
-    if ((v < INT_MIN || v > INT_MAX)) {
-      return SWIG_OverflowError;
-    } else {
-      if (val) *val = static_cast< int >(v);
-    }
-  }  
-  return res;
-}
 
 
 SWIGINTERN int
@@ -3270,6 +3323,87 @@ SWIG_AsVal_bool (PyObject *obj, bool *val)
     return SWIG_ERROR;
   if (val) *val = r ? true : false;
   return SWIG_OK;
+}
+
+
+#ifdef SWIG_LONG_LONG_AVAILABLE
+SWIGINTERNINLINE PyObject* 
+SWIG_From_unsigned_SS_long_SS_long  (unsigned long long value)
+{
+  return (value > LONG_MAX) ?
+    PyLong_FromUnsignedLongLong(value) : PyInt_FromLong(static_cast< long >(value));
+}
+#endif
+
+
+SWIGINTERNINLINE PyObject*
+  SWIG_From_unsigned_SS_int  (unsigned int value)
+{
+  return PyInt_FromSize_t((size_t) value);
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_unsigned_SS_long (PyObject *obj, unsigned long *val) 
+{
+#if PY_VERSION_HEX < 0x03000000
+  if (PyInt_Check(obj)) {
+    long v = PyInt_AsLong(obj);
+    if (v >= 0) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      return SWIG_OverflowError;
+    }
+  } else
+#endif
+  if (PyLong_Check(obj)) {
+    unsigned long v = PyLong_AsUnsignedLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_OK;
+    } else {
+      PyErr_Clear();
+      return SWIG_OverflowError;
+    }
+  }
+#ifdef SWIG_PYTHON_CAST_MODE
+  {
+    int dispatch = 0;
+    unsigned long v = PyLong_AsUnsignedLong(obj);
+    if (!PyErr_Occurred()) {
+      if (val) *val = v;
+      return SWIG_AddCast(SWIG_OK);
+    } else {
+      PyErr_Clear();
+    }
+    if (!dispatch) {
+      double d;
+      int res = SWIG_AddCast(SWIG_AsVal_double (obj,&d));
+      if (SWIG_IsOK(res) && SWIG_CanCastAsInteger(&d, 0, ULONG_MAX)) {
+	if (val) *val = (unsigned long)(d);
+	return res;
+      }
+    }
+  }
+#endif
+  return SWIG_TypeError;
+}
+
+
+SWIGINTERN int
+SWIG_AsVal_unsigned_SS_int (PyObject * obj, unsigned int *val)
+{
+  unsigned long v;
+  int res = SWIG_AsVal_unsigned_SS_long (obj, &v);
+  if (SWIG_IsOK(res)) {
+    if ((v > UINT_MAX)) {
+      return SWIG_OverflowError;
+    } else {
+      if (val) *val = static_cast< unsigned int >(v);
+    }
+  }  
+  return res;
 }
 
 
@@ -3380,7 +3514,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_dVector__SWIG_3(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat32 arg1 ;
+  float arg1 ;
   float val1 ;
   int ecode1 = 0 ;
   dVector *result = 0 ;
@@ -3388,9 +3522,9 @@ SWIGINTERN PyObject *_wrap_new_dVector__SWIG_3(PyObject *SWIGUNUSEDPARM(self), P
   if ((nobjs < 1) || (nobjs > 1)) SWIG_fail;
   ecode1 = SWIG_AsVal_float(swig_obj[0], &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_dVector" "', argument " "1"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_dVector" "', argument " "1"" of type '" "float""'");
   } 
-  arg1 = static_cast< dFloat32 >(val1);
+  arg1 = static_cast< float >(val1);
   result = (dVector *)new dVector(arg1);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dVector, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -3401,7 +3535,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_dVector__SWIG_4(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat32 *arg1 = (dFloat32 *) (dFloat32 *)0 ;
+  float *arg1 = (float *) (float *)0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   dVector *result = 0 ;
@@ -3409,10 +3543,10 @@ SWIGINTERN PyObject *_wrap_new_dVector__SWIG_4(PyObject *SWIGUNUSEDPARM(self), P
   if ((nobjs < 1) || (nobjs > 1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_float, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dVector" "', argument " "1"" of type '" "dFloat32 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dVector" "', argument " "1"" of type '" "float const *const""'"); 
   }
-  arg1 = reinterpret_cast< dFloat32 * >(argp1);
-  result = (dVector *)new dVector((dFloat32 const *)arg1);
+  arg1 = reinterpret_cast< float * >(argp1);
+  result = (dVector *)new dVector((float const *)arg1);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dVector, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
@@ -3422,8 +3556,8 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_dVector__SWIG_5(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat32 *arg1 = (dFloat32 *) (dFloat32 *)0 ;
-  dInt32 *arg2 = (dInt32 *) (dInt32 *)0 ;
+  float *arg1 = (float *) (float *)0 ;
+  int *arg2 = (int *) (int *)0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -3433,15 +3567,15 @@ SWIGINTERN PyObject *_wrap_new_dVector__SWIG_5(PyObject *SWIGUNUSEDPARM(self), P
   if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_float, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dVector" "', argument " "1"" of type '" "dFloat32 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dVector" "', argument " "1"" of type '" "float const *const""'"); 
   }
-  arg1 = reinterpret_cast< dFloat32 * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int32_t, 0 |  0 );
+  arg1 = reinterpret_cast< float * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "new_dVector" "', argument " "2"" of type '" "dInt32 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "new_dVector" "', argument " "2"" of type '" "int const *const""'"); 
   }
-  arg2 = reinterpret_cast< dInt32 * >(argp2);
-  result = (dVector *)new dVector((dFloat32 const *)arg1,(dInt32 const *)arg2);
+  arg2 = reinterpret_cast< int * >(argp2);
+  result = (dVector *)new dVector((float const *)arg1,(int const *)arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dVector, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
@@ -3451,7 +3585,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_dVector__SWIG_6(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat64 *arg1 = (dFloat64 *) (dFloat64 *)0 ;
+  double *arg1 = (double *) (double *)0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   dVector *result = 0 ;
@@ -3459,10 +3593,10 @@ SWIGINTERN PyObject *_wrap_new_dVector__SWIG_6(PyObject *SWIGUNUSEDPARM(self), P
   if ((nobjs < 1) || (nobjs > 1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_double, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dVector" "', argument " "1"" of type '" "dFloat64 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dVector" "', argument " "1"" of type '" "double const *const""'"); 
   }
-  arg1 = reinterpret_cast< dFloat64 * >(argp1);
-  result = (dVector *)new dVector((dFloat64 const *)arg1);
+  arg1 = reinterpret_cast< double * >(argp1);
+  result = (dVector *)new dVector((double const *)arg1);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dVector, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
@@ -3520,10 +3654,10 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_dVector__SWIG_9(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat32 arg1 ;
-  dFloat32 arg2 ;
-  dFloat32 arg3 ;
-  dFloat32 arg4 ;
+  float arg1 ;
+  float arg2 ;
+  float arg3 ;
+  float arg4 ;
   float val1 ;
   int ecode1 = 0 ;
   float val2 ;
@@ -3537,24 +3671,24 @@ SWIGINTERN PyObject *_wrap_new_dVector__SWIG_9(PyObject *SWIGUNUSEDPARM(self), P
   if ((nobjs < 4) || (nobjs > 4)) SWIG_fail;
   ecode1 = SWIG_AsVal_float(swig_obj[0], &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_dVector" "', argument " "1"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_dVector" "', argument " "1"" of type '" "float""'");
   } 
-  arg1 = static_cast< dFloat32 >(val1);
+  arg1 = static_cast< float >(val1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_dVector" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_dVector" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_dVector" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_dVector" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   ecode4 = SWIG_AsVal_float(swig_obj[3], &val4);
   if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "new_dVector" "', argument " "4"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "new_dVector" "', argument " "4"" of type '" "float""'");
   } 
-  arg4 = static_cast< dFloat32 >(val4);
+  arg4 = static_cast< float >(val4);
   result = (dVector *)new dVector(arg1,arg2,arg3,arg4);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dVector, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -3565,73 +3699,41 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_dVector__SWIG_10(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dInt32 arg1 ;
-  dInt32 arg2 ;
-  dInt32 arg3 ;
-  dInt32 arg4 ;
-  void *argp1 ;
-  int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  void *argp3 ;
-  int res3 = 0 ;
-  void *argp4 ;
-  int res4 = 0 ;
+  int arg1 ;
+  int arg2 ;
+  int arg3 ;
+  int arg4 ;
+  int val1 ;
+  int ecode1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
   dVector *result = 0 ;
   
   if ((nobjs < 4) || (nobjs > 4)) SWIG_fail;
-  {
-    res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dVector" "', argument " "1"" of type '" "dInt32""'"); 
-    }  
-    if (!argp1) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_dVector" "', argument " "1"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp1);
-      arg1 = *temp;
-      if (SWIG_IsNewObj(res1)) delete temp;
-    }
-  }
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "new_dVector" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_dVector" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  {
-    res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "new_dVector" "', argument " "3"" of type '" "dInt32""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_dVector" "', argument " "3"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
-  }
-  {
-    res4 = SWIG_ConvertPtr(swig_obj[3], &argp4, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res4)) {
-      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "new_dVector" "', argument " "4"" of type '" "dInt32""'"); 
-    }  
-    if (!argp4) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_dVector" "', argument " "4"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp4);
-      arg4 = *temp;
-      if (SWIG_IsNewObj(res4)) delete temp;
-    }
-  }
+  ecode1 = SWIG_AsVal_int(swig_obj[0], &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_dVector" "', argument " "1"" of type '" "int""'");
+  } 
+  arg1 = static_cast< int >(val1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_dVector" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_dVector" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  ecode4 = SWIG_AsVal_int(swig_obj[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "new_dVector" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = static_cast< int >(val4);
   result = (dVector *)new dVector(arg1,arg2,arg3,arg4);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dVector, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -3718,7 +3820,7 @@ SWIGINTERN PyObject *_wrap_new_dVector(PyObject *self, PyObject *args) {
     _v = SWIG_CheckState(res);
     if (_v) {
       void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_int32_t, 0);
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_int, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
         return _wrap_new_dVector__SWIG_5(self, argc, argv);
@@ -3727,17 +3829,25 @@ SWIGINTERN PyObject *_wrap_new_dVector(PyObject *self, PyObject *args) {
   }
   if (argc == 4) {
     int _v;
-    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
+    {
+      int res = SWIG_AsVal_int(argv[0], NULL);
       _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
+    }
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
         _v = SWIG_CheckState(res);
-        if (_v) {
-          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
           _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
           if (_v) {
             return _wrap_new_dVector__SWIG_10(self, argc, argv);
           }
@@ -3780,14 +3890,14 @@ fail:
     "    dVector::dVector()\n"
     "    dVector::dVector(__m128i const)\n"
     "    dVector::dVector(__m128 const)\n"
-    "    dVector::dVector(dFloat32 const)\n"
-    "    dVector::dVector(dFloat32 const *const)\n"
-    "    dVector::dVector(dFloat32 const *const,dInt32 const *const)\n"
-    "    dVector::dVector(dFloat64 const *const)\n"
+    "    dVector::dVector(float const)\n"
+    "    dVector::dVector(float const *const)\n"
+    "    dVector::dVector(float const *const,int const *const)\n"
+    "    dVector::dVector(double const *const)\n"
     "    dVector::dVector(dVector const &)\n"
     "    dVector::dVector(dBigVector const &)\n"
-    "    dVector::dVector(dFloat32,dFloat32,dFloat32,dFloat32)\n"
-    "    dVector::dVector(dInt32,dInt32,dInt32,dInt32)\n");
+    "    dVector::dVector(float,float,float,float)\n"
+    "    dVector::dVector(int,int,int,int)\n");
   return 0;
 }
 
@@ -3798,7 +3908,7 @@ SWIGINTERN PyObject *_wrap_dVector_GetX(PyObject *SWIGUNUSEDPARM(self), PyObject
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -3807,7 +3917,7 @@ SWIGINTERN PyObject *_wrap_dVector_GetX(PyObject *SWIGUNUSEDPARM(self), PyObject
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dVector_GetX" "', argument " "1"" of type '" "dVector const *""'"); 
   }
   arg1 = reinterpret_cast< dVector * >(argp1);
-  result = (dFloat32)((dVector const *)arg1)->GetX();
+  result = (float)((dVector const *)arg1)->GetX();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -3821,7 +3931,7 @@ SWIGINTERN PyObject *_wrap_dVector_GetY(PyObject *SWIGUNUSEDPARM(self), PyObject
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -3830,7 +3940,7 @@ SWIGINTERN PyObject *_wrap_dVector_GetY(PyObject *SWIGUNUSEDPARM(self), PyObject
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dVector_GetY" "', argument " "1"" of type '" "dVector const *""'"); 
   }
   arg1 = reinterpret_cast< dVector * >(argp1);
-  result = (dFloat32)((dVector const *)arg1)->GetY();
+  result = (float)((dVector const *)arg1)->GetY();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -3844,7 +3954,7 @@ SWIGINTERN PyObject *_wrap_dVector_GetZ(PyObject *SWIGUNUSEDPARM(self), PyObject
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -3853,7 +3963,7 @@ SWIGINTERN PyObject *_wrap_dVector_GetZ(PyObject *SWIGUNUSEDPARM(self), PyObject
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dVector_GetZ" "', argument " "1"" of type '" "dVector const *""'"); 
   }
   arg1 = reinterpret_cast< dVector * >(argp1);
-  result = (dFloat32)((dVector const *)arg1)->GetZ();
+  result = (float)((dVector const *)arg1)->GetZ();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -3867,7 +3977,7 @@ SWIGINTERN PyObject *_wrap_dVector_GetW(PyObject *SWIGUNUSEDPARM(self), PyObject
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -3876,7 +3986,7 @@ SWIGINTERN PyObject *_wrap_dVector_GetW(PyObject *SWIGUNUSEDPARM(self), PyObject
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dVector_GetW" "', argument " "1"" of type '" "dVector const *""'"); 
   }
   arg1 = reinterpret_cast< dVector * >(argp1);
-  result = (dFloat32)((dVector const *)arg1)->GetW();
+  result = (float)((dVector const *)arg1)->GetW();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -3887,7 +3997,7 @@ fail:
 SWIGINTERN PyObject *_wrap_dVector_SetX(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   dVector *arg1 = (dVector *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -3902,9 +4012,9 @@ SWIGINTERN PyObject *_wrap_dVector_SetX(PyObject *SWIGUNUSEDPARM(self), PyObject
   arg1 = reinterpret_cast< dVector * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dVector_SetX" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dVector_SetX" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   (arg1)->SetX(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -3916,7 +4026,7 @@ fail:
 SWIGINTERN PyObject *_wrap_dVector_SetY(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   dVector *arg1 = (dVector *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -3931,9 +4041,9 @@ SWIGINTERN PyObject *_wrap_dVector_SetY(PyObject *SWIGUNUSEDPARM(self), PyObject
   arg1 = reinterpret_cast< dVector * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dVector_SetY" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dVector_SetY" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   (arg1)->SetY(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -3945,7 +4055,7 @@ fail:
 SWIGINTERN PyObject *_wrap_dVector_SetZ(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   dVector *arg1 = (dVector *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -3960,9 +4070,9 @@ SWIGINTERN PyObject *_wrap_dVector_SetZ(PyObject *SWIGUNUSEDPARM(self), PyObject
   arg1 = reinterpret_cast< dVector * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dVector_SetZ" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dVector_SetZ" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   (arg1)->SetZ(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -3974,7 +4084,7 @@ fail:
 SWIGINTERN PyObject *_wrap_dVector_SetW(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   dVector *arg1 = (dVector *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -3989,9 +4099,9 @@ SWIGINTERN PyObject *_wrap_dVector_SetW(PyObject *SWIGUNUSEDPARM(self), PyObject
   arg1 = reinterpret_cast< dVector * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dVector_SetW" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dVector_SetW" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   (arg1)->SetW(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -4006,7 +4116,7 @@ SWIGINTERN PyObject *_wrap_dVector_GetScalar(PyObject *SWIGUNUSEDPARM(self), PyO
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -4015,7 +4125,7 @@ SWIGINTERN PyObject *_wrap_dVector_GetScalar(PyObject *SWIGUNUSEDPARM(self), PyO
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dVector_GetScalar" "', argument " "1"" of type '" "dVector const *""'"); 
   }
   arg1 = reinterpret_cast< dVector * >(argp1);
-  result = (dFloat32)((dVector const *)arg1)->GetScalar();
+  result = (float)((dVector const *)arg1)->GetScalar();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -4026,7 +4136,7 @@ fail:
 SWIGINTERN PyObject *_wrap_dVector_Store(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   dVector *arg1 = (dVector *) 0 ;
-  dFloat32 *arg2 = (dFloat32 *) (dFloat32 *)0 ;
+  float *arg2 = (float *) (float *)0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -4041,9 +4151,9 @@ SWIGINTERN PyObject *_wrap_dVector_Store(PyObject *SWIGUNUSEDPARM(self), PyObjec
   arg1 = reinterpret_cast< dVector * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_float, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dVector_Store" "', argument " "2"" of type '" "dFloat32 *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dVector_Store" "', argument " "2"" of type '" "float *const""'"); 
   }
-  arg2 = reinterpret_cast< dFloat32 * >(argp2);
+  arg2 = reinterpret_cast< float * >(argp2);
   ((dVector const *)arg1)->Store(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -4147,7 +4257,7 @@ fail:
 SWIGINTERN PyObject *_wrap_dVector_Scale(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   dVector *arg1 = (dVector *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -4163,9 +4273,9 @@ SWIGINTERN PyObject *_wrap_dVector_Scale(PyObject *SWIGUNUSEDPARM(self), PyObjec
   arg1 = reinterpret_cast< dVector * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dVector_Scale" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dVector_Scale" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   result = ((dVector const *)arg1)->Scale(arg2);
   resultobj = SWIG_NewPointerObj((new dVector(static_cast< const dVector& >(result))), SWIGTYPE_p_dVector, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -4177,12 +4287,12 @@ fail:
 SWIGINTERN PyObject *_wrap_dVector_GetElement__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   dVector *arg1 = (dVector *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  dFloat32 *result = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  float *result = 0 ;
   
   if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_dVector, 0 |  0 );
@@ -4190,20 +4300,12 @@ SWIGINTERN PyObject *_wrap_dVector_GetElement__SWIG_0(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dVector_GetElement" "', argument " "1"" of type '" "dVector *""'"); 
   }
   arg1 = reinterpret_cast< dVector * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dVector_GetElement" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dVector_GetElement" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  result = (dFloat32 *) &(arg1)->operator [](arg2);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dVector_GetElement" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (float *) &(arg1)->operator [](arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_float, 0 |  0 );
   return resultobj;
 fail:
@@ -4214,12 +4316,12 @@ fail:
 SWIGINTERN PyObject *_wrap_dVector_GetElement__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   dVector *arg1 = (dVector *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  dFloat32 *result = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  float *result = 0 ;
   
   if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_dVector, 0 |  0 );
@@ -4227,20 +4329,12 @@ SWIGINTERN PyObject *_wrap_dVector_GetElement__SWIG_1(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dVector_GetElement" "', argument " "1"" of type '" "dVector const *""'"); 
   }
   arg1 = reinterpret_cast< dVector * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dVector_GetElement" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dVector_GetElement" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  result = (dFloat32 *) &((dVector const *)arg1)->operator [](arg2);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dVector_GetElement" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (float *) &((dVector const *)arg1)->operator [](arg2);
   resultobj = SWIG_From_float(static_cast< float >(*result));
   return resultobj;
 fail:
@@ -4262,8 +4356,10 @@ SWIGINTERN PyObject *_wrap_dVector_GetElement(PyObject *self, PyObject *args) {
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_dVector, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
       if (_v) {
         return _wrap_dVector_GetElement__SWIG_0(self, argc, argv);
       }
@@ -4275,8 +4371,10 @@ SWIGINTERN PyObject *_wrap_dVector_GetElement(PyObject *self, PyObject *args) {
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_dVector, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
       if (_v) {
         return _wrap_dVector_GetElement__SWIG_1(self, argc, argv);
       }
@@ -4286,8 +4384,8 @@ SWIGINTERN PyObject *_wrap_dVector_GetElement(PyObject *self, PyObject *args) {
 fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'dVector_GetElement'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    dVector::operator [](dInt32)\n"
-    "    dVector::operator [](dInt32) const\n");
+    "    dVector::operator [](int)\n"
+    "    dVector::operator [](int) const\n");
   return 0;
 }
 
@@ -5459,7 +5557,7 @@ SWIGINTERN PyObject *_wrap_dVector_GetSignMask(PyObject *SWIGUNUSEDPARM(self), P
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -5468,8 +5566,8 @@ SWIGINTERN PyObject *_wrap_dVector_GetSignMask(PyObject *SWIGUNUSEDPARM(self), P
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dVector_GetSignMask" "', argument " "1"" of type '" "dVector const *""'"); 
   }
   arg1 = reinterpret_cast< dVector * >(argp1);
-  result = ((dVector const *)arg1)->GetSignMask();
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int)((dVector const *)arg1)->GetSignMask();
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -5548,11 +5646,11 @@ fail:
 SWIGINTERN PyObject *_wrap_dVector_ShiftRightLogical(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   dVector *arg1 = (dVector *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   dVector result;
   
@@ -5562,19 +5660,11 @@ SWIGINTERN PyObject *_wrap_dVector_ShiftRightLogical(PyObject *SWIGUNUSEDPARM(se
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dVector_ShiftRightLogical" "', argument " "1"" of type '" "dVector const *""'"); 
   }
   arg1 = reinterpret_cast< dVector * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dVector_ShiftRightLogical" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dVector_ShiftRightLogical" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dVector_ShiftRightLogical" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   result = ((dVector const *)arg1)->ShiftRightLogical(arg2);
   resultobj = SWIG_NewPointerObj((new dVector(static_cast< const dVector& >(result))), SWIGTYPE_p_dVector, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -6523,7 +6613,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_dBigVector__SWIG_4(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat64 arg1 ;
+  double arg1 ;
   double val1 ;
   int ecode1 = 0 ;
   dBigVector *result = 0 ;
@@ -6531,9 +6621,9 @@ SWIGINTERN PyObject *_wrap_new_dBigVector__SWIG_4(PyObject *SWIGUNUSEDPARM(self)
   if ((nobjs < 1) || (nobjs > 1)) SWIG_fail;
   ecode1 = SWIG_AsVal_double(swig_obj[0], &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_dBigVector" "', argument " "1"" of type '" "dFloat64""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_dBigVector" "', argument " "1"" of type '" "double""'");
   } 
-  arg1 = static_cast< dFloat64 >(val1);
+  arg1 = static_cast< double >(val1);
   result = (dBigVector *)new dBigVector(arg1);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dBigVector, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -6544,8 +6634,8 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_dBigVector__SWIG_5(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat64 *arg1 = (dFloat64 *) (dFloat64 *)0 ;
-  dInt64 *arg2 = (dInt64 *) (dInt64 *)0 ;
+  double *arg1 = (double *) (double *)0 ;
+  long long *arg2 = (long long *) (long long *)0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -6555,15 +6645,15 @@ SWIGINTERN PyObject *_wrap_new_dBigVector__SWIG_5(PyObject *SWIGUNUSEDPARM(self)
   if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_double, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dBigVector" "', argument " "1"" of type '" "dFloat64 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dBigVector" "', argument " "1"" of type '" "double const *const""'"); 
   }
-  arg1 = reinterpret_cast< dFloat64 * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int64_t, 0 |  0 );
+  arg1 = reinterpret_cast< double * >(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_long_long, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "new_dBigVector" "', argument " "2"" of type '" "dInt64 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "new_dBigVector" "', argument " "2"" of type '" "long long const *const""'"); 
   }
-  arg2 = reinterpret_cast< dInt64 * >(argp2);
-  result = (dBigVector *)new dBigVector((dFloat64 const *)arg1,(dInt64 const *)arg2);
+  arg2 = reinterpret_cast< long long * >(argp2);
+  result = (dBigVector *)new dBigVector((double const *)arg1,(long long const *)arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dBigVector, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
@@ -6597,7 +6687,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_dBigVector__SWIG_7(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat64 *arg1 = (dFloat64 *) (dFloat64 *)0 ;
+  double *arg1 = (double *) (double *)0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   dBigVector *result = 0 ;
@@ -6605,10 +6695,10 @@ SWIGINTERN PyObject *_wrap_new_dBigVector__SWIG_7(PyObject *SWIGUNUSEDPARM(self)
   if ((nobjs < 1) || (nobjs > 1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_double, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dBigVector" "', argument " "1"" of type '" "dFloat64 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dBigVector" "', argument " "1"" of type '" "double const *const""'"); 
   }
-  arg1 = reinterpret_cast< dFloat64 * >(argp1);
-  result = (dBigVector *)new dBigVector((dFloat64 const *)arg1);
+  arg1 = reinterpret_cast< double * >(argp1);
+  result = (dBigVector *)new dBigVector((double const *)arg1);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dBigVector, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
@@ -6618,10 +6708,10 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_dBigVector__SWIG_8(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat64 arg1 ;
-  dFloat64 arg2 ;
-  dFloat64 arg3 ;
-  dFloat64 arg4 ;
+  double arg1 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
   double val1 ;
   int ecode1 = 0 ;
   double val2 ;
@@ -6635,24 +6725,24 @@ SWIGINTERN PyObject *_wrap_new_dBigVector__SWIG_8(PyObject *SWIGUNUSEDPARM(self)
   if ((nobjs < 4) || (nobjs > 4)) SWIG_fail;
   ecode1 = SWIG_AsVal_double(swig_obj[0], &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_dBigVector" "', argument " "1"" of type '" "dFloat64""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_dBigVector" "', argument " "1"" of type '" "double""'");
   } 
-  arg1 = static_cast< dFloat64 >(val1);
+  arg1 = static_cast< double >(val1);
   ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_dBigVector" "', argument " "2"" of type '" "dFloat64""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_dBigVector" "', argument " "2"" of type '" "double""'");
   } 
-  arg2 = static_cast< dFloat64 >(val2);
+  arg2 = static_cast< double >(val2);
   ecode3 = SWIG_AsVal_double(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_dBigVector" "', argument " "3"" of type '" "dFloat64""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_dBigVector" "', argument " "3"" of type '" "double""'");
   } 
-  arg3 = static_cast< dFloat64 >(val3);
+  arg3 = static_cast< double >(val3);
   ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
   if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "new_dBigVector" "', argument " "4"" of type '" "dFloat64""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "new_dBigVector" "', argument " "4"" of type '" "double""'");
   } 
-  arg4 = static_cast< dFloat64 >(val4);
+  arg4 = static_cast< double >(val4);
   result = (dBigVector *)new dBigVector(arg1,arg2,arg3,arg4);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dBigVector, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -6663,73 +6753,41 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_dBigVector__SWIG_9(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dInt32 arg1 ;
-  dInt32 arg2 ;
-  dInt32 arg3 ;
-  dInt32 arg4 ;
-  void *argp1 ;
-  int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  void *argp3 ;
-  int res3 = 0 ;
-  void *argp4 ;
-  int res4 = 0 ;
+  int arg1 ;
+  int arg2 ;
+  int arg3 ;
+  int arg4 ;
+  int val1 ;
+  int ecode1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
   dBigVector *result = 0 ;
   
   if ((nobjs < 4) || (nobjs > 4)) SWIG_fail;
-  {
-    res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dBigVector" "', argument " "1"" of type '" "dInt32""'"); 
-    }  
-    if (!argp1) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_dBigVector" "', argument " "1"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp1);
-      arg1 = *temp;
-      if (SWIG_IsNewObj(res1)) delete temp;
-    }
-  }
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "new_dBigVector" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_dBigVector" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  {
-    res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "new_dBigVector" "', argument " "3"" of type '" "dInt32""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_dBigVector" "', argument " "3"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
-  }
-  {
-    res4 = SWIG_ConvertPtr(swig_obj[3], &argp4, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res4)) {
-      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "new_dBigVector" "', argument " "4"" of type '" "dInt32""'"); 
-    }  
-    if (!argp4) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_dBigVector" "', argument " "4"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp4);
-      arg4 = *temp;
-      if (SWIG_IsNewObj(res4)) delete temp;
-    }
-  }
+  ecode1 = SWIG_AsVal_int(swig_obj[0], &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_dBigVector" "', argument " "1"" of type '" "int""'");
+  } 
+  arg1 = static_cast< int >(val1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_dBigVector" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_dBigVector" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  ecode4 = SWIG_AsVal_int(swig_obj[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "new_dBigVector" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = static_cast< int >(val4);
   result = (dBigVector *)new dBigVector(arg1,arg2,arg3,arg4);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dBigVector, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -6740,73 +6798,41 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_dBigVector__SWIG_10(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dInt64 arg1 ;
-  dInt64 arg2 ;
-  dInt64 arg3 ;
-  dInt64 arg4 ;
-  void *argp1 ;
-  int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  void *argp3 ;
-  int res3 = 0 ;
-  void *argp4 ;
-  int res4 = 0 ;
+  long long arg1 ;
+  long long arg2 ;
+  long long arg3 ;
+  long long arg4 ;
+  long long val1 ;
+  int ecode1 = 0 ;
+  long long val2 ;
+  int ecode2 = 0 ;
+  long long val3 ;
+  int ecode3 = 0 ;
+  long long val4 ;
+  int ecode4 = 0 ;
   dBigVector *result = 0 ;
   
   if ((nobjs < 4) || (nobjs > 4)) SWIG_fail;
-  {
-    res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_int64_t,  0  | 0);
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dBigVector" "', argument " "1"" of type '" "dInt64""'"); 
-    }  
-    if (!argp1) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_dBigVector" "', argument " "1"" of type '" "dInt64""'");
-    } else {
-      dInt64 * temp = reinterpret_cast< dInt64 * >(argp1);
-      arg1 = *temp;
-      if (SWIG_IsNewObj(res1)) delete temp;
-    }
-  }
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int64_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "new_dBigVector" "', argument " "2"" of type '" "dInt64""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_dBigVector" "', argument " "2"" of type '" "dInt64""'");
-    } else {
-      dInt64 * temp = reinterpret_cast< dInt64 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  {
-    res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_int64_t,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "new_dBigVector" "', argument " "3"" of type '" "dInt64""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_dBigVector" "', argument " "3"" of type '" "dInt64""'");
-    } else {
-      dInt64 * temp = reinterpret_cast< dInt64 * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
-  }
-  {
-    res4 = SWIG_ConvertPtr(swig_obj[3], &argp4, SWIGTYPE_p_int64_t,  0  | 0);
-    if (!SWIG_IsOK(res4)) {
-      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "new_dBigVector" "', argument " "4"" of type '" "dInt64""'"); 
-    }  
-    if (!argp4) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_dBigVector" "', argument " "4"" of type '" "dInt64""'");
-    } else {
-      dInt64 * temp = reinterpret_cast< dInt64 * >(argp4);
-      arg4 = *temp;
-      if (SWIG_IsNewObj(res4)) delete temp;
-    }
-  }
+  ecode1 = SWIG_AsVal_long_SS_long(swig_obj[0], &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_dBigVector" "', argument " "1"" of type '" "long long""'");
+  } 
+  arg1 = static_cast< long long >(val1);
+  ecode2 = SWIG_AsVal_long_SS_long(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_dBigVector" "', argument " "2"" of type '" "long long""'");
+  } 
+  arg2 = static_cast< long long >(val2);
+  ecode3 = SWIG_AsVal_long_SS_long(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_dBigVector" "', argument " "3"" of type '" "long long""'");
+  } 
+  arg3 = static_cast< long long >(val3);
+  ecode4 = SWIG_AsVal_long_SS_long(swig_obj[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "new_dBigVector" "', argument " "4"" of type '" "long long""'");
+  } 
+  arg4 = static_cast< long long >(val4);
   result = (dBigVector *)new dBigVector(arg1,arg2,arg3,arg4);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dBigVector, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -6868,7 +6894,7 @@ SWIGINTERN PyObject *_wrap_new_dBigVector(PyObject *self, PyObject *args) {
     _v = SWIG_CheckState(res);
     if (_v) {
       void *vptr = 0;
-      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_int64_t, 0);
+      int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_long_long, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
         return _wrap_new_dBigVector__SWIG_5(self, argc, argv);
@@ -6901,17 +6927,25 @@ SWIGINTERN PyObject *_wrap_new_dBigVector(PyObject *self, PyObject *args) {
   }
   if (argc == 4) {
     int _v;
-    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
+    {
+      int res = SWIG_AsVal_int(argv[0], NULL);
       _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
+    }
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
         _v = SWIG_CheckState(res);
-        if (_v) {
-          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
           _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_int(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
           if (_v) {
             return _wrap_new_dBigVector__SWIG_9(self, argc, argv);
           }
@@ -6921,17 +6955,25 @@ SWIGINTERN PyObject *_wrap_new_dBigVector(PyObject *self, PyObject *args) {
   }
   if (argc == 4) {
     int _v;
-    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_int64_t, SWIG_POINTER_NO_NULL | 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_int64_t, SWIG_POINTER_NO_NULL | 0);
+    {
+      int res = SWIG_AsVal_long_SS_long(argv[0], NULL);
       _v = SWIG_CheckState(res);
-      if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_int64_t, SWIG_POINTER_NO_NULL | 0);
+    }
+    if (_v) {
+      {
+        int res = SWIG_AsVal_long_SS_long(argv[1], NULL);
         _v = SWIG_CheckState(res);
-        if (_v) {
-          int res = SWIG_ConvertPtr(argv[3], 0, SWIGTYPE_p_int64_t, SWIG_POINTER_NO_NULL | 0);
+      }
+      if (_v) {
+        {
+          int res = SWIG_AsVal_long_SS_long(argv[2], NULL);
           _v = SWIG_CheckState(res);
+        }
+        if (_v) {
+          {
+            int res = SWIG_AsVal_long_SS_long(argv[3], NULL);
+            _v = SWIG_CheckState(res);
+          }
           if (_v) {
             return _wrap_new_dBigVector__SWIG_10(self, argc, argv);
           }
@@ -6975,13 +7017,13 @@ fail:
     "    dBigVector::dBigVector(dBigVector const &)\n"
     "    dBigVector::dBigVector(__m128d const,__m128d const)\n"
     "    dBigVector::dBigVector(__m128i const,__m128i const)\n"
-    "    dBigVector::dBigVector(dFloat64 const)\n"
-    "    dBigVector::dBigVector(dFloat64 const *const,dInt64 const *const)\n"
+    "    dBigVector::dBigVector(double const)\n"
+    "    dBigVector::dBigVector(double const *const,long long const *const)\n"
     "    dBigVector::dBigVector(dVector const &)\n"
-    "    dBigVector::dBigVector(dFloat64 const *const)\n"
-    "    dBigVector::dBigVector(dFloat64,dFloat64,dFloat64,dFloat64)\n"
-    "    dBigVector::dBigVector(dInt32,dInt32,dInt32,dInt32)\n"
-    "    dBigVector::dBigVector(dInt64,dInt64,dInt64,dInt64)\n");
+    "    dBigVector::dBigVector(double const *const)\n"
+    "    dBigVector::dBigVector(double,double,double,double)\n"
+    "    dBigVector::dBigVector(int,int,int,int)\n"
+    "    dBigVector::dBigVector(long long,long long,long long,long long)\n");
   return 0;
 }
 
@@ -6992,7 +7034,7 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetX(PyObject *SWIGUNUSEDPARM(self), PyObj
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat64 result;
+  double result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -7001,7 +7043,7 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetX(PyObject *SWIGUNUSEDPARM(self), PyObj
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dBigVector_GetX" "', argument " "1"" of type '" "dBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< dBigVector * >(argp1);
-  result = (dFloat64)((dBigVector const *)arg1)->GetX();
+  result = (double)((dBigVector const *)arg1)->GetX();
   resultobj = SWIG_From_double(static_cast< double >(result));
   return resultobj;
 fail:
@@ -7015,7 +7057,7 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetY(PyObject *SWIGUNUSEDPARM(self), PyObj
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat64 result;
+  double result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -7024,7 +7066,7 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetY(PyObject *SWIGUNUSEDPARM(self), PyObj
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dBigVector_GetY" "', argument " "1"" of type '" "dBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< dBigVector * >(argp1);
-  result = (dFloat64)((dBigVector const *)arg1)->GetY();
+  result = (double)((dBigVector const *)arg1)->GetY();
   resultobj = SWIG_From_double(static_cast< double >(result));
   return resultobj;
 fail:
@@ -7038,7 +7080,7 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetZ(PyObject *SWIGUNUSEDPARM(self), PyObj
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat64 result;
+  double result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -7047,7 +7089,7 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetZ(PyObject *SWIGUNUSEDPARM(self), PyObj
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dBigVector_GetZ" "', argument " "1"" of type '" "dBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< dBigVector * >(argp1);
-  result = (dFloat64)((dBigVector const *)arg1)->GetZ();
+  result = (double)((dBigVector const *)arg1)->GetZ();
   resultobj = SWIG_From_double(static_cast< double >(result));
   return resultobj;
 fail:
@@ -7061,7 +7103,7 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetW(PyObject *SWIGUNUSEDPARM(self), PyObj
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat64 result;
+  double result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -7070,7 +7112,7 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetW(PyObject *SWIGUNUSEDPARM(self), PyObj
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dBigVector_GetW" "', argument " "1"" of type '" "dBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< dBigVector * >(argp1);
-  result = (dFloat64)((dBigVector const *)arg1)->GetW();
+  result = (double)((dBigVector const *)arg1)->GetW();
   resultobj = SWIG_From_double(static_cast< double >(result));
   return resultobj;
 fail:
@@ -7081,7 +7123,7 @@ fail:
 SWIGINTERN PyObject *_wrap_dBigVector_SetX(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   dBigVector *arg1 = (dBigVector *) 0 ;
-  dFloat64 arg2 ;
+  double arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   double val2 ;
@@ -7096,9 +7138,9 @@ SWIGINTERN PyObject *_wrap_dBigVector_SetX(PyObject *SWIGUNUSEDPARM(self), PyObj
   arg1 = reinterpret_cast< dBigVector * >(argp1);
   ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dBigVector_SetX" "', argument " "2"" of type '" "dFloat64""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dBigVector_SetX" "', argument " "2"" of type '" "double""'");
   } 
-  arg2 = static_cast< dFloat64 >(val2);
+  arg2 = static_cast< double >(val2);
   (arg1)->SetX(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -7110,7 +7152,7 @@ fail:
 SWIGINTERN PyObject *_wrap_dBigVector_SetY(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   dBigVector *arg1 = (dBigVector *) 0 ;
-  dFloat64 arg2 ;
+  double arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   double val2 ;
@@ -7125,9 +7167,9 @@ SWIGINTERN PyObject *_wrap_dBigVector_SetY(PyObject *SWIGUNUSEDPARM(self), PyObj
   arg1 = reinterpret_cast< dBigVector * >(argp1);
   ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dBigVector_SetY" "', argument " "2"" of type '" "dFloat64""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dBigVector_SetY" "', argument " "2"" of type '" "double""'");
   } 
-  arg2 = static_cast< dFloat64 >(val2);
+  arg2 = static_cast< double >(val2);
   (arg1)->SetY(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -7139,7 +7181,7 @@ fail:
 SWIGINTERN PyObject *_wrap_dBigVector_SetZ(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   dBigVector *arg1 = (dBigVector *) 0 ;
-  dFloat64 arg2 ;
+  double arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   double val2 ;
@@ -7154,9 +7196,9 @@ SWIGINTERN PyObject *_wrap_dBigVector_SetZ(PyObject *SWIGUNUSEDPARM(self), PyObj
   arg1 = reinterpret_cast< dBigVector * >(argp1);
   ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dBigVector_SetZ" "', argument " "2"" of type '" "dFloat64""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dBigVector_SetZ" "', argument " "2"" of type '" "double""'");
   } 
-  arg2 = static_cast< dFloat64 >(val2);
+  arg2 = static_cast< double >(val2);
   (arg1)->SetZ(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -7168,7 +7210,7 @@ fail:
 SWIGINTERN PyObject *_wrap_dBigVector_SetW(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   dBigVector *arg1 = (dBigVector *) 0 ;
-  dFloat64 arg2 ;
+  double arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   double val2 ;
@@ -7183,9 +7225,9 @@ SWIGINTERN PyObject *_wrap_dBigVector_SetW(PyObject *SWIGUNUSEDPARM(self), PyObj
   arg1 = reinterpret_cast< dBigVector * >(argp1);
   ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dBigVector_SetW" "', argument " "2"" of type '" "dFloat64""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dBigVector_SetW" "', argument " "2"" of type '" "double""'");
   } 
-  arg2 = static_cast< dFloat64 >(val2);
+  arg2 = static_cast< double >(val2);
   (arg1)->SetW(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -7200,7 +7242,7 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetScalar(PyObject *SWIGUNUSEDPARM(self), 
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat64 result;
+  double result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -7209,7 +7251,7 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetScalar(PyObject *SWIGUNUSEDPARM(self), 
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dBigVector_GetScalar" "', argument " "1"" of type '" "dBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< dBigVector * >(argp1);
-  result = (dFloat64)((dBigVector const *)arg1)->GetScalar();
+  result = (double)((dBigVector const *)arg1)->GetScalar();
   resultobj = SWIG_From_double(static_cast< double >(result));
   return resultobj;
 fail:
@@ -7220,12 +7262,12 @@ fail:
 SWIGINTERN PyObject *_wrap_dBigVector_GetElement__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   dBigVector *arg1 = (dBigVector *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  dFloat64 *result = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  double *result = 0 ;
   
   if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_dBigVector, 0 |  0 );
@@ -7233,20 +7275,12 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetElement__SWIG_0(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dBigVector_GetElement" "', argument " "1"" of type '" "dBigVector *""'"); 
   }
   arg1 = reinterpret_cast< dBigVector * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dBigVector_GetElement" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dBigVector_GetElement" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  result = (dFloat64 *) &(arg1)->operator [](arg2);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dBigVector_GetElement" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (double *) &(arg1)->operator [](arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_double, 0 |  0 );
   return resultobj;
 fail:
@@ -7257,12 +7291,12 @@ fail:
 SWIGINTERN PyObject *_wrap_dBigVector_GetElement__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   dBigVector *arg1 = (dBigVector *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
-  dFloat64 *result = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  double *result = 0 ;
   
   if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_dBigVector, 0 |  0 );
@@ -7270,20 +7304,12 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetElement__SWIG_1(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dBigVector_GetElement" "', argument " "1"" of type '" "dBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< dBigVector * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dBigVector_GetElement" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dBigVector_GetElement" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  result = (dFloat64 *) &((dBigVector const *)arg1)->operator [](arg2);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dBigVector_GetElement" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (double *) &((dBigVector const *)arg1)->operator [](arg2);
   resultobj = SWIG_From_double(static_cast< double >(*result));
   return resultobj;
 fail:
@@ -7305,8 +7331,10 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetElement(PyObject *self, PyObject *args)
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_dBigVector, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
       if (_v) {
         return _wrap_dBigVector_GetElement__SWIG_0(self, argc, argv);
       }
@@ -7318,8 +7346,10 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetElement(PyObject *self, PyObject *args)
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_dBigVector, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
       if (_v) {
         return _wrap_dBigVector_GetElement__SWIG_1(self, argc, argv);
       }
@@ -7329,8 +7359,8 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetElement(PyObject *self, PyObject *args)
 fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'dBigVector_GetElement'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    dBigVector::operator [](dInt32)\n"
-    "    dBigVector::operator [](dInt32) const\n");
+    "    dBigVector::operator [](int)\n"
+    "    dBigVector::operator [](int) const\n");
   return 0;
 }
 
@@ -7777,7 +7807,7 @@ fail:
 SWIGINTERN PyObject *_wrap_dBigVector_Scale(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   dBigVector *arg1 = (dBigVector *) 0 ;
-  dFloat64 arg2 ;
+  double arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   double val2 ;
@@ -7793,9 +7823,9 @@ SWIGINTERN PyObject *_wrap_dBigVector_Scale(PyObject *SWIGUNUSEDPARM(self), PyOb
   arg1 = reinterpret_cast< dBigVector * >(argp1);
   ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dBigVector_Scale" "', argument " "2"" of type '" "dFloat64""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dBigVector_Scale" "', argument " "2"" of type '" "double""'");
   } 
-  arg2 = static_cast< dFloat64 >(val2);
+  arg2 = static_cast< double >(val2);
   result = ((dBigVector const *)arg1)->Scale(arg2);
   resultobj = SWIG_NewPointerObj((new dBigVector(static_cast< const dBigVector& >(result))), SWIGTYPE_p_dBigVector, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -8520,11 +8550,11 @@ fail:
 SWIGINTERN PyObject *_wrap_dBigVector_ShiftRightLogical(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   dBigVector *arg1 = (dBigVector *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   dBigVector result;
   
@@ -8534,19 +8564,11 @@ SWIGINTERN PyObject *_wrap_dBigVector_ShiftRightLogical(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dBigVector_ShiftRightLogical" "', argument " "1"" of type '" "dBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< dBigVector * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dBigVector_ShiftRightLogical" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dBigVector_ShiftRightLogical" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dBigVector_ShiftRightLogical" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   result = ((dBigVector const *)arg1)->ShiftRightLogical(arg2);
   resultobj = SWIG_NewPointerObj((new dBigVector(static_cast< const dBigVector& >(result))), SWIGTYPE_p_dBigVector, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -8561,7 +8583,7 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetSignMask(PyObject *SWIGUNUSEDPARM(self)
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -8570,8 +8592,8 @@ SWIGINTERN PyObject *_wrap_dBigVector_GetSignMask(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dBigVector_GetSignMask" "', argument " "1"" of type '" "dBigVector const *""'"); 
   }
   arg1 = reinterpret_cast< dBigVector * >(argp1);
-  result = ((dBigVector const *)arg1)->GetSignMask();
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int)((dBigVector const *)arg1)->GetSignMask();
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -9568,7 +9590,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_dMatrix__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat32 *arg1 = (dFloat32 *) (dFloat32 *)0 ;
+  float *arg1 = (float *) (float *)0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   dMatrix *result = 0 ;
@@ -9576,10 +9598,10 @@ SWIGINTERN PyObject *_wrap_new_dMatrix__SWIG_1(PyObject *SWIGUNUSEDPARM(self), P
   if ((nobjs < 1) || (nobjs > 1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_float, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dMatrix" "', argument " "1"" of type '" "dFloat32 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_dMatrix" "', argument " "1"" of type '" "float const *const""'"); 
   }
-  arg1 = reinterpret_cast< dFloat32 * >(argp1);
-  result = (dMatrix *)new dMatrix((dFloat32 const *)arg1);
+  arg1 = reinterpret_cast< float * >(argp1);
+  result = (dMatrix *)new dMatrix((float const *)arg1);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dMatrix, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
@@ -9763,11 +9785,11 @@ fail:
 SWIGINTERN PyObject *_wrap_dMatrix_GetElement__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   dMatrix *arg1 = (dMatrix *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   dVector *result = 0 ;
   
   if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
@@ -9776,19 +9798,11 @@ SWIGINTERN PyObject *_wrap_dMatrix_GetElement__SWIG_0(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dMatrix_GetElement" "', argument " "1"" of type '" "dMatrix *""'"); 
   }
   arg1 = reinterpret_cast< dMatrix * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dMatrix_GetElement" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dMatrix_GetElement" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dMatrix_GetElement" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   result = (dVector *) &(arg1)->operator [](arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dVector, 0 |  0 );
   return resultobj;
@@ -9800,11 +9814,11 @@ fail:
 SWIGINTERN PyObject *_wrap_dMatrix_GetElement__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   dMatrix *arg1 = (dMatrix *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   dVector *result = 0 ;
   
   if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
@@ -9813,19 +9827,11 @@ SWIGINTERN PyObject *_wrap_dMatrix_GetElement__SWIG_1(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "dMatrix_GetElement" "', argument " "1"" of type '" "dMatrix const *""'"); 
   }
   arg1 = reinterpret_cast< dMatrix * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dMatrix_GetElement" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dMatrix_GetElement" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dMatrix_GetElement" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   result = (dVector *) &((dMatrix const *)arg1)->operator [](arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dVector, 0 |  0 );
   return resultobj;
@@ -9848,8 +9854,10 @@ SWIGINTERN PyObject *_wrap_dMatrix_GetElement(PyObject *self, PyObject *args) {
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_dMatrix, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
       if (_v) {
         return _wrap_dMatrix_GetElement__SWIG_0(self, argc, argv);
       }
@@ -9861,8 +9869,10 @@ SWIGINTERN PyObject *_wrap_dMatrix_GetElement(PyObject *self, PyObject *args) {
     int res = SWIG_ConvertPtr(argv[0], &vptr, SWIGTYPE_p_dMatrix, 0);
     _v = SWIG_CheckState(res);
     if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-      _v = SWIG_CheckState(res);
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
       if (_v) {
         return _wrap_dMatrix_GetElement__SWIG_1(self, argc, argv);
       }
@@ -9872,8 +9882,8 @@ SWIGINTERN PyObject *_wrap_dMatrix_GetElement(PyObject *self, PyObject *args) {
 fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'dMatrix_GetElement'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    dMatrix::operator [](dInt32)\n"
-    "    dMatrix::operator [](dInt32) const\n");
+    "    dMatrix::operator [](int)\n"
+    "    dMatrix::operator [](int) const\n");
   return 0;
 }
 
@@ -10345,23 +10355,23 @@ fail:
 SWIGINTERN PyObject *_wrap_dMatrix_TransformTriplex__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   dMatrix *arg1 = (dMatrix *) 0 ;
-  dFloat32 *arg2 = (dFloat32 *) (dFloat32 *)0 ;
-  dInt32 arg3 ;
-  dFloat32 *arg4 = (dFloat32 *) (dFloat32 *)0 ;
-  dInt32 arg5 ;
-  dInt32 arg6 ;
+  float *arg2 = (float *) (float *)0 ;
+  int arg3 ;
+  float *arg4 = (float *) (float *)0 ;
+  int arg5 ;
+  int arg6 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
-  void *argp3 ;
-  int res3 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
   void *argp4 = 0 ;
   int res4 = 0 ;
-  void *argp5 ;
-  int res5 = 0 ;
-  void *argp6 ;
-  int res6 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  int val6 ;
+  int ecode6 = 0 ;
   
   if ((nobjs < 6) || (nobjs > 6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_dMatrix, 0 |  0 );
@@ -10371,54 +10381,30 @@ SWIGINTERN PyObject *_wrap_dMatrix_TransformTriplex__SWIG_0(PyObject *SWIGUNUSED
   arg1 = reinterpret_cast< dMatrix * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_float, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dMatrix_TransformTriplex" "', argument " "2"" of type '" "dFloat32 *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dMatrix_TransformTriplex" "', argument " "2"" of type '" "float *const""'"); 
   }
-  arg2 = reinterpret_cast< dFloat32 * >(argp2);
-  {
-    res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "dMatrix_TransformTriplex" "', argument " "3"" of type '" "dInt32""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dMatrix_TransformTriplex" "', argument " "3"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
-  }
+  arg2 = reinterpret_cast< float * >(argp2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "dMatrix_TransformTriplex" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
   res4 = SWIG_ConvertPtr(swig_obj[3], &argp4,SWIGTYPE_p_float, 0 |  0 );
   if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "dMatrix_TransformTriplex" "', argument " "4"" of type '" "dFloat32 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "dMatrix_TransformTriplex" "', argument " "4"" of type '" "float const *const""'"); 
   }
-  arg4 = reinterpret_cast< dFloat32 * >(argp4);
-  {
-    res5 = SWIG_ConvertPtr(swig_obj[4], &argp5, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res5)) {
-      SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "dMatrix_TransformTriplex" "', argument " "5"" of type '" "dInt32""'"); 
-    }  
-    if (!argp5) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dMatrix_TransformTriplex" "', argument " "5"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp5);
-      arg5 = *temp;
-      if (SWIG_IsNewObj(res5)) delete temp;
-    }
-  }
-  {
-    res6 = SWIG_ConvertPtr(swig_obj[5], &argp6, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res6)) {
-      SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "dMatrix_TransformTriplex" "', argument " "6"" of type '" "dInt32""'"); 
-    }  
-    if (!argp6) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dMatrix_TransformTriplex" "', argument " "6"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp6);
-      arg6 = *temp;
-      if (SWIG_IsNewObj(res6)) delete temp;
-    }
-  }
-  ((dMatrix const *)arg1)->TransformTriplex(arg2,arg3,(dFloat32 const *)arg4,arg5,arg6);
+  arg4 = reinterpret_cast< float * >(argp4);
+  ecode5 = SWIG_AsVal_int(swig_obj[4], &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "dMatrix_TransformTriplex" "', argument " "5"" of type '" "int""'");
+  } 
+  arg5 = static_cast< int >(val5);
+  ecode6 = SWIG_AsVal_int(swig_obj[5], &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "dMatrix_TransformTriplex" "', argument " "6"" of type '" "int""'");
+  } 
+  arg6 = static_cast< int >(val6);
+  ((dMatrix const *)arg1)->TransformTriplex(arg2,arg3,(float const *)arg4,arg5,arg6);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -10429,23 +10415,23 @@ fail:
 SWIGINTERN PyObject *_wrap_dMatrix_TransformTriplex__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   dMatrix *arg1 = (dMatrix *) 0 ;
-  dFloat64 *arg2 = (dFloat64 *) (dFloat64 *)0 ;
-  dInt32 arg3 ;
-  dFloat64 *arg4 = (dFloat64 *) (dFloat64 *)0 ;
-  dInt32 arg5 ;
-  dInt32 arg6 ;
+  double *arg2 = (double *) (double *)0 ;
+  int arg3 ;
+  double *arg4 = (double *) (double *)0 ;
+  int arg5 ;
+  int arg6 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
-  void *argp3 ;
-  int res3 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
   void *argp4 = 0 ;
   int res4 = 0 ;
-  void *argp5 ;
-  int res5 = 0 ;
-  void *argp6 ;
-  int res6 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  int val6 ;
+  int ecode6 = 0 ;
   
   if ((nobjs < 6) || (nobjs > 6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_dMatrix, 0 |  0 );
@@ -10455,54 +10441,30 @@ SWIGINTERN PyObject *_wrap_dMatrix_TransformTriplex__SWIG_1(PyObject *SWIGUNUSED
   arg1 = reinterpret_cast< dMatrix * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_double, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dMatrix_TransformTriplex" "', argument " "2"" of type '" "dFloat64 *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dMatrix_TransformTriplex" "', argument " "2"" of type '" "double *const""'"); 
   }
-  arg2 = reinterpret_cast< dFloat64 * >(argp2);
-  {
-    res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "dMatrix_TransformTriplex" "', argument " "3"" of type '" "dInt32""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dMatrix_TransformTriplex" "', argument " "3"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
-  }
+  arg2 = reinterpret_cast< double * >(argp2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "dMatrix_TransformTriplex" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
   res4 = SWIG_ConvertPtr(swig_obj[3], &argp4,SWIGTYPE_p_double, 0 |  0 );
   if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "dMatrix_TransformTriplex" "', argument " "4"" of type '" "dFloat64 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "dMatrix_TransformTriplex" "', argument " "4"" of type '" "double const *const""'"); 
   }
-  arg4 = reinterpret_cast< dFloat64 * >(argp4);
-  {
-    res5 = SWIG_ConvertPtr(swig_obj[4], &argp5, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res5)) {
-      SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "dMatrix_TransformTriplex" "', argument " "5"" of type '" "dInt32""'"); 
-    }  
-    if (!argp5) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dMatrix_TransformTriplex" "', argument " "5"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp5);
-      arg5 = *temp;
-      if (SWIG_IsNewObj(res5)) delete temp;
-    }
-  }
-  {
-    res6 = SWIG_ConvertPtr(swig_obj[5], &argp6, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res6)) {
-      SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "dMatrix_TransformTriplex" "', argument " "6"" of type '" "dInt32""'"); 
-    }  
-    if (!argp6) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dMatrix_TransformTriplex" "', argument " "6"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp6);
-      arg6 = *temp;
-      if (SWIG_IsNewObj(res6)) delete temp;
-    }
-  }
-  ((dMatrix const *)arg1)->TransformTriplex(arg2,arg3,(dFloat64 const *)arg4,arg5,arg6);
+  arg4 = reinterpret_cast< double * >(argp4);
+  ecode5 = SWIG_AsVal_int(swig_obj[4], &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "dMatrix_TransformTriplex" "', argument " "5"" of type '" "int""'");
+  } 
+  arg5 = static_cast< int >(val5);
+  ecode6 = SWIG_AsVal_int(swig_obj[5], &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "dMatrix_TransformTriplex" "', argument " "6"" of type '" "int""'");
+  } 
+  arg6 = static_cast< int >(val6);
+  ((dMatrix const *)arg1)->TransformTriplex(arg2,arg3,(double const *)arg4,arg5,arg6);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -10513,23 +10475,23 @@ fail:
 SWIGINTERN PyObject *_wrap_dMatrix_TransformTriplex__SWIG_2(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   dMatrix *arg1 = (dMatrix *) 0 ;
-  dFloat64 *arg2 = (dFloat64 *) (dFloat64 *)0 ;
-  dInt32 arg3 ;
-  dFloat32 *arg4 = (dFloat32 *) (dFloat32 *)0 ;
-  dInt32 arg5 ;
-  dInt32 arg6 ;
+  double *arg2 = (double *) (double *)0 ;
+  int arg3 ;
+  float *arg4 = (float *) (float *)0 ;
+  int arg5 ;
+  int arg6 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
-  void *argp3 ;
-  int res3 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
   void *argp4 = 0 ;
   int res4 = 0 ;
-  void *argp5 ;
-  int res5 = 0 ;
-  void *argp6 ;
-  int res6 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  int val6 ;
+  int ecode6 = 0 ;
   
   if ((nobjs < 6) || (nobjs > 6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_dMatrix, 0 |  0 );
@@ -10539,54 +10501,30 @@ SWIGINTERN PyObject *_wrap_dMatrix_TransformTriplex__SWIG_2(PyObject *SWIGUNUSED
   arg1 = reinterpret_cast< dMatrix * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_double, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dMatrix_TransformTriplex" "', argument " "2"" of type '" "dFloat64 *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "dMatrix_TransformTriplex" "', argument " "2"" of type '" "double *const""'"); 
   }
-  arg2 = reinterpret_cast< dFloat64 * >(argp2);
-  {
-    res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "dMatrix_TransformTriplex" "', argument " "3"" of type '" "dInt32""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dMatrix_TransformTriplex" "', argument " "3"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
-  }
+  arg2 = reinterpret_cast< double * >(argp2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "dMatrix_TransformTriplex" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
   res4 = SWIG_ConvertPtr(swig_obj[3], &argp4,SWIGTYPE_p_float, 0 |  0 );
   if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "dMatrix_TransformTriplex" "', argument " "4"" of type '" "dFloat32 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "dMatrix_TransformTriplex" "', argument " "4"" of type '" "float const *const""'"); 
   }
-  arg4 = reinterpret_cast< dFloat32 * >(argp4);
-  {
-    res5 = SWIG_ConvertPtr(swig_obj[4], &argp5, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res5)) {
-      SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "dMatrix_TransformTriplex" "', argument " "5"" of type '" "dInt32""'"); 
-    }  
-    if (!argp5) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dMatrix_TransformTriplex" "', argument " "5"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp5);
-      arg5 = *temp;
-      if (SWIG_IsNewObj(res5)) delete temp;
-    }
-  }
-  {
-    res6 = SWIG_ConvertPtr(swig_obj[5], &argp6, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res6)) {
-      SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "dMatrix_TransformTriplex" "', argument " "6"" of type '" "dInt32""'"); 
-    }  
-    if (!argp6) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "dMatrix_TransformTriplex" "', argument " "6"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp6);
-      arg6 = *temp;
-      if (SWIG_IsNewObj(res6)) delete temp;
-    }
-  }
-  ((dMatrix const *)arg1)->TransformTriplex(arg2,arg3,(dFloat32 const *)arg4,arg5,arg6);
+  arg4 = reinterpret_cast< float * >(argp4);
+  ecode5 = SWIG_AsVal_int(swig_obj[4], &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "dMatrix_TransformTriplex" "', argument " "5"" of type '" "int""'");
+  } 
+  arg5 = static_cast< int >(val5);
+  ecode6 = SWIG_AsVal_int(swig_obj[5], &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "dMatrix_TransformTriplex" "', argument " "6"" of type '" "int""'");
+  } 
+  arg6 = static_cast< int >(val6);
+  ((dMatrix const *)arg1)->TransformTriplex(arg2,arg3,(float const *)arg4,arg5,arg6);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -10612,18 +10550,24 @@ SWIGINTERN PyObject *_wrap_dMatrix_TransformTriplex(PyObject *self, PyObject *ar
       int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_float, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
         if (_v) {
           void *vptr = 0;
           int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_float, 0);
           _v = SWIG_CheckState(res);
           if (_v) {
-            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-            _v = SWIG_CheckState(res);
-            if (_v) {
-              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
+            {
+              int res = SWIG_AsVal_int(argv[4], NULL);
               _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_int(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
               if (_v) {
                 return _wrap_dMatrix_TransformTriplex__SWIG_0(self, argc, argv);
               }
@@ -10643,18 +10587,24 @@ SWIGINTERN PyObject *_wrap_dMatrix_TransformTriplex(PyObject *self, PyObject *ar
       int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_double, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
         if (_v) {
           void *vptr = 0;
           int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_double, 0);
           _v = SWIG_CheckState(res);
           if (_v) {
-            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-            _v = SWIG_CheckState(res);
-            if (_v) {
-              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
+            {
+              int res = SWIG_AsVal_int(argv[4], NULL);
               _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_int(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
               if (_v) {
                 return _wrap_dMatrix_TransformTriplex__SWIG_1(self, argc, argv);
               }
@@ -10674,18 +10624,24 @@ SWIGINTERN PyObject *_wrap_dMatrix_TransformTriplex(PyObject *self, PyObject *ar
       int res = SWIG_ConvertPtr(argv[1], &vptr, SWIGTYPE_p_double, 0);
       _v = SWIG_CheckState(res);
       if (_v) {
-        int res = SWIG_ConvertPtr(argv[2], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-        _v = SWIG_CheckState(res);
+        {
+          int res = SWIG_AsVal_int(argv[2], NULL);
+          _v = SWIG_CheckState(res);
+        }
         if (_v) {
           void *vptr = 0;
           int res = SWIG_ConvertPtr(argv[3], &vptr, SWIGTYPE_p_float, 0);
           _v = SWIG_CheckState(res);
           if (_v) {
-            int res = SWIG_ConvertPtr(argv[4], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-            _v = SWIG_CheckState(res);
-            if (_v) {
-              int res = SWIG_ConvertPtr(argv[5], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
+            {
+              int res = SWIG_AsVal_int(argv[4], NULL);
               _v = SWIG_CheckState(res);
+            }
+            if (_v) {
+              {
+                int res = SWIG_AsVal_int(argv[5], NULL);
+                _v = SWIG_CheckState(res);
+              }
               if (_v) {
                 return _wrap_dMatrix_TransformTriplex__SWIG_2(self, argc, argv);
               }
@@ -10699,9 +10655,9 @@ SWIGINTERN PyObject *_wrap_dMatrix_TransformTriplex(PyObject *self, PyObject *ar
 fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'dMatrix_TransformTriplex'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    dMatrix::TransformTriplex(dFloat32 *const,dInt32,dFloat32 const *const,dInt32,dInt32) const\n"
-    "    dMatrix::TransformTriplex(dFloat64 *const,dInt32,dFloat64 const *const,dInt32,dInt32) const\n"
-    "    dMatrix::TransformTriplex(dFloat64 *const,dInt32,dFloat32 const *const,dInt32,dInt32) const\n");
+    "    dMatrix::TransformTriplex(float *const,int,float const *const,int,int) const\n"
+    "    dMatrix::TransformTriplex(double *const,int,double const *const,int,int) const\n"
+    "    dMatrix::TransformTriplex(double *const,int,float const *const,int,int) const\n");
   return 0;
 }
 
@@ -10755,7 +10711,7 @@ fail:
 SWIGINTERN PyObject *_wrap_dMatrix_TestOrthogonal__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   dMatrix *arg1 = (dMatrix *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -10770,9 +10726,9 @@ SWIGINTERN PyObject *_wrap_dMatrix_TestOrthogonal__SWIG_0(PyObject *SWIGUNUSEDPA
   arg1 = reinterpret_cast< dMatrix * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dMatrix_TestOrthogonal" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dMatrix_TestOrthogonal" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   result = (bool)((dMatrix const *)arg1)->TestOrthogonal(arg2);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
@@ -10838,7 +10794,7 @@ SWIGINTERN PyObject *_wrap_dMatrix_TestOrthogonal(PyObject *self, PyObject *args
 fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'dMatrix_TestOrthogonal'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    dMatrix::TestOrthogonal(dFloat32) const\n"
+    "    dMatrix::TestOrthogonal(float) const\n"
     "    dMatrix::TestOrthogonal() const\n");
   return 0;
 }
@@ -11128,7 +11084,7 @@ fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'new_dMatrix'.\n"
     "  Possible C/C++ prototypes are:\n"
     "    dMatrix::dMatrix()\n"
-    "    dMatrix::dMatrix(dFloat32 const *const)\n"
+    "    dMatrix::dMatrix(float const *const)\n"
     "    dMatrix::dMatrix(dVector const &,dVector const &,dVector const &,dVector const &)\n"
     "    dMatrix::dMatrix(dQuaternion const &,dVector const &)\n"
     "    dMatrix::dMatrix(dVector const &)\n"
@@ -11359,7 +11315,7 @@ SWIGINTERN PyObject *dMatrix_swiginit(PyObject *SWIGUNUSEDPARM(self), PyObject *
 
 SWIGINTERN PyObject *_wrap_dPitchMatrix(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  dFloat32 arg1 ;
+  float arg1 ;
   float val1 ;
   int ecode1 = 0 ;
   PyObject *swig_obj[1] ;
@@ -11369,9 +11325,9 @@ SWIGINTERN PyObject *_wrap_dPitchMatrix(PyObject *SWIGUNUSEDPARM(self), PyObject
   swig_obj[0] = args;
   ecode1 = SWIG_AsVal_float(swig_obj[0], &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "dPitchMatrix" "', argument " "1"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "dPitchMatrix" "', argument " "1"" of type '" "float""'");
   } 
-  arg1 = static_cast< dFloat32 >(val1);
+  arg1 = static_cast< float >(val1);
   result = dPitchMatrix(arg1);
   resultobj = SWIG_NewPointerObj((new dMatrix(static_cast< const dMatrix& >(result))), SWIGTYPE_p_dMatrix, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -11382,7 +11338,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_dYawMatrix(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  dFloat32 arg1 ;
+  float arg1 ;
   float val1 ;
   int ecode1 = 0 ;
   PyObject *swig_obj[1] ;
@@ -11392,9 +11348,9 @@ SWIGINTERN PyObject *_wrap_dYawMatrix(PyObject *SWIGUNUSEDPARM(self), PyObject *
   swig_obj[0] = args;
   ecode1 = SWIG_AsVal_float(swig_obj[0], &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "dYawMatrix" "', argument " "1"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "dYawMatrix" "', argument " "1"" of type '" "float""'");
   } 
-  arg1 = static_cast< dFloat32 >(val1);
+  arg1 = static_cast< float >(val1);
   result = dYawMatrix(arg1);
   resultobj = SWIG_NewPointerObj((new dMatrix(static_cast< const dMatrix& >(result))), SWIGTYPE_p_dMatrix, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -11405,7 +11361,7 @@ fail:
 
 SWIGINTERN PyObject *_wrap_dRollMatrix(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  dFloat32 arg1 ;
+  float arg1 ;
   float val1 ;
   int ecode1 = 0 ;
   PyObject *swig_obj[1] ;
@@ -11415,9 +11371,9 @@ SWIGINTERN PyObject *_wrap_dRollMatrix(PyObject *SWIGUNUSEDPARM(self), PyObject 
   swig_obj[0] = args;
   ecode1 = SWIG_AsVal_float(swig_obj[0], &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "dRollMatrix" "', argument " "1"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "dRollMatrix" "', argument " "1"" of type '" "float""'");
   } 
-  arg1 = static_cast< dFloat32 >(val1);
+  arg1 = static_cast< float >(val1);
   result = dRollMatrix(arg1);
   resultobj = SWIG_NewPointerObj((new dMatrix(static_cast< const dMatrix& >(result))), SWIGTYPE_p_dMatrix, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -11513,10 +11469,10 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_dQuaternion__SWIG_4(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat32 arg1 ;
-  dFloat32 arg2 ;
-  dFloat32 arg3 ;
-  dFloat32 arg4 ;
+  float arg1 ;
+  float arg2 ;
+  float arg3 ;
+  float arg4 ;
   float val1 ;
   int ecode1 = 0 ;
   float val2 ;
@@ -11530,24 +11486,24 @@ SWIGINTERN PyObject *_wrap_new_dQuaternion__SWIG_4(PyObject *SWIGUNUSEDPARM(self
   if ((nobjs < 4) || (nobjs > 4)) SWIG_fail;
   ecode1 = SWIG_AsVal_float(swig_obj[0], &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_dQuaternion" "', argument " "1"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_dQuaternion" "', argument " "1"" of type '" "float""'");
   } 
-  arg1 = static_cast< dFloat32 >(val1);
+  arg1 = static_cast< float >(val1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_dQuaternion" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_dQuaternion" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_dQuaternion" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_dQuaternion" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   ecode4 = SWIG_AsVal_float(swig_obj[3], &val4);
   if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "new_dQuaternion" "', argument " "4"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "new_dQuaternion" "', argument " "4"" of type '" "float""'");
   } 
-  arg4 = static_cast< dFloat32 >(val4);
+  arg4 = static_cast< float >(val4);
   result = (dQuaternion *)new dQuaternion(arg1,arg2,arg3,arg4);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dQuaternion, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -11559,7 +11515,7 @@ fail:
 SWIGINTERN PyObject *_wrap_new_dQuaternion__SWIG_5(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   dVector *arg1 = 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -11577,9 +11533,9 @@ SWIGINTERN PyObject *_wrap_new_dQuaternion__SWIG_5(PyObject *SWIGUNUSEDPARM(self
   arg1 = reinterpret_cast< dVector * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_dQuaternion" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_dQuaternion" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   result = (dQuaternion *)new dQuaternion((dVector const &)*arg1,arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dQuaternion, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -11673,8 +11629,8 @@ fail:
     "    dQuaternion::dQuaternion(dVector const &)\n"
     "    dQuaternion::dQuaternion(dQuaternion const &)\n"
     "    dQuaternion::dQuaternion(dMatrix const &)\n"
-    "    dQuaternion::dQuaternion(dFloat32,dFloat32,dFloat32,dFloat32)\n"
-    "    dQuaternion::dQuaternion(dVector const &,dFloat32)\n");
+    "    dQuaternion::dQuaternion(float,float,float,float)\n"
+    "    dQuaternion::dQuaternion(dVector const &,float)\n");
   return 0;
 }
 
@@ -11705,7 +11661,7 @@ fail:
 SWIGINTERN PyObject *_wrap_dQuaternion_Scale(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   dQuaternion *arg1 = (dQuaternion *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -11721,9 +11677,9 @@ SWIGINTERN PyObject *_wrap_dQuaternion_Scale(PyObject *SWIGUNUSEDPARM(self), PyO
   arg1 = reinterpret_cast< dQuaternion * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dQuaternion_Scale" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "dQuaternion_Scale" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   result = ((dQuaternion const *)arg1)->Scale(arg2);
   resultobj = SWIG_NewPointerObj((new dQuaternion(static_cast< const dQuaternion& >(result))), SWIGTYPE_p_dQuaternion, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -11864,7 +11820,7 @@ SWIGINTERN PyObject *_wrap_dQuaternion_Slerp(PyObject *SWIGUNUSEDPARM(self), PyO
   PyObject *resultobj = 0;
   dQuaternion *arg1 = (dQuaternion *) 0 ;
   dQuaternion *arg2 = 0 ;
-  dFloat32 arg3 ;
+  float arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -11890,9 +11846,9 @@ SWIGINTERN PyObject *_wrap_dQuaternion_Slerp(PyObject *SWIGUNUSEDPARM(self), PyO
   arg2 = reinterpret_cast< dQuaternion * >(argp2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "dQuaternion_Slerp" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "dQuaternion_Slerp" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   result = ((dQuaternion const *)arg1)->Slerp((dQuaternion const &)*arg2,arg3);
   resultobj = SWIG_NewPointerObj((new dQuaternion(static_cast< const dQuaternion& >(result))), SWIGTYPE_p_dQuaternion, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -11905,7 +11861,7 @@ SWIGINTERN PyObject *_wrap_dQuaternion_CalcAverageOmega(PyObject *SWIGUNUSEDPARM
   PyObject *resultobj = 0;
   dQuaternion *arg1 = (dQuaternion *) 0 ;
   dQuaternion *arg2 = 0 ;
-  dFloat32 arg3 ;
+  float arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -11931,9 +11887,9 @@ SWIGINTERN PyObject *_wrap_dQuaternion_CalcAverageOmega(PyObject *SWIGUNUSEDPARM
   arg2 = reinterpret_cast< dQuaternion * >(argp2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "dQuaternion_CalcAverageOmega" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "dQuaternion_CalcAverageOmega" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   result = ((dQuaternion const *)arg1)->CalcAverageOmega((dQuaternion const &)*arg2,arg3);
   resultobj = SWIG_NewPointerObj((new dVector(static_cast< const dVector& >(result))), SWIGTYPE_p_dVector, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -11991,11 +11947,11 @@ fail:
 SWIGINTERN PyObject *_wrap_ndShapeMaterial_m_userId_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndShapeMaterial *arg1 = (ndShapeMaterial *) 0 ;
-  dInt64 arg2 ;
+  long long arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  long long val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndShapeMaterial_m_userId_set", 2, 2, swig_obj)) SWIG_fail;
@@ -12004,19 +11960,11 @@ SWIGINTERN PyObject *_wrap_ndShapeMaterial_m_userId_set(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShapeMaterial_m_userId_set" "', argument " "1"" of type '" "ndShapeMaterial *""'"); 
   }
   arg1 = reinterpret_cast< ndShapeMaterial * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int64_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndShapeMaterial_m_userId_set" "', argument " "2"" of type '" "dInt64""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndShapeMaterial_m_userId_set" "', argument " "2"" of type '" "dInt64""'");
-    } else {
-      dInt64 * temp = reinterpret_cast< dInt64 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_long_SS_long(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndShapeMaterial_m_userId_set" "', argument " "2"" of type '" "long long""'");
+  } 
+  arg2 = static_cast< long long >(val2);
   if (arg1) (arg1)->m_userId = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -12031,7 +11979,7 @@ SWIGINTERN PyObject *_wrap_ndShapeMaterial_m_userId_get(PyObject *SWIGUNUSEDPARM
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt64 result;
+  long long result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -12040,8 +11988,8 @@ SWIGINTERN PyObject *_wrap_ndShapeMaterial_m_userId_get(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShapeMaterial_m_userId_get" "', argument " "1"" of type '" "ndShapeMaterial *""'"); 
   }
   arg1 = reinterpret_cast< ndShapeMaterial * >(argp1);
-  result =  ((arg1)->m_userId);
-  resultobj = SWIG_NewPointerObj((new dInt64(static_cast< const dInt64& >(result))), SWIGTYPE_p_int64_t, SWIG_POINTER_OWN |  0 );
+  result = (long long) ((arg1)->m_userId);
+  resultobj = SWIG_From_long_SS_long(static_cast< long long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -12195,7 +12143,7 @@ SWIGINTERN PyObject *ndShapeMaterial_swiginit(PyObject *SWIGUNUSEDPARM(self), Py
 SWIGINTERN PyObject *_wrap_ndBoxInfo_m_x_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -12210,9 +12158,9 @@ SWIGINTERN PyObject *_wrap_ndBoxInfo_m_x_set(PyObject *SWIGUNUSEDPARM(self), PyO
   arg1 = reinterpret_cast< ndBoxInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBoxInfo_m_x_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBoxInfo_m_x_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_x = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -12227,7 +12175,7 @@ SWIGINTERN PyObject *_wrap_ndBoxInfo_m_x_get(PyObject *SWIGUNUSEDPARM(self), PyO
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -12236,7 +12184,7 @@ SWIGINTERN PyObject *_wrap_ndBoxInfo_m_x_get(PyObject *SWIGUNUSEDPARM(self), PyO
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBoxInfo_m_x_get" "', argument " "1"" of type '" "ndBoxInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndBoxInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_x);
+  result = (float) ((arg1)->m_x);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -12247,7 +12195,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndBoxInfo_m_y_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -12262,9 +12210,9 @@ SWIGINTERN PyObject *_wrap_ndBoxInfo_m_y_set(PyObject *SWIGUNUSEDPARM(self), PyO
   arg1 = reinterpret_cast< ndBoxInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBoxInfo_m_y_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBoxInfo_m_y_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_y = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -12279,7 +12227,7 @@ SWIGINTERN PyObject *_wrap_ndBoxInfo_m_y_get(PyObject *SWIGUNUSEDPARM(self), PyO
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -12288,7 +12236,7 @@ SWIGINTERN PyObject *_wrap_ndBoxInfo_m_y_get(PyObject *SWIGUNUSEDPARM(self), PyO
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBoxInfo_m_y_get" "', argument " "1"" of type '" "ndBoxInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndBoxInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_y);
+  result = (float) ((arg1)->m_y);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -12299,7 +12247,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndBoxInfo_m_z_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBoxInfo *arg1 = (ndBoxInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -12314,9 +12262,9 @@ SWIGINTERN PyObject *_wrap_ndBoxInfo_m_z_set(PyObject *SWIGUNUSEDPARM(self), PyO
   arg1 = reinterpret_cast< ndBoxInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBoxInfo_m_z_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBoxInfo_m_z_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_z = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -12331,7 +12279,7 @@ SWIGINTERN PyObject *_wrap_ndBoxInfo_m_z_get(PyObject *SWIGUNUSEDPARM(self), PyO
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -12340,7 +12288,7 @@ SWIGINTERN PyObject *_wrap_ndBoxInfo_m_z_get(PyObject *SWIGUNUSEDPARM(self), PyO
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBoxInfo_m_z_get" "', argument " "1"" of type '" "ndBoxInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndBoxInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_z);
+  result = (float) ((arg1)->m_z);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -12397,7 +12345,7 @@ SWIGINTERN PyObject *ndBoxInfo_swiginit(PyObject *SWIGUNUSEDPARM(self), PyObject
 SWIGINTERN PyObject *_wrap_ndPointInfo_m_noUsed_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPointInfo *arg1 = (ndPointInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -12412,9 +12360,9 @@ SWIGINTERN PyObject *_wrap_ndPointInfo_m_noUsed_set(PyObject *SWIGUNUSEDPARM(sel
   arg1 = reinterpret_cast< ndPointInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndPointInfo_m_noUsed_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndPointInfo_m_noUsed_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_noUsed = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -12429,7 +12377,7 @@ SWIGINTERN PyObject *_wrap_ndPointInfo_m_noUsed_get(PyObject *SWIGUNUSEDPARM(sel
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -12438,7 +12386,7 @@ SWIGINTERN PyObject *_wrap_ndPointInfo_m_noUsed_get(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPointInfo_m_noUsed_get" "', argument " "1"" of type '" "ndPointInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndPointInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_noUsed);
+  result = (float) ((arg1)->m_noUsed);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -12495,7 +12443,7 @@ SWIGINTERN PyObject *ndPointInfo_swiginit(PyObject *SWIGUNUSEDPARM(self), PyObje
 SWIGINTERN PyObject *_wrap_ndSphereInfo_m_radius_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndSphereInfo *arg1 = (ndSphereInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -12510,9 +12458,9 @@ SWIGINTERN PyObject *_wrap_ndSphereInfo_m_radius_set(PyObject *SWIGUNUSEDPARM(se
   arg1 = reinterpret_cast< ndSphereInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndSphereInfo_m_radius_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndSphereInfo_m_radius_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_radius = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -12527,7 +12475,7 @@ SWIGINTERN PyObject *_wrap_ndSphereInfo_m_radius_get(PyObject *SWIGUNUSEDPARM(se
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -12536,7 +12484,7 @@ SWIGINTERN PyObject *_wrap_ndSphereInfo_m_radius_get(PyObject *SWIGUNUSEDPARM(se
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndSphereInfo_m_radius_get" "', argument " "1"" of type '" "ndSphereInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndSphereInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_radius);
+  result = (float) ((arg1)->m_radius);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -12593,7 +12541,7 @@ SWIGINTERN PyObject *ndSphereInfo_swiginit(PyObject *SWIGUNUSEDPARM(self), PyObj
 SWIGINTERN PyObject *_wrap_ndCylinderInfo_m_radio0_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -12608,9 +12556,9 @@ SWIGINTERN PyObject *_wrap_ndCylinderInfo_m_radio0_set(PyObject *SWIGUNUSEDPARM(
   arg1 = reinterpret_cast< ndCylinderInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCylinderInfo_m_radio0_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCylinderInfo_m_radio0_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_radio0 = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -12625,7 +12573,7 @@ SWIGINTERN PyObject *_wrap_ndCylinderInfo_m_radio0_get(PyObject *SWIGUNUSEDPARM(
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -12634,7 +12582,7 @@ SWIGINTERN PyObject *_wrap_ndCylinderInfo_m_radio0_get(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndCylinderInfo_m_radio0_get" "', argument " "1"" of type '" "ndCylinderInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndCylinderInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_radio0);
+  result = (float) ((arg1)->m_radio0);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -12645,7 +12593,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndCylinderInfo_m_radio1_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -12660,9 +12608,9 @@ SWIGINTERN PyObject *_wrap_ndCylinderInfo_m_radio1_set(PyObject *SWIGUNUSEDPARM(
   arg1 = reinterpret_cast< ndCylinderInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCylinderInfo_m_radio1_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCylinderInfo_m_radio1_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_radio1 = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -12677,7 +12625,7 @@ SWIGINTERN PyObject *_wrap_ndCylinderInfo_m_radio1_get(PyObject *SWIGUNUSEDPARM(
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -12686,7 +12634,7 @@ SWIGINTERN PyObject *_wrap_ndCylinderInfo_m_radio1_get(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndCylinderInfo_m_radio1_get" "', argument " "1"" of type '" "ndCylinderInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndCylinderInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_radio1);
+  result = (float) ((arg1)->m_radio1);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -12697,7 +12645,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndCylinderInfo_m_height_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndCylinderInfo *arg1 = (ndCylinderInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -12712,9 +12660,9 @@ SWIGINTERN PyObject *_wrap_ndCylinderInfo_m_height_set(PyObject *SWIGUNUSEDPARM(
   arg1 = reinterpret_cast< ndCylinderInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCylinderInfo_m_height_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCylinderInfo_m_height_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_height = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -12729,7 +12677,7 @@ SWIGINTERN PyObject *_wrap_ndCylinderInfo_m_height_get(PyObject *SWIGUNUSEDPARM(
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -12738,7 +12686,7 @@ SWIGINTERN PyObject *_wrap_ndCylinderInfo_m_height_get(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndCylinderInfo_m_height_get" "', argument " "1"" of type '" "ndCylinderInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndCylinderInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_height);
+  result = (float) ((arg1)->m_height);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -12795,7 +12743,7 @@ SWIGINTERN PyObject *ndCylinderInfo_swiginit(PyObject *SWIGUNUSEDPARM(self), PyO
 SWIGINTERN PyObject *_wrap_ndCapsuleInfo_m_radio0_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -12810,9 +12758,9 @@ SWIGINTERN PyObject *_wrap_ndCapsuleInfo_m_radio0_set(PyObject *SWIGUNUSEDPARM(s
   arg1 = reinterpret_cast< ndCapsuleInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCapsuleInfo_m_radio0_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCapsuleInfo_m_radio0_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_radio0 = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -12827,7 +12775,7 @@ SWIGINTERN PyObject *_wrap_ndCapsuleInfo_m_radio0_get(PyObject *SWIGUNUSEDPARM(s
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -12836,7 +12784,7 @@ SWIGINTERN PyObject *_wrap_ndCapsuleInfo_m_radio0_get(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndCapsuleInfo_m_radio0_get" "', argument " "1"" of type '" "ndCapsuleInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndCapsuleInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_radio0);
+  result = (float) ((arg1)->m_radio0);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -12847,7 +12795,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndCapsuleInfo_m_radio1_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -12862,9 +12810,9 @@ SWIGINTERN PyObject *_wrap_ndCapsuleInfo_m_radio1_set(PyObject *SWIGUNUSEDPARM(s
   arg1 = reinterpret_cast< ndCapsuleInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCapsuleInfo_m_radio1_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCapsuleInfo_m_radio1_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_radio1 = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -12879,7 +12827,7 @@ SWIGINTERN PyObject *_wrap_ndCapsuleInfo_m_radio1_get(PyObject *SWIGUNUSEDPARM(s
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -12888,7 +12836,7 @@ SWIGINTERN PyObject *_wrap_ndCapsuleInfo_m_radio1_get(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndCapsuleInfo_m_radio1_get" "', argument " "1"" of type '" "ndCapsuleInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndCapsuleInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_radio1);
+  result = (float) ((arg1)->m_radio1);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -12899,7 +12847,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndCapsuleInfo_m_height_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndCapsuleInfo *arg1 = (ndCapsuleInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -12914,9 +12862,9 @@ SWIGINTERN PyObject *_wrap_ndCapsuleInfo_m_height_set(PyObject *SWIGUNUSEDPARM(s
   arg1 = reinterpret_cast< ndCapsuleInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCapsuleInfo_m_height_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCapsuleInfo_m_height_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_height = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -12931,7 +12879,7 @@ SWIGINTERN PyObject *_wrap_ndCapsuleInfo_m_height_get(PyObject *SWIGUNUSEDPARM(s
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -12940,7 +12888,7 @@ SWIGINTERN PyObject *_wrap_ndCapsuleInfo_m_height_get(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndCapsuleInfo_m_height_get" "', argument " "1"" of type '" "ndCapsuleInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndCapsuleInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_height);
+  result = (float) ((arg1)->m_height);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -12997,7 +12945,7 @@ SWIGINTERN PyObject *ndCapsuleInfo_swiginit(PyObject *SWIGUNUSEDPARM(self), PyOb
 SWIGINTERN PyObject *_wrap_ndConeInfo_m_radius_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndConeInfo *arg1 = (ndConeInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -13012,9 +12960,9 @@ SWIGINTERN PyObject *_wrap_ndConeInfo_m_radius_set(PyObject *SWIGUNUSEDPARM(self
   arg1 = reinterpret_cast< ndConeInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndConeInfo_m_radius_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndConeInfo_m_radius_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_radius = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -13029,7 +12977,7 @@ SWIGINTERN PyObject *_wrap_ndConeInfo_m_radius_get(PyObject *SWIGUNUSEDPARM(self
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -13038,7 +12986,7 @@ SWIGINTERN PyObject *_wrap_ndConeInfo_m_radius_get(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndConeInfo_m_radius_get" "', argument " "1"" of type '" "ndConeInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndConeInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_radius);
+  result = (float) ((arg1)->m_radius);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -13049,7 +12997,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndConeInfo_m_height_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndConeInfo *arg1 = (ndConeInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -13064,9 +13012,9 @@ SWIGINTERN PyObject *_wrap_ndConeInfo_m_height_set(PyObject *SWIGUNUSEDPARM(self
   arg1 = reinterpret_cast< ndConeInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndConeInfo_m_height_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndConeInfo_m_height_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_height = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -13081,7 +13029,7 @@ SWIGINTERN PyObject *_wrap_ndConeInfo_m_height_get(PyObject *SWIGUNUSEDPARM(self
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -13090,7 +13038,7 @@ SWIGINTERN PyObject *_wrap_ndConeInfo_m_height_get(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndConeInfo_m_height_get" "', argument " "1"" of type '" "ndConeInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndConeInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_height);
+  result = (float) ((arg1)->m_height);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -13147,7 +13095,7 @@ SWIGINTERN PyObject *ndConeInfo_swiginit(PyObject *SWIGUNUSEDPARM(self), PyObjec
 SWIGINTERN PyObject *_wrap_ndChamferCylinderInfo_m_r_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndChamferCylinderInfo *arg1 = (ndChamferCylinderInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -13162,9 +13110,9 @@ SWIGINTERN PyObject *_wrap_ndChamferCylinderInfo_m_r_set(PyObject *SWIGUNUSEDPAR
   arg1 = reinterpret_cast< ndChamferCylinderInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndChamferCylinderInfo_m_r_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndChamferCylinderInfo_m_r_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_r = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -13179,7 +13127,7 @@ SWIGINTERN PyObject *_wrap_ndChamferCylinderInfo_m_r_get(PyObject *SWIGUNUSEDPAR
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -13188,7 +13136,7 @@ SWIGINTERN PyObject *_wrap_ndChamferCylinderInfo_m_r_get(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndChamferCylinderInfo_m_r_get" "', argument " "1"" of type '" "ndChamferCylinderInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndChamferCylinderInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_r);
+  result = (float) ((arg1)->m_r);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -13199,7 +13147,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndChamferCylinderInfo_m_height_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndChamferCylinderInfo *arg1 = (ndChamferCylinderInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -13214,9 +13162,9 @@ SWIGINTERN PyObject *_wrap_ndChamferCylinderInfo_m_height_set(PyObject *SWIGUNUS
   arg1 = reinterpret_cast< ndChamferCylinderInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndChamferCylinderInfo_m_height_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndChamferCylinderInfo_m_height_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_height = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -13231,7 +13179,7 @@ SWIGINTERN PyObject *_wrap_ndChamferCylinderInfo_m_height_get(PyObject *SWIGUNUS
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -13240,7 +13188,7 @@ SWIGINTERN PyObject *_wrap_ndChamferCylinderInfo_m_height_get(PyObject *SWIGUNUS
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndChamferCylinderInfo_m_height_get" "', argument " "1"" of type '" "ndChamferCylinderInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndChamferCylinderInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_height);
+  result = (float) ((arg1)->m_height);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -13297,11 +13245,11 @@ SWIGINTERN PyObject *ndChamferCylinderInfo_swiginit(PyObject *SWIGUNUSEDPARM(sel
 SWIGINTERN PyObject *_wrap_ndConvexHullInfo_m_vertexCount_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndConvexHullInfo_m_vertexCount_set", 2, 2, swig_obj)) SWIG_fail;
@@ -13310,19 +13258,11 @@ SWIGINTERN PyObject *_wrap_ndConvexHullInfo_m_vertexCount_set(PyObject *SWIGUNUS
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndConvexHullInfo_m_vertexCount_set" "', argument " "1"" of type '" "ndConvexHullInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndConvexHullInfo * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndConvexHullInfo_m_vertexCount_set" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndConvexHullInfo_m_vertexCount_set" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndConvexHullInfo_m_vertexCount_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   if (arg1) (arg1)->m_vertexCount = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -13337,7 +13277,7 @@ SWIGINTERN PyObject *_wrap_ndConvexHullInfo_m_vertexCount_get(PyObject *SWIGUNUS
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -13346,8 +13286,8 @@ SWIGINTERN PyObject *_wrap_ndConvexHullInfo_m_vertexCount_get(PyObject *SWIGUNUS
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndConvexHullInfo_m_vertexCount_get" "', argument " "1"" of type '" "ndConvexHullInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndConvexHullInfo * >(argp1);
-  result =  ((arg1)->m_vertexCount);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int) ((arg1)->m_vertexCount);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -13357,11 +13297,11 @@ fail:
 SWIGINTERN PyObject *_wrap_ndConvexHullInfo_m_strideInBytes_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndConvexHullInfo_m_strideInBytes_set", 2, 2, swig_obj)) SWIG_fail;
@@ -13370,19 +13310,11 @@ SWIGINTERN PyObject *_wrap_ndConvexHullInfo_m_strideInBytes_set(PyObject *SWIGUN
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndConvexHullInfo_m_strideInBytes_set" "', argument " "1"" of type '" "ndConvexHullInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndConvexHullInfo * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndConvexHullInfo_m_strideInBytes_set" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndConvexHullInfo_m_strideInBytes_set" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndConvexHullInfo_m_strideInBytes_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   if (arg1) (arg1)->m_strideInBytes = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -13397,7 +13329,7 @@ SWIGINTERN PyObject *_wrap_ndConvexHullInfo_m_strideInBytes_get(PyObject *SWIGUN
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -13406,8 +13338,8 @@ SWIGINTERN PyObject *_wrap_ndConvexHullInfo_m_strideInBytes_get(PyObject *SWIGUN
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndConvexHullInfo_m_strideInBytes_get" "', argument " "1"" of type '" "ndConvexHullInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndConvexHullInfo * >(argp1);
-  result =  ((arg1)->m_strideInBytes);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int) ((arg1)->m_strideInBytes);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -13417,11 +13349,11 @@ fail:
 SWIGINTERN PyObject *_wrap_ndConvexHullInfo_m_faceCount_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndConvexHullInfo *arg1 = (ndConvexHullInfo *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndConvexHullInfo_m_faceCount_set", 2, 2, swig_obj)) SWIG_fail;
@@ -13430,19 +13362,11 @@ SWIGINTERN PyObject *_wrap_ndConvexHullInfo_m_faceCount_set(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndConvexHullInfo_m_faceCount_set" "', argument " "1"" of type '" "ndConvexHullInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndConvexHullInfo * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndConvexHullInfo_m_faceCount_set" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndConvexHullInfo_m_faceCount_set" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndConvexHullInfo_m_faceCount_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   if (arg1) (arg1)->m_faceCount = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -13457,7 +13381,7 @@ SWIGINTERN PyObject *_wrap_ndConvexHullInfo_m_faceCount_get(PyObject *SWIGUNUSED
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -13466,8 +13390,8 @@ SWIGINTERN PyObject *_wrap_ndConvexHullInfo_m_faceCount_get(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndConvexHullInfo_m_faceCount_get" "', argument " "1"" of type '" "ndConvexHullInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndConvexHullInfo * >(argp1);
-  result =  ((arg1)->m_faceCount);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int) ((arg1)->m_faceCount);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -13575,11 +13499,11 @@ SWIGINTERN PyObject *ndConvexHullInfo_swiginit(PyObject *SWIGUNUSEDPARM(self), P
 SWIGINTERN PyObject *_wrap_ndCoumpoundInfo_m_noUsed_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndCoumpoundInfo *arg1 = (ndCoumpoundInfo *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndCoumpoundInfo_m_noUsed_set", 2, 2, swig_obj)) SWIG_fail;
@@ -13588,19 +13512,11 @@ SWIGINTERN PyObject *_wrap_ndCoumpoundInfo_m_noUsed_set(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndCoumpoundInfo_m_noUsed_set" "', argument " "1"" of type '" "ndCoumpoundInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndCoumpoundInfo * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndCoumpoundInfo_m_noUsed_set" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndCoumpoundInfo_m_noUsed_set" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCoumpoundInfo_m_noUsed_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   if (arg1) (arg1)->m_noUsed = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -13615,7 +13531,7 @@ SWIGINTERN PyObject *_wrap_ndCoumpoundInfo_m_noUsed_get(PyObject *SWIGUNUSEDPARM
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -13624,8 +13540,8 @@ SWIGINTERN PyObject *_wrap_ndCoumpoundInfo_m_noUsed_get(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndCoumpoundInfo_m_noUsed_get" "', argument " "1"" of type '" "ndCoumpoundInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndCoumpoundInfo * >(argp1);
-  result =  ((arg1)->m_noUsed);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int) ((arg1)->m_noUsed);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -13681,11 +13597,11 @@ SWIGINTERN PyObject *ndCoumpoundInfo_swiginit(PyObject *SWIGUNUSEDPARM(self), Py
 SWIGINTERN PyObject *_wrap_ndProceduralInfoInfo_m_noUsed_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndProceduralInfoInfo *arg1 = (ndProceduralInfoInfo *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndProceduralInfoInfo_m_noUsed_set", 2, 2, swig_obj)) SWIG_fail;
@@ -13694,19 +13610,11 @@ SWIGINTERN PyObject *_wrap_ndProceduralInfoInfo_m_noUsed_set(PyObject *SWIGUNUSE
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndProceduralInfoInfo_m_noUsed_set" "', argument " "1"" of type '" "ndProceduralInfoInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndProceduralInfoInfo * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndProceduralInfoInfo_m_noUsed_set" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndProceduralInfoInfo_m_noUsed_set" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndProceduralInfoInfo_m_noUsed_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   if (arg1) (arg1)->m_noUsed = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -13721,7 +13629,7 @@ SWIGINTERN PyObject *_wrap_ndProceduralInfoInfo_m_noUsed_get(PyObject *SWIGUNUSE
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -13730,8 +13638,8 @@ SWIGINTERN PyObject *_wrap_ndProceduralInfoInfo_m_noUsed_get(PyObject *SWIGUNUSE
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndProceduralInfoInfo_m_noUsed_get" "', argument " "1"" of type '" "ndProceduralInfoInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndProceduralInfoInfo * >(argp1);
-  result =  ((arg1)->m_noUsed);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int) ((arg1)->m_noUsed);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -13787,11 +13695,11 @@ SWIGINTERN PyObject *ndProceduralInfoInfo_swiginit(PyObject *SWIGUNUSEDPARM(self
 SWIGINTERN PyObject *_wrap_ndCollisionBvhInfo_m_vertexCount_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndCollisionBvhInfo *arg1 = (ndCollisionBvhInfo *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndCollisionBvhInfo_m_vertexCount_set", 2, 2, swig_obj)) SWIG_fail;
@@ -13800,19 +13708,11 @@ SWIGINTERN PyObject *_wrap_ndCollisionBvhInfo_m_vertexCount_set(PyObject *SWIGUN
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndCollisionBvhInfo_m_vertexCount_set" "', argument " "1"" of type '" "ndCollisionBvhInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndCollisionBvhInfo * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndCollisionBvhInfo_m_vertexCount_set" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndCollisionBvhInfo_m_vertexCount_set" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCollisionBvhInfo_m_vertexCount_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   if (arg1) (arg1)->m_vertexCount = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -13827,7 +13727,7 @@ SWIGINTERN PyObject *_wrap_ndCollisionBvhInfo_m_vertexCount_get(PyObject *SWIGUN
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -13836,8 +13736,8 @@ SWIGINTERN PyObject *_wrap_ndCollisionBvhInfo_m_vertexCount_get(PyObject *SWIGUN
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndCollisionBvhInfo_m_vertexCount_get" "', argument " "1"" of type '" "ndCollisionBvhInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndCollisionBvhInfo * >(argp1);
-  result =  ((arg1)->m_vertexCount);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int) ((arg1)->m_vertexCount);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -13847,11 +13747,11 @@ fail:
 SWIGINTERN PyObject *_wrap_ndCollisionBvhInfo_m_indexCount_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndCollisionBvhInfo *arg1 = (ndCollisionBvhInfo *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndCollisionBvhInfo_m_indexCount_set", 2, 2, swig_obj)) SWIG_fail;
@@ -13860,19 +13760,11 @@ SWIGINTERN PyObject *_wrap_ndCollisionBvhInfo_m_indexCount_set(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndCollisionBvhInfo_m_indexCount_set" "', argument " "1"" of type '" "ndCollisionBvhInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndCollisionBvhInfo * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndCollisionBvhInfo_m_indexCount_set" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndCollisionBvhInfo_m_indexCount_set" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndCollisionBvhInfo_m_indexCount_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   if (arg1) (arg1)->m_indexCount = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -13887,7 +13779,7 @@ SWIGINTERN PyObject *_wrap_ndCollisionBvhInfo_m_indexCount_get(PyObject *SWIGUNU
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -13896,8 +13788,8 @@ SWIGINTERN PyObject *_wrap_ndCollisionBvhInfo_m_indexCount_get(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndCollisionBvhInfo_m_indexCount_get" "', argument " "1"" of type '" "ndCollisionBvhInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndCollisionBvhInfo * >(argp1);
-  result =  ((arg1)->m_indexCount);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int) ((arg1)->m_indexCount);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -13953,11 +13845,11 @@ SWIGINTERN PyObject *ndCollisionBvhInfo_swiginit(PyObject *SWIGUNUSEDPARM(self),
 SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_width_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndHeighfieldInfo_m_width_set", 2, 2, swig_obj)) SWIG_fail;
@@ -13966,19 +13858,11 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_width_set(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndHeighfieldInfo_m_width_set" "', argument " "1"" of type '" "ndHeighfieldInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndHeighfieldInfo_m_width_set" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndHeighfieldInfo_m_width_set" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndHeighfieldInfo_m_width_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   if (arg1) (arg1)->m_width = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -13993,7 +13877,7 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_width_get(PyObject *SWIGUNUSEDPARM
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -14002,8 +13886,8 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_width_get(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndHeighfieldInfo_m_width_get" "', argument " "1"" of type '" "ndHeighfieldInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
-  result =  ((arg1)->m_width);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int) ((arg1)->m_width);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -14013,11 +13897,11 @@ fail:
 SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_height_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndHeighfieldInfo_m_height_set", 2, 2, swig_obj)) SWIG_fail;
@@ -14026,19 +13910,11 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_height_set(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndHeighfieldInfo_m_height_set" "', argument " "1"" of type '" "ndHeighfieldInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndHeighfieldInfo_m_height_set" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndHeighfieldInfo_m_height_set" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndHeighfieldInfo_m_height_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   if (arg1) (arg1)->m_height = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -14053,7 +13929,7 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_height_get(PyObject *SWIGUNUSEDPAR
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -14062,8 +13938,8 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_height_get(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndHeighfieldInfo_m_height_get" "', argument " "1"" of type '" "ndHeighfieldInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
-  result =  ((arg1)->m_height);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int) ((arg1)->m_height);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -14073,11 +13949,11 @@ fail:
 SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_gridsDiagonals_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndHeighfieldInfo_m_gridsDiagonals_set", 2, 2, swig_obj)) SWIG_fail;
@@ -14086,19 +13962,11 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_gridsDiagonals_set(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndHeighfieldInfo_m_gridsDiagonals_set" "', argument " "1"" of type '" "ndHeighfieldInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndHeighfieldInfo_m_gridsDiagonals_set" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndHeighfieldInfo_m_gridsDiagonals_set" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndHeighfieldInfo_m_gridsDiagonals_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   if (arg1) (arg1)->m_gridsDiagonals = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -14113,7 +13981,7 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_gridsDiagonals_get(PyObject *SWIGU
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -14122,8 +13990,8 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_gridsDiagonals_get(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndHeighfieldInfo_m_gridsDiagonals_get" "', argument " "1"" of type '" "ndHeighfieldInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
-  result =  ((arg1)->m_gridsDiagonals);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int) ((arg1)->m_gridsDiagonals);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -14133,7 +14001,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_verticalScale_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -14148,9 +14016,9 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_verticalScale_set(PyObject *SWIGUN
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndHeighfieldInfo_m_verticalScale_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndHeighfieldInfo_m_verticalScale_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_verticalScale = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -14165,7 +14033,7 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_verticalScale_get(PyObject *SWIGUN
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -14174,7 +14042,7 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_verticalScale_get(PyObject *SWIGUN
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndHeighfieldInfo_m_verticalScale_get" "', argument " "1"" of type '" "ndHeighfieldInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_verticalScale);
+  result = (float) ((arg1)->m_verticalScale);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -14185,7 +14053,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_horizonalScale_x_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -14200,9 +14068,9 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_horizonalScale_x_set(PyObject *SWI
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndHeighfieldInfo_m_horizonalScale_x_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndHeighfieldInfo_m_horizonalScale_x_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_horizonalScale_x = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -14217,7 +14085,7 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_horizonalScale_x_get(PyObject *SWI
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -14226,7 +14094,7 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_horizonalScale_x_get(PyObject *SWI
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndHeighfieldInfo_m_horizonalScale_x_get" "', argument " "1"" of type '" "ndHeighfieldInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_horizonalScale_x);
+  result = (float) ((arg1)->m_horizonalScale_x);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -14237,7 +14105,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_horizonalScale_z_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -14252,9 +14120,9 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_horizonalScale_z_set(PyObject *SWI
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndHeighfieldInfo_m_horizonalScale_z_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndHeighfieldInfo_m_horizonalScale_z_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_horizonalScale_z = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -14269,7 +14137,7 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_horizonalScale_z_get(PyObject *SWI
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -14278,7 +14146,7 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_horizonalScale_z_get(PyObject *SWI
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndHeighfieldInfo_m_horizonalScale_z_get" "', argument " "1"" of type '" "ndHeighfieldInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
-  result = (dFloat32) ((arg1)->m_horizonalScale_z);
+  result = (float) ((arg1)->m_horizonalScale_z);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -14289,7 +14157,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_elevation_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  dInt16 *arg2 = (dInt16 *) 0 ;
+  short *arg2 = (short *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -14302,11 +14170,11 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_elevation_set(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndHeighfieldInfo_m_elevation_set" "', argument " "1"" of type '" "ndHeighfieldInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int16_t, SWIG_POINTER_DISOWN |  0 );
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_short, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndHeighfieldInfo_m_elevation_set" "', argument " "2"" of type '" "dInt16 *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndHeighfieldInfo_m_elevation_set" "', argument " "2"" of type '" "short *""'"); 
   }
-  arg2 = reinterpret_cast< dInt16 * >(argp2);
+  arg2 = reinterpret_cast< short * >(argp2);
   if (arg1) (arg1)->m_elevation = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -14321,7 +14189,7 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_elevation_get(PyObject *SWIGUNUSED
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt16 *result = 0 ;
+  short *result = 0 ;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -14330,8 +14198,8 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_elevation_get(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndHeighfieldInfo_m_elevation_get" "', argument " "1"" of type '" "ndHeighfieldInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
-  result = (dInt16 *) ((arg1)->m_elevation);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int16_t, 0 |  0 );
+  result = (short *) ((arg1)->m_elevation);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_short, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -14341,7 +14209,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_atributes_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndHeighfieldInfo *arg1 = (ndHeighfieldInfo *) 0 ;
-  dInt8 *arg2 = (dInt8 *) 0 ;
+  signed char *arg2 = (signed char *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -14354,11 +14222,11 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_atributes_set(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndHeighfieldInfo_m_atributes_set" "', argument " "1"" of type '" "ndHeighfieldInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int8_t, SWIG_POINTER_DISOWN |  0 );
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_signed_char, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndHeighfieldInfo_m_atributes_set" "', argument " "2"" of type '" "dInt8 *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndHeighfieldInfo_m_atributes_set" "', argument " "2"" of type '" "signed char *""'"); 
   }
-  arg2 = reinterpret_cast< dInt8 * >(argp2);
+  arg2 = reinterpret_cast< signed char * >(argp2);
   if (arg1) (arg1)->m_atributes = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -14373,7 +14241,7 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_atributes_get(PyObject *SWIGUNUSED
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt8 *result = 0 ;
+  signed char *result = 0 ;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -14382,8 +14250,8 @@ SWIGINTERN PyObject *_wrap_ndHeighfieldInfo_m_atributes_get(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndHeighfieldInfo_m_atributes_get" "', argument " "1"" of type '" "ndHeighfieldInfo *""'"); 
   }
   arg1 = reinterpret_cast< ndHeighfieldInfo * >(argp1);
-  result = (dInt8 *) ((arg1)->m_atributes);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int8_t, 0 |  0 );
+  result = (signed char *) ((arg1)->m_atributes);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_signed_char, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -14696,7 +14564,7 @@ SWIGINTERN PyObject *_wrap_ndShape_GetRefCount(PyObject *SWIGUNUSEDPARM(self), P
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -14705,8 +14573,8 @@ SWIGINTERN PyObject *_wrap_ndShape_GetRefCount(PyObject *SWIGUNUSEDPARM(self), P
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShape_GetRefCount" "', argument " "1"" of type '" "ndShape const *""'"); 
   }
   arg1 = reinterpret_cast< ndShape * >(argp1);
-  result = ((ndShape const *)arg1)->GetRefCount();
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int)((ndShape const *)arg1)->GetRefCount();
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -14719,7 +14587,7 @@ SWIGINTERN PyObject *_wrap_ndShape_Release(PyObject *SWIGUNUSEDPARM(self), PyObj
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -14728,8 +14596,8 @@ SWIGINTERN PyObject *_wrap_ndShape_Release(PyObject *SWIGUNUSEDPARM(self), PyObj
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShape_Release" "', argument " "1"" of type '" "ndShape const *""'"); 
   }
   arg1 = reinterpret_cast< ndShape * >(argp1);
-  result = ((ndShape const *)arg1)->Release();
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int)((ndShape const *)arg1)->Release();
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -15110,7 +14978,7 @@ SWIGINTERN PyObject *_wrap_ndShape_GetConvexVertexCount(PyObject *SWIGUNUSEDPARM
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -15119,8 +14987,8 @@ SWIGINTERN PyObject *_wrap_ndShape_GetConvexVertexCount(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShape_GetConvexVertexCount" "', argument " "1"" of type '" "ndShape const *""'"); 
   }
   arg1 = reinterpret_cast< ndShape * >(argp1);
-  result = ((ndShape const *)arg1)->GetConvexVertexCount();
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int)((ndShape const *)arg1)->GetConvexVertexCount();
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -15179,7 +15047,7 @@ SWIGINTERN PyObject *_wrap_ndShape_GetUmbraClipSize(PyObject *SWIGUNUSEDPARM(sel
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -15188,7 +15056,7 @@ SWIGINTERN PyObject *_wrap_ndShape_GetUmbraClipSize(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShape_GetUmbraClipSize" "', argument " "1"" of type '" "ndShape const *""'"); 
   }
   arg1 = reinterpret_cast< ndShape * >(argp1);
-  result = (dFloat32)((ndShape const *)arg1)->GetUmbraClipSize();
+  result = (float)((ndShape const *)arg1)->GetUmbraClipSize();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -15290,7 +15158,7 @@ SWIGINTERN PyObject *_wrap_ndShape_GetVolume(PyObject *SWIGUNUSEDPARM(self), PyO
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -15299,7 +15167,7 @@ SWIGINTERN PyObject *_wrap_ndShape_GetVolume(PyObject *SWIGUNUSEDPARM(self), PyO
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShape_GetVolume" "', argument " "1"" of type '" "ndShape const *""'"); 
   }
   arg1 = reinterpret_cast< ndShape * >(argp1);
-  result = (dFloat32)((ndShape const *)arg1)->GetVolume();
+  result = (float)((ndShape const *)arg1)->GetVolume();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -15313,7 +15181,7 @@ SWIGINTERN PyObject *_wrap_ndShape_GetBoxMinRadius(PyObject *SWIGUNUSEDPARM(self
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -15322,7 +15190,7 @@ SWIGINTERN PyObject *_wrap_ndShape_GetBoxMinRadius(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShape_GetBoxMinRadius" "', argument " "1"" of type '" "ndShape const *""'"); 
   }
   arg1 = reinterpret_cast< ndShape * >(argp1);
-  result = (dFloat32)((ndShape const *)arg1)->GetBoxMinRadius();
+  result = (float)((ndShape const *)arg1)->GetBoxMinRadius();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -15336,7 +15204,7 @@ SWIGINTERN PyObject *_wrap_ndShape_GetBoxMaxRadius(PyObject *SWIGUNUSEDPARM(self
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -15345,7 +15213,7 @@ SWIGINTERN PyObject *_wrap_ndShape_GetBoxMaxRadius(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShape_GetBoxMaxRadius" "', argument " "1"" of type '" "ndShape const *""'"); 
   }
   arg1 = reinterpret_cast< ndShape * >(argp1);
-  result = (dFloat32)((ndShape const *)arg1)->GetBoxMaxRadius();
+  result = (float)((ndShape const *)arg1)->GetBoxMaxRadius();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -15411,7 +15279,7 @@ SWIGINTERN PyObject *_wrap_ndShape_SupportVertex(PyObject *SWIGUNUSEDPARM(self),
   PyObject *resultobj = 0;
   ndShape *arg1 = (ndShape *) 0 ;
   dVector *arg2 = 0 ;
-  dInt32 *arg3 = (dInt32 *) (dInt32 *)0 ;
+  int *arg3 = (int *) (int *)0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -15435,11 +15303,11 @@ SWIGINTERN PyObject *_wrap_ndShape_SupportVertex(PyObject *SWIGUNUSEDPARM(self),
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndShape_SupportVertex" "', argument " "2"" of type '" "dVector const &""'"); 
   }
   arg2 = reinterpret_cast< dVector * >(argp2);
-  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3,SWIGTYPE_p_int32_t, 0 |  0 );
+  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3,SWIGTYPE_p_int, 0 |  0 );
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndShape_SupportVertex" "', argument " "3"" of type '" "dInt32 *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndShape_SupportVertex" "', argument " "3"" of type '" "int *const""'"); 
   }
-  arg3 = reinterpret_cast< dInt32 * >(argp3);
+  arg3 = reinterpret_cast< int * >(argp3);
   result = ((ndShape const *)arg1)->SupportVertex((dVector const &)*arg2,arg3);
   resultobj = SWIG_NewPointerObj((new dVector(static_cast< const dVector& >(result))), SWIGTYPE_p_dVector, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -15496,8 +15364,8 @@ SWIGINTERN PyObject *_wrap_ndShape_SupportVertexSpecial(PyObject *SWIGUNUSEDPARM
   PyObject *resultobj = 0;
   ndShape *arg1 = (ndShape *) 0 ;
   dVector *arg2 = 0 ;
-  dFloat32 arg3 ;
-  dInt32 *arg4 = (dInt32 *) (dInt32 *)0 ;
+  float arg3 ;
+  int *arg4 = (int *) (int *)0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -15525,14 +15393,14 @@ SWIGINTERN PyObject *_wrap_ndShape_SupportVertexSpecial(PyObject *SWIGUNUSEDPARM
   arg2 = reinterpret_cast< dVector * >(argp2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndShape_SupportVertexSpecial" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndShape_SupportVertexSpecial" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
-  res4 = SWIG_ConvertPtr(swig_obj[3], &argp4,SWIGTYPE_p_int32_t, 0 |  0 );
+  arg3 = static_cast< float >(val3);
+  res4 = SWIG_ConvertPtr(swig_obj[3], &argp4,SWIGTYPE_p_int, 0 |  0 );
   if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ndShape_SupportVertexSpecial" "', argument " "4"" of type '" "dInt32 *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ndShape_SupportVertexSpecial" "', argument " "4"" of type '" "int *const""'"); 
   }
-  arg4 = reinterpret_cast< dInt32 * >(argp4);
+  arg4 = reinterpret_cast< int * >(argp4);
   result = ((ndShape const *)arg1)->SupportVertexSpecial((dVector const &)*arg2,arg3,arg4);
   resultobj = SWIG_NewPointerObj((new dVector(static_cast< const dVector& >(result))), SWIGTYPE_p_dVector, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -15556,7 +15424,7 @@ SWIGINTERN PyObject *_wrap_ndShape_CalculatePlaneIntersection(PyObject *SWIGUNUS
   void *argp4 = 0 ;
   int res4 = 0 ;
   PyObject *swig_obj[4] ;
-  dInt32 result;
+  int result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndShape_CalculatePlaneIntersection", 4, 4, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndShape, 0 |  0 );
@@ -15585,8 +15453,8 @@ SWIGINTERN PyObject *_wrap_ndShape_CalculatePlaneIntersection(PyObject *SWIGUNUS
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ndShape_CalculatePlaneIntersection" "', argument " "4"" of type '" "dVector *const""'"); 
   }
   arg4 = reinterpret_cast< dVector * >(argp4);
-  result = ((ndShape const *)arg1)->CalculatePlaneIntersection((dVector const &)*arg2,(dVector const &)*arg3,arg4);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int)((ndShape const *)arg1)->CalculatePlaneIntersection((dVector const &)*arg2,(dVector const &)*arg3,arg4);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -15654,7 +15522,7 @@ SWIGINTERN PyObject *_wrap_ndShape_RayCast(PyObject *SWIGUNUSEDPARM(self), PyObj
   ndRayCastNotify *arg2 = 0 ;
   dVector *arg3 = 0 ;
   dVector *arg4 = 0 ;
-  dFloat32 arg5 ;
+  float arg5 ;
   ndBody *arg6 = (ndBody *) (ndBody *)0 ;
   ndContactPoint *arg7 = 0 ;
   void *argp1 = 0 ;
@@ -15672,7 +15540,7 @@ SWIGINTERN PyObject *_wrap_ndShape_RayCast(PyObject *SWIGUNUSEDPARM(self), PyObj
   void *argp7 = 0 ;
   int res7 = 0 ;
   PyObject *swig_obj[7] ;
-  dFloat32 result;
+  float result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndShape_RayCast", 7, 7, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndShape, 0 |  0 );
@@ -15706,9 +15574,9 @@ SWIGINTERN PyObject *_wrap_ndShape_RayCast(PyObject *SWIGUNUSEDPARM(self), PyObj
   arg4 = reinterpret_cast< dVector * >(argp4);
   ecode5 = SWIG_AsVal_float(swig_obj[4], &val5);
   if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "ndShape_RayCast" "', argument " "5"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "ndShape_RayCast" "', argument " "5"" of type '" "float""'");
   } 
-  arg5 = static_cast< dFloat32 >(val5);
+  arg5 = static_cast< float >(val5);
   res6 = SWIG_ConvertPtr(swig_obj[5], &argp6,SWIGTYPE_p_ndBody, 0 |  0 );
   if (!SWIG_IsOK(res6)) {
     SWIG_exception_fail(SWIG_ArgError(res6), "in method '" "ndShape_RayCast" "', argument " "6"" of type '" "ndBody const *const""'"); 
@@ -15722,7 +15590,7 @@ SWIGINTERN PyObject *_wrap_ndShape_RayCast(PyObject *SWIGUNUSEDPARM(self), PyObj
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndShape_RayCast" "', argument " "7"" of type '" "ndContactPoint &""'"); 
   }
   arg7 = reinterpret_cast< ndContactPoint * >(argp7);
-  result = (dFloat32)((ndShape const *)arg1)->RayCast(*arg2,(dVector const &)*arg3,(dVector const &)*arg4,arg5,(ndBody const *)arg6,*arg7);
+  result = (float)((ndShape const *)arg1)->RayCast(*arg2,(dVector const &)*arg3,(dVector const &)*arg4,arg5,(ndBody const *)arg6,*arg7);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -15803,7 +15671,7 @@ SWIGINTERN PyObject *_wrap_ndShape_CalculateMassProperties(PyObject *SWIGUNUSEDP
   void *argp5 = 0 ;
   int res5 = 0 ;
   PyObject *swig_obj[5] ;
-  dFloat32 result;
+  float result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndShape_CalculateMassProperties", 5, 5, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndShape, 0 |  0 );
@@ -15843,7 +15711,7 @@ SWIGINTERN PyObject *_wrap_ndShape_CalculateMassProperties(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndShape_CalculateMassProperties" "', argument " "5"" of type '" "dVector &""'"); 
   }
   arg5 = reinterpret_cast< dVector * >(argp5);
-  result = (dFloat32)((ndShape const *)arg1)->CalculateMassProperties((dMatrix const &)*arg2,*arg3,*arg4,*arg5);
+  result = (float)((ndShape const *)arg1)->CalculateMassProperties((dMatrix const &)*arg2,*arg3,*arg4,*arg5);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -15916,9 +15784,9 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_ndShapeBox__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat32 arg1 ;
-  dFloat32 arg2 ;
-  dFloat32 arg3 ;
+  float arg1 ;
+  float arg2 ;
+  float arg3 ;
   float val1 ;
   int ecode1 = 0 ;
   float val2 ;
@@ -15930,19 +15798,19 @@ SWIGINTERN PyObject *_wrap_new_ndShapeBox__SWIG_1(PyObject *SWIGUNUSEDPARM(self)
   if ((nobjs < 3) || (nobjs > 3)) SWIG_fail;
   ecode1 = SWIG_AsVal_float(swig_obj[0], &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ndShapeBox" "', argument " "1"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ndShapeBox" "', argument " "1"" of type '" "float""'");
   } 
-  arg1 = static_cast< dFloat32 >(val1);
+  arg1 = static_cast< float >(val1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ndShapeBox" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ndShapeBox" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_ndShapeBox" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_ndShapeBox" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   result = (ndShapeBox *)new ndShapeBox(arg1,arg2,arg3);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndShapeBox, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -15994,7 +15862,7 @@ fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'new_ndShapeBox'.\n"
     "  Possible C/C++ prototypes are:\n"
     "    ndShapeBox::ndShapeBox(dLoadSaveBase::dLoadDescriptor const &)\n"
-    "    ndShapeBox::ndShapeBox(dFloat32,dFloat32,dFloat32)\n");
+    "    ndShapeBox::ndShapeBox(float,float,float)\n");
   return 0;
 }
 
@@ -16057,8 +15925,8 @@ SWIGINTERN PyObject *ndShapeBox_swiginit(PyObject *SWIGUNUSEDPARM(self), PyObjec
 
 SWIGINTERN PyObject *_wrap_new_ndShapeCone__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat32 arg1 ;
-  dFloat32 arg2 ;
+  float arg1 ;
+  float arg2 ;
   float val1 ;
   int ecode1 = 0 ;
   float val2 ;
@@ -16068,14 +15936,14 @@ SWIGINTERN PyObject *_wrap_new_ndShapeCone__SWIG_0(PyObject *SWIGUNUSEDPARM(self
   if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
   ecode1 = SWIG_AsVal_float(swig_obj[0], &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ndShapeCone" "', argument " "1"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ndShapeCone" "', argument " "1"" of type '" "float""'");
   } 
-  arg1 = static_cast< dFloat32 >(val1);
+  arg1 = static_cast< float >(val1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ndShapeCone" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ndShapeCone" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   result = (ndShapeCone *)new ndShapeCone(arg1,arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndShapeCone, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -16144,7 +16012,7 @@ SWIGINTERN PyObject *_wrap_new_ndShapeCone(PyObject *self, PyObject *args) {
 fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'new_ndShapeCone'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    ndShapeCone::ndShapeCone(dFloat32,dFloat32)\n"
+    "    ndShapeCone::ndShapeCone(float,float)\n"
     "    ndShapeCone::ndShapeCone(dLoadSaveBase::dLoadDescriptor const &)\n");
   return 0;
 }
@@ -16215,7 +16083,7 @@ SWIGINTERN PyObject *ndShapeConvex_swigregister(PyObject *SWIGUNUSEDPARM(self), 
 
 SWIGINTERN PyObject *_wrap_new_ndShapeSphere__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat32 arg1 ;
+  float arg1 ;
   float val1 ;
   int ecode1 = 0 ;
   ndShapeSphere *result = 0 ;
@@ -16223,9 +16091,9 @@ SWIGINTERN PyObject *_wrap_new_ndShapeSphere__SWIG_0(PyObject *SWIGUNUSEDPARM(se
   if ((nobjs < 1) || (nobjs > 1)) SWIG_fail;
   ecode1 = SWIG_AsVal_float(swig_obj[0], &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ndShapeSphere" "', argument " "1"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ndShapeSphere" "', argument " "1"" of type '" "float""'");
   } 
-  arg1 = static_cast< dFloat32 >(val1);
+  arg1 = static_cast< float >(val1);
   result = (ndShapeSphere *)new ndShapeSphere(arg1);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndShapeSphere, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -16288,7 +16156,7 @@ SWIGINTERN PyObject *_wrap_new_ndShapeSphere(PyObject *self, PyObject *args) {
 fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'new_ndShapeSphere'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    ndShapeSphere::ndShapeSphere(dFloat32)\n"
+    "    ndShapeSphere::ndShapeSphere(float)\n"
     "    ndShapeSphere::ndShapeSphere(dLoadSaveBase::dLoadDescriptor const &)\n");
   return 0;
 }
@@ -16376,9 +16244,9 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_ndShapeCapsule__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat32 arg1 ;
-  dFloat32 arg2 ;
-  dFloat32 arg3 ;
+  float arg1 ;
+  float arg2 ;
+  float arg3 ;
   float val1 ;
   int ecode1 = 0 ;
   float val2 ;
@@ -16390,19 +16258,19 @@ SWIGINTERN PyObject *_wrap_new_ndShapeCapsule__SWIG_1(PyObject *SWIGUNUSEDPARM(s
   if ((nobjs < 3) || (nobjs > 3)) SWIG_fail;
   ecode1 = SWIG_AsVal_float(swig_obj[0], &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ndShapeCapsule" "', argument " "1"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ndShapeCapsule" "', argument " "1"" of type '" "float""'");
   } 
-  arg1 = static_cast< dFloat32 >(val1);
+  arg1 = static_cast< float >(val1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ndShapeCapsule" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ndShapeCapsule" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_ndShapeCapsule" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_ndShapeCapsule" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   result = (ndShapeCapsule *)new ndShapeCapsule(arg1,arg2,arg3);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndShapeCapsule, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -16454,7 +16322,7 @@ fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'new_ndShapeCapsule'.\n"
     "  Possible C/C++ prototypes are:\n"
     "    ndShapeCapsule::ndShapeCapsule(dLoadSaveBase::dLoadDescriptor const &)\n"
-    "    ndShapeCapsule::ndShapeCapsule(dFloat32,dFloat32,dFloat32)\n");
+    "    ndShapeCapsule::ndShapeCapsule(float,float,float)\n");
   return 0;
 }
 
@@ -16766,9 +16634,9 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_ndShapeCylinder__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat32 arg1 ;
-  dFloat32 arg2 ;
-  dFloat32 arg3 ;
+  float arg1 ;
+  float arg2 ;
+  float arg3 ;
   float val1 ;
   int ecode1 = 0 ;
   float val2 ;
@@ -16780,19 +16648,19 @@ SWIGINTERN PyObject *_wrap_new_ndShapeCylinder__SWIG_1(PyObject *SWIGUNUSEDPARM(
   if ((nobjs < 3) || (nobjs > 3)) SWIG_fail;
   ecode1 = SWIG_AsVal_float(swig_obj[0], &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ndShapeCylinder" "', argument " "1"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ndShapeCylinder" "', argument " "1"" of type '" "float""'");
   } 
-  arg1 = static_cast< dFloat32 >(val1);
+  arg1 = static_cast< float >(val1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ndShapeCylinder" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ndShapeCylinder" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_ndShapeCylinder" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_ndShapeCylinder" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   result = (ndShapeCylinder *)new ndShapeCylinder(arg1,arg2,arg3);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndShapeCylinder, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -16844,7 +16712,7 @@ fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'new_ndShapeCylinder'.\n"
     "  Possible C/C++ prototypes are:\n"
     "    ndShapeCylinder::ndShapeCylinder(dLoadSaveBase::dLoadDescriptor const &)\n"
-    "    ndShapeCylinder::ndShapeCylinder(dFloat32,dFloat32,dFloat32)\n");
+    "    ndShapeCylinder::ndShapeCylinder(float,float,float)\n");
   return 0;
 }
 
@@ -17129,7 +16997,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_GetSeparetionDistance(PyObject *SWI
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -17138,7 +17006,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_GetSeparetionDistance(PyObject *SWI
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_GetSeparetionDistance" "', argument " "1"" of type '" "ndPolygonMeshDesc const *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  result = (dFloat32)((ndPolygonMeshDesc const *)arg1)->GetSeparetionDistance();
+  result = (float)((ndPolygonMeshDesc const *)arg1)->GetSeparetionDistance();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -17181,13 +17049,13 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_GetFaceIndexCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
-  dInt32 result;
+  int result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndPolygonMeshDesc_GetFaceIndexCount", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndPolygonMeshDesc, 0 |  0 );
@@ -17195,21 +17063,13 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_GetFaceIndexCount(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_GetFaceIndexCount" "', argument " "1"" of type '" "ndPolygonMeshDesc const *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_GetFaceIndexCount" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndPolygonMeshDesc_GetFaceIndexCount" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
-  result = ((ndPolygonMeshDesc const *)arg1)->GetFaceIndexCount(arg2);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndPolygonMeshDesc_GetFaceIndexCount" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
+  result = (int)((ndPolygonMeshDesc const *)arg1)->GetFaceIndexCount(arg2);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -17219,16 +17079,16 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_GetAdjacentFaceEdgeNormalArray(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dInt32 *arg2 = (dInt32 *) (dInt32 *)0 ;
-  dInt32 arg3 ;
+  int *arg2 = (int *) (int *)0 ;
+  int arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
-  void *argp3 ;
-  int res3 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
   PyObject *swig_obj[3] ;
-  dInt32 *result = 0 ;
+  int *result = 0 ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndPolygonMeshDesc_GetAdjacentFaceEdgeNormalArray", 3, 3, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndPolygonMeshDesc, 0 |  0 );
@@ -17236,26 +17096,18 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_GetAdjacentFaceEdgeNormalArray(PyOb
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_GetAdjacentFaceEdgeNormalArray" "', argument " "1"" of type '" "ndPolygonMeshDesc const *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int32_t, 0 |  0 );
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_GetAdjacentFaceEdgeNormalArray" "', argument " "2"" of type '" "dInt32 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_GetAdjacentFaceEdgeNormalArray" "', argument " "2"" of type '" "int const *const""'"); 
   }
-  arg2 = reinterpret_cast< dInt32 * >(argp2);
-  {
-    res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndPolygonMeshDesc_GetAdjacentFaceEdgeNormalArray" "', argument " "3"" of type '" "dInt32""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndPolygonMeshDesc_GetAdjacentFaceEdgeNormalArray" "', argument " "3"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
-  }
-  result = (dInt32 *)((ndPolygonMeshDesc const *)arg1)->GetAdjacentFaceEdgeNormalArray((dInt32 const *)arg2,arg3);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int32_t, 0 |  0 );
+  arg2 = reinterpret_cast< int * >(argp2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndPolygonMeshDesc_GetAdjacentFaceEdgeNormalArray" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  result = (int *)((ndPolygonMeshDesc const *)arg1)->GetAdjacentFaceEdgeNormalArray((int const *)arg2,arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -17265,16 +17117,16 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_GetNormalIndex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dInt32 *arg2 = (dInt32 *) (dInt32 *)0 ;
-  dInt32 arg3 ;
+  int *arg2 = (int *) (int *)0 ;
+  int arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
-  void *argp3 ;
-  int res3 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
   PyObject *swig_obj[3] ;
-  dInt32 result;
+  int result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndPolygonMeshDesc_GetNormalIndex", 3, 3, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndPolygonMeshDesc, 0 |  0 );
@@ -17282,26 +17134,18 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_GetNormalIndex(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_GetNormalIndex" "', argument " "1"" of type '" "ndPolygonMeshDesc const *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int32_t, 0 |  0 );
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_GetNormalIndex" "', argument " "2"" of type '" "dInt32 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_GetNormalIndex" "', argument " "2"" of type '" "int const *const""'"); 
   }
-  arg2 = reinterpret_cast< dInt32 * >(argp2);
-  {
-    res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndPolygonMeshDesc_GetNormalIndex" "', argument " "3"" of type '" "dInt32""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndPolygonMeshDesc_GetNormalIndex" "', argument " "3"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
-  }
-  result = ((ndPolygonMeshDesc const *)arg1)->GetNormalIndex((dInt32 const *)arg2,arg3);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  arg2 = reinterpret_cast< int * >(argp2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndPolygonMeshDesc_GetNormalIndex" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  result = (int)((ndPolygonMeshDesc const *)arg1)->GetNormalIndex((int const *)arg2,arg3);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -17311,16 +17155,16 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_GetFaceId(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dInt32 *arg2 = (dInt32 *) (dInt32 *)0 ;
-  dInt32 arg3 ;
+  int *arg2 = (int *) (int *)0 ;
+  int arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
-  void *argp3 ;
-  int res3 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
   PyObject *swig_obj[3] ;
-  dInt32 result;
+  int result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndPolygonMeshDesc_GetFaceId", 3, 3, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndPolygonMeshDesc, 0 |  0 );
@@ -17328,26 +17172,18 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_GetFaceId(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_GetFaceId" "', argument " "1"" of type '" "ndPolygonMeshDesc const *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int32_t, 0 |  0 );
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_GetFaceId" "', argument " "2"" of type '" "dInt32 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_GetFaceId" "', argument " "2"" of type '" "int const *const""'"); 
   }
-  arg2 = reinterpret_cast< dInt32 * >(argp2);
-  {
-    res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndPolygonMeshDesc_GetFaceId" "', argument " "3"" of type '" "dInt32""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndPolygonMeshDesc_GetFaceId" "', argument " "3"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
-  }
-  result = ((ndPolygonMeshDesc const *)arg1)->GetFaceId((dInt32 const *)arg2,arg3);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  arg2 = reinterpret_cast< int * >(argp2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndPolygonMeshDesc_GetFaceId" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  result = (int)((ndPolygonMeshDesc const *)arg1)->GetFaceId((int const *)arg2,arg3);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -17357,16 +17193,16 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_GetFaceSize(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dInt32 *arg2 = (dInt32 *) (dInt32 *)0 ;
-  dInt32 arg3 ;
+  int *arg2 = (int *) (int *)0 ;
+  int arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
   int res2 = 0 ;
-  void *argp3 ;
-  int res3 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
   PyObject *swig_obj[3] ;
-  dFloat32 result;
+  float result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndPolygonMeshDesc_GetFaceSize", 3, 3, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndPolygonMeshDesc, 0 |  0 );
@@ -17374,25 +17210,17 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_GetFaceSize(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_GetFaceSize" "', argument " "1"" of type '" "ndPolygonMeshDesc const *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int32_t, 0 |  0 );
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_GetFaceSize" "', argument " "2"" of type '" "dInt32 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_GetFaceSize" "', argument " "2"" of type '" "int const *const""'"); 
   }
-  arg2 = reinterpret_cast< dInt32 * >(argp2);
-  {
-    res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndPolygonMeshDesc_GetFaceSize" "', argument " "3"" of type '" "dInt32""'"); 
-    }  
-    if (!argp3) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndPolygonMeshDesc_GetFaceSize" "', argument " "3"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp3);
-      arg3 = *temp;
-      if (SWIG_IsNewObj(res3)) delete temp;
-    }
-  }
-  result = (dFloat32)((ndPolygonMeshDesc const *)arg1)->GetFaceSize((dInt32 const *)arg2,arg3);
+  arg2 = reinterpret_cast< int * >(argp2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndPolygonMeshDesc_GetFaceSize" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  result = (float)((ndPolygonMeshDesc const *)arg1)->GetFaceSize((int const *)arg2,arg3);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -17455,11 +17283,11 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceCount_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndPolygonMeshDesc_m_faceCount_set", 2, 2, swig_obj)) SWIG_fail;
@@ -17468,19 +17296,11 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceCount_set(PyObject *SWIGUNUSE
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_faceCount_set" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_faceCount_set" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndPolygonMeshDesc_m_faceCount_set" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndPolygonMeshDesc_m_faceCount_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   if (arg1) (arg1)->m_faceCount = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -17495,7 +17315,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceCount_get(PyObject *SWIGUNUSE
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -17504,8 +17324,8 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceCount_get(PyObject *SWIGUNUSE
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_faceCount_get" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  result =  ((arg1)->m_faceCount);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int) ((arg1)->m_faceCount);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -17515,11 +17335,11 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_vertexStrideInBytes_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndPolygonMeshDesc_m_vertexStrideInBytes_set", 2, 2, swig_obj)) SWIG_fail;
@@ -17528,19 +17348,11 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_vertexStrideInBytes_set(PyObject 
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_vertexStrideInBytes_set" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_vertexStrideInBytes_set" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndPolygonMeshDesc_m_vertexStrideInBytes_set" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndPolygonMeshDesc_m_vertexStrideInBytes_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   if (arg1) (arg1)->m_vertexStrideInBytes = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -17555,7 +17367,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_vertexStrideInBytes_get(PyObject 
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -17564,8 +17376,8 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_vertexStrideInBytes_get(PyObject 
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_vertexStrideInBytes_get" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  result =  ((arg1)->m_vertexStrideInBytes);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int) ((arg1)->m_vertexStrideInBytes);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -17575,7 +17387,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_skinThickness_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -17590,9 +17402,9 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_skinThickness_set(PyObject *SWIGU
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndPolygonMeshDesc_m_skinThickness_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndPolygonMeshDesc_m_skinThickness_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_skinThickness = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -17607,7 +17419,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_skinThickness_get(PyObject *SWIGU
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -17616,7 +17428,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_skinThickness_get(PyObject *SWIGU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_skinThickness_get" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  result = (dFloat32) ((arg1)->m_skinThickness);
+  result = (float) ((arg1)->m_skinThickness);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -17781,7 +17593,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_vertex_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dFloat32 *arg2 = (dFloat32 *) 0 ;
+  float *arg2 = (float *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -17796,9 +17608,9 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_vertex_set(PyObject *SWIGUNUSEDPA
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_float, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_vertex_set" "', argument " "2"" of type '" "dFloat32 *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_vertex_set" "', argument " "2"" of type '" "float *""'"); 
   }
-  arg2 = reinterpret_cast< dFloat32 * >(argp2);
+  arg2 = reinterpret_cast< float * >(argp2);
   if (arg1) (arg1)->m_vertex = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -17813,7 +17625,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_vertex_get(PyObject *SWIGUNUSEDPA
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 *result = 0 ;
+  float *result = 0 ;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -17822,7 +17634,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_vertex_get(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_vertex_get" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  result = (dFloat32 *) ((arg1)->m_vertex);
+  result = (float *) ((arg1)->m_vertex);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_float, 0 |  0 );
   return resultobj;
 fail:
@@ -17833,7 +17645,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceIndexCount_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dInt32 *arg2 = (dInt32 *) 0 ;
+  int *arg2 = (int *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -17846,11 +17658,11 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceIndexCount_set(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_faceIndexCount_set" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int32_t, SWIG_POINTER_DISOWN |  0 );
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_faceIndexCount_set" "', argument " "2"" of type '" "dInt32 *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_faceIndexCount_set" "', argument " "2"" of type '" "int *""'"); 
   }
-  arg2 = reinterpret_cast< dInt32 * >(argp2);
+  arg2 = reinterpret_cast< int * >(argp2);
   if (arg1) (arg1)->m_faceIndexCount = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -17865,7 +17677,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceIndexCount_get(PyObject *SWIG
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 *result = 0 ;
+  int *result = 0 ;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -17874,8 +17686,8 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceIndexCount_get(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_faceIndexCount_get" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  result = (dInt32 *) ((arg1)->m_faceIndexCount);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int32_t, 0 |  0 );
+  result = (int *) ((arg1)->m_faceIndexCount);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -17885,7 +17697,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceVertexIndex_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dInt32 *arg2 = (dInt32 *) 0 ;
+  int *arg2 = (int *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -17898,11 +17710,11 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceVertexIndex_set(PyObject *SWI
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_faceVertexIndex_set" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int32_t, SWIG_POINTER_DISOWN |  0 );
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_faceVertexIndex_set" "', argument " "2"" of type '" "dInt32 *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_faceVertexIndex_set" "', argument " "2"" of type '" "int *""'"); 
   }
-  arg2 = reinterpret_cast< dInt32 * >(argp2);
+  arg2 = reinterpret_cast< int * >(argp2);
   if (arg1) (arg1)->m_faceVertexIndex = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -17917,7 +17729,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceVertexIndex_get(PyObject *SWI
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 *result = 0 ;
+  int *result = 0 ;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -17926,8 +17738,8 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceVertexIndex_get(PyObject *SWI
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_faceVertexIndex_get" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  result = (dInt32 *) ((arg1)->m_faceVertexIndex);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int32_t, 0 |  0 );
+  result = (int *) ((arg1)->m_faceVertexIndex);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -17937,7 +17749,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceIndexStart_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dInt32 *arg2 = (dInt32 *) 0 ;
+  int *arg2 = (int *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -17950,11 +17762,11 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceIndexStart_set(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_faceIndexStart_set" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int32_t, SWIG_POINTER_DISOWN |  0 );
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_faceIndexStart_set" "', argument " "2"" of type '" "dInt32 *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_faceIndexStart_set" "', argument " "2"" of type '" "int *""'"); 
   }
-  arg2 = reinterpret_cast< dInt32 * >(argp2);
+  arg2 = reinterpret_cast< int * >(argp2);
   if (arg1) (arg1)->m_faceIndexStart = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -17969,7 +17781,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceIndexStart_get(PyObject *SWIG
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 *result = 0 ;
+  int *result = 0 ;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -17978,8 +17790,8 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_faceIndexStart_get(PyObject *SWIG
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_faceIndexStart_get" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  result = (dInt32 *) ((arg1)->m_faceIndexStart);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int32_t, 0 |  0 );
+  result = (int *) ((arg1)->m_faceIndexStart);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -17989,7 +17801,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_hitDistance_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dFloat32 *arg2 = (dFloat32 *) 0 ;
+  float *arg2 = (float *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -18004,9 +17816,9 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_hitDistance_set(PyObject *SWIGUNU
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_float, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_hitDistance_set" "', argument " "2"" of type '" "dFloat32 *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_hitDistance_set" "', argument " "2"" of type '" "float *""'"); 
   }
-  arg2 = reinterpret_cast< dFloat32 * >(argp2);
+  arg2 = reinterpret_cast< float * >(argp2);
   if (arg1) (arg1)->m_hitDistance = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -18021,7 +17833,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_hitDistance_get(PyObject *SWIGUNU
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 *result = 0 ;
+  float *result = 0 ;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -18030,7 +17842,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_hitDistance_get(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_hitDistance_get" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  result = (dFloat32 *) ((arg1)->m_hitDistance);
+  result = (float *) ((arg1)->m_hitDistance);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_float, 0 |  0 );
   return resultobj;
 fail:
@@ -18093,11 +17905,11 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_globalIndexCount_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndPolygonMeshDesc_m_globalIndexCount_set", 2, 2, swig_obj)) SWIG_fail;
@@ -18106,19 +17918,11 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_globalIndexCount_set(PyObject *SW
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_globalIndexCount_set" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_globalIndexCount_set" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndPolygonMeshDesc_m_globalIndexCount_set" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndPolygonMeshDesc_m_globalIndexCount_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   if (arg1) (arg1)->m_globalIndexCount = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -18133,7 +17937,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_globalIndexCount_get(PyObject *SW
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -18142,8 +17946,8 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_globalIndexCount_get(PyObject *SW
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_globalIndexCount_get" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  result =  ((arg1)->m_globalIndexCount);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int) ((arg1)->m_globalIndexCount);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -18153,7 +17957,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_maxT_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -18168,9 +17972,9 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_maxT_set(PyObject *SWIGUNUSEDPARM
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndPolygonMeshDesc_m_maxT_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndPolygonMeshDesc_m_maxT_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_maxT = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -18185,7 +17989,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_maxT_get(PyObject *SWIGUNUSEDPARM
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -18194,7 +17998,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_maxT_get(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_maxT_get" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  result = (dFloat32) ((arg1)->m_maxT);
+  result = (float) ((arg1)->m_maxT);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -18257,7 +18061,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_globalFaceVertexIndex_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndPolygonMeshDesc *arg1 = (ndPolygonMeshDesc *) 0 ;
-  dInt32 *arg2 ;
+  int *arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -18270,17 +18074,17 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_globalFaceVertexIndex_set(PyObjec
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_globalFaceVertexIndex_set" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int32_t, 0 |  0 );
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_globalFaceVertexIndex_set" "', argument " "2"" of type '" "dInt32 [(512*(4*2+3))]""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndPolygonMeshDesc_m_globalFaceVertexIndex_set" "', argument " "2"" of type '" "int [(512*(4*2+3))]""'"); 
   } 
-  arg2 = reinterpret_cast< dInt32 * >(argp2);
+  arg2 = reinterpret_cast< int * >(argp2);
   {
     if (arg2) {
       size_t ii = 0;
-      for (; ii < (size_t)(512*(4*2+3)); ++ii) *(dInt32 *)&arg1->m_globalFaceVertexIndex[ii] = *((dInt32 *)arg2 + ii);
+      for (; ii < (size_t)(512*(4*2+3)); ++ii) *(int *)&arg1->m_globalFaceVertexIndex[ii] = *((int *)arg2 + ii);
     } else {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in variable '""m_globalFaceVertexIndex""' of type '""dInt32 [(512*(4*2+3))]""'");
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in variable '""m_globalFaceVertexIndex""' of type '""int [(512*(4*2+3))]""'");
     }
   }
   resultobj = SWIG_Py_Void();
@@ -18296,7 +18100,7 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_globalFaceVertexIndex_get(PyObjec
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 *result = 0 ;
+  int *result = 0 ;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -18305,8 +18109,8 @@ SWIGINTERN PyObject *_wrap_ndPolygonMeshDesc_m_globalFaceVertexIndex_get(PyObjec
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndPolygonMeshDesc_m_globalFaceVertexIndex_get" "', argument " "1"" of type '" "ndPolygonMeshDesc *""'"); 
   }
   arg1 = reinterpret_cast< ndPolygonMeshDesc * >(argp1);
-  result = (dInt32 *)(dInt32 *) ((arg1)->m_globalFaceVertexIndex);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int32_t, 0 |  0 );
+  result = (int *)(int *) ((arg1)->m_globalFaceVertexIndex);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_int, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -18567,14 +18371,14 @@ fail:
 
 SWIGINTERN PyObject *_wrap_new_ndShapeConvexHull__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dInt32 arg1 ;
-  dInt32 arg2 ;
-  dFloat32 arg3 ;
-  dFloat32 *arg4 = (dFloat32 *) (dFloat32 *)0 ;
-  void *argp1 ;
-  int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int arg1 ;
+  int arg2 ;
+  float arg3 ;
+  float *arg4 = (float *) (float *)0 ;
+  int val1 ;
+  int ecode1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   float val3 ;
   int ecode3 = 0 ;
   void *argp4 = 0 ;
@@ -18582,43 +18386,27 @@ SWIGINTERN PyObject *_wrap_new_ndShapeConvexHull__SWIG_1(PyObject *SWIGUNUSEDPAR
   ndShapeConvexHull *result = 0 ;
   
   if ((nobjs < 4) || (nobjs > 4)) SWIG_fail;
-  {
-    res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_ndShapeConvexHull" "', argument " "1"" of type '" "dInt32""'"); 
-    }  
-    if (!argp1) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_ndShapeConvexHull" "', argument " "1"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp1);
-      arg1 = *temp;
-      if (SWIG_IsNewObj(res1)) delete temp;
-    }
-  }
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "new_ndShapeConvexHull" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_ndShapeConvexHull" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode1 = SWIG_AsVal_int(swig_obj[0], &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ndShapeConvexHull" "', argument " "1"" of type '" "int""'");
+  } 
+  arg1 = static_cast< int >(val1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ndShapeConvexHull" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_ndShapeConvexHull" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_ndShapeConvexHull" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   res4 = SWIG_ConvertPtr(swig_obj[3], &argp4,SWIGTYPE_p_float, 0 |  0 );
   if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "new_ndShapeConvexHull" "', argument " "4"" of type '" "dFloat32 const *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "new_ndShapeConvexHull" "', argument " "4"" of type '" "float const *const""'"); 
   }
-  arg4 = reinterpret_cast< dFloat32 * >(argp4);
-  result = (ndShapeConvexHull *)new ndShapeConvexHull(arg1,arg2,arg3,(dFloat32 const *)arg4);
+  arg4 = reinterpret_cast< float * >(argp4);
+  result = (ndShapeConvexHull *)new ndShapeConvexHull(arg1,arg2,arg3,(float const *)arg4);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndShapeConvexHull, SWIG_POINTER_NEW |  0 );
   return resultobj;
 fail:
@@ -18644,11 +18432,15 @@ SWIGINTERN PyObject *_wrap_new_ndShapeConvexHull(PyObject *self, PyObject *args)
   }
   if (argc == 4) {
     int _v;
-    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
+    {
+      int res = SWIG_AsVal_int(argv[0], NULL);
       _v = SWIG_CheckState(res);
+    }
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
       if (_v) {
         {
           int res = SWIG_AsVal_float(argv[2], NULL);
@@ -18670,7 +18462,7 @@ fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'new_ndShapeConvexHull'.\n"
     "  Possible C/C++ prototypes are:\n"
     "    ndShapeConvexHull::ndShapeConvexHull(dLoadSaveBase::dLoadDescriptor const &)\n"
-    "    ndShapeConvexHull::ndShapeConvexHull(dInt32,dInt32,dFloat32,dFloat32 const *const)\n");
+    "    ndShapeConvexHull::ndShapeConvexHull(int,int,float,float const *const)\n");
   return 0;
 }
 
@@ -18710,16 +18502,16 @@ SWIGINTERN PyObject *ndShapeConvexHull_swiginit(PyObject *SWIGUNUSEDPARM(self), 
 
 SWIGINTERN PyObject *_wrap_new_ndShapeHeightfield__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dInt32 arg1 ;
-  dInt32 arg2 ;
+  int arg1 ;
+  int arg2 ;
   ndShapeHeightfield::ndGridConstruction arg3 ;
-  dFloat32 arg4 ;
-  dFloat32 arg5 ;
-  dFloat32 arg6 ;
-  void *argp1 ;
-  int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  float arg4 ;
+  float arg5 ;
+  float arg6 ;
+  int val1 ;
+  int ecode1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
   float val4 ;
@@ -18731,32 +18523,16 @@ SWIGINTERN PyObject *_wrap_new_ndShapeHeightfield__SWIG_0(PyObject *SWIGUNUSEDPA
   ndShapeHeightfield *result = 0 ;
   
   if ((nobjs < 6) || (nobjs > 6)) SWIG_fail;
-  {
-    res1 = SWIG_ConvertPtr(swig_obj[0], &argp1, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res1)) {
-      SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "new_ndShapeHeightfield" "', argument " "1"" of type '" "dInt32""'"); 
-    }  
-    if (!argp1) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_ndShapeHeightfield" "', argument " "1"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp1);
-      arg1 = *temp;
-      if (SWIG_IsNewObj(res1)) delete temp;
-    }
-  }
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "new_ndShapeHeightfield" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "new_ndShapeHeightfield" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode1 = SWIG_AsVal_int(swig_obj[0], &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ndShapeHeightfield" "', argument " "1"" of type '" "int""'");
+  } 
+  arg1 = static_cast< int >(val1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ndShapeHeightfield" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_ndShapeHeightfield" "', argument " "3"" of type '" "ndShapeHeightfield::ndGridConstruction""'");
@@ -18764,19 +18540,19 @@ SWIGINTERN PyObject *_wrap_new_ndShapeHeightfield__SWIG_0(PyObject *SWIGUNUSEDPA
   arg3 = static_cast< ndShapeHeightfield::ndGridConstruction >(val3);
   ecode4 = SWIG_AsVal_float(swig_obj[3], &val4);
   if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "new_ndShapeHeightfield" "', argument " "4"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "new_ndShapeHeightfield" "', argument " "4"" of type '" "float""'");
   } 
-  arg4 = static_cast< dFloat32 >(val4);
+  arg4 = static_cast< float >(val4);
   ecode5 = SWIG_AsVal_float(swig_obj[4], &val5);
   if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "new_ndShapeHeightfield" "', argument " "5"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "new_ndShapeHeightfield" "', argument " "5"" of type '" "float""'");
   } 
-  arg5 = static_cast< dFloat32 >(val5);
+  arg5 = static_cast< float >(val5);
   ecode6 = SWIG_AsVal_float(swig_obj[5], &val6);
   if (!SWIG_IsOK(ecode6)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "new_ndShapeHeightfield" "', argument " "6"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "new_ndShapeHeightfield" "', argument " "6"" of type '" "float""'");
   } 
-  arg6 = static_cast< dFloat32 >(val6);
+  arg6 = static_cast< float >(val6);
   result = (ndShapeHeightfield *)new ndShapeHeightfield(arg1,arg2,arg3,arg4,arg5,arg6);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndShapeHeightfield, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -18827,11 +18603,15 @@ SWIGINTERN PyObject *_wrap_new_ndShapeHeightfield(PyObject *self, PyObject *args
   }
   if (argc == 6) {
     int _v;
-    int res = SWIG_ConvertPtr(argv[0], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
-    _v = SWIG_CheckState(res);
-    if (_v) {
-      int res = SWIG_ConvertPtr(argv[1], 0, SWIGTYPE_p_int32_t, SWIG_POINTER_NO_NULL | 0);
+    {
+      int res = SWIG_AsVal_int(argv[0], NULL);
       _v = SWIG_CheckState(res);
+    }
+    if (_v) {
+      {
+        int res = SWIG_AsVal_int(argv[1], NULL);
+        _v = SWIG_CheckState(res);
+      }
       if (_v) {
         {
           int res = SWIG_AsVal_int(argv[2], NULL);
@@ -18865,7 +18645,7 @@ SWIGINTERN PyObject *_wrap_new_ndShapeHeightfield(PyObject *self, PyObject *args
 fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'new_ndShapeHeightfield'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    ndShapeHeightfield::ndShapeHeightfield(dInt32,dInt32,ndShapeHeightfield::ndGridConstruction,dFloat32,dFloat32,dFloat32)\n"
+    "    ndShapeHeightfield::ndShapeHeightfield(int,int,ndShapeHeightfield::ndGridConstruction,float,float,float)\n"
     "    ndShapeHeightfield::ndShapeHeightfield(dLoadSaveBase::dLoadDescriptor const &)\n");
   return 0;
 }
@@ -18898,7 +18678,7 @@ SWIGINTERN PyObject *_wrap_ndShapeHeightfield_GetElevationMap__SWIG_0(PyObject *
   ndShapeHeightfield *arg1 = (ndShapeHeightfield *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  dArray< dInt16 > *result = 0 ;
+  dArray< short > *result = 0 ;
   
   if ((nobjs < 1) || (nobjs > 1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndShapeHeightfield, 0 |  0 );
@@ -18906,8 +18686,8 @@ SWIGINTERN PyObject *_wrap_ndShapeHeightfield_GetElevationMap__SWIG_0(PyObject *
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShapeHeightfield_GetElevationMap" "', argument " "1"" of type '" "ndShapeHeightfield *""'"); 
   }
   arg1 = reinterpret_cast< ndShapeHeightfield * >(argp1);
-  result = (dArray< dInt16 > *) &(arg1)->GetElevationMap();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dArrayT_int16_t_t, 0 |  0 );
+  result = (dArray< short > *) &(arg1)->GetElevationMap();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dArrayT_short_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -18919,7 +18699,7 @@ SWIGINTERN PyObject *_wrap_ndShapeHeightfield_GetElevationMap__SWIG_1(PyObject *
   ndShapeHeightfield *arg1 = (ndShapeHeightfield *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  dArray< dInt16 > *result = 0 ;
+  dArray< short > *result = 0 ;
   
   if ((nobjs < 1) || (nobjs > 1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndShapeHeightfield, 0 |  0 );
@@ -18927,8 +18707,8 @@ SWIGINTERN PyObject *_wrap_ndShapeHeightfield_GetElevationMap__SWIG_1(PyObject *
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShapeHeightfield_GetElevationMap" "', argument " "1"" of type '" "ndShapeHeightfield const *""'"); 
   }
   arg1 = reinterpret_cast< ndShapeHeightfield * >(argp1);
-  result = (dArray< dInt16 > *) &((ndShapeHeightfield const *)arg1)->GetElevationMap();
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dArrayT_int16_t_t, 0 |  0 );
+  result = (dArray< short > *) &((ndShapeHeightfield const *)arg1)->GetElevationMap();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_dArrayT_short_t, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -19071,8 +18851,8 @@ SWIGINTERN PyObject *ndShapeHeightfield_swiginit(PyObject *SWIGUNUSEDPARM(self),
 
 SWIGINTERN PyObject *_wrap_new_ndShapeChamferCylinder__SWIG_0(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
-  dFloat32 arg1 ;
-  dFloat32 arg2 ;
+  float arg1 ;
+  float arg2 ;
   float val1 ;
   int ecode1 = 0 ;
   float val2 ;
@@ -19082,14 +18862,14 @@ SWIGINTERN PyObject *_wrap_new_ndShapeChamferCylinder__SWIG_0(PyObject *SWIGUNUS
   if ((nobjs < 2) || (nobjs > 2)) SWIG_fail;
   ecode1 = SWIG_AsVal_float(swig_obj[0], &val1);
   if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ndShapeChamferCylinder" "', argument " "1"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "new_ndShapeChamferCylinder" "', argument " "1"" of type '" "float""'");
   } 
-  arg1 = static_cast< dFloat32 >(val1);
+  arg1 = static_cast< float >(val1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ndShapeChamferCylinder" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ndShapeChamferCylinder" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   result = (ndShapeChamferCylinder *)new ndShapeChamferCylinder(arg1,arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndShapeChamferCylinder, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -19158,7 +18938,7 @@ SWIGINTERN PyObject *_wrap_new_ndShapeChamferCylinder(PyObject *self, PyObject *
 fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'new_ndShapeChamferCylinder'.\n"
     "  Possible C/C++ prototypes are:\n"
-    "    ndShapeChamferCylinder::ndShapeChamferCylinder(dFloat32,dFloat32)\n"
+    "    ndShapeChamferCylinder::ndShapeChamferCylinder(float,float)\n"
     "    ndShapeChamferCylinder::ndShapeChamferCylinder(dLoadSaveBase::dLoadDescriptor const &)\n");
   return 0;
 }
@@ -19245,13 +19025,13 @@ fail:
 SWIGINTERN PyObject *_wrap_ndShapeDebugCallback_DrawPolygon(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndShapeDebugCallback *arg1 = (ndShapeDebugCallback *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   dVector *arg3 = (dVector *) (dVector *)0 ;
   ndShapeDebugCallback::ndEdgeType *arg4 = (ndShapeDebugCallback::ndEdgeType *) (ndShapeDebugCallback::ndEdgeType *)0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
   void *argp4 = 0 ;
@@ -19264,19 +19044,11 @@ SWIGINTERN PyObject *_wrap_ndShapeDebugCallback_DrawPolygon(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShapeDebugCallback_DrawPolygon" "', argument " "1"" of type '" "ndShapeDebugCallback *""'"); 
   }
   arg1 = reinterpret_cast< ndShapeDebugCallback * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndShapeDebugCallback_DrawPolygon" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndShapeDebugCallback_DrawPolygon" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndShapeDebugCallback_DrawPolygon" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   res3 = SWIG_ConvertPtr(swig_obj[2], &argp3,SWIGTYPE_p_dVector, 0 |  0 );
   if (!SWIG_IsOK(res3)) {
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndShapeDebugCallback_DrawPolygon" "', argument " "3"" of type '" "dVector const *const""'"); 
@@ -19765,7 +19537,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_RayCast(PyObject *SWIGUNUSEDPARM(self
   void *argp6 = 0 ;
   int res6 = 0 ;
   PyObject *swig_obj[6] ;
-  dFloat32 result;
+  float result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndShapeInstance_RayCast", 6, 6, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndShapeInstance, 0 |  0 );
@@ -19810,7 +19582,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_RayCast(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndShapeInstance_RayCast" "', argument " "6"" of type '" "ndContactPoint &""'"); 
   }
   arg6 = reinterpret_cast< ndContactPoint * >(argp6);
-  result = (dFloat32)((ndShapeInstance const *)arg1)->RayCast(*arg2,(dVector const &)*arg3,(dVector const &)*arg4,(ndBody const *)arg5,*arg6);
+  result = (float)((ndShapeInstance const *)arg1)->RayCast(*arg2,(dVector const &)*arg3,(dVector const &)*arg4,(ndBody const *)arg5,*arg6);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -19888,7 +19660,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_CalculateBuoyancyCenterOfPresure(PyOb
   void *argp4 = 0 ;
   int res4 = 0 ;
   PyObject *swig_obj[4] ;
-  dFloat32 result;
+  float result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndShapeInstance_CalculateBuoyancyCenterOfPresure", 4, 4, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndShapeInstance, 0 |  0 );
@@ -19920,7 +19692,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_CalculateBuoyancyCenterOfPresure(PyOb
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndShapeInstance_CalculateBuoyancyCenterOfPresure" "', argument " "4"" of type '" "dVector const &""'"); 
   }
   arg4 = reinterpret_cast< dVector * >(argp4);
-  result = (dFloat32)((ndShapeInstance const *)arg1)->CalculateBuoyancyCenterOfPresure(*arg2,(dMatrix const &)*arg3,(dVector const &)*arg4);
+  result = (float)((ndShapeInstance const *)arg1)->CalculateBuoyancyCenterOfPresure(*arg2,(dMatrix const &)*arg3,(dVector const &)*arg4);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -20089,7 +19861,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_SupportVertexSpecial(PyObject *SWIGUN
   PyObject *resultobj = 0;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
   dVector *arg2 = 0 ;
-  dInt32 *arg3 = (dInt32 *) (dInt32 *)0 ;
+  int *arg3 = (int *) (int *)0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -20113,11 +19885,11 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_SupportVertexSpecial(PyObject *SWIGUN
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndShapeInstance_SupportVertexSpecial" "', argument " "2"" of type '" "dVector const &""'"); 
   }
   arg2 = reinterpret_cast< dVector * >(argp2);
-  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3,SWIGTYPE_p_int32_t, 0 |  0 );
+  res3 = SWIG_ConvertPtr(swig_obj[2], &argp3,SWIGTYPE_p_int, 0 |  0 );
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndShapeInstance_SupportVertexSpecial" "', argument " "3"" of type '" "dInt32 *const""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndShapeInstance_SupportVertexSpecial" "', argument " "3"" of type '" "int *const""'"); 
   }
-  arg3 = reinterpret_cast< dInt32 * >(argp3);
+  arg3 = reinterpret_cast< int * >(argp3);
   result = ((ndShapeInstance const *)arg1)->SupportVertexSpecial((dVector const &)*arg2,arg3);
   resultobj = SWIG_NewPointerObj((new dVector(static_cast< const dVector& >(result))), SWIGTYPE_p_dVector, SWIG_POINTER_OWN |  0 );
   return resultobj;
@@ -20338,7 +20110,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_GetConvexVertexCount(PyObject *SWIGUN
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -20347,8 +20119,8 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_GetConvexVertexCount(PyObject *SWIGUN
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShapeInstance_GetConvexVertexCount" "', argument " "1"" of type '" "ndShapeInstance const *""'"); 
   }
   arg1 = reinterpret_cast< ndShapeInstance * >(argp1);
-  result = ((ndShapeInstance const *)arg1)->GetConvexVertexCount();
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int)((ndShapeInstance const *)arg1)->GetConvexVertexCount();
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -20535,7 +20307,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_CalculatePlaneIntersection(PyObject *
   void *argp4 = 0 ;
   int res4 = 0 ;
   PyObject *swig_obj[4] ;
-  dInt32 result;
+  int result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndShapeInstance_CalculatePlaneIntersection", 4, 4, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndShapeInstance, 0 |  0 );
@@ -20564,8 +20336,8 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_CalculatePlaneIntersection(PyObject *
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ndShapeInstance_CalculatePlaneIntersection" "', argument " "4"" of type '" "dVector *const""'"); 
   }
   arg4 = reinterpret_cast< dVector * >(argp4);
-  result = ((ndShapeInstance const *)arg1)->CalculatePlaneIntersection((dVector const &)*arg2,(dVector const &)*arg3,arg4);
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int)((ndShapeInstance const *)arg1)->CalculatePlaneIntersection((dVector const &)*arg2,(dVector const &)*arg3,arg4);
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -20578,7 +20350,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_GetVolume(PyObject *SWIGUNUSEDPARM(se
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -20587,7 +20359,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_GetVolume(PyObject *SWIGUNUSEDPARM(se
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShapeInstance_GetVolume" "', argument " "1"" of type '" "ndShapeInstance const *""'"); 
   }
   arg1 = reinterpret_cast< ndShapeInstance * >(argp1);
-  result = (dFloat32)((ndShapeInstance const *)arg1)->GetVolume();
+  result = (float)((ndShapeInstance const *)arg1)->GetVolume();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -20601,7 +20373,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_GetBoxMinRadius(PyObject *SWIGUNUSEDP
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -20610,7 +20382,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_GetBoxMinRadius(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShapeInstance_GetBoxMinRadius" "', argument " "1"" of type '" "ndShapeInstance const *""'"); 
   }
   arg1 = reinterpret_cast< ndShapeInstance * >(argp1);
-  result = (dFloat32)((ndShapeInstance const *)arg1)->GetBoxMinRadius();
+  result = (float)((ndShapeInstance const *)arg1)->GetBoxMinRadius();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -20624,7 +20396,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_GetBoxMaxRadius(PyObject *SWIGUNUSEDP
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -20633,7 +20405,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_GetBoxMaxRadius(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShapeInstance_GetBoxMaxRadius" "', argument " "1"" of type '" "ndShapeInstance const *""'"); 
   }
   arg1 = reinterpret_cast< ndShapeInstance * >(argp1);
-  result = (dFloat32)((ndShapeInstance const *)arg1)->GetBoxMaxRadius();
+  result = (float)((ndShapeInstance const *)arg1)->GetBoxMaxRadius();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -20670,7 +20442,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_GetUmbraClipSize(PyObject *SWIGUNUSED
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -20679,7 +20451,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_GetUmbraClipSize(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShapeInstance_GetUmbraClipSize" "', argument " "1"" of type '" "ndShapeInstance const *""'"); 
   }
   arg1 = reinterpret_cast< ndShapeInstance * >(argp1);
-  result = (dFloat32)((ndShapeInstance const *)arg1)->GetUmbraClipSize();
+  result = (float)((ndShapeInstance const *)arg1)->GetUmbraClipSize();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -20693,7 +20465,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_GetUserDataID(PyObject *SWIGUNUSEDPAR
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dUnsigned64 result;
+  unsigned long long result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -20702,8 +20474,8 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_GetUserDataID(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShapeInstance_GetUserDataID" "', argument " "1"" of type '" "ndShapeInstance const *""'"); 
   }
   arg1 = reinterpret_cast< ndShapeInstance * >(argp1);
-  result = ((ndShapeInstance const *)arg1)->GetUserDataID();
-  resultobj = SWIG_NewPointerObj((new dUnsigned64(static_cast< const dUnsigned64& >(result))), SWIGTYPE_p_uint64_t, SWIG_POINTER_OWN |  0 );
+  result = (unsigned long long)((ndShapeInstance const *)arg1)->GetUserDataID();
+  resultobj = SWIG_From_unsigned_SS_long_SS_long(static_cast< unsigned long long >(result));
   return resultobj;
 fail:
   return NULL;
@@ -21283,7 +21055,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndShapeInstance_m_skinThickness_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndShapeInstance *arg1 = (ndShapeInstance *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -21298,9 +21070,9 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_m_skinThickness_set(PyObject *SWIGUNU
   arg1 = reinterpret_cast< ndShapeInstance * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndShapeInstance_m_skinThickness_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndShapeInstance_m_skinThickness_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_skinThickness = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -21315,7 +21087,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_m_skinThickness_get(PyObject *SWIGUNU
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -21324,7 +21096,7 @@ SWIGINTERN PyObject *_wrap_ndShapeInstance_m_skinThickness_get(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndShapeInstance_m_skinThickness_get" "', argument " "1"" of type '" "ndShapeInstance *""'"); 
   }
   arg1 = reinterpret_cast< ndShapeInstance * >(argp1);
-  result = (dFloat32) ((arg1)->m_skinThickness);
+  result = (float) ((arg1)->m_skinThickness);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -21659,7 +21431,7 @@ SWIGINTERN PyObject *_wrap_ndBody_GetId(PyObject *SWIGUNUSEDPARM(self), PyObject
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dUnsigned32 result;
+  unsigned int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -21668,8 +21440,8 @@ SWIGINTERN PyObject *_wrap_ndBody_GetId(PyObject *SWIGUNUSEDPARM(self), PyObject
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetId" "', argument " "1"" of type '" "ndBody const *""'"); 
   }
   arg1 = reinterpret_cast< ndBody * >(argp1);
-  result = ((ndBody const *)arg1)->GetId();
-  resultobj = SWIG_NewPointerObj((new dUnsigned32(static_cast< const dUnsigned32& >(result))), SWIGTYPE_p_uint32_t, SWIG_POINTER_OWN |  0 );
+  result = (unsigned int)((ndBody const *)arg1)->GetId();
+  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -21725,7 +21497,7 @@ SWIGINTERN PyObject *_wrap_ndBody_GetInvMass(PyObject *SWIGUNUSEDPARM(self), PyO
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -21734,7 +21506,7 @@ SWIGINTERN PyObject *_wrap_ndBody_GetInvMass(PyObject *SWIGUNUSEDPARM(self), PyO
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBody_GetInvMass" "', argument " "1"" of type '" "ndBody const *""'"); 
   }
   arg1 = reinterpret_cast< ndBody * >(argp1);
-  result = (dFloat32)((ndBody const *)arg1)->GetInvMass();
+  result = (float)((ndBody const *)arg1)->GetInvMass();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -21747,7 +21519,7 @@ SWIGINTERN PyObject *_wrap_ndBody_RayCast(PyObject *SWIGUNUSEDPARM(self), PyObje
   ndBody *arg1 = (ndBody *) 0 ;
   ndRayCastNotify *arg2 = 0 ;
   dFastRay *arg3 = 0 ;
-  dFloat32 arg4 ;
+  float arg4 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -21783,9 +21555,9 @@ SWIGINTERN PyObject *_wrap_ndBody_RayCast(PyObject *SWIGUNUSEDPARM(self), PyObje
   arg3 = reinterpret_cast< dFastRay * >(argp3);
   ecode4 = SWIG_AsVal_float(swig_obj[3], &val4);
   if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "ndBody_RayCast" "', argument " "4"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "ndBody_RayCast" "', argument " "4"" of type '" "float""'");
   } 
-  arg4 = static_cast< dFloat32 >(val4);
+  arg4 = static_cast< float >(val4);
   result = (bool)((ndBody const *)arg1)->RayCast(*arg2,(dFastRay const &)*arg3,arg4);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
@@ -22278,7 +22050,7 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_GetIndex(PyObject *SWIGUNUSEDPARM(sel
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dUnsigned32 result;
+  unsigned int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -22287,8 +22059,8 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_GetIndex(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBodyKinematic_GetIndex" "', argument " "1"" of type '" "ndBodyKinematic const *""'"); 
   }
   arg1 = reinterpret_cast< ndBodyKinematic * >(argp1);
-  result = ((ndBodyKinematic const *)arg1)->GetIndex();
-  resultobj = SWIG_NewPointerObj((new dUnsigned32(static_cast< const dUnsigned32& >(result))), SWIGTYPE_p_uint32_t, SWIG_POINTER_OWN |  0 );
+  result = (unsigned int)((ndBodyKinematic const *)arg1)->GetIndex();
+  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -22301,7 +22073,7 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_GetInvMass(PyObject *SWIGUNUSEDPARM(s
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -22310,7 +22082,7 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_GetInvMass(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBodyKinematic_GetInvMass" "', argument " "1"" of type '" "ndBodyKinematic const *""'"); 
   }
   arg1 = reinterpret_cast< ndBodyKinematic * >(argp1);
-  result = (dFloat32)((ndBodyKinematic const *)arg1)->GetInvMass();
+  result = (float)((ndBodyKinematic const *)arg1)->GetInvMass();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -22575,8 +22347,8 @@ fail:
 SWIGINTERN PyObject *_wrap_ndBodyKinematic_SetDebugMaxAngularIntegrationSteepAndLinearSpeed(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  dFloat32 arg2 ;
-  dFloat32 arg3 ;
+  float arg2 ;
+  float arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -22593,14 +22365,14 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_SetDebugMaxAngularIntegrationSteepAnd
   arg1 = reinterpret_cast< ndBodyKinematic * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyKinematic_SetDebugMaxAngularIntegrationSteepAndLinearSpeed" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyKinematic_SetDebugMaxAngularIntegrationSteepAndLinearSpeed" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndBodyKinematic_SetDebugMaxAngularIntegrationSteepAndLinearSpeed" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndBodyKinematic_SetDebugMaxAngularIntegrationSteepAndLinearSpeed" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   (arg1)->SetDebugMaxAngularIntegrationSteepAndLinearSpeed(arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -22615,7 +22387,7 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_GetLinearDamping(PyObject *SWIGUNUSED
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -22624,7 +22396,7 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_GetLinearDamping(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBodyKinematic_GetLinearDamping" "', argument " "1"" of type '" "ndBodyKinematic const *""'"); 
   }
   arg1 = reinterpret_cast< ndBodyKinematic * >(argp1);
-  result = (dFloat32)((ndBodyKinematic const *)arg1)->GetLinearDamping();
+  result = (float)((ndBodyKinematic const *)arg1)->GetLinearDamping();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -22635,7 +22407,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndBodyKinematic_SetLinearDamping(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -22650,9 +22422,9 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_SetLinearDamping(PyObject *SWIGUNUSED
   arg1 = reinterpret_cast< ndBodyKinematic * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyKinematic_SetLinearDamping" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyKinematic_SetLinearDamping" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   (arg1)->SetLinearDamping(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -22831,7 +22603,7 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_RayCast(PyObject *SWIGUNUSEDPARM(self
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
   ndRayCastNotify *arg2 = 0 ;
   dFastRay *arg3 = 0 ;
-  dFloat32 arg4 ;
+  float arg4 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -22867,9 +22639,9 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_RayCast(PyObject *SWIGUNUSEDPARM(self
   arg3 = reinterpret_cast< dFastRay * >(argp3);
   ecode4 = SWIG_AsVal_float(swig_obj[3], &val4);
   if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "ndBodyKinematic_RayCast" "', argument " "4"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "ndBodyKinematic_RayCast" "', argument " "4"" of type '" "float""'");
   } 
-  arg4 = static_cast< dFloat32 >(val4);
+  arg4 = static_cast< float >(val4);
   result = (bool)((ndBodyKinematic const *)arg1)->RayCast(*arg2,(dFastRay const &)*arg3,arg4);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
@@ -22930,7 +22702,7 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_TotalEnergy(PyObject *SWIGUNUSEDPARM(
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -22939,7 +22711,7 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_TotalEnergy(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBodyKinematic_TotalEnergy" "', argument " "1"" of type '" "ndBodyKinematic const *""'"); 
   }
   arg1 = reinterpret_cast< ndBodyKinematic * >(argp1);
-  result = (dFloat32)((ndBodyKinematic const *)arg1)->TotalEnergy();
+  result = (float)((ndBodyKinematic const *)arg1)->TotalEnergy();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -23018,7 +22790,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndBodyKinematic_IntegrateVelocity(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -23033,9 +22805,9 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_IntegrateVelocity(PyObject *SWIGUNUSE
   arg1 = reinterpret_cast< ndBodyKinematic * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyKinematic_IntegrateVelocity" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyKinematic_IntegrateVelocity" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   (arg1)->IntegrateVelocity(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -23079,7 +22851,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndBodyKinematic_SetMassMatrix__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   ndShapeInstance *arg3 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -23096,9 +22868,9 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_SetMassMatrix__SWIG_1(PyObject *SWIGU
   arg1 = reinterpret_cast< ndBodyKinematic * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyKinematic_SetMassMatrix" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyKinematic_SetMassMatrix" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_ndShapeInstance,  0  | 0);
   if (!SWIG_IsOK(res3)) {
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndBodyKinematic_SetMassMatrix" "', argument " "3"" of type '" "ndShapeInstance const &""'"); 
@@ -23118,10 +22890,10 @@ fail:
 SWIGINTERN PyObject *_wrap_ndBodyKinematic_SetMassMatrix__SWIG_2(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  dFloat32 arg2 ;
-  dFloat32 arg3 ;
-  dFloat32 arg4 ;
-  dFloat32 arg5 ;
+  float arg2 ;
+  float arg3 ;
+  float arg4 ;
+  float arg5 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -23141,24 +22913,24 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_SetMassMatrix__SWIG_2(PyObject *SWIGU
   arg1 = reinterpret_cast< ndBodyKinematic * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyKinematic_SetMassMatrix" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyKinematic_SetMassMatrix" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndBodyKinematic_SetMassMatrix" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndBodyKinematic_SetMassMatrix" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   ecode4 = SWIG_AsVal_float(swig_obj[3], &val4);
   if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "ndBodyKinematic_SetMassMatrix" "', argument " "4"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "ndBodyKinematic_SetMassMatrix" "', argument " "4"" of type '" "float""'");
   } 
-  arg4 = static_cast< dFloat32 >(val4);
+  arg4 = static_cast< float >(val4);
   ecode5 = SWIG_AsVal_float(swig_obj[4], &val5);
   if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "ndBodyKinematic_SetMassMatrix" "', argument " "5"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "ndBodyKinematic_SetMassMatrix" "', argument " "5"" of type '" "float""'");
   } 
-  arg5 = static_cast< dFloat32 >(val5);
+  arg5 = static_cast< float >(val5);
   (arg1)->SetMassMatrix(arg2,arg3,arg4,arg5);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -23245,8 +23017,8 @@ fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'ndBodyKinematic_SetMassMatrix'.\n"
     "  Possible C/C++ prototypes are:\n"
     "    ndBodyKinematic::SetMassMatrix(dVector const &)\n"
-    "    ndBodyKinematic::SetMassMatrix(dFloat32,ndShapeInstance const &)\n"
-    "    ndBodyKinematic::SetMassMatrix(dFloat32,dFloat32,dFloat32,dFloat32)\n");
+    "    ndBodyKinematic::SetMassMatrix(float,ndShapeInstance const &)\n"
+    "    ndBodyKinematic::SetMassMatrix(float,float,float,float)\n");
   return 0;
 }
 
@@ -23254,10 +23026,10 @@ fail:
 SWIGINTERN PyObject *_wrap_ndBodyKinematic_GetMassMatrix__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   ndBodyKinematic *arg1 = (ndBodyKinematic *) 0 ;
-  dFloat32 *arg2 = 0 ;
-  dFloat32 *arg3 = 0 ;
-  dFloat32 *arg4 = 0 ;
-  dFloat32 *arg5 = 0 ;
+  float *arg2 = 0 ;
+  float *arg3 = 0 ;
+  float *arg4 = 0 ;
+  float *arg5 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -23277,36 +23049,36 @@ SWIGINTERN PyObject *_wrap_ndBodyKinematic_GetMassMatrix__SWIG_1(PyObject *SWIGU
   arg1 = reinterpret_cast< ndBodyKinematic * >(argp1);
   res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_float,  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "2"" of type '" "dFloat32 &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "2"" of type '" "float &""'"); 
   }
   if (!argp2) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "2"" of type '" "dFloat32 &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "2"" of type '" "float &""'"); 
   }
-  arg2 = reinterpret_cast< dFloat32 * >(argp2);
+  arg2 = reinterpret_cast< float * >(argp2);
   res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_float,  0 );
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "3"" of type '" "dFloat32 &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "3"" of type '" "float &""'"); 
   }
   if (!argp3) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "3"" of type '" "dFloat32 &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "3"" of type '" "float &""'"); 
   }
-  arg3 = reinterpret_cast< dFloat32 * >(argp3);
+  arg3 = reinterpret_cast< float * >(argp3);
   res4 = SWIG_ConvertPtr(swig_obj[3], &argp4, SWIGTYPE_p_float,  0 );
   if (!SWIG_IsOK(res4)) {
-    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "4"" of type '" "dFloat32 &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "4"" of type '" "float &""'"); 
   }
   if (!argp4) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "4"" of type '" "dFloat32 &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "4"" of type '" "float &""'"); 
   }
-  arg4 = reinterpret_cast< dFloat32 * >(argp4);
+  arg4 = reinterpret_cast< float * >(argp4);
   res5 = SWIG_ConvertPtr(swig_obj[4], &argp5, SWIGTYPE_p_float,  0 );
   if (!SWIG_IsOK(res5)) {
-    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "5"" of type '" "dFloat32 &""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "5"" of type '" "float &""'"); 
   }
   if (!argp5) {
-    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "5"" of type '" "dFloat32 &""'"); 
+    SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBodyKinematic_GetMassMatrix" "', argument " "5"" of type '" "float &""'"); 
   }
-  arg5 = reinterpret_cast< dFloat32 * >(argp5);
+  arg5 = reinterpret_cast< float * >(argp5);
   (arg1)->GetMassMatrix(*arg2,*arg3,*arg4,*arg5);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -23366,7 +23138,7 @@ fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'ndBodyKinematic_GetMassMatrix'.\n"
     "  Possible C/C++ prototypes are:\n"
     "    ndBodyKinematic::GetMassMatrix() const\n"
-    "    ndBodyKinematic::GetMassMatrix(dFloat32 &,dFloat32 &,dFloat32 &,dFloat32 &)\n");
+    "    ndBodyKinematic::GetMassMatrix(float &,float &,float &,float &)\n");
   return 0;
 }
 
@@ -23877,7 +23649,7 @@ SWIGINTERN PyObject *_wrap_ndBodyTriggerVolume_OnTrigger(PyObject *SWIGUNUSEDPAR
   PyObject *resultobj = 0;
   ndBodyTriggerVolume *arg1 = (ndBodyTriggerVolume *) 0 ;
   ndBodyKinematic *arg2 = (ndBodyKinematic *) (ndBodyKinematic *)0 ;
-  dFloat32 arg3 ;
+  float arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -23899,9 +23671,9 @@ SWIGINTERN PyObject *_wrap_ndBodyTriggerVolume_OnTrigger(PyObject *SWIGUNUSEDPAR
   arg2 = reinterpret_cast< ndBodyKinematic * >(argp2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndBodyTriggerVolume_OnTrigger" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndBodyTriggerVolume_OnTrigger" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   (arg1)->OnTrigger(arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -23914,7 +23686,7 @@ SWIGINTERN PyObject *_wrap_ndBodyTriggerVolume_OnTriggerEnter(PyObject *SWIGUNUS
   PyObject *resultobj = 0;
   ndBodyTriggerVolume *arg1 = (ndBodyTriggerVolume *) 0 ;
   ndBodyKinematic *arg2 = (ndBodyKinematic *) (ndBodyKinematic *)0 ;
-  dFloat32 arg3 ;
+  float arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -23936,9 +23708,9 @@ SWIGINTERN PyObject *_wrap_ndBodyTriggerVolume_OnTriggerEnter(PyObject *SWIGUNUS
   arg2 = reinterpret_cast< ndBodyKinematic * >(argp2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndBodyTriggerVolume_OnTriggerEnter" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndBodyTriggerVolume_OnTriggerEnter" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   (arg1)->OnTriggerEnter(arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -23951,7 +23723,7 @@ SWIGINTERN PyObject *_wrap_ndBodyTriggerVolume_OnTriggerExit(PyObject *SWIGUNUSE
   PyObject *resultobj = 0;
   ndBodyTriggerVolume *arg1 = (ndBodyTriggerVolume *) 0 ;
   ndBodyKinematic *arg2 = (ndBodyKinematic *) (ndBodyKinematic *)0 ;
-  dFloat32 arg3 ;
+  float arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -23973,9 +23745,9 @@ SWIGINTERN PyObject *_wrap_ndBodyTriggerVolume_OnTriggerExit(PyObject *SWIGUNUSE
   arg2 = reinterpret_cast< ndBodyKinematic * >(argp2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndBodyTriggerVolume_OnTriggerExit" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndBodyTriggerVolume_OnTriggerExit" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   (arg1)->OnTriggerExit(arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -24054,10 +23826,10 @@ fail:
 SWIGINTERN PyObject *_wrap_new_ndBodyPlayerCapsule__SWIG_1(PyObject *SWIGUNUSEDPARM(self), Py_ssize_t nobjs, PyObject **swig_obj) {
   PyObject *resultobj = 0;
   dMatrix *arg1 = 0 ;
-  dFloat32 arg2 ;
-  dFloat32 arg3 ;
-  dFloat32 arg4 ;
-  dFloat32 arg5 ;
+  float arg2 ;
+  float arg3 ;
+  float arg4 ;
+  float arg5 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -24081,24 +23853,24 @@ SWIGINTERN PyObject *_wrap_new_ndBodyPlayerCapsule__SWIG_1(PyObject *SWIGUNUSEDP
   arg1 = reinterpret_cast< dMatrix * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ndBodyPlayerCapsule" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "new_ndBodyPlayerCapsule" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_ndBodyPlayerCapsule" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "new_ndBodyPlayerCapsule" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   ecode4 = SWIG_AsVal_float(swig_obj[3], &val4);
   if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "new_ndBodyPlayerCapsule" "', argument " "4"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "new_ndBodyPlayerCapsule" "', argument " "4"" of type '" "float""'");
   } 
-  arg4 = static_cast< dFloat32 >(val4);
+  arg4 = static_cast< float >(val4);
   ecode5 = SWIG_AsVal_float(swig_obj[4], &val5);
   if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "new_ndBodyPlayerCapsule" "', argument " "5"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "new_ndBodyPlayerCapsule" "', argument " "5"" of type '" "float""'");
   } 
-  arg5 = static_cast< dFloat32 >(val5);
+  arg5 = static_cast< float >(val5);
   result = (ndBodyPlayerCapsule *)new ndBodyPlayerCapsule((dMatrix const &)*arg1,arg2,arg3,arg4,arg5);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ndBodyPlayerCapsule, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -24160,7 +23932,7 @@ fail:
   SWIG_Python_RaiseOrModifyTypeError("Wrong number or type of arguments for overloaded function 'new_ndBodyPlayerCapsule'.\n"
     "  Possible C/C++ prototypes are:\n"
     "    ndBodyPlayerCapsule::ndBodyPlayerCapsule(dLoadSaveBase::dLoadDescriptor const &)\n"
-    "    ndBodyPlayerCapsule::ndBodyPlayerCapsule(dMatrix const &,dFloat32,dFloat32,dFloat32,dFloat32)\n");
+    "    ndBodyPlayerCapsule::ndBodyPlayerCapsule(dMatrix const &,float,float,float,float)\n");
   return 0;
 }
 
@@ -24216,7 +23988,7 @@ SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_GetForwardSpeed(PyObject *SWIGUNU
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -24225,7 +23997,7 @@ SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_GetForwardSpeed(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBodyPlayerCapsule_GetForwardSpeed" "', argument " "1"" of type '" "ndBodyPlayerCapsule const *""'"); 
   }
   arg1 = reinterpret_cast< ndBodyPlayerCapsule * >(argp1);
-  result = (dFloat32)((ndBodyPlayerCapsule const *)arg1)->GetForwardSpeed();
+  result = (float)((ndBodyPlayerCapsule const *)arg1)->GetForwardSpeed();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -24236,7 +24008,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_SetForwardSpeed(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -24251,9 +24023,9 @@ SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_SetForwardSpeed(PyObject *SWIGUNU
   arg1 = reinterpret_cast< ndBodyPlayerCapsule * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyPlayerCapsule_SetForwardSpeed" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyPlayerCapsule_SetForwardSpeed" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   (arg1)->SetForwardSpeed(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -24268,7 +24040,7 @@ SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_GetLateralSpeed(PyObject *SWIGUNU
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -24277,7 +24049,7 @@ SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_GetLateralSpeed(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBodyPlayerCapsule_GetLateralSpeed" "', argument " "1"" of type '" "ndBodyPlayerCapsule const *""'"); 
   }
   arg1 = reinterpret_cast< ndBodyPlayerCapsule * >(argp1);
-  result = (dFloat32)((ndBodyPlayerCapsule const *)arg1)->GetLateralSpeed();
+  result = (float)((ndBodyPlayerCapsule const *)arg1)->GetLateralSpeed();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -24288,7 +24060,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_SetLateralSpeed(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -24303,9 +24075,9 @@ SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_SetLateralSpeed(PyObject *SWIGUNU
   arg1 = reinterpret_cast< ndBodyPlayerCapsule * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyPlayerCapsule_SetLateralSpeed" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyPlayerCapsule_SetLateralSpeed" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   (arg1)->SetLateralSpeed(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -24320,7 +24092,7 @@ SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_GetHeadingAngle(PyObject *SWIGUNU
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -24329,7 +24101,7 @@ SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_GetHeadingAngle(PyObject *SWIGUNU
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBodyPlayerCapsule_GetHeadingAngle" "', argument " "1"" of type '" "ndBodyPlayerCapsule const *""'"); 
   }
   arg1 = reinterpret_cast< ndBodyPlayerCapsule * >(argp1);
-  result = (dFloat32)((ndBodyPlayerCapsule const *)arg1)->GetHeadingAngle();
+  result = (float)((ndBodyPlayerCapsule const *)arg1)->GetHeadingAngle();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -24340,7 +24112,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_SetHeadingAngle(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -24355,9 +24127,9 @@ SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_SetHeadingAngle(PyObject *SWIGUNU
   arg1 = reinterpret_cast< ndBodyPlayerCapsule * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyPlayerCapsule_SetHeadingAngle" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyPlayerCapsule_SetHeadingAngle" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   (arg1)->SetHeadingAngle(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -24392,7 +24164,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_ApplyInputs(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -24407,9 +24179,9 @@ SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_ApplyInputs(PyObject *SWIGUNUSEDP
   arg1 = reinterpret_cast< ndBodyPlayerCapsule * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyPlayerCapsule_ApplyInputs" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyPlayerCapsule_ApplyInputs" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   (arg1)->ApplyInputs(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -24423,7 +24195,7 @@ SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_ContactFrictionCallback(PyObject 
   ndBodyPlayerCapsule *arg1 = (ndBodyPlayerCapsule *) 0 ;
   dVector *arg2 = 0 ;
   dVector *arg3 = 0 ;
-  dInt32 arg4 ;
+  int arg4 ;
   ndBodyKinematic *arg5 = (ndBodyKinematic *) (ndBodyKinematic *)0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -24431,12 +24203,12 @@ SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_ContactFrictionCallback(PyObject 
   int res2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
-  void *argp4 ;
-  int res4 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
   void *argp5 = 0 ;
   int res5 = 0 ;
   PyObject *swig_obj[5] ;
-  dFloat32 result;
+  float result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndBodyPlayerCapsule_ContactFrictionCallback", 5, 5, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBodyPlayerCapsule, 0 |  0 );
@@ -24460,25 +24232,17 @@ SWIGINTERN PyObject *_wrap_ndBodyPlayerCapsule_ContactFrictionCallback(PyObject 
     SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBodyPlayerCapsule_ContactFrictionCallback" "', argument " "3"" of type '" "dVector const &""'"); 
   }
   arg3 = reinterpret_cast< dVector * >(argp3);
-  {
-    res4 = SWIG_ConvertPtr(swig_obj[3], &argp4, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res4)) {
-      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ndBodyPlayerCapsule_ContactFrictionCallback" "', argument " "4"" of type '" "dInt32""'"); 
-    }  
-    if (!argp4) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBodyPlayerCapsule_ContactFrictionCallback" "', argument " "4"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp4);
-      arg4 = *temp;
-      if (SWIG_IsNewObj(res4)) delete temp;
-    }
-  }
+  ecode4 = SWIG_AsVal_int(swig_obj[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "ndBodyPlayerCapsule_ContactFrictionCallback" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = static_cast< int >(val4);
   res5 = SWIG_ConvertPtr(swig_obj[4], &argp5,SWIGTYPE_p_ndBodyKinematic, 0 |  0 );
   if (!SWIG_IsOK(res5)) {
     SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "ndBodyPlayerCapsule_ContactFrictionCallback" "', argument " "5"" of type '" "ndBodyKinematic const *const""'"); 
   }
   arg5 = reinterpret_cast< ndBodyKinematic * >(argp5);
-  result = (dFloat32)((ndBodyPlayerCapsule const *)arg1)->ContactFrictionCallback((dVector const &)*arg2,(dVector const &)*arg3,arg4,(ndBodyKinematic const *)arg5);
+  result = (float)((ndBodyPlayerCapsule const *)arg1)->ContactFrictionCallback((dVector const &)*arg2,(dVector const &)*arg3,arg4,(ndBodyKinematic const *)arg5);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -24760,12 +24524,12 @@ fail:
 SWIGINTERN PyObject *_wrap_ndBodyNotify_OnTransform(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBodyNotify *arg1 = (ndBodyNotify *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   dMatrix *arg3 = 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
   PyObject *swig_obj[3] ;
@@ -24776,19 +24540,11 @@ SWIGINTERN PyObject *_wrap_ndBodyNotify_OnTransform(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBodyNotify_OnTransform" "', argument " "1"" of type '" "ndBodyNotify *""'"); 
   }
   arg1 = reinterpret_cast< ndBodyNotify * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBodyNotify_OnTransform" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBodyNotify_OnTransform" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyNotify_OnTransform" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   res3 = SWIG_ConvertPtr(swig_obj[2], &argp3, SWIGTYPE_p_dMatrix,  0  | 0);
   if (!SWIG_IsOK(res3)) {
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndBodyNotify_OnTransform" "', argument " "3"" of type '" "dMatrix const &""'"); 
@@ -24840,12 +24596,12 @@ fail:
 SWIGINTERN PyObject *_wrap_ndBodyNotify_OnApplyExternalForce(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndBodyNotify *arg1 = (ndBodyNotify *) 0 ;
-  dInt32 arg2 ;
-  dFloat32 arg3 ;
+  int arg2 ;
+  float arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   float val3 ;
   int ecode3 = 0 ;
   PyObject *swig_obj[3] ;
@@ -24856,24 +24612,16 @@ SWIGINTERN PyObject *_wrap_ndBodyNotify_OnApplyExternalForce(PyObject *SWIGUNUSE
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndBodyNotify_OnApplyExternalForce" "', argument " "1"" of type '" "ndBodyNotify *""'"); 
   }
   arg1 = reinterpret_cast< ndBodyNotify * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBodyNotify_OnApplyExternalForce" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndBodyNotify_OnApplyExternalForce" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndBodyNotify_OnApplyExternalForce" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndBodyNotify_OnApplyExternalForce" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndBodyNotify_OnApplyExternalForce" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   (arg1)->OnApplyExternalForce(arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -24909,7 +24657,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndMaterial_m_restitution_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -24924,9 +24672,9 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_restitution_set(PyObject *SWIGUNUSEDPARM
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_restitution_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_restitution_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_restitution = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -24941,7 +24689,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_restitution_get(PyObject *SWIGUNUSEDPARM
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -24950,7 +24698,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_restitution_get(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMaterial_m_restitution_get" "', argument " "1"" of type '" "ndMaterial *""'"); 
   }
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
-  result = (dFloat32) ((arg1)->m_restitution);
+  result = (float) ((arg1)->m_restitution);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -24961,7 +24709,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndMaterial_m_staticFriction0_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -24976,9 +24724,9 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_staticFriction0_set(PyObject *SWIGUNUSED
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_staticFriction0_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_staticFriction0_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_staticFriction0 = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -24993,7 +24741,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_staticFriction0_get(PyObject *SWIGUNUSED
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -25002,7 +24750,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_staticFriction0_get(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMaterial_m_staticFriction0_get" "', argument " "1"" of type '" "ndMaterial *""'"); 
   }
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
-  result = (dFloat32) ((arg1)->m_staticFriction0);
+  result = (float) ((arg1)->m_staticFriction0);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -25013,7 +24761,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndMaterial_m_staticFriction1_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -25028,9 +24776,9 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_staticFriction1_set(PyObject *SWIGUNUSED
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_staticFriction1_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_staticFriction1_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_staticFriction1 = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -25045,7 +24793,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_staticFriction1_get(PyObject *SWIGUNUSED
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -25054,7 +24802,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_staticFriction1_get(PyObject *SWIGUNUSED
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMaterial_m_staticFriction1_get" "', argument " "1"" of type '" "ndMaterial *""'"); 
   }
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
-  result = (dFloat32) ((arg1)->m_staticFriction1);
+  result = (float) ((arg1)->m_staticFriction1);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -25065,7 +24813,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndMaterial_m_dynamicFriction0_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -25080,9 +24828,9 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_dynamicFriction0_set(PyObject *SWIGUNUSE
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_dynamicFriction0_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_dynamicFriction0_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_dynamicFriction0 = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -25097,7 +24845,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_dynamicFriction0_get(PyObject *SWIGUNUSE
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -25106,7 +24854,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_dynamicFriction0_get(PyObject *SWIGUNUSE
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMaterial_m_dynamicFriction0_get" "', argument " "1"" of type '" "ndMaterial *""'"); 
   }
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
-  result = (dFloat32) ((arg1)->m_dynamicFriction0);
+  result = (float) ((arg1)->m_dynamicFriction0);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -25117,7 +24865,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndMaterial_m_dynamicFriction1_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -25132,9 +24880,9 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_dynamicFriction1_set(PyObject *SWIGUNUSE
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_dynamicFriction1_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_dynamicFriction1_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_dynamicFriction1 = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -25149,7 +24897,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_dynamicFriction1_get(PyObject *SWIGUNUSE
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -25158,7 +24906,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_dynamicFriction1_get(PyObject *SWIGUNUSE
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMaterial_m_dynamicFriction1_get" "', argument " "1"" of type '" "ndMaterial *""'"); 
   }
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
-  result = (dFloat32) ((arg1)->m_dynamicFriction1);
+  result = (float) ((arg1)->m_dynamicFriction1);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -25169,7 +24917,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndMaterial_m_softness_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -25184,9 +24932,9 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_softness_set(PyObject *SWIGUNUSEDPARM(se
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_softness_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_softness_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_softness = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -25201,7 +24949,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_softness_get(PyObject *SWIGUNUSEDPARM(se
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -25210,7 +24958,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_softness_get(PyObject *SWIGUNUSEDPARM(se
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMaterial_m_softness_get" "', argument " "1"" of type '" "ndMaterial *""'"); 
   }
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
-  result = (dFloat32) ((arg1)->m_softness);
+  result = (float) ((arg1)->m_softness);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -25221,7 +24969,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndMaterial_m_skinThickness_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -25236,9 +24984,9 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_skinThickness_set(PyObject *SWIGUNUSEDPA
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_skinThickness_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_skinThickness_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_skinThickness = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -25253,7 +25001,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_skinThickness_get(PyObject *SWIGUNUSEDPA
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -25262,7 +25010,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_skinThickness_get(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMaterial_m_skinThickness_get" "', argument " "1"" of type '" "ndMaterial *""'"); 
   }
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
-  result = (dFloat32) ((arg1)->m_skinThickness);
+  result = (float) ((arg1)->m_skinThickness);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -25273,11 +25021,11 @@ fail:
 SWIGINTERN PyObject *_wrap_ndMaterial_m_flags_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  dUnsigned32 arg2 ;
+  unsigned int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndMaterial_m_flags_set", 2, 2, swig_obj)) SWIG_fail;
@@ -25286,19 +25034,11 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_flags_set(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMaterial_m_flags_set" "', argument " "1"" of type '" "ndMaterial *""'"); 
   }
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_uint32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndMaterial_m_flags_set" "', argument " "2"" of type '" "dUnsigned32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndMaterial_m_flags_set" "', argument " "2"" of type '" "dUnsigned32""'");
-    } else {
-      dUnsigned32 * temp = reinterpret_cast< dUnsigned32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_unsigned_SS_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_flags_set" "', argument " "2"" of type '" "unsigned int""'");
+  } 
+  arg2 = static_cast< unsigned int >(val2);
   if (arg1) (arg1)->m_flags = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -25313,7 +25053,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_flags_get(PyObject *SWIGUNUSEDPARM(self)
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dUnsigned32 result;
+  unsigned int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -25322,8 +25062,8 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_flags_get(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMaterial_m_flags_get" "', argument " "1"" of type '" "ndMaterial *""'"); 
   }
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
-  result =  ((arg1)->m_flags);
-  resultobj = SWIG_NewPointerObj((new dUnsigned32(static_cast< const dUnsigned32& >(result))), SWIGTYPE_p_uint32_t, SWIG_POINTER_OWN |  0 );
+  result = (unsigned int) ((arg1)->m_flags);
+  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -25333,11 +25073,11 @@ fail:
 SWIGINTERN PyObject *_wrap_ndMaterial_m_userFlags_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndMaterial *arg1 = (ndMaterial *) 0 ;
-  dUnsigned32 arg2 ;
+  unsigned int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  unsigned int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndMaterial_m_userFlags_set", 2, 2, swig_obj)) SWIG_fail;
@@ -25346,19 +25086,11 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_userFlags_set(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMaterial_m_userFlags_set" "', argument " "1"" of type '" "ndMaterial *""'"); 
   }
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_uint32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndMaterial_m_userFlags_set" "', argument " "2"" of type '" "dUnsigned32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndMaterial_m_userFlags_set" "', argument " "2"" of type '" "dUnsigned32""'");
-    } else {
-      dUnsigned32 * temp = reinterpret_cast< dUnsigned32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_unsigned_SS_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndMaterial_m_userFlags_set" "', argument " "2"" of type '" "unsigned int""'");
+  } 
+  arg2 = static_cast< unsigned int >(val2);
   if (arg1) (arg1)->m_userFlags = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -25373,7 +25105,7 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_userFlags_get(PyObject *SWIGUNUSEDPARM(s
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dUnsigned32 result;
+  unsigned int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -25382,8 +25114,8 @@ SWIGINTERN PyObject *_wrap_ndMaterial_m_userFlags_get(PyObject *SWIGUNUSEDPARM(s
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndMaterial_m_userFlags_get" "', argument " "1"" of type '" "ndMaterial *""'"); 
   }
   arg1 = reinterpret_cast< ndMaterial * >(argp1);
-  result =  ((arg1)->m_userFlags);
-  resultobj = SWIG_NewPointerObj((new dUnsigned32(static_cast< const dUnsigned32& >(result))), SWIGTYPE_p_uint32_t, SWIG_POINTER_OWN |  0 );
+  result = (unsigned int) ((arg1)->m_userFlags);
+  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -25572,7 +25304,7 @@ SWIGINTERN PyObject *_wrap_ndContactNotify_OnCompoundSubShapeOverlap(PyObject *S
   PyObject *resultobj = 0;
   ndContactNotify *arg1 = (ndContactNotify *) 0 ;
   ndContact *arg2 = (ndContact *) (ndContact *)0 ;
-  dFloat32 arg3 ;
+  float arg3 ;
   ndShapeInstance *arg4 = (ndShapeInstance *) (ndShapeInstance *)0 ;
   ndShapeInstance *arg5 = (ndShapeInstance *) (ndShapeInstance *)0 ;
   void *argp1 = 0 ;
@@ -25601,9 +25333,9 @@ SWIGINTERN PyObject *_wrap_ndContactNotify_OnCompoundSubShapeOverlap(PyObject *S
   arg2 = reinterpret_cast< ndContact * >(argp2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndContactNotify_OnCompoundSubShapeOverlap" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndContactNotify_OnCompoundSubShapeOverlap" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   res4 = SWIG_ConvertPtr(swig_obj[3], &argp4,SWIGTYPE_p_ndShapeInstance, 0 |  0 );
   if (!SWIG_IsOK(res4)) {
     SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "ndContactNotify_OnCompoundSubShapeOverlap" "', argument " "4"" of type '" "ndShapeInstance const *const""'"); 
@@ -25626,7 +25358,7 @@ SWIGINTERN PyObject *_wrap_ndContactNotify_OnAabbOverlap(PyObject *SWIGUNUSEDPAR
   PyObject *resultobj = 0;
   ndContactNotify *arg1 = (ndContactNotify *) 0 ;
   ndContact *arg2 = (ndContact *) (ndContact *)0 ;
-  dFloat32 arg3 ;
+  float arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -25649,9 +25381,9 @@ SWIGINTERN PyObject *_wrap_ndContactNotify_OnAabbOverlap(PyObject *SWIGUNUSEDPAR
   arg2 = reinterpret_cast< ndContact * >(argp2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndContactNotify_OnAabbOverlap" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndContactNotify_OnAabbOverlap" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
+  arg3 = static_cast< float >(val3);
   result = (bool)(arg1)->OnAabbOverlap((ndContact const *)arg2,arg3);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
@@ -25663,13 +25395,13 @@ fail:
 SWIGINTERN PyObject *_wrap_ndContactNotify_OnContactCallback(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndContactNotify *arg1 = (ndContactNotify *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   ndContact *arg3 = (ndContact *) (ndContact *)0 ;
-  dFloat32 arg4 ;
+  float arg4 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   void *argp3 = 0 ;
   int res3 = 0 ;
   float val4 ;
@@ -25682,19 +25414,11 @@ SWIGINTERN PyObject *_wrap_ndContactNotify_OnContactCallback(PyObject *SWIGUNUSE
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndContactNotify_OnContactCallback" "', argument " "1"" of type '" "ndContactNotify *""'"); 
   }
   arg1 = reinterpret_cast< ndContactNotify * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndContactNotify_OnContactCallback" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndContactNotify_OnContactCallback" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndContactNotify_OnContactCallback" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   res3 = SWIG_ConvertPtr(swig_obj[2], &argp3,SWIGTYPE_p_ndContact, 0 |  0 );
   if (!SWIG_IsOK(res3)) {
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndContactNotify_OnContactCallback" "', argument " "3"" of type '" "ndContact const *const""'"); 
@@ -25702,9 +25426,9 @@ SWIGINTERN PyObject *_wrap_ndContactNotify_OnContactCallback(PyObject *SWIGUNUSE
   arg3 = reinterpret_cast< ndContact * >(argp3);
   ecode4 = SWIG_AsVal_float(swig_obj[3], &val4);
   if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "ndContactNotify_OnContactCallback" "', argument " "4"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "ndContactNotify_OnContactCallback" "', argument " "4"" of type '" "float""'");
   } 
-  arg4 = static_cast< dFloat32 >(val4);
+  arg4 = static_cast< float >(val4);
   (arg1)->OnContactCallback(arg2,(ndContact const *)arg3,arg4);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -25824,7 +25548,7 @@ SWIGINTERN PyObject *_wrap_ndRayCastNotify_OnRayPrecastAction(PyObject *SWIGUNUS
   void *argp3 = 0 ;
   int res3 = 0 ;
   PyObject *swig_obj[3] ;
-  dUnsigned32 result;
+  unsigned int result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndRayCastNotify_OnRayPrecastAction", 3, 3, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndRayCastNotify, 0 |  0 );
@@ -25842,8 +25566,8 @@ SWIGINTERN PyObject *_wrap_ndRayCastNotify_OnRayPrecastAction(PyObject *SWIGUNUS
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndRayCastNotify_OnRayPrecastAction" "', argument " "3"" of type '" "ndShapeInstance const *const""'"); 
   }
   arg3 = reinterpret_cast< ndShapeInstance * >(argp3);
-  result = (arg1)->OnRayPrecastAction((ndBody const *)arg2,(ndShapeInstance const *)arg3);
-  resultobj = SWIG_NewPointerObj((new dUnsigned32(static_cast< const dUnsigned32& >(result))), SWIGTYPE_p_uint32_t, SWIG_POINTER_OWN |  0 );
+  result = (unsigned int)(arg1)->OnRayPrecastAction((ndBody const *)arg2,(ndShapeInstance const *)arg3);
+  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -25854,7 +25578,7 @@ SWIGINTERN PyObject *_wrap_ndRayCastNotify_OnRayCastAction(PyObject *SWIGUNUSEDP
   PyObject *resultobj = 0;
   ndRayCastNotify *arg1 = (ndRayCastNotify *) 0 ;
   ndContactPoint *arg2 = 0 ;
-  dFloat32 arg3 ;
+  float arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -25862,7 +25586,7 @@ SWIGINTERN PyObject *_wrap_ndRayCastNotify_OnRayCastAction(PyObject *SWIGUNUSEDP
   float val3 ;
   int ecode3 = 0 ;
   PyObject *swig_obj[3] ;
-  dFloat32 result;
+  float result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndRayCastNotify_OnRayCastAction", 3, 3, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndRayCastNotify, 0 |  0 );
@@ -25880,10 +25604,10 @@ SWIGINTERN PyObject *_wrap_ndRayCastNotify_OnRayCastAction(PyObject *SWIGUNUSEDP
   arg2 = reinterpret_cast< ndContactPoint * >(argp2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndRayCastNotify_OnRayCastAction" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndRayCastNotify_OnRayCastAction" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
-  result = (dFloat32)(arg1)->OnRayCastAction((ndContactPoint const &)*arg2,arg3);
+  arg3 = static_cast< float >(val3);
+  result = (float)(arg1)->OnRayCastAction((ndContactPoint const &)*arg2,arg3);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -25946,7 +25670,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndRayCastNotify_m_param_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndRayCastNotify *arg1 = (ndRayCastNotify *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -25961,9 +25685,9 @@ SWIGINTERN PyObject *_wrap_ndRayCastNotify_m_param_set(PyObject *SWIGUNUSEDPARM(
   arg1 = reinterpret_cast< ndRayCastNotify * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndRayCastNotify_m_param_set" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndRayCastNotify_m_param_set" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   if (arg1) (arg1)->m_param = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -25978,7 +25702,7 @@ SWIGINTERN PyObject *_wrap_ndRayCastNotify_m_param_get(PyObject *SWIGUNUSEDPARM(
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -25987,7 +25711,7 @@ SWIGINTERN PyObject *_wrap_ndRayCastNotify_m_param_get(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndRayCastNotify_m_param_get" "', argument " "1"" of type '" "ndRayCastNotify *""'"); 
   }
   arg1 = reinterpret_cast< ndRayCastNotify * >(argp1);
-  result = (dFloat32) ((arg1)->m_param);
+  result = (float) ((arg1)->m_param);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -26027,7 +25751,7 @@ SWIGINTERN PyObject *_wrap_ndRayCastClosestHitCallback_OnRayPrecastAction(PyObje
   void *argp3 = 0 ;
   int res3 = 0 ;
   PyObject *swig_obj[3] ;
-  dUnsigned32 result;
+  unsigned int result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndRayCastClosestHitCallback_OnRayPrecastAction", 3, 3, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndRayCastClosestHitCallback, 0 |  0 );
@@ -26045,8 +25769,8 @@ SWIGINTERN PyObject *_wrap_ndRayCastClosestHitCallback_OnRayPrecastAction(PyObje
     SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "ndRayCastClosestHitCallback_OnRayPrecastAction" "', argument " "3"" of type '" "ndShapeInstance const *const""'"); 
   }
   arg3 = reinterpret_cast< ndShapeInstance * >(argp3);
-  result = (arg1)->OnRayPrecastAction((ndBody const *)arg2,(ndShapeInstance const *)arg3);
-  resultobj = SWIG_NewPointerObj((new dUnsigned32(static_cast< const dUnsigned32& >(result))), SWIGTYPE_p_uint32_t, SWIG_POINTER_OWN |  0 );
+  result = (unsigned int)(arg1)->OnRayPrecastAction((ndBody const *)arg2,(ndShapeInstance const *)arg3);
+  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -26057,7 +25781,7 @@ SWIGINTERN PyObject *_wrap_ndRayCastClosestHitCallback_OnRayCastAction(PyObject 
   PyObject *resultobj = 0;
   ndRayCastClosestHitCallback *arg1 = (ndRayCastClosestHitCallback *) 0 ;
   ndContactPoint *arg2 = 0 ;
-  dFloat32 arg3 ;
+  float arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   void *argp2 = 0 ;
@@ -26065,7 +25789,7 @@ SWIGINTERN PyObject *_wrap_ndRayCastClosestHitCallback_OnRayCastAction(PyObject 
   float val3 ;
   int ecode3 = 0 ;
   PyObject *swig_obj[3] ;
-  dFloat32 result;
+  float result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndRayCastClosestHitCallback_OnRayCastAction", 3, 3, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndRayCastClosestHitCallback, 0 |  0 );
@@ -26083,10 +25807,10 @@ SWIGINTERN PyObject *_wrap_ndRayCastClosestHitCallback_OnRayCastAction(PyObject 
   arg2 = reinterpret_cast< ndContactPoint * >(argp2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndRayCastClosestHitCallback_OnRayCastAction" "', argument " "3"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ndRayCastClosestHitCallback_OnRayCastAction" "', argument " "3"" of type '" "float""'");
   } 
-  arg3 = static_cast< dFloat32 >(val3);
-  result = (dFloat32)(arg1)->OnRayCastAction((ndContactPoint const &)*arg2,arg3);
+  arg3 = static_cast< float >(val3);
+  result = (float)(arg1)->OnRayCastAction((ndContactPoint const &)*arg2,arg3);
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -26171,7 +25895,7 @@ SWIGINTERN PyObject *_wrap_ndBodiesInAabbNotify_OnOverlap(PyObject *SWIGUNUSEDPA
   void *argp2 = 0 ;
   int res2 = 0 ;
   PyObject *swig_obj[2] ;
-  dUnsigned32 result;
+  unsigned int result;
   
   if (!SWIG_Python_UnpackTuple(args, "ndBodiesInAabbNotify_OnOverlap", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_ndBodiesInAabbNotify, 0 |  0 );
@@ -26184,8 +25908,8 @@ SWIGINTERN PyObject *_wrap_ndBodiesInAabbNotify_OnOverlap(PyObject *SWIGUNUSEDPA
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndBodiesInAabbNotify_OnOverlap" "', argument " "2"" of type '" "ndBody const *const""'"); 
   }
   arg2 = reinterpret_cast< ndBody * >(argp2);
-  result = (arg1)->OnOverlap((ndBody const *)arg2);
-  resultobj = SWIG_NewPointerObj((new dUnsigned32(static_cast< const dUnsigned32& >(result))), SWIGTYPE_p_uint32_t, SWIG_POINTER_OWN |  0 );
+  result = (unsigned int)(arg1)->OnOverlap((ndBody const *)arg2);
+  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -26318,7 +26042,7 @@ SWIGINTERN PyObject *_wrap_ndWorld_GetEngineVersion(PyObject *SWIGUNUSEDPARM(sel
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -26327,8 +26051,8 @@ SWIGINTERN PyObject *_wrap_ndWorld_GetEngineVersion(PyObject *SWIGUNUSEDPARM(sel
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetEngineVersion" "', argument " "1"" of type '" "ndWorld const *""'"); 
   }
   arg1 = reinterpret_cast< ndWorld * >(argp1);
-  result = ((ndWorld const *)arg1)->GetEngineVersion();
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int)((ndWorld const *)arg1)->GetEngineVersion();
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -26360,7 +26084,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndWorld_Update(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndWorld *arg1 = (ndWorld *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -26375,9 +26099,9 @@ SWIGINTERN PyObject *_wrap_ndWorld_Update(PyObject *SWIGUNUSEDPARM(self), PyObje
   arg1 = reinterpret_cast< ndWorld * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndWorld_Update" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndWorld_Update" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   (arg1)->Update(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -26389,7 +26113,7 @@ fail:
 SWIGINTERN PyObject *_wrap_ndWorld_OnPostUpdate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndWorld *arg1 = (ndWorld *) 0 ;
-  dFloat32 arg2 ;
+  float arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   float val2 ;
@@ -26404,9 +26128,9 @@ SWIGINTERN PyObject *_wrap_ndWorld_OnPostUpdate(PyObject *SWIGUNUSEDPARM(self), 
   arg1 = reinterpret_cast< ndWorld * >(argp1);
   ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndWorld_OnPostUpdate" "', argument " "2"" of type '" "dFloat32""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndWorld_OnPostUpdate" "', argument " "2"" of type '" "float""'");
   } 
-  arg2 = static_cast< dFloat32 >(val2);
+  arg2 = static_cast< float >(val2);
   (arg1)->OnPostUpdate(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -26465,7 +26189,7 @@ SWIGINTERN PyObject *_wrap_ndWorld_GetThreadCount(PyObject *SWIGUNUSEDPARM(self)
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -26474,8 +26198,8 @@ SWIGINTERN PyObject *_wrap_ndWorld_GetThreadCount(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetThreadCount" "', argument " "1"" of type '" "ndWorld const *""'"); 
   }
   arg1 = reinterpret_cast< ndWorld * >(argp1);
-  result = ((ndWorld const *)arg1)->GetThreadCount();
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int)((ndWorld const *)arg1)->GetThreadCount();
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -26485,11 +26209,11 @@ fail:
 SWIGINTERN PyObject *_wrap_ndWorld_SetThreadCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndWorld *arg1 = (ndWorld *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndWorld_SetThreadCount", 2, 2, swig_obj)) SWIG_fail;
@@ -26498,19 +26222,11 @@ SWIGINTERN PyObject *_wrap_ndWorld_SetThreadCount(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_SetThreadCount" "', argument " "1"" of type '" "ndWorld *""'"); 
   }
   arg1 = reinterpret_cast< ndWorld * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_SetThreadCount" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_SetThreadCount" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndWorld_SetThreadCount" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   (arg1)->SetThreadCount(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -26525,7 +26241,7 @@ SWIGINTERN PyObject *_wrap_ndWorld_GetSubSteps(PyObject *SWIGUNUSEDPARM(self), P
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -26534,8 +26250,8 @@ SWIGINTERN PyObject *_wrap_ndWorld_GetSubSteps(PyObject *SWIGUNUSEDPARM(self), P
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetSubSteps" "', argument " "1"" of type '" "ndWorld const *""'"); 
   }
   arg1 = reinterpret_cast< ndWorld * >(argp1);
-  result = ((ndWorld const *)arg1)->GetSubSteps();
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int)((ndWorld const *)arg1)->GetSubSteps();
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -26545,11 +26261,11 @@ fail:
 SWIGINTERN PyObject *_wrap_ndWorld_SetSubSteps(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndWorld *arg1 = (ndWorld *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndWorld_SetSubSteps", 2, 2, swig_obj)) SWIG_fail;
@@ -26558,19 +26274,11 @@ SWIGINTERN PyObject *_wrap_ndWorld_SetSubSteps(PyObject *SWIGUNUSEDPARM(self), P
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_SetSubSteps" "', argument " "1"" of type '" "ndWorld *""'"); 
   }
   arg1 = reinterpret_cast< ndWorld * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_SetSubSteps" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_SetSubSteps" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndWorld_SetSubSteps" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   (arg1)->SetSubSteps(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -27025,7 +26733,7 @@ SWIGINTERN PyObject *_wrap_ndWorld_GetSolverIterations(PyObject *SWIGUNUSEDPARM(
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dInt32 result;
+  int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -27034,8 +26742,8 @@ SWIGINTERN PyObject *_wrap_ndWorld_GetSolverIterations(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetSolverIterations" "', argument " "1"" of type '" "ndWorld const *""'"); 
   }
   arg1 = reinterpret_cast< ndWorld * >(argp1);
-  result = ((ndWorld const *)arg1)->GetSolverIterations();
-  resultobj = SWIG_NewPointerObj((new dInt32(static_cast< const dInt32& >(result))), SWIGTYPE_p_int32_t, SWIG_POINTER_OWN |  0 );
+  result = (int)((ndWorld const *)arg1)->GetSolverIterations();
+  resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -27045,11 +26753,11 @@ fail:
 SWIGINTERN PyObject *_wrap_ndWorld_SetSolverIterations(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   ndWorld *arg1 = (ndWorld *) 0 ;
-  dInt32 arg2 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  void *argp2 ;
-  int res2 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
   if (!SWIG_Python_UnpackTuple(args, "ndWorld_SetSolverIterations", 2, 2, swig_obj)) SWIG_fail;
@@ -27058,19 +26766,11 @@ SWIGINTERN PyObject *_wrap_ndWorld_SetSolverIterations(PyObject *SWIGUNUSEDPARM(
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_SetSolverIterations" "', argument " "1"" of type '" "ndWorld *""'"); 
   }
   arg1 = reinterpret_cast< ndWorld * >(argp1);
-  {
-    res2 = SWIG_ConvertPtr(swig_obj[1], &argp2, SWIGTYPE_p_int32_t,  0  | 0);
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "ndWorld_SetSolverIterations" "', argument " "2"" of type '" "dInt32""'"); 
-    }  
-    if (!argp2) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "ndWorld_SetSolverIterations" "', argument " "2"" of type '" "dInt32""'");
-    } else {
-      dInt32 * temp = reinterpret_cast< dInt32 * >(argp2);
-      arg2 = *temp;
-      if (SWIG_IsNewObj(res2)) delete temp;
-    }
-  }
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ndWorld_SetSolverIterations" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = static_cast< int >(val2);
   (arg1)->SetSolverIterations(arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
@@ -27108,7 +26808,7 @@ SWIGINTERN PyObject *_wrap_ndWorld_GetUpdateTime(PyObject *SWIGUNUSEDPARM(self),
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -27117,7 +26817,7 @@ SWIGINTERN PyObject *_wrap_ndWorld_GetUpdateTime(PyObject *SWIGUNUSEDPARM(self),
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetUpdateTime" "', argument " "1"" of type '" "ndWorld const *""'"); 
   }
   arg1 = reinterpret_cast< ndWorld * >(argp1);
-  result = (dFloat32)((ndWorld const *)arg1)->GetUpdateTime();
+  result = (float)((ndWorld const *)arg1)->GetUpdateTime();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -27131,7 +26831,7 @@ SWIGINTERN PyObject *_wrap_ndWorld_GetFrameIndex(PyObject *SWIGUNUSEDPARM(self),
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dUnsigned32 result;
+  unsigned int result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -27140,8 +26840,8 @@ SWIGINTERN PyObject *_wrap_ndWorld_GetFrameIndex(PyObject *SWIGUNUSEDPARM(self),
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetFrameIndex" "', argument " "1"" of type '" "ndWorld const *""'"); 
   }
   arg1 = reinterpret_cast< ndWorld * >(argp1);
-  result = ((ndWorld const *)arg1)->GetFrameIndex();
-  resultobj = SWIG_NewPointerObj((new dUnsigned32(static_cast< const dUnsigned32& >(result))), SWIGTYPE_p_uint32_t, SWIG_POINTER_OWN |  0 );
+  result = (unsigned int)((ndWorld const *)arg1)->GetFrameIndex();
+  resultobj = SWIG_From_unsigned_SS_int(static_cast< unsigned int >(result));
   return resultobj;
 fail:
   return NULL;
@@ -27154,7 +26854,7 @@ SWIGINTERN PyObject *_wrap_ndWorld_GetAverageUpdateTime(PyObject *SWIGUNUSEDPARM
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  dFloat32 result;
+  float result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -27163,7 +26863,7 @@ SWIGINTERN PyObject *_wrap_ndWorld_GetAverageUpdateTime(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ndWorld_GetAverageUpdateTime" "', argument " "1"" of type '" "ndWorld const *""'"); 
   }
   arg1 = reinterpret_cast< ndWorld * >(argp1);
-  result = (dFloat32)((ndWorld const *)arg1)->GetAverageUpdateTime();
+  result = (float)((ndWorld const *)arg1)->GetAverageUpdateTime();
   resultobj = SWIG_From_float(static_cast< float >(result));
   return resultobj;
 fail:
@@ -28304,8 +28004,8 @@ static swig_type_info _swigt__p___m128 = {"_p___m128", "__m128 *", 0, 0, (void*)
 static swig_type_info _swigt__p___m128d = {"_p___m128d", "__m128d *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p___m128i = {"_p___m128i", "__m128i *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_dArrayT_int16_t_t = {"_p_dArrayT_int16_t_t", "dArray< dInt16 > *|dArray< int16_t > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_dArrayT_ndBody_p_t = {"_p_dArrayT_ndBody_p_t", "dArray< ndBody * > *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_dArrayT_short_t = {"_p_dArrayT_short_t", "dArray< short > *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_dBigVector = {"_p_dBigVector", "dBigVector *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_dFastRay = {"_p_dFastRay", "dFastRay *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_dLoadSaveBase__dLoadDescriptor = {"_p_dLoadSaveBase__dLoadDescriptor", "dLoadSaveBase::dLoadDescriptor *", 0, 0, (void*)0, 0};
@@ -28315,12 +28015,10 @@ static swig_type_info _swigt__p_dPlane = {"_p_dPlane", "dPlane *", 0, 0, (void*)
 static swig_type_info _swigt__p_dPolygonSoupBuilder = {"_p_dPolygonSoupBuilder", "dPolygonSoupBuilder *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_dQuaternion = {"_p_dQuaternion", "dQuaternion *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_dVector = {"_p_dVector", "dVector *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_double = {"_p_double", "dFloat64 *|double *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_float = {"_p_float", "float *|dFloat32 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_int16_t = {"_p_int16_t", "dInt16 *|int16_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_int32_t = {"_p_int32_t", "int32_t *|dInt32 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_int64_t = {"_p_int64_t", "int64_t *|dInt64 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_int8_t = {"_p_int8_t", "dInt8 *|int8_t *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_double = {"_p_double", "double *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_float = {"_p_float", "float *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_int = {"_p_int", "int *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_long_long = {"_p_long_long", "long long *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ndBodiesInAabbNotify = {"_p_ndBodiesInAabbNotify", "ndBodiesInAabbNotify *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ndBody = {"_p_ndBody", "ndBody *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ndBodyDynamic = {"_p_ndBodyDynamic", "ndBodyDynamic *", 0, 0, (void*)0, 0};
@@ -28394,10 +28092,8 @@ static swig_type_info _swigt__p_ndSkeletonList = {"_p_ndSkeletonList", "ndSkelet
 static swig_type_info _swigt__p_ndSphereInfo = {"_p_ndSphereInfo", "ndSphereInfo *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ndWorld = {"_p_ndWorld", "ndWorld *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_nd__TiXmlNode = {"_p_nd__TiXmlNode", "nd::TiXmlNode *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_uint16_t = {"_p_uint16_t", "dUnsigned16 *|uint16_t *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_uint32_t = {"_p_uint32_t", "uint32_t *|dUnsigned32 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_uint64_t = {"_p_uint64_t", "uint64_t *|dUnsigned64 *", 0, 0, (void*)0, 0};
-static swig_type_info _swigt__p_uint8_t = {"_p_uint8_t", "dUnsigned8 *|uint8_t *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_short = {"_p_short", "short *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_signed_char = {"_p_signed_char", "signed char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_void = {"_p_void", "void *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
@@ -28405,8 +28101,8 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p___m128d,
   &_swigt__p___m128i,
   &_swigt__p_char,
-  &_swigt__p_dArrayT_int16_t_t,
   &_swigt__p_dArrayT_ndBody_p_t,
+  &_swigt__p_dArrayT_short_t,
   &_swigt__p_dBigVector,
   &_swigt__p_dFastRay,
   &_swigt__p_dLoadSaveBase__dLoadDescriptor,
@@ -28418,10 +28114,8 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_dVector,
   &_swigt__p_double,
   &_swigt__p_float,
-  &_swigt__p_int16_t,
-  &_swigt__p_int32_t,
-  &_swigt__p_int64_t,
-  &_swigt__p_int8_t,
+  &_swigt__p_int,
+  &_swigt__p_long_long,
   &_swigt__p_ndBodiesInAabbNotify,
   &_swigt__p_ndBody,
   &_swigt__p_ndBodyDynamic,
@@ -28495,10 +28189,8 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_ndSphereInfo,
   &_swigt__p_ndWorld,
   &_swigt__p_nd__TiXmlNode,
-  &_swigt__p_uint16_t,
-  &_swigt__p_uint32_t,
-  &_swigt__p_uint64_t,
-  &_swigt__p_uint8_t,
+  &_swigt__p_short,
+  &_swigt__p_signed_char,
   &_swigt__p_void,
 };
 
@@ -28506,8 +28198,8 @@ static swig_cast_info _swigc__p___m128[] = {  {&_swigt__p___m128, 0, 0, 0},{0, 0
 static swig_cast_info _swigc__p___m128d[] = {  {&_swigt__p___m128d, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p___m128i[] = {  {&_swigt__p___m128i, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_dArrayT_int16_t_t[] = {  {&_swigt__p_dArrayT_int16_t_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_dArrayT_ndBody_p_t[] = {  {&_swigt__p_dArrayT_ndBody_p_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_dArrayT_short_t[] = {  {&_swigt__p_dArrayT_short_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_dBigVector[] = {  {&_swigt__p_dBigVector, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_dFastRay[] = {  {&_swigt__p_dFastRay, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_dLoadSaveBase__dLoadDescriptor[] = {  {&_swigt__p_dLoadSaveBase__dLoadDescriptor, 0, 0, 0},{0, 0, 0, 0}};
@@ -28519,10 +28211,8 @@ static swig_cast_info _swigc__p_dQuaternion[] = {  {&_swigt__p_dQuaternion, 0, 0
 static swig_cast_info _swigc__p_dVector[] = {  {&_swigt__p_dVector, 0, 0, 0},  {&_swigt__p_dQuaternion, _p_dQuaternionTo_p_dVector, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_float[] = {  {&_swigt__p_float, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_int16_t[] = {  {&_swigt__p_int16_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_int32_t[] = {  {&_swigt__p_int32_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_int64_t[] = {  {&_swigt__p_int64_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_int8_t[] = {  {&_swigt__p_int8_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_int[] = {  {&_swigt__p_int, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_long_long[] = {  {&_swigt__p_long_long, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ndBodiesInAabbNotify[] = {  {&_swigt__p_ndBodiesInAabbNotify, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ndBody[] = {  {&_swigt__p_ndBodyKinematic, _p_ndBodyKinematicTo_p_ndBody, 0, 0},  {&_swigt__p_ndBodyTriggerVolume, _p_ndBodyTriggerVolumeTo_p_ndBody, 0, 0},  {&_swigt__p_ndBodyPlayerCapsule, _p_ndBodyPlayerCapsuleTo_p_ndBody, 0, 0},  {&_swigt__p_ndBody, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ndBodyDynamic[] = {  {&_swigt__p_ndBodyDynamic, 0, 0, 0},{0, 0, 0, 0}};
@@ -28596,10 +28286,8 @@ static swig_cast_info _swigc__p_ndSkeletonList[] = {  {&_swigt__p_ndSkeletonList
 static swig_cast_info _swigc__p_ndSphereInfo[] = {  {&_swigt__p_ndSphereInfo, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_ndWorld[] = {  {&_swigt__p_ndWorld, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_nd__TiXmlNode[] = {  {&_swigt__p_nd__TiXmlNode, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_uint16_t[] = {  {&_swigt__p_uint16_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_uint32_t[] = {  {&_swigt__p_uint32_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_uint64_t[] = {  {&_swigt__p_uint64_t, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_uint8_t[] = {  {&_swigt__p_uint8_t, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_short[] = {  {&_swigt__p_short, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_signed_char[] = {  {&_swigt__p_signed_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_void[] = {  {&_swigt__p_void, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
@@ -28607,8 +28295,8 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p___m128d,
   _swigc__p___m128i,
   _swigc__p_char,
-  _swigc__p_dArrayT_int16_t_t,
   _swigc__p_dArrayT_ndBody_p_t,
+  _swigc__p_dArrayT_short_t,
   _swigc__p_dBigVector,
   _swigc__p_dFastRay,
   _swigc__p_dLoadSaveBase__dLoadDescriptor,
@@ -28620,10 +28308,8 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_dVector,
   _swigc__p_double,
   _swigc__p_float,
-  _swigc__p_int16_t,
-  _swigc__p_int32_t,
-  _swigc__p_int64_t,
-  _swigc__p_int8_t,
+  _swigc__p_int,
+  _swigc__p_long_long,
   _swigc__p_ndBodiesInAabbNotify,
   _swigc__p_ndBody,
   _swigc__p_ndBodyDynamic,
@@ -28697,10 +28383,8 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_ndSphereInfo,
   _swigc__p_ndWorld,
   _swigc__p_nd__TiXmlNode,
-  _swigc__p_uint16_t,
-  _swigc__p_uint32_t,
-  _swigc__p_uint64_t,
-  _swigc__p_uint8_t,
+  _swigc__p_short,
+  _swigc__p_signed_char,
   _swigc__p_void,
 };
 
