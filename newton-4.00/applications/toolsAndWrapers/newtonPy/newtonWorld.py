@@ -12,7 +12,6 @@ import bpy
 import newton
 
 class TestManager(bpy.types.Object):
-#class TestManager(bpy.types.Object, newton.ndWorld):
     """create an interface to the newton workd"""
 
     def __init__(self, object):
