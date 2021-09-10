@@ -72,7 +72,7 @@ set (pyDst "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}")
 foreach(file IN LISTS PY_SOURCE)
 	add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy ${pySrc}/${file_0} ${pyDst}/${file_0})
+	ARGS -E copy ${pySrc}/${file} ${pyDst}/${file})
 endforeach()
 add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
@@ -81,7 +81,7 @@ add_custom_command(
 foreach(file IN LISTS PY_SOURCE)
 	add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-	ARGS -E copy ${pySrc}/${file_0} $ENV{Blender}/scripts/addons/${projectName}/${file_0})
+	ARGS -E copy ${pySrc}/${file} $ENV{Blender}/scripts/addons/${projectName}/${file})
 endforeach()
 add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
