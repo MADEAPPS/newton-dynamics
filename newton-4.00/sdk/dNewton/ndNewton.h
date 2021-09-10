@@ -61,8 +61,9 @@
 #include <ndContactNotify.h>
 #include <ndCharacterPose.h>
 #include <ndDynamicsUpdate.h>
-#include <ndBodyParticleSet.h>
+#include <ndJointPdActuator.h>
 #include <ndJointFollowPath.h>
+#include <ndBodyParticleSet.h>
 #include <ndCharacterLimbNode.h>
 #include <ndJointDoubleHinge.h>
 #include <ndJointFixDistance.h>
@@ -77,8 +78,7 @@
 #include <ndBodyParticleSetList.h>
 #include <ndJointAttachmentPoint.h>
 #include <ndDynamicsUpdateOpencl.h>
-#include <ndJointPid3dofActuator.h>
-#include <ndJointPid6dofActuator.h>
+
 #include <ndMultiBodyVehicleMotor.h>
 #include <ndCharacterEffectorNode.h>
 #include <ndCharacterPoseGenerator.h>

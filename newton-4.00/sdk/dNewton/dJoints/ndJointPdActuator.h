@@ -19,13 +19,13 @@
 #define D_PID_PENETRATION_RECOVERY_ANGULAR_SPEED dFloat32 (0.1f) 
 #define D_PID_PENETRATION_ANGULAR_LIMIT dFloat32 (10.0f * dDegreeToRad) 
 
-class ndJointPid3dofActuator : public ndJointBilateralConstraint
+class ndJointPdActuator : public ndJointBilateralConstraint
 {
 	public:
-	D_CLASS_REFLECTION(ndJointPid3dofActuator);
-	D_NEWTON_API ndJointPid3dofActuator(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndJointPid3dofActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API virtual ~ndJointPid3dofActuator();
+	D_CLASS_REFLECTION(ndJointPdActuator);
+	D_NEWTON_API ndJointPdActuator(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointPdActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndJointPdActuator();
 
 	D_NEWTON_API dFloat32 GetMaxConeAngle() const;
 	D_NEWTON_API void SetConeLimit(dFloat32 maxConeAngle);
@@ -35,6 +35,16 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 	
 	D_NEWTON_API void GetAngularSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const;
 	D_NEWTON_API void SetAngularSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer = dFloat32(5.0e-3f));
+
+	D_NEWTON_API void GetLinearSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const;
+	D_NEWTON_API void SetLinearSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer = dFloat32(5.0e-3f));
+
+	D_NEWTON_API dVector GetTargetPosition() const;
+	D_NEWTON_API void SetTargetPosition(const dVector& posit);
+
+	D_NEWTON_API dMatrix GetTargetMatrix() const;
+	D_NEWTON_API void SetTargetMatrix(const dMatrix& posit);
+
 
 	const dMatrix& GetReferenceMatrix() const;
 
@@ -47,12 +57,13 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
+	void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitTwistLimits(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
 	void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitPidRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
-	virtual void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
+	
 
 	dMatrix m_referenceFrameBody1;
 	dFloat32 m_maxConeAngle;
@@ -62,23 +73,27 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 	dFloat32 m_angularSpring;
 	dFloat32 m_angularDamper;
 	dFloat32 m_angularRegularizer;
+
+	dFloat32 m_linearSpring;
+	dFloat32 m_linearDamper;
+	dFloat32 m_linearRegularizer;
 };
 
-inline dMatrix ndJointPid3dofActuator::GetTargetRotation() const
+inline dMatrix ndJointPdActuator::GetTargetRotation() const
 {
 	dMatrix tmp(m_localMatrix1);
 	tmp.m_posit = m_referenceFrameBody1.m_posit;
 	return tmp;
 }
 
-inline void ndJointPid3dofActuator::SetTargetRotation(const dMatrix& matrix)
+inline void ndJointPdActuator::SetTargetRotation(const dMatrix& matrix)
 {
 	dMatrix tmp(matrix);
 	tmp.m_posit = m_localMatrix1.m_posit;
 	m_localMatrix1 = tmp;
 }
 
-inline const dMatrix& ndJointPid3dofActuator::GetReferenceMatrix() const
+inline const dMatrix& ndJointPdActuator::GetReferenceMatrix() const
 {
 	return m_referenceFrameBody1;
 }

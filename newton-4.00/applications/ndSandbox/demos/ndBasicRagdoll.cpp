@@ -241,7 +241,7 @@ class ndRagdollModel : public ndCharacter
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
 
 		ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentBone);
-		ndJointPid3dofActuator* const joint = (ndJointPid3dofActuator*)jointNode->GetJoint();
+		ndJointPdActuator* const joint = (ndJointPdActuator*)jointNode->GetJoint();
 		
 		dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 		joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);

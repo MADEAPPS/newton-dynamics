@@ -25,7 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacterLimbNode.h"
 
-class ndJointPid6dofActuator;
+class ndJointPdActuator;
 class ndJointBilateralConstraint;
 
 class ndCharacterEffectorNode: public ndCharacterLimbNode
@@ -50,7 +50,7 @@ class ndCharacterEffectorNode: public ndCharacterLimbNode
 
 	void Debug(ndConstraintDebugCallback& context) const;
 
-	ndJointPid6dofActuator* m_effector;
+	ndJointPdActuator* m_effector;
 	ndCharacterLimbNode* m_referenceNode;
 };
 

@@ -25,7 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacterLimbNode.h"
 
-class ndJointPid3dofActuator;
+class ndJointPdActuator;
 
 class ndCharacterForwardDynamicNode: public ndCharacterLimbNode 
 {
@@ -42,7 +42,7 @@ class ndCharacterForwardDynamicNode: public ndCharacterLimbNode
 	void Save(const ndCharacterSaveDescriptor& desc) const;
 
 	ndBodyDynamic* m_body;
-	ndJointPid3dofActuator* m_joint;
+	ndJointPdActuator* m_joint;
 };
 
 inline ndBodyDynamic* ndCharacterForwardDynamicNode::GetBody() const

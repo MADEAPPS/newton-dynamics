@@ -23,7 +23,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacter.h"
 #include "ndBodyDynamic.h"
-#include "ndJointPid6dofActuator.h"
+#include "ndJointPdActuator.h"
 #include "ndCharacterEffectorNode.h"
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterEffectorNode)
@@ -34,7 +34,7 @@ ndCharacterEffectorNode::ndCharacterEffectorNode(const dMatrix& matrixInGlobalSc
 {
 	ndBodyDynamic* const body0 = parentBone->GetBody();
 	ndBodyDynamic* const body1 = m_referenceNode->GetBody();
-	m_effector = new ndJointPid6dofActuator(matrixInGlobalScape, body0, body1);
+	m_effector = new ndJointPdActuator(matrixInGlobalScape, body0, body1);
 }
 
 ndCharacterEffectorNode::ndCharacterEffectorNode(const ndCharacterLoadDescriptor& desc)
@@ -50,7 +50,7 @@ ndCharacterEffectorNode::ndCharacterEffectorNode(const ndCharacterLoadDescriptor
 	const ndCharacterLimbNode* const reference = desc.m_limbMap->Find(refHash)->GetInfo();
 
 	m_referenceNode = (ndCharacterLimbNode*)reference;
-	m_effector = (ndJointPid6dofActuator*)joint;
+	m_effector = (ndJointPdActuator*)joint;
 }
 
 ndCharacterEffectorNode::~ndCharacterEffectorNode()

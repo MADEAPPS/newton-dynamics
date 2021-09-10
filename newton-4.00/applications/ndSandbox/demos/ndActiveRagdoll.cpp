@@ -201,7 +201,7 @@ class ndActiveRagdollModel : public ndCharacter
 					{
 						dMatrix effectorMatrix(childEntity->GetCurrentMatrix() * parentBone->GetBody()->GetMatrix());
 						ndCharacterEffectorNode* const effectorNode = CreateInverseDynamicEffector(effectorMatrix, parentBone);
-						ndJointPid6dofActuator* const effectorJoint = (ndJointPid6dofActuator*)effectorNode->GetJoint();
+						ndJointPdActuator* const effectorJoint = (ndJointPdActuator*)effectorNode->GetJoint();
 						effectorJoint->SetLinearSpringDamperRegularizer(definition.m_jointData.m_spring, definition.m_jointData.m_damper, definition.m_jointData.m_regularizer);
 
 						if (strstr(name, "right"))
@@ -289,7 +289,7 @@ class ndActiveRagdollModel : public ndCharacter
 			ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
 
 			dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-			ndJointPid3dofActuator* const joint = (ndJointPid3dofActuator*)jointNode->GetJoint();
+			ndJointPdActuator* const joint = (ndJointPdActuator*)jointNode->GetJoint();
 
 			joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
 			joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);

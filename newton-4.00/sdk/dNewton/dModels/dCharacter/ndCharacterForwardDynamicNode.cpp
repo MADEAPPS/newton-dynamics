@@ -23,7 +23,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacter.h"
 #include "ndBodyDynamic.h"
-#include "ndJointPid3dofActuator.h"
+#include "ndJointPdActuator.h"
 #include "ndCharacterForwardDynamicNode.h"
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterForwardDynamicNode)
@@ -31,7 +31,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterForwardDynamicNode)
 ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
 	:ndCharacterLimbNode(parent)
 	,m_body(body)
-	,m_joint(new ndJointPid3dofActuator(matrixInGlobalScape, body, parent->GetBody()))
+	,m_joint(new ndJointPdActuator(matrixInGlobalScape, body, parent->GetBody()))
 {
 }
 
@@ -45,7 +45,7 @@ ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const ndCharacterLo
 	const ndBody* const body = desc.m_bodyMap->Find(bodyHash)->GetInfo();
 	const ndJointBilateralConstraint* const joint = desc.m_jointMap->Find(jointHash)->GetInfo();
 	m_body = (ndBodyDynamic*)body;
-	m_joint = (ndJointPid3dofActuator*)joint;
+	m_joint = (ndJointPdActuator*)joint;
 }
 
 ndCharacterForwardDynamicNode::~ndCharacterForwardDynamicNode()
