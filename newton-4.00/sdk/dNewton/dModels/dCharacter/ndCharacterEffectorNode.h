@@ -33,7 +33,7 @@ class ndCharacterEffectorNode: public ndCharacterLimbNode
 	public:
 	D_CLASS_REFLECTION(ndCharacterEffectorNode);
 	D_NEWTON_API ndCharacterEffectorNode(const ndCharacterLoadDescriptor& desc);
-	D_NEWTON_API ndCharacterEffectorNode(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const child, ndCharacterLimbNode* const referenceNode);
+	D_NEWTON_API ndCharacterEffectorNode(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const parentBone);
 	D_NEWTON_API virtual ~ndCharacterEffectorNode ();
 
 	virtual ndBodyDynamic* GetBody() const;

@@ -313,8 +313,26 @@ void ndJointPid3dofActuator::SubmitLinearLimits(const dMatrix& matrix0, const dM
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 }
 
+void ndJointPid3dofActuator::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "referenceFrameBody1", m_referenceFrameBody1);
+	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
+	xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
+	xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
+	xmlSaveParam(childNode, "angularSpring", m_angularSpring);
+	xmlSaveParam(childNode, "angularDamper", m_angularDamper);
+	xmlSaveParam(childNode, "angularRegularizer", m_angularRegularizer);
+}
+
+
 void ndJointPid3dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
 {
+return;
 	dMatrix matrix0;
 	dMatrix matrix1;
 
@@ -333,20 +351,3 @@ void ndJointPid3dofActuator::JacobianDerivative(ndConstraintDescritor& desc)
 		SubmitAngularAxis(matrix0, matrix1, desc);
 	}
 }
-
-void ndJointPid3dofActuator::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "referenceFrameBody1", m_referenceFrameBody1);
-	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
-	xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
-	xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
-	xmlSaveParam(childNode, "angularSpring", m_angularSpring);
-	xmlSaveParam(childNode, "angularDamper", m_angularDamper);
-	xmlSaveParam(childNode, "angularRegularizer", m_angularRegularizer);
-}
-

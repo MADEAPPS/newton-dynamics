@@ -163,9 +163,9 @@ ndCharacterInverseDynamicNode* ndCharacter::CreateInverseDynamicLimb(const dMatr
 	return limb;
 }
 
-ndCharacterEffectorNode* ndCharacter::CreateInverseDynamicEffector(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const child, ndCharacterLimbNode* const referenceNode)
+ndCharacterEffectorNode* ndCharacter::CreateInverseDynamicEffector(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const parent)
 {
-	ndCharacterEffectorNode* const effector = new ndCharacterEffectorNode(matrixInGlobalScape, child, referenceNode);
+	ndCharacterEffectorNode* const effector = new ndCharacterEffectorNode(matrixInGlobalScape, parent);
 	return effector;
 }
 

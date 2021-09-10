@@ -28,12 +28,12 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterEffectorNode)
 
-ndCharacterEffectorNode::ndCharacterEffectorNode(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const child, ndCharacterLimbNode* const referenceNode)
-	:ndCharacterLimbNode(child)
-	,m_referenceNode(referenceNode)
+ndCharacterEffectorNode::ndCharacterEffectorNode(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const parentBone)
+	:ndCharacterLimbNode(parentBone)
+	,m_referenceNode(parentBone->GetParent()->GetParent())
 {
-	ndBodyDynamic* const body0 = child->GetBody();
-	ndBodyDynamic* const body1 = referenceNode->GetBody();
+	ndBodyDynamic* const body0 = parentBone->GetBody();
+	ndBodyDynamic* const body1 = m_referenceNode->GetBody();
 	m_effector = new ndJointPid6dofActuator(matrixInGlobalScape, body0, body1);
 }
 

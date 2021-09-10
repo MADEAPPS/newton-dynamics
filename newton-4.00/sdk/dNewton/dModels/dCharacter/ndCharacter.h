@@ -56,7 +56,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API ndCharacterRootNode* CreateRoot(ndBodyDynamic* const body);
 	D_NEWTON_API ndCharacterForwardDynamicNode* CreateForwardDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
 	D_NEWTON_API ndCharacterInverseDynamicNode* CreateInverseDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
-	D_NEWTON_API ndCharacterEffectorNode* CreateInverseDynamicEffector(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const child, ndCharacterLimbNode* const parent);
+	D_NEWTON_API ndCharacterEffectorNode* CreateInverseDynamicEffector(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const parent);
 	
 	ndCharacter* GetAsCharacter();
 	ndCharacterRootNode* GetRootNode() const;

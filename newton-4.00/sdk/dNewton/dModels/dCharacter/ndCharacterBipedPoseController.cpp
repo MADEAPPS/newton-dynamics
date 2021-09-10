@@ -67,6 +67,7 @@ dRay ndCharacterBipedPoseController::CalculateSupportPoint(const dVector& comInG
 
 void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) const
 {
+return;
 	ndCharacterRootNode* const rootNode = m_owner->GetRootNode();
 	ndBodyDynamic* const hip = rootNode->GetBody();
 	
