@@ -37,9 +37,6 @@ class NewtonWorld(bpy.types.Object):
         #self.iterations = self.world.GetSolverIterations()
         #self.SetIterations(10)
 
-    def SetIterations (self, iterations):
-        self.world.SetSolverIterations(iterations)
-
 class NewtonWorldCreateHomeObject(bpy.types.Operator):
     """Creates a newton world home"""
     bl_label = 'create newton world'
@@ -56,15 +53,7 @@ class NewtonWorldCreateHomeObject(bpy.types.Operator):
 
         context.active_object.name = 'newtonHome'
         world = NewtonWorld(context.active_object)
-
-        print ("test class NewtonWorld")
-        # this line works
-        world.SetIterations(10)
-
-        # this line fail in blender but not in python
         scene.newton_world = world
-        scene.newton_world.SetIterations(10)
-
         return {'FINISHED'}
 
 class NewtonWorldCreate(bpy.types.Operator):
@@ -75,9 +64,6 @@ class NewtonWorldCreate(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene
-
-        # this does not works.
-        #scene.newton_world = bpy.data.objects.new('newton_world', None) 
         world = NewtonWorld(context.active_object)
         scene.newton_world = world
         return {'FINISHED'}
@@ -106,7 +92,6 @@ class NewtonWorldSetProperty(bpy.types.Operator):
         if col:
             for obj in col.objects:
                 if obj.name == 'newton_world':
-                    print ("esta es una pura mierda 0")
                     return obj
         return None
 
@@ -115,5 +100,5 @@ class NewtonWorldSetProperty(bpy.types.Operator):
         scene = context.scene
         world = self.findWorld()
         propertyGroup = scene.newton_world_properties
-        world.SetIterations(propertyGroup.solverIterations)
+        #world.SetIterations(propertyGroup.solverIterations)
         return {'FINISHED'}
