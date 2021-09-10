@@ -12,6 +12,11 @@ import bpy
 import newton
 
 newtonWorld = newton.ndWorld()
+def NewtonUpdate(scene):
+    print("Frame Change", scene.frame_current)
+
+bpy.app.handlers.frame_change_pre.append(NewtonUpdate)
+
 
 class NewtonWorldProperties(bpy.types.PropertyGroup):
     solverSubSteps: bpy.props.IntProperty(name= "solver substeps", description="number of solver sub step per ticks", default = 2, min=0, max=8)
@@ -82,6 +87,8 @@ class NewtonWorldProperties(bpy.types.PropertyGroup):
 #        scene.newton_world.name = 'newtonHome'
 #        scene.newton_world = None
 #        return {'FINISHED'}
+
+
 
 class NewtonWorldSetProperty(bpy.types.Operator):
     """newton world set engine properties"""
