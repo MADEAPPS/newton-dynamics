@@ -48,6 +48,8 @@ class ndCharacterEffectorNode: public ndCharacterLimbNode
 	void Save(const ndCharacterSaveDescriptor& desc) const;
 	//void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 
+	void Debug(ndConstraintDebugCallback& context) const;
+
 	ndJointPid6dofActuator* m_effector;
 	ndCharacterLimbNode* m_referenceNode;
 };

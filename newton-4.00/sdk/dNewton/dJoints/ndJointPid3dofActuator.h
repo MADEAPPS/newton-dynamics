@@ -41,10 +41,11 @@ class ndJointPid3dofActuator : public ndJointBilateralConstraint
 	dMatrix GetTargetRotation() const;
 	void SetTargetRotation(const dMatrix& rotation);
 
+	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
+
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
-	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	void SubmitTwistLimits(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
 	void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);

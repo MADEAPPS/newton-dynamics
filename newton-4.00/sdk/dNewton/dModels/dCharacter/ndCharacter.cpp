@@ -230,13 +230,19 @@ ndCharacterCentreOfMassState ndCharacter::CalculateCentreOfMassState() const
 
 void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 {
+	dFloat32 scale = context.GetScale();
+	context.SetScale(scale * 0.25f);
+
+	if (m_rootNode)
+	{
+		m_rootNode->Debug(context);
+	}
+
 	if (m_controller)
 	{
-		dFloat32 scale = context.GetScale();
-		context.SetScale(scale * 0.25f);
 		m_controller->Debug(context);
-		context.SetScale(scale);
 	}
+	context.SetScale(scale);
 }
 
 //void ndCharacter::UpdateGlobalPose(ndWorld* const world, dFloat32 timestep)

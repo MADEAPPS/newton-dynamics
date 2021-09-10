@@ -62,15 +62,14 @@ if(MSVC OR MINGW)
 endif()
 
 
+set (pySrc "${CMAKE_CURRENT_SOURCE_DIR}")
 list(APPEND PY_SOURCE 
 	ndbpy.py
 	newton.py
-	newtonWorld.py
-)
-set (pySrc "${CMAKE_CURRENT_SOURCE_DIR}")
+	newtonWorld.py)
 
 set (pyDst "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}")
-foreach(file IN ZIP_LISTS PY_SOURCE)
+foreach(file IN LISTS PY_SOURCE)
 	add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
 	ARGS -E copy ${pySrc}/${file_0} ${pyDst}/${file_0})
@@ -79,7 +78,7 @@ add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
 	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/${projectName}/_newton.pyd)
 
-foreach(file IN ZIP_LISTS PY_SOURCE)
+foreach(file IN LISTS PY_SOURCE)
 	add_custom_command(
 	TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
 	ARGS -E copy ${pySrc}/${file_0} $ENV{Blender}/scripts/addons/${projectName}/${file_0})

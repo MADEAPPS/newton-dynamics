@@ -111,6 +111,8 @@ class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 	virtual void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 	virtual void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
 
+	virtual void Debug(ndConstraintDebugCallback& context) const;
+
 	protected:
 	D_NEWTON_API dNodeBaseHierarchy* CreateClone() const;
 	D_NEWTON_API virtual void Save(const ndCharacterSaveDescriptor& desc) const;

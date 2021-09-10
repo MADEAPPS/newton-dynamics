@@ -96,3 +96,10 @@ void ndCharacterEffectorNode::Save(const ndCharacterSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "jointHash", jointNode->GetInfo());
 	xmlSaveParam(childNode, "referenceNodeHash", limbNode->GetInfo());
 }
+
+void ndCharacterEffectorNode::Debug(ndConstraintDebugCallback& context) const
+{
+	ndCharacterLimbNode::Debug(context);
+
+	m_effector->DebugJoint(context);
+}

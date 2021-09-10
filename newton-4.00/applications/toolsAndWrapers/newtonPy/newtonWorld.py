@@ -57,7 +57,7 @@ class NewtonWorldCreateHomeObject(bpy.types.Operator):
         context.active_object.name = 'newtonHome'
         world = NewtonWorld(context.active_object)
 
-        print ("test calss NewtonWorld")
+        print ("test class NewtonWorld")
         # this line works
         world.SetIterations(10)
 

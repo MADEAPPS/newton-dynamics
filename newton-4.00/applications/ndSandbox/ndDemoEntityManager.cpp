@@ -47,9 +47,9 @@
 //#define DEFAULT_SCENE	9		// static user mesh collision 
 //#define DEFAULT_SCENE	10		// basic joints
 //#define DEFAULT_SCENE	11		// basic rag doll
-//#define DEFAULT_SCENE	12		// active rag doll
+#define DEFAULT_SCENE	12		// active rag doll
 //#define DEFAULT_SCENE	13		// basic vehicle
-#define DEFAULT_SCENE	14		// heavy vehicle
+//#define DEFAULT_SCENE	14		// heavy vehicle
 //#define DEFAULT_SCENE	15		// simple voronoi fracture
 //#define DEFAULT_SCENE	16		// basic voronoi fracture
 //#define DEFAULT_SCENE	17		// linked voronoi fracture
@@ -289,7 +289,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	//m_showModelsDebugInfo = true;
+	m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 2;	
 	//m_collisionDisplayMode = 3;		// solid wire frame
 	//m_synchronousPhysicsUpdate = false;

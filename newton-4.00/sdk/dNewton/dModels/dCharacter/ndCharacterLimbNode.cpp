@@ -84,3 +84,11 @@ void ndCharacterLimbNode::Save(const ndCharacterSaveDescriptor& desc) const
 		child->Save(childDesc);
 	}
 }
+
+void ndCharacterLimbNode::Debug(ndConstraintDebugCallback& context) const
+{
+	for (ndCharacterLimbNode* child = GetChild(); child; child = child->GetSibling())
+	{
+		child->Debug(context);
+	}
+}
