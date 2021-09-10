@@ -32,6 +32,7 @@
 
 %{
 	#include <ndNewton.h>
+	#include <newtonWorld.h>
 %}
 
 %include "newtonConfig.h"
@@ -92,6 +93,7 @@
 %include "../../../sdk/dCollision/ndRayCastNotify.h"
 %include "../../../sdk/dCollision/ndBodiesInAabbNotify.h"
 
-%include "../../../sdk/dNewton/ndWorld.h"
+#%include "../../../sdk/dNewton/ndWorld.h"
+%include "newtonWorld.h"
 
 

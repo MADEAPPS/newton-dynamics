@@ -1732,146 +1732,29 @@ class ndBodiesInAabbNotify(object):
 # Register ndBodiesInAabbNotify in _newton:
 _newton.ndBodiesInAabbNotify_swigregister(ndBodiesInAabbNotify)
 
-D_NEWTON_ENGINE_MAJOR_VERSION = _newton.D_NEWTON_ENGINE_MAJOR_VERSION
-D_NEWTON_ENGINE_MINOR_VERSION = _newton.D_NEWTON_ENGINE_MINOR_VERSION
-D_SLEEP_ENTRIES = _newton.D_SLEEP_ENTRIES
-class ndWorld(object):
+NOMINAL_FPS = _newton.NOMINAL_FPS
+class NewtonWorld(object):
     thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
     __repr__ = _swig_repr
-    ndStandardSolver = _newton.ndWorld_ndStandardSolver
-    ndSimdSoaSolver = _newton.ndWorld_ndSimdSoaSolver
-    ndSimdAvx2Solver = _newton.ndWorld_ndSimdAvx2Solver
-    ndOpenclSolver = _newton.ndWorld_ndOpenclSolver
 
     def __init__(self):
-        _newton.ndWorld_swiginit(self, _newton.new_ndWorld())
-    __swig_destroy__ = _newton.delete_ndWorld
-
-    def CleanUp(self):
-        return _newton.ndWorld_CleanUp(self)
-
-    def GetEngineVersion(self):
-        return _newton.ndWorld_GetEngineVersion(self)
-
-    def Sync(self):
-        return _newton.ndWorld_Sync(self)
+        _newton.NewtonWorld_swiginit(self, _newton.new_NewtonWorld())
+    __swig_destroy__ = _newton.delete_NewtonWorld
 
     def Update(self, timestep):
-        return _newton.ndWorld_Update(self, timestep)
+        return _newton.NewtonWorld_Update(self, timestep)
 
-    def OnPostUpdate(self, timestep):
-        return _newton.ndWorld_OnPostUpdate(self, timestep)
+    def SetSubSteps(self, timestep):
+        return _newton.NewtonWorld_SetSubSteps(self, timestep)
 
-    def UpdateTransformsLock(self):
-        return _newton.ndWorld_UpdateTransformsLock(self)
+    def SetIterations(self, iterations):
+        return _newton.NewtonWorld_SetIterations(self, iterations)
 
-    def UpdateTransformsUnlock(self):
-        return _newton.ndWorld_UpdateTransformsUnlock(self)
+    def SetTimestep(self, nominalTimestep):
+        return _newton.NewtonWorld_SetTimestep(self, nominalTimestep)
 
-    def GetThreadCount(self):
-        return _newton.ndWorld_GetThreadCount(self)
-
-    def SetThreadCount(self, count):
-        return _newton.ndWorld_SetThreadCount(self, count)
-
-    def GetSubSteps(self):
-        return _newton.ndWorld_GetSubSteps(self)
-
-    def SetSubSteps(self, subSteps):
-        return _newton.ndWorld_SetSubSteps(self, subSteps)
-
-    def GetSelectedSolver(self):
-        return _newton.ndWorld_GetSelectedSolver(self)
-
-    def SelectSolver(self, solverMode):
-        return _newton.ndWorld_SelectSolver(self, solverMode)
-
-    def GetSolverString(self):
-        return _newton.ndWorld_GetSolverString(self)
-
-    def AddBody(self, body):
-        return _newton.ndWorld_AddBody(self, body)
-
-    def RemoveBody(self, body):
-        return _newton.ndWorld_RemoveBody(self, body)
-
-    def DeleteBody(self, body):
-        return _newton.ndWorld_DeleteBody(self, body)
-
-    def AddJoint(self, joint):
-        return _newton.ndWorld_AddJoint(self, joint)
-
-    def RemoveJoint(self, joint):
-        return _newton.ndWorld_RemoveJoint(self, joint)
-
-    def AddModel(self, model):
-        return _newton.ndWorld_AddModel(self, model)
-
-    def RemoveModel(self, model):
-        return _newton.ndWorld_RemoveModel(self, model)
-
-    def GetBodyList(self):
-        return _newton.ndWorld_GetBodyList(self)
-
-    def GetJointList(self):
-        return _newton.ndWorld_GetJointList(self)
-
-    def GetModelList(self):
-        return _newton.ndWorld_GetModelList(self)
-
-    def GetContactList(self):
-        return _newton.ndWorld_GetContactList(self)
-
-    def GetSkeletonList(self):
-        return _newton.ndWorld_GetSkeletonList(self)
-
-    def GetParticleList(self):
-        return _newton.ndWorld_GetParticleList(self)
-
-    def GetSentinelBody(self):
-        return _newton.ndWorld_GetSentinelBody(self)
-
-    def GetSolverIterations(self):
-        return _newton.ndWorld_GetSolverIterations(self)
-
-    def SetSolverIterations(self, iterations):
-        return _newton.ndWorld_SetSolverIterations(self, iterations)
-
-    def GetScene(self):
-        return _newton.ndWorld_GetScene(self)
-
-    def GetUpdateTime(self):
-        return _newton.ndWorld_GetUpdateTime(self)
-
-    def GetFrameIndex(self):
-        return _newton.ndWorld_GetFrameIndex(self)
-
-    def GetAverageUpdateTime(self):
-        return _newton.ndWorld_GetAverageUpdateTime(self)
-
-    def GetContactNotify(self):
-        return _newton.ndWorld_GetContactNotify(self)
-
-    def SetContactNotify(self, notify):
-        return _newton.ndWorld_SetContactNotify(self, notify)
-
-    def DebugScene(self, notify):
-        return _newton.ndWorld_DebugScene(self, notify)
-
-    def ClearCache(self):
-        return _newton.ndWorld_ClearCache(self)
-
-    def BodiesInAabb(self, callback):
-        return _newton.ndWorld_BodiesInAabb(self, callback)
-
-    def RayCast(self, callback, globalOrigin, globalDest):
-        return _newton.ndWorld_RayCast(self, callback, globalOrigin, globalDest)
-
-    def ConvexCast(self, callback, convexShape, globalOrigin, globalDest):
-        return _newton.ndWorld_ConvexCast(self, callback, convexShape, globalOrigin, globalDest)
-
-# Register ndWorld in _newton:
-_newton.ndWorld_swigregister(ndWorld)
+# Register NewtonWorld in _newton:
+_newton.NewtonWorld_swigregister(NewtonWorld)
 
 
 

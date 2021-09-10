@@ -11,21 +11,29 @@
 import bpy
 import newton
 
-newtonWorld = newton.ndWorld()
+#newtonWorld = newton.ndWorld()
+newtonWorld = newton.NewtonWorld()
 
 def NewtonStart(scene):
-    print("Start animation", scene.frame_current)
+    fps = scene.render.fps / scene.render.fps_base
+    #timestep = 1.0/fps
+    #print("nominal time step ", timestep)
+    newtonWorld.SetSubSteps(1.0/fps)
 
 def NewtonUpdate(scene):
-    print("Frame Change", scene.frame_current)
+    fps = scene.render.fps / scene.render.fps_base
+    #timestep = 1.0/fps
+    #print("Frame Change ", scene.frame_current, " timestep ", timestep)
+    newtonWorld.Update (1.0/fps)
+
 
 bpy.app.handlers.depsgraph_update_pre.append(NewtonStart)
 bpy.app.handlers.frame_change_pre.append(NewtonUpdate)
 
 
 class NewtonWorldProperties(bpy.types.PropertyGroup):
-    solverSubSteps: bpy.props.IntProperty(name= "solver substeps", description="number of solver sub step per ticks", default = 2, min=0, max=8)
-    solverIterations: bpy.props.IntProperty(name= "solver iterations", description="Set the number of solver iterations per sub step", default = 4, min=4, max=16)
+    solverNominalFps: bpy.props.FloatProperty(name= "solver fix fps", description="solve fix frames per seconds", default = 120, min=60, max=600)
+    solverIterations: bpy.props.IntProperty(name= "solver iterations", description="Set the number of solver iterations per step", default = 4, min=4, max=16)
     
     #my_float_vector : bpy.props.FloatVectorProperty(name= "Scale", soft_min= 0, soft_max= 1000, default= (1,1,1))
     #
@@ -37,17 +45,6 @@ class NewtonWorldProperties(bpy.types.PropertyGroup):
     #            ('OP3', "Add Suzanne", "")
     #    ]
     #)
-
-#class NewtonWorld(bpy.types.Object):
-#    """create an interface to the newton workd"""
-#
-#    def __init__(self, object):
-#        #print ("create manager one once")
-#        self.name = 'newton_world'
-#        self.world = newton.ndWorld()
-#
-#        #self.iterations = self.world.GetSolverIterations()
-#        #self.SetIterations(10)
 
 #class NewtonWorldCreateHomeObject(bpy.types.Operator):
 #    """Creates a newton world home"""
@@ -106,6 +103,7 @@ class NewtonWorldSetProperty(bpy.types.Operator):
         propertyGroup = scene.newton_world_properties
 
         # set all solve properties
-        newtonWorld.SetSubSteps(propertyGroup.solverSubSteps)
-        newtonWorld.SetSolverIterations(propertyGroup.solverIterations)
+        #newtonWorld.SetSubSteps(propertyGroup.solverSubSteps)
+        newtonWorld.SetTimestep(1.0 / propertyGroup.solverNominalFps)
+        newtonWorld.SetIterations(propertyGroup.solverIterations)
         return {'FINISHED'}

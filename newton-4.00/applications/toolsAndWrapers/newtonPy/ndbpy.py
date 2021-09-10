@@ -68,8 +68,8 @@ class NewtonWorldPanel(bpy.types.Panel):
 
         worldProperties = scene.newton_world_properties
         layout.label(text="Engine settings")
-        layout.prop(worldProperties, "solverSubSteps")
         layout.prop(worldProperties, "solverIterations")
+        layout.prop(worldProperties, "solverNominalFps")
         layout.operator("view3d.newton_world_set_property")
 
 classes = [
