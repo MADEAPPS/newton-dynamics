@@ -12,9 +12,14 @@ import bpy
 import newton
 
 newtonWorld = newton.ndWorld()
+
+def NewtonStart(scene):
+    print("Start animation", scene.frame_current)
+
 def NewtonUpdate(scene):
     print("Frame Change", scene.frame_current)
 
+bpy.app.handlers.depsgraph_update_pre.append(NewtonStart)
 bpy.app.handlers.frame_change_pre.append(NewtonUpdate)
 
 
