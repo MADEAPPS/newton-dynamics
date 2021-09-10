@@ -40,65 +40,54 @@ class NewtonWorldPanel(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "newton"
-
-    def findHome(self):
-        col = bpy.data.collections.get("Collection")
-        if col:
-            for obj in col.objects:
-                if obj.name == 'newtonHome':
-                    return obj
-        return None
     
     def draw(self, context):
         scene = context.scene
         layout = self.layout
         
-        world = scene.newton_world
-        if world is None:
-            newtonHome = self.findHome()
-            if newtonHome is None:
-                layout.operator("view3d.newton_world_create_home")
-            else:
-                layout.operator("view3d.newton_world_create")
-        else:
-            worldProperties = scene.newton_world_properties
+        #world = scene.newton_world
+        #if world is None:
+        #    newtonHome = self.findHome()
+        #    if newtonHome is None:
+        #        layout.operator("view3d.newton_world_create_home")
+        #    else:
+        #        layout.operator("view3d.newton_world_create")
+        #else:
+        #    worldProperties = scene.newton_world_properties
+        #
+        #    layout.operator("view3d.newton_world_destroy")
+        #    
+        #
+        #    #list engine parameters
+        #    layout.label(text="Engine Configuration")
+        #    #row = layout.row()
+        #    layout.prop(worldProperties, "solverSubSteps")
+        #    layout.prop(worldProperties, "solverIterations")
+        #    layout.operator("view3d.newton_world_set_property")
 
-            layout.operator("view3d.newton_world_destroy")
-            
 
-            #list engine parameters
-            layout.label(text="Engine Configuration")
-            #row = layout.row()
-            layout.prop(worldProperties, "solverSubSteps")
-            layout.prop(worldProperties, "solverIterations")
-
-            layout.operator("view3d.newton_world_set_property")
+        worldProperties = scene.newton_world_properties
+        layout.label(text="Engine settings")
+        layout.prop(worldProperties, "solverSubSteps")
+        layout.prop(worldProperties, "solverIterations")
+        layout.operator("view3d.newton_world_set_property")
 
 classes = [
     NewtonWorldPanel,
-    newtonWorld.NewtonWorldCreate,
-    newtonWorld.NewtonWorldDestroy,
     newtonWorld.NewtonWorldProperties,
     newtonWorld.NewtonWorldSetProperty,
-    newtonWorld.NewtonWorldCreateHomeObject
 ]
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-
-    bpy.types.Scene.newton_world = bpy.props.PointerProperty(type = bpy.types.Object, name = "newton world",)
     bpy.types.Scene.newton_world_properties = bpy.props.PointerProperty(type = newtonWorld.NewtonWorldProperties)
 
 
 def unregister():
-    del bpy.types.Scene.newton_world
     del bpy.types.Scene.newton_world_properties
-
     for cls in classes:
         bpy.utils.unregister_class(cls)
-
-
 
 if __name__ == "__main__":
     register()
