@@ -15,10 +15,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_PID_MAX_ANGLE	dFloat32 (120.0f * dDegreeToRad)
-#define D_PID_PENETRATION_RECOVERY_ANGULAR_SPEED dFloat32 (0.1f) 
-#define D_PID_PENETRATION_ANGULAR_LIMIT dFloat32 (10.0f * dDegreeToRad) 
-
 class ndJointPdActuator : public ndJointBilateralConstraint
 {
 	public:

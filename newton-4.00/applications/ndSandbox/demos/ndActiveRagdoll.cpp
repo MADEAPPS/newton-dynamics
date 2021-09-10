@@ -366,6 +366,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	playerMatrix = dYawMatrix(angle) * playerMatrix;
 	dVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-5.0f));
 	origin.m_y += 1.0f;
+	origin.m_z -= 3.0f;
 	scene->SetCameraMatrix(playerMatrix, origin);
 
 	//ndLoadSave loadScene;

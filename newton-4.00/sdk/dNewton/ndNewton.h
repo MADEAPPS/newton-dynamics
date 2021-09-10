@@ -61,6 +61,7 @@
 #include <ndContactNotify.h>
 #include <ndCharacterPose.h>
 #include <ndDynamicsUpdate.h>
+#include <ndJointTwoBodyIK.h>
 #include <ndJointPdActuator.h>
 #include <ndJointFollowPath.h>
 #include <ndBodyParticleSet.h>
