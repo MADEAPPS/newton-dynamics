@@ -1,0 +1,33 @@
+/* Copyright (c) <2003-2021> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+
+#ifndef __D_JOINT_INVERSE_DYNAMICS_BASE_H__
+#define __D_JOINT_INVERSE_DYNAMICS_BASE_H__
+
+#include "ndNewtonStdafx.h"
+#include "ndJointBilateralConstraint.h"
+
+
+class ndJointInverseDynamicsBase: public ndJointBilateralConstraint
+{
+	public:
+	D_CLASS_REFLECTION(ndJointInverseDynamicsBase);
+	D_NEWTON_API ndJointInverseDynamicsBase(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointInverseDynamicsBase(dInt32 dof, const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndJointInverseDynamicsBase();
+
+	protected:
+	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+};
+
+
+#endif 
+

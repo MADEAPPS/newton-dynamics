@@ -24,9 +24,10 @@
 
 #include "ndNewtonStdafx.h"
 #include "ndCharacterLimbNode.h"
+#include "ndJointInverseDynamicsBase.h"
 
-class ndJointTwoBodyIK;
-class ndJointBilateralConstraint;
+//class ndJointInverseDynamicsBase;
+//class ndJointBilateralConstraint;
 
 class ndCharacterEffectorNode: public ndCharacterLimbNode
 {
@@ -50,13 +51,13 @@ class ndCharacterEffectorNode: public ndCharacterLimbNode
 
 	void Debug(ndConstraintDebugCallback& context) const;
 
-	ndJointTwoBodyIK* m_effector;
 	ndCharacterLimbNode* m_referenceNode;
+	ndJointInverseDynamicsBase* m_effector;
 };
 
 inline ndJointBilateralConstraint* ndCharacterEffectorNode::GetJoint() const
 {
-	return (ndJointBilateralConstraint*)m_effector;
+	return m_effector;
 }
 
 inline ndBodyDynamic* ndCharacterEffectorNode::GetBody() const

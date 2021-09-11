@@ -13,13 +13,9 @@
 #define __D_JOINT_TWO_BODY_IK_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndJointBilateralConstraint.h"
+#include "ndJointInverseDynamicsBase.h"
 
-#define D_PID_MAX_ANGLE	dFloat32 (120.0f * dDegreeToRad)
-#define D_PID_PENETRATION_RECOVERY_ANGULAR_SPEED dFloat32 (0.1f) 
-#define D_PID_PENETRATION_ANGULAR_LIMIT dFloat32 (10.0f * dDegreeToRad) 
-
-class ndJointTwoBodyIK: public ndJointBilateralConstraint
+class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 {
 	public:
 	D_CLASS_REFLECTION(ndJointTwoBodyIK);

@@ -13,13 +13,16 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointTwoBodyIK.h"
 
-#define D_SMALL_DISTANCE_ERROR dFloat32 (1.0e-2f)
-#define D_SMALL_DISTANCE_ERROR2 (D_SMALL_DISTANCE_ERROR * D_SMALL_DISTANCE_ERROR)
+#define D_TBIK_MAX_ANGLE	dFloat32 (120.0f * dDegreeToRad)
+#define D_TBIK_PENETRATION_RECOVERY_ANGULAR_SPEED dFloat32 (0.1f) 
+#define D_TBIK_PENETRATION_ANGULAR_LIMIT dFloat32 (10.0f * dDegreeToRad) 
+#define D_TBIK_SMALL_DISTANCE_ERROR dFloat32 (1.0e-2f)
+#define D_TBIK_SMALL_DISTANCE_ERROR2 (D_TBIK_SMALL_DISTANCE_ERROR * D_TBIK_SMALL_DISTANCE_ERROR)
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointTwoBodyIK)
 
 ndJointTwoBodyIK::ndJointTwoBodyIK(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
+	:ndJointInverseDynamicsBase(6, pinAndPivotFrame, child, parent)
 	,m_referenceFrameBody1(m_localMatrix1)
 	,m_offsetPosition(dVector::m_zero)
 	,m_maxConeAngle(dFloat32(1.0e10f))
@@ -35,11 +38,11 @@ ndJointTwoBodyIK::ndJointTwoBodyIK(const dMatrix& pinAndPivotFrame, ndBodyKinema
 	dVector offset(m_referenceFrameBody1.m_posit & dVector::m_triplexMask);
 	m_maxDist = dSqrt (offset.DotProduct(offset).GetScalar());
 
-	SetTargetOffset(dVector(-0.2f, -0.0f, 0.0f, 0.0f));
+	SetTargetOffset(dVector(0.0f, 0.2f, 0.0f, 0.0f));
 }
 
 ndJointTwoBodyIK::ndJointTwoBodyIK(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+	:ndJointInverseDynamicsBase(dLoadSaveBase::dLoadDescriptor(desc))
 	,m_referenceFrameBody1(dGetIdentityMatrix())
 	,m_offsetPosition(dVector::m_zero)
 	,m_maxConeAngle(dFloat32(1.0e10f))
@@ -123,7 +126,7 @@ ndJointTwoBodyIK::~ndJointTwoBodyIK()
 
 //void ndJointTwoBodyIK::SetConeLimit(dFloat32 maxConeAngle)
 //{
-//	m_maxConeAngle = dMin (dAbs(maxConeAngle), D_PID_MAX_ANGLE * dFloat32 (0.999f));
+//	m_maxConeAngle = dMin (dAbs(maxConeAngle), D_TBIK_MAX_ANGLE * dFloat32 (0.999f));
 //}
 
 //dVector ndJointTwoBodyIK::GetTargetPosition() const
@@ -166,7 +169,6 @@ void ndJointTwoBodyIK::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 	dMatrix matrix0;
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
-	//matrix1 = m_referenceFrameBody1 * m_body1->GetMatrix();
 	matrix1 = CalculateBaseMatrix() * m_body1->GetMatrix();
 
 	debugCallback.DrawFrame(matrix0);
@@ -228,7 +230,7 @@ void ndJointTwoBodyIK::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 	}
 
 	// show cone angle limits
-	if ((m_maxConeAngle > dFloat32(0.0f)) && (m_maxConeAngle < D_PID_MAX_ANGLE))
+	if ((m_maxConeAngle > dFloat32(0.0f)) && (m_maxConeAngle < D_TBIK_MAX_ANGLE))
 	{
 		dVector color(dFloat32(0.3f), dFloat32(0.8f), dFloat32(0.0f), dFloat32(0.0f));
 		dVector point(radius * dCos(m_maxConeAngle), radius * dSin(m_maxConeAngle), dFloat32 (0.0f), dFloat32(0.0f));
@@ -293,7 +295,7 @@ void ndJointTwoBodyIK::SubmitTwistLimits(const dVector& pin, dFloat32 angle, ndC
 			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const dFloat32 penetration = angle - m_minTwistAngle;
-			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_PID_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
+			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_TBIK_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_TBIK_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetLowerFriction(desc, dFloat32(0.0f));
 		}
@@ -302,7 +304,7 @@ void ndJointTwoBodyIK::SubmitTwistLimits(const dVector& pin, dFloat32 angle, ndC
 			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const dFloat32 penetration = angle - m_maxTwistAngle;
-			const dFloat32 recoveringAceel = desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_PID_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
+			const dFloat32 recoveringAceel = desc.m_invTimestep * D_TBIK_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_TBIK_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetHighFriction(desc, dFloat32(0.0f));
 		}
@@ -324,7 +326,7 @@ void ndJointTwoBodyIK::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& 
 		AddAngularRowJacobian(desc, lateralDir, 0.0f);
 		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		const dFloat32 penetration = coneAngle - m_maxConeAngle;
-		const dFloat32 recoveringAceel = desc.m_invTimestep * D_PID_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_PID_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
+		const dFloat32 recoveringAceel = desc.m_invTimestep * D_TBIK_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_TBIK_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
 		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 		SetHighFriction(desc, dFloat32(0.0f));
 	}
@@ -406,7 +408,7 @@ void ndJointTwoBodyIK::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix&
 	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 	
 	const dVector step(matrix0.m_posit - matrix1.m_posit);
-	if (step.DotProduct(step).GetScalar() <= D_SMALL_DISTANCE_ERROR2)
+	if (step.DotProduct(step).GetScalar() <= D_TBIK_SMALL_DISTANCE_ERROR2)
 	{
 		// Cartesian motion
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
@@ -432,7 +434,7 @@ void ndJointTwoBodyIK::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix&
 
 void ndJointTwoBodyIK::SetTargetOffset(const dVector& offset)
 {
-	dVector posit(dVector::m_triplexMask & (m_referenceFrameBody1.m_posit + offset));
+	dVector posit(dVector::m_triplexMask & m_referenceFrameBody1.TransformVector(offset & dVector::m_triplexMask));
 	dFloat32 mag2 = posit.DotProduct(posit).GetScalar();
 	if (mag2 > (m_maxDist * m_maxDist))
 	{
