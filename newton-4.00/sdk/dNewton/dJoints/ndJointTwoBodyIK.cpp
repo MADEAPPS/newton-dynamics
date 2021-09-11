@@ -38,7 +38,7 @@ ndJointTwoBodyIK::ndJointTwoBodyIK(const dMatrix& pinAndPivotFrame, ndBodyKinema
 	dVector offset(m_referenceFrameBody1.m_posit & dVector::m_triplexMask);
 	m_maxDist = dSqrt (offset.DotProduct(offset).GetScalar());
 
-	SetTargetOffset(dVector(0.0f, 0.2f, 0.0f, 0.0f));
+SetTargetOffset(dVector(0.0f, 0.2f, 0.4f, 0.0f));
 }
 
 ndJointTwoBodyIK::ndJointTwoBodyIK(const dLoadSaveBase::dLoadDescriptor& desc)
@@ -253,133 +253,133 @@ void ndJointTwoBodyIK::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 	}
 }
 
-void ndJointTwoBodyIK::SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
-{
-	dFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
-	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
-	if (coneAngle >= m_maxConeAngle)
-	{
-		dAssert(m_maxConeAngle == dFloat32(0.0f));
-		//this is a hinge joint
-		AddAngularRowJacobian(desc, matrix0.m_front, -pitchAngle);
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-
-		// apply cone limits
-		// two rows to restrict rotation around the parent coordinate system
-		dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-		AddAngularRowJacobian(desc, matrix1.m_up, angle0);
-
-		dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
-		AddAngularRowJacobian(desc, matrix1.m_right, angle1);
-	}
-	else
-	{
-		SubmitPidRotation(matrix0, matrix1, desc);
-	}
-
-	SubmitTwistLimits(matrix0.m_front, pitchAngle, desc);
-}
-
-void ndJointTwoBodyIK::SubmitTwistLimits(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc)
-{
-	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * dDegreeToRad))
-	{
-		AddAngularRowJacobian(desc, pin, -angle);
-		// force this limit to be bound
-		SetLowerFriction(desc, D_LCP_MAX_VALUE * dFloat32 (0.1f));
-	}
-	else
-	{
-		if (angle < m_minTwistAngle)
-		{
-			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
-			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-			const dFloat32 penetration = angle - m_minTwistAngle;
-			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_TBIK_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_TBIK_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
-			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
-			SetLowerFriction(desc, dFloat32(0.0f));
-		}
-		else if (angle >= m_maxTwistAngle)
-		{
-			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
-			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-			const dFloat32 penetration = angle - m_maxTwistAngle;
-			const dFloat32 recoveringAceel = desc.m_invTimestep * D_TBIK_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_TBIK_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
-			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
-			SetHighFriction(desc, dFloat32(0.0f));
-		}
-	}
-}
-
-void ndJointTwoBodyIK::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
-{
-	SubmitPidRotation(matrix0, matrix1, desc);
-
-	dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
-	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
-	lateralDir = lateralDir.Normalize();
-	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
-	dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
-
-	if (coneAngle > m_maxConeAngle)
-	{
-		AddAngularRowJacobian(desc, lateralDir, 0.0f);
-		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-		const dFloat32 penetration = coneAngle - m_maxConeAngle;
-		const dFloat32 recoveringAceel = desc.m_invTimestep * D_TBIK_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_TBIK_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
-		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
-		SetHighFriction(desc, dFloat32(0.0f));
-	}
-
-	dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
-	dFloat32 pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
-	SubmitTwistLimits(matrix0.m_front, pitchAngle, desc);
-}
-
-void ndJointTwoBodyIK::SubmitPidRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
-{
-	dQuaternion q0(matrix0);
-	dQuaternion q1(matrix1);
-	if (q1.DotProduct(q0).GetScalar() < dFloat32(0.0f))
-	{
-		q1 = q1.Scale (dFloat32 (-1.0f));
-	}
-
-	dQuaternion dq(q1.Inverse() * q0);
-	dVector pin(dq.m_x, dq.m_y, dq.m_z, dFloat32(0.0f));
-
-	dFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
-	if (dirMag2 > dFloat32(dFloat32(1.0e-7f)))
-	{
-		dFloat32 dirMag = dSqrt(dirMag2);
-		pin = pin.Scale(dFloat32(1.0f) / dirMag);
-		dFloat32 angle = dFloat32(2.0f) * dAtan2(dirMag, dq.m_w);
-
-		dMatrix basis(pin);
-		AddAngularRowJacobian(desc, basis[0], -angle);
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-
-		AddAngularRowJacobian(desc, basis[1], dFloat32 (0.0f));
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-
-		AddAngularRowJacobian(desc, basis[2], dFloat32(0.0f));
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-	}
-	else
-	{
-		dFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
-		AddAngularRowJacobian(desc, matrix1[0], pitchAngle);
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-		
-		dFloat32 yawAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[1]);
-		AddAngularRowJacobian(desc, matrix1[1], yawAngle);
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-		
-		dFloat32 rollAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[2]);
-		AddAngularRowJacobian(desc, matrix1[2], rollAngle);
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
-	}
-}
+//void ndJointTwoBodyIK::SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+//{
+//	dFloat32 pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
+//	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
+//	if (coneAngle >= m_maxConeAngle)
+//	{
+//		dAssert(m_maxConeAngle == dFloat32(0.0f));
+//		//this is a hinge joint
+//		AddAngularRowJacobian(desc, matrix0.m_front, -pitchAngle);
+//		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+//
+//		// apply cone limits
+//		// two rows to restrict rotation around the parent coordinate system
+//		dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+//		AddAngularRowJacobian(desc, matrix1.m_up, angle0);
+//
+//		dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+//		AddAngularRowJacobian(desc, matrix1.m_right, angle1);
+//	}
+//	else
+//	{
+//		SubmitPidRotation(matrix0, matrix1, desc);
+//	}
+//
+//	SubmitTwistLimits(matrix0.m_front, pitchAngle, desc);
+//}
+//
+//void ndJointTwoBodyIK::SubmitTwistLimits(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc)
+//{
+//	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * dDegreeToRad))
+//	{
+//		AddAngularRowJacobian(desc, pin, -angle);
+//		// force this limit to be bound
+//		SetLowerFriction(desc, D_LCP_MAX_VALUE * dFloat32 (0.1f));
+//	}
+//	else
+//	{
+//		if (angle < m_minTwistAngle)
+//		{
+//			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
+//			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+//			const dFloat32 penetration = angle - m_minTwistAngle;
+//			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_TBIK_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_TBIK_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
+//			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+//			SetLowerFriction(desc, dFloat32(0.0f));
+//		}
+//		else if (angle >= m_maxTwistAngle)
+//		{
+//			AddAngularRowJacobian(desc, pin, dFloat32(0.0f));
+//			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+//			const dFloat32 penetration = angle - m_maxTwistAngle;
+//			const dFloat32 recoveringAceel = desc.m_invTimestep * D_TBIK_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_TBIK_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
+//			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+//			SetHighFriction(desc, dFloat32(0.0f));
+//		}
+//	}
+//}
+//
+//void ndJointTwoBodyIK::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+//{
+//	SubmitPidRotation(matrix0, matrix1, desc);
+//
+//	dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+//	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
+//	lateralDir = lateralDir.Normalize();
+//	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
+//	dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+//
+//	if (coneAngle > m_maxConeAngle)
+//	{
+//		AddAngularRowJacobian(desc, lateralDir, 0.0f);
+//		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+//		const dFloat32 penetration = coneAngle - m_maxConeAngle;
+//		const dFloat32 recoveringAceel = desc.m_invTimestep * D_TBIK_PENETRATION_RECOVERY_ANGULAR_SPEED * dMin(dAbs(penetration / D_TBIK_PENETRATION_ANGULAR_LIMIT), dFloat32(1.0f));
+//		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+//		SetHighFriction(desc, dFloat32(0.0f));
+//	}
+//
+//	dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+//	dFloat32 pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
+//	SubmitTwistLimits(matrix0.m_front, pitchAngle, desc);
+//}
+//
+//void ndJointTwoBodyIK::SubmitPidRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+//{
+//	dQuaternion q0(matrix0);
+//	dQuaternion q1(matrix1);
+//	if (q1.DotProduct(q0).GetScalar() < dFloat32(0.0f))
+//	{
+//		q1 = q1.Scale (dFloat32 (-1.0f));
+//	}
+//
+//	dQuaternion dq(q1.Inverse() * q0);
+//	dVector pin(dq.m_x, dq.m_y, dq.m_z, dFloat32(0.0f));
+//
+//	dFloat32 dirMag2 = pin.DotProduct(pin).GetScalar();
+//	if (dirMag2 > dFloat32(dFloat32(1.0e-7f)))
+//	{
+//		dFloat32 dirMag = dSqrt(dirMag2);
+//		pin = pin.Scale(dFloat32(1.0f) / dirMag);
+//		dFloat32 angle = dFloat32(2.0f) * dAtan2(dirMag, dq.m_w);
+//
+//		dMatrix basis(pin);
+//		AddAngularRowJacobian(desc, basis[0], -angle);
+//		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+//
+//		AddAngularRowJacobian(desc, basis[1], dFloat32 (0.0f));
+//		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+//
+//		AddAngularRowJacobian(desc, basis[2], dFloat32(0.0f));
+//		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+//	}
+//	else
+//	{
+//		dFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
+//		AddAngularRowJacobian(desc, matrix1[0], pitchAngle);
+//		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+//		
+//		dFloat32 yawAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[1]);
+//		AddAngularRowJacobian(desc, matrix1[1], yawAngle);
+//		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+//		
+//		dFloat32 rollAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[2]);
+//		AddAngularRowJacobian(desc, matrix1[2], rollAngle);
+//		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+//	}
+//}
 
 void ndJointTwoBodyIK::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
@@ -461,15 +461,15 @@ void ndJointTwoBodyIK::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix&
 void ndJointTwoBodyIK::SubmitAngularLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
 return;
-	dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
-	if (cosAngleCos >= dFloat32(0.998f))
-	{
-		// special case where the front axis are almost aligned
-		// solve by using Cartesian approximation
-		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
-	}
-	else
-	{
-		SubmitAngularAxis(matrix0, matrix1, desc);
-	}
+	//dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
+	//if (cosAngleCos >= dFloat32(0.998f))
+	//{
+	//	// special case where the front axis are almost aligned
+	//	// solve by using Cartesian approximation
+	//	SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
+	//}
+	//else
+	//{
+	//	SubmitAngularAxis(matrix0, matrix1, desc);
+	//}
 }
