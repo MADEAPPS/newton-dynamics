@@ -55,23 +55,45 @@ ndJointTwoBodyIK::ndJointTwoBodyIK(const dLoadSaveBase::dLoadDescriptor& desc)
 	,m_linearDamper(dFloat32(50.0f))
 	,m_linearRegularizer(dFloat32(5.0e-3f))
 {
-	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-
-	m_referenceFrameBody1 = xmlGetMatrix(xmlNode, "referenceFrameBody1");
-	m_maxConeAngle = xmlGetFloat (xmlNode, "maxConeAngle");
-	m_minTwistAngle = xmlGetFloat (xmlNode, "minTwistAngle");
-	m_maxTwistAngle = xmlGetFloat (xmlNode, "maxTwistAngle");
-	m_angularSpring = xmlGetFloat (xmlNode, "angularSpring");
-	m_angularDamper = xmlGetFloat (xmlNode, "angularDamper");
-	m_angularRegularizer = xmlGetFloat (xmlNode, "angularRegularizer");
-
-	m_linearSpring = xmlGetFloat(xmlNode, "linearSpring");
-	m_linearDamper = xmlGetFloat(xmlNode, "linearDamper");
-	m_linearRegularizer = xmlGetFloat(xmlNode, "linearRegularizer");
+	dAssert(0);
+	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	//
+	//m_referenceFrameBody1 = xmlGetMatrix(xmlNode, "referenceFrameBody1");
+	//m_maxConeAngle = xmlGetFloat (xmlNode, "maxConeAngle");
+	//m_minTwistAngle = xmlGetFloat (xmlNode, "minTwistAngle");
+	//m_maxTwistAngle = xmlGetFloat (xmlNode, "maxTwistAngle");
+	//m_angularSpring = xmlGetFloat (xmlNode, "angularSpring");
+	//m_angularDamper = xmlGetFloat (xmlNode, "angularDamper");
+	//m_angularRegularizer = xmlGetFloat (xmlNode, "angularRegularizer");
+	//
+	//m_linearSpring = xmlGetFloat(xmlNode, "linearSpring");
+	//m_linearDamper = xmlGetFloat(xmlNode, "linearDamper");
+	//m_linearRegularizer = xmlGetFloat(xmlNode, "linearRegularizer");
 }
 
 ndJointTwoBodyIK::~ndJointTwoBodyIK()
 {
+}
+
+void ndJointTwoBodyIK::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointInverseDynamicsBase::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	dAssert(0);
+	//xmlSaveParam(childNode, "referenceFrameBody1", m_referenceFrameBody1);
+	//xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
+	//xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
+	//xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
+	//xmlSaveParam(childNode, "angularSpring", m_angularSpring);
+	//xmlSaveParam(childNode, "angularDamper", m_angularDamper);
+	//xmlSaveParam(childNode, "angularRegularizer", m_angularRegularizer);
+	//
+	//xmlSaveParam(childNode, "linearSpring", m_linearSpring);
+	//xmlSaveParam(childNode, "linearDamper", m_linearDamper);
+	//xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
 }
 
 //dMatrix ndJointTwoBodyIK::GetTargetRotation() const
@@ -381,25 +403,7 @@ void ndJointTwoBodyIK::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 //	}
 //}
 
-void ndJointTwoBodyIK::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
-	xmlSaveParam(childNode, "referenceFrameBody1", m_referenceFrameBody1);
-	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
-	xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
-	xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
-	xmlSaveParam(childNode, "angularSpring", m_angularSpring);
-	xmlSaveParam(childNode, "angularDamper", m_angularDamper);
-	xmlSaveParam(childNode, "angularRegularizer", m_angularRegularizer);
-
-	xmlSaveParam(childNode, "linearSpring", m_linearSpring);
-	xmlSaveParam(childNode, "linearDamper", m_linearDamper);
-	xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
-}
 
 void ndJointTwoBodyIK::SetTargetOffset(const dVector& offset)
 {
