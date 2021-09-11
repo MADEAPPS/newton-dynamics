@@ -67,6 +67,9 @@ class ndCharacter: public ndModel
 	//void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 	//void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
 
+	D_NEWTON_API void AddAttachment(ndJointBilateralConstraint* const joint);
+	D_NEWTON_API void RemoveAttachment(ndJointBilateralConstraint* const joint);
+
 	protected:
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	D_NEWTON_API virtual void Update(ndWorld* const world, dFloat32 timestep);
@@ -75,6 +78,7 @@ class ndCharacter: public ndModel
 	
 	ndCharacterRootNode* m_rootNode;
 	ndCharacterPoseController* m_controller;
+	dList<ndJointBilateralConstraint*> m_extraJointsAttachmentList;
 };
 
 inline ndCharacter* ndCharacter::GetAsCharacter()

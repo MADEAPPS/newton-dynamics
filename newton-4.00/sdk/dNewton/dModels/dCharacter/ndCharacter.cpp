@@ -65,6 +65,12 @@ ndCharacter::ndCharacter(const dLoadSaveBase::dLoadDescriptor& desc)
 
 ndCharacter::~ndCharacter()
 {
+	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointsAttachmentList.GetFirst(); node; node = node->GetNext())
+	{
+		ndJointBilateralConstraint* const joint = node->GetInfo();
+		delete joint;
+	}
+
 	if (m_rootNode)
 	{
 		delete m_rootNode;
@@ -243,6 +249,23 @@ void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 		m_controller->Debug(context);
 	}
 	context.SetScale(scale);
+}
+
+void ndCharacter::AddAttachment(ndJointBilateralConstraint* const joint)
+{
+	m_extraJointsAttachmentList.Append(joint);
+}
+
+void ndCharacter::RemoveAttachment(ndJointBilateralConstraint* const joint)
+{
+	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointsAttachmentList.GetFirst(); node; node = node->GetNext())
+	{
+		if (node->GetInfo() == joint)
+		{
+			m_extraJointsAttachmentList.Remove(node);
+			break;
+		}
+	}
 }
 
 //void ndCharacter::UpdateGlobalPose(ndWorld* const world, dFloat32 timestep)

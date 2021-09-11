@@ -15,9 +15,11 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointInverseDynamicsBase)
 
-ndJointInverseDynamicsBase::ndJointInverseDynamicsBase(dInt32 dof, const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-	:ndJointBilateralConstraint(dof, child, parent, pinAndPivotFrame)
+ndJointInverseDynamicsBase::ndJointInverseDynamicsBase(dInt32 dof, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+	:ndJointBilateralConstraint(dof, child, parent, dGetIdentityMatrix())
 {
+	m_localMatrix0 = dGetIdentityMatrix();
+	m_localMatrix1 = dGetIdentityMatrix();
 }
 
 ndJointInverseDynamicsBase::ndJointInverseDynamicsBase(const dLoadSaveBase::dLoadDescriptor& desc)

@@ -21,7 +21,7 @@ class ndJointInverseDynamicsBase: public ndJointBilateralConstraint
 	public:
 	D_CLASS_REFLECTION(ndJointInverseDynamicsBase);
 	D_NEWTON_API ndJointInverseDynamicsBase(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndJointInverseDynamicsBase(dInt32 dof, const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointInverseDynamicsBase(dInt32 dof, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointInverseDynamicsBase();
 
 	protected:
