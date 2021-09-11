@@ -62,8 +62,10 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	//void SubmitPidRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	//void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
+	dMatrix m_coneRotation;
 	dMatrix m_referenceFrameBody1;
 	dVector m_offsetPosition;
+	
 
 	dFloat32 m_angle;
 	dFloat32 m_minAngle;

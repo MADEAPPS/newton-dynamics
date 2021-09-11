@@ -28,10 +28,10 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterForwardDynamicNode)
 
-ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
+ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
 	:ndCharacterLimbNode(parent)
 	,m_body(body)
-	,m_joint(new ndJointPdActuator(matrixInGlobalScape, body, parent->GetBody()))
+	,m_joint(new ndJointPdActuator(matrixInGlobalSpace, body, parent->GetBody()))
 {
 }
 

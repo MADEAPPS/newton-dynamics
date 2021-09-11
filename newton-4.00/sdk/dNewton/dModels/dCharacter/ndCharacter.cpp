@@ -151,21 +151,21 @@ ndCharacterRootNode* ndCharacter::CreateRoot(ndBodyDynamic* const body)
 	return m_rootNode;
 }
 
-ndCharacterForwardDynamicNode* ndCharacter::CreateForwardDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
+ndCharacterForwardDynamicNode* ndCharacter::CreateForwardDynamicLimb(const dMatrix& matrixInGlobalSpase, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
 {
-	ndCharacterForwardDynamicNode* const limb = new ndCharacterForwardDynamicNode(matrixInGlobalScape, body, parent);
+	ndCharacterForwardDynamicNode* const limb = new ndCharacterForwardDynamicNode(matrixInGlobalSpase, body, parent);
 	return limb;
 }
 
-ndCharacterInverseDynamicNode* ndCharacter::CreateInverseDynamicLimb(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
+ndCharacterInverseDynamicNode* ndCharacter::CreateInverseDynamicLimb(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
 {
-	ndCharacterInverseDynamicNode* const limb = new ndCharacterInverseDynamicNode(matrixInGlobalScape, body, parent);
+	ndCharacterInverseDynamicNode* const limb = new ndCharacterInverseDynamicNode(matrixInGlobalSpace, body, parent);
 	return limb;
 }
 
-ndCharacterEffectorNode* ndCharacter::CreateInverseDynamicEffector(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const parent)
+ndCharacterEffectorNode* ndCharacter::CreateInverseDynamicEffector(const dMatrix& matrixInGlobalSpace, ndCharacterLimbNode* const parent)
 {
-	ndCharacterEffectorNode* const effector = new ndCharacterEffectorNode(matrixInGlobalScape, parent);
+	ndCharacterEffectorNode* const effector = new ndCharacterEffectorNode(matrixInGlobalSpace, parent);
 	return effector;
 }
 

@@ -201,8 +201,16 @@ class ndActiveRagdollModel : public ndCharacter
 					{
 						dMatrix effectorMatrix(childEntity->GetCurrentMatrix() * parentBone->GetBody()->GetMatrix());
 						ndCharacterEffectorNode* const effectorNode = CreateInverseDynamicEffector(effectorMatrix, parentBone);
-						ndJointPdActuator* const effectorJoint = (ndJointPdActuator*)effectorNode->GetJoint();
-						effectorJoint->SetLinearSpringDamperRegularizer(definition.m_jointData.m_spring, definition.m_jointData.m_damper, definition.m_jointData.m_regularizer);
+						if (strcmp(effectorNode->GetJoint()->SubClassName(), "ndJointTwoBodyIK") == 0)
+						{
+							//ndJointTwoBodyIK* const effectorJoint = (ndJointTwoBodyIK*)effectorNode->GetJoint();
+							//effectorJoint->SetLinearSpringDamperRegularizer(definition.m_jointData.m_spring, definition.m_jointData.m_damper, definition.m_jointData.m_regularizer);
+						}
+						else
+						{
+							dAssert(0);
+						}
+						
 
 						if (strstr(name, "right"))
 						{

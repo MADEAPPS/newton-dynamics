@@ -30,7 +30,7 @@ class ndCharacterInverseDynamicNode: public ndCharacterLimbNode
 	public:
 	D_CLASS_REFLECTION(ndCharacterInverseDynamicNode);
 	D_NEWTON_API ndCharacterInverseDynamicNode(const ndCharacterLoadDescriptor& desc);
-	D_NEWTON_API ndCharacterInverseDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
+	D_NEWTON_API ndCharacterInverseDynamicNode(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterInverseDynamicNode ();
 
 	virtual ndBodyDynamic* GetBody() const;

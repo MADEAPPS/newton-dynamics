@@ -28,10 +28,10 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterInverseDynamicNode)
 
-ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const dMatrix& matrixInGlobalScape, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
+ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
 	:ndCharacterLimbNode(parent)
 	,m_body(body)
-	,m_joint(new ndJointBallAndSocket(matrixInGlobalScape, body, parent->GetBody()))
+	,m_joint(new ndJointBallAndSocket(matrixInGlobalSpace, body, parent->GetBody()))
 {
 }
 

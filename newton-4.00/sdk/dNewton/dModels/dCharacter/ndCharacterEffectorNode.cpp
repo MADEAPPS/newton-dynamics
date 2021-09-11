@@ -28,13 +28,13 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterEffectorNode)
 
-ndCharacterEffectorNode::ndCharacterEffectorNode(const dMatrix& matrixInGlobalScape, ndCharacterLimbNode* const parentBone)
+ndCharacterEffectorNode::ndCharacterEffectorNode(const dMatrix& matrixInGlobalSpace, ndCharacterLimbNode* const parentBone)
 	:ndCharacterLimbNode(parentBone)
 	,m_referenceNode(parentBone->GetParent()->GetParent())
 {
 	ndBodyDynamic* const body0 = parentBone->GetBody();
 	ndBodyDynamic* const body1 = m_referenceNode->GetBody();
-	m_effector = new ndJointTwoBodyIK(matrixInGlobalScape, body0, body1);
+	m_effector = new ndJointTwoBodyIK(matrixInGlobalSpace, body0, body1);
 }
 
 ndCharacterEffectorNode::ndCharacterEffectorNode(const ndCharacterLoadDescriptor& desc)
