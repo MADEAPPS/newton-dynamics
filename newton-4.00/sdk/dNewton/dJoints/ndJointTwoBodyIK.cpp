@@ -401,12 +401,38 @@ void ndJointTwoBodyIK::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
 }
 
+void ndJointTwoBodyIK::SetTargetOffset(const dVector& offset)
+{
+	dVector posit(dVector::m_triplexMask & m_referenceFrameBody1.TransformVector(offset & dVector::m_triplexMask));
+	dFloat32 mag2 = posit.DotProduct(posit).GetScalar();
+	if (mag2 > (m_maxDist * m_maxDist))
+	{
+		posit = posit.Normalize().Scale(m_maxDist);
+	}
+	m_offsetPosition = (posit - m_referenceFrameBody1.m_posit) & dVector::m_triplexMask;
+}
+
+dMatrix ndJointTwoBodyIK::CalculateBaseMatrix() const
+{
+	dMatrix matrix (m_referenceFrameBody1);
+	matrix.m_posit += m_offsetPosition;
+	return matrix;
+}
+
+void ndJointTwoBodyIK::JacobianDerivative(ndConstraintDescritor& desc)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+
+	m_localMatrix1 = CalculateBaseMatrix();
+
+	CalculateGlobalMatrix(matrix0, matrix1);
+	SubmitAngularLimits(matrix0, matrix1, desc);
+	SubmitLinearLimits(matrix0, matrix1, desc);
+}
+
 void ndJointTwoBodyIK::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
-	
 	const dVector step(matrix0.m_posit - matrix1.m_posit);
 	if (step.DotProduct(step).GetScalar() <= D_TBIK_SMALL_DISTANCE_ERROR2)
 	{
@@ -432,33 +458,8 @@ void ndJointTwoBodyIK::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix&
 	}
 }
 
-void ndJointTwoBodyIK::SetTargetOffset(const dVector& offset)
+void ndJointTwoBodyIK::SubmitAngularLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	dVector posit(dVector::m_triplexMask & m_referenceFrameBody1.TransformVector(offset & dVector::m_triplexMask));
-	dFloat32 mag2 = posit.DotProduct(posit).GetScalar();
-	if (mag2 > (m_maxDist * m_maxDist))
-	{
-		posit = posit.Normalize().Scale(m_maxDist);
-	}
-	m_offsetPosition = (posit - m_referenceFrameBody1.m_posit) & dVector::m_triplexMask;
-}
-
-dMatrix ndJointTwoBodyIK::CalculateBaseMatrix() const
-{
-	dMatrix matrix (m_referenceFrameBody1);
-	matrix.m_posit += m_offsetPosition;
-	return matrix;
-}
-
-void ndJointTwoBodyIK::JacobianDerivative(ndConstraintDescritor& desc)
-{
-	dMatrix matrix0;
-	dMatrix matrix1;
-
-	m_localMatrix1 = CalculateBaseMatrix();
-	CalculateGlobalMatrix(matrix0, matrix1);
-	SubmitLinearLimits(matrix0, matrix1, desc);
-
 return;
 	dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
 	if (cosAngleCos >= dFloat32(0.998f))
