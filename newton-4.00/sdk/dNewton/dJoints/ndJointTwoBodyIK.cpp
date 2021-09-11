@@ -110,10 +110,6 @@ void ndJointTwoBodyIK::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 //	m_localMatrix1 = tmp;
 //}
 
-//const dMatrix& ndJointTwoBodyIK::GetReferenceMatrix() const
-//{
-//	return m_referenceFrameBody1;
-//}
 
 //void ndJointTwoBodyIK::GetAngularSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const
 //{

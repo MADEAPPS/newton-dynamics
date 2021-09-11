@@ -23,9 +23,9 @@
 #include "ndNewtonStdafx.h"
 #include "ndCharacter.h"
 #include "ndBodyDynamic.h"
+#include "ndJointTwoBodyIK.h"
 #include "ndCharacterRootNode.h"
 #include "ndCharacterIdlePose.h"
-#include "ndJointPid6dofActuator.h"
 #include "ndCharacterEffectorNode.h"
 #include "ndCharacterPoseGenerator.h"
 #include "ndCharacterBipedPoseController.h"
@@ -62,14 +62,14 @@ ndCharaterKeyFramePose ndCharacterIdlePose::CalculateFeetKeyFrame(const dVector&
 {
 	const ndCharacter* const character = m_owner->GetCharacter();
 	ndCharacterRootNode* const rootNode = character->GetRootNode();
-
+	
 	dMatrix rootMatrix(rootNode->GetBody()->GetMatrix());
 	rootMatrix.m_posit = centerOfMass;
 	const dMatrix invRootMatrix(rootMatrix.Inverse());
-
-	ndJointPid6dofActuator* const joint = ((ndJointPid6dofActuator*)effector->GetJoint());
+	
+	ndJointTwoBodyIK* const joint = (ndJointTwoBodyIK*)effector->GetJoint();
 	dMatrix footMatrix(joint->GetReferenceMatrix() * joint->GetBody1()->GetMatrix() * invRootMatrix);
-
+	
 	const dMatrix invLocalFrame(rootNode->GetInvCoronalFrame());
 	footMatrix = footMatrix * invLocalFrame;
 	// snap location to center of mass only in the coronal plane

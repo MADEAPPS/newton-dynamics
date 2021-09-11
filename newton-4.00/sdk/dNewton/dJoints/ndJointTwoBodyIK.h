@@ -44,6 +44,7 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	//dMatrix GetTargetRotation() const;
 	//void SetTargetRotation(const dMatrix& rotation);
 
+	const dMatrix& GetReferenceMatrix() const;
 	void SetTargetOffset(const dVector& offset);
 
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
@@ -64,7 +65,10 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	dMatrix m_referenceFrameBody1;
 	dVector m_offsetPosition;
 
+
 	dFloat32 m_maxConeAngle;
+
+	dFloat32 m_angle;
 	dFloat32 m_minTwistAngle;
 	dFloat32 m_maxTwistAngle;
 
@@ -77,6 +81,11 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	dFloat32 m_linearDamper;
 	dFloat32 m_linearRegularizer;
 };
+
+inline const dMatrix& ndJointTwoBodyIK::GetReferenceMatrix() const
+{
+	return m_referenceFrameBody1;
+}
 
 
 #endif 
