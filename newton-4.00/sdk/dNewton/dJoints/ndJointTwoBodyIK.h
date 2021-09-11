@@ -65,13 +65,9 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	dMatrix m_referenceFrameBody1;
 	dVector m_offsetPosition;
 
-
-	dFloat32 m_maxConeAngle;
-
 	dFloat32 m_angle;
-	dFloat32 m_minTwistAngle;
-	dFloat32 m_maxTwistAngle;
-
+	dFloat32 m_minAngle;
+	dFloat32 m_maxAngle;
 	dFloat32 m_angularSpring;
 	dFloat32 m_angularDamper;
 	dFloat32 m_angularRegularizer;
