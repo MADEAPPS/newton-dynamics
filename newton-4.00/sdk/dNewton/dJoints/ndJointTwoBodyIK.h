@@ -20,7 +20,7 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	public:
 	D_CLASS_REFLECTION(ndJointTwoBodyIK);
 	D_NEWTON_API ndJointTwoBodyIK(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndJointTwoBodyIK(const dVector& positionInGlobalSpace, const dVector& frontDirGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndJointBilateralConstraint* const rootJoint);
+	D_NEWTON_API ndJointTwoBodyIK(const ndJointBilateralConstraint* const rootJoint, const dVector& locationInGlocalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointTwoBodyIK();
 
 	//D_NEWTON_API dFloat32 GetMaxConeAngle() const;
@@ -63,10 +63,9 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	//void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
 	dMatrix m_coneRotation;
-	dMatrix m_referenceFrameBody1;
-	dVector m_offsetPosition;
-	
-	dMatrix m_xxxxx;
+	dMatrix m_pivotFrame;
+	dVector m_targetPosit;
+	dVector m_referencePosit;
 
 	dFloat32 m_angle;
 	dFloat32 m_minAngle;
@@ -83,7 +82,7 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 
 inline const dMatrix& ndJointTwoBodyIK::GetReferenceMatrix() const
 {
-	return m_referenceFrameBody1;
+	return m_pivotFrame;
 }
 
 

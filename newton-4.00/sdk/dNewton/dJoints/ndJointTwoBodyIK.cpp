@@ -21,11 +21,12 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointTwoBodyIK)
 
-ndJointTwoBodyIK::ndJointTwoBodyIK(const dVector& originInGlobalSpace, const dVector& frontDirGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndJointBilateralConstraint* const rootJoint)
+ndJointTwoBodyIK::ndJointTwoBodyIK(const ndJointBilateralConstraint* const rootJoint, const dVector& locationInGlocalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointInverseDynamicsBase(6, child, parent)
 	,m_coneRotation(dGetIdentityMatrix())
-	,m_referenceFrameBody1(m_localMatrix1)
-	,m_offsetPosition(dVector::m_zero)
+	,m_pivotFrame(rootJoint->GetLocalMatrix1())
+	,m_targetPosit(dVector::m_zero)
+	,m_referencePosit(dVector::m_zero)
 	,m_angle(dFloat32(0.0f))
 	,m_minAngle(-dFloat32(30.0f) * dDegreeToRad)
 	,m_maxAngle(dFloat32(30.0f) * dDegreeToRad)
@@ -37,36 +38,23 @@ ndJointTwoBodyIK::ndJointTwoBodyIK(const dVector& originInGlobalSpace, const dVe
 	,m_linearRegularizer(dFloat32(5.0e-3f))
 {
 	dAssert(rootJoint->GetBody1() == m_body1);
-
-	//m_xxxxx = rootJoint->GetLocalMatrix1() * m_body1->GetMatrix();
-	m_xxxxx = rootJoint->GetLocalMatrix1();
-
-	dMatrix baseMatrix(dGetIdentityMatrix());
-	dVector pivot(m_body1->GetMatrix().UntransformVector(originInGlobalSpace) & dVector::m_triplexMask);
-	dVector frontDir(m_body1->GetMatrix().UnrotateVector(frontDirGlobalSpace) & dVector::m_triplexMask);
-
-	baseMatrix.m_front = pivot.Normalize() * dVector::m_negOne;
-	baseMatrix.m_right = (baseMatrix.m_front.CrossProduct(frontDir)).Normalize();
-	baseMatrix.m_up = baseMatrix.m_right.CrossProduct(baseMatrix.m_front);
-	
-	baseMatrix = baseMatrix * m_body1->GetMatrix();
-	baseMatrix.m_posit = originInGlobalSpace;
-	baseMatrix.m_posit.m_w = dFloat32(1.0f);
-	CalculateLocalMatrix(baseMatrix, m_localMatrix0, m_localMatrix1);
-	m_referenceFrameBody1 = m_localMatrix1;
-
-	dVector offset(m_referenceFrameBody1.m_posit & dVector::m_triplexMask);
-	m_maxDist = dSqrt(offset.DotProduct(offset).GetScalar());
+	dMatrix matrix(m_pivotFrame * m_body1->GetMatrix());
+	m_referencePosit = matrix.UntransformVector(locationInGlocalSpace);
+	matrix.m_posit = locationInGlocalSpace;
+	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
+	m_maxDist = dSqrt(m_referencePosit.DotProduct(m_referencePosit & dVector::m_triplexMask).GetScalar());
 
 //SetTargetOffset(dVector(0.0f, 0.2f, 0.4f, 0.0f));
-SetTargetOffset(dVector(0.0f, 0.0f, -0.4f, 0.0f));
+//SetTargetOffset(dVector(0.0f, 0.0f, -0.4f, 0.0f));
+SetTargetOffset(m_referencePosit + dVector(-0.1f, 0.3f, 0.0f, 0.0f));
 }
 
 ndJointTwoBodyIK::ndJointTwoBodyIK(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndJointInverseDynamicsBase(dLoadSaveBase::dLoadDescriptor(desc))
 	,m_coneRotation(dGetIdentityMatrix())
-	,m_referenceFrameBody1(dGetIdentityMatrix())
-	,m_offsetPosition(dVector::m_zero)
+	,m_pivotFrame(dGetIdentityMatrix())
+	,m_targetPosit(dVector::m_zero)
+	,m_referencePosit(dVector::m_zero)
 	,m_angle(dFloat32(0.0f))
 	,m_minAngle(-dFloat32(30.0f) * dDegreeToRad)
 	,m_maxAngle(dFloat32(30.0f) * dDegreeToRad)
@@ -80,7 +68,7 @@ ndJointTwoBodyIK::ndJointTwoBodyIK(const dLoadSaveBase::dLoadDescriptor& desc)
 	dAssert(0);
 	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	//
-	//m_referenceFrameBody1 = xmlGetMatrix(xmlNode, "referenceFrameBody1");
+	//m_pivotFrame = xmlGetMatrix(xmlNode, "referenceFrameBody1");
 	//m_maxConeAngle = xmlGetFloat (xmlNode, "maxConeAngle");
 	//m_minTwistAngle = xmlGetFloat (xmlNode, "minTwistAngle");
 	//m_maxTwistAngle = xmlGetFloat (xmlNode, "maxTwistAngle");
@@ -105,7 +93,7 @@ void ndJointTwoBodyIK::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	ndJointInverseDynamicsBase::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
 	dAssert(0);
-	//xmlSaveParam(childNode, "referenceFrameBody1", m_referenceFrameBody1);
+	//xmlSaveParam(childNode, "referenceFrameBody1", m_pivotFrame);
 	//xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
 	//xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
 	//xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
@@ -122,15 +110,14 @@ void ndJointTwoBodyIK::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 {
 	dMatrix matrix1(CalculateBaseMatrix());
 	dMatrix matrix0(m_coneRotation * m_localMatrix1 * m_body1->GetMatrix() * m_body0->GetMatrix().Inverse());
-
+	dMatrix matrix2(m_pivotFrame * m_body1->GetMatrix());
+	
 	matrix0 = matrix0 * m_body0->GetMatrix();
 	matrix1 = matrix1 * m_body1->GetMatrix();
 
-	dMatrix matrix2(m_xxxxx * m_body1->GetMatrix());
-	debugCallback.DrawFrame(matrix2);
-
 	debugCallback.DrawFrame(matrix0);
-	debugCallback.DrawFrame(matrix1);
+	//debugCallback.DrawFrame(matrix1);
+	debugCallback.DrawFrame(matrix2);
 
 	const dInt32 subdiv = 8;
 	const dVector& coneDir0 = matrix0.m_front;
@@ -214,7 +201,7 @@ void ndJointTwoBodyIK::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 //dMatrix ndJointTwoBodyIK::GetTargetRotation() const
 //{
 //	dMatrix tmp(m_localMatrix1);
-//	tmp.m_posit = m_referenceFrameBody1.m_posit;
+//	tmp.m_posit = m_pivotFrame.m_posit;
 //	return tmp;
 //}
 
@@ -426,21 +413,18 @@ void ndJointTwoBodyIK::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 
 void ndJointTwoBodyIK::SetTargetOffset(const dVector& offset)
 {
-	dVector posit(dVector::m_triplexMask & m_referenceFrameBody1.TransformVector(offset & dVector::m_triplexMask));
+	dVector posit(offset & dVector::m_triplexMask);
 	dFloat32 mag2 = posit.DotProduct(posit).GetScalar();
 	if (mag2 > (m_maxDist * m_maxDist))
 	{
 		posit = posit.Normalize().Scale(m_maxDist);
 	}
 
-	dAssert(posit.DotProduct(posit & dVector::m_triplexMask).GetScalar() > dFloat32(0.1f));
-	m_offsetPosition = (posit - m_referenceFrameBody1.m_posit) & dVector::m_triplexMask;
+	dAssert(posit.DotProduct(posit).GetScalar() > dFloat32(0.1f));
+	m_targetPosit = posit | dVector::m_wOne;
 
-	dVector dir0(m_referenceFrameBody1.m_posit & dVector::m_triplexMask);
-	dVector dir1(dir0 + m_offsetPosition);
-
-	dir0 = dir0.Normalize();
-	dir1 = dir1.Normalize();
+	dVector dir0(posit.Normalize());
+	dVector dir1((m_referencePosit & dVector::m_triplexMask).Normalize());
 
 	dFloat32 cosAngleCos = dir0.DotProduct(dir1).GetScalar();
 	if (cosAngleCos >= dFloat32(0.998f))
@@ -449,19 +433,19 @@ void ndJointTwoBodyIK::SetTargetOffset(const dVector& offset)
 	}
 	else
 	{
-		const dVector lateralDir(dir0.CrossProduct(dir1).Normalize());
+		const dVector lateralDir(dir1.CrossProduct(dir0).Normalize());
 		const dFloat32 angle = dAcos(dClamp(cosAngleCos, dFloat32(-1.0f), dFloat32(1.0f)));
 		const dQuaternion rotation(lateralDir, angle);
 		const dMatrix coneMatrix (rotation, dVector::m_zero);
-		m_coneRotation = m_referenceFrameBody1 * coneMatrix * m_referenceFrameBody1.Inverse();
+		m_coneRotation = m_pivotFrame * coneMatrix * m_pivotFrame.Inverse();
 		m_coneRotation.m_posit = dVector::m_wOne;
 	}
 }
 
 dMatrix ndJointTwoBodyIK::CalculateBaseMatrix() const
 {
-	dMatrix matrix (m_referenceFrameBody1);
-	matrix.m_posit += m_offsetPosition;
+	dMatrix matrix (m_pivotFrame);
+	matrix.m_posit += matrix.RotateVector(m_targetPosit);
 	return matrix;
 }
 
@@ -474,8 +458,8 @@ void ndJointTwoBodyIK::JacobianDerivative(ndConstraintDescritor& desc)
 	//m_localMatrix0 = m_coneRotation * m_localMatrix1 * m_body1->GetMatrix() * m_body1->GetMatrix().Inverse();
 
 	CalculateGlobalMatrix(matrix0, matrix1);
-	SubmitAngularLimits(matrix0, matrix1, desc);
-	SubmitLinearLimits(matrix0, matrix1, desc);
+	//SubmitAngularLimits(matrix0, matrix1, desc);
+	//SubmitLinearLimits(matrix0, matrix1, desc);
 }
 
 void ndJointTwoBodyIK::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)

@@ -34,7 +34,7 @@ ndCharacterEffectorNode::ndCharacterEffectorNode(const dMatrix& matrixInGlobalSp
 {
 	ndBodyDynamic* const body0 = parentBone->GetBody();
 	ndBodyDynamic* const body1 = m_referenceNode->GetBody();
-	m_effector = new ndJointTwoBodyIK(matrixInGlobalSpace.m_posit, matrixInGlobalSpace.m_front, body0, body1, parentBone->GetParent()->GetJoint());
+	m_effector = new ndJointTwoBodyIK(parentBone->GetParent()->GetJoint(), matrixInGlobalSpace.m_posit, body0, body1);
 }
 
 ndCharacterEffectorNode::ndCharacterEffectorNode(const ndCharacterLoadDescriptor& desc)

@@ -20,6 +20,7 @@ ndJointInverseDynamicsBase::ndJointInverseDynamicsBase(dInt32 dof, ndBodyKinemat
 {
 	m_localMatrix0 = dGetIdentityMatrix();
 	m_localMatrix1 = dGetIdentityMatrix();
+	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
 ndJointInverseDynamicsBase::ndJointInverseDynamicsBase(const dLoadSaveBase::dLoadDescriptor& desc)
