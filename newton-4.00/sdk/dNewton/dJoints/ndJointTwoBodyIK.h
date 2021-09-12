@@ -23,9 +23,6 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	D_NEWTON_API ndJointTwoBodyIK(const ndJointBilateralConstraint* const rootJoint, const dVector& locationInGlocalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointTwoBodyIK();
 
-	//D_NEWTON_API dFloat32 GetMaxConeAngle() const;
-	//D_NEWTON_API void SetConeLimit(dFloat32 maxConeAngle);
-	//
 	//D_NEWTON_API void SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle);
 	//D_NEWTON_API void GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const;
 	//
@@ -37,7 +34,7 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 
 	//D_NEWTON_API dVector GetTargetPosition() const;
 	//D_NEWTON_API void SetTargetPosition(const dVector& posit);
-	//
+
 	//D_NEWTON_API dMatrix GetTargetMatrix() const;
 	//D_NEWTON_API void SetTargetMatrix(const dMatrix& posit);
 	//const dMatrix& GetReferenceMatrix() const;
@@ -53,14 +50,10 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
-	dMatrix CalculateBaseMatrix() const;
 	void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
 	//void SubmitTwistLimits(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
-	//void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
-	//void SubmitPidRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
-	//void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
 	dMatrix m_pivotFrame;
 	dMatrix m_coneRotation;

@@ -31,9 +31,9 @@ ndJointPdActuator::ndJointPdActuator(const dMatrix& pinAndPivotFrame, ndBodyKine
 	,m_angularSpring(dFloat32(1000.0f))
 	,m_angularDamper(dFloat32(50.0f))
 	,m_angularRegularizer(dFloat32(5.0e-3f))
-	,m_linearSpring(dFloat32(1000.0f))
-	,m_linearDamper(dFloat32(50.0f))
-	,m_linearRegularizer(dFloat32(5.0e-3f))
+	,m_linearSpring(dFloat32(0.0f))
+	,m_linearDamper(dFloat32(0.0f))
+	,m_linearRegularizer(dFloat32(0.0f))
 {
 }
 
@@ -128,7 +128,7 @@ void ndJointPdActuator::SetLinearSpringDamperRegularizer(dFloat32 spring, dFloat
 {
 	m_linearSpring = dMax(spring, dFloat32(0.0f));
 	m_linearDamper = dMax(damper, dFloat32(0.0f));
-	m_linearRegularizer = dMax(regularizer, dFloat32(1.0e-4f));
+	m_linearRegularizer = dMax(regularizer, dFloat32(0.0f));
 }
 
 dMatrix ndJointPdActuator::GetTargetMatrix() const
@@ -251,7 +251,7 @@ void ndJointPdActuator::SubmitAngularAxisCartesianApproximation(const dMatrix& m
 	}
 	else
 	{
-		SubmitPidRotation(matrix0, matrix1, desc);
+		SubmitPdRotation(matrix0, matrix1, desc);
 	}
 
 	SubmitTwistLimits(matrix0.m_front, pitchAngle, desc);
@@ -290,7 +290,7 @@ void ndJointPdActuator::SubmitTwistLimits(const dVector& pin, dFloat32 angle, nd
 
 void ndJointPdActuator::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	SubmitPidRotation(matrix0, matrix1, desc);
+	SubmitPdRotation(matrix0, matrix1, desc);
 
 	dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
@@ -313,7 +313,7 @@ void ndJointPdActuator::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix&
 	SubmitTwistLimits(matrix0.m_front, pitchAngle, desc);
 }
 
-void ndJointPdActuator::SubmitPidRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointPdActuator::SubmitPdRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	dQuaternion q0(matrix0);
 	dQuaternion q1(matrix1);
@@ -380,37 +380,38 @@ void ndJointPdActuator::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 
 void ndJointPdActuator::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	dAssert(0);
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
-	
-/*
-	const dVector step(matrix0.m_posit - matrix1.m_posit);
-	if (step.DotProduct(step).GetScalar() <= D_PD_SMALL_DISTANCE_ERROR2)
-		//if (1)
+	if (m_linearRegularizer == dFloat32(0.0f))
 	{
-		// Cartesian motion
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
-		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 	}
 	else
 	{
-		const dMatrix basis(step.Normalize());
+		const dVector step(matrix0.m_posit - matrix1.m_posit);
+		if (step.DotProduct(step).GetScalar() <= D_PD_SMALL_DISTANCE_ERROR2)
+		{
+			// Cartesian motion
+			AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
+			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 
-		// move alone the diagonal;
-		AddLinearRowJacobian(desc, matrix1.m_posit, matrix1.m_posit, basis[2]);
-		AddLinearRowJacobian(desc, matrix1.m_posit, matrix1.m_posit, basis[1]);
-		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, basis[0]);
-		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+			AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
+			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+
+			AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
+			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+		}
+		else
+		{
+			const dMatrix basis(step.Normalize());
+
+			// move alone the diagonal;
+			AddLinearRowJacobian(desc, matrix1.m_posit, matrix1.m_posit, basis[2]);
+			AddLinearRowJacobian(desc, matrix1.m_posit, matrix1.m_posit, basis[1]);
+			AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, basis[0]);
+			SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+		}
 	}
-*/
 }
 
 void ndJointPdActuator::JacobianDerivative(ndConstraintDescritor& desc)

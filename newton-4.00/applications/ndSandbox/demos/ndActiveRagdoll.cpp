@@ -39,6 +39,15 @@ class dActiveJointDefinition
 			,m_regularizer(0.001f)
 		{
 		}
+
+		dJointPidData(dFloat32 spring, dFloat32 damper, dFloat32 regularizer)
+			:m_spring(spring)
+			,m_damper(damper)
+			,m_regularizer(regularizer)
+		{
+		}
+
+
 		dFloat32 m_spring;
 		dFloat32 m_damper;
 		dFloat32 m_regularizer;
@@ -123,13 +132,13 @@ static dActiveJointDefinition jointsDefinition[] =
 	
 	{ "mixamorig:RightUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
 	{ "mixamorig:RightLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
-	//{ "mixamorig:RightFoot", dActiveJointDefinition::inverseKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
-	{ "rightFoot_effector", dActiveJointDefinition::effector, 0.0f, {}, {}, {} },
+	{ "rightFoot_effector", dActiveJointDefinition::effector, 0.0f,{},{},{} },
+	{ "mixamorig:RightFoot", dActiveJointDefinition::forwardKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {100.0f, 5.0f, 0.001f} },
 	
-	//{ "mixamorig:LeftUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
-	//{ "mixamorig:LeftLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
-	//{ "mixamorig:LeftFoot", dActiveJointDefinition::inverseKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
-	//{ "leftFoot_effector", dActiveJointDefinition::effector, 0.0f, {}, {}, {} },
+	{ "mixamorig:LeftUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
+	{ "mixamorig:LeftLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
+	{ "leftFoot_effector", dActiveJointDefinition::effector, 0.0f,{},{},{} },
+	{ "mixamorig:LeftFoot", dActiveJointDefinition::forwardKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {100.0f, 5.0f, 0.001f} },
 };
 
 class ndActiveRagdollModel : public ndCharacter
@@ -244,9 +253,9 @@ class ndActiveRagdollModel : public ndCharacter
 			ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
 			if (ent->GetName() == "mixamorig:Hips") 
 			{
-				ndJointFix6dof* const joint = new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody());
-				world->AddJoint(joint);
-				AddAttachment(joint);
+				//ndJointFix6dof* const joint = new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody());
+				//world->AddJoint(joint);
+				//AddAttachment(joint);
 				break;
 			}
 		}
