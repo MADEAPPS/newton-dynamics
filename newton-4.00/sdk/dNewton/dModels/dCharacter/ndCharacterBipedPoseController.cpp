@@ -50,24 +50,26 @@ void ndCharacterBipedPoseController::Init(ndCharacter* const owner, const ndBipe
 
 dRay ndCharacterBipedPoseController::CalculateSupportPoint(const dVector& comInGlobalSpace) const
 {
-	ndBodyKinematic* const leftFootBody = m_config.m_leftFootEffector->GetJoint()->GetBody0();
-	ndBodyKinematic* const rightFootBody = m_config.m_rightFootEffector->GetJoint()->GetBody0();
-	const dVector leftFootCenter(leftFootBody->GetMatrix().TransformVector(leftFootBody->GetCentreOfMass()));
-	const dVector rightFootCenter(rightFootBody->GetMatrix().TransformVector(rightFootBody->GetCentreOfMass()));
-	//const dVector leftFootCenter(leftFootBody->GetMatrix().m_posit);
-	//const dVector rightFootCenter(rightFootBody->GetMatrix().m_posit);
+	//ndBodyKinematic* const leftFootBody = m_config.m_leftFootEffector->GetJoint()->GetBody0();
+	//ndBodyKinematic* const rightFootBody = m_config.m_rightFootEffector->GetJoint()->GetBody0();
+	//const dVector leftFootCenter(leftFootBody->GetMatrix().TransformVector(leftFootBody->GetCentreOfMass()));
+	//const dVector rightFootCenter(rightFootBody->GetMatrix().TransformVector(rightFootBody->GetCentreOfMass()));
+
+	ndJointBilateralConstraint* const leftFootJoint = m_config.m_leftFootEffector->GetJoint();
+	ndJointBilateralConstraint* const rightFootJoint = m_config.m_rightFootEffector->GetJoint();
+	dMatrix leftFootMatrix(leftFootJoint->GetLocalMatrix0() * leftFootJoint->GetBody0()->GetMatrix());
+	dMatrix rightFootMatrix(rightFootJoint->GetLocalMatrix0() * rightFootJoint->GetBody0()->GetMatrix());
 
 	const dVector gravityDir(m_owner->GetRootNode()->GetGravityDir());
 	const dVector p0(comInGlobalSpace);
 	const dVector p1(comInGlobalSpace + gravityDir.Scale (dFloat32 (5.0f)));
 
 	dFastRay supportSegment(p0, p1);
-	return supportSegment.RayDistance(leftFootCenter, rightFootCenter);
+	return supportSegment.RayDistance(leftFootMatrix.m_posit, rightFootMatrix.m_posit);
 }
 
 void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) const
 {
-return;
 	ndCharacterRootNode* const rootNode = m_owner->GetRootNode();
 	ndBodyDynamic* const hip = rootNode->GetBody();
 	
@@ -80,66 +82,71 @@ return;
 
 	const dRay suportPoint(CalculateSupportPoint(comMatrixInGlobalSpace.m_posit));
 	
-	ndBodyKinematic* const leftFootBody = m_config.m_leftFootEffector->GetJoint()->GetBody0();
-	ndBodyKinematic* const rightFootBody = m_config.m_rightFootEffector->GetJoint()->GetBody0();
-	const dVector leftFootCenter(leftFootBody->GetMatrix().TransformVector(leftFootBody->GetCentreOfMass()));
-	const dVector rightFootCenter(rightFootBody->GetMatrix().TransformVector(rightFootBody->GetCentreOfMass()));
+	//ndBodyKinematic* const leftFootBody = m_config.m_leftFootEffector->GetJoint()->GetBody0();
+	//ndBodyKinematic* const rightFootBody = m_config.m_rightFootEffector->GetJoint()->GetBody0();
+	//const dVector leftFootCenter(leftFootBody->GetMatrix().TransformVector(leftFootBody->GetCentreOfMass()));
+	//const dVector rightFootCenter(rightFootBody->GetMatrix().TransformVector(rightFootBody->GetCentreOfMass()));
 
-	context.DrawLine(leftFootCenter, rightFootCenter, dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(1.0f)));
+	ndJointBilateralConstraint* const leftFootJoint = m_config.m_leftFootEffector->GetJoint();
+	ndJointBilateralConstraint* const rightFootJoint = m_config.m_rightFootEffector->GetJoint();
+	dMatrix leftFootMatrix(leftFootJoint->GetLocalMatrix0() * leftFootJoint->GetBody0()->GetMatrix());
+	dMatrix rightFootMatrix(rightFootJoint->GetLocalMatrix0() * rightFootJoint->GetBody0()->GetMatrix());
+
+	context.DrawLine(leftFootMatrix.m_posit, rightFootMatrix.m_posit, dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(1.0f)));
 	context.DrawLine(comMatrixInGlobalSpace.m_posit, suportPoint.m_p0, dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f)));
 	context.DrawLine(suportPoint.m_p0, suportPoint.m_p1, dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(1.0f)), dFloat32(2.0f));
 
-	dFixSizeArray<dVector, 32> supportPolygon;
-	{
-		ndBodyKinematic::ndContactMap::Iterator iter(leftFootBody->GetContactMap());
-		for (iter.Begin(); iter; iter ++)
-		{
-			const ndContact* const contact = iter.GetNode()->GetInfo();
-			if (contact->IsActive())
-			{
-				const ndContactPointList& points = contact->GetContactPoints();
-				if ((supportPolygon.GetCount() + points.GetCount()) < supportPolygon.GetCapacity())
-				{
-					for (ndContactPointList::dNode* node = points.GetFirst(); node; node = node->GetNext())
-					{
-						supportPolygon.PushBack(node->GetInfo().m_point);
-					}
-				}
-			}
-		}
-	}
-
-	{
-		ndBodyKinematic::ndContactMap::Iterator iter(rightFootBody->GetContactMap());
-		for (iter.Begin(); iter; iter++)
-		{
-			const ndContact* const contact = iter.GetNode()->GetInfo();
-			if (contact->IsActive())
-			{
-				const ndContactPointList& points = contact->GetContactPoints();
-				if ((supportPolygon.GetCount() + points.GetCount()) < supportPolygon.GetCapacity())
-				{
-					for (ndContactPointList::dNode* node = points.GetFirst(); node; node = node->GetNext())
-					{
-						supportPolygon.PushBack(node->GetInfo().m_point);
-					}
-				}
-			}
-		}
-	}
-
-	dInt32 hullCount = dConvexHull2d(supportPolygon.GetCount(), &supportPolygon[0]);
-	if (hullCount)
-	{
-		dVector offset(m_owner->GetRootNode()->GetGravityDir().Scale(dFloat32(0.01f)));
-		dVector p0(supportPolygon[hullCount - 1] - offset);
-		for (dInt32 i = 0; i < hullCount; i++)
-		{
-			dVector p1(supportPolygon[i] - offset);
-			context.DrawLine(p0, p1, dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f)));
-			p0 = p1;
-		}
-	}
+	//dFixSizeArray<dVector, 32> supportPolygon;
+	//{
+	//	ndBodyKinematic::ndContactMap::Iterator iter(leftFootBody->GetContactMap());
+	//	for (iter.Begin(); iter; iter ++)
+	//	{
+	//		const ndContact* const contact = iter.GetNode()->GetInfo();
+	//		if (contact->IsActive())
+	//		{
+	//			const ndContactPointList& points = contact->GetContactPoints();
+	//			if ((supportPolygon.GetCount() + points.GetCount()) < supportPolygon.GetCapacity())
+	//			{
+	//				for (ndContactPointList::dNode* node = points.GetFirst(); node; node = node->GetNext())
+	//				{
+	//					supportPolygon.PushBack(node->GetInfo().m_point);
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+	//
+	//{
+	//	ndBodyKinematic::ndContactMap::Iterator iter(rightFootBody->GetContactMap());
+	//	for (iter.Begin(); iter; iter++)
+	//	{
+	//		const ndContact* const contact = iter.GetNode()->GetInfo();
+	//		if (contact->IsActive())
+	//		{
+	//			const ndContactPointList& points = contact->GetContactPoints();
+	//			if ((supportPolygon.GetCount() + points.GetCount()) < supportPolygon.GetCapacity())
+	//			{
+	//				for (ndContactPointList::dNode* node = points.GetFirst(); node; node = node->GetNext())
+	//				{
+	//					supportPolygon.PushBack(node->GetInfo().m_point);
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+	//
+	//dInt32 hullCount = dConvexHull2d(supportPolygon.GetCount(), &supportPolygon[0]);
+	//if (hullCount)
+	//{
+	//	dVector offset(m_owner->GetRootNode()->GetGravityDir().Scale(dFloat32(0.01f)));
+	//	dVector p0(supportPolygon[hullCount - 1] - offset);
+	//	for (dInt32 i = 0; i < hullCount; i++)
+	//	{
+	//		dVector p1(supportPolygon[i] - offset);
+	//		context.DrawLine(p0, p1, dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f)));
+	//		p0 = p1;
+	//	}
+	//}
 }
 
 bool ndCharacterBipedPoseController::Evaluate(ndWorld* const , dFloat32 timestep)

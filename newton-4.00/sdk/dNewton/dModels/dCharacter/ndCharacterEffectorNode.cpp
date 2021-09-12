@@ -102,6 +102,5 @@ void ndCharacterEffectorNode::Save(const ndCharacterSaveDescriptor& desc) const
 void ndCharacterEffectorNode::Debug(ndConstraintDebugCallback& context) const
 {
 	ndCharacterLimbNode::Debug(context);
-
-	m_effector->DebugJoint(context);
+	//m_effector->DebugJoint(context);
 }
