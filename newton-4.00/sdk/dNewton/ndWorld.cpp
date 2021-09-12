@@ -898,7 +898,7 @@ void ndWorld::UpdateSkeletons()
 									if (SkeletonJointTest(constraint))
 									{
 										ndBodyKinematic* const childBody = (constraint->GetBody0() == parentBody) ? constraint->GetBody1() : constraint->GetBody0();
-										if (!childBody->m_skeletonMark && (childBody->GetInvMass() != dFloat32(0.0f)))
+										if (!childBody->m_skeletonMark && (childBody->GetInvMass() != dFloat32(0.0f)) && (constraint->GetSolverModel() != m_jointkinematicCloseLoop))
 										{
 											childBody->m_skeletonMark = 1;
 											ndSkeletonContainer::ndNode* const childNode = skeleton->AddChild(constraint, parentNode);
