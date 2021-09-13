@@ -24,7 +24,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointPdActuator)
 
 ndJointPdActuator::ndJointPdActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
-	,m_referenceFrameBody1(m_localMatrix1)
+	,m_pivotFrame(m_localMatrix1)
 	,m_maxConeAngle(dFloat32(1.0e10f))
 	,m_minTwistAngle(-dFloat32(1.0e10f))
 	,m_maxTwistAngle(dFloat32(1.0e10f))
@@ -39,7 +39,7 @@ ndJointPdActuator::ndJointPdActuator(const dMatrix& pinAndPivotFrame, ndBodyKine
 
 ndJointPdActuator::ndJointPdActuator(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
-	,m_referenceFrameBody1(dGetIdentityMatrix())
+	,m_pivotFrame(dGetIdentityMatrix())
 	,m_maxConeAngle(dFloat32(1.0e10f))
 	,m_minTwistAngle(-dFloat32(1.0e10f))
 	,m_maxTwistAngle(dFloat32(1.0e10f))
@@ -52,7 +52,7 @@ ndJointPdActuator::ndJointPdActuator(const dLoadSaveBase::dLoadDescriptor& desc)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
-	m_referenceFrameBody1 = xmlGetMatrix(xmlNode, "referenceFrameBody1");
+	m_pivotFrame = xmlGetMatrix(xmlNode, "pivotFrame");
 	m_maxConeAngle = xmlGetFloat (xmlNode, "maxConeAngle");
 	m_minTwistAngle = xmlGetFloat (xmlNode, "minTwistAngle");
 	m_maxTwistAngle = xmlGetFloat (xmlNode, "maxTwistAngle");
@@ -76,7 +76,7 @@ void ndJointPdActuator::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
 	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
-	xmlSaveParam(childNode, "referenceFrameBody1", m_referenceFrameBody1);
+	xmlSaveParam(childNode, "pivotFrame", m_pivotFrame);
 	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
 	xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
 	xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
@@ -166,7 +166,7 @@ void ndJointPdActuator::DebugJoint(ndConstraintDebugCallback& debugCallback) con
 	dMatrix matrix0;
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
-	matrix1 = m_referenceFrameBody1 * m_body1->GetMatrix();
+	matrix1 = m_pivotFrame * m_body1->GetMatrix();
 
 	debugCallback.DrawFrame(matrix0);
 	debugCallback.DrawFrame(matrix1);

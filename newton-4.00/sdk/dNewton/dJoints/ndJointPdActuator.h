@@ -59,7 +59,7 @@ class ndJointPdActuator : public ndJointBilateralConstraint
 	void SubmitPdRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
-	dMatrix m_referenceFrameBody1;
+	dMatrix m_pivotFrame;
 	dFloat32 m_maxConeAngle;
 	dFloat32 m_minTwistAngle;
 	dFloat32 m_maxTwistAngle;
@@ -76,7 +76,7 @@ class ndJointPdActuator : public ndJointBilateralConstraint
 inline dMatrix ndJointPdActuator::GetTargetRotation() const
 {
 	dMatrix tmp(m_localMatrix1);
-	tmp.m_posit = m_referenceFrameBody1.m_posit;
+	tmp.m_posit = m_pivotFrame.m_posit;
 	return tmp;
 }
 
@@ -89,7 +89,7 @@ inline void ndJointPdActuator::SetTargetRotation(const dMatrix& matrix)
 
 inline const dMatrix& ndJointPdActuator::GetReferenceMatrix() const
 {
-	return m_referenceFrameBody1;
+	return m_pivotFrame;
 }
 
 #endif 
