@@ -205,6 +205,15 @@ class ndActiveRagdollModel : public ndCharacter
 
 						// connect this body part to its parentBody with a ragdoll joint
 						parentBone = ConnectBodyParts(childBody, parentBone, definition);
+
+						if (strstr(name, "RightFoot"))
+						{
+							bipedConfig.m_rightFootNode = parentBone;
+						}
+						else if (strstr(name, "LeftFoot"))
+						{
+							bipedConfig.m_leftFootNode = parentBone;
+						}
 					}
 					else
 					{

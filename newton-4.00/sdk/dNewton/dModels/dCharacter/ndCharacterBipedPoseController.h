@@ -33,11 +33,15 @@ class ndBipedControllerConfig
 {
 	public:
 	ndBipedControllerConfig()
-		:m_leftFootEffector(nullptr)
+		:m_leftFootNode(nullptr)
+		,m_rightFootNode(nullptr)
+		,m_leftFootEffector(nullptr)
 		,m_rightFootEffector(nullptr)
 	{
 	}
 
+	ndCharacterLimbNode* m_leftFootNode;
+	ndCharacterLimbNode* m_rightFootNode;
 	ndCharacterEffectorNode* m_leftFootEffector;
 	ndCharacterEffectorNode* m_rightFootEffector;
 };
