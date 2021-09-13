@@ -182,10 +182,8 @@ ndCharacterCentreOfMassState ndCharacter::CalculateCentreOfMassState() const
 	
 	nodePool[0] = m_rootNode;
 
-	//dMatrix inertia(dGetZeroMatrix());
 	dVector com(dVector::m_zero);
 	dVector veloc(dVector::m_zero);
-	//dVector omega(dVector::m_zero);
 	dFloat32 mass = dFloat32(0.0f);
 
 	while (stack)
@@ -202,12 +200,6 @@ ndCharacterCentreOfMassState ndCharacter::CalculateCentreOfMassState() const
 				dMatrix bodyMatrix(body->GetMatrix());
 				com += bodyMatrix.TransformVector(body->GetCentreOfMass()).Scale(partMass);
 				veloc += body->GetVelocity().Scale(partMass);
-
-				//dMatrix inertiaPart(body->CalculateInertiaMatrix());
-				//inertia.m_front += inertiaPart.m_front;
-				//inertia.m_up += inertiaPart.m_up;
-				//inertia.m_right += inertiaPart.m_right;
-				//omega += inertiaPart.RotateVector(body->GetOmega());
 			}
 		}
 
@@ -221,16 +213,13 @@ ndCharacterCentreOfMassState ndCharacter::CalculateCentreOfMassState() const
 	dVector invMass (dFloat32(1.0f) / mass);
 	com = com * invMass;
 	veloc = veloc * invMass;
-	//omega = inertia.Inverse4x4().RotateVector(omega);
 	com.m_w = dFloat32(1.0f);
-	//omega.m_w = dFloat32(0.0f);
 	veloc.m_w = dFloat32(0.0f);
 
 	ndCharacterCentreOfMassState state;
 	state.m_mass = mass;
 	state.m_centerOfMass = com;
 	state.m_centerOfMassVeloc = veloc;
-	//state.m_centerOfMassOmega = omega;
 	return state;
 }
 

@@ -33,22 +33,24 @@ class ndCharaterKeyFramePose
 	ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix);
 
 	dVector m_position;
-	dQuaternion m_rotation;
+	//dQuaternion m_rotation;
+	dVector m_euler;
 	ndCharacterLimbNode* m_node;
 };
 
 inline ndCharaterKeyFramePose::ndCharaterKeyFramePose()
-	:m_position(dVector::m_zero)
-	,m_rotation()
+	:m_position(dVector::m_wOne)
+	,m_euler(dVector::m_zero)
 	,m_node(nullptr)
 {
 }
 
 inline ndCharaterKeyFramePose::ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix)
-	:m_position(matrix.m_posit & dVector::m_triplexMask)
-	,m_rotation(matrix)
+	:m_position(matrix.m_posit)
+	,m_euler(dVector::m_zero)
 	,m_node(node)
 {
+	dAssert(0);
 }
 
 #endif

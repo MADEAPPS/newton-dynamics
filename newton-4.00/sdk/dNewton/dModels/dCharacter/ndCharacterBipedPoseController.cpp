@@ -60,7 +60,66 @@ dRay ndCharacterBipedPoseController::CalculateSupportPoint(const dVector& comInG
 	const dVector p1(comInGlobalSpace + gravityDir.Scale (dFloat32 (5.0f)));
 
 	dFastRay supportSegment(p0, p1);
-	return supportSegment.RayDistance(leftFootMatrix.m_posit, rightFootMatrix.m_posit);
+	dRay ray(supportSegment.RayDistance(leftFootMatrix.m_posit, rightFootMatrix.m_posit));
+	return ray;
+}
+
+bool ndCharacterBipedPoseController::CalculateZeroMomentPoint(dVector& zeroMomentPointInGlobalSpace) const
+{
+	dFixSizeArray<dVector, 32> points;
+	{
+		ndBodyKinematic* const leftFootBody = m_config.m_leftFootNode->GetBody();
+		ndBodyKinematic::ndContactMap::Iterator iter(leftFootBody->GetContactMap());
+		for (iter.Begin(); iter; iter++)
+		{
+			const ndContact* const contact = iter.GetNode()->GetInfo();
+			if (contact->IsActive())
+			{
+				ndJointBilateralConstraint* const leftFootJoint = m_config.m_leftFootEffector->GetJoint();
+				dVector p(leftFootJoint->GetBody0()->GetMatrix().TransformVector(leftFootJoint->GetLocalMatrix0().m_posit));
+				points.PushBack(p);
+				break;
+			}
+		}
+	}
+
+	{
+		ndBodyKinematic* const righFootBody = m_config.m_rightFootNode->GetBody();
+		ndBodyKinematic::ndContactMap::Iterator iter(righFootBody->GetContactMap());
+		for (iter.Begin(); iter; iter++)
+		{
+			const ndContact* const contact = iter.GetNode()->GetInfo();
+			if (contact->IsActive())
+			{
+				ndJointBilateralConstraint* const rightFootJoint = m_config.m_rightFootEffector->GetJoint();
+				dVector p(rightFootJoint->GetBody0()->GetMatrix().TransformVector(rightFootJoint->GetLocalMatrix0().m_posit));
+				points.PushBack(p);
+				break;
+			}
+		}
+	}
+
+	bool hasPoint = true;
+	switch (points.GetCount()) 
+	{
+		case 0:
+			hasPoint = false;
+			break;
+
+		case 1:
+			zeroMomentPointInGlobalSpace = points[0];
+			break;
+
+		case 2:
+			zeroMomentPointInGlobalSpace = (points[0] + points[1]).Scale (dFloat32 (0.5f));
+			break;
+
+		default:
+			// here find the varicenter point of the conve hull
+			dAssert(0);
+	}
+
+	return hasPoint;
 }
 
 void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) const

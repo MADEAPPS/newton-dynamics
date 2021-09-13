@@ -36,77 +36,79 @@
 ndCharacterIdlePose::ndCharacterIdlePose(ndCharacterBipedPoseController* const owner)
 	:m_referencePose()
 	,m_owner(owner)
+	,m_invertedPendulumRadius(dFloat32 (0.0f))
 {
 }
 
 void ndCharacterIdlePose::Init()
 {
 	const ndCharacter* const character = m_owner->GetCharacter();
-	ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
-
 	const ndBipedControllerConfig& config = m_owner->GetConfig();
+
+	dVector p0;
+	dVector p1;
 	if (config.m_leftFootEffector)
 	{
-		dVector leftFeetOffset(dFloat32(0.0f), dFloat32(0.0125f), dFloat32(0.0f), dFloat32(0.0f));
-		m_referencePose.PushBack(CalculateFeetKeyFrame(state.m_centerOfMass, leftFeetOffset, config.m_leftFootEffector));
+		//dVector leftFeetOffset(dFloat32(0.0f), dFloat32(0.0125f), dFloat32(0.0f), dFloat32(0.0f));
+		//m_referencePose.PushBack(CalculateFeetKeyFrame(state.m_centerOfMass, leftFeetOffset, config.m_leftFootEffector));
+
+		dMatrix matrix(config.m_leftFootNode->GetJoint()->GetLocalMatrix0() * config.m_leftFootNode->GetBody()->GetMatrix());
+		config.m_leftFootEffector->SetTargetMatrix(matrix);
+		p0 = matrix.m_posit;
 	}
 
 	if (config.m_rightFootEffector)
 	{
-		dVector rightFeetOffset(dFloat32(-0.0f), dFloat32(0.0125f), dFloat32(0.0f), dFloat32(0.0f));
-		m_referencePose.PushBack(CalculateFeetKeyFrame(state.m_centerOfMass, rightFeetOffset, config.m_rightFootEffector));
+		//dVector rightFeetOffset(dFloat32(-0.0f), dFloat32(0.0125f), dFloat32(0.0f), dFloat32(0.0f));
+		//m_referencePose.PushBack(CalculateFeetKeyFrame(state.m_centerOfMass, rightFeetOffset, config.m_rightFootEffector));
+		dMatrix matrix(config.m_rightFootNode->GetJoint()->GetLocalMatrix0() * config.m_rightFootNode->GetBody()->GetMatrix());
+		config.m_rightFootEffector->SetTargetMatrix(matrix);
+		p1 = matrix.m_posit;
 	}
+
+	ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
+	dVector xmp((p1 + p0).Scale(dFloat32(0.5f)));
+	dVector radius(state.m_centerOfMass - xmp);
+	m_invertedPendulumRadius = dSqrt(radius.DotProduct(radius & dVector::m_triplexMask).GetScalar());
 }
 
-ndCharaterKeyFramePose ndCharacterIdlePose::CalculateFeetKeyFrame(const dVector& centerOfMass, const dVector& keyFrameOffset, ndCharacterEffectorNode* const effector)
-{
-	const ndCharacter* const character = m_owner->GetCharacter();
-	ndCharacterRootNode* const rootNode = character->GetRootNode();
-	
-	dMatrix rootMatrix(rootNode->GetBody()->GetMatrix());
-	rootMatrix.m_posit = centerOfMass;
-	const dMatrix invRootMatrix(rootMatrix.Inverse());
-	
-	ndJointTwoBodyIK* const joint = (ndJointTwoBodyIK*)effector->GetJoint();
-	dMatrix footMatrix(joint->GetReferenceMatrix() * joint->GetBody1()->GetMatrix() * invRootMatrix);
-	
-	const dMatrix invLocalFrame(rootNode->GetInvCoronalFrame());
-	footMatrix = footMatrix * invLocalFrame;
-	// snap location to center of mass only in the coronal plane
-	footMatrix.m_posit.m_x = dFloat32(0.0f);
-	// add offset
-	footMatrix.m_posit += keyFrameOffset;
-	return ndCharaterKeyFramePose(effector, footMatrix);
-}
-
-void ndCharacterIdlePose::SetEffectorMatrix(const dVector& localCom, const ndCharaterKeyFramePose& pose)
+//void ndCharacterIdlePose::SetEffectorMatrix(const dVector& localCom, const ndCharaterKeyFramePose& pose)
+void ndCharacterIdlePose::SetEffectorMatrix(const dVector&, const ndCharaterKeyFramePose& pose)
 {
 	if (pose.m_node)
 	{
-		ndCharacterEffectorNode* const effector = pose.m_node->GetAsEffectorNode();
-		dAssert(effector);
-
-		const ndCharacter* const character = m_owner->GetCharacter();
-		ndCharacterRootNode* const rootNode = character->GetRootNode();
-
-		dMatrix matrix(pose.m_rotation, localCom + pose.m_position);
-		//matrix.m_posit.m_y += 0.0125f;
-		//matrix.m_posit.m_x -= 0.025f;
-		matrix = matrix * rootNode->GetCoronalFrame();
-		effector->SetTargetMatrix(matrix);
+		dAssert(0);
+		//ndCharacterEffectorNode* const effector = pose.m_node->GetAsEffectorNode();
+		//dAssert(effector);
+		//
+		//const ndCharacter* const character = m_owner->GetCharacter();
+		//ndCharacterRootNode* const rootNode = character->GetRootNode();
+		//
+		//dMatrix matrix(pose.m_rotation, localCom + pose.m_position);
+		//matrix = matrix * rootNode->GetCoronalFrame();
+		//effector->SetTargetMatrix(matrix);
 	}
 }
 
 //void ndCharacterIdlePose::Update(dFloat32 timestep)
 void ndCharacterIdlePose::Update(dFloat32)
 {
-	const ndCharacter* const character = m_owner->GetCharacter();
-	ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
+	//ndCharacterRootNode* const rootNode = character->GetRootNode();
+	//dVector localCom (rootNode->GetInvCoronalFrame().TransformVector(rootNode->GetBody()->GetMatrix().UntransformVector(state.m_centerOfMass)));
+	//
+	//SetEffectorMatrix(localCom, m_referencePose[0]);
+	//SetEffectorMatrix(localCom, m_referencePose[1]);
 
-	ndCharacterRootNode* const rootNode = character->GetRootNode();
-	dVector localCom (rootNode->GetInvCoronalFrame().TransformVector(rootNode->GetBody()->GetMatrix().UntransformVector(state.m_centerOfMass)));
+	dVector zeroMomentPointInGlobalSpace;
+	if (m_owner->CalculateZeroMomentPoint(zeroMomentPointInGlobalSpace))
+	{
+		const ndCharacter* const character = m_owner->GetCharacter();
+		ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
+		
+		dVector radius(state.m_centerOfMass - zeroMomentPointInGlobalSpace);
 
-	SetEffectorMatrix(localCom, m_referencePose[0]);
-	SetEffectorMatrix(localCom, m_referencePose[1]);
+		dTrace(("r(%f %f %f) v(%f %f %f)\n", radius.m_x, radius.m_y, radius.m_z, 
+			state.m_centerOfMassVeloc.m_x, state.m_centerOfMassVeloc.m_y, state.m_centerOfMassVeloc.m_z));
+	}
 }
 

@@ -42,14 +42,15 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	//void SetTargetRotation(const dMatrix& rotation);
 
 	const dMatrix& GetReferenceMatrix() const;
-	void SetTargetOffset(const dVector& offset);
-
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
+	virtual void SetTargetMatrix(const dMatrix& matrixInGlobalSpace);
+
+	void SetTargetOffset(const dVector& offset);
 	void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 

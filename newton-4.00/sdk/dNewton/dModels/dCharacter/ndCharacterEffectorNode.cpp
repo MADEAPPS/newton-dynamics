@@ -60,11 +60,7 @@ ndCharacterEffectorNode::~ndCharacterEffectorNode()
 
 void ndCharacterEffectorNode::SetTargetMatrix(const dMatrix& matrix)
 {
-	//m_effector->SetTargetPosition(posit);
-	//m_effector->SetTargetRotation(pitch, yaw, roll);
-
-	dTrace(("xxxxxxxx\n"));
-	//m_effector->SetTargetMatrix(matrix);
+	m_effector->SetTargetMatrix(matrix);
 }
 
 //dMatrix ndCharacterEffectorNode::CalculateGlobalTargetMatrix() const

@@ -15,7 +15,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-
 class ndJointInverseDynamicsBase: public ndJointBilateralConstraint
 {
 	public:
@@ -24,10 +23,15 @@ class ndJointInverseDynamicsBase: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointInverseDynamicsBase(dInt32 dof, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointInverseDynamicsBase();
 
+	virtual void SetTargetMatrix(const dMatrix& matrixInGlobalSpace);
 	protected:
 	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 };
 
+inline void ndJointInverseDynamicsBase::SetTargetMatrix(const dMatrix&)
+{
+	dAssert(0);
+}
 
 #endif 
 

@@ -288,6 +288,13 @@ void ndJointTwoBodyIK::SetTargetOffset(const dVector& offset)
 	}
 }
 
+void ndJointTwoBodyIK::SetTargetMatrix(const dMatrix& matrixInGlobalSpace)
+{
+	dMatrix baseMatrix(m_pivotFrame * m_body1->GetMatrix());
+	dMatrix offset(matrixInGlobalSpace * baseMatrix.Inverse());
+	SetTargetOffset(offset.m_posit);
+}
+
 void ndJointTwoBodyIK::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	const dVector step(matrix0.m_posit - matrix1.m_posit);

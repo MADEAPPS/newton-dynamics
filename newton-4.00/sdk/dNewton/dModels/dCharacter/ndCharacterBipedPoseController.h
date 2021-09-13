@@ -59,6 +59,8 @@ class ndCharacterBipedPoseController: public ndCharacterPoseController
 	const ndBipedControllerConfig& GetConfig() const;
 	dRay CalculateSupportPoint(const dVector& comInGlobalSpace) const;
 
+	bool CalculateZeroMomentPoint(dVector& zeroMomentPointInGlobalSpace) const;
+
 	protected:
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 	virtual bool Evaluate(ndWorld* const world, dFloat32 timestep);

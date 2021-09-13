@@ -41,11 +41,9 @@ class ndCharacterIdlePose : public ndCharacterPoseGenerator
 	void Update(dFloat32 timestep);
 	void SetEffectorMatrix(const dVector& localCom, const ndCharaterKeyFramePose& pose);
 
-	ndCharaterKeyFramePose CalculateFeetKeyFrame(const dVector& centerOfMass, const dVector& keyFrameOffset, ndCharacterEffectorNode* const effector);
-
 	dFixSizeArray<ndCharaterKeyFramePose, 2> m_referencePose;
 	ndCharacterBipedPoseController* m_owner;
-
+	dFloat32 m_invertedPendulumRadius;
 	friend class ndCharacterBipedPoseController;
 };
 
