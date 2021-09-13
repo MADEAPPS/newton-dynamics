@@ -69,6 +69,26 @@ ndJointPdActuator::~ndJointPdActuator()
 {
 }
 
+void ndJointPdActuator::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "referenceFrameBody1", m_referenceFrameBody1);
+	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
+	xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
+	xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
+	xmlSaveParam(childNode, "angularSpring", m_angularSpring);
+	xmlSaveParam(childNode, "angularDamper", m_angularDamper);
+	xmlSaveParam(childNode, "angularRegularizer", m_angularRegularizer);
+
+	xmlSaveParam(childNode, "linearSpring", m_linearSpring);
+	xmlSaveParam(childNode, "linearDamper", m_linearDamper);
+	xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
+}
+
 void ndJointPdActuator::GetAngularSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const
 {
 	spring = m_angularSpring;
@@ -356,26 +376,6 @@ void ndJointPdActuator::SubmitPdRotation(const dMatrix& matrix0, const dMatrix& 
 		AddAngularRowJacobian(desc, matrix1[2], rollAngle);
 		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
 	}
-}
-
-void ndJointPdActuator::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "referenceFrameBody1", m_referenceFrameBody1);
-	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
-	xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
-	xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
-	xmlSaveParam(childNode, "angularSpring", m_angularSpring);
-	xmlSaveParam(childNode, "angularDamper", m_angularDamper);
-	xmlSaveParam(childNode, "angularRegularizer", m_angularRegularizer);
-
-	xmlSaveParam(childNode, "linearSpring", m_linearSpring);
-	xmlSaveParam(childNode, "linearDamper", m_linearDamper);
-	xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
 }
 
 void ndJointPdActuator::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)

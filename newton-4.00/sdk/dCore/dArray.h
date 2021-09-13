@@ -30,7 +30,6 @@
 #include "dCoreStdafx.h"
 #include "dTypes.h"
 #include "dUtils.h"
-//#include "dMemory.h"
 #include "dClassAlloc.h"
 
 template<class T>

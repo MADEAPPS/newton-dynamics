@@ -59,8 +59,6 @@ class ndJointPdActuator : public ndJointBilateralConstraint
 	void SubmitPdRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
-	
-
 	dMatrix m_referenceFrameBody1;
 	dFloat32 m_maxConeAngle;
 	dFloat32 m_minTwistAngle;

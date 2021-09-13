@@ -94,7 +94,6 @@
 #include <ndCharacterWalkCycleGenerator.h>
 #include <ndMultiBodyVehicleDifferential.h>
 #include <ndCharacterBipedPoseController.h>
-
 #include <ndMultiBodyVehicleDifferentialAxle.h>
 
 #endif 

@@ -53,8 +53,6 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
-	//void SubmitTwistLimits(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
-
 	dMatrix m_pivotFrame;
 	dMatrix m_coneRotation;
 	dVector m_targetPosit;
