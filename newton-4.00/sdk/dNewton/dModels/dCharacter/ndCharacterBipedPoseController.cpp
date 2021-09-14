@@ -122,34 +122,12 @@ bool ndCharacterBipedPoseController::CalculateZeroMomentPoint(dVector& zeroMomen
 	return hasPoint;
 }
 
-void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) const
+void ndCharacterBipedPoseController::CalculateSuportPolygon(dFixSizeArray<dVector, 32>& supportPolygon) const
 {
-	ndCharacterRootNode* const rootNode = m_owner->GetRootNode();
-	ndBodyDynamic* const hip = rootNode->GetBody();
-	
-	dMatrix comMatrixInGlobalSpace(rootNode->GetCoronalFrame() * hip->GetMatrix());
-	
-	// show character center of mass.
-	ndCharacterCentreOfMassState state(m_owner->CalculateCentreOfMassState());
-	comMatrixInGlobalSpace.m_posit = state.m_centerOfMass;
-	context.DrawFrame(comMatrixInGlobalSpace);
-
-	const dRay suportPoint(CalculateSupportPoint(comMatrixInGlobalSpace.m_posit));
-
-	ndJointBilateralConstraint* const leftFootJoint = m_config.m_leftFootEffector->GetJoint();
-	ndJointBilateralConstraint* const rightFootJoint = m_config.m_rightFootEffector->GetJoint();
-	dMatrix leftFootMatrix(leftFootJoint->GetLocalMatrix0() * leftFootJoint->GetBody0()->GetMatrix());
-	dMatrix rightFootMatrix(rightFootJoint->GetLocalMatrix0() * rightFootJoint->GetBody0()->GetMatrix());
-
-	context.DrawLine(leftFootMatrix.m_posit, rightFootMatrix.m_posit, dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(1.0f)));
-	context.DrawLine(comMatrixInGlobalSpace.m_posit, suportPoint.m_p0, dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f)));
-	context.DrawLine(suportPoint.m_p0, suportPoint.m_p1, dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(1.0f)), dFloat32(2.0f));
-
-	dFixSizeArray<dVector, 32> supportPolygon;
 	{
 		ndBodyKinematic* const leftFootBody = m_config.m_leftFootNode->GetBody();
 		ndBodyKinematic::ndContactMap::Iterator iter(leftFootBody->GetContactMap());
-		for (iter.Begin(); iter; iter ++)
+		for (iter.Begin(); iter; iter++)
 		{
 			const ndContact* const contact = iter.GetNode()->GetInfo();
 			if (contact->IsActive())
@@ -165,7 +143,7 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 			}
 		}
 	}
-	
+
 	{
 		ndBodyKinematic* const rightFootBody = m_config.m_rightFootNode->GetBody();
 		ndBodyKinematic::ndContactMap::Iterator iter(rightFootBody->GetContactMap());
@@ -185,13 +163,39 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 			}
 		}
 	}
-	
-	dInt32 hullCount = dConvexHull2d(supportPolygon.GetCount(), &supportPolygon[0]);
-	if (hullCount)
+	supportPolygon.SetCount(dConvexHull2d(supportPolygon.GetCount(), &supportPolygon[0]));
+}
+
+void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) const
+{
+	ndCharacterRootNode* const rootNode = m_owner->GetRootNode();
+	ndBodyDynamic* const hip = rootNode->GetBody();
+
+	dMatrix comMatrixInGlobalSpace(rootNode->GetCoronalFrame() * hip->GetMatrix());
+
+	// show character center of mass.
+	ndCharacterCentreOfMassState state(m_owner->CalculateCentreOfMassState());
+	comMatrixInGlobalSpace.m_posit = state.m_centerOfMass;
+	context.DrawFrame(comMatrixInGlobalSpace);
+
+	const dRay suportPoint(CalculateSupportPoint(comMatrixInGlobalSpace.m_posit));
+
+	ndJointBilateralConstraint* const leftFootJoint = m_config.m_leftFootEffector->GetJoint();
+	ndJointBilateralConstraint* const rightFootJoint = m_config.m_rightFootEffector->GetJoint();
+	dMatrix leftFootMatrix(leftFootJoint->GetLocalMatrix0() * leftFootJoint->GetBody0()->GetMatrix());
+	dMatrix rightFootMatrix(rightFootJoint->GetLocalMatrix0() * rightFootJoint->GetBody0()->GetMatrix());
+
+	context.DrawLine(leftFootMatrix.m_posit, rightFootMatrix.m_posit, dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(1.0f)));
+	context.DrawLine(comMatrixInGlobalSpace.m_posit, suportPoint.m_p0, dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f)));
+	context.DrawLine(suportPoint.m_p0, suportPoint.m_p1, dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(1.0f)), dFloat32(2.0f));
+
+	dFixSizeArray<dVector, 32> supportPolygon;
+	CalculateSuportPolygon(supportPolygon);
+	if (supportPolygon.GetCount())
 	{
 		dVector offset(m_owner->GetRootNode()->GetGravityDir().Scale(dFloat32(0.01f)));
-		dVector p0(supportPolygon[hullCount - 1] - offset);
-		for (dInt32 i = 0; i < hullCount; i++)
+		dVector p0(supportPolygon[supportPolygon.GetCount() - 1] - offset);
+		for (dInt32 i = 0; i < supportPolygon.GetCount(); i++)
 		{
 			dVector p1(supportPolygon[i] - offset);
 			context.DrawLine(p0, p1, dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(1.0f)));

@@ -60,6 +60,7 @@ class ndCharacterBipedPoseController: public ndCharacterPoseController
 	dRay CalculateSupportPoint(const dVector& comInGlobalSpace) const;
 
 	bool CalculateZeroMomentPoint(dVector& zeroMomentPointInGlobalSpace) const;
+	void CalculateSuportPolygon(dFixSizeArray<dVector, 32>& supportPolygon) const;
 
 	protected:
 	virtual void Debug(ndConstraintDebugCallback& context) const;

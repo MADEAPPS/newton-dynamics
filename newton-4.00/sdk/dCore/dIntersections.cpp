@@ -453,6 +453,7 @@ dInt32 dConvexHull2d(dInt32 count, dVector* const pointArray)
 			hullCount++;
 		}
 
+		hullCount--;
 		for (dInt32 i = 0; i < hullCount; i++)
 		{
 			pointArray[i] = covariance.TransformVector(convexHull[i]);

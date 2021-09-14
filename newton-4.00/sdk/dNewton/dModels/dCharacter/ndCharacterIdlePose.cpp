@@ -34,7 +34,9 @@
 #define D_MIN_DISTANCE_TO_SUPPORT2 (D_MIN_DISTANCE_TO_SUPPORT * D_MIN_DISTANCE_TO_SUPPORT)
 
 ndCharacterIdlePose::ndCharacterIdlePose(ndCharacterBipedPoseController* const owner)
-	:m_referencePose()
+	:m_zeroMomentPoint(dVector::m_zero)
+	,m_state(m_airborne)
+	//,m_referencePose()
 	,m_owner(owner)
 	,m_invertedPendulumRadius(dFloat32 (0.0f))
 {
@@ -66,9 +68,11 @@ void ndCharacterIdlePose::Init()
 		p1 = matrix.m_posit;
 	}
 
+	// calculate the radius of the idle state
 	ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
-	dVector xmp((p1 + p0).Scale(dFloat32(0.5f)));
-	dVector radius(state.m_centerOfMass - xmp);
+	m_zeroMomentPoint = (p1 + p0).Scale(dFloat32(0.5f));
+	m_zeroMomentPoint.m_w = dFloat32(1.0f);
+	dVector radius(state.m_centerOfMass - m_zeroMomentPoint);
 	m_invertedPendulumRadius = dSqrt(radius.DotProduct(radius & dVector::m_triplexMask).GetScalar());
 }
 
@@ -90,25 +94,177 @@ void ndCharacterIdlePose::SetEffectorMatrix(const dVector&, const ndCharaterKeyF
 	}
 }
 
-//void ndCharacterIdlePose::Update(dFloat32 timestep)
-void ndCharacterIdlePose::Update(dFloat32)
+void ndCharacterIdlePose::Update(dFloat32 timestep)
 {
+	switch (m_state)
+	{
+		case m_airborne:
+			AirBorneState(timestep);
+			break;
+
+		case m_twoFeet:
+			TwoFeetState(timestep);
+			break;
+
+		default:
+			dAssert(0);
+
+	}
 	//ndCharacterRootNode* const rootNode = character->GetRootNode();
 	//dVector localCom (rootNode->GetInvCoronalFrame().TransformVector(rootNode->GetBody()->GetMatrix().UntransformVector(state.m_centerOfMass)));
 	//
 	//SetEffectorMatrix(localCom, m_referencePose[0]);
 	//SetEffectorMatrix(localCom, m_referencePose[1]);
 
-	dVector zeroMomentPointInGlobalSpace;
-	if (m_owner->CalculateZeroMomentPoint(zeroMomentPointInGlobalSpace))
-	{
-		const ndCharacter* const character = m_owner->GetCharacter();
-		ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
-		
-		dVector radius(state.m_centerOfMass - zeroMomentPointInGlobalSpace);
+	//dVector zeroMomentPointInGlobalSpace;
+	//if (m_owner->CalculateZeroMomentPoint(zeroMomentPointInGlobalSpace))
+	//{
+	//	const ndCharacter* const character = m_owner->GetCharacter();
+	//	ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
+	//	
+	//	dVector radius(state.m_centerOfMass - zeroMomentPointInGlobalSpace);
+	//	dFloat32 invertedPendulumRadius = dSqrt(radius.DotProduct(radius & dVector::m_triplexMask).GetScalar());
+	//
+	//	dTrace(("r(%f %f %f) v(%f %f %f)\n", radius.m_x, radius.m_y, radius.m_z, 
+	//		state.m_centerOfMassVeloc.m_x, state.m_centerOfMassVeloc.m_y, state.m_centerOfMassVeloc.m_z));
+	//}
+}
 
-		dTrace(("r(%f %f %f) v(%f %f %f)\n", radius.m_x, radius.m_y, radius.m_z, 
-			state.m_centerOfMassVeloc.m_x, state.m_centerOfMassVeloc.m_y, state.m_centerOfMassVeloc.m_z));
+
+bool ndCharacterIdlePose::IsComSupported(const dVector& com) const
+{
+	dFixSizeArray<dVector, 32> supportPolygon;
+	m_owner->CalculateSuportPolygon(supportPolygon);
+
+	dAssert(supportPolygon.GetCount() >= 3);
+	dVector normal(dVector::m_zero);
+	for (dInt32 i = 2; i < supportPolygon.GetCount(); i++)
+	{
+		dVector e0(supportPolygon[i - 0] - supportPolygon[0]);
+		dVector e1(supportPolygon[i - 1] - supportPolygon[0]);
+		normal += e1.CrossProduct(e0);
+	}
+	normal.m_w = dFloat32(0.0f);
+	normal = normal.Normalize();
+	dPlane plane(normal, -normal.DotProduct(supportPolygon[0]).GetScalar());
+
+	const ndCharacter* const character = m_owner->GetCharacter();
+	const dVector gravityDir(character->GetRootNode()->GetGravityDir());
+
+	dFloat32 den = gravityDir.DotProduct(plane).GetScalar();
+	dAssert(dAbs(den) > dFloat32(0.0f));
+	dVector pointInPlane(com + gravityDir.Scale(-plane.Evalue(com) / den));
+	dInt32 i0 = supportPolygon.GetCount() - 1;
+	for (dInt32 i = 0; i < supportPolygon.GetCount(); i++)
+	{
+		dVector e0(pointInPlane - supportPolygon[i0]);
+		dVector e1(pointInPlane - supportPolygon[i]);
+		dFloat32 side = e0.CrossProduct(e1).DotProduct(normal).GetScalar();
+		if (side < dFloat32(0.0f))
+		{
+			return false;
+		}
+
+		i0 = i;
+	}
+
+	return true;
+}
+
+void ndCharacterIdlePose::GetHeelPoints(dFixSizeArray<dVector, 32>& points) const
+{
+	points.SetCount(0);
+	const ndBipedControllerConfig& config = m_owner->GetConfig();
+	{
+		ndBodyKinematic* const leftFootBody = config.m_leftFootNode->GetBody();
+		ndBodyKinematic::ndContactMap::Iterator iter(leftFootBody->GetContactMap());
+		for (iter.Begin(); iter; iter++)
+		{
+			const ndContact* const contact = iter.GetNode()->GetInfo();
+			if (contact->IsActive())
+			{
+				ndJointBilateralConstraint* const leftFootJoint = config.m_leftFootEffector->GetJoint();
+				dVector p(leftFootJoint->GetBody0()->GetMatrix().TransformVector(leftFootJoint->GetLocalMatrix0().m_posit));
+				points.PushBack(p);
+				break;
+			}
+		}
+	}
+
+	{
+		ndBodyKinematic* const righFootBody = config.m_rightFootNode->GetBody();
+		ndBodyKinematic::ndContactMap::Iterator iter(righFootBody->GetContactMap());
+		for (iter.Begin(); iter; iter++)
+		{
+			const ndContact* const contact = iter.GetNode()->GetInfo();
+			if (contact->IsActive())
+			{
+				ndJointBilateralConstraint* const rightFootJoint = config.m_rightFootEffector->GetJoint();
+				dVector p(rightFootJoint->GetBody0()->GetMatrix().TransformVector(rightFootJoint->GetLocalMatrix0().m_posit));
+				points.PushBack(p);
+				break;
+			}
+		}
 	}
 }
 
+void ndCharacterIdlePose::AirBorneState(dFloat32 timestep)
+{
+	dFixSizeArray<dVector, 32> points;
+	GetHeelPoints(points);
+
+	if (points.GetCount() == 0)
+	{
+		// no state change
+	}
+	else if (points.GetCount() == 1)
+	{
+		dAssert(0);
+	}
+	else if (points.GetCount() == 2)
+	{
+		m_state = m_twoFeet;
+		m_zeroMomentPoint = (points[0] + points[1]).Scale(dFloat32(0.5f));
+		m_zeroMomentPoint.m_w = dFloat32(1.0f);
+		TwoFeetState(timestep);
+	}
+}
+
+void ndCharacterIdlePose::TwoFeetState(dFloat32 timestep)
+{
+	dFixSizeArray<dVector, 32> points;
+	GetHeelPoints(points);
+
+	if (points.GetCount() == 0)
+	{
+		m_state = m_airborne;
+		AirBorneState(timestep);
+	}
+	else if (points.GetCount() == 1)
+	{
+		dAssert(0);
+	}
+	else if (points.GetCount() == 2)
+	{
+		// no state change
+		const ndCharacter* const character = m_owner->GetCharacter();
+		ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
+		if (IsComSupported(state.m_centerOfMass))
+		{
+			//dVector zeroMomentPointInGlobalSpace;
+			//if (m_owner->CalculateZeroMomentPoint(zeroMomentPointInGlobalSpace))
+			//{
+			//	//dAssert(0);
+			//}
+		}
+		else
+		{
+			// must enter recovering mode state
+			dAssert(0);
+		}
+	}
+	else
+	{
+		dAssert(0);
+	}
+}

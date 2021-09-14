@@ -33,6 +33,13 @@ class ndCharacterBipedPoseController;
 class ndCharacterIdlePose : public ndCharacterPoseGenerator
 {
 	public:
+	enum ndIdleState
+	{
+		m_airborne,
+		m_oneFeet,
+		m_twoFeet,
+	};
+
 	ndCharacterIdlePose(ndCharacterBipedPoseController* const owner);
 
 	protected:
@@ -41,9 +48,19 @@ class ndCharacterIdlePose : public ndCharacterPoseGenerator
 	void Update(dFloat32 timestep);
 	void SetEffectorMatrix(const dVector& localCom, const ndCharaterKeyFramePose& pose);
 
-	dFixSizeArray<ndCharaterKeyFramePose, 2> m_referencePose;
+	void TwoFeetState(dFloat32 timestep);
+	void AirBorneState(dFloat32 timestep);
+
+	bool IsComSupported(const dVector& com) const;
+	void GetHeelPoints(dFixSizeArray<dVector, 32>& points) const;
+	
+
+	dVector m_zeroMomentPoint;
+	//dFixSizeArray<ndCharaterKeyFramePose, 2> m_referencePose;
 	ndCharacterBipedPoseController* m_owner;
 	dFloat32 m_invertedPendulumRadius;
+
+	ndIdleState m_state;
 	friend class ndCharacterBipedPoseController;
 };
 
