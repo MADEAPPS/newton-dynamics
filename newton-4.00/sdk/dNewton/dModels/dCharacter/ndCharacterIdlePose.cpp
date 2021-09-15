@@ -249,19 +249,38 @@ void ndCharacterIdlePose::TwoFeetState(dFloat32 timestep)
 		// no state change
 		const ndCharacter* const character = m_owner->GetCharacter();
 		ndCharacterCentreOfMassState state(character->CalculateCentreOfMassState());
-		if (IsComSupported(state.m_centerOfMass))
-		{
-			//dVector zeroMomentPointInGlobalSpace;
-			//if (m_owner->CalculateZeroMomentPoint(zeroMomentPointInGlobalSpace))
-			//{
-			//	//dAssert(0);
-			//}
-		}
-		else
+		if (!IsComSupported(state.m_centerOfMass))
 		{
 			// must enter recovering mode state
-			dAssert(0);
+//			dAssert(0);
 		}
+
+		//static dFloat32 angle = 0.0f;
+		//angle += 0.0005f;
+		//dFloat32 r = 0.01f;
+		//dVector offset(r * dCos(angle), 0.0f, 0.0f, 0.0f);
+		//
+		//static int xxxx;
+		//xxxx++;
+		//if (xxxx < 100)
+		//	return;
+		//static dMatrix xxxxx(character->GetRootNode()->GetBody()->GetMatrix());
+		////dMatrix matrix (character->GetRootNode()->GetBody()->GetMatrix());
+		//dMatrix matrix(character->GetRootNode()->GetBody()->GetMatrix());
+		//matrix.m_posit = xxxxx.m_posit + offset;
+		//
+		//dMatrix matrix1(m_owner->GetConfig().m_leftFootEffector->GetReferenceMatrix() * matrix);
+		//dMatrix matrix2(m_owner->GetConfig().m_rightFootEffector->GetReferenceMatrix() * matrix);
+		//m_owner->GetConfig().m_leftFootEffector->SetTargetMatrix(matrix1);
+		//m_owner->GetConfig().m_rightFootEffector->SetTargetMatrix(matrix2);
+	
+
+		// move the com to the apex of the inverted pendulum.
+		//dVector zeroMomentPointInGlobalSpace;
+		//if (m_owner->CalculateZeroMomentPoint(zeroMomentPointInGlobalSpace))
+		//{
+		//	//dAssert(0);
+		//}
 	}
 	else
 	{
