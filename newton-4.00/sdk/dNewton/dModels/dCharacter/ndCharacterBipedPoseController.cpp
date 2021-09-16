@@ -202,6 +202,9 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 			p0 = p1;
 		}
 	}
+
+	m_config.m_leftFootNode->GetJoint()->DebugJoint(context);
+	m_config.m_rightFootNode->GetJoint()->DebugJoint(context);
 }
 
 bool ndCharacterBipedPoseController::Evaluate(ndWorld* const , dFloat32 timestep)

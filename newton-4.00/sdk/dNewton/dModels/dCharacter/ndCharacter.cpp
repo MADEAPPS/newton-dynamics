@@ -77,6 +77,23 @@ ndCharacter::~ndCharacter()
 	}
 }
 
+void ndCharacter::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndModel::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	if (m_rootNode)
+	{
+		dTree<dInt32, const ndCharacterLimbNode*> limbMap;
+		ndCharacterSaveDescriptor childDesc(desc);
+		childDesc.m_rootNode = childNode;
+		childDesc.m_limbMap = &limbMap;
+		m_rootNode->Save(childDesc);
+	}
+}
+
 void ndCharacter::AddToWorld(ndWorld* const world)
 {
 	if (m_rootNode)
@@ -309,19 +326,33 @@ void ndCharacter::Update(ndWorld* const world, dFloat32 timestep)
 	}
 }
 
-void ndCharacter::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+ndCharacterSkeleton* ndCharacter::CreateSkeleton() const
 {
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndModel::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	dInt32 stack = 0;
+	ndCharacterLimbNode* nodePool[32];
+	ndCharacterSkeleton* parentPool[32];
 
-	if (m_rootNode)
+	ndCharacterSkeleton* const skeleton = new ndCharacterSkeleton(m_rootNode, nullptr);
+	for (ndCharacterLimbNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
 	{
-		dTree<dInt32, const ndCharacterLimbNode*> limbMap;
-		ndCharacterSaveDescriptor childDesc(desc);
-		childDesc.m_rootNode = childNode;
-		childDesc.m_limbMap = &limbMap;
-		m_rootNode->Save(childDesc);
+		nodePool[stack] = child;
+		parentPool[stack] = skeleton;
+		stack++;
 	}
+	
+	while (stack)
+	{
+		stack--;
+		ndCharacterLimbNode* const node = nodePool[stack];
+		ndCharacterSkeleton* const parent = new ndCharacterSkeleton(node, parentPool[stack]);
+	
+		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
+		{
+			nodePool[stack] = child;
+			parentPool[stack] = parent;
+			stack++;
+		}
+	}
+
+	return skeleton;
 }

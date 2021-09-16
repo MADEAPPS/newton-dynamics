@@ -21,5 +21,16 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndCharacterPose.h"
+#include "ndCharacterSkeleton.h"
+#include "ndCharacterRootNode.h"
 
+
+ndCharacterSkeleton::ndCharacterSkeleton(ndCharacterLimbNode* const node, ndCharacterSkeleton* const parent)
+	:dNodeHierarchy<ndCharacterSkeleton>()
+	,m_node(node)
+{
+	if (parent)
+	{
+		Attach(parent);
+	}
+}

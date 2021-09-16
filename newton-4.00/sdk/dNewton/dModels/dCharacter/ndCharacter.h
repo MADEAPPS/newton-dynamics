@@ -28,6 +28,7 @@
 class ndWorld;
 class ndCharacterLimbNode;
 class ndCharacterRootNode;
+class ndCharacterSkeleton;
 class ndCharacterEffectorNode;
 class ndCharacterPoseController;
 class ndCharacterForwardDynamicNode;
@@ -69,6 +70,8 @@ class ndCharacter: public ndModel
 
 	D_NEWTON_API void AddAttachment(ndJointBilateralConstraint* const joint);
 	D_NEWTON_API void RemoveAttachment(ndJointBilateralConstraint* const joint);
+
+	D_NEWTON_API ndCharacterSkeleton* CreateSkeleton() const;
 
 	protected:
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;

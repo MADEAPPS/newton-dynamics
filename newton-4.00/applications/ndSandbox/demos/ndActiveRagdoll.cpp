@@ -31,22 +31,21 @@ class dActiveJointDefinition
 		effector,
 	};
 
-	struct dJointPidData
+	struct dJointPdData
 	{
-		dJointPidData()
+		dJointPdData()
 			:m_spring(1500.0f)
 			,m_damper(40.0f)
 			,m_regularizer(0.001f)
 		{
 		}
 
-		dJointPidData(dFloat32 spring, dFloat32 damper, dFloat32 regularizer)
+		dJointPdData(dFloat32 spring, dFloat32 damper, dFloat32 regularizer)
 			:m_spring(spring)
 			,m_damper(damper)
 			,m_regularizer(regularizer)
 		{
 		}
-
 
 		dFloat32 m_spring;
 		dFloat32 m_damper;
@@ -72,7 +71,8 @@ class dActiveJointDefinition
 	dFloat32 m_massWeight;
 	dJointLimit m_jointLimits;
 	dFrameMatrix m_frameBasics;
-	dJointPidData m_jointData;
+	dJointPdData m_coneSpringData;
+	dJointPdData m_twistSpringData;
 };
 
 class ndActiveRagdollEntityNotify : public ndDemoEntityNotify
@@ -133,18 +133,20 @@ static dActiveJointDefinition jointsDefinition[] =
 	{ "mixamorig:RightUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
 	{ "mixamorig:RightLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
 	{ "rightFoot_effector", dActiveJointDefinition::effector, 0.0f,{},{},{} },
-	{ "mixamorig:RightFoot", dActiveJointDefinition::forwardKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {100.0f, 5.0f, 0.001f} },
+	{ "mixamorig:RightFoot", dActiveJointDefinition::forwardKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {100.0f, 5.0f, 0.001f}, {0.0f, 0.0f, 0.0f}},
 	
 	{ "mixamorig:LeftUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
 	{ "mixamorig:LeftLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
 	{ "leftFoot_effector", dActiveJointDefinition::effector, 0.0f,{},{},{} },
-	{ "mixamorig:LeftFoot", dActiveJointDefinition::forwardKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {100.0f, 5.0f, 0.001f} },
+	{ "mixamorig:LeftFoot", dActiveJointDefinition::forwardKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {100.0f, 5.0f, 0.001f}, { 0.0f, 0.0f, 0.0f }},
 };
 
 class ndActiveRagdollModel : public ndCharacter
 {
 	public:
 	ndActiveRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const dMatrix& location)
+		:ndCharacter()
+		,m_skeleton(nullptr)
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = ragdollMesh->CreateClone();
@@ -155,7 +157,7 @@ class ndActiveRagdollModel : public ndCharacter
 		dMatrix matrix(location);
 		dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y;
-		//matrix.m_posit.m_y += 0.5f;
+		matrix.m_posit.m_y += 0.5f;
 
 		// add the root body
 		ndDemoEntity* const rootEntity = (ndDemoEntity*)entity->Find(jointsDefinition[0].m_boneName);
@@ -164,6 +166,7 @@ class ndActiveRagdollModel : public ndCharacter
 		ndDemoEntity* const characterFrame = (ndDemoEntity*)entity->Find("referenceFrame");
 		dMatrix bodyFrame(characterFrame->CalculateGlobalMatrix());
 		rootNode->SetCoronalFrame(bodyFrame);
+		rootNode->SetName(rootEntity->GetName().GetStr());
 
 		dInt32 stack = 0;
 		const dInt32 definitionCount = dInt32 (sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
@@ -206,6 +209,7 @@ class ndActiveRagdollModel : public ndCharacter
 
 						// connect this body part to its parentBody with a ragdoll joint
 						parentBone = ConnectBodyParts(childBody, parentBone, definition);
+						parentBone->SetName(name);
 
 						if (strstr(name, "RightFoot"))
 						{
@@ -220,6 +224,7 @@ class ndActiveRagdollModel : public ndCharacter
 					{
 						dMatrix effectorMatrix(childEntity->GetCurrentMatrix() * parentBone->GetBody()->GetMatrix());
 						ndCharacterEffectorNode* const effectorNode = CreateInverseDynamicEffector(effectorMatrix, parentBone);
+						effectorNode->SetName(name);
 						if (strcmp(effectorNode->GetJoint()->SubClassName(), "ndJointTwoBodyIK") == 0)
 						{
 							//ndJointTwoBodyIK* const effectorJoint = (ndJointTwoBodyIK*)effectorNode->GetJoint();
@@ -230,7 +235,6 @@ class ndActiveRagdollModel : public ndCharacter
 							dAssert(0);
 						}
 						
-
 						if (strstr(name, "right"))
 						{
 							bipedConfig.m_rightFootEffector = effectorNode;
@@ -240,6 +244,7 @@ class ndActiveRagdollModel : public ndCharacter
 							bipedConfig.m_leftFootEffector = effectorNode;
 						}
 					}
+				
 					break;
 				}
 			}
@@ -261,13 +266,24 @@ class ndActiveRagdollModel : public ndCharacter
 		for (dInt32 i = 0; i < bodyCount; i++)
 		{
 			ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
-			if (ent->GetName() == "mixamorig:Hips") 
+			//if (ent->GetName() == "mixamorig:Hips") 
+			if (ent->GetName() == "mixamorig:Spine1")
 			{
-				//ndJointFix6dof* const joint = new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody());
-				//world->AddJoint(joint);
-				//AddAttachment(joint);
+				ndJointFix6dof* const joint = new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody());
+				world->AddJoint(joint);
+				AddAttachment(joint);
 				break;
 			}
+		}
+
+		m_skeleton = CreateSkeleton();
+	}
+
+	~ndActiveRagdollModel()
+	{
+		if (m_skeleton)
+		{
+			delete m_skeleton;
 		}
 	}
 
@@ -322,7 +338,8 @@ class ndActiveRagdollModel : public ndCharacter
 
 			joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
 			joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
-			joint->SetAngularSpringDamperRegularizer(definition.m_jointData.m_spring, definition.m_jointData.m_damper, definition.m_jointData.m_regularizer);
+			joint->SetConeAngleSpringDamperRegularizer(definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper, definition.m_coneSpringData.m_regularizer);
+			joint->SetTwistAngleSpringDamperRegularizer(definition.m_twistSpringData.m_spring, definition.m_twistSpringData.m_damper, definition.m_twistSpringData.m_regularizer);
 
 			return jointNode;
 		}
@@ -357,6 +374,7 @@ class ndActiveRagdollModel : public ndCharacter
 		ndCharacter::PostTransformUpdate(world, timestep);
 	}
 
+	ndCharacterSkeleton* m_skeleton;
 	ndCharacterBipedPoseController m_bipedController;
 };
 

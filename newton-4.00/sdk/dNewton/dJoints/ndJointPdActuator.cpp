@@ -25,12 +25,15 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointPdActuator)
 ndJointPdActuator::ndJointPdActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(8, child, parent, pinAndPivotFrame)
 	,m_pivotFrame(m_localMatrix1)
-	,m_maxConeAngle(dFloat32(1.0e10f))
 	,m_minTwistAngle(-dFloat32(1.0e10f))
 	,m_maxTwistAngle(dFloat32(1.0e10f))
-	,m_angularSpring(dFloat32(1000.0f))
-	,m_angularDamper(dFloat32(50.0f))
-	,m_angularRegularizer(dFloat32(5.0e-3f))
+	,m_maxConeAngle(dFloat32(1.0e10f))
+	,m_twistAngleSpring(dFloat32(1000.0f))
+	,m_twistAngleDamper(dFloat32(50.0f))
+	,m_twistAngleRegularizer(dFloat32(5.0e-3f))
+	,m_coneAngleSpring(dFloat32(1000.0f))
+	,m_coneAngleDamper(dFloat32(50.0f))
+	,m_coneAngleRegularizer(dFloat32(5.0e-3f))
 	,m_linearSpring(dFloat32(0.0f))
 	,m_linearDamper(dFloat32(0.0f))
 	,m_linearRegularizer(dFloat32(0.0f))
@@ -40,12 +43,15 @@ ndJointPdActuator::ndJointPdActuator(const dMatrix& pinAndPivotFrame, ndBodyKine
 ndJointPdActuator::ndJointPdActuator(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
 	,m_pivotFrame(dGetIdentityMatrix())
-	,m_maxConeAngle(dFloat32(1.0e10f))
 	,m_minTwistAngle(-dFloat32(1.0e10f))
 	,m_maxTwistAngle(dFloat32(1.0e10f))
-	,m_angularSpring(dFloat32(1000.0f))
-	,m_angularDamper(dFloat32(50.0f))
-	,m_angularRegularizer(dFloat32(5.0e-3f))
+	,m_maxConeAngle(dFloat32(1.0e10f))
+	,m_twistAngleSpring(dFloat32(1000.0f))
+	,m_twistAngleDamper(dFloat32(50.0f))
+	,m_twistAngleRegularizer(dFloat32(5.0e-3f))
+	,m_coneAngleSpring(dFloat32(1000.0f))
+	,m_coneAngleDamper(dFloat32(50.0f))
+	,m_coneAngleRegularizer(dFloat32(5.0e-3f))
 	,m_linearSpring(dFloat32(1000.0f))
 	,m_linearDamper(dFloat32(50.0f))
 	,m_linearRegularizer(dFloat32(5.0e-3f))
@@ -53,12 +59,16 @@ ndJointPdActuator::ndJointPdActuator(const dLoadSaveBase::dLoadDescriptor& desc)
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
 	m_pivotFrame = xmlGetMatrix(xmlNode, "pivotFrame");
-	m_maxConeAngle = xmlGetFloat (xmlNode, "maxConeAngle");
 	m_minTwistAngle = xmlGetFloat (xmlNode, "minTwistAngle");
 	m_maxTwistAngle = xmlGetFloat (xmlNode, "maxTwistAngle");
-	m_angularSpring = xmlGetFloat (xmlNode, "angularSpring");
-	m_angularDamper = xmlGetFloat (xmlNode, "angularDamper");
-	m_angularRegularizer = xmlGetFloat (xmlNode, "angularRegularizer");
+	m_twistAngleSpring = xmlGetFloat(xmlNode, "twistAngleSpring");
+	m_twistAngleDamper = xmlGetFloat(xmlNode, "twistAngleDamper");
+	m_twistAngleRegularizer = xmlGetFloat(xmlNode, "twistAngleRegularizer");
+
+	m_maxConeAngle = xmlGetFloat(xmlNode, "maxConeAngle");
+	m_coneAngleSpring = xmlGetFloat (xmlNode, "coneAngleSpring");
+	m_coneAngleDamper = xmlGetFloat (xmlNode, "coneAngleDamper");
+	m_coneAngleRegularizer = xmlGetFloat (xmlNode, "coneAngleRegularizer");
 
 	m_linearSpring = xmlGetFloat(xmlNode, "linearSpring");
 	m_linearDamper = xmlGetFloat(xmlNode, "linearDamper");
@@ -77,32 +87,49 @@ void ndJointPdActuator::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "pivotFrame", m_pivotFrame);
-	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
 	xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
 	xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
-	xmlSaveParam(childNode, "angularSpring", m_angularSpring);
-	xmlSaveParam(childNode, "angularDamper", m_angularDamper);
-	xmlSaveParam(childNode, "angularRegularizer", m_angularRegularizer);
+	xmlSaveParam(childNode, "twistAngleSpring", m_twistAngleSpring);
+	xmlSaveParam(childNode, "twistAngleDamper", m_twistAngleDamper);
+	xmlSaveParam(childNode, "twistAngleRegularizer", m_twistAngleRegularizer);
+
+	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
+	xmlSaveParam(childNode, "coneAngleSpring", m_coneAngleSpring);
+	xmlSaveParam(childNode, "coneAngleDamper", m_coneAngleDamper);
+	xmlSaveParam(childNode, "coneAngleRegularizer", m_coneAngleRegularizer);
 
 	xmlSaveParam(childNode, "linearSpring", m_linearSpring);
 	xmlSaveParam(childNode, "linearDamper", m_linearDamper);
 	xmlSaveParam(childNode, "linearRegularizer", m_linearRegularizer);
 }
 
-void ndJointPdActuator::GetAngularSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const
+void ndJointPdActuator::GetConeAngleSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const
 {
-	spring = m_angularSpring;
-	damper = m_angularDamper;
-	regularizer = m_angularRegularizer;
+	spring = m_coneAngleSpring;
+	damper = m_coneAngleDamper;
+	regularizer = m_coneAngleRegularizer;
 }
 
-void ndJointPdActuator::SetAngularSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer)
+void ndJointPdActuator::SetConeAngleSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer)
 {
-	m_angularSpring = dMax(spring, dFloat32(0.0f));
-	m_angularDamper = dMax(damper, dFloat32(0.0f));
-	m_angularRegularizer = dMax(regularizer, dFloat32(1.0e-4f));
+	m_coneAngleSpring = dMax(spring, dFloat32(0.0f));
+	m_coneAngleDamper = dMax(damper, dFloat32(0.0f));
+	m_coneAngleRegularizer = dMax(regularizer, dFloat32(0.0f));
 }
 
+void ndJointPdActuator::GetTwistAngleSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const
+{
+	spring = m_twistAngleSpring;
+	damper = m_twistAngleDamper;
+	regularizer = m_twistAngleRegularizer;
+}
+
+void ndJointPdActuator::SetTwistAngleSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer)
+{
+	m_twistAngleSpring = dMax(spring, dFloat32(0.0f));
+	m_twistAngleDamper = dMax(damper, dFloat32(0.0f));
+	m_twistAngleRegularizer = dMax(regularizer, dFloat32(0.0f));
+}
 
 void ndJointPdActuator::SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle)
 {
@@ -259,7 +286,7 @@ void ndJointPdActuator::SubmitAngularAxisCartesianApproximation(const dMatrix& m
 		dAssert(m_maxConeAngle == dFloat32(0.0f));
 		//this is a hinge joint
 		AddAngularRowJacobian(desc, matrix0.m_front, -pitchAngle);
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+		SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
 
 		// apply cone limits
 		// two rows to restrict rotation around the parent coordinate system
@@ -279,8 +306,8 @@ void ndJointPdActuator::SubmitAngularAxisCartesianApproximation(const dMatrix& m
 
 void ndJointPdActuator::SubmitTwistLimits(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc)
 {
-	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * dDegreeToRad))
-	{
+	if((m_maxTwistAngle - m_minTwistAngle) < (2.0f * dDegreeToRad))
+	{ 
 		AddAngularRowJacobian(desc, pin, -angle);
 		// force this limit to be bound
 		SetLowerFriction(desc, D_LCP_MAX_VALUE * dFloat32 (0.1f));
@@ -354,27 +381,27 @@ void ndJointPdActuator::SubmitPdRotation(const dMatrix& matrix0, const dMatrix& 
 
 		dMatrix basis(pin);
 		AddAngularRowJacobian(desc, basis[0], -angle);
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+		SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
 
 		AddAngularRowJacobian(desc, basis[1], dFloat32 (0.0f));
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+		SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
 
 		AddAngularRowJacobian(desc, basis[2], dFloat32(0.0f));
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+		SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
 	}
 	else
 	{
 		dFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
 		AddAngularRowJacobian(desc, matrix1[0], pitchAngle);
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+		SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
 		
 		dFloat32 yawAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[1]);
 		AddAngularRowJacobian(desc, matrix1[1], yawAngle);
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+		SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
 		
 		dFloat32 rollAngle = CalculateAngle(matrix0[0], matrix1[0], matrix1[2]);
 		AddAngularRowJacobian(desc, matrix1[2], rollAngle);
-		SetMassSpringDamperAcceleration(desc, m_angularRegularizer, m_angularSpring, m_angularDamper);
+		SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
 	}
 }
 
@@ -422,15 +449,21 @@ void ndJointPdActuator::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 	SubmitLinearLimits(matrix0, matrix1, desc);
 
-	dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
-	if (cosAngleCos >= dFloat32(0.998f))
+	if (m_twistAngleRegularizer == dFloat32(0.0f))
 	{
-		// special case where the front axis are almost aligned
-		// solve by using Cartesian approximation
-		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
 	}
 	else
 	{
-		SubmitAngularAxis(matrix0, matrix1, desc);
+		dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
+		if (cosAngleCos >= dFloat32(0.998f))
+		{
+			// special case where the front axis are almost aligned
+			// solve by using Cartesian approximation
+			SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
+		}
+		else
+		{
+			SubmitAngularAxis(matrix0, matrix1, desc);
+		}
 	}
 }

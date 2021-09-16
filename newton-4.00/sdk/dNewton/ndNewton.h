@@ -59,7 +59,6 @@
 #include <ndShapeInstance.h>
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
-#include <ndCharacterPose.h>
 #include <ndDynamicsUpdate.h>
 #include <ndJointTwoBodyIK.h>
 #include <ndJointPdActuator.h>
@@ -69,6 +68,7 @@
 #include <ndJointDoubleHinge.h>
 #include <ndJointFixDistance.h>
 #include <ndMultiBodyVehicle.h>
+#include <ndCharacterSkeleton.h>
 #include <ndCharacterIdlePose.h>
 #include <ndCharacterRootNode.h>
 #include <ndSkeletonContainer.h>

@@ -362,7 +362,7 @@ void ndJointTwoBodyIK::JacobianDerivative(ndConstraintDescritor& desc)
 	m_localMatrix1 = m_coneRotation * m_pivotFrame;
 	m_localMatrix1.m_posit = m_pivotFrame.TransformVector(m_targetPosit);
 	CalculateGlobalMatrix(matrix0, matrix1);
-
+return;
 	SubmitLinearLimits(matrix0, matrix1, desc);
 	SubmitAngularLimits(matrix0, matrix1, desc);
 }

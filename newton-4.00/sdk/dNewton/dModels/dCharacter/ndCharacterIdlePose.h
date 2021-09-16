@@ -23,7 +23,7 @@
 #define __D_CHARACTER_IDLE_POSE_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndCharacterPose.h"
+#include "ndCharacterSkeleton.h"
 #include "ndCharacterPoseGenerator.h"
 
 class ndCharacterEffectorNode;
@@ -46,7 +46,7 @@ class ndCharacterIdlePose : public ndCharacterPoseGenerator
 	virtual void Init();
 
 	void Update(dFloat32 timestep);
-	void SetEffectorMatrix(const dVector& localCom, const ndCharaterKeyFramePose& pose);
+	//void SetEffectorMatrix(const dVector& localCom, const ndCharaterKeyFramePose& pose);
 
 	void TwoFeetState(dFloat32 timestep);
 	void AirBorneState(dFloat32 timestep);

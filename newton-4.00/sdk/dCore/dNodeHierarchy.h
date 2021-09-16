@@ -94,7 +94,6 @@ inline dNodeBaseHierarchy::dNodeBaseHierarchy (const char* const name)
 	SetName (name);
 }
 
-
 inline void dNodeBaseHierarchy::Clear()
 {
 	m_child = nullptr;
@@ -103,7 +102,6 @@ inline void dNodeBaseHierarchy::Clear()
 	m_nameID = 0;
 	m_name = (char*)nullptr;
 }
-
 
 inline dNodeBaseHierarchy* dNodeBaseHierarchy::GetChild () const
 {

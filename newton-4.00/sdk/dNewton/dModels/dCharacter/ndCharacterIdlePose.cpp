@@ -77,25 +77,26 @@ void ndCharacterIdlePose::Init()
 }
 
 //void ndCharacterIdlePose::SetEffectorMatrix(const dVector& localCom, const ndCharaterKeyFramePose& pose)
-void ndCharacterIdlePose::SetEffectorMatrix(const dVector&, const ndCharaterKeyFramePose& pose)
-{
-	if (pose.m_node)
-	{
-		dAssert(0);
-		//ndCharacterEffectorNode* const effector = pose.m_node->GetAsEffectorNode();
-		//dAssert(effector);
-		//
-		//const ndCharacter* const character = m_owner->GetCharacter();
-		//ndCharacterRootNode* const rootNode = character->GetRootNode();
-		//
-		//dMatrix matrix(pose.m_rotation, localCom + pose.m_position);
-		//matrix = matrix * rootNode->GetCoronalFrame();
-		//effector->SetTargetMatrix(matrix);
-	}
-}
+//void ndCharacterIdlePose::SetEffectorMatrix(const dVector&, const ndCharaterKeyFramePose& pose)
+//{
+//	if (pose.m_node)
+//	{
+//		dAssert(0);
+//		//ndCharacterEffectorNode* const effector = pose.m_node->GetAsEffectorNode();
+//		//dAssert(effector);
+//		//
+//		//const ndCharacter* const character = m_owner->GetCharacter();
+//		//ndCharacterRootNode* const rootNode = character->GetRootNode();
+//		//
+//		//dMatrix matrix(pose.m_rotation, localCom + pose.m_position);
+//		//matrix = matrix * rootNode->GetCoronalFrame();
+//		//effector->SetTargetMatrix(matrix);
+//	}
+//}
 
 void ndCharacterIdlePose::Update(dFloat32 timestep)
 {
+return;
 	switch (m_state)
 	{
 		case m_airborne:

@@ -24,33 +24,51 @@
 
 #include "ndNewtonStdafx.h"
 
+class ndCharacterRootNode;
 class ndCharacterLimbNode;
 
-class ndCharaterKeyFramePose
-{
-	public:
-	ndCharaterKeyFramePose();
-	ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix);
+//class ndCharaterKeyFramePose
+//{
+//	public:
+//	ndCharaterKeyFramePose();
+//	ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix);
+//
+//	dVector m_position;
+//	//dQuaternion m_rotation;
+//	dVector m_euler;
+//};
+//
+//inline ndCharaterKeyFramePose::ndCharaterKeyFramePose()
+//	:m_position(dVector::m_wOne)
+//	,m_euler(dVector::m_zero)
+//	,m_node(nullptr)
+//{
+//}
 
-	dVector m_position;
-	//dQuaternion m_rotation;
-	dVector m_euler;
+//inline ndCharaterKeyFramePose::ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix)
+//	:m_position(matrix.m_posit)
+//	,m_euler(dVector::m_zero)
+//	,m_node(node)
+//{
+//	dAssert(0);
+//}
+
+class ndCharacterSkeleton: public dNodeHierarchy<ndCharacterSkeleton>
+{
+	protected:
+	ndCharacterSkeleton(ndCharacterLimbNode* const node, ndCharacterSkeleton* const parent);
+
+	ndCharacterSkeleton* CreateClone() const
+	{
+		dAssert(0);
+		return nullptr;
+	}
+
+	dMatrix m_transform;
 	ndCharacterLimbNode* m_node;
+
+	friend class ndCharacter;
 };
 
-inline ndCharaterKeyFramePose::ndCharaterKeyFramePose()
-	:m_position(dVector::m_wOne)
-	,m_euler(dVector::m_zero)
-	,m_node(nullptr)
-{
-}
-
-inline ndCharaterKeyFramePose::ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix)
-	:m_position(matrix.m_posit)
-	,m_euler(dVector::m_zero)
-	,m_node(node)
-{
-	dAssert(0);
-}
 
 #endif

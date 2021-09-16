@@ -23,14 +23,15 @@ class ndJointPdActuator : public ndJointBilateralConstraint
 	D_NEWTON_API ndJointPdActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointPdActuator();
 
-	D_NEWTON_API dFloat32 GetMaxConeAngle() const;
-	D_NEWTON_API void SetConeLimit(dFloat32 maxConeAngle);
-	
 	D_NEWTON_API void SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle);
 	D_NEWTON_API void GetTwistLimits(dFloat32& minAngle, dFloat32& maxAngle) const;
-	
-	D_NEWTON_API void GetAngularSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const;
-	D_NEWTON_API void SetAngularSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer = dFloat32(5.0e-3f));
+	D_NEWTON_API void GetTwistAngleSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const;
+	D_NEWTON_API void SetTwistAngleSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer = dFloat32(5.0e-3f));
+
+	D_NEWTON_API dFloat32 GetMaxConeAngle() const;
+	D_NEWTON_API void SetConeLimit(dFloat32 maxConeAngle);
+	D_NEWTON_API void GetConeAngleSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const;
+	D_NEWTON_API void SetConeAngleSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer = dFloat32(5.0e-3f));
 
 	D_NEWTON_API void GetLinearSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const;
 	D_NEWTON_API void SetLinearSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer = dFloat32(5.0e-3f));
@@ -40,7 +41,6 @@ class ndJointPdActuator : public ndJointBilateralConstraint
 
 	D_NEWTON_API dMatrix GetTargetMatrix() const;
 	D_NEWTON_API void SetTargetMatrix(const dMatrix& posit);
-
 
 	const dMatrix& GetReferenceMatrix() const;
 
@@ -60,13 +60,17 @@ class ndJointPdActuator : public ndJointBilateralConstraint
 	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
 	dMatrix m_pivotFrame;
-	dFloat32 m_maxConeAngle;
+	
 	dFloat32 m_minTwistAngle;
 	dFloat32 m_maxTwistAngle;
+	dFloat32 m_twistAngleSpring;
+	dFloat32 m_twistAngleDamper;
+	dFloat32 m_twistAngleRegularizer;
 
-	dFloat32 m_angularSpring;
-	dFloat32 m_angularDamper;
-	dFloat32 m_angularRegularizer;
+	dFloat32 m_maxConeAngle;
+	dFloat32 m_coneAngleSpring;
+	dFloat32 m_coneAngleDamper;
+	dFloat32 m_coneAngleRegularizer;
 
 	dFloat32 m_linearSpring;
 	dFloat32 m_linearDamper;
