@@ -47,9 +47,9 @@ void ndCharacterIdlePose::Init()
 	const ndCharacter* const character = m_owner->GetCharacter();
 	const ndBipedControllerConfig& config = m_owner->GetConfig();
 
-	dVector p0;
-	dVector p1;
-	if (config.m_leftFootEffector)
+	dVector p0(dVector::m_zero);
+	dVector p1(dVector::m_zero);
+	if (config.m_leftFootNode)
 	{
 		//dVector leftFeetOffset(dFloat32(0.0f), dFloat32(0.0125f), dFloat32(0.0f), dFloat32(0.0f));
 		//m_referencePose.PushBack(CalculateFeetKeyFrame(state.m_centerOfMass, leftFeetOffset, config.m_leftFootEffector));
@@ -59,7 +59,7 @@ void ndCharacterIdlePose::Init()
 		p0 = matrix.m_posit;
 	}
 
-	if (config.m_rightFootEffector)
+	if (config.m_rightFootNode)
 	{
 		//dVector rightFeetOffset(dFloat32(-0.0f), dFloat32(0.0125f), dFloat32(0.0f), dFloat32(0.0f));
 		//m_referencePose.PushBack(CalculateFeetKeyFrame(state.m_centerOfMass, rightFeetOffset, config.m_rightFootEffector));

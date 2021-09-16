@@ -124,6 +124,7 @@ bool ndCharacterBipedPoseController::CalculateZeroMomentPoint(dVector& zeroMomen
 
 void ndCharacterBipedPoseController::CalculateSuportPolygon(dFixSizeArray<dVector, 32>& supportPolygon) const
 {
+	if (m_config.m_leftFootNode)
 	{
 		ndBodyKinematic* const leftFootBody = m_config.m_leftFootNode->GetBody();
 		ndBodyKinematic::ndContactMap::Iterator iter(leftFootBody->GetContactMap());
@@ -144,6 +145,7 @@ void ndCharacterBipedPoseController::CalculateSuportPolygon(dFixSizeArray<dVecto
 		}
 	}
 
+	if (m_config.m_rightFootNode)
 	{
 		ndBodyKinematic* const rightFootBody = m_config.m_rightFootNode->GetBody();
 		ndBodyKinematic::ndContactMap::Iterator iter(rightFootBody->GetContactMap());
@@ -178,6 +180,12 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 	comMatrixInGlobalSpace.m_posit = state.m_centerOfMass;
 	context.DrawFrame(comMatrixInGlobalSpace);
 
+	//m_config.m_leftFootEffector->GetJoint()->DebugJoint(context);
+	m_config.m_rightFootEffector->GetJoint()->DebugJoint(context);
+	//m_config.m_leftFootNode->GetJoint()->DebugJoint(context);
+	//m_config.m_rightFootNode->GetJoint()->DebugJoint(context);
+
+return;
 	const dRay suportPoint(CalculateSupportPoint(comMatrixInGlobalSpace.m_posit));
 
 	ndJointBilateralConstraint* const leftFootJoint = m_config.m_leftFootEffector->GetJoint();
@@ -202,9 +210,6 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 			p0 = p1;
 		}
 	}
-
-	m_config.m_leftFootNode->GetJoint()->DebugJoint(context);
-	m_config.m_rightFootNode->GetJoint()->DebugJoint(context);
 }
 
 bool ndCharacterBipedPoseController::Evaluate(ndWorld* const , dFloat32 timestep)

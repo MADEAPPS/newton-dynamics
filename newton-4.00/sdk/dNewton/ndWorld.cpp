@@ -193,7 +193,11 @@ void ndWorld::CleanUp()
 		delete body;
 	}
 
+	delete m_sentinelBody;
 	dAssert(!m_scene->GetContactList().GetCount());
+	ndBody::m_uniqueIdCount = 0;
+	m_sentinelBody = new ndBodySentinel;
+
 }
 
 void ndWorld::SelectSolver(ndSolverModes solverMode)

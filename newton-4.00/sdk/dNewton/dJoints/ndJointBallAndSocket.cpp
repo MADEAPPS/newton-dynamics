@@ -52,6 +52,22 @@ ndJointBallAndSocket::~ndJointBallAndSocket()
 {
 }
 
+void ndJointBallAndSocket::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
+	xmlSaveParam(childNode, "coneFriction", m_coneFriction);
+	xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
+	xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
+	xmlSaveParam(childNode, "twistFriction", m_twistFriction);
+	xmlSaveParam(childNode, "coneFrictionRegularizer", m_coneFrictionRegularizer);
+	xmlSaveParam(childNode, "twistFrictionRegularizer", m_twistFrictionRegularizer);
+}
+
 void ndJointBallAndSocket::SetConeFriction(dFloat32 regularizer, dFloat32 viscousFriction)
 {
 	m_coneFriction = dAbs(viscousFriction);
@@ -291,18 +307,3 @@ void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointBallAndSocket::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
-	xmlSaveParam(childNode, "coneFriction", m_coneFriction);
-	xmlSaveParam(childNode, "minTwistAngle", m_minTwistAngle);
-	xmlSaveParam(childNode, "maxTwistAngle", m_maxTwistAngle);
-	xmlSaveParam(childNode, "twistFriction", m_twistFriction);
-	xmlSaveParam(childNode, "coneFrictionRegularizer", m_coneFrictionRegularizer);
-	xmlSaveParam(childNode, "twistFrictionRegularizer", m_twistFrictionRegularizer);
-}
