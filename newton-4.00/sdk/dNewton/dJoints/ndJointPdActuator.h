@@ -59,6 +59,9 @@ class ndJointPdActuator : public ndJointBilateralConstraint
 	void SubmitPdRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
+	void SubmitConeAngleOnlyRows(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
+	void SubmitTwistAngleOnlyRows(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
+
 	dMatrix m_pivotFrame;
 	
 	dFloat32 m_minTwistAngle;
