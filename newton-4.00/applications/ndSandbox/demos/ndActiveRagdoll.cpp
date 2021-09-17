@@ -272,6 +272,9 @@ class ndActiveRagdollModel : public ndCharacter
 				ndJointFix6dof* const joint = new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody());
 				world->AddJoint(joint);
 				AddAttachment(joint);
+				//dVector xxx(rootNode->GetBody()->GetMassMatrix());
+				//rootNode->GetBody()->SetMassMatrix(xxx.Scale (10.0f));
+				//rootNode->GetBody()->SetMassMatrix(dVector::m_zero);
 				break;
 			}
 		}

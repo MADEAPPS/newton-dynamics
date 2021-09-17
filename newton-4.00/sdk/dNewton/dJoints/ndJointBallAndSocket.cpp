@@ -76,8 +76,6 @@ void ndJointBallAndSocket::SetConeFriction(dFloat32 regularizer, dFloat32 viscou
 
 void ndJointBallAndSocket::SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle)
 {
-	//m_minTwistAngle = -dAbs(minAngle);
-	//m_maxTwistAngle = dAbs(maxAngle);
 	m_minTwistAngle = dMin(minAngle, dFloat32 (0.0f));
 	m_maxTwistAngle = dMax(maxAngle, dFloat32(0.0f));
 }

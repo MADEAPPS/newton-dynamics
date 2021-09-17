@@ -128,13 +128,19 @@ void ndJointTwoBodyIK::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 
 void ndJointTwoBodyIK::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
-	dMatrix matrix2(m_pivotFrame * m_body1->GetMatrix());
-	CalculateGlobalMatrix(matrix0, matrix1);
+	//dMatrix matrix0;
+	//dMatrix matrix1;
+	//dMatrix matrix2(m_pivotFrame * m_body1->GetMatrix());
+
+	dMatrix matrix1 (m_coneRotation * m_pivotFrame);
+	matrix1.m_posit = m_pivotFrame.TransformVector(m_targetPosit);
+	matrix1 = matrix1 * m_body1->GetMatrix();
+
+	dMatrix matrix0(m_localMatrix0 * m_body0->GetMatrix());
+	//CalculateGlobalMatrix(matrix0, matrix1);
 	
 	debugCallback.DrawFrame(matrix1);
-	debugCallback.DrawFrame(matrix2);
+	//debugCallback.DrawFrame(matrix2);
 	debugCallback.DrawLine(matrix1.m_posit, matrix1.m_posit - matrix1.m_front.Scale(m_maxDist), dVector(1.0f, 1.0f, 0.0f, 1.0f));
 
 	dFloat32 scale = debugCallback.GetScale();
@@ -297,29 +303,16 @@ void ndJointTwoBodyIK::SetTargetMatrix(const dMatrix& matrixInGlobalSpace)
 
 void ndJointTwoBodyIK::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
+	// Cartesian motion
 	const dVector step(matrix0.m_posit - matrix1.m_posit);
-	if (step.DotProduct(step).GetScalar() <= D_TBIK_SMALL_DISTANCE_ERROR2)
-	{
-		// Cartesian motion
-		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
+	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 
-		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
+	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 
-		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
-		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-	}
-	else
-	{
-		const dMatrix basis(step.Normalize());
-
-		// move alone the diagonal;
-		AddLinearRowJacobian(desc, matrix1.m_posit, matrix1.m_posit, basis[2]);
-		AddLinearRowJacobian(desc, matrix1.m_posit, matrix1.m_posit, basis[1]);
-		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, basis[0]);
-		SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-	}
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
+	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 }
 
 void ndJointTwoBodyIK::SubmitAngularLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
@@ -362,7 +355,7 @@ void ndJointTwoBodyIK::JacobianDerivative(ndConstraintDescritor& desc)
 	m_localMatrix1 = m_coneRotation * m_pivotFrame;
 	m_localMatrix1.m_posit = m_pivotFrame.TransformVector(m_targetPosit);
 	CalculateGlobalMatrix(matrix0, matrix1);
-return;
+
 	SubmitLinearLimits(matrix0, matrix1, desc);
 	SubmitAngularLimits(matrix0, matrix1, desc);
 }
