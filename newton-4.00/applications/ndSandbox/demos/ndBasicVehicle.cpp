@@ -602,7 +602,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	ndMultiBodyVehicleTireJoint* m_fl_tire;
 };
 
-void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const dMatrix& location)
+static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const dMatrix& location)
 {
 	dMatrix localAxis(dGetIdentityMatrix());
 	localAxis[0] = dVector(0.0, 1.0f, 0.0f, 0.0f);

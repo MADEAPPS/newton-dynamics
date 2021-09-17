@@ -34,3 +34,16 @@ ndCharacterSkeleton::ndCharacterSkeleton(ndCharacterLimbNode* const node, ndChar
 		Attach(parent);
 	}
 }
+
+ndCharacterSkeleton* ndCharacterSkeleton::FindNode(ndCharacterLimbNode* const node) const
+{
+	for (dNodeBaseHierarchy* ptr = GetFirst(); ptr && (ptr != this); ptr = ptr->GetNext())
+	{
+		ndCharacterSkeleton*const bone = (ndCharacterSkeleton*)ptr;
+		if (node == bone->m_node)
+		{
+			return bone;
+		}
+	}
+	return nullptr;
+}

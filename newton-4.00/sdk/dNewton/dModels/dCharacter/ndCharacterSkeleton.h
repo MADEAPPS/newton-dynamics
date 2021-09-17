@@ -55,6 +55,9 @@ class ndCharacterLimbNode;
 
 class ndCharacterSkeleton: public dNodeHierarchy<ndCharacterSkeleton>
 {
+	public: 
+	D_NEWTON_API ndCharacterSkeleton* FindNode(ndCharacterLimbNode* const node) const;
+
 	protected:
 	ndCharacterSkeleton(ndCharacterLimbNode* const node, ndCharacterSkeleton* const parent);
 

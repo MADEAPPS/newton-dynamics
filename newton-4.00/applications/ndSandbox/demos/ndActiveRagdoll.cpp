@@ -21,6 +21,13 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+#include "ndAnimationPose.h"
+#include "ndAnimationSequence.h"
+#include "ndBasicPlayerCapsule.h"
+#include "ndAnimationKeyframesTrack.h"
+#include "ndAnimationSequencePlayer.h"
+
+
 class dActiveJointDefinition
 {
 	public:
@@ -269,17 +276,28 @@ class ndActiveRagdollModel : public ndCharacter
 			//if (ent->GetName() == "mixamorig:Hips") 
 			if (ent->GetName() == "mixamorig:Spine1")
 			{
-				//ndJointFix6dof* const joint = new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody());
-				//world->AddJoint(joint);
-				//AddAttachment(joint);
-				//dVector xxx(rootNode->GetBody()->GetMassMatrix());
-				//rootNode->GetBody()->SetMassMatrix(xxx.Scale (10.0f));
+				ndJointFix6dof* const joint = new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody());
+				world->AddJoint(joint);
+				AddAttachment(joint);
 				//rootNode->GetBody()->SetMassMatrix(dVector::m_zero);
 				break;
 			}
 		}
 
 		m_skeleton = CreateSkeleton();
+
+
+		ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
+		const dList<ndAnimationKeyFramesTrack>& tracks = sequence->m_tracks;
+		for (dList<ndAnimationKeyFramesTrack>::dNode* node = tracks.GetFirst(); node; node = node->GetNext())
+		{
+			ndAnimationKeyFramesTrack& track = node->GetInfo();
+			//ndDemoEntity* const ent = entity->Find(track.GetName().GetStr());
+			ndCharacterSkeleton* const skelNode = m_skeleton->FindNode(m_rootNode->Find (track.GetName().GetStr()));
+			ndAnimKeyframe keyFrame;
+			keyFrame.m_userData = skelNode;
+			m_output.PushBack(keyFrame);
+		}
 	}
 
 	~ndActiveRagdollModel()
@@ -377,9 +395,29 @@ class ndActiveRagdollModel : public ndCharacter
 		ndCharacter::PostTransformUpdate(world, timestep);
 	}
 
+	ndAnimationPose m_output;
 	ndCharacterSkeleton* m_skeleton;
 	ndCharacterBipedPoseController m_bipedController;
 };
+
+static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const dMatrix& location)
+{
+	dMatrix localAxis(dGetIdentityMatrix());
+	localAxis[0] = dVector(0.0, 1.0f, 0.0f, 0.0f);
+	localAxis[1] = dVector(1.0, 0.0f, 0.0f, 0.0f);
+	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
+
+	dFloat32 height = 1.9f;
+	dFloat32 radio = 0.5f;
+	dFloat32 mass = 100.0f;
+	ndDemoEntity* const entity = scene->LoadFbxMesh("whiteMan.fbx");
+	ndBasicPlayerCapsule* const player = new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
+	player->GetNotifyCallback()->SetGravity(dVector::m_zero);
+	dMatrix matrix(player->GetMatrix());
+	matrix.m_posit.m_y += 0.5f;
+	player->SetMatrix(matrix);
+	delete entity;
+}
 
 void ndActiveRagdoll (ndDemoEntityManager* const scene)
 {
@@ -395,6 +433,9 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	ndActiveRagdollModel* const ragdoll = new ndActiveRagdollModel(scene, ragdollMesh, matrix);
 	scene->SetSelectedModel(ragdoll);
 	scene->GetWorld()->AddModel(ragdoll);
+
+	matrix.m_posit.m_x += 1.0f;
+	TestPlayerCapsuleInteaction(scene, matrix);
 
 	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_y += 2.0f;
