@@ -143,6 +143,7 @@ ndWorld::ndWorld()
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxOmega = 0.1f;
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_steps = steps;
 
+	ndBody::m_uniqueIdCount = 0;
 	m_sentinelBody = new ndBodySentinel;
 }
 
@@ -193,11 +194,8 @@ void ndWorld::CleanUp()
 		delete body;
 	}
 
-	delete m_sentinelBody;
+	ndBody::m_uniqueIdCount = 1;
 	dAssert(!m_scene->GetContactList().GetCount());
-	ndBody::m_uniqueIdCount = 0;
-	m_sentinelBody = new ndBodySentinel;
-
 }
 
 void ndWorld::SelectSolver(ndSolverModes solverMode)
