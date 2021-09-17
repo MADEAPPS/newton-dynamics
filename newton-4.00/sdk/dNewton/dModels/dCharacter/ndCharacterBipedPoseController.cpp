@@ -181,11 +181,10 @@ void ndCharacterBipedPoseController::Debug(ndConstraintDebugCallback& context) c
 	context.DrawFrame(comMatrixInGlobalSpace);
 
 	//m_config.m_leftFootEffector->GetJoint()->DebugJoint(context);
-	m_config.m_rightFootEffector->GetJoint()->DebugJoint(context);
+	//m_config.m_rightFootEffector->GetJoint()->DebugJoint(context);
 	//m_config.m_leftFootNode->GetJoint()->DebugJoint(context);
 	//m_config.m_rightFootNode->GetJoint()->DebugJoint(context);
 
-return;
 	const dRay suportPoint(CalculateSupportPoint(comMatrixInGlobalSpace.m_posit));
 
 	ndJointBilateralConstraint* const leftFootJoint = m_config.m_leftFootEffector->GetJoint();
