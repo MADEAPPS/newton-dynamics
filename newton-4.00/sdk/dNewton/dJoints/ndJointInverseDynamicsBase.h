@@ -23,12 +23,18 @@ class ndJointInverseDynamicsBase: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointInverseDynamicsBase(dInt32 dof, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointInverseDynamicsBase();
 
-	virtual void SetTargetMatrix(const dMatrix& matrixInGlobalSpace);
+	virtual void SetTargetLocalMatrix(const dMatrix& localMatrix);
+	virtual void SetTargetGlobalMatrix(const dMatrix& globalMatrix);
 	protected:
 	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 };
 
-inline void ndJointInverseDynamicsBase::SetTargetMatrix(const dMatrix&)
+inline void ndJointInverseDynamicsBase::SetTargetLocalMatrix(const dMatrix&)
+{
+	dAssert(0);
+}
+
+inline void ndJointInverseDynamicsBase::SetTargetGlobalMatrix(const dMatrix&)
 {
 	dAssert(0);
 }

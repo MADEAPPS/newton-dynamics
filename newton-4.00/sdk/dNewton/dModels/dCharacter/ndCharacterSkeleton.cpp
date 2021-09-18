@@ -24,8 +24,7 @@
 #include "ndCharacterSkeleton.h"
 #include "ndCharacterRootNode.h"
 
-
-ndCharacterSkeleton::ndCharacterSkeleton(ndCharacterLimbNode* const node, const dMatrix& matrix, ndCharacterSkeleton* const parent)
+ndCharacterSkeleton::ndCharacterSkeleton(ndCharacterNode* const node, const dMatrix& matrix, ndCharacterSkeleton* const parent)
 	:dNodeHierarchy<ndCharacterSkeleton>()
 	,m_transform(matrix)
 	,m_node(node)
@@ -36,7 +35,7 @@ ndCharacterSkeleton::ndCharacterSkeleton(ndCharacterLimbNode* const node, const 
 	}
 }
 
-ndCharacterSkeleton* ndCharacterSkeleton::FindNode(ndCharacterLimbNode* const node) const
+ndCharacterSkeleton* ndCharacterSkeleton::FindNode(ndCharacterNode* const node) const
 {
 	if (m_node == node)
 	{

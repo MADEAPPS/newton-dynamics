@@ -32,8 +32,8 @@ class ndShape;
 class ndModel;
 class ndBodyKinematic;
 class ndShapeInstance;
-class ndCharacterLimbNode;
-class ndCharacterLimbNode;
+class ndCharacterNode;
+class ndCharacterNode;
 class ndJointBilateralConstraint;
 
 class ndShapeLoaderCache : public dTree<const ndShapeInstance, dInt32>
@@ -86,7 +86,7 @@ class dLoadSaveBase: public dClassAlloc
 		const ndModelLoaderCache* m_modelMap;
 		const ndShapeLoaderCache* m_shapeMap;
 		const ndJointLoaderCache* m_jointMap;
-		const ndCharacterLimbNode* m_parentModelNode;
+		const ndCharacterNode* m_parentModelNode;
 	};
 
 	class dSaveDescriptor

@@ -28,7 +28,7 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterRootNode)
 
 ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body)
-	:ndCharacterLimbNode(nullptr)
+	:ndCharacterNode(nullptr)
 	,m_coronalFrame(dGetIdentityMatrix())
 	,m_invCoronalFrame(dGetIdentityMatrix())
 	,m_gravityDir(dFloat32 (0.0f), dFloat32(-1.0f), dFloat32(0.0f), dFloat32(0.0f))
@@ -39,8 +39,8 @@ ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic
 }
 
 ndCharacterRootNode::ndCharacterRootNode(const ndCharacterLoadDescriptor& desc)
-	//:ndCharacterLimbNode(dLoadSaveBase::dLoadDescriptor(desc))
-	:ndCharacterLimbNode(desc)
+	//:ndCharacterNode(dLoadSaveBase::dLoadDescriptor(desc))
+	:ndCharacterNode(desc)
 	,m_coronalFrame(dGetIdentityMatrix())
 	,m_invCoronalFrame(dGetIdentityMatrix())
 	,m_gravityDir(dFloat32(0.0f), dFloat32(-1.0f), dFloat32(0.0f), dFloat32(0.0f))
@@ -80,7 +80,7 @@ void ndCharacterRootNode::Save(const ndCharacterSaveDescriptor& desc) const
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
-	ndCharacterLimbNode::Save(ndCharacterSaveDescriptor(desc, childNode));
+	ndCharacterNode::Save(ndCharacterSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "coronalFrame", m_coronalFrame);
 	xmlSaveParam(childNode, "gravityDir", m_gravityDir);

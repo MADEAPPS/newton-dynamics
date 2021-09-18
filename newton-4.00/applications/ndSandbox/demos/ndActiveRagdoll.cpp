@@ -124,8 +124,8 @@ static dActiveJointDefinition jointsDefinition[] =
 {
 	{ "mixamorig:Hips", dActiveJointDefinition::forwardKinematic, 1.0f, {}, {}, {} },
 	
-	{ "mixamorig:Spine", dActiveJointDefinition::forwardKinematic, 1.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f }, {} },
-	{ "mixamorig:Spine1", dActiveJointDefinition::forwardKinematic, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
+	//{ "mixamorig:Spine", dActiveJointDefinition::forwardKinematic, 1.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f }, {} },
+	//{ "mixamorig:Spine1", dActiveJointDefinition::forwardKinematic, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
 	//{ "mixamorig:Spine2", dActiveJointDefinition::forwardKinematic, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
 	//{ "mixamorig:Neck", dActiveJointDefinition::forwardKinematic, 1.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, {}  },
 	
@@ -139,13 +139,13 @@ static dActiveJointDefinition jointsDefinition[] =
 	
 	{ "mixamorig:RightUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
 	{ "mixamorig:RightLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
-	{ "rightFoot_effector", dActiveJointDefinition::effector, 0.0f,{},{},{} },
+	//{ "rightFoot_effector", dActiveJointDefinition::effector, 0.0f,{},{},{} },
 	{ "mixamorig:RightFoot", dActiveJointDefinition::forwardKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {100.0f, 5.0f, 0.001f}, {0.0f, 0.0f, 0.0f}},
 	
-	{ "mixamorig:LeftUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
-	{ "mixamorig:LeftLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
-	{ "leftFoot_effector", dActiveJointDefinition::effector, 0.0f,{},{},{} },
-	{ "mixamorig:LeftFoot", dActiveJointDefinition::forwardKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {100.0f, 5.0f, 0.001f}, { 0.0f, 0.0f, 0.0f }},
+	//{ "mixamorig:LeftUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
+	//{ "mixamorig:LeftLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
+	//{ "leftFoot_effector", dActiveJointDefinition::effector, 0.0f,{},{},{} },
+	//{ "mixamorig:LeftFoot", dActiveJointDefinition::forwardKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {100.0f, 5.0f, 0.001f}, { 0.0f, 0.0f, 0.0f }},
 };
 
 class ndActiveRagdollModel : public ndCharacter
@@ -153,7 +153,7 @@ class ndActiveRagdollModel : public ndCharacter
 	public:
 	ndActiveRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const dMatrix& location)
 		:ndCharacter()
-		,m_skeleton(nullptr)
+		//,m_skeleton(nullptr)
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = ragdollMesh->CreateClone();
@@ -179,7 +179,7 @@ class ndActiveRagdollModel : public ndCharacter
 		const dInt32 definitionCount = dInt32 (sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
 		
 		ndDemoEntity* childEntities[32];
-		ndCharacterLimbNode* parentBones[32];
+		ndCharacterNode* parentBones[32];
 		for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) 
 		{
 			childEntities[stack] = child;
@@ -193,12 +193,12 @@ class ndActiveRagdollModel : public ndCharacter
 		massWeight[0] = 1.0f;
 		bodyArray[0] = rootNode->GetBody();
 
-		ndBipedControllerConfig bipedConfig;
+		//ndBipedControllerConfig bipedConfig;
 		// walk model hierarchic adding all children designed as rigid body bones. 
 		while (stack) 
 		{
 			stack--;
-			ndCharacterLimbNode* parentBone = parentBones[stack];
+			ndCharacterNode* parentBone = parentBones[stack];
 			ndDemoEntity* const childEntity = childEntities[stack];
 			const char* const name = childEntity->GetName().GetStr();
 			//dTrace(("name: %s\n", name));
@@ -220,36 +220,37 @@ class ndActiveRagdollModel : public ndCharacter
 
 						if (strstr(name, "RightFoot"))
 						{
-							bipedConfig.m_rightFootNode = parentBone;
+							//bipedConfig.m_rightFootNode = parentBone;
 						}
 						else if (strstr(name, "LeftFoot"))
 						{
-							bipedConfig.m_leftFootNode = parentBone;
+							//bipedConfig.m_leftFootNode = parentBone;
 						}
 					}
 					else
 					{
-						dMatrix effectorMatrix(childEntity->GetCurrentMatrix() * parentBone->GetBody()->GetMatrix());
-						ndCharacterEffectorNode* const effectorNode = CreateInverseDynamicEffector(effectorMatrix, parentBone);
-						effectorNode->SetName(name);
-						if (strcmp(effectorNode->GetJoint()->SubClassName(), "ndJointTwoBodyIK") == 0)
-						{
-							//ndJointTwoBodyIK* const effectorJoint = (ndJointTwoBodyIK*)effectorNode->GetJoint();
-							//effectorJoint->SetLinearSpringDamperRegularizer(definition.m_jointData.m_spring, definition.m_jointData.m_damper, definition.m_jointData.m_regularizer);
-						}
-						else
-						{
-							dAssert(0);
-						}
-						
-						if (strstr(name, "right"))
-						{
-							bipedConfig.m_rightFootEffector = effectorNode;
-						}
-						else if (strstr(name, "left"))
-						{
-							bipedConfig.m_leftFootEffector = effectorNode;
-						}
+						dAssert(0);
+						//dMatrix effectorMatrix(childEntity->GetCurrentMatrix() * parentBone->GetBody()->GetMatrix());
+						//ndCharacterEffectorNode* const effectorNode = CreateInverseDynamicEffector(effectorMatrix, parentBone);
+						//effectorNode->SetName(name);
+						//if (strcmp(effectorNode->GetJoint()->SubClassName(), "ndJointTwoBodyIK") == 0)
+						//{
+						//	//ndJointTwoBodyIK* const effectorJoint = (ndJointTwoBodyIK*)effectorNode->GetJoint();
+						//	//effectorJoint->SetLinearSpringDamperRegularizer(definition.m_jointData.m_spring, definition.m_jointData.m_damper, definition.m_jointData.m_regularizer);
+						//}
+						//else
+						//{
+						//	dAssert(0);
+						//}
+						//
+						//if (strstr(name, "right"))
+						//{
+						//	bipedConfig.m_rightFootEffector = effectorNode;
+						//}
+						//else if (strstr(name, "left"))
+						//{
+						//	bipedConfig.m_leftFootEffector = effectorNode;
+						//}
 					}
 				
 					break;
@@ -267,45 +268,54 @@ class ndActiveRagdollModel : public ndCharacter
 		SetModelMass(100.0f, bodyCount, bodyArray, massWeight);
 
 		// initialize a biped controller and set to the model
-		m_bipedController.Init(this, bipedConfig);
-		SetController(&m_bipedController);
+		//m_bipedController.Init(this, bipedConfig);
+		//SetController(&m_bipedController);
 		
-		for (dInt32 i = 0; i < bodyCount; i++)
+
 		{
-			ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
-			//if (ent->GetName() == "mixamorig:Hips") 
-			if (ent->GetName() == "mixamorig:Spine1")
-			{
-				ndJointFix6dof* const joint = new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody());
-				world->AddJoint(joint);
-				AddAttachment(joint);
-				//rootNode->GetBody()->SetMassMatrix(dVector::m_zero);
-				break;
-			}
+			ndBodyKinematic* testBody = m_rootNode->Find("mixamorig:Hips")->GetBody();
+			ndJointFix6dof* const joint = new ndJointFix6dof(testBody->GetMatrix(), testBody, world->GetSentinelBody());
+			world->AddJoint(joint);
+			AddAttachment(joint);
 		}
 
-		m_skeleton = CreateSkeleton();
+		//for (dInt32 i = 0; i < bodyCount; i++)
+		//{
+		//	ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
+		//	if (ent->GetName() == "mixamorig:Hips") 
+		//	//if (ent->GetName() == "mixamorig:Spine1")
+		//	{
+		//		ndJointFix6dof* const joint = new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody());
+		//		world->AddJoint(joint);
+		//		AddAttachment(joint);
+		//		//rootNode->GetBody()->SetMassMatrix(dVector::m_zero);
+		//		break;
+		//	}
+		//}
 
-
-		ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
-		const dList<ndAnimationKeyFramesTrack>& tracks = sequence->m_tracks;
-		for (dList<ndAnimationKeyFramesTrack>::dNode* node = tracks.GetFirst(); node; node = node->GetNext())
-		{
-			ndAnimationKeyFramesTrack& track = node->GetInfo();
-			const char* const name = track.GetName().GetStr();
-			ndCharacterSkeleton* const skelNode = m_skeleton->FindNode(m_rootNode->Find (name));
-			ndAnimKeyframe keyFrame;
-			keyFrame.m_userData = skelNode;
-			m_output.PushBack(keyFrame);
-		}
+		//m_skeleton = CreateSkeleton();
+		//
+		//ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
+		//const dList<ndAnimationKeyFramesTrack>& tracks = sequence->m_tracks;
+		//for (dList<ndAnimationKeyFramesTrack>::dNode* node = tracks.GetFirst(); node; node = node->GetNext())
+		//{
+		//	ndAnimationKeyFramesTrack& track = node->GetInfo();
+		//	const char* const name = track.GetName().GetStr();
+		//	ndCharacterSkeleton* const skelNode = m_skeleton->FindNode(m_rootNode->Find (name));
+		//	ndAnimKeyframe keyFrame;
+		//	keyFrame.m_userData = skelNode;
+		//	m_output.PushBack(keyFrame);
+		//}
+		//
+		//SetPose(m_skeleton);
 	}
 
 	~ndActiveRagdollModel()
 	{
-		if (m_skeleton)
-		{
-			delete m_skeleton;
-		}
+		//if (m_skeleton)
+		//{
+		//	delete m_skeleton;
+		//}
 	}
 
 	void SetModelMass(dFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray, const dFloat32* const massWeight) const
@@ -344,7 +354,7 @@ class ndActiveRagdollModel : public ndCharacter
 		return body;
 	}
 
-	ndCharacterLimbNode* ConnectBodyParts(ndBodyDynamic* const childBody, ndCharacterLimbNode* const parentNode, const dActiveJointDefinition& definition)
+	ndCharacterNode* ConnectBodyParts(ndBodyDynamic* const childBody, ndCharacterNode* const parentNode, const dActiveJointDefinition& definition)
 	{
 		dMatrix matrix(childBody->GetMatrix());
 		dActiveJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
@@ -395,9 +405,9 @@ class ndActiveRagdollModel : public ndCharacter
 		ndCharacter::PostTransformUpdate(world, timestep);
 	}
 
-	ndAnimationPose m_output;
-	ndCharacterSkeleton* m_skeleton;
-	ndCharacterBipedPoseController m_bipedController;
+	//ndAnimationPose m_output;
+	//ndCharacterSkeleton* m_skeleton;
+	//ndCharacterBipedPoseController m_bipedController;
 };
 
 static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const dMatrix& location)

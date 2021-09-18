@@ -29,7 +29,7 @@ class ndWorld;
 class ndCharacter;
 class ndLimbJoint;
 class ndCharacterRootNode;
-class ndCharacterEffectorNode;
+class ndCharacterSkeleton;
 class ndJointBilateralConstraint;
 class ndCharacterForwardDynamicNode;
 class ndCharacterInverseDynamicNode;
@@ -52,7 +52,7 @@ class ndCharacterLoadDescriptor: public dLoadSaveBase::dLoadDescriptor
 		m_limbMap = modelDesc->m_limbMap;
 	}
 
-	ndCharacterLoadDescriptor(const dLoadSaveBase::dLoadDescriptor& desc, dTree<const ndCharacterLimbNode*, dUnsigned32>* const limbMap)
+	ndCharacterLoadDescriptor(const dLoadSaveBase::dLoadDescriptor& desc, dTree<const ndCharacterNode*, dUnsigned32>* const limbMap)
 		:dLoadDescriptor(desc)
 		,m_limbMap(limbMap)
 	{
@@ -64,7 +64,7 @@ class ndCharacterLoadDescriptor: public dLoadSaveBase::dLoadDescriptor
 	{
 	}
 
-	dTree<const ndCharacterLimbNode*, dUnsigned32>* m_limbMap;
+	dTree<const ndCharacterNode*, dUnsigned32>* m_limbMap;
 };
 
 class ndCharacterSaveDescriptor: public dLoadSaveBase::dSaveDescriptor
@@ -88,23 +88,22 @@ class ndCharacterSaveDescriptor: public dLoadSaveBase::dSaveDescriptor
 	{
 	}
 
-	dTree<dInt32, const ndCharacterLimbNode*>* m_limbMap;
+	dTree<dInt32, const ndCharacterNode*>* m_limbMap;
 };
 
-class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
+class ndCharacterNode: public dNodeHierarchy<ndCharacterNode>
 {
 	public:
-	D_CLASS_REFLECTION(ndCharacterLimbNode);
-	D_NEWTON_API ndCharacterLimbNode(const ndCharacterLoadDescriptor& desc);
-	D_NEWTON_API ndCharacterLimbNode(ndCharacterLimbNode* const parent);
-	D_NEWTON_API virtual ~ndCharacterLimbNode ();
+	D_CLASS_REFLECTION(ndCharacterNode);
+	D_NEWTON_API ndCharacterNode(const ndCharacterLoadDescriptor& desc);
+	D_NEWTON_API ndCharacterNode(ndCharacterNode* const parent);
+	D_NEWTON_API virtual ~ndCharacterNode ();
 
 	virtual ndBodyDynamic* GetBody() const;
 	virtual ndJointBilateralConstraint* GetJoint() const;
 
-	virtual ndCharacterLimbNode* GetAsLimbNode();
+	virtual ndCharacterNode* GetAsNode();
 	virtual ndCharacterRootNode* GetAsRootNode();
-	virtual ndCharacterEffectorNode* GetAsEffectorNode();
 	virtual ndCharacterForwardDynamicNode* GetAsForwardDynamicNode();
 	virtual ndCharacterInverseDynamicNode* GetAsInverseDynamicNode();
 
@@ -114,56 +113,62 @@ class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 
 	D_NEWTON_API virtual dMatrix GetBoneMatrix() const;
 
+	D_NEWTON_API virtual void SetPose(const ndCharacterSkeleton* const animationBonePose);
+
 	protected:
 	D_NEWTON_API dNodeBaseHierarchy* CreateClone() const;
 	D_NEWTON_API virtual void Save(const ndCharacterSaveDescriptor& desc) const;
 };
 
-inline ndBodyDynamic* ndCharacterLimbNode::GetBody() const
+inline ndBodyDynamic* ndCharacterNode::GetBody() const
 {
 	return nullptr;
 }
 
-inline ndJointBilateralConstraint* ndCharacterLimbNode::GetJoint() const
+inline ndJointBilateralConstraint* ndCharacterNode::GetJoint() const
 {
 	return nullptr;
 }
 
-inline void ndCharacterLimbNode::UpdateGlobalPose(ndWorld* const, dFloat32)
+inline void ndCharacterNode::UpdateGlobalPose(ndWorld* const, dFloat32)
 {
 }
 
-inline void ndCharacterLimbNode::CalculateLocalPose(ndWorld* const, dFloat32)
+inline void ndCharacterNode::CalculateLocalPose(ndWorld* const, dFloat32)
 {
 }
 
-inline ndCharacterLimbNode* ndCharacterLimbNode::GetAsLimbNode()
+inline ndCharacterNode* ndCharacterNode::GetAsNode()
 {
 	return this;
 }
 
-inline ndCharacterRootNode* ndCharacterLimbNode::GetAsRootNode()
+inline ndCharacterRootNode* ndCharacterNode::GetAsRootNode()
 {
 	dAssert(0);
 	return nullptr;
 }
 
-inline ndCharacterEffectorNode* ndCharacterLimbNode::GetAsEffectorNode()
-{
-	return nullptr;
-}
+//inline ndCharacterEffectorNode* ndCharacterNode::GetAsEffectorNode()
+//{
+//	return nullptr;
+//}
 
-inline ndCharacterInverseDynamicNode* ndCharacterLimbNode::GetAsInverseDynamicNode()
-{
-	dAssert(0);
-	return nullptr;
-}
-
-inline ndCharacterForwardDynamicNode* ndCharacterLimbNode::GetAsForwardDynamicNode()
+inline ndCharacterInverseDynamicNode* ndCharacterNode::GetAsInverseDynamicNode()
 {
 	dAssert(0);
 	return nullptr;
 }
 
+inline ndCharacterForwardDynamicNode* ndCharacterNode::GetAsForwardDynamicNode()
+{
+	dAssert(0);
+	return nullptr;
+}
+
+inline void ndCharacterNode::SetPose(const ndCharacterSkeleton* const)
+{
+
+}
 
 #endif

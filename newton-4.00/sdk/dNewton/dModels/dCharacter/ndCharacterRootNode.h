@@ -23,9 +23,9 @@
 #define __D_CHARACTER_ROOT_NODE_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndCharacterLimbNode.h"
+#include "ndCharacterNode.h"
 
-class ndCharacterRootNode: public ndCharacterLimbNode
+class ndCharacterRootNode: public ndCharacterNode
 {
 	public:
 	D_CLASS_REFLECTION(ndCharacterRootNode);

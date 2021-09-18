@@ -25,13 +25,13 @@
 #include "ndNewtonStdafx.h"
 
 class ndCharacterRootNode;
-class ndCharacterLimbNode;
+class ndCharacterNode;
 
 //class ndCharaterKeyFramePose
 //{
 //	public:
 //	ndCharaterKeyFramePose();
-//	ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix);
+//	ndCharaterKeyFramePose(ndCharacterNode* const node, const dMatrix& matrix);
 //
 //	dVector m_position;
 //	//dQuaternion m_rotation;
@@ -45,7 +45,7 @@ class ndCharacterLimbNode;
 //{
 //}
 
-//inline ndCharaterKeyFramePose::ndCharaterKeyFramePose(ndCharacterLimbNode* const node, const dMatrix& matrix)
+//inline ndCharaterKeyFramePose::ndCharaterKeyFramePose(ndCharacterNode* const node, const dMatrix& matrix)
 //	:m_position(matrix.m_posit)
 //	,m_euler(dVector::m_zero)
 //	,m_node(node)
@@ -56,10 +56,12 @@ class ndCharacterLimbNode;
 class ndCharacterSkeleton: public dNodeHierarchy<ndCharacterSkeleton>
 {
 	public: 
-	D_NEWTON_API ndCharacterSkeleton* FindNode(ndCharacterLimbNode* const node) const;
+	D_NEWTON_API ndCharacterSkeleton* FindNode(ndCharacterNode* const node) const;
+
+	const dMatrix& GetTransform() const;
 
 	protected:
-	ndCharacterSkeleton(ndCharacterLimbNode* const node, const dMatrix& matrix, ndCharacterSkeleton* const parent);
+	ndCharacterSkeleton(ndCharacterNode* const node, const dMatrix& matrix, ndCharacterSkeleton* const parent);
 
 	ndCharacterSkeleton* CreateClone() const
 	{
@@ -68,10 +70,14 @@ class ndCharacterSkeleton: public dNodeHierarchy<ndCharacterSkeleton>
 	}
 
 	dMatrix m_transform;
-	ndCharacterLimbNode* m_node;
+	ndCharacterNode* m_node;
 
 	friend class ndCharacter;
 };
 
+inline const dMatrix& ndCharacterSkeleton::GetTransform() const
+{
+	return m_transform;
+}
 
 #endif

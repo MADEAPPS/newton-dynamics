@@ -143,7 +143,7 @@ class ndRagdollModel : public ndCharacter
 		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
 		
 		ndDemoEntity* childEntities[32];
-		ndCharacterLimbNode* parentBones[32];
+		ndCharacterNode* parentBones[32];
 		for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) 
 		{
 			childEntities[stack] = child;
@@ -159,7 +159,7 @@ class ndRagdollModel : public ndCharacter
 		while (stack) 
 		{
 			stack--;
-			ndCharacterLimbNode* parentBone = parentBones[stack];
+			ndCharacterNode* parentBone = parentBones[stack];
 			ndDemoEntity* const childEntity = childEntities[stack];
 			const char* const name = childEntity->GetName().GetStr();
 			//dTrace(("name: %s\n", name));
@@ -234,7 +234,7 @@ class ndRagdollModel : public ndCharacter
 		return body;
 	}
 
-	ndCharacterLimbNode* ConnectBodyParts(ndBodyDynamic* const childBody, ndCharacterLimbNode* const parentBone, const dJointDefinition& definition)
+	ndCharacterNode* ConnectBodyParts(ndBodyDynamic* const childBody, ndCharacterNode* const parentBone, const dJointDefinition& definition)
 	{
 		dMatrix matrix(childBody->GetMatrix());
 		dJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);

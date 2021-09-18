@@ -23,12 +23,12 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
-#include "ndCharacterLimbNode.h"
+#include "ndCharacterNode.h"
 
-D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterLimbNode)
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterNode)
 
-ndCharacterLimbNode::ndCharacterLimbNode(ndCharacterLimbNode* const parent)
-	:dNodeHierarchy<ndCharacterLimbNode>()
+ndCharacterNode::ndCharacterNode(ndCharacterNode* const parent)
+	:dNodeHierarchy<ndCharacterNode>()
 {
 	if (parent)
 	{
@@ -36,12 +36,12 @@ ndCharacterLimbNode::ndCharacterLimbNode(ndCharacterLimbNode* const parent)
 	}
 }
 
-ndCharacterLimbNode::ndCharacterLimbNode(const ndCharacterLoadDescriptor& desc)
-	:dNodeHierarchy<ndCharacterLimbNode>()
+ndCharacterNode::ndCharacterNode(const ndCharacterLoadDescriptor& desc)
+	:dNodeHierarchy<ndCharacterNode>()
 {
 	if (desc.m_parentModelNode)
 	{
-		Attach((ndCharacterLimbNode*)desc.m_parentModelNode);
+		Attach((ndCharacterNode*)desc.m_parentModelNode);
 	}
 
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -60,41 +60,41 @@ ndCharacterLimbNode::ndCharacterLimbNode(const ndCharacterLoadDescriptor& desc)
 		if (strstr(partName, "ndCharacter"))
 		{
 			childDesc.m_rootNode = node;
-			D_CLASS_REFLECTION_LOAD_NODE(ndCharacterLimbNode, partName, childDesc);
+			D_CLASS_REFLECTION_LOAD_NODE(ndCharacterNode, partName, childDesc);
 		}
 	}
 }
 
-ndCharacterLimbNode::~ndCharacterLimbNode()
+ndCharacterNode::~ndCharacterNode()
 {
 }
 
-dNodeBaseHierarchy* ndCharacterLimbNode::CreateClone() const
+dNodeBaseHierarchy* ndCharacterNode::CreateClone() const
 {
 	dAssert(0);
 	return nullptr;
 }
 
-dMatrix ndCharacterLimbNode::GetBoneMatrix() const
+dMatrix ndCharacterNode::GetBoneMatrix() const
 {
 	return GetBody()->GetMatrix();
 }
 
 
-void ndCharacterLimbNode::Save(const ndCharacterSaveDescriptor& desc) const
+void ndCharacterNode::Save(const ndCharacterSaveDescriptor& desc) const
 {
 	ndCharacterSaveDescriptor childDesc(desc);
 
-	childDesc.m_limbMap->Insert(childDesc.m_limbMap->GetCount(), (ndCharacterLimbNode*)this);
-	for (ndCharacterLimbNode* child = GetChild(); child; child = child->GetSibling())
+	childDesc.m_limbMap->Insert(childDesc.m_limbMap->GetCount(), (ndCharacterNode*)this);
+	for (ndCharacterNode* child = GetChild(); child; child = child->GetSibling())
 	{
 		child->Save(childDesc);
 	}
 }
 
-void ndCharacterLimbNode::Debug(ndConstraintDebugCallback& context) const
+void ndCharacterNode::Debug(ndConstraintDebugCallback& context) const
 {
-	for (ndCharacterLimbNode* child = GetChild(); child; child = child->GetSibling())
+	for (ndCharacterNode* child = GetChild(); child; child = child->GetSibling())
 	{
 		child->Debug(context);
 	}

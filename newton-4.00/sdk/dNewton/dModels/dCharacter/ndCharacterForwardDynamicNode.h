@@ -23,16 +23,16 @@
 #define __D_CHARACTER_FORWARD_DYNAMICS_NODE_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndCharacterLimbNode.h"
+#include "ndCharacterNode.h"
 
 class ndJointPdActuator;
 
-class ndCharacterForwardDynamicNode: public ndCharacterLimbNode 
+class ndCharacterForwardDynamicNode: public ndCharacterNode 
 {
 	public:
 	D_CLASS_REFLECTION(ndCharacterForwardDynamicNode);
 	D_NEWTON_API ndCharacterForwardDynamicNode(const ndCharacterLoadDescriptor& desc);
-	D_NEWTON_API ndCharacterForwardDynamicNode(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
+	D_NEWTON_API ndCharacterForwardDynamicNode(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterForwardDynamicNode ();
 
 	virtual ndBodyDynamic* GetBody() const;

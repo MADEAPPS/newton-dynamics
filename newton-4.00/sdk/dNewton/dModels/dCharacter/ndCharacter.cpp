@@ -24,37 +24,31 @@
 #include "ndWorld.h"
 #include "ndCharacter.h"
 #include "ndBodyDynamic.h"
-#include "ndCharacterLimbNode.h"
+#include "ndCharacterNode.h"
 #include "ndCharacterRootNode.h"
-#include "ndCharacterEffectorNode.h"
-#include "ndCharacterPoseController.h"
 #include "ndCharacterForwardDynamicNode.h"
 #include "ndCharacterInverseDynamicNode.h"
-#include "ndCharacterBipedPoseController.h"
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacter)
 
 ndCharacter::ndCharacter()
 	:ndModel()
 	,m_rootNode(nullptr)
-	,m_controller(nullptr)
 {
 }
 
 ndCharacter::ndCharacter(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndModel(dLoadSaveBase::dLoadDescriptor(desc))
 	,m_rootNode(nullptr)
-	,m_controller(nullptr)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
-	dTree<const ndCharacterLimbNode*, dUnsigned32> limbMap;
+	dTree<const ndCharacterNode*, dUnsigned32> limbMap;
 	for (const nd::TiXmlNode* node = xmlNode->FirstChild(); node; node = node->NextSibling())
 	{
 		const char* const partName = node->Value();
 		if (strcmp(partName, "ndCharacterRootNode") == 0)
 		{
-			//dLoadSaveBase::dLoadDescriptor rootDesc(desc);
 			ndCharacterLoadDescriptor loadDesc(desc, &limbMap);
 			loadDesc.m_rootNode = node;
 			m_rootNode = new ndCharacterRootNode(loadDesc);
@@ -86,7 +80,7 @@ void ndCharacter::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 
 	if (m_rootNode)
 	{
-		dTree<dInt32, const ndCharacterLimbNode*> limbMap;
+		dTree<dInt32, const ndCharacterNode*> limbMap;
 		ndCharacterSaveDescriptor childDesc(desc);
 		childDesc.m_rootNode = childNode;
 		childDesc.m_limbMap = &limbMap;
@@ -101,8 +95,8 @@ void ndCharacter::AddToWorld(ndWorld* const world)
 		world->AddBody(m_rootNode->GetBody());
 
 		dInt32 stack = 0;
-		ndCharacterLimbNode* nodePool[32];
-		for (ndCharacterLimbNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
+		ndCharacterNode* nodePool[32];
+		for (ndCharacterNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
 		{
 			nodePool[stack] = child;
 			stack++;
@@ -111,7 +105,7 @@ void ndCharacter::AddToWorld(ndWorld* const world)
 		while (stack)
 		{
 			stack--;
-			ndCharacterLimbNode* const node = nodePool[stack];
+			ndCharacterNode* const node = nodePool[stack];
 			if (node->GetBody())
 			{
 				world->AddBody(node->GetBody());
@@ -122,7 +116,7 @@ void ndCharacter::AddToWorld(ndWorld* const world)
 				world->AddJoint(node->GetJoint());
 			}
 
-			for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
+			for (ndCharacterNode* child = node->GetChild(); child; child = child->GetSibling())
 			{
 				nodePool[stack] = child;
 				stack++;
@@ -138,8 +132,8 @@ void ndCharacter::RemoveFromToWorld(ndWorld* const world)
 		world->RemoveBody(m_rootNode->GetBody());
 
 		dInt32 stack = 0;
-		ndCharacterLimbNode* nodePool[32];
-		for (ndCharacterLimbNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
+		ndCharacterNode* nodePool[32];
+		for (ndCharacterNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
 		{
 			nodePool[stack] = child;
 			stack++;
@@ -148,7 +142,7 @@ void ndCharacter::RemoveFromToWorld(ndWorld* const world)
 		while (stack)
 		{
 			stack--;
-			ndCharacterLimbNode* const node = nodePool[stack];
+			ndCharacterNode* const node = nodePool[stack];
 			if (node->GetBody())
 			{
 				world->RemoveBody(node->GetBody());
@@ -159,7 +153,7 @@ void ndCharacter::RemoveFromToWorld(ndWorld* const world)
 				world->RemoveJoint(node->GetJoint());
 			}
 
-			for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
+			for (ndCharacterNode* child = node->GetChild(); child; child = child->GetSibling())
 			{
 				nodePool[stack] = child;
 				stack++;
@@ -174,71 +168,71 @@ ndCharacterRootNode* ndCharacter::CreateRoot(ndBodyDynamic* const body)
 	return m_rootNode;
 }
 
-ndCharacterForwardDynamicNode* ndCharacter::CreateForwardDynamicLimb(const dMatrix& matrixInGlobalSpase, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
+ndCharacterForwardDynamicNode* ndCharacter::CreateForwardDynamicLimb(const dMatrix& matrixInGlobalSpase, ndBodyDynamic* const body, ndCharacterNode* const parent)
 {
 	ndCharacterForwardDynamicNode* const limb = new ndCharacterForwardDynamicNode(matrixInGlobalSpase, body, parent);
 	return limb;
 }
 
-ndCharacterInverseDynamicNode* ndCharacter::CreateInverseDynamicLimb(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
+ndCharacterInverseDynamicNode* ndCharacter::CreateInverseDynamicLimb(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent)
 {
 	ndCharacterInverseDynamicNode* const limb = new ndCharacterInverseDynamicNode(matrixInGlobalSpace, body, parent);
 	return limb;
 }
 
-ndCharacterEffectorNode* ndCharacter::CreateInverseDynamicEffector(const dMatrix& matrixInGlobalSpace, ndCharacterLimbNode* const parent)
-{
-	ndCharacterEffectorNode* const effector = new ndCharacterEffectorNode(matrixInGlobalSpace, parent);
-	return effector;
-}
+//ndCharacterEffectorNode* ndCharacter::CreateInverseDynamicEffector(const dMatrix& matrixInGlobalSpace, ndCharacterNode* const parent)
+//{
+//	ndCharacterEffectorNode* const effector = new ndCharacterEffectorNode(matrixInGlobalSpace, parent);
+//	return effector;
+//}
 
-ndCharacterCentreOfMassState ndCharacter::CalculateCentreOfMassState() const
-{
-	dInt32 stack = 1;
-	ndCharacterLimbNode* nodePool[32];
-	
-	nodePool[0] = m_rootNode;
-
-	dVector com(dVector::m_zero);
-	dVector veloc(dVector::m_zero);
-	dFloat32 mass = dFloat32(0.0f);
-
-	while (stack)
-	{
-		stack--;
-		ndCharacterLimbNode* const node = nodePool[stack];
-		if (!node->GetAsEffectorNode())
-		{
-			ndBodyDynamic* const body = node->GetBody();
-			if (body)
-			{
-				dFloat32 partMass = body->GetMassMatrix().m_w;
-				mass += partMass;
-				dMatrix bodyMatrix(body->GetMatrix());
-				com += bodyMatrix.TransformVector(body->GetCentreOfMass()).Scale(partMass);
-				veloc += body->GetVelocity().Scale(partMass);
-			}
-		}
-
-		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
-		{
-			nodePool[stack] = child;
-			stack++;
-		}
-	}
-	//inertia.m_posit.m_w = dFloat32(1.0f);
-	dVector invMass (dFloat32(1.0f) / mass);
-	com = com * invMass;
-	veloc = veloc * invMass;
-	com.m_w = dFloat32(1.0f);
-	veloc.m_w = dFloat32(0.0f);
-
-	ndCharacterCentreOfMassState state;
-	state.m_mass = mass;
-	state.m_centerOfMass = com;
-	state.m_centerOfMassVeloc = veloc;
-	return state;
-}
+//ndCharacterCentreOfMassState ndCharacter::CalculateCentreOfMassState() const
+//{
+//	dInt32 stack = 1;
+//	ndCharacterNode* nodePool[32];
+//	
+//	nodePool[0] = m_rootNode;
+//
+//	dVector com(dVector::m_zero);
+//	dVector veloc(dVector::m_zero);
+//	dFloat32 mass = dFloat32(0.0f);
+//
+//	while (stack)
+//	{
+//		stack--;
+//		ndCharacterNode* const node = nodePool[stack];
+//		if (!node->GetAsEffectorNode())
+//		{
+//			ndBodyDynamic* const body = node->GetBody();
+//			if (body)
+//			{
+//				dFloat32 partMass = body->GetMassMatrix().m_w;
+//				mass += partMass;
+//				dMatrix bodyMatrix(body->GetMatrix());
+//				com += bodyMatrix.TransformVector(body->GetCentreOfMass()).Scale(partMass);
+//				veloc += body->GetVelocity().Scale(partMass);
+//			}
+//		}
+//
+//		for (ndCharacterNode* child = node->GetChild(); child; child = child->GetSibling())
+//		{
+//			nodePool[stack] = child;
+//			stack++;
+//		}
+//	}
+//	//inertia.m_posit.m_w = dFloat32(1.0f);
+//	dVector invMass (dFloat32(1.0f) / mass);
+//	com = com * invMass;
+//	veloc = veloc * invMass;
+//	com.m_w = dFloat32(1.0f);
+//	veloc.m_w = dFloat32(0.0f);
+//
+//	ndCharacterCentreOfMassState state;
+//	state.m_mass = mass;
+//	state.m_centerOfMass = com;
+//	state.m_centerOfMassVeloc = veloc;
+//	return state;
+//}
 
 void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 {
@@ -250,10 +244,10 @@ void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 		m_rootNode->Debug(context);
 	}
 
-	if (m_controller)
-	{
-		m_controller->Debug(context);
-	}
+	//if (m_controller)
+	//{
+	//	m_controller->Debug(context);
+	//}
 	context.SetScale(scale);
 }
 
@@ -277,16 +271,16 @@ void ndCharacter::RemoveAttachment(ndJointBilateralConstraint* const joint)
 //void ndCharacter::UpdateGlobalPose(ndWorld* const world, dFloat32 timestep)
 //{
 //	dInt32 stack = 1;
-//	ndCharacterLimbNode* nodePool[32];
+//	ndCharacterNode* nodePool[32];
 //	nodePool[0] = m_rootNode;
 //
 //	while (stack)
 //	{
 //		stack--;
-//		ndCharacterLimbNode* const node = nodePool[stack];
+//		ndCharacterNode* const node = nodePool[stack];
 //		node->UpdateGlobalPose(world, timestep);
 //
-//		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
+//		for (ndCharacterNode* child = node->GetChild(); child; child = child->GetSibling())
 //		{
 //			nodePool[stack] = child;
 //			stack++;
@@ -297,16 +291,16 @@ void ndCharacter::RemoveAttachment(ndJointBilateralConstraint* const joint)
 //void ndCharacter::CalculateLocalPose(ndWorld* const world, dFloat32 timestep)
 //{
 //	dInt32 stack = 1;
-//	ndCharacterLimbNode* nodePool[32];
+//	ndCharacterNode* nodePool[32];
 //	nodePool[0] = m_rootNode;
 //
 //	while (stack)
 //	{
 //		stack--;
-//		ndCharacterLimbNode* const node = nodePool[stack];
+//		ndCharacterNode* const node = nodePool[stack];
 //		node->CalculateLocalPose(world, timestep);
 //
-//		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
+//		for (ndCharacterNode* child = node->GetChild(); child; child = child->GetSibling())
 //		{
 //			nodePool[stack] = child;
 //			stack++;
@@ -318,44 +312,72 @@ void ndCharacter::PostUpdate(ndWorld* const, dFloat32)
 {
 }
 
-void ndCharacter::Update(ndWorld* const world, dFloat32 timestep)
+//void ndCharacter::Update(ndWorld* const world, dFloat32 timestep)
+void ndCharacter::Update(ndWorld* const, dFloat32)
 {
-	if (m_controller)
-	{
-		m_controller->Evaluate(world, timestep);
-	}
+	//if (m_controller)
+	//{
+	//	m_controller->Evaluate(world, timestep);
+	//}
 }
 
-ndCharacterSkeleton* ndCharacter::CreateSkeleton() const
-{
-	dInt32 stack = 0;
-	ndCharacterLimbNode* nodePool[32];
-	ndCharacterSkeleton* parentPool[32];
-
-	//dMatrix rootMatrix(m_rootNode->GetBody()->GetMatrix().Inverse());
-	ndCharacterSkeleton* const skeleton = new ndCharacterSkeleton(m_rootNode, dGetIdentityMatrix(), nullptr);
-	for (ndCharacterLimbNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
-	{
-		nodePool[stack] = child;
-		parentPool[stack] = skeleton;
-		stack++;
-	}
-	
-	while (stack)
-	{
-		stack--;
-		ndCharacterLimbNode* const node = nodePool[stack];
-		ndCharacterSkeleton* const boneParent = parentPool[stack];
-		dMatrix matrix(node->GetBoneMatrix() * boneParent->m_node->GetBoneMatrix().Inverse());
-		ndCharacterSkeleton* const parent = new ndCharacterSkeleton(node, matrix, boneParent);
-	
-		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
-		{
-			nodePool[stack] = child;
-			parentPool[stack] = parent;
-			stack++;
-		}
-	}
-
-	return skeleton;
-}
+//ndCharacterSkeleton* ndCharacter::CreateSkeleton() const
+//{
+//	dAssert(0);
+//	return nullptr;
+//	//dInt32 stack = 0;
+//	//ndCharacterNode* nodePool[32];
+//	//ndCharacterSkeleton* parentPool[32];
+//	//
+//	//ndCharacterSkeleton* const skeleton = new ndCharacterSkeleton(m_rootNode, dGetIdentityMatrix(), nullptr);
+//	//for (ndCharacterNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
+//	//{
+//	//	nodePool[stack] = child;
+//	//	parentPool[stack] = skeleton;
+//	//	stack++;
+//	//}
+//	//
+//	//while (stack)
+//	//{
+//	//	stack--;
+//	//	ndCharacterNode* const node = nodePool[stack];
+//	//	ndCharacterSkeleton* const boneParent = parentPool[stack];
+//	//	dMatrix matrix(node->GetBoneMatrix() * boneParent->m_node->GetBoneMatrix().Inverse());
+//	//	ndCharacterSkeleton* const parent = new ndCharacterSkeleton(node, matrix, boneParent);
+//	//
+//	//	for (ndCharacterNode* child = node->GetChild(); child; child = child->GetSibling())
+//	//	{
+//	//		nodePool[stack] = child;
+//	//		parentPool[stack] = parent;
+//	//		stack++;
+//	//	}
+//	//}
+//	//
+//	//return skeleton;
+//}
+//
+//void ndCharacter::SetPose(const ndCharacterSkeleton* const skeleton)
+//{
+//	dAssert(0);
+//	//dInt32 stack = 1;
+//	//const ndCharacterSkeleton* nodePool[32];
+//	//
+//	//nodePool[0] = skeleton;
+//	//while (stack)
+//	//{
+//	//	stack--;
+//	//	const ndCharacterSkeleton* const node = nodePool[stack];
+//	//	if (node->m_node)
+//	//	{
+//	//dTrace(("name: %s\n", node->m_node->GetName().GetStr()));
+//	//
+//	//		node->m_node->SetPose(node);
+//	//	}
+//	//
+//	//	for (ndCharacterSkeleton* child = node->GetChild(); child; child = child->GetSibling())
+//	//	{
+//	//		nodePool[stack] = child;
+//	//		stack++;
+//	//	}
+//	//}
+//}

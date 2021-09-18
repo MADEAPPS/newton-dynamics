@@ -26,21 +26,19 @@
 #include "ndModel.h"
 
 class ndWorld;
-class ndCharacterLimbNode;
+class ndCharacterNode;
 class ndCharacterRootNode;
 class ndCharacterSkeleton;
-class ndCharacterEffectorNode;
-class ndCharacterPoseController;
 class ndCharacterForwardDynamicNode;
 class ndCharacterInverseDynamicNode;
 
-class ndCharacterCentreOfMassState
-{
-	public:
-	dVector m_centerOfMass;
-	dVector m_centerOfMassVeloc;
-	dFloat32 m_mass;
-};
+//class ndCharacterCentreOfMassState
+//{
+//	public:
+//	dVector m_centerOfMass;
+//	dVector m_centerOfMassVeloc;
+//	dFloat32 m_mass;
+//};
 
 class ndCharacter: public ndModel
 {
@@ -55,23 +53,23 @@ class ndCharacter: public ndModel
 	D_NEWTON_API virtual void RemoveFromToWorld(ndWorld* const world);
 
 	D_NEWTON_API ndCharacterRootNode* CreateRoot(ndBodyDynamic* const body);
-	D_NEWTON_API ndCharacterForwardDynamicNode* CreateForwardDynamicLimb(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
-	D_NEWTON_API ndCharacterInverseDynamicNode* CreateInverseDynamicLimb(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
-	D_NEWTON_API ndCharacterEffectorNode* CreateInverseDynamicEffector(const dMatrix& matrixInGlobalSpace, ndCharacterLimbNode* const parent);
-	
+	D_NEWTON_API ndCharacterForwardDynamicNode* CreateForwardDynamicLimb(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent);
+	D_NEWTON_API ndCharacterInverseDynamicNode* CreateInverseDynamicLimb(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent);
+
 	ndCharacter* GetAsCharacter();
 	ndCharacterRootNode* GetRootNode() const;
-	ndCharacterPoseController* GetController() const;
-	void SetController(ndCharacterPoseController* const controller);
-
-	ndCharacterCentreOfMassState CalculateCentreOfMassState() const;
-	//void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
-	//void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
 
 	D_NEWTON_API void AddAttachment(ndJointBilateralConstraint* const joint);
 	D_NEWTON_API void RemoveAttachment(ndJointBilateralConstraint* const joint);
 
-	D_NEWTON_API ndCharacterSkeleton* CreateSkeleton() const;
+
+	//ndCharacterPoseController* GetController() const;
+	//void SetController(ndCharacterPoseController* const controller);
+	//ndCharacterCentreOfMassState CalculateCentreOfMassState() const;
+	//void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
+	//void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
+	//D_NEWTON_API ndCharacterSkeleton* CreateSkeleton() const;
+	//D_NEWTON_API void SetPose(const ndCharacterSkeleton* const skeleton);
 
 	protected:
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
@@ -80,7 +78,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 	
 	ndCharacterRootNode* m_rootNode;
-	ndCharacterPoseController* m_controller;
+	//ndCharacterPoseController* m_controller;
 	dList<ndJointBilateralConstraint*> m_extraJointsAttachmentList;
 };
 
@@ -89,15 +87,15 @@ inline ndCharacter* ndCharacter::GetAsCharacter()
 	return this;
 }
 
-inline ndCharacterPoseController* ndCharacter::GetController() const
-{
-	return m_controller;
-}
-
-inline void ndCharacter::SetController(ndCharacterPoseController* const controller)
-{
-	m_controller = controller;
-}
+//inline ndCharacterPoseController* ndCharacter::GetController() const
+//{
+//	return m_controller;
+//}
+//
+//inline void ndCharacter::SetController(ndCharacterPoseController* const controller)
+//{
+//	m_controller = controller;
+//}
 
 inline ndCharacterRootNode* ndCharacter::GetRootNode() const
 {

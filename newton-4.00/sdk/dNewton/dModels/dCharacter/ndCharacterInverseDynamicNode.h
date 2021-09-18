@@ -23,14 +23,14 @@
 #define __D_CHARACTER_INVERSE_DYNAMICS_NODE_H__
 
 #include "ndNewtonStdafx.h"
-#include "ndCharacterLimbNode.h"
+#include "ndCharacterNode.h"
 
-class ndCharacterInverseDynamicNode: public ndCharacterLimbNode 
+class ndCharacterInverseDynamicNode: public ndCharacterNode 
 {
 	public:
 	D_CLASS_REFLECTION(ndCharacterInverseDynamicNode);
 	D_NEWTON_API ndCharacterInverseDynamicNode(const ndCharacterLoadDescriptor& desc);
-	D_NEWTON_API ndCharacterInverseDynamicNode(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterLimbNode* const parent);
+	D_NEWTON_API ndCharacterInverseDynamicNode(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterInverseDynamicNode ();
 
 	virtual ndBodyDynamic* GetBody() const;

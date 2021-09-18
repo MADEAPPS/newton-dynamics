@@ -28,15 +28,15 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterForwardDynamicNode)
 
-ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterLimbNode* const parent)
-	:ndCharacterLimbNode(parent)
+ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent)
+	:ndCharacterNode(parent)
 	,m_body(body)
 	,m_joint(new ndJointPdActuator(matrixInGlobalSpace, body, parent->GetBody()))
 {
 }
 
 ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const ndCharacterLoadDescriptor& desc)
-	:ndCharacterLimbNode(desc)
+	:ndCharacterNode(desc)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	dInt32 bodyHash = xmlGetInt(xmlNode, "bodyHash");
@@ -59,7 +59,7 @@ void ndCharacterForwardDynamicNode::Save(const ndCharacterSaveDescriptor& desc) 
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
-	ndCharacterLimbNode::Save(ndCharacterSaveDescriptor(desc, childNode));
+	ndCharacterNode::Save(ndCharacterSaveDescriptor(desc, childNode));
 
 	dTree<dInt32, const ndJointBilateralConstraint*>::dNode* jointNode = desc.m_jointMap->Find(m_joint);
 	if (!jointNode)

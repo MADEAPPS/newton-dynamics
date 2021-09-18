@@ -45,18 +45,6 @@ ndJointTwoBodyIK::ndJointTwoBodyIK(const ndJointBilateralConstraint* const rootJ
 	m_maxDist = dSqrt(m_targetPosit.DotProduct(m_targetPosit & dVector::m_triplexMask).GetScalar());
 	m_referencePosit = m_localMatrix1.m_front.Scale (m_maxDist) | dVector::m_wOne;
 	SetTargetOffset(m_targetPosit);
-
-//SetTargetOffset(dVector(0.0f, 0.2f, 0.4f, 0.0f));
-//SetTargetOffset(dVector(0.0f, 0.0f, -0.4f, 0.0f));
-//SetTargetOffset(m_referencePosit + dVector(0.0f, 0.0f, 0.0f, 0.0f));
-//SetTargetOffset(m_referencePosit + dVector(-0.1f, 0.3f, 0.0f, 0.0f));
-
-//static int xxxx = 1;
-//if (xxxx & 1)
-//SetTargetOffset(m_referencePosit + dVector(-0.1f, -0.0f, 0.1f, 0.0f));
-//else
-//SetTargetOffset(m_referencePosit + dVector(-0.1f, -0.0f, -0.1f, 0.0f));
-//xxxx++;
 }
 
 ndJointTwoBodyIK::ndJointTwoBodyIK(const dLoadSaveBase::dLoadDescriptor& desc)
@@ -128,16 +116,11 @@ void ndJointTwoBodyIK::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 
 void ndJointTwoBodyIK::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
-	//dMatrix matrix0;
-	//dMatrix matrix1;
-	//dMatrix matrix2(m_pivotFrame * m_body1->GetMatrix());
-
 	dMatrix matrix1 (m_coneRotation * m_pivotFrame);
 	matrix1.m_posit = m_pivotFrame.TransformVector(m_targetPosit);
 	matrix1 = matrix1 * m_body1->GetMatrix();
 
 	dMatrix matrix0(m_localMatrix0 * m_body0->GetMatrix());
-	//CalculateGlobalMatrix(matrix0, matrix1);
 	
 	debugCallback.DrawFrame(matrix1);
 	//debugCallback.DrawFrame(matrix2);
@@ -294,11 +277,23 @@ void ndJointTwoBodyIK::SetTargetOffset(const dVector& offset)
 	}
 }
 
-void ndJointTwoBodyIK::SetTargetMatrix(const dMatrix& matrixInGlobalSpace)
+void ndJointTwoBodyIK::SetTargetLocalMatrix(const dMatrix& localMatrix)
+{
+	dVector euler0;
+	dVector euler1;
+	localMatrix.CalcPitchYawRoll(euler0, euler1);
+	dFloat32 pitch = dAbs(euler0.m_x) < dAbs(euler1.m_x) ? euler0.m_x : euler1.m_x;
+
+	m_angle = pitch;
+	SetTargetOffset(localMatrix.m_posit);
+}
+
+void ndJointTwoBodyIK::SetTargetGlobalMatrix(const dMatrix& matrixInGlobalSpace)
 {
 	dMatrix baseMatrix(m_pivotFrame * m_body1->GetMatrix());
-	dMatrix offset(matrixInGlobalSpace * baseMatrix.Inverse());
-	SetTargetOffset(offset.m_posit);
+	//dMatrix offset(matrixInGlobalSpace * baseMatrix.Inverse());
+	//SetTargetOffset(offset.m_posit);
+	SetTargetLocalMatrix(matrixInGlobalSpace * baseMatrix.Inverse());
 }
 
 void ndJointTwoBodyIK::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
