@@ -444,7 +444,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	scene->SetSelectedModel(ragdoll);
 	scene->GetWorld()->AddModel(ragdoll);
 
-	matrix.m_posit.m_x += 1.25f;
+	matrix.m_posit.m_x += 1.4f;
 	TestPlayerCapsuleInteaction(scene, matrix);
 
 	matrix.m_posit.m_x += 2.0f;
@@ -467,7 +467,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	playerMatrix = dYawMatrix(angle) * playerMatrix;
 	dVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-5.0f));
 	origin.m_y += 1.0f;
-	origin.m_z -= 3.0f;
+	origin.m_z -= 2.0f;
 	scene->SetCameraMatrix(playerMatrix, origin);
 
 	//ndLoadSave loadScene;
