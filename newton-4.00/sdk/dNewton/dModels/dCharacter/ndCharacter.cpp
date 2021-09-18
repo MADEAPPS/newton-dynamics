@@ -26,6 +26,7 @@
 #include "ndBodyDynamic.h"
 #include "ndCharacterNode.h"
 #include "ndCharacterRootNode.h"
+#include "ndJointInverseDynamicsBase.h"
 #include "ndCharacterForwardDynamicNode.h"
 #include "ndCharacterInverseDynamicNode.h"
 
@@ -34,12 +35,16 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacter)
 ndCharacter::ndCharacter()
 	:ndModel()
 	,m_rootNode(nullptr)
+	,m_effectors()
+	,m_extraJointAttachments()
 {
 }
 
 ndCharacter::ndCharacter(const dLoadSaveBase::dLoadDescriptor& desc)
 	:ndModel(dLoadSaveBase::dLoadDescriptor(desc))
 	,m_rootNode(nullptr)
+	,m_effectors()
+	,m_extraJointAttachments()
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
@@ -59,7 +64,13 @@ ndCharacter::ndCharacter(const dLoadSaveBase::dLoadDescriptor& desc)
 
 ndCharacter::~ndCharacter()
 {
-	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointsAttachmentList.GetFirst(); node; node = node->GetNext())
+	for (dList<ndJointInverseDynamicsBase*>::dNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
+	{
+		ndJointBilateralConstraint* const joint = node->GetInfo();
+		delete joint;
+	}
+
+	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointAttachments.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = node->GetInfo();
 		delete joint;
@@ -123,10 +134,34 @@ void ndCharacter::AddToWorld(ndWorld* const world)
 			}
 		}
 	}
+
+	for (dList<ndJointInverseDynamicsBase*>::dNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
+	{
+		ndJointBilateralConstraint* const joint = node->GetInfo();
+		world->AddJoint(joint);
+	}
+
+	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointAttachments.GetFirst(); node; node = node->GetNext())
+	{
+		ndJointBilateralConstraint* const joint = node->GetInfo();
+		world->AddJoint(joint);
+	}
 }
 
 void ndCharacter::RemoveFromToWorld(ndWorld* const world)
 {
+	for (dList<ndJointInverseDynamicsBase*>::dNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
+	{
+		ndJointBilateralConstraint* const joint = node->GetInfo();
+		world->RemoveJoint(joint);
+	}
+
+	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointAttachments.GetFirst(); node; node = node->GetNext())
+	{
+		ndJointBilateralConstraint* const joint = node->GetInfo();
+		world->RemoveJoint(joint);
+	}
+
 	if (m_rootNode)
 	{
 		world->RemoveBody(m_rootNode->GetBody());
@@ -253,19 +288,24 @@ void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 
 void ndCharacter::AddAttachment(ndJointBilateralConstraint* const joint)
 {
-	m_extraJointsAttachmentList.Append(joint);
+	m_extraJointAttachments.Append(joint);
 }
 
 void ndCharacter::RemoveAttachment(ndJointBilateralConstraint* const joint)
 {
-	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointsAttachmentList.GetFirst(); node; node = node->GetNext())
+	for (dList<ndJointBilateralConstraint*>::dNode* node = m_extraJointAttachments.GetFirst(); node; node = node->GetNext())
 	{
 		if (node->GetInfo() == joint)
 		{
-			m_extraJointsAttachmentList.Remove(node);
+			m_extraJointAttachments.Remove(node);
 			break;
 		}
 	}
+}
+
+void ndCharacter::CreateTwoBodyIK(const ndCharacterNode* const node)
+{
+	dAssert(0);
 }
 
 //void ndCharacter::UpdateGlobalPose(ndWorld* const world, dFloat32 timestep)
