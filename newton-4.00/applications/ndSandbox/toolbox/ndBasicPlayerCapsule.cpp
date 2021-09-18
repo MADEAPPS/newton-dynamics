@@ -119,7 +119,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndAnimationTwoWayBlend* const idleMoveBlend = new ndAnimationTwoWayBlend(idle, walkRunBlend);
 	
 	walkRunBlend->SetParam(0.0f);
-	idleMoveBlend->SetParam(0.0f);
+	//idleMoveBlend->SetParam(0.0f);
+	idleMoveBlend->SetParam(1.0f);
 	//walkRunBlend->SetTimeDilation1(scale1);
 	m_animBlendTree = idleMoveBlend;
 

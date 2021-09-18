@@ -22,6 +22,7 @@
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
+#include "ndBodyDynamic.h"
 #include "ndCharacterLimbNode.h"
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterLimbNode)
@@ -73,6 +74,12 @@ dNodeBaseHierarchy* ndCharacterLimbNode::CreateClone() const
 	dAssert(0);
 	return nullptr;
 }
+
+dMatrix ndCharacterLimbNode::GetBoneMatrix() const
+{
+	return GetBody()->GetMatrix();
+}
+
 
 void ndCharacterLimbNode::Save(const ndCharacterSaveDescriptor& desc) const
 {

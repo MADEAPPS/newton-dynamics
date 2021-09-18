@@ -59,7 +59,7 @@ class ndCharacterSkeleton: public dNodeHierarchy<ndCharacterSkeleton>
 	D_NEWTON_API ndCharacterSkeleton* FindNode(ndCharacterLimbNode* const node) const;
 
 	protected:
-	ndCharacterSkeleton(ndCharacterLimbNode* const node, ndCharacterSkeleton* const parent);
+	ndCharacterSkeleton(ndCharacterLimbNode* const node, const dMatrix& matrix, ndCharacterSkeleton* const parent);
 
 	ndCharacterSkeleton* CreateClone() const
 	{

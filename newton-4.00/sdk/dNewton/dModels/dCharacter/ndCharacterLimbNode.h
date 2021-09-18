@@ -110,8 +110,9 @@ class ndCharacterLimbNode: public dNodeHierarchy<ndCharacterLimbNode>
 
 	virtual void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 	virtual void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
-
 	virtual void Debug(ndConstraintDebugCallback& context) const;
+
+	D_NEWTON_API virtual dMatrix GetBoneMatrix() const;
 
 	protected:
 	D_NEWTON_API dNodeBaseHierarchy* CreateClone() const;
@@ -163,5 +164,6 @@ inline ndCharacterForwardDynamicNode* ndCharacterLimbNode::GetAsForwardDynamicNo
 	dAssert(0);
 	return nullptr;
 }
+
 
 #endif

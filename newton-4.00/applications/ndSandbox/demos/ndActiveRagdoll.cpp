@@ -292,8 +292,8 @@ class ndActiveRagdollModel : public ndCharacter
 		for (dList<ndAnimationKeyFramesTrack>::dNode* node = tracks.GetFirst(); node; node = node->GetNext())
 		{
 			ndAnimationKeyFramesTrack& track = node->GetInfo();
-			//ndDemoEntity* const ent = entity->Find(track.GetName().GetStr());
-			ndCharacterSkeleton* const skelNode = m_skeleton->FindNode(m_rootNode->Find (track.GetName().GetStr()));
+			const char* const name = track.GetName().GetStr();
+			ndCharacterSkeleton* const skelNode = m_skeleton->FindNode(m_rootNode->Find (name));
 			ndAnimKeyframe keyFrame;
 			keyFrame.m_userData = skelNode;
 			m_output.PushBack(keyFrame);
@@ -434,7 +434,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	scene->SetSelectedModel(ragdoll);
 	scene->GetWorld()->AddModel(ragdoll);
 
-	matrix.m_posit.m_x += 1.0f;
+	matrix.m_posit.m_x += 1.25f;
 	TestPlayerCapsuleInteaction(scene, matrix);
 
 	matrix.m_posit.m_x += 2.0f;

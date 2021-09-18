@@ -332,7 +332,8 @@ ndCharacterSkeleton* ndCharacter::CreateSkeleton() const
 	ndCharacterLimbNode* nodePool[32];
 	ndCharacterSkeleton* parentPool[32];
 
-	ndCharacterSkeleton* const skeleton = new ndCharacterSkeleton(m_rootNode, nullptr);
+	//dMatrix rootMatrix(m_rootNode->GetBody()->GetMatrix().Inverse());
+	ndCharacterSkeleton* const skeleton = new ndCharacterSkeleton(m_rootNode, dGetIdentityMatrix(), nullptr);
 	for (ndCharacterLimbNode* child = m_rootNode->GetChild(); child; child = child->GetSibling())
 	{
 		nodePool[stack] = child;
@@ -344,7 +345,9 @@ ndCharacterSkeleton* ndCharacter::CreateSkeleton() const
 	{
 		stack--;
 		ndCharacterLimbNode* const node = nodePool[stack];
-		ndCharacterSkeleton* const parent = new ndCharacterSkeleton(node, parentPool[stack]);
+		ndCharacterSkeleton* const boneParent = parentPool[stack];
+		dMatrix matrix(node->GetBoneMatrix() * boneParent->m_node->GetBoneMatrix().Inverse());
+		ndCharacterSkeleton* const parent = new ndCharacterSkeleton(node, matrix, boneParent);
 	
 		for (ndCharacterLimbNode* child = node->GetChild(); child; child = child->GetSibling())
 		{

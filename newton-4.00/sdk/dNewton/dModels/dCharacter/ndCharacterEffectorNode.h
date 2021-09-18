@@ -49,6 +49,7 @@ class ndCharacterEffectorNode: public ndCharacterLimbNode
 	void Save(const ndCharacterSaveDescriptor& desc) const;
 	//void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 
+	dMatrix GetBoneMatrix() const;
 	void Debug(ndConstraintDebugCallback& context) const;
 
 	ndCharacterLimbNode* m_referenceNode;

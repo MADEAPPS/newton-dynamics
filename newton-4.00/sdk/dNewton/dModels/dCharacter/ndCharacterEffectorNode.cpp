@@ -100,3 +100,8 @@ void ndCharacterEffectorNode::Debug(ndConstraintDebugCallback& context) const
 	ndCharacterLimbNode::Debug(context);
 	//m_effector->DebugJoint(context);
 }
+
+dMatrix ndCharacterEffectorNode::GetBoneMatrix() const
+{
+	return m_effector->GetLocalMatrix1() * m_effector->GetBody1()->GetMatrix();
+}
