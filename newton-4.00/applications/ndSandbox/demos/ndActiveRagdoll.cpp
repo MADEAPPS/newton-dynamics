@@ -153,7 +153,7 @@ class ndActiveRagdollModel : public ndCharacter
 	public:
 	ndActiveRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const dMatrix& location)
 		:ndCharacter()
-		//,m_skeleton(nullptr)
+		,m_animBlendTree(nullptr)
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = ragdollMesh->CreateClone();
@@ -295,29 +295,30 @@ class ndActiveRagdollModel : public ndCharacter
 			CreateTwoBodyIK(coronalFrame, leftFoot);
 		}
 
+		ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
+		const dList<ndAnimationKeyFramesTrack>& tracks = sequence->m_tracks;
+		for (dList<ndAnimationKeyFramesTrack>::dNode* node = tracks.GetFirst(); node; node = node->GetNext())
+		{
+			ndAnimationKeyFramesTrack& track = node->GetInfo();
+			const char* const name = track.GetName().GetStr();
+			ndCharacterNode* const skelNode = m_rootNode->Find (name);
+			ndAnimKeyframe keyFrame;
+			keyFrame.m_userData = skelNode;
+			m_output.PushBack(keyFrame);
+		}
+		//SetPose();
 
-		//m_skeleton = CreateSkeleton();
-		//
-		//ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
-		//const dList<ndAnimationKeyFramesTrack>& tracks = sequence->m_tracks;
-		//for (dList<ndAnimationKeyFramesTrack>::dNode* node = tracks.GetFirst(); node; node = node->GetNext())
-		//{
-		//	ndAnimationKeyFramesTrack& track = node->GetInfo();
-		//	const char* const name = track.GetName().GetStr();
-		//	ndCharacterSkeleton* const skelNode = m_skeleton->FindNode(m_rootNode->Find (name));
-		//	ndAnimKeyframe keyFrame;
-		//	keyFrame.m_userData = skelNode;
-		//	m_output.PushBack(keyFrame);
-		//}
-		SetPose();
+		ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
+		ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
+		m_animBlendTree = walk;
 	}
 
 	~ndActiveRagdollModel()
 	{
-		//if (m_skeleton)
-		//{
-		//	delete m_skeleton;
-		//}
+		if (m_animBlendTree)
+		{
+			delete m_animBlendTree;
+		}
 	}
 
 	void SetModelMass(dFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray, const dFloat32* const massWeight) const
@@ -394,6 +395,18 @@ class ndActiveRagdollModel : public ndCharacter
 
 	void Update(ndWorld* const world, dFloat32 timestep) 
 	{
+		m_animBlendTree->Evaluate(m_output, timestep);
+		for (dInt32 i = 0; i < m_output.GetCount(); i++)
+		{
+			const ndAnimKeyframe& keyFrame = m_output[i];
+			ndCharacterNode* const skelNode = (ndCharacterNode*)keyFrame.m_userData;
+			if (skelNode)
+			{
+				skelNode->SetLocalPose(dMatrix(keyFrame.m_rotation, keyFrame.m_posit));
+			}
+		}
+		SetPose();
+
 		ndCharacter::Update(world, timestep);
 	}
 
@@ -407,8 +420,8 @@ class ndActiveRagdollModel : public ndCharacter
 		ndCharacter::PostTransformUpdate(world, timestep);
 	}
 
-	//ndAnimationPose m_output;
-	//ndCharacterSkeleton* m_skeleton;
+	ndAnimationPose m_output;
+	ndAnimationBlendTreeNode* m_animBlendTree;
 	//ndCharacterBipedPoseController m_bipedController;
 };
 
