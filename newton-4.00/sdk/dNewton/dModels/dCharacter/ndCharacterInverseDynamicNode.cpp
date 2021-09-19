@@ -33,12 +33,16 @@ ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const dMatrix& matr
 	,m_body(body)
 	,m_joint(new ndJointBallAndSocket(matrixInGlobalSpace, body, parent->GetBody()))
 {
+	m_localPose = m_body->GetMatrix() * parent->GetBody()->GetMatrix().Inverse();
 }
 
 ndCharacterInverseDynamicNode::ndCharacterInverseDynamicNode(const ndCharacterLoadDescriptor& desc)
 	:ndCharacterNode(desc)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+	const char* const name = xmlGetString(xmlNode, "name");
+	SetName(name);
+	m_localPose = xmlGetMatrix(xmlNode, "localPose");
 	dInt32 bodyHash = xmlGetInt(xmlNode, "bodyHash");
 	dInt32 jointHash = xmlGetInt(xmlNode, "jointHash");
 
@@ -75,6 +79,8 @@ void ndCharacterInverseDynamicNode::Save(const ndCharacterSaveDescriptor& desc) 
 	dAssert(jointNode);
 	dAssert(bodyNode);
 
+	xmlSaveParam(childNode, "name", GetName().GetStr());
+	xmlSaveParam(childNode, "localPose", m_localPose);
 	xmlSaveParam(childNode, "bodyHash", dInt32(bodyNode->GetInfo()));
 	xmlSaveParam(childNode, "jointHash", dInt32(jointNode->GetInfo()));
 }

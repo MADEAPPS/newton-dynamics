@@ -29,6 +29,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterNode)
 
 ndCharacterNode::ndCharacterNode(ndCharacterNode* const parent)
 	:dNodeHierarchy<ndCharacterNode>()
+	,m_localPose(dGetIdentityMatrix())
 {
 	if (parent)
 	{
@@ -69,18 +70,6 @@ ndCharacterNode::~ndCharacterNode()
 {
 }
 
-dNodeBaseHierarchy* ndCharacterNode::CreateClone() const
-{
-	dAssert(0);
-	return nullptr;
-}
-
-dMatrix ndCharacterNode::GetBoneMatrix() const
-{
-	return GetBody()->GetMatrix();
-}
-
-
 void ndCharacterNode::Save(const ndCharacterSaveDescriptor& desc) const
 {
 	ndCharacterSaveDescriptor childDesc(desc);
@@ -90,6 +79,17 @@ void ndCharacterNode::Save(const ndCharacterSaveDescriptor& desc) const
 	{
 		child->Save(childDesc);
 	}
+}
+
+dNodeBaseHierarchy* ndCharacterNode::CreateClone() const
+{
+	dAssert(0);
+	return nullptr;
+}
+
+dMatrix ndCharacterNode::GetBoneMatrix() const
+{
+	return GetBody()->GetMatrix();
 }
 
 void ndCharacterNode::Debug(ndConstraintDebugCallback& context) const

@@ -108,6 +108,11 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	node->SetAttribute("angles", buffer);
 }
 
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value)
+{
+	xmlSaveParam(rootNode, name, "char", value);
+}
+
 void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 count, const dVector* const array)
 {
 	char* const buffer = dAlloca(char, count * 4 * 12);

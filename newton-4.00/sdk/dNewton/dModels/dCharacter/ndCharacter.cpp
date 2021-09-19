@@ -65,9 +65,9 @@ ndCharacter::ndCharacter(const dLoadSaveBase::dLoadDescriptor& desc)
 
 ndCharacter::~ndCharacter()
 {
-	for (dList<ndJointInverseDynamicsBase*>::dNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
+	for (dList<ndEffetorInfo>::dNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
 	{
-		ndJointBilateralConstraint* const joint = node->GetInfo();
+		ndJointBilateralConstraint* const joint = node->GetInfo().m_effector;
 		delete joint;
 	}
 
@@ -136,9 +136,9 @@ void ndCharacter::AddToWorld(ndWorld* const world)
 		}
 	}
 
-	for (dList<ndJointInverseDynamicsBase*>::dNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
+	for (dList<ndEffetorInfo>::dNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
 	{
-		ndJointBilateralConstraint* const joint = node->GetInfo();
+		ndJointBilateralConstraint* const joint = node->GetInfo().m_effector;
 		world->AddJoint(joint);
 	}
 
@@ -151,9 +151,9 @@ void ndCharacter::AddToWorld(ndWorld* const world)
 
 void ndCharacter::RemoveFromToWorld(ndWorld* const world)
 {
-	for (dList<ndJointInverseDynamicsBase*>::dNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
+	for (dList<ndEffetorInfo>::dNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
 	{
-		ndJointBilateralConstraint* const joint = node->GetInfo();
+		ndJointBilateralConstraint* const joint = node->GetInfo().m_effector;
 		world->RemoveJoint(joint);
 	}
 
@@ -275,9 +275,9 @@ void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 	dFloat32 scale = context.GetScale();
 	context.SetScale(scale * 0.25f);
 
-	for (dList<ndJointInverseDynamicsBase*>::dNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
+	for (dList<ndEffetorInfo>::dNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
 	{
-		ndJointBilateralConstraint* const joint = node->GetInfo();
+		ndJointBilateralConstraint* const joint = node->GetInfo().m_effector;
 		joint->DebugJoint(context);
 	}
 
@@ -321,8 +321,9 @@ void ndCharacter::CreateTwoBodyIK(const dMatrix& globalOrientation, const ndChar
 	basis.m_posit = node->GetBody()->GetMatrix().m_posit;
 	ndJointInverseDynamicsBase* const joint = new ndJointTwoBodyIK(basis, pivot, child, parent);
 
-
-	m_effectors.Append(joint);
+	ndEffetorInfo& info = m_effectors.Append()->GetInfo();
+	info.m_effector = joint;
+	info.m_controlNode = (ndCharacterNode*)node;
 }
 
 //void ndCharacter::UpdateGlobalPose(ndWorld* const world, dFloat32 timestep)

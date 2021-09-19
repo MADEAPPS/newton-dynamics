@@ -44,8 +44,14 @@ class ndCharacterInverseDynamicNode;
 class ndCharacter: public ndModel
 {
 	public:
-	D_CLASS_REFLECTION(ndCharacter);
+	class ndEffetorInfo
+	{
+		public:
+		ndCharacterNode* m_controlNode;
+		ndJointInverseDynamicsBase* m_effector;
+	};
 
+	D_CLASS_REFLECTION(ndCharacter);
 	D_NEWTON_API ndCharacter();
 	D_NEWTON_API ndCharacter(const dLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API virtual ~ndCharacter ();
@@ -82,7 +88,7 @@ class ndCharacter: public ndModel
 	
 	ndCharacterRootNode* m_rootNode;
 	//ndCharacterPoseController* m_controller;
-	dList<ndJointInverseDynamicsBase*> m_effectors;
+	dList<ndEffetorInfo> m_effectors;
 	dList<ndJointBilateralConstraint*> m_extraJointAttachments;
 };
 
