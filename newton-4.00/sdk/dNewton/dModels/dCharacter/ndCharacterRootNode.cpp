@@ -30,8 +30,6 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterRootNode)
 ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic* const body)
 	:ndCharacterNode(nullptr)
 	,m_coronalFrame(dGetIdentityMatrix())
-	,m_invCoronalFrame(dGetIdentityMatrix())
-	,m_gravityDir(dFloat32 (0.0f), dFloat32(-1.0f), dFloat32(0.0f), dFloat32(0.0f))
 	,m_owner(owner)
 	,m_body(body)
 {
@@ -39,23 +37,17 @@ ndCharacterRootNode::ndCharacterRootNode(ndCharacter* const owner, ndBodyDynamic
 }
 
 ndCharacterRootNode::ndCharacterRootNode(const ndCharacterLoadDescriptor& desc)
-	//:ndCharacterNode(dLoadSaveBase::dLoadDescriptor(desc))
 	:ndCharacterNode(desc)
 	,m_coronalFrame(dGetIdentityMatrix())
-	,m_invCoronalFrame(dGetIdentityMatrix())
-	,m_gravityDir(dFloat32(0.0f), dFloat32(-1.0f), dFloat32(0.0f), dFloat32(0.0f))
 	,m_owner(nullptr)
 	,m_body(nullptr)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
 	m_coronalFrame = xmlGetMatrix(xmlNode, "coronalFrame");
-	m_gravityDir = xmlGetVector3(xmlNode, "gravityDir");
 
 	dInt32 bodyHash = xmlGetInt(xmlNode, "bodyHash");
 	m_body = (ndBodyDynamic*)desc.m_bodyMap->Find(bodyHash)->GetInfo();
-
-	SetCoronalFrame(m_body->GetMatrix());
 }
 
 ndCharacterRootNode::~ndCharacterRootNode()
@@ -67,7 +59,7 @@ void ndCharacterRootNode::SetCoronalFrame(const dMatrix& frameInGlobalSpace)
 {
 	dMatrix matrix(m_body->GetMatrix());
 	m_coronalFrame = frameInGlobalSpace * matrix.Inverse();
-	m_invCoronalFrame = m_coronalFrame.Inverse();
+	m_coronalFrame.m_posit = dVector::m_wOne;
 }
 
 void ndCharacterRootNode::UpdateGlobalPose(ndWorld* const, dFloat32)
@@ -83,8 +75,6 @@ void ndCharacterRootNode::Save(const ndCharacterSaveDescriptor& desc) const
 	ndCharacterNode::Save(ndCharacterSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "coronalFrame", m_coronalFrame);
-	xmlSaveParam(childNode, "gravityDir", m_gravityDir);
-
 	dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode = desc.m_bodyMap->Find(m_body);
 	if (!bodyNode)
 	{

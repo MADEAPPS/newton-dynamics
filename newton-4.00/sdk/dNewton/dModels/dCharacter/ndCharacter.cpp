@@ -25,6 +25,7 @@
 #include "ndCharacter.h"
 #include "ndBodyDynamic.h"
 #include "ndCharacterNode.h"
+#include "ndJointTwoBodyIK.h"
 #include "ndCharacterRootNode.h"
 #include "ndJointInverseDynamicsBase.h"
 #include "ndCharacterForwardDynamicNode.h"
@@ -274,6 +275,12 @@ void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 	dFloat32 scale = context.GetScale();
 	context.SetScale(scale * 0.25f);
 
+	for (dList<ndJointInverseDynamicsBase*>::dNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
+	{
+		ndJointBilateralConstraint* const joint = node->GetInfo();
+		joint->DebugJoint(context);
+	}
+
 	if (m_rootNode)
 	{
 		m_rootNode->Debug(context);
@@ -303,9 +310,19 @@ void ndCharacter::RemoveAttachment(ndJointBilateralConstraint* const joint)
 	}
 }
 
-void ndCharacter::CreateTwoBodyIK(const ndCharacterNode* const node)
+void ndCharacter::CreateTwoBodyIK(const dMatrix& globalOrientation, const ndCharacterNode* const node)
 {
-	dAssert(0);
+	ndBodyDynamic* const child = node->GetParent()->GetBody();
+	ndBodyDynamic* const secondBody = node->GetParent()->GetParent()->GetBody();
+	ndBodyDynamic* const parent = node->GetParent()->GetParent()->GetParent()->GetBody();
+
+	dMatrix basis(globalOrientation);
+	dVector pivot(secondBody->GetMatrix().m_posit);
+	basis.m_posit = node->GetBody()->GetMatrix().m_posit;
+	ndJointInverseDynamicsBase* const joint = new ndJointTwoBodyIK(basis, pivot, child, parent);
+
+
+	m_effectors.Append(joint);
 }
 
 //void ndCharacter::UpdateGlobalPose(ndWorld* const world, dFloat32 timestep)

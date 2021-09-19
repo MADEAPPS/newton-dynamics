@@ -36,11 +36,7 @@ class ndCharacterRootNode: public ndCharacterNode
 	ndCharacter* GetOwner() const;
 	virtual ndBodyDynamic* GetBody() const;
 
-	const dVector& GetGravityDir() const;
-	void SetGravityDir(const dVector& dir);
-
 	const dMatrix& GetCoronalFrame() const;
-	const dMatrix& GetInvCoronalFrame() const;
 	D_NEWTON_API void SetCoronalFrame(const dMatrix& sagittalFrameInGlobalSpace);
 
 	protected:
@@ -48,8 +44,6 @@ class ndCharacterRootNode: public ndCharacterNode
 	void Save(const ndCharacterSaveDescriptor& desc) const;
 
 	dMatrix m_coronalFrame;
-	dMatrix m_invCoronalFrame;
-	dVector m_gravityDir;
 	ndCharacter* m_owner;
 	ndBodyDynamic* m_body;
 	friend class ndCharacter;
@@ -69,21 +63,5 @@ inline const dMatrix& ndCharacterRootNode::GetCoronalFrame() const
 {
 	return m_coronalFrame;
 }
-
-inline const dMatrix& ndCharacterRootNode::GetInvCoronalFrame() const
-{
-	return m_invCoronalFrame;
-}
-
-inline const dVector& ndCharacterRootNode::GetGravityDir() const
-{
-	return m_gravityDir;
-}
-
-inline void ndCharacterRootNode::SetGravityDir(const dVector& dir)
-{
-	m_gravityDir = dir;
-}
-
 
 #endif

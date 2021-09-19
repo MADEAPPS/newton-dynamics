@@ -63,7 +63,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API void AddAttachment(ndJointBilateralConstraint* const joint);
 	D_NEWTON_API void RemoveAttachment(ndJointBilateralConstraint* const joint);
 
-	D_NEWTON_API void CreateTwoBodyIK(const ndCharacterNode* const node);
+	D_NEWTON_API void CreateTwoBodyIK(const dMatrix& globalOrientation, const ndCharacterNode* const node);
 
 
 	//ndCharacterPoseController* GetController() const;

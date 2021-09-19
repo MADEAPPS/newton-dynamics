@@ -195,6 +195,9 @@ class ndActiveRagdollModel : public ndCharacter
 
 		//ndBipedControllerConfig bipedConfig;
 		// walk model hierarchic adding all children designed as rigid body bones. 
+
+		ndCharacterNode* righFoot = nullptr;
+		ndCharacterNode* leftFoot = nullptr;
 		while (stack) 
 		{
 			stack--;
@@ -220,10 +223,12 @@ class ndActiveRagdollModel : public ndCharacter
 
 						if (strstr(name, "RightFoot"))
 						{
+							righFoot = parentBone;
 							//bipedConfig.m_rightFootNode = parentBone;
 						}
 						else if (strstr(name, "LeftFoot"))
 						{
+							leftFoot = parentBone;
 							//bipedConfig.m_leftFootNode = parentBone;
 						}
 					}
@@ -267,11 +272,6 @@ class ndActiveRagdollModel : public ndCharacter
 		
 		SetModelMass(100.0f, bodyCount, bodyArray, massWeight);
 
-		// initialize a biped controller and set to the model
-		//m_bipedController.Init(this, bipedConfig);
-		//SetController(&m_bipedController);
-		
-
 		{
 			ndBodyKinematic* testBody = m_rootNode->Find("mixamorig:Hips")->GetBody();
 			ndJointFix6dof* const joint = new ndJointFix6dof(testBody->GetMatrix(), testBody, world->GetSentinelBody());
@@ -279,19 +279,21 @@ class ndActiveRagdollModel : public ndCharacter
 			AddAttachment(joint);
 		}
 
-		//for (dInt32 i = 0; i < bodyCount; i++)
-		//{
-		//	ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
-		//	if (ent->GetName() == "mixamorig:Hips") 
-		//	//if (ent->GetName() == "mixamorig:Spine1")
-		//	{
-		//		ndJointFix6dof* const joint = new ndJointFix6dof(bodyArray[i]->GetMatrix(), bodyArray[i], world->GetSentinelBody());
-		//		world->AddJoint(joint);
-		//		AddAttachment(joint);
-		//		//rootNode->GetBody()->SetMassMatrix(dVector::m_zero);
-		//		break;
-		//	}
-		//}
+		// initialize a biped controller and set to the model
+		//m_bipedController.Init(this, bipedConfig);
+		//SetController(&m_bipedController);
+
+		dMatrix coronalFrame(m_rootNode->GetCoronalFrame() * m_rootNode->GetBody()->GetMatrix());
+		if (righFoot)
+		{
+			CreateTwoBodyIK(coronalFrame, righFoot);
+		}
+
+		if (leftFoot)
+		{
+			CreateTwoBodyIK(coronalFrame, leftFoot);
+		}
+
 
 		//m_skeleton = CreateSkeleton();
 		//

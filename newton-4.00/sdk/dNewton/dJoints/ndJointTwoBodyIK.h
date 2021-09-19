@@ -20,7 +20,7 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	public:
 	D_CLASS_REFLECTION(ndJointTwoBodyIK);
 	D_NEWTON_API ndJointTwoBodyIK(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndJointTwoBodyIK(const ndJointBilateralConstraint* const rootJoint, const dVector& locationInGlocalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointTwoBodyIK(const dMatrix& basisInGlobalSpace, const dVector& pivotInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointTwoBodyIK();
 
 	//D_NEWTON_API void SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle);
@@ -41,25 +41,22 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	//dMatrix GetTargetRotation() const;
 	//void SetTargetRotation(const dMatrix& rotation);
 
-	const dMatrix& GetReferenceMatrix() const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
-	//virtual void SetTargetMatrix(const dMatrix& matrixInGlobalSpace);
 	virtual void SetTargetLocalMatrix(const dMatrix& localMatrix);
 	virtual void SetTargetGlobalMatrix(const dMatrix& globalMatrix);
-	
-	void SetTargetOffset(const dVector& offset);
+
 	void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
-
-	dMatrix m_pivotFrame;
 	dMatrix m_coneRotation;
+	dVector m_pivot;
+	dVector m_refPosit;
 	dVector m_targetPosit;
-	dVector m_referencePosit;
+	//dVector m_referencePosit;
 
 	dFloat32 m_angle;
 	dFloat32 m_minAngle;
@@ -74,10 +71,10 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	dFloat32 m_linearRegularizer;
 };
 
-inline const dMatrix& ndJointTwoBodyIK::GetReferenceMatrix() const
-{
-	return m_pivotFrame;
-}
+//inline const dMatrix& ndJointTwoBodyIK::GetReferenceMatrix() const
+//{
+//	return m_pivotFrame;
+//}
 
 
 #endif 
