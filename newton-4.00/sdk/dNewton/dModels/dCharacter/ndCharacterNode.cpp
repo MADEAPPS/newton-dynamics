@@ -87,11 +87,6 @@ dNodeBaseHierarchy* ndCharacterNode::CreateClone() const
 	return nullptr;
 }
 
-dMatrix ndCharacterNode::GetBoneMatrix() const
-{
-	return GetBody()->GetMatrix();
-}
-
 void ndCharacterNode::Debug(ndConstraintDebugCallback& context) const
 {
 	for (ndCharacterNode* child = GetChild(); child; child = child->GetSibling())

@@ -78,7 +78,7 @@ class ndCharacter: public ndModel
 	//void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 	//void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
 	//D_NEWTON_API ndCharacterSkeleton* CreateSkeleton() const;
-	//D_NEWTON_API void SetPose(const ndCharacterSkeleton* const skeleton);
+	D_NEWTON_API void SetPose();
 
 	protected:
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;

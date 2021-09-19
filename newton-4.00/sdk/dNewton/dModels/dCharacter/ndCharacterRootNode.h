@@ -40,7 +40,7 @@ class ndCharacterRootNode: public ndCharacterNode
 	D_NEWTON_API void SetCoronalFrame(const dMatrix& sagittalFrameInGlobalSpace);
 
 	protected:
-	void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
+	//void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
 	void Save(const ndCharacterSaveDescriptor& desc) const;
 
 	dMatrix m_coronalFrame;

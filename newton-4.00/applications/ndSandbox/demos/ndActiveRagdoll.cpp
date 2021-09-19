@@ -309,8 +309,7 @@ class ndActiveRagdollModel : public ndCharacter
 		//	keyFrame.m_userData = skelNode;
 		//	m_output.PushBack(keyFrame);
 		//}
-		//
-		//SetPose(m_skeleton);
+		SetPose();
 	}
 
 	~ndActiveRagdollModel()

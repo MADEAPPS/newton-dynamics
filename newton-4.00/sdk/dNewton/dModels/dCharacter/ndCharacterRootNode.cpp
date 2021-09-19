@@ -85,7 +85,7 @@ void ndCharacterRootNode::SetCoronalFrame(const dMatrix& frameInGlobalSpace)
 	m_coronalFrame.m_posit = dVector::m_wOne;
 }
 
-void ndCharacterRootNode::UpdateGlobalPose(ndWorld* const, dFloat32)
-{
-	// for now just; 
-}
+//void ndCharacterRootNode::UpdateGlobalPose(ndWorld* const, dFloat32)
+//{
+//	// for now just; 
+//}

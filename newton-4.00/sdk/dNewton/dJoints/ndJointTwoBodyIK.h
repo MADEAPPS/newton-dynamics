@@ -50,11 +50,12 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	virtual void SetTargetLocalMatrix(const dVector& posit, dFloat32 angle);
 	virtual void SetTargetGlobalMatrix(const dVector& posit, dFloat32 angle);
 
+	void SubmitAngularLimits(ndConstraintDescritor& desc);
 	void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
-	void SubmitAngularLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
+	dMatrix m_localRotationBody0;
+	dMatrix m_localRotationBody1;
 	dMatrix m_coneRotation;
-	dMatrix m_rotationBasis;
 	dVector m_pivot;
 	dVector m_refPosit;
 	dVector m_targetPosit;

@@ -107,13 +107,14 @@ class ndCharacterNode: public dNodeHierarchy<ndCharacterNode>
 	virtual ndCharacterForwardDynamicNode* GetAsForwardDynamicNode();
 	virtual ndCharacterInverseDynamicNode* GetAsInverseDynamicNode();
 
-	virtual void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
-	virtual void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
+	const dMatrix& GetLocalPose() const;
+	void SetLocalPose(const dMatrix& matrix);
+
+	//virtual void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
+	//virtual void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 
-	D_NEWTON_API virtual dMatrix GetBoneMatrix() const;
-
-	D_NEWTON_API virtual void SetPose(const ndCharacterSkeleton* const animationBonePose);
+	//D_NEWTON_API virtual dMatrix GetBoneMatrix() const;
 
 	protected:
 	D_NEWTON_API dNodeBaseHierarchy* CreateClone() const;
@@ -132,13 +133,13 @@ inline ndJointBilateralConstraint* ndCharacterNode::GetJoint() const
 	return nullptr;
 }
 
-inline void ndCharacterNode::UpdateGlobalPose(ndWorld* const, dFloat32)
-{
-}
-
-inline void ndCharacterNode::CalculateLocalPose(ndWorld* const, dFloat32)
-{
-}
+//inline void ndCharacterNode::UpdateGlobalPose(ndWorld* const, dFloat32)
+//{
+//}
+//
+//inline void ndCharacterNode::CalculateLocalPose(ndWorld* const, dFloat32)
+//{
+//}
 
 inline ndCharacterNode* ndCharacterNode::GetAsNode()
 {
@@ -150,11 +151,6 @@ inline ndCharacterRootNode* ndCharacterNode::GetAsRootNode()
 	dAssert(0);
 	return nullptr;
 }
-
-//inline ndCharacterEffectorNode* ndCharacterNode::GetAsEffectorNode()
-//{
-//	return nullptr;
-//}
 
 inline ndCharacterInverseDynamicNode* ndCharacterNode::GetAsInverseDynamicNode()
 {
@@ -168,9 +164,14 @@ inline ndCharacterForwardDynamicNode* ndCharacterNode::GetAsForwardDynamicNode()
 	return nullptr;
 }
 
-inline void ndCharacterNode::SetPose(const ndCharacterSkeleton* const)
+inline const dMatrix& ndCharacterNode::GetLocalPose() const
 {
+	return m_localPose;
+}
 
+inline void ndCharacterNode::SetLocalPose(const dMatrix& matrix)
+{
+	m_localPose = matrix;
 }
 
 #endif
