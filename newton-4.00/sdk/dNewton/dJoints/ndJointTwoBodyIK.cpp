@@ -50,12 +50,12 @@ ndJointTwoBodyIK::ndJointTwoBodyIK(const dMatrix& basisInGlobalSpace, const dVec
 	m_rotationBasis.m_right = (m_rotationBasis.m_front.CrossProduct(m_localMatrix1.m_front)).Normalize();
 	m_rotationBasis.m_up = m_rotationBasis.m_right.CrossProduct(m_rotationBasis.m_front);
 
-	SetTargetGlobalMatrix(basisInGlobalSpace);
+	SetTargetGlobalMatrix(basisInGlobalSpace.m_posit, dFloat32 (0.0f));
 
-	dMatrix xxxx(basisInGlobalSpace);
-	xxxx.m_posit.m_y += 0.1f;
-	xxxx.m_posit.m_x += 0.2f;
-	SetTargetGlobalMatrix(xxxx);
+	dVector xxxx(basisInGlobalSpace.m_posit);
+	xxxx.m_y += 0.1f;
+	xxxx.m_x += 0.2f;
+	SetTargetGlobalMatrix(xxxx, dFloat32 (0.0f));
 }
 
 ndJointTwoBodyIK::ndJointTwoBodyIK(const dLoadSaveBase::dLoadDescriptor& desc)
@@ -104,11 +104,11 @@ ndJointTwoBodyIK::~ndJointTwoBodyIK()
 void ndJointTwoBodyIK::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 {
 	dAssert(0);
-	//nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	//desc.m_rootNode->LinkEndChild(childNode);
-	//childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	//ndJointInverseDynamicsBase::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
-	//
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointInverseDynamicsBase::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	
 	//xmlSaveParam(childNode, "pivotFrame", m_basePose);
 	//xmlSaveParam(childNode, "targetPosit", m_targetPosit);
 	//
@@ -260,17 +260,11 @@ void ndJointTwoBodyIK::DebugJoint(ndConstraintDebugCallback& debugCallback) cons
 //	m_localMatrix1 = matrix;
 //}
 
-void ndJointTwoBodyIK::SetTargetLocalMatrix(const dMatrix& localMatrix)
+void ndJointTwoBodyIK::SetTargetLocalMatrix(const dVector& offset, dFloat32 swivelAngle)
 {
-	//dVector euler0;
-	//dVector euler1;
-	//localMatrix.CalcPitchYawRoll(euler0, euler1);
-	//dFloat32 pitch = dAbs(euler0.m_x) < dAbs(euler1.m_x) ? euler0.m_x : euler1.m_x;
-	//
-	//m_angle = pitch;
-	m_angle = dFloat32 (0.0f);
+	m_angle = swivelAngle;
 
-	dVector posit((localMatrix.m_posit - m_pivot) & dVector::m_triplexMask);
+	dVector posit((offset - m_pivot) & dVector::m_triplexMask);
 	dFloat32 mag2 = posit.DotProduct(posit).GetScalar();
 	if (mag2 > (m_maxDist * m_maxDist))
 	{
@@ -281,7 +275,6 @@ void ndJointTwoBodyIK::SetTargetLocalMatrix(const dMatrix& localMatrix)
 	m_targetPosit = posit | dVector::m_wOne;
 	
 	m_localMatrix1.m_posit = m_targetPosit;
-	//const dMatrix baseMatrix(m_localMatrix1 * m_body1->GetMatrix());
 	const dMatrix baseMatrix(m_rotationBasis * m_body1->GetMatrix());
 	const dVector dir0(baseMatrix.RotateVector(posit.Normalize()));
 	const dVector dir1(baseMatrix.m_front);
@@ -304,10 +297,10 @@ void ndJointTwoBodyIK::SetTargetLocalMatrix(const dMatrix& localMatrix)
 	}
 }
 
-void ndJointTwoBodyIK::SetTargetGlobalMatrix(const dMatrix& matrixInGlobalSpace)
+void ndJointTwoBodyIK::SetTargetGlobalMatrix(const dVector& offset, dFloat32 swivelAngle)
 {
-	dMatrix localMatrix(matrixInGlobalSpace * m_body1->GetMatrix().Inverse());
-	SetTargetLocalMatrix(localMatrix);
+	dVector localOffset(m_body1->GetMatrix().UntransformVector(offset));
+	SetTargetLocalMatrix(localOffset, swivelAngle);
 }
 
 void ndJointTwoBodyIK::SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)

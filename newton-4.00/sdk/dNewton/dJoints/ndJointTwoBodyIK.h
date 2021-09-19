@@ -47,8 +47,8 @@ class ndJointTwoBodyIK: public ndJointInverseDynamicsBase
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
-	virtual void SetTargetLocalMatrix(const dMatrix& localMatrix);
-	virtual void SetTargetGlobalMatrix(const dMatrix& globalMatrix);
+	virtual void SetTargetLocalMatrix(const dVector& posit, dFloat32 angle);
+	virtual void SetTargetGlobalMatrix(const dVector& posit, dFloat32 angle);
 
 	void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	void SubmitAngularLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
