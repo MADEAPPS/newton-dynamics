@@ -25,9 +25,8 @@
 #include "ndCharacter.h"
 #include "ndBodyDynamic.h"
 #include "ndCharacterNode.h"
-#include "ndJointTwoBodyIK.h"
 #include "ndCharacterRootNode.h"
-#include "ndJointInverseDynamicsBase.h"
+#include "ndJointKinematicChain.h"
 #include "ndCharacterForwardDynamicNode.h"
 #include "ndCharacterInverseDynamicNode.h"
 
@@ -310,20 +309,20 @@ void ndCharacter::RemoveAttachment(ndJointBilateralConstraint* const joint)
 	}
 }
 
-void ndCharacter::CreateTwoBodyIK(const dMatrix& globalOrientation, const ndCharacterNode* const node)
+void ndCharacter::CreateKinematicChain(const dMatrix& globalOrientation, const ndCharacterNode* const footNode)
 {
-	ndBodyDynamic* const child = node->GetParent()->GetBody();
-	ndBodyDynamic* const secondBody = node->GetParent()->GetParent()->GetBody();
-	ndBodyDynamic* const parent = node->GetParent()->GetParent()->GetParent()->GetBody();
+	ndCharacterNode* const calf = footNode->GetParent();
+	ndCharacterNode* const leg = calf->GetParent();
+	ndCharacterNode* const hip = leg->GetParent();
 
-	dMatrix basis(globalOrientation);
-	dVector pivot(secondBody->GetMatrix().m_posit);
-	basis.m_posit = node->GetBody()->GetMatrix().m_posit;
-	ndJointInverseDynamicsBase* const joint = new ndJointTwoBodyIK(basis, pivot, child, parent);
+	dMatrix pinAndPivot(footNode->GetBody()->GetMatrix());
+	dMatrix hipMatrix(globalOrientation);
+	hipMatrix.m_posit = leg->GetBody()->GetMatrix().m_posit;
+	ndJointKinematicChain* const joint = new ndJointKinematicChain(hipMatrix, pinAndPivot, footNode->GetBody(), hip->GetBody());
 
 	ndEffetorInfo& info = m_effectors.Append()->GetInfo();
 	info.m_effector = joint;
-	info.m_controlNode = (ndCharacterNode*)node;
+	info.m_controlNode = (ndCharacterNode*)footNode;
 }
 
 //void ndCharacter::UpdateGlobalPose(ndWorld* const world, dFloat32 timestep)
@@ -418,15 +417,26 @@ void ndCharacter::SetPose()
 {
 	for (dList<ndEffetorInfo>::dNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
 	{
-		ndEffetorInfo& info = node->GetInfo();
-		ndJointInverseDynamicsBase* const joint = info.m_effector;
-
-		dMatrix matrix(info.m_controlNode->GetLocalPose());
-		for (ndCharacterNode* bone = info.m_controlNode->GetParent(); bone->GetBody() != joint->GetBody1(); bone = bone->GetParent())
-		{
-			matrix = matrix * bone->GetLocalPose();
-		}
-		dFloat32 swivelAngle = dFloat32(0.0f);
-		joint->SetTargetLocalMatrix(matrix.m_posit, swivelAngle);
+		dAssert(0);
+		//ndEffetorInfo& info = node->GetInfo();
+		//ndJointKinematicChain* const joint = info.m_effector;
+		//
+		//dMatrix matrix(info.m_controlNode->GetLocalPose());
+		//for (ndCharacterNode* bone = info.m_controlNode->GetParent(); bone->GetBody() != joint->GetBody1(); bone = bone->GetParent())
+		//{
+		//	matrix = matrix * bone->GetLocalPose();
+		//}
+		//dFloat32 swivelAngle = dFloat32(0.0f);
+		//
+		//dMatrix xxxx(info.m_controlNode->GetBody()->GetMatrix() * joint->GetBody1()->GetMatrix().Inverse());
+		//
+		//dVector xxx0;
+		//dVector xxx1;
+		//dVector xxx2;
+		//dVector xxx3;
+		//
+		//xxxx.CalcPitchYawRoll(xxx0, xxx1);
+		//matrix.CalcPitchYawRoll(xxx2, xxx3);
+		//joint->SetTargetLocalMatrix(matrix.m_posit, swivelAngle);
 	}
 }

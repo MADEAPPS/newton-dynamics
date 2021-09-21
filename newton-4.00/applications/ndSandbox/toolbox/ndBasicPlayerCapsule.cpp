@@ -119,8 +119,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndAnimationTwoWayBlend* const idleMoveBlend = new ndAnimationTwoWayBlend(idle, walkRunBlend);
 	
 	walkRunBlend->SetParam(0.0f);
-	//idleMoveBlend->SetParam(0.0f);
-	idleMoveBlend->SetParam(1.0f);
+	idleMoveBlend->SetParam(0.0f);
+	//idleMoveBlend->SetParam(1.0f);
 	//walkRunBlend->SetTimeDilation1(scale1);
 	m_animBlendTree = idleMoveBlend;
 
@@ -176,7 +176,6 @@ void ndBasicPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor& desc) cons
 void ndBasicPlayerCapsule::ApplyInputs(dFloat32 timestep)
 {
 	//calculate the gravity contribution to the velocity, 
-	//dVector gravity(0.0f, 2.0f * DEMO_GRAVITY, 0.0f, 0.0f);
 	const dVector gravity(GetNotifyCallback()->GetGravity());
 	const dVector totalImpulse(m_impulse + gravity.Scale(m_mass * timestep));
 	m_impulse = totalImpulse;

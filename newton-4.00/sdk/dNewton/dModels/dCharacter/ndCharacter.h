@@ -29,7 +29,7 @@ class ndWorld;
 class ndCharacterNode;
 class ndCharacterRootNode;
 class ndCharacterSkeleton;
-class ndJointInverseDynamicsBase;
+class ndJointKinematicChain;
 class ndCharacterForwardDynamicNode;
 class ndCharacterInverseDynamicNode;
 
@@ -48,7 +48,7 @@ class ndCharacter: public ndModel
 	{
 		public:
 		ndCharacterNode* m_controlNode;
-		ndJointInverseDynamicsBase* m_effector;
+		ndJointKinematicChain* m_effector;
 	};
 
 	D_CLASS_REFLECTION(ndCharacter);
@@ -69,8 +69,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API void AddAttachment(ndJointBilateralConstraint* const joint);
 	D_NEWTON_API void RemoveAttachment(ndJointBilateralConstraint* const joint);
 
-	D_NEWTON_API void CreateTwoBodyIK(const dMatrix& globalOrientation, const ndCharacterNode* const node);
-
+	D_NEWTON_API void CreateKinematicChain(const dMatrix& globalOrientation, const ndCharacterNode* const node);
 
 	//ndCharacterPoseController* GetController() const;
 	//void SetController(ndCharacterPoseController* const controller);
