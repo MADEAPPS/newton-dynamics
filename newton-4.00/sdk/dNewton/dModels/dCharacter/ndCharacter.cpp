@@ -417,26 +417,18 @@ void ndCharacter::SetPose()
 {
 	for (dList<ndEffetorInfo>::dNode* node = m_effectors.GetFirst(); node; node = node->GetNext())
 	{
-		dAssert(0);
-		//ndEffetorInfo& info = node->GetInfo();
-		//ndJointKinematicChain* const joint = info.m_effector;
-		//
-		//dMatrix matrix(info.m_controlNode->GetLocalPose());
-		//for (ndCharacterNode* bone = info.m_controlNode->GetParent(); bone->GetBody() != joint->GetBody1(); bone = bone->GetParent())
-		//{
-		//	matrix = matrix * bone->GetLocalPose();
-		//}
-		//dFloat32 swivelAngle = dFloat32(0.0f);
-		//
-		//dMatrix xxxx(info.m_controlNode->GetBody()->GetMatrix() * joint->GetBody1()->GetMatrix().Inverse());
-		//
-		//dVector xxx0;
-		//dVector xxx1;
-		//dVector xxx2;
-		//dVector xxx3;
-		//
-		//xxxx.CalcPitchYawRoll(xxx0, xxx1);
-		//matrix.CalcPitchYawRoll(xxx2, xxx3);
-		//joint->SetTargetLocalMatrix(matrix.m_posit, swivelAngle);
+		ndEffetorInfo& info = node->GetInfo();
+		ndJointKinematicChain* const joint = info.m_effector;
+		
+		dMatrix matrix(info.m_controlNode->GetLocalPose());
+		for (ndCharacterNode* bone = info.m_controlNode->GetParent(); bone->GetBody() != joint->GetBody1(); bone = bone->GetParent())
+		{
+			matrix = matrix * bone->GetLocalPose();
+		}
+
+		dVector xxx(matrix.m_posit);
+		matrix = joint->GetLocalMatrix1();
+		matrix.m_posit = xxx;
+		joint->SetTargetLocalMatrix(matrix);
 	}
 }

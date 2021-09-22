@@ -140,13 +140,10 @@ static dActiveJointDefinition jointsDefinition[] =
 	{ "mixamorig:RightUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
 	{ "mixamorig:RightLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
 	{ "mixamorig:RightFoot", dActiveJointDefinition::inverseKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {}},
-	//{ "mixamorig:RightFoot", dActiveJointDefinition::forwardKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {100.0f, 5.0f, 0.001f}, {0.0f, 0.0f, 0.0f}},
-	//{ "rightFoot_effector", dActiveJointDefinition::effector, 0.0f,{},{},{} },
 	
-	//{ "mixamorig:LeftUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
-	//{ "mixamorig:LeftLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
-	//{ "mixamorig:LeftFoot", dActiveJointDefinition::forwardKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {100.0f, 5.0f, 0.001f}, { 0.0f, 0.0f, 0.0f }},
-	//{ "leftFoot_effector", dActiveJointDefinition::effector, 0.0f,{},{},{} },
+	{ "mixamorig:LeftUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
+	{ "mixamorig:LeftLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
+	{ "mixamorig:LeftFoot", dActiveJointDefinition::inverseKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
 };
 
 class ndActiveRagdollModel : public ndCharacter
@@ -397,8 +394,8 @@ class ndActiveRagdollModel : public ndCharacter
 
 	void Update(ndWorld* const world, dFloat32 timestep) 
 	{
-		m_animBlendTree->Evaluate(m_output, timestep);
-		//m_animBlendTree->Evaluate(m_output, 0.0f);
+		//m_animBlendTree->Evaluate(m_output, timestep);
+		m_animBlendTree->Evaluate(m_output, timestep * 0.1f);
 		for (dInt32 i = 0; i < m_output.GetCount(); i++)
 		{
 			const ndAnimKeyframe& keyFrame = m_output[i];
@@ -408,7 +405,7 @@ class ndActiveRagdollModel : public ndCharacter
 				skelNode->SetLocalPose(dMatrix(keyFrame.m_rotation, keyFrame.m_posit));
 			}
 		}
-		//SetPose();
+		SetPose();
 
 		ndCharacter::Update(world, timestep);
 	}
@@ -463,7 +460,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(ragdoll);
 
 	matrix.m_posit.m_x += 1.4f;
-	//TestPlayerCapsuleInteaction(scene, matrix);
+	TestPlayerCapsuleInteaction(scene, matrix);
 
 	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_y += 2.0f;

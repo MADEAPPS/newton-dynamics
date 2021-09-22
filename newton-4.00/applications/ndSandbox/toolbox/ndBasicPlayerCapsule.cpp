@@ -52,6 +52,7 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 		dFloat32 timestep = word->GetScene()->GetTimestep();
 		//timestep *= 0.25f;
 		//timestep = 1.0f/(30.0f * 4.0f);
+		timestep *= 0.1f;
 		player->m_animBlendTree->Evaluate(player->m_output, timestep);
 
 		for (int i = 0; i < player->m_output.GetCount(); i++)
@@ -119,8 +120,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndAnimationTwoWayBlend* const idleMoveBlend = new ndAnimationTwoWayBlend(idle, walkRunBlend);
 	
 	walkRunBlend->SetParam(0.0f);
-	idleMoveBlend->SetParam(0.0f);
-	//idleMoveBlend->SetParam(1.0f);
+	//idleMoveBlend->SetParam(0.0f);
+	idleMoveBlend->SetParam(1.0f);
 	//walkRunBlend->SetTimeDilation1(scale1);
 	m_animBlendTree = idleMoveBlend;
 
