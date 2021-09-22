@@ -39,18 +39,12 @@ ndJointKinematicChain::ndJointKinematicChain(const dVector& globalHipPivot, cons
 	dVector dist(m_localMatrix1.m_posit - m_hipPivot);
 	m_maxDist = dSqrt(dist.DotProduct(dist & dVector::m_triplexMask).GetScalar());
 	dAssert(m_maxDist > dFloat32(0.0f));
-	
-	//dMatrix matrix(dGetIdentityMatrix());
-	//matrix.m_front = dist.Normalize();
-	//matrix.m_right = (matrix.m_front.CrossProduct(m_coronalFrame.m_front)).Normalize();
-	//matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front);
-	//matrix = matrix * m_body1->GetMatrix();
-	//m_localRotation = matrix * effectorMatrix.Inverse();
-	//m_localRotation.m_posit = dVector::m_wOne;
-	
+
+	// test joint positioning.
 	dMatrix matrix(m_baseFrame);
 	matrix.m_posit += m_baseFrame.m_front.Scale(0.1f);
-	////CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
+	//matrix.m_posit += m_baseFrame.m_up.Scale(0.2f);
+	matrix.m_posit += m_baseFrame.m_right.Scale(-0.2f);
 	SetTargetGlobalMatrix(matrix * m_body1->GetMatrix());
 }
 
