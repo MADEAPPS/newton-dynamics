@@ -315,10 +315,10 @@ void ndCharacter::CreateKinematicChain(const dMatrix& globalOrientation, const n
 	ndCharacterNode* const leg = calf->GetParent();
 	ndCharacterNode* const hip = leg->GetParent();
 
-	dMatrix pinAndPivot(footNode->GetBody()->GetMatrix());
-	dMatrix hipMatrix(globalOrientation);
-	hipMatrix.m_posit = leg->GetBody()->GetMatrix().m_posit;
-	ndJointKinematicChain* const joint = new ndJointKinematicChain(hipMatrix, pinAndPivot, footNode->GetBody(), hip->GetBody());
+	dMatrix pinAndPivot(globalOrientation);
+	dVector hipPivot(leg->GetBody()->GetMatrix().m_posit);
+	pinAndPivot.m_posit = footNode->GetBody()->GetMatrix().m_posit;
+	ndJointKinematicChain* const joint = new ndJointKinematicChain(hipPivot, pinAndPivot, footNode->GetBody(), hip->GetBody());
 
 	ndEffetorInfo& info = m_effectors.Append()->GetInfo();
 	info.m_effector = joint;

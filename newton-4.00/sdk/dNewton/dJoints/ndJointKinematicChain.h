@@ -20,8 +20,7 @@ class ndJointKinematicChain: public ndJointBilateralConstraint
 	public:
 	D_CLASS_REFLECTION(ndJointKinematicChain);
 	D_NEWTON_API ndJointKinematicChain(const dLoadSaveBase::dLoadDescriptor& desc);
-	//D_NEWTON_API ndJointKinematicChain(const dMatrix& basisInGlobalSpace, const dVector& pivotInGlobalSpace, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API ndJointKinematicChain(const dMatrix& hipReference, const dMatrix& pinAndpivot, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointKinematicChain(const dVector& globalHipPivot, const dMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointKinematicChain();
 
 	D_NEWTON_API void SetTargetLocalMatrix(const dMatrix& matrix);
@@ -32,14 +31,12 @@ class ndJointKinematicChain: public ndJointBilateralConstraint
 	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
-	void SubmitLinearLimits(ndConstraintDescritor& desc);
-	void SubmitAngularLimits(ndConstraintDescritor& desc);
+	void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
+	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 	
 
-	dMatrix m_localRotation;
-	dMatrix m_coronalFrame;
-	dMatrix m_coneRotation;
-	dVector m_targetPosit;
+	dMatrix m_baseFrame;
+	dVector m_hipPivot;
 
 	dFloat32 m_angle;
 	dFloat32 m_minAngle;
@@ -53,11 +50,6 @@ class ndJointKinematicChain: public ndJointBilateralConstraint
 	dFloat32 m_linearDamper;
 	dFloat32 m_linearRegularizer;
 };
-
-//inline const dMatrix& ndJointKinematicChain::GetReferenceMatrix() const
-//{
-//	return m_pivotFrame;
-//}
 
 
 #endif 

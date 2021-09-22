@@ -172,8 +172,8 @@ class ndActiveRagdollModel : public ndCharacter
 		rootEntity->ResetMatrix(rootEntity->GetCurrentMatrix() * matrix);
 		ndCharacterRootNode* const rootNode = CreateRoot(CreateBodyPart(scene, rootEntity, nullptr));
 		ndDemoEntity* const characterFrame = (ndDemoEntity*)entity->Find("referenceFrame");
-		dMatrix bodyFrame(characterFrame->CalculateGlobalMatrix());
-		rootNode->SetCoronalFrame(bodyFrame);
+		dMatrix coronalFrame(dPitchMatrix(180.0f*dDegreeToRad) * dRollMatrix(90.0f*dDegreeToRad) * characterFrame->CalculateGlobalMatrix());
+		rootNode->SetCoronalFrame(coronalFrame);
 		rootNode->SetName(rootEntity->GetName().GetStr());
 
 		dInt32 stack = 0;
@@ -286,7 +286,6 @@ class ndActiveRagdollModel : public ndCharacter
 		//m_bipedController.Init(this, bipedConfig);
 		//SetController(&m_bipedController);
 
-		dMatrix coronalFrame(m_rootNode->GetCoronalFrame() * m_rootNode->GetBody()->GetMatrix());
 		if (righFoot)
 		{
 			CreateKinematicChain(coronalFrame, righFoot);

@@ -78,12 +78,12 @@ void ndCharacterRootNode::Save(const ndCharacterSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "coronalFrame", m_coronalFrame);
 }
 
-void ndCharacterRootNode::SetCoronalFrame(const dMatrix& frameInGlobalSpace)
-{
-	dMatrix matrix(m_body->GetMatrix());
-	m_coronalFrame = frameInGlobalSpace * matrix.Inverse();
-	m_coronalFrame.m_posit = dVector::m_wOne;
-}
+//void ndCharacterRootNode::SetCoronalFrame(const dMatrix& frameInGlobalSpace)
+//{
+//	dMatrix matrix(m_body->GetMatrix());
+//	m_coronalFrame = frameInGlobalSpace * matrix.Inverse();
+//	m_coronalFrame.m_posit = dVector::m_wOne;
+//}
 
 //void ndCharacterRootNode::UpdateGlobalPose(ndWorld* const, dFloat32)
 //{
