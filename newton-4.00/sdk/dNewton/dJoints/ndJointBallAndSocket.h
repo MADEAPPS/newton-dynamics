@@ -42,7 +42,9 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 
 	void SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
 	void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
-	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix07, const dMatrix& matrix1, ndConstraintDescritor& desc);
+	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
+
+	void SubmitConeAngleOnlyRows(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
 
 	dFloat32 m_maxConeAngle;
 	dFloat32 m_coneFriction;

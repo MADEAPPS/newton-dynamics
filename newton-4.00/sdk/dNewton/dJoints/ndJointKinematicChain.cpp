@@ -35,6 +35,8 @@ ndJointKinematicChain::ndJointKinematicChain(const dVector& globalHipPivot, cons
 	,m_linearDamper(dFloat32(50.0f))
 	,m_linearRegularizer(dFloat32(5.0e-3f))
 {
+	SetSolverModel(m_jointkinematicCloseLoop);
+
 	m_baseFrame = m_localMatrix1;
 	dVector dist(m_localMatrix1.m_posit - m_hipPivot);
 	m_maxDist = dSqrt(dist.DotProduct(dist & dVector::m_triplexMask).GetScalar());
@@ -182,36 +184,6 @@ void ndJointKinematicChain::SetTargetGlobalMatrix(const dMatrix& matrix)
 	SetTargetLocalMatrix(matrix * m_body1->GetMatrix().Inverse());
 }
 
-void ndJointKinematicChain::JacobianDerivative(ndConstraintDescritor& desc)
-{
-	dMatrix matrix0;
-	dMatrix matrix1;
-	CalculateGlobalMatrix(matrix0, matrix1);
-
-	const dVector step(matrix0.m_posit - matrix1.m_posit);
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-	
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-	
-	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
-	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
-
-
-	dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
-	if (cosAngleCos >= dFloat32(0.998f))
-	{
-		// special case where the front axis are almost aligned
-		// solve by using Cartesian approximation
-		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
-	}
-	else
-	{
-		SubmitAngularAxis(matrix0, matrix1, desc);
-	}
-}
-
 void ndJointKinematicChain::SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	dFloat32 m_twistAngleSpring = m_angularSpring;
@@ -263,4 +235,34 @@ void ndJointKinematicChain::SubmitAngularAxis(const dMatrix& matrix0, const dMat
 
 	AddAngularRowJacobian(desc, lateralDir, -coneAngle);
 	SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
+}
+
+
+void ndJointKinematicChain::JacobianDerivative(ndConstraintDescritor& desc)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	const dVector step(matrix0.m_posit - matrix1.m_posit);
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
+	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
+	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
+	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
+
+	dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
+	if (cosAngleCos >= dFloat32(0.998f))
+	{
+		// special case where the front axis are almost aligned
+		// solve by using Cartesian approximation
+		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
+	}
+	else
+	{
+		SubmitAngularAxis(matrix0, matrix1, desc);
+	}
 }

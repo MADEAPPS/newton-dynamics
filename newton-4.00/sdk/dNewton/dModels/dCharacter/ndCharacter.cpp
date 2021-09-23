@@ -278,6 +278,7 @@ void ndCharacter::Debug(ndConstraintDebugCallback& context) const
 	{
 		ndJointBilateralConstraint* const joint = node->GetInfo().m_effector;
 		joint->DebugJoint(context);
+		node->GetInfo().m_controlNode->GetJoint()->DebugJoint(context);
 	}
 
 	if (m_rootNode)
@@ -429,6 +430,7 @@ void ndCharacter::SetPose()
 		dVector xxx(matrix.m_posit);
 		matrix = joint->GetLocalMatrix1();
 		matrix.m_posit = xxx;
+		matrix.m_posit.m_x -= 0.1f;
 		joint->SetTargetLocalMatrix(matrix);
 	}
 }

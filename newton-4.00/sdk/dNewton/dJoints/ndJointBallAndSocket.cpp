@@ -286,22 +286,77 @@ void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 
 	dFloat32 deltaTwist = m_maxTwistAngle - m_minTwistAngle;
-	bool hasAngleRows = deltaTwist > dFloat32(1.0e-3f);
-	hasAngleRows = hasAngleRows && (deltaTwist < dFloat32(2.0f) * dPi);
-	hasAngleRows = hasAngleRows || (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_ANGLE);
-	if (hasAngleRows)
+	if (deltaTwist < (2.0f * dDegreeToRad))
 	{
-		dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
-		if (cosAngleCos >= dFloat32(0.998f))
+		SubmitConeAngleOnlyRows(matrix0, matrix1, desc);
+	}
+	else
+	{
+
+	}
+
+	//bool hasAngleRows = deltaTwist > dFloat32(1.0e-3f);
+	//hasAngleRows = hasAngleRows && (deltaTwist < dFloat32(2.0f) * dPi);
+	//hasAngleRows = hasAngleRows || (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_ANGLE);
+	//if (hasAngleRows)
+	//{
+	//	dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
+	//	if (cosAngleCos >= dFloat32(0.998f))
+	//	{
+	//		// special case where the front axis are almost aligned
+	//		// solve by using Cartesian approximation
+	//		SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
+	//	}
+	//	else
+	//	{
+	//		SubmitAngularAxis(matrix0, matrix1, desc);
+	//	}
+	//}
+}
+
+void ndJointBallAndSocket::SubmitConeAngleOnlyRows(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+{
+	const dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
+	if (cosAngleCos >= dFloat32(0.998f))
+	{
+		dAssert(dAcos(dClamp(cosAngleCos, dFloat32(-1.0f), dFloat32(1.0f))) < m_maxConeAngle);
+		dFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
+		AddAngularRowJacobian(desc, matrix0.m_front, pitchAngle);
+	}
+	else
+	{
+		dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+		dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
+		lateralDir = lateralDir.Normalize();
+		const dFloat32 coneAngle = dAcos(dClamp(cosAngleCos, dFloat32(-1.0f), dFloat32(1.0f)));
+
+		const dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+		const dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+
+		const dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+		const dFloat32 pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
+
+		dAssert(desc.m_rowsCount < 6);
+		AddAngularRowJacobian(desc, matrix0.m_front, pitchAngle);
+
+		if (coneAngle > m_maxConeAngle)
 		{
-			// special case where the front axis are almost aligned
-			// solve by using Cartesian approximation
-			SubmitAngularAxisCartesianApproximation(matrix0, matrix1, desc);
+			AddAngularRowJacobian(desc, lateralDir, dFloat32(0.0f));
+			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const dFloat32 penetration = coneAngle - m_maxConeAngle;
+			const dFloat32 recoveringAceel = desc.m_invTimestep * D_BALL_AND_SOCKED_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_BALL_AND_SOCKED_PENETRATION_LIMIT), dFloat32(1.0f));
+			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
+			SetHighFriction(desc, dFloat32(0.0f));
+
+			AddAngularRowJacobian(desc, sideDir, dFloat32(0.0f));
 		}
-		else
+		else if (m_coneFriction > dFloat32(0.0f))
 		{
-			SubmitAngularAxis(matrix0, matrix1, desc);
+			AddAngularRowJacobian(desc, lateralDir, dFloat32(0.0f));
+			SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, dFloat32(0.0f), m_coneFriction);
+
+			AddAngularRowJacobian(desc, sideDir, dFloat32(0.0f));
+			SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, dFloat32(0.0f), m_coneFriction);
 		}
 	}
 }
-
