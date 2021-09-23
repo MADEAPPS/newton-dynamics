@@ -99,7 +99,8 @@ dFloat32 ndJointBallAndSocket::GetMaxConeAngle() const
 
 void ndJointBallAndSocket::SetConeLimit(dFloat32 maxConeAngle)
 {
-	m_maxConeAngle = dMin (dAbs (maxConeAngle), D_BALL_AND_SOCKED_MAX_ANGLE * dFloat32 (0.999f));
+	//m_maxConeAngle = dMin (dAbs (maxConeAngle), D_BALL_AND_SOCKED_MAX_ANGLE * dFloat32 (0.999f));
+	m_maxConeAngle = maxConeAngle;
 }
 
 void ndJointBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) const

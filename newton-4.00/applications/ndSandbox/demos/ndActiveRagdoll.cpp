@@ -34,7 +34,7 @@ class dActiveJointDefinition
 	enum dLimbType
 	{
 		forwardKinematic,
-		inverseKinematic,
+		ballAndSocket,
 		effector,
 	};
 
@@ -137,14 +137,14 @@ static dActiveJointDefinition jointsDefinition[] =
 	//{ "mixamorig:LeftForeArm", dActiveJointDefinition::forwardKinematic, 1.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f }, {}  },
 	//{ "mixamorig:LeftHand", dActiveJointDefinition::forwardKinematic, 2.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
 	
-	{ "mixamorig:RightUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
-	{ "mixamorig:RightLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
-	//{ "mixamorig:RightFoot", dActiveJointDefinition::inverseKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {}},
-	{ "mixamorig:RightFoot", dActiveJointDefinition::inverseKinematic, 1.0f,{ 0.0f, 0.0f, 160.0f },{ 0.0f, 0.0f, 180.0f },{} },
+	{ "mixamorig:RightUpLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
+	{ "mixamorig:RightLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
+	//{ "mixamorig:RightFoot", dActiveJointDefinition::ballAndSocket, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {}},
+	{ "mixamorig:RightFoot", dActiveJointDefinition::ballAndSocket, 1.0f, { 0.0f, 0.0f, 1000.0f }, { 0.0f, 0.0f, 180.0f },{} },
 	
-	//{ "mixamorig:LeftUpLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
-	//{ "mixamorig:LeftLeg", dActiveJointDefinition::inverseKinematic, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
-	//{ "mixamorig:LeftFoot", dActiveJointDefinition::inverseKinematic, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
+	//{ "mixamorig:LeftUpLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
+	//{ "mixamorig:LeftLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
+	//{ "mixamorig:LeftFoot", dActiveJointDefinition::ballAndSocket, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
 };
 
 class ndActiveRagdollModel : public ndCharacter
