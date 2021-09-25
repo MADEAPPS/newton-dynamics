@@ -384,6 +384,9 @@ class ndActiveRagdollModel : public ndCharacter
 			dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 			ndJointBallAndSocket* const joint = (ndJointBallAndSocket*)jointNode->GetJoint();
 
+			dTrace (("do not forget to delete this debug\n"))
+			joint->SetSolverModel(m_jointkinematicCloseLoop);
+
 			joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
 			joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
 			joint->SetConeFriction(dFloat32(0.0f), dFloat32(0.0f));
@@ -396,7 +399,8 @@ class ndActiveRagdollModel : public ndCharacter
 	void Update(ndWorld* const world, dFloat32 timestep) 
 	{
 		//m_animBlendTree->Evaluate(m_output, timestep);
-		m_animBlendTree->Evaluate(m_output, timestep * 0.05f);
+		//m_animBlendTree->Evaluate(m_output, timestep * 0.05f);
+		m_animBlendTree->Evaluate(m_output, 0.0f);
 		for (dInt32 i = 0; i < m_output.GetCount(); i++)
 		{
 			const ndAnimKeyframe& keyFrame = m_output[i];
@@ -461,7 +465,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(ragdoll);
 
 	matrix.m_posit.m_x += 1.4f;
-	//TestPlayerCapsuleInteaction(scene, matrix);
+	TestPlayerCapsuleInteaction(scene, matrix);
 
 	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_y += 2.0f;

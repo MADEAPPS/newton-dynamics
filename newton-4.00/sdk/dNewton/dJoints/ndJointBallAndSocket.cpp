@@ -278,6 +278,7 @@ void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 
 void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 {
+return;
 	dMatrix matrix0;
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);

@@ -427,10 +427,10 @@ void ndCharacter::SetPose()
 			matrix = matrix * bone->GetLocalPose();
 		}
 
-		dVector xxx(matrix.m_posit);
-		matrix = joint->GetLocalMatrix1();
-		matrix.m_posit = xxx;
-		matrix.m_posit.m_x -= 0.1f;
+		//dVector xxx(matrix.m_posit);
+		//matrix = joint->GetLocalMatrix1();
+		//matrix.m_posit = xxx;
+		//matrix.m_posit.m_x -= 0.1f;
 		joint->SetTargetLocalMatrix(matrix);
 	}
 }
