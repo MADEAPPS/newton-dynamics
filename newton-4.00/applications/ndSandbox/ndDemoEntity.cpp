@@ -12,6 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
+#include "ndAnimationPose.h"
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndDemoEntityNotify)
 
@@ -254,6 +255,11 @@ void ndDemoEntity::SetMeshMatrix(const dMatrix& matrix)
 dMatrix ndDemoEntity::GetCurrentMatrix () const
 {
 	return dMatrix (m_curRotation, m_curPosition);
+}
+
+ndAnimKeyframe ndDemoEntity::GetCurrentTransform() const
+{
+	return ndAnimKeyframe(m_curPosition, m_curRotation);
 }
 
 dMatrix ndDemoEntity::GetNextMatrix () const

@@ -17,6 +17,20 @@
 class ndAnimKeyframe
 {
 	public:
+	ndAnimKeyframe()
+		:m_posit(dVector::m_wOne)
+		,m_rotation()
+		,m_userData(nullptr)
+	{
+	}
+
+	ndAnimKeyframe(const dVector& posit, const dQuaternion& rotation)
+		:m_posit(posit)
+		,m_rotation(rotation)
+		,m_userData(nullptr)
+	{
+	}
+
 	dVector m_posit;
 	dQuaternion m_rotation;
 	void* m_userData;

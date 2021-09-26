@@ -16,6 +16,7 @@
 #include "ndPhysicsUtils.h"
 
 class ndDemoEntity;
+class ndAnimKeyframe;
 class ndShaderPrograms;
 class ndDemoMeshInterface;
 
@@ -81,6 +82,7 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 
 	dMatrix GetNextMatrix () const;
 	dMatrix GetCurrentMatrix () const;
+	ndAnimKeyframe GetCurrentTransform() const;
 	virtual void SetMatrix(const dQuaternion& rotation, const dVector& position);
 	virtual void SetNextMatrix (const dQuaternion& rotation, const dVector& position);
 	virtual void ResetMatrix(const dMatrix& matrix);

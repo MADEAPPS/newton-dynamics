@@ -294,23 +294,7 @@ class ndActiveRagdollModel : public ndCharacter
 			CreateKinematicChain(coronalFrame, leftFoot);
 		}
 
-		ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
-		const dList<ndAnimationKeyFramesTrack>& tracks = sequence->m_tracks;
-		for (dList<ndAnimationKeyFramesTrack>::dNode* node = tracks.GetFirst(); node; node = node->GetNext())
-		{
-			ndAnimationKeyFramesTrack& track = node->GetInfo();
-			const char* const name = track.GetName().GetStr();
-			ndCharacterNode* const skelNode = m_rootNode->Find (name);
-			ndAnimKeyframe keyFrame;
-			keyFrame.m_userData = skelNode;
-			m_output.PushBack(keyFrame);
-		}
-		//SetPose();
-
-		//ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
-		ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
-		ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
-		m_animBlendTree = walk;
+		SetAnimation(scene, entity);
 	}
 
 	~ndActiveRagdollModel()
@@ -319,6 +303,30 @@ class ndActiveRagdollModel : public ndCharacter
 		{
 			delete m_animBlendTree;
 		}
+	}
+
+	void SetAnimation(ndDemoEntityManager* const scene, const ndDemoEntity* const entity)
+	{
+		ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
+		const dList<ndAnimationKeyFramesTrack>& tracks = sequence->m_tracks;
+		for (dList<ndAnimationKeyFramesTrack>::dNode* node = tracks.GetFirst(); node; node = node->GetNext())
+		{
+			ndAnimationKeyFramesTrack& track = node->GetInfo();
+			const char* const name = track.GetName().GetStr();
+			ndCharacterNode* const skelNode = m_rootNode->Find(name);
+			const ndDemoEntity* const ent = entity->Find(name);
+			dAssert(ent);
+			ndAnimKeyframe keyFrame(ent->GetCurrentTransform());
+			keyFrame.m_userData = skelNode;
+			m_output.PushBack(keyFrame);
+		}
+		SetPose();
+
+		//ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
+		ndAnimationSequence* const walkSequence = scene->GetAnimationSequence("whiteman_walk.fbx");
+		ndAnimationSequencePlayer* const walk = new ndAnimationSequencePlayer(walkSequence);
+		m_animBlendTree = walk;
+
 	}
 
 	void SetModelMass(dFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray, const dFloat32* const massWeight) const
@@ -407,10 +415,10 @@ class ndActiveRagdollModel : public ndCharacter
 			ndCharacterNode* const skelNode = (ndCharacterNode*)keyFrame.m_userData;
 			if (skelNode)
 			{
-				skelNode->SetLocalPose(dMatrix(keyFrame.m_rotation, keyFrame.m_posit));
+				//skelNode->SetLocalPose(dMatrix(keyFrame.m_rotation, keyFrame.m_posit));
 			}
 		}
-		SetPose();
+		//SetPose();
 
 		ndCharacter::Update(world, timestep);
 	}
