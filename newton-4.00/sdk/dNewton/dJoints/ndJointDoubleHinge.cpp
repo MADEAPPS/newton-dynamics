@@ -57,7 +57,7 @@ void ndJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	// but is hard for an first order integrator to prevent the side angle from drifting, 
 	// even an implicit one with expanding the Jacobian partial derivatives still has a hard time
 	// nullifying the gyro torque generate by the two angular velocities.
-	const dFloat32 alphaRollError = GetMotorZeroAcceleration(desc) + 0.5f * angle * desc.m_invTimestep * desc.m_invTimestep;
+	const dFloat32 alphaRollError = GetMotorZeroAcceleration(desc) + dFloat32 (0.5f) * angle * desc.m_invTimestep * desc.m_invTimestep;
 	SetMotorAcceleration(desc, alphaRollError);
 
 	//// save the current joint Omega

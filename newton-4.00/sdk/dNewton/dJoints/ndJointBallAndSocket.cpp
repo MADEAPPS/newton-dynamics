@@ -278,7 +278,9 @@ void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 
 void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 {
-return;
+if (m_body0->GetId() != 5)
+return ;
+
 	dMatrix matrix0;
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
@@ -324,6 +326,7 @@ void ndJointBallAndSocket::SubmitConeAngleOnlyRows(const dMatrix& matrix0, const
 		dAssert(dAcos(dClamp(cosAngleCos, dFloat32(-1.0f), dFloat32(1.0f))) < m_maxConeAngle);
 		dFloat32 pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
 		AddAngularRowJacobian(desc, matrix0.m_front, pitchAngle);
+		//dTrace(("%f\n", pitchAngle * dRadToDegree));
 	}
 	else
 	{
@@ -337,9 +340,13 @@ void ndJointBallAndSocket::SubmitConeAngleOnlyRows(const dMatrix& matrix0, const
 
 		const dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 		const dFloat32 pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
+		//dTrace(("%f\n", pitchAngle * dRadToDegree));
+		//dMatrix xxxxx0(dPitchMatrix(-pitchAngle) * matrix1 * coneRotation);
 
 		dAssert(desc.m_rowsCount < 6);
 		AddAngularRowJacobian(desc, matrix0.m_front, pitchAngle);
+		//const dFloat32 stopAccel = GetMotorZeroAcceleration(desc) + 0.0f * pitchAngle * desc.m_invTimestep * desc.m_invTimestep;
+		//SetMotorAcceleration(desc, stopAccel);
 
 		if (coneAngle > m_maxConeAngle)
 		{
