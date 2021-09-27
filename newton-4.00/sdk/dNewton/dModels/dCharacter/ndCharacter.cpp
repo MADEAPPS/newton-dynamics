@@ -321,7 +321,15 @@ void ndCharacter::CreateKinematicChain(const dMatrix& globalOrientation, const n
 	pinAndPivot.m_posit = footNode->GetBody()->GetMatrix().m_posit;
 	ndJointKinematicChain* const joint = new ndJointKinematicChain(hipPivot, pinAndPivot, footNode->GetBody(), hip->GetBody());
 
+
 	ndEffetorInfo& info = m_effectors.Append()->GetInfo();
+	//dMatrix localPivot1(footNode->GetBody()->GetMatrix() * hip->GetBody()->GetMatrix().Inverse());
+	//dMatrix localPivot0(pinAndPivot * hip->GetBody()->GetMatrix().Inverse());
+
+	const dMatrix localPivot0(pinAndPivot);
+	const dMatrix localPivot1(footNode->GetBody()->GetMatrix());
+
+	info.m_bindMatrix = localPivot0 * localPivot1.Inverse();
 	info.m_effector = joint;
 	info.m_controlNode = (ndCharacterNode*)footNode;
 }
@@ -421,16 +429,11 @@ void ndCharacter::SetPose()
 		ndEffetorInfo& info = node->GetInfo();
 		ndJointKinematicChain* const joint = info.m_effector;
 		
-		dMatrix matrix(info.m_controlNode->GetLocalPose());
+		dMatrix matrix(info.m_bindMatrix * info.m_controlNode->GetLocalPose());
 		for (ndCharacterNode* bone = info.m_controlNode->GetParent(); bone->GetBody() != joint->GetBody1(); bone = bone->GetParent())
 		{
 			matrix = matrix * bone->GetLocalPose();
 		}
-
-		//dVector xxx(matrix.m_posit);
-		//matrix = joint->GetLocalMatrix1();
-		//matrix.m_posit = xxx;
-		//matrix.m_posit.m_x -= 0.1f;
 		joint->SetTargetLocalMatrix(matrix);
 	}
 }

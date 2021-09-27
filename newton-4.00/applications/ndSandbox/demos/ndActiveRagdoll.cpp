@@ -139,12 +139,11 @@ static dActiveJointDefinition jointsDefinition[] =
 	
 	{ "mixamorig:RightUpLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
 	{ "mixamorig:RightLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
-	//{ "mixamorig:RightFoot", dActiveJointDefinition::ballAndSocket, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {}},
-	{ "mixamorig:RightFoot", dActiveJointDefinition::ballAndSocket, 1.0f, { 0.0f, 0.0f, 1000.0f }, { 0.0f, 0.0f, 180.0f },{} },
+	{ "mixamorig:RightFoot", dActiveJointDefinition::ballAndSocket, 1.0f, { 0.0f, 0.0f, 1.0e4f }, { 0.0f, 0.0f, 180.0f },{} },
 	
-	//{ "mixamorig:LeftUpLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
-	//{ "mixamorig:LeftLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
-	//{ "mixamorig:LeftFoot", dActiveJointDefinition::ballAndSocket, 1.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
+	{ "mixamorig:LeftUpLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
+	{ "mixamorig:LeftLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
+	{ "mixamorig:LeftFoot", dActiveJointDefinition::ballAndSocket, 1.0f, { 0.0f, 0.0f, 1.0e4f }, { 0.0f, 0.0f, 180.0f }, {} },
 };
 
 class ndActiveRagdollModel : public ndCharacter
@@ -407,18 +406,18 @@ class ndActiveRagdollModel : public ndCharacter
 	void Update(ndWorld* const world, dFloat32 timestep) 
 	{
 		//m_animBlendTree->Evaluate(m_output, timestep);
-		//m_animBlendTree->Evaluate(m_output, timestep * 0.05f);
-		m_animBlendTree->Evaluate(m_output, 0.0f);
+		m_animBlendTree->Evaluate(m_output, timestep * 0.05f);
+		//m_animBlendTree->Evaluate(m_output, 0.0f);
 		for (dInt32 i = 0; i < m_output.GetCount(); i++)
 		{
 			const ndAnimKeyframe& keyFrame = m_output[i];
 			ndCharacterNode* const skelNode = (ndCharacterNode*)keyFrame.m_userData;
 			if (skelNode)
 			{
-				//skelNode->SetLocalPose(dMatrix(keyFrame.m_rotation, keyFrame.m_posit));
+				skelNode->SetLocalPose(dMatrix(keyFrame.m_rotation, keyFrame.m_posit));
 			}
 		}
-		//SetPose();
+		SetPose();
 
 		ndCharacter::Update(world, timestep);
 	}

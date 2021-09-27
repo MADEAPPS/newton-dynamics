@@ -47,6 +47,7 @@ class ndCharacter: public ndModel
 	class ndEffetorInfo
 	{
 		public:
+		dMatrix m_bindMatrix;
 		ndCharacterNode* m_controlNode;
 		ndJointKinematicChain* m_effector;
 	};
