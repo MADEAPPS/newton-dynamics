@@ -480,54 +480,6 @@ void ndSkeletonContainer::AddSelfCollisionJoint(ndConstraint* const joint)
 	m_dynamicsLoopCount++;
 }
 
-void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSide, ndRightHandSide* const rightHandSide, bool consideredCloseLoop)
-{
-	D_TRACKTIME();
-	if (m_isResting)
-	{
-		return;
-	}
-	dInt32 rowCount = 0;
-	dInt32 auxiliaryCount = 0;
-	m_leftHandSide = leftHandSide;
-	m_rightHandSide = rightHandSide;
-	m_consideredCloseLoop = consideredCloseLoop ? 1 : 0;
-	
-	const dInt32 nodeCount = m_nodeList.GetCount();
-	dSpatialMatrix* const bodyMassArray = dAlloca(dSpatialMatrix, nodeCount);
-	dSpatialMatrix* const jointMassArray = dAlloca(dSpatialMatrix, nodeCount);
-	if (m_nodesOrder) 
-	{
-		for (dInt32 i = 0; i < nodeCount - 1; i++) 
-		{
-			ndNode* const node = m_nodesOrder[i];
-			rowCount += node->m_joint->m_rowCount;
-			auxiliaryCount += node->Factorize(leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
-		}
-		m_nodesOrder[nodeCount - 1]->Factorize(leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
-	}
-
-	m_rowCount = dInt16(rowCount);
-	m_auxiliaryRowCount = dInt16(auxiliaryCount);
-	
-	dInt32 loopRowCount = 0;
-	const dInt32 loopCount = m_loopCount + m_dynamicsLoopCount;
-	for (dInt32 j = 0; j < loopCount; j++) 
-	{
-		const ndConstraint* const joint = m_loopingJoints[j];
-		loopRowCount += joint->m_rowCount;
-	}
-
-	m_loopRowCount = dInt16(loopRowCount);
-	m_rowCount += m_loopRowCount;
-	m_auxiliaryRowCount += m_loopRowCount;
-	
-	if (m_auxiliaryRowCount && m_consideredCloseLoop) 
-	{
-		InitLoopMassMatrix();
-	}
-}
-
 void ndSkeletonContainer::CheckSleepState()
 {
 	bool equilibrium = true;
@@ -1449,6 +1401,54 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 		internalForces[m0].m_angular += row->m_Jt.m_jacobianM0.m_angular * jointForce;
 		internalForces[m1].m_linear += row->m_Jt.m_jacobianM1.m_linear * jointForce;
 		internalForces[m1].m_angular += row->m_Jt.m_jacobianM1.m_angular * jointForce;
+	}
+}
+
+void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSide, ndRightHandSide* const rightHandSide, bool consideredCloseLoop)
+{
+	D_TRACKTIME();
+	if (m_isResting)
+	{
+		return;
+	}
+	dInt32 rowCount = 0;
+	dInt32 auxiliaryCount = 0;
+	m_leftHandSide = leftHandSide;
+	m_rightHandSide = rightHandSide;
+	m_consideredCloseLoop = consideredCloseLoop ? 1 : 0;
+
+	const dInt32 nodeCount = m_nodeList.GetCount();
+	dSpatialMatrix* const bodyMassArray = dAlloca(dSpatialMatrix, nodeCount);
+	dSpatialMatrix* const jointMassArray = dAlloca(dSpatialMatrix, nodeCount);
+	if (m_nodesOrder)
+	{
+		for (dInt32 i = 0; i < nodeCount - 1; i++)
+		{
+			ndNode* const node = m_nodesOrder[i];
+			rowCount += node->m_joint->m_rowCount;
+			auxiliaryCount += node->Factorize(leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
+		}
+		m_nodesOrder[nodeCount - 1]->Factorize(leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
+	}
+
+	m_rowCount = dInt16(rowCount);
+	m_auxiliaryRowCount = dInt16(auxiliaryCount);
+
+	dInt32 loopRowCount = 0;
+	const dInt32 loopCount = m_loopCount + m_dynamicsLoopCount;
+	for (dInt32 j = 0; j < loopCount; j++)
+	{
+		const ndConstraint* const joint = m_loopingJoints[j];
+		loopRowCount += joint->m_rowCount;
+	}
+
+	m_loopRowCount = dInt16(loopRowCount);
+	m_rowCount += m_loopRowCount;
+	m_auxiliaryRowCount += m_loopRowCount;
+
+	if (m_auxiliaryRowCount && m_consideredCloseLoop)
+	{
+		InitLoopMassMatrix();
 	}
 }
 
