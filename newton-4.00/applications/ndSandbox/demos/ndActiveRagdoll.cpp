@@ -138,8 +138,8 @@ static dActiveJointDefinition jointsDefinition[] =
 	//{ "mixamorig:LeftHand", dActiveJointDefinition::forwardKinematic, 2.0f, { 0.0f, 0.0f, 60.0f }, { 0.0f, 0.0f, 180.0f }, {} },
 	
 	{ "mixamorig:RightUpLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
-	//{ "mixamorig:RightLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
-	//{ "mixamorig:RightFoot", dActiveJointDefinition::ballAndSocket, 1.0f, { 0.0f, 0.0f, 1.0e4f }, { 0.0f, 0.0f, 180.0f },{} },
+	{ "mixamorig:RightLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
+	{ "mixamorig:RightFoot", dActiveJointDefinition::ballAndSocket, 1.0f, { 0.0f, 0.0f, 1.0e4f }, { 0.0f, 0.0f, 180.0f },{} },
 	
 	//{ "mixamorig:LeftUpLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 180.0f, 0.0f }, {} },
 	//{ "mixamorig:LeftLeg", dActiveJointDefinition::ballAndSocket, 1.0f, { -140.0f, 0.0f, 0.0f }, { 0.0f, 90.0f, 90.0f }, {} },
@@ -391,8 +391,8 @@ class ndActiveRagdollModel : public ndCharacter
 			dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 			ndJointBallAndSocket* const joint = (ndJointBallAndSocket*)jointNode->GetJoint();
 
-			dTrace (("do not forget to delete this debug\n"))
-			joint->SetSolverModel(m_jointkinematicCloseLoop);
+			//dTrace (("do not forget to delete this debug\n"))
+			//joint->SetSolverModel(m_jointkinematicCloseLoop);
 
 			joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
 			joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);

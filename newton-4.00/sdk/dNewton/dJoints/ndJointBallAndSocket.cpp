@@ -296,7 +296,7 @@ return ;
 	}
 	else
 	{
-
+		dAssert(0);
 	}
 
 	//bool hasAngleRows = deltaTwist > dFloat32(1.0e-3f);
@@ -340,12 +340,12 @@ void ndJointBallAndSocket::SubmitConeAngleOnlyRows(const dMatrix& matrix0, const
 
 		const dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 		const dFloat32 pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
-		//dTrace(("%f\n", pitchAngle * dRadToDegree));
-		//dMatrix xxxxx0(dPitchMatrix(-pitchAngle) * matrix1 * coneRotation);
+		dTrace(("%f %f\n", pitchAngle * dRadToDegree, coneAngle * dRadToDegree));
+		dMatrix xxxxx0(dPitchMatrix(-pitchAngle) * matrix1 * coneRotation);
 
 		dAssert(desc.m_rowsCount < 6);
 		AddAngularRowJacobian(desc, matrix0.m_front, pitchAngle);
-		//const dFloat32 stopAccel = GetMotorZeroAcceleration(desc) + 0.0f * pitchAngle * desc.m_invTimestep * desc.m_invTimestep;
+		//const dFloat32 stopAccel = GetMotorZeroAcceleration(desc) - dFloat32 (0.0f) * pitchAngle * desc.m_invTimestep * desc.m_invTimestep;
 		//SetMotorAcceleration(desc, stopAccel);
 
 		if (coneAngle > m_maxConeAngle)

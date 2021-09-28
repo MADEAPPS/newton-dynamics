@@ -251,7 +251,7 @@ dInt32 ndSkeletonContainer::ndNode::Factorize(const ndLeftHandSide* const leftHa
 				count--;
 			}
 		}
-		dAssert(m_dof > 0);
+		dAssert(m_dof >= 0);
 		dAssert(m_dof <= 6);
 		boundedDof += m_joint->m_rowCount - count;
 		GetJacobians(leftHandSide, rightHandSide, jointMassArray);
@@ -1391,10 +1391,7 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 	{
 		dInt32 index = m_matrixRowsIndex[i];
 		const ndLeftHandSide* const row = &m_leftHandSide[index];
-		//ndRightHandSide* const rhs = &m_rightHandSide[index];
-		//rhs->m_force += f[i];
-
-		dVector jointForce(f[i]);
+		const dVector jointForce(f[i]);
 		const dInt32 m0 = m_pairs[i].m_m0;
 		const dInt32 m1 = m_pairs[i].m_m1;
 		internalForces[m0].m_linear += row->m_Jt.m_jacobianM0.m_linear * jointForce;
