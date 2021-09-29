@@ -2210,8 +2210,8 @@ dFloat64 dPolyhedra::EdgePenalty (const dBigVector* const pool, dEdge* const edg
 				dFloat64 mag0 = e0.DotProduct(e0).GetScalar();
 				dFloat64 mag1 = e1.DotProduct(e1).GetScalar();
 				dFloat64 mag2 = e2.DotProduct(e2).GetScalar();
-				dFloat64 maxMag = dMax (mag0, mag1, mag2);
-				dFloat64 minMag = dMin (mag0, mag1, mag2);
+				dFloat64 maxMag = dMax(dMax (mag0, mag1), mag2);
+				dFloat64 minMag = dMin(dMin (mag0, mag1), mag2);
 				dFloat64 ratio = minMag / maxMag;
 
 				if (ratio < aspect) {

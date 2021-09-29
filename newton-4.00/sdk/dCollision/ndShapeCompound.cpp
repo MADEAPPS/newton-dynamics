@@ -921,7 +921,7 @@ void ndShapeCompound::EndAddRemove()
 		}
 		
 		dAssert(m_root->m_size.m_w == dFloat32(0.0f));
-		m_boxMinRadius = dMin(m_root->m_size.m_x, m_root->m_size.m_y, m_root->m_size.m_z);
+		m_boxMinRadius = dMin(dMin(m_root->m_size.m_x, m_root->m_size.m_y), m_root->m_size.m_z);
 		m_boxMaxRadius = dSqrt(m_root->m_size.DotProduct(m_root->m_size).GetScalar());
 		
 		m_boxSize = m_root->m_size;

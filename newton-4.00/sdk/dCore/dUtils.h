@@ -72,17 +72,17 @@ inline T dMax(T A, T B)
 	return (A > B) ? A : B; 
 }
 
-template <class T>
-inline T dMin(T A, T B, T C)
-{
-	return dMin(dMin (A, B), C);
-}
-
-template <class T>
-inline T dMax(T A, T B, T C)
-{
-	return dMax(dMax (A, B), C);
-}
+//template <class T>
+//inline T dMin(T A, T B, T C)
+//{
+//	return dMin(dMin (A, B), C);
+//}
+//
+//template <class T>
+//inline T dMax(T A, T B, T C)
+//{
+//	return dMax(dMax (A, B), C);
+//}
 
 template <class T>
 inline T dClamp(T val, T min, T max)

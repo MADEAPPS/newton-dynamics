@@ -1684,7 +1684,8 @@ dInt32 ndMeshEffect::dFormat::GetSortIndex(const dChannel<dBigVector, m_point>& 
 	}
 
 	dBigVector del(maxP - minP);
-	dFloat64 minDist = dMin(del.m_x, del.m_y, del.m_z);
+	//dFloat64 minDist = dMin(del.m_x, del.m_y, del.m_z);
+	dFloat64 minDist = dMin (dMin(del.m_x, del.m_y), del.m_z);
 	if (minDist < dFloat64(1.0e-3f))
 	{
 		minDist = dFloat64(1.0e-3f);

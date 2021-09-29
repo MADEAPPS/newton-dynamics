@@ -1150,7 +1150,8 @@ ndMeshEffect* ndMeshEffect::CreateVoronoiConvexDecomposition(const dArray<dVecto
 	count = dVertexListToIndexList(&pool[0].m_x, sizeof(dBigVector), 3, count, &indexList[0], dFloat64(5.0e-2f));
 	dAssert(count >= 8);
 	
-	dFloat64 maxSize = dMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y, pMax.m_z - pMin.m_z);
+	//dFloat64 maxSize = dMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y, pMax.m_z - pMin.m_z);
+	dFloat64 maxSize = dMax(dMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y), pMax.m_z - pMin.m_z);
 	pMin -= dBigVector(maxSize, maxSize, maxSize, dFloat64(0.0f));
 	pMax += dBigVector(maxSize, maxSize, maxSize, dFloat64(0.0f));
 
