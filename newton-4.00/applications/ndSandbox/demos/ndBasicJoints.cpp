@@ -225,7 +225,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const dVector& or
 	massMatrix.m_x = maxInertia;
 	massMatrix.m_y = maxInertia;
 	massMatrix.m_z = maxInertia;
-	body->SetMassMatrix(massMatrix);
+	//body->SetMassMatrix(massMatrix);
 
 	body->SetOmega(dVector(0.0f, 10.0f, 20.0f, 0.0f));
 

@@ -278,8 +278,8 @@ void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 
 void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 {
-if (m_body0->GetId() != 5)
-return ;
+//if (m_body0->GetId() != 5)
+//return ;
 
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -296,7 +296,7 @@ return ;
 	}
 	else
 	{
-		dAssert(0);
+		//dAssert(0);
 	}
 
 	//bool hasAngleRows = deltaTwist > dFloat32(1.0e-3f);
