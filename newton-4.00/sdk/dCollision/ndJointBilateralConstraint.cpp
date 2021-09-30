@@ -295,6 +295,7 @@ void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& de
 
 	const dVector& omega0 = m_body0->GetOmega();
 	const dVector& omega1 = m_body1->GetOmega();
+
 	const dFloat32 relOmega = -(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular).AddHorizontal().GetScalar();
 
 	dAssert(desc.m_timestep > dFloat32(0.0f));
@@ -302,48 +303,39 @@ void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& de
 
 	m_rowIsMotor &= ~(1 << index);
 	m_motorAcceleration[index] = dFloat32(0.0f);
-	if (desc.m_timestep > dFloat32(0.0f))
-	{
-		#ifdef _DEBUG
-		const dFloat32 relCentr = -(omega0 * omega0.CrossProduct(jacobian0.m_angular) + omega1 * omega1.CrossProduct(jacobian1.m_angular)).AddHorizontal().GetScalar();
-		// allow for some large error since this is affected bu numerical precision a lot
-		dAssert(dAbs(relCentr) < dFloat32(4.0f));
-		#endif
+	dAssert(desc.m_timestep);
+	#ifdef _DEBUG
+	const dFloat32 relCentr = -(omega0 * omega0.CrossProduct(jacobian0.m_angular) + omega1 * omega1.CrossProduct(jacobian1.m_angular)).AddHorizontal().GetScalar();
+	// allow for some large error since this is affected bu numerical precision a lot
+	dAssert(dAbs(relCentr) < dFloat32(4.0f));
+	#endif
 
-		const dVector& gyroAlpha0 = m_body0->m_gyroAlpha;
-		const dVector& gyroAlpha1 = m_body1->m_gyroAlpha;
-		const dFloat32 relGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
+	const dVector& gyroAlpha0 = m_body0->m_gyroAlpha;
+	const dVector& gyroAlpha1 = m_body1->m_gyroAlpha;
 
-		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
-		dFloat32 dt = desc.m_timestep;
-		dFloat32 ks = D_POS_DAMP;
-		dFloat32 kd = D_VEL_DAMP;
-		dFloat32 ksd = dt * ks;
-		dFloat32 num = ks * relAngle + kd * relOmega + ksd * relOmega;
-		dFloat32 den = dFloat32(1.0f) + dt * kd + dt * ksd;
-		dFloat32 alphaError = num / den;
+	//dVector angularMomentum0(m_body0->CalculateAngularMomentum());
+	//dVector angularMomentum1(m_body1->CalculateAngularMomentum());
 
-		desc.m_flags[index] = 0;
-		desc.m_penetration[index] = relAngle;
-		desc.m_diagonalRegularizer[index] = m_defualtDiagonalRegularizer;
-		desc.m_jointAccel[index] = alphaError + relGyro;
-		desc.m_penetrationStiffness[index] = alphaError + relGyro;
-		desc.m_restitution[index] = dFloat32(0.0f);
-		desc.m_forceBounds[index].m_jointForce = jointForce;
-		desc.m_zeroRowAcceleration[index] = relOmega * desc.m_invTimestep + relGyro;
-	}
-	else
-	{
-		dAssert(0);
-		//desc.m_flags[index] = 0;
-		//desc.m_penetration[index] = dFloat32(0.0f);
-		//desc.m_restitution[index] = dFloat32(0.0f);
-		//desc.m_diagonalRegularizer[index] = stiffness;
-		//desc.m_jointAccel[index] = relOmega;
-		//desc.m_penetrationStiffness[index] = relOmega;;
-		//desc.m_zeroRowAcceleration[index] = dFloat32(0.0f);
-		//desc.m_forceBounds[index].m_jointForce = jointForce;
-	}
+	const dFloat32 relGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
+
+	//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
+	dFloat32 dt = desc.m_timestep;
+	dFloat32 ks = D_POS_DAMP;
+	dFloat32 kd = D_VEL_DAMP;
+	dFloat32 ksd = dt * ks;
+	dFloat32 num = ks * relAngle + kd * relOmega + ksd * relOmega;
+	dFloat32 den = dFloat32(1.0f) + dt * kd + dt * ksd;
+	dFloat32 alphaError = num / den;
+
+	desc.m_flags[index] = 0;
+	desc.m_penetration[index] = relAngle;
+	desc.m_diagonalRegularizer[index] = m_defualtDiagonalRegularizer;
+	desc.m_jointAccel[index] = alphaError + relGyro;
+	desc.m_penetrationStiffness[index] = alphaError + relGyro;
+	desc.m_restitution[index] = dFloat32(0.0f);
+	desc.m_forceBounds[index].m_jointForce = jointForce;
+	desc.m_zeroRowAcceleration[index] = relOmega * desc.m_invTimestep + relGyro;
+
 	desc.m_rowsCount = index + 1;
 }
 
