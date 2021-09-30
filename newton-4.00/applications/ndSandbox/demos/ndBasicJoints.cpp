@@ -220,6 +220,13 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const dVector& or
 	ndBodyDynamic* const fixBody = world->GetSentinelBody();
 	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 
+	dVector massMatrix(body->GetMassMatrix());
+	dFloat32 maxInertia(dMax (dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z));
+	massMatrix.m_x = maxInertia;
+	massMatrix.m_y = maxInertia;
+	massMatrix.m_z = maxInertia;
+	body->SetMassMatrix(massMatrix);
+
 	body->SetOmega(dVector(0.0f, 10.0f, 20.0f, 0.0f));
 
 	ndJointDoubleHinge* const joint = new ndJointDoubleHinge (matrix, body, fixBody);
@@ -426,15 +433,14 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
-	BuildBallSocket(scene, dVector(0.0f, 0.0f, -7.0f, 1.0f));
-	BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 100.0f, 0.75f);
-	BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	//BuildBallSocket(scene, dVector(0.0f, 0.0f, -7.0f, 1.0f));
+	//BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
+	//BuildSlider(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 100.0f, 0.75f);
+	//BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
 	BuildDoubleHinge(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 100.0f, 0.75f);
-	BuildFixDistanceJoints(scene, dVector(10.0f, 0.0f, -5.0f, 1.0f));
-	BuildRollingFriction(scene, dVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
-	
-	AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
+	//BuildFixDistanceJoints(scene, dVector(10.0f, 0.0f, -5.0f, 1.0f));
+	//BuildRollingFriction(scene, dVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
+	//AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
 	dQuaternion rot;
 	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);

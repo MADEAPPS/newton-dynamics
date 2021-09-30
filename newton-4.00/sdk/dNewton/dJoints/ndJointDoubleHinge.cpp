@@ -38,6 +38,17 @@ ndJointDoubleHinge::~ndJointDoubleHinge()
 {
 }
 
+void ndJointDoubleHinge::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	// since this joint is not used that much
+	// for now double hinges do not have the hinge functionality
+}
+
 void ndJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
@@ -81,16 +92,5 @@ void ndJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	//
 	//const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	//AddAngularRowJacobian(desc, matrix1.m_right, angle1);
-}
-
-void ndJointDoubleHinge::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
-
-	// since this joint is not used that much
-	// for now double hinges do not have the hinge functionality
 }
 
