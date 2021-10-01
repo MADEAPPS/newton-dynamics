@@ -480,7 +480,7 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 		// f(w + dt) ~= f(w) + f'(w) * dt
 		
 		// calculating dw as the  f'(w) = d(wx, wy, wz) | dt
-		// dw/dt = a = (Tl - (wl x (wl * Il)) * Il^1
+		// dw/dt = a = (Tl - (wl x (wl * Il)) * Il^-1
 		
 		// expanding f(w) 
 		// f'(wx) = Ix * ax = Tx - (Iz - Iy) * wy * wz 

@@ -228,6 +228,12 @@ void ndBodyDynamic::IntegrateGyroSubstep(const dVector& timestep)
 		const dVector localGyroTorque(localOmega.CrossProduct(m_mass * localOmega));
 		m_gyroTorque = matrix.RotateVector(localGyroTorque);
 		m_gyroAlpha = matrix.RotateVector(localGyroTorque * m_invMass);
+
+#ifdef TEST_GYRO_SOLVER
+		m_gyroAlpha = dVector::m_zero;
+		m_gyroTorque = dVector::m_zero;
+#endif		
+
 	}
 	else
 	{
