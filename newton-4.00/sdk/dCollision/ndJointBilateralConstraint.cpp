@@ -276,7 +276,6 @@ void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& de
 
 	const dVector& omega0 = m_body0->GetOmega();
 	const dVector& omega1 = m_body1->GetOmega();
-
 	const dFloat32 relOmega = -(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular).AddHorizontal().GetScalar();
 
 	dAssert(desc.m_timestep > dFloat32(0.0f));

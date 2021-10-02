@@ -549,11 +549,6 @@ void ndDynamicsUpdate::InitBodyArray()
 					body->m_gyroRotation = body->m_rotation;
 					body->m_gyroTorque = body->m_omega.CrossProduct(angularMomentum);
 					body->m_gyroAlpha = body->m_invWorldInertiaMatrix.RotateVector(body->m_gyroTorque);
-
-					#ifdef TEST_GYRO_SOLVER
-					body->m_gyroTorque = dVector::m_zero;
-					body->m_gyroAlpha = dVector::m_zero;
-					#endif		
 				}
 			}
 		}

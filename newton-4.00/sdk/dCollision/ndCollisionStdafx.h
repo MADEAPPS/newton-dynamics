@@ -29,6 +29,8 @@
 
 #include <dCore.h>
 
+#define TEST_TWO_PASS_SOLVER
+
 #ifdef _D_COLLISION_DLL
 	#ifdef _D_COLLISION_EXPORT_DLL
 		#define D_COLLISION_API D_LIBRARY_EXPORT

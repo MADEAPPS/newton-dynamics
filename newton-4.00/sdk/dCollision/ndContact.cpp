@@ -56,9 +56,6 @@ ndContact::ndContact()
 	,m_skeletonIntraCollision(1)
 	,m_skeletonSelftCollision(1)
 {
-	//static int xxxxxx;
-	//xxxxx = xxxxxx;
-	//xxxxxx++;
 	m_active = false;
 }
 
@@ -115,7 +112,6 @@ void ndContact::CalculatePointDerivative(dInt32 index, ndConstraintDescritor& de
 	dAssert(m_body0);
 	dAssert(m_body1);
 
-	//desc.m_flags[index] = 0;
 	ndJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0;
 	ndJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1;
 	jacobian0.m_linear = dir;
@@ -285,7 +281,6 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 	ndRightHandSide* const rightHandSide = desc->m_rightHandSide;
 	const ndLeftHandSide* const leftHandSide = desc->m_leftHandSide;
 
-	//dTrace(("zzzzzz %d: ", xxxxxxx));
 	for (dInt32 k = 0; k < count; k++) 
 	{
 		// note: using restitution been negative to indicate that the acceleration was override

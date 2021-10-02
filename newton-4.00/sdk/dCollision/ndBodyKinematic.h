@@ -32,8 +32,6 @@ class ndSceneBodyNode;
 class ndSkeletonContainer;
 class ndJointBilateralConstraint;
 
-//#define TEST_GYRO_SOLVER
-
 D_MSV_NEWTON_ALIGN_32
 class ndBodyKinematic: public ndBody
 {
