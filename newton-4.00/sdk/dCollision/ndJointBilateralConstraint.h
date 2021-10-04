@@ -68,7 +68,6 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	D_COLLISION_API dFloat32 CalculateSpringDamperAcceleration(dFloat32 dt, dFloat32 ks, dFloat32 x, dFloat32 kd, dFloat32 v) const;
 	D_COLLISION_API void SetMassSpringDamperAcceleration(ndConstraintDescritor& desc, dFloat32 regularizer, dFloat32 spring, dFloat32 damper);
 	
-	
 	const dMatrix& GetLocalMatrix0() const;
 	const dMatrix& GetLocalMatrix1() const;
 
@@ -77,6 +76,7 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	dVector GetForceBody1() const;
 	dVector GetTorqueBody1() const;
 
+	bool IsBilateral() const;
 	bool IsCollidable() const;
 	void SetCollidable(bool state);
 	void SetSkeletonFlag(bool flag);
@@ -245,6 +245,11 @@ inline void ndJointBilateralConstraint::SetSkeletonFlag(bool flag)
 inline bool ndJointBilateralConstraint::IsCollidable() const
 {
 	return m_enableCollision ? true : false;
+}
+
+inline bool ndJointBilateralConstraint::IsBilateral() const
+{
+	return true;
 }
 
 inline void ndJointBilateralConstraint::SetCollidable(bool state)
