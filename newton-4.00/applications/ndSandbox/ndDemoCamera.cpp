@@ -86,20 +86,15 @@ dMatrix ndDemoCamera::CreateMatrixFromFrustum(dFloat32 Left, dFloat32 Right, dFl
 
 dMatrix ndDemoCamera::CreateLookAtMatrix(const dVector& eye, const dVector& center, const dVector& normUp)
 {
-	//dVector XAxis, YAxis, ZAxis, negEye;
 	dMatrix Result(dGetIdentityMatrix());
 	
 	dVector ZAxis (center - eye);
 	ZAxis = ZAxis & dVector::m_triplexMask;
 
-	//NormalizeVector(ZAxis);
 	ZAxis = ZAxis.Normalize();
-
 	dVector XAxis (ZAxis.CrossProduct(normUp));
 
-	//NormalizeVector(XAxis);
 	XAxis = XAxis.Normalize();
-
 	dVector YAxis (XAxis.CrossProduct(ZAxis));
 
 	Result[0] = XAxis;

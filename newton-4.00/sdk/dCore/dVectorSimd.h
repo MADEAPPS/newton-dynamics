@@ -224,8 +224,16 @@ class dVector
 	// return cross product
 	inline dVector CrossProduct (const dVector& B) const
 	{
-		return _mm_sub_ps (_mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 0, 2, 1)), _mm_shuffle_ps (B.m_type, B.m_type, PERMUTE_MASK(3, 1, 0, 2))),
-			   _mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PERMUTE_MASK(3, 0, 2, 1))));
+		//__m128 xxx = _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(3, 0, 2, 1)), _mm_shuffle_ps(B.m_type, B.m_type, PERMUTE_MASK(3, 1, 0, 2))),
+		//	                      _mm_mul_ps(_mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(3, 1, 0, 2)), _mm_shuffle_ps(B.m_type, B.m_type, PERMUTE_MASK(3, 0, 2, 1))));
+		__m128 tmp0_a (_mm_shuffle_ps(  m_type,   m_type, PERMUTE_MASK(3, 0, 2, 1)));
+		__m128 tmp0_b (_mm_shuffle_ps(B.m_type, B.m_type, PERMUTE_MASK(3, 1, 0, 2)));
+		__m128 tmp1_a (_mm_shuffle_ps(  m_type,   m_type, PERMUTE_MASK(3, 1, 0, 2)));
+		__m128 tmp1_b (_mm_shuffle_ps(B.m_type, B.m_type, PERMUTE_MASK(3, 0, 2, 1)));
+		__m128 tmp0 (_mm_mul_ps(tmp0_a, tmp0_b));
+		__m128 tmp1 (_mm_mul_ps(tmp1_a, tmp1_b));
+		__m128 tmp (_mm_sub_ps(tmp0, tmp1));
+		return tmp;
 	}
 
 	inline dVector DotProduct(const dVector& A) const
@@ -297,7 +305,7 @@ class dVector
 			__m128 tmp (_mm_hadd_ps (m_type, m_type));
 			return _mm_hadd_ps (tmp, tmp);
 		#else
-			__m128 tmp = _mm_add_ps (m_type, _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(1, 0, 3, 2)));
+			__m128 tmp (_mm_add_ps (m_type, _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(1, 0, 3, 2))));
 			return _mm_add_ps(tmp, _mm_shuffle_ps(tmp, tmp, PERMUTE_MASK(2, 3, 0, 1)));
 		#endif	
 	}
