@@ -100,6 +100,7 @@ class ndBodyKinematic: public ndBody
 	void SetMassMatrix(const dVector& massMatrix);
 
 	dVector GetGyroAlpha() const;
+	dVector GetGyroTorque() const;
 
 	bool GetSleepState() const;
 	void RestoreSleepState(bool state);
@@ -240,6 +241,11 @@ inline const dMatrix& ndBodyKinematic::GetInvInertiaMatrix() const
 inline dVector ndBodyKinematic::GetGyroAlpha() const
 {
 	return m_gyroAlpha;
+}
+
+inline dVector ndBodyKinematic::GetGyroTorque() const
+{
+	return m_gyroTorque;
 }
 
 inline void ndBodyKinematic::GetMassMatrix(dFloat32& Ixx, dFloat32& Iyy, dFloat32& Izz, dFloat32& mass)

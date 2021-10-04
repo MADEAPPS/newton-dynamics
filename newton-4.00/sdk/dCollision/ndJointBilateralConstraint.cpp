@@ -337,21 +337,13 @@ void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& de
 
 void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 {
-#ifdef TEST_TWO_PASS_SOLVER
-	dAssert(0);
-#else
+#ifndef TEST_TWO_PASS_SOLVER
 	const dVector& bodyVeloc0 = m_body0->m_veloc;
 	const dVector& bodyOmega0 = m_body0->m_omega;
 	const dVector& bodyVeloc1 = m_body1->m_veloc;
 	const dVector& bodyOmega1 = m_body1->m_omega;
-
 	const dVector& gyroAlpha0 = m_body0->m_gyroAlpha;
 	const dVector& gyroAlpha1 = m_body1->m_gyroAlpha;
-	
-	//dVector gAlpha0(m_body0->GetInvInertiaMatrix().RotateVector(bodyOmega0.CrossProduct(m_body0->CalculateAngularMomentum())));
-	//dVector gAlpha1(m_body1->GetInvInertiaMatrix().RotateVector(bodyOmega1.CrossProduct(m_body1->CalculateAngularMomentum())));
-	//dVector gyroAlpha0(m_body0->GetInvInertiaMatrix().RotateVector(bodyOmega0.CrossProduct(m_body0->CalculateAngularMomentum())));
-	//dVector gyroAlpha1(m_body1->GetInvInertiaMatrix().RotateVector(bodyOmega1.CrossProduct(m_body1->CalculateAngularMomentum())));
 
 	ndRightHandSide* const rhs = desc->m_rightHandSide;
 	const ndLeftHandSide* const row = desc->m_leftHandSide;

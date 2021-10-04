@@ -66,6 +66,17 @@ ndBodyDynamic::~ndBodyDynamic()
 {
 }
 
+void ndBodyDynamic::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+	desc.m_rootNode->LinkEndChild(childNode);
+	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+	ndBodyKinematic::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+
+	xmlSaveParam(childNode, "linearDampCoef", m_dampCoef.m_w);
+	xmlSaveParam(childNode, "angularDampCoef", m_dampCoef);
+}
+
 void ndBodyDynamic::SetForce(const dVector& force)
 {
 	m_externalForce = force & dVector::m_triplexMask;
@@ -181,22 +192,17 @@ void ndBodyDynamic::IntegrateVelocity(dFloat32 timestep)
 ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep) const
 {
 	ndJacobian velocStep;
-
 #ifdef TEST_TWO_PASS_SOLVER
-	dAssert(0);
-	return velocStep;
+	const dMatrix& matrix = m_matrix;
 #else
-	const dVector gyroAlpha0(dVector::m_zero);
-	const dVector gyroAlpha1(dVector::m_zero);
-
-	const dVector dtHalf(timestep);
 	const dMatrix matrix(m_gyroRotation, dVector::m_wOne);
-	
+#endif
+
+	const dVector localTorque(matrix.UnrotateVector(torque));
 	const dVector localOmega(matrix.UnrotateVector(m_omega));
-	const dVector localTorque(matrix.UnrotateVector(torque - m_gyroTorque));
 	
 	// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
-	const dVector dw(localOmega * dtHalf);
+	const dVector dw(localOmega * timestep);
 	const dMatrix jacobianMatrix(
 		dVector(m_mass[0], (m_mass[2] - m_mass[1]) * dw[2], (m_mass[2] - m_mass[1]) * dw[1], dFloat32(0.0f)),
 		dVector((m_mass[0] - m_mass[2]) * dw[2], m_mass[1], (m_mass[0] - m_mass[2]) * dw[0], dFloat32(1.0f)),
@@ -210,7 +216,6 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVe
 	velocStep.m_angular = matrix.RotateVector(gradientStep);
 	velocStep.m_linear = force.Scale(m_invMass.m_w) * timestep;
 	return velocStep;
-#endif
 }
 
 void ndBodyDynamic::IntegrateGyroSubstep(const dVector& timestep)
@@ -244,15 +249,4 @@ void ndBodyDynamic::IntegrateGyroSubstep(const dVector& timestep)
 		m_gyroTorque = dVector::m_zero;
 	}
 #endif
-}
-
-void ndBodyDynamic::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-	desc.m_rootNode->LinkEndChild(childNode);
-	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBodyKinematic::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
-
-	xmlSaveParam(childNode, "linearDampCoef", m_dampCoef.m_w);
-	xmlSaveParam(childNode, "angularDampCoef", m_dampCoef);
 }
