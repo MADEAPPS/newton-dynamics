@@ -179,6 +179,9 @@ void ndJointBilateralConstraint::SetMassSpringDamperAcceleration(ndConstraintDes
 	const ndJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0;
 	const ndJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1;
 
+#ifdef TEST_TWO_PASS_SOLVER
+	dAssert(0);
+#else
 	const dFloat32 relPosit = desc.m_penetration[index];
 	const dFloat32 relVeloc = -(veloc0.DotProduct(jacobian0.m_linear) + veloc1.DotProduct(jacobian1.m_linear) + omega0.DotProduct(jacobian0.m_angular) + omega1.DotProduct(jacobian1.m_angular)).GetScalar();
 
@@ -187,15 +190,15 @@ void ndJointBilateralConstraint::SetMassSpringDamperAcceleration(ndConstraintDes
 	
 	desc.m_diagonalRegularizer[index] = r;
 	SetMotorAcceleration(desc, accel);
+#endif
 }
 
 void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& desc, const dVector& pivot0, const dVector& pivot1, const dVector& dir)
 {
 	dgPointParam param;
-	InitPointParam(param, m_defualtDiagonalRegularizer, pivot0, pivot1);
+	InitPointParam(param, pivot0, pivot1);
 
 	const dInt32 index = desc.m_rowsCount;
-	ndForceImpactPair* const jointForce = &m_jointForce[index];
 	dAssert(dir.m_w == dFloat32(0.0f));
 
 	ndJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0;
@@ -218,17 +221,30 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 	m_motorAcceleration[index] = dFloat32(0.0f);
 	dAssert(desc.m_timestep > dFloat32(0.0f));
 
-	dVector positError(param.m_posit1 - param.m_posit0);
-	dFloat32 relPosit = positError.DotProduct(dir).GetScalar();
-
-	const dVector& veloc0 = m_body0->m_veloc;
-	const dVector& veloc1 = m_body1->m_veloc;
 	const dVector& omega0 = m_body0->m_omega;
 	const dVector& omega1 = m_body1->m_omega;
-	const dVector& gyroAlpha0 = m_body0->m_gyroAlpha;
-	const dVector& gyroAlpha1 = m_body1->m_gyroAlpha;
+	const dVector gyroAlpha0(m_body0->GetGyroAlpha());
+	const dVector gyroAlpha1(m_body1->GetGyroAlpha());
 	const dVector centripetal0(omega0.CrossProduct(omega0.CrossProduct(m_r0[index])));
 	const dVector centripetal1(omega1.CrossProduct(omega1.CrossProduct(m_r1[index])));
+
+	ndForceImpactPair* const jointForce = &m_jointForce[index];
+
+#ifdef TEST_TWO_PASS_SOLVER
+	const dVector jointAccel(
+		jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1 -
+		jacobian0.m_linear * centripetal0 - jacobian1.m_linear * centripetal1);
+	const dFloat32 relAccel = jointAccel.AddHorizontal().GetScalar();
+
+	desc.m_flags[index] = 0;
+	desc.m_jointAccel[index] = relAccel;
+	desc.m_forceBounds[index].m_jointForce = jointForce;
+	desc.m_diagonalRegularizer[index] = m_defualtDiagonalRegularizer;
+#else
+	const dVector& veloc0 = m_body0->m_veloc;
+	const dVector& veloc1 = m_body1->m_veloc;
+	const dVector positError(param.m_posit1 - param.m_posit0);
+	dFloat32 relPosit = positError.DotProduct(dir).GetScalar();
 
 	const dFloat32 relGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 	const dFloat32 relCentr = -(jacobian0.m_linear * centripetal0 + jacobian1.m_linear * centripetal1).AddHorizontal().GetScalar();
@@ -246,12 +262,13 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 	const dFloat32 relAccel = accelError + relCentr + relGyro;
 	desc.m_flags[index] = 0;
 	desc.m_penetration[index] = relPosit;
-	desc.m_diagonalRegularizer[index] = param.m_defaultDiagonalRegularizer;
+	desc.m_diagonalRegularizer[index] = m_defualtDiagonalRegularizer;
 	desc.m_jointAccel[index] = relAccel;
 	desc.m_penetrationStiffness[index] = relAccel;
 	desc.m_restitution[index] = dFloat32(0.0f);
 	desc.m_forceBounds[index].m_jointForce = jointForce;
 	desc.m_zeroRowAcceleration[index] = relVeloc * desc.m_invTimestep + relGyro;
+#endif
 
 	desc.m_rowsCount = index + 1;
 }
@@ -274,8 +291,11 @@ void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& de
 	jacobian1.m_angular = dir * dVector::m_negOne;
 	dAssert(jacobian1.m_angular.m_w == dFloat32(0.0f));
 
-	const dVector& omega0 = m_body0->GetOmega();
-	const dVector& omega1 = m_body1->GetOmega();
+	const dVector omega0 (m_body0->GetOmega());
+	const dVector omega1 (m_body1->GetOmega());
+	const dVector gyroAlpha0(m_body0->GetGyroAlpha());
+	const dVector gyroAlpha1(m_body1->GetGyroAlpha());
+
 	const dFloat32 relOmega = -(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular).AddHorizontal().GetScalar();
 
 	dAssert(desc.m_timestep > dFloat32(0.0f));
@@ -284,17 +304,14 @@ void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& de
 	m_rowIsMotor &= ~(1 << index);
 	m_motorAcceleration[index] = dFloat32(0.0f);
 	dAssert(desc.m_timestep);
-	#ifdef _DEBUG
-	const dFloat32 relCentr = -(omega0 * omega0.CrossProduct(jacobian0.m_angular) + omega1 * omega1.CrossProduct(jacobian1.m_angular)).AddHorizontal().GetScalar();
-	// allow for some large error since this is affected bu numerical precision a lot
-	dAssert(dAbs(relCentr) < dFloat32(4.0f));
-	#endif
 
-	const dVector& gyroAlpha0 = m_body0->m_gyroAlpha;
-	const dVector& gyroAlpha1 = m_body1->m_gyroAlpha;
-	//dVector gAlpha0(m_body0->GetInvInertiaMatrix().RotateVector(omega0.CrossProduct(m_body0->CalculateAngularMomentum())));
-	//dVector gAlpha1(m_body1->GetInvInertiaMatrix().RotateVector(omega1.CrossProduct(m_body1->CalculateAngularMomentum())));
 	const dFloat32 relGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
+
+#ifdef TEST_TWO_PASS_SOLVER
+	desc.m_flags[index] = 0;
+	desc.m_jointAccel[index] = relGyro;
+	desc.m_diagonalRegularizer[index] = m_defualtDiagonalRegularizer;
+#else
 
 	//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 	dFloat32 dt = desc.m_timestep;
@@ -311,18 +328,23 @@ void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& de
 	desc.m_jointAccel[index] = alphaError + relGyro;
 	desc.m_penetrationStiffness[index] = alphaError + relGyro;
 	desc.m_restitution[index] = dFloat32(0.0f);
-	desc.m_forceBounds[index].m_jointForce = jointForce;
 	desc.m_zeroRowAcceleration[index] = relOmega * desc.m_invTimestep + relGyro;
+#endif
 
+	desc.m_forceBounds[index].m_jointForce = jointForce;
 	desc.m_rowsCount = index + 1;
 }
 
 void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 {
+#ifdef TEST_TWO_PASS_SOLVER
+	dAssert(0);
+#else
 	const dVector& bodyVeloc0 = m_body0->m_veloc;
 	const dVector& bodyOmega0 = m_body0->m_omega;
 	const dVector& bodyVeloc1 = m_body1->m_veloc;
 	const dVector& bodyOmega1 = m_body1->m_omega;
+
 	const dVector& gyroAlpha0 = m_body0->m_gyroAlpha;
 	const dVector& gyroAlpha1 = m_body1->m_gyroAlpha;
 	
@@ -370,4 +392,5 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 			rhs[k].m_coordenateAccel = rhs[k].m_deltaAccel + aRelErr + (relGyro - relCentr).AddHorizontal().GetScalar();
 		}
 	}
+#endif
 }

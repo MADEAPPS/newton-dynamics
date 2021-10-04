@@ -156,20 +156,19 @@ void ndBodyDynamic::AddDampingAcceleration(dFloat32 timestep)
 	if (dAbs(m_cachedTimeStep - timestep) > dFloat32(1.0e-6f)) 
 	{
 		m_cachedTimeStep = timestep;
-		const dFloat32 tau = dFloat32(60.0f) * timestep;
+		// assume a nominal 60 frame seconds time step.
+		dFloat32 tau = dFloat32(60.0f) * timestep;
+		// recalculate damping to match the time independent drag
 		m_cachedDampCoef.m_x = dPow(dFloat32(1.0f) - m_dampCoef.m_x, tau);
 		m_cachedDampCoef.m_y = dPow(dFloat32(1.0f) - m_dampCoef.m_y, tau);
 		m_cachedDampCoef.m_z = dPow(dFloat32(1.0f) - m_dampCoef.m_z, tau);
 		m_cachedDampCoef.m_w = dPow(dFloat32(1.0f) - m_dampCoef.m_w, tau);
 	}
-	dVector damp (m_cachedDampCoef);
-
-	//dVector damp(GetDampCoeffcient(timestep));
-	dVector omegaDamp(damp & dVector::m_triplexMask);
-	dVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
 	
-	m_veloc = m_veloc.Scale(damp.m_w);
+	const dVector omegaDamp(m_cachedDampCoef & dVector::m_triplexMask);
+	const dVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
 	m_omega = m_matrix.RotateVector(omega);
+	m_veloc = m_veloc.Scale(m_cachedDampCoef.m_w);
 }
 
 void ndBodyDynamic::IntegrateVelocity(dFloat32 timestep)
@@ -183,7 +182,13 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVe
 {
 	ndJacobian velocStep;
 
-	//dVector dtHalf(timestep * dVector::m_half);
+#ifdef TEST_TWO_PASS_SOLVER
+	dAssert(0);
+	return velocStep;
+#else
+	const dVector gyroAlpha0(dVector::m_zero);
+	const dVector gyroAlpha1(dVector::m_zero);
+
 	const dVector dtHalf(timestep);
 	const dMatrix matrix(m_gyroRotation, dVector::m_wOne);
 	
@@ -205,10 +210,14 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVe
 	velocStep.m_angular = matrix.RotateVector(gradientStep);
 	velocStep.m_linear = force.Scale(m_invMass.m_w) * timestep;
 	return velocStep;
+#endif
 }
 
 void ndBodyDynamic::IntegrateGyroSubstep(const dVector& timestep)
 {
+#ifdef TEST_TWO_PASS_SOLVER
+	dAssert(0);
+#else
 	const dFloat32 omegaMag2 = m_omega.DotProduct(m_omega).GetScalar() + dFloat32(1.0e-12f);
 	const dFloat32 tol = (dFloat32(0.0125f) * dDegreeToRad);
 	if (omegaMag2 > (tol * tol))
@@ -234,6 +243,7 @@ void ndBodyDynamic::IntegrateGyroSubstep(const dVector& timestep)
 		m_gyroAlpha = dVector::m_zero;
 		m_gyroTorque = dVector::m_zero;
 	}
+#endif
 }
 
 void ndBodyDynamic::Save(const dLoadSaveBase::dSaveDescriptor& desc) const

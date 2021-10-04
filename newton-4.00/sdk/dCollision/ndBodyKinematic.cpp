@@ -93,7 +93,9 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_residualOmega(dVector::m_zero)
 	,m_gyroAlpha(dVector::m_zero)
 	,m_gyroTorque(dVector::m_zero)
+#ifndef TEST_TWO_PASS_SOLVER
 	,m_gyroRotation()
+#endif
 	,m_jointList()
 	,m_contactList()
 	,m_lock()
@@ -124,7 +126,9 @@ ndBodyKinematic::ndBodyKinematic(const dLoadSaveBase::dLoadDescriptor& desc)
 	,m_residualOmega(dVector::m_zero)
 	,m_gyroAlpha(dVector::m_zero)
 	,m_gyroTorque(dVector::m_zero)
+#ifndef TEST_TWO_PASS_SOLVER
 	,m_gyroRotation()
+#endif
 	,m_jointList()
 	,m_contactList()
 	,m_lock()

@@ -92,7 +92,6 @@ class dgPointParam
 	dVector m_r1;
 	dVector m_posit0;
 	dVector m_posit1;
-	dFloat32 m_defaultDiagonalRegularizer;
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -180,12 +179,17 @@ class ndConstraintDescritor
 	public:
 	ndJacobianPair m_jacobian[D_CONSTRAINT_MAX_ROWS];
 	ndBilateralBounds m_forceBounds[D_CONSTRAINT_MAX_ROWS];
+
 	dFloat32 m_jointAccel[D_CONSTRAINT_MAX_ROWS];
+	dFloat32 m_diagonalRegularizer[D_CONSTRAINT_MAX_ROWS];
+#ifdef TEST_TWO_PASS_SOLVER
+#else
 	dFloat32 m_restitution[D_CONSTRAINT_MAX_ROWS];
 	dFloat32 m_penetration[D_CONSTRAINT_MAX_ROWS];
-	dFloat32 m_diagonalRegularizer[D_CONSTRAINT_MAX_ROWS];
 	dFloat32 m_penetrationStiffness[D_CONSTRAINT_MAX_ROWS];
 	dFloat32 m_zeroRowAcceleration[D_CONSTRAINT_MAX_ROWS];
+#endif
+
 	dInt32 m_flags[D_CONSTRAINT_MAX_ROWS];
 	dFloat32 m_timestep;
 	dFloat32 m_invTimestep;
@@ -208,20 +212,20 @@ class ndRightHandSide
 	dFloat32 m_diagDamp;
 	dFloat32 m_invJinvMJt;
 	dFloat32 m_coordenateAccel;
-
+	dFloat32 m_diagonalRegularizer;
 	dFloat32 m_lowerBoundFrictionCoefficent;
 	dFloat32 m_upperBoundFrictionCoefficent;
+#ifdef TEST_TWO_PASS_SOLVER
+#else
 	dFloat32 m_deltaAccel;
 	dFloat32 m_restitution;
-
 	dFloat32 m_maxImpact;
 	dFloat32 m_penetration;
-	dFloat32 m_diagonalRegularizer;
 	dFloat32 m_penetrationStiffness;
-
+#endif
 	ndForceImpactPair* m_jointFeebackForce;
 	dInt32 m_normalForceIndex;
-	dInt32 m_normalForceIndexFlat;
+	dInt32 m_normalForceFlatIndex;
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -247,7 +251,7 @@ class ndConstraint
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc) = 0;
 	
 	virtual void DebugJoint(ndConstraintDebugCallback&) const;
-	void InitPointParam(dgPointParam& param, dFloat32 stiffness, const dVector& p0Global, const dVector& p1Global) const;
+	void InitPointParam(dgPointParam& param, const dVector& p0Global, const dVector& p1Global) const;
 
 	dFloat32 m_preconditioner0;
 	dFloat32 m_preconditioner1;

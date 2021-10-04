@@ -180,8 +180,10 @@ class ndBodyKinematic: public ndBody
 	dVector m_residualOmega;
 	dVector m_gyroAlpha;
 	dVector m_gyroTorque;
+#ifdef TEST_TWO_PASS_SOLVER 
+#else
 	dQuaternion m_gyroRotation;
-
+#endif
 	ndJointList m_jointList;
 	ndContactMap m_contactList;
 	mutable dSpinLock m_lock;

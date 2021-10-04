@@ -29,7 +29,7 @@
 
 #include <dCore.h>
 
-#define TEST_TWO_PASS_SOLVER
+//#define TEST_TWO_PASS_SOLVER
 
 #ifdef _D_COLLISION_DLL
 	#ifdef _D_COLLISION_EXPORT_DLL
