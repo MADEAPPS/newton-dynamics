@@ -221,7 +221,14 @@ class dVector
 		return (*this = _mm_mul_ps(m_type, A.m_type));
 	}
 
-	// return cross product
+	// return 4d cross product
+	inline dVector DotProduct(const dVector& A) const
+	{
+		const dVector tmp(_mm_mul_ps(m_type, A.m_type));
+		return tmp.AddHorizontal();
+	}
+
+	// return 3d cross product
 	inline dVector CrossProduct (const dVector& B) const
 	{
 		//__m128 xxx = _mm_sub_ps(_mm_mul_ps(_mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(3, 0, 2, 1)), _mm_shuffle_ps(B.m_type, B.m_type, PERMUTE_MASK(3, 1, 0, 2))),
@@ -236,12 +243,7 @@ class dVector
 		return tmp;
 	}
 
-	inline dVector DotProduct(const dVector& A) const
-	{
-		const dVector tmp(_mm_mul_ps(m_type, A.m_type));
-		return tmp.AddHorizontal();
-	}
-
+	// return 4d cross product
 	inline dVector CrossProduct (const dVector& A, const dVector& B) const
 	{
 		dFloat32 cofactor[3][3];
@@ -711,12 +713,6 @@ class dBigVector
 		return *this - A * B;
 	}
 
-	// return cross product
-	inline dBigVector CrossProduct(const dBigVector& B) const
-	{
-		return dBigVector(m_y * B.m_z - m_z * B.m_y, m_z * B.m_x - m_x * B.m_z, m_x * B.m_y - m_y * B.m_x, m_w);
-	}
-
 	inline dBigVector AddHorizontal() const
 	{
 		__m128d tmp0(_mm_add_pd(m_typeHigh, m_typeLow));
@@ -924,6 +920,13 @@ class dBigVector
 		return tmp.AddHorizontal();
 	}
 
+	// return 3d cross product
+	inline dBigVector CrossProduct(const dBigVector& B) const
+	{
+		return dBigVector(m_y * B.m_z - m_z * B.m_y, m_z * B.m_x - m_x * B.m_z, m_x * B.m_y - m_y * B.m_x, m_w);
+	}
+
+	// return 4d cross product
 	inline dBigVector CrossProduct(const dBigVector& A, const dBigVector& B) const
 	{
 		dFloat64 cofactor[3][3];

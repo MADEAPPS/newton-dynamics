@@ -185,7 +185,6 @@ inline void ndJointBilateralConstraint::SetMotorAcceleration(ndConstraintDescrit
 	desc.m_flags[index] = 0;
 	m_motorAcceleration[index] = acceleration;
 	desc.m_jointAccel[index] = acceleration;
-	desc.m_penetrationStiffness[index] = acceleration;
 }
 
 inline void ndJointBilateralConstraint::SetLowerFriction(ndConstraintDescritor& desc, dFloat32 friction)

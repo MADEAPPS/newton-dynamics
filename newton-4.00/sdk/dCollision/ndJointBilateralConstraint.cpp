@@ -234,11 +234,10 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 
 	desc.m_flags[index] = 0;
 	//desc.m_penetration[index] = relPosit;
-	desc.m_diagonalRegularizer[index] = param.m_defaultDiagonalRegularizer;
 	desc.m_jointAccel[index] = relAccel;
-	desc.m_penetrationStiffness[index] = relAccel;
 	desc.m_restitution[index] = dFloat32(0.0f);
 	desc.m_forceBounds[index].m_jointForce = jointForce;
+	desc.m_diagonalRegularizer[index] = param.m_defaultDiagonalRegularizer;
 	//desc.m_zeroRowAcceleration[index] = relVeloc * desc.m_invTimestep + relGyro;
 
 #else
@@ -262,12 +261,12 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 
 	const dFloat32 relAccel = accelError + relCentr + relGyro;
 	desc.m_flags[index] = 0;
-	desc.m_penetration[index] = relPosit;
-	desc.m_diagonalRegularizer[index] = m_defualtDiagonalRegularizer;
 	desc.m_jointAccel[index] = relAccel;
-	desc.m_penetrationStiffness[index] = relAccel;
+	desc.m_penetration[index] = relPosit;
 	desc.m_restitution[index] = dFloat32(0.0f);
+	desc.m_penetrationStiffness[index] = dFloat32(0.0f);
 	desc.m_forceBounds[index].m_jointForce = jointForce;
+	desc.m_diagonalRegularizer[index] = m_defualtDiagonalRegularizer;
 	desc.m_zeroRowAcceleration[index] = relVeloc * desc.m_invTimestep + relGyro;
 #endif
 
@@ -326,11 +325,11 @@ void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& de
 
 	desc.m_flags[index] = 0;
 	desc.m_penetration[index] = relAngle;
-	desc.m_diagonalRegularizer[index] = m_defualtDiagonalRegularizer;
 	desc.m_jointAccel[index] = alphaError + relGyro;
-	desc.m_penetrationStiffness[index] = alphaError + relGyro;
 	desc.m_restitution[index] = dFloat32(0.0f);
+	desc.m_penetrationStiffness[index] = dFloat32(0.0f);
 	desc.m_forceBounds[index].m_jointForce = jointForce;
+	desc.m_diagonalRegularizer[index] = m_defualtDiagonalRegularizer;
 	desc.m_zeroRowAcceleration[index] = relOmega * desc.m_invTimestep + relGyro;
 #endif
 	desc.m_rowsCount = index + 1;
@@ -347,23 +346,18 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 	const dVector gyroAlpha0(dVector::m_zero);
 	const dVector gyroAlpha1(dVector::m_zero);
 #else
-	const dVector& gyroAlpha0 = m_body0->m_gyroAlpha;
-	const dVector& gyroAlpha1 = m_body1->m_gyroAlpha;
+	const dVector gyroAlpha0(m_body0->GetGyroAlpha());
+	const dVector gyroAlpha1(m_body1->GetGyroAlpha());
 #endif
-
-	//dVector gAlpha0(m_body0->GetInvInertiaMatrix().RotateVector(bodyOmega0.CrossProduct(m_body0->CalculateAngularMomentum())));
-	//dVector gAlpha1(m_body1->GetInvInertiaMatrix().RotateVector(bodyOmega1.CrossProduct(m_body1->CalculateAngularMomentum())));
-	//dVector gyroAlpha0(m_body0->GetInvInertiaMatrix().RotateVector(bodyOmega0.CrossProduct(m_body0->CalculateAngularMomentum())));
-	//dVector gyroAlpha1(m_body1->GetInvInertiaMatrix().RotateVector(bodyOmega1.CrossProduct(m_body1->CalculateAngularMomentum())));
 
 	ndRightHandSide* const rhs = desc->m_rightHandSide;
 	const ndLeftHandSide* const row = desc->m_leftHandSide;
 	dAssert(desc->m_timestep > dFloat32(0.0f));
 	dAssert(desc->m_invTimestep > dFloat32(0.0f));
 
+	const dFloat32 dt = desc->m_timestep;
 	const dFloat32 ks = D_POS_DAMP * dFloat32(0.5f);
 	const dFloat32 kd = D_VEL_DAMP * dFloat32(4.0f);
-	const dFloat32 dt = desc->m_timestep;
 	for (dInt32 k = 0; k < desc->m_rowsCount; k++)
 	{
 		if (m_rowIsMotor & (1 << k))
