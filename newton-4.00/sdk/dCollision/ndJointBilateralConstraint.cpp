@@ -24,8 +24,8 @@
 #include "ndBodyKinematic.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_VEL_DAMP				 (dFloat32(100.0f))
-#define D_POS_DAMP				 (dFloat32(1500.0f))
+#define D_VEL_DAMP			 dFloat32(100.0f)
+#define D_POS_DAMP			 dFloat32(1500.0f)
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointBilateralConstraint)
 
