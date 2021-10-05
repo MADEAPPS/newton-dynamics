@@ -129,7 +129,6 @@ void ndContact::CalculatePointDerivative(dInt32 index, ndConstraintDescritor& de
 void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, dInt32 normalIndex, dInt32& frictionIndex)
 {
 	dgPointParam pointData;
-	//InitPointParam(pointData, dFloat32(1.0f), contact.m_point, contact.m_point);
 	InitPointParam(pointData, contact.m_point, contact.m_point);
 	CalculatePointDerivative(normalIndex, desc, contact.m_normal, pointData);
 
@@ -148,9 +147,6 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	dFloat32 relSpeed = -(normalJacobian0.m_linear * veloc0 + normalJacobian0.m_angular * omega0 + normalJacobian1.m_linear * veloc1 + normalJacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 	dFloat32 penetration = dClamp(contact.m_penetration - D_RESTING_CONTACT_PENETRATION, dFloat32(0.0f), dFloat32(0.5f));
 	desc.m_flags[normalIndex] = contact.m_material.m_flags & m_isSoftContact;
-#ifdef TEST_TWO_PASS_SOLVER
-	dAssert(0);
-#else
 	desc.m_penetration[normalIndex] = penetration;
 	desc.m_restitution[normalIndex] = restitutionCoefficient;
 	desc.m_forceBounds[normalIndex].m_low = dFloat32(0.0f);
@@ -265,14 +261,10 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		}
 		desc.m_forceBounds[jacobIndex].m_jointForce = (ndForceImpactPair*)&contact.m_dir1_Force;
 	}
-#endif
 }
 
 void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 {
-#ifdef TEST_TWO_PASS_SOLVER
-	dAssert(0);
-#else
 	const dVector bodyOmega0(m_body0->GetOmega());
 	const dVector bodyOmega1(m_body1->GetOmega());
 	const dVector bodyVeloc0(m_body0->GetVelocity());
@@ -336,5 +328,5 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 			//dTrace(("%f ", rhs->m_coordenateAccel));
 		}
 	}
-#endif	
+	//dTrace(("\n"));
 }

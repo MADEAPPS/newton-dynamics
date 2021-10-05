@@ -173,12 +173,7 @@ inline dFloat32 ndJointBilateralConstraint::GetMotorZeroAcceleration(ndConstrain
 	const dInt32 index = desc.m_rowsCount - 1;
 	dAssert(index >= 0);
 	dAssert(index < dInt32(m_maxDof));
-#ifdef TEST_TWO_PASS_SOLVER
-	dAssert(0);
-	return 0;
-#else
 	return desc.m_zeroRowAcceleration[index];
-#endif
 }
 
 inline void ndJointBilateralConstraint::SetMotorAcceleration(ndConstraintDescritor& desc, dFloat32 acceleration)
@@ -190,11 +185,7 @@ inline void ndJointBilateralConstraint::SetMotorAcceleration(ndConstraintDescrit
 	desc.m_flags[index] = 0;
 	m_motorAcceleration[index] = acceleration;
 	desc.m_jointAccel[index] = acceleration;
-#ifdef TEST_TWO_PASS_SOLVER
-	dAssert(0);
-#else
 	desc.m_penetrationStiffness[index] = acceleration;
-#endif
 }
 
 inline void ndJointBilateralConstraint::SetLowerFriction(ndConstraintDescritor& desc, dFloat32 friction)

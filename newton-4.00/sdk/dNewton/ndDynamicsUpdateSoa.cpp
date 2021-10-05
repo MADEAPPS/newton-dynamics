@@ -967,9 +967,6 @@ void ndDynamicsUpdateSoa::GetJacobianDerivatives(ndConstraint* const joint)
 		ndLeftHandSide* const row = &m_leftHandSide[baseIndex + i];
 		ndRightHandSide* const rhs = &m_rightHandSide[baseIndex + i];
 
-#ifdef TEST_TWO_PASS_SOLVER
-		dAssert(0);
-#else
 		row->m_Jt = constraintParam.m_jacobian[i];
 		rhs->m_diagDamp = dFloat32(0.0f);
 		rhs->m_diagonalRegularizer = dMax(constraintParam.m_diagonalRegularizer[i], dFloat32(1.0e-5f));
@@ -984,7 +981,6 @@ void ndDynamicsUpdateSoa::GetJacobianDerivatives(ndConstraint* const joint)
 
 		dAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -1);
 		rhs->m_normalForceIndex = constraintParam.m_forceBounds[i].m_normalIndex;
-#endif
 	}
 }
 
@@ -1011,6 +1007,8 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 			const dInt32 m1 = body1->m_index;
 			const dInt32 index = joint->m_rowStart;
 			const dInt32 count = joint->m_rowCount;
+
+			const bool isBilateral = joint->IsBilateral();
 
 			const dMatrix& invInertia0 = body0->m_invWorldInertiaMatrix;
 			const dMatrix& invInertia1 = body1->m_invWorldInertiaMatrix;
@@ -1059,12 +1057,8 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 			const dFloat32 preconditioner0 = joint->m_preconditioner0;
 			const dFloat32 preconditioner1 = joint->m_preconditioner1;
 
-			const bool isBilateral = joint->IsBilateral();
 			for (dInt32 i = 0; i < count; i++)
 			{
-#ifdef TEST_TWO_PASS_SOLVER
-				dAssert(0);
-#else
 				ndLeftHandSide* const row = &m_leftHandSide[index + i];
 				ndRightHandSide* const rhs = &m_rightHandSide[index + i];
 
@@ -1107,7 +1101,6 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 				torqueAcc0 = torqueAcc0 + JtM0.m_angular * f0;
 				forceAcc1 = forceAcc1 + JtM1.m_linear * f1;
 				torqueAcc1 = torqueAcc1 + JtM1.m_angular * f1;
-#endif
 			}
 
 			ndJacobian& outBody0 = m_internalForces[m0];
@@ -1324,9 +1317,6 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 						#endif
 						for (dInt32 k = 0; k < D_SOA_WORD_GROUP_SIZE; k++)
 						{
-#ifdef TEST_TWO_PASS_SOLVER
-							dAssert(0);
-#else
 							const ndConstraint* const soaJoint = jointArray[index + k];
 							const ndRightHandSide* const rhs = &rightHandSide[soaJoint->m_rowStart + j];
 							row.m_force[k] = rhs->m_force;
@@ -1336,7 +1326,6 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 							normalIndex[k] = (rhs->m_normalForceIndex + 1) * D_SOA_WORD_GROUP_SIZE + k;
 							row.m_lowerBoundFrictionCoefficent[k] = rhs->m_lowerBoundFrictionCoefficent;
 							row.m_upperBoundFrictionCoefficent[k] = rhs->m_upperBoundFrictionCoefficent;
-#endif
 						}
 					}
 				}
@@ -1388,9 +1377,6 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 						{
 							for (dInt32 k = 0; k < joint->m_rowCount; k++)
 							{
-#ifdef TEST_TWO_PASS_SOLVER
-								dAssert(0);
-#else
 								ndSoa::ndSoaMatrixElement& row = massMatrix[soaRowBase + k];
 								const ndLeftHandSide* const lhs = &leftHandSide[joint->m_rowStart + k];
 					
@@ -1434,7 +1420,6 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 								normalIndex[j] = (rhs->m_normalForceIndex + 1) * D_SOA_WORD_GROUP_SIZE + j;
 								row.m_lowerBoundFrictionCoefficent[j] = rhs->m_lowerBoundFrictionCoefficent;
 								row.m_upperBoundFrictionCoefficent[j] = rhs->m_upperBoundFrictionCoefficent;
-#endif
 							}
 						}
 					}
@@ -1483,15 +1468,11 @@ void ndDynamicsUpdateSoa::UpdateForceFeedback()
 
 				for (dInt32 j = 0; j < rows; j++)
 				{
-#ifdef TEST_TWO_PASS_SOLVER
-					dAssert(0);
-#else
 					const ndRightHandSide* const rhs = &rightHandSide[j + first];
 					dAssert(dCheckFloat(rhs->m_force));
 					rhs->m_jointFeebackForce->Push(rhs->m_force);
 					rhs->m_jointFeebackForce->m_force = rhs->m_force;
 					rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;
-#endif
 				}
 
 				if (joint->GetAsBilateral())
@@ -1676,12 +1657,8 @@ void ndDynamicsUpdateSoa::CalculateJointsAcceleration()
 						const dInt32 base = Joint->m_rowStart;
 						for (dInt32 k = 0; k < rowCount; k++)
 						{
-#ifdef TEST_TWO_PASS_SOLVER
-							dAssert(0);
-#else
 							ndSoaMatrixElement* const row = &massMatrix[soaRowStartBase + k];
 							row->m_coordenateAccel[j] = rightHandSide[base + k].m_coordenateAccel;
-#endif
 						}
 					}
 				}
@@ -1696,12 +1673,8 @@ void ndDynamicsUpdateSoa::CalculateJointsAcceleration()
 							const dInt32 base = Joint->m_rowStart;
 							for (dInt32 k = 0; k < rowCount; k++)
 							{
-#ifdef TEST_TWO_PASS_SOLVER
-								dAssert(0);
-#else
 								ndSoaMatrixElement* const row = &massMatrix[soaRowStartBase + k];
 								row->m_coordenateAccel[j] = rightHandSide[base + k].m_coordenateAccel;
-#endif
 							}
 						}
 					}
@@ -2112,13 +2085,9 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 					dInt32 const rowStartBase = joint->m_rowStart;
 					for (dInt32 j = 0; j < rowCount; j++)
 					{
-#ifdef TEST_TWO_PASS_SOLVER
-						dAssert(0);
-#else
 						const ndSoaMatrixElement* const row = &massMatrix[j];
 						rightHandSide[j + rowStartBase].m_force = row->m_force[i];
 						rightHandSide[j + rowStartBase].m_maxImpact = dMax(dAbs(row->m_force[i]), rightHandSide[j + rowStartBase].m_maxImpact);
-#endif
 					}
 				}
 			}

@@ -58,15 +58,11 @@ inline dInt32 ndSkeletonContainer::ndNode::GetAuxiliaryRows(const ndRightHandSid
 		const dInt32 first = m_joint->m_rowStart;
 		for (dInt32 i = 0; i < count; i++) 
 		{
-#ifdef TEST_TWO_PASS_SOLVER
-			dAssert(0);
-#else
 			const ndRightHandSide* const rhs = &rightHandSide[i + first];
 			if (!((rhs->m_lowerBoundFrictionCoefficent <= dFloat32(-D_MAX_SKELETON_LCP_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= dFloat32(D_MAX_SKELETON_LCP_VALUE)))) 
 			{
 				rowCount++;
 			}
-#endif
 		}
 	}
 	return rowCount;
@@ -125,9 +121,6 @@ inline void ndSkeletonContainer::ndNode::GetJacobians(const ndLeftHandSide* cons
 	{
 		for (dInt32 i = 0; i < m_dof; i++) 
 		{
-#ifdef TEST_TWO_PASS_SOLVER
-			dAssert(0);
-#else
 			const dInt32 k = m_sourceJacobianIndex[i];
 			const ndRightHandSide* const rhs = &rightHandSide[start + k];
 			const ndLeftHandSide* const row = &leftHandSide[start + k];
@@ -141,7 +134,6 @@ inline void ndSkeletonContainer::ndNode::GetJacobians(const ndLeftHandSide* cons
 				bodyJt[i][3 + j] = bodyJt[i][4 + j];
 				jointJ[i][3 + j] = jointJ[i][4 + j];
 			}
-#endif
 		}
 	}
 }
@@ -893,9 +885,6 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 		const dInt32 auxiliaryDof = joint->m_rowCount - primaryDof;
 		for (dInt32 j = 0; j < auxiliaryDof; j++) 
 		{
-#ifdef TEST_TWO_PASS_SOLVER
-			dAssert(0);
-#else
 			const dInt32 index = node->m_sourceJacobianIndex[primaryDof + j];
 			const ndRightHandSide* const rhs = &m_rightHandSide[first + index];
 
@@ -907,7 +896,6 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 			boundRow[auxiliaryIndex] = boundIndex;
 			m_blockSize += boundIndex;
 			auxiliaryIndex++;
-#endif
 		}
 	}
 	dAssert(m_loopRowCount == (m_auxiliaryRowCount - auxiliaryIndex));
@@ -923,9 +911,6 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 		const dInt32 auxiliaryDof = joint->m_rowCount;
 		for (dInt32 i = 0; i < auxiliaryDof; i++) 
 		{
-#ifdef TEST_TWO_PASS_SOLVER
-			dAssert(0);
-#else
 			const ndRightHandSide* const rhs = &m_rightHandSide[first + i];
 			m_pairs[auxiliaryIndex + primaryCount].m_m0 = m0;
 			m_pairs[auxiliaryIndex + primaryCount].m_m1 = m1;
@@ -935,7 +920,6 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 			boundRow[auxiliaryIndex] = boundIndex;
 			m_blockSize += boundIndex;
 			auxiliaryIndex++;
-#endif
 		}
 	}
 
@@ -1070,9 +1054,6 @@ inline void ndSkeletonContainer::CalculateJointAccel(const ndJacobian* const int
 
 		for (dInt32 j = 0; j < dof; j++) 
 		{
-#ifdef TEST_TWO_PASS_SOLVER
-			dAssert(0);
-#else
 			const dInt32 k = node->m_sourceJacobianIndex[j];
 			const ndLeftHandSide* const row = &m_leftHandSide[first + k];
 			const ndRightHandSide* const rhs = &m_rightHandSide[first + k];
@@ -1080,7 +1061,6 @@ inline void ndSkeletonContainer::CalculateJointAccel(const ndJacobian* const int
 				row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
 				row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
 			a.m_joint[j] = -(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp - diag.AddHorizontal().GetScalar());
-#endif
 		}
 	}
 	dAssert((nodeCount - 1) == m_nodesOrder[nodeCount - 1]->m_index);
@@ -1378,9 +1358,7 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 		const ndJacobian& y1 = internalForces[m1];
 
 		f[primaryCount + i] = dFloat32(0.0f);
-#ifdef TEST_TWO_PASS_SOLVER
-		dAssert(0);
-#else
+
 		dVector acc(
 			row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
 			row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
@@ -1389,7 +1367,6 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 		u0[i] = rhs->m_force;
 		low[i] = rhs->m_lowerBoundFrictionCoefficent;
 		high[i] = rhs->m_upperBoundFrictionCoefficent;
-#endif
 	}
 
 	for (dInt32 i = 0; i < m_auxiliaryRowCount; i++) 

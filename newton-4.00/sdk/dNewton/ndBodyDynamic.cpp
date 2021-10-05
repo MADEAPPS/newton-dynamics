@@ -175,7 +175,7 @@ void ndBodyDynamic::AddDampingAcceleration(dFloat32 timestep)
 		m_cachedDampCoef.m_z = dPow(dFloat32(1.0f) - m_dampCoef.m_z, tau);
 		m_cachedDampCoef.m_w = dPow(dFloat32(1.0f) - m_dampCoef.m_w, tau);
 	}
-	
+
 	const dVector omegaDamp(m_cachedDampCoef & dVector::m_triplexMask);
 	const dVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
 	m_omega = m_matrix.RotateVector(omega);
@@ -193,13 +193,13 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVe
 {
 	ndJacobian velocStep;
 #ifdef TEST_TWO_PASS_SOLVER
-	const dMatrix& matrix = m_matrix;
+	dAssert(0);
+	return velocStep;
 #else
-	const dMatrix matrix(m_gyroRotation, dVector::m_wOne);
-#endif
 
-	const dVector localTorque(matrix.UnrotateVector(torque));
+	const dMatrix matrix(m_gyroRotation, dVector::m_wOne);
 	const dVector localOmega(matrix.UnrotateVector(m_omega));
+	const dVector localTorque(matrix.UnrotateVector(torque));
 	
 	// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
 	const dVector dw(localOmega * timestep);
@@ -216,6 +216,7 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVe
 	velocStep.m_angular = matrix.RotateVector(gradientStep);
 	velocStep.m_linear = force.Scale(m_invMass.m_w) * timestep;
 	return velocStep;
+#endif
 }
 
 void ndBodyDynamic::IntegrateGyroSubstep(const dVector& timestep)
