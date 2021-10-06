@@ -31,10 +31,11 @@
 
 #ifdef D_SCALAR_VECTOR_CLASS
 	#include "dVectorScalar.h"
-#elif defined(__ANDROID__) || defined (_ARM_VER) 
-	#include "dVectorArmNeon.h"
-#else
+#elif defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
 	#include "dVectorSimd.h"
+#else
+	// assume arm instruction set until otherwise
+	#include "dVectorArmNeon.h"
 #endif
 
 #endif

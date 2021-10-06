@@ -204,7 +204,10 @@ class ndContactSolver::ndBoxBoxDistance2
 				
 					const dVector mask((box0 * box1) > dVector::m_zero);
 					const dVector dist(box0.Abs().GetMin(box1.Abs()) & mask);
-					separatingDistance2 = dist.GetMax().GetScalar();
+
+					//separatingDistance2 = dist.GetMax().GetScalar();
+					const dVector maxVal(dist.GetMax());
+					separatingDistance2 = maxVal.GetScalar();
 					i += 3;
 				} while ((i < 9) && (separatingDistance2 == dFloat32 (0.0f)));
 				separatingDistance2 = separatingDistance2 * separatingDistance2;

@@ -127,8 +127,9 @@ static inline float32x4_t vec_set(const float w, const float z, const float y, c
 
 class dBigVector;
 DG_MSC_VECTOR_ALIGMENT
-class dVector {
-public:
+class dVector 
+{
+	public:
     inline dVector()
     {
     }
@@ -150,13 +151,13 @@ public:
     inline dVector (const dVector& v)
     : m_type( v.m_type )
     {
-        //dAssert (dgCheckVector ((*this)));
+        //dAssert (dCheckVector ((*this)));
     }
     
     inline dVector (const dFloat32* const ptr)
     :m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (dFloat32 (0.0f))
     {
-        dAssert (dgCheckVector ((*this)));
+        dAssert (dCheckVector ((*this)));
     }
     
 #ifndef    D_NEWTON_USE_DOUBLE
@@ -173,7 +174,7 @@ public:
     inline dVector (dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
     :m_x(x), m_y(y), m_z(z), m_w(w)
     {
-        dAssert (dgCheckVector ((*this)));
+        dAssert (dCheckVector ((*this)));
     }
     
     inline dVector (dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
@@ -188,7 +189,7 @@ public:
     ,m_z(dFloat32 (((dFloat64*)&copy)[2]))
     ,m_w(dFloat32 (((dFloat64*)&copy)[3]))
     {
-        dAssert (dgCheckVector ((*this)));
+        dAssert (dCheckVector ((*this)));
     }
 #endif
     
@@ -600,20 +601,20 @@ public:
 	inline dBigVector(const dFloat32* const ptr)
 		: m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(dFloat32(0.0f))
 	{
-		dAssert(dgCheckVector((*this)));
+		dAssert(dCheckVector((*this)));
 	}
 #endif
 
 	inline dBigVector(const dFloat64* const ptr)
 		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(dFloat32(0.0f))
 	{
-		dAssert(dgCheckVector((*this)));
+		dAssert(dCheckVector((*this)));
 	}
 
 	inline dBigVector(dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w)
 		: m_x(x), m_y(y), m_z(z), m_w(w)
 	{
-		dAssert(dgCheckVector((*this)));
+		dAssert(dCheckVector((*this)));
 	}
 
 	inline dBigVector(dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
@@ -1020,6 +1021,8 @@ D_MSV_NEWTON_ALIGN_16
 class dVector
 {
 	public:
+	D_OPERATOR_NEW_AND_DELETE
+
 	inline dVector()
 	{
 	}
@@ -1043,8 +1046,17 @@ class dVector
 		//: m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(ptr[3])
 		:m_type(vld1q_f32 (ptr))
 	{
-		dAssert(dgCheckVector((*this)));
+		dAssert(dCheckVector((*this)));
 	}
+
+	inline dVector(const dFloat32* const baseAddr, const dInt32* const index)
+		:m_x(baseAddr[index[0]])
+		,m_y(baseAddr[index[1]])
+		,m_z(baseAddr[index[2]])
+		,m_w(baseAddr[index[3]])
+	{
+	}
+
 
 #ifndef	D_NEWTON_USE_DOUBLE
 	inline dVector(const dFloat64* const ptr)
@@ -1059,7 +1071,7 @@ class dVector
 	inline dVector(dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
 		:m_x(x), m_y(y), m_z(z), m_w(w)
 	{
-		dAssert(dgCheckVector((*this)));
+		dAssert(dCheckVector((*this)));
 	}
 
 	inline dVector(dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
@@ -1074,7 +1086,7 @@ class dVector
 		,m_z(dFloat32(((dFloat64*)&copy)[2]))
 		,m_w(dFloat32(((dFloat64*)&copy)[3]))
 	{
-		dAssert(dgCheckVector((*this)));
+		dAssert(dCheckVector((*this)));
 	}
 #endif
 
@@ -1107,7 +1119,6 @@ class dVector
 	{
 		return dVector(m_w);
 	}
-
 
 	inline dFloat32& operator[] (dInt32 i)
 	{
@@ -1231,7 +1242,7 @@ class dVector
 
 	inline dVector GetInt() const
 	{
-		return dVector(dInt32(dgFloor(m_x)), dInt32(dgFloor(m_y)), dInt32(dgFloor(m_z)), dInt32(dgFloor(m_w)));
+		return dVector(dInt32(dFloor(m_x)), dInt32(dFloor(m_y)), dInt32(dFloor(m_z)), dInt32(dFloor(m_w)));
 	}
 
 	inline dVector TestZero() const
@@ -1245,7 +1256,7 @@ class dVector
 
 	inline dVector Floor() const
 	{
-		return dVector(dgFloor(m_x), dgFloor(m_y), dgFloor(m_z), dgFloor(m_w));
+		return dVector(dFloor(m_x), dFloor(m_y), dFloor(m_z), dFloor(m_w));
 	}
 
 	inline dVector DotProduct(const dVector &A) const
@@ -1260,17 +1271,17 @@ class dVector
 
 	inline dVector Sqrt() const
 	{
-		return dVector(dgSqrt(m_x), dgSqrt(m_y), dgSqrt(m_z), dgSqrt(m_w));
+		return dVector(dSqrt(m_x), dSqrt(m_y), dSqrt(m_z), dSqrt(m_w));
 	}
 
 	inline dVector InvSqrt() const
 	{
-		return dVector(dgRsqrt(m_x), dgRsqrt(m_y), dgRsqrt(m_z), dgRsqrt(m_w));
+		return dVector(dRsqrt(m_x), dRsqrt(m_y), dRsqrt(m_z), dRsqrt(m_w));
 	}
 
 	inline dVector InvMagSqrt() const
 	{
-		return dVector(dgRsqrt(DotProduct(*this).m_x));
+		return dVector(dRsqrt(DotProduct(*this).m_x));
 	}
 
 	inline dVector Normalize() const
@@ -1391,8 +1402,6 @@ class dVector
 		dst3.m_type = res2.val[1];
 	}
 
-	DG_CLASS_ALLOCATOR(allocator)
-
 	union 
 	{
 		dFloat32 m_f[4];
@@ -1438,6 +1447,8 @@ D_MSV_NEWTON_ALIGN_32
 class dBigVector
 {
 	public:
+	D_OPERATOR_NEW_AND_DELETE
+
 	inline dBigVector()
 	{
 	}
@@ -1461,20 +1472,20 @@ class dBigVector
 	inline dBigVector(const dFloat32* const ptr)
 		: m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(dFloat32(0.0f))
 	{
-		dAssert(dgCheckVector((*this)));
+		dAssert(dCheckVector((*this)));
 	}
 #endif
 
 	inline dBigVector(const dFloat64* const ptr)
 		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(ptr[3])
 	{
-		dAssert(dgCheckVector((*this)));
+		dAssert(dCheckVector((*this)));
 	}
 
 	inline dBigVector(dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w)
 		: m_x(x), m_y(y), m_z(z), m_w(w)
 	{
-		dAssert(dgCheckVector((*this)));
+		dAssert(dCheckVector((*this)));
 	}
 
 	inline dBigVector(dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
@@ -1830,9 +1841,7 @@ class dBigVector
 		dst3 = dBigVector(tmp0.m_w, tmp1.m_w, tmp2.m_w, tmp3.m_w);
 	}
 
-	DG_CLASS_ALLOCATOR(allocator)
-
-		union
+	union
 	{
 		dInt64 m_i[4];
 		struct

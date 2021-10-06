@@ -57,7 +57,6 @@
 #include <stdarg.h>
 #include <locale.h>
 #include <tinyxml.h>
-#include <immintrin.h>
 #include <condition_variable>
 
 // we need _clearfp() and _controlfp() from float.h which are excluded if __STRICT_ANSI__ is defined
@@ -97,11 +96,16 @@
 		extern "C" 
 		{ 
 			// for SSE3 and up
+			#include <immintrin.h>
 			#include <pmmintrin.h> 
 			#include <emmintrin.h> 
 			#include <mmintrin.h> 
 		} 
 	#endif
+#endif
+
+#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)
+	#include <immintrin.h>
 #endif
 
 #if defined (__APPLE__)
@@ -110,6 +114,7 @@
     #include <assert.h> 
     #if (defined __i386__ || defined __x86_64__)
 		#include <fenv.h>
+		#include <immintrin.h>
 		#include <pmmintrin.h> 
 		#include <emmintrin.h>  //sse3
         #include <mmintrin.h> 
