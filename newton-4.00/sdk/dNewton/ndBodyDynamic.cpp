@@ -192,11 +192,6 @@ void ndBodyDynamic::IntegrateVelocity(dFloat32 timestep)
 ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep) const
 {
 	ndJacobian velocStep;
-#ifdef TEST_TWO_PASS_SOLVER
-	dAssert(0);
-	return velocStep;
-#else
-
 	const dMatrix matrix(m_gyroRotation, dVector::m_wOne);
 	const dVector localOmega(matrix.UnrotateVector(m_omega));
 	const dVector localTorque(matrix.UnrotateVector(torque));
@@ -216,14 +211,10 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVe
 	velocStep.m_angular = matrix.RotateVector(gradientStep);
 	velocStep.m_linear = force.Scale(m_invMass.m_w) * timestep;
 	return velocStep;
-#endif
 }
 
 void ndBodyDynamic::IntegrateGyroSubstep(const dVector& timestep)
 {
-#ifdef TEST_TWO_PASS_SOLVER
-	dAssert(0);
-#else
 	const dFloat32 omegaMag2 = m_omega.DotProduct(m_omega).GetScalar() + dFloat32(1.0e-12f);
 	const dFloat32 tol = (dFloat32(0.0125f) * dDegreeToRad);
 	if (omegaMag2 > (tol * tol))
@@ -249,5 +240,4 @@ void ndBodyDynamic::IntegrateGyroSubstep(const dVector& timestep)
 		m_gyroAlpha = dVector::m_zero;
 		m_gyroTorque = dVector::m_zero;
 	}
-#endif
 }
