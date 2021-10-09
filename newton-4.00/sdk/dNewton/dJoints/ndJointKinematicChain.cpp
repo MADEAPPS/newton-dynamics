@@ -244,7 +244,7 @@ void ndJointKinematicChain::JacobianDerivative(ndConstraintDescritor& desc)
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	const dVector step(matrix0.m_posit - matrix1.m_posit);
+	//const dVector step(matrix0.m_posit - matrix1.m_posit);
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
 	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 

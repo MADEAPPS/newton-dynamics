@@ -860,24 +860,24 @@ void ndDynamicsUpdateSoa::InitBodyArray()
 
 			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{
-				ndBodyKinematic* const body = bodyArray[i]->GetAsBodyDynamic();
-				ndBodyDynamic* const kinBody = body->GetAsBodyDynamic();
-				if (kinBody)
+				//ndBodyKinematic* const body = bodyArray[i]->GetAsBodyDynamic();
+				//ndBodyDynamic* const kinBody = body->GetAsBodyDynamic();
+				ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
+				if (body)
 				{
-					dAssert(kinBody->m_bodyIsConstrained);
-					kinBody->UpdateInvInertiaMatrix();
-					kinBody->AddDampingAcceleration(m_timestep);
+					dAssert(body->m_bodyIsConstrained);
+					body->UpdateInvInertiaMatrix();
+					body->AddDampingAcceleration(m_timestep);
 
-					const dVector localOmega(kinBody->m_matrix.UnrotateVector(kinBody->m_omega));
-					const dVector localAngularMomentum(kinBody->m_mass * localOmega);
-					const dVector angularMomentum(kinBody->m_matrix.RotateVector(localAngularMomentum));
+					const dVector localOmega(body->m_matrix.UnrotateVector(body->m_omega));
+					const dVector localAngularMomentum(body->m_mass * localOmega);
+					const dVector angularMomentum(body->m_matrix.RotateVector(localAngularMomentum));
+					body->m_gyroTorque = body->m_omega.CrossProduct(angularMomentum);
+					body->m_gyroAlpha = body->m_invWorldInertiaMatrix.RotateVector(body->m_gyroTorque);
 
-					dAssert(0);
-					//kinBody->m_accel = kinBody->m_veloc;
-					//kinBody->m_alpha = kinBody->m_omega;
-					//kinBody->m_gyroRotation = kinBody->m_rotation;
-					//kinBody->m_gyroTorque = kinBody->m_omega.CrossProduct(angularMomentum);
-					//kinBody->m_gyroAlpha = kinBody->m_invWorldInertiaMatrix.RotateVector(kinBody->m_gyroTorque);
+					body->m_accel = body->m_veloc;
+					body->m_alpha = body->m_omega;
+					body->m_gyroRotation = body->m_rotation;
 				}
 			}
 		}

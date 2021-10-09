@@ -118,6 +118,7 @@ class ndBody: public dClassAlloc
 	dUnsigned32 m_uniqueId;
 	static dUnsigned32 m_uniqueIdCount;
 
+	friend class ndWorld;
 	friend class ndScene;
 	friend class ndConstraint;
 	friend class ndBodyPlayerCapsuleImpulseSolver;

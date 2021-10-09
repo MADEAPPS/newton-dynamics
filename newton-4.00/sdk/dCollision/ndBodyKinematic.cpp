@@ -406,21 +406,6 @@ dFloat32 ndBodyKinematic::TotalEnergy() const
 	return energy.AddHorizontal().GetScalar()* dFloat32(0.5f);
 }
 
-void ndBodyKinematic::UpdateInvInertiaMatrix()
-{
-	dAssert(m_invWorldInertiaMatrix[0][3] == dFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[1][3] == dFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[2][3] == dFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[3][3] == dFloat32(1.0f));
-
-	m_invWorldInertiaMatrix = CalculateInvInertiaMatrix();
-
-	dAssert(m_invWorldInertiaMatrix[0][3] == dFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[1][3] == dFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[2][3] == dFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[3][3] == dFloat32(1.0f));
-}
-
 void ndBodyKinematic::IntegrateVelocity(dFloat32 timestep)
 {
 	dAssert(m_veloc.m_w == dFloat32(0.0f));

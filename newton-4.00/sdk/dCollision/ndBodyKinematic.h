@@ -436,5 +436,21 @@ inline dVector ndBodyKinematic::GetAngularDamping() const
 	return dVector::m_zero;
 }
 
+inline void ndBodyKinematic::UpdateInvInertiaMatrix()
+{
+	dAssert(m_invWorldInertiaMatrix[0][3] == dFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[1][3] == dFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[2][3] == dFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[3][3] == dFloat32(1.0f));
+
+	m_invWorldInertiaMatrix = CalculateInvInertiaMatrix();
+
+	dAssert(m_invWorldInertiaMatrix[0][3] == dFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[1][3] == dFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[2][3] == dFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[3][3] == dFloat32(1.0f));
+}
+
+
 #endif 
 
