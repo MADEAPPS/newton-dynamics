@@ -116,7 +116,7 @@ class ndBody: public dClassAlloc
 	};
 
 	dUnsigned32 m_uniqueId;
-	static dUnsigned32 m_uniqueIdCount;
+	D_COLLISION_API static dUnsigned32 m_uniqueIdCount;
 
 	friend class ndWorld;
 	friend class ndScene;

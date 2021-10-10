@@ -96,7 +96,7 @@ class dThreadPool: public dSyncMutex, public dThread
 	D_CORE_API dThreadPool(const char* const baseName);
 	D_CORE_API virtual ~dThreadPool();
 
-	D_CORE_API dInt32 GetCount() const;
+	dInt32 GetCount() const;
 	D_CORE_API void SetCount(dInt32 count);
 
 	D_CORE_API void TickOne();
@@ -115,5 +115,10 @@ class dThreadPool: public dSyncMutex, public dThread
 	dAtomic<dInt32> m_joindInqueue;
 	dThreadLockFreeUpdate m_lockFreeJobs[D_MAX_THREADS_COUNT];
 };
+
+inline dInt32 dThreadPool::GetCount() const
+{
+	return m_count + 1;
+}
 
 #endif

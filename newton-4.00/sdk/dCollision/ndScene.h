@@ -98,7 +98,7 @@ class ndScene : public dThreadPool
 	dArray<ndBodyKinematic*>& GetActiveBodyArray();
 	const dArray<ndBodyKinematic*>& GetActiveBodyArray() const;
 
-	template <class T>
+	template <class T> 
 	void SubmitJobs(void* const context = nullptr);
 
 	dFloat32 GetTimestep() const;

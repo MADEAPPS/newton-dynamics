@@ -18,6 +18,12 @@ if (NEWTON_BUILD_PROFILER)
 	add_subdirectory(dProfiler)
 endif()
 
+if(NEWTON_ENABLE_AVX2_SOLVER)
+	add_definitions(-D_D_USE_AVX2_SOLVER)
+endif()
+
+add_subdirectory(dExtensions)
+
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	add_subdirectory(dCore)
 	add_subdirectory(dNewton)
@@ -37,6 +43,10 @@ else()
 	include_directories(dNewton/dModels/)
 	include_directories(dNewton/dModels/dVehicle)
 	include_directories(dNewton/dModels/dCharacter)
+
+	if(NEWTON_ENABLE_AVX2_SOLVER)
+		include_directories(dExtensions/dAvx2)
+	endif()
 
 	if (NEWTON_ENABLE_GPU_SOLVER)
 		add_definitions(-D_D_NEWTON_OPENCL)
@@ -82,24 +92,6 @@ else()
 		dNewton/dModels/dCharacter/*.h
 		dNewton/dModels/dCharacter/*.cpp)
 
-	# exclude AVX files when disabled
-	if(NOT NEWTON_ENABLE_AVX2_SOLVER)
-		list(FILTER HEADERS EXCLUDE REGEX "(Avx)")
-		list(FILTER CPP_SOURCE EXCLUDE REGEX "(Avx)")
-	endif()
-
-	if(MSVC AND NEWTON_ENABLE_AVX2_SOLVER)
-		set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
-	endif()
-
-	if(MINGW AND NEWTON_ENABLE_AVX2_SOLVER)
-		set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " -mavx2 -mfma  " )
-	endif()
-
-	if(UNIX AND NEWTON_ENABLE_AVX2_SOLVER)
-		set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " -march=haswell " )
-	endif()
-
 	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 	add_definitions(-D_D_SINGLE_LIBRARY)
@@ -110,6 +102,8 @@ else()
 		add_definitions(-D_D_TINYXML_EXPORT_DLL)
 		add_definitions(-D_D_COLLISION_EXPORT_DLL)
 		add_library(${projectName} SHARED ${CPP_SOURCE})
+
+		target_link_libraries (${projectName} ndAvx2Solver)
 
 		if(MSVC OR MINGW)
 			target_link_options(${projectName} PUBLIC "/DEBUG") 

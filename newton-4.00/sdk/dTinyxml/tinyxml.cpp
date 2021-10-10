@@ -22,10 +22,8 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
-#include "dCoreStdafx.h"
-#include "ndNewtonStdafx.h"
-#include "dClassAlloc.h"
-
+#include <dCoreStdafx.h>
+#include <ndNewtonStdafx.h>
 #include <ctype.h>
 
 #ifdef TIXML_USE_STL
@@ -40,83 +38,98 @@ namespace nd
 
 void *TiXmlVisitor::operator new (size_t size)
 {
-	return dMemory::Malloc(size);
+	//return dMemory::Malloc(size);
+	return __alloc__(size);
 }
 
 void *TiXmlVisitor::operator new[](size_t size)
 {
-	return dMemory::Malloc(size);
+	//return dMemory::Malloc(size);
+	return __alloc__(size);
 }
 
 void TiXmlVisitor::operator delete (void* ptr)
 {
-	dMemory::Free(ptr);
+	//dMemory::Free(ptr);
+	__free__(ptr);
 }
 
 void TiXmlVisitor::operator delete[](void* ptr)
 {
-	dMemory::Free(ptr);
+	//dMemory::Free(ptr);
+	__free__(ptr);
 }
 
 void *TiXmlAttributeSet::operator new (size_t size)
 {
-	return dMemory::Malloc(size);
+	//return dMemory::Malloc(size);
+	return __alloc__(size);
 }
 
 void *TiXmlAttributeSet::operator new[](size_t size)
 {
-	return dMemory::Malloc(size);
+	//return dMemory::Malloc(size);
+	return __alloc__(size);
 }
 
 void TiXmlAttributeSet::operator delete (void* ptr)
 {
-	dMemory::Free(ptr);
+	//dMemory::Free(ptr);
+	__free__(ptr);
 }
 
 void TiXmlAttributeSet::operator delete[](void* ptr)
 {
-	dMemory::Free(ptr);
+	//dMemory::Free(ptr);
+	__free__(ptr);
 }
 
 void *TiXmlBase::operator new (size_t size)
 {
-	return dMemory::Malloc(size);
+	//return dMemory::Malloc(size);
+	return __alloc__(size);
 }
 
 void *TiXmlBase::operator new[](size_t size)
 {
-	return dMemory::Malloc(size);
+	//return dMemory::Malloc(size);
+	return __alloc__(size);
 }
 
 void TiXmlBase::operator delete (void* ptr)
 {
-	dMemory::Free(ptr);
+	//dMemory::Free(ptr);
+	__free__(ptr);
 }
 
 void TiXmlBase::operator delete[](void* ptr)
 {
-	dMemory::Free(ptr);
+	//dMemory::Free(ptr);
+	__free__(ptr);
 }
-
 
 void *TiXmlHandle::operator new (size_t size)
 {
-	return dMemory::Malloc(size);
+	//return dMemory::Malloc(size);
+	return __alloc__(size);
 }
 
 void *TiXmlHandle::operator new[](size_t size)
 {
-	return dMemory::Malloc(size);
+	//return dMemory::Malloc(size);
+	return __alloc__(size);
 }
 
 void TiXmlHandle::operator delete (void* ptr)
 {
-	dMemory::Free(ptr);
+	//dMemory::Free(ptr);
+	__free__(ptr);
 }
 
 void TiXmlHandle::operator delete[](void* ptr)
 {
-	dMemory::Free(ptr);
+	//dMemory::Free(ptr);
+	__free__(ptr);
 }
 
 bool TiXmlBase::condenseWhiteSpace = true;
@@ -1109,12 +1122,14 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 	*/
 
 	//char* buf = new char[ length+1 ];
-	char* buf = (char*)dMemory::Malloc((length + 1) * sizeof (char));
+	//char* buf = (char*)dMemory::Malloc((length + 1) * sizeof (char));
+	char* buf = (char*)__alloc__((length + 1) * sizeof(char));
 	buf[0] = 0;
 
 	if ( fread( buf, length, 1, file ) != 1 ) {
 		//delete [] buf;
-		dMemory::Free(buf);
+		//dMemory::Free(buf);
+		__free__(buf);
 		SetError( TIXML_ERROR_OPENING_FILE, 0, 0, TIXML_ENCODING_UNKNOWN );
 		return false;
 	}
@@ -1163,7 +1178,8 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 		data.append( lastPos, p-lastPos );
 	}		
 	//delete [] buf;
-	dMemory::Free(buf);
+	//dMemory::Free(buf);
+	__free__(buf);
 	buf = 0;
 
 	Parse( data.c_str(), 0, encoding );

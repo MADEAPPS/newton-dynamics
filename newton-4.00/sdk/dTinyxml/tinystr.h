@@ -42,6 +42,10 @@ distribution.
 #include <assert.h>
 #include <string.h>
 
+
+typedef void* (*xmlAlloc) (size_t size);
+typedef void (*xmlFree) (void*);
+
 #if defined(_MSC_VER)
 	#define D_TINYXML_EXPORT __declspec(dllexport)
 	#define D_TINYXML_IMPORT __declspec(dllimport)
@@ -77,6 +81,9 @@ distribution.
 
 namespace nd
 {
+	extern D_TINY_API xmlFree __free__;
+	extern D_TINY_API xmlAlloc __alloc__;
+
 /*
    TiXmlString is an emulation of a subset of the std::string template.
    Its purpose is to allow compiling TinyXML on compilers with no or poor STL support.

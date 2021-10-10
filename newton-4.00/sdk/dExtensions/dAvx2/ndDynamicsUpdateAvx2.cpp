@@ -19,13 +19,13 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dCoreStdafx.h"
-#include "ndNewtonStdafx.h"
-#include "ndWorld.h"
-#include "ndBodyDynamic.h"
-#include "ndSkeletonList.h"
+//#include "dCoreStdafx.h"
+//#include "ndNewtonStdafx.h"
+//#include "ndWorld.h"
+//#include "ndBodyDynamic.h"
+//#include "ndSkeletonList.h"
 #include "ndDynamicsUpdateAvx2.h"
-#include "ndJointBilateralConstraint.h"
+//#include "ndJointBilateralConstraint.h"
 
 #define D_AVX_WORD_GROUP_SIZE	8 
 
@@ -385,6 +385,7 @@ class ndSoaMatrixElement
 
 ndDynamicsUpdateAvx2::ndDynamicsUpdateAvx2(ndWorld* const world)
 	:ndDynamicsUpdate(world)
+	,m_zero(dFloat32 (0.0f))
 	,m_soaJointRows(D_DEFAULT_BUFFER_SIZE * 4)
 {
 	m_soaMassMatrixArray = new dArray<ndSoaMatrixElement>;
@@ -553,18 +554,18 @@ void ndDynamicsUpdateAvx2::UpdateIslandState(const ndIsland& island)
 			ndBodyDynamic* const body = bodyIslands[i]->GetAsBodyDynamic();
 			if (body)
 			{
-				body->m_accel = dVector::m_zero;
-				body->m_alpha = dVector::m_zero;
-				body->m_veloc = dVector::m_zero;
-				body->m_omega = dVector::m_zero;
+				body->m_accel = m_zero;
+				body->m_alpha = m_zero;
+				body->m_veloc = m_zero;
+				body->m_omega = m_zero;
 				body->m_equilibrium = (body->GetInvMass() == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
 			}
 			else
 			{
 				ndBodyKinematic* const kinBody = bodyIslands[i]->GetAsBodyKinematic();
 				dAssert(kinBody);
-				kinBody->m_veloc = dVector::m_zero;
-				kinBody->m_omega = dVector::m_zero;
+				kinBody->m_veloc = m_zero;
+				kinBody->m_omega = m_zero;
 				kinBody->m_equilibrium = (kinBody->GetInvMass() == dFloat32(0.0f)) ? 1 : kinBody->m_autoSleep;
 			}
 		}
@@ -624,14 +625,14 @@ void ndDynamicsUpdateAvx2::UpdateIslandState(const ndIsland& island)
 				for (dInt32 i = 0; i < count; i++)
 				{
 					ndBodyKinematic* const body = bodyIslands[i];
-					body->m_veloc = dVector::m_zero;
-					body->m_omega = dVector::m_zero;
+					body->m_veloc = m_zero;
+					body->m_omega = m_zero;
 					body->m_equilibrium = body->m_autoSleep;
 					ndBodyDynamic* const dynBody = body->GetAsBodyDynamic();
 					if (dynBody)
 					{
-						dynBody->m_accel = dVector::m_zero;
-						dynBody->m_alpha = dVector::m_zero;
+						dynBody->m_accel = m_zero;
+						dynBody->m_alpha = m_zero;
 						dynBody->m_sleepingCounter = 0;
 					}
 				}
@@ -1341,7 +1342,6 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 	{
 		public:
 		ndInitJacobianMatrix()
-			:m_zero(dVector::m_zero)
 		{
 		}
 
@@ -1349,6 +1349,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 		{
 			dAssert(joint->GetBody0());
 			dAssert(joint->GetBody1());
+			
 			ndBodyKinematic* const body0 = joint->GetBody0();
 			ndBodyKinematic* const body1 = joint->GetBody1();
 			const ndBodyDynamic* const dynBody0 = body0->GetAsBodyDynamic();
@@ -1366,16 +1367,18 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			const dVector invMass0(body0->m_invMass[3]);
 			const dVector invMass1(body1->m_invMass[3]);
 
-			dVector force0(m_zero);
-			dVector torque0(m_zero);
+			ndWorld* const world = m_owner->GetWorld();
+			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
+			dVector force0(me->m_zero);
+			dVector torque0(me->m_zero);
 			if (dynBody0)
 			{
 				force0 = dynBody0->m_externalForce;
 				torque0 = dynBody0->m_externalTorque;
 			}
 
-			dVector force1(m_zero);
-			dVector torque1(m_zero);
+			dVector force1(me->m_zero);
+			dVector torque1(me->m_zero);
 			if (dynBody1)
 			{
 				force1 = dynBody1->m_externalForce;
@@ -1398,10 +1401,10 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 				}
 			}
 
-			dVector forceAcc0(m_zero);
-			dVector torqueAcc0(m_zero);
-			dVector forceAcc1(m_zero);
-			dVector torqueAcc1(m_zero);
+			dVector forceAcc0(me->m_zero);
+			dVector torqueAcc0(me->m_zero);
+			dVector forceAcc1(me->m_zero);
+			dVector torqueAcc1(me->m_zero);
 
 			const dVector weigh0(body0->m_weigh * joint->m_preconditioner0);
 			const dVector weigh1(body1->m_weigh * joint->m_preconditioner0);
@@ -1489,7 +1492,6 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			}
 		}
 
-		dVector m_zero;
 		ndJacobian* m_internalForces;
 		ndRightHandSide* m_rightHandSide;
 		ndLeftHandSide* m_leftHandSide;
@@ -1507,7 +1509,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
 
-			const dVector zero(dVector::m_zero);
+			const dVector zero(me->m_zero);
 			ndJacobian* const internalForces = &me->GetInternalForces()[0];
 			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{
@@ -1875,10 +1877,10 @@ void ndDynamicsUpdateAvx2::UpdateForceFeedback()
 				if (joint->GetAsBilateral())
 				{
 					const dArray<ndLeftHandSide>& leftHandSide = me->m_leftHandSide;
-					dVector force0(dVector::m_zero);
-					dVector force1(dVector::m_zero);
-					dVector torque0(dVector::m_zero);
-					dVector torque1(dVector::m_zero);
+					dVector force0(me->m_zero);
+					dVector force1(me->m_zero);
+					dVector torque0(me->m_zero);
+					dVector torque1(me->m_zero);
 					for (dInt32 j = 0; j < rows; j++)
 					{
 						const ndRightHandSide* const rhs = &rightHandSide[j + first];
@@ -2557,7 +2559,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 
 			if (threadCount > 1)
 			{
-				const dVector zero(dVector::m_zero);
+				const dVector zero(me->m_zero);
 				for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 				{
 					dVector force(zero);

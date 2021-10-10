@@ -19,17 +19,34 @@ file(GLOB HEADERS *.h)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
-#include_directories(../dCore)
-#include_directories(../dNewton)
+include_directories(../dCore)
+include_directories(../dNewton)
 include_directories(../dTinyxml/)
-#include_directories(../dCollision)
+include_directories(../dCollision)
 
-if(NEWTON_BUILD_SHARED_LIBS STREQUAL "ON")
+if(NEWTON_BUILD_SHARED_LIBS)
 	add_definitions(-D_D_TINYXML_EXPORT_DLL)
 	add_library(${projectName} SHARED ${CPP_SOURCE})
 else()
 	add_library(${projectName} STATIC ${CPP_SOURCE})
 endif()
+
+if (MSVC)
+	if (NEWTON_BUILD_TEST AND NEWTON_BUILD_SHARED_LIBS)
+		add_custom_command(
+			TARGET ${projectName} POST_BUILD
+			COMMAND ${CMAKE_COMMAND}
+			ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/applications/ndTest/${CMAKE_CFG_INTDIR}/$<TARGET_FILE_NAME:${projectName}>)
+	endif ()
+
+	if (NEWTON_BUILD_SANDBOX_DEMOS AND NEWTON_BUILD_SHARED_LIBS)
+		add_custom_command(
+			TARGET ${projectName} POST_BUILD
+			COMMAND ${CMAKE_COMMAND}
+			ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/applications/ndSandbox/${CMAKE_CFG_INTDIR}/$<TARGET_FILE_NAME:${projectName}>)
+	endif ()
+
+endif(MSVC)
 
 if(UNIX)
     target_compile_options(${projectName} PRIVATE -fPIC)

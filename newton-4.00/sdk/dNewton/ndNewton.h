@@ -71,12 +71,10 @@
 #include <ndSkeletonContainer.h>
 #include <ndDynamicsUpdateSoa.h>
 #include <ndJointHingeActuator.h>
-#include <ndDynamicsUpdateAvx2.h>
 #include <ndJointBallAndSocket.h>
 #include <ndJointKinematicChain.h>
 #include <ndBodyParticleSetList.h>
 #include <ndJointAttachmentPoint.h>
-#include <ndDynamicsUpdateOpencl.h>
 #include <ndMultiBodyVehicleMotor.h>
 #include <ndMultiBodyVehicleGearBox.h>
 #include <ndJointDryRollingFriction.h>
@@ -87,6 +85,7 @@
 #include <ndCharacterInverseDynamicNode.h>
 #include <ndMultiBodyVehicleDifferential.h>
 #include <ndMultiBodyVehicleDifferentialAxle.h>
+
 
 #endif 
 

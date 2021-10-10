@@ -33,9 +33,31 @@ class dLoaderFactory
 	dLoadSaveBase* m_loader;
 };
 
+class dLoaderClasseArray: public dFixSizeArray<dLoaderFactory, 128>
+{
+	public:
+	dLoaderClasseArray()
+		:dFixSizeArray<dLoaderFactory, 128>()
+	{
+		nd::__free__ = Free;
+		nd::__alloc__ = Malloc;
+	}
+
+	static void* Malloc(size_t size)
+	{
+		return dMemory::Malloc(size);
+	}
+
+	static void Free(void* ptr)
+	{
+		return dMemory::Free(ptr);
+	}
+
+};
+
 static dFixSizeArray<dLoaderFactory, 128>& GetFactory()
 {
-	static dFixSizeArray<dLoaderFactory, 128> factory;
+	static dLoaderClasseArray factory;
 	return factory;
 }
 

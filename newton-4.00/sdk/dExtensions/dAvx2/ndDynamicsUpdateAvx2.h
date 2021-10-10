@@ -22,8 +22,9 @@
 #ifndef __D_WORLD_DYNAMICS_UPDATE_AVX2_H__
 #define __D_WORLD_DYNAMICS_UPDATE_AVX2_H__
 
-#include "ndNewtonStdafx.h"
-#include "ndDynamicsUpdate.h"
+//#include "ndNewtonStdafx.h"
+//#include "ndDynamicsUpdate.h"
+#include <ndNewton.h>
 
 class ndSoaMatrixElement;
 
@@ -61,6 +62,7 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	void GetJacobianDerivatives(ndConstraint* const joint);
 	static dInt32 CompareIslands(const ndIsland* const A, const ndIsland* const B, void* const context);
 
+	dVector m_zero;
 	dArray<dInt32> m_soaJointRows;
 	void* m_soaMassMatrixArray;
 

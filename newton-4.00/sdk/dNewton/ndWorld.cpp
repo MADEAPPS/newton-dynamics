@@ -29,9 +29,15 @@
 #include "ndDynamicsUpdate.h"
 #include "ndBodyParticleSet.h"
 #include "ndDynamicsUpdateSoa.h"
-#include "ndDynamicsUpdateAvx2.h"
-#include "ndDynamicsUpdateOpencl.h"
 #include "ndJointBilateralConstraint.h"
+
+#ifdef _D_USE_AVX2_SOLVER
+	#include "ndDynamicsUpdateAvx2.h"
+#endif
+
+#ifdef _D_NEWTON_OPENCL
+	#include "ndDynamicsUpdateOpencl.h"
+#endif
 
 class ndSkeletonQueue : public dFixSizeArray<ndSkeletonContainer::ndNode*, 1024 * 4>
 {
@@ -215,12 +221,14 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateAvx2(this);
 				break;
-			#endif // D_USE_VECTOR_AVX2_SOLVER
+			#endif
 
+			#ifdef _D_NEWTON_OPENCL
 			case ndOpenclSolver:
 				m_solverMode = solverMode;
 				m_solver = new ndDynamicsUpdateOpencl(this);
 				break;
+			#endif
 
 			case ndStandardSolver:
 			default:

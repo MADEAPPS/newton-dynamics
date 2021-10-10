@@ -94,11 +94,6 @@ dThreadPool::~dThreadPool()
 	SetCount(0);
 }
 
-dInt32 dThreadPool::GetCount() const
-{
-	return m_count + 1;
-}
-
 void dThreadPool::SetCount(dInt32 count)
 {
 #ifdef D_USE_THREAD_EMULATION	

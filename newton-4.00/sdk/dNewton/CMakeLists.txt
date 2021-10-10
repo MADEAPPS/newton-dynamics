@@ -35,22 +35,8 @@ file(GLOB HEADERS *.h dModels/*.h)
 file(GLOB HEADERS *.h dModels/dVehicle/*.h)
 file(GLOB HEADERS *.h dModels/dCharacter/*.h)
 
-# exclude AVX files when disabled
-#if(NOT NEWTON_ENABLE_AVX)
-#	list(FILTER HEADERS EXCLUDE REGEX "(Avx)")
-#	list(FILTER CPP_SOURCE EXCLUDE REGEX "(Avx)")
-#endif()
-
-if(MSVC AND NEWTON_ENABLE_AVX2_SOLVER)
-	set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
-endif()
-
-if(MINGW AND NEWTON_ENABLE_AVX2_SOLVER)
-	set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " -mavx2 -mfma  " )
-endif()
-
-if(UNIX AND NEWTON_ENABLE_AVX2_SOLVER)
-	set_source_files_properties(dNewton/ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " -march=haswell " )
+if(NEWTON_ENABLE_AVX2_SOLVER)
+	add_definitions(-D_D_USE_AVX2_SOLVER)
 endif()
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
@@ -62,6 +48,10 @@ include_directories(dModels/dVehicle/)
 include_directories(../dCore/)
 include_directories(../dTinyxml/)
 include_directories(../dCollision/)
+
+if(NEWTON_ENABLE_AVX2_SOLVER)
+	include_directories(../dExtensions/dAvx2)
+endif()
 
 if (NEWTON_ENABLE_GPU_SOLVER)
 	add_definitions(-D_D_NEWTON_OPENCL)
@@ -78,19 +68,11 @@ if (NEWTON_ENABLE_GPU_SOLVER)
 	endif()
 endif(NEWTON_ENABLE_GPU_SOLVER)
 
-if (MSVC)
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /fp:fast")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast")
-	set_source_files_properties(./ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
-endif(MSVC)
-
-if(UNIX)
-	set_source_files_properties(./ndDynamicsUpdateAvx2.cpp PROPERTIES COMPILE_FLAGS " -march=haswell " )
-endif(UNIX)
-
 if(NEWTON_BUILD_SHARED_LIBS)
 	add_definitions(-D_D_NEWTON_EXPORT_DLL)
 	add_library(${projectName} SHARED ${CPP_SOURCE})
+
+	target_link_libraries (${projectName} ndAvx2Solver)
 
 	if(MSVC OR MINGW)
 		target_link_options(${projectName} PUBLIC "/DEBUG") 

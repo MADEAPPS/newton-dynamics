@@ -43,10 +43,6 @@ if(NEWTON_DOUBLE_PRECISION)
 	add_definitions(-DD_NEWTON_USE_DOUBLE)
 endif()
 
-if(NEWTON_ENABLE_AVX2_SOLVER)
-	add_definitions(-D_D_USE_AVX2_SOLVER)
-endif()
-
 if(NEWTON_BUILD_SINGLE_THREADED)
 	add_definitions(-DD_USE_THREAD_EMULATION)
 endif()

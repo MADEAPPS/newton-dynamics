@@ -53,6 +53,12 @@ else()
 	target_link_libraries (${projectName} ndNewton glfw imgui glatter openfbx)
 endif()
 
+if(NEWTON_ENABLE_AVX2_SOLVER)
+	if (NOT NEWTON_BUILD_SHARED_LIBS)
+		target_link_libraries (${projectName} ndAvx2Solver)
+	endif()
+endif()
+
 if (NEWTON_ENABLE_GPU_SOLVER)
 	if (NEWTON_BUILD_SHARED_LIBS STREQUAL "OFF")
 		if (PTR_SIZE EQUAL 8)

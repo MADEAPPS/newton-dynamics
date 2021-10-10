@@ -26,15 +26,22 @@ distribution.
  * THIS FILE WAS ALTERED BY Tyge Løvset, 7. April 2005.
  */
 
-#include "dCoreStdafx.h"
-#include "ndNewtonStdafx.h"
+#include <dCoreStdafx.h>
+#include <ndNewtonStdafx.h>
 
 #ifndef TIXML_USE_STL
 
 #include "tinystr.h"
+#include <stdlib.h>
+
 
 namespace nd
 {
+	//xmlFree	 __free__ = free;
+	//xmlAlloc __alloc__ = malloc;
+	xmlFree	 __free__ = nullptr;
+	xmlAlloc __alloc__ = nullptr;
+
 
 // Error value for find primitive
 const TiXmlString::size_type TiXmlString::npos = static_cast< TiXmlString::size_type >(-1);
@@ -46,32 +53,38 @@ TiXmlString::Rep TiXmlString::nullrep_ = { 0, 0, { '\0' } };
 
 void *TiXmlString::operator new (size_t size)
 {
-	return dMemory::Malloc(size);
+	//return dMemory::Malloc(size);
+	return __alloc__(size);
 }
 
 void *TiXmlString::operator new[](size_t size)
 {
-	return dMemory::Malloc(size);
+	//return dMemory::Malloc(size);
+	return __alloc__(size);
 }
 
 void TiXmlString::operator delete (void* ptr)
 {
-	dMemory::Free(ptr);
+	//dMemory::Free(ptr);
+	__free__(ptr);
 }
 
 void TiXmlString::operator delete[](void* ptr)
 {
-	dMemory::Free(ptr);
+	//dMemory::Free(ptr);
+	__free__(ptr);
 }
 
 void* TiXmlString::Malloc(size_type size)
 {
-	return dMemory::Malloc(size);
+	//return dMemory::Malloc(size);
+	return __alloc__(size);
 }
 
 void TiXmlString::Free(void* ptr)
 {
-	dMemory::Free(ptr);
+	//dMemory::Free(ptr);
+	__free__(ptr);
 }
 
 

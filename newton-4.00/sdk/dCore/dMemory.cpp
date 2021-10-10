@@ -24,8 +24,9 @@
 #include "dMemory.h"
 
 dAtomic<dUnsigned64> dMemory::m_memoryUsed(0);
-static dMemAllocCallback m_allocMemory = malloc;
+
 static dMemFreeCallback m_freeMemory = free;
+static dMemAllocCallback m_allocMemory = malloc;
 
 class dMemoryHeader
 {
