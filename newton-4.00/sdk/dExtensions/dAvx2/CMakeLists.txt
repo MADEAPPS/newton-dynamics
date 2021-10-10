@@ -36,12 +36,15 @@ if(MINGW)
 endif()
 
 if(UNIX)
-
-message (xxxxxxxxxxxxxxxx)
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -march=haswell ")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
 	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
 endif()
+
+if(LINUX) 
+	message(STATUS ">>> Linux")
+endif()       
+
 
 message (${CMAKE_CXX_FLAGS_RELEASE})
 
