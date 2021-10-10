@@ -23,30 +23,36 @@ include_directories(../../dNewton/dModels/)
 include_directories(../../dNewton/dModels/dVehicle)
 include_directories(../../dNewton/dModels/dCharacter)
 
+file(GLOB CPP_SOURCE *.c *.cpp *.h)
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
+
 if(MSVC)
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /arch:AVX2")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast /arch:AVX2")
 	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast /arch:AVX2")
+	add_library(${projectName} STATIC ${CPP_SOURCE})
 endif()
 
 if(MINGW)
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -mavx2 -mfma  ")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -mavx2 -mfma ")
 	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -mavx2 -mfma")
+	add_library(${projectName} STATIC ${CPP_SOURCE})
 endif()
 
 if(UNIX)
-	message("xxxxxxxxxxxxx >>> Linux")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -march=haswell ")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
 	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELEASE} -march=haswell ")
+
+	if(NEWTON_BUILD_SHARED_LIBS)
+		add_library(${projectName} SHARED ${CPP_SOURCE})
+	else()
+		add_library(${projectName} STATIC ${CPP_SOURCE})
+	endif()
 endif()
 
 
-message (${CMAKE_CXX_FLAGS_RELEASE})
 
-file(GLOB CPP_SOURCE *.c *.cpp *.h)
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
-add_library(${projectName} STATIC ${CPP_SOURCE})
 
