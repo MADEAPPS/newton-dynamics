@@ -22,6 +22,8 @@
 #ifndef __D_VECTOR_ARM_NEON_H__
 #define __D_VECTOR_ARM_NEON_H__
 
+//#include <arm_neon.h>
+
 #if 0
 // *****************************************************************************************
 //
