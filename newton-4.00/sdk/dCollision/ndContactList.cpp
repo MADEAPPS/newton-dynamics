@@ -53,5 +53,5 @@ void ndContactList::DeleteAllContacts()
 	{
 		DeleteContact(&GetFirst()->GetInfo());
 	}
-	FlushFreeList();
+	//FlushFreeList();
 }

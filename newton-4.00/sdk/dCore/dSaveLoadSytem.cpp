@@ -26,6 +26,8 @@
 #include "dFixSizeArray.h"	
 #include "dSaveLoadSytem.h"
 
+#define D_LOADER_DICTIONARY_SIZE 128
+
 class dLoaderFactory
 {
 	public:
@@ -33,11 +35,11 @@ class dLoaderFactory
 	dLoadSaveBase* m_loader;
 };
 
-class dLoaderClasseArray: public dFixSizeArray<dLoaderFactory, 128>
+class dLoaderClasseArray: public dFixSizeArray<dLoaderFactory, D_LOADER_DICTIONARY_SIZE>
 {
 	public:
 	dLoaderClasseArray()
-		:dFixSizeArray<dLoaderFactory, 128>()
+		:dFixSizeArray<dLoaderFactory, D_LOADER_DICTIONARY_SIZE>()
 	{
 		nd::__free__ = Free;
 		nd::__alloc__ = Malloc;
@@ -52,10 +54,9 @@ class dLoaderClasseArray: public dFixSizeArray<dLoaderFactory, 128>
 	{
 		return dMemory::Free(ptr);
 	}
-
 };
 
-static dFixSizeArray<dLoaderFactory, 128>& GetFactory()
+static dFixSizeArray<dLoaderFactory, D_LOADER_DICTIONARY_SIZE>& GetFactory()
 {
 	static dLoaderClasseArray factory;
 	return factory;
@@ -66,7 +67,7 @@ void RegisterLoaderClass(const char* const className, dLoadSaveBase* const loade
 	dLoaderFactory entry;
 	entry.m_classNameHash = dCRC64(className);
 	entry.m_loader = loaderClass;
-	dFixSizeArray<dLoaderFactory, 128>& factory = GetFactory();
+	dFixSizeArray<dLoaderFactory, D_LOADER_DICTIONARY_SIZE>& factory = GetFactory();
 	factory.PushBack(entry);
 	for (dInt32 i = factory.GetCount() - 2; i >= 0; i--)
 	{
@@ -86,7 +87,7 @@ void* LoadClass(const char* const className, const dLoadSaveBase::dLoadDescripto
 {
 	dUnsigned64 classNameHash = dCRC64(className);
 
-	const dFixSizeArray<dLoaderFactory, 128>& factory = GetFactory();
+	const dFixSizeArray<dLoaderFactory, D_LOADER_DICTIONARY_SIZE>& factory = GetFactory();
 
 	dInt32 i0 = 0; 
 	dInt32 i1 = factory.GetCount() - 1;

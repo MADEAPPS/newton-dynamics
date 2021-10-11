@@ -210,10 +210,11 @@ ndScene::~ndScene()
 	Cleanup();
 	Finish();
 	delete m_contactNotifyCallback;
-	ndContactList::FlushFreeList();
-	ndContactPointList::FlushFreeList();
-	ndShapeCompound::ndTreeArray::FlushFreeList();
-	ndShapeStaticProceduralMesh::ndEdgeMap::FlushFreeList();
+	dFreeListAlloc::Flush();
+	//ndContactList::FlushFreeList();
+	//ndContactPointList::FlushFreeList();
+	//ndShapeCompound::ndTreeArray::FlushFreeList();
+	//ndShapeStaticProceduralMesh::ndEdgeMap::FlushFreeList();
 }
 
 void ndScene::CollisionOnlyUpdate()
@@ -1898,10 +1899,8 @@ void ndScene::Cleanup()
 		RemoveBody(body);
 		delete body;
 	}
-	ndContact::FlushFreeList();
-	ndBodyList::FlushFreeList();
-	ndFitnessList::FlushFreeList();
-	ndBodyKinematic::ReleaseMemory();
+	dFreeListAlloc::Flush();
+	//ndBodyKinematic::ReleaseMemory();
 	m_activeBodyArray.Resize(256);
 	m_activeConstraintArray.Resize(256);
 }

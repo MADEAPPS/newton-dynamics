@@ -231,7 +231,8 @@ class dList: public dClassAlloc
 
 	static void FlushFreeList()
 	{
-		allocator::FlushFreeList();
+		dAssert(0);
+		//allocator::FlushFreeList();
 	}
 
 	protected:

@@ -156,7 +156,7 @@ class ndBodyKinematic: public ndBody
 	const ndContactMap& GetContactMap() const;
 
 	protected:
-	D_COLLISION_API static void ReleaseMemory();
+	//D_COLLISION_API static void ReleaseMemory();
 	D_COLLISION_API virtual void AttachContact(ndContact* const contact);
 	D_COLLISION_API virtual void DetachContact(ndContact* const contact);
 	D_COLLISION_API virtual void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);

@@ -272,9 +272,9 @@ class dTree: public dClassAlloc
 
 	static void FlushFreeList()
 	{
-		allocator::FlushFreeList();
+		dAssert(0);
+		//allocator::FlushFreeList();
 	}
-
 
 	// ***********************************************************
 	// member variables

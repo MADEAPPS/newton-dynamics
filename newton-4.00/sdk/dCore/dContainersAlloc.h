@@ -23,8 +23,6 @@
 #define _D_CONTAINERS_ALLOC_H_
 
 #include "dCoreStdafx.h"
-#include "dMemory.h"
-#include "dClassAlloc.h"
 
 template<class T>
 class dContainersAlloc: public dClassAlloc
@@ -43,79 +41,31 @@ class dContainersAlloc: public dClassAlloc
 	}
 };
 
-template<class T>
-class dContainersFreeListAlloc
+class dFreeListAlloc
 {
-	class FreeList 
-	{
-		public:
-		FreeList* m_next;
-	};
+	public:
+	dFreeListAlloc();
+	D_CORE_API static void Flush();
+	D_CORE_API void *operator new (size_t size);
+	D_CORE_API void operator delete (void* ptr);
+};
 
+inline dFreeListAlloc::dFreeListAlloc() 
+{
+}
+
+template<class T>
+class dContainersFreeListAlloc: public dFreeListAlloc
+{
 	public:
 	dContainersFreeListAlloc()
+		:dFreeListAlloc()
 	{
 	}
 
 	~dContainersFreeListAlloc()
 	{
 	}
-
-	void *operator new (size_t size)
-	{
-		dScopeSpinLock lock(m_lock);
-		FreeList** const freeList = GetFreeList();
-		if (*freeList) 
-		{
-			m_size--;
-			FreeList* const self = *freeList;
-			*freeList = self->m_next;
-			return self;
-		}
-		else
-		{
-			return dMemory::Malloc(size);
-		}
-	}
-
-	void operator delete (void* ptr)
-	{
-		dScopeSpinLock lock(m_lock);
-		FreeList** const freeList = GetFreeList();
-		FreeList* const self = (FreeList*)ptr;
-		self->m_next = *freeList;
-		*freeList = self;
-		m_size++;
-	}
-
-	static void FlushFreeList()
-	{
-		FreeList** const freeList = GetFreeList();
-		FreeList* first = *freeList;
-		while (first)
-		{
-			FreeList* const self = first;
-			first = first->m_next;
-			dMemory::Free(self);
-		}
-		m_size = 0;
-		*freeList = nullptr;
-	}
-
-	private:
-	static FreeList** GetFreeList()
-	{
-		static FreeList* freeList = nullptr;
-		return &freeList;
-	}
-	static dSpinLock m_lock;
-	static dUnsigned32 m_size;
 };
-
-template<class T>
-dSpinLock dContainersFreeListAlloc<T>::m_lock;
-
-template<class T>
-dUnsigned32 dContainersFreeListAlloc<T>::m_size = 0;
 
 #endif

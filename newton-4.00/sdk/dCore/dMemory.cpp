@@ -42,6 +42,11 @@ class dMemoryHeader
 	};
 };
 
+dInt32 dMemory::CalculateBufferSize(size_t size)
+{
+	return dInt32 (size + 2 * sizeof(dMemoryHeader) - 1);
+}
+
 void* dMemory::Malloc(size_t size)
 {
 	size += 2 * sizeof(dMemoryHeader) - 1;
@@ -61,6 +66,12 @@ void dMemory::Free(void* const ptr)
 	dMemoryHeader* const ret = ((dMemoryHeader*)ptr) - 1;
 	m_memoryUsed.fetch_sub(ret->m_size);
 	m_freeMemory(ret->m_ptr);
+}
+
+dInt32 dMemory::GetSize(void* const ptr)
+{
+	dMemoryHeader* const ret = ((dMemoryHeader*)ptr) - 1;
+	return ret->m_size;
 }
 
 dUnsigned64 dMemory::GetMemoryUsed()

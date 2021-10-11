@@ -186,10 +186,10 @@ void ndBodyKinematic::SetCollisionShape(const ndShapeInstance& shapeInstance)
 	}
 }
 
-void ndBodyKinematic::ReleaseMemory()
-{
-	ndContactMap::FlushFreeList();
-}
+//void ndBodyKinematic::ReleaseMemory()
+//{
+//	ndContactMap::FlushFreeList();
+//}
 
 ndContact* ndBodyKinematic::FindContact(const ndBody* const otherBody) const
 {

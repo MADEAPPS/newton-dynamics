@@ -39,6 +39,13 @@ class dMemory
 	/// Destroy a memory buffer previously allocated by Malloc.
 	D_CORE_API static void Free(void* const ptr);
 
+	/// Get memory buffer size previously allocated by Malloc.
+	D_CORE_API static dInt32 GetSize(void* const ptr);
+
+	/// Calculate buffer size.
+	D_CORE_API static dInt32 CalculateBufferSize(size_t size);
+
+
 	/// Return the total memory allocated by the newton engine and tools.
 	D_CORE_API static dUnsigned64 GetMemoryUsed();
 

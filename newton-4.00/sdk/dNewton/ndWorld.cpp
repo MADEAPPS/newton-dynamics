@@ -246,19 +246,7 @@ const char* ndWorld::GetSolverString() const
 
 void ndWorld::ClearCache()
 {
-	ndContact::FlushFreeList();
-	ndBodyList::FlushFreeList();
-	ndModelList::FlushFreeList();
-	ndJointList::FlushFreeList();
-	ndContactList::FlushFreeList();
-	ndSkeletonList::FlushFreeList();
-	ndContactPointList::FlushFreeList();
-	ndBodyParticleSetList::FlushFreeList();
-	ndScene::ndFitnessList::FlushFreeList();
-	dIsoSurface::dIsoVertexMap::FlushFreeList();
-	ndBodyKinematic::ndContactMap::FlushFreeList();
-	ndSkeletonContainer::ndNodeList::FlushFreeList();
-	ndShapeStaticProceduralMesh::ndEdgeMap::FlushFreeList();
+	dFreeListAlloc::Flush();
 }
 
 void ndWorld::UpdateTransforms()
