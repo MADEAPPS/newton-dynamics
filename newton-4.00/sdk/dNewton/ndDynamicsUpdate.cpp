@@ -927,7 +927,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 					const dInt32 index = body->m_index;
 					const ndJacobian& forceAndTorque = internalForces[index];
 					const dVector force(body->GetForce() + forceAndTorque.m_linear);
-					const dVector torque(body->GetTorque() - body->GetGyroTorque() + forceAndTorque.m_angular);
+					const dVector torque(body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque());
 
 					ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
 

@@ -1721,7 +1721,7 @@ void ndDynamicsUpdateSoa::IntegrateBodiesVelocity()
 					const dInt32 index = dynBody->m_index;
 					const ndJacobian& forceAndTorque = internalForces[index];
 					const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
-					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
+					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque());
 					ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
 
 					if (!body->m_resting)

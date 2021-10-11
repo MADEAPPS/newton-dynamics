@@ -22,8 +22,6 @@
 #ifndef __D_WORLD_DYNAMICS_UPDATE_AVX2_H__
 #define __D_WORLD_DYNAMICS_UPDATE_AVX2_H__
 
-//#include "ndNewtonStdafx.h"
-//#include "ndDynamicsUpdate.h"
 #include <ndNewton.h>
 
 class ndSoaMatrixElement;

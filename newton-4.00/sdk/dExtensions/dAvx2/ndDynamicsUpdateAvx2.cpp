@@ -19,13 +19,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-//#include "dCoreStdafx.h"
-//#include "ndNewtonStdafx.h"
-//#include "ndWorld.h"
-//#include "ndBodyDynamic.h"
-//#include "ndSkeletonList.h"
 #include "ndDynamicsUpdateAvx2.h"
-//#include "ndJointBilateralConstraint.h"
 
 #define D_AVX_WORD_GROUP_SIZE	8 
 
@@ -2120,7 +2114,7 @@ void ndDynamicsUpdateAvx2::IntegrateBodiesVelocity()
 					const dInt32 index = dynBody->m_index;
 					const ndJacobian& forceAndTorque = internalForces[index];
 					const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
-					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
+					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque());
 					ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
 
 					if (!body->m_resting)
