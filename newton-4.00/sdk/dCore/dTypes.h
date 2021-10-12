@@ -430,7 +430,7 @@ class dSpinLock
 	void Unlock()
 	{
 		#ifndef D_USE_THREAD_EMULATION	
-		m_lock.exchange(0);
+		m_lock.store(0);
 		#endif
 	}
 

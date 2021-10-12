@@ -62,6 +62,67 @@ class dFreeListDictionary: public dFixSizeArray<dFreeListHeader, D_FREELIST_DICT
 		return dictionary;
 	}
 
+	void Flush(dFreeListHeader* const header)
+	{
+		dFreeListEntry* next;
+		for (dFreeListEntry* node = header->m_headPointer; node; node = next)
+		{
+			next = node->m_next;
+			dMemory::Free(node);
+		}
+		header->m_count = 0;
+		header->m_headPointer = nullptr;
+	}
+
+	void* Malloc(dInt32 size)
+	{
+		dScopeSpinLock lock(m_lock);
+		dFreeListHeader* const header = FindEntry(dMemory::CalculateBufferSize(size));
+		dAssert(header->m_count >= 0);
+		if (header->m_count)
+		{
+			header->m_count--;
+			dFreeListEntry* const self = header->m_headPointer;
+			header->m_headPointer = self->m_next;
+			return self;
+		}
+		void* const ptr = dMemory::Malloc(size);
+		dAssert(dMemory::GetSize(ptr) == dMemory::CalculateBufferSize(size));
+		return ptr;
+	}
+
+	void Free(void* ptr)
+	{
+		dScopeSpinLock lock(m_lock);
+		dFreeListHeader* const header = FindEntry(dMemory::GetSize(ptr));
+		dAssert(header);
+		dFreeListEntry* const self = (dFreeListEntry*)ptr;
+
+		self->m_next = header->m_headPointer;
+		header->m_count++;
+		header->m_headPointer = self;
+	}
+
+	void Flush()
+	{
+		dScopeSpinLock lock(m_lock);
+		dFreeListDictionary& me = *this;
+		for (dInt32 i = 0; i < GetCount(); i++)
+		{
+			dFreeListHeader* const header = &me[i];
+			Flush(header);
+		}
+		SetCount(0);
+	}
+
+	void Flush(dInt32 size)
+	{
+		dScopeSpinLock lock(m_lock);
+		dFreeListHeader* const header = FindEntry(dMemory::CalculateBufferSize(size));
+		Flush(header);
+	}
+
+	private:
 	dFreeListHeader* FindEntry(dInt32 size)
 	{
 		dInt32 i0 = 0;
@@ -115,66 +176,6 @@ class dFreeListDictionary: public dFixSizeArray<dFreeListHeader, D_FREELIST_DICT
 			}
 		}
 		return &me[index];
-	}
-
-	void* Malloc(dInt32 size)
-	{
-		dScopeSpinLock lock(m_lock);
-		dFreeListHeader* const header = FindEntry(dMemory::CalculateBufferSize(size));
-		dAssert(header->m_count >= 0);
-		if (header->m_count)
-		{
-			header->m_count--;
-			dFreeListEntry* const self = header->m_headPointer;
-			header->m_headPointer = self->m_next;
-			return self;
-		}
-		void* const ptr = dMemory::Malloc(size);
-		dAssert(dMemory::GetSize(ptr) == dMemory::CalculateBufferSize(size));
-		return ptr;
-	}
-
-	void Free(void* ptr)
-	{
-		dScopeSpinLock lock(m_lock);
-		dFreeListHeader* const header = FindEntry(dMemory::GetSize(ptr));
-		dAssert(header);
-		dFreeListEntry* const self = (dFreeListEntry*)ptr;
-
-		self->m_next = header->m_headPointer;
-		header->m_count++;
-		header->m_headPointer = self;
-	}
-
-	void Flush(dFreeListHeader* const header)
-	{
-		dFreeListEntry* next;
-		for (dFreeListEntry* node = header->m_headPointer; node; node = next)
-		{
-			next = node->m_next;
-			dMemory::Free(node);
-		}
-		header->m_count = 0;
-		header->m_headPointer = nullptr;
-	}
-
-	void Flush()
-	{
-		dScopeSpinLock lock(m_lock);
-		dFreeListDictionary& me = *this;
-		for (dInt32 i = 0; i < GetCount(); i++)
-		{
-			dFreeListHeader* const header = &me[i];
-			Flush(header);
-		}
-		SetCount(0);
-	}
-
-	void Flush(dInt32 size)
-	{
-		dScopeSpinLock lock(m_lock);
-		dFreeListHeader* const header = FindEntry(dMemory::CalculateBufferSize(size));
-		Flush(header);
 	}
 
 	dSpinLock m_lock;
