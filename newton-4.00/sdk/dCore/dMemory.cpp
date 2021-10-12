@@ -37,27 +37,27 @@ class dMemoryHeader
 };
 
 #define D_MEMORY_ALIGMNET 32
-#define dGetBufferSize(x) dInt32(x + D_MEMORY_ALIGMNET - 1 + sizeof (dMemoryHeader))
+#define dGetBufferSize dInt32(D_MEMORY_ALIGMNET - 1 + sizeof (dMemoryHeader))
 
 dInt32 dMemory::CalculateBufferSize(size_t size)
 {
-	return dGetBufferSize(size);
+	return dInt32 (size + dGetBufferSize);
 }
 
 void* dMemory::Malloc(size_t size)
 {
 	//size += 2 * D_MEMORY_ALIGMNET - 1;
-	size = dGetBufferSize(size);
+	size += dGetBufferSize;
 	void* const ptr = m_allocMemory(size);
-	dInt64 val = dUnsigned64(ptr) + D_MEMORY_ALIGMNET - 1;
+	dInt64 val = dUnsigned64(ptr) + dGetBufferSize;
 	dInt64 mask = -dInt64(D_MEMORY_ALIGMNET);
 	val = val & mask;
 	dMemoryHeader* const ret = (dMemoryHeader*)val;
-
-	ret->m_ptr = ptr;
-	ret->m_size = dInt32 (size);
+	dMemoryHeader* const info = ret - 1;
+	info->m_ptr = ptr;
+	info->m_size = dInt32 (size);
 	m_memoryUsed.fetch_add(size);
-	return &ret[1];
+	return ret;
 }
 
 void dMemory::Free(void* const ptr)

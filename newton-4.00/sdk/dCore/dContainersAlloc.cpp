@@ -141,6 +141,18 @@ class dFreeListDictionary: public dFixSizeArray<dFreeListHeader, D_FREELIST_DICT
 		header->m_headPointer = self;
 	}
 
+	void Flush(dFreeListHeader* const header)
+	{
+		dFreeListEntry* next;
+		for (dFreeListEntry* node = header->m_headPointer; node; node = next)
+		{
+			next = node->m_next;
+			dMemory::Free(node);
+		}
+		header->m_count = 0;
+		header->m_headPointer = nullptr;
+	}
+
 	void Flush()
 	{
 		dScopeSpinLock lock(m_lock);
@@ -148,19 +160,20 @@ class dFreeListDictionary: public dFixSizeArray<dFreeListHeader, D_FREELIST_DICT
 		for (dInt32 i = 0; i < GetCount(); i++)
 		{
 			dFreeListHeader* const header = &me[i];
-			dFreeListEntry* next;
-			for (dFreeListEntry* node = header->m_headPointer; node; node = next)
-			{
-				next = node->m_next;
-				dMemory::Free(node);
-			}
+			Flush(header);
 		}
 		SetCount(0);
 	}
 
+	void Flush(dInt32 size)
+	{
+		dScopeSpinLock lock(m_lock);
+		dFreeListHeader* const header = FindEntry(dMemory::CalculateBufferSize(size));
+		Flush(header);
+	}
+
 	dSpinLock m_lock;
 };
-
 
 void dFreeListAlloc::Flush()
 {
@@ -180,4 +193,9 @@ void dFreeListAlloc::operator delete (void* ptr)
 	dictionary.Free(ptr);
 }
 
+void dFreeListAlloc::Flush(dInt32 size)
+{
+	dFreeListDictionary& dictionary = dFreeListDictionary::GetHeader();
+	dictionary.Flush(size);
+}
 
