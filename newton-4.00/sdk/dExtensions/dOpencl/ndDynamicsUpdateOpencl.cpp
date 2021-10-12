@@ -28,6 +28,56 @@
 #include "ndDynamicsUpdateOpencl.h"
 #include "ndJointBilateralConstraint.h"
 
+char* ndDynamicsUpdateOpencl::m_kernels = "							\
+struct ndOpenclMatrix3x3											\
+{																	\
+	float3 m_element[3];											\
+};																	\
+																	\
+struct ndOpenclBodyProxy											\
+{																	\
+	float4 m_rotation;												\
+	float3 m_position;												\
+	float3 m_veloc;													\
+	float3 m_omega;													\
+	float4 m_invMass;												\
+};																	\
+																	\
+struct ndOpenclBodyWorkingBuffer									\
+{																	\
+	struct ndOpenclMatrix3x3 m_matrix;								\
+	float4 m_rotation;												\
+	float3 m_position;												\
+	float3 m_veloc;													\
+	float3 m_omega;													\
+};																	\
+																	\
+__kernel void IntegrateUnconstrainedBodies(							\
+	float timestep,													\
+	int bodyCount,													\
+	__global struct ndOpenclBodyProxy* inputArray,					\
+	__global struct ndOpenclBodyWorkingBuffer* outputArray)			\
+{																	\
+	const int index = get_global_id(0);								\
+																	\
+	struct ndOpenclBodyProxy body;									\
+																	\
+	// load all variable into registers.							\
+	if (index < bodyCount)											\
+	{																\
+		body = inputArray[index];									\
+	}																\
+	barrier(CLK_LOCAL_MEM_FENCE);									\
+																	\
+	if (index < bodyCount)											\
+	{																\
+		struct ndOpenclMatrix3x3 matrix;							\
+		matrix = QuatToMatrix(body.m_rotation);						\
+	}																\
+}																	\
+																	\
+";													
+
 #if 0
 template<class T>
 class dOpenclBuffer: public dArray<T>

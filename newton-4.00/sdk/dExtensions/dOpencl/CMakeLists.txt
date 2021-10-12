@@ -25,7 +25,6 @@ include_directories(../../dNewton/dModels/dVehicle)
 include_directories(../../dNewton/dModels/dCharacter)
 
 add_definitions(-DCL_TARGET_OPENCL_VERSION=120)
-add_definitions(-DCL_KERNEL_PATH="${CMAKE_CURRENT_SOURCE_DIR}/dOpencl/")
 include_directories(./)
 include_directories(CL/)
 
