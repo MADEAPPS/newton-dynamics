@@ -18,10 +18,6 @@ if (NEWTON_BUILD_PROFILER)
 	add_subdirectory(dProfiler)
 endif()
 
-if(NEWTON_ENABLE_AVX2_SOLVER)
-	add_definitions(-D_D_USE_AVX2_SOLVER)
-endif()
-
 add_subdirectory(dExtensions)
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
@@ -29,9 +25,7 @@ if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	add_subdirectory(dNewton)
 	add_subdirectory(dTinyxml)
 	add_subdirectory(dCollision)
-
 else()
-
 	set (projectName "ndNewton")
 	message (${projectName})
 
@@ -45,22 +39,22 @@ else()
 	include_directories(dNewton/dModels/dCharacter)
 
 	if(NEWTON_ENABLE_AVX2_SOLVER)
+		add_definitions(-D_D_USE_AVX2_SOLVER)
 		include_directories(dExtensions/dAvx2)
 	endif()
 
 	if (NEWTON_ENABLE_GPU_SOLVER)
 		add_definitions(-D_D_NEWTON_OPENCL)
-		add_definitions(-DCL_TARGET_OPENCL_VERSION=120)
-		add_definitions(-DCL_KERNEL_PATH="${CMAKE_CURRENT_SOURCE_DIR}/dOpencl/")
-		include_directories(dOpencl/)
+		include_directories(dExtensions/dOpencl)
 
 		if(NEWTON_BUILD_SHARED_LIBS)
 			if (PTR_SIZE EQUAL 8)
-				link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dOpencl/CL/lib/x64/OpenCL.lib")
+				link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dExtensions/dOpencl/CL/lib/x64/OpenCL.lib")
 			else()
-				link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dOpencl/CL/lib/x86/OpenCL.lib")
+				link_libraries ("${CMAKE_CURRENT_SOURCE_DIR}/dExtensions/dOpencl/CL/lib/x86/OpenCL.lib")
 			endif()
 		endif()
+
 	endif(NEWTON_ENABLE_GPU_SOLVER)
 
 	# source and header files
@@ -103,7 +97,13 @@ else()
 		add_definitions(-D_D_COLLISION_EXPORT_DLL)
 		add_library(${projectName} SHARED ${CPP_SOURCE})
 
-		target_link_libraries (${projectName} ndAvx2Solver)
+		if(NEWTON_ENABLE_AVX2_SOLVER)
+			target_link_libraries (${projectName} ndSolverAvx2)
+		endif()
+
+		if (NEWTON_ENABLE_GPU_SOLVER)
+			target_link_libraries (${projectName} ndSolverOpenCL)
+		endif()
 
 		if(MSVC OR MINGW)
 			target_link_options(${projectName} PUBLIC "/DEBUG") 

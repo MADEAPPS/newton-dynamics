@@ -21,15 +21,14 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
+#include <CL/cl.h>
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
 #include "ndSkeletonList.h"
 #include "ndDynamicsUpdateOpencl.h"
 #include "ndJointBilateralConstraint.h"
 
-#ifdef _D_NEWTON_OPENCL
-#include <CL/cl.h>
-
+#if 0
 template<class T>
 class dOpenclBuffer: public dArray<T>
 {

@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
-set (projectName "ndSolverAvx2")
+set (projectName "ndSolverOpenCL")
 message (${projectName})
 
 include_directories(../.././)
@@ -23,6 +23,11 @@ include_directories(../../dNewton/dJoints/)
 include_directories(../../dNewton/dModels/)
 include_directories(../../dNewton/dModels/dVehicle)
 include_directories(../../dNewton/dModels/dCharacter)
+
+add_definitions(-DCL_TARGET_OPENCL_VERSION=120)
+add_definitions(-DCL_KERNEL_PATH="${CMAKE_CURRENT_SOURCE_DIR}/dOpencl/")
+include_directories(./)
+include_directories(CL/)
 
 file(GLOB CPP_SOURCE *.c *.cpp *.h)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})

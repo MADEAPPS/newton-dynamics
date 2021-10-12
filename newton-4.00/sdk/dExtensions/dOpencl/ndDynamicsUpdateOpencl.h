@@ -53,7 +53,8 @@ class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 	OpenclSystem* m_opencl;
 };
 
-#ifndef _D_NEWTON_OPENCL
+//#ifndef _D_NEWTON_OPENCL___
+#if 1
 inline ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world)
 	:ndDynamicsUpdate(world)
 	,m_opencl(nullptr)
