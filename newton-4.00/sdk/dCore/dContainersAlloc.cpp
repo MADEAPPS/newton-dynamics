@@ -51,6 +51,11 @@ class dFreeListDictionary: public dFixSizeArray<dFreeListHeader, D_FREELIST_DICT
 	{
 	}
 
+	~dFreeListDictionary()
+	{
+		Flush();
+	}
+
 	static dFreeListDictionary& GetHeader()
 	{
 		static dFreeListDictionary dictionary;
