@@ -28,56 +28,6 @@
 #include "ndDynamicsUpdateOpencl.h"
 #include "ndJointBilateralConstraint.h"
 
-char* ndDynamicsUpdateOpencl::m_kernels = "							\
-struct ndOpenclMatrix3x3											\
-{																	\
-	float3 m_element[3];											\
-};																	\
-																	\
-struct ndOpenclBodyProxy											\
-{																	\
-	float4 m_rotation;												\
-	float3 m_position;												\
-	float3 m_veloc;													\
-	float3 m_omega;													\
-	float4 m_invMass;												\
-};																	\
-																	\
-struct ndOpenclBodyWorkingBuffer									\
-{																	\
-	struct ndOpenclMatrix3x3 m_matrix;								\
-	float4 m_rotation;												\
-	float3 m_position;												\
-	float3 m_veloc;													\
-	float3 m_omega;													\
-};																	\
-																	\
-__kernel void IntegrateUnconstrainedBodies(							\
-	float timestep,													\
-	int bodyCount,													\
-	__global struct ndOpenclBodyProxy* inputArray,					\
-	__global struct ndOpenclBodyWorkingBuffer* outputArray)			\
-{																	\
-	const int index = get_global_id(0);								\
-																	\
-	struct ndOpenclBodyProxy body;									\
-																	\
-	// load all variable into registers.							\
-	if (index < bodyCount)											\
-	{																\
-		body = inputArray[index];									\
-	}																\
-	barrier(CLK_LOCAL_MEM_FENCE);									\
-																	\
-	if (index < bodyCount)											\
-	{																\
-		struct ndOpenclMatrix3x3 matrix;							\
-		matrix = QuatToMatrix(body.m_rotation);						\
-	}																\
-}																	\
-																	\
-";													
-
 #if 0
 template<class T>
 class dOpenclBuffer: public dArray<T>
@@ -175,6 +125,7 @@ class ndOpenclMatrix3x3
 	//cl_float3 m_matrix[3];
 };
 
+
 class ndOpenclBodyWorkingBuffer
 {
 	public:
@@ -185,22 +136,24 @@ class ndOpenclBodyWorkingBuffer
 	cl_float3 m_omega;
 };
 
-class OpenclSystem
+#endif
+
+class OpenclSystem: public dClassAlloc
 {
 	public:
 	OpenclSystem(cl_context context, cl_platform_id platform)
 		:m_context(context)
-		//,m_bodyArray(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR)
-		,m_bodyArray(CL_MEM_READ_ONLY)
-		//,m_outBodyArray(CL_MEM_WRITE_ONLY)
-		,m_bodyWorkingArray(CL_MEM_READ_WRITE)
+		////,m_bodyArray(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR)
+		//,m_bodyArray(CL_MEM_READ_ONLY)
+		////,m_outBodyArray(CL_MEM_WRITE_ONLY)
+		//,m_bodyWorkingArray(CL_MEM_READ_WRITE)
 		,m_integrateUnconstrainedBodies(nullptr)
 	{
 		cl_int err;
 		// get the device
 		err = clGetContextInfo(m_context, CL_CONTEXT_DEVICES, sizeof(cl_device_id), &m_device, nullptr);
 		dAssert(err == CL_SUCCESS);
-
+		
 		// get vendor driver support
 		size_t stringLength = 0;
 		err = clGetPlatformInfo(platform, CL_PLATFORM_NAME, 0, nullptr, &stringLength);
@@ -208,23 +161,23 @@ class OpenclSystem
 		dAssert(stringLength < sizeof(m_platformName));
 		err = clGetPlatformInfo(platform, CL_PLATFORM_NAME, stringLength, m_platformName, nullptr);
 		dAssert(err == CL_SUCCESS);
-
+		
 		// get opencl version
 		err = clGetDeviceInfo(m_device, CL_DEVICE_VERSION, 0, NULL, &stringLength);
 		dAssert(err == CL_SUCCESS);
 		dAssert(stringLength < sizeof(m_platformName));
 		err = clGetDeviceInfo(m_device, CL_DEVICE_VERSION, stringLength, m_platformName, nullptr);
 		dAssert(err == CL_SUCCESS);
-
+		
 		// create command queue
 		cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
 		m_commandQueue = clCreateCommandQueue(m_context, m_device, properties, &err);
 		dAssert(err == CL_SUCCESS);
-
-		char programFile[256];
-		sprintf(programFile, "%s/CL/solver/solver.cl", CL_KERNEL_PATH);
-		m_solverProgram = CompileProgram(programFile);
-
+		
+		//char programFile[256];
+		//sprintf(programFile, "%s/CL/solver/solver.cl", CL_KERNEL_PATH);
+		m_solverProgram = CompileProgram();
+		
 		m_integrateUnconstrainedBodies = clCreateKernel(m_solverProgram, "IntegrateUnconstrainedBodies", &err);
 		dAssert(err == CL_SUCCESS);
 	}
@@ -232,58 +185,21 @@ class OpenclSystem
 	~OpenclSystem()
 	{
 		cl_int err;
-
+		
 		err = clReleaseKernel(m_integrateUnconstrainedBodies);
 		dAssert(err == CL_SUCCESS);
-
+		
 		err = clReleaseProgram(m_solverProgram);
 		dAssert(err == CL_SUCCESS);
-
+		
 		err = clReleaseCommandQueue(m_commandQueue);
 		dAssert(err == CL_SUCCESS);
-
+		
 		err = clReleaseDevice(m_device);
 		dAssert(err == CL_SUCCESS);
-
+		
 		err = clReleaseContext(m_context);
 		dAssert(err == CL_SUCCESS);
-	}
-
-	cl_program CompileProgram(char* const filename)
-	{
-		FILE* const fp = fopen(filename, "rb");
-		if (fp)
-		{
-			size_t bytesRead;
-			size_t sourceSize;
-	
-			fseek(fp, 0, SEEK_END);
-			sourceSize = ftell(fp);
-			fseek(fp, 0, SEEK_SET);
-
-			char* const source = dAlloca(char, sourceSize * 256);
-			bytesRead = fread(source, 1, sourceSize, fp);
-			fclose(fp);
-
-			int errorCode;
-			cl_program program = clCreateProgramWithSource(m_context, 1, (const char**)&source, &sourceSize, &errorCode);
-			dAssert(errorCode == CL_SUCCESS);
-
-			errorCode = clBuildProgram(program, 1, &m_device, "", nullptr, nullptr);
-			if (errorCode == CL_BUILD_PROGRAM_FAILURE)
-			{
-				size_t log_size = 0;
-				clGetProgramBuildInfo(program, m_device, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
-
-				char* const build_log = dAlloca(char, log_size * 256);
-				clGetProgramBuildInfo(program, m_device, CL_PROGRAM_BUILD_LOG, log_size, build_log, nullptr);
-				dTrace((build_log));
-			}
-			dAssert(errorCode == CL_SUCCESS);
-
-			return program;
-		}
-		return nullptr;
 	}
 
 	static OpenclSystem* Singleton()
@@ -330,21 +246,110 @@ class OpenclSystem
 		return new OpenclSystem(context, bestPlatform);
 	}
 
+	cl_program CompileProgram()
+	{
+		int errorCode;
+		size_t sourceSize = strlen (m_kernelSource);
+		cl_program program = clCreateProgramWithSource(m_context, 1, (const char**)&m_kernelSource, &sourceSize, &errorCode);
+		dAssert(errorCode == CL_SUCCESS);
+
+		errorCode = clBuildProgram(program, 1, &m_device, "", nullptr, nullptr);
+		if (errorCode == CL_BUILD_PROGRAM_FAILURE)
+		{
+			size_t log_size = 0;
+			clGetProgramBuildInfo(program, m_device, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
+
+			char* const build_log = dAlloca(char, log_size + 4096);
+			clGetProgramBuildInfo(program, m_device, CL_PROGRAM_BUILD_LOG, log_size, build_log, nullptr);
+			dTrace((build_log));
+		}
+		dAssert(errorCode == CL_SUCCESS);
+		return program;
+	}
+
+	#if 0	
+	//cl_kernel        kernel;				// hold the kernel handler
+	
+
+	dOpenclBuffer<ndOpenclBodyProxy> m_bodyArray;
+	dOpenclBuffer<ndOpenclBodyWorkingBuffer> m_bodyWorkingArray;
+//	dOpenclBuffer<ndOpenclOutBodyProxy> m_outBodyArray;
+
+
+#endif
+
+	char m_platformName[128];
+
 	// Regular OpenCL objects:
 	cl_context m_context;					// hold the context handler
 	cl_device_id m_device;					// hold the selected device handler
 	cl_program	m_solverProgram;			// hold the program handler
 	cl_command_queue m_commandQueue;		// hold the commands-queue handler
 
-	//cl_kernel        kernel;				// hold the kernel handler
-	char m_platformName[128];
-
-	dOpenclBuffer<ndOpenclBodyProxy> m_bodyArray;
-	dOpenclBuffer<ndOpenclBodyWorkingBuffer> m_bodyWorkingArray;
-//	dOpenclBuffer<ndOpenclOutBodyProxy> m_outBodyArray;
-
 	cl_kernel m_integrateUnconstrainedBodies;
+
+	static char* m_kernelSource;
 };
+
+
+char* OpenclSystem::m_kernelSource = "								\
+struct ndOpenclMatrix3x3											\
+{																	\
+	float3 m_element[3];											\
+};																	\n\
+																	\n\
+struct ndOpenclBodyProxy											\n\
+{																	\n\
+	float4 m_rotation;												\n\
+	float3 m_position;												\n\
+	float3 m_veloc;													\n\
+	float3 m_omega;													\n\
+	float4 m_invMass;												\n\
+};																	\n\
+																	\n\
+struct ndOpenclBodyWorkingBuffer									\n\
+{																	\n\
+	struct ndOpenclMatrix3x3 m_matrix;								\n\
+	float4 m_rotation;												\n\
+	float3 m_position;												\n\
+	float3 m_veloc;													\n\
+	float3 m_omega;													\n\
+};																	\n\
+																	\n\
+struct ndOpenclMatrix3x3 QuatToMatrix(float4 rotation)				\n\
+{																	\n\
+	struct ndOpenclMatrix3x3 matrix;								\n\
+	return matrix;													\n\
+}																	\n\
+																	\n\
+__kernel void IntegrateUnconstrainedBodies(							\n\
+	float timestep,													\n\
+	int bodyCount,													\n\
+	__global struct ndOpenclBodyProxy* inputArray,					\n\
+	__global struct ndOpenclBodyWorkingBuffer* outputArray)			\n\
+{																	\n\
+	const int index = get_global_id(0);								\n\
+																	\n\
+	struct ndOpenclBodyProxy body;									\n\
+																	\n\
+	// load all variable into registers.							\n\
+	if (index < bodyCount)											\n\
+	{																\n\
+		body = inputArray[index];									\n\
+	}																\n\
+	barrier(CLK_LOCAL_MEM_FENCE);									\n\
+																	\n\
+	if (index < bodyCount)											\n\
+	{																\n\
+		struct ndOpenclMatrix3x3 matrix;							\n\
+		matrix = QuatToMatrix(body.m_rotation);						\n\
+	}																\n\
+}																	\n\
+																	\n\
+";
+
+
+
 
 ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world)
 	:ndDynamicsUpdate(world)
@@ -352,6 +357,7 @@ ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world)
 {
 	m_opencl = OpenclSystem::Singleton();
 }
+
 
 ndDynamicsUpdateOpencl::~ndDynamicsUpdateOpencl()
 {
@@ -366,6 +372,8 @@ const char* ndDynamicsUpdateOpencl::GetStringId() const
 	return m_opencl ? m_opencl->m_platformName : "no opencl support";
 }
 
+
+#if 0
 void ndDynamicsUpdateOpencl::Update()
 {
 	D_TRACKTIME();

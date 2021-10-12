@@ -51,25 +51,10 @@ class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 	void IntegrateUnconstrainedBodies();
 
 	OpenclSystem* m_opencl;
-	static char* m_kernels;
 };
 
 
 #if 1
-inline ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world)
-	:ndDynamicsUpdate(world)
-	,m_opencl(nullptr)
-{
-}
-
-inline ndDynamicsUpdateOpencl::~ndDynamicsUpdateOpencl()
-{
-}
-
-inline const char* ndDynamicsUpdateOpencl::GetStringId() const
-{
-	return "no opencl support";
-}
 
 inline void ndDynamicsUpdateOpencl::Update()
 {
