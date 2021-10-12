@@ -26,7 +26,7 @@
 #include "dFixSizeArray.h"
 #include "dContainersAlloc.h"
 
-#define D_FREELIST_DICTIONARY_SIZE 256
+#define D_FREELIST_DICTIONARY_SIZE 64
 
 class dFreeListEntry
 {

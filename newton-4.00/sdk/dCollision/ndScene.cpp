@@ -968,7 +968,6 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		}
 		else 
 		{
-			//dScopeSpinLock lock(m_contactLock);
 			contactNode = contactPointList.Append();
 		}
 
