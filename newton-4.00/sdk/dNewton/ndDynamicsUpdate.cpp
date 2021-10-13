@@ -81,7 +81,7 @@ dInt32 ndDynamicsUpdate::CompareIslands(const ndIsland* const islandA, const ndI
 	return 0;
 }
 
-#if 1
+#if 0
 void ndDynamicsUpdate::SortJoints()
 {
 	D_TRACKTIME();
@@ -372,7 +372,8 @@ void ndDynamicsUpdate::SortJoints()
 	ndConstraint** const sortBuffer = (ndConstraint**)&m_leftHandSide[0];
 
 	dInt32 histogram[2];
-	memset(histogram, 0, sizeof(histogram));
+	histogram[0] = 0;
+	histogram[1] = 0;
 	for (dInt32 i = jointArray.GetCount() - 1; i >= 0; i--)
 	{
 		ndConstraint* const joint = jointArray[i];
@@ -383,16 +384,15 @@ void ndDynamicsUpdate::SortJoints()
 		histogram[key]++;
 	}
 
-	dInt32 acc = histogram[0];
-	histogram[0] = 0;
-	histogram[1] = acc;
-	m_activeJointCount = acc;
-	dAssert(acc <= jointArray.GetCount());
+	m_activeJointCount = histogram[0];
+	dAssert(m_activeJointCount <= jointArray.GetCount());
 	if (!m_activeJointCount)
 	{
 		return;
 	}
 
+	histogram[1] = histogram[0];
+	histogram[0] = 0;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = sortBuffer[i];
@@ -475,7 +475,7 @@ void ndDynamicsUpdate::SortJoints()
 		jointCountSpans[key.m_value] ++;
 	}
 
-	acc = 0;
+	dInt32 acc = 0;
 	for (dInt32 i = 0; i < dInt32(sizeof(jointCountSpans) / sizeof(jointCountSpans[0])); i++)
 	{
 		const dInt32 val = jointCountSpans[i];
