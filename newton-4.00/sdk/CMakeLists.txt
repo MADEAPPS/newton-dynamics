@@ -43,7 +43,7 @@ else()
 		include_directories(dExtensions/dAvx2)
 	endif()
 
-	if (NEWTON_ENABLE_GPU_SOLVER)
+	if (NEWTON_ENABLE_OPENCL_SOLVER)
 		add_definitions(-D_D_NEWTON_OPENCL)
 		include_directories(dExtensions/dOpencl)
 
@@ -55,7 +55,7 @@ else()
 			endif()
 		endif()
 
-	endif(NEWTON_ENABLE_GPU_SOLVER)
+	endif(NEWTON_ENABLE_OPENCL_SOLVER)
 
 	# source and header files
 	file(GLOB HEADERS 
@@ -101,7 +101,7 @@ else()
 			target_link_libraries (${projectName} ndSolverAvx2)
 		endif()
 
-		if (NEWTON_ENABLE_GPU_SOLVER)
+		if (NEWTON_ENABLE_OPENCL_SOLVER)
 			target_link_libraries (${projectName} ndSolverOpenCL)
 		endif()
 

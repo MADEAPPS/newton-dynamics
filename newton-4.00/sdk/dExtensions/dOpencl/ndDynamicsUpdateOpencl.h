@@ -40,9 +40,29 @@ class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 	protected:
 	virtual void Update();
 
+	private:
+	void GpuUpdate();
+	void SortJoints();
+	void SortIslands();
+	void BuildIsland();
+	static dInt32 CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const);
+
 	OpenclSystem* m_opencl;
 };
 
+
+inline void ndDynamicsUpdateOpencl::Update()
+{
+	if (m_opencl)
+	{
+		GpuUpdate();
+	}
+	else
+	{
+		ndDynamicsUpdate::Update();
+	}
+
+}
 
 #endif
 

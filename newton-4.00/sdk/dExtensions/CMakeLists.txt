@@ -14,7 +14,7 @@ if(NEWTON_ENABLE_AVX2_SOLVER)
 	add_subdirectory(dAvx2)
 endif()
 
-if (NEWTON_ENABLE_GPU_SOLVER)
+if (NEWTON_ENABLE_OPENCL_SOLVER)
 	add_subdirectory(dOpencl)
 endif()
 
