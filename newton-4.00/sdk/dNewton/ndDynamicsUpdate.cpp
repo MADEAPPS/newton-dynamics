@@ -1655,7 +1655,6 @@ void ndDynamicsUpdate::CalculateForces()
 	}
 }
 
-#ifndef TEST_TWO_PASS_SOLVER 
 void ndDynamicsUpdate::Update()
 {
 	D_TRACKTIME();
@@ -1673,24 +1672,3 @@ void ndDynamicsUpdate::Update()
 		DetermineSleepStates();
 	}
 }
-
-#else
-
-void ndDynamicsUpdate::Update()
-{
-	D_TRACKTIME();
-	m_timestep = m_world->GetScene()->GetTimestep();
-
-	BuildIsland();
-	if (m_islands.GetCount())
-	{
-		IntegrateUnconstrainedBodies();
-		InitWeights();
-		InitBodyArray();
-		InitJacobianMatrix();
-		CalculateForces();
-		IntegrateBodies();
-		DetermineSleepStates();
-	}
-}
-#endif
