@@ -28,6 +28,8 @@
 #include "ndDynamicsUpdateOpencl.h"
 #include "ndJointBilateralConstraint.h"
 
+#define D_BLOCK_SIZE	128
+
 #if 0
 template<class T>
 class dOpenclBuffer: public dArray<T>
@@ -615,6 +617,79 @@ dInt32 ndDynamicsUpdateOpencl::CompareIslands(const ndIsland* const islandA, con
 	return 0;
 }
 
+
+void ndDynamicsUpdateOpencl::RadixSort()
+{
+	dInt32 elements = m_islands.GetCount();
+	if (elements < 64)
+	{
+		dSort(&m_islands[0], elements, CompareIslands);
+	}
+	else
+	{
+		const dInt32 radixBits = 9;
+		dInt32 histogram[2][1 << radixBits];
+
+		memset(histogram, 0, sizeof(histogram));
+		for (dInt32 i = 0; i < elements; i++)
+		{
+			dUnsigned32 key = m_islands[i].m_count * 2 + m_islands[i].m_root->m_bodyIsConstrained;
+			dInt32 radix0 = key & ((1 << radixBits) - 1);
+			dInt32 radix1 = key >> radixBits;
+			histogram[0][radix0]++;
+			histogram[1][radix1]++;
+		}
+
+		dInt32 acc0 = 0;
+		dInt32 acc1 = 0;
+		for (dInt32 i = 0; i < (1 << radixBits); i++)
+		{
+			const dInt32 n0 = histogram[0][i];
+			const dInt32 n1 = histogram[1][i];
+			histogram[0][i] = acc0;
+			histogram[1][i] = acc1;
+			acc0 += n0;
+			acc1 += n1;
+		}
+
+		ndIsland* const buffer = dAlloca(ndIsland, elements);
+
+		dInt32* const scan0 = &histogram[0][0];
+		for (dInt32 i = 0; i < elements; i++)
+		{
+			dUnsigned32 key = (m_islands[i].m_count * 2 + m_islands[i].m_root->m_bodyIsConstrained) & ((1 << radixBits) - 1);
+			const dInt32 index = scan0[key];
+			buffer[index] = m_islands[i];
+			scan0[key] = index + 1;
+		}
+
+		if (histogram[1][1] != elements)
+		{
+			dInt32* const scan1 = &histogram[1][0];
+			for (dInt32 i = 0; i < elements; i++)
+			{
+				dUnsigned32 key = (buffer[i].m_count * 2 + buffer[i].m_root->m_bodyIsConstrained) >> radixBits;
+				const dInt32 index = scan1[key];
+				m_islands[index] = buffer[index];
+				scan1[key] = index + 1;
+			}
+		}
+		else
+		{
+			memcpy(&m_islands[0], buffer, elements * sizeof(ndIsland));
+		}
+
+		#ifdef _DEBUG
+		for (dInt32 i = 0; i < (elements - 1); i++)
+		{
+			dUnsigned32 key0 = m_islands[i].m_count * 2 + m_islands[i].m_root->m_bodyIsConstrained;
+			dUnsigned32 key1 = m_islands[i + 1].m_count * 2 + m_islands[i + 1].m_root->m_bodyIsConstrained;
+			dAssert(key0 <= key1);
+		}
+		#endif
+	}
+}
+
 void ndDynamicsUpdateOpencl::SortIslands()
 {
 	D_TRACKTIME();
@@ -706,7 +781,7 @@ void ndDynamicsUpdateOpencl::SortIslands()
 		}
 
 		m_unConstrainedBodyCount = unConstrainedCount;
-		dSort(&m_islands[0], m_islands.GetCount(), CompareIslands);
+		RadixSort();
 	}
 }
 

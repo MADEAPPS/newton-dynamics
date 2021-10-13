@@ -25,8 +25,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndDynamicsUpdate.h"
 
-#define D_BLOCK_SIZE	128
-
 class OpenclSystem;
 
 class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
@@ -42,9 +40,11 @@ class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 
 	private:
 	void GpuUpdate();
+	void RadixSort();
 	void SortJoints();
 	void SortIslands();
 	void BuildIsland();
+	
 	static dInt32 CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const);
 
 	OpenclSystem* m_opencl;
