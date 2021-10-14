@@ -106,6 +106,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
 
 	private:
+	void RadixSort();
 	void SortJoints();
 	void SortIslands();
 	void BuildIsland();

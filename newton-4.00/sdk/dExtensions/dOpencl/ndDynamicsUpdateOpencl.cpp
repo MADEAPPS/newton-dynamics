@@ -617,7 +617,6 @@ dInt32 ndDynamicsUpdateOpencl::CompareIslands(const ndIsland* const islandA, con
 	return 0;
 }
 
-
 void ndDynamicsUpdateOpencl::RadixSort()
 {
 	dInt32 elements = m_islands.GetCount();
