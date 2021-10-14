@@ -80,6 +80,7 @@ class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 	virtual void Update();
 
 	private:
+	void RadixSort();
 	void SortJoints();
 	void SortIslands();
 	void BuildIsland();

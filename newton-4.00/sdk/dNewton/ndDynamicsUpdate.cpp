@@ -650,29 +650,29 @@ void ndDynamicsUpdate::SortJoints()
 void ndDynamicsUpdate::RadixSort()
 {
 	dInt32 elements = m_islands.GetCount();
-	//if (elements < 64)
-	if (1)
+	if (elements < 256)
 	{
 		dSort(&m_islands[0], elements, CompareIslands);
 	}
 	else
 	{
 		const dInt32 radixBits = 9;
+		const dInt32 radix = (1 << radixBits) - 1;
 		dInt32 histogram[2][1 << radixBits];
 
 		memset(histogram, 0, sizeof(histogram));
 		for (dInt32 i = 0; i < elements; i++)
 		{
 			dUnsigned32 key = m_islands[i].m_count * 2 + m_islands[i].m_root->m_bodyIsConstrained;
-			dInt32 radix0 = key & ((1 << radixBits) - 1);
-			dInt32 radix1 = key >> radixBits;
+			dInt32 radix0 = radix - (key & radix);
+			dInt32 radix1 = radix - (key >> radixBits);
 			histogram[0][radix0]++;
 			histogram[1][radix1]++;
 		}
 
 		dInt32 acc0 = 0;
 		dInt32 acc1 = 0;
-		for (dInt32 i = 0; i < (1 << radixBits); i++)
+		for (dInt32 i = 0; i <= radix; i++)
 		{
 			const dInt32 n0 = histogram[0][i];
 			const dInt32 n1 = histogram[1][i];
@@ -687,36 +687,29 @@ void ndDynamicsUpdate::RadixSort()
 		dInt32* const scan0 = &histogram[0][0];
 		for (dInt32 i = 0; i < elements; i++)
 		{
-			dUnsigned32 key = (m_islands[i].m_count * 2 + m_islands[i].m_root->m_bodyIsConstrained) & ((1 << radixBits) - 1);
+			dUnsigned32 key = radix - ((m_islands[i].m_count * 2 + m_islands[i].m_root->m_bodyIsConstrained) & radix);
 			const dInt32 index = scan0[key];
 			buffer[index] = m_islands[i];
 			scan0[key] = index + 1;
 		}
 
-		if (histogram[1][1] != elements)
+		dInt32* const scan1 = &histogram[1][0];
+		for (dInt32 i = 0; i < elements; i++)
 		{
-			dInt32* const scan1 = &histogram[1][0];
-			for (dInt32 i = 0; i < elements; i++)
-			{
-				dUnsigned32 key = (buffer[i].m_count * 2 + buffer[i].m_root->m_bodyIsConstrained) >> radixBits;
-				const dInt32 index = scan1[key];
-				m_islands[index] = buffer[index];
-				scan1[key] = index + 1;
-			}
-		}
-		else
-		{
-			memcpy(&m_islands[0], buffer, elements * sizeof(ndIsland));
+			dUnsigned32 key = radix - ((buffer[i].m_count * 2 + buffer[i].m_root->m_bodyIsConstrained) >> radixBits);
+			const dInt32 index = scan1[key];
+			m_islands[index] = buffer[i];
+			scan1[key] = index + 1;
 		}
 
-#ifdef _DEBUG
-		for (dInt32 i = 0; i < (elements - 1); i++)
+		#ifdef _DEBUG
+		for (dInt32 i = elements - 1; i ; i--)
 		{
-			dUnsigned32 key0 = m_islands[i + 0].m_count * 2 + m_islands[i + 0].m_root->m_bodyIsConstrained;
-			dUnsigned32 key1 = m_islands[i + 1].m_count * 2 + m_islands[i + 1].m_root->m_bodyIsConstrained;
-			dAssert(key0 <= key1);
+			dUnsigned32 key0 = m_islands[i - 1].m_count * 2 + m_islands[i - 1].m_root->m_bodyIsConstrained;
+			dUnsigned32 key1 = m_islands[i + 0].m_count * 2 + m_islands[i + 0].m_root->m_bodyIsConstrained;
+			dAssert(key0 >= key1);
 		}
-#endif
+		#endif
 	}
 }
 
