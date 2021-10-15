@@ -32,9 +32,9 @@ ndConstraint::ndConstraint()
 	,m_preconditioner1(dFloat32(1.0f))
 	,m_rowCount(0)
 	,m_rowStart(0)
-	,m_jointFeebackForce(false)
-	,m_isInSkeletonLoop(false)
-	,m_active(true)
+	,m_active(1)
+	,m_isInSkeletonLoop(0)
+	//,m_jointFeebackForce(0)
 {
 }
 

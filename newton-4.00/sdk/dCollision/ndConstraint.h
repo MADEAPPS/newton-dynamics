@@ -252,9 +252,10 @@ class ndConstraint
 	dFloat32 m_preconditioner1;
 	dInt32 m_rowCount;
 	dInt32 m_rowStart;
-	bool m_jointFeebackForce;
-	bool m_isInSkeletonLoop;
-	bool m_active;
+	dUnsigned32 m_active : 1;
+	dUnsigned32 m_isInSkeletonLoop : 1;
+	//dUnsigned32 m_jointFeebackForce : 1;
+	
 	protected:
 	ndConstraint();
 } D_GCC_NEWTON_ALIGN_32 ;
@@ -275,12 +276,12 @@ inline ndJointBilateralConstraint* ndConstraint::GetAsBilateral()
 
 inline bool ndConstraint::IsActive() const
 { 
-	return m_active; 
+	return m_active ? true : false;
 }
 
 inline void ndConstraint::SetActive(bool state)
 { 
-	m_active = state; 
+	m_active = state ? 1 : 0;
 }
 
 inline bool ndConstraint::IsBilateral() const

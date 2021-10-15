@@ -56,7 +56,7 @@ ndContact::ndContact()
 	,m_skeletonIntraCollision(1)
 	,m_skeletonSelftCollision(1)
 {
-	m_active = false;
+	m_active = 0;
 }
 
 ndContact::~ndContact()
