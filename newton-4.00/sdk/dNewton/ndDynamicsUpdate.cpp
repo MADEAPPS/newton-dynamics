@@ -375,11 +375,15 @@ void ndDynamicsUpdate::SortJoints()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				const ndConstraint* const joint = jointArray[i + start];
+				ndConstraint* const joint = jointArray[i + start];
 				ndBodyKinematic* const body0 = joint->GetBody0();
 				ndBodyKinematic* const body1 = joint->GetBody1();
 				dAssert(body0->m_solverSleep1 <= 1);
 				dAssert(body1->m_solverSleep1 <= 1);
+
+				const dInt32 sleeping = body0->m_resting & body1->m_resting;
+				//activeJointCount += (1 - sleeping);
+				joint->m_sleeping = sleeping;
 
 				const dInt32 test = body0->m_solverSleep0 & body1->m_solverSleep0;
 				if (!test)
@@ -588,12 +592,10 @@ void ndDynamicsUpdate::SortJoints()
 		ndConstraint* const joint = jointArray[i];
 		sortBuffer[i] = joint;
 
-		const ndBodyKinematic* const body0 = joint->GetBody0();
-		const ndBodyKinematic* const body1 = joint->GetBody1();
-		const dInt32 resting = (body0->m_resting & body1->m_resting) ? 1 : 0;
-		activeJointCount += (1 - resting);
+		dAssert((joint->GetBody0()->m_resting & joint->GetBody1()->m_resting) == joint->m_sleeping);
+		activeJointCount += (1 - joint->m_sleeping);
 
-		const ndSortKey key(resting, joint->m_rowCount);
+		const ndSortKey key(joint->m_sleeping, joint->m_rowCount);
 		dAssert(key.m_value >= 0);
 		dAssert(key.m_value < dInt32(sizeof(jointCountSpans) / sizeof(jointCountSpans[0])));
 		jointCountSpans[key.m_value] ++;
