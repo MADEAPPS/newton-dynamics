@@ -327,20 +327,31 @@ void ndDynamicsUpdate::SortJoints()
 
 			for (dInt32 i = 0; i < blockSize; i ++)
 			{
-				const ndConstraint* const joint = jointArray[i + start];
+				ndConstraint* const joint = jointArray[i + start];
 				ndBodyKinematic* const body0 = joint->GetBody0();
 				ndBodyKinematic* const body1 = joint->GetBody1();
 				dAssert(body0->m_solverSleep0 <= 1);
 				dAssert(body1->m_solverSleep0 <= 1);
 
-				const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
-				if (!resting)
+				const dInt32 rows = joint->GetRowsCount();
+				joint->m_rowCount = rows;
+				
+				const dInt32 equilibrium = (body0->m_equilibrium & body1->m_equilibrium) ? 1 : 0;
+				if (!equilibrium)
 				{
 					body0->m_solverSleep0 = 0;
 					if (body1->GetInvMass() > dFloat32(0.0f))
 					{
 						body1->m_solverSleep0 = 0;
 					}
+				}
+
+				body0->m_bodyIsConstrained = 1;
+				body0->m_resting = body0->m_resting & equilibrium;
+				if (body1->GetInvMass() > dFloat32(0.0f))
+				{
+					body1->m_bodyIsConstrained = 1;
+					body1->m_resting = body1->m_resting & equilibrium;
 				}
 			}
 		}
@@ -531,18 +542,9 @@ void ndDynamicsUpdate::SortJoints()
 		ndConstraint* const joint = jointArray[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
 		ndBodyKinematic* const body1 = joint->GetBody1();
-		const dInt32 resting = (body0->m_equilibrium & body1->m_equilibrium) ? 1 : 0;
-		const dInt32 rows = joint->GetRowsCount();
-		joint->m_rowCount = rows;
-
-		body0->m_bodyIsConstrained = 1;
-		body0->m_resting = body0->m_resting & resting;
 
 		if (body1->GetInvMass() > dFloat32(0.0f))
 		{
-			body1->m_bodyIsConstrained = 1;
-			body1->m_resting = body1->m_resting & resting;
-
 			ndBodyKinematic* root0 = FindRootAndSplit(body0);
 			ndBodyKinematic* root1 = FindRootAndSplit(body1);
 			if (root0 != root1)
