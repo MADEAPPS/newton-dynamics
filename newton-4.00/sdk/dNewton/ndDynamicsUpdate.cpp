@@ -373,6 +373,7 @@ void ndDynamicsUpdate::SortJoints()
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
 
+			dInt32 activeJointCount = 0;
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				ndConstraint* const joint = jointArray[i + start];
@@ -382,7 +383,7 @@ void ndDynamicsUpdate::SortJoints()
 				dAssert(body1->m_solverSleep1 <= 1);
 
 				const dInt32 sleeping = body0->m_resting & body1->m_resting;
-				//activeJointCount += (1 - sleeping);
+				activeJointCount += (1 - sleeping);
 				joint->m_sleeping = sleeping;
 
 				const dInt32 test = body0->m_solverSleep0 & body1->m_solverSleep0;
@@ -395,6 +396,7 @@ void ndDynamicsUpdate::SortJoints()
 					}
 				}
 			}
+			*(((dInt32*)m_context) + threadIndex) = activeJointCount;
 		}
 	};
 
@@ -489,20 +491,28 @@ void ndDynamicsUpdate::SortJoints()
 	m_leftHandSide.SetCount(jointArray.GetCount() + 32);
 	
 	dInt32 histogram[D_MAX_THREADS_COUNT][2];
+	dInt32 movingJoints[D_MAX_THREADS_COUNT];
 	const dInt32 threadCount = scene->GetThreadCount();
-	memset(histogram, 0, 2 * sizeof(dInt32) * threadCount);
+	for (dInt32 i = 0; i < threadCount; i++)
+	{
+		histogram[i][0] = 0;
+		histogram[i][1] = 0;
+		movingJoints[i] = 0;
+	}
 
 	scene->SubmitJobs<ndSleep0>();
-	scene->SubmitJobs<ndSleep1>();
+	scene->SubmitJobs<ndSleep1>(movingJoints);
 	scene->SubmitJobs<ndScan0>(histogram);
 
 	dInt32 scan[2];
 	scan[0] = 0;
 	scan[1] = 0;
+	dInt32 movingJointCount = 0;
 	for (dInt32 i = 0; i < threadCount; i++)
 	{
 		scan[0] += histogram[i][0];
 		scan[1] += histogram[i][1];
+		movingJointCount += movingJoints[i];
 	}
 	
 	m_activeJointCount = scan[0];
@@ -600,6 +610,8 @@ void ndDynamicsUpdate::SortJoints()
 		dAssert(key.m_value < dInt32(sizeof(jointCountSpans) / sizeof(jointCountSpans[0])));
 		jointCountSpans[key.m_value] ++;
 	}
+	dAssert(movingJointCount == activeJointCount);
+	m_activeJointCount = activeJointCount;
 
 	dInt32 acc = 0;
 	for (dInt32 i = 0; i < dInt32(sizeof(jointCountSpans) / sizeof(jointCountSpans[0])); i++)
@@ -609,15 +621,11 @@ void ndDynamicsUpdate::SortJoints()
 		acc += val;
 	}
 
-	m_activeJointCount = activeJointCount;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = sortBuffer[i];
-		const ndBodyKinematic* const body0 = joint->GetBody0();
-		const ndBodyKinematic* const body1 = joint->GetBody1();
-		const dInt32 resting = (body0->m_resting & body1->m_resting) ? 1 : 0;
-
-		const ndSortKey key(resting, joint->m_rowCount);
+		dAssert((joint->GetBody0()->m_resting & joint->GetBody1()->m_resting) == joint->m_sleeping);
+		const ndSortKey key(joint->m_sleeping, joint->m_rowCount);
 		dAssert(key.m_value >= 0);
 		dAssert(key.m_value < dInt32(sizeof(jointCountSpans) / sizeof(jointCountSpans[0])));
 
