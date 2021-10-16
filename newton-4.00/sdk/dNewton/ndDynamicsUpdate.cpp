@@ -491,14 +491,10 @@ void ndDynamicsUpdate::SortJoints()
 				dAssert((joint->GetBody0()->m_resting & joint->GetBody1()->m_resting) == joint->m_sleeping);
 				const ndSortKey key(joint->m_sleeping, joint->m_rowCount);
 
-				//if (joint->m_sleeping)
-				dTrace(("%d (%d %d) sleep %d \n", i, joint->GetBody0()->m_uniqueId, joint->GetBody1()->m_uniqueId, joint->m_sleeping))
-
 				dAssert(key.m_value >= 0);
 				dAssert(key.m_value <= 127);
 				jointCountSpans[key.m_value] ++;
 			}
-			dTrace(("\n"));
 		}
 	};
 
@@ -627,7 +623,25 @@ void ndDynamicsUpdate::SortJoints()
 	}
 	#endif
 
+ndConstraint* xxxxxxxxx;
+xxxxxxxxx = nullptr;
+for (dInt32 i = 0; i < jointArray.GetCount(); i++)
+{
+	ndConstraint* const joint = jointArray[i];
+	if ((joint->GetBody0()->m_uniqueId == 4) && (joint->GetBody1()->m_uniqueId == 1))
+		xxxxxxxxx = joint;
+}
+dAssert(xxxxxxxxx);
 	jointArray.SetCount(m_activeJointCount);
+xxxxxxxxx = nullptr;
+for (dInt32 i = 0; i < jointArray.GetCount(); i++)
+{
+	ndConstraint* const joint = jointArray[i];
+	if ((joint->GetBody0()->m_uniqueId == 4) && (joint->GetBody1()->m_uniqueId == 1))
+		xxxxxxxxx = joint;
+}
+dAssert(xxxxxxxxx);
+
 	for (dInt32 i = m_activeJointCount - 1; i >= 0; i--)
 	{
 		ndConstraint* const joint = jointArray[i];
@@ -687,16 +701,13 @@ xxxx *= 1;
 		dAssert((joint->GetBody0()->m_resting & joint->GetBody1()->m_resting) == joint->m_sleeping);
 	
 		const ndSortKey key(joint->m_sleeping, joint->m_rowCount);
-//if (joint->m_sleeping)
-//dTrace(("%d (%d %d) sleep %d \n", i, joint->GetBody0()->m_uniqueId, joint->GetBody1()->m_uniqueId, joint->m_sleeping))
 		dAssert(key.m_value >= 0);
 		dAssert(key.m_value < 127);
 		jointCountSpans[key.m_value] ++;
 	}
-//	dTrace(("\n"));
 
 	dInt32 acc = 0;
-	for (dInt32 i = 0; i < dInt32(sizeof(jointCountSpans) / sizeof(jointCountSpans[0])); i++)
+	for (dInt32 i = 0; i < 128; i++)
 	{
 		const dInt32 val = jointCountSpans[i];
 		jointCountSpans[i] = acc;
