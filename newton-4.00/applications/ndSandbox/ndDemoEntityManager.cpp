@@ -277,12 +277,12 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
 	//m_autoSleepMode = false;
-	//m_solverMode = ndWorld::ndSimdSoaSolver;
+	m_solverMode = ndWorld::ndSimdSoaSolver;
 	//m_solverMode = ndWorld::ndOpenclSolver;
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
-	m_solverMode = ndWorld::ndStandardSolver;
+	//m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverPasses = 4;
-	m_workerThreads = 4;
+	m_workerThreads = 1;
 	//m_solverSubSteps = 2;
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;

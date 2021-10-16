@@ -103,6 +103,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	dInt32 GetUnconstrainedBodyCount() const {return m_unConstrainedBodyCount;}
 	dArray<ndBodyKinematic*>& GetBodyIslandOrder() { return m_bodyIslandOrder; }
 
+	void* GetTempBuffer() const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
 
 	private:
@@ -153,6 +154,11 @@ class ndDynamicsUpdate: public dClassAlloc
 
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
+
+inline void* ndDynamicsUpdate::GetTempBuffer() const
+{
+	return (void*)&m_leftHandSide[0];
+}
 
 inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const
 {

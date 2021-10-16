@@ -217,7 +217,7 @@ void ndDynamicsUpdate::SortJoints()
 
 	dInt32 jointCountSpans[128];
 	m_leftHandSide.SetCount(jointArray.GetCount() + 32);
-	ndConstraint** const sortBuffer = (ndConstraint**)&m_leftHandSide[0];
+	ndConstraint** const sortBuffer = (ndConstraint**)GetTempBuffer();
 	memset(jointCountSpans, 0, sizeof(jointCountSpans));
 
 	dInt32 activeJointCount = 0;
@@ -418,7 +418,7 @@ void ndDynamicsUpdate::SortJoints()
 			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
 
 			dInt32* const histogram = ((dInt32*)m_context) + 2 * threadIndex;
-			ndConstraint** const sortBuffer = (ndConstraint**)&me->m_leftHandSide[0];
+			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				ndConstraint* const joint = jointArray[i + start];
@@ -449,7 +449,7 @@ void ndDynamicsUpdate::SortJoints()
 			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
 
 			dInt32* const histogram = ((dInt32*)m_context) + 2 * threadIndex;
-			ndConstraint** const sortBuffer = (ndConstraint**)&me->m_leftHandSide[0];
+			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				ndConstraint* const joint = sortBuffer[i + start];
@@ -481,7 +481,7 @@ void ndDynamicsUpdate::SortJoints()
 			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
 
 			dInt32* const jointCountSpans = ((dInt32*)m_context) + 128 * threadIndex;
-			ndConstraint** const sortBuffer = (ndConstraint**)&me->m_leftHandSide[0];
+			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				ndConstraint* const joint = jointArray[i + start];
@@ -515,7 +515,7 @@ void ndDynamicsUpdate::SortJoints()
 			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
 
 			dInt32* const jointCountSpans = ((dInt32*)m_context) + 128 * threadIndex;
-			ndConstraint** const sortBuffer = (ndConstraint**)&me->m_leftHandSide[0];
+			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				ndConstraint* const joint = sortBuffer[i + start];
@@ -665,45 +665,6 @@ void ndDynamicsUpdate::SortJoints()
 	}
 	m_activeJointCount = movingJointCount;
 
-#if 0
-	dInt32 jointCountSpans[128];
-	memset(jointCountSpans, 0, sizeof(jointCountSpans));
-	ndConstraint** const sortBuffer = (ndConstraint**)&m_leftHandSide[0];
-	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
-	{
-		ndConstraint* const joint = jointArray[i];
-		sortBuffer[i] = joint;
-	
-		dAssert((joint->GetBody0()->m_resting & joint->GetBody1()->m_resting) == joint->m_sleeping);
-	
-		const ndSortKey key(joint->m_sleeping, joint->m_rowCount);
-		dAssert(key.m_value >= 0);
-		dAssert(key.m_value < 127);
-		jointCountSpans[key.m_value] ++;
-	}
-
-	dInt32 sum = 0;
-	for (dInt32 i = 0; i < 128; i++)
-	{
-		const dInt32 val = jointCountSpans[i];
-		jointCountSpans[i] = sum;
-		sum += val;
-	}
-
-	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
-	{
-		ndConstraint* const joint = sortBuffer[i];
-		dAssert((joint->GetBody0()->m_resting & joint->GetBody1()->m_resting) == joint->m_sleeping);
-		const ndSortKey key(joint->m_sleeping, joint->m_rowCount);
-		dAssert(key.m_value >= 0);
-		dAssert(key.m_value < 127);
-	
-		const dInt32 entry = jointCountSpans[key.m_value];
-		jointArray[entry] = joint;
-		jointCountSpans[key.m_value] = entry + 1;
-	}
-
-#else	
 	scene->SubmitJobs<ndRowScan>(jointRowScans);
 	dInt32 acc = 0;
 	for (dInt32 i = 0; i < 128; i++)
@@ -716,7 +677,6 @@ void ndDynamicsUpdate::SortJoints()
 		}
 	}
 	scene->SubmitJobs<ndSortByRows>(jointRowScans);
-#endif
 
 	dInt32 rowCount = 1;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)

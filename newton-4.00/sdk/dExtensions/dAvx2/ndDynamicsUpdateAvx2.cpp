@@ -388,7 +388,7 @@ ndDynamicsUpdateAvx2::ndDynamicsUpdateAvx2(ndWorld* const world)
 ndDynamicsUpdateAvx2::~ndDynamicsUpdateAvx2()
 {
 	Clear();
-	//m_soaJointRows.Resize(1024);
+	m_soaJointRows.Resize(D_DEFAULT_BUFFER_SIZE * 4);
 	dArray<ndSoaMatrixElement>* m_soaMassMatrix = (dArray<ndSoaMatrixElement>*)m_soaMassMatrixArray;
 	delete m_soaMassMatrix;
 }
