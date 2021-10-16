@@ -228,7 +228,7 @@ void ndDynamicsUpdate::SortJoints()
 
 		const ndBodyKinematic* const body0 = joint->GetBody0();
 		const ndBodyKinematic* const body1 = joint->GetBody1();
-		const dInt32 resting = (body0->m_resting & body1->m_resting) ? 1 : 0;
+		const dInt32 resting = body0->m_resting & body1->m_resting;
 		activeJointCount += (1 - resting);
 
 		const ndSortKey key(resting, joint->m_rowCount);
@@ -251,7 +251,7 @@ void ndDynamicsUpdate::SortJoints()
 		ndConstraint* const joint = sortBuffer[i];
 		const ndBodyKinematic* const body0 = joint->GetBody0();
 		const ndBodyKinematic* const body1 = joint->GetBody1();
-		const dInt32 resting = (body0->m_resting & body1->m_resting) ? 1 : 0;
+		const dInt32 resting = body0->m_resting & body1->m_resting;
 
 		const ndSortKey key(resting, joint->m_rowCount);
 		dAssert(key.m_value >= 0);
@@ -382,12 +382,12 @@ void ndDynamicsUpdate::SortJoints()
 				dAssert(body0->m_solverSleep1 <= 1);
 				dAssert(body1->m_solverSleep1 <= 1);
 
-				const dInt32 sleeping = body0->m_resting & body1->m_resting;
-				activeJointCount += (1 - sleeping);
-				joint->m_sleeping = sleeping;
+				const dInt32 resting = body0->m_resting & body1->m_resting;
+				activeJointCount += (1 - resting);
+				joint->m_sleeping = resting;
 
-				const dInt32 test = body0->m_solverSleep0 & body1->m_solverSleep0;
-				if (!test)
+				const dInt32 solverSleep = body0->m_solverSleep0 & body1->m_solverSleep0;
+				if (!solverSleep)
 				{
 					body0->m_solverSleep1 = 0;
 					if (body1->GetInvMass() > dFloat32(0.0f))
@@ -1900,8 +1900,8 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			const dInt32 rowStart = joint->m_rowStart;
 			const dInt32 rowsCount = joint->m_rowCount;
 
-			dInt32 isSleeping = body0->m_resting & body1->m_resting;
-			if (!isSleeping)
+			dInt32 resting = body0->m_resting & body1->m_resting;
+			if (!resting)
 			{
 				dVector preconditioner0(joint->m_preconditioner0);
 				dVector preconditioner1(joint->m_preconditioner1);
