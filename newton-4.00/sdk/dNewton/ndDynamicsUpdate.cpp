@@ -482,10 +482,9 @@ void ndDynamicsUpdate::SortJoints()
 
 			dInt32* const jointCountSpans = ((dInt32*)m_context) + 128 * threadIndex;
 			ndConstraint** const sortBuffer = (ndConstraint**)&me->m_leftHandSide[0];
-
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndConstraint* const joint = sortBuffer[i + start];
+				ndConstraint* const joint = jointArray[i + start];
 				sortBuffer[i + start] = joint;
 				
 				dAssert((joint->GetBody0()->m_resting & joint->GetBody1()->m_resting) == joint->m_sleeping);
@@ -623,25 +622,7 @@ void ndDynamicsUpdate::SortJoints()
 	}
 	#endif
 
-ndConstraint* xxxxxxxxx;
-xxxxxxxxx = nullptr;
-for (dInt32 i = 0; i < jointArray.GetCount(); i++)
-{
-	ndConstraint* const joint = jointArray[i];
-	if ((joint->GetBody0()->m_uniqueId == 4) && (joint->GetBody1()->m_uniqueId == 1))
-		xxxxxxxxx = joint;
-}
-dAssert(xxxxxxxxx);
 	jointArray.SetCount(m_activeJointCount);
-xxxxxxxxx = nullptr;
-for (dInt32 i = 0; i < jointArray.GetCount(); i++)
-{
-	ndConstraint* const joint = jointArray[i];
-	if ((joint->GetBody0()->m_uniqueId == 4) && (joint->GetBody1()->m_uniqueId == 1))
-		xxxxxxxxx = joint;
-}
-dAssert(xxxxxxxxx);
-
 	for (dInt32 i = m_activeJointCount - 1; i >= 0; i--)
 	{
 		ndConstraint* const joint = jointArray[i];
@@ -684,12 +665,7 @@ dAssert(xxxxxxxxx);
 	}
 	m_activeJointCount = movingJointCount;
 
-static int xxxx;
-xxxx++;
-if (xxxx == 4)
-xxxx *= 1;
-
-#if 1
+#if 0
 	dInt32 jointCountSpans[128];
 	memset(jointCountSpans, 0, sizeof(jointCountSpans));
 	ndConstraint** const sortBuffer = (ndConstraint**)&m_leftHandSide[0];
@@ -706,12 +682,12 @@ xxxx *= 1;
 		jointCountSpans[key.m_value] ++;
 	}
 
-	dInt32 acc = 0;
+	dInt32 sum = 0;
 	for (dInt32 i = 0; i < 128; i++)
 	{
 		const dInt32 val = jointCountSpans[i];
-		jointCountSpans[i] = acc;
-		acc += val;
+		jointCountSpans[i] = sum;
+		sum += val;
 	}
 
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
