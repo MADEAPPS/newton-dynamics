@@ -1186,7 +1186,8 @@ void ndDynamicsUpdateSoa::SortJoints()
 	dInt32 scan[2];
 	scan[0] = 0;
 	scan[1] = 0;
-	for (dInt32 i = 0; i < 1; i++)
+	const dInt32 threadCount = scene->GetThreadCount();
+	for (dInt32 i = 0; i < threadCount; i++)
 	{
 		scan[0] += histogram[0];
 		scan[1] += histogram[1];
@@ -1200,62 +1201,72 @@ void ndDynamicsUpdateSoa::SortJoints()
 		return;
 	}
 
-	dInt32 currentActive = jointArray.GetCount();
-	for (dInt32 i = currentActive - 1; i >= 0; i--)
+	dInt32 sum = 0;
+	for (dInt32 i = 0; i < 2; i++)
+	{
+		for (dInt32 j = 0; j < threadCount; j++)
+		{
+			dInt32 partialSum = histogram[j];
+			histogram[i] = sum;
+			sum += partialSum;
+		}
+	}
+
+	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
+	{
+		ndConstraint* const joint = sortBuffer[i];
+		ndBodyKinematic* const body0 = joint->GetBody0();
+		ndBodyKinematic* const body1 = joint->GetBody1();
+		const dInt32 key = body0->m_solverSleep1 & body1->m_solverSleep1;
+		const dInt32 entry = histogram[key];
+		jointArray[entry] = joint;
+		histogram[key] = entry + 1;
+	}
+
+	dAssert(m_activeJointCount <= jointArray.GetCount());
+	jointArray.SetCount(m_activeJointCount);
+
+	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = jointArray[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
 		ndBodyKinematic* const body1 = joint->GetBody1();
-		const dInt32 test = body0->m_solverSleep1 & body1->m_solverSleep1;
-		if (!test)
+		if (body1->GetInvMass() > dFloat32(0.0f))
 		{
-			if (body1->GetInvMass() > dFloat32(0.0f))
+			ndBodyKinematic* root0 = FindRootAndSplit(body0);
+			ndBodyKinematic* root1 = FindRootAndSplit(body1);
+			if (root0 != root1)
 			{
-				ndBodyKinematic* root0 = FindRootAndSplit(body0);
-				ndBodyKinematic* root1 = FindRootAndSplit(body1);
-				if (root0 != root1)
+				if (root0->m_rank > root1->m_rank)
 				{
-					if (root0->m_rank > root1->m_rank)
-					{
-						dSwap(root0, root1);
-					}
-					root0->m_islandParent = root1;
-					if (root0->m_rank == root1->m_rank)
-					{
-						root1->m_rank += 1;
-						dAssert(root1->m_rank <= 6);
-					}
+					dSwap(root0, root1);
 				}
-
-				const dInt32 sleep = body0->m_islandSleep & body1->m_islandSleep;
-				if (!sleep)
+				root0->m_islandParent = root1;
+				if (root0->m_rank == root1->m_rank)
 				{
-					dAssert(root1->m_islandParent == root1);
-					root1->m_islandSleep = 0;
+					root1->m_rank += 1;
+					dAssert(root1->m_rank <= 6);
 				}
 			}
-			else
+
+			const dInt32 sleep = body0->m_islandSleep & body1->m_islandSleep;
+			if (!sleep)
 			{
-				if (!body0->m_islandSleep)
-				{
-					ndBodyKinematic* const root = FindRootAndSplit(body0);
-					root->m_islandSleep = 0;
-				}
+				dAssert(root1->m_islandParent == root1);
+				root1->m_islandSleep = 0;
 			}
 		}
 		else
 		{
-			currentActive--;
-			jointArray[i] = jointArray[currentActive];
+			if (!body0->m_islandSleep)
+			{
+				ndBodyKinematic* const root = FindRootAndSplit(body0);
+				root->m_islandSleep = 0;
+			}
 		}
 	}
-	dAssert(currentActive == m_activeJointCount);
-
-	dAssert(currentActive <= jointArray.GetCount());
-	jointArray.SetCount(m_activeJointCount);
 
 	dInt32 jointRowScans[128];
-	//ndConstraint** const sortBuffer = (ndConstraint**)GetTempBuffer();
 	memset(jointRowScans, 0, sizeof(jointRowScans));
 
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
