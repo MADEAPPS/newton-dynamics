@@ -90,9 +90,7 @@ void dThread::Finish()
 
 void dThread::Signal()
 {
-#ifdef D_USE_THREAD_EMULATION
-	ThreadFunction();
-#else
+#ifndef D_USE_THREAD_EMULATION
 	dSemaphore::Signal();
 #endif
 }

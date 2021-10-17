@@ -622,8 +622,9 @@ void ndDynamicsUpdate::SortJoints()
 	}
 	#endif
 
+	dAssert(m_activeJointCount <= jointArray.GetCount());
 	jointArray.SetCount(m_activeJointCount);
-	for (dInt32 i = m_activeJointCount - 1; i >= 0; i--)
+	for (dInt32 i = jointArray.GetCount() - 1; i >= 0; i--)
 	{
 		ndConstraint* const joint = jointArray[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();

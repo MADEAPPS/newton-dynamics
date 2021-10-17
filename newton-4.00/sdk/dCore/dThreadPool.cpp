@@ -27,6 +27,7 @@
 
 void dThreadPool::dThreadLockFreeUpdate::Execute()
 {
+#ifndef	D_USE_THREAD_EMULATION
 	m_begin.store(true);
 	while (m_begin.load())
 	{
@@ -41,6 +42,7 @@ void dThreadPool::dThreadLockFreeUpdate::Execute()
 			std::this_thread::yield();
 		}
 	}
+#endif
 }
 
 dThreadPool::dWorkerThread::dWorkerThread()
@@ -96,9 +98,6 @@ dThreadPool::~dThreadPool()
 
 void dThreadPool::SetCount(dInt32 count)
 {
-#ifdef D_USE_THREAD_EMULATION	
-	count = 1;
-#endif
 	count = dClamp(count, 1, D_MAX_THREADS_COUNT) - 1;
 	if (count != m_count)
 	{
@@ -126,6 +125,14 @@ void dThreadPool::SetCount(dInt32 count)
 
 void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs)
 {
+#ifdef D_USE_THREAD_EMULATION	
+	for (dInt32 i = 0; i <= m_count; i++)
+	{
+		jobs[i]->m_threadIndex = i;
+		m_lockFreeJobs[i].m_job = jobs[i];
+		jobs[i]->Execute();
+	}
+#else
 	if (m_count > 0)
 	{
 		m_joindInqueue.fetch_add(m_count);
@@ -147,16 +154,12 @@ void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs)
 		jobs[0]->m_threadIndex = 0;
 		jobs[0]->Execute();
 	}
+#endif
 }
 
 void dThreadPool::Begin()
 {
 	D_TRACKTIME();
-	for (dInt32 i = 0; i < m_count; i++)
-	{
-		m_workers[i].ExecuteJob(&m_lockFreeJobs[i]);
-	}
-
 	class ndDoNothing : public dThreadPoolJob
 	{
 		virtual void Execute()
@@ -164,6 +167,11 @@ void dThreadPool::Begin()
 			D_TRACKTIME();
 		}
 	};
+
+	for (dInt32 i = 0; i < m_count; i++)
+	{
+		m_workers[i].ExecuteJob(&m_lockFreeJobs[i]);
+	}
 
 	ndDoNothing extJob[D_MAX_THREADS_COUNT];
 	dThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];

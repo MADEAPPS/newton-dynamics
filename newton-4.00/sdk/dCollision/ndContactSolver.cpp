@@ -719,8 +719,9 @@ void ndContactSolver::CalculateContactFromFeacture(dInt32 featureType)
 			const dFloat64 a01 = e10.DotProduct(e20).GetScalar();
 
 			const dFloat64 det = a00 * a11 - a01 * a01;
-			dAssert(det >= dFloat32(0.0f));
-			if (dAbs(det) > dFloat32(1.0e-24f))
+			//dAssert(det >= dFloat32(0.0f));
+			// check against machine precision 
+			if (dAbs(det) > dFloat32(1.0e-16f))
 			{
 				const dFloat64 b0 = -e10.DotProduct(p0).GetScalar();
 				const dFloat64 b1 = -e20.DotProduct(p0).GetScalar();
