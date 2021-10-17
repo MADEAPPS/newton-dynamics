@@ -903,11 +903,6 @@ void ndDynamicsUpdateSoa::SortJoints()
 	dInt32 movingJoints[D_MAX_THREADS_COUNT];
 	const dInt32 threadCount = scene->GetThreadCount();
 
-static int xxxx;
-xxxx++;
-if (xxxx == 7)
-xxxx *= 1;
-
 	scene->SubmitJobs<ndSleep0>();
 	scene->SubmitJobs<ndSleep1>(movingJoints);
 	scene->SubmitJobs<ndScan0>(histogram);

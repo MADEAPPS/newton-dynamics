@@ -330,9 +330,6 @@ void ndDynamicsUpdate::SortJoints()
 				ndConstraint* const joint = jointArray[i + start];
 				ndBodyKinematic* const body0 = joint->GetBody0();
 				ndBodyKinematic* const body1 = joint->GetBody1();
-				dAssert(body0->m_solverSleep0 <= 1);
-				dAssert(body1->m_solverSleep0 <= 1);
-
 				const dInt32 rows = joint->GetRowsCount();
 				joint->m_rowCount = rows;
 				
@@ -379,15 +376,13 @@ void ndDynamicsUpdate::SortJoints()
 				ndConstraint* const joint = jointArray[i + start];
 				ndBodyKinematic* const body0 = joint->GetBody0();
 				ndBodyKinematic* const body1 = joint->GetBody1();
-				dAssert(body0->m_solverSleep1 <= 1);
-				dAssert(body1->m_solverSleep1 <= 1);
 
 				const dInt32 resting = body0->m_resting & body1->m_resting;
 				activeJointCount += (1 - resting);
 				joint->m_sleeping = resting;
 
-				const dInt32 solverSleep = body0->m_solverSleep0 & body1->m_solverSleep0;
-				if (!solverSleep)
+				const dInt32 solverSleep0 = body0->m_solverSleep0 & body1->m_solverSleep0;
+				if (!solverSleep0)
 				{
 					body0->m_solverSleep1 = 0;
 					if (body1->GetInvMass() > dFloat32(0.0f))
@@ -419,6 +414,9 @@ void ndDynamicsUpdate::SortJoints()
 
 			dInt32* const histogram = ((dInt32*)m_context) + 2 * threadIndex;
 			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
+
+			histogram[0] = 0;
+			histogram[1] = 0;
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				ndConstraint* const joint = jointArray[i + start];
@@ -482,6 +480,8 @@ void ndDynamicsUpdate::SortJoints()
 
 			dInt32* const jointCountSpans = ((dInt32*)m_context) + 128 * threadIndex;
 			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
+
+			memset(jointCountSpans, 0, 128 * sizeof(dInt32));
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				ndConstraint* const joint = jointArray[i + start];
@@ -562,12 +562,6 @@ void ndDynamicsUpdate::SortJoints()
 	dInt32 histogram[D_MAX_THREADS_COUNT][2];
 	dInt32 movingJoints[D_MAX_THREADS_COUNT];
 	const dInt32 threadCount = scene->GetThreadCount();
-	for (dInt32 i = 0; i < threadCount; i++)
-	{
-		histogram[i][0] = 0;
-		histogram[i][1] = 0;
-		movingJoints[i] = 0;
-	}
 
 	scene->SubmitJobs<ndSleep0>();
 	scene->SubmitJobs<ndSleep1>(movingJoints);
@@ -591,24 +585,14 @@ void ndDynamicsUpdate::SortJoints()
 		return;
 	}
 
-	dInt32 scanAcc[2];
-	dInt32 jointRowScans[D_MAX_THREADS_COUNT][128];
-
-	scan[1] = scan[0];
-	scan[0] = 0;
-	scanAcc[0] = 0;
-	scanAcc[1] = 0;
-	for (dInt32 j = 0; j < threadCount; j++)
+	dInt32 sum = 0;
+	for (dInt32 i = 0; i < 2; i++)
 	{
-		dInt32 a = histogram[j][0];
-		histogram[j][0] = scanAcc[0] + scan[0];
-		scanAcc[0] += a;
-		a = histogram[j][1];
-		histogram[j][1] = scanAcc[1] + scan[1];
-		scanAcc[1] += a;
-		for (dInt32 i = 0; i < 128; i++)
+		for (dInt32 j = 0; j < threadCount; j++)
 		{
-			jointRowScans[j][i] = 0;
+			dInt32 partialSum = histogram[j][i];
+			histogram[j][i] = sum;
+			sum += partialSum;
 		}
 	}
 	scene->SubmitJobs<ndSort0>(histogram);
@@ -668,6 +652,7 @@ void ndDynamicsUpdate::SortJoints()
 	}
 	m_activeJointCount = movingJointCount;
 
+	dInt32 jointRowScans[D_MAX_THREADS_COUNT][128];
 	scene->SubmitJobs<ndRowScan>(jointRowScans);
 	dInt32 acc = 0;
 	for (dInt32 i = 0; i < 128; i++)
