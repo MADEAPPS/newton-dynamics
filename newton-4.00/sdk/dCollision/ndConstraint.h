@@ -253,7 +253,7 @@ class ndConstraint
 	dInt32 m_rowCount;
 	dInt32 m_rowStart;
 	dUnsigned32 m_active : 1;
-	dUnsigned32 m_sleeping : 1;
+	dUnsigned32 m_resting : 1;
 	dUnsigned32 m_isInSkeletonLoop : 1;
 	//dUnsigned32 m_jointFeebackForce : 1;
 	

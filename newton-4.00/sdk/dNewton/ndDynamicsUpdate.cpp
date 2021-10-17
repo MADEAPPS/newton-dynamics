@@ -379,7 +379,7 @@ void ndDynamicsUpdate::SortJoints()
 
 				const dInt32 resting = body0->m_resting & body1->m_resting;
 				activeJointCount += (1 - resting);
-				joint->m_sleeping = resting;
+				joint->m_resting = resting;
 
 				const dInt32 solverSleep0 = body0->m_solverSleep0 & body1->m_solverSleep0;
 				if (!solverSleep0)
@@ -487,8 +487,8 @@ void ndDynamicsUpdate::SortJoints()
 				ndConstraint* const joint = jointArray[i + start];
 				sortBuffer[i + start] = joint;
 				
-				dAssert((joint->GetBody0()->m_resting & joint->GetBody1()->m_resting) == joint->m_sleeping);
-				const ndSortKey key(joint->m_sleeping, joint->m_rowCount);
+				dAssert((joint->GetBody0()->m_resting & joint->GetBody1()->m_resting) == joint->m_resting);
+				const ndSortKey key(joint->m_resting, joint->m_rowCount);
 
 				dAssert(key.m_value >= 0);
 				dAssert(key.m_value <= 127);
@@ -520,8 +520,8 @@ void ndDynamicsUpdate::SortJoints()
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				ndConstraint* const joint = sortBuffer[i + start];
-				dAssert((joint->GetBody0()->m_resting & joint->GetBody1()->m_resting) == joint->m_sleeping);
-				const ndSortKey key(joint->m_sleeping, joint->m_rowCount);
+				dAssert((joint->GetBody0()->m_resting & joint->GetBody1()->m_resting) == joint->m_resting);
+				const ndSortKey key(joint->m_resting, joint->m_rowCount);
 				dAssert(key.m_value >= 0);
 				dAssert(key.m_value <= 127);
 				
@@ -690,8 +690,8 @@ void ndDynamicsUpdate::SortJoints()
 		{
 			ndConstraint* const joint0 = jointArray[i - 1];
 			ndConstraint* const joint1 = jointArray[i - 0];
-			dAssert(!joint0->m_sleeping);
-			dAssert(!joint1->m_sleeping);
+			dAssert(!joint0->m_resting);
+			dAssert(!joint1->m_resting);
 			dAssert(joint0->m_rowCount >= joint1->m_rowCount);
 			dAssert(!(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting));
 			dAssert(!(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting));
@@ -701,8 +701,8 @@ void ndDynamicsUpdate::SortJoints()
 		{
 			ndConstraint* const joint0 = jointArray[i - 1];
 			ndConstraint* const joint1 = jointArray[i - 0];
-			dAssert(joint0->m_sleeping);
-			dAssert(joint1->m_sleeping);
+			dAssert(joint0->m_resting);
+			dAssert(joint1->m_resting);
 			dAssert(joint0->m_rowCount >= joint1->m_rowCount);
 			dAssert(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting);
 			dAssert(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting);

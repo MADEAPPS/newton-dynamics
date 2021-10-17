@@ -33,7 +33,7 @@ ndConstraint::ndConstraint()
 	,m_rowCount(0)
 	,m_rowStart(0)
 	,m_active(1)
-	,m_sleeping(0)
+	,m_resting(0)
 	,m_isInSkeletonLoop(0)
 	//,m_jointFeebackForce(0)
 {
