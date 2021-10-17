@@ -369,7 +369,7 @@ void ndDynamicsUpdateSoa::RadixSort()
 	}
 }
 
-#if 1
+#if 0
 void ndDynamicsUpdateSoa::SortJoints()
 {
 	D_TRACKTIME();
@@ -665,15 +665,13 @@ void ndDynamicsUpdateSoa::SortJoints()
 
 			const dInt32 stride = count / threadCount;
 			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				ndConstraint* const joint = jointArray[i + start];
 				ndBodyKinematic* const body0 = joint->GetBody0();
 				ndBodyKinematic* const body1 = joint->GetBody1();
-				dAssert(body0->m_solverSleep0 <= 1);
-				dAssert(body1->m_solverSleep0 <= 1);
 
 				const dInt32 rows = joint->GetRowsCount();
 				joint->m_rowCount = rows;
@@ -713,7 +711,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 stride = count / threadCount;
 			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
 			dInt32 activeJointCount = 0;
 			for (dInt32 i = 0; i < blockSize; i++)
@@ -721,15 +719,13 @@ void ndDynamicsUpdateSoa::SortJoints()
 				ndConstraint* const joint = jointArray[i + start];
 				ndBodyKinematic* const body0 = joint->GetBody0();
 				ndBodyKinematic* const body1 = joint->GetBody1();
-				dAssert(body0->m_solverSleep1 <= 1);
-				dAssert(body1->m_solverSleep1 <= 1);
 
-				const dInt32 sleeping = body0->m_resting & body1->m_resting;
-				activeJointCount += (1 - sleeping);
-				joint->m_sleeping = sleeping;
+				const dInt32 resting = body0->m_resting & body1->m_resting;
+				activeJointCount += (1 - resting);
+				joint->m_sleeping = resting;
 
-				const dInt32 test = body0->m_solverSleep0 & body1->m_solverSleep0;
-				if (!test)
+				const dInt32 solverSleep0 = body0->m_solverSleep0 & body1->m_solverSleep0;
+				if (!solverSleep0)
 				{
 					body0->m_solverSleep1 = 0;
 					if (body1->GetInvMass() > dFloat32(0.0f))
@@ -757,10 +753,13 @@ void ndDynamicsUpdateSoa::SortJoints()
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 stride = count / threadCount;
 			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
 			dInt32* const histogram = ((dInt32*)m_context) + 2 * threadIndex;
 			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
+
+			histogram[0] = 0;
+			histogram[1] = 0;
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				ndConstraint* const joint = jointArray[i + start];
@@ -788,7 +787,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 stride = count / threadCount;
 			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
 			dInt32* const histogram = ((dInt32*)m_context) + 2 * threadIndex;
 			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
@@ -820,10 +819,11 @@ void ndDynamicsUpdateSoa::SortJoints()
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 stride = count / threadCount;
 			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
 			dInt32* const jointCountSpans = ((dInt32*)m_context) + 128 * threadIndex;
 			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
+
 			memset(jointCountSpans, 0, sizeof(dInt32) * 128);
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
@@ -855,7 +855,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 stride = count / threadCount;
 			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
 			dInt32* const jointCountSpans = ((dInt32*)m_context) + 128 * threadIndex;
 			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
@@ -873,9 +873,6 @@ void ndDynamicsUpdateSoa::SortJoints()
 			}
 		}
 	};
-
-static int xxxx;
-xxxx++;
 
 	ndScene* const scene = m_world->GetScene();
 	for (ndSkeletonList::dNode* node = m_world->GetSkeletonList().GetFirst(); node; node = node->GetNext())
@@ -905,12 +902,11 @@ xxxx++;
 	dInt32 histogram[D_MAX_THREADS_COUNT][2];
 	dInt32 movingJoints[D_MAX_THREADS_COUNT];
 	const dInt32 threadCount = scene->GetThreadCount();
-	for (dInt32 i = 0; i < threadCount; i++)
-	{
-		histogram[i][0] = 0;
-		histogram[i][1] = 0;
-		movingJoints[i] = 0;
-	}
+
+static int xxxx;
+xxxx++;
+if (xxxx == 7)
+xxxx *= 1;
 
 	scene->SubmitJobs<ndSleep0>();
 	scene->SubmitJobs<ndSleep1>(movingJoints);
@@ -922,8 +918,8 @@ xxxx++;
 	dInt32 movingJointCount = 0;
 	for (dInt32 i = 0; i < threadCount; i++)
 	{
-		scan[0] += histogram[0][0];
-		scan[1] += histogram[0][1];
+		scan[0] += histogram[i][0];
+		scan[1] += histogram[i][1];
 		movingJointCount += movingJoints[i];
 	}
 
@@ -965,6 +961,7 @@ xxxx++;
 		ndConstraint* const joint = jointArray[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
 		ndBodyKinematic* const body1 = joint->GetBody1();
+
 		if (body1->GetInvMass() > dFloat32(0.0f))
 		{
 			ndBodyKinematic* root0 = FindRootAndSplit(body0);

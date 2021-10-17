@@ -323,7 +323,7 @@ void ndDynamicsUpdate::SortJoints()
 
 			const dInt32 stride = count / threadCount;
 			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
 			for (dInt32 i = 0; i < blockSize; i ++)
 			{
@@ -415,7 +415,7 @@ void ndDynamicsUpdate::SortJoints()
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 stride = count / threadCount;
 			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
 			dInt32* const histogram = ((dInt32*)m_context) + 2 * threadIndex;
 			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
@@ -446,7 +446,7 @@ void ndDynamicsUpdate::SortJoints()
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 stride = count / threadCount;
 			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
 			dInt32* const histogram = ((dInt32*)m_context) + 2 * threadIndex;
 			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
@@ -478,7 +478,7 @@ void ndDynamicsUpdate::SortJoints()
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 stride = count / threadCount;
 			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
 			dInt32* const jointCountSpans = ((dInt32*)m_context) + 128 * threadIndex;
 			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
@@ -512,10 +512,11 @@ void ndDynamicsUpdate::SortJoints()
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 stride = count / threadCount;
 			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = threadIndex != (threadCount - 1) ? stride : count - start;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
 			dInt32* const jointCountSpans = ((dInt32*)m_context) + 128 * threadIndex;
 			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
+
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				ndConstraint* const joint = sortBuffer[i + start];
@@ -544,6 +545,7 @@ void ndDynamicsUpdate::SortJoints()
 
 	dInt32 index = jointArray.GetCount();
 	jointArray.SetCount(index + jointList.GetCount());
+
 	for (ndJointList::dNode* node = jointList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = node->GetInfo();
