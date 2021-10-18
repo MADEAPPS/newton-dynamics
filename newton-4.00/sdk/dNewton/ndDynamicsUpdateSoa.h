@@ -27,8 +27,6 @@
 
 namespace ndSoa
 {
-	#define D_SOA_WORD_GROUP_SIZE 4 
-
 	class ndSoaVector3
 	{
 		public:

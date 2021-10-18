@@ -27,6 +27,7 @@
 #include "ndDynamicsUpdateSoa.h"
 #include "ndJointBilateralConstraint.h"
 
+#define D_SOA_WORD_GROUP_SIZE 4 
 using namespace ndSoa;
 
 ndDynamicsUpdateSoa::ndDynamicsUpdateSoa(ndWorld* const world)

@@ -24,7 +24,7 @@
 
 #include <ndNewton.h>
 
-class ndSoaMatrixElement;
+class dAvxMatrixArray;
 
 D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
@@ -62,8 +62,8 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	static dInt32 CompareIslands(const ndIsland* const A, const ndIsland* const B, void* const context);
 
 	dVector m_zero;
-	dArray<dInt32> m_soaJointRows;
-	void* m_soaMassMatrixArray;
+	dArray<dInt32> m_avxJointRows;
+	dAvxMatrixArray* m_avxMassMatrixArray;
 
 } D_GCC_NEWTON_ALIGN_32;
 
