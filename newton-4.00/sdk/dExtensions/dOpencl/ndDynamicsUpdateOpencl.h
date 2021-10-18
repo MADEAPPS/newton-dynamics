@@ -44,7 +44,22 @@ class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 	void SortJoints();
 	void SortIslands();
 	void BuildIsland();
-	
+	void InitWeights();
+	void InitBodyArray();
+	void InitSkeletons();
+	void CalculateForces();
+	void IntegrateBodies();
+	void UpdateSkeletons();
+	void InitJacobianMatrix();
+	void UpdateForceFeedback();
+	void CalculateJointsForce();
+	void IntegrateBodiesVelocity();
+	void CalculateJointsAcceleration();
+	void IntegrateUnconstrainedBodies();
+
+	void DetermineSleepStates();
+	void UpdateIslandState(const ndIsland& island);
+	void GetJacobianDerivatives(ndConstraint* const joint);
 	static dInt32 CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const);
 
 	OpenclSystem* m_opencl;

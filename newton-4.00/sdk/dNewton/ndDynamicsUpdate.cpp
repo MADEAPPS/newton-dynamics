@@ -2134,11 +2134,11 @@ void ndDynamicsUpdate::CalculateForces()
 void ndDynamicsUpdate::Update()
 {
 	D_TRACKTIME();
+	m_timestep = m_world->GetScene()->GetTimestep();
 
 	BuildIsland();
 	if (m_islands.GetCount())
 	{
-		m_timestep = m_world->GetScene()->GetTimestep();
 		IntegrateUnconstrainedBodies();
 		InitWeights();
 		InitBodyArray();
