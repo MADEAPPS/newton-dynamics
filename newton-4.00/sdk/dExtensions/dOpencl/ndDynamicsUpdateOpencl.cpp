@@ -28,7 +28,7 @@
 #include "ndDynamicsUpdateOpencl.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_BLOCK_SIZE	128
+#define D_GPU_WORK_GROUP 128
 
 #if 0
 template<class T>
