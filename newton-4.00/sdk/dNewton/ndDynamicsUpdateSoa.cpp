@@ -597,6 +597,78 @@ void ndDynamicsUpdateSoa::SortJoints()
 		}
 	};
 
+	class ndSetRowStarts : public ndScene::ndBaseJob
+	{
+		public:
+		class ndRowsCount
+		{
+			public:
+			dInt32 m_rowsCount;
+			dInt32 m_soaJointRowCount;
+		};
+
+		void SetRowsCount()
+		{
+			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = world->GetScene();
+			ndConstraintArray& jointArray = scene->GetActiveContactArray();
+			const dInt32 count = jointArray.GetCount();
+		
+			dInt32 rowCount = 1;
+			for (dInt32 i = 0; i < count; i++)
+			{
+				ndConstraint* const joint = jointArray[i];
+				joint->m_rowStart = rowCount;
+				rowCount += joint->m_rowCount;
+			}
+			ndRowsCount* const counters = (ndRowsCount*)m_context;
+			counters->m_rowsCount = rowCount;
+		}
+
+		void SetSoaRowsCount()
+		{
+			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = world->GetScene();
+			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
+			ndConstraintArray& jointArray = scene->GetActiveContactArray();
+			const dInt32 count = jointArray.GetCount();
+
+			dInt32 soaJointRowCount = 0;
+			dArray<dInt32>& soaJointRows = me->m_soaJointRows;
+			dInt32 soaJointCountBatches = soaJointRows.GetCount();
+			for (dInt32 i = 0; i < soaJointCountBatches; i++)
+			{
+				const ndConstraint* const joint = jointArray[i * D_SOA_WORD_GROUP_SIZE];
+				soaJointRows[i] = soaJointRowCount;
+				soaJointRowCount += joint->m_rowCount;
+			}
+
+			ndRowsCount* const counters = (ndRowsCount*)m_context;
+			counters->m_soaJointRowCount = soaJointRowCount;
+		}
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+
+			if (threadCount == 1)
+			{
+				SetRowsCount();
+				SetSoaRowsCount();
+			}
+			else if (threadIndex == 0)
+			{
+				SetRowsCount();
+			}
+			else if (threadIndex == (threadCount - 1))
+			{
+				SetSoaRowsCount();
+			}
+		}
+	};
+
 	ndScene* const scene = m_world->GetScene();
 	for (ndSkeletonList::dNode* node = m_world->GetSkeletonList().GetFirst(); node; node = node->GetNext())
 	{
@@ -782,27 +854,14 @@ void ndDynamicsUpdateSoa::SortJoints()
 		}
 	}
 
-	dInt32 soaJointRowCount = 0;
+	ndSetRowStarts::ndRowsCount rowsCount;
 	const dInt32 soaJointCountBatches = soaJointCount / D_SOA_WORD_GROUP_SIZE;
 	m_soaJointRows.SetCount(soaJointCountBatches);
-	for (dInt32 i = 0; i < soaJointCountBatches; i++)
-	{
-		const ndConstraint* const joint = jointArray[i * D_SOA_WORD_GROUP_SIZE];
-		m_soaJointRows[i] = soaJointRowCount;
-		soaJointRowCount += joint->m_rowCount;
-	}
+	scene->SubmitJobs<ndSetRowStarts>(&rowsCount);
 
-	dInt32 rowCount = 1;
-	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
-	{
-		ndConstraint* const joint = jointArray[i];
-		joint->m_rowStart = rowCount;
-		rowCount += joint->m_rowCount;
-	}
-
-	m_leftHandSide.SetCount(rowCount);
-	m_rightHandSide.SetCount(rowCount);
-	m_soaMassMatrix.SetCount(soaJointRowCount);
+	m_leftHandSide.SetCount(rowsCount.m_rowsCount);
+	m_rightHandSide.SetCount(rowsCount.m_rowsCount);
+	m_soaMassMatrix.SetCount(rowsCount.m_soaJointRowCount);
 
 	#ifdef _DEBUG
 		dAssert(m_activeJointCount <= jointArray.GetCount());
