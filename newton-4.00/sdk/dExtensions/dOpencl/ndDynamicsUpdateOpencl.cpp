@@ -250,9 +250,11 @@ class OpenclSystem: public dClassAlloc
 
 	cl_program CompileProgram()
 	{
-		int errorCode;
-		size_t sourceSize = strlen (m_kernelSource);
-		cl_program program = clCreateProgramWithSource(m_context, 1, (const char**)&m_kernelSource, &sourceSize, &errorCode);
+		dInt32 errorCode;
+		const char* source[1];
+		source[0] = m_kernelSource1.c_str();
+		size_t sourceSize = m_kernelSource1.size();
+		cl_program program = clCreateProgramWithSource(m_context, 1, source, &sourceSize, &errorCode);
 		dAssert(errorCode == CL_SUCCESS);
 
 		errorCode = clBuildProgram(program, 1, &m_device, "", nullptr, nullptr);
@@ -290,61 +292,61 @@ class OpenclSystem: public dClassAlloc
 
 	cl_kernel m_integrateUnconstrainedBodies;
 
-	static char* m_kernelSource;
+	static std::string m_kernelSource1;
 };
 
+std::string OpenclSystem::m_kernelSource1 = (R"(
 
-char* OpenclSystem::m_kernelSource = "\n\
-struct ndOpenclMatrix3x3 \n\
-{ \n\
-	float3 m_element[3];\n\
-}; \n\
-\n\
-struct ndOpenclBodyProxy \n\
-{ \n\
-	float4 m_rotation; \n\
-	float3 m_position; \n\
-	float3 m_veloc;	\n\
-	float3 m_omega;	\n\
-	float4 m_invMass; \n\
-}; \n\
-\n\
-struct ndOpenclBodyWorkingBuffer \n\
-{ \n\
-	struct ndOpenclMatrix3x3 m_matrix; \n\
-	float4 m_rotation; \n\
-	float3 m_position; \n\
-	float3 m_veloc;	\n\
-	float3 m_omega;	\n\
-}; \n\
-\n\
-struct ndOpenclMatrix3x3 QuatToMatrix(float4 rotation) \n\
-{ \n\
-	struct ndOpenclMatrix3x3 matrix; \n\
-	return matrix; \n\
-} \n\
-\n\
-__kernel void IntegrateUnconstrainedBodies(float timestep, int bodyCount, __global struct ndOpenclBodyProxy* inputArray, __global struct ndOpenclBodyWorkingBuffer* outputArray) \n\
-{ \n\
-	const int index = get_global_id(0); \n\
-\n\
-	struct ndOpenclBodyProxy body; \n\
-\n\
-	// load all variable into registers.\n\
-	if (index < bodyCount) \n\
-	{ \n\
-		body = inputArray[index];\n\
-	} \n\
-	barrier(CLK_LOCAL_MEM_FENCE); \n\
-\n\
-	if (index < bodyCount) \n\
-	{ \n\
-		struct ndOpenclMatrix3x3 matrix; \n\
-		matrix = QuatToMatrix(body.m_rotation); \n\
-	} \n\
-} \n\
-\n\
-";
+struct ndOpenclMatrix3x3
+{
+	float3 m_element[3];
+}; 
+
+struct ndOpenclBodyProxy 
+{ 
+	float4 m_rotation; 
+	float3 m_position; 
+	float3 m_veloc;	
+	float3 m_omega;	
+	float4 m_invMass; 
+}; 
+
+struct ndOpenclBodyWorkingBuffer 
+{ 
+	struct ndOpenclMatrix3x3 m_matrix; 
+	float4 m_rotation; 
+	float3 m_position; 
+	float3 m_veloc;	
+	float3 m_omega;	
+}; 
+
+struct ndOpenclMatrix3x3 QuatToMatrix(float4 rotation) 
+{ 
+	struct ndOpenclMatrix3x3 matrix; 
+	return matrix; 
+} 
+
+__kernel void IntegrateUnconstrainedBodies(float timestep, int bodyCount, __global struct ndOpenclBodyProxy* inputArray, __global struct ndOpenclBodyWorkingBuffer* outputArray) 
+{ 
+	const int index = get_global_id(0); 
+
+	struct ndOpenclBodyProxy body; 
+
+	// load all variable into registers.
+	if (index < bodyCount) 
+	{ 
+		body = inputArray[index];
+	} 
+	barrier(CLK_LOCAL_MEM_FENCE); 
+
+	if (index < bodyCount) 
+	{ 
+		struct ndOpenclMatrix3x3 matrix; 
+		matrix = QuatToMatrix(body.m_rotation); 
+	} 
+} 
+
+)");
 
 
 
