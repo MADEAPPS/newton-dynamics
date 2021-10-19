@@ -2362,6 +2362,42 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 				forceM1.m_angular.m_z = forceM1.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_z, force);
 			}
 
+			ndJacobian force0[4];
+			ndJacobian force1[4];
+			dVector::Transpose4x4(
+				force0[0].m_linear,
+				force0[1].m_linear,
+				force0[2].m_linear,
+				force0[3].m_linear,
+				forceM0.m_linear.m_x,
+				forceM0.m_linear.m_y,
+				forceM0.m_linear.m_z, dVector::m_zero);
+			dVector::Transpose4x4(
+				force0[0].m_angular,
+				force0[1].m_angular,
+				force0[2].m_angular,
+				force0[3].m_angular,
+				forceM0.m_angular.m_x,
+				forceM0.m_angular.m_y,
+				forceM0.m_angular.m_z, dVector::m_zero);
+
+			dVector::Transpose4x4(
+				force1[0].m_linear,
+				force1[1].m_linear,
+				force1[2].m_linear,
+				force1[3].m_linear,
+				forceM1.m_linear.m_x,
+				forceM1.m_linear.m_y,
+				forceM1.m_linear.m_z, dVector::m_zero);
+			dVector::Transpose4x4(
+				force1[0].m_angular,
+				force1[1].m_angular,
+				force1[2].m_angular,
+				force1[3].m_angular,
+				forceM1.m_angular.m_x,
+				forceM1.m_angular.m_y,
+				forceM1.m_angular.m_z, dVector::m_zero);
+
 			ndRightHandSide* const rightHandSide = &m_rightHandSide[0];
 			for (dInt32 i = 0; i < D_SOA_WORD_GROUP_SIZE; i++)
 			{
@@ -2374,23 +2410,6 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 					const dInt32 m0 = body0->m_index;
 					const dInt32 m1 = body1->m_index;
 
-					ndJacobian m_body0Force;
-					ndJacobian m_body1Force;
-
-					m_body0Force.m_linear = dVector(forceM0.m_linear.m_x[i], forceM0.m_linear.m_y[i], forceM0.m_linear.m_z[i], dFloat32(0.0f));
-					m_body0Force.m_angular = dVector(forceM0.m_angular.m_x[i], forceM0.m_angular.m_y[i], forceM0.m_angular.m_z[i], dFloat32(0.0f));
-
-					m_body1Force.m_linear = dVector(forceM1.m_linear.m_x[i], forceM1.m_linear.m_y[i], forceM1.m_linear.m_z[i], dFloat32(0.0f));
-					m_body1Force.m_angular = dVector(forceM1.m_angular.m_x[i], forceM1.m_angular.m_y[i], forceM1.m_angular.m_z[i], dFloat32(0.0f));
-
-					ndJacobian& outBody0 = m_outputForces[m0];
-					outBody0.m_linear += m_body0Force.m_linear;
-					outBody0.m_angular += m_body0Force.m_angular;
-
-					ndJacobian& outBody1 = m_outputForces[m1];
-					outBody1.m_linear += m_body1Force.m_linear;
-					outBody1.m_angular += m_body1Force.m_angular;
-
 					dInt32 const rowCount = joint->m_rowCount;
 					dInt32 const rowStartBase = joint->m_rowStart;
 					for (dInt32 j = 0; j < rowCount; j++)
@@ -2399,6 +2418,17 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 						rightHandSide[j + rowStartBase].m_force = row->m_force[i];
 						rightHandSide[j + rowStartBase].m_maxImpact = dMax(dAbs(row->m_force[i]), rightHandSide[j + rowStartBase].m_maxImpact);
 					}
+
+					if (body1->GetInvMass() > dFloat32(0.0f))
+					{
+						ndJacobian& outBody1 = m_outputForces[m1];
+						outBody1.m_linear += force1[i].m_linear;
+						outBody1.m_angular += force1[i].m_angular;
+					}
+
+					ndJacobian& outBody0 = m_outputForces[m0];
+					outBody0.m_linear += force0[i].m_linear;
+					outBody0.m_angular += force0[i].m_angular;
 				}
 			}
 

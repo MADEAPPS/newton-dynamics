@@ -278,8 +278,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showConcaveEdge = true;
 	//m_autoSleepMode = false;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
-	m_solverMode = ndWorld::ndOpenclSolver;
-	//m_solverMode = ndWorld::ndSimdAvx2Solver;
+	//m_solverMode = ndWorld::ndOpenclSolver;
+	m_solverMode = ndWorld::ndSimdAvx2Solver;
 	//m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverPasses = 4;
 	m_workerThreads = 1;

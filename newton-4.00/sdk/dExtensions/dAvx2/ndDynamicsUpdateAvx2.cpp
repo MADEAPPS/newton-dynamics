@@ -331,6 +331,7 @@
 		{
 			__m256 m_type;
 			__m256i m_typeInt;
+			ndJacobian m_vector8;
 			dInt32 m_ints[D_AVX_WORD_GROUP_SIZE];
 		};
 	} D_GCC_NEWTON_ALIGN_32;
@@ -2756,6 +2757,74 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 				forceM1.m_angular.m_z = forceM1.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_z, force);
 			}
 
+			ndAvxFloat force0[8];
+			ndAvxFloat force1[8];
+			dVector::Transpose4x4(
+				force0[0].m_vector8.m_linear, 
+				force0[1].m_vector8.m_linear, 
+				force0[2].m_vector8.m_linear, 
+				force0[3].m_vector8.m_linear,
+				forceM0.m_linear.m_x.m_vector8.m_linear, 
+				forceM0.m_linear.m_y.m_vector8.m_linear, 
+				forceM0.m_linear.m_z.m_vector8.m_linear, dVector::m_zero);
+			dVector::Transpose4x4(
+				force0[4].m_vector8.m_linear,
+				force0[5].m_vector8.m_linear,
+				force0[6].m_vector8.m_linear,
+				force0[7].m_vector8.m_linear,
+				forceM0.m_linear.m_x.m_vector8.m_angular,
+				forceM0.m_linear.m_y.m_vector8.m_angular,
+				forceM0.m_linear.m_z.m_vector8.m_angular, dVector::m_zero);
+			dVector::Transpose4x4(
+				force0[0].m_vector8.m_angular,
+				force0[1].m_vector8.m_angular,
+				force0[2].m_vector8.m_angular,
+				force0[3].m_vector8.m_angular,
+				forceM0.m_angular.m_x.m_vector8.m_linear,
+				forceM0.m_angular.m_y.m_vector8.m_linear,
+				forceM0.m_angular.m_z.m_vector8.m_linear, dVector::m_zero);
+			dVector::Transpose4x4(
+				force0[4].m_vector8.m_angular,
+				force0[5].m_vector8.m_angular,
+				force0[6].m_vector8.m_angular,
+				force0[7].m_vector8.m_angular,
+				forceM0.m_angular.m_x.m_vector8.m_angular,
+				forceM0.m_angular.m_y.m_vector8.m_angular,
+				forceM0.m_angular.m_z.m_vector8.m_angular, dVector::m_zero);
+
+			dVector::Transpose4x4(
+				force1[0].m_vector8.m_linear,
+				force1[1].m_vector8.m_linear,
+				force1[2].m_vector8.m_linear,
+				force1[3].m_vector8.m_linear,
+				forceM1.m_linear.m_x.m_vector8.m_linear,
+				forceM1.m_linear.m_y.m_vector8.m_linear,
+				forceM1.m_linear.m_z.m_vector8.m_linear, dVector::m_zero);
+			dVector::Transpose4x4(
+				force1[4].m_vector8.m_linear,
+				force1[5].m_vector8.m_linear,
+				force1[6].m_vector8.m_linear,
+				force1[7].m_vector8.m_linear,
+				forceM1.m_linear.m_x.m_vector8.m_angular,
+				forceM1.m_linear.m_y.m_vector8.m_angular,
+				forceM1.m_linear.m_z.m_vector8.m_angular, dVector::m_zero);
+			dVector::Transpose4x4(
+				force1[0].m_vector8.m_angular,
+				force1[1].m_vector8.m_angular,
+				force1[2].m_vector8.m_angular,
+				force1[3].m_vector8.m_angular,
+				forceM1.m_angular.m_x.m_vector8.m_linear,
+				forceM1.m_angular.m_y.m_vector8.m_linear,
+				forceM1.m_angular.m_z.m_vector8.m_linear, dVector::m_zero);
+			dVector::Transpose4x4(
+				force1[4].m_vector8.m_angular,
+				force1[5].m_vector8.m_angular,
+				force1[6].m_vector8.m_angular,
+				force1[7].m_vector8.m_angular,
+				forceM1.m_angular.m_x.m_vector8.m_angular,
+				forceM1.m_angular.m_y.m_vector8.m_angular,
+				forceM1.m_angular.m_z.m_vector8.m_angular, dVector::m_zero);
+
 			ndRightHandSide* const rightHandSide = &m_rightHandSide[0];
 			for (dInt32 i = 0; i < D_AVX_WORD_GROUP_SIZE; i++)
 			{
@@ -2768,23 +2837,6 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 					const dInt32 m0 = body0->m_index;
 					const dInt32 m1 = body1->m_index;
 
-					ndJacobian m_body0Force;
-					ndJacobian m_body1Force;
-
-					m_body0Force.m_linear = dVector(forceM0.m_linear.m_x[i], forceM0.m_linear.m_y[i], forceM0.m_linear.m_z[i], dFloat32(0.0f));
-					m_body0Force.m_angular = dVector(forceM0.m_angular.m_x[i], forceM0.m_angular.m_y[i], forceM0.m_angular.m_z[i], dFloat32(0.0f));
-
-					m_body1Force.m_linear = dVector(forceM1.m_linear.m_x[i], forceM1.m_linear.m_y[i], forceM1.m_linear.m_z[i], dFloat32(0.0f));
-					m_body1Force.m_angular = dVector(forceM1.m_angular.m_x[i], forceM1.m_angular.m_y[i], forceM1.m_angular.m_z[i], dFloat32(0.0f));
-
-					ndJacobian& outBody0 = m_outputForces[m0];
-					outBody0.m_linear += m_body0Force.m_linear;
-					outBody0.m_angular += m_body0Force.m_angular;
-
-					ndJacobian& outBody1 = m_outputForces[m1];
-					outBody1.m_linear += m_body1Force.m_linear;
-					outBody1.m_angular += m_body1Force.m_angular;
-
 					dInt32 const rowCount = joint->m_rowCount;
 					dInt32 const rowStartBase = joint->m_rowStart;
 					for (dInt32 j = 0; j < rowCount; j++)
@@ -2793,6 +2845,15 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 						rightHandSide[j + rowStartBase].m_force = row->m_force[i];
 						rightHandSide[j + rowStartBase].m_maxImpact = dMax(dAbs(row->m_force[i]), rightHandSide[j + rowStartBase].m_maxImpact);
 					}
+
+					if (body1->GetInvMass() > dFloat32(0.0f))
+					{
+						ndAvxFloat& outBody = (ndAvxFloat&)m_outputForces[m1];
+						outBody = outBody + force1[i];
+					}
+
+					ndAvxFloat& outBody = (ndAvxFloat&)m_outputForces[m0];
+					outBody = outBody + force0[i];
 				}
 			}
 
