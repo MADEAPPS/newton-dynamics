@@ -1996,13 +1996,18 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				rhs->m_maxImpact = dMax(dAbs(f.GetScalar()), rhs->m_maxImpact);
 			}
 
+			if (body1->GetInvMass() > dFloat32(0.0f))
+			{
+				ndJacobian& outBody1 = m_outputForces[m1];
+				dScopeSpinLock lock(body1->m_lock);
+				outBody1.m_linear += forceM1;
+				outBody1.m_angular += torqueM1;
+			}
+
 			ndJacobian& outBody0 = m_outputForces[m0];
+			dScopeSpinLock lock(body0->m_lock);
 			outBody0.m_linear += forceM0;
 			outBody0.m_angular += torqueM0;
-
-			ndJacobian& outBody1 = m_outputForces[m1];
-			outBody1.m_linear += forceM1;
-			outBody1.m_angular += torqueM1;
 
 			return accNorm.GetScalar();
 		}

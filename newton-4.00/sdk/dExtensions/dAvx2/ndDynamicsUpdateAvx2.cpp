@@ -2849,10 +2849,12 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 					if (body1->GetInvMass() > dFloat32(0.0f))
 					{
 						ndAvxFloat& outBody = (ndAvxFloat&)m_outputForces[m1];
+						dScopeSpinLock lock(body1->m_lock);
 						outBody = outBody + force1[i];
 					}
 
 					ndAvxFloat& outBody = (ndAvxFloat&)m_outputForces[m0];
+					dScopeSpinLock lock(body0->m_lock);
 					outBody = outBody + force0[i];
 				}
 			}

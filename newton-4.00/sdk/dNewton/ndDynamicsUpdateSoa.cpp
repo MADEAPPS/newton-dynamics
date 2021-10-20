@@ -2422,11 +2422,13 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 					if (body1->GetInvMass() > dFloat32(0.0f))
 					{
 						ndJacobian& outBody1 = m_outputForces[m1];
+						dScopeSpinLock lock(body1->m_lock);
 						outBody1.m_linear += force1[i].m_linear;
 						outBody1.m_angular += force1[i].m_angular;
 					}
 
 					ndJacobian& outBody0 = m_outputForces[m0];
+					dScopeSpinLock lock(body0->m_lock);
 					outBody0.m_linear += force0[i].m_linear;
 					outBody0.m_angular += force0[i].m_angular;
 				}
