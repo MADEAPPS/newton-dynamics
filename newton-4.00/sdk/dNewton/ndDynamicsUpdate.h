@@ -48,6 +48,12 @@ D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate: public dClassAlloc
 {
 	public:
+	class ndJointForcesSpans
+	{
+		dInt32 m_count;
+		dInt32 m_start;
+	};
+
 	class ndSortKey
 	{
 		public:
@@ -137,11 +143,13 @@ class ndDynamicsUpdate: public dClassAlloc
 
 	dVector m_velocTol;
 	dArray<ndIsland> m_islands;
-	dArray<ndBodyKinematic*> m_bodyIslandOrder;
+	dArray<dInt32> m_jointForcesIndex;
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
+	dArray<ndBodyKinematic*> m_bodyIslandOrder;
 	dArray<ndJacobianPair> m_internalJointForces;
+	dArray<ndJointForcesSpans> m_jointForcesSpans;
 
 	ndWorld* m_world;
 	dFloat32 m_timestep;
