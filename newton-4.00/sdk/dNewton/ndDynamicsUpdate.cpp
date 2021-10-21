@@ -678,6 +678,7 @@ void ndDynamicsUpdate::SortJoints()
 
 	m_leftHandSide.SetCount(rowCount);
 	m_rightHandSide.SetCount(rowCount);
+	m_internalJointForces.SetCount(jointArray.GetCount());
 
 	#ifdef _DEBUG
 		dAssert(m_activeJointCount <= jointArray.GetCount());
@@ -1143,7 +1144,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 		{
 		}
 
-		void BuildJacobianMatrix(ndConstraint* const joint)
+		void BuildJacobianMatrix(ndConstraint* const joint, dInt32 jointIndex)
 		{
 			dAssert(joint->GetBody0());
 			dAssert(joint->GetBody1());
@@ -1258,6 +1259,11 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			ndJacobian& outBody1 = m_internalForces[m1];
 			outBody1.m_linear += forceAcc1;
 			outBody1.m_angular += torqueAcc1;
+
+			m_internalJointForces[jointIndex].m_jacobianM0.m_linear = forceAcc0;
+			m_internalJointForces[jointIndex].m_jacobianM0.m_angular = torqueAcc0;
+			m_internalJointForces[jointIndex].m_jacobianM1.m_linear = forceAcc1;
+			m_internalJointForces[jointIndex].m_jacobianM1.m_angular = torqueAcc1;
 		}
 
 		virtual void Execute()
@@ -1273,23 +1279,29 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
 
 			const dInt32 threadIndex = GetThreadId();
-			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
+			const dInt32 threadCount = m_owner->GetThreadCount();
 
+			const dInt32 stride = jointCount / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : jointCount - start;
+
+			m_internalJointForces = &me->GetInternalJointForces()[0];
 			m_internalForces = &me->GetInternalForces()[threadIndex * bodyCount];
 
 			me->ClearJacobianBuffer(bodyCount, m_internalForces);
-			for (dInt32 i = threadIndex; i < jointCount; i += threadCount)
+			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndConstraint* const joint = jointArray[i];
+				ndConstraint* const joint = jointArray[i + start];
 				me->GetJacobianDerivatives(joint);
-				BuildJacobianMatrix(joint);
+				BuildJacobianMatrix(joint, i + start);
 			}
 		}
 
 		dVector m_zero;
 		ndJacobian* m_internalForces;
-		ndRightHandSide* m_rightHandSide;
 		ndLeftHandSide* m_leftHandSide;
+		ndRightHandSide* m_rightHandSide;
+		ndJacobianPair* m_internalJointForces;
 	};
 
 	class ndInitJacobianAccumulatePartialForces : public ndScene::ndBaseJob
@@ -1304,18 +1316,23 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
+
+			const dInt32 stride = bodyCount / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
 			ndJacobian* const internalForces = &me->GetInternalForces()[0];
-			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
+			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				dVector force(zero);
 				dVector torque(zero);
-				for (dInt32 j = 1; j < threadCount; j++)
+				dInt32 index = i + start;
+				for (dInt32 j = 0; j < threadCount; j++)
 				{
-					force += internalForces[bodyCount * j + i].m_linear;
-					torque += internalForces[bodyCount * j + i].m_angular;
+					force += internalForces[bodyCount * j + index].m_linear;
+					torque += internalForces[bodyCount * j + index].m_angular;
 				}
-				internalForces[i].m_linear += force;
-				internalForces[i].m_angular += torque;
+				internalForces[index].m_linear = force;
+				internalForces[index].m_angular = torque;
 			}
 		}
 	};
@@ -1326,10 +1343,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 		D_TRACKTIME();
 		m_rightHandSide[0].m_force = dFloat32(1.0f);
 		scene->SubmitJobs<ndInitJacobianMatrix>();
-		if (scene->GetThreadCount() > 1)
-		{
-			scene->SubmitJobs<ndInitJacobianAccumulatePartialForces>();
-		}
+		scene->SubmitJobs<ndInitJacobianAccumulatePartialForces>();
 	}
 }
 

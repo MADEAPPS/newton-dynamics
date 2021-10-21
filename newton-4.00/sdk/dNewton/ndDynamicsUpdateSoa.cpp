@@ -1460,25 +1460,29 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
+			const dVector zero(dVector::m_zero);
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
 
-			const dVector zero(dVector::m_zero);
+			const dInt32 stride = bodyCount / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
 			ndJacobian* const internalForces = &me->GetInternalForces()[0];
-			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
+			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				dVector force(zero);
 				dVector torque(zero);
-				for (dInt32 j = 1; j < threadCount; j++)
+				dInt32 index = i + start;
+				for (dInt32 j = 0; j < threadCount; j++)
 				{
-					force += internalForces[bodyCount * j + i].m_linear;
-					torque += internalForces[bodyCount * j + i].m_angular;
+					force += internalForces[bodyCount * j + index].m_linear;
+					torque += internalForces[bodyCount * j + index].m_angular;
 				}
-				internalForces[i].m_linear += force;
-				internalForces[i].m_angular += torque;
+				internalForces[index].m_linear = force;
+				internalForces[index].m_angular = torque;
 			}
 		}
 	};
@@ -1742,11 +1746,9 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 	if (scene->GetActiveContactArray().GetCount())
 	{
 		D_TRACKTIME();
+		m_rightHandSide[0].m_force = dFloat32(1.0f);
 		scene->SubmitJobs<ndInitJacobianMatrix>();
-		if (scene->GetThreadCount() > 1)
-		{
-			scene->SubmitJobs<ndInitJacobianAccumulatePartialForces>();
-		}
+		scene->SubmitJobs<ndInitJacobianAccumulatePartialForces>();
 		scene->SubmitJobs<ndTransposeMassMatrixSoa>();
 	}
 }
