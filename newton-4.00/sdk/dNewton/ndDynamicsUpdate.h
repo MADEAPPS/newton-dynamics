@@ -96,15 +96,16 @@ class ndDynamicsUpdate: public dClassAlloc
 	ndDynamicsUpdate(ndWorld* const world);
 	virtual ~ndDynamicsUpdate();
 
-	virtual const char* GetStringId() const;
-	dArray<ndJacobian>& GetInternalForces() { return m_internalForces; }
-	dArray<ndLeftHandSide>& GetLeftHandSide() { return m_leftHandSide; }
-	dArray<ndRightHandSide>& GetRightHandSide() { return m_rightHandSide; }
-	dInt32 GetUnconstrainedBodyCount() const {return m_unConstrainedBodyCount;}
-	dArray<ndBodyKinematic*>& GetBodyIslandOrder() { return m_bodyIslandOrder; }
-
 	void* GetTempBuffer() const;
+	virtual const char* GetStringId() const;
+	dInt32 GetUnconstrainedBodyCount() const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
+
+	dArray<ndJacobian>& GetInternalForces();
+	dArray<ndLeftHandSide>& GetLeftHandSide();
+	dArray<ndRightHandSide>& GetRightHandSide();
+	dArray<ndBodyKinematic*>& GetBodyIslandOrder();
+	dArray<ndJacobianPair>& GetInternalJointForces();
 
 	private:
 	void RadixSort();
@@ -140,6 +141,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
+	dArray<ndJacobianPair> m_internalJointForces;
 
 	ndWorld* m_world;
 	dFloat32 m_timestep;
@@ -158,6 +160,36 @@ class ndDynamicsUpdate: public dClassAlloc
 inline void* ndDynamicsUpdate::GetTempBuffer() const
 {
 	return (void*)&m_leftHandSide[0];
+}
+
+inline  dArray<ndJacobian>& ndDynamicsUpdate::GetInternalForces()
+{ 
+	return m_internalForces; 
+}
+
+inline  dArray<ndLeftHandSide>& ndDynamicsUpdate::GetLeftHandSide()
+{ 
+	return m_leftHandSide; 
+}
+
+inline  dArray<ndRightHandSide>& ndDynamicsUpdate::GetRightHandSide()
+{ 
+	return m_rightHandSide; 
+}
+
+inline  dArray<ndBodyKinematic*>& ndDynamicsUpdate::GetBodyIslandOrder()
+{ 
+	return m_bodyIslandOrder; 
+}
+
+inline  dArray<ndJacobianPair>& ndDynamicsUpdate::GetInternalJointForces()
+{ 
+	return m_internalJointForces; 
+}
+
+inline  dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
+{
+	return m_unConstrainedBodyCount;
 }
 
 inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const
