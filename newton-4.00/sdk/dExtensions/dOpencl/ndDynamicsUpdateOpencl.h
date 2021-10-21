@@ -65,7 +65,6 @@ class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 	OpenclSystem* m_opencl;
 };
 
-
 inline void ndDynamicsUpdateOpencl::Update()
 {
 	if (m_opencl)
@@ -76,7 +75,6 @@ inline void ndDynamicsUpdateOpencl::Update()
 	{
 		ndDynamicsUpdate::Update();
 	}
-
 }
 
 #endif

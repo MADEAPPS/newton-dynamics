@@ -28,7 +28,6 @@ dAtomic<dUnsigned64> dMemory::m_memoryUsed(0);
 static dMemFreeCallback m_freeMemory = free;
 static dMemAllocCallback m_allocMemory = malloc;
 
-
 class dMemoryHeader
 {
 	public:
