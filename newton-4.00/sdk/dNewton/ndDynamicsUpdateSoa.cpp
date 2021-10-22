@@ -898,7 +898,7 @@ void ndDynamicsUpdateSoa::SortIslands()
 	GetTempInternalForces().SetCount(bodyArray.GetCount());
 
 	dInt32 count = 0;
-	ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)GetTempBuffer();
+	ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)&GetInternalForces____()[0];
 	for (dInt32 i = bodyArray.GetCount() - 2; i >= 0; i--)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
@@ -2000,12 +2000,12 @@ void ndDynamicsUpdateSoa::IntegrateBodiesVelocity()
 			dArray<ndBodyKinematic*>& bodyArray = me->m_bodyIslandOrder;
 			const dArray<ndJacobian>& internalForces = me->GetInternalForces____();
 
+			const dVector timestep4(me->m_timestepRK);
+			const dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));
+
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - me->m_unConstrainedBodyCount;
-
-			const dVector timestep4(me->m_timestepRK);
-			const dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));
 
 			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
 			{

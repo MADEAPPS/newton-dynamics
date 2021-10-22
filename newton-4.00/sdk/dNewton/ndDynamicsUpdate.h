@@ -107,7 +107,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	dInt32 GetUnconstrainedBodyCount() const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
 
-	dArray<ndJacobian>& GetInternalForces();
+	dArray<ndJacobian>& GetInternalForces_();
 	dArray<ndLeftHandSide>& GetLeftHandSide();
 	dArray<ndRightHandSide>& GetRightHandSide();
 	dArray<ndJacobian>& GetTempInternalForces();
@@ -147,7 +147,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	dVector m_velocTol;
 	dArray<ndIsland> m_islands;
 	dArray<dInt32> m_jointForcesIndex;
-	dArray<ndJacobian> m_internalForces____;
+	dArray<ndJacobian> m_internalForces;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
 	dArray<ndJacobian> m_tempInternalForces;
@@ -176,13 +176,13 @@ inline void* ndDynamicsUpdate::GetTempBuffer() const
 
 inline dArray<ndJacobian>& ndDynamicsUpdate::GetInternalForces____()
 {
-	return m_internalForces____;
+	return m_internalForces;
 }
 
-inline dArray<ndJacobian>& ndDynamicsUpdate::GetInternalForces()
+inline dArray<ndJacobian>& ndDynamicsUpdate::GetInternalForces_()
 { 
 	dAssert(0);
-	return m_internalForces____; 
+	return m_internalForces; 
 }
 
 inline dArray<ndJacobian>& ndDynamicsUpdate::GetTempInternalForces()

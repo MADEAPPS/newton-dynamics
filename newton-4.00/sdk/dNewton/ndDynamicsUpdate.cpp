@@ -31,7 +31,7 @@ ndDynamicsUpdate::ndDynamicsUpdate(ndWorld* const world)
 	:m_velocTol(dFloat32(1.0e-8f))
 	,m_islands(D_DEFAULT_BUFFER_SIZE)
 	,m_jointForcesIndex(D_DEFAULT_BUFFER_SIZE)
-	,m_internalForces____(D_DEFAULT_BUFFER_SIZE)
+	,m_internalForces(D_DEFAULT_BUFFER_SIZE)
 	,m_leftHandSide(D_DEFAULT_BUFFER_SIZE * 4)
 	,m_rightHandSide(D_DEFAULT_BUFFER_SIZE)
 	,m_tempInternalForces(D_DEFAULT_BUFFER_SIZE)
@@ -65,7 +65,7 @@ void ndDynamicsUpdate::Clear()
 {
 	m_islands.Resize(D_DEFAULT_BUFFER_SIZE);
 	m_rightHandSide.Resize(D_DEFAULT_BUFFER_SIZE);
-	m_internalForces____.Resize(D_DEFAULT_BUFFER_SIZE);
+	m_internalForces.Resize(D_DEFAULT_BUFFER_SIZE);
 	m_bodyIslandOrder.Resize(D_DEFAULT_BUFFER_SIZE);
 	m_leftHandSide.Resize(D_DEFAULT_BUFFER_SIZE * 4);
 	m_tempInternalForces.Resize(D_DEFAULT_BUFFER_SIZE);
@@ -797,7 +797,7 @@ void ndDynamicsUpdate::SortIslands()
 	GetTempInternalForces().SetCount(bodyArray.GetCount());
 
 	dInt32 count = 0;
-	ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)GetTempBuffer();
+	ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)&GetInternalForces____()[0];
 	for (dInt32 i = bodyArray.GetCount() - 2; i >= 0; i--)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
