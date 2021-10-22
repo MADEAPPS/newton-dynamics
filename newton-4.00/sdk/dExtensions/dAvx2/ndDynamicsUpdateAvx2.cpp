@@ -1068,6 +1068,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	dAssert(m_activeJointCount <= jointArray.GetCount());
 	if (!m_activeJointCount)
 	{
+		jointArray.SetCount(0);
 		return;
 	}
 
@@ -1832,7 +1833,6 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 				internalForces[index].m_linear = force;
 				internalForces[index].m_angular = torque;
 			}
-
 		}
 	};
 

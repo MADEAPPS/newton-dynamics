@@ -718,6 +718,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 	dAssert(m_activeJointCount <= jointArray.GetCount());
 	if (!m_activeJointCount)
 	{
+		jointArray.SetCount(0);
 		return;
 	}
 

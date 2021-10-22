@@ -157,7 +157,7 @@ void BuildPyramidStacks(ndDemoEntityManager* const scene, dFloat32 mass, const d
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
-	stackHigh = 1;
+	stackHigh = 2;
 	//stackHigh = 20;
 
 	origin1.m_z = 0.0f;
