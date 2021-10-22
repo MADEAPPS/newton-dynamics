@@ -1290,7 +1290,6 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : jointCount - start;
 
-			m_internalJointForces = &me->GetInternalJointForces()[0];
 			m_internalForces = &me->GetInternalForces()[threadIndex * bodyCount];
 
 			me->ClearJacobianBuffer(bodyCount, m_internalForces);
@@ -1306,7 +1305,6 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 		ndJacobian* m_internalForces;
 		ndLeftHandSide* m_leftHandSide;
 		ndRightHandSide* m_rightHandSide;
-		ndJacobianPair* m_internalJointForces;
 	};
 
 	class ndInitJacobianAccumulatePartialForces : public ndScene::ndBaseJob
