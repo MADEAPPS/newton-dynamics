@@ -157,7 +157,7 @@ void BuildPyramidStacks(ndDemoEntityManager* const scene, dFloat32 mass, const d
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
-	stackHigh = 2;
+	//stackHigh = 2;
 	//stackHigh = 20;
 
 	origin1.m_z = 0.0f;
@@ -169,27 +169,25 @@ void BuildPyramidStacks(ndDemoEntityManager* const scene, dFloat32 mass, const d
 void ndBasicStacks (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	//BuildFloorBox(scene);
 	BuildFlatPlane(scene, true);
-	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 
 	dVector origin(10.0f, 0.0f, 4.0f, 0.0f);
-	//BuildBoxStack(scene, 1.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+	BuildBoxStack(scene, 1.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 	
 	origin.m_z = -4.0f;
-	//BuildCylinderStack(scene, 1.0f, origin, dVector(0.5f, 0.4f, 0.5f, 0.0f), 20);
+	BuildCylinderStack(scene, 1.0f, origin, dVector(0.5f, 0.4f, 0.5f, 0.0f), 20);
 	
 	origin.m_x += 4.0f;
 	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
 	
-	//origin.m_x += 4.0f;
-	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
-	//
-	//origin.m_x += 4.0f;
-	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
-	//
-	//origin.m_x += 4.0f;
-	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	origin.m_x += 4.0f;
+	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	
+	origin.m_x += 4.0f;
+	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	
+	origin.m_x += 4.0f;
+	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
 
 	dQuaternion rot(dYawMatrix (90.0f * dDegreeToRad));
 	dVector origin1(20.0f, 5.0f, 30.0f, 0.0f);
