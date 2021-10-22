@@ -1482,7 +1482,7 @@ void ndDynamicsUpdateAvx2::InitWeights()
 	m_invTimestepRK = m_invTimestep * dFloat32(4.0f);
 
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
-	const dInt32 buffersCount = dMax(scene->GetThreadCount(), 1) + 1;
+	const dInt32 buffersCount = scene->GetThreadCount();
 	const dInt32 bodyCount = bodyArray.GetCount();
 	GetInternalForces().SetCount(bodyCount * buffersCount);
 
@@ -1785,7 +1785,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
 
 			const dInt32 threadIndex = GetThreadId();
-			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
+			const dInt32 threadCount = m_owner->GetThreadCount();
 
 			m_internalForces = &me->GetInternalForces()[threadIndex * bodyCount];
 
@@ -1848,7 +1848,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			const dInt32 jointCount = m_owner->GetActiveContactArray().GetCount();
 
 			const dInt32 threadIndex = GetThreadId();
-			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
+			const dInt32 threadCount = m_owner->GetThreadCount();
 			const ndLeftHandSide* const leftHandSide = &me->GetLeftHandSide()[0];
 			const ndRightHandSide* const rightHandSide = &me->GetRightHandSide()[0];
 			dAvxMatrixArray& massMatrix = *me->m_avxMassMatrixArray;
@@ -2882,7 +2882,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
 
 			const dInt32 threadIndex = GetThreadId();
-			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
+			const dInt32 threadCount = m_owner->GetThreadCount();
 			m_outputForces = &m_internalForces[bodyCount * (threadIndex + 1)];
 			m_jointArray = &jointArray[0];
 
@@ -2960,7 +2960,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 
 	ndScene* const scene = m_world->GetScene();
 	const dInt32 passes = m_solverPasses;
-	const dInt32 threadsCount = dMax(scene->GetThreadCount(), 1);
+	const dInt32 threadsCount = scene->GetThreadCount();
 
 	dFloat32 m_accelNorm[D_MAX_THREADS_COUNT];
 	dFloat32 accNorm = D_SOLVER_MAX_ERROR * dFloat32(2.0f);

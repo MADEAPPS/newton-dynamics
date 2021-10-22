@@ -110,8 +110,11 @@ class ndDynamicsUpdate: public dClassAlloc
 	dArray<ndJacobian>& GetInternalForces();
 	dArray<ndLeftHandSide>& GetLeftHandSide();
 	dArray<ndRightHandSide>& GetRightHandSide();
+	dArray<ndJacobian>& GetTempInternalForces();
 	dArray<ndBodyKinematic*>& GetBodyIslandOrder();
 	dArray<ndJacobianPair>& GetInternalJointForces();
+
+	dArray<ndJacobian>& ndDynamicsUpdate::GetInternalForces____();
 
 	private:
 	void RadixSort();
@@ -144,9 +147,10 @@ class ndDynamicsUpdate: public dClassAlloc
 	dVector m_velocTol;
 	dArray<ndIsland> m_islands;
 	dArray<dInt32> m_jointForcesIndex;
-	dArray<ndJacobian> m_internalForces;
+	dArray<ndJacobian> m_internalForces____;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
+	dArray<ndJacobian> m_tempInternalForces;
 	dArray<ndBodyKinematic*> m_bodyIslandOrder;
 	dArray<ndJacobianPair> m_internalJointForces;
 	dArray<ndJointForcesSpans> m_jointForcesSpans;
@@ -170,10 +174,22 @@ inline void* ndDynamicsUpdate::GetTempBuffer() const
 	return (void*)&m_leftHandSide[0];
 }
 
-inline  dArray<ndJacobian>& ndDynamicsUpdate::GetInternalForces()
-{ 
-	return m_internalForces; 
+inline dArray<ndJacobian>& ndDynamicsUpdate::GetInternalForces____()
+{
+	return m_internalForces____;
 }
+
+inline dArray<ndJacobian>& ndDynamicsUpdate::GetInternalForces()
+{ 
+	dAssert(0);
+	return m_internalForces____; 
+}
+
+inline dArray<ndJacobian>& ndDynamicsUpdate::GetTempInternalForces()
+{
+	return m_tempInternalForces;
+}
+
 
 inline  dArray<ndLeftHandSide>& ndDynamicsUpdate::GetLeftHandSide()
 { 
@@ -190,12 +206,12 @@ inline  dArray<ndBodyKinematic*>& ndDynamicsUpdate::GetBodyIslandOrder()
 	return m_bodyIslandOrder; 
 }
 
-inline  dArray<ndJacobianPair>& ndDynamicsUpdate::GetInternalJointForces()
+inline dArray<ndJacobianPair>& ndDynamicsUpdate::GetInternalJointForces()
 { 
 	return m_internalJointForces; 
 }
 
-inline  dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
+inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
 {
 	return m_unConstrainedBodyCount;
 }
