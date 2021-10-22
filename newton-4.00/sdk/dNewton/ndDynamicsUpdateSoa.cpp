@@ -894,11 +894,11 @@ void ndDynamicsUpdateSoa::SortIslands()
 	ndScene* const scene = m_world->GetScene();
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 
-	GetInternalForces____().SetCount(bodyArray.GetCount());
+	GetInternalForces().SetCount(bodyArray.GetCount());
 	GetTempInternalForces().SetCount(bodyArray.GetCount());
 
 	dInt32 count = 0;
-	ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)&GetInternalForces____()[0];
+	ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)&GetInternalForces()[0];
 	for (dInt32 i = bodyArray.GetCount() - 2; i >= 0; i--)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
@@ -1147,7 +1147,7 @@ void ndDynamicsUpdateSoa::InitWeights()
 
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	const dInt32 bodyCount = bodyArray.GetCount();
-	GetInternalForces____().SetCount(bodyCount);
+	GetInternalForces().SetCount(bodyCount);
 	GetTempInternalForces().SetCount(bodyCount);
 
 	dFloat32 extraPassesArray[D_MAX_THREADS_COUNT];
@@ -1449,7 +1449,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
 			m_leftHandSide = &me->GetLeftHandSide()[0];
 			m_rightHandSide = &me->GetRightHandSide()[0];
-			m_internalForces = &me->GetInternalForces____()[0];
+			m_internalForces = &me->GetInternalForces()[0];
 			
 			ndConstraint** const jointArray = &m_owner->GetActiveContactArray()[0];
 			const dInt32 jointCount = m_owner->GetActiveContactArray().GetCount();
@@ -1731,7 +1731,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 	{
 		D_TRACKTIME();
 		m_rightHandSide[0].m_force = dFloat32(1.0f);
-		ClearJacobianBuffer(GetInternalForces____().GetCount(), &GetInternalForces____()[0]);
+		ClearJacobianBuffer(GetInternalForces().GetCount(), &GetInternalForces()[0]);
 		scene->SubmitJobs<ndInitJacobianMatrix>();
 		scene->SubmitJobs<ndTransposeMassMatrixSoa>();
 	}
@@ -1860,7 +1860,7 @@ void ndDynamicsUpdateSoa::UpdateSkeletons()
 				node = node ? node->GetNext() : nullptr;
 			}
 
-			ndJacobian* const internalForces = &me->GetInternalForces____()[0];
+			ndJacobian* const internalForces = &me->GetInternalForces()[0];
 			const dArray<ndBodyKinematic*>& activeBodies = m_owner->ndScene::GetActiveBodyArray();
 			const ndBodyKinematic** const bodyArray = (const ndBodyKinematic**)&activeBodies[0];
 
@@ -1998,7 +1998,7 @@ void ndDynamicsUpdateSoa::IntegrateBodiesVelocity()
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
 			dArray<ndBodyKinematic*>& bodyArray = me->m_bodyIslandOrder;
-			const dArray<ndJacobian>& internalForces = me->GetInternalForces____();
+			const dArray<ndJacobian>& internalForces = me->GetInternalForces();
 
 			const dVector timestep4(me->m_timestepRK);
 			const dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));
@@ -2431,7 +2431,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
 			m_leftHandSide = &me->m_leftHandSide[0];
 			m_rightHandSide = &me->m_rightHandSide[0];
-			m_internalForces = &me->GetInternalForces____()[0];
+			m_internalForces = &me->GetInternalForces()[0];
 			m_outputForces = &me->GetTempInternalForces()[0];
 
 			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
@@ -2483,7 +2483,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 	{
 		ClearJacobianBuffer(GetTempInternalForces().GetCount(), &GetTempInternalForces()[0]);
 		scene->SubmitJobs<ndCalculateJointsForce>(m_accelNorm);
-		GetInternalForces____().Swap(GetTempInternalForces());
+		GetInternalForces().Swap(GetTempInternalForces());
 
 		accNorm = dFloat32(0.0f);
 		for (dInt32 j = 0; j < threadsCount; j++)

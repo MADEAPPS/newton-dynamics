@@ -114,8 +114,6 @@ class ndDynamicsUpdate: public dClassAlloc
 	dArray<ndBodyKinematic*>& GetBodyIslandOrder();
 	dArray<ndJacobianPair>& GetInternalJointForces();
 
-	dArray<ndJacobian>& ndDynamicsUpdate::GetInternalForces____();
-
 	private:
 	void RadixSort();
 	void SortJoints();
@@ -174,7 +172,7 @@ inline void* ndDynamicsUpdate::GetTempBuffer() const
 	return (void*)&m_leftHandSide[0];
 }
 
-inline dArray<ndJacobian>& ndDynamicsUpdate::GetInternalForces____()
+inline dArray<ndJacobian>& ndDynamicsUpdate::GetInternalForces()
 {
 	return m_internalForces;
 }
