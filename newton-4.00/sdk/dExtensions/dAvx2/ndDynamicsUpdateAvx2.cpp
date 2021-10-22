@@ -1488,7 +1488,6 @@ void ndDynamicsUpdateAvx2::InitWeights()
 	m_invTimestepRK = m_invTimestep * dFloat32(4.0f);
 
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
-	const dInt32 buffersCount = scene->GetThreadCount();
 	const dInt32 bodyCount = bodyArray.GetCount();
 	GetInternalForces____().SetCount(bodyCount);
 	GetTempInternalForces().SetCount(bodyCount);
