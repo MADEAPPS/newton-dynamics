@@ -1148,7 +1148,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 		{
 		}
 
-		void BuildJacobianMatrix(ndConstraint* const joint, dInt32 jointIndex)
+		void BuildJacobianMatrix(ndConstraint* const joint)
 		{
 			dAssert(joint->GetBody0());
 			dAssert(joint->GetBody1());
@@ -1264,10 +1264,10 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			outBody1.m_linear += forceAcc1;
 			outBody1.m_angular += torqueAcc1;
 
-			m_internalJointForces[jointIndex].m_jacobianM0.m_linear = forceAcc0;
-			m_internalJointForces[jointIndex].m_jacobianM0.m_angular = torqueAcc0;
-			m_internalJointForces[jointIndex].m_jacobianM1.m_linear = forceAcc1;
-			m_internalJointForces[jointIndex].m_jacobianM1.m_angular = torqueAcc1;
+			//m_internalJointForces[jointIndex].m_jacobianM0.m_linear = forceAcc0;
+			//m_internalJointForces[jointIndex].m_jacobianM0.m_angular = torqueAcc0;
+			//m_internalJointForces[jointIndex].m_jacobianM1.m_linear = forceAcc1;
+			//m_internalJointForces[jointIndex].m_jacobianM1.m_angular = torqueAcc1;
 		}
 
 		virtual void Execute()
@@ -1297,7 +1297,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			{
 				ndConstraint* const joint = jointArray[i + start];
 				me->GetJacobianDerivatives(joint);
-				BuildJacobianMatrix(joint, i + start);
+				BuildJacobianMatrix(joint);
 			}
 		}
 

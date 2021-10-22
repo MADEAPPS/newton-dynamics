@@ -413,6 +413,7 @@ void ndDynamicsUpdateOpencl::SortJoints()
 				const dInt32 rows = joint->GetRowsCount();
 				joint->m_rowCount = rows;
 
+				joint->m_index = -1;
 				const dInt32 equilibrium = body0->m_equilibrium & body1->m_equilibrium;
 				if (!equilibrium)
 				{
@@ -751,6 +752,7 @@ void ndDynamicsUpdateOpencl::SortJoints()
 	{
 		ndConstraint* const joint = jointArray[i];
 		joint->m_rowStart = rowCount;
+		joint->m_index = i;
 		rowCount += joint->m_rowCount;
 	}
 
