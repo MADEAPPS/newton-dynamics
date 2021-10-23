@@ -1506,15 +1506,19 @@ void ndDynamicsUpdate::IntegrateBodies()
 			ndDynamicsUpdate* const me = world->m_solver;
 			dArray<ndBodyKinematic*>& bodyArray = me->m_bodyIslandOrder;
 
+			const dFloat32 timestep = m_timestep;
+			const dVector invTime(me->m_invTimestep);
+
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount();
+			const dInt32 stride = bodyCount / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
 
-			const dFloat32 timestep = m_timestep;
-			const dVector invTime(me->m_invTimestep);
-			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
+			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndBodyDynamic* const dynBody = bodyArray[i]->GetAsBodyDynamic();
+				ndBodyDynamic* const dynBody = bodyArray[i + start]->GetAsBodyDynamic();
 
 				// the initial velocity and angular velocity were stored in m_accel and dynBody->m_alpha for memory saving
 				if (dynBody)
