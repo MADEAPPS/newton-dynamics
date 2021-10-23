@@ -224,9 +224,14 @@ void ndWorld::SelectSolver(ndSolverModes solverMode)
 			#endif
 
 			#ifdef _D_NEWTON_OPENCL
-			case ndOpenclSolver:
+			case ndOpenclSolver1:
 				m_solverMode = solverMode;
-				m_solver = new ndDynamicsUpdateOpencl(this);
+				m_solver = new ndDynamicsUpdateOpencl(this, 0);
+				break;
+
+			case ndOpenclSolver2:
+				m_solverMode = solverMode;
+				m_solver = new ndDynamicsUpdateOpencl(this, 1);
 				break;
 			#endif
 

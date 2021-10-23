@@ -51,7 +51,8 @@ class ndWorld: public dClassAlloc
 		ndStandardSolver,
 		ndSimdSoaSolver,
 		ndSimdAvx2Solver,
-		ndOpenclSolver,
+		ndOpenclSolver1,
+		ndOpenclSolver2,
 	};
 
 	D_NEWTON_API ndWorld();

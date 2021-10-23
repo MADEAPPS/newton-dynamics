@@ -176,8 +176,6 @@ class OpenclSystem: public dClassAlloc
 		m_commandQueue = clCreateCommandQueue(m_context, m_device, properties, &err);
 		dAssert(err == CL_SUCCESS);
 		
-		//char programFile[256];
-		//sprintf(programFile, "%s/CL/solver/solver.cl", CL_KERNEL_PATH);
 		m_solverProgram = CompileProgram();
 		
 		m_integrateUnconstrainedBodies = clCreateKernel(m_solverProgram, "IntegrateUnconstrainedBodies", &err);
@@ -204,7 +202,7 @@ class OpenclSystem: public dClassAlloc
 		dAssert(err == CL_SUCCESS);
 	}
 
-	static OpenclSystem* Singleton()
+	static OpenclSystem* Singleton(dInt32 driveNumber)
 	{
 		cl_uint numPlatforms = 0;
 		cl_int err = clGetPlatformIDs(0, nullptr, &numPlatforms);
@@ -221,6 +219,7 @@ class OpenclSystem: public dClassAlloc
 			return nullptr;
 		}
 
+		dInt32 driveIndex = 0;
 		cl_platform_id bestPlatform = 0;
 		for (cl_uint i = 0; i < numPlatforms; i++)
 		{
@@ -229,6 +228,11 @@ class OpenclSystem: public dClassAlloc
 			if (!((err != CL_SUCCESS) || (numDevices == 0)))
 			{
 				bestPlatform = platforms[i];
+				if (driveIndex == driveNumber)
+				{
+					break;
+				}
+				driveIndex++;
 			}
 		}
 
@@ -291,8 +295,6 @@ class OpenclSystem: public dClassAlloc
 	cl_command_queue m_commandQueue;		// hold the commands-queue handler
 
 	cl_kernel m_integrateUnconstrainedBodies;
-
-	//static std::string m_kernelSource;
 	static char* m_kernelSource;
 };
 
@@ -349,14 +351,12 @@ __kernel void IntegrateUnconstrainedBodies(float timestep, int bodyCount, __glob
 
 )"""";
 
-
-ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world)
+ndDynamicsUpdateOpencl::ndDynamicsUpdateOpencl(ndWorld* const world, dInt32 driverNumber)
 	:ndDynamicsUpdate(world)
 	,m_opencl(nullptr)
 {
-	m_opencl = OpenclSystem::Singleton();
+	m_opencl = OpenclSystem::Singleton(driverNumber);
 }
-
 
 ndDynamicsUpdateOpencl::~ndDynamicsUpdateOpencl()
 {

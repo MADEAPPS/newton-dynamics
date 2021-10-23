@@ -277,7 +277,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showScene = true;
 	//m_showConcaveEdge = true;
 	//m_autoSleepMode = false;
-	m_solverMode = ndWorld::ndOpenclSolver;
+	//m_solverMode = ndWorld::ndOpenclSolver1;
+	m_solverMode = ndWorld::ndOpenclSolver2;
 	//m_solverMode = ndWorld::ndSimdSoaSolver;
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
 	//m_solverMode = ndWorld::ndStandardSolver;
@@ -796,7 +797,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			dInt32 solverMode(m_solverMode);
 			ImGui::RadioButton("sse soa", &solverMode, ndWorld::ndSimdSoaSolver);
 			ImGui::RadioButton("avx2", &solverMode, ndWorld::ndSimdAvx2Solver);
-			ImGui::RadioButton("opencl", &solverMode, ndWorld::ndOpenclSolver);
+			ImGui::RadioButton("opencl 1", &solverMode, ndWorld::ndOpenclSolver1);
+			ImGui::RadioButton("opencl 2", &solverMode, ndWorld::ndOpenclSolver2);
 			ImGui::RadioButton("default", &solverMode, ndWorld::ndStandardSolver);
 			m_solverMode = ndWorld::ndSolverModes(solverMode);
 			ImGui::Separator();

@@ -30,7 +30,7 @@ class OpenclSystem;
 class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 {
 	public:
-	ndDynamicsUpdateOpencl(ndWorld* const world);
+	ndDynamicsUpdateOpencl(ndWorld* const world, dInt32 driverNumber);
 	virtual ~ndDynamicsUpdateOpencl();
 
 	virtual const char* GetStringId() const;
