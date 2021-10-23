@@ -107,9 +107,7 @@ if(UNIX)
 	endif()
 
 	if (NEWTON_ENABLE_OPENCL_SOLVER)
-		target_link_libraries (${projectName} ndSolverOpenCL)
-		#target_link_libraries (${projectName} "${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/dExtensions/dOpencl/CL/lib/x64/OpenCL.lib")
-		target_link_libraries (${projectName} "opencl")
+		target_link_libraries (${projectName} OpenCL ndSolverOpenCL)
 	endif()
 
     target_link_libraries (${projectName} GL GLU dl X11 pthread openal)
