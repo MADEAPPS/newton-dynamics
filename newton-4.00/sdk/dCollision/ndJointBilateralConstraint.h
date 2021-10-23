@@ -39,7 +39,8 @@ enum ndJointBilateralSolverModel
 };
 
 D_MSV_NEWTON_ALIGN_32
-class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
+//class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
+class ndJointBilateralConstraint : public ndConstraint, public dContainersFreeListAlloc<ndJointBilateralConstraint>
 {
 	public:
 	D_CLASS_REFLECTION(ndJointBilateralConstraint);
