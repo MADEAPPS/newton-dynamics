@@ -105,7 +105,7 @@ if(UNIX)
 	target_link_libraries (${projectName} GL GLU dl X11 pthread openal)
 
 	if(NEWTON_ENABLE_AVX2_SOLVER)
-		target_link_libraries (${projectName} ndAvx2Solver)
+		target_link_libraries (${projectName} ndSolverAvx2)
 	endif()
 
 	if (NEWTON_ENABLE_OPENCL_SOLVER)
