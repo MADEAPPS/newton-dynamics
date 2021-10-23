@@ -102,6 +102,8 @@ if(MSVC OR MINGW)
 endif()
 
 if(UNIX)
+	target_link_libraries (${projectName} GL GLU dl X11 pthread openal)
+
 	if(NEWTON_ENABLE_AVX2_SOLVER)
 		target_link_libraries (${projectName} ndAvx2Solver)
 	endif()
@@ -109,8 +111,7 @@ if(UNIX)
 	if (NEWTON_ENABLE_OPENCL_SOLVER)
 		target_link_libraries (${projectName} OpenCL ndSolverOpenCL)
 	endif()
-
-    target_link_libraries (${projectName} GL GLU dl X11 pthread openal)
+    
     set (source "${CMAKE_SOURCE_DIR}/applications/media")
     set (destination "${PROJECT_BINARY_DIR}/applications/media")
     add_custom_command(
