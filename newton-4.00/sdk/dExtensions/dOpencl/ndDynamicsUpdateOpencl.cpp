@@ -295,10 +295,10 @@ class OpenclSystem: public dClassAlloc
 	cl_command_queue m_commandQueue;		// hold the commands-queue handler
 
 	cl_kernel m_integrateUnconstrainedBodies;
-	static char* m_kernelSource;
+	static const char* m_kernelSource;
 };
 
-char* OpenclSystem::m_kernelSource = R""""(
+const char* OpenclSystem::m_kernelSource = R""""(
 
 struct ndOpenclMatrix3x3
 {
