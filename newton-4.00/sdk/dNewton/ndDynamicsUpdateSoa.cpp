@@ -339,7 +339,8 @@ void ndDynamicsUpdateSoa::RadixSort()
 			acc1 += n1;
 		}
 
-		ndIsland* const buffer = dAlloca(ndIsland, elements);
+		//ndIsland* const buffer = dAlloca(ndIsland, elements);
+		ndIsland* const buffer = (ndIsland*)GetTempBuffer();
 
 		dInt32* const scan0 = &histogram[0][0];
 		for (dInt32 i = 0; i < elements; i++)

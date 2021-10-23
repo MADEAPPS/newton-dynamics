@@ -614,11 +614,129 @@ void ndDynamicsUpdateOpencl::SortJoints()
 				const dInt32 m0 = body0->m_index;
 				const dInt32 m1 = body1->m_index;
 				jointBodyBuffer[entry * 2 + 0].m_body = m0;
-				jointBodyBuffer[entry * 2 + 0].m_joint = entry;
+				jointBodyBuffer[entry * 2 + 0].m_joint = entry * 2 + 0;
 				jointBodyBuffer[entry * 2 + 1].m_body = m1;
-				jointBodyBuffer[entry * 2 + 1].m_joint = entry;
+				jointBodyBuffer[entry * 2 + 1].m_joint = entry * 2 + 1;
 
 				jointCountSpans[key.m_value] = entry + 1;
+			}
+		}
+	};
+
+	class ndJointBodySortKey
+	{
+		public:
+		dInt32 m_lowCount;
+		dInt32 m_hightCount;
+	};
+
+	class ndBodyJointJorcesScan : public ndScene::ndBaseJob
+	{
+		public:
+		ndBodyJointJorcesScan()
+		{
+		}
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			ndDynamicsUpdateOpencl* const me = (ndDynamicsUpdateOpencl*)world->m_solver;
+			const dArray<ndJointBodyPairIndex>& bodyJointPairs = me->GetJointBodyPairIndexBuffer();
+			const dInt32 count = bodyJointPairs.GetCount();
+			const dInt32 threadIndex = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			const dInt32 stride = count / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
+
+			const dInt32 radixBits = 9;
+			const dInt32 radix = 1 << radixBits;
+			const dInt32 radixMass = radix - 1;
+
+			ndJointBodySortKey* const histogram = ((ndJointBodySortKey*)m_context) + radix * threadIndex;
+			memset(histogram, 0, radix * sizeof(ndJointBodySortKey));
+			for (dInt32 i = 0; i < blockSize; i++)
+			{
+				dUnsigned32 key = bodyJointPairs[i + start].m_body;
+				dInt32 radix0 = key & radixMass;
+				dInt32 radix1 = key >> radixBits;
+				histogram[radix0].m_lowCount++;
+				histogram[radix1].m_hightCount++;
+			}
+		}
+	};
+
+	class ndBodyJointJorcesSortLowDigit : public ndScene::ndBaseJob
+	{
+		public:
+
+		ndBodyJointJorcesSortLowDigit()
+		{
+		}
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			ndDynamicsUpdateOpencl* const me = (ndDynamicsUpdateOpencl*)world->m_solver;
+			const dArray<ndJointBodyPairIndex>& bodyJointPairs = me->GetJointBodyPairIndexBuffer();
+			const dInt32 count = bodyJointPairs.GetCount();
+			const dInt32 threadIndex = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			const dInt32 stride = count / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
+
+			const dInt32 radixBits = 9;
+			const dInt32 radix = 1 << radixBits;
+			const dInt32 radixMass = radix - 1;
+
+			ndJointBodySortKey* const histogram = ((ndJointBodySortKey*)m_context) + radix * threadIndex;
+			ndJointBodyPairIndex* const sortBuffer = (ndJointBodyPairIndex*)me->GetTempBuffer();
+			for (dInt32 i = 0; i < blockSize; i++)
+			{
+				ndJointBodyPairIndex pair (bodyJointPairs[i + start]);
+				dUnsigned32 key = pair.m_body & radixMass;
+				dInt32 index = histogram[key].m_lowCount;
+				sortBuffer[index] = pair;
+				histogram[key].m_lowCount++;
+			}
+		}
+	};
+
+	class ndBodyJointJorcesSortHighDigit : public ndScene::ndBaseJob
+	{
+		public:
+		ndBodyJointJorcesSortHighDigit()
+		{
+		}
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			ndDynamicsUpdateOpencl* const me = (ndDynamicsUpdateOpencl*)world->m_solver;
+			dArray<ndJointBodyPairIndex>& bodyJointPairs = me->GetJointBodyPairIndexBuffer();
+			const dInt32 count = bodyJointPairs.GetCount();
+			const dInt32 threadIndex = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			const dInt32 stride = count / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
+
+			const dInt32 radixBits = 9;
+			const dInt32 radix = 1 << radixBits;
+
+			ndJointBodySortKey* const histogram = ((ndJointBodySortKey*)m_context) + radix * threadIndex;
+			const ndJointBodyPairIndex* const sortBuffer = (ndJointBodyPairIndex*)me->GetTempBuffer();
+			for (dInt32 i = 0; i < blockSize; i++)
+			{
+				ndJointBodyPairIndex pair(sortBuffer[i + start]);
+				dUnsigned32 key = pair.m_body >> radixBits;
+				dInt32 index = histogram[key].m_hightCount;
+				bodyJointPairs[index] = pair;
+				histogram[key].m_hightCount++;
 			}
 		}
 	};
@@ -756,17 +874,41 @@ void ndDynamicsUpdateOpencl::SortJoints()
 			acc += temp;
 		}
 	}
-	
+
 	dArray<ndJointBodyPairIndex>& jointBodyBuffer = GetJointBodyPairIndexBuffer();
 	jointBodyBuffer.SetCount(jointArray.GetCount() * 2);
+	GetTempInternalForces().SetCount(jointArray.GetCount());
 	scene->SubmitJobs<ndSortByRows>(jointRowScans);
+
+	const dInt32 radixBits = 9;
+	const dInt32 radix = 1 << radixBits;
+	ndJointBodySortKey bodyJointHistogram[D_MAX_THREADS_COUNT][1 << radixBits];
+	scene->SubmitJobs<ndBodyJointJorcesScan>(bodyJointHistogram);
+	
+	dInt32 lowDigitSum = 0;
+	dInt32 highDigitSum = 0;
+	for (dInt32 i = 0; i < radix; i ++)
+	{
+		for (dInt32 j = 0; j < threadCount; j++)
+		{
+			dInt32 lowDigit = bodyJointHistogram[j][i].m_lowCount;
+			dInt32 highDigit = bodyJointHistogram[j][i].m_hightCount;
+			bodyJointHistogram[j][i].m_lowCount = lowDigitSum;
+			bodyJointHistogram[j][i].m_hightCount = highDigitSum;
+			lowDigitSum += lowDigit;
+			highDigitSum += highDigit;
+		}
+	}
+
+	scene->SubmitJobs<ndBodyJointJorcesSortLowDigit>(bodyJointHistogram);
+	scene->SubmitJobs<ndBodyJointJorcesSortHighDigit>(bodyJointHistogram);
 
 	dInt32 rowCount = 1;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = jointArray[i];
 
-		dTrace(("(%d %d) (%d %d)\n", joint->GetBody0()->GetId(), joint->GetBody1()->GetId(), joint->GetBody0()->m_index, joint->GetBody1()->m_index));
+		dTrace(("id(%d %d) index(%d %d)\n", joint->GetBody0()->GetId(), joint->GetBody1()->GetId(), joint->GetBody0()->m_index, joint->GetBody1()->m_index));
 		joint->m_rowStart = rowCount;
 		rowCount += joint->m_rowCount;
 	}
@@ -857,7 +999,8 @@ void ndDynamicsUpdateOpencl::RadixSort()
 			acc1 += n1;
 		}
 
-		ndIsland* const buffer = dAlloca(ndIsland, elements);
+		//ndIsland* const buffer = dAlloca(ndIsland, elements);
+		ndIsland* const buffer = (ndIsland*)GetTempBuffer();
 
 		dInt32* const scan0 = &histogram[0][0];
 		for (dInt32 i = 0; i < elements; i++)
