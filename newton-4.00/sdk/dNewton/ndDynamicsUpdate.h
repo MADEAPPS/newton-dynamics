@@ -48,10 +48,11 @@ D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate: public dClassAlloc
 {
 	public:
-	class ndJointForcesSpans
+	class ndJointBodyPairIndex
 	{
-		dInt32 m_count;
-		dInt32 m_start;
+		public:
+		dInt32 m_body;
+		dInt32 m_joint;
 	};
 
 	class ndSortKey
@@ -113,6 +114,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	dArray<ndJacobian>& GetTempInternalForces();
 	dArray<ndBodyKinematic*>& GetBodyIslandOrder();
 	dArray<ndJacobianPair>& GetInternalJointForces();
+	dArray<ndJointBodyPairIndex>& GetJointBodyPairIndexBuffer();
 
 	private:
 	void RadixSort();
@@ -151,7 +153,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	dArray<ndJacobian> m_tempInternalForces;
 	dArray<ndBodyKinematic*> m_bodyIslandOrder;
 	dArray<ndJacobianPair> m_internalJointForces;
-	dArray<ndJointForcesSpans> m_jointForcesSpans;
+	dArray<ndJointBodyPairIndex> m_jointBodyPairIndexBuffer;
 
 	ndWorld* m_world;
 	dFloat32 m_timestep;
@@ -205,6 +207,11 @@ inline dArray<ndJacobianPair>& ndDynamicsUpdate::GetInternalJointForces()
 inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
 {
 	return m_unConstrainedBodyCount;
+}
+
+inline dArray<ndDynamicsUpdate::ndJointBodyPairIndex>& ndDynamicsUpdate::GetJointBodyPairIndexBuffer()
+{
+	return m_jointBodyPairIndexBuffer;
 }
 
 inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const

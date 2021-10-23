@@ -596,17 +596,28 @@ void ndDynamicsUpdateOpencl::SortJoints()
 
 			dInt32* const jointCountSpans = ((dInt32*)m_context) + 128 * threadIndex;
 			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
+			ndJointBodyPairIndex* const jointBodyBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				ndConstraint* const joint = sortBuffer[i + start];
-				dAssert((joint->GetBody0()->m_resting & joint->GetBody1()->m_resting) == joint->m_resting);
+				const ndBodyKinematic* const body0 = joint->GetBody0();
+				const ndBodyKinematic* const body1 = joint->GetBody1();
+				dAssert((body0->m_resting & body1->m_resting) == joint->m_resting);
 				const ndSortKey key(joint->m_resting, joint->m_rowCount);
 				dAssert(key.m_value >= 0);
 				dAssert(key.m_value <= 127);
 
 				const dInt32 entry = jointCountSpans[key.m_value];
 				jointArray[entry] = joint;
+
+				const dInt32 m0 = body0->m_index;
+				const dInt32 m1 = body1->m_index;
+				jointBodyBuffer[entry * 2 + 0].m_body = m0;
+				jointBodyBuffer[entry * 2 + 0].m_joint = entry;
+				jointBodyBuffer[entry * 2 + 1].m_body = m1;
+				jointBodyBuffer[entry * 2 + 1].m_joint = entry;
+
 				jointCountSpans[key.m_value] = entry + 1;
 			}
 		}
@@ -745,12 +756,17 @@ void ndDynamicsUpdateOpencl::SortJoints()
 			acc += temp;
 		}
 	}
+	
+	dArray<ndJointBodyPairIndex>& jointBodyBuffer = GetJointBodyPairIndexBuffer();
+	jointBodyBuffer.SetCount(jointArray.GetCount() * 2);
 	scene->SubmitJobs<ndSortByRows>(jointRowScans);
 
 	dInt32 rowCount = 1;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = jointArray[i];
+
+		dTrace(("(%d %d) (%d %d)\n", joint->GetBody0()->GetId(), joint->GetBody1()->GetId(), joint->GetBody0()->m_index, joint->GetBody1()->m_index));
 		joint->m_rowStart = rowCount;
 		rowCount += joint->m_rowCount;
 	}

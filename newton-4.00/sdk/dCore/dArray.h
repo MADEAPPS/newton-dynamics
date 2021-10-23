@@ -166,7 +166,6 @@ void dArray<T>::Clear()
 template<class T>
 void dArray<T>::Resize(dInt32 size)
 {
-	//if (size >= m_capacity) 
 	if (size > m_capacity || (m_capacity == 0))
 	{
 		size = dMax(size, 16);

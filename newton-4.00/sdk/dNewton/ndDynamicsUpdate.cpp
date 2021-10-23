@@ -37,7 +37,7 @@ ndDynamicsUpdate::ndDynamicsUpdate(ndWorld* const world)
 	,m_tempInternalForces(D_DEFAULT_BUFFER_SIZE)
 	,m_bodyIslandOrder(D_DEFAULT_BUFFER_SIZE)
 	,m_internalJointForces(D_DEFAULT_BUFFER_SIZE)
-	,m_jointForcesSpans(D_DEFAULT_BUFFER_SIZE)
+	,m_jointBodyPairIndexBuffer(D_DEFAULT_BUFFER_SIZE)
 	,m_world(world)
 	,m_timestep(dFloat32(0.0f))
 	,m_invTimestep(dFloat32(0.0f))
@@ -71,7 +71,7 @@ void ndDynamicsUpdate::Clear()
 	m_tempInternalForces.Resize(D_DEFAULT_BUFFER_SIZE);
 	m_internalJointForces.Resize(D_DEFAULT_BUFFER_SIZE);
 	m_jointForcesIndex.Resize(D_DEFAULT_BUFFER_SIZE);
-	m_jointForcesSpans.Resize(D_DEFAULT_BUFFER_SIZE);
+	m_jointBodyPairIndexBuffer.Resize(D_DEFAULT_BUFFER_SIZE);
 }
 
 dInt32 ndDynamicsUpdate::CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const)
