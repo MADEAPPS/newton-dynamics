@@ -2848,8 +2848,8 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			m_leftHandSide = &me->m_leftHandSide[0];
-			m_rightHandSide = &me->m_rightHandSide[0];
+			m_leftHandSide = &me->GetLeftHandSide()[0];
+			m_rightHandSide = &me->GetRightHandSide()[0];
 			m_internalForces = &me->GetInternalForces()[0];
 			m_outputForces = &me->GetTempInternalForces()[0];
 

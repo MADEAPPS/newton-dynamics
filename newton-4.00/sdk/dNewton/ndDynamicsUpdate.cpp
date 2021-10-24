@@ -1289,8 +1289,8 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
-			m_leftHandSide = &me->m_leftHandSide[0];
-			m_rightHandSide = &me->m_rightHandSide[0];
+			m_leftHandSide = &me->GetLeftHandSide()[0];
+			m_rightHandSide = &me->GetRightHandSide()[0];
 			m_internalForces = &me->GetInternalForces()[0];
 
 			ndConstraint** const jointArray = &m_owner->GetActiveContactArray()[0];
