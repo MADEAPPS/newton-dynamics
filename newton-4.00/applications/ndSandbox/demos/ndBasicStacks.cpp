@@ -157,9 +157,6 @@ void BuildPyramidStacks(ndDemoEntityManager* const scene, dFloat32 mass, const d
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
-	//stackHigh = 2;
-	stackHigh = 3;
-
 	origin1.m_z = 0.0f;
 	origin1.m_x += 3.0f;
 	BuildPyramid(scene, rootEntity, shape, mass, origin1, boxSize, stackHigh);
@@ -171,17 +168,18 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFlatPlane(scene, true);
 
+	dInt32 pyramidHigh = 3;
 	dVector origin(dVector::m_zero);
-	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
 	
 	//origin.m_x += 4.0f;
-	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
 	//
 	//origin.m_x += 4.0f;
-	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
 	//
 	//origin.m_x += 4.0f;
-	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
+	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
 	//
 	//origin = dVector::m_zero;
 	//origin.m_x -= 2.0f;
