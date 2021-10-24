@@ -903,14 +903,37 @@ void ndDynamicsUpdateOpencl::SortJoints()
 	scene->SubmitJobs<ndBodyJointJorcesSortLowDigit>(bodyJointHistogram);
 	scene->SubmitJobs<ndBodyJointJorcesSortHighDigit>(bodyJointHistogram);
 
+	dArray<dInt32>& bodyJointIndex = GetJointForceIndexBuffer();
+	dInt32 bodyJointIndexCount = scene->GetActiveBodyArray().GetCount() + 1;
+	bodyJointIndex.SetCount(bodyJointIndexCount);
+	dInt32 sizeInJacobian = (bodyJointIndexCount * sizeof(dInt32)) / sizeof(ndJacobian);
+	ClearJacobianBuffer(sizeInJacobian, (ndJacobian*)&bodyJointIndex[0]);
+	for (dInt32 i = (sizeInJacobian * sizeof(ndJacobian)) / sizeof(dInt32); i < bodyJointIndexCount; i++)
+	{
+		bodyJointIndex[i] = 0;
+	}
+
 	dInt32 rowCount = 1;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = jointArray[i];
-
-		dTrace(("id(%d %d) index(%d %d)\n", joint->GetBody0()->GetId(), joint->GetBody1()->GetId(), joint->GetBody0()->m_index, joint->GetBody1()->m_index));
+		const ndBodyKinematic* const body0 = joint->GetBody0();
+		const ndBodyKinematic* const body1 = joint->GetBody1();
+		dInt32 m0 = body0->m_index;
+		dInt32 m1 = body1->m_index;
+		bodyJointIndex[m0] ++;
+		bodyJointIndex[m1] ++;
+		//dTrace(("id(%d %d) index(%d %d)\n", body0->GetId(), body1->GetId(), body0->m_index, body1->m_index));
 		joint->m_rowStart = rowCount;
 		rowCount += joint->m_rowCount;
+	}
+
+	dInt32 bodyJointIndexAcc = 0;
+	for (dInt32 i = 0; i < bodyJointIndexCount; i++)
+	{
+		dInt32 count = bodyJointIndex[i];
+		bodyJointIndex[i] = bodyJointIndexAcc;
+		bodyJointIndexAcc += count;
 	}
 
 	m_leftHandSide.SetCount(rowCount);

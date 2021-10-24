@@ -183,7 +183,6 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	//origin.m_x += 4.0f;
 	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), 30);
 	//
-	//
 	//origin = dVector::m_zero;
 	//origin.m_x -= 2.0f;
 	//origin.m_z -= 3.0f;
@@ -191,7 +190,6 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	//
 	//origin.m_z += 6.0f;
 	//BuildCylinderStack(scene, 1.0f, origin, dVector(0.5f, 0.4f, 0.5f, 0.0f), 20);
-
 
 	dQuaternion rot(dYawMatrix (0.0f * dDegreeToRad));
 	origin = dVector::m_zero;

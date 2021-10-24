@@ -110,6 +110,7 @@ class ndDynamicsUpdate: public dClassAlloc
 
 	dArray<ndJacobian>& GetInternalForces();
 	dArray<ndLeftHandSide>& GetLeftHandSide();
+	dArray<dInt32>& GetJointForceIndexBuffer();
 	dArray<ndRightHandSide>& GetRightHandSide();
 	dArray<ndJacobian>& GetTempInternalForces();
 	dArray<ndBodyKinematic*>& GetBodyIslandOrder();
@@ -212,6 +213,11 @@ inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
 inline dArray<ndDynamicsUpdate::ndJointBodyPairIndex>& ndDynamicsUpdate::GetJointBodyPairIndexBuffer()
 {
 	return m_jointBodyPairIndexBuffer;
+}
+
+inline dArray<dInt32>& ndDynamicsUpdate::GetJointForceIndexBuffer()
+{
+	return m_jointForcesIndex;
 }
 
 inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const
