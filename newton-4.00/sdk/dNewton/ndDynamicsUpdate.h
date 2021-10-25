@@ -24,11 +24,14 @@
 
 #include "ndNewtonStdafx.h"
 
-#define D_SMALL_ISLAND_COUNT			32
-#define	D_FREEZZING_VELOCITY_DRAG		dFloat32 (0.9f)
-#define	D_SOLVER_MAX_ERROR				(D_FREEZE_MAG * dFloat32 (0.5f))
+#define D_SMALL_ISLAND_COUNT		32
+#define	D_FREEZZING_VELOCITY_DRAG	dFloat32 (0.9f)
+#define	D_SOLVER_MAX_ERROR			(D_FREEZE_MAG * dFloat32 (0.5f))
 
-#define D_DEFAULT_BUFFER_SIZE			1024
+#define D_DEFAULT_BUFFER_SIZE		1024
+#define D_MAX_BODY_RADIX_BIT		9
+#define D_MAX_BODY_RADIX_DIGIT		(1<<D_MAX_BODY_RADIX_BIT)
+#define D_MAX_BODY_RADIX_MASK		(D_MAX_BODY_RADIX_DIGIT-1)
 
 // the solver is a RK order 4, but instead of weighting the intermediate derivative by the usual 1/6, 1/3, 1/3, 1/6 coefficients
 // I am using 1/4, 1/4, 1/4, 1/4.
@@ -53,6 +56,13 @@ class ndDynamicsUpdate: public dClassAlloc
 		public:
 		dInt32 m_body;
 		dInt32 m_joint;
+	};
+
+	class ndJointBodySortKey
+	{
+		public:
+		dInt32 m_lowCount;
+		dInt32 m_hightCount;
 	};
 
 	class ndSortKey
@@ -106,6 +116,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	void* GetTempBuffer() const;
 	virtual const char* GetStringId() const;
 	dInt32 GetUnconstrainedBodyCount() const;
+	void ClearBuffer(void* const buffer, dInt32 sizeInByte) const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
 
 	dArray<ndJacobian>& GetInternalForces();
@@ -228,6 +239,17 @@ inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* cons
 	{
 		dst[i * 2 + 0] = zero;
 		dst[i * 2 + 1] = zero;
+	}
+}
+
+inline void ndDynamicsUpdate::ClearBuffer(void* const buffer, dInt32 sizeInByte) const
+{
+	dInt32 sizeInJacobian = sizeInByte / sizeof(ndJacobian);
+	ClearJacobianBuffer(sizeInJacobian, (ndJacobian*)buffer);
+	char* const ptr = (char*)buffer;
+	for (dInt32 i = sizeInJacobian * sizeof(ndJacobian); i < sizeInByte; i++)
+	{
+		ptr[i] = 0;
 	}
 }
 

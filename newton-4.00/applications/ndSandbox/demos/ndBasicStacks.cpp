@@ -168,7 +168,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFlatPlane(scene, true);
 
-	dInt32 pyramidHigh = 3;
+	dInt32 pyramidHigh = 30;
 	dVector origin(dVector::m_zero);
 	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
 	
@@ -193,5 +193,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	origin = dVector::m_zero;
 	origin.m_x -= 3.0f;
 	origin.m_y += 2.0f;
+
+	origin.m_x -= 20.0f;
 	scene->SetCameraMatrix(rot, origin);
 }

@@ -30,10 +30,6 @@
 
 #define D_GPU_WORK_GROUP		128
 
-#define D_MAX_BODY_RADIX_BIT		9
-#define D_MAX_BODY_RADIX_DIGIT		(1<<D_MAX_BODY_RADIX_BIT)
-#define D_MAX_BODY_RADIX_MASK		(D_MAX_BODY_RADIX_DIGIT-1)
-
 #if 0
 template<class T>
 class dOpenclBuffer: public dArray<T>
@@ -627,13 +623,6 @@ void ndDynamicsUpdateOpencl::SortJoints()
 		}
 	};
 
-	class ndJointBodySortKey
-	{
-		public:
-		dInt32 m_lowCount;
-		dInt32 m_hightCount;
-	};
-
 	class ndBodyJointJorcesScan : public ndScene::ndBaseJob
 	{
 		public:
@@ -895,26 +884,22 @@ void ndDynamicsUpdateOpencl::SortJoints()
 	scene->SubmitJobs<ndBodyJointJorcesSortHighDigit>(bodyJointHistogram);
 
 	dArray<dInt32>& bodyJointIndex = GetJointForceIndexBuffer();
-	dInt32 bodyJointIndexCount = scene->GetActiveBodyArray().GetCount() + 1;
+	const dInt32 bodyJointIndexCount = scene->GetActiveBodyArray().GetCount() + 1;
 	bodyJointIndex.SetCount(bodyJointIndexCount);
-	dInt32 sizeInJacobian = (bodyJointIndexCount * sizeof(dInt32)) / sizeof(ndJacobian);
-	ClearJacobianBuffer(sizeInJacobian, (ndJacobian*)&bodyJointIndex[0]);
-	for (dInt32 i = (sizeInJacobian * sizeof(ndJacobian)) / sizeof(dInt32); i < bodyJointIndexCount; i++)
-	{
-		bodyJointIndex[i] = 0;
-	}
+	ClearBuffer(&bodyJointIndex[0], bodyJointIndexCount * sizeof(dInt32));
 
 	dInt32 rowCount = 1;
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = jointArray[i];
+
 		const ndBodyKinematic* const body0 = joint->GetBody0();
 		const ndBodyKinematic* const body1 = joint->GetBody1();
 		dInt32 m0 = body0->m_index;
 		dInt32 m1 = body1->m_index;
 		bodyJointIndex[m0] ++;
 		bodyJointIndex[m1] ++;
-		//dTrace(("id(%d %d) index(%d %d)\n", body0->GetId(), body1->GetId(), body0->m_index, body1->m_index));
+
 		joint->m_rowStart = rowCount;
 		rowCount += joint->m_rowCount;
 	}
@@ -1235,7 +1220,6 @@ void ndDynamicsUpdateOpencl::InitWeights()
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	const dInt32 bodyCount = bodyArray.GetCount();
 	GetInternalForces().SetCount(bodyCount);
-	GetTempInternalForces().SetCount(bodyCount);
 
 	dFloat32 extraPassesArray[D_MAX_THREADS_COUNT];
 	memset(extraPassesArray, 0, sizeof(extraPassesArray));
@@ -1513,18 +1497,6 @@ void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 				forceAcc1 = forceAcc1 + JtM1.m_linear * f1;
 				torqueAcc1 = torqueAcc1 + JtM1.m_angular * f1;
 			}
-
-			//if (body1->GetInvMass() > dFloat32(0.0f))
-			//{
-			//	ndJacobian& outBody1 = m_internalForces[m1];
-			//	dScopeSpinLock lock(body1->m_lock);
-			//	outBody1.m_linear += forceAcc1;
-			//	outBody1.m_angular += torqueAcc1;
-			//}
-			//ndJacobian& outBody0 = m_internalForces[m0];
-			//dScopeSpinLock lock(body0->m_lock);
-			//outBody0.m_linear += forceAcc0;
-			//outBody0.m_angular += torqueAcc0;
 
 			const dInt32 index0 = jointIndex * 2 + 0;
 			ndJacobian& outBody0 = m_internalForces[index0];
@@ -2294,19 +2266,6 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 				torqueM1 = torqueM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_angular, f);
 				rhs->m_maxImpact = dMax(dAbs(f.GetScalar()), rhs->m_maxImpact);
 			}
-
-			//if (body1->GetInvMass() > dFloat32(0.0f))
-			//{
-			//	ndJacobian& outBody1 = m_outputForces[m1];
-			//	dScopeSpinLock lock(body1->m_lock);
-			//	outBody1.m_linear += forceM1;
-			//	outBody1.m_angular += torqueM1;
-			//}
-			//
-			//ndJacobian& outBody0 = m_outputForces[m0];
-			//dScopeSpinLock lock(body0->m_lock);
-			//outBody0.m_linear += forceM0;
-			//outBody0.m_angular += torqueM0;
 
 			const dInt32 index0 = jointIndex * 2 + 0;
 			ndJacobian& outBody0 = m_jointPartialForces[index0];
