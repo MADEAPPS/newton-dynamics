@@ -1899,12 +1899,13 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 
 			ndJacobian* const internalForces = &me->GetInternalForces()[0];
 			const dInt32* const bodyIndex = &me->GetJointForceIndexBuffer()[0];
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
 			const ndJacobian* const jointInternalForces = &me->GetTempInternalForces()[0];
 			const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
+			const dInt32 bodyCount = bodyArray.GetCount();
 
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
@@ -1918,11 +1919,15 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 				{
 					dVector force(zero);
 					dVector torque(zero);
-					for (dInt32 j = 0; j < count; j++)
+					const ndBodyKinematic* const body = bodyArray[i];
+					if (body->GetInvMass() > dFloat32(0.0f))
 					{
-						dInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
-						force += jointInternalForces[index].m_linear;
-						torque += jointInternalForces[index].m_angular;
+						for (dInt32 j = 0; j < count; j++)
+						{
+							dInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
+							force += jointInternalForces[index].m_linear;
+							torque += jointInternalForces[index].m_angular;
+						}
 					}
 					internalForces[i + start].m_linear = force;
 					internalForces[i + start].m_angular = torque;
@@ -2674,7 +2679,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 		dInt32 m_activeCount;
 	};
 
-	class ndInitJacobianAccumulatePartialForces : public ndScene::ndBaseJob
+	class ndApplyJacobianAccumulatePartialForces : public ndScene::ndBaseJob
 	{
 		public:
 		virtual void Execute()
@@ -2704,16 +2709,20 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 				dInt32 count = bodyIndex[i + start + 1] - startIndex;
 				if (count)
 				{
-					dVector force(zero);
-					dVector torque(zero);
-					for (dInt32 j = 0; j < count; j++)
+					const ndBodyKinematic* body = bodyArray[i];
+					if (body->GetInvMass() > dFloat32(0.0f))
 					{
-						dInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
-						force += jointInternalForces[index].m_linear;
-						torque += jointInternalForces[index].m_angular;
+						dVector force(zero);
+						dVector torque(zero);
+						for (dInt32 j = 0; j < count; j++)
+						{
+							dInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
+							force += jointInternalForces[index].m_linear;
+							torque += jointInternalForces[index].m_angular;
+						}
+						internalForces[i + start].m_linear = force;
+						internalForces[i + start].m_angular = torque;
 					}
-					internalForces[i + start].m_linear = force;
-					internalForces[i + start].m_angular = torque;
 				}
 			}
 		}
@@ -2729,7 +2738,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 	for (dInt32 i = 0; (i < passes) && (accNorm > D_SOLVER_MAX_ERROR); i++)
 	{
 		scene->SubmitJobs<ndCalculateJointsForce>(m_accelNorm);
-		scene->SubmitJobs<ndInitJacobianAccumulatePartialForces>();
+		scene->SubmitJobs<ndApplyJacobianAccumulatePartialForces>();
 
 		accNorm = dFloat32(0.0f);
 		for (dInt32 j = 0; j < threadsCount; j++)
