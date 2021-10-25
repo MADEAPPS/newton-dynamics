@@ -583,6 +583,7 @@ void ndDynamicsUpdate::SortJoints()
 			}
 		}
 	};
+	
 	class ndBodyJointJorcesSortLowDigit : public ndScene::ndBaseJob
 	{
 		public:
