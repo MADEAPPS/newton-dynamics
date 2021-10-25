@@ -49,7 +49,10 @@ if(UNIX)
 	add_library(${projectName} SHARED ${CPP_SOURCE})
 endif()
 
+install(TARGETS ${projectName}
+		LIBRARY DESTINATION lib
+		ARCHIVE DESTINATION lib
+		RUNTIME DESTINATION bin)
 
-
-
+install(FILES ${HEADERS} DESTINATION include/${projectName})
 

@@ -54,7 +54,9 @@ if(UNIX)
 	target_link_libraries (${projectName} OpenCL)
 endif()
 
+install(TARGETS ${projectName} 
+		LIBRARY DESTINATION lib
+		ARCHIVE DESTINATION lib
+		RUNTIME DESTINATION bin)
 
-
-
-
+install(FILES ${HEADERS} DESTINATION include/${projectName})

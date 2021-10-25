@@ -149,5 +149,3 @@ else()
 	install(FILES ${HEADERS} DESTINATION include/${projectName})
 
 endif()
-
-	

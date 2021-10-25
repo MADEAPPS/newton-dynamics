@@ -61,12 +61,13 @@ endif ()
 if(MSVC OR MINGW)
 	if(NEWTON_ENABLE_AVX2_SOLVER)
 		if (NOT NEWTON_BUILD_SHARED_LIBS)
-			target_link_libraries (${projectName} ndAvx2Solver)
+			target_link_libraries (${projectName} ndSolverAvx2)
 		endif()
 	endif()
 
 	if (NEWTON_ENABLE_OPENCL_SOLVER)
 		if (NOT NEWTON_BUILD_SHARED_LIBS)
+			target_link_libraries (${projectName} ndSolverOpenCL)
 			if (PTR_SIZE EQUAL 8)
 				message (${CMAKE_CURRENT_SOURCE_DIR})
 				target_link_libraries (${projectName} "${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/dExtensions/dOpencl/CL/lib/x64/OpenCL.lib")
@@ -126,5 +127,3 @@ if(WIN32)
 endif()
 
 install(DIRECTORY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications")
-
-
