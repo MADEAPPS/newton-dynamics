@@ -118,6 +118,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	dInt32 GetUnconstrainedBodyCount() const;
 	void ClearBuffer(void* const buffer, dInt32 sizeInByte) const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
+	void ClearJacobianBuffer___(dInt32 count, ndJacobian* const dst) const;
 
 	dArray<ndJacobian>& GetInternalForces();
 	dArray<ndLeftHandSide>& GetLeftHandSide();
@@ -233,6 +234,18 @@ inline dArray<dInt32>& ndDynamicsUpdate::GetJointForceIndexBuffer()
 
 inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const
 {
+	dAssert(0);
+	const dVector zero(dVector::m_zero);
+	dVector* const dst = &buffer[0].m_linear;
+	for (dInt32 i = 0; i < count; i++)
+	{
+		dst[i * 2 + 0] = zero;
+		dst[i * 2 + 1] = zero;
+	}
+}
+
+inline void ndDynamicsUpdate::ClearJacobianBuffer___(dInt32 count, ndJacobian* const buffer) const
+{
 	const dVector zero(dVector::m_zero);
 	dVector* const dst = &buffer[0].m_linear;
 	for (dInt32 i = 0; i < count; i++)
@@ -245,7 +258,7 @@ inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* cons
 inline void ndDynamicsUpdate::ClearBuffer(void* const buffer, dInt32 sizeInByte) const
 {
 	dInt32 sizeInJacobian = sizeInByte / sizeof(ndJacobian);
-	ClearJacobianBuffer(sizeInJacobian, (ndJacobian*)buffer);
+	ClearJacobianBuffer___(sizeInJacobian, (ndJacobian*)buffer);
 	char* const ptr = (char*)buffer;
 	for (dInt32 i = sizeInJacobian * sizeof(ndJacobian); i < sizeInByte; i++)
 	{

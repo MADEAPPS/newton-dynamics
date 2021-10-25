@@ -134,8 +134,9 @@ class ndForceImpactPair
 
 	dFloat32 GetInitiailGuess() const
 	{
-		dFloat32 value = dFloat32(dFloat32(0.0f));
+		//return 100.0f;
 		dFloat32 smallest = dFloat32(1.0e15f);
+		dFloat32 value = dFloat32(dFloat32(0.0f));
 		for (dInt32 i = 0; i < dInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); i++)
 		{
 			dFloat32 mag = dAbs(m_initialGuess[i]);

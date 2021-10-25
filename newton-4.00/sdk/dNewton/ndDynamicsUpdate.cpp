@@ -1442,8 +1442,8 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			m_rightHandSide = &me->GetRightHandSide()[0];
 			m_internalForces = &me->GetTempInternalForces()[0];
 			m_jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
-
 			ndConstraint** const jointArray = &m_owner->GetActiveContactArray()[0];
+
 			const dInt32 jointCount = m_owner->GetActiveContactArray().GetCount();
 			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
 			const dInt32 threadIndex = GetThreadId();
@@ -1513,7 +1513,6 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 	{
 		D_TRACKTIME();
 		m_rightHandSide[0].m_force = dFloat32(1.0f);
-		ClearJacobianBuffer(GetInternalForces().GetCount(), &GetInternalForces()[0]);
 		scene->SubmitJobs<ndInitJacobianMatrix>();
 		scene->SubmitJobs<ndInitJacobianAccumulatePartialForces>();
 	}

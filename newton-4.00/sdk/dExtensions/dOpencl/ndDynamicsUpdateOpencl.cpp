@@ -1589,7 +1589,6 @@ void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 	{
 		D_TRACKTIME();
 		m_rightHandSide[0].m_force = dFloat32(1.0f);
-		ClearJacobianBuffer(GetInternalForces().GetCount(), &GetInternalForces()[0]);
 		scene->SubmitJobs<ndInitJacobianMatrix>();
 		scene->SubmitJobs<ndInitJacobianAccumulatePartialForces>();
 	}
