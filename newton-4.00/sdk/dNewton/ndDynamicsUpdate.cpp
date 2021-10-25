@@ -2241,7 +2241,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 
 	class ndInitJacobianAccumulatePartialForces : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
