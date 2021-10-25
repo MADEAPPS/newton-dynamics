@@ -2654,7 +2654,8 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			const dInt32 soaJointCount = ((jointCount + D_SSE_WORK_GROUP - 1) & mask) / D_SSE_WORK_GROUP;
 			for (dInt32 i = threadIndex; i < soaJointCount; i += threadCount)
 			{
-				accNorm += JointForce(i * D_SSE_WORK_GROUP, &soaMassMatrix[soaJointRows[i]]);
+				dInt32 block = i * D_SSE_WORK_GROUP;
+				accNorm += JointForce(block, &soaMassMatrix[soaJointRows[i]]);
 			}
 
 			dFloat32* const accelNorm = (dFloat32*)m_context;
@@ -2768,7 +2769,13 @@ void ndDynamicsUpdateSoa::Update()
 {
 	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
-return;
+static int xxx;
+xxx++;
+if (xxx == 294)
+xxx *= 1;
+if (xxx > 100)
+xxx *= 1;
+
 	BuildIsland();
 	if (m_islands.GetCount())
 	{
