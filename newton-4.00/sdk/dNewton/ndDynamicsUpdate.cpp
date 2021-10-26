@@ -549,10 +549,10 @@ void ndDynamicsUpdate::SortJoints()
 		}
 	};
 
-	class ndBodyJointJorcesScan : public ndScene::ndBaseJob
+	class ndBodyJointForceScan : public ndScene::ndBaseJob
 	{
 		public:
-		ndBodyJointJorcesScan()
+		ndBodyJointForceScan()
 		{
 		}
 
@@ -582,10 +582,10 @@ void ndDynamicsUpdate::SortJoints()
 		}
 	};
 	
-	class ndBodyJointJorcesSortLowDigit : public ndScene::ndBaseJob
+	class ndBodyJointForceSortLowDigit : public ndScene::ndBaseJob
 	{
 		public:
-		ndBodyJointJorcesSortLowDigit()
+		ndBodyJointForceSortLowDigit()
 		{
 		}
 
@@ -615,10 +615,10 @@ void ndDynamicsUpdate::SortJoints()
 		}
 	};
 
-	class ndBodyJointJorcesSortHighDigit : public ndScene::ndBaseJob
+	class ndBodyJointForceSortHighDigit : public ndScene::ndBaseJob
 	{
 		public:
-		ndBodyJointJorcesSortHighDigit()
+		ndBodyJointForceSortHighDigit()
 		{
 		}
 
@@ -787,7 +787,7 @@ void ndDynamicsUpdate::SortJoints()
 	scene->SubmitJobs<ndSortByRows>(jointRowScans);
 
 	ndJointBodySortKey bodyJointHistogram[D_MAX_THREADS_COUNT][D_MAX_BODY_RADIX_DIGIT];
-	scene->SubmitJobs<ndBodyJointJorcesScan>(bodyJointHistogram);
+	scene->SubmitJobs<ndBodyJointForceScan>(bodyJointHistogram);
 
 	dInt32 lowDigitSum = 0;
 	dInt32 highDigitSum = 0;
@@ -804,8 +804,8 @@ void ndDynamicsUpdate::SortJoints()
 		}
 	}
 
-	scene->SubmitJobs<ndBodyJointJorcesSortLowDigit>(bodyJointHistogram);
-	scene->SubmitJobs<ndBodyJointJorcesSortHighDigit>(bodyJointHistogram);
+	scene->SubmitJobs<ndBodyJointForceSortLowDigit>(bodyJointHistogram);
+	scene->SubmitJobs<ndBodyJointForceSortHighDigit>(bodyJointHistogram);
 
 	dArray<dInt32>& bodyJointIndex = GetJointForceIndexBuffer();
 	const dInt32 bodyJointIndexCount = scene->GetActiveBodyArray().GetCount() + 1;

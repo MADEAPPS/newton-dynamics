@@ -708,10 +708,10 @@ void ndDynamicsUpdateSoa::SortJoints()
 		}
 	};
 
-	class ndBodyJointJorcesScan : public ndScene::ndBaseJob
+	class ndBodyJointForceScan : public ndScene::ndBaseJob
 	{
 		public:
-		ndBodyJointJorcesScan()
+		ndBodyJointForceScan()
 		{
 		}
 
@@ -741,10 +741,10 @@ void ndDynamicsUpdateSoa::SortJoints()
 		}
 	};
 
-	class ndBodyJointJorcesSortLowDigit : public ndScene::ndBaseJob
+	class ndBodyJointForceSortLowDigit : public ndScene::ndBaseJob
 	{
 		public:
-		ndBodyJointJorcesSortLowDigit()
+		ndBodyJointForceSortLowDigit()
 		{
 		}
 
@@ -774,10 +774,10 @@ void ndDynamicsUpdateSoa::SortJoints()
 		}
 	};
 
-	class ndBodyJointJorcesSortHighDigit : public ndScene::ndBaseJob
+	class ndBodyJointForceSortHighDigit : public ndScene::ndBaseJob
 	{
 		public:
-		ndBodyJointJorcesSortHighDigit()
+		ndBodyJointForceSortHighDigit()
 		{
 		}
 
@@ -1004,7 +1004,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 	scene->SubmitJobs<ndCountJointBodyPairs>();
 
 	ndJointBodySortKey bodyJointHistogram[D_MAX_THREADS_COUNT][D_MAX_BODY_RADIX_DIGIT];
-	scene->SubmitJobs<ndBodyJointJorcesScan>(bodyJointHistogram);
+	scene->SubmitJobs<ndBodyJointForceScan>(bodyJointHistogram);
 	
 	dInt32 lowDigitSum = 0;
 	dInt32 highDigitSum = 0;
@@ -1020,8 +1020,8 @@ void ndDynamicsUpdateSoa::SortJoints()
 			highDigitSum += highDigit;
 		}
 	}
-	scene->SubmitJobs<ndBodyJointJorcesSortLowDigit>(bodyJointHistogram);
-	scene->SubmitJobs<ndBodyJointJorcesSortHighDigit>(bodyJointHistogram);
+	scene->SubmitJobs<ndBodyJointForceSortLowDigit>(bodyJointHistogram);
+	scene->SubmitJobs<ndBodyJointForceSortHighDigit>(bodyJointHistogram);
 	
 	dArray<dInt32>& bodyJointIndex = GetJointForceIndexBuffer();
 	const dInt32 bodyJointIndexCount = scene->GetActiveBodyArray().GetCount() + 1;
@@ -2679,7 +2679,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			const dInt32 jointCount = jointArray.GetCount();
 			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
 			const dInt32 threadIndex = GetThreadId();
-			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
+			const dInt32 threadCount = m_owner->GetThreadCount();
 
 			m_mask = dVector::m_xyzwMask;
 			const dInt32 mask = -dInt32(D_SSE_WORK_GROUP);
@@ -2757,7 +2757,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 
 	ndScene* const scene = m_world->GetScene();
 	const dInt32 passes = m_solverPasses;
-	const dInt32 threadsCount = dMax(scene->GetThreadCount(), 1);
+	const dInt32 threadsCount = scene->GetThreadCount();
 
 	dFloat32 m_accelNorm[D_MAX_THREADS_COUNT];
 	dFloat32 accNorm = D_SOLVER_MAX_ERROR * dFloat32(2.0f);
