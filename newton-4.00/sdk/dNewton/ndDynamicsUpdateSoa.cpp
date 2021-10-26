@@ -588,19 +588,13 @@ void ndDynamicsUpdateSoa::SortJoints()
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				ndConstraint* const joint = sortBuffer[i + start];
-				const ndBodyKinematic* const body0 = joint->GetBody0();
-				const ndBodyKinematic* const body1 = joint->GetBody1();
-
-				dAssert((body0->m_resting & body1->m_resting) == joint->m_resting);
+				dAssert((joint->GetBody0()->m_resting & joint->GetBody1()->m_resting) == joint->m_resting);
 				const ndSortKey key(joint->m_resting, joint->m_rowCount);
 				dAssert(key.m_value >= 0);
 				dAssert(key.m_value <= 127);
 
 				const dInt32 entry = jointCountSpans[key.m_value];
 				jointArray[entry] = joint;
-
-				const dInt32 m0 = body0->m_index;
-				const dInt32 m1 = body1->m_index;
 				jointCountSpans[key.m_value] = entry + 1;
 			}
 		}
