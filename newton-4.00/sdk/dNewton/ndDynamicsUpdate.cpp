@@ -1494,7 +1494,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 				{
 					dVector force(zero);
 					dVector torque(zero);
-					const ndBodyKinematic* const body = bodyArray[i];
+					const ndBodyKinematic* const body = bodyArray[i + start];
 					if (body->GetInvMass() > dFloat32(0.0f))
 					{
 						for (dInt32 j = 0; j < count; j++)
@@ -2272,7 +2272,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				dInt32 count = bodyIndex[i + start + 1] - startIndex;
 				if (count)
 				{
-					const ndBodyKinematic* body = bodyArray[i];
+					const ndBodyKinematic* body = bodyArray[i + start];
 					if (body->GetInvMass() > dFloat32(0.0f))
 					{
 						dVector force(zero);
