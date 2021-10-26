@@ -20,7 +20,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-//static void AddRigidBody(ndDemoEntityManager* const scene, const dMatrix& matrix, const ndShapeInstance& shape, ndDemoInstanceEntity* const rootEntity, dFloat32 mass)
 static void AddRigidBody(ndDemoEntityManager* const scene, 
 	const dMatrix& matrix, const ndShapeInstance& shape, 
 	ndDemoInstanceEntity* const rootEntity, dFloat32 mass)
@@ -168,7 +167,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFlatPlane(scene, true);
 
-	dInt32 pyramidHigh = 3;
+	dInt32 pyramidHigh = 30;
 	dVector origin(dVector::m_zero);
 	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
 	

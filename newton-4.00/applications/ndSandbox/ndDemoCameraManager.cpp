@@ -16,7 +16,7 @@
 #include "ndPhysicsUtils.h"
 #include "ndDemoCameraManager.h"
 
-#define D_ENABLE_CAMERA_REPLAY
+//#define D_ENABLE_CAMERA_REPLAY
 #ifdef D_ENABLE_CAMERA_REPLAY
 	//#define D_RECORD_CAMERA
 #endif

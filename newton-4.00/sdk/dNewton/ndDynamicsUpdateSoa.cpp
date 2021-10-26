@@ -678,7 +678,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 		}
 	};
 
-	class ndSortByRows____ : public ndScene::ndBaseJob
+	class ndCountJointBodyPairs : public ndScene::ndBaseJob
 	{
 		public:
 		virtual void Execute()
@@ -687,7 +687,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 			ndWorld* const world = m_owner->GetWorld();
 			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
-			ndConstraintArray& jointArray = scene->GetActiveContactArray();
+			const ndConstraintArray& jointArray = scene->GetActiveContactArray();
 			ndJointBodyPairIndex* const jointBodyBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 
 			const dInt32 count = jointArray.GetCount();
@@ -696,31 +696,20 @@ void ndDynamicsUpdateSoa::SortJoints()
 			const dInt32 stride = count / threadCount;
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
-
-			dInt32* const jointCountSpans = ((dInt32*)m_context) + 128 * threadIndex;
-			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
+			
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndConstraint* const joint = sortBuffer[i + start];
+				const dInt32 index = i + start;
+				const ndConstraint* const joint = jointArray[index];
 				const ndBodyKinematic* const body0 = joint->GetBody0();
 				const ndBodyKinematic* const body1 = joint->GetBody1();
 
-				dAssert((body0->m_resting & body1->m_resting) == joint->m_resting);
-				const ndSortKey key(joint->m_resting, joint->m_rowCount);
-				dAssert(key.m_value >= 0);
-				dAssert(key.m_value <= 127);
-
-				const dInt32 entry = jointCountSpans[key.m_value];
-				jointArray[entry] = joint;
-
 				const dInt32 m0 = body0->m_index;
 				const dInt32 m1 = body1->m_index;
-				jointBodyBuffer[entry * 2 + 0].m_body = m0;
-				jointBodyBuffer[entry * 2 + 0].m_joint = entry * 2 + 0;
-				jointBodyBuffer[entry * 2 + 1].m_body = m1;
-				jointBodyBuffer[entry * 2 + 1].m_joint = entry * 2 + 1;
-
-				jointCountSpans[key.m_value] = entry + 1;
+				jointBodyBuffer[index * 2 + 0].m_body = m0;
+				jointBodyBuffer[index * 2 + 0].m_joint = index * 2 + 0;
+				jointBodyBuffer[index * 2 + 1].m_body = m1;
+				jointBodyBuffer[index * 2 + 1].m_joint = index * 2 + 1;
 			}
 		}
 	};
@@ -1016,64 +1005,64 @@ void ndDynamicsUpdateSoa::SortJoints()
 	m_soaJointRows.SetCount(soaJointCountBatches);
 	scene->SubmitJobs<ndSetRowStarts>(&rowsCount);
 
-	dAssert(0);
-	//GetTempInternalForces().SetCount(jointArray.GetCount() * 2);
-	//GetJointBodyPairIndexBuffer().SetCount(jointArray.GetCount() * 2);
+	GetTempInternalForces().SetCount(jointArray.GetCount() * 2);
+	GetJointBodyPairIndexBuffer().SetCount(jointArray.GetCount() * 2);
+	scene->SubmitJobs<ndCountJointBodyPairs>();
 
-	//ndJointBodySortKey bodyJointHistogram[D_MAX_THREADS_COUNT][D_MAX_BODY_RADIX_DIGIT];
-	//scene->SubmitJobs<ndBodyJointJorcesScan>(bodyJointHistogram);
-	//
-	//dInt32 lowDigitSum = 0;
-	//dInt32 highDigitSum = 0;
-	//for (dInt32 i = 0; i < D_MAX_BODY_RADIX_DIGIT; i++)
-	//{
-	//	for (dInt32 j = 0; j < threadCount; j++)
-	//	{
-	//		dInt32 lowDigit = bodyJointHistogram[j][i].m_lowCount;
-	//		dInt32 highDigit = bodyJointHistogram[j][i].m_hightCount;
-	//		bodyJointHistogram[j][i].m_lowCount = lowDigitSum;
-	//		bodyJointHistogram[j][i].m_hightCount = highDigitSum;
-	//		lowDigitSum += lowDigit;
-	//		highDigitSum += highDigit;
-	//	}
-	//}
-	//scene->SubmitJobs<ndBodyJointJorcesSortLowDigit>(bodyJointHistogram);
-	//scene->SubmitJobs<ndBodyJointJorcesSortHighDigit>(bodyJointHistogram);
-	//
-	//dArray<dInt32>& bodyJointIndex = GetJointForceIndexBuffer();
-	//const dInt32 bodyJointIndexCount = scene->GetActiveBodyArray().GetCount() + 1;
-	//bodyJointIndex.SetCount(bodyJointIndexCount);
-	//ClearBuffer(&bodyJointIndex[0], bodyJointIndexCount * sizeof(dInt32));
-	//
-	//dInt32 rowCount = 1;
-	//for (dInt32 i = 0; i < jointArray.GetCount(); i++)
-	//{
-	//	ndConstraint* const joint = jointArray[i];
-	//
-	//	const ndBodyKinematic* const body0 = joint->GetBody0();
-	//	const ndBodyKinematic* const body1 = joint->GetBody1();
-	//	dInt32 m0 = body0->m_index;
-	//	dInt32 m1 = body1->m_index;
-	//	bodyJointIndex[m0] ++;
-	//	bodyJointIndex[m1] ++;
-	//
-	//	dTrace(("id(%d %d) index(%d %d)\n", body0->m_uniqueId, body1->m_uniqueId, m0, m1));
-	//
-	//	joint->m_rowStart = rowCount;
-	//	rowCount += joint->m_rowCount;
-	//}
-	//
-	//dInt32 bodyJointIndexAcc = 0;
-	//for (dInt32 i = 0; i < bodyJointIndexCount; i++)
-	//{
-	//	dInt32 count = bodyJointIndex[i];
-	//	bodyJointIndex[i] = bodyJointIndexAcc;
-	//	bodyJointIndexAcc += count;
-	//}
+	ndJointBodySortKey bodyJointHistogram[D_MAX_THREADS_COUNT][D_MAX_BODY_RADIX_DIGIT];
+	scene->SubmitJobs<ndBodyJointJorcesScan>(bodyJointHistogram);
 	
-	//m_leftHandSide.SetCount(rowsCount.m_rowsCount);
-	//m_rightHandSide.SetCount(rowsCount.m_rowsCount);
-	//m_soaMassMatrix.SetCount(rowsCount.m_soaJointRowCount);
+	dInt32 lowDigitSum = 0;
+	dInt32 highDigitSum = 0;
+	for (dInt32 i = 0; i < D_MAX_BODY_RADIX_DIGIT; i++)
+	{
+		for (dInt32 j = 0; j < threadCount; j++)
+		{
+			dInt32 lowDigit = bodyJointHistogram[j][i].m_lowCount;
+			dInt32 highDigit = bodyJointHistogram[j][i].m_hightCount;
+			bodyJointHistogram[j][i].m_lowCount = lowDigitSum;
+			bodyJointHistogram[j][i].m_hightCount = highDigitSum;
+			lowDigitSum += lowDigit;
+			highDigitSum += highDigit;
+		}
+	}
+	scene->SubmitJobs<ndBodyJointJorcesSortLowDigit>(bodyJointHistogram);
+	scene->SubmitJobs<ndBodyJointJorcesSortHighDigit>(bodyJointHistogram);
+	
+	dArray<dInt32>& bodyJointIndex = GetJointForceIndexBuffer();
+	const dInt32 bodyJointIndexCount = scene->GetActiveBodyArray().GetCount() + 1;
+	bodyJointIndex.SetCount(bodyJointIndexCount);
+	ClearBuffer(&bodyJointIndex[0], bodyJointIndexCount * sizeof(dInt32));
+	
+	dInt32 rowCount = 1;
+	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
+	{
+		ndConstraint* const joint = jointArray[i];
+	
+		const ndBodyKinematic* const body0 = joint->GetBody0();
+		const ndBodyKinematic* const body1 = joint->GetBody1();
+		dInt32 m0 = body0->m_index;
+		dInt32 m1 = body1->m_index;
+		bodyJointIndex[m0] ++;
+		bodyJointIndex[m1] ++;
+	
+		//dTrace(("id(%d %d) index(%d %d)\n", body0->m_uniqueId, body1->m_uniqueId, m0, m1));
+	
+		joint->m_rowStart = rowCount;
+		rowCount += joint->m_rowCount;
+	}
+	
+	dInt32 bodyJointIndexAcc = 0;
+	for (dInt32 i = 0; i < bodyJointIndexCount; i++)
+	{
+		dInt32 count = bodyJointIndex[i];
+		bodyJointIndex[i] = bodyJointIndexAcc;
+		bodyJointIndexAcc += count;
+	}
+	
+	m_leftHandSide.SetCount(rowsCount.m_rowsCount);
+	m_rightHandSide.SetCount(rowsCount.m_rowsCount);
+	m_soaMassMatrix.SetCount(rowsCount.m_soaJointRowCount);
 
 	#ifdef _DEBUG
 		dAssert(m_activeJointCount <= jointArray.GetCount());
@@ -2822,10 +2811,6 @@ void ndDynamicsUpdateSoa::Update()
 {
 	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
-static int xxx;
-xxx++;
-if (xxx == 294)
-xxx *= 1;
 
 	BuildIsland();
 	if (m_islands.GetCount())
