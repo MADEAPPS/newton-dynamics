@@ -100,7 +100,7 @@ static void BuildCylinderStack(ndDemoEntityManager* const scene, dFloat32 mass, 
 	for (dInt32 i = 0; i < count; i++)
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
-		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
+		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_z);
 		baseMatrix = rotation * baseMatrix;
 	}
 
@@ -179,20 +179,21 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	//
 	//origin.m_x += 4.0f;
 	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
-	//
-	//origin = dVector::m_zero;
-	//origin.m_x -= 2.0f;
-	//origin.m_z -= 3.0f;
-	//BuildBoxStack(scene, 1.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
-	//
-	//origin.m_z += 6.0f;
-	//BuildCylinderStack(scene, 1.0f, origin, dVector(0.5f, 0.4f, 0.5f, 0.0f), 20);
+	
+	origin = dVector::m_zero;
+	origin.m_x -= 2.0f;
+	origin.m_z -= 3.0f;
+	BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+	
+	origin.m_z += 6.0f;
+	BuildCylinderStack(scene, 10.0f, origin, dVector(0.75f, 0.6f, 1.0f, 0.0f), 15);
 
-	dQuaternion rot(dYawMatrix (0.0f * dDegreeToRad));
+	dQuaternion rot(dYawMatrix (45.0f * dDegreeToRad));
 	origin = dVector::m_zero;
 	origin.m_x -= 3.0f;
-	origin.m_y += 2.0f;
+	origin.m_y += 5.0f;
 
-	origin.m_x -= 20.0f;
+	origin.m_x -= 15.0f;
+	origin.m_z += 15.0f;
 	scene->SetCameraMatrix(rot, origin);
 }
