@@ -577,7 +577,7 @@ void ndDynamicsUpdate::SortJoints()
 				dInt32 radix0 = key & D_MAX_BODY_RADIX_MASK;
 				dInt32 radix1 = key >> D_MAX_BODY_RADIX_BIT;
 				histogram[radix0].m_lowCount++;
-				histogram[radix1].m_hightCount++;
+				histogram[radix1].m_highCount++;
 			}
 		}
 	};
@@ -606,9 +606,11 @@ void ndDynamicsUpdate::SortJoints()
 			ndJointBodyPairIndex* const sortBuffer = (ndJointBodyPairIndex*)me->GetTempBuffer();
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndJointBodyPairIndex pair(bodyJointPairs[i + start]);
-				dUnsigned32 key = pair.m_body & D_MAX_BODY_RADIX_MASK;
-				dInt32 index = histogram[key].m_lowCount;
+				const ndJointBodyPairIndex pair(bodyJointPairs[i + start]);
+				if (pair.m_body >= 512)
+					i*=1;
+				const dUnsigned32 key = pair.m_body & D_MAX_BODY_RADIX_MASK;
+				const dInt32 index = histogram[key].m_lowCount;
 				sortBuffer[index] = pair;
 				histogram[key].m_lowCount++;
 			}
@@ -639,11 +641,15 @@ void ndDynamicsUpdate::SortJoints()
 			const ndJointBodyPairIndex* const sortBuffer = (ndJointBodyPairIndex*)me->GetTempBuffer();
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndJointBodyPairIndex pair(sortBuffer[i + start]);
-				dUnsigned32 key = pair.m_body >> D_MAX_BODY_RADIX_BIT;
-				dInt32 index = histogram[key].m_hightCount;
+				const ndJointBodyPairIndex pair(sortBuffer[i + start]);
+
+				if (pair.m_body >= 512)
+					i *= 1;
+
+				const dUnsigned32 key = pair.m_body >> D_MAX_BODY_RADIX_BIT;
+				const dInt32 index = histogram[key].m_highCount;
 				bodyJointPairs[index] = pair;
-				histogram[key].m_hightCount++;
+				histogram[key].m_highCount++;
 			}
 		}
 	};
@@ -678,6 +684,8 @@ void ndDynamicsUpdate::SortJoints()
 	dInt32 histogram[D_MAX_THREADS_COUNT][2];
 	dInt32 movingJoints[D_MAX_THREADS_COUNT];
 	const dInt32 threadCount = scene->GetThreadCount();
+
+	//XXXXX();
 
 	scene->SubmitJobs<ndSleep0>();
 	scene->SubmitJobs<ndSleep1>(movingJoints);
@@ -722,6 +730,7 @@ void ndDynamicsUpdate::SortJoints()
 		const dInt32 key0 = (joint0->GetBody0()->m_solverSleep1 & joint0->GetBody1()->m_solverSleep1) ? 1 : 0;
 		const dInt32 key1 = (joint1->GetBody0()->m_solverSleep1 & joint1->GetBody1()->m_solverSleep1) ? 1 : 0;
 		dAssert(key0 <= key1);
+		//dTrace(("id(%d %d)  index(%d %d)\n", joint0->GetBody0()->m_uniqueId, joint0->GetBody1()->m_uniqueId, joint0->GetBody0()->m_index, joint0->GetBody1()->m_index));
 	}
 	#endif
 
@@ -796,9 +805,9 @@ void ndDynamicsUpdate::SortJoints()
 		for (dInt32 j = 0; j < threadCount; j++)
 		{
 			dInt32 lowDigit = bodyJointHistogram[j][i].m_lowCount;
-			dInt32 highDigit = bodyJointHistogram[j][i].m_hightCount;
+			dInt32 highDigit = bodyJointHistogram[j][i].m_highCount;
 			bodyJointHistogram[j][i].m_lowCount = lowDigitSum;
-			bodyJointHistogram[j][i].m_hightCount = highDigitSum;
+			bodyJointHistogram[j][i].m_highCount = highDigitSum;
 			lowDigitSum += lowDigit;
 			highDigitSum += highDigit;
 		}
@@ -824,6 +833,8 @@ void ndDynamicsUpdate::SortJoints()
 		bodyJointIndex[m0] ++;
 		bodyJointIndex[m1] ++;
 
+		//dTrace(("id(%d %d)  index(%d %d)\n", body0->m_uniqueId, body1->m_uniqueId, m0, m1));
+
 		joint->m_rowStart = rowCount;
 		rowCount += joint->m_rowCount;
 	}
@@ -839,7 +850,21 @@ void ndDynamicsUpdate::SortJoints()
 	m_leftHandSide.SetCount(rowCount);
 	m_rightHandSide.SetCount(rowCount);
 
+	//XXXXX();
+
 	#ifdef _DEBUG
+		const dArray<ndJointBodyPairIndex>& jointBodyPairIndexBuffer = GetJointBodyPairIndexBuffer();
+		for (dInt32 i = 0; i < scene->GetActiveBodyArray().GetCount(); i++)
+		{
+			dInt32 startIndex = bodyJointIndex[i];
+			dInt32 count = bodyJointIndex[i + 1] - startIndex;
+			for (dInt32 j = 0; j < count; j++)
+			{
+				dInt32 bodyIndex = jointBodyPairIndexBuffer[startIndex + j].m_body;
+				dAssert(bodyIndex == i);
+			}
+		}
+
 		dAssert(m_activeJointCount <= jointArray.GetCount());
 		for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 		{
@@ -1394,7 +1419,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 				rhs->m_deltaAccel = extenalAcceleration;
 				rhs->m_coordenateAccel += extenalAcceleration;
 				dAssert(rhs->m_jointFeebackForce);
-				const dFloat32 force = rhs->m_jointFeebackForce->GetInitiailGuess();
+				const dFloat32 force = rhs->m_jointFeebackForce->GetInitialGuess();
 
 				rhs->m_force = isBilateral ? dClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 				rhs->m_maxImpact = dFloat32(0.0f);
@@ -1486,6 +1511,10 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
 
+			static int xxxx;
+			//dTrace(("%d\n", xxxx));
+			xxxx++;
+
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				dInt32 startIndex = bodyIndex[i + start];
@@ -1504,6 +1533,12 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 							torque += jointInternalForces[index].m_angular;
 						}
 					}
+					if (i + start == 379)
+					{
+						xxxx *= 1;
+					}
+
+
 					internalForces[i + start].m_linear = force;
 					internalForces[i + start].m_angular = torque;
 				}
@@ -2266,6 +2301,10 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
 
+			static int xxxxx;
+			dTrace(("%d\n", xxxxx / 2));
+			xxxxx++;
+
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				dInt32 startIndex = bodyIndex[i + start];
@@ -2283,6 +2322,12 @@ void ndDynamicsUpdate::CalculateJointsForce()
 							force += jointInternalForces[index].m_linear;
 							torque += jointInternalForces[index].m_angular;
 						}
+
+						if (i + start == 379)
+						{
+							xxxxx *= 1;
+						}
+
 						internalForces[i + start].m_linear = force;
 						internalForces[i + start].m_angular = torque;
 					}

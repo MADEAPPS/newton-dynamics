@@ -178,6 +178,7 @@ class ndScene : public dThreadPool
 	ndConstraintArray m_activeConstraintArray;
 	dArray<ndBodyKinematic*> m_sceneBodyArray;
 	dArray<ndBodyKinematic*> m_activeBodyArray;
+	dArray<ndBodyKinematic*> m_activeBodyArrayBuffer;
 	dSpinLock m_contactLock;
 	ndSceneNode* m_rootNode;
 	ndContactNotify* m_contactNotifyCallback;

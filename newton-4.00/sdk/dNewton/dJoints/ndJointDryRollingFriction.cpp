@@ -64,7 +64,7 @@ void ndJointDryRollingFriction::JacobianDerivative(ndConstraintDescritor& desc)
 			for (ndContactPointList::dNode* node = contactPoints.GetFirst(); node; node = node->GetNext())
 			{
 				const ndForceImpactPair& normalForce = node->GetInfo().m_normal_Force;
-				dFloat32 force = normalForce.GetInitiailGuess();
+				dFloat32 force = normalForce.GetInitialGuess();
 				maxForce = dMax(force, maxForce);
 			}
 		}

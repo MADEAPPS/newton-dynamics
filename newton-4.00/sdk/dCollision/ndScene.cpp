@@ -194,6 +194,7 @@ ndScene::ndScene()
 	,m_activeConstraintArray()
 	,m_sceneBodyArray(1024)
 	,m_activeBodyArray(1024)
+	,m_activeBodyArrayBuffer(1024)
 	,m_contactLock()
 	,m_rootNode(nullptr)
 	,m_contactNotifyCallback(new ndContactNotify())
@@ -1254,55 +1255,47 @@ void ndScene::BuildBodyArray()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const dInt32 threadIndex = GetThreadId();
-
-			ndBodyList::dNode* node = m_owner->m_bodyList.GetFirst();
-			for (dInt32 i = 0; i < threadIndex; i++)
-			{
-				node = node ? node->GetNext() : nullptr;
-			}
-
 			dAtomic<dUnsigned32>& activeBodyCount = *((dAtomic<dUnsigned32>*)m_context);
 			dArray<ndBodyKinematic*>& activeBodyArray = m_owner->m_activeBodyArray;
-
+			const dArray<ndBodyKinematic*>& bodyArrayBuffer = m_owner->m_activeBodyArrayBuffer;
+			
 			dInt32 bodyCount = 0;
+			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			while (node)
+			const dInt32 bodyBufferCount = bodyArrayBuffer.GetCount();
+			const dInt32 stride = bodyBufferCount / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyBufferCount - start;
+
+			for (dInt32 j = 0; j < blockSize; j++)
 			{
-				ndBodyKinematic* const body = node->GetInfo();
+				ndBodyKinematic* const body = bodyArrayBuffer[j + start];
 				body->m_bodyIsConstrained = 0;
-				if (body)
+				const ndShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
+				if (!shape)
 				{
-					const ndShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
-					if (!shape)
+					bool inScene = true;
+					if (!body->GetSceneBodyNode())
 					{
-						bool inScene = true;
-						if (!body->GetSceneBodyNode())
+						dScopeSpinLock lock(m_owner->m_contactLock);
+						inScene = m_owner->AddBody(body);
+					}
+					if (inScene)
+					{
+						m_buffer[bodyCount] = body;
+						bodyCount++;
+						if (bodyCount >= D_LOCAL_POOL_SIZE)
 						{
-							dScopeSpinLock lock(m_owner->m_contactLock);
-							inScene = m_owner->AddBody(body);
-						}
-						if (inScene)
-						{
-							m_buffer[bodyCount] = body;
-							bodyCount++;
-							if (bodyCount >= D_LOCAL_POOL_SIZE)
+							bodyCount = 0;
+							const dInt32 baseIndex = activeBodyCount.fetch_add(D_LOCAL_POOL_SIZE);
+							for (dInt32 i = 0; i < D_LOCAL_POOL_SIZE; i++)
 							{
-								bodyCount = 0;
-								const dInt32 baseIndex = activeBodyCount.fetch_add(D_LOCAL_POOL_SIZE);
-								for (dInt32 i = 0; i < D_LOCAL_POOL_SIZE; i++)
-								{
-									const dInt32 index = baseIndex + i;
-									m_buffer[i]->PrepareStep(index);
-									activeBodyArray[index] = m_buffer[i];
-								}
+								const dInt32 index = baseIndex + i;
+								m_buffer[i]->PrepareStep(index);
+								activeBodyArray[index] = m_buffer[i];
 							}
 						}
 					}
-				}
-				for (dInt32 i = 0; i < threadCount; i++)
-				{
-					node = node ? node->GetNext() : nullptr;
 				}
 			}
 
@@ -1320,6 +1313,14 @@ void ndScene::BuildBodyArray()
 
 		ndBodyKinematic* m_buffer[D_LOCAL_POOL_SIZE];
 	};
+
+	dInt32 index = 0;
+	m_activeBodyArrayBuffer.SetCount(m_bodyList.GetCount());
+	for (ndBodyList::dNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
+	{
+		m_activeBodyArrayBuffer[index] = node->GetInfo();
+		index++;
+	}
 
 	dAtomic<dUnsigned32> activeBodyCount(0);
 	m_activeBodyArray.SetCount(m_bodyList.GetCount());
@@ -1438,9 +1439,13 @@ void ndScene::FindCollidingPairs()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
-			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
+			const dInt32 stride = bodyCount / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
+
+			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndBodyKinematic* const body = bodyArray[i];
+				ndBodyKinematic* const body = bodyArray[i + start];
 				m_owner->FindCollidingPairs(body);
 			}
 		}
@@ -1457,9 +1462,13 @@ void ndScene::FindCollidingPairs()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 bodyCount = bodyArray.GetCount();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
+			const dInt32 stride = bodyCount / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
+
+			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndBodyKinematic* const body = bodyArray[i];
+				ndBodyKinematic* const body = bodyArray[i + start];
 				m_owner->FindCollidingPairsForward(body);
 			}
 		}
@@ -1476,9 +1485,13 @@ void ndScene::FindCollidingPairs()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 bodyCount = bodyArray.GetCount();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			for (dInt32 i = threadIndex; i < bodyCount; i += threadCount)
+			const dInt32 stride = bodyCount / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
+
+			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndBodyKinematic* const body = bodyArray[i];
+				ndBodyKinematic* const body = bodyArray[i + start];
 				m_owner->FindCollidingPairsBackward(body);
 			}
 		}
@@ -1899,9 +1912,10 @@ void ndScene::Cleanup()
 		delete body;
 	}
 	dFreeListAlloc::Flush();
-	//ndBodyKinematic::ReleaseMemory();
-	m_activeBodyArray.Resize(256);
-	m_activeConstraintArray.Resize(256);
+	m_sceneBodyArray.Resize(1024);
+	m_activeBodyArray.Resize(1024);
+	m_activeConstraintArray.Resize(1024);
+	m_activeBodyArrayBuffer.Resize(1024);
 }
 
 void ndScene::AddNode(ndSceneNode* const newNode)

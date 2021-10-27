@@ -62,7 +62,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	{
 		public:
 		dInt32 m_lowCount;
-		dInt32 m_hightCount;
+		dInt32 m_highCount;
 	};
 
 	class ndSortKey
@@ -118,7 +118,6 @@ class ndDynamicsUpdate: public dClassAlloc
 	dInt32 GetUnconstrainedBodyCount() const;
 	void ClearBuffer(void* const buffer, dInt32 sizeInByte) const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
-	void ClearJacobianBuffer___(dInt32 count, ndJacobian* const dst) const;
 
 	dArray<ndJacobian>& GetInternalForces();
 	dArray<ndLeftHandSide>& GetLeftHandSide();
@@ -150,6 +149,18 @@ class ndDynamicsUpdate: public dClassAlloc
 	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
 	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const);
+
+	void XXXXX()
+	{
+		ndConstraintArray& jointArray = m_world->GetScene()->GetActiveContactArray();
+
+		for (dInt32 i = 0; i < jointArray.GetCount(); i++)
+		{
+			const ndConstraint* const joint0 = jointArray[i];
+			dTrace(("id(%d %d)  index(%d %d)\n", joint0->GetBody0()->m_uniqueId, joint0->GetBody1()->m_uniqueId, joint0->GetBody0()->m_index, joint0->GetBody1()->m_index));
+		}
+		dTrace(("\n"));
+	}
 
 	protected:
 	void Clear();
@@ -225,19 +236,8 @@ inline dArray<dInt32>& ndDynamicsUpdate::GetJointForceIndexBuffer()
 	return m_jointForcesIndex;
 }
 
-inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const
-{
-	dAssert(0);
-	const dVector zero(dVector::m_zero);
-	dVector* const dst = &buffer[0].m_linear;
-	for (dInt32 i = 0; i < count; i++)
-	{
-		dst[i * 2 + 0] = zero;
-		dst[i * 2 + 1] = zero;
-	}
-}
 
-inline void ndDynamicsUpdate::ClearJacobianBuffer___(dInt32 count, ndJacobian* const buffer) const
+inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const
 {
 	const dVector zero(dVector::m_zero);
 	dVector* const dst = &buffer[0].m_linear;
@@ -251,7 +251,7 @@ inline void ndDynamicsUpdate::ClearJacobianBuffer___(dInt32 count, ndJacobian* c
 inline void ndDynamicsUpdate::ClearBuffer(void* const buffer, dInt32 sizeInByte) const
 {
 	dInt32 sizeInJacobian = sizeInByte / sizeof(ndJacobian);
-	ClearJacobianBuffer___(sizeInJacobian, (ndJacobian*)buffer);
+	ClearJacobianBuffer(sizeInJacobian, (ndJacobian*)buffer);
 	char* const ptr = (char*)buffer;
 	for (dInt32 i = sizeInJacobian * sizeof(ndJacobian); i < sizeInByte; i++)
 	{

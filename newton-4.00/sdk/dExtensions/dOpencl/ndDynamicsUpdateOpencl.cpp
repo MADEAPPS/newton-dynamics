@@ -651,7 +651,7 @@ void ndDynamicsUpdateOpencl::SortJoints()
 				dInt32 radix0 = key & D_MAX_BODY_RADIX_MASK;
 				dInt32 radix1 = key >> D_MAX_BODY_RADIX_BIT;
 				histogram[radix0].m_lowCount++;
-				histogram[radix1].m_hightCount++;
+				histogram[radix1].m_highCount++;
 			}
 		}
 	};
@@ -716,9 +716,9 @@ void ndDynamicsUpdateOpencl::SortJoints()
 			{
 				ndJointBodyPairIndex pair(sortBuffer[i + start]);
 				dUnsigned32 key = pair.m_body >> D_MAX_BODY_RADIX_BIT;
-				dInt32 index = histogram[key].m_hightCount;
+				dInt32 index = histogram[key].m_highCount;
 				bodyJointPairs[index] = pair;
-				histogram[key].m_hightCount++;
+				histogram[key].m_highCount++;
 			}
 		}
 	};
@@ -872,9 +872,9 @@ void ndDynamicsUpdateOpencl::SortJoints()
 		for (dInt32 j = 0; j < threadCount; j++)
 		{
 			dInt32 lowDigit = bodyJointHistogram[j][i].m_lowCount;
-			dInt32 highDigit = bodyJointHistogram[j][i].m_hightCount;
+			dInt32 highDigit = bodyJointHistogram[j][i].m_highCount;
 			bodyJointHistogram[j][i].m_lowCount = lowDigitSum;
-			bodyJointHistogram[j][i].m_hightCount = highDigitSum;
+			bodyJointHistogram[j][i].m_highCount = highDigitSum;
 			lowDigitSum += lowDigit;
 			highDigitSum += highDigit;
 		}
@@ -1472,7 +1472,7 @@ void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 				rhs->m_deltaAccel = extenalAcceleration;
 				rhs->m_coordenateAccel += extenalAcceleration;
 				dAssert(rhs->m_jointFeebackForce);
-				const dFloat32 force = rhs->m_jointFeebackForce->GetInitiailGuess();
+				const dFloat32 force = rhs->m_jointFeebackForce->GetInitialGuess();
 
 				rhs->m_force = isBilateral ? dClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 				rhs->m_maxImpact = dFloat32(0.0f);
