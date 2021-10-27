@@ -685,8 +685,6 @@ void ndDynamicsUpdate::SortJoints()
 	dInt32 movingJoints[D_MAX_THREADS_COUNT];
 	const dInt32 threadCount = scene->GetThreadCount();
 
-	//XXXXX();
-
 	scene->SubmitJobs<ndSleep0>();
 	scene->SubmitJobs<ndSleep1>(movingJoints);
 	scene->SubmitJobs<ndScan0>(histogram);
@@ -730,7 +728,6 @@ void ndDynamicsUpdate::SortJoints()
 		const dInt32 key0 = (joint0->GetBody0()->m_solverSleep1 & joint0->GetBody1()->m_solverSleep1) ? 1 : 0;
 		const dInt32 key1 = (joint1->GetBody0()->m_solverSleep1 & joint1->GetBody1()->m_solverSleep1) ? 1 : 0;
 		dAssert(key0 <= key1);
-		//dTrace(("id(%d %d)  index(%d %d)\n", joint0->GetBody0()->m_uniqueId, joint0->GetBody1()->m_uniqueId, joint0->GetBody0()->m_index, joint0->GetBody1()->m_index));
 	}
 	#endif
 
@@ -850,7 +847,7 @@ void ndDynamicsUpdate::SortJoints()
 	m_leftHandSide.SetCount(rowCount);
 	m_rightHandSide.SetCount(rowCount);
 
-	//XXXXX();
+	SortBodyJointScan();
 
 	#ifdef _DEBUG
 		const dArray<ndJointBodyPairIndex>& jointBodyPairIndexBuffer = GetJointBodyPairIndexBuffer();
@@ -1511,10 +1508,6 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
 
-			static int xxxx;
-			//dTrace(("%d\n", xxxx));
-			xxxx++;
-
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				dInt32 startIndex = bodyIndex[i + start];
@@ -1533,11 +1526,6 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 							torque += jointInternalForces[index].m_angular;
 						}
 					}
-					if (i + start == 379)
-					{
-						xxxx *= 1;
-					}
-
 
 					internalForces[i + start].m_linear = force;
 					internalForces[i + start].m_angular = torque;
@@ -2301,10 +2289,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
 
-			static int xxxxx;
-			dTrace(("%d\n", xxxxx / 2));
-			xxxxx++;
-
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				dInt32 startIndex = bodyIndex[i + start];
@@ -2321,11 +2305,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 							dInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
 							force += jointInternalForces[index].m_linear;
 							torque += jointInternalForces[index].m_angular;
-						}
-
-						if (i + start == 379)
-						{
-							xxxxx *= 1;
 						}
 
 						internalForces[i + start].m_linear = force;
