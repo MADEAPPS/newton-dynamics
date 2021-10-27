@@ -946,6 +946,7 @@ void ndDynamicsUpdateOpencl::SortJoints()
 			dAssert(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting);
 		}
 	#endif
+	SortBodyJointScan();
 }
 
 dInt32 ndDynamicsUpdateOpencl::CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const)
@@ -998,7 +999,6 @@ void ndDynamicsUpdateOpencl::RadixSort()
 			acc1 += n1;
 		}
 
-		//ndIsland* const buffer = dAlloca(ndIsland, elements);
 		ndIsland* const buffer = (ndIsland*)GetTempBuffer();
 
 		dInt32* const scan0 = &histogram[0][0];

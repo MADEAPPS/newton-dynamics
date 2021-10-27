@@ -1429,6 +1429,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 			}
 		}
 	#endif
+	SortBodyJointScan();
 }
 
 void ndDynamicsUpdateAvx2::SortIslands()
