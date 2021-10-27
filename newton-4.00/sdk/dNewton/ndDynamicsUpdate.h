@@ -156,23 +156,10 @@ class ndDynamicsUpdate: public dClassAlloc
 	void GetJacobianDerivatives(ndConstraint* const joint);
 	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const);
 
-	void SortBodyJointScan();
-
-	//void XXXXX()
-	//{
-	//	ndConstraintArray& jointArray = m_world->GetScene()->GetActiveContactArray();
-	//
-	//	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
-	//	{
-	//		const ndConstraint* const joint0 = jointArray[i];
-	//		dTrace(("id(%d %d)  index(%d %d)\n", joint0->GetBody0()->m_uniqueId, joint0->GetBody1()->m_uniqueId, joint0->GetBody0()->m_index, joint0->GetBody1()->m_index));
-	//	}
-	//	dTrace(("\n"));
-	//}
-
 	protected:
 	void Clear();
 	virtual void Update();
+	void SortBodyJointScan();
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
 	dVector m_velocTol;
@@ -281,8 +268,6 @@ inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* cons
 
 inline void ndDynamicsUpdate::SortBodyJointScan()
 {
-
-
 	class ndCountJointBodyPairs : public ndScene::ndBaseJob
 	{
 		public:
