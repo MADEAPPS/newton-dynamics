@@ -27,6 +27,18 @@
 #include "ndDynamicsUpdate.h"
 #include "ndJointBilateralConstraint.h"
 
+//#define D_MAX_BODY_RADIX_BIT		9
+#define D_MAX_BODY_RADIX_BIT		2
+#define D_MAX_BODY_RADIX_DIGIT		(1<<D_MAX_BODY_RADIX_BIT)
+#define D_MAX_BODY_RADIX_MASK		(D_MAX_BODY_RADIX_DIGIT-1)
+
+class ndDynamicsUpdate::ndPartialJointForceCounters
+{
+	public:
+	dInt32 m_scans[2][D_MAX_THREADS_COUNT][D_MAX_BODY_RADIX_DIGIT];
+};
+
+
 ndDynamicsUpdate::ndDynamicsUpdate(ndWorld* const world)
 	:m_velocTol(dFloat32(1.0e-8f))
 	,m_islands(D_DEFAULT_BUFFER_SIZE)
@@ -175,6 +187,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
 			const dArray<ndJointBodyPairIndex>& bodyJointPairs = me->GetJointBodyPairIndexBuffer();
+			ndJointBodyPairIndex* const sortBuffer = (ndJointBodyPairIndex*)me->GetTempBuffer();
 			const dInt32 count = bodyJointPairs.GetCount();
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
@@ -182,7 +195,6 @@ void ndDynamicsUpdate::SortBodyJointScan()
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
-			ndJointBodyPairIndex* const sortBuffer = (ndJointBodyPairIndex*)me->GetTempBuffer();
 			ndPartialJointForceCounters& counters = *((ndPartialJointForceCounters*)m_context);
 			dInt32* const scan = &counters.m_scans[0][threadIndex][0];
 			for (dInt32 i = 0; i < blockSize; i++)
@@ -209,6 +221,8 @@ void ndDynamicsUpdate::SortBodyJointScan()
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
 			dArray<ndJointBodyPairIndex>& bodyJointPairs = me->GetJointBodyPairIndexBuffer();
+			const ndJointBodyPairIndex* const sortBuffer = (ndJointBodyPairIndex*)me->GetTempBuffer();
+
 			const dInt32 count = bodyJointPairs.GetCount();
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
@@ -216,17 +230,12 @@ void ndDynamicsUpdate::SortBodyJointScan()
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
-			const ndJointBodyPairIndex* const sortBuffer = (ndJointBodyPairIndex*)me->GetTempBuffer();
 			ndPartialJointForceCounters& counters = *((ndPartialJointForceCounters*)m_context);
 			dInt32* const scan = &counters.m_scans[1][threadIndex][0];
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				const ndJointBodyPairIndex pair(sortBuffer[i + start]);
-
-				if (pair.m_body >= 512)
-					i *= 1;
-
 				const dUnsigned32 key = pair.m_body >> D_MAX_BODY_RADIX_BIT;
 				const dInt32 index = scan[key];
 				bodyJointPairs[index] = pair;

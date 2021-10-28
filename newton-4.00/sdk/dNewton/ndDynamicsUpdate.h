@@ -29,9 +29,6 @@
 #define	D_SOLVER_MAX_ERROR			(D_FREEZE_MAG * dFloat32 (0.5f))
 
 #define D_DEFAULT_BUFFER_SIZE		1024
-#define D_MAX_BODY_RADIX_BIT		9
-#define D_MAX_BODY_RADIX_DIGIT		(1<<D_MAX_BODY_RADIX_BIT)
-#define D_MAX_BODY_RADIX_MASK		(D_MAX_BODY_RADIX_DIGIT-1)
 
 // the solver is a RK order 4, but instead of weighting the intermediate derivative by the usual 1/6, 1/3, 1/3, 1/6 coefficients
 // I am using 1/4, 1/4, 1/4, 1/4.
@@ -58,18 +55,7 @@ class ndDynamicsUpdate: public dClassAlloc
 		dInt32 m_joint;
 	};
 
-	class ndJointBodySortKey
-	{
-		public:
-		dInt32 m_lowCount;
-		dInt32 m_highCount;
-	};
-
-	class ndPartialJointForceCounters
-	{
-		public:
-		dInt32 m_scans[2][D_MAX_THREADS_COUNT][D_MAX_BODY_RADIX_DIGIT];
-	};
+	class ndPartialJointForceCounters;
 
 	class ndSortKey
 	{
