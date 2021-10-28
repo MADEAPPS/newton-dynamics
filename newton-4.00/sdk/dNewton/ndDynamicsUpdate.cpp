@@ -27,15 +27,17 @@
 #include "ndDynamicsUpdate.h"
 #include "ndJointBilateralConstraint.h"
 
-//#define D_MAX_BODY_RADIX_BIT		9
-#define D_MAX_BODY_RADIX_BIT		2
+//#define D_MAX_BODY_RADIX_BIT		2
+#define D_MAX_BODY_RADIX_BIT		9
 #define D_MAX_BODY_RADIX_DIGIT		(1<<D_MAX_BODY_RADIX_BIT)
 #define D_MAX_BODY_RADIX_MASK		(D_MAX_BODY_RADIX_DIGIT-1)
+
+#define D_DEFAULT_BUFFER_SIZE		1024
 
 class ndDynamicsUpdate::ndPartialJointForceCounters
 {
 	public:
-	dInt32 m_scans[2][D_MAX_THREADS_COUNT][D_MAX_BODY_RADIX_DIGIT];
+	dInt32 m_digitScan[D_MAX_THREADS_COUNT][D_MAX_BODY_RADIX_DIGIT];
 };
 
 
@@ -137,10 +139,10 @@ void ndDynamicsUpdate::SortBodyJointScan()
 		}
 	};
 
-	class ndBodyJointForceScan : public ndScene::ndBaseJob
+	class ndBodyJointForceScanLowDigit : public ndScene::ndBaseJob
 	{
 		public:
-		ndBodyJointForceScan()
+		ndBodyJointForceScanLowDigit()
 		{
 		}
 
@@ -158,18 +160,13 @@ void ndDynamicsUpdate::SortBodyJointScan()
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
 			ndPartialJointForceCounters& counters = *((ndPartialJointForceCounters*)m_context);
-			dInt32* const lowDigit = &counters.m_scans[0][threadIndex][0];
-			dInt32* const highDigit = &counters.m_scans[1][threadIndex][0];
-			memset(lowDigit, 0, D_MAX_BODY_RADIX_DIGIT * sizeof(dInt32));
-			memset(highDigit, 0, D_MAX_BODY_RADIX_DIGIT * sizeof(dInt32));
-
+			dInt32* const digit = &counters.m_digitScan[threadIndex][0];
+			memset(digit, 0, D_MAX_BODY_RADIX_DIGIT * sizeof(dInt32));
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				const dUnsigned32 key = bodyJointPairs[i + start].m_body;
-				const dInt32 lowEntry = key & D_MAX_BODY_RADIX_MASK;
-				const dInt32 highEntry = key >> D_MAX_BODY_RADIX_BIT;
-				lowDigit[lowEntry] ++;
-				highDigit[highEntry] ++;
+				const dInt32 entry = key & D_MAX_BODY_RADIX_MASK;
+				digit[entry] ++;
 			}
 		}
 	};
@@ -196,14 +193,46 @@ void ndDynamicsUpdate::SortBodyJointScan()
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
 			ndPartialJointForceCounters& counters = *((ndPartialJointForceCounters*)m_context);
-			dInt32* const scan = &counters.m_scans[0][threadIndex][0];
+			dInt32* const lowDigit = &counters.m_digitScan[threadIndex][0];
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				const ndJointBodyPairIndex pair(bodyJointPairs[i + start]);
 				const dUnsigned32 key = pair.m_body & D_MAX_BODY_RADIX_MASK;
-				const dInt32 index = scan[key];
+				const dInt32 index = lowDigit[key];
 				sortBuffer[index] = pair;
-				scan[key]++;
+				lowDigit[key]++;
+			}
+		}
+	};
+
+	class ndBodyJointForceScanHighDigit : public ndScene::ndBaseJob
+	{
+		public:
+		ndBodyJointForceScanHighDigit()
+		{
+		}
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
+			const ndJointBodyPairIndex* const sortBuffer = (ndJointBodyPairIndex*)me->GetTempBuffer();
+			const dInt32 count = me->GetJointBodyPairIndexBuffer().GetCount();
+			const dInt32 threadIndex = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			const dInt32 stride = count / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
+
+			ndPartialJointForceCounters& counters = *((ndPartialJointForceCounters*)m_context);
+			dInt32* const digit = &counters.m_digitScan[threadIndex][0];
+			memset(digit, 0, D_MAX_BODY_RADIX_DIGIT * sizeof(dInt32));
+			for (dInt32 i = 0; i < blockSize; i++)
+			{
+				const dUnsigned32 key = sortBuffer[i + start].m_body;
+				const dInt32 entry = key >> D_MAX_BODY_RADIX_BIT;
+				digit[entry] ++;
 			}
 		}
 	};
@@ -231,8 +260,8 @@ void ndDynamicsUpdate::SortBodyJointScan()
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
 
 			ndPartialJointForceCounters& counters = *((ndPartialJointForceCounters*)m_context);
-			dInt32* const scan = &counters.m_scans[1][threadIndex][0];
-
+			dInt32* const scan = &counters.m_digitScan[threadIndex][0];
+			
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				const ndJointBodyPairIndex pair(sortBuffer[i + start]);
@@ -248,31 +277,38 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	ndPartialJointForceCounters counters;
 
 	ndScene* const scene = m_world->GetScene();
+	const dInt32 threadCount = scene->GetThreadCount();
 	ndConstraintArray& jointArray = scene->GetActiveContactArray();
 	GetTempInternalForces().SetCount(jointArray.GetCount() * 2);
 	GetJointBodyPairIndexBuffer().SetCount(jointArray.GetCount() * 2);
 
-	scene->SubmitJobs<ndCountJointBodyPairs>();
-	scene->SubmitJobs<ndBodyJointForceScan>(&counters);
-
 	dInt32 lowDigitSum = 0;
-	dInt32 highDigitSum = 0;
-
-	const dInt32 threadCount = scene->GetThreadCount();
-	for (dInt32 i = 0; i < D_MAX_BODY_RADIX_DIGIT; i++)
+	scene->SubmitJobs<ndCountJointBodyPairs>();
+	scene->SubmitJobs<ndBodyJointForceScanLowDigit>(&counters);
+	for (dInt32 j = 0; j < D_MAX_BODY_RADIX_DIGIT; j++)
 	{
-		for (dInt32 j = 0; j < threadCount; j++)
+		for (dInt32 i = 0; i < threadCount; i++)
 		{
-			const dInt32 lowDigit = counters.m_scans[0][j][i];
-			const dInt32 highDigit = counters.m_scans[1][j][i];
-			counters.m_scans[0][j][i] = lowDigitSum;
-			counters.m_scans[1][j][i] = highDigitSum;
-			lowDigitSum += lowDigit;
-			highDigitSum += highDigit;
+			const dInt32 digit = counters.m_digitScan[i][j];
+			counters.m_digitScan[i][j] = lowDigitSum;
+			lowDigitSum += digit;
 		}
 	}
 
+	dInt32 highDigitSum = 0;
 	scene->SubmitJobs<ndBodyJointForceSortLowDigit>(&counters);
+	scene->SubmitJobs<ndBodyJointForceScanHighDigit>(&counters);
+	for (dInt32 j = 0; j < D_MAX_BODY_RADIX_DIGIT; j++)
+	{
+		for (dInt32 i = 0; i < threadCount; i++)
+		{
+			const dInt32 digit = counters.m_digitScan[i][j];
+			counters.m_digitScan[i][j] = highDigitSum;
+			highDigitSum += digit;
+		}
+	}
+
+	//memset(&GetJointBodyPairIndexBuffer()[0], -1, sizeof(ndJointBodyPairIndex) * GetJointBodyPairIndexBuffer().GetCount());
 	scene->SubmitJobs<ndBodyJointForceSortHighDigit>(&counters);
 
 	dArray<dInt32>& bodyJointIndex = GetJointForceIndexBuffer();

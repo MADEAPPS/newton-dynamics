@@ -27,12 +27,13 @@
 #include "ndDynamicsUpdateSoa.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_SSE_WORK_GROUP 4 
+#define D_SSE_WORK_GROUP			4 
+#define D_SSE_DEFAULT_BUFFER_SIZE	1024
 using namespace ndSoa;
 
 ndDynamicsUpdateSoa::ndDynamicsUpdateSoa(ndWorld* const world)
 	:ndDynamicsUpdate(world)
-	,m_soaJointRows(D_DEFAULT_BUFFER_SIZE * 4)
+	,m_soaJointRows(D_SSE_DEFAULT_BUFFER_SIZE * 4)
 {
 	m_ordinals.m_i[0] = 0;
 	m_ordinals.m_i[1] = 1;
@@ -43,7 +44,7 @@ ndDynamicsUpdateSoa::ndDynamicsUpdateSoa(ndWorld* const world)
 ndDynamicsUpdateSoa::~ndDynamicsUpdateSoa()
 {
 	Clear();
-	m_soaJointRows.Resize(D_DEFAULT_BUFFER_SIZE * 4);
+	m_soaJointRows.Resize(D_SSE_DEFAULT_BUFFER_SIZE * 4);
 }
 
 const char* ndDynamicsUpdateSoa::GetStringId() const

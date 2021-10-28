@@ -738,7 +738,7 @@ void ndWorld::UpdateSkeletons()
 
 		// find all root nodes for all independent joint arrangements
 		dInt32 inslandCount = 0;
-		solverUpdate.m_leftHandSide.SetCount(dMax(bodyArray.GetCount() + 256, D_DEFAULT_BUFFER_SIZE));
+		solverUpdate.m_leftHandSide.SetCount(dMax(bodyArray.GetCount() + 256, 1024));
 		ndIslandMember* const islands = (ndIslandMember*)&solverUpdate.m_leftHandSide[0];
 		for (dInt32 i = 0; i < bodyArray.GetCount(); i++)
 		{

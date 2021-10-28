@@ -21,7 +21,8 @@
 
 #include "ndDynamicsUpdateAvx2.h"
 
-#define D_AVX_WORK_GROUP	8 
+#define D_AVX_WORK_GROUP			8 
+#define D_AVX_DEFAULT_BUFFER_SIZE	1024
 
 #ifdef D_NEWTON_USE_DOUBLE
 	D_MSV_NEWTON_ALIGN_32
@@ -385,7 +386,7 @@ class dAvxMatrixArray : public dArray<ndSoaMatrixElement>
 ndDynamicsUpdateAvx2::ndDynamicsUpdateAvx2(ndWorld* const world)
 	:ndDynamicsUpdate(world)
 	,m_zero(dFloat32 (0.0f))
-	,m_avxJointRows(D_DEFAULT_BUFFER_SIZE * 4)
+	,m_avxJointRows(D_AVX_DEFAULT_BUFFER_SIZE * 4)
 	,m_avxMassMatrixArray(new dAvxMatrixArray)
 {
 }
@@ -393,7 +394,7 @@ ndDynamicsUpdateAvx2::ndDynamicsUpdateAvx2(ndWorld* const world)
 ndDynamicsUpdateAvx2::~ndDynamicsUpdateAvx2()
 {
 	Clear();
-	m_avxJointRows.Resize(D_DEFAULT_BUFFER_SIZE * 4);
+	m_avxJointRows.Resize(D_AVX_DEFAULT_BUFFER_SIZE * 4);
 	delete m_avxMassMatrixArray;
 }
 
