@@ -308,6 +308,9 @@ dInt32 ndDynamicsUpdateSoa::CompareIslands(const ndIsland* const islandA, const 
 void ndDynamicsUpdateSoa::RadixSort()
 {
 	dInt32 elements = m_islands.GetCount();
+#if 1
+	dSort(&m_islands[0], elements, CompareIslands);
+#else
 	if (elements < 256)
 	{
 		dSort(&m_islands[0], elements, CompareIslands);
@@ -370,6 +373,7 @@ void ndDynamicsUpdateSoa::RadixSort()
 		}
 #endif
 	}
+#endif
 }
 
 void ndDynamicsUpdateSoa::SortJoints()

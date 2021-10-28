@@ -767,6 +767,9 @@ void ndDynamicsUpdate::SortJoints()
 void ndDynamicsUpdate::RadixSort()
 {
 	dInt32 elements = m_islands.GetCount();
+#if 1
+	dSort(&m_islands[0], elements, CompareIslands);
+#else
 	if (elements < 256)
 	{
 		dSort(&m_islands[0], elements, CompareIslands);
@@ -828,6 +831,7 @@ void ndDynamicsUpdate::RadixSort()
 		}
 		#endif
 	}
+#endif
 }
 
 void ndDynamicsUpdate::SortIslands()

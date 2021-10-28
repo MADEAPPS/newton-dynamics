@@ -658,6 +658,9 @@ dInt32 ndDynamicsUpdateAvx2::CompareIslands(const ndIsland* const islandA, const
 void ndDynamicsUpdateAvx2::RadixSort()
 {
 	dInt32 elements = m_islands.GetCount();
+#if 1
+	dSort(&m_islands[0], elements, CompareIslands);
+#else
 	if (elements < 256)
 	{
 		dSort(&m_islands[0], elements, CompareIslands);
@@ -720,6 +723,7 @@ void ndDynamicsUpdateAvx2::RadixSort()
 		}
 		#endif
 	}
+#endif
 }
 
 void ndDynamicsUpdateAvx2::SortJoints()
