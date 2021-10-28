@@ -601,9 +601,7 @@ void ndDynamicsUpdateOpencl::SortJoints()
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				ndConstraint* const joint = sortBuffer[i + start];
-				const ndBodyKinematic* const body0 = joint->GetBody0();
-				const ndBodyKinematic* const body1 = joint->GetBody1();
-				dAssert((body0->m_resting & body1->m_resting) == joint->m_resting);
+				dAssert((joint->GetBody0()->m_resting & joint->GetBody1()->m_resting) == joint->m_resting);
 				const ndSortKey key(joint->m_resting, joint->m_rowCount);
 				dAssert(key.m_value >= 0);
 				dAssert(key.m_value <= 127);
@@ -2235,11 +2233,11 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 		scene->SubmitJobs<ndCalculateJointsForce>(m_accelNorm);
 		scene->SubmitJobs<ndApplyJacobianAccumulatePartialForces>();
 
-		accNorm = dFloat32(0.0f);
-		for (dInt32 j = 0; j < threadsCount; j++)
-		{
-			accNorm = dMax(accNorm, m_accelNorm[j]);
-		}
+		//accNorm = dFloat32(0.0f);
+		//for (dInt32 j = 0; j < threadsCount; j++)
+		//{
+		//	accNorm = dMax(accNorm, m_accelNorm[j]);
+		//}
 	}
 }
 
