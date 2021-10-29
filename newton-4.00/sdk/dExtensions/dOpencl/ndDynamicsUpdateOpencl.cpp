@@ -2004,7 +2004,6 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 
 		void JointForce(ndConstraint* const joint, dInt32 jointIndex)
 		{
-			//dVector accNorm(m_zero);
 			ndBodyKinematic* const body0 = joint->GetBody0();
 			ndBodyKinematic* const body1 = joint->GetBody1();
 			dAssert(body0);
@@ -2047,9 +2046,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 					const dFloat32 frictionNormal = m_rightHandSide[frictionIndex].m_force;
 					const dVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
 					const dVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
-					a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 					f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-					//accNorm = accNorm.MulAdd(a, a);
 					rhs->m_force = f.GetScalar();
 
 					const dVector deltaForce(f - force);
@@ -2062,13 +2059,8 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 					torqueM1 = torqueM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_angular, deltaForce1);
 				}
 
-				//const dFloat32 tol = dFloat32(0.5f);
-				//const dFloat32 tol2 = tol * tol;
-				//dVector maxAccel(accNorm);
-				//for (dInt32 k = 0; (k < 4) && (maxAccel.GetScalar() > tol2); k++)
 				for (dInt32 k = 0; k < 4; k++)
 				{
-					//maxAccel = m_zero;
 					for (dInt32 j = 0; j < rowsCount; j++)
 					{
 						ndRightHandSide* const rhs = &m_rightHandSide[rowStart + j];
@@ -2089,9 +2081,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 						const dVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
 						const dVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
 
-						a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 						f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-						//maxAccel = maxAccel.MulAdd(a, a);
 						rhs->m_force = f.GetScalar();
 
 						const dVector deltaForce(f - force);
@@ -2132,8 +2122,6 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 			ndJacobian& outBody1 = m_jointPartialForces[index1];
 			outBody1.m_linear = forceM1;
 			outBody1.m_angular = torqueM1;
-
-			//return accNorm.GetScalar();
 		}
 
 		virtual void Execute()
@@ -2226,18 +2214,10 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 	const dInt32 passes = m_solverPasses;
 	const dInt32 threadsCount = scene->GetThreadCount();
 
-	//dFloat32 m_accelNorm[D_MAX_THREADS_COUNT];
-	//dFloat32 accNorm = D_SOLVER_MAX_ERROR * dFloat32(2.0f);
 	for (dInt32 i = 0; i < passes; i++)
 	{
 		scene->SubmitJobs<ndCalculateJointsForce>();
 		scene->SubmitJobs<ndApplyJacobianAccumulatePartialForces>();
-
-		//accNorm = dFloat32(0.0f);
-		//for (dInt32 j = 0; j < threadsCount; j++)
-		//{
-		//	accNorm = dMax(accNorm, m_accelNorm[j]);
-		//}
 	}
 }
 
