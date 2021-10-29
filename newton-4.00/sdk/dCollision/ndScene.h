@@ -101,6 +101,9 @@ class ndScene : public dThreadPool
 	template <class T> 
 	void SubmitJobs(void* const context = nullptr);
 
+	template <class T, dInt32 bits, class EvaluateKey, class key = dUnsigned32>
+	void CountingSort(const T* const inputArray, T* const outputArray, dInt32 elements, dInt32 digitLocation);
+
 	dFloat32 GetTimestep() const;
 	void SetTimestep(dFloat32 timestep);
 
@@ -277,5 +280,112 @@ inline dFloat32 ndScene::CalculateSurfaceArea(const ndSceneNode* const node0, co
 	dVector side0(maxBox - minBox);
 	return side0.DotProduct(side0.ShiftTripleRight()).GetScalar();
 }
+
+template <class T, dInt32 bits, class EvaluateKey, class key>
+void ndScene::CountingSort(const T* const inputArray, T* const outputArray, dInt32 elementsCount, dInt32 digitLocation)
+{
+	class ndInfo
+	{
+		public:
+		T* m_outputBuffer;
+		const T* m_sourceBuffer;
+		dInt32 m_elementCount;
+		dInt32 m_digitNumber;
+		dInt32 m_digitScan[D_MAX_THREADS_COUNT][1 << bits];
+	};
+
+	class ndScanDigit : public ndBaseJob
+	{
+		public:
+		ndScanDigit()
+		{
+		}
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndInfo& info = *((ndInfo*)m_context);
+			const dInt32 threadIndex = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			const dInt32 stride = info.m_elementCount / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : info.m_elementCount - start;
+			
+			const dUnsigned32 digitCount = 1 << bits;
+			const dUnsigned32 shiftBits = info.m_digitNumber * bits;
+			const key digitMask = digitCount - 1;
+
+			dInt32* const digitBuffer = &info.m_digitScan[threadIndex][0];
+			memset(digitBuffer, 0, digitCount * sizeof(dInt32));
+						
+			EvaluateKey evaluator;
+			for (dInt32 i = 0; i < blockSize; i++)
+			{
+				const key key = evaluator.GetKey(info.m_sourceBuffer[i + start]);
+				const dInt32 entry = dInt32 ((key >> shiftBits) & digitMask);
+				digitBuffer[entry] ++;
+			}
+		}
+	};
+
+	class ndSortBuffer : public ndBaseJob
+	{
+		public:
+		ndSortBuffer()
+		{
+		}
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndInfo& info = *((ndInfo*)m_context);
+			const dInt32 threadIndex = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			const dInt32 stride = info.m_elementCount / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : info.m_elementCount - start;
+
+			const dUnsigned32 digitCount = 1 << bits;
+			const dUnsigned32 shiftBits = info.m_digitNumber * bits;
+			const key digitMask = digitCount - 1;
+
+			dInt32* const digitBuffer = &info.m_digitScan[threadIndex][0];
+
+			EvaluateKey evaluator;
+			for (dInt32 i = 0; i < blockSize; i++)
+			{
+				const T data(info.m_sourceBuffer[i + start]);
+				const key key = evaluator.GetKey(data);
+				const dInt32 digitEntry = dInt32((key >> shiftBits) & digitMask);
+				const dInt32 dstIndex = digitBuffer[digitEntry];
+				info.m_outputBuffer[dstIndex] = data;
+				digitBuffer[digitEntry] ++;
+			}
+		}
+	};
+
+	ndInfo info;
+	info.m_sourceBuffer = inputArray;
+	info.m_outputBuffer = outputArray;
+	info.m_elementCount = elementsCount;
+	info.m_digitNumber = digitLocation;
+
+	const dInt32 threadCount = GetThreadCount();
+	SubmitJobs<ndScanDigit>(&info);
+
+	dInt32 sum = 0;
+	for (dInt32 j = 0; j < 1 << bits; j++)
+	{
+		for (dInt32 i = 0; i < threadCount; i++)
+		{
+			const dInt32 count = info.m_digitScan[i][j];
+			info.m_digitScan[i][j] = sum;
+			sum += count;
+		}
+	}
+
+	SubmitJobs<ndSortBuffer>(&info);
+}
+
 
 #endif

@@ -19,17 +19,11 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
 
 #ifndef _D_COLLISION_STDAFX_H__
 #define _D_COLLISION_STDAFX_H__
 
 #include <dCore.h>
-
-//#define TEST_TWO_PASS_SOLVER
 
 #ifdef _D_COLLISION_DLL
 	#ifdef _D_COLLISION_EXPORT_DLL

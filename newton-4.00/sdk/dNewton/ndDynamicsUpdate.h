@@ -55,7 +55,7 @@ class ndDynamicsUpdate: public dClassAlloc
 		dInt32 m_joint;
 	};
 
-	class ndPartialJointForceCounters;
+	//class ndPartialJointForceCounters;
 
 	class ndSortKey
 	{

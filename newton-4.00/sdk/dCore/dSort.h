@@ -108,72 +108,6 @@ dInt32 dgBinarySearchIndirect(T** const array, dInt32 elements, const T& entry, 
 }
 
 template <class T>
-void dgRadixSort(T* const array, T* const tmpArray, dInt32 elements, dInt32 radixPass, dInt32(*getRadixKey) (const T* const  A, void* const context), void* const context = nullptr)
-{
-	dInt32 scanCount[256];
-	dInt32 histogram[256][4];
-
-	dAssert(radixPass >= 1);
-	dAssert(radixPass <= 4);
-
-	memset(histogram, 0, sizeof(histogram));
-	for (dInt32 i = 0; i < elements; i++) 
-	{
-		dInt32 key = getRadixKey(&array[i], context);
-		for (dInt32 j = 0; j < radixPass; j++) 
-		{
-			dInt32 radix = (key >> (j << 3)) & 0xff;
-			histogram[radix][j] = histogram[radix][j] + 1;
-		}
-	}
-
-	for (dInt32 radix = 0; radix < radixPass; radix += 2) 
-	{
-		scanCount[0] = 0;
-		for (dInt32 i = 1; i < 256; i++) 
-		{
-			scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix];
-		}
-		dInt32 radixShift = radix << 3;
-		for (dInt32 i = 0; i < elements; i++) 
-		{
-			dInt32 key = (getRadixKey(&array[i], context) >> radixShift) & 0xff;
-			dInt32 index = scanCount[key];
-			tmpArray[index] = array[i];
-			scanCount[key] = index + 1;
-		}
-
-		if ((radix + 1) < radixPass) 
-		{
-			scanCount[0] = 0;
-			for (dInt32 i = 1; i < 256; i++) {
-				scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix + 1];
-			}
-
-			dInt32 radixShift = (radix + 1) << 3;
-			for (dInt32 i = 0; i < elements; i++) 
-			{
-				dInt32 key = (getRadixKey(&array[i], context) >> radixShift) & 0xff;
-				dInt32 index = scanCount[key];
-				array[index] = tmpArray[i];
-				scanCount[key] = index + 1;
-			}
-		}
-		else 
-		{
-			memcpy(array, tmpArray, elements * sizeof(T));
-		}
-	}
-
-	#ifdef _DEBUG
-	for (dInt32 i = 0; i < (elements - 1); i++) 
-	{
-		dAssert(getRadixKey(&array[i], context) <= getRadixKey(&array[i + 1], context));
-	}
-	#endif
-}
-
-template <class T>
 void dSort(T* const array, dInt32 elements, dInt32(*compare) (const T* const  A, const T* const B, void* const context), void* const context = nullptr)
 {
 	D_TRACKTIME();
@@ -362,5 +296,73 @@ void dSortIndirect(T** const array, dInt32 elements, dInt32(*compare) (const T* 
 	}
 	#endif
 }
+
+
+//template <class T>
+//void dgRadixSort(T* const array, T* const tmpArray, dInt32 elements, dInt32 radixPass, dInt32(*getRadixKey) (const T* const  A, void* const context), void* const context = nullptr)
+//{
+//	dInt32 scanCount[256];
+//	dInt32 histogram[256][4];
+//
+//	dAssert(radixPass >= 1);
+//	dAssert(radixPass <= 4);
+//
+//	memset(histogram, 0, sizeof(histogram));
+//	for (dInt32 i = 0; i < elements; i++)
+//	{
+//		dInt32 key = getRadixKey(&array[i], context);
+//		for (dInt32 j = 0; j < radixPass; j++)
+//		{
+//			dInt32 radix = (key >> (j << 3)) & 0xff;
+//			histogram[radix][j] = histogram[radix][j] + 1;
+//		}
+//	}
+//
+//	for (dInt32 radix = 0; radix < radixPass; radix += 2)
+//	{
+//		scanCount[0] = 0;
+//		for (dInt32 i = 1; i < 256; i++)
+//		{
+//			scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix];
+//		}
+//		dInt32 radixShift = radix << 3;
+//		for (dInt32 i = 0; i < elements; i++)
+//		{
+//			dInt32 key = (getRadixKey(&array[i], context) >> radixShift) & 0xff;
+//			dInt32 index = scanCount[key];
+//			tmpArray[index] = array[i];
+//			scanCount[key] = index + 1;
+//		}
+//
+//		if ((radix + 1) < radixPass)
+//		{
+//			scanCount[0] = 0;
+//			for (dInt32 i = 1; i < 256; i++) {
+//				scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix + 1];
+//			}
+//
+//			dInt32 radixShift = (radix + 1) << 3;
+//			for (dInt32 i = 0; i < elements; i++)
+//			{
+//				dInt32 key = (getRadixKey(&array[i], context) >> radixShift) & 0xff;
+//				dInt32 index = scanCount[key];
+//				array[index] = tmpArray[i];
+//				scanCount[key] = index + 1;
+//			}
+//		}
+//		else
+//		{
+//			memcpy(array, tmpArray, elements * sizeof(T));
+//		}
+//	}
+//
+//#ifdef _DEBUG
+//	for (dInt32 i = 0; i < (elements - 1); i++)
+//	{
+//		dAssert(getRadixKey(&array[i], context) <= getRadixKey(&array[i + 1], context));
+//	}
+//#endif
+//}
+
 
 #endif
