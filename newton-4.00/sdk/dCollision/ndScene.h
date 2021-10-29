@@ -102,7 +102,7 @@ class ndScene : public dThreadPool
 	void SubmitJobs(void* const context = nullptr);
 
 	template <class T, dInt32 bits, class EvaluateKey, class key = dUnsigned32>
-	void CountingSort(const T* const inputArray, T* const outputArray, dInt32 elements, dInt32 digitLocation);
+	void CountingSort(T* const array, T* const scratchBuffer, dInt32 elements, dInt32 digitLocation);
 
 	dFloat32 GetTimestep() const;
 	void SetTimestep(dFloat32 timestep);
@@ -282,13 +282,13 @@ inline dFloat32 ndScene::CalculateSurfaceArea(const ndSceneNode* const node0, co
 }
 
 template <class T, dInt32 bits, class EvaluateKey, class key>
-void ndScene::CountingSort(const T* const inputArray, T* const outputArray, dInt32 elementsCount, dInt32 digitLocation)
+void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elementsCount, dInt32 digitLocation)
 {
 	class ndInfo
 	{
 		public:
-		T* m_outputBuffer;
-		const T* m_sourceBuffer;
+		T* m_sourceBuffer;
+		T* m_scratchBuffer;
 		dInt32 m_elementCount;
 		dInt32 m_digitNumber;
 		dInt32 m_digitScan[D_MAX_THREADS_COUNT][1 << bits];
@@ -321,7 +321,10 @@ void ndScene::CountingSort(const T* const inputArray, T* const outputArray, dInt
 			EvaluateKey evaluator;
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				const key key = evaluator.GetKey(info.m_sourceBuffer[i + start]);
+				const T data(info.m_sourceBuffer[i + start]);
+				info.m_scratchBuffer[i + start] = data;
+
+				const key key = evaluator.GetKey(data);
 				const dInt32 entry = dInt32 ((key >> shiftBits) & digitMask);
 				digitBuffer[entry] ++;
 			}
@@ -354,19 +357,19 @@ void ndScene::CountingSort(const T* const inputArray, T* const outputArray, dInt
 			EvaluateKey evaluator;
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				const T data(info.m_sourceBuffer[i + start]);
+				const T data(info.m_scratchBuffer[i + start]);
 				const key key = evaluator.GetKey(data);
 				const dInt32 digitEntry = dInt32((key >> shiftBits) & digitMask);
 				const dInt32 dstIndex = digitBuffer[digitEntry];
-				info.m_outputBuffer[dstIndex] = data;
+				info.m_sourceBuffer[dstIndex] = data;
 				digitBuffer[digitEntry] ++;
 			}
 		}
 	};
 
 	ndInfo info;
-	info.m_sourceBuffer = inputArray;
-	info.m_outputBuffer = outputArray;
+	info.m_sourceBuffer = array;
+	info.m_scratchBuffer = scratchBuffer;
 	info.m_elementCount = elementsCount;
 	info.m_digitNumber = digitLocation;
 
