@@ -76,21 +76,6 @@ void ndDynamicsUpdate::Clear()
 	m_jointBodyPairIndexBuffer.Resize(D_DEFAULT_BUFFER_SIZE);
 }
 
-dInt32 ndDynamicsUpdate::CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const)
-{
-	dUnsigned32 keyA = islandA->m_count * 2 + islandA->m_root->m_bodyIsConstrained;
-	dUnsigned32 keyB = islandB->m_count * 2 + islandB->m_root->m_bodyIsConstrained;;
-	if (keyA < keyB)
-	{
-		return 1;
-	}
-	else if (keyA > keyB)
-	{
-		return -1;
-	}
-	return 0;
-}
-
 void ndDynamicsUpdate::SortBodyJointScan()
 {
 	class ndCountJointBodyPairs : public ndScene::ndBaseJob
@@ -600,76 +585,6 @@ void ndDynamicsUpdate::SortJoints()
 	SortBodyJointScan();
 }
 
-void ndDynamicsUpdate::RadixSort()
-{
-	dInt32 elements = m_islands.GetCount();
-#if 1
-	dSort(&m_islands[0], elements, CompareIslands);
-#else
-	if (elements < 256)
-	{
-		dSort(&m_islands[0], elements, CompareIslands);
-	}
-	else
-	{
-		const dInt32 radixBits = 9;
-		const dInt32 radix = (1 << radixBits) - 1;
-		dInt32 histogram[2][1 << radixBits];
-
-		memset(histogram, 0, sizeof(histogram));
-		for (dInt32 i = 0; i < elements; i++)
-		{
-			dUnsigned32 key = m_islands[i].m_count * 2 + m_islands[i].m_root->m_bodyIsConstrained;
-			dInt32 radix0 = radix - (key & radix);
-			dInt32 radix1 = radix - (key >> radixBits);
-			histogram[0][radix0]++;
-			histogram[1][radix1]++;
-		}
-
-		dInt32 acc0 = 0;
-		dInt32 acc1 = 0;
-		for (dInt32 i = 0; i <= radix; i++)
-		{
-			const dInt32 n0 = histogram[0][i];
-			const dInt32 n1 = histogram[1][i];
-			histogram[0][i] = acc0;
-			histogram[1][i] = acc1;
-			acc0 += n0;
-			acc1 += n1;
-		}
-
-		ndIsland* const buffer = dAlloca(ndIsland, elements);
-
-		dInt32* const scan0 = &histogram[0][0];
-		for (dInt32 i = 0; i < elements; i++)
-		{
-			dUnsigned32 key = radix - ((m_islands[i].m_count * 2 + m_islands[i].m_root->m_bodyIsConstrained) & radix);
-			const dInt32 index = scan0[key];
-			buffer[index] = m_islands[i];
-			scan0[key] = index + 1;
-		}
-
-		dInt32* const scan1 = &histogram[1][0];
-		for (dInt32 i = 0; i < elements; i++)
-		{
-			dUnsigned32 key = radix - ((buffer[i].m_count * 2 + buffer[i].m_root->m_bodyIsConstrained) >> radixBits);
-			const dInt32 index = scan1[key];
-			m_islands[index] = buffer[i];
-			scan1[key] = index + 1;
-		}
-
-		#ifdef _DEBUG
-		for (dInt32 i = elements - 1; i ; i--)
-		{
-			dUnsigned32 key0 = m_islands[i - 1].m_count * 2 + m_islands[i - 1].m_root->m_bodyIsConstrained;
-			dUnsigned32 key1 = m_islands[i + 0].m_count * 2 + m_islands[i + 0].m_root->m_bodyIsConstrained;
-			dAssert(key0 >= key1);
-		}
-		#endif
-	}
-#endif
-}
-
 void ndDynamicsUpdate::SortIslands()
 {
 	D_TRACKTIME();
@@ -750,18 +665,36 @@ void ndDynamicsUpdate::SortIslands()
 		}
 
 		dInt32 start = 0;
+		dInt32 islandMaxKeySize = 0;
 		dInt32 unConstrainedCount = 0;
 		for (dInt32 i = 0; i < m_islands.GetCount(); i++)
 		{
 			ndIsland& island = m_islands[i];
 			island.m_start = start;
 			island.m_count = island.m_root->m_rank;
+			islandMaxKeySize = dMax(islandMaxKeySize, island.m_count);
 			start += island.m_count;
 			unConstrainedCount += island.m_root->m_bodyIsConstrained ? 0 : 1;
 		}
 
 		m_unConstrainedBodyCount = unConstrainedCount;
-		RadixSort();
+		class EvaluateKey
+		{
+			public:
+			dUnsigned32 GetKey(const ndIsland& island) const
+			{
+				dUnsigned32 key = island.m_count * 2 + island.m_root->m_bodyIsConstrained;
+				const dUnsigned32 maxVal = 1 << (9 * 2);
+				dAssert(key < maxVal);
+				return maxVal - key;
+			}
+		};
+		scene->CountingSort<ndIsland, 9, EvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 0);
+		if (islandMaxKeySize >= 256)
+		{
+			scene->CountingSort<ndIsland, 9, EvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 1);
+		}
+
 	}
 }
 

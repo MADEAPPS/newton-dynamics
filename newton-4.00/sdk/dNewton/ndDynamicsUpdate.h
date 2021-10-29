@@ -118,7 +118,6 @@ class ndDynamicsUpdate: public dClassAlloc
 	dArray<ndJointBodyPairIndex>& GetJointBodyPairIndexBuffer();
 
 	private:
-	void RadixSort();
 	void SortJoints();
 	void SortIslands();
 	void BuildIsland();
@@ -138,7 +137,6 @@ class ndDynamicsUpdate: public dClassAlloc
 	void DetermineSleepStates();
 	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
-	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const);
 
 	protected:
 	void Clear();

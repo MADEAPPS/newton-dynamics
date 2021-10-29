@@ -388,6 +388,22 @@ void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elemen
 	}
 
 	SubmitJobs<ndSortBuffer>(&info);
+
+#ifdef _DEBUG
+	const dUnsigned32 digitCount = 1 << bits;
+	const dUnsigned32 shiftBits = info.m_digitNumber * bits;
+	const key digitMask = digitCount - 1;
+
+	EvaluateKey evaluator;
+	for (dInt32 i = elementsCount - 1; i; i--)
+	{
+		const key key0 = evaluator.GetKey(array[i - 1]);
+		const key key1 = evaluator.GetKey(array[i - 0]);
+		const dInt32 digitEntry0 = dInt32((key0 >> shiftBits) & digitMask);
+		const dInt32 digitEntry1 = dInt32((key1 >> shiftBits) & digitMask);
+		dAssert(digitEntry0 <= digitEntry1);
+	}
+#endif
 }
 
 

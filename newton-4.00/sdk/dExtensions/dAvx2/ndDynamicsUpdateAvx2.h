@@ -39,7 +39,6 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	virtual void Update();
 
 	private:
-	void RadixSort();
 	void SortJoints();
 	void SortIslands();
 	void BuildIsland();
@@ -59,7 +58,6 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	void DetermineSleepStates();
 	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
-	static dInt32 CompareIslands(const ndIsland* const A, const ndIsland* const B, void* const context);
 
 	dVector m_zero;
 	dArray<dInt32> m_avxJointRows;

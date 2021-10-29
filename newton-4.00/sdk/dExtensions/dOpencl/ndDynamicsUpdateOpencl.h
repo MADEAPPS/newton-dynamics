@@ -40,7 +40,6 @@ class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 
 	private:
 	void GpuUpdate();
-	void RadixSort();
 	void SortJoints();
 	void SortIslands();
 	void BuildIsland();
@@ -60,8 +59,6 @@ class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 	void DetermineSleepStates();
 	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
-	static dInt32 CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const);
-
 	OpenclSystem* m_opencl;
 };
 
