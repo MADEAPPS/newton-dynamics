@@ -141,6 +141,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	protected:
 	void Clear();
 	virtual void Update();
+	void SortJointsScan();
 	void SortBodyJointScan();
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 

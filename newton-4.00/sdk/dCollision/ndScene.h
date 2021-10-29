@@ -377,7 +377,8 @@ void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elemen
 	SubmitJobs<ndScanDigit>(&info);
 
 	dInt32 sum = 0;
-	for (dInt32 j = 0; j < 1 << bits; j++)
+	const dInt32 scanSize = 1 << bits;
+	for (dInt32 j = 0; j < scanSize; j++)
 	{
 		for (dInt32 i = 0; i < threadCount; i++)
 		{
