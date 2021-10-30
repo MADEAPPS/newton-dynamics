@@ -143,13 +143,27 @@ class ndOpenclBodyWorkingBuffer
 class OpenclSystem: public dClassAlloc
 {
 	public:
+	class ndKernel
+	{
+		public:
+		ndKernel()
+			:m_kernel(nullptr)
+			,m_workWroupSize(0)
+		{
+		}
+
+		cl_kernel m_kernel;
+		size_t m_workWroupSize;
+	};
+
 	OpenclSystem(cl_context context, cl_platform_id platform)
 		:m_context(context)
 		////,m_bodyArray(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR)
 		//,m_bodyArray(CL_MEM_READ_ONLY)
 		////,m_outBodyArray(CL_MEM_WRITE_ONLY)
 		//,m_bodyWorkingArray(CL_MEM_READ_WRITE)
-		,m_integrateUnconstrainedBodies(nullptr)
+		,m_integrateBodies()
+		//,m_integrateUnconstrainedBodies(nullptr)
 	{
 		cl_int err;
 		// get the device
@@ -177,17 +191,20 @@ class OpenclSystem: public dClassAlloc
 		dAssert(err == CL_SUCCESS);
 		
 		m_solverProgram = CompileProgram();
-		
-		m_integrateUnconstrainedBodies = clCreateKernel(m_solverProgram, "IntegrateUnconstrainedBodies", &err);
-		dAssert(err == CL_SUCCESS);
+
+		SetKernel("IntegrateBodies", m_integrateBodies);
+		//SetKernel("IntegrateUnconstrainedBodies", m_integrateBodies);
 	}
 
 	~OpenclSystem()
 	{
 		cl_int err;
-		
-		err = clReleaseKernel(m_integrateUnconstrainedBodies);
+
+		err = clReleaseKernel(m_integrateBodies.m_kernel);
 		dAssert(err == CL_SUCCESS);
+
+		//err = clReleaseKernel(m_integrateUnconstrainedBodies);
+		//dAssert(err == CL_SUCCESS);
 		
 		err = clReleaseProgram(m_solverProgram);
 		dAssert(err == CL_SUCCESS);
@@ -275,10 +292,17 @@ class OpenclSystem: public dClassAlloc
 		return program;
 	}
 
-	#if 0	
-	//cl_kernel        kernel;				// hold the kernel handler
-	
+	void SetKernel(const char* const name, ndKernel& kerner)
+	{
+		cl_int err;
+		kerner.m_kernel = clCreateKernel(m_solverProgram, name, &err);
+		dAssert(err == CL_SUCCESS);
 
+		err = clGetKernelWorkGroupInfo(kerner.m_kernel, m_device, CL_KERNEL_WORK_GROUP_SIZE, sizeof(kerner.m_workWroupSize), &kerner.m_workWroupSize, nullptr);
+		dAssert(err == CL_SUCCESS);
+	}
+	
+#if 0	
 	dOpenclBuffer<ndOpenclBodyProxy> m_bodyArray;
 	dOpenclBuffer<ndOpenclBodyWorkingBuffer> m_bodyWorkingArray;
 //	dOpenclBuffer<ndOpenclOutBodyProxy> m_outBodyArray;
@@ -294,7 +318,9 @@ class OpenclSystem: public dClassAlloc
 	cl_program	m_solverProgram;			// hold the program handler
 	cl_command_queue m_commandQueue;		// hold the commands-queue handler
 
-	cl_kernel m_integrateUnconstrainedBodies;
+
+	ndKernel m_integrateBodies;
+	//cl_kernel m_integrateUnconstrainedBodies;
 	static const char* m_kernelSource;
 };
 
@@ -329,7 +355,7 @@ struct ndOpenclMatrix3x3 QuatToMatrix(float4 rotation)
 	return matrix; 
 } 
 
-__kernel void IntegrateUnconstrainedBodies(float timestep, int bodyCount, __global struct ndOpenclBodyProxy* inputArray, __global struct ndOpenclBodyWorkingBuffer* outputArray) 
+__kernel void IntegrateBodies(float timestep, int bodyCount, __global struct ndOpenclBodyProxy* inputArray, __global struct ndOpenclBodyWorkingBuffer* outputArray) 
 { 
 	const int index = get_global_id(0); 
 
@@ -348,6 +374,27 @@ __kernel void IntegrateUnconstrainedBodies(float timestep, int bodyCount, __glob
 		matrix = QuatToMatrix(body.m_rotation); 
 	} 
 } 
+
+//__kernel void IntegrateUnconstrainedBodies(float timestep, int bodyCount, __global struct ndOpenclBodyProxy* inputArray, __global struct ndOpenclBodyWorkingBuffer* outputArray) 
+//{ 
+//	const int index = get_global_id(0); 
+//
+//	struct ndOpenclBodyProxy body; 
+//
+//	// load all variable into registers.
+//	if (index < bodyCount) 
+//	{ 
+//		body = inputArray[index];
+//	} 
+//	barrier(CLK_LOCAL_MEM_FENCE); 
+//
+//	if (index < bodyCount) 
+//	{ 
+//		struct ndOpenclMatrix3x3 matrix; 
+//		matrix = QuatToMatrix(body.m_rotation); 
+//	} 
+//} 
+
 
 )"""";
 
