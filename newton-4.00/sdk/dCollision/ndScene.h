@@ -310,14 +310,14 @@ void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elemen
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : info.m_elementCount - start;
 			
-			const dUnsigned32 digitCount = 1 << bits;
-			const dUnsigned32 shiftBits = info.m_digitNumber * bits;
+			const dInt32 digitCount = 1 << bits;
 			const key digitMask = digitCount - 1;
+			const dInt32 shiftBits = info.m_digitNumber * bits;
 
 			dInt32* const digitBuffer = &info.m_digitScan[threadIndex][0];
 			memset(digitBuffer, 0, digitCount * sizeof(dInt32));
 						
-			EvaluateKey evaluator;
+			const EvaluateKey evaluator;
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				const T data(info.m_sourceBuffer[i + start]);
@@ -347,13 +347,12 @@ void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elemen
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : info.m_elementCount - start;
 
-			const dUnsigned32 digitCount = 1 << bits;
-			const dUnsigned32 shiftBits = info.m_digitNumber * bits;
+			const dInt32 digitCount = 1 << bits;
 			const key digitMask = digitCount - 1;
-
+			const dInt32 shiftBits = info.m_digitNumber * bits;
 			dInt32* const digitBuffer = &info.m_digitScan[threadIndex][0];
 
-			EvaluateKey evaluator;
+			const EvaluateKey evaluator;
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				const T data(info.m_scratchBuffer[i + start]);
@@ -389,21 +388,21 @@ void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elemen
 
 	SubmitJobs<ndSortBuffer>(&info);
 
-#ifdef _DEBUG
-	const dUnsigned32 digitCount = 1 << bits;
-	const dUnsigned32 shiftBits = info.m_digitNumber * bits;
-	const key digitMask = digitCount - 1;
+	#ifdef _DEBUG
+		const dInt32 digitCount = 1 << bits;
+		const key digitMask = digitCount - 1;
+		const dInt32 shiftBits = info.m_digitNumber * bits;
 
-	EvaluateKey evaluator;
-	for (dInt32 i = elementsCount - 1; i; i--)
-	{
-		const key key0 = evaluator.GetKey(array[i - 1]);
-		const key key1 = evaluator.GetKey(array[i - 0]);
-		const dInt32 digitEntry0 = dInt32((key0 >> shiftBits) & digitMask);
-		const dInt32 digitEntry1 = dInt32((key1 >> shiftBits) & digitMask);
-		dAssert(digitEntry0 <= digitEntry1);
-	}
-#endif
+		const EvaluateKey evaluator;
+		for (dInt32 i = elementsCount - 1; i; i--)
+		{
+			const key key0 = evaluator.GetKey(array[i - 1]);
+			const key key1 = evaluator.GetKey(array[i - 0]);
+			const dInt32 digitEntry0 = dInt32((key0 >> shiftBits) & digitMask);
+			const dInt32 digitEntry1 = dInt32((key1 >> shiftBits) & digitMask);
+			dAssert(digitEntry0 <= digitEntry1);
+		}
+	#endif
 }
 
 

@@ -431,7 +431,7 @@ dInt32 dConvexHull3d::GetUniquePoints(dConvexHull3dVertex* const points, const d
 	class CompareVertex
 	{
 		public:
-		dInt32 Compare(const dConvexHull3dVertex& elementA, const dConvexHull3dVertex& elementB, void* const)
+		dInt32 Compare(const dConvexHull3dVertex& elementA, const dConvexHull3dVertex& elementB, void* const) const
 		{
 			for (dInt32 i = 0; i < 3; i++) 
 			{

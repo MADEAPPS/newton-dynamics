@@ -143,7 +143,7 @@ void dDelaunayTetrahedralization::SortVertexArray ()
 	class CompareVertex
 	{
 		public:
-		dInt32 Compare(const dConvexHull4dVector& elementA, const dConvexHull4dVector& elementB, void* const)
+		dInt32 Compare(const dConvexHull4dVector& elementA, const dConvexHull4dVector& elementB, void* const) const
 		{
 			if (elementA.m_index < elementB.m_index)
 			{

@@ -117,7 +117,7 @@ void dSort(T* const array, dInt32 elements, void* const context = nullptr)
 	stack[0][0] = 0;
 	stack[0][1] = elements - 1;
 	dInt32 stackIndex = 1;
-	CompareKey comparator;
+	const CompareKey comparator;
 	while (stackIndex)
 	{
 		stackIndex--;
@@ -140,7 +140,7 @@ void dSort(T* const array, dInt32 elements, void* const context = nullptr)
 			}
 			dInt32 i = lo + 1;
 			dInt32 j = hi - 1;
-			T pivot(array[mid]);
+			const T pivot(array[mid]);
 			do
 			{
 				while (comparator.Compare(array[i], pivot, context) < 0) i++;
@@ -186,7 +186,7 @@ void dSort(T* const array, dInt32 elements, void* const context = nullptr)
 	for (dInt32 i = 1; i < elements; i++)
 	{
 		dInt32 j = i;
-		T tmp(array[i]);
+		const T tmp(array[i]);
 		for (; comparator.Compare(array[j - 1], tmp, context) > 0; j--)
 		{
 			dAssert(j > 0);

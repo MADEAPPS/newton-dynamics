@@ -889,7 +889,7 @@ void ndShapeCompound::EndAddRemove()
 				class CompareNodes
 				{
 					public:
-					dInt32 Compare(const ndNodeBase* const elementA, const ndNodeBase* const elementB, void* const)
+					dInt32 Compare(const ndNodeBase* const elementA, const ndNodeBase* const elementB, void* const) const
 					{
 						dFloat32 areaA = elementA->m_area;
 						dFloat32 areaB = elementB->m_area;

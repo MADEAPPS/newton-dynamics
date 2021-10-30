@@ -27,7 +27,6 @@
 #include "ndDynamicsUpdate.h"
 #include "ndJointBilateralConstraint.h"
 
-//#define D_MAX_BODY_RADIX_BIT		2
 #define D_MAX_BODY_RADIX_BIT		9
 #define D_DEFAULT_BUFFER_SIZE		1024
 
@@ -625,15 +624,15 @@ void ndDynamicsUpdate::SortIslands()
 			dUnsigned32 GetKey(const ndIsland& island) const
 			{
 				dUnsigned32 key = island.m_count * 2 + island.m_root->m_bodyIsConstrained;
-				const dUnsigned32 maxVal = 1 << (9 * 2);
+				const dUnsigned32 maxVal = 1 << (D_MAX_BODY_RADIX_BIT * 2);
 				dAssert(key < maxVal);
 				return maxVal - key;
 			}
 		};
-		scene->CountingSort<ndIsland, 9, EvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 0);
-		if (islandMaxKeySize >= 256)
+		scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, EvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 0);
+		if (islandMaxKeySize >= 1 << (D_MAX_BODY_RADIX_BIT - 1))
 		{
-			scene->CountingSort<ndIsland, 9, EvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 1);
+			scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, EvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 1);
 		}
 	}
 }

@@ -643,7 +643,7 @@ dInt32 dConvexHull4d::InitVertexArray(dConvexHull4dVector* const points, const d
 	class CompareVertex
 	{
 		public:
-		dInt32 Compare(const dConvexHull4dVector& elementA, const dConvexHull4dVector& elementB, void* const)
+		dInt32 Compare(const dConvexHull4dVector& elementA, const dConvexHull4dVector& elementB, void* const) const
 		{
 			for (dInt32 i = 0; i < 4; i++)
 			{

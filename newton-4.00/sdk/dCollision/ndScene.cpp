@@ -583,21 +583,6 @@ dFloat64 ndScene::ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const root
 	return fitness.m_currentCost;
 }
 
-//dInt32 ndScene::CompareNodes(const ndSceneNode* const nodeA, const ndSceneNode* const nodeB, void* const)
-//{
-//	dFloat32 areaA = nodeA->m_surfaceArea;
-//	dFloat32 areaB = nodeB->m_surfaceArea;
-//	if (areaA < areaB) 
-//	{
-//		return 1;
-//	}
-//	if (areaA > areaB) 
-//	{
-//		return -1;
-//	}
-//	return 0;
-//}
-
 void ndScene::UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndSceneNode** const root)
 {
 	if (*root) 
@@ -642,7 +627,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndScen
 				class CompareNodes
 				{
 					public:
-					dInt32 Compare(const ndSceneNode* const elementA, const ndSceneNode* const elementB, void* const)
+					dInt32 Compare(const ndSceneNode* const elementA, const ndSceneNode* const elementB, void* const) const
 					{
 						dFloat32 areaA = elementA->m_surfaceArea;
 						dFloat32 areaB = elementB->m_surfaceArea;

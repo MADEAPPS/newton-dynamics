@@ -43,7 +43,7 @@ dInt32 dConvexHull2d(dVector* const vertexCloud2d, dInt32 count)
 	class CompareVertex
 	{
 		public:
-		dInt32 Compare(const dVector& elementA, const dVector& elementB, void* const)
+		dInt32 Compare(const dVector& elementA, const dVector& elementB, void* const) const
 		{
 			if (elementA.m_x < elementB.m_x)
 			{
