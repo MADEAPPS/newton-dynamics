@@ -340,13 +340,22 @@ struct ndOpenclBodyProxy
 	float4 m_invMass; 
 }; 
 
-struct ndOpenclBodyWorkingBuffer 
+struct ndOpenclBodyWorkingBuffer
 { 
-	struct ndOpenclMatrix3x3 m_matrix; 
-	float4 m_rotation; 
-	float3 m_position; 
-	float3 m_veloc;	
-	float3 m_omega;	
+	//struct ndOpenclMatrix3x3 m_matrix; 
+	//float4 m_rotation; 
+	//float3 m_position; 
+	//float3 m_veloc;	
+	//float3 m_omega;	
+	//int m_isdynamic;
+	float4* m_rotation; 
+	float4* m_posit; 
+	float4* m_omega;
+	float4* m_veloc;
+	float4* m_alpha;
+	float4* m_accel;
+	bool* m_isdynamic;
+	bool* m_equilibrium;
 }; 
 
 struct ndOpenclMatrix3x3 QuatToMatrix(float4 rotation) 
@@ -355,45 +364,88 @@ struct ndOpenclMatrix3x3 QuatToMatrix(float4 rotation)
 	return matrix; 
 } 
 
-__kernel void IntegrateBodies(float timestep, int bodyCount, __global struct ndOpenclBodyProxy* inputArray, __global struct ndOpenclBodyWorkingBuffer* outputArray) 
+float4 MakeQuat(float4 axis, float angle)
+{
+	angle = angle * 0.5f;
+	float sinAngle = sin (angle);
+	float4 quat = axis * ((float4) angle);
+	quat.w = cos (angle);
+}
+
+float4 MultiplyQuat(float4 r, float4 q)
+{
+	float4 x = (float4)( q.w,  q.z, -q.y, -q.x);
+	float4 y = (float4)(-q.z,  q.w,  q.x, -q.y);
+	float4 z = (float4)( q.y, -q.x,  q.w, -q.z);
+	float4 w = (float4)( q.x,  q.y,  q.z,  q.w);
+	return x * (float4)(r.x) + y * (float4)(r.y) + z * (float4)(r.z) + w * (float4)(r.w);
+}
+
+float4 NormalizeQuat(float4 r)
+{
+	float4 mag2Vec = r * r;
+	float invMag = 1.0f / sqrt(mag2Vec.x + mag2Vec.y + mag2Vec.z + mag2Vec.w);
+	return r * (float4) (invMag);
+}
+
+__kernel void IntegrateBodies(
+	float timestepIn, 
+	int bodyCount, 
+	__global float4* rotationBuffer, 
+	__global float4* centerOfMassBuffer,
+	__global float4* velocBuffer,
+	__global float4* omegaBuffer,
+	__global float4* accelBuffer,
+	__global float4* alphaBuffer) 
 { 
-	const int index = get_global_id(0); 
+	const int globalIndex = get_global_id(0); 
+	if (globalIndex >= bodyCount) 
+	{
+		return;
+	}	
 
-	struct ndOpenclBodyProxy body; 
+	float4 timestep = (float4) (timestepIn);
+	float4 invTimestep = (float4) (1.0f / timestepIn);
 
-	// load all variable into registers.
-	if (index < bodyCount) 
-	{ 
-		body = inputArray[index];
-	} 
-	barrier(CLK_LOCAL_MEM_FENCE); 
+	float4 veloc = velocBuffer[globalIndex];
+	float4 omega = omegaBuffer[globalIndex];
+	float4 accel = accelBuffer[globalIndex];
+	float4 alpha = alphaBuffer[globalIndex];
+	float4 com = centerOfMassBuffer[globalIndex];
+	float4 rotation = rotationBuffer[globalIndex]; 
 
-	if (index < bodyCount) 
-	{ 
-		struct ndOpenclMatrix3x3 matrix; 
-		matrix = QuatToMatrix(body.m_rotation); 
-	} 
+	com = com + timestep * veloc;
+	accel = invTimestep * (veloc - accel);
+	alpha = invTimestep * (omega - alpha);
+
+	float4 omega2 = omega * omega;
+	float omegaMag2 = omega2.x + omega2.y + omega2.z;
+	
+	const float tol = 0.0125f * 3.141592f / 180.0f;
+	if (omegaMag2 > (tol * tol))
+	{
+		float invOmegaMag = 1.0f / sqrt(omegaMag2);
+		float omegaAngle = invOmegaMag * omegaMag2 * timestepIn;
+		float4 omegaAxis = omega * invOmegaMag;
+		float4 rotationStep = MakeQuat(omegaAxis, omegaAngle);
+		float4 newRotation = MultiplyQuat(rotation, rotationStep);
+		rotation = NormalizeQuat(newRotation);
+	}
+
+	accelBuffer[globalIndex] = accel;
+	alphaBuffer[globalIndex] = alpha;
+	centerOfMassBuffer[globalIndex] = com;
+	rotationBuffer[globalIndex] = rotation; 
 } 
 
-//__kernel void IntegrateUnconstrainedBodies(float timestep, int bodyCount, __global struct ndOpenclBodyProxy* inputArray, __global struct ndOpenclBodyWorkingBuffer* outputArray) 
-//{ 
-//	const int index = get_global_id(0); 
-//
-//	struct ndOpenclBodyProxy body; 
-//
-//	// load all variable into registers.
-//	if (index < bodyCount) 
-//	{ 
-//		body = inputArray[index];
-//	} 
-//	barrier(CLK_LOCAL_MEM_FENCE); 
-//
-//	if (index < bodyCount) 
-//	{ 
-//		struct ndOpenclMatrix3x3 matrix; 
-//		matrix = QuatToMatrix(body.m_rotation); 
-//	} 
-//} 
+__kernel void IntegrateUnconstrainedBodies(float timestep, int bodyCount, __global struct ndOpenclBodyProxy* inputArray, __global struct ndOpenclBodyWorkingBuffer* outputArray) 
+{ 
+	const int globalIndex = get_global_id(0); 
+	if (globalIndex >= bodyCount) 
+	{
+		return;
+	}	
+} 
 
 
 )"""";
