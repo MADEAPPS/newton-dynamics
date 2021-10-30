@@ -89,8 +89,8 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_shapeInstance(ndDummyCollision::GetNullShape())
 	,m_mass(dVector::m_zero)
 	,m_invMass(dVector::m_zero)
-	,m_residualVeloc(dVector::m_zero)
-	,m_residualOmega(dVector::m_zero)
+	//,m_residualVeloc(dVector::m_zero)
+	//,m_residualOmega(dVector::m_zero)
 	,m_gyroAlpha(dVector::m_zero)
 	,m_gyroTorque(dVector::m_zero)
 	,m_gyroRotation()
@@ -120,8 +120,8 @@ ndBodyKinematic::ndBodyKinematic(const dLoadSaveBase::dLoadDescriptor& desc)
 	,m_shapeInstance(ndDummyCollision::GetNullShape())
 	,m_mass(dVector::m_zero)
 	,m_invMass(dVector::m_zero)
-	,m_residualVeloc(dVector::m_zero)
-	,m_residualOmega(dVector::m_zero)
+	//,m_residualVeloc(dVector::m_zero)
+	//,m_residualOmega(dVector::m_zero)
 	,m_gyroAlpha(dVector::m_zero)
 	,m_gyroTorque(dVector::m_zero)
 	,m_gyroRotation()
@@ -429,8 +429,8 @@ void ndBodyKinematic::IntegrateVelocity(dFloat32 timestep)
 	if (omegaMag2 > (tol * tol))
 	{
 		const dFloat32 invOmegaMag = dRsqrt(omegaMag2);
-		const dVector omegaAxis(m_omega.Scale(invOmegaMag));
 		const dFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
+		const dVector omegaAxis(m_omega.Scale(invOmegaMag));
 		const dQuaternion rotationStep(omegaAxis, omegaAngle);
 		const dQuaternion rotation(m_rotation * rotationStep);
 		m_rotation = rotation.Normalize();
@@ -441,8 +441,8 @@ void ndBodyKinematic::IntegrateVelocity(dFloat32 timestep)
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
 	dAssert(m_matrix.TestOrthogonal());
 
-	m_residualVeloc = m_veloc;
-	m_residualOmega = m_omega;
+	//m_residualVeloc = m_veloc;
+	//m_residualOmega = m_omega;
 }
 
 void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
