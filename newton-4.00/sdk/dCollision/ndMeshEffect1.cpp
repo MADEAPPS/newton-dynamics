@@ -1649,7 +1649,7 @@ dInt32 ndMeshEffect::InterpolateVertex(const dBigVector& srcPoint, const dEdge* 
 
 #endif
 
-dInt32 ndMeshEffect::dFormat::CompareVertex(const dSortKey* const ptr0, const dSortKey* const ptr1, void* const context)
+inline dInt32 ndMeshEffect::dFormat::CompareVertex(const dSortKey* const ptr0, const dSortKey* const ptr1, void* const context)
 {
 	const dVertexSortData* const sortContext = (dVertexSortData*)context;
 	const dInt32 compIndex = sortContext->m_vertexSortIndex;
@@ -1723,9 +1723,16 @@ void ndMeshEffect::dPointFormat::CompressData(dInt32* const indexList)
 	dPointFormat tmpFormat(*this);
 	dVertexSortData sortContext;
 	sortContext.m_points = &tmpFormat.m_vertex;
-	//sortContext.m_points = &tmpFormat;
 	sortContext.m_vertexSortIndex = firstSortAxis;
-	dSort(indirectList, m_vertex.GetCount(), dFormat::CompareVertex, &sortContext);
+	class CompareKey
+	{
+		public:
+		dInt32 Compare(const dFormat::dSortKey& elementA, const dFormat::dSortKey& elementB, void* context)
+		{
+			return ndMeshEffect::dFormat::CompareVertex(&elementA, &elementB, context);
+		}
+	};
+	dSort<dFormat::dSortKey, CompareKey>(indirectList, m_vertex.GetCount(), &sortContext);
 	
 	const dFloat64 tolerance = dMin(minDist, dFloat64(1.0e-12f));
 	const dFloat64 sweptWindow = dFloat64(2.0f) * tolerance + dFloat64(1.0e-10f);
@@ -1828,7 +1835,17 @@ void ndMeshEffect::dAttibutFormat::CompressData(const dPointFormat& points, dInt
 	dVertexSortData sortContext;
 	sortContext.m_points = &points.m_vertex;
 	sortContext.m_vertexSortIndex = firstSortAxis;
-	dSort(indirectList, m_pointChannel.GetCount(), dFormat::CompareVertex, &sortContext);
+
+	class CompareKey
+	{
+		public:
+		dInt32 Compare(const dFormat::dSortKey& elementA, const dFormat::dSortKey& elementB, void* context)
+		{
+			return ndMeshEffect::dFormat::CompareVertex(&elementA, &elementB, context);
+		}
+	};
+	dSort<dFormat::dSortKey, CompareKey>(indirectList, m_pointChannel.GetCount(), &sortContext);
+
 	dAttibutFormat tmpFormat(*this);
 	Clear();
 
