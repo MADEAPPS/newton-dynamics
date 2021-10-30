@@ -1594,7 +1594,7 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 			const dInt32 rowStart = joint->m_rowStart;
 			const dInt32 rowsCount = joint->m_rowCount;
 
-			dInt32 resting = body0->m_resting & body1->m_resting;
+			const dInt32 resting = body0->m_resting & body1->m_resting;
 			if (!resting)
 			{
 				dVector preconditioner0(joint->m_preconditioner0);
@@ -1685,7 +1685,6 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 			m_jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
 
-			//dFloat32 accNorm = dFloat32(0.0f);
 			const dInt32 jointCount = jointArray.GetCount();
 			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
 			const dInt32 threadIndex = GetThreadId();
@@ -1694,12 +1693,8 @@ void ndDynamicsUpdateOpencl::CalculateJointsForce()
 			for (dInt32 i = threadIndex; i < jointCount; i += threadCount)
 			{
 				ndConstraint* const joint = jointArray[i];
-				//accNorm += JointForce(joint, i);
 				JointForce(joint, i);
 			}
-
-			//dFloat32* const accelNorm = (dFloat32*)m_context;
-			//accelNorm[threadIndex] = accNorm;
 		}
 
 		dVector m_zero;
