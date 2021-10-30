@@ -1689,7 +1689,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			const dInt32 rowStart = joint->m_rowStart;
 			const dInt32 rowsCount = joint->m_rowCount;
 
-			dInt32 resting = body0->m_resting & body1->m_resting;
+			const dInt32 resting = body0->m_resting & body1->m_resting;
 			if (!resting)
 			{
 				dVector preconditioner0(joint->m_preconditioner0);

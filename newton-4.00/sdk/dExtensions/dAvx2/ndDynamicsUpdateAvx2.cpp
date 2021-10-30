@@ -2336,8 +2336,9 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 						const ndBodyKinematic* const body1 = joint->GetBody1();
 						dAssert(body0);
 						dAssert(body1);
-						const dInt32 isSleeping = body0->m_resting & body1->m_resting;
-						if (isSleeping)
+						//const dInt32 isSleeping = body0->m_resting & body1->m_resting;
+						const dInt32 resting = body0->m_resting & body1->m_resting;
+						if (resting)
 						{
 							mask[i] = dFloat32(0.0f);
 						}
