@@ -260,31 +260,35 @@ inline bool dMatrix::TestIdentity() const
 
 inline bool dMatrix::TestOrthogonal(dFloat32 tol) const
 {
+	#ifdef _DEBUG
+		const dMatrix& me = *this;
+		for (dInt32 i = 0; i < 4; i++)
+		{
+			for (dInt32 j = 0; j < 4; j++)
+			{
+				dAssert(dCheckFloat(me[i][j]));
+			}
+		}
+	#endif
+
 	dVector n (m_front.CrossProduct(m_up));
 	dFloat32 a = m_right.DotProduct(m_right).GetScalar();
 	dFloat32 b = m_up.DotProduct(m_up).GetScalar();
 	dFloat32 c = m_front.DotProduct(m_front).GetScalar();
 	dFloat32 d = n.DotProduct(m_right).GetScalar();
-
-#ifdef _DEBUG
-	const dMatrix& me = *this;
-	for (dInt32 i = 0; i < 4; i++) 
+	bool ret =  (m_front[3] == dFloat32(0.0f)) &&
+			    (m_up[3] == dFloat32(0.0f)) &&
+				(m_right[3] == dFloat32(0.0f)) &&
+				(m_posit[3] == dFloat32(1.0f)) &&
+				(dAbs(a - dFloat32(1.0f)) < tol) &&
+				(dAbs(b - dFloat32(1.0f)) < tol) &&
+				(dAbs(c - dFloat32(1.0f)) < tol) &&
+				(dAbs(d - dFloat32(1.0f)) < tol);
+	if (!ret)
 	{
-		for (dInt32 j = 0; j < 4; j++) 
-		{
-			dAssert(dCheckFloat(me[i][j]));
-		}
+		dAssert (0);
 	}
-#endif
-
-	return (m_front[3] == dFloat32 (0.0f)) & 
-		   (m_up[3] == dFloat32 (0.0f)) & 
-		   (m_right[3] == dFloat32 (0.0f)) & 
-		   (m_posit[3] == dFloat32 (1.0f)) &
-		   (dAbs(a - dFloat32 (1.0f)) < tol) & 
-		   (dAbs(b - dFloat32 (1.0f)) < tol) &
-		   (dAbs(c - dFloat32 (1.0f)) < tol) &
-		   (dAbs(d - dFloat32 (1.0f)) < tol); 
+	return ret;
 }
 
 inline bool dMatrix::TestSymetric3x3() const

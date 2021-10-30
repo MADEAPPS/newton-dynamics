@@ -133,8 +133,6 @@ class dConvexHull4d: public dList<dConvexHull4dTetraherum>
 	void LinkSibling (dNode* node0, dNode* node1)	const;
 	bool Sanity() const;
 	dConvexHull4dAABBTreeNode* BuildTree (dConvexHull4dAABBTreeNode* const parent, dConvexHull4dVector* const points, dInt32 count, dInt32 baseIndex, dInt8** const memoryPool, dInt32& maxMemSize) const;
-
-	static dInt32 ConvexCompareVertex(const dConvexHull4dVector* const  A, const dConvexHull4dVector* const B, void* const context);
 	
 	class dgNormalMap
 	{

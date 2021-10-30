@@ -94,7 +94,7 @@ class dConvexHull3d: public dList<dConvexHull3dFace>
 
 	dInt32 GetUniquePoints(dConvexHull3dVertex* const points, const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, void* const memoryPool, dInt32 maxMemSize);
 	dConvexHull3dAABBTreeNode* BuildTree (dConvexHull3dAABBTreeNode* const parent, dConvexHull3dVertex* const points, dInt32 count, dInt32 baseIndex, dInt8** const memoryPool, dInt32& maxMemSize) const;
-	static dInt32 ConvexCompareVertex(const dConvexHull3dVertex* const A, const dConvexHull3dVertex* const B, void* const context);
+	//static dInt32 ConvexCompareVertex(const dConvexHull3dVertex* const A, const dConvexHull3dVertex* const B, void* const context);
 	bool Sanity() const;
 	void Save (const char* const filename) const;
 

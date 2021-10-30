@@ -44,7 +44,6 @@ typedef dFloat32 (*dRayIntersectCallback) (void* const context,
 										   const dFloat32* const polygon, dInt32 strideInBytes,
 										   const dInt32* const indexArray, dInt32 indexCount);
 
-D_CORE_API dInt32 dConvexHull2d(dInt32 count, dVector* const pointArray);
 D_CORE_API dBigVector dPointToRayDistance (const dBigVector& point, const dBigVector& ray_p0, const dBigVector& ray_p1); 
 D_CORE_API dBigVector dPointToTriangleDistance (const dBigVector& point, const dBigVector& p0, const dBigVector& p1, const dBigVector& p2);
 D_CORE_API dBigVector dPointToTetrahedrumDistance (const dBigVector& point, const dBigVector& p0, const dBigVector& p1, const dBigVector& p2, const dBigVector& p3);

@@ -428,11 +428,13 @@ void ndBodyKinematic::IntegrateVelocity(dFloat32 timestep)
 	const dFloat32 tol = (dFloat32(0.0125f) * dDegreeToRad);
 	if (omegaMag2 > (tol * tol))
 	{
-		dFloat32 invOmegaMag = dRsqrt(omegaMag2);
-		dVector omegaAxis(m_omega.Scale(invOmegaMag));
-		dFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
-		dQuaternion rotationStep(omegaAxis, omegaAngle);
-		m_rotation = (m_rotation * rotationStep).Normalize();
+		const dFloat32 invOmegaMag = dRsqrt(omegaMag2);
+		const dVector omegaAxis(m_omega.Scale(invOmegaMag));
+		const dFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
+		const dQuaternion rotationStep(omegaAxis, omegaAngle);
+		const dQuaternion rotation(m_rotation * rotationStep);
+		m_rotation = rotation.Normalize();
+		dAssert((m_rotation.DotProduct(m_rotation).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-5f));
 		m_matrix = dMatrix(m_rotation, m_matrix.m_posit);
 	}
 

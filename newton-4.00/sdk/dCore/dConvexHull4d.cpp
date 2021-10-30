@@ -513,21 +513,6 @@ dInt32 dConvexHull4d::SupportVertex (dConvexHull4dAABBTreeNode** const treePoint
 	return index;
 }
 
-dInt32 dConvexHull4d::ConvexCompareVertex(const dConvexHull4dVector* const  A, const dConvexHull4dVector* const B, void* const)
-{
-	for (dInt32 i = 0; i < 4; i ++) 
-	{
-		if ((*A)[i] < (*B)[i]) 
-		{
-			return -1;
-		} 
-		else if ((*A)[i] > (*B)[i]) 
-		{
-			return 1;
-		}
-	}
-	return 0;
-}
 
 dConvexHull4dAABBTreeNode* dConvexHull4d::BuildTree (dConvexHull4dAABBTreeNode* const parent, dConvexHull4dVector* const points, dInt32 count, dInt32 baseIndex, dInt8** memoryPool, dInt32& maxMemSize) const
 {
@@ -655,13 +640,34 @@ dInt32 dConvexHull4d::InitVertexArray(dConvexHull4dVector* const points, const d
 		points[i].m_mark = 0;
 	}
 
-	dSort(points, count, ConvexCompareVertex);
+	class CompareVertex
+	{
+		public:
+		dInt32 Compare(const dConvexHull4dVector& elementA, const dConvexHull4dVector& elementB, void* const)
+		{
+			for (dInt32 i = 0; i < 4; i++)
+			{
+				if (elementA[i] < elementB[i])
+				{
+					return -1;
+				}
+				else if (elementA[i] > elementB[i])
+				{
+					return 1;
+				}
+			}
+			return 0;
+		}
+	};
+	dSort<dConvexHull4dVector, CompareVertex>(points, count);
+
 	dInt32 indexCount = 0;
+	CompareVertex compareVetex;
 	for (dInt32 i = 1; i < count; i ++) 
 	{
 		for (; i < count; i ++) 
 		{
-			if (ConvexCompareVertex (&points[indexCount], &points[i], nullptr)) 
+			if (compareVetex.Compare (points[indexCount], points[i], nullptr))
 			{
 				indexCount ++;
 				points[indexCount] = points[i];

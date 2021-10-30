@@ -123,19 +123,6 @@ dInt32 dDelaunayTetrahedralization::AddVertex (const dBigVector& vertex)
 	return index;
 }
 
-dInt32 dDelaunayTetrahedralization::CompareVertexByIndex(const dConvexHull4dVector* const A, const dConvexHull4dVector* const B, void* const)
-{
-	if (A->m_index < B ->m_index) 
-	{
-		return -1;
-	} 
-	else if (A->m_index > B->m_index) 
-	{
-		return 1;
-	}
-	return 0;
-}
-
 void dDelaunayTetrahedralization::SortVertexArray ()
 {
 	dConvexHull4dVector* const points = &m_points[0];
@@ -153,7 +140,23 @@ void dDelaunayTetrahedralization::SortVertexArray ()
 		}
 	}
 
-	dSort(points, m_count, CompareVertexByIndex);
+	class CompareVertex
+	{
+		public:
+		dInt32 Compare(const dConvexHull4dVector& elementA, const dConvexHull4dVector& elementB, void* const)
+		{
+			if (elementA.m_index < elementB.m_index)
+			{
+				return -1;
+			}
+			else if (elementA.m_index > elementB.m_index)
+			{
+				return 1;
+			}
+			return 0;
+		}
+	};
+	dSort<dConvexHull4dVector, CompareVertex>(points, m_count);
 }
 
 void dDelaunayTetrahedralization::RemoveUpperHull ()

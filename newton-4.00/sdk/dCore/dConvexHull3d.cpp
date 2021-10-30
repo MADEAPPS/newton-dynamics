@@ -275,18 +275,6 @@ void dConvexHull3d::BuildHull (const dFloat64* const vertexCloud, dInt32 strideI
 #endif
 }
 
-dInt32 dConvexHull3d::ConvexCompareVertex(const dConvexHull3dVertex* const  A, const dConvexHull3dVertex* const B, void* const)
-{
-	for (dInt32 i = 0; i < 3; i ++) {
-		if ((*A)[i] < (*B)[i]) {
-			return -1;
-		} else if ((*A)[i] > (*B)[i]) {
-			return 1;
-		}
-	}
-	return 0;
-}
-
 dConvexHull3dAABBTreeNode* dConvexHull3d::BuildTree (dConvexHull3dAABBTreeNode* const parent, dConvexHull3dVertex* const points, dInt32 count, dInt32 baseIndex, dInt8** memoryPool, dInt32& maxMemSize) const
 {
 	dConvexHull3dAABBTreeNode* tree = nullptr;
@@ -440,13 +428,34 @@ dInt32 dConvexHull3d::GetUniquePoints(dConvexHull3dVertex* const points, const d
 		points[i].m_mark = 0;
 	}
 
-	dSort(points, count, ConvexCompareVertex);
+	class CompareVertex
+	{
+		public:
+		dInt32 Compare(const dConvexHull3dVertex& elementA, const dConvexHull3dVertex& elementB, void* const)
+		{
+			for (dInt32 i = 0; i < 3; i++) 
+			{
+				if (elementA[i] < elementB[i])
+				{
+					return -1;
+				}
+				else if (elementA[i] > elementB[i])
+				{
+					return 1;
+				}
+			}
+			return 0;
+		}
+	};
+	dSort<dConvexHull3dVertex, CompareVertex>(points, count);
 
 	dInt32 indexCount = 0;
+	CompareVertex compareVetex;
 	for (dInt32 i = 1; i < count; i++) 
 	{
-		for (; i < count; i++) {
-			if (ConvexCompareVertex(&points[indexCount], &points[i], nullptr)) 
+		for (; i < count; i++) 
+		{
+			if (compareVetex.Compare(points[indexCount], points[i], nullptr))
 			{
 				indexCount++;
 				points[indexCount] = points[i];

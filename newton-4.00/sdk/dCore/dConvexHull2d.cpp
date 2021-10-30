@@ -23,30 +23,6 @@
 #include "dSort.h"
 #include "dConvexHull2d.h"
 
-static dInt32 CompareVertex(const dVector* const A, const dVector* const B, void*)
-{
-	if (A->m_x < B->m_x) 
-	{
-		return 1;
-	}
-	else if (A->m_x > B->m_x)
-	{
-		return -1;
-	}
-	else
-	{
-		if (A->m_y < B->m_y)
-		{
-			return 1;
-		}
-		else if (A->m_y > B->m_y)
-		{
-			return -1;
-		}
-	}
-	return 0;
-}
-
 static dFloat32 Cross(const dVector &O, const dVector &A, const dVector &B)
 {
 	dVector A0(A - O);
@@ -64,7 +40,34 @@ dInt32 dConvexHull2d(dVector* const vertexCloud2d, dInt32 count)
 	dVector* const hull = dAlloca(dVector, 2 * count);
 
 	// Sort points lexicographically
-	dSort(vertexCloud2d, count, CompareVertex);
+	class CompareVertex
+	{
+		public:
+		dInt32 Compare(const dVector& elementA, const dVector& elementB, void* const)
+		{
+			if (elementA.m_x < elementB.m_x)
+			{
+				return 1;
+			}
+			else if (elementA.m_x > elementB.m_x)
+			{
+				return -1;
+			}
+			else
+			{
+				if (elementA.m_y < elementB.m_y)
+				{
+					return 1;
+				}
+				else if (elementA.m_y > elementB.m_y)
+				{
+					return -1;
+				}
+			}
+			return 0;
+		}
+	};
+	dSort<dVector, CompareVertex>(vertexCloud2d, count);
 
 	// Build lower hull
 	dInt32 k = 0;
