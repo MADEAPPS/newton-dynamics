@@ -206,6 +206,8 @@ void dSort(T* const array, dInt32 elements, void* const context = nullptr)
 template <class T>
 void dSort(T* const array, dInt32 elements, dInt32(*compare) (const T* const  A, const T* const B, void* const context), void* const context = nullptr)
 {
+	//dAssert(0);
+
 	D_TRACKTIME();
 	const dInt32 batchSize = 8;
 	dInt32 stack[1024][2];
@@ -298,105 +300,13 @@ void dSort(T* const array, dInt32 elements, dInt32(*compare) (const T* const  A,
 	#endif
 }
 
-template <class T>
-void dSortIndirect(T** const array, dInt32 elements, dInt32(*compare) (const T* const  A, const T* const B, void* const context), void* const context = nullptr)
-{
-	D_TRACKTIME();
-	const dInt32 batchSize = 8;
-	dInt32 stack[1024][2];
-
-	stack[0][0] = 0;
-	stack[0][1] = elements - 1;
-	dInt32 stackIndex = 1;
-	while (stackIndex) 
-	{
-		stackIndex--;
-		dInt32 lo = stack[stackIndex][0];
-		dInt32 hi = stack[stackIndex][1];
-		if ((hi - lo) > batchSize) 
-		{
-			dInt32 mid = (lo + hi) >> 1;
-			if (compare(array[lo], array[mid], context) > 0) 
-			{
-				dSwap(array[lo], array[mid]);
-			}
-			if (compare(array[mid], array[hi], context) > 0) 
-			{
-				dSwap(array[mid], array[hi]);
-			}
-			if (compare(array[lo], array[mid], context) > 0) 
-			{
-				dSwap(array[lo], array[mid]);
-			}
-			dInt32 i = lo + 1;
-			dInt32 j = hi - 1;
-			T* val(array[mid]);
-			do 
-			{
-				while (compare(array[i], val, context) < 0) i++;
-				while (compare(array[j], val, context) > 0) j--;
-
-				if (i <= j) 
-				{
-					dSwap(array[i], array[j]);
-					i++;
-					j--;
-				}
-			} while (i <= j);
-
-			if (i < hi) 
-			{
-				stack[stackIndex][0] = i;
-				stack[stackIndex][1] = hi;
-				stackIndex++;
-			}
-			if (lo < j) 
-			{
-				stack[stackIndex][0] = lo;
-				stack[stackIndex][1] = j;
-				stackIndex++;
-			}
-			dAssert(stackIndex < dInt32(sizeof(stack) / (2 * sizeof(stack[0][0]))));
-		}
-	}
-
-	dInt32 stride = batchSize + 1;
-	if (elements < stride) 
-	{
-		stride = elements;
-	}
-	for (dInt32 i = 1; i < stride; i++) 
-	{
-		if (compare(array[0], array[i], context) > 0) 
-		{
-			dSwap(array[0], array[i]);
-		}
-	}
-
-	for (dInt32 i = 1; i < elements; i++) 
-	{
-		dInt32 j = i;
-		T* tmp(array[i]);
-		for (; compare(array[j - 1], tmp, context) > 0; j--) 
-		{
-			dAssert(j > 0);
-			array[j] = array[j - 1];
-		}
-		array[j] = tmp;
-	}
-
-	#ifdef _DEBUG
-	for (dInt32 i = 0; i < (elements - 1); i++) 
-	{
-		dAssert(compare(array[i], array[i + 1], context) <= 0);
-	}
-	#endif
-}
-
 
 //template <class T>
-//void dgRadixSort(T* const array, T* const tmpArray, dInt32 elements, dInt32 radixPass, dInt32(*getRadixKey) (const T* const  A, void* const context), void* const context = nullptr)
-//{
+//void dCountingSort(T* const array, T* const tmpArray, dInt32 elements, dInt32 radixPass, dInt32(*getRadixKey) (const T* const  A, void* const context), void* const context = nullptr)
+template <class T, dInt32 bits, class EvaluateKey, class key>
+void dCountingSort(T* const array, T* const scratchBuffer, dInt32 elementsCount, dInt32 digitLocation)
+{
+	dAssert(0);
 //	dInt32 scanCount[256];
 //	dInt32 histogram[256][4];
 //
@@ -458,7 +368,7 @@ void dSortIndirect(T** const array, dInt32 elements, dInt32(*compare) (const T* 
 //		dAssert(getRadixKey(&array[i], context) <= getRadixKey(&array[i + 1], context));
 //	}
 //#endif
-//}
+}
 
 
 #endif

@@ -745,20 +745,6 @@ dFloat64 ndShapeCompound::CalculateEntropy(dInt32 count, ndNodeBase** array)
 	return cost0;
 }
 
-dInt32 ndShapeCompound::CompareNodes(const ndNodeBase* const nodeA, const ndNodeBase* const nodeB, void*)
-{
-	dFloat32 areaA = nodeA->m_area;
-	dFloat32 areaB = nodeB->m_area;
-	if (areaA < areaB) 
-	{
-		return -1;
-	}
-	if (areaA > areaB) 
-	{
-		return 1;
-	}
-	return 0;
-}
 
 ndShapeCompound::ndNodeBase* ndShapeCompound::BuildTopDown(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory, dInt32& rootIndex)
 {
@@ -900,7 +886,25 @@ void ndShapeCompound::EndAddRemove()
 					}
 				}
 		
-				dSortIndirect(&leafArray[0], leafNodesCount, CompareNodes);
+				class CompareNodes
+				{
+					public:
+					dInt32 Compare(const ndNodeBase* const elementA, const ndNodeBase* const elementB, void* const)
+					{
+						dFloat32 areaA = elementA->m_area;
+						dFloat32 areaB = elementB->m_area;
+						if (areaA < areaB)
+						{
+							return 1;
+						}
+						if (areaA > areaB)
+						{
+							return -1;
+						}
+						return 0;
+					}
+				};
+				dSort<ndNodeBase*, CompareNodes>(leafArray, leafNodesCount);
 
 				dInt32 rootIndex = 0;
 				m_root = BuildTopDownBig(&leafArray[0], 0, leafNodesCount - 1, nodeArray, rootIndex);

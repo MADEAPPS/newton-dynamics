@@ -1727,7 +1727,7 @@ void ndMeshEffect::dPointFormat::CompressData(dInt32* const indexList)
 	class CompareKey
 	{
 		public:
-		dInt32 Compare(const dFormat::dSortKey& elementA, const dFormat::dSortKey& elementB, void* context)
+		dInt32 Compare(const dFormat::dSortKey& elementA, const dFormat::dSortKey& elementB, void* const context)
 		{
 			return ndMeshEffect::dFormat::CompareVertex(&elementA, &elementB, context);
 		}
@@ -1839,7 +1839,7 @@ void ndMeshEffect::dAttibutFormat::CompressData(const dPointFormat& points, dInt
 	class CompareKey
 	{
 		public:
-		dInt32 Compare(const dFormat::dSortKey& elementA, const dFormat::dSortKey& elementB, void* context)
+		dInt32 Compare(const dFormat::dSortKey& elementA, const dFormat::dSortKey& elementB, void* const context)
 		{
 			return ndMeshEffect::dFormat::CompareVertex(&elementA, &elementB, context);
 		}

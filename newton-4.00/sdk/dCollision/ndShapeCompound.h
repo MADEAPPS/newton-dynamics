@@ -86,7 +86,6 @@ class ndShapeCompound: public ndShape
 	void SetSubShapeOwner(ndBodyKinematic* const body);
 	void ImproveNodeFitness(ndNodeBase* const node) const;
 	dFloat64 CalculateEntropy(dInt32 count, ndNodeBase** array);
-	static dInt32 CompareNodes(const ndNodeBase* const nodeA, const ndNodeBase* const nodeB, void*);
 	ndNodeBase* BuildTopDown(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory, dInt32& rootIndex);
 	ndNodeBase* BuildTopDownBig(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory, dInt32& rootIndex);
 	dFloat32 CalculateSurfaceArea(ndNodeBase* const node0, ndNodeBase* const node1, dVector& minBox, dVector& maxBox) const;
