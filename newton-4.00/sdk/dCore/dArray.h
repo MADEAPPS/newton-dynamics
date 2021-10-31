@@ -193,8 +193,9 @@ void dArray<T>::Resize(dInt32 size)
 			}
 			dMemory::Free(m_array);
 		}
-		m_array = newArray;
+		m_size = size;
 		m_capacity = size;
+		m_array = newArray;
 	}
 }
 

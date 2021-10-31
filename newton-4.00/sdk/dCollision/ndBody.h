@@ -64,14 +64,20 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 	D_COLLISION_API void SetCentreOfMass(const dVector& com);
 
 	ndBodyNotify* GetNotifyCallback() const;
+
+	
+	dVector GetOmega() const;
+	dMatrix GetMatrix() const;
+	dVector GetVelocity() const;
+	dVector GetPosition() const;
+	dQuaternion GetRotation() const;
+	dVector GetGlobalGetCentreOfMass() const;
+
 	D_COLLISION_API void SetNotifyCallback(ndBodyNotify* const notify);
-	D_COLLISION_API dVector GetOmega() const;
 	D_COLLISION_API void SetOmega(const dVector& veloc);
-	D_COLLISION_API dVector GetVelocity() const;
 	D_COLLISION_API void SetVelocity(const dVector& veloc);
-	D_COLLISION_API dMatrix GetMatrix() const;
 	D_COLLISION_API void SetMatrix(const dMatrix& matrix);
-	D_COLLISION_API dQuaternion GetRotation() const;
+	
 	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
 	D_COLLISION_API dVector GetVelocityAtPoint(const dVector& point) const;
@@ -123,7 +129,6 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 	friend class ndBodyPlayerCapsuleImpulseSolver;
 } D_GCC_NEWTON_ALIGN_32;
 
-
 inline dUnsigned32 ndBody::GetId() const
 {
 	return m_uniqueId;
@@ -132,6 +137,26 @@ inline dUnsigned32 ndBody::GetId() const
 inline ndBodyNotify* ndBody::GetNotifyCallback() const
 {
 	return m_notifyCallback;
+}
+
+inline dMatrix ndBody::GetMatrix() const
+{
+	return m_matrix;
+}
+
+inline dVector ndBody::GetPosition() const
+{
+	return m_matrix.m_posit;
+}
+
+inline dQuaternion ndBody::GetRotation() const
+{
+	return m_rotation;
+}
+
+inline dVector ndBody::GetGlobalGetCentreOfMass() const
+{
+	return m_globalCentreOfMass;
 }
 
 inline dVector ndBody::GetVelocity() const

@@ -128,16 +128,6 @@ void ndBody::SetVelocity(const dVector& veloc)
 	m_veloc = veloc;
 }
 
-dMatrix ndBody::GetMatrix() const
-{
-	return m_matrix;
-}
-
-dQuaternion ndBody::GetRotation() const
-{
-	return m_rotation;
-}
-
 void ndBody::SetMatrix(const dMatrix& matrix)
 {
 	m_equilibrium = 0;
