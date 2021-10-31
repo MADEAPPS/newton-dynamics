@@ -186,7 +186,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	//BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 	
 	origin.m_z += 6.0f;
-	BuildCylinderStack(scene, 10.0f, origin, dVector(0.75f, 0.6f, 1.0f, 0.0f), 15);
+	BuildCylinderStack(scene, 10.0f, origin, dVector(0.75f, 0.6f, 1.0f, 0.0f), 20);
 
 	dQuaternion rot(dYawMatrix (45.0f * dDegreeToRad));
 	origin = dVector::m_zero;

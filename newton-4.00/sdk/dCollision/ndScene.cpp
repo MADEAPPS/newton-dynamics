@@ -792,7 +792,6 @@ bool ndScene::ValidateContactCache(ndContact* const contact, const dVector& time
 	ndBodyKinematic* const body0 = contact->GetBody0();
 	ndBodyKinematic* const body1 = contact->GetBody1();
 
-	//dVector positStep(timestep * (body0->m_residual_Veloc - body1->m_residual_Veloc));
 	dVector positStep(timestep * (body0->m_veloc - body1->m_veloc));
 	positStep = ((positStep.DotProduct(positStep)) > m_velocTol) & positStep;
 	contact->m_positAcc += positStep;
@@ -801,7 +800,6 @@ bool ndScene::ValidateContactCache(ndContact* const contact, const dVector& time
 	dVector positSign(dVector::m_negOne & (positError2 < m_linearContactError2));
 	if (positSign.GetSignMask())
 	{
-		//dVector rotationStep(timestep * (body0->m_residual_Omega - body1->m_residual_Omega));
 		dVector rotationStep(timestep * (body0->m_omega - body1->m_omega));
 		rotationStep = ((rotationStep.DotProduct(rotationStep)) > m_velocTol) & rotationStep;
 		contact->m_rotationAcc = contact->m_rotationAcc * dQuaternion(rotationStep.m_x, rotationStep.m_y, rotationStep.m_z, dFloat32(1.0f));
