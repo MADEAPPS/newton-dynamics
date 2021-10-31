@@ -101,7 +101,7 @@ class ndScene : public dThreadPool
 	template <class T> 
 	void SubmitJobs(void* const context = nullptr);
 
-	template <class T, dInt32 bits, class EvaluateKey, class key = dUnsigned32>
+	template <class T, dInt32 bits, class dEvaluateKey, class dKey = dUnsigned32>
 	void CountingSort(T* const array, T* const scratchBuffer, dInt32 elements, dInt32 digitLocation);
 
 	dFloat32 GetTimestep() const;
@@ -280,7 +280,7 @@ inline dFloat32 ndScene::CalculateSurfaceArea(const ndSceneNode* const node0, co
 	return side0.DotProduct(side0.ShiftTripleRight()).GetScalar();
 }
 
-template <class T, dInt32 bits, class EvaluateKey, class key>
+template <class T, dInt32 bits, class dEvaluateKey, class dKey>
 void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elementsCount, dInt32 digitLocation)
 {
 	class ndInfo
@@ -311,19 +311,19 @@ void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elemen
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : info.m_elementCount - start;
 			
 			const dInt32 digitCount = 1 << bits;
-			const key digitMask = digitCount - 1;
+			const dKey digitMask = digitCount - 1;
 			const dInt32 shiftBits = info.m_digitNumber * bits;
 
 			dInt32* const digitBuffer = &info.m_digitScan[threadIndex][0];
 			memset(digitBuffer, 0, digitCount * sizeof(dInt32));
 						
-			const EvaluateKey evaluator;
+			const dEvaluateKey evaluator;
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				const T data(info.m_sourceBuffer[i + start]);
 				info.m_scratchBuffer[i + start] = data;
 
-				const key key = evaluator.GetKey(data);
+				const dKey key = evaluator.GetKey(data);
 				const dInt32 entry = dInt32 ((key >> shiftBits) & digitMask);
 				digitBuffer[entry] ++;
 			}
@@ -348,15 +348,15 @@ void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elemen
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : info.m_elementCount - start;
 
 			const dInt32 digitCount = 1 << bits;
-			const key digitMask = digitCount - 1;
+			const dKey digitMask = digitCount - 1;
 			const dInt32 shiftBits = info.m_digitNumber * bits;
 			dInt32* const digitBuffer = &info.m_digitScan[threadIndex][0];
 
-			const EvaluateKey evaluator;
+			const dEvaluateKey evaluator;
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				const T data(info.m_scratchBuffer[i + start]);
-				const key key = evaluator.GetKey(data);
+				const dKey key = evaluator.GetKey(data);
 				const dInt32 digitEntry = dInt32((key >> shiftBits) & digitMask);
 				const dInt32 dstIndex = digitBuffer[digitEntry];
 				info.m_sourceBuffer[dstIndex] = data;
@@ -390,14 +390,14 @@ void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elemen
 
 	#ifdef _DEBUG
 		const dInt32 digitCount = 1 << bits;
-		const key digitMask = digitCount - 1;
+		const dKey digitMask = digitCount - 1;
 		const dInt32 shiftBits = info.m_digitNumber * bits;
 
-		const EvaluateKey evaluator;
+		const dEvaluateKey evaluator;
 		for (dInt32 i = elementsCount - 1; i; i--)
 		{
-			const key key0 = evaluator.GetKey(array[i - 1]);
-			const key key1 = evaluator.GetKey(array[i - 0]);
+			const dKey key0 = evaluator.GetKey(array[i - 1]);
+			const dKey key1 = evaluator.GetKey(array[i - 0]);
 			const dInt32 digitEntry0 = dInt32((key0 >> shiftBits) & digitMask);
 			const dInt32 digitEntry1 = dInt32((key1 >> shiftBits) & digitMask);
 			dAssert(digitEntry0 <= digitEntry1);
