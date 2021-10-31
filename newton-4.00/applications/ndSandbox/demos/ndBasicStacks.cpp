@@ -86,7 +86,7 @@ static void BuildCylinderStack(ndDemoEntityManager* const scene, dFloat32 mass, 
 	baseMatrix.m_posit.m_z = origin.m_z;
 
 	dVector floor(FindFloor(*world, baseMatrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y * 0.5f;
+	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_z * 0.5f;
 
 	ndShapeInstance shape(new ndShapeCylinder(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z));
 	shape.SetLocalMatrix(dRollMatrix(dPi * 0.5f));
@@ -169,21 +169,21 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 
 	dInt32 pyramidHigh = 30;
 	dVector origin(dVector::m_zero);
-	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
-	
-	origin.m_x += 4.0f;
-	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
-	
-	origin.m_x += 4.0f;
-	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
-	
-	origin.m_x += 4.0f;
-	BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
-	
-	origin = dVector::m_zero;
-	origin.m_x -= 2.0f;
-	origin.m_z -= 3.0f;
-	BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
+	//
+	//origin.m_x += 4.0f;
+	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
+	//
+	//origin.m_x += 4.0f;
+	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
+	//
+	//origin.m_x += 4.0f;
+	//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
+	//
+	//origin = dVector::m_zero;
+	//origin.m_x -= 2.0f;
+	//origin.m_z -= 3.0f;
+	//BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 	
 	origin.m_z += 6.0f;
 	BuildCylinderStack(scene, 10.0f, origin, dVector(0.75f, 0.6f, 1.0f, 0.0f), 15);
