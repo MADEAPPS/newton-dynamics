@@ -156,7 +156,8 @@ class OpenclSystem: public dClassAlloc
 		size_t m_workWroupSize;
 	};
 
-	OpenclSystem(cl_context context, cl_platform_id platform)
+	//OpenclSystem(cl_context context, cl_platform_id platform)
+	OpenclSystem(cl_context context, cl_platform_id)
 		:m_context(context)
 		////,m_bodyArray(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR)
 		//,m_bodyArray(CL_MEM_READ_ONLY)
@@ -171,19 +172,23 @@ class OpenclSystem: public dClassAlloc
 		dAssert(err == CL_SUCCESS);
 		
 		// get vendor driver support
-		size_t stringLength = 0;
-		err = clGetPlatformInfo(platform, CL_PLATFORM_NAME, 0, nullptr, &stringLength);
+		size_t stringLength;
+		//err = clGetPlatformInfo(platform, CL_PLATFORM_NAME, 0, nullptr, &stringLength);
+		//dAssert(err == CL_SUCCESS);
+		//dAssert(stringLength < sizeof(m_platformName));
+		//err = clGetPlatformInfo(platform, CL_PLATFORM_NAME, stringLength, m_platformName, nullptr);
+		//dAssert(err == CL_SUCCESS);
+
+		char deviceName[1024];
+		err = clGetDeviceInfo(m_device, CL_DEVICE_NAME, sizeof (deviceName), deviceName, &stringLength);
 		dAssert(err == CL_SUCCESS);
-		dAssert(stringLength < sizeof(m_platformName));
-		err = clGetPlatformInfo(platform, CL_PLATFORM_NAME, stringLength, m_platformName, nullptr);
+
+		char driverVersion[1024];
+		err = clGetDeviceInfo(m_device, CL_DEVICE_VERSION, sizeof(driverVersion), driverVersion, &stringLength);
 		dAssert(err == CL_SUCCESS);
-		
-		// get opencl version
-		err = clGetDeviceInfo(m_device, CL_DEVICE_VERSION, 0, NULL, &stringLength);
-		dAssert(err == CL_SUCCESS);
-		dAssert(stringLength < sizeof(m_platformName));
-		err = clGetDeviceInfo(m_device, CL_DEVICE_VERSION, stringLength, m_platformName, nullptr);
-		dAssert(err == CL_SUCCESS);
+		dAssert((strlen(deviceName) + strlen(driverVersion) + 8) < sizeof(m_platformName));
+
+		sprintf(m_platformName, "%s: %s", deviceName, driverVersion);
 		
 		// create command queue
 		cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
