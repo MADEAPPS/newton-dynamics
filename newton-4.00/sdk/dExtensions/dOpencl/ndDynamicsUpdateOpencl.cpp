@@ -217,7 +217,11 @@ class OpenclSystem: public dClassAlloc
 		dAssert(err == CL_SUCCESS);
 		dAssert((strlen(deviceName) + strlen(driverVersion) + 8) < sizeof(m_platformName));
 
-		sprintf(m_platformName, "%s: %s", deviceName, driverVersion);
+		// linux does not like this;
+		//sprintf(m_platformName, "%s: %s", deviceName, driverVersion);
+		strcpy(m_platformName, deviceName);
+		strcat(m_platformName, ": ");
+		strcat(m_platformName, driverVersion);
 		
 		// create command queue
 		cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
