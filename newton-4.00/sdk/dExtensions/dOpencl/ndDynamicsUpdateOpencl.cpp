@@ -28,23 +28,28 @@
 #include "ndDynamicsUpdateOpencl.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_GPU_WORK_GROUP		128
 
-#if 0
+#define D_OPENCL_BUFFER_SIZE	1024
+
 template<class T>
 class dOpenclBuffer: public dArray<T>
 {
 	public:
 	dOpenclBuffer(cl_mem_flags flags)
-		:dArray<T>(D_DEFAULT_BUFFER_SIZE)
+		:dArray<T>()
 		,m_flags(flags)
 		,m_gpuBuffer(nullptr)
 	{
-		//SetCount(D_DEFAULT_BUFFER_SIZE);
-		dArray<T>::SetCount(D_DEFAULT_BUFFER_SIZE * 10);
 	}
 
 	~dOpenclBuffer()
+	{
+		m_size = 0;
+		m_capacity = 0;
+		dAssert(!m_gpuBuffer);
+	}
+
+	void Cleanup()
 	{
 		if (m_gpuBuffer)
 		{
@@ -52,31 +57,35 @@ class dOpenclBuffer: public dArray<T>
 			err = clReleaseMemObject(m_gpuBuffer);
 			dAssert(err == CL_SUCCESS);
 		}
+		m_size = 0;
+		m_capacity = 0;
+		m_gpuBuffer = nullptr;
 	}
 
 	void SyncSize(cl_context context, dInt32 size)
 	{
-		cl_int err;
+		cl_int err = 0;
 
 		if (m_gpuBuffer == nullptr)
 		{
 			if (m_flags & CL_MEM_USE_HOST_PTR)
 			{
-				void* const hostBuffer = &(*this)[0];
-				m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * dArray<T>::GetCapacity(), hostBuffer, &err);
+				dAssert(0);
+				//void* const hostBuffer = &(*this)[0];
+				//m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * dArray<T>::GetCapacity(), hostBuffer, &err);
 			}
 			else
 			{
-				m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * dArray<T>::GetCapacity(), nullptr, &err);
+				m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * size, nullptr, &err);
 			}
+			m_size = size;
+			m_capacity = size;
 			dAssert(err == CL_SUCCESS);
 		}
-
-		if (dArray<T>::GetCapacity() < size)
+		else
 		{
 			dAssert(0);
 		}
-		dArray<T>::SetCount(size);
 	}
 
 	void ReadData(cl_command_queue commandQueue)
@@ -102,43 +111,58 @@ class dOpenclBuffer: public dArray<T>
 	cl_mem m_gpuBuffer;
 };
 
-class ndOpenclBodyProxy
+class ndOpenclBodyBuffer
 {
 	public:
-	cl_float4 m_rotation;
-	cl_float3 m_position;
-	cl_float3 m_veloc;
-	cl_float3 m_omega;
-	cl_float4 m_invMass;
+	ndOpenclBodyBuffer()
+		:m_rotation(CL_MEM_READ_WRITE)
+		,m_posit(CL_MEM_READ_WRITE)
+		,m_omega(CL_MEM_READ_WRITE)
+		,m_veloc(CL_MEM_READ_WRITE)
+		,m_alpha(CL_MEM_READ_WRITE)
+		,m_accel(CL_MEM_READ_WRITE)
+	{
+	}
+
+	~ndOpenclBodyBuffer()
+	{
+	}
+
+	void Cleanup()
+	{
+		m_rotation.Cleanup();
+		m_posit.Cleanup();
+		m_omega.Cleanup();
+		m_veloc.Cleanup();
+		m_alpha.Cleanup();
+		m_accel.Cleanup();
+	}
+
+	void Resize(cl_context context, dArray<ndBodyKinematic*>& bodyArray)
+	{
+		if (m_rotation.GetCount() < bodyArray.GetCount())
+		{
+			dInt32 size = dMax(m_rotation.GetCount(), D_OPENCL_BUFFER_SIZE);
+			while (size < bodyArray.GetCount())
+			{
+				size *= 2;
+			}
+			m_rotation.SyncSize(context, size);
+			m_posit.SyncSize(context, size);
+			m_omega.SyncSize(context, size);
+			m_veloc.SyncSize(context, size);
+			m_alpha.SyncSize(context, size);
+			m_accel.SyncSize(context, size);
+		}
+	}
+
+	dOpenclBuffer<cl_float4> m_rotation;
+	dOpenclBuffer<cl_float4> m_posit;
+	dOpenclBuffer<cl_float4> m_omega;
+	dOpenclBuffer<cl_float4> m_veloc;
+	dOpenclBuffer<cl_float4> m_alpha;
+	dOpenclBuffer<cl_float4> m_accel;
 };
-
-//class ndOpenclOutBodyProxy
-//{
-//	public:
-//	cl_float3 m_matrix[3];
-//	cl_float3 m_position;
-//	cl_float4 m_rotation;
-//	cl_float3 m_veloc;
-//	cl_float3 m_omega;
-//};
-
-class ndOpenclMatrix3x3
-{
-	//cl_float3 m_matrix[3];
-};
-
-
-class ndOpenclBodyWorkingBuffer
-{
-	public:
-	//ndOpenclMatrix3x3 m_matrix;
-	cl_float4 m_rotation;
-	cl_float3 m_position;
-	cl_float3 m_veloc;
-	cl_float3 m_omega;
-};
-
-#endif
 
 class OpenclSystem: public dClassAlloc
 {
@@ -156,15 +180,10 @@ class OpenclSystem: public dClassAlloc
 		size_t m_workWroupSize;
 	};
 
-	//OpenclSystem(cl_context context, cl_platform_id platform)
 	OpenclSystem(cl_context context, cl_platform_id)
 		:m_context(context)
-		////,m_bodyArray(CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR)
-		//,m_bodyArray(CL_MEM_READ_ONLY)
-		////,m_outBodyArray(CL_MEM_WRITE_ONLY)
-		//,m_bodyWorkingArray(CL_MEM_READ_WRITE)
+		,m_bodyArray()
 		,m_integrateBodies()
-		//,m_integrateUnconstrainedBodies(nullptr)
 	{
 		cl_int err;
 		// get the device
@@ -204,6 +223,8 @@ class OpenclSystem: public dClassAlloc
 	~OpenclSystem()
 	{
 		cl_int err;
+
+		m_bodyArray.Cleanup();
 
 		err = clReleaseKernel(m_integrateBodies.m_kernel);
 		dAssert(err == CL_SUCCESS);
@@ -306,68 +327,35 @@ class OpenclSystem: public dClassAlloc
 		err = clGetKernelWorkGroupInfo(kerner.m_kernel, m_device, CL_KERNEL_WORK_GROUP_SIZE, sizeof(kerner.m_workWroupSize), &kerner.m_workWroupSize, nullptr);
 		dAssert(err == CL_SUCCESS);
 	}
-	
-#if 0	
-	dOpenclBuffer<ndOpenclBodyProxy> m_bodyArray;
-	dOpenclBuffer<ndOpenclBodyWorkingBuffer> m_bodyWorkingArray;
-//	dOpenclBuffer<ndOpenclOutBodyProxy> m_outBodyArray;
 
+	void Resize(dArray<ndBodyKinematic*>& bodyArray)
+	{
+		m_bodyArray.Resize(m_context, bodyArray);
+	}
 
-#endif
-
+	ndOpenclBodyBuffer m_bodyArray;
 	char m_platformName[128];
-
 	// Regular OpenCL objects:
 	cl_context m_context;					// hold the context handler
 	cl_device_id m_device;					// hold the selected device handler
 	cl_program	m_solverProgram;			// hold the program handler
 	cl_command_queue m_commandQueue;		// hold the commands-queue handler
 
-
 	ndKernel m_integrateBodies;
-	//cl_kernel m_integrateUnconstrainedBodies;
 	static const char* m_kernelSource;
 };
 
 const char* OpenclSystem::m_kernelSource = R""""(
 
-struct ndOpenclMatrix3x3
-{
-	float3 m_element[3];
-}; 
-
-struct ndOpenclBodyProxy 
+struct ndOpenclBodyBuffer
 { 
-	float4 m_rotation; 
-	float3 m_position; 
-	float3 m_veloc;	
-	float3 m_omega;	
-	float4 m_invMass; 
-}; 
-
-struct ndOpenclBodyWorkingBuffer
-{ 
-	//struct ndOpenclMatrix3x3 m_matrix; 
-	//float4 m_rotation; 
-	//float3 m_position; 
-	//float3 m_veloc;	
-	//float3 m_omega;	
-	//int m_isdynamic;
 	float4* m_rotation; 
 	float4* m_posit; 
 	float4* m_omega;
 	float4* m_veloc;
 	float4* m_alpha;
 	float4* m_accel;
-	bool* m_isdynamic;
-	bool* m_equilibrium;
 }; 
-
-struct ndOpenclMatrix3x3 QuatToMatrix(float4 rotation) 
-{ 
-	struct ndOpenclMatrix3x3 matrix; 
-	return matrix; 
-} 
 
 float4 MakeQuat(float4 axis, float angle)
 {
@@ -443,7 +431,7 @@ __kernel void IntegrateBodies(
 	rotationBuffer[globalIndex] = rotation; 
 } 
 
-__kernel void IntegrateUnconstrainedBodies(float timestep, int bodyCount, __global struct ndOpenclBodyProxy* inputArray, __global struct ndOpenclBodyWorkingBuffer* outputArray) 
+__kernel void IntegrateUnconstrainedBodies(float timestep, int bodyCount, __global struct ndOpenclBodyBuffer* inputArray, __global struct ndOpenclBodyBuffer* outputArray) 
 { 
 	const int globalIndex = get_global_id(0); 
 	if (globalIndex >= bodyCount) 
@@ -1354,6 +1342,8 @@ void ndDynamicsUpdateOpencl::IntegrateBodies()
 			}
 		}
 	};
+
+	m_opencl->Resize(GetBodyIslandOrder());
 
 	ndScene* const scene = m_world->GetScene();
 	scene->SubmitJobs<ndIntegrateBodies>();

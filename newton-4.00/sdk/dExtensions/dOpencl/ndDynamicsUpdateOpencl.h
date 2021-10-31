@@ -59,6 +59,8 @@ class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 	void DetermineSleepStates();
 	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
+
+
 	OpenclSystem* m_opencl;
 };
 
