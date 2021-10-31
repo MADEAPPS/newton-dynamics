@@ -27,7 +27,7 @@
 class ndBody;
 
 D_MSV_NEWTON_ALIGN_32
-class ndBodyNotify: public dClassAlloc
+class ndBodyNotify : public dContainersFreeListAlloc<ndBodyNotify>
 {
 	public:  
 	D_CLASS_REFLECTION(ndBodyNotify);
@@ -54,7 +54,7 @@ class ndBodyNotify: public dClassAlloc
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndBodyNotify::ndBodyNotify(const dVector& defualtGravity)
-	:dClassAlloc()
+	:dContainersFreeListAlloc<ndBodyNotify>()
 	,m_defualtGravity(defualtGravity & dVector::m_triplexMask)
 	,m_body(nullptr)
 {

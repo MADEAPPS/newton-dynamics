@@ -76,15 +76,17 @@ class dFreeListDictionary: public dFixSizeArray<dFreeListHeader, D_FREELIST_DICT
 
 	void* Malloc(dInt32 size)
 	{
-		dScopeSpinLock lock(m_lock);
-		dFreeListHeader* const header = FindEntry(dMemory::CalculateBufferSize(size));
-		dAssert(header->m_count >= 0);
-		if (header->m_count)
 		{
-			header->m_count--;
-			dFreeListEntry* const self = header->m_headPointer;
-			header->m_headPointer = self->m_next;
-			return self;
+			dScopeSpinLock lock(m_lock);
+			dFreeListHeader* const header = FindEntry(dMemory::CalculateBufferSize(size));
+			dAssert(header->m_count >= 0);
+			if (header->m_count)
+			{
+				header->m_count--;
+				dFreeListEntry* const self = header->m_headPointer;
+				header->m_headPointer = self->m_next;
+				return self;
+			}
 		}
 		void* const ptr = dMemory::Malloc(size);
 		dAssert(dMemory::GetSize(ptr) == dMemory::CalculateBufferSize(size));
@@ -149,12 +151,12 @@ class dFreeListDictionary: public dFixSizeArray<dFreeListHeader, D_FREELIST_DICT
 			}
 		}
 
-#ifdef _DEBUG
-		for (dInt32 i = 0; i < GetCount(); i++)
-		{
-			dAssert(me[i].m_schunkSize != size);
-		}
-#endif
+		#ifdef _DEBUG
+			for (dInt32 i = 0; i < GetCount(); i++)
+			{
+				dAssert(me[i].m_schunkSize != size);
+			}
+		#endif
 
 		dFreeListHeader header;
 		header.m_count = 0;

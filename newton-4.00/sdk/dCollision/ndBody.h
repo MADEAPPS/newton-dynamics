@@ -37,7 +37,7 @@ class ndBodyTriggerVolume;
 class ndJointBilateralConstraint;
 
 D_MSV_NEWTON_ALIGN_32
-class ndBody: public dClassAlloc
+class ndBody : public dContainersFreeListAlloc<ndBody>
 {
 	public:
 	D_CLASS_REFLECTION(ndBody);

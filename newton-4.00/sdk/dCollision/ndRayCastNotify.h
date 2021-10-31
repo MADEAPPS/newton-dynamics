@@ -27,7 +27,7 @@
 #include "ndContact.h"
 
 D_MSV_NEWTON_ALIGN_32
-class ndRayCastNotify
+class ndRayCastNotify : public dClassAlloc
 {
 	public: 
 	ndRayCastNotify()

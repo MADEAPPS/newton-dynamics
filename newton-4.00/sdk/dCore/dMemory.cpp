@@ -45,7 +45,6 @@ dInt32 dMemory::CalculateBufferSize(size_t size)
 
 void* dMemory::Malloc(size_t size)
 {
-	//size += 2 * D_MEMORY_ALIGMNET - 1;
 	size += dGetBufferSize;
 	void* const ptr = m_allocMemory(size);
 	dInt64 val = dUnsigned64(ptr) + dGetBufferSize;

@@ -40,7 +40,7 @@ class ndBodiesInAabbNotify;
 class ndJointBilateralConstraint;
 
 D_MSV_NEWTON_ALIGN_32
-class ndSceneTreeNotiFy
+class ndSceneTreeNotiFy : public dClassAlloc
 {
 	public:
 	ndSceneTreeNotiFy()

@@ -30,7 +30,7 @@ class ndScene;
 class ndShapeInstance;
 
 D_MSV_NEWTON_ALIGN_32
-class ndConvexCastNotify
+class ndConvexCastNotify : public dClassAlloc
 {
 	public: 
 	ndConvexCastNotify()

@@ -26,7 +26,7 @@
 
 
 D_MSV_NEWTON_ALIGN_32
-class ndBodiesInAabbNotify
+class ndBodiesInAabbNotify : public dClassAlloc
 {
 	public: 
 	ndBodiesInAabbNotify()

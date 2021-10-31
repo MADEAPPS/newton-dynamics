@@ -1068,13 +1068,9 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		dAssert(contactPoint->m_normal.m_w == dFloat32(0.0f));
 	}
 	
-	if (count) 
+	for (dInt32 i = 0; i < count; i++) 
 	{
-		//dScopeSpinLock lock(m_contactLock);
-		for (dInt32 i = 0; i < count; i++) 
-		{
-			contactPointList.Remove(nodes[i]);
-		}
+		contactPointList.Remove(nodes[i]);
 	}
 	
 	contact->m_maxDOF = dUnsigned32(3 * contactPointList.GetCount());

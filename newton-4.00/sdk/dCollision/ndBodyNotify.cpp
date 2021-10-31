@@ -27,7 +27,7 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyNotify)
 
 ndBodyNotify::ndBodyNotify(const dLoadSaveBase::dLoadDescriptor& desc)
-	:dClassAlloc()
+	:dContainersFreeListAlloc<ndBodyNotify>()
 	,m_body(nullptr)
 {
 	const nd::TiXmlNode* const rootNode = desc.m_rootNode;
