@@ -37,78 +37,83 @@ class dOpenclBuffer: public dArray<T>
 	public:
 	dOpenclBuffer(cl_mem_flags flags)
 		:dArray<T>()
-		,m_flags(flags)
 		,m_gpuBuffer(nullptr)
+		,m_flags(flags)
 	{
 	}
 
 	~dOpenclBuffer()
 	{
-		m_size = 0;
-		m_capacity = 0;
-		dAssert(!m_gpuBuffer);
+		dAssert(0);
+		//m_size = 0;
+		//m_capacity = 0;
+		//dAssert(!m_gpuBuffer);
 	}
 
 	void Cleanup()
 	{
-		if (m_gpuBuffer)
-		{
-			cl_int err;
-			err = clReleaseMemObject(m_gpuBuffer);
-			dAssert(err == CL_SUCCESS);
-		}
-		m_size = 0;
-		m_capacity = 0;
-		m_gpuBuffer = nullptr;
+		dAssert(0);
+		//if (m_gpuBuffer)
+		//{
+		//	cl_int err;
+		//	err = clReleaseMemObject(m_gpuBuffer);
+		//	dAssert(err == CL_SUCCESS);
+		//}
+		//m_size = 0;
+		//m_capacity = 0;
+		//m_gpuBuffer = nullptr;
 	}
 
 	void SyncSize(cl_context context, dInt32 size)
 	{
-		cl_int err = 0;
-
-		if (m_gpuBuffer == nullptr)
-		{
-			if (m_flags & CL_MEM_USE_HOST_PTR)
-			{
-				dAssert(0);
-				//void* const hostBuffer = &(*this)[0];
-				//m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * dArray<T>::GetCapacity(), hostBuffer, &err);
-			}
-			else
-			{
-				m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * size, nullptr, &err);
-			}
-			m_size = size;
-			m_capacity = size;
-			dAssert(err == CL_SUCCESS);
-		}
-		else
-		{
-			dAssert(0);
-		}
+		dAssert(0);
+		//cl_int err = 0;
+		//
+		//if (m_gpuBuffer == nullptr)
+		//{
+		//	if (m_flags & CL_MEM_USE_HOST_PTR)
+		//	{
+		//		dAssert(0);
+		//		//void* const hostBuffer = &(*this)[0];
+		//		//m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * dArray<T>::GetCapacity(), hostBuffer, &err);
+		//	}
+		//	else
+		//	{
+		//		m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * size, nullptr, &err);
+		//	}
+		//	m_size = size;
+		//	m_capacity = size;
+		//	dAssert(err == CL_SUCCESS);
+		//}
+		//else
+		//{
+		//	dAssert(0);
+		//}
 	}
 
 	void ReadData(cl_command_queue commandQueue)
 	{
-		void* const source = &(*this)[0];
-		cl_int err = clEnqueueReadBuffer(commandQueue, m_gpuBuffer,
-			CL_FALSE, 0, sizeof(T) * dArray<T>::GetCount(), source,
-			0, nullptr, nullptr);
-		dAssert(err == CL_SUCCESS);
+		dAssert(0);
+		//void* const source = &(*this)[0];
+		//cl_int err = clEnqueueReadBuffer(commandQueue, m_gpuBuffer,
+		//	CL_FALSE, 0, sizeof(T) * dArray<T>::GetCount(), source,
+		//	0, nullptr, nullptr);
+		//dAssert(err == CL_SUCCESS);
 	}
 
 	void WriteData(cl_command_queue commandQueue)
 	{
-		cl_int err;
-		const void* const source = &(*this)[0];
-		err = clEnqueueWriteBuffer(commandQueue, m_gpuBuffer,
-			CL_FALSE, 0, sizeof(T) * dArray<T>::GetCount(), source,
-			0, nullptr, nullptr);
-		dAssert(err == CL_SUCCESS);
+		dAssert(0);
+		//cl_int err;
+		//const void* const source = &(*this)[0];
+		//err = clEnqueueWriteBuffer(commandQueue, m_gpuBuffer,
+		//	CL_FALSE, 0, sizeof(T) * dArray<T>::GetCount(), source,
+		//	0, nullptr, nullptr);
+		//dAssert(err == CL_SUCCESS);
 	}
 
-	cl_mem_flags m_flags;
 	cl_mem m_gpuBuffer;
+	cl_mem_flags m_flags;
 };
 
 class ndOpenclBodyBuffer
@@ -154,6 +159,11 @@ class ndOpenclBodyBuffer
 			m_alpha.SyncSize(context, size);
 			m_accel.SyncSize(context, size);
 		}
+	}
+
+	void CopyToGpu(cl_command_queue m_commandQueue, const dArray<ndBodyKinematic*>& bodyArray)
+	{
+		//m_rotation.
 	}
 
 	dOpenclBuffer<cl_float4> m_rotation;
@@ -331,6 +341,11 @@ class OpenclSystem: public dClassAlloc
 	void Resize(dArray<ndBodyKinematic*>& bodyArray)
 	{
 		m_bodyArray.Resize(m_context, bodyArray);
+	}
+
+	void CopyToGpu(const dArray<ndBodyKinematic*>& bodyArray)
+	{
+		m_bodyArray.CopyToGpu(m_commandQueue, bodyArray);
 	}
 
 	ndOpenclBodyBuffer m_bodyArray;
@@ -1344,6 +1359,7 @@ void ndDynamicsUpdateOpencl::IntegrateBodies()
 	};
 
 	m_opencl->Resize(GetBodyIslandOrder());
+	m_opencl->CopyToGpu(GetBodyIslandOrder());
 
 	ndScene* const scene = m_world->GetScene();
 	scene->SubmitJobs<ndIntegrateBodies>();
