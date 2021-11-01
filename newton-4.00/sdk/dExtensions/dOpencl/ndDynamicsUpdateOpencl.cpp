@@ -28,6 +28,7 @@
 #include "ndDynamicsUpdateOpencl.h"
 #include "ndJointBilateralConstraint.h"
 
+#define D_USE_GPU_DEVICE
 
 #define D_OPENCL_BUFFER_SIZE	1024
 
@@ -511,8 +512,8 @@ float4 MultiplyQuat(float4 r, float4 q)
 	float4 x = (float4)( q.w,  q.z, -q.y, -q.x);
 	float4 y = (float4)(-q.z,  q.w,  q.x, -q.y);
 	float4 z = (float4)( q.y, -q.x,  q.w, -q.z);
-	float4 w = (float4)( q.x,  q.y,  q.z,  q.w);
-	return x * (float4)(r.x) + y * (float4)(r.y) + z * (float4)(r.z) + w * (float4)(r.w);
+	//float4 w = (float4)( q.x,  q.y,  q.z,  q.w);
+	return x * (float4)(r.x) + y * (float4)(r.y) + z * (float4)(r.z) + q * (float4)(r.w);
 }
 
 float4 NormalizeQuat(float4 r)
@@ -553,18 +554,18 @@ __kernel void IntegrateBodies(
 	alpha = invTimestep * (omega - alpha);
 
 	float4 omega2 = omega * omega;
-	float omegaMag2 = omega2.x + omega2.y + omega2.z;
+	float tmpMag2 = omega2.x + omega2.y + omega2.z;
+
+	float tol = (0.0125f * 3.141592f / 180.0f);
+	float tol2 = tol * tol;
+	float omegaMag2 = (tmpMag2 > tol2) ? tmpMag2 : tol2;
 	
-	const float tol = 0.0125f * 3.141592f / 180.0f;
-	if (omegaMag2 > (tol * tol))
-	{
-		float invOmegaMag = 1.0f / sqrt(omegaMag2);
-		float omegaAngle = invOmegaMag * omegaMag2 * timestepIn;
-		float4 omegaAxis = omega * invOmegaMag;
-		float4 rotationStep = MakeQuat(omegaAxis, omegaAngle);
-		float4 newRotation = MultiplyQuat(rotation, rotationStep);
-		rotation = NormalizeQuat(newRotation);
-	}
+	float invOmegaMag = 1.0f / sqrt(omegaMag2);
+	float omegaAngle = invOmegaMag * omegaMag2 * timestepIn;
+	float4 omegaAxis = omega * invOmegaMag;
+	float4 rotationStep = MakeQuat(omegaAxis, omegaAngle);
+	float4 newRotation = MultiplyQuat(rotation, rotationStep);
+	rotation = NormalizeQuat(newRotation);
 
 	accelBuffer[globalIndex] = accel;
 	alphaBuffer[globalIndex] = alpha;
@@ -1484,15 +1485,20 @@ void ndDynamicsUpdateOpencl::IntegrateBodies()
 		}
 	};
 
+#ifdef D_USE_GPU_DEVICE
 	m_opencl->Resize(GetBodyIslandOrder());
 	m_opencl->CopyToGpu(GetBodyIslandOrder());
 	m_opencl->ExecuteIntegrateBody(m_timestep, GetBodyIslandOrder());
-
+	
 	m_opencl->Finish();
 	ndScene* const scene = m_world->GetScene();
 	scene->SubmitJobs<ndIntegrateBodies>();
 
 	m_opencl->CopyFromGpu(GetBodyIslandOrder());
+#else
+	ndScene* const scene = m_world->GetScene();
+	scene->SubmitJobs<ndIntegrateBodies>();
+#endif
 }
 
 void ndDynamicsUpdateOpencl::DetermineSleepStates()

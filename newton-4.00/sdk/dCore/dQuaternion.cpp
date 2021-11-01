@@ -111,7 +111,8 @@ dQuaternion dQuaternion::operator* (const dQuaternion &q) const
 	const dVector x( q.m_w,  q.m_z, -q.m_y, -q.m_x);
 	const dVector y(-q.m_z,  q.m_w,  q.m_x, -q.m_y);
 	const dVector z( q.m_y, -q.m_x,  q.m_w, -q.m_z);
-	const dVector w( q.m_x,  q.m_y,  q.m_z,  q.m_w);
+	//const dVector w( q.m_x,  q.m_y,  q.m_z,  q.m_w);
+	const dVector w(q);
 
 //#ifdef _DEBUG
 //	dQuaternion xxx0(x * dVector(m_x) + y * dVector(m_y) + z * dVector(m_z) + w * dVector(m_w));

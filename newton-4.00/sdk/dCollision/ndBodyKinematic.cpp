@@ -407,7 +407,11 @@ void ndBodyKinematic::IntegrateVelocity(dFloat32 timestep)
 	dAssert(m_veloc.m_w == dFloat32(0.0f));
 	dAssert(m_omega.m_w == dFloat32(0.0f));
 	m_globalCentreOfMass += m_veloc.Scale(timestep);
-	dFloat32 omegaMag2 = m_omega.DotProduct(m_omega).GetScalar();
+
+	const dFloat32 tol = (dFloat32(0.0125f) * dDegreeToRad);
+	const dFloat32 tol2 = tol * tol;
+	const dFloat32 omegaMag2 = dMax(m_omega.DotProduct(m_omega).GetScalar(), tol2);
+
 #ifdef _DEBUG
 	const dFloat32 err2 = m_maxAngleStep * m_maxAngleStep;
 	const dFloat32 step2 = omegaMag2 * timestep * timestep;
@@ -421,18 +425,14 @@ void ndBodyKinematic::IntegrateVelocity(dFloat32 timestep)
 #endif
 
 	// this is correct
-	const dFloat32 tol = (dFloat32(0.0125f) * dDegreeToRad);
-	if (omegaMag2 > (tol * tol))
-	{
-		const dFloat32 invOmegaMag = dRsqrt(omegaMag2);
-		const dFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
-		const dVector omegaAxis(m_omega.Scale(invOmegaMag));
-		const dQuaternion rotationStep(omegaAxis, omegaAngle);
-		const dQuaternion rotation(m_rotation * rotationStep);
-		m_rotation = rotation.Normalize();
-		dAssert((m_rotation.DotProduct(m_rotation).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-5f));
-		m_matrix = dMatrix(m_rotation, m_matrix.m_posit);
-	}
+	const dFloat32 invOmegaMag = dRsqrt(omegaMag2);
+	const dFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
+	const dVector omegaAxis(m_omega.Scale(invOmegaMag));
+	const dQuaternion rotationStep(omegaAxis, omegaAngle);
+	const dQuaternion rotation(m_rotation * rotationStep);
+	m_rotation = rotation.Normalize();
+	dAssert((m_rotation.DotProduct(m_rotation).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-5f));
+	m_matrix = dMatrix(m_rotation, m_matrix.m_posit);
 
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
 	dAssert(m_matrix.TestOrthogonal());
