@@ -77,7 +77,8 @@ class ndDemoEntityNotify: public ndBodyNotify
 		m_applicationUserData = nullptr;
 	}
 
-	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
+	//virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
+	virtual void OnApplyExternalForce(dInt32, dFloat32)
 	{
 		ndBodyDynamic* const dynamicBody = GetBody()->GetAsBodyDynamic();
 		if (dynamicBody)
@@ -89,7 +90,8 @@ class ndDemoEntityNotify: public ndBodyNotify
 		}
 	}
 
-	virtual void OnTransform(dInt32 threadIndex, const dMatrix& matrix)
+	//virtual void OnTransform(dInt32 threadIndex, const dMatrix& matrix)
+	virtual void OnTransform(dInt32, const dMatrix&)
 	{
 		// apply this transformation matrix to the application user data.
 		//dAssert(0);
@@ -104,9 +106,9 @@ dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist)
 	dVector p0(origin);
 	dVector p1(origin - dVector(0.0f, dAbs(dist), 0.0f, 0.0f));
 
-	ndRayCastClosestHitCallback rayCaster(world.GetScene());
-	dFloat32 param = rayCaster.TraceRay(p0, p1);
-	return (param < 1.0f) ? rayCaster.m_contact.m_point : p0;
+	ndRayCastClosestHitCallback rayCaster;
+	world.RayCast(rayCaster, p0, p1);
+	return (rayCaster.m_param < 1.0f) ? rayCaster.m_contact.m_point : p0;
 }
 
 void BuildFloorBox(ndWorld& world)
@@ -131,7 +133,7 @@ void BuildPyramid(ndWorld& world, dFloat32 mass, const dVector& origin, const dV
 	matrix.m_posit.m_w = 1.0f;
 
 	world.Sync();
-	ndShapeInstance xxx(new ndShapeSphere(1.0f));
+	//ndShapeInstance xxx(new ndShapeSphere(1.0f));
 	ndShapeInstance box(new ndShapeBox(size.m_x, size.m_y, size.m_z));
 
 	dVector floor(FindFloor(world, dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
@@ -140,7 +142,7 @@ void BuildPyramid(ndWorld& world, dFloat32 mass, const dVector& origin, const dV
 	// get the dimension from shape itself
 	dVector minP(0.0f);
 	dVector maxP(0.0f);
-	box.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
+	box.CalculateAabb(dGetIdentityMatrix(), minP, maxP);
 
 	dFloat32 stepz = maxP.m_z - minP.m_z + 0.03125f;
 	dFloat32 stepy = (maxP.m_y - minP.m_y) - 0.01f;
@@ -171,7 +173,7 @@ void BuildPyramid(ndWorld& world, dFloat32 mass, const dVector& origin, const dV
 	}
 }
 
-void BuildSphere(ndWorld& world, dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
+void BuildSphere(ndWorld& world, dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 offsetHigh)
 {
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -184,7 +186,7 @@ void BuildSphere(ndWorld& world, dFloat32 mass, const dVector& origin, const dFl
 	dVector floor(FindFloor(world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f;
 
-	matrix.m_posit.m_y += xxxx;
+	matrix.m_posit.m_y += offsetHigh;
 
 	for (int i = 0; i < count; i++)
 	{
@@ -200,18 +202,11 @@ void BuildSphere(ndWorld& world, dFloat32 mass, const dVector& origin, const dFl
 	}
 }
 
-int main (int argc, const char * argv[]) 
+int main (int, const char*) 
 {
 	ndWorld world;
 	world.SetSubSteps(2);
 	//world.SetThreadCount(2);
-
-	// test allocation
-	ndFixSizeBuffer<dVector, 10> buffer0;
-	ndFixSizeBuffer<dVector, 10>* const buffer1 = new ndFixSizeBuffer<dVector, 10>;
-	(*buffer1)[0] = dVector (0.5f, 0.25f, 0.8f, 0.0f);
-	(*buffer1)[0] = (*buffer1)[0] + (*buffer1)[0];
-	delete buffer1;
 
 	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
 	dVector origin(0.0f, 0.0f, 0.0f, 0.0f);
@@ -222,12 +217,11 @@ int main (int argc, const char * argv[])
 	//BuildSphere(world, 1.0f, origin + dVector(6.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
 	//BuildSphere(world, 1.0f, origin + dVector(9.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
 	
-	static dFloat32 totalTime = 0;
+	dFloat32 totalTime = 0;
 	for (int i = 0; i < 10000; i ++)
 	{
-		//world.GetScene()->Update(1.0f / 60.0f);
-		totalTime += world.GetUpdateTime();
 		world.Update(1.0f / 60.0f);
+		totalTime += world.GetUpdateTime();
 		//newton.Sync();
 	}
 

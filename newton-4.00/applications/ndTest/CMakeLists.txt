@@ -23,7 +23,9 @@ include_directories(../../sdk/dNewton/)
 include_directories(../../sdk/dTinyxml/)
 include_directories(../../sdk/dCollision/)
 include_directories(../../sdk/dNewton/dJoints)
-
+include_directories(../../sdk/dNewton/dModels)
+include_directories(../../sdk/dNewton/dModels/dVehicle)
+include_directories(../../sdk/dNewton/dModels/dCharacter)
 
 if(MSVC)
 	set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEBUG") 
