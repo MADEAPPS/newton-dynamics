@@ -29,85 +29,50 @@
 
 #define D_PARALLET_SORT_BATCH_SIZE	1024
 
-template <class T>
-dInt32 dgBinarySearch(T const* array, dInt32 elements, const T& entry, dInt32(*compare) (const T* const  A, const T* const B, void* const context), void* const context = nullptr)
-{
-	dInt32 index0 = 0;
-	dInt32 index2 = elements - 1;
-
-	while ((index2 - index0) > 4) 
-	{
-		dInt32 index1 = (index0 + index2) >> 1;
-		dInt32 test = compare(&array[index1], &entry, context);
-		if (test < 0) 
-		{
-			index0 = index1;
-		}
-		else 
-		{
-			index2 = index1;
-		}
-	}
-
-	index0 = (index0 > 0) ? index0 - 1 : 0;
-	index2 = ((index2 + 1) < elements) ? index2 + 1 : elements;
-	dInt32 index = index0 - 1;
-	for (dInt32 i = index0; i < index2; i++) 
-	{
-		dInt32 test = compare(&array[i], &entry, context);
-		if (!test) 
-		{
-			return i;
-		}
-		else if (test > 0) 
-		{
-			break;
-		}
-		index = i;
-	}
-	return index;
-}
-
-template <class T>
-dInt32 dgBinarySearchIndirect(T** const array, dInt32 elements, const T& entry, dInt32(*compare) (const T* const  A, const T* const B, void* const context), void* const context = nullptr)
-{
-	dInt32 index0 = 0;
-	dInt32 index2 = elements - 1;
-
-	while ((index2 - index0) > 4) 
-	{
-		dInt32 index1 = (index0 + index2) >> 1;
-		dInt32 test = compare(array[index1], &entry, context);
-		if (test < 0) 
-		{
-			index0 = index1;
-		}
-		else 
-		{
-			index2 = index1;
-		}
-	}
-
-	index0 = (index0 > 0) ? index0 - 1 : 0;
-	index2 = ((index2 + 1) < elements) ? index2 + 1 : elements;
-	dInt32 index = index0 - 1;
-	for (dInt32 i = index0; i < index2; i++) 
-	{
-		dInt32 test = compare(array[i], &entry, context);
-		if (!test) 
-		{
-			return i;
-		}
-		else if (test > 0) 
-		{
-			break;
-		}
-		index = i;
-	}
-	return index;
-}
-
+//template <class T>
+//dInt32 dgBinarySearch(T const* array, dInt32 elements, const T& entry, dInt32(*compare) (const T* const  A, const T* const B, void* const context), void* const context = nullptr)
 template <class T, class CompareKey>
+void dBinarySearch(T* const array, dInt32 elements, void* const context = nullptr)
+{
+	dAssert(0);
+	//dInt32 index0 = 0;
+	//dInt32 index2 = elements - 1;
+	//
+	//while ((index2 - index0) > 4) 
+	//{
+	//	dInt32 index1 = (index0 + index2) >> 1;
+	//	dInt32 test = compare(&array[index1], &entry, context);
+	//	if (test < 0) 
+	//	{
+	//		index0 = index1;
+	//	}
+	//	else 
+	//	{
+	//		index2 = index1;
+	//	}
+	//}
+	//
+	//index0 = (index0 > 0) ? index0 - 1 : 0;
+	//index2 = ((index2 + 1) < elements) ? index2 + 1 : elements;
+	//dInt32 index = index0 - 1;
+	//for (dInt32 i = index0; i < index2; i++) 
+	//{
+	//	dInt32 test = compare(&array[i], &entry, context);
+	//	if (!test) 
+	//	{
+	//		return i;
+	//	}
+	//	else if (test > 0) 
+	//	{
+	//		break;
+	//	}
+	//	index = i;
+	//}
+	//return index;
+}
+
+
+template <class T, class dCompareKey>
 void dSort(T* const array, dInt32 elements, void* const context = nullptr)
 {
 	D_TRACKTIME();
@@ -117,7 +82,7 @@ void dSort(T* const array, dInt32 elements, void* const context = nullptr)
 	stack[0][0] = 0;
 	stack[0][1] = elements - 1;
 	dInt32 stackIndex = 1;
-	const CompareKey comparator;
+	const dCompareKey comparator;
 	while (stackIndex)
 	{
 		stackIndex--;
@@ -203,9 +168,7 @@ void dSort(T* const array, dInt32 elements, void* const context = nullptr)
 	#endif
 }
 
-//template <class T>
-//void dCountingSort(T* const array, T* const tmpArray, dInt32 elements, dInt32 radixPass, dInt32(*getRadixKey) (const T* const  A, void* const context), void* const context = nullptr)
-template <class T, dInt32 bits, class EvaluateKey, class key>
+template <class T, dInt32 bits, class nEvaluateKey, class dKey>
 void dCountingSort(T* const array, T* const scratchBuffer, dInt32 elementsCount, dInt32 digitLocation)
 {
 	dAssert(0);

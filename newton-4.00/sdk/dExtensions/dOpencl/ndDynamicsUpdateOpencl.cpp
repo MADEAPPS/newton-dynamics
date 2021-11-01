@@ -191,8 +191,48 @@ class ndOpenclBodyBuffer
 		m_accel.WriteData(commandQueue);
 	}
 
-	dOpenclBuffer<cl_float4> m_rotation;
-	dOpenclBuffer<cl_float4> m_posit;
+	void SetKernelParameters(cl_kernel kernel, dFloat32 timestep, const dArray<ndBodyKinematic*>& bodyArray)
+	{
+		//__kernel void IntegrateBodies(
+		//	float timestepIn,
+		//	int bodyCount,
+		//	__global float4* rotationBuffer,
+		//	__global float4* centerOfMassBuffer,
+		//	__global float4* velocBuffer,
+		//	__global float4* omegaBuffer,
+		//	__global float4* accelBuffer,
+		//	__global float4* alphaBuffer)
+
+		cl_int err = CL_SUCCESS;
+		err = clSetKernelArg(kernel, 0, sizeof(cl_float), &timestep);
+		dAssert(err == CL_SUCCESS);
+
+		cl_int bodyCount = bodyArray.GetCount();
+		err = clSetKernelArg(kernel, 1, sizeof(cl_int), &bodyCount);
+		dAssert(err == CL_SUCCESS);
+
+		err = clSetKernelArg(kernel, 2, sizeof(cl_mem), &m_rotation.m_gpuBuffer);
+		dAssert(err == CL_SUCCESS);
+
+		err = clSetKernelArg(kernel, 3, sizeof(cl_mem), &m_posit.m_gpuBuffer);
+		dAssert(err == CL_SUCCESS);
+
+		err = clSetKernelArg(kernel, 4, sizeof(cl_mem), &m_omega.m_gpuBuffer);
+		dAssert(err == CL_SUCCESS);
+
+		err = clSetKernelArg(kernel, 5, sizeof(cl_mem), &m_veloc.m_gpuBuffer);
+		dAssert(err == CL_SUCCESS);
+
+		err = clSetKernelArg(kernel, 6, sizeof(cl_mem), &m_alpha.m_gpuBuffer);
+		dAssert(err == CL_SUCCESS);
+
+		err = clSetKernelArg(kernel, 7, sizeof(cl_mem), &m_accel.m_gpuBuffer);
+		dAssert(err == CL_SUCCESS);
+
+	}
+
+	dOpenclBuffer<cl_float4> m_rotation;	// location 2
+	dOpenclBuffer<cl_float4> m_posit;		// location 3
 	dOpenclBuffer<cl_float4> m_omega;
 	dOpenclBuffer<cl_float4> m_veloc;
 	dOpenclBuffer<cl_float4> m_alpha;
@@ -383,6 +423,18 @@ class OpenclSystem: public dClassAlloc
 		err = clFinish(m_commandQueue);
 		dAssert(err == CL_SUCCESS);
 	}
+
+	void ExecuteIntegrateBody(dFloat32 timestep, const dArray<ndBodyKinematic*>& bodyArray)
+	{
+		//size_t local = bodyArray.GetCount();
+		size_t global = bodyArray.GetCount();
+		m_bodyArray.SetKernelParameters(m_integrateBodies.m_kernel, timestep, bodyArray);
+		cl_int err = clEnqueueNDRangeKernel(
+			m_commandQueue, m_integrateBodies.m_kernel, 1, 
+			nullptr, &global, nullptr, 0, nullptr, nullptr);
+		dAssert(err == CL_SUCCESS);
+	}
+
 
 	ndOpenclBodyBuffer m_bodyArray;
 	char m_platformName[128];
@@ -1396,9 +1448,9 @@ void ndDynamicsUpdateOpencl::IntegrateBodies()
 
 	m_opencl->Resize(GetBodyIslandOrder());
 	m_opencl->CopyToGpu(GetBodyIslandOrder());
-	m_opencl->Finish();
-	
+	m_opencl->ExecuteIntegrateBody(m_timestep, GetBodyIslandOrder());
 
+	m_opencl->Finish();
 	ndScene* const scene = m_world->GetScene();
 	scene->SubmitJobs<ndIntegrateBodies>();
 }
