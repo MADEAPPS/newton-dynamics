@@ -86,12 +86,12 @@ class dOpenclBuffer: public dArray<T>
 
 	void ReadData(cl_command_queue commandQueue)
 	{
-		dAssert(0);
-		//void* const source = &(*this)[0];
-		//cl_int err = clEnqueueReadBuffer(commandQueue, m_gpuBuffer,
-		//	CL_FALSE, 0, sizeof(T) * dArray<T>::GetCount(), source,
-		//	0, nullptr, nullptr);
-		//dAssert(err == CL_SUCCESS);
+		void* const destination = &(*this)[0];
+		cl_int err = clEnqueueReadBuffer(
+			commandQueue, m_gpuBuffer,
+			CL_FALSE, 0, sizeof(T) * dArray<T>::GetCount(), destination,
+			0, nullptr, nullptr);
+		dAssert(err == CL_SUCCESS);
 	}
 
 	void WriteData(cl_command_queue commandQueue)
@@ -190,6 +190,37 @@ class ndOpenclBodyBuffer
 		m_alpha.WriteData(commandQueue);
 		m_accel.WriteData(commandQueue);
 	}
+
+	void CopyFromGpu(cl_command_queue commandQueue, const dArray<ndBodyKinematic*>& bodyArray)
+	{
+		dQuaternion* const rotationBuffer = (dQuaternion*)&m_rotation[0];
+		dVector* const positBuffer = (dVector*)&m_posit[0];
+		dVector* const positOmega = (dVector*)&m_omega[0];
+		dVector* const positVeloc = (dVector*)&m_veloc[0];
+		dVector* const positAlpha = (dVector*)&m_alpha[0];
+		dVector* const positAccel = (dVector*)&m_accel[0];
+
+		const dInt32 items = bodyArray.GetCount();
+
+		m_rotation.ReadData(commandQueue);
+		m_posit.ReadData(commandQueue);
+		m_omega.ReadData(commandQueue);
+		m_veloc.ReadData(commandQueue);
+		m_alpha.ReadData(commandQueue);
+		m_accel.ReadData(commandQueue);
+		for (dInt32 i = 0; i < items; i++)
+		{
+			ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
+			ndBodyDynamic* const body1 = bodyArray[i]->GetAsBodyDynamic();
+			//rotationBuffer[i] = body->GetRotation();
+			//positBuffer[i] = body->GetGlobalGetCentreOfMass();
+			//positOmega[i] = body->GetOmega();
+			//positVeloc[i] = body->GetVelocity();
+			//positAlpha[i] = body->GetAlpha();
+			//positAccel[i] = body->GetAccel();
+		}
+	}
+
 
 	void SetKernelParameters(cl_kernel kernel, dFloat32 timestep, const dArray<ndBodyKinematic*>& bodyArray)
 	{
@@ -417,6 +448,11 @@ class OpenclSystem: public dClassAlloc
 		m_bodyArray.CopyToGpu(m_commandQueue, bodyArray);
 	}
 
+	void CopyFromGpu(const dArray<ndBodyKinematic*>& bodyArray)
+	{
+		m_bodyArray.CopyFromGpu(m_commandQueue, bodyArray);
+	}
+
 	void Finish()
 	{
 		cl_int err = CL_SUCCESS;
@@ -426,6 +462,7 @@ class OpenclSystem: public dClassAlloc
 
 	void ExecuteIntegrateBody(dFloat32 timestep, const dArray<ndBodyKinematic*>& bodyArray)
 	{
+		// let the driver decide the local work group size.
 		//size_t local = bodyArray.GetCount();
 		size_t global = bodyArray.GetCount();
 		m_bodyArray.SetKernelParameters(m_integrateBodies.m_kernel, timestep, bodyArray);
@@ -466,6 +503,7 @@ float4 MakeQuat(float4 axis, float angle)
 	float sinAngle = sin (angle);
 	float4 quat = axis * ((float4) angle);
 	quat.w = cos (angle);
+	return quat;
 }
 
 float4 MultiplyQuat(float4 r, float4 q)
@@ -1453,6 +1491,8 @@ void ndDynamicsUpdateOpencl::IntegrateBodies()
 	m_opencl->Finish();
 	ndScene* const scene = m_world->GetScene();
 	scene->SubmitJobs<ndIntegrateBodies>();
+
+	m_opencl->CopyFromGpu(GetBodyIslandOrder());
 }
 
 void ndDynamicsUpdateOpencl::DetermineSleepStates()
