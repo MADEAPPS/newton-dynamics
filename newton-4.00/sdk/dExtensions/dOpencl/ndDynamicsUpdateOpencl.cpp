@@ -328,11 +328,6 @@ class OpenclSystem: public dClassAlloc
 		
 		// get vendor driver support
 		size_t stringLength;
-		//err = clGetPlatformInfo(platform, CL_PLATFORM_NAME, 0, nullptr, &stringLength);
-		//dAssert(err == CL_SUCCESS);
-		//dAssert(stringLength < sizeof(m_platformName));
-		//err = clGetPlatformInfo(platform, CL_PLATFORM_NAME, stringLength, m_platformName, nullptr);
-		//dAssert(err == CL_SUCCESS);
 
 		char deviceName[1024];
 		err = clGetDeviceInfo(m_device, CL_DEVICE_NAME, sizeof (deviceName), deviceName, &stringLength);
@@ -477,11 +472,6 @@ class OpenclSystem: public dClassAlloc
 	{
 		m_bodyArray.CopyToGpu(m_commandQueue, bodyArray);
 	}
-
-	//void CopyFromGpu(const dArray<ndBodyKinematic*>& bodyArray)
-	//{
-	//	m_bodyArray.CopyFromGpu(m_commandQueue, bodyArray);
-	//}
 
 	void Finish()
 	{
@@ -2071,7 +2061,6 @@ void ndDynamicsUpdateOpencl::CalculateForces()
 void ndDynamicsUpdateOpencl::FinishGpuUpdate()
 {
 	m_opencl->Finish();
-	//m_opencl->CopyFromGpu(GetBodyIslandOrder());
 
 	dArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder();
 	//dVector* const omega = (dVector*)&m_omega[0];
