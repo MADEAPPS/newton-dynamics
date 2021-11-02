@@ -119,14 +119,15 @@ __kernel void IntegrateBodies(
 	rotationBuffer[globalIndex] = rotation; 
 } 
 
-__kernel void IntegrateUnconstrainedBodies(float timestep, int bodyCount, __global struct ndOpenclBodyBuffer* inputArray, __global struct ndOpenclBodyBuffer* outputArray) 
-{ 
+__kernel void IntegrateBodiesVelocity(float timestep, int bodyCount)
+{
 	const int globalIndex = get_global_id(0); 
 	if (globalIndex >= bodyCount) 
 	{
 		return;
 	}	
-} 
+}
+
 
 
 )"""";
@@ -135,11 +136,11 @@ __kernel void IntegrateUnconstrainedBodies(float timestep, int bodyCount, __glob
 
 ndOpenclBodyBuffer::ndOpenclBodyBuffer()
 	:m_rotation(CL_MEM_READ_WRITE)
-	, m_posit(CL_MEM_READ_WRITE)
-	, m_omega(CL_MEM_READ_WRITE)
-	, m_veloc(CL_MEM_READ_WRITE)
-	, m_alpha(CL_MEM_READ_WRITE)
-	, m_accel(CL_MEM_READ_WRITE)
+	,m_posit(CL_MEM_READ_WRITE)
+	,m_omega(CL_MEM_READ_WRITE)
+	,m_veloc(CL_MEM_READ_WRITE)
+	,m_alpha(CL_MEM_READ_WRITE)
+	,m_accel(CL_MEM_READ_WRITE)
 {
 }
 
@@ -312,12 +313,11 @@ void ndOpenclBodyBuffer::SetKernelParameters(cl_kernel kernel, dFloat32 timestep
 	dAssert(err == CL_SUCCESS);
 }
 
-
-
 ndOpenclSystem::ndOpenclSystem(cl_context context, cl_platform_id)
 	:m_context(context)
 	,m_bodyArray()
-	,m_integrateBodies()
+	,m_integrateBodiesPosition()
+	,m_integrateBodiesVelocity()
 {
 	cl_int err = CL_SUCCESS;
 
@@ -350,8 +350,8 @@ ndOpenclSystem::ndOpenclSystem(cl_context context, cl_platform_id)
 
 	m_solverProgram = CompileProgram();
 
-	SetKernel("IntegrateBodies", m_integrateBodies);
-	//SetKernel("IntegrateUnconstrainedBodies", m_integrateBodies);
+	SetKernel("IntegrateBodiesPosition", m_integrateBodiesPosition);
+	SetKernel("IntegrateBodiesVelocity", m_integrateBodiesVelocity);
 }
 
 ndOpenclSystem::~ndOpenclSystem()
@@ -360,11 +360,11 @@ ndOpenclSystem::~ndOpenclSystem()
 
 	m_bodyArray.Cleanup();
 
-	err = clReleaseKernel(m_integrateBodies.m_kernel);
+	err = clReleaseKernel(m_integrateBodiesPosition.m_kernel);
 	dAssert(err == CL_SUCCESS);
 
-	//err = clReleaseKernel(m_integrateUnconstrainedBodies);
-	//dAssert(err == CL_SUCCESS);
+	err = clReleaseKernel(m_integrateBodiesVelocity.m_kernel);
+	dAssert(err == CL_SUCCESS);
 
 	err = clReleaseProgram(m_solverProgram);
 	dAssert(err == CL_SUCCESS);
@@ -480,15 +480,15 @@ void ndOpenclSystem::Finish()
 	dAssert(err == CL_SUCCESS);
 }
 
-void ndOpenclSystem::ExecuteIntegrateBody(dFloat32 timestep, const dArray<ndBodyKinematic*>& bodyArray)
+void ndOpenclSystem::ExecuteIntegrateBodyPosition(dFloat32 timestep, const dArray<ndBodyKinematic*>& bodyArray)
 {
 	// let the driver decide the local work group size.
 	//size_t local = bodyArray.GetCount();
 	cl_int err = CL_SUCCESS;
 	size_t global = bodyArray.GetCount();
-	m_bodyArray.SetKernelParameters(m_integrateBodies.m_kernel, timestep, bodyArray);
+	m_bodyArray.SetKernelParameters(m_integrateBodiesPosition.m_kernel, timestep, bodyArray);
 	err = clEnqueueNDRangeKernel(
-		m_commandQueue, m_integrateBodies.m_kernel, 1,
+		m_commandQueue, m_integrateBodiesPosition.m_kernel, 1,
 		nullptr, &global, nullptr, 0, nullptr, nullptr);
 	dAssert(err == CL_SUCCESS);
 

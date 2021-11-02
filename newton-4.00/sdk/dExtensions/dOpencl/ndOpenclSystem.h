@@ -99,7 +99,7 @@ class ndOpenclSystem: public dClassAlloc
 	void Resize(dArray<ndBodyKinematic*>& bodyArray);
 	void SetKernel(const char* const name, ndKernel& kerner);
 	void CopyToGpu(const dArray<ndBodyKinematic*>& bodyArray);
-	void ExecuteIntegrateBody(dFloat32 timestep, const dArray<ndBodyKinematic*>& bodyArray);
+	void ExecuteIntegrateBodyPosition(dFloat32 timestep, const dArray<ndBodyKinematic*>& bodyArray);
 
 	static ndOpenclSystem* Singleton(dInt32 driveNumber);
 
@@ -112,7 +112,8 @@ class ndOpenclSystem: public dClassAlloc
 	cl_program	m_solverProgram;			// hold the program handler
 	cl_command_queue m_commandQueue;		// hold the commands-queue handler
 
-	ndKernel m_integrateBodies;
+	ndKernel m_integrateBodiesPosition;
+	ndKernel m_integrateBodiesVelocity;
 	static const char* m_kernelSource;
 };
 

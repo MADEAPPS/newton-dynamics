@@ -932,7 +932,7 @@ void ndDynamicsUpdateOpencl::IntegrateBodies()
 #ifdef D_USE_GPU_DEVICE
 	m_opencl->Resize(GetBodyIslandOrder());
 	m_opencl->CopyToGpu(GetBodyIslandOrder());
-	m_opencl->ExecuteIntegrateBody(m_timestep, GetBodyIslandOrder());
+	m_opencl->ExecuteIntegrateBodyPosition(m_timestep, GetBodyIslandOrder());
 #else
 	ndScene* const scene = m_world->GetScene();
 	scene->SubmitJobs<ndIntegrateBodies>();
