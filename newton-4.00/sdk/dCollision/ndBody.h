@@ -82,6 +82,8 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 
 	D_COLLISION_API dVector GetVelocityAtPoint(const dVector& point) const;
 
+	void SetMatrixAndCentreOfMass(const dQuaternion& rotation, const dVector& globalcom);
+
 	protected:
 	D_COLLISION_API static const nd::TiXmlNode* FindNode(const nd::TiXmlNode* const rootNode, const char* const name);
 
@@ -188,6 +190,14 @@ inline dVector ndBody::GetVelocityAtPoint(const dVector& point) const
 inline dFloat32 ndBody::GetInvMass() const 
 { 
 	return dFloat32(0.0f); 
+}
+
+inline void ndBody::SetMatrixAndCentreOfMass(const dQuaternion& rotation, const dVector& globalcom)
+{
+	m_rotation = rotation;
+	m_globalCentreOfMass = globalcom;
+	m_matrix = dMatrix(rotation, m_matrix.m_posit);
+	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
 }
 
 #endif 

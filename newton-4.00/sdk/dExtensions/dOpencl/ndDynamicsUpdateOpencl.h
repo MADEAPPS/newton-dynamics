@@ -49,6 +49,7 @@ class ndDynamicsUpdateOpencl : public ndDynamicsUpdate
 	void CalculateForces();
 	void IntegrateBodies();
 	void UpdateSkeletons();
+	void FinishGpuUpdate();
 	void InitJacobianMatrix();
 	void UpdateForceFeedback();
 	void CalculateJointsForce();
