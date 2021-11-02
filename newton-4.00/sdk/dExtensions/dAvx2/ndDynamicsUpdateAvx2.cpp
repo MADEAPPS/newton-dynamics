@@ -188,6 +188,7 @@
 				__m256i m_lowInt;
 				__m256i m_highInt;
 			};
+			ndJacobian m_vector8;
 			dInt64 m_ints[D_AVX_WORK_GROUP];
 		};
 	} D_GCC_NEWTON_ALIGN_32;

@@ -417,9 +417,9 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 			m_line[1].m_x = GLfloat(p1.m_x);
 			m_line[1].m_y = GLfloat(p1.m_y);
 			m_line[1].m_z = GLfloat(p1.m_z);
-
 			glVector4 c(color);
-			glLineWidth(thickness);
+			
+			glLineWidth(GLfloat(thickness));
 			glUniform4fv(m_shadeColorLocation, 1, &c[0]);
 			glDrawArrays(GL_LINES, 0, 2);
 			glLineWidth(1);
@@ -480,7 +480,7 @@ void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 			m_line[1].m_z = GLfloat(p1.m_z);
 			glVector4 c(color);
 
-			glLineWidth(thickness);
+			glLineWidth(GLfloat(thickness));
 			glUniform4fv(m_shadeColorLocation, 1, &c[0]);
 			glDrawArrays(GL_LINES, 0, 2);
 			glLineWidth(1);
