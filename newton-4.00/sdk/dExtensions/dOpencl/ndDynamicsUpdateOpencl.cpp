@@ -577,8 +577,7 @@ __kernel void IntegrateBodies(
 	float4 rotation = rotationBuffer[globalIndex]; 
 	
 	com = com + timestep * veloc;
-	//accel = invTimestep * (veloc - accel);
-	accel = (float4)(0.0f);
+	accel = invTimestep * (veloc - accel);
 	alpha = invTimestep * (omega - alpha);
 	
 	float4 omega2 = omega * omega;
@@ -2088,12 +2087,6 @@ void ndDynamicsUpdateOpencl::FinishGpuUpdate()
 		{
 			dAssert(0);
 		}
-		//rotationBuffer[i] = body->GetRotation();
-		//positBuffer[i] = body->GetGlobalGetCentreOfMass();
-		//positOmega[i] = body->GetOmega();
-		//positVeloc[i] = body->GetVelocity();
-		//positAlpha[i] = body->GetAlpha();
-		//positAccel[i] = body->GetAccel();
 	}
 }
 
