@@ -31,6 +31,12 @@
 
 const char* ndOpenclSystem::m_kernelSource = R""""(
 
+struct dJacobian
+{
+	float4 m_linear;
+	float4 m_angular;
+};
+
 struct ndOpenclBodyBuffer
 { 
 	float4* m_rotation; 
@@ -69,7 +75,7 @@ float4 NormalizeQuat(float4 r)
 	return r * ((float4) (invMag));
 }
 
-__kernel void IntegrateBodies(
+__kernel void IntegrateBodiesPosition(
 	float timestepIn, 
 	int bodyCount, 
 	__global float4* rotationBuffer, 
@@ -119,13 +125,43 @@ __kernel void IntegrateBodies(
 	rotationBuffer[globalIndex] = rotation; 
 } 
 
-__kernel void IntegrateBodiesVelocity(float timestep, int bodyCount)
+__kernel void IntegrateBodiesVelocity(
+	float timestep, 
+	int bodyCount,
+	__global int* indexPtr,
+	__global struct dJacobian* internalForcesPtr)
 {
 	const int globalIndex = get_global_id(0); 
 	if (globalIndex >= bodyCount) 
 	{
 		return;
 	}	
+
+	//ndBodyDynamic* const body = bodyArray[i + start]->GetAsBodyDynamic();
+	//const dInt32 index = body->m_index;
+	//const ndJacobian& forceAndTorque = internalForces[index];
+
+	int index = indexPtr[globalIndex];
+	struct dJacobian forceAndTorque = internalForcesPtr[index];
+	//const dVector force(body->GetForce() + forceAndTorque.m_linear);
+	//const dVector torque(body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque());
+	//
+	//ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
+	//
+	//if (!body->m_resting)
+	//{
+	//	body->m_veloc += velocStep.m_linear;
+	//	body->m_omega += velocStep.m_angular;
+	//	body->IntegrateGyroSubstep(timestep4);
+	//}
+	//else
+	//{
+	//	const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
+	//	const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
+	//	const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
+	//	const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
+	//	body->m_resting &= equilibrium;
+	//}
 }
 
 
