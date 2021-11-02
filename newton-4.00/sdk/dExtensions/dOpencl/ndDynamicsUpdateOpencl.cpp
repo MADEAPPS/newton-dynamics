@@ -2102,11 +2102,6 @@ void ndDynamicsUpdateOpencl::GpuUpdate()
 	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
 
-static int xxx;
-xxx++;
-if (xxx == 191)
-xxx *= 1;
-
 	BuildIsland();
 	if (m_islands.GetCount())
 	{
