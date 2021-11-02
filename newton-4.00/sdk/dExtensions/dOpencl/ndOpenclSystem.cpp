@@ -484,9 +484,10 @@ void ndOpenclSystem::ExecuteIntegrateBody(dFloat32 timestep, const dArray<ndBody
 {
 	// let the driver decide the local work group size.
 	//size_t local = bodyArray.GetCount();
+	cl_int err = CL_SUCCESS;
 	size_t global = bodyArray.GetCount();
 	m_bodyArray.SetKernelParameters(m_integrateBodies.m_kernel, timestep, bodyArray);
-	cl_int err = clEnqueueNDRangeKernel(
+	err = clEnqueueNDRangeKernel(
 		m_commandQueue, m_integrateBodies.m_kernel, 1,
 		nullptr, &global, nullptr, 0, nullptr, nullptr);
 	dAssert(err == CL_SUCCESS);
