@@ -41,15 +41,12 @@ union dJacobian
 	};
 };
 
-//struct ndOpenclBodyBuffer
-//{ 
-//	float4* m_rotation; 
-//	float4* m_posit; 
-//	struct dJacobian* m_veloc;
-//	struct dJacobian* m_accel;
-//	struct dJacobian* m_externalForce;
-//	struct dJacobian* m_internalForce;
-//}; 
+struct dMatrix3x3
+{
+	float4 m_front;
+	float4 m_up;
+	float4 m_right;
+};
 
 float DotProduct(float4 a, float4 b)
 {
@@ -79,30 +76,38 @@ float4 NormalizeQuat(float4 r)
 	return r * ((float4) (invMag));
 }
 
+struct dMatrix3x3 QuatToMatrix (float4 q)
+{
+	struct dMatrix3x3 matrix;
 
-//struct dJacobian IntegrateForceAndToque(float4 timestep, float4 force, float4 torque)
-//{
-//	struct dJacobian velocStep;
-//	const dMatrix matrix(m_gyroRotation, dVector::m_wOne);
-//	const dVector localOmega(matrix.UnrotateVector(m_omega));
-//	const dVector localTorque(matrix.UnrotateVector(torque));
-//	
-//	// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
-//	const dVector dw(localOmega * timestep);
-//	const dMatrix jacobianMatrix(
-//		dVector(m_mass[0], (m_mass[2] - m_mass[1]) * dw[2], (m_mass[2] - m_mass[1]) * dw[1], dFloat32(0.0f)),
-//		dVector((m_mass[0] - m_mass[2]) * dw[2], m_mass[1], (m_mass[0] - m_mass[2]) * dw[0], dFloat32(1.0f)),
-//		dVector((m_mass[1] - m_mass[0]) * dw[1], (m_mass[1] - m_mass[0]) * dw[0], m_mass[2], dFloat32(1.0f)),
-//		dVector::m_wOne);
-//	
-//	// and solving for alpha we get the angular acceleration at t + dt
-//	// calculate gradient at a full time step
-//	const dVector gradientStep(jacobianMatrix.SolveByGaussianElimination(localTorque * timestep));
-//
-//	velocStep.m_angular = matrix.RotateVector(gradientStep);
-//	velocStep.m_linear = force.Scale(m_invMass.m_w) * timestep;
-//	return velocStep;
-//}
+	//const dQuaternion quat0(quat);
+	//const dQuaternion quat1(quat0.Scale (dFloat32(2.0f)));
+	float4 quat0 = q;
+	float4 quat1 = q * ((float4)(2.0f));
+	
+	float x2 = quat0.x * quat1.x;
+	float y2 = quat0.y * quat1.y;
+	float z2 = quat0.z * quat1.z;
+	
+	float xy = quat0.x * quat1.y;
+	float xz = quat0.x * quat1.z;
+	float xw = quat0.x * quat1.w;
+	float yz = quat0.y * quat1.z;
+	float yw = quat0.y * quat1.w;
+	float zw = quat0.z * quat1.w;
+	
+	matrix.m_front = (float4) (1.0f - y2 - z2, xy + zw, xz - yw, 0.0f);
+	matrix.m_up    = (float4) (xy - zw, 1.0f - x2 - z2, yz + xw, 0.0f);
+	matrix.m_right = (float4) (xz + yw, yz - xw, 1.0f - x2 - y2, 0.0f);
+
+	return matrix;
+}
+
+float4 MatrixUnrotateVector (struct dMatrix3x3 matrix, float4 q)
+{
+	float4 ret;
+	return ret;
+}
 
 __kernel void IntegrateBodiesPosition(
 	float timestepIn, 
@@ -143,10 +148,45 @@ __kernel void IntegrateBodiesPosition(
 	transformBuffer[globalIndex] = (float8) (com, rotation);
 } 
 
+float8 IntegrateForceAndToque(float8 timestep, float4 mass, float8 force, float4 gyroRotation, float4 omega)
+{
+	float8 velocStep;
+	//const dMatrix matrix(m_gyroRotation, dVector::m_wOne);
+	//const dVector localOmega(matrix.UnrotateVector(m_omega));
+	//const dVector localTorque(matrix.UnrotateVector(torque));
+
+	struct dMatrix3x3 matrix = QuatToMatrix (gyroRotation);
+	float4 localOmega = MatrixUnrotateVector (matrix, omega);
+	float4 localTorque = MatrixUnrotateVector (matrix, force.hi);
+	
+	// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
+	//const dVector dw(localOmega * timestep);
+	float4 dw = localOmega * timestep.lo;
+
+	//const dMatrix jacobianMatrix(
+	//	dVector(m_mass.m_x, (m_mass.m_z - m_mass.m_y) * dw.m_z, (m_mass.m_z - m_mass.m_y) * dw.m_y, dFloat32(0.0f)),
+	//	dVector((m_mass.m_x - m_mass.m_z) * dw.m_z, m_mass.m_y, (m_mass.m_x - m_mass.m_z) * dw.m_x, dFloat32(0.0f)),
+	//	dVector((m_mass.m_y - m_mass.m_x) * dw.m_y, (m_mass.m_y - m_mass.m_x) * dw.m_x, m_mass.m_z, dFloat32(0.0f)),
+	//	dVector::m_wOne);
+	struct dMatrix3x3 jacobianMatrix;
+	jacobianMatrix.m_front = (float4)(mass.x, (mass.z - mass.y) * dw.z, (mass.z - mass.y) * dw.y, 0.0f);
+	jacobianMatrix.m_up    = (float4)((mass.x - mass.z) * dw.z, mass.y, (mass.x - mass.z) * dw.x, 0.0f);
+	jacobianMatrix.m_right = (float4)((mass.y - mass.x) * dw.y, (mass.y - mass.x) * dw.x, mass.z, 0.0f);
+	
+	//// and solving for alpha we get the angular acceleration at t + dt
+	//// calculate gradient at a full time step
+	//const dVector gradientStep(jacobianMatrix.SolveByGaussianElimination(localTorque * timestep));
+	//
+	//velocStep.m_angular = matrix.RotateVector(gradientStep);
+	//velocStep.m_linear = force.Scale(m_invMass.m_w) * timestep;
+	return velocStep;
+}
+
 __kernel void IntegrateBodiesVelocity(
 	float timestep, 
 	int bodyCount,
 	__global int* indexPtr,
+	__global float4* gyroRotationBuffer,
 	__global float4* gyroTorqueBuffer, 
 	__global float8* externalForcesPtr,
 	__global float8* internalForcesPtr)
