@@ -247,7 +247,6 @@ dMatrix dMatrix::Inverse4x4 () const
 
 dVector dMatrix::SolveByGaussianElimination(const dVector &v) const
 {
-//	return  Inverse4x4().UnrotateVector(v);
 	dMatrix tmp(*this);
 	dVector ret(v);
 	for (dInt32 i = 0; i < 4; i++) 
