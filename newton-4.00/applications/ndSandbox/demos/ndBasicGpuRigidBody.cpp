@@ -131,7 +131,7 @@ void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
 	//BuildFloorBox(scene, dGetIdentityMatrix());
 
 	//AddBox(scene, dVector(0.0f, 0.0f, -3.0f, 1.0f), 0.6f, 5.0f, 0.5f, 3.0f);
-	AddBox(scene, dVector(0.0f, 2.0f, -3.0f, 1.0f), 1.0f, 10);
+	AddBox(scene, dVector(0.0f, 2.0f, -3.0f, 1.0f), 1.0f, 2);
 
 	dQuaternion rot;
 	dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);

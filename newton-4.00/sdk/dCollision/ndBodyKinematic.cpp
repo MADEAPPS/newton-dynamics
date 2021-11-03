@@ -365,9 +365,9 @@ dMatrix ndBodyKinematic::CalculateInvInertiaMatrix() const
 
 dMatrix ndBodyKinematic::CalculateInertiaMatrix() const
 {
-	const dVector Ixx(m_mass[0]);
-	const dVector Iyy(m_mass[1]);
-	const dVector Izz(m_mass[2]);
+	const dVector Ixx(m_mass.m_x);
+	const dVector Iyy(m_mass.m_y);
+	const dVector Izz(m_mass.m_z);
 	return dMatrix(
 		m_matrix.m_front.Scale(m_matrix.m_front[0]) * Ixx +
 		m_matrix.m_up.Scale(m_matrix.m_up[0])		* Iyy +
@@ -498,9 +498,9 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 		//		dWy / dwx = (Ix - Iz) * wz * dt, dWy / dwy = Iy, dWy / dwz = (Ix - Iz) * wx * dt
 		//		dWz / dwx = (Iy - Ix) * wy * dt, dWz / dwy = (Iy - Ix) * wx * dt, dWz / dwz = Iz
 		const dMatrix jacobianMatrix(
-			dVector(m_mass[0], (m_mass[2] - m_mass[1]) * dw[2], (m_mass[2] - m_mass[1]) * dw[1], dFloat32(0.0f)),
-			dVector((m_mass[0] - m_mass[2]) * dw[2], m_mass[1], (m_mass[0] - m_mass[2]) * dw[0], dFloat32(0.0f)),
-			dVector((m_mass[1] - m_mass[0]) * dw[1], (m_mass[1] - m_mass[0]) * dw[0], m_mass[2], dFloat32(0.0f)),
+			dVector(m_mass.m_x, (m_mass.m_z - m_mass.m_y) * dw.m_z, (m_mass.m_z - m_mass.m_y) * dw.m_y, dFloat32(0.0f)),
+			dVector((m_mass.m_x - m_mass.m_z) * dw.m_z, m_mass.m_y, (m_mass.m_x - m_mass.m_z) * dw.m_x, dFloat32(0.0f)),
+			dVector((m_mass.m_y - m_mass.m_x) * dw.m_y, (m_mass.m_y - m_mass.m_x) * dw.m_x, m_mass.m_z, dFloat32(0.0f)),
 			dVector::m_wOne);
 		
 		gradientStep = jacobianMatrix.SolveByGaussianElimination(gradientStep);
