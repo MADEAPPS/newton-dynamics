@@ -1481,8 +1481,9 @@ void ndDynamicsUpdateOpencl::FinishGpuUpdate()
 	dArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder();
 	//dVector* const omega = (dVector*)&m_omega[0];
 	//dVector* const veloc = (dVector*)&m_opencl->m_bodyArray.m_veloc[0];
-	dVector* const alpha = (dVector*)&m_opencl->m_bodyArray.m_alpha[0];
-	dVector* const accel = (dVector*)&m_opencl->m_bodyArray.m_accel[0];
+	//dVector* const alpha = (dVector*)&m_opencl->m_bodyArray.m_alpha[0];
+	//dVector* const accel = (dVector*)&m_opencl->m_bodyArray.m_accel[0];
+	ndJacobian* const accel = (ndJacobian*)&m_opencl->m_bodyArray.m_accel[0];
 	dVector* const posit = (dVector*)&m_opencl->m_bodyArray.m_posit[0];
 	dQuaternion* const rotation = (dQuaternion*)&m_opencl->m_bodyArray.m_rotation[0];
 	
@@ -1494,9 +1495,8 @@ void ndDynamicsUpdateOpencl::FinishGpuUpdate()
 		{
 			if (!dynBody->m_equilibrium)
 			{
-				dynBody->SetAlpha(alpha[i]);
 				dynBody->SetAccel(accel[i]);
-				dynBody->SetExternalForces();
+				dynBody->SaveExternalForces();
 				dynBody->SetMatrixAndCentreOfMass(rotation[i], posit[i]);
 			}
 		}

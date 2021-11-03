@@ -33,6 +33,7 @@
 
 #define D_OPENCL_BUFFER_SIZE	1024
 
+
 template<class T>
 class dOpenclBuffer: public dArray<T>
 {
@@ -52,6 +53,12 @@ class dOpenclBuffer: public dArray<T>
 class ndOpenclBodyBuffer
 {
 	public:
+	struct ndOpenclJacobian
+	{
+		cl_float4 m_linear;
+		cl_float4 m_angular;
+	};
+
 	ndOpenclBodyBuffer();
 	~ndOpenclBodyBuffer();
 
@@ -67,12 +74,10 @@ class ndOpenclBodyBuffer
 	void DebudKernel(dFloat32 timestepIn, const dArray<ndBodyKinematic*>& bodyArray);
 #endif
 
-	dOpenclBuffer<cl_float4> m_rotation;	// location 2
-	dOpenclBuffer<cl_float4> m_posit;		// location 3
-	dOpenclBuffer<cl_float4> m_omega;
-	dOpenclBuffer<cl_float4> m_veloc;
-	dOpenclBuffer<cl_float4> m_alpha;
-	dOpenclBuffer<cl_float4> m_accel;
+	dOpenclBuffer<cl_float4> m_rotation;	
+	dOpenclBuffer<cl_float4> m_posit;		
+	dOpenclBuffer<ndOpenclJacobian> m_veloc;
+	dOpenclBuffer<ndOpenclJacobian> m_accel;
 };
 
 class ndOpenclSystem: public dClassAlloc

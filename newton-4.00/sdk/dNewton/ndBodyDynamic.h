@@ -72,10 +72,12 @@ class ndBodyDynamic: public ndBodyKinematic
 	dVector GetAlpha() const;
 	virtual void SetAlpha(const dVector& alpha);
 
+	void SetAccel(const ndJacobian& accel);
+	
 	void IntegrateGyroSubstep(const dVector& timestep);
 	ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep) const;
 
-	void SetExternalForces();
+	void SaveExternalForces();
 
 	protected:
 	dVector m_accel;
@@ -131,7 +133,13 @@ inline void ndBodyDynamic::SetAlpha(const dVector& alpha)
 	m_alpha = alpha;
 }
 
-inline void ndBodyDynamic::SetExternalForces()
+inline void ndBodyDynamic::SetAccel(const ndJacobian& accel)
+{
+	SetAccel(accel.m_linear);
+	SetAlpha(accel.m_angular);
+}
+
+inline void ndBodyDynamic::SaveExternalForces()
 {
 	m_savedExternalForce = m_externalForce;
 	m_savedExternalTorque = m_externalTorque;

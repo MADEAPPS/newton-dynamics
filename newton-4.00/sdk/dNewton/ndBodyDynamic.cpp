@@ -185,7 +185,7 @@ void ndBodyDynamic::AddDampingAcceleration(dFloat32 timestep)
 void ndBodyDynamic::IntegrateVelocity(dFloat32 timestep)
 {
 	ndBodyKinematic::IntegrateVelocity(timestep);
-	SetExternalForces();
+	SaveExternalForces();
 }
 
 ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep) const
