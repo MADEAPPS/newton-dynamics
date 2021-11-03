@@ -53,11 +53,15 @@ class dOpenclBuffer: public dArray<T>
 class ndOpenclBodyBuffer
 {
 	public:
-	struct ndOpenclJacobian
+	typedef union 
 	{
-		cl_float4 m_linear;
-		cl_float4 m_angular;
-	};
+		cl_float8 m_data;
+		struct
+		{
+			cl_float4 m_linear;
+			cl_float4 m_angular;
+		};
+	} ndOpenclJacobian;
 
 	ndOpenclBodyBuffer();
 	~ndOpenclBodyBuffer();
@@ -74,8 +78,7 @@ class ndOpenclBodyBuffer
 	void DebudKernel(dFloat32 timestepIn, const dArray<ndBodyKinematic*>& bodyArray);
 #endif
 
-	dOpenclBuffer<cl_float4> m_rotation;	
-	dOpenclBuffer<cl_float4> m_posit;		
+	dOpenclBuffer<ndOpenclJacobian> m_transform;
 	dOpenclBuffer<ndOpenclJacobian> m_veloc;
 	dOpenclBuffer<ndOpenclJacobian> m_accel;
 };

@@ -31,10 +31,14 @@
 
 const char* ndOpenclSystem::m_kernelSource = R""""(
 
-struct dJacobian
+union dJacobian
 {
-	float4 m_linear;
-	float4 m_angular;
+	float8 m_data;
+	struct
+	{
+		float4 m_linear;
+		float4 m_angular;
+	};
 };
 
 //struct ndOpenclBodyBuffer
@@ -76,9 +80,9 @@ float4 NormalizeQuat(float4 r)
 }
 
 
-struct dJacobian IntegrateForceAndToque(float4 timestep, float4 force, float4 torque)
-{
-	struct dJacobian velocStep;
+//struct dJacobian IntegrateForceAndToque(float4 timestep, float4 force, float4 torque)
+//{
+//	struct dJacobian velocStep;
 //	const dMatrix matrix(m_gyroRotation, dVector::m_wOne);
 //	const dVector localOmega(matrix.UnrotateVector(m_omega));
 //	const dVector localTorque(matrix.UnrotateVector(torque));
@@ -97,16 +101,15 @@ struct dJacobian IntegrateForceAndToque(float4 timestep, float4 force, float4 to
 //
 //	velocStep.m_angular = matrix.RotateVector(gradientStep);
 //	velocStep.m_linear = force.Scale(m_invMass.m_w) * timestep;
-	return velocStep;
-}
+//	return velocStep;
+//}
 
 __kernel void IntegrateBodiesPosition(
 	float timestepIn, 
 	int bodyCount, 
-	__global float4* rotationBuffer, 
-	__global float4* centerOfMassBuffer,
-	__global struct dJacobian* velocBuffer,
-	__global struct dJacobian* accelBuffer) 
+	__global float8* transformBuffer,
+	__global float8* velocBuffer,
+	__global float8* accelBuffer) 
 { 
 	const int globalIndex = get_global_id(0); 
 	if (globalIndex >= bodyCount) 
@@ -114,21 +117,16 @@ __kernel void IntegrateBodiesPosition(
 		return;
 	}	
 
-	float4 timestep = (float4) (timestepIn);
-	float4 invTimestep = (float4) (1.0f / timestepIn);
+	float8 veloc = velocBuffer[globalIndex];
+	float8 accel = accelBuffer[globalIndex];
+	float8 transform = transformBuffer[globalIndex];
+
+	float8 timestep = (float8) (timestepIn);
+	float8 invTimestep = (float8) (1.0f / timestepIn);
 	
-	float4 veloc = velocBuffer[globalIndex].m_linear;
-	float4 omega = velocBuffer[globalIndex].m_angular;
-	float4 accel = accelBuffer[globalIndex].m_linear;
-	float4 alpha = accelBuffer[globalIndex].m_angular;
-	float4 com = centerOfMassBuffer[globalIndex];
-	float4 rotation = rotationBuffer[globalIndex]; 
-	
-	com = com + timestep * veloc;
 	accel = invTimestep * (veloc - accel);
-	alpha = invTimestep * (omega - alpha);
-	
-	float4 omega2 = omega * omega;
+	float4 com = transform.lo + timestep.lo * veloc.lo;
+	float4 omega2 = veloc.hi * veloc.hi;
 	float tmpMag2 = omega2.x + omega2.y + omega2.z;
 	
 	float tol = (0.0125f * 3.141592f / 180.0f);
@@ -137,15 +135,12 @@ __kernel void IntegrateBodiesPosition(
 	
 	float invOmegaMag = 1.0f / sqrt(omegaMag2);
 	float omegaAngle = invOmegaMag * omegaMag2 * timestepIn;
-	float4 omegaAxis = omega * invOmegaMag;
+	float4 omegaAxis = veloc.hi * invOmegaMag;
 	float4 rotationStep = MakeQuat(omegaAxis, omegaAngle);
-	float4 newRotation = MultiplyQuat(rotation, rotationStep);
-	rotation = NormalizeQuat(newRotation);
+	float4 rotation = NormalizeQuat(MultiplyQuat(transform.hi, rotationStep));
 	
-	accelBuffer[globalIndex].m_linear = accel;
-	accelBuffer[globalIndex].m_angular = alpha;
-	centerOfMassBuffer[globalIndex] = com;
-	rotationBuffer[globalIndex] = rotation; 
+	accelBuffer[globalIndex] = accel;
+	transformBuffer[globalIndex] = (float8) (com, rotation);
 } 
 
 __kernel void IntegrateBodiesVelocity(
@@ -153,8 +148,8 @@ __kernel void IntegrateBodiesVelocity(
 	int bodyCount,
 	__global int* indexPtr,
 	__global float4* gyroTorqueBuffer, 
-	__global struct dJacobian* externalForcesPtr,
-	__global struct dJacobian* internalForcesPtr)
+	__global float8* externalForcesPtr,
+	__global float8* internalForcesPtr)
 {
 	const int globalIndex = get_global_id(0); 
 	if (globalIndex >= bodyCount) 
@@ -166,45 +161,42 @@ __kernel void IntegrateBodiesVelocity(
 	//const dInt32 index = body->m_index;
 	//const ndJacobian& forceAndTorque = internalForces[index];
 
-	int index = indexPtr[globalIndex];
-	float4 gyroTorque = gyroTorqueBuffer[index];
-	float4 externalForce = externalForcesPtr[index].m_linear;
-	float4 externalTorque = externalForcesPtr[index].m_angular;
-	float4 internalForce = internalForcesPtr[index].m_linear;
-	float4 internalTorque = internalForcesPtr[index].m_angular;
-
-	//const dVector force(body->GetForce() + forceAndTorque.m_linear);
-	//const dVector torque(body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque());
-	float4 force = externalForce + internalForce;
-	float4 torque = externalTorque + internalTorque - gyroTorque;
-	
-	//ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
+	//int index = indexPtr[globalIndex];
+	//float4 gyroTorque = gyroTorqueBuffer[index];
+	//float4 externalForce = externalForcesPtr[index].m_linear;
+	//float4 externalTorque = externalForcesPtr[index].m_angular;
+	//float4 internalForce = internalForcesPtr[index].m_linear;
+	//float4 internalTorque = internalForcesPtr[index].m_angular;
 	//
-	//if (!body->m_resting)
-	//{
-	//	body->m_veloc += velocStep.m_linear;
-	//	body->m_omega += velocStep.m_angular;
-	//	body->IntegrateGyroSubstep(timestep4);
-	//}
-	//else
-	//{
-	//	const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
-	//	const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
-	//	const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
-	//	const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
-	//	body->m_resting &= equilibrium;
-	//}
+	////const dVector force(body->GetForce() + forceAndTorque.m_linear);
+	////const dVector torque(body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque());
+	//float4 force = externalForce + internalForce;
+	//float4 torque = externalTorque + internalTorque - gyroTorque;
+	//
+	////ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
+	////
+	////if (!body->m_resting)
+	////{
+	////	body->m_veloc += velocStep.m_linear;
+	////	body->m_omega += velocStep.m_angular;
+	////	body->IntegrateGyroSubstep(timestep4);
+	////}
+	////else
+	////{
+	////	const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
+	////	const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
+	////	const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
+	////	const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
+	////	body->m_resting &= equilibrium;
+	////}
 }
-
-
 
 )"""";
 
 
 
 ndOpenclBodyBuffer::ndOpenclBodyBuffer()
-	:m_rotation(CL_MEM_READ_WRITE)
-	,m_posit(CL_MEM_READ_WRITE)
+	:m_transform(CL_MEM_READ_WRITE)
 	,m_veloc(CL_MEM_READ_WRITE)
 	,m_accel(CL_MEM_READ_WRITE)
 {
@@ -216,56 +208,51 @@ ndOpenclBodyBuffer::~ndOpenclBodyBuffer()
 
 void ndOpenclBodyBuffer::Cleanup()
 {
-	m_rotation.Cleanup();
-	m_posit.Cleanup();
 	m_veloc.Cleanup();
 	m_accel.Cleanup();
+	m_transform.Cleanup();
 }
 
 void ndOpenclBodyBuffer::Resize(cl_context context, dArray<ndBodyKinematic*>& bodyArray)
 {
-	if (m_rotation.GetCapacity() < bodyArray.GetCount())
+	if (m_transform.GetCapacity() < bodyArray.GetCount())
 	{
-		dInt32 size = dMax(m_rotation.GetCapacity(), D_OPENCL_BUFFER_SIZE);
+		dInt32 size = dMax(m_transform.GetCapacity(), D_OPENCL_BUFFER_SIZE);
 		while (size < bodyArray.GetCount())
 		{
 			size *= 2;
 		}
-		m_rotation.SyncSize(context, size);
-		m_posit.SyncSize(context, size);
 		m_veloc.SyncSize(context, size);
 		m_accel.SyncSize(context, size);
+		m_transform.SyncSize(context, size);
 	}
 }
 
 void ndOpenclBodyBuffer::CopyToGpu(cl_command_queue commandQueue, const dArray<ndBodyKinematic*>& bodyArray)
 {
 	const dInt32 items = bodyArray.GetCount();
-	m_rotation.SetCount(items);
-	m_posit.SetCount(items);
 	m_veloc.SetCount(items);
 	m_accel.SetCount(items);
+	m_transform.SetCount(items);
 
-	dVector* const posit = (dVector*)&m_posit[0];
 	ndJacobian* const veloc = (ndJacobian*)&m_veloc[0];
 	ndJacobian* const accel = (ndJacobian*)&m_accel[0];
-	dQuaternion* const rotation = (dQuaternion*)&m_rotation[0];
+	ndJacobian* const transform = (ndJacobian*)&m_transform[0];
 
 	for (dInt32 i = 0; i < items; i++)
 	{
 		ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
-		rotation[i] = body->GetRotation();
-		posit[i] = body->GetGlobalGetCentreOfMass();
 		veloc[i].m_angular = body->GetOmega();
 		veloc[i].m_linear = body->GetVelocity();
 		accel[i].m_linear = body->GetAccel();
 		accel[i].m_angular = body->GetAlpha();
+		transform[i].m_angular = body->GetRotation();
+		transform[i].m_linear = body->GetGlobalGetCentreOfMass();
 	}
 
-	m_rotation.WriteData(commandQueue);
-	m_posit.WriteData(commandQueue);
 	m_veloc.WriteData(commandQueue);
 	m_accel.WriteData(commandQueue);
+	m_transform.WriteData(commandQueue);
 }
 
 #ifdef D_DEBUG_GPU_KERNELS
@@ -350,16 +337,13 @@ void ndOpenclBodyBuffer::SetKernelParameters(cl_kernel kernel, dFloat32 timestep
 	err = clSetKernelArg(kernel, 1, sizeof(cl_int), &bodyCount);
 	dAssert(err == CL_SUCCESS);
 
-	err = clSetKernelArg(kernel, 2, sizeof(cl_mem), &m_rotation.m_gpuBuffer);
+	err = clSetKernelArg(kernel, 2, sizeof(cl_mem), &m_transform.m_gpuBuffer);
 	dAssert(err == CL_SUCCESS);
 
-	err = clSetKernelArg(kernel, 3, sizeof(cl_mem), &m_posit.m_gpuBuffer);
+	err = clSetKernelArg(kernel, 3, sizeof(cl_mem), &m_veloc.m_gpuBuffer);
 	dAssert(err == CL_SUCCESS);
 
-	err = clSetKernelArg(kernel, 4, sizeof(cl_mem), &m_veloc.m_gpuBuffer);
-	dAssert(err == CL_SUCCESS);
-
-	err = clSetKernelArg(kernel, 5, sizeof(cl_mem), &m_accel.m_gpuBuffer);
+	err = clSetKernelArg(kernel, 4, sizeof(cl_mem), &m_accel.m_gpuBuffer);
 	dAssert(err == CL_SUCCESS);
 }
 
@@ -544,8 +528,7 @@ void ndOpenclSystem::ExecuteIntegrateBodyPosition(dFloat32 timestep, const dArra
 
 	// enqueue to read the body buffers results
 	m_bodyArray.m_accel.ReadData(m_commandQueue);
-	m_bodyArray.m_posit.ReadData(m_commandQueue);
-	m_bodyArray.m_rotation.ReadData(m_commandQueue);
+	m_bodyArray.m_transform.ReadData(m_commandQueue);
 
 #ifdef D_DEBUG_GPU_KERNELS
 	m_bodyArray.DebudKernel(timestep, bodyArray);
