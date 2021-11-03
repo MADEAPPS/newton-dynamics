@@ -161,34 +161,33 @@ __kernel void IntegrateBodiesVelocity(
 	//const dInt32 index = body->m_index;
 	//const ndJacobian& forceAndTorque = internalForces[index];
 
-	//int index = indexPtr[globalIndex];
-	//float4 gyroTorque = gyroTorqueBuffer[index];
-	//float4 externalForce = externalForcesPtr[index].m_linear;
-	//float4 externalTorque = externalForcesPtr[index].m_angular;
-	//float4 internalForce = internalForcesPtr[index].m_linear;
-	//float4 internalTorque = internalForcesPtr[index].m_angular;
+	int index = indexPtr[globalIndex];
+	float4 gyroTorque = gyroTorqueBuffer[index];
+	float8 externalForce = externalForcesPtr[index];
+	float8 internalForce = internalForcesPtr[index];
+
+	//const dVector force(body->GetForce() + forceAndTorque.m_linear);
+	//const dVector torque(body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque());
+	float8 force = externalForce + internalForce;
+	force.hi = force.hi - gyroTorque;
+
+
+	//ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
 	//
-	////const dVector force(body->GetForce() + forceAndTorque.m_linear);
-	////const dVector torque(body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque());
-	//float4 force = externalForce + internalForce;
-	//float4 torque = externalTorque + internalTorque - gyroTorque;
-	//
-	////ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
-	////
-	////if (!body->m_resting)
-	////{
-	////	body->m_veloc += velocStep.m_linear;
-	////	body->m_omega += velocStep.m_angular;
-	////	body->IntegrateGyroSubstep(timestep4);
-	////}
-	////else
-	////{
-	////	const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
-	////	const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
-	////	const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
-	////	const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
-	////	body->m_resting &= equilibrium;
-	////}
+	//if (!body->m_resting)
+	//{
+	//	body->m_veloc += velocStep.m_linear;
+	//	body->m_omega += velocStep.m_angular;
+	//	body->IntegrateGyroSubstep(timestep4);
+	//}
+	//else
+	//{
+	//	const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
+	//	const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
+	//	const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
+	//	const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
+	//	body->m_resting &= equilibrium;
+	//}
 }
 
 )"""";
