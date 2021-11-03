@@ -123,6 +123,7 @@ class ndOpenclSystem: public dClassAlloc
 	ndKernel m_integrateBodiesPosition;
 	ndKernel m_integrateBodiesVelocity;
 	static const char* m_kernelSource;
+	dInt32 m_computeUnits;
 };
 
 template<class T>

@@ -376,6 +376,11 @@ ndOpenclSystem::ndOpenclSystem(cl_context context, cl_platform_id)
 	strcat(m_platformName, ": ");
 	strcat(m_platformName, driverVersion);
 
+	size_t computeUnits;
+	err = clGetDeviceInfo(m_device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(size_t), &computeUnits, &stringLength);
+	dAssert(err == CL_SUCCESS);
+	m_computeUnits = dInt32(computeUnits);
+
 	// create command queue
 	cl_command_queue_properties properties = CL_QUEUE_PROFILING_ENABLE;
 	m_commandQueue = clCreateCommandQueue(m_context, m_device, properties, &err);
