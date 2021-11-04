@@ -122,6 +122,7 @@ class ndOpenclSystem: public dClassAlloc
 
 	ndKernel m_integrateBodiesPosition;
 	ndKernel m_integrateBodiesVelocity;
+	ndKernel m_integrateUnconstrainedBodies;
 	static const char* m_kernelSource;
 	dInt32 m_computeUnits;
 };

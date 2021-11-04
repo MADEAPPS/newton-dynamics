@@ -55,18 +55,20 @@ struct dMatrix3x3
 	};
 };
 
-float DotProduct(float4 a, float4 b)
+#define dSwap(type,a,b) { type temp = a; a = b; b = temp;}
+
+float dDotProduct(float4 a, float4 b)
 {
 	float4 mag2 = a * b;
 	return mag2.x + mag2.y + mag2.z + mag2.w;
 }
 
-float AddHorizontal (float4 a)
+float dAddHorizontal (float4 a)
 {
 	return a.x + a.y + a.z + a.w;
 }
 
-float4 MakeQuat(float4 axis, float angle)
+float4 dMakeQuat(float4 axis, float angle)
 {
 	angle = angle * 0.5f;
 	float4 quat = axis * ((float4) (sin (angle)));
@@ -74,7 +76,7 @@ float4 MakeQuat(float4 axis, float angle)
 	return quat;
 }
 
-float4 MultiplyQuat(float4 r, float4 q)
+float4 dMultiplyQuat(float4 r, float4 q)
 {
 	float4 x = (float4)( q.w,  q.z, -q.y, -q.x);
 	float4 y = (float4)(-q.z,  q.w,  q.x, -q.y);
@@ -82,13 +84,13 @@ float4 MultiplyQuat(float4 r, float4 q)
 	return x * ((float4)(r.x)) + y * ((float4)(r.y)) + z * ((float4)(r.z)) + q * ((float4)(r.w));
 }
 
-float4 NormalizeQuat(float4 r)
+float4 dNormalizeQuat(float4 r)
 {
-	float invMag = 1.0f / sqrt(DotProduct(r, r));
+	float invMag = 1.0f / sqrt(dDotProduct(r, r));
 	return r * ((float4) (invMag));
 }
 
-struct dMatrix3x3 QuatToMatrix (float4 q)
+struct dMatrix3x3 dQuatToMatrix (float4 q)
 {
 	struct dMatrix3x3 matrix;
 
@@ -115,15 +117,15 @@ struct dMatrix3x3 QuatToMatrix (float4 q)
 	return matrix;
 }
 
-float4 MatrixUnrotateVector (struct dMatrix3x3 matrix, float4 q)
+float4 dMatrixUnrotateVector (struct dMatrix3x3 matrix, float4 q)
 {
 	float4 x = matrix.m_front * q;
 	float4 y = matrix.m_up * q;
 	float4 z = matrix.m_right * q;
-	return (float4) (AddHorizontal (x), AddHorizontal (y), AddHorizontal (z), 0.0f);
+	return (float4) (dAddHorizontal (x), dAddHorizontal (y), dAddHorizontal (z), 0.0f);
 }
 
-float4 MatrixRotateVector (struct dMatrix3x3 matrix, float4 q)
+float4 dMatrixRotateVector (struct dMatrix3x3 matrix, float4 q)
 {
 	float4 x = matrix.m_front * (float4)(q.x);
 	float4 y = matrix.m_up * (float4)(q.y);
@@ -131,9 +133,8 @@ float4 MatrixRotateVector (struct dMatrix3x3 matrix, float4 q)
 	return x + y + z;
 }
 
-float4 MatrixByGaussianElimination(struct dMatrix3x3 matrix, float4 v)
+float4 dMatrixByGaussianElimination(struct dMatrix3x3 matrix, float4 v)
 {
-	//dMatrix tmp(*this);
 	float4 ret = v;
 	struct dMatrix3x3 tmp = matrix;
 	for (int i = 0; i < 3; i++) 
@@ -155,14 +156,9 @@ float4 MatrixByGaussianElimination(struct dMatrix3x3 matrix, float4 v)
 			if (permute != i) 
 			{
 				//dSwap(ret[i], ret[permute]);
-				float ret1 = ret[i];
-				ret[i] = ret[permute];
-				ret[permute] = ret1;
-
 				//dSwap(tmp[i], tmp[permute]);
-				float4 tmp1 = tmp.m_data[i];
-				tmp.m_data[i] = tmp.m_data[permute];
-				tmp.m_data[permute] = tmp1;
+				dSwap(float, ret[i], ret[permute]);
+				dSwap(float4, tmp.m_data[i], tmp.m_data[permute]);
 			}
 		}
 	
@@ -185,13 +181,13 @@ float4 MatrixByGaussianElimination(struct dMatrix3x3 matrix, float4 v)
 		//dVector pivot(tmp[i] * ret);
 		//ret[i] = (ret[i] - pivot.AddHorizontal().GetScalar() + tmp[i][i] * ret[i]) / tmp[i][i];
 		float4 pivot = tmp.m_data[i] * ret;
-		ret[i] = (ret[i] - AddHorizontal(pivot) + tmp.m_data[i][i] * ret[i]) / tmp.m_data[i][i];
+		ret[i] = (ret[i] - dAddHorizontal(pivot) + tmp.m_data[i][i] * ret[i]) / tmp.m_data[i][i];
 	}
 	
 	return ret;
 }
 
-float8 IntegrateForceAndToque(
+float8 dIntegrateForceAndToque(
 	float4 timestep, 
 	float4 mass, 
 	float4 invMass, 
@@ -199,9 +195,9 @@ float8 IntegrateForceAndToque(
 	float4 omega,
 	float8 force)
 {
-	struct dMatrix3x3 matrix = QuatToMatrix (gyroRotation);
-	float4 localOmega = MatrixUnrotateVector (matrix, omega);
-	float4 localTorque = MatrixUnrotateVector (matrix, force.hi);
+	struct dMatrix3x3 matrix = dQuatToMatrix (gyroRotation);
+	float4 localOmega = dMatrixUnrotateVector (matrix, omega);
+	float4 localTorque = dMatrixUnrotateVector (matrix, force.hi);
 	
 	//derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
 	//const dVector dw(localOmega * timestep);
@@ -220,10 +216,10 @@ float8 IntegrateForceAndToque(
 	//and solving for alpha we get the angular acceleration at t + dt
 	//calculate gradient at a full time step
 	//const dVector gradientStep(jacobianMatrix.SolveByGaussianElimination(localTorque * timestep));
-	float4 gradientStep = MatrixByGaussianElimination(jacobianMatrix, localTorque * timestep);
+	float4 gradientStep = dMatrixByGaussianElimination(jacobianMatrix, localTorque * timestep);
 
 	float8 velocStep;
-	velocStep.hi = MatrixRotateVector (matrix, gradientStep);
+	velocStep.hi = dMatrixRotateVector (matrix, gradientStep);
 	velocStep.lo = force.lo * timestep * (float4)(invMass.w);
 	return velocStep;
 }
@@ -260,8 +256,8 @@ __kernel void IntegrateBodiesPosition(
 	float invOmegaMag = 1.0f / sqrt(omegaMag2);
 	float omegaAngle = invOmegaMag * omegaMag2 * timestepIn;
 	float4 omegaAxis = veloc.hi * invOmegaMag;
-	float4 rotationStep = MakeQuat(omegaAxis, omegaAngle);
-	float4 rotation = NormalizeQuat(MultiplyQuat(transform.hi, rotationStep));
+	float4 rotationStep = dMakeQuat(omegaAxis, omegaAngle);
+	float4 rotation = dNormalizeQuat(dMultiplyQuat(transform.hi, rotationStep));
 	
 	accelBuffer[globalIndex] = accel;
 	transformBuffer[globalIndex] = (float8) (com, rotation);
@@ -305,7 +301,7 @@ __kernel void IntegrateBodiesVelocity(
 
 	float4 timestep4 = (float4) (timestep);
 	//ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
-	float8 velocStep = IntegrateForceAndToque(timestep4, mass, invMass, gyroRotation, veloc.hi, force);
+	float8 velocStep = dIntegrateForceAndToque(timestep4, mass, invMass, gyroRotation, veloc.hi, force);
 
 
 	//if (!body->m_resting)
@@ -322,6 +318,33 @@ __kernel void IntegrateBodiesVelocity(
 	//	const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
 	//	body->m_resting &= equilibrium;
 	//}
+}
+
+__kernel void IntegrateUnconstrainedBodies(
+	float timestep, 
+	int bodyCount,
+	__global int* indexPtr
+	//__global float4* massBuffer,
+	//__global float4* invMassBuffer,
+	//__global float4* gyroRotationBuffer,
+	//__global float4* gyroTorqueBuffer, 
+	//__global float8* velocBuffer, 
+	//__global float8* externalForcesPtr,
+	//__global float8* internalForcesPtr
+)
+{
+	const int globalIndex = get_global_id(0); 
+	if (globalIndex >= bodyCount) 
+	{
+		return;
+	}	
+
+	int index = indexPtr[globalIndex];
+
+	//ndBodyKinematic* const body = bodyArray[base + i]->GetAsBodyKinematic();
+	//body->UpdateInvInertiaMatrix();
+	//body->AddDampingAcceleration(m_timestep);
+	//body->IntegrateExternalForce(timestep);
 }
 
 )"""";
@@ -485,6 +508,7 @@ ndOpenclSystem::ndOpenclSystem(cl_context context, cl_platform_id)
 	,m_bodyArray()
 	,m_integrateBodiesPosition()
 	,m_integrateBodiesVelocity()
+	,m_integrateUnconstrainedBodies()
 {
 	cl_int err = CL_SUCCESS;
 
@@ -524,6 +548,7 @@ ndOpenclSystem::ndOpenclSystem(cl_context context, cl_platform_id)
 
 	SetKernel("IntegrateBodiesPosition", m_integrateBodiesPosition);
 	SetKernel("IntegrateBodiesVelocity", m_integrateBodiesVelocity);
+	SetKernel("IntegrateUnconstrainedBodies", m_integrateUnconstrainedBodies);
 }
 
 ndOpenclSystem::~ndOpenclSystem()
@@ -537,6 +562,10 @@ ndOpenclSystem::~ndOpenclSystem()
 
 	err = clReleaseKernel(m_integrateBodiesVelocity.m_kernel);
 	dAssert(err == CL_SUCCESS);
+
+	err = clReleaseKernel(m_integrateUnconstrainedBodies.m_kernel);
+	dAssert(err == CL_SUCCESS);
+
 
 	err = clReleaseProgram(m_solverProgram);
 	dAssert(err == CL_SUCCESS);
