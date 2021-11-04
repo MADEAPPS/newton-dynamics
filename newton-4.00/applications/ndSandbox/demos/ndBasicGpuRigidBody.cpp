@@ -130,10 +130,10 @@ void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
 	// build a floor
 	//BuildFloorBox(scene, dGetIdentityMatrix());
 
-	//AddBox(scene, dVector(0.0f, 0.0f, -3.0f, 1.0f), 0.6f, 5.0f, 0.5f, 3.0f);
-	AddBox(scene, dVector(0.0f, 2.0f, -3.0f, 1.0f), 1.0f, 1);
+	dInt32 count = 1;
+	AddBox(scene, dVector(0.0f, 2.0f, -3.0f, 1.0f), 1.0f, count);
 
 	dQuaternion rot;
-	dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-10.0f - 5.0f * count, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
