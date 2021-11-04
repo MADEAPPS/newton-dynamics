@@ -1368,8 +1368,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 
 			for (dInt32 i = threadIndex; i < islandCount; i += threadCount)
 			{
-				const ndIsland& island = islandArray[i];
-				me->UpdateIslandState(island);
+				me->UpdateIslandState(i);
 			}
 		}
 	};
@@ -1378,8 +1377,9 @@ void ndDynamicsUpdate::DetermineSleepStates()
 	scene->SubmitJobs<ndDetermineSleepStates>();
 }
 
-void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
+void ndDynamicsUpdate::UpdateIslandState(dInt32 entry)
 {
+	const ndIsland& island = m_islands[entry];
 	dFloat32 velocityDragCoeff = D_FREEZZING_VELOCITY_DRAG;
 
 	const dInt32 count = island.m_count;

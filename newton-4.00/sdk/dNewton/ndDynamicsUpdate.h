@@ -40,6 +40,8 @@
 // For more detail on the derivation of the Runge Kutta coefficients you can go to:  
 // http://pathfinder.scar.utoronto.ca/~dyer/csca57/book_P/node51.html
 
+#define D_USE_ISLANDS
+
 class ndWorld;
 
 D_MSV_NEWTON_ALIGN_32
@@ -82,6 +84,7 @@ class ndDynamicsUpdate: public dClassAlloc
 		ndBodyKinematic* m_root;
 	};
 
+#ifdef D_USE_ISLANDS
 	class ndIsland
 	{
 		public:
@@ -96,6 +99,7 @@ class ndDynamicsUpdate: public dClassAlloc
 		dInt32 m_count;
 		ndBodyKinematic* m_root;
 	};
+#endif
 
 	public:
 	ndDynamicsUpdate(ndWorld* const world);
@@ -133,7 +137,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	void IntegrateUnconstrainedBodies();
 
 	void DetermineSleepStates();
-	void UpdateIslandState(const ndIsland& island);
+	void UpdateIslandState(dInt32 index);
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
 	protected:
@@ -144,7 +148,9 @@ class ndDynamicsUpdate: public dClassAlloc
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
 	dVector m_velocTol;
+#ifdef D_USE_ISLANDS
 	dArray<ndIsland> m_islands;
+#endif
 	dArray<dInt32> m_jointForcesIndex;
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndLeftHandSide> m_leftHandSide;
