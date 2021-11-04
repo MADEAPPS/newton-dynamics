@@ -31,21 +31,28 @@
 
 const char* ndOpenclSystem::m_kernelSource = R""""(
 
-union dJacobian
-{
-	float8 m_data;
-	struct
-	{
-		float4 m_linear;
-		float4 m_angular;
-	};
-};
+//union dJacobian
+//{
+//	float8 m_data;
+//	struct
+//	{
+//		float4 m_linear;
+//		float4 m_angular;
+//	};
+//};
 
 struct dMatrix3x3
 {
-	float4 m_front;
-	float4 m_up;
-	float4 m_right;
+	union 
+	{
+		float4 m_data[3];
+		struct 
+		{
+			float4 m_front;
+			float4 m_up;
+			float4 m_right;
+		};
+	};
 };
 
 float DotProduct(float4 a, float4 b)
@@ -127,47 +134,61 @@ float4 MatrixRotateVector (struct dMatrix3x3 matrix, float4 q)
 float4 MatrixByGaussianElimination(struct dMatrix3x3 matrix, float4 v)
 {
 	//dMatrix tmp(*this);
-	//dVector ret(v);
-	//for (dInt32 i = 0; i < 4; i++) 
-	//{
-	//	dFloat32 pivot = dAbs(tmp[i][i]);
-	//	if (pivot < dFloat32(0.01f)) 
-	//	{
-	//		dInt32 permute = i;
-	//		for (dInt32 j = i + 1; j < 4; j++) 
-	//		{
-	//			dFloat32 pivot1 = dAbs(tmp[j][i]);
-	//			if (pivot1 > pivot) {
-	//				permute = j;
-	//				pivot = pivot1;
-	//			}
-	//		}
-	//		
-	//		if (permute != i) 
-	//		{
-	//			dAssert(pivot > dFloat32(1.0e-6f));
-	//			dSwap(ret[i], ret[permute]);
-	//			dSwap(tmp[i], tmp[permute]);
-	//		}
-	//	}
-	//
-	//	for (dInt32 j = i + 1; j < 4; j++) 
-	//	{
-	//		dVector scale(tmp[j][i] / tmp[i][i]);
-	//		tmp[j] -= tmp[i] * scale;
-	//		ret[j] -= ret[i] * scale.GetScalar();
-	//		tmp[j][i] = dFloat32(0.0f);
-	//	}
-	//}
-	//
-	//for (dInt32 i = 3; i >= 0; i--) 
-	//{
-	//	dVector pivot(tmp[i] * ret);
-	//	ret[i] = (ret[i] - pivot.AddHorizontal().GetScalar() + tmp[i][i] * ret[i]) / tmp[i][i];
-	//}
-	//
-	//return ret;
-	return (float4)(0);
+	float4 ret = v;
+	struct dMatrix3x3 tmp = matrix;
+	for (int i = 0; i < 3; i++) 
+	{
+		float pivot = fabs(tmp.m_data[i][i]);
+		if (pivot < 0.01f) 
+		{
+			int permute = i;
+			for (int j = i + 1; j < 3; j++) 
+			{
+				float pivot1 = fabs(tmp.m_data[j][i]);
+				if (pivot1 > pivot) 
+				{
+					permute = j;
+					pivot = pivot1;
+				}
+			}
+			
+			if (permute != i) 
+			{
+				//dSwap(ret[i], ret[permute]);
+				float ret1 = ret[i];
+				ret[i] = ret[permute];
+				ret[permute] = ret1;
+
+				//dSwap(tmp[i], tmp[permute]);
+				float4 tmp1 = tmp.m_data[i];
+				tmp.m_data[i] = tmp.m_data[permute];
+				tmp.m_data[permute] = tmp1;
+			}
+		}
+	
+		for (int j = i + 1; j < 3; j++) 
+		{
+			//dVector scale(tmp[j][i] / tmp[i][i]);
+			//tmp[j] -= tmp[i] * scale;
+			//ret[j] -= ret[i] * scale.GetScalar();
+			//tmp[j][i] = dFloat32(0.0f);
+
+			float4 scale = (float4) (tmp.m_data[j][i] / tmp.m_data[i][i]);
+			tmp.m_data[j] = tmp.m_data[j] - tmp.m_data[i] * scale;
+			ret[j] = ret[j] - ret[i] * scale[0];
+			tmp.m_data[j][i] = 0.0f;
+		}
+	}
+	
+	for (int i = 2; i >= 0; i--) 
+	{
+		//dVector pivot(tmp[i] * ret);
+		//ret[i] = (ret[i] - pivot.AddHorizontal().GetScalar() + tmp[i][i] * ret[i]) / tmp[i][i];
+		float4 pivot = tmp.m_data[i] * ret;
+		ret[i] = (ret[i] - AddHorizontal(pivot) + tmp.m_data[i][i] * ret[i]) / tmp.m_data[i][i];
+	}
+	
+	return ret;
 }
 
 float8 IntegrateForceAndToque(
@@ -182,7 +203,7 @@ float8 IntegrateForceAndToque(
 	float4 localOmega = MatrixUnrotateVector (matrix, omega);
 	float4 localTorque = MatrixUnrotateVector (matrix, force.hi);
 	
-	// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
+	//derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
 	//const dVector dw(localOmega * timestep);
 	float4 dw = localOmega * timestep;
 
@@ -196,8 +217,8 @@ float8 IntegrateForceAndToque(
 	jacobianMatrix.m_up    = (float4)((mass.x - mass.z) * dw.z, mass.y, (mass.x - mass.z) * dw.x, 0.0f);
 	jacobianMatrix.m_right = (float4)((mass.y - mass.x) * dw.y, (mass.y - mass.x) * dw.x, mass.z, 0.0f);
 	
-	// and solving for alpha we get the angular acceleration at t + dt
-	// calculate gradient at a full time step
+	//and solving for alpha we get the angular acceleration at t + dt
+	//calculate gradient at a full time step
 	//const dVector gradientStep(jacobianMatrix.SolveByGaussianElimination(localTorque * timestep));
 	float4 gradientStep = MatrixByGaussianElimination(jacobianMatrix, localTorque * timestep);
 

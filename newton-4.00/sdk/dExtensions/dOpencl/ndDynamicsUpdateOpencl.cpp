@@ -1476,6 +1476,7 @@ void ndDynamicsUpdateOpencl::CalculateForces()
 
 void ndDynamicsUpdateOpencl::FinishGpuUpdate()
 {
+	D_TRACKTIME();
 	m_opencl->Finish();
 
 	dArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder();

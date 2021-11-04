@@ -258,7 +258,8 @@ dVector dMatrix::SolveByGaussianElimination(const dVector &v) const
 			for (dInt32 j = i + 1; j < 4; j++) 
 			{
 				dFloat32 pivot1 = dAbs(tmp[j][i]);
-				if (pivot1 > pivot) {
+				if (pivot1 > pivot) 
+				{
 					permute = j;
 					pivot = pivot1;
 				}
