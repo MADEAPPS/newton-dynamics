@@ -65,6 +65,7 @@ static void BuildBoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
+baseMatrix.m_posit.m_y += 1.0f;
 		baseMatrix = rotation * baseMatrix;
 	}
 
@@ -179,7 +180,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	origin = dVector::m_zero;
 	origin.m_x -= 2.0f;
 	origin.m_z -= 3.0f;
-	BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+	BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 2);
 	
 	origin.m_z += 6.0f;
 	//BuildCylinderStack(scene, 10.0f, origin, dVector(0.75f, 0.6f, 1.0f, 0.0f), 20);
