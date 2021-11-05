@@ -26,10 +26,10 @@
 #include "dCoreStdafx.h"
 #include "dTypes.h"
 #include "dUtils.h"
-
+#include "dClassAlloc.h"
 
 template<class T, class dMatrixTimeVector, class dInversePrecoditionerTimeVector>
-class dConjugateGradient
+class dConjugateGradient : public dClassAlloc
 {
 	public:
 	dConjugateGradient();

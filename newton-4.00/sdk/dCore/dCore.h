@@ -69,6 +69,7 @@
 #include <dContainersAlloc.h>
 #include <dAabbPolygonSoup.h>
 #include <dSmallDeterminant.h>
+#include <dConjugateGradient.h>
 #include <dPolygonSoupBuilder.h>
 #include <dPolygonSoupDatabase.h>
 #include <dPolyhedraMassProperties.h>

@@ -411,6 +411,9 @@ void ndDynamicsUpdate::SortJointsScan()
 
 	dAssert(m_activeJointCount <= jointArray.GetCount());
 	jointArray.SetCount(m_activeJointCount);
+
+	dAssert(0);
+#ifdef D_USE_ISLANDS
 	for (dInt32 i = jointArray.GetCount() - 1; i >= 0; i--)
 	{
 		ndConstraint* const joint = jointArray[i];
@@ -451,6 +454,7 @@ void ndDynamicsUpdate::SortJointsScan()
 			}
 		}
 	}
+#endif
 	m_activeJointCount = movingJointCount;
 
 	GetTempInternalForces().SetCount(jointArray.GetCount() * 2);
@@ -473,14 +477,20 @@ void ndDynamicsUpdate::SortJoints()
 	D_TRACKTIME();
 
 	SortJointsScan();
-
+	ndScene* const scene = m_world->GetScene();
 	if (!m_activeJointCount)
 	{
-	//	jointArray.SetCount(0);
+		#ifndef D_USE_ISLANDS
+		dArray<dInt32>& indexBuffer = GetJointForceIndexBuffer();
+		const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
+		indexBuffer.SetCount(bodyArray.GetCount() + 1);
+		ClearBuffer(&indexBuffer[0], sizeof(dInt32) * bodyArray.GetCount());
+		m_unConstrainedBodyCount = bodyArray.GetCount();
+		#endif
 		return;
 	}
 
-	ndScene* const scene = m_world->GetScene();
+	
 	ndConstraintArray& jointArray = scene->GetActiveContactArray();
 
 	dInt32 rowCount = 1;
@@ -639,8 +649,6 @@ void ndDynamicsUpdate::SortIslands()
 			scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, EvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 1);
 		}
 	}
-#else
-	dAssert(0);
 #endif
 }
 
@@ -1965,8 +1973,7 @@ void ndDynamicsUpdate::Update()
 #ifdef D_USE_ISLANDS
 	dInt32 count = m_islands.GetCount();
 #else
-	dAssert(0);
-	dInt32 count = 0;
+	dInt32 count = m_unConstrainedBodyCount || m_activeJointCount;
 #endif
 	if (count)
 	{
