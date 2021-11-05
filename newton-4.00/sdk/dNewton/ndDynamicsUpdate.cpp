@@ -639,6 +639,8 @@ void ndDynamicsUpdate::SortIslands()
 			scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, EvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 1);
 		}
 	}
+#else
+	dAssert(0);
 #endif
 }
 
@@ -1381,6 +1383,8 @@ void ndDynamicsUpdate::DetermineSleepStates()
 
 	ndScene* const scene = m_world->GetScene();
 	scene->SubmitJobs<ndDetermineSleepStates>();
+#else
+	dAssert(0);
 #endif
 }
 
@@ -1591,6 +1595,8 @@ void ndDynamicsUpdate::UpdateIslandState(dInt32 entry)
 			}
 		}
 	}
+#else
+	dAssert(0);
 #endif
 }
 

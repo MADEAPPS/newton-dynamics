@@ -350,15 +350,15 @@ dMatrix ndBodyKinematic::CalculateInvInertiaMatrix() const
 	const dVector invIzz(m_invMass[2]);
 	return dMatrix(
 		m_matrix.m_front.Scale(m_matrix.m_front[0]) * invIxx +
-		m_matrix.m_up.Scale(m_matrix.m_up[0])		* invIyy +
+		m_matrix.m_up.Scale(m_matrix.m_up[0])	* invIyy +
 		m_matrix.m_right.Scale(m_matrix.m_right[0]) * invIzz,
 
 		m_matrix.m_front.Scale(m_matrix.m_front[1]) * invIxx +
-		m_matrix.m_up.Scale(m_matrix.m_up[1])		* invIyy +
+   		m_matrix.m_up.Scale(m_matrix.m_up[1])	* invIyy +
 		m_matrix.m_right.Scale(m_matrix.m_right[1]) * invIzz,
 
 		m_matrix.m_front.Scale(m_matrix.m_front[2]) * invIxx +
-		m_matrix.m_up.Scale(m_matrix.m_up[2])		* invIyy +
+		m_matrix.m_up.Scale(m_matrix.m_up[2])	* invIyy +
 		m_matrix.m_right.Scale(m_matrix.m_right[2]) * invIzz,
 		dVector::m_wOne);
 }
@@ -370,7 +370,7 @@ dMatrix ndBodyKinematic::CalculateInertiaMatrix() const
 	const dVector Izz(m_mass.m_z);
 	return dMatrix(
 		m_matrix.m_front.Scale(m_matrix.m_front[0]) * Ixx +
-		m_matrix.m_up.Scale(m_matrix.m_up[0])		* Iyy +
+		m_matrix.m_up.Scale(m_matrix.m_up[0]) 	* Iyy +
 		m_matrix.m_right.Scale(m_matrix.m_right[0]) * Izz,
 
 		m_matrix.m_front.Scale(m_matrix.m_front[1]) * Ixx +

@@ -36,10 +36,10 @@
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0		// basic rigidbody
-//#define DEFAULT_SCENE	1		// gpu basic rigidbody
+#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// conservation of momentum 
-#define DEFAULT_SCENE	4		// basic Stacks
+//#define DEFAULT_SCENE	4		// basic Stacks
 //#define DEFAULT_SCENE	5		// basic Trigger
 //#define DEFAULT_SCENE	6		// basic player
 //#define DEFAULT_SCENE	7		// particle fluid
@@ -795,10 +795,10 @@ void ndDemoEntityManager::ShowMainMenuBar()
 
 			ImGui::Text("solvers");
 			dInt32 solverMode(m_solverMode);
-			ImGui::RadioButton("sse soa", &solverMode, ndWorld::ndSimdSoaSolver);
 			ImGui::RadioButton("avx2", &solverMode, ndWorld::ndSimdAvx2Solver);
-			ImGui::RadioButton("opencl 1", &solverMode, ndWorld::ndOpenclSolver1);
-			ImGui::RadioButton("opencl 2", &solverMode, ndWorld::ndOpenclSolver2);
+			ImGui::RadioButton("sse soa", &solverMode, ndWorld::ndSimdSoaSolver);
+			ImGui::RadioButton("opencl1", &solverMode, ndWorld::ndOpenclSolver1);
+			ImGui::RadioButton("opencl2", &solverMode, ndWorld::ndOpenclSolver2);
 			ImGui::RadioButton("default", &solverMode, ndWorld::ndStandardSolver);
 			m_solverMode = ndWorld::ndSolverModes(solverMode);
 			ImGui::Separator();

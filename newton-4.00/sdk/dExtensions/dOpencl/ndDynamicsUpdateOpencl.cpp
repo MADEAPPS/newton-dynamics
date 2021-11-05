@@ -125,7 +125,7 @@ void ndDynamicsUpdateOpencl::SortJoints()
 void ndDynamicsUpdateOpencl::SortIslands()
 {
 	D_TRACKTIME();
-
+#ifdef D_USE_ISLANDS
 	ndScene* const scene = m_world->GetScene();
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	GetInternalForces().SetCount(bodyArray.GetCount());
@@ -233,6 +233,9 @@ void ndDynamicsUpdateOpencl::SortIslands()
 			scene->CountingSort<ndIsland, 9, EvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 1);
 		}
 	}
+#else
+	dAssert(0);
+#endif
 }
 
 void ndDynamicsUpdateOpencl::IntegrateUnconstrainedBodies()
@@ -942,6 +945,7 @@ void ndDynamicsUpdateOpencl::IntegrateBodies()
 void ndDynamicsUpdateOpencl::DetermineSleepStates()
 {
 	D_TRACKTIME();
+#ifdef D_USE_ISLANDS
 	class ndDetermineSleepStates : public ndScene::ndBaseJob
 	{
 		public:
@@ -965,10 +969,15 @@ void ndDynamicsUpdateOpencl::DetermineSleepStates()
 
 	ndScene* const scene = m_world->GetScene();
 	scene->SubmitJobs<ndDetermineSleepStates>();
+#else
+	dAssert(0);
+#endif
 }
 
 void ndDynamicsUpdateOpencl::UpdateIslandState(dInt32 entry)
 {
+#ifdef D_USE_ISLANDS
+
 	const ndIsland& island = m_islands[entry];
 
 	dFloat32 velocityDragCoeff = D_FREEZZING_VELOCITY_DRAG;
@@ -1174,6 +1183,9 @@ void ndDynamicsUpdateOpencl::UpdateIslandState(dInt32 entry)
 			}
 		}
 	}
+#else
+	dAssert(0);
+#endif
 }
 
 void ndDynamicsUpdateOpencl::InitSkeletons()
@@ -1513,7 +1525,13 @@ void ndDynamicsUpdateOpencl::Update()
 		m_timestep = m_world->GetScene()->GetTimestep();
 
 		BuildIsland();
-		if (m_islands.GetCount())
+#ifdef D_USE_ISLANDS
+		dInt32 count = m_islands.GetCount();
+#else
+		dAssert(0);
+		dInt32 count = 0;
+#endif
+		if (count)
 		{
 			IntegrateUnconstrainedBodies();
 			InitWeights();
