@@ -104,7 +104,8 @@ T dConjugateGradient<T, dMatrixTimeVector, dInversePrecoditionerTimeVector>::Sol
 template<class T, class dMatrixTimeVector, class dInversePrecoditionerTimeVector>
 T dConjugateGradient<T, dMatrixTimeVector, dInversePrecoditionerTimeVector>::SolveInternal(dInt32 size, T tolerance, T* const x, const T* const b) const
 {
-	dAssert(0);
+dAssert(0);
+return 0;
 	//MatrixTimeVector(m_z0, x);
 	//dSub(size, m_r0, b, m_z0);
 	//InversePrecoditionerTimeVector(m_p0, m_r0);
@@ -149,7 +150,7 @@ T dConjugateGradient<T, dMatrixTimeVector, dInversePrecoditionerTimeVector>::Sol
 	//	}
 	//}
 	//dAssert(iter <= size);
-	return num;
+	//return num;
 }
 
 #endif
