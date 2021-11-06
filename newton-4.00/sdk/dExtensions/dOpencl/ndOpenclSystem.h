@@ -172,7 +172,7 @@ void dOpenclBuffer<T>::SyncSize(cl_context context, dInt32 size)
 			m_gpuBuffer = clCreateBuffer(context, m_flags, sizeof(T) * size, nullptr, &err);
 		}
 		dAssert(err == CL_SUCCESS);
-		Resize(size);
+		dArray<T>::Resize(size);
 	}
 	else
 	{
