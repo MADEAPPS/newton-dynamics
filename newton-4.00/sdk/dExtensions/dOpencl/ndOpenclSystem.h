@@ -149,7 +149,7 @@ void dOpenclBuffer<T>::Cleanup()
 		cl_int err = CL_SUCCESS;
 		err = clReleaseMemObject(m_gpuBuffer);
 		dAssert(err == CL_SUCCESS);
-		Resize(0);
+		dArray<T>::Resize(0);
 	}
 	m_gpuBuffer = nullptr;
 }
