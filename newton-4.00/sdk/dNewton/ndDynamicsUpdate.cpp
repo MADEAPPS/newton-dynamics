@@ -1487,7 +1487,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 		{
 		}
 
-		void CheckUncontrainedBody(ndBodyDynamic* const body) const
+		void CheckUncontrainedBodySleepState(ndBodyDynamic* const body) const
 		{
 			const dVector accelTest((body->m_accel.DotProduct(body->m_accel) > m_maxSingleAccNorm2) | 
 									(body->m_alpha.DotProduct(body->m_alpha) > m_maxSingleAccNorm2));
@@ -1516,7 +1516,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 					body->m_veloc = velocMask & veloc;
 					body->m_omega = omegaMask & omega;
 				}
-				body->m_equilibrium = equilibriumTest;
+				body->m_equilibrium = equilibriumTest & body->m_autoSleep;
 			}
 			else
 			{
@@ -1524,7 +1524,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 			}
 		}
 
-		void CheckContrainedBody(ndBodyDynamic* const body) const
+		void CheckContrainedBodySleepState(ndBodyDynamic* const body) const
 		{
 			const dVector accelTest(
 				(body->m_accel.DotProduct(body->m_accel) > m_maxSingleAccNorm2) |
@@ -1554,7 +1554,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 					body->m_veloc = velocMask & veloc;
 					body->m_omega = omegaMask & omega;
 				}
-				body->m_equilibrium = equilibriumTest;
+				body->m_equilibrium = equilibriumTest & body->m_autoSleep;
 			}
 			else
 			{
@@ -1605,11 +1605,11 @@ void ndDynamicsUpdate::DetermineSleepStates()
 
 				if (isContrained)
 				{
-					CheckContrainedBody(body);;
+					CheckContrainedBodySleepState(body);;
 				}
 				else
 				{
-					CheckUncontrainedBody(body);
+					CheckUncontrainedBodySleepState(body);
 				}
 			}
 		}
