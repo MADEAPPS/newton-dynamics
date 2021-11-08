@@ -842,8 +842,9 @@ void ndDynamicsUpdateAvx2::SortIslands()
 	GetInternalForces().SetCount(bodyArray.GetCount());
 
 	dInt32 count = 0;
+	const dInt32 bodyCount = bodyArray.GetCount() - 1;
 	ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)&GetInternalForces()[0];
-	for (dInt32 i = bodyArray.GetCount() - 2; i >= 0; i--)
+	for (dInt32 i = 0; i < bodyCount; i++)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
 		if (!(body->m_resting & body->m_islandSleep) || body->GetAsBodyPlayerCapsule())
@@ -2605,7 +2606,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 				dInt32 count = bodyIndex[i + start + 1] - startIndex;
 				if (count)
 				{
-					const ndBodyKinematic* body = bodyArray[i + start];
+					const ndBodyKinematic* const body = bodyArray[i + start];
 					if (body->GetInvMass() > dFloat32(0.0f))
 					{
 						dVector force(zero);

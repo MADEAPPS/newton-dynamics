@@ -138,7 +138,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 
 	dArray<dInt32>& bodyJointIndex = GetJointForceIndexBuffer();
 	const dInt32 bodyJointIndexCount = scene->GetActiveBodyArray().GetCount() + 1;
-	bodyJointIndex.SetCount(bodyJointIndexCount);
+ 	bodyJointIndex.SetCount(bodyJointIndexCount);
 	ClearBuffer(&bodyJointIndex[0], bodyJointIndexCount * sizeof(dInt32));
 
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
@@ -343,19 +343,19 @@ void ndDynamicsUpdate::SortJointsScan()
 	const ndJointList& jointList = m_world->GetJointList();
 	ndConstraintArray& jointArray = scene->GetActiveContactArray();
 
-	dInt32 index = jointArray.GetCount();
-	jointArray.SetCount(index + jointList.GetCount());
+	dInt32 jointArrayCount = jointArray.GetCount();
+	jointArray.SetCount(jointArrayCount + jointList.GetCount());
 
 	for (ndJointList::dNode* node = jointList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = node->GetInfo();
 		if (joint->IsActive())
 		{
-			jointArray[index] = joint;
-			index++;
+			jointArray[jointArrayCount] = joint;
+			jointArrayCount++;
 		}
 	}
-	jointArray.SetCount(index);
+	jointArray.SetCount(jointArrayCount);
 
 	m_leftHandSide.SetCount(jointArray.GetCount() + 32);
 
@@ -486,26 +486,27 @@ void ndDynamicsUpdate::SortJoints()
 		ClearBuffer(&indexBuffer[0], sizeof(dInt32) * bodyArray.GetCount());
 
 		dInt32 unConstrainedCount = 0;
-		m_bodyForceIndex.SetCount(bodyArray.GetCount());
-		for (dInt32 i = bodyArray.GetCount() - 2; i >= 0; i--)
+		dArray<dInt32>& islandOrder = GetBodyIslandOrder();
+		islandOrder.SetCount(bodyArray.GetCount());
+		const dInt32 bodyCount = bodyArray.GetCount() - 1;
+		for (dInt32 i = 0; i < bodyCount; i++)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
-			if (!(body->m_resting & body->m_islandSleep) || body->GetAsBodyPlayerCapsule())
+			dAssert(!body->GetAsBodyPlayerCapsule());
+			if (!body->m_equilibrium || body->GetAsBodyPlayerCapsule())
 			{
-				m_bodyForceIndex[unConstrainedCount] = body->m_index;
+				islandOrder[unConstrainedCount] = body->m_index;
 				unConstrainedCount++;
 			}
 		}
-		m_bodyForceIndex.SetCount(unConstrainedCount);
+		islandOrder.SetCount(unConstrainedCount);
 		m_unConstrainedBodyCount = unConstrainedCount;
 		#endif
 		return;
 	}
 
-	
-	ndConstraintArray& jointArray = scene->GetActiveContactArray();
-
 	dInt32 rowCount = 1;
+	ndConstraintArray& jointArray = scene->GetActiveContactArray();
 	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = jointArray[i];
@@ -549,19 +550,71 @@ void ndDynamicsUpdate::SortJoints()
 	#endif
 
 	SortBodyJointScan();
+
+#ifndef D_USE_ISLANDS
+	dArray<dInt32>& islandOrder = GetBodyIslandOrder();
+	const dInt32* const bodyJointsPtr = &GetJointForceIndexBuffer()[0];
+	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
+	islandOrder.SetCount(bodyArray.GetCount());
+	const dInt32 bodyCount = bodyArray.GetCount() - 1;
+
+	dInt32 constrainedCount = 0;
+	for (dInt32 i = 0; i < bodyCount; i++)
+	{
+		ndBodyKinematic* const body = bodyArray[i];
+		dAssert(!body->GetAsBodyPlayerCapsule());
+
+		bool isConstrained = (bodyJointsPtr[i] != bodyJointsPtr[i + 1]);
+		isConstrained = isConstrained & (body->GetInvMass() > dFloat32(0.0f));
+		isConstrained = isConstrained & !body->GetAsBodyPlayerCapsule();
+		if (isConstrained)
+		{
+			//if (!body->m_resting)
+			if (!body->m_equilibrium)
+			{
+				islandOrder[constrainedCount] = body->m_index;
+				constrainedCount++;
+			}
+		}
+	}
+
+	dInt32 unConstrainedCount = 0;
+	for (dInt32 i = 0; i < bodyCount; i++)
+	{
+		ndBodyKinematic* const body = bodyArray[i];
+		dAssert(!body->GetAsBodyPlayerCapsule());
+
+		bool isConstrained = (bodyJointsPtr[i] != bodyJointsPtr[i + 1]);
+		isConstrained = isConstrained & (body->GetInvMass() > dFloat32(0.0f));
+		isConstrained = isConstrained & !body->GetAsBodyPlayerCapsule();
+		if (!isConstrained)
+		{
+			//if (!body->m_resting)
+			if (!body->m_equilibrium)
+			{
+				islandOrder[constrainedCount + unConstrainedCount] = body->m_index;
+				unConstrainedCount++;
+			}
+		}
+	}
+
+	islandOrder.SetCount(unConstrainedCount + constrainedCount);
+	m_unConstrainedBodyCount = unConstrainedCount;
+#endif
 }
 
 void ndDynamicsUpdate::SortIslands()
 {
-	D_TRACKTIME();
 #ifdef D_USE_ISLANDS
+	D_TRACKTIME();
 	ndScene* const scene = m_world->GetScene();
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	GetInternalForces().SetCount(bodyArray.GetCount());
 
 	dInt32 count = 0;
+	const dInt32 bodyCount = bodyArray.GetCount() - 1;
 	ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)&GetInternalForces()[0];
-	for (dInt32 i = bodyArray.GetCount() - 2; i >= 0; i--)
+	for (dInt32 i = 0; i < bodyCount; i++)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
 		if (!(body->m_resting & body->m_islandSleep) || body->GetAsBodyPlayerCapsule())
@@ -1424,7 +1477,48 @@ void ndDynamicsUpdate::DetermineSleepStates()
 	ndScene* const scene = m_world->GetScene();
 	scene->SubmitJobs<ndDetermineSleepStates>();
 #else
-	//dAssert(0);
+	class ndDetermineSleepStates : public ndScene::ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			ndDynamicsUpdate* const me = world->m_solver;
+
+			dArray<dInt32>& islandOrder = me->GetBodyIslandOrder();
+			const dInt32* const bodyIndex = &me->GetJointForceIndexBuffer()[0];
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+
+			const dInt32 bodyCount = islandOrder.GetCount();
+			const dInt32 threadIndex = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+
+			const dInt32 stride = bodyCount / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
+
+			for (dInt32 i = 0; i < blockSize; i++)
+			{
+				dInt32 index = islandOrder[i + start];
+				const ndBodyKinematic* const body = bodyArray[index];
+				bool iscontrained = (bodyIndex[index + 1] != bodyIndex[index]);
+				iscontrained = iscontrained & (body->GetInvMass() > dFloat32(0.0f));
+				if (iscontrained)
+				{
+					dAssert(0);
+				}
+				else
+				{
+					dAssert(0);
+				}
+				//me->UpdateIslandState(i);
+			}
+		}
+	};
+
+	ndScene* const scene = m_world->GetScene();
+	scene->SubmitJobs<ndDetermineSleepStates>();
 #endif
 }
 
@@ -1935,7 +2029,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				dInt32 count = bodyIndex[i + start + 1] - startIndex;
 				if (count)
 				{
-					const ndBodyKinematic* body = bodyArray[i + start];
+					const ndBodyKinematic* const body = bodyArray[i + start];
 					if (body->GetInvMass() > dFloat32(0.0f))
 					{
 						dVector force(zero);
