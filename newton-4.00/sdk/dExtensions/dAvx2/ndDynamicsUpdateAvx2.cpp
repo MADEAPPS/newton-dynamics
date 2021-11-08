@@ -456,18 +456,19 @@ void ndDynamicsUpdateAvx2::UpdateIslandState(dInt32 entry)
 	const dFloat32 speedFreeze = m_world->m_freezeSpeed2;
 	const dFloat32 accelFreeze = m_world->m_freezeAccel2 * ((count <= D_SMALL_ISLAND_COUNT) ? dFloat32(0.01f) : dFloat32(1.0f));
 	const dFloat32 acc2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
-	const dFloat32 maxAccNorm2 = (count > 4) ? acc2 : acc2 * dFloat32(0.0625f);
+	const dVector maxAccNorm2 ((count > 4) ? acc2 : acc2 * dFloat32(0.0625f));
 	const dVector velocDragVect(velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, dFloat32(0.0f));
 
 	dInt32 stackSleeping = 1;
 	dInt32 sleepCounter = 10000;
+	const dInt32 start = island.m_start;
 	ndScene* const scene = m_world->GetScene();
 
 	const dArray<dInt32>& bodyIndexArray = GetBodyIslandOrder();
 	ndBodyKinematic** const bodyIslands = &scene->GetActiveBodyArray()[0];
 	for (dInt32 i = 0; i < count; i++)
 	{
-		dInt32 index = bodyIndexArray[i];
+		dInt32 index = bodyIndexArray[start + i];
 		ndBodyDynamic* const dynBody = bodyIslands[index]->GetAsBodyDynamic();
 		if (dynBody)
 		{

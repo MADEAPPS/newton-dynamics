@@ -1480,11 +1480,96 @@ void ndDynamicsUpdate::DetermineSleepStates()
 	class ndDetermineSleepStates : public ndScene::ndBaseJob
 	{
 		public:
+		ndDetermineSleepStates()
+			:m_maxSingleAccNorm2(D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR * dFloat32(0.0625f))
+			,m_velocSingleDrag(0.9999f)
+		{
+		}
+
+		void CheckUncontrainedBody(ndBodyDynamic* const body) const
+		{
+			const dVector accelTest((body->m_accel.DotProduct(body->m_accel) > m_maxSingleAccNorm2) | 
+									(body->m_alpha.DotProduct(body->m_alpha) > m_maxSingleAccNorm2));
+			body->m_accel = body->m_accel & accelTest;
+			body->m_alpha = body->m_alpha & accelTest;
+
+			dUnsigned32 equilibrium = (body->GetInvMass() == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
+			const dVector isMovingMask(body->m_veloc + body->m_omega + body->m_accel + body->m_alpha);
+			const dVector mask(isMovingMask.TestZero());
+			const dInt32 test = mask.GetSignMask() & 7;
+			if (test != 7)
+			{
+				const dFloat32 accel2 = body->m_accel.DotProduct(body->m_accel).GetScalar();
+				const dFloat32 alpha2 = body->m_alpha.DotProduct(body->m_alpha).GetScalar();
+				const dFloat32 speed2 = body->m_veloc.DotProduct(body->m_veloc).GetScalar();
+				const dFloat32 omega2 = body->m_omega.DotProduct(body->m_omega).GetScalar();
+
+				dUnsigned32 equilibriumTest = (accel2 < m_accelSingleFreeze) && (alpha2 < m_accelSingleFreeze) && (speed2 < m_speedSingleFreeze) && (omega2 < m_speedSingleFreeze);
+
+				if (equilibriumTest)
+				{
+					const dVector veloc(body->m_veloc * m_velocSingleDrag);
+					const dVector omega(body->m_omega * m_velocSingleDrag);
+					const dVector velocMask(veloc.DotProduct(veloc) > m_velocTol);
+					const dVector omegaMask(omega.DotProduct(omega) > m_velocTol);
+					body->m_veloc = velocMask & veloc;
+					body->m_omega = omegaMask & omega;
+				}
+				equilibrium = equilibriumTest;
+			}
+			else
+			{
+				body->m_equilibrium = equilibrium;
+			}
+		}
+
+		void CheckContrainedBody(ndBodyDynamic* const body) const
+		{
+			const dVector accelTest(
+				(body->m_accel.DotProduct(body->m_accel) > m_maxSingleAccNorm2) |
+				(body->m_alpha.DotProduct(body->m_alpha) > m_maxSingleAccNorm2));
+			body->m_accel = body->m_accel & accelTest;
+			body->m_alpha = body->m_alpha & accelTest;
+
+			dUnsigned32 equilibrium = (body->GetInvMass() == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
+			const dVector isMovingMask(body->m_veloc + body->m_omega + body->m_accel + body->m_alpha);
+			const dVector mask(isMovingMask.TestZero());
+			const dInt32 test = mask.GetSignMask() & 7;
+			if (test != 7)
+			{
+				const dFloat32 accel2 = body->m_accel.DotProduct(body->m_accel).GetScalar();
+				const dFloat32 alpha2 = body->m_alpha.DotProduct(body->m_alpha).GetScalar();
+				const dFloat32 speed2 = body->m_veloc.DotProduct(body->m_veloc).GetScalar();
+				const dFloat32 omega2 = body->m_omega.DotProduct(body->m_omega).GetScalar();
+
+				dUnsigned32 equilibriumTest = (accel2 < m_accelSingleFreeze) && (alpha2 < m_accelSingleFreeze) && (speed2 < m_speedSingleFreeze) && (omega2 < m_speedSingleFreeze);
+
+				if (equilibriumTest)
+				{
+					const dVector veloc(body->m_veloc * m_velocSingleDrag);
+					const dVector omega(body->m_omega * m_velocSingleDrag);
+					const dVector velocMask(veloc.DotProduct(veloc) > m_velocTol);
+					const dVector omegaMask(omega.DotProduct(omega) > m_velocTol);
+					body->m_veloc = velocMask & veloc;
+					body->m_omega = omegaMask & omega;
+				}
+				body->m_equilibrium = equilibriumTest;
+			}
+			else
+			{
+				body->m_equilibrium = equilibrium;
+			}
+		}
+
 		virtual void Execute()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
+
+			m_velocTol = me->m_velocTol;
+			m_speedSingleFreeze = world->m_freezeSpeed2;
+			m_accelSingleFreeze = world->m_freezeAccel2 * dFloat32(0.01f);
 
 			dArray<dInt32>& islandOrder = me->GetBodyIslandOrder();
 			const dInt32* const bodyIndex = &me->GetJointForceIndexBuffer()[0];
@@ -1501,20 +1586,25 @@ void ndDynamicsUpdate::DetermineSleepStates()
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				dInt32 index = islandOrder[i + start];
-				const ndBodyKinematic* const body = bodyArray[index];
+				ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
 				bool iscontrained = (bodyIndex[index + 1] != bodyIndex[index]);
 				iscontrained = iscontrained & (body->GetInvMass() > dFloat32(0.0f));
 				if (iscontrained)
 				{
-					dAssert(0);
+					CheckContrainedBody(body);
 				}
 				else
 				{
-					dAssert(0);
+					CheckUncontrainedBody(body);
 				}
-				//me->UpdateIslandState(i);
 			}
 		}
+
+		dVector m_velocTol;
+		dVector m_maxSingleAccNorm2;
+		dVector m_velocSingleDrag;
+		dFloat32 m_speedSingleFreeze;
+		dFloat32 m_accelSingleFreeze;
 	};
 
 	ndScene* const scene = m_world->GetScene();
@@ -1542,18 +1632,19 @@ void ndDynamicsUpdate::UpdateIslandState(dInt32 entry)
 	const dFloat32 speedFreeze = m_world->m_freezeSpeed2;
 	const dFloat32 accelFreeze = m_world->m_freezeAccel2 * ((count <= D_SMALL_ISLAND_COUNT) ? dFloat32(0.01f) : dFloat32(1.0f));
 	const dFloat32 acc2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
-	const dFloat32 maxAccNorm2 = (count > 4) ? acc2 : acc2 * dFloat32(0.0625f);
+	const dVector maxAccNorm2 ((count > 4) ? acc2 : acc2 * dFloat32(0.0625f));
 	const dVector velocDragVect(velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, dFloat32(0.0f));
 
 	dInt32 stackSleeping = 1;
 	dInt32 sleepCounter = 10000;
+	const dInt32 start = island.m_start;
 	ndScene* const scene = m_world->GetScene();
 
 	const dArray<dInt32>& bodyIndexArray = m_bodyForceIndex;
 	ndBodyKinematic** const bodyIslands = &scene->GetActiveBodyArray()[0];
 	for (dInt32 i = 0; i < count; i++)
 	{
-		dInt32 index = bodyIndexArray[i];
+		dInt32 index = bodyIndexArray[start + i];
 		ndBodyDynamic* const dynBody = bodyIslands[index]->GetAsBodyDynamic();
 		if (dynBody)
 		{

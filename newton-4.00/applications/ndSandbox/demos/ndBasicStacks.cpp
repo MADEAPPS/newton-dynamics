@@ -60,14 +60,14 @@ static void BuildBoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
-baseMatrix.m_posit.m_y -= 0.1f;
+//baseMatrix.m_posit.m_y -= 0.1f;
 	dMatrix rotation(dYawMatrix(20.0f * dDegreeToRad));
 	for (dInt32 i = 0; i < count; i++) 
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
-//baseMatrix.m_posit.m_y += 1.0f;
-baseMatrix.m_posit.m_y -= 0.1f;
+baseMatrix.m_posit.m_y += 1.0f;
+//baseMatrix.m_posit.m_y -= 0.1f;
 		baseMatrix = rotation * baseMatrix;
 	}
 
