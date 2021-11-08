@@ -175,14 +175,14 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 
 	for (dInt32 i = 0; i < 1; i++)
 	{
-		BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
+		//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
 		origin.m_x += 4.0f;
 	}
 	
 	origin = dVector::m_zero;
 	origin.m_x -= 2.0f;
 	origin.m_z -= 3.0f;
-	//BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 2);
+	BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 2);
 	
 	origin.m_z += 6.0f;
 	//BuildCylinderStack(scene, 10.0f, origin, dVector(0.75f, 0.6f, 1.0f, 0.0f), 20);
