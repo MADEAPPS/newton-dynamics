@@ -32,9 +32,7 @@
 
 ndDynamicsUpdate::ndDynamicsUpdate(ndWorld* const world)
 	:m_velocTol(dFloat32(1.0e-8f))
-#ifdef D_USE_ISLANDS
 	,m_islands(D_DEFAULT_BUFFER_SIZE)
-#endif
 	,m_jointForcesIndex(D_DEFAULT_BUFFER_SIZE)
 	,m_internalForces(D_DEFAULT_BUFFER_SIZE)
 	,m_leftHandSide(D_DEFAULT_BUFFER_SIZE * 4)
@@ -67,9 +65,7 @@ const char* ndDynamicsUpdate::GetStringId() const
 
 void ndDynamicsUpdate::Clear()
 {
-#ifdef D_USE_ISLANDS
 	m_islands.Resize(D_DEFAULT_BUFFER_SIZE);
-#endif
 	m_rightHandSide.Resize(D_DEFAULT_BUFFER_SIZE);
 	m_internalForces.Resize(D_DEFAULT_BUFFER_SIZE);
 	m_bodyIslandOrder.Resize(D_DEFAULT_BUFFER_SIZE);
@@ -531,7 +527,6 @@ void ndDynamicsUpdate::SortJoints()
 
 void ndDynamicsUpdate::SortIslands()
 {
-#ifdef D_USE_ISLANDS
 	D_TRACKTIME();
 	ndScene* const scene = m_world->GetScene();
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
@@ -641,9 +636,6 @@ void ndDynamicsUpdate::SortIslands()
 			scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, EvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 1);
 		}
 	}
-#else
-	dAssert(0);
-#endif
 }
 
 void ndDynamicsUpdate::BuildIsland()
@@ -1364,7 +1356,6 @@ void ndDynamicsUpdate::IntegrateBodies()
 void ndDynamicsUpdate::DetermineSleepStates()
 {
 	D_TRACKTIME();
-#ifdef D_USE_ISLANDS
 	class ndDetermineSleepStates : public ndScene::ndBaseJob
 	{
 		public:
@@ -1388,14 +1379,10 @@ void ndDynamicsUpdate::DetermineSleepStates()
 
 	ndScene* const scene = m_world->GetScene();
 	scene->SubmitJobs<ndDetermineSleepStates>();
-#else
-	dAssert(0);
-#endif
 }
 
 void ndDynamicsUpdate::UpdateIslandState(dInt32 entry)
 {
-#ifdef D_USE_ISLANDS
 	const ndIsland& island = m_islands[entry];
 	dFloat32 velocityDragCoeff = D_FREEZZING_VELOCITY_DRAG;
 
@@ -1600,9 +1587,6 @@ void ndDynamicsUpdate::UpdateIslandState(dInt32 entry)
 			}
 		}
 	}
-#else
-	dAssert(0);
-#endif
 }
 
 void ndDynamicsUpdate::InitSkeletons()
@@ -1967,12 +1951,7 @@ void ndDynamicsUpdate::Update()
 	m_timestep = m_world->GetScene()->GetTimestep();
 
 	BuildIsland();
-#ifdef D_USE_ISLANDS
 	dInt32 count = m_islands.GetCount();
-#else
-	dAssert(0);
-	dInt32 count = 0;
-#endif
 	if (count)
 	{
 		IntegrateUnconstrainedBodies();

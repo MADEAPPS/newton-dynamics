@@ -82,7 +82,6 @@ class ndDynamicsUpdate: public dClassAlloc
 		ndBodyKinematic* m_root;
 	};
 
-#ifdef D_USE_ISLANDS
 	class ndIsland
 	{
 		public:
@@ -97,7 +96,6 @@ class ndDynamicsUpdate: public dClassAlloc
 		dInt32 m_count;
 		ndBodyKinematic* m_root;
 	};
-#endif
 
 	public:
 	ndDynamicsUpdate(ndWorld* const world);
@@ -146,9 +144,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
 	dVector m_velocTol;
-#ifdef D_USE_ISLANDS
 	dArray<ndIsland> m_islands;
-#endif
 	dArray<dInt32> m_jointForcesIndex;
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndLeftHandSide> m_leftHandSide;
