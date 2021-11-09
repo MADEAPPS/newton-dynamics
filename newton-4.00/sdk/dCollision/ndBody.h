@@ -109,9 +109,7 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 			dUnsigned32 m_resting : 1;
 			dUnsigned32 m_autoSleep : 1;
 			dUnsigned32 m_equilibrium : 1;
-#ifdef D_USE_ISLANDS
 			dUnsigned32 m_islandSleep : 1;
-#endif
 			dUnsigned32 m_solverSleep0 : 1;
 			dUnsigned32 m_solverSleep1 : 1;
 			dUnsigned32 m_skeletonMark : 1;
