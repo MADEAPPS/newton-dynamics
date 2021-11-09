@@ -124,8 +124,8 @@ void ndDynamicsUpdateOpencl::SortJoints()
 
 void ndDynamicsUpdateOpencl::SortIslands()
 {
-	D_TRACKTIME();
 #ifdef D_USE_ISLANDS
+	D_TRACKTIME();
 	ndScene* const scene = m_world->GetScene();
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	GetInternalForces().SetCount(bodyArray.GetCount());
@@ -133,7 +133,6 @@ void ndDynamicsUpdateOpencl::SortIslands()
 	dInt32 count = 0;
 	const dInt32 bodyCount = bodyArray.GetCount() - 1;
 	ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)&GetInternalForces()[0];
-	//for (dInt32 i = bodyArray.GetCount() - 2; i >= 0; i--)
 	for (dInt32 i = 0; i < bodyCount; i++)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
@@ -165,6 +164,7 @@ void ndDynamicsUpdateOpencl::SortIslands()
 
 	m_islands.SetCount(0);
 	m_bodyIslandOrder.SetCount(count);
+	
 	m_unConstrainedBodyCount = 0;
 	if (count)
 	{
