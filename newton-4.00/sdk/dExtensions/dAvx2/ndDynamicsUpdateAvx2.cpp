@@ -1754,8 +1754,8 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				dInt32 startIndex = bodyIndex[i + start];
-				dInt32 count = bodyIndex[i + start + 1] - startIndex;
+				dInt32 startIndex = bodyIndex[start + i];
+				dInt32 count = bodyIndex[start + i + 1] - startIndex;
 				if (count)
 				{
 					dVector force(zero);
@@ -2578,11 +2578,11 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				dInt32 startIndex = bodyIndex[i + start];
-				dInt32 count = bodyIndex[i + start + 1] - startIndex;
+				dInt32 startIndex = bodyIndex[start + i];
+				dInt32 count = bodyIndex[start + i + 1] - startIndex;
 				if (count)
 				{
-					const ndBodyKinematic* const const body = bodyArray[i + start];
+					const ndBodyKinematic* const body = bodyArray[i + start];
 					if (body->GetInvMass() > dFloat32(0.0f))
 					{
 						dVector force(zero);

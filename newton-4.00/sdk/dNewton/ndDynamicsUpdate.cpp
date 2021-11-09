@@ -1103,8 +1103,8 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				dInt32 startIndex = bodyIndex[i + start];
-				dInt32 count = bodyIndex[i + start + 1] - startIndex;
+				dInt32 startIndex = bodyIndex[start + i];
+				dInt32 count = bodyIndex[start + i + 1] - startIndex;
 				if (count)
 				{
 					dVector force(zero);
@@ -1892,8 +1892,8 @@ void ndDynamicsUpdate::CalculateJointsForce()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				dInt32 startIndex = bodyIndex[i + start];
-				dInt32 count = bodyIndex[i + start + 1] - startIndex;
+				dInt32 startIndex = bodyIndex[start + i];
+				dInt32 count = bodyIndex[start + i + 1] - startIndex;
 				if (count)
 				{
 					const ndBodyKinematic* const body = bodyArray[i + start];
