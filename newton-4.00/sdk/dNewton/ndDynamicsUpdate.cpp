@@ -343,19 +343,19 @@ void ndDynamicsUpdate::SortJointsScan()
 	const ndJointList& jointList = m_world->GetJointList();
 	ndConstraintArray& jointArray = scene->GetActiveContactArray();
 
-	dInt32 index = jointArray.GetCount();
-	jointArray.SetCount(index + jointList.GetCount());
+	dInt32 jointArrayCount = jointArray.GetCount();
+	jointArray.SetCount(jointArrayCount + jointList.GetCount());
 
 	for (ndJointList::dNode* node = jointList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = node->GetInfo();
 		if (joint->IsActive())
 		{
-			jointArray[index] = joint;
-			index++;
+			jointArray[jointArrayCount] = joint;
+			jointArrayCount++;
 		}
 	}
-	jointArray.SetCount(index);
+	jointArray.SetCount(jointArrayCount);
 
 	m_leftHandSide.SetCount(jointArray.GetCount() + 32);
 
@@ -538,8 +538,10 @@ void ndDynamicsUpdate::SortIslands()
 	GetInternalForces().SetCount(bodyArray.GetCount());
 
 	dInt32 count = 0;
+	const dInt32 bodyCount = bodyArray.GetCount() - 1;
 	ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)&GetInternalForces()[0];
-	for (dInt32 i = bodyArray.GetCount() - 2; i >= 0; i--)
+	//for (dInt32 i = bodyArray.GetCount() - 2; i >= 0; i--)
+	for (dInt32 i = 0; i < bodyCount; i++)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
 		if (!(body->m_resting & body->m_islandSleep) || body->GetAsBodyPlayerCapsule())
@@ -673,14 +675,15 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = me->GetUnconstrainedBodyCount();
+
 			const dInt32 stride = bodyCount / threadCount;
-			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-			const dInt32 base = bodyArray.GetCount() - bodyCount + start;
+			const dInt32 start0 = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start0;
+			const dInt32 start = bodyArray.GetCount() - bodyCount + start0;
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndBodyKinematic* const body = bodyArray[base + i]->GetAsBodyKinematic();
+				ndBodyKinematic* const body = bodyArray[start + i]->GetAsBodyKinematic();
 				dAssert(body);
 				body->UpdateInvInertiaMatrix();
 				body->AddDampingAcceleration(timestep);
@@ -785,13 +788,14 @@ void ndDynamicsUpdate::InitBodyArray()
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - me->GetUnconstrainedBodyCount();
+
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndBodyDynamic* const body = bodyArray[i + start]->GetAsBodyDynamic();
+				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
 				if (body)
 				{
 					dAssert(body->m_bodyIsConstrained);
@@ -1201,7 +1205,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndBodyDynamic* const body = bodyArray[i + start]->GetAsBodyDynamic();
+				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
 				if (body)
 				{
 					dAssert(body->m_bodyIsConstrained);
@@ -1328,7 +1332,7 @@ void ndDynamicsUpdate::IntegrateBodies()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndBodyDynamic* const dynBody = bodyArray[i + start]->GetAsBodyDynamic();
+				ndBodyDynamic* const dynBody = bodyArray[start + i]->GetAsBodyDynamic();
 
 				// the initial velocity and angular velocity were stored in m_accel and dynBody->m_alpha for memory saving
 				if (dynBody)
@@ -1892,7 +1896,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				dInt32 count = bodyIndex[i + start + 1] - startIndex;
 				if (count)
 				{
-					const ndBodyKinematic* body = bodyArray[i + start];
+					const ndBodyKinematic* const body = bodyArray[i + start];
 					if (body->GetInvMass() > dFloat32(0.0f))
 					{
 						dVector force(zero);

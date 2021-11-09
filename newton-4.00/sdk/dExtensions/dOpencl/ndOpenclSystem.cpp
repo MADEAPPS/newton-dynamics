@@ -281,7 +281,7 @@ __kernel void IntegrateBodiesVelocity(
 		return;
 	}	
 
-	//ndBodyDynamic* const body = bodyArray[i + start]->GetAsBodyDynamic();
+	//ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
 	//const dInt32 index = body->m_index;
 	//const ndJacobian& forceAndTorque = internalForces[index];
 
