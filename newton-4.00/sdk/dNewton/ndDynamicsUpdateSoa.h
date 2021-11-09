@@ -95,7 +95,6 @@ class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 	void IntegrateUnconstrainedBodies();
 	
 	void DetermineSleepStates();
-	void UpdateIslandState(dInt32 index);
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
 	dVector m_ordinals;

@@ -22,7 +22,7 @@
 #ifndef _DG_TYPES_H_
 #define _DG_TYPES_H_
 
-#define D_USE_ISLANDS
+//#define D_USE_ISLANDS
 
 #include "dTypes.h"
 
