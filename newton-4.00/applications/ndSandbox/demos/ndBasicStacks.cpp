@@ -60,7 +60,7 @@ static void BuildBoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
-//baseMatrix.m_posit.m_y -= 0.1f;
+baseMatrix.m_posit.m_y -= 0.1f;
 	dMatrix rotation(dYawMatrix(20.0f * dDegreeToRad));
 	for (dInt32 i = 0; i < count; i++) 
 	{
@@ -175,7 +175,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 
 	for (dInt32 i = 0; i < 1; i++)
 	{
-		BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
+		//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
 		origin.m_x += 4.0f;
 	}
 	

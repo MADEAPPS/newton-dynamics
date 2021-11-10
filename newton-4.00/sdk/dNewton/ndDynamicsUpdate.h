@@ -28,6 +28,8 @@
 #define	D_FREEZZING_VELOCITY_DRAG	dFloat32 (0.9f)
 #define	D_SOLVER_MAX_ERROR			(D_FREEZE_MAG * dFloat32 (0.5f))
 
+#define D_MAX_BODY_RADIX_BIT		9
+
 // the solver is a RK order 4, but instead of weighting the intermediate derivative by the usual 1/6, 1/3, 1/3, 1/6 coefficients
 // I am using 1/4, 1/4, 1/4, 1/4.
 // This is correct.The weighting coefficients of any RK method comes from an arbitrary criteria
@@ -143,7 +145,6 @@ class ndDynamicsUpdate: public dClassAlloc
 	void SortBodyJointScan();
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
-	//dVector m_velocTol;
 	dArray<ndIsland> m_islands;
 	dArray<dInt32> m_jointForcesIndex;
 	dArray<ndJacobian> m_internalForces;
