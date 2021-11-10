@@ -1736,7 +1736,8 @@ void ndDynamicsUpdateOpencl::Update()
 {
 	D_TRACKTIME();
 
-	if (m_opencl)
+	//if (m_opencl)
+	if (0)
 	{
 		m_timestep = m_world->GetScene()->GetTimestep();
 
