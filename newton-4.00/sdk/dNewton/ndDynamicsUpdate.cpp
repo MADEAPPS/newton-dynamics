@@ -406,7 +406,7 @@ void ndDynamicsUpdate::SortJointsScan()
 
 	dAssert(m_activeJointCount <= jointArray.GetCount());
 	jointArray.SetCount(m_activeJointCount);
-	for (dInt32 i = jointArray.GetCount() - 1; i >= 0; i--)
+	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 	{
 		ndConstraint* const joint = jointArray[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
@@ -531,15 +531,15 @@ void ndDynamicsUpdate::SortIslands()
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	GetInternalForces().SetCount(bodyArray.GetCount());
 
-	dInt32 count = 0;
-	const dInt32 bodyCount = bodyArray.GetCount() - 1;
+	dInt32 bodyCount = 0;
+	const dInt32 totalBodyCount = bodyArray.GetCount() - 1;
 	ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)&GetInternalForces()[0];
-	for (dInt32 i = 0; i < bodyCount; i++)
+	for (dInt32 i = 0; i < totalBodyCount; i++)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
 		if (!(body->m_resting & body->m_islandSleep) || body->GetAsBodyPlayerCapsule())
 		{
-			buffer0[count].m_body = body;
+			buffer0[bodyCount].m_body = body;
 			if (body->GetInvMass() > dFloat32(0.0f))
 			{
 				ndBodyKinematic* root = body->m_islandParent;
@@ -548,7 +548,7 @@ void ndDynamicsUpdate::SortIslands()
 					root = root->m_islandParent;
 				}
 
-				buffer0[count].m_root = root;
+				buffer0[bodyCount].m_root = root;
 				if (root->m_rank != -1)
 				{
 					root->m_rank = -1;
@@ -556,10 +556,10 @@ void ndDynamicsUpdate::SortIslands()
 			}
 			else
 			{
-				buffer0[count].m_root = body;
+				buffer0[bodyCount].m_root = body;
 				body->m_rank = -1;
 			}
-			count++;
+			bodyCount++;
 		}
 	}
 
@@ -567,24 +567,24 @@ void ndDynamicsUpdate::SortIslands()
 	dArray<ndBodyKinematic*>& islandOrder = GetBodyIslandOrder();
 
 	islands.SetCount(0);
-	islandOrder.SetCount(count);
+	islandOrder.SetCount(bodyCount);
 
 	m_unConstrainedBodyCount = 0;
-	if (count)
+	if (bodyCount)
 	{
 		// sort using counting sort o(n)
 		dInt32 scans[2];
 		scans[0] = 0;
 		scans[1] = 0;
-		for (dInt32 i = 0; i < count; i++)
+		for (dInt32 i = 0; i < bodyCount; i++)
 		{
 			dInt32 j = 1 - buffer0[i].m_root->m_bodyIsConstrained;
 			scans[j] ++;
 		}
 		scans[1] = scans[0];
 		scans[0] = 0;
-		ndBodyIndexPair* const buffer2 = buffer0 + count;
-		for (dInt32 i = 0; i < count; i++)
+		ndBodyIndexPair* const buffer2 = buffer0 + bodyCount;
+		for (dInt32 i = 0; i < bodyCount; i++)
 		{
 			const dInt32 key = 1 - buffer0[i].m_root->m_bodyIsConstrained;
 			const dInt32 j = scans[key];
@@ -592,10 +592,10 @@ void ndDynamicsUpdate::SortIslands()
 			scans[key] = j + 1;
 		}
 
-		const ndBodyIndexPair* const buffer1 = buffer0 + count;
-		for (dInt32 i = 0; i < count; i++)
+		const ndBodyIndexPair* const buffer1 = buffer0 + bodyCount;
+		for (dInt32 i = 0; i < bodyCount; i++)
 		{
-			dAssert((i == count - 1) || (buffer1[i].m_root->m_bodyIsConstrained >= buffer1[i + 1].m_root->m_bodyIsConstrained));
+			dAssert((i == bodyCount - 1) || (buffer1[i].m_root->m_bodyIsConstrained >= buffer1[i + 1].m_root->m_bodyIsConstrained));
 
 			islandOrder[i] = buffer1[i].m_body;
 			if (buffer1[i].m_root->m_rank == -1)
