@@ -66,7 +66,7 @@ baseMatrix.m_posit.m_y -= 0.02f;
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
-baseMatrix.m_posit.m_y += 2.0f;
+//baseMatrix.m_posit.m_y += 2.0f;
 //baseMatrix.m_posit.m_y -= 0.1f;
 		baseMatrix = rotation * baseMatrix;
 	}
@@ -170,19 +170,19 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFlatPlane(scene, true);
 
-	dInt32 pyramidHigh = 28;
+	dInt32 pyramidHigh = 10;
 	dVector origin(dVector::m_zero);
 
 	for (dInt32 i = 0; i < 1; i++)
 	{
-		//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
+		BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
 		origin.m_x += 4.0f;
 	}
 	
 	origin = dVector::m_zero;
 	origin.m_x -= 2.0f;
 	origin.m_z -= 3.0f;
-	BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 2);
+	//BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 	
 	origin.m_z += 6.0f;
 	//BuildCylinderStack(scene, 10.0f, origin, dVector(0.75f, 0.6f, 1.0f, 0.0f), 20);

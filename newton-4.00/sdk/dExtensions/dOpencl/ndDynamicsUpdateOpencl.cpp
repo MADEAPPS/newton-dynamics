@@ -162,7 +162,7 @@ void ndDynamicsUpdateOpencl::SortIslands()
 	}
 
 	dArray<ndIsland>& islands = GetIsland();
-	dArray<ndBodyKinematic*>& islandOrder = GetBodyIslandOrder();
+	dArray<ndBodyKinematic*>& islandOrder = GetBodyIslandOrder____();
 
 	islands.SetCount(0);
 	islandOrder.SetCount(bodyCount);
@@ -250,7 +250,7 @@ void ndDynamicsUpdateOpencl::IntegrateUnconstrainedBodies()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateOpencl* const me = (ndDynamicsUpdateOpencl*)world->m_solver;
-			dArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
+			dArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder____();
 
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
@@ -363,7 +363,7 @@ void ndDynamicsUpdateOpencl::InitBodyArray()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateOpencl* const me = (ndDynamicsUpdateOpencl*)world->m_solver;
-			dArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
+			dArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder____();
 
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
@@ -768,7 +768,7 @@ void ndDynamicsUpdateOpencl::IntegrateBodiesVelocity()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateOpencl* const me = (ndDynamicsUpdateOpencl*)world->m_solver;
-			dArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
+			dArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder____();
 			const dArray<ndJacobian>& internalForces = me->GetInternalForces();
 
 			const dVector timestep4(me->m_timestepRK);
@@ -897,7 +897,7 @@ void ndDynamicsUpdateOpencl::IntegrateBodies()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateOpencl* const me = (ndDynamicsUpdateOpencl*)world->m_solver;
-			dArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
+			dArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder____();
 
 			const dFloat32 timestep = m_timestep;
 			const dVector invTime(me->m_invTimestep);
@@ -937,9 +937,9 @@ void ndDynamicsUpdateOpencl::IntegrateBodies()
 	};
 
 #ifdef D_USE_GPU_DEVICE
-	m_opencl->Resize(GetBodyIslandOrder());
-	m_opencl->CopyToGpu(GetBodyIslandOrder());
-	m_opencl->ExecuteIntegrateBodyPosition(m_timestep, GetBodyIslandOrder());
+	m_opencl->Resize(GetBodyIslandOrder____());
+	m_opencl->CopyToGpu(GetBodyIslandOrder____());
+	m_opencl->ExecuteIntegrateBodyPosition(m_timestep, GetBodyIslandOrder____());
 #else
 	ndScene* const scene = m_world->GetScene();
 	scene->SubmitJobs<ndIntegrateBodies>();
@@ -988,7 +988,7 @@ void ndDynamicsUpdateOpencl::DetermineSleepStates()
 			dInt32 stackSleeping = 1;
 			dInt32 sleepCounter = 10000;
 
-			ndBodyKinematic** const bodyIslands = &me->GetBodyIslandOrder()[island.m_start];
+			ndBodyKinematic** const bodyIslands = &me->GetBodyIslandOrder____()[island.m_start];
 			for (dInt32 i = 0; i < count; i++)
 			{
 				ndBodyDynamic* const dynBody = bodyIslands[i]->GetAsBodyDynamic();
@@ -1500,7 +1500,7 @@ void ndDynamicsUpdateOpencl::FinishGpuUpdate()
 	D_TRACKTIME();
 	m_opencl->Finish();
 
-	dArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder();
+	dArray<ndBodyKinematic*>& bodyArray = GetBodyIslandOrder____();
 	ndJacobian* const accel = (ndJacobian*)&m_opencl->m_bodyArray.m_accel[0];
 	ndJacobian* const transform = (ndJacobian*)&m_opencl->m_bodyArray.m_transform[0];
 	
