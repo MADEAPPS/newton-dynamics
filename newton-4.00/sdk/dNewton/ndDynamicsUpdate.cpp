@@ -1690,14 +1690,14 @@ void ndDynamicsUpdate::DetermineSleepStates()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			//ndWorld* const world = m_owner->GetWorld();
-			//ndDynamicsUpdate* const me = world->m_solver;
+			ndWorld* const world = m_owner->GetWorld();
+			ndDynamicsUpdate* const me = world->m_solver;
 			//
 			//m_speedSingleFreeze = world->m_freezeSpeed2;
 			//m_accelSingleFreeze = world->m_freezeAccel2 * dFloat32(0.01f);
-			//
+			
 			//dArray<dInt32>& islandOrder = me->GetBodyIslandOrder();
-			//const dInt32* const bodyIndex = &me->GetJointForceIndexBuffer()[0];
+			const dInt32* const bodyIndex = &me->GetJointForceIndexBuffer()[0];
 			//ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
 			//const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
 			//const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
@@ -1737,6 +1737,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 			//	}
 			//}
 
+			/*
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			const dArray<ndIsland>& islandArray = me->GetIsland();
@@ -1749,6 +1750,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 			{
 				//UpdateIslandState(i);
 			}
+			*/
 		}
 
 		dVector m_velocTol;

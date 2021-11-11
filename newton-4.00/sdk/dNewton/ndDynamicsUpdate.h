@@ -218,7 +218,6 @@ inline dArray<dInt32>& ndDynamicsUpdate::GetJointForceIndexBuffer()
 	return m_jointForcesIndex;
 }
 
-
 inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const
 {
 	const dVector zero(dVector::m_zero);
