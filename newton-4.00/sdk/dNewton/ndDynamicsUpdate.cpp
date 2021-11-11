@@ -566,7 +566,7 @@ void ndDynamicsUpdate::SortIslands()
 	}
 
 	dArray<ndIsland>& islands = GetIsland();
-	dArray<ndBodyKinematic*>& islandOrder = GetBodyIslandOrder____();
+	dArray<dInt32>& islandOrder = GetBodyIslandOrder();
 
 	islands.SetCount(0);
 	islandOrder.SetCount(bodyCount);
@@ -597,9 +597,11 @@ void ndDynamicsUpdate::SortIslands()
 		const ndBodyIndexPair* const buffer1 = buffer0 + bodyCount;
 		for (dInt32 i = 0; i < bodyCount; i++)
 		{
+			dAssert(bodyArray[buffer1[i].m_body->m_index] == buffer1[i].m_body);
 			dAssert((i == bodyCount - 1) || (buffer1[i].m_root->m_bodyIsConstrained >= buffer1[i + 1].m_root->m_bodyIsConstrained));
 
-			islandOrder[i] = buffer1[i].m_body;
+			//islandOrder[i] = buffer1[i].m_body;
+			islandOrder[i] = buffer1[i].m_body->m_index;
 			if (buffer1[i].m_root->m_rank == -1)
 			{
 				buffer1[i].m_root->m_rank = 0;
@@ -665,8 +667,10 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
-			dArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder____();
+			dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder();
+			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
@@ -676,11 +680,13 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start0 = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start0;
-			const dInt32 start = bodyArray.GetCount() - bodyCount + start0;
+			const dInt32 start = bodyIslandOrder.GetCount() - bodyCount + start0;
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndBodyKinematic* const body = bodyArray[start + i]->GetAsBodyKinematic();
+				//ndBodyKinematic* const body = bodyArray[start + i]->GetAsBodyKinematic();
+				dInt32 index = bodyIslandOrder[start + i];
+				ndBodyKinematic* const body = bodyArray[index]->GetAsBodyKinematic();
 				dAssert(body);
 				body->UpdateInvInertiaMatrix();
 				body->AddDampingAcceleration(timestep);
@@ -778,13 +784,15 @@ void ndDynamicsUpdate::InitBodyArray()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
-			dArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder____();
+			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder();
+			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = bodyArray.GetCount() - me->GetUnconstrainedBodyCount();
+			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount();
 
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
@@ -792,7 +800,9 @@ void ndDynamicsUpdate::InitBodyArray()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
+				//ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
+				dInt32 index = bodyIslandOrder[start + i];
+				ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
 				if (body)
 				{
 					dAssert(body->m_bodyIsConstrained);
@@ -1185,8 +1195,10 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
-			dArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder____();
+			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder();
+			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
 			const dArray<ndJacobian>& internalForces = me->GetInternalForces();
 
 			const dVector timestep4(me->m_timestepRK);
@@ -1194,7 +1206,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = bodyArray.GetCount() - me->m_unConstrainedBodyCount;
+			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->m_unConstrainedBodyCount;
 
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
@@ -1202,16 +1214,16 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
+				dInt32 index = bodyIslandOrder[start + i];
+				ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
 				if (body)
 				{
+					dAssert(body->m_index == index);
 					dAssert(body->m_bodyIsConstrained);
-					const dInt32 index = body->m_index;
 					const ndJacobian& forceAndTorque = internalForces[index];
 					const dVector force(body->GetForce() + forceAndTorque.m_linear);
 					const dVector torque(body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque());
-
-					ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
+					const ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
 
 					if (!body->m_resting)
 					{
@@ -1314,22 +1326,25 @@ void ndDynamicsUpdate::IntegrateBodies()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
-			dArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder____();
+			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder();
+			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dVector invTime(me->m_invTimestep);
 
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = bodyArray.GetCount();
+			const dInt32 bodyCount = bodyIslandOrder.GetCount();
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndBodyDynamic* const dynBody = bodyArray[start + i]->GetAsBodyDynamic();
+				dInt32 index = bodyIslandOrder[start + i];
+				ndBodyDynamic* const dynBody = bodyArray[index]->GetAsBodyDynamic();
 
 				// the initial velocity and angular velocity were stored in m_accel and dynBody->m_alpha for memory saving
 				if (dynBody)
@@ -1374,9 +1389,12 @@ void ndDynamicsUpdate::DetermineSleepStates()
 		void UpdateIslandState(dInt32 entry)
 		{
 			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
-			const dArray<ndIsland>& islandArray = me->GetIsland();
-			const ndIsland& island = islandArray[entry];
+			const ndIsland& island = me->GetIsland()[entry];
+			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder();
+			ndBodyKinematic** const bodyIslands = &scene->GetActiveBodyArray()[0];
+
 			dFloat32 velocityDragCoeff = D_FREEZZING_VELOCITY_DRAG;
 
 			const dInt32 count = island.m_count;
@@ -1399,11 +1417,12 @@ void ndDynamicsUpdate::DetermineSleepStates()
 
 			dInt32 stackSleeping = 1;
 			dInt32 sleepCounter = 10000;
-			
-			ndBodyKinematic** const bodyIslands = &me->GetBodyIslandOrder____()[island.m_start];
+			const dInt32 start = island.m_start;
+
 			for (dInt32 i = 0; i < count; i++)
 			{
-				ndBodyDynamic* const dynBody = bodyIslands[i]->GetAsBodyDynamic();
+				dInt32 index = bodyIslandOrder[start + i];
+				ndBodyDynamic* const dynBody = bodyIslands[index]->GetAsBodyDynamic();
 				if (dynBody)
 				{
 					dAssert(dynBody->m_accel.m_w == dFloat32(0.0f));

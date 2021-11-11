@@ -793,7 +793,7 @@ void ndDynamicsUpdateOpencl::IntegrateBodiesVelocity()
 					const dVector force(body->GetForce() + forceAndTorque.m_linear);
 					const dVector torque(body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque());
 
-					ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
+					const ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
 
 					if (!body->m_resting)
 					{
