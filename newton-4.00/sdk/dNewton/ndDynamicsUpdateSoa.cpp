@@ -192,7 +192,6 @@ void ndDynamicsUpdateSoa::DetermineSleepStates()
 				for (dInt32 i = 0; i < count; i++)
 				{
 					// force entire island to equilibriumTest
-					//ndBodyDynamic* const body = bodyIslands[i]->GetAsBodyDynamic();
 					dInt32 index = bodyIslandOrder[start + i];
 					ndBodyDynamic* const body = bodyIslands[index]->GetAsBodyDynamic();
 					if (body)
@@ -270,9 +269,8 @@ void ndDynamicsUpdateSoa::DetermineSleepStates()
 					{
 						for (dInt32 i = 0; i < count; i++)
 						{
-							//ndBodyKinematic* const body = bodyIslands[i];
-							dInt32 index = bodyIslandOrder[start + i];
-							ndBodyKinematic* const body = bodyIslands[index];
+							dInt32 index1 = bodyIslandOrder[start + i];
+							ndBodyKinematic* const body = bodyIslands[index1];
 							body->m_veloc = dVector::m_zero;
 							body->m_omega = dVector::m_zero;
 							body->m_equilibrium = body->m_autoSleep;
@@ -711,7 +709,7 @@ void ndDynamicsUpdateSoa::IntegrateBodies()
 				}
 				else
 				{
-					ndBodyKinematic* const kinBody = bodyArray[i]->GetAsBodyKinematic();
+					ndBodyKinematic* const kinBody = dynBody->GetAsBodyKinematic();
 					dAssert(kinBody);
 					if (!kinBody->m_equilibrium)
 					{

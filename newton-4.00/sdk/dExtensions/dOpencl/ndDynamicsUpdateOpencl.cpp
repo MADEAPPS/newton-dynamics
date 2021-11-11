@@ -925,7 +925,7 @@ void ndDynamicsUpdateOpencl::IntegrateBodies()
 				}
 				else
 				{
-					ndBodyKinematic* const kinBody = bodyArray[i]->GetAsBodyKinematic();
+					ndBodyKinematic* const kinBody = dynBody->GetAsBodyKinematic();
 					dAssert(kinBody);
 					if (!kinBody->m_equilibrium)
 					{
