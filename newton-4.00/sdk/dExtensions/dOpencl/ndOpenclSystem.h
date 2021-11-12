@@ -67,8 +67,8 @@ class ndOpenclBodyBuffer
 	~ndOpenclBodyBuffer();
 
 	void Cleanup();
-	void Resize(cl_context context, dArray<ndBodyKinematic*>& bodyArray);
-	void CopyToGpu(cl_command_queue commandQueue, const dArray<ndBodyKinematic*>& bodyArray);
+	void Resize(cl_context context, const dArray<dInt32>& bodyArray);
+	void CopyToGpu(cl_command_queue commandQueue, const dArray<dInt32>& bodyArray);
 	void SetKernelParameters(cl_kernel kernel, dFloat32 timestep, const dArray<ndBodyKinematic*>& bodyArray);
 
 #ifdef D_DEBUG_GPU_KERNELS
@@ -104,9 +104,9 @@ class ndOpenclSystem: public dClassAlloc
 
 	void Finish();
 	cl_program CompileProgram();
-	void Resize(dArray<ndBodyKinematic*>& bodyArray);
+	void Resize(const dArray<dInt32>& bodyArray);
+	void CopyToGpu(const dArray<dInt32>& bodyArray);
 	void SetKernel(const char* const name, ndKernel& kerner);
-	void CopyToGpu(const dArray<ndBodyKinematic*>& bodyArray);
 	void ExecuteIntegrateBodyPosition(dFloat32 timestep, const dArray<ndBodyKinematic*>& bodyArray);
 
 	static ndOpenclSystem* Singleton(dInt32 driveNumber);

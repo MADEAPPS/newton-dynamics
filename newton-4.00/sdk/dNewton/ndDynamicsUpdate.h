@@ -116,7 +116,6 @@ class ndDynamicsUpdate: public dClassAlloc
 	dArray<dInt32>& GetJointForceIndexBuffer();
 	dArray<ndRightHandSide>& GetRightHandSide();
 	dArray<ndJacobian>& GetTempInternalForces();
-	dArray<ndBodyKinematic*>& GetBodyIslandOrder____();
 	dArray<ndJointBodyPairIndex>& GetJointBodyPairIndexBuffer();
 
 	private:
@@ -153,7 +152,6 @@ class ndDynamicsUpdate: public dClassAlloc
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
 	dArray<ndJacobian> m_tempInternalForces;
-	dArray<ndBodyKinematic*> m_bodyIslandOrder____;
 	dArray<ndJointBodyPairIndex> m_jointBodyPairIndexBuffer;
 
 	ndWorld* m_world;
@@ -203,12 +201,6 @@ inline dArray<ndRightHandSide>& ndDynamicsUpdate::GetRightHandSide()
 inline dArray<dInt32>& ndDynamicsUpdate::GetBodyIslandOrder()
 {
 	return m_bodyIslandOrder;
-}
-
-inline dArray<ndBodyKinematic*>& ndDynamicsUpdate::GetBodyIslandOrder____()
-{ 
-	//dAssert(0);
-	return m_bodyIslandOrder____; 
 }
 
 inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const

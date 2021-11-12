@@ -369,7 +369,7 @@ void ndOpenclBodyBuffer::Cleanup()
 	m_transform.Cleanup();
 }
 
-void ndOpenclBodyBuffer::Resize(cl_context context, dArray<ndBodyKinematic*>& bodyArray)
+void ndOpenclBodyBuffer::Resize(cl_context context, const dArray<dInt32>& bodyArray)
 {
 	if (m_transform.GetCapacity() < bodyArray.GetCount())
 	{
@@ -384,7 +384,7 @@ void ndOpenclBodyBuffer::Resize(cl_context context, dArray<ndBodyKinematic*>& bo
 	}
 }
 
-void ndOpenclBodyBuffer::CopyToGpu(cl_command_queue commandQueue, const dArray<ndBodyKinematic*>& bodyArray)
+void ndOpenclBodyBuffer::CopyToGpu(cl_command_queue commandQueue, const dArray<dInt32>& bodyArray)
 {
 	const dInt32 items = bodyArray.GetCount();
 	m_veloc.SetCount(items);
@@ -397,13 +397,14 @@ void ndOpenclBodyBuffer::CopyToGpu(cl_command_queue commandQueue, const dArray<n
 
 	for (dInt32 i = 0; i < items; i++)
 	{
-		ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
-		veloc[i].m_angular = body->GetOmega();
-		veloc[i].m_linear = body->GetVelocity();
-		accel[i].m_linear = body->GetAccel();
-		accel[i].m_angular = body->GetAlpha();
-		transform[i].m_angular = body->GetRotation();
-		transform[i].m_linear = body->GetGlobalGetCentreOfMass();
+		dAssert(0);
+		//ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
+		//veloc[i].m_angular = body->GetOmega();
+		//veloc[i].m_linear = body->GetVelocity();
+		//accel[i].m_linear = body->GetAccel();
+		//accel[i].m_angular = body->GetAlpha();
+		//transform[i].m_angular = body->GetRotation();
+		//transform[i].m_linear = body->GetGlobalGetCentreOfMass();
 	}
 
 	m_veloc.WriteData(commandQueue);
@@ -664,12 +665,12 @@ void ndOpenclSystem::SetKernel(const char* const name, ndKernel& kerner)
 	dAssert(err == CL_SUCCESS);
 }
 
-void ndOpenclSystem::Resize(dArray<ndBodyKinematic*>& bodyArray)
+void ndOpenclSystem::Resize(const dArray<dInt32>& bodyArray)
 {
 	m_bodyArray.Resize(m_context, bodyArray);
 }
 
-void ndOpenclSystem::CopyToGpu(const dArray<ndBodyKinematic*>& bodyArray)
+void ndOpenclSystem::CopyToGpu(const dArray<dInt32>& bodyArray)
 {
 	m_bodyArray.CopyToGpu(m_commandQueue, bodyArray);
 }
