@@ -28,7 +28,7 @@
 #include "dUtils.h"
 #include "dClassAlloc.h"
 
-template<class T, class dMatrixTimeVector, class dInversePrecoditionerTimeVector>
+template<class T, class dMatrixTimeVector, class dPrecoditionerSolve>
 class dConjugateGradient : public dClassAlloc
 {
 	public:
@@ -55,25 +55,25 @@ class dConjugateGradient : public dClassAlloc
 	T* m_q0;
 };
 
-template<class T, class dMatrixTimeVector, class dInversePrecoditionerTimeVector>
-dConjugateGradient<T, dMatrixTimeVector, dInversePrecoditionerTimeVector>::dConjugateGradient()
+template<class T, class dMatrixTimeVector, class dPrecoditionerSolve>
+dConjugateGradient<T, dMatrixTimeVector, dPrecoditionerSolve>::dConjugateGradient()
 {
 	SetBuffers(nullptr, nullptr, nullptr, nullptr);
 }
 
-template<class T, class dMatrixTimeVector, class dInversePrecoditionerTimeVector>
-dConjugateGradient<T, dMatrixTimeVector, dInversePrecoditionerTimeVector>::dConjugateGradient(T* const r0, T* const z0, T* const p0, T* const q0)
+template<class T, class dMatrixTimeVector, class dPrecoditionerSolve>
+dConjugateGradient<T, dMatrixTimeVector, dPrecoditionerSolve>::dConjugateGradient(T* const r0, T* const z0, T* const p0, T* const q0)
 {
 	SetBuffers(r0, z0, p0, q0);
 }
 
-template<class T, class dMatrixTimeVector, class dInversePrecoditionerTimeVector>
-dConjugateGradient<T, dMatrixTimeVector, dInversePrecoditionerTimeVector>::~dConjugateGradient()
+template<class T, class dMatrixTimeVector, class dPrecoditionerSolve>
+dConjugateGradient<T, dMatrixTimeVector, dPrecoditionerSolve>::~dConjugateGradient()
 {
 }
 
-template<class T, class dMatrixTimeVector, class dInversePrecoditionerTimeVector>
-void dConjugateGradient<T, dMatrixTimeVector, dInversePrecoditionerTimeVector>::SetBuffers(T* const r0, T* const z0, T* const p0, T* const q0)
+template<class T, class dMatrixTimeVector, class dPrecoditionerSolve>
+void dConjugateGradient<T, dMatrixTimeVector, dPrecoditionerSolve>::SetBuffers(T* const r0, T* const z0, T* const p0, T* const q0)
 {
 	m_r0 = r0;
 	m_z0 = z0;
@@ -81,8 +81,8 @@ void dConjugateGradient<T, dMatrixTimeVector, dInversePrecoditionerTimeVector>::
 	m_q0 = q0;
 }
 
-template<class T, class dMatrixTimeVector, class dInversePrecoditionerTimeVector>
-T dConjugateGradient<T, dMatrixTimeVector, dInversePrecoditionerTimeVector>::Solve(dInt32 size, T tolerance, T* const x, const T* const b)
+template<class T, class dMatrixTimeVector, class dPrecoditionerSolve>
+T dConjugateGradient<T, dMatrixTimeVector, dPrecoditionerSolve>::Solve(dInt32 size, T tolerance, T* const x, const T* const b)
 {
 	if (m_r0) 
 	{
@@ -101,8 +101,8 @@ T dConjugateGradient<T, dMatrixTimeVector, dInversePrecoditionerTimeVector>::Sol
 	}
 }
 
-template<class T, class dMatrixTimeVector, class dInversePrecoditionerTimeVector>
-T dConjugateGradient<T, dMatrixTimeVector, dInversePrecoditionerTimeVector>::SolveInternal(dInt32 size, T tolerance, T* const x, const T* const b) const
+template<class T, class dMatrixTimeVector, class dPrecoditionerSolve>
+T dConjugateGradient<T, dMatrixTimeVector, dPrecoditionerSolve>::SolveInternal(dInt32 size, T tolerance, T* const x, const T* const b) const
 {
 dAssert(0);
 return 0;

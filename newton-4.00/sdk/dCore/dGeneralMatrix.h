@@ -72,11 +72,11 @@ void dCovarianceMatrix(dInt32 size, T* const matrix, const T* const vectorA, con
 	dInt32 stride = 0;
 	for (dInt32 i = 0; i < size; i++) 
 	{
+		T scale(vectorA[i]);
 		T* const row = &matrix[stride];
-		T scale (vectorA[i]);
 		for (dInt32 j = 0; j < size; j++) 
 		{
-			row[j] = scale * vectorA[j];
+			row[j] = scale * vectorB[j];
 		}
 		stride += size;
 	}
