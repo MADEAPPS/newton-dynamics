@@ -24,7 +24,6 @@
 
 #include "dCoreStdafx.h"
 #include "dTypes.h"
-//#include "dMemory.h"
 
 template <class T>
 T dSQRH(const T num, const T den)

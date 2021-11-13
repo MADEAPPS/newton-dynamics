@@ -27,8 +27,41 @@
 #include "dTypes.h"
 #include "dUtils.h"
 #include "dClassAlloc.h"
+#include "dGeneralVector.h"
+#include "dGeneralMatrix.h"
 
-template<class T, class dMatrixTimeVector, class dPrecoditionerSolve>
+template<class T>
+class dDefaultMatrixOperator
+{
+	public:
+	dDefaultMatrixOperator(dInt32 size, const T* const matrix, T* const preconditonerBuffer)
+		:m_matrix(matrix)
+		,m_preconditoner(preconditonerBuffer)
+		,m_size(size)
+	{
+	}
+
+	void MatrixTimeVector(const T* const input, T* const output)
+	{
+		dMatrixTimeVector(m_size, m_matrix, input, output);
+	}
+
+	void PreconditionerSolve(const T* const input, T* const output)
+	{
+		const T* row = m_matrix;
+		for (dInt32 i = 0; i < m_size; i++)
+		{
+			output[i] = input[i]/row[i];
+			row += m_size;
+		}
+	}
+
+	const T* m_matrix;
+	T* m_preconditoner;
+	dInt32 m_size;
+};
+
+template<class T, class dMatrixOperator = dDefaultMatrixOperator<T>>
 class dConjugateGradient : public dClassAlloc
 {
 	public:
@@ -37,17 +70,10 @@ class dConjugateGradient : public dClassAlloc
 	~dConjugateGradient();
 
 	void SetBuffers(T* const r0, T* const z0, T* const p0, T* const q0);
-	T Solve(dInt32 size, T tolerance, T* const x, const T* const b);
-
-	protected:
-	//virtual void MatrixTimeVector(T* const out, const T* const v) const = 0;
-	//virtual void InversePrecoditionerTimeVector(T* const out, const T* const v) const = 0;
+	T Solve(dInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer);
 
 	private:
-	T SolveInternal(dInt32 size, T tolerance, T* const x, const T* const b) const;
-	//T DotProduct(dInt32 size, const T* const b, const T* const c) const;
-	//void Sub(dInt32 size, T* const a, const T* const b, const T* const c) const;
-	//void ScaleAdd(dInt32 size, T* const a, const T* const b, T scale, const T* const c) const;
+	T SolveInternal(dInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer) const;
 
 	T* m_r0;
 	T* m_z0;
@@ -55,25 +81,25 @@ class dConjugateGradient : public dClassAlloc
 	T* m_q0;
 };
 
-template<class T, class dMatrixTimeVector, class dPrecoditionerSolve>
-dConjugateGradient<T, dMatrixTimeVector, dPrecoditionerSolve>::dConjugateGradient()
+template<class T, class dMatrixOperator>
+dConjugateGradient<T, dMatrixOperator>::dConjugateGradient()
 {
 	SetBuffers(nullptr, nullptr, nullptr, nullptr);
 }
 
-template<class T, class dMatrixTimeVector, class dPrecoditionerSolve>
-dConjugateGradient<T, dMatrixTimeVector, dPrecoditionerSolve>::dConjugateGradient(T* const r0, T* const z0, T* const p0, T* const q0)
+template<class T, class dMatrixOperator>
+dConjugateGradient<T, dMatrixOperator>::dConjugateGradient(T* const r0, T* const z0, T* const p0, T* const q0)
 {
 	SetBuffers(r0, z0, p0, q0);
 }
 
-template<class T, class dMatrixTimeVector, class dPrecoditionerSolve>
-dConjugateGradient<T, dMatrixTimeVector, dPrecoditionerSolve>::~dConjugateGradient()
+template<class T, class dMatrixOperator>
+dConjugateGradient<T, dMatrixOperator>::~dConjugateGradient()
 {
 }
 
-template<class T, class dMatrixTimeVector, class dPrecoditionerSolve>
-void dConjugateGradient<T, dMatrixTimeVector, dPrecoditionerSolve>::SetBuffers(T* const r0, T* const z0, T* const p0, T* const q0)
+template<class T, class dMatrixOperator>
+void dConjugateGradient<T, dMatrixOperator>::SetBuffers(T* const r0, T* const z0, T* const p0, T* const q0)
 {
 	m_r0 = r0;
 	m_z0 = z0;
@@ -81,12 +107,12 @@ void dConjugateGradient<T, dMatrixTimeVector, dPrecoditionerSolve>::SetBuffers(T
 	m_q0 = q0;
 }
 
-template<class T, class dMatrixTimeVector, class dPrecoditionerSolve>
-T dConjugateGradient<T, dMatrixTimeVector, dPrecoditionerSolve>::Solve(dInt32 size, T tolerance, T* const x, const T* const b)
+template<class T, class dMatrixOperator>
+T dConjugateGradient<T, dMatrixOperator>::Solve(dInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer)
 {
 	if (m_r0) 
 	{
-		return SolveInternal(size, tolerance, x, b);
+		return SolveInternal(size, tolerance, x, b, matrix, preconditionerBuffer);
 	} 
 	else 
 	{
@@ -95,62 +121,54 @@ T dConjugateGradient<T, dMatrixTimeVector, dPrecoditionerSolve>::Solve(dInt32 si
 		T* const p0 = dAlloca(T, size);
 		T* const q0 = dAlloca(T, size);
 		SetBuffers(r0, z0, p0, q0);
-		T error = SolveInternal(size, tolerance, x, b);
+		T error = SolveInternal(size, tolerance, x, b, matrix, preconditionerBuffer);
 		SetBuffers(nullptr, nullptr, nullptr, nullptr);
 		return error;
 	}
 }
 
-template<class T, class dMatrixTimeVector, class dPrecoditionerSolve>
-T dConjugateGradient<T, dMatrixTimeVector, dPrecoditionerSolve>::SolveInternal(dInt32 size, T tolerance, T* const x, const T* const b) const
+template<class T, class dMatrixOperator>
+T dConjugateGradient<T, dMatrixOperator>::SolveInternal(dInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer) const
 {
-dAssert(0);
-return 0;
-	//MatrixTimeVector(m_z0, x);
-	//dSub(size, m_r0, b, m_z0);
-	//InversePrecoditionerTimeVector(m_p0, m_r0);
-	//
-	//dInt32 iter = 0;
-	//T num = dDotProduct(size, m_r0, m_p0);
-	//T error2 = num;
-	//for (dInt32 j = 0; (j < size) && (error2 > tolerance); j++) 
-	//{
-	//	MatrixTimeVector(m_z0, m_p0);
-	//	T den = dDotProduct(size, m_p0, m_z0);
-	//
-	//	dAssert(fabs(den) > T(0.0f));
-	//	T alpha = num / den;
-	//
-	//	dMulAdd(size, x, x, m_p0, alpha);
-	//	if ((j % 50) != 49) 
-	//	{
-	//		dMulAdd(size, m_r0, m_r0, m_z0, -alpha);
-	//	} 
-	//	else 
-	//	{
-	//		MatrixTimeVector(m_z0, x);
-	//		dSub(size, m_r0, b, m_z0);
-	//	}
-	//
-	//	InversePrecoditionerTimeVector(m_q0, m_r0);
-	//
-	//	T num1 = dDotProduct(size, m_r0, m_q0);
-	//	T beta = num1 / num;
-	//	dMulAdd(size, m_p0, m_q0, m_p0, beta);
-	//	num = dDotProduct(size, m_r0, m_q0);
-	//	iter++;
-	//	error2 = num;
-	//	if (j > 10) 
-	//	{
-	//		error2 = T(0.0f);
-	//		for (dInt32 i = 0; i < size; i++) 
-	//		{
-	//			error2 = dMax(error2, m_r0[i] * m_r0[i]);
-	//		}
-	//	}
-	//}
-	//dAssert(iter <= size);
-	//return num;
+	dMatrixOperator matrixOper(size, matrix, preconditionerBuffer);
+
+	matrixOper.MatrixTimeVector(x, m_z0);
+	dSub(size, m_r0, b, m_z0);
+	matrixOper.PreconditionerSolve(m_r0, m_p0);
+	
+	dInt32 iter = 0;
+	T num = dDotProduct(size, m_r0, m_p0);
+	T error2 = num;
+	for (dInt32 j = 0; (j < size) && (error2 > tolerance); j++) 
+	{
+		matrixOper.MatrixTimeVector(m_p0, m_z0);
+		T den = dDotProduct(size, m_p0, m_z0);
+	
+		dAssert(fabs(den) > T(0.0f));
+		T alpha = num / den;
+	
+		dMulAdd(size, x, x, m_p0, alpha);
+		if ((j % 50) != 49) 
+		{
+			dMulAdd(size, m_r0, m_r0, m_z0, -alpha);
+		} 
+		else 
+		{
+			matrixOper.MatrixTimeVector(x, m_z0);
+			dSub(size, m_r0, b, m_z0);
+		}
+	
+		matrixOper.PreconditionerSolve(m_r0, m_q0);
+	
+		T num1 = dDotProduct(size, m_r0, m_q0);
+		T beta = num1 / num;
+		dMulAdd(size, m_p0, m_q0, m_p0, beta);
+		num = dDotProduct(size, m_r0, m_q0);
+		iter++;
+		error2 = num;
+	}
+	dAssert(iter <= size);
+	return num;
 }
 
 #endif

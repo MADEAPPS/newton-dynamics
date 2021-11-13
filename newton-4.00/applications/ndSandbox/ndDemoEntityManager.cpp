@@ -309,31 +309,29 @@ ndDemoEntityManager::ndDemoEntityManager ()
 #endif
 
 
-	//dFloat32 xxxx[] = { 1.0f, -2.0f, 1.0f, 2.5f };
-	//dFloat32 A[4][4];
-	//dFloat32 B[4];
-	//
-	//dCovarianceMatrix<dFloat32>(4, &A[0][0], xxxx, xxxx);
-	//A[0][0] *= 2;
-	//A[1][1] *= 2;
-	//A[2][2] *= 2;
-	//A[3][3] *= 3;
-	//
-	//dMatrixTimeVector<dFloat32>(4, &A[0][0], xxxx, B);
-	////dCholeskyFactorization<dFloat32>(4, 4, &A[0][0]);
-	////dSolveCholesky<dFloat32>(4, 4, &A[0][0], xxxx, B);
-	//dMatrixTimeVector<dFloat32>(4, &A[0][0], xxxx, B);
-	//
-	//class MatrixTimeVector
-	//{
-	//};
-	//
-	//class PrecoditionerSolve
-	//{
-	//};
-	//
-	//dConjugateGradient<dFloat32, MatrixTimeVector, PrecoditionerSolve> cgd;
-	//cgd.Solve(4, 1.0e-5f, xxxx, B);
+	dFloat32 xxxx[] = { 1.0f, -2.0f, 1.0f, 2.5f };
+	dFloat32 A[4][4];
+	dFloat32 B[4];
+	
+	dCovarianceMatrix<dFloat32>(4, &A[0][0], xxxx, xxxx);
+	for (dInt32 i = 0; i < 4; i++)
+	{
+		A[i][i] *= 2;
+	}
+	dMatrixTimeVector<dFloat32>(4, &A[0][0], xxxx, B);
+	//dCholeskyFactorization<dFloat32>(4, 4, &A[0][0]);
+	//dSolveCholesky<dFloat32>(4, 4, &A[0][0], xxxx, B);
+	dMatrixTimeVector<dFloat32>(4, &A[0][0], xxxx, B);
+
+
+	for (dInt32 i = 0; i < 4; i++)
+	{
+		xxxx[i] = 0;
+	}
+
+	dFloat32 precond[4 * 2];
+	dConjugateGradient<dFloat32> cgd;
+	cgd.Solve(4, 1.0e-5f, xxxx, B, &A[0][0], precond);
 
 /*
 	dFloat32 A[2][2];
