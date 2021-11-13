@@ -39,6 +39,65 @@ class dDefaultMatrixOperator
 		,m_preconditoner(preconditonerBuffer)
 		,m_size(size)
 	{
+		memcpy(A, matrix, sizeof(A));
+
+		dCholeskyFactorization(size, size, &A[0][0]);
+		//for (dInt32 i = 2; i < 6; i++)
+		//{
+		//	for (dInt32 j = 0; j < i - 1; j++)
+		//	{
+		//		A[i][j] = 0.0f;
+		//	}
+		//}
+
+		//for (dInt32 i = 0; i < 6; i++)
+		//{
+		//	for (dInt32 j = i + 2; j < 6; j++)
+		//	{
+		//		A[i][j] = 0.0f;
+		//		A[j][i] = 0.0f;
+		//	}
+		//}
+		//
+		//for (dInt32 i = 0; i < 5; i++)
+		//{
+		//	T val = dAbs(A[i][i] * T(0.99f));
+		//	if (val < dAbs(A[i][i + 1]))
+		//	{
+		//		//val *= dSign(A[i][i + 1]);
+		//		val = 0;
+		//		A[i][i + 1] = val;
+		//		A[i + 1][i] = val;
+		//		//A[i][i + 1] = 0;
+		//		//A[i + 1][i] = 0;
+		//	}
+		//}
+		//
+		//for (dInt32 i = 1; i < 6; i++)
+		//{
+		//	T val = dAbs(A[i][i] * T(0.99f));
+		//	if (val < dAbs(A[i][i - 1]))
+		//	{
+		//		//val *= dSign(A[i][i - 1]);
+		//		val = 0;
+		//		A[i][i - 1] = val;
+		//		A[i - 1][i] = val;
+		//	}
+		//}
+		//
+		//
+		//dCholeskyFactorization(size, size, &A[0][0]);
+	}
+
+	void PreconditionerSolve(const T* const input, T* const output)
+	{
+		//const T* row = m_matrix;
+		//for (dInt32 i = 0; i < m_size; i++)
+		//{
+		//	output[i] = input[i] / row[i];
+		//	row += m_size;
+		//}
+		dSolveCholesky(m_size, m_size, &A[0][0], output, input);
 	}
 
 	void MatrixTimeVector(const T* const input, T* const output)
@@ -46,19 +105,11 @@ class dDefaultMatrixOperator
 		dMatrixTimeVector(m_size, m_matrix, input, output);
 	}
 
-	void PreconditionerSolve(const T* const input, T* const output)
-	{
-		const T* row = m_matrix;
-		for (dInt32 i = 0; i < m_size; i++)
-		{
-			output[i] = input[i]/row[i];
-			row += m_size;
-		}
-	}
-
 	const T* m_matrix;
 	T* m_preconditoner;
 	dInt32 m_size;
+
+	T A[6][6];
 };
 
 template<class T, class dMatrixOperator = dDefaultMatrixOperator<T>>

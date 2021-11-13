@@ -126,29 +126,27 @@ dInt32 ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 
 void Test0__()
 {
-	dFloat32 xxxx[] = { 1.0f, -2.0f, 1.0f, 2.5f };
-	dFloat32 A[4][4];
-	dFloat32 B[4];
+	//dFloat32 x[] = { 1.0f, -2.0f, 1.0f, 2.5f, 3.0f, -1.0f };
+	dFloat32 x[] = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+	dFloat32 A[6][6];
+	dFloat32 B[6];
 
-	dCovarianceMatrix<dFloat32>(4, &A[0][0], xxxx, xxxx);
-	for (dInt32 i = 0; i < 4; i++)
+	dCovarianceMatrix<dFloat32>(6, &A[0][0], x, x);
+	for (dInt32 i = 0; i < 6; i++)
 	{
 		A[i][i] *= 1.1f;
 	}
-	dMatrixTimeVector<dFloat32>(4, &A[0][0], xxxx, B);
-	//dCholeskyFactorization<dFloat32>(4, 4, &A[0][0]);
-	//dSolveCholesky<dFloat32>(4, 4, &A[0][0], xxxx, B);
-	dMatrixTimeVector<dFloat32>(4, &A[0][0], xxxx, B);
+	dAssert(dTestPSDmatrix(6, 6, &A[0][0]));
 
-
-	for (dInt32 i = 0; i < 4; i++)
+	dMatrixTimeVector<dFloat32>(6, &A[0][0], x, B);
+	for (dInt32 i = 0; i < 6; i++)
 	{
-		xxxx[i] = 0;
+		x[i] = 0;
 	}
 
-	dFloat32 precond[4 * 2];
+	dFloat32 precond[6 * 2];
 	dConjugateGradient<dFloat32> cgd;
-	cgd.Solve(4, 1.0e-5f, xxxx, B, &A[0][0], precond);
+	cgd.Solve(6, 1.0e-5f, x, B, &A[0][0], precond);
 }
 
 void Test1__()
@@ -377,8 +375,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	#endif
 #endif
 
-	Test0__();
-	Test1__();
+	//Test0__();
+	//Test1__();
 }
 
 ndDemoEntityManager::~ndDemoEntityManager ()
