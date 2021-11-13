@@ -30,6 +30,8 @@
 #include "dGeneralVector.h"
 #include "dGeneralMatrix.h"
 
+#define D_USE_JACOBI_PRECONDITIONER
+
 template<class T>
 class dDefaultMatrixOperator
 {
@@ -39,9 +41,20 @@ class dDefaultMatrixOperator
 		,m_preconditoner(preconditonerBuffer)
 		,m_size(size)
 	{
-		memcpy(A, matrix, sizeof(A));
+#ifdef D_USE_JACOBI_PRECONDITIONER
+		// use Jacobi preconditiner
+		const T* row = m_matrix;
+		for (dInt32 i = 0; i < size; i++)
+		{
+			m_preconditoner[i] = T(1.0f) / row[i];
+			row += m_size;
+		}
+#endif
 
-		dCholeskyFactorization(size, size, &A[0][0]);
+		// trying Gauss sidel preconditoner later, but does no seem to get any better reasult than Jacobi.
+		//memcpy(A, matrix, sizeof(A));
+		//
+		//dCholeskyFactorization(size, size, &A[0][0]);
 		//for (dInt32 i = 2; i < 6; i++)
 		//{
 		//	for (dInt32 j = 0; j < i - 1; j++)
@@ -91,13 +104,13 @@ class dDefaultMatrixOperator
 
 	void PreconditionerSolve(const T* const input, T* const output)
 	{
-		//const T* row = m_matrix;
-		//for (dInt32 i = 0; i < m_size; i++)
-		//{
-		//	output[i] = input[i] / row[i];
-		//	row += m_size;
-		//}
-		dSolveCholesky(m_size, m_size, &A[0][0], output, input);
+#ifdef D_USE_JACOBI_PRECONDITIONER
+		for (dInt32 i = 0; i < m_size; i++)
+		{
+			output[i] = input[i] * m_preconditoner[i];
+		}
+#endif
+		//dSolveCholesky(m_size, m_size, &A[0][0], output, input);
 	}
 
 	void MatrixTimeVector(const T* const input, T* const output)

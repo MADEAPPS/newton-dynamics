@@ -126,8 +126,8 @@ dInt32 ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 
 void Test0__()
 {
-	//dFloat32 x[] = { 1.0f, -2.0f, 1.0f, 2.5f, 3.0f, -1.0f };
-	dFloat32 x[] = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+	dFloat32 x[] = { 1.0f, -2.0f, 1.0f, 2.5f, 3.0f, -1.0f };
+	//dFloat32 x[] = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
 	dFloat32 A[6][6];
 	dFloat32 B[6];
 
@@ -375,7 +375,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	#endif
 #endif
 
-	//Test0__();
+	Test0__();
 	//Test1__();
 }
 
