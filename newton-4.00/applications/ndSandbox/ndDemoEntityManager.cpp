@@ -124,6 +124,75 @@ dInt32 ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 	return m_state ? 1 : 0;
 }
 
+void Test0__()
+{
+	dFloat32 xxxx[] = { 1.0f, -2.0f, 1.0f, 2.5f };
+	dFloat32 A[4][4];
+	dFloat32 B[4];
+
+	dCovarianceMatrix<dFloat32>(4, &A[0][0], xxxx, xxxx);
+	for (dInt32 i = 0; i < 4; i++)
+	{
+		A[i][i] *= 1.1f;
+	}
+	dMatrixTimeVector<dFloat32>(4, &A[0][0], xxxx, B);
+	//dCholeskyFactorization<dFloat32>(4, 4, &A[0][0]);
+	//dSolveCholesky<dFloat32>(4, 4, &A[0][0], xxxx, B);
+	dMatrixTimeVector<dFloat32>(4, &A[0][0], xxxx, B);
+
+
+	for (dInt32 i = 0; i < 4; i++)
+	{
+		xxxx[i] = 0;
+	}
+
+	dFloat32 precond[4 * 2];
+	dConjugateGradient<dFloat32> cgd;
+	cgd.Solve(4, 1.0e-5f, xxxx, B, &A[0][0], precond);
+}
+
+void Test1__()
+{
+	//dFloat32 A[2][2];
+	//dFloat32 x[2];
+	//dFloat32 b[2];
+	//dFloat32 l[2];
+	//dFloat32 h[2];
+	//
+	//A[0][0] = 2.0f;
+	//A[0][1] = 1.0f;
+	//A[1][0] = 1.0f;
+	//A[1][1] = 2.0f;
+	//b[0] = 1.0f;
+	//b[1] = 1.0f;
+	//x[0] = 1;
+	//x[1] = 2;
+	//
+	//l[0] = 0.0f;
+	//l[1] = 0.0f;
+	//h[0] = 0.25f;
+	//h[1] = 1.0f;
+	//
+	//dMatrixTimeVector(2, &A[0][0], x, b);
+	//dSolveDantzigLCP(2, &A[0][0], x, b, l, h);
+	//
+	//dInt32 xxx = 0;
+	//const dInt32 xxxxxx = 450;
+	//dDownHeap<dInt32, unsigned> xxxxx (xxxxxx + 2);
+	//for (dInt32 i = 0; i < xxxxxx; i ++)
+	//{
+	//	xxxxx.Push (xxx, i);
+	//}
+	//
+	//for (dInt32 i = 0; i < 10000; i ++)
+	//{
+	//	dInt32 index = dRandInt() % xxxxxx;
+	//	dInt32 key = xxxxx.Value(index);
+	//	xxxxx.Remove (index);
+	//	xxxxx.Push (xxx, key);
+	//}
+}
+
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 ndDemoEntityManager::ndDemoEntityManager ()
@@ -308,71 +377,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	#endif
 #endif
 
-
-	dFloat32 xxxx[] = { 1.0f, -2.0f, 1.0f, 2.5f };
-	dFloat32 A[4][4];
-	dFloat32 B[4];
-	
-	dCovarianceMatrix<dFloat32>(4, &A[0][0], xxxx, xxxx);
-	for (dInt32 i = 0; i < 4; i++)
-	{
-		A[i][i] *= 2;
-	}
-	dMatrixTimeVector<dFloat32>(4, &A[0][0], xxxx, B);
-	//dCholeskyFactorization<dFloat32>(4, 4, &A[0][0]);
-	//dSolveCholesky<dFloat32>(4, 4, &A[0][0], xxxx, B);
-	dMatrixTimeVector<dFloat32>(4, &A[0][0], xxxx, B);
-
-
-	for (dInt32 i = 0; i < 4; i++)
-	{
-		xxxx[i] = 0;
-	}
-
-	dFloat32 precond[4 * 2];
-	dConjugateGradient<dFloat32> cgd;
-	cgd.Solve(4, 1.0e-5f, xxxx, B, &A[0][0], precond);
-
-/*
-	dFloat32 A[2][2];
-	dFloat32 x[2];
-	dFloat32 b[2];
-	dFloat32 l[2];
-	dFloat32 h[2];
-
-	A[0][0] = 2.0f;
-	A[0][1] = 1.0f;
-	A[1][0] = 1.0f;
-	A[1][1] = 2.0f;
-	b[0] = 1.0f;
-	b[1] = 1.0f;
-	x[0] = 1;
-	x[1] = 2;
-	
-	l[0] = 0.0f;
-	l[1] = 0.0f;
-	h[0] = 0.25f;
-	h[1] = 1.0f;
-	
-	dMatrixTimeVector(2, &A[0][0], x, b);
-	dSolveDantzigLCP(2, &A[0][0], x, b, l, h);
-
-	dInt32 xxx = 0;
-	const dInt32 xxxxxx = 450;
-	dDownHeap<dInt32, unsigned> xxxxx (xxxxxx + 2);
-	for (dInt32 i = 0; i < xxxxxx; i ++)
-	{
-		xxxxx.Push (xxx, i);
-	}
-
-	for (dInt32 i = 0; i < 10000; i ++)
-	{
-		dInt32 index = dRand() % xxxxxx;
-		dInt32 key = xxxxx.Value(index);
-		xxxxx.Remove (index);
-		xxxxx.Push (xxx, key);
-	}
-*/
+	Test0__();
+	Test1__();
 }
 
 ndDemoEntityManager::~ndDemoEntityManager ()

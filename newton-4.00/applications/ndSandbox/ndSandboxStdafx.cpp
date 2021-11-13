@@ -26,14 +26,21 @@ void dSetRandSeed (dUnsigned32 seed)
 	___dRandSeed___	= seed; 
 }
 
-/// return a random variable between 0.0 and 1.0
-dFloat32 dRand()
+dInt32 dRandInt()
 {
 	// numerical recipe in c
 	#define RAND_MUL 1664525u
 	#define RAND_ADD 1013904223u
 	___dRandSeed___ = RAND_MUL * ___dRandSeed___ + RAND_ADD;
-	dFloat32 r = dFloat32(___dRandSeed___ & dRAND_MAX) * ((dFloat32(1.0f) / dRAND_MAX));
+	return ___dRandSeed___ & dRAND_MAX;
+}
+
+
+/// return a random variable between 0.0 and 1.0
+dFloat32 dRand()
+{
+	// numerical recipe in c
+	dFloat32 r = dFloat32(dRandInt()) * ((dFloat32(1.0f) / dRAND_MAX));
 	//dTrace(("%f\n", r));
 	return r;
 }

@@ -113,6 +113,7 @@
 #define dRAND_MAX		0x00ffffff
 
 dFloat32 dRand();
+dInt32 dRandInt();
 void dSetRandSeed (dUnsigned32 seed);
 dFloat32 dGaussianRandom (dFloat32 amp);
 
