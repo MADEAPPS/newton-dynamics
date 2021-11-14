@@ -464,7 +464,7 @@ void ndDynamicsUpdateAvx2::DetermineSleepStates()
 					dynBody->m_accel = dynBody->m_accel & accelTest;
 					dynBody->m_alpha = dynBody->m_alpha & accelTest;
 
-					dUnsigned32 equilibrium = (dynBody->GetInvMass() == dFloat32(0.0f)) ? 1 : dynBody->m_autoSleep;
+					dUnsigned32 equilibrium = (dynBody->m_invMass.m_w == dFloat32(0.0f)) ? 1 : dynBody->m_autoSleep;
 					const dVector isMovingMask(dynBody->m_veloc + dynBody->m_omega + dynBody->m_accel + dynBody->m_alpha);
 					const dVector mask(isMovingMask.TestZero());
 					const dInt32 test = mask.GetSignMask() & 7;
@@ -505,7 +505,7 @@ void ndDynamicsUpdateAvx2::DetermineSleepStates()
 				{
 					ndBodyKinematic* const kinBody = dynBody->GetAsBodyKinematic();
 					dAssert(kinBody);
-					dUnsigned32 equilibrium = (kinBody->GetInvMass() == dFloat32(0.0f)) ? 1 : (kinBody->m_autoSleep & ~kinBody->m_equilibriumOverride);
+					dUnsigned32 equilibrium = (kinBody->m_invMass.m_w == dFloat32(0.0f)) ? 1 : (kinBody->m_autoSleep & ~kinBody->m_equilibriumOverride);
 					const dVector isMovingMask(kinBody->m_veloc + kinBody->m_omega);
 					const dVector mask(isMovingMask.TestZero());
 					const dInt32 test = mask.GetSignMask() & 7;
@@ -553,7 +553,7 @@ void ndDynamicsUpdateAvx2::DetermineSleepStates()
 						body->m_alpha = dVector::m_zero;
 						body->m_veloc = dVector::m_zero;
 						body->m_omega = dVector::m_zero;
-						body->m_equilibrium = (body->GetInvMass() == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
+						body->m_equilibrium = (body->m_invMass.m_w == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
 					}
 					else
 					{
@@ -561,7 +561,7 @@ void ndDynamicsUpdateAvx2::DetermineSleepStates()
 						dAssert(kinBody);
 						kinBody->m_veloc = dVector::m_zero;
 						kinBody->m_omega = dVector::m_zero;
-						kinBody->m_equilibrium = (kinBody->GetInvMass() == dFloat32(0.0f)) ? 1 : kinBody->m_autoSleep;
+						kinBody->m_equilibrium = (kinBody->m_invMass.m_w == dFloat32(0.0f)) ? 1 : kinBody->m_autoSleep;
 					}
 				}
 			}
@@ -858,7 +858,7 @@ void ndDynamicsUpdateAvx2::SortIslands()
 		if (!(body->m_resting & body->m_islandSleep) || body->GetAsBodyPlayerCapsule())
 		{
 			buffer0[bodyCount].m_body = body;
-			if (body->GetInvMass() > dFloat32(0.0f))
+			if (body->m_invMass.m_w > dFloat32(0.0f))
 			{
 				ndBodyKinematic* root = body->m_islandParent;
 				while (root != root->m_islandParent)
@@ -1101,7 +1101,7 @@ void ndDynamicsUpdateAvx2::InitWeights()
 				ndBodyKinematic* const body0 = constraint->GetBody0();
 				ndBodyKinematic* const body1 = constraint->GetBody1();
 
-				if (body1->GetInvMass() > dFloat32(0.0f))
+				if (body1->m_invMass.m_w > dFloat32(0.0f))
 				{
 					dScopeSpinLock lock(body1->m_lock);
 					body1->m_weigh += dFloat32(1.0f);
@@ -1113,7 +1113,7 @@ void ndDynamicsUpdateAvx2::InitWeights()
 				}
 				dScopeSpinLock lock(body0->m_lock);
 				body0->m_weigh += dFloat32(1.0f);
-				dAssert(body0->GetInvMass() != dFloat32(0.0f));
+				dAssert(body0->m_invMass.m_w != dFloat32(0.0f));
 				maxExtraPasses = dMax(body0->m_weigh, maxExtraPasses);
 			}
 
@@ -1785,7 +1785,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					dVector force(zero);
 					dVector torque(zero);
 					const ndBodyKinematic* const body = bodyArray[i + start];
-					if (body->GetInvMass() > dFloat32(0.0f))
+					if (body->m_invMass.m_w > dFloat32(0.0f))
 					{
 						for (dInt32 j = 0; j < count; j++)
 						{
@@ -2613,7 +2613,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 				if (count)
 				{
 					const ndBodyKinematic* const body = bodyArray[i + start];
-					if (body->GetInvMass() > dFloat32(0.0f))
+					if (body->m_invMass.m_w > dFloat32(0.0f))
 					{
 						dVector force(zero);
 						dVector torque(zero);

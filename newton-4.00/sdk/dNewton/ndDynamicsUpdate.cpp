@@ -203,7 +203,7 @@ void ndDynamicsUpdate::SortJointsScan()
 				if (!equilibrium)
 				{
 					body0->m_solverSleep0 = 0;
-					if (body1->GetInvMass() > dFloat32(0.0f))
+					if (body1->m_invMass.m_w > dFloat32(0.0f))
 					{
 						body1->m_solverSleep0 = 0;
 					}
@@ -211,7 +211,7 @@ void ndDynamicsUpdate::SortJointsScan()
 
 				body0->m_bodyIsConstrained = 1;
 				body0->m_resting = body0->m_resting & equilibrium;
-				if (body1->GetInvMass() > dFloat32(0.0f))
+				if (body1->m_invMass.m_w > dFloat32(0.0f))
 				{
 					body1->m_bodyIsConstrained = 1;
 					body1->m_resting = body1->m_resting & equilibrium;
@@ -251,7 +251,7 @@ void ndDynamicsUpdate::SortJointsScan()
 				if (!solverSleep0)
 				{
 					body0->m_solverSleep1 = 0;
-					if (body1->GetInvMass() > dFloat32(0.0f))
+					if (body1->m_invMass.m_w > dFloat32(0.0f))
 					{
 						body1->m_solverSleep1 = 0;
 					}
@@ -362,6 +362,12 @@ void ndDynamicsUpdate::SortJointsScan()
 	scene->SubmitJobs<ndSleep1>(movingJoints);
 	scene->SubmitJobs<ndScan0>(histogram);
 
+static int xxxx;
+xxxx++;
+if (xxxx >= 16)
+xxxx *= 1;
+
+
 	dInt32 scan[2];
 	scan[0] = 0;
 	scan[1] = 0;
@@ -412,7 +418,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		ndBodyKinematic* const body0 = joint->GetBody0();
 		ndBodyKinematic* const body1 = joint->GetBody1();
 
-		if (body1->GetInvMass() > dFloat32(0.0f))
+		if (body1->m_invMass.m_w > dFloat32(0.0f))
 		{
 			ndBodyKinematic* root0 = FindRootAndSplit(body0);
 			ndBodyKinematic* root1 = FindRootAndSplit(body1);
@@ -540,7 +546,7 @@ void ndDynamicsUpdate::SortIslands()
 		if (!(body->m_resting & body->m_islandSleep) || body->GetAsBodyPlayerCapsule())
 		{
 			buffer0[bodyCount].m_body = body;
-			if (body->GetInvMass() > dFloat32(0.0f))
+			if (body->m_invMass.m_w > dFloat32(0.0f))
 			{
 				ndBodyKinematic* root = body->m_islandParent;
 				while (root != root->m_islandParent)
@@ -725,7 +731,7 @@ void ndDynamicsUpdate::InitWeights()
 				ndBodyKinematic* const body0 = constraint->GetBody0();
 				ndBodyKinematic* const body1 = constraint->GetBody1();
 
-				if (body1->GetInvMass() > dFloat32(0.0f))
+				if (body1->m_invMass.m_w > dFloat32(0.0f))
 				{
 					dScopeSpinLock lock(body1->m_lock);
 					body1->m_weigh += dFloat32(1.0f);
@@ -737,7 +743,7 @@ void ndDynamicsUpdate::InitWeights()
 				}
 				dScopeSpinLock lock(body0->m_lock);
 				body0->m_weigh += dFloat32(1.0f);
-				dAssert(body0->GetInvMass() != dFloat32(0.0f));
+				dAssert(body0->m_invMass.m_w != dFloat32(0.0f));
 				maxExtraPasses = dMax(body0->m_weigh, maxExtraPasses);
 			}
 			dFloat32* const extraPasses = (dFloat32*)m_context;
@@ -1112,7 +1118,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 					dVector force(zero);
 					dVector torque(zero);
 					const ndBodyKinematic* const body = bodyArray[i + start];
-					if (body->GetInvMass() > dFloat32(0.0f))
+					if (body->m_invMass.m_w > dFloat32(0.0f))
 					{
 						for (dInt32 j = 0; j < count; j++)
 						{
@@ -1429,7 +1435,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 					dynBody->m_accel = dynBody->m_accel & accelTest;
 					dynBody->m_alpha = dynBody->m_alpha & accelTest;
 
-					dUnsigned32 equilibrium = (dynBody->GetInvMass() == dFloat32(0.0f)) ? 1 : dynBody->m_autoSleep;
+					dUnsigned32 equilibrium = (dynBody->m_invMass.m_w == dFloat32(0.0f)) ? 1 : dynBody->m_autoSleep;
 					const dVector isMovingMask(dynBody->m_veloc + dynBody->m_omega + dynBody->m_accel + dynBody->m_alpha);
 					const dVector mask(isMovingMask.TestZero());
 					const dInt32 test = mask.GetSignMask() & 7;
@@ -1470,7 +1476,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 				{
 					ndBodyKinematic* const kinBody = dynBody->GetAsBodyKinematic();
 					dAssert(kinBody);
-					dUnsigned32 equilibrium = (kinBody->GetInvMass() == dFloat32(0.0f)) ? 1 : (kinBody->m_autoSleep & ~kinBody->m_equilibriumOverride);
+					dUnsigned32 equilibrium = (kinBody->m_invMass.m_w == dFloat32(0.0f)) ? 1 : (kinBody->m_autoSleep & ~kinBody->m_equilibriumOverride);
 					const dVector isMovingMask(kinBody->m_veloc + kinBody->m_omega);
 					const dVector mask(isMovingMask.TestZero());
 					const dInt32 test = mask.GetSignMask() & 7;
@@ -1518,7 +1524,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 						body->m_alpha = dVector::m_zero;
 						body->m_veloc = dVector::m_zero;
 						body->m_omega = dVector::m_zero;
-						body->m_equilibrium = (body->GetInvMass() == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
+						body->m_equilibrium = (body->m_invMass.m_w == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
 					}
 					else
 					{
@@ -1526,7 +1532,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 						dAssert(kinBody);
 						kinBody->m_veloc = dVector::m_zero;
 						kinBody->m_omega = dVector::m_zero;
-						kinBody->m_equilibrium = (kinBody->GetInvMass() == dFloat32(0.0f)) ? 1 : kinBody->m_autoSleep;
+						kinBody->m_equilibrium = (kinBody->m_invMass.m_w == dFloat32(0.0f)) ? 1 : kinBody->m_autoSleep;
 					}
 				}
 			}
@@ -1640,7 +1646,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 			body->m_accel = body->m_accel & accelTest;
 			body->m_alpha = body->m_alpha & accelTest;
 
-			const dUnsigned32 equilibrium = (body->GetInvMass() == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
+			const dUnsigned32 equilibrium = (body->m_invMass.m_w == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
 			const dVector isMovingMask(body->m_veloc + body->m_omega + body->m_accel + body->m_alpha);
 			const dVector mask(isMovingMask.TestZero());
 			const dInt32 test = mask.GetSignMask() & 7;
@@ -1678,7 +1684,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 			body->m_accel = body->m_accel & accelTest;
 			body->m_alpha = body->m_alpha & accelTest;
 
-			dUnsigned32 equilibrium = (body->GetInvMass() == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
+			dUnsigned32 equilibrium = (body->m_invMass.m_w == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
 			const dVector isMovingMask(body->m_veloc + body->m_omega + body->m_accel + body->m_alpha);
 			const dVector mask(isMovingMask.TestZero());
 			const dInt32 test = mask.GetSignMask() & 7;
@@ -1737,7 +1743,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 			//	const dInt32 jointsCount = (bodyIndex[index + 1] - bodyIndex[index]);
 			//	ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
 			//	bool isContrained = (jointsCount != 0);
-			//	isContrained = isContrained & (body->GetInvMass() > dFloat32(0.0f));
+			//	isContrained = isContrained & (body->m_invMass.m_w > dFloat32(0.0f));
 			//	if (isContrained && (jointsCount == 1))
 			//	{
 			//		const dInt32 jointStart = bodyIndex[index];
@@ -1745,7 +1751,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 			//		const ndConstraint* const joint = jointArray[jointIndex];
 			//		dAssert((joint->GetBody0() == body) || (joint->GetBody1() == body));
 			//		const ndBodyKinematic* const body1 = (joint->GetBody0() != body) ? joint->GetBody0() : joint->GetBody1();
-			//		isContrained = (body1->GetInvMass() != dFloat32(0.0f));
+			//		isContrained = (body1->m_invMass.m_w != dFloat32(0.0f));
 			//	}
 			//
 			//	if (isContrained)
@@ -2079,7 +2085,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				if (count)
 				{
 					const ndBodyKinematic* const body = bodyArray[i + start];
-					if (body->GetInvMass() > dFloat32(0.0f))
+					if (body->m_invMass.m_w > dFloat32(0.0f))
 					{
 						dVector force(zero);
 						dVector torque(zero);
@@ -2147,11 +2153,6 @@ void ndDynamicsUpdate::Update()
 {
 	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
-
-static int xxxx;
-xxxx++;
-if (xxxx >= 16)
-xxxx *= 1;
 
 	BuildIsland();
 	dInt32 count = GetIsland().GetCount();
