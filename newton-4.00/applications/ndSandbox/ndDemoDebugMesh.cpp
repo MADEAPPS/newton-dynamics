@@ -28,11 +28,11 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 	,m_vertextArrayBuffer(0)
 	,m_triangleIndexBuffer(0)
 {
-	class ndDrawShape : public ndShapeDebugCallback
+	class ndDrawShape : public ndShapeDebugNotify
 	{
 		public:
 		ndDrawShape()
-			:ndShapeDebugCallback()
+			:ndShapeDebugNotify()
 			,m_triangles(1024)
 		{
 		}
@@ -169,7 +169,7 @@ void ndFlatShadedDebugMesh::Render(ndDemoEntityManager* const scene, const dMatr
 	}
 }
 
-ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, ndShapeDebugCallback::ndEdgeType edgeTypefilter)
+ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, ndShapeDebugNotify::ndEdgeType edgeTypefilter)
 	:ndDemoMeshInterface()
 	,m_indexCount(0)
 	,m_shadeColorLocation(0)
@@ -179,11 +179,11 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 	,m_vertextArrayBuffer(0)
 	,m_lineIndexBuffer(0)
 {
-	class ndDrawShape : public ndShapeDebugCallback
+	class ndDrawShape : public ndShapeDebugNotify
 	{
 		public:
 		ndDrawShape(ndEdgeType edgeTypefilter)
-			:ndShapeDebugCallback()
+			:ndShapeDebugNotify()
 			,m_lines(1024)
 			,m_edgeType(edgeTypefilter)
 		{

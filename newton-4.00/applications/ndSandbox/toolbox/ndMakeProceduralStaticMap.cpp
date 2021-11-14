@@ -29,7 +29,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 	{
 	}
 
-	virtual void DebugShape(const dMatrix&, ndShapeDebugCallback&) const
+	virtual void DebugShape(const dMatrix&, ndShapeDebugNotify&) const
 	{
 		// do nothing since it depends on the application implementation.
 	}

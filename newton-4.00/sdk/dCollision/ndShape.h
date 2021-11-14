@@ -43,7 +43,7 @@ class ndShapeStatic_bvh;
 class ndShapeStaticMesh;
 class ndShapeHeightfield;
 class ndShapeConvexPolygon;
-class ndShapeDebugCallback;
+class ndShapeDebugNotify;
 class ndShapeChamferCylinder;
 class ndShapeStaticProceduralMesh;
 
@@ -239,7 +239,7 @@ class ndShape: public dClassAlloc
 
 	D_COLLISION_API virtual void MassProperties();
 
-	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const = 0;
+	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const = 0;
 
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual dFloat32 GetVolume() const = 0;

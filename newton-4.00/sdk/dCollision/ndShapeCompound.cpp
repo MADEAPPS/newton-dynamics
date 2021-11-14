@@ -372,7 +372,7 @@ ndShapeInfo ndShapeCompound::GetShapeInfo() const
 	return info;
 }
 
-void ndShapeCompound::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+void ndShapeCompound::DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const
 {
 	ndTreeArray::Iterator iter(m_array);
 	for (iter.Begin(); iter; iter++) 
@@ -1087,7 +1087,7 @@ void ndShapeCompound::ApplyScale(const dVector& scale)
 
 dFloat32 ndShapeCompound::CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const
 {
-	class ndCalculateMassProperties: public ndShapeDebugCallback
+	class ndCalculateMassProperties: public ndShapeDebugNotify
 	{
 		public:
 

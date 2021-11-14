@@ -34,7 +34,7 @@ class ndShapeInstance;
 class ndRayCastNotify;
 
 D_MSV_NEWTON_ALIGN_32
-class ndShapeDebugCallback : public dClassAlloc
+class ndShapeDebugNotify : public dClassAlloc
 {
 	public: 
 	enum ndEdgeType
@@ -43,12 +43,12 @@ class ndShapeDebugCallback : public dClassAlloc
 		m_open,
 	};
 
-	ndShapeDebugCallback()
+	ndShapeDebugNotify()
 		:m_instance(nullptr)
 	{
 	}
 
-	virtual ~ndShapeDebugCallback()
+	virtual ~ndShapeDebugNotify()
 	{
 	}
 
@@ -114,7 +114,7 @@ class ndShapeInstance: public dClassAlloc
 	D_COLLISION_API dMatrix CalculateInertia() const;
 	D_COLLISION_API void CalculateObb(dVector& origin, dVector& size) const;
 	D_COLLISION_API void CalculateAabb(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
-	D_COLLISION_API void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
+	D_COLLISION_API void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	D_COLLISION_API dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const;
 
 	//D_COLLISION_API dInt32 ClosestPoint(const dMatrix& matrix, const dVector& point, dVector& contactPoint) const;

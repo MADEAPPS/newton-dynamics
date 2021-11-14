@@ -22,7 +22,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndConvexFractureModel_0.h"
 
-class ndFaceArrayDatabase : public ndShapeDebugCallback
+class ndFaceArrayDatabase : public ndShapeDebugNotify
 {
 	public:
 	struct ndFaceInfo
@@ -74,7 +74,7 @@ class ndFaceArrayDatabase : public ndShapeDebugCallback
 	};
 
 	ndFaceArrayDatabase(dFloat32 sign = 1.0f)
-		:ndShapeDebugCallback()
+		:ndShapeDebugNotify()
 		,m_sign(sign)
 		,m_count(0)
 	{

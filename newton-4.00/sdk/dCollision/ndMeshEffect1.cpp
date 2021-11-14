@@ -3790,11 +3790,11 @@ ndMeshEffect::ndMeshEffect(const ndShapeInstance& shape)
 	,m_vertexBaseCount(0)
 	,m_constructionIndex(0)
 {
-	class ndMeshEffectBuilder : public ndShapeDebugCallback
+	class ndMeshEffectBuilder : public ndShapeDebugNotify
 	{
 		public:
 		ndMeshEffectBuilder()
-			:ndShapeDebugCallback()
+			:ndShapeDebugNotify()
 			, m_vertex(1024)
 			, m_faceMaterial(1024)
 			, m_faceIndexCount(1024)

@@ -30,7 +30,7 @@
 ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& instance)
 	:ndMeshEffect()
 {
-	class dgMeshEffectBuilder: public ndShapeDebugCallback
+	class dgMeshEffectBuilder: public ndShapeDebugNotify
 	{
 		public:
 		dgMeshEffectBuilder()

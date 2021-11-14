@@ -47,7 +47,7 @@ class ndShapeConvexHull : public ndShapeConvex
 	dVector SupportVertexBruteForce(const dVector& dir, dInt32* const vertexIndex) const;
 	dVector SupportVertexhierarchical(const dVector& dir, dInt32* const vertexIndex) const;
 	
-	void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
+	void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 
 	//protected:
 	//dInt32 GetFaceIndices (dInt32 index, dInt32* const indices) const;

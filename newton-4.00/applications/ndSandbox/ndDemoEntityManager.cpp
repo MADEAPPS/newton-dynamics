@@ -1379,7 +1379,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 				debugMesh.m_wireFrameShareEdge = new ndWireFrameDebugMesh(m_shaderCache, &shape);
 				if (shape.GetShape()->GetAsShapeStaticBVH())
 				{
-					debugMesh.m_wireFrameOpenEdge = new ndWireFrameDebugMesh(m_shaderCache, &shape, ndShapeDebugCallback::ndEdgeType::m_open);
+					debugMesh.m_wireFrameOpenEdge = new ndWireFrameDebugMesh(m_shaderCache, &shape, ndShapeDebugNotify::ndEdgeType::m_open);
 					debugMesh.m_wireFrameOpenEdge->SetColor(dVector(1.0f, 0.0f, 1.0f, 1.0f));
 				}
 				shapeNode = m_debugShapeCache.Insert(debugMesh, key);

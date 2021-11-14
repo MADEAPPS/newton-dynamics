@@ -33,7 +33,7 @@ class ndCollisionBvhShowPolyContext
 	public:
 	dMatrix m_matrix;
 	void* m_userData;
-	ndShapeDebugCallback* m_callback;
+	ndShapeDebugNotify* m_callback;
 };
 
 D_MSV_NEWTON_ALIGN_32 
@@ -137,7 +137,7 @@ ndShapeInfo ndShapeStatic_bvh::GetShapeInfo() const
 dIntersectStatus ndShapeStatic_bvh::ShowDebugPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32)
 {
 	dVector poly[128];
-	ndShapeDebugCallback::ndEdgeType edgeType[128];
+	ndShapeDebugNotify::ndEdgeType edgeType[128];
 
 	dInt32 stride = dInt32(strideInBytes / sizeof(dFloat32));
 
@@ -147,14 +147,14 @@ dIntersectStatus ndShapeStatic_bvh::ShowDebugPolygon(void* const context, const 
 		dVector p(&polygon[indexArray[i] * stride]);
 		poly[i] = data.m_matrix.TransformVector(p & dVector::m_triplexMask);
 		dInt32 edgeIndexType = (indexArray[i + indexCount + 2]) & D_CONCAVE_EDGE_MASK;
-		edgeType[i] = edgeIndexType ? ndShapeDebugCallback::m_open : ndShapeDebugCallback::m_shared;
+		edgeType[i] = edgeIndexType ? ndShapeDebugNotify::m_open : ndShapeDebugNotify::m_shared;
 	}
 	//dAssert(0);
 	data.m_callback->DrawPolygon(indexCount, poly, edgeType);
 	return t_ContinueSearh;
 }
 
-void ndShapeStatic_bvh::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+void ndShapeStatic_bvh::DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const
 {
 	ndCollisionBvhShowPolyContext context;
 

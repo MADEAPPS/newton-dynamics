@@ -112,7 +112,7 @@ ndShapeInfo ndShapePoint::GetShapeInfo() const
 	return info;
 }
 
-void ndShapePoint::DebugShape(const dMatrix&, ndShapeDebugCallback&) const
+void ndShapePoint::DebugShape(const dMatrix&, ndShapeDebugNotify&) const
 {
 	dAssert(0);
 	//dVector tmpVectex[1024 * 2];

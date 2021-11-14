@@ -51,7 +51,7 @@ class ndShapeConvex: public ndShape
 
 	D_COLLISION_API void SetVolumeAndCG();
 	D_COLLISION_API virtual void MassProperties();
-	D_COLLISION_API virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
+	D_COLLISION_API virtual void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	D_COLLISION_API virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
 	D_COLLISION_API virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
 

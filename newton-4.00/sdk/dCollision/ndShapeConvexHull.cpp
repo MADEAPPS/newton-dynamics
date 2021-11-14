@@ -935,11 +935,11 @@ ndShapeInfo ndShapeConvexHull::GetShapeInfo() const
 	return info;
 }
 
-void ndShapeConvexHull::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+void ndShapeConvexHull::DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const
 {
 	dVector vertex[512];
-	ndShapeDebugCallback::ndEdgeType edgeType[512];
-	memset(edgeType, ndShapeDebugCallback::m_shared, sizeof(edgeType));
+	ndShapeDebugNotify::ndEdgeType edgeType[512];
+	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
 	for (dInt32 i = 0; i < m_faceCount; i++) 
 	{
 		ndConvexSimplexEdge* const face = m_faceArray[i];

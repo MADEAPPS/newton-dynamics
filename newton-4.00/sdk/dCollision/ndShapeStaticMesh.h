@@ -137,7 +137,7 @@ class ndShapeStaticMesh: public ndShape
 	D_COLLISION_API dInt32 CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 strideInFloat, const dPlane& localPlane, dVector* const contactsOut) const;
 	D_COLLISION_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
-	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
+	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
 	D_MSV_NEWTON_ALIGN_32 
@@ -216,7 +216,7 @@ inline void ndPolygonMeshDesc::SetDistanceTravel(const dVector& distanceInGlobal
 	}
 }
 
-inline void ndShapeStaticMesh::DebugShape(const dMatrix&, ndShapeDebugCallback&) const
+inline void ndShapeStaticMesh::DebugShape(const dMatrix&, ndShapeDebugNotify&) const
 {
 }
 

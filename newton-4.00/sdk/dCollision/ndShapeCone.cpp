@@ -138,13 +138,13 @@ ndShapeInfo ndShapeCone::GetShapeInfo() const
 	return info;
 }
 
-void ndShapeCone::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+void ndShapeCone::DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const
 {
 	#define NUMBER_OF_DEBUG_SEGMENTS  40
 	dVector pool[NUMBER_OF_DEBUG_SEGMENTS + 1];
 	dVector face[NUMBER_OF_DEBUG_SEGMENTS];
-	ndShapeDebugCallback::ndEdgeType edgeType[NUMBER_OF_DEBUG_SEGMENTS];
-	memset(edgeType, ndShapeDebugCallback::m_shared, sizeof(edgeType));
+	ndShapeDebugNotify::ndEdgeType edgeType[NUMBER_OF_DEBUG_SEGMENTS];
+	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
 
 	dFloat32 angle = dFloat32(0.0f);
 	for (dInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 

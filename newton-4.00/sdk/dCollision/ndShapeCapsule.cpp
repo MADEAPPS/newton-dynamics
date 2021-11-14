@@ -255,7 +255,7 @@ void ndShapeCapsule::TesselateTriangle(dInt32 level, const dVector& p0, const dV
 	}
 }
 
-void ndShapeCapsule::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+void ndShapeCapsule::DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const
 {
 	if (m_radius0 == m_radius1) 
 	{
@@ -281,8 +281,8 @@ void ndShapeCapsule::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& deb
 		TesselateTriangle(POWER, p1, p2, p5, count, tmpVectex);
 
 		dVector face[4];
-		ndShapeDebugCallback::ndEdgeType edgeType[4];
-		memset(edgeType, ndShapeDebugCallback::m_shared, sizeof(edgeType));
+		ndShapeDebugNotify::ndEdgeType edgeType[4];
+		memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
 
 		for (dInt32 i = 0; i < count; i += 3) 
 		{

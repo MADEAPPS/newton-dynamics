@@ -57,18 +57,18 @@ ndShapeConvex::~ndShapeConvex()
 	}
 }
 
-void ndShapeConvex::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+void ndShapeConvex::DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const
 {
 	dVector tmp[D_MAX_EDGE_COUNT];
 	dVector vertex[D_MAX_EDGE_COUNT];
 	dInt8 mark[D_MAX_EDGE_COUNT];
-	ndShapeDebugCallback::ndEdgeType edgeType[D_MAX_EDGE_COUNT];
+	ndShapeDebugNotify::ndEdgeType edgeType[D_MAX_EDGE_COUNT];
 
 	dAssert(m_edgeCount < D_MAX_EDGE_COUNT);
 	dAssert(m_vertexCount < D_MAX_EDGE_COUNT);
 
 	memset(mark, 0, sizeof(mark));
-	memset(edgeType, ndShapeDebugCallback::m_shared, sizeof(edgeType));
+	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
 	matrix.TransformTriplex(&tmp[0].m_x, sizeof(dVector), &m_vertex[0].m_x, sizeof(dVector), m_vertexCount);
 	for (dInt32 i = 0; i < m_edgeCount; i++) 
 	{
@@ -166,7 +166,7 @@ void ndShapeConvex::MassProperties()
 
 dFloat32 ndShapeConvex::CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const
 {
-	class dMassPropertiesCalculator : public ndShapeDebugCallback
+	class dMassPropertiesCalculator : public ndShapeDebugNotify
 	{
 		public:
 		dMassPropertiesCalculator()

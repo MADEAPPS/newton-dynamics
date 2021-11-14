@@ -196,7 +196,7 @@ void ndShapeChamferCylinder::CalculateAabb(const dMatrix& matrix, dVector& p0, d
 	//p1 = max_q0.GetMax(max_q1) & dVector::m_triplexMask;
 }
 
-void ndShapeChamferCylinder::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+void ndShapeChamferCylinder::DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const
 {
 	dInt32 slices = 12;
 	dInt32 brakes = 24;
@@ -222,8 +222,8 @@ void ndShapeChamferCylinder::DebugShape(const dMatrix& matrix, ndShapeDebugCallb
 	matrix.TransformTriplex(&pool[0].m_x, sizeof(dVector), &pool[0].m_x, sizeof(dVector), 24 * (12 + 1));
 
 	dVector face[32];
-	ndShapeDebugCallback::ndEdgeType edgeType[32];
-	memset(edgeType, ndShapeDebugCallback::m_shared, sizeof(edgeType));
+	ndShapeDebugNotify::ndEdgeType edgeType[32];
+	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
 
 	index = 0;
 	for (dInt32 j = 0; j < slices; j++)

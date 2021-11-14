@@ -204,13 +204,13 @@ const dInt32* ndShapeHeightfield::GetIndexList() const
 	return &m_cellIndices[(m_diagonalMode == m_normalDiagonals) ? 0 : 1][0];
 }
 
-void ndShapeHeightfield::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+void ndShapeHeightfield::DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const
 {
 	dVector points[4];
 	dVector triangle[3];
 
-	ndShapeDebugCallback::ndEdgeType edgeType[4];
-	memset(edgeType, ndShapeDebugCallback::m_shared, sizeof(edgeType));
+	ndShapeDebugNotify::ndEdgeType edgeType[4];
+	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
 
 	const dInt32* const indirectIndex = GetIndexList();
 	const dInt32 i0 = indirectIndex[0];

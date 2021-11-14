@@ -39,7 +39,7 @@ class ndShapeNull : public ndShape
 	virtual dFloat32 GetBoxMaxRadius() const;
 	virtual void CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
-	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
+	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
 	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
@@ -77,7 +77,7 @@ inline dFloat32 ndShapeNull::RayCast(ndRayCastNotify&, const dVector&, const dVe
 	return dFloat32(1.2f);
 }
 
-inline void ndShapeNull::DebugShape(const dMatrix&, ndShapeDebugCallback&) const
+inline void ndShapeNull::DebugShape(const dMatrix&, ndShapeDebugNotify&) const
 {
 }
 

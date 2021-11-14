@@ -165,7 +165,7 @@ ndShapeInstance& ndShapeInstance::operator=(const ndShapeInstance& instance)
 	return *this;
 }
 
-void ndShapeInstance::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+void ndShapeInstance::DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const
 {
 	debugCallback.m_instance = this;
 	m_shape->DebugShape(GetScaledTransform(matrix), debugCallback);

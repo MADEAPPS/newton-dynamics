@@ -50,7 +50,7 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	protected:
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return this; }
-	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
+	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
 	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;

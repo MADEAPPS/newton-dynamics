@@ -63,7 +63,7 @@ class ndShapeCompound: public ndShape
 	class ndSpliteInfo;
 	ndShapeCompound(const ndShapeCompound& source, const ndShapeInstance* const myInstance);
 	virtual ndShapeInfo GetShapeInfo() const;
-	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
+	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
 
