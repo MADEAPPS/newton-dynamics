@@ -391,9 +391,9 @@ void ndOpenclBodyBuffer::CopyToGpu(cl_command_queue commandQueue, const dArray<d
 	m_accel.SetCount(items);
 	m_transform.SetCount(items);
 
-	ndJacobian* const veloc = (ndJacobian*)&m_veloc[0];
-	ndJacobian* const accel = (ndJacobian*)&m_accel[0];
-	ndJacobian* const transform = (ndJacobian*)&m_transform[0];
+	//ndJacobian* const veloc = (ndJacobian*)&m_veloc[0];
+	//ndJacobian* const accel = (ndJacobian*)&m_accel[0];
+	//ndJacobian* const transform = (ndJacobian*)&m_transform[0];
 
 	for (dInt32 i = 0; i < items; i++)
 	{
