@@ -105,7 +105,11 @@ class ndDynamicsUpdate: public dClassAlloc
 
 	void* GetTempBuffer() const;
 	virtual const char* GetStringId() const;
+
+	dInt32 GetConstrainedBodyCount() const;
 	dInt32 GetUnconstrainedBodyCount() const;
+	dInt32 GetUnconstrainedBodyCount____() const;
+	
 	void ClearBuffer(void* const buffer, dInt32 sizeInByte) const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
 
@@ -165,24 +169,25 @@ class ndDynamicsUpdate: public dClassAlloc
 	dFloat32 m_invTimestepRK;
 	dUnsigned32 m_solverPasses;
 	dInt32 m_activeJointCount;
+	dInt32 m_activeConstrainedBodyCount;
 	dInt32 m_unConstrainedBodyCount____;
 
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
 
+inline dInt32 ndDynamicsUpdate::GetConstrainedBodyCount() const
+{
+	return m_activeConstrainedBodyCount;
+}
+
+inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
+{
+	return m_activeBodies.GetCount() - m_activeConstrainedBodyCount;
+}
+
 inline void* ndDynamicsUpdate::GetTempBuffer() const
 {
 	return (void*)&m_leftHandSide[0];
-}
-
-inline dArray<ndDynamicsUpdate::ndIsland>& ndDynamicsUpdate::GetIsland____()
-{
-	return m_islands____;
-}
-
-inline dArray<dInt32>& ndDynamicsUpdate::GetBodyIslandOrder____()
-{
-	return m_bodyIslandOrder____;
 }
 
 inline dArray<dInt32>& ndDynamicsUpdate::GetActiveBodies()
@@ -208,11 +213,6 @@ inline  dArray<ndLeftHandSide>& ndDynamicsUpdate::GetLeftHandSide()
 inline dArray<ndRightHandSide>& ndDynamicsUpdate::GetRightHandSide()
 { 
 	return m_rightHandSide; 
-}
-
-inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
-{
-	return m_unConstrainedBodyCount____;
 }
 
 inline dArray<ndDynamicsUpdate::ndJointBodyPairIndex>& ndDynamicsUpdate::GetJointBodyPairIndexBuffer()
@@ -257,6 +257,23 @@ inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* cons
 		prev->m_islandParent = node->m_islandParent;
 	}
 	return node;
+}
+
+inline dArray<ndDynamicsUpdate::ndIsland>& ndDynamicsUpdate::GetIsland____()
+{
+	return m_islands____;
+}
+
+inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount____() const
+{
+	//dAssert(0);
+	return m_unConstrainedBodyCount____;
+}
+
+inline dArray<dInt32>& ndDynamicsUpdate::GetBodyIslandOrder____()
+{
+	//dAssert(0);
+	return m_bodyIslandOrder____;
 }
 
 #endif

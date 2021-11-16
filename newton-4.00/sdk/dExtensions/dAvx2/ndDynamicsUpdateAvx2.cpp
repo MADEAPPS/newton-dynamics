@@ -991,7 +991,7 @@ void ndDynamicsUpdateAvx2::IntegrateUnconstrainedBodies()
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = me->GetUnconstrainedBodyCount();
+			const dInt32 bodyCount = me->GetUnconstrainedBodyCount____();
 
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start0 = threadIndex * stride;
@@ -1010,7 +1010,7 @@ void ndDynamicsUpdateAvx2::IntegrateUnconstrainedBodies()
 		}
 	};
 
-	if (GetUnconstrainedBodyCount())
+	if (GetUnconstrainedBodyCount____())
 	{
 		D_TRACKTIME();
 		ndScene* const scene = m_world->GetScene();
@@ -1165,7 +1165,7 @@ void ndDynamicsUpdateAvx2::InitBodyArray()
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount();
+			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount____();
 
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
@@ -2083,7 +2083,7 @@ void ndDynamicsUpdateAvx2::IntegrateBodiesVelocity()
 
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount();
+			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount____();
 
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;

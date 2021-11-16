@@ -48,6 +48,7 @@ ndDynamicsUpdate::ndDynamicsUpdate(ndWorld* const world)
 	,m_timestepRK(dFloat32(0.0f))
 	,m_invTimestepRK(dFloat32(0.0f))
 	,m_solverPasses(0)
+	,m_activeConstrainedBodyCount(0)
 	,m_activeJointCount(0)
 	,m_unConstrainedBodyCount____(0)
 {
@@ -258,7 +259,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	}
 #endif
 
-#ifndef D_USE_ISLANDS
+//#ifndef D_USE_ISLANDS
 	ndSleepingBodiesInfo sleepingBodiesInfo;
 	scene->SubmitJobs<ndCountSleepingBodies>(&sleepingBodiesInfo);
 
@@ -275,11 +276,13 @@ void ndDynamicsUpdate::SortBodyJointScan()
 		}
 	}
 
+	m_activeConstrainedBodyCount = sleepingBodiesInfo.m_digitSum[1] - sleepingBodiesInfo.m_digitSum[0];
+
 	GetActiveBodies().SetCount(sleepingBodiesInfo.m_digitSum[3]);
 	scene->SubmitJobs<ndSortSleepingBodies>(&sleepingBodiesInfo);
 
 	GetActiveBodies().SetCount(sleepingBodiesInfo.m_digitSum[2]);
-#endif
+//#endif
 }
 
 void ndDynamicsUpdate::SortJointsScan()
@@ -768,7 +771,9 @@ void ndDynamicsUpdate::BuildIsland()
 	{
 		D_TRACKTIME();
 		SortJoints();
+#ifdef D_USE_ISLANDS
 		SortIslands();
+#endif
 	}
 }
 
@@ -783,19 +788,23 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 			ndWorld* const world = m_owner->GetWorld();
 			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
-			dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
+			//dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
 			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
+			//const dInt32 bodyCount = me->GetUnconstrainedBodyCount____();
+			const dInt32 bodyStart = me->GetConstrainedBodyCount();
 			const dInt32 bodyCount = me->GetUnconstrainedBodyCount();
 
 			const dInt32 stride = bodyCount / threadCount;
-			const dInt32 start0 = threadIndex * stride;
-			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start0;
-			const dInt32 start = bodyIslandOrder.GetCount() - bodyCount + start0;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
+			//const dInt32 start = bodyIslandOrder.GetCount() - bodyCount + start0;
+			//const dInt32 start = bodyStart + start0;
 
+			const dInt32* const bodyIslandOrder = &me->GetActiveBodies()[bodyStart];
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				dInt32 index = bodyIslandOrder[start + i];
@@ -905,7 +914,7 @@ void ndDynamicsUpdate::InitBodyArray()
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount();
+			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount____();
 
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
@@ -1318,7 +1327,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount();
+			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount____();
 
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
@@ -2182,7 +2191,8 @@ void ndDynamicsUpdate::Update()
 	m_timestep = m_world->GetScene()->GetTimestep();
 
 	BuildIsland();
-	dInt32 count = GetIsland____().GetCount();
+	//dInt32 count = GetIsland____().GetCount();
+	dInt32 count = GetActiveBodies().GetCount();
 	if (count)
 	{
 		IntegrateUnconstrainedBodies();

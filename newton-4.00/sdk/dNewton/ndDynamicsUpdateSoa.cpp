@@ -640,7 +640,7 @@ void ndDynamicsUpdateSoa::IntegrateUnconstrainedBodies()
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = me->GetUnconstrainedBodyCount();
+			const dInt32 bodyCount = me->GetUnconstrainedBodyCount____();
 
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start0 = threadIndex * stride;
@@ -659,7 +659,7 @@ void ndDynamicsUpdateSoa::IntegrateUnconstrainedBodies()
 		}
 	};
 
-	if (GetUnconstrainedBodyCount())
+	if (GetUnconstrainedBodyCount____())
 	{
 		D_TRACKTIME();
 		ndScene* const scene = m_world->GetScene();
@@ -814,7 +814,7 @@ void ndDynamicsUpdateSoa::InitBodyArray()
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount();
+			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount____();
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
@@ -1690,7 +1690,7 @@ void ndDynamicsUpdateSoa::IntegrateBodiesVelocity()
 
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount();
+			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount____();
 
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
