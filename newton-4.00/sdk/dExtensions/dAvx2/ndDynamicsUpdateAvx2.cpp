@@ -1107,10 +1107,6 @@ void ndDynamicsUpdateAvx2::InitWeights()
 					body1->m_weigh += dFloat32(1.0f);
 					maxExtraPasses = dMax(body1->m_weigh, maxExtraPasses);
 				}
-				else if (body1->m_weigh != dFloat32(1.0f))
-				{
-					body1->m_weigh = dFloat32(1.0f);
-				}
 				dScopeSpinLock lock(body0->m_lock);
 				body0->m_weigh += dFloat32(1.0f);
 				dAssert(body0->m_invMass.m_w != dFloat32(0.0f));
@@ -2683,7 +2679,7 @@ void ndDynamicsUpdateAvx2::Update()
 	m_timestep = m_world->GetScene()->GetTimestep();
 
 	BuildIsland();
-	dInt32 count = GetIsland____().GetCount();
+	dInt32 count = GetActiveBodies().GetCount();
 	if (count)
 	{
 		IntegrateUnconstrainedBodies();

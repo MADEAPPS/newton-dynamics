@@ -592,6 +592,7 @@ void ndDynamicsUpdate::SortJoints()
 	if (!m_activeJointCount)
 	{
 	//	jointArray.SetCount(0);
+		dTrace(("fix this xxxxxxxxxx\n"));
 		return;
 	}
 
@@ -827,6 +828,7 @@ void ndDynamicsUpdate::InitWeights()
 	class ndInitWeights : public ndScene::ndBaseJob
 	{
 		public:
+#if 1
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -853,10 +855,6 @@ void ndDynamicsUpdate::InitWeights()
 					body1->m_weigh += dFloat32(1.0f);
 					maxExtraPasses = dMax(body1->m_weigh, maxExtraPasses);
 				}
-				else if (body1->m_weigh != dFloat32(1.0f))
-				{
-					body1->m_weigh = dFloat32(1.0f);
-				}
 				dScopeSpinLock lock(body0->m_lock);
 				body0->m_weigh += dFloat32(1.0f);
 				dAssert(body0->m_invMass.m_w != dFloat32(0.0f));
@@ -865,6 +863,42 @@ void ndDynamicsUpdate::InitWeights()
 			dFloat32* const extraPasses = (dFloat32*)m_context;
 			extraPasses[threadIndex] = maxExtraPasses;
 		}
+
+#else
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dVector zero(dVector::m_zero);
+			ndWorld* const world = m_owner->GetWorld();
+			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
+
+			const dInt32* const bodyIndex = &me->GetJointForceIndexBuffer()[0];
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+
+			const dInt32 bodyCount = me->GetConstrainedBodyCount();
+			const dInt32 threadIndex = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+
+			const dInt32 stride = bodyCount / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
+
+			dFloat32 maxExtraPasses = dFloat32(1.0f);
+			const dInt32* const activeBodyArray = &me->GetActiveBodies()[0];
+			for (dInt32 i = 0; i < blockSize; i++)
+			{
+				const dInt32 index = activeBodyArray[start + i];
+				ndBodyKinematic* const body = bodyArray[index]->GetAsBodyKinematic();
+				dAssert(body->m_invMass.m_w > dFloat32(0.0f));
+				const dInt32 index1 = activeBodyArray[start + i + 1];
+				const dFloat32 weigh = dFloat32(bodyIndex[index1] - bodyIndex[index]);
+				body->m_weigh = weigh;
+				maxExtraPasses = dMax(weigh, maxExtraPasses);
+			}
+			dFloat32* const extraPasses = (dFloat32*)m_context;
+			extraPasses[threadIndex] = maxExtraPasses;
+		}
+#endif
 	};
 
 	ndScene* const scene = m_world->GetScene();
@@ -2187,7 +2221,6 @@ void ndDynamicsUpdate::Update()
 	m_timestep = m_world->GetScene()->GetTimestep();
 
 	BuildIsland();
-	//dInt32 count = GetIsland____().GetCount();
 	dInt32 count = GetActiveBodies().GetCount();
 	if (count)
 	{
