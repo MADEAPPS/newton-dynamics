@@ -175,24 +175,9 @@ class ndDynamicsUpdate: public dClassAlloc
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
 
-inline dInt32 ndDynamicsUpdate::GetConstrainedBodyCount() const
-{
-	return m_activeConstrainedBodyCount;
-}
-
-inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
-{
-	return m_activeBodies.GetCount() - m_activeConstrainedBodyCount;
-}
-
 inline void* ndDynamicsUpdate::GetTempBuffer() const
 {
 	return (void*)&m_leftHandSide[0];
-}
-
-inline dArray<dInt32>& ndDynamicsUpdate::GetActiveBodies()
-{
-	return m_activeBodies;
 }
 
 inline dArray<ndJacobian>& ndDynamicsUpdate::GetInternalForces()
@@ -218,11 +203,6 @@ inline dArray<ndRightHandSide>& ndDynamicsUpdate::GetRightHandSide()
 inline dArray<ndDynamicsUpdate::ndJointBodyPairIndex>& ndDynamicsUpdate::GetJointBodyPairIndexBuffer()
 {
 	return m_jointBodyPairIndexBuffer;
-}
-
-inline dArray<dInt32>& ndDynamicsUpdate::GetJointForceIndexBuffer()
-{
-	return m_jointForcesIndex;
 }
 
 inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const
@@ -257,6 +237,26 @@ inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* cons
 		prev->m_islandParent = node->m_islandParent;
 	}
 	return node;
+}
+
+inline dArray<dInt32>& ndDynamicsUpdate::GetActiveBodies()
+{
+	return m_activeBodies;
+}
+
+inline dArray<dInt32>& ndDynamicsUpdate::GetJointForceIndexBuffer()
+{
+	return m_jointForcesIndex;
+}
+
+inline dInt32 ndDynamicsUpdate::GetConstrainedBodyCount() const
+{
+	return m_activeConstrainedBodyCount;
+}
+
+inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
+{
+	return m_activeBodies.GetCount() - m_activeConstrainedBodyCount;
 }
 
 inline dArray<ndDynamicsUpdate::ndIsland>& ndDynamicsUpdate::GetIsland____()
