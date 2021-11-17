@@ -67,14 +67,34 @@ void ndDynamicsUpdateOpencl::SortJoints()
 	D_TRACKTIME();
 
 	SortJointsScan();
-
+	ndScene* const scene = m_world->GetScene();
 	if (!m_activeJointCount)
 	{
-		//jointArray.SetCount(0);
+		dArray<dInt32>& indexBuffer = GetJointForceIndexBuffer();
+		const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
+		indexBuffer.SetCount(bodyArray.GetCount() + 1);
+
+		const dInt32 bodyCount = bodyArray.GetCount();
+		dArray<dInt32>& bodyIndexArray = GetActiveBodies();
+		bodyIndexArray.SetCount(bodyCount);
+
+		dInt32 count = 0;
+		for (dInt32 i = 0; i < bodyCount; i++)
+		{
+			const ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
+			if (!body->m_equilibrium)
+			{
+				dAssert(i == body->m_index);
+				bodyIndexArray[count] = i;
+				count++;
+			}
+		}
+
+		bodyIndexArray.SetCount(count);
+		m_activeConstrainedBodyCount = 0;
 		return;
 	}
 
-	ndScene* const scene = m_world->GetScene();
 	ndConstraintArray& jointArray = scene->GetActiveContactArray();
 
 	dInt32 rowCount = 1;
@@ -294,33 +314,29 @@ void ndDynamicsUpdateOpencl::InitWeights()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			ndWorld* const world = m_owner->GetWorld();
+			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
 
-			dFloat32 maxExtraPasses = dFloat32(1.0f);
+			const dInt32 bodyCount = me->GetConstrainedBodyCount();
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 jointCount = jointArray.GetCount();
 
-			const dInt32 stride = jointCount / threadCount;
+			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : jointCount - start;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
 
+			dFloat32 maxExtraPasses = dFloat32(1.0f);
+			const dInt32* const activeBodyArray = &me->GetActiveBodies()[0];
+			const dInt32* const activeJointsCount = &me->GetJointForceIndexBuffer()[0];
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndConstraint* const constraint = jointArray[i + start];
-				ndBodyKinematic* const body0 = constraint->GetBody0();
-				ndBodyKinematic* const body1 = constraint->GetBody1();
-
-				if (body1->m_invMass.m_w > dFloat32(0.0f))
-				{
-					dScopeSpinLock lock(body1->m_lock);
-					body1->m_weigh += dFloat32(1.0f);
-					maxExtraPasses = dMax(body1->m_weigh, maxExtraPasses);
-				}
-				dScopeSpinLock lock(body0->m_lock);
-				body0->m_weigh += dFloat32(1.0f);
-				dAssert(body0->m_invMass.m_w != dFloat32(0.0f));
-				maxExtraPasses = dMax(body0->m_weigh, maxExtraPasses);
+				const dInt32 index = activeBodyArray[start + i];
+				ndBodyKinematic* const body = bodyArray[index]->GetAsBodyKinematic();
+				dAssert(body->m_invMass.m_w > dFloat32(0.0f));
+				const dFloat32 weigh = dFloat32(activeJointsCount[index + 1] - activeJointsCount[index]);
+				body->m_weigh = weigh;
+				maxExtraPasses = dMax(weigh, maxExtraPasses);
 			}
 			dFloat32* const extraPasses = (dFloat32*)m_context;
 			extraPasses[threadIndex] = maxExtraPasses;
@@ -642,7 +658,6 @@ void ndDynamicsUpdateOpencl::InitJacobianMatrix()
 			ndConstraint** const jointArray = &m_owner->GetActiveContactArray()[0];
 
 			const dInt32 jointCount = m_owner->GetActiveContactArray().GetCount();
-			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 
