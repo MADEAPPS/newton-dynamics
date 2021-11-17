@@ -116,6 +116,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	dArray<ndIsland>& GetIsland____();
 	dArray<dInt32>& GetActiveBodies();
 	dArray<dInt32>& GetBodyIslandOrder____();
+	dArray<dInt32>& GetBodyIslandOrder_______();
 	dArray<ndJacobian>& GetInternalForces();
 	dArray<ndLeftHandSide>& GetLeftHandSide();
 	dArray<dInt32>& GetJointForceIndexBuffer();
@@ -272,7 +273,12 @@ inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount____() const
 
 inline dArray<dInt32>& ndDynamicsUpdate::GetBodyIslandOrder____()
 {
-	//dAssert(0);
+//	dAssert(0);
+	return m_bodyIslandOrder____;
+}
+
+inline dArray<dInt32>& ndDynamicsUpdate::GetBodyIslandOrder_______()
+{
 	return m_bodyIslandOrder____;
 }
 

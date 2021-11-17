@@ -703,7 +703,7 @@ void ndDynamicsUpdate::SortIslands()
 	}
 
 	dArray<ndIsland>& islands = GetIsland____();
-	dArray<dInt32>& islandOrder = GetBodyIslandOrder____();
+	dArray<dInt32>& islandOrder = GetBodyIslandOrder_______();
 
 	islands.SetCount(0);
 	islandOrder.SetCount(bodyCount);
@@ -953,13 +953,15 @@ void ndDynamicsUpdate::InitBodyArray()
 			ndWorld* const world = m_owner->GetWorld();
 			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
-			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
+			//const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
+			const dInt32* bodyIndexArray = &me->GetActiveBodies()[0];
 			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount____();
+			//const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount____();
+			const dInt32 bodyCount = me->GetConstrainedBodyCount();
 
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
@@ -967,7 +969,7 @@ void ndDynamicsUpdate::InitBodyArray()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				dInt32 index = bodyIslandOrder[start + i];
+				dInt32 index = bodyIndexArray[start + i];
 				ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
 				if (body)
 				{
@@ -1264,6 +1266,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
 			const ndJacobian* const jointInternalForces = &me->GetTempInternalForces()[0];
 			const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
+			//dTrace(("xxxxxxxxxxx\n"));
 
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
