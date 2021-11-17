@@ -170,7 +170,8 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFlatPlane(scene, true);
 
-	dInt32 pyramidHigh = 25;
+	//dInt32 pyramidHigh = 60;
+	dInt32 pyramidHigh = 1;
 	dVector origin(dVector::m_zero);
 
 	for (dInt32 i = 0; i < 1; i++)

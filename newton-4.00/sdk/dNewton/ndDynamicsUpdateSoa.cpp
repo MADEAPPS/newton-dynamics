@@ -755,7 +755,9 @@ void ndDynamicsUpdateSoa::InitWeights()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
+			const dInt32* const indirectBodyArray = &me->GetActiveBodies()[0];
 			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+			const dInt32* const activeJointsCount = &me->GetJointForceIndexBuffer()[0];
 
 			const dInt32 bodyCount = me->GetConstrainedBodyCount();
 			const dInt32 threadIndex = GetThreadId();
@@ -766,11 +768,9 @@ void ndDynamicsUpdateSoa::InitWeights()
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
 
 			dFloat32 maxExtraPasses = dFloat32(1.0f);
-			const dInt32* const activeBodyArray = &me->GetActiveBodies()[0];
-			const dInt32* const activeJointsCount = &me->GetJointForceIndexBuffer()[0];
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				const dInt32 index = activeBodyArray[start + i];
+				const dInt32 index = indirectBodyArray[start + i];
 				ndBodyKinematic* const body = bodyArray[index]->GetAsBodyKinematic();
 				dAssert(body->m_invMass.m_w > dFloat32(0.0f));
 				const dFloat32 weigh = dFloat32(activeJointsCount[index + 1] - activeJointsCount[index]);
@@ -1404,7 +1404,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 				{
 					dVector force(zero);
 					dVector torque(zero);
-					const ndBodyKinematic* const body = bodyArray[i + start];
+					const ndBodyKinematic* const body = bodyArray[start + i];
 					if (body->m_invMass.m_w > dFloat32(0.0f))
 					{
 						for (dInt32 j = 0; j < count; j++)
@@ -1414,8 +1414,8 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 							torque += jointInternalForces[index].m_angular;
 						}
 					}
-					internalForces[i + start].m_linear = force;
-					internalForces[i + start].m_angular = torque;
+					internalForces[start + i].m_linear = force;
+					internalForces[start + i].m_angular = torque;
 				}
 			}
 		}
@@ -2201,7 +2201,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 				dInt32 count = bodyIndex[start + i + 1] - startIndex;
 				if (count)
 				{
-					const ndBodyKinematic* const body = bodyArray[i + start];
+					const ndBodyKinematic* const body = bodyArray[start + i];
 					if (body->m_invMass.m_w > dFloat32(0.0f))
 					{
 						dVector force(zero);
@@ -2212,8 +2212,8 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 							force += jointInternalForces[index].m_linear;
 							torque += jointInternalForces[index].m_angular;
 						}
-						internalForces[i + start].m_linear = force;
-						internalForces[i + start].m_angular = torque;
+						internalForces[start + i].m_linear = force;
+						internalForces[start + i].m_angular = torque;
 					}
 				}
 			}
