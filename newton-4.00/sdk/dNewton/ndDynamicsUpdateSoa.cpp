@@ -1379,14 +1379,12 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 			const dVector zero(dVector::m_zero);
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
-
+			
 			ndJacobian* const internalForces = &me->GetInternalForces()[0];
+			const dInt32* const indirectBodyArray = &me->GetActiveBodies()[0];
 			const dInt32* const bodyJointsIndexArray = &me->GetJointForceIndexBuffer()[0];
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
 			const ndJacobian* const jointInternalForces = &me->GetTempInternalForces()[0];
 			const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
-
-			const dInt32* const indirectBodyArray = &me->GetActiveBodies()[0];
 
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
@@ -1398,15 +1396,14 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
+				dVector force(zero);
+				dVector torque(zero);
 				const dInt32 bodyIndex = indirectBodyArray[start + i];
 				const dInt32 startIndex = bodyJointsIndexArray[bodyIndex];
 				const dInt32 count = bodyJointsIndexArray[bodyIndex + 1] - startIndex;
 
 				dAssert(count);
-				dVector force(zero);
-				dVector torque(zero);
-				const ndBodyKinematic* const body = bodyArray[bodyIndex];
-				dAssert(body->m_invMass.m_w > dFloat32(0.0f));
+				dAssert(m_owner->GetActiveBodyArray()[bodyIndex]->m_invMass.m_w > dFloat32(0.0f));
 				for (dInt32 j = 0; j < count; j++)
 				{
 					const dInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
@@ -2178,17 +2175,17 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			D_TRACKTIME();
 			const dVector zero(dVector::m_zero);
 			ndWorld* const world = m_owner->GetWorld();
-			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
+			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
 
 			ndJacobian* const internalForces = &me->GetInternalForces()[0];
-			const dInt32* const bodyIndex = &me->GetJointForceIndexBuffer()[0];
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+			const dInt32* const indirectBodyArray = &me->GetActiveBodies()[0];
+			const dInt32* const bodyJointsIndexArray = &me->GetJointForceIndexBuffer()[0];
 			const ndJacobian* const jointInternalForces = &me->GetTempInternalForces()[0];
 			const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 
-			const dInt32 bodyCount = bodyArray.GetCount();
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
+			const dInt32 bodyCount = me->GetConstrainedBodyCount();
 
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
@@ -2196,25 +2193,23 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				dInt32 startIndex = bodyIndex[start + i];
-				dInt32 count = bodyIndex[start + i + 1] - startIndex;
-				if (count)
+				dVector force(zero);
+				dVector torque(zero);
+				const dInt32 bodyIndex = indirectBodyArray[start + i];
+				const dInt32 startIndex = bodyJointsIndexArray[bodyIndex];
+				const dInt32 count = bodyJointsIndexArray[bodyIndex + 1] - startIndex;
+
+				dAssert(count);
+				dAssert(m_owner->GetActiveBodyArray()[bodyIndex]->m_invMass.m_w > dFloat32(0.0f));
+				for (dInt32 j = 0; j < count; j++)
 				{
-					const ndBodyKinematic* const body = bodyArray[start + i];
-					if (body->m_invMass.m_w > dFloat32(0.0f))
-					{
-						dVector force(zero);
-						dVector torque(zero);
-						for (dInt32 j = 0; j < count; j++)
-						{
-							dInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
-							force += jointInternalForces[index].m_linear;
-							torque += jointInternalForces[index].m_angular;
-						}
-						internalForces[start + i].m_linear = force;
-						internalForces[start + i].m_angular = torque;
-					}
+					dInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
+					force += jointInternalForces[index].m_linear;
+					torque += jointInternalForces[index].m_angular;
 				}
+
+				internalForces[bodyIndex].m_linear = force;
+				internalForces[bodyIndex].m_angular = torque;
 			}
 		}
 	};
