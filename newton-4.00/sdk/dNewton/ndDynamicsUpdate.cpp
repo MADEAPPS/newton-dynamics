@@ -258,7 +258,6 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	}
 #endif
 
-//#ifndef D_USE_ISLANDS
 	ndSleepingBodiesInfo sleepingBodiesInfo;
 	scene->SubmitJobs<ndCountSleepingBodies>(&sleepingBodiesInfo);
 
@@ -281,7 +280,6 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	scene->SubmitJobs<ndSortSleepingBodies>(&sleepingBodiesInfo);
 
 	GetActiveBodies().SetCount(sleepingBodiesInfo.m_digitSum[2]);
-//#endif
 }
 
 void ndDynamicsUpdate::SortJointsScan()
@@ -915,14 +913,12 @@ void ndDynamicsUpdate::InitBodyArray()
 			ndWorld* const world = m_owner->GetWorld();
 			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
-			//const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
 			const dInt32* bodyIndexArray = &me->GetActiveBodies()[0];
 			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			//const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount____();
 			const dInt32 bodyCount = me->GetConstrainedBodyCount();
 
 			const dInt32 stride = bodyCount / threadCount;
@@ -1216,52 +1212,6 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 	class ndInitJacobianAccumulatePartialForces : public ndScene::ndBaseJob
 	{
 		public:
-#if 1
-			virtual void Execute()
-			{
-				D_TRACKTIME();
-				const dVector zero(dVector::m_zero);
-				ndWorld* const world = m_owner->GetWorld();
-				ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
-
-				ndJacobian* const internalForces = &me->GetInternalForces()[0];
-				const dInt32* const bodyIndex = &me->GetJointForceIndexBuffer()[0];
-				const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-				const ndJacobian* const jointInternalForces = &me->GetTempInternalForces()[0];
-				const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
-
-				const dInt32 threadIndex = GetThreadId();
-				const dInt32 threadCount = m_owner->GetThreadCount();
-				const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
-
-				const dInt32 stride = bodyCount / threadCount;
-				const dInt32 start = threadIndex * stride;
-				const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-
-				for (dInt32 i = 0; i < blockSize; i++)
-				{
-					dInt32 startIndex = bodyIndex[start + i];
-					dInt32 count = bodyIndex[start + i + 1] - startIndex;
-					if (count)
-					{
-						dVector force(zero);
-						dVector torque(zero);
-						const ndBodyKinematic* const body = bodyArray[start + i];
-						if (body->m_invMass.m_w > dFloat32(0.0f))
-						{
-							for (dInt32 j = 0; j < count; j++)
-							{
-								dInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
-								force += jointInternalForces[index].m_linear;
-								torque += jointInternalForces[index].m_angular;
-							}
-						}
-						internalForces[start + i].m_linear = force;
-						internalForces[start + i].m_angular = torque;
-					}
-				}
-			}
-#else
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -1276,14 +1226,9 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 
 			const dInt32* const indirectBodyArray = &me->GetActiveBodies()[0];
-			//const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			//const dInt32* const activeJointsCount = &me->GetJointForceIndexBuffer()[0];
-
-			//dTrace(("xxxxxxxxxxx\n"));
 
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			//const dInt32 bodyCount___ = m_owner->GetActiveBodyArray().GetCount();
 			const dInt32 bodyCount = me->GetConstrainedBodyCount();
 
 			const dInt32 stride = bodyCount / threadCount;
@@ -1294,35 +1239,24 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			{
 				const dInt32 bodyIndex = indirectBodyArray[start + i];
 				const dInt32 startIndex = bodyJointsIndexArray[bodyIndex];
-				const dInt32 count = bodyJointsIndexArray[startIndex + 1] - startIndex;
+				const dInt32 count = bodyJointsIndexArray[bodyIndex + 1] - startIndex;
 
-				//dInt32 startIndex = bodyIndex[start + i];
-				//dInt32 count = bodyIndex[start + i + 1] - startIndex;
-				//dAssert(count == count1);
-				//dAssert(startIndex == startIndex___);
-				if (count)
+				dAssert(count);
+				dVector force(zero);
+				dVector torque(zero);
+				const ndBodyKinematic* const body = bodyArray[bodyIndex];
+				dAssert(body->m_invMass.m_w > dFloat32(0.0f));
+				for (dInt32 j = 0; j < count; j++)
 				{
-					dVector force(zero);
-					dVector torque(zero);
-					//const ndBodyKinematic* const body = bodyArray[start + i];
-					const ndBodyKinematic* const body = bodyArray[bodyIndex];
-					dAssert(body->m_invMass.m_w > dFloat32(0.0f));
-					//if (body->m_invMass.m_w > dFloat32(0.0f))
-					//{
-						for (dInt32 j = 0; j < count; j++)
-						{
-							const dInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
-							force += jointInternalForces[index].m_linear;
-							torque += jointInternalForces[index].m_angular;
-						}
-					//}
-
-					internalForces[start + i].m_linear = force;
-					internalForces[start + i].m_angular = torque;
+					const dInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
+					force += jointInternalForces[index].m_linear;
+					torque += jointInternalForces[index].m_angular;
 				}
+
+				internalForces[bodyIndex].m_linear = force;
+				internalForces[bodyIndex].m_angular = torque;
 			}
 		}
-#endif
 	};
 
 	ndScene* const scene = m_world->GetScene();
@@ -2170,6 +2104,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
 
+			//xxxxxxxxxxxx
 			ndJacobian* const internalForces = &me->GetInternalForces()[0];
 			const dInt32* const bodyIndex = &me->GetJointForceIndexBuffer()[0];
 			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
