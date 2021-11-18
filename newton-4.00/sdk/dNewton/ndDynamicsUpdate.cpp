@@ -1324,6 +1324,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
 			const dArray<ndJacobian>& internalForces = me->GetInternalForces();
 
+			// xxxxxxxxxxxxxx
 			const dVector timestep4(me->m_timestepRK);
 			const dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));
 
@@ -2095,7 +2096,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 	class ndApplyJacobianAccumulatePartialForces : public ndScene::ndBaseJob
 	{
 		public:
-#if 0
+#if 1
 		virtual void Execute()
 		{
 			D_TRACKTIME();

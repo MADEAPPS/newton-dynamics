@@ -273,7 +273,7 @@ inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount____() const
 
 inline dArray<dInt32>& ndDynamicsUpdate::GetBodyIslandOrder____()
 {
-//	dAssert(0);
+	//dAssert(0);
 	return m_bodyIslandOrder____;
 }
 

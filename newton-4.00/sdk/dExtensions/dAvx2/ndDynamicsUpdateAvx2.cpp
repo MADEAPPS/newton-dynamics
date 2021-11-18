@@ -2600,6 +2600,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
+			dAssert(0);
 			const dVector zero(dVector::m_zero);
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
