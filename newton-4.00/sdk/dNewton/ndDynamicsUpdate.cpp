@@ -769,6 +769,9 @@ void ndDynamicsUpdate::BuildIsland()
 	ndScene* const scene = m_world->GetScene();
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	dAssert(bodyArray.GetCount() >= 1);
+
+static int xxx;
+
 	if (bodyArray.GetCount() - 1)
 	{
 		D_TRACKTIME();
@@ -776,6 +779,93 @@ void ndDynamicsUpdate::BuildIsland()
 #ifdef D_USE_ISLANDS
 		SortIslands();
 #endif
+
+
+		class xxxxxxx
+		{
+		public:
+			void ExecuteOld(ndJacobian* out)
+			{
+				ndWorld* const world = m_owner->GetWorld();
+				ndDynamicsUpdate* const me = world->m_solver;
+				const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
+				ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
+				const dArray<ndJacobian>& internalForces = me->GetInternalForces();
+
+				const dInt32 threadIndex = 0;
+				const dInt32 threadCount = 1;
+				const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount____();
+
+				const dInt32 stride = bodyCount / threadCount;
+				const dInt32 start = threadIndex * stride;
+				const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
+
+				for (dInt32 i = 0; i < blockSize; i++)
+				{
+					dInt32 index = bodyIslandOrder[start + i];
+					ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
+
+					const ndJacobian& forceAndTorque = internalForces[index];
+					out[index].m_linear = body->GetForce() + forceAndTorque.m_linear;
+					out[index].m_angular = body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque();
+				}
+			}
+
+			void ExecuteNew(ndJacobian* out)
+			{
+				ndWorld* const world = m_owner->GetWorld();
+				ndDynamicsUpdate* const me = world->m_solver;
+
+				ndJacobian* const internalForces = &me->GetInternalForces()[0];
+				const dInt32* const indirectBodyArray = &me->GetActiveBodies()[0];
+				ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
+
+				const dInt32 threadIndex = 0;
+				const dInt32 threadCount = 1;
+				const dInt32 bodyCount = me->GetConstrainedBodyCount();
+
+				const dInt32 stride = bodyCount / threadCount;
+				const dInt32 start = threadIndex * stride;
+				const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
+
+				for (dInt32 i = 0; i < blockSize; i++)
+				{
+					const dInt32 index = indirectBodyArray[start + i];
+					ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
+					const ndJacobian& forceAndTorque = internalForces[index];
+					out[index].m_linear = body->GetForce() + forceAndTorque.m_linear;
+					out[index].m_angular = body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque();
+				}
+			}
+
+
+			xxxxxxx(ndScene* owner)
+				:m_owner(owner)
+			{
+				ndJacobian out0[140];
+				ndJacobian out1[140];
+				memset(out0, 0, sizeof(out0));
+				memset(out1, 0, sizeof(out1));
+				ExecuteOld(out0);
+				ExecuteNew(out1);
+
+				ndWorld* const world = m_owner->GetWorld();
+				ndDynamicsUpdate* const me = world->m_solver;
+				const dInt32 bodyCount = me->GetConstrainedBodyCount();
+				for (dInt32 i = 0; i < bodyCount; i++)
+				{
+					dVector err(out0[i].m_linear - out1[i].m_linear);
+					dFloat32 mag2 = err.DotProduct(err).GetScalar();
+					dAssert(mag2 < 1.0e-6f);
+				}
+
+			}
+			ndScene* m_owner;
+		};
+
+		xxxxxxx xxxxx(scene);
+
+		xxx++;
 	}
 }
 
@@ -2361,9 +2451,6 @@ void ndDynamicsUpdate::Update()
 	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
 
-static int xxx;
-ndScene* const scene = m_world->GetScene();
-
 	BuildIsland();
 	dInt32 count = GetActiveBodies().GetCount();
 	if (count)
@@ -2372,94 +2459,6 @@ ndScene* const scene = m_world->GetScene();
 		InitWeights();
 		InitBodyArray();
 		InitJacobianMatrix();
-
-
-		class xxxxxxx
-		{
-			public:
-			void ExecuteOld(ndJacobian* out)
-			{
-				ndWorld* const world = m_owner->GetWorld();
-				ndDynamicsUpdate* const me = world->m_solver;
-				const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
-				ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
-				const dArray<ndJacobian>& internalForces = me->GetInternalForces();
-
-				const dInt32 threadIndex = 0;
-				const dInt32 threadCount = 1;
-				const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount____();
-
-				const dInt32 stride = bodyCount / threadCount;
-				const dInt32 start = threadIndex * stride;
-				const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-
-				for (dInt32 i = 0; i < blockSize; i++)
-				{
-					dInt32 index = bodyIslandOrder[start + i];
-					ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
-
-					const ndJacobian& forceAndTorque = internalForces[index];
-					out[index].m_linear = body->GetForce() + forceAndTorque.m_linear;
-					out[index].m_angular = body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque();
-				}
-			}
-
-			void ExecuteNew(ndJacobian* out)
-			{
-				ndWorld* const world = m_owner->GetWorld();
-				ndDynamicsUpdate* const me = world->m_solver;
-
-				ndJacobian* const internalForces = &me->GetInternalForces()[0];
-				const dInt32* const indirectBodyArray = &me->GetActiveBodies()[0];
-				ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
-
-				const dInt32 threadIndex = 0;
-				const dInt32 threadCount = 1;
-				const dInt32 bodyCount = me->GetConstrainedBodyCount();
-
-				const dInt32 stride = bodyCount / threadCount;
-				const dInt32 start = threadIndex * stride;
-				const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-
-				for (dInt32 i = 0; i < blockSize; i++)
-				{
-					const dInt32 index = indirectBodyArray[start + i];
-					ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
-					const ndJacobian& forceAndTorque = internalForces[index];
-					out[index].m_linear = body->GetForce() + forceAndTorque.m_linear;
-					out[index].m_angular = body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque();
-				}
-			}
-
-
-			xxxxxxx(ndScene* owner)
-				:m_owner(owner)
-			{
-				ndJacobian out0[140];
-				ndJacobian out1[140];
-				memset(out0, 0, sizeof(out0));
-				memset(out1, 0, sizeof(out1));
-				ExecuteOld(out0);
-				ExecuteNew(out1);
-
-				ndWorld* const world = m_owner->GetWorld();
-				ndDynamicsUpdate* const me = world->m_solver;
-				const dInt32 bodyCount = me->GetConstrainedBodyCount();
-				for (dInt32 i = 0; i < bodyCount; i++)
-				{
-					dVector err(out0[i].m_linear - out1[i].m_linear);
-					dFloat32 mag2 = err.DotProduct(err).GetScalar();
-					dAssert(mag2 < 1.0e-6f);
-				}
-
-			}
-			ndScene* m_owner;
-		};
-
-		xxxxxxx xxxxx(scene);
-
-		xxx++;
-
 		CalculateForces();
 		IntegrateBodies();
 		DetermineSleepStates();
