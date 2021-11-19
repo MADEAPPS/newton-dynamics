@@ -418,11 +418,10 @@ void ndDynamicsUpdateAvx2::DetermineSleepStates()
 		void UpdateIslandState(dInt32 entry)
 		{
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
 			const ndIsland& island = me->GetIsland____()[entry];
 			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
-			ndBodyKinematic** const bodyIslands = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyIslands = &m_owner->GetActiveBodyArray()[0];
 
 			dFloat32 velocityDragCoeff = D_FREEZZING_VELOCITY_DRAG;
 
@@ -678,9 +677,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 
 		void SetRowsCount()
 		{
-			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
-			ndConstraintArray& jointArray = scene->GetActiveContactArray();
+			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
 			const dInt32 count = jointArray.GetCount();
 
 			dInt32 rowCount = 1;
@@ -697,9 +694,8 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		void SetSoaRowsCount()
 		{
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			ndConstraintArray& jointArray = scene->GetActiveContactArray();
+			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
 			const dInt32 count = jointArray.GetCount();
 
 			dInt32 soaJointRowCount = 0;
@@ -1004,9 +1000,8 @@ void ndDynamicsUpdateAvx2::IntegrateUnconstrainedBodies()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
@@ -1050,9 +1045,8 @@ void ndDynamicsUpdateAvx2::IntegrateBodies()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			ndScene* const scene = world->GetScene();
 			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
-			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dVector invTime(me->m_invTimestep);
@@ -1169,16 +1163,13 @@ void ndDynamicsUpdateAvx2::InitBodyArray()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			//const dArray<dInt32>& bodyIndexArray = me->GetBodyIslandOrder____();
 			const dInt32* bodyIndexArray = &me->GetActiveBodies()[0];
-			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			//const dInt32 bodyCount = bodyIndexArray.GetCount() - me->GetUnconstrainedBodyCount____();
 			const dInt32 bodyCount = me->GetConstrainedBodyCount();
 
 			const dInt32 stride = bodyCount / threadCount;
@@ -2084,10 +2075,9 @@ void ndDynamicsUpdateAvx2::IntegrateBodiesVelocity()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
-			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
 			const dArray<ndJacobian>& internalForces = me->GetInternalForces();
 
 			const dVector timestep4(me->m_timestepRK);

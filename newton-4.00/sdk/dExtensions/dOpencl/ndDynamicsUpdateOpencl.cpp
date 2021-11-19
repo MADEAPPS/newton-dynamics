@@ -271,9 +271,8 @@ void ndDynamicsUpdateOpencl::IntegrateUnconstrainedBodies()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdateOpencl* const me = (ndDynamicsUpdateOpencl*)world->m_solver;
-			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
@@ -379,10 +378,9 @@ void ndDynamicsUpdateOpencl::InitBodyArray()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdateOpencl* const me = (ndDynamicsUpdateOpencl*)world->m_solver;
 			const dInt32* bodyIndexArray = &me->GetActiveBodies()[0];
-			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
@@ -785,10 +783,9 @@ void ndDynamicsUpdateOpencl::IntegrateBodiesVelocity()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdateOpencl* const me = (ndDynamicsUpdateOpencl*)world->m_solver;
 			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
-			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
 			const dArray<ndJacobian>& internalForces = me->GetInternalForces();
 
 			const dVector timestep4(me->m_timestepRK);
@@ -916,10 +913,9 @@ void ndDynamicsUpdateOpencl::IntegrateBodies()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdateOpencl* const me = (ndDynamicsUpdateOpencl*)world->m_solver;
 			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
-			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dVector invTime(me->m_invTimestep);
@@ -985,11 +981,10 @@ void ndDynamicsUpdateOpencl::DetermineSleepStates()
 		void UpdateIslandState(dInt32 entry)
 		{
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
 			const ndIsland& island = me->GetIsland____()[entry];
 			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
-			ndBodyKinematic** const bodyIslands = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyIslands = &m_owner->GetActiveBodyArray()[0];
 
 			dFloat32 velocityDragCoeff = D_FREEZZING_VELOCITY_DRAG;
 

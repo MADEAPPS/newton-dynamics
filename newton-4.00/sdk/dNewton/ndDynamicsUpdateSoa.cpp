@@ -67,11 +67,10 @@ void ndDynamicsUpdateSoa::DetermineSleepStates()
 		void UpdateIslandState(dInt32 entry)
 		{
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
 			const ndIsland& island = me->GetIsland____()[entry];
 			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
-			ndBodyKinematic** const bodyIslands = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyIslands = &m_owner->GetActiveBodyArray()[0];
 
 			dFloat32 velocityDragCoeff = D_FREEZZING_VELOCITY_DRAG;
 
@@ -326,9 +325,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 
 		void SetRowsCount()
 		{
-			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
-			ndConstraintArray& jointArray = scene->GetActiveContactArray();
+			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
 			const dInt32 count = jointArray.GetCount();
 		
 			dInt32 rowCount = 1;
@@ -345,9 +342,8 @@ void ndDynamicsUpdateSoa::SortJoints()
 		void SetSoaRowsCount()
 		{
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
-			ndConstraintArray& jointArray = scene->GetActiveContactArray();
+			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
 			const dInt32 count = jointArray.GetCount();
 
 			dInt32 soaJointRowCount = 0;
@@ -652,9 +648,8 @@ void ndDynamicsUpdateSoa::IntegrateUnconstrainedBodies()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
-			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
@@ -697,10 +692,9 @@ void ndDynamicsUpdateSoa::IntegrateBodies()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
 			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
-			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dVector invTime(me->m_invTimestep);
@@ -817,10 +811,9 @@ void ndDynamicsUpdateSoa::InitBodyArray()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
 			const dInt32* bodyIndexArray = &me->GetActiveBodies()[0];
-			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
 			const dInt32 threadIndex = GetThreadId();
@@ -1687,10 +1680,9 @@ void ndDynamicsUpdateSoa::IntegrateBodiesVelocity()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
 			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
-			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
 			const dArray<ndJacobian>& internalForces = me->GetInternalForces();
 
 			const dVector timestep4(me->m_timestepRK);
