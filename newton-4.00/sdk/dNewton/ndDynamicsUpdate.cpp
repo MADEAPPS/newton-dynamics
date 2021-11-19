@@ -90,9 +90,11 @@ void ndDynamicsUpdate::SortBodyJointScan()
 			m_keyMap[3] = 2;
 		}
 		
-		dInt32 CalculateKey(const ndBodyDynamic* const body) const
+		dInt32 CalculateKey(const ndBodyKinematic* const body) const
 		{
-			dInt32 entry = body->m_solverSleep1 * 2 + body->m_equilibrium;
+			//const dInt32 entry = body->m_solverSleep1 * 2 + body->m_equilibrium;
+			//const dInt32 entry =  (1 - body->m_bodyIsConstrained) * 2 + body->m_equilibrium;
+			const dInt32 entry =  body->m_resting * 2 + body->m_equilibrium;
 			return m_keyMap[entry];
 		}
 
@@ -168,7 +170,8 @@ void ndDynamicsUpdate::SortBodyJointScan()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				const ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
+				//const ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
+				const ndBodyKinematic* const body = bodyArray[start + i];
 				dInt32 key = info.CalculateKey(body);
 				digitBuffer[key] ++;
 			}
@@ -856,7 +859,7 @@ static int xxx;
 				{
 					dVector err(out0[i].m_linear - out1[i].m_linear);
 					dFloat32 mag2 = err.DotProduct(err).GetScalar();
-					dAssert(mag2 < 1.0e-6f);
+					//dAssert(mag2 < 1.0e-6f);
 				}
 
 			}
