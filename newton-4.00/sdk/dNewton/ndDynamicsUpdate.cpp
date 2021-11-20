@@ -4198,6 +4198,7 @@ void ndDynamicsUpdate::Update()
 	dInt32 count = GetActiveBodies().GetCount();
 	if (count)
 	{
+		m_internalForces.SetCount(count + 100);
 		for (int xxx = 0; xxx < m_internalForces.GetCount(); xxx++)
 		{
 			m_internalForces[xxx].m_linear = dVector::m_zero;
