@@ -52,7 +52,12 @@ const char* ndDynamicsUpdateSoa::GetStringId() const
 	return "sse soa";
 }
 
-
+#ifdef OLD_SOLVER
+void ndDynamicsUpdateSoa::Update()
+{
+	dAssert(0);
+}
+#else OLD_SOLVER
 void ndDynamicsUpdateSoa::DetermineSleepStates()
 {
 	D_TRACKTIME();
@@ -2272,3 +2277,4 @@ void ndDynamicsUpdateSoa::Update()
 		DetermineSleepStates();
 	}
 }
+#endif

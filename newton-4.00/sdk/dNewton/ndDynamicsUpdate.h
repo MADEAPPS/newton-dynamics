@@ -44,6 +44,8 @@
 
 class ndWorld;
 
+#define OLD_SOLVER
+
 D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate: public dClassAlloc
 {
@@ -115,8 +117,13 @@ class ndDynamicsUpdate: public dClassAlloc
 
 	dArray<ndIsland>& GetIsland____();
 	dArray<dInt32>& GetActiveBodies();
+#ifdef OLD_SOLVER
+	dArray<ndBodyKinematic*>& GetBodyIslandOrder____();
+	dArray<ndBodyKinematic*>& GetBodyIslandOrder_______();
+#else
 	dArray<dInt32>& GetBodyIslandOrder____();
 	dArray<dInt32>& GetBodyIslandOrder_______();
+#endif
 	dArray<ndJacobian>& GetInternalForces();
 	dArray<ndLeftHandSide>& GetLeftHandSide();
 	dArray<dInt32>& GetJointForceIndexBuffer();
@@ -151,9 +158,14 @@ class ndDynamicsUpdate: public dClassAlloc
 	void SortBodyJointScan();
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
+	dVector m_velocTol____;
 	dArray<ndIsland> m_islands____;
 	dArray<dInt32> m_activeBodies;
+#ifdef OLD_SOLVER
+	dArray<ndBodyKinematic*> m_bodyIslandOrder____;
+#else
 	dArray<dInt32> m_bodyIslandOrder____;
+#endif
 	dArray<dInt32> m_jointForcesIndex;
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndLeftHandSide> m_leftHandSide;
@@ -271,13 +283,21 @@ inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount____() const
 	return m_unConstrainedBodyCount____;
 }
 
+#ifdef OLD_SOLVER
+inline dArray<ndBodyKinematic*>& ndDynamicsUpdate::GetBodyIslandOrder____()
+#else
 inline dArray<dInt32>& ndDynamicsUpdate::GetBodyIslandOrder____()
+#endif
 {
 	//dAssert(0);
 	return m_bodyIslandOrder____;
 }
 
+#ifdef OLD_SOLVER
+inline dArray<ndBodyKinematic*>& ndDynamicsUpdate::GetBodyIslandOrder_______()
+#else
 inline dArray<dInt32>& ndDynamicsUpdate::GetBodyIslandOrder_______()
+#endif
 {
 	return m_bodyIslandOrder____;
 }
