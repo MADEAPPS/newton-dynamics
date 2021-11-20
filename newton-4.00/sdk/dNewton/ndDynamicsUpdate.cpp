@@ -1390,60 +1390,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 	class ndIntegrateBodiesVelocity : public ndScene::ndBaseJob
 	{
 		public:
-#if 1
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
-			ndDynamicsUpdate* const me = world->m_solver;
-			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
-			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
-			const dArray<ndJacobian>& internalForces = me->GetInternalForces();
 
-			const dVector timestep4(me->m_timestepRK);
-			const dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));
-
-			const dInt32 threadIndex = GetThreadId();
-			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = bodyIslandOrder.GetCount() - me->GetUnconstrainedBodyCount____();
-
-			const dInt32 stride = bodyCount / threadCount;
-			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-
-			for (dInt32 i = 0; i < blockSize; i++)
-			{
-				dInt32 index = bodyIslandOrder[start + i];
-				ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
-				if (body)
-				{
-					dAssert(body->m_index == index);
-					dAssert(body->m_bodyIsConstrained);
-					const ndJacobian& forceAndTorque = internalForces[index];
-					const dVector force(body->GetForce() + forceAndTorque.m_linear);
-					const dVector torque(body->GetTorque() + forceAndTorque.m_angular - body->GetGyroTorque());
-					const ndJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
-
-					if (!body->m_resting)
-					{
-						body->m_veloc += velocStep.m_linear;
-						body->m_omega += velocStep.m_angular;
-						body->IntegrateGyroSubstep(timestep4);
-					}
-					else
-					{
-						const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
-						const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
-						const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
-						const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
-						body->m_resting &= equilibrium;
-					}
-					dAssert(body->m_veloc.m_w == dFloat32(0.0f));
-					dAssert(body->m_omega.m_w == dFloat32(0.0f));
-				}
-			}
-		}
-#else
 
 		virtual void Execute()
 		{
@@ -1469,7 +1416,6 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				//dInt32 index = bodyIslandOrder[start + i];
 				const dInt32 index = indirectBodyArray[start + i];
 				ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
 				if (body)
@@ -1500,7 +1446,6 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 				}
 			}
 		}
-#endif
 	};
 
 	ndScene* const scene = m_world->GetScene();
@@ -1584,7 +1529,8 @@ void ndDynamicsUpdate::IntegrateBodies()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
-			const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
+			//const dArray<dInt32>& bodyIslandOrder = me->GetBodyIslandOrder____();
+			const dArray<dInt32>& indirectBodyArray = me->GetActiveBodies();
 			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
 
 			const dFloat32 timestep = m_timestep;
@@ -1592,14 +1538,14 @@ void ndDynamicsUpdate::IntegrateBodies()
 
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 bodyCount = bodyIslandOrder.GetCount();
+			const dInt32 bodyCount = indirectBodyArray.GetCount();
 			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
 			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				dInt32 index = bodyIslandOrder[start + i];
+				dInt32 index = indirectBodyArray[start + i];
 				ndBodyDynamic* const dynBody = bodyArray[index]->GetAsBodyDynamic();
 
 				// the initial velocity and angular velocity were stored in m_accel and dynBody->m_alpha for memory saving
@@ -2227,55 +2173,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 	class ndApplyJacobianAccumulatePartialForces : public ndScene::ndBaseJob
 	{
 		public:
-#if 1
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			const dVector zero(dVector::m_zero);
-			ndWorld* const world = m_owner->GetWorld();
-			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
-
-			//xxxxxxxxxxxx
-			ndJacobian* const internalForces = &me->GetInternalForces()[0];
-			const dInt32* const bodyIndex = &me->GetJointForceIndexBuffer()[0];
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			const ndJacobian* const jointInternalForces = &me->GetTempInternalForces()[0];
-			const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
-
-			const dInt32 bodyCount = bodyArray.GetCount();
-			const dInt32 threadIndex = GetThreadId();
-			const dInt32 threadCount = m_owner->GetThreadCount();
-
-			const dInt32 stride = bodyCount / threadCount;
-			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-
-			for (dInt32 i = 0; i < blockSize; i++)
-			{
-				dInt32 startIndex = bodyIndex[start + i];
-				dInt32 count = bodyIndex[start + i + 1] - startIndex;
-				if (count)
-				{
-					const ndBodyKinematic* const body = bodyArray[start + i];
-					if (body->m_invMass.m_w > dFloat32(0.0f))
-					{
-						dVector force(zero);
-						dVector torque(zero);
-						for (dInt32 j = 0; j < count; j++)
-						{
-							dInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
-							force += jointInternalForces[index].m_linear;
-							torque += jointInternalForces[index].m_angular;
-						}
-
-						internalForces[start + i].m_linear = force;
-						internalForces[start + i].m_angular = torque;
-					}
-				}
-			}
-		}
-
-#else
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -2318,7 +2215,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				internalForces[bodyIndex].m_angular = torque;
 			}
 		}
-#endif
 	};
 
 	ndScene* const scene = m_world->GetScene();
