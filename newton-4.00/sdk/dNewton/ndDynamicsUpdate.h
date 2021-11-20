@@ -44,7 +44,6 @@
 
 class ndWorld;
 
-#define OLD_SOLVER
 
 #ifdef OLD_SOLVER
 D_MSV_NEWTON_ALIGN_32

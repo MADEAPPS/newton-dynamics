@@ -34,24 +34,24 @@
 
 ndDynamicsUpdate::ndDynamicsUpdate(ndWorld* const world)
 	:m_velocTol(dFloat32(1.0e-8f))
-	, m_islands(D_DEFAULT_BUFFER_SIZE)
-	, m_jointForcesIndex(D_DEFAULT_BUFFER_SIZE)
-	, m_internalForces(D_DEFAULT_BUFFER_SIZE)
-	, m_leftHandSide(D_DEFAULT_BUFFER_SIZE * 4)
-	, m_rightHandSide(D_DEFAULT_BUFFER_SIZE)
-	, m_tempInternalForces(D_DEFAULT_BUFFER_SIZE)
-	, m_bodyIslandOrder(D_DEFAULT_BUFFER_SIZE)
-	, m_jointBodyPairIndexBuffer(D_DEFAULT_BUFFER_SIZE)
-	, m_world(world)
-	, m_timestep(dFloat32(0.0f))
-	, m_invTimestep(dFloat32(0.0f))
-	, m_firstPassCoef(dFloat32(0.0f))
-	, m_invStepRK(dFloat32(0.0f))
-	, m_timestepRK(dFloat32(0.0f))
-	, m_invTimestepRK(dFloat32(0.0f))
-	, m_solverPasses(0)
-	, m_activeJointCount(0)
-	, m_unConstrainedBodyCount(0)
+	,m_islands(D_DEFAULT_BUFFER_SIZE)
+	,m_jointForcesIndex(D_DEFAULT_BUFFER_SIZE)
+	,m_internalForces(D_DEFAULT_BUFFER_SIZE)
+	,m_leftHandSide(D_DEFAULT_BUFFER_SIZE * 4)
+	,m_rightHandSide(D_DEFAULT_BUFFER_SIZE)
+	,m_tempInternalForces(D_DEFAULT_BUFFER_SIZE)
+	,m_bodyIslandOrder(D_DEFAULT_BUFFER_SIZE)
+	,m_jointBodyPairIndexBuffer(D_DEFAULT_BUFFER_SIZE)
+	,m_world(world)
+	,m_timestep(dFloat32(0.0f))
+	,m_invTimestep(dFloat32(0.0f))
+	,m_firstPassCoef(dFloat32(0.0f))
+	,m_invStepRK(dFloat32(0.0f))
+	,m_timestepRK(dFloat32(0.0f))
+	,m_invTimestepRK(dFloat32(0.0f))
+	,m_solverPasses(0)
+	,m_activeJointCount(0)
+	,m_unConstrainedBodyCount(0)
 {
 }
 
@@ -81,14 +81,13 @@ void ndDynamicsUpdate::SortBodyJointScan()
 {
 	class ndCountJointBodyPairs : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
-			const ndConstraintArray& jointArray = scene->GetActiveContactArray();
+			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
 			ndJointBodyPairIndex* const jointBodyBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 
 			const dInt32 count = jointArray.GetCount();
@@ -125,7 +124,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 
 	class EvaluateKey
 	{
-	public:
+		public:
 		dUnsigned32 GetKey(const ndDynamicsUpdate::ndJointBodyPairIndex& entry) const
 		{
 			return entry.m_body;
@@ -179,13 +178,11 @@ void ndDynamicsUpdate::SortJointsScan()
 
 	class ndSleep0 : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
-			ndConstraintArray& jointArray = scene->GetActiveContactArray();
+			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
 			const dInt32 count = jointArray.GetCount();
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
@@ -225,13 +222,11 @@ void ndDynamicsUpdate::SortJointsScan()
 
 	class ndSleep1 : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
-			ndConstraintArray& jointArray = scene->GetActiveContactArray();
+			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
 			const dInt32 count = jointArray.GetCount();
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
@@ -266,14 +261,13 @@ void ndDynamicsUpdate::SortJointsScan()
 
 	class ndScan0 : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
-			ndConstraintArray& jointArray = scene->GetActiveContactArray();
+			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
 			const dInt32 count = jointArray.GetCount();
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
@@ -300,14 +294,14 @@ void ndDynamicsUpdate::SortJointsScan()
 
 	class ndSort0 : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			ndScene* const scene = world->GetScene();
+			//ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
-			ndConstraintArray& jointArray = scene->GetActiveContactArray();
+			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
 			const dInt32 count = jointArray.GetCount();
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
@@ -456,7 +450,7 @@ void ndDynamicsUpdate::SortJointsScan()
 
 	class EvaluateCountRows
 	{
-	public:
+		public:
 		dUnsigned32 GetKey(const ndConstraint* const joint) const
 		{
 			const ndSortKey key(joint->m_resting, joint->m_rowCount);
@@ -622,7 +616,7 @@ void ndDynamicsUpdate::SortIslands()
 		m_unConstrainedBodyCount = unConstrainedCount;
 		class EvaluateKey
 		{
-		public:
+			public:
 			dUnsigned32 GetKey(const ndIsland& island) const
 			{
 				dUnsigned32 key = island.m_count * 2 + island.m_root->m_bodyIsConstrained;
@@ -656,7 +650,7 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 {
 	class ndIntegrateUnconstrainedBodies : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -697,7 +691,7 @@ void ndDynamicsUpdate::InitWeights()
 	D_TRACKTIME();
 	class ndInitWeights : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -768,7 +762,7 @@ void ndDynamicsUpdate::InitBodyArray()
 	D_TRACKTIME();
 	class ndInitBodyArray : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -911,7 +905,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 {
 	class ndInitJacobianMatrix : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		ndInitJacobianMatrix()
 			:m_zero(dVector::m_zero)
 		{
@@ -1069,7 +1063,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 
 	class ndInitJacobianAccumulatePartialForces : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -1132,7 +1126,7 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 	D_TRACKTIME();
 	class ndCalculateJointsAcceleration : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -1173,7 +1167,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 	D_TRACKTIME();
 	class ndIntegrateBodiesVelocity : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -1236,7 +1230,7 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 	D_TRACKTIME();
 	class ndUpdateForceFeedback : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -1302,7 +1296,7 @@ void ndDynamicsUpdate::IntegrateBodies()
 	D_TRACKTIME();
 	class ndIntegrateBodies : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -1356,7 +1350,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 	D_TRACKTIME();
 	class ndDetermineSleepStates : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -1593,7 +1587,7 @@ void ndDynamicsUpdate::InitSkeletons()
 
 	class ndInitSkeletons : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -1632,7 +1626,7 @@ void ndDynamicsUpdate::UpdateSkeletons()
 	D_TRACKTIME();
 	class ndUpdateSkeletons : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -1672,7 +1666,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 	D_TRACKTIME();
 	class ndCalculateJointsForce : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		ndCalculateJointsForce()
 			:m_zero(dVector::m_zero)
 		{
@@ -1850,7 +1844,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 
 	class ndApplyJacobianAccumulatePartialForces : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
