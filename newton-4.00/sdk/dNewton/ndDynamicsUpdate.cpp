@@ -299,7 +299,6 @@ void ndDynamicsUpdate::SortJointsScan()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			//ndScene* const scene = world->GetScene();
 			ndDynamicsUpdate* const me = world->m_solver;
 			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
 			const dInt32 count = jointArray.GetCount();
