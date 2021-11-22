@@ -344,16 +344,13 @@ inline void ndBodyKinematic::AddDampingAcceleration(dFloat32)
 inline void ndBodyKinematic::PrepareStep(dInt32 index)
 {
 	m_rank = 0;
+	m_isBoundary = 0;
 	m_index = index;
 	m_resting = 1;
 	m_solverSleep0 = 1;
 	m_solverSleep1 = 1;
 	m_islandSleep = m_equilibrium;
-#ifdef OLD_SOLVER
 	m_weigh = dFloat32(0.0f);
-#else
-	m_weigh = dFloat32(1.0f);
-#endif
 	m_islandParent = this;
 }
 

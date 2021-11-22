@@ -121,8 +121,10 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 			dUnsigned32 m_equilibriumOverride : 1;
 		};
 	};
-
 	dUnsigned32 m_uniqueId;
+
+	dUnsigned8 m_isBoundary;
+
 	D_COLLISION_API static dUnsigned32 m_uniqueIdCount;
 
 	friend class ndWorld;

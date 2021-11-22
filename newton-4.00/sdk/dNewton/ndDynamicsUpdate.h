@@ -57,28 +57,6 @@ class ndDynamicsUpdate : public dClassAlloc
 		dInt32 m_joint;
 	};
 
-	class ndSortKey
-	{
-		public:
-		ndSortKey(dInt32 sleep, dInt32 rows)
-			:m_value(0)
-		{
-			dAssert(rows > 0);
-			m_upperBit = sleep;
-			m_lowerBit = (1 << 6) - rows - 1;
-		}
-
-		union
-		{
-			dInt32 m_value;
-			struct
-			{
-				dUnsigned32 m_lowerBit : 6;
-				dUnsigned32 m_upperBit : 1;
-			};
-		};
-	};
-
 	class ndBodyIndexPair
 	{
 		public:
@@ -259,52 +237,8 @@ class ndDynamicsUpdate: public dClassAlloc
 	class ndJointBodyPairIndex
 	{
 		public:
-		dInt32 m_body;
-		dInt32 m_joint;
-	};
-
-	class ndSortKey
-	{
-		public:
-		ndSortKey(dInt32 sleep, dInt32 rows)
-			:m_value(0)
-		{
-			dAssert(rows > 0);
-			m_upperBit = sleep;
-			m_lowerBit = (1 << 6) - rows - 1;
-		}
-
-		union 
-		{
-			dInt32 m_value;
-			struct
-			{
-				dUnsigned32 m_lowerBit : 6;
-				dUnsigned32 m_upperBit : 1;
-			};
-		};
-	};
-
-	class ndBodyIndexPair
-	{
-		public:
-		ndBodyKinematic* m_body;
-		ndBodyKinematic* m_root;
-	};
-
-	class ndIsland
-	{
-		public:
-		ndIsland(ndBodyKinematic* const root)
-			:m_start(0)
-			,m_count(0)
-			,m_root(root)
-		{
-		}
-
-		dInt32 m_start;
-		dInt32 m_count;
-		ndBodyKinematic* m_root;
+		dUnsigned32 m_body;
+		dUnsigned32 m_joint;
 	};
 
 	public:
@@ -316,15 +250,11 @@ class ndDynamicsUpdate: public dClassAlloc
 
 	dInt32 GetConstrainedBodyCount() const;
 	dInt32 GetUnconstrainedBodyCount() const;
-	dInt32 GetUnconstrainedBodyCount____() const;
-	
+		
 	void ClearBuffer(void* const buffer, dInt32 sizeInByte) const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
 
-	dArray<ndIsland>& GetIsland____();
 	dArray<dInt32>& GetActiveBodies();
-	dArray<dInt32>& GetBodyIslandOrder____();
-	dArray<dInt32>& GetBodyIslandOrder_______();
 	dArray<ndJacobian>& GetInternalForces();
 	dArray<ndLeftHandSide>& GetLeftHandSide();
 	dArray<dInt32>& GetJointForceIndexBuffer();
@@ -334,7 +264,6 @@ class ndDynamicsUpdate: public dClassAlloc
 
 	private:
 	void SortJoints();
-	void SortIslands();
 	void BuildIsland();
 	void InitWeights();
 	void InitBodyArray();
@@ -359,10 +288,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	void SortBodyJointScan();
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
-	dVector m_velocTol____;
-	dArray<ndIsland> m_islands____;
 	dArray<dInt32> m_activeBodies;
-	dArray<dInt32> m_bodyIslandOrder____;
 	dArray<dInt32> m_jointForcesIndex;
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndLeftHandSide> m_leftHandSide;
@@ -380,7 +306,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	dUnsigned32 m_solverPasses;
 	dInt32 m_activeJointCount;
 	dInt32 m_activeConstrainedBodyCount;
-	dInt32 m_unConstrainedBodyCount____;
+	//dInt32 m_unConstrainedBodyCount____;
 
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
@@ -469,27 +395,6 @@ inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
 	return m_activeBodies.GetCount() - m_activeConstrainedBodyCount;
 }
 
-inline dArray<ndDynamicsUpdate::ndIsland>& ndDynamicsUpdate::GetIsland____()
-{
-	return m_islands____;
-}
-
-inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount____() const
-{
-	//dAssert(0);
-	return m_unConstrainedBodyCount____;
-}
-
-inline dArray<dInt32>& ndDynamicsUpdate::GetBodyIslandOrder____()
-{
-	//dAssert(0);
-	return m_bodyIslandOrder____;
-}
-
-inline dArray<dInt32>& ndDynamicsUpdate::GetBodyIslandOrder_______()
-{
-	return m_bodyIslandOrder____;
-}
 #endif
 
 #endif
