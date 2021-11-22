@@ -1982,7 +1982,8 @@ if (xxxx == 4)
 }
 
 	//dInt32 data[] = { 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 0 };
-	dInt32 data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	//dInt32 data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	dInt32 data[] = { 0, 1, 2, 3, 4, 5};
 	dTree<ndBodyKinematic*, dInt32> xx;
 	for (int i = 0; i < xxxxxxxxx; i++)
 	{
@@ -2004,15 +2005,27 @@ if (xxxx == 4)
 if (m_islands.GetCount())
 {
 	ndBodyKinematic** const bodyIslands = &m_bodyIslandOrder[m_islands[0].m_start];
-	int xxxxxxxx = m_islands[0].m_count;
+	const ndIsland& island = m_islands[0];
+	//int xxxxxxxx = m_islands[0].m_count;
 	dArray<dInt32> xxxxxx;
-	xxxxxx.SetCount(xxxxxxxx);
-	for (int i = 0; i < xxxxxxxx; i++)
+	xxxxxx.SetCount(island.m_count);
+
+	dTree<ndBodyKinematic*, dInt32> xxx;
+	for (int i = 0; i < island.m_count; i++)
 	{
-		ndBodyKinematic* body = bodyIslands[xxxxxxxx - i - 1];
-		xxxxxx[i] = body->m_uniqueId;
+		ndBodyKinematic* body = bodyIslands[i];
+		xxx.Insert(body, body->m_uniqueId);
 	}
-	xxxxxxxx *= 1;
+
+	dTree<ndBodyKinematic*, dInt32>::Iterator iter(xxx);
+	int index = 0;
+	for (iter.Begin(); iter; iter++)
+	{
+		ndBodyKinematic* body = iter.GetNode()->GetInfo();
+		xxxxxx[index] = body->m_uniqueId;
+		index++;
+	}
+	index *= 1;
 }
 
 	if (m_islands.GetCount())
@@ -3647,7 +3660,8 @@ xxxx++;
 const dArray<ndBodyKinematic*>& x = m_world->GetScene()->GetActiveBodyArray();
 int xxxxxxxxx = x.GetCount();
 //dInt32 data[] = { 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 0 };
-dInt32 data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+//dInt32 data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+dInt32 data[] = { 0, 1, 2, 3, 4, 5};
 dTree<ndBodyKinematic*, dInt32> xx;
 for (int i = 0; i < xxxxxxxxx; i++)
 {
