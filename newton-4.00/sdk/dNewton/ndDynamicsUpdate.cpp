@@ -1969,29 +1969,48 @@ const dArray<ndBodyKinematic*>& x = m_world->GetScene()->GetActiveBodyArray();
 int xxxxxxxxx = x.GetCount();
 if (xxxx == 4)
 {
-	for (int i = 0; i < xxxxxxxxx; i++)
+	dTrace(("dInt32 data[] = {"));
+	for (int i = 0; i < xxxxxxxxx - 1; i++)
 	{
 		ndBodyKinematic* body = x[i];
 		if (body->m_equilibrium)
 		{
-			dTrace(("(id:%d index:%d) ", body->m_uniqueId, body->m_index));
+			dTrace(("%d, ", body->m_uniqueId));
 		}
 	}
-	dTrace(("\n"));
+	dTrace(("%d};\n", x[xxxxxxxxx - 1]->m_uniqueId));
 }
+
+	//dInt32 data[] = { 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 0 };
+	dInt32 data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	dTree<ndBodyKinematic*, dInt32> xx;
+	for (int i = 0; i < xxxxxxxxx; i++)
+	{
+		ndBodyKinematic* body = x[i];
+		body->m_equilibrium = 0;
+		xx.Insert(body, body->m_uniqueId);
+	}
+
+	for (int i = 0; i < sizeof(data) / sizeof(data[0]); i++)
+	{
+		dTree<ndBodyKinematic*, dInt32>::dNode* node = xx.Find(data[i]);
+		dAssert(node);
+		ndBodyKinematic* body = node->GetInfo();
+		body->m_equilibrium = 1;
+	}
 
 	BuildIsland();
 
 if (m_islands.GetCount())
 {
-	dArray<dInt32> xxxxxx;
-	xxxxxx.SetCount(xxxxxxxxx);
 	ndBodyKinematic** const bodyIslands = &m_bodyIslandOrder[m_islands[0].m_start];
 	int xxxxxxxx = m_islands[0].m_count;
+	dArray<dInt32> xxxxxx;
+	xxxxxx.SetCount(xxxxxxxx);
 	for (int i = 0; i < xxxxxxxx; i++)
 	{
 		ndBodyKinematic* body = bodyIslands[xxxxxxxx - i - 1];
-		xxxxxx[i] = body->m_index;
+		xxxxxx[i] = body->m_uniqueId;
 	}
 	xxxxxxxx *= 1;
 }
@@ -3624,6 +3643,27 @@ void ndDynamicsUpdate::Update()
 
 static int xxxx;
 xxxx++;
+
+const dArray<ndBodyKinematic*>& x = m_world->GetScene()->GetActiveBodyArray();
+int xxxxxxxxx = x.GetCount();
+//dInt32 data[] = { 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 0 };
+dInt32 data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+dTree<ndBodyKinematic*, dInt32> xx;
+for (int i = 0; i < xxxxxxxxx; i++)
+{
+	ndBodyKinematic* body = x[i];
+	body->m_equilibrium = 0;
+	xx.Insert(body, body->m_uniqueId);
+}
+
+for (int i = 0; i < sizeof(data) / sizeof(data[0]); i++)
+{
+	dTree<ndBodyKinematic*, dInt32>::dNode* node = xx.Find(data[i]);
+	dAssert(node);
+	ndBodyKinematic* body = node->GetInfo();
+	body->m_equilibrium = 1;
+}
+
 
 	BuildIsland();
 	dInt32 count = GetActiveBodies().GetCount();
