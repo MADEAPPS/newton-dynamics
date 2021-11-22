@@ -1963,7 +1963,24 @@ void ndDynamicsUpdate::Update()
 	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
 
+static int xxxx;
+xxxx++;
+
 	BuildIsland();
+
+if (m_islands.GetCount())
+{
+	dArray<dInt32> xxxxxx;
+	xxxxxx.SetCount(m_world->GetScene()->GetActiveBodyArray().GetCount());
+	ndBodyKinematic** const bodyIslands = &m_bodyIslandOrder[m_islands[0].m_start];
+	int xxxxxxxx = m_islands[0].m_count;
+	for (int i = 0; i < xxxxxxxx; i++)
+	{
+		xxxxxx[i] = bodyIslands[xxxxxxxx - i - 1]->m_index;
+	}
+	xxxxxxxx *= 1;
+}
+
 	if (m_islands.GetCount())
 	{
 		IntegrateUnconstrainedBodies();
@@ -3525,7 +3542,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				const ndBodyKinematic* const body = bodyArray[bodyIndex];
 				const dInt32 mask = -dInt32(body->m_invMass.m_w > dFloat32(0.0f));
 				const dInt32 startIndex = bodyJointsIndexArray[bodyIndex];
-				//const dInt32 count = bodyJointsIndexArray[bodyIndex + 1] - startIndex;
 				const dInt32 count = mask & (bodyJointsIndexArray[bodyIndex + 1] - startIndex);
 
 				for (dInt32 j = 0; j < count; j++)
@@ -3591,19 +3607,13 @@ void ndDynamicsUpdate::Update()
 	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
 
+static int xxxx;
+xxxx++;
+
 	BuildIsland();
 	dInt32 count = GetActiveBodies().GetCount();
 	if (count)
 	{
-		m_internalForces.SetCount(count + 100);
-		for (int xxx = 0; xxx < m_internalForces.GetCount(); xxx++)
-		{
-			m_internalForces[xxx].m_linear = dVector::m_zero;
-			m_internalForces[xxx].m_angular = dVector::m_zero;
-			m_internalForces[xxx].m_linear.m_y = 1.0e10f;
-		}
-		memset(&m_internalForces[0].m_linear.m_x, 0xff, m_internalForces.GetCount() * sizeof(ndJacobian));
-
 		IntegrateUnconstrainedBodies();
 		InitWeights();
 		InitBodyArray();
