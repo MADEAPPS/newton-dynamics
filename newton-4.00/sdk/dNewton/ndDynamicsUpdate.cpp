@@ -1965,18 +1965,33 @@ void ndDynamicsUpdate::Update()
 
 static int xxxx;
 xxxx++;
+const dArray<ndBodyKinematic*>& x = m_world->GetScene()->GetActiveBodyArray();
+int xxxxxxxxx = x.GetCount();
+if (xxxx == 4)
+{
+	for (int i = 0; i < xxxxxxxxx; i++)
+	{
+		ndBodyKinematic* body = x[i];
+		if (body->m_equilibrium)
+		{
+			dTrace(("(id:%d index:%d) ", body->m_uniqueId, body->m_index));
+		}
+	}
+	dTrace(("\n"));
+}
 
 	BuildIsland();
 
 if (m_islands.GetCount())
 {
 	dArray<dInt32> xxxxxx;
-	xxxxxx.SetCount(m_world->GetScene()->GetActiveBodyArray().GetCount());
+	xxxxxx.SetCount(xxxxxxxxx);
 	ndBodyKinematic** const bodyIslands = &m_bodyIslandOrder[m_islands[0].m_start];
 	int xxxxxxxx = m_islands[0].m_count;
 	for (int i = 0; i < xxxxxxxx; i++)
 	{
-		xxxxxx[i] = bodyIslands[xxxxxxxx - i - 1]->m_index;
+		ndBodyKinematic* body = bodyIslands[xxxxxxxx - i - 1];
+		xxxxxx[i] = body->m_index;
 	}
 	xxxxxxxx *= 1;
 }
