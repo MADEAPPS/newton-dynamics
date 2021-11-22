@@ -2261,7 +2261,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		public:
 		dUnsigned32 GetKey(const ndConstraint* const joint) const
 		{
-			const ndSortKey key(joint->m_isBoundary, joint->m_rowCount);
+			const ndSortKey key(1-joint->m_isBoundary, joint->m_rowCount);
 			return key.m_value;
 		}
 	};
