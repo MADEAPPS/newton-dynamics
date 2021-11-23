@@ -524,6 +524,8 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	sentinelBody->m_autoSleep = 1;
 	sentinelBody->m_isJointArea = 0;
 	sentinelBody->m_equilibrium = 1;
+	sentinelBody->m_isJointFence0 = 1;
+	sentinelBody->m_isJointFence1 = 1;
 
 #ifdef OLD_SOLVER
 	sentinelBody->m_resting = 1;

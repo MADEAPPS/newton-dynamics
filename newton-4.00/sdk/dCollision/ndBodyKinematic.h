@@ -344,11 +344,12 @@ inline void ndBodyKinematic::AddDampingAcceleration(dFloat32)
 inline void ndBodyKinematic::PrepareStep(dInt32 index)
 {
 	m_rank = 0;
-	m_isJointArea = 0;
 	m_index = index;
 	m_weigh = dFloat32(0.0f);
 	m_islandParent = this;
-
+	m_isJointArea = 0;
+	m_isJointFence0 = m_equilibrium;
+	m_isJointFence1 = m_equilibrium;
 #ifdef OLD_SOLVER
 	m_resting = 1;
 	m_solverSleep0 = 1;

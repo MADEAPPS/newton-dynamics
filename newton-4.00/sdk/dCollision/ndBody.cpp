@@ -43,6 +43,8 @@ ndBody::ndBody()
 	,m_autoSleep(1)
 	,m_equilibrium(0)
 	,m_isJointArea(0)
+	,m_isJointFence0(0)
+	,m_isJointFence1(0)
 {
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;
@@ -64,6 +66,8 @@ ndBody::ndBody(const dLoadSaveBase::dLoadDescriptor& desc)
 	,m_autoSleep(1)
 	,m_equilibrium(0)
 	,m_isJointArea(0)
+	,m_isJointFence0(0)
+	,m_isJointFence1(0)
 {
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;

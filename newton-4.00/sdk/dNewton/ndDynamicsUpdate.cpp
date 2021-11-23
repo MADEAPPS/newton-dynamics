@@ -1963,71 +1963,71 @@ void ndDynamicsUpdate::Update()
 	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
 
-static int xxxx;
-xxxx++;
-const dArray<ndBodyKinematic*>& x = m_world->GetScene()->GetActiveBodyArray();
-int xxxxxxxxx = x.GetCount();
-if (xxxx == 4)
-{
-	dTrace(("dInt32 data[] = {"));
-	for (int i = 0; i < xxxxxxxxx - 1; i++)
-	{
-		ndBodyKinematic* body = x[i];
-		if (body->m_equilibrium)
-		{
-			dTrace(("%d, ", body->m_uniqueId));
-		}
-	}
-	dTrace(("%d};\n", x[xxxxxxxxx - 1]->m_uniqueId));
-}
-
-	//dInt32 data[] = { 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 0 };
-	//dInt32 data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-	dInt32 data[] = { 0, 1, 2, 3, 4, 5};
-	//dInt32 data[] = { 0, 1, 2 };
-	dTree<ndBodyKinematic*, dInt32> xx;
-	for (int i = 0; i < xxxxxxxxx; i++)
-	{
-		ndBodyKinematic* body = x[i];
-		body->m_equilibrium = 0;
-		xx.Insert(body, body->m_uniqueId);
-	}
-
-	for (int i = 0; i < sizeof(data) / sizeof(data[0]); i++)
-	{
-		dTree<ndBodyKinematic*, dInt32>::dNode* node = xx.Find(data[i]);
-		dAssert(node);
-		ndBodyKinematic* body = node->GetInfo();
-		body->m_equilibrium = 1;
-	}
+//static int xxxx;
+//xxxx++;
+//const dArray<ndBodyKinematic*>& x = m_world->GetScene()->GetActiveBodyArray();
+//int xxxxxxxxx = x.GetCount();
+//if (xxxx == 4)
+//{
+//	dTrace(("dInt32 data[] = {"));
+//	for (int i = 0; i < xxxxxxxxx - 1; i++)
+//	{
+//		ndBodyKinematic* body = x[i];
+//		if (body->m_equilibrium)
+//		{
+//			dTrace(("%d, ", body->m_uniqueId));
+//		}
+//	}
+//	dTrace(("%d};\n", x[xxxxxxxxx - 1]->m_uniqueId));
+//}
+//
+//	dInt32 data[] = { 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 0 };
+//	//dInt32 data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+//	//dInt32 data[] = { 0, 1, 2, 3, 4, 5};
+//	//dInt32 data[] = { 0, 1, 2 };
+//	dTree<ndBodyKinematic*, dInt32> xx;
+//	for (int i = 0; i < xxxxxxxxx; i++)
+//	{
+//		ndBodyKinematic* body = x[i];
+//		body->m_equilibrium = 0;
+//		xx.Insert(body, body->m_uniqueId);
+//	}
+//
+//	for (int i = 0; i < sizeof(data) / sizeof(data[0]); i++)
+//	{
+//		dTree<ndBodyKinematic*, dInt32>::dNode* node = xx.Find(data[i]);
+//		dAssert(node);
+//		ndBodyKinematic* body = node->GetInfo();
+//		body->m_equilibrium = 1;
+//	}
 
 	BuildIsland();
 
-if (m_islands.GetCount())
-{
-	ndBodyKinematic** const bodyIslands = &m_bodyIslandOrder[m_islands[0].m_start];
-	const ndIsland& island = m_islands[0];
-	//int xxxxxxxx = m_islands[0].m_count;
-	dArray<dInt32> xxxxxx;
-	xxxxxx.SetCount(island.m_count);
-
-	dTree<ndBodyKinematic*, dInt32> xxx;
-	for (int i = 0; i < island.m_count; i++)
-	{
-		ndBodyKinematic* body = bodyIslands[i];
-		xxx.Insert(body, body->m_uniqueId);
-	}
-
-	dTree<ndBodyKinematic*, dInt32>::Iterator iter(xxx);
-	int index = 0;
-	for (iter.Begin(); iter; iter++)
-	{
-		ndBodyKinematic* body = iter.GetNode()->GetInfo();
-		xxxxxx[index] = body->m_uniqueId;
-		index++;
-	}
-	index *= 1;
-}
+//if (m_islands.GetCount())
+//{
+//	ndBodyKinematic** const bodyIslands = &m_bodyIslandOrder[m_islands[0].m_start];
+//	const ndIsland& island = m_islands[0];
+//	//int xxxxxxxx = m_islands[0].m_count;
+//	dArray<dInt32> xxxxxx;
+//	xxxxxx.SetCount(island.m_count);
+//
+//	dTree<ndBodyKinematic*, dInt32> xxx;
+//	for (int i = 0; i < island.m_count; i++)
+//	{
+//		ndBodyKinematic* body = bodyIslands[i];
+//		xxx.Insert(body, body->m_uniqueId);
+//	}
+//
+//	dTree<ndBodyKinematic*, dInt32>::Iterator iter(xxx);
+//	int index = 0;
+//	for (iter.Begin(); iter; iter++)
+//	{
+//		ndBodyKinematic* body = iter.GetNode()->GetInfo();
+//		xxxxxx[index] = body->m_uniqueId;
+//		index++;
+//	}
+//	index *= 1;
+//}
 
 	if (m_islands.GetCount())
 	{
@@ -2331,6 +2331,68 @@ void ndDynamicsUpdate::SortJointsScan()
 		}
 	};
 
+	class ndMarkFence0 : public ndScene::ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+
+			const dInt32 count = jointArray.GetCount();
+			const dInt32 threadIndex = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+
+			const dInt32 stride = count / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
+
+			for (dInt32 i = 0; i < blockSize; i++)
+			{
+				const ndConstraint* const joint = jointArray[i + start];
+				ndBodyKinematic* const body0 = joint->GetBody0();
+				ndBodyKinematic* const body1 = joint->GetBody1();
+				const dUnsigned8 isJointBoundary = body0->m_equilibrium ^ body1->m_equilibrium;
+				if (isJointBoundary)
+				{
+					body0->m_isJointFence0 = 0;
+					body1->m_isJointFence0 = 0;
+				}
+			}
+		}
+	};
+
+	class ndMarkFence1 : public ndScene::ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+
+			const dInt32 count = jointArray.GetCount();
+			const dInt32 threadIndex = GetThreadId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+
+			const dInt32 stride = count / threadCount;
+			const dInt32 start = threadIndex * stride;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
+
+			for (dInt32 i = 0; i < blockSize; i++)
+			{
+				const ndConstraint* const joint = jointArray[i + start];
+				ndBodyKinematic* const body0 = joint->GetBody0();
+				ndBodyKinematic* const body1 = joint->GetBody1();
+				const dUnsigned8 isJointBoundary = body0->m_isJointFence0 ^ body1->m_isJointFence0;
+				if (isJointBoundary)
+				{
+					body0->m_isJointFence1 = 0;
+					body1->m_isJointFence1 = 0;
+				}
+			}
+		}
+	};
+
 	class ndMarkBoundary : public ndScene::ndBaseJob
 	{
 		public:
@@ -2355,7 +2417,8 @@ void ndDynamicsUpdate::SortJointsScan()
 				const dInt32 rows = joint->GetRowsCount();
 				joint->m_rowCount = rows;
 
-				const dUnsigned8 isJointBoundary = 1 - ((body0->m_equilibrium & body1->m_equilibrium));
+				//const dUnsigned8 isJointBoundary = 1 - ((body0->m_equilibrium & body1->m_equilibrium));
+				const dUnsigned8 isJointBoundary = 1 - ((body0->m_isJointFence1 & body1->m_isJointFence1));
 				joint->m_isBoundary = isJointBoundary;
 				if (isJointBoundary)
 				{
@@ -2394,6 +2457,8 @@ void ndDynamicsUpdate::SortJointsScan()
 	const dInt32 threadCount = scene->GetThreadCount();
 
 	dInt32 activeJointCount[D_MAX_THREADS_COUNT];
+	scene->SubmitJobs<ndMarkFence0>();
+	scene->SubmitJobs<ndMarkFence1>();
 	scene->SubmitJobs<ndMarkBoundary>(activeJointCount);
 
 	m_activeJointCount = 0;
@@ -3658,36 +3723,38 @@ void ndDynamicsUpdate::Update()
 static int xxxx;
 xxxx++;
 
-const dArray<ndBodyKinematic*>& x = m_world->GetScene()->GetActiveBodyArray();
-int xxxxxxxxx = x.GetCount();
+//const dArray<ndBodyKinematic*>& x = m_world->GetScene()->GetActiveBodyArray();
+//int xxxxxxxxx = x.GetCount();
 //dInt32 data[] = { 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 0 };
-//dInt32 data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-dInt32 data[] = { 0, 1, 2, 3, 4, 5};
-//dInt32 data[] = { 0, 1, 2 };
-dTree<ndBodyKinematic*, dInt32> xx;
-for (int i = 0; i < xxxxxxxxx; i++)
-{
-	ndBodyKinematic* body = x[i];
-	body->m_equilibrium = 0;
-	xx.Insert(body, body->m_uniqueId);
-}
-
-for (int i = 0; i < sizeof(data) / sizeof(data[0]); i++)
-{
-	dTree<ndBodyKinematic*, dInt32>::dNode* node = xx.Find(data[i]);
-	dAssert(node);
-	ndBodyKinematic* body = node->GetInfo();
-	body->m_equilibrium = 1;
-}
+////dInt32 data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+////dInt32 data[] = { 0, 1, 2, 3, 4, 5};
+////dInt32 data[] = { 0, 1, 2 };
+//dTree<ndBodyKinematic*, dInt32> xx;
+//for (int i = 0; i < xxxxxxxxx; i++)
+//{
+//	ndBodyKinematic* body = x[i];
+//	body->m_equilibrium = 0;
+//	body->m_isJointFence0 = 0;
+//	xx.Insert(body, body->m_uniqueId);
+//}
+//
+//for (int i = 0; i < sizeof(data) / sizeof(data[0]); i++)
+//{
+//	dTree<ndBodyKinematic*, dInt32>::dNode* node = xx.Find(data[i]);
+//	dAssert(node);
+//	ndBodyKinematic* body = node->GetInfo();
+//	body->m_equilibrium = 1;
+//	body->m_isJointFence0 = 1;
+//}
 
 	BuildIsland();
 
-dArray<dInt32> xxx;
-for (int i = 0; i < m_activeBodies.GetCount(); i++)
-{
-	ndBodyKinematic* body = x[m_activeBodies[i]];
-	xxx.PushBack(body->m_uniqueId);
-}
+//dArray<dInt32> xxx;
+//for (int i = 0; i < m_activeBodies.GetCount(); i++)
+//{
+//	ndBodyKinematic* body = x[m_activeBodies[i]];
+//	xxx.PushBack(body->m_uniqueId);
+//}
 
 
 	dInt32 count = GetActiveBodies().GetCount();
