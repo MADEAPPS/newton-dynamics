@@ -522,7 +522,7 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	sentinelBody->PrepareStep(m_scene->GetActiveBodyArray().GetCount());
 	
 	sentinelBody->m_autoSleep = 1;
-	sentinelBody->m_isBoundary = 0;
+	sentinelBody->m_isJointArea = 0;
 	sentinelBody->m_equilibrium = 1;
 
 #ifdef OLD_SOLVER

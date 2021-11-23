@@ -2102,7 +2102,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 		
 		dInt32 CalculateKey(const ndBodyKinematic* const body) const
 		{
-			const dInt32 entry = body->m_isBoundary * 2 + body->m_equilibrium;
+			const dInt32 entry = body->m_isJointArea * 2 + body->m_equilibrium;
 			return m_keyMap[entry];
 		}
 
@@ -2360,8 +2360,8 @@ void ndDynamicsUpdate::SortJointsScan()
 				if (isJointBoundary)
 				{
 					activeJointCount++;
-					body0->m_isBoundary = 1;
-					body1->m_isBoundary = 1;
+					body0->m_isJointArea = 1;
+					body1->m_isJointArea = 1;
 				}
 			}
 			*(((dInt32*)m_context) + threadIndex) = activeJointCount;

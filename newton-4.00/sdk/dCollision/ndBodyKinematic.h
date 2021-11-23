@@ -344,7 +344,7 @@ inline void ndBodyKinematic::AddDampingAcceleration(dFloat32)
 inline void ndBodyKinematic::PrepareStep(dInt32 index)
 {
 	m_rank = 0;
-	m_isBoundary = 0;
+	m_isJointArea = 0;
 	m_index = index;
 	m_weigh = dFloat32(0.0f);
 	m_islandParent = this;

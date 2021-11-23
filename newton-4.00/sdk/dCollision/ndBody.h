@@ -126,8 +126,8 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 	};
 
 	dUnsigned8 m_autoSleep;
-	dUnsigned8 m_isBoundary;
 	dUnsigned8 m_equilibrium;
+	dUnsigned8 m_isJointArea;
 
 	D_COLLISION_API static dUnsigned32 m_uniqueIdCount;
 
