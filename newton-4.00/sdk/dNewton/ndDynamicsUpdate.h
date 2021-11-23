@@ -239,6 +239,7 @@ class ndDynamicsUpdate: public dClassAlloc
 		public:
 		dUnsigned32 m_body;
 		dUnsigned32 m_joint;
+		dUnsigned32 m_xxxxxx;
 	};
 
 	public:
