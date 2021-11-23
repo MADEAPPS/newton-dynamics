@@ -101,29 +101,33 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 	dQuaternion m_rotation;
 	ndBodyNotify* m_notifyCallback;
 
+	dUnsigned32 m_uniqueId;
 	union
 	{
 		dUnsigned32 m_flags;
 		struct
 		{
-			dUnsigned32 m_resting : 1;
-			dUnsigned32 m_autoSleep : 1;
-			dUnsigned32 m_equilibrium : 1;
-			dUnsigned32 m_islandSleep : 1;
-			dUnsigned32 m_solverSleep0 : 1;
-			dUnsigned32 m_solverSleep1 : 1;
+			#ifdef OLD_SOLVER
+				dUnsigned32 m_resting : 1;
+				dUnsigned32 m_islandSleep : 1;
+				dUnsigned32 m_solverSleep0 : 1;
+				dUnsigned32 m_solverSleep1 : 1;
+				dUnsigned32 m_bodyIsConstrained : 1;
+			#endif
+			
 			dUnsigned32 m_skeletonMark : 1;
 			dUnsigned32 m_skeletonMark0 : 1;
 			dUnsigned32 m_skeletonMark1 : 1;
 			dUnsigned32 m_contactTestOnly : 1;
 			dUnsigned32 m_transformIsDirty : 1;
-			dUnsigned32 m_bodyIsConstrained : 1;
+			
 			dUnsigned32 m_equilibriumOverride : 1;
 		};
 	};
-	dUnsigned32 m_uniqueId;
 
+	dUnsigned8 m_autoSleep;
 	dUnsigned8 m_isBoundary;
+	dUnsigned8 m_equilibrium;
 
 	D_COLLISION_API static dUnsigned32 m_uniqueIdCount;
 

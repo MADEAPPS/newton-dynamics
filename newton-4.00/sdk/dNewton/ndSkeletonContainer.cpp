@@ -482,12 +482,12 @@ void ndSkeletonContainer::AddSelfCollisionJoint(ndConstraint* const joint)
 
 void ndSkeletonContainer::CheckSleepState()
 {
-	bool equilibrium = true;
+	dInt32 equilibrium = 1;
 	for (dInt32 i = m_nodeList.GetCount() - 1; i >= 0; --i)
 	{
 		ndNode* const node = m_nodesOrder[i];
 		dAssert(node->m_body);
-		equilibrium &= (node->m_body->m_equilibrium ? true : false);
+		equilibrium &= node->m_body->m_equilibrium;
 	}
 
 	if (equilibrium)
@@ -498,8 +498,8 @@ void ndSkeletonContainer::CheckSleepState()
 			const ndConstraint* const joint = m_loopingJoints[i];
 			ndBodyKinematic* const body0 = joint->GetBody0();
 			ndBodyKinematic* const body1 = joint->GetBody1();
-			equilibrium &= (body0->m_equilibrium ? true : false);
-			equilibrium &= (body1->m_equilibrium ? true : false);
+			equilibrium &= body0->m_equilibrium;
+			equilibrium &= body1->m_equilibrium;
 		}
 	}
 
@@ -527,7 +527,9 @@ void ndSkeletonContainer::CheckSleepState()
 			}
 		}
 	}
-	m_isResting = equilibrium;
+#ifdef 	OLD_SOLVER
+	m_isResting = equilibrium ? true : false;
+#endif
 }
 
 void ndSkeletonContainer::CalculateBufferSizeInBytes()

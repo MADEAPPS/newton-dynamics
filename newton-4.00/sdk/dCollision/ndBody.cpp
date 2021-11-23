@@ -38,12 +38,14 @@ ndBody::ndBody()
 	,m_maxAabb(dVector::m_wOne)
 	,m_rotation()
 	,m_notifyCallback(nullptr)
-	,m_flags(0)
 	,m_uniqueId(m_uniqueIdCount)
+	,m_flags(0)
+	,m_autoSleep(1)
+	,m_isBoundary(0)
+	,m_equilibrium(0)
 {
-	m_autoSleep = 1;
-	m_transformIsDirty = 1;
 	m_uniqueIdCount++;
+	m_transformIsDirty = 1;
 }
 
 ndBody::ndBody(const dLoadSaveBase::dLoadDescriptor& desc)
@@ -57,8 +59,11 @@ ndBody::ndBody(const dLoadSaveBase::dLoadDescriptor& desc)
 	,m_maxAabb(dVector::m_wOne)
 	,m_rotation()
 	,m_notifyCallback(nullptr)
-	,m_flags(0)
 	,m_uniqueId(m_uniqueIdCount)
+	,m_flags(0)
+	,m_autoSleep(1)
+	,m_isBoundary(0)
+	,m_equilibrium(0)
 {
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;
@@ -118,14 +123,14 @@ void ndBody::SetNotifyCallback(ndBodyNotify* const notify)
 
 void ndBody::SetOmega(const dVector& omega)
 {
-	m_equilibrium = 0;
 	m_omega = omega;
+	m_equilibrium = 0;
 }
 
 void ndBody::SetVelocity(const dVector& veloc)
 {
-	m_equilibrium = 0;
 	m_veloc = veloc;
+	m_equilibrium = 0;
 }
 
 void ndBody::SetMatrix(const dMatrix& matrix)
@@ -161,5 +166,5 @@ void ndBody::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "veloc", m_veloc);
 	xmlSaveParam(childNode, "omega", m_omega);
 	xmlSaveParam(childNode, "centreOfMass", m_localCentreOfMass);
-	xmlSaveParam(childNode, "autoSleep", m_autoSleep ? 1 : 0);
+	xmlSaveParam(childNode, "autoSleep", m_autoSleep);
 }

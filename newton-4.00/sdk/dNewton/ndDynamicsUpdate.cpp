@@ -1433,7 +1433,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 			dynBody->m_accel = dynBody->m_accel & accelTest;
 			dynBody->m_alpha = dynBody->m_alpha & accelTest;
 
-			dUnsigned32 equilibrium = (dynBody->GetInvMass() == dFloat32(0.0f)) ? 1 : dynBody->m_autoSleep;
+			dUnsigned8 equilibrium = (dynBody->GetInvMass() == dFloat32(0.0f)) ? 1 : dynBody->m_autoSleep;
 			const dVector isMovingMask(dynBody->m_veloc + dynBody->m_omega + dynBody->m_accel + dynBody->m_alpha);
 			const dVector mask(isMovingMask.TestZero());
 			const dInt32 test = mask.GetSignMask() & 7;
@@ -1474,7 +1474,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 		{
 			ndBodyKinematic* const kinBody = bodyIslands[i]->GetAsBodyKinematic();
 			dAssert(kinBody);
-			dUnsigned32 equilibrium = (kinBody->GetInvMass() == dFloat32(0.0f)) ? 1 : (kinBody->m_autoSleep & ~kinBody->m_equilibriumOverride);
+			dUnsigned8 equilibrium = (kinBody->GetInvMass() == dFloat32(0.0f)) ? 1 : (kinBody->m_autoSleep & ~kinBody->m_equilibriumOverride);
 			const dVector isMovingMask(kinBody->m_veloc + kinBody->m_omega);
 			const dVector mask(isMovingMask.TestZero());
 			const dInt32 test = mask.GetSignMask() & 7;
@@ -1984,6 +1984,7 @@ if (xxxx == 4)
 	//dInt32 data[] = { 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 0 };
 	//dInt32 data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 	dInt32 data[] = { 0, 1, 2, 3, 4, 5};
+	//dInt32 data[] = { 0, 1, 2 };
 	dTree<ndBodyKinematic*, dInt32> xx;
 	for (int i = 0; i < xxxxxxxxx; i++)
 	{
@@ -2101,9 +2102,6 @@ void ndDynamicsUpdate::SortBodyJointScan()
 		
 		dInt32 CalculateKey(const ndBodyKinematic* const body) const
 		{
-			//const dInt32 entry = body->m_solverSleep1 * 2 + body->m_equilibrium;
-			//const dInt32 entry =  (1 - body->m_bodyIsConstrained) * 2 + body->m_equilibrium;
-			//const dInt32 entry =  body->m_resting * 2 + body->m_equilibrium;
 			const dInt32 entry = body->m_isBoundary * 2 + body->m_equilibrium;
 			return m_keyMap[entry];
 		}
@@ -2357,7 +2355,7 @@ void ndDynamicsUpdate::SortJointsScan()
 				const dInt32 rows = joint->GetRowsCount();
 				joint->m_rowCount = rows;
 
-				const dUnsigned8 isJointBoundary = dUnsigned8 (1 - ((body0->m_equilibrium & body1->m_equilibrium)));
+				const dUnsigned8 isJointBoundary = 1 - ((body0->m_equilibrium & body1->m_equilibrium));
 				joint->m_isBoundary = isJointBoundary;
 				if (isJointBoundary)
 				{
@@ -3665,6 +3663,7 @@ int xxxxxxxxx = x.GetCount();
 //dInt32 data[] = { 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 36, 37, 0 };
 //dInt32 data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 dInt32 data[] = { 0, 1, 2, 3, 4, 5};
+//dInt32 data[] = { 0, 1, 2 };
 dTree<ndBodyKinematic*, dInt32> xx;
 for (int i = 0; i < xxxxxxxxx; i++)
 {
@@ -3681,8 +3680,16 @@ for (int i = 0; i < sizeof(data) / sizeof(data[0]); i++)
 	body->m_equilibrium = 1;
 }
 
-
 	BuildIsland();
+
+dArray<dInt32> xxx;
+for (int i = 0; i < m_activeBodies.GetCount(); i++)
+{
+	ndBodyKinematic* body = x[m_activeBodies[i]];
+	xxx.PushBack(body->m_uniqueId);
+}
+
+
 	dInt32 count = GetActiveBodies().GetCount();
 	if (count)
 	{

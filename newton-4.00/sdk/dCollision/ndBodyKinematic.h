@@ -346,12 +346,16 @@ inline void ndBodyKinematic::PrepareStep(dInt32 index)
 	m_rank = 0;
 	m_isBoundary = 0;
 	m_index = index;
+	m_weigh = dFloat32(0.0f);
+	m_islandParent = this;
+
+#ifdef OLD_SOLVER
 	m_resting = 1;
 	m_solverSleep0 = 1;
 	m_solverSleep1 = 1;
+	m_bodyIsConstrained = 0;
 	m_islandSleep = m_equilibrium;
-	m_weigh = dFloat32(0.0f);
-	m_islandParent = this;
+#endif
 }
 
 inline ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap()
@@ -381,7 +385,7 @@ inline const ndShapeInstance& ndBodyKinematic::GetCollisionShape() const
 
 inline bool ndBodyKinematic::GetAutoSleep() const
 {
-	return m_autoSleep;
+	return m_autoSleep ? true : false;
 }
 
 inline bool ndBodyKinematic::GetSleepState() const

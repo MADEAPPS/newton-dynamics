@@ -1269,7 +1269,7 @@ void ndScene::BuildBodyArray()
 			for (dInt32 j = 0; j < blockSize; j++)
 			{
 				ndBodyKinematic* const body = bodyArrayBuffer[j + start];
-				body->m_bodyIsConstrained = 0;
+				//body->m_bodyIsConstrained = 0;
 				const ndShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
 				if (!shape)
 				{
@@ -1618,10 +1618,10 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 		if (active ^ contact->IsActive())
 		{
 			dAssert(body0->GetInvMass() > dFloat32(0.0f));
-			body0->m_equilibrium = false;
+			body0->m_equilibrium = 0;
 			if (body1->GetInvMass() > dFloat32(0.0f))
 			{
-				body1->m_equilibrium = false;
+				body1->m_equilibrium = 0;
 			}
 		}
 	}
