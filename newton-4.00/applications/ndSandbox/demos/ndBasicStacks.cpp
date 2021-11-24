@@ -172,7 +172,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 
 	//dInt32 pyramidHigh = 60;
 	//dInt32 pyramidHigh = 8;
-	dInt32 pyramidHigh = 20;
+	dInt32 pyramidHigh = 4;
 	dVector origin(dVector::m_zero);
 
 	for (dInt32 i = 0; i < 1; i++)
@@ -184,7 +184,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	origin = dVector::m_zero;
 	origin.m_x -= 2.0f;
 	origin.m_z -= 3.0f;
-	BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+	//BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 5);
 	
 	origin.m_z += 6.0f;
 	//BuildCylinderStack(scene, 10.0f, origin, dVector(0.75f, 0.6f, 1.0f, 0.0f), 20);
@@ -197,7 +197,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	origin.m_x -= 15.0f;
 	origin.m_z += 15.0f;
 
-	origin.m_x -= 20.0f;
-	origin.m_z += 20.0f;
+	//origin.m_x -= 20.0f;
+	//origin.m_z += 20.0f;
 	scene->SetCameraMatrix(rot, origin);
 }
