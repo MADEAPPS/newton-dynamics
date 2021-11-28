@@ -107,29 +107,25 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 		dUnsigned32 m_flags;
 		struct
 		{
-			#ifdef OLD_SOLVER
-				dUnsigned32 m_resting : 1;
-				dUnsigned32 m_islandSleep : 1;
-				dUnsigned32 m_solverSleep0 : 1;
-				dUnsigned32 m_solverSleep1 : 1;
-				dUnsigned32 m_bodyIsConstrained : 1;
-			#endif
-			
 			dUnsigned32 m_skeletonMark : 1;
 			dUnsigned32 m_skeletonMark0 : 1;
 			dUnsigned32 m_skeletonMark1 : 1;
 			dUnsigned32 m_contactTestOnly : 1;
 			dUnsigned32 m_transformIsDirty : 1;
-			
 			dUnsigned32 m_equilibriumOverride : 1;
 		};
 	};
 
 	dUnsigned8 m_autoSleep;
 	dUnsigned8 m_equilibrium;
-	dUnsigned8 m_isJointArea;
 	dUnsigned8 m_isJointFence0;
 	dUnsigned8 m_isJointFence1;
+
+//#ifdef OLD_SOLVER
+	dUnsigned8 m_resting : 1;
+	dUnsigned8 m_islandSleep : 1;
+	dUnsigned8 m_bodyIsConstrained : 1;
+//#endif
 
 	D_COLLISION_API static dUnsigned32 m_uniqueIdCount;
 

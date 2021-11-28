@@ -42,9 +42,13 @@ ndBody::ndBody()
 	,m_flags(0)
 	,m_autoSleep(1)
 	,m_equilibrium(0)
-	,m_isJointArea(0)
 	,m_isJointFence0(0)
 	,m_isJointFence1(0)
+//#ifdef OLD_SOLVER
+	,m_resting(0)
+	,m_islandSleep(0)
+	,m_bodyIsConstrained(0)
+//#endif
 {
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;
@@ -65,9 +69,13 @@ ndBody::ndBody(const dLoadSaveBase::dLoadDescriptor& desc)
 	,m_flags(0)
 	,m_autoSleep(1)
 	,m_equilibrium(0)
-	,m_isJointArea(0)
 	,m_isJointFence0(0)
 	,m_isJointFence1(0)
+//#ifdef OLD_SOLVER
+	,m_resting(0)
+	,m_islandSleep(0)
+	,m_bodyIsConstrained(0)
+//#endif
 {
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;

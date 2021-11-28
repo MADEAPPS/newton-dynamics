@@ -118,6 +118,8 @@ class ndDynamicsUpdate : public dClassAlloc
 	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
+	void XXXXXXXX();
+
 	protected:
 	void Clear();
 	virtual void Update();
@@ -239,7 +241,6 @@ class ndDynamicsUpdate: public dClassAlloc
 		public:
 		dUnsigned32 m_body;
 		dUnsigned32 m_joint;
-		dUnsigned32 m_xxxxxx;
 	};
 
 	public:
@@ -249,8 +250,10 @@ class ndDynamicsUpdate: public dClassAlloc
 	void* GetTempBuffer() const;
 	virtual const char* GetStringId() const;
 
+	dInt32 GetActiveJointCount() const;
 	dInt32 GetConstrainedBodyCount() const;
 	dInt32 GetUnconstrainedBodyCount() const;
+	dInt32 GetActiveConstrainedBodyCount() const;
 		
 	void ClearBuffer(void* const buffer, dInt32 sizeInByte) const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
@@ -282,6 +285,8 @@ class ndDynamicsUpdate: public dClassAlloc
 	void DetermineSleepStates();
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
+	void XXXXXXXX();
+
 	protected:
 	void Clear();
 	virtual void Update();
@@ -306,8 +311,8 @@ class ndDynamicsUpdate: public dClassAlloc
 	dFloat32 m_invTimestepRK;
 	dUnsigned32 m_solverPasses;
 	dInt32 m_activeJointCount;
+	dInt32 m_constrainedBodyCount;
 	dInt32 m_activeConstrainedBodyCount;
-	//dInt32 m_unConstrainedBodyCount____;
 
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
@@ -386,14 +391,24 @@ inline dArray<dInt32>& ndDynamicsUpdate::GetJointForceIndexBuffer()
 	return m_jointForcesIndex;
 }
 
+inline dInt32 ndDynamicsUpdate::GetActiveJointCount() const
+{
+	return m_activeJointCount;
+}
+
 inline dInt32 ndDynamicsUpdate::GetConstrainedBodyCount() const
+{
+	return m_constrainedBodyCount;
+}
+
+inline dInt32 ndDynamicsUpdate::GetActiveConstrainedBodyCount() const
 {
 	return m_activeConstrainedBodyCount;
 }
 
 inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
 {
-	return m_activeBodies.GetCount() - m_activeConstrainedBodyCount;
+	return m_activeBodies.GetCount() - m_constrainedBodyCount;
 }
 
 #endif

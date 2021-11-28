@@ -89,6 +89,8 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_shapeInstance(ndDummyCollision::GetNullShape())
 	,m_mass(dVector::m_zero)
 	,m_invMass(dVector::m_zero)
+	,m_accel(dVector::m_zero)
+	,m_alpha(dVector::m_zero)
 	,m_gyroAlpha(dVector::m_zero)
 	,m_gyroTorque(dVector::m_zero)
 	,m_gyroRotation()
@@ -118,6 +120,8 @@ ndBodyKinematic::ndBodyKinematic(const dLoadSaveBase::dLoadDescriptor& desc)
 	,m_shapeInstance(ndDummyCollision::GetNullShape())
 	,m_mass(dVector::m_zero)
 	,m_invMass(dVector::m_zero)
+	,m_accel(dVector::m_zero)
+	,m_alpha(dVector::m_zero)
 	,m_gyroAlpha(dVector::m_zero)
 	,m_gyroTorque(dVector::m_zero)
 	,m_gyroRotation()
@@ -181,11 +185,6 @@ void ndBodyKinematic::SetCollisionShape(const ndShapeInstance& shapeInstance)
 		m_shapeInstance.GetShape()->GetAsShapeCompound()->SetSubShapeOwner(this);
 	}
 }
-
-//void ndBodyKinematic::ReleaseMemory()
-//{
-//	ndContactMap::FlushFreeList();
-//}
 
 ndContact* ndBodyKinematic::FindContact(const ndBody* const otherBody) const
 {

@@ -26,6 +26,7 @@
 #include "ndBody.h"
 #include "ndBodyList.h"
 #include "ndJointList.h"
+#include "ndConstraint.h"
 
 class ndScene;
 class ndSceneBodyNode;
@@ -145,11 +146,16 @@ class ndBodyKinematic: public ndBody
 
 	virtual dVector GetForce() const;
 	virtual dVector GetTorque() const;
+
 	virtual void SetForce(const dVector& force);
 	virtual void SetTorque(const dVector& torque);
 
-	virtual void SetAccel(const dVector& accel);
-	virtual void SetAlpha(const dVector& alpha);
+	dVector GetAccel() const;
+	dVector GetAlpha() const;
+	void SetAccel(const dVector& accel);
+	void SetAlpha(const dVector& alpha);
+
+	void SetAccel(const ndJacobian& accel);
 
 	ndContactMap& GetContactMap();
 	const ndJointList& GetJointList() const;
@@ -176,6 +182,8 @@ class ndBodyKinematic: public ndBody
 	ndShapeInstance m_shapeInstance;
 	dVector m_mass;
 	dVector m_invMass;
+	dVector m_accel;
+	dVector m_alpha;
 	dVector m_gyroAlpha;
 	dVector m_gyroTorque;
 	dQuaternion m_gyroRotation;
@@ -329,17 +337,36 @@ inline void ndBodyKinematic::SetTorque(const dVector&)
 {
 }
 
-inline void ndBodyKinematic::SetAccel(const dVector&)
+inline dVector ndBodyKinematic::GetAccel() const
 {
+	return m_accel;
 }
 
-inline void ndBodyKinematic::SetAlpha(const dVector&)
+inline void ndBodyKinematic::SetAccel(const dVector& accel)
 {
+	m_accel = accel;
+}
+
+inline dVector ndBodyKinematic::GetAlpha() const
+{
+	return m_alpha;
+}
+
+inline void ndBodyKinematic::SetAlpha(const dVector& alpha)
+{
+	m_alpha = alpha;
 }
 
 inline void ndBodyKinematic::AddDampingAcceleration(dFloat32)
 {
 }
+
+inline void ndBodyKinematic::SetAccel(const ndJacobian& accel)
+{
+	SetAccel(accel.m_linear);
+	SetAlpha(accel.m_angular);
+}
+
 
 inline void ndBodyKinematic::PrepareStep(dInt32 index)
 {
@@ -347,13 +374,14 @@ inline void ndBodyKinematic::PrepareStep(dInt32 index)
 	m_index = index;
 	m_weigh = dFloat32(0.0f);
 	m_islandParent = this;
-	m_isJointArea = 0;
+	m_equilibrium = (m_invMass.m_w == dFloat32(0.0f)) ? 1 : m_equilibrium;
 	m_isJointFence0 = m_equilibrium;
 	m_isJointFence1 = m_equilibrium;
+
 #ifdef OLD_SOLVER
 	m_resting = 1;
-	m_solverSleep0 = 1;
-	m_solverSleep1 = 1;
+	m_isJointFence0 = 1;
+	m_isJointFence1 = 1;
 	m_bodyIsConstrained = 0;
 	m_islandSleep = m_equilibrium;
 #endif

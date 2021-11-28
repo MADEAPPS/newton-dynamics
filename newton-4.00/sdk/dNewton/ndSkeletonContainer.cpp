@@ -527,7 +527,9 @@ void ndSkeletonContainer::CheckSleepState()
 			}
 		}
 	}
+
 #ifdef 	OLD_SOLVER
+	dAssert(0);
 	m_isResting = equilibrium ? true : false;
 #endif
 }
