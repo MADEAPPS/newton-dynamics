@@ -29,7 +29,7 @@
 
 static int xxxx;
 
-#ifdef OLD_SOLVER
+#ifdef USE_ISLAND_SOLVER
 
 #define D_MAX_BODY_RADIX_BIT		9
 #define D_DEFAULT_BUFFER_SIZE		1024

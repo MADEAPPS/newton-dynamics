@@ -121,7 +121,7 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 	dUnsigned8 m_isJointFence0;
 	dUnsigned8 m_isJointFence1;
 
-//#ifdef OLD_SOLVER
+//#ifdef ISLAND_SOLVER
 	dUnsigned8 m_resting : 1;
 	dUnsigned8 m_islandSleep : 1;
 	dUnsigned8 m_bodyIsConstrained : 1;

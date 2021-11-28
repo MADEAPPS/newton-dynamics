@@ -378,7 +378,7 @@ inline void ndBodyKinematic::PrepareStep(dInt32 index)
 	m_isJointFence0 = m_equilibrium;
 	m_isJointFence1 = m_equilibrium;
 
-#ifdef OLD_SOLVER
+#ifdef USE_ISLAND_SOLVER
 	m_resting = 1;
 	m_isJointFence0 = 1;
 	m_isJointFence1 = 1;

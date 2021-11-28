@@ -22,7 +22,7 @@
 #ifndef _DG_TYPES_H_
 #define _DG_TYPES_H_
 
-#define OLD_SOLVER
+#define USE_ISLAND_SOLVER
 
 #include "dTypes.h"
 

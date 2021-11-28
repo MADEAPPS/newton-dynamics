@@ -45,7 +45,7 @@
 class ndWorld;
 
 
-#ifdef OLD_SOLVER
+#ifdef USE_ISLAND_SOLVER
 D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate : public dClassAlloc
 {
