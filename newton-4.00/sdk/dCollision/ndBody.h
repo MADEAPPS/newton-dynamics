@@ -116,6 +116,7 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 		};
 	};
 
+	dUnsigned8 m_isStatic;
 	dUnsigned8 m_autoSleep;
 	dUnsigned8 m_equilibrium;
 	dUnsigned8 m_isJointFence0;

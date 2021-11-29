@@ -521,6 +521,7 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	ndBodyKinematic* sentinelBody = m_sentinelBody;
 	sentinelBody->PrepareStep(m_scene->GetActiveBodyArray().GetCount());
 	
+	sentinelBody->m_isStatic = 1;
 	sentinelBody->m_autoSleep = 1;
 	sentinelBody->m_equilibrium = 1;
 	sentinelBody->m_isJointFence0 = 1;
