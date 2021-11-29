@@ -2202,20 +2202,15 @@ void ndDynamicsUpdate::SortJointsScan()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndConstraint* const joint = jointArray[i + start];
+				const ndConstraint* const joint = jointArray[i + start];
 				ndBodyKinematic* const body0 = joint->GetBody0();
 				ndBodyKinematic* const body1 = joint->GetBody1();
-				const dInt32 rows = joint->GetRowsCount();
-				joint->m_rowCount = rows;
 
 				const dInt32 isJointBoundary = body0->m_equilibrium & body1->m_equilibrium;
 				if (!isJointBoundary)
 				{
 					body0->m_isJointFence0 = 0;
-					if (body1->m_invMass.m_w > dFloat32(0.0f))
-					{
-						body1->m_isJointFence0 = 0;
-					}
+					body1->m_isJointFence0 = body1->m_isStatic;
 				}
 
 				body0->m_bodyIsConstrained = 1;
@@ -2247,7 +2242,7 @@ void ndDynamicsUpdate::SortJointsScan()
 
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndConstraint* const joint = jointArray[i + start];
+				const ndConstraint* const joint = jointArray[i + start];
 				ndBodyKinematic* const body0 = joint->GetBody0();
 				ndBodyKinematic* const body1 = joint->GetBody1();
 
@@ -2255,10 +2250,7 @@ void ndDynamicsUpdate::SortJointsScan()
 				if (!isResting)
 				{
 					body0->m_isJointFence1 = 0;
-					if (body1->GetInvMass() > dFloat32(0.0f))
-					{
-						body1->m_isJointFence1 = 0;
-					}
+					body1->m_isJointFence1 = body1->m_isStatic;
 				}
 			}
 		}
@@ -2286,11 +2278,16 @@ void ndDynamicsUpdate::SortJointsScan()
 				ndConstraint* const joint = jointArray[i + start];
 				ndBodyKinematic* const body0 = joint->GetBody0();
 				ndBodyKinematic* const body1 = joint->GetBody1();
+
+				const dInt32 rows = joint->GetRowsCount();
+				joint->m_rowCount = rows;
+
 				const dInt8 fence0 = body0->m_isJointFence0 & body1->m_isJointFence0;
 				const dInt8 fence1 = body0->m_isJointFence1 & body1->m_isJointFence1;
 
 				//const dInt8 isResting = body0->m_resting & body1->m_resting;
-				joint->m_resting = fence0;
+				joint->m_resting = fence1;
+				dAssert((body0->m_resting & body1->m_resting) == fence1);
 
 				fence0Count += !fence0;
 				fence1Count += !fence1;
@@ -2528,6 +2525,7 @@ void ndDynamicsUpdate::SortJoints()
 
 	if (!m_activeJointCount)
 	{
+		//dAssert(0);
 		//	jointArray.SetCount(0);
 		return;
 	}
