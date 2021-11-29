@@ -134,6 +134,8 @@ else()
 				ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/applications/ndSandbox/${CMAKE_CFG_INTDIR}/$<TARGET_FILE_NAME:${projectName}>)
 		endif ()
 
+		install(FILES $<TARGET_PDB_FILE:${projectName}> DESTINATION bin OPTIONAL)
+
 	endif(MSVC)
 
 	target_include_directories(${projectName} PUBLIC .)
