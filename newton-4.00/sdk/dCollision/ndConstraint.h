@@ -253,12 +253,9 @@ class ndConstraint
 	dFloat32 m_preconditioner1;
 	dInt32 m_rowCount;
 	dInt32 m_rowStart;
-	dUnsigned8 m_isBoundary;
-
-	dUnsigned32 m_active : 1;
-	dUnsigned32 m_resting : 1;
-	dUnsigned32 m_isInSkeletonLoop : 1;
-	//dUnsigned32 m_jointFeebackForce : 1;
+	dUnsigned8 m_active;
+	dUnsigned8 m_resting;
+	dUnsigned8 m_isInSkeletonLoop;
 	
 	protected:
 	ndConstraint();

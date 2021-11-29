@@ -185,6 +185,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	origin.m_x -= 2.0f;
 	origin.m_z -= 3.0f;
 	BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 7);
+	//BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 	
 	origin.m_z += 6.0f;
 	//BuildCylinderStack(scene, 10.0f, origin, dVector(0.75f, 0.6f, 1.0f, 0.0f), 20);

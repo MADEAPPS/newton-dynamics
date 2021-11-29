@@ -232,15 +232,38 @@ inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* cons
 }
 
 #else
+
 D_MSV_NEWTON_ALIGN_32
-class ndDynamicsUpdate: public dClassAlloc
+class ndDynamicsUpdate : public dClassAlloc
 {
 	public:
 	class ndJointBodyPairIndex
 	{
+	public:
+		dInt32 m_body;
+		dInt32 m_joint;
+	};
+
+	class ndBodyIndexPair
+	{
 		public:
-		dUnsigned32 m_body;
-		dUnsigned32 m_joint;
+		ndBodyKinematic* m_body;
+		ndBodyKinematic* m_root;
+	};
+
+	class ndIsland
+	{
+		public:
+		ndIsland(ndBodyKinematic* const root)
+			:m_start(0)
+			, m_count(0)
+			, m_root(root)
+		{
+		}
+
+		dInt32 m_start;
+		dInt32 m_count;
+		ndBodyKinematic* m_root;
 	};
 
 	public:
@@ -249,25 +272,21 @@ class ndDynamicsUpdate: public dClassAlloc
 
 	void* GetTempBuffer() const;
 	virtual const char* GetStringId() const;
-
-	dInt32 GetActiveJointCount() const;
-	dInt32 GetConstrainedBodyCount() const;
 	dInt32 GetUnconstrainedBodyCount() const;
-	dInt32 GetActiveConstrainedBodyCount() const;
-		
 	void ClearBuffer(void* const buffer, dInt32 sizeInByte) const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
 
-	dArray<dInt32>& GetActiveBodies();
 	dArray<ndJacobian>& GetInternalForces();
 	dArray<ndLeftHandSide>& GetLeftHandSide();
 	dArray<dInt32>& GetJointForceIndexBuffer();
 	dArray<ndRightHandSide>& GetRightHandSide();
 	dArray<ndJacobian>& GetTempInternalForces();
+	dArray<ndBodyKinematic*>& GetBodyIslandOrder();
 	dArray<ndJointBodyPairIndex>& GetJointBodyPairIndexBuffer();
 
 	private:
 	void SortJoints();
+	void SortIslands();
 	void BuildIsland();
 	void InitWeights();
 	void InitBodyArray();
@@ -283,6 +302,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	void IntegrateUnconstrainedBodies();
 
 	void DetermineSleepStates();
+	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
 	void XXXXXXXX();
@@ -294,12 +314,14 @@ class ndDynamicsUpdate: public dClassAlloc
 	void SortBodyJointScan();
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
-	dArray<dInt32> m_activeBodies;
+	dVector m_velocTol;
+	dArray<ndIsland> m_islands;
 	dArray<dInt32> m_jointForcesIndex;
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
 	dArray<ndJacobian> m_tempInternalForces;
+	dArray<ndBodyKinematic*> m_bodyIslandOrder;
 	dArray<ndJointBodyPairIndex> m_jointBodyPairIndexBuffer;
 
 	ndWorld* m_world;
@@ -311,8 +333,7 @@ class ndDynamicsUpdate: public dClassAlloc
 	dFloat32 m_invTimestepRK;
 	dUnsigned32 m_solverPasses;
 	dInt32 m_activeJointCount;
-	dInt32 m_constrainedBodyCount;
-	dInt32 m_activeConstrainedBodyCount;
+	dInt32 m_unConstrainedBodyCount;
 
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
@@ -333,19 +354,35 @@ inline dArray<ndJacobian>& ndDynamicsUpdate::GetTempInternalForces()
 }
 
 inline  dArray<ndLeftHandSide>& ndDynamicsUpdate::GetLeftHandSide()
-{ 
-	return m_leftHandSide; 
+{
+	return m_leftHandSide;
 }
 
-inline dArray<ndRightHandSide>& ndDynamicsUpdate::GetRightHandSide()
-{ 
-	return m_rightHandSide; 
+inline  dArray<ndRightHandSide>& ndDynamicsUpdate::GetRightHandSide()
+{
+	return m_rightHandSide;
+}
+
+inline  dArray<ndBodyKinematic*>& ndDynamicsUpdate::GetBodyIslandOrder()
+{
+	return m_bodyIslandOrder;
+}
+
+inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
+{
+	return m_unConstrainedBodyCount;
 }
 
 inline dArray<ndDynamicsUpdate::ndJointBodyPairIndex>& ndDynamicsUpdate::GetJointBodyPairIndexBuffer()
 {
 	return m_jointBodyPairIndexBuffer;
 }
+
+inline dArray<dInt32>& ndDynamicsUpdate::GetJointForceIndexBuffer()
+{
+	return m_jointForcesIndex;
+}
+
 
 inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const
 {
@@ -379,36 +416,6 @@ inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* cons
 		prev->m_islandParent = node->m_islandParent;
 	}
 	return node;
-}
-
-inline dArray<dInt32>& ndDynamicsUpdate::GetActiveBodies()
-{
-	return m_activeBodies;
-}
-
-inline dArray<dInt32>& ndDynamicsUpdate::GetJointForceIndexBuffer()
-{
-	return m_jointForcesIndex;
-}
-
-inline dInt32 ndDynamicsUpdate::GetActiveJointCount() const
-{
-	return m_activeJointCount;
-}
-
-inline dInt32 ndDynamicsUpdate::GetConstrainedBodyCount() const
-{
-	return m_constrainedBodyCount;
-}
-
-inline dInt32 ndDynamicsUpdate::GetActiveConstrainedBodyCount() const
-{
-	return m_activeConstrainedBodyCount;
-}
-
-inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
-{
-	return m_activeBodies.GetCount() - m_constrainedBodyCount;
 }
 
 #endif

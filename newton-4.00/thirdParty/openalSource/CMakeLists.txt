@@ -1191,6 +1191,10 @@ IF(ALSOFT_INSTALL)
             LIBRARY DESTINATION "lib${LIB_SUFFIX}"
             ARCHIVE DESTINATION "lib${LIB_SUFFIX}"
     )
+
+	message ("install pdb")
+	install(FILES $<TARGET_PDB_FILE:${LIBNAME}> DESTINATION bin OPTIONAL)
+
     INSTALL(FILES include/AL/al.h
                   include/AL/alc.h
                   include/AL/alext.h

@@ -528,7 +528,7 @@ void ndSkeletonContainer::CheckSleepState()
 		}
 	}
 
-#ifdef 	USE_ISLAND_SOLVER
+#ifdef USE_ISLAND_SOLVER
 	dAssert(0);
 	m_isResting = equilibrium ? true : false;
 #endif

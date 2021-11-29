@@ -375,16 +375,14 @@ inline void ndBodyKinematic::PrepareStep(dInt32 index)
 	m_weigh = dFloat32(0.0f);
 	m_islandParent = this;
 	m_equilibrium = (m_invMass.m_w == dFloat32(0.0f)) ? 1 : m_equilibrium;
-	m_isJointFence0 = m_equilibrium;
-	m_isJointFence1 = m_equilibrium;
-
-#ifdef USE_ISLAND_SOLVER
-	m_resting = 1;
 	m_isJointFence0 = 1;
 	m_isJointFence1 = 1;
+
+//#ifdef USE_ISLAND_SOLVER
+	m_resting = 1;
 	m_bodyIsConstrained = 0;
 	m_islandSleep = m_equilibrium;
-#endif
+//#endif
 }
 
 inline ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap()
