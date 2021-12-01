@@ -2028,7 +2028,7 @@ if (xxxx == 100)
 	const dArray<ndBodyKinematic*>& x = m_world->GetScene()->GetActiveBodyArray();
 	ndBodyKinematic* body = x[4];
 	body->m_equilibrium = 0;
-	body->m_veloc.m_z = 1.0f;
+	body->m_veloc.m_z = 10.0f;
 }
 
 	BuildIsland();
@@ -2545,8 +2545,10 @@ void ndDynamicsUpdate::SortJoints()
 	{
 		ndConstraint* const joint0 = jointArray[i - 1];
 		ndConstraint* const joint1 = jointArray[i - 0];
-		dAssert(!joint0->m_resting);
-		dAssert(!joint1->m_resting);
+		dAssert(!joint0->m_fence0);
+		dAssert(!joint1->m_fence0);
+		dAssert(joint0->m_fence0 == joint0->m_resting);
+		dAssert(joint1->m_fence0 == joint1->m_resting);
 		dAssert(joint0->m_rowCount >= joint1->m_rowCount);
 		dAssert(!(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting));
 		dAssert(!(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting));
@@ -2556,8 +2558,10 @@ void ndDynamicsUpdate::SortJoints()
 	{
 		ndConstraint* const joint0 = jointArray[i - 1];
 		ndConstraint* const joint1 = jointArray[i - 0];
-		dAssert(joint0->m_resting);
-		dAssert(joint1->m_resting);
+		dAssert(joint0->m_fence0);
+		dAssert(joint1->m_fence0);
+		dAssert(joint0->m_fence0 == joint0->m_resting);
+		dAssert(joint1->m_fence0 == joint1->m_resting);
 		dAssert(joint0->m_rowCount >= joint1->m_rowCount);
 		dAssert(joint0->GetBody0()->m_resting & joint0->GetBody1()->m_resting);
 		dAssert(joint1->GetBody0()->m_resting & joint1->GetBody1()->m_resting);
@@ -2570,6 +2574,18 @@ void ndDynamicsUpdate::SortJoints()
 void ndDynamicsUpdate::SortIslands()
 {
 	D_TRACKTIME();
+
+	class ndEvaluateKey
+	{
+		public:
+		dUnsigned32 GetKey(const ndIsland& island) const
+		{
+			dUnsigned32 key = island.m_count * 2 + island.m_root->m_bodyIsConstrained;
+			const dUnsigned32 maxVal = 1 << (D_MAX_BODY_RADIX_BIT * 2);
+			dAssert(key < maxVal);
+			return maxVal - key;
+		}
+	};
 
 	ndScene* const scene = m_world->GetScene();
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
@@ -2660,21 +2676,11 @@ void ndDynamicsUpdate::SortIslands()
 		}
 
 		m_unConstrainedBodyCount = unConstrainedCount;
-		class EvaluateKey
-		{
-		public:
-			dUnsigned32 GetKey(const ndIsland& island) const
-			{
-				dUnsigned32 key = island.m_count * 2 + island.m_root->m_bodyIsConstrained;
-				const dUnsigned32 maxVal = 1 << (D_MAX_BODY_RADIX_BIT * 2);
-				dAssert(key < maxVal);
-				return maxVal - key;
-			}
-		};
-		scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, EvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 0);
+
+		scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 0);
 		if (islandMaxKeySize >= 1 << (D_MAX_BODY_RADIX_BIT - 1))
 		{
-			scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, EvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 1);
+			scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 1);
 		}
 	}
 }
@@ -4020,7 +4026,7 @@ if (xxxx == 100)
 	const dArray<ndBodyKinematic*>& x = m_world->GetScene()->GetActiveBodyArray();
 	ndBodyKinematic* body = x[4];
 	body->m_equilibrium = 0;
-//	body->m_veloc.m_z = 1.0f;
+	body->m_veloc.m_z = 10.0f;
 }
 
 	BuildIsland();
