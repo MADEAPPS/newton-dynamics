@@ -24,8 +24,8 @@
 //      are changed infrequently
 //
 
-#ifndef _D_COLLISION_H__
-#define _D_COLLISION_H__
+#ifndef __ND_COLLISION_H__
+#define __ND_COLLISION_H__
 
 #include <ndCore.h>
 #include <ndCollisionStdafx.h>

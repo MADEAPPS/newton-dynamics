@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _D_CONTAINERS_ALLOC_H_
-#define _D_CONTAINERS_ALLOC_H_
+#ifndef __ND_CONTAINERS_ALLOC_H_
+#define __ND_CONTAINERS_ALLOC_H_
 
 #include "ndCoreStdafx.h"
 

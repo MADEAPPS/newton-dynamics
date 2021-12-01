@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _D_SEMAPHORE_H_
-#define _D_SEMAPHORE_H_
+#ifndef __ND_SEMAPHORE_H_
+#define __ND_SEMAPHORE_H_
 
 #include "ndCoreStdafx.h"
 

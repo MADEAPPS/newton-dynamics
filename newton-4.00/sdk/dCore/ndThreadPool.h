@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _D_THREAD_POOL_H_
-#define _D_THREAD_POOL_H_
+#ifndef __ND_THREAD_POOL_H_
+#define __ND_THREAD_POOL_H_
 
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"
