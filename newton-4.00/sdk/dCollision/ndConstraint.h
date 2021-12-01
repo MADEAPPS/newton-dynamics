@@ -254,7 +254,9 @@ class ndConstraint
 	dInt32 m_rowCount;
 	dInt32 m_rowStart;
 	dUnsigned8 m_active;
-	dUnsigned8 m_resting;
+	dUnsigned8 m_fence0;
+	dUnsigned8 m_fence1;
+	dUnsigned8 m_resting;   // this should be idnetial to m_fence0, should be removed. 
 	dUnsigned8 m_isInSkeletonLoop;
 	
 	protected:

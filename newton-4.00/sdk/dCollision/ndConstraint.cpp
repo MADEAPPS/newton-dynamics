@@ -33,6 +33,8 @@ ndConstraint::ndConstraint()
 	,m_rowCount(0)
 	,m_rowStart(0)
 	,m_active(1)
+	,m_fence0(0)
+	,m_fence1(0)
 	,m_resting(0)
 	,m_isInSkeletonLoop(0)
 {

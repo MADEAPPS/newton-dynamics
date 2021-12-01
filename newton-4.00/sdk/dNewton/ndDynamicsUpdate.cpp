@@ -426,7 +426,19 @@ void ndDynamicsUpdate::SortJointsScan()
 			sum += partialSum;
 		}
 	}
+
+if (xxxx == 100)
+{
+	XXXXXXXX();
+}
+
 	scene->SubmitJobs<ndSort0>(histogram);
+
+if (xxxx == 100)
+{
+	XXXXXXXX();
+}
+
 
 #ifdef _DEBUG
 	for (dInt32 i = 0; i < (jointArray.GetCount() - 1); i++)
@@ -487,6 +499,12 @@ void ndDynamicsUpdate::SortJointsScan()
 	GetTempInternalForces().SetCount(jointArray.GetCount() * 2);
 	GetJointBodyPairIndexBuffer().SetCount(jointArray.GetCount() * 2);
 	scene->CountingSort<ndConstraint*, 7, ndEvaluateCountRows>(&jointArray[0], (ndConstraint**)GetTempBuffer(), jointArray.GetCount(), 0);
+
+if (xxxx == 100)
+{
+	XXXXXXXX();
+}
+
 }
 
 void ndDynamicsUpdate::SortJoints()
@@ -1981,8 +1999,8 @@ void ndDynamicsUpdate::XXXXXXXX()
 	for (int i = 0; i < x.GetCount(); i++)
 	{
 		ndBodyKinematic* body = x[i];
-		dTrace(("index:%d w:%d e:%d f0:%d f1:%d  uniqueID:%d\n",
-			body->m_index, dInt32(body->m_weigh), body->m_equilibrium,
+		dTrace(("index:%d w:%d e:%d r:%d f0:%d f1:%d uniqueID:%d\n",
+			body->m_index, dInt32(body->m_weigh), body->m_equilibrium, body->m_resting,
 			body->m_isJointFence0, body->m_isJointFence1, body->m_uniqueId));
 	}
 
@@ -2004,19 +2022,23 @@ void ndDynamicsUpdate::Update()
 	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
 
-//xxxx++;
-//if (xxxx == 100)
-//{
-//	const dArray<ndBodyKinematic*>& x = m_world->GetScene()->GetActiveBodyArray();
-//	ndBodyKinematic* body = x[4];
-//	body->m_equilibrium = 0;
-//	body->m_veloc.m_z = 1.0f;
-//}
-//if (xxxx >= 102)
-//{
-////	XXXXXXXX();
-//}
+xxxx++;
+if (xxxx == 100)
+{
+	const dArray<ndBodyKinematic*>& x = m_world->GetScene()->GetActiveBodyArray();
+	ndBodyKinematic* body = x[4];
+	body->m_equilibrium = 0;
+	body->m_veloc.m_z = 1.0f;
+}
+
 	BuildIsland();
+
+if (xxxx == 100)
+{
+	XXXXXXXX();
+}
+
+
 	if (m_islands.GetCount())
 	{
 		IntegrateUnconstrainedBodies();
@@ -2213,11 +2235,11 @@ void ndDynamicsUpdate::SortJointsScan()
 					body1->m_isJointFence0 = body1->m_isStatic;
 				}
 
-				body0->m_bodyIsConstrained = 1;
+				//body0->m_bodyIsConstrained = 1;
 				body0->m_resting = body0->m_resting & isJointBoundary;
 				if (body1->m_invMass.m_w > dFloat32(0.0f))
 				{
-					body1->m_bodyIsConstrained = 1;
+				//	body1->m_bodyIsConstrained = 1;
 					body1->m_resting = body1->m_resting & isJointBoundary;
 				}
 			}
@@ -2285,9 +2307,14 @@ void ndDynamicsUpdate::SortJointsScan()
 				const dInt8 fence0 = body0->m_isJointFence0 & body1->m_isJointFence0;
 				const dInt8 fence1 = body0->m_isJointFence1 & body1->m_isJointFence1;
 
-				//const dInt8 isResting = body0->m_resting & body1->m_resting;
-				joint->m_resting = fence1;
-				dAssert((body0->m_resting & body1->m_resting) == fence1);
+				joint->m_fence0 = fence0;
+				joint->m_fence1 = fence1;
+				joint->m_resting = fence0;
+
+				body0->m_bodyIsConstrained = 1;
+				body1->m_bodyIsConstrained = !body1->m_isStatic;
+				
+				dAssert((body0->m_resting & body1->m_resting) == fence0);
 
 				fence0Count += !fence0;
 				fence1Count += !fence1;
@@ -2297,70 +2324,6 @@ void ndDynamicsUpdate::SortJointsScan()
 			fences.m_fence1[threadIndex] = fence1Count;
 		}
 	};
-
-	//class ndScan0 : public ndScene::ndBaseJob
-	//{
-	//	public:
-	//	virtual void Execute()
-	//	{
-	//		D_TRACKTIME();
-	//		ndWorld* const world = m_owner->GetWorld();
-	//		ndDynamicsUpdate* const me = world->m_solver;
-	//		ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
-	//		const dInt32 count = jointArray.GetCount();
-	//		const dInt32 threadIndex = GetThreadId();
-	//		const dInt32 threadCount = m_owner->GetThreadCount();
-	//		const dInt32 stride = count / threadCount;
-	//		const dInt32 start = threadIndex * stride;
-	//		const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
-	//
-	//		dInt32* const histogram = ((dInt32*)m_context) + 2 * threadIndex;
-	//		ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
-	//
-	//		histogram[0] = 0;
-	//		histogram[1] = 0;
-	//		for (dInt32 i = 0; i < blockSize; i++)
-	//		{
-	//			ndConstraint* const joint = jointArray[i + start];
-	//			sortBuffer[i + start] = joint;
-	//			ndBodyKinematic* const body0 = joint->GetBody0();
-	//			ndBodyKinematic* const body1 = joint->GetBody1();
-	//			const dInt32 key = body0->m_isJointFence1 & body1->m_isJointFence1;
-	//			histogram[key]++;
-	//		}
-	//	}
-	//};
-	//
-	//class ndSort0 : public ndScene::ndBaseJob
-	//{
-	//	public:
-	//	virtual void Execute()
-	//	{
-	//		D_TRACKTIME();
-	//		ndWorld* const world = m_owner->GetWorld();
-	//		ndDynamicsUpdate* const me = world->m_solver;
-	//		ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
-	//		const dInt32 count = jointArray.GetCount();
-	//		const dInt32 threadIndex = GetThreadId();
-	//		const dInt32 threadCount = m_owner->GetThreadCount();
-	//		const dInt32 stride = count / threadCount;
-	//		const dInt32 start = threadIndex * stride;
-	//		const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : count - start;
-	//
-	//		dInt32* const histogram = ((dInt32*)m_context) + 2 * threadIndex;
-	//		ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
-	//		for (dInt32 i = 0; i < blockSize; i++)
-	//		{
-	//			ndConstraint* const joint = sortBuffer[i + start];
-	//			ndBodyKinematic* const body0 = joint->GetBody0();
-	//			ndBodyKinematic* const body1 = joint->GetBody1();
-	//			const dInt32 key = body0->m_isJointFence1 & body1->m_isJointFence1;
-	//			const dInt32 entry = histogram[key];
-	//			jointArray[entry] = joint;
-	//			histogram[key] = entry + 1;
-	//		}
-	//	}
-	//};
 
 	class ndEvaluateCountRows
 	{
@@ -2399,10 +2362,7 @@ void ndDynamicsUpdate::SortJointsScan()
 
 		dUnsigned32 GetKey(const ndConstraint* const joint) const
 		{
-			//const ndBodyKinematic* const body0 = joint->GetBody0();
-			//const ndBodyKinematic* const body1 = joint->GetBody1();
-			//const ndSortKey key(joint->m_resting, joint->m_rowCount);
-			const ndSortKey key(1, 0, joint->m_resting);
+			const ndSortKey key(joint->m_rowCount, joint->m_fence0, joint->m_fence1);
 			return key.m_value;
 		}
 	};
@@ -2436,7 +2396,19 @@ void ndDynamicsUpdate::SortJointsScan()
 	ndFencesCount fenceCount;
 	scene->SubmitJobs<ndMarkFence0>();
 	scene->SubmitJobs<ndMarkFence1>();
+
+if (xxxx == 100)
+{
+	XXXXXXXX();
+}
+
 	scene->SubmitJobs<ndCountFences>(&fenceCount);
+
+if (xxxx == 100)
+{
+XXXXXXXX();
+}
+
 
 	dInt32 activeCount = 0;
 	dInt32 totalActiveCount = 0;
@@ -2459,20 +2431,34 @@ void ndDynamicsUpdate::SortJointsScan()
 	GetJointBodyPairIndexBuffer().SetCount(jointArray.GetCount() * 2);
 	scene->CountingSort<ndConstraint*, 7, ndEvaluateCountRows>(&jointArray[0], (ndConstraint**)GetTempBuffer(), jointArray.GetCount(), 0);
 
+if (xxxx == 100)
+{
+XXXXXXXX();
+}
+
+
 	#ifdef _DEBUG
 	for (dInt32 i = 0; i < (jointArray.GetCount() - 1); i++)
 	{
 		const ndConstraint* const joint0 = jointArray[i];
 		const ndConstraint* const joint1 = jointArray[i + 1];
-		const dInt32 key0 = (joint0->GetBody0()->m_isJointFence1 & joint0->GetBody1()->m_isJointFence1) ? 1 : 0;
-		const dInt32 key1 = (joint1->GetBody0()->m_isJointFence1 & joint1->GetBody1()->m_isJointFence1) ? 1 : 0;
+		const dInt32 joint0fence0 = joint0->GetBody0()->m_isJointFence0 & joint0->GetBody1()->m_isJointFence0;
+		const dInt32 joint0fence1 = joint0->GetBody0()->m_isJointFence1 & joint0->GetBody1()->m_isJointFence1;
+		const dInt32 joint1fence0 = joint1->GetBody0()->m_isJointFence0 & joint1->GetBody1()->m_isJointFence0;
+		const dInt32 joint1fence1 = joint1->GetBody0()->m_isJointFence1 & joint1->GetBody1()->m_isJointFence1;
+		dAssert(joint0fence0 == joint0->m_fence0);
+		dAssert(joint0fence1 == joint0->m_fence1);
+		dAssert(joint1fence0 == joint1->m_fence0);
+		dAssert(joint1fence1 == joint1->m_fence1);
+
+		const dInt32 key0 = joint0->m_fence1 * 2 + joint0->m_fence0;
+		const dInt32 key1 = joint1->m_fence1 * 2 + joint1->m_fence0;
 		dAssert(key0 <= key1);
 	}
 	#endif
-	
-	dAssert(m_activeJointCount <= jointArray.GetCount());
-	jointArray.SetCount(m_activeJointCount);
-	for (dInt32 i = jointArray.GetCount() - 1; i >= 0; i--)
+
+	//for (dInt32 i = jointArray.GetCount() - 1; i >= 0; i--)
+	for (dInt32 i = totalActiveCount-1; i >= 0; i--)
 	{
 		ndConstraint* const joint = jointArray[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
@@ -2512,9 +2498,11 @@ void ndDynamicsUpdate::SortJointsScan()
 			}
 		}
 	}
-	
-	jointArray.SetCount(totalActiveCount);
+
+	dAssert(activeCount <= totalActiveCount);
+	dAssert(totalActiveCount <= jointArray.GetCount());
 	m_activeJointCount = activeCount;
+	jointArray.SetCount(totalActiveCount);
 }
 
 void ndDynamicsUpdate::SortJoints()
@@ -4003,8 +3991,8 @@ void ndDynamicsUpdate::XXXXXXXX()
 	for (int i = 0; i < x.GetCount(); i++)
 	{
 		ndBodyKinematic* body = x[i];
-		dTrace(("index:%d w:%d e:%d f0:%d f1:%d  uniqueID:%d\n",
-			body->m_index, dInt32(body->m_weigh), body->m_equilibrium,
+		dTrace(("index:%d w:%d e:%d r:%d f0:%d f1:%d uniqueID:%d\n",
+			body->m_index, dInt32(body->m_weigh), body->m_equilibrium, body->m_resting,
 			body->m_isJointFence0, body->m_isJointFence1, body->m_uniqueId));
 	}
 
@@ -4036,6 +4024,12 @@ if (xxxx == 100)
 }
 
 	BuildIsland();
+
+if (xxxx == 100)
+{
+	XXXXXXXX();
+}
+
 	if (m_islands.GetCount())
 	{
 		IntegrateUnconstrainedBodies();
