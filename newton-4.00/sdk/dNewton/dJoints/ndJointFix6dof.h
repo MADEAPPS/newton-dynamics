@@ -9,8 +9,8 @@
 * freely
 */
 
-#ifndef __D_JOINT_FIX_6DOF_H_
-#define __D_JOINT_FIX_6DOF_H_
+#ifndef __ND_JOINT_FIX_6DOF_H_
+#define __ND_JOINT_FIX_6DOF_H_
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"

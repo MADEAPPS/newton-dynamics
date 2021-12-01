@@ -20,10 +20,10 @@
 */
 
 
-#ifndef _D_COLLISION_STDAFX_H__
-#define _D_COLLISION_STDAFX_H__
+#ifndef _ND_COLLISION_STDAFX_H__
+#define _ND_COLLISION_STDAFX_H__
 
-#include <dCore.h>
+#include <ndCore.h>
 
 #ifdef _D_COLLISION_DLL
 	#ifdef _D_COLLISION_EXPORT_DLL

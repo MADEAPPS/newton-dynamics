@@ -19,12 +19,12 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dCoreStdafx.h"
+#include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
-#include "dSort.h"
-#include "dStack.h"
-#include "dVector.h"
-#include "dMatrix.h"
+#include "ndSort.h"
+#include "ndStack.h"
+#include "ndVector.h"
+#include "ndMatrix.h"
 #include "ndShape.h"
 #include "ndMeshEffect.h"
 #include "ndShapeInstance.h"

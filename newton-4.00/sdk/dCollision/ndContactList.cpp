@@ -20,7 +20,7 @@
 */
 
 
-#include "dCoreStdafx.h"
+#include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndContact.h"
 #include "ndContactList.h"

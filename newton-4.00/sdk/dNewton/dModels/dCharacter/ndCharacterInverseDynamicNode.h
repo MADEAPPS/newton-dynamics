@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CHARACTER_INVERSE_DYNAMICS_NODE_H__
-#define __D_CHARACTER_INVERSE_DYNAMICS_NODE_H__
+#ifndef __ND_CHARACTER_INVERSE_DYNAMICS_NODE_H__
+#define __ND_CHARACTER_INVERSE_DYNAMICS_NODE_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndCharacterNode.h"

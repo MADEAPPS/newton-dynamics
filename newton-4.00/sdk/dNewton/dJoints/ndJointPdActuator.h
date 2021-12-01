@@ -9,8 +9,8 @@
 * freely
 */
 
-#ifndef __D_JOINT_PID_3DOF_ACTUATOR_H__
-#define __D_JOINT_PID_3DOF_ACTUATOR_H__
+#ifndef __ND_JOINT_PID_3DOF_ACTUATOR_H__
+#define __ND_JOINT_PID_3DOF_ACTUATOR_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"

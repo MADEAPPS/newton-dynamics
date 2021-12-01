@@ -9,8 +9,8 @@
 * freely
 */
 
-#ifndef __D_JOINT_ATTACHEMENT_POINT_H_
-#define __D_JOINT_ATTACHEMENT_POINT_H_
+#ifndef __ND_JOINT_ATTACHEMENT_POINT_H_
+#define __ND_JOINT_ATTACHEMENT_POINT_H_
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"

@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_MODEL_H__
-#define __D_MODEL_H__
+#ifndef __ND_MODEL_H__
+#define __ND_MODEL_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndModelList.h"

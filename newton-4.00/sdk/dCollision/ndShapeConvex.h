@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_SHAPE_CONVEX_H__
-#define __D_SHAPE_CONVEX_H__
+#ifndef __ND_SHAPE_CONVEX_H__
+#define __ND_SHAPE_CONVEX_H__
 
 #include "ndCollisionStdafx.h"
 #include "ndShape.h"

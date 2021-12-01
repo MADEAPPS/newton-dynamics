@@ -10,8 +10,8 @@
 */
 
 
-#ifndef __D_JOINT_DRY_ROLLING_FRICTION_H_
-#define __D_JOINT_DRY_ROLLING_FRICTION_H_
+#ifndef __ND_JOINT_DRY_ROLLING_FRICTION_H_
+#define __ND_JOINT_DRY_ROLLING_FRICTION_H_
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"

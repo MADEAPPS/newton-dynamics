@@ -27,7 +27,7 @@
 #ifndef _D_COLLISION_H__
 #define _D_COLLISION_H__
 
-#include <dCore.h>
+#include <ndCore.h>
 #include <ndCollisionStdafx.h>
 #include <ndBody.h>
 #include <ndScene.h>

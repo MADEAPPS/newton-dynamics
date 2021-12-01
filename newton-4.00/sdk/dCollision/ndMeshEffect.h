@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_MESH_EFFECT_H__
-#define __D_MESH_EFFECT_H__
+#ifndef __ND_MESH_EFFECT_H__
+#define __ND_MESH_EFFECT_H__
 
 #include "ndCollisionStdafx.h"
 

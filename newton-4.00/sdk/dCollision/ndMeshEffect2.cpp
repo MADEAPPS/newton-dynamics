@@ -19,14 +19,14 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dCoreStdafx.h"
+#include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
-#include "dStack.h"
-#include "dMatrix.h"
+#include "ndStack.h"
+#include "ndMatrix.h"
 #include "ndMeshEffect.h"
-#include "dConvexHull3d.h"
-#include "dConvexHull4d.h"
-#include "dDelaunayTetrahedralization.h"
+#include "ndConvexHull3d.h"
+#include "ndConvexHull4d.h"
+#include "ndDelaunayTetrahedralization.h"
 
 //#include "dgCollisionConvexHull.h"
 

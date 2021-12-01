@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_BODY_PARTICLE_SET_H__
-#define __D_BODY_PARTICLE_SET_H__
+#ifndef __ND_BODY_PARTICLE_SET_H__
+#define __ND_BODY_PARTICLE_SET_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndBodyParticleSetList.h"

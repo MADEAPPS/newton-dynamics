@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CONTACT_H__
-#define __D_CONTACT_H__
+#ifndef __ND_CONTACT_H__
+#define __ND_CONTACT_H__
 
 #include "ndCollisionStdafx.h"
 #include "ndConstraint.h"

@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_SHAPE_CONE_H__
-#define __D_SHAPE_CONE_H__
+#ifndef __ND_SHAPE_CONE_H__
+#define __ND_SHAPE_CONE_H__
 
 #include "ndShapeConvex.h"
 

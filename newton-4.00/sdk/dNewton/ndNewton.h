@@ -27,7 +27,7 @@
 #ifndef _D_NEWTON_H__
 #define _D_NEWTON_H__
 
-#include <dCore.h>
+#include <ndCore.h>
 #include <ndNewtonStdafx.h>
 #include <ndBody.h>
 #include <ndShape.h>

@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_MULTIBODY_VEHICLE_DIFFERENTIAL_AXLE_H__
-#define __D_MULTIBODY_VEHICLE_DIFFERENTIAL_AXLE_H__
+#ifndef __ND_MULTIBODY_VEHICLE_DIFFERENTIAL_AXLE_H__
+#define __ND_MULTIBODY_VEHICLE_DIFFERENTIAL_AXLE_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"

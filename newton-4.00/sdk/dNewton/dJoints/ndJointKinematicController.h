@@ -13,8 +13,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __D_JOINT_KINEMATIC_CONTROLLER_H__
-#define __D_JOINT_KINEMATIC_CONTROLLER_H__
+#ifndef __ND_JOINT_KINEMATIC_CONTROLLER_H__
+#define __ND_JOINT_KINEMATIC_CONTROLLER_H__
 
 
 #include "ndNewtonStdafx.h"

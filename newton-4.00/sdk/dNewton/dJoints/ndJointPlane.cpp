@@ -9,7 +9,7 @@
 * freely
 */
 
-#include "dCoreStdafx.h"
+#include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndJointPlane.h"
 

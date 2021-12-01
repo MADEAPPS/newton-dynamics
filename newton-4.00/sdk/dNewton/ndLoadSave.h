@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_ND_LOAD_SAVE_H__
-#define __D_ND_LOAD_SAVE_H__
+#ifndef __ND_ND_LOAD_SAVE_H__
+#define __ND_ND_LOAD_SAVE_H__
 
 #include "ndNewtonStdafx.h"
 

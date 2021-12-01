@@ -33,10 +33,10 @@
 // by Bruno Lévy Sylvain Petitjean Nicolas Ray Jérome Maillot
 // for automatic seam and atlas generation 
 
-#include "dCoreStdafx.h"
+#include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
-#include "dStack.h"
-#include "dMatrix.h"
+#include "ndStack.h"
+#include "ndMatrix.h"
 #include "ndMeshEffect.h"
 //#include "dgWorld.h"
 //#include "ndMeshEffect.h"

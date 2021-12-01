@@ -19,7 +19,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dCoreStdafx.h"
+#include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndJointWheel.h"
 #include "ndMultiBodyVehicle.h"

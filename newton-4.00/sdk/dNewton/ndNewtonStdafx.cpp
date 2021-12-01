@@ -19,7 +19,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dCoreStdafx.h"
+#include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 
 #if defined (_D_NEWTON_DLL) && !defined (_D_SINGLE_LIBRARY)

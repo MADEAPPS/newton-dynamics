@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_COLLISION_CONVEX_POLYGON_H__
-#define __D_COLLISION_CONVEX_POLYGON_H__
+#ifndef __ND_COLLISION_CONVEX_POLYGON_H__
+#define __ND_COLLISION_CONVEX_POLYGON_H__
 
 #include "ndShapeConvex.h"
 class ndShapeInstance;

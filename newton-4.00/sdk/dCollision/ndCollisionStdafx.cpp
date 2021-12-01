@@ -19,7 +19,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dCoreStdafx.h"
+#include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 
 #if defined (_D_COLLISION_DLL) && !defined (_D_SINGLE_LIBRARY)

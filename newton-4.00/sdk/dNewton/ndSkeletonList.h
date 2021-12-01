@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_SKELETON_LIST_H__
-#define __D_SKELETON_LIST_H__
+#ifndef __ND_SKELETON_LIST_H__
+#define __ND_SKELETON_LIST_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndSkeletonContainer.h"

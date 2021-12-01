@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_BODIES_IN_AABB_NOTYFY_H__
-#define __D_BODIES_IN_AABB_NOTYFY_H__
+#ifndef __ND_BODIES_IN_AABB_NOTIFY_H__
+#define __ND_BODIES_IN_AABB_NOTIFY_H__
 
 #include "ndCollisionStdafx.h"
 
