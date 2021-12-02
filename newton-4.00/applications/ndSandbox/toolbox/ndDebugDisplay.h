@@ -14,8 +14,6 @@
 #define __DEBUG_DISPLAY_H__
 
 #include "ndSandboxStdafx.h"
-#include <ndVector.h>
-#include <ndMatrix.h>
 
 class ndDemoEntityManager;
 
