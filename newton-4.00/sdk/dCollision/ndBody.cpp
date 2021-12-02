@@ -45,10 +45,10 @@ ndBody::ndBody()
 	,m_equilibrium(0)
 	,m_isJointFence0(0)
 	,m_isJointFence1(0)
+	,m_bodyIsConstrained(0)
 //#ifdef ISLAND_SOLVER
 	,m_resting(0)
 	,m_islandSleep(0)
-	,m_bodyIsConstrained(0)
 //#endif
 {
 	m_uniqueIdCount++;
@@ -73,10 +73,10 @@ ndBody::ndBody(const dLoadSaveBase::dLoadDescriptor& desc)
 	,m_equilibrium(0)
 	,m_isJointFence0(0)
 	,m_isJointFence1(0)
+	,m_bodyIsConstrained(0)
 //#ifdef ISLAND_SOLVER
 	,m_resting(0)
 	,m_islandSleep(0)
-	,m_bodyIsConstrained(0)
 //#endif
 {
 	m_uniqueIdCount++;

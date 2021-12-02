@@ -1269,7 +1269,6 @@ void ndScene::BuildBodyArray()
 			for (dInt32 j = 0; j < blockSize; j++)
 			{
 				ndBodyKinematic* const body = bodyArrayBuffer[j + start];
-				//body->m_bodyIsConstrained = 0;
 				const ndShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
 				if (!shape)
 				{

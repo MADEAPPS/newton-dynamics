@@ -256,8 +256,8 @@ class ndDynamicsUpdate : public dClassAlloc
 		public:
 		ndIsland(ndBodyKinematic* const root)
 			:m_start(0)
-			, m_count(0)
-			, m_root(root)
+			,m_count(0)
+			,m_root(root)
 		{
 		}
 
@@ -276,6 +276,7 @@ class ndDynamicsUpdate : public dClassAlloc
 	void ClearBuffer(void* const buffer, dInt32 sizeInByte) const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
 
+	dArray<dInt32>& GetActiveBodyArray();
 	dArray<ndJacobian>& GetInternalForces();
 	dArray<ndLeftHandSide>& GetLeftHandSide();
 	dArray<dInt32>& GetJointForceIndexBuffer();
@@ -316,6 +317,7 @@ class ndDynamicsUpdate : public dClassAlloc
 
 	dVector m_velocTol;
 	dArray<ndIsland> m_islands;
+	dArray<dInt32> m_activeBodyArray;
 	dArray<dInt32> m_jointForcesIndex;
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndLeftHandSide> m_leftHandSide;
@@ -333,6 +335,7 @@ class ndDynamicsUpdate : public dClassAlloc
 	dFloat32 m_invTimestepRK;
 	dUnsigned32 m_solverPasses;
 	dInt32 m_activeJointCount;
+	dInt32 m_constrainedBodyCount;
 	dInt32 m_unConstrainedBodyCount;
 
 	friend class ndWorld;
@@ -353,17 +356,22 @@ inline dArray<ndJacobian>& ndDynamicsUpdate::GetTempInternalForces()
 	return m_tempInternalForces;
 }
 
-inline  dArray<ndLeftHandSide>& ndDynamicsUpdate::GetLeftHandSide()
+inline dArray<ndLeftHandSide>& ndDynamicsUpdate::GetLeftHandSide()
 {
 	return m_leftHandSide;
 }
 
-inline  dArray<ndRightHandSide>& ndDynamicsUpdate::GetRightHandSide()
+inline dArray<ndRightHandSide>& ndDynamicsUpdate::GetRightHandSide()
 {
 	return m_rightHandSide;
 }
 
-inline  dArray<ndBodyKinematic*>& ndDynamicsUpdate::GetBodyIslandOrder()
+inline dArray<dInt32>& ndDynamicsUpdate::GetActiveBodyArray()
+{
+	return m_activeBodyArray;
+}
+
+inline dArray<ndBodyKinematic*>& ndDynamicsUpdate::GetBodyIslandOrder()
 {
 	return m_bodyIslandOrder;
 }
@@ -382,7 +390,6 @@ inline dArray<dInt32>& ndDynamicsUpdate::GetJointForceIndexBuffer()
 {
 	return m_jointForcesIndex;
 }
-
 
 inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const
 {

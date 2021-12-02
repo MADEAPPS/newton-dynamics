@@ -121,11 +121,11 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 	dUnsigned8 m_equilibrium;
 	dUnsigned8 m_isJointFence0;
 	dUnsigned8 m_isJointFence1;
+	dUnsigned8 m_bodyIsConstrained : 1;
 
 //#ifdef ISLAND_SOLVER
 	dUnsigned8 m_resting : 1;
 	dUnsigned8 m_islandSleep : 1;
-	dUnsigned8 m_bodyIsConstrained : 1;
 //#endif
 
 	D_COLLISION_API static dUnsigned32 m_uniqueIdCount;
