@@ -57,6 +57,10 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API void SetForce(const dVector& force);
 	D_NEWTON_API void SetTorque(const dVector& torque);
 
+	D_NEWTON_API void AddImpulse(const dVector& pointVeloc, const dVector& pointPosit, dFloat32 timestep);
+	D_NEWTON_API void ApplyImpulsePair(const dVector& linearImpulse, const dVector& angularImpulse, dFloat32 timestep);
+	D_NEWTON_API void ApplyImpulsesAtPoint(dInt32 count, const dVector* const impulseArray, const dVector* const pointArray, dFloat32 timestep);
+
 	D_NEWTON_API dFloat32 GetLinearDamping() const;
 	D_NEWTON_API void SetLinearDamping(dFloat32 linearDamp);
 

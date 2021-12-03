@@ -150,6 +150,10 @@ class ndBodyKinematic: public ndBody
 	virtual void SetForce(const dVector& force);
 	virtual void SetTorque(const dVector& torque);
 
+	virtual void AddImpulse(const dVector& pointVeloc, const dVector& pointPosit, dFloat32 timestep);
+	virtual void ApplyImpulsePair(const dVector& linearImpulse, const dVector& angularImpulse, dFloat32 timestep);
+	virtual void ApplyImpulsesAtPoint(dInt32 count, const dVector* const impulseArray, const dVector* const pointArray, dFloat32 timestep);
+
 	dVector GetAccel() const;
 	dVector GetAlpha() const;
 	void SetAccel(const dVector& accel);
@@ -481,6 +485,17 @@ inline void ndBodyKinematic::UpdateInvInertiaMatrix()
 	dAssert(m_invWorldInertiaMatrix[3][3] == dFloat32(1.0f));
 }
 
+inline void ndBodyKinematic::AddImpulse(const dVector&, const dVector&, dFloat32)
+{
+}
+
+inline void ndBodyKinematic::ApplyImpulsePair(const dVector&, const dVector&, dFloat32)
+{
+}
+
+inline void ndBodyKinematic::ApplyImpulsesAtPoint(dInt32, const dVector* const, const dVector* const, dFloat32)
+{
+}
 
 #endif 
 

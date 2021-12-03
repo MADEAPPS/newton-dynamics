@@ -124,6 +124,107 @@ void ndBodyDynamic::ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep)
 	m_impulseTorque = dVector::m_zero;
 }
 
+void ndBodyDynamic::AddImpulse(const dVector& pointDeltaVeloc, const dVector& pointPosit, dFloat32 timestep)
+{
+	dMatrix invInertia(CalculateInvInertiaMatrix());
+
+	// get contact matrix
+	dMatrix tmp;
+	dVector globalContact(pointPosit - m_globalCentreOfMass);
+
+	tmp[0][0] = dFloat32(0.0f);
+	tmp[0][1] = +globalContact[2];
+	tmp[0][2] = -globalContact[1];
+	tmp[0][3] = dFloat32(0.0f);
+
+	tmp[1][0] = -globalContact[2];
+	tmp[1][1] = dFloat32(0.0f);
+	tmp[1][2] = +globalContact[0];
+	tmp[1][3] = dFloat32(0.0f);
+
+	tmp[2][0] = +globalContact[1];
+	tmp[2][1] = -globalContact[0];
+	tmp[2][2] = dFloat32(0.0f);
+	tmp[2][3] = dFloat32(0.0f);
+
+	tmp[3][0] = dFloat32(0.0f);
+	tmp[3][1] = dFloat32(0.0f);
+	tmp[3][2] = dFloat32(0.0f);
+	tmp[3][3] = dFloat32(1.0f);
+
+	dMatrix contactMatrix(tmp * invInertia * tmp);
+	//for (dInt32 i = 0; i < 3; i++) 
+	//{
+	//	for (dInt32 j = 0; j < 3; j++) 
+	//	{
+	//		contactMatrix[i][j] *= -dFloat32(1.0f);
+	//	}
+	//}
+	contactMatrix[0] = contactMatrix[0] * dVector::m_negOne;
+	contactMatrix[1] = contactMatrix[1] * dVector::m_negOne;
+	contactMatrix[2] = contactMatrix[2] * dVector::m_negOne;
+	contactMatrix[0][0] += m_invMass.m_w;
+	contactMatrix[1][1] += m_invMass.m_w;
+	contactMatrix[2][2] += m_invMass.m_w;
+
+	contactMatrix = contactMatrix.Inverse4x4();
+
+	// change of momentum
+	dVector changeOfMomentum(contactMatrix.RotateVector(pointDeltaVeloc));
+
+	if (changeOfMomentum.DotProduct(changeOfMomentum).GetScalar() > dFloat32(1.0e-6f))
+	{
+		m_impulseForce += changeOfMomentum.Scale(1.0f / timestep);
+		m_impulseTorque += globalContact.CrossProduct(m_impulseForce);
+
+		m_equilibrium = false;
+		//Unfreeze();
+	}
+}
+
+void ndBodyDynamic::ApplyImpulsePair(const dVector& linearImpulse, const dVector& angularImpulse, dFloat32 timestep)
+{
+	dAssert(linearImpulse.m_w == dFloat32(0.0f));
+	dAssert(angularImpulse.m_w == dFloat32(0.0f));
+	if ((linearImpulse.DotProduct(linearImpulse).GetScalar() > dFloat32(1.0e-6f)) ||
+		(angularImpulse.DotProduct(angularImpulse).GetScalar() > dFloat32(1.0e-6f))) 
+	{
+		m_impulseForce += linearImpulse.Scale(1.0f / timestep);
+		m_impulseTorque += angularImpulse.Scale(1.0f / timestep);
+
+		m_equilibrium = false;
+	}
+}
+
+void ndBodyDynamic::ApplyImpulsesAtPoint(dInt32 count, const dVector* const impulseArray, const dVector* const pointArray, dFloat32 timestep)
+{
+	dVector impulse(dVector::m_zero);
+	dVector angularImpulse(dVector::m_zero);
+
+	dVector com(m_globalCentreOfMass);
+	for (dInt32 i = 0; i < count; i++) 
+	{
+		dVector r(pointArray[i]);
+		dVector L(impulseArray[i]);
+		dVector Q((r - com).CrossProduct(L));
+
+		impulse += L;
+		angularImpulse += Q;
+	}
+
+	impulse = impulse & dVector::m_triplexMask;
+	angularImpulse = angularImpulse & dVector::m_triplexMask;
+
+	if ((impulse.DotProduct(impulse).GetScalar() > dFloat32(1.0e-6f)) ||
+		(angularImpulse.DotProduct(angularImpulse).GetScalar() > dFloat32(1.0e-6f))) 
+	{
+		m_impulseForce += impulse.Scale(1.0f / timestep);
+		m_impulseTorque += angularImpulse.Scale(1.0f / timestep);
+
+		m_equilibrium = false;
+	}
+}
+
 void ndBodyDynamic::SetLinearDamping(dFloat32 linearDamp)
 {
 	linearDamp = dClamp(linearDamp, dFloat32(0.0f), dFloat32(1.0f));
