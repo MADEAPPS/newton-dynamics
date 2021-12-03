@@ -239,7 +239,7 @@ class ndDynamicsUpdate : public dClassAlloc
 	public:
 	class ndJointBodyPairIndex
 	{
-	public:
+		public:
 		dInt32 m_body;
 		dInt32 m_joint;
 	};
@@ -272,6 +272,8 @@ class ndDynamicsUpdate : public dClassAlloc
 
 	void* GetTempBuffer() const;
 	virtual const char* GetStringId() const;
+
+	dInt32 GetConstrainedBodyCount() const;
 	dInt32 GetUnconstrainedBodyCount() const;
 	void ClearBuffer(void* const buffer, dInt32 sizeInByte) const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
@@ -374,6 +376,11 @@ inline dArray<dInt32>& ndDynamicsUpdate::GetActiveBodyArray()
 inline dArray<ndBodyKinematic*>& ndDynamicsUpdate::GetBodyIslandOrder()
 {
 	return m_bodyIslandOrder;
+}
+
+inline dInt32 ndDynamicsUpdate::GetConstrainedBodyCount() const
+{
+	return m_constrainedBodyCount;
 }
 
 inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
