@@ -107,6 +107,7 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 		dUnsigned32 m_flags;
 		struct
 		{
+			dUnsigned32 m_isDynamics : 1;
 			dUnsigned32 m_skeletonMark : 1;
 			dUnsigned32 m_skeletonMark0 : 1;
 			dUnsigned32 m_skeletonMark1 : 1;

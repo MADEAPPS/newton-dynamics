@@ -150,6 +150,9 @@ class ndBodyKinematic: public ndBody
 	virtual void SetForce(const dVector& force);
 	virtual void SetTorque(const dVector& torque);
 
+	virtual void IntegrateGyroSubstep(const dVector& timestep);
+	virtual ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep) const;
+
 	virtual void AddImpulse(const dVector& pointVeloc, const dVector& pointPosit, dFloat32 timestep);
 	virtual void ApplyImpulsePair(const dVector& linearImpulse, const dVector& angularImpulse, dFloat32 timestep);
 	virtual void ApplyImpulsesAtPoint(dInt32 count, const dVector* const impulseArray, const dVector* const pointArray, dFloat32 timestep);
@@ -483,6 +486,18 @@ inline void ndBodyKinematic::UpdateInvInertiaMatrix()
 	dAssert(m_invWorldInertiaMatrix[1][3] == dFloat32(0.0f));
 	dAssert(m_invWorldInertiaMatrix[2][3] == dFloat32(0.0f));
 	dAssert(m_invWorldInertiaMatrix[3][3] == dFloat32(1.0f));
+}
+
+inline void ndBodyKinematic::IntegrateGyroSubstep(const dVector&)
+{
+}
+
+inline ndJacobian ndBodyKinematic::IntegrateForceAndToque(const dVector&, const dVector&, const dVector&) const
+{
+	ndJacobian step;
+	step.m_linear = dVector::m_zero;
+	step.m_angular = dVector::m_zero;
+	return step;
 }
 
 inline void ndBodyKinematic::AddImpulse(const dVector&, const dVector&, dFloat32)

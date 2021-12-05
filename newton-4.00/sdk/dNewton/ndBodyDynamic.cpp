@@ -38,6 +38,7 @@ ndBodyDynamic::ndBodyDynamic()
 	,m_cachedDampCoef(dVector::m_zero)
 	,m_cachedTimeStep(dFloat32 (0.0f))
 {
+	m_isDynamics = 1;
 }
 
 ndBodyDynamic::ndBodyDynamic(const dLoadSaveBase::dLoadDescriptor& desc)
@@ -54,6 +55,7 @@ ndBodyDynamic::ndBodyDynamic(const dLoadSaveBase::dLoadDescriptor& desc)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
+	m_isDynamics = 1;
 	m_dampCoef = xmlGetVector3(xmlNode, "angularDampCoef");
 	m_dampCoef.m_w = xmlGetFloat(xmlNode, "linearDampCoef");
 }

@@ -681,12 +681,13 @@ void ndDynamicsUpdateSoa::IntegrateUnconstrainedBodies()
 		}
 	};
 
-	if (GetUnconstrainedBodyCount())
-	{
-		D_TRACKTIME();
-		ndScene* const scene = m_world->GetScene();
-		scene->SubmitJobs<ndIntegrateUnconstrainedBodies>();
-	}
+	dAssert(0);
+	//if (GetUnconstrainedBodyCount())
+	//{
+	//	D_TRACKTIME();
+	//	ndScene* const scene = m_world->GetScene();
+	//	scene->SubmitJobs<ndIntegrateUnconstrainedBodies>();
+	//}
 }
 
 void ndDynamicsUpdateSoa::IntegrateBodies()

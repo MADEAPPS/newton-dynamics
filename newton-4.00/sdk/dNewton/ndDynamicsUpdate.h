@@ -237,6 +237,13 @@ D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate : public dClassAlloc
 {
 	public:
+	class ndSpan
+	{
+		public:
+		dInt32 m_start;
+		dInt32 m_count;
+	};
+
 	class ndJointBodyPairIndex
 	{
 		public:
@@ -273,8 +280,7 @@ class ndDynamicsUpdate : public dClassAlloc
 	void* GetTempBuffer() const;
 	virtual const char* GetStringId() const;
 
-	dInt32 GetConstrainedBodyCount() const;
-	dInt32 GetUnconstrainedBodyCount() const;
+	dInt32 GetActiveJointCount() const;
 	void ClearBuffer(void* const buffer, dInt32 sizeInByte) const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
 
@@ -318,14 +324,14 @@ class ndDynamicsUpdate : public dClassAlloc
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
 	dVector m_velocTol;
-	dArray<ndIsland> m_islands;
+	dArray<ndIsland> m_islands; // to be removed
 	dArray<dInt32> m_activeBodyArray;
 	dArray<dInt32> m_jointForcesIndex;
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
 	dArray<ndJacobian> m_tempInternalForces;
-	dArray<ndBodyKinematic*> m_bodyIslandOrder;
+	dArray<ndBodyKinematic*> m_bodyIslandOrder;  // to be removed
 	dArray<ndJointBodyPairIndex> m_jointBodyPairIndexBuffer;
 
 	ndWorld* m_world;
@@ -335,10 +341,14 @@ class ndDynamicsUpdate : public dClassAlloc
 	dFloat32 m_invStepRK;
 	dFloat32 m_timestepRK;
 	dFloat32 m_invTimestepRK;
-	dUnsigned32 m_solverPasses;
+	dInt32 m_solverPasses;
 	dInt32 m_activeJointCount;
-	dInt32 m_constrainedBodyCount;
-	dInt32 m_unConstrainedBodyCount;
+	//dInt32 m_constrainedBodyCount____;
+	dInt32 m_unConstrainedBodyCount____;
+
+	ndSpan m_activeBodyCount;
+	ndSpan m_constrainedBodyCount_;
+	ndSpan m_unConstrainedBodyCount_;
 
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
@@ -378,14 +388,9 @@ inline dArray<ndBodyKinematic*>& ndDynamicsUpdate::GetBodyIslandOrder()
 	return m_bodyIslandOrder;
 }
 
-inline dInt32 ndDynamicsUpdate::GetConstrainedBodyCount() const
+inline dInt32 ndDynamicsUpdate::GetActiveJointCount() const
 {
-	return m_constrainedBodyCount;
-}
-
-inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
-{
-	return m_unConstrainedBodyCount;
+	return m_activeJointCount;
 }
 
 inline dArray<ndDynamicsUpdate::ndJointBodyPairIndex>& ndDynamicsUpdate::GetJointBodyPairIndexBuffer()

@@ -70,8 +70,8 @@ class ndBodyDynamic: public ndBodyKinematic
 	virtual dVector GetForce() const;
 	virtual dVector GetTorque() const;
 	
-	void IntegrateGyroSubstep(const dVector& timestep);
-	ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep) const;
+	virtual void IntegrateGyroSubstep(const dVector& timestep);
+	virtual ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep) const;
 
 	void SaveExternalForces();
 
