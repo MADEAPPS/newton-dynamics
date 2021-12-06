@@ -2523,19 +2523,7 @@ void ndDynamicsUpdate::SortJointsScan()
 	ndFencesCount fenceCount;
 	scene->SubmitJobs<ndMarkFence0>();
 	scene->SubmitJobs<ndMarkFence1>();
-
-if (xxxx == 100)
-{
-	XXXXXXXX();
-}
-
 	scene->SubmitJobs<ndSetStateFlags>(&fenceCount);
-
-if (xxxx == 100)
-{
-XXXXXXXX();
-}
-
 
 	dInt32 activeCount = 0;
 	dInt32 totalActiveCount = 0;
@@ -2557,12 +2545,6 @@ XXXXXXXX();
 	GetTempInternalForces().SetCount(jointArray.GetCount() * 2);
 	GetJointBodyPairIndexBuffer().SetCount(jointArray.GetCount() * 2);
 	scene->CountingSort<ndConstraint*, 7, ndEvaluateCountRows>(&jointArray[0], (ndConstraint**)GetTempBuffer(), jointArray.GetCount(), 0);
-
-if (xxxx == 100)
-{
-XXXXXXXX();
-}
-
 
 	#ifdef _DEBUG
 	for (dInt32 i = 0; i < (jointArray.GetCount() - 1); i++)
@@ -4253,18 +4235,16 @@ if (xxxx == 100)
 }
 
 	BuildIsland();
+if (xxxx >= 100)
+{
+XXXXXXXX();
+}
 
 
 	if (m_islands.GetCount())
 	{
 		IntegrateUnconstrainedBodies();
 		InitWeights();
-
-if (xxxx == 100)
-{
-	//XXXXXXXX();
-}
-
 		InitBodyArray();
 		InitJacobianMatrix();
 		CalculateForces();
