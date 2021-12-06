@@ -346,10 +346,11 @@ class ndDynamicsUpdate : public dClassAlloc
 	//dInt32 m_constrainedBodyCount____;
 	dInt32 m_unConstrainedBodyCount____;
 
+	ndSpan m_totalBodyCount;
 	ndSpan m_activeBodyCount;
-	ndSpan m_constrainedBodyCount_;
-	ndSpan m_unConstrainedBodyCount_;
-
+	ndSpan m_constrainedBodyCount;
+	ndSpan m_unConstrainedBodyCount;
+	
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
 
