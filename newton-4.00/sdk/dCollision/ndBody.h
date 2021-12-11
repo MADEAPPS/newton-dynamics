@@ -120,13 +120,13 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	dUnsigned8 m_isStatic;
 	dUnsigned8 m_autoSleep;
 	dUnsigned8 m_equilibrium;
+	dUnsigned8 m_equilibrium0;
 	dUnsigned8 m_isJointFence0;
 	dUnsigned8 m_isJointFence1;
 	dUnsigned8 m_bodyIsConstrained;
 
 //#ifdef ISLAND_SOLVER
-	dUnsigned8 m_resting : 1;
-	dUnsigned8 m_islandSleep : 1;
+	dUnsigned8 m_islandSleep;
 //#endif
 
 	D_COLLISION_API static dUnsigned32 m_uniqueIdCount;

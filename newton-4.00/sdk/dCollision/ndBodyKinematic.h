@@ -388,7 +388,7 @@ inline void ndBodyKinematic::PrepareStep(dInt32 index)
 	m_bodyIsConstrained = 0;
 
 //#ifdef USE_ISLAND_SOLVER
-	m_resting = 1;
+	m_equilibrium0 = 1;
 	m_islandSleep = m_equilibrium;
 //#endif
 }
