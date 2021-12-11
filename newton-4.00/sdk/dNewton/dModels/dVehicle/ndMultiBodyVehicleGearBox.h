@@ -31,7 +31,7 @@ class ndMultiBodyVehicleGearBox : public ndJointGear
 {
 	public: 
 	D_CLASS_REFLECTION(ndMultiBodyVehicleGearBox);
-	D_NEWTON_API ndMultiBodyVehicleGearBox(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndMultiBodyVehicleGearBox(const ndLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, ndMultiBodyVehicle* const chassis);
 
 	D_NEWTON_API void SetClutchTorque(dFloat32 torqueInNewtonMeters);
@@ -40,7 +40,7 @@ class ndMultiBodyVehicleGearBox : public ndJointGear
 	protected:
 	void DebugJoint(ndConstraintDebugCallback&) const {}
 	void JacobianDerivative(ndConstraintDescritor& desc);
-	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	ndMultiBodyVehicle* m_chassis;
 	dFloat32 m_clutchTorque;

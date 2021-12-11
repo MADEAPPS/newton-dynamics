@@ -51,28 +51,28 @@ class ndShapeConvex: public ndShape
 
 	D_COLLISION_API void SetVolumeAndCG();
 	D_COLLISION_API virtual void MassProperties();
-	D_COLLISION_API virtual void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	D_COLLISION_API virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
-	D_COLLISION_API virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
+	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
+	D_COLLISION_API virtual dFloat32 CalculateMassProperties(const ndMatrix& offset, ndVector& inertia, ndVector& crossInertia, ndVector& centerOfMass) const;
+	D_COLLISION_API virtual ndMatrix CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const;
 
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API virtual void CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const;
-	D_COLLISION_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
-	D_COLLISION_API virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
-	D_COLLISION_API virtual dVector CalculateVolumeIntegral(const dMatrix& globalMatrix, const dVector& globalPlane, const ndShapeInstance& parentScale) const;
-	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
+	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir, dInt32* const vertexIndex) const;
+	D_COLLISION_API virtual dInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
+	D_COLLISION_API virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& globalPlane, const ndShapeInstance& parentScale) const;
+	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
-	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
-	bool SanityCheck(dPolyhedra& hull) const;
-	bool SanityCheck(dInt32 count, const dVector& normal, dVector* const contactsOut) const;
-	dInt32 RectifyConvexSlice(dInt32 count, const dVector& normal, dVector* const contactsOut) const;
+	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
+	bool SanityCheck(ndPolyhedra& hull) const;
+	bool SanityCheck(dInt32 count, const ndVector& normal, ndVector* const contactsOut) const;
+	dInt32 RectifyConvexSlice(dInt32 count, const ndVector& normal, ndVector* const contactsOut) const;
 	virtual dInt32 GetConvexVertexCount() const { return m_vertexCount; }
-	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32, dInt32* const vertexIndex) const
+	virtual ndVector SupportVertexSpecial(const ndVector& dir, dFloat32, dInt32* const vertexIndex) const
 	{
 		return SupportVertex(dir, vertexIndex);
 	}
 
-	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector&) const
+	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const
 	{
 		return point;
 	}
@@ -86,10 +86,10 @@ class ndShapeConvex: public ndShape
 	virtual dFloat32 GetBoxMinRadius() const;
 	virtual dFloat32 GetBoxMaxRadius() const;
 
-	dVector CalculateVolumeIntegral(const dPlane& plane) const;
-	dInt32 BuildCylinderCapPoly (dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const;
+	ndVector CalculateVolumeIntegral(const ndPlane& plane) const;
+	dInt32 BuildCylinderCapPoly (dFloat32 radius, const ndMatrix& transform, ndVector* const vertexOut) const;
 
-	dVector* m_vertex;
+	ndVector* m_vertex;
 	ndConvexSimplexEdge* m_simplex;
 
 	dFloat32 m_boxMinRadius;

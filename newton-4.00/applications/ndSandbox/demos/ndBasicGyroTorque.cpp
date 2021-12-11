@@ -29,46 +29,46 @@ class ndAsymetricInertiaBody: public ndBodyDynamic
 	{
 	}
 	
-	virtual void SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
+	virtual void SetMassMatrix(dFloat32 mass, const ndMatrix& inertia)
 	{
 		m_principalAxis = inertia;
-		dVector eigenValues(m_principalAxis.EigenVectors());
-		dMatrix massMatrix(dGetIdentityMatrix());
+		ndVector eigenValues(m_principalAxis.EigenVectors());
+		ndMatrix massMatrix(dGetIdentityMatrix());
 		massMatrix[0][0] = eigenValues[0];
 		massMatrix[1][1] = eigenValues[1];
 		massMatrix[2][2] = eigenValues[2];
 		ndBodyDynamic::SetMassMatrix(mass, massMatrix);
 	}
 
-	virtual dMatrix CalculateInvInertiaMatrix() const
+	virtual ndMatrix CalculateInvInertiaMatrix() const
 	{
-		dMatrix matrix(m_principalAxis * m_matrix);
-		matrix.m_posit = dVector::m_wOne;
-		dMatrix diagonal(dGetIdentityMatrix());
+		ndMatrix matrix(m_principalAxis * m_matrix);
+		matrix.m_posit = ndVector::m_wOne;
+		ndMatrix diagonal(dGetIdentityMatrix());
 		diagonal[0][0] = m_invMass[0];
 		diagonal[1][1] = m_invMass[1];
 		diagonal[2][2] = m_invMass[2];
 		return matrix * diagonal * matrix.Inverse();
 	}
 	
-	dMatrix m_principalAxis;
+	ndMatrix m_principalAxis;
 };
 
-static void DzhanibekovEffect(ndDemoEntityManager* const scene, dFloat32 mass, dFloat32 angularSpeed, const dVector& origin)
+static void DzhanibekovEffect(ndDemoEntityManager* const scene, dFloat32 mass, dFloat32 angularSpeed, const ndVector& origin)
 {
-	dMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	//dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y += 5.0f;
 
 	ndShapeInstance shape(new ndShapeBox(2.0f, 0.5f, 1.0));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	dVector omega(0.1f, 0.0f, angularSpeed, 0.0f);
+	ndVector omega(0.1f, 0.0f, angularSpeed, 0.0f);
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(mesh, dGetIdentityMatrix());
@@ -85,23 +85,23 @@ static void DzhanibekovEffect(ndDemoEntityManager* const scene, dFloat32 mass, d
 	mesh->Release();
 }
 
-static void Phitop(ndDemoEntityManager* const scene, dFloat32 mass, dFloat32 angularSpeed, const dVector& origin)
+static void Phitop(ndDemoEntityManager* const scene, dFloat32 mass, dFloat32 angularSpeed, const ndVector& origin)
 {
-	dMatrix matrix(dPitchMatrix(15.0f * dDegreeToRad));
+	ndMatrix matrix(dPitchMatrix(15.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	//dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	//ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y += 0.5f;
 
 	ndShapeInstance shape(new ndShapeSphere(1.0f));
-	shape.SetScale(dVector (0.5f, 0.5f, 1.0f, 0.0f));
+	shape.SetScale(ndVector (0.5f, 0.5f, 1.0f, 0.0f));
 
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	dVector omega(0.0f, angularSpeed, 0.0f, 0.0f);
+	ndVector omega(0.0f, angularSpeed, 0.0f, 0.0f);
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(mesh, dGetIdentityMatrix());
@@ -118,22 +118,22 @@ static void Phitop(ndDemoEntityManager* const scene, dFloat32 mass, dFloat32 ang
 	mesh->Release();
 }
 
-static void RattleBack(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin)
+static void RattleBack(ndDemoEntityManager* const scene, dFloat32 mass, const ndVector& origin)
 {
-	dMatrix matrix(dPitchMatrix(15.0f * dDegreeToRad));
+	ndMatrix matrix(dPitchMatrix(15.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y += floor.m_y + 0.4f;
 
-	dMatrix shapeMatrix(dYawMatrix(5.0f * dDegreeToRad));
+	ndMatrix shapeMatrix(dYawMatrix(5.0f * dDegreeToRad));
 
 	ndShapeInstance shape(new ndShapeSphere(1.0f));
 	shape.SetLocalMatrix(shapeMatrix);
-	shape.SetScale(dVector(0.3f, 0.25f, 1.0f, 0.0f));
+	shape.SetScale(ndVector(0.3f, 0.25f, 1.0f, 0.0f));
 
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
@@ -145,7 +145,7 @@ static void RattleBack(ndDemoEntityManager* const scene, dFloat32 mass, const dV
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(shape);
 	body->SetMassMatrix(mass, shape);
-	body->SetCentreOfMass(dVector(0.0f, -0.1f, 0.0f, 0.0f));
+	body->SetCentreOfMass(ndVector(0.0f, -0.1f, 0.0f, 0.0f));
 
 	world->AddBody(body);
 	scene->AddEntity(entity);
@@ -153,14 +153,14 @@ static void RattleBack(ndDemoEntityManager* const scene, dFloat32 mass, const dV
 	mesh->Release();
 }
 
-static void PrecessingTop(ndDemoEntityManager* const scene, const dVector& origin)
+static void PrecessingTop(ndDemoEntityManager* const scene, const ndVector& origin)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndShapeInstance shape(new ndShapeCone(0.7f, 1.0f));
 	shape.SetLocalMatrix(dRollMatrix(-90.0f * dDegreeToRad));
 
-	dMatrix matrix(dPitchMatrix(15.0f * dDegreeToRad));
+	ndMatrix matrix(dPitchMatrix(15.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 	ndDemoMesh* const geometry = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
@@ -181,7 +181,7 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const dVector& origi
 	scene->AddEntity(entity);
 }
 
-static void CreateFlyWheel(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 speed, dFloat32 radius, dFloat32 lenght, dFloat32 tiltAnsgle)
+static void CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 mass, dFloat32 speed, dFloat32 radius, dFloat32 lenght, dFloat32 tiltAnsgle)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
@@ -189,7 +189,7 @@ static void CreateFlyWheel(ndDemoEntityManager* const scene, const dVector& orig
 	ndShapeInstance rod(new ndShapeCapsule(smallRadius * 0.5f, smallRadius * 0.5f, lenght));
 	ndShapeInstance wheel(new ndShapeCylinder(radius, radius, 0.125f));
 
-	dMatrix offset(dGetIdentityMatrix());
+	ndMatrix offset(dGetIdentityMatrix());
 	offset.m_posit.m_x = lenght * 0.5f;
 	wheel.SetLocalMatrix(offset);
 
@@ -200,7 +200,7 @@ static void CreateFlyWheel(ndDemoEntityManager* const scene, const dVector& orig
 	compound->AddCollision(&wheel);
 	compound->EndAddRemove();
 
-	dMatrix matrix(dRollMatrix(tiltAnsgle * dDegreeToRad));
+	ndMatrix matrix(dRollMatrix(tiltAnsgle * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_y += 5.0f;
 	matrix.m_posit.m_w = 1.0f;
@@ -216,7 +216,7 @@ static void CreateFlyWheel(ndDemoEntityManager* const scene, const dVector& orig
 	body->SetCollisionShape(flyWheelShape);
 	body->SetMassMatrix(mass, flyWheelShape);
 
-	dVector omega(matrix.m_front.Scale (speed));
+	ndVector omega(matrix.m_front.Scale (speed));
 	body->SetOmega(omega);
 
 	matrix.m_posit -= matrix.m_front.Scale(lenght * 0.5f);
@@ -233,29 +233,29 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, dGetIdentityMatrix()); 
 
 	// should spins very slowly, with a tilt angle of 30 degrees
-	//CreateFlyWheel(scene, dVector(15.0f, 0.0f, -12.0f, 0.0f), 10.0f, 50.0f, 0.6f, 0.5f, 30.0f);
-	//CreateFlyWheel(scene, dVector(15.0f, 0.0f, -10.0f, 0.0f), 10.0f, 100.0f, 0.6f, 0.5f, 0.0f);
-	//CreateFlyWheel(scene, dVector(15.0f, 0.0f,  -8.0f, 0.0f), 10.0f, -30.0f, 0.6f, 0.5f, 0.0f);
+	//CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -12.0f, 0.0f), 10.0f, 50.0f, 0.6f, 0.5f, 30.0f);
+	//CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -10.0f, 0.0f), 10.0f, 100.0f, 0.6f, 0.5f, 0.0f);
+	//CreateFlyWheel(scene, ndVector(15.0f, 0.0f,  -8.0f, 0.0f), 10.0f, -30.0f, 0.6f, 0.5f, 0.0f);
 	
-	DzhanibekovEffect(scene, 10.0f, 5.0f, dVector(15.0f, 0.0f, -4.0f, 0.0f));
-	//DzhanibekovEffect(scene, 10.0f, -5.0f, dVector(15.0f, 0.0f, 0.0f, 0.0f));
-	//DzhanibekovEffect(scene, 10.0f, 10.0f, dVector(15.0f, 0.0f, 4.0f, 0.0f));
+	DzhanibekovEffect(scene, 10.0f, 5.0f, ndVector(15.0f, 0.0f, -4.0f, 0.0f));
+	//DzhanibekovEffect(scene, 10.0f, -5.0f, ndVector(15.0f, 0.0f, 0.0f, 0.0f));
+	//DzhanibekovEffect(scene, 10.0f, 10.0f, ndVector(15.0f, 0.0f, 4.0f, 0.0f));
 	//
-	//Phitop(scene, 10.0f,  25.0f, dVector(10.0f, 0.0f, -6.0f, 0.0f));
-	//Phitop(scene, 10.0f, -25.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
-	//Phitop(scene, 10.0f,  35.0f, dVector(10.0f, 0.0f, 6.0f, 0.0f));
+	//Phitop(scene, 10.0f,  25.0f, ndVector(10.0f, 0.0f, -6.0f, 0.0f));
+	//Phitop(scene, 10.0f, -25.0f, ndVector(10.0f, 0.0f, 0.0f, 0.0f));
+	//Phitop(scene, 10.0f,  35.0f, ndVector(10.0f, 0.0f, 6.0f, 0.0f));
 	//
-	//PrecessingTop(scene, dVector(5.0f, 0.0f, -4.0f, 0.0f));
-	//PrecessingTop(scene, dVector(5.0f, 0.0f, 0.0f, 0.0f));
-	//PrecessingTop(scene, dVector(5.0f, 0.0f, 4.0f, 0.0f));
+	//PrecessingTop(scene, ndVector(5.0f, 0.0f, -4.0f, 0.0f));
+	//PrecessingTop(scene, ndVector(5.0f, 0.0f, 0.0f, 0.0f));
+	//PrecessingTop(scene, ndVector(5.0f, 0.0f, 4.0f, 0.0f));
 	//
-	//RattleBack(scene, 10.0f, dVector(0.0f, 0.0f, -4.0f, 0.0f));
-	//RattleBack(scene, 10.0f, dVector(0.0f, 0.0f, 0.0f, 0.0f));
-	//RattleBack(scene, 10.0f, dVector(0.0f, 0.0f,  4.0f, 0.0f));
+	//RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f, -4.0f, 0.0f));
+	//RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f, 0.0f, 0.0f));
+	//RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f,  4.0f, 0.0f));
 	
 	scene->GetCameraManager()->SetPickMode(true);
 
-	dQuaternion rot;
-	dVector origin(-15.0f, 5.0f, 0.0f, 0.0f);
+	ndQuaternion rot;
+	ndVector origin(-15.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

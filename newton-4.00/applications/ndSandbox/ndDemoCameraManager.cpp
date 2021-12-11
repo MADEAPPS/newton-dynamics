@@ -24,7 +24,7 @@
 class ndDemoCameraPickBodyJoint: public ndJointKinematicController
 {
 	public:
-	ndDemoCameraPickBodyJoint(ndBodyKinematic* const childBody, ndBodyKinematic* const worldBody, const dVector& attachmentPointInGlobalSpace, ndDemoCameraManager* const camera)
+	ndDemoCameraPickBodyJoint(ndBodyKinematic* const childBody, ndBodyKinematic* const worldBody, const ndVector& attachmentPointInGlobalSpace, ndDemoCameraManager* const camera)
 		:ndJointKinematicController(childBody, worldBody, attachmentPointInGlobalSpace)
 		,m_manager (camera)
 	{
@@ -42,10 +42,10 @@ class ndDemoCameraPickBodyJoint: public ndJointKinematicController
 };
 
 ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const)
-	:dClassAlloc()
-	,m_pickedBodyTargetPosition(dVector::m_wOne)
-	,m_pickedBodyLocalAtachmentPoint(dVector::m_wOne)
-	,m_pickedBodyLocalAtachmentNormal(dVector::m_zero)
+	:ndClassAlloc()
+	,m_pickedBodyTargetPosition(ndVector::m_wOne)
+	,m_pickedBodyLocalAtachmentPoint(ndVector::m_wOne)
+	,m_pickedBodyLocalAtachmentNormal(ndVector::m_zero)
 	,m_camera(new ndDemoCamera())
 	,m_targetPicked(nullptr)
 	,m_pickJoint(nullptr)
@@ -73,7 +73,7 @@ ndDemoCameraManager::~ndDemoCameraManager()
 	delete m_camera;
 }
 
-void ndDemoCameraManager::SetCameraMatrix(const dQuaternion& rotation, const dVector& position)
+void ndDemoCameraManager::SetCameraMatrix(const ndQuaternion& rotation, const ndVector& position)
 {
 	m_camera->SetMatrix(rotation, position);
 	m_camera->SetMatrix(rotation, position);
@@ -84,7 +84,7 @@ void ndDemoCameraManager::SetCameraMatrix(const dQuaternion& rotation, const dVe
 void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 timestep)
 {
 	// update the camera;
-	dMatrix targetMatrix (m_camera->GetNextMatrix());
+	ndMatrix targetMatrix (m_camera->GetNextMatrix());
 
 	dFloat32 mouseX;
 	dFloat32 mouseY;
@@ -158,19 +158,19 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	m_mousePosY = mouseY;
 
 	//m_yaw += 0.01f;
-	dMatrix matrix (dRollMatrix(m_pitch) * dYawMatrix(m_yaw));
-	dQuaternion rot (matrix);
+	ndMatrix matrix (dRollMatrix(m_pitch) * dYawMatrix(m_yaw));
+	ndQuaternion rot (matrix);
 	m_camera->SetMatrix (rot, targetMatrix.m_posit);
 
 	// get the mouse pick parameter so that we can do replay for debugging
-	dVector p0(m_camera->ScreenToWorld(dVector(mouseX, mouseY, 0.0f, 0.0f)));
-	dVector p1(m_camera->ScreenToWorld(dVector(mouseX, mouseY, 1.0f, 0.0f)));
+	ndVector p0(m_camera->ScreenToWorld(ndVector(mouseX, mouseY, 0.0f, 0.0f)));
+	ndVector p1(m_camera->ScreenToWorld(ndVector(mouseX, mouseY, 1.0f, 0.0f)));
 
 #ifdef D_ENABLE_CAMERA_REPLAY
 	struct ndReplay
 	{
-		dVector m_p0;
-		dVector m_p1;
+		ndVector m_p0;
+		ndVector m_p1;
 		dInt32 m_mouseState;
 	};
 	ndReplay replay;
@@ -212,11 +212,11 @@ void ndDemoCameraManager::RenderPickedTarget () const
 	if (m_targetPicked) 
 	{
 		dAssert(0);
-		//dMatrix matrix;
+		//ndMatrix matrix;
 		//NewtonBodyGetMatrix(m_targetPicked, &matrix[0][0]);
 		//
-		//dVector p0 (matrix.TransformVector(m_pickedBodyLocalAtachmentPoint));
-		//dVector p1 (p0 + matrix.RotateVector (m_pickedBodyLocalAtachmentNormal.Scale (0.5f)));
+		//ndVector p0 (matrix.TransformVector(m_pickedBodyLocalAtachmentPoint));
+		//ndVector p1 (p0 + matrix.RotateVector (m_pickedBodyLocalAtachmentNormal.Scale (0.5f)));
 		//ShowMousePicking (p0, p1);
 	}
 }
@@ -227,7 +227,7 @@ void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene,
 	ndWorld* const world = scene->GetWorld();
 	world->UpdateTransformsLock();
 
-	for (ndDemoEntityManager::dNode* node = scene->GetFirst(); node; node = node->GetNext()) 
+	for (ndDemoEntityManager::ndNode* node = scene->GetFirst(); node; node = node->GetNext()) 
 	{
 		ndDemoEntity* const entity = node->GetInfo();
 		entity->InterpolateMatrix(param);
@@ -239,7 +239,7 @@ void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene,
 	world->UpdateTransformsUnlock();
 }
 
-void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool mousePickState, const dVector& p0, const dVector& p1, dFloat32) 
+void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool mousePickState, const ndVector& p0, const ndVector& p1, dFloat32) 
 {
 	// handle pick body from the screen
 	if (!m_targetPicked) 
@@ -247,8 +247,8 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 		if (!m_prevMouseState && mousePickState) 
 		{
 			dFloat32 param;
-			dVector posit;
-			dVector normal;
+			ndVector posit;
+			ndVector normal;
 		
 			ndBodyKinematic* const body = MousePickBody (scene->GetWorld(), p0, p1, param, posit, normal);
 			if (body) 
@@ -267,7 +267,7 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 						m_pickJoint = nullptr;
 					}
 
-					dVector mass(m_targetPicked->GetMassMatrix());
+					ndVector mass(m_targetPicked->GetMassMatrix());
 
 					//change this to make the grabbing stronger or weaker
 					//const dFloat32 angularFritionAccel = 10.0f;

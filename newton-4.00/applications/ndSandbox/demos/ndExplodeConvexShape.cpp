@@ -22,68 +22,68 @@
 
 static void makePointCloud(ndExplodeConvexShapeModel::ndDesc& desc)
 {
-	//dVector pMin;
-	//dVector pMax;
+	//ndVector pMin;
+	//ndVector pMax;
 	//desc.m_shape->CalculateAabb(dGetIdentityMatrix(), pMin, pMax);
-	//dVector size((pMax - pMin).Scale(0.25f));
+	//ndVector size((pMax - pMin).Scale(0.25f));
 	//
-	//desc.m_pointCloud.PushBack(dVector::m_zero);
+	//desc.m_pointCloud.PushBack(ndVector::m_zero);
 	//
-	//desc.m_pointCloud.PushBack(dVector(-size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(dVector(-size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(dVector(-size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(dVector(-size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(ndVector(-size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(ndVector(-size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(ndVector(-size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(ndVector(-size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
 	//
-	//desc.m_pointCloud.PushBack(dVector(size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(dVector(size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(dVector(size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
-	//desc.m_pointCloud.PushBack(dVector(size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(ndVector(size.m_x, -size.m_y, -size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(ndVector(size.m_x, -size.m_y, size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(ndVector(size.m_x, size.m_y, -size.m_z, dFloat32(0.0f)));
+	//desc.m_pointCloud.PushBack(ndVector(size.m_x, size.m_y, size.m_z, dFloat32(0.0f)));
 	//
 	//for (dInt32 i = 0; i < desc.m_pointCloud.GetCount(); i++)
 	//{
 	//	dFloat32 x = dGaussianRandom(size.m_x);
 	//	dFloat32 y = dGaussianRandom(size.m_y);
 	//	dFloat32 z = dGaussianRandom(size.m_y);
-	//	desc.m_pointCloud[i] += dVector(x, y, z, dFloat32(0.0f));
+	//	desc.m_pointCloud[i] += ndVector(x, y, z, dFloat32(0.0f));
 	//}
 
-	dVector pMin;
-	dVector pMax;
+	ndVector pMin;
+	ndVector pMax;
 	desc.m_shape->CalculateAabb(dGetIdentityMatrix(), pMin, pMax);
-	dVector size(pMax - pMin);
+	ndVector size(pMax - pMin);
 
 	const dInt32 count = 20;
 
 	dSetRandSeed(0);
-	const dVector scale(0.2f);
-	const dVector invScale(size * scale.Reciproc());
+	const ndVector scale(0.2f);
+	const ndVector invScale(size * scale.Reciproc());
 	for (dInt32 i = 0; i < count; i++)
 	{
 		dFloat32 x = dRand();
 		dFloat32 y = dRand();
 		dFloat32 z = dRand();
-		dVector randPoint(x, y, z, dFloat32(0.0f));
+		ndVector randPoint(x, y, z, dFloat32(0.0f));
 		randPoint *= invScale;
 		randPoint = pMin + scale * randPoint.Floor();
 		desc.m_pointCloud.PushBack(randPoint);
 	}
 }
 
-static dVector CalculateLocation(ndExplodeConvexShapeModel* const manager, const dMatrix& matrix, const ndShapeInstance& shape)
+static ndVector CalculateLocation(ndExplodeConvexShapeModel* const manager, const ndMatrix& matrix, const ndShapeInstance& shape)
 {
-	dVector minBox;
-	dVector maxBox;
+	ndVector minBox;
+	ndVector maxBox;
 	shape.CalculateAabb(dGetIdentityMatrix(), minBox, maxBox);
 
 	ndWorld* const world = manager->m_scene->GetWorld();
-	dVector floor(FindFloor(*world, dVector(matrix.m_posit.m_x, 100.0f, matrix.m_posit.m_z, dFloat32(0.0f)), 2.0f * 100.0f));
+	ndVector floor(FindFloor(*world, ndVector(matrix.m_posit.m_x, 100.0f, matrix.m_posit.m_z, dFloat32(0.0f)), 2.0f * 100.0f));
 
-	dVector boxPadding(ndShapeInstance::GetBoxPadding());
+	ndVector boxPadding(ndShapeInstance::GetBoxPadding());
 	floor.m_y += (maxBox.m_y - minBox.m_y) * 0.5f - boxPadding.m_y;
 	return floor;
 }
 
-static void AddBoxEffect(ndExplodeConvexShapeModel* const manager, const dMatrix& matrix)
+static void AddBoxEffect(ndExplodeConvexShapeModel* const manager, const ndMatrix& matrix)
 {
 	ndExplodeConvexShapeModel::ndDesc desc;
 
@@ -102,7 +102,7 @@ static void AddBoxEffect(ndExplodeConvexShapeModel* const manager, const dMatrix
 	ndExplodeConvexShapeModel::ndEffect effect(manager, desc);
 
 	// get a location in the scene
-	dMatrix location(matrix);
+	ndMatrix location(matrix);
 	location.m_posit = CalculateLocation(manager, matrix, shape);
 
 	// place few instance of the same effect in the scene.
@@ -120,7 +120,7 @@ static void AddBoxEffect(ndExplodeConvexShapeModel* const manager, const dMatrix
 	}
 }
 
-static void AddCapsuleEffect(ndExplodeConvexShapeModel* const manager, const dMatrix& matrix)
+static void AddCapsuleEffect(ndExplodeConvexShapeModel* const manager, const ndMatrix& matrix)
 {
 	ndExplodeConvexShapeModel::ndDesc desc;
 
@@ -131,7 +131,7 @@ static void AddCapsuleEffect(ndExplodeConvexShapeModel* const manager, const dMa
 	desc.m_innerTexture = "wood_1.tga";
 	desc.m_breakImpactSpeed = 10.0f;
 
-	dMatrix location(matrix);
+	ndMatrix location(matrix);
 	location.m_posit = CalculateLocation(manager, matrix, shape);
 
 	makePointCloud(desc);
@@ -151,7 +151,7 @@ static void AddCapsuleEffect(ndExplodeConvexShapeModel* const manager, const dMa
 	}
 }
 
-static void AddCylinderEffect(ndExplodeConvexShapeModel* const manager, const dMatrix& matrix)
+static void AddCylinderEffect(ndExplodeConvexShapeModel* const manager, const ndMatrix& matrix)
 {
 	ndExplodeConvexShapeModel::ndDesc desc;
 
@@ -162,7 +162,7 @@ static void AddCylinderEffect(ndExplodeConvexShapeModel* const manager, const dM
 	desc.m_innerTexture = "wood_4.tga";
 	desc.m_breakImpactSpeed = 10.0f;
 
-	dMatrix location(matrix);
+	ndMatrix location(matrix);
 	location.m_posit = CalculateLocation(manager, matrix, shape);
 
 	makePointCloud(desc);
@@ -191,7 +191,7 @@ void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene)
 	ndExplodeConvexShapeModel* const fractureManager = new ndExplodeConvexShapeModel(scene);
 	world->AddModel(fractureManager);
 
-	dMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(dGetIdentityMatrix());
 
 	matrix.m_posit.m_x += 10.0f;
 	matrix.m_posit.m_y += 2.0f;
@@ -204,7 +204,7 @@ void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z += 5.0f;
 	AddCylinderEffect(fractureManager, matrix);
 
-	dQuaternion rot;
-	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	ndQuaternion rot;
+	ndVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

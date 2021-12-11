@@ -59,7 +59,7 @@ void ndAnimationBlendTreeNode::dAnimationPose::SetTargetPose() const
 */
 
 ndAnimationBlendTreeNode::ndAnimationBlendTreeNode(ndAnimationBlendTreeNode* const child)
-	:dClassAlloc()
+	:ndClassAlloc()
 //	,m_character(character)
 	,m_input(child)
 {

@@ -27,20 +27,20 @@
 #include "ndShapeInstance.h"
 #include "ndConvexCastNotify.h"
 
-bool ndConvexCastNotify::CastShape(const ndShapeInstance& castingInstance, const dMatrix& globalOrigin, const dVector& globalDest, const ndShapeInstance& targetShape, const dMatrix& targetMatrix)
+bool ndConvexCastNotify::CastShape(const ndShapeInstance& castingInstance, const ndMatrix& globalOrigin, const ndVector& globalDest, const ndShapeInstance& targetShape, const ndMatrix& targetMatrix)
 {
 	ndContact contact;
 	ndBodyKinematic body0;
 	ndBodyKinematic body1;
 	ndContactNotify notify;
-	dFixSizeArray<ndContactPoint, D_MAX_CONTATCS> contactBuffer;
+	ndFixSizeArray<ndContactPoint, D_MAX_CONTATCS> contactBuffer;
 	contactBuffer.SetCount(D_MAX_CONTATCS);
 
 	body0.SetCollisionShape(castingInstance);
 	body1.SetCollisionShape(targetShape);
 	body0.SetMatrix(globalOrigin);
 	body1.SetMatrix(targetMatrix);
-	body0.SetMassMatrix(dVector::m_one);
+	body0.SetMassMatrix(ndVector::m_one);
 	body0.SetVelocity(globalDest - globalOrigin.m_posit);
 
 	contact.SetBodies(&body0, &body1);

@@ -27,13 +27,13 @@
 class ndWorld;
 class ndLoadSaveInfo;
 
-class ndWordSettings : public dClassAlloc
+class ndWordSettings : public ndClassAlloc
 {
 	public:
 	D_CLASS_REFLECTION(ndWordSettings);
 
 	ndWordSettings()
-		:dClassAlloc()
+		:ndClassAlloc()
 		,m_subSteps(2)
 		,m_solverIterations(4)
 	{
@@ -43,16 +43,16 @@ class ndWordSettings : public dClassAlloc
 	{
 	}
 
-	D_NEWTON_API ndWordSettings(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API virtual void Load(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API ndWordSettings(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API virtual void Load(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	dInt32 m_subSteps;
 	dInt32 m_solverIterations;
 };
 
 D_MSV_NEWTON_ALIGN_32
-class ndLoadSave: public dClassAlloc
+class ndLoadSave: public ndClassAlloc
 {
 	public:
 	ndLoadSave();
@@ -84,7 +84,7 @@ class ndLoadSave: public dClassAlloc
 
 
 inline ndLoadSave::ndLoadSave()
-	:dClassAlloc()	
+	:ndClassAlloc()	
 	,m_setting(nullptr)
 	,m_bodyMap()
 	,m_jointMap()

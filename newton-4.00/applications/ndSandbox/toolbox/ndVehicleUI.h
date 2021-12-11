@@ -22,7 +22,7 @@
 
 class ndDemoEntityManager;
 
-class ndVehicleUI: public dClassAlloc
+class ndVehicleUI: public ndClassAlloc
 {
 	public:
 
@@ -30,7 +30,7 @@ class ndVehicleUI: public dClassAlloc
 	~ndVehicleUI();
 	
 	void CreateBufferUI();
-	void CreateOrthoViewMatrix(ndDemoEntityManager* const uscene, dFloat32 origin_x, const dFloat32 origin_y, dMatrix& projmatrix);
+	void CreateOrthoViewMatrix(ndDemoEntityManager* const uscene, dFloat32 origin_x, const dFloat32 origin_y, ndMatrix& projmatrix);
 	void RenderGearUI(ndDemoEntityManager* const uscene, const dInt32 gearid, GLuint tex1, dFloat32 origin_x, dFloat32 origin_y, dFloat32 ptsize);
 	void RenderGageUI(ndDemoEntityManager* const uscene, const GLuint tex1, const dFloat32 origin_x, const dFloat32 origin_y, const dFloat32 ptsize, dFloat32 cparam, dFloat32 minAngle, dFloat32 maxAngle);
 

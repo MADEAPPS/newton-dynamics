@@ -31,14 +31,14 @@ void *operator new (size_t size)
 	// this should not happens on this test
 	// newton should never use global operator new and delete.
 	//dAssert(0);
-	void* const ptr = dMemory::Malloc(size);
+	void* const ptr = ndMemory::Malloc(size);
 	dAssert((dUnsigned64(ptr) & (0x1f)) == 0);
 	return ptr;
 }
 
 void operator delete (void* ptr) noexcept
 {
-	dMemory::Free(ptr);
+	ndMemory::Free(ptr);
 }
 
 class CheckMemoryLeaks
@@ -60,7 +60,7 @@ class CheckMemoryLeaks
 		// Set the memory allocation function before creation the newton world
 		// this is the only function that can be called before the creation of the newton world.
 		// it should be called once, and the the call is optional 
-		dMemory::SetMemoryAllocators(PhysicsAlloc, PhysicsFree);
+		ndMemory::SetMemoryAllocators(PhysicsAlloc, PhysicsFree);
 	}
 
 	static void CheckMemoryLeaksCallback()

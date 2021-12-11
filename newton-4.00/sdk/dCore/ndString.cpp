@@ -21,7 +21,7 @@
 #define D_STRING_MEM_BUCKETS			(D_STRING_MEM_MAX_BUCKET_SIZE / D_STRING_MEM_GRANULARITY)
 #define D_DSTRING_ENTRIES_IN_FREELIST	32
 
-class dString::dStringAllocator
+class ndString::ndStringAllocator
 {
 	public:
 	#ifdef D_USE_POOL_BUKECT_ALLOCATOR
@@ -51,7 +51,7 @@ class dString::dStringAllocator
 			{
 				for (dInt32 i = 0; i < D_DSTRING_ENTRIES_IN_FREELIST; i ++) 
 				{
-					dDataChunk* const data = (dDataChunk*) dMemory::Malloc(chunckSize + sizeof (dInt32));
+					dDataChunk* const data = (dDataChunk*) ndMemory::Malloc(chunckSize + sizeof (dInt32));
 					data->m_count = i + 1; 
 					data->m_size = chunckSize;
 					data->m_next = m_freeListDataChunk; 
@@ -65,7 +65,7 @@ class dString::dStringAllocator
 				{
 					dDataChunk* const ptr = m_freeListDataChunk;
 					m_freeListDataChunk = m_freeListDataChunk->m_next;
-					dMemory::Free (ptr);
+					ndMemory::Free (ptr);
 				}
 			}
 
@@ -99,7 +99,7 @@ class dString::dStringAllocator
 			dDataChunk* m_freeListDataChunk;
 		};
 
-		dStringAllocator()
+		ndStringAllocator()
 		{
 			for (dInt32 i = 0; i < dInt32 (sizeof (m_buckects) / sizeof (m_buckects[0])); i ++) 
 			{
@@ -107,7 +107,7 @@ class dString::dStringAllocator
 			}
 		}
 
-		~dStringAllocator()
+		~ndStringAllocator()
 		{
 			for (dInt32 i = 0; i < dInt32 (sizeof (m_buckects) / sizeof (m_buckects[0])); i ++) 
 			{
@@ -124,7 +124,7 @@ class dString::dStringAllocator
 				dInt32 buckectSize = (buckectEntry + 1) * D_STRING_MEM_GRANULARITY;
 				return m_buckects[buckectEntry].Alloc(buckectSize);
 			}
-			dMemBucket::dDataChunk* const ptr = (dMemBucket::dDataChunk*) dMemory::Malloc (size + sizeof (dInt32));
+			dMemBucket::dDataChunk* const ptr = (dMemBucket::dDataChunk*) ndMemory::Malloc (size + sizeof (dInt32));
 			ptr->m_size = size;
 			return ((char*)ptr) + sizeof (dInt32);
 		}
@@ -141,7 +141,7 @@ class dString::dStringAllocator
 			else 
 			{
 				void* const ptr1 = ((char*)ptr) - sizeof (dInt32);
-				dMemory::Free (ptr1);
+				ndMemory::Free (ptr1);
 			}
 		}
 
@@ -150,24 +150,24 @@ class dString::dStringAllocator
 	#else 
 		char* Alloc(dInt32 size)
 		{
-			return (char*) dMemory::Malloc (size);
+			return (char*) ndMemory::Malloc (size);
 		}
 
 		void Free(char* const ptr)
 		{
-			dMemory::Free (ptr);
+			ndMemory::Free (ptr);
 		}
 	#endif
 };
 
-dString::dString ()
+ndString::ndString ()
 	:m_string(nullptr)
 	,m_size(0)
 	,m_capacity(0)
 {
 }
 
-dString::dString (const dString& src)
+ndString::ndString (const ndString& src)
 	:m_string(nullptr)
 	,m_size(0)
 	,m_capacity(0)
@@ -183,7 +183,7 @@ dString::dString (const dString& src)
 	}
 }
 
-dString::dString (const char* const data)
+ndString::ndString (const char* const data)
 	:m_string(nullptr)
 	,m_size(0)
 	,m_capacity(0)
@@ -199,7 +199,7 @@ dString::dString (const char* const data)
 	}
 }
 
-dString::dString (const char* const data, dInt32 maxSize)
+ndString::ndString (const char* const data, dInt32 maxSize)
 	:m_string(nullptr)
 	,m_size(0)
 	,m_capacity(0)
@@ -214,7 +214,7 @@ dString::dString (const char* const data, dInt32 maxSize)
 	}
 }
 
-dString::dString (const dString& src, const char* const concatenate, dInt32 concatenateSize)
+ndString::ndString (const ndString& src, const char* const concatenate, dInt32 concatenateSize)
 	:m_string(nullptr)
 	,m_size(0)
 	,m_capacity(0)
@@ -227,7 +227,7 @@ dString::dString (const dString& src, const char* const concatenate, dInt32 conc
 	m_capacity = m_size + 1;
 }
 
-dString::dString (char chr)
+ndString::ndString (char chr)
 	:m_string(nullptr)
 	,m_size(0)
 	,m_capacity(0)
@@ -239,7 +239,7 @@ dString::dString (char chr)
 	m_capacity = m_size + 1;
 }
 
-dString::dString (dInt32 val)
+ndString::ndString (dInt32 val)
 	:m_string(nullptr)
 	,m_size(0)
 	,m_capacity(0)
@@ -270,7 +270,7 @@ dString::dString (dInt32 val)
 	m_capacity = m_size + 1;
 }
 
-dString::dString (dUnsigned64 input)
+ndString::ndString (dUnsigned64 input)
 	:m_string(nullptr)
 	,m_size(0)
 	,m_capacity(0)
@@ -303,12 +303,12 @@ dString::dString (dUnsigned64 input)
 	m_capacity = m_size + 1;
 }
 
-dString::~dString ()
+ndString::~ndString ()
 {
 	Clear();
 }
 
-void dString::Clear()
+void ndString::Clear()
 {
 	if (m_capacity && m_string) 
 	{
@@ -319,13 +319,13 @@ void dString::Clear()
 	m_string = nullptr;
 }
 
-void dString::Empty()
+void ndString::Empty()
 {
 	m_size = 0;
 	m_string[0] = 0;
 }
 
-void dString::LoadFile (FILE* const file)
+void ndString::LoadFile (FILE* const file)
 {
 	Clear();
 	dInt32 size = 0;
@@ -343,7 +343,7 @@ void dString::LoadFile (FILE* const file)
 	m_capacity = m_size + 1;
 }
 
-void dString::operator+= (const char* const src)
+void ndString::operator+= (const char* const src)
 {
 	char* const oldData = m_string;
 	dInt32 size = CalculateSize (src);
@@ -370,7 +370,7 @@ void dString::operator+= (const char* const src)
 	}
 }
 
-dInt32 dString::ToInteger() const
+dInt32 ndString::ToInteger() const
 {
 	dInt32 value = 0;
 	if (m_size) 
@@ -394,7 +394,7 @@ dInt32 dString::ToInteger() const
 }
 
 
-dUnsigned64 dString::ToInteger64() const
+dUnsigned64 ndString::ToInteger64() const
 {
 	dUnsigned64 value = 0;
 	if (m_size) 
@@ -417,7 +417,7 @@ dUnsigned64 dString::ToInteger64() const
 	return value;
 }
 
-dFloat64 dString::ToFloat() const
+dFloat64 ndString::ToFloat() const
 {
 	dFloat64 value = 0.0;
 	dFloat64 power = 1.0;
@@ -449,7 +449,7 @@ dFloat64 dString::ToFloat() const
 	return value;
 }
 
-dString& dString::operator= (const dString& src)
+ndString& ndString::operator= (const ndString& src)
 {
 	if (m_capacity && m_string) 
 	{
@@ -467,7 +467,7 @@ dString& dString::operator= (const dString& src)
 	return *this;
 }
 
-dInt32 dString::CalculateSize (const char* const data) const
+dInt32 ndString::CalculateSize (const char* const data) const
 {
 	dInt32 size = 0;
 	if (data) 
@@ -480,7 +480,7 @@ dInt32 dString::CalculateSize (const char* const data) const
 	return size;
 }
 
-void dString::ToUpper()
+void ndString::ToUpper()
 {
 	if (m_string) 
 	{
@@ -494,7 +494,7 @@ void dString::ToUpper()
 	}
 }
 
-void dString::ToLower()
+void ndString::ToLower()
 {
 	if (m_string) 
 	{
@@ -508,7 +508,7 @@ void dString::ToLower()
 	}
 }
 
-dInt32 dString::Find (char ch, dInt32 from) const
+dInt32 ndString::Find (char ch, dInt32 from) const
 {
 	for (dInt32 i = from; i < m_size; i ++) 
 	{
@@ -520,8 +520,8 @@ dInt32 dString::Find (char ch, dInt32 from) const
 	return -1;
 }
 
-//dInt32 dString::Find (const dString& subStream, dInt32 from) const
-dInt32 dString::Find (const char* const subString, dInt32 subStringLength, dInt32 from, dInt32 lenght) const
+//dInt32 ndString::Find (const ndString& subStream, dInt32 from) const
+dInt32 ndString::Find (const char* const subString, dInt32 subStringLength, dInt32 from, dInt32 lenght) const
 {
 	dAssert (from >= 0);
 	//dAssert (subStream.m_size >= 0);
@@ -592,7 +592,7 @@ dInt32 dString::Find (const char* const subString, dInt32 subStringLength, dInt3
 }
 
 
-void dString::Replace (dInt32 start, dInt32 size, const char* const str, dInt32 strSize)
+void ndString::Replace (dInt32 start, dInt32 size, const char* const str, dInt32 strSize)
 {
 	char* const oldData = m_string;
 	m_string = AllocMem (m_size - size + strSize + 1);
@@ -605,7 +605,7 @@ void dString::Replace (dInt32 start, dInt32 size, const char* const str, dInt32 
 	FreeMem(oldData);
 }
 
-void dString::Expand (dInt32 size)
+void ndString::Expand (dInt32 size)
 {
 	char* const oldData = m_string;
 	m_string = AllocMem (m_size + size + 1);
@@ -619,18 +619,18 @@ void dString::Expand (dInt32 size)
 	m_capacity = m_size + size + 1;
 }
 
-dString::dStringAllocator& dString::GetAllocator() const
+ndString::ndStringAllocator& ndString::GetAllocator() const
 {
-	static dStringAllocator allocator;
+	static ndStringAllocator allocator;
 	return allocator;
 }
 
-char* dString::AllocMem(dInt32 size)
+char* ndString::AllocMem(dInt32 size)
 {
 	return GetAllocator().Alloc(size);
 }
 
-void dString::FreeMem (char* const ptr)
+void ndString::FreeMem (char* const ptr)
 {
 	if (ptr) 
 	{

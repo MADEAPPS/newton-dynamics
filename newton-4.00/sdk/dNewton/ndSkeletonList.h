@@ -27,18 +27,18 @@
 
 class ndBodyKinematic;
 
-class ndSkeletonList: public dList<ndSkeletonContainer, dContainersFreeListAlloc<ndSkeletonContainer> >
+class ndSkeletonList: public ndList<ndSkeletonContainer, ndContainersFreeListAlloc<ndSkeletonContainer> >
 {
 	public:
 	ndSkeletonList()
-		:dList<ndSkeletonContainer, dContainersFreeListAlloc<ndSkeletonContainer>>()
+		:ndList<ndSkeletonContainer, ndContainersFreeListAlloc<ndSkeletonContainer>>()
 		,m_skelListIsDirty(false)
 	{
 	}
 
 	ndSkeletonContainer* CreateContatiner(ndBodyKinematic* const rootBody)
 	{
-		dNode* const node = Append();
+		ndNode* const node = Append();
 		ndSkeletonContainer* const container = &node->GetInfo();
 		container->Init(rootBody);
 		return container;

@@ -38,27 +38,27 @@
 
 #define DG_POINTS_RUN (512 * 1024)
 
-class dPolygonSoupBuilder::dgFaceInfo
+class ndPolygonSoupBuilder::dgFaceInfo
 {
 	public:
 	dInt32 indexCount;
 	dInt32 indexStart;
 };
 
-class dPolygonSoupBuilder::dgFaceBucket: public dList<dgFaceInfo>
+class ndPolygonSoupBuilder::dgFaceBucket: public ndList<dgFaceInfo>
 {
 	public: 
 	dgFaceBucket ()
-		:dList<dgFaceInfo>()
+		:ndList<dgFaceInfo>()
 	{
 	}
 };
 
-class dPolygonSoupBuilder::dgFaceMap: public dTree<dgFaceBucket, dInt32>
+class ndPolygonSoupBuilder::dgFaceMap: public ndTree<dgFaceBucket, dInt32>
 {
 	public:
-	dgFaceMap (dPolygonSoupBuilder& builder)
-		:dTree<dgFaceBucket, dInt32>()
+	dgFaceMap (ndPolygonSoupBuilder& builder)
+		:ndTree<dgFaceBucket, dInt32>()
 	{
 		dInt32 polygonIndex = 0;
 		//dInt32 faceCount = builder.m_faceCount;
@@ -70,7 +70,7 @@ class dPolygonSoupBuilder::dgFaceMap: public dTree<dgFaceBucket, dInt32>
 			dInt32 count = faceVertexCounts[i];
 			dInt32 attribute = faceVertexIndex[polygonIndex + count - 1];
 			
-			dNode* node = Find(attribute);
+			ndNode* node = Find(attribute);
 			if (!node) 
 			{
 				dgFaceBucket tmp;
@@ -86,11 +86,11 @@ class dPolygonSoupBuilder::dgFaceMap: public dTree<dgFaceBucket, dInt32>
 	}
 };
 
-class dPolygonSoupBuilder::dgPolySoupFilterAllocator: public dPolyhedra
+class ndPolygonSoupBuilder::dgPolySoupFilterAllocator: public ndPolyhedra
 {
 	public: 
 	dgPolySoupFilterAllocator ()
-		:dPolyhedra ()
+		:ndPolyhedra ()
 	{
 	}
 
@@ -132,7 +132,7 @@ class dPolygonSoupBuilder::dgPolySoupFilterAllocator: public dPolyhedra
 	}
 };
 
-dPolygonSoupBuilder::dPolygonSoupBuilder ()
+ndPolygonSoupBuilder::ndPolygonSoupBuilder ()
 	:m_faceVertexCount()
 	,m_vertexIndex()
 	,m_normalIndex()
@@ -142,7 +142,7 @@ dPolygonSoupBuilder::dPolygonSoupBuilder ()
 	m_run = DG_POINTS_RUN;
 }
 
-dPolygonSoupBuilder::dPolygonSoupBuilder (const dPolygonSoupBuilder& source)
+ndPolygonSoupBuilder::ndPolygonSoupBuilder (const ndPolygonSoupBuilder& source)
 	:m_faceVertexCount(source.m_faceVertexCount.GetCount())
 	,m_vertexIndex(source.m_vertexIndex.GetCount())
 	,m_normalIndex()
@@ -156,7 +156,7 @@ dPolygonSoupBuilder::dPolygonSoupBuilder (const dPolygonSoupBuilder& source)
 	
 	memcpy (&m_vertexIndex[0], &source.m_vertexIndex[0], sizeof (dInt32) * source.m_vertexIndex.GetCount());
 	memcpy (&m_faceVertexCount[0], &source.m_faceVertexCount[0], sizeof (dInt32) * source.m_faceVertexCount.GetCount());
-	memcpy (&m_vertexPoints[0], &source.m_vertexPoints[0], sizeof (dBigVector) * source.m_vertexPoints.GetCount());
+	memcpy (&m_vertexPoints[0], &source.m_vertexPoints[0], sizeof (ndBigVector) * source.m_vertexPoints.GetCount());
 
 	if (m_normalPoints.GetCount())
 	{
@@ -166,15 +166,15 @@ dPolygonSoupBuilder::dPolygonSoupBuilder (const dPolygonSoupBuilder& source)
 		m_normalPoints.SetCount(source.m_normalPoints.GetCount());
 
 		memcpy (&m_normalIndex[0], &source.m_normalIndex[0], sizeof (dInt32) * source.m_normalIndex.GetCount());
-		memcpy (&m_normalPoints[0], &source.m_normalPoints[0], sizeof (dBigVector) * source.m_normalPoints.GetCount());
+		memcpy (&m_normalPoints[0], &source.m_normalPoints[0], sizeof (ndBigVector) * source.m_normalPoints.GetCount());
 	}
 }
 
-dPolygonSoupBuilder::~dPolygonSoupBuilder ()
+ndPolygonSoupBuilder::~ndPolygonSoupBuilder ()
 {
 }
 
-void dPolygonSoupBuilder::Begin()
+void ndPolygonSoupBuilder::Begin()
 {
 	m_run = DG_POINTS_RUN;
 	m_vertexIndex.SetCount(0);
@@ -184,7 +184,7 @@ void dPolygonSoupBuilder::Begin()
 	m_faceVertexCount.SetCount(0);
 }
 
-void dPolygonSoupBuilder::SavePLY(const char* const fileName) const
+void ndPolygonSoupBuilder::SavePLY(const char* const fileName) const
 {
 	FILE* const file = fopen(fileName, "wb");
 
@@ -202,7 +202,7 @@ void dPolygonSoupBuilder::SavePLY(const char* const fileName) const
 
 	for (dInt32 i = 0; i < m_vertexPoints.GetCount(); i ++)
 	{
-		const dBigVector& point = m_vertexPoints[i];
+		const ndBigVector& point = m_vertexPoints[i];
 		fprintf(file, "%f %f %f\n", point.m_x, point.m_y, point.m_z);
 	}
 
@@ -221,7 +221,7 @@ void dPolygonSoupBuilder::SavePLY(const char* const fileName) const
 	fclose(file);
 }
 
-void dPolygonSoupBuilder::AddFaceIndirect(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 faceId, const dInt32* const indexArray, dInt32 indexCount)
+void ndPolygonSoupBuilder::AddFaceIndirect(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 faceId, const dInt32* const indexArray, dInt32 indexCount)
 {
 	dInt32 faces[32];
 	dInt32 pool[512];
@@ -232,7 +232,7 @@ void dPolygonSoupBuilder::AddFaceIndirect(const dFloat32* const vertex, dInt32 s
 	{
 		pool[i] = i + vertexCount;
 		const dInt32 j = indexArray[i] * stride;
-		dBigVector point(vertex[j + 0], vertex[j + 1], vertex[j + 2], dFloat32(0.0f));
+		ndBigVector point(vertex[j + 0], vertex[j + 1], vertex[j + 2], dFloat32(0.0f));
 		m_vertexPoints.PushBack (point);
 	}
 
@@ -240,11 +240,11 @@ void dPolygonSoupBuilder::AddFaceIndirect(const dFloat32* const vertex, dInt32 s
 	if (indexCount == 3)
 	{
 		convexFaces = 1;
-		dBigVector p0(m_vertexPoints[pool[2]]);
+		ndBigVector p0(m_vertexPoints[pool[2]]);
 		for (dInt32 j = 0; j < 3; j++)
 		{
-			dBigVector p1(m_vertexPoints[pool[j]]);
-			dBigVector edge(p1 - p0);
+			ndBigVector p1(m_vertexPoints[pool[j]]);
+			ndBigVector edge(p1 - p0);
 			dFloat64 mag2 = edge.DotProduct(edge).GetScalar();
 			if (mag2 < dFloat32(1.0e-6f))
 			{
@@ -255,11 +255,11 @@ void dPolygonSoupBuilder::AddFaceIndirect(const dFloat32* const vertex, dInt32 s
 
 		if (convexFaces)
 		{
-			dBigVector edge0(m_vertexPoints[pool[2]] - m_vertexPoints[pool[0]]);
-			dBigVector edge1(m_vertexPoints[pool[1]] - m_vertexPoints[pool[0]]);
+			ndBigVector edge0(m_vertexPoints[pool[2]] - m_vertexPoints[pool[0]]);
+			ndBigVector edge1(m_vertexPoints[pool[1]] - m_vertexPoints[pool[0]]);
 			dAssert(edge0.m_w == dFloat32(0.0f));
 			dAssert(edge1.m_w == dFloat32(0.0f));
-			dBigVector normal(edge0.CrossProduct(edge1));
+			ndBigVector normal(edge0.CrossProduct(edge1));
 			dFloat64 mag2 = normal.DotProduct(normal).GetScalar();
 			if (mag2 < dFloat32(1.0e-8f))
 			{
@@ -298,7 +298,7 @@ void dPolygonSoupBuilder::AddFaceIndirect(const dFloat32* const vertex, dInt32 s
 	}
 }
 
-void dPolygonSoupBuilder::AddFace(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 vertexCount, const dInt32 faceId)
+void ndPolygonSoupBuilder::AddFace(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 vertexCount, const dInt32 faceId)
 {
 	dInt32 indexArray[1024];
 	dAssert(vertexCount < dInt32 (sizeof(indexArray)/sizeof (indexArray[0])));
@@ -309,12 +309,12 @@ void dPolygonSoupBuilder::AddFace(const dFloat32* const vertex, dInt32 strideInB
 	AddFaceIndirect(vertex, strideInBytes, faceId, indexArray, vertexCount);
 }
 
-void dPolygonSoupBuilder::PackArray()
+void ndPolygonSoupBuilder::PackArray()
 {
 	dAssert(0);
-	dStack<dInt32> indexMapPool (m_vertexPoints.GetCount());
+	ndStack<dInt32> indexMapPool (m_vertexPoints.GetCount());
 	dInt32* const indexMap = &indexMapPool[0];
-	dInt32 vertexCount = dVertexListToIndexList(&m_vertexPoints[0].m_x, sizeof (dBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], dFloat32 (1.0e-6f));
+	dInt32 vertexCount = dVertexListToIndexList(&m_vertexPoints[0].m_x, sizeof (ndBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], dFloat32 (1.0e-6f));
 
 	dInt32 k = 0;
 	for (dInt32 i = 0; i < m_faceVertexCount.GetCount(); i ++)
@@ -335,16 +335,16 @@ void dPolygonSoupBuilder::PackArray()
 	m_run = DG_POINTS_RUN;
 }
 
-void dPolygonSoupBuilder::Finalize()
+void ndPolygonSoupBuilder::Finalize()
 {
 	const dInt32 faceCount = m_faceVertexCount.GetCount();
 	if (faceCount)
 	{
-		//dStack<dInt32> indexMapPool (m_indexCount + m_vertexCount);
-		dStack<dInt32> indexMapPool(m_vertexIndex.GetCount());
+		//ndStack<dInt32> indexMapPool (m_indexCount + m_vertexCount);
+		ndStack<dInt32> indexMapPool(m_vertexIndex.GetCount());
 
 		dInt32* const indexMap = &indexMapPool[0];
-		dInt32 vertexCount = dVertexListToIndexList(&m_vertexPoints[0].m_x, sizeof (dBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], dFloat32 (1.0e-4f));
+		dInt32 vertexCount = dVertexListToIndexList(&m_vertexPoints[0].m_x, sizeof (ndBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], dFloat32 (1.0e-4f));
 		dAssert(vertexCount <= m_vertexPoints.GetCount());
 		m_vertexPoints.SetCount(vertexCount);
 
@@ -365,14 +365,14 @@ void dPolygonSoupBuilder::Finalize()
 	}
 }
 
-void dPolygonSoupBuilder::FinalizeAndOptimize(dInt32 id)
+void ndPolygonSoupBuilder::FinalizeAndOptimize(dInt32 id)
 {
 	Finalize();
-	dPolyhedra polyhedra;
-	dPolygonSoupBuilder source(*this);
-	dPolygonSoupBuilder leftOver;
+	ndPolyhedra polyhedra;
+	ndPolygonSoupBuilder source(*this);
+	ndPolygonSoupBuilder leftOver;
 	dInt32 tmpIndexPool[1024];
-	dVector tmpVertexPool[1024];
+	ndVector tmpVertexPool[1024];
 
 	Begin();
 	leftOver.Begin();
@@ -384,7 +384,7 @@ void dPolygonSoupBuilder::FinalizeAndOptimize(dInt32 id)
 		dInt32 indexCount = source.m_faceVertexCount[i];
 		dAssert (indexCount < 1024);
 
-		dEdge* const face = polyhedra.AddFace(indexCount - 1, &source.m_vertexIndex[faceIndexNumber]);
+		ndEdge* const face = polyhedra.AddFace(indexCount - 1, &source.m_vertexIndex[faceIndexNumber]);
 		if (!face) 
 		{
 			for (dInt32 j = 0; j < indexCount - 1; j ++) 
@@ -395,12 +395,12 @@ void dPolygonSoupBuilder::FinalizeAndOptimize(dInt32 id)
 			}
 			//dInt32 faceArray = indexCount - 1;
 			//leftOver.AddMesh (&tmpVertexPool[0].m_x, indexCount, sizeof (tmpVertexPool[0]), 1, &faceArray, tmpIndexPool, &attribute, dGetIdentityMatrix());
-			leftOver.AddFaceIndirect(&tmpVertexPool[0].m_x, sizeof (dVector), attribute, tmpIndexPool, indexCount - 1);
+			leftOver.AddFaceIndirect(&tmpVertexPool[0].m_x, sizeof (ndVector), attribute, tmpIndexPool, indexCount - 1);
 		} 
 		else 
 		{
 			// set the attribute
-			dEdge* ptr = face;
+			ndEdge* ptr = face;
 			do 
 			{
 				ptr->m_userData = dUnsigned64 (attribute);
@@ -411,16 +411,16 @@ void dPolygonSoupBuilder::FinalizeAndOptimize(dInt32 id)
 	} 
 	polyhedra.EndFace();
 
-	dPolyhedra facesLeft;
+	ndPolyhedra facesLeft;
 	facesLeft.BeginFace();
-	polyhedra.ConvexPartition (&source.m_vertexPoints[0].m_x, sizeof (dBigVector), &facesLeft);
+	polyhedra.ConvexPartition (&source.m_vertexPoints[0].m_x, sizeof (ndBigVector), &facesLeft);
 	facesLeft.EndFace();
 
 	dInt32 mark = polyhedra.IncLRU();
-	dPolyhedra::Iterator iter (polyhedra);
+	ndPolyhedra::Iterator iter (polyhedra);
 	for (iter.Begin(); iter; iter ++) 
 	{
-		dEdge* const edge = &(*iter);
+		ndEdge* const edge = &(*iter);
 		if (edge->m_incidentFace < 0) 
 		{
 			continue;
@@ -430,7 +430,7 @@ void dPolygonSoupBuilder::FinalizeAndOptimize(dInt32 id)
 			continue;
 		}
 
-		dEdge* ptr = edge;
+		ndEdge* ptr = edge;
 		dInt32 indexCount = 0;
 		do 
 		{
@@ -444,15 +444,15 @@ void dPolygonSoupBuilder::FinalizeAndOptimize(dInt32 id)
 		if (indexCount >= 3) 
 		{
 			//AddMesh (&tmpVertexPool[0].m_x, indexCount, sizeof (tmpVertexPool[0]), 1, &indexCount, tmpIndexPool, &attribute, dGetIdentityMatrix());
-			AddFaceIndirect(&tmpVertexPool[0].m_x, sizeof (dVector), attribute, tmpIndexPool, indexCount);
+			AddFaceIndirect(&tmpVertexPool[0].m_x, sizeof (ndVector), attribute, tmpIndexPool, indexCount);
 		}
 	}
 
 	mark = facesLeft.IncLRU();
-	dPolyhedra::Iterator iter1 (facesLeft);
+	ndPolyhedra::Iterator iter1 (facesLeft);
 	for (iter1.Begin(); iter1; iter1 ++) 
 	{
-		dEdge* const edge = &(*iter1);
+		ndEdge* const edge = &(*iter1);
 		if (edge->m_incidentFace < 0) 
 		{
 			continue;
@@ -462,7 +462,7 @@ void dPolygonSoupBuilder::FinalizeAndOptimize(dInt32 id)
 			continue;
 		}
 
-		dEdge* ptr = edge;
+		ndEdge* ptr = edge;
 		dInt32 indexCount = 0;
 		do 
 		{
@@ -474,8 +474,8 @@ void dPolygonSoupBuilder::FinalizeAndOptimize(dInt32 id)
 		} while (ptr != edge);
 		if (indexCount >= 3) 
 		{
-			//AddMesh (&tmpVertexPool[0].m_x, indexCount, sizeof (dVector), 1, &indexCount, tmpIndexPool, &attribute, dGetIdentityMatrix());
-			AddFaceIndirect(&tmpVertexPool[0].m_x, sizeof(dVector), attribute, tmpIndexPool, indexCount);
+			//AddMesh (&tmpVertexPool[0].m_x, indexCount, sizeof (ndVector), 1, &indexCount, tmpIndexPool, &attribute, dGetIdentityMatrix());
+			AddFaceIndirect(&tmpVertexPool[0].m_x, sizeof(ndVector), attribute, tmpIndexPool, indexCount);
 		}
 	}
 
@@ -491,7 +491,7 @@ void dPolygonSoupBuilder::FinalizeAndOptimize(dInt32 id)
 		}
 		//dInt32 faceArray = indexCount;
 		//AddMesh (&tmpVertexPool[0].m_x, indexCount, sizeof (tmpVertexPool[0]), 1, &faceArray, tmpIndexPool, &attribute, dGetIdentityMatrix());
-		AddFaceIndirect(&tmpVertexPool[0].m_x, sizeof(dVector), attribute, tmpIndexPool, indexCount);
+		AddFaceIndirect(&tmpVertexPool[0].m_x, sizeof(ndVector), attribute, tmpIndexPool, indexCount);
 
 		faceIndexNumber += (indexCount + 1); 
 	}
@@ -500,7 +500,7 @@ void dPolygonSoupBuilder::FinalizeAndOptimize(dInt32 id)
 
 }
 
-void dPolygonSoupBuilder::OptimizeByIndividualFaces()
+void ndPolygonSoupBuilder::OptimizeByIndividualFaces()
 {
 	dInt32* const faceArray = &m_faceVertexCount[0];
 	dInt32* const indexArray = &m_vertexIndex[0];
@@ -536,11 +536,11 @@ void dPolygonSoupBuilder::OptimizeByIndividualFaces()
 	m_faceVertexCount.SetCount(newFaceCount);
 }
 
-void dPolygonSoupBuilder::End(bool optimize)
+void ndPolygonSoupBuilder::End(bool optimize)
 {
 	if (optimize) 
 	{
-		dPolygonSoupBuilder copy (*this);
+		ndPolygonSoupBuilder copy (*this);
 		dgFaceMap faceMap (copy);
 
 		Begin();
@@ -566,18 +566,18 @@ void dPolygonSoupBuilder::End(bool optimize)
 			dInt32 faceIndexCount = m_faceVertexCount[i];
 
 			const dInt32* const ptr = &m_vertexIndex[indexCount];
-			dBigVector v0(&m_vertexPoints[ptr[0]].m_x);
-			dBigVector v1(&m_vertexPoints[ptr[1]].m_x);
-			dBigVector e0(v1 - v0);
-			dBigVector normal0(dBigVector::m_zero);
+			ndBigVector v0(&m_vertexPoints[ptr[0]].m_x);
+			ndBigVector v1(&m_vertexPoints[ptr[1]].m_x);
+			ndBigVector e0(v1 - v0);
+			ndBigVector normal0(ndBigVector::m_zero);
 			for (dInt32 j = 2; j < faceIndexCount - 1; j++)
 			{
-				dBigVector v2(&m_vertexPoints[ptr[j]].m_x);
-				dBigVector e1(v2 - v0);
+				ndBigVector v2(&m_vertexPoints[ptr[j]].m_x);
+				ndBigVector e1(v2 - v0);
 				normal0 += e0.CrossProduct(e1);
 				e0 = e1;
 			}
-			dBigVector normal(normal0.Normalize());
+			ndBigVector normal(normal0.Normalize());
 
 			m_normalPoints[i].m_x = normal.m_x;
 			m_normalPoints[i].m_y = normal.m_y;
@@ -590,26 +590,26 @@ void dPolygonSoupBuilder::End(bool optimize)
 
 		m_normalIndex.Resize(faceCount);;
 		m_normalIndex.SetCount(faceCount);
-		dInt32 normalCount = dVertexListToIndexList(&m_normalPoints[0].m_x, sizeof(dBigVector), 3, faceCount, &m_normalIndex[0], dFloat32(1.0e-6f));
+		dInt32 normalCount = dVertexListToIndexList(&m_normalPoints[0].m_x, sizeof(ndBigVector), 3, faceCount, &m_normalIndex[0], dFloat32(1.0e-6f));
 		dAssert(normalCount <= m_normalPoints.GetCount());
 		m_normalPoints.SetCount(normalCount);
 	}
 }
 
-void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket, const dPolygonSoupBuilder& source)
+void ndPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket, const ndPolygonSoupBuilder& source)
 {
 	#define DG_MESH_PARTITION_SIZE (1024 * 4)
 
 	const dInt32* const indexArray = &source.m_vertexIndex[0];
-	const dBigVector* const points = &source.m_vertexPoints[0];
+	const ndBigVector* const points = &source.m_vertexPoints[0];
 
-	dVector face[256];
+	ndVector face[256];
 	dInt32 faceIndex[256];
 	if (faceBucket.GetCount() >= DG_MESH_PARTITION_SIZE) 
 	{
-		dStack<dgFaceBucket::dNode*> array(faceBucket.GetCount());
+		ndStack<dgFaceBucket::ndNode*> array(faceBucket.GetCount());
 		dInt32 count = 0;
-		for (dgFaceBucket::dNode* node = faceBucket.GetFirst(); node; node = node->GetNext()) 
+		for (dgFaceBucket::ndNode* node = faceBucket.GetFirst(); node; node = node->GetNext()) 
 		{
 			array[count] = node;
 			count ++;
@@ -629,7 +629,7 @@ void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket
 
 			if (faceCount <= DG_MESH_PARTITION_SIZE) 
 			{
-				dPolygonSoupBuilder tmpBuilder;
+				ndPolygonSoupBuilder tmpBuilder;
 				for (dInt32 i = 0; i < faceCount; i ++) 
 				{
 					const dgFaceInfo& faceInfo = array[faceStart + i]->GetInfo();
@@ -644,8 +644,8 @@ void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket
 						faceIndex[j] = j;
 					}
 					//dInt32 faceIndexCount = count1;
-					//tmpBuilder.AddMesh (&face[0].m_x, count1, sizeof (dVector), 1, &faceIndexCount, &faceIndex[0], &faceId, dGetIdentityMatrix()); 
-					tmpBuilder.AddFaceIndirect(&face[0].m_x, sizeof(dVector), faceId, faceIndex, count1);
+					//tmpBuilder.AddMesh (&face[0].m_x, count1, sizeof (ndVector), 1, &faceIndexCount, &faceIndex[0], &faceId, dGetIdentityMatrix()); 
+					tmpBuilder.AddFaceIndirect(&face[0].m_x, sizeof(ndVector), faceId, faceIndex, count1);
 				}
 				tmpBuilder.FinalizeAndOptimize (faceId);
 
@@ -660,31 +660,31 @@ void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket
 						faceIndex[j] = j;
 					}
 					//dInt32 faceArray = indexCount;
-					//AddMesh (&face[0].m_x, indexCount, sizeof (dVector), 1, &faceArray, faceIndex, &faceId, dGetIdentityMatrix());
-					AddFaceIndirect(&face[0].m_x, sizeof(dVector), faceId, faceIndex, indexCount);
+					//AddMesh (&face[0].m_x, indexCount, sizeof (ndVector), 1, &faceArray, faceIndex, &faceId, dGetIdentityMatrix());
+					AddFaceIndirect(&face[0].m_x, sizeof(ndVector), faceId, faceIndex, indexCount);
 					faceIndexNumber += (indexCount + 1); 
 				}
 			} 
 			else 
 			{
-				dBigVector median (dBigVector::m_zero);
-				dBigVector varian (dBigVector::m_zero);
+				ndBigVector median (ndBigVector::m_zero);
+				ndBigVector varian (ndBigVector::m_zero);
 				for (dInt32 i = 0; i < faceCount; i ++) 
 				{
 					const dgFaceInfo& faceInfo = array[faceStart + i]->GetInfo();
 					dInt32 count1 = faceInfo.indexCount - 1;
 					dInt32 start1 = faceInfo.indexStart;
-					dBigVector p0 (dFloat32 ( 1.0e10f), dFloat32 ( 1.0e10f), dFloat32 ( 1.0e10f), dFloat32 (0.0f));
-					dBigVector p1 (dFloat32 (-1.0e10f), dFloat32 (-1.0e10f), dFloat32 (-1.0e10f), dFloat32 (0.0f));
+					ndBigVector p0 (dFloat32 ( 1.0e10f), dFloat32 ( 1.0e10f), dFloat32 ( 1.0e10f), dFloat32 (0.0f));
+					ndBigVector p1 (dFloat32 (-1.0e10f), dFloat32 (-1.0e10f), dFloat32 (-1.0e10f), dFloat32 (0.0f));
 					for (dInt32 j = 0; j < count1; j ++) 
 					{
 						dInt32 index = indexArray[start1 + j];
-						const dBigVector& p = points[index];
+						const ndBigVector& p = points[index];
 						dAssert(p.m_w == dFloat32(0.0f));
 						p0 = p0.GetMin(p);
 						p1 = p1.GetMax(p);
 					}
-					dBigVector p ((p0 + p1).Scale (0.5f));
+					ndBigVector p ((p0 + p1).Scale (0.5f));
 					median += p;
 					varian += p * p;
 				}
@@ -701,7 +701,7 @@ void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket
 						maxVarian = dFloat32 (varian[i]);
 					}
 				}
-				dBigVector center = median.Scale (dFloat32 (1.0f) / dFloat32 (faceCount));
+				ndBigVector center = median.Scale (dFloat32 (1.0f) / dFloat32 (faceCount));
 				dFloat64 axisVal = center[axis];
 
 				dInt32 leftCount = 0;
@@ -717,7 +717,7 @@ void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket
 					for (dInt32 j = 0; j < count1; j ++) 
 					{
 						dInt32 index = indexArray[start1 + j];
-						const dBigVector& p = points[index];
+						const ndBigVector& p = points[index];
 						if (p[axis] > axisVal) 
 						{
 							side = 1;
@@ -751,8 +751,8 @@ void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket
 	} 
 	else 
 	{
-		dPolygonSoupBuilder tmpBuilder;
-		for (dgFaceBucket::dNode* node = faceBucket.GetFirst(); node; node = node->GetNext()) 
+		ndPolygonSoupBuilder tmpBuilder;
+		for (dgFaceBucket::ndNode* node = faceBucket.GetFirst(); node; node = node->GetNext()) 
 		{
 			const dgFaceInfo& faceInfo = node->GetInfo();
 
@@ -766,8 +766,8 @@ void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket
 				faceIndex[j] = j;
 			}
 			//dInt32 faceIndexCount = count;
-			//tmpBuilder.AddMesh (&face[0].m_x, count, sizeof (dVector), 1, &faceIndexCount, &faceIndex[0], &faceId, dGetIdentityMatrix()); 
-			tmpBuilder.AddFaceIndirect(&face[0].m_x, sizeof(dVector), faceId, faceIndex, count);
+			//tmpBuilder.AddMesh (&face[0].m_x, count, sizeof (ndVector), 1, &faceIndexCount, &faceIndex[0], &faceId, dGetIdentityMatrix()); 
+			tmpBuilder.AddFaceIndirect(&face[0].m_x, sizeof(ndVector), faceId, faceIndex, count);
 		}
 		tmpBuilder.FinalizeAndOptimize (faceId);
 
@@ -782,23 +782,23 @@ void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket
 				faceIndex[j] = j;
 			}
 			//dInt32 faceArray = indexCount;
-			//AddMesh (&face[0].m_x, indexCount, sizeof (dVector), 1, &faceArray, faceIndex, &faceId, dGetIdentityMatrix());
-			AddFaceIndirect(&face[0].m_x, sizeof(dVector), faceId, faceIndex, indexCount);
+			//AddMesh (&face[0].m_x, indexCount, sizeof (ndVector), 1, &faceArray, faceIndex, &faceId, dGetIdentityMatrix());
+			AddFaceIndirect(&face[0].m_x, sizeof(ndVector), faceId, faceIndex, indexCount);
 		
 			faceIndexNumber += (indexCount + 1); 
 		}
 	}
 }
 
-dInt32 dPolygonSoupBuilder::FilterFace (dInt32 count, dInt32* const pool)
+dInt32 ndPolygonSoupBuilder::FilterFace (dInt32 count, dInt32* const pool)
 {
 	if (count == 3) 
 	{
-		dBigVector p0 (m_vertexPoints[pool[2]]);
+		ndBigVector p0 (m_vertexPoints[pool[2]]);
 		for (dInt32 i = 0; i < 3; i ++) 
 		{
-			dBigVector p1 (m_vertexPoints[pool[i]]);
-			dBigVector edge (p1 - p0);
+			ndBigVector p1 (m_vertexPoints[pool[i]]);
+			ndBigVector edge (p1 - p0);
 			dFloat64 mag2 = edge.DotProduct(edge).GetScalar();
 			if (mag2 < dFloat32 (1.0e-6f)) 
 			{
@@ -809,9 +809,9 @@ dInt32 dPolygonSoupBuilder::FilterFace (dInt32 count, dInt32* const pool)
 
 		if (count == 3) 
 		{
-			dBigVector edge0 (m_vertexPoints[pool[2]] - m_vertexPoints[pool[0]]);
-			dBigVector edge1 (m_vertexPoints[pool[1]] - m_vertexPoints[pool[0]]);
-			dBigVector normal (edge0.CrossProduct(edge1));
+			ndBigVector edge0 (m_vertexPoints[pool[2]] - m_vertexPoints[pool[0]]);
+			ndBigVector edge1 (m_vertexPoints[pool[1]] - m_vertexPoints[pool[0]]);
+			ndBigVector normal (edge0.CrossProduct(edge1));
 
 			dAssert(edge0.m_w == dFloat32(0.0f));
 			dAssert(edge1.m_w == dFloat32(0.0f));
@@ -833,7 +833,7 @@ dInt32 dPolygonSoupBuilder::FilterFace (dInt32 count, dInt32* const pool)
 			return 0;
 		}
 
-		dEdge* edge = &polyhedra.GetRoot()->GetInfo();
+		ndEdge* edge = &polyhedra.GetRoot()->GetInfo();
 		if (edge->m_incidentFace < 0) 
 		{
 			edge = edge->m_twin;
@@ -845,14 +845,14 @@ dInt32 dPolygonSoupBuilder::FilterFace (dInt32 count, dInt32* const pool)
 			flag = false;
 			if (count >= 3) 
 			{
-				dEdge* ptr = edge;
-				dBigVector p0 (&m_vertexPoints[ptr->m_incidentVertex].m_x);
-				p0 = p0 & dBigVector::m_triplexMask;
+				ndEdge* ptr = edge;
+				ndBigVector p0 (&m_vertexPoints[ptr->m_incidentVertex].m_x);
+				p0 = p0 & ndBigVector::m_triplexMask;
 				do 
 				{
-					dBigVector p1 (&m_vertexPoints[ptr->m_next->m_incidentVertex].m_x);
-					p1 = p1 & dBigVector::m_triplexMask;
-					dBigVector e0 (p1 - p0);
+					ndBigVector p1 (&m_vertexPoints[ptr->m_next->m_incidentVertex].m_x);
+					p1 = p1 & ndBigVector::m_triplexMask;
+					ndBigVector e0 (p1 - p0);
 					dFloat64 mag2 = e0.DotProduct(e0).GetScalar();
 					if (mag2 < dFloat32 (1.0e-6f)) 
 					{
@@ -873,7 +873,7 @@ dInt32 dPolygonSoupBuilder::FilterFace (dInt32 count, dInt32* const pool)
 		if (count >= 3) 
 		{
 			flag = true;
-			dBigVector normal (polyhedra.FaceNormal (edge, &m_vertexPoints[0].m_x, sizeof (dBigVector)));
+			ndBigVector normal (polyhedra.FaceNormal (edge, &m_vertexPoints[0].m_x, sizeof (ndBigVector)));
 			dAssert (normal.m_w == dFloat32 (0.0f));
 
 			dAssert (normal.DotProduct(normal).GetScalar() > dFloat32 (1.0e-10f)); 
@@ -884,20 +884,20 @@ dInt32 dPolygonSoupBuilder::FilterFace (dInt32 count, dInt32* const pool)
 				flag = false;
 				if (count >= 3) 
 				{
-					dEdge* ptr = edge;
+					ndEdge* ptr = edge;
 
-					dBigVector p0 (&m_vertexPoints[ptr->m_prev->m_incidentVertex].m_x);
-					dBigVector p1 (&m_vertexPoints[ptr->m_incidentVertex].m_x);
+					ndBigVector p0 (&m_vertexPoints[ptr->m_prev->m_incidentVertex].m_x);
+					ndBigVector p1 (&m_vertexPoints[ptr->m_incidentVertex].m_x);
 
-					p0 = p0 & dBigVector::m_triplexMask;
-					p1 = p1 & dBigVector::m_triplexMask;
-					dBigVector e0 (p1 - p0);
+					p0 = p0 & ndBigVector::m_triplexMask;
+					p1 = p1 & ndBigVector::m_triplexMask;
+					ndBigVector e0 (p1 - p0);
 					e0 = e0.Scale (dFloat64 (1.0f) / sqrt (e0.DotProduct(e0).GetScalar() + dFloat32(1.0e-24f)));
 					do 
 					{
-						dBigVector p2 (&m_vertexPoints[ptr->m_next->m_incidentVertex].m_x);
-						p2 = p2 & dBigVector::m_triplexMask;
-						dBigVector e1 (p2 - p1);
+						ndBigVector p2 (&m_vertexPoints[ptr->m_next->m_incidentVertex].m_x);
+						p2 = p2 & ndBigVector::m_triplexMask;
+						ndBigVector e1 (p2 - p1);
 
 						e1 = e1.Scale (dFloat64 (1.0f) / sqrt (e1.DotProduct(e1).GetScalar() + dFloat32(1.0e-24f)));
 						dFloat64 mag2 = e1.DotProduct(e0).GetScalar();
@@ -913,7 +913,7 @@ dInt32 dPolygonSoupBuilder::FilterFace (dInt32 count, dInt32* const pool)
 							break;
 						}
 
-						dBigVector n (e0.CrossProduct(e1));
+						ndBigVector n (e0.CrossProduct(e1));
 						dAssert (n.m_w == dFloat32 (0.0f));
 						mag2 = n.DotProduct(normal).GetScalar();
 						if (mag2 < dFloat32 (1.0e-5f)) 
@@ -936,23 +936,23 @@ dInt32 dPolygonSoupBuilder::FilterFace (dInt32 count, dInt32* const pool)
 			}
 		}
 
-		dEdge* first = edge;
+		ndEdge* first = edge;
 		if (count >= 3) 
 		{
 			dFloat64 best = dFloat32 (2.0f);
-			dEdge* ptr = edge;
+			ndEdge* ptr = edge;
 
-			dBigVector p0 (&m_vertexPoints[ptr->m_incidentVertex].m_x);
-			dBigVector p1 (&m_vertexPoints[ptr->m_next->m_incidentVertex].m_x);
-			p0 = p0 & dBigVector::m_triplexMask;
-			p1 = p1 & dBigVector::m_triplexMask;
-			dBigVector e0 (p1 - p0);
+			ndBigVector p0 (&m_vertexPoints[ptr->m_incidentVertex].m_x);
+			ndBigVector p1 (&m_vertexPoints[ptr->m_next->m_incidentVertex].m_x);
+			p0 = p0 & ndBigVector::m_triplexMask;
+			p1 = p1 & ndBigVector::m_triplexMask;
+			ndBigVector e0 (p1 - p0);
 			e0 = e0.Scale (dFloat64 (1.0f) / sqrt (e0.DotProduct(e0).GetScalar() + dFloat32(1.0e-24f)));
 			do 
 			{
-				dBigVector p2 (&m_vertexPoints[ptr->m_next->m_next->m_incidentVertex].m_x);
-				p2 = p2 & dBigVector::m_triplexMask;
-				dBigVector e1 (p2 - p1);
+				ndBigVector p2 (&m_vertexPoints[ptr->m_next->m_next->m_incidentVertex].m_x);
+				p2 = p2 & ndBigVector::m_triplexMask;
+				ndBigVector e1 (p2 - p1);
 
 				e1 = e1.Scale (dFloat64 (1.0f) / sqrt (e1.DotProduct(e1).GetScalar() + dFloat32(1.0e-24f)));
 				dFloat64 mag2 = fabs (e1.DotProduct(e0).GetScalar());
@@ -982,21 +982,21 @@ dInt32 dPolygonSoupBuilder::FilterFace (dInt32 count, dInt32* const pool)
 		{
 			dInt32 j0 = count - 2;  
 			dInt32 j1 = count - 1;  
-			dBigVector normal (polyhedra.FaceNormal (edge, &m_vertexPoints[0].m_x, sizeof (dBigVector)));
+			ndBigVector normal (polyhedra.FaceNormal (edge, &m_vertexPoints[0].m_x, sizeof (ndBigVector)));
 			dAssert (normal.m_w == dFloat32 (0.0f));
 			for (dInt32 j2 = 0; j2 < count; j2 ++) 
 			{ 
-				dBigVector p0 (&m_vertexPoints[pool[j0]].m_x);
-				dBigVector p1 (&m_vertexPoints[pool[j1]].m_x);
-				dBigVector p2 (&m_vertexPoints[pool[j2]].m_x);
-				p0 = p0 & dBigVector::m_triplexMask;
-				p1 = p1 & dBigVector::m_triplexMask;
-				p2 = p2 & dBigVector::m_triplexMask;
+				ndBigVector p0 (&m_vertexPoints[pool[j0]].m_x);
+				ndBigVector p1 (&m_vertexPoints[pool[j1]].m_x);
+				ndBigVector p2 (&m_vertexPoints[pool[j2]].m_x);
+				p0 = p0 & ndBigVector::m_triplexMask;
+				p1 = p1 & ndBigVector::m_triplexMask;
+				p2 = p2 & ndBigVector::m_triplexMask;
 
-				dBigVector e0 ((p0 - p1));
-				dBigVector e1 ((p2 - p1));
+				ndBigVector e0 ((p0 - p1));
+				ndBigVector e1 ((p2 - p1));
 
-				dBigVector n (e1.CrossProduct(e0));
+				ndBigVector n (e1.CrossProduct(e0));
 				dAssert (n.DotProduct(normal).GetScalar() > dFloat32 (0.0f));
 				j0 = j1;
 				j1 = j2;
@@ -1008,13 +1008,13 @@ dInt32 dPolygonSoupBuilder::FilterFace (dInt32 count, dInt32* const pool)
 	return (count >= 3) ? count : 0;
 }
 
-dInt32 dPolygonSoupBuilder::AddConvexFace (dInt32 count, dInt32* const pool, dInt32* const facesArray)
+dInt32 ndPolygonSoupBuilder::AddConvexFace (dInt32 count, dInt32* const pool, dInt32* const facesArray)
 {
 	dgPolySoupFilterAllocator polyhedra;
 
 	count = polyhedra.AddFilterFace(dUnsigned32 (count), pool);
 
-	dEdge* edge = &polyhedra.GetRoot()->GetInfo();
+	ndEdge* edge = &polyhedra.GetRoot()->GetInfo();
 	if (edge->m_incidentFace < 0) 
 	{
 		edge = edge->m_twin;
@@ -1029,13 +1029,13 @@ dInt32 dPolygonSoupBuilder::AddConvexFace (dInt32 count, dInt32* const pool, dIn
 		flag = 0;
 		if (count >= 3) 
 		{
-			dEdge* ptr = edge;
+			ndEdge* ptr = edge;
 
-			dBigVector p0 (&m_vertexPoints[ptr->m_incidentVertex].m_x);
+			ndBigVector p0 (&m_vertexPoints[ptr->m_incidentVertex].m_x);
 			do 
 			{
-				dBigVector p1 (&m_vertexPoints[ptr->m_next->m_incidentVertex].m_x);
-				dBigVector e0 (p1 - p0);
+				ndBigVector p1 (&m_vertexPoints[ptr->m_next->m_incidentVertex].m_x);
+				ndBigVector e0 (p1 - p0);
 				dFloat64 mag2 = e0.DotProduct(e0).GetScalar();
 				if (mag2 < dFloat32 (1.0e-6f)) 
 				{
@@ -1062,16 +1062,16 @@ dInt32 dPolygonSoupBuilder::AddConvexFace (dInt32 count, dInt32* const pool, dIn
 			flag = 0;
 			if (count >= 3) 
 			{
-				dEdge* ptr = edge;
+				ndEdge* ptr = edge;
 
-				dBigVector p0 (&m_vertexPoints[ptr->m_prev->m_incidentVertex].m_x);
-				dBigVector p1 (&m_vertexPoints[ptr->m_incidentVertex].m_x);
-				dBigVector e0 (p1 - p0);
+				ndBigVector p0 (&m_vertexPoints[ptr->m_prev->m_incidentVertex].m_x);
+				ndBigVector p1 (&m_vertexPoints[ptr->m_incidentVertex].m_x);
+				ndBigVector e0 (p1 - p0);
 				e0 = e0.Scale (dFloat64 (1.0f) / sqrt (e0.DotProduct(e0).GetScalar() + dFloat32(1.0e-24f)));
 				do 
 				{
-					dBigVector p2 (&m_vertexPoints[ptr->m_next->m_incidentVertex].m_x);
-					dBigVector e1 (p2 - p1);
+					ndBigVector p2 (&m_vertexPoints[ptr->m_next->m_incidentVertex].m_x);
+					ndBigVector e1 (p2 - p1);
 
 					e1 = e1.Scale (dFloat64 (1.0f) / sqrt (e1.DotProduct(e1).GetScalar() + dFloat32(1.0e-24f)));
 					dFloat64 mag2 = e1.DotProduct(e0).GetScalar();
@@ -1094,7 +1094,7 @@ dInt32 dPolygonSoupBuilder::AddConvexFace (dInt32 count, dInt32* const pool, dIn
 			}
 		}
 
-		dBigVector normal (polyhedra.FaceNormal (edge, &m_vertexPoints[0].m_x, sizeof (dBigVector)));
+		ndBigVector normal (polyhedra.FaceNormal (edge, &m_vertexPoints[0].m_x, sizeof (ndBigVector)));
 		dFloat64 mag2 = normal.DotProduct(normal).GetScalar();
 		if (mag2 < dFloat32 (1.0e-8f)) 
 		{
@@ -1104,19 +1104,19 @@ dInt32 dPolygonSoupBuilder::AddConvexFace (dInt32 count, dInt32* const pool, dIn
 
 		if (count >= 3) 
 		{
-			dEdge* ptr = edge;
-			dBigVector p0 (&m_vertexPoints[ptr->m_prev->m_incidentVertex].m_x);
-			dBigVector p1 (&m_vertexPoints[ptr->m_incidentVertex].m_x);
-			dBigVector e0 (p1 - p0);
+			ndEdge* ptr = edge;
+			ndBigVector p0 (&m_vertexPoints[ptr->m_prev->m_incidentVertex].m_x);
+			ndBigVector p1 (&m_vertexPoints[ptr->m_incidentVertex].m_x);
+			ndBigVector e0 (p1 - p0);
 			e0 = e0.Scale (dFloat64 (1.0f) / sqrt (e0.DotProduct(e0).GetScalar() + dFloat32(1.0e-24f)));
 			do 
 			{
-				dBigVector p2 (&m_vertexPoints[ptr->m_next->m_incidentVertex].m_x);
-				dBigVector e1 (p2 - p1);
+				ndBigVector p2 (&m_vertexPoints[ptr->m_next->m_incidentVertex].m_x);
+				ndBigVector e1 (p2 - p1);
 
 				e1 = e1.Scale (dFloat64 (1.0f) / sqrt (e1.DotProduct(e1).GetScalar() + dFloat32(1.0e-24f)));
 
-				dBigVector n (e0.CrossProduct(e1));
+				ndBigVector n (e0.CrossProduct(e1));
 				dFloat64 magnitud2 = n.DotProduct(normal).GetScalar();
 				if (magnitud2 < dFloat32 (1.0e-5f)) 
 				{
@@ -1133,11 +1133,11 @@ dInt32 dPolygonSoupBuilder::AddConvexFace (dInt32 count, dInt32* const pool, dIn
 
 	if (isconvex) 
 	{
-		dEdge* const first = edge;
+		ndEdge* const first = edge;
 		if (count >= 3) 
 		{
 			count = 0;
-			dEdge* ptr = first;
+			ndEdge* ptr = first;
 			do 
 			{
 				pool[count] = ptr->m_incidentVertex;
@@ -1148,9 +1148,9 @@ dInt32 dPolygonSoupBuilder::AddConvexFace (dInt32 count, dInt32* const pool, dIn
 			facesCount = 1;
 		}
 	} else {
-		dPolyhedra leftOver;
-		dPolyhedra polyhedra2;
-		dEdge* ptr = edge;
+		ndPolyhedra leftOver;
+		ndPolyhedra polyhedra2;
+		ndEdge* ptr = edge;
 		count = 0;
 		do 
 		{
@@ -1164,7 +1164,7 @@ dInt32 dPolygonSoupBuilder::AddConvexFace (dInt32 count, dInt32* const pool, dIn
 		polyhedra2.AddFace (count, pool);
 		polyhedra2.EndFace();
 		leftOver.BeginFace();
-		polyhedra2.ConvexPartition (&m_vertexPoints[0].m_x, sizeof (dBigVector), &leftOver);
+		polyhedra2.ConvexPartition (&m_vertexPoints[0].m_x, sizeof (ndBigVector), &leftOver);
 		leftOver.EndFace();
 
 #if _DEBUG
@@ -1177,10 +1177,10 @@ dInt32 dPolygonSoupBuilder::AddConvexFace (dInt32 count, dInt32* const pool, dIn
 
 		dInt32 mark = polyhedra2.IncLRU();
 		dInt32 index = 0;
-		dPolyhedra::Iterator iter (polyhedra2);
+		ndPolyhedra::Iterator iter (polyhedra2);
 		for (iter.Begin(); iter; iter ++) 
 		{
-			dEdge* const edge1 = &(*iter);
+			ndEdge* const edge1 = &(*iter);
 			if (edge1->m_incidentFace < 0) 
 			{
 				continue;

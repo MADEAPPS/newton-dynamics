@@ -27,35 +27,35 @@
 class ndBody;
 
 D_MSV_NEWTON_ALIGN_32
-class ndBodyNotify : public dContainersFreeListAlloc<ndBodyNotify>
+class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 {
 	public:  
 	D_CLASS_REFLECTION(ndBodyNotify);
-	ndBodyNotify(const dVector& defualtGravity);
-	D_COLLISION_API ndBodyNotify(const dLoadSaveBase::dLoadDescriptor& desc);
+	ndBodyNotify(const ndVector& defualtGravity);
+	D_COLLISION_API ndBodyNotify(const ndLoadSaveBase::dLoadDescriptor& desc);
 	virtual ~ndBodyNotify();
 
 	ndBody* GetBody();
 	const ndBody* GetBody() const;
 	virtual void* GetUserData() const;
-	dVector GetGravity() const;
-	void SetGravity(const dVector& defualtGravity);
+	ndVector GetGravity() const;
+	void SetGravity(const ndVector& defualtGravity);
 
-	virtual void OnTransform(dInt32 threadIndex, const dMatrix& matrix);
+	virtual void OnTransform(dInt32 threadIndex, const ndMatrix& matrix);
 
-	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_COLLISION_API virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep);
 
 	private:
-	dVector m_defualtGravity;
+	ndVector m_defualtGravity;
 	ndBody* m_body;
 	friend class ndBody;
 
 } D_GCC_NEWTON_ALIGN_32;
 
-inline ndBodyNotify::ndBodyNotify(const dVector& defualtGravity)
-	:dContainersFreeListAlloc<ndBodyNotify>()
-	,m_defualtGravity(defualtGravity & dVector::m_triplexMask)
+inline ndBodyNotify::ndBodyNotify(const ndVector& defualtGravity)
+	:ndContainersFreeListAlloc<ndBodyNotify>()
+	,m_defualtGravity(defualtGravity & ndVector::m_triplexMask)
 	,m_body(nullptr)
 {
 }
@@ -74,14 +74,14 @@ inline const ndBody* ndBodyNotify::GetBody() const
 	return m_body;
 }
 
-inline dVector ndBodyNotify::GetGravity() const
+inline ndVector ndBodyNotify::GetGravity() const
 {
 	return m_defualtGravity;
 }
 
-inline void ndBodyNotify::SetGravity(const dVector& defualtGravity)
+inline void ndBodyNotify::SetGravity(const ndVector& defualtGravity)
 {
-	m_defualtGravity = defualtGravity & dVector::m_triplexMask;
+	m_defualtGravity = defualtGravity & ndVector::m_triplexMask;
 }
 
 
@@ -90,7 +90,7 @@ inline void* ndBodyNotify::GetUserData() const
 	return nullptr;
 }
 
-inline void ndBodyNotify::OnTransform(dInt32, const dMatrix&)
+inline void ndBodyNotify::OnTransform(dInt32, const ndMatrix&)
 {
 }
 

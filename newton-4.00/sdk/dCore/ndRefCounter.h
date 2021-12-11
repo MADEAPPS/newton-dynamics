@@ -16,43 +16,43 @@
 #include "ndClassAlloc.h"
 
 template<class T>
-class dRefCounter: public dClassAlloc
+class ndRefCounter: public ndClassAlloc
 {
 	public:
-	dRefCounter();
+	ndRefCounter();
 	dInt32 GetRef() const;
 
 	T* AddRef();
 	virtual dInt32 Release();
 
 	protected:
-	virtual ~dRefCounter(void);
+	virtual ~ndRefCounter(void);
 
 	private:
 	dInt32 m_refCount;
 };
 
 template<class T>
-dRefCounter<T>::dRefCounter(void)
-	:dClassAlloc()
+ndRefCounter<T>::ndRefCounter(void)
+	:ndClassAlloc()
 	,m_refCount(1)
 {
 }
 
 template<class T>
-inline dRefCounter<T>::~dRefCounter(void)
+inline ndRefCounter<T>::~ndRefCounter(void)
 {
 }
 
 template<class T>
-inline T* dRefCounter<T>::AddRef()
+inline T* ndRefCounter<T>::AddRef()
 {
 	m_refCount++;
 	return (T*) this;
 }
 
 template<class T>
-inline dInt32 dRefCounter<T>::Release()
+inline dInt32 ndRefCounter<T>::Release()
 {
 	m_refCount--;
 	dAssert(m_refCount >= 0);
@@ -65,7 +65,7 @@ inline dInt32 dRefCounter<T>::Release()
 }
 
 template<class T>
-inline dInt32 dRefCounter<T>::GetRef() const
+inline dInt32 ndRefCounter<T>::GetRef() const
 {
 	return m_refCount;
 }

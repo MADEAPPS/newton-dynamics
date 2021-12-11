@@ -24,14 +24,14 @@
 #include "ndGeneralMatrix.h"
 #include "ndSpatialMatrix.h"
 
-dSpatialMatrix dSpatialMatrix::Inverse(dInt32 rows) const
+ndSpatialMatrix ndSpatialMatrix::Inverse(dInt32 rows) const
 {
-	dSpatialMatrix tmp;
-	dSpatialMatrix inv;
+	ndSpatialMatrix tmp;
+	ndSpatialMatrix inv;
 	for (dInt32 i = 0; i < rows; i++) 
 	{
 		tmp[i] = (*this)[i];
-		inv[i] = dSpatialVector::m_zero;
+		inv[i] = ndSpatialVector::m_zero;
 		inv[i][i] = dFloat32(1.0f);
 	}
 
@@ -89,7 +89,7 @@ dSpatialMatrix dSpatialMatrix::Inverse(dInt32 rows) const
 
 	for (dInt32 i = rows - 1; i >= 0; i--) 
 	{
-		dSpatialVector acc(dFloat64(0.0f));
+		ndSpatialVector acc(dFloat64(0.0f));
 		for (dInt32 j = i + 1; j < rows; j++) 
 		{
 			dFloat64 pivot = tmp[i][j];
@@ -117,7 +117,7 @@ dSpatialMatrix dSpatialMatrix::Inverse(dInt32 rows) const
 
 	for (dInt32 i = 0; i < rows; i++) 
 	{
-		dSpatialVector v(inv.VectorTimeMatrix(tmp[i], rows));
+		ndSpatialVector v(inv.VectorTimeMatrix(tmp[i], rows));
 		dAssert(dAbs(v[i] - dFloat64(1.0f)) < dFloat64(1.0e-6f));
 		for (dInt32 j = 0; j < rows; j++) 
 		{

@@ -25,13 +25,13 @@
 #include "ndThreadPool.h"
 #include "ndProfiler.h"
 
-void dThreadPool::dThreadLockFreeUpdate::Execute()
+void ndThreadPool::ndThreadLockFreeUpdate::Execute()
 {
 #ifndef	D_USE_THREAD_EMULATION
 	m_begin.store(true);
 	while (m_begin.load())
 	{
-		dThreadPoolJob* const job = m_job.exchange(nullptr);
+		ndThreadPoolJob* const job = m_job.exchange(nullptr);
 		if (job)
 		{
 			job->Execute();
@@ -45,19 +45,19 @@ void dThreadPool::dThreadLockFreeUpdate::Execute()
 #endif
 }
 
-dThreadPool::dWorkerThread::dWorkerThread()
-	:dThread()
+ndThreadPool::ndWorkerThread::ndWorkerThread()
+	:ndThread()
 	,m_job(nullptr)
 	,m_threadIndex(0)
 {
 }
 
-dThreadPool::dWorkerThread::~dWorkerThread()
+ndThreadPool::ndWorkerThread::~ndWorkerThread()
 {
 	Finish();
 }
 
-void dThreadPool::dWorkerThread::ThreadFunction()
+void ndThreadPool::ndWorkerThread::ThreadFunction()
 {
 	dAssert(m_job);
 	D_SET_TRACK_NAME(m_name);
@@ -65,7 +65,7 @@ void dThreadPool::dWorkerThread::ThreadFunction()
 	m_owner->m_sync.Release();
 }
 
-void dThreadPool::dWorkerThread::ExecuteJob(dThreadPoolJob* const job)
+void ndThreadPool::ndWorkerThread::ExecuteJob(ndThreadPoolJob* const job)
 {
 	m_job = job;
 	m_job->m_threadIndex = m_threadIndex;
@@ -73,9 +73,9 @@ void dThreadPool::dWorkerThread::ExecuteJob(dThreadPoolJob* const job)
 	Signal();
 }
 
-dThreadPool::dThreadPool(const char* const baseName)
-	:dSyncMutex()
-	,dThread()
+ndThreadPool::ndThreadPool(const char* const baseName)
+	:ndSyncMutex()
+	,ndThread()
 	,m_sync()
 	,m_workers(nullptr)
 	,m_count(0)
@@ -91,12 +91,12 @@ dThreadPool::dThreadPool(const char* const baseName)
 	}
 }
 
-dThreadPool::~dThreadPool()
+ndThreadPool::~ndThreadPool()
 {
 	SetCount(0);
 }
 
-void dThreadPool::SetCount(dInt32 count)
+void ndThreadPool::SetCount(dInt32 count)
 {
 	count = dClamp(count, 1, D_MAX_THREADS_COUNT) - 1;
 	if (count != m_count)
@@ -110,7 +110,7 @@ void dThreadPool::SetCount(dInt32 count)
 		if (count)
 		{
 			m_count = count;
-			m_workers = new dWorkerThread[count];
+			m_workers = new ndWorkerThread[count];
 			for (dInt32 i = 0; i < count; i++)
 			{
 				char name[256];
@@ -123,7 +123,7 @@ void dThreadPool::SetCount(dInt32 count)
 	}
 }
 
-void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs)
+void ndThreadPool::ExecuteJobs(ndThreadPoolJob** const jobs)
 {
 #ifdef D_USE_THREAD_EMULATION	
 	for (dInt32 i = 0; i <= m_count; i++)
@@ -157,10 +157,10 @@ void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs)
 #endif
 }
 
-void dThreadPool::Begin()
+void ndThreadPool::Begin()
 {
 	D_TRACKTIME();
-	class ndDoNothing : public dThreadPoolJob
+	class ndDoNothing : public ndThreadPoolJob
 	{
 		virtual void Execute()
 		{
@@ -174,7 +174,7 @@ void dThreadPool::Begin()
 	}
 
 	ndDoNothing extJob[D_MAX_THREADS_COUNT];
-	dThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
+	ndThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
 	for (dInt32 i = 0; i < D_MAX_THREADS_COUNT; i++)
 	{
 		extJobPtr[i] = &extJob[i];
@@ -182,7 +182,7 @@ void dThreadPool::Begin()
 	ExecuteJobs(extJobPtr);
 }
 
-void dThreadPool::End()
+void ndThreadPool::End()
 {
 	for (dInt32 i = 0; i < m_count; i++)
 	{
@@ -191,16 +191,16 @@ void dThreadPool::End()
 	m_sync.Sync();
 }
 
-void dThreadPool::TickOne()
+void ndThreadPool::TickOne()
 {
-	dSyncMutex::Tick();
-	dSemaphore::Signal();
+	ndSyncMutex::Tick();
+	ndSemaphore::Signal();
 #ifdef D_USE_THREAD_EMULATION	
 	ThreadFunction();
 #endif
 }
 
-void dThreadPool::Release()
+void ndThreadPool::Release()
 {
-	dSyncMutex::Release();
+	ndSyncMutex::Release();
 }

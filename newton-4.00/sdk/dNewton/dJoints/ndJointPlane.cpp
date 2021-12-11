@@ -15,19 +15,19 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointPlane)
 
-ndJointPlane::ndJointPlane (const dVector& pivot, const dVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointPlane::ndJointPlane (const ndVector& pivot, const ndVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(5, child, parent, dGetIdentityMatrix())
 	,m_enableControlRotation(true)
 {
-	dMatrix pinAndPivotFrame(normal);
+	ndMatrix pinAndPivotFrame(normal);
 	pinAndPivotFrame.m_posit = pivot;
 	pinAndPivotFrame.m_posit.m_w = 1.0f;
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
-ndJointPlane::ndJointPlane(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+ndJointPlane::ndJointPlane(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_enableControlRotation(true)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -41,21 +41,21 @@ ndJointPlane::~ndJointPlane()
 
 void ndJointPlane::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
 
 	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
-	const dVector& dir = matrix1[0];
-	const dVector& p0 = matrix0.m_posit;
-	const dVector& p1 = matrix1.m_posit;
+	const ndVector& dir = matrix1[0];
+	const ndVector& p0 = matrix0.m_posit;
+	const ndVector& p1 = matrix1.m_posit;
 	//NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &dir[0]);
 	AddLinearRowJacobian(desc, p0, p1, dir);
 	
 	//const dFloat32 invTimeStep = 1.0f / timestep;
-	const dFloat32 dist = 0.25f * dir.DotProduct((p1 - p0) & dVector::m_triplexMask).GetScalar();
+	const dFloat32 dist = 0.25f * dir.DotProduct((p1 - p0) & ndVector::m_triplexMask).GetScalar();
 	//const dFloat32 accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dist * invTimeStep * invTimeStep;
 	const dFloat32 accel = GetMotorZeroAcceleration(desc) + dist * desc.m_invTimestep * desc.m_invTimestep;
 
@@ -76,12 +76,12 @@ void ndJointPlane::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointPlane::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndJointPlane::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "enableControlRotation", m_enableControlRotation ? 1 : 0);
 }

@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTargaToOpenGl.h"
 
-class ndTextureEntry: public dRefCounter<ndTextureEntry>
+class ndTextureEntry: public ndRefCounter<ndTextureEntry>
 {
 	public:
 	ndTextureEntry()
@@ -20,10 +20,10 @@ class ndTextureEntry: public dRefCounter<ndTextureEntry>
 	}
 
 	GLuint m_textureID;
-	dString m_textureName;
+	ndString m_textureName;
 };
 
-class ndTextureCache: public dTree<ndTextureEntry, dUnsigned64>
+class ndTextureCache: public ndTree<ndTextureEntry, dUnsigned64>
 {
 	public: 
 	GLuint GetTexture(const char* const texName)
@@ -40,7 +40,7 @@ class ndTextureCache: public dTree<ndTextureEntry, dUnsigned64>
 		_strlwr(name);
 		dUnsigned64 crc = dCRC64(name);
 
-		dNode* node = Find(crc);
+		ndNode* node = Find(crc);
 		if (node) 
 		{
 			node->GetInfo().AddRef();
@@ -86,7 +86,7 @@ class ndTextureCache: public dTree<ndTextureEntry, dUnsigned64>
 		}
 	}
 
-	dNode* FindById (GLuint id) const
+	ndNode* FindById (GLuint id) const
 	{
 		Iterator iter (*this);
 		for (iter.Begin(); iter; iter ++) 
@@ -240,7 +240,7 @@ GLuint LoadTexture(const char* const filename)
 		unsigned lImageSize = width * height * sDepth;
 
 		// Allocate memory and check for success
-		char* const pBits = (char*)dMemory::Malloc (width * height * sizeof (dInt32));
+		char* const pBits = (char*)ndMemory::Malloc (width * height * sizeof (dInt32));
 		if(pBits == nullptr) 
 		{
 			fclose(pFile);
@@ -278,7 +278,7 @@ GLuint LoadTexture(const char* const filename)
 
 		// Done with File
 		fclose(pFile);
-		dMemory::Free (pBits);
+		ndMemory::Free (pBits);
 	}
 	return texture;
 } 
@@ -296,7 +296,7 @@ void ReleaseTexture (GLuint texture)
 const char* FindTextureById (GLuint textureID)
 {
 	ndTextureCache& cache = ndTextureCache::GetChache();	
-	ndTextureCache::dNode* const node = cache.FindById (textureID);
+	ndTextureCache::ndNode* const node = cache.FindById (textureID);
 	if (node) 
 	{
 		return node->GetInfo().m_textureName.GetStr();
@@ -307,7 +307,7 @@ const char* FindTextureById (GLuint textureID)
 GLuint AddTextureRef (GLuint texture)
 {
 	ndTextureCache& cache = ndTextureCache::GetChache();	
-	ndTextureCache::dNode* const node = cache.FindById (texture);
+	ndTextureCache::ndNode* const node = cache.FindById (texture);
 	if (node) 
 	{
 		node->GetInfo().AddRef();

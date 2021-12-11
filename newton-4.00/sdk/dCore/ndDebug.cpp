@@ -24,7 +24,7 @@
 #include "ndDebug.h"
 
 #ifdef DG_TRACE
-void dgExpandTraceMessage(const char* const fmt, ...)
+void ndExpandTraceMessage(const char* const fmt, ...)
 {
 	va_list v_args;
 	char text[4096];

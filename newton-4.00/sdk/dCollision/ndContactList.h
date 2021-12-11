@@ -26,20 +26,20 @@
 #include "ndContact.h"
 
 
-class ndConstraintArray: public dArray<ndConstraint*>
+class ndConstraintArray: public ndArray<ndConstraint*>
 {
 	public: 
 	ndConstraintArray()
-		:dArray<ndConstraint*>(1024)
+		:ndArray<ndConstraint*>(1024)
 	{
 	}
 };
 
-class ndContactList: public dList<ndContact, dContainersFreeListAlloc<ndContact>>
+class ndContactList: public ndList<ndContact, ndContainersFreeListAlloc<ndContact>>
 {
 	public:
 	ndContactList()
-		:dList<ndContact, dContainersFreeListAlloc<ndContact>>()
+		:ndList<ndContact, ndContainersFreeListAlloc<ndContact>>()
 		,m_lock()
 	{
 	}
@@ -51,7 +51,7 @@ class ndContactList: public dList<ndContact, dContainersFreeListAlloc<ndContact>
 	D_COLLISION_API void DeleteAllContacts();
 	D_COLLISION_API void DeleteContact(ndContact* const contact);
 	D_COLLISION_API ndContact* CreateContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
-	dSpinLock m_lock;
+	ndSpinLock m_lock;
 };
 
 

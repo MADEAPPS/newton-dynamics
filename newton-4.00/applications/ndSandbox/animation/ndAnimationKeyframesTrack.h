@@ -16,11 +16,11 @@ class ndAnimationKeyFramesTrack
 {
 	public:
 	template<class OBJECT>
-	class dKeyFramesArray: public dArray<OBJECT>
+	class dKeyFramesArray: public ndArray<OBJECT>
 	{
 		public:
 		dKeyFramesArray()
-			:dArray<OBJECT>()
+			:ndArray<OBJECT>()
 		{
 		}
 		dInt32 GetIndex(dFloat32 time) const;
@@ -29,7 +29,7 @@ class ndAnimationKeyFramesTrack
 		dInt32 GetIndexDebug(dFloat32 time) const;
 
 		public:
-		dArray<dFloat32> m_time;
+		ndArray<dFloat32> m_time;
 	};
 
 	ndAnimationKeyFramesTrack()
@@ -42,22 +42,22 @@ class ndAnimationKeyFramesTrack
 	{
 	}
 
-	const dString& GetName () const
+	const ndString& GetName () const
 	{
 		return m_name;
 	}
 
-	void SetName (const dString& name)
+	void SetName (const ndString& name)
 	{
 		m_name = name; 
 	}
 
-	void InterpolatePosition(dFloat32 time, dFloat32 length, dVector &positOut) const;
-	void InterpolateRotation(dFloat32 time, dFloat32 length, dQuaternion& rotationOut) const;
+	void InterpolatePosition(dFloat32 time, dFloat32 length, ndVector &positOut) const;
+	void InterpolateRotation(dFloat32 time, dFloat32 length, ndQuaternion& rotationOut) const;
 
-	dString m_name;
-	dKeyFramesArray<dVector> m_position;
-	dKeyFramesArray<dQuaternion> m_rotation;
+	ndString m_name;
+	dKeyFramesArray<ndVector> m_position;
+	dKeyFramesArray<ndQuaternion> m_rotation;
 };
 
 #endif

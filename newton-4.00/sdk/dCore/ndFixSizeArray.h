@@ -25,10 +25,10 @@
 #include "ndCoreStdafx.h"
 
 template<class T, dInt32 maxSize>
-class dFixSizeArray: public dClassAlloc
+class ndFixSizeArray: public ndClassAlloc
 {
 	public:
-	dFixSizeArray();
+	ndFixSizeArray();
 
 	dInt32 GetCount() const;
 	void SetCount(dInt32 count);
@@ -45,32 +45,32 @@ class dFixSizeArray: public dClassAlloc
 };
 
 template<class T, dInt32 maxSize>
-dFixSizeArray<T, maxSize>::dFixSizeArray()
-	:dClassAlloc()
+ndFixSizeArray<T, maxSize>::ndFixSizeArray()
+	:ndClassAlloc()
 	,m_count(0)
 {
 }
 
 template<class T, dInt32 maxSize>
-dInt32 dFixSizeArray<T, maxSize>::GetCapacity() const
+dInt32 ndFixSizeArray<T, maxSize>::GetCapacity() const
 {
 	return maxSize;
 }
 
 template<class T, dInt32 maxSize>
-dInt32 dFixSizeArray<T, maxSize>::GetCount() const
+dInt32 ndFixSizeArray<T, maxSize>::GetCount() const
 {
 	return m_count;
 }
 
 template<class T, dInt32 maxSize>
-void dFixSizeArray<T, maxSize>::SetCount(dInt32 count)
+void ndFixSizeArray<T, maxSize>::SetCount(dInt32 count)
 {
 	m_count = (count < 0) ? 0 : ((count > maxSize) ? maxSize : count);
 }
 
 template<class T, dInt32 maxSize>
-T& dFixSizeArray<T, maxSize>::operator[] (dInt32 i)
+T& ndFixSizeArray<T, maxSize>::operator[] (dInt32 i)
 {
 	dAssert(i >= 0);
 	dAssert(i < maxSize);
@@ -78,7 +78,7 @@ T& dFixSizeArray<T, maxSize>::operator[] (dInt32 i)
 }
 
 template<class T, dInt32 maxSize>
-const T& dFixSizeArray<T, maxSize>::operator[] (dInt32 i) const
+const T& ndFixSizeArray<T, maxSize>::operator[] (dInt32 i) const
 {
 	dAssert(i >= 0);
 	dAssert(i < maxSize);
@@ -86,7 +86,7 @@ const T& dFixSizeArray<T, maxSize>::operator[] (dInt32 i) const
 }
 
 template<class T, dInt32 maxSize>
-void dFixSizeArray<T, maxSize>::PushBack(const T& element)
+void ndFixSizeArray<T, maxSize>::PushBack(const T& element)
 {
 	dAssert(m_count <= maxSize);
 	(*this)[m_count] = element;

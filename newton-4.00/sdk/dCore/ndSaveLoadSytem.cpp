@@ -28,18 +28,18 @@
 
 #define D_LOADER_DICTIONARY_SIZE 128
 
-class dLoaderFactory
+class ndLoaderFactory
 {
 	public:
 	dUnsigned64 m_classNameHash;
-	dLoadSaveBase* m_loader;
+	ndLoadSaveBase* m_loader;
 };
 
-class dLoaderClasseArray: public dFixSizeArray<dLoaderFactory, D_LOADER_DICTIONARY_SIZE>
+class ndLoaderClassArray: public ndFixSizeArray<ndLoaderFactory, D_LOADER_DICTIONARY_SIZE>
 {
 	public:
-	dLoaderClasseArray()
-		:dFixSizeArray<dLoaderFactory, D_LOADER_DICTIONARY_SIZE>()
+	ndLoaderClassArray()
+		:ndFixSizeArray<ndLoaderFactory, D_LOADER_DICTIONARY_SIZE>()
 	{
 		nd::__free__ = Free;
 		nd::__alloc__ = Malloc;
@@ -47,27 +47,27 @@ class dLoaderClasseArray: public dFixSizeArray<dLoaderFactory, D_LOADER_DICTIONA
 
 	static void* Malloc(size_t size)
 	{
-		return dMemory::Malloc(size);
+		return ndMemory::Malloc(size);
 	}
 
 	static void Free(void* ptr)
 	{
-		return dMemory::Free(ptr);
+		return ndMemory::Free(ptr);
 	}
 };
 
-static dFixSizeArray<dLoaderFactory, D_LOADER_DICTIONARY_SIZE>& GetFactory()
+static ndFixSizeArray<ndLoaderFactory, D_LOADER_DICTIONARY_SIZE>& GetFactory()
 {
-	static dLoaderClasseArray factory;
+	static ndLoaderClassArray factory;
 	return factory;
 }
 
-void RegisterLoaderClass(const char* const className, dLoadSaveBase* const loaderClass)
+void RegisterLoaderClass(const char* const className, ndLoadSaveBase* const loaderClass)
 {
-	dLoaderFactory entry;
+	ndLoaderFactory entry;
 	entry.m_classNameHash = dCRC64(className);
 	entry.m_loader = loaderClass;
-	dFixSizeArray<dLoaderFactory, D_LOADER_DICTIONARY_SIZE>& factory = GetFactory();
+	ndFixSizeArray<ndLoaderFactory, D_LOADER_DICTIONARY_SIZE>& factory = GetFactory();
 	factory.PushBack(entry);
 	for (dInt32 i = factory.GetCount() - 2; i >= 0; i--)
 	{
@@ -83,11 +83,11 @@ void RegisterLoaderClass(const char* const className, dLoadSaveBase* const loade
 	}
 }
 
-void* LoadClass(const char* const className, const dLoadSaveBase::dLoadDescriptor& descriptor)
+void* LoadClass(const char* const className, const ndLoadSaveBase::dLoadDescriptor& descriptor)
 {
 	dUnsigned64 classNameHash = dCRC64(className);
 
-	const dFixSizeArray<dLoaderFactory, D_LOADER_DICTIONARY_SIZE>& factory = GetFactory();
+	const ndFixSizeArray<ndLoaderFactory, D_LOADER_DICTIONARY_SIZE>& factory = GetFactory();
 
 	dInt32 i0 = 0; 
 	dInt32 i1 = factory.GetCount() - 1;
@@ -122,7 +122,7 @@ void* LoadClass(const char* const className, const dLoadSaveBase::dLoadDescripto
 	}
 	#endif
 	
-	dLoadSaveBase::dLoadDescriptor baseClassDesc(descriptor);
+	ndLoadSaveBase::dLoadDescriptor baseClassDesc(descriptor);
 	for (const nd::TiXmlNode* node = descriptor.m_rootNode->FirstChild(); node; node = node->NextSibling())
 	{
 		const char* const name = node->Value();

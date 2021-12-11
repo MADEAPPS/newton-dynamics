@@ -32,7 +32,7 @@ enum QUAT_INDEX
 };
 static QUAT_INDEX QIndex[] = { Y_INDEX, Z_INDEX, X_INDEX };
 
-dQuaternion::dQuaternion(const dMatrix& matrix)
+ndQuaternion::ndQuaternion(const ndMatrix& matrix)
 {
 	dFloat32 trace = matrix[0][0] + matrix[1][1] + matrix[2][2];
 	if (trace > dFloat32(0.0f))
@@ -71,8 +71,8 @@ dQuaternion::dQuaternion(const dMatrix& matrix)
 
 #ifdef _DEBUG
 
-	dMatrix tmp (*this, matrix.m_posit);
-	dMatrix unitMatrix (tmp * matrix.Inverse());
+	ndMatrix tmp (*this, matrix.m_posit);
+	ndMatrix unitMatrix (tmp * matrix.Inverse());
 	for (dInt32 i = 0; i < 4; i ++) 
 	{
 		dFloat32 err = dAbs (unitMatrix[i][i] - dFloat32(1.0f));
@@ -84,7 +84,7 @@ dQuaternion::dQuaternion(const dMatrix& matrix)
 #endif
 }
 
-dQuaternion::dQuaternion (const dVector &unitAxis, dFloat32 angle)
+ndQuaternion::ndQuaternion (const ndVector &unitAxis, dFloat32 angle)
 {
 	angle *= dFloat32 (0.5f);
 	m_w = dCos (angle);
@@ -92,7 +92,7 @@ dQuaternion::dQuaternion (const dVector &unitAxis, dFloat32 angle)
 
 #ifdef _DEBUG
 	if (dAbs (angle) > dFloat32(dEpsilon / 10.0f)) {
-		dAssert (dAbs (dFloat32(1.0f) - unitAxis.DotProduct(unitAxis & dVector::m_triplexMask).GetScalar()) < dFloat32(dEpsilon * 10.0f));
+		dAssert (dAbs (dFloat32(1.0f) - unitAxis.DotProduct(unitAxis & ndVector::m_triplexMask).GetScalar()) < dFloat32(dEpsilon * 10.0f));
 	} 
 #endif
 	m_x = unitAxis.m_x * sinAng;
@@ -100,23 +100,23 @@ dQuaternion::dQuaternion (const dVector &unitAxis, dFloat32 angle)
 	m_z = unitAxis.m_z * sinAng;
 }
 
-dQuaternion dQuaternion::operator* (const dQuaternion &q) const
+ndQuaternion ndQuaternion::operator* (const ndQuaternion &q) const
 {
-	//return dQuaternion(
+	//return ndQuaternion(
 	//	q.m_x * m_w + q.m_w * m_x - q.m_z * m_y + q.m_y * m_z,
 	//	q.m_y * m_w + q.m_z * m_x + q.m_w * m_y - q.m_x * m_z,
 	//	q.m_z * m_w - q.m_y * m_x + q.m_x * m_y + q.m_w * m_z,
 	//	q.m_w * m_w - q.m_x * m_x - q.m_y * m_y - q.m_z * m_z);
 
-	const dVector x( q.m_w,  q.m_z, -q.m_y, -q.m_x);
-	const dVector y(-q.m_z,  q.m_w,  q.m_x, -q.m_y);
-	const dVector z( q.m_y, -q.m_x,  q.m_w, -q.m_z);
-	//const dVector w( q.m_x,  q.m_y,  q.m_z,  q.m_w);
-	const dVector w(q);
+	const ndVector x( q.m_w,  q.m_z, -q.m_y, -q.m_x);
+	const ndVector y(-q.m_z,  q.m_w,  q.m_x, -q.m_y);
+	const ndVector z( q.m_y, -q.m_x,  q.m_w, -q.m_z);
+	//const ndVector w( q.m_x,  q.m_y,  q.m_z,  q.m_w);
+	const ndVector w(q);
 
 //#ifdef _DEBUG
-//	dQuaternion xxx0(x * dVector(m_x) + y * dVector(m_y) + z * dVector(m_z) + w * dVector(m_w));
-//	dQuaternion xxx1(
+//	ndQuaternion xxx0(x * ndVector(m_x) + y * ndVector(m_y) + z * ndVector(m_z) + w * ndVector(m_w));
+//	ndQuaternion xxx1(
 //		q.m_x * m_w + q.m_w * m_x - q.m_z * m_y + q.m_y * m_z,
 //		q.m_y * m_w + q.m_z * m_x + q.m_w * m_y - q.m_x * m_z,
 //		q.m_z * m_w - q.m_y * m_x + q.m_x * m_y + q.m_w * m_z,
@@ -128,23 +128,23 @@ dQuaternion dQuaternion::operator* (const dQuaternion &q) const
 //	dAssert(dAbs(error) < dFloat32(1.0e-5f));
 //#endif
 
-	return x * dVector(m_x) + y * dVector(m_y) + z * dVector(m_z) + w * dVector(m_w);
+	return x * ndVector(m_x) + y * ndVector(m_y) + z * ndVector(m_z) + w * ndVector(m_w);
 }
 
-dVector dQuaternion::CalcAverageOmega (const dQuaternion &q1, dFloat32 invdt) const
+ndVector ndQuaternion::CalcAverageOmega (const ndQuaternion &q1, dFloat32 invdt) const
 {
-	dQuaternion q0 (*this);
+	ndQuaternion q0 (*this);
 	if (q0.DotProduct (q1).GetScalar() < dFloat32 (0.0f)) 
 	{
 		q0 = q0.Scale(dFloat32 (-1.0f));
 	}
-	dQuaternion dq (q0.Inverse() * q1);
-	dVector omegaDir (dq.m_x, dq.m_y, dq.m_z, dFloat32 (0.0f));
+	ndQuaternion dq (q0.Inverse() * q1);
+	ndVector omegaDir (dq.m_x, dq.m_y, dq.m_z, dFloat32 (0.0f));
 
 	dFloat32 dirMag2 = omegaDir.DotProduct(omegaDir).GetScalar();
 	if (dirMag2	< dFloat32(dFloat32 (1.0e-5f) * dFloat32 (1.0e-5f))) 
 	{
-		return dVector (dFloat32(0.0f));
+		return ndVector (dFloat32(0.0f));
 	}
 
 	dFloat32 dirMagInv = dRsqrt (dirMag2);
@@ -154,9 +154,9 @@ dVector dQuaternion::CalcAverageOmega (const dQuaternion &q1, dFloat32 invdt) co
 	return omegaDir.Scale (dirMagInv * omegaMag);
 }
 
-dQuaternion dQuaternion::Slerp (const dQuaternion &q1, dFloat32 t) const 
+ndQuaternion ndQuaternion::Slerp (const ndQuaternion &q1, dFloat32 t) const 
 {
-	dQuaternion q0;
+	ndQuaternion q0;
 
 	dFloat32 dot = DotProduct(q1).GetScalar();
 	if ((dot + dFloat32(1.0f)) > dEpsilon) 

@@ -32,10 +32,10 @@
 #include "ndMemory.h"
 #include "ndClassAlloc.h"
 
-//#define DG_HEAP_DEBUG_CHECK
+//#define ND_HEAP_DEBUG_CHECK
 
 template <class OBJECT, class KEY>
-class dHeapBase: public dClassAlloc
+class ndHeapBase: public ndClassAlloc
 {
 	protected:
 	struct RECORD 
@@ -49,9 +49,9 @@ class dHeapBase: public dClassAlloc
 		}
 	};
 
-	dHeapBase (dInt32 maxElements);
-	dHeapBase (const void * const buffer, dInt32 sizeInBytes);
-	~dHeapBase ();
+	ndHeapBase (dInt32 maxElements);
+	ndHeapBase (const void * const buffer, dInt32 sizeInBytes);
+	~ndHeapBase ();
 	
 	public:
 	void Flush (); 
@@ -70,11 +70,11 @@ class dHeapBase: public dClassAlloc
 };
 
 template <class OBJECT, class KEY>
-class dDownHeap: public dHeapBase<OBJECT, KEY>
+class ndDownHeap: public ndHeapBase<OBJECT, KEY>
 {
 	public:
-	dDownHeap (dInt32 maxElements);
-	dDownHeap (const void * const buffer, dInt32 sizeInBytes);
+	ndDownHeap (dInt32 maxElements);
+	ndDownHeap (const void * const buffer, dInt32 sizeInBytes);
 
 	void Pop();
 	void Push (OBJECT &obj, KEY key);
@@ -84,11 +84,11 @@ class dDownHeap: public dHeapBase<OBJECT, KEY>
 };
 
 template <class OBJECT, class KEY>
-class dUpHeap: public dHeapBase<OBJECT, KEY>
+class ndUpHeap: public ndHeapBase<OBJECT, KEY>
 {
 	public:
-	dUpHeap (dInt32 maxElements);
-	dUpHeap (const void * const buffer, dInt32 sizeInBytes);
+	ndUpHeap (dInt32 maxElements);
+	ndUpHeap (const void * const buffer, dInt32 sizeInBytes);
 
 	void Pop();
 	void Push (OBJECT &obj, KEY key);
@@ -98,9 +98,9 @@ class dUpHeap: public dHeapBase<OBJECT, KEY>
 };
 
 template <class OBJECT, class KEY>
-dHeapBase<OBJECT,KEY>::dHeapBase (dInt32 maxElements)
-	:dClassAlloc()
-	,m_pool((RECORD *)dMemory::Malloc(maxElements * sizeof(RECORD)))
+ndHeapBase<OBJECT,KEY>::ndHeapBase (dInt32 maxElements)
+	:ndClassAlloc()
+	,m_pool((RECORD *)ndMemory::Malloc(maxElements * sizeof(RECORD)))
 	,m_curCount(0)
 	,m_maxCount(maxElements)
 	,m_bufferIsOwnned(true)
@@ -109,8 +109,8 @@ dHeapBase<OBJECT,KEY>::dHeapBase (dInt32 maxElements)
 }
 
 template <class OBJECT, class KEY>
-dHeapBase<OBJECT,KEY>::dHeapBase (const void * const buffer, dInt32 sizeInBytes)
-	:dClassAlloc()
+ndHeapBase<OBJECT,KEY>::ndHeapBase (const void * const buffer, dInt32 sizeInBytes)
+	:ndClassAlloc()
 	,m_pool((RECORD *)buffer)
 	,m_curCount(0)
 	,m_maxCount(dInt32(sizeInBytes / sizeof(RECORD)))
@@ -120,50 +120,50 @@ dHeapBase<OBJECT,KEY>::dHeapBase (const void * const buffer, dInt32 sizeInBytes)
 }
 
 template <class OBJECT, class KEY>
-dHeapBase<OBJECT,KEY>::~dHeapBase ()
+ndHeapBase<OBJECT,KEY>::~ndHeapBase ()
 {   
 	if (m_bufferIsOwnned)
 	{
-		dMemory::Free (m_pool);
+		ndMemory::Free (m_pool);
 	}
 }
 
 template <class OBJECT, class KEY>
-KEY dHeapBase<OBJECT,KEY>::Value(dInt32 i) const
+KEY ndHeapBase<OBJECT,KEY>::Value(dInt32 i) const
 {
 	return m_pool[i].m_key;
 }
 
 template <class OBJECT, class KEY>
-dInt32 dHeapBase<OBJECT,KEY>::GetCount() const
+dInt32 ndHeapBase<OBJECT,KEY>::GetCount() const
 { 
 	return m_curCount;
 }
 
 template <class OBJECT, class KEY>
-void dHeapBase<OBJECT,KEY>::Flush () 
+void ndHeapBase<OBJECT,KEY>::Flush () 
 {
 	m_curCount = 0;
 
 	#ifdef _DEBUG
-//	dHeapBase<OBJECT,KEY>::m_pool[dHeapBase<OBJECT,KEY>::m_curCount].m_key = KEY (0);
+//	ndHeapBase<OBJECT,KEY>::m_pool[ndHeapBase<OBJECT,KEY>::m_curCount].m_key = KEY (0);
 	#endif
 }
 
 template <class OBJECT, class KEY>
-KEY dHeapBase<OBJECT,KEY>::MaxValue() const 
+KEY ndHeapBase<OBJECT,KEY>::MaxValue() const 
 {
 	return m_pool[0].m_key;
 }
 
 template <class OBJECT, class KEY>
-dInt32 dHeapBase<OBJECT,KEY>::GetMaxCount() const
+dInt32 ndHeapBase<OBJECT,KEY>::GetMaxCount() const
 { 
 	return m_maxCount;
 }
 
 template <class OBJECT, class KEY>
-dInt32 dHeapBase<OBJECT,KEY>::Find (OBJECT &obj)
+dInt32 ndHeapBase<OBJECT,KEY>::Find (OBJECT &obj)
 {
 	// For now let perform a linear search
 	// this is efficient if the size of the heap is small
@@ -182,7 +182,7 @@ dInt32 dHeapBase<OBJECT,KEY>::Find (OBJECT &obj)
 }
 
 template <class OBJECT, class KEY>
-dInt32 dHeapBase<OBJECT,KEY>::Find (KEY key)
+dInt32 ndHeapBase<OBJECT,KEY>::Find (KEY key)
 {
 	// ex: m_curCount < 32
 	// this will be change to a binary search in the heap shoud the 
@@ -199,7 +199,7 @@ dInt32 dHeapBase<OBJECT,KEY>::Find (KEY key)
 }
 
 template <class OBJECT, class KEY>
-const OBJECT& dHeapBase<OBJECT,KEY>::operator[] (dInt32 i) const
+const OBJECT& ndHeapBase<OBJECT,KEY>::operator[] (dInt32 i) const
 { 
 	dAssert (i<= m_curCount);
 	return m_pool[i].m_obj;
@@ -211,77 +211,77 @@ const OBJECT& dHeapBase<OBJECT,KEY>::operator[] (dInt32 i) const
 //
 // **************************************************************************
 template <class OBJECT, class KEY>
-dDownHeap<OBJECT,KEY>::dDownHeap (dInt32 maxElements)
-	:dHeapBase<OBJECT, KEY> (maxElements)
+ndDownHeap<OBJECT,KEY>::ndDownHeap (dInt32 maxElements)
+	:ndHeapBase<OBJECT, KEY> (maxElements)
 {
 }
 
 template <class OBJECT, class KEY>
-dDownHeap<OBJECT,KEY>::dDownHeap (const void * const buffer, dInt32 sizeInBytes)
-	:dHeapBase<OBJECT, KEY> (buffer, sizeInBytes)
+ndDownHeap<OBJECT,KEY>::ndDownHeap (const void * const buffer, dInt32 sizeInBytes)
+	:ndHeapBase<OBJECT, KEY> (buffer, sizeInBytes)
 {
 }
 
 template <class OBJECT, class KEY>
-void dDownHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
+void ndDownHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 {
-	dHeapBase<OBJECT,KEY>::m_curCount ++;
+	ndHeapBase<OBJECT,KEY>::m_curCount ++;
 
 	//dInt32 j;
-	dInt32 i = dHeapBase<OBJECT,KEY>::m_curCount;
+	dInt32 i = ndHeapBase<OBJECT,KEY>::m_curCount;
 	for (dInt32 j = 0; i; i = j)
 	{
 		j = i >> 1;
-		if (!j || (dHeapBase<OBJECT,KEY>::m_pool[j - 1].m_key > key)) 
+		if (!j || (ndHeapBase<OBJECT,KEY>::m_pool[j - 1].m_key > key)) 
 		{
 			break;
 		}
-		dHeapBase<OBJECT,KEY>::m_pool[i - 1] = dHeapBase<OBJECT,KEY>::m_pool[j - 1];
+		ndHeapBase<OBJECT,KEY>::m_pool[i - 1] = ndHeapBase<OBJECT,KEY>::m_pool[j - 1];
 	}
 	dAssert (i);
-	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
-	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = obj;
+	ndHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
+	ndHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = obj;
 
 	dAssert (SanityCheck());
 }
 
 template <class OBJECT, class KEY>
-void dDownHeap<OBJECT, KEY>::Pop()
+void ndDownHeap<OBJECT, KEY>::Pop()
 {
-	//dDownHeap<OBJECT, KEY>::Remove(0);
+	//ndDownHeap<OBJECT, KEY>::Remove(0);
 	Remove(0);
 }
 
 template <class OBJECT, class KEY>
-void dDownHeap<OBJECT,KEY>::Remove (dInt32 index)
+void ndDownHeap<OBJECT,KEY>::Remove (dInt32 index)
 {
-	dHeapBase<OBJECT, KEY>::m_curCount--;
-	dHeapBase<OBJECT, KEY>::m_pool[index] = dHeapBase<OBJECT, KEY>::m_pool[dHeapBase<OBJECT, KEY>::m_curCount];
-	while (index && dHeapBase<OBJECT, KEY>::m_pool[(index - 1) >> 1].m_key < dHeapBase<OBJECT, KEY>::m_pool[index].m_key) 
+	ndHeapBase<OBJECT, KEY>::m_curCount--;
+	ndHeapBase<OBJECT, KEY>::m_pool[index] = ndHeapBase<OBJECT, KEY>::m_pool[ndHeapBase<OBJECT, KEY>::m_curCount];
+	while (index && ndHeapBase<OBJECT, KEY>::m_pool[(index - 1) >> 1].m_key < ndHeapBase<OBJECT, KEY>::m_pool[index].m_key) 
 	{
-		dSwap(dHeapBase<OBJECT, KEY>::m_pool[(index - 1) >> 1], dHeapBase<OBJECT, KEY>::m_pool[index]);
+		dSwap(ndHeapBase<OBJECT, KEY>::m_pool[(index - 1) >> 1], ndHeapBase<OBJECT, KEY>::m_pool[index]);
 		index = (index - 1) >> 1;
 	}
 
-	while ((2 * index + 1) < dHeapBase<OBJECT, KEY>::m_curCount) 
+	while ((2 * index + 1) < ndHeapBase<OBJECT, KEY>::m_curCount) 
 	{
 		dInt32 i0 = 2 * index + 1;
 		dInt32 i1 = 2 * index + 2;
-		if (i1 < dHeapBase<OBJECT, KEY>::m_curCount) 
+		if (i1 < ndHeapBase<OBJECT, KEY>::m_curCount) 
 		{
-			i0 = (dHeapBase<OBJECT, KEY>::m_pool[i0].m_key > dHeapBase<OBJECT, KEY>::m_pool[i1].m_key) ? i0 : i1;
-			if (dHeapBase<OBJECT, KEY>::m_pool[i0].m_key <= dHeapBase<OBJECT, KEY>::m_pool[index].m_key) 
+			i0 = (ndHeapBase<OBJECT, KEY>::m_pool[i0].m_key > ndHeapBase<OBJECT, KEY>::m_pool[i1].m_key) ? i0 : i1;
+			if (ndHeapBase<OBJECT, KEY>::m_pool[i0].m_key <= ndHeapBase<OBJECT, KEY>::m_pool[index].m_key) 
 			{
 				break;
 			}
-			dSwap(dHeapBase<OBJECT, KEY>::m_pool[i0], dHeapBase<OBJECT, KEY>::m_pool[index]);
+			dSwap(ndHeapBase<OBJECT, KEY>::m_pool[i0], ndHeapBase<OBJECT, KEY>::m_pool[index]);
 			index = i0;
 		} 
 		else 
 		{
-			if (dHeapBase<OBJECT, KEY>::m_pool[i0].m_key > dHeapBase<OBJECT, KEY>::m_pool[index].m_key) 
+			if (ndHeapBase<OBJECT, KEY>::m_pool[i0].m_key > ndHeapBase<OBJECT, KEY>::m_pool[index].m_key) 
 			{
-				dSwap(dHeapBase<OBJECT, KEY>::m_pool[i0], dHeapBase<OBJECT, KEY>::m_pool[index]);
+				dSwap(ndHeapBase<OBJECT, KEY>::m_pool[i0], ndHeapBase<OBJECT, KEY>::m_pool[index]);
 			}
 			index = i0;
 		}
@@ -290,48 +290,48 @@ void dDownHeap<OBJECT,KEY>::Remove (dInt32 index)
 }
 
 template <class OBJECT, class KEY>
-void dDownHeap<OBJECT,KEY>::Sort ()
+void ndDownHeap<OBJECT,KEY>::Sort ()
 {
-	dInt32 count = dHeapBase<OBJECT,KEY>::m_curCount;
+	dInt32 count = ndHeapBase<OBJECT,KEY>::m_curCount;
 	for (dInt32 i = 1; i < count; i ++) 
 	{
-		KEY key (dHeapBase<OBJECT,KEY>::m_pool[0].m_key);
-		OBJECT obj (dHeapBase<OBJECT,KEY>::m_pool[0].m_obj);
+		KEY key (ndHeapBase<OBJECT,KEY>::m_pool[0].m_key);
+		OBJECT obj (ndHeapBase<OBJECT,KEY>::m_pool[0].m_obj);
 
 		Pop();
 
-		dHeapBase<OBJECT,KEY>::m_pool[dHeapBase<OBJECT,KEY>::m_curCount].m_key = key;
-		dHeapBase<OBJECT,KEY>::m_pool[dHeapBase<OBJECT,KEY>::m_curCount].m_obj = obj;
+		ndHeapBase<OBJECT,KEY>::m_pool[ndHeapBase<OBJECT,KEY>::m_curCount].m_key = key;
+		ndHeapBase<OBJECT,KEY>::m_pool[ndHeapBase<OBJECT,KEY>::m_curCount].m_obj = obj;
 	}
 
-	dHeapBase<OBJECT,KEY>::m_curCount = count;
+	ndHeapBase<OBJECT,KEY>::m_curCount = count;
 	for (dInt32 i = 0; i < count / 2; i ++) 
 	{
-		KEY key (dHeapBase<OBJECT,KEY>::m_pool[i].m_key);
-		OBJECT obj (dHeapBase<OBJECT,KEY>::m_pool[i].m_obj);
+		KEY key (ndHeapBase<OBJECT,KEY>::m_pool[i].m_key);
+		OBJECT obj (ndHeapBase<OBJECT,KEY>::m_pool[i].m_obj);
 
-		dHeapBase<OBJECT,KEY>::m_pool[i].m_key = dHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_key;
-		dHeapBase<OBJECT,KEY>::m_pool[i].m_obj = dHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_obj;
+		ndHeapBase<OBJECT,KEY>::m_pool[i].m_key = ndHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_key;
+		ndHeapBase<OBJECT,KEY>::m_pool[i].m_obj = ndHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_obj;
 
-		dHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_key = key;
-		dHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_obj = obj;
+		ndHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_key = key;
+		ndHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_obj = obj;
 	}
 	dAssert (SanityCheck());
 }
 
 template <class OBJECT, class KEY>
-bool dDownHeap<OBJECT,KEY>::SanityCheck()
+bool ndDownHeap<OBJECT,KEY>::SanityCheck()
 {
-#ifdef DG_HEAP_DEBUG_CHECK
+#ifdef ND_HEAP_DEBUG_CHECK
 	for (dInt32 i = 0; i < m_curCount; i++) 
 	{
 		dInt32 i1 = 2 * i + 1;
 		dInt32 i2 = 2 * i + 2;
-		if ((i1 < m_curCount) && (dHeapBase<OBJECT, KEY>::m_pool[i].m_key < dHeapBase<OBJECT, KEY>::m_pool[i1].m_key)) 
+		if ((i1 < m_curCount) && (ndHeapBase<OBJECT, KEY>::m_pool[i].m_key < ndHeapBase<OBJECT, KEY>::m_pool[i1].m_key)) 
 		{
 			return false;
 		}
-		if ((i2 < m_curCount) && (dHeapBase<OBJECT, KEY>::m_pool[i].m_key < dHeapBase<OBJECT, KEY>::m_pool[i2].m_key)) 
+		if ((i2 < m_curCount) && (ndHeapBase<OBJECT, KEY>::m_pool[i].m_key < ndHeapBase<OBJECT, KEY>::m_pool[i2].m_key)) 
 		{
 			return false;
 		}
@@ -346,31 +346,31 @@ bool dDownHeap<OBJECT,KEY>::SanityCheck()
 //
 // **************************************************************************
 template <class OBJECT, class KEY>
-dUpHeap<OBJECT,KEY>::dUpHeap (dInt32 maxElements)
-//	:dHeapBase<OBJECT, KEY> (maxElements, allocator)
-	:dHeapBase<OBJECT, KEY>(maxElements)
+ndUpHeap<OBJECT,KEY>::ndUpHeap (dInt32 maxElements)
+//	:ndHeapBase<OBJECT, KEY> (maxElements, allocator)
+	:ndHeapBase<OBJECT, KEY>(maxElements)
 {
 }
 
 template <class OBJECT, class KEY>
-dUpHeap<OBJECT,KEY>::dUpHeap (const void * const buffer, dInt32 sizeInBytes)
-	:dHeapBase<OBJECT, KEY> (buffer, sizeInBytes)
+ndUpHeap<OBJECT,KEY>::ndUpHeap (const void * const buffer, dInt32 sizeInBytes)
+	:ndHeapBase<OBJECT, KEY> (buffer, sizeInBytes)
 {
 }
 
 template <class OBJECT, class KEY>
-bool dUpHeap<OBJECT,KEY>::SanityCheck()
+bool ndUpHeap<OBJECT,KEY>::SanityCheck()
 {
-#ifdef DG_HEAP_DEBUG_CHECK
+#ifdef ND_HEAP_DEBUG_CHECK
 	for (dInt32 i = 0; i < m_curCount; i ++) 
 	{
 		dInt32 i1 = 2 * i + 1; 
 		dInt32 i2 = 2 * i + 2; 
-		if ((i1 < m_curCount) && (dHeapBase<OBJECT,KEY>::m_pool[i].m_key > dHeapBase<OBJECT,KEY>::m_pool[i1].m_key)) 
+		if ((i1 < m_curCount) && (ndHeapBase<OBJECT,KEY>::m_pool[i].m_key > ndHeapBase<OBJECT,KEY>::m_pool[i1].m_key)) 
 		{
 			return false;
 		}
-		if ((i2 < m_curCount) && (dHeapBase<OBJECT,KEY>::m_pool[i].m_key > dHeapBase<OBJECT,KEY>::m_pool[i2].m_key)) 
+		if ((i2 < m_curCount) && (ndHeapBase<OBJECT,KEY>::m_pool[i].m_key > ndHeapBase<OBJECT,KEY>::m_pool[i2].m_key)) 
 		{
 			return false;
 		}
@@ -380,92 +380,92 @@ bool dUpHeap<OBJECT,KEY>::SanityCheck()
 }
 
 template <class OBJECT, class KEY>
-void dUpHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
+void ndUpHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 {
-	dHeapBase<OBJECT,KEY>::m_curCount ++;
+	ndHeapBase<OBJECT,KEY>::m_curCount ++;
 
-	dInt32 i = dHeapBase<OBJECT,KEY>::m_curCount;
+	dInt32 i = ndHeapBase<OBJECT,KEY>::m_curCount;
 	for (dInt32 j = 0; i; i = j)
 	{
 		j = i >> 1;
-		if (!j || (dHeapBase<OBJECT,KEY>::m_pool[j - 1].m_key < key)) 
+		if (!j || (ndHeapBase<OBJECT,KEY>::m_pool[j - 1].m_key < key)) 
 		{
 			break;
 		}
-		dHeapBase<OBJECT,KEY>::m_pool[i - 1] = dHeapBase<OBJECT,KEY>::m_pool[j - 1];
+		ndHeapBase<OBJECT,KEY>::m_pool[i - 1] = ndHeapBase<OBJECT,KEY>::m_pool[j - 1];
 	}
 	dAssert (i);
-	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
-	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = obj;
+	ndHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
+	ndHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = obj;
 	dAssert (SanityCheck());
 }
 
 template <class OBJECT, class KEY>
-void dUpHeap<OBJECT, KEY>::Pop()
+void ndUpHeap<OBJECT, KEY>::Pop()
 { 
 	Remove(0); 
 }
 
 template <class OBJECT, class KEY>
-void dUpHeap<OBJECT,KEY>::Sort ()
+void ndUpHeap<OBJECT,KEY>::Sort ()
 {
-	dInt32 count = dHeapBase<OBJECT,KEY>::m_curCount;
+	dInt32 count = ndHeapBase<OBJECT,KEY>::m_curCount;
 	for (dInt32 i = 1; i < count; i ++) 
 	{
-		KEY key (dHeapBase<OBJECT,KEY>::m_pool[0].m_key);
-		OBJECT obj (dHeapBase<OBJECT,KEY>::m_pool[0].m_obj);
+		KEY key (ndHeapBase<OBJECT,KEY>::m_pool[0].m_key);
+		OBJECT obj (ndHeapBase<OBJECT,KEY>::m_pool[0].m_obj);
 
 		Pop();
 
-		dHeapBase<OBJECT,KEY>::m_pool[dHeapBase<OBJECT,KEY>::m_curCount].m_key = key;
-		dHeapBase<OBJECT,KEY>::m_pool[dHeapBase<OBJECT,KEY>::m_curCount].m_obj = obj;
+		ndHeapBase<OBJECT,KEY>::m_pool[ndHeapBase<OBJECT,KEY>::m_curCount].m_key = key;
+		ndHeapBase<OBJECT,KEY>::m_pool[ndHeapBase<OBJECT,KEY>::m_curCount].m_obj = obj;
 	}
 
-	dHeapBase<OBJECT,KEY>::m_curCount = count;
+	ndHeapBase<OBJECT,KEY>::m_curCount = count;
 	for (dInt32 i = 0; i < count / 2; i ++) 
 	{
-		KEY key (dHeapBase<OBJECT,KEY>::m_pool[i].m_key);
-		OBJECT obj (dHeapBase<OBJECT,KEY>::m_pool[i].m_obj);
+		KEY key (ndHeapBase<OBJECT,KEY>::m_pool[i].m_key);
+		OBJECT obj (ndHeapBase<OBJECT,KEY>::m_pool[i].m_obj);
 
-		dHeapBase<OBJECT,KEY>::m_pool[i].m_key = dHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_key;
-		dHeapBase<OBJECT,KEY>::m_pool[i].m_obj = dHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_obj;
+		ndHeapBase<OBJECT,KEY>::m_pool[i].m_key = ndHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_key;
+		ndHeapBase<OBJECT,KEY>::m_pool[i].m_obj = ndHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_obj;
 
-		dHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_key = key;
-		dHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_obj = obj;
+		ndHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_key = key;
+		ndHeapBase<OBJECT,KEY>::m_pool[count - i - 1].m_obj = obj;
 	}
 	dAssert (SanityCheck());
 }
 
 template <class OBJECT, class KEY>
-void dUpHeap<OBJECT,KEY>::Remove (dInt32 index)
+void ndUpHeap<OBJECT,KEY>::Remove (dInt32 index)
 {
-	dHeapBase<OBJECT, KEY>::m_curCount--;
-	dHeapBase<OBJECT, KEY>::m_pool[index] = dHeapBase<OBJECT, KEY>::m_pool[dHeapBase<OBJECT, KEY>::m_curCount];
-	while (index && dHeapBase<OBJECT, KEY>::m_pool[(index - 1) >> 1].m_key > dHeapBase<OBJECT, KEY>::m_pool[index].m_key) 
+	ndHeapBase<OBJECT, KEY>::m_curCount--;
+	ndHeapBase<OBJECT, KEY>::m_pool[index] = ndHeapBase<OBJECT, KEY>::m_pool[ndHeapBase<OBJECT, KEY>::m_curCount];
+	while (index && ndHeapBase<OBJECT, KEY>::m_pool[(index - 1) >> 1].m_key > ndHeapBase<OBJECT, KEY>::m_pool[index].m_key) 
 	{
-		dSwap(dHeapBase<OBJECT, KEY>::m_pool[(index - 1) >> 1], dHeapBase<OBJECT, KEY>::m_pool[index]);
+		dSwap(ndHeapBase<OBJECT, KEY>::m_pool[(index - 1) >> 1], ndHeapBase<OBJECT, KEY>::m_pool[index]);
 		index = (index - 1) >> 1;
 	}
 
-	while ((2 * index + 1) < dHeapBase<OBJECT, KEY>::m_curCount) 
+	while ((2 * index + 1) < ndHeapBase<OBJECT, KEY>::m_curCount) 
 	{
 		dInt32 i0 = 2 * index + 1;
 		dInt32 i1 = 2 * index + 2;
-		if (i1 < dHeapBase<OBJECT, KEY>::m_curCount) 
+		if (i1 < ndHeapBase<OBJECT, KEY>::m_curCount) 
 		{
-			i0 = (dHeapBase<OBJECT, KEY>::m_pool[i0].m_key < dHeapBase<OBJECT, KEY>::m_pool[i1].m_key) ? i0 : i1;
-			if (dHeapBase<OBJECT, KEY>::m_pool[i0].m_key >= dHeapBase<OBJECT, KEY>::m_pool[index].m_key) 
+			i0 = (ndHeapBase<OBJECT, KEY>::m_pool[i0].m_key < ndHeapBase<OBJECT, KEY>::m_pool[i1].m_key) ? i0 : i1;
+			if (ndHeapBase<OBJECT, KEY>::m_pool[i0].m_key >= ndHeapBase<OBJECT, KEY>::m_pool[index].m_key) 
 			{
 				break;
 			}
-			dSwap(dHeapBase<OBJECT, KEY>::m_pool[i0], dHeapBase<OBJECT, KEY>::m_pool[index]);
+			dSwap(ndHeapBase<OBJECT, KEY>::m_pool[i0], ndHeapBase<OBJECT, KEY>::m_pool[index]);
 			index = i0;
 		} 
 		else 
 		{
-			if (dHeapBase<OBJECT, KEY>::m_pool[i0].m_key < dHeapBase<OBJECT, KEY>::m_pool[index].m_key) 
+			if (ndHeapBase<OBJECT, KEY>::m_pool[i0].m_key < ndHeapBase<OBJECT, KEY>::m_pool[index].m_key) 
 			{
-				dSwap(dHeapBase<OBJECT, KEY>::m_pool[i0], dHeapBase<OBJECT, KEY>::m_pool[index]);
+				dSwap(ndHeapBase<OBJECT, KEY>::m_pool[i0], ndHeapBase<OBJECT, KEY>::m_pool[index]);
 			}
 			index = i0;
 		}

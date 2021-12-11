@@ -33,8 +33,8 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 {
 	public:
 	D_CLASS_REFLECTION(ndBodyPlayerCapsule);
-	D_COLLISION_API ndBodyPlayerCapsule(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_COLLISION_API ndBodyPlayerCapsule(const dMatrix& localAxis, dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight);
+	D_COLLISION_API ndBodyPlayerCapsule(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndBodyPlayerCapsule(const ndMatrix& localAxis, dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight);
 	D_COLLISION_API virtual ~ndBodyPlayerCapsule();
 
 	ndBodyPlayerCapsule* GetAsBodyPlayerCapsule();
@@ -51,7 +51,7 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 	bool IsOnFloor() const;
 
 	virtual void ApplyInputs(dFloat32 timestep);
-	virtual dFloat32 ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const;
+	virtual dFloat32 ContactFrictionCallback(const ndVector& position, const ndVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const;
 
 	private:
 	enum dCollisionState
@@ -68,16 +68,16 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 	void ResolveStep(ndBodyPlayerCapsuleContactSolver& contactSolver, dFloat32 timestep);
 	void ResolveCollision(ndBodyPlayerCapsuleContactSolver& contactSolver, dFloat32 timestep);
 	dFloat32 PredictTimestep(ndBodyPlayerCapsuleContactSolver& contactSolver, dFloat32 timestep);
-	dCollisionState TestPredictCollision(const ndBodyPlayerCapsuleContactSolver& contactSolver, const dVector& veloc) const;
+	dCollisionState TestPredictCollision(const ndBodyPlayerCapsuleContactSolver& contactSolver, const ndVector& veloc) const;
 	void ResolveInterpenetrations(ndBodyPlayerCapsuleContactSolver& contactSolver, ndBodyPlayerCapsuleImpulseSolver& impulseSolver);
 
 	void IntegrateVelocity(dFloat32 timestep);
 
 	protected: 
-	D_COLLISION_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_COLLISION_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	dMatrix m_localFrame;
-	dVector m_impulse;
+	ndMatrix m_localFrame;
+	ndVector m_impulse;
 	dFloat32 m_mass;
 	dFloat32 m_invMass;
 	dFloat32 m_headingAngle;
@@ -108,7 +108,7 @@ inline void ndBodyPlayerCapsule::ApplyInputs(dFloat32)
 {
 }
 
-inline dFloat32 ndBodyPlayerCapsule::ContactFrictionCallback(const dVector&, const dVector&, dInt32, const ndBodyKinematic* const) const
+inline dFloat32 ndBodyPlayerCapsule::ContactFrictionCallback(const ndVector&, const ndVector&, dInt32, const ndBodyKinematic* const) const
 {
 	return dFloat32 (2.0f);
 }

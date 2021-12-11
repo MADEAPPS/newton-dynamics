@@ -39,11 +39,11 @@
 class ndHeightfieldMesh : public ndDemoMesh
 {
 	public: 
-	ndHeightfieldMesh(const dArray<dVector>& heightfield, const ndShaderPrograms& shaderCache)
+	ndHeightfieldMesh(const ndArray<ndVector>& heightfield, const ndShaderPrograms& shaderCache)
 		:ndDemoMesh ("heightfield")
 	{
-		dArray<glPositionNormalUV> points(heightfield.GetCount());
-		dArray<dInt32> indexList(6 * D_TERRAIN_WIDTH * D_TERRAIN_WIDTH + 1024);
+		ndArray<glPositionNormalUV> points(heightfield.GetCount());
+		ndArray<dInt32> indexList(6 * D_TERRAIN_WIDTH * D_TERRAIN_WIDTH + 1024);
 
 		m_shader = shaderCache.m_diffuseEffect;
 
@@ -53,7 +53,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 	}
 
 	private:
-	void BuildTilesArray(dArray<dInt32>& indexList, const char* const texName)
+	void BuildTilesArray(ndArray<dInt32>& indexList, const char* const texName)
 	{
 		for (dInt32 z = 0; z < D_TERRAIN_HEIGHT - 1; z += D_TERRAIN_TILE_SIZE)
 		{
@@ -64,7 +64,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 		}
 	}
 
-	void BuildTile(dArray<dInt32>& indexList, dInt32 x0, dInt32 z0, const char* const texName)
+	void BuildTile(ndArray<dInt32>& indexList, dInt32 x0, dInt32 z0, const char* const texName)
 	{
 		const dInt32 start = indexList.GetCount();
 		const dInt32 zMax = ((z0 + D_TERRAIN_TILE_SIZE) >= D_TERRAIN_HEIGHT) ? D_TERRAIN_HEIGHT - 1 : z0 + D_TERRAIN_TILE_SIZE;
@@ -94,7 +94,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 		segment->m_indexCount = indexList.GetCount() - start;
 	}
 
-	void BuildVertexAndNormals(const dArray<dInt32>& indexList, const dArray<dVector>& heightfield, dArray<glPositionNormalUV>& points)
+	void BuildVertexAndNormals(const ndArray<dInt32>& indexList, const ndArray<ndVector>& heightfield, ndArray<glPositionNormalUV>& points)
 	{
 		points.SetCount(heightfield.GetCount());
 		memset(&points[0], 0, heightfield.GetCount() * sizeof(glPositionNormalUV));
@@ -104,13 +104,13 @@ class ndHeightfieldMesh : public ndDemoMesh
 			const dInt32 i0 = indexList[i + 0];
 			const dInt32 i1 = indexList[i + 1];
 			const dInt32 i2 = indexList[i + 2];
-			const dVector& p0 = heightfield[i0];
-			const dVector& p1 = heightfield[i1];
-			const dVector& p2 = heightfield[i2];
+			const ndVector& p0 = heightfield[i0];
+			const ndVector& p1 = heightfield[i1];
+			const ndVector& p2 = heightfield[i2];
 
-			dVector e10(p1 - p0);
-			dVector e20(p2 - p0);
-			dVector normal(e10.CrossProduct(e20));
+			ndVector e10(p1 - p0);
+			ndVector e20(p2 - p0);
+			ndVector normal(e10.CrossProduct(e20));
 			dAssert(normal.m_w == dFloat32(0.0f));
 			normal = normal.Normalize();
 
@@ -130,7 +130,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 		dFloat32 uvScale = 1.0f / 32.0f;
 		for (dInt32 i = 0; i < points.GetCount(); i++)
 		{
-			dVector normal(points[i].m_normal.m_x, points[i].m_normal.m_y, points[i].m_normal.m_z, dFloat32(0.0f));
+			ndVector normal(points[i].m_normal.m_x, points[i].m_normal.m_y, points[i].m_normal.m_z, dFloat32(0.0f));
 			normal = normal.Normalize();
 			points[i].m_posit = glVector3(GLfloat(heightfield[i].m_x), GLfloat(heightfield[i].m_y), GLfloat(heightfield[i].m_z));
 			points[i].m_normal = glVector3(GLfloat(normal.m_x), GLfloat(normal.m_y), GLfloat(normal.m_z));
@@ -140,7 +140,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 	}
 };
 
-static void MakeNoiseHeightfield(dArray<dVector>& heightfield)
+static void MakeNoiseHeightfield(ndArray<ndVector>& heightfield)
 {
 	heightfield.SetCount(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
 	
@@ -156,7 +156,7 @@ static void MakeNoiseHeightfield(dArray<dVector>& heightfield)
 		for (dInt32 x = 0; x < D_TERRAIN_WIDTH; x++)
 		{
 			dFloat32 noiseVal = BrownianMotion(octaves, persistance, noiseGridScale * dFloat32(x), noiseGridScale * dFloat32(z));
-			heightfield[z * D_TERRAIN_WIDTH + x] = dVector(x * cellSize, noiseVal, z * cellSize, dFloat32 (0.0f));
+			heightfield[z * D_TERRAIN_WIDTH + x] = ndVector(x * cellSize, noiseVal, z * cellSize, dFloat32 (0.0f));
 			minHeight = dMin(minHeight, noiseVal);
 			maxHight = dMax(maxHight, noiseVal);
 		}
@@ -172,9 +172,9 @@ static void MakeNoiseHeightfield(dArray<dVector>& heightfield)
 	}
 }
 
-ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const dMatrix& location)
+ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
-	dArray<dVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
+	ndArray<ndVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
 	MakeNoiseHeightfield(heightfield);
 
 	// create the visual mesh
@@ -190,7 +190,7 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 		1.0f / 100.0f, D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
 
 	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
-	dArray<dInt16>& hightMap = shape->GetElevationMap();
+	ndArray<dInt16>& hightMap = shape->GetElevationMap();
 	dAssert(hightMap.GetCount() == heightfield.GetCount());
 	for (int i = 0; i < heightfield.GetCount(); i++)
 	{
@@ -211,9 +211,9 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 	return body;
 }
 
-void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const dMatrix& matrix)
+void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const ndMatrix& matrix)
 {
-	dArray<dVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
+	ndArray<ndVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
 	MakeNoiseHeightfield(heightfield);
 
 	ndDemoMesh* const mesh = new ndHeightfieldMesh(heightfield, scene->GetShaderCache());
@@ -226,7 +226,7 @@ void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& s
 		1.0f / 100.0f, D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
 
 	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
-	dArray<dInt16>& hightMap = shape->GetElevationMap();
+	ndArray<dInt16>& hightMap = shape->GetElevationMap();
 	dAssert(hightMap.GetCount() == heightfield.GetCount());
 	for (int i = 0; i < heightfield.GetCount(); i++)
 	{

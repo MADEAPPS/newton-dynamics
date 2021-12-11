@@ -25,11 +25,11 @@
 #include "ndNewtonStdafx.h"
 
 class ndBodyParticleSet;
-class ndBodyParticleSetList : public dList<ndBodyParticleSet*, dContainersFreeListAlloc<ndBodyParticleSet*>>
+class ndBodyParticleSetList : public ndList<ndBodyParticleSet*, ndContainersFreeListAlloc<ndBodyParticleSet*>>
 {
 	public:
 	ndBodyParticleSetList()
-		:dList<ndBodyParticleSet*, dContainersFreeListAlloc<ndBodyParticleSet*>>()
+		:ndList<ndBodyParticleSet*, ndContainersFreeListAlloc<ndBodyParticleSet*>>()
 	{
 	}
 };

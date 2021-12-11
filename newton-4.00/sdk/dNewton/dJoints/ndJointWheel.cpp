@@ -58,7 +58,7 @@ void ndWheelDescriptor::Save(nd::TiXmlNode* const xmlNode) const
 	xmlSaveParam(childNode, "longitudinalStiffness", m_longitudinalStiffness);
 }
 
-ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info)
+ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	,m_baseFrame(m_localMatrix1)
 	,m_info(info)
@@ -71,8 +71,8 @@ ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 {
 }
 
-ndJointWheel::ndJointWheel(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+ndJointWheel::ndJointWheel(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_baseFrame(dGetIdentityMatrix())
 	,m_info()
 	,m_posit(dFloat32(0.0f))
@@ -113,50 +113,50 @@ void ndJointWheel::SetSteering(dFloat32 normalidedSteering)
 
 void ndJointWheel::UpdateTireSteeringAngleMatrix()
 {
-	dMatrix tireMatrix;
-	dMatrix chassisMatrix;
+	ndMatrix tireMatrix;
+	ndMatrix chassisMatrix;
 	m_localMatrix1 = dYawMatrix(m_normalidedSteering * m_info.m_steeringAngle) * m_baseFrame;
 
 	CalculateGlobalMatrix(tireMatrix, chassisMatrix);
-	const dVector localRelPosit(chassisMatrix.UntransformVector(tireMatrix.m_posit));
+	const ndVector localRelPosit(chassisMatrix.UntransformVector(tireMatrix.m_posit));
 	const dFloat32 distance = dClamp(localRelPosit.m_y, m_info.m_upperStop, m_info.m_lowerStop);
 
 	const dFloat32 spinAngle = -CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
-	dMatrix newTireMatrix(dPitchMatrix(spinAngle) * chassisMatrix);
+	ndMatrix newTireMatrix(dPitchMatrix(spinAngle) * chassisMatrix);
 	newTireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(distance);
 
-	const dMatrix tireBodyMatrix(m_localMatrix0.Inverse() * newTireMatrix);
+	const ndMatrix tireBodyMatrix(m_localMatrix0.Inverse() * newTireMatrix);
 	m_body0->SetMatrix(tireBodyMatrix);
 }
 
-dMatrix ndJointWheel::CalculateUpperBumperMatrix() const
+ndMatrix ndJointWheel::CalculateUpperBumperMatrix() const
 {
-	dMatrix matrix(m_localMatrix1 * m_body1->GetMatrix());
+	ndMatrix matrix(m_localMatrix1 * m_body1->GetMatrix());
 	matrix.m_posit += matrix.m_up.Scale(m_info.m_lowerStop);
 	return matrix;
 }
 
 void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	// calculate position and speed	
-	const dVector veloc0(m_body0->GetVelocityAtPoint(matrix0.m_posit));
-	const dVector veloc1(m_body1->GetVelocityAtPoint(matrix1.m_posit));
+	const ndVector veloc0(m_body0->GetVelocityAtPoint(matrix0.m_posit));
+	const ndVector veloc1(m_body1->GetVelocityAtPoint(matrix1.m_posit));
 
-	const dVector& pin = matrix1[0];
-	const dVector& p0 = matrix0.m_posit;
-	const dVector& p1 = matrix1.m_posit;
-	const dVector prel(p0 - p1);
-	const dVector vrel(veloc0 - veloc1);
+	const ndVector& pin = matrix1[0];
+	const ndVector& p0 = matrix0.m_posit;
+	const ndVector& p1 = matrix1.m_posit;
+	const ndVector prel(p0 - p1);
+	const ndVector vrel(veloc0 - veloc1);
 
 	m_speed = vrel.DotProduct(matrix1.m_up).GetScalar();
 	m_posit = prel.DotProduct(matrix1.m_up).GetScalar();
-	const dVector projectedPoint = p1 + pin.Scale(pin.DotProduct(prel).GetScalar());
+	const ndVector projectedPoint = p1 + pin.Scale(pin.DotProduct(prel).GetScalar());
 
 	const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
@@ -176,8 +176,8 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		const dFloat32 brakesToChassisInfluence = dFloat32 (0.125f);
 
 		AddAngularRowJacobian(desc, matrix1.m_front, dFloat32(0.0f));
-		const dVector tireOmega(m_body0->GetOmega());
-		const dVector chassisOmega(m_body1->GetOmega());
+		const ndVector tireOmega(m_body0->GetOmega());
+		const ndVector chassisOmega(m_body1->GetOmega());
 
 		ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
 		ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
@@ -210,12 +210,12 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointWheel::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndJointWheel::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	m_info.Save(childNode);
 	xmlSaveParam(childNode, "baseFrame", m_baseFrame);

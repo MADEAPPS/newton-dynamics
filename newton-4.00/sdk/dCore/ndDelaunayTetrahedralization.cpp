@@ -26,35 +26,35 @@
 #include "ndSmallDeterminant.h"
 #include "ndDelaunayTetrahedralization.h"
 
-dDelaunayTetrahedralization::dDelaunayTetrahedralization(const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol)
-	:dConvexHull4d()
+ndDelaunayTetrahedralization::ndDelaunayTetrahedralization(const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol)
+	:ndConvexHull4d()
 {
-	dSetPrecisionDouble precision;
-	dStack<dBigVector> pool(count + 2);
+	ndSetPrecisionDouble precision;
+	ndStack<ndBigVector> pool(count + 2);
 
-	dBigVector* const points = &pool[0];
+	ndBigVector* const points = &pool[0];
 	dInt32 stride = dInt32 (strideInByte / sizeof (dFloat64));
 	for (dInt32 i = 0; i < count; i ++) 
 	{
 		dFloat64 x = dRoundToFloat (vertexCloud[i * stride + 0]);
 		dFloat64 y = dRoundToFloat (vertexCloud[i * stride + 1]);
 		dFloat64 z = dRoundToFloat (vertexCloud[i * stride + 2]);
-		points[i] = dBigVector (x, y, z, x * x + y * y + z * z);
+		points[i] = ndBigVector (x, y, z, x * x + y * y + z * z);
 	}
 
 	dInt32 oldCount = count;
-	BuildHull (&pool[0].m_x, sizeof (dBigVector), count, distTol);
+	BuildHull (&pool[0].m_x, sizeof (ndBigVector), count, distTol);
 	if (oldCount > m_count) 
 	{
 		// the mesh is convex, need to add two steiners point to make tractable
-		dBigVector origin (dFloat64 (0.0f));
+		ndBigVector origin (dFloat64 (0.0f));
 		dFloat64 maxW = dFloat64 (-1.0e20f);
 		for (dInt32 i = 0; i < count; i++) 
 		{
 			dFloat64 x = dRoundToFloat(vertexCloud[i * stride + 0]);
 			dFloat64 y = dRoundToFloat(vertexCloud[i * stride + 1]);
 			dFloat64 z = dRoundToFloat(vertexCloud[i * stride + 2]);
-			points[i] = dBigVector(x, y, z, x * x + y * y + z * z);
+			points[i] = ndBigVector(x, y, z, x * x + y * y + z * z);
 			origin += points[i];
 			maxW = dMax (points[i].m_w, maxW);
 		}
@@ -63,7 +63,7 @@ dDelaunayTetrahedralization::dDelaunayTetrahedralization(const dFloat64* const v
 		points[count + 1] = origin;
 		points[count + 0].m_w += dFloat64 (1.0f);
 		points[count + 1].m_w -= dFloat64 (1.0f);
- 		BuildHull (&pool[0].m_x, sizeof (dBigVector), count + 2, distTol);
+ 		BuildHull (&pool[0].m_x, sizeof (ndBigVector), count + 2, distTol);
 	}
 
 	if (oldCount > m_count) 
@@ -75,7 +75,7 @@ dDelaunayTetrahedralization::dDelaunayTetrahedralization(const dFloat64* const v
 		for (dInt32 i = 0; i < count; i ++) 
 		{
 			bool inHull = false;
-			const dConvexHull4dVector* const hullPoints = &m_points[0];
+			const ndConvexHull4dVector* const hullPoints = &m_points[0];
 			for (dInt32 j = 0; j < hullCount; j ++) 
 			{
 				if (hullPoints[j].m_index == i) 
@@ -86,7 +86,7 @@ dDelaunayTetrahedralization::dDelaunayTetrahedralization(const dFloat64* const v
 			}
 			if (!inHull) 
 			{
-				dBigVector q (points[i]);
+				ndBigVector q (points[i]);
 				dInt32 index = AddVertex(q);
 				if (index == -1) 
 				{
@@ -107,31 +107,31 @@ dDelaunayTetrahedralization::dDelaunayTetrahedralization(const dFloat64* const v
 	ndTempList::FlushFreeList();
 }
 
-dDelaunayTetrahedralization::~dDelaunayTetrahedralization()
+ndDelaunayTetrahedralization::~ndDelaunayTetrahedralization()
 {
 }
 
-dInt32 dDelaunayTetrahedralization::AddVertex (const dBigVector& vertex)
+dInt32 ndDelaunayTetrahedralization::AddVertex (const ndBigVector& vertex)
 {
-	dSetPrecisionDouble precision;
+	ndSetPrecisionDouble precision;
 
-	dBigVector p (vertex);
+	ndBigVector p (vertex);
 	dAssert(p.m_w == dFloat32(0.0f));
 	p.m_w = p.DotProduct(p).GetScalar();
-	dInt32 index = dConvexHull4d::AddVertex(p);
+	dInt32 index = ndConvexHull4d::AddVertex(p);
 
 	return index;
 }
 
-void dDelaunayTetrahedralization::SortVertexArray ()
+void ndDelaunayTetrahedralization::SortVertexArray ()
 {
-	dConvexHull4dVector* const points = &m_points[0];
-	for (dNode* node = GetFirst(); node; node = node->GetNext())
+	ndConvexHull4dVector* const points = &m_points[0];
+	for (ndNode* node = GetFirst(); node; node = node->GetNext())
 	{	
-		dConvexHull4dTetraherum* const tetra = &node->GetInfo();
+		ndConvexHull4dTetraherum* const tetra = &node->GetInfo();
 		for (dInt32 i = 0; i < 4; i ++) 
 		{
-			dConvexHull4dTetraherum::dgTetrahedrumFace& face = tetra->m_faces[i];
+			ndConvexHull4dTetraherum::ndTetrahedrumFace& face = tetra->m_faces[i];
 			for (dInt32 j = 0; j < 4; j ++) 
 			{
 				dInt32 index = face.m_index[j];
@@ -143,7 +143,7 @@ void dDelaunayTetrahedralization::SortVertexArray ()
 	class CompareVertex
 	{
 		public:
-		dInt32 Compare(const dConvexHull4dVector& elementA, const dConvexHull4dVector& elementB, void* const) const
+		dInt32 Compare(const ndConvexHull4dVector& elementA, const ndConvexHull4dVector& elementB, void* const) const
 		{
 			if (elementA.m_index < elementB.m_index)
 			{
@@ -156,19 +156,19 @@ void dDelaunayTetrahedralization::SortVertexArray ()
 			return 0;
 		}
 	};
-	dSort<dConvexHull4dVector, CompareVertex>(points, m_count);
+	ndSort<ndConvexHull4dVector, CompareVertex>(points, m_count);
 }
 
-void dDelaunayTetrahedralization::RemoveUpperHull ()
+void ndDelaunayTetrahedralization::RemoveUpperHull ()
 {
-	dSetPrecisionDouble precision;
+	ndSetPrecisionDouble precision;
 
-	dNode* nextNode = NULL;
-	for (dNode* node = GetFirst(); node; node = nextNode) 
+	ndNode* nextNode = NULL;
+	for (ndNode* node = GetFirst(); node; node = nextNode) 
 	{
 		nextNode = node->GetNext();
 
-		dConvexHull4dTetraherum* const tetra = &node->GetInfo();
+		ndConvexHull4dTetraherum* const tetra = &node->GetInfo();
 		tetra->SetMark(0);
 		dFloat64 w = GetTetraVolume (tetra);
 		if (w >= dFloat64 (0.0f)) 
@@ -178,15 +178,15 @@ void dDelaunayTetrahedralization::RemoveUpperHull ()
 	}
 }
 
-void dDelaunayTetrahedralization::DeleteFace (dNode* const node)
+void ndDelaunayTetrahedralization::DeleteFace (ndNode* const node)
 {
-	dConvexHull4dTetraherum* const tetra = &node->GetInfo();
+	ndConvexHull4dTetraherum* const tetra = &node->GetInfo();
 	for (dInt32 i = 0; i < 4; i ++) 
 	{
-		dNode* const twinNode = tetra->m_faces[i].m_twin;
+		ndNode* const twinNode = tetra->m_faces[i].m_twin;
 		if (twinNode) 
 		{
-			dConvexHull4dTetraherum* const twinTetra = &twinNode->GetInfo();
+			ndConvexHull4dTetraherum* const twinTetra = &twinNode->GetInfo();
 			for (dInt32 j = 0; j < 4; j ++) 
 			{
 				if (twinTetra->m_faces[j].m_twin == node) 
@@ -197,5 +197,5 @@ void dDelaunayTetrahedralization::DeleteFace (dNode* const node)
 			}
 		}
 	}
-	dConvexHull4d::DeleteFace (node);
+	ndConvexHull4d::DeleteFace (node);
 }

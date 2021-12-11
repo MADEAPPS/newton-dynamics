@@ -25,14 +25,14 @@
 #include "ndCoreStdafx.h"
 
 /// Generic counting mutex for synchronization of thread jobs
-class dSyncMutex
+class ndSyncMutex
 {
 	public:
 	/// Create and initialize counter to zero
-	D_CORE_API dSyncMutex();
+	D_CORE_API ndSyncMutex();
 
 	/// Destroy mutex
-	D_CORE_API ~dSyncMutex();
+	D_CORE_API ~ndSyncMutex();
 
 	/// Synchronize with another worker threads.
 	/// \brief When internal variable m_counter larger than zero, this function blocks

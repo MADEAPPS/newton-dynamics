@@ -33,9 +33,9 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	};
 
 	D_CLASS_REFLECTION(ndJointKinematicController);
-	D_NEWTON_API ndJointKinematicController(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const dVector& attachmentPointInGlobalSpace);
-	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const dMatrix& attachmentMatrixInGlobalSpace);
+	D_NEWTON_API ndJointKinematicController(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const ndVector& attachmentPointInGlobalSpace);
+	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const ndMatrix& attachmentMatrixInGlobalSpace);
 	D_NEWTON_API virtual ~ndJointKinematicController();
 
 	virtual bool IsBilateral() const;
@@ -46,17 +46,17 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	void SetMaxAngularFriction(dFloat32 torque);
 	void SetAngularViscuosFrictionCoefficient(dFloat32 coefficient);
 
-	dMatrix GetTargetMatrix() const;
-	void SetTargetPosit(const dVector& posit);
-	void SetTargetMatrix(const dMatrix& matrix);
-	void SetTargetRotation(const dQuaternion& rotation);
+	ndMatrix GetTargetMatrix() const;
+	void SetTargetPosit(const ndVector& posit);
+	void SetTargetMatrix(const ndMatrix& matrix);
+	void SetTargetRotation(const ndQuaternion& rotation);
 
 	protected:
-	void Init(const dMatrix& matrix);
+	void Init(const ndMatrix& matrix);
 
 	D_NEWTON_API void CheckSleep() const;
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	dFloat32 m_maxSpeed;
 	dFloat32 m_maxOmega;
@@ -95,32 +95,32 @@ inline void ndJointKinematicController::SetMaxOmega(dFloat32 speedInRadiansPerSe
 
 inline void ndJointKinematicController::SetAngularViscuosFrictionCoefficient(dFloat32 coefficient)
 {
-	dVector mass (GetBody0()->GetMassMatrix());
+	ndVector mass (GetBody0()->GetMassMatrix());
 	m_angularFrictionCoefficient = dAbs(coefficient) * dMax(mass.m_x, dMax(mass.m_y, mass.m_z));
 }
 
-inline void ndJointKinematicController::SetTargetPosit(const dVector& posit)
+inline void ndJointKinematicController::SetTargetPosit(const ndVector& posit)
 {
 	m_localMatrix1.m_posit = posit;
 	dAssert(m_localMatrix1.m_posit.m_w == dFloat32(1.0f));
 	CheckSleep();
 }
 
-inline void ndJointKinematicController::SetTargetMatrix(const dMatrix& matrix)
+inline void ndJointKinematicController::SetTargetMatrix(const ndMatrix& matrix)
 {
 	m_localMatrix1 = matrix;
 	CheckSleep();
 }
 
-inline dMatrix ndJointKinematicController::GetTargetMatrix() const
+inline ndMatrix ndJointKinematicController::GetTargetMatrix() const
 {
 	dAssert(0);
 	return m_localMatrix0;
 }
 
-inline void ndJointKinematicController::SetTargetRotation(const dQuaternion& rotation)
+inline void ndJointKinematicController::SetTargetRotation(const ndQuaternion& rotation)
 {
-	m_localMatrix1 = dMatrix(rotation, m_localMatrix1.m_posit);
+	m_localMatrix1 = ndMatrix(rotation, m_localMatrix1.m_posit);
 	dAssert(m_localMatrix1.m_posit.m_w == dFloat32(1.0f));
 	CheckSleep();
 }

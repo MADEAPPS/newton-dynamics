@@ -20,15 +20,15 @@ class ndJointUpVector: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointUpVector);
-	D_NEWTON_API ndJointUpVector(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndJointUpVector(const dVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointUpVector(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointUpVector(const ndVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointUpVector();
 
-	D_NEWTON_API void SetPinDir (const dVector& pin);
+	D_NEWTON_API void SetPinDir (const ndVector& pin);
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 };
 
 #endif

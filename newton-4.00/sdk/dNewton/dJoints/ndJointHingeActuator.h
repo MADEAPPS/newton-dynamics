@@ -19,9 +19,9 @@ class ndJointHingeActuator: public ndJointHinge
 {
 	public:
 	D_CLASS_REFLECTION(ndJointHingeActuator);
-	D_NEWTON_API ndJointHingeActuator(const dLoadSaveBase::dLoadDescriptor& desc);
-	//D_NEWTON_API ndJointHingeActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API ndJointHingeActuator(const dMatrix& pinAndPivotFrame, dFloat32 angularRate, dFloat32 minAngle, dFloat32 maxAngle, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointHingeActuator(const ndLoadSaveBase::dLoadDescriptor& desc);
+	//D_NEWTON_API ndJointHingeActuator(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointHingeActuator(const ndMatrix& pinAndPivotFrame, dFloat32 angularRate, dFloat32 minAngle, dFloat32 maxAngle, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointHingeActuator();
 
 	D_NEWTON_API dFloat32 GetTargetAngle() const;
@@ -41,7 +41,7 @@ class ndJointHingeActuator: public ndJointHinge
 	
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	
 	dFloat32 m_targetAngle;
 	dFloat32 m_motorSpeed;

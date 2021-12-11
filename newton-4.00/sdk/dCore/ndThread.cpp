@@ -25,13 +25,13 @@
 #include "ndThread.h"
 #include "ndProfiler.h"
 
-dThread::dThread()
-	:dClassAlloc()
-	,dSemaphore()
+ndThread::ndThread()
+	:ndClassAlloc()
+	,ndSemaphore()
 #ifndef D_USE_THREAD_EMULATION
-	,dAtomic<bool>(true)
+	,ndAtomic<bool>(true)
 	,std::condition_variable()
-	,std::thread(&dThread::ThreadFunctionCallback, this)
+	,std::thread(&ndThread::ThreadFunctionCallback, this)
 #endif
 {
 	strcpy (m_name, "newtonWorker");
@@ -43,11 +43,11 @@ dThread::dThread()
 #endif
 }
 
-dThread::~dThread()
+ndThread::~ndThread()
 {
 }
 
-void dThread::SetName(const char* const name)
+void ndThread::SetName(const char* const name)
 {
 	strncpy(m_name, name, sizeof(m_name) - 1);
 #if defined(_MSC_VER) && !defined (D_USE_THREAD_EMULATION)
@@ -80,7 +80,7 @@ void dThread::SetName(const char* const name)
 	D_SET_TRACK_NAME(m_name);
 }
 
-void dThread::Finish()
+void ndThread::Finish()
 {
 #ifndef D_USE_THREAD_EMULATION
 	Terminate();
@@ -88,14 +88,14 @@ void dThread::Finish()
 #endif
 }
 
-void dThread::Signal()
+void ndThread::Signal()
 {
 #ifndef D_USE_THREAD_EMULATION
-	dSemaphore::Signal();
+	ndSemaphore::Signal();
 #endif
 }
 
-void dThread::ThreadFunctionCallback()
+void ndThread::ThreadFunctionCallback()
 {
 #ifndef D_USE_THREAD_EMULATION
 
@@ -103,7 +103,7 @@ void dThread::ThreadFunctionCallback()
 
 	store(false);
 	D_SET_TRACK_NAME(m_name);
-	dFloatExceptions exception;
+	ndFloatExceptions exception;
 
 	while (!Wait())
 	{

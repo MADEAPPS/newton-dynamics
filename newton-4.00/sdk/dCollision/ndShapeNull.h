@@ -37,20 +37,20 @@ class ndShapeNull : public ndShape
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual dFloat32 GetBoxMinRadius() const;
 	virtual dFloat32 GetBoxMaxRadius() const;
-	virtual void CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const;
-	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
-	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
-	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
-	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
-	virtual dVector CalculateVolumeIntegral(const dMatrix& globalMatrix, const dVector& globalPlane, const ndShapeInstance& parentScale) const;
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
+	virtual ndVector SupportVertex(const ndVector& dir, dInt32* const vertexIndex) const;
+	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
+	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
+	virtual ndVector SupportVertexSpecial(const ndVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
+	virtual dInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
+	virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& globalPlane, const ndShapeInstance& parentScale) const;
+	virtual dFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 };
 
 inline ndShapeNull::ndShapeNull()
 	:ndShape(m_nullCollision)
 {
-	m_inertia = dVector::m_one | dVector::m_triplexMask;
+	m_inertia = ndVector::m_one | ndVector::m_triplexMask;
 }
 
 inline ndShapeNull::~ndShapeNull()
@@ -62,29 +62,29 @@ inline ndShapeNull* ndShapeNull::GetAsShapeNull()
 	return this; 
 }
 
-inline dVector ndShapeNull::SupportVertex(const dVector&, dInt32* const) const
+inline ndVector ndShapeNull::SupportVertex(const ndVector&, dInt32* const) const
 {
-	return dVector::m_zero;
+	return ndVector::m_zero;
 }
 
-inline dVector ndShapeNull::SupportVertexSpecial(const dVector&, dFloat32, dInt32* const) const
+inline ndVector ndShapeNull::SupportVertexSpecial(const ndVector&, dFloat32, dInt32* const) const
 {
-	return dVector::m_zero;
+	return ndVector::m_zero;
 }
 
-inline dFloat32 ndShapeNull::RayCast(ndRayCastNotify&, const dVector&, const dVector&, dFloat32, const ndBody* const, ndContactPoint&) const
+inline dFloat32 ndShapeNull::RayCast(ndRayCastNotify&, const ndVector&, const ndVector&, dFloat32, const ndBody* const, ndContactPoint&) const
 {
 	return dFloat32(1.2f);
 }
 
-inline void ndShapeNull::DebugShape(const dMatrix&, ndShapeDebugNotify&) const
+inline void ndShapeNull::DebugShape(const ndMatrix&, ndShapeDebugNotify&) const
 {
 }
 
-inline void ndShapeNull::CalculateAabb(const dMatrix&, dVector& p0, dVector& p1) const
+inline void ndShapeNull::CalculateAabb(const ndMatrix&, ndVector& p0, ndVector& p1) const
 {
-	p0 = dVector::m_zero;
-	p1 = dVector::m_zero;
+	p0 = ndVector::m_zero;
+	p1 = ndVector::m_zero;
 }
 
 inline ndShapeInfo ndShapeNull::GetShapeInfo() const
@@ -109,17 +109,17 @@ inline dFloat32 ndShapeNull::GetBoxMaxRadius() const
 	return dFloat32(0.0f);
 }
 
-inline dVector ndShapeNull::CalculateVolumeIntegral(const dMatrix&, const dVector&, const ndShapeInstance&) const
+inline ndVector ndShapeNull::CalculateVolumeIntegral(const ndMatrix&, const ndVector&, const ndShapeInstance&) const
 {
-	return dVector::m_zero;
+	return ndVector::m_zero;
 }
 
-inline dVector ndShapeNull::SupportVertexSpecialProjectPoint(const dVector& point, const dVector&) const
+inline ndVector ndShapeNull::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector&) const
 {
 	return point;
 }
 
-inline dInt32 ndShapeNull::CalculatePlaneIntersection(const dVector&, const dVector&, dVector* const) const
+inline dInt32 ndShapeNull::CalculatePlaneIntersection(const ndVector&, const ndVector&, ndVector* const) const
 {
 	return 0;
 }

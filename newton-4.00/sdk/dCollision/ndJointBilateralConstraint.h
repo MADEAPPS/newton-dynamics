@@ -40,12 +40,12 @@ enum ndJointBilateralSolverModel
 
 D_MSV_NEWTON_ALIGN_32
 //class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
-class ndJointBilateralConstraint : public ndConstraint, public dContainersFreeListAlloc<ndJointBilateralConstraint>
+class ndJointBilateralConstraint : public ndConstraint, public ndContainersFreeListAlloc<ndJointBilateralConstraint>
 {
 	public:
 	D_CLASS_REFLECTION(ndJointBilateralConstraint);
-	D_COLLISION_API ndJointBilateralConstraint(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_COLLISION_API ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
+	D_COLLISION_API ndJointBilateralConstraint(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrix);
 	D_COLLISION_API virtual ~ndJointBilateralConstraint();
 
 	virtual ndBodyKinematic* GetBody0() const;
@@ -58,30 +58,30 @@ class ndJointBilateralConstraint : public ndConstraint, public dContainersFreeLi
 	virtual ndJointBilateralSolverModel GetSolverModel() const;
 	virtual void SetSolverModel(ndJointBilateralSolverModel model);
 
-	D_COLLISION_API dFloat32 CalculateAngle(const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
+	D_COLLISION_API dFloat32 CalculateAngle(const ndVector& planeDir, const ndVector& cosDir, const ndVector& sinDir) const;
 	D_COLLISION_API virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
-	D_COLLISION_API void CalculateLocalMatrix(const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
-	D_COLLISION_API void AddAngularRowJacobian(ndConstraintDescritor& desc, const dVector& dir, dFloat32 relAngle);
-	D_COLLISION_API void AddLinearRowJacobian(ndConstraintDescritor& desc, const dVector& pivot0, const dVector& pivot1, const dVector& dir);
+	D_COLLISION_API void CalculateLocalMatrix(const ndMatrix& pinsAndPivotFrame, ndMatrix& localMatrix0, ndMatrix& localMatrix1) const;
+	D_COLLISION_API void AddAngularRowJacobian(ndConstraintDescritor& desc, const ndVector& dir, dFloat32 relAngle);
+	D_COLLISION_API void AddLinearRowJacobian(ndConstraintDescritor& desc, const ndVector& pivot0, const ndVector& pivot1, const ndVector& dir);
 
-	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_COLLISION_API virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 	D_COLLISION_API dFloat32 CalculateSpringDamperAcceleration(dFloat32 dt, dFloat32 ks, dFloat32 x, dFloat32 kd, dFloat32 v) const;
 	D_COLLISION_API void SetMassSpringDamperAcceleration(ndConstraintDescritor& desc, dFloat32 regularizer, dFloat32 spring, dFloat32 damper);
 	
-	const dMatrix& GetLocalMatrix0() const;
-	const dMatrix& GetLocalMatrix1() const;
+	const ndMatrix& GetLocalMatrix0() const;
+	const ndMatrix& GetLocalMatrix1() const;
 
-	dVector GetForceBody0() const;
-	dVector GetTorqueBody0() const;
-	dVector GetForceBody1() const;
-	dVector GetTorqueBody1() const;
+	ndVector GetForceBody0() const;
+	ndVector GetTorqueBody0() const;
+	ndVector GetForceBody1() const;
+	ndVector GetTorqueBody1() const;
 
 	bool IsBilateral() const;
 	bool IsCollidable() const;
 	void SetCollidable(bool state);
 	void SetSkeletonFlag(bool flag);
-	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const;
+	void CalculateGlobalMatrix(ndMatrix& matrix0, ndMatrix& matrix1) const;
 	dFloat32 GetMotorZeroAcceleration(ndConstraintDescritor& desc) const;
 	void SetHighFriction(ndConstraintDescritor& desc, dFloat32 friction);
 	void SetLowerFriction(ndConstraintDescritor& desc, dFloat32 friction);
@@ -92,22 +92,22 @@ class ndJointBilateralConstraint : public ndConstraint, public dContainersFreeLi
 	bool IsSkeleton() const;
 
 	protected:
-	dMatrix m_localMatrix0;
-	dMatrix m_localMatrix1;
-	dVector m_forceBody0;
-	dVector m_torqueBody0;
-	dVector m_forceBody1;
-	dVector m_torqueBody1;
+	ndMatrix m_localMatrix0;
+	ndMatrix m_localMatrix1;
+	ndVector m_forceBody0;
+	ndVector m_torqueBody0;
+	ndVector m_forceBody1;
+	ndVector m_torqueBody1;
 
-	dVector m_r0[DG_BILATERAL_CONTRAINT_DOF];
-	dVector m_r1[DG_BILATERAL_CONTRAINT_DOF];
+	ndVector m_r0[DG_BILATERAL_CONTRAINT_DOF];
+	ndVector m_r1[DG_BILATERAL_CONTRAINT_DOF];
 	ndForceImpactPair m_jointForce[DG_BILATERAL_CONTRAINT_DOF];
 	dFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];
 	ndBodyKinematic* m_body0;
 	ndBodyKinematic* m_body1;
-	ndJointList::dNode* m_worldNode;
-	ndJointList::dNode* m_body0Node;
-	ndJointList::dNode* m_body1Node;
+	ndJointList::ndNode* m_worldNode;
+	ndJointList::ndNode* m_body0Node;
+	ndJointList::ndNode* m_body1Node;
 
 	dFloat32 m_defualtDiagonalRegularizer;
 	dUnsigned32 m_maxDof			: 6;
@@ -143,7 +143,7 @@ inline dUnsigned32 ndJointBilateralConstraint::GetRowsCount() const
 	return m_maxDof;
 }
 
-inline void ndJointBilateralConstraint::CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const
+inline void ndJointBilateralConstraint::CalculateGlobalMatrix(ndMatrix& matrix0, ndMatrix& matrix1) const
 {
 	matrix0 = m_localMatrix0 * m_body0->GetMatrix();
 	matrix1 = m_localMatrix1 * m_body1->GetMatrix();
@@ -159,12 +159,12 @@ inline ndBodyKinematic* ndJointBilateralConstraint::GetBody1() const
 	return m_body1;
 }
 
-inline const dMatrix& ndJointBilateralConstraint::GetLocalMatrix0() const
+inline const ndMatrix& ndJointBilateralConstraint::GetLocalMatrix0() const
 {
 	return m_localMatrix0;
 }
 
-inline const dMatrix& ndJointBilateralConstraint::GetLocalMatrix1() const
+inline const ndMatrix& ndJointBilateralConstraint::GetLocalMatrix1() const
 {
 	return m_localMatrix1;
 }
@@ -257,22 +257,22 @@ inline void ndJointBilateralConstraint::SetCollidable(bool state)
 	m_enableCollision = state ? 1 : 0;
 }
 
-inline dVector ndJointBilateralConstraint::GetForceBody0() const
+inline ndVector ndJointBilateralConstraint::GetForceBody0() const
 {
 	return m_forceBody0;
 }
 
-inline dVector ndJointBilateralConstraint::GetTorqueBody0() const
+inline ndVector ndJointBilateralConstraint::GetTorqueBody0() const
 {
 	return m_torqueBody0;
 }
 
-inline dVector ndJointBilateralConstraint::GetForceBody1() const
+inline ndVector ndJointBilateralConstraint::GetForceBody1() const
 {
 	return m_forceBody1;
 }
 
-inline dVector ndJointBilateralConstraint::GetTorqueBody1() const
+inline ndVector ndJointBilateralConstraint::GetTorqueBody1() const
 {
 	return m_torqueBody1;
 }

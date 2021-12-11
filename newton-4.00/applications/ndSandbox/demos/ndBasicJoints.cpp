@@ -25,38 +25,38 @@ class ndFollowSplinePath : public ndJointFollowPath
 {
 	public:
 	D_CLASS_REFLECTION(ndFollowSplinePath);
-	ndFollowSplinePath(const dMatrix& pinAndPivotFrame, ndBodyDynamic* const child, ndBodyDynamic* const pathBody)
+	ndFollowSplinePath(const ndMatrix& pinAndPivotFrame, ndBodyDynamic* const child, ndBodyDynamic* const pathBody)
 		:ndJointFollowPath(pinAndPivotFrame, child, pathBody)
 	{
 	}
 
-	void GetPointAndTangentAtLocation(const dVector& location, dVector& positOut, dVector& tangentOut) const
+	void GetPointAndTangentAtLocation(const ndVector& location, ndVector& positOut, ndVector& tangentOut) const
 	{
 		ndDemoEntity* const pathEntity = (ndDemoEntity*)GetBody1()->GetNotifyCallback()->GetUserData();
 		ndDemoSplinePathMesh* const mesh = (ndDemoSplinePathMesh*)pathEntity->GetMesh();
-		const dBezierSpline& spline = mesh->m_curve;
+		const ndBezierSpline& spline = mesh->m_curve;
 		
-		dMatrix matrix(GetBody1()->GetMatrix());
+		ndMatrix matrix(GetBody1()->GetMatrix());
 		
-		dVector p(matrix.UntransformVector(location));
-		dBigVector point;
+		ndVector p(matrix.UntransformVector(location));
+		ndBigVector point;
 		dFloat64 knot = spline.FindClosestKnot(point, p, 4);
-		dBigVector tangent(spline.CurveDerivative(knot));
+		ndBigVector tangent(spline.CurveDerivative(knot));
 		tangent = tangent.Scale(1.0 / dSqrt(tangent.DotProduct(tangent).GetScalar()));
 		positOut = matrix.TransformVector(point);
 		tangentOut = tangent;
 	}
 
-	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	{
 		nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 		desc.m_rootNode->LinkEndChild(childNode);
 		childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-		ndJointFollowPath::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+		ndJointFollowPath::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 	}
 };
 
-static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const dMatrix& matrix, const ndShapeInstance& shape, ndDemoMesh* const mesh, dFloat32 mass)
+static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const ndMatrix& matrix, const ndShapeInstance& shape, ndDemoMesh* const mesh, dFloat32 mass)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
@@ -71,20 +71,20 @@ static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const dMat
 	return body;
 }
 
-static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& origin)
+static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& origin)
 {
 	dFloat32 mass = 1.0f;
 	dFloat32 diameter = 0.5f;
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
+	ndMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 
 	matrix.m_posit.m_y += 1.0f;
@@ -92,9 +92,9 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 	matrix.m_posit.m_y += 1.0f;
 	ndBodyDynamic* const body1 = MakePrimitive(scene, matrix, shape, mesh, mass);
 
-	dMatrix bodyMatrix0(body0->GetMatrix());
-	dMatrix bodyMatrix1(body1->GetMatrix());
-	dMatrix pinMatrix(bodyMatrix0);
+	ndMatrix bodyMatrix0(body0->GetMatrix());
+	ndMatrix bodyMatrix1(body1->GetMatrix());
+	ndMatrix pinMatrix(bodyMatrix0);
 	pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
 	ndJointBallAndSocket* const joint0 = new ndJointBallAndSocket(pinMatrix, body0, body1);
 	world->AddJoint(joint0);
@@ -118,9 +118,9 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 	mesh->Release();
 }
 
-static void BuildRollingFriction(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 diameter)
+static void BuildRollingFriction(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 mass, dFloat32 diameter)
 {
-	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
+	ndMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 	
@@ -130,31 +130,31 @@ static void BuildRollingFriction(ndDemoEntityManager* const scene, const dVector
 	//ndBodyDynamic* const bodyA = MakePrimitive(scene, matrix, shape2, mesh2, mass);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-	dVector posit(matrix.m_posit);
+	ndVector posit(matrix.m_posit);
 	for (dInt32 i = 0; i < 8; i++)
 	{
 		ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape2, mesh2, mass);
 		ndJointBilateralConstraint* const joint = new ndJointDryRollingFriction(body, world->GetSentinelBody(), 0.5f);
 		world->AddJoint(joint);
 		posit.m_y += diameter * 1.5f;
-		matrix.m_posit = posit + dVector(dGaussianRandom(0.01f), 0.0f, dGaussianRandom(0.01f), 0.0f);
+		matrix.m_posit = posit + ndVector(dGaussianRandom(0.01f), 0.0f, dGaussianRandom(0.01f), 0.0f);
 	}
 
 	mesh2->Release();
 }
 
-static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 diameter)
+static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 mass, dFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
+	ndMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 
 	matrix.m_posit.m_y += 2.0f;
@@ -173,18 +173,18 @@ static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin,
 	mesh->Release();
 }
 
-static void BuildHinge(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 diameter)
+static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 mass, dFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
+	ndMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 
 	matrix.m_posit.m_y += 2.0f;
@@ -201,18 +201,18 @@ static void BuildHinge(ndDemoEntityManager* const scene, const dVector& origin, 
 	mesh->Release();
 }
 
-static void BuildDoubleHinge(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 diameter)
+static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 mass, dFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeCylinder(diameter, diameter, diameter * 0.5f));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	dMatrix matrix(dYawMatrix(90.0f * dDegreeToRad));
+	ndMatrix matrix(dYawMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 
 	matrix.m_posit.m_y += 2.0f;
@@ -220,14 +220,14 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const dVector& or
 	ndBodyDynamic* const fixBody = world->GetSentinelBody();
 	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 
-	dVector massMatrix(body->GetMassMatrix());
+	ndVector massMatrix(body->GetMassMatrix());
 	dFloat32 maxInertia(dMax (dMax(massMatrix.m_x, massMatrix.m_y), massMatrix.m_z));
 	massMatrix.m_x = maxInertia;
 	massMatrix.m_y = maxInertia;
 	massMatrix.m_z = maxInertia;
 	//body->SetMassMatrix(massMatrix);
 
-	body->SetOmega(dVector(0.0f, 10.0f, 20.0f, 0.0f));
+	body->SetOmega(ndVector(0.0f, 10.0f, 20.0f, 0.0f));
 
 	ndJointDoubleHinge* const joint = new ndJointDoubleHinge (matrix, body, fixBody);
 	//joint->SetAsSpringDamper(true, 0.1f, 500.0f, 5.0f);
@@ -238,37 +238,37 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const dVector& or
 	mesh->Release();
 }
 
-void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const dVector& origin)
+void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const ndVector& origin)
 {
 	ndShapeInstance shape(new ndShapeSphere(0.25f));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	dMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(dGetIdentityMatrix());
 
 	ndBodyDynamic* bodies[8];
 
-	matrix.m_posit = origin + dVector(0.0f, 4.0f, 0.0f, 0.0f);
+	matrix.m_posit = origin + ndVector(0.0f, 4.0f, 0.0f, 0.0f);
 	bodies[0] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
 
-	matrix.m_posit = origin + dVector(2.0f, 4.0f, 0.0f, 0.0f);
+	matrix.m_posit = origin + ndVector(2.0f, 4.0f, 0.0f, 0.0f);
 	bodies[1] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
 
-	matrix.m_posit = origin + dVector(2.0f, 4.0f, 2.0f, 0.0f);
+	matrix.m_posit = origin + ndVector(2.0f, 4.0f, 2.0f, 0.0f);
 	bodies[2] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
 
-	matrix.m_posit = origin + dVector(0.0f, 4.0f, 2.0f, 0.0f);
+	matrix.m_posit = origin + ndVector(0.0f, 4.0f, 2.0f, 0.0f);
 	bodies[3] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
 
-	matrix.m_posit = origin + dVector(0.0f, 6.0f, 0.0f, 0.0f);
+	matrix.m_posit = origin + ndVector(0.0f, 6.0f, 0.0f, 0.0f);
 	bodies[4] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
 
-	matrix.m_posit = origin + dVector(2.0f, 6.0f, 0.0f, 0.0f);
+	matrix.m_posit = origin + ndVector(2.0f, 6.0f, 0.0f, 0.0f);
 	bodies[5] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
 
-	matrix.m_posit = origin + dVector(2.0f, 6.0f, 2.0f, 0.0f);
+	matrix.m_posit = origin + ndVector(2.0f, 6.0f, 2.0f, 0.0f);
 	bodies[6] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
 
-	matrix.m_posit = origin + dVector(0.0f, 6.0f, 2.0f, 0.0f);
+	matrix.m_posit = origin + ndVector(0.0f, 6.0f, 2.0f, 0.0f);
 	bodies[7] = MakePrimitive(scene, matrix, shape, mesh, 5.0f);
 
 	ndWorld* world = scene->GetWorld();
@@ -285,18 +285,18 @@ void BuildFixDistanceJoints(ndDemoEntityManager* const scene, const dVector& ori
 	mesh->Release();
 }
 
-static void BuildGear(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 diameter)
+static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 mass, dFloat32 diameter)
 {
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
+	ndMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 
 	matrix.m_posit.m_y += 2.0f;
@@ -310,15 +310,15 @@ static void BuildGear(ndDemoEntityManager* const scene, const dVector& origin, d
 	world->AddJoint(new ndJointHinge(matrix, body0, fixBody));
 	world->AddJoint(new ndJointHinge(matrix, body1, fixBody));
 
-	dVector pin(matrix.m_front);
+	ndVector pin(matrix.m_front);
 	world->AddJoint(new ndJointGear(5.0f, pin, body0, pin, body1));
 
 	mesh->Release();
 }
 
-static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origin)
+static void AddPathFollow(ndDemoEntityManager* const scene, const ndVector& origin)
 {
-	dMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
 
 	// create a Bezier Spline path for AI car to drive
@@ -326,19 +326,19 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 	ndBodyDynamic* const pathBody = MakePrimitive(scene, matrix, box, nullptr, 0.0f);
 	ndDemoEntity* const rollerCosterPath = (ndDemoEntity*)pathBody->GetNotifyCallback()->GetUserData();
 
-	dBezierSpline spline;
+	ndBezierSpline spline;
 	dFloat64 knots[] = { 0.0f, 1.0f / 5.0f, 2.0f / 5.0f, 3.0f / 5.0f, 4.0f / 5.0f, 1.0f };
 
-	dBigVector control[] =
+	ndBigVector control[] =
 	{
-		dBigVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f),
-		dBigVector(150.0f - 100.0f, 10.0f, 150.0f - 250.0f, 1.0f),
-		dBigVector(175.0f - 100.0f, 30.0f, 250.0f - 250.0f, 1.0f),
-		dBigVector(200.0f - 100.0f, 70.0f, 250.0f - 250.0f, 1.0f),
-		dBigVector(215.0f - 100.0f, 20.0f, 250.0f - 250.0f, 1.0f),
-		dBigVector(150.0f - 100.0f, 50.0f, 350.0f - 250.0f, 1.0f),
-		dBigVector(50.0f - 100.0f, 30.0f, 250.0f - 250.0f, 1.0f),
-		dBigVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f),
+		ndBigVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f),
+		ndBigVector(150.0f - 100.0f, 10.0f, 150.0f - 250.0f, 1.0f),
+		ndBigVector(175.0f - 100.0f, 30.0f, 250.0f - 250.0f, 1.0f),
+		ndBigVector(200.0f - 100.0f, 70.0f, 250.0f - 250.0f, 1.0f),
+		ndBigVector(215.0f - 100.0f, 20.0f, 250.0f - 250.0f, 1.0f),
+		ndBigVector(150.0f - 100.0f, 50.0f, 350.0f - 250.0f, 1.0f),
+		ndBigVector(50.0f - 100.0f, 30.0f, 250.0f - 250.0f, 1.0f),
+		ndBigVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f),
 	};
 
 	spline.CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
@@ -353,21 +353,21 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 	const dInt32 count = 32;
 	//const dInt32 count = 3;
 
-	dBigVector point0;
-	dVector positions[count + 1];
-	dFloat64 knot = spline.FindClosestKnot(point0, dBigVector(dVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f)), 4);
+	ndBigVector point0;
+	ndVector positions[count + 1];
+	dFloat64 knot = spline.FindClosestKnot(point0, ndBigVector(ndVector(100.0f - 100.0f, 20.0f, 200.0f - 250.0f, 1.0f)), 4);
 	positions[0] = point0;
 	for (dInt32 i = 0; i < count; i++) 
 	{
-		dBigVector point1;
-		dBigVector tangent(spline.CurveDerivative(knot));
+		ndBigVector point1;
+		ndBigVector tangent(spline.CurveDerivative(knot));
 		tangent = tangent.Scale(1.0 / dSqrt(tangent.DotProduct(tangent).GetScalar()));
-		knot = spline.FindClosestKnot(point1, dBigVector(point0 + tangent.Scale(2.0f)), 4);
+		knot = spline.FindClosestKnot(point1, ndBigVector(point0 + tangent.Scale(2.0f)), 4);
 		point0 = point1;
 		positions[i + 1] = point1;
 	}
 
-	dMatrix pathBodyMatrix (pathBody->GetMatrix());
+	ndMatrix pathBodyMatrix (pathBody->GetMatrix());
 	dFloat32 attachmentOffset = 0.8f;
 
 	ndShapeInstance shape(new ndShapeChamferCylinder(0.5f, 0.5f));
@@ -380,20 +380,20 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 	ndPhysicsWorld* const world = scene->GetWorld();
 	for (dInt32 i = 0; i < count; i++) 
 	{
-		dVector location0(positions[i + 0].m_x, positions[i + 0].m_y, positions[i + 0].m_z, 0.0);
-		dVector location1(positions[i + 1].m_x, positions[i + 1].m_y, positions[i + 1].m_z, 0.0);
+		ndVector location0(positions[i + 0].m_x, positions[i + 0].m_y, positions[i + 0].m_z, 0.0);
+		ndVector location1(positions[i + 1].m_x, positions[i + 1].m_y, positions[i + 1].m_z, 0.0);
 		
 		location0 = pathBodyMatrix.TransformVector(location0);
 		location1 = pathBodyMatrix.TransformVector(location1);
 		
-		dVector dir(location1 - location0);
+		ndVector dir(location1 - location0);
 		dir.m_w = 0.0f;
 		matrix.m_front = dir.Scale(1.0f / dSqrt(dir.DotProduct(dir).GetScalar()));
 		matrix.m_right = matrix.m_front.CrossProduct(matrix.m_up);
 		matrix.m_right = matrix.m_right.Scale(1.0f / dSqrt(matrix.m_right.DotProduct(matrix.m_right).GetScalar()));
 		matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front);
-		matrix.m_posit = pathBodyMatrix.TransformVector(dVector(positions[i].m_x, positions[i].m_y - attachmentOffset, positions[i].m_z, 1.0));
-		dMatrix matrix1(dYawMatrix(0.5f * dPi) * matrix);
+		matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y - attachmentOffset, positions[i].m_z, 1.0));
+		ndMatrix matrix1(dYawMatrix(0.5f * dPi) * matrix);
 		
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		ndDemoEntity* const entity = new ndDemoEntity(matrix1, rootEntity);
@@ -406,10 +406,10 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 		world->AddBody(body);
 		
 		bodies[i] = body;
-		matrix.m_posit = pathBodyMatrix.TransformVector(dVector(positions[i].m_x, positions[i].m_y, positions[i].m_z, 1.0));
+		matrix.m_posit = pathBodyMatrix.TransformVector(ndVector(positions[i].m_x, positions[i].m_y, positions[i].m_z, 1.0));
 		world->AddJoint(new ndFollowSplinePath(matrix, body, pathBody));
 		
-		dVector veloc(dir.Scale(20.0f));
+		ndVector veloc(dir.Scale(20.0f));
 		body->SetVelocity(veloc);
 	}
 
@@ -418,8 +418,8 @@ static void AddPathFollow(ndDemoEntityManager* const scene, const dVector& origi
 		ndBodyDynamic* const box0 = bodies[i - 1];
 		ndBodyDynamic* const box1 = bodies[i - 0];
 
-		dMatrix matrix0(box0->GetMatrix());
-		dMatrix matrix1(box1->GetMatrix());
+		ndMatrix matrix0(box0->GetMatrix());
+		ndMatrix matrix1(box1->GetMatrix());
 
 		matrix0.m_posit.m_y += attachmentOffset;
 		matrix1.m_posit.m_y += attachmentOffset;
@@ -433,16 +433,16 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
-	//BuildBallSocket(scene, dVector(0.0f, 0.0f, -7.0f, 1.0f));
-	//BuildHinge(scene, dVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
-	//BuildSlider(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f), 100.0f, 0.75f);
-	//BuildGear(scene, dVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
-	BuildDoubleHinge(scene, dVector(0.0f, 0.0f, 2.0f, 1.0f), 100.0f, 0.75f);
-	//BuildFixDistanceJoints(scene, dVector(10.0f, 0.0f, -5.0f, 1.0f));
-	//BuildRollingFriction(scene, dVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
-	//AddPathFollow(scene, dVector(40.0f, 0.0f, 0.0f, 1.0f));
+	//BuildBallSocket(scene, ndVector(0.0f, 0.0f, -7.0f, 1.0f));
+	//BuildHinge(scene, ndVector(0.0f, 0.0f, -2.0f, 1.0f), 10.0f, 1.0f);
+	//BuildSlider(scene, ndVector(0.0f, 0.0f, 0.0f, 1.0f), 100.0f, 0.75f);
+	//BuildGear(scene, ndVector(0.0f, 0.0f, -4.0f, 1.0f), 100.0f, 0.75f);
+	BuildDoubleHinge(scene, ndVector(0.0f, 0.0f, 2.0f, 1.0f), 100.0f, 0.75f);
+	//BuildFixDistanceJoints(scene, ndVector(10.0f, 0.0f, -5.0f, 1.0f));
+	//BuildRollingFriction(scene, ndVector(4.0f, 0.0f, 0.0f, 1.0f), 10.0f, 0.5f);
+	//AddPathFollow(scene, ndVector(40.0f, 0.0f, 0.0f, 1.0f));
 	
-	dQuaternion rot;
-	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
+	ndQuaternion rot;
+	ndVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

@@ -24,10 +24,10 @@
 #include "ndVector.h"
 #include "ndPolyhedraMassProperties.h"
 
-dPolyhedraMassProperties::dPolyhedraMassProperties()
-	:dClassAlloc()
+ndPolyhedraMassProperties::ndPolyhedraMassProperties()
+	:ndClassAlloc()
 {
-	memset (this, 0, sizeof (dPolyhedraMassProperties));
+	memset (this, 0, sizeof (ndPolyhedraMassProperties));
 	mult[0] = dFloat32 (1.0f/6.0f); 
 	mult[1] = dFloat32 (1.0f/24.0f);
 	mult[2] = dFloat32 (1.0f/24.0f);
@@ -40,7 +40,7 @@ dPolyhedraMassProperties::dPolyhedraMassProperties()
 	mult[9] = dFloat32 (1.0f/120.0f);
 }
 
-void dPolyhedraMassProperties::AddCGFace (dInt32 indexCount, const dVector* const faceVertex)
+void ndPolyhedraMassProperties::AddCGFace (dInt32 indexCount, const ndVector* const faceVertex)
 {
 	#define CDSubexpressions(w0,w1,w2,f1,f2) \
 	{					\
@@ -49,19 +49,19 @@ void dPolyhedraMassProperties::AddCGFace (dInt32 indexCount, const dVector* cons
 		f2 = w0 * w0 + w1 * temp0 + w2 * f1; \
 	}					
 
-	dVector p0 (faceVertex[0]);
-	dVector p1 (faceVertex[1]);
+	ndVector p0 (faceVertex[0]);
+	ndVector p1 (faceVertex[1]);
 
 	for (dInt32 i = 2; i < indexCount; i++) 
 	{
-		dVector p2 (faceVertex[i]);
+		ndVector p2 (faceVertex[i]);
 
-		dVector e01 (p1 - p0);
-		dVector e02 (p2 - p0);
-		dVector d (e01.CrossProduct(e02));
+		ndVector e01 (p1 - p0);
+		ndVector e02 (p2 - p0);
+		ndVector d (e01.CrossProduct(e02));
 
-		dVector f1;
-		dVector f2;
+		ndVector f1;
+		ndVector f2;
 		CDSubexpressions (p0.m_x, p1.m_x, p2.m_x, f1.m_x, f2.m_x);
 		CDSubexpressions (p0.m_y, p1.m_y, p2.m_y, f1.m_y, f2.m_y);
 		CDSubexpressions (p0.m_z, p1.m_z, p2.m_z, f1.m_z, f2.m_z);
@@ -77,7 +77,7 @@ void dPolyhedraMassProperties::AddCGFace (dInt32 indexCount, const dVector* cons
 	}
 }
 
-void dPolyhedraMassProperties::AddInertiaFace (dInt32 indexCount, const dVector* const faceVertex)
+void ndPolyhedraMassProperties::AddInertiaFace (dInt32 indexCount, const ndVector* const faceVertex)
 {
 	#define InertiaSubexpression(w0,w1,w2,f1,f2,f3) \
 	{					 \
@@ -89,20 +89,20 @@ void dPolyhedraMassProperties::AddInertiaFace (dInt32 indexCount, const dVector*
 		f3 = w0 * temp1 + w1 * temp2 + w2 * f2; \
 	}
 
-	dVector p0 (faceVertex[0]);
-	dVector p1 (faceVertex[1]);
+	ndVector p0 (faceVertex[0]);
+	ndVector p1 (faceVertex[1]);
 
 	for (dInt32 i = 2; i < indexCount; i++) 
 	{
-		dVector p2 (faceVertex[i]);
+		ndVector p2 (faceVertex[i]);
 
-		dVector e01 (p1 - p0);
-		dVector e02 (p2 - p0);
-		dVector d (e01.CrossProduct(e02));
+		ndVector e01 (p1 - p0);
+		ndVector e02 (p2 - p0);
+		ndVector d (e01.CrossProduct(e02));
 
-		dVector f1;
-		dVector f2;
-		dVector f3;
+		ndVector f1;
+		ndVector f2;
+		ndVector f3;
 		InertiaSubexpression (p0.m_x, p1.m_x, p2.m_x, f1.m_x, f2.m_x, f3.m_x);
 		InertiaSubexpression (p0.m_y, p1.m_y, p2.m_y, f1.m_y, f2.m_y, f3.m_y);
 		InertiaSubexpression (p0.m_z, p1.m_z, p2.m_z, f1.m_z, f2.m_z, f3.m_z);
@@ -122,7 +122,7 @@ void dPolyhedraMassProperties::AddInertiaFace (dInt32 indexCount, const dVector*
 	}
 }
 
-void dPolyhedraMassProperties::AddInertiaAndCrossFace (dInt32 indexCount, const dVector* const faceVertex)
+void ndPolyhedraMassProperties::AddInertiaAndCrossFace (dInt32 indexCount, const ndVector* const faceVertex)
 {
 	#define Subexpressions(w0,w1,w2,f1,f2,f3,g0,g1,g2) \
 	{												   \
@@ -137,22 +137,22 @@ void dPolyhedraMassProperties::AddInertiaAndCrossFace (dInt32 indexCount, const 
 		g2 = f2 + w2 * (f1 + w2); \
 	}
 
-	dVector p0 (faceVertex[0]);
-	dVector p1 (faceVertex[1]);
+	ndVector p0 (faceVertex[0]);
+	ndVector p1 (faceVertex[1]);
 	for (dInt32 i = 2; i < indexCount; i++) 
 	{
-		dVector p2 (faceVertex[i]);
+		ndVector p2 (faceVertex[i]);
 
-		dVector e01 (p1 - p0);
-		dVector e02 (p2 - p0);
-		dVector d (e01.CrossProduct(e02));
+		ndVector e01 (p1 - p0);
+		ndVector e02 (p2 - p0);
+		ndVector d (e01.CrossProduct(e02));
 
-		dVector f1;
-		dVector f2;
-		dVector f3;
-		dVector g0;
-		dVector g1;
-		dVector g2;
+		ndVector f1;
+		ndVector f2;
+		ndVector f3;
+		ndVector g0;
+		ndVector g1;
+		ndVector g2;
 		Subexpressions (p0.m_x, p1.m_x, p2.m_x, f1.m_x, f2.m_x, f3.m_x, g0.m_x, g1.m_x, g2.m_x);
 		Subexpressions (p0.m_y, p1.m_y, p2.m_y, f1.m_y, f2.m_y, f3.m_y, g0.m_y, g1.m_y, g2.m_y);
 		Subexpressions (p0.m_z, p1.m_z, p2.m_z, f1.m_z, f2.m_z, f3.m_z, g0.m_z, g1.m_z, g2.m_z);
@@ -176,7 +176,7 @@ void dPolyhedraMassProperties::AddInertiaAndCrossFace (dInt32 indexCount, const 
 	}
 }
 
-dFloat32 dPolyhedraMassProperties::MassProperties (dVector& cg, dVector& inertia, dVector& crossInertia)
+dFloat32 ndPolyhedraMassProperties::MassProperties (ndVector& cg, ndVector& inertia, ndVector& crossInertia)
 {
 	for (dInt32 i = 0; i < 10; i++) 
 	{

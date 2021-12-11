@@ -25,18 +25,18 @@
 #include "ndCoreStdafx.h"
 #include "ndConvexHull4d.h"
 
-class dDelaunayTetrahedralization: public dConvexHull4d
+class ndDelaunayTetrahedralization: public ndConvexHull4d
 {
 	public:
-	D_CORE_API dDelaunayTetrahedralization(const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol);
-	D_CORE_API virtual ~dDelaunayTetrahedralization();
+	D_CORE_API ndDelaunayTetrahedralization(const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol);
+	D_CORE_API virtual ~ndDelaunayTetrahedralization();
 	D_CORE_API void RemoveUpperHull ();
 
-	D_CORE_API dInt32 AddVertex (const dBigVector& vertex);
+	D_CORE_API dInt32 AddVertex (const ndBigVector& vertex);
 
 	protected:
 	D_CORE_API void SortVertexArray();
-	D_CORE_API virtual void DeleteFace (dNode* const node) ;
+	D_CORE_API virtual void DeleteFace (ndNode* const node) ;
 };
 
 #endif

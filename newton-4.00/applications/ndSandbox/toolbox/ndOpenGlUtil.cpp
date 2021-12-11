@@ -26,7 +26,7 @@ void GetCursorPos(dMOUSE_POINT& point)
 	point = mouse0;
 }
 
-void ShowMousePicking(const dVector&, const dVector&, const dVector&, const dVector&)
+void ShowMousePicking(const ndVector&, const ndVector&, const ndVector&, const ndVector&)
 {
 	dTrace((__FUNCTION__));
 	// set up the cube's texture

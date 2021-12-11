@@ -30,10 +30,10 @@
 #include "ndArray.h"
 #include "ndTree.h"
 
-class dIsoSurface: public dClassAlloc
+class ndIsoSurface: public ndClassAlloc
 {
 	public:
-	class dIsoCell
+	class ndIsoCell
 	{
 		public:
 		dFloat32 m_isoValues[2][2][2];
@@ -42,45 +42,45 @@ class dIsoSurface: public dClassAlloc
 		dInt32 m_z;
 	};
 
-	class dIsoTriangle
+	class ndIsoTriangle
 	{
 		public:
 		dUnsigned64 m_pointId[3];
 	};
 
-	class dIsoVertexMap: public dTree<dVector, dUnsigned64, dContainersFreeListAlloc<dVector>>
+	class ndIsoVertexMap: public ndTree<ndVector, dUnsigned64, ndContainersFreeListAlloc<ndVector>>
 	{
 		public: 
 	};
 
-	D_CORE_API dIsoSurface();
-	D_CORE_API ~dIsoSurface();
+	D_CORE_API ndIsoSurface();
+	D_CORE_API ~ndIsoSurface();
 
-	D_CORE_API void Begin(const dVector& origin, dFloat32 isovalue, dFloat32 gridSize, dInt32 sizex, dInt32 sizey, dInt32 sizez);
-	D_CORE_API void ProcessCell(const dIsoCell& cell);
+	D_CORE_API void Begin(const ndVector& origin, dFloat32 isovalue, dFloat32 gridSize, dInt32 sizex, dInt32 sizey, dInt32 sizez);
+	D_CORE_API void ProcessCell(const ndIsoCell& cell);
 	D_CORE_API void End();
 
 	dInt32 GetIndexCount() const;
 	dInt32 GetVertexCount() const;
-	const dVector* GetPoints() const;
-	const dVector* GetNormals() const;
+	const ndVector* GetPoints() const;
+	const ndVector* GetNormals() const;
 	const dUnsigned64* GetIndexList() const;
 
 	private:
 	dUnsigned64 GetVertexID(dInt32 x, dInt32 y, dInt32 z);
-	dUnsigned64 GetEdgeID(const dIsoCell& cell, dInt32 edgeCode);
-	dVector CalculateIntersection(const dIsoCell& cell, dInt32 edgeCode);
-	dVector InterpolateEdge(dFloat32 fX1, dFloat32 fY1, dFloat32 fZ1, dFloat32 fX2, dFloat32 fY2, dFloat32 fZ2, dFloat32 tVal1, dFloat32 tVal2);
+	dUnsigned64 GetEdgeID(const ndIsoCell& cell, dInt32 edgeCode);
+	ndVector CalculateIntersection(const ndIsoCell& cell, dInt32 edgeCode);
+	ndVector InterpolateEdge(dFloat32 fX1, dFloat32 fY1, dFloat32 fZ1, dFloat32 fX2, dFloat32 fY2, dFloat32 fZ2, dFloat32 tVal1, dFloat32 tVal2);
 
 	void RemapIndexList();
 	void CalculateNormals();
 
-	dVector m_origin;
-	dArray<dVector> m_points;
-	dArray<dVector> m_normals;
-	dArray<dIsoTriangle> m_trianglesList;
+	ndVector m_origin;
+	ndArray<ndVector> m_points;
+	ndArray<ndVector> m_normals;
+	ndArray<ndIsoTriangle> m_trianglesList;
 
-	dIsoVertexMap m_vertexMap;
+	ndIsoVertexMap m_vertexMap;
 	dInt32 m_xCellSize;
 	dInt32 m_yCellSize;
 	dInt32 m_zCellSize;
@@ -91,27 +91,27 @@ class dIsoSurface: public dClassAlloc
 	static const dInt32 m_triangleTable[][16];
 };
 
-inline dInt32 dIsoSurface::GetIndexCount() const
+inline dInt32 ndIsoSurface::GetIndexCount() const
 {
 	return m_trianglesList.GetCount() * 3;
 }
 
-inline dInt32 dIsoSurface::GetVertexCount() const
+inline dInt32 ndIsoSurface::GetVertexCount() const
 {
 	return m_points.GetCount();
 }
 
-inline const dVector* dIsoSurface::GetPoints() const
+inline const ndVector* ndIsoSurface::GetPoints() const
 {
 	return m_points.GetCount() ? &m_points[0] : nullptr;
 }
 
-inline const dVector* dIsoSurface::GetNormals() const
+inline const ndVector* ndIsoSurface::GetNormals() const
 {
 	return m_normals.GetCount() ? &m_normals[0] : nullptr;
 }
 
-inline const dUnsigned64* dIsoSurface::GetIndexList() const
+inline const dUnsigned64* ndIsoSurface::GetIndexList() const
 {
 	return m_trianglesList.GetCount() ? &m_trianglesList[0].m_pointId[0] : nullptr;
 }

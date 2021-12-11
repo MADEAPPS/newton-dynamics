@@ -18,25 +18,25 @@ class ndAnimKeyframe
 {
 	public:
 	ndAnimKeyframe()
-		:m_posit(dVector::m_wOne)
+		:m_posit(ndVector::m_wOne)
 		,m_rotation()
 		,m_userData(nullptr)
 	{
 	}
 
-	ndAnimKeyframe(const dVector& posit, const dQuaternion& rotation)
+	ndAnimKeyframe(const ndVector& posit, const ndQuaternion& rotation)
 		:m_posit(posit)
 		,m_rotation(rotation)
 		,m_userData(nullptr)
 	{
 	}
 
-	dVector m_posit;
-	dQuaternion m_rotation;
+	ndVector m_posit;
+	ndQuaternion m_rotation;
 	void* m_userData;
 };
 
-class ndAnimationPose: public dArray<ndAnimKeyframe>
+class ndAnimationPose: public ndArray<ndAnimKeyframe>
 {
 	public:
 	ndAnimationPose();

@@ -32,18 +32,18 @@ D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const
 D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 value);
 D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt64 value);
 D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dFloat32 value);
-D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const dVector& value);
-D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const dMatrix& value);
+D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndVector& value);
+D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndMatrix& value);
 D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value);
-D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 count, const dVector* const array);
+D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 count, const ndVector* const array);
 
 D_CORE_API dInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name);
 D_CORE_API dInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name);
 D_CORE_API dFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name);
-D_CORE_API dVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name);
-D_CORE_API dMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name);
+D_CORE_API ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name);
+D_CORE_API ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name);
 D_CORE_API const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name);
-D_CORE_API void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, dArray<dVector>& array);
+D_CORE_API void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndVector>& array);
 
 #endif
 

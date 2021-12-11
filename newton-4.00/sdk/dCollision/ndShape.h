@@ -146,7 +146,7 @@ struct ndConvexHullInfo
 	dInt32 m_vertexCount;
 	dInt32 m_strideInBytes;
 	dInt32 m_faceCount;
-	dVector* m_vertex;
+	ndVector* m_vertex;
 };
 
 struct ndCoumpoundInfo
@@ -183,8 +183,8 @@ class ndShapeInfo
 	public:
 
 
-	dMatrix m_offsetMatrix;
-	dVector m_scale;
+	ndMatrix m_offsetMatrix;
+	ndVector m_scale;
 	ndShapeMaterial m_shapeMaterial;
 	ndShapeID m_collisionType;
 	union
@@ -207,7 +207,7 @@ class ndShapeInfo
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
-class ndShape: public dClassAlloc
+class ndShape: public ndClassAlloc
 {
 	public:
 	D_CLASS_REFLECTION(ndShape);
@@ -233,45 +233,45 @@ class ndShape: public dClassAlloc
 
 	virtual dInt32 GetConvexVertexCount() const;
 
-	dVector GetObbSize() const;
-	dVector GetObbOrigin() const;
+	ndVector GetObbSize() const;
+	ndVector GetObbOrigin() const;
 	dFloat32 GetUmbraClipSize() const;
 
 	D_COLLISION_API virtual void MassProperties();
 
-	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const = 0;
+	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const = 0;
 
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual dFloat32 GetVolume() const = 0;
 	virtual dFloat32 GetBoxMinRadius() const = 0;
 	virtual dFloat32 GetBoxMaxRadius() const = 0;
 
-	virtual void CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const = 0;
-	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const = 0;
-	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const = 0;
-	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinSkinThickness, dInt32* const vertexIndex) const = 0;
-	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const = 0;
-	virtual dVector CalculateVolumeIntegral(const dMatrix& globalMatrix, const dVector& globalPlane, const ndShapeInstance& parentScale) const = 0;
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const = 0;
+	virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const = 0;
+	virtual ndVector SupportVertex(const ndVector& dir, dInt32* const vertexIndex) const = 0;
+	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const = 0;
+	virtual ndVector SupportVertexSpecial(const ndVector& dir, dFloat32 skinSkinThickness, dInt32* const vertexIndex) const = 0;
+	virtual dInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const = 0;
+	virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& globalPlane, const ndShapeInstance& parentScale) const = 0;
+	virtual dFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const = 0;
 
-	virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
-	virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
+	virtual ndMatrix CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const;
+	virtual dFloat32 CalculateMassProperties(const ndMatrix& offset, ndVector& inertia, ndVector& crossInertia, ndVector& centerOfMass) const;
 
-	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	protected:
 	D_COLLISION_API ndShape(ndShapeID id);
 	D_COLLISION_API ndShape (const ndShape& source);
 	D_COLLISION_API virtual ~ndShape();
 
-	dVector m_inertia;	
-	dVector m_crossInertia;	
-	dVector m_centerOfMass;
-	dVector m_boxSize;
-	dVector m_boxOrigin;
-	mutable dAtomic<dInt32> m_refCount;
+	ndVector m_inertia;	
+	ndVector m_crossInertia;	
+	ndVector m_centerOfMass;
+	ndVector m_boxSize;
+	ndVector m_boxOrigin;
+	mutable ndAtomic<dInt32> m_refCount;
 	ndShapeID m_collisionId;
-	static dVector m_flushZero;
+	static ndVector m_flushZero;
 
 } D_GCC_NEWTON_ALIGN_32;
 
@@ -302,24 +302,24 @@ inline dInt32 ndShape::GetRefCount() const
 	return m_refCount.load();
 }
 
-inline dFloat32 ndShape::CalculateMassProperties(const dMatrix&, dVector&, dVector&, dVector&) const
+inline dFloat32 ndShape::CalculateMassProperties(const ndMatrix&, ndVector&, ndVector&, ndVector&) const
 { 
 	dAssert(0); 
 	return 0; 
 }
 
-inline dMatrix ndShape::CalculateInertiaAndCenterOfMass(const dMatrix&, const dVector&, const dMatrix&) const
+inline ndMatrix ndShape::CalculateInertiaAndCenterOfMass(const ndMatrix&, const ndVector&, const ndMatrix&) const
 {
 	dAssert(0);
 	return dGetZeroMatrix();
 }
 
-inline dVector ndShape::GetObbOrigin() const
+inline ndVector ndShape::GetObbOrigin() const
 {
 	return m_boxOrigin;
 }
 
-inline dVector ndShape::GetObbSize() const
+inline ndVector ndShape::GetObbSize() const
 {
 	return m_boxSize;
 }

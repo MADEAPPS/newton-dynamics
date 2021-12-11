@@ -26,11 +26,11 @@
 
 class ndBodyKinematic;
 
-class ndBodyList: public dList<ndBodyKinematic*, dContainersFreeListAlloc<ndBodyKinematic*>>
+class ndBodyList: public ndList<ndBodyKinematic*, ndContainersFreeListAlloc<ndBodyKinematic*>>
 {
 	public:
 	ndBodyList()
-		:dList<ndBodyKinematic*, dContainersFreeListAlloc<ndBodyKinematic*>>()
+		:ndList<ndBodyKinematic*, ndContainersFreeListAlloc<ndBodyKinematic*>>()
 	{
 	}
 };

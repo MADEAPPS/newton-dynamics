@@ -28,14 +28,14 @@
 dUnsigned32 ndBody::m_uniqueIdCount = 0;
 
 ndBody::ndBody()
-	:dContainersFreeListAlloc<ndBody>()
+	:ndContainersFreeListAlloc<ndBody>()
 	,m_matrix(dGetIdentityMatrix())
-	,m_veloc(dVector::m_zero)
-	,m_omega(dVector::m_zero)
-	,m_localCentreOfMass(dVector::m_wOne)
-	,m_globalCentreOfMass(dVector::m_wOne)
-	,m_minAabb(dVector::m_wOne)
-	,m_maxAabb(dVector::m_wOne)
+	,m_veloc(ndVector::m_zero)
+	,m_omega(ndVector::m_zero)
+	,m_localCentreOfMass(ndVector::m_wOne)
+	,m_globalCentreOfMass(ndVector::m_wOne)
+	,m_minAabb(ndVector::m_wOne)
+	,m_maxAabb(ndVector::m_wOne)
 	,m_rotation()
 	,m_notifyCallback(nullptr)
 	,m_uniqueId(m_uniqueIdCount)
@@ -55,15 +55,15 @@ ndBody::ndBody()
 	m_transformIsDirty = 1;
 }
 
-ndBody::ndBody(const dLoadSaveBase::dLoadDescriptor& desc)
-	:dContainersFreeListAlloc<ndBody>()
+ndBody::ndBody(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndContainersFreeListAlloc<ndBody>()
 	,m_matrix(dGetIdentityMatrix())
-	,m_veloc(dVector::m_zero)
-	,m_omega(dVector::m_zero)
-	,m_localCentreOfMass(dVector::m_wOne)
-	,m_globalCentreOfMass(dVector::m_wOne)
-	,m_minAabb(dVector::m_wOne)
-	,m_maxAabb(dVector::m_wOne)
+	,m_veloc(ndVector::m_zero)
+	,m_omega(ndVector::m_zero)
+	,m_localCentreOfMass(ndVector::m_wOne)
+	,m_globalCentreOfMass(ndVector::m_wOne)
+	,m_minAabb(ndVector::m_wOne)
+	,m_maxAabb(ndVector::m_wOne)
 	,m_rotation()
 	,m_notifyCallback(nullptr)
 	,m_uniqueId(m_uniqueIdCount)
@@ -84,7 +84,7 @@ ndBody::ndBody(const dLoadSaveBase::dLoadDescriptor& desc)
 
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
-	dMatrix matrix(xmlGetMatrix(xmlNode, "matrix"));
+	ndMatrix matrix(xmlGetMatrix(xmlNode, "matrix"));
 	m_veloc = xmlGetVector3(xmlNode, "veloc");
 	m_omega = xmlGetVector3(xmlNode, "omega");
 	m_localCentreOfMass = xmlGetVector3(xmlNode, "centreOfMass");
@@ -97,7 +97,7 @@ ndBody::ndBody(const dLoadSaveBase::dLoadDescriptor& desc)
 		const nd::TiXmlNode* node = notifyNode->FirstChild();
 		const char* const className = node->Value();
 
-		dLoadSaveBase::dLoadDescriptor notifyDesc(desc);
+		ndLoadSaveBase::dLoadDescriptor notifyDesc(desc);
 		notifyDesc.m_rootNode = node;
 		m_notifyCallback = D_CLASS_REFLECTION_LOAD_NODE(ndBodyNotify, className, notifyDesc);
 		m_notifyCallback->m_body = this;
@@ -112,7 +112,7 @@ ndBody::~ndBody()
 	}
 }
 
-void ndBody::SetCentreOfMass(const dVector& com)
+void ndBody::SetCentreOfMass(const ndVector& com)
 {
 	m_localCentreOfMass.m_x = com.m_x;
 	m_localCentreOfMass.m_y = com.m_y;
@@ -135,26 +135,26 @@ void ndBody::SetNotifyCallback(ndBodyNotify* const notify)
 	}
 }
 
-void ndBody::SetOmega(const dVector& omega)
+void ndBody::SetOmega(const ndVector& omega)
 {
 	m_omega = omega;
 	m_equilibrium = 0;
 }
 
-void ndBody::SetVelocity(const dVector& veloc)
+void ndBody::SetVelocity(const ndVector& veloc)
 {
 	m_veloc = veloc;
 	m_equilibrium = 0;
 }
 
-void ndBody::SetMatrix(const dMatrix& matrix)
+void ndBody::SetMatrix(const ndMatrix& matrix)
 {
 	m_equilibrium = 0;
 	m_transformIsDirty = 1;
 	m_matrix = matrix;
 	dAssert(m_matrix.TestOrthogonal(dFloat32(1.0e-4f)));
 
-	m_rotation = dQuaternion(m_matrix);
+	m_rotation = ndQuaternion(m_matrix);
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
 }
 
@@ -163,7 +163,7 @@ D_COLLISION_API const nd::TiXmlNode* ndBody::FindNode(const nd::TiXmlNode* const
 	return rootNode->FirstChild(name);
 }
 
-void ndBody::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndBody::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
@@ -173,7 +173,7 @@ void ndBody::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	{
 		nd::TiXmlElement* const notifyNode = new nd::TiXmlElement("bodyNotifyClass");
 		childNode->LinkEndChild(notifyNode);
-		m_notifyCallback->Save(dLoadSaveBase::dSaveDescriptor(desc, notifyNode));
+		m_notifyCallback->Save(ndLoadSaveBase::ndSaveDescriptor(desc, notifyNode));
 	}
 
 	xmlSaveParam(childNode, "matrix", m_matrix);

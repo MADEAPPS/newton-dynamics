@@ -27,47 +27,47 @@
 #include "ndVector.h"
 #include "ndSpatialVector.h"
 
-class dSpatialMatrix
+class ndSpatialMatrix
 {
 	public:
 	D_OPERATOR_NEW_AND_DELETE
 
-	inline dSpatialMatrix()
+	inline ndSpatialMatrix()
 	{
 	}
 
-	inline dSpatialMatrix(dFloat32 val)
+	inline ndSpatialMatrix(dFloat32 val)
 	{
-		const dSpatialVector row (val);
+		const ndSpatialVector row (val);
 		for (dInt32 i = 0; i < 6; i++) 
 		{
 			m_rows[i] = row;
 		}
 	}
 
-	inline ~dSpatialMatrix()
+	inline ~ndSpatialMatrix()
 	{
 	}
 	
-	inline dSpatialVector& operator[] (dInt32 i)
+	inline ndSpatialVector& operator[] (dInt32 i)
 	{
 		dAssert(i < 6);
 		dAssert(i >= 0);
 		return m_rows[i];
 	}
 
-	inline const dSpatialVector& operator[] (dInt32 i) const
+	inline const ndSpatialVector& operator[] (dInt32 i) const
 	{
 		dAssert(i < 6);
 		dAssert(i >= 0);
 		return m_rows[i];
 	}
 
-	D_CORE_API dSpatialMatrix Inverse(dInt32 rows) const;
+	D_CORE_API ndSpatialMatrix Inverse(dInt32 rows) const;
 
-	inline dSpatialVector VectorTimeMatrix(const dSpatialVector& jacobian) const
+	inline ndSpatialVector VectorTimeMatrix(const ndSpatialVector& jacobian) const
 	{
-		dSpatialVector tmp(m_rows[0].Scale (jacobian[0]));
+		ndSpatialVector tmp(m_rows[0].Scale (jacobian[0]));
 		for (dInt32 i = 1; i < 6; i++) 
 		{
 			tmp = tmp + m_rows[i].Scale(jacobian[i]);
@@ -75,9 +75,9 @@ class dSpatialMatrix
 		return tmp;
 	}
 
-	inline dSpatialVector VectorTimeMatrix(const dSpatialVector& jacobian, dInt32 dof) const
+	inline ndSpatialVector VectorTimeMatrix(const ndSpatialVector& jacobian, dInt32 dof) const
 	{
-		dSpatialVector tmp(dFloat32 (0.0f));
+		ndSpatialVector tmp(dFloat32 (0.0f));
 		for (dInt32 i = 0; i < dof; i++) 
 		{
 			tmp = tmp + m_rows[i].Scale(jacobian[i]);
@@ -85,7 +85,7 @@ class dSpatialMatrix
 		return tmp;
 	}
 
-	dSpatialVector m_rows[6];
+	ndSpatialVector m_rows[6];
 };
 
 #endif

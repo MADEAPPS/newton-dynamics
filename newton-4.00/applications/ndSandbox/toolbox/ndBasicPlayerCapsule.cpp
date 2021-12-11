@@ -42,7 +42,7 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 	{
 	}
 
-	void OnTransform(dInt32 thread, const dMatrix& matrix)
+	void OnTransform(dInt32 thread, const ndMatrix& matrix)
 	{
 		ndDemoEntityNotify::OnTransform(thread, matrix);
 
@@ -66,7 +66,7 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndDemoEntityManager* const scene, const ndDemoEntity* const modelEntity,
-	const dMatrix& localAxis, const dMatrix& location,
+	const ndMatrix& localAxis, const ndMatrix& location,
 	dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight, bool isPlayer)
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 	,m_scene(scene)
@@ -74,9 +74,9 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	,m_output()
 	,m_animBlendTree(nullptr)
 {
-	dMatrix matrix(location);
+	ndMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	//matrix.m_posit.m_y = floor.m_y + 1.0f;
 	matrix.m_posit.m_y = floor.m_y;
 	
@@ -95,8 +95,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 
 	// create bind pose to animation sequences.
 	ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
-	const dList<ndAnimationKeyFramesTrack>& tracks = sequence->m_tracks;
-	for (dList<ndAnimationKeyFramesTrack>::dNode* node = tracks.GetFirst(); node; node = node->GetNext()) 
+	const ndList<ndAnimationKeyFramesTrack>& tracks = sequence->m_tracks;
+	for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext()) 
 	{
 		ndAnimationKeyFramesTrack& track = node->GetInfo();
 		ndDemoEntity* const ent = entity->Find(track.GetName().GetStr());
@@ -130,8 +130,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	m_animBlendTree->Evaluate(m_output, dFloat32(0.0f));
 }
 
-ndBasicPlayerCapsule::ndBasicPlayerCapsule(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndBodyPlayerCapsule(dLoadSaveBase::dLoadDescriptor(desc))
+ndBasicPlayerCapsule::ndBasicPlayerCapsule(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndBodyPlayerCapsule(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_scene(nullptr)
 	,m_isPlayer(false)
 	,m_output()
@@ -164,12 +164,12 @@ ndBasicPlayerCapsule::~ndBasicPlayerCapsule()
 	}
 }
 
-void ndBasicPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndBasicPlayerCapsule::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBodyPlayerCapsule::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndBodyPlayerCapsule::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	//xmlSaveParam(paramNode, "isPlayer", m_isPlayer ? 1 : 0);
 }
@@ -177,14 +177,14 @@ void ndBasicPlayerCapsule::Save(const dLoadSaveBase::dSaveDescriptor& desc) cons
 void ndBasicPlayerCapsule::ApplyInputs(dFloat32 timestep)
 {
 	//calculate the gravity contribution to the velocity, 
-	const dVector gravity(GetNotifyCallback()->GetGravity());
-	const dVector totalImpulse(m_impulse + gravity.Scale(m_mass * timestep));
+	const ndVector gravity(GetNotifyCallback()->GetGravity());
+	const ndVector totalImpulse(m_impulse + gravity.Scale(m_mass * timestep));
 	m_impulse = totalImpulse;
 
 	//dTrace(("  frame: %d    player camera: %f\n", m_scene->GetWorld()->GetFrameIndex(), m_playerInput.m_heading * dRadToDegree));
 	if (m_playerInput.m_jump)
 	{
-		dVector jumpImpule(0.0f, PLAYER_JUMP_SPEED * m_mass, 0.0f, 0.0f);
+		ndVector jumpImpule(0.0f, PLAYER_JUMP_SPEED * m_mass, 0.0f, 0.0f);
 		m_impulse += jumpImpule;
 		m_playerInput.m_jump = false;
 	}
@@ -194,8 +194,8 @@ void ndBasicPlayerCapsule::ApplyInputs(dFloat32 timestep)
 	SetHeadingAngle(m_playerInput.m_heading);
 }
 
-//dFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const
-dFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const dVector&, const dVector& normal, dInt32, const ndBodyKinematic* const) const
+//dFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const ndVector& position, const ndVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const
+dFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const ndVector&, const ndVector& normal, dInt32, const ndBodyKinematic* const) const
 {
 	//return dFloat32(2.0f);
 	if (dAbs(normal.m_y) < 0.8f)
@@ -210,16 +210,16 @@ void ndBasicPlayerCapsule::SetCamera()
 	if (m_isPlayer)
 	{
 		ndDemoCamera* const camera = m_scene->GetCamera();
-		dMatrix camMatrix(camera->GetNextMatrix());
+		ndMatrix camMatrix(camera->GetNextMatrix());
 
 		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)GetNotifyCallback();
 		ndDemoEntity* const player = (ndDemoEntity*)notify->GetUserData();
-		dMatrix playerMatrix(player->GetNextMatrix());
+		ndMatrix playerMatrix(player->GetNextMatrix());
 
 		const dFloat32 height = m_height;
-		const dVector frontDir(camMatrix[0]);
-		const dVector upDir(0.0f, 1.0f, 0.0f, 0.0f);
-		dVector camOrigin = playerMatrix.TransformVector(upDir.Scale(height));
+		const ndVector frontDir(camMatrix[0]);
+		const ndVector upDir(0.0f, 1.0f, 0.0f, 0.0f);
+		ndVector camOrigin = playerMatrix.TransformVector(upDir.Scale(height));
 		camOrigin -= frontDir.Scale(PLAYER_THIRD_PERSON_VIEW_DIST);
 
 		camera->SetNextMatrix(camMatrix, camOrigin);

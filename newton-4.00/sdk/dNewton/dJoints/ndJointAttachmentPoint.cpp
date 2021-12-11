@@ -15,15 +15,15 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointAttachmentPoint)
 
-ndJointAttachmentPoint::ndJointAttachmentPoint(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const body0, ndBodyKinematic* const body1)
+ndJointAttachmentPoint::ndJointAttachmentPoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 	:ndJointBilateralConstraint(3, body0, body1, pinAndPivotFrame)
 {
 	m_lockedDimnetions.m_lockDof = 0x07f;
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
-ndJointAttachmentPoint::ndJointAttachmentPoint(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+ndJointAttachmentPoint::ndJointAttachmentPoint(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	m_lockedDimnetions.m_lockDof = xmlGetInt(xmlNode, "lockDof");
@@ -35,8 +35,8 @@ ndJointAttachmentPoint::~ndJointAttachmentPoint()
 
 void ndJointAttachmentPoint::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 	if (m_lockedDimnetions.m_lock_x)
 	{
@@ -52,12 +52,12 @@ void ndJointAttachmentPoint::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointAttachmentPoint::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndJointAttachmentPoint::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "lockDof", m_lockedDimnetions.m_lockDof);
 }

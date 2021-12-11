@@ -36,13 +36,13 @@ ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehi
 	,m_springDamperRegularizer(dFloat32(0.1f))
 	,m_axleCount(0)
 {
-	const dMatrix worldMatrix (vehicle->m_localFrame * vehicle->m_chassis->GetMatrix());
+	const ndMatrix worldMatrix (vehicle->m_localFrame * vehicle->m_chassis->GetMatrix());
 	CalculateLocalMatrix(worldMatrix, m_localMatrix0, m_localMatrix1);
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
-ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_springK(dFloat32(10.0f))
 	,m_damperC(dFloat32(1.0f))
 	,m_springDamperRegularizer(dFloat32(0.1f))
@@ -78,8 +78,8 @@ void ndMultiBodyVehicleTorsionBar::JacobianDerivative(ndConstraintDescritor& des
 {
 	if (m_axleCount)
 	{
-		dMatrix matrix0;
-		dMatrix matrix1;
+		ndMatrix matrix0;
+		ndMatrix matrix1;
 	
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 		CalculateGlobalMatrix(matrix0, matrix1);
@@ -88,7 +88,7 @@ void ndMultiBodyVehicleTorsionBar::JacobianDerivative(ndConstraintDescritor& des
 		dFloat32 omega = dFloat32(0.0f);
 		for (dInt32 i = 0; i < m_axleCount; i++)
 		{
-			dVector dir(m_axles[i].m_rightTire->GetMatrix().m_posit - m_axles[i].m_leftTire->GetMatrix().m_posit);
+			ndVector dir(m_axles[i].m_rightTire->GetMatrix().m_posit - m_axles[i].m_leftTire->GetMatrix().m_posit);
 			dir = dir.Normalize();
 			angle += matrix0.m_right.CrossProduct(dir).DotProduct(matrix0.m_front).GetScalar();
 			omega += (angle - m_axles[i].m_axleAngle) * desc.m_invTimestep;
@@ -104,12 +104,12 @@ void ndMultiBodyVehicleTorsionBar::JacobianDerivative(ndConstraintDescritor& des
 	}
 }
 
-void ndMultiBodyVehicleTorsionBar::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndMultiBodyVehicleTorsionBar::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "springK", m_springK);
 	xmlSaveParam(childNode, "damperC", m_damperC);

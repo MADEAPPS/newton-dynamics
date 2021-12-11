@@ -30,23 +30,23 @@ class ndBodyParticleSet: public ndBody
 {
 	public:
 	D_NEWTON_API ndBodyParticleSet();
-	D_NEWTON_API ndBodyParticleSet(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndBodyParticleSet(const ndLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API virtual ~ndBodyParticleSet ();
-	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	const dArray<dVector>& GetPositions() const;
+	const ndArray<ndVector>& GetPositions() const;
 	virtual ndBodyParticleSet* GetAsBodyParticleSet();
 
 	dFloat32 GetParticleRadius() const;
 	void SetParticleRadius(dFloat32 raidus);
 	
-	D_NEWTON_API virtual void AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity) = 0;
+	D_NEWTON_API virtual void AddParticle(const dFloat32 mass, const ndVector& position, const ndVector& velocity) = 0;
 
 	D_NEWTON_API virtual void Update(const ndWorld* const workd, dFloat32 timestep) = 0;
 
 	protected:
-	dArray<dVector> m_posit;
-	ndBodyParticleSetList::dNode* m_listNode;
+	ndArray<ndVector> m_posit;
+	ndBodyParticleSetList::ndNode* m_listNode;
 	dFloat32 m_radius;
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32 ;
@@ -66,7 +66,7 @@ inline void ndBodyParticleSet::SetParticleRadius(dFloat32 raidus)
 	m_radius = raidus;
 }
 
-inline const dArray<dVector>& ndBodyParticleSet::GetPositions() const
+inline const ndArray<ndVector>& ndBodyParticleSet::GetPositions() const
 {
 	return m_posit;
 }

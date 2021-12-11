@@ -21,7 +21,7 @@
 #include "ndDemoInstanceEntity.h"
 
 static void AddRigidBody(ndDemoEntityManager* const scene, 
-	const dMatrix& matrix, const ndShapeInstance& shape, 
+	const ndMatrix& matrix, const ndShapeInstance& shape, 
 	ndDemoInstanceEntity* const rootEntity, dFloat32 mass)
 {
 	ndBodyDynamic* const body = new ndBodyDynamic();
@@ -36,22 +36,22 @@ static void AddRigidBody(ndDemoEntityManager* const scene,
 	world->AddBody(body);
 }
 
-static void BuildBoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& size, dInt32 count)
+static void BuildBoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const ndVector& origin, const ndVector& size, dInt32 count)
 {
 	// build a standard block stack of 20 * 3 boxes for a total of 60
 	ndWorld* const world = scene->GetWorld();
 
-	dVector blockBoxSize(size);
+	ndVector blockBoxSize(size);
 	blockBoxSize = blockBoxSize.Scale(2.0f);
 
 	// create the stack
-	dMatrix baseMatrix(dGetIdentityMatrix());
+	ndMatrix baseMatrix(dGetIdentityMatrix());
 
 	// for the elevation of the floor at the stack position
 	baseMatrix.m_posit.m_x = origin.m_x;
 	baseMatrix.m_posit.m_z = origin.m_z;
 
-	dVector floor(FindFloor(*world, baseMatrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndVector floor(FindFloor(*world, baseMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y * 0.5f;
 
 	ndShapeInstance shape(new ndShapeBox(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z));
@@ -61,7 +61,7 @@ static void BuildBoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const
 	scene->AddEntity(rootEntity);
 
 baseMatrix.m_posit.m_y -= 0.02f;
-	dMatrix rotation(dYawMatrix(20.0f * dDegreeToRad));
+	ndMatrix rotation(dYawMatrix(20.0f * dDegreeToRad));
 	for (dInt32 i = 0; i < count; i++) 
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
@@ -74,21 +74,21 @@ baseMatrix.m_posit.m_y -= 0.02f;
 	geometry->Release();
 }
 
-static void BuildCylinderStack(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& size, dInt32 count)
+static void BuildCylinderStack(ndDemoEntityManager* const scene, dFloat32 mass, const ndVector& origin, const ndVector& size, dInt32 count)
 {
 	// build a standard block stack of 20 * 3 boxes for a total of 60
 	ndWorld* const world = scene->GetWorld();
 
-	dVector blockBoxSize(size);
+	ndVector blockBoxSize(size);
 
 	// create the stack
-	dMatrix baseMatrix(dGetIdentityMatrix());
+	ndMatrix baseMatrix(dGetIdentityMatrix());
 
 	// for the elevation of the floor at the stack position
 	baseMatrix.m_posit.m_x = origin.m_x;
 	baseMatrix.m_posit.m_z = origin.m_z;
 
-	dVector floor(FindFloor(*world, baseMatrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndVector floor(FindFloor(*world, baseMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_z * 0.5f;
 
 	ndShapeInstance shape(new ndShapeCylinder(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z));
@@ -98,7 +98,7 @@ static void BuildCylinderStack(ndDemoEntityManager* const scene, dFloat32 mass, 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
-	dMatrix rotation(dYawMatrix(20.0f * dDegreeToRad));
+	ndMatrix rotation(dYawMatrix(20.0f * dDegreeToRad));
 
 	for (dInt32 i = 0; i < count; i++)
 	{
@@ -112,16 +112,16 @@ static void BuildCylinderStack(ndDemoEntityManager* const scene, dFloat32 mass, 
 
 static void BuildPyramid(ndDemoEntityManager* const scene, 
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& shape,
-	dFloat32 mass, const dVector& origin, const dVector& boxSize, dInt32 count)
+	dFloat32 mass, const ndVector& origin, const ndVector& boxSize, dInt32 count)
 {
-	dMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
 	// create the shape and visual mesh as a common data to be re used
 	ndWorld* const world = scene->GetWorld();
 
-	dVector floor(FindFloor(*world, origin + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndVector floor(FindFloor(*world, origin + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 	
 	dFloat32 stepz = boxSize.m_z + 1.0e-2f;
@@ -148,11 +148,11 @@ stepy = boxSize.m_y;
 	}
 }
 
-void BuildPyramidStacks(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& boxSize, dInt32 stackHigh)
+void BuildPyramidStacks(ndDemoEntityManager* const scene, dFloat32 mass, const ndVector& origin, const ndVector& boxSize, dInt32 stackHigh)
 {
-	dVector origin1(origin);
+	ndVector origin1(origin);
 
-	dVector size(boxSize.Scale(1.0f));
+	ndVector size(boxSize.Scale(1.0f));
 	ndShapeInstance shape(new ndShapeBox(size.m_x, size.m_y, size.m_z));
 	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
@@ -173,25 +173,25 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	//dInt32 pyramidHigh = 60;
 	//dInt32 pyramidHigh = 8;
 	dInt32 pyramidHigh = 30;
-	dVector origin(dVector::m_zero);
+	ndVector origin(ndVector::m_zero);
 
 	for (dInt32 i = 0; i < 1; i++)
 	{
-		//BuildPyramidStacks(scene, 1.0f, origin, dVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
+		//BuildPyramidStacks(scene, 1.0f, origin, ndVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
 		origin.m_x += 4.0f;
 	}
 	
-	origin = dVector::m_zero;
+	origin = ndVector::m_zero;
 	origin.m_x -= 2.0f;
 	origin.m_z -= 3.0f;
-	BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 7);
-	//BuildBoxStack(scene, 10.0f, origin, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+	BuildBoxStack(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 7);
+	//BuildBoxStack(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 40);
 	
 	origin.m_z += 6.0f;
-	//BuildCylinderStack(scene, 10.0f, origin, dVector(0.75f, 0.6f, 1.0f, 0.0f), 20);
+	//BuildCylinderStack(scene, 10.0f, origin, ndVector(0.75f, 0.6f, 1.0f, 0.0f), 40);
 
-	dQuaternion rot(dYawMatrix (45.0f * dDegreeToRad));
-	origin = dVector::m_zero;
+	ndQuaternion rot(dYawMatrix (45.0f * dDegreeToRad));
+	origin = ndVector::m_zero;
 	origin.m_x -= 3.0f;
 	origin.m_y += 5.0f;
 

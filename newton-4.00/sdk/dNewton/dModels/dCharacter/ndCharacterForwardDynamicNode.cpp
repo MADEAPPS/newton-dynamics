@@ -28,7 +28,7 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndCharacterForwardDynamicNode)
 
-ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent)
+ndCharacterForwardDynamicNode::ndCharacterForwardDynamicNode(const ndMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent)
 	:ndCharacterNode(parent)
 	,m_body(body)
 	,m_joint(new ndJointPdActuator(matrixInGlobalSpace, body, parent->GetBody()))
@@ -66,14 +66,14 @@ void ndCharacterForwardDynamicNode::Save(const ndCharacterSaveDescriptor& desc) 
 	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
 	ndCharacterNode::Save(ndCharacterSaveDescriptor(desc, childNode));
 
-	dTree<dInt32, const ndJointBilateralConstraint*>::dNode* jointNode = desc.m_jointMap->Find(m_joint);
+	ndTree<dInt32, const ndJointBilateralConstraint*>::ndNode* jointNode = desc.m_jointMap->Find(m_joint);
 	if (!jointNode)
 	{
 		jointNode = desc.m_jointMap->Insert(desc.m_jointMap->GetCount(), m_joint);
 	}
 	dAssert(jointNode);
 
-	dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode = desc.m_bodyMap->Find(m_body);
+	ndTree<dInt32, const ndBodyKinematic*>::ndNode* bodyNode = desc.m_bodyMap->Find(m_body);
 	if (!bodyNode)
 	{
 		bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_body);

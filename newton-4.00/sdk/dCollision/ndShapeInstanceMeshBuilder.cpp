@@ -40,18 +40,18 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 		{
 		}
 
-		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex, const ndEdgeType* const)
+		virtual void DrawPolygon(dInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const)
 		{
 			m_faceIndexCount.PushBack(vertexCount);
 			for (dInt32 i = 0; i < vertexCount; i++) 
 			{
-				dBigVector point(faceVertex[i].m_x, faceVertex[i].m_y, faceVertex[i].m_z, dFloat32(m_brush));
+				ndBigVector point(faceVertex[i].m_x, faceVertex[i].m_y, faceVertex[i].m_z, dFloat32(m_brush));
 				m_vertex.PushBack(point);
 			}
 		}
 	
-		dArray<dBigVector> m_vertex;
-		dArray<dInt32> m_faceIndexCount;
+		ndArray<ndBigVector> m_vertex;
+		ndArray<dInt32> m_faceIndexCount;
 		dInt32 m_brush;
 	};
 	dgMeshEffectBuilder builder;
@@ -60,7 +60,7 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 	if (((ndShape*)instance.GetShape())->GetAsShapeCompound())
 	{
 		dInt32 brush = 0;
-		dMatrix matrix(instance.GetLocalMatrix());
+		ndMatrix matrix(instance.GetLocalMatrix());
 		const ndShapeCompound* const compound = ((ndShape*)instance.GetShape())->GetAsShapeCompound();
 		const ndShapeCompound::ndTreeArray& array = compound->GetTree();
 		ndShapeCompound::ndTreeArray::Iterator iter(array);
@@ -74,13 +74,13 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 	}
 	else 
 	{
-		dMatrix matrix(dGetIdentityMatrix());
+		ndMatrix matrix(dGetIdentityMatrix());
 		instance.DebugShape(matrix, builder);
 	}
 
-	dStack<dInt32>indexListBuffer(builder.m_vertex.GetCount());
+	ndStack<dInt32>indexListBuffer(builder.m_vertex.GetCount());
 	dInt32* const indexList = &indexListBuffer[0];
-	dVertexListToIndexList(&builder.m_vertex[0].m_x, sizeof(dBigVector), 4, builder.m_vertex.GetCount(), &indexList[0], DG_VERTEXLIST_INDEXLIST_TOL);
+	dVertexListToIndexList(&builder.m_vertex[0].m_x, sizeof(ndBigVector), 4, builder.m_vertex.GetCount(), &indexList[0], DG_VERTEXLIST_INDEXLIST_TOL);
 	
 	ndMeshEffect::dMeshVertexFormat vertexFormat;
 	
@@ -89,7 +89,7 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 	//vertexFormat.m_faceMaterial = materialIndex;
 	
 	vertexFormat.m_vertex.m_data = &builder.m_vertex[0].m_x;
-	vertexFormat.m_vertex.m_strideInBytes = sizeof(dBigVector);
+	vertexFormat.m_vertex.m_strideInBytes = sizeof(ndBigVector);
 	vertexFormat.m_vertex.m_indexList = &indexList[0];
 	
 	BuildFromIndexList(&vertexFormat);

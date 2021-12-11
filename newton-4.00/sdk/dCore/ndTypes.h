@@ -247,7 +247,7 @@ typedef double dFloat64;
 #endif
 
 #ifdef D_NEWTON_USE_DOUBLE
-	union dFloatSign
+	union ndFloatSign
 	{
 		struct 
 		{
@@ -257,7 +257,7 @@ typedef double dFloat64;
 		dFloat64 m_fVal;
 	};
 #else
-	union dFloatSign
+	union ndFloatSign
 	{
 		struct 
 		{
@@ -267,7 +267,7 @@ typedef double dFloat64;
 	};
 #endif
 
-union dDoubleInt
+union ndDoubleInt
 {
 	struct 
 	{
@@ -279,7 +279,7 @@ union dDoubleInt
 	dFloat64 m_float;
 };
 
-class dTriplex
+class ndTriplex
 {
 	public:
 	dFloat32 m_x;
@@ -287,26 +287,25 @@ class dTriplex
 	dFloat32 m_z;
 };
 
-
 #define D_OPERATOR_NEW_AND_DELETE			\
 inline void *operator new (size_t size)		\
 {											\
-	return dMemory::Malloc(size);			\
+	return ndMemory::Malloc(size);			\
 }											\
 											\
 inline void *operator new[](size_t size) 	\
 {											\
-	return dMemory::Malloc(size);			\
+	return ndMemory::Malloc(size);			\
 }											\
 											\
 inline void operator delete (void* ptr)		\
 {											\
-	dMemory::Free(ptr);						\
+	ndMemory::Free(ptr);					\
 }											\
 											\
 inline void operator delete[](void* ptr)	\
 {											\
-	dMemory::Free(ptr);						\
+	ndMemory::Free(ptr);					\
 }
 
 #ifndef _MSC_VER 
@@ -316,15 +315,15 @@ inline void operator delete[](void* ptr)	\
 #ifdef D_USE_THREAD_EMULATION
 	/// wrapper over standard atomic operations
 	template<class T>
-	class dAtomic
+	class ndAtomic
 	{
 		public:
-		dAtomic<T>()
+		ndAtomic<T>()
 			: m_val(T(0))
 		{
 		}
 
-		dAtomic<T>(T val)
+		ndAtomic<T>(T val)
 			: m_val(val)
 		{
 		}
@@ -380,20 +379,20 @@ inline void operator delete[](void* ptr)	\
 #else
 	/// wrapper over standard atomic operations
 	template<class T>
-	class dAtomic : public std::atomic<T>
+	class ndAtomic : public std::atomic<T>
 	{
 		public:
-		dAtomic<T>()
+		ndAtomic<T>()
 			: std::atomic<T>(T(0))
 		{
 		}
 
-		dAtomic<T>(T val)
+		ndAtomic<T>(T val)
 			: std::atomic<T>(val)
 		{
 		}
 
-		dAtomic<T>(const dAtomic<T>& copy)
+		ndAtomic<T>(const ndAtomic<T>& copy)
 			: std::atomic<T>(copy)
 		{
 		}
@@ -406,10 +405,10 @@ inline void operator delete[](void* ptr)	\
 #endif
 
 /// Simple spin lock for synchronizing threads for very short period of time.
-class dSpinLock
+class ndSpinLock
 {
 	public:
-	dSpinLock()
+	ndSpinLock()
 		#ifndef D_USE_THREAD_EMULATION	
 		:m_lock(0)
 		#endif
@@ -438,26 +437,26 @@ class dSpinLock
 	private:
 	D_CORE_API void Delay(dInt32& exp);
 
-	dAtomic<dUnsigned32> m_lock;
+	ndAtomic<dUnsigned32> m_lock;
 	#endif
 };
 
 /// Simple scope based spin lock.
-class dScopeSpinLock
+class ndScopeSpinLock
 {
 	public:
-	dScopeSpinLock(dSpinLock& spinLock)
+	ndScopeSpinLock(ndSpinLock& spinLock)
 		:m_spinLock(spinLock)
 	{
 		m_spinLock.Lock();
 	}
 
-	~dScopeSpinLock()
+	~ndScopeSpinLock()
 	{
 		m_spinLock.Unlock();
 	}
 
-	dSpinLock& m_spinLock;
+	ndSpinLock& m_spinLock;
 };
 
 

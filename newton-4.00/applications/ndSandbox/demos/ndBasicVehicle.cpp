@@ -35,7 +35,7 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 	{
 		m_useHardSolverMode = true;
 		//m_useHardSolverMode = false;
-		m_comDisplacement = dVector(0.25f, -0.35f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.25f, -0.35f, 0.0f, 0.0f);
 
 		dFloat32 fuelInjectionRate = 10.0f;
 		dFloat32 idleTorquePoundFoot = 100.0f;
@@ -58,8 +58,8 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 	{
 		//m_useHardSolverMode = true;
 		m_useHardSolverMode = false;
-		//m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
-		m_comDisplacement = dVector(0.0f, -0.35f, 0.0f, 0.0f);
+		//m_comDisplacement = ndVector(0.0f, -0.55f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.0f, -0.35f, 0.0f, 0.0f);
 
 		dFloat32 fuelInjectionRate = 10.0f;
 		dFloat32 idleTorquePoundFoot = 200.0f;
@@ -110,7 +110,7 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 	ndVehicleDectriptorMonsterTruck()
 		:ndVehicleDectriptor("monsterTruck.fbx")
 	{
-		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.0f, -0.55f, 0.0f, 0.0f);
 
 		dFloat32 fuelInjectionRate = 10.0f;
 		dFloat32 idleTorquePoundFoot = 250.0f;
@@ -170,7 +170,7 @@ static const char* engineSounds[] =
 class ndBasicMultiBodyVehicle : public ndBasicVehicle
 {
 	public:
-	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const dMatrix& matrix)
+	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
 		:ndBasicVehicle(desc)
 		,m_vehicleUI(nullptr)
 	{
@@ -184,10 +184,10 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 		// create the vehicle chassis as a normal rigid body
 		ndBodyDynamic* const chassis = CreateChassis(scene, vehicleEntity, m_configuration.m_chassisMass);
-		chassis->SetAngularDamping(dVector(m_configuration.m_chassisAngularDrag));
+		chassis->SetAngularDamping(ndVector(m_configuration.m_chassisAngularDrag));
 
 		// lower vehicle com;
-		dVector com(chassis->GetCentreOfMass());
+		ndVector com(chassis->GetCentreOfMass());
 		com += m_localFrame.m_up.Scale(m_configuration.m_comDisplacement.m_y);
 		com += m_localFrame.m_front.Scale(m_configuration.m_comDisplacement.m_x);
 		com += m_localFrame.m_right.Scale(m_configuration.m_comDisplacement.m_z);
@@ -371,7 +371,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	private:
 	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, dFloat32 mass)
 	{
-		dMatrix matrix(chassisEntity->CalculateGlobalMatrix(nullptr));
+		ndMatrix matrix(chassisEntity->CalculateGlobalMatrix(nullptr));
 		ndShapeInstance* const chassisCollision = chassisEntity->CreateCollisionFromchildren();
 
 		ndBodyDynamic* const body = new ndBodyDynamic();
@@ -394,12 +394,12 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	{
 		ndDemoCamera* const camera = manager->GetCamera();
 		ndDemoEntity* const chassisEntity = (ndDemoEntity*)m_chassis->GetNotifyCallback()->GetUserData();
-		dMatrix camMatrix(camera->GetNextMatrix());
-		dMatrix playerMatrix(chassisEntity->GetNextMatrix());
+		ndMatrix camMatrix(camera->GetNextMatrix());
+		ndMatrix playerMatrix(chassisEntity->GetNextMatrix());
 
-		dVector frontDir(camMatrix[0]);
-		dVector camOrigin(0.0f);
-		camOrigin = playerMatrix.m_posit + dVector(0.0f, 1.0f, 0.0f, 0.0f);
+		ndVector frontDir(camMatrix[0]);
+		ndVector camOrigin(0.0f);
+		camOrigin = playerMatrix.m_posit + ndVector(0.0f, 1.0f, 0.0f, 0.0f);
 		camOrigin -= frontDir.Scale(10.0f);
 
 		camera->SetNextMatrix(camMatrix, camOrigin);
@@ -407,7 +407,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 	void RenderHelp(ndDemoEntityManager* const scene)
 	{
-		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Vehicle driving keyboard control");
 		scene->Print(color, "change vehicle     : 'c'");
 		scene->Print(color, "accelerator        : 'w'");
@@ -509,7 +509,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			//dTrace(("%f\n", volumeFactor));
 
 			// apply positional sound
-			const dMatrix& location = m_chassis->GetMatrix();
+			const ndMatrix& location = m_chassis->GetMatrix();
 			m_engineRpmSound->SetPosition(location.m_posit);
 			m_engineRpmSound->SetVelocity(m_chassis->GetVelocity());
 		}
@@ -522,8 +522,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			if (tire)
 			{
 				const ndWheelDescriptor& info = tire->GetInfo();
-				const dMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
-				const dVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_lowerStop - info.m_upperStop));
+				const ndMatrix tireUpperBumperMatrix(tire->CalculateUpperBumperMatrix());
+				const ndVector dest(tireUpperBumperMatrix.m_posit - tireUpperBumperMatrix.m_up.Scale(info.m_lowerStop - info.m_upperStop));
 				class ndConvexCastNotifyTest : public ndConvexCastNotify
 				{
 					public:
@@ -558,24 +558,24 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)m_chassis->GetNotifyCallback();
 		if (m_rearAxlePivot && m_frontAxlePivot)
 		{
-			const dMatrix rearPivotMatrix((m_rearAxlePivot->CalculateGlobalMatrix(notify->m_entity) * m_chassis->GetMatrix()).Inverse());
-			const dMatrix rearLeftTireMatrix(m_rl_tire->GetBody0()->GetMatrix() * rearPivotMatrix);
-			const dMatrix rearRightTireMatrix(m_rr_tire->GetBody0()->GetMatrix() * rearPivotMatrix);
-			const dVector rearOrigin(dVector::m_half * (rearRightTireMatrix.m_posit + rearLeftTireMatrix.m_posit));
-			const dVector rearStep(rearRightTireMatrix.m_posit - rearLeftTireMatrix.m_posit);
+			const ndMatrix rearPivotMatrix((m_rearAxlePivot->CalculateGlobalMatrix(notify->m_entity) * m_chassis->GetMatrix()).Inverse());
+			const ndMatrix rearLeftTireMatrix(m_rl_tire->GetBody0()->GetMatrix() * rearPivotMatrix);
+			const ndMatrix rearRightTireMatrix(m_rr_tire->GetBody0()->GetMatrix() * rearPivotMatrix);
+			const ndVector rearOrigin(ndVector::m_half * (rearRightTireMatrix.m_posit + rearLeftTireMatrix.m_posit));
+			const ndVector rearStep(rearRightTireMatrix.m_posit - rearLeftTireMatrix.m_posit);
 
 			const dFloat32 rearAxleAngle = dAtan2(-rearStep.m_y, rearStep.m_z);
-			const dQuaternion rearAxelRotation(dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)), rearAxleAngle);
+			const ndQuaternion rearAxelRotation(ndVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)), rearAxleAngle);
 			m_rearAxlePivot->GetChild()->SetNextMatrix(rearAxelRotation, rearOrigin);
 
-			const dMatrix frontPivotMatrix((m_frontAxlePivot->CalculateGlobalMatrix(notify->m_entity) * m_chassis->GetMatrix()).Inverse());
-			const dMatrix frontLeftTireMatrix(m_fl_tire->GetBody0()->GetMatrix() * frontPivotMatrix);
-			const dMatrix frontRightTireMatrix(m_fr_tire->GetBody0()->GetMatrix() * frontPivotMatrix);
-			const dVector frontOrigin(dVector::m_half * (frontRightTireMatrix.m_posit + frontLeftTireMatrix.m_posit));
-			const dVector frontStep(frontRightTireMatrix.m_posit - frontLeftTireMatrix.m_posit);
+			const ndMatrix frontPivotMatrix((m_frontAxlePivot->CalculateGlobalMatrix(notify->m_entity) * m_chassis->GetMatrix()).Inverse());
+			const ndMatrix frontLeftTireMatrix(m_fl_tire->GetBody0()->GetMatrix() * frontPivotMatrix);
+			const ndMatrix frontRightTireMatrix(m_fr_tire->GetBody0()->GetMatrix() * frontPivotMatrix);
+			const ndVector frontOrigin(ndVector::m_half * (frontRightTireMatrix.m_posit + frontLeftTireMatrix.m_posit));
+			const ndVector frontStep(frontRightTireMatrix.m_posit - frontLeftTireMatrix.m_posit);
 
 			const dFloat32 frontAxleAngle = dAtan2(-frontStep.m_y, frontStep.m_z);
-			const dQuaternion frontAxelRotation(dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)), frontAxleAngle);
+			const ndQuaternion frontAxelRotation(ndVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)), frontAxleAngle);
 			m_frontAxlePivot->GetChild()->SetNextMatrix(frontAxelRotation, frontOrigin);
 		}
 	}
@@ -602,11 +602,11 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	ndMultiBodyVehicleTireJoint* m_fl_tire;
 };
 
-static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const dMatrix& location)
+static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
-	dMatrix localAxis(dGetIdentityMatrix());
-	localAxis[0] = dVector(0.0, 1.0f, 0.0f, 0.0f);
-	localAxis[1] = dVector(1.0, 0.0f, 0.0f, 0.0f);
+	ndMatrix localAxis(dGetIdentityMatrix());
+	localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
+	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
 	dFloat32 height = 1.9f;
@@ -619,7 +619,7 @@ static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const 
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
-	dMatrix sceneLocation(dGetIdentityMatrix());
+	ndMatrix sceneLocation(dGetIdentityMatrix());
 
 	//BuildFloorBox(scene, sceneLocation);
 	//BuildFlatPlane(scene, true);
@@ -633,15 +633,15 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//BuildHeightFieldTerrain(scene, sceneLocation);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
+	ndVector location(0.0f, 2.0f, 0.0f, 1.0f);
 	
-	dMatrix matrix(dGetIdentityMatrix());
-	dVector floor(FindFloor(*world, location + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndMatrix matrix(dGetIdentityMatrix());
+	ndVector floor(FindFloor(*world, location + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit = floor;
 	matrix.m_posit.m_y += 0.5f;
 
-	//dVector location(0.0f, 1.75f, 0.0f, 1.0f);
-	//dMatrix matrix(dGetIdentityMatrix());
+	//ndVector location(0.0f, 1.75f, 0.0f, 1.0f);
+	//ndMatrix matrix(dGetIdentityMatrix());
 	//matrix = dYawMatrix(180.0f * dDegreeToRad);
 	//matrix = matrix * dRollMatrix(-70.0f * dDegreeToRad);
 	//matrix.m_posit = location;
@@ -690,8 +690,8 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//matrix.m_posit.m_x += 15.0f;
 	//AddPlanks(scene, matrix.m_posit, 60.0f, 5);
 
-	dQuaternion rot;
-	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
+	ndQuaternion rot;
+	ndVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 	//ndLoadSave loadScene;

@@ -29,10 +29,10 @@ class ndDemoDebrisRootEntity;
 class ndDemoDebrisMesh : public ndDemoMesh
 {
 	public:
-	ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMesh, const dArray<glDebrisPoint>& vertexArray);
-	ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase, dArray<glDebrisPoint>& vertexArray);
+	ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMesh, const ndArray<glDebrisPoint>& vertexArray);
+	ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase, ndArray<glDebrisPoint>& vertexArray);
 
-	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+	void Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 
 	private:
 	ndDemoSubMeshMaterial m_material[2];
@@ -48,9 +48,9 @@ class ndDemoDebrisRootEntity: public ndDemoEntity
 	ndDemoDebrisRootEntity(const ndDemoDebrisRootEntity& copyFrom);
 	virtual ~ndDemoDebrisRootEntity(void);
 
-	void FinalizeConstruction(const dArray<glDebrisPoint>& vertexArray);
+	void FinalizeConstruction(const ndArray<glDebrisPoint>& vertexArray);
 
-	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
+	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
 	//dInt32 m_vertexCount;
 	//dInt32 m_buffRefCount;
@@ -61,12 +61,12 @@ class ndDemoDebrisRootEntity: public ndDemoEntity
 class ndDemoDebrisEntity : public ndDemoEntity
 {
 	public:
-	ndDemoDebrisEntity(ndMeshEffect* const meshNode, dArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache);
+	ndDemoDebrisEntity(ndMeshEffect* const meshNode, ndArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache);
 	ndDemoDebrisEntity(const ndDemoDebrisEntity& copyFrom);
 	virtual ~ndDemoDebrisEntity();
-	dNodeBaseHierarchy* CreateClone() const;
+	ndNodeBaseHierarchy* CreateClone() const;
 
-	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
+	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
 	//dInt32 m_vertexOffsetBase;
 };

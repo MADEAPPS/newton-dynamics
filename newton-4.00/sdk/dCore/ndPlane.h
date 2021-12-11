@@ -27,124 +27,124 @@
 
 
 #ifdef D_NEWTON_USE_DOUBLE
-	#define dPlane dBigPlane
+	#define ndPlane ndBigPlane
 #else 
 
 D_MSV_NEWTON_ALIGN_16
-class dPlane: public dVector
+class ndPlane: public ndVector
 {
 	public:
-	dPlane ();
-	dPlane (const dVector& point);
-	dPlane (dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w);
-	dPlane (const dVector &normal, dFloat32 distance); 
-	dPlane (const dVector &P0, const dVector &P1, const dVector &P2);
-	dPlane Scale (dFloat32 s) const;
+	ndPlane ();
+	ndPlane (const ndVector& point);
+	ndPlane (dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w);
+	ndPlane (const ndVector &normal, dFloat32 distance); 
+	ndPlane (const ndVector &P0, const ndVector &P1, const ndVector &P2);
+	ndPlane Scale (dFloat32 s) const;
 	dFloat32 Evalue (const dFloat32* const point) const;
-	dFloat32 Evalue (const dVector &point) const;
+	dFloat32 Evalue (const ndVector &point) const;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #endif
 
-class dBigPlane: public dBigVector
+class ndBigPlane: public ndBigVector
 {
 	public:
-	dBigPlane ();
-	dBigPlane (const dBigVector& point);
-	dBigPlane (dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w);
-	dBigPlane (const dBigVector &normal, dFloat64 distance); 
-	dBigPlane (const dBigVector &P0, const dBigVector &P1, const dBigVector &P2);
-	dBigPlane Scale (dFloat64 s) const;
+	ndBigPlane ();
+	ndBigPlane (const ndBigVector& point);
+	ndBigPlane (dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w);
+	ndBigPlane (const ndBigVector &normal, dFloat64 distance); 
+	ndBigPlane (const ndBigVector &P0, const ndBigVector &P1, const ndBigVector &P2);
+	ndBigPlane Scale (dFloat64 s) const;
 	dFloat64 Evalue (const dFloat64* const point) const;
-	dFloat64 Evalue (const dBigVector &point) const;
+	dFloat64 Evalue (const ndBigVector &point) const;
 };
 
 #ifndef D_NEWTON_USE_DOUBLE
 
-inline dPlane::dPlane () 
-	:dVector () 
+inline ndPlane::ndPlane () 
+	:ndVector () 
 {
 }
 
-inline dPlane::dPlane (const dVector& point)
-	:dVector (point)
+inline ndPlane::ndPlane (const ndVector& point)
+	:ndVector (point)
 {
 }
 
-inline dPlane::dPlane (dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
-	:dVector (x, y, z, w) 
+inline ndPlane::ndPlane (dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
+	:ndVector (x, y, z, w) 
 {
 }
 
-inline dPlane::dPlane (const dVector &normal, dFloat32 distance) 
-	:dVector (normal)
+inline ndPlane::ndPlane (const ndVector &normal, dFloat32 distance) 
+	:ndVector (normal)
 {
 	m_w = distance;
 }
 
-inline dPlane::dPlane (const dVector &P0, const dVector &P1, const dVector &P2)
-	:dVector ((P1 - P0).CrossProduct(P2 - P0)) 
+inline ndPlane::ndPlane (const ndVector &P0, const ndVector &P1, const ndVector &P2)
+	:ndVector ((P1 - P0).CrossProduct(P2 - P0)) 
 {
-	m_w = - DotProduct(P0 & dVector::m_triplexMask).GetScalar();
+	m_w = - DotProduct(P0 & ndVector::m_triplexMask).GetScalar();
 }
 
-inline dPlane dPlane::Scale (dFloat32 s)	const
+inline ndPlane ndPlane::Scale (dFloat32 s)	const
 {
-	return dPlane(*this * dVector(s));
+	return ndPlane(*this * ndVector(s));
 }
 
-inline dFloat32 dPlane::Evalue (const dFloat32* const point) const
+inline dFloat32 ndPlane::Evalue (const dFloat32* const point) const
 {
-	dVector p (point);
+	ndVector p (point);
 	return DotProduct ((p & m_triplexMask) | m_wOne).GetScalar();
 }
 
-inline dFloat32 dPlane::Evalue (const dVector& point) const
+inline dFloat32 ndPlane::Evalue (const ndVector& point) const
 {
 	return DotProduct ((point & m_triplexMask) | m_wOne).GetScalar();
 }
 #endif
 
 
-inline dBigPlane::dBigPlane () 
-	:dBigVector () 
+inline ndBigPlane::ndBigPlane () 
+	:ndBigVector () 
 {
 }
 
-inline dBigPlane::dBigPlane (const dBigVector& point)
-	:dBigVector (point)
+inline ndBigPlane::ndBigPlane (const ndBigVector& point)
+	:ndBigVector (point)
 {
 }
 
-inline dBigPlane::dBigPlane (dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w)
-	:dBigVector (x, y, z, w) 
+inline ndBigPlane::ndBigPlane (dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w)
+	:ndBigVector (x, y, z, w) 
 {
 }
 
-inline dBigPlane::dBigPlane (const dBigVector &normal, dFloat64 distance) 
-	:dBigVector (normal)
+inline ndBigPlane::ndBigPlane (const ndBigVector &normal, dFloat64 distance) 
+	:ndBigVector (normal)
 {
 	m_w = distance;
 }
 
-inline dBigPlane::dBigPlane (const dBigVector &P0, const dBigVector &P1, const dBigVector &P2)
-	:dBigVector ((P1 - P0).CrossProduct(P2 - P0)) 
+inline ndBigPlane::ndBigPlane (const ndBigVector &P0, const ndBigVector &P1, const ndBigVector &P2)
+	:ndBigVector ((P1 - P0).CrossProduct(P2 - P0)) 
 {
-	m_w = - DotProduct(P0 & dBigVector::m_triplexMask).GetScalar();
+	m_w = - DotProduct(P0 & ndBigVector::m_triplexMask).GetScalar();
 }
 
-inline dBigPlane dBigPlane::Scale (dFloat64 s) const
+inline ndBigPlane ndBigPlane::Scale (dFloat64 s) const
 {
-	return dBigPlane (m_x * s, m_y * s, m_z * s, m_w * s);
+	return ndBigPlane (m_x * s, m_y * s, m_z * s, m_w * s);
 }
 
-inline dFloat64 dBigPlane::Evalue (const dFloat64* const point) const
+inline dFloat64 ndBigPlane::Evalue (const dFloat64* const point) const
 {
 	return m_x * point[0] + m_y * point[1] + m_z * point[2] + m_w;
 }
 
 
-inline dFloat64 dBigPlane::Evalue (const dBigVector &point) const
+inline dFloat64 ndBigPlane::Evalue (const ndBigVector &point) const
 {
 	return m_x * point.m_x + m_y * point.m_y + m_z * point.m_z + m_w;
 }

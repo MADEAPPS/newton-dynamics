@@ -173,28 +173,28 @@ void ndJointKinematicController::SubmitConstraints (dFloat32 timestep, dInt32 th
 
 #endif
 
-ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const body, ndBodyKinematic* const referenceBody, const dVector& attachmentPointInGlobalSpace)
-	:ndJointBilateralConstraint(6, body, referenceBody, dMatrix(attachmentPointInGlobalSpace))
+ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const body, ndBodyKinematic* const referenceBody, const ndVector& attachmentPointInGlobalSpace)
+	:ndJointBilateralConstraint(6, body, referenceBody, ndMatrix(attachmentPointInGlobalSpace))
 {
 	dAssert(GetBody0() == body);
-	dMatrix matrix(body->GetMatrix());
+	ndMatrix matrix(body->GetMatrix());
 	matrix.m_posit = attachmentPointInGlobalSpace;
 	matrix.m_posit.m_w = dFloat32(1.0f);
 
 	Init(matrix);
 }
 
-ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const dMatrix& attachmentMatrixInGlobalSpace)
+ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const ndMatrix& attachmentMatrixInGlobalSpace)
 	:ndJointBilateralConstraint(6, referenceBody, body, attachmentMatrixInGlobalSpace)
 {
 	Init(attachmentMatrixInGlobalSpace);
 }
 
-ndJointKinematicController::ndJointKinematicController(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+ndJointKinematicController::ndJointKinematicController(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-	dMatrix attachmentMatrixInGlobalSpace(m_localMatrix0 * GetBody0()->GetMatrix());
+	ndMatrix attachmentMatrixInGlobalSpace(m_localMatrix0 * GetBody0()->GetMatrix());
 	Init(attachmentMatrixInGlobalSpace);
 
 	m_maxSpeed = xmlGetFloat(xmlNode, "maxSpeed");
@@ -212,7 +212,7 @@ ndJointKinematicController::~ndJointKinematicController()
 	m_body0->SetAutoSleep(m_autoSleepState);
 }
 
-void ndJointKinematicController::Init(const dMatrix& globalMatrix)
+void ndJointKinematicController::Init(const ndMatrix& globalMatrix)
 {
 	CalculateLocalMatrix(globalMatrix, m_localMatrix0, m_localMatrix1);
 
@@ -232,14 +232,14 @@ void ndJointKinematicController::Init(const dMatrix& globalMatrix)
 
 void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	const dVector omega0(m_body0->GetOmega());
-	const dVector omega1(m_body1->GetOmega());
-	const dVector veloc0(m_body0->GetVelocity());
-	const dVector veloc1(m_body1->GetVelocity());
+	const ndVector omega0(m_body0->GetOmega());
+	const ndVector omega1(m_body1->GetOmega());
+	const ndVector veloc0(m_body0->GetVelocity());
+	const ndVector veloc1(m_body1->GetVelocity());
 
 	const dFloat32 timestep = desc.m_timestep;
 	const dFloat32 invTimestep = desc.m_invTimestep;
@@ -252,11 +252,11 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1[i]);
 		const ndJacobianPair& jacobianPair = desc.m_jacobian[index];
 	
-		const dVector pointPosit(
+		const ndVector pointPosit(
 			matrix0.m_posit * jacobianPair.m_jacobianM0.m_linear + 
 			matrix1.m_posit * jacobianPair.m_jacobianM1.m_linear);
 
-		const dVector pointVeloc(
+		const ndVector pointVeloc(
 			veloc0 * jacobianPair.m_jacobianM0.m_linear + omega0 * jacobianPair.m_jacobianM0.m_angular + 
 			veloc1 * jacobianPair.m_jacobianM1.m_linear + omega1 * jacobianPair.m_jacobianM1.m_angular);
 	
@@ -289,7 +289,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 				AddAngularRowJacobian(desc, matrix1[i], dFloat32 (0.0f));
 				const ndJacobianPair& jacobianPair = desc.m_jacobian[index];
 				
-				const dVector pointOmega(omega0 * jacobianPair.m_jacobianM0.m_angular + omega1 * jacobianPair.m_jacobianM1.m_angular);
+				const ndVector pointOmega(omega0 * jacobianPair.m_jacobianM0.m_angular + omega1 * jacobianPair.m_jacobianM1.m_angular);
 				const dFloat32 relSpeed = pointOmega.AddHorizontal().GetScalar();
 				const dFloat32 relAccel = dClamp (relSpeed * invTimestep, dFloat32 (-3000.0f), dFloat32(3000.0f));
 				SetMotorAcceleration(desc, -relAccel);
@@ -310,7 +310,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		//				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);
 		//				NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
 		//
-		//				dVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+		//				ndVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
 		//				dFloat32 relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
 		//
 		//				dFloat32 w = m_maxOmega * dSign(coneAngle);
@@ -331,17 +331,17 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		//	}
 		//	else {
 		//
-		//		dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+		//		ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 		//		dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
 		//		lateralDir = lateralDir.Normalize();
 		//		dFloat32 coneAngle = dAcos(dClamp(cosAngle, dFloat32(-1.0f), dFloat32(1.0f)));
-		//		dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+		//		ndMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
 		//
 		//		if ((m_controlMode == m_linearAndCone) || (m_controlMode == m_full6dof)) {
 		//			NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
 		//			NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
 		//
-		//			dVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+		//			ndVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
 		//			dFloat32 relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
 		//
 		//			dFloat32 w = m_maxOmega * dSign(coneAngle);
@@ -355,7 +355,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		//			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
 		//
 		//
-		//			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+		//			ndVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
 		//			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
 		//			NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
 		//			pointOmega = omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular;
@@ -367,14 +367,14 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		//			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
 		//		}
 		//
-		//		dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+		//		ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 		//		pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 		//	}
 		//
 		//	if ((m_controlMode == m_linearAndTwist) || (m_controlMode == m_full6dof)) {
 		//		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
 		//		NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
-		//		dVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+		//		ndVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
 		//		dFloat32 relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
 		//
 		//		dFloat32 w = m_maxOmega * dSign(pitchAngle);
@@ -397,11 +397,11 @@ void ndJointKinematicController::CheckSleep() const
 	GetBody0()->SetSleepState(false);
 
 	//dAssert(0);
-	//dMatrix matrix0;
-	//dMatrix matrix1;
+	//ndMatrix matrix0;
+	//ndMatrix matrix1;
 	//CalculateGlobalMatrix(matrix0, matrix1);
 	//
-	//dMatrix matrix(matrix1 * matrix0.Inverse());
+	//ndMatrix matrix(matrix1 * matrix0.Inverse());
 	//matrix.m_posit.m_w = 0.0f;
 	//if (matrix.m_posit.DotProduct3(matrix.m_posit) > dFloat32(1.0e-6f)) 
 	//{
@@ -442,12 +442,12 @@ void ndJointKinematicController::CheckSleep() const
 	//			}
 	//			else 
 	//			{
-	//				dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+	//				ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 	//				dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
 	//				lateralDir = lateralDir.Normalize();
 	//				dFloat32 coneAngle = dAcos(dClamp(cosAngle, dFloat32(-1.0f), dFloat32(1.0f)));
-	//				dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
-	//				dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+	//				ndMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+	//				ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 	//				pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 	//			}
 	//
@@ -461,12 +461,12 @@ void ndJointKinematicController::CheckSleep() const
 	//}
 }
 
-void ndJointKinematicController::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndJointKinematicController::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "maxSpeed", m_maxSpeed);
 	xmlSaveParam(childNode, "maxOmega", m_maxOmega);

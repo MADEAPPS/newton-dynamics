@@ -96,7 +96,7 @@ class ndActiveRagdollEntityNotify : public ndDemoEntityNotify
 		}
 	}
 
-	void OnTransform(dInt32 thread, const dMatrix& matrix)
+	void OnTransform(dInt32 thread, const ndMatrix& matrix)
 	{
 		if (!m_parentBody)
 		{
@@ -104,9 +104,9 @@ class ndActiveRagdollEntityNotify : public ndDemoEntityNotify
 		}
 		else
 		{
-			const dMatrix parentMatrix(m_parentBody->GetMatrix());
-			const dMatrix localMatrix(matrix * parentMatrix.Inverse() * m_bindMatrix);
-			const dQuaternion rot(localMatrix);
+			const ndMatrix parentMatrix(m_parentBody->GetMatrix());
+			const ndMatrix localMatrix(matrix * parentMatrix.Inverse() * m_bindMatrix);
+			const ndQuaternion rot(localMatrix);
 			m_entity->SetMatrix(rot, localMatrix.m_posit);
 		}
 	}
@@ -117,7 +117,7 @@ class ndActiveRagdollEntityNotify : public ndDemoEntityNotify
 		// remember to check and clamp huge angular velocities
 	}
 
-	dMatrix m_bindMatrix;
+	ndMatrix m_bindMatrix;
 };
 
 static dActiveJointDefinition jointsDefinition[] =
@@ -149,7 +149,7 @@ static dActiveJointDefinition jointsDefinition[] =
 class ndActiveRagdollModel : public ndCharacter
 {
 	public:
-	ndActiveRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const dMatrix& location)
+	ndActiveRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const ndMatrix& location)
 		:ndCharacter()
 		,m_animBlendTree(nullptr)
 	{
@@ -159,8 +159,8 @@ class ndActiveRagdollModel : public ndCharacter
 		ndWorld* const world = scene->GetWorld();
 		
 		// find the floor location 
-		dMatrix matrix(location);
-		dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		ndMatrix matrix(location);
+		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y;
 		matrix.m_posit.m_y += 0.5f;
 
@@ -169,7 +169,7 @@ class ndActiveRagdollModel : public ndCharacter
 		rootEntity->ResetMatrix(rootEntity->GetCurrentMatrix() * matrix);
 		ndCharacterRootNode* const rootNode = CreateRoot(CreateBodyPart(scene, rootEntity, nullptr));
 		ndDemoEntity* const characterFrame = (ndDemoEntity*)entity->Find("referenceFrame");
-		dMatrix coronalFrame(dPitchMatrix(180.0f*dDegreeToRad) * dRollMatrix(90.0f*dDegreeToRad) * characterFrame->CalculateGlobalMatrix());
+		ndMatrix coronalFrame(dPitchMatrix(180.0f*dDegreeToRad) * dRollMatrix(90.0f*dDegreeToRad) * characterFrame->CalculateGlobalMatrix());
 		rootNode->SetCoronalFrame(coronalFrame);
 		rootNode->SetName(rootEntity->GetName().GetStr());
 
@@ -233,7 +233,7 @@ class ndActiveRagdollModel : public ndCharacter
 					else
 					{
 						dAssert(0);
-						//dMatrix effectorMatrix(childEntity->GetCurrentMatrix() * parentBone->GetBody()->GetMatrix());
+						//ndMatrix effectorMatrix(childEntity->GetCurrentMatrix() * parentBone->GetBody()->GetMatrix());
 						//ndCharacterEffectorNode* const effectorNode = CreateInverseDynamicEffector(effectorMatrix, parentBone);
 						//effectorNode->SetName(name);
 						//if (strcmp(effectorNode->GetJoint()->SubClassName(), "ndJointTwoBodyIK") == 0)
@@ -307,8 +307,8 @@ class ndActiveRagdollModel : public ndCharacter
 	void SetAnimation(ndDemoEntityManager* const scene, const ndDemoEntity* const entity)
 	{
 		ndAnimationSequence* const sequence = scene->GetAnimationSequence("whiteMan_idle.fbx");
-		const dList<ndAnimationKeyFramesTrack>& tracks = sequence->m_tracks;
-		for (dList<ndAnimationKeyFramesTrack>::dNode* node = tracks.GetFirst(); node; node = node->GetNext())
+		const ndList<ndAnimationKeyFramesTrack>& tracks = sequence->m_tracks;
+		for (ndList<ndAnimationKeyFramesTrack>::ndNode* node = tracks.GetFirst(); node; node = node->GetNext())
 		{
 			ndAnimationKeyFramesTrack& track = node->GetInfo();
 			const char* const name = track.GetName().GetStr();
@@ -341,7 +341,7 @@ class ndActiveRagdollModel : public ndCharacter
 		{
 			ndBodyDynamic* const body = bodyArray[i];
 			dFloat32 scale = density * body->GetCollisionShape().GetVolume() * massWeight[i];
-			dVector inertia(body->GetMassMatrix().Scale (scale));
+			ndVector inertia(body->GetMassMatrix().Scale (scale));
 			body->SetMassMatrix(inertia);
 		}
 	}
@@ -352,7 +352,7 @@ class ndActiveRagdollModel : public ndCharacter
 		dAssert(shape);
 
 		// create the rigid body that will make this body
-		dMatrix matrix(entityPart->CalculateGlobalMatrix());
+		ndMatrix matrix(entityPart->CalculateGlobalMatrix());
 
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		body->SetMatrix(matrix);
@@ -366,9 +366,9 @@ class ndActiveRagdollModel : public ndCharacter
 
 	ndCharacterNode* ConnectBodyParts(ndBodyDynamic* const childBody, ndCharacterNode* const parentNode, const dActiveJointDefinition& definition)
 	{
-		dMatrix matrix(childBody->GetMatrix());
+		ndMatrix matrix(childBody->GetMatrix());
 		dActiveJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
-		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
+		ndMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
 
 		if (definition.m_limbType == dActiveJointDefinition::forwardKinematic)
 		{
@@ -414,7 +414,7 @@ class ndActiveRagdollModel : public ndCharacter
 			ndCharacterNode* const skelNode = (ndCharacterNode*)keyFrame.m_userData;
 			if (skelNode)
 			{
-				skelNode->SetLocalPose(dMatrix(keyFrame.m_rotation, keyFrame.m_posit));
+				skelNode->SetLocalPose(ndMatrix(keyFrame.m_rotation, keyFrame.m_posit));
 			}
 		}
 		SetPose();
@@ -437,11 +437,11 @@ class ndActiveRagdollModel : public ndCharacter
 	//ndCharacterBipedPoseController m_bipedController;
 };
 
-static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const dMatrix& location)
+static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
-	dMatrix localAxis(dGetIdentityMatrix());
-	localAxis[0] = dVector(0.0, 1.0f, 0.0f, 0.0f);
-	localAxis[1] = dVector(1.0, 0.0f, 0.0f, 0.0f);
+	ndMatrix localAxis(dGetIdentityMatrix());
+	localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
+	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
 	dFloat32 height = 1.9f;
@@ -449,8 +449,8 @@ static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const 
 	dFloat32 mass = 100.0f;
 	ndDemoEntity* const entity = scene->LoadFbxMesh("whiteMan.fbx");
 	ndBasicPlayerCapsule* const player = new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
-	player->GetNotifyCallback()->SetGravity(dVector::m_zero);
-	dMatrix matrix(player->GetMatrix());
+	player->GetNotifyCallback()->SetGravity(ndVector::m_zero);
+	ndMatrix matrix(player->GetMatrix());
 	matrix.m_posit.m_y += 0.5f;
 	player->SetMatrix(matrix);
 	delete entity;
@@ -461,12 +461,12 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
-	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
+	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	fbxDemoEntity* const ragdollMesh = scene->LoadFbxMesh("whiteMan.fbx");
 
-	dMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
-	dMatrix playerMatrix(matrix);
+	ndMatrix playerMatrix(matrix);
 	ndActiveRagdollModel* const ragdoll = new ndActiveRagdollModel(scene, ragdollMesh, matrix);
 	scene->SetSelectedModel(ragdoll);
 	scene->GetWorld()->AddModel(ragdoll);
@@ -477,7 +477,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_y += 2.0f;
 	//ndBodyKinematic* const reckingBall = AddSphere(scene, matrix.m_posit, 25.0f, 0.25f);
-	//reckingBall->SetVelocity(dVector(-5.0f, 0.0f, 0.0f, 0.0f));
+	//reckingBall->SetVelocity(ndVector(-5.0f, 0.0f, 0.0f, 0.0f));
 
 	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_z -= 2.0f;
@@ -492,7 +492,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 
 	dFloat32 angle = dFloat32(90.0f * dDegreeToRad);
 	playerMatrix = dYawMatrix(angle) * playerMatrix;
-	dVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-5.0f));
+	ndVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-5.0f));
 	origin.m_y += 1.0f;
 	origin.m_z -= 2.0f;
 	scene->SetCameraMatrix(playerMatrix, origin);

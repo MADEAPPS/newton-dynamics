@@ -27,7 +27,7 @@ class ndDemoCameraManager;
 class ndWireFrameDebugMesh;
 class ndFlatShadedDebugMesh;
 
-class ndDemoEntityManager: public dList <ndDemoEntity*>
+class ndDemoEntityManager: public ndList <ndDemoEntity*>
 {
 	public:
 	typedef void (*LaunchSDKDemoCallback) (ndDemoEntityManager* const scene);
@@ -64,10 +64,10 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	class ndLightSource
 	{
 		public:
-		dVector m_position;
-		dVector m_ambient;
-		dVector m_diffuse;
-		dVector m_specular;
+		ndVector m_position;
+		ndVector m_ambient;
+		ndVector m_diffuse;
+		ndVector m_specular;
 		dFloat32 m_shininess;
 	};
 
@@ -81,21 +81,21 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 		{
 		}
 
-		TransparentMesh(const dMatrix& matrix, ndDemoMesh* const mesh)
+		TransparentMesh(const ndMatrix& matrix, ndDemoMesh* const mesh)
 			:m_matrix(matrix)
 			,m_mesh(mesh)
 		{
 		}
 
-		dMatrix m_matrix;
+		ndMatrix m_matrix;
 		ndDemoMesh* m_mesh;
 	};
 
-	class TransparentHeap: public dUpHeap <TransparentMesh, dFloat32>
+	class TransparentHeap: public ndUpHeap <TransparentMesh, dFloat32>
 	{
 		public:
 		TransparentHeap()
-			:dUpHeap <TransparentMesh, dFloat32>(2048)
+			:ndUpHeap <TransparentMesh, dFloat32>(2048)
 		{
 		}
 	};
@@ -136,7 +136,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 		ndWireFrameDebugMesh* m_wireFrameShareEdge;
 	};
 
-	class ndDebugMeshCache: public dTree<ndDebuMesh, const ndShape*>
+	class ndDebugMeshCache: public ndTree<ndDebuMesh, const ndShape*>
 	{
 	};
 
@@ -161,22 +161,22 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	ndDemoCameraManager* GetCameraManager() const;
 	bool GetMouseSpeed(dFloat32& posX, dFloat32& posY) const;
 	bool GetMousePosition (dFloat32& posX, dFloat32& posY) const;
-	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
+	void SetCameraMatrix (const ndQuaternion& rotation, const ndVector& position);
 	
 	void SetSelectedModel(ndModel* const model);
 	void SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context);
-	void PushTransparentMesh(const ndDemoMeshInterface* const mesh, const dMatrix& modelMatrix);
+	void PushTransparentMesh(const ndDemoMeshInterface* const mesh, const ndMatrix& modelMatrix);
 	void Set2DDisplayRenderFunction (RenderGuiHelpCallback helpCallback, RenderGuiHelpCallback UIcallback, void* const context);
 
 	bool IsShiftKeyDown () const;
 	bool IsControlKeyDown () const;
 	bool GetKeyState(dInt32 key) const;
-	dInt32 GetJoystickAxis (dFixSizeArray<dFloat32, 8>& axisValues);
-	dInt32 GetJoystickButtons (dFixSizeArray<char, 32>& axisbuttons);
+	dInt32 GetJoystickAxis (ndFixSizeArray<dFloat32, 8>& axisValues);
+	dInt32 GetJoystickButtons (ndFixSizeArray<char, 32>& axisbuttons);
 
 	bool GetCaptured () const;
 	bool GetMouseKeyState (dInt32 button ) const;
-	dInt32 Print (const dVector& color, const char *fmt, ... ) const;
+	dInt32 Print (const ndVector& color, const char *fmt, ... ) const;
 	dInt32 GetDebugDisplay() const;
 	void SetDebugDisplay(dInt32 mode) const;
 
@@ -235,7 +235,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	dUnsigned64 m_microsecunds;
 	TransparentHeap m_tranparentHeap;
-	dTree<ndAnimationSequence*, dString> m_animationCache;
+	ndTree<ndAnimationSequence*, ndString> m_animationCache;
 
 	dInt32 m_currentScene;
 	dInt32 m_lastCurrentScene;
@@ -252,7 +252,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	dFloat32 m_fps;
 	dFloat32 m_timestepAcc;
 	dFloat32 m_currentListenerTimestep;
-	dSpinLock m_addDeleteLock;
+	ndSpinLock m_addDeleteLock;
 	
 	bool m_showUI;
 	bool m_showAABB;

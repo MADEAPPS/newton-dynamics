@@ -16,14 +16,14 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndArchimedesBuoyancyVolume);
 
 ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume()
 	:ndBodyTriggerVolume()
-	,m_plane(dVector::m_zero)
+	,m_plane(ndVector::m_zero)
 	,m_density(1.0f)
 	,m_hasPlane(0)
 {
 }
 
-ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndBodyTriggerVolume(dLoadSaveBase::dLoadDescriptor(desc))
+ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndBodyTriggerVolume(ndLoadSaveBase::dLoadDescriptor(desc))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	m_plane = xmlGetVector3(xmlNode, "planeNormal");
@@ -48,10 +48,10 @@ void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)
 		}
 	};
 
-	dMatrix matrix(body->GetMatrix());
+	ndMatrix matrix(body->GetMatrix());
 
-	dVector p0(matrix.m_posit);
-	dVector p1(matrix.m_posit);
+	ndVector p0(matrix.m_posit);
+	ndVector p1(matrix.m_posit);
 
 	p0.m_y += 30.0f;
 	p1.m_y -= 30.0f;
@@ -61,7 +61,7 @@ void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)
 	if (m_hasPlane)
 	{ 
 		dFloat32 dist = -rayCaster.m_contact.m_normal.DotProduct(rayCaster.m_contact.m_point).GetScalar();
-		m_plane = dPlane(rayCaster.m_contact.m_normal, dist);
+		m_plane = ndPlane(rayCaster.m_contact.m_normal, dist);
 	}
 }
 
@@ -80,9 +80,9 @@ void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, dFloa
 
 	if (body && m_hasPlane && (body->GetInvMass() != 0.0f))
 	{
-		dVector mass (body->GetMassMatrix());
-		dVector centerOfPreasure(dVector::m_zero);
-		dMatrix matrix (body->GetMatrix());
+		ndVector mass (body->GetMassMatrix());
+		ndVector centerOfPreasure(ndVector::m_zero);
+		ndMatrix matrix (body->GetMatrix());
 		ndShapeInstance& collision = body->GetCollisionShape();
 
 		dFloat32 volume = collision.CalculateBuoyancyCenterOfPresure (centerOfPreasure, matrix, m_plane);
@@ -91,7 +91,7 @@ void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, dFloa
 			// if some part of the shape si under water, calculate the buoyancy force base on 
 			// Archimedes's buoyancy principle, which is the buoyancy force is equal to the 
 			// weight of the fluid displaced by the volume under water. 
-			//dVector cog(dVector::m_zero);
+			//ndVector cog(ndVector::m_zero);
 			const dFloat32 viscousDrag = 0.99f;
 
 			ndShapeMaterial material(collision.GetMaterial());
@@ -100,19 +100,19 @@ void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, dFloa
 			dFloat32 desplacedVolume = density * collision.GetVolume();
 				
 			dFloat32 displacedMass = mass.m_w * volume / desplacedVolume;
-			dVector cog(body->GetCentreOfMass());
+			ndVector cog(body->GetCentreOfMass());
 			centerOfPreasure -= matrix.TransformVector(cog);
 				
 			// now with the mass and center of mass of the volume under water, calculate buoyancy force and torque
-			dVector force(dFloat32(0.0f), dFloat32(-DEMO_GRAVITY * displacedMass), dFloat32(0.0f), dFloat32(0.0f));
-			dVector torque(centerOfPreasure.CrossProduct(force));
+			ndVector force(dFloat32(0.0f), dFloat32(-DEMO_GRAVITY * displacedMass), dFloat32(0.0f), dFloat32(0.0f));
+			ndVector torque(centerOfPreasure.CrossProduct(force));
 				
 			body->SetForce(body->GetForce() + force);
 			body->SetTorque(body->GetTorque() + torque);
 				
 			// apply a fake viscous drag to damp the under water motion 
-			dVector omega(body->GetOmega());
-			dVector veloc(body->GetVelocity());
+			ndVector omega(body->GetOmega());
+			ndVector veloc(body->GetVelocity());
 			omega = omega.Scale(viscousDrag);
 			veloc = veloc.Scale(viscousDrag);
 			body->SetOmega(omega);
@@ -134,12 +134,12 @@ void ndArchimedesBuoyancyVolume::OnTriggerExit(ndBodyKinematic* const, dFloat32)
 	//dTrace(("exit trigger body: %d\n", body->GetId()));
 }
 
-void ndArchimedesBuoyancyVolume::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndArchimedesBuoyancyVolume::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBodyTriggerVolume::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndBodyTriggerVolume::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "planeNormal", m_plane);
 	xmlSaveParam(childNode, "planeDist", m_plane.m_w);

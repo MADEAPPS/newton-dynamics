@@ -15,7 +15,7 @@
 #include "ndSandboxStdafx.h"
 
 class ndDemoEntityManager;
-ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const dMatrix& location = dGetIdentityMatrix());
-void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const dMatrix& matrix);
+ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const ndMatrix& location = dGetIdentityMatrix());
+void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const ndMatrix& matrix);
 #endif 
 

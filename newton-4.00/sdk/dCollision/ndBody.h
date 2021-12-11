@@ -37,12 +37,12 @@ class ndBodyTriggerVolume;
 class ndJointBilateralConstraint;
 
 D_MSV_NEWTON_ALIGN_32
-class ndBody : public dContainersFreeListAlloc<ndBody>
+class ndBody : public ndContainersFreeListAlloc<ndBody>
 {
 	public:
 	D_CLASS_REFLECTION(ndBody);
 	D_COLLISION_API ndBody();
-	D_COLLISION_API ndBody(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndBody(const ndLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndBody();
 
 	virtual ndBody* GetAsBody() { return this;}
@@ -55,34 +55,34 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 	virtual ndBodyTriggerVolume* GetAsBodyTriggerVolume() { return nullptr; }
 
 	dUnsigned32 GetId() const;
-	void GetAABB(dVector& p0, dVector& p1) const;
+	void GetAABB(ndVector& p0, ndVector& p1) const;
 
 	virtual dFloat32 GetInvMass() const;
-	virtual bool RayCast(ndRayCastNotify& callback, const dFastRay& ray, const dFloat32 maxT) const = 0;
+	virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const dFloat32 maxT) const = 0;
 
-	const dVector& GetCentreOfMass() const;
-	D_COLLISION_API void SetCentreOfMass(const dVector& com);
+	const ndVector& GetCentreOfMass() const;
+	D_COLLISION_API void SetCentreOfMass(const ndVector& com);
 
 	ndBodyNotify* GetNotifyCallback() const;
 
 	
-	dVector GetOmega() const;
-	dMatrix GetMatrix() const;
-	dVector GetVelocity() const;
-	dVector GetPosition() const;
-	dQuaternion GetRotation() const;
-	dVector GetGlobalGetCentreOfMass() const;
+	ndVector GetOmega() const;
+	ndMatrix GetMatrix() const;
+	ndVector GetVelocity() const;
+	ndVector GetPosition() const;
+	ndQuaternion GetRotation() const;
+	ndVector GetGlobalGetCentreOfMass() const;
 
 	D_COLLISION_API void SetNotifyCallback(ndBodyNotify* const notify);
-	D_COLLISION_API void SetOmega(const dVector& veloc);
-	D_COLLISION_API void SetVelocity(const dVector& veloc);
-	D_COLLISION_API void SetMatrix(const dMatrix& matrix);
+	D_COLLISION_API void SetOmega(const ndVector& veloc);
+	D_COLLISION_API void SetVelocity(const ndVector& veloc);
+	D_COLLISION_API void SetMatrix(const ndMatrix& matrix);
 	
-	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	D_COLLISION_API dVector GetVelocityAtPoint(const dVector& point) const;
+	D_COLLISION_API ndVector GetVelocityAtPoint(const ndVector& point) const;
 
-	void SetMatrixAndCentreOfMass(const dQuaternion& rotation, const dVector& globalcom);
+	void SetMatrixAndCentreOfMass(const ndQuaternion& rotation, const ndVector& globalcom);
 
 	protected:
 	D_COLLISION_API static const nd::TiXmlNode* FindNode(const nd::TiXmlNode* const rootNode, const char* const name);
@@ -91,14 +91,14 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 	virtual void DetachContact(ndContact* const) {}
 	virtual ndContact* FindContact(const ndBody* const) const { return nullptr; }
 
-	dMatrix m_matrix;
-	dVector m_veloc;
-	dVector m_omega;
-	dVector m_localCentreOfMass;
-	dVector m_globalCentreOfMass;
-	dVector m_minAabb;
-	dVector m_maxAabb;
-	dQuaternion m_rotation;
+	ndMatrix m_matrix;
+	ndVector m_veloc;
+	ndVector m_omega;
+	ndVector m_localCentreOfMass;
+	ndVector m_globalCentreOfMass;
+	ndVector m_minAabb;
+	ndVector m_maxAabb;
+	ndQuaternion m_rotation;
 	ndBodyNotify* m_notifyCallback;
 
 	dUnsigned32 m_uniqueId;
@@ -107,6 +107,7 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 		dUnsigned32 m_flags;
 		struct
 		{
+			dUnsigned32 m_isDynamics : 1;
 			dUnsigned32 m_skeletonMark : 1;
 			dUnsigned32 m_skeletonMark0 : 1;
 			dUnsigned32 m_skeletonMark1 : 1;
@@ -121,7 +122,7 @@ class ndBody : public dContainersFreeListAlloc<ndBody>
 	dUnsigned8 m_equilibrium;
 	dUnsigned8 m_isJointFence0;
 	dUnsigned8 m_isJointFence1;
-	dUnsigned8 m_bodyIsConstrained : 1;
+	dUnsigned8 m_bodyIsConstrained;
 
 //#ifdef ISLAND_SOLVER
 	dUnsigned8 m_resting : 1;
@@ -146,48 +147,48 @@ inline ndBodyNotify* ndBody::GetNotifyCallback() const
 	return m_notifyCallback;
 }
 
-inline dMatrix ndBody::GetMatrix() const
+inline ndMatrix ndBody::GetMatrix() const
 {
 	return m_matrix;
 }
 
-inline dVector ndBody::GetPosition() const
+inline ndVector ndBody::GetPosition() const
 {
 	return m_matrix.m_posit;
 }
 
-inline dQuaternion ndBody::GetRotation() const
+inline ndQuaternion ndBody::GetRotation() const
 {
 	return m_rotation;
 }
 
-inline dVector ndBody::GetGlobalGetCentreOfMass() const
+inline ndVector ndBody::GetGlobalGetCentreOfMass() const
 {
 	return m_globalCentreOfMass;
 }
 
-inline dVector ndBody::GetVelocity() const
+inline ndVector ndBody::GetVelocity() const
 {
 	return m_veloc;
 }
 
-inline dVector ndBody::GetOmega() const
+inline ndVector ndBody::GetOmega() const
 {
 	return m_omega;
 }
 
-inline void ndBody::GetAABB(dVector& p0, dVector& p1) const
+inline void ndBody::GetAABB(ndVector& p0, ndVector& p1) const
 {
 	p0 = m_minAabb;
 	p1 = m_maxAabb;
 }
 
-inline const dVector& ndBody::GetCentreOfMass() const
+inline const ndVector& ndBody::GetCentreOfMass() const
 {
 	return m_localCentreOfMass;
 }
 
-inline dVector ndBody::GetVelocityAtPoint(const dVector& point) const
+inline ndVector ndBody::GetVelocityAtPoint(const ndVector& point) const
 {
 	return m_veloc + m_omega.CrossProduct(point - m_globalCentreOfMass);
 }
@@ -197,11 +198,11 @@ inline dFloat32 ndBody::GetInvMass() const
 	return dFloat32(0.0f); 
 }
 
-inline void ndBody::SetMatrixAndCentreOfMass(const dQuaternion& rotation, const dVector& globalcom)
+inline void ndBody::SetMatrixAndCentreOfMass(const ndQuaternion& rotation, const ndVector& globalcom)
 {
 	m_rotation = rotation;
 	m_globalCentreOfMass = globalcom;
-	m_matrix = dMatrix(rotation, m_matrix.m_posit);
+	m_matrix = ndMatrix(rotation, m_matrix.m_posit);
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
 }
 

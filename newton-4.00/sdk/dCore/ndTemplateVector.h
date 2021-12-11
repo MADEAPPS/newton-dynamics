@@ -29,26 +29,26 @@
 //#define dCheckVector(x) (dCheckFloat(x[0]) && dCheckFloat(x[1]) && dCheckFloat(x[2]) && dCheckFloat(x[3]))
 
 template<class T>
-class dTemplateVector: public dClassAlloc
+class ndTemplateVector: public ndClassAlloc
 {
 	public:
-	dTemplateVector () 
+	ndTemplateVector () 
 	{
 	}
 	
-	dTemplateVector (const T* const ptr)
+	ndTemplateVector (const T* const ptr)
 		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (ptr[3])
 	{
 		//dAssert (dCheckVector ((*this)));
 	}
 
-	dTemplateVector (const dTemplateVector<T>& copy)
+	ndTemplateVector (const ndTemplateVector<T>& copy)
 		:m_x(copy.m_x), m_y(copy.m_y), m_z(copy.m_z), m_w (copy.m_w)
 	{
 		//	dAssert (dCheckVector ((*this)));
 	}
 
-	dTemplateVector (T x, T y, T z, T w) 
+	ndTemplateVector (T x, T y, T z, T w) 
 		:m_x(x), m_y(y), m_z(z), m_w (w)
 	{
 	}
@@ -72,71 +72,71 @@ class dTemplateVector: public dClassAlloc
 		return m_x;
 	}
 
-	dTemplateVector<T> Scale (T scale) const
+	ndTemplateVector<T> Scale (T scale) const
 	{
-		return dTemplateVector<T> (m_x * scale, m_y * scale, m_z * scale, m_w * scale);
+		return ndTemplateVector<T> (m_x * scale, m_y * scale, m_z * scale, m_w * scale);
 	}
 
-	dTemplateVector<T> operator+ (const dTemplateVector<T>& B) const
+	ndTemplateVector<T> operator+ (const ndTemplateVector<T>& B) const
 	{
-		return dTemplateVector<T> (m_x + B.m_x, m_y + B.m_y, m_z + B.m_z, m_w + B.m_w);
+		return ndTemplateVector<T> (m_x + B.m_x, m_y + B.m_y, m_z + B.m_z, m_w + B.m_w);
 	}
 
-	dTemplateVector<T>& operator+= (const dTemplateVector<T>& A) 
+	ndTemplateVector<T>& operator+= (const ndTemplateVector<T>& A) 
 	{
-		return (*this = dTemplateVector<T> (m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w));
+		return (*this = ndTemplateVector<T> (m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w));
 	}
 
-	dTemplateVector<T> operator- (const dTemplateVector<T>& A) const
+	ndTemplateVector<T> operator- (const ndTemplateVector<T>& A) const
 	{
-		return dTemplateVector<T> (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
+		return ndTemplateVector<T> (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
 	}
 
-	dTemplateVector<T>& operator-= (const dTemplateVector<T>& A) 
+	ndTemplateVector<T>& operator-= (const ndTemplateVector<T>& A) 
 	{
-		return (*this = dTemplateVector<T> (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w));
+		return (*this = ndTemplateVector<T> (m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w));
 	}
 
-	dTemplateVector<T> operator* (const dTemplateVector<T>& B) const
+	ndTemplateVector<T> operator* (const ndTemplateVector<T>& B) const
 	{
-		return dTemplateVector<T>(m_x * B.m_x, m_y * B.m_y, m_z * B.m_z, m_w * B.m_w);
+		return ndTemplateVector<T>(m_x * B.m_x, m_y * B.m_y, m_z * B.m_z, m_w * B.m_w);
 	}
 
-	dTemplateVector<T> operator*= (const dTemplateVector<T>& B) const
+	ndTemplateVector<T> operator*= (const ndTemplateVector<T>& B) const
 	{
-		return (*this = dTemplateVector<T>(m_x * B.m_x, m_y * B.m_y, m_z * B.m_z, m_w * B.m_w));
+		return (*this = ndTemplateVector<T>(m_x * B.m_x, m_y * B.m_y, m_z * B.m_z, m_w * B.m_w));
 	}
 
-	dTemplateVector<T> AddHorizontal() const
+	ndTemplateVector<T> AddHorizontal() const
 	{
 		T val(m_x + m_y + m_z + m_w);
-		return dTemplateVector<T>(val, val, val, val);
+		return ndTemplateVector<T>(val, val, val, val);
 	}
 
-	dTemplateVector<T> MulAdd(const dTemplateVector<T>& A, const dTemplateVector<T>& B) const
+	ndTemplateVector<T> MulAdd(const ndTemplateVector<T>& A, const ndTemplateVector<T>& B) const
 	{
 		return *this + A * B;
 	}
 
-	dTemplateVector<T> MulSub(const dTemplateVector<T>& A, const dTemplateVector<T>& B) const
+	ndTemplateVector<T> MulSub(const ndTemplateVector<T>& A, const ndTemplateVector<T>& B) const
 	{
 		return *this - A * B;
 	}
 
 	// return cross product
-	dTemplateVector<T> CrossProduct (const dTemplateVector<T>& B) const
+	ndTemplateVector<T> CrossProduct (const ndTemplateVector<T>& B) const
 	{
-		return dTemplateVector<T> (m_y * B.m_z - m_z * B.m_y,
+		return ndTemplateVector<T> (m_y * B.m_z - m_z * B.m_y,
 									m_z * B.m_x - m_x * B.m_z,
 									m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
-	dTemplateVector<T> CrossProduct(const dTemplateVector &A, const dTemplateVector &B) const
+	ndTemplateVector<T> CrossProduct(const ndTemplateVector &A, const ndTemplateVector &B) const
 	{
 		T cofactor[3][3];
 		T array[4][4];
 
-		const dTemplateVector<T>& me = *this;
+		const ndTemplateVector<T>& me = *this;
 		for (dInt32 i = 0; i < 4; i++) {
 			array[0][i] = me[i];
 			array[1][i] = A[i];
@@ -144,7 +144,7 @@ class dTemplateVector: public dClassAlloc
 			array[3][i] = T(1.0f);
 		}
 
-		dTemplateVector<T> normal;
+		ndTemplateVector<T> normal;
 		T sign = T(-1.0f);
 		for (dInt32 i = 0; i < 4; i++) 
 		{
@@ -173,10 +173,10 @@ class dTemplateVector: public dClassAlloc
 	}
 
 	// return dot 4d dot product
-	dTemplateVector<T> DotProduct (const dTemplateVector &A) const
+	ndTemplateVector<T> DotProduct (const ndTemplateVector &A) const
 	{
 		T val (m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
-		return dTemplateVector<T> (val, val, val, val);
+		return ndTemplateVector<T> (val, val, val, val);
 	}
 
 
@@ -185,14 +185,14 @@ class dTemplateVector: public dClassAlloc
 		return dMax(dMax(m_x, m_y), dMax(m_z, m_w));
 	}
 
-	dTemplateVector<T> GetMax(const dTemplateVector<T>& data) const
+	ndTemplateVector<T> GetMax(const ndTemplateVector<T>& data) const
 	{
-		return dTemplateVector<T>((m_x > data.m_x) ? m_x : data.m_x, (m_y > data.m_y) ? m_y : data.m_y, (m_z > data.m_z) ? m_z : data.m_z,	(m_w > data.m_w) ? m_w : data.m_w);
+		return ndTemplateVector<T>((m_x > data.m_x) ? m_x : data.m_x, (m_y > data.m_y) ? m_y : data.m_y, (m_z > data.m_z) ? m_z : data.m_z,	(m_w > data.m_w) ? m_w : data.m_w);
 	}
 
-	dTemplateVector<T> GetMin(const dTemplateVector<T>& data) const
+	ndTemplateVector<T> GetMin(const ndTemplateVector<T>& data) const
 	{
-		return dTemplateVector<T>((m_x < data.m_x) ? m_x : data.m_x, (m_y < data.m_y) ? m_y : data.m_y, (m_z < data.m_z) ? m_z : data.m_z,	(m_w < data.m_w) ? m_w : data.m_w);
+		return ndTemplateVector<T>((m_x < data.m_x) ? m_x : data.m_x, (m_y < data.m_y) ? m_y : data.m_y, (m_z < data.m_z) ? m_z : data.m_z,	(m_w < data.m_w) ? m_w : data.m_w);
 	}
 
 	// check validity of floats

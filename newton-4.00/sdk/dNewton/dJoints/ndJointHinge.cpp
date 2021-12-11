@@ -15,7 +15,7 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointHinge)
 
-ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	,m_angle(dFloat32(0.0f))
 	,m_omega(dFloat32(0.0f))
@@ -30,7 +30,7 @@ ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 {
 }
 
-ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotInChild, const dMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotInChild)
 	,m_angle(dFloat32(0.0f))
 	,m_omega(dFloat32(0.0f))
@@ -43,13 +43,13 @@ ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotInChild, const dMatrix& pin
 	,m_hasLimits(false)
 	,m_isSpringDamper(false)
 {
-	dMatrix tmp;
+	ndMatrix tmp;
 	CalculateLocalMatrix(pinAndPivotInChild, m_localMatrix0, tmp);
 	CalculateLocalMatrix(pinAndPivotInParent, tmp, m_localMatrix1);
 }
 
-ndJointHinge::ndJointHinge(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+ndJointHinge::ndJointHinge(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_angle(dFloat32(0.0f))
 	,m_omega(dFloat32(0.0f))
 	,m_springK(dFloat32(0.0f))
@@ -122,7 +122,7 @@ void ndJointHinge::SetAsSpringDamper(bool state, dFloat32 regularizer, dFloat32 
 	m_maxDof = (m_isSpringDamper && m_hasLimits) ? 7 : 6;
 }
 
-void ndJointHinge::SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
+void ndJointHinge::SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	if ((m_minLimit > dFloat32 (-1.e-4f)) && (m_maxLimit < dFloat32(1.e-4f)))
 	{
@@ -160,7 +160,7 @@ void ndJointHinge::SubmitConstraintLimits(ndConstraintDescritor& desc, const dMa
 	}
 }
 
-void ndJointHinge::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& )
+void ndJointHinge::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& )
 {
 	// add spring damper row
 	AddAngularRowJacobian(desc, matrix0.m_front, -m_angle);
@@ -189,8 +189,8 @@ void ndJointHinge::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc
 
 void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
@@ -198,8 +198,8 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 
 	// save the current joint Omega
-	dVector omega0(m_body0->GetOmega());
-	dVector omega1(m_body1->GetOmega());
+	ndVector omega0(m_body0->GetOmega());
+	ndVector omega1(m_body1->GetOmega());
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
 	const dFloat32 deltaAngle = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_angle);
@@ -241,12 +241,12 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointHinge::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndJointHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "springK", m_springK);
 	xmlSaveParam(childNode, "damperC", m_damperC);

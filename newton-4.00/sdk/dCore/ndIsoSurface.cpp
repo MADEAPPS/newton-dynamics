@@ -25,7 +25,7 @@
 #include "ndMatrix.h"
 #include "ndIsoSurface.h"
 
-const dInt32 dIsoSurface::m_edgeTable[256] =
+const dInt32 ndIsoSurface::m_edgeTable[256] =
 {
 	0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,
 	0x80c, 0x905, 0xa0f, 0xb06, 0xc0a, 0xd03, 0xe09, 0xf00,
@@ -61,7 +61,7 @@ const dInt32 dIsoSurface::m_edgeTable[256] =
 	0x70c, 0x605, 0x50f, 0x406, 0x30a, 0x203, 0x109, 0x0
 };
 
-const dInt32 dIsoSurface::m_triangleTable[256][16] =
+const dInt32 ndIsoSurface::m_triangleTable[256][16] =
 {
 	{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
 	{ 0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
@@ -321,8 +321,8 @@ const dInt32 dIsoSurface::m_triangleTable[256][16] =
 	{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }
 };
 
-dIsoSurface::dIsoSurface()
-	:m_origin(dVector::m_zero)
+ndIsoSurface::ndIsoSurface()
+	:m_origin(ndVector::m_zero)
 	,m_points(1024)
 	,m_normals(1024)
 	,m_trianglesList(1024)
@@ -335,13 +335,13 @@ dIsoSurface::dIsoSurface()
 {
 }
 
-dIsoSurface::~dIsoSurface()
+ndIsoSurface::~ndIsoSurface()
 {
 }
 
-void dIsoSurface::Begin(const dVector& origin, dFloat32 isovalue, dFloat32 gridSize, dInt32 sizex, dInt32 sizey, dInt32 sizez)
+void ndIsoSurface::Begin(const ndVector& origin, dFloat32 isovalue, dFloat32 gridSize, dInt32 sizex, dInt32 sizey, dInt32 sizez)
 {
-	m_origin = origin & dVector::m_triplexMask;
+	m_origin = origin & ndVector::m_triplexMask;
 	m_xCellSize = sizex;
 	m_yCellSize = sizey;
 	m_zCellSize = sizez;
@@ -352,19 +352,19 @@ void dIsoSurface::Begin(const dVector& origin, dFloat32 isovalue, dFloat32 gridS
 	m_trianglesList.SetCount(0);
 }
 
-void dIsoSurface::End()
+void ndIsoSurface::End()
 {
 	RemapIndexList();
 	CalculateNormals();
 }
 
-dUnsigned64 dIsoSurface::GetVertexID(dInt32 gridX, dInt32 gridY, dInt32 gridZ)
+dUnsigned64 ndIsoSurface::GetVertexID(dInt32 gridX, dInt32 gridY, dInt32 gridZ)
 {
 	//return 3 * (gridZ*(m_nCellsY + 1)*(m_nCellsX + 1) + gridY*(m_nCellsX + 1) + gridX);
 	return 3 * (m_xCellSize * dUnsigned64(gridZ * m_yCellSize + gridY) + gridX);
 }
 
-dUnsigned64 dIsoSurface::GetEdgeID(const dIsoCell& cell, dInt32 edgeCode)
+dUnsigned64 ndIsoSurface::GetEdgeID(const ndIsoCell& cell, dInt32 edgeCode)
 {
 	const dInt32 gridX = cell.m_x;
 	const dInt32 gridY = cell.m_y;
@@ -401,16 +401,16 @@ dUnsigned64 dIsoSurface::GetEdgeID(const dIsoCell& cell, dInt32 edgeCode)
 	}
 }
 
-dVector dIsoSurface::InterpolateEdge(dFloat32 fX1, dFloat32 fY1, dFloat32 fZ1, dFloat32 fX2, dFloat32 fY2, dFloat32 fZ2, dFloat32 tVal1, dFloat32 tVal2)
+ndVector ndIsoSurface::InterpolateEdge(dFloat32 fX1, dFloat32 fY1, dFloat32 fZ1, dFloat32 fX2, dFloat32 fY2, dFloat32 fZ2, dFloat32 tVal1, dFloat32 tVal2)
 {
 	dFloat32 mu = (m_isoValue - tVal1) / (tVal2 - tVal1);
 	dFloat32 x = fX1 + mu*(fX2 - fX1);
 	dFloat32 y = fY1 + mu*(fY2 - fY1);
 	dFloat32 z = fZ1 + mu*(fZ2 - fZ1);
-	return dVector(x, y, z, dFloat32 (0.0f));
+	return ndVector(x, y, z, dFloat32 (0.0f));
 }
 
-dVector dIsoSurface::CalculateIntersection(const dIsoCell& cell, dInt32 edgeCode)
+ndVector ndIsoSurface::CalculateIntersection(const ndIsoCell& cell, dInt32 edgeCode)
 {
 	dInt32 v1x = cell.m_x;
 	dInt32 v1y = cell.m_y;
@@ -495,7 +495,7 @@ dVector dIsoSurface::CalculateIntersection(const dIsoCell& cell, dInt32 edgeCode
 	return InterpolateEdge(x1, y1, z1, x2, y2, z2, val1, val2);
 }
 
-void dIsoSurface::ProcessCell(const dIsoCell& cell)
+void ndIsoSurface::ProcessCell(const ndIsoCell& cell)
 {
 	dAssert(cell.m_x < m_xCellSize - 1);
 	dAssert(cell.m_y < m_yCellSize - 1);
@@ -525,21 +525,21 @@ void dIsoSurface::ProcessCell(const dIsoCell& cell)
 	{
 		if (edgeBits & 8)
 		{
-			dVector pt (CalculateIntersection(cell, 3));
+			ndVector pt (CalculateIntersection(cell, 3));
 			dUnsigned64 id = GetEdgeID(cell, 3);
 			dAssert(!m_vertexMap.Find(id));
 			m_vertexMap.Insert(pt, id);
 		}
 		if (edgeBits & 1)
 		{
-			dVector pt (CalculateIntersection(cell, 0));
+			ndVector pt (CalculateIntersection(cell, 0));
 			dUnsigned64 id = GetEdgeID(cell, 0);
 			dAssert(!m_vertexMap.Find(id));
 			m_vertexMap.Insert(pt, id);
 		}
 		if (edgeBits & 256)
 		{
-			dVector pt (CalculateIntersection(cell, 8));
+			ndVector pt (CalculateIntersection(cell, 8));
 			dUnsigned64 id = GetEdgeID(cell, 8);
 			dAssert(!m_vertexMap.Find(id));
 			m_vertexMap.Insert(pt, id);
@@ -547,7 +547,7 @@ void dIsoSurface::ProcessCell(const dIsoCell& cell)
 	
 		for (dInt32 i = 0; m_triangleTable[tableIndex][i] != -1; i += 3)
 		{
-			dIsoTriangle triangle;
+			ndIsoTriangle triangle;
 			dUnsigned64 pointID0 = GetEdgeID(cell, m_triangleTable[tableIndex][i + 0]);
 			dUnsigned64 pointID1 = GetEdgeID(cell, m_triangleTable[tableIndex][i + 1]);
 			dUnsigned64 pointID2 = GetEdgeID(cell, m_triangleTable[tableIndex][i + 2]);
@@ -559,16 +559,16 @@ void dIsoSurface::ProcessCell(const dIsoCell& cell)
 	}
 }
 
-void dIsoSurface::RemapIndexList()
+void ndIsoSurface::RemapIndexList()
 {
 	dInt32 nextID = 0;
 
 	// calculate monotonic index list
 	m_points.SetCount(m_vertexMap.GetCount());
-	dIsoVertexMap::Iterator iter(m_vertexMap);
+	ndIsoVertexMap::Iterator iter(m_vertexMap);
 	for (iter.Begin(); iter; iter++)
 	{
-		dVector& point = iter.GetNode()->GetInfo();
+		ndVector& point = iter.GetNode()->GetInfo();
 		m_points[nextID] = point + m_origin;
 		dAssert(m_points[nextID].m_w == dFloat32(0.0f));
 		point.m_w = dFloat32(nextID);
@@ -580,7 +580,7 @@ void dIsoSurface::RemapIndexList()
 	{
 		for (dInt32 i = 0; i < 3; i++)
 		{
-			dIsoVertexMap::dNode* const node = m_vertexMap.Find(m_trianglesList[k].m_pointId[i]);
+			ndIsoVertexMap::ndNode* const node = m_vertexMap.Find(m_trianglesList[k].m_pointId[i]);
 			dAssert(node);
 			dInt32 id = dInt32 (node->GetInfo().m_w);
 			m_trianglesList[k].m_pointId[i] = id;
@@ -589,23 +589,23 @@ void dIsoSurface::RemapIndexList()
 	m_vertexMap.RemoveAll();
 }
 
-void dIsoSurface::CalculateNormals()
+void ndIsoSurface::CalculateNormals()
 {
 	m_normals.SetCount(m_points.GetCount());
 
 	// Set all normals to 0.
 	if (m_normals.GetCount())
 	{
-		memset(&m_normals[0], 0, m_normals.GetCount() * sizeof(dVector));
+		memset(&m_normals[0], 0, m_normals.GetCount() * sizeof(ndVector));
 
 		for (dInt32 i = 0; i < m_trianglesList.GetCount(); i++)
 		{
 			dInt32 id0 = dInt32(m_trianglesList[i].m_pointId[0]);
 			dInt32 id1 = dInt32(m_trianglesList[i].m_pointId[1]);
 			dInt32 id2 = dInt32(m_trianglesList[i].m_pointId[2]);
-			dVector vec1(m_points[id1] - m_points[id0]);
-			dVector vec2(m_points[id2] - m_points[id0]);
-			dVector normal = vec1.CrossProduct(vec2);
+			ndVector vec1(m_points[id1] - m_points[id0]);
+			ndVector vec2(m_points[id2] - m_points[id0]);
+			ndVector normal = vec1.CrossProduct(vec2);
 			m_normals[id0] += normal;
 			m_normals[id1] += normal;
 			m_normals[id2] += normal;

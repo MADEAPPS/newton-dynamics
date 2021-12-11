@@ -23,10 +23,10 @@
 #include "ndTypes.h"
 #include "ndMemory.h"
 
-dAtomic<dUnsigned64> dMemory::m_memoryUsed(0);
+ndAtomic<dUnsigned64> ndMemory::m_memoryUsed(0);
 
-static dMemFreeCallback m_freeMemory = free;
-static dMemAllocCallback m_allocMemory = malloc;
+static ndMemFreeCallback m_freeMemory = free;
+static ndMemAllocCallback m_allocMemory = malloc;
 
 class dMemoryHeader
 {
@@ -38,12 +38,12 @@ class dMemoryHeader
 #define D_MEMORY_ALIGMNET 32
 #define dGetBufferSize dInt32(D_MEMORY_ALIGMNET - 1 + sizeof (dMemoryHeader))
 
-dInt32 dMemory::CalculateBufferSize(size_t size)
+dInt32 ndMemory::CalculateBufferSize(size_t size)
 {
 	return dInt32 (size + dGetBufferSize);
 }
 
-void* dMemory::Malloc(size_t size)
+void* ndMemory::Malloc(size_t size)
 {
 	size += dGetBufferSize;
 	void* const ptr = m_allocMemory(size);
@@ -58,25 +58,25 @@ void* dMemory::Malloc(size_t size)
 	return ret;
 }
 
-void dMemory::Free(void* const ptr)
+void ndMemory::Free(void* const ptr)
 {
 	dMemoryHeader* const ret = ((dMemoryHeader*)ptr) - 1;
 	m_memoryUsed.fetch_sub(ret->m_size);
 	m_freeMemory(ret->m_ptr);
 }
 
-dInt32 dMemory::GetSize(void* const ptr)
+dInt32 ndMemory::GetSize(void* const ptr)
 {
 	dMemoryHeader* const ret = ((dMemoryHeader*)ptr) - 1;
 	return ret->m_size;
 }
 
-dUnsigned64 dMemory::GetMemoryUsed()
+dUnsigned64 ndMemory::GetMemoryUsed()
 {
 	return m_memoryUsed.load();
 }
 
-void dMemory::SetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free)
+void ndMemory::SetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free)
 {
 	m_allocMemory = alloc;
 	m_freeMemory = free;

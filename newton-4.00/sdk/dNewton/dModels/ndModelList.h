@@ -25,11 +25,11 @@
 #include "ndNewtonStdafx.h"
 
 class ndModel;
-class ndModelList : public dList<ndModel*, dContainersFreeListAlloc<ndModel*>>
+class ndModelList : public ndList<ndModel*, ndContainersFreeListAlloc<ndModel*>>
 {
 	public:
 	ndModelList()
-		:dList<ndModel*, dContainersFreeListAlloc<ndModel*>>()
+		:ndList<ndModel*, ndContainersFreeListAlloc<ndModel*>>()
 	{
 	}
 };

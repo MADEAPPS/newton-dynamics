@@ -26,8 +26,8 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyNotify)
 
-ndBodyNotify::ndBodyNotify(const dLoadSaveBase::dLoadDescriptor& desc)
-	:dContainersFreeListAlloc<ndBodyNotify>()
+ndBodyNotify::ndBodyNotify(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndContainersFreeListAlloc<ndBodyNotify>()
 	,m_body(nullptr)
 {
 	const nd::TiXmlNode* const rootNode = desc.m_rootNode;
@@ -40,17 +40,17 @@ void ndBodyNotify::OnApplyExternalForce(dInt32, dFloat32)
 	dAssert(body);
 	if (body->GetInvMass() > 0.0f)
 	{
-		dVector massMatrix(body->GetMassMatrix());
-		dVector force (m_defualtGravity.Scale(massMatrix.m_w));
+		ndVector massMatrix(body->GetMassMatrix());
+		ndVector force (m_defualtGravity.Scale(massMatrix.m_w));
 		body->SetForce(force);
-		body->SetTorque(dVector::m_zero);
+		body->SetTorque(ndVector::m_zero);
 
-		//dVector L(body->CalculateAngularMomentum());
+		//ndVector L(body->CalculateAngularMomentum());
 		//dTrace(("%f %f %f\n", L.m_x, L.m_y, L.m_z));
 	}
 }
 
-void ndBodyNotify::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndBodyNotify::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	//nd::TiXmlElement* const rootNode, const char* const
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());

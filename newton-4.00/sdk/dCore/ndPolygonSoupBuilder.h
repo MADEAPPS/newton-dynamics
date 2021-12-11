@@ -34,16 +34,16 @@
 #include "ndVector.h"
 #include "ndMatrix.h"
 
-class AdjacentdFace
+class ndAdjacentdFace
 {
 	public:
-	dPlane m_normal;
+	ndPlane m_normal;
 	dInt32 m_count;
 	dInt32 *m_index;
 	dInt64 m_edgeMap[256];
 };
 
-class dPolygonSoupBuilder: public dClassAlloc 
+class ndPolygonSoupBuilder: public ndClassAlloc 
 {
 	class dgFaceMap;
 	class dgFaceInfo;
@@ -51,9 +51,9 @@ class dPolygonSoupBuilder: public dClassAlloc
 	class dgPolySoupFilterAllocator;
 	public:
 
-	D_CORE_API dPolygonSoupBuilder ();
-	D_CORE_API dPolygonSoupBuilder (const dPolygonSoupBuilder& sopurce);
-	D_CORE_API ~dPolygonSoupBuilder ();
+	D_CORE_API ndPolygonSoupBuilder ();
+	D_CORE_API ndPolygonSoupBuilder (const ndPolygonSoupBuilder& sopurce);
+	D_CORE_API ~ndPolygonSoupBuilder ();
 
 	D_CORE_API void Begin();
 	D_CORE_API void End(bool optimize);
@@ -63,7 +63,7 @@ class dPolygonSoupBuilder: public dClassAlloc
 	D_CORE_API void SavePLY(const char* const fileName) const;
 
 	private:
-	void Optimize(dInt32 faceId, const dgFaceBucket& faceBucket, const dPolygonSoupBuilder& source);
+	void Optimize(dInt32 faceId, const dgFaceBucket& faceBucket, const ndPolygonSoupBuilder& source);
 
 	void Finalize();
 	void OptimizeByIndividualFaces();
@@ -73,39 +73,39 @@ class dPolygonSoupBuilder: public dClassAlloc
 	void PackArray();
 
 	public:
-	class dgVertexArray: public dArray<dBigVector>
+	class ndVertexArray: public ndArray<ndBigVector>
 	{	
 		public:
-		dgVertexArray()
-			:dArray<dBigVector>()
+		ndVertexArray()
+			:ndArray<ndBigVector>()
 		{
 		}
 
-		dgVertexArray(dInt32 count)
-			:dArray<dBigVector>(count)
+		ndVertexArray(dInt32 count)
+			:ndArray<ndBigVector>(count)
 		{
 		}
 	};
 
-	class dgIndexArray: public dArray<dInt32>
+	class ndIndexArray: public ndArray<dInt32>
 	{
 		public:
-		dgIndexArray()
-			:dArray<dInt32>()
+		ndIndexArray()
+			:ndArray<dInt32>()
 		{
 		}
 
-		dgIndexArray(dInt32 count)
-			:dArray<dInt32>(count)
+		ndIndexArray(dInt32 count)
+			:ndArray<dInt32>(count)
 		{
 		}
 	};
 
-	dgIndexArray m_faceVertexCount;
-	dgIndexArray m_vertexIndex;
-	dgIndexArray m_normalIndex;
-	dgVertexArray m_vertexPoints;
-	dgVertexArray m_normalPoints;
+	ndIndexArray m_faceVertexCount;
+	ndIndexArray m_vertexIndex;
+	ndIndexArray m_normalIndex;
+	ndVertexArray m_vertexPoints;
+	ndVertexArray m_normalPoints;
 	dInt32 m_run;
 };
 

@@ -48,7 +48,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 		20,21,22,  22,23,20     // v4-v7-v6, v6-v5-v4 (back)
 	};
 
-	dMatrix texMatrix(dGetIdentityMatrix());
+	ndMatrix texMatrix(dGetIdentityMatrix());
 	texMatrix[1][1] = -1.0f;
 	texMatrix[1][3] = size;
 	m_textureMatrix = glMatrix(texMatrix);
@@ -141,7 +141,7 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 	unsigned lImageSize = width * height * sDepth;
 	
 	// Allocate memory and check for success
-	char* const pBits = (char*)dMemory::Malloc(width * height * sizeof(dInt32));
+	char* const pBits = (char*)ndMemory::Malloc(width * height * sizeof(dInt32));
 	if (pBits == nullptr)
 	{
 		dAssert(0);
@@ -170,7 +170,7 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 	
 	// Done with File
 	fclose(pFile);
-	dMemory::Free(pBits);
+	ndMemory::Free(pBits);
 }
 
 void ndSkyBox::SetupCubeMap()
@@ -217,7 +217,7 @@ ndSkyBox::~ndSkyBox()
 	}
 }
 
-void ndSkyBox::Render(dFloat32, ndDemoEntityManager* const scene, const dMatrix&) const
+void ndSkyBox::Render(dFloat32, ndDemoEntityManager* const scene, const ndMatrix&) const
 {
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
@@ -225,11 +225,11 @@ void ndSkyBox::Render(dFloat32, ndDemoEntityManager* const scene, const dMatrix&
 
 	ndDemoCamera* const camera = scene->GetCamera();
 	
-	dMatrix skyMatrix(dGetIdentityMatrix());
-	dMatrix viewMatrix(camera->GetViewMatrix());
-	skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, 0.0f, 1.0f));
+	ndMatrix skyMatrix(dGetIdentityMatrix());
+	ndMatrix viewMatrix(camera->GetViewMatrix());
+	skyMatrix.m_posit = viewMatrix.UntransformVector(ndVector(0.0f, 0.25f, 0.0f, 1.0f));
 
-	//dMatrix viewModelMatrix(skyMatrix * camera->GetViewMatrix());
+	//ndMatrix viewModelMatrix(skyMatrix * camera->GetViewMatrix());
 	const glMatrix projectionViewModelMatrix(skyMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 	
 	glUseProgram(m_shader);

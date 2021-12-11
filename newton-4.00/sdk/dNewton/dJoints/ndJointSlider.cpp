@@ -15,7 +15,7 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointSlider)
 
-ndJointSlider::ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointSlider::ndJointSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 	,m_posit(dFloat32 (0.0f))
 	,m_speed(dFloat32(0.0f))
@@ -30,8 +30,8 @@ ndJointSlider::ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* c
 {
 }
 
-ndJointSlider::ndJointSlider(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+ndJointSlider::ndJointSlider(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_posit(dFloat32(0.0f))
 	,m_speed(dFloat32(0.0f))
 	,m_springK(dFloat32(0.0f))
@@ -104,7 +104,7 @@ void ndJointSlider::SetAsSpringDamper(bool state, dFloat32 regularizer, dFloat32
 	m_maxDof = (m_isSpringDamper && m_hasLimits) ? 7 : 6;
 }
 
-void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
+void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	if ((m_minLimit == dFloat32 (0.0f)) && (m_maxLimit == dFloat32(0.0f)))
 	{
@@ -115,7 +115,7 @@ void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dM
 		dFloat32 x = m_posit + m_speed * desc.m_timestep;
 		if (x < m_minLimit)
 		{
-			dVector p1(matrix1.m_posit + matrix1.m_front.Scale (m_minLimit));
+			ndVector p1(matrix1.m_posit + matrix1.m_front.Scale (m_minLimit));
 			AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
 			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			const dFloat32 penetration = x - m_minLimit;
@@ -143,7 +143,7 @@ void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dM
 	}
 }
 
-void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
+void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	// add spring damper row
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
@@ -152,7 +152,7 @@ void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& des
 	dFloat32 x = m_posit + m_speed * desc.m_timestep;
 	if (x < m_minLimit)
 	{
-		const dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_minLimit));
+		const ndVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_minLimit));
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
 		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		const dFloat32 penetration = x - m_minLimit;
@@ -162,7 +162,7 @@ void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& des
 	}
 	else if (x > m_maxLimit)
 	{
-		const dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_maxLimit));
+		const ndVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_maxLimit));
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
 		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		const dFloat32 penetration = x - m_maxLimit;
@@ -174,25 +174,25 @@ void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& des
 
 void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	// calculate position and speed	
-	const dVector veloc0(m_body0->GetVelocityAtPoint(matrix0.m_posit));
-	const dVector veloc1(m_body1->GetVelocityAtPoint(matrix1.m_posit));
+	const ndVector veloc0(m_body0->GetVelocityAtPoint(matrix0.m_posit));
+	const ndVector veloc1(m_body1->GetVelocityAtPoint(matrix1.m_posit));
 
-	const dVector& pin = matrix1[0];
-	const dVector& p0 = matrix0.m_posit;
-	const dVector& p1 = matrix1.m_posit;
-	const dVector prel(p0 - p1);
-	const dVector vrel(veloc0 - veloc1);
+	const ndVector& pin = matrix1[0];
+	const ndVector& p0 = matrix0.m_posit;
+	const ndVector& p1 = matrix1.m_posit;
+	const ndVector prel(p0 - p1);
+	const ndVector vrel(veloc0 - veloc1);
 
 	m_speed = vrel.DotProduct(matrix1.m_front).GetScalar();
 	m_posit = prel.DotProduct(matrix1.m_front).GetScalar();
-	const dVector projectedPoint = p1 + pin.Scale(pin.DotProduct(prel).GetScalar());
+	const ndVector projectedPoint = p1 + pin.Scale(pin.DotProduct(prel).GetScalar());
 
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[1]);
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[2]);
@@ -235,12 +235,12 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointSlider::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndJointSlider::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "springK", m_springK);
 	xmlSaveParam(childNode, "damperC", m_damperC);

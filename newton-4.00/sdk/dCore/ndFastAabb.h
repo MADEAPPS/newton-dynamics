@@ -28,86 +28,86 @@
 #include "ndMatrix.h"
 
 D_MSV_NEWTON_ALIGN_32 
-class dFastAabb : public dMatrix
+class ndFastAabb : public ndMatrix
 {
 	public:
-	dFastAabb();
-	dFastAabb(const dVector& p0, const dVector& p1);
-	dFastAabb(const dMatrix& matrix, const dVector& size);
+	ndFastAabb();
+	ndFastAabb(const ndVector& p0, const ndVector& p1);
+	ndFastAabb(const ndMatrix& matrix, const ndVector& size);
 
-	const dVector& GetOrigin() const;
-	const dVector& GetTarget() const;
+	const ndVector& GetOrigin() const;
+	const ndVector& GetTarget() const;
 
 	void SetSeparatingDistance(const dFloat32 distance);
-	void SetTransposeAbsMatrix(const dMatrix& matrix);
+	void SetTransposeAbsMatrix(const ndMatrix& matrix);
 
-	D_CORE_API dFloat32 PolygonBoxDistance(const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const;
-	D_CORE_API dFloat32 PolygonBoxRayDistance(const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, const dFastRay& ray) const;
+	D_CORE_API dFloat32 PolygonBoxDistance(const ndVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const;
+	D_CORE_API dFloat32 PolygonBoxRayDistance(const ndVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, const ndFastRay& ray) const;
 
 	private:
-	dMatrix MakeFaceMatrix(const dVector& faceNormal, dInt32, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const;
-	void MakeBox1(dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, dVector& minBox, dVector& maxBox) const;
-	void MakeBox2(const dMatrix& faceMatrix, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, dVector& minBox, dVector& maxBox) const;
+	ndMatrix MakeFaceMatrix(const ndVector& faceNormal, dInt32, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const;
+	void MakeBox1(dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, ndVector& minBox, ndVector& maxBox) const;
+	void MakeBox2(const ndMatrix& faceMatrix, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, ndVector& minBox, ndVector& maxBox) const;
 
 	protected:
-	dMatrix m_absDir;
-	dVector m_p0;
-	dVector m_p1;
-	dVector m_size;
-	mutable dVector m_separationDistance;
+	ndMatrix m_absDir;
+	ndVector m_p0;
+	ndVector m_p1;
+	ndVector m_size;
+	mutable ndVector m_separationDistance;
 
-	friend class dAabbPolygonSoup;
+	friend class ndAabbPolygonSoup;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-inline dFastAabb::dFastAabb()
-	:dMatrix(dGetIdentityMatrix())
+inline ndFastAabb::ndFastAabb()
+	:ndMatrix(dGetIdentityMatrix())
 	,m_absDir(dGetIdentityMatrix())
-	,m_p0(dVector::m_zero)
-	,m_p1(dVector::m_zero)
-	,m_size(dVector::m_zero)
+	,m_p0(ndVector::m_zero)
+	,m_p1(ndVector::m_zero)
+	,m_size(ndVector::m_zero)
 	,m_separationDistance(dFloat32(1.0e10f))
 {
 }
 
-inline dFastAabb::dFastAabb(const dMatrix& matrix, const dVector& size)
-	:dMatrix(matrix)
+inline ndFastAabb::ndFastAabb(const ndMatrix& matrix, const ndVector& size)
+	:ndMatrix(matrix)
 	,m_separationDistance(dFloat32(1.0e10f))
 {
 	SetTransposeAbsMatrix(matrix);
-	m_size = dVector(matrix[0].Abs().Scale(size.m_x) + matrix[1].Abs().Scale(size.m_y) + matrix[2].Abs().Scale(size.m_z));
-	m_p0 = (matrix[3] - m_size) & dVector::m_triplexMask;
-	m_p1 = (matrix[3] + m_size) & dVector::m_triplexMask;
+	m_size = ndVector(matrix[0].Abs().Scale(size.m_x) + matrix[1].Abs().Scale(size.m_y) + matrix[2].Abs().Scale(size.m_z));
+	m_p0 = (matrix[3] - m_size) & ndVector::m_triplexMask;
+	m_p1 = (matrix[3] + m_size) & ndVector::m_triplexMask;
 }
 
-inline dFastAabb::dFastAabb(const dVector& p0, const dVector& p1)
-	:dMatrix(dGetIdentityMatrix())
+inline ndFastAabb::ndFastAabb(const ndVector& p0, const ndVector& p1)
+	:ndMatrix(dGetIdentityMatrix())
 	,m_absDir(dGetIdentityMatrix())
 	,m_p0(p0)
 	,m_p1(p1)
-	,m_size(dVector::m_half * (p1 - p0))
+	,m_size(ndVector::m_half * (p1 - p0))
 	,m_separationDistance(dFloat32(1.0e10f))
 {
-	m_posit = (dVector::m_half * (p1 + p0)) | dVector::m_wOne;
+	m_posit = (ndVector::m_half * (p1 + p0)) | ndVector::m_wOne;
 	dAssert(m_size.m_w == dFloat32(0.0f));
 	dAssert(m_posit.m_w == dFloat32(1.0f));
 }
 
-inline const dVector& dFastAabb::GetOrigin() const
+inline const ndVector& ndFastAabb::GetOrigin() const
 {
 	return m_p0;
 }
 
-inline const dVector& dFastAabb::GetTarget() const
+inline const ndVector& ndFastAabb::GetTarget() const
 {
 	return m_p1;
 }
 
-inline void dFastAabb::SetSeparatingDistance(const dFloat32 distance)
+inline void ndFastAabb::SetSeparatingDistance(const dFloat32 distance)
 {
 	m_separationDistance = distance;
 }
 
-inline void dFastAabb::SetTransposeAbsMatrix(const dMatrix& matrix)
+inline void ndFastAabb::SetTransposeAbsMatrix(const ndMatrix& matrix)
 {
 	m_absDir = matrix.Transpose();
 	m_absDir[0] = m_absDir[0].Abs();

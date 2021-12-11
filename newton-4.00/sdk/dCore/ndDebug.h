@@ -32,8 +32,8 @@
 #endif
 
 #ifdef DG_TRACE
-	D_CORE_API void dgExpandTraceMessage(const char* const fmt, ...);
-	#define dTrace(x) dgExpandTraceMessage x;
+	D_CORE_API void ndExpandTraceMessage(const char* const fmt, ...);
+	#define dTrace(x) ndExpandTraceMessage x;
 #else
 	#define dTrace(x);
 #endif

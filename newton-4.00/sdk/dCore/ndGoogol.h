@@ -34,34 +34,34 @@
 //#define ND_GOOGOL_SIZE	16
 #define ND_GOOGOL_SIZE		4
 
-class dGoogol
+class ndGoogol
 {
 	public:
 	D_OPERATOR_NEW_AND_DELETE
 
-	dGoogol(void);
-	dGoogol(dFloat64 value);
+	ndGoogol(void);
+	ndGoogol(dFloat64 value);
 
 	operator double() const;	
-	dGoogol operator+ (const dGoogol &A) const; 
-	dGoogol operator- (const dGoogol &A) const; 
-	dGoogol operator* (const dGoogol &A) const; 
-	dGoogol operator/ (const dGoogol &A) const; 
+	ndGoogol operator+ (const ndGoogol &A) const; 
+	ndGoogol operator- (const ndGoogol &A) const; 
+	ndGoogol operator* (const ndGoogol &A) const; 
+	ndGoogol operator/ (const ndGoogol &A) const; 
 
-	dGoogol operator+= (const dGoogol &A); 
-	dGoogol operator-= (const dGoogol &A); 
+	ndGoogol operator+= (const ndGoogol &A); 
+	ndGoogol operator-= (const ndGoogol &A); 
 
-	bool operator> (const dGoogol &A) const; 
-	bool operator>= (const dGoogol &A) const; 
-	bool operator< (const dGoogol &A) const; 
-	bool operator<= (const dGoogol &A) const; 
-	bool operator== (const dGoogol &A) const; 
-	bool operator!= (const dGoogol &A) const; 
+	bool operator> (const ndGoogol &A) const; 
+	bool operator>= (const ndGoogol &A) const; 
+	bool operator< (const ndGoogol &A) const; 
+	bool operator<= (const ndGoogol &A) const; 
+	bool operator== (const ndGoogol &A) const; 
+	bool operator!= (const ndGoogol &A) const; 
 
-	dGoogol Abs () const;
-	dGoogol Sqrt () const;
-	dGoogol InvSqrt () const;
-	dGoogol Floor () const;
+	ndGoogol Abs () const;
+	ndGoogol Sqrt () const;
+	ndGoogol InvSqrt () const;
+	ndGoogol Floor () const;
 	
 	void Trace () const;
 	void ToString (char* const string) const;
@@ -83,42 +83,42 @@ class dGoogol
 	dUnsigned64 m_mantissa[ND_GOOGOL_SIZE];
 
 	public:
-	D_CORE_API static dGoogol m_zero; 
-	D_CORE_API static dGoogol m_one; 
-	D_CORE_API static dGoogol m_two; 
-	D_CORE_API static dGoogol m_three; 
-	D_CORE_API static dGoogol m_half; 
+	D_CORE_API static ndGoogol m_zero; 
+	D_CORE_API static ndGoogol m_one; 
+	D_CORE_API static ndGoogol m_two; 
+	D_CORE_API static ndGoogol m_three; 
+	D_CORE_API static ndGoogol m_half; 
 };
 
-class dHugeVector: public dTemplateVector<dGoogol>
+class ndHugeVector: public ndTemplateVector<ndGoogol>
 {
 	public:
-	dHugeVector ()
-		:dTemplateVector<dGoogol>()
+	ndHugeVector ()
+		:ndTemplateVector<ndGoogol>()
 	{
 	}
 
-	dHugeVector (const dBigVector& a)
-		:dTemplateVector<dGoogol>(dGoogol (a.m_x), dGoogol (a.m_y), dGoogol (a.m_z), dGoogol (a.m_w))
+	ndHugeVector (const ndBigVector& a)
+		:ndTemplateVector<ndGoogol>(ndGoogol (a.m_x), ndGoogol (a.m_y), ndGoogol (a.m_z), ndGoogol (a.m_w))
 	{
 	}
 
-	dHugeVector (const dTemplateVector<dGoogol>& a)
-		:dTemplateVector<dGoogol>(a)
+	ndHugeVector (const ndTemplateVector<ndGoogol>& a)
+		:ndTemplateVector<ndGoogol>(a)
 	{
 	}
 
-	dHugeVector (dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w)
-		:dTemplateVector<dGoogol>(x, y, z, w)
+	ndHugeVector (dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w)
+		:ndTemplateVector<ndGoogol>(x, y, z, w)
 	{
 	}
 
-	dHugeVector(const dGoogol& x, const dGoogol& y, const dGoogol& z, const dGoogol& w)
-		:dTemplateVector<dGoogol>(x, y, z, w)
+	ndHugeVector(const ndGoogol& x, const ndGoogol& y, const ndGoogol& z, const ndGoogol& w)
+		:ndTemplateVector<ndGoogol>(x, y, z, w)
 	{
 	}
 
-	dGoogol EvaluePlane (const dHugeVector& point) const 
+	ndGoogol EvaluePlane (const ndHugeVector& point) const 
 	{
 		//return (point % (*this)) + m_w;
 		return DotProduct(point).GetScalar();

@@ -120,8 +120,8 @@ void ndPolygonMeshDesc::SortFaceArray()
 }
 
 ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)
-	:dFastAabb()
-	,m_boxDistanceTravelInMeshSpace(dVector::m_zero)
+	:ndFastAabb()
+	,m_boxDistanceTravelInMeshSpace(ndVector::m_zero)
 	,m_faceCount(0)
 	,m_vertexStrideInBytes(0)
 	,m_skinThickness(proxy.m_skinThickness)
@@ -135,12 +135,12 @@ ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)
 	,m_maxT(dFloat32 (1.0f))
 	,m_doContinuesCollisionTest(ccdMode)
 {
-	const dMatrix& hullMatrix = m_convexInstance->GetGlobalMatrix();
-	const dMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();
+	const ndMatrix& hullMatrix = m_convexInstance->GetGlobalMatrix();
+	const ndMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();
 	
-	dMatrix& matrix = *this;
+	ndMatrix& matrix = *this;
 	matrix = hullMatrix * soupMatrix.Inverse();
-	dMatrix convexMatrix (dGetIdentityMatrix());
+	ndMatrix convexMatrix (dGetIdentityMatrix());
 	
 	switch (m_polySoupInstance->GetScaleType())
 	{
@@ -151,21 +151,21 @@ ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)
 	
 		case ndShapeInstance::m_uniform:
 		{
-			const dVector& invScale = m_polySoupInstance->GetInvScale();
+			const ndVector& invScale = m_polySoupInstance->GetInvScale();
 			convexMatrix[0][0] = invScale.GetScalar();
 			convexMatrix[1][1] = invScale.GetScalar();
 			convexMatrix[2][2] = invScale.GetScalar();
-			matrix.m_posit = matrix.m_posit * (invScale | dVector::m_wOne);
+			matrix.m_posit = matrix.m_posit * (invScale | ndVector::m_wOne);
 			break;
 		}
 	
 		case ndShapeInstance::m_nonUniform:
 		{
-			const dVector& invScale = m_polySoupInstance->GetInvScale();
-			dMatrix tmp (matrix[0] * invScale, matrix[1] * invScale, matrix[2] * invScale, dVector::m_wOne);
+			const ndVector& invScale = m_polySoupInstance->GetInvScale();
+			ndMatrix tmp (matrix[0] * invScale, matrix[1] * invScale, matrix[2] * invScale, ndVector::m_wOne);
 			convexMatrix = tmp * matrix.Inverse();
-			convexMatrix.m_posit = dVector::m_wOne;
-			matrix.m_posit = matrix.m_posit * (invScale | dVector::m_wOne);
+			convexMatrix.m_posit = ndVector::m_wOne;
+			matrix.m_posit = matrix.m_posit * (invScale | ndVector::m_wOne);
 			break;
 		}
 	
@@ -176,15 +176,15 @@ ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)
 		}
 	}
 	
-	dMatrix fullMatrix (convexMatrix * matrix);
+	ndMatrix fullMatrix (convexMatrix * matrix);
 	m_convexInstance->CalculateAabb(fullMatrix, m_p0, m_p1);
 	
-	dVector p0;
-	dVector p1;
+	ndVector p0;
+	ndVector p1;
 	SetTransposeAbsMatrix(matrix);
 	m_convexInstance->CalculateAabb(convexMatrix, p0, p1);
-	m_size = dVector::m_half * (p1 - p0);
-	m_posit = matrix.TransformVector(dVector::m_half * (p1 + p0));
+	m_size = ndVector::m_half * (p1 - p0);
+	m_posit = matrix.TransformVector(ndVector::m_half * (p1 + p0));
 	dAssert (m_posit.m_w == dFloat32 (1.0f));
 }
 
@@ -193,7 +193,7 @@ ndShapeStaticMesh::ndShapeStaticMesh(ndShapeID id)
 {
 }
 
-ndShapeStaticMesh::ndShapeStaticMesh(const dLoadSaveBase::dLoadDescriptor&)
+ndShapeStaticMesh::ndShapeStaticMesh(const ndLoadSaveBase::dLoadDescriptor&)
 	:ndShape(m_staticMesh)
 {
 }
@@ -203,35 +203,35 @@ ndShapeStaticMesh::~ndShapeStaticMesh()
 {
 }
 
-void ndShapeStaticMesh::CalculateAabb(const dMatrix& matrix, dVector &p0, dVector &p1) const
+void ndShapeStaticMesh::CalculateAabb(const ndMatrix& matrix, ndVector &p0, ndVector &p1) const
 {
-	dVector origin(matrix.TransformVector(m_boxOrigin));
-	dVector size(matrix.m_front.Abs().Scale(m_boxSize.m_x) + matrix.m_up.Abs().Scale(m_boxSize.m_y) + matrix.m_right.Abs().Scale(m_boxSize.m_z));
+	ndVector origin(matrix.TransformVector(m_boxOrigin));
+	ndVector size(matrix.m_front.Abs().Scale(m_boxSize.m_x) + matrix.m_up.Abs().Scale(m_boxSize.m_y) + matrix.m_right.Abs().Scale(m_boxSize.m_z));
 
-	p0 = (origin - size) & dVector::m_triplexMask;
-	p1 = (origin + size) & dVector::m_triplexMask;
+	p0 = (origin - size) & ndVector::m_triplexMask;
+	p1 = (origin + size) & ndVector::m_triplexMask;
 }
 
 
-//dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 stride, const dPlane& localPlane, dVector* const contactsOut) const
-dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dFloat32* const, const dInt32* const, dInt32, dInt32, const dPlane&, dVector* const) const
+//dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 stride, const dPlane& localPlane, ndVector* const contactsOut) const
+dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dFloat32* const, const dInt32* const, dInt32, dInt32, const ndPlane&, ndVector* const) const
 {
 	dAssert(0);
 	return 0;
 	//dInt32 count = 0;
 	//dInt32 j = index[indexCount - 1] * stride;
-	//dVector p0(&vertex[j]);
-	//p0 = p0 & dVector::m_triplexMask;
+	//ndVector p0(&vertex[j]);
+	//p0 = p0 & ndVector::m_triplexMask;
 	//dFloat32 side0 = localPlane.Evalue(p0);
 	//for (dInt32 i = 0; i < indexCount; i++) {
 	//	j = index[i] * stride;
-	//	dVector p1(&vertex[j]);
-	//	p1 = p1 & dVector::m_triplexMask;
+	//	ndVector p1(&vertex[j]);
+	//	p1 = p1 & ndVector::m_triplexMask;
 	//	dFloat32 side1 = localPlane.Evalue(p1);
 	//
 	//	if (side0 < dFloat32(0.0f)) {
 	//		if (side1 >= dFloat32(0.0f)) {
-	//			dVector dp(p1 - p0);
+	//			ndVector dp(p1 - p0);
 	//			dAssert(dp.m_w == dFloat32(0.0f));
 	//			dFloat32 t = localPlane.DotProduct(dp).GetScalar();
 	//			dAssert(dgAbs(t) >= dFloat32(0.0f));
@@ -245,7 +245,7 @@ dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dFloat32* const, cons
 	//		}
 	//	}
 	//	else if (side1 <= dFloat32(0.0f)) {
-	//		dVector dp(p1 - p0);
+	//		ndVector dp(p1 - p0);
 	//		dAssert(dp.m_w == dFloat32(0.0f));
 	//		dFloat32 t = localPlane.DotProduct(dp).GetScalar();
 	//		dAssert(dgAbs(t) >= dFloat32(0.0f));
@@ -264,10 +264,10 @@ dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dFloat32* const, cons
 	//return count;
 }
 
-void ndShapeStaticMesh::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndShapeStaticMesh::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShape::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndShape::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }

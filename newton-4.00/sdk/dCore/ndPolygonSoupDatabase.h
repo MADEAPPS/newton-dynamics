@@ -26,7 +26,7 @@
 #include "ndTypes.h"
 #include "ndClassAlloc.h"
 
-class dPolygonSoupDatabase: public dClassAlloc
+class ndPolygonSoupDatabase: public ndClassAlloc
 {
 	public:
 	dFloat32 GetRadius() const;
@@ -38,35 +38,35 @@ class dPolygonSoupDatabase: public dClassAlloc
 	void SetTagId(const dInt32* const face, dInt32 indexCount, dUnsigned32 newID) const;
 		
 	protected:
-	dPolygonSoupDatabase(const char* const name = nullptr);
-	virtual ~dPolygonSoupDatabase ();
+	ndPolygonSoupDatabase(const char* const name = nullptr);
+	virtual ~ndPolygonSoupDatabase ();
 
 	dInt32 m_vertexCount;
 	dInt32 m_strideInBytes;
 	dFloat32* m_localVertex;
 };
 
-inline dInt32 dPolygonSoupDatabase::GetVertexCount()	const
+inline dInt32 ndPolygonSoupDatabase::GetVertexCount()	const
 {
 	return m_vertexCount;
 }
 
-inline dFloat32* dPolygonSoupDatabase::GetLocalVertexPool() const
+inline dFloat32* ndPolygonSoupDatabase::GetLocalVertexPool() const
 {
 	return m_localVertex;
 }
 
-inline dInt32 dPolygonSoupDatabase::GetStrideInBytes() const
+inline dInt32 ndPolygonSoupDatabase::GetStrideInBytes() const
 {
 	return m_strideInBytes;
 }
 
-inline dFloat32 dPolygonSoupDatabase::GetRadius() const
+inline dFloat32 ndPolygonSoupDatabase::GetRadius() const
 {
 	return dFloat32 (0.0f);
 }
 
-inline dUnsigned32 dPolygonSoupDatabase::GetTagId(const dInt32* const face, dInt32 indexCount) const
+inline dUnsigned32 ndPolygonSoupDatabase::GetTagId(const dInt32* const face, dInt32 indexCount) const
 {
 	return dUnsigned32(face[indexCount]);
 }

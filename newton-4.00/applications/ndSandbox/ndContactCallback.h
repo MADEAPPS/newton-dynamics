@@ -75,7 +75,7 @@ class ndContactCallback: public ndContactNotify
 
 	void PlaySoundTest(const ndContact* const contactJoint);
 
-	dTree<ndMaterial, ndMaterailKey> m_materialMap;
+	ndTree<ndMaterial, ndMaterailKey> m_materialMap;
 };
 
 

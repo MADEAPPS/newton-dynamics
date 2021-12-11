@@ -29,14 +29,14 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointBilateralConstraint)
 
-ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix)
+ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrix)
 	:ndConstraint()
 	//,dClassAlloc()
-	,dContainersFreeListAlloc<ndJointBilateralConstraint>()
-	,m_forceBody0(dVector::m_zero)
-	,m_torqueBody0(dVector::m_zero)
-	,m_forceBody1(dVector::m_zero)
-	,m_torqueBody1(dVector::m_zero)
+	,ndContainersFreeListAlloc<ndJointBilateralConstraint>()
+	,m_forceBody0(ndVector::m_zero)
+	,m_torqueBody0(ndVector::m_zero)
+	,m_forceBody1(ndVector::m_zero)
+	,m_torqueBody1(ndVector::m_zero)
 	,m_body0(body0)
 	,m_body1(body1)
 	,m_worldNode(nullptr)
@@ -67,14 +67,14 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKine
 	memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
 }
 
-ndJointBilateralConstraint::ndJointBilateralConstraint(const dLoadSaveBase::dLoadDescriptor& desc)
+ndJointBilateralConstraint::ndJointBilateralConstraint(const ndLoadSaveBase::dLoadDescriptor& desc)
 	:ndConstraint()
 	//,dClassAlloc()
-	,dContainersFreeListAlloc<ndJointBilateralConstraint>()
-	,m_forceBody0(dVector::m_zero)
-	,m_torqueBody0(dVector::m_zero)
-	,m_forceBody1(dVector::m_zero)
-	,m_torqueBody1(dVector::m_zero)
+	,ndContainersFreeListAlloc<ndJointBilateralConstraint>()
+	,m_forceBody0(ndVector::m_zero)
+	,m_torqueBody0(ndVector::m_zero)
+	,m_forceBody1(ndVector::m_zero)
+	,m_torqueBody1(ndVector::m_zero)
 	,m_worldNode(nullptr)
 	,m_body0Node(nullptr)
 	,m_body1Node(nullptr)
@@ -113,7 +113,7 @@ ndJointBilateralConstraint::~ndJointBilateralConstraint()
 	dAssert(m_body1Node == nullptr);
 }
 
-void ndJointBilateralConstraint::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndJointBilateralConstraint::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
@@ -133,23 +133,23 @@ void ndJointBilateralConstraint::Save(const dLoadSaveBase::dSaveDescriptor& desc
 
 void ndJointBilateralConstraint::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 	debugCallback.DrawFrame(matrix0);
 	debugCallback.DrawFrame(matrix1);
 }
 
-dFloat32 ndJointBilateralConstraint::CalculateAngle(const dVector& dir, const dVector& cosDir, const dVector& sinDir) const
+dFloat32 ndJointBilateralConstraint::CalculateAngle(const ndVector& dir, const ndVector& cosDir, const ndVector& sinDir) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
-	dVector projectDir(dir - sinDir * dir.DotProduct(sinDir));
+	ndVector projectDir(dir - sinDir * dir.DotProduct(sinDir));
 	dFloat32 cosAngle = projectDir.DotProduct(cosDir).GetScalar();
 	dFloat32 sinAngle = sinDir.DotProduct(projectDir.CrossProduct(cosDir)).GetScalar();
 	return dAtan2(sinAngle, cosAngle);
 }
 
-void ndJointBilateralConstraint::CalculateLocalMatrix(const dMatrix& globalMatrix, dMatrix& localMatrix0, dMatrix& localMatrix1) const
+void ndJointBilateralConstraint::CalculateLocalMatrix(const ndMatrix& globalMatrix, ndMatrix& localMatrix0, ndMatrix& localMatrix1) const
 {
 	dAssert(globalMatrix.TestOrthogonal());
 	localMatrix0 = globalMatrix * m_body0->GetMatrix().Inverse();
@@ -174,10 +174,10 @@ void ndJointBilateralConstraint::SetMassSpringDamperAcceleration(ndConstraintDes
 	dAssert(index >= 0);
 	dAssert(index < dInt32(m_maxDof));
 	
-	const dVector& veloc0 = m_body0->m_veloc;
-	const dVector& omega0 = m_body0->m_omega;
-	const dVector& veloc1 = m_body1->m_veloc;
-	const dVector& omega1 = m_body1->m_omega;
+	const ndVector& veloc0 = m_body0->m_veloc;
+	const ndVector& omega0 = m_body0->m_omega;
+	const ndVector& veloc1 = m_body1->m_veloc;
+	const ndVector& omega1 = m_body1->m_omega;
 	const ndJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0;
 	const ndJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1;
 
@@ -193,12 +193,12 @@ void ndJointBilateralConstraint::SetMassSpringDamperAcceleration(ndConstraintDes
 
 void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 {
-	const dVector& bodyVeloc0 = m_body0->m_veloc;
-	const dVector& bodyOmega0 = m_body0->m_omega;
-	const dVector& bodyVeloc1 = m_body1->m_veloc;
-	const dVector& bodyOmega1 = m_body1->m_omega;
-	const dVector gyroAlpha0(m_body0->GetGyroAlpha());
-	const dVector gyroAlpha1(m_body1->GetGyroAlpha());
+	const ndVector& bodyVeloc0 = m_body0->m_veloc;
+	const ndVector& bodyOmega0 = m_body0->m_omega;
+	const ndVector& bodyVeloc1 = m_body1->m_veloc;
+	const ndVector& bodyOmega1 = m_body1->m_omega;
+	const ndVector gyroAlpha0(m_body0->GetGyroAlpha());
+	const ndVector gyroAlpha1(m_body1->GetGyroAlpha());
 
 	ndRightHandSide* const rhs = desc->m_rightHandSide;
 	const ndLeftHandSide* const row = desc->m_leftHandSide;
@@ -220,14 +220,14 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 			const ndJacobianPair& Jt = row[k].m_Jt;
 
 			//calculate internal centripetal each sub step 
-			const dVector centripetal0(bodyOmega0.CrossProduct(bodyOmega0.CrossProduct(m_r0[k])));
-			const dVector centripetal1(bodyOmega1.CrossProduct(bodyOmega1.CrossProduct(m_r1[k])));
+			const ndVector centripetal0(bodyOmega0.CrossProduct(bodyOmega0.CrossProduct(m_r0[k])));
+			const ndVector centripetal1(bodyOmega1.CrossProduct(bodyOmega1.CrossProduct(m_r1[k])));
 
-			const dVector relVeloc(
+			const ndVector relVeloc(
 				Jt.m_jacobianM0.m_linear * bodyVeloc0 + Jt.m_jacobianM0.m_angular * bodyOmega0 +
 				Jt.m_jacobianM1.m_linear * bodyVeloc1 + Jt.m_jacobianM1.m_angular * bodyOmega1);
-			const dVector relGyro(Jt.m_jacobianM0.m_angular * gyroAlpha0 + Jt.m_jacobianM1.m_angular * gyroAlpha1);
-			const dVector relCentr(Jt.m_jacobianM0.m_linear * centripetal0 + Jt.m_jacobianM1.m_linear * centripetal1);
+			const ndVector relGyro(Jt.m_jacobianM0.m_angular * gyroAlpha0 + Jt.m_jacobianM1.m_angular * gyroAlpha1);
+			const ndVector relCentr(Jt.m_jacobianM0.m_linear * centripetal0 + Jt.m_jacobianM1.m_linear * centripetal1);
 			const dFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
 
 			const dFloat32 relPosit = rhs[k].m_penetration - vRel * dt * desc->m_firstPassCoefFlag;
@@ -243,7 +243,7 @@ void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor
 	}
 }
 
-void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& desc, const dVector& pivot0, const dVector& pivot1, const dVector& dir)
+void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& desc, const ndVector& pivot0, const ndVector& pivot1, const ndVector& dir)
 {
 	dgPointParam param;
 	InitPointParam(param, pivot0, pivot1);
@@ -252,7 +252,7 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 	dAssert(dir.m_w == dFloat32(0.0f));
 
 	ndJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0;
-	dVector r0CrossDir(param.m_r0.CrossProduct(dir));
+	ndVector r0CrossDir(param.m_r0.CrossProduct(dir));
 	m_r0[index] = param.m_r0;
 	jacobian0.m_linear = dir;
 	jacobian0.m_angular = r0CrossDir;
@@ -260,9 +260,9 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 	dAssert(jacobian0.m_angular.m_w == dFloat32(0.0f));
 	
 	ndJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1;
-	dVector r1CrossDir(dir.CrossProduct(param.m_r1));
+	ndVector r1CrossDir(dir.CrossProduct(param.m_r1));
 	m_r1[index] = param.m_r1;
-	jacobian1.m_linear = dir * dVector::m_negOne;
+	jacobian1.m_linear = dir * ndVector::m_negOne;
 	jacobian1.m_angular = r1CrossDir;
 	dAssert(jacobian1.m_linear.m_w == dFloat32(0.0f));
 	dAssert(jacobian1.m_angular.m_w == dFloat32(0.0f));
@@ -271,18 +271,18 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 	m_motorAcceleration[index] = dFloat32(0.0f);
 	dAssert(desc.m_timestep > dFloat32(0.0f));
 
-	const dVector& omega0 = m_body0->m_omega;
-	const dVector& omega1 = m_body1->m_omega;
-	const dVector gyroAlpha0(m_body0->GetGyroAlpha());
-	const dVector gyroAlpha1(m_body1->GetGyroAlpha());
-	const dVector centripetal0(omega0.CrossProduct(omega0.CrossProduct(m_r0[index])));
-	const dVector centripetal1(omega1.CrossProduct(omega1.CrossProduct(m_r1[index])));
+	const ndVector& omega0 = m_body0->m_omega;
+	const ndVector& omega1 = m_body1->m_omega;
+	const ndVector gyroAlpha0(m_body0->GetGyroAlpha());
+	const ndVector gyroAlpha1(m_body1->GetGyroAlpha());
+	const ndVector centripetal0(omega0.CrossProduct(omega0.CrossProduct(m_r0[index])));
+	const ndVector centripetal1(omega1.CrossProduct(omega1.CrossProduct(m_r1[index])));
 
 	ndForceImpactPair* const jointForce = &m_jointForce[index];
 
-	const dVector& veloc0 = m_body0->m_veloc;
-	const dVector& veloc1 = m_body1->m_veloc;
-	const dVector positError(param.m_posit1 - param.m_posit0);
+	const ndVector& veloc0 = m_body0->m_veloc;
+	const ndVector& veloc1 = m_body1->m_veloc;
+	const ndVector positError(param.m_posit1 - param.m_posit0);
 	dFloat32 relPosit = positError.DotProduct(dir).GetScalar();
 
 	const dFloat32 relGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
@@ -310,28 +310,28 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 	desc.m_rowsCount = index + 1;
 }
 
-void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& desc, const dVector& dir, dFloat32 relAngle)
+void ndJointBilateralConstraint::AddAngularRowJacobian(ndConstraintDescritor& desc, const ndVector& dir, dFloat32 relAngle)
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	const dInt32 index = desc.m_rowsCount;
 	ndForceImpactPair* const jointForce = &m_jointForce[index];
 	ndJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0;
-	m_r0[index] = dVector::m_zero;
-	jacobian0.m_linear = dVector::m_zero;
+	m_r0[index] = ndVector::m_zero;
+	jacobian0.m_linear = ndVector::m_zero;
 	jacobian0.m_angular = dir;
 	dAssert(jacobian0.m_angular.m_w == dFloat32(0.0f));
 
 	ndJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1;
 	dAssert(m_body1);
-	m_r1[index] = dVector::m_zero;
-	jacobian1.m_linear = dVector::m_zero;
-	jacobian1.m_angular = dir * dVector::m_negOne;
+	m_r1[index] = ndVector::m_zero;
+	jacobian1.m_linear = ndVector::m_zero;
+	jacobian1.m_angular = dir * ndVector::m_negOne;
 	dAssert(jacobian1.m_angular.m_w == dFloat32(0.0f));
 
-	const dVector omega0 (m_body0->GetOmega());
-	const dVector omega1 (m_body1->GetOmega());
-	const dVector gyroAlpha0(m_body0->GetGyroAlpha());
-	const dVector gyroAlpha1(m_body1->GetGyroAlpha());
+	const ndVector omega0 (m_body0->GetOmega());
+	const ndVector omega1 (m_body1->GetOmega());
+	const ndVector gyroAlpha0(m_body0->GetGyroAlpha());
+	const ndVector gyroAlpha1(m_body1->GetGyroAlpha());
 
 	const dFloat32 relOmega = -(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular).AddHorizontal().GetScalar();
 

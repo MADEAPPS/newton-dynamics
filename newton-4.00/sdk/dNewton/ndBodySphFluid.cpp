@@ -59,7 +59,7 @@ ndBodySphFluid::ndBodySphFluid()
 {
 }
 
-ndBodySphFluid::ndBodySphFluid(const dLoadSaveBase::dLoadDescriptor& desc)
+ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::dLoadDescriptor& desc)
 	:ndBodyParticleSet(desc)
 	,m_box0(dFloat32(-1e10f))
 	,m_box1(dFloat32(1e10f))
@@ -75,25 +75,25 @@ ndBodySphFluid::~ndBodySphFluid()
 }
 
 //void ndBodySphFluid::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-void ndBodySphFluid::Save(const dLoadSaveBase::dSaveDescriptor&) const
+void ndBodySphFluid::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 {
 	dAssert(0);
 	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodySphFluid", nodeid);
 	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
 }
 
-void ndBodySphFluid::AddParticle(const dFloat32, const dVector& position, const dVector&)
+void ndBodySphFluid::AddParticle(const dFloat32, const ndVector& position, const ndVector&)
 {
-	dVector point(position);
+	ndVector point(position);
 	point.m_w = dFloat32(1.0f);
 	m_posit.PushBack(point);
 }
 
-void ndBodySphFluid::CaculateAABB(const ndWorld* const, dVector& boxP0, dVector& boxP1) const
+void ndBodySphFluid::CaculateAABB(const ndWorld* const, ndVector& boxP0, ndVector& boxP1) const
 {
 	D_TRACKTIME();
-	dVector box0(dFloat32(1e20f));
-	dVector box1(dFloat32(-1e20f));
+	ndVector box0(dFloat32(1e20f));
+	ndVector box1(dFloat32(-1e20f));
 	for (dInt32 i = m_posit.GetCount() - 1; i >= 0; i--)
 	{
 		box0 = box0.GetMin(m_posit[i]);
@@ -105,12 +105,12 @@ void ndBodySphFluid::CaculateAABB(const ndWorld* const, dVector& boxP0, dVector&
 
 void ndBodySphFluid::Update(const ndWorld* const world, dFloat32)
 {
-	dVector boxP0;
-	dVector boxP1;
+	ndVector boxP0;
+	ndVector boxP1;
 	CaculateAABB(world, boxP0, boxP1);
 	const dFloat32 gridSize = CalculateGridSize();
-	m_box0 = boxP0 - dVector(gridSize);
-	m_box1 = boxP1 + dVector(gridSize);
+	m_box0 = boxP0 - ndVector(gridSize);
+	m_box1 = boxP1 + ndVector(gridSize);
 
 	CreateGrids(world);
 	SortGrids(world);
@@ -489,7 +489,7 @@ return;
 }
 
 
-void ndBodySphFluid::CalculateScansDebug(dArray<dInt32>& gridScans)
+void ndBodySphFluid::CalculateScansDebug(ndArray<dInt32>& gridScans)
 {
 	dInt32 count = 0;
 	gridScans.SetCount(0);
@@ -567,7 +567,7 @@ void ndBodySphFluid::CalculateScans(const ndWorld* const world)
 				
 			const dInt32 start = context->m_scan[threadIndex];
 			const dInt32 strideCount = context->m_scan[threadIndex + 1] - start;
-			dArray<dInt32>& gridScans = fluid->m_gridScans[threadIndex];
+			ndArray<dInt32>& gridScans = fluid->m_gridScans[threadIndex];
 			dUnsigned64 gridHash0 = hashGridMap[start].m_gridHash;
 
 			dInt32 count = 0;
@@ -592,7 +592,7 @@ void ndBodySphFluid::CalculateScans(const ndWorld* const world)
 	scene->SubmitJobs<ndCalculateScans>(&context);
 
 	dInt32 acc = 0;
-	dArray<dInt32>& gridScans = m_gridScans[0];
+	ndArray<dInt32>& gridScans = m_gridScans[0];
 	for (dInt32 i = 0; i < gridScans.GetCount(); i++)
 	{
 		dInt32 sum = gridScans[i];
@@ -603,8 +603,8 @@ void ndBodySphFluid::CalculateScans(const ndWorld* const world)
 	dInt32 threadCount = scene->GetThreadCount();
 	for (dInt32 threadIndex = 1; threadIndex < threadCount; threadIndex++)
 	{
-		dArray<dInt32>& dstGridScans = m_gridScans[0];
-		const dArray<dInt32>& srcGridScans = m_gridScans[threadIndex];
+		ndArray<dInt32>& dstGridScans = m_gridScans[0];
+		const ndArray<dInt32>& srcGridScans = m_gridScans[threadIndex];
 		const dInt32 base = dstGridScans.GetCount();
 		dstGridScans.SetCount(base + srcGridScans.GetCount());
 
@@ -644,18 +644,18 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			}
 
 			ndBodySphFluid* m_fluid;
-			dSpinLock m_lock;
+			ndSpinLock m_lock;
 		};
 
 		// size of the level one cache minus few values for local variables.
 		#define D_SCRATCH_BUFFER_SIZE		(1024 * 24 / sizeof (ndGridHash))
 		#define D_SCRATCH_BUFFER_SIZE_PADD	(32)
 
-		class ndHashCacheBuffer : public dFixSizeArray<ndGridHash, D_SCRATCH_BUFFER_SIZE + D_SCRATCH_BUFFER_SIZE_PADD>
+		class ndHashCacheBuffer : public ndFixSizeArray<ndGridHash, D_SCRATCH_BUFFER_SIZE + D_SCRATCH_BUFFER_SIZE_PADD>
 		{
 			public:
 			ndHashCacheBuffer()
-				:dFixSizeArray<ndGridHash, D_SCRATCH_BUFFER_SIZE + D_SCRATCH_BUFFER_SIZE_PADD>()
+				:ndFixSizeArray<ndGridHash, D_SCRATCH_BUFFER_SIZE + D_SCRATCH_BUFFER_SIZE_PADD>()
 				, m_size(0)
 			{
 				// check the local scratch buffer is smaller than level one cache
@@ -697,7 +697,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 		{
 			D_TRACKTIME();
 
-			dVector m_neighborkDirs[8];
+			ndVector m_neighborkDirs[8];
 
 			ndBodySphFluid* const fluid = ((ndContext*)m_context)->m_fluid;
 			const dFloat32 radius = fluid->m_radius;
@@ -712,12 +712,12 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 
 			const dFloat32 gridSize = fluid->CalculateGridSize();
 
-			const dVector origin(fluid->m_box0);
-			const dVector invGridSize(dFloat32(1.0f) / gridSize);
-			const dVector* const posit = &fluid->m_posit[0];
+			const ndVector origin(fluid->m_box0);
+			const ndVector invGridSize(dFloat32(1.0f) / gridSize);
+			const ndVector* const posit = &fluid->m_posit[0];
 
-			const dVector box0(-radius, -radius, -radius, dFloat32(0.0f));
-			const dVector box1(radius, radius, radius, dFloat32(0.0f));
+			const ndVector box0(-radius, -radius, -radius, dFloat32(0.0f));
+			const ndVector box1(radius, radius, radius, dFloat32(0.0f));
 
 			ndGridHash stepsCode_xyz[8];
 			stepsCode_xyz[0] = ndGridHash(0, 0, 0);
@@ -762,15 +762,15 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			ndHashCacheBuffer bufferOut;
 			for (dInt32 i = 0; i < count; i++)
 			{
-				dVector r(posit[start + i] - origin);
-				dVector p(r * invGridSize);
+				ndVector r(posit[start + i] - origin);
+				ndVector p(r * invGridSize);
 				ndGridHash hashKey(p, i);
 
 				fluid->m_upperDigisIsValid[0] |= hashKey.m_xHigh;
 				fluid->m_upperDigisIsValid[1] |= hashKey.m_yHigh;
 				fluid->m_upperDigisIsValid[2] |= hashKey.m_zHigh;
-				dVector p0((r + box0) * invGridSize);
-				dVector p1((r + box1) * invGridSize);
+				ndVector p0((r + box0) * invGridSize);
+				ndVector p1((r + box1) * invGridSize);
 
 				ndGridHash box0Hash(p0, i);
 				ndGridHash box1Hash(p1, i);
@@ -847,7 +847,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 				if (bufferOut.m_size > dInt32 (D_SCRATCH_BUFFER_SIZE))
 				{
 					D_TRACKTIME();
-					dScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
+					ndScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
 					dInt32 dstIndex = fluid->m_hashGridMap.GetCount();
 					fluid->m_hashGridMap.SetCount(dstIndex + bufferOut.m_size);
 					memcpy(&fluid->m_hashGridMap[dstIndex], &bufferOut[0], bufferOut.m_size * sizeof(ndGridHash));
@@ -858,7 +858,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			if (bufferOut.m_size)
 			{
 				D_TRACKTIME();
-				dScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
+				ndScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
 				dInt32 dstIndex = fluid->m_hashGridMap.GetCount();
 				fluid->m_hashGridMap.SetCount(dstIndex + bufferOut.m_size);
 				memcpy(&fluid->m_hashGridMap[dstIndex], &bufferOut[0], bufferOut.m_size * sizeof(ndGridHash));
@@ -921,17 +921,17 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			}
 
 			ndBodySphFluid* m_fluid;
-			dSpinLock m_lock;
+			ndSpinLock m_lock;
 		};
 
 		#define D_SCRATCH_PAIR_BUFFER_SIZE		(1024 * 24 / sizeof (ndParticlePair))
 		#define D_SCRATCH_PAIR_BUFFER_SIZE_PADD (256)
 
-		class ndParticlePairCacheBuffer : public dFixSizeArray<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>
+		class ndParticlePairCacheBuffer : public ndFixSizeArray<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>
 		{
 			public:
 			ndParticlePairCacheBuffer()
-				:dFixSizeArray<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>()
+				:ndFixSizeArray<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>()
 				, m_size(0)
 			{
 				// check the local scratch buffer is smaller than level one cache
@@ -959,14 +959,14 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			const dInt32 threadId = GetThreadId();
 			const dInt32 threadCount = world->GetThreadCount();
 			
-			const dArray<dInt32>& gridCounts = fluid->m_gridScans[0];
+			const ndArray<dInt32>& gridCounts = fluid->m_gridScans[0];
 			const dInt32 count = gridCounts.GetCount() - 1;
 			const dInt32 size = count / threadCount;
 			const dInt32 start = threadId * size;
 			const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
 			const ndGridHash* const srcArray = &fluid->m_hashGridMap[0];
 
-			//const dVector* const positions = &fluid->m_posit[0];
+			//const ndVector* const positions = &fluid->m_posit[0];
 			//const dFloat32 diameter = dFloat32(2.0f) * fluid->m_radius;
 			//const dFloat32 diameter2 = diameter * diameter;
 			
@@ -983,7 +983,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 					if (cell0.m_cellType == ndHomeGrid)
 					{
 						const dInt32 m0 = cell0.m_particleIndex;
-						//const dVector& posit0 = positions[m0];
+						//const ndVector& posit0 = positions[m0];
 			
 						for (dInt32 k = j - 1; k >= 0; k--)
 						{
@@ -991,8 +991,8 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 							const dInt32 m1 = cell1.m_particleIndex;
 							bool test = (cell1.m_cellType == ndHomeGrid);
 							dAssert(0);
-							//const dVector& posit1 = positions[m1];
-							//const dVector dist(posit1 - posit0);
+							//const ndVector& posit1 = positions[m1];
+							//const ndVector dist(posit1 - posit0);
 							//dFloat32 dist2 = dist.DotProduct(dist).GetScalar();
 							//test = test | (cell0.m_particleIndex <= cell1.m_gridHash);
 							//test = test & (dist2 <= diameter2);
@@ -1006,7 +1006,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			
 				if (buffer.m_size > dInt32 (D_SCRATCH_PAIR_BUFFER_SIZE))
 				{
-					dScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
+					ndScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
 					dInt32 dstIndex = fluid->m_particlesPairs.GetCount();
 					fluid->m_particlesPairs.SetCount(dstIndex + buffer.m_size);
 					memcpy(&fluid->m_particlesPairs[dstIndex], &buffer[0], buffer.m_size * sizeof(ndParticlePair));
@@ -1017,7 +1017,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			if (buffer.m_size)
 			{
 				D_TRACKTIME();
-				dScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
+				ndScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
 				dInt32 dstIndex = fluid->m_particlesPairs.GetCount();
 				fluid->m_particlesPairs.SetCount(dstIndex + buffer.m_size);
 				memcpy(&fluid->m_particlesPairs[dstIndex], &buffer[0], buffer.m_size * sizeof(ndParticlePair));
@@ -1060,7 +1060,7 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 			const dInt32 threadCount = world->GetThreadCount();
 			
 
-			dArray<ndParticlePair>& particlesPairs = fluid->m_particlesPairs;
+			ndArray<ndParticlePair>& particlesPairs = fluid->m_particlesPairs;
 			const dInt32 count = particlesPairs.GetCount();
 			const dInt32 stride = count / threadCount;
 			const dInt32 start = threadId * stride;

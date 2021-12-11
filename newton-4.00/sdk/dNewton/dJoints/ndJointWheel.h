@@ -52,8 +52,8 @@ class ndJointWheel: public ndJointBilateralConstraint
 	public:
 
 	D_CLASS_REFLECTION(ndJointWheel);
-	D_NEWTON_API ndJointWheel(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& desc);
+	D_NEWTON_API ndJointWheel(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& desc);
 	D_NEWTON_API virtual ~ndJointWheel();
 
 	D_NEWTON_API void SetBrake(dFloat32 normalizedTorque);
@@ -61,7 +61,7 @@ class ndJointWheel: public ndJointBilateralConstraint
 	D_NEWTON_API void SetSteering(dFloat32 normalidedSteering);
 	
 	D_NEWTON_API void UpdateTireSteeringAngleMatrix();
-	D_NEWTON_API dMatrix CalculateUpperBumperMatrix() const;
+	D_NEWTON_API ndMatrix CalculateUpperBumperMatrix() const;
 
 	const ndWheelDescriptor& GetInfo() const
 	{
@@ -75,9 +75,9 @@ class ndJointWheel: public ndJointBilateralConstraint
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	dMatrix m_baseFrame;
+	ndMatrix m_baseFrame;
 	ndWheelDescriptor m_info;
 	dFloat32 m_posit;
 	dFloat32 m_speed;

@@ -39,7 +39,7 @@ class ndBodyKinematic;
 class ndJointBilateralConstraint;
 
 D_MSV_NEWTON_ALIGN_32
-class ndConstraintDebugCallback: public dClassAlloc
+class ndConstraintDebugCallback: public ndClassAlloc
 {
 	public:
 	ndConstraintDebugCallback()
@@ -51,7 +51,7 @@ class ndConstraintDebugCallback: public dClassAlloc
 	{
 	}
 
-	virtual void DrawLine(const dVector& p0, const dVector& p1, const dVector& color, dFloat32 thickness = dFloat32 (1.0f)) = 0;
+	virtual void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, dFloat32 thickness = dFloat32 (1.0f)) = 0;
 
 	virtual void SetScale(dFloat32 scale)
 	{
@@ -63,21 +63,21 @@ class ndConstraintDebugCallback: public dClassAlloc
 		return m_debugScale;
 	}
 
-	virtual void DrawFrame(const dMatrix& matrix)
+	virtual void DrawFrame(const ndMatrix& matrix)
 	{
-		dVector x(matrix.m_posit + matrix.RotateVector(dVector(m_debugScale, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f))));
-		DrawLine(matrix.m_posit, x, dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)));
+		ndVector x(matrix.m_posit + matrix.RotateVector(ndVector(m_debugScale, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f))));
+		DrawLine(matrix.m_posit, x, ndVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)));
 
-		dVector y(matrix.m_posit + matrix.RotateVector(dVector(dFloat32(0.0f), m_debugScale, dFloat32(0.0f), dFloat32(0.0f))));
-		DrawLine(matrix.m_posit, y, dVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f)));
+		ndVector y(matrix.m_posit + matrix.RotateVector(ndVector(dFloat32(0.0f), m_debugScale, dFloat32(0.0f), dFloat32(0.0f))));
+		DrawLine(matrix.m_posit, y, ndVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f)));
 
-		dVector z(matrix.m_posit + matrix.RotateVector(dVector(dFloat32(0.0f), dFloat32(0.0f), m_debugScale, dFloat32(0.0f))));
-		DrawLine(matrix.m_posit, z, dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)));
+		ndVector z(matrix.m_posit + matrix.RotateVector(ndVector(dFloat32(0.0f), dFloat32(0.0f), m_debugScale, dFloat32(0.0f))));
+		DrawLine(matrix.m_posit, z, ndVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)));
 	}
 
-	virtual void DrawArrow(const dMatrix& matrix, const dVector& color, dFloat32 length)
+	virtual void DrawArrow(const ndMatrix& matrix, const ndVector& color, dFloat32 length)
 	{
-		dVector p1(matrix.m_posit + matrix.RotateVector(dVector(m_debugScale * length, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f))));
+		ndVector p1(matrix.m_posit + matrix.RotateVector(ndVector(m_debugScale * length, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f))));
 		DrawLine(matrix.m_posit, p1, color);
 	}
 		
@@ -88,18 +88,18 @@ D_MSV_NEWTON_ALIGN_32
 class dgPointParam
 {
 	public:
-	dVector m_r0;
-	dVector m_r1;
-	dVector m_posit0;
-	dVector m_posit1;
+	ndVector m_r0;
+	ndVector m_r1;
+	ndVector m_posit0;
+	ndVector m_posit1;
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
 class ndJacobian
 {
 	public:
-	dVector m_linear;
-	dVector m_angular;
+	ndVector m_linear;
+	ndVector m_angular;
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -247,7 +247,7 @@ class ndConstraint
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc) = 0;
 	
 	virtual void DebugJoint(ndConstraintDebugCallback&) const;
-	void InitPointParam(dgPointParam& param, const dVector& p0Global, const dVector& p1Global) const;
+	void InitPointParam(dgPointParam& param, const ndVector& p0Global, const ndVector& p1Global) const;
 
 	dFloat32 m_preconditioner0;
 	dFloat32 m_preconditioner1;

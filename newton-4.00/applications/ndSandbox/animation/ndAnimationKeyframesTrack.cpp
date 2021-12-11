@@ -16,7 +16,7 @@ template<class OBJECT>
 dInt32 ndAnimationKeyFramesTrack::dKeyFramesArray<OBJECT>::GetIndexDebug(dFloat32 time) const
 {
 	dInt32 index = 0;
-	for (dInt32 i = dArray<OBJECT>::GetCount()-1; i >= 0; i --)
+	for (dInt32 i = ndArray<OBJECT>::GetCount()-1; i >= 0; i --)
 	{
 		if (m_time[i] < time)
 		{
@@ -31,7 +31,7 @@ template<class OBJECT>
 dInt32 ndAnimationKeyFramesTrack::dKeyFramesArray<OBJECT>::GetIndex(dFloat32 time) const
 {
 	dAssert(time >= 0.0f);
-	dInt32 index = dArray<OBJECT>::GetCount() - 1;
+	dInt32 index = ndArray<OBJECT>::GetCount() - 1;
 	if (time < m_time[index])
 	{
 		dInt32 i0 = 0;
@@ -64,7 +64,7 @@ dInt32 ndAnimationKeyFramesTrack::dKeyFramesArray<OBJECT>::GetIndex(dFloat32 tim
 	return index;
 }
 
-void ndAnimationKeyFramesTrack::InterpolatePosition(dFloat32 time, dFloat32 length, dVector& posit) const
+void ndAnimationKeyFramesTrack::InterpolatePosition(dFloat32 time, dFloat32 length, ndVector& posit) const
 {
 	if (m_position.GetCount()) 
 	{
@@ -73,8 +73,8 @@ void ndAnimationKeyFramesTrack::InterpolatePosition(dFloat32 time, dFloat32 leng
 		{
 			const dFloat32 t0 = m_position.m_time[base + 0];
 			const dFloat32 t1 = m_position.m_time[base + 1];
-			const dVector& p0 = m_position[base + 0];
-			const dVector& p1 = m_position[base + 1];
+			const ndVector& p0 = m_position[base + 0];
+			const ndVector& p1 = m_position[base + 1];
 			const dFloat32 param = (time - t0) / (t1 - t0 + dFloat32(1.0e-6f));
 			posit = p0 + (p1 - p0).Scale(param);
 		}
@@ -82,15 +82,15 @@ void ndAnimationKeyFramesTrack::InterpolatePosition(dFloat32 time, dFloat32 leng
 		{
 			const dFloat32 t1 = length;
 			const dFloat32 t0 = m_position.m_time[base];
-			const dVector& p1 = m_position[0];
-			const dVector& p0 = m_position[base];
+			const ndVector& p1 = m_position[0];
+			const ndVector& p0 = m_position[base];
 			const dFloat32 param = (time - t0) / (t1 - t0 + dFloat32(1.0e-6f));
 			posit = p0 + (p1 - p0).Scale(param);
 		}
 	}
 }
 
-void ndAnimationKeyFramesTrack::InterpolateRotation(dFloat32 time, dFloat32 length, dQuaternion& rotation) const
+void ndAnimationKeyFramesTrack::InterpolateRotation(dFloat32 time, dFloat32 length, ndQuaternion& rotation) const
 {
 	if (m_rotation.GetCount()) 
 	{
@@ -99,8 +99,8 @@ void ndAnimationKeyFramesTrack::InterpolateRotation(dFloat32 time, dFloat32 leng
 		{
 			const dFloat32 t0 = m_rotation.m_time[base + 0];
 			const dFloat32 t1 = m_rotation.m_time[base + 1];
-			const dQuaternion& rot0 = m_rotation[base + 0];
-			const dQuaternion& rot1 = m_rotation[base + 1];
+			const ndQuaternion& rot0 = m_rotation[base + 0];
+			const ndQuaternion& rot1 = m_rotation[base + 1];
 			const dFloat32 param = (time - t0) / (t1 - t0 + dFloat32(1.0e-6f));
 			dAssert(rot0.DotProduct(rot1).GetScalar() > 0.0f);
 			rotation = rot0.Slerp(rot1, param);
@@ -109,8 +109,8 @@ void ndAnimationKeyFramesTrack::InterpolateRotation(dFloat32 time, dFloat32 leng
 		{
 			const dFloat32 t1 = length;
 			const dFloat32 t0 = m_rotation.m_time[base];
-			const dQuaternion& rot1 = m_rotation[0];
-			const dQuaternion& rot0 = m_rotation[base];
+			const ndQuaternion& rot1 = m_rotation[0];
+			const ndQuaternion& rot0 = m_rotation[base];
 			const dFloat32 param = (time - t0) / (t1 - t0 + dFloat32(1.0e-6f));
 			dAssert(rot0.DotProduct(rot1).GetScalar() > 0.0f);
 			rotation = rot0.Slerp(rot1, param);

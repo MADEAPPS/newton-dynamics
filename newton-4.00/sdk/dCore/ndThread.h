@@ -26,18 +26,18 @@
 #include "ndSemaphore.h"
 #include "ndClassAlloc.h"
 
-class dThread
-	:public dClassAlloc
-	,public dSemaphore
+class ndThread
+	:public ndClassAlloc
+	,public ndSemaphore
 #ifndef D_USE_THREAD_EMULATION
-	,public dAtomic<bool>
+	,public ndAtomic<bool>
 	,public std::condition_variable
 	,public std::thread
 #endif
 {
 	public:
-	D_CORE_API dThread();
-	D_CORE_API virtual ~dThread();
+	D_CORE_API ndThread();
+	D_CORE_API virtual ~ndThread();
 
 	D_CORE_API void SetName(const char* const name);
 

@@ -39,7 +39,7 @@ class ndShapeCompound: public ndShape
 	};
 
 	class ndNodeBase;
-	class ndTreeArray : public dTree<ndNodeBase*, dInt32, dContainersFreeListAlloc<ndNodeBase*>>
+	class ndTreeArray : public ndTree<ndNodeBase*, dInt32, ndContainersFreeListAlloc<ndNodeBase*>>
 	{
 		public:
 		ndTreeArray();
@@ -48,7 +48,7 @@ class ndShapeCompound: public ndShape
 
 	D_CLASS_REFLECTION(ndShapeCompound);
 	D_COLLISION_API ndShapeCompound();
-	D_COLLISION_API ndShapeCompound(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndShapeCompound(const ndLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeCompound();
 
 	void SetOwner(const ndShapeInstance* const myInstance);
@@ -56,41 +56,41 @@ class ndShapeCompound: public ndShape
 	const ndTreeArray& GetTree() const;
 
 	D_COLLISION_API virtual void BeginAddRemove();
-	D_COLLISION_API virtual ndTreeArray::dNode* AddCollision(ndShapeInstance* const part);
+	D_COLLISION_API virtual ndTreeArray::ndNode* AddCollision(ndShapeInstance* const part);
 	D_COLLISION_API virtual void EndAddRemove();
 
 	protected:
 	class ndSpliteInfo;
 	ndShapeCompound(const ndShapeCompound& source, const ndShapeInstance* const myInstance);
 	virtual ndShapeInfo GetShapeInfo() const;
-	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
-	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
+	virtual dFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	virtual dFloat32 GetVolume() const;
 	virtual dFloat32 GetBoxMinRadius() const;
 	virtual dFloat32 GetBoxMaxRadius() const;
 
 	virtual ndShapeCompound* GetAsShapeCompound();
-	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
-	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
-	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
-	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
-	virtual dVector CalculateVolumeIntegral(const dMatrix& globalMatrix, const dVector& plane, const ndShapeInstance& parentScale) const;
+	virtual ndVector SupportVertex(const ndVector& dir, dInt32* const vertexIndex) const;
+	virtual ndVector SupportVertexSpecial(const ndVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
+	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
+	virtual dInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
+	virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& plane, const ndShapeInstance& parentScale) const;
 	
-	D_COLLISION_API virtual void CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const;
+	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
 	//D_COLLISION_API dInt32 CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 strideInFloat, const dPlane& localPlane, dVector* const contactsOut) const;
 
 	virtual void MassProperties();
-	void ApplyScale(const dVector& scale);
+	void ApplyScale(const ndVector& scale);
 	void SetSubShapeOwner(ndBodyKinematic* const body);
 	void ImproveNodeFitness(ndNodeBase* const node) const;
 	dFloat64 CalculateEntropy(dInt32 count, ndNodeBase** array);
 	ndNodeBase* BuildTopDown(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory, dInt32& rootIndex);
 	ndNodeBase* BuildTopDownBig(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory, dInt32& rootIndex);
-	dFloat32 CalculateSurfaceArea(ndNodeBase* const node0, ndNodeBase* const node1, dVector& minBox, dVector& maxBox) const;
-	dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
-	dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
+	dFloat32 CalculateSurfaceArea(ndNodeBase* const node0, ndNodeBase* const node1, ndVector& minBox, ndVector& maxBox) const;
+	ndMatrix CalculateInertiaAndCenterOfMass(const ndMatrix& alignMatrix, const ndVector& localScale, const ndMatrix& matrix) const;
+	dFloat32 CalculateMassProperties(const ndMatrix& offset, ndVector& inertia, ndVector& crossInertia, ndVector& centerOfMass) const;
 
 	ndTreeArray m_array;
 	dFloat64 m_treeEntropy;
@@ -115,7 +115,7 @@ inline void ndShapeCompound::SetOwner(const ndShapeInstance* const instance)
 	m_myInstance = instance;
 }
 
-class ndShapeCompound::ndNodeBase: public dClassAlloc
+class ndShapeCompound::ndNodeBase: public ndClassAlloc
 {
 	public:
 	ndNodeBase();
@@ -127,23 +127,23 @@ class ndShapeCompound::ndNodeBase: public dClassAlloc
 	//void Sanity(int level = 0);
 	void CalculateAABB();
 	ndShapeInstance* GetShape() const;
-	void SetBox(const dVector& p0, const dVector& p1);
+	void SetBox(const ndVector& p0, const ndVector& p1);
 
-	dVector m_p0;
-	dVector m_p1;
-	dVector m_size;
-	dVector m_origin;
+	ndVector m_p0;
+	ndVector m_p1;
+	ndVector m_size;
+	ndVector m_origin;
 	dFloat32 m_area;
 	dInt32 m_type;
 	ndNodeBase* m_left;
 	ndNodeBase* m_right;
 	ndNodeBase* m_parent;
-	ndTreeArray::dNode* m_myNode;
+	ndTreeArray::ndNode* m_myNode;
 	ndShapeInstance* m_shapeInstance;
 };
 
 inline ndShapeCompound::ndNodeBase::ndNodeBase()
-	:dClassAlloc()
+	:ndClassAlloc()
 	,m_type(m_node)
 	,m_left(nullptr)
 	,m_right(nullptr)
@@ -154,7 +154,7 @@ inline ndShapeCompound::ndNodeBase::ndNodeBase()
 }
 
 inline ndShapeCompound::ndNodeBase::ndNodeBase(const ndNodeBase& copyFrom)
-	:dClassAlloc()
+	:ndClassAlloc()
 	,m_p0(copyFrom.m_p0)
 	,m_p1(copyFrom.m_p1)
 	,m_size(copyFrom.m_size)
@@ -171,7 +171,7 @@ inline ndShapeCompound::ndNodeBase::ndNodeBase(const ndNodeBase& copyFrom)
 }
 
 inline ndShapeCompound::ndNodeBase::ndNodeBase(ndShapeInstance* const instance)
-	:dClassAlloc()
+	:ndClassAlloc()
 	,m_type(m_leaf)
 	,m_left(nullptr)
 	,m_right(nullptr)
@@ -183,7 +183,7 @@ inline ndShapeCompound::ndNodeBase::ndNodeBase(ndShapeInstance* const instance)
 }
 
 inline ndShapeCompound::ndNodeBase::ndNodeBase(ndNodeBase* const left, ndNodeBase* const right)
-	:dClassAlloc()
+	:ndClassAlloc()
 	,m_type(m_node)
 	,m_left(left)
 	,m_right(right)
@@ -194,8 +194,8 @@ inline ndShapeCompound::ndNodeBase::ndNodeBase(ndNodeBase* const left, ndNodeBas
 	m_left->m_parent = this;
 	m_right->m_parent = this;
 
-	dVector p0(left->m_p0.GetMin(right->m_p0));
-	dVector p1(left->m_p1.GetMax(right->m_p1));
+	ndVector p0(left->m_p0.GetMin(right->m_p0));
+	ndVector p1(left->m_p1.GetMax(right->m_p1));
 	SetBox(p0, p1);
 }
 
@@ -206,20 +206,20 @@ inline ndShapeInstance* ndShapeCompound::ndNodeBase::GetShape() const
 
 inline void ndShapeCompound::ndNodeBase::CalculateAABB()
 {
-	dVector p0;
-	dVector p1;
+	ndVector p0;
+	ndVector p1;
 	m_shapeInstance->CalculateAabb(m_shapeInstance->GetLocalMatrix(), p0, p1);
 	SetBox(p0, p1);
 }
 
-inline void ndShapeCompound::ndNodeBase::SetBox(const dVector& p0, const dVector& p1)
+inline void ndShapeCompound::ndNodeBase::SetBox(const ndVector& p0, const ndVector& p1)
 {
 	m_p0 = p0;
 	m_p1 = p1;
 	dAssert(m_p0.m_w == dFloat32(0.0f));
 	dAssert(m_p1.m_w == dFloat32(0.0f));
-	m_size = dVector::m_half * (m_p1 - m_p0);
-	m_origin = dVector::m_half * (m_p1 + m_p0);
+	m_size = ndVector::m_half * (m_p1 - m_p0);
+	m_origin = ndVector::m_half * (m_p1 + m_p0);
 	m_area = m_size.DotProduct(m_size.ShiftTripleRight()).m_x;
 }
 

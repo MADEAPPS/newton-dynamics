@@ -28,7 +28,7 @@
 #include "ndThreadPool.h"
 
 template <class T, class CompareKey>
-void dBinarySearch(T* const array, dInt32 elements, void* const context = nullptr)
+void ndBinarySearch(T* const array, dInt32 elements, void* const context = nullptr)
 {
 	dAssert(0);
 	//dInt32 index0 = 0;
@@ -68,7 +68,7 @@ void dBinarySearch(T* const array, dInt32 elements, void* const context = nullpt
 }
 
 template <class T, class dCompareKey>
-void dSort(T* const array, dInt32 elements, void* const context = nullptr)
+void ndSort(T* const array, dInt32 elements, void* const context = nullptr)
 {
 	D_TRACKTIME();
 	const dInt32 batchSize = 8;
@@ -164,7 +164,7 @@ void dSort(T* const array, dInt32 elements, void* const context = nullptr)
 }
 
 template <class T, dInt32 bits, class nEvaluateKey, class dKey>
-void dCountingSort(T* const array, T* const scratchBuffer, dInt32 elementsCount, dInt32 digitLocation)
+void ndCountingSort(T* const array, T* const scratchBuffer, dInt32 elementsCount, dInt32 digitLocation)
 {
 	dAssert(0);
 //	dInt32 scanCount[256];

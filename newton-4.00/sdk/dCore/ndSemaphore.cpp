@@ -22,7 +22,7 @@
 #include "ndCoreStdafx.h"
 #include "ndSemaphore.h"
 
-dSemaphore::dSemaphore()
+ndSemaphore::ndSemaphore()
 #ifndef D_USE_THREAD_EMULATION
 	:m_mutex()
 	,m_condition()
@@ -32,11 +32,11 @@ dSemaphore::dSemaphore()
 {
 }
 
-dSemaphore::~dSemaphore()
+ndSemaphore::~ndSemaphore()
 {
 }
 
-dInt32 dSemaphore::GetCount() const
+dInt32 ndSemaphore::GetCount() const
 {
 #ifdef D_USE_THREAD_EMULATION
 	return 0;
@@ -46,7 +46,7 @@ dInt32 dSemaphore::GetCount() const
 #endif
 }
 
-bool dSemaphore::Wait()
+bool ndSemaphore::Wait()
 {
 #ifdef D_USE_THREAD_EMULATION
 	return false;
@@ -62,7 +62,7 @@ bool dSemaphore::Wait()
 #endif
 }
 
-void dSemaphore::Signal()
+void ndSemaphore::Signal()
 {
 #ifndef D_USE_THREAD_EMULATION
 	std::unique_lock<std::mutex> lock(m_mutex);
@@ -71,7 +71,7 @@ void dSemaphore::Signal()
 #endif
 }
 
-void dSemaphore::Terminate()
+void ndSemaphore::Terminate()
 {
 #ifndef D_USE_THREAD_EMULATION
 	std::unique_lock<std::mutex> lock(m_mutex);

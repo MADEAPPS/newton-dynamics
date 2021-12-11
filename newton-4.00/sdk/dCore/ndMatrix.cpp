@@ -25,27 +25,27 @@
 #include "ndQuaternion.h"
 #include "ndGeneralMatrix.h"
 
-const dMatrix& dGetIdentityMatrix()
+const ndMatrix& dGetIdentityMatrix()
 {
-	static dMatrix identityMatrix(
-		dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)),
-		dVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f)),
-		dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)),
-		dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f)));
+	static ndMatrix identityMatrix(
+		ndVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)),
+		ndVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f)),
+		ndVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)),
+		ndVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f)));
 	return identityMatrix;
 }
 
-const dMatrix& dGetZeroMatrix ()
+const ndMatrix& dGetZeroMatrix ()
 {
-	static dMatrix zeroMatrix(dVector::m_zero, dVector::m_zero, dVector::m_zero, dVector::m_zero);
+	static ndMatrix zeroMatrix(ndVector::m_zero, ndVector::m_zero, ndVector::m_zero, ndVector::m_zero);
 	return zeroMatrix;
 }
 
-dMatrix::dMatrix (const dQuaternion &quat, const dVector &position)
+ndMatrix::ndMatrix (const ndQuaternion &quat, const ndVector &position)
 {
 	dAssert((quat.DotProduct(quat).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
-	const dQuaternion quat0(quat);
-	const dQuaternion quat1(quat0.Scale (dFloat32(2.0f)));
+	const ndQuaternion quat0(quat);
+	const ndQuaternion quat1(quat0.Scale (dFloat32(2.0f)));
 
 	dFloat32 x2 = quat0.m_x * quat1.m_x;
 	dFloat32 y2 = quat0.m_y * quat1.m_y;
@@ -63,9 +63,9 @@ dMatrix::dMatrix (const dQuaternion &quat, const dVector &position)
 	dFloat32 yw = quat0.m_y * quat1.m_w;
 	dFloat32 zw = quat0.m_z * quat1.m_w;
 
-	m_front = dVector (dFloat32(1.0f) - y2 - z2, xy + zw, xz - yw, dFloat32(0.0f));
-	m_up    = dVector (xy - zw, dFloat32(1.0f) - x2 - z2, yz + xw, dFloat32(0.0f));
-	m_right = dVector (xz + yw, yz - xw, dFloat32(1.0f) - x2 - y2, dFloat32(0.0f));
+	m_front = ndVector (dFloat32(1.0f) - y2 - z2, xy + zw, xz - yw, dFloat32(0.0f));
+	m_up    = ndVector (xy - zw, dFloat32(1.0f) - x2 - z2, yz + xw, dFloat32(0.0f));
+	m_right = ndVector (xz + yw, yz - xw, dFloat32(1.0f) - x2 - y2, dFloat32(0.0f));
 
 	m_posit.m_x = position.m_x;
 	m_posit.m_y = position.m_y;
@@ -73,14 +73,14 @@ dMatrix::dMatrix (const dQuaternion &quat, const dVector &position)
 	m_posit.m_w = dFloat32(1.0f);
 }
 
-dMatrix::dMatrix (const dMatrix& transformMatrix, const dVector& scale, const dMatrix& stretchAxis)
+ndMatrix::ndMatrix (const ndMatrix& transformMatrix, const ndVector& scale, const ndMatrix& stretchAxis)
 {
-	//dMatrix scaledAxis;
+	//ndMatrix scaledAxis;
 	//scaledAxis[0] = stretchAxis[0].Scale (scale[0]);
 	//scaledAxis[1] = stretchAxis[1].Scale (scale[1]);
 	//scaledAxis[2] = stretchAxis[2].Scale (scale[2]);
 	//scaledAxis[3] = stretchAxis[3];
-	dMatrix scaledAxis(
+	ndMatrix scaledAxis(
 		stretchAxis[0].Scale(scale[0]),
 		stretchAxis[1].Scale(scale[1]),
 		stretchAxis[2].Scale(scale[2]),
@@ -88,23 +88,23 @@ dMatrix::dMatrix (const dMatrix& transformMatrix, const dVector& scale, const dM
 	*this = stretchAxis.Transpose() * scaledAxis * transformMatrix;
 }
 
-dMatrix dMatrix::Multiply3X3 (const dMatrix &B) const
+ndMatrix ndMatrix::Multiply3X3 (const ndMatrix &B) const
 {
-	return dMatrix (B.m_front * m_front.BroadcastX() + B.m_up * m_front.BroadcastY() + B.m_right * m_front.BroadcastZ(), 
+	return ndMatrix (B.m_front * m_front.BroadcastX() + B.m_up * m_front.BroadcastY() + B.m_right * m_front.BroadcastZ(), 
 					B.m_front * m_up.BroadcastX()    + B.m_up * m_up.BroadcastY()    + B.m_right * m_up.BroadcastZ(), 
 					B.m_front * m_right.BroadcastX() + B.m_up * m_right.BroadcastY() + B.m_right * m_right.BroadcastZ(), 
-					dVector::m_wOne); 
+					ndVector::m_wOne); 
 }
 
-dMatrix dMatrix::operator* (const dMatrix &B) const
+ndMatrix ndMatrix::operator* (const ndMatrix &B) const
 {
-	return dMatrix (B.m_front * m_front.BroadcastX() + B.m_up * m_front.BroadcastY() + B.m_right * m_front.BroadcastZ() + B.m_posit * m_front.BroadcastW(), 
+	return ndMatrix (B.m_front * m_front.BroadcastX() + B.m_up * m_front.BroadcastY() + B.m_right * m_front.BroadcastZ() + B.m_posit * m_front.BroadcastW(), 
 					B.m_front * m_up.BroadcastX()    + B.m_up * m_up.BroadcastY()    + B.m_right * m_up.BroadcastZ()    + B.m_posit * m_up.BroadcastW(), 
 					B.m_front * m_right.BroadcastX() + B.m_up * m_right.BroadcastY() + B.m_right * m_right.BroadcastZ() + B.m_posit * m_right.BroadcastW(), 
 					B.m_front * m_posit.BroadcastX() + B.m_up * m_posit.BroadcastY() + B.m_right * m_posit.BroadcastZ() + B.m_posit * m_posit.BroadcastW()); 
 }
 
-void dMatrix::TransformTriplex (dFloat32* const dst, dInt32 dstStrideInBytes, const dFloat32* const src, dInt32 srcStrideInBytes, dInt32 count) const
+void ndMatrix::TransformTriplex (dFloat32* const dst, dInt32 dstStrideInBytes, const dFloat32* const src, dInt32 srcStrideInBytes, dInt32 count) const
 {
 	dInt32 dstStride = dInt32 (dstStrideInBytes /sizeof (dFloat32));
 	dInt32 srcStride = dInt32 (srcStrideInBytes / sizeof (dFloat32));
@@ -125,7 +125,7 @@ void dMatrix::TransformTriplex (dFloat32* const dst, dInt32 dstStrideInBytes, co
 }
 
 #ifndef D_NEWTON_USE_DOUBLE
-void dMatrix::TransformTriplex (dFloat64* const dst, dInt32 dstStrideInBytes, const dFloat64* const src, dInt32 srcStrideInBytes, dInt32 count) const
+void ndMatrix::TransformTriplex (dFloat64* const dst, dInt32 dstStrideInBytes, const dFloat64* const src, dInt32 srcStrideInBytes, dInt32 count) const
 {
 	dInt32 dstStride = dInt32 (dstStrideInBytes /sizeof (dFloat64));
 	dInt32 srcStride = dInt32 (srcStrideInBytes / sizeof (dFloat64));
@@ -145,7 +145,7 @@ void dMatrix::TransformTriplex (dFloat64* const dst, dInt32 dstStrideInBytes, co
 	}
 }
 
-void dMatrix::TransformTriplex (dFloat64* const dst, dInt32 dstStrideInBytes, const dFloat32* const src, dInt32 srcStrideInBytes, dInt32 count) const
+void ndMatrix::TransformTriplex (dFloat64* const dst, dInt32 dstStrideInBytes, const dFloat32* const src, dInt32 srcStrideInBytes, dInt32 count) const
 {
 	dInt32 dstStride = dInt32 (dstStrideInBytes /sizeof (dFloat64));
 	dInt32 srcStride = dInt32 (srcStrideInBytes / sizeof (dFloat32));
@@ -166,12 +166,12 @@ void dMatrix::TransformTriplex (dFloat64* const dst, dInt32 dstStrideInBytes, co
 }
 #endif
 
-void dMatrix::TransformBBox (const dVector& p0local, const dVector& p1local, dVector& p0, dVector& p1) const
+void ndMatrix::TransformBBox (const ndVector& p0local, const ndVector& p1local, ndVector& p0, ndVector& p1) const
 {
-	const dMatrix& matrix = *this;
-	dVector size ((p1local - p0local) * dVector::m_half);
-	dVector center (TransformVector ((p1local + p0local) * dVector::m_half));
-	dVector extends (size.m_x * dAbs(matrix[0][0]) + size.m_y * dAbs(matrix[1][0]) + size.m_z * dAbs(matrix[2][0]),  
+	const ndMatrix& matrix = *this;
+	ndVector size ((p1local - p0local) * ndVector::m_half);
+	ndVector center (TransformVector ((p1local + p0local) * ndVector::m_half));
+	ndVector extends (size.m_x * dAbs(matrix[0][0]) + size.m_y * dAbs(matrix[1][0]) + size.m_z * dAbs(matrix[2][0]),  
 					 size.m_x * dAbs(matrix[0][1]) + size.m_y * dAbs(matrix[1][1]) + size.m_z * dAbs(matrix[2][1]),  
 	                 size.m_x * dAbs(matrix[0][2]) + size.m_y * dAbs(matrix[1][2]) + size.m_z * dAbs(matrix[2][2]), dFloat32 (0.0f));  
 
@@ -179,10 +179,10 @@ void dMatrix::TransformBBox (const dVector& p0local, const dVector& p1local, dVe
 	p1 = center + extends;
 }
 
-dMatrix dMatrix::Inverse4x4 () const
+ndMatrix ndMatrix::Inverse4x4 () const
 {
-	dMatrix tmp (*this);
-	dMatrix inv (dGetIdentityMatrix());
+	ndMatrix tmp (*this);
+	ndMatrix inv (dGetIdentityMatrix());
 	for (dInt32 i = 0; i < 4; i++) 
 	{
 		dFloat32 pivot = dAbs(tmp[i][i]);
@@ -209,7 +209,7 @@ dMatrix dMatrix::Inverse4x4 () const
 
 		for (dInt32 j = i + 1; j < 4; j++) 
 		{
-			dVector scale (tmp[j][i] / tmp[i][i]);
+			ndVector scale (tmp[j][i] / tmp[i][i]);
 			tmp[j] -= tmp[i] * scale;
 			inv[j] -= inv[i] * scale;
 			tmp[j][i] = dFloat32 (0.0f);
@@ -218,13 +218,13 @@ dMatrix dMatrix::Inverse4x4 () const
 
 	for (dInt32 i = 3; i >= 0; i--) 
 	{
-		dVector acc(dVector::m_zero);
+		ndVector acc(ndVector::m_zero);
 		for (dInt32 j = i + 1; j < 4; j++) 
 		{
-			dVector pivot(tmp[i][j]);
+			ndVector pivot(tmp[i][j]);
 			acc += pivot * inv[j];
 		}
-		dVector den(dFloat32(1.0f) / tmp[i][i]);
+		ndVector den(dFloat32(1.0f) / tmp[i][i]);
 		inv[i] = den * (inv[i] - acc);
 	}
 
@@ -245,10 +245,10 @@ dMatrix dMatrix::Inverse4x4 () const
 	return inv;
 }
 
-dVector dMatrix::SolveByGaussianElimination(const dVector &v) const
+ndVector ndMatrix::SolveByGaussianElimination(const ndVector &v) const
 {
-	dMatrix tmp(*this);
-	dVector ret(v);
+	ndMatrix tmp(*this);
+	ndVector ret(v);
 	for (dInt32 i = 0; i < 4; i++) 
 	{
 		dFloat32 pivot = dAbs(tmp[i][i]);
@@ -275,7 +275,7 @@ dVector dMatrix::SolveByGaussianElimination(const dVector &v) const
 
 		for (dInt32 j = i + 1; j < 4; j++) 
 		{
-			dVector scale(tmp[j][i] / tmp[i][i]);
+			ndVector scale(tmp[j][i] / tmp[i][i]);
 			tmp[j] -= tmp[i] * scale;
 			ret[j] -= ret[i] * scale.GetScalar();
 			tmp[j][i] = dFloat32(0.0f);
@@ -284,16 +284,16 @@ dVector dMatrix::SolveByGaussianElimination(const dVector &v) const
 
 	for (dInt32 i = 3; i >= 0; i--) 
 	{
-		dVector pivot(tmp[i] * ret);
+		ndVector pivot(tmp[i] * ret);
 		ret[i] = (ret[i] - pivot.AddHorizontal().GetScalar() + tmp[i][i] * ret[i]) / tmp[i][i];
 	}
 
 	return ret;
 }
 
-void dMatrix::CalcPitchYawRoll (dVector& euler0, dVector& euler1) const
+void ndMatrix::CalcPitchYawRoll (ndVector& euler0, ndVector& euler1) const
 {
-	const dMatrix& matrix = *this;
+	const ndMatrix& matrix = *this;
 	dAssert (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() > 0.0f);
 	dAssert (dAbs (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-4f));
 
@@ -311,8 +311,8 @@ void dMatrix::CalcPitchYawRoll (dVector& euler0, dVector& euler1) const
 		euler1[0] = picth0;
 		euler1[1] = yaw0;
 		euler1[2] = roll0;
-		//dMatrix xxxx(dPitchMatrix(picth0) * dYawMatrix(yaw0) * dRollMatrix(roll0));
-		//dMatrix xxxx1(dPitchMatrix(picth0) * dYawMatrix(yaw0) * dRollMatrix(roll0));
+		//ndMatrix xxxx(dPitchMatrix(picth0) * dYawMatrix(yaw0) * dRollMatrix(roll0));
+		//ndMatrix xxxx1(dPitchMatrix(picth0) * dYawMatrix(yaw0) * dRollMatrix(roll0));
 	} 
 	else if (matrix[0][2] < dFloat32 (-0.99995f)) 
 	{
@@ -326,8 +326,8 @@ void dMatrix::CalcPitchYawRoll (dVector& euler0, dVector& euler1) const
 		euler1[0] = picth0;
 		euler1[1] = yaw0;
 		euler1[2] = roll0;
-		//dMatrix xxxx(dPitchMatrix(picth0) * dYawMatrix(yaw0) * dRollMatrix(roll0));
-		//dMatrix xxxx1(dPitchMatrix(picth0) * dYawMatrix(yaw0) * dRollMatrix(roll0));
+		//ndMatrix xxxx(dPitchMatrix(picth0) * dYawMatrix(yaw0) * dRollMatrix(roll0));
+		//ndMatrix xxxx1(dPitchMatrix(picth0) * dYawMatrix(yaw0) * dRollMatrix(roll0));
 	} 
 	else 
 	{
@@ -358,8 +358,8 @@ void dMatrix::CalcPitchYawRoll (dVector& euler0, dVector& euler1) const
 	euler1[3] = dFloat32(0.0f);
 
 #ifdef _DEBUG
-	dMatrix m0 (dPitchMatrix (euler0[0]) * dYawMatrix(euler0[1]) * dRollMatrix(euler0[2]));
-	dMatrix m1 (dPitchMatrix (euler1[0]) * dYawMatrix(euler1[1]) * dRollMatrix(euler1[2]));
+	ndMatrix m0 (dPitchMatrix (euler0[0]) * dYawMatrix(euler0[1]) * dRollMatrix(euler0[2]));
+	ndMatrix m1 (dPitchMatrix (euler1[0]) * dYawMatrix(euler1[1]) * dRollMatrix(euler1[2]));
 	for (dInt32 i = 0; i < 3; i ++) 
 	{
 		for (dInt32 j = 0; j < 3; j ++) 
@@ -373,12 +373,12 @@ void dMatrix::CalcPitchYawRoll (dVector& euler0, dVector& euler1) const
 #endif
 }
 
-void dMatrix::PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMatrix& stretchAxis) const
+void ndMatrix::PolarDecomposition (ndMatrix& transformMatrix, ndVector& scale, ndMatrix& stretchAxis) const
 {
 	// a polar decomposition decompose matrix A = O * S
 	// where S = sqrt (transpose (L) * L)
 
-	const dMatrix& me = *this;
+	const ndMatrix& me = *this;
 	dFloat32 sign = dSign (me[2].DotProduct(me[0].CrossProduct(me[1])).GetScalar());
 	stretchAxis = me * Transpose();
 	scale = stretchAxis.EigenVectors();
@@ -392,12 +392,12 @@ void dMatrix::PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMat
 	scale[2] = sign * dSqrt (scale[2]);
 	scale[3] = dFloat32 (0.0f);
 
-	dMatrix scaledAxis;
+	ndMatrix scaledAxis;
 	scaledAxis[0] = stretchAxis[0].Scale (dFloat32 (1.0f) / scale[0]);
 	scaledAxis[1] = stretchAxis[1].Scale (dFloat32 (1.0f) / scale[1]);
 	scaledAxis[2] = stretchAxis[2].Scale (dFloat32 (1.0f) / scale[2]);
 	scaledAxis[3] = stretchAxis[3];
-	dMatrix symetricInv (stretchAxis.Transpose() * scaledAxis);
+	ndMatrix symetricInv (stretchAxis.Transpose() * scaledAxis);
 
 	transformMatrix = symetricInv * (*this);
 	transformMatrix.m_posit = m_posit;
@@ -495,10 +495,10 @@ dVector dMatrix::EigenVectors()
 }
 
 #else
-dVector dMatrix::EigenVectors ()
+ndVector ndMatrix::EigenVectors ()
 {
-	dMatrix matrix (*this);
-	dMatrix eigenVectors(dGetIdentityMatrix());
+	ndMatrix matrix (*this);
+	ndMatrix eigenVectors(dGetIdentityMatrix());
 
 #if 0
 	if (dAbs(m_front.m_z) > dFloat32(1.0e-6f)) {
@@ -524,17 +524,17 @@ dVector dMatrix::EigenVectors ()
 	// QR algorithm is really bad at converging matrices with very different eigenvalue. 
 	// the solution is to use RD with double shift which I do not feel like implementing. 
 	// using Jacobi diagonalize instead
-	dVector d (matrix[0][0], matrix[1][1], matrix[2][2], dFloat32 (0.0f)); 
-	dVector b (d);
+	ndVector d (matrix[0][0], matrix[1][1], matrix[2][2], dFloat32 (0.0f)); 
+	ndVector b (d);
 	for (dInt32 i = 0; i < 50; i++) 
 	{
 		dFloat32 sm = matrix[0][1] * matrix[0][1] + matrix[0][2] * matrix[0][2] + matrix[1][2] * matrix[1][2];
 		if (sm < dFloat32 (1.0e-12f)) 
 		{
 			// make sure the the Eigen vectors are orthonormal
-			//dVector tmp (eigenVectors.m_front.CrossProduct(eigenVectors.m_up));
+			//ndVector tmp (eigenVectors.m_front.CrossProduct(eigenVectors.m_up));
 			//if (tmp.DotProduct(eigenVectors.m_right).GetScalar() < dFloat32(0.0f)) {
-			//	eigenVectors.m_right = eigenVectors.m_right * dVector::m_negOne;
+			//	eigenVectors.m_right = eigenVectors.m_right * ndVector::m_negOne;
 			//}
 			dAssert (eigenVectors[0].DotProduct(eigenVectors[1].CrossProduct(eigenVectors[2])).GetScalar() > dFloat32 (0.0f));
 			break;
@@ -546,7 +546,7 @@ dVector dMatrix::EigenVectors ()
 			thresh = (dFloat32)(0.2f / 9.0f) * sm;
 		}
 
-		dVector z (dVector::m_zero);
+		ndVector z (ndVector::m_zero);
 		for (dInt32 j = 0; j < 2; j ++) 
 		{
 			for (dInt32 k = j + 1; k < 3; k ++) 
@@ -605,10 +605,10 @@ dVector dMatrix::EigenVectors ()
 						matrix[k][n] = h0 + s * (g0 - h0 * tau);
 					}
 
-					dVector sv (s);
-					dVector tauv (tau);
-					dVector gv (eigenVectors[j]);
-					dVector hv (eigenVectors[k]);
+					ndVector sv (s);
+					ndVector tauv (tau);
+					ndVector gv (eigenVectors[j]);
+					ndVector hv (eigenVectors[k]);
 					eigenVectors[j] -= sv * (hv + gv * tauv); 
 					eigenVectors[k] += sv * (gv - hv * tauv);
 				}
@@ -620,13 +620,13 @@ dVector dMatrix::EigenVectors ()
 	}
 
 	#ifdef _DEBUG___
-		dMatrix diag(dGetIdentityMatrix());
+		ndMatrix diag(dGetIdentityMatrix());
 		diag[0][0] = d[0];
 		diag[1][1] = d[1];
 		diag[2][2] = d[2];
-		dMatrix E(eigenVectors.Transpose());
-		dMatrix originalMatrix(*this);
-		dMatrix tempMatrix(E * diag * E.Transpose());
+		ndMatrix E(eigenVectors.Transpose());
+		ndMatrix originalMatrix(*this);
+		ndMatrix tempMatrix(E * diag * E.Transpose());
 		for (dInt32 j = 0; j < 3; j++) 
 		{
 			for (dInt32 k = 0; k < 3; k++) 

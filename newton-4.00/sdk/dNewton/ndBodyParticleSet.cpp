@@ -39,7 +39,7 @@ ndBodyParticleSet::ndBodyParticleSet()
 	//dAssert(0);
 }
 
-ndBodyParticleSet::ndBodyParticleSet(const dLoadSaveBase::dLoadDescriptor& desc)
+ndBodyParticleSet::ndBodyParticleSet(const ndLoadSaveBase::dLoadDescriptor& desc)
 	:ndBody(desc)
 	//,m_accel(dVector::m_zero)
 	//,m_alpha(dVector::m_zero)
@@ -60,7 +60,7 @@ ndBodyParticleSet::~ndBodyParticleSet()
 }
 
 //void ndBodyParticleSet::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
-void ndBodyParticleSet::Save(const dLoadSaveBase::dSaveDescriptor&) const
+void ndBodyParticleSet::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 {
 	dAssert(0);
 	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyParticleSet", nodeid);

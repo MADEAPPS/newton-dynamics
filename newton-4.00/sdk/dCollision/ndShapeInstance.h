@@ -34,7 +34,7 @@ class ndShapeInstance;
 class ndRayCastNotify;
 
 D_MSV_NEWTON_ALIGN_32
-class ndShapeDebugNotify : public dClassAlloc
+class ndShapeDebugNotify : public ndClassAlloc
 {
 	public: 
 	enum ndEdgeType
@@ -52,13 +52,13 @@ class ndShapeDebugNotify : public dClassAlloc
 	{
 	}
 
-	virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray, const ndEdgeType* const edgeType) = 0;
+	virtual void DrawPolygon(dInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const edgeType) = 0;
 
 	const ndShapeInstance* m_instance;
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
-class ndShapeInstance: public dClassAlloc
+class ndShapeInstance: public ndClassAlloc
 {
 	public:
 	class ndDistanceCalculator
@@ -70,13 +70,13 @@ class ndShapeInstance: public dClassAlloc
 		}
 
 		ndDistanceCalculator(ndScene* const scene,
-			ndShapeInstance* const shape0, const dMatrix& matrix0,
-			ndShapeInstance* const shape1, const dMatrix& matrix1)
+			ndShapeInstance* const shape0, const ndMatrix& matrix0,
+			ndShapeInstance* const shape1, const ndMatrix& matrix1)
 			:m_matrix0(matrix0)
 			,m_matrix1(matrix1)
-			,m_point0(dVector::m_wOne)
-			,m_point1(dVector::m_wOne)
-			,m_normal(dVector::m_zero)
+			,m_point0(ndVector::m_wOne)
+			,m_point1(ndVector::m_wOne)
+			,m_normal(ndVector::m_zero)
 			,m_scene(scene)
 			,m_shape0(shape0)
 			,m_shape1(shape1)
@@ -85,11 +85,11 @@ class ndShapeInstance: public dClassAlloc
 
 		D_COLLISION_API bool ClosestPoint();
 
-		dMatrix m_matrix0;
-		dMatrix m_matrix1;
-		dVector m_point0;
-		dVector m_point1;
-		dVector m_normal;
+		ndMatrix m_matrix0;
+		ndMatrix m_matrix1;
+		ndVector m_point0;
+		ndVector m_point1;
+		ndVector m_normal;
 		ndScene* m_scene;
 		ndShapeInstance* m_shape0;
 		ndShapeInstance* m_shape1;
@@ -111,33 +111,33 @@ class ndShapeInstance: public dClassAlloc
 
 	D_COLLISION_API ndShapeInstance& operator=(const ndShapeInstance& src);
 
-	D_COLLISION_API dMatrix CalculateInertia() const;
-	D_COLLISION_API void CalculateObb(dVector& origin, dVector& size) const;
-	D_COLLISION_API void CalculateAabb(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
-	D_COLLISION_API void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	D_COLLISION_API dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API ndMatrix CalculateInertia() const;
+	D_COLLISION_API void CalculateObb(ndVector& origin, ndVector& size) const;
+	D_COLLISION_API void CalculateAabb(const ndMatrix& matrix, ndVector& minP, ndVector& maxP) const;
+	D_COLLISION_API void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
+	D_COLLISION_API dFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const;
 
-	//D_COLLISION_API dInt32 ClosestPoint(const dMatrix& matrix, const dVector& point, dVector& contactPoint) const;
+	//D_COLLISION_API dInt32 ClosestPoint(const ndMatrix& matrix, const ndVector& point, ndVector& contactPoint) const;
 
 	D_COLLISION_API ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
-	D_COLLISION_API dFloat32 CalculateBuoyancyCenterOfPresure(dVector& com, const dMatrix& matrix, const dVector& fluidPlane) const;
+	D_COLLISION_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
+	D_COLLISION_API dFloat32 CalculateBuoyancyCenterOfPresure(ndVector& com, const ndMatrix& matrix, const ndVector& fluidPlane) const;
 
-	D_COLLISION_API static dVector GetBoxPadding();
+	D_COLLISION_API static ndVector GetBoxPadding();
 	
 
 	ndShape* GetShape();
 	const ndShape* GetShape() const;
-	dVector SupportVertex(const dVector& dir) const;
-	dMatrix GetScaledTransform(const dMatrix& matrix) const;
-	dVector SupportVertexSpecial(const dVector& dir, dInt32* const vertexIndex) const;
-	dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
+	ndVector SupportVertex(const ndVector& dir) const;
+	ndMatrix GetScaledTransform(const ndMatrix& matrix) const;
+	ndVector SupportVertexSpecial(const ndVector& dir, dInt32* const vertexIndex) const;
+	ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
 
-	const dMatrix& GetLocalMatrix() const;
-	void SetLocalMatrix(const dMatrix& matrix);
+	const ndMatrix& GetLocalMatrix() const;
+	void SetLocalMatrix(const ndMatrix& matrix);
 
-	const dMatrix& GetGlobalMatrix() const;
-	void SetGlobalMatrix(const dMatrix& scale);
+	const ndMatrix& GetGlobalMatrix() const;
+	void SetGlobalMatrix(const ndMatrix& scale);
 
 	bool GetCollisionMode() const;
 	void SetCollisionMode(bool mode);
@@ -146,11 +146,11 @@ class ndShapeInstance: public dClassAlloc
 	ndShapeMaterial GetMaterial() const;
 	void SetMaterial(const ndShapeMaterial& material);
 	
-	const dVector& GetScale() const;
-	const dVector& GetInvScale() const;
-	D_COLLISION_API void SetScale(const dVector& scale);
-	D_COLLISION_API void SetGlobalScale(const dVector& scale);
-	D_COLLISION_API dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
+	const ndVector& GetScale() const;
+	const ndVector& GetInvScale() const;
+	D_COLLISION_API void SetScale(const ndVector& scale);
+	D_COLLISION_API void SetGlobalScale(const ndVector& scale);
+	D_COLLISION_API dInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 
 	dFloat32 GetVolume() const;
 	dFloat32 GetBoxMinRadius() const;
@@ -160,12 +160,12 @@ class ndShapeInstance: public dClassAlloc
 	dFloat32 GetUmbraClipSize() const;
 	dUnsigned64 GetUserDataID() const;
 
-	dMatrix m_globalMatrix;
-	dMatrix m_localMatrix;
-	dMatrix m_aligmentMatrix;
-	dVector m_scale;
-	dVector m_invScale;
-	dVector m_maxScale;
+	ndMatrix m_globalMatrix;
+	ndMatrix m_localMatrix;
+	ndMatrix m_aligmentMatrix;
+	ndVector m_scale;
+	ndVector m_invScale;
+	ndVector m_maxScale;
 
 	ndShapeMaterial m_shapeMaterial;
 	const ndShape* m_shape;
@@ -178,7 +178,7 @@ class ndShapeInstance: public dClassAlloc
 	bool m_collisionMode;
 
 	private:
-	static dVector m_padding;
+	static ndVector m_padding;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline ndShape* ndShapeInstance::GetShape()
@@ -191,12 +191,12 @@ inline const ndShape* ndShapeInstance::GetShape() const
 	return m_shape; 
 }
 
-inline const dMatrix& ndShapeInstance::GetLocalMatrix() const
+inline const ndMatrix& ndShapeInstance::GetLocalMatrix() const
 {
 	return m_localMatrix;
 }
 
-inline void ndShapeInstance::SetLocalMatrix(const dMatrix& matrix)
+inline void ndShapeInstance::SetLocalMatrix(const ndMatrix& matrix)
 {
 	m_localMatrix = matrix;
 }
@@ -206,26 +206,26 @@ inline dInt32 ndShapeInstance::GetConvexVertexCount() const
 	return m_shape->GetConvexVertexCount();
 }
 
-inline const dMatrix& ndShapeInstance::GetGlobalMatrix() const
+inline const ndMatrix& ndShapeInstance::GetGlobalMatrix() const
 {
 	return m_globalMatrix;
 }
 
-inline void ndShapeInstance::SetGlobalMatrix(const dMatrix& matrix)
+inline void ndShapeInstance::SetGlobalMatrix(const ndMatrix& matrix)
 {
 	m_globalMatrix = matrix;
 }
 
-inline dMatrix ndShapeInstance::GetScaledTransform(const dMatrix& matrix) const
+inline ndMatrix ndShapeInstance::GetScaledTransform(const ndMatrix& matrix) const
 {
-	dMatrix scaledMatrix(m_localMatrix * matrix);
+	ndMatrix scaledMatrix(m_localMatrix * matrix);
 	scaledMatrix[0] = scaledMatrix[0].Scale(m_scale[0]);
 	scaledMatrix[1] = scaledMatrix[1].Scale(m_scale[1]);
 	scaledMatrix[2] = scaledMatrix[2].Scale(m_scale[2]);
 	return m_aligmentMatrix * scaledMatrix;
 }
 
-inline dVector ndShapeInstance::SupportVertex(const dVector& dir) const
+inline ndVector ndShapeInstance::SupportVertex(const ndVector& dir) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-2f));
@@ -243,20 +243,20 @@ inline dVector ndShapeInstance::SupportVertex(const dVector& dir) const
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p, n * transp(S)) 
-			dVector dir1((m_scale * dir).Normalize());
+			ndVector dir1((m_scale * dir).Normalize());
 			return m_scale * m_shape->SupportVertex(dir1, nullptr);
 		}
 
 		case m_global:
 		default:
 		{
-			dVector dir1(m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
+			ndVector dir1(m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
 			return m_scale * m_aligmentMatrix.TransformVector(m_shape->SupportVertex(dir1, nullptr));
 		}
 	}
 }
 
-inline dVector ndShapeInstance::SupportVertexSpecial(const dVector& dir, dInt32* const vertexIndex) const
+inline ndVector ndShapeInstance::SupportVertexSpecial(const ndVector& dir, dInt32* const vertexIndex) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-2f));
@@ -277,7 +277,7 @@ inline dVector ndShapeInstance::SupportVertexSpecial(const dVector& dir, dInt32*
 	}
 }
 
-inline dVector ndShapeInstance::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const
+inline ndVector ndShapeInstance::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-2f));
@@ -323,12 +323,12 @@ inline void ndShapeInstance::SetCollisionMode(bool mode)
 	m_collisionMode = mode;
 }
 
-inline const dVector& ndShapeInstance::GetScale() const
+inline const ndVector& ndShapeInstance::GetScale() const
 {
 	return m_scale;
 }
 
-inline const dVector& ndShapeInstance::GetInvScale() const
+inline const ndVector& ndShapeInstance::GetInvScale() const
 {
 	return m_invScale;
 }

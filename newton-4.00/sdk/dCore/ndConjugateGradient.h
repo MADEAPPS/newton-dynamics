@@ -33,10 +33,10 @@
 #define D_USE_JACOBI_PRECONDITIONER
 
 template<class T>
-class dDefaultMatrixOperator
+class ndDefaultMatrixOperator
 {
 	public:
-	dDefaultMatrixOperator(dInt32 size, const T* const matrix, T* const preconditonerBuffer)
+	ndDefaultMatrixOperator(dInt32 size, const T* const matrix, T* const preconditonerBuffer)
 		:m_matrix(matrix)
 		,m_preconditoner(preconditonerBuffer)
 		,m_size(size)
@@ -125,13 +125,13 @@ class dDefaultMatrixOperator
 	T A[6][6];
 };
 
-template<class T, class dMatrixOperator = dDefaultMatrixOperator<T>>
-class dConjugateGradient : public dClassAlloc
+template<class T, class ndMatrixOperator = ndDefaultMatrixOperator<T>>
+class ndConjugateGradient : public ndClassAlloc
 {
 	public:
-	dConjugateGradient();
-	dConjugateGradient(T* const r0, T* const z0, T* const p0, T* const q0);
-	~dConjugateGradient();
+	ndConjugateGradient();
+	ndConjugateGradient(T* const r0, T* const z0, T* const p0, T* const q0);
+	~ndConjugateGradient();
 
 	void SetBuffers(T* const r0, T* const z0, T* const p0, T* const q0);
 	T Solve(dInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer);
@@ -145,25 +145,25 @@ class dConjugateGradient : public dClassAlloc
 	T* m_q0;
 };
 
-template<class T, class dMatrixOperator>
-dConjugateGradient<T, dMatrixOperator>::dConjugateGradient()
+template<class T, class ndMatrixOperator>
+ndConjugateGradient<T, ndMatrixOperator>::ndConjugateGradient()
 {
 	SetBuffers(nullptr, nullptr, nullptr, nullptr);
 }
 
-template<class T, class dMatrixOperator>
-dConjugateGradient<T, dMatrixOperator>::dConjugateGradient(T* const r0, T* const z0, T* const p0, T* const q0)
+template<class T, class ndMatrixOperator>
+ndConjugateGradient<T, ndMatrixOperator>::ndConjugateGradient(T* const r0, T* const z0, T* const p0, T* const q0)
 {
 	SetBuffers(r0, z0, p0, q0);
 }
 
-template<class T, class dMatrixOperator>
-dConjugateGradient<T, dMatrixOperator>::~dConjugateGradient()
+template<class T, class ndMatrixOperator>
+ndConjugateGradient<T, ndMatrixOperator>::~ndConjugateGradient()
 {
 }
 
-template<class T, class dMatrixOperator>
-void dConjugateGradient<T, dMatrixOperator>::SetBuffers(T* const r0, T* const z0, T* const p0, T* const q0)
+template<class T, class ndMatrixOperator>
+void ndConjugateGradient<T, ndMatrixOperator>::SetBuffers(T* const r0, T* const z0, T* const p0, T* const q0)
 {
 	m_r0 = r0;
 	m_z0 = z0;
@@ -171,8 +171,8 @@ void dConjugateGradient<T, dMatrixOperator>::SetBuffers(T* const r0, T* const z0
 	m_q0 = q0;
 }
 
-template<class T, class dMatrixOperator>
-T dConjugateGradient<T, dMatrixOperator>::Solve(dInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer)
+template<class T, class ndMatrixOperator>
+T ndConjugateGradient<T, ndMatrixOperator>::Solve(dInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer)
 {
 	if (m_r0) 
 	{
@@ -191,10 +191,10 @@ T dConjugateGradient<T, dMatrixOperator>::Solve(dInt32 size, T tolerance, T* con
 	}
 }
 
-template<class T, class dMatrixOperator>
-T dConjugateGradient<T, dMatrixOperator>::SolveInternal(dInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer) const
+template<class T, class ndMatrixOperator>
+T ndConjugateGradient<T, ndMatrixOperator>::SolveInternal(dInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer) const
 {
-	dMatrixOperator matrixOper(size, matrix, preconditionerBuffer);
+	ndMatrixOperator matrixOper(size, matrix, preconditionerBuffer);
 
 	matrixOper.MatrixTimeVector(x, m_z0);
 	dSub(size, m_r0, b, m_z0);

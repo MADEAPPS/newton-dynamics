@@ -45,23 +45,23 @@ class ndShapeConvexPolygon: public ndShapeConvex
 
 	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon();
 
-	dVector CalculateGlobalNormal(const ndShapeInstance* const parentMesh, const dVector& localNormal) const;
+	ndVector CalculateGlobalNormal(const ndShapeInstance* const parentMesh, const ndVector& localNormal) const;
 	dInt32 CalculateContactToConvexHullDescrete(const ndShapeInstance* const parentMesh, ndContactSolver& proxy);
 	dInt32 CalculateContactToConvexHullContinue(const ndShapeInstance* const parentMesh, ndContactSolver& proxy);
 
 	virtual dFloat32 GetVolume() const;
 	virtual dFloat32 GetBoxMinRadius() const;
 	virtual dFloat32 GetBoxMaxRadius() const;
-	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
-	bool BeamClipping(const dVector& origin, dFloat32 size, const ndShapeInstance* const parentMesh);
-	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
+	virtual ndVector SupportVertex(const ndVector& dir, dInt32* const vertexIndex) const;
+	bool BeamClipping(const ndVector& origin, dFloat32 size, const ndShapeInstance* const parentMesh);
+	virtual dInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	virtual dFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
 	virtual dInt32 Release() const;
 
-	dVector m_normal;
-	dVector m_localPoly[D_CONVEX_POLYGON_MAX_VERTEX_COUNT];
+	ndVector m_normal;
+	ndVector m_localPoly[D_CONVEX_POLYGON_MAX_VERTEX_COUNT];
 	dInt32 m_clippEdgeNormal[D_CONVEX_POLYGON_MAX_VERTEX_COUNT];
 	dFloat32 m_faceClipSize;
 	dInt32 m_count;
@@ -80,7 +80,7 @@ inline ndShapeConvexPolygon* ndShapeConvexPolygon::GetAsShapeAsConvexPolygon()
 	return this; 
 }
 
-inline dFloat32 ndShapeConvexPolygon::RayCast(ndRayCastNotify&, const dVector&, const dVector&, dFloat32, const ndBody* const, ndContactPoint&) const
+inline dFloat32 ndShapeConvexPolygon::RayCast(ndRayCastNotify&, const ndVector&, const ndVector&, dFloat32, const ndBody* const, ndContactPoint&) const
 {
 	return dFloat32(1.2f);
 }

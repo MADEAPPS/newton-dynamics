@@ -12,18 +12,18 @@
 #include "ndCoreStdafx.h"
 #include "ndNodeHierarchy.h"
 
-dNodeBaseHierarchy::dNodeBaseHierarchy (const dNodeBaseHierarchy &clone)
+ndNodeBaseHierarchy::ndNodeBaseHierarchy (const ndNodeBaseHierarchy &clone)
 {
 	Clear ();
 	SetName (clone.m_name.GetStr());
-	for (dNodeBaseHierarchy* obj = clone.m_child; obj; obj = obj->m_sibling) 
+	for (ndNodeBaseHierarchy* obj = clone.m_child; obj; obj = obj->m_sibling) 
 	{
-		dNodeBaseHierarchy* const newObj = obj->CreateClone ();
+		ndNodeBaseHierarchy* const newObj = obj->CreateClone ();
 		newObj->Attach (this);
 	}
 }
 
-dNodeBaseHierarchy::~dNodeBaseHierarchy () 
+ndNodeBaseHierarchy::~ndNodeBaseHierarchy () 
 {
 	Detach();
 	while (m_child) 
@@ -32,7 +32,7 @@ dNodeBaseHierarchy::~dNodeBaseHierarchy ()
 	}
 }
 
-void dNodeBaseHierarchy::Attach (dNodeBaseHierarchy* const parentArg, bool addFirst)
+void ndNodeBaseHierarchy::Attach (ndNodeBaseHierarchy* const parentArg, bool addFirst)
 {
 	m_parent = parentArg;
 	if (m_parent->m_child) 
@@ -44,7 +44,7 @@ void dNodeBaseHierarchy::Attach (dNodeBaseHierarchy* const parentArg, bool addFi
 		} 
 		else 
 		{
-			dNodeBaseHierarchy* obj = m_parent->m_child;
+			ndNodeBaseHierarchy* obj = m_parent->m_child;
 			for (; obj->m_sibling; obj = obj->m_sibling);
 			obj->m_sibling = this;
 		}
@@ -55,7 +55,7 @@ void dNodeBaseHierarchy::Attach (dNodeBaseHierarchy* const parentArg, bool addFi
 	}
 }
 
-void dNodeBaseHierarchy::Detach ()
+void ndNodeBaseHierarchy::Detach ()
 {
  	if (m_parent) 
 	{
@@ -65,7 +65,7 @@ void dNodeBaseHierarchy::Detach ()
 		} 
 		else 
 		{
-			dNodeBaseHierarchy* ptr = m_parent->m_child;
+			ndNodeBaseHierarchy* ptr = m_parent->m_child;
 			for (; ptr->m_sibling != this; ptr = ptr->m_sibling);
 			ptr->m_sibling = m_sibling;
 		}
@@ -74,29 +74,29 @@ void dNodeBaseHierarchy::Detach ()
 	}
 }
 	
-dNodeBaseHierarchy* dNodeBaseHierarchy::GetRoot() const
+ndNodeBaseHierarchy* ndNodeBaseHierarchy::GetRoot() const
 {
-	const dNodeBaseHierarchy* root = this;
+	const ndNodeBaseHierarchy* root = this;
 	for (; root->m_parent; root = root->m_parent);
-	return (dNodeBaseHierarchy*)root;
+	return (ndNodeBaseHierarchy*)root;
 }
 
-dNodeBaseHierarchy* dNodeBaseHierarchy::GetFirst() const
+ndNodeBaseHierarchy* ndNodeBaseHierarchy::GetFirst() const
 {
-	dNodeBaseHierarchy* ptr = (dNodeBaseHierarchy*) this;
+	ndNodeBaseHierarchy* ptr = (ndNodeBaseHierarchy*) this;
 	for (; ptr->m_child; ptr = ptr->m_child);
 	return ptr;
 }
 
-dNodeBaseHierarchy* dNodeBaseHierarchy::GetNext() const
+ndNodeBaseHierarchy* ndNodeBaseHierarchy::GetNext() const
 {
 	if (m_sibling) 
 	{
 		return m_sibling->GetFirst();
 	}
 
-	dNodeBaseHierarchy* ptr = m_parent;
-	dNodeBaseHierarchy* x = (dNodeBaseHierarchy *)this;
+	ndNodeBaseHierarchy* ptr = m_parent;
+	ndNodeBaseHierarchy* x = (ndNodeBaseHierarchy *)this;
 	for (; ptr && (x == ptr->m_sibling); ptr = ptr->m_parent) 
 	{
 		x = ptr;
@@ -104,22 +104,22 @@ dNodeBaseHierarchy* dNodeBaseHierarchy::GetNext() const
 	return ptr;
 }
 
-dNodeBaseHierarchy* dNodeBaseHierarchy::GetLast() const
+ndNodeBaseHierarchy* ndNodeBaseHierarchy::GetLast() const
 {
-	dNodeBaseHierarchy* ptr = (dNodeBaseHierarchy*) this;
+	ndNodeBaseHierarchy* ptr = (ndNodeBaseHierarchy*) this;
 	for (; ptr->m_sibling; ptr = ptr->m_sibling);
 	return ptr;
 }
 
-dNodeBaseHierarchy* dNodeBaseHierarchy::GetPrev() const
+ndNodeBaseHierarchy* ndNodeBaseHierarchy::GetPrev() const
 {
 	if (m_child) 
 	{
 		return m_child->GetNext();
 	}
 
-	dNodeBaseHierarchy* ptr = m_parent;
-	dNodeBaseHierarchy* x = (dNodeBaseHierarchy *)this;
+	ndNodeBaseHierarchy* ptr = m_parent;
+	ndNodeBaseHierarchy* x = (ndNodeBaseHierarchy *)this;
 	for (; ptr && (x == ptr->m_child); ptr = ptr->m_child) 
 	{
 		x = ptr;
@@ -127,15 +127,15 @@ dNodeBaseHierarchy* dNodeBaseHierarchy::GetPrev() const
 	return ptr;
 }
 
-dNodeBaseHierarchy* dNodeBaseHierarchy::Find (dUnsigned64 nameCRC) const 
+ndNodeBaseHierarchy* ndNodeBaseHierarchy::Find (dUnsigned64 nameCRC) const 
 {
 	if (nameCRC == GetNameID()) 
 	{
-		return (dNodeBaseHierarchy*)this;
+		return (ndNodeBaseHierarchy*)this;
 	} 
 	else 
 	{
-		for (dNodeBaseHierarchy* ptr = GetFirst(); ptr && (ptr != this); ptr = ptr->GetNext()) 
+		for (ndNodeBaseHierarchy* ptr = GetFirst(); ptr && (ptr != this); ptr = ptr->GetNext()) 
 		{
 			if (nameCRC == ptr->GetNameID()) 
 			{

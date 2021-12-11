@@ -30,7 +30,7 @@ ndShapePoint::ndShapePoint()
 {
 }
 
-ndShapePoint::ndShapePoint(const dLoadSaveBase::dLoadDescriptor&)
+ndShapePoint::ndShapePoint(const ndLoadSaveBase::dLoadDescriptor&)
 	:ndShapeConvex(m_pointCollision)
 {
 	dAssert(0);
@@ -43,45 +43,45 @@ ndShapePoint::~ndShapePoint()
 void ndShapePoint::MassProperties()
 {
 	dAssert(0);
-	//m_centerOfMass = dVector::m_zero;
-	//m_crossInertia = dVector::m_zero;
+	//m_centerOfMass = ndVector::m_zero;
+	//m_crossInertia = ndVector::m_zero;
 	//dFloat32 volume = dFloat32(4.0f * dPi / 3.0f) * m_radius *  m_radius * m_radius;
 	//dFloat32 II = dFloat32(2.0f / 5.0f) * m_radius *  m_radius;
-	//m_inertia = dVector(II, II, II, dFloat32(0.0f));
+	//m_inertia = ndVector(II, II, II, dFloat32(0.0f));
 	//m_centerOfMass.m_w = volume;
 }
 
-void ndShapePoint::CalculateAabb(const dMatrix&, dVector &, dVector &) const
+void ndShapePoint::CalculateAabb(const ndMatrix&, ndVector &, ndVector &) const
 {
 	dAssert(0);
-	//dVector size(m_radius);
-	//p0 = (matrix[3] - size) & dVector::m_triplexMask;
-	//p1 = (matrix[3] + size) & dVector::m_triplexMask;
+	//ndVector size(m_radius);
+	//p0 = (matrix[3] - size) & ndVector::m_triplexMask;
+	//p1 = (matrix[3] + size) & ndVector::m_triplexMask;
 }
 
-dVector ndShapePoint::SupportVertexSpecialProjectPoint(const dVector&, const dVector&) const
+ndVector ndShapePoint::SupportVertexSpecialProjectPoint(const ndVector&, const ndVector&) const
 {
 	dAssert(0);
 	//return dir.Scale(m_radius - D_PENETRATION_TOL);
-	return dVector::m_zero;
+	return ndVector::m_zero;
 }
 
-dVector ndShapePoint::SupportVertexSpecial(const dVector&, dFloat32, dInt32* const) const
+ndVector ndShapePoint::SupportVertexSpecial(const ndVector&, dFloat32, dInt32* const) const
 {
-	return dVector::m_zero;
+	return ndVector::m_zero;
 }
 
-dVector ndShapePoint::SupportVertex(const dVector&, dInt32* const) const
+ndVector ndShapePoint::SupportVertex(const ndVector&, dInt32* const) const
 {
 	dAssert(0);
 	//dAssert(dir.m_w == dFloat32(0.0f));
 	//dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
 	//dAssert(dir.m_w == 0.0f);
 	//return dir.Scale(m_radius);
-	return dVector::m_zero;
+	return ndVector::m_zero;
 }
 
-dInt32 ndShapePoint::CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const
+dInt32 ndShapePoint::CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const
 {
 	dAssert(normal.m_w == 0.0f);
 	dAssert(normal.DotProduct(normal).GetScalar() > dFloat32(0.999f));
@@ -89,14 +89,14 @@ dInt32 ndShapePoint::CalculatePlaneIntersection(const dVector& normal, const dVe
 	return 1;
 }
 
-dFloat32 ndShapePoint::RayCast(ndRayCastNotify&, const dVector&, const dVector&, dFloat32, const ndBody* const, ndContactPoint&) const
+dFloat32 ndShapePoint::RayCast(ndRayCastNotify&, const ndVector&, const ndVector&, dFloat32, const ndBody* const, ndContactPoint&) const
 {
 	dAssert(0);
 	return dFloat32 (1.2f);
-	//dFloat32 t = dRayCastSphere(localP0, localP1, dVector::m_zero, m_radius);
+	//dFloat32 t = dRayCastSphere(localP0, localP1, ndVector::m_zero, m_radius);
 	//if (t < maxT) 
 	//{
-	//	dVector contact(localP0 + (localP1 - localP0).Scale(t));
+	//	ndVector contact(localP0 + (localP1 - localP0).Scale(t));
 	//	dAssert(contact.m_w == dFloat32(0.0f));
 	//	//contactOut.m_normal = contact.Scale (dgRsqrt (contact.DotProduct(contact).GetScalar()));
 	//	contactOut.m_normal = contact.Normalize();
@@ -112,17 +112,17 @@ ndShapeInfo ndShapePoint::GetShapeInfo() const
 	return info;
 }
 
-void ndShapePoint::DebugShape(const dMatrix&, ndShapeDebugNotify&) const
+void ndShapePoint::DebugShape(const ndMatrix&, ndShapeDebugNotify&) const
 {
 	dAssert(0);
-	//dVector tmpVectex[1024 * 2];
+	//ndVector tmpVectex[1024 * 2];
 	//
-	//dVector p0(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
-	//dVector p1(-dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
-	//dVector p2(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
-	//dVector p3(dFloat32(0.0f), -dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
-	//dVector p4(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f));
-	//dVector p5(dFloat32(0.0f), dFloat32(0.0f), -dFloat32(1.0f), dFloat32(0.0f));
+	//ndVector p0(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+	//ndVector p1(-dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+	//ndVector p2(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
+	//ndVector p3(dFloat32(0.0f), -dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
+	//ndVector p4(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f));
+	//ndVector p5(dFloat32(0.0f), dFloat32(0.0f), -dFloat32(1.0f), dFloat32(0.0f));
 	//
 	//dInt32 index = 3;
 	//dInt32 count = 0;
@@ -137,7 +137,7 @@ void ndShapePoint::DebugShape(const dMatrix&, ndShapeDebugNotify&) const
 	//
 	//for (dInt32 i = 0; i < count; i++) 
 	//{
-	//	tmpVectex[i] = matrix.TransformVector(tmpVectex[i].Scale(m_radius)) & dVector::m_triplexMask;
+	//	tmpVectex[i] = matrix.TransformVector(tmpVectex[i].Scale(m_radius)) & ndVector::m_triplexMask;
 	//}
 	//
 	//for (dInt32 i = 0; i < count; i += 3) 
@@ -146,7 +146,7 @@ void ndShapePoint::DebugShape(const dMatrix&, ndShapeDebugNotify&) const
 	//}
 }
 
-void ndShapePoint::Save(const dLoadSaveBase::dSaveDescriptor&) const
+void ndShapePoint::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 {
 	dAssert(0);
 }

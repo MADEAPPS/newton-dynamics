@@ -26,25 +26,25 @@
 #include "ndMemory.h"
 
 /// Base class for providing memory allocation for all other engine classes.
-class dClassAlloc  
+class ndClassAlloc  
 {
 	public:
 	/// Empty
-	inline dClassAlloc()
+	inline ndClassAlloc()
 	{
 	}
 
 	/// Empty
-	inline ~dClassAlloc()
+	inline ~ndClassAlloc()
 	{
 	}
 
 	D_OPERATOR_NEW_AND_DELETE
 
-	/// Generic allocation for any function subclass from dClassAlloc
+	/// Generic allocation for any function subclass from ndClassAlloc
 	D_CORE_API static void* Malloc(size_t size);
 
-	/// Generic destruction for any function subclass from dClassAlloc
+	/// Generic destruction for any function subclass from ndClassAlloc
 	D_CORE_API static void Free(void* const ptr);
 };
 

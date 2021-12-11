@@ -20,13 +20,13 @@ class ndDemoEntity;
 class ndShaderPrograms;
 class ndDemoEntityManager;
 
-class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
+class ndDemoMesh: public ndDemoMeshInterface, public ndList<ndDemoSubMesh>
 {
 	public:
 	ndDemoMesh(const char* const name);
 	ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCache);
 	ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
-	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
+	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = dGetIdentityMatrix());
 
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const) 
 	{ 
@@ -38,16 +38,16 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	virtual const char* GetTextureName (const ndDemoSubMesh* const subMesh) const;
 
 	virtual void RenderNormals();
-	virtual void Render (ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
-	virtual void RenderTransparency(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+	virtual void Render (ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
+	virtual void RenderTransparency(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 	void OptimizeForRender(const glPositionNormalUV* const points, dInt32 pointCount,
 						   const dInt32* const indices, dInt32 indexCount);
-	void GetVertexArray(dArray<dVector>& points) const;
+	void GetVertexArray(ndArray<ndVector>& points) const;
 
 	protected:
 	virtual ~ndDemoMesh();
 	void ResetOptimization();
-	void RenderGeometry(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+	void RenderGeometry(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 
 	dInt32 m_indexCount;
 	dInt32 m_vertexCount;

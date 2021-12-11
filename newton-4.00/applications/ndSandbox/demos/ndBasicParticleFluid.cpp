@@ -33,8 +33,8 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 		//segment->m_material.m_textureHandle = (GLuint)material;
 		segment->m_material.m_textureHandle = (GLuint)1;
 
-		segment->m_material.m_diffuse = dVector(0.1f, 0.6f, 0.9f, 0.0f);
-		segment->m_material.m_ambient = dVector(0.1f, 0.6f, 0.9f, 0.0f);
+		segment->m_material.m_diffuse = ndVector(0.1f, 0.6f, 0.9f, 0.0f);
+		segment->m_material.m_ambient = ndVector(0.1f, 0.6f, 0.9f, 0.0f);
 
 		segment->SetOpacity(0.4f);
 		segment->m_segmentStart = 0;
@@ -42,7 +42,7 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 		m_hasTransparency = true;
 	}
 
-	void UpdateBuffers(const dArray<glPositionNormalUV>& points, const dArray<dInt32>& indexList)
+	void UpdateBuffers(const ndArray<glPositionNormalUV>& points, const ndArray<dInt32>& indexList)
 	{
 		//OptimizeForRender(points, indexList);
 		OptimizeForRender(&points[0], points.GetCount(), &indexList[0], indexList.GetCount());
@@ -55,18 +55,18 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 class ndWaterVolumeEntity : public ndDemoEntity
 {
 	public:
-	//ndWaterVolumeEntity(ndDemoEntityManager* const scene, const dMatrix& location, const dVector& size, ndBodySphFluid* const fluidBody, dFloat32 radius)
-		ndWaterVolumeEntity(ndDemoEntityManager* const scene, const dMatrix& location, const dVector&, ndBodySphFluid* const fluidBody, dFloat32)
+	//ndWaterVolumeEntity(ndDemoEntityManager* const scene, const ndMatrix& location, const ndVector& size, ndBodySphFluid* const fluidBody, dFloat32 radius)
+		ndWaterVolumeEntity(ndDemoEntityManager* const scene, const ndMatrix& location, const ndVector&, ndBodySphFluid* const fluidBody, dFloat32)
 		:ndDemoEntity(location, nullptr)
 		,m_fluidBody(fluidBody)
 		,m_hasNewMesh(false)
 	{
 		ndShapeInstance box(new ndShapeBox(9.0f, 10.0f, 9.0f));
-		dMatrix uvMatrix(dGetIdentityMatrix());
+		ndMatrix uvMatrix(dGetIdentityMatrix());
 		uvMatrix[0][0] *= 1.0f / 20.0f;
 		uvMatrix[1][1] *= 1.0f / 10.0f;
 		uvMatrix[2][2] *= 1.0f / 20.0f;
-		uvMatrix.m_posit = dVector(0.5f, 0.5f, 0.5f, 1.0f);
+		uvMatrix.m_posit = ndVector(0.5f, 0.5f, 0.5f, 1.0f);
 
 		ndDemoMesh* const geometry = new ndDemoMesh("fluidVolume", scene->GetShaderCache(), &box, "metal_30.tga", "metal_30.tga", "logo_php.tga", 0.5f, uvMatrix);
 		SetMesh(geometry, dGetIdentityMatrix());
@@ -80,23 +80,23 @@ class ndWaterVolumeEntity : public ndDemoEntity
 
 	~ndWaterVolumeEntity()
 	{
-		dScopeSpinLock lock(m_lock);
+		ndScopeSpinLock lock(m_lock);
 		m_isoSurfaceMesh0->Release();
 		m_isoSurfaceMesh1->Release();
 	}
 
-	void Render(dFloat32, ndDemoEntityManager* const scene, const dMatrix&) const
+	void Render(dFloat32, ndDemoEntityManager* const scene, const ndMatrix&) const
 	{
 		// for now the mesh in is global space I need to fix that
-		//dMatrix nodeMatrix(m_matrix * matrix);
+		//ndMatrix nodeMatrix(m_matrix * matrix);
 
-		dMatrix nodeMatrix(dGetIdentityMatrix());
+		ndMatrix nodeMatrix(dGetIdentityMatrix());
 		//nodeMatrix.m_posit.m_y += 0.125f;
 	
 		// render the fluid;
 		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
 		
-		dScopeSpinLock lock(m_lock);
+		ndScopeSpinLock lock(m_lock);
 		if (m_hasNewMesh)
 		{
 			m_hasNewMesh = false;
@@ -108,14 +108,14 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		//ndDemoEntity::Render(timeStep, scene, matrix);
 	}
 
-	void UpdateIsoSuface(const dIsoSurface& isoSurface)
+	void UpdateIsoSuface(const ndIsoSurface& isoSurface)
 	{
 		if (isoSurface.GetVertexCount())
 		{
 			m_points.Resize(isoSurface.GetVertexCount());
 			m_points.SetCount(isoSurface.GetVertexCount());
-			const dVector* const points = isoSurface.GetPoints();
-			const dVector* const normals = isoSurface.GetNormals();
+			const ndVector* const points = isoSurface.GetPoints();
+			const ndVector* const normals = isoSurface.GetNormals();
 			for (dInt32 i = 0; i < isoSurface.GetVertexCount(); i++)
 			{
 				m_points[i].m_posit = glVector3(GLfloat(points[i].m_x), GLfloat(points[i].m_y), GLfloat(points[i].m_z));
@@ -132,16 +132,16 @@ class ndWaterVolumeEntity : public ndDemoEntity
 				m_indexList[i] = dInt32(indexList[i]);
 			}
 
-			dScopeSpinLock lock(m_lock);
+			ndScopeSpinLock lock(m_lock);
 			m_hasNewMesh = true;
 		}
 	}
 
 	ndBodySphFluid* m_fluidBody;
-	dArray<dInt32> m_indexList;
-	dArray<glPositionNormalUV> m_points;
+	ndArray<dInt32> m_indexList;
+	ndArray<glPositionNormalUV> m_points;
 	mutable bool m_hasNewMesh;
-	mutable dSpinLock m_lock;
+	mutable ndSpinLock m_lock;
 	mutable ndIsoSurfaceMesh* m_isoSurfaceMesh0;
 	mutable ndIsoSurfaceMesh* m_isoSurfaceMesh1;
 };
@@ -154,32 +154,32 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 	{
 	}
 
-	void OnTransform(dInt32, const dMatrix&)
+	void OnTransform(dInt32, const ndMatrix&)
 	{
 		ndBodySphFluid* const fluid = GetBody()->GetAsBodySphFluid();
 		dAssert(fluid);
 
 		//fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.25f);
 		fluid->GenerateIsoSurface(m_manager->GetWorld());
-		const dIsoSurface& isoSurface = fluid->GetIsoSurface();
+		const ndIsoSurface& isoSurface = fluid->GetIsoSurface();
 
 		ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
 		entity->UpdateIsoSuface(isoSurface);
 	}
 };
 
-static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& location)
+static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	dMatrix matrix(location);
-	dVector floor(FindFloor(*world, matrix.m_posit, 200.0f));
+	ndMatrix matrix(location);
+	ndVector floor(FindFloor(*world, matrix.m_posit, 200.0f));
 	matrix.m_posit = floor;
 	matrix.m_posit.m_w = 1.0f;
 
 	dFloat32 diameter = 0.25f;
 	ndBodySphFluid* const fluidObject = new ndBodySphFluid();
-	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, dVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject, diameter * 0.5f);
+	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, ndVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject, diameter * 0.5f);
 
 	fluidObject->SetNotifyCallback(new ndWaterVolumeCallback(scene, entity));
 	fluidObject->SetMatrix(matrix);
@@ -192,7 +192,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 	dFloat32 spacing = diameter * 1.0f;
 
 	dFloat32 offset = spacing * particleCountPerAxis / 2.0f;
-	dVector origin(-offset, 1.0f, -offset, dFloat32(0.0f));
+	ndVector origin(-offset, 1.0f, -offset, dFloat32(0.0f));
 
 	matrix.m_posit += origin;
 	
@@ -205,14 +205,14 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 			for (dInt32 x = 0; x < particleCountPerAxis; x++)
 			//for (dInt32 x = 0; x < 1; x++)
 			{
-				dVector posit (matrix.TransformVector(dVector (x * spacing, y * spacing, z * spacing, dFloat32 (1.0f))));
-				fluidObject->AddParticle(0.1f, posit, dVector::m_zero);
+				ndVector posit (matrix.TransformVector(ndVector (x * spacing, y * spacing, z * spacing, dFloat32 (1.0f))));
+				fluidObject->AddParticle(0.1f, posit, ndVector::m_zero);
 
-				//dVector xxxx(dVector::m_zero);
-				//fluidObject->AddParticle(0.1f, xxxx, dVector::m_zero);
+				//ndVector xxxx(ndVector::m_zero);
+				//fluidObject->AddParticle(0.1f, xxxx, ndVector::m_zero);
 
-				//posit += dVector(0.01f, 0.01f, 0.01f, 0.0f);
-				//fluidObject->AddParticle(0.1f, origin + posit, dVector::m_zero);
+				//posit += ndVector(0.01f, 0.01f, 0.01f, 0.0f);
+				//fluidObject->AddParticle(0.1f, origin + posit, ndVector::m_zero);
 			}
 		}
 	}
@@ -225,12 +225,12 @@ void ndBasicParticleFluid (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFlatPlane(scene, true);
 
-	dMatrix location(dGetIdentityMatrix());
+	ndMatrix location(dGetIdentityMatrix());
 
 	// adding a water volume
 	AddWaterVolume(scene, location);
 
-	dQuaternion rot;
-	dVector origin(-15.0f, 4.0f, 0.0f, 0.0f);
+	ndQuaternion rot;
+	ndVector origin(-15.0f, 4.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

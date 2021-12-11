@@ -18,7 +18,7 @@
 
 ndDemoMesh::ndDemoMesh(const char* const name)
 	:ndDemoMeshInterface()
-	,dList<ndDemoSubMesh>()
+	,ndList<ndDemoSubMesh>()
 	,m_indexCount(0)
 	,m_vertexCount(0)
 	,m_textureLocation(0)
@@ -41,7 +41,7 @@ ndDemoMesh::ndDemoMesh(const char* const name)
 
 ndDemoMesh::ndDemoMesh(const ndDemoMesh&, const ndShaderPrograms&)
 	:ndDemoMeshInterface()
-	,dList<ndDemoSubMesh>()
+	,ndList<ndDemoSubMesh>()
 	,m_indexCount(0)
 	,m_vertexCount(0)
 	,m_shader(0)
@@ -54,7 +54,7 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh&, const ndShaderPrograms&)
 	//AllocVertexData(mesh.m_vertexCount);
 	//memcpy (m_points, mesh.m_points, m_vertexCount * sizeof (glPositionNormalUV));
 	//
-	//for (dNode* nodes = mesh.GetFirst(); nodes; nodes = nodes->GetNext()) 
+	//for (ndNode* nodes = mesh.GetFirst(); nodes; nodes = nodes->GetNext()) 
 	//{
 	//	ndDemoSubMesh* const segment = AddSubMesh();
 	//	ndDemoSubMesh& srcSegment = nodes->GetInfo();
@@ -79,9 +79,9 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh&, const ndShaderPrograms&)
 	//OptimizeForRender ();
 }
 
-ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const, const char* const, dFloat32 opacity, const dMatrix& uvMatrix)
+ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const, const char* const, dFloat32 opacity, const ndMatrix& uvMatrix)
 	:ndDemoMeshInterface()
-	,dList<ndDemoSubMesh>()
+	,ndList<ndDemoSubMesh>()
 	,m_indexCount(0)
 	,m_vertexCount(0)
 	,m_shader(0)
@@ -95,8 +95,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 
 	//mesh.CalculateNormals(30.0f * dDegreeToRad);
 
-	dMatrix aligmentUV(uvMatrix);
-	//dMatrix aligmentUV (collision->GetLocalMatrix());
+	ndMatrix aligmentUV(uvMatrix);
+	//ndMatrix aligmentUV (collision->GetLocalMatrix());
 	//aligmentUV = aligmentUV.Inverse();
 
 	m_shader = shaderCache.m_diffuseEffect;
@@ -161,9 +161,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		dFloat32 m_uv[2];
 	};
 
-	dArray<dTmpData> tmp;
-	dArray<dInt32> indices;
-	dArray<glPositionNormalUV> points;
+	ndArray<dTmpData> tmp;
+	ndArray<dInt32> indices;
+	ndArray<glPositionNormalUV> points;
 
 	tmp.SetCount(vertexCount);
 	points.SetCount(vertexCount);
@@ -213,7 +213,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 
 ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
-	,dList<ndDemoSubMesh>()
+	,ndList<ndDemoSubMesh>()
 	,m_indexCount(0)
 	,m_vertexCount(0)
 	,m_shader(0)
@@ -243,9 +243,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 		dFloat32 m_uv[2];
 	};
 
-	dArray<dTmpData> tmp;
-	dArray<dInt32> indices;
-	dArray<glPositionNormalUV> points;
+	ndArray<dTmpData> tmp;
+	ndArray<dInt32> indices;
+	ndArray<glPositionNormalUV> points;
 
 	indices.SetCount(indexCount);
 	points.SetCount(vertexCount);
@@ -269,7 +269,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, con
 
 	dInt32 segmentStart = 0;
 	bool hasTransparency = false;
-	const dArray<ndMeshEffect::dMaterial>& materialArray = meshNode->GetMaterials();
+	const ndArray<ndMeshEffect::dMaterial>& materialArray = meshNode->GetMaterials();
 	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
 	{
 		dInt32 materialIndex = meshNode->GetMaterialID(geometryHandle, handle);
@@ -399,7 +399,7 @@ void  ndDemoMesh::ResetOptimization()
 	}
 }
 
-void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+void ndDemoMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
 {
 	if (m_isVisible)
 	{
@@ -411,7 +411,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 
 		if (hasTrasnparency)
 		{
-			for (dNode* node = GetFirst(); node; node = node->GetNext())
+			for (ndNode* node = GetFirst(); node; node = node->GetNext())
 			{
 				ndDemoSubMesh& segment = node->GetInfo();
 				hasTrasnparency = hasTrasnparency & segment.m_hasTranparency;
@@ -425,10 +425,10 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 
 			ndDemoCamera* const camera = scene->GetCamera();
 
-			const dMatrix& viewMatrix = camera->GetViewMatrix();
+			const ndMatrix& viewMatrix = camera->GetViewMatrix();
 			const glMatrix& projectionMatrix (camera->GetProjectionMatrix());
 			const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
-			const glVector4 directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+			const glVector4 directionaLight(viewMatrix.RotateVector(ndVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
 
 			glUniform1i(m_textureLocation, 0);
 			glUniform1f(m_transparencyLocation, 1.0f);
@@ -439,7 +439,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 
 			//float k1 = 7.0 / 120.0;
 			//float k2 = 1.0 / 240.0;
-			//float d2 = viewModelMatrix.m_posit.DotProduct(viewModelMatrix.m_posit & dVector::m_triplexMask).GetScalar();
+			//float d2 = viewModelMatrix.m_posit.DotProduct(viewModelMatrix.m_posit & ndVector::m_triplexMask).GetScalar();
 			//float d1 = sqrt(d2);
 			//float attenuation = 1.0 / (1.0 + k1 * d1 + k2 * d2);
 			//dAssert(attenuation > 0.0f);
@@ -449,7 +449,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 			glActiveTexture(GL_TEXTURE0);
-			for (dNode* node = GetFirst(); node; node = node->GetNext())
+			for (ndNode* node = GetFirst(); node; node = node->GetNext())
 			{
 				ndDemoSubMesh& segment = node->GetInfo();
 				if (!segment.m_hasTranparency)
@@ -473,16 +473,16 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 	}
 }
 
-void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
 {
 	glUseProgram(m_shader);
 
 	ndDemoCamera* const camera = scene->GetCamera();
 
-	const dMatrix& viewMatrix = camera->GetViewMatrix();
+	const ndMatrix& viewMatrix = camera->GetViewMatrix();
 	const glMatrix& projectionMatrix (camera->GetProjectionMatrix());
 	const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
-	const glVector4 directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+	const glVector4 directionaLight(viewMatrix.RotateVector(ndVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
 
 	glUniform1i(m_textureLocation, 0);
 	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight[0]);
@@ -494,7 +494,7 @@ void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const dMatrix&
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 	glActiveTexture(GL_TEXTURE0);
-	for (dNode* node = GetFirst(); node; node = node->GetNext())
+	for (ndNode* node = GetFirst(); node; node = node->GetNext())
 	{
 		ndDemoSubMesh& segment = node->GetInfo();
 		if (segment.m_hasTranparency)
@@ -521,7 +521,7 @@ void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const dMatrix&
 	glUseProgram(0);
 }
 
-void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
 {
 	if (m_isVisible)
 	{
@@ -542,7 +542,7 @@ void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMat
 	}
 }
 
-void ndDemoMesh::GetVertexArray(dArray<dVector>& points) const
+void ndDemoMesh::GetVertexArray(ndArray<ndVector>& points) const
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	const glPositionNormalUV* const data = (glPositionNormalUV*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
@@ -551,7 +551,7 @@ void ndDemoMesh::GetVertexArray(dArray<dVector>& points) const
 	points.SetCount(m_vertexCount);
 	for (dInt32 i = 0; i < m_vertexCount; i++)
 	{
-		points[i] = dVector(data[i].m_posit.m_x, data[i].m_posit.m_y, data[i].m_posit.m_z, dFloat32 (0.0f));
+		points[i] = ndVector(data[i].m_posit.m_x, data[i].m_posit.m_y, data[i].m_posit.m_z, dFloat32 (0.0f));
 	}
 
 	glUnmapBuffer(GL_ARRAY_BUFFER);

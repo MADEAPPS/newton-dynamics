@@ -28,13 +28,13 @@
 #include "ndClassAlloc.h"
 #include "ndContainersAlloc.h"
 
-template<class T, class allocator = dContainersAlloc<T> >
-class dList: public dClassAlloc
+template<class T, class allocator = ndContainersAlloc<T> >
+class ndList: public ndClassAlloc
 {
 	public:
-	class dNode: public allocator
+	class ndNode: public allocator
 	{
-		dNode (dNode* const prev, dNode* const next) 
+		ndNode (ndNode* const prev, ndNode* const next) 
 			:allocator()
 			,m_info () 
 			,m_next(next)
@@ -50,7 +50,7 @@ class dList: public dClassAlloc
 			}
 		}
 
-		dNode (const T &info, dNode* const prev, dNode* const next) 
+		ndNode (const T &info, ndNode* const prev, ndNode* const next) 
 			:allocator()
 			,m_info (info) 
 			,m_next(next)
@@ -66,7 +66,7 @@ class dList: public dClassAlloc
 			}
 		}
 
-		~dNode()
+		~ndNode()
 		{
 		}
 
@@ -84,13 +84,13 @@ class dList: public dClassAlloc
 			m_next = nullptr;
 		}
 
-		void AddLast(dNode* const node) 
+		void AddLast(ndNode* const node) 
 		{
 			m_next = node;
 			node->m_prev = this;
 		}
 
-		void AddFirst(dNode* const node) 
+		void AddFirst(ndNode* const node) 
 		{
 			m_prev = node;
 			node->m_next = this;
@@ -102,30 +102,30 @@ class dList: public dClassAlloc
 			return m_info;
 		}
 
-		dNode *GetNext() const
+		ndNode *GetNext() const
 		{
 			return m_next;
 		}
 
-		dNode *GetPrev() const
+		ndNode *GetPrev() const
 		{
 			return m_prev;
 		}
 
 		private:
 		T m_info;
-		dNode *m_next;
-		dNode *m_prev;
-		friend class dList<T, allocator>;
+		ndNode *m_next;
+		ndNode *m_prev;
+		friend class ndList<T, allocator>;
 	};
 
 	class Iterator
 	{
 		public:
-		Iterator (const dList<T, allocator> &me)
+		Iterator (const ndList<T, allocator> &me)
 		{
 			m_ptr = nullptr;
-			m_list = (dList *)&me;
+			m_list = (ndList *)&me;
 		}
 
 		~Iterator ()
@@ -152,7 +152,7 @@ class dList: public dClassAlloc
 			m_ptr = m_list->GetLast();
 		}
 
-		void Set (dNode* const node)
+		void Set (ndNode* const node)
 		{
 			m_ptr = node;
 		}
@@ -186,52 +186,52 @@ class dList: public dClassAlloc
 			return m_ptr->GetInfo();
 		}
 
-		dNode *GetNode() const
+		ndNode *GetNode() const
 		{
 			return m_ptr;
 		}
 
 		private:
-		dList *m_list;
-		dNode *m_ptr;
+		ndList *m_list;
+		ndNode *m_ptr;
 	};
 
 	// ***********************************************************
 	// member functions
 	// ***********************************************************
 	public:
-	dList ();
-	~dList ();
+	ndList ();
+	~ndList ();
 
 	operator dInt32() const;
 	dInt32 GetCount() const;
-	dNode* GetLast() const;
-	dNode* GetFirst() const;
-	dNode* Append ();
-	dNode* Append (dNode* const node);
-	dNode* Append (const T &element);
-	dNode* Addtop ();
-	dNode* Addtop (dNode* const node);
-	dNode* Addtop (const T &element);
+	ndNode* GetLast() const;
+	ndNode* GetFirst() const;
+	ndNode* Append ();
+	ndNode* Append (ndNode* const node);
+	ndNode* Append (const T &element);
+	ndNode* Addtop ();
+	ndNode* Addtop (ndNode* const node);
+	ndNode* Addtop (const T &element);
 	
-	void RotateToEnd (dNode* const node);
-	void RotateToBegin (dNode* const node);
-	void InsertAfter (dNode* const root, dNode* const node);
-	void InsertBefore (dNode* const root, dNode* const node);
+	void RotateToEnd (ndNode* const node);
+	void RotateToBegin (ndNode* const node);
+	void InsertAfter (ndNode* const root, ndNode* const node);
+	void InsertBefore (ndNode* const root, ndNode* const node);
 
-	dNode* Find (const T &element) const;
-	dNode* GetNodeFromInfo (T &m_info) const;
-	void Remove (dNode* const node);
+	ndNode* Find (const T &element) const;
+	ndNode* GetNodeFromInfo (T &m_info) const;
+	void Remove (ndNode* const node);
 	void Remove (const T &element);
 	void RemoveAll ();
 
-	void Merge (dList<T, allocator>& list);
-	void Unlink (dNode* const node);
+	void Merge (ndList<T, allocator>& list);
+	void Unlink (ndNode* const node);
 	bool SanityCheck () const;
 
 	static void FlushFreeList()
 	{
-		allocator::FlushFreeList(sizeof (dNode));
+		allocator::FlushFreeList(sizeof (ndNode));
 	}
 
 	protected:
@@ -239,15 +239,15 @@ class dList: public dClassAlloc
 	// member variables
 	// ***********************************************************
 	private:
-	dNode* m_first;
-	dNode* m_last;
+	ndNode* m_first;
+	ndNode* m_last;
 	dInt32 m_count;
-	friend class dNode;
+	friend class ndNode;
 };
 
 template<class T, class allocator>
-dList<T,allocator>::dList ()
-	:dClassAlloc()
+ndList<T,allocator>::ndList ()
+	:ndClassAlloc()
 	,m_first(nullptr)
 	,m_last(nullptr)
 	,m_count(0)
@@ -255,37 +255,37 @@ dList<T,allocator>::dList ()
 }
 
 template<class T, class allocator>
-dList<T,allocator>::~dList () 
+ndList<T,allocator>::~ndList () 
 {
 	RemoveAll ();
 }
 
 template<class T, class allocator>
-dInt32 dList<T,allocator>::GetCount() const
+dInt32 ndList<T,allocator>::GetCount() const
 {
 	return m_count;
 }
 
 template<class T, class allocator>
-dList<T,allocator>::operator dInt32() const
+ndList<T,allocator>::operator dInt32() const
 {
 	return m_first != nullptr;
 }
 
 template<class T, class allocator>
-typename dList<T,allocator>::dNode *dList<T,allocator>::GetFirst() const
+typename ndList<T,allocator>::ndNode *ndList<T,allocator>::GetFirst() const
 {
 	return m_first;
 }
 
 template<class T, class allocator>
-typename dList<T,allocator>::dNode *dList<T,allocator>::GetLast() const
+typename ndList<T,allocator>::ndNode *ndList<T,allocator>::GetLast() const
 {
 	return m_last;
 }
 
 template<class T, class allocator>
-typename dList<T,allocator>::dNode *dList<T,allocator>::Append (dNode* const node)
+typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Append (ndNode* const node)
 {
 	dAssert (node->m_next == nullptr);
 	dAssert (node->m_prev == nullptr);
@@ -307,17 +307,17 @@ typename dList<T,allocator>::dNode *dList<T,allocator>::Append (dNode* const nod
 }
 
 template<class T, class allocator>
-typename dList<T,allocator>::dNode *dList<T,allocator>::Append ()
+typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Append ()
 {
 	m_count	++;
 	if (m_first == nullptr) 
 	{
-		m_first = new dNode(nullptr, nullptr);
+		m_first = new ndNode(nullptr, nullptr);
 		m_last = m_first;
 	} 
 	else 
 	{
-		m_last = new dNode(m_last, nullptr);
+		m_last = new ndNode(m_last, nullptr);
 	}
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dAssert (SanityCheck ());
@@ -326,17 +326,17 @@ typename dList<T,allocator>::dNode *dList<T,allocator>::Append ()
 }
 
 template<class T, class allocator>
-typename dList<T,allocator>::dNode *dList<T,allocator>::Append (const T &element)
+typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Append (const T &element)
 {
 	m_count	++;
 	if (m_first == nullptr) 
 	{
-		m_first = new dNode(element, nullptr, nullptr);
+		m_first = new ndNode(element, nullptr, nullptr);
 		m_last = m_first;
 	} 
 	else 
 	{
-		m_last = new dNode(element, m_last, nullptr);
+		m_last = new ndNode(element, m_last, nullptr);
 	}
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dAssert (SanityCheck ());
@@ -346,7 +346,7 @@ typename dList<T,allocator>::dNode *dList<T,allocator>::Append (const T &element
 }
 
 template<class T, class allocator>
-typename dList<T,allocator>::dNode *dList<T,allocator>::Addtop (dNode* const node)
+typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Addtop (ndNode* const node)
 {
 	dAssert (node->m_next == nullptr);
 	dAssert (node->m_prev == nullptr);
@@ -368,17 +368,17 @@ typename dList<T,allocator>::dNode *dList<T,allocator>::Addtop (dNode* const nod
 }
 
 template<class T, class allocator>
-typename dList<T,allocator>::dNode *dList<T,allocator>::Addtop ()
+typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Addtop ()
 {
 	m_count	++;
 	if (m_last == nullptr) 
 	{
-		m_last = new dNode(nullptr, nullptr);
+		m_last = new ndNode(nullptr, nullptr);
 		m_first = m_last;
 	} 
 	else 
 	{
-		m_first = new dNode(nullptr, m_first);
+		m_first = new ndNode(nullptr, m_first);
 	}
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dAssert (SanityCheck ());
@@ -387,17 +387,17 @@ typename dList<T,allocator>::dNode *dList<T,allocator>::Addtop ()
 }
 
 template<class T, class allocator>
-typename dList<T,allocator>::dNode *dList<T,allocator>::Addtop (const T &element)
+typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Addtop (const T &element)
 {
 	m_count	++;
 	if (m_last == nullptr) 
 	{
-		m_last = new dNode(element, nullptr, nullptr);
+		m_last = new ndNode(element, nullptr, nullptr);
 		m_first = m_last;
 	} 
 	else 
 	{
-		m_first = new dNode(element, nullptr, m_first);
+		m_first = new ndNode(element, nullptr, m_first);
 	}
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dAssert (SanityCheck ());
@@ -406,7 +406,7 @@ typename dList<T,allocator>::dNode *dList<T,allocator>::Addtop (const T &element
 }
 
 template<class T, class allocator>
-void dList<T,allocator>::InsertAfter (dNode* const root, dNode* const node)
+void ndList<T,allocator>::InsertAfter (ndNode* const root, ndNode* const node)
 {
 	dAssert (root);
 	if (node != root) 
@@ -446,7 +446,7 @@ void dList<T,allocator>::InsertAfter (dNode* const root, dNode* const node)
 }
 
 template<class T, class allocator>
-void dList<T,allocator>::InsertBefore (dNode* const root, dNode* const node)
+void ndList<T,allocator>::InsertBefore (ndNode* const root, ndNode* const node)
 {
 	dAssert (root);
 	if (node != root) 
@@ -484,7 +484,7 @@ void dList<T,allocator>::InsertBefore (dNode* const root, dNode* const node)
 }
 
 template<class T, class allocator>
-void dList<T,allocator>::RotateToEnd (dNode* const node)
+void ndList<T,allocator>::RotateToEnd (ndNode* const node)
 {
 	if (node != m_last) 
 	{
@@ -506,7 +506,7 @@ void dList<T,allocator>::RotateToEnd (dNode* const node)
 }
 
 template<class T, class allocator>
-void dList<T,allocator>::RotateToBegin (dNode* const node)
+void ndList<T,allocator>::RotateToBegin (ndNode* const node)
 {
 	if (node != m_first) 
 	{
@@ -528,9 +528,9 @@ void dList<T,allocator>::RotateToBegin (dNode* const node)
 }
 
 template<class T, class allocator>
-typename dList<T,allocator>::dNode *dList<T,allocator>::Find (const T &element) const
+typename ndList<T,allocator>::ndNode *ndList<T,allocator>::Find (const T &element) const
 {
-	dNode *node;
+	ndNode *node;
 	for (node = m_first; node; node = node->GetNext()) 
 	{
 		if (element	== node->m_info) 
@@ -542,20 +542,20 @@ typename dList<T,allocator>::dNode *dList<T,allocator>::Find (const T &element) 
 }
 
 template<class T, class allocator>
-typename dList<T,allocator>::dNode *dList<T,allocator>::GetNodeFromInfo (T &info) const
+typename ndList<T,allocator>::ndNode *ndList<T,allocator>::GetNodeFromInfo (T &info) const
 {
-	dNode* const node = (dNode *) &info;
+	ndNode* const node = (ndNode *) &info;
 	dInt64 offset = ((char*) &node->m_info) - ((char *) node);
-	dNode* const retnode = (dNode *) (((char *) node) - offset);
+	ndNode* const retnode = (ndNode *) (((char *) node) - offset);
 
 	dAssert (&retnode->GetInfo () == &info);
 	return retnode;
 }
 
 template<class T, class allocator> 
-void dList<T,allocator>::Remove (const T &element)
+void ndList<T,allocator>::Remove (const T &element)
 {
-	dNode *const node = Find (element);
+	ndNode *const node = Find (element);
 	if (node) 
 	{
 		Remove (node);
@@ -563,7 +563,7 @@ void dList<T,allocator>::Remove (const T &element)
 }
 
 template<class T, class allocator> 
-void dList<T,allocator>::Unlink (dNode* const node)
+void ndList<T,allocator>::Unlink (ndNode* const node)
 {
 	dAssert (node);
 
@@ -586,7 +586,7 @@ void dList<T,allocator>::Unlink (dNode* const node)
 }
 
 template<class T, class allocator> 
-void dList<T,allocator>::Merge (dList<T, allocator>& list)
+void ndList<T,allocator>::Merge (ndList<T, allocator>& list)
 {
 	m_count += list.m_count;
 	if (list.m_first) 
@@ -612,16 +612,16 @@ void dList<T,allocator>::Merge (dList<T, allocator>& list)
 }
 
 template<class T, class allocator>
-void dList<T,allocator>::Remove (dNode* const node)
+void ndList<T,allocator>::Remove (ndNode* const node)
 {
 	Unlink (node);
 	delete node;
 }
 
 template<class T, class allocator>
-void dList<T,allocator>::RemoveAll ()
+void ndList<T,allocator>::RemoveAll ()
 {
-	for (dNode *node = m_first; node; node = m_first) 
+	for (ndNode *node = m_first; node; node = m_first) 
 	{
 		m_count --;
 		m_first = node->GetNext();
@@ -634,11 +634,11 @@ void dList<T,allocator>::RemoveAll ()
 }
 
 template<class T, class allocator>
-bool dList<T,allocator>::SanityCheck () const
+bool ndList<T,allocator>::SanityCheck () const
 {
 	#ifdef _DEBUG
 	dInt32 tCount = 0;
-	for (dNode * node = m_first; node; node = node->GetNext()) 
+	for (ndNode * node = m_first; node; node = node->GetNext()) 
 	{
 		tCount ++;
 		if (node->GetPrev()) {

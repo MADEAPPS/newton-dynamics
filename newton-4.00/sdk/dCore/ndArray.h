@@ -33,14 +33,14 @@
 #include "ndClassAlloc.h"
 
 template<class T>
-class dArray: public dClassAlloc
+class ndArray: public ndClassAlloc
 {
 	public:
-	dArray();
-	dArray(dInt32 count);
-	dArray(const dArray& source);
+	ndArray();
+	ndArray(dInt32 count);
+	ndArray(const ndArray& source);
 
-	~dArray ();
+	~ndArray ();
 
 	dInt32 GetCount() const;
 	void SetCount(dInt32 count);
@@ -52,7 +52,7 @@ class dArray: public dClassAlloc
 	T& operator[] (dInt32 i);
 	const T& operator[] (dInt32 i) const;
 
-	void Swap(dArray& other);
+	void Swap(ndArray& other);
 	void PushBack(const T& element);
 
 	protected:
@@ -62,8 +62,8 @@ class dArray: public dClassAlloc
 };
 
 template<class T>
-dArray<T>::dArray()
-	:dClassAlloc()
+ndArray<T>::ndArray()
+	:ndClassAlloc()
 	,m_array(nullptr)
 	,m_size(0)
 	,m_capacity(0)
@@ -71,8 +71,8 @@ dArray<T>::dArray()
 }
 
 template<class T>
-dArray<T>::dArray(dInt32 count)
-	:dClassAlloc()
+ndArray<T>::ndArray(dInt32 count)
+	:ndClassAlloc()
 	,m_array(nullptr)
 	,m_size(0)
 	,m_capacity(0)
@@ -81,8 +81,8 @@ dArray<T>::dArray(dInt32 count)
 }
 
 template<class T>
-dArray<T>::dArray(const dArray& source)
-	:dClassAlloc()
+ndArray<T>::ndArray(const ndArray& source)
+	:ndClassAlloc()
 	,m_array(nullptr)
 	,m_size(0)
 	,m_capacity(0)
@@ -99,16 +99,16 @@ dArray<T>::dArray(const dArray& source)
 }
 
 template<class T>
-dArray<T>::~dArray ()
+ndArray<T>::~ndArray ()
 {
 	if (m_array) 
 	{
-		dMemory::Free(m_array);
+		ndMemory::Free(m_array);
 	}
 }
 
 template<class T>
-const T& dArray<T>::operator[] (dInt32 i) const
+const T& ndArray<T>::operator[] (dInt32 i) const
 {
 	dAssert(i >= 0);
 	dAssert(i < m_size);
@@ -116,7 +116,7 @@ const T& dArray<T>::operator[] (dInt32 i) const
 }
 
 template<class T>
-T& dArray<T>::operator[] (dInt32 i)
+T& ndArray<T>::operator[] (dInt32 i)
 {
 	dAssert(i >= 0);
 	dAssert(i < m_size);
@@ -124,7 +124,7 @@ T& dArray<T>::operator[] (dInt32 i)
 }
 
 template<class T>
-void dArray<T>::PushBack(const T& element)
+void ndArray<T>::PushBack(const T& element)
 {
 	dAssert(m_size <= m_capacity);
 	if (m_size == m_capacity)
@@ -136,13 +136,13 @@ void dArray<T>::PushBack(const T& element)
 }
 
 template<class T>
-dInt32 dArray<T>::GetCount() const
+dInt32 ndArray<T>::GetCount() const
 {
 	return m_size;
 }
 
 template<class T>
-void dArray<T>::SetCount(dInt32 count)
+void ndArray<T>::SetCount(dInt32 count)
 {
 	m_size = count;
 	while (m_size > m_capacity)
@@ -152,31 +152,31 @@ void dArray<T>::SetCount(dInt32 count)
 }
 
 template<class T>
-dInt32 dArray<T>::GetCapacity() const
+dInt32 ndArray<T>::GetCapacity() const
 {
 	return m_capacity;
 }
 
 template<class T>
-void dArray<T>::Clear()
+void ndArray<T>::Clear()
 {
 	m_size = 0;
 }
 
 template<class T>
-void dArray<T>::Resize(dInt32 size)
+void ndArray<T>::Resize(dInt32 size)
 {
 	if (size > m_capacity || (m_capacity == 0))
 	{
 		size = dMax(size, 16);
-		T* const newArray = (T*)dMemory::Malloc(dInt32(sizeof(T) * size));
+		T* const newArray = (T*)ndMemory::Malloc(dInt32(sizeof(T) * size));
 		if (m_array) 
 		{
 			for (dInt32 i = 0; i < m_capacity; i++)
 			{
 				memcpy(&newArray[i], &m_array[i], sizeof(T));
 			}
-			dMemory::Free(m_array);
+			ndMemory::Free(m_array);
 		}
 		m_array = newArray;
 		m_capacity = size;
@@ -184,14 +184,14 @@ void dArray<T>::Resize(dInt32 size)
 	else if (size < m_capacity) 
 	{
 		size = dMax(size, 16);
-		T* const newArray = (T*)dMemory::Malloc(dInt32(sizeof(T) * size));
+		T* const newArray = (T*)ndMemory::Malloc(dInt32(sizeof(T) * size));
 		if (m_array) 
 		{
 			for (dInt32 i = 0; i < size; i++) 
 			{
 				memcpy(&newArray[i], &m_array[i], sizeof(T));
 			}
-			dMemory::Free(m_array);
+			ndMemory::Free(m_array);
 		}
 		m_size = size;
 		m_capacity = size;
@@ -200,7 +200,7 @@ void dArray<T>::Resize(dInt32 size)
 }
 
 template<class T>
-void dArray<T>::Swap(dArray& other)
+void ndArray<T>::Swap(ndArray& other)
 {
 	dSwap(m_array, other.m_array);
 	dSwap(m_size, other.m_size);

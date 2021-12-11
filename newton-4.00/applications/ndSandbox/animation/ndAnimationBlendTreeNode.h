@@ -14,7 +14,7 @@
 
 class ndAnimationPose;
 
-class ndAnimationBlendTreeNode: public dClassAlloc
+class ndAnimationBlendTreeNode: public ndClassAlloc
 {
 	public:
 	ndAnimationBlendTreeNode(ndAnimationBlendTreeNode* const input);

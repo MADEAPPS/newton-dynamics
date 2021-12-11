@@ -65,7 +65,7 @@ void ndCharacterRootNode::Save(const ndCharacterSaveDescriptor& desc) const
 	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
 	ndCharacterNode::Save(ndCharacterSaveDescriptor(desc, childNode));
 	
-	dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode = desc.m_bodyMap->Find(m_body);
+	ndTree<dInt32, const ndBodyKinematic*>::ndNode* bodyNode = desc.m_bodyMap->Find(m_body);
 	if (!bodyNode)
 	{
 		bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_body);

@@ -90,20 +90,20 @@ class ndLoadSaveInfo
 	const ndModelList* m_modelList;
 	const ndWordSettings* m_setting;
 
-	dTree<dInt32, const ndShape*> m_shapeMap;
-	dTree<dInt32, const ndModel*> m_modelMap;
-	dTree<dInt32, const ndBodyKinematic*> m_bodyMap;
-	dTree<dInt32, const ndJointBilateralConstraint*> m_jointMap;
+	ndTree<dInt32, const ndShape*> m_shapeMap;
+	ndTree<dInt32, const ndModel*> m_modelMap;
+	ndTree<dInt32, const ndBodyKinematic*> m_bodyMap;
+	ndTree<dInt32, const ndJointBilateralConstraint*> m_jointMap;
 };
 
-ndWordSettings::ndWordSettings(const dLoadSaveBase::dLoadDescriptor&)
-	:dClassAlloc()
+ndWordSettings::ndWordSettings(const ndLoadSaveBase::dLoadDescriptor&)
+	:ndClassAlloc()
 	,m_subSteps(2)
 	,m_solverIterations(4)
 {
 }
 
-void ndWordSettings::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndWordSettings::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
@@ -114,7 +114,7 @@ void ndWordSettings::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "solverIterations", m_solverIterations);
 }
 
-void ndWordSettings::Load(const dLoadSaveBase::dLoadDescriptor& desc)
+void ndWordSettings::Load(const ndLoadSaveBase::dLoadDescriptor& desc)
 {
 	m_subSteps = xmlGetInt(desc.m_rootNode, "solverSubsteps");
 	m_solverIterations = xmlGetInt(desc.m_rootNode, "solverIterations");
@@ -128,7 +128,7 @@ void ndLoadSave::LoadSceneSettings(const nd::TiXmlNode* const rootNode, const ch
 	const nd::TiXmlNode* node = setting->FirstChild();
 	const char* const className = node->Value();
 
-	dLoadSaveBase::dLoadDescriptor settingDesc;
+	ndLoadSaveBase::dLoadDescriptor settingDesc;
 	settingDesc.m_rootNode = node;
 	settingDesc.m_assetPath = assetPath;
 
@@ -142,7 +142,7 @@ void ndLoadSave::LoadShapes(const nd::TiXmlNode* const rootNode,
 	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndShapes");
 	if (shapes)
 	{
-		dLoadSaveBase::dLoadDescriptor descriptor;
+		ndLoadSaveBase::dLoadDescriptor descriptor;
 		descriptor.m_assetPath = assetPath;
 
 		class ndPendingCompounds
@@ -152,7 +152,7 @@ void ndLoadSave::LoadShapes(const nd::TiXmlNode* const rootNode,
 			const nd::TiXmlNode* m_subShapeNodes;
 		};
 
-		dArray<ndPendingCompounds> pendingCompounds;
+		ndArray<ndPendingCompounds> pendingCompounds;
 		for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
 		{
 			const char* const name = node->Value();
@@ -164,7 +164,7 @@ void ndLoadSave::LoadShapes(const nd::TiXmlNode* const rootNode,
 				dInt32 hashId;
 				const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
 				element->Attribute("hashId", &hashId);
-				ndShapeLoaderCache::dNode* const shapeMapNode = shapesMap.Insert(ndShapeInstance(shape), hashId);
+				ndShapeLoaderCache::ndNode* const shapeMapNode = shapesMap.Insert(ndShapeInstance(shape), hashId);
 				ndShapeCompound* const compound = ((ndShape*)shapeMapNode->GetInfo().GetShape())->GetAsShapeCompound();
 				if (compound)
 				{
@@ -197,7 +197,7 @@ void ndLoadSave::LoadBodies(const nd::TiXmlNode* const rootNode,
 	const nd::TiXmlNode* const bodies = rootNode->FirstChild("ndBodies");
 	if (bodies)
 	{
-		dLoadSaveBase::dLoadDescriptor descriptor;
+		ndLoadSaveBase::dLoadDescriptor descriptor;
 		descriptor.m_assetPath = assetPath;
 		descriptor.m_shapeMap = &shapesMap;
 
@@ -222,7 +222,7 @@ void ndLoadSave::LoadJoints(const nd::TiXmlNode* const rootNode, const char* con
 	const nd::TiXmlNode* const joints = rootNode->FirstChild("ndJoints");
 	if (joints)
 	{
-		dLoadSaveBase::dLoadDescriptor descriptor;
+		ndLoadSaveBase::dLoadDescriptor descriptor;
 		descriptor.m_assetPath = assetPath;
 		descriptor.m_bodyMap = &m_bodyMap;
 
@@ -251,7 +251,7 @@ void ndLoadSave::LoadModels(const nd::TiXmlNode* const rootNode, const char* con
 	const nd::TiXmlNode* const models = rootNode->FirstChild("ndModels");
 	if (models)
 	{
-		dLoadSaveBase::dLoadDescriptor descriptor;
+		ndLoadSaveBase::dLoadDescriptor descriptor;
 		descriptor.m_assetPath = assetPath;
 		descriptor.m_bodyMap = &m_bodyMap;
 		descriptor.m_jointMap = &m_jointMap;
@@ -274,7 +274,7 @@ void ndLoadSave::LoadModels(const nd::TiXmlNode* const rootNode, const char* con
 
 void ndLoadSave::SaveSceneSettings(ndLoadSaveInfo& info) const
 {
-	dLoadSaveBase::dSaveDescriptor descriptor;
+	ndLoadSaveBase::ndSaveDescriptor descriptor;
 	descriptor.m_assetPath = info.m_assetPath;
 	descriptor.m_assetName = info.m_assetName;
 	descriptor.m_rootNode = info.m_settingsNode;
@@ -283,8 +283,8 @@ void ndLoadSave::SaveSceneSettings(ndLoadSaveInfo& info) const
 
 void ndLoadSave::SaveShapes(ndLoadSaveInfo& info)
 {
-	dTree<const ndShape*, dInt32> shapeList;
-	dTree<dInt32, const ndShape*>::Iterator iter (info.m_shapeMap);
+	ndTree<const ndShape*, dInt32> shapeList;
+	ndTree<dInt32, const ndShape*>::Iterator iter (info.m_shapeMap);
 	for (iter.Begin(); iter; iter++)
 	{
 		dInt32 hash = iter.GetNode()->GetInfo();
@@ -292,13 +292,13 @@ void ndLoadSave::SaveShapes(ndLoadSaveInfo& info)
 		shapeList.Insert(shape, hash);
 	}
 
-	dLoadSaveBase::dSaveDescriptor descriptor;
+	ndLoadSaveBase::ndSaveDescriptor descriptor;
 	descriptor.m_assetPath = info.m_assetPath;
 	descriptor.m_assetName = info.m_assetName;
 	descriptor.m_rootNode = info.m_shapesNode;
 	descriptor.m_shapeMap = &info.m_shapeMap;
 
-	dTree<const ndShape*, dInt32>::Iterator shapeIter(shapeList);
+	ndTree<const ndShape*, dInt32>::Iterator shapeIter(shapeList);
 	for (shapeIter.Begin(); shapeIter; shapeIter++)
 	{
 		descriptor.m_nodeNodeHash = shapeIter.GetKey();
@@ -309,17 +309,17 @@ void ndLoadSave::SaveShapes(ndLoadSaveInfo& info)
 
 void ndLoadSave::SaveBodies(ndLoadSaveInfo& info)
 {
-	dLoadSaveBase::dSaveDescriptor descriptor;
+	ndLoadSaveBase::ndSaveDescriptor descriptor;
 	descriptor.m_assetPath = info.m_assetPath;
 	descriptor.m_assetName = info.m_assetName;
 	descriptor.m_rootNode = info.m_bodiesNode;
 
-	for (ndBodyList::dNode* bodyNode = info.m_bodyList->GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	for (ndBodyList::ndNode* bodyNode = info.m_bodyList->GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
 
 		ndShape* const shape = body->GetCollisionShape().GetShape();
-		dTree<dInt32, const ndShape*>::dNode* shapeNode0 = info.m_shapeMap.Find(shape);
+		ndTree<dInt32, const ndShape*>::ndNode* shapeNode0 = info.m_shapeMap.Find(shape);
 		if (!shapeNode0)
 		{
 			ndShapeCompound* const compound = shape->GetAsShapeCompound();
@@ -331,7 +331,7 @@ void ndLoadSave::SaveBodies(ndLoadSaveInfo& info)
 					ndShapeCompound::ndNodeBase* const node = iter.GetNode()->GetInfo();
 					ndShapeInstance* const instance = node->GetShape();
 					ndShape* const subShape = instance->GetShape();
-					dTree<dInt32, const ndShape*>::dNode* subShapeNode = info.m_shapeMap.Find(subShape);
+					ndTree<dInt32, const ndShape*>::ndNode* subShapeNode = info.m_shapeMap.Find(subShape);
 					if (!subShapeNode)
 					{
 						info.m_shapeMap.Insert(info.m_shapeMap.GetCount(), subShape);
@@ -342,7 +342,7 @@ void ndLoadSave::SaveBodies(ndLoadSaveInfo& info)
 		}
 		descriptor.m_shapeNodeHash = shapeNode0->GetInfo();
 
-		dTree<dInt32, const ndBodyKinematic*>::dNode* bodyHashNode = info.m_bodyMap.Find(body);
+		ndTree<dInt32, const ndBodyKinematic*>::ndNode* bodyHashNode = info.m_bodyMap.Find(body);
 		if (!bodyHashNode)
 		{
 			bodyHashNode = info.m_bodyMap.Insert(info.m_bodyMap.GetCount() + 1, body);
@@ -354,22 +354,22 @@ void ndLoadSave::SaveBodies(ndLoadSaveInfo& info)
 
 void ndLoadSave::SaveJoints(ndLoadSaveInfo& info)
 {
-	dLoadSaveBase::dSaveDescriptor descriptor;
+	ndLoadSaveBase::ndSaveDescriptor descriptor;
 	descriptor.m_assetPath = info.m_assetPath;
 	descriptor.m_assetName = info.m_assetName;
 	descriptor.m_rootNode = info.m_jointsNode;
 
-	for (ndJointList::dNode* jointNode = info.m_jointList->GetFirst(); jointNode; jointNode = jointNode->GetNext())
+	for (ndJointList::ndNode* jointNode = info.m_jointList->GetFirst(); jointNode; jointNode = jointNode->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = jointNode->GetInfo();
 		const ndBodyKinematic* const body0 = joint->GetBody0();
-		dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode0 = info.m_bodyMap.Find(body0);
+		ndTree<dInt32, const ndBodyKinematic*>::ndNode* bodyNode0 = info.m_bodyMap.Find(body0);
 		if (!bodyNode0)
 		{
 			bodyNode0 = info.m_bodyMap.Insert(info.m_bodyMap.GetCount(), body0);
 		}
 		const ndBodyKinematic* const body1 = joint->GetBody1()->GetAsBodySentinel() ? nullptr : joint->GetBody1();
-		dTree<dInt32, const ndBodyKinematic*>::dNode* bodyNode1 = info.m_bodyMap.Find(body1);
+		ndTree<dInt32, const ndBodyKinematic*>::ndNode* bodyNode1 = info.m_bodyMap.Find(body1);
 		if (!bodyNode1)
 		{
 			bodyNode1 = info.m_bodyMap.Insert(info.m_bodyMap.GetCount(), body1);
@@ -378,7 +378,7 @@ void ndLoadSave::SaveJoints(ndLoadSaveInfo& info)
 		descriptor.m_body0NodeHash = bodyNode0->GetInfo();
 		descriptor.m_body1NodeHash = bodyNode1->GetInfo();
 
-		dTree<dInt32, const ndJointBilateralConstraint*>::dNode* jointHashNode = info.m_jointMap.Find(joint);
+		ndTree<dInt32, const ndJointBilateralConstraint*>::ndNode* jointHashNode = info.m_jointMap.Find(joint);
 		if (!jointHashNode)
 		{
 			jointHashNode = info.m_jointMap.Insert(info.m_jointMap.GetCount(), joint);
@@ -391,14 +391,14 @@ void ndLoadSave::SaveJoints(ndLoadSaveInfo& info)
 
 void ndLoadSave::SaveModels(ndLoadSaveInfo& info)
 {
-	dLoadSaveBase::dSaveDescriptor descriptor;
+	ndLoadSaveBase::ndSaveDescriptor descriptor;
 	descriptor.m_assetPath = info.m_assetPath;
 	descriptor.m_assetName = info.m_assetName;
 	descriptor.m_rootNode = info.m_modelsNode;
 	descriptor.m_bodyMap = &info.m_bodyMap;
 	descriptor.m_jointMap = &info.m_jointMap;
 	
-	for (ndModelList::dNode* modelNode = info.m_modelList->GetFirst(); modelNode; modelNode = modelNode->GetNext())
+	for (ndModelList::ndNode* modelNode = info.m_modelList->GetFirst(); modelNode; modelNode = modelNode->GetNext())
 	{
 		ndModel* const model = modelNode->GetInfo();
 		descriptor.m_nodeNodeHash = info.m_modelMap.GetCount();
@@ -538,7 +538,7 @@ void ndLoadSave::SaveModel(const char* const path, const ndModel* const model)
 	SaveSceneSettings(info);
 	SaveModels(info);
 
-	dTree<dInt32, const ndJointBilateralConstraint*>::Iterator jointIter(info.m_jointMap);
+	ndTree<dInt32, const ndJointBilateralConstraint*>::Iterator jointIter(info.m_jointMap);
 	for (jointIter.Begin(); jointIter; jointIter++)
 	{
 		jointList.Append((ndJointBilateralConstraint*)jointIter.GetKey());
@@ -546,7 +546,7 @@ void ndLoadSave::SaveModel(const char* const path, const ndModel* const model)
 	SaveJoints(info);
 	info.m_bodyMap.Remove((ndBodyKinematic*)nullptr);
 
-	dTree<dInt32, const ndBodyKinematic*>::Iterator bodyIter(info.m_bodyMap);
+	ndTree<dInt32, const ndBodyKinematic*>::Iterator bodyIter(info.m_bodyMap);
 	for (bodyIter.Begin(); bodyIter; bodyIter++)
 	{
 		bodyList.Append((ndBodyKinematic*)bodyIter.GetKey());

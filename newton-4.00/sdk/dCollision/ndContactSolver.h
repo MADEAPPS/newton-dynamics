@@ -26,7 +26,7 @@
 #include "ndShape.h"
 #include "ndShapeInstance.h"
 
-class dPlane;
+class ndPlane;
 class ndBodyKinematic;
 class ndContactNotify;
 class ndPolygonMeshDesc;
@@ -35,7 +35,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndMinkFace
 {
 	public:
-	dPlane m_plane;
+	ndPlane m_plane;
 	ndMinkFace* m_twin[3];
 	dInt16 m_vertex[3];
 	dInt8 m_mark;
@@ -56,7 +56,7 @@ class ndContact;
 class dCollisionParamProxy;
 
 D_MSV_NEWTON_ALIGN_32
-class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>  
+class ndContactSolver: public ndDownHeap<ndMinkFace *, dFloat32>  
 {
 	public: 
 	class ndBoxBoxDistance2;
@@ -68,7 +68,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 CalculateContactsDiscrete(); // done
 	dInt32 CalculateContactsContinue(); // done
 
-	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, ndContactPoint& contactOut);
+	dFloat32 RayCast (const ndVector& localP0, const ndVector& localP1, ndContactPoint& contactOut);
 	
 	private:
 	dInt32 ConvexContactsDiscrete(); // done
@@ -81,7 +81,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 CompoundToShapeStaticBvhContactsDiscrete(); // done
 	dInt32 CompoundToStaticHeightfieldContactsDiscrete(); // done
 	dInt32 CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDesc& data); // done
-	dInt32 ConvexToSaticStaticBvhContactsNodeDescrete(const dAabbPolygonSoup::dNode* const node); // done
+	dInt32 ConvexToSaticStaticBvhContactsNodeDescrete(const ndAabbPolygonSoup::ndNode* const node); // done
 
 	dInt32 ConvexContactsContinue(); // done
 	dInt32 CompoundContactsContinue(); // done
@@ -93,7 +93,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	class dgPerimenterEdge
 	{
 		public:
-		const dVector* m_vertex;
+		const ndVector* m_vertex;
 		dgPerimenterEdge* m_next;
 		dgPerimenterEdge* m_prev;
 	};
@@ -114,33 +114,33 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	
 	dInt32 CalculateIntersectingPlane(dInt32 count);
 	dInt32 PruneContacts(dInt32 count, dInt32 maxCount) const;
-	dInt32 PruneSupport(dInt32 count, const dVector& dir, const dVector* const points) const;
-	dInt32 CalculateContacts(const dVector& point0, const dVector& point1, const dVector& normal);
-	dInt32 Prune2dContacts(const dMatrix& matrix, dInt32 count, ndContactPoint* const contactArray, dInt32 maxCount) const;
-	dInt32 Prune3dContacts(const dMatrix& matrix, dInt32 count, ndContactPoint* const contactArray, dInt32 maxCount) const;
-	dInt32 ConvexPolygonsIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dInt32 maxContacts) const;
-	dInt32 ConvexPolygonToLineIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dVector* const mem) const;
+	dInt32 PruneSupport(dInt32 count, const ndVector& dir, const ndVector* const points) const;
+	dInt32 CalculateContacts(const ndVector& point0, const ndVector& point1, const ndVector& normal);
+	dInt32 Prune2dContacts(const ndMatrix& matrix, dInt32 count, ndContactPoint* const contactArray, dInt32 maxCount) const;
+	dInt32 Prune3dContacts(const ndMatrix& matrix, dInt32 count, ndContactPoint* const contactArray, dInt32 maxCount) const;
+	dInt32 ConvexPolygonsIntersection(const ndVector& normal, dInt32 count1, ndVector* const shape1, dInt32 count2, ndVector* const shape2, ndVector* const contactOut, dInt32 maxContacts) const;
+	dInt32 ConvexPolygonToLineIntersection(const ndVector& normal, dInt32 count1, ndVector* const shape1, dInt32 count2, ndVector* const shape2, ndVector* const contactOut, ndVector* const mem) const;
 
-	dBigVector ReduceLine(dInt32& indexOut);
-	dBigVector ReduceTriangle (dInt32& indexOut);
-	dBigVector ReduceTetrahedrum (dInt32& indexOut);
-	void SupportVertex(const dVector& dir, dInt32 vertexIndex);
+	ndBigVector ReduceLine(dInt32& indexOut);
+	ndBigVector ReduceTriangle (dInt32& indexOut);
+	ndBigVector ReduceTetrahedrum (dInt32& indexOut);
+	void SupportVertex(const ndVector& dir, dInt32 vertexIndex);
 
-	void TranslateSimplex(const dVector& step);
+	void TranslateSimplex(const ndVector& step);
 	void CalculateContactFromFeacture(dInt32 featureType);
 
 	ndShapeInstance m_instance0;
 	ndShapeInstance m_instance1;
-	dVector m_closestPoint0;
-	dVector m_closestPoint1;
-	dVector m_separatingVector;
+	ndVector m_closestPoint0;
+	ndVector m_closestPoint1;
+	ndVector m_separatingVector;
 	union
 	{
-		dVector m_buffer[2 * D_CONVEX_MINK_MAX_POINTS];
+		ndVector m_buffer[2 * D_CONVEX_MINK_MAX_POINTS];
 		struct
 		{
-			dVector m_hullDiff[D_CONVEX_MINK_MAX_POINTS];
-			dVector m_hullSum[D_CONVEX_MINK_MAX_POINTS];
+			ndVector m_hullDiff[D_CONVEX_MINK_MAX_POINTS];
+			ndVector m_hullSum[D_CONVEX_MINK_MAX_POINTS];
 		};
 	};
 
@@ -164,10 +164,10 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	ndMinkFace m_facePool[D_CONVEX_MINK_MAX_FACES];
 	dInt8 m_heapBuffer[D_CONVEX_MINK_MAX_FACES * (sizeof (dFloat32) + sizeof (ndMinkFace *))];
 
-	static dVector m_pruneUpDir;
-	static dVector m_pruneSupportX;
+	static ndVector m_pruneUpDir;
+	static ndVector m_pruneSupportX;
 
-	static dVector m_hullDirs[14]; 
+	static ndVector m_hullDirs[14]; 
 	static dInt32 m_rayCastSimplex[4][4];
 
 	friend class ndScene;

@@ -26,16 +26,16 @@
 #include "ndTypes.h"
 #include "ndClassAlloc.h"
 
-class dPolyhedraMassProperties: public dClassAlloc
+class ndPolyhedraMassProperties: public ndClassAlloc
 {
 	public:
-	D_CORE_API dPolyhedraMassProperties();
+	D_CORE_API ndPolyhedraMassProperties();
 
-	D_CORE_API void AddCGFace (dInt32 indexCount, const dVector* const faceVertex);
-	D_CORE_API void AddInertiaFace (dInt32 indexCount, const dVector* const faceVertex);
-	D_CORE_API void AddInertiaAndCrossFace (dInt32 indexCount, const dVector* const faceVertex);
+	D_CORE_API void AddCGFace (dInt32 indexCount, const ndVector* const faceVertex);
+	D_CORE_API void AddInertiaFace (dInt32 indexCount, const ndVector* const faceVertex);
+	D_CORE_API void AddInertiaAndCrossFace (dInt32 indexCount, const ndVector* const faceVertex);
 	
-	D_CORE_API dFloat32 MassProperties (dVector& cg, dVector& inertia, dVector& crossInertia);
+	D_CORE_API dFloat32 MassProperties (ndVector& cg, ndVector& inertia, ndVector& crossInertia);
 
 	private:
 	dFloat32 intg[10];

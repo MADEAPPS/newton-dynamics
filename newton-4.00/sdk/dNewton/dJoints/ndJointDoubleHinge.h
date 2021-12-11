@@ -19,13 +19,13 @@ class ndJointDoubleHinge: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointDoubleHinge);
-	D_NEWTON_API ndJointDoubleHinge(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndJointDoubleHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointDoubleHinge(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointDoubleHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointDoubleHinge();
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	dFloat32 m_angle0;
 	dFloat32 m_omega0;

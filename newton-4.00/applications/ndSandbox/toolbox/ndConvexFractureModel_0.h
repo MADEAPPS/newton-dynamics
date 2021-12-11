@@ -20,7 +20,7 @@ class ndDemoEntityManager;
 class ndDemoDebriEntityRoot;
 class ndDemoDebrisRootEntity;
 
-class ndConvexFracture : public dClassAlloc
+class ndConvexFracture : public ndClassAlloc
 {
 	class ndDebrisNotify : public ndDemoEntityNotify
 	{
@@ -35,12 +35,12 @@ class ndConvexFracture : public dClassAlloc
 
 	void GenerateEffect(ndDemoEntityManager* const scene);
 
-	void AddEffect(ndDemoEntityManager* const scene, const dMatrix& location);
+	void AddEffect(ndDemoEntityManager* const scene, const ndMatrix& location);
 
-	void ExplodeLocation(ndBodyDynamic* const body, const dMatrix& location, dFloat32 factor) const;
+	void ExplodeLocation(ndBodyDynamic* const body, const ndMatrix& location, dFloat32 factor) const;
 
-	dMatrix m_textureMatrix;
-	dArray<dVector> m_pointCloud;
+	ndMatrix m_textureMatrix;
+	ndArray<ndVector> m_pointCloud;
 	ndMeshEffect* m_singleManifoldMesh;
 	const char* m_innerTexture;
 	dFloat32 m_tileFactor;

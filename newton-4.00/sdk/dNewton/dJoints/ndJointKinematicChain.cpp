@@ -21,7 +21,7 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointKinematicChain)
 
-ndJointKinematicChain::ndJointKinematicChain(const dVector& globalHipPivot, const dMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointKinematicChain::ndJointKinematicChain(const ndVector& globalHipPivot, const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, globalPinAndPivot)
 	,m_baseFrame(dGetIdentityMatrix())
 	,m_hipPivot(parent->GetMatrix().UntransformVector(globalHipPivot))
@@ -38,21 +38,21 @@ ndJointKinematicChain::ndJointKinematicChain(const dVector& globalHipPivot, cons
 	SetSolverModel(m_jointkinematicCloseLoop);
 
 	m_baseFrame = m_localMatrix1;
-	dVector dist(m_localMatrix1.m_posit - m_hipPivot);
-	m_maxDist = dSqrt(dist.DotProduct(dist & dVector::m_triplexMask).GetScalar());
+	ndVector dist(m_localMatrix1.m_posit - m_hipPivot);
+	m_maxDist = dSqrt(dist.DotProduct(dist & ndVector::m_triplexMask).GetScalar());
 	dAssert(m_maxDist > dFloat32(0.0f));
 
 	// test joint positioning.
-	dMatrix matrix(m_baseFrame);
+	ndMatrix matrix(m_baseFrame);
 	matrix.m_posit += m_baseFrame.m_front.Scale(0.1f);
 	//matrix.m_posit += m_baseFrame.m_up.Scale(0.2f);
 	matrix.m_posit += m_baseFrame.m_right.Scale(-0.2f);
 	SetTargetGlobalMatrix(matrix * m_body1->GetMatrix());
 }
 
-ndJointKinematicChain::ndJointKinematicChain(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
-	,m_hipPivot(dVector::m_wOne)
+ndJointKinematicChain::ndJointKinematicChain(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+	,m_hipPivot(ndVector::m_wOne)
 	,m_angle(dFloat32(0.0f))
 	,m_minAngle(-dFloat32(45.0f) * dDegreeToRad)
 	,m_maxAngle(dFloat32(45.0f) * dDegreeToRad)
@@ -90,13 +90,13 @@ ndJointKinematicChain::~ndJointKinematicChain()
 {
 }
 
-void ndJointKinematicChain::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndJointKinematicChain::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	dAssert(0);
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 	
 	//xmlSaveParam(childNode, "pivotFrame", m_basePose);
 	//xmlSaveParam(childNode, "targetPosit", m_targetPosit);
@@ -116,41 +116,41 @@ void ndJointKinematicChain::Save(const dLoadSaveBase::dSaveDescriptor& desc) con
 
 void ndJointKinematicChain::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
-	//dMatrix localRotationBody1(m_localRotationBody1);
+	//ndMatrix localRotationBody1(m_localRotationBody1);
 	//localRotationBody1.m_posit = m_targetPosit + m_pivot;
 	//localRotationBody1.m_posit.m_w = dFloat32(1.0f);
 
-	//dMatrix localMatrix1(m_coronalFrame);
-	//localMatrix1.m_posit += (m_targetPosit & dVector::m_triplexMask);
-	//const dMatrix matrix1 (localMatrix1 * m_body1->GetMatrix());
+	//ndMatrix localMatrix1(m_coronalFrame);
+	//localMatrix1.m_posit += (m_targetPosit & ndVector::m_triplexMask);
+	//const ndMatrix matrix1 (localMatrix1 * m_body1->GetMatrix());
 
-	//const dMatrix matrix0(m_localMatrix0 * m_body0->GetMatrix());
-	const dMatrix matrix0(m_localMatrix0 * m_body0->GetMatrix());
-	const dMatrix matrix1(m_localMatrix1 * m_body1->GetMatrix());
+	//const ndMatrix matrix0(m_localMatrix0 * m_body0->GetMatrix());
+	const ndMatrix matrix0(m_localMatrix0 * m_body0->GetMatrix());
+	const ndMatrix matrix1(m_localMatrix1 * m_body1->GetMatrix());
 	
-	//const dMatrix twistMatrix(dPitchMatrix(0.0f));
-	//const dMatrix matrix0(twistMatrix * m_localRotationBody0 * m_body0->GetMatrix());
-	//const dMatrix matrix1(m_coneRotation * localRotationBody1 * m_body1->GetMatrix());
+	//const ndMatrix twistMatrix(dPitchMatrix(0.0f));
+	//const ndMatrix matrix0(twistMatrix * m_localRotationBody0 * m_body0->GetMatrix());
+	//const ndMatrix matrix1(m_coneRotation * localRotationBody1 * m_body1->GetMatrix());
 	
 	debugCallback.DrawFrame(matrix0);
 	debugCallback.DrawFrame(matrix1);
 
-	//debugCallback.DrawLine(matrix1.m_posit, matrix1.m_posit - matrix1.m_front.Scale(m_maxDist), dVector(1.0f, 1.0f, 0.0f, 1.0f));
-	//debugCallback.DrawLine(matrix0.m_posit, matrix0.m_posit - matrix0.m_front.Scale(m_maxDist), dVector(1.0f, 1.0f, 0.0f, 1.0f));
+	//debugCallback.DrawLine(matrix1.m_posit, matrix1.m_posit - matrix1.m_front.Scale(m_maxDist), ndVector(1.0f, 1.0f, 0.0f, 1.0f));
+	//debugCallback.DrawLine(matrix0.m_posit, matrix0.m_posit - matrix0.m_front.Scale(m_maxDist), ndVector(1.0f, 1.0f, 0.0f, 1.0f));
 	
 	//const dInt32 subdiv = 8;
 	//const dFloat32 radius = debugCallback.m_debugScale;
-	//dVector arch[subdiv + 1];
+	//ndVector arch[subdiv + 1];
 	//
 	//// show twist angle limits
 	//dFloat32 deltaTwist = m_maxAngle - m_minAngle;
 	//if ((deltaTwist > dFloat32(1.0e-3f)) && (deltaTwist < dFloat32(2.0f) * dPi))
 	//{
-	//	dVector point(dFloat32(0.0f), dFloat32(radius), dFloat32(0.0f), dFloat32(1.0f));
+	//	ndVector point(dFloat32(0.0f), dFloat32(radius), dFloat32(0.0f), dFloat32(1.0f));
 	//	dFloat32 angleStep = dMin(m_maxAngle - m_minAngle, dFloat32(2.0f * dPi)) / subdiv;
 	//	dFloat32 angle0 = m_minAngle;
 	//
-	//	dVector color(dFloat32(0.4f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+	//	ndVector color(dFloat32(0.4f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
 	//	for (dInt32 i = 0; i <= subdiv; i++)
 	//	{
 	//		arch[i] = matrix1.TransformVector(dPitchMatrix(angle0).RotateVector(point));
@@ -165,9 +165,9 @@ void ndJointKinematicChain::DebugJoint(ndConstraintDebugCallback& debugCallback)
 	//}
 }
 
-void ndJointKinematicChain::SetTargetLocalMatrix(const dMatrix& matrix)
+void ndJointKinematicChain::SetTargetLocalMatrix(const ndMatrix& matrix)
 {
-	dVector posit((matrix.m_posit - m_hipPivot) & dVector::m_triplexMask);
+	ndVector posit((matrix.m_posit - m_hipPivot) & ndVector::m_triplexMask);
 	dFloat32 mag2 = posit.DotProduct(posit).GetScalar();
 	if (mag2 > (m_maxDist * m_maxDist))
 	{
@@ -179,12 +179,12 @@ void ndJointKinematicChain::SetTargetLocalMatrix(const dMatrix& matrix)
 	m_localMatrix1.m_posit.m_w = dFloat32(1.0f);
 }
 
-void ndJointKinematicChain::SetTargetGlobalMatrix(const dMatrix& matrix)
+void ndJointKinematicChain::SetTargetGlobalMatrix(const ndMatrix& matrix)
 {
 	SetTargetLocalMatrix(matrix * m_body1->GetMatrix().Inverse());
 }
 
-void ndJointKinematicChain::SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointKinematicChain::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	dFloat32 m_twistAngleSpring = m_angularSpring;
 	dFloat32 m_twistAngleDamper = m_angularDamper;
@@ -206,7 +206,7 @@ void ndJointKinematicChain::SubmitAngularAxisCartesianApproximation(const dMatri
 	SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
 }
 
-void ndJointKinematicChain::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointKinematicChain::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	dFloat32 m_twistAngleSpring = m_angularSpring;
 	dFloat32 m_twistAngleDamper = m_angularDamper;
@@ -215,21 +215,21 @@ void ndJointKinematicChain::SubmitAngularAxis(const dMatrix& matrix0, const dMat
 	dFloat32 m_coneAngleDamper = m_angularDamper;
 	dFloat32 m_coneAngleRegularizer = m_angularRegularizer;
 
-	const dVector dir0(matrix0.m_front);
-	const dVector dir1(matrix1.m_front);
-	const dVector lateralDir(dir1.CrossProduct(dir0).Normalize());
+	const ndVector dir0(matrix0.m_front);
+	const ndVector dir1(matrix1.m_front);
+	const ndVector lateralDir(dir1.CrossProduct(dir0).Normalize());
 	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
 	dFloat32 cosAngleCos = dir1.DotProduct(dir0).GetScalar();
 	dFloat32 coneAngle = dAcos(dClamp(cosAngleCos, dFloat32(-1.0f), dFloat32(1.0f)));
-	const dQuaternion rotation(lateralDir, coneAngle);
-	const dMatrix coneMatrix(rotation, dVector::m_zero);
-	const dMatrix pitchMatrix = matrix1 * coneMatrix * matrix0.Inverse();
+	const ndQuaternion rotation(lateralDir, coneAngle);
+	const ndMatrix coneMatrix(rotation, ndVector::m_zero);
+	const ndMatrix pitchMatrix = matrix1 * coneMatrix * matrix0.Inverse();
 	dFloat32 twistAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 
 	AddAngularRowJacobian(desc, dir0, twistAngle);
 	SetMassSpringDamperAcceleration(desc, m_twistAngleRegularizer, m_twistAngleSpring, m_twistAngleDamper);
 
-	dVector sideDir(lateralDir.CrossProduct(dir0));
+	ndVector sideDir(lateralDir.CrossProduct(dir0));
 	AddAngularRowJacobian(desc, sideDir, dFloat32(0.0f));
 	SetMassSpringDamperAcceleration(desc, m_coneAngleRegularizer, m_coneAngleSpring, m_coneAngleDamper);
 
@@ -240,11 +240,11 @@ void ndJointKinematicChain::SubmitAngularAxis(const dMatrix& matrix0, const dMat
 
 void ndJointKinematicChain::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	//const dVector step(matrix0.m_posit - matrix1.m_posit);
+	//const ndVector step(matrix0.m_posit - matrix1.m_posit);
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
 	SetMassSpringDamperAcceleration(desc, m_linearRegularizer, m_linearSpring, m_linearDamper);
 

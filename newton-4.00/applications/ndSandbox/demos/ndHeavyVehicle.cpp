@@ -34,7 +34,7 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 	{
 		m_chassisMass = 2000.0f;
 		m_chassisAngularDrag = 0.25f;
-		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.0f, -0.55f, 0.0f, 0.0f);
 
 		m_useHardSolverMode = false;
 
@@ -89,7 +89,7 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 	ndVehicleDectriptorTractor()
 		:ndVehicleDectriptor("tractor.fbx")
 	{
-		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.0f, -0.55f, 0.0f, 0.0f);
 		m_chassisMass = 2000.0f;
 		m_chassisAngularDrag = 0.25f;
 
@@ -154,7 +154,7 @@ class ndVehicleDectriptorBigRig : public ndVehicleDectriptor
 	{
 		m_chassisMass = 2000.0f;
 		m_chassisAngularDrag = 0.25f;
-		m_comDisplacement = dVector(0.0f, -0.55f, 0.0f, 0.0f);
+		m_comDisplacement = ndVector(0.0f, -0.55f, 0.0f, 0.0f);
 
 		m_useHardSolverMode = false;
 
@@ -210,7 +210,7 @@ static ndVehicleDectriptorTractor tractorDesc;
 class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 {
 	public:
-	ndHeavyMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const dMatrix& matrix)
+	ndHeavyMultiBodyVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
 		:ndBasicVehicle(desc)
 		,m_vehicleUI(nullptr)
 	{
@@ -223,10 +223,10 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 		// create the vehicle chassis as a normal rigid body
 		ndBodyDynamic* const chassis = CreateChassis(scene, vehicleEntity, m_configuration.m_chassisMass);
-		chassis->SetAngularDamping(dVector(m_configuration.m_chassisAngularDrag));
+		chassis->SetAngularDamping(ndVector(m_configuration.m_chassisAngularDrag));
 
 		// lower vehicle com;
-		dVector com(chassis->GetCentreOfMass());
+		ndVector com(chassis->GetCentreOfMass());
 		com += m_localFrame.m_up.Scale(m_configuration.m_comDisplacement.m_y);
 		com += m_localFrame.m_front.Scale(m_configuration.m_comDisplacement.m_x);
 		com += m_localFrame.m_right.Scale(m_configuration.m_comDisplacement.m_z);
@@ -295,7 +295,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		ndShapeInstance* const vehCollision = vehPart->CreateCollisionFromchildren();
 
 		ndBodyDynamic* const vehBody = new ndBodyDynamic();
-		const dMatrix matrix(vehPart->CalculateGlobalMatrix(nullptr));
+		const ndMatrix matrix(vehPart->CalculateGlobalMatrix(nullptr));
 		vehBody->SetNotifyCallback(new ndDemoEntityNotify(scene, vehPart, parentBody));
 		vehBody->SetMatrix(matrix);
 		vehBody->SetCollisionShape(*vehCollision);
@@ -310,7 +310,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, dFloat32 mass)
 	{
-		dMatrix matrix(chassisEntity->CalculateGlobalMatrix(nullptr));
+		ndMatrix matrix(chassisEntity->CalculateGlobalMatrix(nullptr));
 		ndShapeInstance* const chassisCollision = chassisEntity->CreateCollisionFromchildren();
 
 		ndBodyDynamic* const body = new ndBodyDynamic();
@@ -333,12 +333,12 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 	{
 		ndDemoCamera* const camera = manager->GetCamera();
 		ndDemoEntity* const chassisEntity = (ndDemoEntity*)m_chassis->GetNotifyCallback()->GetUserData();
-		dMatrix camMatrix(camera->GetNextMatrix());
-		dMatrix playerMatrix(chassisEntity->GetNextMatrix());
+		ndMatrix camMatrix(camera->GetNextMatrix());
+		ndMatrix playerMatrix(chassisEntity->GetNextMatrix());
 
-		dVector frontDir(camMatrix[0]);
-		dVector camOrigin(0.0f);
-		camOrigin = playerMatrix.m_posit + dVector(0.0f, 1.0f, 0.0f, 0.0f);
+		ndVector frontDir(camMatrix[0]);
+		ndVector camOrigin(0.0f);
+		camOrigin = playerMatrix.m_posit + ndVector(0.0f, 1.0f, 0.0f, 0.0f);
 		camOrigin -= frontDir.Scale(10.0f);
 
 		camera->SetNextMatrix(camMatrix, camOrigin);
@@ -346,7 +346,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 
 	void RenderHelp(ndDemoEntityManager* const scene)
 	{
-		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		ndVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Vehicle driving keyboard control");
 		scene->Print(color, "change vehicle     : 'c'");
 		scene->Print(color, "accelerator        : 'w'");
@@ -426,7 +426,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 {
 	public:
-	ndLav25Vehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const dMatrix& matrix)
+	ndLav25Vehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
 		:ndHeavyMultiBodyVehicle(scene, desc, matrix)
 		,m_turretHinge(nullptr)
 		,m_cannonHinge(nullptr)
@@ -522,7 +522,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 	{
 		//turret servo controller actuator
 		ndBodyDynamic* const turretBody = MakeChildPart(scene, m_chassis, "turret", m_configuration.m_chassisMass * 0.05f);
-		dMatrix turretMatrix(m_localFrame * turretBody->GetMatrix());
+		ndMatrix turretMatrix(m_localFrame * turretBody->GetMatrix());
 		m_turretHinge = new ndJointHingeActuator(turretMatrix, 1.5f, -5000.0f * dDegreeToRad, 5000.0f * dDegreeToRad, turretBody, m_chassis);
 		m_turrectAngle0 = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
 		AddExtraBody(turretBody);
@@ -530,7 +530,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 
 		//cannon servo controller actuator
 		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.025f);
-		dMatrix cannonMatrix(m_localFrame * canonBody->GetMatrix());
+		ndMatrix cannonMatrix(m_localFrame * canonBody->GetMatrix());
 		m_cannonHinge = new ndJointHingeActuator(cannonMatrix, 1.5f, -45.0f * dDegreeToRad, 5.0f * dDegreeToRad, canonBody, turretBody);
 		AddExtraBody(canonBody);
 		AddExtraJoint(m_cannonHinge);
@@ -549,8 +549,8 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		ndShapeInfo frontInfo(body1->GetCollisionShape().GetShapeInfo());
 		dFloat32 tireRatio = rearInfo.m_scale.m_y / frontInfo.m_scale.m_y;
 
-		dMatrix pin0(tire0->GetLocalMatrix0() * body0->GetMatrix());
-		dMatrix pin1(tire1->GetLocalMatrix0() * body1->GetMatrix());
+		ndMatrix pin0(tire0->GetLocalMatrix0() * body0->GetMatrix());
+		ndMatrix pin1(tire1->GetLocalMatrix0() * body1->GetMatrix());
 		world->AddJoint(new ndJointGear(tireRatio, pin0.m_front.Scale(-1.0f), body0, pin1.m_front, body1));
 	}
 
@@ -561,7 +561,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		if (m_isPlayer)
 		{
 			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-			dFixSizeArray<char, 32> buttons;
+			ndFixSizeArray<char, 32> buttons;
 			scene->GetJoystickButtons(buttons);
 
 			bool wakeUpVehicle = false;
@@ -596,7 +596,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 			}
 
 			// apply inputs to actuators joint
-			const dMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
+			const ndMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
 			dFloat32 turretAngle = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
 			dFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turrectAngle0), -turretAngle);
 			dFloat32 turretTargetAngle = m_turretHinge->GetAngle();
@@ -606,7 +606,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 			}
 			m_turretHinge->SetTargetAngle(turretTargetAngle);
 
-			const dMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
+			const ndMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
 			dFloat32 y = cannonMatrix[1][1];
 			dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
 			dFloat32 cannonAngle = -dAtan2(y, x);
@@ -638,7 +638,7 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 {
 	public:
-	ndTractorVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const dMatrix& matrix)
+	ndTractorVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
 		:ndHeavyMultiBodyVehicle(scene, desc, matrix)
 		,m_armHinge(nullptr)
 		,m_bucketHinge(nullptr)
@@ -702,7 +702,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		ndBodyDynamic* const axleBody = MakeChildPart(scene, m_chassis, "front_axel", m_configuration.m_chassisMass * 0.2f);
 
 		// connect the part to the main body with a hinge
-		dMatrix hingeFrame(m_localFrame * axleBody->GetMatrix());
+		ndMatrix hingeFrame(m_localFrame * axleBody->GetMatrix());
 		ndJointHinge* const hinge = new ndJointHinge(hingeFrame, axleBody, chassis);
 		hinge->EnableLimits(true, -15.0f * dDegreeToRad, 15.0f * dDegreeToRad);
 
@@ -714,13 +714,13 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 	void AddHydraulic(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, const char* const name0, const char* const name1, ndBodyDynamic* const attachmentBody, const char* const attachement)
 	{
 		ndBodyDynamic* const body0 = MakeChildPart(scene, parentBody, name0, m_configuration.m_chassisMass * 0.01f);
-		dMatrix matrix0(m_localFrame * body0->GetMatrix());
+		ndMatrix matrix0(m_localFrame * body0->GetMatrix());
 		ndJointBilateralConstraint* const joint0 = new ndJointHinge(matrix0, body0, parentBody);
 		AddExtraBody(body0);
 		AddExtraJoint(joint0);
 
 		ndBodyDynamic* const body1 = MakeChildPart(scene, body0, name1, m_configuration.m_chassisMass * 0.01f);
-		dMatrix matrix1(m_localFrame * body1->GetMatrix());
+		ndMatrix matrix1(m_localFrame * body1->GetMatrix());
 		ndJointBilateralConstraint* const joint1 = new ndJointSlider(matrix1, body1, body0);
 		AddExtraBody(body1);
 		AddExtraJoint(joint1);
@@ -745,7 +745,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 	void CreateTractorBucket(ndDemoEntityManager* const scene)
 	{
 		ndBodyDynamic* const frontBucketArmBody = MakeChildPart(scene, m_chassis, "arms", m_configuration.m_chassisMass * 0.05f);
-		dMatrix turretMatrix(m_localFrame * frontBucketArmBody->GetMatrix());
+		ndMatrix turretMatrix(m_localFrame * frontBucketArmBody->GetMatrix());
 		m_armHinge = new ndJointHingeActuator(turretMatrix, 1.5f, -10.0f * dDegreeToRad, 55.0f * dDegreeToRad, frontBucketArmBody, m_chassis);
 		AddExtraBody(frontBucketArmBody);
 		AddExtraJoint(m_armHinge);
@@ -756,7 +756,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 
 		//cannon servo controller actuator
 		ndBodyDynamic* const frontBucketBody = MakeChildPart(scene, frontBucketArmBody, "frontBucket", m_configuration.m_chassisMass * 0.025f);
-		dMatrix frontBucketMatrix(m_localFrame * frontBucketBody->GetMatrix());
+		ndMatrix frontBucketMatrix(m_localFrame * frontBucketBody->GetMatrix());
 		m_bucketHinge = new ndJointHingeActuator(frontBucketMatrix, 2.5f, -75.0f * dDegreeToRad, 80.0f * dDegreeToRad, frontBucketBody, frontBucketArmBody);
 		AddExtraBody(frontBucketBody);
 		AddExtraJoint(m_bucketHinge);
@@ -774,7 +774,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		if (m_isPlayer)
 		{
 			ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
-			dFixSizeArray<char, 32> buttons;
+			ndFixSizeArray<char, 32> buttons;
 
 			bool wakeUpVehicle = false;
 			scene->GetJoystickButtons(buttons);
@@ -803,7 +803,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 				m_bucketAngle = dMax(m_bucketAngle - 5.0e-3f, m_bucketHinge->GetMinAngularLimit());
 				m_bucketHinge->SetTargetAngle(m_bucketAngle);
 			}
-			const dMatrix bucketMatrix(m_bucketHinge->GetLocalMatrix0() * m_bucketHinge->GetBody0()->GetMatrix());
+			const ndMatrix bucketMatrix(m_bucketHinge->GetLocalMatrix0() * m_bucketHinge->GetBody0()->GetMatrix());
 			dFloat32 y = bucketMatrix[1][1];
 			dFloat32 x = dSqrt(bucketMatrix[1][0] * bucketMatrix[1][0] + bucketMatrix[1][2] * bucketMatrix[1][2] + 1.0e-6f);
 			dFloat32 bucketAngle = -dAtan2(y, x);
@@ -832,7 +832,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 {
 	public:
-	ndBigRigVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const dMatrix& matrix)
+	ndBigRigVehicle(ndDemoEntityManager* const scene, const ndVehicleDectriptor& desc, const ndMatrix& matrix)
 		:ndHeavyMultiBodyVehicle(scene, desc, matrix)
 	{
 		VehicleAssembly(scene);
@@ -896,7 +896,7 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 
 void ndHeavyVehicle (ndDemoEntityManager* const scene)
 {
-	dMatrix sceneLocation(dGetIdentityMatrix());
+	ndMatrix sceneLocation(dGetIdentityMatrix());
 	//BuildFloorBox(scene, sceneLocation);
 	//BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
@@ -908,9 +908,9 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	//sceneLocation.m_posit.m_z = -200.0f;
 	//BuildHeightFieldTerrain(scene, sceneLocation);
 
-	dVector location(0.0f, 2.0f, 0.0f, 1.0f);
+	ndVector location(0.0f, 2.0f, 0.0f, 1.0f);
 
-	dMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = location;
 
 	// add a model for general controls
@@ -935,8 +935,8 @@ void ndHeavyVehicle (ndDemoEntityManager* const scene)
 	matrix.m_posit.m_z += 6.0f;
 	AddPlanks(scene, matrix.m_posit, 300.0f, 5);
 
-	dQuaternion rot;
-	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
+	ndQuaternion rot;
+	ndVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 	//ndLoadSave loadScene;

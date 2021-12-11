@@ -32,7 +32,7 @@ class ndShapeSphere: public ndShapeConvex
 	public:
 	D_CLASS_REFLECTION(ndShapeSphere);
 	D_COLLISION_API ndShapeSphere(dFloat32 radius);
-	D_COLLISION_API ndShapeSphere(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndShapeSphere(const ndLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeSphere();
 
 	virtual ndShapeSphere* GetAsShapeSphere() { return this; }
@@ -42,23 +42,23 @@ class ndShapeSphere: public ndShapeConvex
 	D_COLLISION_API virtual void MassProperties();
 
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API virtual void CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const;
-	D_COLLISION_API virtual void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	D_COLLISION_API virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
-	D_COLLISION_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
-	D_COLLISION_API virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
-	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
-	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
+	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
+	D_COLLISION_API virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
+	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir, dInt32* const vertexIndex) const;
+	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
+	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
+	virtual dInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 
-	void TesselateTriangle(dInt32 level, const dVector& p0, const dVector& p1, const dVector& p2, dInt32& count, dVector* const ouput) const;
+	void TesselateTriangle(dInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, dInt32& count, ndVector* const ouput) const;
 
-	dVector m_vertex[D_SPHERE_VERTEX_COUNT];
+	ndVector m_vertex[D_SPHERE_VERTEX_COUNT];
 	dFloat32 m_radius;
 
 	static dInt32 m_shapeRefCount;
-	static dVector m_unitSphere[];
+	static ndVector m_unitSphere[];
 	static ndConvexSimplexEdge m_edgeArray[];
 
 } D_GCC_NEWTON_ALIGN_32;

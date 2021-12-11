@@ -30,12 +30,12 @@
 #include "ndMatrix.h"
 #include "ndQuaternion.h"
 
-class dConvexHull4dAABBTreeNode;
+class ndConvexHull4dAABBTreeNode;
 
-class dConvexHull4dVector: public dBigVector
+class ndConvexHull4dVector: public ndBigVector
 {
 	public:
-	void operator = (const dBigVector& a) 
+	void operator = (const ndBigVector& a) 
 	{
 		m_x = a.m_x;
 		m_y = a.m_y;
@@ -49,122 +49,121 @@ class dConvexHull4dVector: public dBigVector
 	dInt32 m_mark;
 };
 
-class dConvexHull4dTetraherum
+class ndConvexHull4dTetraherum
 {
 	public:
-	class dgTetrahedrumFace 
+	class ndTetrahedrumFace 
 	{
 		public:
 		dInt32 m_index[4];
-		dList<dConvexHull4dTetraherum>::dNode* m_twin;
+		ndList<ndConvexHull4dTetraherum>::ndNode* m_twin;
 	};
-
-
-	class dgTetrahedrumPlane: public dBigVector
+	
+	class ndTetrahedrumPlane: public ndBigVector
 	{
 		public: 
-		dgTetrahedrumPlane (const dBigVector& p0, const dBigVector& p1, const dBigVector& p2, const dBigVector& p3);
-		dFloat64 Evalue (const dBigVector& point) const;
+		ndTetrahedrumPlane (const ndBigVector& p0, const ndBigVector& p1, const ndBigVector& p2, const ndBigVector& p3);
+		dFloat64 Evalue (const ndBigVector& point) const;
 		dFloat64 m_dist;
 	};
 
-	dConvexHull4dTetraherum();
-	dgTetrahedrumPlane GetPlaneEquation (const dConvexHull4dVector* const points) const;
-	dFloat64 GetTetraVolume (const dConvexHull4dVector* const pointArray) const;	
-	D_CORE_API dBigVector CircumSphereCenter (const dConvexHull4dVector* const pointArray) const;
-	dFloat64 Evalue (const dConvexHull4dVector* const pointArray, const dBigVector& point) const;
+	ndConvexHull4dTetraherum();
+	ndTetrahedrumPlane GetPlaneEquation (const ndConvexHull4dVector* const points) const;
+	dFloat64 GetTetraVolume (const ndConvexHull4dVector* const pointArray) const;	
+	D_CORE_API ndBigVector CircumSphereCenter (const ndConvexHull4dVector* const pointArray) const;
+	dFloat64 Evalue (const ndConvexHull4dVector* const pointArray, const ndBigVector& point) const;
 
 	dInt32 GetMark() const { return m_mark; }
 	void SetMark(dInt32 mark) { m_mark = mark; }
 
 	private:
-	void Init (const dConvexHull4dVector* const points, dInt32 v0, dInt32 v1, dInt32 v2, dInt32 v3);
+	void Init (const ndConvexHull4dVector* const points, dInt32 v0, dInt32 v1, dInt32 v2, dInt32 v3);
 
 	public:
-	dgTetrahedrumFace m_faces[4];
+	ndTetrahedrumFace m_faces[4];
 	dInt32 m_mark;
 	dInt32 m_uniqueID;
 
 #ifdef _DEBUG
 	dInt32 m_debugID;
 #endif
-	friend class dConvexHull4d;
-	friend class dDelaunayTetrahedralization;
+	friend class ndConvexHull4d;
+	friend class ndDelaunayTetrahedralization;
 };
 
-class dConvexHull4d: public dList<dConvexHull4dTetraherum>
+class ndConvexHull4d: public ndList<ndConvexHull4dTetraherum>
 {
 	public:
-	class ndTempList: public dList<dNode*, dContainersFreeListAlloc<dNode*>>
+	class ndTempList: public ndList<ndNode*, ndContainersFreeListAlloc<ndNode*>>
 	{
 	};
 
-	D_CORE_API dConvexHull4d(const dConvexHull4d& source);
-	D_CORE_API dConvexHull4d(const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, dFloat64 distTol);
-	D_CORE_API virtual ~dConvexHull4d();
+	D_CORE_API ndConvexHull4d(const ndConvexHull4d& source);
+	D_CORE_API ndConvexHull4d(const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, dFloat64 distTol);
+	D_CORE_API virtual ~ndConvexHull4d();
 
 	dInt32 GetVertexCount() const;
 	dInt32 GetVertexIndex(dInt32 i) const;
-	const dBigVector& GetVertex(dInt32 i) const;
+	const ndBigVector& GetVertex(dInt32 i) const;
 
-	const dConvexHull4dVector* GetHullVertexArray() const;
-	dFloat64 GetTetraVolume (const dConvexHull4dTetraherum* const tetra) const;
+	const ndConvexHull4dVector* GetHullVertexArray() const;
+	dFloat64 GetTetraVolume (const ndConvexHull4dTetraherum* const tetra) const;
 
 	dInt32 IncMark (); 
 	void Save (const char* const filename) const;
 
 	protected:
-	dConvexHull4d();
+	ndConvexHull4d();
 
 	void BuildHull (const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, dFloat64 distTol);
 
-	virtual dInt32 AddVertex (const dBigVector& vertex);
-	virtual dInt32 InitVertexArray(dConvexHull4dVector* const points, const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, void* const memoryPool, dInt32 maxMemSize);
+	virtual dInt32 AddVertex (const ndBigVector& vertex);
+	virtual dInt32 InitVertexArray(ndConvexHull4dVector* const points, const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, void* const memoryPool, dInt32 maxMemSize);
 	
-	virtual dNode* AddFace (dInt32 i0, dInt32 i1, dInt32 i2, dInt32 i3);
-	virtual void DeleteFace (dNode* const node);
+	virtual ndNode* AddFace (dInt32 i0, dInt32 i1, dInt32 i2, dInt32 i3);
+	virtual void DeleteFace (ndNode* const node);
 
-	dNode* FindFacingNode(const dBigVector& vertex);
+	ndNode* FindFacingNode(const ndBigVector& vertex);
 	
-	void InsertNewVertex(dInt32 vertexIndex, dNode* const frontFace, ndTempList& deletedFaces, ndTempList& newFaces);
-	dInt32 SupportVertex (dConvexHull4dAABBTreeNode** const tree, const dConvexHull4dVector* const points, const dBigVector& dir, const bool removeEntry = true) const;
+	void InsertNewVertex(dInt32 vertexIndex, ndNode* const frontFace, ndTempList& deletedFaces, ndTempList& newFaces);
+	dInt32 SupportVertex (ndConvexHull4dAABBTreeNode** const tree, const ndConvexHull4dVector* const points, const ndBigVector& dir, const bool removeEntry = true) const;
 	
-	void CalculateConvexHull (dConvexHull4dAABBTreeNode* vertexTree, dConvexHull4dVector* const points, dInt32 count, dFloat64 distTol);
-	void LinkSibling (dNode* node0, dNode* node1)	const;
+	void CalculateConvexHull (ndConvexHull4dAABBTreeNode* vertexTree, ndConvexHull4dVector* const points, dInt32 count, dFloat64 distTol);
+	void LinkSibling (ndNode* node0, ndNode* node1)	const;
 	bool Sanity() const;
-	dConvexHull4dAABBTreeNode* BuildTree (dConvexHull4dAABBTreeNode* const parent, dConvexHull4dVector* const points, dInt32 count, dInt32 baseIndex, dInt8** const memoryPool, dInt32& maxMemSize) const;
+	ndConvexHull4dAABBTreeNode* BuildTree (ndConvexHull4dAABBTreeNode* const parent, ndConvexHull4dVector* const points, dInt32 count, dInt32 baseIndex, dInt8** const memoryPool, dInt32& maxMemSize) const;
 	
-	class dgNormalMap
+	class ndNormalMap
 	{
 		public:
-		dgNormalMap();
+		ndNormalMap();
 		private:
-		void TessellateTriangle(dInt32 level, const dVector& p0, const dVector& p1, const dVector& p2, dBigVector* const buffer, dInt32& count);
+		void TessellateTriangle(dInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, ndBigVector* const buffer, dInt32& count);
 
-		dBigVector m_normal[1024];
+		ndBigVector m_normal[1024];
 		dInt32 m_count;
-		friend class dConvexHull4d; 
+		friend class ndConvexHull4d; 
 	};
-	static const dgNormalMap& GetNormaMap();
+	static const ndNormalMap& GetNormaMap();
 
 	dInt32 m_mark;
 	dInt32 m_count;
 	dFloat64 m_diag;
-	dArray<dConvexHull4dVector> m_points;
+	ndArray<ndConvexHull4dVector> m_points;
 };
 
-inline dInt32 dConvexHull4d::IncMark ()
+inline dInt32 ndConvexHull4d::IncMark ()
 {
 	m_mark ++;
 	return m_mark;
 }
 
-inline dInt32 dConvexHull4d::GetVertexCount() const
+inline dInt32 ndConvexHull4d::GetVertexCount() const
 {
 	return m_count;
 }
 
-inline dInt32 dConvexHull4d::GetVertexIndex(dInt32 index) const
+inline dInt32 ndConvexHull4d::GetVertexIndex(dInt32 index) const
 {
 	dAssert (index >= 0);
 	dAssert (index < m_count);
@@ -172,19 +171,19 @@ inline dInt32 dConvexHull4d::GetVertexIndex(dInt32 index) const
 }
 
 
-inline const dBigVector& dConvexHull4d::GetVertex(dInt32 index) const
+inline const ndBigVector& ndConvexHull4d::GetVertex(dInt32 index) const
 {
 	dAssert (index >= 0);
 	dAssert (index < m_count);
 	return m_points[index];
 }
 
-inline const dConvexHull4dVector* dConvexHull4d::GetHullVertexArray() const
+inline const ndConvexHull4dVector* ndConvexHull4d::GetHullVertexArray() const
 {
 	return &m_points[0];
 }
 
-inline dFloat64 dConvexHull4d::GetTetraVolume (const dConvexHull4dTetraherum* const tetra) const
+inline dFloat64 ndConvexHull4d::GetTetraVolume (const ndConvexHull4dTetraherum* const tetra) const
 {
 	return tetra->GetTetraVolume (&m_points[0]);
 }

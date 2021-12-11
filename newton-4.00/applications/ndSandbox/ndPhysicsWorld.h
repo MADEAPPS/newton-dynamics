@@ -41,9 +41,9 @@ class ndPhysicsWorld: public ndWorld
 	ndDemoEntityManager* m_manager;
 	ndSoundManager* m_soundManager;
 	dFloat32 m_timeAccumulator;
-	dArray<ndBody*> m_deletedBodies;
-	dAtomic<bool> m_hasPendingObjectToDelete;
-	dSpinLock m_deletedLock;
+	ndArray<ndBody*> m_deletedBodies;
+	ndAtomic<bool> m_hasPendingObjectToDelete;
+	ndSpinLock m_deletedLock;
 };
 
 #endif

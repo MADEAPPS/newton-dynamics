@@ -27,31 +27,31 @@
 #include "ndVector.h"
 
 D_MSV_NEWTON_ALIGN_32
-class dSpatialVector
+class ndSpatialVector
 {
 	public:
 	D_OPERATOR_NEW_AND_DELETE
 
-	inline dSpatialVector()
+	inline ndSpatialVector()
 	{
 	}
 
-	inline dSpatialVector(const dFloat64 a)
+	inline ndSpatialVector(const dFloat64 a)
 		:m_data(a)
 	{
 	}
 
-	inline dSpatialVector(const dSpatialVector& copy)
+	inline ndSpatialVector(const ndSpatialVector& copy)
 		:m_data(copy.m_data)
 	{
 	}
 
-	inline dSpatialVector(const dBigVector& low, const dBigVector& high)
+	inline ndSpatialVector(const ndBigVector& low, const ndBigVector& high)
 		:m_data(low, high)
 	{
 	}
 
-	inline ~dSpatialVector()
+	inline ~ndSpatialVector()
 	{
 	}
 
@@ -69,28 +69,28 @@ class dSpatialVector
 		return ((dFloat64*)&m_f)[i];
 	}
 
-	inline dSpatialVector operator+ (const dSpatialVector& A) const
+	inline ndSpatialVector operator+ (const ndSpatialVector& A) const
 	{
-		return dSpatialVector(m_data.m_low + A.m_data.m_low, m_data.m_high + A.m_data.m_high);
+		return ndSpatialVector(m_data.m_low + A.m_data.m_low, m_data.m_high + A.m_data.m_high);
 	}
 
-	inline dSpatialVector operator*(const dSpatialVector& A) const
+	inline ndSpatialVector operator*(const ndSpatialVector& A) const
 	{
-		return dSpatialVector(m_data.m_low * A.m_data.m_low, m_data.m_high * A.m_data.m_high);
+		return ndSpatialVector(m_data.m_low * A.m_data.m_low, m_data.m_high * A.m_data.m_high);
 	}
 
-	inline dFloat64 DotProduct(const dSpatialVector& v) const
+	inline dFloat64 DotProduct(const ndSpatialVector& v) const
 	{
 		dAssert(m_f[6] == dFloat32(0.0f));
 		dAssert(m_f[7] == dFloat32(0.0f));
-		dBigVector tmp(m_data.m_low * v.m_data.m_low + m_data.m_high * v.m_data.m_high);
+		ndBigVector tmp(m_data.m_low * v.m_data.m_low + m_data.m_high * v.m_data.m_high);
 		return tmp.AddHorizontal().GetScalar();
 	}
 
-	inline dSpatialVector Scale(dFloat64 s) const
+	inline ndSpatialVector Scale(dFloat64 s) const
 	{
-		dBigVector tmp(s);
-		return dSpatialVector(m_data.m_low * tmp, m_data.m_high * tmp);
+		ndBigVector tmp(s);
+		return ndSpatialVector(m_data.m_low * tmp, m_data.m_high * tmp);
 	}
 
 	struct ndData
@@ -107,14 +107,14 @@ class dSpatialVector
 		{
 		}
 
-		inline ndData(const dBigVector& low, const dBigVector& high)
+		inline ndData(const ndBigVector& low, const ndBigVector& high)
 			:m_low(low)
 			,m_high(high)
 		{
 		}
 
-		dBigVector m_low;
-		dBigVector m_high;
+		ndBigVector m_low;
+		ndBigVector m_high;
 	};
 
 	union
@@ -123,7 +123,7 @@ class dSpatialVector
 		ndData m_data;
 	};
 
-	D_CORE_API static dSpatialVector m_zero;
+	D_CORE_API static ndSpatialVector m_zero;
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif

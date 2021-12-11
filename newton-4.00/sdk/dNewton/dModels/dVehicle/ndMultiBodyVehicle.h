@@ -68,8 +68,8 @@ class ndMultiBodyVehicle: public ndModel
 	};
 
 	D_CLASS_REFLECTION(ndMultiBodyVehicle);
-	D_NEWTON_API ndMultiBodyVehicle(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndMultiBodyVehicle(const dVector& frontDir, const dVector& upDir);
+	D_NEWTON_API ndMultiBodyVehicle(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndMultiBodyVehicle(const ndVector& frontDir, const ndVector& upDir);
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
 
 	D_NEWTON_API virtual void AddToWorld(ndWorld* const world);
@@ -108,19 +108,19 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	D_NEWTON_API virtual void Update(ndWorld* const world, dFloat32 timestep);
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
-	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	dMatrix m_localFrame;
+	ndMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
 	ndMultiBodyVehicleMotor* m_motor;
 	ndShapeChamferCylinder* m_tireShape;
 	ndMultiBodyVehicleGearBox* m_gearBox;
 	ndMultiBodyVehicleTorsionBar* m_torsionBar;
-	dList<ndMultiBodyVehicleTireJoint*> m_tireList;
-	dList<ndBodyDynamic*> m_extraBodiesAttachmentList;
-	dList<ndMultiBodyVehicleDifferentialAxle*> m_axleList;
-	dList<ndMultiBodyVehicleDifferential*> m_differentialList;
-	dList<ndJointBilateralConstraint*> m_extraJointsAttachmentList;
+	ndList<ndMultiBodyVehicleTireJoint*> m_tireList;
+	ndList<ndBodyDynamic*> m_extraBodiesAttachmentList;
+	ndList<ndMultiBodyVehicleDifferentialAxle*> m_axleList;
+	ndList<ndMultiBodyVehicleDifferential*> m_differentialList;
+	ndList<ndJointBilateralConstraint*> m_extraJointsAttachmentList;
 	ndDownForce m_downForce;
 	
 	friend class ndMultiBodyVehicleMotor;

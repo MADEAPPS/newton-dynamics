@@ -22,7 +22,7 @@
 #include "ndCoreStdafx.h"
 #include "ndSyncMutex.h"
 
-dSyncMutex::dSyncMutex()
+ndSyncMutex::ndSyncMutex()
 #ifndef D_USE_THREAD_EMULATION
 	:m_mutex()
 	,m_condition()
@@ -31,11 +31,11 @@ dSyncMutex::dSyncMutex()
 {
 }
 
-dSyncMutex::~dSyncMutex()
+ndSyncMutex::~ndSyncMutex()
 {
 }
 
-void dSyncMutex::Sync()
+void ndSyncMutex::Sync()
 {
 #ifndef D_USE_THREAD_EMULATION
 	std::unique_lock<std::mutex> lock(m_mutex);
@@ -46,7 +46,7 @@ void dSyncMutex::Sync()
 #endif
 }
 
-void dSyncMutex::Release()
+void ndSyncMutex::Release()
 {
 #ifndef D_USE_THREAD_EMULATION
 	std::unique_lock<std::mutex> lock(m_mutex);
@@ -55,7 +55,7 @@ void dSyncMutex::Release()
 #endif
 }
 
-void dSyncMutex::Tick()
+void ndSyncMutex::Tick()
 {
 #ifndef D_USE_THREAD_EMULATION
 	std::unique_lock<std::mutex> lock(m_mutex);

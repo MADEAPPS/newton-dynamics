@@ -18,7 +18,7 @@
 class ndDemoCamera;
 class ndDemoCameraPickBodyJoint;
 
-class ndDemoCameraManager: public dClassAlloc
+class ndDemoCameraManager: public ndClassAlloc
 {
 	public:
 	ndDemoCameraManager(ndDemoEntityManager* const scene);
@@ -29,7 +29,7 @@ class ndDemoCameraManager: public dClassAlloc
 		return m_camera;
 	}
 
-	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
+	void SetCameraMatrix (const ndQuaternion& rotation, const ndVector& position);
 
 	void SetCameraMouseLock (bool loockState);
 
@@ -45,11 +45,11 @@ class ndDemoCameraManager: public dClassAlloc
 
 	private:
 	//virtual void OnBodyDestroy (NewtonBody* const body);
-	void UpdatePickBody (ndDemoEntityManager* const scene, bool mouseState, const dVector& camPos0, const dVector& camPos1, dFloat32 timestep); 
+	void UpdatePickBody (ndDemoEntityManager* const scene, bool mouseState, const ndVector& camPos0, const ndVector& camPos1, dFloat32 timestep); 
 
-	dVector m_pickedBodyTargetPosition;
-	dVector m_pickedBodyLocalAtachmentPoint;
-	dVector m_pickedBodyLocalAtachmentNormal;
+	ndVector m_pickedBodyTargetPosition;
+	ndVector m_pickedBodyLocalAtachmentPoint;
+	ndVector m_pickedBodyLocalAtachmentNormal;
 
 	ndDemoCamera* m_camera;
 	ndBodyKinematic* m_targetPicked;

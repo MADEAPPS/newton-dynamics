@@ -30,9 +30,9 @@ namespace ndSoa
 	class ndSoaVector3
 	{
 		public:
-		dVector m_x;
-		dVector m_y;
-		dVector m_z;
+		ndVector m_x;
+		ndVector m_y;
+		ndVector m_z;
 	};
 
 	class ndSoaVector6
@@ -55,13 +55,13 @@ namespace ndSoa
 		ndSoaJacobianPair m_Jt;
 		ndSoaJacobianPair m_JMinv;
 
-		dVector m_force;
-		dVector m_diagDamp;
-		dVector m_invJinvMJt;
-		dVector m_coordenateAccel;
-		dVector m_normalForceIndex;
-		dVector m_lowerBoundFrictionCoefficent;
-		dVector m_upperBoundFrictionCoefficent;
+		ndVector m_force;
+		ndVector m_diagDamp;
+		ndVector m_invJinvMJt;
+		ndVector m_coordenateAccel;
+		ndVector m_normalForceIndex;
+		ndVector m_lowerBoundFrictionCoefficent;
+		ndVector m_upperBoundFrictionCoefficent;
 	};
 };
 
@@ -97,9 +97,9 @@ class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 	void DetermineSleepStates();
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
-	dVector m_ordinals;
-	dArray<dInt32> m_soaJointRows;
-	dArray<ndSoa::ndSoaMatrixElement> m_soaMassMatrix;
+	ndVector m_ordinals;
+	ndArray<dInt32> m_soaJointRows;
+	ndArray<ndSoa::ndSoaMatrixElement> m_soaMassMatrix;
 
 } D_GCC_NEWTON_ALIGN_32;
 

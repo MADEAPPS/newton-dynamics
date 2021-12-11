@@ -25,14 +25,14 @@
 #include "ndCoreStdafx.h"
 
 /// Generic counting semaphore for thread synchronization 
-class dSemaphore
+class ndSemaphore
 {
 	public:
 	/// Create and initialize counter to zero
-	D_CORE_API dSemaphore();
+	D_CORE_API ndSemaphore();
 
 	/// Destroy semaphore
-	D_CORE_API ~dSemaphore();
+	D_CORE_API ~ndSemaphore();
 
 	/// Returns counter counter value
 	D_CORE_API dInt32 GetCount() const;
@@ -58,7 +58,7 @@ class dSemaphore
 	mutable std::mutex m_mutex;
 	std::condition_variable m_condition;
 	dInt32 m_count;
-	dAtomic<bool> m_terminate;
+	ndAtomic<bool> m_terminate;
 #endif
 };
 

@@ -24,7 +24,7 @@
 #include "ndVector.h"
 #include "ndFastRay.h"
 
-dFloat32 dFastRay::PolygonIntersect (const dVector& faceNormal, dFloat32 maxT, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount) const
+dFloat32 ndFastRay::PolygonIntersect (const ndVector& faceNormal, dFloat32 maxT, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount) const
 {
 	dAssert (m_p0.m_w == dFloat32 (0.0f));
 	dAssert (m_p1.m_w == dFloat32 (0.0f));
@@ -32,24 +32,24 @@ dFloat32 dFastRay::PolygonIntersect (const dVector& faceNormal, dFloat32 maxT, c
 	if (faceNormal.DotProduct(m_unitDir).GetScalar() < dFloat32 (0.0f)) 
 	{
 		dInt32 stride = dInt32(strideInBytes / sizeof (dFloat32));
-		dBigVector v0(dVector(&polygon[indexArray[indexCount - 1] * stride]) & dVector::m_triplexMask);
-		dBigVector p0(m_p0);
-		dBigVector p0v0(v0 - p0);
+		ndBigVector v0(ndVector(&polygon[indexArray[indexCount - 1] * stride]) & ndVector::m_triplexMask);
+		ndBigVector p0(m_p0);
+		ndBigVector p0v0(v0 - p0);
 
-		dBigVector diff(m_diff);
-		dBigVector normal(faceNormal);
+		ndBigVector diff(m_diff);
+		ndBigVector normal(faceNormal);
 		dFloat64 tOut = normal.DotProduct(p0v0).GetScalar() / normal.DotProduct(diff).GetScalar();
 		if ((tOut >= dFloat64(0.0f)) && (tOut <= maxT)) 
 		{
-			dBigVector p (p0 + diff.Scale (tOut));
-			dBigVector unitDir(m_unitDir);
+			ndBigVector p (p0 + diff.Scale (tOut));
+			ndBigVector unitDir(m_unitDir);
 			for (dInt32 i = 0; i < indexCount; i++) 
 			{
 				dInt32 i2 = indexArray[i] * stride;
-				dBigVector v1(dVector(&polygon[i2]) & dVector::m_triplexMask);
+				ndBigVector v1(ndVector(&polygon[i2]) & ndVector::m_triplexMask);
 
-				dBigVector edge0(p - v0);
-				dBigVector edge1(v1 - v0);
+				ndBigVector edge0(p - v0);
+				ndBigVector edge1(v1 - v0);
 				dFloat64 area = unitDir.DotProduct (edge0.CrossProduct(edge1)).GetScalar();
 				if (area < dFloat32 (0.0f)) 
 				{
@@ -65,11 +65,11 @@ dFloat32 dFastRay::PolygonIntersect (const dVector& faceNormal, dFloat32 maxT, c
 	return dFloat32 (1.2f);
 }
 
-dRay dFastRay::RayDistance(const dVector& ray_q0, const dVector& ray_q1) const
+ndRay ndFastRay::RayDistance(const ndVector& ray_q0, const ndVector& ray_q1) const
 {
-	const dVector u(m_diff);
-	const dVector v(dVector::m_triplexMask & (ray_q1 - ray_q0));
-	const dVector w(dVector::m_triplexMask & (m_p0 - ray_q0));
+	const ndVector u(m_diff);
+	const ndVector v(ndVector::m_triplexMask & (ray_q1 - ray_q0));
+	const ndVector w(ndVector::m_triplexMask & (m_p0 - ray_q0));
 	dAssert(u.m_w == dFloat32(0.0f));
 	dAssert(v.m_w == dFloat32(0.0f));
 	dAssert(w.m_w == dFloat32(0.0f));
@@ -160,5 +160,5 @@ dRay dFastRay::RayDistance(const dVector& ray_q0, const dVector& ray_q1) const
 	
 	dAssert(u.m_w == dFloat32(0.0f));
 	dAssert(v.m_w == dFloat32(0.0f));
-	return dRay(m_p0 + u.Scale(sc), ray_q0 + v.Scale(tc));
+	return ndRay(m_p0 + u.Scale(sc), ray_q0 + v.Scale(tc));
 }

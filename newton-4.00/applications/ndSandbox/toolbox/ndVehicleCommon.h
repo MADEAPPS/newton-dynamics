@@ -103,7 +103,7 @@ class ndVehicleDectriptor
 	ndVehicleDectriptor() {}
 	ndVehicleDectriptor(const char* const fileName);
 
-	dVector m_comDisplacement;
+	ndVector m_comDisplacement;
 	char m_name[32];
 
 	dFloat32 m_chassisMass;
@@ -172,11 +172,11 @@ class ndVehicleSelector : public ndModel
 	public:
 	D_CLASS_REFLECTION(ndVehicleSelector);
 	ndVehicleSelector();
-	ndVehicleSelector(const dLoadSaveBase::dLoadDescriptor& desc);
+	ndVehicleSelector(const ndLoadSaveBase::dLoadDescriptor& desc);
 
 	void Update(ndWorld* const, dFloat32){}
 	void PostUpdate(ndWorld* const world, dFloat32);
-	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;
 };

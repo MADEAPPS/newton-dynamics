@@ -13,13 +13,13 @@
 #include "ndAnimationPose.h"
 
 ndAnimationPose::ndAnimationPose()
-	:dArray<ndAnimKeyframe>()
+	:ndArray<ndAnimKeyframe>()
 {
 }
 
 //ndAnimationPose::ndAnimationPose(const ndAnimationPose& source)
 ndAnimationPose::ndAnimationPose(const ndAnimationPose&)
-	:dArray<ndAnimKeyframe>()
+	:ndArray<ndAnimKeyframe>()
 {
 	dAssert(0);
 }

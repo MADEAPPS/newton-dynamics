@@ -29,8 +29,8 @@ class ndExplodeConvexShapeModel: public ndModel
 		ndAtom(const ndAtom& atom);
 		~ndAtom();
 
-		dVector m_centerOfMass;
-		dVector m_momentOfInertia;
+		ndVector m_centerOfMass;
+		ndVector m_momentOfInertia;
 		ndDemoDebrisEntity* m_mesh;
 		ndShapeInstance* m_collision;
 		dFloat32 m_massFraction;
@@ -49,14 +49,14 @@ class ndExplodeConvexShapeModel: public ndModel
 		{
 		}
 
-		dArray<dVector> m_pointCloud;
+		ndArray<ndVector> m_pointCloud;
 		ndShapeInstance* m_shape;
 		const char* m_outTexture;
 		const char* m_innerTexture; 
 		dFloat32 m_breakImpactSpeed;
 	};
 
-	class ndEffect : public dList<ndAtom>
+	class ndEffect : public ndList<ndAtom>
 	{
 		public:
 		ndEffect(ndExplodeConvexShapeModel* const manager, const ndDesc& desc);
@@ -77,17 +77,17 @@ class ndExplodeConvexShapeModel: public ndModel
 	ndExplodeConvexShapeModel(ndDemoEntityManager* const scene);
 	~ndExplodeConvexShapeModel();
 
-	void AddEffect(const ndEffect& effect, dFloat32 mass, const dMatrix& location);
+	void AddEffect(const ndEffect& effect, dFloat32 mass, const ndMatrix& location);
 
 	virtual void Update(ndWorld* const world, dFloat32 timestep);
 	virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
 
 	void UpdateEffect(ndWorld* const world, ndEffect& effect);
 
-	dList<ndEffect> m_effectList;
-	dList<ndEffect> m_pendingEffect;
+	ndList<ndEffect> m_effectList;
+	ndList<ndEffect> m_pendingEffect;
 	ndDemoEntityManager* m_scene;
-	dSpinLock m_lock;
+	ndSpinLock m_lock;
 };
 
 #endif

@@ -19,8 +19,8 @@ class ndJointPdActuator : public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointPdActuator);
-	D_NEWTON_API ndJointPdActuator(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndJointPdActuator(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointPdActuator(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointPdActuator(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointPdActuator();
 
 	D_NEWTON_API void SetTwistLimits(dFloat32 minAngle, dFloat32 maxAngle);
@@ -36,35 +36,35 @@ class ndJointPdActuator : public ndJointBilateralConstraint
 	D_NEWTON_API void GetLinearSpringDamperRegularizer(dFloat32& spring, dFloat32& damper, dFloat32& regularizer) const;
 	D_NEWTON_API void SetLinearSpringDamperRegularizer(dFloat32 spring, dFloat32 damper, dFloat32 regularizer = dFloat32(5.0e-3f));
 
-	D_NEWTON_API dVector GetTargetPosition() const;
-	D_NEWTON_API void SetTargetPosition(const dVector& posit);
+	D_NEWTON_API ndVector GetTargetPosition() const;
+	D_NEWTON_API void SetTargetPosition(const ndVector& posit);
 
-	D_NEWTON_API dMatrix GetTargetMatrix() const;
-	D_NEWTON_API void SetTargetMatrix(const dMatrix& posit);
+	D_NEWTON_API ndMatrix GetTargetMatrix() const;
+	D_NEWTON_API void SetTargetMatrix(const ndMatrix& posit);
 
-	const dMatrix& GetReferenceMatrix() const;
+	const ndMatrix& GetReferenceMatrix() const;
 
-	dMatrix GetTargetRotation() const;
-	void SetTargetRotation(const dMatrix& rotation);
+	ndMatrix GetTargetRotation() const;
+	void SetTargetRotation(const ndMatrix& rotation);
 
 	D_NEWTON_API void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 
 	//void SubmitTwistLimits(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc);
-	//void SubmitPdRotation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
+	//void SubmitPdRotation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 
-	void SubmitLinearLimits(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
-	void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
-	void SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
+	void SubmitLinearLimits(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	void SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	void SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 
-	void SubmitConeAngleOnlyRows(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
-	void SubmitTwistAngleOnlyRows(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc);
+	void SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
+	void SubmitTwistAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc);
 
-	dMatrix m_pivotFrame;
+	ndMatrix m_pivotFrame;
 	
 	dFloat32 m_minTwistAngle;
 	dFloat32 m_maxTwistAngle;
@@ -82,21 +82,21 @@ class ndJointPdActuator : public ndJointBilateralConstraint
 	dFloat32 m_linearRegularizer;
 };
 
-inline dMatrix ndJointPdActuator::GetTargetRotation() const
+inline ndMatrix ndJointPdActuator::GetTargetRotation() const
 {
-	dMatrix tmp(m_localMatrix1);
+	ndMatrix tmp(m_localMatrix1);
 	tmp.m_posit = m_pivotFrame.m_posit;
 	return tmp;
 }
 
-inline void ndJointPdActuator::SetTargetRotation(const dMatrix& matrix)
+inline void ndJointPdActuator::SetTargetRotation(const ndMatrix& matrix)
 {
-	dMatrix tmp(matrix);
+	ndMatrix tmp(matrix);
 	tmp.m_posit = m_localMatrix1.m_posit;
 	m_localMatrix1 = tmp;
 }
 
-inline const dMatrix& ndJointPdActuator::GetReferenceMatrix() const
+inline const ndMatrix& ndJointPdActuator::GetReferenceMatrix() const
 {
 	return m_pivotFrame;
 }

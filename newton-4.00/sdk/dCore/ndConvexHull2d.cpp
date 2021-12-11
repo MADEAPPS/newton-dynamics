@@ -23,27 +23,27 @@
 #include "ndSort.h"
 #include "ndConvexHull2d.h"
 
-static dFloat32 Cross(const dVector &O, const dVector &A, const dVector &B)
+static dFloat32 Cross(const ndVector &O, const ndVector &A, const ndVector &B)
 {
-	dVector A0(A - O);
-	dVector B0(B - O);
+	ndVector A0(A - O);
+	ndVector B0(B - O);
 	return A0.m_x * B0.m_y - A0.m_y * B0.m_x;
 }
 
-dInt32 dConvexHull2d(dVector* const vertexCloud2d, dInt32 count)
+dInt32 dConvexHull2d(ndVector* const vertexCloud2d, dInt32 count)
 {
 	if (count <= 3)
 	{
 		return count;
 	}
 
-	dVector* const hull = dAlloca(dVector, 2 * count);
+	ndVector* const hull = dAlloca(ndVector, 2 * count);
 
 	// Sort points lexicographically
 	class CompareVertex
 	{
 		public:
-		dInt32 Compare(const dVector& elementA, const dVector& elementB, void* const) const
+		dInt32 Compare(const ndVector& elementA, const ndVector& elementB, void* const) const
 		{
 			if (elementA.m_x < elementB.m_x)
 			{
@@ -67,7 +67,7 @@ dInt32 dConvexHull2d(dVector* const vertexCloud2d, dInt32 count)
 			return 0;
 		}
 	};
-	dSort<dVector, CompareVertex>(vertexCloud2d, count);
+	ndSort<ndVector, CompareVertex>(vertexCloud2d, count);
 
 	// Build lower hull
 	dInt32 k = 0;
@@ -92,6 +92,6 @@ dInt32 dConvexHull2d(dVector* const vertexCloud2d, dInt32 count)
 		k++;
 	}
 
-	memcpy(vertexCloud2d, hull, k * sizeof(dVector));
+	memcpy(vertexCloud2d, hull, k * sizeof(ndVector));
 	return k - 1;
 }

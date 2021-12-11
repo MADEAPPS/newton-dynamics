@@ -18,12 +18,12 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoSplinePathMesh.h"
 
-ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const dMatrix& location)
+ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
-	dMatrix uvMatrix(dGetIdentityMatrix());
+	ndMatrix uvMatrix(dGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
@@ -46,16 +46,16 @@ ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene, const dMatrix& 
 
 ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, dFloat32 gridSize, dFloat32 perturbation)
 {
-	dVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
+	ndVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
 
-	dArray<dVector> points;
+	ndArray<ndVector> points;
 	for (dInt32 iz = 0; iz <= grids; iz++)
 	{
 		dFloat32 z0 = origin.m_z + iz * gridSize;
 		for (dInt32 ix = 0; ix <= grids; ix++)
 		{
 			dFloat32 x0 = origin.m_x + ix * gridSize;
-			points.PushBack(dVector(x0, dGaussianRandom(perturbation), z0, 1.0f));
+			points.PushBack(ndVector(x0, dGaussianRandom(perturbation), z0, 1.0f));
 		}
 	}
 
@@ -65,10 +65,10 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, 
 	{ 
 		for (dInt32 ix = 0; ix < grids; ix++)
 		{
-			dVector p0(points[(ix + 0) * (grids + 1) + iz + 0]);
-			dVector p1(points[(ix + 1) * (grids + 1) + iz + 0]);
-			dVector p2(points[(ix + 1) * (grids + 1) + iz + 1]);
-			dVector p3(points[(ix + 0) * (grids + 1) + iz + 1]);
+			ndVector p0(points[(ix + 0) * (grids + 1) + iz + 0]);
+			ndVector p1(points[(ix + 1) * (grids + 1) + iz + 0]);
+			ndVector p2(points[(ix + 1) * (grids + 1) + iz + 1]);
+			ndVector p3(points[(ix + 0) * (grids + 1) + iz + 1]);
 
 			meshEffect.BeginBuildFace();
 			meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
@@ -86,7 +86,7 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, 
 	meshEffect.EndBuild(0.0f);
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-	dPolygonSoupBuilder meshBuilder;
+	ndPolygonSoupBuilder meshBuilder;
 	meshBuilder.Begin();
 
 	dInt32 vertexStride = meshEffect.GetVertexStrideInByte() / sizeof(dFloat64);
@@ -94,19 +94,19 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, 
 
 	dInt32 mark = meshEffect.IncLRU();
 
-	dVector face[16];
-	dPolyhedra::Iterator iter(meshEffect);
+	ndVector face[16];
+	ndPolyhedra::Iterator iter(meshEffect);
 	for (iter.Begin(); iter; iter++)
 	{
-		dEdge* const edge = &(*iter);
+		ndEdge* const edge = &(*iter);
 		if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark))
 		{
 			dInt32 count = 0;
-			dEdge* ptr = edge;
+			ndEdge* ptr = edge;
 			do
 			{
 				dInt32 i = ptr->m_incidentVertex * vertexStride;
-				dVector point(dFloat32(vertexData[i + 0]), dFloat32(vertexData[i + 1]), dFloat32(vertexData[i + 2]), dFloat32(1.0f));
+				ndVector point(dFloat32(vertexData[i + 0]), dFloat32(vertexData[i + 1]), dFloat32(vertexData[i + 2]), dFloat32(1.0f));
 				face[count] = point;
 				count++;
 				ptr->m_mark = mark;
@@ -114,7 +114,7 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, 
 			} while (ptr != edge);
 
 			dInt32 materialIndex = meshEffect.GetFaceMaterial(edge);
-			meshBuilder.AddFace(&face[0].m_x, sizeof(dVector), 3, materialIndex);
+			meshBuilder.AddFace(&face[0].m_x, sizeof(ndVector), 3, materialIndex);
 		}
 	}
 	meshBuilder.End(false);
@@ -122,13 +122,13 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, 
 	dFloat32 uvScale = 1.0 / 16.0f;
 
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
-	dMatrix uvMatrix(dGetIdentityMatrix());
+	ndMatrix uvMatrix(dGetIdentityMatrix());
 	uvMatrix[0][0] *= uvScale;
 	uvMatrix[1][1] *= uvScale;
 	uvMatrix[2][2] *= uvScale;
 	ndDemoMesh* const geometry = new ndDemoMesh("plane", scene->GetShaderCache(), &plane, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
 
-	dMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(dGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 
@@ -147,7 +147,7 @@ ndBodyKinematic* BuildGridPlane(ndDemoEntityManager* const scene, dInt32 grids, 
 ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
-	dVector floor[] =
+	ndVector floor[] =
 	{
 		{ 200.0f, 0.0f,  200.0f, 1.0f },
 		{ 200.0f, 0.0f, -200.0f, 1.0f },
@@ -156,20 +156,20 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized
 	};
 	dInt32 index[][3] = { { 0, 1, 2 },{ 0, 2, 3 } };
 
-	dPolygonSoupBuilder meshBuilder;
+	ndPolygonSoupBuilder meshBuilder;
 	meshBuilder.Begin();
-	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[0][0], 3);
-	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[1][0], 3);
+	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[0][0], 3);
+	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(ndVector), 31, &index[1][0], 3);
 	meshBuilder.End(optimized);
 
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
-	dMatrix uvMatrix(dGetIdentityMatrix());
+	ndMatrix uvMatrix(dGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;
 	uvMatrix[2][2] *= 0.025f;
 	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &plane, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
 
-	dMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(dGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 
@@ -190,11 +190,11 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 	fbxDemoEntity* const entity = scene->LoadFbxMesh(meshName);
 	scene->AddEntity(entity);
 
-	dPolygonSoupBuilder meshBuilder;
+	ndPolygonSoupBuilder meshBuilder;
 	meshBuilder.Begin();
 	
 	dInt32 stack = 1;
-	dMatrix matrixBuffer[1024];
+	ndMatrix matrixBuffer[1024];
 	fbxDemoEntity* entBuffer[1024];
 	
 	entBuffer[0] = entity;
@@ -204,7 +204,7 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 	{
 		stack--;
 		fbxDemoEntity* const ent = entBuffer[stack];
-		dMatrix matrix (ent->GetCurrentMatrix() * matrixBuffer[stack]);
+		ndMatrix matrix (ent->GetCurrentMatrix() * matrixBuffer[stack]);
 	
 		if (ent->m_fbxMeshEffect)
 		{
@@ -212,21 +212,21 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 			const dFloat64* const vertexData = ent->m_fbxMeshEffect->GetVertexPool();
 	
 			dInt32 mark = ent->m_fbxMeshEffect->IncLRU();
-			dPolyhedra::Iterator iter(*ent->m_fbxMeshEffect);
+			ndPolyhedra::Iterator iter(*ent->m_fbxMeshEffect);
 			
-			dVector face[256];
-			dMatrix worldMatrix(ent->GetMeshMatrix() * matrix);
+			ndVector face[256];
+			ndMatrix worldMatrix(ent->GetMeshMatrix() * matrix);
 			for (iter.Begin(); iter; iter++)
 			{
-				dEdge* const edge = &(*iter);
+				ndEdge* const edge = &(*iter);
 				if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark))
 				{
 					dInt32 count = 0;
-					dEdge* ptr = edge;
+					ndEdge* ptr = edge;
 					do
 					{
 						dInt32 i = ptr->m_incidentVertex * vertexStride;
-						dVector point(dFloat32(vertexData[i + 0]), dFloat32(vertexData[i + 1]), dFloat32(vertexData[i + 2]), dFloat32(1.0f));
+						ndVector point(dFloat32(vertexData[i + 0]), dFloat32(vertexData[i + 1]), dFloat32(vertexData[i + 2]), dFloat32(1.0f));
 						face[count] = worldMatrix.TransformVector(point);
 						count++;
 						ptr->m_mark = mark;
@@ -234,7 +234,7 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 					} while (ptr != edge);
 	
 					dInt32 materialIndex = ent->m_fbxMeshEffect->GetFaceMaterial(edge);
-					meshBuilder.AddFace(&face[0].m_x, sizeof(dVector), 3, materialIndex);
+					meshBuilder.AddFace(&face[0].m_x, sizeof(ndVector), 3, materialIndex);
 				}
 			}
 		}
@@ -249,7 +249,7 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 	meshBuilder.End(optimized);
 	ndShapeInstance shape(new ndShapeStatic_bvh(meshBuilder));
 
-	dMatrix matrix(entity->GetCurrentMatrix());
+	ndMatrix matrix(entity->GetCurrentMatrix());
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
@@ -265,11 +265,11 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	fbxDemoEntity* const entity = scene->LoadFbxMesh("playerarena.fbx");
 	scene->AddEntity(entity);
 
-	dPolygonSoupBuilder meshBuilder;
+	ndPolygonSoupBuilder meshBuilder;
 	meshBuilder.Begin();
 
 	dInt32 stack = 1;
-	dMatrix matrixBuffer[1024];
+	ndMatrix matrixBuffer[1024];
 	fbxDemoEntity* entBuffer[1024];
 
 	entBuffer[0] = entity;
@@ -279,7 +279,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	{
 		stack--;
 		fbxDemoEntity* const ent = entBuffer[stack];
-		dMatrix matrix(ent->GetCurrentMatrix() * matrixBuffer[stack]);
+		ndMatrix matrix(ent->GetCurrentMatrix() * matrixBuffer[stack]);
 
 		if (ent->m_fbxMeshEffect)
 		{
@@ -287,21 +287,21 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 			const dFloat64* const vertexData = ent->m_fbxMeshEffect->GetVertexPool();
 
 			dInt32 mark = ent->m_fbxMeshEffect->IncLRU();
-			dPolyhedra::Iterator iter(*ent->m_fbxMeshEffect);
+			ndPolyhedra::Iterator iter(*ent->m_fbxMeshEffect);
 
-			dVector face[256];
-			dMatrix worldMatrix(ent->GetMeshMatrix() * matrix);
+			ndVector face[256];
+			ndMatrix worldMatrix(ent->GetMeshMatrix() * matrix);
 			for (iter.Begin(); iter; iter++)
 			{
-				dEdge* const edge = &(*iter);
+				ndEdge* const edge = &(*iter);
 				if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark))
 				{
 					dInt32 count = 0;
-					dEdge* ptr = edge;
+					ndEdge* ptr = edge;
 					do
 					{
 						dInt32 i = ptr->m_incidentVertex * vertexStride;
-						dVector point(dFloat32(vertexData[i + 0]), dFloat32(vertexData[i + 1]), dFloat32(vertexData[i + 2]), dFloat32(1.0f));
+						ndVector point(dFloat32(vertexData[i + 0]), dFloat32(vertexData[i + 1]), dFloat32(vertexData[i + 2]), dFloat32(1.0f));
 						face[count] = worldMatrix.TransformVector(point);
 						count++;
 						ptr->m_mark = mark;
@@ -309,7 +309,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 					} while (ptr != edge);
 
 					dInt32 materialIndex = ent->m_fbxMeshEffect->GetFaceMaterial(edge);
-					meshBuilder.AddFace(&face[0].m_x, sizeof(dVector), 3, materialIndex);
+					meshBuilder.AddFace(&face[0].m_x, sizeof(ndVector), 3, materialIndex);
 				}
 			}
 		}
@@ -324,7 +324,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	meshBuilder.End(true);
 	ndShapeInstance shape(new ndShapeStatic_bvh(meshBuilder));
 
-	dMatrix matrix(entity->GetCurrentMatrix());
+	ndMatrix matrix(entity->GetCurrentMatrix());
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
@@ -334,9 +334,9 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	ndDemoEntity* const pivot0 = entity->Find("pivot1");
 	ndDemoEntity* const pivot1 = entity->Find("pivot0");
 
-	dMatrix matrix0(pivot0->CalculateGlobalMatrix());
-	dMatrix matrix1(pivot1->CalculateGlobalMatrix());
-	dVector dir(matrix1.m_posit - matrix0.m_posit);
+	ndMatrix matrix0(pivot0->CalculateGlobalMatrix());
+	ndMatrix matrix1(pivot1->CalculateGlobalMatrix());
+	ndVector dir(matrix1.m_posit - matrix0.m_posit);
 	dFloat32 lenght = dSqrt (dir.DotProduct(dir).GetScalar());
 
 	const dInt32 plankCount = 30;
@@ -352,7 +352,7 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 #if 1
 	ndShapeInstance plankShape(new ndShapeBox(sizex, sizey, sizez + deflection ));
 
-	dFixSizeArray<ndBodyKinematic*, plankCount> array;
+	ndFixSizeArray<ndBodyKinematic*, plankCount> array;
 	for (dInt32 i = 0; i < plankCount; i ++)
 	{
 		array.PushBack(CreateBody(scene, plankShape, matrix, 20.0f));
@@ -363,11 +363,11 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	{
 		ndBodyKinematic* body0 = array[i - 1];
 		ndBodyKinematic* body1 = array[i];
-		dMatrix linkMatrix(body0->GetMatrix());
-		linkMatrix.m_posit = dVector::m_half * (body0->GetMatrix().m_posit + body1->GetMatrix().m_posit);
+		ndMatrix linkMatrix(body0->GetMatrix());
+		linkMatrix.m_posit = ndVector::m_half * (body0->GetMatrix().m_posit + body1->GetMatrix().m_posit);
 		linkMatrix.m_posit.m_y += sizey * 0.5f;
-		dMatrix matrix_0(linkMatrix);
-		dMatrix matrix_1(linkMatrix);
+		ndMatrix matrix_0(linkMatrix);
+		ndMatrix matrix_1(linkMatrix);
 		matrix_0.m_posit.m_z += deflection  * 0.5f;
 		matrix_1.m_posit.m_z -= deflection  * 0.5f;
 		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
@@ -378,12 +378,12 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	{
 		ndBodyKinematic* body0 = array[0];
 		ndBodyKinematic* body1 = body;
-		dMatrix linkMatrix(body0->GetMatrix());
+		ndMatrix linkMatrix(body0->GetMatrix());
 		linkMatrix.m_posit = body0->GetMatrix().m_posit;
 		linkMatrix.m_posit.m_z -= (sizez + deflection ) * 0.5f;
 		linkMatrix.m_posit.m_y += sizey * 0.5f;
-		dMatrix matrix_0(linkMatrix);
-		dMatrix matrix_1(linkMatrix);
+		ndMatrix matrix_0(linkMatrix);
+		ndMatrix matrix_1(linkMatrix);
 		matrix_0.m_posit.m_z += deflection  * 0.5f;
 		matrix_1.m_posit.m_z -= deflection  * 0.5f;
 		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
@@ -394,12 +394,12 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 	{
 		ndBodyKinematic* body0 = array[plankCount-1];
 		ndBodyKinematic* body1 = body;
-		dMatrix linkMatrix(body0->GetMatrix());
+		ndMatrix linkMatrix(body0->GetMatrix());
 		linkMatrix.m_posit = body0->GetMatrix().m_posit;
 		linkMatrix.m_posit.m_z += (sizez + deflection ) * 0.5f;
 		linkMatrix.m_posit.m_y += sizey * 0.5f;
-		dMatrix matrix_0(linkMatrix);
-		dMatrix matrix_1(linkMatrix);
+		ndMatrix matrix_0(linkMatrix);
+		ndMatrix matrix_1(linkMatrix);
 		matrix_0.m_posit.m_z += deflection  * 0.5f;
 		matrix_1.m_posit.m_z -= deflection  * 0.5f;
 		ndJointHinge* const hinge = new ndJointHinge(matrix_0, matrix_1, body0, body1);
@@ -414,25 +414,25 @@ ndBodyKinematic* BuildPlayArena(ndDemoEntityManager* const scene)
 ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* const meshName, bool optimized)
 {
 	dFloat64 knots[] = { 0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f };
-	dBigVector control[] =
+	ndBigVector control[] =
 	{
-		dBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
-		dBigVector(-36.0f, 1.0f,   4.0f, 1.0f),
-		dBigVector(  4.0f, 1.0f,  15.0f, 1.0f),
-		dBigVector( 44.0f, 1.0f,   4.0f, 1.0f),
-		dBigVector(  4.0f, 1.0f, -22.0f, 1.0f),
-		dBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
+		ndBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
+		ndBigVector(-36.0f, 1.0f,   4.0f, 1.0f),
+		ndBigVector(  4.0f, 1.0f,  15.0f, 1.0f),
+		ndBigVector( 44.0f, 1.0f,   4.0f, 1.0f),
+		ndBigVector(  4.0f, 1.0f, -22.0f, 1.0f),
+		ndBigVector(-16.0f, 1.0f, -10.0f, 1.0f),
 	};
 
-	dBezierSpline spline;
+	ndBezierSpline spline;
 	spline.CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
 
 	// recreate the spline from sample points at equally spaced distance 
 	//ndPhysicsWorld* const world = scene->GetWorld();
 
-	dMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(dGetIdentityMatrix());
 	ndDemoSplinePathMesh* const splineMesh = new ndDemoSplinePathMesh(spline, scene->GetShaderCache(), 500);
-	splineMesh->SetColor(dVector(1.0f, 0.0f, 0.0f, 1.0f));
+	splineMesh->SetColor(ndVector(1.0f, 0.0f, 0.0f, 1.0f));
 	ndDemoEntity* const splineEntity = new ndDemoEntity(matrix, nullptr);
 	scene->AddEntity(splineEntity);
 	splineEntity->SetMesh(splineMesh, dGetIdentityMatrix());
@@ -441,17 +441,17 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 
 	{
 		// try different degrees
-		//dBigVector points[4];
-		//points[0] = dBigVector(-16.0f, 1.0f, -10.0f, 1.0f);
-		//points[1] = dBigVector(-36.0f, 1.0f, 4.0f, 1.0f);
-		//points[2] = dBigVector(4.0f, 1.0f, 15.0f, 1.0f);
-		//points[3] = dBigVector(44.0f, 1.0f, 4.0f, 1.0f);
+		//ndBigVector points[4];
+		//points[0] = ndBigVector(-16.0f, 1.0f, -10.0f, 1.0f);
+		//points[1] = ndBigVector(-36.0f, 1.0f, 4.0f, 1.0f);
+		//points[2] = ndBigVector(4.0f, 1.0f, 15.0f, 1.0f);
+		//points[3] = ndBigVector(44.0f, 1.0f, 4.0f, 1.0f);
 		dInt32 size = sizeof(control) / sizeof(control[0]);
 
-		dBigVector derivP0(control[1] - control[size-1]);
-		//dBigVector derivP1(control[0] - control[size - 2]);
+		ndBigVector derivP0(control[1] - control[size-1]);
+		//ndBigVector derivP1(control[0] - control[size - 2]);
 
-		dBezierSpline spline1;
+		ndBezierSpline spline1;
 		//spline1.GlobalCubicInterpolation(size, control, derivP0, derivP1);
 		spline1.GlobalCubicInterpolation(size, control, derivP0, derivP0);
 
@@ -463,7 +463,7 @@ ndBodyKinematic* BuildSplineTrack(ndDemoEntityManager* const scene, const char* 
 		//spline.InsertKnot(u);
 		//spline.RemoveKnot(u, 1.0e-3f);
 		ndDemoSplinePathMesh* const splineMesh1 = new ndDemoSplinePathMesh(spline1, scene->GetShaderCache(), 500);
-		splineMesh1->SetColor(dVector(0.0f, 1.0f, 0.0f, 1.0f));
+		splineMesh1->SetColor(ndVector(0.0f, 1.0f, 0.0f, 1.0f));
 		ndDemoEntity* const splineEntity1 = new ndDemoEntity(matrix, nullptr);
 		scene->AddEntity(splineEntity1);
 		splineEntity1->SetMesh(splineMesh1, dGetIdentityMatrix());

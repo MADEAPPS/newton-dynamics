@@ -33,7 +33,7 @@ ndDemoSubMeshMaterial::~ndDemoSubMeshMaterial()
 }
 
 ndDemoMeshInterface::ndDemoMeshInterface()
-	:dRefCounter<ndDemoMeshInterface>()
+	:ndRefCounter<ndDemoMeshInterface>()
 	,m_name()
 	,m_isVisible(true)
 {
@@ -45,10 +45,10 @@ ndDemoMeshInterface::~ndDemoMeshInterface()
 
 dInt32 ndDemoMeshInterface::Release()
 {
-	return dRefCounter<ndDemoMeshInterface>::Release();
+	return ndRefCounter<ndDemoMeshInterface>::Release();
 }
 
-const dString& ndDemoMeshInterface::GetName () const
+const ndString& ndDemoMeshInterface::GetName () const
 {
 	return m_name;
 }

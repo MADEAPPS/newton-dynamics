@@ -40,7 +40,7 @@ class ndBodiesInAabbNotify;
 class ndJointBilateralConstraint;
 
 D_MSV_NEWTON_ALIGN_32
-class ndSceneTreeNotiFy : public dClassAlloc
+class ndSceneTreeNotiFy : public ndClassAlloc
 {
 	public:
 	ndSceneTreeNotiFy()
@@ -56,10 +56,10 @@ class ndSceneTreeNotiFy : public dClassAlloc
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
-class ndScene : public dThreadPool
+class ndScene : public ndThreadPool
 {
 	public: 
-	class ndBaseJob: public dThreadPoolJob
+	class ndBaseJob: public ndThreadPoolJob
 	{
 		public:
 		ndScene* m_owner;
@@ -69,7 +69,7 @@ class ndScene : public dThreadPool
 
 	protected:
 	class ndSpliteInfo;
-	class ndFitnessList: public dList <ndSceneTreeNode*, dContainersFreeListAlloc<ndSceneTreeNode*>>
+	class ndFitnessList: public ndList <ndSceneTreeNode*, ndContainersFreeListAlloc<ndSceneTreeNode*>>
 	{
 		public:
 		ndFitnessList();
@@ -79,7 +79,7 @@ class ndScene : public dThreadPool
 		void RemoveNode(ndSceneTreeNode* const node);
 		
 		dFloat64 m_currentCost;
-		dNode* m_currentNode;
+		ndNode* m_currentNode;
 		dInt32 m_index;
 	};
 
@@ -95,8 +95,8 @@ class ndScene : public dThreadPool
 	ndConstraintArray& GetActiveContactArray();
 	const ndConstraintArray& GetActiveContactArray() const;
 
-	dArray<ndBodyKinematic*>& GetActiveBodyArray();
-	const dArray<ndBodyKinematic*>& GetActiveBodyArray() const;
+	ndArray<ndBodyKinematic*>& GetActiveBodyArray();
+	const ndArray<ndBodyKinematic*>& GetActiveBodyArray() const;
 
 	template <class T> 
 	void SubmitJobs(void* const context = nullptr);
@@ -119,12 +119,12 @@ class ndScene : public dThreadPool
 	D_COLLISION_API virtual void DebugScene(ndSceneTreeNotiFy* const notify);
 
 	D_COLLISION_API virtual void BodiesInAabb(ndBodiesInAabbNotify& callback) const;
-	D_COLLISION_API virtual bool RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const;
-	D_COLLISION_API virtual bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const;
+	D_COLLISION_API virtual bool RayCast(ndRayCastNotify& callback, const ndVector& globalOrigin, const ndVector& globalDest) const;
+	D_COLLISION_API virtual bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 
 	private:
-	bool ValidateContactCache(ndContact* const contact, const dVector& timestep) const;
-	dFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, dVector& minBox, dVector& maxBox) const;
+	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
+	dFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, ndVector& minBox, ndVector& maxBox) const;
 
 	D_COLLISION_API virtual void FindCollidingPairs(ndBodyKinematic* const body);
 	D_COLLISION_API virtual void FindCollidingPairsForward(ndBodyKinematic* const body);
@@ -143,8 +143,8 @@ class ndScene : public dThreadPool
 	void RotateRight(ndSceneTreeNode* const node, ndSceneNode** const root);
 	dFloat64 ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const root);
 	void ImproveNodeFitness(ndSceneTreeNode* const node, ndSceneNode** const root);
-	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dNode** const nextNode);
-	ndSceneNode* BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dNode** const nextNode);
+	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::ndNode** const nextNode);
+	ndSceneNode* BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::ndNode** const nextNode);
 
 	D_COLLISION_API void CollisionOnlyUpdate();
 	const ndContactList& GetContactList() const;
@@ -159,8 +159,8 @@ class ndScene : public dThreadPool
 	void SubmitPairs(ndSceneNode* const leaftNode, ndSceneNode* const node);
 
 	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, dInt32 stack) const;
-	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRay& ray) const;
-	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRay& ray, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const;
+	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const ndFastRay& ray) const;
+	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 
 	protected:
 	D_COLLISION_API ndScene();
@@ -178,10 +178,10 @@ class ndScene : public dThreadPool
 	ndBodyList m_bodyList;
 	ndContactList m_contactList;
 	ndConstraintArray m_activeConstraintArray;
-	dArray<ndBodyKinematic*> m_sceneBodyArray;
-	dArray<ndBodyKinematic*> m_activeBodyArray;
-	dArray<ndBodyKinematic*> m_activeBodyArrayBuffer;
-	dSpinLock m_contactLock;
+	ndArray<ndBodyKinematic*> m_sceneBodyArray;
+	ndArray<ndBodyKinematic*> m_activeBodyArray;
+	ndArray<ndBodyKinematic*> m_activeBodyArrayBuffer;
+	ndSpinLock m_contactLock;
 	ndSceneNode* m_rootNode;
 	ndContactNotify* m_contactNotifyCallback;
 	dFloat64 m_treeEntropy;
@@ -189,9 +189,9 @@ class ndScene : public dThreadPool
 	dFloat32 m_timestep;
 	dUnsigned32 m_lru;
 
-	static dVector m_velocTol;
-	static dVector m_linearContactError2;
-	static dVector m_angularContactError2;
+	static ndVector m_velocTol;
+	static ndVector m_linearContactError2;
+	static ndVector m_angularContactError2;
 
 	friend class ndWorld;
 	friend class ndRayCastNotify;
@@ -201,7 +201,7 @@ class ndScene : public dThreadPool
 
 inline void ndScene::Sync()
 {
-	dThreadPool::Sync();
+	ndThreadPool::Sync();
 }
 
 inline ndWorld* ndScene::GetWorld() const
@@ -211,7 +211,7 @@ inline ndWorld* ndScene::GetWorld() const
 
 inline dInt32 ndScene::GetThreadCount() const
 {
-	const dThreadPool& pool = *this;
+	const ndThreadPool& pool = *this;
 	return pool.GetCount();
 }
 
@@ -230,12 +230,12 @@ inline const ndConstraintArray& ndScene::GetActiveContactArray() const
 	return m_activeConstraintArray;
 }
 
-inline dArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray()
+inline ndArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray()
 {
 	return m_activeBodyArray;
 }
 
-inline const dArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray() const
+inline const ndArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray() const
 {
 	return m_activeBodyArray;
 }
@@ -249,7 +249,7 @@ template <class T>
 void ndScene::SubmitJobs(void* const context)
 {
 	T extJob[D_MAX_THREADS_COUNT];
-	dThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
+	ndThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
 
 	const dInt32 threadCount = GetThreadCount();
 	for (dInt32 i = 0; i < threadCount; i++)
@@ -272,11 +272,11 @@ inline void ndScene::SetTimestep(dFloat32 timestep)
 	m_timestep = timestep;
 }
 
-inline dFloat32 ndScene::CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, dVector& minBox, dVector& maxBox) const
+inline dFloat32 ndScene::CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, ndVector& minBox, ndVector& maxBox) const
 {
 	minBox = node0->m_minBox.GetMin(node1->m_minBox);
 	maxBox = node0->m_maxBox.GetMax(node1->m_maxBox);
-	dVector side0(maxBox - minBox);
+	ndVector side0(maxBox - minBox);
 	return side0.DotProduct(side0.ShiftTripleRight()).GetScalar();
 }
 

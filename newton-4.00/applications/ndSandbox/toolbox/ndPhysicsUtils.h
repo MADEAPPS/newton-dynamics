@@ -17,17 +17,17 @@
 
 class ndDemoEntityManager;
 
-dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist);
-ndBodyKinematic* MousePickBody(ndWorld* const nWorld, const dVector& origin, const dVector& end, dFloat32& paramter, dVector& positionOut, dVector& normalOut);
+ndVector FindFloor(const ndWorld& world, const ndVector& origin, dFloat32 dist);
+ndBodyKinematic* MousePickBody(ndWorld* const nWorld, const ndVector& origin, const ndVector& end, dFloat32& paramter, ndVector& positionOut, ndVector& normalOut);
 
-ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const dMatrix& origin, dFloat32 mass);
+ndBodyKinematic* CreateBody(ndDemoEntityManager* const scene, const ndShapeInstance& shape, const ndMatrix& origin, dFloat32 mass);
 
-ndBodyKinematic* AddSphere(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 radius);
-ndBodyKinematic* AddBox(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 sizex, dFloat32 sizey, dFloat32 sizez);
-ndBodyKinematic* AddCapsule(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 radius0, dFloat32 radius1, dFloat32 high);
-ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 radius, dFloat32 high, dInt32 segments);
+ndBodyKinematic* AddSphere(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 mass, dFloat32 radius);
+ndBodyKinematic* AddBox(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 mass, dFloat32 sizex, dFloat32 sizey, dFloat32 sizez);
+ndBodyKinematic* AddCapsule(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 mass, dFloat32 radius0, dFloat32 radius1, dFloat32 high);
+ndBodyKinematic* AddConvexHull(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 mass, dFloat32 radius, dFloat32 high, dInt32 segments);
 
-void AddPlanks(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dInt32 count);
-void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 radius0, dFloat32 radius1, dFloat32 high, dInt32 rows_x, dInt32 rows_z, dInt32 columHigh);
+void AddPlanks(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 mass, dInt32 count);
+void AddCapsulesStacks(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 mass, dFloat32 radius0, dFloat32 radius1, dFloat32 high, dInt32 rows_x, dInt32 rows_z, dInt32 columHigh);
 
 #endif

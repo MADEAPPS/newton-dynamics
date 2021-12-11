@@ -38,22 +38,22 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	D_COLLISION_API ndShapeHeightfield(
 		dInt32 width, dInt32 height, ndGridConstruction contructionMode,
 		dFloat32 verticalScale, dFloat32 horizontalScale_x, dFloat32 horizontalScale_z);
-	D_COLLISION_API ndShapeHeightfield(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndShapeHeightfield(const ndLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeHeightfield();
 
-	dArray<dInt16>& GetElevationMap();
-	const dArray<dInt16>& GetElevationMap() const;
+	ndArray<dInt16>& GetElevationMap();
+	const ndArray<dInt16>& GetElevationMap() const;
 
 	D_COLLISION_API void UpdateElevationMapAabb();
-	D_COLLISION_API void GetLocalAabb(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
+	D_COLLISION_API void GetLocalAabb(const ndVector& p0, const ndVector& p1, ndVector& boxP0, ndVector& boxP1) const;
 
 	protected:
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return this; }
-	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
+	virtual dFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
-	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	private: 
 	class ndLocalThreadData
@@ -64,22 +64,22 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 		{
 		}
 
-		dArray<dVector> m_vertex;
+		ndArray<ndVector> m_vertex;
 		std::thread::id m_threadId;
 	};
 
 	void CalculateLocalObb();
 	dInt32 FastInt(dFloat32 x) const;
 	const dInt32* GetIndexList() const;
-	void CalculateMinExtend2d(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
-	void CalculateMinExtend3d(const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
-	dFloat32 RayCastCell(const dFastRay& ray, dInt32 xIndex0, dInt32 zIndex0, dVector& normalOut, dFloat32 maxT) const;
+	void CalculateMinExtend2d(const ndVector& p0, const ndVector& p1, ndVector& boxP0, ndVector& boxP1) const;
+	void CalculateMinExtend3d(const ndVector& p0, const ndVector& p1, ndVector& boxP0, ndVector& boxP1) const;
+	dFloat32 RayCastCell(const ndFastRay& ray, dInt32 xIndex0, dInt32 zIndex0, ndVector& normalOut, dFloat32 maxT) const;
 	void CalculateMinAndMaxElevation(dInt32 x0, dInt32 x1, dInt32 z0, dInt32 z1, dFloat32& minHeight, dFloat32& maxHeight) const;
 
-	dVector m_minBox;
-	dVector m_maxBox;
-	dArray<dInt8> m_atributeMap;
-	dArray<dInt16> m_elevationMap;
+	ndVector m_minBox;
+	ndVector m_maxBox;
+	ndArray<dInt8> m_atributeMap;
+	ndArray<dInt16> m_elevationMap;
 	dFloat32 m_verticalScale;
 	dFloat32 m_horizontalScale_x;
 	dFloat32 m_horizontalScale_z;
@@ -88,23 +88,23 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	dInt32 m_width;
 	dInt32 m_height;
 	ndGridConstruction m_diagonalMode;
-	mutable dList<ndLocalThreadData> m_localData;
+	mutable ndList<ndLocalThreadData> m_localData;
 
-	static dVector m_yMask;
-	static dVector m_padding;
-	static dVector m_elevationPadding;
+	static ndVector m_yMask;
+	static ndVector m_padding;
+	static ndVector m_elevationPadding;
 	static dInt32 m_cellIndices[][4];
 	static dInt32 m_verticalEdgeMap[][7];
 	static dInt32 m_horizontalEdgeMap[][7];
 	friend class ndContactSolver;
 };
 
-inline dArray<dInt16>& ndShapeHeightfield::GetElevationMap()
+inline ndArray<dInt16>& ndShapeHeightfield::GetElevationMap()
 {
 	return m_elevationMap;
 }
 
-inline const dArray<dInt16>& ndShapeHeightfield::GetElevationMap() const
+inline const ndArray<dInt16>& ndShapeHeightfield::GetElevationMap() const
 {
 	return m_elevationMap;
 }

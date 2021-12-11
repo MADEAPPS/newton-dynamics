@@ -28,32 +28,32 @@
 #include "ndMemory.h"
 #include "ndClassAlloc.h"
 
-class dStackBase : public dClassAlloc
+class ndStackBase : public ndClassAlloc
 {
 	protected:
-	dStackBase (size_t size);
-	~dStackBase ();
+	ndStackBase (size_t size);
+	~ndStackBase ();
 
-	const void *m_ptr;
+	const void* m_ptr;
 };
 
-inline dStackBase::dStackBase (size_t size)
-	:dClassAlloc()
-	,m_ptr (dMemory::Malloc (size_t (size)))
+inline ndStackBase::ndStackBase (size_t size)
+	:ndClassAlloc()
+	,m_ptr (ndMemory::Malloc (size_t (size)))
 {
 }
 
-inline dStackBase::~dStackBase ()
+inline ndStackBase::~ndStackBase ()
 {
-	dMemory::Free ((void*)m_ptr);
+	ndMemory::Free ((void*)m_ptr);
 }
 
 template<class T>
-class dStack: public dStackBase
+class ndStack: public ndStackBase
 {
 	public:
-	dStack (size_t size);
-	~dStack ();
+	ndStack (size_t size);
+	~ndStack ();
 	dInt32 GetSizeInBytes() const;
 	dInt32 GetElementsCount() const;
 	
@@ -65,31 +65,31 @@ class dStack: public dStackBase
 };
 
 template<class T>
-dStack<T>::dStack (size_t size)
-	:dStackBase (size * sizeof(T))
+ndStack<T>::ndStack (size_t size)
+	:ndStackBase (size * sizeof(T))
 	,m_size(size)
 {
 }
 
 template<class T>
-dStack<T>::~dStack ()
+ndStack<T>::~ndStack ()
 {
 }
 
 template<class T>
-dInt32 dStack<T>::GetElementsCount() const
+dInt32 ndStack<T>::GetElementsCount() const
 {
 	return dInt32 (m_size);
 }
 
 template<class T>
-dInt32 dStack<T>::GetSizeInBytes() const
+dInt32 ndStack<T>::GetSizeInBytes() const
 {
 	return dInt32 (m_size * sizeof(T));
 }
 
 template<class T>
-inline T& dStack<T>::operator[] (dInt32 entry) 
+inline T& ndStack<T>::operator[] (dInt32 entry) 
 {
 	dAssert (entry >= 0);
 	dAssert ((size_t(entry) < m_size) || ((m_size == 0) && (entry == 0)));
@@ -99,7 +99,7 @@ inline T& dStack<T>::operator[] (dInt32 entry)
 }
 
 template<class T>
-inline const T& dStack<T>::operator[] (dInt32 entry) const
+inline const T& ndStack<T>::operator[] (dInt32 entry) const
 {
 	dAssert (entry >= 0);
 	dAssert ((entry < m_size) || ((m_size == 0) && (entry == 0)));

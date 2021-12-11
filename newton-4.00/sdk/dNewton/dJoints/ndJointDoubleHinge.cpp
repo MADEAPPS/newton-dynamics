@@ -15,7 +15,7 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointDoubleHinge)
 
-ndJointDoubleHinge::ndJointDoubleHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointDoubleHinge::ndJointDoubleHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 	,m_angle0(dFloat32(0.0f))
 	,m_omega0(dFloat32(0.0f))
@@ -24,8 +24,8 @@ ndJointDoubleHinge::ndJointDoubleHinge(const dMatrix& pinAndPivotFrame, ndBodyKi
 {
 }
 
-ndJointDoubleHinge::ndJointDoubleHinge(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+ndJointDoubleHinge::ndJointDoubleHinge(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_angle0(dFloat32(0.0f))
 	,m_omega0(dFloat32(0.0f))
 	,m_angle1(dFloat32(0.0f))
@@ -38,12 +38,12 @@ ndJointDoubleHinge::~ndJointDoubleHinge()
 {
 }
 
-void ndJointDoubleHinge::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndJointDoubleHinge::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	// since this joint is not used that much
 	// for now double hinges do not have the hinge functionality
@@ -51,16 +51,16 @@ void ndJointDoubleHinge::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
 
 void ndJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
 	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
 	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 
-	const dVector frontDir((matrix0.m_front - matrix1.m_up.Scale(matrix0.m_front.DotProduct(matrix1.m_up).GetScalar())).Normalize());
-	const dVector sideDir(frontDir.CrossProduct(matrix1.m_up));
+	const ndVector frontDir((matrix0.m_front - matrix1.m_up.Scale(matrix0.m_front.DotProduct(matrix1.m_up).GetScalar())).Normalize());
+	const ndVector sideDir(frontDir.CrossProduct(matrix1.m_up));
 	const dFloat32 angle = CalculateAngle(matrix0.m_front, frontDir, sideDir);
 	AddAngularRowJacobian(desc, sideDir, angle);
 
@@ -72,8 +72,8 @@ void ndJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	SetMotorAcceleration(desc, alphaRollError);
 
 	//// save the current joint Omega
-	dVector omega0(m_body0->GetOmega());
-	dVector omega1(m_body1->GetOmega());
+	ndVector omega0(m_body0->GetOmega());
+	ndVector omega1(m_body1->GetOmega());
 	
 	// calculate joint parameters, angles and omega
 	const dFloat32 deltaAngle0 = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, frontDir), -m_angle0);

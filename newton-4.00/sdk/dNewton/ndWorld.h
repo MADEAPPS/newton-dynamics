@@ -43,7 +43,7 @@ class ndJointBilateralConstraint;
 #define D_SLEEP_ENTRIES			8
 
 D_MSV_NEWTON_ALIGN_32
-class ndWorld: public dClassAlloc
+class ndWorld: public ndClassAlloc
 {
 	public:
 	enum ndSolverModes
@@ -116,8 +116,8 @@ class ndWorld: public dClassAlloc
 	D_NEWTON_API void ClearCache();
 
 	D_NEWTON_API void BodiesInAabb(ndBodiesInAabbNotify& callback) const;
-	D_NEWTON_API bool RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const;
-	D_NEWTON_API bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const;
+	D_NEWTON_API bool RayCast(ndRayCastNotify& callback, const ndVector& globalOrigin, const ndVector& globalDest) const;
+	D_NEWTON_API bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 
 	private:
 	void ThreadFunction();

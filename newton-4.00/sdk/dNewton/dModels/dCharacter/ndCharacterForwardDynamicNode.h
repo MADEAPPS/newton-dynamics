@@ -32,7 +32,7 @@ class ndCharacterForwardDynamicNode: public ndCharacterNode
 	public:
 	D_CLASS_REFLECTION(ndCharacterForwardDynamicNode);
 	D_NEWTON_API ndCharacterForwardDynamicNode(const ndCharacterLoadDescriptor& desc);
-	D_NEWTON_API ndCharacterForwardDynamicNode(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent);
+	D_NEWTON_API ndCharacterForwardDynamicNode(const ndMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent);
 	D_NEWTON_API virtual ~ndCharacterForwardDynamicNode ();
 
 	virtual ndBodyDynamic* GetBody() const;

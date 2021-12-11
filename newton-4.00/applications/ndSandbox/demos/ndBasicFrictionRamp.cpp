@@ -21,7 +21,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const dMatrix& matrix, ndDemoMesh* const geometry, const ndShapeInstance& shape, dFloat32 mass)
+static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMatrix& matrix, ndDemoMesh* const geometry, const ndShapeInstance& shape, dFloat32 mass)
 {
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
@@ -43,15 +43,15 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndShapeInstance box(new ndShapeBox(30.0f, 0.25f, 30.f));
-	dMatrix uvMatrix(dGetIdentityMatrix());
+	ndMatrix uvMatrix(dGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.25f;
 	uvMatrix[1][1] *= 0.25f;
 	uvMatrix[2][2] *= 0.25f;
-	uvMatrix.m_posit = dVector(-0.5f, -0.5f, 0.0f, 1.0f);
+	uvMatrix.m_posit = ndVector(-0.5f, -0.5f, 0.0f, 1.0f);
 	const char* const textureName = "wood_3.tga";
 	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, textureName, textureName, textureName, 1.0f, uvMatrix);
 
-	dMatrix matrix(dPitchMatrix(30.0f * dDegreeToRad));
+	ndMatrix matrix(dPitchMatrix(30.0f * dDegreeToRad));
 	matrix.m_posit.m_y = 5.0f;
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
@@ -65,16 +65,16 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	scene->AddEntity(entity);
 	
 
-	dVector boxSize(1.0f, 0.5f, 1.5f, 0.0f);
+	ndVector boxSize(1.0f, 0.5f, 1.5f, 0.0f);
 	matrix.m_posit.m_z -= 10.0f;
 	matrix.m_posit.m_x -= 12.0f;
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 
 	ndShapeInstance shape(new ndShapeBox(boxSize.m_x, boxSize.m_y, boxSize.m_z));
 	matrix.m_posit.m_y = floor.m_y + boxSize.m_y;
 
 
-	dMatrix texMatrix(dGetIdentityMatrix());
+	ndMatrix texMatrix(dGetIdentityMatrix());
 	texMatrix.m_posit.m_x = -0.5f;
 	texMatrix.m_posit.m_y = -0.5f;
 	const char* const boxTexName = "wood_0.tga";
@@ -116,10 +116,10 @@ void ndBasicFrictionRamp (ndDemoEntityManager* const scene)
 
 	BuildFrictionRamp(scene);
 
-	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
+	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 
-	dMatrix camMatrix(dRollMatrix(10.0f * dDegreeToRad) *  dYawMatrix(20.0f * dDegreeToRad));
-	dQuaternion rot(camMatrix);
-	dVector origin(-40.0f, 10.0f, 15.0f, 0.0f);
+	ndMatrix camMatrix(dRollMatrix(10.0f * dDegreeToRad) *  dYawMatrix(20.0f * dDegreeToRad));
+	ndQuaternion rot(camMatrix);
+	ndVector origin(-40.0f, 10.0f, 15.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

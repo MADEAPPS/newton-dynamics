@@ -42,11 +42,11 @@ class dFreeListHeader
 	dInt32 m_schunkSize;
 };
 
-class dFreeListDictionary: public dFixSizeArray<dFreeListHeader, D_FREELIST_DICTIONARY_SIZE>
+class dFreeListDictionary: public ndFixSizeArray<dFreeListHeader, D_FREELIST_DICTIONARY_SIZE>
 {
 	public:
 	dFreeListDictionary()
-		:dFixSizeArray<dFreeListHeader, D_FREELIST_DICTIONARY_SIZE>()
+		:ndFixSizeArray<dFreeListHeader, D_FREELIST_DICTIONARY_SIZE>()
 		,m_lock()
 	{
 	}
@@ -68,7 +68,7 @@ class dFreeListDictionary: public dFixSizeArray<dFreeListHeader, D_FREELIST_DICT
 		for (dFreeListEntry* node = header->m_headPointer; node; node = next)
 		{
 			next = node->m_next;
-			dMemory::Free(node);
+			ndMemory::Free(node);
 		}
 		header->m_count = 0;
 		header->m_headPointer = nullptr;
@@ -77,8 +77,8 @@ class dFreeListDictionary: public dFixSizeArray<dFreeListHeader, D_FREELIST_DICT
 	void* Malloc(dInt32 size)
 	{
 		{
-			dScopeSpinLock lock(m_lock);
-			dFreeListHeader* const header = FindEntry(dMemory::CalculateBufferSize(size));
+			ndScopeSpinLock lock(m_lock);
+			dFreeListHeader* const header = FindEntry(ndMemory::CalculateBufferSize(size));
 			dAssert(header->m_count >= 0);
 			if (header->m_count)
 			{
@@ -88,15 +88,15 @@ class dFreeListDictionary: public dFixSizeArray<dFreeListHeader, D_FREELIST_DICT
 				return self;
 			}
 		}
-		void* const ptr = dMemory::Malloc(size);
-		dAssert(dMemory::GetSize(ptr) == dMemory::CalculateBufferSize(size));
+		void* const ptr = ndMemory::Malloc(size);
+		dAssert(ndMemory::GetSize(ptr) == ndMemory::CalculateBufferSize(size));
 		return ptr;
 	}
 
 	void Free(void* ptr)
 	{
-		dScopeSpinLock lock(m_lock);
-		dFreeListHeader* const header = FindEntry(dMemory::GetSize(ptr));
+		ndScopeSpinLock lock(m_lock);
+		dFreeListHeader* const header = FindEntry(ndMemory::GetSize(ptr));
 		dAssert(header);
 		dFreeListEntry* const self = (dFreeListEntry*)ptr;
 
@@ -107,7 +107,7 @@ class dFreeListDictionary: public dFixSizeArray<dFreeListHeader, D_FREELIST_DICT
 
 	void Flush()
 	{
-		dScopeSpinLock lock(m_lock);
+		ndScopeSpinLock lock(m_lock);
 		dFreeListDictionary& me = *this;
 		for (dInt32 i = 0; i < GetCount(); i++)
 		{
@@ -119,8 +119,8 @@ class dFreeListDictionary: public dFixSizeArray<dFreeListHeader, D_FREELIST_DICT
 
 	void Flush(dInt32 size)
 	{
-		dScopeSpinLock lock(m_lock);
-		dFreeListHeader* const header = FindEntry(dMemory::CalculateBufferSize(size));
+		ndScopeSpinLock lock(m_lock);
+		dFreeListHeader* const header = FindEntry(ndMemory::CalculateBufferSize(size));
 		Flush(header);
 	}
 
@@ -180,28 +180,28 @@ class dFreeListDictionary: public dFixSizeArray<dFreeListHeader, D_FREELIST_DICT
 		return &me[index];
 	}
 
-	dSpinLock m_lock;
+	ndSpinLock m_lock;
 };
 
-void dFreeListAlloc::Flush()
+void ndFreeListAlloc::Flush()
 {
 	dFreeListDictionary& dictionary = dFreeListDictionary::GetHeader();
 	dictionary.Flush();
 }
 
-void* dFreeListAlloc::operator new (size_t size)
+void* ndFreeListAlloc::operator new (size_t size)
 {
 	dFreeListDictionary& dictionary = dFreeListDictionary::GetHeader();
 	return dictionary.Malloc(dInt32 (size));
 }
 
-void dFreeListAlloc::operator delete (void* ptr)
+void ndFreeListAlloc::operator delete (void* ptr)
 {
 	dFreeListDictionary& dictionary = dFreeListDictionary::GetHeader();
 	dictionary.Free(ptr);
 }
 
-void dFreeListAlloc::Flush(dInt32 size)
+void ndFreeListAlloc::Flush(dInt32 size)
 {
 	dFreeListDictionary& dictionary = dFreeListDictionary::GetHeader();
 	dictionary.Flush(size);

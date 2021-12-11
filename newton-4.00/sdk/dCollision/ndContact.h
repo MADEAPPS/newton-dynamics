@@ -39,8 +39,8 @@ D_MSV_NEWTON_ALIGN_32
 class ndContactPoint
 {
 	public:
-	dVector m_point;
-	dVector m_normal;
+	ndVector m_point;
+	ndVector m_normal;
 	const ndBodyKinematic* m_body0;
 	const ndBodyKinematic* m_body1;
 	const ndShapeInstance* m_shapeInstance0;
@@ -55,33 +55,33 @@ class ndContactMaterial: public ndContactPoint
 {
 	public:
 	ndContactMaterial()
-		:m_dir0(dVector::m_zero)
-		,m_dir1(dVector::m_zero)
+		:m_dir0(ndVector::m_zero)
+		,m_dir1(ndVector::m_zero)
 		,m_material()
 	{
 		m_dir0_Force.Clear();
 		m_dir1_Force.Clear();
 		m_normal_Force.Clear();
 	}
-	dVector m_dir0;
-	dVector m_dir1;
+	ndVector m_dir0;
+	ndVector m_dir1;
 	ndForceImpactPair m_normal_Force;
 	ndForceImpactPair m_dir0_Force;
 	ndForceImpactPair m_dir1_Force;
 	ndMaterial m_material;
 } D_GCC_NEWTON_ALIGN_32;
 
-class ndContactPointList : public dList<ndContactMaterial, dContainersFreeListAlloc<ndContactMaterial>>
+class ndContactPointList : public ndList<ndContactMaterial, ndContainersFreeListAlloc<ndContactMaterial>>
 {
 	public:
 	ndContactPointList()
-		:dList<ndContactMaterial, dContainersFreeListAlloc<ndContactMaterial>>()
+		:ndList<ndContactMaterial, ndContainersFreeListAlloc<ndContactMaterial>>()
 	{
 	}
 };
 
 D_MSV_NEWTON_ALIGN_32 
-class ndContact: public ndConstraint, public dContainersFreeListAlloc<ndContact*>
+class ndContact: public ndConstraint, public ndContainersFreeListAlloc<ndContact*>
 {
 	public:
 	D_COLLISION_API ndContact();
@@ -110,16 +110,16 @@ class ndContact: public ndConstraint, public dContainersFreeListAlloc<ndContact*
 	
 	private:
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
-	void CalculatePointDerivative(dInt32 index, ndConstraintDescritor& desc, const dVector& dir, const dgPointParam& param) const;
+	void CalculatePointDerivative(dInt32 index, ndConstraintDescritor& desc, const ndVector& dir, const dgPointParam& param) const;
 	void JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, dInt32 normalIndex, dInt32& frictionIndex);
 
-	dVector m_positAcc;
-	dQuaternion m_rotationAcc;
-	dVector m_separatingVector;
+	ndVector m_positAcc;
+	ndQuaternion m_rotationAcc;
+	ndVector m_separatingVector;
 	ndContactPointList m_contacPointsList;
 	ndBodyKinematic* m_body0;
 	ndBodyKinematic* m_body1;
-	dList<ndContact, dContainersFreeListAlloc<ndContact>>::dNode* m_linkNode;
+	ndList<ndContact, ndContainersFreeListAlloc<ndContact>>::ndNode* m_linkNode;
 	ndMaterial m_material;
 	dFloat32 m_timeOfImpact;
 	dFloat32 m_separationDistance;
@@ -131,7 +131,7 @@ class ndContact: public ndConstraint, public dContainersFreeListAlloc<ndContact*
 	dUnsigned32 m_isIntersetionTestOnly : 1;
 	dUnsigned32 m_skeletonIntraCollision : 1;
 	dUnsigned32 m_skeletonSelftCollision : 1;
-	static dVector m_initialSeparatingVector;
+	static ndVector m_initialSeparatingVector;
 
 	friend class ndScene;
 	friend class ndContactList;

@@ -30,13 +30,13 @@ class ndScene;
 class ndShapeInstance;
 
 D_MSV_NEWTON_ALIGN_32
-class ndConvexCastNotify : public dClassAlloc
+class ndConvexCastNotify : public ndClassAlloc
 {
 	public: 
 	ndConvexCastNotify()
-		:m_normal(dVector::m_zero)
-		,m_closestPoint0(dVector::m_zero)
-		,m_closestPoint1(dVector::m_zero)
+		:m_normal(ndVector::m_zero)
+		,m_closestPoint0(ndVector::m_zero)
+		,m_closestPoint1(ndVector::m_zero)
 		,m_contacts()
 		,m_param(dFloat32 (1.2f))
 	{
@@ -59,12 +59,12 @@ class ndConvexCastNotify : public dClassAlloc
 		return 0;
 	}
 
-	D_COLLISION_API bool CastShape(const ndShapeInstance& castingInstance, const dMatrix& globalOrigin, const dVector& globalDest, const ndShapeInstance& targetShape, const dMatrix& targetMatrix);
+	D_COLLISION_API bool CastShape(const ndShapeInstance& castingInstance, const ndMatrix& globalOrigin, const ndVector& globalDest, const ndShapeInstance& targetShape, const ndMatrix& targetMatrix);
 
-	dVector m_normal;
-	dVector m_closestPoint0;
-	dVector m_closestPoint1;
-	dFixSizeArray<ndContactPoint, 8> m_contacts;
+	ndVector m_normal;
+	ndVector m_closestPoint0;
+	ndVector m_closestPoint1;
+	ndFixSizeArray<ndContactPoint, 8> m_contacts;
 	dFloat32 m_param;
 } D_GCC_NEWTON_ALIGN_32;
 

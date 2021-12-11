@@ -34,10 +34,10 @@ dFloat64 Determinant2x2 (const dFloat64 matrix[2][2], dFloat64* const error)
 	return a00xa11 - a01xa10;
 }
 
-dGoogol Determinant2x2 (const dGoogol matrix[2][2])
+ndGoogol Determinant2x2 (const ndGoogol matrix[2][2])
 {
-	dGoogol a00xa11 (matrix[0][0] * matrix[1][1]);
-	dGoogol a01xa10 (matrix[0][1] * matrix[1][0]);
+	ndGoogol a00xa11 (matrix[0][0] * matrix[1][1]);
+	ndGoogol a01xa10 (matrix[0][1] * matrix[1][0]);
 	return a00xa11 - a01xa10;
 }
 
@@ -73,14 +73,14 @@ dFloat64 Determinant3x3 (const dFloat64 matrix[3][3], dFloat64* const error)
 	return det;
 }
 
-dGoogol Determinant3x3 (const dGoogol matrix[3][3])
+ndGoogol Determinant3x3 (const ndGoogol matrix[3][3])
 {
-	dGoogol negOne (dFloat64 (-1.0f));
-	dGoogol sign (dFloat64 (-1.0f));
-	dGoogol det = dFloat64 (0.0f);
+	ndGoogol negOne (dFloat64 (-1.0f));
+	ndGoogol sign (dFloat64 (-1.0f));
+	ndGoogol det = dFloat64 (0.0f);
 	for (dInt32 i = 0; i < 3; i ++)  
 	{
-		dGoogol cofactor[2][2];
+		ndGoogol cofactor[2][2];
 		for (dInt32 j = 0; j < 2; j ++) 
 		{
 			dInt32 k0 = 0;
@@ -94,7 +94,7 @@ dGoogol Determinant3x3 (const dGoogol matrix[3][3])
 			}
 		}
 
-		dGoogol minorDet (Determinant2x2 (cofactor));
+		ndGoogol minorDet (Determinant2x2 (cofactor));
 		det = det + sign * minorDet * matrix[2][i];
 		sign = sign * negOne;
 	}
@@ -132,15 +132,15 @@ dFloat64 Determinant4x4 (const dFloat64 matrix[4][4], dFloat64* const error)
 	return det;
 }
 
-dGoogol Determinant4x4 (const dGoogol matrix[4][4])
+ndGoogol Determinant4x4 (const ndGoogol matrix[4][4])
 {
-	dGoogol sign = dFloat64 (1.0f);
-	dGoogol det = dFloat64 (0.0f);
-	dGoogol negOne (dFloat64 (-1.0f));
+	ndGoogol sign = dFloat64 (1.0f);
+	ndGoogol det = dFloat64 (0.0f);
+	ndGoogol negOne (dFloat64 (-1.0f));
 	//dGoogol accError = dFloat64 (0.0f);
 	for (dInt32 i = 0; i < 4; i ++)  
 	{
-		dGoogol  cofactor[3][3];
+		ndGoogol  cofactor[3][3];
 		for (dInt32 j = 0; j < 3; j ++) 
 		{
 			dInt32 k0 = 0;
@@ -154,7 +154,7 @@ dGoogol Determinant4x4 (const dGoogol matrix[4][4])
 			}
 		}
 
-		dGoogol minorDet = Determinant3x3 (cofactor);
+		ndGoogol minorDet = Determinant3x3 (cofactor);
 		det = det + sign * minorDet * matrix[3][i];
 		sign = sign * negOne;
 	}

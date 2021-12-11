@@ -25,14 +25,14 @@ class fbxDemoEntity : public ndDemoEntity
 	fbxDemoEntity(const fbxDemoEntity& source);
 	~fbxDemoEntity();
 
-	void SetRenderMatrix(const dMatrix& matrix)
+	void SetRenderMatrix(const ndMatrix& matrix)
 	{
 		m_matrix = matrix;
 	}
 
 	void CleanIntermediate();
 	ndDemoEntity* CreateClone() const;
-	void ApplyTransform(const dMatrix& cordinateSystem);
+	void ApplyTransform(const ndMatrix& cordinateSystem);
 	void BuildRenderMeshes(ndDemoEntityManager* const scene);
 
 	ndMeshEffect* m_fbxMeshEffect;

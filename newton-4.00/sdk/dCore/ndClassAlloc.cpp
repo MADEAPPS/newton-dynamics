@@ -23,12 +23,12 @@
 #include "ndMemory.h"
 #include "ndClassAlloc.h"
 
-void* dClassAlloc::Malloc(size_t size)
+void* ndClassAlloc::Malloc(size_t size)
 {
-	return dMemory::Malloc(size);
+	return ndMemory::Malloc(size);
 }
 
-void dClassAlloc::Free(void* const ptr)
+void ndClassAlloc::Free(void* const ptr)
 {
-	dMemory::Free(ptr);
+	ndMemory::Free(ptr);
 }

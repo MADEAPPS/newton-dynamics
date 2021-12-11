@@ -31,8 +31,8 @@ ndBodyTriggerVolume::ndBodyTriggerVolume()
 	m_contactTestOnly = 1;
 }
 
-ndBodyTriggerVolume::ndBodyTriggerVolume(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndBodyKinematic(dLoadSaveBase::dLoadDescriptor(desc))
+ndBodyTriggerVolume::ndBodyTriggerVolume(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndBodyKinematic(ndLoadSaveBase::dLoadDescriptor(desc))
 {
 	m_contactTestOnly = 1;
 }
@@ -41,12 +41,12 @@ ndBodyTriggerVolume::~ndBodyTriggerVolume()
 {
 }
 
-void ndBodyTriggerVolume::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndBodyTriggerVolume::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBodyKinematic::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndBodyKinematic::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	// nothing to save so far
 }

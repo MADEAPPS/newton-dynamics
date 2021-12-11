@@ -108,7 +108,7 @@ dFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetTorque(dFloat32 omegaInRad
 }
 
 ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
-	:m_comDisplacement(dVector::m_zero)
+	:m_comDisplacement(ndVector::m_zero)
 {
 	strncpy(m_name, fileName, sizeof(m_name));
 
@@ -193,23 +193,23 @@ ndVehicleSelector::ndVehicleSelector()
 {
 }
 
-ndVehicleSelector::ndVehicleSelector(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndModel(dLoadSaveBase::dLoadDescriptor(desc))
+ndVehicleSelector::ndVehicleSelector(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndModel(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_changeVehicle()
 {
 }
 
-void ndVehicleSelector::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndVehicleSelector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndModel::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndModel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
 void ndVehicleSelector::PostUpdate(ndWorld* const world, dFloat32)
 {
-	dFixSizeArray<char, 32> buttons;
+	ndFixSizeArray<char, 32> buttons;
 	ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 	scene->GetJoystickButtons(buttons);
 	if (m_changeVehicle.Update(scene->GetKeyState('C') || buttons[5]))
@@ -218,7 +218,7 @@ void ndVehicleSelector::PostUpdate(ndWorld* const world, dFloat32)
 
 		dInt32 vehiclesCount = 0;
 		ndBasicVehicle* vehicleArray[1024];
-		for (ndModelList::dNode* node = modelList.GetFirst(); node; node = node->GetNext())
+		for (ndModelList::ndNode* node = modelList.GetFirst(); node; node = node->GetNext())
 		{
 			ndModel* const model = node->GetInfo();
 			//if (!strcmp(model->ClassName(), "ndBasicVehicle"))
@@ -246,7 +246,7 @@ void ndVehicleSelector::PostUpdate(ndWorld* const world, dFloat32)
 }
 
 ndBasicVehicle::ndBasicVehicle(const ndVehicleDectriptor& desc)
-	:ndMultiBodyVehicle(dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f))
+	:ndMultiBodyVehicle(ndVector(1.0f, 0.0f, 0.0f, 0.0f), ndVector(0.0f, 1.0f, 0.0f, 0.0f))
 	,m_configuration(desc)
 	,m_steerAngle(0.0f)
 	,m_parking()
@@ -292,21 +292,21 @@ void ndBasicVehicle::CalculateTireDimensions(const char* const tireName, dFloat3
 	// make a convex hull collision shape to assist in calculation of the tire shape size
 	ndDemoMesh* const tireMesh = (ndDemoMesh*)tirePart->GetMesh();
 
-	const dMatrix matrix(tirePart->GetMeshMatrix());
+	const ndMatrix matrix(tirePart->GetMeshMatrix());
 
-	dArray<dVector> temp;
+	ndArray<ndVector> temp;
 	tireMesh->GetVertexArray(temp);
 
-	dVector minVal(1.0e10f);
-	dVector maxVal(-1.0e10f);
+	ndVector minVal(1.0e10f);
+	ndVector maxVal(-1.0e10f);
 	for (dInt32 i = 0; i < temp.GetCount(); i++)
 	{
-		dVector p(matrix.TransformVector(temp[i]));
+		ndVector p(matrix.TransformVector(temp[i]));
 		minVal = minVal.GetMin(p);
 		maxVal = maxVal.GetMax(p);
 	}
 
-	dVector size(maxVal - minVal);
+	ndVector size(maxVal - minVal);
 	width = size.m_x;
 	radius = size.m_y * 0.5f;
 }
@@ -321,9 +321,9 @@ ndBodyDynamic* ndBasicVehicle::CreateTireBody(ndDemoEntityManager* const scene, 
 	ndShapeInstance tireCollision(CreateTireShape(radius, width));
 
 	ndDemoEntity* const tireEntity = parentEntity->Find(tireName);
-	dMatrix matrix(tireEntity->CalculateGlobalMatrix(nullptr));
+	ndMatrix matrix(tireEntity->CalculateGlobalMatrix(nullptr));
 
-	const dMatrix chassisMatrix(m_localFrame * m_chassis->GetMatrix());
+	const ndMatrix chassisMatrix(m_localFrame * m_chassis->GetMatrix());
 	matrix.m_posit += chassisMatrix.m_up.Scale(definition.m_verticalOffset);
 
 	ndBodyDynamic* const tireBody = new ndBodyDynamic();
@@ -339,8 +339,8 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 {
 	if (m_isPlayer && m_motor)
 	{
-		dFixSizeArray<dFloat32, 8> axis;
-		dFixSizeArray<char, 32> buttons;
+		ndFixSizeArray<dFloat32, 8> axis;
+		ndFixSizeArray<char, 32> buttons;
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 
 		scene->GetJoystickAxis(axis);
@@ -478,7 +478,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 			brake = 1.0f;
 		}
 
-		for (dList<ndMultiBodyVehicleTireJoint*>::dNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
+		for (ndList<ndMultiBodyVehicleTireJoint*>::ndNode* node = m_tireList.GetFirst(); node; node = node->GetNext())
 		{
 			ndMultiBodyVehicleTireJoint* const tire = node->GetInfo();
 			tire->SetSteering(m_steerAngle);

@@ -29,22 +29,22 @@
 #include "ndMemory.h"
 #include "ndPolygonSoupDatabase.h"
 
-dPolygonSoupDatabase::dPolygonSoupDatabase(const char* const)
+ndPolygonSoupDatabase::ndPolygonSoupDatabase(const char* const)
 {
 	m_vertexCount = 0;
 	m_strideInBytes = 0;
 	m_localVertex = nullptr;
 }
 
-dPolygonSoupDatabase::~dPolygonSoupDatabase ()
+ndPolygonSoupDatabase::~ndPolygonSoupDatabase ()
 {
 	if (m_localVertex) 
 	{
-		dMemory::Free (m_localVertex);
+		ndMemory::Free (m_localVertex);
 	}
 }
 
-void dPolygonSoupDatabase::SetTagId(const dInt32* const facePtr, dInt32 indexCount, dUnsigned32 newID) const
+void ndPolygonSoupDatabase::SetTagId(const dInt32* const facePtr, dInt32 indexCount, dUnsigned32 newID) const
 {
 	dUnsigned32* const face = (dUnsigned32*) facePtr;
 	face[indexCount] = newID;

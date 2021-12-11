@@ -38,8 +38,8 @@ ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const moto
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
-ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointGear(dLoadSaveBase::dLoadDescriptor(desc))
+ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointGear(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_chassis(nullptr)
 	,m_clutchTorque(dFloat32(1.0e5f))
 	,m_driveTrainResistanceTorque(dFloat32(1000.0f))
@@ -64,8 +64,8 @@ void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	if (dAbs(m_gearRatio) > dFloat32(1.0e-2f))
 	{
-		dMatrix matrix0;
-		dMatrix matrix1;
+		ndMatrix matrix0;
+		ndMatrix matrix1;
 		
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 		CalculateGlobalMatrix(matrix0, matrix1);
@@ -80,8 +80,8 @@ void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 		jacobian0.m_angular = matrix0.m_front;
 		jacobian1.m_angular = matrix1.m_front.Scale(gearRatio);
 		
-		const dVector& omega0 = m_body0->GetOmega();
-		const dVector& omega1 = m_body1->GetOmega();
+		const ndVector& omega0 = m_body0->GetOmega();
+		const ndVector& omega1 = m_body1->GetOmega();
 		
 		dAssert(m_chassis->m_motor);
 		ndMultiBodyVehicleMotor* const rotor = m_chassis->m_motor;
@@ -107,12 +107,12 @@ void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndMultiBodyVehicleGearBox::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndMultiBodyVehicleGearBox::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointGear::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointGear::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 	
 	xmlSaveParam(childNode, "clutchTorque", m_clutchTorque);
 	xmlSaveParam(childNode, "driveTrainResistanceTorque", m_driveTrainResistanceTorque);

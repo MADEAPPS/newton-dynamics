@@ -25,14 +25,14 @@
 #include "ndCoreStdafx.h"
 
 template<class T>
-class dContainersAlloc: public dClassAlloc
+class ndContainersAlloc: public ndClassAlloc
 {
 	public:
-	dContainersAlloc()
+	ndContainersAlloc()
 	{
 	}
 
-	~dContainersAlloc() 
+	~ndContainersAlloc() 
 	{
 	}
 
@@ -41,30 +41,30 @@ class dContainersAlloc: public dClassAlloc
 	}
 };
 
-class dFreeListAlloc
+class ndFreeListAlloc
 {
 	public:
-	dFreeListAlloc();
+	ndFreeListAlloc();
 	D_CORE_API static void Flush();
 	D_CORE_API static void Flush(dInt32 size);
 	D_CORE_API void *operator new (size_t size);
 	D_CORE_API void operator delete (void* ptr);
 };
 
-inline dFreeListAlloc::dFreeListAlloc() 
+inline ndFreeListAlloc::ndFreeListAlloc() 
 {
 }
 
 template<class T>
-class dContainersFreeListAlloc: public dFreeListAlloc
+class ndContainersFreeListAlloc: public ndFreeListAlloc
 {
 	public:
-	dContainersFreeListAlloc()
-		:dFreeListAlloc()
+	ndContainersFreeListAlloc()
+		:ndFreeListAlloc()
 	{
 	}
 
-	~dContainersFreeListAlloc()
+	~ndContainersFreeListAlloc()
 	{
 	}
 

@@ -47,22 +47,22 @@ class ndCharacter: public ndModel
 	class ndEffetorInfo
 	{
 		public:
-		dMatrix m_bindMatrix;
+		ndMatrix m_bindMatrix;
 		ndCharacterNode* m_controlNode;
 		ndJointKinematicChain* m_effector;
 	};
 
 	D_CLASS_REFLECTION(ndCharacter);
 	D_NEWTON_API ndCharacter();
-	D_NEWTON_API ndCharacter(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndCharacter(const ndLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API virtual ~ndCharacter ();
 
 	D_NEWTON_API virtual void AddToWorld(ndWorld* const world);
 	D_NEWTON_API virtual void RemoveFromToWorld(ndWorld* const world);
 
 	D_NEWTON_API ndCharacterRootNode* CreateRoot(ndBodyDynamic* const body);
-	D_NEWTON_API ndCharacterForwardDynamicNode* CreateForwardDynamicLimb(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent);
-	D_NEWTON_API ndCharacterInverseDynamicNode* CreateInverseDynamicLimb(const dMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent);
+	D_NEWTON_API ndCharacterForwardDynamicNode* CreateForwardDynamicLimb(const ndMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent);
+	D_NEWTON_API ndCharacterInverseDynamicNode* CreateInverseDynamicLimb(const ndMatrix& matrixInGlobalSpace, ndBodyDynamic* const body, ndCharacterNode* const parent);
 
 	ndCharacter* GetAsCharacter();
 	ndCharacterRootNode* GetRootNode() const;
@@ -70,7 +70,7 @@ class ndCharacter: public ndModel
 	D_NEWTON_API void AddAttachment(ndJointBilateralConstraint* const joint);
 	D_NEWTON_API void RemoveAttachment(ndJointBilateralConstraint* const joint);
 
-	D_NEWTON_API void CreateKinematicChain(const dMatrix& globalOrientation, const ndCharacterNode* const node);
+	D_NEWTON_API void CreateKinematicChain(const ndMatrix& globalOrientation, const ndCharacterNode* const node);
 
 	//ndCharacterPoseController* GetController() const;
 	//void SetController(ndCharacterPoseController* const controller);
@@ -84,12 +84,12 @@ class ndCharacter: public ndModel
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	D_NEWTON_API virtual void Update(ndWorld* const world, dFloat32 timestep);
 	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
-	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	
 	ndCharacterRootNode* m_rootNode;
 	//ndCharacterPoseController* m_controller;
-	dList<ndEffetorInfo> m_effectors;
-	dList<ndJointBilateralConstraint*> m_extraJointAttachments;
+	ndList<ndEffetorInfo> m_effectors;
+	ndList<ndJointBilateralConstraint*> m_extraJointAttachments;
 };
 
 inline ndCharacter* ndCharacter::GetAsCharacter()

@@ -29,12 +29,12 @@ class ndMultiBodyVehicle;
 class ndConstraintDebugCallback;
 
 D_MSV_NEWTON_ALIGN_32
-class ndModel: public dClassAlloc
+class ndModel: public ndClassAlloc
 {
 	public:
 	D_CLASS_REFLECTION(ndModel);
 	ndModel();
-	D_NEWTON_API ndModel(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndModel(const ndLoadSaveBase::dLoadDescriptor& desc);
 
 	virtual ~ndModel ();
 	
@@ -51,16 +51,16 @@ class ndModel: public dClassAlloc
 	virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
 	virtual void PostTransformUpdate(ndWorld* const world, dFloat32 timestep);
 
-	D_NEWTON_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	ndModelList::dNode* m_node;
+	ndModelList::ndNode* m_node;
 
 	friend class ndWorld;
 	friend class ndLoadSave;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndModel::ndModel()
-	:dClassAlloc()
+	:ndClassAlloc()
 	,m_node(nullptr)
 {
 }

@@ -41,8 +41,8 @@ ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, n
 {
 }
 
-ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_omega(dFloat32(0.0f))
 	,m_idleOmega(dFloat32(0.0f))
 	,m_throttle(dFloat32(0.0f))
@@ -60,8 +60,8 @@ ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(const dLoadSaveBase::dLoadDescr
 
 void ndMultiBodyVehicleMotor::AlignMatrix()
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	//matrix1.m_posit += matrix1.m_up.Scale(1.0f);
@@ -69,15 +69,15 @@ void ndMultiBodyVehicleMotor::AlignMatrix()
 	m_body0->SetMatrix(matrix1);
 	m_body0->SetVelocity(m_body1->GetVelocity());
 
-	const dVector omega0(m_body0->GetOmega());
-	const dVector omega1(m_body1->GetOmega());
+	const ndVector omega0(m_body0->GetOmega());
+	const ndVector omega1(m_body1->GetOmega());
 
-	const dVector wx(matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar()));
-	const dVector wy(matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega1).GetScalar()));
-	const dVector wz(matrix1.m_right.Scale (matrix1.m_right.DotProduct(omega1).GetScalar()));
-	const dVector omega(wx + wy + wz);
+	const ndVector wx(matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar()));
+	const ndVector wy(matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega1).GetScalar()));
+	const ndVector wz(matrix1.m_right.Scale (matrix1.m_right.DotProduct(omega1).GetScalar()));
+	const ndVector omega(wx + wy + wz);
 
-	//dVector error(omega1 - omega);
+	//ndVector error(omega1 - omega);
 	//dTrace(("(%f %f %f)\n", error.m_x, error.m_y, error.m_z));
 	m_body0->SetOmega(omega);
 }
@@ -110,9 +110,9 @@ void ndMultiBodyVehicleMotor::SetThrottle(dFloat32 param)
 
 dFloat32 ndMultiBodyVehicleMotor::CalculateAcceleration(ndConstraintDescritor& desc)
 {
-	const dVector& omega0 = m_body0->GetOmega();
+	const ndVector& omega0 = m_body0->GetOmega();
 	const ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
-	const dVector relOmega(omega0 * jacobian0.m_angular);
+	const ndVector relOmega(omega0 * jacobian0.m_angular);
 
 	m_omega = -relOmega.AddHorizontal().GetScalar();
 	const dFloat32 throttleOmega = dClamp(m_throttle * m_maxOmega, m_idleOmega, m_maxOmega);
@@ -124,8 +124,8 @@ dFloat32 ndMultiBodyVehicleMotor::CalculateAcceleration(ndConstraintDescritor& d
 
 void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	// two rows to restrict rotation around around the parent coordinate system
@@ -146,7 +146,7 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 		if (gearBox && dAbs(gearBox->GetRatio()) > dFloat32(0.0f))
 		{
 			ndJacobian& jacobian = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
-			jacobian.m_angular = dVector::m_zero;
+			jacobian.m_angular = ndVector::m_zero;
 		}
 
 		if (m_omega <= dFloat32(0.0f))
@@ -179,12 +179,12 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndMultiBodyVehicleMotor::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndMultiBodyVehicleMotor::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "maxOmega", m_maxOmega);
 	xmlSaveParam(childNode, "idleOmega", m_idleOmega);

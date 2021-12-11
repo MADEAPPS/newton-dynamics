@@ -30,12 +30,12 @@
 	{
 		// this should not happens on this test
 		// newton should never use global operator new and delete.
-		return dMemory::Malloc(size);
+		return ndMemory::Malloc(size);
 	}
 
 	void operator delete (void* ptr) noexcept
 	{
-		dMemory::Free(ptr);
+		ndMemory::Free(ptr);
 	}
 	#endif
 

@@ -27,7 +27,7 @@
 #include "ndContact.h"
 
 D_MSV_NEWTON_ALIGN_32
-class ndRayCastNotify : public dClassAlloc
+class ndRayCastNotify : public ndClassAlloc
 {
 	public: 
 	ndRayCastNotify()
@@ -39,7 +39,7 @@ class ndRayCastNotify : public dClassAlloc
 	{
 	}
 
-	D_COLLISION_API bool TraceShape(const dVector& globalOrigin, const dVector& globalDestination, const ndShapeInstance& shapeInstance, const dMatrix& shapeGlobal);
+	D_COLLISION_API bool TraceShape(const ndVector& globalOrigin, const ndVector& globalDestination, const ndShapeInstance& shapeInstance, const ndMatrix& shapeGlobal);
 
 	virtual dUnsigned32 OnRayPrecastAction(const ndBody* const, const ndShapeInstance* const)
 	{

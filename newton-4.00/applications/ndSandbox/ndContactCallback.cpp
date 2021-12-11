@@ -30,7 +30,7 @@ void ndContactCallback::OnBodyRemoved(ndBodyKinematic* const) const
 ndMaterial& ndContactCallback::RegisterMaterial(dUnsigned32 id0, dUnsigned32 id1)
 {
 	ndMaterailKey key(id0, id1);
-	dTree<ndMaterial, ndMaterailKey>::dNode* node = m_materialMap.Find(key);
+	ndTree<ndMaterial, ndMaterailKey>::ndNode* node = m_materialMap.Find(key);
 	if (!node)
 	{
 		node = m_materialMap.Insert(ndMaterial(), key);
@@ -42,7 +42,7 @@ ndMaterial& ndContactCallback::RegisterMaterial(dUnsigned32 id0, dUnsigned32 id1
 ndMaterial ndContactCallback::GetMaterial(const ndContact* const, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const
 {
 	ndMaterailKey key(instance0.GetMaterial().m_userId, instance1.GetMaterial().m_userId);
-	dTree<ndMaterial, ndMaterailKey>::dNode* const node = m_materialMap.Find(key);
+	ndTree<ndMaterial, ndMaterailKey>::ndNode* const node = m_materialMap.Find(key);
 	return node ? node->GetInfo() : ndMaterial();
 }
 
@@ -71,12 +71,12 @@ void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 	dFloat32 maxTangentSpeed = dFloat32(0.0f);
 	const ndContactMaterial* normalContact = nullptr;
 	const ndContactMaterial* tangentContact = nullptr;
-	for (ndContactPointList::dNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+	for (ndContactPointList::ndNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 	{
 		const ndContactMaterial& contactPoint = contactNode->GetInfo();
-		const dVector pointVeloc0(body0->GetVelocityAtPoint(contactPoint.m_point));
-		const dVector pointVeloc1(body1->GetVelocityAtPoint(contactPoint.m_point));
-		const dVector veloc(pointVeloc1 - pointVeloc0);
+		const ndVector pointVeloc0(body0->GetVelocityAtPoint(contactPoint.m_point));
+		const ndVector pointVeloc1(body1->GetVelocityAtPoint(contactPoint.m_point));
+		const ndVector veloc(pointVeloc1 - pointVeloc0);
 
 		const dFloat32 verticalSpeed = contactPoint.m_normal.DotProduct(veloc).GetScalar();
 		const dFloat32 nornalSpeed = dAbs(verticalSpeed);
@@ -86,7 +86,7 @@ void ndContactCallback::PlaySoundTest(const ndContact* const contactJoint)
 			normalContact = &contactPoint;
 		}
 
-		dVector tangVeloc(veloc - contactPoint.m_normal.Scale(verticalSpeed));
+		ndVector tangVeloc(veloc - contactPoint.m_normal.Scale(verticalSpeed));
 		const dFloat32 tangentSpeed = tangVeloc.DotProduct(tangVeloc).GetScalar();
 		if (tangentSpeed > maxTangentSpeed)
 		{

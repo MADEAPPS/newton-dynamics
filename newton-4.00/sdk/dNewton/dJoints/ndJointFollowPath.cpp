@@ -16,15 +16,15 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointFollowPath)
 
-ndJointFollowPath::ndJointFollowPath (const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointFollowPath::ndJointFollowPath (const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 {
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
-ndJointFollowPath::ndJointFollowPath(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+ndJointFollowPath::ndJointFollowPath(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 {
 	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 }
@@ -35,10 +35,10 @@ ndJointFollowPath::~ndJointFollowPath()
 
 void ndJointFollowPath::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
-	dVector pathPosit(dVector::m_zero);
-	dVector pathTangent(dVector::m_zero);
+	ndMatrix matrix0;
+	ndMatrix matrix1;
+	ndVector pathPosit(ndVector::m_zero);
+	ndVector pathTangent(ndVector::m_zero);
 		
 	// Get the global matrices of each rigid body.
 	CalculateGlobalMatrix (matrix0, matrix1);
@@ -49,15 +49,15 @@ void ndJointFollowPath::JacobianDerivative(ndConstraintDescritor& desc)
 		pathTangent = pathTangent.Scale (-1.0f);
 	}
 
-	matrix1 = dMatrix(pathTangent);
+	matrix1 = ndMatrix(pathTangent);
 	matrix1.m_posit = pathPosit;
 	matrix1.m_posit.m_w = 1.0f;
 	
 	// Restrict the movement on the pivot point along all tree the normal and bi normal of the path
-	const dVector& p0 = matrix0.m_posit;
-	const dVector& p1 = matrix1.m_posit;
-	dVector p00 (p0 + matrix0.m_front.Scale(50.0f));
-	dVector p11 (p1 + matrix1.m_front.Scale(50.0f));
+	const ndVector& p0 = matrix0.m_posit;
+	const ndVector& p1 = matrix1.m_posit;
+	ndVector p00 (p0 + matrix0.m_front.Scale(50.0f));
+	ndVector p11 (p1 + matrix1.m_front.Scale(50.0f));
 	
 	AddLinearRowJacobian(desc, p0, p1, matrix1[1]);
 	AddLinearRowJacobian(desc, p0, p1, matrix1[2]);
@@ -65,12 +65,12 @@ void ndJointFollowPath::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, p00, p11, matrix1[2]);
 }
 
-void ndJointFollowPath::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndJointFollowPath::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
 

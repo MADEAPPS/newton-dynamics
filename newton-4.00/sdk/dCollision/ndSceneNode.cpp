@@ -28,8 +28,8 @@
 #define D_AABB_QUANTIZATION		dFloat32 (4.0f)
 #define D_AABB_INV_QUANTIZATION	(dFloat32 (1.0f) / D_AABB_QUANTIZATION)
 
-dVector ndSceneNode::m_aabbQuantization(D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, dFloat32 (0.0f));
-dVector ndSceneNode::m_aabbInvQuantization(D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, dFloat32(0.0f));
+ndVector ndSceneNode::m_aabbQuantization(D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, dFloat32 (0.0f));
+ndVector ndSceneNode::m_aabbInvQuantization(D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, dFloat32(0.0f));
 
 ndSceneBodyNode::ndSceneBodyNode(ndBodyKinematic* const body)
 	:ndSceneNode(nullptr)
@@ -72,7 +72,7 @@ ndSceneTreeNode::ndSceneTreeNode(ndSceneNode* const sibling, ndSceneNode* const 
 
 	m_minBox = left->m_minBox.GetMin(right->m_minBox);
 	m_maxBox = left->m_maxBox.GetMax(right->m_maxBox);
-	dVector side0(m_maxBox - m_minBox);
+	ndVector side0(m_maxBox - m_minBox);
 	m_surfaceArea = side0.DotProduct(side0.ShiftTripleRight()).m_x;
 }
 

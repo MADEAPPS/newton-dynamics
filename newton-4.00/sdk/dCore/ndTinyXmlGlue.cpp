@@ -82,7 +82,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dFlo
 	xmlSaveParam(rootNode, name, "float", buffer);
 }
 
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const dVector& value)
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndVector& value)
 {
 	char buffer[1024];
 	char* ptr0 = FloatToString(buffer, value.m_x);
@@ -91,10 +91,10 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	xmlSaveParam(rootNode, name, "float3", buffer);
 }
 
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const dMatrix& value)
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndMatrix& value)
 {
-	dVector euler0;
-	dVector euler1;
+	ndVector euler0;
+	ndVector euler1;
 	value.CalcPitchYawRoll(euler0, euler1);
 	euler0 = euler0.Scale(dRadToDegree);
 
@@ -113,7 +113,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	xmlSaveParam(rootNode, name, "char", value);
 }
 
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 count, const dVector* const array)
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 count, const ndVector* const array)
 {
 	char* const buffer = dAlloca(char, count * 4 * 12);
 
@@ -163,7 +163,7 @@ dFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name
 	return dFloat32 (value);
 }
 
-void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, dArray<dVector>& array)
+void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndVector>& array)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
 	dAssert(element);
@@ -175,7 +175,7 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 	const char* const data = element->Attribute("floatArray");
 
 	size_t start = 0;
-	dVector point(dVector::m_zero);
+	ndVector point(ndVector::m_zero);
 	for (dInt32 i = 0; i < count; i++)
 	{
 		char x[64];
@@ -200,7 +200,7 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 	}
 }
 
-D_CORE_API dVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name)
+D_CORE_API ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
 	dAssert(element);
@@ -212,14 +212,14 @@ D_CORE_API dVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char
 	dFloat64 fz;
 	sscanf(positData, "%lf %lf %lf", &fx, &fy, &fz);
 
-	dVector posit(dVector::m_zero);
+	ndVector posit(ndVector::m_zero);
 	posit.m_x = dFloat32(fx);
 	posit.m_y = dFloat32(fy);
 	posit.m_z = dFloat32(fz);
 	return posit;
 }
 
-dMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name)
+ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
 	dAssert(element);
@@ -227,8 +227,8 @@ dMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name
 	const char* const positData = element->Attribute("position");
 	const char* const angleData = element->Attribute("angles");
 
-	dVector posit(dVector::m_one);
-	dVector euler(dVector::m_zero);
+	ndVector posit(ndVector::m_one);
+	ndVector euler(ndVector::m_zero);
 
 	dFloat64 fx;
 	dFloat64 fy;
@@ -246,7 +246,7 @@ dMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name
 	euler.m_z = dFloat32(fz);
 	euler = euler.Scale(dDegreeToRad);
 
-	dMatrix matrix (dPitchMatrix(euler.m_x) * dYawMatrix(euler.m_y) * dRollMatrix(euler.m_z));
+	ndMatrix matrix (dPitchMatrix(euler.m_x) * dYawMatrix(euler.m_y) * dRollMatrix(euler.m_z));
 	matrix.m_posit = posit;
 	return matrix;
 }

@@ -24,20 +24,20 @@
 #include "ndTypes.h"
 #include "ndGoogol.h"
 
-dGoogol dGoogol::m_zero(0.0); 
-dGoogol dGoogol::m_one(1.0); 
-dGoogol dGoogol::m_two(2.0);  
-dGoogol dGoogol::m_three(3.0);   
-dGoogol dGoogol::m_half(0.5);   
+ndGoogol ndGoogol::m_zero(0.0); 
+ndGoogol ndGoogol::m_one(1.0); 
+ndGoogol ndGoogol::m_two(2.0);  
+ndGoogol ndGoogol::m_three(3.0);   
+ndGoogol ndGoogol::m_half(0.5);   
 
-dGoogol::dGoogol(void)
+ndGoogol::ndGoogol(void)
 	:m_sign(0)
 	,m_exponent(0)
 {
 	memset (m_mantissa, 0, sizeof (m_mantissa));
 }
 
-dGoogol::dGoogol(dFloat64 value)
+ndGoogol::ndGoogol(dFloat64 value)
 	:m_sign(0)
 	,m_exponent(0)
 {
@@ -55,7 +55,7 @@ dGoogol::dGoogol(dFloat64 value)
 	dAssert ((m_mantissa[0] & dUnsigned64(1)<<63) == 0);
 }
 
-void dGoogol::CopySignedMantissa (dUnsigned64* const mantissa) const
+void ndGoogol::CopySignedMantissa (dUnsigned64* const mantissa) const
 {
 	memcpy (mantissa, m_mantissa, sizeof (m_mantissa));
 	if (m_sign) 
@@ -64,16 +64,16 @@ void dGoogol::CopySignedMantissa (dUnsigned64* const mantissa) const
 	}
 }
 
-dGoogol::operator double() const
+ndGoogol::operator double() const
 {
 	dFloat64 mantissa = (dFloat64(1.0f) / dFloat64 (dUnsigned64(1)<<62)) * dFloat64 (m_mantissa[0]);
 	mantissa = ldexp(mantissa, m_exponent) * (m_sign ?  dFloat64 (-1.0f) : dFloat64 (1.0f));
 	return mantissa;
 }
 
-dGoogol dGoogol::operator+ (const dGoogol &A) const
+ndGoogol ndGoogol::operator+ (const ndGoogol &A) const
 {
-	dGoogol tmp;
+	ndGoogol tmp;
 	dAssert (dInt64 (m_mantissa[0]) >= 0);
 	dAssert (dInt64 (A.m_mantissa[0]) >= 0);
 
@@ -141,14 +141,14 @@ dGoogol dGoogol::operator+ (const dGoogol &A) const
 	return tmp;
 }
 
-dGoogol dGoogol::operator- (const dGoogol &A) const
+ndGoogol ndGoogol::operator- (const ndGoogol &A) const
 {
-	dGoogol tmp (A);
+	ndGoogol tmp (A);
 	tmp.m_sign = !tmp.m_sign;
 	return *this + tmp;
 }
 
-void dGoogol::ScaleMantissa (dUnsigned64* const dst, dUnsigned64 scale) const
+void ndGoogol::ScaleMantissa (dUnsigned64* const dst, dUnsigned64 scale) const
 {
 	dUnsigned64 carrier = 0;
 	for (dInt32 i = ND_GOOGOL_SIZE - 1; i >= 0; i --) 
@@ -174,7 +174,7 @@ void dGoogol::ScaleMantissa (dUnsigned64* const dst, dUnsigned64 scale) const
 	dst[0] = carrier;
 }
 
-dGoogol dGoogol::operator* (const dGoogol &A) const
+ndGoogol ndGoogol::operator* (const ndGoogol &A) const
 {
 	dAssert (dInt64 (m_mantissa[0]) >= 0);
 	dAssert (dInt64 (A.m_mantissa[0]) >= 0);
@@ -217,19 +217,19 @@ dGoogol dGoogol::operator* (const dGoogol &A) const
 
 		dInt32 exp = m_exponent + A.m_exponent - (bits - 2);
 
-		dGoogol tmp;
+		ndGoogol tmp;
 		tmp.m_sign = m_sign ^ A.m_sign;
 		tmp.m_exponent = dInt16 (exp);
 		memcpy (tmp.m_mantissa, mantissaAcc, sizeof (m_mantissa));
 
 		return tmp;
 	} 
-	return dGoogol(0.0);
+	return ndGoogol(0.0);
 }
 
-dGoogol dGoogol::operator/ (const dGoogol &A) const
+ndGoogol ndGoogol::operator/ (const ndGoogol &A) const
 {
-	dGoogol tmp (1.0 / A);
+	ndGoogol tmp (1.0 / A);
 	tmp = tmp * (m_two - A * tmp);
 	tmp = tmp * (m_two - A * tmp);
 	dInt32 test = 0;
@@ -237,26 +237,26 @@ dGoogol dGoogol::operator/ (const dGoogol &A) const
 	do 
 	{
 		passes ++;
-		dGoogol tmp0 (tmp);
+		ndGoogol tmp0 (tmp);
 		tmp = tmp * (m_two - A * tmp);
-		test = memcmp (&tmp0, &tmp, sizeof (dGoogol));
+		test = memcmp (&tmp0, &tmp, sizeof (ndGoogol));
 	} while (test && (passes < (2 * ND_GOOGOL_SIZE)));	
 	dAssert (passes <= (2 * ND_GOOGOL_SIZE));
 	return (*this) * tmp;
 }
 
-dGoogol dGoogol::Abs () const
+ndGoogol ndGoogol::Abs () const
 {
-	dGoogol tmp (*this);
+	ndGoogol tmp (*this);
 	tmp.m_sign = 0;
 	return tmp;
 }
 
-dGoogol dGoogol::Floor () const
+ndGoogol ndGoogol::Floor () const
 {
 	if (m_exponent < 1) 
 	{
-		return dGoogol (0.0);
+		return ndGoogol (0.0);
 	} 
 	dInt32 bits = m_exponent + 2;
 	dInt32 start = 0;
@@ -266,7 +266,7 @@ dGoogol dGoogol::Floor () const
 		start ++;
 	}
 
-	dGoogol tmp (*this);
+	ndGoogol tmp (*this);
 	for (dInt32 i = ND_GOOGOL_SIZE - 1; i > start; i --) 
 	{
 		tmp.m_mantissa[i] = 0;
@@ -283,33 +283,33 @@ dGoogol dGoogol::Floor () const
 	return tmp;
 }
 
-dGoogol dGoogol::InvSqrt () const
+ndGoogol ndGoogol::InvSqrt () const
 {
-	const dGoogol& me = *this;
-	dGoogol x (1.0f / sqrt (me));
+	const ndGoogol& me = *this;
+	ndGoogol x (1.0f / sqrt (me));
 
 	dInt32 test = 0;
 	dInt32 passes = 0;
 	do 
 	{
 		passes ++;
-		dGoogol tmp (x);
+		ndGoogol tmp (x);
 		x = m_half * x * (m_three - me * x * x);
-		test = memcmp (&x, &tmp, sizeof (dGoogol));
+		test = memcmp (&x, &tmp, sizeof (ndGoogol));
 	} while (test && (passes < (2 * ND_GOOGOL_SIZE)));	
 	dAssert (passes <= (2 * ND_GOOGOL_SIZE));
 	return x;
 }
 
-dGoogol dGoogol::Sqrt () const
+ndGoogol ndGoogol::Sqrt () const
 {
 	return *this * InvSqrt();
 }
 
-void dGoogol::ToString (char* const string) const
+void ndGoogol::ToString (char* const string) const
 {
-	dGoogol tmp (*this);
-	dGoogol base (10.0);
+	ndGoogol tmp (*this);
+	ndGoogol base (10.0);
 	while (dFloat64 (tmp) > 1.0) 
 	{
 		tmp = tmp/base;
@@ -319,7 +319,7 @@ void dGoogol::ToString (char* const string) const
 	while (tmp.m_mantissa[0]) 
 	{
 		tmp = tmp * base;
-		dGoogol digit (tmp.Floor());
+		ndGoogol digit (tmp.Floor());
 		tmp -= digit;
 		dFloat64 val = digit;
 		string[index] = char (val) + '0';
@@ -328,7 +328,7 @@ void dGoogol::ToString (char* const string) const
 	string[index] = 0;
 }
 
-void dGoogol::NegateMantissa (dUnsigned64* const mantissa) const
+void ndGoogol::NegateMantissa (dUnsigned64* const mantissa) const
 {
 	dUnsigned64 carrier = 1;
 	for (dInt32 i = ND_GOOGOL_SIZE - 1; i >= 0; i --) 
@@ -342,7 +342,7 @@ void dGoogol::NegateMantissa (dUnsigned64* const mantissa) const
 	}
 }
 
-void dGoogol::ShiftRightMantissa (dUnsigned64* const mantissa, dInt32 bits) const
+void ndGoogol::ShiftRightMantissa (dUnsigned64* const mantissa, dInt32 bits) const
 {
 	dUnsigned64 carrier = 0;
 	if (dInt64 (mantissa[0]) < dInt64 (0)) 
@@ -372,7 +372,7 @@ void dGoogol::ShiftRightMantissa (dUnsigned64* const mantissa, dInt32 bits) cons
 	}
 }
 
-dInt32 dGoogol::LeadingZeros (dUnsigned64 a) const
+dInt32 ndGoogol::LeadingZeros (dUnsigned64 a) const
 {
 	#define dgCOUNTBIT(mask,add)		\
 	{									\
@@ -393,7 +393,7 @@ dInt32 dGoogol::LeadingZeros (dUnsigned64 a) const
 	return n;
 }
 
-dInt32 dGoogol::NormalizeMantissa (dUnsigned64* const mantissa) const
+dInt32 ndGoogol::NormalizeMantissa (dUnsigned64* const mantissa) const
 {
 	dAssert (dInt64 (mantissa[0]) >= 0);
 
@@ -446,12 +446,12 @@ dInt32 dGoogol::NormalizeMantissa (dUnsigned64* const mantissa) const
 	return bits;
 }
 
-dUnsigned64 dGoogol::CheckCarrier (dUnsigned64 a, dUnsigned64 b) const
+dUnsigned64 ndGoogol::CheckCarrier (dUnsigned64 a, dUnsigned64 b) const
 {
 	return ((dUnsigned64 (-1) - b) < a) ? dUnsigned64(1) : 0;
 }
 
-void dGoogol::ExtendeMultiply (dUnsigned64 a, dUnsigned64 b, dUnsigned64& high, dUnsigned64& low) const
+void ndGoogol::ExtendeMultiply (dUnsigned64 a, dUnsigned64 b, dUnsigned64& high, dUnsigned64& low) const
 {
 	dUnsigned64 bLow = b & 0xffffffff; 
 	dUnsigned64 bHigh = b >> 32; 
@@ -478,55 +478,55 @@ void dGoogol::ExtendeMultiply (dUnsigned64 a, dUnsigned64 b, dUnsigned64& high, 
 	high = hh;
 }
 
-dGoogol dGoogol::operator+= (const dGoogol &A)
+ndGoogol ndGoogol::operator+= (const ndGoogol &A)
 {
 	*this = *this + A;
 	return *this;
 }
 
-dGoogol dGoogol::operator-= (const dGoogol &A)
+ndGoogol ndGoogol::operator-= (const ndGoogol &A)
 {
 	*this = *this - A;
 	return *this;
 }
 
-bool dGoogol::operator> (const dGoogol &A) const
+bool ndGoogol::operator> (const ndGoogol &A) const
 {
-	dGoogol tmp (*this - A);
+	ndGoogol tmp (*this - A);
 	return dFloat64(tmp) > 0.0;
 }
 
-bool dGoogol::operator>= (const dGoogol &A) const 
+bool ndGoogol::operator>= (const ndGoogol &A) const 
 {
-	dGoogol tmp (*this - A);
+	ndGoogol tmp (*this - A);
 	return dFloat64 (tmp) >= 0.0;
 }
 
-bool dGoogol::operator< (const dGoogol &A) const 
+bool ndGoogol::operator< (const ndGoogol &A) const 
 {
-	dGoogol tmp (*this - A);
+	ndGoogol tmp (*this - A);
 	return dFloat64 (tmp) < 0.0;
 }
 
-bool dGoogol::operator<= (const dGoogol &A) const 
+bool ndGoogol::operator<= (const ndGoogol &A) const 
 {
-	dGoogol tmp (*this - A);
+	ndGoogol tmp (*this - A);
 	return dFloat64 (tmp) <= 0.0;
 }
 
-bool dGoogol::operator== (const dGoogol &A) const 
+bool ndGoogol::operator== (const ndGoogol &A) const 
 {
-	dGoogol tmp (*this - A);
+	ndGoogol tmp (*this - A);
 	return dFloat64 (tmp) == 0.0;
 }
 
-bool dGoogol::operator!= (const dGoogol &A) const 
+bool ndGoogol::operator!= (const ndGoogol &A) const 
 {
-	dGoogol tmp (*this - A);
+	ndGoogol tmp (*this - A);
 	return dFloat64 (tmp) != 0.0;
 }
 
-void dGoogol::Trace () const
+void ndGoogol::Trace () const
 {
 	dAssert(0);
 	//dTrace (("%f ", dFloat64 (*this)));

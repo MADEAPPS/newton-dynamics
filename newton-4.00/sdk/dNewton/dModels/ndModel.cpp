@@ -26,13 +26,13 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndModel)
 
-ndModel::ndModel(const dLoadSaveBase::dLoadDescriptor&)
-	:dClassAlloc()
+ndModel::ndModel(const ndLoadSaveBase::dLoadDescriptor&)
+	:ndClassAlloc()
 	,m_node(nullptr)
 {
 }
 
-void ndModel::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndModel::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);

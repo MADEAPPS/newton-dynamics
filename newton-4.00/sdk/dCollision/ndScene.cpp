@@ -40,9 +40,9 @@
 #define D_CONTACT_TRANSLATION_ERROR	dFloat32 (1.0e-3f)
 #define D_CONTACT_ANGULAR_ERROR		(dFloat32 (0.25f * dDegreeToRad))
 
-dVector ndScene::m_velocTol(dFloat32(1.0e-16f));
-dVector ndScene::m_angularContactError2(D_CONTACT_ANGULAR_ERROR * D_CONTACT_ANGULAR_ERROR);
-dVector ndScene::m_linearContactError2(D_CONTACT_TRANSLATION_ERROR * D_CONTACT_TRANSLATION_ERROR);
+ndVector ndScene::m_velocTol(dFloat32(1.0e-16f));
+ndVector ndScene::m_angularContactError2(D_CONTACT_ANGULAR_ERROR * D_CONTACT_ANGULAR_ERROR);
+ndVector ndScene::m_linearContactError2(D_CONTACT_TRANSLATION_ERROR * D_CONTACT_TRANSLATION_ERROR);
 
 D_MSV_NEWTON_ALIGN_32
 class ndScene::ndSpliteInfo
@@ -50,8 +50,8 @@ class ndScene::ndSpliteInfo
 	public:
 	ndSpliteInfo(ndSceneNode** const boxArray, dInt32 boxCount)
 	{
-		dVector minP(dFloat32(1.0e15f));
-		dVector maxP(-dFloat32(1.0e15f));
+		ndVector minP(dFloat32(1.0e15f));
+		ndVector maxP(-dFloat32(1.0e15f));
 
 		if (boxCount == 2)
 		{
@@ -66,15 +66,15 @@ class ndScene::ndSpliteInfo
 		}
 		else
 		{
-			dVector median(dVector::m_zero);
-			dVector varian(dVector::m_zero);
+			ndVector median(ndVector::m_zero);
+			ndVector varian(ndVector::m_zero);
 			for (dInt32 i = 0; i < boxCount; i++)
 			{
 				ndSceneNode* const node = boxArray[i];
 				dAssert(node->GetAsSceneBodyNode());
 				minP = minP.GetMin(node->m_minBox);
 				maxP = maxP.GetMax(node->m_maxBox);
-				dVector p(dVector::m_half * (node->m_minBox + node->m_maxBox));
+				ndVector p(ndVector::m_half * (node->m_minBox + node->m_maxBox));
 				median += p;
 				varian += p * p;
 			}
@@ -92,7 +92,7 @@ class ndScene::ndSpliteInfo
 				}
 			}
 
-			dVector center = median.Scale(dFloat32(1.0f) / dFloat32(boxCount));
+			ndVector center = median.Scale(dFloat32(1.0f) / dFloat32(boxCount));
 
 			dFloat32 test = center[index];
 
@@ -147,13 +147,13 @@ class ndScene::ndSpliteInfo
 		m_p1 = maxP;
 	}
 
-	dVector m_p0;
-	dVector m_p1;
+	ndVector m_p0;
+	ndVector m_p1;
 	dInt32 m_axis;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 ndScene::ndFitnessList::ndFitnessList()
-	:dList <ndSceneTreeNode*, dContainersFreeListAlloc<ndSceneTreeNode*>>()
+	:ndList <ndSceneTreeNode*, ndContainersFreeListAlloc<ndSceneTreeNode*>>()
 	,m_currentCost(dFloat32(0.0f))
 	,m_currentNode(nullptr)
 	,m_index(0)
@@ -180,7 +180,7 @@ dFloat64 ndScene::ndFitnessList::TotalCost() const
 {
 	D_TRACKTIME();
 	dFloat64 cost = dFloat32(0.0f);
-	for (dNode* node = GetFirst(); node; node = node->GetNext()) {
+	for (ndNode* node = GetFirst(); node; node = node->GetNext()) {
 		ndSceneNode* const box = node->GetInfo();
 		cost += box->m_surfaceArea;
 	}
@@ -188,7 +188,7 @@ dFloat64 ndScene::ndFitnessList::TotalCost() const
 }
 	
 ndScene::ndScene()
-	:dThreadPool("newtonWorker")
+	:ndThreadPool("newtonWorker")
 	,m_bodyList()
 	,m_contactList()
 	,m_activeConstraintArray()
@@ -211,7 +211,7 @@ ndScene::~ndScene()
 	Cleanup();
 	Finish();
 	delete m_contactNotifyCallback;
-	dFreeListAlloc::Flush();
+	ndFreeListAlloc::Flush();
 	//ndContactList::FlushFreeList();
 	//ndContactPointList::FlushFreeList();
 	//ndShapeCompound::ndTreeArray::FlushFreeList();
@@ -274,7 +274,7 @@ void ndScene::SetContactNotify(ndContactNotify* const notify)
 
 void ndScene::DebugScene(ndSceneTreeNotiFy* const notify)
 {
-	for (ndFitnessList::dNode* node = m_fitness.GetFirst(); node; node = node->GetNext())
+	for (ndFitnessList::ndNode* node = m_fitness.GetFirst(); node; node = node->GetNext())
 	{
 		if (node->GetInfo()->GetLeft()->GetAsSceneBodyNode())
 		{
@@ -291,7 +291,7 @@ bool ndScene::AddBody(ndBodyKinematic* const body)
 {
 	if ((body->m_scene == nullptr) && (body->m_sceneNode == nullptr))
 	{
-		ndBodyList::dNode* const node = m_bodyList.Append(body);
+		ndBodyList::ndNode* const node = m_bodyList.Append(body);
 		body->SetSceneNodes(this, node);
 		m_contactNotifyCallback->OnBodyAdded(body);
 
@@ -330,8 +330,8 @@ bool ndScene::RemoveBody(ndBodyKinematic* const body)
 
 ndSceneTreeNode* ndScene::InsertNode(ndSceneNode* const root, ndSceneNode* const node)
 {
-	dVector p0;
-	dVector p1;
+	ndVector p0;
+	ndVector p1;
 
 	ndSceneNode* sibling = root;
 	dFloat32 surfaceArea = CalculateSurfaceArea(node, sibling, p0, p1);
@@ -341,12 +341,12 @@ ndSceneTreeNode* ndScene::InsertNode(ndSceneNode* const root, ndSceneNode* const
 		sibling->m_maxBox = p1;
 		sibling->m_surfaceArea = surfaceArea;
 	
-		dVector leftP0;
-		dVector leftP1;
+		ndVector leftP0;
+		ndVector leftP1;
 		dFloat32 leftSurfaceArea = CalculateSurfaceArea(node, sibling->GetLeft(), leftP0, leftP1);
 		
-		dVector rightP0;
-		dVector rightP1;
+		ndVector rightP0;
+		ndVector rightP1;
 		dFloat32 rightSurfaceArea = CalculateSurfaceArea(node, sibling->GetRight(), rightP0, rightP1);
 	
 		if (leftSurfaceArea < rightSurfaceArea) 
@@ -371,15 +371,15 @@ ndSceneTreeNode* ndScene::InsertNode(ndSceneNode* const root, ndSceneNode* const
 
 void ndScene::RotateLeft(ndSceneTreeNode* const node, ndSceneNode** const root)
 {
-	dVector cost1P0;
-	dVector cost1P1;
+	ndVector cost1P0;
+	ndVector cost1P1;
 
 	ndSceneTreeNode* const parent = (ndSceneTreeNode*)node->m_parent;
 	dAssert(parent && !parent->GetAsSceneBodyNode());
 	dFloat32 cost1 = CalculateSurfaceArea(node->m_left, parent->m_left, cost1P0, cost1P1);
 
-	dVector cost2P0;
-	dVector cost2P1;
+	ndVector cost2P0;
+	ndVector cost2P1;
 	dFloat32 cost2 = CalculateSurfaceArea(node->m_right, parent->m_left, cost2P0, cost2P1);
 
 	dFloat32 cost0 = node->m_surfaceArea;
@@ -455,16 +455,16 @@ void ndScene::RotateLeft(ndSceneTreeNode* const node, ndSceneNode** const root)
 
 void ndScene::RotateRight(ndSceneTreeNode* const node, ndSceneNode** const root)
 {
-	dVector cost1P0;
-	dVector cost1P1;
+	ndVector cost1P0;
+	ndVector cost1P1;
 
 	ndSceneTreeNode* const parent = (ndSceneTreeNode*)node->m_parent;
 	dAssert(parent && !parent->GetAsSceneBodyNode());
 
 	dFloat32 cost1 = CalculateSurfaceArea(node->m_right, parent->m_right, cost1P0, cost1P1);
 
-	dVector cost2P0;
-	dVector cost2P1;
+	ndVector cost2P0;
+	ndVector cost2P1;
 	dFloat32 cost2 = CalculateSurfaceArea(node->m_left, parent->m_right, cost2P0, cost2P1);
 
 	dFloat32 cost0 = node->m_surfaceArea;
@@ -572,7 +572,7 @@ dFloat64 ndScene::ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const root
 	else
 	{
 		dInt32 count = 0;
-		ndFitnessList::dNode* node = fitness.m_currentNode;
+		ndFitnessList::ndNode* node = fitness.m_currentNode;
 		for ( ;node && count < 64; node = node->GetNext())
 		{
 			count++;
@@ -600,7 +600,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndScen
 				ndSceneNode** const leafArray = dAlloca(ndSceneNode*, fitness.GetCount() * 2 + 16);
 
 				dInt32 leafNodesCount = 0;
-				for (ndFitnessList::dNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) 
+				for (ndFitnessList::ndNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) 
 				{
 					ndSceneNode* const node = nodePtr->GetInfo();
 					ndSceneNode* const leftNode = node->GetLeft();
@@ -623,7 +623,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndScen
 					}
 				}
 				
-				ndFitnessList::dNode* nodePtr = fitness.GetFirst();
+				ndFitnessList::ndNode* nodePtr = fitness.GetFirst();
 				class CompareNodes
 				{
 					public:
@@ -642,7 +642,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndScen
 						return 0;
 					}
 				};
-				dSort<ndSceneNode*, CompareNodes>(leafArray, leafNodesCount);
+				ndSort<ndSceneNode*, CompareNodes>(leafArray, leafNodesCount);
 				
 				*root = BuildTopDownBig(leafArray, 0, leafNodesCount - 1, &nodePtr);
 				dAssert(!(*root)->m_parent);
@@ -661,7 +661,7 @@ void ndScene::BalanceScene()
 	UpdateFitness(m_fitness, m_treeEntropy, &m_rootNode);
 }
 
-ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dNode** const nextNode)
+ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::ndNode** const nextNode)
 {
 	dAssert(firstBox >= 0);
 	dAssert(lastBox >= 0);
@@ -689,7 +689,7 @@ ndSceneNode* ndScene::BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBo
 	}
 }
 
-ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dNode** const nextNode)
+ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::ndNode** const nextNode)
 {
 	if (lastBox == firstBox) 
 	{
@@ -729,8 +729,8 @@ ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firs
 		parent->m_left = BuildTopDownBig(leafArray, firstBox + midPoint + 1, lastBox, nextNode);
 		parent->m_left->m_parent = parent;
 
-		dVector minP(parent->m_left->m_minBox.GetMin(parent->m_right->m_minBox));
-		dVector maxP(parent->m_left->m_maxBox.GetMax(parent->m_right->m_maxBox));
+		ndVector minP(parent->m_left->m_minBox.GetMin(parent->m_right->m_minBox));
+		ndVector maxP(parent->m_left->m_maxBox.GetMax(parent->m_right->m_maxBox));
 		parent->SetAabb(minP, maxP);
 
 		return parent;
@@ -769,9 +769,9 @@ void ndScene::UpdateAabb(dInt32, ndBodyKinematic* const body)
 			dAssert(root == nullptr);
 			for (ndSceneNode* parent = bodyNode->m_parent; parent != root; parent = parent->m_parent) 
 			{
-				dScopeSpinLock lock(parent->m_lock);
-				dVector minBox;
-				dVector maxBox;
+				ndScopeSpinLock lock(parent->m_lock);
+				ndVector minBox;
+				ndVector maxBox;
 				dFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
 				if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox)) 
 				{
@@ -785,28 +785,28 @@ void ndScene::UpdateAabb(dInt32, ndBodyKinematic* const body)
 	}
 }
 
-bool ndScene::ValidateContactCache(ndContact* const contact, const dVector& timestep) const
+bool ndScene::ValidateContactCache(ndContact* const contact, const ndVector& timestep) const
 {
 	dAssert(contact && (contact->GetAsContact()));
 
 	ndBodyKinematic* const body0 = contact->GetBody0();
 	ndBodyKinematic* const body1 = contact->GetBody1();
 
-	dVector positStep(timestep * (body0->m_veloc - body1->m_veloc));
+	ndVector positStep(timestep * (body0->m_veloc - body1->m_veloc));
 	positStep = ((positStep.DotProduct(positStep)) > m_velocTol) & positStep;
 	contact->m_positAcc += positStep;
 	
-	dVector positError2(contact->m_positAcc.DotProduct(contact->m_positAcc));
-	dVector positSign(dVector::m_negOne & (positError2 < m_linearContactError2));
+	ndVector positError2(contact->m_positAcc.DotProduct(contact->m_positAcc));
+	ndVector positSign(ndVector::m_negOne & (positError2 < m_linearContactError2));
 	if (positSign.GetSignMask())
 	{
-		dVector rotationStep(timestep * (body0->m_omega - body1->m_omega));
+		ndVector rotationStep(timestep * (body0->m_omega - body1->m_omega));
 		rotationStep = ((rotationStep.DotProduct(rotationStep)) > m_velocTol) & rotationStep;
-		contact->m_rotationAcc = contact->m_rotationAcc * dQuaternion(rotationStep.m_x, rotationStep.m_y, rotationStep.m_z, dFloat32(1.0f));
+		contact->m_rotationAcc = contact->m_rotationAcc * ndQuaternion(rotationStep.m_x, rotationStep.m_y, rotationStep.m_z, dFloat32(1.0f));
 	
-		dVector angle(contact->m_rotationAcc & dVector::m_triplexMask);
-		dVector rotatError2(angle.DotProduct(angle));
-		dVector rotationSign(dVector::m_negOne & (rotatError2 < m_linearContactError2));
+		ndVector angle(contact->m_rotationAcc & ndVector::m_triplexMask);
+		ndVector rotatError2(angle.DotProduct(angle));
+		ndVector rotationSign(ndVector::m_negOne & (rotatError2 < m_linearContactError2));
 		if (rotationSign.GetSignMask())
 		{
 			return true;
@@ -882,8 +882,8 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContactSolver* const contactSolver)
 {
 	ndContact* const contact = contactSolver->m_contact;
-	contact->m_positAcc = dVector::m_zero;
-	contact->m_rotationAcc = dQuaternion();
+	contact->m_positAcc = ndVector::m_zero;
+	contact->m_rotationAcc = ndQuaternion();
 
 	ndBodyKinematic* const body0 = contact->m_body0;
 	ndBodyKinematic* const body1 = contact->m_body1;
@@ -895,32 +895,32 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 	const ndContactPoint* const contactArray = contactSolver->m_contactBuffer;
 	
 	dInt32 count = 0;
-	dVector cachePosition[D_MAX_CONTATCS];
-	ndContactPointList::dNode* nodes[D_MAX_CONTATCS];
+	ndVector cachePosition[D_MAX_CONTATCS];
+	ndContactPointList::ndNode* nodes[D_MAX_CONTATCS];
 	ndContactPointList& contactPointList = contact->m_contacPointsList;
-	for (ndContactPointList::dNode* contactNode = contactPointList.GetFirst(); contactNode; contactNode = contactNode->GetNext()) 
+	for (ndContactPointList::ndNode* contactNode = contactPointList.GetFirst(); contactNode; contactNode = contactNode->GetNext()) 
 	{
 		nodes[count] = contactNode;
 		cachePosition[count] = contactNode->GetInfo().m_point;
 		count++;
 	}
 	
-	const dVector& v0 = body0->m_veloc;
-	const dVector& w0 = body0->m_omega;
-	const dVector& com0 = body0->m_globalCentreOfMass;
+	const ndVector& v0 = body0->m_veloc;
+	const ndVector& w0 = body0->m_omega;
+	const ndVector& com0 = body0->m_globalCentreOfMass;
 	
-	const dVector& v1 = body1->m_veloc;
-	const dVector& w1 = body1->m_omega;
-	const dVector& com1 = body1->m_globalCentreOfMass;
+	const ndVector& v1 = body1->m_veloc;
+	const ndVector& w1 = body1->m_omega;
+	const ndVector& com1 = body1->m_globalCentreOfMass;
 
-	dVector controlDir0(dVector::m_zero);
-	dVector controlDir1(dVector::m_zero);
-	dVector controlNormal(contactArray[0].m_normal);
-	dVector vel0(v0 + w0.CrossProduct(contactArray[0].m_point - com0));
-	dVector vel1(v1 + w1.CrossProduct(contactArray[0].m_point - com1));
-	dVector vRel(vel1 - vel0);
+	ndVector controlDir0(ndVector::m_zero);
+	ndVector controlDir1(ndVector::m_zero);
+	ndVector controlNormal(contactArray[0].m_normal);
+	ndVector vel0(v0 + w0.CrossProduct(contactArray[0].m_point - com0));
+	ndVector vel1(v1 + w1.CrossProduct(contactArray[0].m_point - com1));
+	ndVector vRel(vel1 - vel0);
 	dAssert(controlNormal.m_w == dFloat32(0.0f));
-	dVector tangDir(vRel - controlNormal * vRel.DotProduct(controlNormal));
+	ndVector tangDir(vRel - controlNormal * vRel.DotProduct(controlNormal));
 	dAssert(tangDir.m_w == dFloat32(0.0f));
 	dFloat32 diff = tangDir.DotProduct(tangDir).GetScalar();
 	
@@ -930,11 +930,11 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		staticMotion = 1;
 		if (dAbs(controlNormal.m_z) > dFloat32(0.577f)) 
 		{
-			tangDir = dVector(-controlNormal.m_y, controlNormal.m_z, dFloat32(0.0f), dFloat32(0.0f));
+			tangDir = ndVector(-controlNormal.m_y, controlNormal.m_z, dFloat32(0.0f), dFloat32(0.0f));
 		}
 		else 
 		{
-			tangDir = dVector(-controlNormal.m_y, controlNormal.m_x, dFloat32(0.0f), dFloat32(0.0f));
+			tangDir = ndVector(-controlNormal.m_y, controlNormal.m_x, dFloat32(0.0f), dFloat32(0.0f));
 		}
 		controlDir0 = controlNormal.CrossProduct(tangDir);
 		dAssert(controlDir0.m_w == dFloat32(0.0f));
@@ -949,10 +949,10 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 	{
 		dInt32 index = -1;
 		dFloat32 min = dFloat32(1.0e20f);
-		ndContactPointList::dNode* contactNode = nullptr;
+		ndContactPointList::ndNode* contactNode = nullptr;
 		for (dInt32 j = 0; j < count; j++) 
 		{
-			dVector v(dVector::m_triplexMask & (cachePosition[j] - contactArray[i].m_point));
+			ndVector v(ndVector::m_triplexMask & (cachePosition[j] - contactArray[i].m_point));
 			dAssert(v.m_w == dFloat32(0.0f));
 			diff = v.DotProduct(v).GetScalar();
 			if (diff < min) 
@@ -1008,11 +1008,11 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 			{
 				if (dAbs(contactPoint->m_normal.m_z) > dFloat32(0.577f))
 				{
-					tangDir = dVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_z, dFloat32(0.0f), dFloat32(0.0f));
+					tangDir = ndVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_z, dFloat32(0.0f), dFloat32(0.0f));
 				}
 				else 
 				{
-					tangDir = dVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_x, dFloat32(0.0f), dFloat32(0.0f));
+					tangDir = ndVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_x, dFloat32(0.0f), dFloat32(0.0f));
 				}
 				contactPoint->m_dir0 = contactPoint->m_normal.CrossProduct(tangDir);
 				dAssert(contactPoint->m_dir0.m_w == dFloat32(0.0f));
@@ -1024,9 +1024,9 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		}
 		else 
 		{
-			dVector veloc0(v0 + w0.CrossProduct(contactPoint->m_point - com0));
-			dVector veloc1(v1 + w1.CrossProduct(contactPoint->m_point - com1));
-			dVector relReloc(veloc1 - veloc0);
+			ndVector veloc0(v0 + w0.CrossProduct(contactPoint->m_point - com0));
+			ndVector veloc1(v1 + w1.CrossProduct(contactPoint->m_point - com1));
+			ndVector relReloc(veloc1 - veloc0);
 	
 			dAssert(contactPoint->m_normal.m_w == dFloat32(0.0f));
 			dFloat32 impulse = relReloc.DotProduct(contactPoint->m_normal).GetScalar();
@@ -1035,7 +1035,7 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 				maxImpulse = dAbs(impulse);
 			}
 	
-			dVector tangentDir(relReloc - contactPoint->m_normal.Scale(impulse));
+			ndVector tangentDir(relReloc - contactPoint->m_normal.Scale(impulse));
 			dAssert(tangentDir.m_w == dFloat32(0.0f));
 			diff = tangentDir.DotProduct(tangentDir).GetScalar();
 			if (diff > dFloat32(1.0e-2f)) 
@@ -1047,11 +1047,11 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 			{
 				if (dAbs(contactPoint->m_normal.m_z) > dFloat32(0.577f)) 
 				{
-					tangentDir = dVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_z, dFloat32(0.0f), dFloat32(0.0f));
+					tangentDir = ndVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_z, dFloat32(0.0f), dFloat32(0.0f));
 				}
 				else 
 				{
-					tangentDir = dVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_x, dFloat32(0.0f), dFloat32(0.0f));
+					tangentDir = ndVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_x, dFloat32(0.0f), dFloat32(0.0f));
 				}
 				contactPoint->m_dir0 = contactPoint->m_normal.CrossProduct(tangentDir);
 				dAssert(contactPoint->m_dir0.m_w == dFloat32(0.0f));
@@ -1078,8 +1078,8 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
 {
 	ndBodyKinematic* const body0 = leafNode->GetBody() ? leafNode->GetBody() : nullptr;
-	const dVector boxP0(body0 ? body0->m_minAabb : leafNode->m_minBox);
-	const dVector boxP1(body0 ? body0->m_maxAabb : leafNode->m_maxBox);
+	const ndVector boxP0(body0 ? body0->m_minAabb : leafNode->m_minBox);
+	const ndVector boxP1(body0 ? body0->m_maxAabb : leafNode->m_maxBox);
 	const bool test0 = body0 ? (body0->m_invMass.m_w != dFloat32(0.0f)) : true;
 
 	dInt32 stack = 1;
@@ -1157,19 +1157,19 @@ bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKin
 	//	const dgCollisionInstance* const instance1 = body1->GetCollision();
 	//
 	//	if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
-	//		dVector velRelative(body1->GetVelocity() - body0->GetVelocity());
+	//		ndVector velRelative(body1->GetVelocity() - body0->GetVelocity());
 	//		if (velRelative.DotProduct(velRelative).GetScalar() > dFloat32(0.25f)) {
-	//			dVector box0_p0;
-	//			dVector box0_p1;
-	//			dVector box1_p0;
-	//			dVector box1_p1;
+	//			ndVector box0_p0;
+	//			ndVector box0_p1;
+	//			ndVector box1_p0;
+	//			ndVector box1_p1;
 	//
 	//			instance0->CalculateAabb(instance0->GetGlobalMatrix(), box0_p0, box0_p1);
 	//			instance1->CalculateAabb(instance1->GetGlobalMatrix(), box1_p0, box1_p1);
 	//
-	//			dVector boxp0(box0_p0 - box1_p1);
-	//			dVector boxp1(box0_p1 - box1_p0);
-	//			dFastRay ray(dVector::m_zero, velRelative.Scale(timestep * dFloat32(4.0f)));
+	//			ndVector boxp0(box0_p0 - box1_p1);
+	//			ndVector boxp1(box0_p1 - box1_p0);
+	//			ndFastRay ray(ndVector::m_zero, velRelative.Scale(timestep * dFloat32(4.0f)));
 	//			dFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
 	//			ret = (distance < dFloat32(1.0f));
 	//		}
@@ -1191,7 +1191,7 @@ ndJointBilateralConstraint* ndScene::FindBilateralJoint(ndBodyKinematic* const b
 {
 	if (body0->m_jointList.GetCount() <= body1->m_jointList.GetCount())
 	{
-		for (ndJointList::dNode* node = body0->m_jointList.GetFirst(); node; node = node->GetNext())
+		for (ndJointList::ndNode* node = body0->m_jointList.GetFirst(); node; node = node->GetNext())
 		{
 			ndJointBilateralConstraint* const joint = node->GetInfo();
 			if ((joint->GetBody0() == body1) || (joint->GetBody1() == body1))
@@ -1202,7 +1202,7 @@ ndJointBilateralConstraint* ndScene::FindBilateralJoint(ndBodyKinematic* const b
 	}
 	else
 	{
-		for (ndJointList::dNode* node = body1->m_jointList.GetFirst(); node; node = node->GetNext())
+		for (ndJointList::ndNode* node = body1->m_jointList.GetFirst(); node; node = node->GetNext())
 		{
 			ndJointBilateralConstraint* const joint = node->GetInfo();
 			if ((joint->GetBody0() == body0) || (joint->GetBody1() == body0))
@@ -1254,9 +1254,9 @@ void ndScene::BuildBodyArray()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			dAtomic<dUnsigned32>& activeBodyCount = *((dAtomic<dUnsigned32>*)m_context);
-			dArray<ndBodyKinematic*>& activeBodyArray = m_owner->m_activeBodyArray;
-			const dArray<ndBodyKinematic*>& bodyArrayBuffer = m_owner->m_activeBodyArrayBuffer;
+			ndAtomic<dUnsigned32>& activeBodyCount = *((ndAtomic<dUnsigned32>*)m_context);
+			ndArray<ndBodyKinematic*>& activeBodyArray = m_owner->m_activeBodyArray;
+			const ndArray<ndBodyKinematic*>& bodyArrayBuffer = m_owner->m_activeBodyArrayBuffer;
 			
 			dInt32 bodyCount = 0;
 			const dInt32 threadIndex = GetThreadId();
@@ -1275,7 +1275,7 @@ void ndScene::BuildBodyArray()
 					bool inScene = true;
 					if (!body->GetSceneBodyNode())
 					{
-						dScopeSpinLock lock(m_owner->m_contactLock);
+						ndScopeSpinLock lock(m_owner->m_contactLock);
 						inScene = m_owner->AddBody(body);
 					}
 					if (inScene)
@@ -1314,13 +1314,13 @@ void ndScene::BuildBodyArray()
 
 	dInt32 index = 0;
 	m_activeBodyArrayBuffer.SetCount(m_bodyList.GetCount());
-	for (ndBodyList::dNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
+	for (ndBodyList::ndNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
 		m_activeBodyArrayBuffer[index] = node->GetInfo();
 		index++;
 	}
 
-	dAtomic<dUnsigned32> activeBodyCount(0);
+	ndAtomic<dUnsigned32> activeBodyCount(0);
 	m_activeBodyArray.SetCount(m_bodyList.GetCount());
 	SubmitJobs<ndBuildBodyArray>(&activeBodyCount);
 	m_activeBodyArray.SetCount(activeBodyCount);
@@ -1360,7 +1360,7 @@ void ndScene::UpdateAabb()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
@@ -1433,7 +1433,7 @@ void ndScene::FindCollidingPairs()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
@@ -1456,7 +1456,7 @@ void ndScene::FindCollidingPairs()
 		{
 			D_TRACKTIME();
 
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->m_sceneBodyArray;
+			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->m_sceneBodyArray;
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 bodyCount = bodyArray.GetCount();
 			const dInt32 threadCount = m_owner->GetThreadCount();
@@ -1479,7 +1479,7 @@ void ndScene::FindCollidingPairs()
 		{
 			D_TRACKTIME();
 
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->m_sceneBodyArray;
+			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->m_sceneBodyArray;
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 bodyCount = bodyArray.GetCount();
 			const dInt32 threadCount = m_owner->GetThreadCount();
@@ -1532,7 +1532,7 @@ void ndScene::UpdateTransform()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
@@ -1551,7 +1551,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 {
 	const dUnsigned32 lru = m_lru - D_CONTACT_DELAY_FRAMES;
 
-	dVector deltaTime(m_timestep);
+	ndVector deltaTime(m_timestep);
 	ndBodyKinematic* const body0 = contact->GetBody0();
 	ndBodyKinematic* const body1 = contact->GetBody1();
 
@@ -1567,23 +1567,23 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 		else
 		{
 			contact->SetActive(false);
-			contact->m_positAcc = dVector::m_zero;
-			contact->m_rotationAcc = dQuaternion();
+			contact->m_positAcc = ndVector::m_zero;
+			contact->m_rotationAcc = ndQuaternion();
 
 			dFloat32 distance = contact->m_separationDistance;
 			if (distance >= D_NARROW_PHASE_DIST)
 			{
-				const dVector veloc0(body0->GetVelocity());
-				const dVector veloc1(body1->GetVelocity());
+				const ndVector veloc0(body0->GetVelocity());
+				const ndVector veloc1(body1->GetVelocity());
 				
-				const dVector veloc(veloc1 - veloc0);
-				const dVector omega0(body0->GetOmega());
-				const dVector omega1(body1->GetOmega());
+				const ndVector veloc(veloc1 - veloc0);
+				const ndVector omega0(body0->GetOmega());
+				const ndVector omega1(body1->GetOmega());
 				const ndShapeInstance* const collision0 = &body0->GetCollisionShape();
 				const ndShapeInstance* const collision1 = &body1->GetCollisionShape();
-				const dVector scale(dFloat32(1.0f), dFloat32(3.5f) * collision0->GetBoxMaxRadius(), dFloat32(3.5f) * collision1->GetBoxMaxRadius(), dFloat32(0.0f));
-				const dVector velocMag2(veloc.DotProduct(veloc).GetScalar(), omega0.DotProduct(omega0).GetScalar(), omega1.DotProduct(omega1).GetScalar(), dFloat32(0.0f));
-				const dVector velocMag(velocMag2.GetMax(dVector::m_epsilon).InvSqrt() * velocMag2 * scale);
+				const ndVector scale(dFloat32(1.0f), dFloat32(3.5f) * collision0->GetBoxMaxRadius(), dFloat32(3.5f) * collision1->GetBoxMaxRadius(), dFloat32(0.0f));
+				const ndVector velocMag2(veloc.DotProduct(veloc).GetScalar(), omega0.DotProduct(omega0).GetScalar(), omega1.DotProduct(omega1).GetScalar(), dFloat32(0.0f));
+				const ndVector velocMag(velocMag2.GetMax(ndVector::m_epsilon).InvSqrt() * velocMag2 * scale);
 				const dFloat32 speed = velocMag.AddHorizontal().GetScalar() + dFloat32(0.5f);
 				
 				distance -= speed * m_timestep;
@@ -1645,7 +1645,7 @@ void ndScene::BuildContactArray()
 	D_TRACKTIME();
 	dInt32 count = 0;
 	m_activeConstraintArray.SetCount(m_contactList.GetCount());
-	for (ndContactList::dNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
+	for (ndContactList::ndNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
 	{
 		ndContact* const contact = &node->GetInfo();
 		dAssert(contact->m_isAttached);
@@ -1683,10 +1683,10 @@ void ndScene::DeleteDeadContact()
 	m_activeConstraintArray.SetCount(activeCount);
 }
 
-bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const stackDistance, dInt32 stack, const dFastRay& ray, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const
+bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const stackDistance, dInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const
 {
-	dVector boxP0;
-	dVector boxP1;
+	ndVector boxP0;
+	ndVector boxP1;
 
 	dAssert(globalOrigin.TestOrthogonal());
 	convexShape.CalculateAabb(globalOrigin, boxP0, boxP1);
@@ -1746,8 +1746,8 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 				{
 					const ndSceneNode* const left = me->GetLeft();
 					dAssert(left);
-					const dVector minBox(left->m_minBox - boxP1);
-					const dVector maxBox(left->m_maxBox - boxP0);
+					const ndVector minBox(left->m_minBox - boxP1);
+					const ndVector maxBox(left->m_maxBox - boxP0);
 					dFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
 					if (dist1 < callback.m_param)
 					{
@@ -1768,8 +1768,8 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 					//const dgBroadPhaseNode* const right = node->m_right;
 					const ndSceneNode* const right = me->GetRight();
 					dAssert(right);
-					const dVector minBox(right->m_minBox - boxP1);
-					const dVector maxBox = right->m_maxBox - boxP0;
+					const ndVector minBox(right->m_minBox - boxP1);
+					const ndVector maxBox = right->m_maxBox - boxP0;
 					dFloat32 dist1 = ray.BoxIntersect(minBox, maxBox);
 					if (dist1 < callback.m_param)
 					{
@@ -1791,7 +1791,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 	return callback.m_contacts.GetCount() > 0;
 }
 
-bool ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const stackDistance, dInt32 stack, const dFastRay& ray) const
+bool ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const stackDistance, dInt32 stack, const ndFastRay& ray) const
 {
 	bool state = false;
 	while (stack)
@@ -1909,7 +1909,7 @@ void ndScene::Cleanup()
 		RemoveBody(body);
 		delete body;
 	}
-	dFreeListAlloc::Flush();
+	ndFreeListAlloc::Flush();
 	m_sceneBodyArray.Resize(1024);
 	m_activeBodyArray.Resize(1024);
 	m_activeConstraintArray.Resize(1024);
@@ -2007,23 +2007,23 @@ void ndScene::RemoveNode(ndSceneNode* const node)
 	}
 }
 
-bool ndScene::RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, const dVector& globalDest) const
+bool ndScene::RayCast(ndRayCastNotify& callback, const ndVector& globalOrigin, const ndVector& globalDest) const
 {
-	const dVector p0(globalOrigin & dVector::m_triplexMask);
-	const dVector p1(globalDest & dVector::m_triplexMask);
+	const ndVector p0(globalOrigin & ndVector::m_triplexMask);
+	const ndVector p1(globalDest & ndVector::m_triplexMask);
 
 	bool state = false;
 	callback.m_param = dFloat32(1.2f);
 	if (m_rootNode)
 	{
-		const dVector segment(p1 - p0);
+		const ndVector segment(p1 - p0);
 		dFloat32 dist2 = segment.DotProduct(segment).GetScalar();
 		if (dist2 > dFloat32(1.0e-8f))
 		{
 			dFloat32 distance[D_SCENE_MAX_STACK_DEPTH];
 			const ndSceneNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
 
-			dFastRay ray(p0, p1);
+			ndFastRay ray(p0, p1);
 
 			stackPool[0] = m_rootNode;
 			distance[0] = ray.BoxIntersect(m_rootNode->m_minBox, m_rootNode->m_maxBox);
@@ -2033,25 +2033,25 @@ bool ndScene::RayCast(ndRayCastNotify& callback, const dVector& globalOrigin, co
 	return state;
 }
 
-bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const dMatrix& globalOrigin, const dVector& globalDest) const
+bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const
 {
 	bool state = false;
 	callback.m_param = dFloat32(1.2f);
 	if (m_rootNode)
 	{
-		dVector boxP0;
-		dVector boxP1;
+		ndVector boxP0;
+		ndVector boxP1;
 		dAssert(globalOrigin.TestOrthogonal());
 		convexShape.CalculateAabb(globalOrigin, boxP0, boxP1);
 
 		dFloat32 distance[D_SCENE_MAX_STACK_DEPTH];
 		const ndSceneNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
 
-		const dVector velocB(dVector::m_zero);
-		const dVector velocA((globalDest - globalOrigin.m_posit) & dVector::m_triplexMask);
-		const dVector minBox(m_rootNode->m_minBox - boxP1);
-		const dVector maxBox(m_rootNode->m_maxBox - boxP0);
-		dFastRay ray(dVector::m_zero, velocA);
+		const ndVector velocB(ndVector::m_zero);
+		const ndVector velocA((globalDest - globalOrigin.m_posit) & ndVector::m_triplexMask);
+		const ndVector minBox(m_rootNode->m_minBox - boxP1);
+		const ndVector maxBox(m_rootNode->m_maxBox - boxP0);
+		ndFastRay ray(ndVector::m_zero, velocA);
 
 		stackPool[0] = m_rootNode;
 		distance[0] = ray.BoxIntersect(minBox, maxBox);

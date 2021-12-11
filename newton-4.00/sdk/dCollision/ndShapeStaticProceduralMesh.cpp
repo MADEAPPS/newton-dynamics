@@ -29,20 +29,20 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeStaticProceduralMesh)
 
 template<class T>
-class dTempArray : public dArray<T>
+class dTempArray : public ndArray<T>
 {
 	public:
 	dTempArray(dInt32 maxSize, T* const buffer) 
-		:dArray<T>()
+		:ndArray<T>()
 		,m_buffer(buffer)
 	{
-		dArray<T>::m_array = buffer;
-		dArray<T>::m_capacity = maxSize;
+		ndArray<T>::m_array = buffer;
+		ndArray<T>::m_capacity = maxSize;
 	}
 
 	~dTempArray()
 	{
-		dArray<T>::m_array = nullptr;
+		ndArray<T>::m_array = nullptr;
 	}
 
 	T* m_buffer;
@@ -50,8 +50,8 @@ class dTempArray : public dArray<T>
 
 ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(dFloat32 sizex, dFloat32 sizey, dFloat32 sizez)
 	:ndShapeStaticMesh(m_staticProceduralMesh)
-	,m_minBox(dVector::m_negOne * dVector::m_half * dVector(sizex, sizey, sizez, dFloat32(0.0f)))
-	,m_maxBox(dVector::m_half * dVector(sizex, sizey, sizez, dFloat32(0.0f)))
+	,m_minBox(ndVector::m_negOne * ndVector::m_half * ndVector(sizex, sizey, sizez, dFloat32(0.0f)))
+	,m_maxBox(ndVector::m_half * ndVector(sizex, sizey, sizez, dFloat32(0.0f)))
 	,m_localData()
 	,m_maxFaceCount(64)
 	,m_maxVertexCount(256)
@@ -59,7 +59,7 @@ ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(dFloat32 sizex, dFloat3
 	CalculateLocalObb();
 }
 
-ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const dLoadSaveBase::dLoadDescriptor& desc)
+ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const ndLoadSaveBase::dLoadDescriptor& desc)
 	:ndShapeStaticMesh(m_staticProceduralMesh)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -81,12 +81,12 @@ void ndShapeStaticProceduralMesh::SetMaxVertexAndFaces(dInt32 maxVertex, dInt32 
 	m_maxVertexCount = maxVertex;
 }
 
-void ndShapeStaticProceduralMesh::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndShapeStaticProceduralMesh::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeStaticMesh::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndShapeStaticMesh::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "minBox", m_minBox);
 	xmlSaveParam(childNode, "maxBox", m_maxBox);
@@ -103,18 +103,18 @@ ndShapeInfo ndShapeStaticProceduralMesh::GetShapeInfo() const
 
 void ndShapeStaticProceduralMesh::CalculateLocalObb()
 {
-	m_boxSize = (m_maxBox - m_minBox) * dVector::m_half;
-	m_boxOrigin = (m_maxBox + m_minBox) * dVector::m_half;
+	m_boxSize = (m_maxBox - m_minBox) * ndVector::m_half;
+	m_boxOrigin = (m_maxBox + m_minBox) * ndVector::m_half;
 }
 
 void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 {
-	dVector* const vertexBuffer = dAlloca(dVector, m_maxVertexCount);
+	ndVector* const vertexBuffer = dAlloca(ndVector, m_maxVertexCount);
 	dInt32* const faceBuffer = dAlloca(dInt32, m_maxFaceCount);
 	dInt32* const materialBuffer = dAlloca(dInt32, m_maxFaceCount);
 	dInt32* const indexBuffer = dAlloca(dInt32, m_maxFaceCount * 4);
 
-	dTempArray<dVector> vertexList(m_maxVertexCount, vertexBuffer);
+	dTempArray<ndVector> vertexList(m_maxVertexCount, vertexBuffer);
 	dTempArray<dInt32> faceList(m_maxFaceCount, faceBuffer);
 	dTempArray<dInt32> faceMaterialList(m_maxFaceCount, materialBuffer);
 	dTempArray<dInt32> indexList(m_maxFaceCount * 4, indexBuffer);
@@ -126,8 +126,8 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	}
 
 	std::thread::id threadId = std::this_thread::get_id();
-	dList<ndLocalThreadData>::dNode* localDataNode = nullptr;
-	for (dList<ndLocalThreadData>::dNode* node = m_localData.GetFirst(); node; node = node->GetNext())
+	ndList<ndLocalThreadData>::ndNode* localDataNode = nullptr;
+	for (ndList<ndLocalThreadData>::ndNode* node = m_localData.GetFirst(); node; node = node->GetNext())
 	{
 		if (node->GetInfo().m_threadId == threadId)
 		{
@@ -143,9 +143,9 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	}
 	
 	// scan the vertices's intersected by the box extend
-	dArray<dVector>& vertex = localDataNode->GetInfo().m_vertex;
+	ndArray<ndVector>& vertex = localDataNode->GetInfo().m_vertex;
 	vertex.SetCount(vertexList.GetCount() + faceList.GetCount());
-	memcpy(&vertex[0], &vertexList[0], vertexList.GetCount() * sizeof(dVector));
+	memcpy(&vertex[0], &vertexList[0], vertexList.GetCount() * sizeof(ndVector));
 	
 	ndEdgeMap edgeMap;
 	dInt32 index = 0;
@@ -157,13 +157,13 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	{
 		dInt32 i0 = indexList[faceStart + 0];
 		dInt32 i1 = indexList[faceStart + 1];
-		dVector area(dVector::m_zero);
-		dVector edge0(vertex[i1] - vertex[i0]);
+		ndVector area(ndVector::m_zero);
+		ndVector edge0(vertex[i1] - vertex[i0]);
 
 		for (dInt32 j = 2; j < faceList[i]; j++)
 		{
 			dInt32 i2 = indexList[faceStart + j];
-			const dVector edge1(vertex[i2] - vertex[i0]);
+			const ndVector edge1(vertex[i2] - vertex[i0]);
 			area += edge0.CrossProduct(edge1);
 			edge0 = edge1;
 		}
@@ -199,12 +199,12 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	ndEdgeMap::Iterator iter(edgeMap);
 	for (iter.Begin(); iter; iter++)
 	{
-		ndEdgeMap::dNode* const edgeNode = iter.GetNode();
+		ndEdgeMap::ndNode* const edgeNode = iter.GetNode();
 		if (edgeNode->GetInfo() != -1)
 		{
 			ndEdge twin(iter.GetKey());
 			dSwap(twin.m_i0, twin.m_i1);
-			ndEdgeMap::dNode* const twinNode = edgeMap.Find(twin);
+			ndEdgeMap::ndNode* const twinNode = edgeMap.Find(twin);
 			if (twinNode)
 			{
 				dInt32 i0 = edgeNode->GetInfo();
@@ -219,18 +219,18 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	dInt32 faceCount0 = 0;
 	dInt32 faceIndexCount0 = 0;
 	dInt32 faceIndexCount1 = 0;
-	dInt32 stride = sizeof(dVector) / sizeof(dFloat32);
+	dInt32 stride = sizeof(ndVector) / sizeof(dFloat32);
 	
 	dInt32* const address = data->m_meshData.m_globalFaceIndexStart;
 	dFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
 	if (data->m_doContinuesCollisionTest) 
 	{
 		dAssert(0);
-		//dFastRay ray(dVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
+		//dFastRay ray(ndVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
 		//for (dInt32 i = 0; i < faceCount; i++) 
 		//{
 		//	const dInt32* const indexArray = &indices[faceIndexCount1];
-		//	const dVector& faceNormal = vertex[indexArray[4]];
+		//	const ndVector& faceNormal = vertex[indexArray[4]];
 		//	dFloat32 dist = data->PolygonBoxRayDistance(faceNormal, 3, indexArray, stride, &vertex[0].m_x, ray);
 		//	if (dist < dFloat32(1.0f)) 
 		//	{
@@ -249,7 +249,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 		{
 			const dInt32 vertexCount = faceIndexCount[i];
 			const dInt32* const indexArray = &indices[faceIndexCount1];
-			const dVector& faceNormal = vertex[indexArray[vertexCount + 1]];
+			const ndVector& faceNormal = vertex[indexArray[vertexCount + 1]];
 			dFloat32 dist = data->PolygonBoxDistance(faceNormal, vertexCount, indexArray, stride, &vertex[0].m_x);
 			if (dist > dFloat32(0.0f)) 
 			{
@@ -272,7 +272,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 		data->m_faceIndexStart = address;
 		data->m_hitDistance = hitDistance;
 		data->m_faceIndexCount = faceIndexCount;
-		data->m_vertexStrideInBytes = sizeof(dVector);
+		data->m_vertexStrideInBytes = sizeof(ndVector);
 	}
 }
 

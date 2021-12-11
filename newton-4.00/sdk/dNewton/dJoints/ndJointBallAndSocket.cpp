@@ -15,7 +15,7 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointBallAndSocket)
 
-ndJointBallAndSocket::ndJointBallAndSocket(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointBallAndSocket::ndJointBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 	,m_maxConeAngle(dFloat32 (1.0e10f))
 	,m_coneFriction(dFloat32(0.0))
@@ -27,8 +27,8 @@ ndJointBallAndSocket::ndJointBallAndSocket(const dMatrix& pinAndPivotFrame, ndBo
 {
 }
 
-ndJointBallAndSocket::ndJointBallAndSocket(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+ndJointBallAndSocket::ndJointBallAndSocket(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_maxConeAngle(dFloat32(1.0e10f))
 	,m_coneFriction(dFloat32(0.0))
 	,m_minTwistAngle(-dFloat32(1.0e10f))
@@ -52,12 +52,12 @@ ndJointBallAndSocket::~ndJointBallAndSocket()
 {
 }
 
-void ndJointBallAndSocket::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndJointBallAndSocket::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "maxConeAngle", m_maxConeAngle);
 	xmlSaveParam(childNode, "coneFriction", m_coneFriction);
@@ -105,31 +105,31 @@ void ndJointBallAndSocket::SetConeLimit(dFloat32 maxConeAngle)
 
 void ndJointBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) const
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	debugCallback.DrawFrame(matrix0);
 	debugCallback.DrawFrame(matrix1);
 
 	const dInt32 subdiv = 8;
-	const dVector& coneDir0 = matrix0.m_front;
-	const dVector& coneDir1 = matrix1.m_front;
+	const ndVector& coneDir0 = matrix0.m_front;
+	const ndVector& coneDir1 = matrix1.m_front;
 	dFloat32 cosAngleCos = coneDir0.DotProduct(coneDir1).GetScalar();
-	dMatrix coneRotation(dGetIdentityMatrix());
+	ndMatrix coneRotation(dGetIdentityMatrix());
 	if (cosAngleCos < dFloat32(0.9999f))
 	{
-		dVector lateralDir(coneDir1.CrossProduct(coneDir0));
+		ndVector lateralDir(coneDir1.CrossProduct(coneDir0));
 		dFloat32 mag2 = lateralDir.DotProduct(lateralDir).GetScalar();
 		if (mag2 > dFloat32 (1.0e-4f)) 
 		{
 			lateralDir = lateralDir.Scale(dFloat32 (1.0f) / dSqrt(mag2));
-			coneRotation = dMatrix(dQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat32(-1.0f), dFloat32(1.0f)))), matrix1.m_posit);
+			coneRotation = ndMatrix(ndQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat32(-1.0f), dFloat32(1.0f)))), matrix1.m_posit);
 		}
 		else 
 		{
 			lateralDir = matrix0.m_up.Scale(-dFloat32 (1.0f));
-			coneRotation = dMatrix(dQuaternion(matrix0.m_up, dFloat32 (180.0f) * dDegreeToRad), matrix1.m_posit);
+			coneRotation = ndMatrix(ndQuaternion(matrix0.m_up, dFloat32 (180.0f) * dDegreeToRad), matrix1.m_posit);
 		}
 	}
 	else if (cosAngleCos < -dFloat32 (0.9999f)) 
@@ -139,21 +139,21 @@ void ndJointBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) 
 	}
 	
 	const dFloat32 radius = debugCallback.m_debugScale;
-	dVector arch[subdiv + 1];
+	ndVector arch[subdiv + 1];
 	
 	// show twist angle limits
 	dFloat32 deltaTwist = m_maxTwistAngle - m_minTwistAngle;
 	if ((deltaTwist > dFloat32(1.0e-3f)) && (deltaTwist < dFloat32 (2.0f) * dPi))
 	{ 
-		dMatrix pitchMatrix(matrix1 * coneRotation);
+		ndMatrix pitchMatrix(matrix1 * coneRotation);
 		pitchMatrix.m_posit = matrix1.m_posit;
 	
-		dVector point(dFloat32(0.0f), dFloat32(radius), dFloat32(0.0f), dFloat32(0.0f));
+		ndVector point(dFloat32(0.0f), dFloat32(radius), dFloat32(0.0f), dFloat32(0.0f));
 	
 		dFloat32 angleStep = dMin(m_maxTwistAngle - m_minTwistAngle, dFloat32(2.0f * dPi)) / subdiv;
 		dFloat32 angle0 = m_minTwistAngle;
 	
-		dVector color(dFloat32 (0.4f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+		ndVector color(dFloat32 (0.4f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
 		for (dInt32 i = 0; i <= subdiv; i++) 
 		{
 			arch[i] = pitchMatrix.TransformVector(dPitchMatrix(angle0).RotateVector(point));
@@ -170,15 +170,15 @@ void ndJointBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) 
 	// show cone angle limits
 	if ((m_maxConeAngle > dFloat32 (0.0f)) && (m_maxConeAngle < D_BALL_AND_SOCKED_MAX_ANGLE)) 
 	{
-		dVector color(dFloat32(0.3f), dFloat32(0.8f), dFloat32(0.0f), dFloat32(0.0f));
-		dVector point(radius * dCos(m_maxConeAngle), radius * dSin(m_maxConeAngle), dFloat32 (0.0f), dFloat32(0.0f));
+		ndVector color(dFloat32(0.3f), dFloat32(0.8f), dFloat32(0.0f), dFloat32(0.0f));
+		ndVector point(radius * dCos(m_maxConeAngle), radius * dSin(m_maxConeAngle), dFloat32 (0.0f), dFloat32(0.0f));
 		dFloat32 angleStep = dPi * dFloat32(2.0f) / subdiv;
 	
 		dFloat32 angle0 = dFloat32 (0.0f);
 		for (dInt32 i = 0; i <= subdiv; i++) 
 		{
-			dVector conePoint(dPitchMatrix(angle0).RotateVector(point));
-			dVector p(matrix1.TransformVector(conePoint));
+			ndVector conePoint(dPitchMatrix(angle0).RotateVector(point));
+			ndVector p(matrix1.TransformVector(conePoint));
 			arch[i] = p;
 			debugCallback.DrawLine(matrix1.m_posit, p, color);
 			angle0 += angleStep;
@@ -191,7 +191,7 @@ void ndJointBallAndSocket::DebugJoint(ndConstraintDebugCallback& debugCallback) 
 	}
 }
 
-void ndJointBallAndSocket::SubmitAngularAxisCartesianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointBallAndSocket::SubmitAngularAxisCartesianApproximation(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
 	if (coneAngle > m_maxConeAngle)
@@ -208,7 +208,7 @@ void ndJointBallAndSocket::SubmitAngularAxisCartesianApproximation(const dMatrix
 	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
 
-void ndJointBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat32 angle, ndConstraintDescritor& desc)
+void ndJointBallAndSocket::SubmitTwistAngle(const ndVector& pin, dFloat32 angle, ndConstraintDescritor& desc)
 {
 	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * dDegreeToRad)) 
 	{
@@ -243,14 +243,14 @@ void ndJointBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat32 angle, 
 	}
 }
 
-void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointBallAndSocket::SubmitAngularAxis(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
-	dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+	ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
 	lateralDir = lateralDir.Normalize();
 	const dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
-	const dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
-	const dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+	const ndMatrix coneRotation(ndQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+	const ndVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
 	if (coneAngle > m_maxConeAngle)
 	{ 
 		AddAngularRowJacobian(desc, lateralDir, dFloat32 (0.0f));
@@ -271,7 +271,7 @@ void ndJointBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 		SetMassSpringDamperAcceleration(desc, m_coneFrictionRegularizer, dFloat32(0.0f), m_coneFriction);
 	}
 
-	const dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+	const ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 	const dFloat32 pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 	SubmitTwistAngle(matrix0.m_front, pitchAngle, desc);
 }
@@ -281,8 +281,8 @@ void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 //if (m_body0->GetId() != 5)
 //return ;
 
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
@@ -318,7 +318,7 @@ void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
 	//}
 }
 
-void ndJointBallAndSocket::SubmitConeAngleOnlyRows(const dMatrix& matrix0, const dMatrix& matrix1, ndConstraintDescritor& desc)
+void ndJointBallAndSocket::SubmitConeAngleOnlyRows(const ndMatrix& matrix0, const ndMatrix& matrix1, ndConstraintDescritor& desc)
 {
 	const dFloat32 cosAngleCos = matrix1.m_front.DotProduct(matrix0.m_front).GetScalar();
 	if (cosAngleCos >= dFloat32(0.998f))
@@ -330,18 +330,18 @@ void ndJointBallAndSocket::SubmitConeAngleOnlyRows(const dMatrix& matrix0, const
 	}
 	else
 	{
-		dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+		ndVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 		dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > 1.0e-6f);
 		lateralDir = lateralDir.Normalize();
 		const dFloat32 coneAngle = dAcos(dClamp(cosAngleCos, dFloat32(-1.0f), dFloat32(1.0f)));
 
-		const dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
-		const dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+		const ndMatrix coneRotation(ndQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+		const ndVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
 
-		const dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+		const ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 		const dFloat32 pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 		dTrace(("%f %f\n", pitchAngle * dRadToDegree, coneAngle * dRadToDegree));
-		dMatrix xxxxx0(dPitchMatrix(-pitchAngle) * matrix1 * coneRotation);
+		ndMatrix xxxxx0(dPitchMatrix(-pitchAngle) * matrix1 * coneRotation);
 
 		dAssert(desc.m_rowsCount < 6);
 		AddAngularRowJacobian(desc, matrix0.m_front, pitchAngle);

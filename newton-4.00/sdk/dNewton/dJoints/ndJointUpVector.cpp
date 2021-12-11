@@ -15,17 +15,17 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointUpVector)
 
-ndJointUpVector::ndJointUpVector(const dVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointUpVector::ndJointUpVector(const ndVector& normal, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(2, child, parent, dGetIdentityMatrix())
 {
-	dMatrix matrix(normal);
+	ndMatrix matrix(normal);
 	matrix.m_posit = child->GetMatrix().m_posit;
 
 	CalculateLocalMatrix (matrix, m_localMatrix0, m_localMatrix1);
 }
 
-ndJointUpVector::ndJointUpVector(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+ndJointUpVector::ndJointUpVector(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 {
 	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 }
@@ -35,21 +35,21 @@ ndJointUpVector::~ndJointUpVector()
 }
 
 // bu animating the orientation of the pin vector the application can change the orientation of the picked object
-void ndJointUpVector::SetPinDir (const dVector& pin)
+void ndJointUpVector::SetPinDir (const ndVector& pin)
 {
-	m_localMatrix1 = dMatrix(pin);
+	m_localMatrix1 = ndMatrix(pin);
 }
 
 void ndJointUpVector::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix (matrix0, matrix1);
   
 	// if the body has rotated by some amount, the there will be a plane of rotation
-	dVector lateralDir (matrix0.m_front.CrossProduct(matrix1.m_front));
+	ndVector lateralDir (matrix0.m_front.CrossProduct(matrix1.m_front));
 	dAssert(lateralDir.m_w == dFloat32(0.0f));
 	dFloat32 mag = lateralDir.DotProduct(lateralDir).GetScalar();
 	if (mag > 1.0e-6f) 
@@ -65,7 +65,7 @@ void ndJointUpVector::JacobianDerivative(ndConstraintDescritor& desc)
 
 		// in theory only one correction is needed, but this produces instability as the body may move sideway.
 		// a lateral correction prevent this from happening.
-		dVector frontDir (lateralDir.CrossProduct(matrix1.m_front));
+		ndVector frontDir (lateralDir.CrossProduct(matrix1.m_front));
 		//NewtonUserJointAddAngularRow (m_joint, 0.0f, &frontDir[0]);
 		AddAngularRowJacobian(desc, frontDir, dFloat32 (0.0f));
  	} 
@@ -79,11 +79,11 @@ void ndJointUpVector::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointUpVector::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndJointUpVector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 }

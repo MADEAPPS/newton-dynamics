@@ -28,46 +28,46 @@
 #include "ndClassAlloc.h"
 
 D_MSV_NEWTON_ALIGN_32
-class dRay: public dClassAlloc
+class ndRay: public ndClassAlloc
 {
 	public:
-	dRay(const dVector& l0, const dVector& l1)
-		:dClassAlloc()
-		,m_p0(l0 & dVector::m_triplexMask)
-		,m_p1(l1 & dVector::m_triplexMask)
+	ndRay(const ndVector& l0, const ndVector& l1)
+		:ndClassAlloc()
+		,m_p0(l0 & ndVector::m_triplexMask)
+		,m_p1(l1 & ndVector::m_triplexMask)
 	{
 	}
 
-	const dVector m_p0;
-	const dVector m_p1;
+	const ndVector m_p0;
+	const ndVector m_p1;
 } D_GCC_NEWTON_ALIGN_32;
 
 
 D_MSV_NEWTON_ALIGN_32
-class dFastRay: public dRay
+class ndFastRay: public ndRay
 {
 	public:
-	dFastRay(const dVector& l0, const dVector& l1);
+	ndFastRay(const ndVector& l0, const ndVector& l1);
 
-	dInt32 BoxTest(const dVector& minBox, const dVector& maxBox) const;
-	dFloat32 BoxIntersect(const dVector& minBox, const dVector& maxBox) const;
+	dInt32 BoxTest(const ndVector& minBox, const ndVector& maxBox) const;
+	dFloat32 BoxIntersect(const ndVector& minBox, const ndVector& maxBox) const;
 
-	dRay PointDistance(const dVector& point) const;
-	D_CORE_API dRay RayDistance(const dVector& ray_p0, const dVector& ray_p1) const;
-	D_CORE_API dFloat32 PolygonIntersect(const dVector& normal, dFloat32 maxT, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount) const;
+	ndRay PointDistance(const ndVector& point) const;
+	D_CORE_API ndRay RayDistance(const ndVector& ray_p0, const ndVector& ray_p1) const;
+	D_CORE_API dFloat32 PolygonIntersect(const ndVector& normal, dFloat32 maxT, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount) const;
 
-	//const dVector m_p0;
-	//const dVector m_p1;
-	const dVector m_diff;
-	dVector m_dpInv;
-	dVector m_minT;
-	dVector m_maxT;
-	dVector m_unitDir;
-	dVector m_isParallel;
+	//const ndVector m_p0;
+	//const ndVector m_p1;
+	const ndVector m_diff;
+	ndVector m_dpInv;
+	ndVector m_minT;
+	ndVector m_maxT;
+	ndVector m_unitDir;
+	ndVector m_isParallel;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-inline dFastRay::dFastRay(const dVector& l0, const dVector& l1)
-	:dRay(l0, l1)
+inline ndFastRay::ndFastRay(const ndVector& l0, const ndVector& l1)
+	:ndRay(l0, l1)
 	,m_diff(m_p1 - m_p0)
 	,m_minT(dFloat32(0.0f))
 	,m_maxT(dFloat32(1.0f))
@@ -77,33 +77,33 @@ inline dFastRay::dFastRay(const dVector& l0, const dVector& l1)
 	dAssert(m_diff.m_w == dFloat32(0.0f));
 
 	dAssert(m_diff.DotProduct(m_diff).GetScalar() > dFloat32(0.0f));
-	m_isParallel = (m_diff.Abs() < dVector(1.0e-8f));
-	m_dpInv = m_diff.Select(dVector(dFloat32(1.0e-20f)), m_isParallel).Reciproc() & dVector::m_triplexMask;
+	m_isParallel = (m_diff.Abs() < ndVector(1.0e-8f));
+	m_dpInv = m_diff.Select(ndVector(dFloat32(1.0e-20f)), m_isParallel).Reciproc() & ndVector::m_triplexMask;
 	m_unitDir = m_diff.Normalize();
 }
 
-inline dRay dFastRay::PointDistance(const dVector& point) const
+inline ndRay ndFastRay::PointDistance(const ndVector& point) const
 {
 	//dBigVector dp(ray_p1 - ray_p0);
 	//dAssert(dp.m_w == dFloat32(0.0f));
 	dFloat32 t = dClamp(m_diff.DotProduct(point - m_p0).GetScalar() / m_diff.DotProduct(m_diff).GetScalar(), dFloat32(0.0f), dFloat32(1.0f));
-	return dRay (m_p0 + m_diff.Scale(t), point);
+	return ndRay (m_p0 + m_diff.Scale(t), point);
 }
 
-inline dInt32 dFastRay::BoxTest(const dVector& minBox, const dVector& maxBox) const
+inline dInt32 ndFastRay::BoxTest(const ndVector& minBox, const ndVector& maxBox) const
 {
 #if 1
-	dVector test(((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
+	ndVector test(((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
 	if (test.GetSignMask() & 0x07) 
 	{
 		return 0;
 	}
 
-	dVector tt0(m_dpInv * (minBox - m_p0));
-	dVector tt1(m_dpInv * (maxBox - m_p0));
+	ndVector tt0(m_dpInv * (minBox - m_p0));
+	ndVector tt1(m_dpInv * (maxBox - m_p0));
 
-	dVector t0(m_minT.GetMax(tt0.GetMin(tt1)));
-	dVector t1(m_maxT.GetMin(tt0.GetMax(tt1)));
+	ndVector t0(m_minT.GetMax(tt0.GetMin(tt1)));
+	ndVector t1(m_maxT.GetMin(tt0.GetMax(tt1)));
 	t0 = t0.GetMax(t0.ShiftTripleRight());
 	t1 = t1.GetMin(t1.ShiftTripleRight());
 	t0 = t0.GetMax(t0.ShiftTripleRight());
@@ -151,23 +151,23 @@ inline dInt32 dFastRay::BoxTest(const dVector& minBox, const dVector& maxBox) co
 #endif
 }
 
-inline dFloat32 dFastRay::BoxIntersect(const dVector& minBox, const dVector& maxBox) const
+inline dFloat32 ndFastRay::BoxIntersect(const ndVector& minBox, const ndVector& maxBox) const
 {
-	dVector test(((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
+	ndVector test(((m_p0 <= minBox) | (m_p0 >= maxBox)) & m_isParallel);
 	if (test.GetSignMask() & 0x07)
 	{
 		return dFloat32(1.2f);
 	}
-	dVector tt0(m_dpInv * (minBox - m_p0));
-	dVector tt1(m_dpInv * (maxBox - m_p0));
-	dVector t0(m_minT.GetMax(tt0.GetMin(tt1)));
-	dVector t1(m_maxT.GetMin(tt0.GetMax(tt1)));
+	ndVector tt0(m_dpInv * (minBox - m_p0));
+	ndVector tt1(m_dpInv * (maxBox - m_p0));
+	ndVector t0(m_minT.GetMax(tt0.GetMin(tt1)));
+	ndVector t1(m_maxT.GetMin(tt0.GetMax(tt1)));
 	t0 = t0.GetMax(t0.ShiftTripleRight());
 	t1 = t1.GetMin(t1.ShiftTripleRight());
 	t0 = t0.GetMax(t0.ShiftTripleRight());
 	t1 = t1.GetMin(t1.ShiftTripleRight());
-	dVector mask(t0 < t1);
-	dVector maxDist(dFloat32(1.2f));
+	ndVector mask(t0 < t1);
+	ndVector maxDist(dFloat32(1.2f));
 	t0 = maxDist.Select(t0, mask);
 	dAssert((mask.GetSignMask() & 1) == (t0.m_x < dFloat32(1.0f)));
 	return t0.GetScalar();

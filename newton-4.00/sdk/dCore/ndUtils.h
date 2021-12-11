@@ -72,18 +72,6 @@ inline T dMax(T A, T B)
 	return (A > B) ? A : B; 
 }
 
-//template <class T>
-//inline T dMin(T A, T B, T C)
-//{
-//	return dMin(dMin (A, B), C);
-//}
-//
-//template <class T>
-//inline T dMax(T A, T B, T C)
-//{
-//	return dMax(dMax (A, B), C);
-//}
-
 template <class T>
 inline T dClamp(T val, T min, T max)
 {
@@ -170,7 +158,7 @@ template <class T>
 dInt32 dVertexListToIndexList(T* const vertexList, dInt32 strideInBytes, dInt32 compareCount, dInt32 vertexCount, dInt32* const indexListOut, T tolerance = dEpsilon)
 {
 	dInt32 stride = dInt32(strideInBytes / sizeof(T));
-	dStack<dFloat64> pool(vertexCount * stride);
+	ndStack<dFloat64> pool(vertexCount * stride);
 
 	dFloat64* const data = &pool[0];
 	for (dInt32 i = 0; i < vertexCount; i++)
@@ -198,7 +186,7 @@ dInt32 dVertexListToIndexList(T* const vertexList, dInt32 strideInBytes, dInt32 
 }
 
 /// Set cpu floating point exceptions, the original exception state is restored when the destructor is called.
-class dFloatExceptions
+class ndFloatExceptions
 {
 	public:
 	#ifdef _MSC_VER
@@ -207,8 +195,8 @@ class dFloatExceptions
 		#define D_FLOAT_EXECTIONS_MASK	0
 	#endif
 
-	dFloatExceptions(dUnsigned32 mask = D_FLOAT_EXECTIONS_MASK);
-	~dFloatExceptions();
+	ndFloatExceptions(dUnsigned32 mask = D_FLOAT_EXECTIONS_MASK);
+	~ndFloatExceptions();
 
 	private:
 	#if (defined(WIN32) || defined(_WIN32))
@@ -217,11 +205,11 @@ class dFloatExceptions
 };
 
 /// Set cpu floating point precision mode, the original mode is restored when the destructor is called.
-class dSetPrecisionDouble 
+class ndSetPrecisionDouble 
 {
 	public:
-	dSetPrecisionDouble();
-	~dSetPrecisionDouble();
+	ndSetPrecisionDouble();
+	~ndSetPrecisionDouble();
 	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
 	dInt32 m_mask; 
 	#endif

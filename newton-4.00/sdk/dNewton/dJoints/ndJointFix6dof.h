@@ -19,8 +19,8 @@ class ndJointFix6dof: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointFix6dof);
-	D_NEWTON_API ndJointFix6dof(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndJointFix6dof(const dMatrix& frameInGlbalSpace, ndBodyKinematic* const body0, ndBodyKinematic* const body1);
+	D_NEWTON_API ndJointFix6dof(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointFix6dof(const ndMatrix& frameInGlbalSpace, ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 	D_NEWTON_API virtual ~ndJointFix6dof();
 
 	D_NEWTON_API void SetAsSoftJoint(bool mode);
@@ -28,10 +28,10 @@ class ndJointFix6dof: public ndJointBilateralConstraint
 
 	private:
 	void JacobianDerivative(ndConstraintDescritor& desc);
-	void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	void SubmitAngularAxis(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
-	void SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
+	void SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+	void SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 
 	dFloat32 m_softness;
 	dFloat32 m_maxForce;

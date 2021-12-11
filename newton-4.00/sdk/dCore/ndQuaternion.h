@@ -26,76 +26,76 @@
 #include "ndTypes.h"
 #include "ndVector.h"
 
-class dMatrix;
+class ndMatrix;
 
-class dQuaternion: public dVector
+class ndQuaternion: public ndVector
 {
 	public:
-	dQuaternion(); 
-	dQuaternion(const dVector& quat);
-	dQuaternion(const dQuaternion& quat);
-	D_CORE_API dQuaternion (const dMatrix& matrix);
-	dQuaternion (dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3);
-	D_CORE_API dQuaternion (const dVector &unit_Axis, dFloat32 angle);
+	ndQuaternion(); 
+	ndQuaternion(const ndVector& quat);
+	ndQuaternion(const ndQuaternion& quat);
+	D_CORE_API ndQuaternion (const ndMatrix& matrix);
+	ndQuaternion (dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3);
+	D_CORE_API ndQuaternion (const ndVector &unit_Axis, dFloat32 angle);
 
-	dQuaternion Normalize() const;
-	dQuaternion Scale(dFloat32 scale) const;
-	dQuaternion Inverse () const; 
-	dQuaternion operator+ (const dQuaternion &B) const; 
-	dQuaternion operator- (const dQuaternion &B) const; 
+	ndQuaternion Normalize() const;
+	ndQuaternion Scale(dFloat32 scale) const;
+	ndQuaternion Inverse () const; 
+	ndQuaternion operator+ (const ndQuaternion &B) const; 
+	ndQuaternion operator- (const ndQuaternion &B) const; 
 
-	D_CORE_API dQuaternion operator* (const dQuaternion &B) const;
-	D_CORE_API dQuaternion Slerp(const dQuaternion &q1, dFloat32 t) const;
-	D_CORE_API dVector CalcAverageOmega(const dQuaternion &q1, dFloat32 invdt) const;
+	D_CORE_API ndQuaternion operator* (const ndQuaternion &B) const;
+	D_CORE_API ndQuaternion Slerp(const ndQuaternion &q1, dFloat32 t) const;
+	D_CORE_API ndVector CalcAverageOmega(const ndQuaternion &q1, dFloat32 invdt) const;
 
 };
 
-inline dQuaternion::dQuaternion()
-	:dVector(dVector::m_wOne)
+inline ndQuaternion::ndQuaternion()
+	:ndVector(ndVector::m_wOne)
 {
 }
 
-inline dQuaternion::dQuaternion(const dVector& quat)
-	:dVector(quat)
+inline ndQuaternion::ndQuaternion(const ndVector& quat)
+	:ndVector(quat)
 {
 }
 
-inline dQuaternion::dQuaternion(const dQuaternion& quat)
-	:dVector(quat)
+inline ndQuaternion::ndQuaternion(const ndQuaternion& quat)
+	:ndVector(quat)
 {
 }
 
-inline dQuaternion::dQuaternion(dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3)
-	:dVector(q0, q1, q2, q3)
+inline ndQuaternion::ndQuaternion(dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3)
+	:ndVector(q0, q1, q2, q3)
 {
 	*this = Normalize();
 }
 
-inline dQuaternion dQuaternion::Inverse () const 
+inline ndQuaternion ndQuaternion::Inverse () const 
 {
-	return dQuaternion (-m_x, -m_y, -m_z, m_w);
+	return ndQuaternion (-m_x, -m_y, -m_z, m_w);
 }
 
-inline dQuaternion dQuaternion::operator+ (const dQuaternion &q) const
+inline ndQuaternion ndQuaternion::operator+ (const ndQuaternion &q) const
 {
-	//return dQuaternion (m_x + q.m_x, m_y + q.m_y, m_z + q.m_z, m_w + q.m_w);
-	return dVector::operator+(q);
+	//return ndQuaternion (m_x + q.m_x, m_y + q.m_y, m_z + q.m_z, m_w + q.m_w);
+	return ndVector::operator+(q);
 }
 
-inline dQuaternion dQuaternion::operator- (const dQuaternion &q) const
+inline ndQuaternion ndQuaternion::operator- (const ndQuaternion &q) const
 {
-	//return dQuaternion (m_x - q.m_x, m_y - q.m_y, m_z - q.m_z, m_w - q.m_w);
-	return dVector::operator-(q);
+	//return ndQuaternion (m_x - q.m_x, m_y - q.m_y, m_z - q.m_z, m_w - q.m_w);
+	return ndVector::operator-(q);
 }
 
-inline dQuaternion dQuaternion::Normalize() const
+inline ndQuaternion ndQuaternion::Normalize() const
 {
-	return dVector::Normalize();
+	return ndVector::Normalize();
 }
 
-inline dQuaternion dQuaternion::Scale(dFloat32 scale) const
+inline ndQuaternion ndQuaternion::Scale(dFloat32 scale) const
 {
-	return dVector::Scale(scale);
+	return ndVector::Scale(scale);
 }
 
 #endif

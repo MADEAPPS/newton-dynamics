@@ -43,16 +43,16 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 
 	ndBasicPlayerCapsule(
 		ndDemoEntityManager* const scene, const ndDemoEntity* const modelEntity,
-		const dMatrix& localAxis, const dMatrix& location, 
+		const ndMatrix& localAxis, const ndMatrix& location, 
 		dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight, bool isPlayer = false);
 
 	~ndBasicPlayerCapsule();
 
-	ndBasicPlayerCapsule(const dLoadSaveBase::dLoadDescriptor& desc);
-	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	ndBasicPlayerCapsule(const ndLoadSaveBase::dLoadDescriptor& desc);
+	virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	void ApplyInputs(dFloat32 timestep);
-	dFloat32 ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const;
+	dFloat32 ContactFrictionCallback(const ndVector& position, const ndVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const;
 
 	void SetCamera();
 	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, dFloat32 timestep);

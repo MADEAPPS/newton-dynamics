@@ -57,11 +57,11 @@ class ndMaterial
 };
 
 D_MSV_NEWTON_ALIGN_32
-class ndContactNotify: public dClassAlloc
+class ndContactNotify: public ndClassAlloc
 {
 	public:
 	ndContactNotify()
-		:dClassAlloc()
+		:ndClassAlloc()
 		,m_scene(nullptr)
 	{
 	}

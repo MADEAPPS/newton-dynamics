@@ -36,7 +36,7 @@ ndShapeCone::ndShapeCone(dFloat32 radius, dFloat32 height)
 	Init(radius, height);
 }
 
-ndShapeCone::ndShapeCone(const dLoadSaveBase::dLoadDescriptor& desc)
+ndShapeCone::ndShapeCone(const ndLoadSaveBase::dLoadDescriptor& desc)
 	: ndShapeConvex(m_cone)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -63,10 +63,10 @@ void ndShapeCone::Init(dFloat32 radius, dFloat32 height)
 	{
 		dFloat32 sinAngle = dSin(angle);
 		dFloat32 cosAngle = dCos(angle);
-		m_vertex[i] = dVector(-m_height, m_radius * cosAngle, m_radius * sinAngle, dFloat32(0.0f));
+		m_vertex[i] = ndVector(-m_height, m_radius * cosAngle, m_radius * sinAngle, dFloat32(0.0f));
 		angle += dFloat32 (2.0f) * dPi / D_CONE_SEGMENTS;
 	}
-	m_vertex[D_CONE_SEGMENTS] = dVector(m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+	m_vertex[D_CONE_SEGMENTS] = ndVector(m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
 
 	m_edgeCount = D_CONE_SEGMENTS * 4;
 	m_vertexCount = D_CONE_SEGMENTS + 1;
@@ -74,7 +74,7 @@ void ndShapeCone::Init(dFloat32 radius, dFloat32 height)
 
 	if (!m_shapeRefCount) 
 	{
-		dPolyhedra polyhedra;
+		ndPolyhedra polyhedra;
 		dInt32 wireframe[D_CONE_SEGMENTS];
 
 		dInt32 j = D_CONE_SEGMENTS - 1;
@@ -98,17 +98,17 @@ void ndShapeCone::Init(dFloat32 radius, dFloat32 height)
 		dAssert(SanityCheck(polyhedra));
 
 		dUnsigned64 i = 0;
-		dPolyhedra::Iterator iter(polyhedra);
+		ndPolyhedra::Iterator iter(polyhedra);
 		for (iter.Begin(); iter; iter++) 
 		{
-			dEdge* const edge = &(*iter);
+			ndEdge* const edge = &(*iter);
 			edge->m_userData = i;
 			i++;
 		}
 
 		for (iter.Begin(); iter; iter++) 
 		{
-			dEdge* const edge = &(*iter);
+			ndEdge* const edge = &(*iter);
 
 			ndConvexSimplexEdge* const ptr = &m_edgeArray[edge->m_userData];
 
@@ -119,9 +119,9 @@ void ndShapeCone::Init(dFloat32 radius, dFloat32 height)
 		}
 	}
 
-	m_profile[0] = dVector(m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
-	m_profile[1] = dVector(-m_height, m_radius, dFloat32(0.0f), dFloat32(0.0f));
-	m_profile[2] = dVector(-m_height, -m_radius, dFloat32(0.0f), dFloat32(0.0f));
+	m_profile[0] = ndVector(m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+	m_profile[1] = ndVector(-m_height, m_radius, dFloat32(0.0f), dFloat32(0.0f));
+	m_profile[2] = ndVector(-m_height, -m_radius, dFloat32(0.0f), dFloat32(0.0f));
 
 	m_shapeRefCount++;
 	ndShapeConvex::m_simplex = m_edgeArray;
@@ -138,11 +138,11 @@ ndShapeInfo ndShapeCone::GetShapeInfo() const
 	return info;
 }
 
-void ndShapeCone::DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const
+void ndShapeCone::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const
 {
 	#define NUMBER_OF_DEBUG_SEGMENTS  40
-	dVector pool[NUMBER_OF_DEBUG_SEGMENTS + 1];
-	dVector face[NUMBER_OF_DEBUG_SEGMENTS];
+	ndVector pool[NUMBER_OF_DEBUG_SEGMENTS + 1];
+	ndVector face[NUMBER_OF_DEBUG_SEGMENTS];
 	ndShapeDebugNotify::ndEdgeType edgeType[NUMBER_OF_DEBUG_SEGMENTS];
 	memset(edgeType, ndShapeDebugNotify::m_shared, sizeof(edgeType));
 
@@ -162,7 +162,7 @@ void ndShapeCone::DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCal
 	pool[NUMBER_OF_DEBUG_SEGMENTS].m_z = dFloat32(0.0f);
 	pool[NUMBER_OF_DEBUG_SEGMENTS].m_w = dFloat32(0.0f);
 
-	matrix.TransformTriplex(&pool[0].m_x, sizeof(dVector), &pool[0].m_x, sizeof(dVector), NUMBER_OF_DEBUG_SEGMENTS + 1);
+	matrix.TransformTriplex(&pool[0].m_x, sizeof(ndVector), &pool[0].m_x, sizeof(ndVector), NUMBER_OF_DEBUG_SEGMENTS + 1);
 	dInt32 j = NUMBER_OF_DEBUG_SEGMENTS - 1;
 	for (dInt32 i = 0; i < NUMBER_OF_DEBUG_SEGMENTS; i++) 
 	{
@@ -180,28 +180,28 @@ void ndShapeCone::DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCal
 	debugCallback.DrawPolygon(NUMBER_OF_DEBUG_SEGMENTS, face, edgeType);
 }
 
-dVector ndShapeCone::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const
+ndVector ndShapeCone::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
 	return point + dir.Scale(D_PENETRATION_TOL);
 }
 
-dVector ndShapeCone::SupportVertex(const dVector& dir, dInt32* const) const
+ndVector ndShapeCone::SupportVertex(const ndVector& dir, dInt32* const) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
 
 	if (dir.m_x < dFloat32(-0.9999f)) 
 	{
-		return dVector(-m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+		return ndVector(-m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
 	}
 	else if (dir.m_x > dFloat32(0.9999f)) 
 	{
-		return dVector(m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+		return ndVector(m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
 	}
 	
-	dVector dir_yz(dir);
+	ndVector dir_yz(dir);
 	dir_yz.m_x = dFloat32(0.0f);
 	//dFloat32 mag2 = dir_yz.DotProduct(dir_yz).GetScalar();
 	//dAssert(mag2 > dFloat32(0.0f));
@@ -209,8 +209,8 @@ dVector ndShapeCone::SupportVertex(const dVector& dir, dInt32* const) const
 	dAssert(dir_yz.DotProduct(dir_yz).GetScalar() > dFloat32(0.0f));
 	dir_yz = dir_yz.Normalize();
 
-	dVector p0(dir_yz.Scale(m_radius));
-	dVector p1(dVector::m_zero);
+	ndVector p0(dir_yz.Scale(m_radius));
+	ndVector p1(ndVector::m_zero);
 
 	p0.m_x = -m_height;
 	p1.m_x = m_height;
@@ -225,21 +225,21 @@ dVector ndShapeCone::SupportVertex(const dVector& dir, dInt32* const) const
 	return p0;
 }
 
-dVector ndShapeCone::SupportVertexSpecial(const dVector& dir, dFloat32, dInt32* const) const
+ndVector ndShapeCone::SupportVertexSpecial(const ndVector& dir, dFloat32, dInt32* const) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
 
 	if (dir.m_x < dFloat32(-0.9999f)) 
 	{
-		return dVector(-(m_height - D_PENETRATION_TOL), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+		return ndVector(-(m_height - D_PENETRATION_TOL), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
 	}
 	else if (dir.m_x > dFloat32(0.9999f)) 
 	{
-		return dVector(m_height - D_PENETRATION_TOL, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+		return ndVector(m_height - D_PENETRATION_TOL, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
 	}
 
-	dVector dir_yz(dir);
+	ndVector dir_yz(dir);
 	//dir_yz.m_x = dFloat32(0.0f);
 	//dFloat32 mag2 = dir_yz.DotProduct(dir_yz).GetScalar();
 	//dgAssert(mag2 > dFloat32(0.0f));
@@ -247,8 +247,8 @@ dVector ndShapeCone::SupportVertexSpecial(const dVector& dir, dFloat32, dInt32* 
 	dAssert(dir_yz.DotProduct(dir_yz).GetScalar() > dFloat32(0.0f));
 	dir_yz = dir_yz.Normalize();
 
-	dVector p0(dir_yz.Scale(m_radius - D_PENETRATION_TOL));
-	dVector p1(dVector::m_zero);
+	ndVector p0(dir_yz.Scale(m_radius - D_PENETRATION_TOL));
+	ndVector p1(ndVector::m_zero);
 
 	p0.m_x = -(m_height - D_PENETRATION_TOL);
 	p1.m_x = m_height - D_PENETRATION_TOL;
@@ -263,17 +263,17 @@ dVector ndShapeCone::SupportVertexSpecial(const dVector& dir, dFloat32, dInt32* 
 	return p0;
 }
 
-dFloat32 ndShapeCone::RayCast(ndRayCastNotify& callback, const dVector& r0, const dVector& r1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeCone::RayCast(ndRayCastNotify& callback, const ndVector& r0, const ndVector& r1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
 	return ndShapeConvex::RayCast(callback, r0, r1, maxT, body, contactOut);
 }
 
-dInt32 ndShapeCone::CalculatePlaneIntersection(const dVector& normal, const dVector& origin, dVector* const contactsOut) const
+dInt32 ndShapeCone::CalculatePlaneIntersection(const ndVector& normal, const ndVector& origin, ndVector* const contactsOut) const
 {
 	dInt32 count = 0;
 	if (normal.m_x > dFloat32(0.99f)) 
 	{
-		contactsOut[0] = dVector(m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+		contactsOut[0] = ndVector(m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
 		count = 1;
 	}
 	else if (normal.m_x < dFloat32(-0.995f)) 
@@ -281,7 +281,7 @@ dInt32 ndShapeCone::CalculatePlaneIntersection(const dVector& normal, const dVec
 		const dFloat32 inclination = dFloat32(0.9998f);
 		if (normal.m_x < -inclination) 
 		{
-			dMatrix matrix(normal);
+			ndMatrix matrix(normal);
 			matrix.m_posit.m_x = origin.m_x;
 			count = BuildCylinderCapPoly(m_radius, matrix, contactsOut);
 			//count = RectifyConvexSlice(n, normal, contactsOut);
@@ -292,8 +292,8 @@ dInt32 ndShapeCone::CalculatePlaneIntersection(const dVector& normal, const dVec
 			dFloat32 sinAng = normal.m_z * magInv;
 
 			dAssert(dAbs(normal.m_z * cosAng - normal.m_y * sinAng) < dFloat32(1.0e-4f));
-			dVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, dFloat32(0.0f), dFloat32(0.0f));
-			dVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, dFloat32(0.0f));
+			ndVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, dFloat32(0.0f), dFloat32(0.0f));
+			ndVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, dFloat32(0.0f));
 
 			count = ndShapeConvex::CalculatePlaneIntersection(normal1, origin1, contactsOut);
 			if (count > 6) 
@@ -331,19 +331,19 @@ dInt32 ndShapeCone::CalculatePlaneIntersection(const dVector& normal, const dVec
 		dFloat32 sinAng = normal.m_z * magInv;
 
 		dAssert(dAbs(normal.m_z * cosAng - normal.m_y * sinAng) < dFloat32(1.0e-4f));
-		dVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, dFloat32(0.0f), dFloat32(0.0f));
-		dVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, dFloat32(0.0f));
+		ndVector normal1(normal.m_x, normal.m_y * cosAng + normal.m_z * sinAng, dFloat32(0.0f), dFloat32(0.0f));
+		ndVector origin1(origin.m_x, origin.m_y * cosAng + origin.m_z * sinAng, origin.m_z * cosAng - origin.m_y * sinAng, dFloat32(0.0f));
 
 		count = 0;
 		dInt32 i0 = 2;
-		dVector test0((m_profile[i0] - origin1).DotProduct(normal1));
+		ndVector test0((m_profile[i0] - origin1).DotProduct(normal1));
 		for (dInt32 i = 0; (i < 3) && (count < 2); i++) 
 		{
-			dVector test1((m_profile[i] - origin1).DotProduct(normal1));
-			dVector acrossPlane(test0 * test1);
+			ndVector test1((m_profile[i] - origin1).DotProduct(normal1));
+			ndVector acrossPlane(test0 * test1);
 			if (acrossPlane.m_x < 0.0f) 
 			{
-				dVector step(m_profile[i] - m_profile[i0]);
+				ndVector step(m_profile[i] - m_profile[i0]);
 				contactsOut[count] = m_profile[i0] - step.Scale(test0.m_x / (step.DotProduct(normal1).m_x));
 				count++;
 			}
@@ -363,17 +363,17 @@ dInt32 ndShapeCone::CalculatePlaneIntersection(const dVector& normal, const dVec
 	return count;
 }
 
-void ndShapeCone::CalculateAabb(const dMatrix& matrix, dVector& p0, dVector& p1) const
+void ndShapeCone::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const
 {
 	ndShapeConvex::CalculateAabb(matrix, p0, p1);
 }
 
-void ndShapeCone::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndShapeCone::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndShapeConvex::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndShapeConvex::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "radius", m_radius);
 	xmlSaveParam(childNode, "height", m_height * dFloat32 (2.0f));

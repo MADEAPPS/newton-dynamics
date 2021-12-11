@@ -44,28 +44,28 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 
 	dInt32 stack = 1;
 	ndDemoEntity* pool[128];
-	dMatrix parentMatrix[128];
-	dArray<dMatrix> bindMatrixArray;
-	dArray<ndDemoEntity*> entityArray;
+	ndMatrix parentMatrix[128];
+	ndArray<ndMatrix> bindMatrixArray;
+	ndArray<ndDemoEntity*> entityArray;
 
 	pool[0] = root;
 	parentMatrix[0] = dGetIdentityMatrix();
-	dMatrix shapeBindMatrix(m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix());
+	ndMatrix shapeBindMatrix(m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix());
 
-	dTree<dInt32, dString> boneClusterRemapIndex;
+	ndTree<dInt32, ndString> boneClusterRemapIndex;
 	const ndMeshEffect::dClusterMap& clusterMap = meshNode->GetCluster();
 	
 	while (stack) 
 	{
 		stack--;
 		ndDemoEntity* const entity = pool[stack];
-		const dMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix[stack]);
+		const ndMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix[stack]);
 	
-		const dMatrix bindMatrix(shapeBindMatrix * boneMatrix.Inverse());
+		const ndMatrix bindMatrix(shapeBindMatrix * boneMatrix.Inverse());
 		entityArray.PushBack(entity);
 		bindMatrixArray.PushBack(bindMatrix);
 	
-		ndMeshEffect::dClusterMap::dNode* const clusterNode = clusterMap.Find(entity->GetName());
+		ndMeshEffect::dClusterMap::ndNode* const clusterNode = clusterMap.Find(entity->GetName());
 		if (clusterNode) 
 		{
 			boneClusterRemapIndex.Insert(entityArray.GetCount() - 1, entity->GetName());
@@ -86,11 +86,11 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 		m_bindingMatrixArray[i] = bindMatrixArray[i];
 	}
 	
-	dArray<dVector> weight;
-	dArray<dWeightBoneIndex> skinBone;
+	ndArray<ndVector> weight;
+	ndArray<dWeightBoneIndex> skinBone;
 	weight.SetCount(meshNode->GetVertexCount());
 	skinBone.SetCount(meshNode->GetVertexCount());
-	memset(&weight[0], 0, meshNode->GetVertexCount() * sizeof(dVector));
+	memset(&weight[0], 0, meshNode->GetVertexCount() * sizeof(ndVector));
 	memset(&skinBone[0], -1, meshNode->GetVertexCount() * sizeof(dWeightBoneIndex));
 	
 	dInt32 vCount = 0;
@@ -124,7 +124,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	dInt32 weightcount = 0;
 	for (dInt32 i = 0; i < weight.GetCount(); i++)
 	{
-		dVector w(weight[i]);
+		ndVector w(weight[i]);
 		dFloat32 invMag = w.m_x + w.m_y + w.m_z + w.m_w;
 		dAssert(invMag > 0.0f);
 		invMag = 1.0f / invMag;
@@ -165,10 +165,10 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 		dFloat32 m_uv[2];
 	};
 	
-	dArray<dTmpData> tmp;
-	dArray<dInt32> indices;
-	dArray<dInt32> vertexIndex;
-	dArray<glSkinVertex> points;
+	ndArray<dTmpData> tmp;
+	ndArray<dInt32> indices;
+	ndArray<dInt32> vertexIndex;
+	ndArray<glSkinVertex> points;
 	
 	indices.SetCount(indexCount);
 	points.SetCount(vertexCount);
@@ -201,7 +201,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(ndDemoEntity* const owner, ndMeshEffect* const me
 	
 	dInt32 segmentStart = 0;
 	bool hasTransparency = false;
-	const dArray<ndMeshEffect::dMaterial>& materialArray = meshNode->GetMaterials();
+	const ndArray<ndMeshEffect::dMaterial>& materialArray = meshNode->GetMaterials();
 	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
 	{
 		dInt32 materialIndex = meshNode->GetMaterialID(geometryHandle, handle);
@@ -242,7 +242,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(const ndDemoSkinMesh& source, ndDemoEntity* const
 	,m_matrixPalette(source.m_matrixPalette)
 {
 	m_bindingMatrixArray.SetCount(source.m_bindingMatrixArray.GetCount());
-	memcpy(&m_bindingMatrixArray[0], &source.m_bindingMatrixArray[0], source.m_bindingMatrixArray.GetCount() * sizeof(dMatrix));
+	memcpy(&m_bindingMatrixArray[0], &source.m_bindingMatrixArray[0], source.m_bindingMatrixArray.GetCount() * sizeof(ndMatrix));
 }
 
 ndDemoSkinMesh::~ndDemoSkinMesh()
@@ -313,11 +313,11 @@ void ndDemoSkinMesh::CreateRenderMesh(
 	m_shareMesh->m_indexCount = indexCount;
 }
 
-dInt32 ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
+dInt32 ndDemoSkinMesh::CalculateMatrixPalette(ndMatrix* const bindMatrix) const
 {
 	int stack = 1;
 	ndDemoEntity* pool[128];
-	dMatrix parentMatrix[128];
+	ndMatrix parentMatrix[128];
 
 	ndDemoEntity* root = m_ownerEntity;
 	while (root->GetParent()) 
@@ -328,12 +328,12 @@ dInt32 ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 	int count = 0;
 	pool[0] = root;
 	parentMatrix[0] = dGetIdentityMatrix();
-	dMatrix shapeBindMatrix((m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix()).Inverse());
+	ndMatrix shapeBindMatrix((m_ownerEntity->GetMeshMatrix() * m_ownerEntity->CalculateGlobalMatrix()).Inverse());
 	while (stack) 
 	{
 		stack--;
 		ndDemoEntity* const entity = pool[stack];
-		dMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix[stack]);
+		ndMatrix boneMatrix(entity->GetCurrentMatrix() * parentMatrix[stack]);
 		bindMatrix[count] = m_bindingMatrixArray[count] * boneMatrix * shapeBindMatrix;
 
 		count++;
@@ -349,9 +349,9 @@ dInt32 ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 	return count;
 }
 
-void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
 {
-	dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
+	ndMatrix* const bindMatrix = dAlloca(ndMatrix, m_nodeCount);
 	dInt32 count = CalculateMatrixPalette(bindMatrix);
 	glMatrix* const glMatrixPallete = dAlloca(glMatrix, count);
 	for (dInt32 i = 0; i < count; i++)
@@ -363,10 +363,10 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& mod
 
 	ndDemoCamera* const camera = scene->GetCamera();
 
-	const dMatrix& viewMatrix = camera->GetViewMatrix();
+	const ndMatrix& viewMatrix = camera->GetViewMatrix();
 	const glMatrix& projectionMatrix(camera->GetProjectionMatrix());
 	const glMatrix viewModelMatrix(modelMatrix * viewMatrix);
-	const glVector4 directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+	const glVector4 directionaLight(viewMatrix.RotateVector(ndVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
 
 	glUniform1i(m_shareMesh->m_textureLocation, 0);
 	glUniform1f(m_shareMesh->m_transparencyLocation, 1.0f);
@@ -380,7 +380,7 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& mod
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_shareMesh->m_indexBuffer);
 
 	glActiveTexture(GL_TEXTURE0);
-	for (ndDemoMesh::dNode* node = m_shareMesh->GetFirst(); node; node = node->GetNext())
+	for (ndDemoMesh::ndNode* node = m_shareMesh->GetFirst(); node; node = node->GetNext())
 	{
 		ndDemoSubMesh& segment = node->GetInfo();
 		if (!segment.m_hasTranparency)

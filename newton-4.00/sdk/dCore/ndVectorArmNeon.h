@@ -31,7 +31,7 @@
 //
 // *****************************************************************************************
 #ifdef D_NEWTON_USE_DOUBLE
-#define dVector dBigVector
+#define ndVector ndBigVector
 #else
 
 
@@ -127,43 +127,43 @@ static inline float32x4_t vec_set(const float w, const float z, const float y, c
 }
 
 
-class dBigVector;
+class ndBigVector;
 DG_MSC_VECTOR_ALIGMENT
-class dVector 
+class ndVector 
 {
 	public:
-    inline dVector()
+    inline ndVector()
     {
     }
     
-    inline dVector(const float32x4_t type)
+    inline ndVector(const float32x4_t type)
     : m_type(type) {
     }
     
-    inline dVector(const uint32x4_t type)
+    inline ndVector(const uint32x4_t type)
     : m_typeInt(type) {
     }
 
     
-    inline dVector(dFloat32 val)
+    inline ndVector(dFloat32 val)
     : m_type(vmovq_n_f32(val))
     {
     }
     
-    inline dVector (const dVector& v)
+    inline ndVector (const ndVector& v)
     : m_type( v.m_type )
     {
         //dAssert (dCheckVector ((*this)));
     }
     
-    inline dVector (const dFloat32* const ptr)
+    inline ndVector (const dFloat32* const ptr)
     :m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (dFloat32 (0.0f))
     {
         dAssert (dCheckVector ((*this)));
     }
     
 #ifndef    D_NEWTON_USE_DOUBLE
-    inline dVector(const dFloat64* const ptr)
+    inline ndVector(const dFloat64* const ptr)
     :m_x(dFloat32(ptr[0]))
     ,m_y(dFloat32(ptr[1]))
     ,m_z(dFloat32(ptr[2]))
@@ -173,19 +173,19 @@ class dVector
 #endif
     
     
-    inline dVector (dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
+    inline ndVector (dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
     :m_x(x), m_y(y), m_z(z), m_w(w)
     {
         dAssert (dCheckVector ((*this)));
     }
     
-    inline dVector (dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
+    inline ndVector (dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
     :m_x(*((dFloat32*)&ix)), m_y(*((dFloat32*)&iy)), m_z(*((dFloat32*)&iz)), m_w(*((dFloat32*)&iw))
     {
     }
     
 #ifndef  D_NEWTON_USE_DOUBLE
-    inline dVector (const dBigVector& copy)
+    inline ndVector (const ndBigVector& copy)
     :m_x(dFloat32 (((dFloat64*)&copy)[0]))
     ,m_y(dFloat32 (((dFloat64*)&copy)[1]))
     ,m_z(dFloat32 (((dFloat64*)&copy)[2]))
@@ -205,24 +205,24 @@ class dVector
         vec_store(dst, m_type);
     }
     
-    inline dVector BroadcastX () const
+    inline ndVector BroadcastX () const
     {
-        return dVector (m_x);
+        return ndVector (m_x);
     }
     
-    inline dVector BroadcastY () const
+    inline ndVector BroadcastY () const
     {
-        return dVector (m_y);
+        return ndVector (m_y);
     }
     
-    inline dVector BroadcastZ () const
+    inline ndVector BroadcastZ () const
     {
-        return dVector (m_z);
+        return ndVector (m_z);
     }
     
-    inline dVector BroadcastW () const
+    inline ndVector BroadcastW () const
     {
-        return dVector (m_w);
+        return ndVector (m_w);
     }
     
     
@@ -240,34 +240,34 @@ class dVector
         return (&m_x)[i];
     }
     
-    inline dVector operator+ (const dVector& A) const
+    inline ndVector operator+ (const ndVector& A) const
     {
         return vec_add(m_type, A.m_type);
     }
     
-    inline dVector operator- (const dVector& A) const
+    inline ndVector operator- (const ndVector& A) const
     {
         return vec_sub(m_type, A.m_type);
     }
     
-    inline dVector operator* (const dVector& A) const
+    inline ndVector operator* (const ndVector& A) const
     {
         return vec_mul(m_type, A.m_type);
     }
     
-    inline dVector& operator+= (const dVector& A)
+    inline ndVector& operator+= (const ndVector& A)
     {
         m_type = vec_add(m_type, A.m_type);
         return *this;
     }
     
-    inline dVector& operator-= (const dVector& A)
+    inline ndVector& operator-= (const ndVector& A)
     {
         m_type = vec_sub(m_type, A.m_type);
         return *this;
     }
     
-    inline dVector& operator*= (const dVector& A)
+    inline ndVector& operator*= (const ndVector& A)
     {
         m_type = vec_mul(m_type, A.m_type);
         return *this;
@@ -275,29 +275,29 @@ class dVector
     
     
     
-    inline dVector AddHorizontal () const
+    inline ndVector AddHorizontal () const
     {
-        return vec_hadd3(m_type); // dVector (m_x + m_y + m_z + m_w);
+        return vec_hadd3(m_type); // ndVector (m_x + m_y + m_z + m_w);
     }
     
-    inline dVector Scale3 (dFloat32 scale) const
+    inline ndVector Scale3 (dFloat32 scale) const
     {
-        return dVector (m_x * scale, m_y * scale, m_z * scale, m_w);
+        return ndVector (m_x * scale, m_y * scale, m_z * scale, m_w);
     }
     
-    inline dVector Scale (dFloat32 scale) const
+    inline ndVector Scale (dFloat32 scale) const
     {
         return vec_mul(vmovq_n_f32(scale), m_type);
     }
     
     // component wise multiplication
-    inline dVector CompProduct3 (const dVector& A) const
+    inline ndVector CompProduct3 (const ndVector& A) const
     {
-        return dVector (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
+        return ndVector (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
     }
     
     // return cross product
-    inline dVector CrossProduct (const dVector& B) const
+    inline ndVector CrossProduct (const ndVector& B) const
     {
         /*
          float32x4_t v1 = m_type;
@@ -306,17 +306,17 @@ class dVector
          float32x4x2_t v_2013 = vzipq_f32(vcombine_f32(vrev64_f32(vget_low_f32(v_1203.val[0])), vrev64_f32(vget_low_f32(v_1203.val[1]))), vcombine_f32(vget_high_f32(v_1203.val[0]), vget_high_f32(v_1203.val[1])));
          inVec->vec = vmlsq_f32(vmulq_f32(v_1203.val[0], v_2013.val[1]), v_1203.val[1], v_2013.val[0]);
          */
-        return dVector (m_y * B.m_z - m_z * B.m_y,
+        return ndVector (m_y * B.m_z - m_z * B.m_y,
                          m_z * B.m_x - m_x * B.m_z,
                          m_x * B.m_y - m_y * B.m_x, m_w);
     }
     
-    inline dVector CrossProduct (const dVector& A, const dVector& B) const
+    inline ndVector CrossProduct (const ndVector& A, const ndVector& B) const
     {
         dFloat32 cofactor[3][3];
         dFloat32 array[4][4];
         
-        const dVector& me = *this;
+        const ndVector& me = *this;
         for (dInt32 i = 0; i < 4; i ++) {
             array[0][i] = me[i];
             array[1][i] = A[i];
@@ -324,7 +324,7 @@ class dVector
             array[3][i] = dFloat32 (1.0f);
         }
         
-        dVector normal;
+        ndVector normal;
         dFloat32  sign = dFloat32 (-1.0f);
         for (dInt32 i = 0; i < 4; i ++)  
 		{
@@ -352,33 +352,33 @@ class dVector
         return normal;
     }
     
-    inline dVector GetInt () const
+    inline ndVector GetInt () const
     {
         return vcvtq_u32_f32(m_type);
     }
     
-    inline dVector GetFloat () const
+    inline ndVector GetFloat () const
     {
         return vcvtq_f32_u32(m_type);
     }
     
-    inline dVector TestZero() const
+    inline ndVector TestZero() const
     {
         return m_negOne & (*this == m_zero);
     }
     
-    inline dVector Floor () const
+    inline ndVector Floor () const
     {
 #if DG_ARCH >= DG_ARCH_NEON_64
         // #if __ARM_ARCH >= 8 && defined(__ARM_FEATURE_DIRECTED_ROUNDING)
         return vec_floor(m_type);
 #else
-        return dVector (dgFloor (m_x), dgFloor (m_y), dgFloor (m_z), dgFloor (m_w));
+        return ndVector (dgFloor (m_x), dgFloor (m_y), dgFloor (m_z), dgFloor (m_w));
         
 #endif
     }
     
-    inline dVector DotProduct (const dVector &A) const
+    inline ndVector DotProduct (const ndVector &A) const
     {
         auto tmp = vec_mul(m_type, A.m_type);
         return vec_hadd4(tmp);
@@ -386,12 +386,12 @@ class dVector
     
    
     
-    inline dVector InvMagSqrt() const
+    inline ndVector InvMagSqrt() const
     {
-        return dVector(dgRsqrt(DotProduct(*this).m_x));
+        return ndVector(dgRsqrt(DotProduct(*this).m_x));
     }
     
-    inline dVector Reciproc() const
+    inline ndVector Reciproc() const
     {
         float32x4_t reciprocal = vrecpeq_f32(m_type);
         reciprocal = vrecpsq_f32(m_type, reciprocal) * reciprocal;
@@ -400,39 +400,39 @@ class dVector
     }
 
 
-    inline dVector MulAdd(const dVector& A, const dVector& B) const
+    inline ndVector MulAdd(const ndVector& A, const ndVector& B) const
     {
         // a * b + this
         return vec_madd(A.m_type, B.m_type, m_type);
     }
 
-    inline dVector MulSub(const dVector& A, const dVector& B) const
+    inline ndVector MulSub(const ndVector& A, const ndVector& B) const
     {
         // a * b - this
         return vec_msub(A.m_type, B.m_type, m_type);
     }
 
-    inline dVector InvSqrt() const
+    inline ndVector InvSqrt() const
     {
         float32x4_t sqrt_reciprocal = vrsqrteq_f32(m_type);
         return vrsqrtsq_f32(m_type * sqrt_reciprocal, sqrt_reciprocal) * sqrt_reciprocal;
     }
     
-    inline dVector Sqrt() const
+    inline ndVector Sqrt() const
     {
         float32x4_t sqrt_reciprocal = vrsqrteq_f32(m_type);
         float32x4_t tmp = vrsqrtsq_f32(m_type * sqrt_reciprocal, sqrt_reciprocal) * sqrt_reciprocal;
         return vec_mul(m_type, tmp);
     }
     
-    inline dVector Normalize () const
+    inline ndVector Normalize () const
     {
         dAssert (m_w == dFloat32 (0.0f));
-        const dVector& me = *this;
+        const ndVector& me = *this;
         return me * InvMagSqrt();
     }
     
-    dVector Abs () const
+    ndVector Abs () const
     {
         return vec_abs(m_type);
     }
@@ -442,64 +442,64 @@ class dVector
         return dMax(dMax(m_x, m_y), dMax(m_z, m_w));
     }
     
-    dVector GetMax (const dVector& data) const
+    ndVector GetMax (const ndVector& data) const
     {
         return vec_max(m_type, data.m_type);
     }
     
-    dVector GetMin (const dVector& data) const
+    ndVector GetMin (const ndVector& data) const
     {
         return vec_min(m_type, data.m_type);
     }
     
     // relational operators
-    inline dVector operator== (const dVector& data) const
+    inline ndVector operator== (const ndVector& data) const
     {
         return vec_cmpeq(m_typeInt, data.m_typeInt);
     }
     
-    inline dVector operator!= (const dVector& data) const
+    inline ndVector operator!= (const ndVector& data) const
     {
         return vec_cmpne(m_typeInt, data.m_typeInt);
     }
     
-    inline dVector operator> (const dVector& data) const
+    inline ndVector operator> (const ndVector& data) const
     {
         return vec_cmpgt(m_typeInt, data.m_typeInt);
     }
     
-    inline dVector operator< (const dVector& data) const
+    inline ndVector operator< (const ndVector& data) const
     {
         return vec_cmplt(m_typeInt, data.m_typeInt);
     }
     
-    inline dVector operator>= (const dVector& data) const
+    inline ndVector operator>= (const ndVector& data) const
     {
         return vec_cmpge(m_typeInt, data.m_typeInt);
     }
     
-    inline dVector operator<= (const dVector& data) const
+    inline ndVector operator<= (const ndVector& data) const
     {
         return vec_cmple(m_typeInt, data.m_typeInt);
     }
     
     // logical operations
-    inline dVector operator& (const dVector& data) const
+    inline ndVector operator& (const ndVector& data) const
     {
         return vec_and(m_typeInt, data.m_typeInt);
     }
     
-    inline dVector operator| (const dVector& data) const
+    inline ndVector operator| (const ndVector& data) const
     {
         return vec_or(m_typeInt, data.m_typeInt);
     }
     
-    inline dVector operator^ (const dVector& data) const
+    inline ndVector operator^ (const ndVector& data) const
     {
         return vec_xor(m_typeInt, data.m_typeInt);
     }
     
-    inline dVector AndNot (const dVector& data) const
+    inline ndVector AndNot (const ndVector& data) const
     {
         return vec_andnot(m_typeInt, data.m_typeInt);
     }
@@ -510,22 +510,22 @@ class dVector
         return (((a[0] & 0x80000000) ? 1 : 0) | ((a[1] & 0x80000000) ? 2 : 0) | ((a[2] & 0x80000000) ? 4 : 0) | ((a[3] & 0x80000000) ? 8 : 0));
     }
     
-    inline dVector ShiftTripleRight () const
+    inline ndVector ShiftTripleRight () const
     {
-        return dVector (m_z, m_x, m_y, m_w);
+        return ndVector (m_z, m_x, m_y, m_w);
     }
     
-    inline dVector ShiftTripleLeft () const
+    inline ndVector ShiftTripleLeft () const
     {
-        return dVector (m_y, m_z, m_x, m_w);
+        return ndVector (m_y, m_z, m_x, m_w);
     }
     
-    inline dVector ShiftRightLogical (dInt32 bits) const
+    inline ndVector ShiftRightLogical (dInt32 bits) const
     {
-        return dVector (dInt32 (dUnsigned32 (m_ix) >> bits), dInt32 (dUnsigned32 (m_iy) >> bits), dInt32 (dUnsigned32 (m_iz) >> bits), dInt32 (dUnsigned32 (m_iw) >> bits));
+        return ndVector (dInt32 (dUnsigned32 (m_ix) >> bits), dInt32 (dUnsigned32 (m_iy) >> bits), dInt32 (dUnsigned32 (m_iz) >> bits), dInt32 (dUnsigned32 (m_iw) >> bits));
     }
     
-    inline static void Transpose4x4 (dVector& dst0, dVector& dst1, dVector& dst2, dVector& dst3, const dVector& src0, const dVector& src1, const dVector& src2, const dVector& src3)
+    inline static void Transpose4x4 (ndVector& dst0, ndVector& dst1, ndVector& dst2, ndVector& dst3, const ndVector& src0, const ndVector& src1, const ndVector& src2, const ndVector& src3)
     {
         float32x4x2_t vtrn1 = vzipq_f32(src0.m_type, src2.m_type);
         float32x4x2_t vtrn2 = vzipq_f32(src1.m_type, src3.m_type);
@@ -558,73 +558,73 @@ class dVector
 		};
 	};
 
-	D_CORE_API static dVector m_zero;
-	D_CORE_API static dVector m_one;
-	D_CORE_API static dVector m_wOne;
-	D_CORE_API static dVector m_half;
-	D_CORE_API static dVector m_two;
-	D_CORE_API static dVector m_three;
-	D_CORE_API static dVector m_negOne;
-	D_CORE_API static dVector m_xMask;
-	D_CORE_API static dVector m_yMask;
-	D_CORE_API static dVector m_zMask;
-	D_CORE_API static dVector m_wMask;
-	D_CORE_API static dVector m_xyzwMask;
-	D_CORE_API static dVector m_signMask;
-	D_CORE_API static dVector m_triplexMask;
+	D_CORE_API static ndVector m_zero;
+	D_CORE_API static ndVector m_one;
+	D_CORE_API static ndVector m_wOne;
+	D_CORE_API static ndVector m_half;
+	D_CORE_API static ndVector m_two;
+	D_CORE_API static ndVector m_three;
+	D_CORE_API static ndVector m_negOne;
+	D_CORE_API static ndVector m_xMask;
+	D_CORE_API static ndVector m_yMask;
+	D_CORE_API static ndVector m_zMask;
+	D_CORE_API static ndVector m_wMask;
+	D_CORE_API static ndVector m_xyzwMask;
+	D_CORE_API static ndVector m_signMask;
+	D_CORE_API static ndVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
 
 #endif
 
 DG_MSC_VECTOR_ALIGMENT
-class dBigVector
+class ndBigVector
 {
 public:
-	inline dBigVector()
+	inline ndBigVector()
 	{
 	}
 
-	inline dBigVector(dFloat64 val)
+	inline ndBigVector(dFloat64 val)
 		:m_x(val), m_y(val), m_z(val), m_w(val)
 	{
 	}
 
-	inline dBigVector(const dBigVector& v)
+	inline ndBigVector(const ndBigVector& v)
 		: m_x(v.m_x), m_y(v.m_y), m_z(v.m_z), m_w(v.m_w)
 	{
 	}
 
 #ifndef D_NEWTON_USE_DOUBLE
-	inline dBigVector(const dVector& v)
+	inline ndBigVector(const ndVector& v)
 		: m_x(v.m_x), m_y(v.m_y), m_z(v.m_z), m_w(v.m_w)
 	{
 	}
 
-	inline dBigVector(const dFloat32* const ptr)
+	inline ndBigVector(const dFloat32* const ptr)
 		: m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(dFloat32(0.0f))
 	{
 		dAssert(dCheckVector((*this)));
 	}
 #endif
 
-	inline dBigVector(const dFloat64* const ptr)
+	inline ndBigVector(const dFloat64* const ptr)
 		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(dFloat32(0.0f))
 	{
 		dAssert(dCheckVector((*this)));
 	}
 
-	inline dBigVector(dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w)
+	inline ndBigVector(dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w)
 		: m_x(x), m_y(y), m_z(z), m_w(w)
 	{
 		dAssert(dCheckVector((*this)));
 	}
 
-	inline dBigVector(dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
+	inline ndBigVector(dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
 		: m_ix(ix), m_iy(iy), m_iz(iz), m_iw(iw)
 	{
 	}
 
-	inline dBigVector(dInt64 ix, dInt64 iy, dInt64 iz, dInt64 iw)
+	inline ndBigVector(dInt64 ix, dInt64 iy, dInt64 iz, dInt64 iw)
 		: m_ix(ix), m_iy(iy), m_iz(iz), m_iw(iw)
 	{
 	}
@@ -642,24 +642,24 @@ public:
 		dst[3] = m_w;
 	}
 
-	inline dBigVector BroadcastX() const
+	inline ndBigVector BroadcastX() const
 	{
-		return dBigVector(m_x);
+		return ndBigVector(m_x);
 	}
 
-	inline dBigVector BroadcastY() const
+	inline ndBigVector BroadcastY() const
 	{
-		return dBigVector(m_y);
+		return ndBigVector(m_y);
 	}
 
-	inline dBigVector BroadcastZ() const
+	inline ndBigVector BroadcastZ() const
 	{
-		return dBigVector(m_z);
+		return ndBigVector(m_z);
 	}
 
-	inline dBigVector BroadcastW() const
+	inline ndBigVector BroadcastW() const
 	{
-		return dBigVector(m_w);
+		return ndBigVector(m_w);
 	}
 
 
@@ -677,69 +677,69 @@ public:
 		return (&m_x)[i];
 	}
 
-	inline dBigVector operator+ (const dBigVector& A) const
+	inline ndBigVector operator+ (const ndBigVector& A) const
 	{
-		return dBigVector(m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w);
+		return ndBigVector(m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w);
 	}
 
-	inline dBigVector operator- (const dBigVector& A) const
+	inline ndBigVector operator- (const ndBigVector& A) const
 	{
-		return dBigVector(m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
+		return ndBigVector(m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
 	}
 
-	inline dBigVector operator* (const dBigVector& A) const
+	inline ndBigVector operator* (const ndBigVector& A) const
 	{
-		return dBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
+		return ndBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
 	}
 
-	inline dBigVector& operator+= (const dBigVector& A)
+	inline ndBigVector& operator+= (const ndBigVector& A)
 	{
-		return (*this = dBigVector(m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w));
+		return (*this = ndBigVector(m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w));
 	}
 
-	inline dBigVector& operator-= (const dBigVector& A)
+	inline ndBigVector& operator-= (const ndBigVector& A)
 	{
-		return (*this = dBigVector(m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w));
+		return (*this = ndBigVector(m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w));
 	}
 
-	inline dBigVector& operator*= (const dBigVector& A)
+	inline ndBigVector& operator*= (const ndBigVector& A)
 	{
-		return (*this = dBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w));
+		return (*this = ndBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w));
 	}
 
-	inline dBigVector AddHorizontal() const
+	inline ndBigVector AddHorizontal() const
 	{
-		return dBigVector(m_x + m_y + m_z + m_w);
+		return ndBigVector(m_x + m_y + m_z + m_w);
 	}
 
-	inline dBigVector Scale3(dFloat64 scale) const
+	inline ndBigVector Scale3(dFloat64 scale) const
 	{
-		return dBigVector(m_x * scale, m_y * scale, m_z * scale, m_w);
+		return ndBigVector(m_x * scale, m_y * scale, m_z * scale, m_w);
 	}
 
-	inline dBigVector Scale(dFloat64 scale) const
+	inline ndBigVector Scale(dFloat64 scale) const
 	{
-		return dBigVector(m_x * scale, m_y * scale, m_z * scale, m_w * scale);
+		return ndBigVector(m_x * scale, m_y * scale, m_z * scale, m_w * scale);
 	}
 
 	// component wise multiplication
-	inline dBigVector CompProduct3(const dBigVector& A) const
+	inline ndBigVector CompProduct3(const ndBigVector& A) const
 	{
-		return dBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
+		return ndBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
 	}
 
 	// return cross product
-	inline dBigVector CrossProduct(const dBigVector& B) const
+	inline ndBigVector CrossProduct(const ndBigVector& B) const
 	{
-		return dBigVector(m_y * B.m_z - m_z * B.m_y, m_z * B.m_x - m_x * B.m_z, m_x * B.m_y - m_y * B.m_x, m_w);
+		return ndBigVector(m_y * B.m_z - m_z * B.m_y, m_z * B.m_x - m_x * B.m_z, m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
-	inline dBigVector CrossProduct(const dBigVector& A, const dBigVector& B) const
+	inline ndBigVector CrossProduct(const ndBigVector& A, const ndBigVector& B) const
 	{
 		dFloat64 cofactor[3][3];
 		dFloat64 array[4][4];
 
-		const dBigVector& me = *this;
+		const ndBigVector& me = *this;
 		for (dInt32 i = 0; i < 4; i++) {
 			array[0][i] = me[i];
 			array[1][i] = A[i];
@@ -747,7 +747,7 @@ public:
 			array[3][i] = dFloat32(1.0f);
 		}
 
-		dBigVector normal;
+		ndBigVector normal;
 		dFloat64  sign = dFloat64(-1.0f);
 		for (dInt32 i = 0; i < 4; i++) {
 
@@ -772,62 +772,62 @@ public:
 		return normal;
 	}
 
-	inline dBigVector GetInt() const
+	inline ndBigVector GetInt() const
 	{
-		return dBigVector(dInt64(floor(m_x)), dInt64(floor(m_y)), dInt64(floor(m_z)), dInt64(floor(m_w)));
+		return ndBigVector(dInt64(floor(m_x)), dInt64(floor(m_y)), dInt64(floor(m_z)), dInt64(floor(m_w)));
 	}
 
-	inline dBigVector TestZero() const
+	inline ndBigVector TestZero() const
 	{
 		const dInt64* const a = (dInt64*)&m_x;
-		return dBigVector((a[0] == 0) ? dFloat64(-1.0f) : dFloat64(1.0f),
+		return ndBigVector((a[0] == 0) ? dFloat64(-1.0f) : dFloat64(1.0f),
 			(a[1] == 0) ? dFloat64(-1.0f) : dFloat64(1.0f),
 			(a[2] == 0) ? dFloat64(-1.0f) : dFloat64(1.0f),
 			(a[3] == 0) ? dFloat64(-1.0f) : dFloat64(1.0f));
 	}
 
 
-	inline dBigVector Floor() const
+	inline ndBigVector Floor() const
 	{
-		return dBigVector(floor(m_x), floor(m_y), floor(m_z), floor(m_w));
+		return ndBigVector(floor(m_x), floor(m_y), floor(m_z), floor(m_w));
 	}
 
-	inline dBigVector DotProduct(const dBigVector &A) const
+	inline ndBigVector DotProduct(const ndBigVector &A) const
 	{
-		return dBigVector(m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
+		return ndBigVector(m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
 	}
 
-	inline dBigVector Reciproc() const
+	inline ndBigVector Reciproc() const
 	{
-		return dBigVector(dFloat64(1.0f) / m_x, dFloat64(1.0f) / m_y, dFloat64(1.0f) / m_z, dFloat64(1.0f) / m_w);
+		return ndBigVector(dFloat64(1.0f) / m_x, dFloat64(1.0f) / m_y, dFloat64(1.0f) / m_z, dFloat64(1.0f) / m_w);
 	}
 
-	inline dBigVector Sqrt() const
+	inline ndBigVector Sqrt() const
 	{
-		return dBigVector(sqrt(m_x), sqrt(m_y), sqrt(m_z), sqrt(m_w));
+		return ndBigVector(sqrt(m_x), sqrt(m_y), sqrt(m_z), sqrt(m_w));
 	}
 
-	inline dBigVector InvSqrt() const
+	inline ndBigVector InvSqrt() const
 	{
-		return dBigVector(dFloat64(1.0f) / sqrt(m_x), dFloat64(1.0f) / sqrt(m_y), dFloat64(1.0f) / sqrt(m_z), dFloat64(1.0f) / sqrt(m_w));
+		return ndBigVector(dFloat64(1.0f) / sqrt(m_x), dFloat64(1.0f) / sqrt(m_y), dFloat64(1.0f) / sqrt(m_z), dFloat64(1.0f) / sqrt(m_w));
 	}
 
-	inline dBigVector InvMagSqrt() const
+	inline ndBigVector InvMagSqrt() const
 	{
-		return dBigVector(dFloat64(1.0f) / sqrt(DotProduct(*this).m_x));
+		return ndBigVector(dFloat64(1.0f) / sqrt(DotProduct(*this).m_x));
 	}
 
-	inline dBigVector Normalize() const
+	inline ndBigVector Normalize() const
 	{
 		dAssert(m_w == dFloat64(0.0f));
-		//const dBigVector& me = *this;
-		//return *this * dBigVector (dgRsqrt(DotProduct(*this).m_x));
+		//const ndBigVector& me = *this;
+		//return *this * ndBigVector (dgRsqrt(DotProduct(*this).m_x));
 		return *this * InvMagSqrt();
 	}
 
-	dBigVector Abs() const
+	ndBigVector Abs() const
 	{
-		return dBigVector((m_x > dFloat64(0.0f)) ? m_x : -m_x,
+		return ndBigVector((m_x > dFloat64(0.0f)) ? m_x : -m_x,
 			(m_y > dFloat64(0.0f)) ? m_y : -m_y,
 			(m_z > dFloat64(0.0f)) ? m_z : -m_z,
 			(m_w > dFloat64(0.0f)) ? m_w : -m_w);
@@ -838,58 +838,58 @@ public:
 		return dMax(dMax(m_x, m_y), dMax(m_z, m_w));
 	}
 
-	dBigVector GetMax(const dBigVector& data) const
+	ndBigVector GetMax(const ndBigVector& data) const
 	{
-		return dBigVector((m_x > data.m_x) ? m_x : data.m_x,
+		return ndBigVector((m_x > data.m_x) ? m_x : data.m_x,
 			(m_y > data.m_y) ? m_y : data.m_y,
 			(m_z > data.m_z) ? m_z : data.m_z,
 			(m_w > data.m_w) ? m_w : data.m_w);
 	}
 
-	dBigVector GetMin(const dBigVector& data) const
+	ndBigVector GetMin(const ndBigVector& data) const
 	{
-		return dBigVector((m_x < data.m_x) ? m_x : data.m_x,
+		return ndBigVector((m_x < data.m_x) ? m_x : data.m_x,
 			(m_y < data.m_y) ? m_y : data.m_y,
 			(m_z < data.m_z) ? m_z : data.m_z,
 			(m_w < data.m_w) ? m_w : data.m_w);
 	}
 
 	// relational operators
-	inline dBigVector operator== (const dBigVector& data) const
+	inline ndBigVector operator== (const ndBigVector& data) const
 	{
-		return dBigVector((m_x == data.m_x) ? dInt64(-1) : dInt64(0),
+		return ndBigVector((m_x == data.m_x) ? dInt64(-1) : dInt64(0),
 			(m_y == data.m_y) ? dInt64(-1) : dInt64(0),
 			(m_z == data.m_z) ? dInt64(-1) : dInt64(0),
 			(m_w == data.m_w) ? dInt64(-1) : dInt64(0));
 	}
 
-	inline dBigVector operator> (const dBigVector& data) const
+	inline ndBigVector operator> (const ndBigVector& data) const
 	{
-		return dBigVector((m_x > data.m_x) ? dInt64(-1) : dInt64(0),
+		return ndBigVector((m_x > data.m_x) ? dInt64(-1) : dInt64(0),
 			(m_y > data.m_y) ? dInt64(-1) : dInt64(0),
 			(m_z > data.m_z) ? dInt64(-1) : dInt64(0),
 			(m_w > data.m_w) ? dInt64(-1) : dInt64(0));
 	}
 
-	inline dBigVector operator< (const dBigVector& data) const
+	inline ndBigVector operator< (const ndBigVector& data) const
 	{
-		return dBigVector((m_x < data.m_x) ? dInt64(-1) : dInt64(0),
+		return ndBigVector((m_x < data.m_x) ? dInt64(-1) : dInt64(0),
 			(m_y < data.m_y) ? dInt64(-1) : dInt64(0),
 			(m_z < data.m_z) ? dInt64(-1) : dInt64(0),
 			(m_w < data.m_w) ? dInt64(-1) : dInt64(0));
 	}
 
-	inline dBigVector operator>= (const dBigVector& data) const
+	inline ndBigVector operator>= (const ndBigVector& data) const
 	{
-		return dBigVector((m_x >= data.m_x) ? dInt64(-1) : dInt64(0),
+		return ndBigVector((m_x >= data.m_x) ? dInt64(-1) : dInt64(0),
 			(m_y >= data.m_y) ? dInt64(-1) : dInt64(0),
 			(m_z >= data.m_z) ? dInt64(-1) : dInt64(0),
 			(m_w >= data.m_w) ? dInt64(-1) : dInt64(0));
 	}
 
-	inline dBigVector operator<= (const dBigVector& data) const
+	inline ndBigVector operator<= (const ndBigVector& data) const
 	{
-		return dBigVector((m_x <= data.m_x) ? dInt64(-1) : dInt64(0),
+		return ndBigVector((m_x <= data.m_x) ? dInt64(-1) : dInt64(0),
 			(m_y <= data.m_y) ? dInt64(-1) : dInt64(0),
 			(m_z <= data.m_z) ? dInt64(-1) : dInt64(0),
 			(m_w <= data.m_w) ? dInt64(-1) : dInt64(0));
@@ -897,32 +897,32 @@ public:
 
 
 	// logical operations
-	inline dBigVector operator& (const dBigVector& data) const
+	inline ndBigVector operator& (const ndBigVector& data) const
 	{
 		const dInt64* const a = (dInt64*)&m_x;
 		const dInt64* const b = (dInt64*)&data.m_x;
-		return dBigVector(a[0] & b[0], a[1] & b[1], a[2] & b[2], a[3] & b[3]);
+		return ndBigVector(a[0] & b[0], a[1] & b[1], a[2] & b[2], a[3] & b[3]);
 	}
 
-	inline dBigVector operator| (const dBigVector& data) const
+	inline ndBigVector operator| (const ndBigVector& data) const
 	{
 		const dInt64* const a = (dInt64*)&m_x;
 		const dInt64* const b = (dInt64*)&data.m_x;
-		return dBigVector(a[0] | b[0], a[1] | b[1], a[2] | b[2], a[3] | b[3]);
+		return ndBigVector(a[0] | b[0], a[1] | b[1], a[2] | b[2], a[3] | b[3]);
 	}
 
-	inline dBigVector operator^ (const dBigVector& data) const
+	inline ndBigVector operator^ (const ndBigVector& data) const
 	{
 		const dInt64* const a = (dInt64*)&m_x;
 		const dInt64* const b = (dInt64*)&data.m_x;
-		return dBigVector(a[0] ^ b[0], a[1] ^ b[1], a[2] ^ b[2], a[3] ^ b[3]);
+		return ndBigVector(a[0] ^ b[0], a[1] ^ b[1], a[2] ^ b[2], a[3] ^ b[3]);
 	}
 
-	inline dBigVector AndNot(const dBigVector& data) const
+	inline ndBigVector AndNot(const ndBigVector& data) const
 	{
 		const dInt64* const a = (dInt64*)&m_x;
 		const dInt64* const b = (dInt64*)&data.m_x;
-		return dBigVector(a[0] & ~b[0], a[1] & ~b[1], a[2] & ~b[2], a[3] & ~b[3]);
+		return ndBigVector(a[0] & ~b[0], a[1] & ~b[1], a[2] & ~b[2], a[3] & ~b[3]);
 	}
 
 	inline dInt32 GetSignMask() const
@@ -931,32 +931,32 @@ public:
 		return (((a[0] >> 63) ? 1 : 0) | ((a[1] >> 63) ? 2 : 0) | ((a[2] >> 63) ? 4 : 0) | ((a[3] >> 63) ? 8 : 0));
 	}
 
-	inline dBigVector ShiftTripleRight() const
+	inline ndBigVector ShiftTripleRight() const
 	{
-		return dBigVector(m_z, m_x, m_y, m_w);
+		return ndBigVector(m_z, m_x, m_y, m_w);
 	}
 
-	inline dBigVector ShiftTripleLeft() const
+	inline ndBigVector ShiftTripleLeft() const
 	{
-		return dBigVector(m_y, m_z, m_x, m_w);
+		return ndBigVector(m_y, m_z, m_x, m_w);
 	}
 
-	inline dBigVector ShiftRightLogical(dInt32 bits) const
+	inline ndBigVector ShiftRightLogical(dInt32 bits) const
 	{
-		return dBigVector(dInt64(dUnsigned64(m_ix) >> bits), dInt64(dUnsigned64(m_iy) >> bits), dInt64(dUnsigned64(m_iz) >> bits), dInt64(dUnsigned64(m_iw) >> bits));
+		return ndBigVector(dInt64(dUnsigned64(m_ix) >> bits), dInt64(dUnsigned64(m_iy) >> bits), dInt64(dUnsigned64(m_iz) >> bits), dInt64(dUnsigned64(m_iw) >> bits));
 	}
 
-	inline static void Transpose4x4(dBigVector& dst0, dBigVector& dst1, dBigVector& dst2, dBigVector& dst3, const dBigVector& src0, const dBigVector& src1, const dBigVector& src2, const dBigVector& src3)
+	inline static void Transpose4x4(ndBigVector& dst0, ndBigVector& dst1, ndBigVector& dst2, ndBigVector& dst3, const ndBigVector& src0, const ndBigVector& src1, const ndBigVector& src2, const ndBigVector& src3)
 	{
-		dBigVector tmp0(src0);
-		dBigVector tmp1(src1);
-		dBigVector tmp2(src2);
-		dBigVector tmp3(src3);
+		ndBigVector tmp0(src0);
+		ndBigVector tmp1(src1);
+		ndBigVector tmp2(src2);
+		ndBigVector tmp3(src3);
 
-		dst0 = dBigVector(tmp0.m_x, tmp1.m_x, tmp2.m_x, tmp3.m_x);
-		dst1 = dBigVector(tmp0.m_y, tmp1.m_y, tmp2.m_y, tmp3.m_y);
-		dst2 = dBigVector(tmp0.m_z, tmp1.m_z, tmp2.m_z, tmp3.m_z);
-		dst3 = dBigVector(tmp0.m_w, tmp1.m_w, tmp2.m_w, tmp3.m_w);
+		dst0 = ndBigVector(tmp0.m_x, tmp1.m_x, tmp2.m_x, tmp3.m_x);
+		dst1 = ndBigVector(tmp0.m_y, tmp1.m_y, tmp2.m_y, tmp3.m_y);
+		dst2 = ndBigVector(tmp0.m_z, tmp1.m_z, tmp2.m_z, tmp3.m_z);
+		dst3 = ndBigVector(tmp0.m_w, tmp1.m_w, tmp2.m_w, tmp3.m_w);
 	}
 
 	DG_CLASS_ALLOCATOR(allocator)
@@ -990,20 +990,20 @@ public:
 		};
 	};
 
-	D_CORE_API static dBigVector m_zero;
-	D_CORE_API static dBigVector m_one;
-	D_CORE_API static dBigVector m_wOne;
-	D_CORE_API static dBigVector m_half;
-	D_CORE_API static dBigVector m_two;
-	D_CORE_API static dBigVector m_three;
-	D_CORE_API static dBigVector m_negOne;
-	D_CORE_API static dBigVector m_xMask;
-	D_CORE_API static dBigVector m_yMask;
-	D_CORE_API static dBigVector m_zMask;
-	D_CORE_API static dBigVector m_wMask;
-	D_CORE_API static dBigVector m_xyzwMask;
-	D_CORE_API static dBigVector m_signMask;
-	D_CORE_API static dBigVector m_triplexMask;
+	D_CORE_API static ndBigVector m_zero;
+	D_CORE_API static ndBigVector m_one;
+	D_CORE_API static ndBigVector m_wOne;
+	D_CORE_API static ndBigVector m_half;
+	D_CORE_API static ndBigVector m_two;
+	D_CORE_API static ndBigVector m_three;
+	D_CORE_API static ndBigVector m_negOne;
+	D_CORE_API static ndBigVector m_xMask;
+	D_CORE_API static ndBigVector m_yMask;
+	D_CORE_API static ndBigVector m_zMask;
+	D_CORE_API static ndBigVector m_wMask;
+	D_CORE_API static ndBigVector m_xyzwMask;
+	D_CORE_API static ndBigVector m_signMask;
+	D_CORE_API static ndBigVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
 
 #endif
@@ -1015,43 +1015,43 @@ public:
 //
 // *****************************************************************************************
 #ifdef D_NEWTON_USE_DOUBLE
-#define dVector dBigVector
+#define ndVector ndBigVector
 #else
 
-class dBigVector;
+class ndBigVector;
 D_MSV_NEWTON_ALIGN_16
-class dVector
+class ndVector
 {
 	public:
 	D_OPERATOR_NEW_AND_DELETE
 
-	inline dVector()
+	inline ndVector()
 	{
 	}
 
-	inline dVector(dFloat32 val)
+	inline ndVector(dFloat32 val)
 		:m_type(vmovq_n_f32(val))
 	{
 	}
 
-	inline dVector(const dVector& v)
+	inline ndVector(const ndVector& v)
 		:m_type(v.m_type)
 	{
 	}
 
-	inline dVector(const float32x4_t type)
+	inline ndVector(const float32x4_t type)
 		:m_type(type)
 	{
 	}
 
-	inline dVector(const dFloat32* const ptr)
+	inline ndVector(const dFloat32* const ptr)
 		//: m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(ptr[3])
 		:m_type(vld1q_f32 (ptr))
 	{
 		dAssert(dCheckVector((*this)));
 	}
 
-	inline dVector(const dFloat32* const baseAddr, const dInt32* const index)
+	inline ndVector(const dFloat32* const baseAddr, const dInt32* const index)
 		:m_x(baseAddr[index[0]])
 		,m_y(baseAddr[index[1]])
 		,m_z(baseAddr[index[2]])
@@ -1061,7 +1061,7 @@ class dVector
 
 
 #ifndef	D_NEWTON_USE_DOUBLE
-	inline dVector(const dFloat64* const ptr)
+	inline ndVector(const dFloat64* const ptr)
 		:m_x(dFloat32(ptr[0]))
 		,m_y(dFloat32(ptr[1]))
 		,m_z(dFloat32(ptr[2]))
@@ -1070,19 +1070,19 @@ class dVector
 	}
 #endif
 
-	inline dVector(dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
+	inline ndVector(dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
 		:m_x(x), m_y(y), m_z(z), m_w(w)
 	{
 		dAssert(dCheckVector((*this)));
 	}
 
-	inline dVector(dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
+	inline ndVector(dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
 		: m_x(*((dFloat32*)&ix)), m_y(*((dFloat32*)&iy)), m_z(*((dFloat32*)&iz)), m_w(*((dFloat32*)&iw))
 	{
 	}
 
 #ifndef  D_NEWTON_USE_DOUBLE 
-	inline dVector(const dBigVector& copy)
+	inline ndVector(const ndBigVector& copy)
 		:m_x(dFloat32(((dFloat64*)&copy)[0]))
 		,m_y(dFloat32(((dFloat64*)&copy)[1]))
 		,m_z(dFloat32(((dFloat64*)&copy)[2]))
@@ -1102,24 +1102,24 @@ class dVector
 		vst1q_f32(dst, m_type);
 	}
 
-	inline dVector BroadcastX() const
+	inline ndVector BroadcastX() const
 	{
-		return dVector(m_x);
+		return ndVector(m_x);
 	}
 
-	inline dVector BroadcastY() const
+	inline ndVector BroadcastY() const
 	{
-		return dVector(m_y);
+		return ndVector(m_y);
 	}
 
-	inline dVector BroadcastZ() const
+	inline ndVector BroadcastZ() const
 	{
-		return dVector(m_z);
+		return ndVector(m_z);
 	}
 
-	inline dVector BroadcastW() const
+	inline ndVector BroadcastW() const
 	{
-		return dVector(m_w);
+		return ndVector(m_w);
 	}
 
 	inline dFloat32& operator[] (dInt32 i)
@@ -1136,76 +1136,76 @@ class dVector
 		return (&m_x)[i];
 	}
 
-	inline dVector operator+ (const dVector& A) const
+	inline ndVector operator+ (const ndVector& A) const
 	{
 		return vaddq_f32(m_type, A.m_type);
 	}
 
-	inline dVector operator- (const dVector& A) const
+	inline ndVector operator- (const ndVector& A) const
 	{
 		return vsubq_f32(m_type, A.m_type);
 	}
 
-	inline dVector operator* (const dVector& A) const
+	inline ndVector operator* (const ndVector& A) const
 	{
 		return vmulq_f32(m_type, A.m_type);
 	}
 
-	inline dVector& operator+= (const dVector& A)
+	inline ndVector& operator+= (const ndVector& A)
 	{
 		return (*this = vsubq_f32(m_type, A.m_type));
 	}
 
-	inline dVector& operator-= (const dVector& A)
+	inline ndVector& operator-= (const ndVector& A)
 	{
 		return (*this = vsubq_f32(m_type, A.m_type));
 	}
 
-	inline dVector& operator*= (const dVector& A)
+	inline ndVector& operator*= (const ndVector& A)
 	{
 		return (*this = vmulq_f32(m_type, A.m_type));
 	}
 
-	inline dVector MulAdd(const dVector& A, const dVector& B) const
+	inline ndVector MulAdd(const ndVector& A, const ndVector& B) const
 	{
 		//return *this + A * B;
 		//return vfmaq_f32(A.m_type, B.m_type, m_type);
 		return vmlaq_f32(m_type, A.m_type, B.m_type);
 	}
 
-	inline dVector MulSub(const dVector& A, const dVector& B) const
+	inline ndVector MulSub(const ndVector& A, const ndVector& B) const
 	{
 		//return *this - A * B;
 		return vmlsq_f32(m_type, A.m_type, B.m_type);
 	}
 
-	inline dVector AddHorizontal() const
+	inline ndVector AddHorizontal() const
 	{
-		return dVector(m_x + m_y + m_z + m_w);
+		return ndVector(m_x + m_y + m_z + m_w);
 		//float32x2_t temp = vpadd_f32(vget_low_f32(m_type), vget_low_f32(m_type));
 		//temp = vadd_f32(temp, vget_high_f32(m_type));
 		//return vget_lane_f32(temp, 0);
 	}
 
-	inline dVector Scale(dFloat32 scale) const
+	inline ndVector Scale(dFloat32 scale) const
 	{
-		return dVector(m_x * scale, m_y * scale, m_z * scale, m_w * scale);
+		return ndVector(m_x * scale, m_y * scale, m_z * scale, m_w * scale);
 	}
 
 	// return cross product
-	inline dVector CrossProduct(const dVector& B) const
+	inline ndVector CrossProduct(const ndVector& B) const
 	{
-		return dVector(m_y * B.m_z - m_z * B.m_y,
+		return ndVector(m_y * B.m_z - m_z * B.m_y,
 			m_z * B.m_x - m_x * B.m_z,
 			m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
-	inline dVector CrossProduct(const dVector& A, const dVector& B) const
+	inline ndVector CrossProduct(const ndVector& A, const ndVector& B) const
 	{
 		dFloat32 cofactor[3][3];
 		dFloat32 array[4][4];
 
-		const dVector& me = *this;
+		const ndVector& me = *this;
 		for (dInt32 i = 0; i < 4; i++) 
 		{
 			array[0][i] = me[i];
@@ -1214,7 +1214,7 @@ class dVector
 			array[3][i] = dFloat32(1.0f);
 		}
 
-		dVector normal;
+		ndVector normal;
 		dFloat32  sign = dFloat32(-1.0f);
 		for (dInt32 i = 0; i < 4; i++) 
 		{
@@ -1242,58 +1242,58 @@ class dVector
 		return normal;
 	}
 
-	inline dVector GetInt() const
+	inline ndVector GetInt() const
 	{
-		return dVector(dInt32(dFloor(m_x)), dInt32(dFloor(m_y)), dInt32(dFloor(m_z)), dInt32(dFloor(m_w)));
+		return ndVector(dInt32(dFloor(m_x)), dInt32(dFloor(m_y)), dInt32(dFloor(m_z)), dInt32(dFloor(m_w)));
 	}
 
-	inline dVector TestZero() const
+	inline ndVector TestZero() const
 	{
 		const dInt32* const a = (dInt32*)&m_x;
-		return dVector((a[0] == 0) ? dFloat32(-1.0f) : dFloat32(1.0f),
+		return ndVector((a[0] == 0) ? dFloat32(-1.0f) : dFloat32(1.0f),
 			(a[1] == 0) ? dFloat32(-1.0f) : dFloat32(1.0f),
 			(a[2] == 0) ? dFloat32(-1.0f) : dFloat32(1.0f),
 			(a[3] == 0) ? dFloat32(-1.0f) : dFloat32(1.0f));
 	}
 
-	inline dVector Floor() const
+	inline ndVector Floor() const
 	{
-		return dVector(dFloor(m_x), dFloor(m_y), dFloor(m_z), dFloor(m_w));
+		return ndVector(dFloor(m_x), dFloor(m_y), dFloor(m_z), dFloor(m_w));
 	}
 
-	inline dVector DotProduct(const dVector &A) const
+	inline ndVector DotProduct(const ndVector &A) const
 	{
-		return dVector(m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
+		return ndVector(m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
 	}
 
-	inline dVector Reciproc() const
+	inline ndVector Reciproc() const
 	{
-		return dVector(dFloat32(1.0f) / m_x, dFloat32(1.0f) / m_y, dFloat32(1.0f) / m_z, dFloat32(1.0f) / m_w);
+		return ndVector(dFloat32(1.0f) / m_x, dFloat32(1.0f) / m_y, dFloat32(1.0f) / m_z, dFloat32(1.0f) / m_w);
 	}
 
-	inline dVector Sqrt() const
+	inline ndVector Sqrt() const
 	{
-		return dVector(dSqrt(m_x), dSqrt(m_y), dSqrt(m_z), dSqrt(m_w));
+		return ndVector(dSqrt(m_x), dSqrt(m_y), dSqrt(m_z), dSqrt(m_w));
 	}
 
-	inline dVector InvSqrt() const
+	inline ndVector InvSqrt() const
 	{
-		return dVector(dRsqrt(m_x), dRsqrt(m_y), dRsqrt(m_z), dRsqrt(m_w));
+		return ndVector(dRsqrt(m_x), dRsqrt(m_y), dRsqrt(m_z), dRsqrt(m_w));
 	}
 
-	inline dVector InvMagSqrt() const
+	inline ndVector InvMagSqrt() const
 	{
-		return dVector(dRsqrt(DotProduct(*this).m_x));
+		return ndVector(dRsqrt(DotProduct(*this).m_x));
 	}
 
-	inline dVector Normalize() const
+	inline ndVector Normalize() const
 	{
 		dAssert(m_w == dFloat32(0.0f));
-		const dVector& me = *this;
+		const ndVector& me = *this;
 		return me * InvMagSqrt();
 	}
 
-	dVector Abs() const
+	ndVector Abs() const
 	{
 		return vabsq_f32(m_type);
 	}
@@ -1303,64 +1303,64 @@ class dVector
 		return dMax(dMax(m_x, m_y), dMax(m_z, m_w));
 	}
 
-	dVector GetMax(const dVector& data) const
+	ndVector GetMax(const ndVector& data) const
 	{
 		return vmaxq_f32(m_type, data.m_type);
 	}
 
-	dVector GetMin(const dVector& data) const
+	ndVector GetMin(const ndVector& data) const
 	{
 		return vminq_f32(m_type, data.m_type);
 	}
 
 	// relational operators
-	inline dVector operator== (const dVector& data) const
+	inline ndVector operator== (const ndVector& data) const
 	{
 		return vceqq_f32(m_typeInt, data.m_typeInt);
 	}
 
-	inline dVector operator> (const dVector& data) const
+	inline ndVector operator> (const ndVector& data) const
 	{
 		return vcgtq_f32(m_typeInt, data.m_typeInt);
 	}
 
-	inline dVector operator< (const dVector& data) const
+	inline ndVector operator< (const ndVector& data) const
 	{
 		return vcltq_f32(m_typeInt, data.m_typeInt);
 	}
 
-	inline dVector operator>= (const dVector& data) const
+	inline ndVector operator>= (const ndVector& data) const
 	{
 		return vcgeq_f32(m_typeInt, data.m_typeInt);
 	}
 
-	inline dVector operator<= (const dVector& data) const
+	inline ndVector operator<= (const ndVector& data) const
 	{
 		return vcleq_f32(m_typeInt, data.m_typeInt);
 	}
 
 	// logical operations
-	inline dVector operator& (const dVector& data) const
+	inline ndVector operator& (const ndVector& data) const
 	{
 		return vandq_u32(m_typeInt, data.m_typeInt);
 	}
 
-	inline dVector operator| (const dVector& data) const
+	inline ndVector operator| (const ndVector& data) const
 	{
 		return vorrq_u32(m_typeInt, data.m_typeInt);
 	}
 
-	inline dVector operator^ (const dVector& data) const
+	inline ndVector operator^ (const ndVector& data) const
 	{
 		return veorq_u32(m_typeInt, data.m_typeInt);
 	}
 
-	inline dVector AndNot(const dVector& data) const
+	inline ndVector AndNot(const ndVector& data) const
 	{
 		return vbicq_u32(m_typeInt, data.m_typeInt);
 	}
 
-	inline dVector Select(const dVector& data, const dVector& mask) const
+	inline ndVector Select(const ndVector& data, const ndVector& mask) const
 	{
 		// (((b ^ a) & mask)^a)
 		return  (*this) ^ (mask & (data ^ (*this)));
@@ -1372,27 +1372,27 @@ class dVector
 		return (((a[0] & 0x80000000) ? 1 : 0) | ((a[1] & 0x80000000) ? 2 : 0) | ((a[2] & 0x80000000) ? 4 : 0) | ((a[3] & 0x80000000) ? 8 : 0));
 	}
 
-	inline dVector ShiftRight() const
+	inline ndVector ShiftRight() const
 	{
-		return dVector(m_w, m_x, m_y, m_z);
+		return ndVector(m_w, m_x, m_y, m_z);
 	}
 
-	inline dVector ShiftTripleRight() const
+	inline ndVector ShiftTripleRight() const
 	{
-		return dVector(m_z, m_x, m_y, m_w);
+		return ndVector(m_z, m_x, m_y, m_w);
 	}
 
-	inline dVector ShiftTripleLeft() const
+	inline ndVector ShiftTripleLeft() const
 	{
-		return dVector(m_y, m_z, m_x, m_w);
+		return ndVector(m_y, m_z, m_x, m_w);
 	}
 
-	inline dVector ShiftRightLogical(dInt32 bits) const
+	inline ndVector ShiftRightLogical(dInt32 bits) const
 	{
-		return dVector(dInt32(dUnsigned32(m_ix) >> bits), dInt32(dUnsigned32(m_iy) >> bits), dInt32(dUnsigned32(m_iz) >> bits), dInt32(dUnsigned32(m_iw) >> bits));
+		return ndVector(dInt32(dUnsigned32(m_ix) >> bits), dInt32(dUnsigned32(m_iy) >> bits), dInt32(dUnsigned32(m_iz) >> bits), dInt32(dUnsigned32(m_iw) >> bits));
 	}
 
-	inline static void Transpose4x4(dVector& dst0, dVector& dst1, dVector& dst2, dVector& dst3, const dVector& src0, const dVector& src1, const dVector& src2, const dVector& src3)
+	inline static void Transpose4x4(ndVector& dst0, ndVector& dst1, ndVector& dst2, ndVector& dst3, const ndVector& src0, const ndVector& src1, const ndVector& src2, const ndVector& src3)
 	{
 		float32x4x2_t vtrn1 = vzipq_f32(src0.m_type, src2.m_type);
 		float32x4x2_t vtrn2 = vzipq_f32(src1.m_type, src3.m_type);
@@ -1426,76 +1426,76 @@ class dVector
 		};
 	};
 
-	D_CORE_API static dVector m_zero;
-	D_CORE_API static dVector m_one;
-	D_CORE_API static dVector m_wOne;
-	D_CORE_API static dVector m_half;
-	D_CORE_API static dVector m_two;
-	D_CORE_API static dVector m_three;
-	D_CORE_API static dVector m_negOne;
-	D_CORE_API static dVector m_xMask;
-	D_CORE_API static dVector m_yMask;
-	D_CORE_API static dVector m_zMask;
-	D_CORE_API static dVector m_wMask;
-	D_CORE_API static dVector m_xyzwMask;
-	D_CORE_API static dVector m_epsilon;
-	D_CORE_API static dVector m_signMask;
-	D_CORE_API static dVector m_triplexMask;
+	D_CORE_API static ndVector m_zero;
+	D_CORE_API static ndVector m_one;
+	D_CORE_API static ndVector m_wOne;
+	D_CORE_API static ndVector m_half;
+	D_CORE_API static ndVector m_two;
+	D_CORE_API static ndVector m_three;
+	D_CORE_API static ndVector m_negOne;
+	D_CORE_API static ndVector m_xMask;
+	D_CORE_API static ndVector m_yMask;
+	D_CORE_API static ndVector m_zMask;
+	D_CORE_API static ndVector m_wMask;
+	D_CORE_API static ndVector m_xyzwMask;
+	D_CORE_API static ndVector m_epsilon;
+	D_CORE_API static ndVector m_signMask;
+	D_CORE_API static ndVector m_triplexMask;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #endif
 
 D_MSV_NEWTON_ALIGN_32
-class dBigVector
+class ndBigVector
 {
 	public:
 	D_OPERATOR_NEW_AND_DELETE
 
-	inline dBigVector()
+	inline ndBigVector()
 	{
 	}
 
-	inline dBigVector(dFloat64 val)
+	inline ndBigVector(dFloat64 val)
 		:m_x(val), m_y(val), m_z(val), m_w(val)
 	{
 	}
 
-	inline dBigVector(const dBigVector& v)
+	inline ndBigVector(const ndBigVector& v)
 		: m_x(v.m_x), m_y(v.m_y), m_z(v.m_z), m_w(v.m_w)
 	{
 	}
 
 #ifndef D_NEWTON_USE_DOUBLE
-	inline dBigVector(const dVector& v)
+	inline ndBigVector(const ndVector& v)
 		: m_x(v.m_x), m_y(v.m_y), m_z(v.m_z), m_w(v.m_w)
 	{
 	}
 
-	inline dBigVector(const dFloat32* const ptr)
+	inline ndBigVector(const dFloat32* const ptr)
 		: m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(dFloat32(0.0f))
 	{
 		dAssert(dCheckVector((*this)));
 	}
 #endif
 
-	inline dBigVector(const dFloat64* const ptr)
+	inline ndBigVector(const dFloat64* const ptr)
 		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(ptr[3])
 	{
 		dAssert(dCheckVector((*this)));
 	}
 
-	inline dBigVector(dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w)
+	inline ndBigVector(dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w)
 		: m_x(x), m_y(y), m_z(z), m_w(w)
 	{
 		dAssert(dCheckVector((*this)));
 	}
 
-	inline dBigVector(dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
+	inline ndBigVector(dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
 		: m_ix(ix), m_iy(iy), m_iz(iz), m_iw(iw)
 	{
 	}
 
-	inline dBigVector(dInt64 ix, dInt64 iy, dInt64 iz, dInt64 iw)
+	inline ndBigVector(dInt64 ix, dInt64 iy, dInt64 iz, dInt64 iw)
 		: m_ix(ix), m_iy(iy), m_iz(iz), m_iw(iw)
 	{
 	}
@@ -1513,24 +1513,24 @@ class dBigVector
 		dst[3] = m_w;
 	}
 
-	inline dBigVector BroadcastX() const
+	inline ndBigVector BroadcastX() const
 	{
-		return dBigVector(m_x);
+		return ndBigVector(m_x);
 	}
 
-	inline dBigVector BroadcastY() const
+	inline ndBigVector BroadcastY() const
 	{
-		return dBigVector(m_y);
+		return ndBigVector(m_y);
 	}
 
-	inline dBigVector BroadcastZ() const
+	inline ndBigVector BroadcastZ() const
 	{
-		return dBigVector(m_z);
+		return ndBigVector(m_z);
 	}
 
-	inline dBigVector BroadcastW() const
+	inline ndBigVector BroadcastW() const
 	{
-		return dBigVector(m_w);
+		return ndBigVector(m_w);
 	}
 
 	inline dFloat64& operator[] (dInt32 i)
@@ -1547,69 +1547,69 @@ class dBigVector
 		return (&m_x)[i];
 	}
 
-	inline dBigVector operator+ (const dBigVector& A) const
+	inline ndBigVector operator+ (const ndBigVector& A) const
 	{
-		return dBigVector(m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w);
+		return ndBigVector(m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w);
 	}
 
-	inline dBigVector operator- (const dBigVector& A) const
+	inline ndBigVector operator- (const ndBigVector& A) const
 	{
-		return dBigVector(m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
+		return ndBigVector(m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w);
 	}
 
-	inline dBigVector operator* (const dBigVector& A) const
+	inline ndBigVector operator* (const ndBigVector& A) const
 	{
-		return dBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
+		return ndBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w);
 	}
 
-	inline dBigVector& operator+= (const dBigVector& A)
+	inline ndBigVector& operator+= (const ndBigVector& A)
 	{
-		return (*this = dBigVector(m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w));
+		return (*this = ndBigVector(m_x + A.m_x, m_y + A.m_y, m_z + A.m_z, m_w + A.m_w));
 	}
 
-	inline dBigVector& operator-= (const dBigVector& A)
+	inline ndBigVector& operator-= (const ndBigVector& A)
 	{
-		return (*this = dBigVector(m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w));
+		return (*this = ndBigVector(m_x - A.m_x, m_y - A.m_y, m_z - A.m_z, m_w - A.m_w));
 	}
 
-	inline dBigVector& operator*= (const dBigVector& A)
+	inline ndBigVector& operator*= (const ndBigVector& A)
 	{
-		return (*this = dBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w));
+		return (*this = ndBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, m_w * A.m_w));
 	}
 
-	inline dBigVector MulAdd(const dBigVector& A, const dBigVector& B) const
+	inline ndBigVector MulAdd(const ndBigVector& A, const ndBigVector& B) const
 	{
 		return *this + A * B;
 	}
 
-	inline dBigVector MulSub(const dVector& A, const dBigVector& B) const
+	inline ndBigVector MulSub(const ndVector& A, const ndBigVector& B) const
 	{
 		return *this - A * B;
 	}
 
 
-	inline dBigVector AddHorizontal() const
+	inline ndBigVector AddHorizontal() const
 	{
-		return dBigVector(m_x + m_y + m_z + m_w);
+		return ndBigVector(m_x + m_y + m_z + m_w);
 	}
 
-	inline dBigVector Scale(dFloat64 scale) const
+	inline ndBigVector Scale(dFloat64 scale) const
 	{
-		return dBigVector(m_x * scale, m_y * scale, m_z * scale, m_w * scale);
+		return ndBigVector(m_x * scale, m_y * scale, m_z * scale, m_w * scale);
 	}
 
 	// return cross product
-	inline dBigVector CrossProduct(const dBigVector& B) const
+	inline ndBigVector CrossProduct(const ndBigVector& B) const
 	{
-		return dBigVector(m_y * B.m_z - m_z * B.m_y, m_z * B.m_x - m_x * B.m_z, m_x * B.m_y - m_y * B.m_x, m_w);
+		return ndBigVector(m_y * B.m_z - m_z * B.m_y, m_z * B.m_x - m_x * B.m_z, m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
-	inline dBigVector CrossProduct(const dBigVector& A, const dBigVector& B) const
+	inline ndBigVector CrossProduct(const ndBigVector& A, const ndBigVector& B) const
 	{
 		dFloat64 cofactor[3][3];
 		dFloat64 array[4][4];
 
-		const dBigVector& me = *this;
+		const ndBigVector& me = *this;
 		for (dInt32 i = 0; i < 4; i++) {
 			array[0][i] = me[i];
 			array[1][i] = A[i];
@@ -1617,7 +1617,7 @@ class dBigVector
 			array[3][i] = dFloat32(1.0f);
 		}
 
-		dBigVector normal;
+		ndBigVector normal;
 		dFloat64  sign = dFloat64(-1.0f);
 		for (dInt32 i = 0; i < 4; i++) 
 		{
@@ -1645,62 +1645,62 @@ class dBigVector
 		return normal;
 	}
 
-	inline dBigVector GetInt() const
+	inline ndBigVector GetInt() const
 	{
-		return dBigVector(dInt64(floor(m_x)), dInt64(floor(m_y)), dInt64(floor(m_z)), dInt64(floor(m_w)));
+		return ndBigVector(dInt64(floor(m_x)), dInt64(floor(m_y)), dInt64(floor(m_z)), dInt64(floor(m_w)));
 	}
 
-	inline dBigVector TestZero() const
+	inline ndBigVector TestZero() const
 	{
 		const dInt64* const a = (dInt64*)&m_x;
-		return dBigVector((a[0] == 0) ? dFloat64(-1.0f) : dFloat64(1.0f),
+		return ndBigVector((a[0] == 0) ? dFloat64(-1.0f) : dFloat64(1.0f),
 			(a[1] == 0) ? dFloat64(-1.0f) : dFloat64(1.0f),
 			(a[2] == 0) ? dFloat64(-1.0f) : dFloat64(1.0f),
 			(a[3] == 0) ? dFloat64(-1.0f) : dFloat64(1.0f));
 	}
 
 
-	inline dBigVector Floor() const
+	inline ndBigVector Floor() const
 	{
-		return dBigVector(floor(m_x), floor(m_y), floor(m_z), floor(m_w));
+		return ndBigVector(floor(m_x), floor(m_y), floor(m_z), floor(m_w));
 	}
 
-	inline dBigVector DotProduct(const dBigVector &A) const
+	inline ndBigVector DotProduct(const ndBigVector &A) const
 	{
-		return dBigVector(m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
+		return ndBigVector(m_x * A.m_x + m_y * A.m_y + m_z * A.m_z + m_w * A.m_w);
 	}
 
-	inline dBigVector Reciproc() const
+	inline ndBigVector Reciproc() const
 	{
-		return dBigVector(dFloat64(1.0f) / m_x, dFloat64(1.0f) / m_y, dFloat64(1.0f) / m_z, dFloat64(1.0f) / m_w);
+		return ndBigVector(dFloat64(1.0f) / m_x, dFloat64(1.0f) / m_y, dFloat64(1.0f) / m_z, dFloat64(1.0f) / m_w);
 	}
 
-	inline dBigVector Sqrt() const
+	inline ndBigVector Sqrt() const
 	{
-		return dBigVector(sqrt(m_x), sqrt(m_y), sqrt(m_z), sqrt(m_w));
+		return ndBigVector(sqrt(m_x), sqrt(m_y), sqrt(m_z), sqrt(m_w));
 	}
 
-	inline dBigVector InvSqrt() const
+	inline ndBigVector InvSqrt() const
 	{
-		return dBigVector(dFloat64(1.0f) / sqrt(m_x), dFloat64(1.0f) / sqrt(m_y), dFloat64(1.0f) / sqrt(m_z), dFloat64(1.0f) / sqrt(m_w));
+		return ndBigVector(dFloat64(1.0f) / sqrt(m_x), dFloat64(1.0f) / sqrt(m_y), dFloat64(1.0f) / sqrt(m_z), dFloat64(1.0f) / sqrt(m_w));
 	}
 
-	inline dBigVector InvMagSqrt() const
+	inline ndBigVector InvMagSqrt() const
 	{
-		return dBigVector(dFloat64(1.0f) / sqrt(DotProduct(*this).m_x));
+		return ndBigVector(dFloat64(1.0f) / sqrt(DotProduct(*this).m_x));
 	}
 
-	inline dBigVector Normalize() const
+	inline ndBigVector Normalize() const
 	{
 		dAssert(m_w == dFloat64(0.0f));
-		//const dBigVector& me = *this;
-		//return *this * dBigVector (dgRsqrt(DotProduct(*this).m_x));
+		//const ndBigVector& me = *this;
+		//return *this * ndBigVector (dgRsqrt(DotProduct(*this).m_x));
 		return *this * InvMagSqrt();
 	}
 
-	dBigVector Abs() const
+	ndBigVector Abs() const
 	{
-		return dBigVector((m_x > dFloat64(0.0f)) ? m_x : -m_x,
+		return ndBigVector((m_x > dFloat64(0.0f)) ? m_x : -m_x,
 			(m_y > dFloat64(0.0f)) ? m_y : -m_y,
 			(m_z > dFloat64(0.0f)) ? m_z : -m_z,
 			(m_w > dFloat64(0.0f)) ? m_w : -m_w);
@@ -1711,58 +1711,58 @@ class dBigVector
 		return dMax(dMax(m_x, m_y), dMax(m_z, m_w));
 	}
 
-	dBigVector GetMax(const dBigVector& data) const
+	ndBigVector GetMax(const ndBigVector& data) const
 	{
-		return dBigVector((m_x > data.m_x) ? m_x : data.m_x,
+		return ndBigVector((m_x > data.m_x) ? m_x : data.m_x,
 			(m_y > data.m_y) ? m_y : data.m_y,
 			(m_z > data.m_z) ? m_z : data.m_z,
 			(m_w > data.m_w) ? m_w : data.m_w);
 	}
 
-	dBigVector GetMin(const dBigVector& data) const
+	ndBigVector GetMin(const ndBigVector& data) const
 	{
-		return dBigVector((m_x < data.m_x) ? m_x : data.m_x,
+		return ndBigVector((m_x < data.m_x) ? m_x : data.m_x,
 			(m_y < data.m_y) ? m_y : data.m_y,
 			(m_z < data.m_z) ? m_z : data.m_z,
 			(m_w < data.m_w) ? m_w : data.m_w);
 	}
 
 	// relational operators
-	inline dBigVector operator== (const dBigVector& data) const
+	inline ndBigVector operator== (const ndBigVector& data) const
 	{
-		return dBigVector((m_x == data.m_x) ? dInt64(-1) : dInt64(0),
+		return ndBigVector((m_x == data.m_x) ? dInt64(-1) : dInt64(0),
 			(m_y == data.m_y) ? dInt64(-1) : dInt64(0),
 			(m_z == data.m_z) ? dInt64(-1) : dInt64(0),
 			(m_w == data.m_w) ? dInt64(-1) : dInt64(0));
 	}
 
-	inline dBigVector operator> (const dBigVector& data) const
+	inline ndBigVector operator> (const ndBigVector& data) const
 	{
-		return dBigVector((m_x > data.m_x) ? dInt64(-1) : dInt64(0),
+		return ndBigVector((m_x > data.m_x) ? dInt64(-1) : dInt64(0),
 			(m_y > data.m_y) ? dInt64(-1) : dInt64(0),
 			(m_z > data.m_z) ? dInt64(-1) : dInt64(0),
 			(m_w > data.m_w) ? dInt64(-1) : dInt64(0));
 	}
 
-	inline dBigVector operator< (const dBigVector& data) const
+	inline ndBigVector operator< (const ndBigVector& data) const
 	{
-		return dBigVector((m_x < data.m_x) ? dInt64(-1) : dInt64(0),
+		return ndBigVector((m_x < data.m_x) ? dInt64(-1) : dInt64(0),
 			(m_y < data.m_y) ? dInt64(-1) : dInt64(0),
 			(m_z < data.m_z) ? dInt64(-1) : dInt64(0),
 			(m_w < data.m_w) ? dInt64(-1) : dInt64(0));
 	}
 
-	inline dBigVector operator>= (const dBigVector& data) const
+	inline ndBigVector operator>= (const ndBigVector& data) const
 	{
-		return dBigVector((m_x >= data.m_x) ? dInt64(-1) : dInt64(0),
+		return ndBigVector((m_x >= data.m_x) ? dInt64(-1) : dInt64(0),
 			(m_y >= data.m_y) ? dInt64(-1) : dInt64(0),
 			(m_z >= data.m_z) ? dInt64(-1) : dInt64(0),
 			(m_w >= data.m_w) ? dInt64(-1) : dInt64(0));
 	}
 
-	inline dBigVector operator<= (const dBigVector& data) const
+	inline ndBigVector operator<= (const ndBigVector& data) const
 	{
-		return dBigVector((m_x <= data.m_x) ? dInt64(-1) : dInt64(0),
+		return ndBigVector((m_x <= data.m_x) ? dInt64(-1) : dInt64(0),
 			(m_y <= data.m_y) ? dInt64(-1) : dInt64(0),
 			(m_z <= data.m_z) ? dInt64(-1) : dInt64(0),
 			(m_w <= data.m_w) ? dInt64(-1) : dInt64(0));
@@ -1770,35 +1770,35 @@ class dBigVector
 
 
 	// logical operations
-	inline dBigVector operator& (const dBigVector& data) const
+	inline ndBigVector operator& (const ndBigVector& data) const
 	{
 		const dInt64* const a = (dInt64*)&m_x;
 		const dInt64* const b = (dInt64*)&data.m_x;
-		return dBigVector(a[0] & b[0], a[1] & b[1], a[2] & b[2], a[3] & b[3]);
+		return ndBigVector(a[0] & b[0], a[1] & b[1], a[2] & b[2], a[3] & b[3]);
 	}
 
-	inline dBigVector operator| (const dBigVector& data) const
+	inline ndBigVector operator| (const ndBigVector& data) const
 	{
 		const dInt64* const a = (dInt64*)&m_x;
 		const dInt64* const b = (dInt64*)&data.m_x;
-		return dBigVector(a[0] | b[0], a[1] | b[1], a[2] | b[2], a[3] | b[3]);
+		return ndBigVector(a[0] | b[0], a[1] | b[1], a[2] | b[2], a[3] | b[3]);
 	}
 
-	inline dBigVector operator^ (const dBigVector& data) const
+	inline ndBigVector operator^ (const ndBigVector& data) const
 	{
 		const dInt64* const a = (dInt64*)&m_x;
 		const dInt64* const b = (dInt64*)&data.m_x;
-		return dBigVector(a[0] ^ b[0], a[1] ^ b[1], a[2] ^ b[2], a[3] ^ b[3]);
+		return ndBigVector(a[0] ^ b[0], a[1] ^ b[1], a[2] ^ b[2], a[3] ^ b[3]);
 	}
 
-	inline dBigVector AndNot(const dBigVector& data) const
+	inline ndBigVector AndNot(const ndBigVector& data) const
 	{
 		const dInt64* const a = (dInt64*)&m_x;
 		const dInt64* const b = (dInt64*)&data.m_x;
-		return dBigVector(a[0] & ~b[0], a[1] & ~b[1], a[2] & ~b[2], a[3] & ~b[3]);
+		return ndBigVector(a[0] & ~b[0], a[1] & ~b[1], a[2] & ~b[2], a[3] & ~b[3]);
 	}
 
-	inline dBigVector Select(const dBigVector& data, const dBigVector& mask) const
+	inline ndBigVector Select(const ndBigVector& data, const ndBigVector& mask) const
 	{
 		// (((b ^ a) & mask)^a)
 		return  (*this) ^ (mask & (data ^ (*this)));
@@ -1810,37 +1810,37 @@ class dBigVector
 		return (((a[0] >> 63) ? 1 : 0) | ((a[1] >> 63) ? 2 : 0) | ((a[2] >> 63) ? 4 : 0) | ((a[3] >> 63) ? 8 : 0));
 	}
 
-	inline dVector ShiftRight() const
+	inline ndVector ShiftRight() const
 	{
-		return dBigVector(m_w, m_x, m_y, m_z);
+		return ndBigVector(m_w, m_x, m_y, m_z);
 	}
 
-	inline dBigVector ShiftTripleRight() const
+	inline ndBigVector ShiftTripleRight() const
 	{
-		return dBigVector(m_z, m_x, m_y, m_w);
+		return ndBigVector(m_z, m_x, m_y, m_w);
 	}
 
-	inline dBigVector ShiftTripleLeft() const
+	inline ndBigVector ShiftTripleLeft() const
 	{
-		return dBigVector(m_y, m_z, m_x, m_w);
+		return ndBigVector(m_y, m_z, m_x, m_w);
 	}
 
-	inline dBigVector ShiftRightLogical(dInt32 bits) const
+	inline ndBigVector ShiftRightLogical(dInt32 bits) const
 	{
-		return dBigVector(dInt64(dUnsigned64(m_ix) >> bits), dInt64(dUnsigned64(m_iy) >> bits), dInt64(dUnsigned64(m_iz) >> bits), dInt64(dUnsigned64(m_iw) >> bits));
+		return ndBigVector(dInt64(dUnsigned64(m_ix) >> bits), dInt64(dUnsigned64(m_iy) >> bits), dInt64(dUnsigned64(m_iz) >> bits), dInt64(dUnsigned64(m_iw) >> bits));
 	}
 
-	inline static void Transpose4x4(dBigVector& dst0, dBigVector& dst1, dBigVector& dst2, dBigVector& dst3, const dBigVector& src0, const dBigVector& src1, const dBigVector& src2, const dBigVector& src3)
+	inline static void Transpose4x4(ndBigVector& dst0, ndBigVector& dst1, ndBigVector& dst2, ndBigVector& dst3, const ndBigVector& src0, const ndBigVector& src1, const ndBigVector& src2, const ndBigVector& src3)
 	{
-		dBigVector tmp0(src0);
-		dBigVector tmp1(src1);
-		dBigVector tmp2(src2);
-		dBigVector tmp3(src3);
+		ndBigVector tmp0(src0);
+		ndBigVector tmp1(src1);
+		ndBigVector tmp2(src2);
+		ndBigVector tmp3(src3);
 
-		dst0 = dBigVector(tmp0.m_x, tmp1.m_x, tmp2.m_x, tmp3.m_x);
-		dst1 = dBigVector(tmp0.m_y, tmp1.m_y, tmp2.m_y, tmp3.m_y);
-		dst2 = dBigVector(tmp0.m_z, tmp1.m_z, tmp2.m_z, tmp3.m_z);
-		dst3 = dBigVector(tmp0.m_w, tmp1.m_w, tmp2.m_w, tmp3.m_w);
+		dst0 = ndBigVector(tmp0.m_x, tmp1.m_x, tmp2.m_x, tmp3.m_x);
+		dst1 = ndBigVector(tmp0.m_y, tmp1.m_y, tmp2.m_y, tmp3.m_y);
+		dst2 = ndBigVector(tmp0.m_z, tmp1.m_z, tmp2.m_z, tmp3.m_z);
+		dst3 = ndBigVector(tmp0.m_w, tmp1.m_w, tmp2.m_w, tmp3.m_w);
 	}
 
 	union
@@ -1862,21 +1862,21 @@ class dBigVector
 		};
 	};
 
-	D_CORE_API static dBigVector m_zero;
-	D_CORE_API static dBigVector m_one;
-	D_CORE_API static dBigVector m_wOne;
-	D_CORE_API static dBigVector m_half;
-	D_CORE_API static dBigVector m_two;
-	D_CORE_API static dBigVector m_three;
-	D_CORE_API static dBigVector m_negOne;
-	D_CORE_API static dBigVector m_xMask;
-	D_CORE_API static dBigVector m_yMask;
-	D_CORE_API static dBigVector m_zMask;
-	D_CORE_API static dBigVector m_wMask;
-	D_CORE_API static dBigVector m_xyzwMask;
-	D_CORE_API static dBigVector m_epsilon;
-	D_CORE_API static dBigVector m_signMask;
-	D_CORE_API static dBigVector m_triplexMask;
+	D_CORE_API static ndBigVector m_zero;
+	D_CORE_API static ndBigVector m_one;
+	D_CORE_API static ndBigVector m_wOne;
+	D_CORE_API static ndBigVector m_half;
+	D_CORE_API static ndBigVector m_two;
+	D_CORE_API static ndBigVector m_three;
+	D_CORE_API static ndBigVector m_negOne;
+	D_CORE_API static ndBigVector m_xMask;
+	D_CORE_API static ndBigVector m_yMask;
+	D_CORE_API static ndBigVector m_zMask;
+	D_CORE_API static ndBigVector m_wMask;
+	D_CORE_API static ndBigVector m_xyzwMask;
+	D_CORE_API static ndBigVector m_epsilon;
+	D_CORE_API static ndBigVector m_signMask;
+	D_CORE_API static ndBigVector m_triplexMask;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #endif

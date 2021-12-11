@@ -29,25 +29,25 @@ class ndDemoCamera: public ndDemoEntity
 	dFloat32 GetYawAngle() const;
 	dFloat32 GetPichAngle() const;
 
-	const dMatrix& GetViewMatrix() const;
-	const dMatrix& GetProjectionMatrix() const;
+	const ndMatrix& GetViewMatrix() const;
+	const ndMatrix& GetProjectionMatrix() const;
 
-	void SetMatrix (const dQuaternion& rotation, const dVector& position);
+	void SetMatrix (const ndQuaternion& rotation, const ndVector& position);
 	void SetViewMatrix (dInt32 width, dInt32 height);
 
-	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
+	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
-	dVector ScreenToWorld (const dVector& screenPoint) const;
-	dVector WorldToScreen (const dVector& worldPoint) const;
+	ndVector ScreenToWorld (const ndVector& screenPoint) const;
+	ndVector WorldToScreen (const ndVector& worldPoint) const;
 
 	
 	private:
-	dMatrix CreateLookAtMatrix(const dVector& eye, const dVector& center, const dVector& normUp);
-	dMatrix CreateMatrixFromFrustum(dFloat32 Left, dFloat32 Right, dFloat32 Bottom, dFloat32 Top, dFloat32 ZNear, dFloat32 ZFar);
-	dMatrix CreatePerspectiveMatrix(dFloat32 FOV, dFloat32 Aspect, dFloat32 ZNear, dFloat32 ZFar);
+	ndMatrix CreateLookAtMatrix(const ndVector& eye, const ndVector& center, const ndVector& normUp);
+	ndMatrix CreateMatrixFromFrustum(dFloat32 Left, dFloat32 Right, dFloat32 Bottom, dFloat32 Top, dFloat32 ZNear, dFloat32 ZFar);
+	ndMatrix CreatePerspectiveMatrix(dFloat32 FOV, dFloat32 Aspect, dFloat32 ZNear, dFloat32 ZFar);
 
-	dMatrix m_viewMatrix;
-	dMatrix m_projectionMatrix;
+	ndMatrix m_viewMatrix;
+	ndMatrix m_projectionMatrix;
 
 	dFloat32 m_fov;
 	dFloat32 m_backPlane;

@@ -24,22 +24,22 @@
 #include "ndRayCastNotify.h"
 #include "ndBodyKinematic.h"
 
-bool ndRayCastNotify::TraceShape(const dVector& globalOrigin, const dVector& globalDestination, const ndShapeInstance& shapeInstance, const dMatrix& shapeGlobal)
+bool ndRayCastNotify::TraceShape(const ndVector& globalOrigin, const ndVector& globalDestination, const ndShapeInstance& shapeInstance, const ndMatrix& shapeGlobal)
 {
 	ndContactPoint contactOut;
 
 	ndBodyKinematic tmpBody;
 	tmpBody.SetMatrix(globalOrigin);
 	tmpBody.SetCollisionShape(shapeInstance);
-	tmpBody.SetMassMatrix(dVector::m_one);
+	tmpBody.SetMassMatrix(ndVector::m_one);
 
-	const dVector& localOrigin(shapeGlobal.UntransformVector(globalOrigin) & dVector::m_triplexMask);
-	const dVector& localDestination(shapeGlobal.UntransformVector(globalDestination) & dVector::m_triplexMask);
+	const ndVector& localOrigin(shapeGlobal.UntransformVector(globalOrigin) & ndVector::m_triplexMask);
+	const ndVector& localDestination(shapeGlobal.UntransformVector(globalDestination) & ndVector::m_triplexMask);
 	dFloat32 t = shapeInstance.RayCast(*this, localOrigin, localDestination, &tmpBody, contactOut);
 	bool state = false;
 	if (t <= dFloat32 (1.0f))
 	{
-		dVector p(shapeGlobal.TransformVector(localOrigin + (localDestination - localOrigin).Scale(t)));
+		ndVector p(shapeGlobal.TransformVector(localOrigin + (localDestination - localOrigin).Scale(t)));
 		dAssert(t >= dFloat32(0.0f));
 		dAssert(t <= dFloat32(1.0f));
 		m_param = t;

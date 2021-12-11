@@ -26,11 +26,11 @@
 
 class ndJointBilateralConstraint;
 
-class ndJointList: public dList<ndJointBilateralConstraint*, dContainersFreeListAlloc<ndJointBilateralConstraint*>>
+class ndJointList: public ndList<ndJointBilateralConstraint*, ndContainersFreeListAlloc<ndJointBilateralConstraint*>>
 {
 	public:
 	ndJointList()
-		:dList<ndJointBilateralConstraint*, dContainersFreeListAlloc<ndJointBilateralConstraint*>>()
+		:ndList<ndJointBilateralConstraint*, ndContainersFreeListAlloc<ndJointBilateralConstraint*>>()
 	{
 	}
 };

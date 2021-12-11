@@ -40,16 +40,16 @@ class ndSkeletonContainer
 	class ndForcePair
 	{
 		public:
-		dSpatialVector m_joint;
-		dSpatialVector m_body;
+		ndSpatialVector m_joint;
+		ndSpatialVector m_body;
 	} D_GCC_NEWTON_ALIGN_32;
 
 	D_MSV_NEWTON_ALIGN_32
 	class ndMatriData
 	{
 		public:
-		dSpatialMatrix m_jt;
-		dSpatialMatrix m_invMass;
+		ndSpatialMatrix m_jt;
+		ndSpatialMatrix m_invMass;
 	} D_GCC_NEWTON_ALIGN_32;
 
 	D_MSV_NEWTON_ALIGN_32
@@ -65,13 +65,13 @@ class ndSkeletonContainer
 		public:
 		ndNode();
 		~ndNode();
-		dInt32 Factorize(const ndLeftHandSide* const leftHandSide, const ndRightHandSide* const rightHandSide, dSpatialMatrix* const bodyMassArray, dSpatialMatrix* const jointMassArray);
+		dInt32 Factorize(const ndLeftHandSide* const leftHandSide, const ndRightHandSide* const rightHandSide, ndSpatialMatrix* const bodyMassArray, ndSpatialMatrix* const jointMassArray);
 
 		inline void CalculateJacobianBlock();
-		inline void CalculateInertiaMatrix(dSpatialMatrix* const bodyMassArray) const;
-		inline void CalculateJointDiagonal(const dSpatialMatrix* const bodyMassArray, dSpatialMatrix* const jointMassArray);
-		inline void CalculateBodyDiagonal(ndNode* const child, dSpatialMatrix* const bodyMassArray, const dSpatialMatrix* const jointMassArray);
-		inline void GetJacobians(const ndLeftHandSide* const leftHandSide, const ndRightHandSide* const rightHandSide, dSpatialMatrix* const jointMassArray);
+		inline void CalculateInertiaMatrix(ndSpatialMatrix* const bodyMassArray) const;
+		inline void CalculateJointDiagonal(const ndSpatialMatrix* const bodyMassArray, ndSpatialMatrix* const jointMassArray);
+		inline void CalculateBodyDiagonal(ndNode* const child, ndSpatialMatrix* const bodyMassArray, const ndSpatialMatrix* const jointMassArray);
+		inline void GetJacobians(const ndLeftHandSide* const leftHandSide, const ndRightHandSide* const rightHandSide, ndSpatialMatrix* const jointMassArray);
 
 		inline void BodyDiagInvTimeSolution(ndForcePair& force);
 		inline void JointDiagInvTimeSolution(ndForcePair& force);
@@ -98,11 +98,11 @@ class ndSkeletonContainer
 		static dInt64 m_ordinalInit;
 	};
 
-	class ndNodeList : public dList<ndNode, dContainersFreeListAlloc<ndSkeletonContainer::ndNode> >
+	class ndNodeList : public ndList<ndNode, ndContainersFreeListAlloc<ndSkeletonContainer::ndNode> >
 	{
 		public:
 		ndNodeList()
-			:dList<ndSkeletonContainer::ndNode, dContainersFreeListAlloc<ndSkeletonContainer::ndNode> >()
+			:ndList<ndSkeletonContainer::ndNode, ndContainersFreeListAlloc<ndSkeletonContainer::ndNode> >()
 		{
 		}
 	};
@@ -153,9 +153,9 @@ class ndSkeletonContainer
 	dFloat32* m_deltaForce;
 
 	ndNodeList m_nodeList;
-	dArray<ndConstraint*> m_loopingJoints;
-	dArray<dInt8> m_auxiliaryMemoryBuffer;
-	dSpinLock m_lock;
+	ndArray<ndConstraint*> m_loopingJoints;
+	ndArray<dInt8> m_auxiliaryMemoryBuffer;
+	ndSpinLock m_lock;
 	dInt32 m_blockSize;
 	dInt16 m_rowCount;
 	dInt16 m_loopRowCount;

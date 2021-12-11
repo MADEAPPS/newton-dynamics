@@ -30,12 +30,12 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	//BuildFloorBox(scene, dGetIdentityMatrix());
 	//BuildCompoundScene(scene, dGetIdentityMatrix());
 
-	dMatrix location(dGetIdentityMatrix());
+	ndMatrix location(dGetIdentityMatrix());
 	location.m_posit.m_y += 2.0f;
 
-	dMatrix localAxis(dGetIdentityMatrix());
-	localAxis[0] = dVector(0.0, 1.0f, 0.0f, 0.0f);
-	localAxis[1] = dVector(1.0, 0.0f, 0.0f, 0.0f);
+	ndMatrix localAxis(dGetIdentityMatrix());
+	localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
+	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
 	dFloat32 height = 1.9f;
@@ -50,13 +50,13 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	location.m_posit.m_z += 2.0f;
 	new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
 
-	//AddCapsulesStacks(scene, dVector (32.0f, 0.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
-	AddBox(scene, dVector(10.0f, 0.0f, 0.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
-	AddBox(scene, dVector(10.0f, 0.5f, 1.125f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
-	AddBox(scene, dVector(10.0f, 1.0f, 1.250f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
+	//AddCapsulesStacks(scene, ndVector (32.0f, 0.0f, 0.0f, 0.0f), 10.0f, 0.5f, 0.5f, 1.0f, 10, 10, 7);
+	AddBox(scene, ndVector(10.0f, 0.0f, 0.0f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddBox(scene, ndVector(10.0f, 0.5f, 1.125f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
+	AddBox(scene, ndVector(10.0f, 1.0f, 1.250f, 0.0f), 30.0f, 2.0f, 0.25f, 2.5f);
 
 	delete entity;
-	dQuaternion rot;
-	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	ndQuaternion rot;
+	ndVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

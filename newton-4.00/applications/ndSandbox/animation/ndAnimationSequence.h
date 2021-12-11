@@ -17,7 +17,7 @@
 
 class ndAnimationPose;
 
-class ndAnimationSequence: public dClassAlloc
+class ndAnimationSequence: public ndClassAlloc
 {
 	public:
 	ndAnimationSequence();
@@ -27,18 +27,18 @@ class ndAnimationSequence: public dClassAlloc
 
 	dFloat32 GetPeriod() const;
 	void SetPeriod(dFloat32 period);
-	dList<ndAnimationKeyFramesTrack>& GetTracks();
+	ndList<ndAnimationKeyFramesTrack>& GetTracks();
 	
-	const dString& GetName() const;
+	const ndString& GetName() const;
 	void SetName(const char* const name);
 	void CalculatePose(ndAnimationPose& output, dFloat32 t) const;
 	
-	dString m_name;
-	dList<ndAnimationKeyFramesTrack> m_tracks;
+	ndString m_name;
+	ndList<ndAnimationKeyFramesTrack> m_tracks;
 	dFloat32 m_period;
 };
 
-inline const dString& ndAnimationSequence::GetName() const
+inline const ndString& ndAnimationSequence::GetName() const
 {
 	return m_name;
 }
@@ -59,7 +59,7 @@ inline void ndAnimationSequence::SetPeriod(dFloat32 period)
 	m_period = period; 
 }
 
-inline dList<ndAnimationKeyFramesTrack>& ndAnimationSequence::GetTracks() 
+inline ndList<ndAnimationKeyFramesTrack>& ndAnimationSequence::GetTracks() 
 { 
 	return m_tracks; 
 }

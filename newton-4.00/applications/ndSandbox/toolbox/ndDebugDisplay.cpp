@@ -20,14 +20,14 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 
-static glVector3 CalculatePoint(const dMatrix& matrix, const dVector& center, dFloat32 x, dFloat32 y, dFloat32 w)
+static glVector3 CalculatePoint(const ndMatrix& matrix, const ndVector& center, dFloat32 x, dFloat32 y, dFloat32 w)
 {
-	dVector point(center.m_x + x, center.m_y + y, center.m_z, center.m_w);
+	ndVector point(center.m_x + x, center.m_y + y, center.m_z, center.m_w);
 	point = matrix.TransformVector1x4(point.Scale(w));
 	return glVector3(GLfloat(point.m_x), GLfloat(point.m_y), GLfloat(point.m_z));
 }
 
-static void DrawBox(const dVector& p0, const dVector& p1, glVector3 box[12][2])
+static void DrawBox(const ndVector& p0, const ndVector& p1, glVector3 box[12][2])
 {
 	//ndMeshVector box[12][2];
 	box[0][0] = glVector3(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
@@ -97,10 +97,10 @@ void RenderBodiesAABB(ndDemoEntityManager* const scene)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof (glVector3), box);
 
-	for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
-		dVector p0;
-		dVector p1;
+		ndVector p0;
+		ndVector p1;
 		ndBodyKinematic* const body = bodyNode->GetInfo();
 		body->GetAABB(p0, p1);
 		DrawBox(p0, p1, box);
@@ -117,7 +117,7 @@ void RenderWorldScene(ndDemoEntityManager* const scene)
 	ndDemoCamera* const camera = scene->GetCamera();
 	const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
 
-	glVector4 color(dVector(1.0f, 1.0f, 0.0f, 1.0f));
+	glVector4 color(ndVector(1.0f, 1.0f, 0.0f, 1.0f));
 
 	glUseProgram(shader);
 
@@ -139,8 +139,8 @@ void RenderWorldScene(ndDemoEntityManager* const scene)
 
 		virtual void OnDebugNode(const ndSceneNode* const node)
 		{
-			dVector p0;
-			dVector p1;
+			ndVector p0;
+			ndVector p1;
 			node->GetAabb(p0, p1);
 			DrawBox(p0, p1, m_box);
 		}
@@ -161,10 +161,10 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	GLuint shader = scene->GetShaderCache().m_wireFrame;
 
 	ndDemoCamera* const camera = scene->GetCamera();
-	const dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
-	const dMatrix invViewProjectionMatrix(camera->GetProjectionMatrix().Inverse4x4() * camera->GetViewMatrix().Inverse());
+	const ndMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+	const ndMatrix invViewProjectionMatrix(camera->GetProjectionMatrix().Inverse4x4() * camera->GetViewMatrix().Inverse());
 
-	glVector4 color(dVector(1.0f, 0.0f, 0.0f, 1.0f));
+	glVector4 color(ndVector(1.0f, 0.0f, 0.0f, 1.0f));
 
 	glUseProgram(shader);
 
@@ -182,16 +182,16 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof (glVector3), pointBuffer);
 	const ndContactList& contactList = world->GetContactList();
-	for (ndContactList::dNode* contactNode = contactList.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+	for (ndContactList::ndNode* contactNode = contactList.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 	{
 		const ndContact* const contact = &contactNode->GetInfo();
 		if (contact->IsActive())
 		{
 			const ndContactPointList& contactPoints = contact->GetContactPoints();
-			for (ndContactPointList::dNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
+			for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
 			{
 				const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
-				dVector point(viewProjectionMatrix.TransformVector1x4(contactPoint.m_point));
+				ndVector point(viewProjectionMatrix.TransformVector1x4(contactPoint.m_point));
 				dFloat32 zDist = point.m_w;
 				point = point.Scale(1.0f / zDist);
 
@@ -227,37 +227,37 @@ void RenderBodyFrame(ndDemoEntityManager* const scene)
 	glVertexPointer(3, GL_FLOAT, sizeof(glVector3), line);
 
 	const ndBodyList& bodyList = world->GetBodyList();
-	for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
 
-		dMatrix matrix(body->GetMatrix());
-		dVector o(matrix.m_posit);
+		ndMatrix matrix(body->GetMatrix());
+		ndVector o(matrix.m_posit);
 		line[0].m_x = GLfloat(o.m_x);
 		line[0].m_y = GLfloat(o.m_y);
 		line[0].m_z = GLfloat(o.m_z);
 
-		dVector x(o + matrix.RotateVector(dVector(0.5f, 0.0f, 0.0f, 0.0f)));
+		ndVector x(o + matrix.RotateVector(ndVector(0.5f, 0.0f, 0.0f, 0.0f)));
 		line[1].m_x = GLfloat(x.m_x);
 		line[1].m_y = GLfloat(x.m_y);
 		line[1].m_z = GLfloat(x.m_z);
-		glVector4 color (dVector (1.0f, 0.0f, 0.0f, 0.0f));
+		glVector4 color (ndVector (1.0f, 0.0f, 0.0f, 0.0f));
 		glUniform4fv(shadeColorLocation, 1, &color[0]);
 		glDrawArrays(GL_LINES, 0, 2);
 
-		x = o + matrix.RotateVector(dVector(0.0f, 0.5f, 0.0f, 0.0f));
+		x = o + matrix.RotateVector(ndVector(0.0f, 0.5f, 0.0f, 0.0f));
 		line[1].m_x = GLfloat(x.m_x);
 		line[1].m_y = GLfloat(x.m_y);
 		line[1].m_z = GLfloat(x.m_z);
-		color = glVector4(dVector(0.0f, 1.0f, 0.0f, 0.0f));
+		color = glVector4(ndVector(0.0f, 1.0f, 0.0f, 0.0f));
 		glUniform4fv(shadeColorLocation, 1, &color[0]);
 		glDrawArrays(GL_LINES, 0, 2);
 
-		x = o + matrix.RotateVector(dVector(0.0f, 0.0f, 0.5f, 0.0f));
+		x = o + matrix.RotateVector(ndVector(0.0f, 0.0f, 0.5f, 0.0f));
 		line[1].m_x = GLfloat(x.m_x);
 		line[1].m_y = GLfloat(x.m_y);
 		line[1].m_z = GLfloat(x.m_z);
-		color = glVector4(dVector(0.0f, 0.0f, 1.0f, 0.0f));
+		color = glVector4(ndVector(0.0f, 0.0f, 1.0f, 0.0f));
 		glUniform4fv(shadeColorLocation, 1, &color[0]);
 		glDrawArrays(GL_LINES, 0, 2);
 	}
@@ -284,39 +284,39 @@ void RenderCenterOfMass(ndDemoEntityManager* const scene)
 	glVertexPointer(3, GL_FLOAT, sizeof(glVector3), line);
 
 	const ndBodyList& bodyList = world->GetBodyList();
-	for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
 
-		dMatrix matrix(body->GetMatrix());
-		dVector com(body->GetCentreOfMass());
+		ndMatrix matrix(body->GetMatrix());
+		ndVector com(body->GetCentreOfMass());
 		
-		dVector o(matrix.TransformVector(com));
+		ndVector o(matrix.TransformVector(com));
 		line[0].m_x = GLfloat(o.m_x);
 		line[0].m_y = GLfloat(o.m_y);
 		line[0].m_z = GLfloat(o.m_z);
 
-		dVector x(o + matrix.RotateVector(dVector(0.5f, 0.0f, 0.0f, 0.0f)));
+		ndVector x(o + matrix.RotateVector(ndVector(0.5f, 0.0f, 0.0f, 0.0f)));
 		line[1].m_x = GLfloat(x.m_x);
 		line[1].m_y = GLfloat(x.m_y);
 		line[1].m_z = GLfloat(x.m_z);
-		glVector4 color (dVector (1.0f, 0.0f, 0.0f, 0.0f));
+		glVector4 color (ndVector (1.0f, 0.0f, 0.0f, 0.0f));
 		glUniform4fv(shadeColorLocation, 1, &color[0]);
 		glDrawArrays(GL_LINES, 0, 2);
 
-		x = o + matrix.RotateVector(dVector(0.0f, 0.5f, 0.0f, 0.0f));
+		x = o + matrix.RotateVector(ndVector(0.0f, 0.5f, 0.0f, 0.0f));
 		line[1].m_x = GLfloat(x.m_x);
 		line[1].m_y = GLfloat(x.m_y);
 		line[1].m_z = GLfloat(x.m_z);
-		color = glVector4(dVector(0.0f, 1.0f, 0.0f, 0.0f));
+		color = glVector4(ndVector(0.0f, 1.0f, 0.0f, 0.0f));
 		glUniform4fv(shadeColorLocation, 1, &color[0]);
 		glDrawArrays(GL_LINES, 0, 2);
 
-		x = o + matrix.RotateVector(dVector(0.0f, 0.0f, 0.5f, 0.0f));
+		x = o + matrix.RotateVector(ndVector(0.0f, 0.0f, 0.5f, 0.0f));
 		line[1].m_x = GLfloat(x.m_x);
 		line[1].m_y = GLfloat(x.m_y);
 		line[1].m_z = GLfloat(x.m_z);
-		color = glVector4(dVector (0.0f, 0.0f, 1.0f, 0.0f));
+		color = glVector4(ndVector (0.0f, 0.0f, 1.0f, 0.0f));
 		glUniform4fv(shadeColorLocation, 1, &color[0]);
 		glDrawArrays(GL_LINES, 0, 2);
 	}
@@ -331,8 +331,8 @@ void RenderParticles(ndDemoEntityManager* const scene)
 	GLuint shader = scene->GetShaderCache().m_wireFrame;
 
 	ndDemoCamera* const camera = scene->GetCamera();
-	const dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
-	const dMatrix invViewProjectionMatrix(camera->GetProjectionMatrix().Inverse4x4() * camera->GetViewMatrix().Inverse());
+	const ndMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+	const ndMatrix invViewProjectionMatrix(camera->GetProjectionMatrix().Inverse4x4() * camera->GetViewMatrix().Inverse());
 
 	glVector4 color;
 	color.m_x = 50.0f / 255.0f;
@@ -358,15 +358,15 @@ void RenderParticles(ndDemoEntityManager* const scene)
 	glVertexPointer(3, GL_FLOAT, sizeof(glVector3), pointBuffer);
 
 	const ndBodyParticleSetList& particles = world->GetParticleList();
-	for (ndBodyParticleSetList::dNode* particleNode = particles.GetFirst(); particleNode; particleNode = particleNode->GetNext())
+	for (ndBodyParticleSetList::ndNode* particleNode = particles.GetFirst(); particleNode; particleNode = particleNode->GetNext())
 	{
 		ndBodyParticleSet* const particle = particleNode->GetInfo();
-		const dArray<dVector>& positions = particle->GetPositions();
+		const ndArray<ndVector>& positions = particle->GetPositions();
 		for (dInt32 i = 0; i < positions.GetCount(); i ++)
 		{
-			dVector particlePosit(positions[i]);
+			ndVector particlePosit(positions[i]);
 			particlePosit.m_w = 1.0f;
-			dVector point(viewProjectionMatrix.TransformVector1x4(particlePosit));
+			ndVector point(viewProjectionMatrix.TransformVector1x4(particlePosit));
 			dFloat32 zDist = point.m_w;
 			point = point.Scale(1.0f / zDist);
 
@@ -409,7 +409,7 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 			glUseProgram(0);
 		}
 
-		void DrawLine(const dVector& p0, const dVector& p1, const dVector& color, dFloat32 thickness)
+		void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, dFloat32 thickness)
 		{
 			m_line[0].m_x = GLfloat(p0.m_x);
 			m_line[0].m_y = GLfloat(p0.m_y);
@@ -436,7 +436,7 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 	debugJoint.SetScale(0.2f);
 	ndWorld* const workd = scene->GetWorld();
 	const ndJointList& jointList = workd->GetJointList();
-	for (ndJointList::dNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+	for (ndJointList::ndNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = jointNode->GetInfo();
 		joint->DebugJoint(debugJoint);
@@ -470,7 +470,7 @@ void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 			glUseProgram(0);
 		}
 		
-		void DrawLine(const dVector& p0, const dVector& p1, const dVector& color, dFloat32 thickness)
+		void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, dFloat32 thickness)
 		{
 			m_line[0].m_x = GLfloat(p0.m_x);
 			m_line[0].m_y = GLfloat(p0.m_y);
@@ -496,7 +496,7 @@ void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 	ndJoindDebug debugJoint(scene);
 	ndWorld* const workd = scene->GetWorld();
 	const ndModelList& modelList = workd->GetModelList();
-	for (ndModelList::dNode* jointNode = modelList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+	for (ndModelList::ndNode* jointNode = modelList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
 	{
 		ndModel* const model = jointNode->GetInfo();
 		model->Debug(debugJoint);

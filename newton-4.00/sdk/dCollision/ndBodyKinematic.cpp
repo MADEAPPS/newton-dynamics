@@ -54,14 +54,14 @@ class ndDummyCollision: public ndShapeNull
 };
 
 ndBodyKinematic::ndContactMap::ndContactMap()
-	:dTree<ndContact*, ndContactkey, dContainersFreeListAlloc<ndContact*>>()
+	:ndTree<ndContact*, ndContactkey, ndContainersFreeListAlloc<ndContact*>>()
 {
 }
 
 ndContact* ndBodyKinematic::ndContactMap::FindContact(const ndBody* const body0, const ndBody* const body1) const
 {
 	ndContactkey key(body0->GetId(), body1->GetId());
-	dNode* const node = Find(key);
+	ndNode* const node = Find(key);
 	return node ? node->GetInfo() : nullptr;
 }
 
@@ -87,12 +87,12 @@ ndBodyKinematic::ndBodyKinematic()
 	:ndBody()
 	,m_invWorldInertiaMatrix(dGetZeroMatrix())
 	,m_shapeInstance(ndDummyCollision::GetNullShape())
-	,m_mass(dVector::m_zero)
-	,m_invMass(dVector::m_zero)
-	,m_accel(dVector::m_zero)
-	,m_alpha(dVector::m_zero)
-	,m_gyroAlpha(dVector::m_zero)
-	,m_gyroTorque(dVector::m_zero)
+	,m_mass(ndVector::m_zero)
+	,m_invMass(ndVector::m_zero)
+	,m_accel(ndVector::m_zero)
+	,m_alpha(ndVector::m_zero)
+	,m_gyroAlpha(ndVector::m_zero)
+	,m_gyroTorque(ndVector::m_zero)
 	,m_gyroRotation()
 	,m_jointList()
 	,m_contactList()
@@ -111,19 +111,19 @@ ndBodyKinematic::ndBodyKinematic()
 {
 	m_invWorldInertiaMatrix[3][3] = dFloat32(1.0f);
 	m_shapeInstance.m_ownerBody = this;
-	SetMassMatrix(dVector::m_zero);
+	SetMassMatrix(ndVector::m_zero);
 }
 
-ndBodyKinematic::ndBodyKinematic(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndBody(dLoadSaveBase::dLoadDescriptor(desc))
+ndBodyKinematic::ndBodyKinematic(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndBody(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_invWorldInertiaMatrix(dGetZeroMatrix())
 	,m_shapeInstance(ndDummyCollision::GetNullShape())
-	,m_mass(dVector::m_zero)
-	,m_invMass(dVector::m_zero)
-	,m_accel(dVector::m_zero)
-	,m_alpha(dVector::m_zero)
-	,m_gyroAlpha(dVector::m_zero)
-	,m_gyroTorque(dVector::m_zero)
+	,m_mass(ndVector::m_zero)
+	,m_invMass(ndVector::m_zero)
+	,m_accel(ndVector::m_zero)
+	,m_alpha(ndVector::m_zero)
+	,m_gyroAlpha(ndVector::m_zero)
+	,m_gyroTorque(ndVector::m_zero)
 	,m_gyroRotation()
 	,m_jointList()
 	,m_contactList()
@@ -144,10 +144,10 @@ ndBodyKinematic::ndBodyKinematic(const dLoadSaveBase::dLoadDescriptor& desc)
 	SetCollisionShape(instance);
 	
 	dFloat32 invMass = xmlGetFloat(xmlNode, "invMass");
-	SetMassMatrix(dVector::m_zero);
+	SetMassMatrix(ndVector::m_zero);
 	if (invMass > dFloat32 (0.0f))
 	{
-		dVector invInertia(xmlGetVector3(xmlNode, "invPrincipalInertia"));
+		ndVector invInertia(xmlGetVector3(xmlNode, "invPrincipalInertia"));
 		SetMassMatrix(dFloat32 (1.0f)/invInertia.m_x, dFloat32(1.0f) / invInertia.m_y, dFloat32(1.0f) / invInertia.m_z, dFloat32(1.0f) / invMass);
 	}
 
@@ -166,7 +166,7 @@ void ndBodyKinematic::SetSleepState(bool state)
 	m_equilibrium = state ? 1 : 0;
 	if ((m_invMass.m_w > dFloat32(0.0f)) && (m_veloc.DotProduct(m_veloc).GetScalar() < dFloat32(1.0e-10f)) && (m_omega.DotProduct(m_omega).GetScalar() < dFloat32(1.0e-10f))) 
 	{
-		dVector invalidateVeloc(dFloat32(10.0f));
+		ndVector invalidateVeloc(dFloat32(10.0f));
 		ndContactMap::Iterator it(m_contactList);
 		for (it.Begin(); it; it ++)
 		{
@@ -188,13 +188,13 @@ void ndBodyKinematic::SetCollisionShape(const ndShapeInstance& shapeInstance)
 
 ndContact* ndBodyKinematic::FindContact(const ndBody* const otherBody) const
 {
-	dScopeSpinLock lock(m_lock);
+	ndScopeSpinLock lock(m_lock);
 	return m_contactList.FindContact(this, otherBody);
 }
 
 void ndBodyKinematic::AttachContact(ndContact* const contact)
 {
-	dScopeSpinLock lock(m_lock);
+	ndScopeSpinLock lock(m_lock);
 	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
 	if (m_invMass.m_w > dFloat32(0.0f))
 	{
@@ -206,24 +206,24 @@ void ndBodyKinematic::AttachContact(ndContact* const contact)
 
 void ndBodyKinematic::DetachContact(ndContact* const contact)
 {
-	dScopeSpinLock lock(m_lock);
+	ndScopeSpinLock lock(m_lock);
 	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
 	m_equilibrium = contact->m_body0->m_equilibrium & contact->m_body1->m_equilibrium;
 	m_contactList.DetachContact(contact);
 }
 
-ndJointList::dNode* ndBodyKinematic::AttachJoint(ndJointBilateralConstraint* const joint)
+ndJointList::ndNode* ndBodyKinematic::AttachJoint(ndJointBilateralConstraint* const joint)
 {
 	m_equilibrium = 0;
 	return m_jointList.Append(joint);
 }
 
-void ndBodyKinematic::DetachJoint(ndJointList::dNode* const node)
+void ndBodyKinematic::DetachJoint(ndJointList::ndNode* const node)
 {
 	m_equilibrium = 0;
 #ifdef _DEBUG
 	bool found = false;
-	for (ndJointList::dNode* nodeptr = m_jointList.GetFirst(); nodeptr; nodeptr = nodeptr->GetNext())
+	for (ndJointList::ndNode* nodeptr = m_jointList.GetFirst(); nodeptr; nodeptr = nodeptr->GetNext())
 	{
 		found = found || nodeptr;
 	}
@@ -232,7 +232,7 @@ void ndBodyKinematic::DetachJoint(ndJointList::dNode* const node)
 	m_jointList.Remove(node);
 }
 
-void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
+void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const ndMatrix& inertia)
 {
 	mass = dAbs(mass);
 
@@ -249,7 +249,7 @@ void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 		m_mass.m_y = D_INFINITE_MASS;
 		m_mass.m_z = D_INFINITE_MASS;
 		m_mass.m_w = D_INFINITE_MASS;
-		m_invMass = dVector::m_zero;
+		m_invMass = ndVector::m_zero;
 	}
 	else
 	{
@@ -294,18 +294,18 @@ void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 #endif
 }
 
-bool ndBodyKinematic::RayCast(ndRayCastNotify& callback, const dFastRay& ray, dFloat32 maxT) const
+bool ndBodyKinematic::RayCast(ndRayCastNotify& callback, const ndFastRay& ray, dFloat32 maxT) const
 {
-	dVector l0(ray.m_p0);
-	dVector l1(ray.m_p0 + ray.m_diff.Scale(dMin(maxT, dFloat32(1.0f))));
+	ndVector l0(ray.m_p0);
+	ndVector l1(ray.m_p0 + ray.m_diff.Scale(dMin(maxT, dFloat32(1.0f))));
 
 	bool state = false;
 	if (dRayBoxClip(l0, l1, m_minAabb, m_maxAabb))
 	{
-		const dMatrix& globalMatrix = m_shapeInstance.GetGlobalMatrix();
-		dVector localP0(globalMatrix.UntransformVector(l0) & dVector::m_triplexMask);
-		dVector localP1(globalMatrix.UntransformVector(l1) & dVector::m_triplexMask);
-		dVector p1p0(localP1 - localP0);
+		const ndMatrix& globalMatrix = m_shapeInstance.GetGlobalMatrix();
+		ndVector localP0(globalMatrix.UntransformVector(l0) & ndVector::m_triplexMask);
+		ndVector localP1(globalMatrix.UntransformVector(l1) & ndVector::m_triplexMask);
+		ndVector p1p0(localP1 - localP0);
 		dAssert(p1p0.m_w == dFloat32(0.0f));
 		if (p1p0.DotProduct(p1p0).GetScalar() > dFloat32(1.0e-12f))
 		{
@@ -316,7 +316,7 @@ bool ndBodyKinematic::RayCast(ndRayCastNotify& callback, const dFastRay& ray, dF
 				if (t < dFloat32(1.0f))
 				{
 					dAssert(localP0.m_w == localP1.m_w);
-					dVector p(globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale(t)));
+					ndVector p(globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale(t)));
 					t = ray.m_diff.DotProduct(p - ray.m_p0).GetScalar() / ray.m_diff.DotProduct(ray.m_diff).GetScalar();
 					if (t < maxT)
 					{
@@ -342,12 +342,12 @@ void ndBodyKinematic::UpdateCollisionMatrix()
 	m_shapeInstance.CalculateAabb(m_shapeInstance.GetGlobalMatrix(), m_minAabb, m_maxAabb);
 }
 
-dMatrix ndBodyKinematic::CalculateInvInertiaMatrix() const
+ndMatrix ndBodyKinematic::CalculateInvInertiaMatrix() const
 {
-	const dVector invIxx(m_invMass[0]);
-	const dVector invIyy(m_invMass[1]);
-	const dVector invIzz(m_invMass[2]);
-	return dMatrix(
+	const ndVector invIxx(m_invMass[0]);
+	const ndVector invIyy(m_invMass[1]);
+	const ndVector invIzz(m_invMass[2]);
+	return ndMatrix(
 		m_matrix.m_front.Scale(m_matrix.m_front[0]) * invIxx +
 		m_matrix.m_up.Scale(m_matrix.m_up[0])	* invIyy +
 		m_matrix.m_right.Scale(m_matrix.m_right[0]) * invIzz,
@@ -359,15 +359,15 @@ dMatrix ndBodyKinematic::CalculateInvInertiaMatrix() const
 		m_matrix.m_front.Scale(m_matrix.m_front[2]) * invIxx +
 		m_matrix.m_up.Scale(m_matrix.m_up[2])	* invIyy +
 		m_matrix.m_right.Scale(m_matrix.m_right[2]) * invIzz,
-		dVector::m_wOne);
+		ndVector::m_wOne);
 }
 
-dMatrix ndBodyKinematic::CalculateInertiaMatrix() const
+ndMatrix ndBodyKinematic::CalculateInertiaMatrix() const
 {
-	const dVector Ixx(m_mass.m_x);
-	const dVector Iyy(m_mass.m_y);
-	const dVector Izz(m_mass.m_z);
-	return dMatrix(
+	const ndVector Ixx(m_mass.m_x);
+	const ndVector Iyy(m_mass.m_y);
+	const ndVector Izz(m_mass.m_z);
+	return ndMatrix(
 		m_matrix.m_front.Scale(m_matrix.m_front[0]) * Ixx +
 		m_matrix.m_up.Scale(m_matrix.m_up[0]) 	* Iyy +
 		m_matrix.m_right.Scale(m_matrix.m_right[0]) * Izz,
@@ -379,25 +379,25 @@ dMatrix ndBodyKinematic::CalculateInertiaMatrix() const
 		m_matrix.m_front.Scale(m_matrix.m_front[2]) * Ixx +
 		m_matrix.m_up.Scale(m_matrix.m_up[2])       * Iyy +
 		m_matrix.m_right.Scale(m_matrix.m_right[2]) * Izz,
-		dVector::m_wOne);
+		ndVector::m_wOne);
 
 }
 
-dVector ndBodyKinematic::CalculateLinearMomentum() const
+ndVector ndBodyKinematic::CalculateLinearMomentum() const
 {
 	return m_veloc.Scale(m_mass.m_w);
 }
 
-dVector ndBodyKinematic::CalculateAngularMomentum() const
+ndVector ndBodyKinematic::CalculateAngularMomentum() const
 {
-	const dVector localOmega(m_matrix.UnrotateVector(m_omega));
-	const dVector localAngularMomentum(m_mass * localOmega);
+	const ndVector localOmega(m_matrix.UnrotateVector(m_omega));
+	const ndVector localAngularMomentum(m_mass * localOmega);
 	return m_matrix.RotateVector(localAngularMomentum);
 }
 
 dFloat32 ndBodyKinematic::TotalEnergy() const
 {
-	dVector energy (m_veloc.DotProduct(CalculateLinearMomentum()) + m_veloc.DotProduct(CalculateAngularMomentum()));
+	ndVector energy (m_veloc.DotProduct(CalculateLinearMomentum()) + m_veloc.DotProduct(CalculateAngularMomentum()));
 	return energy.AddHorizontal().GetScalar()* dFloat32(0.5f);
 }
 
@@ -426,12 +426,12 @@ void ndBodyKinematic::IntegrateVelocity(dFloat32 timestep)
 	// this is correct
 	const dFloat32 invOmegaMag = dRsqrt(omegaMag2);
 	const dFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
-	const dVector omegaAxis(m_omega.Scale(invOmegaMag));
-	const dQuaternion rotationStep(omegaAxis, omegaAngle);
-	const dQuaternion rotation(m_rotation * rotationStep);
+	const ndVector omegaAxis(m_omega.Scale(invOmegaMag));
+	const ndQuaternion rotationStep(omegaAxis, omegaAngle);
+	const ndQuaternion rotation(m_rotation * rotationStep);
 	m_rotation = rotation.Normalize();
 	dAssert((m_rotation.DotProduct(m_rotation).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-5f));
-	m_matrix = dMatrix(m_rotation, m_matrix.m_posit);
+	m_matrix = ndMatrix(m_rotation, m_matrix.m_posit);
 
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
 	dAssert(m_matrix.TestOrthogonal());
@@ -441,8 +441,8 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 {
 	if (!m_equilibrium && (m_invMass.m_w > dFloat32(0.0f)))
 	{
-		const dVector accel(GetForce().Scale(m_invMass.m_w));
-		const dVector torque(GetTorque());
+		const ndVector accel(GetForce().Scale(m_invMass.m_w));
+		const ndVector torque(GetTorque());
 
 		// using simple backward Euler or implicit integration, this is. 
 		// f'(t + dt) = (f(t + dt) - f(t)) / dt  
@@ -474,19 +474,19 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 		// Iy * ay + (Ix - Iz) * dwz * ax + (Ix - Iz) * dwx * az = Ty - (Ix - Iz) * wz * wx
 		// Iz * az + (Iy - Ix) * dwx * ay + (Iy - Ix) * dwy * ax = Tz - (Iy - Ix) * wx * wy
 		
-		dVector localOmega(m_matrix.UnrotateVector(m_omega));
-		const dVector localAngularMomentum(m_mass * localOmega);
-		const dVector angularMomentum(m_matrix.RotateVector(localAngularMomentum));
-		const dVector gyroTorque(m_omega.CrossProduct(angularMomentum));
-		const dVector localTorque(m_matrix.UnrotateVector(torque - gyroTorque));
+		ndVector localOmega(m_matrix.UnrotateVector(m_omega));
+		const ndVector localAngularMomentum(m_mass * localOmega);
+		const ndVector angularMomentum(m_matrix.RotateVector(localAngularMomentum));
+		const ndVector gyroTorque(m_omega.CrossProduct(angularMomentum));
+		const ndVector localTorque(m_matrix.UnrotateVector(torque - gyroTorque));
 		
 		// and solving for alpha we get the angular acceleration at t + dt
 		// calculate gradient at a full time step
-		dVector gradientStep(localTorque.Scale(timestep));
+		ndVector gradientStep(localTorque.Scale(timestep));
 		
 		// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
-		const dVector dw(localOmega.Scale(dFloat32(0.5f) * timestep));
-		//dVector dw(localOmega.Scale(dFloat32(1.0f) * timestep));
+		const ndVector dw(localOmega.Scale(dFloat32(0.5f) * timestep));
+		//ndVector dw(localOmega.Scale(dFloat32(1.0f) * timestep));
 		
 		// calculates Jacobian matrix (
 		//		dWx / dwx, dWx / dwy, dWx / dwz
@@ -496,17 +496,17 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 		//		dWx / dwx = Ix, dWx / dwy = (Iz - Iy) * wz * dt, dWx / dwz = (Iz - Iy) * wy * dt)
 		//		dWy / dwx = (Ix - Iz) * wz * dt, dWy / dwy = Iy, dWy / dwz = (Ix - Iz) * wx * dt
 		//		dWz / dwx = (Iy - Ix) * wy * dt, dWz / dwy = (Iy - Ix) * wx * dt, dWz / dwz = Iz
-		const dMatrix jacobianMatrix(
-			dVector(m_mass.m_x, (m_mass.m_z - m_mass.m_y) * dw.m_z, (m_mass.m_z - m_mass.m_y) * dw.m_y, dFloat32(0.0f)),
-			dVector((m_mass.m_x - m_mass.m_z) * dw.m_z, m_mass.m_y, (m_mass.m_x - m_mass.m_z) * dw.m_x, dFloat32(0.0f)),
-			dVector((m_mass.m_y - m_mass.m_x) * dw.m_y, (m_mass.m_y - m_mass.m_x) * dw.m_x, m_mass.m_z, dFloat32(0.0f)),
-			dVector::m_wOne);
+		const ndMatrix jacobianMatrix(
+			ndVector(m_mass.m_x, (m_mass.m_z - m_mass.m_y) * dw.m_z, (m_mass.m_z - m_mass.m_y) * dw.m_y, dFloat32(0.0f)),
+			ndVector((m_mass.m_x - m_mass.m_z) * dw.m_z, m_mass.m_y, (m_mass.m_x - m_mass.m_z) * dw.m_x, dFloat32(0.0f)),
+			ndVector((m_mass.m_y - m_mass.m_x) * dw.m_y, (m_mass.m_y - m_mass.m_x) * dw.m_x, m_mass.m_z, dFloat32(0.0f)),
+			ndVector::m_wOne);
 		
 		gradientStep = jacobianMatrix.SolveByGaussianElimination(gradientStep);
 		
 		localOmega += gradientStep;
 		
-		const dVector alpha(m_matrix.RotateVector(localTorque * m_invMass));
+		const ndVector alpha(m_matrix.RotateVector(localTorque * m_invMass));
 		
 		SetAccel(accel);
 		SetAlpha(alpha);
@@ -515,24 +515,24 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 	}
 	else
 	{
-		SetAccel(dVector::m_zero);
-		SetAlpha(dVector::m_zero);
+		SetAccel(ndVector::m_zero);
+		SetAlpha(ndVector::m_zero);
 	}
 }
 
-void ndBodyKinematic::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndBodyKinematic::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndBody::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndBody::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 	
 	xmlSaveParam(childNode, "invMass", m_invMass.m_w);
-	dVector invInertia(m_invMass & dVector::m_triplexMask);
+	ndVector invInertia(m_invMass & ndVector::m_triplexMask);
 	xmlSaveParam(childNode, "invPrincipalInertia", invInertia);
 
 	xmlSaveParam(childNode, "maxAngleStep", m_maxAngleStep);
 	xmlSaveParam(childNode, "maxLinearSpeed", m_maxLinearSpeed);
 
-	m_shapeInstance.Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	m_shapeInstance.Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }

@@ -15,7 +15,7 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointFix6dof)
 
-ndJointFix6dof::ndJointFix6dof(const dMatrix& frameInGlbalSpace, ndBodyKinematic* const body0, ndBodyKinematic* const body1)
+ndJointFix6dof::ndJointFix6dof(const ndMatrix& frameInGlbalSpace, ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 	:ndJointBilateralConstraint(6, body0, body1, frameInGlbalSpace)
 	,m_softness(dFloat32(0.0f))
 	,m_maxForce(D_MAX_BOUND)
@@ -23,8 +23,8 @@ ndJointFix6dof::ndJointFix6dof(const dMatrix& frameInGlbalSpace, ndBodyKinematic
 {
 }
 
-ndJointFix6dof::ndJointFix6dof(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+ndJointFix6dof::ndJointFix6dof(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_softness(dFloat32(0.0f))
 	,m_maxForce(D_MAX_BOUND)
 	,m_maxTorque(D_MAX_BOUND)
@@ -53,8 +53,8 @@ void ndJointFix6dof::SetRegularizer(dFloat32 regularizer)
 
 void ndJointFix6dof::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 
 //for (dInt32 i = 0; i < 3; i++)
 //{
@@ -92,7 +92,7 @@ void ndJointFix6dof::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 }
 
-void ndJointFix6dof::SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
+void ndJointFix6dof::SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	// since very small angle rotation commute, we can issue
 	// three angle around the matrix1 axis in any order.
@@ -115,28 +115,28 @@ void ndJointFix6dof::SubmitAngularAxisCartisianApproximation(ndConstraintDescrit
 	SetDiagonalRegularizer(desc, m_softness);
 }
 
-void ndJointFix6dof::SubmitAngularAxis(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
+void ndJointFix6dof::SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
 	// calculate cone angle
-	dVector lateralDir(matrix1.m_front.CrossProduct(matrix0.m_front));
+	ndVector lateralDir(matrix1.m_front.CrossProduct(matrix0.m_front));
 	dAssert(lateralDir.DotProduct(lateralDir).GetScalar() > dFloat32 (1.0e-6f));
 	lateralDir = lateralDir.Normalize();
 	dFloat32 coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct(matrix0.m_front).GetScalar(), dFloat32(-1.0f), dFloat32(1.0f)));
-	dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+	ndMatrix coneRotation(ndQuaternion(lateralDir, coneAngle), matrix1.m_posit);
 
 	AddAngularRowJacobian(desc, lateralDir, -coneAngle);
 	SetLowerFriction(desc, -m_maxTorque);
 	SetHighFriction(desc, m_maxTorque);
 	SetDiagonalRegularizer(desc, m_softness);
 
-	dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+	ndVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
 	AddAngularRowJacobian(desc, sideDir, dFloat32(0.0f));
 	SetLowerFriction(desc, -m_maxTorque);
 	SetHighFriction(desc, m_maxTorque);
 	SetDiagonalRegularizer(desc, m_softness);
 
 	// calculate pitch angle
-	dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+	ndMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 	dFloat32 pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 	AddAngularRowJacobian(desc, matrix0.m_front, pitchAngle);
 	SetLowerFriction(desc, -m_maxTorque);
@@ -145,12 +145,12 @@ void ndJointFix6dof::SubmitAngularAxis(ndConstraintDescritor& desc, const dMatri
 	//dTrace(("%f %f\n", coneAngle * dRadToDegree, pitchAngle * dRadToDegree));
 }
 
-void ndJointFix6dof::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndJointFix6dof::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "m_softness", m_softness);
 	xmlSaveParam(childNode, "m_softness", m_maxForce);

@@ -21,7 +21,7 @@
 class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 {
 	public:
-	ndRegularProceduralGrid(dFloat32 gridSize, dFloat32 sizex, dFloat32 sizey, dFloat32 sizez, const dVector& planeEquation)
+	ndRegularProceduralGrid(dFloat32 gridSize, dFloat32 sizex, dFloat32 sizey, dFloat32 sizez, const ndVector& planeEquation)
 		:ndShapeStaticProceduralMesh(sizex, sizey, sizez)
 		,m_planeEquation(planeEquation)
 		,m_gridSize(gridSize)
@@ -29,14 +29,14 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 	{
 	}
 
-	virtual void DebugShape(const dMatrix&, ndShapeDebugNotify&) const
+	virtual void DebugShape(const ndMatrix&, ndShapeDebugNotify&) const
 	{
 		// do nothing since it depends on the application implementation.
 	}
 
-	virtual dFloat32 RayCast(ndRayCastNotify&, const dVector& localP0, const dVector& localP1, dFloat32, const ndBody* const, ndContactPoint& contactOut) const
+	virtual dFloat32 RayCast(ndRayCastNotify&, const ndVector& localP0, const ndVector& localP1, dFloat32, const ndBody* const, ndContactPoint& contactOut) const
 	{
-		dVector segment(dVector::m_triplexMask & (localP1 - localP0));
+		ndVector segment(ndVector::m_triplexMask & (localP1 - localP0));
 		dFloat32 den = m_planeEquation.DotProduct(segment).GetScalar();
 		dFloat32 num = m_planeEquation.DotProduct(localP0).GetScalar() + m_planeEquation.m_w;
 		dFloat32 t = -num / den;
@@ -45,19 +45,19 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 		return dClamp (t, dFloat32 (0.0f), dFloat32 (1.2f));
 	}
 
-	virtual void GetCollidingFaces(const dVector& minBox, const dVector& maxBox, dArray<dVector>& vertex, dArray<dInt32>& faceList, dArray<dInt32>& faceMaterial, dArray<dInt32>& indexListList) const
+	virtual void GetCollidingFaces(const ndVector& minBox, const ndVector& maxBox, ndArray<ndVector>& vertex, ndArray<dInt32>& faceList, ndArray<dInt32>& faceMaterial, ndArray<dInt32>& indexListList) const
 	{
 		// generate the point cloud
-		dVector p0(minBox.Scale(m_invGridSize).Floor());
-		dVector p1(maxBox.Scale(m_invGridSize).Floor() + dVector::m_one);
-		dVector origin(p0.Scale(m_gridSize) & dVector::m_triplexMask);
+		ndVector p0(minBox.Scale(m_invGridSize).Floor());
+		ndVector p1(maxBox.Scale(m_invGridSize).Floor() + ndVector::m_one);
+		ndVector origin(p0.Scale(m_gridSize) & ndVector::m_triplexMask);
 		dInt32 count_x = dInt32(p1.m_x - p0.m_x);
 		dInt32 count_z = dInt32(p1.m_z - p0.m_z);
 
 		origin.m_y = 0.0f;
 		for (dInt32 iz = 0; iz <= count_z; iz++)
 		{
-			dVector point(origin);
+			ndVector point(origin);
 			for (dInt32 ix = 0; ix <= count_x; ix++)
 			{
 				vertex.PushBack(point);
@@ -83,23 +83,23 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 		}
 	}
 
-	dVector m_planeEquation;
+	ndVector m_planeEquation;
 	dFloat32 m_gridSize;
 	dFloat32 m_invGridSize;
 };
 
 ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, dInt32 grids, dFloat32 gridSize, dFloat32 perturbation)
 {
-	dVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
+	ndVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
 
-	dArray<dVector> points;
+	ndArray<ndVector> points;
 	for (dInt32 iz = 0; iz <= grids; iz++)
 	{
 		dFloat32 z0 = origin.m_z + iz * gridSize;
 		for (dInt32 ix = 0; ix <= grids; ix++)
 		{
 			dFloat32 x0 = origin.m_x + ix * gridSize;
-			points.PushBack(dVector(x0, dGaussianRandom(perturbation), z0, 1.0f));
+			points.PushBack(ndVector(x0, dGaussianRandom(perturbation), z0, 1.0f));
 		}
 	}
 
@@ -109,10 +109,10 @@ ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, dInt32 grids, 
 	{
 		for (dInt32 ix = 0; ix < grids; ix++)
 		{
-			dVector p0(points[(ix + 0) * (grids + 1) + iz + 0]);
-			dVector p1(points[(ix + 1) * (grids + 1) + iz + 0]);
-			dVector p2(points[(ix + 1) * (grids + 1) + iz + 1]);
-			dVector p3(points[(ix + 0) * (grids + 1) + iz + 1]);
+			ndVector p0(points[(ix + 0) * (grids + 1) + iz + 0]);
+			ndVector p1(points[(ix + 1) * (grids + 1) + iz + 0]);
+			ndVector p2(points[(ix + 1) * (grids + 1) + iz + 1]);
+			ndVector p3(points[(ix + 0) * (grids + 1) + iz + 1]);
 
 			meshEffect.BeginBuildFace();
 			meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
@@ -129,7 +129,7 @@ ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, dInt32 grids, 
 	}
 	meshEffect.EndBuild(0.0f);
 
-	dPolygonSoupBuilder meshBuilder;
+	ndPolygonSoupBuilder meshBuilder;
 
 	meshBuilder.Begin();
 	dInt32 vertexStride = meshEffect.GetVertexStrideInByte() / sizeof(dFloat64);
@@ -137,19 +137,19 @@ ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, dInt32 grids, 
 
 	dInt32 mark = meshEffect.IncLRU();
 
-	dVector face[16];
-	dPolyhedra::Iterator iter(meshEffect);
+	ndVector face[16];
+	ndPolyhedra::Iterator iter(meshEffect);
 	for (iter.Begin(); iter; iter++)
 	{
-		dEdge* const edge = &(*iter);
+		ndEdge* const edge = &(*iter);
 		if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark))
 		{
 			dInt32 count = 0;
-			dEdge* ptr = edge;
+			ndEdge* ptr = edge;
 			do
 			{
 				dInt32 i = ptr->m_incidentVertex * vertexStride;
-				dVector point(dFloat32(vertexData[i + 0]), dFloat32(vertexData[i + 1]), dFloat32(vertexData[i + 2]), dFloat32(1.0f));
+				ndVector point(dFloat32(vertexData[i + 0]), dFloat32(vertexData[i + 1]), dFloat32(vertexData[i + 2]), dFloat32(1.0f));
 				face[count] = point;
 				count++;
 				ptr->m_mark = mark;
@@ -157,7 +157,7 @@ ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, dInt32 grids, 
 			} while (ptr != edge);
 
 			dInt32 materialIndex = meshEffect.GetFaceMaterial(edge);
-			meshBuilder.AddFace(&face[0].m_x, sizeof(dVector), 3, materialIndex);
+			meshBuilder.AddFace(&face[0].m_x, sizeof(ndVector), 3, materialIndex);
 		}
 	}
 	meshBuilder.End(false);
@@ -165,13 +165,13 @@ ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, dInt32 grids, 
 	dFloat32 uvScale = 1.0 / 16.0f;
 
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
-	dMatrix uvMatrix(dGetIdentityMatrix());
+	ndMatrix uvMatrix(dGetIdentityMatrix());
 	uvMatrix[0][0] *= uvScale;
 	uvMatrix[1][1] *= uvScale;
 	uvMatrix[2][2] *= uvScale;
 	ndDemoMesh* const geometry = new ndDemoMesh("plane", scene->GetShaderCache(), &plane, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
 
-	dMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(dGetIdentityMatrix());
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 
@@ -257,11 +257,11 @@ ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, dInt32 gri
 	meshBuilder.End(false);
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
 #else
-	dPlane planeEquation(dVector(0.0f, 1.0f, 0.0f, 0.0f));
+	ndPlane planeEquation(ndVector(0.0f, 1.0f, 0.0f, 0.0f));
 	ndShapeInstance plane(new ndRegularProceduralGrid(gridSize, 2.0f * grids * gridSize, 1.0f, 2.0f * grids * gridSize, planeEquation));
 #endif
 
-	dMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(dGetIdentityMatrix());
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndBodyDynamic* const body = new ndBodyDynamic();

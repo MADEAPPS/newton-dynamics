@@ -25,10 +25,10 @@
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"
 
-typedef void* (*dMemAllocCallback) (size_t size);
-typedef void (*dMemFreeCallback) (void* const ptr);
+typedef void* (*ndMemAllocCallback) (size_t size);
+typedef void (*ndMemFreeCallback) (void* const ptr);
 
-class dMemory
+class ndMemory
 {
 	public:
 	/// General Memory allocation function.
@@ -50,8 +50,8 @@ class dMemory
 	D_CORE_API static dUnsigned64 GetMemoryUsed();
 
 	/// Install low level system memory allocation functions.
-	/// \param dMemAllocCallback alloc: is a function pointer callback to allocate a memory chunk.
-	/// \param dMemFreeCallback free: is a function pointer callback to free a memory chunk.
+	/// \param ndMemAllocCallback alloc: is a function pointer callback to allocate a memory chunk.
+	/// \param ndMemFreeCallback free: is a function pointer callback to free a memory chunk.
 	/// \brief All memory allocated by alloc, does not need to be aligned, therefore an application can
 	/// write them using standard malloc and free.
 	/// By default the memory allocation is set to call the standard 
@@ -62,10 +62,10 @@ class dMemory
 	/// allocation using global operators new and delete, therefore it 
 	/// is ok to install the memory allocator on the main of the 
 	/// application or just before start using the engine.
-	D_CORE_API static void SetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free);
+	D_CORE_API static void SetMemoryAllocators(ndMemAllocCallback alloc, ndMemFreeCallback free);
 
 	private:
-	static dAtomic<dUnsigned64> m_memoryUsed;
+	static ndAtomic<dUnsigned64> m_memoryUsed;
 };
 
 #endif

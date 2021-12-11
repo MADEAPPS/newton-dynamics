@@ -26,7 +26,7 @@
 
 
 D_MSV_NEWTON_ALIGN_32
-class ndBodiesInAabbNotify : public dClassAlloc
+class ndBodiesInAabbNotify : public ndClassAlloc
 {
 	public: 
 	ndBodiesInAabbNotify()
@@ -43,7 +43,7 @@ class ndBodiesInAabbNotify : public dClassAlloc
 		return 1;
 	}
 
-	dArray<ndBody*> m_bodyArray;
+	ndArray<ndBody*> m_bodyArray;
 } D_GCC_NEWTON_ALIGN_32;
 
 

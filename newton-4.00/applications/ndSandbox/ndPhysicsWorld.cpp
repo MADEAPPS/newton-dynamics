@@ -37,36 +37,36 @@ class ndPhysicsWorldSettings : public ndWordSettings
 	{
 	}
 
-	ndPhysicsWorldSettings(const dLoadSaveBase::dLoadDescriptor& desc)
-		:ndWordSettings(dLoadSaveBase::dLoadDescriptor(desc))
+	ndPhysicsWorldSettings(const ndLoadSaveBase::dLoadDescriptor& desc)
+		:ndWordSettings(ndLoadSaveBase::dLoadDescriptor(desc))
 		,m_world(nullptr)
 	{
 	}
 
-	virtual void Load(const dLoadSaveBase::dLoadDescriptor& desc)
+	virtual void Load(const ndLoadSaveBase::dLoadDescriptor& desc)
 	{
-		dLoadSaveBase::dLoadDescriptor childDesc(desc);
+		ndLoadSaveBase::dLoadDescriptor childDesc(desc);
 		ndWordSettings::Load(childDesc);
 		
 		// load application specific settings here
 		m_cameraMatrix = xmlGetMatrix(desc.m_rootNode, "cameraMatrix");
 	}
 
-	virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+	virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	{
 		nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 		desc.m_rootNode->LinkEndChild(childNode);
-		ndWordSettings::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+		ndWordSettings::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 		ndDemoEntityManager* const manager = m_world->GetManager();
 		ndDemoCamera* const camera = manager->GetCamera();
 
-		dMatrix cameraMatrix (camera->GetCurrentMatrix());
+		ndMatrix cameraMatrix (camera->GetCurrentMatrix());
 		xmlSaveParam(childNode, "description", "string", "this scene was saved from Newton 4.0 sandbox demos");
 		xmlSaveParam(childNode, "cameraMatrix", cameraMatrix);
 	}
 	
-	dMatrix m_cameraMatrix;
+	ndMatrix m_cameraMatrix;
 	ndPhysicsWorld* m_world;
 };
 
@@ -100,7 +100,7 @@ ndDemoEntityManager* ndPhysicsWorld::GetManager() const
 
 void ndPhysicsWorld::QueueBodyForDelete(ndBody* const body)
 {
-	dScopeSpinLock lock(m_deletedLock);
+	ndScopeSpinLock lock(m_deletedLock);
 	m_hasPendingObjectToDelete.store(true);
 	m_deletedBodies.PushBack(body);
 }
@@ -215,7 +215,7 @@ bool ndPhysicsWorld::LoadScene(const char* const path)
 	}
 
 	// add some visualization
-	dMatrix scale(dGetIdentityMatrix());
+	ndMatrix scale(dGetIdentityMatrix());
 	scale[0][0] = 0.5f;
 	scale[1][1] = 0.5f;
 	scale[2][2] = 0.5f;

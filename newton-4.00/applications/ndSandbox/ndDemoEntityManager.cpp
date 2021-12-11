@@ -145,7 +145,7 @@ void Test0__()
 	}
 
 	dFloat32 precond[6 * 2];
-	dConjugateGradient<dFloat32> cgd;
+	ndConjugateGradient<dFloat32> cgd;
 	cgd.Solve(6, 1.0e-5f, x, B, &A[0][0], precond);
 }
 
@@ -456,7 +456,7 @@ bool ndDemoEntityManager::GetKeyState(dInt32 key) const
 
 ndAnimationSequence* ndDemoEntityManager::GetAnimationSequence(const char* const fileName)
 {
-	dTree<ndAnimationSequence*, dString>::dNode* node = m_animationCache.Find(fileName);
+	ndTree<ndAnimationSequence*, ndString>::ndNode* node = m_animationCache.Find(fileName);
 	if (!node)
 	{
 		ndAnimationSequence* const sequence = LoadFbxAnimation(fileName);
@@ -507,7 +507,7 @@ void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback,
 	m_updateCameraContext = context;
 }
 
-dInt32 ndDemoEntityManager::GetJoystickAxis (dFixSizeArray<dFloat32, 8>& axisValues)
+dInt32 ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<dFloat32, 8>& axisValues)
 {
 	dInt32 axisCount = 0;
 	for (dInt32 i = 0; i < axisValues.GetCapacity(); i++)
@@ -547,7 +547,7 @@ dInt32 ndDemoEntityManager::GetJoystickAxis (dFixSizeArray<dFloat32, 8>& axisVal
 	return axisCount;
 }
 
-dInt32 ndDemoEntityManager::GetJoystickButtons(dFixSizeArray<char, 32>& axisbuttons)
+dInt32 ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbuttons)
 {
 	dInt32 buttonsCount = 0;
 	memset(&axisbuttons[0], 0, axisbuttons.GetCapacity());
@@ -590,14 +590,14 @@ void ndDemoEntityManager::ResetTimer()
 
 void ndDemoEntityManager::AddEntity(ndDemoEntity* const ent)
 {
-	dScopeSpinLock lock(m_addDeleteLock);
+	ndScopeSpinLock lock(m_addDeleteLock);
 	dAssert(!ent->m_rootNode);
 	ent->m_rootNode = Append(ent);
 }
 
 void ndDemoEntityManager::RemoveEntity (ndDemoEntity* const ent)
 {
-	dScopeSpinLock lock(m_addDeleteLock);
+	ndScopeSpinLock lock(m_addDeleteLock);
 	dAssert(ent->m_rootNode);
 	Remove(ent->m_rootNode);
 }
@@ -610,7 +610,7 @@ void ndDemoEntityManager::Cleanup ()
 		m_world->Sync();
 	}
 
-	dTree<ndAnimationSequence*, dString>::Iterator iter(m_animationCache);
+	ndTree<ndAnimationSequence*, ndString>::Iterator iter(m_animationCache);
 	for (iter.Begin(); iter; iter++)
 	{
 		delete *iter;
@@ -619,7 +619,7 @@ void ndDemoEntityManager::Cleanup ()
 
 	while (m_debugShapeCache.GetRoot())
 	{
-		ndDebugMeshCache::dNode* const root = m_debugShapeCache.GetRoot();
+		ndDebugMeshCache::ndNode* const root = m_debugShapeCache.GetRoot();
 		ndDebuMesh& debugMesh = root->GetInfo();
 		debugMesh.m_flatShaded->Release();
 		debugMesh.m_wireFrameShareEdge->Release();
@@ -642,7 +642,7 @@ void ndDemoEntityManager::Cleanup ()
 	if (m_world) 
 	{
 		const ndBodyList& bodyList = m_world->GetBodyList();
-		for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+		for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
 			ndBodyKinematic* const body = bodyNode->GetInfo();
 			ndDemoEntityNotify* const callback = (ndDemoEntityNotify*)body->GetNotifyCallback();
@@ -736,7 +736,7 @@ void ndDemoEntityManager::ApplyMenuOptions()
 
 	bool state = m_autoSleepMode ? true : false;
 	const ndBodyList& bodyList = m_world->GetBodyList();
-	for (ndBodyList::dNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	for (ndBodyList::ndNode* node = bodyList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyKinematic* const body = node->GetInfo();
 		body->SetAutoSleep(state);
@@ -1119,7 +1119,7 @@ void ndDemoEntityManager::RenderStats()
 			sprintf(text, "contact joints: %d", m_world->GetContactList().GetCount());
 			ImGui::Text(text, "");
 
-			sprintf(text, "memory used:   %6.3f mbytes", dFloat32(dFloat64(dMemory::GetMemoryUsed()) / (1024 * 1024)));
+			sprintf(text, "memory used:   %6.3f mbytes", dFloat32(dFloat64(ndMemory::GetMemoryUsed()) / (1024 * 1024)));
 			ImGui::Text(text, "");
 
 
@@ -1181,15 +1181,15 @@ void ndDemoEntityManager::CreateSkyBox()
 	{
 		m_sky = new ndSkyBox(m_shaderCache.m_skyBox);
 		
-		dScopeSpinLock lock(m_addDeleteLock);
+		ndScopeSpinLock lock(m_addDeleteLock);
 		dAssert(!m_sky->m_rootNode);
 		m_sky->m_rootNode = Addtop(m_sky);
 	}
 }
 
-void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const mesh, const dMatrix& modelMatrix)
+void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const mesh, const ndMatrix& modelMatrix)
 {
-	dVector dist (m_cameraManager->GetCamera()->GetViewMatrix().TransformVector(modelMatrix.m_posit));
+	ndVector dist (m_cameraManager->GetCamera()->GetViewMatrix().TransformVector(modelMatrix.m_posit));
 	TransparentMesh entry (modelMatrix, (ndDemoMesh*) mesh);
 	m_tranparentHeap.Push (entry, dist.m_z);
 }
@@ -1203,7 +1203,7 @@ void ndDemoEntityManager::ImportPLYfile(const char* const)
 	//CreatePLYMesh (this, fileName, true);
 }
 
-dInt32 ndDemoEntityManager::Print (const dVector&, const char *fmt, ... ) const
+dInt32 ndDemoEntityManager::Print (const ndVector&, const char *fmt, ... ) const
 {
 	va_list argptr;
 	char string[1024];
@@ -1215,7 +1215,7 @@ dInt32 ndDemoEntityManager::Print (const dVector&, const char *fmt, ... ) const
 	return 0;
 }
 
-void ndDemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
+void ndDemoEntityManager::SetCameraMatrix (const ndQuaternion& rotation, const ndVector& position)
 {
 	m_cameraManager->SetCameraMatrix(rotation, position);
 }
@@ -1334,8 +1334,8 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 
 void ndDemoEntityManager::DrawDebugShapes()
 {
-	const dVector awakeColor(1.0f, 1.0f, 1.0f, 1.0f);
-	const dVector sleepColor(0.42f, 0.73f, 0.98f, 1.0f);
+	const ndVector awakeColor(1.0f, 1.0f, 1.0f, 1.0f);
+	const ndVector sleepColor(0.42f, 0.73f, 0.98f, 1.0f);
 
 	const ndBodyList& bodyList = m_world->GetBodyList();
 
@@ -1343,16 +1343,16 @@ void ndDemoEntityManager::DrawDebugShapes()
 	{
 		// do a z buffer pre pass for hidden line 
 		glColorMask(0, 0, 0, 0);
-		for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+		for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
 			ndBodyKinematic* const body = bodyNode->GetInfo();
 			if (!body->GetAsBodyTriggerVolume())
 			{
 				const ndShapeInstance& shapeInstance = body->GetCollisionShape();
-				ndDebugMeshCache::dNode* const shapeNode = m_debugShapeCache.Find(shapeInstance.GetShape());
+				ndDebugMeshCache::ndNode* const shapeNode = m_debugShapeCache.Find(shapeInstance.GetShape());
 				if (shapeNode)
 				{
-					dMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
+					ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
 					shapeNode->GetInfo().m_flatShaded->Render(this, matrix);
 				}
 			}
@@ -1360,18 +1360,18 @@ void ndDemoEntityManager::DrawDebugShapes()
 		glColorMask(1, 1, 1, 1);
 	}
 
-	for (ndBodyList::dNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
 		const ndShapeInstance& shapeInstance = body->GetCollisionShape();
 		const ndShape* const key = shapeInstance.GetShape();
 		if (!((ndShape*)key)->GetAsShapeNull())
 		{
-			ndDebugMeshCache::dNode* shapeNode = m_debugShapeCache.Find(key);
+			ndDebugMeshCache::ndNode* shapeNode = m_debugShapeCache.Find(key);
 			if (!shapeNode)
 			{
 				ndShapeInstance shape(body->GetCollisionShape());
-				shape.SetScale(dVector(1.0f));
+				shape.SetScale(ndVector(1.0f));
 				shape.SetLocalMatrix(dGetIdentityMatrix());
 
 				ndDebuMesh debugMesh;
@@ -1380,14 +1380,14 @@ void ndDemoEntityManager::DrawDebugShapes()
 				if (shape.GetShape()->GetAsShapeStaticBVH())
 				{
 					debugMesh.m_wireFrameOpenEdge = new ndWireFrameDebugMesh(m_shaderCache, &shape, ndShapeDebugNotify::ndEdgeType::m_open);
-					debugMesh.m_wireFrameOpenEdge->SetColor(dVector(1.0f, 0.0f, 1.0f, 1.0f));
+					debugMesh.m_wireFrameOpenEdge->SetColor(ndVector(1.0f, 0.0f, 1.0f, 1.0f));
 				}
 				shapeNode = m_debugShapeCache.Insert(debugMesh, key);
 			}
 
-			dMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
+			ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
 			dInt32 sleepState = body->GetSleepState();
-			dVector color((sleepState == 1) ? sleepColor : awakeColor);
+			ndVector color((sleepState == 1) ? sleepColor : awakeColor);
 
 			if (m_collisionDisplayMode >= 2)
 			{
@@ -1398,7 +1398,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 				if (shapeNode->GetInfo().m_wireFrameOpenEdge)
 				{
 					ndWireFrameDebugMesh* const openEdgeMesh = shapeNode->GetInfo().m_wireFrameOpenEdge;
-					dVector color1(m_showConcaveEdge ? dVector(1.0f, 0.0f, 1.0f, 1.0f) : color);
+					ndVector color1(m_showConcaveEdge ? ndVector(1.0f, 0.0f, 1.0f, 1.0f) : color);
 					openEdgeMesh->SetColor(color1);
 					openEdgeMesh->Render(this, matrix);
 				}
@@ -1470,7 +1470,7 @@ void ndDemoEntityManager::RenderScene()
 	//glEnable(GL_LIGHT0);
 
 	// one light from the Camera eye point
-	dVector camPosition (m_cameraManager->GetCamera()->m_matrix.m_posit);
+	ndVector camPosition (m_cameraManager->GetCamera()->m_matrix.m_posit);
 	GLfloat lightDiffuse1[] = { 0.5f, 0.5f, 0.5f, 0.0f };
 	GLfloat lightAmbient1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	GLfloat lightSpecular1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -1487,7 +1487,7 @@ void ndDemoEntityManager::RenderScene()
 	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
 
 	// render all entities
-	const dMatrix globalMatrix (dGetIdentityMatrix());
+	const ndMatrix globalMatrix (dGetIdentityMatrix());
 	if (m_hideVisualMeshes) 
 	{
 		if (m_sky) 
@@ -1497,7 +1497,7 @@ void ndDemoEntityManager::RenderScene()
 	} 
 	else 
 	{
-		for (dNode* node = dList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext()) 
+		for (ndNode* node = ndList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext()) 
 		{
 			ndDemoEntity* const entity = node->GetInfo();
 			entity->Render(timestep, this, globalMatrix);

@@ -24,8 +24,8 @@ class ndJointAttachmentPoint: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointAttachmentPoint);
-	D_NEWTON_API ndJointAttachmentPoint(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndJointAttachmentPoint(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const body0, ndBodyKinematic* const body1);
+	D_NEWTON_API ndJointAttachmentPoint(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointAttachmentPoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 	D_NEWTON_API virtual ~ndJointAttachmentPoint();
 
 	void SetDimnetionX(bool lock);
@@ -38,7 +38,7 @@ class ndJointAttachmentPoint: public ndJointBilateralConstraint
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	union ndLockedDOF
 	{

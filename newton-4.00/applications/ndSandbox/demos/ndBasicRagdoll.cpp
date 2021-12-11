@@ -68,7 +68,7 @@ class ndRagdollEntityNotify : public ndDemoEntityNotify
 		}
 	}
 
-	void OnTransform(dInt32 thread, const dMatrix& matrix)
+	void OnTransform(dInt32 thread, const ndMatrix& matrix)
 	{
 		if (!m_parentBody)
 		{
@@ -76,9 +76,9 @@ class ndRagdollEntityNotify : public ndDemoEntityNotify
 		}
 		else
 		{
-			const dMatrix parentMatrix(m_parentBody->GetMatrix());
-			const dMatrix localMatrix(matrix * parentMatrix.Inverse() * m_bindMatrix);
-			const dQuaternion rot(localMatrix);
+			const ndMatrix parentMatrix(m_parentBody->GetMatrix());
+			const ndMatrix localMatrix(matrix * parentMatrix.Inverse() * m_bindMatrix);
+			const ndQuaternion rot(localMatrix);
 			m_entity->SetMatrix(rot, localMatrix.m_posit);
 		}
 	}
@@ -89,7 +89,7 @@ class ndRagdollEntityNotify : public ndDemoEntityNotify
 		// remember to check and clamp huge angular velocities
 	}
 
-	dMatrix m_bindMatrix;
+	ndMatrix m_bindMatrix;
 };
 
 static dJointDefinition jointsDefinition[] =
@@ -120,7 +120,7 @@ static dJointDefinition jointsDefinition[] =
 class ndRagdollModel : public ndCharacter
 {
 	public:
-	ndRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const dMatrix& location)
+	ndRagdollModel(ndDemoEntityManager* const scene, fbxDemoEntity* const ragdollMesh, const ndMatrix& location)
 		:ndCharacter()
 	{
 		// make a clone of the mesh and add it to the scene
@@ -129,8 +129,8 @@ class ndRagdollModel : public ndCharacter
 		ndWorld* const world = scene->GetWorld();
 		
 		// find the floor location 
-		dMatrix matrix(location);
-		dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+		ndMatrix matrix(location);
+		ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 		matrix.m_posit.m_y = floor.m_y + 1.0f;
 
 		// add the root body
@@ -211,7 +211,7 @@ class ndRagdollModel : public ndCharacter
 		{
 			ndBodyDynamic* const body = bodyArray[i];
 			dFloat32 scale = density * body->GetCollisionShape().GetVolume();
-			dVector inertia(body->GetMassMatrix().Scale (scale));
+			ndVector inertia(body->GetMassMatrix().Scale (scale));
 			body->SetMassMatrix(inertia);
 		}
 	}
@@ -222,7 +222,7 @@ class ndRagdollModel : public ndCharacter
 		dAssert(shape);
 
 		// create the rigid body that will make this body
-		dMatrix matrix(entityPart->CalculateGlobalMatrix());
+		ndMatrix matrix(entityPart->CalculateGlobalMatrix());
 
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		body->SetMatrix(matrix);
@@ -236,9 +236,9 @@ class ndRagdollModel : public ndCharacter
 
 	ndCharacterNode* ConnectBodyParts(ndBodyDynamic* const childBody, ndCharacterNode* const parentBone, const dJointDefinition& definition)
 	{
-		dMatrix matrix(childBody->GetMatrix());
+		ndMatrix matrix(childBody->GetMatrix());
 		dJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
-		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
+		ndMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
 
 		ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentBone);
 		ndJointPdActuator* const joint = (ndJointPdActuator*)jointNode->GetJoint();
@@ -271,10 +271,10 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
-	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
+	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	fbxDemoEntity* const ragdollMesh = scene->LoadFbxMesh("whiteMan.fbx");
 
-	dMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_y = 0.5f;
 	ndRagdollModel* const ragdoll = new ndRagdollModel(scene, ragdollMesh, matrix);
 	scene->SetSelectedModel(ragdoll);
@@ -291,7 +291,7 @@ void ndBasicRagdoll (ndDemoEntityManager* const scene)
 	AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 
 	delete ragdollMesh;
-	dQuaternion rot;
-	dVector origin(-5.0f, 1.0f, 0.0f, 0.0f);
+	ndQuaternion rot;
+	ndVector origin(-5.0f, 1.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

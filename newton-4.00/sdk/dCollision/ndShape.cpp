@@ -23,22 +23,22 @@
 #include "ndCollisionStdafx.h"
 #include "ndShape.h"
 
-dVector ndShape::m_flushZero(dFloat32(1.0e-7f));
+ndVector ndShape::m_flushZero(dFloat32(1.0e-7f));
 
 ndShape::ndShape(ndShapeID id)
-	:dClassAlloc()
-	,m_inertia(dVector::m_zero)
-	,m_crossInertia(dVector::m_zero)
-	,m_centerOfMass(dVector::m_zero)
-	,m_boxSize(dVector::m_zero)
-	,m_boxOrigin(dVector::m_zero)
+	:ndClassAlloc()
+	,m_inertia(ndVector::m_zero)
+	,m_crossInertia(ndVector::m_zero)
+	,m_centerOfMass(ndVector::m_zero)
+	,m_boxSize(ndVector::m_zero)
+	,m_boxOrigin(ndVector::m_zero)
 	,m_refCount(0)
 	,m_collisionId(id)
 {
 }
 
 ndShape::ndShape(const ndShape& source)
-	:dClassAlloc()
+	:ndClassAlloc()
 	,m_inertia(source.m_inertia)
 	,m_crossInertia(source.m_crossInertia)
 	,m_centerOfMass(source.m_centerOfMass)
@@ -59,7 +59,7 @@ void ndShape::MassProperties()
 	// using general central theorem, to extract the Inertia relative to the center of mass 
 	//IImatrix = IIorigin + unitmass * [(displacemnet % displacemnet) * identityMatrix - transpose(displacement) * displacement)];
 
-	dMatrix inertia(dGetIdentityMatrix());
+	ndMatrix inertia(dGetIdentityMatrix());
 	inertia[0][0] = m_inertia[0];
 	inertia[1][1] = m_inertia[1];
 	inertia[2][2] = m_inertia[2];
@@ -70,11 +70,11 @@ void ndShape::MassProperties()
 	inertia[1][2] = m_crossInertia[0];
 	inertia[2][1] = m_crossInertia[0];
 
-	dVector origin(m_centerOfMass);
-	dFloat32 originMag2 = origin.DotProduct(origin & dVector::m_triplexMask).GetScalar();
+	ndVector origin(m_centerOfMass);
+	dFloat32 originMag2 = origin.DotProduct(origin & ndVector::m_triplexMask).GetScalar();
 
-	dMatrix Covariance(origin, origin);
-	dMatrix parallel(dGetIdentityMatrix());
+	ndMatrix Covariance(origin, origin);
+	ndMatrix parallel(dGetIdentityMatrix());
 	for (dInt32 i = 0; i < 3; i++) 
 	{
 		parallel[i][i] = originMag2;
@@ -97,7 +97,7 @@ ndShapeInfo ndShape::GetShapeInfo() const
 	return info;
 }
 
-void ndShape::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndShape::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);

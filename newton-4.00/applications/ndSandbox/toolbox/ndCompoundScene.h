@@ -15,6 +15,6 @@
 #include "ndSandboxStdafx.h"
 
 class ndDemoEntityManager;
-ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const dMatrix& location = dGetIdentityMatrix());
+ndBodyKinematic* BuildCompoundScene(ndDemoEntityManager* const scene, const ndMatrix& location = dGetIdentityMatrix());
 #endif 
 

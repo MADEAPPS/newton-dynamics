@@ -36,23 +36,23 @@ class ndCharacterNode;
 class ndCharacterNode;
 class ndJointBilateralConstraint;
 
-class ndShapeLoaderCache : public dTree<const ndShapeInstance, dInt32>
+class ndShapeLoaderCache : public ndTree<const ndShapeInstance, dInt32>
 {
 };
 
-class ndBodyLoaderCache: public dTree<const ndBody*, dInt32>
+class ndBodyLoaderCache: public ndTree<const ndBody*, dInt32>
 {
 };
 
-class ndJointLoaderCache: public dTree<const ndJointBilateralConstraint*, dInt32>
+class ndJointLoaderCache: public ndTree<const ndJointBilateralConstraint*, dInt32>
 {
 };
 
-class ndModelLoaderCache: public dTree<const ndModel*, dInt32>
+class ndModelLoaderCache: public ndTree<const ndModel*, dInt32>
 {
 };
 
-class dLoadSaveBase: public dClassAlloc
+class ndLoadSaveBase: public ndClassAlloc
 {
 	public:
 	class dLoadDescriptor
@@ -89,10 +89,10 @@ class dLoadSaveBase: public dClassAlloc
 		const ndCharacterNode* m_parentModelNode;
 	};
 
-	class dSaveDescriptor
+	class ndSaveDescriptor
 	{
 		public:
-		dSaveDescriptor()
+		ndSaveDescriptor()
 			:m_assetPath(nullptr)
 			,m_assetName(nullptr)
 			,m_rootNode(nullptr)
@@ -107,7 +107,7 @@ class dLoadSaveBase: public dClassAlloc
 		{
 		}
 
-		dSaveDescriptor(const dSaveDescriptor& desc, nd::TiXmlNode* const rootNode)
+		ndSaveDescriptor(const ndSaveDescriptor& desc, nd::TiXmlNode* const rootNode)
 			:m_assetPath(desc.m_assetPath)
 			,m_assetName(desc.m_assetName)
 			,m_rootNode(rootNode)
@@ -130,9 +130,9 @@ class dLoadSaveBase: public dClassAlloc
 		dInt32 m_body0NodeHash;
 		dInt32 m_body1NodeHash;
 		mutable dInt32 m_assetIndex;
-		dTree<dInt32, const ndShape*>* m_shapeMap;
-		dTree<dInt32, const ndBodyKinematic*>* m_bodyMap;
-		dTree<dInt32, const ndJointBilateralConstraint*>* m_jointMap;
+		ndTree<dInt32, const ndShape*>* m_shapeMap;
+		ndTree<dInt32, const ndBodyKinematic*>* m_bodyMap;
+		ndTree<dInt32, const ndJointBilateralConstraint*>* m_jointMap;
 	};
 
 	virtual void* CreateClass(const dLoadDescriptor&)
@@ -142,14 +142,14 @@ class dLoadSaveBase: public dClassAlloc
 	}
 };
 
-D_CORE_API void* LoadClass(const char* const className, const dLoadSaveBase::dLoadDescriptor& desc);
-D_CORE_API void RegisterLoaderClass(const char* const className, dLoadSaveBase* const loaderClass);
+D_CORE_API void* LoadClass(const char* const className, const ndLoadSaveBase::dLoadDescriptor& desc);
+D_CORE_API void RegisterLoaderClass(const char* const className, ndLoadSaveBase* const loaderClass);
 
 template<class T>
-class dLoadSaveClass: public dLoadSaveBase
+class ndLoadSaveClass: public ndLoadSaveBase
 {
 	public:
-	dLoadSaveClass<T>(const char* const className)
+	ndLoadSaveClass<T>(const char* const className)
 	{
 		RegisterLoaderClass(className, this);
 	}
@@ -163,10 +163,10 @@ class dLoadSaveClass: public dLoadSaveBase
 #define D_CLASS_REFLECTION(Class)								\
 	const virtual char* SubClassName() {return #Class;}			\
 	static const char* ClassName() {return #Class;}				\
-	static dLoadSaveClass<Class> __classLoader__;
+	static ndLoadSaveClass<Class> __classLoader__;
 
 #define D_CLASS_REFLECTION_IMPLEMENT_LOADER(Class) \
-	dLoadSaveClass<Class> Class::__classLoader__(#Class);
+	ndLoadSaveClass<Class> Class::__classLoader__(#Class);
 
 #define D_CLASS_REFLECTION_LOAD_NODE(castType,className,desc) \
 	(castType*)LoadClass(className, desc);

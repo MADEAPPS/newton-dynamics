@@ -27,7 +27,7 @@
 #include "ndBodyKinematic.h"
 #include "ndContactOptions.h"
 
-dVector ndContact::m_initialSeparatingVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
+ndVector ndContact::m_initialSeparatingVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
 
 #define D_REST_RELATIVE_VELOCITY		dFloat32 (1.0e-3f)
 #define D_MAX_DYNAMIC_FRICTION_SPEED	dFloat32 (0.3f)
@@ -36,7 +36,7 @@ dVector ndContact::m_initialSeparatingVector(dFloat32(0.0f), dFloat32(1.0f), dFl
 
 ndContact::ndContact()
 	:ndConstraint()
-	,dContainersFreeListAlloc<ndContact*>()
+	,ndContainersFreeListAlloc<ndContact*>()
 	,m_positAcc(dFloat32(10.0f))
 	,m_rotationAcc()
 	,m_separatingVector(m_initialSeparatingVector)
@@ -97,7 +97,7 @@ void ndContact::JacobianDerivative(ndConstraintDescritor& desc)
 	{
 		dInt32 i = 0;
 		frictionIndex = m_contacPointsList.GetCount();
-		for (ndContactPointList::dNode* node = m_contacPointsList.GetFirst(); node; node = node->GetNext())
+		for (ndContactPointList::ndNode* node = m_contacPointsList.GetFirst(); node; node = node->GetNext())
 		{
 			const ndContactMaterial& contact = node->GetInfo();
 			JacobianContactDerivative(desc, contact, i, frictionIndex);
@@ -107,7 +107,7 @@ void ndContact::JacobianDerivative(ndConstraintDescritor& desc)
 	desc.m_rowsCount = frictionIndex;
 }
 
-void ndContact::CalculatePointDerivative(dInt32 index, ndConstraintDescritor& desc, const dVector& dir, const dgPointParam& param) const
+void ndContact::CalculatePointDerivative(dInt32 index, ndConstraintDescritor& desc, const ndVector& dir, const dgPointParam& param) const
 {
 	dAssert(m_body0);
 	dAssert(m_body1);
@@ -115,7 +115,7 @@ void ndContact::CalculatePointDerivative(dInt32 index, ndConstraintDescritor& de
 	ndJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0;
 	ndJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1;
 	jacobian0.m_linear = dir;
-	jacobian1.m_linear = dir * dVector::m_negOne;
+	jacobian1.m_linear = dir * ndVector::m_negOne;
 
 	jacobian0.m_angular = param.m_r0.CrossProduct(dir);
 	jacobian1.m_angular = dir.CrossProduct(param.m_r1);
@@ -132,12 +132,12 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	InitPointParam(pointData, contact.m_point, contact.m_point);
 	CalculatePointDerivative(normalIndex, desc, contact.m_normal, pointData);
 
-	const dVector omega0(m_body0->GetOmega());
-	const dVector omega1(m_body1->GetOmega());
-	const dVector veloc0 (m_body0->GetVelocity());
-	const dVector veloc1(m_body1->GetVelocity());
-	const dVector gyroAlpha0(m_body0->GetGyroAlpha());
-	const dVector gyroAlpha1(m_body1->GetGyroAlpha());
+	const ndVector omega0(m_body0->GetOmega());
+	const ndVector omega1(m_body1->GetOmega());
+	const ndVector veloc0 (m_body0->GetVelocity());
+	const ndVector veloc1(m_body1->GetVelocity());
+	const ndVector gyroAlpha0(m_body0->GetGyroAlpha());
+	const ndVector gyroAlpha1(m_body1->GetGyroAlpha());
 
 	dAssert(contact.m_normal.m_w == dFloat32(0.0f));
 	const ndJacobian& normalJacobian0 = desc.m_jacobian[normalIndex].m_jacobianM0;
@@ -265,12 +265,12 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 
 void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 {
-	const dVector bodyOmega0(m_body0->GetOmega());
-	const dVector bodyOmega1(m_body1->GetOmega());
-	const dVector bodyVeloc0(m_body0->GetVelocity());
-	const dVector bodyVeloc1(m_body1->GetVelocity());
-	const dVector gyroAlpha0(m_body0->GetGyroAlpha());
-	const dVector gyroAlpha1(m_body1->GetGyroAlpha());
+	const ndVector bodyOmega0(m_body0->GetOmega());
+	const ndVector bodyOmega1(m_body1->GetOmega());
+	const ndVector bodyVeloc0(m_body0->GetVelocity());
+	const ndVector bodyVeloc1(m_body1->GetVelocity());
+	const ndVector gyroAlpha0(m_body0->GetGyroAlpha());
+	const ndVector gyroAlpha1(m_body1->GetGyroAlpha());
 
 	const dInt32 count = desc->m_rowsCount;
 	const dFloat32 timestep = desc->m_timestep;
@@ -291,7 +291,7 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 			const ndJacobian& jacobian0 = row->m_Jt.m_jacobianM0;
 			const ndJacobian& jacobian1 = row->m_Jt.m_jacobianM1;
 		
-			dVector relVeloc(jacobian0.m_linear * bodyVeloc0 + jacobian0.m_angular * bodyOmega0 + jacobian1.m_linear * bodyVeloc1 + jacobian1.m_angular * bodyOmega1);
+			ndVector relVeloc(jacobian0.m_linear * bodyVeloc0 + jacobian0.m_angular * bodyOmega0 + jacobian1.m_linear * bodyVeloc1 + jacobian1.m_angular * bodyOmega1);
 			dFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
 			dFloat32 aRel = rhs->m_deltaAccel;
 		

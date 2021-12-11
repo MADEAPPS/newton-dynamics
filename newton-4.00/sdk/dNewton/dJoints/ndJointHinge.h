@@ -22,9 +22,9 @@ class ndJointHinge: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointHinge);
-	D_NEWTON_API ndJointHinge(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndJointHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API ndJointHinge(const dMatrix& pinAndPivotInChild, const dMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointHinge(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointHinge(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointHinge();
 
 	D_NEWTON_API dFloat32 GetAngle() const;
@@ -36,12 +36,12 @@ class ndJointHinge: public ndJointBilateralConstraint
 	D_NEWTON_API void SetAsSpringDamper(bool state, dFloat32 regularizer, dFloat32 spring, dFloat32 damper);
 
 	private:
-	void SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
-	void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
+	void SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+	void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	dFloat32 m_angle;
 	dFloat32 m_omega;

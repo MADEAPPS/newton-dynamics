@@ -32,14 +32,14 @@
 
 #define	D_MAX_THREADS_COUNT	16
 
-class dThreadPoolJob
+class ndThreadPoolJob
 {
 	public:
-	dThreadPoolJob() 
+	ndThreadPoolJob() 
 	{
 	}
 
-	virtual ~dThreadPoolJob() 
+	virtual ~ndThreadPoolJob() 
 	{
 	}
 
@@ -52,32 +52,32 @@ class dThreadPoolJob
 
 	private:
 	dInt32 m_threadIndex;
-	friend class dThreadPool;
+	friend class ndThreadPool;
 };
 
-class dThreadPool: public dSyncMutex, public dThread
+class ndThreadPool: public ndSyncMutex, public ndThread
 {
-	class dWorkerThread: public dThread
+	class ndWorkerThread: public ndThread
 	{
 		public:
-		D_CORE_API dWorkerThread();
-		D_CORE_API virtual ~dWorkerThread();
+		D_CORE_API ndWorkerThread();
+		D_CORE_API virtual ~ndWorkerThread();
 
 		private:
-		void ExecuteJob(dThreadPoolJob* const job);
+		void ExecuteJob(ndThreadPoolJob* const job);
 		virtual void ThreadFunction();
 
-		dThreadPoolJob* m_job;
-		dThreadPool* m_owner;
+		ndThreadPoolJob* m_job;
+		ndThreadPool* m_owner;
 		dInt32 m_threadIndex;
-		friend class dThreadPool;
+		friend class ndThreadPool;
 	};
 
-	class dThreadLockFreeUpdate: public dThreadPoolJob
+	class ndThreadLockFreeUpdate: public ndThreadPoolJob
 	{
 		public:
-		dThreadLockFreeUpdate()
-			:dThreadPoolJob()
+		ndThreadLockFreeUpdate()
+			:ndThreadPoolJob()
 			,m_job(nullptr)
 			,m_begin(false)
 			,m_joindInqueue(nullptr)
@@ -86,21 +86,21 @@ class dThreadPool: public dSyncMutex, public dThread
 
 		virtual void Execute();
 		private:
-		dAtomic<dThreadPoolJob*> m_job;
-		dAtomic<bool> m_begin;
-		dAtomic<dInt32>* m_joindInqueue;
-		friend class dThreadPool;
+		ndAtomic<ndThreadPoolJob*> m_job;
+		ndAtomic<bool> m_begin;
+		ndAtomic<dInt32>* m_joindInqueue;
+		friend class ndThreadPool;
 	};
 
 	public:
-	D_CORE_API dThreadPool(const char* const baseName);
-	D_CORE_API virtual ~dThreadPool();
+	D_CORE_API ndThreadPool(const char* const baseName);
+	D_CORE_API virtual ~ndThreadPool();
 
 	dInt32 GetCount() const;
 	D_CORE_API void SetCount(dInt32 count);
 
 	D_CORE_API void TickOne();
-	D_CORE_API void ExecuteJobs(dThreadPoolJob** const jobs);
+	D_CORE_API void ExecuteJobs(ndThreadPoolJob** const jobs);
 
 	D_CORE_API void Begin();
 	D_CORE_API void End();
@@ -108,15 +108,15 @@ class dThreadPool: public dSyncMutex, public dThread
 	private:
 	D_CORE_API virtual void Release();
 
-	dSyncMutex m_sync;
-	dWorkerThread* m_workers;
+	ndSyncMutex m_sync;
+	ndWorkerThread* m_workers;
 	dInt32 m_count;
 	char m_baseName[32];
-	dAtomic<dInt32> m_joindInqueue;
-	dThreadLockFreeUpdate m_lockFreeJobs[D_MAX_THREADS_COUNT];
+	ndAtomic<dInt32> m_joindInqueue;
+	ndThreadLockFreeUpdate m_lockFreeJobs[D_MAX_THREADS_COUNT];
 };
 
-inline dInt32 dThreadPool::GetCount() const
+inline dInt32 ndThreadPool::GetCount() const
 {
 	return m_count + 1;
 }

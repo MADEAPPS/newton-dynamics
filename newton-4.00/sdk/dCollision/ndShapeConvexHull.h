@@ -31,33 +31,33 @@ class ndShapeConvexHull : public ndShapeConvex
 
 	public:
 	D_CLASS_REFLECTION(ndShapeConvexHull);
-	D_COLLISION_API ndShapeConvexHull(const dLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndShapeConvexHull(const ndLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API ndShapeConvexHull(dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray);
 	D_COLLISION_API virtual ~ndShapeConvexHull();
 
 	protected:
 	ndShapeInfo GetShapeInfo() const;
-	dBigVector FaceNormal(const dEdge *face, const dBigVector* const pool) const;
-	bool RemoveCoplanarEdge(dPolyhedra& convex, const dBigVector* const hullVertexArray) const;
+	ndBigVector FaceNormal(const ndEdge *face, const ndBigVector* const pool) const;
+	bool RemoveCoplanarEdge(ndPolyhedra& convex, const ndBigVector* const hullVertexArray) const;
 	bool Create(dInt32 count, dInt32 strideInBytes, const dFloat32* const vertexArray, dFloat32 tolerance);
-	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
-	D_COLLISION_API virtual void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	virtual ndVector SupportVertex(const ndVector& dir, dInt32* const vertexIndex) const;
+	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	private:
-	dVector SupportVertexBruteForce(const dVector& dir, dInt32* const vertexIndex) const;
-	dVector SupportVertexhierarchical(const dVector& dir, dInt32* const vertexIndex) const;
+	ndVector SupportVertexBruteForce(const ndVector& dir, dInt32* const vertexIndex) const;
+	ndVector SupportVertexhierarchical(const ndVector& dir, dInt32* const vertexIndex) const;
 	
-	void DebugShape(const dMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
+	void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 
 	//protected:
 	//dInt32 GetFaceIndices (dInt32 index, dInt32* const indices) const;
 	//virtual const ndConvexSimplexEdge** GetVertexToEdgeMapping() const {return m_vertexToEdgeMapping;}
 	ndConvexBox* m_supportTree;
 	ndConvexSimplexEdge** m_faceArray;
-	dVector* m_soa_x;
-	dVector* m_soa_y;
-	dVector* m_soa_z;
-	dVector* m_soa_index;
+	ndVector* m_soa_x;
+	ndVector* m_soa_y;
+	ndVector* m_soa_z;
+	ndVector* m_soa_index;
 
 	const ndConvexSimplexEdge** m_vertexToEdgeMapping;
 	dInt32 m_faceCount;

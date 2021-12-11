@@ -15,7 +15,7 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointHingeActuator)
 
-ndJointHingeActuator::ndJointHingeActuator(const dMatrix& pinAndPivotFrame, dFloat32 angularRate, dFloat32 minAngle, dFloat32 maxAngle, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointHingeActuator::ndJointHingeActuator(const ndMatrix& pinAndPivotFrame, dFloat32 angularRate, dFloat32 minAngle, dFloat32 maxAngle, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointHinge(pinAndPivotFrame, child, parent)
 	,m_targetAngle(dFloat32(0.0f))
 	,m_motorSpeed(angularRate)
@@ -26,8 +26,8 @@ ndJointHingeActuator::ndJointHingeActuator(const dMatrix& pinAndPivotFrame, dFlo
 	EnableLimits(false, minAngle, maxAngle);
 }
 
-ndJointHingeActuator::ndJointHingeActuator(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointHinge(dLoadSaveBase::dLoadDescriptor(desc))
+ndJointHingeActuator::ndJointHingeActuator(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointHinge(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_targetAngle(dFloat32 (0.0f))
 	,m_motorSpeed(dFloat32(0.0f))
 	,m_maxTorque(D_LCP_MAX_VALUE)
@@ -130,7 +130,7 @@ void ndJointHingeActuator::JacobianDerivative(ndConstraintDescritor& desc)
 		dAssert(dAbs(currentSpeed) < m_motorSpeed);
 	}
 
-	const dVector pin(m_body0->GetMatrix().RotateVector(m_localMatrix0.m_front));
+	const ndVector pin(m_body0->GetMatrix().RotateVector(m_localMatrix0.m_front));
 	
 	AddAngularRowJacobian(desc, pin, dFloat32 (0.0f));
 	dFloat32 accel = GetMotorZeroAcceleration(desc) + dFloat32(0.3f) * currentSpeed * desc.m_invTimestep;
@@ -151,12 +151,12 @@ void ndJointHingeActuator::JacobianDerivative(ndConstraintDescritor& desc)
 	dAssert(desc.m_rowsCount <= 6);
 }
 
-void ndJointHingeActuator::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndJointHingeActuator::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointHinge::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointHinge::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "targetAngle", m_targetAngle);
 	xmlSaveParam(childNode, "motorSpeed", m_motorSpeed);

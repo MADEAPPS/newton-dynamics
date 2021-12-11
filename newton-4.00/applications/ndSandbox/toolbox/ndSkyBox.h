@@ -28,7 +28,7 @@ class ndSkyBox: public ndDemoEntity
 	ndSkyBox(GLuint shader);
 	~ndSkyBox();
 
-	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
+	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
 	private:
 	void SetupCubeMap();

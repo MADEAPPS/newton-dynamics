@@ -46,7 +46,7 @@ dUnsigned64 dGetTimeInMicroseconds()
 	return timeStamp;
 }
 
-dFloatExceptions::dFloatExceptions(dUnsigned32 mask)
+ndFloatExceptions::ndFloatExceptions(dUnsigned32 mask)
 {
 //#if defined (_MSC_VER)
 #if	(defined(WIN32) || defined(_WIN32))
@@ -81,7 +81,7 @@ dFloatExceptions::dFloatExceptions(dUnsigned32 mask)
 	//count++;
 }
 
-dFloatExceptions::~dFloatExceptions()
+ndFloatExceptions::~ndFloatExceptions()
 {
 #if (defined (_MSC_VER) && defined (_WIN_32_VER))
 	dClearFP();
@@ -89,7 +89,7 @@ dFloatExceptions::~dFloatExceptions()
 #endif
 }
 
-dSetPrecisionDouble::dSetPrecisionDouble()
+ndSetPrecisionDouble::ndSetPrecisionDouble()
 {
 #if (defined (_MSC_VER) && defined (_WIN_32_VER))
 	dClearFP();
@@ -98,7 +98,7 @@ dSetPrecisionDouble::dSetPrecisionDouble()
 #endif
 }
 
-dSetPrecisionDouble::~dSetPrecisionDouble()
+ndSetPrecisionDouble::~ndSetPrecisionDouble()
 {
 #if (defined (_MSC_VER) && defined (_WIN_32_VER))
 	dClearFP();
@@ -123,14 +123,14 @@ static inline dInt32 cmp_vertex(const dFloat64* const v1, const dFloat64* const 
 
 static dInt32 SortVertices(dFloat64* const vertexList, dInt32 stride, dInt32 compareCount, dInt32 vertexCount, dFloat64 tolerance)
 {
-	dBigVector xc(dBigVector::m_zero);
-	dBigVector x2c(dBigVector::m_zero);
-	dBigVector minP(dFloat64(1.0e10f), dFloat64(1.0e10f), dFloat64(1.0e10f), dFloat64(0.0f));
-	dBigVector maxP(dFloat64(-1.0e10f), dFloat64(-1.0e10f), dFloat64(-1.0e10f), dFloat64(0.0f));
+	ndBigVector xc(ndBigVector::m_zero);
+	ndBigVector x2c(ndBigVector::m_zero);
+	ndBigVector minP(dFloat64(1.0e10f), dFloat64(1.0e10f), dFloat64(1.0e10f), dFloat64(0.0f));
+	ndBigVector maxP(dFloat64(-1.0e10f), dFloat64(-1.0e10f), dFloat64(-1.0e10f), dFloat64(0.0f));
 
 	for (dInt32 k = 0, i = 0; i < vertexCount; i++) 
 	{
-		dBigVector x(vertexList[k + 2], vertexList[k + 3], vertexList[k + 4], dFloat64(0.0f));
+		ndBigVector x(vertexList[k + 2], vertexList[k + 3], vertexList[k + 4], dFloat64(0.0f));
 		xc += x;
 		x2c += x * x;
 		minP = minP.GetMin(x);
@@ -138,7 +138,7 @@ static dInt32 SortVertices(dFloat64* const vertexList, dInt32 stride, dInt32 com
 		k += stride;
 	}
 
-	dBigVector del(maxP - minP);
+	ndBigVector del(maxP - minP);
 	dFloat64 minDist = dMin(dMin(del.m_x, del.m_y), del.m_z);
 	if (minDist < dFloat64(1.0e-3f)) 
 	{
@@ -349,14 +349,10 @@ static dInt32 QuickSortVertices(dFloat64* const vertList, dInt32 stride, dInt32 
 			memcpy(&vertList[(count0 + i) * stride + 2], &vertList[(i0 + i) * stride + 2], (stride - 2) * sizeof(dFloat64));
 		}
 
-
-		//dFloat64* const indexPtr = (dInt64*)vertList;
 		for (dInt32 i = i0; i < vertexCount; i++) 
 		{
-			//indexPtr[i * stride] += count0;
 			vertList[i * stride] += dFloat64(count0);
 		}
-
 	}
 	else 
 	{
@@ -368,7 +364,7 @@ static dInt32 QuickSortVertices(dFloat64* const vertList, dInt32 stride, dInt32 
 
 dInt32 dVertexListToIndexList(dFloat64* const vertList, dInt32 strideInBytes, dInt32 compareCount, dInt32 vertexCount, dInt32* const indexListOut, dFloat64 tolerance)
 {
-	dSetPrecisionDouble precision;
+	ndSetPrecisionDouble precision;
 
 	if (strideInBytes < 3 * dInt32(sizeof(dFloat64))) 
 	{
@@ -384,7 +380,7 @@ dInt32 dVertexListToIndexList(dFloat64* const vertList, dInt32 strideInBytes, dI
 	dInt32 stride = strideInBytes / dInt32(sizeof(dFloat64));
 	dInt32 stride2 = stride + 2;
 
-	dStack<dFloat64>pool(stride2  * vertexCount);
+	ndStack<dFloat64>pool(stride2  * vertexCount);
 	dFloat64* const tmpVertexList = &pool[0];
 
 	dInt32 k = 0;
@@ -423,7 +419,7 @@ dInt32 dVertexListToIndexList(dFloat64* const vertList, dInt32 strideInBytes, dI
 }
 
 #ifndef D_USE_THREAD_EMULATION
-void dSpinLock::Delay(dInt32& exp)
+void ndSpinLock::Delay(dInt32& exp)
 {
 	//#if (defined(WIN32) || defined(_WIN32))
 	#if defined (__x86_64) || defined(__x86_64__) || defined(_M_IX86) || defined(_M_X64)

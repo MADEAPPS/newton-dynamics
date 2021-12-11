@@ -32,8 +32,8 @@ ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(ndBodyKinematic* 
 	dAssert(slipOmegaLock >= 0.0f);
 }
 
-ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(const dLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(dLoadSaveBase::dLoadDescriptor(desc))
+ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(const ndLoadSaveBase::dLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_limitedSlipOmega(dFloat32 (0.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -43,8 +43,8 @@ ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(const dLoadSaveBa
 
 void ndMultiBodyVehicleDifferential::AlignMatrix()
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	//matrix1.m_posit += matrix1.m_up.Scale(1.0f);
@@ -52,9 +52,9 @@ void ndMultiBodyVehicleDifferential::AlignMatrix()
 	m_body0->SetMatrix(matrix1);
 	m_body0->SetVelocity(m_body1->GetVelocity());
 
-	dVector omega0(m_body0->GetOmega());
-	dVector omega1(m_body1->GetOmega());
-	dVector omega(
+	ndVector omega0(m_body0->GetOmega());
+	ndVector omega1(m_body1->GetOmega());
+	ndVector omega(
 		matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar()) +
 		matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega0).GetScalar()) +
 		matrix1.m_right.Scale(matrix1.m_right.DotProduct(omega1).GetScalar()));
@@ -64,23 +64,23 @@ void ndMultiBodyVehicleDifferential::AlignMatrix()
 
 void ndMultiBodyVehicleDifferential::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
+	ndMatrix matrix0;
+	ndMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	//one rows to restrict rotation around around the parent coordinate system
 	const dFloat32 angle = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle);
 
-	const dVector omega0(m_body0->GetOmega());
-	const dVector omega1(m_body1->GetOmega());
+	const ndVector omega0(m_body0->GetOmega());
+	const ndVector omega1(m_body1->GetOmega());
 
 	dFloat32 slipOmega = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
 	if (dAbs(slipOmega) > m_limitedSlipOmega) 
 	{
 		AddAngularRowJacobian(desc, matrix1.m_up, dFloat32 (0.0f));
 		ndJacobian& jacobian = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
-		jacobian.m_angular = dVector::m_zero;
+		jacobian.m_angular = ndVector::m_zero;
 		if (slipOmega > m_limitedSlipOmega)
 		{
 			slipOmega -= m_limitedSlipOmega;
@@ -99,12 +99,12 @@ void ndMultiBodyVehicleDifferential::JacobianDerivative(ndConstraintDescritor& d
 	}
 }
 
-void ndMultiBodyVehicleDifferential::Save(const dLoadSaveBase::dSaveDescriptor& desc) const
+void ndMultiBodyVehicleDifferential::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
 	desc.m_rootNode->LinkEndChild(childNode);
 	childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-	ndJointBilateralConstraint::Save(dLoadSaveBase::dSaveDescriptor(desc, childNode));
+	ndJointBilateralConstraint::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 
 	xmlSaveParam(childNode, "limitedSlipOmega", m_limitedSlipOmega);
 }

@@ -22,8 +22,8 @@ class ndJointSlider: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointSlider);
-	D_NEWTON_API ndJointSlider(const dLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API ndJointSlider(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointSlider();
 
 	D_NEWTON_API dFloat32 GetSpeed() const;
@@ -35,12 +35,12 @@ class ndJointSlider: public ndJointBilateralConstraint
 	D_NEWTON_API void SetAsSpringDamper(bool state, dFloat32 regularizer, dFloat32 spring, dFloat32 damper);
 
 	private:
-	void SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
-	void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
+	void SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
+	void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
-	D_NEWTON_API void Save(const dLoadSaveBase::dSaveDescriptor& desc) const;
+	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	dFloat32 m_posit;
 	dFloat32 m_speed;
