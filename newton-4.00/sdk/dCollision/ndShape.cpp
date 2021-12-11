@@ -26,7 +26,8 @@
 ndVector ndShape::m_flushZero(dFloat32(1.0e-7f));
 
 ndShape::ndShape(ndShapeID id)
-	:ndClassAlloc()
+	//:ndClassAlloc()
+	:ndContainersFreeListAlloc<ndShape>()
 	,m_inertia(ndVector::m_zero)
 	,m_crossInertia(ndVector::m_zero)
 	,m_centerOfMass(ndVector::m_zero)
@@ -38,7 +39,8 @@ ndShape::ndShape(ndShapeID id)
 }
 
 ndShape::ndShape(const ndShape& source)
-	:ndClassAlloc()
+	//:ndClassAlloc()
+	:ndContainersFreeListAlloc<ndShape>()
 	,m_inertia(source.m_inertia)
 	,m_crossInertia(source.m_crossInertia)
 	,m_centerOfMass(source.m_centerOfMass)

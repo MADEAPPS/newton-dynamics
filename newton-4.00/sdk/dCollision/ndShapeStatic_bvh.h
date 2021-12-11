@@ -33,6 +33,9 @@ class ndShapeStatic_bvh: public ndShapeStaticMesh, public ndAabbPolygonSoup
 	D_COLLISION_API ndShapeStatic_bvh(const ndLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeStatic_bvh();
 
+	void *operator new (size_t size);
+	void operator delete (void* ptr);
+
 	protected:
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual ndShapeStatic_bvh* GetAsShapeStaticBVH() { return this; }
@@ -51,6 +54,16 @@ class ndShapeStatic_bvh: public ndShapeStaticMesh, public ndAabbPolygonSoup
 
 	friend class ndContactSolver;
 };
+
+inline void* ndShapeStatic_bvh::operator new (size_t size)
+{
+	return ndShapeStaticMesh::operator new (size);
+}
+
+inline void ndShapeStatic_bvh::operator delete (void* ptr)
+{
+	ndShapeStaticMesh::operator delete(ptr);
+}
 
 
 #endif

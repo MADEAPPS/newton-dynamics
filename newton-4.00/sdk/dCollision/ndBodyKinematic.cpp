@@ -32,26 +32,26 @@
 #define D_INFINITE_MASS	dFloat32(1.0e15f)
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyKinematic);
 
-class ndDummyCollision: public ndShapeNull
-{
-	public:
-	ndDummyCollision()
-		:ndShapeNull()
-	{
-		m_refCount.fetch_add(1);
-	}
-
-	~ndDummyCollision()
-	{
-		m_refCount.fetch_add(-1);
-	}
-
-	static ndShapeNull* GetNullShape()
-	{
-		static ndDummyCollision nullShape;
-		return &nullShape;
-	}
-};
+//class ndDummyCollision: public ndShapeNull
+//{
+//	public:
+//	ndDummyCollision()
+//		:ndShapeNull()
+//	{
+//		m_refCount.fetch_add(1);
+//	}
+//
+//	~ndDummyCollision()
+//	{
+//		m_refCount.fetch_add(-1);
+//	}
+//
+//	static ndShapeNull* GetNullShape()
+//	{
+//		static ndDummyCollision nullShape;
+//		return &nullShape;
+//	}
+//};
 
 ndBodyKinematic::ndContactMap::ndContactMap()
 	:ndTree<ndContact*, ndContactkey, ndContainersFreeListAlloc<ndContact*>>()
@@ -86,7 +86,7 @@ void ndBodyKinematic::ndContactMap::DetachContact(ndContact* const contact)
 ndBodyKinematic::ndBodyKinematic()
 	:ndBody()
 	,m_invWorldInertiaMatrix(dGetZeroMatrix())
-	,m_shapeInstance(ndDummyCollision::GetNullShape())
+	,m_shapeInstance(new ndShapeNull)
 	,m_mass(ndVector::m_zero)
 	,m_invMass(ndVector::m_zero)
 	,m_accel(ndVector::m_zero)
@@ -117,7 +117,7 @@ ndBodyKinematic::ndBodyKinematic()
 ndBodyKinematic::ndBodyKinematic(const ndLoadSaveBase::dLoadDescriptor& desc)
 	:ndBody(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_invWorldInertiaMatrix(dGetZeroMatrix())
-	,m_shapeInstance(ndDummyCollision::GetNullShape())
+	,m_shapeInstance(new ndShapeNull)
 	,m_mass(ndVector::m_zero)
 	,m_invMass(ndVector::m_zero)
 	,m_accel(ndVector::m_zero)
