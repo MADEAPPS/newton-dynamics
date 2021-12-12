@@ -1360,10 +1360,10 @@ void ndDynamicsUpdate::IntegrateBodies()
 				}
 				else
 				{
-					dynBody->m_accel = ndVector::m_zero;
-					dynBody->m_alpha = ndVector::m_zero;
 					ndBodyKinematic* const kinBody = bodyArray[i]->GetAsBodyKinematic();
 					dAssert(kinBody);
+					kinBody->m_accel = ndVector::m_zero;
+					kinBody->m_alpha = ndVector::m_zero;
 					if (!kinBody->m_equilibrium)
 					{
 						kinBody->IntegrateVelocity(timestep);
@@ -1542,7 +1542,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 				kinBody->m_veloc = ndVector::m_zero;
 				kinBody->m_omega = ndVector::m_zero;
 				//kinBody->m_equilibrium = (kinBody->m_invMass.m_w == dFloat32(0.0f)) ? 1 : kinBody->m_autoSleep;
-				kinBody->m_equilibrium = body->m_isStatic | body->m_autoSleep;
+				kinBody->m_equilibrium = kinBody->m_isStatic | kinBody->m_autoSleep;
 			}
 		}
 	}
@@ -1979,17 +1979,12 @@ void ndDynamicsUpdate::XXXXXXXX()
 	//dTrace(("frame %d bodies %d\n", xxxx, x.GetCount()));
 	//sprintf(buffer, "frame %d bodies %d\n", xxxx, x.GetCount());
 	dUnsigned64 code = 0;
-	//for (int i = 0; i < x.GetCount(); i++)
-	for (int i = 0; i < 1; i++)
+	for (dInt32 i = 0; i < x.GetCount(); i++)
+	//for (dInt32 i = 0; i < 1; i++)
 	{
 		ndBodyKinematic* body = x[i];
-		//dTrace(("index:%d w:%d e:%d r:%d f0:%d f1:%d c:%d uniqueID:%d\n",
-		//	body->m_index, dInt32(body->m_weigh),
-		//	body->m_equilibrium, body->m_equilibrium0,
-		//	body->m_isJointFence0, body->m_isJointFence1, body->m_bodyIsConstrained,
-		//	body->m_uniqueId));
 		sprintf(buffer,
-			"index:%d w:%d e:%d r:%d f0:%d f1:%d c:%d uniqueID:%d",
+			"index:%d w:%d e:%d e0:%d f0:%d f1:%d c:%d uniqueID:%d",
 			body->m_index, dInt32(body->m_weigh),
 			body->m_equilibrium, body->m_equilibrium0,
 			body->m_isJointFence0, body->m_isJointFence1, body->m_bodyIsConstrained,
@@ -1998,6 +1993,21 @@ void ndDynamicsUpdate::XXXXXXXX()
 		dTrace(("%s\n", buffer));
 		code = dCRC64(buffer, code);
 	}
+
+	ndScene* const scene = m_world->GetScene();
+	ndConstraintArray& jointArray = scene->GetActiveContactArray();
+
+	//dTrace(("joints %d\n", jointArray.GetCount()));
+	for (dInt32 i = 0; i < jointArray.GetCount(); i++)
+	{
+		ndConstraint* const joint = jointArray[i];
+		ndBodyKinematic* const body0 = joint->GetBody0();
+		ndBodyKinematic* const body1 = joint->GetBody1();
+		//dTrace(("%d (m0: %d m1:%d)\n", i, body0->m_index, body1->m_index));
+		sprintf(buffer, "%d (m0: %d m1:%d)", i, body0->m_index, body1->m_index);
+		//code = dCRC64(buffer, code);
+	}
+	dTrace(("%d %lld", xxxx, code));
 }
 
 void ndDynamicsUpdate::Update()
