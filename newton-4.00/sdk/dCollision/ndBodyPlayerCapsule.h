@@ -150,8 +150,6 @@ inline void ndBodyPlayerCapsule::SetHeadingAngle(dFloat32 angle)
 
 inline void ndBodyPlayerCapsule::IntegrateVelocity(dFloat32)
 {
-	dTrace(("fix player capsule"));
-	//dAssert(0);
 }
 
 inline bool ndBodyPlayerCapsule::IsOnFloor() const 
