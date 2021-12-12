@@ -61,7 +61,6 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	glGenBuffers(1, &m_vertexBuffer); //m_vbo
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(VertexPT) * 24, &vtx[0], GL_STATIC_DRAW);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
@@ -69,7 +68,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(dInt32), &indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices[0], GL_STATIC_DRAW);
 	
 	glBindVertexArray(0);
 	
