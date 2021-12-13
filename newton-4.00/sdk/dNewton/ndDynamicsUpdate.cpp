@@ -1432,7 +1432,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 	ndBodyKinematic** const bodyIslands = &scene->GetActiveBodyArray()[0];
 	for (dInt32 i = 0; i < count; i++)
 	{
-		dInt32 index = indexBodyArray[i];
+		dInt32 index = indexBodyArray[i + island.m_start];
 		ndBodyDynamic* const dynBody = bodyIslands[index]->GetAsBodyDynamic();
 		if (dynBody)
 		{
@@ -1526,7 +1526,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 		for (dInt32 i = 0; i < count; i++)
 		{
 			// force entire island to equilibriumTest
-			dInt32 index = indexBodyArray[i];
+			dInt32 index = indexBodyArray[i + island.m_start];
 			ndBodyDynamic* const body = bodyIslands[index]->GetAsBodyDynamic();
 			if (body)
 			{
@@ -1548,7 +1548,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 			}
 		}
 	}
-	else if ((count > 1) || bodyIslands[indexBodyArray[0]]->m_bodyIsConstrained)
+	else if ((count > 1) || bodyIslands[indexBodyArray[island.m_start]]->m_bodyIsConstrained)
 	{
 		const bool state =
 			(maxAccel > m_world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAccel) ||
@@ -1560,7 +1560,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 		{
 			for (dInt32 i = 0; i < count; i++)
 			{
-				dInt32 index = indexBodyArray[i];
+				dInt32 index = indexBodyArray[i + island.m_start];
 				ndBodyDynamic* const body = bodyIslands[index]->GetAsBodyDynamic();
 				if (body)
 				{
@@ -1576,7 +1576,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 				sleepCounter >>= 8;
 				for (dInt32 i = 0; i < count; i++)
 				{
-					dInt32 index = indexBodyArray[i];
+					dInt32 index = indexBodyArray[i + island.m_start];
 					ndBodyKinematic* const body = bodyIslands[index];
 					body->m_equilibrium = 0;
 				}
@@ -1603,7 +1603,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 			{
 				for (dInt32 i = 0; i < count; i++)
 				{
-					dInt32 index = indexBodyArray[i];
+					dInt32 index = indexBodyArray[i + island.m_start];
 					ndBodyKinematic* const body = bodyIslands[index];
 					body->m_veloc = ndVector::m_zero;
 					body->m_omega = ndVector::m_zero;

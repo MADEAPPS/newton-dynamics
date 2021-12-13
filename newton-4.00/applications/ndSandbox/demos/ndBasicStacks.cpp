@@ -172,9 +172,9 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 
 	ndVector origin(ndVector::m_zero);
 
-	//dInt32 pyramidHigh = 60;
-	//dInt32 pyramidHigh = 18;
+	//dInt32 pyramidHigh = 1;
 	dInt32 pyramidHigh = 30;
+	//dInt32 pyramidHigh = 60;
 	for (dInt32 i = 0; i < 1; i++)
 	{
 		BuildPyramidStacks(scene, 1.0f, origin, ndVector(0.5f, 0.25f, 0.8f, 0.0f), pyramidHigh);
