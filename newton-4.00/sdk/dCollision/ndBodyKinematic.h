@@ -386,11 +386,8 @@ inline void ndBodyKinematic::PrepareStep(dInt32 index)
 	m_isJointFence0 = 1;
 	m_isJointFence1 = 1;
 	m_bodyIsConstrained = 0;
-
-//#ifdef USE_ISLAND_SOLVER
-	m_equilibrium0 = 1;
 	m_islandSleep = m_equilibrium;
-//#endif
+	m_equilibrium0 = m_equilibrium;
 }
 
 inline ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap()

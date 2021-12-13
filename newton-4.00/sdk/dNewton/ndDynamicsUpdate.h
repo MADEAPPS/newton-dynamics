@@ -45,7 +45,7 @@
 class ndWorld;
 
 
-#ifdef USE_ISLAND_SOLVER
+
 D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate : public ndClassAlloc
 {
@@ -89,12 +89,13 @@ class ndDynamicsUpdate : public ndClassAlloc
 	void ClearBuffer(void* const buffer, dInt32 sizeInByte) const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
 
+	ndArray<dInt32>& GetActiveBodyArray();
 	ndArray<ndJacobian>& GetInternalForces();
 	ndArray<ndLeftHandSide>& GetLeftHandSide();
 	ndArray<dInt32>& GetJointForceIndexBuffer();
 	ndArray<ndRightHandSide>& GetRightHandSide();
 	ndArray<ndJacobian>& GetTempInternalForces();
-	ndArray<ndBodyKinematic*>& GetBodyIslandOrder();
+	ndArray<ndBodyKinematic*>& GetActiveBodyArray____();
 	ndArray<ndJointBodyPairIndex>& GetJointBodyPairIndexBuffer();
 
 	private:
@@ -118,8 +119,6 @@ class ndDynamicsUpdate : public ndClassAlloc
 	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
-	void XXXXXXXX();
-
 	protected:
 	void Clear();
 	virtual void Update();
@@ -130,11 +129,11 @@ class ndDynamicsUpdate : public ndClassAlloc
 	ndVector m_velocTol;
 	ndArray<ndIsland> m_islands;
 	ndArray<dInt32> m_jointForcesIndex;
+	ndArray<dInt32> m_activeBodiesArray;
 	ndArray<ndJacobian> m_internalForces;
 	ndArray<ndLeftHandSide> m_leftHandSide;
 	ndArray<ndRightHandSide> m_rightHandSide;
 	ndArray<ndJacobian> m_tempInternalForces;
-	ndArray<ndBodyKinematic*> m_bodyIslandOrder;
 	ndArray<ndJointBodyPairIndex> m_jointBodyPairIndexBuffer;
 
 	ndWorld* m_world;
@@ -176,9 +175,9 @@ inline  ndArray<ndRightHandSide>& ndDynamicsUpdate::GetRightHandSide()
 	return m_rightHandSide;
 }
 
-inline  ndArray<ndBodyKinematic*>& ndDynamicsUpdate::GetBodyIslandOrder()
+inline ndArray<dInt32>& ndDynamicsUpdate::GetActiveBodyArray()
 {
-	return m_bodyIslandOrder;
+	return m_activeBodiesArray;
 }
 
 inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
@@ -230,215 +229,6 @@ inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* cons
 	}
 	return node;
 }
-
-#else
-
-D_MSV_NEWTON_ALIGN_32
-class ndDynamicsUpdate : public ndClassAlloc
-{
-	public:
-	class ndSpan
-	{
-		public:
-		dInt32 m_start;
-		dInt32 m_count;
-	};
-
-	class ndJointBodyPairIndex
-	{
-		public:
-		dInt32 m_body;
-		dInt32 m_joint;
-	};
-
-	class ndBodyIndexPair
-	{
-		public:
-		ndBodyKinematic* m_body;
-		ndBodyKinematic* m_root;
-	};
-
-	class ndIsland
-	{
-		public:
-		ndIsland(ndBodyKinematic* const root)
-			:m_start(0)
-			,m_count(0)
-			,m_root(root)
-		{
-		}
-
-		dInt32 m_start;
-		dInt32 m_count;
-		ndBodyKinematic* m_root;
-	};
-
-	public:
-	ndDynamicsUpdate(ndWorld* const world);
-	virtual ~ndDynamicsUpdate();
-
-	void* GetTempBuffer() const;
-	virtual const char* GetStringId() const;
-
-	dInt32 GetActiveJointCount() const;
-	void ClearBuffer(void* const buffer, dInt32 sizeInByte) const;
-	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
-
-	ndArray<dInt32>& GetActiveBodyArray();
-	ndArray<ndJacobian>& GetInternalForces();
-	ndArray<ndLeftHandSide>& GetLeftHandSide();
-	ndArray<dInt32>& GetJointForceIndexBuffer();
-	ndArray<ndRightHandSide>& GetRightHandSide();
-	ndArray<ndJacobian>& GetTempInternalForces();
-	ndArray<ndBodyKinematic*>& GetBodyIslandOrder();
-	ndArray<ndJointBodyPairIndex>& GetJointBodyPairIndexBuffer();
-
-	private:
-	void SortJoints();
-	void SortIslands();
-	void BuildIsland();
-	void InitWeights();
-	void InitBodyArray();
-	void InitSkeletons();
-	void CalculateForces();
-	void IntegrateBodies();
-	void UpdateSkeletons();
-	void InitJacobianMatrix();
-	void UpdateForceFeedback();
-	void CalculateJointsForce();
-	void IntegrateBodiesVelocity();
-	void CalculateJointsAcceleration();
-	void IntegrateUnconstrainedBodies();
-
-	void DetermineSleepStates();
-	void UpdateIslandState(const ndIsland& island);
-	void GetJacobianDerivatives(ndConstraint* const joint);
-
-	void XXXXXXXX();
-
-	protected:
-	void Clear();
-	virtual void Update();
-	void SortJointsScan();
-	void SortBodyJointScan();
-	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
-
-	ndVector m_velocTol;
-	ndArray<ndIsland> m_islands; // to be removed
-	ndArray<dInt32> m_activeBodyArray;
-	ndArray<dInt32> m_jointForcesIndex;
-	ndArray<ndJacobian> m_internalForces;
-	ndArray<ndLeftHandSide> m_leftHandSide;
-	ndArray<ndRightHandSide> m_rightHandSide;
-	ndArray<ndJacobian> m_tempInternalForces;
-	ndArray<ndBodyKinematic*> m_bodyIslandOrder;  // to be removed
-	ndArray<ndJointBodyPairIndex> m_jointBodyPairIndexBuffer;
-
-	ndWorld* m_world;
-	dFloat32 m_timestep;
-	dFloat32 m_invTimestep;
-	dFloat32 m_firstPassCoef;
-	dFloat32 m_invStepRK;
-	dFloat32 m_timestepRK;
-	dFloat32 m_invTimestepRK;
-	dInt32 m_solverPasses;
-	dInt32 m_activeJointCount;
-	//dInt32 m_constrainedBodyCount____;
-	dInt32 m_unConstrainedBodyCount____;
-
-	ndSpan m_totalBodyCount;
-	ndSpan m_activeBodyCount;
-	ndSpan m_constrainedBodyCount;
-	ndSpan m_unConstrainedBodyCount;
-
-	friend class ndWorld;
-} D_GCC_NEWTON_ALIGN_32;
-
-inline void* ndDynamicsUpdate::GetTempBuffer() const
-{
-	return (void*)&m_leftHandSide[0];
-}
-
-inline ndArray<ndJacobian>& ndDynamicsUpdate::GetInternalForces()
-{
-	return m_internalForces;
-}
-
-inline ndArray<ndJacobian>& ndDynamicsUpdate::GetTempInternalForces()
-{
-	return m_tempInternalForces;
-}
-
-inline ndArray<ndLeftHandSide>& ndDynamicsUpdate::GetLeftHandSide()
-{
-	return m_leftHandSide;
-}
-
-inline ndArray<ndRightHandSide>& ndDynamicsUpdate::GetRightHandSide()
-{
-	return m_rightHandSide;
-}
-
-inline ndArray<dInt32>& ndDynamicsUpdate::GetActiveBodyArray()
-{
-	return m_activeBodyArray;
-}
-
-inline ndArray<ndBodyKinematic*>& ndDynamicsUpdate::GetBodyIslandOrder()
-{
-	return m_bodyIslandOrder;
-}
-
-inline dInt32 ndDynamicsUpdate::GetActiveJointCount() const
-{
-	return m_activeJointCount;
-}
-
-inline ndArray<ndDynamicsUpdate::ndJointBodyPairIndex>& ndDynamicsUpdate::GetJointBodyPairIndexBuffer()
-{
-	return m_jointBodyPairIndexBuffer;
-}
-
-inline ndArray<dInt32>& ndDynamicsUpdate::GetJointForceIndexBuffer()
-{
-	return m_jointForcesIndex;
-}
-
-inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const
-{
-	const ndVector zero(ndVector::m_zero);
-	ndVector* const dst = &buffer[0].m_linear;
-	for (dInt32 i = 0; i < count; i++)
-	{
-		dst[i * 2 + 0] = zero;
-		dst[i * 2 + 1] = zero;
-	}
-}
-
-inline void ndDynamicsUpdate::ClearBuffer(void* const buffer, dInt32 sizeInByte) const
-{
-	dInt32 sizeInJacobian = sizeInByte / sizeof(ndJacobian);
-	ClearJacobianBuffer(sizeInJacobian, (ndJacobian*)buffer);
-	char* const ptr = (char*)buffer;
-	for (dInt32 i = sizeInJacobian * sizeof(ndJacobian); i < sizeInByte; i++)
-	{
-		ptr[i] = 0;
-	}
-}
-
-inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* const body)
-{
-	ndBodyKinematic* node = body;
-	while (node->m_islandParent != node)
-	{
-		ndBodyKinematic* const prev = node;
-		node = node->m_islandParent;
-		prev->m_islandParent = node->m_islandParent;
-	}
-	return node;
-}
-
-#endif
 
 #endif
 

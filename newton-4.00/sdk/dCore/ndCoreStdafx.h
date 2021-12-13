@@ -22,8 +22,6 @@
 #ifndef _ND_TYPES_H_
 #define _ND_TYPES_H_
 
-#define USE_ISLAND_SOLVER
-
 #include "ndTypes.h"
 
 #endif

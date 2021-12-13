@@ -523,15 +523,12 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	
 	sentinelBody->m_isStatic = 1;
 	sentinelBody->m_autoSleep = 1;
+	sentinelBody->m_islandSleep = 1;
 	sentinelBody->m_equilibrium = 1;
 	sentinelBody->m_equilibrium0 = 1;
 	sentinelBody->m_isJointFence0 = 1;
 	sentinelBody->m_isJointFence1 = 1;
 	sentinelBody->m_bodyIsConstrained = 0;
-
-//#ifdef ISLAND_SOLVER
-	sentinelBody->m_islandSleep = 1;
-//#endif
 	
 	m_scene->GetActiveBodyArray().PushBack(sentinelBody);
 

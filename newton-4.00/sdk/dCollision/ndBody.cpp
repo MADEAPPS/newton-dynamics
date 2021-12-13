@@ -42,14 +42,12 @@ ndBody::ndBody()
 	,m_flags(0)
 	,m_isStatic(0)
 	,m_autoSleep(1)
+	,m_islandSleep(0)
 	,m_equilibrium(0)
 	,m_equilibrium0(0)
 	,m_isJointFence0(0)
 	,m_isJointFence1(0)
 	,m_bodyIsConstrained(0)
-//#ifdef ISLAND_SOLVER
-	,m_islandSleep(0)
-//#endif
 {
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;
@@ -70,14 +68,12 @@ ndBody::ndBody(const ndLoadSaveBase::dLoadDescriptor& desc)
 	,m_flags(0)
 	,m_isStatic(0)
 	,m_autoSleep(1)
+	,m_islandSleep(0)
 	,m_equilibrium(0)
 	,m_equilibrium0(0)
 	,m_isJointFence0(0)
 	,m_isJointFence1(0)
 	,m_bodyIsConstrained(0)
-//#ifdef ISLAND_SOLVER
-	,m_islandSleep(0)
-//#endif
 {
 	m_uniqueIdCount++;
 	m_transformIsDirty = 1;

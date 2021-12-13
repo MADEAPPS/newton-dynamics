@@ -358,7 +358,7 @@ ndSkeletonContainer::ndSkeletonContainer()
 	,m_loopCount(0)
 	,m_dynamicsLoopCount(0)
 	,m_consideredCloseLoop(1)
-	,m_isResting()
+	,m_isResting(0)
 {
 }
 
@@ -482,7 +482,7 @@ void ndSkeletonContainer::AddSelfCollisionJoint(ndConstraint* const joint)
 
 void ndSkeletonContainer::CheckSleepState()
 {
-	dInt32 equilibrium = 1;
+	dUnsigned8 equilibrium = 1;
 	for (dInt32 i = m_nodeList.GetCount() - 1; i >= 0; --i)
 	{
 		ndNode* const node = m_nodesOrder[i];
@@ -527,10 +527,8 @@ void ndSkeletonContainer::CheckSleepState()
 			}
 		}
 	}
-
-#ifdef USE_ISLAND_SOLVER
-	m_isResting = equilibrium ? true : false;
-#endif
+	//m_isResting = equilibrium ? true : false;
+	m_isResting = equilibrium;
 }
 
 void ndSkeletonContainer::CalculateBufferSizeInBytes()

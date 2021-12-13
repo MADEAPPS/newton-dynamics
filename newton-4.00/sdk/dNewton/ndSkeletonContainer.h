@@ -163,7 +163,7 @@ class ndSkeletonContainer
 	dInt16 m_loopCount;
 	dInt16 m_dynamicsLoopCount;
 	dInt16 m_consideredCloseLoop;
-	bool m_isResting;
+	dUnsigned8 m_isResting;
 };
 
 inline ndSkeletonContainer::ndNode* ndSkeletonContainer::GetRoot() const
