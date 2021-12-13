@@ -134,7 +134,9 @@ else()
 				ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/applications/ndSandbox/${CMAKE_CFG_INTDIR}/$<TARGET_FILE_NAME:${projectName}>)
 		endif ()
 
-		install(FILES $<TARGET_PDB_FILE:${projectName}> DESTINATION bin OPTIONAL)
+		if(NEWTON_BUILD_SHARED_LIBS)
+			install(FILES $<TARGET_PDB_FILE:${projectName}> DESTINATION bin OPTIONAL)
+		endif(NEWTON_BUILD_SHARED_LIBS)
 
 	endif(MSVC)
 
