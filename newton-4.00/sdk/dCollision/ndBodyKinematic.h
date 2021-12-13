@@ -379,13 +379,13 @@ inline void ndBodyKinematic::PrepareStep(dInt32 index)
 {
 	m_rank = 0;
 	m_index = index;
-	m_weigh = dFloat32(0.0f);
-	m_islandParent = this;
-	m_isStatic = (m_invMass.m_w == dFloat32(0.0f));
-	m_equilibrium = m_isStatic | m_equilibrium;
 	m_isJointFence0 = 1;
 	m_isJointFence1 = 1;
+	m_islandParent = this;
 	m_bodyIsConstrained = 0;
+	m_weigh = dFloat32(1.0f);
+	m_isStatic = (m_invMass.m_w == dFloat32(0.0f));
+	m_equilibrium = m_isStatic | m_equilibrium;
 	m_islandSleep = m_equilibrium;
 	m_equilibrium0 = m_equilibrium;
 }

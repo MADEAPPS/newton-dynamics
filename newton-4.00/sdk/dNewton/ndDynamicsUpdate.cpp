@@ -719,40 +719,33 @@ void ndDynamicsUpdate::InitWeights()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			ndWorld* const world = m_owner->GetWorld();
+			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
 
-			dFloat32 maxExtraPasses = dFloat32(1.0f);
+			const ndArray<dInt32>& indexBodyArray = me->GetActiveBodyArray();
+			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
+			const dInt32* const activeJointsCount = &me->GetJointForceIndexBuffer()[0];
+
 			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 jointCount = jointArray.GetCount();
+			const dInt32 bodyCount = indexBodyArray.GetCount();
 
-			const dInt32 stride = jointCount / threadCount;
+			const dInt32 stride = bodyCount / threadCount;
 			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : jointCount - start;
+			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
 
+			dInt32 maxExtraPasses = 1;
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
-				ndConstraint* const constraint = jointArray[i + start];
-				ndBodyKinematic* const body0 = constraint->GetBody0();
-				ndBodyKinematic* const body1 = constraint->GetBody1();
-
-				//if (body1->m_invMass.m_w > dFloat32(0.0f))
-				if (!body1->m_isStatic)
-				{
-					ndScopeSpinLock lock(body1->m_lock);
-					body1->m_weigh += dFloat32(1.0f);
-					maxExtraPasses = dMax(body1->m_weigh, maxExtraPasses);
-				}
-				else if (body1->m_weigh != dFloat32(1.0f))
-				{
-					body1->m_weigh = dFloat32(1.0f);
-				}
-				ndScopeSpinLock lock(body0->m_lock);
-				body0->m_weigh += dFloat32(1.0f);
-				dAssert(body0->m_invMass.m_w != dFloat32(0.0f));
-				maxExtraPasses = dMax(body0->m_weigh, maxExtraPasses);
+				const dInt32 index = indexBodyArray[start + i];
+				ndBodyKinematic* const body = bodyArray[index];
+				dAssert(body->m_bodyIsConstrained <= 1);
+				const dInt32 mask = -dInt32(body->m_bodyIsConstrained & ~body->m_isStatic);
+				const dInt32 weigh = 1 + (mask & (activeJointsCount[index + 1] - activeJointsCount[index] - 1));
+				body->m_weigh = dFloat32(weigh);
+				maxExtraPasses = dMax(weigh, maxExtraPasses);
 			}
-			dFloat32* const extraPasses = (dFloat32*)m_context;
+			dInt32* const extraPasses = (dInt32*)m_context;
 			extraPasses[threadIndex] = maxExtraPasses;
 		}
 	};
@@ -767,11 +760,10 @@ void ndDynamicsUpdate::InitWeights()
 	const dInt32 bodyCount = bodyArray.GetCount();
 	GetInternalForces().SetCount(bodyCount);
 
-	dFloat32 extraPassesArray[D_MAX_THREADS_COUNT];
-	memset(extraPassesArray, 0, sizeof(extraPassesArray));
+	dInt32 extraPassesArray[D_MAX_THREADS_COUNT];
 	scene->SubmitJobs<ndInitWeights>(extraPassesArray);
 
-	dFloat32 extraPasses = dFloat32(0.0f);
+	dInt32 extraPasses = 0;
 	const dInt32 threadCount = scene->GetThreadCount();
 	for (dInt32 i = 0; i < threadCount; i++)
 	{
@@ -779,7 +771,7 @@ void ndDynamicsUpdate::InitWeights()
 	}
 
 	const dInt32 conectivity = 7;
-	m_solverPasses = m_world->GetSolverIterations() + 2 * dInt32(extraPasses) / conectivity + 1;
+	m_solverPasses = m_world->GetSolverIterations() + 2 * extraPasses / conectivity + 1;
 }
 
 void ndDynamicsUpdate::InitBodyArray()
