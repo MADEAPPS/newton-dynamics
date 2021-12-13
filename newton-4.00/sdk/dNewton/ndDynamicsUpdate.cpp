@@ -799,21 +799,18 @@ void ndDynamicsUpdate::InitBodyArray()
 			for (dInt32 i = 0; i < blockSize; i++)
 			{
 				dInt32 index = indexBodyArray[i + start];
-				ndBodyDynamic* const body = bodyArray[index]->GetAsBodyDynamic();
-				if (body)
-				{
-					dAssert(index == body->m_index);
-					dAssert(body->m_bodyIsConstrained);
-					body->UpdateInvInertiaMatrix();
-					body->AddDampingAcceleration(m_timestep);
-					const ndVector angularMomentum(body->CalculateAngularMomentum());
-					body->m_gyroTorque = body->m_omega.CrossProduct(angularMomentum);
-					body->m_gyroAlpha = body->m_invWorldInertiaMatrix.RotateVector(body->m_gyroTorque);
+				ndBodyKinematic* const body = bodyArray[index];
+				dAssert(index == body->m_index);
+				dAssert(body->m_bodyIsConstrained);
+				body->UpdateInvInertiaMatrix();
+				body->AddDampingAcceleration(m_timestep);
+				const ndVector angularMomentum(body->CalculateAngularMomentum());
+				body->m_gyroTorque = body->m_omega.CrossProduct(angularMomentum);
+				body->m_gyroAlpha = body->m_invWorldInertiaMatrix.RotateVector(body->m_gyroTorque);
 
-					body->m_accel = body->m_veloc;
-					body->m_alpha = body->m_omega;
-					body->m_gyroRotation = body->m_rotation;
-				}
+				body->m_accel = body->m_veloc;
+				body->m_alpha = body->m_omega;
+				body->m_gyroRotation = body->m_rotation;
 			}
 		}
 	};
