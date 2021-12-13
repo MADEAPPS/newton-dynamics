@@ -70,12 +70,11 @@ class ndBodyDynamic: public ndBodyKinematic
 	virtual ndVector GetForce() const;
 	virtual ndVector GetTorque() const;
 	
-	virtual void IntegrateGyroSubstep(const ndVector& timestep);
-	virtual ndJacobian IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const;
-
+	private:
 	void SaveExternalForces();
+	D_NEWTON_API virtual void IntegrateGyroSubstep(const ndVector& timestep);
+	D_NEWTON_API virtual ndJacobian IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const;
 
-	protected:
 	ndVector m_externalForce;
 	ndVector m_externalTorque;
 	ndVector m_impulseForce;

@@ -150,9 +150,6 @@ class ndBodyKinematic: public ndBody
 	virtual void SetForce(const ndVector& force);
 	virtual void SetTorque(const ndVector& torque);
 
-	virtual void IntegrateGyroSubstep(const ndVector& timestep);
-	virtual ndJacobian IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const;
-
 	virtual void AddImpulse(const ndVector& pointVeloc, const ndVector& pointPosit, dFloat32 timestep);
 	virtual void ApplyImpulsePair(const ndVector& linearImpulse, const ndVector& angularImpulse, dFloat32 timestep);
 	virtual void ApplyImpulsesAtPoint(dInt32 count, const ndVector* const impulseArray, const ndVector* const pointArray, dFloat32 timestep);
@@ -161,8 +158,6 @@ class ndBodyKinematic: public ndBody
 	ndVector GetAlpha() const;
 	void SetAccel(const ndVector& accel);
 	void SetAlpha(const ndVector& alpha);
-
-	void SetAccel(const ndJacobian& accel);
 
 	ndContactMap& GetContactMap();
 	const ndJointList& GetJointList() const;
@@ -176,6 +171,10 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API virtual ndJointList::ndNode* AttachJoint(ndJointBilateralConstraint* const joint);
 	D_COLLISION_API virtual void DetachJoint(ndJointList::ndNode* const node);
 	D_COLLISION_API virtual void IntegrateExternalForce(dFloat32 timestep);
+
+	void SetAccel(const ndJacobian& accel);
+	virtual void IntegrateGyroSubstep(const ndVector& timestep);
+	virtual ndJacobian IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const;
 
 	void UpdateCollisionMatrix();
 	void PrepareStep(dInt32 index);
