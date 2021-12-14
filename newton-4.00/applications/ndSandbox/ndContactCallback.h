@@ -36,9 +36,9 @@ class ndContactCallback: public ndContactNotify
 		{
 		}
 
-		ndMaterailKey(dUnsigned64 low, dUnsigned64 high)
-			:m_lowKey(dUnsigned32(dMin(low, high)))
-			,m_highKey(dUnsigned32(dMax(low, high)))
+		ndMaterailKey(ndUnsigned64 low, ndUnsigned64 high)
+			:m_lowKey(ndUnsigned32(dMin(low, high)))
+			,m_highKey(ndUnsigned32(dMax(low, high)))
 		{
 		}
 
@@ -56,22 +56,22 @@ class ndContactCallback: public ndContactNotify
 		{
 			struct 
 			{
-				dUnsigned32 m_lowKey;
-				dUnsigned32 m_highKey;
+				ndUnsigned32 m_lowKey;
+				ndUnsigned32 m_highKey;
 			};
-			dUnsigned64 m_key;
+			ndUnsigned64 m_key;
 		};
 	};
 
 	ndContactCallback();
 
-	virtual ndMaterial& RegisterMaterial(dUnsigned32 id0, dUnsigned32 id1);
+	virtual ndMaterial& RegisterMaterial(ndUnsigned32 id0, ndUnsigned32 id1);
 
 	virtual void OnBodyAdded(ndBodyKinematic* const body) const;
 	virtual void OnBodyRemoved(ndBodyKinematic* const body) const;
 	virtual ndMaterial GetMaterial(const ndContact* const contactJoint, const ndShapeInstance& instance0, const ndShapeInstance& instance1) const;
-	virtual bool OnAabbOverlap(const ndContact* const contactJoint, dFloat32 timestep);
-	virtual void OnContactCallback(dInt32 threadIndex, const ndContact* const contactJoint, dFloat32 timestep);
+	virtual bool OnAabbOverlap(const ndContact* const contactJoint, ndFloat32 timestep);
+	virtual void OnContactCallback(ndInt32 threadIndex, const ndContact* const contactJoint, ndFloat32 timestep);
 
 	void PlaySoundTest(const ndContact* const contactJoint);
 

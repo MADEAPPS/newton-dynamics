@@ -31,9 +31,9 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleTorsionBar)
 
 ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehicle* const vehicle, ndBodyDynamic* const fixedbody)
 	:ndJointBilateralConstraint(1, vehicle->m_chassis, fixedbody, dGetIdentityMatrix())
-	,m_springK(dFloat32 (10.0f))
-	,m_damperC(dFloat32(1.0f))
-	,m_springDamperRegularizer(dFloat32(0.1f))
+	,m_springK(ndFloat32 (10.0f))
+	,m_damperC(ndFloat32(1.0f))
+	,m_springDamperRegularizer(ndFloat32(0.1f))
 	,m_axleCount(0)
 {
 	const ndMatrix worldMatrix (vehicle->m_localFrame * vehicle->m_chassis->GetMatrix());
@@ -43,9 +43,9 @@ ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehi
 
 ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndLoadSaveBase::dLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
-	,m_springK(dFloat32(10.0f))
-	,m_damperC(dFloat32(1.0f))
-	,m_springDamperRegularizer(dFloat32(0.1f))
+	,m_springK(ndFloat32(10.0f))
+	,m_damperC(ndFloat32(1.0f))
+	,m_springDamperRegularizer(ndFloat32(0.1f))
 	,m_axleCount(0)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
@@ -56,18 +56,18 @@ ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndLoadSaveBase:
 	m_axleCount = xmlGetInt(xmlNode, "axleCount");
 }
 
-void ndMultiBodyVehicleTorsionBar::SetTorsionTorque(dFloat32 springK, dFloat32 damperC, dFloat32 springDamperRegularizer)
+void ndMultiBodyVehicleTorsionBar::SetTorsionTorque(ndFloat32 springK, ndFloat32 damperC, ndFloat32 springDamperRegularizer)
 {
 	m_springK = dAbs(springK);
 	m_damperC = dAbs(damperC);
-	m_springDamperRegularizer = dClamp (springDamperRegularizer, dFloat32 (0.001), dFloat32(0.99f));
+	m_springDamperRegularizer = dClamp (springDamperRegularizer, ndFloat32 (0.001), ndFloat32(0.99f));
 }
 
 void ndMultiBodyVehicleTorsionBar::AddAxel(const ndBodyKinematic* const leftTire, const ndBodyKinematic* const rightTire)
 {
-	if (m_axleCount < dInt32 (sizeof(m_axles) / sizeof(m_axles[0])))
+	if (m_axleCount < ndInt32 (sizeof(m_axles) / sizeof(m_axles[0])))
 	{
-		m_axles[m_axleCount].m_axleAngle = dFloat32(0.0f);
+		m_axles[m_axleCount].m_axleAngle = ndFloat32(0.0f);
 		m_axles[m_axleCount].m_leftTire = leftTire;
 		m_axles[m_axleCount].m_rightTire = rightTire;
 		m_axleCount++;
@@ -84,9 +84,9 @@ void ndMultiBodyVehicleTorsionBar::JacobianDerivative(ndConstraintDescritor& des
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 		CalculateGlobalMatrix(matrix0, matrix1);
 	
-		dFloat32 angle = dFloat32(0.0f);
-		dFloat32 omega = dFloat32(0.0f);
-		for (dInt32 i = 0; i < m_axleCount; i++)
+		ndFloat32 angle = ndFloat32(0.0f);
+		ndFloat32 omega = ndFloat32(0.0f);
+		for (ndInt32 i = 0; i < m_axleCount; i++)
 		{
 			ndVector dir(m_axles[i].m_rightTire->GetMatrix().m_posit - m_axles[i].m_leftTire->GetMatrix().m_posit);
 			dir = dir.Normalize();
@@ -97,10 +97,10 @@ void ndMultiBodyVehicleTorsionBar::JacobianDerivative(ndConstraintDescritor& des
 		angle = angle / m_axleCount;
 		omega = omega / m_axleCount;
 		//dTrace(("%f\n", angle * dRadToDegree));
-		AddAngularRowJacobian(desc, matrix0.m_front, dFloat32(0.0f));
-		dFloat32 accel = -CalculateSpringDamperAcceleration(desc.m_timestep, 300.0f, angle, dFloat32(10.0f), omega);
+		AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
+		ndFloat32 accel = -CalculateSpringDamperAcceleration(desc.m_timestep, 300.0f, angle, ndFloat32(10.0f), omega);
 		SetMotorAcceleration(desc, accel);
-		SetDiagonalRegularizer(desc, dFloat32 (0.2f));
+		SetDiagonalRegularizer(desc, ndFloat32 (0.2f));
 	}
 }
 

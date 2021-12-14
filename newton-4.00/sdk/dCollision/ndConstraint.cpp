@@ -28,8 +28,8 @@
 #include "ndBodyKinematic.h"
 
 ndConstraint::ndConstraint()
-	:m_preconditioner0(dFloat32 (1.0f))
-	,m_preconditioner1(dFloat32(1.0f))
+	:m_preconditioner0(ndFloat32 (1.0f))
+	,m_preconditioner1(ndFloat32(1.0f))
 	,m_rowCount(0)
 	,m_rowStart(0)
 	,m_active(1)

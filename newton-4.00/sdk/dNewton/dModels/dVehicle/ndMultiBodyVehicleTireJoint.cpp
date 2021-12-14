@@ -19,8 +19,8 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleTireJoint)
 ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info, ndMultiBodyVehicle* const vehicle)
 	:ndJointWheel(pinAndPivotFrame, child, parent, info)
 	,m_vehicle(vehicle)
-	,m_lateralSlip(dFloat32 (0.0f))
-	,m_longitudinalSlip(dFloat32(0.0f))
+	,m_lateralSlip(ndFloat32 (0.0f))
+	,m_longitudinalSlip(ndFloat32(0.0f))
 {
 }
 
@@ -38,12 +38,12 @@ ndMultiBodyVehicleTireJoint::~ndMultiBodyVehicleTireJoint()
 {
 }
 
-dFloat32 ndMultiBodyVehicleTireJoint::GetSideSlip() const
+ndFloat32 ndMultiBodyVehicleTireJoint::GetSideSlip() const
 {
 	return m_lateralSlip;
 }
 
-dFloat32 ndMultiBodyVehicleTireJoint::GetLongitudinalSlip() const
+ndFloat32 ndMultiBodyVehicleTireJoint::GetLongitudinalSlip() const
 {
 	return m_longitudinalSlip;
 }

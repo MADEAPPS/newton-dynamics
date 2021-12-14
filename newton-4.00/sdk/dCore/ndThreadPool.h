@@ -43,7 +43,7 @@ class ndThreadPoolJob
 	{
 	}
 
-	dInt32 GetThreadId() const 
+	ndInt32 GetThreadId() const 
 	{ 
 		return m_threadIndex; 
 	}
@@ -51,7 +51,7 @@ class ndThreadPoolJob
 	virtual void Execute() = 0;
 
 	private:
-	dInt32 m_threadIndex;
+	ndInt32 m_threadIndex;
 	friend class ndThreadPool;
 };
 
@@ -69,7 +69,7 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 
 		ndThreadPoolJob* m_job;
 		ndThreadPool* m_owner;
-		dInt32 m_threadIndex;
+		ndInt32 m_threadIndex;
 		friend class ndThreadPool;
 	};
 
@@ -88,7 +88,7 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 		private:
 		ndAtomic<ndThreadPoolJob*> m_job;
 		ndAtomic<bool> m_begin;
-		ndAtomic<dInt32>* m_joindInqueue;
+		ndAtomic<ndInt32>* m_joindInqueue;
 		friend class ndThreadPool;
 	};
 
@@ -96,8 +96,8 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 	D_CORE_API ndThreadPool(const char* const baseName);
 	D_CORE_API virtual ~ndThreadPool();
 
-	dInt32 GetCount() const;
-	D_CORE_API void SetCount(dInt32 count);
+	ndInt32 GetCount() const;
+	D_CORE_API void SetCount(ndInt32 count);
 
 	D_CORE_API void TickOne();
 	D_CORE_API void ExecuteJobs(ndThreadPoolJob** const jobs);
@@ -110,13 +110,13 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 
 	ndSyncMutex m_sync;
 	ndWorkerThread* m_workers;
-	dInt32 m_count;
+	ndInt32 m_count;
 	char m_baseName[32];
-	ndAtomic<dInt32> m_joindInqueue;
+	ndAtomic<ndInt32> m_joindInqueue;
 	ndThreadLockFreeUpdate m_lockFreeJobs[D_MAX_THREADS_COUNT];
 };
 
-inline dInt32 ndThreadPool::GetCount() const
+inline ndInt32 ndThreadPool::GetCount() const
 {
 	return m_count + 1;
 }

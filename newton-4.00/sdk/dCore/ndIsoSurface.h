@@ -36,19 +36,19 @@ class ndIsoSurface: public ndClassAlloc
 	class ndIsoCell
 	{
 		public:
-		dFloat32 m_isoValues[2][2][2];
-		dInt32 m_x;
-		dInt32 m_y;
-		dInt32 m_z;
+		ndFloat32 m_isoValues[2][2][2];
+		ndInt32 m_x;
+		ndInt32 m_y;
+		ndInt32 m_z;
 	};
 
 	class ndIsoTriangle
 	{
 		public:
-		dUnsigned64 m_pointId[3];
+		ndUnsigned64 m_pointId[3];
 	};
 
-	class ndIsoVertexMap: public ndTree<ndVector, dUnsigned64, ndContainersFreeListAlloc<ndVector>>
+	class ndIsoVertexMap: public ndTree<ndVector, ndUnsigned64, ndContainersFreeListAlloc<ndVector>>
 	{
 		public: 
 	};
@@ -56,21 +56,21 @@ class ndIsoSurface: public ndClassAlloc
 	D_CORE_API ndIsoSurface();
 	D_CORE_API ~ndIsoSurface();
 
-	D_CORE_API void Begin(const ndVector& origin, dFloat32 isovalue, dFloat32 gridSize, dInt32 sizex, dInt32 sizey, dInt32 sizez);
+	D_CORE_API void Begin(const ndVector& origin, ndFloat32 isovalue, ndFloat32 gridSize, ndInt32 sizex, ndInt32 sizey, ndInt32 sizez);
 	D_CORE_API void ProcessCell(const ndIsoCell& cell);
 	D_CORE_API void End();
 
-	dInt32 GetIndexCount() const;
-	dInt32 GetVertexCount() const;
+	ndInt32 GetIndexCount() const;
+	ndInt32 GetVertexCount() const;
 	const ndVector* GetPoints() const;
 	const ndVector* GetNormals() const;
-	const dUnsigned64* GetIndexList() const;
+	const ndUnsigned64* GetIndexList() const;
 
 	private:
-	dUnsigned64 GetVertexID(dInt32 x, dInt32 y, dInt32 z);
-	dUnsigned64 GetEdgeID(const ndIsoCell& cell, dInt32 edgeCode);
-	ndVector CalculateIntersection(const ndIsoCell& cell, dInt32 edgeCode);
-	ndVector InterpolateEdge(dFloat32 fX1, dFloat32 fY1, dFloat32 fZ1, dFloat32 fX2, dFloat32 fY2, dFloat32 fZ2, dFloat32 tVal1, dFloat32 tVal2);
+	ndUnsigned64 GetVertexID(ndInt32 x, ndInt32 y, ndInt32 z);
+	ndUnsigned64 GetEdgeID(const ndIsoCell& cell, ndInt32 edgeCode);
+	ndVector CalculateIntersection(const ndIsoCell& cell, ndInt32 edgeCode);
+	ndVector InterpolateEdge(ndFloat32 fX1, ndFloat32 fY1, ndFloat32 fZ1, ndFloat32 fX2, ndFloat32 fY2, ndFloat32 fZ2, ndFloat32 tVal1, ndFloat32 tVal2);
 
 	void RemapIndexList();
 	void CalculateNormals();
@@ -81,22 +81,22 @@ class ndIsoSurface: public ndClassAlloc
 	ndArray<ndIsoTriangle> m_trianglesList;
 
 	ndIsoVertexMap m_vertexMap;
-	dInt32 m_xCellSize;
-	dInt32 m_yCellSize;
-	dInt32 m_zCellSize;
-	dFloat32 m_gridSize;
-	dFloat32 m_isoValue;
+	ndInt32 m_xCellSize;
+	ndInt32 m_yCellSize;
+	ndInt32 m_zCellSize;
+	ndFloat32 m_gridSize;
+	ndFloat32 m_isoValue;
 
-	static const dInt32 m_edgeTable[];
-	static const dInt32 m_triangleTable[][16];
+	static const ndInt32 m_edgeTable[];
+	static const ndInt32 m_triangleTable[][16];
 };
 
-inline dInt32 ndIsoSurface::GetIndexCount() const
+inline ndInt32 ndIsoSurface::GetIndexCount() const
 {
 	return m_trianglesList.GetCount() * 3;
 }
 
-inline dInt32 ndIsoSurface::GetVertexCount() const
+inline ndInt32 ndIsoSurface::GetVertexCount() const
 {
 	return m_points.GetCount();
 }
@@ -111,7 +111,7 @@ inline const ndVector* ndIsoSurface::GetNormals() const
 	return m_normals.GetCount() ? &m_normals[0] : nullptr;
 }
 
-inline const dUnsigned64* ndIsoSurface::GetIndexList() const
+inline const ndUnsigned64* ndIsoSurface::GetIndexList() const
 {
 	return m_trianglesList.GetCount() ? &m_trianglesList[0].m_pointId[0] : nullptr;
 }

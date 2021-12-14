@@ -36,13 +36,13 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 
 	D_CLASS_REFLECTION(ndShapeHeightfield);
 	D_COLLISION_API ndShapeHeightfield(
-		dInt32 width, dInt32 height, ndGridConstruction contructionMode,
-		dFloat32 verticalScale, dFloat32 horizontalScale_x, dFloat32 horizontalScale_z);
+		ndInt32 width, ndInt32 height, ndGridConstruction contructionMode,
+		ndFloat32 verticalScale, ndFloat32 horizontalScale_x, ndFloat32 horizontalScale_z);
 	D_COLLISION_API ndShapeHeightfield(const ndLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeHeightfield();
 
-	ndArray<dInt16>& GetElevationMap();
-	const ndArray<dInt16>& GetElevationMap() const;
+	ndArray<ndInt16>& GetElevationMap();
+	const ndArray<ndInt16>& GetElevationMap() const;
 
 	D_COLLISION_API void UpdateElevationMapAabb();
 	D_COLLISION_API void GetLocalAabb(const ndVector& p0, const ndVector& p1, ndVector& boxP0, ndVector& boxP1) const;
@@ -51,7 +51,7 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual ndShapeHeightfield* GetAsShapeHeightfield() { return this; }
 	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
 	virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
@@ -69,50 +69,50 @@ class ndShapeHeightfield: public ndShapeStaticMesh
 	};
 
 	void CalculateLocalObb();
-	dInt32 FastInt(dFloat32 x) const;
-	const dInt32* GetIndexList() const;
+	ndInt32 FastInt(ndFloat32 x) const;
+	const ndInt32* GetIndexList() const;
 	void CalculateMinExtend2d(const ndVector& p0, const ndVector& p1, ndVector& boxP0, ndVector& boxP1) const;
 	void CalculateMinExtend3d(const ndVector& p0, const ndVector& p1, ndVector& boxP0, ndVector& boxP1) const;
-	dFloat32 RayCastCell(const ndFastRay& ray, dInt32 xIndex0, dInt32 zIndex0, ndVector& normalOut, dFloat32 maxT) const;
-	void CalculateMinAndMaxElevation(dInt32 x0, dInt32 x1, dInt32 z0, dInt32 z1, dFloat32& minHeight, dFloat32& maxHeight) const;
+	ndFloat32 RayCastCell(const ndFastRay& ray, ndInt32 xIndex0, ndInt32 zIndex0, ndVector& normalOut, ndFloat32 maxT) const;
+	void CalculateMinAndMaxElevation(ndInt32 x0, ndInt32 x1, ndInt32 z0, ndInt32 z1, ndFloat32& minHeight, ndFloat32& maxHeight) const;
 
 	ndVector m_minBox;
 	ndVector m_maxBox;
-	ndArray<dInt8> m_atributeMap;
-	ndArray<dInt16> m_elevationMap;
-	dFloat32 m_verticalScale;
-	dFloat32 m_horizontalScale_x;
-	dFloat32 m_horizontalScale_z;
-	dFloat32 m_horizontalScaleInv_x;
-	dFloat32 m_horizontalScaleInv_z;
-	dInt32 m_width;
-	dInt32 m_height;
+	ndArray<ndInt8> m_atributeMap;
+	ndArray<ndInt16> m_elevationMap;
+	ndFloat32 m_verticalScale;
+	ndFloat32 m_horizontalScale_x;
+	ndFloat32 m_horizontalScale_z;
+	ndFloat32 m_horizontalScaleInv_x;
+	ndFloat32 m_horizontalScaleInv_z;
+	ndInt32 m_width;
+	ndInt32 m_height;
 	ndGridConstruction m_diagonalMode;
 	mutable ndList<ndLocalThreadData> m_localData;
 
 	static ndVector m_yMask;
 	static ndVector m_padding;
 	static ndVector m_elevationPadding;
-	static dInt32 m_cellIndices[][4];
-	static dInt32 m_verticalEdgeMap[][7];
-	static dInt32 m_horizontalEdgeMap[][7];
+	static ndInt32 m_cellIndices[][4];
+	static ndInt32 m_verticalEdgeMap[][7];
+	static ndInt32 m_horizontalEdgeMap[][7];
 	friend class ndContactSolver;
 };
 
-inline ndArray<dInt16>& ndShapeHeightfield::GetElevationMap()
+inline ndArray<ndInt16>& ndShapeHeightfield::GetElevationMap()
 {
 	return m_elevationMap;
 }
 
-inline const ndArray<dInt16>& ndShapeHeightfield::GetElevationMap() const
+inline const ndArray<ndInt16>& ndShapeHeightfield::GetElevationMap() const
 {
 	return m_elevationMap;
 }
 
-inline dInt32 ndShapeHeightfield::FastInt(dFloat32 x) const
+inline ndInt32 ndShapeHeightfield::FastInt(ndFloat32 x) const
 {
-	dInt32 i = dInt32(x);
-	if (dFloat32(i) > x) 
+	ndInt32 i = ndInt32(x);
+	if (ndFloat32(i) > x) 
 	{
 		i--;
 	}

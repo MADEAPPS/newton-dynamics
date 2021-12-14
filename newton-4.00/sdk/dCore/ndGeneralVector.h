@@ -48,10 +48,10 @@ T dSign(const T a, const T b)
 
 // return dot product
 template<class T>
-T dDotProduct(dInt32 size, const T* const A, const T* const B)
+T dDotProduct(ndInt32 size, const T* const A, const T* const B)
 {
 	T val(0.0f);
-	for (dInt32 i = 0; i < size; i++) 
+	for (ndInt32 i = 0; i < size; i++) 
 	{
 		val = val + A[i] * B[i];
 	}
@@ -59,27 +59,27 @@ T dDotProduct(dInt32 size, const T* const A, const T* const B)
 }
 
 template<class T>
-void dAdd(dInt32 size, T* const X, const T* const A, const T* const B)
+void dAdd(ndInt32 size, T* const X, const T* const A, const T* const B)
 {
-	for (dInt32 i = 0; i < size; i++) 
+	for (ndInt32 i = 0; i < size; i++) 
 	{
 		X[i] = A[i] + B[i];
 	}
 }
 
 template<class T>
-void dSub(dInt32 size, T* const X, const T* const A, const T* const B)
+void dSub(ndInt32 size, T* const X, const T* const A, const T* const B)
 {
-	for (dInt32 i = 0; i < size; i++) 
+	for (ndInt32 i = 0; i < size; i++) 
 	{
 		X[i] = A[i] - B[i];
 	}
 }
 
 template<class T>
-void dMulAdd(dInt32 size, T* const X, const T* const A, const T* const B, T C)
+void dMulAdd(ndInt32 size, T* const X, const T* const A, const T* const B, T C)
 {
-	for (dInt32 i = 0; i < size; i++) 
+	for (ndInt32 i = 0; i < size; i++) 
 	{
 		X[i] = A[i] + B[i] * C;
 	}

@@ -111,7 +111,7 @@ void ndPhysicsWorld::DeletePendingObjects()
 	{
 		Sync();
 		m_hasPendingObjectToDelete.store(false);
-		for (dInt32 i = 0; i < m_deletedBodies.GetCount(); i++)
+		for (ndInt32 i = 0; i < m_deletedBodies.GetCount(); i++)
 		{
 			DeleteBody(m_deletedBodies[i]);
 		}
@@ -119,17 +119,17 @@ void ndPhysicsWorld::DeletePendingObjects()
 	}
 }
 
-void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
+void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 {
-	const dFloat32 descreteStep = (1.0f / MAX_PHYSICS_FPS);
+	const ndFloat32 descreteStep = (1.0f / MAX_PHYSICS_FPS);
 
-	dInt32 maxSteps = MAX_PHYSICS_STEPS;
+	ndInt32 maxSteps = MAX_PHYSICS_STEPS;
 	m_timeAccumulator += timestep;
 
 	// if the time step is more than max timestep par frame, throw away the extra steps.
 	if (m_timeAccumulator > descreteStep * maxSteps)
 	{
-		dFloat32 steps = dFloor(m_timeAccumulator / descreteStep) - maxSteps;
+		ndFloat32 steps = ndFloor(m_timeAccumulator / descreteStep) - maxSteps;
 		dAssert(steps >= 0.0f);
 		m_timeAccumulator -= descreteStep * steps;
 	}
@@ -152,7 +152,7 @@ ndSoundManager* ndPhysicsWorld::GetSoundManager() const
 	return m_soundManager;
 }
 
-void ndPhysicsWorld::OnPostUpdate(dFloat32 timestep)
+void ndPhysicsWorld::OnPostUpdate(ndFloat32 timestep)
 {
 	m_manager->m_cameraManager->FixUpdate(m_manager, timestep);
 	if (m_manager->m_updateCamera)

@@ -38,7 +38,7 @@ class ndCharacterInverseDynamicNode;
 //	public:
 //	dVector m_centerOfMass;
 //	dVector m_centerOfMassVeloc;
-//	dFloat32 m_mass;
+//	ndFloat32 m_mass;
 //};
 
 class ndCharacter: public ndModel
@@ -75,15 +75,15 @@ class ndCharacter: public ndModel
 	//ndCharacterPoseController* GetController() const;
 	//void SetController(ndCharacterPoseController* const controller);
 	//ndCharacterCentreOfMassState CalculateCentreOfMassState() const;
-	//void UpdateGlobalPose(ndWorld* const world, dFloat32 timestep);
-	//void CalculateLocalPose(ndWorld* const world, dFloat32 timestep);
+	//void UpdateGlobalPose(ndWorld* const world, ndFloat32 timestep);
+	//void CalculateLocalPose(ndWorld* const world, ndFloat32 timestep);
 	//D_NEWTON_API ndCharacterSkeleton* CreateSkeleton() const;
 	D_NEWTON_API void SetPose();
 
 	protected:
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
-	D_NEWTON_API virtual void Update(ndWorld* const world, dFloat32 timestep);
-	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
+	D_NEWTON_API virtual void Update(ndWorld* const world, ndFloat32 timestep);
+	D_NEWTON_API virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	
 	ndCharacterRootNode* m_rootNode;

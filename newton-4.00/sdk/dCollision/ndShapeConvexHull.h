@@ -32,25 +32,25 @@ class ndShapeConvexHull : public ndShapeConvex
 	public:
 	D_CLASS_REFLECTION(ndShapeConvexHull);
 	D_COLLISION_API ndShapeConvexHull(const ndLoadSaveBase::dLoadDescriptor& desc);
-	D_COLLISION_API ndShapeConvexHull(dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray);
+	D_COLLISION_API ndShapeConvexHull(ndInt32 count, ndInt32 strideInBytes, ndFloat32 tolerance, const ndFloat32* const vertexArray);
 	D_COLLISION_API virtual ~ndShapeConvexHull();
 
 	protected:
 	ndShapeInfo GetShapeInfo() const;
 	ndBigVector FaceNormal(const ndEdge *face, const ndBigVector* const pool) const;
 	bool RemoveCoplanarEdge(ndPolyhedra& convex, const ndBigVector* const hullVertexArray) const;
-	bool Create(dInt32 count, dInt32 strideInBytes, const dFloat32* const vertexArray, dFloat32 tolerance);
-	virtual ndVector SupportVertex(const ndVector& dir, dInt32* const vertexIndex) const;
+	bool Create(ndInt32 count, ndInt32 strideInBytes, const ndFloat32* const vertexArray, ndFloat32 tolerance);
+	virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	private:
-	ndVector SupportVertexBruteForce(const ndVector& dir, dInt32* const vertexIndex) const;
-	ndVector SupportVertexhierarchical(const ndVector& dir, dInt32* const vertexIndex) const;
+	ndVector SupportVertexBruteForce(const ndVector& dir, ndInt32* const vertexIndex) const;
+	ndVector SupportVertexhierarchical(const ndVector& dir, ndInt32* const vertexIndex) const;
 	
 	void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 
 	//protected:
-	//dInt32 GetFaceIndices (dInt32 index, dInt32* const indices) const;
+	//ndInt32 GetFaceIndices (ndInt32 index, ndInt32* const indices) const;
 	//virtual const ndConvexSimplexEdge** GetVertexToEdgeMapping() const {return m_vertexToEdgeMapping;}
 	ndConvexBox* m_supportTree;
 	ndConvexSimplexEdge** m_faceArray;
@@ -60,9 +60,9 @@ class ndShapeConvexHull : public ndShapeConvex
 	ndVector* m_soa_index;
 
 	const ndConvexSimplexEdge** m_vertexToEdgeMapping;
-	dInt32 m_faceCount;
-	dInt32 m_soaVertexCount;
-	dInt32 m_supportTreeCount;
+	ndInt32 m_faceCount;
+	ndInt32 m_soaVertexCount;
+	ndInt32 m_supportTreeCount;
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif 

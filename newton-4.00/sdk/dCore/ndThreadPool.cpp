@@ -85,7 +85,7 @@ ndThreadPool::ndThreadPool(const char* const baseName)
 	strncpy(m_baseName, baseName, sizeof (m_baseName));
 	sprintf(name, "%s_%d", m_baseName, 0);
 	SetName(name);
-	for (dInt32 i = 0; i < D_MAX_THREADS_COUNT; i++)
+	for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; i++)
 	{
 		m_lockFreeJobs[i].m_joindInqueue = &m_joindInqueue;
 	}
@@ -96,7 +96,7 @@ ndThreadPool::~ndThreadPool()
 	SetCount(0);
 }
 
-void ndThreadPool::SetCount(dInt32 count)
+void ndThreadPool::SetCount(ndInt32 count)
 {
 	count = dClamp(count, 1, D_MAX_THREADS_COUNT) - 1;
 	if (count != m_count)
@@ -111,7 +111,7 @@ void ndThreadPool::SetCount(dInt32 count)
 		{
 			m_count = count;
 			m_workers = new ndWorkerThread[count];
-			for (dInt32 i = 0; i < count; i++)
+			for (ndInt32 i = 0; i < count; i++)
 			{
 				char name[256];
 				m_workers[i].m_owner = this;
@@ -126,7 +126,7 @@ void ndThreadPool::SetCount(dInt32 count)
 void ndThreadPool::ExecuteJobs(ndThreadPoolJob** const jobs)
 {
 #ifdef D_USE_THREAD_EMULATION	
-	for (dInt32 i = 0; i <= m_count; i++)
+	for (ndInt32 i = 0; i <= m_count; i++)
 	{
 		jobs[i]->m_threadIndex = i;
 		m_lockFreeJobs[i].m_job = jobs[i];
@@ -136,7 +136,7 @@ void ndThreadPool::ExecuteJobs(ndThreadPoolJob** const jobs)
 	if (m_count > 0)
 	{
 		m_joindInqueue.fetch_add(m_count);
-		for (dInt32 i = 0; i < m_count; i++)
+		for (ndInt32 i = 0; i < m_count; i++)
 		{
 			jobs[i]->m_threadIndex = i;
 			m_lockFreeJobs[i].m_job.store(jobs[i]);
@@ -168,14 +168,14 @@ void ndThreadPool::Begin()
 		}
 	};
 
-	for (dInt32 i = 0; i < m_count; i++)
+	for (ndInt32 i = 0; i < m_count; i++)
 	{
 		m_workers[i].ExecuteJob(&m_lockFreeJobs[i]);
 	}
 
 	ndDoNothing extJob[D_MAX_THREADS_COUNT];
 	ndThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
-	for (dInt32 i = 0; i < D_MAX_THREADS_COUNT; i++)
+	for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; i++)
 	{
 		extJobPtr[i] = &extJob[i];
 	}
@@ -184,7 +184,7 @@ void ndThreadPool::Begin()
 
 void ndThreadPool::End()
 {
-	for (dInt32 i = 0; i < m_count; i++)
+	for (ndInt32 i = 0; i < m_count; i++)
 	{
 		m_lockFreeJobs[i].m_begin.store(false);
 	}

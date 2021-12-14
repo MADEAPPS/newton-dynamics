@@ -28,21 +28,21 @@
 #include "ndBodyKinematic.h"
 #include "ndShapeCompound.h"
 
-ndVector ndShapeInstance::m_padding(D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, dFloat32(0.0f));
+ndVector ndShapeInstance::m_padding(D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, ndFloat32(0.0f));
 
 ndShapeInstance::ndShapeInstance(ndShape* const shape)
 	:ndClassAlloc()
 	,m_globalMatrix(dGetIdentityMatrix())
 	,m_localMatrix(dGetIdentityMatrix())
 	,m_aligmentMatrix(dGetIdentityMatrix())
-	,m_scale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
-	,m_invScale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
-	,m_maxScale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
+	,m_scale(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f))
+	,m_invScale(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f))
+	,m_maxScale(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f))
 	,m_shape(shape->AddRef())
 	,m_ownerBody(nullptr)
 	,m_subCollisionHandle(nullptr)
 	,m_parent(nullptr)
-	,m_skinThickness(dFloat32(0.0f))
+	,m_skinThickness(ndFloat32(0.0f))
 	,m_scaleType(m_unit)
 	,m_collisionMode(true)
 {
@@ -103,18 +103,18 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndSha
 	,m_globalMatrix(dGetIdentityMatrix())
 	,m_localMatrix(dGetIdentityMatrix())
 	,m_aligmentMatrix(dGetIdentityMatrix())
-	,m_scale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
-	,m_invScale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
-	,m_maxScale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
+	,m_scale(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f))
+	,m_invScale(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f))
+	,m_maxScale(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f))
 	,m_shape(nullptr)
 	,m_ownerBody(nullptr)
 	,m_subCollisionHandle(nullptr)
 	,m_parent(nullptr)
-	,m_skinThickness(dFloat32(0.0f))
+	,m_skinThickness(ndFloat32(0.0f))
 	,m_scaleType(m_unit)
 	,m_collisionMode(true)
 {
-	dInt32 index = xmlGetInt(xmlNode, "shapeHashId");
+	ndInt32 index = xmlGetInt(xmlNode, "shapeHashId");
 	const ndShapeInstance& cacheInstance = shapesCache.Find(index)->GetInfo();
 	//m_shape = shapesCache.Find(index)->GetInfo()->AddRef();
 	m_shape = cacheInstance.GetShape()->AddRef();
@@ -126,7 +126,7 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndSha
 	m_shapeMaterial.m_userId = xmlGetInt64(xmlNode, "materialID");
 	m_shapeMaterial.m_data.m_alignPad = xmlGetInt64(xmlNode, "materialUserData");
 	
-	for (dInt32 i = 0; i < dInt32 (sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); i++)
+	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); i++)
 	{
 		char name[64];
 		sprintf(name, "intData%d", i);
@@ -237,8 +237,8 @@ void ndShapeInstance::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVect
 		}
 	}
 
-	dAssert(p0.m_w == dFloat32(0.0f));
-	dAssert(p1.m_w == dFloat32(0.0f));
+	dAssert(p0.m_w == ndFloat32(0.0f));
+	dAssert(p1.m_w == ndFloat32(0.0f));
 }
 
 void ndShapeInstance::CalculateObb(ndVector& origin, ndVector& size) const
@@ -280,21 +280,21 @@ void ndShapeInstance::CalculateObb(ndVector& origin, ndVector& size) const
 		}
 	}
 
-	dAssert(size.m_w == dFloat32(0.0f));
-	dAssert(origin.m_w == dFloat32(0.0f));
+	dAssert(size.m_w == ndFloat32(0.0f));
+	dAssert(origin.m_w == ndFloat32(0.0f));
 }
 
-dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const
+ndFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const
 {
-	dFloat32 t = dFloat32(1.2f);
+	ndFloat32 t = ndFloat32(1.2f);
 	if (callback.OnRayPrecastAction(body, this))
 	{
 		switch (m_scaleType)
 		{
 			case m_unit:
 			{
-				t = m_shape->RayCast(callback, localP0, localP1, dFloat32(1.0f), body, contactOut);
-				if (t < dFloat32 (1.0f)) 
+				t = m_shape->RayCast(callback, localP0, localP1, ndFloat32(1.0f), body, contactOut);
+				if (t < ndFloat32 (1.0f)) 
 				{
 					contactOut.m_shapeInstance0 = this;
 					contactOut.m_shapeInstance1 = this;
@@ -306,8 +306,8 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& loc
 			{
 				ndVector p0(localP0 * m_invScale);
 				ndVector p1(localP1 * m_invScale);
-				t = m_shape->RayCast(callback, p0, p1, dFloat32(1.0f), body, contactOut);
-				if (t < dFloat32(1.0f))
+				t = m_shape->RayCast(callback, p0, p1, ndFloat32(1.0f), body, contactOut);
+				if (t < ndFloat32(1.0f))
 				{
 					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 					contactOut.m_shapeInstance0 = this;
@@ -320,8 +320,8 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& loc
 			{
 				ndVector p0(localP0 * m_invScale);
 				ndVector p1(localP1 * m_invScale);
-				t = m_shape->RayCast(callback, p0, p1, dFloat32(1.0f), body, contactOut);
-				if (t < dFloat32(1.0f))
+				t = m_shape->RayCast(callback, p0, p1, ndFloat32(1.0f), body, contactOut);
+				if (t < ndFloat32(1.0f))
 				{
 					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 					ndVector normal(m_invScale * contactOut.m_normal);
@@ -337,8 +337,8 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& loc
 			{
 				ndVector p0(m_aligmentMatrix.UntransformVector(localP0 * m_invScale));
 				ndVector p1(m_aligmentMatrix.UntransformVector(localP1 * m_invScale));
-				t = m_shape->RayCast(callback, p0, p1, dFloat32(1.0f), body, contactOut);
-				if (t < dFloat32(1.0f))
+				t = m_shape->RayCast(callback, p0, p1, ndFloat32(1.0f), body, contactOut);
+				if (t < ndFloat32(1.0f))
 				{
 					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 					ndVector normal(m_aligmentMatrix.RotateVector(m_invScale * contactOut.m_normal));
@@ -353,10 +353,10 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const ndVector& loc
 	return t;
 }
 
-dInt32 ndShapeInstance::CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const
+ndInt32 ndShapeInstance::CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const
 {
-	dInt32 count = 0;
-	dAssert(normal.m_w == dFloat32(0.0f));
+	ndInt32 count = 0;
+	dAssert(normal.m_w == ndFloat32(0.0f));
 	switch (m_scaleType)
 	{
 		case m_unit:
@@ -368,7 +368,7 @@ dInt32 ndShapeInstance::CalculatePlaneIntersection(const ndVector& normal, const
 		{
 			ndVector point1(m_invScale * point);
 			count = m_shape->CalculatePlaneIntersection(normal, point1, contactsOut);
-			for (dInt32 i = 0; i < count; i++) {
+			for (ndInt32 i = 0; i < count; i++) {
 				contactsOut[i] = m_scale * contactsOut[i];
 			}
 			break;
@@ -381,7 +381,7 @@ dInt32 ndShapeInstance::CalculatePlaneIntersection(const ndVector& normal, const
 			ndVector normal1(m_scale * normal);
 			normal1 = normal1.Normalize();
 			count = m_shape->CalculatePlaneIntersection(normal1, point1, contactsOut);
-			for (dInt32 i = 0; i < count; i++) {
+			for (ndInt32 i = 0; i < count; i++) {
 				contactsOut[i] = m_scale * contactsOut[i];
 			}
 			break;
@@ -394,7 +394,7 @@ dInt32 ndShapeInstance::CalculatePlaneIntersection(const ndVector& normal, const
 			ndVector normal1(m_aligmentMatrix.UntransformVector(m_scale * normal));
 			normal1 = normal1.Normalize();
 			count = m_shape->CalculatePlaneIntersection(normal1, point1, contactsOut);
-			for (dInt32 i = 0; i < count; i++) {
+			for (ndInt32 i = 0; i < count; i++) {
 				contactsOut[i] = m_scale * m_aligmentMatrix.TransformVector(contactsOut[i]);
 			}
 		}
@@ -404,12 +404,12 @@ dInt32 ndShapeInstance::CalculatePlaneIntersection(const ndVector& normal, const
 
 void ndShapeInstance::SetScale(const ndVector& scale)
 {
-	dFloat32 scaleX = dAbs(scale.m_x);
-	dFloat32 scaleY = dAbs(scale.m_y);
-	dFloat32 scaleZ = dAbs(scale.m_z);
-	dAssert(scaleX > dFloat32(0.0f));
-	dAssert(scaleY > dFloat32(0.0f));
-	dAssert(scaleZ > dFloat32(0.0f));
+	ndFloat32 scaleX = dAbs(scale.m_x);
+	ndFloat32 scaleY = dAbs(scale.m_y);
+	ndFloat32 scaleZ = dAbs(scale.m_z);
+	dAssert(scaleX > ndFloat32(0.0f));
+	dAssert(scaleY > ndFloat32(0.0f));
+	dAssert(scaleZ > ndFloat32(0.0f));
 
 	//if (IsType(dgCollision::dgCollisionCompound_RTTI)) 
 	if (((ndShape*)m_shape)->GetAsShapeCompound())
@@ -418,29 +418,29 @@ void ndShapeInstance::SetScale(const ndVector& scale)
 		ndShapeCompound* const compound = ((ndShape*)m_shape)->GetAsShapeCompound();
 		compound->ApplyScale(scale);
 	}
-	else if ((dAbs(scaleX - scaleY) < dFloat32(1.0e-4f)) && (dAbs(scaleX - scaleZ) < dFloat32(1.0e-4f))) 
+	else if ((dAbs(scaleX - scaleY) < ndFloat32(1.0e-4f)) && (dAbs(scaleX - scaleZ) < ndFloat32(1.0e-4f))) 
 	{
-		if ((dAbs(scaleX - dFloat32(1.0f)) < dFloat32(1.0e-4f))) 
+		if ((dAbs(scaleX - ndFloat32(1.0f)) < ndFloat32(1.0e-4f))) 
 		{
 			m_scaleType = m_unit;
-			m_scale = ndVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f));
+			m_scale = ndVector(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f));
 			m_maxScale = m_scale;
 			m_invScale = m_scale;
 		}
 		else 
 		{
 			m_scaleType = m_uniform;
-			m_scale = ndVector(scaleX, scaleX, scaleX, dFloat32(0.0f));
+			m_scale = ndVector(scaleX, scaleX, scaleX, ndFloat32(0.0f));
 			m_maxScale = m_scale;
-			m_invScale = ndVector(dFloat32(1.0f) / scaleX, dFloat32(1.0f) / scaleX, dFloat32(1.0f) / scaleX, dFloat32(0.0f));
+			m_invScale = ndVector(ndFloat32(1.0f) / scaleX, ndFloat32(1.0f) / scaleX, ndFloat32(1.0f) / scaleX, ndFloat32(0.0f));
 		}
 	}
 	else 
 	{
 		m_scaleType = m_nonUniform;
 		m_maxScale = dMax(dMax(scaleX, scaleY), scaleZ);
-		m_scale = ndVector(scaleX, scaleY, scaleZ, dFloat32(0.0f));
-		m_invScale = ndVector(dFloat32(1.0f) / scaleX, dFloat32(1.0f) / scaleY, dFloat32(1.0f) / scaleZ, dFloat32(0.0f));
+		m_scale = ndVector(scaleX, scaleY, scaleZ, ndFloat32(0.0f));
+		m_invScale = ndVector(ndFloat32(1.0f) / scaleX, ndFloat32(1.0f) / scaleY, ndFloat32(1.0f) / scaleZ, ndFloat32(0.0f));
 	}
 }
 
@@ -454,13 +454,13 @@ void ndShapeInstance::SetGlobalScale(const ndVector& scale)
 
 	// extract the original local matrix
 	ndMatrix transpose(matrix.Transpose());
-	ndVector globalScale(dSqrt(transpose[0].DotProduct(transpose[0]).GetScalar()), dSqrt(transpose[1].DotProduct(transpose[1]).GetScalar()), dSqrt(transpose[2].DotProduct(transpose[2]).GetScalar()), dFloat32(1.0f));
-	ndVector invGlobalScale(dFloat32(1.0f) / globalScale.m_x, dFloat32(1.0f) / globalScale.m_y, dFloat32(1.0f) / globalScale.m_z, dFloat32(1.0f));
+	ndVector globalScale(ndSqrt(transpose[0].DotProduct(transpose[0]).GetScalar()), ndSqrt(transpose[1].DotProduct(transpose[1]).GetScalar()), ndSqrt(transpose[2].DotProduct(transpose[2]).GetScalar()), ndFloat32(1.0f));
+	ndVector invGlobalScale(ndFloat32(1.0f) / globalScale.m_x, ndFloat32(1.0f) / globalScale.m_y, ndFloat32(1.0f) / globalScale.m_z, ndFloat32(1.0f));
 	ndMatrix localMatrix(m_aligmentMatrix.Transpose() * m_localMatrix);
 	localMatrix.m_posit = matrix.m_posit * invGlobalScale;
-	dAssert(localMatrix.m_posit.m_w == dFloat32(1.0f));
+	dAssert(localMatrix.m_posit.m_w == ndFloat32(1.0f));
 
-	if ((dAbs(scale[0] - scale[1]) < dFloat32(1.0e-4f)) && (dAbs(scale[0] - scale[2]) < dFloat32(1.0e-4f))) 
+	if ((dAbs(scale[0] - scale[1]) < ndFloat32(1.0e-4f)) && (dAbs(scale[0] - scale[2]) < ndFloat32(1.0e-4f))) 
 	{
 		m_localMatrix = localMatrix;
 		m_localMatrix.m_posit = m_localMatrix.m_posit * scale | ndVector::m_wOne;
@@ -474,7 +474,7 @@ void ndShapeInstance::SetGlobalScale(const ndVector& scale)
 		localMatrix[1] = localMatrix[1] * scale;
 		localMatrix[2] = localMatrix[2] * scale;
 		localMatrix[3] = localMatrix[3] * scale;
-		localMatrix[3][3] = dFloat32(1.0f);
+		localMatrix[3][3] = ndFloat32(1.0f);
 
 		// decompose into to align * scale * local
 		localMatrix.PolarDecomposition(m_localMatrix, m_scale, m_aligmentMatrix);
@@ -492,23 +492,23 @@ void ndShapeInstance::SetGlobalScale(const ndVector& scale)
 		//ndMatrix xxx (m_aligmentMatrix * xxx1 * m_localMatrix);
 
 		bool isIdentity = true;
-		for (dInt32 i = 0; i < 3; i++) 
+		for (ndInt32 i = 0; i < 3; i++) 
 		{
-			isIdentity &= dAbs(m_aligmentMatrix[i][i] - dFloat32(1.0f)) < dFloat32(1.0e-5f);
-			isIdentity &= dAbs(m_aligmentMatrix[3][i]) < dFloat32(1.0e-5f);
+			isIdentity &= dAbs(m_aligmentMatrix[i][i] - ndFloat32(1.0f)) < ndFloat32(1.0e-5f);
+			isIdentity &= dAbs(m_aligmentMatrix[3][i]) < ndFloat32(1.0e-5f);
 		}
 		m_scaleType = isIdentity ? m_nonUniform : m_global;
 
 		m_maxScale = dMax(dMax(m_scale[0], m_scale[1]), m_scale[2]);
-		m_invScale = ndVector(dFloat32(1.0f) / m_scale[0], dFloat32(1.0f) / m_scale[1], dFloat32(1.0f) / m_scale[2], dFloat32(0.0f));
+		m_invScale = ndVector(ndFloat32(1.0f) / m_scale[0], ndFloat32(1.0f) / m_scale[1], ndFloat32(1.0f) / m_scale[2], ndFloat32(0.0f));
 	}
 }
 
-dFloat32 ndShapeInstance::CalculateBuoyancyCenterOfPresure(ndVector& com, const ndMatrix& matrix, const ndVector& fluidPlane) const
+ndFloat32 ndShapeInstance::CalculateBuoyancyCenterOfPresure(ndVector& com, const ndMatrix& matrix, const ndVector& fluidPlane) const
 {
 	com = m_shape->CalculateVolumeIntegral(m_localMatrix * matrix, fluidPlane, *this);
-	dFloat32 volume = com.m_w;
-	com.m_w = dFloat32(0.0f);
+	ndFloat32 volume = com.m_w;
+	com.m_w = ndFloat32(0.0f);
 	return volume;
 }
 
@@ -525,12 +525,12 @@ void ndShapeInstance::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	xmlSaveParam(paramNode, "skinThickness", m_skinThickness);
 	xmlSaveParam(paramNode, "collisionMode", m_collisionMode ? 1 : 0);
 	xmlSaveParam(paramNode, "materialID", m_shapeMaterial.m_userId);
-	xmlSaveParam(paramNode, "materialUserData", dInt64(m_shapeMaterial.m_data.m_alignPad));
-	for (dInt32 i = 0; i < dInt32 (sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); i++)
+	xmlSaveParam(paramNode, "materialUserData", ndInt64(m_shapeMaterial.m_data.m_alignPad));
+	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); i++)
 	{
 		char name[64];
 		sprintf(name, "intData%d", i);
-		xmlSaveParam(paramNode, name, dInt64(m_shapeMaterial.m_userParam[i].m_intData));
+		xmlSaveParam(paramNode, name, ndInt64(m_shapeMaterial.m_userParam[i].m_intData));
 	}
 }
 
@@ -570,12 +570,12 @@ bool ndShapeInstance::ndDistanceCalculator::ClosestPoint()
 	m_normal = solver.m_separatingVector;
 	m_point0 = solver.m_closestPoint0 + m_matrix0.m_posit;
 	m_point1 = solver.m_closestPoint1 + m_matrix0.m_posit;
-	m_point0.m_w = dFloat32(1.0f);
-	m_point1.m_w = dFloat32(1.0f);
+	m_point0.m_w = ndFloat32(1.0f);
+	m_point1.m_w = ndFloat32(1.0f);
 	return ret;
 }
 
-//dInt32 ndShapeInstance::ClosestPoint(const ndMatrix& matrix, const ndVector& point, ndVector& contactPoint) const
+//ndInt32 ndShapeInstance::ClosestPoint(const ndMatrix& matrix, const ndVector& point, ndVector& contactPoint) const
 //{
 //	return ndContactSolver::CalculatePointOnsurface(this, matrix, point, contactPoint);
 //}

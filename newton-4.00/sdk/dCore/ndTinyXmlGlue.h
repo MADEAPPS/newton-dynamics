@@ -29,17 +29,17 @@
 #include "ndMatrix.h"
 
 D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const type, const char* const value);
-D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 value);
-D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt64 value);
-D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dFloat32 value);
+D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 value);
+D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt64 value);
+D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndFloat32 value);
 D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndVector& value);
 D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const ndMatrix& value);
 D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value);
-D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 count, const ndVector* const array);
+D_CORE_API void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 count, const ndVector* const array);
 
-D_CORE_API dInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name);
-D_CORE_API dInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name);
-D_CORE_API dFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name);
+D_CORE_API ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name);
+D_CORE_API ndInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name);
+D_CORE_API ndFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name);
 D_CORE_API ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name);
 D_CORE_API ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name);
 D_CORE_API const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name);

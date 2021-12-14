@@ -53,14 +53,14 @@ class ndTemplateVector: public ndClassAlloc
 	{
 	}
 	
-	T& operator[] (dInt32 i)
+	T& operator[] (ndInt32 i)
 	{
 		dAssert (i < 4);
 		dAssert (i >= 0);
 		return (&m_x)[i];
 	}	
 
-	const T& operator[] (dInt32 i) const
+	const T& operator[] (ndInt32 i) const
 	{
 		dAssert (i < 4);
 		dAssert (i >= 0);
@@ -137,7 +137,7 @@ class ndTemplateVector: public ndClassAlloc
 		T array[4][4];
 
 		const ndTemplateVector<T>& me = *this;
-		for (dInt32 i = 0; i < 4; i++) {
+		for (ndInt32 i = 0; i < 4; i++) {
 			array[0][i] = me[i];
 			array[1][i] = A[i];
 			array[2][i] = B[i];
@@ -146,12 +146,12 @@ class ndTemplateVector: public ndClassAlloc
 
 		ndTemplateVector<T> normal;
 		T sign = T(-1.0f);
-		for (dInt32 i = 0; i < 4; i++) 
+		for (ndInt32 i = 0; i < 4; i++) 
 		{
-			for (dInt32 j = 0; j < 3; j++) 
+			for (ndInt32 j = 0; j < 3; j++) 
 			{
-				dInt32 k0 = 0;
-				for (dInt32 k = 0; k < 4; k++) 
+				ndInt32 k0 = 0;
+				for (ndInt32 k = 0; k < 4; k++) 
 				{
 					if (k != i) 
 					{

@@ -20,31 +20,31 @@ ndVehicleDectriptor::ndEngineTorqueCurve::ndEngineTorqueCurve()
 {
 	// take from the data sheet of a 2005 dodge viper, 
 	// some values are missing so I have to improvise them
-	dFloat32 fuelInjectionRate = 10.0f;
-	dFloat32 idleTorquePoundFoot = 100.0f;
-	dFloat32 idleRmp = 800.0f;
-	dFloat32 horsePower = 400.0f;
-	dFloat32 rpm0 = 5000.0f;
-	dFloat32 rpm1 = 6200.0f;
-	dFloat32 horsePowerAtRedLine = 100.0f;
-	dFloat32 redLineRpm = 8000.0f;
+	ndFloat32 fuelInjectionRate = 10.0f;
+	ndFloat32 idleTorquePoundFoot = 100.0f;
+	ndFloat32 idleRmp = 800.0f;
+	ndFloat32 horsePower = 400.0f;
+	ndFloat32 rpm0 = 5000.0f;
+	ndFloat32 rpm1 = 6200.0f;
+	ndFloat32 horsePowerAtRedLine = 100.0f;
+	ndFloat32 redLineRpm = 8000.0f;
 	Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp,
 		horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 }
 
 void ndVehicleDectriptor::ndEngineTorqueCurve::Init(
-	dFloat32 fuelInjectionRate,
-	dFloat32 idleTorquePoundFoot, dFloat32 idleRmp,
-	dFloat32 horsePower, dFloat32 rpm0, dFloat32 rpm1,
-	dFloat32 horsePowerAtRedLine, dFloat32 redLineRpm)
+	ndFloat32 fuelInjectionRate,
+	ndFloat32 idleTorquePoundFoot, ndFloat32 idleRmp,
+	ndFloat32 horsePower, ndFloat32 rpm0, ndFloat32 rpm1,
+	ndFloat32 horsePowerAtRedLine, ndFloat32 redLineRpm)
 {
 	m_fuelInjectionRate = fuelInjectionRate;
 	m_torqueCurve[0] = ndTorqueTap(0.0f, idleTorquePoundFoot);
 	m_torqueCurve[1] = ndTorqueTap(idleRmp, idleTorquePoundFoot);
 	
-	dFloat32 power = horsePower * 746.0f;
-	dFloat32 omegaInRadPerSec = rpm0 * 0.105f;
-	dFloat32 torqueInPoundFood = (power / omegaInRadPerSec) / 1.36f;
+	ndFloat32 power = horsePower * 746.0f;
+	ndFloat32 omegaInRadPerSec = rpm0 * 0.105f;
+	ndFloat32 torqueInPoundFood = (power / omegaInRadPerSec) / 1.36f;
 	m_torqueCurve[2] = ndTorqueTap(rpm0, torqueInPoundFood);
 	
 	power = horsePower * 746.0f;
@@ -58,48 +58,48 @@ void ndVehicleDectriptor::ndEngineTorqueCurve::Init(
 	m_torqueCurve[4] = ndTorqueTap(redLineRpm, torqueInPoundFood);
 }
 
-dFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetFuelRate() const
+ndFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetFuelRate() const
 {
 	return m_fuelInjectionRate;
 }
 
-dFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetIdleRadPerSec() const
+ndFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetIdleRadPerSec() const
 {
 	return m_torqueCurve[1].m_radPerSeconds;
 }
 
-dFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetLowGearShiftRadPerSec() const
+ndFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetLowGearShiftRadPerSec() const
 {
 	return m_torqueCurve[2].m_radPerSeconds;
 }
 
-dFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetHighGearShiftRadPerSec() const
+ndFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetHighGearShiftRadPerSec() const
 {
 	return m_torqueCurve[3].m_radPerSeconds;
 }
 
-dFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetRedLineRadPerSec() const
+ndFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetRedLineRadPerSec() const
 {
 	const int maxIndex = sizeof(m_torqueCurve) / sizeof(m_torqueCurve[0]);
 	return m_torqueCurve[maxIndex - 1].m_radPerSeconds;
 }
 
-dFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetTorque(dFloat32 omegaInRadPerSeconds) const
+ndFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetTorque(ndFloat32 omegaInRadPerSeconds) const
 {
 	const int maxIndex = sizeof(m_torqueCurve) / sizeof(m_torqueCurve[0]);
-	omegaInRadPerSeconds = dClamp(omegaInRadPerSeconds, dFloat32(0.0f), m_torqueCurve[maxIndex - 1].m_radPerSeconds);
+	omegaInRadPerSeconds = dClamp(omegaInRadPerSeconds, ndFloat32(0.0f), m_torqueCurve[maxIndex - 1].m_radPerSeconds);
 
-	for (dInt32 i = 1; i < maxIndex; i++)
+	for (ndInt32 i = 1; i < maxIndex; i++)
 	{
 		if (omegaInRadPerSeconds <= m_torqueCurve[i].m_radPerSeconds)
 		{
-			dFloat32 omega0 = m_torqueCurve[i - 0].m_radPerSeconds;
-			dFloat32 omega1 = m_torqueCurve[i - 1].m_radPerSeconds;
+			ndFloat32 omega0 = m_torqueCurve[i - 0].m_radPerSeconds;
+			ndFloat32 omega1 = m_torqueCurve[i - 1].m_radPerSeconds;
 
-			dFloat32 torque0 = m_torqueCurve[i - 0].m_torqueInNewtonMeters;
-			dFloat32 torque1 = m_torqueCurve[i - 1].m_torqueInNewtonMeters;
+			ndFloat32 torque0 = m_torqueCurve[i - 0].m_torqueInNewtonMeters;
+			ndFloat32 torque1 = m_torqueCurve[i - 1].m_torqueInNewtonMeters;
 
-			dFloat32 torque = torque0 + (omegaInRadPerSeconds - omega0) * (torque1 - torque0) / (omega1 - omega0);
+			ndFloat32 torque = torque0 + (omegaInRadPerSeconds - omega0) * (torque1 - torque0) / (omega1 - omega0);
 			return torque;
 		}
 	}
@@ -112,14 +112,14 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 {
 	strncpy(m_name, fileName, sizeof(m_name));
 
-	dFloat32 fuelInjectionRate = 10.0f;
-	dFloat32 idleTorquePoundFoot = 100.0f;
-	dFloat32 idleRmp = 900.0f;
-	dFloat32 horsePower = 400.0f;
-	dFloat32 rpm0 = 5000.0f;
-	dFloat32 rpm1 = 6200.0f;
-	dFloat32 horsePowerAtRedLine = 100.0f;
-	dFloat32 redLineRpm = 8000.0f;
+	ndFloat32 fuelInjectionRate = 10.0f;
+	ndFloat32 idleTorquePoundFoot = 100.0f;
+	ndFloat32 idleRmp = 900.0f;
+	ndFloat32 horsePower = 400.0f;
+	ndFloat32 rpm0 = 5000.0f;
+	ndFloat32 rpm1 = 6200.0f;
+	ndFloat32 horsePowerAtRedLine = 100.0f;
+	ndFloat32 redLineRpm = 8000.0f;
 	m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 	m_chassisMass = 1000.0f;
@@ -152,7 +152,7 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	m_frontTire.m_verticalOffset = 0.0f;
 	m_frontTire.m_brakeTorque = 1500.0f;
 	m_frontTire.m_handBrakeTorque = 1500.0f;
-	m_frontTire.m_steeringAngle = 35.0f * dDegreeToRad;
+	m_frontTire.m_steeringAngle = 35.0f * ndDegreeToRad;
 	m_frontTire.m_laterialStiffness  = 100.0f / 1000.0f;
 	m_frontTire.m_longitudinalStiffness  = 600.0f / 1000.0f;
 
@@ -207,7 +207,7 @@ void ndVehicleSelector::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	ndModel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
 
-void ndVehicleSelector::PostUpdate(ndWorld* const world, dFloat32)
+void ndVehicleSelector::PostUpdate(ndWorld* const world, ndFloat32)
 {
 	ndFixSizeArray<char, 32> buttons;
 	ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
@@ -216,7 +216,7 @@ void ndVehicleSelector::PostUpdate(ndWorld* const world, dFloat32)
 	{
 		const ndModelList& modelList = world->GetModelList();
 
-		dInt32 vehiclesCount = 0;
+		ndInt32 vehiclesCount = 0;
 		ndBasicVehicle* vehicleArray[1024];
 		for (ndModelList::ndNode* node = modelList.GetFirst(); node; node = node->GetNext())
 		{
@@ -231,7 +231,7 @@ void ndVehicleSelector::PostUpdate(ndWorld* const world, dFloat32)
 
 		if (vehiclesCount > 1)
 		{
-			for (dInt32 i = 0; i < vehiclesCount; i++)
+			for (ndInt32 i = 0; i < vehiclesCount; i++)
 			{
 				if (vehicleArray[i]->IsPlayer())
 				{
@@ -278,12 +278,12 @@ bool ndBasicVehicle::IsPlayer() const
 	return m_isPlayer;
 }
 
-dFloat32 ndBasicVehicle::GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const
+ndFloat32 ndBasicVehicle::GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const
 {
 	return m_configuration.m_frictionCoefficientScale;
 }
 
-void ndBasicVehicle::CalculateTireDimensions(const char* const tireName, dFloat32& width, dFloat32& radius, ndDemoEntity* const vehEntity) const
+void ndBasicVehicle::CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const
 {
 	// find the the tire visual mesh 
 	ndDemoEntity* const tirePart = vehEntity->Find(tireName);
@@ -299,7 +299,7 @@ void ndBasicVehicle::CalculateTireDimensions(const char* const tireName, dFloat3
 
 	ndVector minVal(1.0e10f);
 	ndVector maxVal(-1.0e10f);
-	for (dInt32 i = 0; i < temp.GetCount(); i++)
+	for (ndInt32 i = 0; i < temp.GetCount(); i++)
 	{
 		ndVector p(matrix.TransformVector(temp[i]));
 		minVal = minVal.GetMin(p);
@@ -313,8 +313,8 @@ void ndBasicVehicle::CalculateTireDimensions(const char* const tireName, dFloat3
 
 ndBodyDynamic* ndBasicVehicle::CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, const ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const
 {
-	dFloat32 width;
-	dFloat32 radius;
+	ndFloat32 width;
+	ndFloat32 radius;
 	ndDemoEntity* const parentEntity = (ndDemoEntity*)parentBody->GetNotifyCallback()->GetUserData();
 	CalculateTireDimensions(tireName, width, radius, parentEntity);
 
@@ -335,40 +335,40 @@ ndBodyDynamic* ndBasicVehicle::CreateTireBody(ndDemoEntityManager* const scene, 
 	return tireBody;
 }
 
-void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
+void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 {
 	if (m_isPlayer && m_motor)
 	{
-		ndFixSizeArray<dFloat32, 8> axis;
+		ndFixSizeArray<ndFloat32, 8> axis;
 		ndFixSizeArray<char, 32> buttons;
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 
 		scene->GetJoystickAxis(axis);
 		scene->GetJoystickButtons(buttons);
 		
-		dFloat32 brake = scene->GetKeyState('S') ? dFloat32 (1.0f) : dFloat32 (0.0f);
+		ndFloat32 brake = scene->GetKeyState('S') ? ndFloat32 (1.0f) : ndFloat32 (0.0f);
 		if (brake == 0.0f)
 		{
-			dFloat32 val = (axis[4] + 1.0f) * 0.5f;
+			ndFloat32 val = (axis[4] + 1.0f) * 0.5f;
 			brake = val * val * val;
 			//dTrace(("brake %f\n", brake));
 		}
 
-		dFloat32 throttle = dFloat32(scene->GetKeyState('W')) ? 1.0f : 0.0f;
+		ndFloat32 throttle = ndFloat32(scene->GetKeyState('W')) ? 1.0f : 0.0f;
 		if (throttle == 0.0f)
 		{
 			throttle = (axis[5] + 1.0f) * 0.5f;
 			throttle = throttle * throttle * throttle;
 		}
 
-		dFloat32 steerAngle = dFloat32(scene->GetKeyState('A')) - dFloat32(scene->GetKeyState('D'));
+		ndFloat32 steerAngle = ndFloat32(scene->GetKeyState('A')) - ndFloat32(scene->GetKeyState('D'));
 		if (dAbs(steerAngle) == 0.0f)
 		{
 			steerAngle = - axis[0] * axis[0] * axis[0];
 		}
 		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
 
-		dFloat32 handBrake = (scene->GetKeyState(' ') || buttons[4]) ? 1.0f : 0.0f;
+		ndFloat32 handBrake = (scene->GetKeyState(' ') || buttons[4]) ? 1.0f : 0.0f;
 
 		if (m_parking.Update(scene->GetKeyState('P') || buttons[6]))
 		{
@@ -401,7 +401,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 					m_currentGear = m_configuration.m_transmission.m_gearsCount - 1;
 				}
 			}
-			dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
 			m_gearBox->SetRatio(gearGain);
 			m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 		}
@@ -422,12 +422,12 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 					m_currentGear = 0;
 				}
 			}
-			dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
 			m_gearBox->SetRatio(gearGain);
 			m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 		}
 
-		const dFloat32 omega = m_motor->GetRpm() / dRadPerSecToRpm;
+		const ndFloat32 omega = m_motor->GetRpm() / dRadPerSecToRpm;
 		if (!m_isManualTransmission && (m_autoGearShiftTimer < 0))
 		{
 			if (m_currentGear < m_configuration.m_transmission.m_gearsCount)
@@ -437,7 +437,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 					if (m_currentGear > 0)
 					{
 						m_currentGear--;
-						dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+						ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
 						m_gearBox->SetRatio(gearGain);
 						m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 					}
@@ -447,7 +447,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 					if (m_currentGear < (m_configuration.m_transmission.m_gearsCount - 1))
 					{
 						m_currentGear++;
-						dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+						ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
 						m_gearBox->SetRatio(gearGain);
 						m_autoGearShiftTimer = AUTOMATION_TRANSMISSION_FRAME_DELAY;
 					}
@@ -469,7 +469,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, dFloat32)
 			m_isParked = false;
 			m_currentGear = sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]);
 
-			dFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
+			ndFloat32 gearGain = m_configuration.m_transmission.m_crownGearRatio * m_configuration.m_transmission.m_forwardRatios[m_currentGear];
 			m_gearBox->SetRatio(gearGain);
 		}
 

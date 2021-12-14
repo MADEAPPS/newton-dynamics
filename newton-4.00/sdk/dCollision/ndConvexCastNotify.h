@@ -38,7 +38,7 @@ class ndConvexCastNotify : public ndClassAlloc
 		,m_closestPoint0(ndVector::m_zero)
 		,m_closestPoint1(ndVector::m_zero)
 		,m_contacts()
-		,m_param(dFloat32 (1.2f))
+		,m_param(ndFloat32 (1.2f))
 	{
 	}
 
@@ -46,14 +46,14 @@ class ndConvexCastNotify : public ndClassAlloc
 	{
 	}
 	
-	virtual dUnsigned32 OnRayPrecastAction(const ndBody* const, const ndShapeInstance* const)
+	virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const, const ndShapeInstance* const)
 	{
 		dAssert(0);
 		return 1;
 	}
 
-	//virtual dFloat32 OnRayCastAction(const ndContactPoint& contact, dFloat32 intersetParam)
-	virtual dFloat32 OnRayCastAction(const ndContactPoint&, dFloat32)
+	//virtual ndFloat32 OnRayCastAction(const ndContactPoint& contact, ndFloat32 intersetParam)
+	virtual ndFloat32 OnRayCastAction(const ndContactPoint&, ndFloat32)
 	{
 		dAssert(0);
 		return 0;
@@ -65,7 +65,7 @@ class ndConvexCastNotify : public ndClassAlloc
 	ndVector m_closestPoint0;
 	ndVector m_closestPoint1;
 	ndFixSizeArray<ndContactPoint, 8> m_contacts;
-	dFloat32 m_param;
+	ndFloat32 m_param;
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif

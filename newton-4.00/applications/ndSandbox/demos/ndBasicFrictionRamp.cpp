@@ -21,7 +21,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMatrix& matrix, ndDemoMesh* const geometry, const ndShapeInstance& shape, dFloat32 mass)
+static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene, const ndMatrix& matrix, ndDemoMesh* const geometry, const ndShapeInstance& shape, ndFloat32 mass)
 {
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
@@ -51,7 +51,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	const char* const textureName = "wood_3.tga";
 	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, textureName, textureName, textureName, 1.0f, uvMatrix);
 
-	ndMatrix matrix(dPitchMatrix(30.0f * dDegreeToRad));
+	ndMatrix matrix(dPitchMatrix(30.0f * ndDegreeToRad));
 	matrix.m_posit.m_y = 5.0f;
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
@@ -81,14 +81,14 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 	ndDemoMesh* const boxGeometry = new ndDemoMesh("box", scene->GetShaderCache(), &shape, boxTexName, boxTexName, boxTexName, 1.0f, texMatrix);
 
 	ndContactCallback* const callback = (ndContactCallback*)world->GetContactNotify();
-	for (dInt32 i = 0; i < 10; i++)
+	for (ndInt32 i = 0; i < 10; i++)
 	{
 		ndBodyDynamic* const boxBody = AddRigidBody(scene, matrix, boxGeometry, shape, 5.0f);
 		matrix.m_posit.m_x += 2.5f;
 
 		// assign material id to the collision shape.
 		ndShapeInstance& instanceShape = boxBody->GetCollisionShape();
-		dInt32 newId = i + 1;
+		ndInt32 newId = i + 1;
 		instanceShape.m_shapeMaterial.m_userId = newId;
 		//sound play sound only when the relative speed is larger that 10.0f
 		instanceShape.m_shapeMaterial.m_userParam[0].m_floatData = 10.0f;
@@ -96,7 +96,7 @@ static void BuildFrictionRamp(ndDemoEntityManager* const scene)
 		// register a contact joint physics material pair and 
 		// set the physics parameters and application custom options 
 		ndMaterial& material = callback->RegisterMaterial(0, newId);
-		dFloat32 frictionValue = dFloat32(i) / 15.0f;
+		ndFloat32 frictionValue = ndFloat32(i) / 15.0f;
 		material.m_staticFriction0 = frictionValue;
 		material.m_staticFriction1 = frictionValue;
 		material.m_dynamicFriction0 = frictionValue;
@@ -118,7 +118,7 @@ void ndBasicFrictionRamp (ndDemoEntityManager* const scene)
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 
-	ndMatrix camMatrix(dRollMatrix(10.0f * dDegreeToRad) *  dYawMatrix(20.0f * dDegreeToRad));
+	ndMatrix camMatrix(dRollMatrix(10.0f * ndDegreeToRad) *  dYawMatrix(20.0f * ndDegreeToRad));
 	ndQuaternion rot(camMatrix);
 	ndVector origin(-40.0f, 10.0f, 15.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);

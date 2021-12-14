@@ -29,46 +29,46 @@
 class ndPolygonSoupDatabase: public ndClassAlloc
 {
 	public:
-	dFloat32 GetRadius() const;
-	dInt32 GetVertexCount() const;
-	dInt32 GetStrideInBytes() const;
-	dFloat32* GetLocalVertexPool() const;
+	ndFloat32 GetRadius() const;
+	ndInt32 GetVertexCount() const;
+	ndInt32 GetStrideInBytes() const;
+	ndFloat32* GetLocalVertexPool() const;
 
-	dUnsigned32 GetTagId(const dInt32* const face, dInt32 indexCount) const;
-	void SetTagId(const dInt32* const face, dInt32 indexCount, dUnsigned32 newID) const;
+	ndUnsigned32 GetTagId(const ndInt32* const face, ndInt32 indexCount) const;
+	void SetTagId(const ndInt32* const face, ndInt32 indexCount, ndUnsigned32 newID) const;
 		
 	protected:
 	ndPolygonSoupDatabase(const char* const name = nullptr);
 	virtual ~ndPolygonSoupDatabase ();
 
-	dInt32 m_vertexCount;
-	dInt32 m_strideInBytes;
-	dFloat32* m_localVertex;
+	ndInt32 m_vertexCount;
+	ndInt32 m_strideInBytes;
+	ndFloat32* m_localVertex;
 };
 
-inline dInt32 ndPolygonSoupDatabase::GetVertexCount()	const
+inline ndInt32 ndPolygonSoupDatabase::GetVertexCount()	const
 {
 	return m_vertexCount;
 }
 
-inline dFloat32* ndPolygonSoupDatabase::GetLocalVertexPool() const
+inline ndFloat32* ndPolygonSoupDatabase::GetLocalVertexPool() const
 {
 	return m_localVertex;
 }
 
-inline dInt32 ndPolygonSoupDatabase::GetStrideInBytes() const
+inline ndInt32 ndPolygonSoupDatabase::GetStrideInBytes() const
 {
 	return m_strideInBytes;
 }
 
-inline dFloat32 ndPolygonSoupDatabase::GetRadius() const
+inline ndFloat32 ndPolygonSoupDatabase::GetRadius() const
 {
-	return dFloat32 (0.0f);
+	return ndFloat32 (0.0f);
 }
 
-inline dUnsigned32 ndPolygonSoupDatabase::GetTagId(const dInt32* const face, dInt32 indexCount) const
+inline ndUnsigned32 ndPolygonSoupDatabase::GetTagId(const ndInt32* const face, ndInt32 indexCount) const
 {
-	return dUnsigned32(face[indexCount]);
+	return ndUnsigned32(face[indexCount]);
 }
 
 #endif

@@ -31,15 +31,15 @@ class ndPolyhedraMassProperties: public ndClassAlloc
 	public:
 	D_CORE_API ndPolyhedraMassProperties();
 
-	D_CORE_API void AddCGFace (dInt32 indexCount, const ndVector* const faceVertex);
-	D_CORE_API void AddInertiaFace (dInt32 indexCount, const ndVector* const faceVertex);
-	D_CORE_API void AddInertiaAndCrossFace (dInt32 indexCount, const ndVector* const faceVertex);
+	D_CORE_API void AddCGFace (ndInt32 indexCount, const ndVector* const faceVertex);
+	D_CORE_API void AddInertiaFace (ndInt32 indexCount, const ndVector* const faceVertex);
+	D_CORE_API void AddInertiaAndCrossFace (ndInt32 indexCount, const ndVector* const faceVertex);
 	
-	D_CORE_API dFloat32 MassProperties (ndVector& cg, ndVector& inertia, ndVector& crossInertia);
+	D_CORE_API ndFloat32 MassProperties (ndVector& cg, ndVector& inertia, ndVector& crossInertia);
 
 	private:
-	dFloat32 intg[10];
-	dFloat32 mult[10];
+	ndFloat32 intg[10];
+	ndFloat32 mult[10];
 };
 
 #endif

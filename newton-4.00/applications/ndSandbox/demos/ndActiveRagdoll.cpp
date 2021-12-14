@@ -47,35 +47,35 @@ class dActiveJointDefinition
 		{
 		}
 
-		dJointPdData(dFloat32 spring, dFloat32 damper, dFloat32 regularizer)
+		dJointPdData(ndFloat32 spring, ndFloat32 damper, ndFloat32 regularizer)
 			:m_spring(spring)
 			,m_damper(damper)
 			,m_regularizer(regularizer)
 		{
 		}
 
-		dFloat32 m_spring;
-		dFloat32 m_damper;
-		dFloat32 m_regularizer;
+		ndFloat32 m_spring;
+		ndFloat32 m_damper;
+		ndFloat32 m_regularizer;
 	};
 
 	struct dJointLimit
 	{
-		dFloat32 m_minTwistAngle;
-		dFloat32 m_maxTwistAngle;
-		dFloat32 m_coneAngle;
+		ndFloat32 m_minTwistAngle;
+		ndFloat32 m_maxTwistAngle;
+		ndFloat32 m_coneAngle;
 	};
 
 	struct dFrameMatrix
 	{
-		dFloat32 m_pitch;
-		dFloat32 m_yaw;
-		dFloat32 m_roll;
+		ndFloat32 m_pitch;
+		ndFloat32 m_yaw;
+		ndFloat32 m_roll;
 	};
 
 	char m_boneName[32];
 	dLimbType m_limbType;
-	dFloat32 m_massWeight;
+	ndFloat32 m_massWeight;
 	dJointLimit m_jointLimits;
 	dFrameMatrix m_frameBasics;
 	dJointPdData m_coneSpringData;
@@ -96,7 +96,7 @@ class ndActiveRagdollEntityNotify : public ndDemoEntityNotify
 		}
 	}
 
-	void OnTransform(dInt32 thread, const ndMatrix& matrix)
+	void OnTransform(ndInt32 thread, const ndMatrix& matrix)
 	{
 		if (!m_parentBody)
 		{
@@ -111,7 +111,7 @@ class ndActiveRagdollEntityNotify : public ndDemoEntityNotify
 		}
 	}
 
-	void OnApplyExternalForce(dInt32 thread, dFloat32 timestep)
+	void OnApplyExternalForce(ndInt32 thread, ndFloat32 timestep)
 	{
 		ndDemoEntityNotify::OnApplyExternalForce(thread, timestep);
 		// remember to check and clamp huge angular velocities
@@ -169,12 +169,12 @@ class ndActiveRagdollModel : public ndCharacter
 		rootEntity->ResetMatrix(rootEntity->GetCurrentMatrix() * matrix);
 		ndCharacterRootNode* const rootNode = CreateRoot(CreateBodyPart(scene, rootEntity, nullptr));
 		ndDemoEntity* const characterFrame = (ndDemoEntity*)entity->Find("referenceFrame");
-		ndMatrix coronalFrame(dPitchMatrix(180.0f*dDegreeToRad) * dRollMatrix(90.0f*dDegreeToRad) * characterFrame->CalculateGlobalMatrix());
+		ndMatrix coronalFrame(dPitchMatrix(180.0f*ndDegreeToRad) * dRollMatrix(90.0f*ndDegreeToRad) * characterFrame->CalculateGlobalMatrix());
 		rootNode->SetCoronalFrame(coronalFrame);
 		rootNode->SetName(rootEntity->GetName().GetStr());
 
-		dInt32 stack = 0;
-		const dInt32 definitionCount = dInt32 (sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
+		ndInt32 stack = 0;
+		const ndInt32 definitionCount = ndInt32 (sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
 		
 		ndDemoEntity* childEntities[32];
 		ndCharacterNode* parentBones[32];
@@ -185,8 +185,8 @@ class ndActiveRagdollModel : public ndCharacter
 			stack++;
 		}
 		
-		dInt32 bodyCount = 1;
-		dFloat32 massWeight[1024];
+		ndInt32 bodyCount = 1;
+		ndFloat32 massWeight[1024];
 		ndBodyDynamic* bodyArray[1024];
 		massWeight[0] = 1.0f;
 		bodyArray[0] = rootNode->GetBody();
@@ -203,7 +203,7 @@ class ndActiveRagdollModel : public ndCharacter
 			ndDemoEntity* const childEntity = childEntities[stack];
 			const char* const name = childEntity->GetName().GetStr();
 			//dTrace(("name: %s\n", name));
-			for (dInt32 i = 0; i < definitionCount; i++) 
+			for (ndInt32 i = 0; i < definitionCount; i++) 
 			{
 				const dActiveJointDefinition& definition = jointsDefinition[i];
 				if (!strcmp(definition.m_boneName, name))
@@ -328,19 +328,19 @@ class ndActiveRagdollModel : public ndCharacter
 
 	}
 
-	void SetModelMass(dFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray, const dFloat32* const massWeight) const
+	void SetModelMass(ndFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray, const ndFloat32* const massWeight) const
 	{
-		dFloat32 volume = 0.0f;
-		for (dInt32 i = 0; i < bodyCount; i++) 
+		ndFloat32 volume = 0.0f;
+		for (ndInt32 i = 0; i < bodyCount; i++) 
 		{
 			volume += bodyArray[i]->GetCollisionShape().GetVolume() * massWeight[i];
 		}
-		dFloat32 density = mass / volume;
+		ndFloat32 density = mass / volume;
 
-		for (dInt32 i = 0; i < bodyCount; i++) 
+		for (ndInt32 i = 0; i < bodyCount; i++) 
 		{
 			ndBodyDynamic* const body = bodyArray[i];
-			dFloat32 scale = density * body->GetCollisionShape().GetVolume() * massWeight[i];
+			ndFloat32 scale = density * body->GetCollisionShape().GetVolume() * massWeight[i];
 			ndVector inertia(body->GetMassMatrix().Scale (scale));
 			body->SetMassMatrix(inertia);
 		}
@@ -368,7 +368,7 @@ class ndActiveRagdollModel : public ndCharacter
 	{
 		ndMatrix matrix(childBody->GetMatrix());
 		dActiveJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
-		ndMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
+		ndMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * dYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * dRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
 
 		if (definition.m_limbType == dActiveJointDefinition::forwardKinematic)
 		{
@@ -377,8 +377,8 @@ class ndActiveRagdollModel : public ndCharacter
 			dActiveJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 			ndJointPdActuator* const joint = (ndJointPdActuator*)jointNode->GetJoint();
 
-			joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
-			joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
+			joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
+			joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
 			joint->SetConeAngleSpringDamperRegularizer(definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper, definition.m_coneSpringData.m_regularizer);
 			joint->SetTwistAngleSpringDamperRegularizer(definition.m_twistSpringData.m_spring, definition.m_twistSpringData.m_damper, definition.m_twistSpringData.m_regularizer);
 
@@ -394,21 +394,21 @@ class ndActiveRagdollModel : public ndCharacter
 			//dTrace (("do not forget to delete this debug\n"))
 			//joint->SetSolverModel(m_jointkinematicCloseLoop);
 
-			joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
-			joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
-			joint->SetConeFriction(dFloat32(0.0f), dFloat32(0.0f));
-			joint->SetTwistFriction(dFloat32(0.0f), dFloat32(0.0f));
+			joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
+			joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
+			joint->SetConeFriction(ndFloat32(0.0f), ndFloat32(0.0f));
+			joint->SetTwistFriction(ndFloat32(0.0f), ndFloat32(0.0f));
 
 			return jointNode;
 		}
 	}
 
-	void Update(ndWorld* const world, dFloat32 timestep) 
+	void Update(ndWorld* const world, ndFloat32 timestep) 
 	{
 		//m_animBlendTree->Evaluate(m_output, timestep);
 		m_animBlendTree->Evaluate(m_output, timestep * 0.05f);
 		//m_animBlendTree->Evaluate(m_output, 0.0f);
-		for (dInt32 i = 0; i < m_output.GetCount(); i++)
+		for (ndInt32 i = 0; i < m_output.GetCount(); i++)
 		{
 			const ndAnimKeyframe& keyFrame = m_output[i];
 			ndCharacterNode* const skelNode = (ndCharacterNode*)keyFrame.m_userData;
@@ -422,12 +422,12 @@ class ndActiveRagdollModel : public ndCharacter
 		ndCharacter::Update(world, timestep);
 	}
 
-	void PostUpdate(ndWorld* const world, dFloat32 timestep)
+	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndCharacter::PostUpdate(world, timestep);
 	}
 
-	void PostTransformUpdate(ndWorld* const world, dFloat32 timestep)
+	void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndCharacter::PostTransformUpdate(world, timestep);
 	}
@@ -444,9 +444,9 @@ static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const 
 	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
-	dFloat32 height = 1.9f;
-	dFloat32 radio = 0.5f;
-	dFloat32 mass = 100.0f;
+	ndFloat32 height = 1.9f;
+	ndFloat32 radio = 0.5f;
+	ndFloat32 mass = 100.0f;
 	ndDemoEntity* const entity = scene->LoadFbxMesh("whiteMan.fbx");
 	ndBasicPlayerCapsule* const player = new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
 	player->GetNotifyCallback()->SetGravity(ndVector::m_zero);
@@ -490,7 +490,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	origin1.m_x += 20.0f;
 	//AddCapsulesStacks(scene, origin1, 10.0f, 0.25f, 0.25f, 0.5f, 10, 10, 7);
 
-	dFloat32 angle = dFloat32(90.0f * dDegreeToRad);
+	ndFloat32 angle = ndFloat32(90.0f * ndDegreeToRad);
 	playerMatrix = dYawMatrix(angle) * playerMatrix;
 	ndVector origin(playerMatrix.m_posit + playerMatrix.m_front.Scale (-5.0f));
 	origin.m_y += 1.0f;

@@ -23,16 +23,16 @@ class ndMultiBodyVehicleTireJoint: public ndJointWheel
 	D_NEWTON_API ndMultiBodyVehicleTireJoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& desc, ndMultiBodyVehicle* const vehicle);
 	D_NEWTON_API virtual ~ndMultiBodyVehicleTireJoint();
 
-	D_NEWTON_API dFloat32 GetSideSlip() const;
-	D_NEWTON_API dFloat32 GetLongitudinalSlip() const;
+	D_NEWTON_API ndFloat32 GetSideSlip() const;
+	D_NEWTON_API ndFloat32 GetLongitudinalSlip() const;
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	ndMultiBodyVehicle* m_vehicle;
-	dFloat32 m_lateralSlip;
-	dFloat32 m_longitudinalSlip;
+	ndFloat32 m_lateralSlip;
+	ndFloat32 m_longitudinalSlip;
 
 	friend class ndMultiBodyVehicle;
 };

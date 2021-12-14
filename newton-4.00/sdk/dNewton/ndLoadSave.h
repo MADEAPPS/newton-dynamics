@@ -47,8 +47,8 @@ class ndWordSettings : public ndClassAlloc
 	D_NEWTON_API virtual void Load(const ndLoadSaveBase::dLoadDescriptor& desc);
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	dInt32 m_subSteps;
-	dInt32 m_solverIterations;
+	ndInt32 m_subSteps;
+	ndInt32 m_solverIterations;
 };
 
 D_MSV_NEWTON_ALIGN_32

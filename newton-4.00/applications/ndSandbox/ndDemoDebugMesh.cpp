@@ -37,7 +37,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 		{
 		}
 
-		virtual void DrawPolygon(dInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const)
+		virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const)
 		{
 			ndVector p0(faceVertex[0]);
 			ndVector p1(faceVertex[1]);
@@ -45,7 +45,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 			
 			ndVector normal((p1 - p0).CrossProduct(p2 - p0));
 			normal = normal.Normalize();
-			for (dInt32 i = 2; i < vertexCount; i++)
+			for (ndInt32 i = 2; i < vertexCount; i++)
 			{
 				glPositionNormal point;
 				point.m_posit.m_x = GLfloat(faceVertex[0].m_x);
@@ -81,9 +81,9 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 	collision->DebugShape(dGetIdentityMatrix(), drawShapes);
 	if (drawShapes.m_triangles.GetCount())
 	{
-		ndArray<dInt32> m_triangles(drawShapes.m_triangles.GetCount());
+		ndArray<ndInt32> m_triangles(drawShapes.m_triangles.GetCount());
 		m_triangles.SetCount(drawShapes.m_triangles.GetCount());
-		dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(glPositionNormal), 6, drawShapes.m_triangles.GetCount(), &m_triangles[0], GLfloat(1.0e-6f));
+		ndInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(glPositionNormal), 6, drawShapes.m_triangles.GetCount(), &m_triangles[0], GLfloat(1.0e-6f));
 
 		m_shader = shaderCache.m_flatShaded;
 		m_indexCount = m_triangles.GetCount();
@@ -189,10 +189,10 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 		{
 		}
 
-		virtual void DrawPolygon(dInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const edgeType)
+		virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const edgeType)
 		{
-			dInt32 i0 = vertexCount - 1;
-			for (dInt32 i = 0; i < vertexCount; i++)
+			ndInt32 i0 = vertexCount - 1;
+			for (ndInt32 i = 0; i < vertexCount; i++)
 			{
 				if (edgeType[i0] == m_edgeType)
 				{
@@ -222,25 +222,25 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 	
 	if (drawShapes.m_lines.GetCount())
 	{
-		ndArray<dInt32> m_lines(drawShapes.m_lines.GetCount());
+		ndArray<ndInt32> m_lines(drawShapes.m_lines.GetCount());
 		m_lines.SetCount(drawShapes.m_lines.GetCount());
-		dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_lines[0].m_x, sizeof(glVector3), 3, drawShapes.m_lines.GetCount(), &m_lines[0], GLfloat(1.0e-6f));
+		ndInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_lines[0].m_x, sizeof(glVector3), 3, drawShapes.m_lines.GetCount(), &m_lines[0], GLfloat(1.0e-6f));
 
 		m_indexCount = m_lines.GetCount();
-		ndTree<dUnsigned64, dUnsigned64> filter;
-		for (dInt32 i = m_lines.GetCount() - 1; i >= 0; i -= 2)
+		ndTree<ndUnsigned64, ndUnsigned64> filter;
+		for (ndInt32 i = m_lines.GetCount() - 1; i >= 0; i -= 2)
 		{
 			union
 			{
-				dUnsigned64 m_key;
+				ndUnsigned64 m_key;
 				struct
 				{
-					dUnsigned32 m_low;
-					dUnsigned32 m_high;
+					ndUnsigned32 m_low;
+					ndUnsigned32 m_high;
 				};
 			} key;
-			dInt32 i0 = m_lines[i - 1];
-			dInt32 i1 = m_lines[i - 0];
+			ndInt32 i0 = m_lines[i - 1];
+			ndInt32 i1 = m_lines[i - 0];
 			key.m_low = dMin(i0, i1);
 			key.m_high = dMax(i0, i1);
 			if (filter.Find(key.m_key))

@@ -54,11 +54,11 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	virtual ndBodyParticleSet* GetAsBodyParticleSet() { return nullptr; }
 	virtual ndBodyTriggerVolume* GetAsBodyTriggerVolume() { return nullptr; }
 
-	dUnsigned32 GetId() const;
+	ndUnsigned32 GetId() const;
 	void GetAABB(ndVector& p0, ndVector& p1) const;
 
-	virtual dFloat32 GetInvMass() const;
-	virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const dFloat32 maxT) const = 0;
+	virtual ndFloat32 GetInvMass() const;
+	virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const = 0;
 
 	const ndVector& GetCentreOfMass() const;
 	D_COLLISION_API void SetCentreOfMass(const ndVector& com);
@@ -101,33 +101,33 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	ndQuaternion m_rotation;
 	ndBodyNotify* m_notifyCallback;
 
-	dUnsigned32 m_uniqueId;
+	ndUnsigned32 m_uniqueId;
 	union
 	{
-		dUnsigned32 m_flags;
+		ndUnsigned32 m_flags;
 		struct
 		{
-			dUnsigned32 m_isDynamics : 1;
-			dUnsigned32 m_skeletonMark : 1;
-			dUnsigned32 m_skeletonMark0 : 1;
-			dUnsigned32 m_skeletonMark1 : 1;
-			dUnsigned32 m_contactTestOnly : 1;
-			dUnsigned32 m_transformIsDirty : 1;
-			dUnsigned32 m_equilibriumOverride : 1;
+			ndUnsigned32 m_isDynamics : 1;
+			ndUnsigned32 m_skeletonMark : 1;
+			ndUnsigned32 m_skeletonMark0 : 1;
+			ndUnsigned32 m_skeletonMark1 : 1;
+			ndUnsigned32 m_contactTestOnly : 1;
+			ndUnsigned32 m_transformIsDirty : 1;
+			ndUnsigned32 m_equilibriumOverride : 1;
 		};
 	};
 
-	dUnsigned8 m_isStatic;
-	dUnsigned8 m_autoSleep;
-	dUnsigned8 m_islandSleep;
-	dUnsigned8 m_equilibrium;
-	dUnsigned8 m_equilibrium0;
-	dUnsigned8 m_isJointFence0;
-	dUnsigned8 m_isJointFence1;
-	dUnsigned8 m_bodyIsConstrained;
+	ndUnsigned8 m_isStatic;
+	ndUnsigned8 m_autoSleep;
+	ndUnsigned8 m_islandSleep;
+	ndUnsigned8 m_equilibrium;
+	ndUnsigned8 m_equilibrium0;
+	ndUnsigned8 m_isJointFence0;
+	ndUnsigned8 m_isJointFence1;
+	ndUnsigned8 m_bodyIsConstrained;
 
-	dUnsigned8 m_resting;
-	D_COLLISION_API static dUnsigned32 m_uniqueIdCount;
+	ndUnsigned8 m_resting;
+	D_COLLISION_API static ndUnsigned32 m_uniqueIdCount;
 
 	friend class ndWorld;
 	friend class ndScene;
@@ -135,7 +135,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	friend class ndBodyPlayerCapsuleImpulseSolver;
 } D_GCC_NEWTON_ALIGN_32;
 
-inline dUnsigned32 ndBody::GetId() const
+inline ndUnsigned32 ndBody::GetId() const
 {
 	return m_uniqueId;
 }
@@ -191,9 +191,9 @@ inline ndVector ndBody::GetVelocityAtPoint(const ndVector& point) const
 	return m_veloc + m_omega.CrossProduct(point - m_globalCentreOfMass);
 }
 
-inline dFloat32 ndBody::GetInvMass() const 
+inline ndFloat32 ndBody::GetInvMass() const 
 { 
-	return dFloat32(0.0f); 
+	return ndFloat32(0.0f); 
 }
 
 inline void ndBody::SetMatrixAndCentreOfMass(const ndQuaternion& rotation, const ndVector& globalcom)

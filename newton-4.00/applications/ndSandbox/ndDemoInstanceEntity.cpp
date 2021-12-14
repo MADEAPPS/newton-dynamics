@@ -17,7 +17,7 @@
 
 ndArray<ndMatrix> ndDemoInstanceEntity::m_matrixStack;
 
-ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const, const char* const, dFloat32 opacity, const ndMatrix& uvMatrix)
+ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const, const char* const, ndFloat32 opacity, const ndMatrix& uvMatrix)
 	:ndDemoMesh(name)
 	,m_offsets(nullptr)
 	,m_instanceCount(0)
@@ -42,14 +42,14 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 
 		case ndShapeID::m_box:
 		{
-			dInt32 tex0 = LoadTexture(texture0);
+			ndInt32 tex0 = LoadTexture(texture0);
 			mesh.UniformBoxMapping(tex0, aligmentUV);
 			break;
 		}
 
 		default:
 		{
-			dInt32 tex0 = LoadTexture(texture0);
+			ndInt32 tex0 = LoadTexture(texture0);
 			mesh.UniformBoxMapping(tex0, aligmentUV);
 		}
 	}
@@ -58,22 +58,22 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
 
 	// extract vertex data  from the newton mesh		
-	dInt32 vertexCount = mesh.GetPropertiesCount();
-	dInt32 indexCount = 0;
-	for (dInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+	ndInt32 vertexCount = mesh.GetPropertiesCount();
+	ndInt32 indexCount = 0;
+	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
 	{
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
 
 	struct dTmpData
 	{
-		dFloat32 m_posit[3];
-		dFloat32 m_normal[3];
-		dFloat32 m_uv[2];
+		ndFloat32 m_posit[3];
+		ndFloat32 m_normal[3];
+		ndFloat32 m_uv[2];
 	};
 
 	ndArray<dTmpData> tmp;
-	ndArray<dInt32> indices;
+	ndArray<ndInt32> indices;
 	ndArray<glPositionNormalUV> points;
 	ndArray<glMatrix> offsets;
 
@@ -86,7 +86,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 	mesh.GetNormalChannel(sizeof(dTmpData), &tmp[0].m_normal[0]);
 	mesh.GetUV0Channel(sizeof(dTmpData), &tmp[0].m_uv[0]);
 
-	for (dInt32 i = 0; i < vertexCount; i++)
+	for (ndInt32 i = 0; i < vertexCount; i++)
 	{
 		points[i].m_posit.m_x = GLfloat(tmp[i].m_posit[0]);
 		points[i].m_posit.m_y = GLfloat(tmp[i].m_posit[1]);
@@ -98,11 +98,11 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 		points[i].m_uv.m_v = GLfloat(tmp[i].m_uv[1]);
 	}
 
-	dInt32 segmentStart = 0;
+	ndInt32 segmentStart = 0;
 	bool hasTransparency = false;
-	for (dInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+	for (ndInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
 	{
-		dInt32 material = mesh.GetMaterialID(geometryHandle, handle);
+		ndInt32 material = mesh.GetMaterialID(geometryHandle, handle);
 		ndDemoSubMesh* const segment = AddSubMesh();
 
 		segment->m_material.m_textureHandle = (GLuint)material;
@@ -195,26 +195,26 @@ ndDemoMeshIntance::~ndDemoMeshIntance()
 	glDeleteBuffers(1, &m_matrixOffsetBuffer);
 }
 
-void ndDemoMeshIntance::SetTransforms(dInt32 count, const ndMatrix* const matrixArray)
+void ndDemoMeshIntance::SetTransforms(ndInt32 count, const ndMatrix* const matrixArray)
 {
 	m_offsets = matrixArray;
 	m_instanceCount = count;
 }
 
-void ndDemoMeshIntance::RenderBatch(dInt32 start, ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
+void ndDemoMeshIntance::RenderBatch(ndInt32 start, ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_matrixOffsetBuffer);
 
 	glMatrix* const matrixBuffer = (glMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 
-	const dInt32 base = start * m_maxInstanceCount;
-	const dInt32 count = ((base + m_maxInstanceCount) > m_instanceCount) ? m_instanceCount - base : m_maxInstanceCount;
-	for (dInt32 i = 0; i < count; i++)
+	const ndInt32 base = start * m_maxInstanceCount;
+	const ndInt32 count = ((base + m_maxInstanceCount) > m_instanceCount) ? m_instanceCount - base : m_maxInstanceCount;
+	for (ndInt32 i = 0; i < count; i++)
 	{
 		ndMatrix matrix(m_offsets[base + i]);
-		const dFloat32* const src = &matrix[0][0];
+		const ndFloat32* const src = &matrix[0][0];
 		GLfloat* const dst = &matrixBuffer[i][0][0];
-		for (dInt32 j = 0; j < 16; j++) 
+		for (ndInt32 j = 0; j < 16; j++) 
 		{
 			dst[j] = GLfloat(src[j]);
 		}
@@ -267,8 +267,8 @@ void ndDemoMeshIntance::RenderBatch(dInt32 start, ndDemoEntityManager* const sce
 
 void ndDemoMeshIntance::Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
 {
-	dInt32 segments = (m_instanceCount - 1) / m_maxInstanceCount;
-	for (dInt32 i = 0; i < segments; i++)
+	ndInt32 segments = (m_instanceCount - 1) / m_maxInstanceCount;
+	for (ndInt32 i = 0; i < segments; i++)
 	{
 		RenderBatch(i, scene, modelMatrix);
 	}
@@ -295,18 +295,18 @@ ndDemoInstanceEntity::~ndDemoInstanceEntity(void)
 	m_instanceMesh->Release();
 }
 
-void ndDemoInstanceEntity::Render(dFloat32, ndDemoEntityManager* const scene, const ndMatrix& matrix) const
+void ndDemoInstanceEntity::Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatrix& matrix) const
 {
 	D_TRACKTIME();
 	//count active instances 
-	dInt32 count = 0;
+	ndInt32 count = 0;
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
 	{
 		count++;
 	}
 	
 	// prepare the transforms buffer form all the children matrices
-	dInt32 index = 0;
+	ndInt32 index = 0;
 	//ndMatrix* const matrixStack = dAlloca(ndMatrix, count);
 	m_matrixStack.SetCount(count);
 	

@@ -35,7 +35,7 @@ class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 	D_NEWTON_API ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehicle* const chassis, ndBodyDynamic* const fixedbody);
 
 	D_NEWTON_API void AddAxel(const ndBodyKinematic* const leftTire, const ndBodyKinematic* const rightTire);
-	D_NEWTON_API void SetTorsionTorque(dFloat32 springK, dFloat32 damperC, dFloat32 springDamperRegularizer);
+	D_NEWTON_API void SetTorsionTorque(ndFloat32 springK, ndFloat32 damperC, ndFloat32 springDamperRegularizer);
 
 	protected:
 	class ndAxles
@@ -44,12 +44,12 @@ class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 		ndAxles()
 			:m_leftTire(nullptr)
 			,m_rightTire(nullptr)
-			,m_axleAngle(dFloat32(0.0f))
+			,m_axleAngle(ndFloat32(0.0f))
 		{
 		}
 		const ndBodyKinematic* m_leftTire;
 		const ndBodyKinematic* m_rightTire;
-		dFloat32 m_axleAngle;
+		ndFloat32 m_axleAngle;
 	};
 
 	void DebugJoint(ndConstraintDebugCallback&) const {}
@@ -57,10 +57,10 @@ class ndMultiBodyVehicleTorsionBar : public ndJointBilateralConstraint
 	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	ndAxles m_axles[2];
-	dFloat32 m_springK;
-	dFloat32 m_damperC;
-	dFloat32 m_springDamperRegularizer;
-	dInt32 m_axleCount;
+	ndFloat32 m_springK;
+	ndFloat32 m_damperC;
+	ndFloat32 m_springDamperRegularizer;
+	ndInt32 m_axleCount;
 	friend class ndMultiBodyVehicle;
 };
 

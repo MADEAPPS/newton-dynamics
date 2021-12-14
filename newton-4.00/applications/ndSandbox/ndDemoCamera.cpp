@@ -21,7 +21,7 @@ ndDemoCamera::ndDemoCamera()
 	:ndDemoEntity (dGetIdentityMatrix(), nullptr) 
 	,m_viewMatrix(dGetIdentityMatrix())
 	,m_projectionMatrix(dGetIdentityMatrix())
-	,m_fov(D_CAMERA_ANGLE * dDegreeToRad)
+	,m_fov(D_CAMERA_ANGLE * ndDegreeToRad)
 	,m_backPlane(2000.0f)
 	,m_frontPlane (0.01f)
 	,m_cameraYaw(0.0f)
@@ -33,16 +33,16 @@ ndDemoCamera::~ndDemoCamera()
 {
 }
 
-void ndDemoCamera::Render(dFloat32, ndDemoEntityManager* const, const ndMatrix&) const
+void ndDemoCamera::Render(ndFloat32, ndDemoEntityManager* const, const ndMatrix&) const
 {
 }
 
-dFloat32 ndDemoCamera::GetYawAngle() const
+ndFloat32 ndDemoCamera::GetYawAngle() const
 {
 	return m_cameraYaw;
 }
 
-dFloat32 ndDemoCamera::GetPichAngle() const
+ndFloat32 ndDemoCamera::GetPichAngle() const
 {
 	return m_cameraPitch;
 }
@@ -57,7 +57,7 @@ const ndMatrix& ndDemoCamera::GetViewMatrix() const
 	return m_viewMatrix;
 }
 
-ndMatrix ndDemoCamera::CreateMatrixFromFrustum(dFloat32 Left, dFloat32 Right, dFloat32 Bottom, dFloat32 Top, dFloat32 ZNear, dFloat32 ZFar)
+ndMatrix ndDemoCamera::CreateMatrixFromFrustum(ndFloat32 Left, ndFloat32 Right, ndFloat32 Bottom, ndFloat32 Top, ndFloat32 ZNear, ndFloat32 ZFar)
 {
 	ndMatrix Result(dGetIdentityMatrix());
 
@@ -118,17 +118,17 @@ ndMatrix ndDemoCamera::CreateLookAtMatrix(const ndVector& eye, const ndVector& c
 	return Result;
 }
 
-ndMatrix ndDemoCamera::CreatePerspectiveMatrix(dFloat32 fov, dFloat32 Aspect, dFloat32 ZNear, dFloat32 ZFar)
+ndMatrix ndDemoCamera::CreatePerspectiveMatrix(ndFloat32 fov, ndFloat32 Aspect, ndFloat32 ZNear, ndFloat32 ZFar)
 {
-	fov = dClamp (fov, dFloat32 (0.0f), dPi);
-	//y = ZNear * (dFloat32)dTan((fov * cPIdiv180) * 0.5f);
-	dFloat32 y = ZNear * dTan(fov * 0.5f);
-	dFloat32 x = y * Aspect;
+	fov = dClamp (fov, ndFloat32 (0.0f), ndPi);
+	//y = ZNear * (ndFloat32)ndTan((fov * cPIdiv180) * 0.5f);
+	ndFloat32 y = ZNear * ndTan(fov * 0.5f);
+	ndFloat32 x = y * Aspect;
 	ndMatrix Result (CreateMatrixFromFrustum(-x, x, -y, y, ZNear, ZFar));
 	return Result;
 }
 
-void ndDemoCamera::SetViewMatrix(dInt32 width, dInt32 height)
+void ndDemoCamera::SetViewMatrix(ndInt32 width, ndInt32 height)
 {
 	// set the view port for this render section
 	glViewport(0, 0, (GLint)width, (GLint)height);
@@ -154,16 +154,16 @@ ndVector ndDemoCamera::ScreenToWorld (const ndVector& screenPoint) const
 	//Now windows coordinates start with (0,0) being at the top left 
 	//whereas OpenGL cords start lower left so we have to do this to convert it: 
 	//Remember we got viewport value before 
-	winY = (dFloat32)m_viewport[3] - winY; 
+	winY = (ndFloat32)m_viewport[3] - winY; 
 
 	GLdouble objx;
 	GLdouble objy;
 	GLdouble objz;
 	GLdouble modelViewMatrix[16];
 	GLdouble projectionViewMatrix[16];
-	for (dInt32 i = 0; i < 4; i++) 
+	for (ndInt32 i = 0; i < 4; i++) 
 	{
-		for (dInt32 j = 0; j < 4; j++)
+		for (ndInt32 j = 0; j < 4; j++)
 		{
 			modelViewMatrix[i * 4 + j] = m_viewMatrix[i][j];
 			projectionViewMatrix[i * 4 + j] = m_projectionMatrix[i][j];
@@ -171,7 +171,7 @@ ndVector ndDemoCamera::ScreenToWorld (const ndVector& screenPoint) const
 	}
 
 	gluUnProject (winX, winY, winZ, modelViewMatrix, projectionViewMatrix, (GLint*)&m_viewport, &objx, &objy, &objz);
-	return ndVector (dFloat32(objx), dFloat32(objy), dFloat32(objz), dFloat32 (1.0f));
+	return ndVector (ndFloat32(objx), ndFloat32(objy), ndFloat32(objz), ndFloat32 (1.0f));
 }
 
 //ndVector ndDemoCamera::WorldToScreen (const ndVector& worldPoint) const
@@ -180,7 +180,7 @@ ndVector ndDemoCamera::WorldToScreen(const ndVector&) const
 dAssert (0);
 
 /*
-	dInt32 win[4]; 
+	ndInt32 win[4]; 
 	GLint viewport[4]; 
 
 	//Retrieves the viewport and stores it in the variable
@@ -216,9 +216,9 @@ dAssert (0);
 	glGetIntegerv(GL_VIEWPORT, viewport); 
 	gluProject (objx, objy, objz, modelview, projection, viewport, &winX, &winY, &winZ);
 
-	winY = (dFloat32)viewport[3] - winY; 
+	winY = (ndFloat32)viewport[3] - winY; 
 
-	return ndVector (dFloat32(winX), dFloat32 (winY), dFloat32(winZ), 0.0f);
+	return ndVector (ndFloat32(winX), ndFloat32 (winY), ndFloat32(winZ), 0.0f);
 */
 	return ndVector::m_zero;
 }
@@ -228,8 +228,8 @@ dAssert (0);
 void ndDemoCamera::SetMatrix (const ndQuaternion& rotation, const ndVector& position)
 {
 	ndMatrix matrix (rotation, position);
-	m_cameraPitch = dAsin (matrix.m_front.m_y);
-	m_cameraYaw = dAtan2 (-matrix.m_front.m_z, matrix.m_front.m_x);
+	m_cameraPitch = ndAsin (matrix.m_front.m_y);
+	m_cameraYaw = ndAtan2 (-matrix.m_front.m_z, matrix.m_front.m_x);
 
 	ndDemoEntity::SetMatrix (rotation, position);
 }

@@ -30,9 +30,9 @@ class ndVehicleUI: public ndClassAlloc
 	~ndVehicleUI();
 	
 	void CreateBufferUI();
-	void CreateOrthoViewMatrix(ndDemoEntityManager* const uscene, dFloat32 origin_x, const dFloat32 origin_y, ndMatrix& projmatrix);
-	void RenderGearUI(ndDemoEntityManager* const uscene, const dInt32 gearid, GLuint tex1, dFloat32 origin_x, dFloat32 origin_y, dFloat32 ptsize);
-	void RenderGageUI(ndDemoEntityManager* const uscene, const GLuint tex1, const dFloat32 origin_x, const dFloat32 origin_y, const dFloat32 ptsize, dFloat32 cparam, dFloat32 minAngle, dFloat32 maxAngle);
+	void CreateOrthoViewMatrix(ndDemoEntityManager* const uscene, ndFloat32 origin_x, const ndFloat32 origin_y, ndMatrix& projmatrix);
+	void RenderGearUI(ndDemoEntityManager* const uscene, const ndInt32 gearid, GLuint tex1, ndFloat32 origin_x, ndFloat32 origin_y, ndFloat32 ptsize);
+	void RenderGageUI(ndDemoEntityManager* const uscene, const GLuint tex1, const ndFloat32 origin_x, const ndFloat32 origin_y, const ndFloat32 ptsize, ndFloat32 cparam, ndFloat32 minAngle, ndFloat32 maxAngle);
 
 	
 	GLuint m_shaderHandle;
@@ -50,8 +50,8 @@ class ndVehicleUI: public ndClassAlloc
 	GLuint m_iboSta;
 	glPositionUV m_vertDyn[4];
 	glPositionUV m_vertSta[4];
-	dUnsigned32 m_indxDyn[6];
-	dUnsigned32 m_indxSta[6];
+	ndUnsigned32 m_indxDyn[6];
+	ndUnsigned32 m_indxSta[6];
 };
 
 #endif

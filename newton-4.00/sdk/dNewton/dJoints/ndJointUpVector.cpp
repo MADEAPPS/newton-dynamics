@@ -50,14 +50,14 @@ void ndJointUpVector::JacobianDerivative(ndConstraintDescritor& desc)
   
 	// if the body has rotated by some amount, the there will be a plane of rotation
 	ndVector lateralDir (matrix0.m_front.CrossProduct(matrix1.m_front));
-	dAssert(lateralDir.m_w == dFloat32(0.0f));
-	dFloat32 mag = lateralDir.DotProduct(lateralDir).GetScalar();
+	dAssert(lateralDir.m_w == ndFloat32(0.0f));
+	ndFloat32 mag = lateralDir.DotProduct(lateralDir).GetScalar();
 	if (mag > 1.0e-6f) 
 	{
 		// if the side vector is not zero, it means the body has rotated
-		mag = dSqrt (mag);
+		mag = ndSqrt (mag);
 		lateralDir = lateralDir.Scale (1.0f / mag);
-		dFloat32 angle = dAsin (mag);
+		ndFloat32 angle = ndAsin (mag);
 
 		// add an angular constraint to correct the error angle
 		//NewtonUserJointAddAngularRow (m_joint, angle, &lateralDir[0]);
@@ -67,15 +67,15 @@ void ndJointUpVector::JacobianDerivative(ndConstraintDescritor& desc)
 		// a lateral correction prevent this from happening.
 		ndVector frontDir (lateralDir.CrossProduct(matrix1.m_front));
 		//NewtonUserJointAddAngularRow (m_joint, 0.0f, &frontDir[0]);
-		AddAngularRowJacobian(desc, frontDir, dFloat32 (0.0f));
+		AddAngularRowJacobian(desc, frontDir, ndFloat32 (0.0f));
  	} 
 	else 
 	{
 		// if the angle error is very small then two angular correction along the plane axis do the trick
 		//NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_up[0]);
-		AddAngularRowJacobian(desc, matrix0.m_up, dFloat32(0.0f));
+		AddAngularRowJacobian(desc, matrix0.m_up, ndFloat32(0.0f));
 		//NewtonUserJointAddAngularRow (m_joint, 0.0f, &matrix0.m_right[0]);
-		AddAngularRowJacobian(desc, matrix0.m_right, dFloat32(0.0f));
+		AddAngularRowJacobian(desc, matrix0.m_right, ndFloat32(0.0f));
 	}
 }
 

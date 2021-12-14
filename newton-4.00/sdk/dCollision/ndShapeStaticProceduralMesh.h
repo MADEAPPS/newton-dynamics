@@ -32,21 +32,21 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	{
 		public:
 		ndEdge();
-		ndEdge(dUnsigned64 key);
+		ndEdge(ndUnsigned64 key);
 		bool operator< (const ndEdge& edge) const;
 		bool operator> (const ndEdge& edge) const;
 		union
 		{
-			dUnsigned64 m_key;
+			ndUnsigned64 m_key;
 			struct
 			{
-				dInt32 m_i0;
-				dInt32 m_i1;
+				ndInt32 m_i0;
+				ndInt32 m_i1;
 			};
 		};
 	};
 
-	class ndEdgeMap : public ndTree<dInt32, ndEdge, ndContainersFreeListAlloc<dInt32>>
+	class ndEdgeMap : public ndTree<ndInt32, ndEdge, ndContainersFreeListAlloc<ndInt32>>
 	{
 		public:
 		ndEdgeMap();
@@ -54,15 +54,15 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 
 	D_CLASS_REFLECTION(ndShapeStaticProceduralMesh);
 	D_COLLISION_API ndShapeStaticProceduralMesh(const ndLoadSaveBase::dLoadDescriptor& desc);
-	D_COLLISION_API ndShapeStaticProceduralMesh(dFloat32 sizex, dFloat32 sizey, dFloat32 sizez);
+	D_COLLISION_API ndShapeStaticProceduralMesh(ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez);
 	D_COLLISION_API virtual ~ndShapeStaticProceduralMesh();
 
 	virtual ndShapeStaticProceduralMesh* GetAsShapeStaticProceduralMesh() { return this; }
 
-	virtual void GetCollidingFaces(const ndVector& minBox, const ndVector& maxBox, ndArray<ndVector>& vertex, ndArray<dInt32>& faceList, ndArray<dInt32>& faceMaterial, ndArray<dInt32>& indexListList) const;
+	virtual void GetCollidingFaces(const ndVector& minBox, const ndVector& maxBox, ndArray<ndVector>& vertex, ndArray<ndInt32>& faceList, ndArray<ndInt32>& faceMaterial, ndArray<ndInt32>& indexListList) const;
 
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
-	D_COLLISION_API void SetMaxVertexAndFaces(dInt32 maxVertex, dInt32 maxFaces);
+	D_COLLISION_API void SetMaxVertexAndFaces(ndInt32 maxVertex, ndInt32 maxFaces);
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	private:
@@ -85,13 +85,13 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	ndVector m_minBox;
 	ndVector m_maxBox;
 	mutable ndList<ndLocalThreadData> m_localData;
-	dInt32 m_maxFaceCount;
-	dInt32 m_maxVertexCount;
+	ndInt32 m_maxFaceCount;
+	ndInt32 m_maxVertexCount;
 
 	friend class ndContactSolver;
 };
 
-inline void ndShapeStaticProceduralMesh::GetCollidingFaces(const ndVector&, const ndVector&, ndArray<ndVector>&, ndArray<dInt32>&, ndArray<dInt32>&, ndArray<dInt32>&) const
+inline void ndShapeStaticProceduralMesh::GetCollidingFaces(const ndVector&, const ndVector&, ndArray<ndVector>&, ndArray<ndInt32>&, ndArray<ndInt32>&, ndArray<ndInt32>&) const
 {
 	dAssert(0);
 }
@@ -100,7 +100,7 @@ inline ndShapeStaticProceduralMesh::ndEdge::ndEdge()
 {
 }
 
-inline ndShapeStaticProceduralMesh::ndEdge::ndEdge(dUnsigned64 key)
+inline ndShapeStaticProceduralMesh::ndEdge::ndEdge(ndUnsigned64 key)
 	:m_key(key)
 {
 }
@@ -116,7 +116,7 @@ inline bool ndShapeStaticProceduralMesh::ndEdge::operator> (const ndEdge& edge) 
 }
 
 inline ndShapeStaticProceduralMesh::ndEdgeMap::ndEdgeMap()
-	:ndTree<dInt32, ndEdge, ndContainersFreeListAlloc<dInt32>>()
+	:ndTree<ndInt32, ndEdge, ndContainersFreeListAlloc<ndInt32>>()
 {
 }
 

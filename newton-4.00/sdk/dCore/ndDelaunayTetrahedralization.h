@@ -28,11 +28,11 @@
 class ndDelaunayTetrahedralization: public ndConvexHull4d
 {
 	public:
-	D_CORE_API ndDelaunayTetrahedralization(const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol);
+	D_CORE_API ndDelaunayTetrahedralization(const ndFloat64* const vertexCloud, ndInt32 count, ndInt32 strideInByte, ndFloat64 distTol);
 	D_CORE_API virtual ~ndDelaunayTetrahedralization();
 	D_CORE_API void RemoveUpperHull ();
 
-	D_CORE_API dInt32 AddVertex (const ndBigVector& vertex);
+	D_CORE_API ndInt32 AddVertex (const ndBigVector& vertex);
 
 	protected:
 	D_CORE_API void SortVertexArray();

@@ -35,30 +35,30 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 	D_NEWTON_API ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel);
 
 	bool GetStart() const;
-	dFloat32 GetRpm() const;
+	ndFloat32 GetRpm() const;
 
 	D_NEWTON_API void SetStart(bool startkey);
-	D_NEWTON_API void SetThrottle(dFloat32 param);
+	D_NEWTON_API void SetThrottle(ndFloat32 param);
 
-	D_NEWTON_API void SetRpmLimits(dFloat32 idle, dFloat32 redLineRpm);
+	D_NEWTON_API void SetRpmLimits(ndFloat32 idle, ndFloat32 redLineRpm);
 
-	D_NEWTON_API void SetFuelRate(dFloat32 radPerSecondsStep);
-	D_NEWTON_API void SetTorque(dFloat32 torqueInNewtonMeters);
+	D_NEWTON_API void SetFuelRate(ndFloat32 radPerSecondsStep);
+	D_NEWTON_API void SetTorque(ndFloat32 torqueInNewtonMeters);
 
 	private:
 	void AlignMatrix();
 	void DebugJoint(ndConstraintDebugCallback&) const {}
 	void JacobianDerivative(ndConstraintDescritor& desc);
 	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
-	dFloat32 CalculateAcceleration(ndConstraintDescritor& desc);
+	ndFloat32 CalculateAcceleration(ndConstraintDescritor& desc);
 
 	protected:
-	dFloat32 m_omega;
-	dFloat32 m_maxOmega;
-	dFloat32 m_idleOmega;
-	dFloat32 m_throttle;
-	dFloat32 m_engineTorque;
-	dFloat32 m_fuelValveRate;
+	ndFloat32 m_omega;
+	ndFloat32 m_maxOmega;
+	ndFloat32 m_idleOmega;
+	ndFloat32 m_throttle;
+	ndFloat32 m_engineTorque;
+	ndFloat32 m_fuelValveRate;
 	ndMultiBodyVehicle* m_vehicelModel;
 	bool m_startEngine;
 	friend class ndMultiBodyVehicle;
@@ -70,7 +70,7 @@ inline bool ndMultiBodyVehicleMotor::GetStart() const
 	return m_startEngine;
 }
 
-inline dFloat32 ndMultiBodyVehicleMotor::GetRpm() const
+inline ndFloat32 ndMultiBodyVehicleMotor::GetRpm() const
 {
 	return m_omega * dRadPerSecToRpm;
 }

@@ -38,11 +38,11 @@ class ndDemoSubMesh
 	public:
 	ndDemoSubMesh();
 	~ndDemoSubMesh();
-	void SetOpacity(dFloat32 opacity);
+	void SetOpacity(ndFloat32 opacity);
 
 	ndDemoSubMeshMaterial m_material;
-	dInt32 m_indexCount;
-	dInt32 m_segmentStart;
+	ndInt32 m_indexCount;
+	ndInt32 m_segmentStart;
 	bool m_hasTranparency;
 };
 
@@ -53,7 +53,7 @@ class ndDemoMeshInterface: public ndRefCounter<ndDemoMeshInterface>
 	~ndDemoMeshInterface();
 	const ndString& GetName () const;
 
-	dInt32 Release();
+	ndInt32 Release();
 	bool GetVisible () const;
 	void SetVisible (bool visibilityFlag);
 

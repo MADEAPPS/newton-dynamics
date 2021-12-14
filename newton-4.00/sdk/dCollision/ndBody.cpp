@@ -25,7 +25,7 @@
 #include "ndContact.h"
 #include "ndBodyNotify.h"
 
-dUnsigned32 ndBody::m_uniqueIdCount = 0;
+ndUnsigned32 ndBody::m_uniqueIdCount = 0;
 
 ndBody::ndBody()
 	:ndContainersFreeListAlloc<ndBody>()
@@ -115,7 +115,7 @@ void ndBody::SetCentreOfMass(const ndVector& com)
 	m_localCentreOfMass.m_x = com.m_x;
 	m_localCentreOfMass.m_y = com.m_y;
 	m_localCentreOfMass.m_z = com.m_z;
-	m_localCentreOfMass.m_w = dFloat32(1.0f);
+	m_localCentreOfMass.m_w = ndFloat32(1.0f);
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
 }
 
@@ -150,7 +150,7 @@ void ndBody::SetMatrix(const ndMatrix& matrix)
 	m_equilibrium = 0;
 	m_transformIsDirty = 1;
 	m_matrix = matrix;
-	dAssert(m_matrix.TestOrthogonal(dFloat32(1.0e-4f)));
+	dAssert(m_matrix.TestOrthogonal(ndFloat32(1.0e-4f)));
 
 	m_rotation = ndQuaternion(m_matrix);
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);

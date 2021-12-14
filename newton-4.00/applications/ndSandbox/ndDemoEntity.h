@@ -25,7 +25,7 @@ class ndDemoEntityNotify: public ndBodyNotify
 	public:
 	D_CLASS_REFLECTION(ndDemoEntityNotify);
 	ndDemoEntityNotify(const ndLoadSaveBase::dLoadDescriptor& desc);
-	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody = nullptr, dFloat32 gravity = DEMO_GRAVITY);
+	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody = nullptr, ndFloat32 gravity = DEMO_GRAVITY);
 	virtual ~ndDemoEntityNotify();
 
 	void* GetUserData() const
@@ -34,8 +34,8 @@ class ndDemoEntityNotify: public ndBodyNotify
 	}
 
 	virtual void OnObjectPick() const;
-	virtual void OnTransform(dInt32 threadIndex, const ndMatrix& matrix);
-	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep);
+	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
+	virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);
 
 	virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
@@ -59,7 +59,7 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 		{
 		}
 		
-		virtual void OnRender (dFloat32 timestep) const = 0;
+		virtual void OnRender (ndFloat32 timestep) const = 0;
 	};
 
 	ndDemoEntity(const ndDemoEntity& copyFrom);
@@ -86,13 +86,13 @@ class ndDemoEntity : public ndNodeHierarchy<ndDemoEntity>
 	virtual void SetMatrix(const ndQuaternion& rotation, const ndVector& position);
 	virtual void SetNextMatrix (const ndQuaternion& rotation, const ndVector& position);
 	virtual void ResetMatrix(const ndMatrix& matrix);
-	virtual void InterpolateMatrix (dFloat32 param);
+	virtual void InterpolateMatrix (ndFloat32 param);
 	ndMatrix CalculateInterpolatedGlobalMatrix (const ndDemoEntity* const root = nullptr) const;
 
 	void RenderBone() const;
 	ndShapeInstance* CreateCollisionFromchildren() const;
 
-	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
+	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
 	protected:
 	mutable ndMatrix m_matrix;			// interpolated matrix

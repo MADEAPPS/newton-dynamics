@@ -24,37 +24,37 @@
 #include "ndGeneralMatrix.h"
 #include "ndSpatialMatrix.h"
 
-ndSpatialMatrix ndSpatialMatrix::Inverse(dInt32 rows) const
+ndSpatialMatrix ndSpatialMatrix::Inverse(ndInt32 rows) const
 {
 	ndSpatialMatrix tmp;
 	ndSpatialMatrix inv;
-	for (dInt32 i = 0; i < rows; i++) 
+	for (ndInt32 i = 0; i < rows; i++) 
 	{
 		tmp[i] = (*this)[i];
 		inv[i] = ndSpatialVector::m_zero;
-		inv[i][i] = dFloat32(1.0f);
+		inv[i][i] = ndFloat32(1.0f);
 	}
 
-	for (dInt32 i = 0; i < rows; i++) 
+	for (ndInt32 i = 0; i < rows; i++) 
 	{
-		dFloat64 pivot = dAbs(tmp[i][i]);
-		if (pivot < dFloat64(0.01f)) 
+		ndFloat64 pivot = dAbs(tmp[i][i]);
+		if (pivot < ndFloat64(0.01f)) 
 		{
-			dInt32 permute = i;
-			for (dInt32 j = i + 1; j < rows; j++) 
+			ndInt32 permute = i;
+			for (ndInt32 j = i + 1; j < rows; j++) 
 			{
-				dFloat64 pivot1 = dAbs(tmp[j][i]);
+				ndFloat64 pivot1 = dAbs(tmp[j][i]);
 				if (pivot1 > pivot) {
 					permute = j;
 					pivot = pivot1;
 				}
 			}
-			dAssert(pivot > dFloat32(0.0f));
-			dAssert((pivot > dFloat32(1.0e-6f)) || (dConditionNumber(rows, 6, (dFloat64*)&m_rows[0]) < dFloat32(1.0e5f)));
-			//if (!((pivot > dFloat32(1.0e-6f)) || (dConditionNumber(rows, 6, (dFloat64*)&m_rows[0]) < dFloat32(1.0e5f))))
+			dAssert(pivot > ndFloat32(0.0f));
+			dAssert((pivot > ndFloat32(1.0e-6f)) || (dConditionNumber(rows, 6, (ndFloat64*)&m_rows[0]) < ndFloat32(1.0e5f)));
+			//if (!((pivot > ndFloat32(1.0e-6f)) || (dConditionNumber(rows, 6, (dFloat64*)&m_rows[0]) < ndFloat32(1.0e5f))))
 			//{
-			//	for (dInt32 m = 0; m < rows; m++) {
-			//		for (dInt32 n = 0; n < rows; n++) {
+			//	for (ndInt32 m = 0; m < rows; m++) {
+			//		for (ndInt32 n = 0; n < rows; n++) {
 			//			dTrace(("%f ", m_rows[m][n]));
 			//		}
 			//		dTrace(("\n"));
@@ -64,7 +64,7 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(dInt32 rows) const
 
 			if (permute != i) 
 			{
-				for (dInt32 j = 0; j < rows; j++) 
+				for (ndInt32 j = 0; j < rows; j++) 
 				{
 					dSwap(tmp[i][j], tmp[permute][j]);
 					dSwap(tmp[i][j], tmp[permute][j]);
@@ -72,34 +72,34 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(dInt32 rows) const
 			}
 		}
 
-		for (dInt32 j = i + 1; j < rows; j++) 
+		for (ndInt32 j = i + 1; j < rows; j++) 
 		{
-			dFloat64 scale = tmp[j][i] / tmp[i][i];
-			tmp[j][i] = dFloat64(0.0f);
-			for (dInt32 k = i + 1; k < rows; k++) 
+			ndFloat64 scale = tmp[j][i] / tmp[i][i];
+			tmp[j][i] = ndFloat64(0.0f);
+			for (ndInt32 k = i + 1; k < rows; k++) 
 			{
 				tmp[j][k] -= scale * tmp[i][k];
 			}
-			for (dInt32 k = 0; k <= i; k++) 
+			for (ndInt32 k = 0; k <= i; k++) 
 			{
 				inv[j][k] -= scale * inv[i][k];
 			}
 		}
 	}
 
-	for (dInt32 i = rows - 1; i >= 0; i--) 
+	for (ndInt32 i = rows - 1; i >= 0; i--) 
 	{
-		ndSpatialVector acc(dFloat64(0.0f));
-		for (dInt32 j = i + 1; j < rows; j++) 
+		ndSpatialVector acc(ndFloat64(0.0f));
+		for (ndInt32 j = i + 1; j < rows; j++) 
 		{
-			dFloat64 pivot = tmp[i][j];
-			for (dInt32 k = 0; k < rows; k++) 
+			ndFloat64 pivot = tmp[i][j];
+			for (ndInt32 k = 0; k < rows; k++) 
 			{
 				acc[k] += pivot * inv[j][k];
 			}
 		}
-		dFloat64 den = dFloat64(1.0f) / tmp[i][i];
-		for (dInt32 k = 0; k < rows; k++) 
+		ndFloat64 den = ndFloat64(1.0f) / tmp[i][i];
+		for (ndInt32 k = 0; k < rows; k++) 
 		{
 			inv[i][k] = den * (inv[i][k] - acc[k]);
 		}
@@ -107,23 +107,23 @@ ndSpatialMatrix ndSpatialMatrix::Inverse(dInt32 rows) const
 
 
 #ifdef _DEBUG
-	for (dInt32 i = 0; i < rows; i++) 
+	for (ndInt32 i = 0; i < rows; i++) 
 	{
-		for (dInt32 j = 0; j < rows; j++) 
+		for (ndInt32 j = 0; j < rows; j++) 
 		{
 			tmp[i][j] = m_rows[j][i];
 		}
 	}
 
-	for (dInt32 i = 0; i < rows; i++) 
+	for (ndInt32 i = 0; i < rows; i++) 
 	{
 		ndSpatialVector v(inv.VectorTimeMatrix(tmp[i], rows));
-		dAssert(dAbs(v[i] - dFloat64(1.0f)) < dFloat64(1.0e-6f));
-		for (dInt32 j = 0; j < rows; j++) 
+		dAssert(dAbs(v[i] - ndFloat64(1.0f)) < ndFloat64(1.0e-6f));
+		for (ndInt32 j = 0; j < rows; j++) 
 		{
 			if (j != i) 
 			{
-				dAssert(dAbs(v[j]) < dFloat64(1.0e-6f));
+				dAssert(dAbs(v[j]) < ndFloat64(1.0e-6f));
 			}
 		}
 	}

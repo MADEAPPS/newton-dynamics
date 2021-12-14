@@ -24,68 +24,68 @@
 
 #include "ndCoreStdafx.h"
 
-template<class T, dInt32 maxSize>
+template<class T, ndInt32 maxSize>
 class ndFixSizeArray: public ndClassAlloc
 {
 	public:
 	ndFixSizeArray();
 
-	dInt32 GetCount() const;
-	void SetCount(dInt32 count);
+	ndInt32 GetCount() const;
+	void SetCount(ndInt32 count);
 
-	dInt32 GetCapacity() const;
+	ndInt32 GetCapacity() const;
 
-	T& operator[] (dInt32 i);
-	const T& operator[] (dInt32 i) const;
+	T& operator[] (ndInt32 i);
+	const T& operator[] (ndInt32 i) const;
 
 	void PushBack(const T& element);
 
 	T m_array[maxSize];
-	dInt32 m_count;
+	ndInt32 m_count;
 };
 
-template<class T, dInt32 maxSize>
+template<class T, ndInt32 maxSize>
 ndFixSizeArray<T, maxSize>::ndFixSizeArray()
 	:ndClassAlloc()
 	,m_count(0)
 {
 }
 
-template<class T, dInt32 maxSize>
-dInt32 ndFixSizeArray<T, maxSize>::GetCapacity() const
+template<class T, ndInt32 maxSize>
+ndInt32 ndFixSizeArray<T, maxSize>::GetCapacity() const
 {
 	return maxSize;
 }
 
-template<class T, dInt32 maxSize>
-dInt32 ndFixSizeArray<T, maxSize>::GetCount() const
+template<class T, ndInt32 maxSize>
+ndInt32 ndFixSizeArray<T, maxSize>::GetCount() const
 {
 	return m_count;
 }
 
-template<class T, dInt32 maxSize>
-void ndFixSizeArray<T, maxSize>::SetCount(dInt32 count)
+template<class T, ndInt32 maxSize>
+void ndFixSizeArray<T, maxSize>::SetCount(ndInt32 count)
 {
 	m_count = (count < 0) ? 0 : ((count > maxSize) ? maxSize : count);
 }
 
-template<class T, dInt32 maxSize>
-T& ndFixSizeArray<T, maxSize>::operator[] (dInt32 i)
+template<class T, ndInt32 maxSize>
+T& ndFixSizeArray<T, maxSize>::operator[] (ndInt32 i)
 {
 	dAssert(i >= 0);
 	dAssert(i < maxSize);
 	return m_array[i];
 }
 
-template<class T, dInt32 maxSize>
-const T& ndFixSizeArray<T, maxSize>::operator[] (dInt32 i) const
+template<class T, ndInt32 maxSize>
+const T& ndFixSizeArray<T, maxSize>::operator[] (ndInt32 i) const
 {
 	dAssert(i >= 0);
 	dAssert(i < maxSize);
 	return m_array[i];
 }
 
-template<class T, dInt32 maxSize>
+template<class T, ndInt32 maxSize>
 void ndFixSizeArray<T, maxSize>::PushBack(const T& element)
 {
 	dAssert(m_count <= maxSize);

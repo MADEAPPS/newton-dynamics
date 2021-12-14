@@ -44,7 +44,7 @@ void ndJointFollowPath::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix (matrix0, matrix1);
 	
 	GetPointAndTangentAtLocation(matrix0.m_posit, pathPosit, pathTangent);
-	if (pathTangent.DotProduct(matrix0.m_front).GetScalar() < dFloat32 (0.0f)) 
+	if (pathTangent.DotProduct(matrix0.m_front).GetScalar() < ndFloat32 (0.0f)) 
 	{
 		pathTangent = pathTangent.Scale (-1.0f);
 	}

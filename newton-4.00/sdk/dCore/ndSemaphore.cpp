@@ -36,7 +36,7 @@ ndSemaphore::~ndSemaphore()
 {
 }
 
-dInt32 ndSemaphore::GetCount() const
+ndInt32 ndSemaphore::GetCount() const
 {
 #ifdef D_USE_THREAD_EMULATION
 	return 0;

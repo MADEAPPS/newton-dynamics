@@ -81,17 +81,17 @@ void ndDemoCameraManager::SetCameraMatrix(const ndQuaternion& rotation, const nd
 	m_pitch = m_camera->GetPichAngle();
 }
 
-void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 timestep)
+void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, ndFloat32 timestep)
 {
 	// update the camera;
 	ndMatrix targetMatrix (m_camera->GetNextMatrix());
 
-	dFloat32 mouseX;
-	dFloat32 mouseY;
+	ndFloat32 mouseX;
+	ndFloat32 mouseY;
 	scene->GetMousePosition (mouseX, mouseY);
 	
 	// slow down the Camera if we have a Body
-	dFloat32 slowDownFactor = scene->IsShiftKeyDown() ? 0.5f/10.0f : 0.5f;
+	ndFloat32 slowDownFactor = scene->IsShiftKeyDown() ? 0.5f/10.0f : 0.5f;
 
 	// do camera translation
 	if (scene->GetKeyState ('W')) 
@@ -127,8 +127,8 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	bool buttonState = m_mouseLockState || mouseState;
 	if (!m_targetPicked && buttonState) 
 	{
-		dFloat32 mouseSpeedX = mouseX - m_mousePosX;
-		dFloat32 mouseSpeedY = mouseY - m_mousePosY;
+		ndFloat32 mouseSpeedX = mouseX - m_mousePosX;
+		ndFloat32 mouseSpeedY = mouseY - m_mousePosY;
 
 		//if ((ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0))) 
 		if (ImGui::IsMouseDown(0))
@@ -150,7 +150,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 			{
 				m_pitch -= m_pitchRate;
 			}
-			m_pitch = dClamp(m_pitch, dFloat32 (-80.0f * dDegreeToRad), dFloat32 (80.0f * dDegreeToRad));
+			m_pitch = dClamp(m_pitch, ndFloat32 (-80.0f * ndDegreeToRad), ndFloat32 (80.0f * ndDegreeToRad));
 		}
 	}
 
@@ -171,7 +171,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	{
 		ndVector m_p0;
 		ndVector m_p1;
-		dInt32 m_mouseState;
+		ndInt32 m_mouseState;
 	};
 	ndReplay replay;
 
@@ -221,7 +221,7 @@ void ndDemoCameraManager::RenderPickedTarget () const
 	}
 }
 
-void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene, dFloat32 param)
+void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene, ndFloat32 param)
 {
 	// interpolate the location of all entities in the world
 	ndWorld* const world = scene->GetWorld();
@@ -239,14 +239,14 @@ void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene,
 	world->UpdateTransformsUnlock();
 }
 
-void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool mousePickState, const ndVector& p0, const ndVector& p1, dFloat32) 
+void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool mousePickState, const ndVector& p0, const ndVector& p1, ndFloat32) 
 {
 	// handle pick body from the screen
 	if (!m_targetPicked) 
 	{
 		if (!m_prevMouseState && mousePickState) 
 		{
-			dFloat32 param;
+			ndFloat32 param;
 			ndVector posit;
 			ndVector normal;
 		
@@ -270,10 +270,10 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 					ndVector mass(m_targetPicked->GetMassMatrix());
 
 					//change this to make the grabbing stronger or weaker
-					//const dFloat32 angularFritionAccel = 10.0f;
-					const dFloat32 angularFritionAccel = 10.0f;
-					const dFloat32 linearFrictionAccel = 40.0f * dMax(dAbs(DEMO_GRAVITY), dFloat32(10.0f));
-					const dFloat32 inertia = dMax(mass.m_z, dMax(mass.m_x, mass.m_y));
+					//const ndFloat32 angularFritionAccel = 10.0f;
+					const ndFloat32 angularFritionAccel = 10.0f;
+					const ndFloat32 linearFrictionAccel = 40.0f * dMax(dAbs(DEMO_GRAVITY), ndFloat32(10.0f));
+					const ndFloat32 inertia = dMax(mass.m_z, dMax(mass.m_x, mass.m_y));
 
 					m_pickJoint = new ndDemoCameraPickBodyJoint(body, scene->GetWorld()->GetSentinelBody(), posit, this);
 					scene->GetWorld()->AddJoint(m_pickJoint);

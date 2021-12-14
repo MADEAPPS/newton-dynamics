@@ -24,7 +24,7 @@ class ndPhysicsWorld: public ndWorld
 	ndPhysicsWorld(ndDemoEntityManager* const manager);
 	virtual ~ndPhysicsWorld();
 
-	void AdvanceTime(dFloat32 timestep);
+	void AdvanceTime(ndFloat32 timestep);
 	ndDemoEntityManager* GetManager() const;
 	ndSoundManager* GetSoundManager() const;
 
@@ -36,11 +36,11 @@ class ndPhysicsWorld: public ndWorld
 
 	private:
 	void DeletePendingObjects();
-	void OnPostUpdate(dFloat32 timestep);
+	void OnPostUpdate(ndFloat32 timestep);
 
 	ndDemoEntityManager* m_manager;
 	ndSoundManager* m_soundManager;
-	dFloat32 m_timeAccumulator;
+	ndFloat32 m_timeAccumulator;
 	ndArray<ndBody*> m_deletedBodies;
 	ndAtomic<bool> m_hasPendingObjectToDelete;
 	ndSpinLock m_deletedLock;

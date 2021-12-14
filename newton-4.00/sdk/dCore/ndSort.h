@@ -28,16 +28,16 @@
 #include "ndThreadPool.h"
 
 template <class T, class CompareKey>
-void ndBinarySearch(T* const array, dInt32 elements, void* const context = nullptr)
+void ndBinarySearch(T* const array, ndInt32 elements, void* const context = nullptr)
 {
 	dAssert(0);
-	//dInt32 index0 = 0;
-	//dInt32 index2 = elements - 1;
+	//ndInt32 index0 = 0;
+	//ndInt32 index2 = elements - 1;
 	//
 	//while ((index2 - index0) > 4) 
 	//{
-	//	dInt32 index1 = (index0 + index2) >> 1;
-	//	dInt32 test = compare(&array[index1], &entry, context);
+	//	ndInt32 index1 = (index0 + index2) >> 1;
+	//	ndInt32 test = compare(&array[index1], &entry, context);
 	//	if (test < 0) 
 	//	{
 	//		index0 = index1;
@@ -50,10 +50,10 @@ void ndBinarySearch(T* const array, dInt32 elements, void* const context = nullp
 	//
 	//index0 = (index0 > 0) ? index0 - 1 : 0;
 	//index2 = ((index2 + 1) < elements) ? index2 + 1 : elements;
-	//dInt32 index = index0 - 1;
-	//for (dInt32 i = index0; i < index2; i++) 
+	//ndInt32 index = index0 - 1;
+	//for (ndInt32 i = index0; i < index2; i++) 
 	//{
-	//	dInt32 test = compare(&array[i], &entry, context);
+	//	ndInt32 test = compare(&array[i], &entry, context);
 	//	if (!test) 
 	//	{
 	//		return i;
@@ -68,24 +68,24 @@ void ndBinarySearch(T* const array, dInt32 elements, void* const context = nullp
 }
 
 template <class T, class dCompareKey>
-void ndSort(T* const array, dInt32 elements, void* const context = nullptr)
+void ndSort(T* const array, ndInt32 elements, void* const context = nullptr)
 {
 	D_TRACKTIME();
-	const dInt32 batchSize = 8;
-	dInt32 stack[1024][2];
+	const ndInt32 batchSize = 8;
+	ndInt32 stack[1024][2];
 
 	stack[0][0] = 0;
 	stack[0][1] = elements - 1;
-	dInt32 stackIndex = 1;
+	ndInt32 stackIndex = 1;
 	const dCompareKey comparator;
 	while (stackIndex)
 	{
 		stackIndex--;
-		dInt32 lo = stack[stackIndex][0];
-		dInt32 hi = stack[stackIndex][1];
+		ndInt32 lo = stack[stackIndex][0];
+		ndInt32 hi = stack[stackIndex][1];
 		if ((hi - lo) > batchSize)
 		{
-			dInt32 mid = (lo + hi) >> 1;
+			ndInt32 mid = (lo + hi) >> 1;
 			if (comparator.Compare(array[lo], array[mid], context) > 0)
 			{
 				dSwap(array[lo], array[mid]);
@@ -98,8 +98,8 @@ void ndSort(T* const array, dInt32 elements, void* const context = nullptr)
 			{
 				dSwap(array[lo], array[mid]);
 			}
-			dInt32 i = lo + 1;
-			dInt32 j = hi - 1;
+			ndInt32 i = lo + 1;
+			ndInt32 j = hi - 1;
 			const T pivot(array[mid]);
 			do
 			{
@@ -126,16 +126,16 @@ void ndSort(T* const array, dInt32 elements, void* const context = nullptr)
 				stack[stackIndex][1] = j;
 				stackIndex++;
 			}
-			dAssert(stackIndex < dInt32(sizeof(stack) / (2 * sizeof(stack[0][0]))));
+			dAssert(stackIndex < ndInt32(sizeof(stack) / (2 * sizeof(stack[0][0]))));
 		}
 	}
 
-	dInt32 stride = batchSize + 1;
+	ndInt32 stride = batchSize + 1;
 	if (elements < stride)
 	{
 		stride = elements;
 	}
-	for (dInt32 i = 1; i < stride; i++)
+	for (ndInt32 i = 1; i < stride; i++)
 	{
 		if (comparator.Compare(array[0], array[i], context) > 0)
 		{
@@ -143,9 +143,9 @@ void ndSort(T* const array, dInt32 elements, void* const context = nullptr)
 		}
 	}
 
-	for (dInt32 i = 1; i < elements; i++)
+	for (ndInt32 i = 1; i < elements; i++)
 	{
-		dInt32 j = i;
+		ndInt32 j = i;
 		const T tmp(array[i]);
 		for (; comparator.Compare(array[j - 1], tmp, context) > 0; j--)
 		{
@@ -156,46 +156,46 @@ void ndSort(T* const array, dInt32 elements, void* const context = nullptr)
 	}
 
 	#ifdef _DEBUG
-		for (dInt32 i = 0; i < (elements - 1); i++)
+		for (ndInt32 i = 0; i < (elements - 1); i++)
 		{
 			dAssert(comparator.Compare(array[i], array[i + 1], context) <= 0);
 		}
 	#endif
 }
 
-template <class T, dInt32 bits, class nEvaluateKey, class dKey>
-void ndCountingSort(T* const array, T* const scratchBuffer, dInt32 elementsCount, dInt32 digitLocation)
+template <class T, ndInt32 bits, class nEvaluateKey, class dKey>
+void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 elementsCount, ndInt32 digitLocation)
 {
 	dAssert(0);
-//	dInt32 scanCount[256];
-//	dInt32 histogram[256][4];
+//	ndInt32 scanCount[256];
+//	ndInt32 histogram[256][4];
 //
 //	dAssert(radixPass >= 1);
 //	dAssert(radixPass <= 4);
 //
 //	memset(histogram, 0, sizeof(histogram));
-//	for (dInt32 i = 0; i < elements; i++)
+//	for (ndInt32 i = 0; i < elements; i++)
 //	{
-//		dInt32 key = getRadixKey(&array[i], context);
-//		for (dInt32 j = 0; j < radixPass; j++)
+//		ndInt32 key = getRadixKey(&array[i], context);
+//		for (ndInt32 j = 0; j < radixPass; j++)
 //		{
-//			dInt32 radix = (key >> (j << 3)) & 0xff;
+//			ndInt32 radix = (key >> (j << 3)) & 0xff;
 //			histogram[radix][j] = histogram[radix][j] + 1;
 //		}
 //	}
 //
-//	for (dInt32 radix = 0; radix < radixPass; radix += 2)
+//	for (ndInt32 radix = 0; radix < radixPass; radix += 2)
 //	{
 //		scanCount[0] = 0;
-//		for (dInt32 i = 1; i < 256; i++)
+//		for (ndInt32 i = 1; i < 256; i++)
 //		{
 //			scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix];
 //		}
-//		dInt32 radixShift = radix << 3;
-//		for (dInt32 i = 0; i < elements; i++)
+//		ndInt32 radixShift = radix << 3;
+//		for (ndInt32 i = 0; i < elements; i++)
 //		{
-//			dInt32 key = (getRadixKey(&array[i], context) >> radixShift) & 0xff;
-//			dInt32 index = scanCount[key];
+//			ndInt32 key = (getRadixKey(&array[i], context) >> radixShift) & 0xff;
+//			ndInt32 index = scanCount[key];
 //			tmpArray[index] = array[i];
 //			scanCount[key] = index + 1;
 //		}
@@ -203,15 +203,15 @@ void ndCountingSort(T* const array, T* const scratchBuffer, dInt32 elementsCount
 //		if ((radix + 1) < radixPass)
 //		{
 //			scanCount[0] = 0;
-//			for (dInt32 i = 1; i < 256; i++) {
+//			for (ndInt32 i = 1; i < 256; i++) {
 //				scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix + 1];
 //			}
 //
-//			dInt32 radixShift = (radix + 1) << 3;
-//			for (dInt32 i = 0; i < elements; i++)
+//			ndInt32 radixShift = (radix + 1) << 3;
+//			for (ndInt32 i = 0; i < elements; i++)
 //			{
-//				dInt32 key = (getRadixKey(&array[i], context) >> radixShift) & 0xff;
-//				dInt32 index = scanCount[key];
+//				ndInt32 key = (getRadixKey(&array[i], context) >> radixShift) & 0xff;
+//				ndInt32 index = scanCount[key];
 //				array[index] = tmpArray[i];
 //				scanCount[key] = index + 1;
 //			}
@@ -223,7 +223,7 @@ void ndCountingSort(T* const array, T* const scratchBuffer, dInt32 elementsCount
 //	}
 //
 //#ifdef _DEBUG
-//	for (dInt32 i = 0; i < (elements - 1); i++)
+//	for (ndInt32 i = 0; i < (elements - 1); i++)
 //	{
 //		dAssert(getRadixKey(&array[i], context) <= getRadixKey(&array[i + 1], context));
 //	}

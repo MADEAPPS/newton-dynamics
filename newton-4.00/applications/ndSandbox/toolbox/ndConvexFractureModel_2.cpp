@@ -90,7 +90,7 @@ ndConvexFractureModel_2::ndEffect::ndEffect(ndConvexFractureModel_2* const manag
 	ndMeshEffect* nextDebris;
 	ndMatrix translateMatrix(dGetIdentityMatrix());
 
-	dFloat32 volume = dFloat32(mesh.CalculateVolume());
+	ndFloat32 volume = ndFloat32(mesh.CalculateVolume());
 	ndDemoEntityManager* const scene = manager->m_scene;
 
 	ndArray<glDebrisPoint> vertexArray;
@@ -105,7 +105,7 @@ ndConvexFractureModel_2::ndEffect::ndEffect(ndConvexFractureModel_2* const manag
 		if (fracturePiece)
 		{
 			// make a convex hull collision shape
-			ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
+			ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(ndFloat32(0.0f));
 			if (collision)
 			{
 				// we have a piece which has a convex collision  representation, add that to the list
@@ -117,7 +117,7 @@ ndConvexFractureModel_2::ndEffect::ndEffect(ndConvexFractureModel_2* const manag
 				atom.m_centerOfMass = inertia.m_posit;
 
 				// get the mass fraction;
-				dFloat32 debriVolume = collision->GetVolume();
+				ndFloat32 debriVolume = collision->GetVolume();
 				atom.m_massFraction = debriVolume / volume;
 
 				// set the collision shape
@@ -128,9 +128,9 @@ ndConvexFractureModel_2::ndEffect::ndEffect(ndConvexFractureModel_2* const manag
 				translateMatrix.m_posit = atom.m_centerOfMass.Scale(-1.0f);
 				translateMatrix.m_posit.m_w = 1.0f;
 				fracturePiece->ApplyTransform(translateMatrix);
-				ndShapeInstance* const inertiaShape = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
+				ndShapeInstance* const inertiaShape = fracturePiece->CreateConvexCollision(ndFloat32(0.0f));
 				ndMatrix momentOfInertia(inertiaShape->CalculateInertia());
-				atom.m_momentOfInertia = ndVector(momentOfInertia[0][0], momentOfInertia[1][1], momentOfInertia[2][2], dFloat32(0.0f));
+				atom.m_momentOfInertia = ndVector(momentOfInertia[0][0], momentOfInertia[1][1], momentOfInertia[2][2], ndFloat32(0.0f));
 				delete inertiaShape;
 			}
 			delete fracturePiece;
@@ -197,8 +197,8 @@ ndConvexFractureModel_2::~ndConvexFractureModel_2()
 {
 }
 
-//void ndConvexFractureModel_2::Update(ndWorld* const world, dFloat32 timestep)
-void ndConvexFractureModel_2::Update(ndWorld* const, dFloat32)
+//void ndConvexFractureModel_2::Update(ndWorld* const world, ndFloat32 timestep)
+void ndConvexFractureModel_2::Update(ndWorld* const, ndFloat32)
 {
 	dAssert(0);
 	ndList<ndEffect>::ndNode* nextNody;
@@ -207,7 +207,7 @@ void ndConvexFractureModel_2::Update(ndWorld* const, dFloat32)
 		nextNody = node->GetNext();
 		ndEffect& effect = node->GetInfo();
 
-		dFloat32 maxImpactImpulse = 0.0f;
+		ndFloat32 maxImpactImpulse = 0.0f;
 		const ndBodyKinematic::ndContactMap& contactMap = effect.m_body->GetContactMap();
 		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
 		for (it.Begin(); it; it++)
@@ -219,7 +219,7 @@ void ndConvexFractureModel_2::Update(ndWorld* const, dFloat32)
 				for (ndContactPointList::ndNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 				{
 					const ndContactMaterial& contactPoint = contactNode->GetInfo();
-					const dFloat32 impulseImpact = contactPoint.m_normal_Force.m_impact;
+					const ndFloat32 impulseImpact = contactPoint.m_normal_Force.m_impact;
 					if (impulseImpact > maxImpactImpulse)
 					{
 						maxImpactImpulse = impulseImpact;
@@ -228,7 +228,7 @@ void ndConvexFractureModel_2::Update(ndWorld* const, dFloat32)
 			}
 		}
 
-		dFloat32 impactSpeed = maxImpactImpulse * effect.m_body->GetInvMass();
+		ndFloat32 impactSpeed = maxImpactImpulse * effect.m_body->GetInvMass();
 		if (impactSpeed >= effect.m_breakImpactSpeed)
 		{
 			ndScopeSpinLock lock(m_lock);
@@ -238,8 +238,8 @@ void ndConvexFractureModel_2::Update(ndWorld* const, dFloat32)
 	}
 }
 
-//void ndConvexFractureModel_2::PostUpdate(ndWorld* const world, dFloat32 timestep)
-void ndConvexFractureModel_2::PostUpdate(ndWorld* const world, dFloat32)
+//void ndConvexFractureModel_2::PostUpdate(ndWorld* const world, ndFloat32 timestep)
+void ndConvexFractureModel_2::PostUpdate(ndWorld* const world, ndFloat32)
 {
 	dAssert(0);
 	if (m_pendingEffect.GetCount())
@@ -257,7 +257,7 @@ void ndConvexFractureModel_2::PostUpdate(ndWorld* const world, dFloat32)
 	}
 }
 
-void ndConvexFractureModel_2::AddEffect(const ndEffect& effect, dFloat32 mass, const ndMatrix& location)
+void ndConvexFractureModel_2::AddEffect(const ndEffect& effect, ndFloat32 mass, const ndMatrix& location)
 {
 	dAssert(0);
 	ndEffect& newEffect = m_effectList.Append(effect)->GetInfo();
@@ -274,13 +274,13 @@ void ndConvexFractureModel_2::AddEffect(const ndEffect& effect, dFloat32 mass, c
 	body->SetMassMatrix(mass, *effect.m_shape);
 }
 
-void ndConvexFractureModel_2::ExplodeLocation(ndBodyDynamic* const body, const ndMatrix& location, dFloat32 factor) const
+void ndConvexFractureModel_2::ExplodeLocation(ndBodyDynamic* const body, const ndMatrix& location, ndFloat32 factor) const
 {
 	dAssert(0);
 	ndVector center(location.TransformVector(body->GetCentreOfMass()));
 	ndVector radios((center - location.m_posit) & ndVector::m_triplexMask);
 	ndVector dir(radios.Normalize());
-	dFloat32 lenght = dSqrt(radios.DotProduct(radios).GetScalar());
+	ndFloat32 lenght = ndSqrt(radios.DotProduct(radios).GetScalar());
 	dir = dir.Scale(lenght * factor);
 	ndMatrix matrix(location);
 	matrix.m_posit += dir;
@@ -316,7 +316,7 @@ void ndConvexFractureModel_2::UpdateEffect(ndWorld* const world, ndEffect& effec
 		ndDemoDebrisEntity* const entity = atom.m_mesh;
 		entity->SetMatrix(rotation, matrix.m_posit);
 
-		dFloat32 debriMass = massMatrix.m_w * atom.m_massFraction;
+		ndFloat32 debriMass = massMatrix.m_w * atom.m_massFraction;
 
 		// calculate debris initial velocity
 		ndVector center(matrix.TransformVector(atom.m_centerOfMass));
@@ -333,7 +333,7 @@ void ndConvexFractureModel_2::UpdateEffect(ndWorld* const world, ndEffect& effec
 		debriMassMatrix.m_w = debriMass;
 		body->SetMassMatrix(debriMassMatrix);
 		body->SetCentreOfMass(atom.m_centerOfMass);
-		body->SetAngularDamping(ndVector(dFloat32(0.1f)));
+		body->SetAngularDamping(ndVector(ndFloat32(0.1f)));
 
 		body->SetOmega(omega);
 		body->SetVelocity(debriVeloc);

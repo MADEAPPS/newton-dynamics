@@ -24,13 +24,13 @@ class ndString: public ndClassAlloc
 	D_CORE_API ndString (char chr);
 	D_CORE_API ndString (const ndString& src);
 	D_CORE_API ndString (const char* const data);
-	D_CORE_API ndString (const char* const data, dInt32 maxSize);
-	D_CORE_API ndString (dInt32 val);
-	D_CORE_API ndString (dUnsigned64 val);
+	D_CORE_API ndString (const char* const data, ndInt32 maxSize);
+	D_CORE_API ndString (ndInt32 val);
+	D_CORE_API ndString (ndUnsigned64 val);
 	D_CORE_API ~ndString ();
 
-	char& operator[] (dInt32 index);
-	char operator[] (dInt32 index) const;
+	char& operator[] (ndInt32 index);
+	char operator[] (ndInt32 index) const;
 	
 	D_CORE_API ndString& operator= (const ndString& src);
 	bool operator== (const ndString& src) const;
@@ -46,52 +46,52 @@ class ndString: public ndClassAlloc
 	ndString operator+ (const char* const src) const;
 	ndString operator+ (const ndString& src) const;
 
-	D_CORE_API dInt32 Find (char ch, dInt32 from = 0) const;
-	dInt32 Find (const ndString& subString, dInt32 from = 0) const;
-	D_CORE_API dInt32 Find (const char* const subString, dInt32 from = 0, dInt32 lenght = 0x7ffffff) const;
+	D_CORE_API ndInt32 Find (char ch, ndInt32 from = 0) const;
+	ndInt32 Find (const ndString& subString, ndInt32 from = 0) const;
+	D_CORE_API ndInt32 Find (const char* const subString, ndInt32 from = 0, ndInt32 lenght = 0x7ffffff) const;
 
-	D_CORE_API void Replace (dInt32 start, dInt32 size, const char* const str, dInt32 strSize);
-	void Replace (dInt32 start, dInt32 size, const ndString& str);
+	D_CORE_API void Replace (ndInt32 start, ndInt32 size, const char* const str, ndInt32 strSize);
+	void Replace (ndInt32 start, ndInt32 size, const ndString& str);
 
 	void Clear();
 	void Empty();
 
 	D_CORE_API void ToUpper();
 	D_CORE_API void ToLower();
-	D_CORE_API dInt32 ToInteger() const;
-	D_CORE_API dFloat64 ToFloat() const;
-	D_CORE_API dUnsigned64 ToInteger64() const;
+	D_CORE_API ndInt32 ToInteger() const;
+	D_CORE_API ndFloat64 ToFloat() const;
+	D_CORE_API ndUnsigned64 ToInteger64() const;
 
-	dInt32 Size() const;
-	dInt32 Capacity() const;
-	D_CORE_API void Expand (dInt32 size);
+	ndInt32 Size() const;
+	ndInt32 Capacity() const;
+	D_CORE_API void Expand (ndInt32 size);
 
 	D_CORE_API void LoadFile (FILE* const file);
-	ndString SubString(dInt32 start = 0, dInt32 size = 0x7fffffff) const;
+	ndString SubString(ndInt32 start = 0, ndInt32 size = 0x7fffffff) const;
 
 	const char* GetStr () const;
 
 	private:
-	D_CORE_API dInt32 CalculateSize (const char* const data) const;
-	dInt32 Compare (const char* const str0, const char* const str1) const;
-	void CopyData (char* const dst, const char* const src, dInt32 size) const;
+	D_CORE_API ndInt32 CalculateSize (const char* const data) const;
+	ndInt32 Compare (const char* const str0, const char* const str1) const;
+	void CopyData (char* const dst, const char* const src, ndInt32 size) const;
 
-	D_CORE_API dInt32 Find (const char* const subString, dInt32 stringSize, dInt32 from, dInt32 lenght) const;
+	D_CORE_API ndInt32 Find (const char* const subString, ndInt32 stringSize, ndInt32 from, ndInt32 lenght) const;
 
 	protected:
-	char* AllocMem(dInt32 size);
+	char* AllocMem(ndInt32 size);
 	void FreeMem (char* const ptr);
-	D_CORE_API ndString (const ndString& src, const char* const concatenate, dInt32 maxSize);
+	D_CORE_API ndString (const ndString& src, const char* const concatenate, ndInt32 maxSize);
 	
 	char* m_string;
-	dInt32 m_size;
-	dInt32 m_capacity;
+	ndInt32 m_size;
+	ndInt32 m_capacity;
 
 	private:
 	ndStringAllocator& GetAllocator() const;
 };
 
-inline char& ndString::operator[] (dInt32 index)
+inline char& ndString::operator[] (ndInt32 index)
 {
 	dAssert (m_string);
 	dAssert (index >= 0);
@@ -99,7 +99,7 @@ inline char& ndString::operator[] (dInt32 index)
 	return m_string[index];
 }
 
-inline char ndString::operator[] (dInt32 index) const
+inline char ndString::operator[] (ndInt32 index) const
 {
 	dAssert (m_string);
 	dAssert (index >= 0);
@@ -112,23 +112,23 @@ inline const char* ndString::GetStr () const
 	return m_string;
 }
 
-inline dInt32 ndString::Size() const
+inline ndInt32 ndString::Size() const
 {
 	return m_size;
 }
 
-inline dInt32 ndString::Find (const char* const subString, dInt32 from, dInt32 lenght) const
+inline ndInt32 ndString::Find (const char* const subString, ndInt32 from, ndInt32 lenght) const
 {
 	return Find (subString, CalculateSize(subString), from, lenght);
 }
 
-inline dInt32 ndString::Find (const ndString& subStream, dInt32 from) const
+inline ndInt32 ndString::Find (const ndString& subStream, ndInt32 from) const
 {
 	dAssert (subStream.m_string);
 	return Find (subStream.m_string, subStream.m_size, from, subStream.m_size);
 }
 
-inline void ndString::Replace (dInt32 start, dInt32 size, const ndString& str)
+inline void ndString::Replace (ndInt32 start, ndInt32 size, const ndString& str)
 {
 	Replace(start, size, str.m_string, str.m_size);
 }
@@ -149,19 +149,19 @@ inline ndString ndString::operator+ (const char* const copy) const
 }
 
 
-inline dInt32 ndString::Capacity() const
+inline ndInt32 ndString::Capacity() const
 {
 	return m_capacity;
 }
 
-inline void ndString::CopyData (char* const dst, const char* const src, dInt32 size) const
+inline void ndString::CopyData (char* const dst, const char* const src, ndInt32 size) const
 {
 	dAssert (dst);
 	dAssert (src);
 	memcpy (dst, src, size);
 }
 
-inline dInt32 ndString::Compare (const char* const str0, const char* const str1) const
+inline ndInt32 ndString::Compare (const char* const str0, const char* const str1) const
 {
 	dAssert (str0);
 	dAssert (str1);
@@ -200,7 +200,7 @@ inline bool ndString::operator>= (const ndString& src) const
 	return Compare (m_string, src.m_string) >= 0;
 }
 
-inline ndString ndString::SubString(dInt32 start, dInt32 size) const
+inline ndString ndString::SubString(ndInt32 start, ndInt32 size) const
 {
 	dAssert (m_string);
 	return ndString (&m_string[start], size);

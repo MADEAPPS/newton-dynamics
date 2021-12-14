@@ -16,7 +16,7 @@
 #include "ndSandboxStdafx.h"
 
 void dResetTimer();
-dFloat32 dGetElapsedSeconds();
+ndFloat32 dGetElapsedSeconds();
 
 #endif 
 

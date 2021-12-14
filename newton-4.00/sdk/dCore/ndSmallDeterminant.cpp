@@ -26,10 +26,10 @@
 
 #define Absolute(a)  ((a) >= 0.0 ? (a) : -(a))
 
-dFloat64 Determinant2x2 (const dFloat64 matrix[2][2], dFloat64* const error)
+ndFloat64 Determinant2x2 (const ndFloat64 matrix[2][2], ndFloat64* const error)
 {
-	dFloat64 a00xa11 = matrix[0][0] * matrix[1][1];
-	dFloat64 a01xa10 = matrix[0][1] * matrix[1][0];
+	ndFloat64 a00xa11 = matrix[0][0] * matrix[1][1];
+	ndFloat64 a01xa10 = matrix[0][1] * matrix[1][0];
 	*error = Absolute(a00xa11) + Absolute(a01xa10);
 	return a00xa11 - a01xa10;
 }
@@ -41,18 +41,18 @@ ndGoogol Determinant2x2 (const ndGoogol matrix[2][2])
 	return a00xa11 - a01xa10;
 }
 
-dFloat64 Determinant3x3 (const dFloat64 matrix[3][3], dFloat64* const error)
+ndFloat64 Determinant3x3 (const ndFloat64 matrix[3][3], ndFloat64* const error)
 {
-	dFloat64 sign = dFloat64 (-1.0f);
-	dFloat64 det = dFloat64 (0.0f);
-	dFloat64 accError = dFloat64 (0.0f); 
-	for (dInt32 i = 0; i < 3; i ++)  
+	ndFloat64 sign = ndFloat64 (-1.0f);
+	ndFloat64 det = ndFloat64 (0.0f);
+	ndFloat64 accError = ndFloat64 (0.0f); 
+	for (ndInt32 i = 0; i < 3; i ++)  
 	{
-		dFloat64 cofactor[2][2];
-		for (dInt32 j = 0; j < 2; j ++) 
+		ndFloat64 cofactor[2][2];
+		for (ndInt32 j = 0; j < 2; j ++) 
 		{
-			dInt32 k0 = 0;
-			for (dInt32 k = 0; k < 3; k ++) 
+			ndInt32 k0 = 0;
+			for (ndInt32 k = 0; k < 3; k ++) 
 			{
 				if (k != i) 
 				{
@@ -62,11 +62,11 @@ dFloat64 Determinant3x3 (const dFloat64 matrix[3][3], dFloat64* const error)
 			}
 		}
 
-		dFloat64 parcialError;
-		dFloat64 minorDet = Determinant2x2 (cofactor, &parcialError);
+		ndFloat64 parcialError;
+		ndFloat64 minorDet = Determinant2x2 (cofactor, &parcialError);
 		accError += parcialError * Absolute (matrix[2][i]);
 		det += sign * minorDet * matrix[2][i];
-		sign *= dFloat64 (-1.0f);
+		sign *= ndFloat64 (-1.0f);
 	}
 
 	*error = accError;
@@ -75,16 +75,16 @@ dFloat64 Determinant3x3 (const dFloat64 matrix[3][3], dFloat64* const error)
 
 ndGoogol Determinant3x3 (const ndGoogol matrix[3][3])
 {
-	ndGoogol negOne (dFloat64 (-1.0f));
-	ndGoogol sign (dFloat64 (-1.0f));
-	ndGoogol det = dFloat64 (0.0f);
-	for (dInt32 i = 0; i < 3; i ++)  
+	ndGoogol negOne (ndFloat64 (-1.0f));
+	ndGoogol sign (ndFloat64 (-1.0f));
+	ndGoogol det = ndFloat64 (0.0f);
+	for (ndInt32 i = 0; i < 3; i ++)  
 	{
 		ndGoogol cofactor[2][2];
-		for (dInt32 j = 0; j < 2; j ++) 
+		for (ndInt32 j = 0; j < 2; j ++) 
 		{
-			dInt32 k0 = 0;
-			for (dInt32 k = 0; k < 3; k ++) 
+			ndInt32 k0 = 0;
+			for (ndInt32 k = 0; k < 3; k ++) 
 			{
 				if (k != i) 
 				{
@@ -101,18 +101,18 @@ ndGoogol Determinant3x3 (const ndGoogol matrix[3][3])
 	return det;
 }
 
-dFloat64 Determinant4x4 (const dFloat64 matrix[4][4], dFloat64* const error)
+ndFloat64 Determinant4x4 (const ndFloat64 matrix[4][4], ndFloat64* const error)
 {
-	dFloat64 sign = dFloat64 (1.0f);
-	dFloat64 det = dFloat64 (0.0f);
-	dFloat64 accError = dFloat64 (0.0f); 
-	for (dInt32 i = 0; i < 4; i ++)  
+	ndFloat64 sign = ndFloat64 (1.0f);
+	ndFloat64 det = ndFloat64 (0.0f);
+	ndFloat64 accError = ndFloat64 (0.0f); 
+	for (ndInt32 i = 0; i < 4; i ++)  
 	{
-		dFloat64 cofactor[3][3];
-		for (dInt32 j = 0; j < 3; j ++) 
+		ndFloat64 cofactor[3][3];
+		for (ndInt32 j = 0; j < 3; j ++) 
 		{
-			dInt32 k0 = 0;
-			for (dInt32 k = 0; k < 4; k ++) 
+			ndInt32 k0 = 0;
+			for (ndInt32 k = 0; k < 4; k ++) 
 			{
 				if (k != i) {
 					cofactor[j][k0] = matrix[j][k];
@@ -121,11 +121,11 @@ dFloat64 Determinant4x4 (const dFloat64 matrix[4][4], dFloat64* const error)
 			}
 		}
 
-		dFloat64 parcialError;
-		dFloat64 minorDet = Determinant3x3 (cofactor, &parcialError);
+		ndFloat64 parcialError;
+		ndFloat64 minorDet = Determinant3x3 (cofactor, &parcialError);
 		accError +=  parcialError * Absolute (matrix[3][i]);
 		det += sign * minorDet * matrix[3][i];
-		sign *= dFloat64 (-1.0f);
+		sign *= ndFloat64 (-1.0f);
 	}
 
 	*error = accError;
@@ -134,17 +134,17 @@ dFloat64 Determinant4x4 (const dFloat64 matrix[4][4], dFloat64* const error)
 
 ndGoogol Determinant4x4 (const ndGoogol matrix[4][4])
 {
-	ndGoogol sign = dFloat64 (1.0f);
-	ndGoogol det = dFloat64 (0.0f);
-	ndGoogol negOne (dFloat64 (-1.0f));
-	//dGoogol accError = dFloat64 (0.0f);
-	for (dInt32 i = 0; i < 4; i ++)  
+	ndGoogol sign = ndFloat64 (1.0f);
+	ndGoogol det = ndFloat64 (0.0f);
+	ndGoogol negOne (ndFloat64 (-1.0f));
+	//dGoogol accError = ndFloat64 (0.0f);
+	for (ndInt32 i = 0; i < 4; i ++)  
 	{
 		ndGoogol  cofactor[3][3];
-		for (dInt32 j = 0; j < 3; j ++) 
+		for (ndInt32 j = 0; j < 3; j ++) 
 		{
-			dInt32 k0 = 0;
-			for (dInt32 k = 0; k < 4; k ++) 
+			ndInt32 k0 = 0;
+			for (ndInt32 k = 0; k < 4; k ++) 
 			{
 				if (k != i) 
 				{

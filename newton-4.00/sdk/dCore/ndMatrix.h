@@ -41,7 +41,7 @@ class ndMatrix
 	D_OPERATOR_NEW_AND_DELETE
 
 	ndMatrix ();
-	ndMatrix (const dFloat32* const array);
+	ndMatrix (const ndFloat32* const array);
 	ndMatrix (const ndVector &front, const ndVector &up, const ndVector &right, const ndVector &posit);
 	D_CORE_API ndMatrix (const ndQuaternion &rotation, const ndVector &position);
 
@@ -53,8 +53,8 @@ class ndMatrix
 	// create a covariance Matrix = transpose(p) * q 
 	ndMatrix (const ndVector& p, const ndVector& q);
 
-	ndVector& operator[] (dInt32 i);
-	const ndVector& operator[] (dInt32 i) const;
+	ndVector& operator[] (ndInt32 i);
+	const ndVector& operator[] (ndInt32 i) const;
 
 	ndMatrix Inverse () const;
 	D_CORE_API ndMatrix Inverse4x4 () const;
@@ -72,22 +72,22 @@ class ndMatrix
 
 	D_CORE_API void CalcPitchYawRoll (ndVector& euler0, ndVector& euler1) const;
 	D_CORE_API void TransformTriplex (
-		dFloat32* const dst, dInt32 dstStrideInBytes,
-		const dFloat32* const src, dInt32 srcStrideInBytes, dInt32 count) const;
+		ndFloat32* const dst, ndInt32 dstStrideInBytes,
+		const ndFloat32* const src, ndInt32 srcStrideInBytes, ndInt32 count) const;
 
 #ifndef D_NEWTON_USE_DOUBLE
 	D_CORE_API void TransformTriplex (
-		dFloat64* const dst, dInt32 dstStrideInBytes,
-		const dFloat64* const src, dInt32 srcStrideInBytes, dInt32 count) const;
+		ndFloat64* const dst, ndInt32 dstStrideInBytes,
+		const ndFloat64* const src, ndInt32 srcStrideInBytes, ndInt32 count) const;
 
 	D_CORE_API void TransformTriplex (
-		dFloat64* const dst, dInt32 dstStrideInBytes,
-		const dFloat32* const src, dInt32 srcStrideInBytes, dInt32 count) const;
+		ndFloat64* const dst, ndInt32 dstStrideInBytes,
+		const ndFloat32* const src, ndInt32 srcStrideInBytes, ndInt32 count) const;
 #endif
 
 	bool TestIdentity() const;
 	bool TestSymetric3x3() const;
-	bool TestOrthogonal(dFloat32 tol = dFloat32 (1.0e-4f)) const;
+	bool TestOrthogonal(ndFloat32 tol = ndFloat32 (1.0e-4f)) const;
 
 	D_CORE_API ndMatrix Multiply3X3 (const ndMatrix &B) const;
 	D_CORE_API ndMatrix operator* (const ndMatrix &B) const;
@@ -114,7 +114,7 @@ inline ndMatrix::ndMatrix ()
 {
 }
 
-inline ndMatrix::ndMatrix (const dFloat32* const array)
+inline ndMatrix::ndMatrix (const ndFloat32* const array)
 {
 	memcpy (&m_front.m_x, array, sizeof (ndMatrix)) ;
 }
@@ -140,27 +140,27 @@ inline ndMatrix::ndMatrix (const ndVector& front)
 	:m_front((front & ndVector::m_triplexMask).Normalize())
 	,m_posit(ndVector::m_wOne)
 {
-	if (dAbs(m_front.m_z) > dFloat32 (0.577f)) 
+	if (dAbs(m_front.m_z) > ndFloat32 (0.577f)) 
 	{
-		m_right = m_front.CrossProduct(ndVector(-m_front.m_y, m_front.m_z, dFloat32(0.0f), dFloat32(0.0f)));
+		m_right = m_front.CrossProduct(ndVector(-m_front.m_y, m_front.m_z, ndFloat32(0.0f), ndFloat32(0.0f)));
 	}
 	else 
 	{
-		m_right = m_front.CrossProduct(ndVector(-m_front.m_y, m_front.m_x, dFloat32(0.0f), dFloat32(0.0f)));
+		m_right = m_front.CrossProduct(ndVector(-m_front.m_y, m_front.m_x, ndFloat32(0.0f), ndFloat32(0.0f)));
 	}
 	m_right = m_right.Normalize();
 	m_up = m_right.CrossProduct(m_front);
 	dAssert(TestOrthogonal());
 }
 
-inline ndVector& ndMatrix::operator[] (dInt32  i)
+inline ndVector& ndMatrix::operator[] (ndInt32  i)
 {
 	dAssert (i < 4);
 	dAssert (i >= 0);
 	return (&m_front)[i];
 }
 
-inline const ndVector& ndMatrix::operator[] (dInt32  i) const
+inline const ndVector& ndMatrix::operator[] (ndInt32  i) const
 {
 	dAssert (i < 4);
 	dAssert (i >= 0);
@@ -188,7 +188,7 @@ inline ndVector ndMatrix::RotateVector (const ndVector &v) const
 
 inline ndVector ndMatrix::UnrotateVector (const ndVector &v) const
 {
-	return ndVector ((m_front * v).AddHorizontal().GetScalar(), (m_up * v).AddHorizontal().GetScalar(), (m_right * v).AddHorizontal().GetScalar(), dFloat32 (0.0f));
+	return ndVector ((m_front * v).AddHorizontal().GetScalar(), (m_up * v).AddHorizontal().GetScalar(), (m_right * v).AddHorizontal().GetScalar(), ndFloat32 (0.0f));
 }
 
 inline ndVector ndMatrix::TransformVector (const ndVector &v) const
@@ -237,19 +237,19 @@ inline ndMatrix ndMatrix::Inverse () const
 inline bool ndMatrix::TestIdentity() const
 {
 	const ndMatrix& me = *this;
-	for (dInt32 i = 0; i < 4; i++) 
+	for (ndInt32 i = 0; i < 4; i++) 
 	{
-		if (me[i][i] != dFloat32 (1.0f)) 
+		if (me[i][i] != ndFloat32 (1.0f)) 
 		{
 			return false;
 		}
-		for (dInt32 j = i + 1; j < 4; j++) 
+		for (ndInt32 j = i + 1; j < 4; j++) 
 		{
-			if (me[i][j] != dFloat32 (0.0f)) 
+			if (me[i][j] != ndFloat32 (0.0f)) 
 			{
 				return false;
 			}
-			if (me[j][i] != dFloat32(0.0f)) 
+			if (me[j][i] != ndFloat32(0.0f)) 
 			{
 				return false;
 			}
@@ -258,13 +258,13 @@ inline bool ndMatrix::TestIdentity() const
 	return true;
 }
 
-inline bool ndMatrix::TestOrthogonal(dFloat32 tol) const
+inline bool ndMatrix::TestOrthogonal(ndFloat32 tol) const
 {
 	#ifdef _DEBUG
 		const ndMatrix& me = *this;
-		for (dInt32 i = 0; i < 4; i++)
+		for (ndInt32 i = 0; i < 4; i++)
 		{
-			for (dInt32 j = 0; j < 4; j++)
+			for (ndInt32 j = 0; j < 4; j++)
 			{
 				dAssert(dCheckFloat(me[i][j]));
 			}
@@ -272,18 +272,18 @@ inline bool ndMatrix::TestOrthogonal(dFloat32 tol) const
 	#endif
 
 	ndVector n (m_front.CrossProduct(m_up));
-	dFloat32 a = m_right.DotProduct(m_right).GetScalar();
-	dFloat32 b = m_up.DotProduct(m_up).GetScalar();
-	dFloat32 c = m_front.DotProduct(m_front).GetScalar();
-	dFloat32 d = n.DotProduct(m_right).GetScalar();
-	bool ret =  (m_front[3] == dFloat32(0.0f)) &&
-			    (m_up[3] == dFloat32(0.0f)) &&
-				(m_right[3] == dFloat32(0.0f)) &&
-				(m_posit[3] == dFloat32(1.0f)) &&
-				(dAbs(a - dFloat32(1.0f)) < tol) &&
-				(dAbs(b - dFloat32(1.0f)) < tol) &&
-				(dAbs(c - dFloat32(1.0f)) < tol) &&
-				(dAbs(d - dFloat32(1.0f)) < tol);
+	ndFloat32 a = m_right.DotProduct(m_right).GetScalar();
+	ndFloat32 b = m_up.DotProduct(m_up).GetScalar();
+	ndFloat32 c = m_front.DotProduct(m_front).GetScalar();
+	ndFloat32 d = n.DotProduct(m_right).GetScalar();
+	bool ret =  (m_front[3] == ndFloat32(0.0f)) &&
+			    (m_up[3] == ndFloat32(0.0f)) &&
+				(m_right[3] == ndFloat32(0.0f)) &&
+				(m_posit[3] == ndFloat32(1.0f)) &&
+				(dAbs(a - ndFloat32(1.0f)) < tol) &&
+				(dAbs(b - ndFloat32(1.0f)) < tol) &&
+				(dAbs(c - ndFloat32(1.0f)) < tol) &&
+				(dAbs(d - ndFloat32(1.0f)) < tol);
 	if (!ret)
 	{
 		dAssert (0);
@@ -294,48 +294,48 @@ inline bool ndMatrix::TestOrthogonal(dFloat32 tol) const
 inline bool ndMatrix::TestSymetric3x3() const
 {
 	const ndMatrix& me = *this;
-	return (dAbs (me[0][1] - me[1][0]) < dFloat32 (1.0e-5f)) && 
-		   (dAbs (me[0][2] - me[2][0]) < dFloat32 (1.0e-5f)) &&
-		   (dAbs (me[1][2] - me[2][1]) < dFloat32 (1.0e-5f)) &&
-		   (me[0][3] == dFloat32 (0.0f)) &&
-		   (me[1][3] == dFloat32 (0.0f)) &&
-		   (me[2][3] == dFloat32 (0.0f)) &&
-		   (me[3][0] == dFloat32 (0.0f)) &&
-		   (me[3][1] == dFloat32 (0.0f)) &&
-		   (me[3][2] == dFloat32 (0.0f)) &&
-		   (me[3][3] == dFloat32 (1.0f));
+	return (dAbs (me[0][1] - me[1][0]) < ndFloat32 (1.0e-5f)) && 
+		   (dAbs (me[0][2] - me[2][0]) < ndFloat32 (1.0e-5f)) &&
+		   (dAbs (me[1][2] - me[2][1]) < ndFloat32 (1.0e-5f)) &&
+		   (me[0][3] == ndFloat32 (0.0f)) &&
+		   (me[1][3] == ndFloat32 (0.0f)) &&
+		   (me[2][3] == ndFloat32 (0.0f)) &&
+		   (me[3][0] == ndFloat32 (0.0f)) &&
+		   (me[3][1] == ndFloat32 (0.0f)) &&
+		   (me[3][2] == ndFloat32 (0.0f)) &&
+		   (me[3][3] == ndFloat32 (1.0f));
 }
 
-inline ndMatrix dPitchMatrix(dFloat32 ang)
+inline ndMatrix dPitchMatrix(ndFloat32 ang)
 {
-	dFloat32 sinAng = dSin (ang);
-	dFloat32 cosAng = dCos (ang);
+	ndFloat32 sinAng = ndSin (ang);
+	ndFloat32 cosAng = ndCos (ang);
 	return ndMatrix (
-		ndVector (dFloat32(1.0f),  dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)), 
-		ndVector (dFloat32(0.0f),  cosAng,          sinAng,        dFloat32(0.0f)),
-		ndVector (dFloat32(0.0f), -sinAng,          cosAng,        dFloat32(0.0f)), 
-		ndVector (dFloat32(0.0f),  dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f))); 
+		ndVector (ndFloat32(1.0f),  ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)), 
+		ndVector (ndFloat32(0.0f),  cosAng,          sinAng,        ndFloat32(0.0f)),
+		ndVector (ndFloat32(0.0f), -sinAng,          cosAng,        ndFloat32(0.0f)), 
+		ndVector (ndFloat32(0.0f),  ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f))); 
 }
 
-inline ndMatrix dYawMatrix(dFloat32 ang)
+inline ndMatrix dYawMatrix(ndFloat32 ang)
 {
-	dFloat32 sinAng = dSin (ang);
-	dFloat32 cosAng = dCos (ang);
+	ndFloat32 sinAng = ndSin (ang);
+	ndFloat32 cosAng = ndCos (ang);
 	return ndMatrix (
-		ndVector (cosAng,          dFloat32(0.0f), -sinAng,        dFloat32(0.0f)), 
-		ndVector (dFloat32(0.0f), dFloat32(1.0f),  dFloat32(0.0f), dFloat32(0.0f)), 
-		ndVector (sinAng,          dFloat32(0.0f),  cosAng,        dFloat32(0.0f)), 
-		ndVector (dFloat32(0.0f), dFloat32(0.0f),  dFloat32(0.0f), dFloat32(1.0f))); 
+		ndVector (cosAng,          ndFloat32(0.0f), -sinAng,        ndFloat32(0.0f)), 
+		ndVector (ndFloat32(0.0f), ndFloat32(1.0f),  ndFloat32(0.0f), ndFloat32(0.0f)), 
+		ndVector (sinAng,          ndFloat32(0.0f),  cosAng,        ndFloat32(0.0f)), 
+		ndVector (ndFloat32(0.0f), ndFloat32(0.0f),  ndFloat32(0.0f), ndFloat32(1.0f))); 
 }
 
-inline ndMatrix dRollMatrix(dFloat32 ang)
+inline ndMatrix dRollMatrix(ndFloat32 ang)
 {
-	dFloat32 sinAng = dSin (ang);
-	dFloat32 cosAng = dCos (ang);
-	return ndMatrix (ndVector ( cosAng,          sinAng,          dFloat32(0.0f), dFloat32(0.0f)), 
-					ndVector (-sinAng,          cosAng,          dFloat32(0.0f), dFloat32(0.0f)),
-					ndVector ( dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)), 
-					ndVector ( dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f))); 
+	ndFloat32 sinAng = ndSin (ang);
+	ndFloat32 cosAng = ndCos (ang);
+	return ndMatrix (ndVector ( cosAng,          sinAng,          ndFloat32(0.0f), ndFloat32(0.0f)), 
+					ndVector (-sinAng,          cosAng,          ndFloat32(0.0f), ndFloat32(0.0f)),
+					ndVector ( ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f)), 
+					ndVector ( ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f))); 
 }																		 
 
 #endif

@@ -202,43 +202,43 @@
 	#define D_CORE_API 
 #endif
 
-typedef int8_t dInt8;
-typedef uint8_t dUnsigned8;
-typedef int16_t dInt16;
-typedef uint16_t dUnsigned16;
-typedef int32_t dInt32;
-typedef uint32_t dUnsigned32;
-typedef int64_t dInt64;
-typedef uint64_t dUnsigned64;
+typedef int8_t ndInt8;
+typedef uint8_t ndUnsigned8;
+typedef int16_t ndInt16;
+typedef uint16_t ndUnsigned16;
+typedef int32_t ndInt32;
+typedef uint32_t ndUnsigned32;
+typedef int64_t ndInt64;
+typedef uint64_t ndUnsigned64;
 
-typedef double dFloat64;
+typedef double ndFloat64;
 #ifdef D_NEWTON_USE_DOUBLE
-	typedef double dFloat32;
+	typedef double ndFloat32;
 #else
-	typedef float dFloat32;
+	typedef float ndFloat32;
 #endif
 
-#define dPi		 		dFloat32 (3.141592f)
-#define dEXP		 	dFloat32 (2.71828f)
-#define dEpsilon	  	dFloat32 (1.0e-5f)
-#define dDegreeToRad	dFloat32 (dPi / 180.0f)
-#define dRadToDegree  	dFloat32 (180.0f / dPi)
+#define ndPi	 		ndFloat32 (3.141592f)
+#define ndEXP		 	ndFloat32 (2.71828f)
+#define ndEpsilon	  	ndFloat32 (1.0e-5f)
+#define ndDegreeToRad	ndFloat32 (ndPi / 180.0f)
+#define ndRadToDegree  	ndFloat32 (180.0f / ndPi)
 
-#define dSqrt(x)		dFloat32 (sqrt(x))	
-#define dSin(x)			dFloat32 (sin(x))
-#define dCos(x)			dFloat32 (cos(x))
-#define dAsin(x)		dFloat32 (asin(x))
-#define dAcos(x)		dFloat32 (acos(x))
-#define dLog(x)			dFloat32 (log(x))
-#define dCeil(x)		dFloat32 (ceil(x))
-#define dFloor(x)		dFloat32 (floor(x))	
-#define dPow(x,y)		dFloat32 (pow(x,y))
-#define dFmod(x,y)		dFloat32 (fmod(x,y))
-#define dTan(x)			dFloat32 (tan(x))
-#define dAtan2(x,y)		dFloat32 (atan2(x,y))
-#define dRsqrt(x)		(dFloat32 (1.0f) / dSqrt(x))
-#define dClearFP()		_clearfp() 
-#define dControlFP(x,y)	_controlfp(x,y)
+#define ndSqrt(x)		ndFloat32 (sqrt(x))	
+#define ndSin(x)		ndFloat32 (sin(x))
+#define ndCos(x)		ndFloat32 (cos(x))
+#define ndAsin(x)		ndFloat32 (asin(x))
+#define ndAcos(x)		ndFloat32 (acos(x))
+#define ndLog(x)		ndFloat32 (log(x))
+#define ndCeil(x)		ndFloat32 (ceil(x))
+#define ndFloor(x)		ndFloat32 (floor(x))	
+#define ndPow(x,y)		ndFloat32 (pow(x,y))
+#define ndFmod(x,y)		ndFloat32 (fmod(x,y))
+#define ndTan(x)		ndFloat32 (tan(x))
+#define ndAtan2(x,y)	ndFloat32 (atan2(x,y))
+#define ndRsqrt(x)		(ndFloat32 (1.0f) / ndSqrt(x))
+#define ndClearFP()		 _clearfp() 
+#define ndControlFP(x,y) _controlfp(x,y)
 
 #if (defined (WIN32) || defined(_WIN32) || defined (_M_ARM) || defined (_M_ARM64))
 	#define dCheckFloat(x) (_finite(x) && !_isnan(x))
@@ -251,19 +251,19 @@ typedef double dFloat64;
 	{
 		struct 
 		{
-			dInt32 m_dommy;
-			dInt32 m_iVal;
+			ndInt32 m_dommy;
+			ndInt32 m_iVal;
 		} m_integer;
-		dFloat64 m_fVal;
+		ndFloat64 m_fVal;
 	};
 #else
 	union ndFloatSign
 	{
 		struct 
 		{
-			dInt32 m_iVal;
+			ndInt32 m_iVal;
 		} m_integer;
-		dFloat32 m_fVal;
+		ndFloat32 m_fVal;
 	};
 #endif
 
@@ -271,20 +271,20 @@ union ndDoubleInt
 {
 	struct 
 	{
-		dInt32 m_intL;
-		dInt32 m_intH;
+		ndInt32 m_intL;
+		ndInt32 m_intH;
 	};
 	void* m_ptr;
-	dInt64 m_int;
-	dFloat64 m_float;
+	ndInt64 m_int;
+	ndFloat64 m_float;
 };
 
 class ndTriplex
 {
 	public:
-	dFloat32 m_x;
-	dFloat32 m_y;
-	dFloat32 m_z;
+	ndFloat32 m_x;
+	ndFloat32 m_y;
+	ndFloat32 m_z;
 };
 
 #define D_OPERATOR_NEW_AND_DELETE			\
@@ -418,8 +418,8 @@ class ndSpinLock
 	void Lock()
 	{
 		#ifndef D_USE_THREAD_EMULATION	
-		dInt32 exp = 1;
-		for (dUnsigned32 test = 0; !m_lock.compare_exchange_weak(test, 1); test = 0)
+		ndInt32 exp = 1;
+		for (ndUnsigned32 test = 0; !m_lock.compare_exchange_weak(test, 1); test = 0)
 		{
 			Delay(exp);
 		}
@@ -435,9 +435,9 @@ class ndSpinLock
 
 	#ifndef D_USE_THREAD_EMULATION	
 	private:
-	D_CORE_API void Delay(dInt32& exp);
+	D_CORE_API void Delay(ndInt32& exp);
 
-	ndAtomic<dUnsigned32> m_lock;
+	ndAtomic<ndUnsigned32> m_lock;
 	#endif
 };
 

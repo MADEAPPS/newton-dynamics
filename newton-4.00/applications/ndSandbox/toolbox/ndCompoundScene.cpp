@@ -46,7 +46,7 @@ static void AddBoxSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sc
 	//return subInstance;
 }
 
-static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const ndMatrix& location, dInt32 count)
+static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInstance& sceneInstance, ndDemoEntity* const rootEntity, const ndMatrix& location, ndInt32 count)
 {
 	ndShapeInstance capsule(new ndShapeCapsule(0.75f, 0.75f, 10.0f));
 	ndMatrix uvMatrix(dGetIdentityMatrix());
@@ -55,12 +55,12 @@ static void AddSpeedBumpsSubShape(ndDemoEntityManager* const scene, ndShapeInsta
 	uvMatrix[2][2] *= 0.025f;
 	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &capsule, "Concrete_011_COLOR.tga", "Concrete_011_COLOR.tga", "Concrete_011_COLOR.tga", 1.0f, uvMatrix);
 
-	dFloat32 spacing = 3.0f;
+	ndFloat32 spacing = 3.0f;
 	ndMatrix matrix(location);
 	matrix.m_posit.m_y += -0.6f;
 	matrix.m_posit.m_z -= (count/2) * spacing;
 	ndShapeMaterial material(capsule.GetMaterial());
-	for (dInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; i++)
 	{
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
 		entity->SetMesh(geometry, dGetIdentityMatrix());
@@ -86,7 +86,7 @@ static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const me
 	ndPolygonSoupBuilder meshBuilder;
 	meshBuilder.Begin();
 	
-	dInt32 stack = 1;
+	ndInt32 stack = 1;
 	ndMatrix matrixBuffer[1024];
 	fbxDemoEntity* entBuffer[1024];
 	
@@ -101,10 +101,10 @@ static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const me
 	
 		if (ent->m_fbxMeshEffect)
 		{
-			dInt32 vertexStride = ent->m_fbxMeshEffect->GetVertexStrideInByte() / sizeof(dFloat64);
-			const dFloat64* const vertexData = ent->m_fbxMeshEffect->GetVertexPool();
+			ndInt32 vertexStride = ent->m_fbxMeshEffect->GetVertexStrideInByte() / sizeof(ndFloat64);
+			const ndFloat64* const vertexData = ent->m_fbxMeshEffect->GetVertexPool();
 	
-			dInt32 mark = ent->m_fbxMeshEffect->IncLRU();
+			ndInt32 mark = ent->m_fbxMeshEffect->IncLRU();
 			ndPolyhedra::Iterator iter(*ent->m_fbxMeshEffect);
 	
 			ndVector face[256];
@@ -114,19 +114,19 @@ static void AddStaticMesh(ndDemoEntityManager* const scene, const char* const me
 				ndEdge* const edge = &(*iter);
 				if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark))
 				{
-					dInt32 count = 0;
+					ndInt32 count = 0;
 					ndEdge* ptr = edge;
 					do
 					{
-						dInt32 i = ptr->m_incidentVertex * vertexStride;
-						ndVector point(dFloat32(vertexData[i + 0]), dFloat32(vertexData[i + 1]), dFloat32(vertexData[i + 2]), dFloat32(1.0f));
+						ndInt32 i = ptr->m_incidentVertex * vertexStride;
+						ndVector point(ndFloat32(vertexData[i + 0]), ndFloat32(vertexData[i + 1]), ndFloat32(vertexData[i + 2]), ndFloat32(1.0f));
 						face[count] = worldMatrix.TransformVector(point);
 						count++;
 						ptr->m_mark = mark;
 						ptr = ptr->m_next;
 					} while (ptr != edge);
 	
-					dInt32 materialIndex = ent->m_fbxMeshEffect->GetFaceMaterial(edge);
+					ndInt32 materialIndex = ent->m_fbxMeshEffect->GetFaceMaterial(edge);
 					meshBuilder.AddFace(&face[0].m_x, sizeof(ndVector), 3, materialIndex);
 				}
 			}

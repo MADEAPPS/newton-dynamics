@@ -16,8 +16,8 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndDemoEntityNotify)
 
-ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody, dFloat32 gravity)
-	:ndBodyNotify(ndVector (dFloat32 (0.0f), gravity, dFloat32(0.0f), dFloat32(0.0f)))
+ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const parentBody, ndFloat32 gravity)
+	:ndBodyNotify(ndVector (ndFloat32 (0.0f), gravity, ndFloat32(0.0f), ndFloat32(0.0f)))
 	,m_entity(entity)
 	,m_parentBody(parentBody)
 	,m_manager(manager)
@@ -55,7 +55,7 @@ void ndDemoEntityNotify::OnObjectPick() const
 	dTrace(("picked body id: %d\n", GetBody()->GetId()));
 }
 
-void ndDemoEntityNotify::OnApplyExternalForce(dInt32, dFloat32)
+void ndDemoEntityNotify::OnApplyExternalForce(ndInt32, ndFloat32)
 {
 	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
 	dAssert(body);
@@ -71,7 +71,7 @@ void ndDemoEntityNotify::OnApplyExternalForce(dInt32, dFloat32)
 	}
 }
 
-void ndDemoEntityNotify::OnTransform(dInt32, const ndMatrix& matrix)
+void ndDemoEntityNotify::OnTransform(ndInt32, const ndMatrix& matrix)
 {
 	// apply this transformation matrix to the application user data.
 	if (m_entity)
@@ -207,7 +207,7 @@ void ndDemoEntity::SetUserData (UserData* const data)
 }
 
 /*
-void ndDemoEntity::TransformCallback(const NewtonBody* body, const dFloat32* matrix, dInt32 threadIndex)
+void ndDemoEntity::TransformCallback(const NewtonBody* body, const ndFloat32* matrix, ndInt32 threadIndex)
 {
 	ndDemoEntity* const ent = (ndDemoEntity*) NewtonBodyGetUserData(body);
 	if (ent) {
@@ -295,10 +295,10 @@ void ndDemoEntity::SetMatrix(const ndQuaternion& rotation, const ndVector& posit
 	m_nextPosition = position;
 	m_nextRotation = rotation;
 
-	dFloat32 angle = m_curRotation.DotProduct(m_nextRotation).GetScalar();
+	ndFloat32 angle = m_curRotation.DotProduct(m_nextRotation).GetScalar();
 	if (angle < 0.0f) 
 	{
-		m_curRotation = m_curRotation.Scale(dFloat32(-1.0f));
+		m_curRotation = m_curRotation.Scale(ndFloat32(-1.0f));
 	}
 }
 
@@ -308,10 +308,10 @@ void ndDemoEntity::SetNextMatrix (const ndQuaternion& rotation, const ndVector& 
 	m_nextPosition = position;
 	m_nextRotation = rotation;
 
-	dFloat32 angle = m_curRotation.DotProduct(m_nextRotation).GetScalar();
+	ndFloat32 angle = m_curRotation.DotProduct(m_nextRotation).GetScalar();
 	if (angle < 0.0f) 
 	{
-		m_curRotation = m_curRotation.Scale(dFloat32 (-1.0f));
+		m_curRotation = m_curRotation.Scale(ndFloat32 (-1.0f));
 	}
 }
 
@@ -320,10 +320,10 @@ void ndDemoEntity::ResetMatrix(const ndMatrix& matrix)
 	ndQuaternion rot (matrix);
 	SetMatrix(rot, matrix.m_posit);
 	SetMatrix(rot, matrix.m_posit);
-	InterpolateMatrix (dFloat32 (0.0f));
+	InterpolateMatrix (ndFloat32 (0.0f));
 }
 
-void ndDemoEntity::InterpolateMatrix(dFloat32 param)
+void ndDemoEntity::InterpolateMatrix(ndFloat32 param)
 {
 	ndVector p0(m_curPosition);
 	ndVector p1(m_nextPosition);
@@ -365,7 +365,7 @@ void ndDemoEntity::RenderBone() const
 	}
 }
 
-void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const
+void ndDemoEntity::Render(ndFloat32 timestep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const
 {
 	ndMatrix nodeMatrix (m_matrix * matrix);
 	if (m_isVisible && m_mesh) 
@@ -384,7 +384,7 @@ void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, c
 
 ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren() const
 {
-	dInt32 count = 1;
+	ndInt32 count = 1;
 	ndShapeInstance* shapeArray[128];
 	
 	shapeArray[0] = nullptr;
@@ -400,9 +400,9 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren() const
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			mesh->GetVertexArray(points);
 
-			ndVector minP(dFloat32(1.0e10f));
-			ndVector maxP(dFloat32(-1.0e10f));
-			for (dInt32 i = 0; i < mesh->m_vertexCount; i++)
+			ndVector minP(ndFloat32(1.0e10f));
+			ndVector maxP(ndFloat32(-1.0e10f));
+			for (ndInt32 i = 0; i < mesh->m_vertexCount; i++)
 			{
 				minP = minP.GetMin(points[i]);
 				maxP = maxP.GetMax(points[i]);
@@ -410,12 +410,12 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren() const
 			ndVector size(ndVector::m_half * (maxP - minP));
 			ndMatrix alighMatrix(dGetIdentityMatrix());
 			alighMatrix.m_posit = ndVector::m_half * (maxP + minP);
-			alighMatrix.m_posit.m_w = dFloat32(1.0f);
+			alighMatrix.m_posit.m_w = ndFloat32(1.0f);
 			const ndMatrix matrix(child->GetMeshMatrix() * alighMatrix * child->GetCurrentMatrix());
 			shapeArray[count] = new ndShapeInstance(new ndShapeSphere(size.m_x));
 			shapeArray[count]->SetLocalMatrix(matrix);
 			count++;
-			dAssert(count < dInt32 (sizeof(shapeArray) / sizeof(shapeArray[0])));
+			dAssert(count < ndInt32 (sizeof(shapeArray) / sizeof(shapeArray[0])));
 		} 
 		else if (strstr (name, "box")) 
 		{
@@ -423,9 +423,9 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren() const
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			mesh->GetVertexArray(points);
 			
-			ndVector minP(dFloat32(1.0e10f));
-			ndVector maxP(dFloat32(-1.0e10f));
-			for (dInt32 i = 0; i < mesh->m_vertexCount; i++)
+			ndVector minP(ndFloat32(1.0e10f));
+			ndVector maxP(ndFloat32(-1.0e10f));
+			for (ndInt32 i = 0; i < mesh->m_vertexCount; i++)
 			{
 				minP = minP.GetMin(points[i]);
 				maxP = maxP.GetMax(points[i]);
@@ -433,7 +433,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren() const
 			ndVector size(maxP - minP);
 			shapeArray[count] = new ndShapeInstance(new ndShapeBox(size.m_x, size.m_y, size.m_z));
 
-			ndVector origin((maxP + minP).Scale (dFloat32 (0.5f)));
+			ndVector origin((maxP + minP).Scale (ndFloat32 (0.5f)));
 
 			ndMatrix matrix(child->GetMeshMatrix());
 			matrix.m_posit += origin;
@@ -441,7 +441,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren() const
 			
 			shapeArray[count]->SetLocalMatrix(matrix);
 			count++;
-			dAssert(count < dInt32(sizeof(shapeArray) / sizeof(shapeArray[0])));
+			dAssert(count < ndInt32(sizeof(shapeArray) / sizeof(shapeArray[0])));
 		} 
 		else if (strstr (name, "capsule")) 
 		{
@@ -449,25 +449,25 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren() const
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			mesh->GetVertexArray(points);
 
-			ndVector minP(dFloat32(1.0e10f));
-			ndVector maxP(dFloat32(-1.0e10f));
-			for (dInt32 i = 0; i < mesh->m_vertexCount; i++)
+			ndVector minP(ndFloat32(1.0e10f));
+			ndVector maxP(ndFloat32(-1.0e10f));
+			for (ndInt32 i = 0; i < mesh->m_vertexCount; i++)
 			{
 				minP = minP.GetMin(points[i]);
 				maxP = maxP.GetMax(points[i]);
 			}
 			ndVector size(ndVector::m_half * (maxP - minP));
 			ndVector origin(ndVector::m_half * (maxP + minP));
-			dFloat32 high = 2.0f * dMax (size.m_y - size.m_x, dFloat32 (0.05f));
-			ndMatrix alighMatrix(dRollMatrix(90.0f * dDegreeToRad));
+			ndFloat32 high = 2.0f * dMax (size.m_y - size.m_x, ndFloat32 (0.05f));
+			ndMatrix alighMatrix(dRollMatrix(90.0f * ndDegreeToRad));
 			alighMatrix.m_posit = origin;
-			alighMatrix.m_posit.m_w = dFloat32(1.0f);
+			alighMatrix.m_posit.m_w = ndFloat32(1.0f);
 			const ndMatrix matrix (alighMatrix * child->GetMeshMatrix() * child->GetCurrentMatrix());
 
 			shapeArray[count] = new ndShapeInstance(new ndShapeCapsule(size.m_x, size.m_x, high));
 			shapeArray[count]->SetLocalMatrix(matrix);
 			count++;
-			dAssert(count < dInt32 (sizeof(shapeArray)/ sizeof (shapeArray[0])));
+			dAssert(count < ndInt32 (sizeof(shapeArray)/ sizeof (shapeArray[0])));
 		} 
 		else if (strstr(name, "convexhull")) 
 		{
@@ -478,7 +478,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren() const
 			const ndMatrix matrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
 			shapeArray[count]->SetLocalMatrix(matrix);
 			count++;
-			dAssert(count < dInt32 (sizeof(shapeArray) / sizeof(shapeArray[0])));
+			dAssert(count < ndInt32 (sizeof(shapeArray) / sizeof(shapeArray[0])));
 		}
 	}
 	
@@ -489,7 +489,7 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren() const
 		//compound->SetOwner(compoundInstance);
 
 		compound->BeginAddRemove ();
-		for (dInt32 i = 1; i < count; i ++) 
+		for (ndInt32 i = 1; i < count; i ++) 
 		{
 			compound->AddCollision(shapeArray[i]);
 			delete shapeArray[i];

@@ -21,7 +21,7 @@
 
 using namespace ofbx;
 
-#define D_ANIM_BASE_FREQ dFloat32 (30.0f)
+#define D_ANIM_BASE_FREQ ndFloat32 (30.0f)
 
 fbxDemoEntity::fbxDemoEntity(ndDemoEntity* const parent)
 	:ndDemoEntity(dGetIdentityMatrix(), parent)
@@ -64,7 +64,7 @@ void fbxDemoEntity::CleanIntermediate()
 
 void fbxDemoEntity::BuildRenderMeshes(ndDemoEntityManager* const scene)
 {
-	dInt32 stack = 1;
+	ndInt32 stack = 1;
 	fbxDemoEntity* entBuffer[1024];
 	entBuffer[0] = this;
 	while (stack)
@@ -102,7 +102,7 @@ void fbxDemoEntity::BuildRenderMeshes(ndDemoEntityManager* const scene)
 
 void fbxDemoEntity::ApplyTransform(const ndMatrix& transform)
 {
-	dInt32 stack = 1;
+	ndInt32 stack = 1;
 	fbxDemoEntity* entBuffer[1024];
 	entBuffer[0] = this;
 	ndMatrix invTransform(transform.Inverse4x4());
@@ -160,14 +160,14 @@ static ndMatrix GetCoordinateSystemMatrix(ofbx::IScene* const fbxScene)
 
 	ndMatrix convertMatrix(dGetIdentityMatrix());
 
-	dFloat32 scaleFactor = globalSettings->UnitScaleFactor;
-	convertMatrix[0][0] = dFloat32(scaleFactor / 100.0f);
-	convertMatrix[1][1] = dFloat32(scaleFactor / 100.0f);
-	convertMatrix[2][2] = dFloat32(scaleFactor / 100.0f);
+	ndFloat32 scaleFactor = globalSettings->UnitScaleFactor;
+	convertMatrix[0][0] = ndFloat32(scaleFactor / 100.0f);
+	convertMatrix[1][1] = ndFloat32(scaleFactor / 100.0f);
+	convertMatrix[2][2] = ndFloat32(scaleFactor / 100.0f);
 
 	ndMatrix axisMatrix(dGetZeroMatrix());
-	axisMatrix.m_up[globalSettings->UpAxis] = dFloat32(globalSettings->UpAxisSign);
-	axisMatrix.m_front[globalSettings->FrontAxis] = dFloat32(globalSettings->FrontAxisSign);
+	axisMatrix.m_up[globalSettings->UpAxis] = ndFloat32(globalSettings->UpAxisSign);
+	axisMatrix.m_front[globalSettings->FrontAxis] = ndFloat32(globalSettings->FrontAxisSign);
 	axisMatrix.m_right = axisMatrix.m_front.CrossProduct(axisMatrix.m_up);
 	axisMatrix = axisMatrix.Transpose();
 	
@@ -176,10 +176,10 @@ static ndMatrix GetCoordinateSystemMatrix(ofbx::IScene* const fbxScene)
 	return convertMatrix;
 }
 
-static dInt32 GetChildrenNodes(const ofbx::Object* const node, ofbx::Object** buffer)
+static ndInt32 GetChildrenNodes(const ofbx::Object* const node, ofbx::Object** buffer)
 {
-	dInt32 count = 0;
-	dInt32 index = 0;
+	ndInt32 count = 0;
+	ndInt32 index = 0;
 	while (ofbx::Object* child = node->resolveObjectLink(index))
 	{
 		if (child->isNode())
@@ -196,11 +196,11 @@ static dInt32 GetChildrenNodes(const ofbx::Object* const node, ofbx::Object** bu
 static ndMatrix ofbxMatrix2dMatrix(const ofbx::Matrix& fbxMatrix)
 {
 	ndMatrix matrix;
-	for (dInt32 i = 0; i < 4; i++)
+	for (ndInt32 i = 0; i < 4; i++)
 	{
-		for (dInt32 j = 0; j < 4; j++)
+		for (ndInt32 j = 0; j < 4; j++)
 		{
-			matrix[i][j] = dFloat32 (fbxMatrix.m[i * 4 + j]);
+			matrix[i][j] = ndFloat32 (fbxMatrix.m[i * 4 + j]);
 		}
 	}
 	return matrix;
@@ -208,7 +208,7 @@ static ndMatrix ofbxMatrix2dMatrix(const ofbx::Matrix& fbxMatrix)
 
 static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNodeMap& nodeMap)
 {
-	dInt32 stack = 0;
+	ndInt32 stack = 0;
 	ofbx::Object* buffer[1024];
 	fbxImportStackData nodeStack[1024];
 	const ofbx::Object* const rootNode = fbxScene->getRoot();
@@ -222,7 +222,7 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNodeM
 		rootEntity->SetName("dommyRoot");
 	}
 
-	for (dInt32 i = 0; i < stack; i++)
+	for (ndInt32 i = 0; i < stack; i++)
 	{
 		ofbx::Object* const child = buffer[stack - i - 1];
 		nodeStack[i] = fbxImportStackData(child, rootEntity);
@@ -245,13 +245,13 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNodeM
 		node->SetRenderMatrix(localMatrix);
 
 		nodeMap.Insert(node, data.m_fbxNode);
-		const dInt32 count = GetChildrenNodes(data.m_fbxNode, buffer);
-		for (dInt32 i = 0; i < count; i++) 
+		const ndInt32 count = GetChildrenNodes(data.m_fbxNode, buffer);
+		for (ndInt32 i = 0; i < count; i++) 
 		{
 			ofbx::Object* const child = buffer[count - i - 1];
 			nodeStack[stack] = fbxImportStackData(child, node);
 			stack++;
-			dAssert(stack < dInt32(sizeof(nodeStack) / sizeof(nodeStack[0])));
+			dAssert(stack < ndInt32(sizeof(nodeStack) / sizeof(nodeStack[0])));
 		}
 	}
 	return rootEntity;
@@ -261,7 +261,7 @@ static void ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const
 {
 	ndArray<ndMeshEffect::dMaterial>& materialArray = mesh->GetMaterials();
 	
-	dInt32 materialCount = fbxMesh->getMaterialCount();
+	ndInt32 materialCount = fbxMesh->getMaterialCount();
 	if (materialCount == 0)
 	{
 		ndMeshEffect::dMaterial defaultMaterial;
@@ -269,7 +269,7 @@ static void ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const
 	}
 	else
 	{
-		for (dInt32 i = 0; i < materialCount; i++)
+		for (ndInt32 i = 0; i < materialCount; i++)
 		{
 			ndMeshEffect::dMaterial material;
 			const ofbx::Material* const fbxMaterial = fbxMesh->getMaterial(i);
@@ -284,8 +284,8 @@ static void ImportMaterials(const ofbx::Mesh* const fbxMesh, ndMeshEffect* const
 			color = fbxMaterial->getSpecularColor();
 			material.m_specular = ndVector(color.r, color.g, color.b, 1.0f);
 			
-			material.m_opacity = dFloat32(fbxMaterial->getOpacityFactor());
-			material.m_shiness = dFloat32(fbxMaterial->getShininess());
+			material.m_opacity = ndFloat32(fbxMaterial->getOpacityFactor());
+			material.m_shiness = ndFloat32(fbxMaterial->getShininess());
 			
 			const ofbx::Texture* const texture = fbxMaterial->getTexture(ofbx::Texture::DIFFUSE);
 			if (texture)
@@ -332,12 +332,12 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 
 	const ofbx::Geometry* const geom = fbxMesh->getGeometry();
 	const ofbx::Vec3* const vertices = geom->getVertices();
-	dInt32 indexCount = geom->getIndexCount();
-	dInt32* const indexArray = new dInt32 [indexCount];
-	memcpy(indexArray, geom->getFaceIndices(), indexCount * sizeof(dInt32));
+	ndInt32 indexCount = geom->getIndexCount();
+	ndInt32* const indexArray = new ndInt32 [indexCount];
+	memcpy(indexArray, geom->getFaceIndices(), indexCount * sizeof(ndInt32));
 
-	dInt32 faceCount = 0;
-	for (dInt32 i = 0; i < indexCount; i++)
+	ndInt32 faceCount = 0;
+	for (ndInt32 i = 0; i < indexCount; i++)
 	{
 		if (indexArray[i] < 0)
 		{
@@ -345,16 +345,16 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 		}
 	}
 
-	dInt32* const faceIndexArray = new dInt32[faceCount];
-	dInt32* const faceMaterialArray = new dInt32[faceCount];
+	ndInt32* const faceIndexArray = new ndInt32[faceCount];
+	ndInt32* const faceMaterialArray = new ndInt32[faceCount];
 
 	ImportMaterials(fbxMesh, mesh);
 
-	dInt32 count = 0;
-	dInt32 faceIndex = 0;
+	ndInt32 count = 0;
+	ndInt32 faceIndex = 0;
 	const ndArray<ndMeshEffect::dMaterial>& materialArray = mesh->GetMaterials();
-	dInt32 materialId = (materialArray.GetCount() <= 1) ? 0 : -1;
-	for (dInt32 i = 0; i < indexCount; i++)
+	ndInt32 materialId = (materialArray.GetCount() <= 1) ? 0 : -1;
+	for (ndInt32 i = 0; i < indexCount; i++)
 	{
 		count++;
 		if (indexArray[i] < 0)
@@ -367,7 +367,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 			}
 			else
 			{
-				dInt32 fbxMatIndex = geom->getMaterials()[faceIndex];
+				ndInt32 fbxMatIndex = geom->getMaterials()[faceIndex];
 				faceMaterialArray[faceIndex] = fbxMatIndex;
 			}
 			count = 0;
@@ -390,10 +390,10 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 		normalArray.Resize(indexCount);
 		normalArray.SetCount(indexCount);
 		const ofbx::Vec3* const normals = geom->getNormals();
-		for (dInt32 i = 0; i < indexCount; ++i)
+		for (ndInt32 i = 0; i < indexCount; ++i)
 		{
 			ofbx::Vec3 n = normals[i];
-			normalArray[i] = ndVector(dFloat32(n.x), dFloat32(n.y), dFloat32(n.z), dFloat32(0.0f));
+			normalArray[i] = ndVector(ndFloat32(n.x), ndFloat32(n.y), ndFloat32(n.z), ndFloat32(0.0f));
 		}
 
 		format.m_normal.m_data = &normalArray[0].m_x;
@@ -407,10 +407,10 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 		uvArray.Resize(indexCount);
 		uvArray.SetCount(indexCount);
 		const ofbx::Vec2* const uv = geom->getUVs();
-		for (dInt32 i = 0; i < indexCount; ++i)
+		for (ndInt32 i = 0; i < indexCount; ++i)
 		{
 			ofbx::Vec2 n = uv[i];
-			uvArray[i] = ndVector(dFloat32(n.x), dFloat32(n.y), dFloat32(0.0f), dFloat32(0.0f));
+			uvArray[i] = ndVector(ndFloat32(n.x), ndFloat32(n.y), ndFloat32(0.0f), ndFloat32(0.0f));
 		}
 		format.m_uv0.m_data = &uvArray[0].m_x;
 		format.m_uv0.m_indexList = indexArray;
@@ -421,10 +421,10 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 	if (geom->getSkin())
 	{
 		const ofbx::Skin* const skin = geom->getSkin();
-		dInt32 clusterCount = skin->getClusterCount();
+		ndInt32 clusterCount = skin->getClusterCount();
 
 		ndTree <const ofbx::Cluster*, const Object*> clusterBoneMap;
-		for (dInt32 i = 0; i < clusterCount; i++) 
+		for (ndInt32 i = 0; i < clusterCount; i++) 
 		{
 			const ofbx::Cluster* const cluster = skin->getCluster(i);
 			const ofbx::Object* const link = cluster->getLink();
@@ -440,13 +440,13 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNodeMap& nodeMa
 				ndMeshEffect::dVertexCluster* const cluster = mesh->CreateCluster(fbxBone->name);
 
 				dAssert(fbxCluster->getIndicesCount() == fbxCluster->getWeightsCount());
-				dInt32 clusterIndexCount = fbxCluster->getIndicesCount();
-				const dInt32* const indices = fbxCluster->getIndices();
+				ndInt32 clusterIndexCount = fbxCluster->getIndicesCount();
+				const ndInt32* const indices = fbxCluster->getIndices();
 				const double* const weights = fbxCluster->getWeights();
-				for (dInt32 j = 0; j < clusterIndexCount; j++)
+				for (ndInt32 j = 0; j < clusterIndexCount; j++)
 				{
 					cluster->m_vertexIndex.PushBack(indices[j]);
-					cluster->m_vertexWeigh.PushBack(dFloat32 (weights[j]));
+					cluster->m_vertexWeigh.PushBack(ndFloat32 (weights[j]));
 				}
 			}
 		}
@@ -526,7 +526,7 @@ static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 
 static void FreezeScale(fbxDemoEntity* const entity)
 {
-	dInt32 stack = 1;
+	ndInt32 stack = 1;
 	fbxDemoEntity* entBuffer[1024];
 	ndMatrix parentMatrix[1024];
 	entBuffer[0] = entity;
@@ -599,10 +599,10 @@ class dFbxAnimationTrack
 	class dCurveValue
 	{
 		public:
-		dFloat32 m_x;
-		dFloat32 m_y;
-		dFloat32 m_z;
-		dFloat32 m_time;
+		ndFloat32 m_x;
+		ndFloat32 m_y;
+		ndFloat32 m_z;
+		ndFloat32 m_time;
 	};
 
 	class dCurve : public ndList <dCurveValue>
@@ -613,7 +613,7 @@ class dFbxAnimationTrack
 		{
 		}
 
-		dCurveValue Evaluate(dFloat32 t) const
+		dCurveValue Evaluate(ndFloat32 t) const
 		{
 			for (ndNode* ptr = GetFirst(); ptr->GetNext(); ptr = ptr->GetNext()) 
 			{
@@ -622,7 +622,7 @@ class dFbxAnimationTrack
 				{
 					dCurveValue& info0 = ptr->GetInfo();
 					dCurveValue val;
-					dFloat32 param = (t - info0.m_time) / (info1.m_time - info0.m_time);
+					ndFloat32 param = (t - info0.m_time) / (info1.m_time - info0.m_time);
 					val.m_x = info0.m_x + (info1.m_x - info0.m_x) * param;
 					val.m_y = info0.m_y + (info1.m_y - info0.m_y) * param;
 					val.m_z = info0.m_z + (info1.m_z - info0.m_z) * param;
@@ -647,7 +647,7 @@ class dFbxAnimationTrack
 	//const ndList<dCurveValue>& GetPositions() const;
 	//const ndList<dCurveValue>& GetRotations() const;
 
-	void AddKeyframe(dFloat32 time, const ndMatrix& matrix)
+	void AddKeyframe(ndFloat32 time, const ndMatrix& matrix)
 	{
 		ndVector scale;
 		ndVector euler0;
@@ -662,7 +662,7 @@ class dFbxAnimationTrack
 		AddRotation(time, euler0.m_x, euler0.m_y, euler0.m_z);
 	}
 
-	ndMatrix GetKeyframe(dFloat32 time) const
+	ndMatrix GetKeyframe(ndFloat32 time) const
 	{
 		dCurveValue scale(m_scale.Evaluate(time));
 		dCurveValue position(m_position.Evaluate(time));
@@ -750,7 +750,7 @@ class dFbxAnimationTrack
 	}
 
 	private:
-	void AddScale(dFloat32 time, dFloat32 x, dFloat32 y, dFloat32 z)
+	void AddScale(ndFloat32 time, ndFloat32 x, ndFloat32 y, ndFloat32 z)
 	{
 		dCurveValue& value = m_scale.Append()->GetInfo();
 		value.m_x = x;
@@ -759,7 +759,7 @@ class dFbxAnimationTrack
 		value.m_time = time;
 	}
 
-	void AddPosition(dFloat32 time, dFloat32 x, dFloat32 y, dFloat32 z)
+	void AddPosition(ndFloat32 time, ndFloat32 x, ndFloat32 y, ndFloat32 z)
 	{
 		dCurveValue& value = m_position.Append()->GetInfo();
 		value.m_x = x;
@@ -768,7 +768,7 @@ class dFbxAnimationTrack
 		value.m_time = time;
 	}
 
-	void AddRotation(dFloat32 time, dFloat32 x, dFloat32 y, dFloat32 z)
+	void AddRotation(ndFloat32 time, ndFloat32 x, ndFloat32 y, ndFloat32 z)
 	{
 		dCurveValue& value = m_rotation.Append()->GetInfo();
 		value.m_x = x;
@@ -777,28 +777,28 @@ class dFbxAnimationTrack
 		value.m_time = time;
 	}
 
-	dFloat32 FixAngleAlias(dFloat32 angleA, dFloat32 angleB) const
+	ndFloat32 FixAngleAlias(ndFloat32 angleA, ndFloat32 angleB) const
 	{
-		dFloat32 sinA = dSin(angleA);
-		dFloat32 cosA = dCos(angleA);
-		dFloat32 sinB = dSin(angleB);
-		dFloat32 cosB = dCos(angleB);
+		ndFloat32 sinA = ndSin(angleA);
+		ndFloat32 cosA = ndCos(angleA);
+		ndFloat32 sinB = ndSin(angleB);
+		ndFloat32 cosB = ndCos(angleB);
 
-		dFloat32 num = sinB * cosA - cosB * sinA;
-		dFloat32 den = cosA * cosB + sinA * sinB;
-		angleB = angleA + dAtan2(num, den);
+		ndFloat32 num = sinB * cosA - cosB * sinA;
+		ndFloat32 den = cosA * cosB + sinA * sinB;
+		angleB = angleA + ndAtan2(num, den);
 		return angleB;
 	}
 
-	dFloat32 Interpolate(dFloat32 x0, dFloat32 t0, dFloat32 x1, dFloat32 t1, dFloat32 t) const
+	ndFloat32 Interpolate(ndFloat32 x0, ndFloat32 t0, ndFloat32 x1, ndFloat32 t1, ndFloat32 t) const
 	{
 		return x0 + (x1 - x0) * (t - t0) / (t1 - t0);
 	}
 
 	void OptimizeCurve(ndList<dCurveValue>& curve)
 	{
-		const dFloat32 tol = 5.0e-5f;
-		const dFloat32 tol2 = tol * tol;
+		const ndFloat32 tol = 5.0e-5f;
+		const ndFloat32 tol2 = tol * tol;
 		for (dCurve::ndNode* node0 = curve.GetFirst(); node0->GetNext(); node0 = node0->GetNext()) 
 		{
 			const dCurveValue& value0 = node0->GetInfo();
@@ -806,15 +806,15 @@ class dFbxAnimationTrack
 			{
 				const dCurveValue& value1 = node1->GetPrev()->GetInfo();
 				const dCurveValue& value2 = node1->GetInfo();
-				ndVector p1(value1.m_x, value1.m_y, value1.m_z, dFloat32(0.0f));
-				ndVector p2(value2.m_x, value2.m_y, value2.m_z, dFloat32(0.0f));
+				ndVector p1(value1.m_x, value1.m_y, value1.m_z, ndFloat32(0.0f));
+				ndVector p2(value2.m_x, value2.m_y, value2.m_z, ndFloat32(0.0f));
 		
-				dFloat32 dist_x = value1.m_x - Interpolate(value0.m_x, value0.m_time, value2.m_x, value2.m_time, value1.m_time);
-				dFloat32 dist_y = value1.m_y - Interpolate(value0.m_y, value0.m_time, value2.m_y, value2.m_time, value1.m_time);
-				dFloat32 dist_z = value1.m_z - Interpolate(value0.m_z, value0.m_time, value2.m_z, value2.m_time, value1.m_time);
+				ndFloat32 dist_x = value1.m_x - Interpolate(value0.m_x, value0.m_time, value2.m_x, value2.m_time, value1.m_time);
+				ndFloat32 dist_y = value1.m_y - Interpolate(value0.m_y, value0.m_time, value2.m_y, value2.m_time, value1.m_time);
+				ndFloat32 dist_z = value1.m_z - Interpolate(value0.m_z, value0.m_time, value2.m_z, value2.m_time, value1.m_time);
 		
 				ndVector err(dist_x, dist_y, dist_z, 0.0f);
-				dFloat32 mag2 = err.DotProduct(err).GetScalar();
+				ndFloat32 mag2 = err.DotProduct(err).GetScalar();
 				if (mag2 > tol2) 
 				{
 					break;
@@ -874,8 +874,8 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 		ndMatrix parentMatrixStack[1024];
 		fbxDemoEntity* stackPool[1024];
 
-		dFloat32 deltaTimeAcc = dFloat32 (0.0f);
-		for (dInt32 i = 0; i < m_framesCount; i++)
+		ndFloat32 deltaTimeAcc = ndFloat32 (0.0f);
+		for (ndInt32 i = 0; i < m_framesCount; i++)
 		{
 			for (fbxDemoEntity* node = (fbxDemoEntity*)entity->GetFirst(); node; node = (fbxDemoEntity*)node->GetNext())
 			{
@@ -888,7 +888,7 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 				}
 			}
 
-			dInt32 stack = 1;
+			ndInt32 stack = 1;
 			stackPool[0] = entity;
 			parentMatrixStack[0] = dGetIdentityMatrix();
 			while (stack)
@@ -958,7 +958,7 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 			{
 				dFbxAnimationTrack::dCurveValue& keyFrame = node->GetInfo();
 				track->m_position.m_time.PushBack(keyFrame.m_time);
-				track->m_position.PushBack(ndVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, dFloat32(1.0f)));
+				track->m_position.PushBack(ndVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, ndFloat32(1.0f)));
 				//dTrace(("%f %f %f %f\n", keyFrame.m_time, keyFrame.m_x, keyFrame.m_y, keyFrame.m_z));
 			}
 
@@ -979,9 +979,9 @@ class dFbxAnimation : public ndTree <dFbxAnimationTrack, ndString>
 		return sequence;
 	}
 
-	dFloat32 m_length;
-	dFloat32 m_timestep;
-	dInt32 m_framesCount;
+	ndFloat32 m_length;
+	ndFloat32 m_timestep;
+	ndInt32 m_framesCount;
 };
 
 static void LoadAnimationCurve(ofbx::IScene* const, const ofbx::Object* const bone, const ofbx::AnimationLayer* const animLayer, dFbxAnimation& animation)
@@ -996,8 +996,8 @@ static void LoadAnimationCurve(ofbx::IScene* const, const ofbx::Object* const bo
 	Vec3 rotation;
 	Vec3 translation;
 
-	dFloat32 timeAcc = 0.0f;
-	dFloat32 timestep = animation.m_timestep;
+	ndFloat32 timeAcc = 0.0f;
+	ndFloat32 timestep = animation.m_timestep;
 
 	ndVector scale1;
 	ndVector euler0;
@@ -1007,7 +1007,7 @@ static void LoadAnimationCurve(ofbx::IScene* const, const ofbx::Object* const bo
 	ndMatrix boneMatrix(ofbxMatrix2dMatrix(bone->getLocalTransform()));
 	boneMatrix.PolarDecomposition(transform, scale1, eigenScaleAxis);
 	transform.CalcPitchYawRoll(euler0, euler1);
-	for (dInt32 i = 0; i < animation.m_framesCount; i++)
+	for (ndInt32 i = 0; i < animation.m_framesCount; i++)
 	{
 		scale.x = scale1.m_x;
 		scale.y = scale1.m_y;
@@ -1040,21 +1040,21 @@ static void LoadAnimationCurve(ofbx::IScene* const, const ofbx::Object* const bo
 
 static void LoadAnimationLayer(ofbx::IScene* const fbxScene, const ofbx::AnimationLayer* const animLayer, dFbxAnimation& animation)
 {
-	dInt32 stack = 0;
+	ndInt32 stack = 0;
 	ofbx::Object* stackPool[1024];
 	const ofbx::Object* const rootNode = fbxScene->getRoot();
 	dAssert(rootNode);
 	stack = GetChildrenNodes(rootNode, stackPool);
 
 	const ofbx::TakeInfo* const animationInfo = fbxScene->getTakeInfo(0);
-	//animation.m_length = dFloat32(animationInfo->local_time_to - animationInfo->local_time_from);
+	//animation.m_length = ndFloat32(animationInfo->local_time_to - animationInfo->local_time_from);
 
-	dFloat32 period = dFloat32(animationInfo->local_time_to - animationInfo->local_time_from);
-	dFloat32 framesFloat = period * D_ANIM_BASE_FREQ;
+	ndFloat32 period = ndFloat32(animationInfo->local_time_to - animationInfo->local_time_from);
+	ndFloat32 framesFloat = period * D_ANIM_BASE_FREQ;
 
-	dInt32 frames = dInt32(dFloor(framesFloat));
+	ndInt32 frames = ndInt32(ndFloor(framesFloat));
 	dAssert(frames > 0);
-	dFloat32 timestep = period / frames;
+	ndFloat32 timestep = period / frames;
 
 	animation.m_length = period;
 	animation.m_timestep = timestep;
@@ -1067,18 +1067,18 @@ static void LoadAnimationLayer(ofbx::IScene* const fbxScene, const ofbx::Animati
 		LoadAnimationCurve(fbxScene, bone, animLayer, animation);
 
 		stack += GetChildrenNodes(bone, &stackPool[stack]);
-		dAssert(stack < dInt32(sizeof(stackPool) / sizeof(stackPool[0]) - 64));
+		dAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0]) - 64));
 	}
 }
 
 static void LoadAnimation(ofbx::IScene* const fbxScene, dFbxAnimation& animation)
 {
-	dInt32 animationCount = fbxScene->getAnimationStackCount();
+	ndInt32 animationCount = fbxScene->getAnimationStackCount();
 	for (int i = 0; i < animationCount; i++)
 	{
 		const ofbx::AnimationStack* const animStack = fbxScene->getAnimationStack(i);
 		
-		dInt32 layerCount = 0;
+		ndInt32 layerCount = 0;
 		while (const ofbx::AnimationLayer* const animLayer = animStack->getLayer(layerCount))
 		{
 			LoadAnimationLayer(fbxScene, animLayer, animation);

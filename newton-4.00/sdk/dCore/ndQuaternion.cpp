@@ -34,12 +34,12 @@ static QUAT_INDEX QIndex[] = { Y_INDEX, Z_INDEX, X_INDEX };
 
 ndQuaternion::ndQuaternion(const ndMatrix& matrix)
 {
-	dFloat32 trace = matrix[0][0] + matrix[1][1] + matrix[2][2];
-	if (trace > dFloat32(0.0f))
+	ndFloat32 trace = matrix[0][0] + matrix[1][1] + matrix[2][2];
+	if (trace > ndFloat32(0.0f))
 	{
-		trace = dSqrt(trace + dFloat32(1.0f));
-		m_w = dFloat32(0.5f) * trace;
-		trace = dFloat32(0.5f) / trace;
+		trace = ndSqrt(trace + ndFloat32(1.0f));
+		m_w = ndFloat32(0.5f) * trace;
+		trace = ndFloat32(0.5f) / trace;
 		m_x = (matrix[1][2] - matrix[2][1]) * trace;
 		m_y = (matrix[2][0] - matrix[0][2]) * trace;
 		m_z = (matrix[0][1] - matrix[1][0]) * trace;
@@ -58,12 +58,12 @@ ndQuaternion::ndQuaternion(const ndMatrix& matrix)
 		QUAT_INDEX j = QIndex[i];
 		QUAT_INDEX k = QIndex[j];
 
-		trace = dFloat32(1.0f) + matrix[i][i] - matrix[j][j] - matrix[k][k];
-		trace = dSqrt(trace);
+		trace = ndFloat32(1.0f) + matrix[i][i] - matrix[j][j] - matrix[k][k];
+		trace = ndSqrt(trace);
 
-		dFloat32* const ptr = &m_x;
-		ptr[i] = dFloat32(0.5f) * trace;
-		trace = dFloat32(0.5f) / trace;
+		ndFloat32* const ptr = &m_x;
+		ptr[i] = ndFloat32(0.5f) * trace;
+		trace = ndFloat32(0.5f) / trace;
 		m_w = (matrix[j][k] - matrix[k][j]) * trace;
 		ptr[j] = (matrix[i][j] + matrix[j][i]) * trace;
 		ptr[k] = (matrix[i][k] + matrix[k][i]) * trace;
@@ -73,26 +73,26 @@ ndQuaternion::ndQuaternion(const ndMatrix& matrix)
 
 	ndMatrix tmp (*this, matrix.m_posit);
 	ndMatrix unitMatrix (tmp * matrix.Inverse());
-	for (dInt32 i = 0; i < 4; i ++) 
+	for (ndInt32 i = 0; i < 4; i ++) 
 	{
-		dFloat32 err = dAbs (unitMatrix[i][i] - dFloat32(1.0f));
-		dAssert (err < dFloat32 (1.0e-2f));
+		ndFloat32 err = dAbs (unitMatrix[i][i] - ndFloat32(1.0f));
+		dAssert (err < ndFloat32 (1.0e-2f));
 	}
 
-	dFloat32 err = dAbs (DotProduct(*this).GetScalar() - dFloat32(1.0f));
-	dAssert (err < dFloat32(dEpsilon * 100.0f));
+	ndFloat32 err = dAbs (DotProduct(*this).GetScalar() - ndFloat32(1.0f));
+	dAssert (err < ndFloat32(ndEpsilon * 100.0f));
 #endif
 }
 
-ndQuaternion::ndQuaternion (const ndVector &unitAxis, dFloat32 angle)
+ndQuaternion::ndQuaternion (const ndVector &unitAxis, ndFloat32 angle)
 {
-	angle *= dFloat32 (0.5f);
-	m_w = dCos (angle);
-	dFloat32 sinAng = dSin (angle);
+	angle *= ndFloat32 (0.5f);
+	m_w = ndCos (angle);
+	ndFloat32 sinAng = ndSin (angle);
 
 #ifdef _DEBUG
-	if (dAbs (angle) > dFloat32(dEpsilon / 10.0f)) {
-		dAssert (dAbs (dFloat32(1.0f) - unitAxis.DotProduct(unitAxis & ndVector::m_triplexMask).GetScalar()) < dFloat32(dEpsilon * 10.0f));
+	if (dAbs (angle) > ndFloat32(ndEpsilon / 10.0f)) {
+		dAssert (dAbs (ndFloat32(1.0f) - unitAxis.DotProduct(unitAxis & ndVector::m_triplexMask).GetScalar()) < ndFloat32(ndEpsilon * 10.0f));
 	} 
 #endif
 	m_x = unitAxis.m_x * sinAng;
@@ -122,60 +122,60 @@ ndQuaternion ndQuaternion::operator* (const ndQuaternion &q) const
 //		q.m_z * m_w - q.m_y * m_x + q.m_x * m_y + q.m_w * m_z,
 //		q.m_w * m_w - q.m_x * m_x - q.m_y * m_y - q.m_z * m_z);
 //
-//	dFloat32 mag0 = xxx0.DotProduct(xxx0).GetScalar();
-//	dFloat32 mag1 = xxx1.DotProduct(xxx1).GetScalar();
-//	dFloat32 error = mag0 - mag1;
-//	dAssert(dAbs(error) < dFloat32(1.0e-5f));
+//	ndFloat32 mag0 = xxx0.DotProduct(xxx0).GetScalar();
+//	ndFloat32 mag1 = xxx1.DotProduct(xxx1).GetScalar();
+//	ndFloat32 error = mag0 - mag1;
+//	dAssert(dAbs(error) < ndFloat32(1.0e-5f));
 //#endif
 
 	return x * ndVector(m_x) + y * ndVector(m_y) + z * ndVector(m_z) + w * ndVector(m_w);
 }
 
-ndVector ndQuaternion::CalcAverageOmega (const ndQuaternion &q1, dFloat32 invdt) const
+ndVector ndQuaternion::CalcAverageOmega (const ndQuaternion &q1, ndFloat32 invdt) const
 {
 	ndQuaternion q0 (*this);
-	if (q0.DotProduct (q1).GetScalar() < dFloat32 (0.0f)) 
+	if (q0.DotProduct (q1).GetScalar() < ndFloat32 (0.0f)) 
 	{
-		q0 = q0.Scale(dFloat32 (-1.0f));
+		q0 = q0.Scale(ndFloat32 (-1.0f));
 	}
 	ndQuaternion dq (q0.Inverse() * q1);
-	ndVector omegaDir (dq.m_x, dq.m_y, dq.m_z, dFloat32 (0.0f));
+	ndVector omegaDir (dq.m_x, dq.m_y, dq.m_z, ndFloat32 (0.0f));
 
-	dFloat32 dirMag2 = omegaDir.DotProduct(omegaDir).GetScalar();
-	if (dirMag2	< dFloat32(dFloat32 (1.0e-5f) * dFloat32 (1.0e-5f))) 
+	ndFloat32 dirMag2 = omegaDir.DotProduct(omegaDir).GetScalar();
+	if (dirMag2	< ndFloat32(ndFloat32 (1.0e-5f) * ndFloat32 (1.0e-5f))) 
 	{
-		return ndVector (dFloat32(0.0f));
+		return ndVector (ndFloat32(0.0f));
 	}
 
-	dFloat32 dirMagInv = dRsqrt (dirMag2);
-	dFloat32 dirMag = dirMag2 * dirMagInv;
+	ndFloat32 dirMagInv = ndRsqrt (dirMag2);
+	ndFloat32 dirMag = dirMag2 * dirMagInv;
 
-	dFloat32 omegaMag = dFloat32(2.0f) * dAtan2 (dirMag, dq.m_w) * invdt;
+	ndFloat32 omegaMag = ndFloat32(2.0f) * ndAtan2 (dirMag, dq.m_w) * invdt;
 	return omegaDir.Scale (dirMagInv * omegaMag);
 }
 
-ndQuaternion ndQuaternion::Slerp (const ndQuaternion &q1, dFloat32 t) const 
+ndQuaternion ndQuaternion::Slerp (const ndQuaternion &q1, ndFloat32 t) const 
 {
 	ndQuaternion q0;
 
-	dFloat32 dot = DotProduct(q1).GetScalar();
-	if ((dot + dFloat32(1.0f)) > dEpsilon) 
+	ndFloat32 dot = DotProduct(q1).GetScalar();
+	if ((dot + ndFloat32(1.0f)) > ndEpsilon) 
 	{
-		dFloat32 Sclp;
-		dFloat32 Sclq;
-		if (dot < (dFloat32(1.0f) - dEpsilon) ) 
+		ndFloat32 Sclp;
+		ndFloat32 Sclq;
+		if (dot < (ndFloat32(1.0f) - ndEpsilon) ) 
 		{
-			dFloat32 ang = dAcos (dot);
+			ndFloat32 ang = ndAcos (dot);
 
-			dFloat32 sinAng = dSin (ang);
-			dFloat32 den = dFloat32(1.0f) / sinAng;
+			ndFloat32 sinAng = ndSin (ang);
+			ndFloat32 den = ndFloat32(1.0f) / sinAng;
 
-			Sclp = dSin ((dFloat32(1.0f) - t ) * ang) * den;
-			Sclq = dSin (t * ang) * den;
+			Sclp = ndSin ((ndFloat32(1.0f) - t ) * ang) * den;
+			Sclq = ndSin (t * ang) * den;
 		} 
 		else
 		{
-			Sclp = dFloat32(1.0f) - t;
+			Sclp = ndFloat32(1.0f) - t;
 			Sclq = t;
 		}
 
@@ -191,8 +191,8 @@ ndQuaternion ndQuaternion::Slerp (const ndQuaternion &q1, dFloat32 t) const
 		q0.m_y =  m_x;
 		q0.m_z =  m_w;
 
-		dFloat32 Sclp = dSin ((dFloat32(1.0f) - t) * dPi * dFloat32 (0.5f));
-		dFloat32 Sclq = dSin (t * dPi * dFloat32 (0.5f));
+		ndFloat32 Sclp = ndSin ((ndFloat32(1.0f) - t) * ndPi * ndFloat32 (0.5f));
+		ndFloat32 Sclq = ndSin (t * ndPi * ndFloat32 (0.5f));
 
 		q0.m_w = m_w * Sclp + q0.m_w * Sclq;
 		q0.m_x = m_x * Sclp + q0.m_x * Sclq;
@@ -201,9 +201,9 @@ ndQuaternion ndQuaternion::Slerp (const ndQuaternion &q1, dFloat32 t) const
 	}
 
 	dot = q0.DotProduct (q0).GetScalar();
-	if (dAbs (dot - dFloat32(1.0f)) > dEpsilon) 
+	if (dAbs (dot - ndFloat32(1.0f)) > ndEpsilon) 
 	{
-		dot = dRsqrt (dot);
+		dot = ndRsqrt (dot);
 		q0 = q0.Scale(dot);
 	}
 	return q0;

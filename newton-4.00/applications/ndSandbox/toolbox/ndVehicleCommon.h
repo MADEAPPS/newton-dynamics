@@ -24,13 +24,13 @@ class ndVehicleDectriptor
 	{
 		public:
 		ndTorqueTap() {}
-		ndTorqueTap(dFloat32 rpm, dFloat32 torqueInPoundFeet)
+		ndTorqueTap(ndFloat32 rpm, ndFloat32 torqueInPoundFeet)
 			:m_radPerSeconds(rpm * 0.105f)
 			,m_torqueInNewtonMeters(torqueInPoundFeet * 1.36f)
 		{
 		}
-		dFloat32 m_radPerSeconds;
-		dFloat32 m_torqueInNewtonMeters;
+		ndFloat32 m_radPerSeconds;
+		ndFloat32 m_torqueInNewtonMeters;
 	};
 
 	class ndEngineTorqueCurve
@@ -38,50 +38,50 @@ class ndVehicleDectriptor
 		public:
 		ndEngineTorqueCurve();
 	
-		void Init(dFloat32 fuelInjectionRate,
-			dFloat32 idleTorquePoundFoot, dFloat32 idleRmp,
-			dFloat32 horsePower, dFloat32 rpm0, dFloat32 rpm1,
-			dFloat32 horsePowerAtRedLine, dFloat32 redLineRpm);
+		void Init(ndFloat32 fuelInjectionRate,
+			ndFloat32 idleTorquePoundFoot, ndFloat32 idleRmp,
+			ndFloat32 horsePower, ndFloat32 rpm0, ndFloat32 rpm1,
+			ndFloat32 horsePowerAtRedLine, ndFloat32 redLineRpm);
 
-		dFloat32 GetFuelRate() const;
-		dFloat32 GetIdleRadPerSec() const;
-		dFloat32 GetRedLineRadPerSec() const;
-		dFloat32 GetLowGearShiftRadPerSec() const;
-		dFloat32 GetHighGearShiftRadPerSec() const;
-		dFloat32 GetTorque(dFloat32 omegaInRadPerSeconds) const;
+		ndFloat32 GetFuelRate() const;
+		ndFloat32 GetIdleRadPerSec() const;
+		ndFloat32 GetRedLineRadPerSec() const;
+		ndFloat32 GetLowGearShiftRadPerSec() const;
+		ndFloat32 GetHighGearShiftRadPerSec() const;
+		ndFloat32 GetTorque(ndFloat32 omegaInRadPerSeconds) const;
 	
 		private:
 		ndTorqueTap m_torqueCurve[5];
-		dFloat32 m_fuelInjectionRate;
+		ndFloat32 m_fuelInjectionRate;
 	};
 
 	class ndGearBox
 	{
 		public:
-		dInt32 m_gearsCount;
+		ndInt32 m_gearsCount;
 		union
 		{
 			struct
 			{
-				dFloat32 m_forwardRatios[5];
-				dFloat32 m_reverseRatio;
-				dFloat32 m_neutral;
+				ndFloat32 m_forwardRatios[5];
+				ndFloat32 m_reverseRatio;
+				ndFloat32 m_neutral;
 			};
-			dFloat32 m_ratios[8];
+			ndFloat32 m_ratios[8];
 		};
 
-		dFloat32 m_idleClutchTorque;
-		dFloat32 m_lockedClutchTorque;
-		dFloat32 m_crownGearRatio;
-		dFloat32 m_torqueConverter;
+		ndFloat32 m_idleClutchTorque;
+		ndFloat32 m_lockedClutchTorque;
+		ndFloat32 m_crownGearRatio;
+		ndFloat32 m_torqueConverter;
 		bool m_manual;
 	};
 
 	class ndTireDefinition: public ndWheelDescriptor
 	{
 		public:
-		dFloat32 m_mass;
-		dFloat32 m_verticalOffset;
+		ndFloat32 m_mass;
+		ndFloat32 m_verticalOffset;
 	};
 
 	enum ndDifferentialType
@@ -106,26 +106,26 @@ class ndVehicleDectriptor
 	ndVector m_comDisplacement;
 	char m_name[32];
 
-	dFloat32 m_chassisMass;
-	dFloat32 m_chassisAngularDrag;
+	ndFloat32 m_chassisMass;
+	ndFloat32 m_chassisAngularDrag;
 	ndEngineTorqueCurve m_engine;
 	ndGearBox m_transmission;
 	ndTireDefinition m_frontTire;
 	ndTireDefinition m_rearTire;
 
-	dFloat32 m_frictionCoefficientScale;
+	ndFloat32 m_frictionCoefficientScale;
 
-	dFloat32 m_motorMass;
-	dFloat32 m_motorRadius;
+	ndFloat32 m_motorMass;
+	ndFloat32 m_motorRadius;
 
-	dFloat32 m_differentialMass;
-	dFloat32 m_differentialRadius;
-	dFloat32 m_slipDifferentialRmpLock;
+	ndFloat32 m_differentialMass;
+	ndFloat32 m_differentialRadius;
+	ndFloat32 m_slipDifferentialRmpLock;
 	ndDifferentialType m_differentialType;
 
-	dFloat32 m_torsionBarSpringK;
-	dFloat32 m_torsionBarDamperC;
-	dFloat32 m_torsionBarRegularizer;
+	ndFloat32 m_torsionBarSpringK;
+	ndFloat32 m_torsionBarDamperC;
+	ndFloat32 m_torsionBarRegularizer;
 	ndTorsionBarType m_torsionBarType;
 
 	bool m_useHardSolverMode;
@@ -143,14 +143,14 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 	virtual void SetAsPlayer(ndDemoEntityManager* const scene, bool mode = true);
 
 	protected:
-	void ApplyInputs(ndWorld* const world, dFloat32 timestep);
-	dFloat32 GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const;
+	void ApplyInputs(ndWorld* const world, ndFloat32 timestep);
+	ndFloat32 GetFrictionCoeficient(const ndMultiBodyVehicleTireJoint* const, const ndContactMaterial&) const;
 
-	void CalculateTireDimensions(const char* const tireName, dFloat32& width, dFloat32& radius, ndDemoEntity* const vehEntity) const;
+	void CalculateTireDimensions(const char* const tireName, ndFloat32& width, ndFloat32& radius, ndDemoEntity* const vehEntity) const;
 	ndBodyDynamic* CreateTireBody(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, const ndVehicleDectriptor::ndTireDefinition& definition, const char* const tireName) const;
 
 	ndVehicleDectriptor m_configuration;
-	dFloat32 m_steerAngle;
+	ndFloat32 m_steerAngle;
 
 	ndDemoEntityManager::ndKeyTrigger m_parking;
 	ndDemoEntityManager::ndKeyTrigger m_ignition;
@@ -160,8 +160,8 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 	ndDemoEntityManager::ndKeyTrigger m_forwardGearDown;
 	ndDemoEntityManager::ndKeyTrigger m_manualTransmission;
 
-	dInt32 m_currentGear;
-	dInt32 m_autoGearShiftTimer;
+	ndInt32 m_currentGear;
+	ndInt32 m_autoGearShiftTimer;
 	bool m_isPlayer;
 	bool m_isParked;
 	bool m_isManualTransmission;
@@ -174,8 +174,8 @@ class ndVehicleSelector : public ndModel
 	ndVehicleSelector();
 	ndVehicleSelector(const ndLoadSaveBase::dLoadDescriptor& desc);
 
-	void Update(ndWorld* const, dFloat32){}
-	void PostUpdate(ndWorld* const world, dFloat32);
+	void Update(ndWorld* const, ndFloat32){}
+	void PostUpdate(ndWorld* const world, ndFloat32);
 	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	ndDemoEntityManager::ndKeyTrigger m_changeVehicle;

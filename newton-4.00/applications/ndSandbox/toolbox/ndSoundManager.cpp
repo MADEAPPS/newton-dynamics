@@ -22,11 +22,11 @@ ndSoundChannel::ndSoundChannel()
 	,m_manager(nullptr)
 	,m_assetNode(nullptr)
 	,m_playingNode(nullptr)
-	,m_gain(dFloat32 (1.0f))
-	,m_pitch(dFloat32(1.0f))
-	,m_volume(dFloat32(1.0f))
-	,m_minDropOffDist(dFloat32(30.0f))
-	,m_maxDropOffDist(dFloat32(50.0f))
+	,m_gain(ndFloat32 (1.0f))
+	,m_pitch(ndFloat32(1.0f))
+	,m_volume(ndFloat32(1.0f))
+	,m_minDropOffDist(ndFloat32(30.0f))
+	,m_maxDropOffDist(ndFloat32(50.0f))
 {
 	alGenSources(1, (ALuint*)&m_source);
 	dAssert(m_source);
@@ -39,12 +39,12 @@ ndSoundChannel::ndSoundChannel()
 	ALfloat posit[3];
 	alGetSourcefv(m_source, AL_POSITION, posit);
 	dAssert(alGetError() == AL_NO_ERROR);
-	m_posit = ndVector (dFloat32(posit[0]), dFloat32(posit[1]), dFloat32(posit[2]), dFloat32(1.0f));
+	m_posit = ndVector (ndFloat32(posit[0]), ndFloat32(posit[1]), ndFloat32(posit[2]), ndFloat32(1.0f));
 
 	ALfloat veloc[3];
 	alGetSourcefv(m_source, AL_VELOCITY, veloc);
 	dAssert(alGetError() == AL_NO_ERROR);
-	m_veloc = ndVector(dFloat32(veloc[0]), dFloat32(veloc[1]), dFloat32(veloc[2]), dFloat32(0.0f));
+	m_veloc = ndVector(ndFloat32(veloc[0]), ndFloat32(veloc[1]), ndFloat32(veloc[2]), ndFloat32(0.0f));
 }
 
 ndSoundChannel::~ndSoundChannel()
@@ -99,9 +99,9 @@ void ndSoundChannel::Stop()
 	}
 }
 
-void ndSoundChannel::SetVolume(dFloat32 volume)
+void ndSoundChannel::SetVolume(ndFloat32 volume)
 {
-	if (dAbs(volume - m_volume) > dFloat32(1.0e-3f))
+	if (dAbs(volume - m_volume) > ndFloat32(1.0e-3f))
 	{
 		m_volume = volume;
 		alSourcef(m_source, AL_GAIN, ALfloat(m_volume));
@@ -109,12 +109,12 @@ void ndSoundChannel::SetVolume(dFloat32 volume)
 	}
 }
 
-dFloat32 ndSoundChannel::GetVolume() const
+ndFloat32 ndSoundChannel::GetVolume() const
 {
 	return m_volume;
 }
 
-void ndSoundChannel::SetAttenuationRefDistance(dFloat32 dist, dFloat32 minDropOffDist, dFloat32 maxDropOffDist)
+void ndSoundChannel::SetAttenuationRefDistance(ndFloat32 dist, ndFloat32 minDropOffDist, ndFloat32 maxDropOffDist)
 {
 	alSourcef(m_source, AL_REFERENCE_DISTANCE, ALfloat(dist));
 	dAssert(alGetError() == AL_NO_ERROR);
@@ -127,20 +127,20 @@ void ndSoundChannel::SetAttenuationRefDistance(dFloat32 dist, dFloat32 minDropOf
 
 void ndSoundChannel::ApplyAttenuation(const ndVector& listenerPosit)
 {
-	dFloat32 gain = dFloat32(1.0f);
+	ndFloat32 gain = ndFloat32(1.0f);
 	const ndVector dist(m_posit - listenerPosit);
-	dFloat32 distance = dSqrt(dist.DotProduct(dist).GetScalar());
+	ndFloat32 distance = ndSqrt(dist.DotProduct(dist).GetScalar());
 	if (distance > m_minDropOffDist)
 	{
-		gain = dFloat32(0.0f);
+		gain = ndFloat32(0.0f);
 		if (distance < m_maxDropOffDist)
 		{
-			gain = dFloat32(1.0f) - ((distance - m_minDropOffDist) / (m_maxDropOffDist - m_minDropOffDist));
+			gain = ndFloat32(1.0f) - ((distance - m_minDropOffDist) / (m_maxDropOffDist - m_minDropOffDist));
 		}
 	}
 
 	gain *= m_volume;
-	if (dAbs(gain - m_gain) > dFloat32(1.0e-3f))
+	if (dAbs(gain - m_gain) > ndFloat32(1.0e-3f))
 	{
 		m_gain = gain;
 		alSourcef(m_source, AL_GAIN, ALfloat(m_gain));
@@ -148,14 +148,14 @@ void ndSoundChannel::ApplyAttenuation(const ndVector& listenerPosit)
 	}
 }
 
-dFloat32 ndSoundChannel::GetPitch() const
+ndFloat32 ndSoundChannel::GetPitch() const
 {
 	return m_pitch;
 }
 
-void ndSoundChannel::SetPitch(dFloat32 pitch)
+void ndSoundChannel::SetPitch(ndFloat32 pitch)
 {
-	if (dAbs(pitch - m_pitch) > dFloat32(1.0e-3f))
+	if (dAbs(pitch - m_pitch) > ndFloat32(1.0e-3f))
 	{
 		m_pitch = pitch;
 		alSourcef(m_source, AL_PITCH, ALfloat(m_pitch));
@@ -163,12 +163,12 @@ void ndSoundChannel::SetPitch(dFloat32 pitch)
 	}
 }
 
-dFloat32 ndSoundChannel::GetLengthInSeconds() const
+ndFloat32 ndSoundChannel::GetLengthInSeconds() const
 {
 	return m_asset->m_durationInSeconds;
 }
 
-dFloat32 ndSoundChannel::GetPositionInSeconds() const
+ndFloat32 ndSoundChannel::GetPositionInSeconds() const
 {
 	ALfloat position;
 	alGetSourcef(m_source, AL_SEC_OFFSET, &position);
@@ -185,7 +185,7 @@ void ndSoundChannel::SetPosition(const ndVector& position)
 {
 	const ndVector posit(m_manager->m_coordinateSystem.TransformVector(position));
 	const ndVector err(posit - m_posit);
-	if (err.DotProduct(err).GetScalar() > dFloat32(1.0f))
+	if (err.DotProduct(err).GetScalar() > ndFloat32(1.0f))
 	{
 		ALfloat sourcePosition[3];
 		m_posit = posit;
@@ -206,7 +206,7 @@ void ndSoundChannel::SetVelocity(const ndVector& velocity)
 {
 	const ndVector veloc(m_manager->m_coordinateSystem.RotateVector(velocity));
 	const ndVector err(veloc - m_veloc);
-	if (err.DotProduct(err).GetScalar() > dFloat32(0.25f))
+	if (err.DotProduct(err).GetScalar() > ndFloat32(0.25f))
 	{
 		m_veloc = veloc & ndVector::m_triplexMask;
 		ALfloat sourceVeloc[3];
@@ -261,12 +261,12 @@ ndSoundManager::ndSoundManager(ndDemoEntityManager* const scene)
 	,m_scene(scene)
 	,m_assets()
 	,m_channelPlaying()
-	,m_coordinateSystem(dYawMatrix (90.0f * dDegreeToRad))
+	,m_coordinateSystem(dYawMatrix (90.0f * ndDegreeToRad))
 	,m_posit(ndVector::m_zero)
 	,m_veloc(ndVector::m_zero)
 	,m_posit0(ndVector::m_zero)
-	,m_upDir(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f))
-	,m_frontDir(dFloat32 (0.0f), dFloat32(0.0f), dFloat32(-1.0f), dFloat32(0.0f))
+	,m_upDir(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f))
+	,m_frontDir(ndFloat32 (0.0f), ndFloat32(0.0f), ndFloat32(-1.0f), ndFloat32(0.0f))
 {
 	dAssert(m_device);
 	if (m_device)
@@ -315,18 +315,18 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 		size_t bytesRead = fread(xbuffer, sizeof(char), 4, wave);
 		if (!strcmp(xbuffer, "RIFF"))
 		{
-			dInt32 chunkSize;
-			bytesRead = fread(&chunkSize, sizeof(dInt32), 1, wave);
+			ndInt32 chunkSize;
+			bytesRead = fread(&chunkSize, sizeof(ndInt32), 1, wave);
 			bytesRead = fread(xbuffer, sizeof(char), 4, wave);
 			if (!strcmp(xbuffer, "WAVE"))
 			{
 				bytesRead = fread(xbuffer, sizeof(char), 4, wave);
 				if (!strcmp(xbuffer, "fmt "))
 				{
-					bytesRead = fread(&chunkSize, sizeof(dInt32), 1, wave);
+					bytesRead = fread(&chunkSize, sizeof(ndInt32), 1, wave);
 
-					dInt32 sampleRate;
-					dInt32 byteRate;
+					ndInt32 sampleRate;
+					ndInt32 byteRate;
 					short channels;
 					short audioFormat;
 					short blockAlign;
@@ -334,11 +334,11 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 
 					bytesRead = fread(&audioFormat, sizeof(short), 1, wave);
 					bytesRead = fread(&channels, sizeof(short), 1, wave);
-					bytesRead = fread(&sampleRate, sizeof(dInt32), 1, wave);
-					bytesRead = fread(&byteRate, sizeof(dInt32), 1, wave);
+					bytesRead = fread(&sampleRate, sizeof(ndInt32), 1, wave);
+					bytesRead = fread(&byteRate, sizeof(ndInt32), 1, wave);
 					bytesRead = fread(&blockAlign, sizeof(short), 1, wave);
 					bytesRead = fread(&bitsPerSample, sizeof(short), 1, wave);
-					for (dInt32 i = 0; i < (chunkSize - 16); i++)
+					for (ndInt32 i = 0; i < (chunkSize - 16); i++)
 					{
 						bytesRead = fread(xbuffer, sizeof(char), 1, wave);
 					}
@@ -355,23 +355,23 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 					bytesRead = fread(xbuffer, sizeof(char), 4, wave);
 					if (!strcmp(xbuffer, "fact"))
 					{
-						dInt32 size;
-						dInt32 samplesPerChannels;
-						bytesRead = fread(&size, sizeof(dInt32), 1, wave);
-						bytesRead = fread(&samplesPerChannels, sizeof(dInt32), 1, wave);
+						ndInt32 size;
+						ndInt32 samplesPerChannels;
+						bytesRead = fread(&size, sizeof(ndInt32), 1, wave);
+						bytesRead = fread(&samplesPerChannels, sizeof(ndInt32), 1, wave);
 						bytesRead = fread(xbuffer, sizeof(char), 4, wave);
 					}
 
 					if (!strcmp(xbuffer, "data"))
 					{
-						dInt32 size;
-						bytesRead = fread(&size, sizeof(dInt32), 1, wave);
+						ndInt32 size;
+						bytesRead = fread(&size, sizeof(ndInt32), 1, wave);
 
 						ndArray<char> data;
 						data.SetCount(size);
 						bytesRead = fread(&data[0], sizeof(char), size, wave);
 
-						dInt32 waveFormat = AL_FORMAT_MONO8;
+						ndInt32 waveFormat = AL_FORMAT_MONO8;
 						if (channels == 1)
 						{
 							if (bitsPerSample == 8)
@@ -398,8 +398,8 @@ void ndSoundManager::LoadWaveFile(ndSoundAsset* const asset, const char* const f
 							}
 						}
 
-						asset->m_frequecy = dFloat32(sampleRate);
-						asset->m_durationInSeconds = dFloat32(size) / byteRate;
+						asset->m_frequecy = ndFloat32(sampleRate);
+						asset->m_durationInSeconds = ndFloat32(size) / byteRate;
 						alBufferData(asset->m_buffer, waveFormat, &data[0], size, sampleRate);
 					}
 				}
@@ -414,7 +414,7 @@ ndSoundAsset* ndSoundManager::CreateSoundAsset(const char* const fileName)
 	ndSoundAssetList::ndNode* assetNode = nullptr;
 	if (m_device)
 	{
-		dUnsigned64 code = dCRC64(fileName);
+		ndUnsigned64 code = dCRC64(fileName);
 		assetNode = m_assets.Find(code);
 		if (!assetNode)
 		{
@@ -431,7 +431,7 @@ ndSoundChannel* ndSoundManager::CreateSoundChannel(const char* const fileName)
 	ndSoundChannel* channel = nullptr;
 	if (m_device)
 	{
-		dUnsigned64 code = dCRC64(fileName);
+		ndUnsigned64 code = dCRC64(fileName);
 		ndSoundAssetList::ndNode* const assetNode = m_assets.Find(code);
 		dAssert(assetNode);
 	
@@ -447,7 +447,7 @@ ndSoundChannel* ndSoundManager::CreateSoundChannel(const char* const fileName)
 	return channel;
 }
 
-void ndSoundManager::Update(ndWorld* const, dFloat32 timestep)
+void ndSoundManager::Update(ndWorld* const, ndFloat32 timestep)
 {
 	if (m_device)
 	{
@@ -456,7 +456,7 @@ void ndSoundManager::Update(ndWorld* const, dFloat32 timestep)
 		const ndMatrix matrix(camera->GetCurrentMatrix() * m_coordinateSystem);
 
 		ndVector err(matrix.m_posit - m_posit);
-		if (err.DotProduct(err).GetScalar() > dFloat32 (0.25f))
+		if (err.DotProduct(err).GetScalar() > ndFloat32 (0.25f))
 		{
 			// set Listener position
 			ALfloat listenerPosit[3];
@@ -470,7 +470,7 @@ void ndSoundManager::Update(ndWorld* const, dFloat32 timestep)
 
 		ndVector veloc((matrix.m_posit - m_posit0).Scale(1.0f / timestep));
 		err = veloc - m_veloc;
-		if (err.DotProduct(err).GetScalar() > dFloat32(1.0f))
+		if (err.DotProduct(err).GetScalar() > ndFloat32(1.0f))
 		{
 			// estimate listener velocity, by using camera previous location
 			m_veloc = veloc;
@@ -483,9 +483,9 @@ void ndSoundManager::Update(ndWorld* const, dFloat32 timestep)
 		}
 		m_posit0 = matrix.m_posit;
 
-		dFloat32 angle0 = matrix.m_up.DotProduct(m_upDir).GetScalar();
-		dFloat32 angle1 = matrix.m_front.DotProduct(m_frontDir).GetScalar();
-		if ((angle0 < dFloat32(0.999f)) || (angle1 < dFloat32(0.999f)))
+		ndFloat32 angle0 = matrix.m_up.DotProduct(m_upDir).GetScalar();
+		ndFloat32 angle1 = matrix.m_front.DotProduct(m_frontDir).GetScalar();
+		if ((angle0 < ndFloat32(0.999f)) || (angle1 < ndFloat32(0.999f)))
 		{
 			// update camera if is changes more than 2.5 degrees for previous orientation
 			m_upDir = matrix.m_up;

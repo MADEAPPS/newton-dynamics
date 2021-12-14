@@ -51,14 +51,14 @@ bool ndConvexCastNotify::CastShape(const ndShapeInstance& castingInstance, const
 	shape1.SetGlobalMatrix(shape1.GetLocalMatrix() * body1.GetMatrix());
 
 	m_contacts.SetCount(0);
-	ndContactSolver contactSolver(&contact, &notify, dFloat32(1.0f));
+	ndContactSolver contactSolver(&contact, &notify, ndFloat32(1.0f));
 	contactSolver.m_contactBuffer = &contactBuffer[0];
 
-	m_param = dFloat32(1.2f);
-	const dInt32 count = dMin(contactSolver.CalculateContactsContinue(), m_contacts.GetCapacity());
+	m_param = ndFloat32(1.2f);
+	const ndInt32 count = dMin(contactSolver.CalculateContactsContinue(), m_contacts.GetCapacity());
 	if (count)
 	{
-		for (dInt32 i = 0; i < count; i++)
+		for (ndInt32 i = 0; i < count; i++)
 		{
 			m_contacts.PushBack(contactBuffer[i]);
 		}

@@ -42,14 +42,14 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 	{
 	}
 
-	void OnTransform(dInt32 thread, const ndMatrix& matrix)
+	void OnTransform(ndInt32 thread, const ndMatrix& matrix)
 	{
 		ndDemoEntityNotify::OnTransform(thread, matrix);
 
 		ndWorld* const word = m_manager->GetWorld();
 		ndBasicPlayerCapsule* const player = (ndBasicPlayerCapsule*)GetBody();
 
-		dFloat32 timestep = word->GetScene()->GetTimestep();
+		ndFloat32 timestep = word->GetScene()->GetTimestep();
 		//timestep *= 0.25f;
 		//timestep = 1.0f/(30.0f * 4.0f);
 		timestep *= 0.05f;
@@ -67,7 +67,7 @@ class ndBasicPlayerCapsuleNotify : public ndDemoEntityNotify
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndDemoEntityManager* const scene, const ndDemoEntity* const modelEntity,
 	const ndMatrix& localAxis, const ndMatrix& location,
-	dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight, bool isPlayer)
+	ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight, bool isPlayer)
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 	,m_scene(scene)
 	,m_isPlayer(isPlayer)
@@ -115,7 +115,7 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	ndAnimationSequencePlayer* const run = new ndAnimationSequencePlayer(runSequence);
 	
 	////dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
-	//dFloat32 scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
+	//ndFloat32 scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
 	ndAnimationTwoWayBlend* const walkRunBlend = new ndAnimationTwoWayBlend(walk, run);
 	ndAnimationTwoWayBlend* const idleMoveBlend = new ndAnimationTwoWayBlend(idle, walkRunBlend);
 	
@@ -126,8 +126,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	m_animBlendTree = idleMoveBlend;
 
 	// evaluate twice that interpolation is reset
-	m_animBlendTree->Evaluate(m_output, dFloat32(0.0f));
-	m_animBlendTree->Evaluate(m_output, dFloat32(0.0f));
+	m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
+	m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
 }
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(const ndLoadSaveBase::dLoadDescriptor& desc)
@@ -174,7 +174,7 @@ void ndBasicPlayerCapsule::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) co
 	//xmlSaveParam(paramNode, "isPlayer", m_isPlayer ? 1 : 0);
 }
 
-void ndBasicPlayerCapsule::ApplyInputs(dFloat32 timestep)
+void ndBasicPlayerCapsule::ApplyInputs(ndFloat32 timestep)
 {
 	//calculate the gravity contribution to the velocity, 
 	const ndVector gravity(GetNotifyCallback()->GetGravity());
@@ -194,15 +194,15 @@ void ndBasicPlayerCapsule::ApplyInputs(dFloat32 timestep)
 	SetHeadingAngle(m_playerInput.m_heading);
 }
 
-//dFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const ndVector& position, const ndVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const
-dFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const ndVector&, const ndVector& normal, dInt32, const ndBodyKinematic* const) const
+//ndFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const ndVector& position, const ndVector& normal, ndInt32 contactId, const ndBodyKinematic* const otherbody) const
+ndFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const ndVector&, const ndVector& normal, ndInt32, const ndBodyKinematic* const) const
 {
-	//return dFloat32(2.0f);
+	//return ndFloat32(2.0f);
 	if (dAbs(normal.m_y) < 0.8f)
 	{
 		return 0.4f;
 	}
-	return dFloat32(2.0f);
+	return ndFloat32(2.0f);
 }
 
 void ndBasicPlayerCapsule::SetCamera()
@@ -216,7 +216,7 @@ void ndBasicPlayerCapsule::SetCamera()
 		ndDemoEntity* const player = (ndDemoEntity*)notify->GetUserData();
 		ndMatrix playerMatrix(player->GetNextMatrix());
 
-		const dFloat32 height = m_height;
+		const ndFloat32 height = m_height;
 		const ndVector frontDir(camMatrix[0]);
 		const ndVector upDir(0.0f, 1.0f, 0.0f, 0.0f);
 		ndVector camOrigin = playerMatrix.TransformVector(upDir.Scale(height));
@@ -224,9 +224,9 @@ void ndBasicPlayerCapsule::SetCamera()
 
 		camera->SetNextMatrix(camMatrix, camOrigin);
 
-		dFloat32 angle0 = camera->GetYawAngle();
-		dFloat32 angle1 = GetHeadingAngle();
-		dFloat32 error = AnglesAdd(angle1, -angle0);
+		ndFloat32 angle0 = camera->GetYawAngle();
+		ndFloat32 angle1 = GetHeadingAngle();
+		ndFloat32 error = AnglesAdd(angle1, -angle0);
 
 		if ((dAbs (error) > 1.0e-3f) ||
 			m_scene->GetKeyState(' ') ||
@@ -239,21 +239,21 @@ void ndBasicPlayerCapsule::SetCamera()
 		}
 
 		m_playerInput.m_heading = camera->GetYawAngle();
-		m_playerInput.m_forwardSpeed = (dInt32(m_scene->GetKeyState('W')) - dInt32(m_scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
-		m_playerInput.m_strafeSpeed = (dInt32(m_scene->GetKeyState('D')) - dInt32(m_scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
+		m_playerInput.m_forwardSpeed = (ndInt32(m_scene->GetKeyState('W')) - ndInt32(m_scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
+		m_playerInput.m_strafeSpeed = (ndInt32(m_scene->GetKeyState('D')) - ndInt32(m_scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
 		m_playerInput.m_jump = m_scene->GetKeyState(' ') && IsOnFloor();
 
 		if (m_playerInput.m_forwardSpeed && m_playerInput.m_strafeSpeed)
 		{
-			dFloat32 invMag = PLAYER_WALK_SPEED / dSqrt(m_playerInput.m_forwardSpeed * m_playerInput.m_forwardSpeed + m_playerInput.m_strafeSpeed * m_playerInput.m_strafeSpeed);
+			ndFloat32 invMag = PLAYER_WALK_SPEED / ndSqrt(m_playerInput.m_forwardSpeed * m_playerInput.m_forwardSpeed + m_playerInput.m_strafeSpeed * m_playerInput.m_strafeSpeed);
 			m_playerInput.m_forwardSpeed *= invMag;
 			m_playerInput.m_strafeSpeed *= invMag;
 		}
 	}
 }
 
-//void ndBasicPlayerCapsule::UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, dFloat32 timestep)
-void ndBasicPlayerCapsule::UpdateCameraCallback(ndDemoEntityManager* const, void* const context, dFloat32)
+//void ndBasicPlayerCapsule::UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, ndFloat32 timestep)
+void ndBasicPlayerCapsule::UpdateCameraCallback(ndDemoEntityManager* const, void* const context, ndFloat32)
 {
 	ndBasicPlayerCapsule* const me = (ndBasicPlayerCapsule*)context;
 	me->SetCamera();

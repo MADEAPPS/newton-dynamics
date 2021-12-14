@@ -19,14 +19,14 @@
 // TODO: reference any additional headers you need in STDAFX.H
 // and not in this file
 
-static dUnsigned32 ___dRandSeed___ = 0;
+static ndUnsigned32 ___dRandSeed___ = 0;
 
-void dSetRandSeed (dUnsigned32 seed)
+void dSetRandSeed (ndUnsigned32 seed)
 {
 	___dRandSeed___	= seed; 
 }
 
-dInt32 dRandInt()
+ndInt32 dRandInt()
 {
 	// numerical recipe in c
 	#define RAND_MUL 1664525u
@@ -37,22 +37,22 @@ dInt32 dRandInt()
 
 
 /// return a random variable between 0.0 and 1.0
-dFloat32 dRand()
+ndFloat32 dRand()
 {
 	// numerical recipe in c
-	dFloat32 r = dFloat32(dRandInt()) * ((dFloat32(1.0f) / dRAND_MAX));
+	ndFloat32 r = ndFloat32(dRandInt()) * ((ndFloat32(1.0f) / dRAND_MAX));
 	//dTrace(("%f\n", r));
 	return r;
 }
 
 /// return a pseudo Gaussian random with mean 0 and variance 0.5f
-dFloat32 dGaussianRandom (dFloat32 amp)
+ndFloat32 dGaussianRandom (ndFloat32 amp)
 {
-	const dInt32 count = 4;
-	dFloat32 r = dFloat32(0.0f);
-	for (dInt32 i = 0; i < count; i++)
+	const ndInt32 count = 4;
+	ndFloat32 r = ndFloat32(0.0f);
+	for (ndInt32 i = 0; i < count; i++)
 	{
-		r += dFloat32(2.0f) * dRand() - dFloat32 (1.0f);
+		r += ndFloat32(2.0f) * dRand() - ndFloat32 (1.0f);
 	}
 	r *= (amp / count);
 	//dTrace(("%f\n", r));
@@ -101,23 +101,23 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 
 	// endian conversion
 #ifdef __ppc__
-	dUnsigned16 SWAP_INT16(dUnsigned16 short x)
+	ndUnsigned16 SWAP_INT16(ndUnsigned16 short x)
 	{
 		return ((x >> 8) & 0xff) + ((x & 0xff) << 8);
 	}
 
-	dUnsigned32 SWAP_INT32(dUnsigned32 x)
+	ndUnsigned32 SWAP_INT32(ndUnsigned32 x)
 	{
 		return SWAP_INT16 ( x >> 16) + (SWAP_INT16 (x) << 16);
 	}
 
-	void SWAP_FLOAT32_ARRAY (void* const array, dInt32 count)
+	void SWAP_FLOAT32_ARRAY (void* const array, ndInt32 count)
 	{
-		dInt32* const ptr = (dInt32*) array;
-		count /= sizeof (dInt32);
-		for (dInt32 i = 0; i < count; i ++) 
+		ndInt32* const ptr = (ndInt32*) array;
+		count /= sizeof (ndInt32);
+		for (ndInt32 i = 0; i < count; i ++) 
 		{
-			dInt32 x;
+			ndInt32 x;
 			x = SWAP_INT32 (ptr[i]);
 			ptr[i] = x;
 		}
@@ -125,17 +125,17 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 
 #else
 
-	dUnsigned32 SWAP_INT32(dUnsigned32 x)
+	ndUnsigned32 SWAP_INT32(ndUnsigned32 x)
 	{
 		return x;
 	}
 
-	dUnsigned16 SWAP_INT16(dUnsigned16 x)
+	ndUnsigned16 SWAP_INT16(ndUnsigned16 x)
 	{
 		return x;
 	}
 
-	void SWAP_FLOAT32_ARRAY (void* const, dInt32)
+	void SWAP_FLOAT32_ARRAY (void* const, ndInt32)
 	{
 	}
 #endif

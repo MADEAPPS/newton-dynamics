@@ -15,8 +15,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_HINGE_PENETRATION_RECOVERY_SPEED	dFloat32 (0.1f) 
-#define D_HINGE_PENETRATION_LIMIT			dFloat32 (10.0f * dDegreeToRad) 
+#define D_HINGE_PENETRATION_RECOVERY_SPEED	ndFloat32 (0.1f) 
+#define D_HINGE_PENETRATION_LIMIT			ndFloat32 (10.0f * ndDegreeToRad) 
 
 class ndJointHinge: public ndJointBilateralConstraint
 {
@@ -27,13 +27,13 @@ class ndJointHinge: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& pinAndPivotInParent, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointHinge();
 
-	D_NEWTON_API dFloat32 GetAngle() const;
-	D_NEWTON_API dFloat32 GetOmega() const;
-	D_NEWTON_API dFloat32 GetFriction() const;
+	D_NEWTON_API ndFloat32 GetAngle() const;
+	D_NEWTON_API ndFloat32 GetOmega() const;
+	D_NEWTON_API ndFloat32 GetFriction() const;
 
-	D_NEWTON_API void SetFriction(dFloat32 frictionTorque);
-	D_NEWTON_API void EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimit);
-	D_NEWTON_API void SetAsSpringDamper(bool state, dFloat32 regularizer, dFloat32 spring, dFloat32 damper);
+	D_NEWTON_API void SetFriction(ndFloat32 frictionTorque);
+	D_NEWTON_API void EnableLimits(bool state, ndFloat32 minLimit, ndFloat32 maxLimit);
+	D_NEWTON_API void SetAsSpringDamper(bool state, ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper);
 
 	private:
 	void SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
@@ -43,14 +43,14 @@ class ndJointHinge: public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	dFloat32 m_angle;
-	dFloat32 m_omega;
-	dFloat32 m_springK;
-	dFloat32 m_damperC;
-	dFloat32 m_minLimit;
-	dFloat32 m_maxLimit;
-	dFloat32 m_friction;
-	dFloat32 m_springDamperRegularizer;
+	ndFloat32 m_angle;
+	ndFloat32 m_omega;
+	ndFloat32 m_springK;
+	ndFloat32 m_damperC;
+	ndFloat32 m_minLimit;
+	ndFloat32 m_maxLimit;
+	ndFloat32 m_friction;
+	ndFloat32 m_springDamperRegularizer;
 
 	bool m_hasLimits;
 	bool m_isSpringDamper;

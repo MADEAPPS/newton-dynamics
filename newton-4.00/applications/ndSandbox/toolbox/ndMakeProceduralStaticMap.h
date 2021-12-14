@@ -15,6 +15,6 @@
 #include "ndSandboxStdafx.h"
 
 class ndDemoEntityManager;
-ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, dInt32 grids, dFloat32 gridSize, dFloat32 perturbation);
+ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation);
 
 #endif

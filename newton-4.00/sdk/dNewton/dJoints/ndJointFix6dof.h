@@ -24,7 +24,7 @@ class ndJointFix6dof: public ndJointBilateralConstraint
 	D_NEWTON_API virtual ~ndJointFix6dof();
 
 	D_NEWTON_API void SetAsSoftJoint(bool mode);
-	D_NEWTON_API void SetRegularizer(dFloat32 regularizer);
+	D_NEWTON_API void SetRegularizer(ndFloat32 regularizer);
 
 	private:
 	void JacobianDerivative(ndConstraintDescritor& desc);
@@ -33,9 +33,9 @@ class ndJointFix6dof: public ndJointBilateralConstraint
 	void SubmitAngularAxis(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 	void SubmitAngularAxisCartisianApproximation(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1);
 
-	dFloat32 m_softness;
-	dFloat32 m_maxForce;
-	dFloat32 m_maxTorque;
+	ndFloat32 m_softness;
+	ndFloat32 m_maxForce;
+	ndFloat32 m_maxTorque;
 };
 #endif 
 

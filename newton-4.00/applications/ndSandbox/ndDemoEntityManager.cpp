@@ -108,14 +108,14 @@ ndDemoEntityManager::ButtonKey::ButtonKey (bool state)
 {
 }
 
-dInt32 ndDemoEntityManager::ButtonKey::UpdateTrigger (bool triggerValue)
+ndInt32 ndDemoEntityManager::ButtonKey::UpdateTrigger (bool triggerValue)
 {
 	m_memory0 = m_memory1;
 	m_memory1 = triggerValue;
 	return (!m_memory0 & m_memory1) ? 1 : 0;
 }
 
-dInt32 ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
+ndInt32 ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 {
 	if (UpdateTrigger (triggerValue)) 
 	{
@@ -126,36 +126,36 @@ dInt32 ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 
 void Test0__()
 {
-	dFloat32 x[] = { 1.0f, -2.0f, 1.0f, 2.5f, 3.0f, -1.0f };
-	//dFloat32 x[] = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
-	dFloat32 A[6][6];
-	dFloat32 B[6];
+	ndFloat32 x[] = { 1.0f, -2.0f, 1.0f, 2.5f, 3.0f, -1.0f };
+	//ndFloat32 x[] = { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+	ndFloat32 A[6][6];
+	ndFloat32 B[6];
 
-	dCovarianceMatrix<dFloat32>(6, &A[0][0], x, x);
-	for (dInt32 i = 0; i < 6; i++)
+	dCovarianceMatrix<ndFloat32>(6, &A[0][0], x, x);
+	for (ndInt32 i = 0; i < 6; i++)
 	{
 		A[i][i] *= 1.1f;
 	}
 	dAssert(dTestPSDmatrix(6, 6, &A[0][0]));
 
-	dMatrixTimeVector<dFloat32>(6, &A[0][0], x, B);
-	for (dInt32 i = 0; i < 6; i++)
+	dMatrixTimeVector<ndFloat32>(6, &A[0][0], x, B);
+	for (ndInt32 i = 0; i < 6; i++)
 	{
 		x[i] = 0;
 	}
 
-	dFloat32 precond[6 * 2];
-	ndConjugateGradient<dFloat32> cgd;
+	ndFloat32 precond[6 * 2];
+	ndConjugateGradient<ndFloat32> cgd;
 	cgd.Solve(6, 1.0e-5f, x, B, &A[0][0], precond);
 }
 
 void Test1__()
 {
-	//dFloat32 A[2][2];
-	//dFloat32 x[2];
-	//dFloat32 b[2];
-	//dFloat32 l[2];
-	//dFloat32 h[2];
+	//ndFloat32 A[2][2];
+	//ndFloat32 x[2];
+	//ndFloat32 b[2];
+	//ndFloat32 l[2];
+	//ndFloat32 h[2];
 	//
 	//A[0][0] = 2.0f;
 	//A[0][1] = 1.0f;
@@ -174,18 +174,18 @@ void Test1__()
 	//dMatrixTimeVector(2, &A[0][0], x, b);
 	//dSolveDantzigLCP(2, &A[0][0], x, b, l, h);
 	//
-	//dInt32 xxx = 0;
-	//const dInt32 xxxxxx = 450;
-	//dDownHeap<dInt32, unsigned> xxxxx (xxxxxx + 2);
-	//for (dInt32 i = 0; i < xxxxxx; i ++)
+	//ndInt32 xxx = 0;
+	//const ndInt32 xxxxxx = 450;
+	//dDownHeap<ndInt32, unsigned> xxxxx (xxxxxx + 2);
+	//for (ndInt32 i = 0; i < xxxxxx; i ++)
 	//{
 	//	xxxxx.Push (xxx, i);
 	//}
 	//
-	//for (dInt32 i = 0; i < 10000; i ++)
+	//for (ndInt32 i = 0; i < 10000; i ++)
 	//{
-	//	dInt32 index = dRandInt() % xxxxxx;
-	//	dInt32 key = xxxxx.Value(index);
+	//	ndInt32 index = dRandInt() % xxxxxx;
+	//	ndInt32 key = xxxxx.Value(index);
 	//	xxxxx.Remove (index);
 	//	xxxxx.Push (xxx, key);
 	//}
@@ -264,14 +264,14 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	m_mainFrame = glfwCreateWindow(1280, 720, version, nullptr, nullptr);
 	glfwMakeContextCurrent(m_mainFrame);
 
-	dInt32 monitorsCount;
+	ndInt32 monitorsCount;
 	GLFWmonitor** monitors = glfwGetMonitors(&monitorsCount);
 	if (monitorsCount > 1) 
 	{
-		dInt32 window_x;
-		dInt32 window_y;
-		dInt32 monitor_x;
-		dInt32 monitor_y;
+		ndInt32 window_x;
+		ndInt32 window_y;
+		ndInt32 monitor_x;
+		ndInt32 monitor_y;
 
 		glfwGetMonitorPos(monitors[1], &monitor_x, &monitor_y);
 		glfwGetWindowPos(m_mainFrame, &window_x, &window_y);
@@ -436,18 +436,18 @@ ndDemoCamera* ndDemoEntityManager::GetCamera() const
 	return m_cameraManager->GetCamera();
 }
 
-bool ndDemoEntityManager::GetKeyState(dInt32 key) const
+bool ndDemoEntityManager::GetKeyState(ndInt32 key) const
 {
 	const ImGuiIO& io = ImGui::GetIO();
 	bool state = io.KeysDown[key];
 #ifdef ENABLE_REPLAY
 	#ifdef REPLAY_RECORD
-		dInt32 value = state;
-		fwrite(&value, sizeof(dInt32), 1, m_replayLogFile);
+		ndInt32 value = state;
+		fwrite(&value, sizeof(ndInt32), 1, m_replayLogFile);
 		fflush(m_replayLogFile);
 	#else
-		dInt32 value;
-		fread(&value, sizeof(dInt32), 1, m_replayLogFile);
+		ndInt32 value;
+		fread(&value, sizeof(ndInt32), 1, m_replayLogFile);
 		state = value ? 1 : 0;
 	#endif	
 #endif
@@ -488,7 +488,7 @@ bool ndDemoEntityManager::GetCaptured() const
 	return io.WantCaptureMouse;
 }
 
-bool ndDemoEntityManager::GetMouseKeyState (dInt32 button) const
+bool ndDemoEntityManager::GetMouseKeyState (ndInt32 button) const
 {
 	ImGuiIO& io = ImGui::GetIO();
 	return io.MouseDown[button];
@@ -507,16 +507,16 @@ void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback,
 	m_updateCameraContext = context;
 }
 
-dInt32 ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<dFloat32, 8>& axisValues)
+ndInt32 ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<ndFloat32, 8>& axisValues)
 {
-	dInt32 axisCount = 0;
-	for (dInt32 i = 0; i < axisValues.GetCapacity(); i++)
+	ndInt32 axisCount = 0;
+	for (ndInt32 i = 0; i < axisValues.GetCapacity(); i++)
 	{
-		axisValues[i] = dFloat32(0.0f);
+		axisValues[i] = ndFloat32(0.0f);
 	}
 	// for xbox controllers.
-	axisValues[4] = dFloat32(-1.0f);
-	axisValues[5] = dFloat32(-1.0f);
+	axisValues[4] = ndFloat32(-1.0f);
+	axisValues[5] = ndFloat32(-1.0f);
 
 	if (!m_hasJoytick)
 	{
@@ -527,7 +527,7 @@ dInt32 ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<dFloat32, 8>& axisVa
 	{
 		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
 		axisCount = dMin (axisCount, axisValues.GetCapacity());
-		for (dInt32 i = 0; i < axisCount; i ++) 
+		for (ndInt32 i = 0; i < axisCount; i ++) 
 		{
 			axisValues[i] = axis[i];
 			//if (axis[i] && axis[i] > -1.0f) dTrace(("%d %f\n", i, axis[i]));
@@ -537,19 +537,19 @@ dInt32 ndDemoEntityManager::GetJoystickAxis (ndFixSizeArray<dFloat32, 8>& axisVa
 #ifdef ENABLE_REPLAY
 	#ifdef REPLAY_RECORD
 		fwrite(&axisCount, sizeof(axisCount), 1, m_replayLogFile);
-		fwrite(&axisValues[0], sizeof(dFloat32) * axisValues.GetCapacity(), 1, m_replayLogFile);
+		fwrite(&axisValues[0], sizeof(ndFloat32) * axisValues.GetCapacity(), 1, m_replayLogFile);
 		fflush(m_replayLogFile);
 	#else 
 		fread(&axisCount, sizeof(axisCount), 1, m_replayLogFile);
-		fread(&axisValues[0], sizeof(dFloat32) * axisValues.GetCapacity(), 1, m_replayLogFile);
+		fread(&axisValues[0], sizeof(ndFloat32) * axisValues.GetCapacity(), 1, m_replayLogFile);
 	#endif
 #endif
 	return axisCount;
 }
 
-dInt32 ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbuttons)
+ndInt32 ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbuttons)
 {
-	dInt32 buttonsCount = 0;
+	ndInt32 buttonsCount = 0;
 	memset(&axisbuttons[0], 0, axisbuttons.GetCapacity());
 
 	if (!m_hasJoytick)
@@ -561,7 +561,7 @@ dInt32 ndDemoEntityManager::GetJoystickButtons(ndFixSizeArray<char, 32>& axisbut
 	{
 		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
 		buttonsCount = dMin (buttonsCount, axisbuttons.GetCapacity());
-		for (dInt32 i = 0; i < buttonsCount; i ++) 
+		for (ndInt32 i = 0; i < buttonsCount; i ++) 
 		{
 			axisbuttons[i] = buttons[i];
 			//if (buttons[i]) dTrace(("%d %d\n", i, buttons[i]));
@@ -703,7 +703,7 @@ void ndDemoEntityManager::LoadFont()
 	// If your ImTextureId represent a higher-level concept than just a GL texture id, 
 	// consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
 	unsigned char* pixels;
-	dInt32 width, height;
+	ndInt32 width, height;
 	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);   
 
 	// Upload texture to graphics system
@@ -717,7 +717,7 @@ void ndDemoEntityManager::LoadFont()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 	// Store our identifier
-	m_defaultFont = dInt32 (font_texture);
+	m_defaultFont = ndInt32 (font_texture);
 	io.Fonts->TexID = (void *)(intptr_t)m_defaultFont;
 
 	// Restore state
@@ -798,8 +798,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		if (ImGui::BeginMenu("Demos")) 
 		{
 			m_suspendPhysicsUpdate = true;
-			dInt32 demosCount = dInt32 (sizeof (m_demosSelection) / sizeof m_demosSelection[0]);
-			for (dInt32 i = 0; i < demosCount; i ++) 
+			ndInt32 demosCount = ndInt32 (sizeof (m_demosSelection) / sizeof m_demosSelection[0]);
+			for (ndInt32 i = 0; i < demosCount; i ++) 
 			{
 				if (ImGui::MenuItem(m_demosSelection[i].m_name, "")) 
 				{
@@ -823,7 +823,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Separator();
 
 			ImGui::Text("solvers");
-			dInt32 solverMode(m_solverMode);
+			ndInt32 solverMode(m_solverMode);
 			ImGui::RadioButton("avx2", &solverMode, ndWorld::ndSimdAvx2Solver);
 			ImGui::RadioButton("sse soa", &solverMode, ndWorld::ndSimdSoaSolver);
 			ImGui::RadioButton("opencl1", &solverMode, ndWorld::ndOpenclSolver1);
@@ -938,7 +938,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 	}
 }
 
-void ndDemoEntityManager::LoadDemo(dInt32 menu)
+void ndDemoEntityManager::LoadDemo(ndInt32 menu)
 {
 	char newTitle[256];
 	Cleanup();
@@ -953,7 +953,7 @@ void ndDemoEntityManager::LoadDemo(dInt32 menu)
 	ResetTimer();
 }
 
-void ndDemoEntityManager::ErrorCallback(dInt32 error, const char* description)
+void ndDemoEntityManager::ErrorCallback(ndInt32 error, const char* description)
 {
 	dTrace (("Error %d: %s\n", error, description));
 	fprintf(stderr, "Error %d: %s\n", error, description);
@@ -967,7 +967,7 @@ fbxDemoEntity* ndDemoEntityManager::LoadFbxMesh(const char* const meshName)
 	return entity;
 }
 
-void ndDemoEntityManager::MouseButtonCallback(GLFWwindow*, dInt32 button, dInt32 action, dInt32)
+void ndDemoEntityManager::MouseButtonCallback(GLFWwindow*, ndInt32 button, ndInt32 action, ndInt32)
 {
 	if (button >= 0 && button < 3) 
 	{
@@ -995,7 +995,7 @@ void ndDemoEntityManager::CursorposCallback  (GLFWwindow* , double x, double y)
 	io.MousePos = ImVec2((float)x, (float)y);
 }
 
-bool ndDemoEntityManager::GetMouseSpeed(dFloat32& speedX, dFloat32& speedY) const
+bool ndDemoEntityManager::GetMouseSpeed(ndFloat32& speedX, ndFloat32& speedY) const
 {
 	ImVec2 speed(ImGui::GetMouseDragDelta(0, 0.0f));
 	speedX = speed.x;
@@ -1003,7 +1003,7 @@ bool ndDemoEntityManager::GetMouseSpeed(dFloat32& speedX, dFloat32& speedY) cons
 	return true;
 }
 
-bool ndDemoEntityManager::GetMousePosition (dFloat32& posX, dFloat32& posY) const
+bool ndDemoEntityManager::GetMousePosition (ndFloat32& posX, ndFloat32& posY) const
 {
 	ImVec2 posit(ImGui::GetMousePos());
 	posX = posit.x;
@@ -1011,14 +1011,14 @@ bool ndDemoEntityManager::GetMousePosition (dFloat32& posX, dFloat32& posY) cons
 	return true;
 }
 
-void ndDemoEntityManager::CharCallback(GLFWwindow*, dUnsigned32 ch)
+void ndDemoEntityManager::CharCallback(GLFWwindow*, ndUnsigned32 ch)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	io.AddInputCharacter((unsigned short)ch);
 }
 
 
-void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, dInt32 key, dInt32, dInt32 action, dInt32 mods)
+void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, ndInt32 key, ndInt32, ndInt32 action, ndInt32 mods)
 {
 	ImGuiIO& io = ImGui::GetIO();
 	if (action == GLFW_PRESS)
@@ -1032,7 +1032,7 @@ void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, dInt32 key, dInt
 	io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
 	io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 	
-	static dInt32 prevKey;
+	static ndInt32 prevKey;
 	ndDemoEntityManager* const manager = (ndDemoEntityManager*)glfwGetWindowUserPointer(window);
 	if ((key == GLFW_KEY_F10) && (key != prevKey)) 
 	{
@@ -1069,8 +1069,8 @@ void ndDemoEntityManager::BeginFrame()
 	ImGuiIO& io = ImGui::GetIO();
 
 	// Setup display size (every frame to accommodate for window resizing)
-	dInt32 w, h;
-	dInt32 display_w, display_h;
+	ndInt32 w, h;
+	ndInt32 display_w, display_h;
 	glfwGetWindowSize(m_mainFrame, &w, &h);
 	glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
 	io.DisplaySize = ImVec2((float)w, (float)h);
@@ -1100,7 +1100,7 @@ void ndDemoEntityManager::RenderStats()
 			if (m_currentPlugin) 
 			{
 				dAssert(0);
-				//dInt32 index = 1;
+				//ndInt32 index = 1;
 				//for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
 				//	if (index == m_currentPlugin) {
 				//		sprintf(text, "plugin:        %s", NewtonGetPluginString(m_world, plugin));
@@ -1119,7 +1119,7 @@ void ndDemoEntityManager::RenderStats()
 			sprintf(text, "contact joints: %d", m_world->GetContactList().GetCount());
 			ImGui::Text(text, "");
 
-			sprintf(text, "memory used:   %6.3f mbytes", dFloat32(dFloat64(ndMemory::GetMemoryUsed()) / (1024 * 1024)));
+			sprintf(text, "memory used:   %6.3f mbytes", ndFloat32(ndFloat64(ndMemory::GetMemoryUsed()) / (1024 * 1024)));
 			ImGui::Text(text, "");
 
 
@@ -1153,7 +1153,7 @@ void ndDemoEntityManager::RenderStats()
 	ShowMainMenuBar();
 }
 
-void ndDemoEntityManager::CalculateFPS(dFloat32 timestep)
+void ndDemoEntityManager::CalculateFPS(ndFloat32 timestep)
 {
 	m_framesCount ++;
 	m_timestepAcc += timestep;
@@ -1166,10 +1166,10 @@ void ndDemoEntityManager::CalculateFPS(dFloat32 timestep)
 	}
 
 	//update fps every quarter of a second
-	const dFloat32 movingAverage = 0.5f;
+	const ndFloat32 movingAverage = 0.5f;
 	if (m_timestepAcc >= movingAverage)
 	{
-		m_fps = dFloat32 (m_framesCount) / m_timestepAcc;
+		m_fps = ndFloat32 (m_framesCount) / m_timestepAcc;
 		m_timestepAcc -= movingAverage;
 		m_framesCount = 0;
 	}
@@ -1203,7 +1203,7 @@ void ndDemoEntityManager::ImportPLYfile(const char* const)
 	//CreatePLYMesh (this, fileName, true);
 }
 
-dInt32 ndDemoEntityManager::Print (const ndVector&, const char *fmt, ... ) const
+ndInt32 ndDemoEntityManager::Print (const ndVector&, const char *fmt, ... ) const
 {
 	va_list argptr;
 	char string[1024];
@@ -1220,7 +1220,7 @@ void ndDemoEntityManager::SetCameraMatrix (const ndQuaternion& rotation, const n
 	m_cameraManager->SetCameraMatrix(rotation, position);
 }
 
-void ndDemoEntityManager::UpdatePhysics(dFloat32 timestep)
+void ndDemoEntityManager::UpdatePhysics(ndFloat32 timestep)
 {
 	// update the physics
 	if (m_world && !m_suspendPhysicsUpdate) 
@@ -1229,10 +1229,10 @@ void ndDemoEntityManager::UpdatePhysics(dFloat32 timestep)
 	}
 }
 
-dFloat32 ndDemoEntityManager::CalculateInteplationParam () const
+ndFloat32 ndDemoEntityManager::CalculateInteplationParam () const
 {
-	dUnsigned64 timeStep = dGetTimeInMicroseconds () - m_microsecunds;		
-	dFloat32 param = (dFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
+	ndUnsigned64 timeStep = dGetTimeInMicroseconds () - m_microsecunds;		
+	ndFloat32 param = (ndFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
 	dAssert (param >= 0.0f);
 	if (param > 1.0f) {
 		param = 1.0f;
@@ -1249,8 +1249,8 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
 	ImGuiIO& io = ImGui::GetIO();
 
-	dInt32 fb_width = (dInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-	dInt32 fb_height = (dInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+	ndInt32 fb_width = (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+	ndInt32 fb_height = (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 	if (fb_width == 0 || fb_height == 0)
 		return;
 
@@ -1293,7 +1293,7 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	// Render command lists
 	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
 	//#define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
-	for (dInt32 n = 0; n < draw_data->CmdListsCount; n++)
+	for (ndInt32 n = 0; n < draw_data->CmdListsCount; n++)
 	{
 		const ImDrawList* cmd_list = draw_data->CmdLists[n];
 		const ImDrawVert* vtx_buffer = cmd_list->VtxBuffer.Data;
@@ -1302,7 +1302,7 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 		glTexCoordPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, uv)));
 		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, col)));
 
-		for (dInt32 cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
+		for (ndInt32 cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
 		{
 			const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
 			if (pcmd->UserCallback)
@@ -1312,7 +1312,7 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 			else
 			{
 				glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
-				glScissor((dInt32)pcmd->ClipRect.x, (dInt32)(fb_height - pcmd->ClipRect.w), (dInt32)(pcmd->ClipRect.z - pcmd->ClipRect.x), (dInt32)(pcmd->ClipRect.w - pcmd->ClipRect.y));
+				glScissor((ndInt32)pcmd->ClipRect.x, (ndInt32)(fb_height - pcmd->ClipRect.w), (ndInt32)(pcmd->ClipRect.z - pcmd->ClipRect.x), (ndInt32)(pcmd->ClipRect.w - pcmd->ClipRect.y));
 				glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer);
 			}
 			idx_buffer += pcmd->ElemCount;
@@ -1386,7 +1386,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 			}
 
 			ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
-			dInt32 sleepState = body->GetSleepState();
+			ndInt32 sleepState = body->GetSleepState();
 			ndVector color((sleepState == 1) ? sleepColor : awakeColor);
 
 			if (m_collisionDisplayMode >= 2)
@@ -1417,7 +1417,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 
 void ndDemoEntityManager::RenderScene()
 {
-	dFloat32 timestep = dGetElapsedSeconds();	
+	ndFloat32 timestep = dGetElapsedSeconds();	
 	CalculateFPS(timestep);
 	UpdatePhysics(timestep);
 
@@ -1426,8 +1426,8 @@ void ndDemoEntityManager::RenderScene()
 	m_cameraManager->InterpolateMatrices (this, CalculateInteplationParam());
 
 	ImGuiIO& io = ImGui::GetIO();
-	dInt32 display_w = (dInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-	dInt32 display_h = (dInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+	ndInt32 display_w = (ndInt32)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+	ndInt32 display_h = (ndInt32)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 	glViewport(0, 0, display_w, display_h);
 	glScissor(0, 0, display_w, display_h);
 	glEnable(GL_SCISSOR_TEST);	
@@ -1450,7 +1450,7 @@ void ndDemoEntityManager::RenderScene()
 	glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
 
 	// set default lightning
-	//dFloat32 cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
+	//ndFloat32 cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
 	//glMaterialParam(GL_FRONT, GL_SPECULAR, cubeColor);
 	//glMaterialParam(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cubeColor);
 	//glMaterialf(GL_FRONT, GL_SHININESS, 50.0);

@@ -98,7 +98,7 @@ class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
 	ndVector m_ordinals;
-	ndArray<dInt32> m_soaJointRows;
+	ndArray<ndInt32> m_soaJointRows;
 	ndArray<ndSoa::ndSoaMatrixElement> m_soaMassMatrix;
 
 } D_GCC_NEWTON_ALIGN_32;

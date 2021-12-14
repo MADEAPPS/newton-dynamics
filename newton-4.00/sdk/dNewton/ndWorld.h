@@ -60,21 +60,21 @@ class ndWorld: public ndClassAlloc
 
 	D_NEWTON_API virtual void CleanUp();
 
-	dInt32 GetEngineVersion() const;
+	ndInt32 GetEngineVersion() const;
 
 	void Sync() const;
-	void Update(dFloat32 timestep);
+	void Update(ndFloat32 timestep);
 
-	virtual void OnPostUpdate(dFloat32 timestep);
+	virtual void OnPostUpdate(ndFloat32 timestep);
 
 	void UpdateTransformsLock();
 	void UpdateTransformsUnlock();
 
-	dInt32 GetThreadCount() const;
-	void SetThreadCount(dInt32 count);
+	ndInt32 GetThreadCount() const;
+	void SetThreadCount(ndInt32 count);
 
-	dInt32 GetSubSteps() const;
-	void SetSubSteps(dInt32 subSteps);
+	ndInt32 GetSubSteps() const;
+	void SetSubSteps(ndInt32 subSteps);
 
 	ndSolverModes GetSelectedSolver() const;
 	D_NEWTON_API void SelectSolver(ndSolverModes solverMode);
@@ -99,14 +99,14 @@ class ndWorld: public ndClassAlloc
 
 	ndBodyDynamic* GetSentinelBody() const;
 
-	dInt32 GetSolverIterations() const;
-	void SetSolverIterations(dInt32 iterations);
+	ndInt32 GetSolverIterations() const;
+	void SetSolverIterations(ndInt32 iterations);
 
 	ndScene* GetScene() const;
 
-	dFloat32 GetUpdateTime() const;
-	dUnsigned32 GetFrameIndex() const;
-	dFloat32 GetAverageUpdateTime() const;
+	ndFloat32 GetUpdateTime() const;
+	ndUnsigned32 GetFrameIndex() const;
+	ndFloat32 GetAverageUpdateTime() const;
 
 	ndContactNotify* GetContactNotify() const;
 	void SetContactNotify(ndContactNotify* const notify);
@@ -121,7 +121,7 @@ class ndWorld: public ndClassAlloc
 
 	private:
 	void ThreadFunction();
-	void PostUpdate(dFloat32 timestep);
+	void PostUpdate(ndFloat32 timestep);
 	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();
@@ -133,11 +133,11 @@ class ndWorld: public ndClassAlloc
 	class dgSolverProgressiveSleepEntry
 	{
 		public:
-		dFloat32 m_maxAccel;
-		dFloat32 m_maxAlpha;
-		dFloat32 m_maxVeloc;
-		dFloat32 m_maxOmega;
-		dInt32 m_steps;
+		ndFloat32 m_maxAccel;
+		ndFloat32 m_maxAlpha;
+		ndFloat32 m_maxVeloc;
+		ndFloat32 m_maxOmega;
+		ndInt32 m_steps;
 	};
 
 	class ndIslandMember
@@ -151,10 +151,10 @@ class ndWorld: public ndClassAlloc
 	void ModelPostUpdate();
 	void ParticleUpdate();
 	void CalculateAverageUpdateTime();
-	void SubStepUpdate(dFloat32 timestep);
+	void SubStepUpdate(ndFloat32 timestep);
 
 	bool SkeletonJointTest(ndJointBilateralConstraint* const jointA) const;
-	static dInt32 CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void* notUsed);
+	static ndInt32 CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void* notUsed);
 
 	ndScene* m_scene;
 	ndBodyDynamic* m_sentinelBody;
@@ -164,22 +164,22 @@ class ndWorld: public ndClassAlloc
 	ndSkeletonList m_skeletonList;
 	ndBodyParticleSetList m_particleSetList;
 
-	dFloat32 m_timestep;
-	dFloat32 m_freezeAccel2;
-	dFloat32 m_freezeAlpha2;
-	dFloat32 m_freezeSpeed2;
-	dFloat32 m_freezeOmega2;
-	dFloat32 m_averageUpdateTime;
-	dFloat32 m_averageTimestepAcc;
-	dFloat32 m_averageFramesCount;
-	dFloat32 m_lastExecutionTime;
+	ndFloat32 m_timestep;
+	ndFloat32 m_freezeAccel2;
+	ndFloat32 m_freezeAlpha2;
+	ndFloat32 m_freezeSpeed2;
+	ndFloat32 m_freezeOmega2;
+	ndFloat32 m_averageUpdateTime;
+	ndFloat32 m_averageTimestepAcc;
+	ndFloat32 m_averageFramesCount;
+	ndFloat32 m_lastExecutionTime;
 
 	dgSolverProgressiveSleepEntry m_sleepTable[D_SLEEP_ENTRIES];
 
-	dInt32 m_subSteps;
+	ndInt32 m_subSteps;
 	ndSolverModes m_solverMode;
-	dInt32 m_solverIterations;
-	dUnsigned32 m_frameIndex;
+	ndInt32 m_solverIterations;
+	ndUnsigned32 m_frameIndex;
 	std::mutex m_transformsLock;
 	bool m_inUpdate;
 	bool m_collisionUpdate;
@@ -197,22 +197,22 @@ inline void ndWorld::Sync() const
 	m_scene->Sync();
 }
 
-inline dInt32 ndWorld::GetThreadCount() const
+inline ndInt32 ndWorld::GetThreadCount() const
 {
 	return m_scene->GetThreadCount();
 }
 
-inline void ndWorld::SetThreadCount(dInt32 count)
+inline void ndWorld::SetThreadCount(ndInt32 count)
 {
 	m_scene->SetCount(count);
 }
 
-inline dInt32 ndWorld::GetSubSteps() const
+inline ndInt32 ndWorld::GetSubSteps() const
 {
 	return m_subSteps;
 }
 
-inline void ndWorld::SetSubSteps(dInt32 subSteps)
+inline void ndWorld::SetSubSteps(ndInt32 subSteps)
 {
 	m_subSteps = dClamp(subSteps, 1, 16);
 }
@@ -222,14 +222,14 @@ inline ndScene* ndWorld::GetScene() const
 	return m_scene;
 }
 
-inline dInt32 ndWorld::GetSolverIterations() const
+inline ndInt32 ndWorld::GetSolverIterations() const
 {
 	return m_solverIterations;
 }
 
-inline void ndWorld::SetSolverIterations(dInt32 iterations)
+inline void ndWorld::SetSolverIterations(ndInt32 iterations)
 {
-	m_solverIterations = dUnsigned32(dMax(4, iterations));
+	m_solverIterations = ndUnsigned32(dMax(4, iterations));
 }
 
 inline ndContactNotify* ndWorld::GetContactNotify() const
@@ -278,22 +278,22 @@ inline const ndModelList& ndWorld::GetModelList() const
 	return m_modelList;
 }
 
-inline dFloat32 ndWorld::GetUpdateTime() const
+inline ndFloat32 ndWorld::GetUpdateTime() const
 {
 	return m_lastExecutionTime;
 }
 
-inline dFloat32 ndWorld::GetAverageUpdateTime() const
+inline ndFloat32 ndWorld::GetAverageUpdateTime() const
 {
 	return m_averageUpdateTime;
 }
 
-inline dUnsigned32 ndWorld::GetFrameIndex() const
+inline ndUnsigned32 ndWorld::GetFrameIndex() const
 {
 	return m_frameIndex;
 }
 
-inline void ndWorld::OnPostUpdate(dFloat32)
+inline void ndWorld::OnPostUpdate(ndFloat32)
 {
 }
 
@@ -302,7 +302,7 @@ inline void ndWorld::DebugScene(ndSceneTreeNotiFy* const notify)
 	m_scene->DebugScene(notify);
 }
 
-inline void ndWorld::Update(dFloat32 timestep)
+inline void ndWorld::Update(ndFloat32 timestep)
 {
 	// wait until previous update complete.
 	Sync();
@@ -330,7 +330,7 @@ inline void ndWorld::UpdateTransformsUnlock()
 	m_transformsLock.unlock();
 }
 
-inline dInt32 ndWorld::GetEngineVersion() const
+inline ndInt32 ndWorld::GetEngineVersion() const
 {
 	return D_NEWTON_ENGINE_MAJOR_VERSION * 100 + D_NEWTON_ENGINE_MINOR_VERSION;
 }

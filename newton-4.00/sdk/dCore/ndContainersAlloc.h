@@ -36,7 +36,7 @@ class ndContainersAlloc: public ndClassAlloc
 	{
 	}
 
-	static void FlushFreeList(dInt32)
+	static void FlushFreeList(ndInt32)
 	{
 	}
 };
@@ -46,7 +46,7 @@ class ndFreeListAlloc
 	public:
 	ndFreeListAlloc();
 	D_CORE_API static void Flush();
-	D_CORE_API static void Flush(dInt32 size);
+	D_CORE_API static void Flush(ndInt32 size);
 	D_CORE_API void *operator new (size_t size);
 	D_CORE_API void operator delete (void* ptr);
 };
@@ -68,7 +68,7 @@ class ndContainersFreeListAlloc: public ndFreeListAlloc
 	{
 	}
 
-	static void FlushFreeList(dInt32 size)
+	static void FlushFreeList(ndInt32 size)
 	{
 		Flush(size);
 	}

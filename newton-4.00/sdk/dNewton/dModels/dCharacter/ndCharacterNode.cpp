@@ -47,7 +47,7 @@ ndCharacterNode::ndCharacterNode(const ndCharacterLoadDescriptor& desc)
 
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
-	dInt32 hashId;
+	ndInt32 hashId;
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) xmlNode;
 	element->Attribute("hashId", &hashId);
 	desc.m_limbMap->Insert(this, hashId);

@@ -34,7 +34,7 @@ ndBodyNotify::ndBodyNotify(const ndLoadSaveBase::dLoadDescriptor& desc)
 	m_defualtGravity = xmlGetVector3(rootNode, "gravity");
 }
 
-void ndBodyNotify::OnApplyExternalForce(dInt32, dFloat32)
+void ndBodyNotify::OnApplyExternalForce(ndInt32, ndFloat32)
 {
 	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
 	dAssert(body);

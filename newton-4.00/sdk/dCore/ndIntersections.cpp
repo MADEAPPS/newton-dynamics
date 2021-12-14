@@ -31,17 +31,17 @@
 
 bool dRayBoxClip (ndVector& p0, ndVector& p1, const ndVector& boxP0, const ndVector& boxP1) 
 {	
-	dAssert (p0.m_w == dFloat32(0.0f));
-	dAssert (p1.m_w == dFloat32(0.0f));
-	dAssert (boxP0.m_w == dFloat32(0.0f));
-	dAssert (boxP1.m_w == dFloat32(0.0f));
-	for (dInt32 i = 0; i < 3; i ++) 
+	dAssert (p0.m_w == ndFloat32(0.0f));
+	dAssert (p1.m_w == ndFloat32(0.0f));
+	dAssert (boxP0.m_w == ndFloat32(0.0f));
+	dAssert (boxP1.m_w == ndFloat32(0.0f));
+	for (ndInt32 i = 0; i < 3; i ++) 
 	{
-		dFloat32 tmp0 = boxP1[i] - p0[i];
-		if (tmp0 > dFloat32 (0.0f)) 
+		ndFloat32 tmp0 = boxP1[i] - p0[i];
+		if (tmp0 > ndFloat32 (0.0f)) 
 		{
-			dFloat32 tmp1 = boxP1[i] - p1[i];
-			if (tmp1 < dFloat32 (0.0f)) 
+			ndFloat32 tmp1 = boxP1[i] - p1[i];
+			if (tmp1 < ndFloat32 (0.0f)) 
 			{
 				p1 = p0 + (p1 - p0).Scale (tmp0 / (p1[i] - p0[i])); 
 				p1[i] = boxP1[i];
@@ -49,8 +49,8 @@ bool dRayBoxClip (ndVector& p0, ndVector& p1, const ndVector& boxP0, const ndVec
 		} 
 		else 
 		{
-			dFloat32 tmp1 = boxP1[i] - p1[i];
-			if (tmp1 > dFloat32 (0.0f)) 
+			ndFloat32 tmp1 = boxP1[i] - p1[i];
+			if (tmp1 > ndFloat32 (0.0f)) 
 			{
 				p0 += (p1 - p0).Scale (tmp0 / (p1[i] - p0[i])); 
 				p0[i] = boxP1[i];
@@ -62,10 +62,10 @@ bool dRayBoxClip (ndVector& p0, ndVector& p1, const ndVector& boxP0, const ndVec
 		}
 
 		tmp0 = boxP0[i] - p0[i];
-		if (tmp0 < dFloat32 (0.0f)) 
+		if (tmp0 < ndFloat32 (0.0f)) 
 		{
-			dFloat32 tmp1 = boxP0[i] - p1[i];
-			if (tmp1 > dFloat32 (0.0f)) 
+			ndFloat32 tmp1 = boxP0[i] - p1[i];
+			if (tmp1 > ndFloat32 (0.0f)) 
 			{
 				p1 = p0 + (p1 - p0).Scale (tmp0 / (p1[i] - p0[i])); 
 				p1[i] = boxP0[i];
@@ -73,8 +73,8 @@ bool dRayBoxClip (ndVector& p0, ndVector& p1, const ndVector& boxP0, const ndVec
 		} 
 		else 
 		{
-			dFloat32 tmp1 = boxP0[i] - p1[i];
-			if (tmp1 < dFloat32 (0.0f)) 
+			ndFloat32 tmp1 = boxP0[i] - p1[i];
+			if (tmp1 < ndFloat32 (0.0f)) 
 			{
 				p0 += (p1 - p0).Scale (tmp0 / (p1[i] - p0[i])); 
 				p0[i] = boxP0[i];
@@ -91,8 +91,8 @@ bool dRayBoxClip (ndVector& p0, ndVector& p1, const ndVector& boxP0, const ndVec
 ndBigVector dPointToRayDistance(const ndBigVector& point, const ndBigVector& ray_p0, const ndBigVector& ray_p1)
 {
 	ndBigVector dp (ray_p1 - ray_p0);
-	dAssert (dp.m_w == dFloat32 (0.0f));
-	dFloat64 t = dClamp (dp.DotProduct(point - ray_p0).GetScalar() / dp.DotProduct(dp).GetScalar(), dFloat64(0.0f), dFloat64 (1.0f));
+	dAssert (dp.m_w == ndFloat32 (0.0f));
+	ndFloat64 t = dClamp (dp.DotProduct(point - ray_p0).GetScalar() / dp.DotProduct(dp).GetScalar(), ndFloat64(0.0f), ndFloat64 (1.0f));
 	return ray_p0 + dp.Scale (t);
 }
 
@@ -100,25 +100,25 @@ ndBigVector dPointToTriangleDistance(const ndBigVector& point, const ndBigVector
 {
 	const ndBigVector e10(p1 - p0);
 	const ndBigVector e20(p2 - p0);
-	const dFloat64 a00 = e10.DotProduct(e10).GetScalar();
-	const dFloat64 a11 = e20.DotProduct(e20).GetScalar();
-	const dFloat64 a01 = e10.DotProduct(e20).GetScalar();
+	const ndFloat64 a00 = e10.DotProduct(e10).GetScalar();
+	const ndFloat64 a11 = e20.DotProduct(e20).GetScalar();
+	const ndFloat64 a01 = e10.DotProduct(e20).GetScalar();
 
-	const dFloat64 det = a00 * a11 - a01 * a01;
-	dAssert(det >= dFloat32(0.0f));
-	if (dAbs(det) > dFloat32(1.0e-24f)) 
+	const ndFloat64 det = a00 * a11 - a01 * a01;
+	dAssert(det >= ndFloat32(0.0f));
+	if (dAbs(det) > ndFloat32(1.0e-24f)) 
 	{
 		ndBigVector p0Point (point - p0);
-		const dFloat64 b0 = e10.DotProduct(p0Point).GetScalar();
-		const dFloat64 b1 = e20.DotProduct(p0Point).GetScalar();
+		const ndFloat64 b0 = e10.DotProduct(p0Point).GetScalar();
+		const ndFloat64 b1 = e20.DotProduct(p0Point).GetScalar();
 
-		const dFloat64 beta = b1 * a00 - a01 * b0;
-		const dFloat64 alpha = b0 * a11 - a01 * b1;
-		if (beta < dFloat32(0.0f)) 
+		const ndFloat64 beta = b1 * a00 - a01 * b0;
+		const ndFloat64 alpha = b0 * a11 - a01 * b1;
+		if (beta < ndFloat32(0.0f)) 
 		{
 			return dPointToRayDistance (point, p0, p1);
 		} 
-		else if (alpha < dFloat32(0.0f)) 
+		else if (alpha < ndFloat32(0.0f)) 
 		{
 			return dPointToRayDistance (point, p0, p2);
 		} 
@@ -126,7 +126,7 @@ ndBigVector dPointToTriangleDistance(const ndBigVector& point, const ndBigVector
 		{
 			return dPointToRayDistance (point, p1, p2);
 		}
-		return p0 + (e10.Scale(alpha) + e20.Scale(beta)).Scale(dFloat64(1.0f) / det);
+		return p0 + (e10.Scale(alpha) + e20.Scale(beta)).Scale(ndFloat64(1.0f) / det);
 	}
 	// this is a degenerated triangle. this should never happens
 	dAssert(0);
@@ -139,48 +139,48 @@ ndBigVector dPointToTetrahedrumDistance (const ndBigVector& point, const ndBigVe
 	const ndBigVector e20(p2 - p0);
 	const ndBigVector e30(p3 - p0);
 
-	const dFloat64 d0 = sqrt(e10.DotProduct(e10).GetScalar());
-	if (d0 > dFloat64(0.0f)) 
+	const ndFloat64 d0 = sqrt(e10.DotProduct(e10).GetScalar());
+	if (d0 > ndFloat64(0.0f)) 
 	{
-		const dFloat64 invd0 = dFloat64(1.0f) / d0;
-		const dFloat64 l10 = e20.DotProduct(e10).GetScalar() * invd0;
-		const dFloat64 l20 = e30.DotProduct(e10).GetScalar() * invd0;
-		const dFloat64 desc11 = e20.DotProduct(e20).GetScalar() - l10 * l10;
-		if (desc11 > dFloat64(0.0f)) 
+		const ndFloat64 invd0 = ndFloat64(1.0f) / d0;
+		const ndFloat64 l10 = e20.DotProduct(e10).GetScalar() * invd0;
+		const ndFloat64 l20 = e30.DotProduct(e10).GetScalar() * invd0;
+		const ndFloat64 desc11 = e20.DotProduct(e20).GetScalar() - l10 * l10;
+		if (desc11 > ndFloat64(0.0f)) 
 		{
-			const dFloat64 d1 = sqrt(desc11);
-			const dFloat64 invd1 = dFloat64(1.0f) / d1;
-			const dFloat64 l21 = (e30.DotProduct(e20).GetScalar() - l20 * l10) * invd1;
-			const dFloat64 desc22 = e30.DotProduct(e30).GetScalar() - l20 * l20 - l21 * l21;
-			if (desc22 > dFloat64(0.0f)) 
+			const ndFloat64 d1 = sqrt(desc11);
+			const ndFloat64 invd1 = ndFloat64(1.0f) / d1;
+			const ndFloat64 l21 = (e30.DotProduct(e20).GetScalar() - l20 * l10) * invd1;
+			const ndFloat64 desc22 = e30.DotProduct(e30).GetScalar() - l20 * l20 - l21 * l21;
+			if (desc22 > ndFloat64(0.0f)) 
 			{
 				ndBigVector p0Point (point - p0);
-				const dFloat64 d2 = sqrt(desc22);
-				const dFloat64 invd2 = dFloat64(1.0f) / d2;
+				const ndFloat64 d2 = sqrt(desc22);
+				const ndFloat64 invd2 = ndFloat64(1.0f) / d2;
 				
-				const dFloat64 b0 = e10.DotProduct(p0Point).GetScalar();
-				const dFloat64 b1 = e20.DotProduct(p0Point).GetScalar();
-				const dFloat64 b2 = e30.DotProduct(p0Point).GetScalar();
+				const ndFloat64 b0 = e10.DotProduct(p0Point).GetScalar();
+				const ndFloat64 b1 = e20.DotProduct(p0Point).GetScalar();
+				const ndFloat64 b2 = e30.DotProduct(p0Point).GetScalar();
 
-				dFloat64 u1 = b0 * invd0;
-				dFloat64 u2 = (b1 - l10 * u1) * invd1;
-				dFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2 * invd2;
+				ndFloat64 u1 = b0 * invd0;
+				ndFloat64 u2 = (b1 - l10 * u1) * invd1;
+				ndFloat64 u3 = (b2 - l20 * u1 - l21 * u2) * invd2 * invd2;
 				u2 = (u2 - l21 * u3) * invd1;
 				u1 = (u1 - l10 * u2 - l20 * u3) * invd0;
-				if (u3 < dFloat64(0.0f)) 
+				if (u3 < ndFloat64(0.0f)) 
 				{
 					// this looks funny but it is correct
 					return dPointToTriangleDistance(point, p0, p1, p2);
 				} 
-				else if (u2 < dFloat64(0.0f)) 
+				else if (u2 < ndFloat64(0.0f)) 
 				{
 					return dPointToTriangleDistance(point, p0, p1, p3);
 				} 
-				else if (u1 < dFloat64(0.0f)) 
+				else if (u1 < ndFloat64(0.0f)) 
 				{
 					return dPointToTriangleDistance(point, p0, p2, p3);
 				} 
-				else if (u1 + u2 + u3 > dFloat64(1.0f)) 
+				else if (u1 + u2 + u3 > ndFloat64(1.0f)) 
 				{
 					return dPointToTriangleDistance(point, p1, p2, p3);
 				}
@@ -193,42 +193,42 @@ ndBigVector dPointToTetrahedrumDistance (const ndBigVector& point, const ndBigVe
 	return p0;
 }
 
-dFloat32 dRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector& origin, dFloat32 radius)
+ndFloat32 dRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector& origin, ndFloat32 radius)
 {
 	ndVector p0Origin (p0 - origin);
-	dAssert (p0Origin.m_w == dFloat32 (0.0f));
-	if (p0Origin.DotProduct(p0Origin).GetScalar() < (dFloat32 (100.0f) * radius * radius)) 
+	dAssert (p0Origin.m_w == ndFloat32 (0.0f));
+	if (p0Origin.DotProduct(p0Origin).GetScalar() < (ndFloat32 (100.0f) * radius * radius)) 
 	{
 		ndVector dp (p1 - p0);
-		dAssert (dp.m_w == dFloat32 (0.0f));
-		dFloat32 a = dp.DotProduct(dp).GetScalar();
-		dFloat32 b = dFloat32 (2.0f) * p0Origin.DotProduct(dp).GetScalar();
-		dFloat32 c = p0Origin.DotProduct(p0Origin).GetScalar() - radius * radius;
-		dFloat32 desc = b * b - dFloat32 (4.0f) * a * c;
+		dAssert (dp.m_w == ndFloat32 (0.0f));
+		ndFloat32 a = dp.DotProduct(dp).GetScalar();
+		ndFloat32 b = ndFloat32 (2.0f) * p0Origin.DotProduct(dp).GetScalar();
+		ndFloat32 c = p0Origin.DotProduct(p0Origin).GetScalar() - radius * radius;
+		ndFloat32 desc = b * b - ndFloat32 (4.0f) * a * c;
 		if (desc >= 0.0f) 
 		{
-			desc = dSqrt (desc);
-			dFloat32 den = dFloat32 (0.5f) / a;
-			dFloat32 t0 = (-b + desc) * den;
-			dFloat32 t1 = (-b - desc) * den;
-			if ((t0 >= dFloat32 (0.0f)) && (t1 >= dFloat32 (0.0f))) 
+			desc = ndSqrt (desc);
+			ndFloat32 den = ndFloat32 (0.5f) / a;
+			ndFloat32 t0 = (-b + desc) * den;
+			ndFloat32 t1 = (-b - desc) * den;
+			if ((t0 >= ndFloat32 (0.0f)) && (t1 >= ndFloat32 (0.0f))) 
 			{
 				t0 =  dMin(t0, t1);
-				if (t0 <= dFloat32 (1.0f)) 
+				if (t0 <= ndFloat32 (1.0f)) 
 				{
 					return t0;
 				}
 			} 
-			else if (t0 >= dFloat32 (0.0f)) 
+			else if (t0 >= ndFloat32 (0.0f)) 
 			{
-				if (t0 <= dFloat32 (1.0f)) 
+				if (t0 <= ndFloat32 (1.0f)) 
 				{
 					return t0;
 				}
 			} 
 			else 
 			{
-				if ((t1 >= dFloat32 (0.0f)) && (t1 <= dFloat32 (1.0f))) 
+				if ((t1 >= ndFloat32 (0.0f)) && (t1 <= ndFloat32 (1.0f))) 
 				{
 					return t1;
 				}
@@ -239,68 +239,68 @@ dFloat32 dRayCastSphere (const ndVector& p0, const ndVector& p1, const ndVector&
 	{
 		ndBigVector p0Origin1 (p0Origin);
 ndBigVector dp(p1 - p0);
-dAssert(dp.m_w == dFloat32(0.0f));
-dFloat64 a = dp.DotProduct(dp).GetScalar();
-dFloat64 b = dFloat32(2.0f) * p0Origin1.DotProduct(dp).GetScalar();
-dFloat64 c = p0Origin1.DotProduct(p0Origin1).GetScalar() - dFloat64(radius) * radius;
-dFloat64 desc = b * b - dFloat32(4.0f) * a * c;
+dAssert(dp.m_w == ndFloat32(0.0f));
+ndFloat64 a = dp.DotProduct(dp).GetScalar();
+ndFloat64 b = ndFloat32(2.0f) * p0Origin1.DotProduct(dp).GetScalar();
+ndFloat64 c = p0Origin1.DotProduct(p0Origin1).GetScalar() - ndFloat64(radius) * radius;
+ndFloat64 desc = b * b - ndFloat32(4.0f) * a * c;
 if (desc >= 0.0f)
 {
 	desc = sqrt(desc);
-	dFloat64 den = dFloat32(0.5f) / a;
-	dFloat64 t0 = (-b + desc) * den;
-	dFloat64 t1 = (-b - desc) * den;
-	if ((t0 >= dFloat32(0.0f)) && (t1 >= dFloat32(0.0f)))
+	ndFloat64 den = ndFloat32(0.5f) / a;
+	ndFloat64 t0 = (-b + desc) * den;
+	ndFloat64 t1 = (-b - desc) * den;
+	if ((t0 >= ndFloat32(0.0f)) && (t1 >= ndFloat32(0.0f)))
 	{
 		t0 = dMin(t0, t1);
-		if (t0 <= dFloat32(1.0f))
+		if (t0 <= ndFloat32(1.0f))
 		{
-			return dFloat32(t0);
+			return ndFloat32(t0);
 		}
 	}
-	else if (t0 >= dFloat32(0.0f))
+	else if (t0 >= ndFloat32(0.0f))
 	{
-		if (t0 <= dFloat32(1.0f))
+		if (t0 <= ndFloat32(1.0f))
 		{
-			return dFloat32(t0);
+			return ndFloat32(t0);
 		}
 	}
 	else
 	{
-		if ((t1 >= dFloat32(0.0f)) && (t1 <= dFloat32(1.0f)))
+		if ((t1 >= ndFloat32(0.0f)) && (t1 <= ndFloat32(1.0f)))
 		{
-			return dFloat32(t1);
+			return ndFloat32(t1);
 		}
 	}
 }
 	}
-	return dFloat32(1.2f);
+	return ndFloat32(1.2f);
 }
 
-dFloat32 dRayCastBox(const ndVector& p0, const ndVector& p1, const ndVector& boxP0, const ndVector& boxP1, ndVector& normalOut)
+ndFloat32 dRayCastBox(const ndVector& p0, const ndVector& p1, const ndVector& boxP0, const ndVector& boxP1, ndVector& normalOut)
 {
-	dInt32 index = 0;
-	dFloat32 signDir = dFloat32(0.0f);
-	dFloat32 tmin = dFloat32(0.0f);
-	dFloat32 tmax = dFloat32(1.0f);
+	ndInt32 index = 0;
+	ndFloat32 signDir = ndFloat32(0.0f);
+	ndFloat32 tmin = ndFloat32(0.0f);
+	ndFloat32 tmax = ndFloat32(1.0f);
 
-	for (dInt32 i = 0; i < 3; i++)
+	for (ndInt32 i = 0; i < 3; i++)
 	{
-		dFloat32 dp = p1[i] - p0[i];
-		if (dAbs(dp) < dFloat32(1.0e-8f))
+		ndFloat32 dp = p1[i] - p0[i];
+		if (dAbs(dp) < ndFloat32(1.0e-8f))
 		{
 			if (p0[i] <= boxP0[i] || p0[i] >= boxP1[i])
 			{
-				return dFloat32(1.2f);
+				return ndFloat32(1.2f);
 			}
 		}
 		else
 		{
-			dp = dFloat32(1.0f) / dp;
-			dFloat32 t1 = (boxP0[i] - p0[i]) * dp;
-			dFloat32 t2 = (boxP1[i] - p0[i]) * dp;
+			dp = ndFloat32(1.0f) / dp;
+			ndFloat32 t1 = (boxP0[i] - p0[i]) * dp;
+			ndFloat32 t2 = (boxP1[i] - p0[i]) * dp;
 
-			dFloat32 sign = dFloat32(-1.0f);
+			ndFloat32 sign = ndFloat32(-1.0f);
 			if (t1 > t2)
 			{
 				sign = 1;
@@ -318,20 +318,20 @@ dFloat32 dRayCastBox(const ndVector& p0, const ndVector& p1, const ndVector& box
 			}
 			if (tmin > tmax)
 			{
-				return dFloat32(1.2f);
+				return ndFloat32(1.2f);
 			}
 		}
 	}
 
-	if (tmin > dFloat32(0.0f))
+	if (tmin > ndFloat32(0.0f))
 	{
 		dAssert(tmin < 1.0f);
-		normalOut = ndVector(dFloat32(0.0f));
+		normalOut = ndVector(ndFloat32(0.0f));
 		normalOut[index] = signDir;
 	}
 	else
 	{
-		tmin = dFloat32(1.2f);
+		tmin = ndFloat32(1.2f);
 	}
 	return tmin;
 }

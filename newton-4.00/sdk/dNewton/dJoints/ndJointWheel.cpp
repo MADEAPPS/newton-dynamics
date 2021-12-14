@@ -62,12 +62,12 @@ ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* co
 	:ndJointBilateralConstraint(7, child, parent, pinAndPivotFrame)
 	,m_baseFrame(m_localMatrix1)
 	,m_info(info)
-	,m_posit(dFloat32 (0.0f))
-	,m_speed(dFloat32(0.0f))
+	,m_posit(ndFloat32 (0.0f))
+	,m_speed(ndFloat32(0.0f))
 	,m_regularizer(info.m_regularizer)
-	,m_normalizedBrake(dFloat32(0.0f))
-	,m_normalidedSteering(dFloat32(0.0f))
-	,m_normalizedHandBrake(dFloat32(0.0f))
+	,m_normalizedBrake(ndFloat32(0.0f))
+	,m_normalidedSteering(ndFloat32(0.0f))
+	,m_normalizedHandBrake(ndFloat32(0.0f))
 {
 }
 
@@ -75,12 +75,12 @@ ndJointWheel::ndJointWheel(const ndLoadSaveBase::dLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_baseFrame(dGetIdentityMatrix())
 	,m_info()
-	,m_posit(dFloat32(0.0f))
-	,m_speed(dFloat32(0.0f))
+	,m_posit(ndFloat32(0.0f))
+	,m_speed(ndFloat32(0.0f))
 	,m_regularizer(0.0f)
-	,m_normalizedBrake(dFloat32(0.0f))
-	,m_normalidedSteering(dFloat32(0.0f))
-	,m_normalizedHandBrake(dFloat32(0.0f))
+	,m_normalizedBrake(ndFloat32(0.0f))
+	,m_normalidedSteering(ndFloat32(0.0f))
+	,m_normalizedHandBrake(ndFloat32(0.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
@@ -96,19 +96,19 @@ ndJointWheel::~ndJointWheel()
 {
 }
 
-void ndJointWheel::SetBrake(dFloat32 normalizedBrake)
+void ndJointWheel::SetBrake(ndFloat32 normalizedBrake)
 {
-	m_normalizedBrake = dClamp (normalizedBrake, dFloat32 (0.0f), dFloat32 (1.0f));
+	m_normalizedBrake = dClamp (normalizedBrake, ndFloat32 (0.0f), ndFloat32 (1.0f));
 }
 
-void ndJointWheel::SetHandBrake(dFloat32 normalizedBrake)
+void ndJointWheel::SetHandBrake(ndFloat32 normalizedBrake)
 {
-	m_normalizedHandBrake = dClamp(normalizedBrake, dFloat32(0.0f), dFloat32(1.0f));
+	m_normalizedHandBrake = dClamp(normalizedBrake, ndFloat32(0.0f), ndFloat32(1.0f));
 }
 
-void ndJointWheel::SetSteering(dFloat32 normalidedSteering)
+void ndJointWheel::SetSteering(ndFloat32 normalidedSteering)
 {
-	m_normalidedSteering = dClamp(normalidedSteering, dFloat32(-1.0f), dFloat32(1.0f));
+	m_normalidedSteering = dClamp(normalidedSteering, ndFloat32(-1.0f), ndFloat32(1.0f));
 }
 
 void ndJointWheel::UpdateTireSteeringAngleMatrix()
@@ -119,9 +119,9 @@ void ndJointWheel::UpdateTireSteeringAngleMatrix()
 
 	CalculateGlobalMatrix(tireMatrix, chassisMatrix);
 	const ndVector localRelPosit(chassisMatrix.UntransformVector(tireMatrix.m_posit));
-	const dFloat32 distance = dClamp(localRelPosit.m_y, m_info.m_upperStop, m_info.m_lowerStop);
+	const ndFloat32 distance = dClamp(localRelPosit.m_y, m_info.m_upperStop, m_info.m_lowerStop);
 
-	const dFloat32 spinAngle = -CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
+	const ndFloat32 spinAngle = -CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
 	ndMatrix newTireMatrix(dPitchMatrix(spinAngle) * chassisMatrix);
 	newTireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(distance);
 
@@ -158,8 +158,8 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	m_posit = prel.DotProduct(matrix1.m_up).GetScalar();
 	const ndVector projectedPoint = p1 + pin.Scale(pin.DotProduct(prel).GetScalar());
 
-	const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+	const ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+	const ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[0]);
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[2]);
@@ -170,12 +170,12 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
 	SetMassSpringDamperAcceleration(desc, m_regularizer, m_info.m_springK, m_info.m_damperC);
 
-	const dFloat32 brakeFrictionTorque = dMax(m_normalizedBrake * m_info.m_brakeTorque, m_normalizedHandBrake * m_info.m_handBrakeTorque);
-	if (brakeFrictionTorque > dFloat32(0.0f))
+	const ndFloat32 brakeFrictionTorque = dMax(m_normalizedBrake * m_info.m_brakeTorque, m_normalizedHandBrake * m_info.m_handBrakeTorque);
+	if (brakeFrictionTorque > ndFloat32(0.0f))
 	{
-		const dFloat32 brakesToChassisInfluence = dFloat32 (0.125f);
+		const ndFloat32 brakesToChassisInfluence = ndFloat32 (0.125f);
 
-		AddAngularRowJacobian(desc, matrix1.m_front, dFloat32(0.0f));
+		AddAngularRowJacobian(desc, matrix1.m_front, ndFloat32(0.0f));
 		const ndVector tireOmega(m_body0->GetOmega());
 		const ndVector chassisOmega(m_body1->GetOmega());
 
@@ -183,9 +183,9 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
 		jacobian1.m_angular = jacobian1.m_angular.Scale(brakesToChassisInfluence);
 
-		dFloat32 w0 = tireOmega.DotProduct(jacobian0.m_angular).GetScalar();
-		dFloat32 w1 = chassisOmega.DotProduct(jacobian1.m_angular).GetScalar();
-		dFloat32 wRel = (w0 + w1) * dFloat32 (0.35f);
+		ndFloat32 w0 = tireOmega.DotProduct(jacobian0.m_angular).GetScalar();
+		ndFloat32 w1 = chassisOmega.DotProduct(jacobian1.m_angular).GetScalar();
+		ndFloat32 wRel = (w0 + w1) * ndFloat32 (0.35f);
 
 		SetMotorAcceleration(desc, -wRel * desc.m_invTimestep);
 		SetHighFriction(desc, brakeFrictionTorque);
@@ -193,20 +193,20 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 
 	// add suspension limits alone the vertical axis 
-	const dFloat32 x = m_posit + m_speed * desc.m_timestep;
+	const ndFloat32 x = m_posit + m_speed * desc.m_timestep;
 	if (x < m_info.m_upperStop)
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
-		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		SetMotorAcceleration(desc, stopAccel);
-		SetLowerFriction(desc, dFloat32(0.0f));
+		SetLowerFriction(desc, ndFloat32(0.0f));
 	}
 	else if (x > m_info.m_lowerStop)
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
-		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		SetMotorAcceleration(desc, stopAccel);
-		SetHighFriction(desc, dFloat32(0.0f));
+		SetHighFriction(desc, ndFloat32(0.0f));
 	}
 }
 

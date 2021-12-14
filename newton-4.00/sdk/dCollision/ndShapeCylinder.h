@@ -32,32 +32,32 @@ class ndShapeCylinder : public ndShapeConvex
 	public:
 	D_CLASS_REFLECTION(ndShapeCylinder);
 	D_COLLISION_API ndShapeCylinder(const ndLoadSaveBase::dLoadDescriptor& desc);
-	D_COLLISION_API ndShapeCylinder(dFloat32 radio0, dFloat32 radio1, dFloat32 height);
+	D_COLLISION_API ndShapeCylinder(ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height);
 	D_COLLISION_API ~ndShapeCylinder();
 
 	virtual ndShapeCylinder* GetAsShapeCylinder() { return this; }
 
 	protected:
-	D_COLLISION_API void Init (dFloat32 radio0, dFloat32 radio1, dFloat32 height);
+	D_COLLISION_API void Init (ndFloat32 radio0, ndFloat32 radio1, ndFloat32 height);
 
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
 	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	D_COLLISION_API virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
-	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir, dInt32* const vertexIndex) const;
-	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
-	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
+	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinThickness, ndInt32* const vertexIndex) const;
+	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	virtual dInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
+	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 
 	ndVector m_profile[4];
 	ndVector m_vertex[D_TAPED_CYLINDER_SEGMENTS * 2];
-	dFloat32 m_radius0;
-	dFloat32 m_radius1;
-	dFloat32 m_height;
+	ndFloat32 m_radius0;
+	ndFloat32 m_radius1;
+	ndFloat32 m_height;
 
-	static dInt32 m_shapeRefCount;
+	static ndInt32 m_shapeRefCount;
 	static ndConvexSimplexEdge m_edgeArray[];
 
 } D_GCC_NEWTON_ALIGN_32;

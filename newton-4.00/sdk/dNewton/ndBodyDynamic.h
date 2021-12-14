@@ -24,10 +24,10 @@
 
 #include "ndNewtonStdafx.h"
 
-#define D_MAX_SPEED_ATT	dFloat32(0.02f)
-//#define D_FREEZE_ACCEL	dFloat32(0.1f)
-#define D_FREEZE_ACCEL		dFloat32(1.0f)
-#define D_FREEZE_SPEED		dFloat32(0.032f)
+#define D_MAX_SPEED_ATT	ndFloat32(0.02f)
+//#define D_FREEZE_ACCEL	ndFloat32(0.1f)
+#define D_FREEZE_ACCEL		ndFloat32(1.0f)
+#define D_FREEZE_SPEED		ndFloat32(0.032f)
 
 #define D_FREEZE_ACCEL2		(D_FREEZE_ACCEL * D_FREEZE_ACCEL)
 #define D_FREEZE_SPEED2		(D_FREEZE_SPEED * D_FREEZE_SPEED)
@@ -35,7 +35,7 @@
 #define D_FREEZE_MAG		D_FREEZE_ACCEL
 #define D_FREEZE_MAG2		(D_FREEZE_MAG * D_FREEZE_MAG)
 
-#define D_ERR_TOLERANCE		dFloat32(1.0e-2f)
+#define D_ERR_TOLERANCE		ndFloat32(1.0e-2f)
 #define D_ERR_TOLERANCE2	(D_ERR_TOLERANCE * D_ERR_TOLERANCE)
 
 D_MSV_NEWTON_ALIGN_32
@@ -48,21 +48,21 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API virtual ~ndBodyDynamic ();
 
 	D_NEWTON_API virtual ndBodyDynamic* GetAsBodyDynamic() { return this; }
-	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep);
-	D_NEWTON_API virtual void AddDampingAcceleration(dFloat32 timestep);
-	D_NEWTON_API virtual void IntegrateVelocity(dFloat32 timestep);
+	D_NEWTON_API virtual void ApplyExternalForces(ndInt32 threadIndex, ndFloat32 timestep);
+	D_NEWTON_API virtual void AddDampingAcceleration(ndFloat32 timestep);
+	D_NEWTON_API virtual void IntegrateVelocity(ndFloat32 timestep);
 
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	D_NEWTON_API void SetForce(const ndVector& force);
 	D_NEWTON_API void SetTorque(const ndVector& torque);
 
-	D_NEWTON_API void AddImpulse(const ndVector& pointVeloc, const ndVector& pointPosit, dFloat32 timestep);
-	D_NEWTON_API void ApplyImpulsePair(const ndVector& linearImpulse, const ndVector& angularImpulse, dFloat32 timestep);
-	D_NEWTON_API void ApplyImpulsesAtPoint(dInt32 count, const ndVector* const impulseArray, const ndVector* const pointArray, dFloat32 timestep);
+	D_NEWTON_API void AddImpulse(const ndVector& pointVeloc, const ndVector& pointPosit, ndFloat32 timestep);
+	D_NEWTON_API void ApplyImpulsePair(const ndVector& linearImpulse, const ndVector& angularImpulse, ndFloat32 timestep);
+	D_NEWTON_API void ApplyImpulsesAtPoint(ndInt32 count, const ndVector* const impulseArray, const ndVector* const pointArray, ndFloat32 timestep);
 
-	D_NEWTON_API dFloat32 GetLinearDamping() const;
-	D_NEWTON_API void SetLinearDamping(dFloat32 linearDamp);
+	D_NEWTON_API ndFloat32 GetLinearDamping() const;
+	D_NEWTON_API void SetLinearDamping(ndFloat32 linearDamp);
 
 	D_NEWTON_API ndVector GetAngularDamping() const;
 	D_NEWTON_API void SetAngularDamping(const ndVector& angularDamp);
@@ -83,7 +83,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	ndVector m_savedExternalTorque;
 	ndVector m_dampCoef;
 	ndVector m_cachedDampCoef;
-	dFloat32 m_cachedTimeStep;
+	ndFloat32 m_cachedTimeStep;
 
 	friend class ndDynamicsUpdate;
 	friend class ndDynamicsUpdateSoa;

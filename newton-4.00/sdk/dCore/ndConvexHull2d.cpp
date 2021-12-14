@@ -23,14 +23,14 @@
 #include "ndSort.h"
 #include "ndConvexHull2d.h"
 
-static dFloat32 Cross(const ndVector &O, const ndVector &A, const ndVector &B)
+static ndFloat32 Cross(const ndVector &O, const ndVector &A, const ndVector &B)
 {
 	ndVector A0(A - O);
 	ndVector B0(B - O);
 	return A0.m_x * B0.m_y - A0.m_y * B0.m_x;
 }
 
-dInt32 dConvexHull2d(ndVector* const vertexCloud2d, dInt32 count)
+ndInt32 dConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 {
 	if (count <= 3)
 	{
@@ -43,7 +43,7 @@ dInt32 dConvexHull2d(ndVector* const vertexCloud2d, dInt32 count)
 	class CompareVertex
 	{
 		public:
-		dInt32 Compare(const ndVector& elementA, const ndVector& elementB, void* const) const
+		ndInt32 Compare(const ndVector& elementA, const ndVector& elementB, void* const) const
 		{
 			if (elementA.m_x < elementB.m_x)
 			{
@@ -70,8 +70,8 @@ dInt32 dConvexHull2d(ndVector* const vertexCloud2d, dInt32 count)
 	ndSort<ndVector, CompareVertex>(vertexCloud2d, count);
 
 	// Build lower hull
-	dInt32 k = 0;
-	for (dInt32 i = 0; i < count; i++) 
+	ndInt32 k = 0;
+	for (ndInt32 i = 0; i < count; i++) 
 	{
 		while (k >= 2 && Cross(hull[k - 2], hull[k - 1], vertexCloud2d[i]) <= 0.0f)
 		{
@@ -82,7 +82,7 @@ dInt32 dConvexHull2d(ndVector* const vertexCloud2d, dInt32 count)
 	}
 	
 	// Build upper hull
-	for (dInt32 i = count - 1, t = k + 1; i > 0; i--) 
+	for (ndInt32 i = count - 1, t = k + 1; i > 0; i--) 
 	{
 		while (k >= t && Cross(hull[k - 2], hull[k - 1], vertexCloud2d[i - 1]) <= 0.0f)
 		{

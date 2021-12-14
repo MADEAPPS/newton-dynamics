@@ -48,7 +48,7 @@ ndCharacterRootNode::ndCharacterRootNode(const ndCharacterLoadDescriptor& desc)
 	SetName(name);
 	m_localPose = xmlGetMatrix(xmlNode, "localPose");
 
-	dInt32 bodyHash = xmlGetInt(xmlNode, "bodyHash");
+	ndInt32 bodyHash = xmlGetInt(xmlNode, "bodyHash");
 	m_body = (ndBodyDynamic*)desc.m_bodyMap->Find(bodyHash)->GetInfo();
 	m_coronalFrame = xmlGetMatrix(xmlNode, "coronalFrame");
 }
@@ -65,7 +65,7 @@ void ndCharacterRootNode::Save(const ndCharacterSaveDescriptor& desc) const
 	childNode->SetAttribute("hashId", desc.m_limbMap->GetCount());
 	ndCharacterNode::Save(ndCharacterSaveDescriptor(desc, childNode));
 	
-	ndTree<dInt32, const ndBodyKinematic*>::ndNode* bodyNode = desc.m_bodyMap->Find(m_body);
+	ndTree<ndInt32, const ndBodyKinematic*>::ndNode* bodyNode = desc.m_bodyMap->Find(m_body);
 	if (!bodyNode)
 	{
 		bodyNode = desc.m_bodyMap->Insert(desc.m_bodyMap->GetCount(), m_body);

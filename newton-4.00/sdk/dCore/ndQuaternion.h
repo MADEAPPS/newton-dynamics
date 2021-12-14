@@ -35,18 +35,18 @@ class ndQuaternion: public ndVector
 	ndQuaternion(const ndVector& quat);
 	ndQuaternion(const ndQuaternion& quat);
 	D_CORE_API ndQuaternion (const ndMatrix& matrix);
-	ndQuaternion (dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3);
-	D_CORE_API ndQuaternion (const ndVector &unit_Axis, dFloat32 angle);
+	ndQuaternion (ndFloat32 q0, ndFloat32 q1, ndFloat32 q2, ndFloat32 q3);
+	D_CORE_API ndQuaternion (const ndVector &unit_Axis, ndFloat32 angle);
 
 	ndQuaternion Normalize() const;
-	ndQuaternion Scale(dFloat32 scale) const;
+	ndQuaternion Scale(ndFloat32 scale) const;
 	ndQuaternion Inverse () const; 
 	ndQuaternion operator+ (const ndQuaternion &B) const; 
 	ndQuaternion operator- (const ndQuaternion &B) const; 
 
 	D_CORE_API ndQuaternion operator* (const ndQuaternion &B) const;
-	D_CORE_API ndQuaternion Slerp(const ndQuaternion &q1, dFloat32 t) const;
-	D_CORE_API ndVector CalcAverageOmega(const ndQuaternion &q1, dFloat32 invdt) const;
+	D_CORE_API ndQuaternion Slerp(const ndQuaternion &q1, ndFloat32 t) const;
+	D_CORE_API ndVector CalcAverageOmega(const ndQuaternion &q1, ndFloat32 invdt) const;
 
 };
 
@@ -65,7 +65,7 @@ inline ndQuaternion::ndQuaternion(const ndQuaternion& quat)
 {
 }
 
-inline ndQuaternion::ndQuaternion(dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3)
+inline ndQuaternion::ndQuaternion(ndFloat32 q0, ndFloat32 q1, ndFloat32 q2, ndFloat32 q3)
 	:ndVector(q0, q1, q2, q3)
 {
 	*this = Normalize();
@@ -93,7 +93,7 @@ inline ndQuaternion ndQuaternion::Normalize() const
 	return ndVector::Normalize();
 }
 
-inline ndQuaternion ndQuaternion::Scale(dFloat32 scale) const
+inline ndQuaternion ndQuaternion::Scale(ndFloat32 scale) const
 {
 	return ndVector::Scale(scale);
 }

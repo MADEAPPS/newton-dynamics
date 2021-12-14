@@ -36,8 +36,8 @@ class ndShapeConvexPolygon: public ndShapeConvex
 		public:
 		dgClippedFaceEdge* m_next;
 		dgClippedFaceEdge* m_twin;
-		dInt32 m_incidentNormal;
-		dInt32 m_incidentVertex;
+		ndInt32 m_incidentNormal;
+		ndInt32 m_incidentVertex;
 	};
 
 	ndShapeConvexPolygon ();
@@ -46,33 +46,33 @@ class ndShapeConvexPolygon: public ndShapeConvex
 	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon();
 
 	ndVector CalculateGlobalNormal(const ndShapeInstance* const parentMesh, const ndVector& localNormal) const;
-	dInt32 CalculateContactToConvexHullDescrete(const ndShapeInstance* const parentMesh, ndContactSolver& proxy);
-	dInt32 CalculateContactToConvexHullContinue(const ndShapeInstance* const parentMesh, ndContactSolver& proxy);
+	ndInt32 CalculateContactToConvexHullDescrete(const ndShapeInstance* const parentMesh, ndContactSolver& proxy);
+	ndInt32 CalculateContactToConvexHullContinue(const ndShapeInstance* const parentMesh, ndContactSolver& proxy);
 
-	virtual dFloat32 GetVolume() const;
-	virtual dFloat32 GetBoxMinRadius() const;
-	virtual dFloat32 GetBoxMaxRadius() const;
-	virtual ndVector SupportVertex(const ndVector& dir, dInt32* const vertexIndex) const;
-	bool BeamClipping(const ndVector& origin, dFloat32 size, const ndShapeInstance* const parentMesh);
-	virtual dInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
+	virtual ndFloat32 GetVolume() const;
+	virtual ndFloat32 GetBoxMinRadius() const;
+	virtual ndFloat32 GetBoxMaxRadius() const;
+	virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
+	bool BeamClipping(const ndVector& origin, ndFloat32 size, const ndShapeInstance* const parentMesh);
+	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
-	virtual dInt32 Release() const;
+	virtual ndInt32 Release() const;
 
 	ndVector m_normal;
 	ndVector m_localPoly[D_CONVEX_POLYGON_MAX_VERTEX_COUNT];
-	dInt32 m_clippEdgeNormal[D_CONVEX_POLYGON_MAX_VERTEX_COUNT];
-	dFloat32 m_faceClipSize;
-	dInt32 m_count;
-	dInt32 m_paddedCount;
-	dInt32 m_faceId;
-	dInt32 m_stride;
-	dInt32 m_faceNormalIndex;
+	ndInt32 m_clippEdgeNormal[D_CONVEX_POLYGON_MAX_VERTEX_COUNT];
+	ndFloat32 m_faceClipSize;
+	ndInt32 m_count;
+	ndInt32 m_paddedCount;
+	ndInt32 m_faceId;
+	ndInt32 m_stride;
+	ndInt32 m_faceNormalIndex;
 	
-	const dFloat32* m_vertex;
-	const dInt32* m_vertexIndex;
-	const dInt32* m_adjacentFaceEdgeNormalIndex;
+	const ndFloat32* m_vertex;
+	const ndInt32* m_vertexIndex;
+	const ndInt32* m_adjacentFaceEdgeNormalIndex;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndShapeConvexPolygon* ndShapeConvexPolygon::GetAsShapeAsConvexPolygon()
@@ -80,22 +80,22 @@ inline ndShapeConvexPolygon* ndShapeConvexPolygon::GetAsShapeAsConvexPolygon()
 	return this; 
 }
 
-inline dFloat32 ndShapeConvexPolygon::RayCast(ndRayCastNotify&, const ndVector&, const ndVector&, dFloat32, const ndBody* const, ndContactPoint&) const
+inline ndFloat32 ndShapeConvexPolygon::RayCast(ndRayCastNotify&, const ndVector&, const ndVector&, ndFloat32, const ndBody* const, ndContactPoint&) const
 {
-	return dFloat32(1.2f);
+	return ndFloat32(1.2f);
 }
 
-inline dFloat32 ndShapeConvexPolygon::GetVolume() const
+inline ndFloat32 ndShapeConvexPolygon::GetVolume() const
 {
-	return dFloat32(0.0f);
+	return ndFloat32(0.0f);
 }
 
-inline dFloat32 ndShapeConvexPolygon::GetBoxMinRadius() const
+inline ndFloat32 ndShapeConvexPolygon::GetBoxMinRadius() const
 {
 	return m_faceClipSize;
 }
 
-inline dFloat32 ndShapeConvexPolygon::GetBoxMaxRadius() const
+inline ndFloat32 ndShapeConvexPolygon::GetBoxMaxRadius() const
 {
 	return GetBoxMinRadius();
 }

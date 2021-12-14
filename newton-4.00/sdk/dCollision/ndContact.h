@@ -32,8 +32,8 @@ class ndShapeInstance;
 
 #define D_MAX_CONTATCS					128
 #define D_CONSTRAINT_MAX_ROWS			(3 * 16)
-#define D_RESTING_CONTACT_PENETRATION	(D_PENETRATION_TOL + dFloat32 (1.0f / 1024.0f))
-#define D_DIAGONAL_PRECONDITIONER		dFloat32 (25.0f)
+#define D_RESTING_CONTACT_PENETRATION	(D_PENETRATION_TOL + ndFloat32 (1.0f / 1024.0f))
+#define D_DIAGONAL_PRECONDITIONER		ndFloat32 (25.0f)
 
 D_MSV_NEWTON_ALIGN_32
 class ndContactPoint
@@ -45,9 +45,9 @@ class ndContactPoint
 	const ndBodyKinematic* m_body1;
 	const ndShapeInstance* m_shapeInstance0;
 	const ndShapeInstance* m_shapeInstance1;
-	dInt64 m_shapeId0;
-	dInt64 m_shapeId1;
-	dFloat32 m_penetration;
+	ndInt64 m_shapeId0;
+	ndInt64 m_shapeId1;
+	ndFloat32 m_penetration;
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -94,11 +94,11 @@ class ndContact: public ndConstraint, public ndContainersFreeListAlloc<ndContact
 	D_COLLISION_API void DetachFromBodies();
 
 	ndContact* GetAsContact() { return this; }
-	dFloat32 GetPruningTolerance() const;
+	ndFloat32 GetPruningTolerance() const;
 
 	const ndMaterial& GetMaterial() const;
 
-	virtual dUnsigned32 GetRowsCount() const;
+	virtual ndUnsigned32 GetRowsCount() const;
 	virtual void JacobianDerivative(ndConstraintDescritor& desc);
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
 
@@ -110,8 +110,8 @@ class ndContact: public ndConstraint, public ndContainersFreeListAlloc<ndContact
 	
 	private:
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
-	void CalculatePointDerivative(dInt32 index, ndConstraintDescritor& desc, const ndVector& dir, const dgPointParam& param) const;
-	void JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, dInt32 normalIndex, dInt32& frictionIndex);
+	void CalculatePointDerivative(ndInt32 index, ndConstraintDescritor& desc, const ndVector& dir, const dgPointParam& param) const;
+	void JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, ndInt32 normalIndex, ndInt32& frictionIndex);
 
 	ndVector m_positAcc;
 	ndQuaternion m_rotationAcc;
@@ -121,16 +121,16 @@ class ndContact: public ndConstraint, public ndContainersFreeListAlloc<ndContact
 	ndBodyKinematic* m_body1;
 	ndList<ndContact, ndContainersFreeListAlloc<ndContact>>::ndNode* m_linkNode;
 	ndMaterial m_material;
-	dFloat32 m_timeOfImpact;
-	dFloat32 m_separationDistance;
-	dFloat32 m_contactPruningTolereance;
-	dUnsigned32 m_maxDOF;
-	dUnsigned32 m_sceneLru;
-	dUnsigned32 m_isDead : 1;
-	dUnsigned32 m_isAttached : 1;
-	dUnsigned32 m_isIntersetionTestOnly : 1;
-	dUnsigned32 m_skeletonIntraCollision : 1;
-	dUnsigned32 m_skeletonSelftCollision : 1;
+	ndFloat32 m_timeOfImpact;
+	ndFloat32 m_separationDistance;
+	ndFloat32 m_contactPruningTolereance;
+	ndUnsigned32 m_maxDOF;
+	ndUnsigned32 m_sceneLru;
+	ndUnsigned32 m_isDead : 1;
+	ndUnsigned32 m_isAttached : 1;
+	ndUnsigned32 m_isIntersetionTestOnly : 1;
+	ndUnsigned32 m_skeletonIntraCollision : 1;
+	ndUnsigned32 m_skeletonSelftCollision : 1;
 	static ndVector m_initialSeparatingVector;
 
 	friend class ndScene;
@@ -148,12 +148,12 @@ inline const ndMaterial& ndContact::GetMaterial() const
 	return m_material;
 }
 
-inline dFloat32 ndContact::GetPruningTolerance() const
+inline ndFloat32 ndContact::GetPruningTolerance() const
 {
 	return m_contactPruningTolereance;
 }
 
-inline dUnsigned32 ndContact::GetRowsCount() const
+inline ndUnsigned32 ndContact::GetRowsCount() const
 {
 	return m_maxDOF;
 }

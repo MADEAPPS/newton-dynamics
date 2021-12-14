@@ -38,7 +38,7 @@ class ndBodiesInAabbNotify : public ndClassAlloc
 	{
 	}
 
-	virtual dUnsigned32 OnOverlap(const ndBody* const)
+	virtual ndUnsigned32 OnOverlap(const ndBody* const)
 	{
 		return 1;
 	}

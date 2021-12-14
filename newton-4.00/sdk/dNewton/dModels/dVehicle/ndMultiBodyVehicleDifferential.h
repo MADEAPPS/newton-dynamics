@@ -25,17 +25,17 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_MINIMUM_SLIP_OMEGA dFloat32 (2.0f)
+#define D_MINIMUM_SLIP_OMEGA ndFloat32 (2.0f)
 
 class ndMultiBodyVehicleDifferential : public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndMultiBodyVehicleDifferential);
 	D_NEWTON_API ndMultiBodyVehicleDifferential(const ndLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndMultiBodyVehicleDifferential(ndBodyKinematic* const differential, ndBodyKinematic* const chassis, dFloat32 slipOmegaLock);
+	D_NEWTON_API ndMultiBodyVehicleDifferential(ndBodyKinematic* const differential, ndBodyKinematic* const chassis, ndFloat32 slipOmegaLock);
 
-	dFloat32 GetSlipOmega() const;
-	void SetSlipOmega(dFloat32 speed);
+	ndFloat32 GetSlipOmega() const;
+	void SetSlipOmega(ndFloat32 speed);
 
 	protected:
 	void AlignMatrix();
@@ -44,15 +44,15 @@ class ndMultiBodyVehicleDifferential : public ndJointBilateralConstraint
 	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	friend class ndMultiBodyVehicle;
-	dFloat32 m_limitedSlipOmega;
+	ndFloat32 m_limitedSlipOmega;
 };
 
-inline dFloat32 ndMultiBodyVehicleDifferential::GetSlipOmega() const
+inline ndFloat32 ndMultiBodyVehicleDifferential::GetSlipOmega() const
 {
 	return m_limitedSlipOmega;
 }
 
-inline void ndMultiBodyVehicleDifferential::SetSlipOmega(dFloat32 omega)
+inline void ndMultiBodyVehicleDifferential::SetSlipOmega(ndFloat32 omega)
 {
 	m_limitedSlipOmega = dMax(D_MINIMUM_SLIP_OMEGA, dAbs(omega));
 }

@@ -54,11 +54,11 @@ class ndStack: public ndStackBase
 	public:
 	ndStack (size_t size);
 	~ndStack ();
-	dInt32 GetSizeInBytes() const;
-	dInt32 GetElementsCount() const;
+	ndInt32 GetSizeInBytes() const;
+	ndInt32 GetElementsCount() const;
 	
-	inline T& operator[] (dInt32 entry);
-	inline const T& operator[] (dInt32 entry) const;
+	inline T& operator[] (ndInt32 entry);
+	inline const T& operator[] (ndInt32 entry) const;
 
 	private:
 	size_t m_size;
@@ -77,19 +77,19 @@ ndStack<T>::~ndStack ()
 }
 
 template<class T>
-dInt32 ndStack<T>::GetElementsCount() const
+ndInt32 ndStack<T>::GetElementsCount() const
 {
-	return dInt32 (m_size);
+	return ndInt32 (m_size);
 }
 
 template<class T>
-dInt32 ndStack<T>::GetSizeInBytes() const
+ndInt32 ndStack<T>::GetSizeInBytes() const
 {
-	return dInt32 (m_size * sizeof(T));
+	return ndInt32 (m_size * sizeof(T));
 }
 
 template<class T>
-inline T& ndStack<T>::operator[] (dInt32 entry) 
+inline T& ndStack<T>::operator[] (ndInt32 entry) 
 {
 	dAssert (entry >= 0);
 	dAssert ((size_t(entry) < m_size) || ((m_size == 0) && (entry == 0)));
@@ -99,7 +99,7 @@ inline T& ndStack<T>::operator[] (dInt32 entry)
 }
 
 template<class T>
-inline const T& ndStack<T>::operator[] (dInt32 entry) const
+inline const T& ndStack<T>::operator[] (ndInt32 entry) const
 {
 	dAssert (entry >= 0);
 	dAssert ((entry < m_size) || ((m_size == 0) && (entry == 0)));

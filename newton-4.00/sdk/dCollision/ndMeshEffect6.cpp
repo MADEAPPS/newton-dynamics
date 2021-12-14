@@ -43,11 +43,11 @@
 
 #if 0
 #define dgABF_MAX_ITERATIONS		5
-#define dgABF_TOL2					dFloat64 (1.0e-12)
-#define dgABF_LINEAR_SOLVER_TOL		dFloat64 (1.0e-14)
-#define dgABF_PI					dFloat64 (3.1415926535)
+#define dgABF_TOL2					ndFloat64 (1.0e-12)
+#define dgABF_LINEAR_SOLVER_TOL		ndFloat64 (1.0e-14)
+#define dgABF_PI					ndFloat64 (3.1415926535)
 
-#define dgABF_UV_TOL2				dFloat64 (1.0e-8)
+#define dgABF_UV_TOL2				ndFloat64 (1.0e-8)
 
 #if 1
 	#define DG_DEBUG_UV	dTrace 
@@ -56,10 +56,10 @@
 #endif
 
 
-class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
+class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<ndFloat64>
 {
 	public:
-	dgTriangleAnglesToUV (ndMeshEffect* const mesh, dInt32 material, dgReportProgress progressReportCallback, void* const userData, const dFloat64* const pinnedPoint, dFloat64* const triangleAnglesVector = nullptr)
+	dgTriangleAnglesToUV (ndMeshEffect* const mesh, ndInt32 material, dgReportProgress progressReportCallback, void* const userData, const ndFloat64* const pinnedPoint, ndFloat64* const triangleAnglesVector = nullptr)
 		:m_hessianCoLumnIndex (mesh->GetAllocator())
 		,m_hessianCoLumnValue(mesh->GetAllocator())
 		,m_mesh(mesh)
@@ -69,7 +69,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 		,m_matrixElementCount(0)
 		,m_allocated(false)
 	{
-		dInt32 mark = m_mesh->IncLRU();
+		ndInt32 mark = m_mesh->IncLRU();
 		ndMeshEffect::Iterator iter (*m_mesh);
 		for (iter.Begin(); iter; iter ++) {
 			ndEdge* const edge = &iter.GetNode()->GetInfo();
@@ -86,7 +86,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 
 		m_triangles = (ndEdge**) m_mesh->GetAllocator()->MallocLow (m_trianglesCount * sizeof (ndEdge*));
 
-		dInt32 count = 0;
+		ndInt32 count = 0;
 		mark = m_mesh->IncLRU();
 		for (iter.Begin(); iter; iter ++) {
 			ndEdge* const edge = &iter.GetNode()->GetInfo();
@@ -108,7 +108,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 			AnglesFromUV ();
 		}
 		
-		m_uvArray = (dFloat64*) m_mesh->GetAllocator()->MallocLow (2 * m_mesh->GetVertexCount() * sizeof (dFloat64));
+		m_uvArray = (ndFloat64*) m_mesh->GetAllocator()->MallocLow (2 * m_mesh->GetVertexCount() * sizeof (ndFloat64));
 		mark = m_mesh->IncLRU();
 		for (iter.Begin(); iter; iter ++) {
 			ndEdge* const edge = &iter.GetNode()->GetInfo();
@@ -124,7 +124,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 				} while (ptr != edge);
 				dAssert (0);
 /*
-				dInt32 index = dInt32 (uvEdge->m_userData);
+				ndInt32 index = ndInt32 (uvEdge->m_userData);
 				ndMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
 				m_uvArray[index * 2 + 0] = attribute.m_u0;
 				m_uvArray[index * 2 + 1] = attribute.m_v0;
@@ -132,11 +132,11 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 			}
 		}
 
-		m_sinTable = (dFloat64*) m_mesh->GetAllocator()->MallocLow (3 * m_trianglesCount * sizeof (dFloat64));
-		m_cosTable = (dFloat64*) m_mesh->GetAllocator()->MallocLow (3 * m_trianglesCount * sizeof (dFloat64));
+		m_sinTable = (ndFloat64*) m_mesh->GetAllocator()->MallocLow (3 * m_trianglesCount * sizeof (ndFloat64));
+		m_cosTable = (ndFloat64*) m_mesh->GetAllocator()->MallocLow (3 * m_trianglesCount * sizeof (ndFloat64));
 
 		// pre-compute sin cos tables
-		for (dInt32 i = 0; i < m_trianglesCount * 3; i ++) {
+		for (ndInt32 i = 0; i < m_trianglesCount * 3; i ++) {
 			m_sinTable[i] = sin (m_triangleAngles[i]);
 			m_cosTable[i] = cos (m_triangleAngles[i]);
 		}
@@ -146,7 +146,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 		for (iter.Begin(); iter; iter ++) {
 			ndEdge* const vertex = &iter.GetNode()->GetInfo();
 			if (vertex->m_mark != mark) {
-				dInt32 index = vertex->m_incidentVertex;
+				ndInt32 index = vertex->m_incidentVertex;
 				m_vertexEdge[index] = vertex;
 				ndEdge* ptr = vertex;
 				do {
@@ -156,27 +156,27 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 			}
 		}
 
-		m_gradients = (dFloat64*) m_mesh->GetAllocator()->MallocLow (2 * m_mesh->GetVertexCount() * sizeof (dFloat64));
-		m_diagonal = (dFloat64*) m_mesh->GetAllocator()->MallocLow (2 * m_mesh->GetVertexCount() * sizeof (dFloat64));
+		m_gradients = (ndFloat64*) m_mesh->GetAllocator()->MallocLow (2 * m_mesh->GetVertexCount() * sizeof (ndFloat64));
+		m_diagonal = (ndFloat64*) m_mesh->GetAllocator()->MallocLow (2 * m_mesh->GetVertexCount() * sizeof (ndFloat64));
 
 		LagrangeOptimization();
 
 		dAssert (0);
 /*
 		ndStack<ndMeshEffect::dgVertexAtribute>attribArray (m_mesh->GetCount());
-//		dInt32 attribCount = m_mesh->EnumerateAttributeArray (&attribArray[0]);
+//		ndInt32 attribCount = m_mesh->EnumerateAttributeArray (&attribArray[0]);
 		mark = m_mesh->IncLRU();
 		for (iter.Begin(); iter; iter ++) {
 			ndEdge* const edge = &iter.GetNode()->GetInfo();
 			if (edge->m_mark != mark) {
-				dInt32 vertexIndex = edge->m_incidentVertex;
+				ndInt32 vertexIndex = edge->m_incidentVertex;
 				ndEdge* const vertexEdge = m_vertexEdge[vertexIndex];
-				dFloat64 u = m_uvArray[vertexIndex * 2 + 0];
-				dFloat64 v = m_uvArray[vertexIndex * 2 + 1];
+				ndFloat64 u = m_uvArray[vertexIndex * 2 + 0];
+				ndFloat64 v = m_uvArray[vertexIndex * 2 + 1];
 				ndEdge* ptr = vertexEdge;
 				do {
 					if (ptr->m_incidentFace > 0) {
-						dInt32 index = dInt32 (ptr->m_userData);
+						ndInt32 index = ndInt32 (ptr->m_userData);
 						ndMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
 						attribute.m_u0 = u;
 						attribute.m_v0 = v;
@@ -214,17 +214,17 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 
 		ndStack<dInt8> attibuteUsed (m_attibuteCount);
 		memset (&attibuteUsed[0], 0, attibuteUsed.GetSizeInBytes());
-		dInt32 mark = m_mesh->IncLRU();
-		for (dInt32 i = 0; i < m_triangleCount; i ++) {
+		ndInt32 mark = m_mesh->IncLRU();
+		for (ndInt32 i = 0; i < m_triangleCount; i ++) {
 			ndEdge* const face = m_betaEdge[i * 3];
 			if (face->m_mark != mark) {
 				ndEdge* ptr = face;
 				do {
 					if (ptr->m_incidentFace > 0) {
-						dInt32 index = dInt32 (ptr->m_userData);
+						ndInt32 index = ndInt32 (ptr->m_userData);
 						attibuteUsed[index] = 1;
-						m_uvArray[index].m_u0 = dFloat32 (0.0f);
-						m_uvArray[index].m_v0 = dFloat32 (0.0f);
+						m_uvArray[index].m_u0 = ndFloat32 (0.0f);
+						m_uvArray[index].m_v0 = ndFloat32 (0.0f);
 					}
 					ptr = ptr->m_twin->m_next;
 				} while (ptr != face);
@@ -233,15 +233,15 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 				const ndBigVector& p0 = m_mesh->GetVertex(face->m_incidentVertex);
 				const ndBigVector& p1 = m_mesh->GetVertex(twinFace->m_incidentVertex);
 				ndBigVector p10 (p1 - p0);
-				dFloat64 e0length = sqrt (p10 % p10);
+				ndFloat64 e0length = sqrt (p10 % p10);
 
 				ptr = twinFace;
 				do {
 					if (ptr->m_incidentFace > 0) {
-						dInt32 index = dInt32 (ptr->m_userData);
+						ndInt32 index = ndInt32 (ptr->m_userData);
 						attibuteUsed[index] = 1;
 						m_uvArray[index].m_u0 = e0length;
-						m_uvArray[index].m_v0 = dFloat32 (0.0f);
+						m_uvArray[index].m_v0 = ndFloat32 (0.0f);
 					}
 					ptr = ptr->m_twin->m_next;
 				} while (ptr != twinFace);
@@ -253,29 +253,29 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 					ndEdge* const face = node->GetInfo();
 					stack.Remove (node);
 					if (face->m_mark != mark) {
-						dInt32 uvIndex2 = dInt32 (face->m_prev->m_userData);
+						ndInt32 uvIndex2 = ndInt32 (face->m_prev->m_userData);
 						if (!attibuteUsed[uvIndex2]) {
 
-							dInt32 uvIndex0 = dInt32 (face->m_userData);
-							dInt32 uvIndex1 = dInt32 (face->m_next->m_userData);
+							ndInt32 uvIndex0 = ndInt32 (face->m_userData);
+							ndInt32 uvIndex1 = ndInt32 (face->m_next->m_userData);
 
-							dInt32 edgeIndex0 = GetAlphaLandaIndex (face);
-							dInt32 edgeIndex1 = GetAlphaLandaIndex (face->m_next);
-							dInt32 edgeIndex2 = GetAlphaLandaIndex (face->m_prev);
+							ndInt32 edgeIndex0 = GetAlphaLandaIndex (face);
+							ndInt32 edgeIndex1 = GetAlphaLandaIndex (face->m_next);
+							ndInt32 edgeIndex2 = GetAlphaLandaIndex (face->m_prev);
 
-							dFloat64 refAngleCos = cos (m_variables[edgeIndex0]);
-							dFloat64 refAngleSin = sin (m_variables[edgeIndex0]);
-							dFloat64 scale = sin (m_variables[edgeIndex1]) / sin (m_variables[edgeIndex2]);
+							ndFloat64 refAngleCos = cos (m_variables[edgeIndex0]);
+							ndFloat64 refAngleSin = sin (m_variables[edgeIndex0]);
+							ndFloat64 scale = sin (m_variables[edgeIndex1]) / sin (m_variables[edgeIndex2]);
 
-							dFloat64 du = (m_uvArray[uvIndex1].m_u0 - m_uvArray[uvIndex0].m_u0) * scale;
-							dFloat64 dv = (m_uvArray[uvIndex1].m_v0 - m_uvArray[uvIndex0].m_v0) * scale;
-							dFloat64 u = m_uvArray[uvIndex0].m_u0 + du * refAngleCos - dv * refAngleSin; 
-							dFloat64 v = m_uvArray[uvIndex0].m_v0 + du * refAngleSin + dv * refAngleCos; 
+							ndFloat64 du = (m_uvArray[uvIndex1].m_u0 - m_uvArray[uvIndex0].m_u0) * scale;
+							ndFloat64 dv = (m_uvArray[uvIndex1].m_v0 - m_uvArray[uvIndex0].m_v0) * scale;
+							ndFloat64 u = m_uvArray[uvIndex0].m_u0 + du * refAngleCos - dv * refAngleSin; 
+							ndFloat64 v = m_uvArray[uvIndex0].m_v0 + du * refAngleSin + dv * refAngleCos; 
 
 							ndEdge* ptr = face->m_prev;
 							do {
 								if (ptr->m_incidentFace > 0) {
-									dInt32 index = dInt32 (ptr->m_userData);
+									ndInt32 index = ndInt32 (ptr->m_userData);
 									attibuteUsed[index] = 1;
 									m_uvArray[index].m_u0 = u;
 									m_uvArray[index].m_v0 = v;
@@ -302,7 +302,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 	}
 */
 
-	dInt32 GetAlphaLandaIndex (const ndEdge* const edge) const
+	ndInt32 GetAlphaLandaIndex (const ndEdge* const edge) const
 	{
 		return edge->m_incidentFace - 1;
 	}
@@ -310,10 +310,10 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 	void AnglesFromUV ()
 	{
 		m_allocated = true;
-		m_triangleAngles = (dFloat64*) m_mesh->GetAllocator()->MallocLow (3 * m_trianglesCount * sizeof (dFloat64));
+		m_triangleAngles = (ndFloat64*) m_mesh->GetAllocator()->MallocLow (3 * m_trianglesCount * sizeof (ndFloat64));
 
 		// calculate initial beta angle for each triangle
-		for (dInt32 i = 0; i < m_trianglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_trianglesCount; i ++) {
 			ndEdge* const edge = m_triangles[i];
 
 			const ndBigVector& p0 = m_mesh->GetVertex(edge->m_incidentVertex);
@@ -323,16 +323,16 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 			ndBigVector e10 (p1 - p0);
 			ndBigVector e20 (p2 - p0);
 			ndBigVector e12 (p2 - p1);
-			dAssert(e10.m_w == dFloat32(0.0f));
-			dAssert(e20.m_w == dFloat32(0.0f));
-			dAssert(e12.m_w == dFloat32(0.0f));
+			dAssert(e10.m_w == ndFloat32(0.0f));
+			dAssert(e20.m_w == ndFloat32(0.0f));
+			dAssert(e12.m_w == ndFloat32(0.0f));
 
-			e10 = e10.Scale (dFloat64 (1.0) / sqrt (e10.DotProduct(e10).GetScalar()));
-			e20 = e20.Scale (dFloat64 (1.0) / sqrt (e20.DotProduct(e20).GetScalar()));
-			e12 = e20.Scale (dFloat64 (1.0) / sqrt (e12.DotProduct(e12).GetScalar()));
+			e10 = e10.Scale (ndFloat64 (1.0) / sqrt (e10.DotProduct(e10).GetScalar()));
+			e20 = e20.Scale (ndFloat64 (1.0) / sqrt (e20.DotProduct(e20).GetScalar()));
+			e12 = e20.Scale (ndFloat64 (1.0) / sqrt (e12.DotProduct(e12).GetScalar()));
 
-			m_triangleAngles[i * 3 + 0] = acos (dClamp(e10.DotProduct(e20).GetScalar(), dFloat64 (-1.0f), dFloat64 (1.0f)));
-			m_triangleAngles[i * 3 + 1] = acos (dClamp(e10.DotProduct(e20).GetScalar(), dFloat64 (-1.0f), dFloat64 (1.0f)));
+			m_triangleAngles[i * 3 + 0] = acos (dClamp(e10.DotProduct(e20).GetScalar(), ndFloat64 (-1.0f), ndFloat64 (1.0f)));
+			m_triangleAngles[i * 3 + 1] = acos (dClamp(e10.DotProduct(e20).GetScalar(), ndFloat64 (-1.0f), ndFloat64 (1.0f)));
 			m_triangleAngles[i * 3 + 2] = dgABF_PI - m_triangleAngles[i * 3 + 0] - m_triangleAngles[i * 3 + 1];
 		}
 	}
@@ -362,7 +362,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 	void TraceObjectiveFunction() const
 	{
 		DG_DEBUG_UV (("f["));
-		for (dInt32 i = 2; i < m_mesh->GetVertexCount(); i ++) {
+		for (ndInt32 i = 2; i < m_mesh->GetVertexCount(); i ++) {
 			DG_DEBUG_UV (("u%d_,v%d_", i, i));
 			if (i != (m_mesh->GetVertexCount() - 1)) {
 				DG_DEBUG_UV ((","));
@@ -370,12 +370,12 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 		}
 		DG_DEBUG_UV (("] := \n"));
 
-		for (dInt32 i = 0; i < m_trianglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_trianglesCount; i ++) {
 			ndEdge* const face = m_triangles[i];
 
-			dInt32 v0 = face->m_incidentVertex;
-			dInt32 v1 = face->m_next->m_incidentVertex;
-			dInt32 v2 = face->m_prev->m_incidentVertex;
+			ndInt32 v0 = face->m_incidentVertex;
+			ndInt32 v1 = face->m_next->m_incidentVertex;
+			ndInt32 v2 = face->m_prev->m_incidentVertex;
 			(void)(v0);
 			(void)(v1);
 			(void)(v2);
@@ -389,18 +389,18 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 		}
 	}
 
-	dFloat64 CalculateExpression_U_face (const ndEdge* const face) const
+	ndFloat64 CalculateExpression_U_face (const ndEdge* const face) const
 	{
-		dInt32 faceIndex = GetAlphaLandaIndex (face);
+		ndInt32 faceIndex = GetAlphaLandaIndex (face);
 		ndEdge* const faceStartEdge = m_triangles[faceIndex];
 
-		dInt32 uvIndex0 = dInt32 (faceStartEdge->m_incidentVertex);
-		dInt32 uvIndex1 = dInt32 (faceStartEdge->m_next->m_incidentVertex);
-		dInt32 uvIndex2 = dInt32 (faceStartEdge->m_prev->m_incidentVertex);
+		ndInt32 uvIndex0 = ndInt32 (faceStartEdge->m_incidentVertex);
+		ndInt32 uvIndex1 = ndInt32 (faceStartEdge->m_next->m_incidentVertex);
+		ndInt32 uvIndex2 = ndInt32 (faceStartEdge->m_prev->m_incidentVertex);
 
-		dInt32 alphaIndex0 = faceIndex * 3;
-		dInt32 alphaIndex1 = faceIndex * 3 + 1;
-		dInt32 alphaIndex2 = faceIndex * 3 + 2;
+		ndInt32 alphaIndex0 = faceIndex * 3;
+		ndInt32 alphaIndex1 = faceIndex * 3 + 1;
+		ndInt32 alphaIndex2 = faceIndex * 3 + 2;
 
 		DG_DEBUG_UV (("("));
 		DG_DEBUG_UV (("cos(a%d) * sin(b%d) * (u%d - u%d) + ", faceIndex, faceIndex, uvIndex1, uvIndex0));
@@ -408,24 +408,24 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 		DG_DEBUG_UV (("sin(c%d) * (u%d - u%d)", faceIndex, uvIndex2, uvIndex0));
 		DG_DEBUG_UV ((")"));
 
-		dFloat64 gradient = m_cosTable[alphaIndex0] * m_sinTable[alphaIndex1] * (m_uvArray[uvIndex1 * 2] - m_uvArray[uvIndex0 * 2]) + 
+		ndFloat64 gradient = m_cosTable[alphaIndex0] * m_sinTable[alphaIndex1] * (m_uvArray[uvIndex1 * 2] - m_uvArray[uvIndex0 * 2]) + 
 							 m_sinTable[alphaIndex0] * m_sinTable[alphaIndex1] * (m_uvArray[uvIndex1 * 2 + 1] - m_uvArray[uvIndex0 * 2 + 1]) +
 							 m_sinTable[alphaIndex2] * (m_uvArray[uvIndex2 * 2] - m_uvArray[uvIndex0 * 2]);
 		return gradient;
 	}
 
-	dFloat64 CalculateExpression_V_face (const ndEdge* const face) const
+	ndFloat64 CalculateExpression_V_face (const ndEdge* const face) const
 	{
-		dInt32 faceIndex = GetAlphaLandaIndex (face);
+		ndInt32 faceIndex = GetAlphaLandaIndex (face);
 		ndEdge* const faceStartEdge = m_triangles[faceIndex];
 
-		dInt32 uvIndex0 = dInt32 (faceStartEdge->m_incidentVertex);
-		dInt32 uvIndex1 = dInt32 (faceStartEdge->m_next->m_incidentVertex);
-		dInt32 uvIndex2 = dInt32 (faceStartEdge->m_prev->m_incidentVertex);
+		ndInt32 uvIndex0 = ndInt32 (faceStartEdge->m_incidentVertex);
+		ndInt32 uvIndex1 = ndInt32 (faceStartEdge->m_next->m_incidentVertex);
+		ndInt32 uvIndex2 = ndInt32 (faceStartEdge->m_prev->m_incidentVertex);
 
-		dInt32 alphaIndex0 = faceIndex * 3;
-		dInt32 alphaIndex1 = faceIndex * 3 + 1;
-		dInt32 alphaIndex2 = faceIndex * 3 + 2;
+		ndInt32 alphaIndex0 = faceIndex * 3;
+		ndInt32 alphaIndex1 = faceIndex * 3 + 1;
+		ndInt32 alphaIndex2 = faceIndex * 3 + 2;
 
 		DG_DEBUG_UV (("("));
 		DG_DEBUG_UV (("cos(a%d) * sin(b%d) * (v%d - v%d) + ", faceIndex, faceIndex, uvIndex1, uvIndex0));
@@ -433,24 +433,24 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 		DG_DEBUG_UV (("sin(c%d) * (v%d - v%d)", faceIndex, uvIndex2, uvIndex0));
 		DG_DEBUG_UV ((")"));
 
-		dFloat64 gradient = m_cosTable[alphaIndex0] * m_sinTable[alphaIndex1] * (m_uvArray[uvIndex1 * 2 + 1] - m_uvArray[uvIndex0 * 2 + 1]) + 
+		ndFloat64 gradient = m_cosTable[alphaIndex0] * m_sinTable[alphaIndex1] * (m_uvArray[uvIndex1 * 2 + 1] - m_uvArray[uvIndex0 * 2 + 1]) + 
 							 m_sinTable[alphaIndex0] * m_sinTable[alphaIndex1] * (m_uvArray[uvIndex1 * 2] - m_uvArray[uvIndex0 * 2]) +
 							 m_sinTable[alphaIndex2] * (m_uvArray[uvIndex2 * 2 + 1] - m_uvArray[uvIndex0 * 2 + 1]);
 		return gradient;
 	}
 
 
-	dFloat64 CalculateGradient_U_Coefficent (const ndEdge* const edge, bool u) const
+	ndFloat64 CalculateGradient_U_Coefficent (const ndEdge* const edge, bool u) const
 	{
 		DG_DEBUG_UV (("("));
-		dInt32 faceIndex = GetAlphaLandaIndex (edge);
+		ndInt32 faceIndex = GetAlphaLandaIndex (edge);
 		ndEdge* const faceStartEdge = m_triangles[faceIndex];
 
-		dFloat64 gradient = dFloat64 (0.0f);
+		ndFloat64 gradient = ndFloat64 (0.0f);
 
-		dInt32 alphaIndex0 = faceIndex * 3;
-		dInt32 alphaIndex1 = faceIndex * 3 + 1;
-		dInt32 alphaIndex2 = faceIndex * 3 + 2;
+		ndInt32 alphaIndex0 = faceIndex * 3;
+		ndInt32 alphaIndex1 = faceIndex * 3 + 1;
+		ndInt32 alphaIndex2 = faceIndex * 3 + 2;
 		if (faceStartEdge == edge) {
 			if (u) {
 				DG_DEBUG_UV ((" - cos(a%d) * sin(b%d) - sin(c%d)", faceIndex, faceIndex, faceIndex));
@@ -480,17 +480,17 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 		return gradient;
 	}
 
-	dFloat64 CalculateGradient_V_Coefficent (const ndEdge* const edge, bool u) const
+	ndFloat64 CalculateGradient_V_Coefficent (const ndEdge* const edge, bool u) const
 	{
 		DG_DEBUG_UV (("("));
-		dInt32 faceIndex = GetAlphaLandaIndex (edge);
+		ndInt32 faceIndex = GetAlphaLandaIndex (edge);
 		ndEdge* const faceStartEdge = m_triangles[faceIndex];
 
-		dInt32 alphaIndex0 = faceIndex * 3;
-		dInt32 alphaIndex1 = faceIndex * 3 + 1;
-		dInt32 alphaIndex2 = faceIndex * 3 + 2;
+		ndInt32 alphaIndex0 = faceIndex * 3;
+		ndInt32 alphaIndex1 = faceIndex * 3 + 1;
+		ndInt32 alphaIndex2 = faceIndex * 3 + 2;
 
-		dFloat64 gradient = dFloat64 (0.0f);
+		ndFloat64 gradient = ndFloat64 (0.0f);
 		if (faceStartEdge == edge) {
 			if (!u) {
 				DG_DEBUG_UV ((" - cos(a%d) * sin(b%d) - sin(c%d)", faceIndex, faceIndex, faceIndex));
@@ -521,49 +521,49 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 	}
 
 
-	dFloat64 CalculateHessianExpression_U_V (const ndEdge* const face) const
+	ndFloat64 CalculateHessianExpression_U_V (const ndEdge* const face) const
 	{
-		dInt32 faceIndex = GetAlphaLandaIndex (face);
+		ndInt32 faceIndex = GetAlphaLandaIndex (face);
 		//ndEdge* const faceStartEdge = m_triangles[faceIndex];
-		//dInt32 uvIndex0 = dInt32 (faceStartEdge->m_incidentVertex);
-		//dInt32 uvIndex1 = dInt32 (faceStartEdge->m_next->m_incidentVertex);
-		//dInt32 uvIndex2 = dInt32 (faceStartEdge->m_prev->m_incidentVertex);
-		dInt32 alphaIndex0 = faceIndex * 3;
-		dInt32 alphaIndex1 = faceIndex * 3 + 1;
-		//dInt32 alphaIndex2 = faceIndex * 3 + 2;
+		//ndInt32 uvIndex0 = ndInt32 (faceStartEdge->m_incidentVertex);
+		//ndInt32 uvIndex1 = ndInt32 (faceStartEdge->m_next->m_incidentVertex);
+		//ndInt32 uvIndex2 = ndInt32 (faceStartEdge->m_prev->m_incidentVertex);
+		ndInt32 alphaIndex0 = faceIndex * 3;
+		ndInt32 alphaIndex1 = faceIndex * 3 + 1;
+		//ndInt32 alphaIndex2 = faceIndex * 3 + 2;
 		DG_DEBUG_UV (("( - sin(a%d) * sin(b%d))", faceIndex, faceIndex));
 		return - m_sinTable[alphaIndex0] * m_sinTable[alphaIndex1];
 	}
 
 
-	dFloat64 CalculateHessianExpression_V_V (const ndEdge* const face) const
+	ndFloat64 CalculateHessianExpression_V_V (const ndEdge* const face) const
 	{
-		dInt32 faceIndex = GetAlphaLandaIndex (face);
+		ndInt32 faceIndex = GetAlphaLandaIndex (face);
 		//ndEdge* const faceStartEdge = m_triangles[faceIndex];
-		//dInt32 uvIndex0 = dInt32 (faceStartEdge->m_incidentVertex);
-		//dInt32 uvIndex1 = dInt32 (faceStartEdge->m_next->m_incidentVertex);
-		//dInt32 uvIndex2 = dInt32 (faceStartEdge->m_prev->m_incidentVertex);
+		//ndInt32 uvIndex0 = ndInt32 (faceStartEdge->m_incidentVertex);
+		//ndInt32 uvIndex1 = ndInt32 (faceStartEdge->m_next->m_incidentVertex);
+		//ndInt32 uvIndex2 = ndInt32 (faceStartEdge->m_prev->m_incidentVertex);
 
-		dInt32 alphaIndex0 = faceIndex * 3;
-		dInt32 alphaIndex1 = faceIndex * 3 + 1;
-		dInt32 alphaIndex2 = faceIndex * 3 + 2;
+		ndInt32 alphaIndex0 = faceIndex * 3;
+		ndInt32 alphaIndex1 = faceIndex * 3 + 1;
+		ndInt32 alphaIndex2 = faceIndex * 3 + 2;
 		DG_DEBUG_UV (("(- cos(a%d) * sin(b%d) - sin(c%d))", faceIndex, faceIndex, faceIndex));
 		return - m_cosTable[alphaIndex0] * m_sinTable[alphaIndex1] - m_sinTable[alphaIndex2];
 	}
 
 
-	void CalculateGradientU (dInt32 vertexIndex)
+	void CalculateGradientU (ndInt32 vertexIndex)
 	{
 		// calculate U Gradient derivative
 		const ndEdge* const vertex = m_vertexEdge[vertexIndex];
 		DG_DEBUG_UV (("du%d =\n", vertexIndex));
-		dFloat64 gradient = dFloat64 (0.0f);
+		ndFloat64 gradient = ndFloat64 (0.0f);
 		const ndEdge* ptr = vertex;
 		do {
 			if (ptr->m_incidentFace > 0) {
 				DG_DEBUG_UV (("2 * "));
 				dAssert (ptr->m_incidentVertex == vertexIndex);
-				dFloat64 a = CalculateGradient_U_Coefficent (ptr, true) ;
+				ndFloat64 a = CalculateGradient_U_Coefficent (ptr, true) ;
 				DG_DEBUG_UV ((" * "));
 				gradient += a * CalculateExpression_U_face (ptr);
 				DG_DEBUG_UV ((" +\n"));
@@ -581,13 +581,13 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 
 		// calculate diagonal derivative
 		DG_DEBUG_UV (("H(u%d,u%d) =\n", vertexIndex, vertexIndex));
-		dFloat64 diagonal = dFloat64 (0.0f);
+		ndFloat64 diagonal = ndFloat64 (0.0f);
 		ptr = vertex;
 		do {
 			if (ptr->m_incidentFace > 0) {
 				DG_DEBUG_UV (("2 * "));
 				dAssert (ptr->m_incidentVertex == vertexIndex);
-				dFloat64 diag = CalculateGradient_U_Coefficent (ptr, true);
+				ndFloat64 diag = CalculateGradient_U_Coefficent (ptr, true);
 				diagonal += diag * diag;
 				DG_DEBUG_UV (("^2 +\n"));
 
@@ -598,7 +598,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 			}
 			ptr = ptr->m_twin->m_next;
 		} while (ptr != vertex);
-		dAssert (diagonal > dFloat32 (0.0f));
+		dAssert (diagonal > ndFloat32 (0.0f));
 
 		m_hessianCoLumnValue[m_matrixElementCount] = diagonal;
 		m_hessianCoLumnIndex[m_matrixElementCount] = vertexIndex * 2 + 0;
@@ -608,13 +608,13 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 
 		// calculate of diagonal UiVi derivative
 		DG_DEBUG_UV (("H(u%d,v%d) =\n", vertexIndex, vertexIndex));
-		dFloat64 hessianUV = dFloat64 (0.0);
+		ndFloat64 hessianUV = ndFloat64 (0.0);
 		ptr = vertex;
 		do {
 			if (ptr->m_incidentFace > 0) {
 				DG_DEBUG_UV (("2 * "));
 				dAssert (ptr->m_incidentVertex == vertexIndex);
-				dFloat64 a = CalculateGradient_U_Coefficent (ptr, true);
+				ndFloat64 a = CalculateGradient_U_Coefficent (ptr, true);
 				DG_DEBUG_UV ((" * "));
 				hessianUV += a * CalculateHessianExpression_U_V (ptr);
 				DG_DEBUG_UV ((" +\n"));
@@ -639,12 +639,12 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 		ptr = vertex;
 		do {
 			// derivative respect to U(i, j)
-			dInt32 vertexIndex2 = ptr->m_twin->m_incidentVertex;
+			ndInt32 vertexIndex2 = ptr->m_twin->m_incidentVertex;
 			DG_DEBUG_UV (("H(u%d,u%d) =\n", vertexIndex, vertexIndex2));
 			if (ptr->m_incidentFace > 0) {
 				DG_DEBUG_UV (("2 * "));
 				dAssert (ptr->m_incidentVertex == vertexIndex);
-				dFloat64 a = CalculateGradient_U_Coefficent (ptr, true);
+				ndFloat64 a = CalculateGradient_U_Coefficent (ptr, true);
 				DG_DEBUG_UV ((" * "));
 //				gradient += diag * TraceExpression_U_face (ptr);
 				DG_DEBUG_UV ((" +\n"));
@@ -659,7 +659,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 			if (ptr->m_twin->m_incidentFace > 0) {
 				DG_DEBUG_UV (("2 * "));
 				dAssert (ptr->m_incidentVertex == vertexIndex);
-				dFloat64 a = CalculateGradient_U_Coefficent (ptr->m_twin->m_next, true);
+				ndFloat64 a = CalculateGradient_U_Coefficent (ptr->m_twin->m_next, true);
 				DG_DEBUG_UV ((" * "));
 				//				gradient += diag * TraceExpression_U_face (ptr);
 				DG_DEBUG_UV ((" +\n"));
@@ -677,7 +677,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 
 				DG_DEBUG_UV (("2 * "));
 				dAssert (ptr->m_incidentVertex == vertexIndex);
-				dFloat64 a = CalculateGradient_U_Coefficent (ptr, true);
+				ndFloat64 a = CalculateGradient_U_Coefficent (ptr, true);
 				DG_DEBUG_UV ((" * "));
 				//				gradient += diag * TraceExpression_U_face (ptr);
 				DG_DEBUG_UV ((" +\n"));
@@ -694,7 +694,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 
 				DG_DEBUG_UV (("2 * "));
 				dAssert (ptr->m_incidentVertex == vertexIndex);
-				dFloat64 a = CalculateGradient_U_Coefficent (ptr->m_twin->m_next, true);
+				ndFloat64 a = CalculateGradient_U_Coefficent (ptr->m_twin->m_next, true);
 				DG_DEBUG_UV ((" * "));
 				//				gradient += diag * TraceExpression_U_face (ptr);
 				DG_DEBUG_UV ((" +\n"));
@@ -714,19 +714,19 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 	}
 
 
-	void CalculateGradientV (dInt32 vertexIndex)
+	void CalculateGradientV (ndInt32 vertexIndex)
 	{
 		// calculate U Gradient derivative
 		const ndEdge* const vertex = m_vertexEdge[vertexIndex];
 		DG_DEBUG_UV (("dv%d =\n", vertexIndex));
 			
-		dFloat64 gradient = dFloat64 (0.0f);
+		ndFloat64 gradient = ndFloat64 (0.0f);
 		const ndEdge* ptr = vertex;
 		do {
 			if (ptr->m_incidentFace > 0) {
 				DG_DEBUG_UV (("2 * "));
 				dAssert (ptr->m_incidentVertex == vertexIndex);
-				dFloat64 a = CalculateGradient_V_Coefficent (ptr, true);
+				ndFloat64 a = CalculateGradient_V_Coefficent (ptr, true);
 				DG_DEBUG_UV ((" * "));
 				gradient += a * CalculateExpression_U_face (ptr);
 				DG_DEBUG_UV ((" +\n"));
@@ -745,13 +745,13 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 
 		// calculate diagonal derivative
 		DG_DEBUG_UV (("H(v%d,v%d) =\n", vertexIndex, vertexIndex));
-		dFloat64 diagonal = dFloat64 (0.0f);
+		ndFloat64 diagonal = ndFloat64 (0.0f);
 		ptr = vertex;
 		do {
 			if (ptr->m_incidentFace > 0) {
 				DG_DEBUG_UV (("2 * "));
 				dAssert (ptr->m_incidentVertex == vertexIndex);
-				dFloat64 diag = CalculateGradient_V_Coefficent (ptr, true);
+				ndFloat64 diag = CalculateGradient_V_Coefficent (ptr, true);
 				diagonal += diag * diag;
 				DG_DEBUG_UV (("^2 +\n"));
 
@@ -762,7 +762,7 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 			}
 			ptr = ptr->m_twin->m_next;
 		} while (ptr != vertex);
-		dAssert (diagonal > dFloat32 (0.0f));
+		dAssert (diagonal > ndFloat32 (0.0f));
 
 		m_hessianCoLumnValue[m_matrixElementCount] = diagonal;
 		m_hessianCoLumnIndex[m_matrixElementCount] = vertexIndex * 2 + 1;
@@ -785,36 +785,36 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 
 		// trace gradients
 		DG_DEBUG_UV (("\n"));
-		dInt32 count = m_mesh->GetVertexCount();
-		for (dInt32 i = 0; i < count; i ++) {
+		ndInt32 count = m_mesh->GetVertexCount();
+		for (ndInt32 i = 0; i < count; i ++) {
 			CalculateGradientU (i);
 			CalculateGradientV (i);
 		}
 		DG_DEBUG_UV (("\n"));
 	}
 
-	void InversePrecoditionerTimeVector (dFloat64* const out, const dFloat64* const v) const
+	void InversePrecoditionerTimeVector (ndFloat64* const out, const ndFloat64* const v) const
 	{
-		const dInt32 count = m_mesh->GetVertexCount();
-		for (dInt32 i = 0; i < count; i ++) {
+		const ndInt32 count = m_mesh->GetVertexCount();
+		for (ndInt32 i = 0; i < count; i ++) {
 			out[2 * i + 0] = m_pinnedPoints[i] * v[i * 2 + 0] / m_diagonal[2 * i + 0];
 			out[2 * i + 1] = m_pinnedPoints[i] * v[i * 2 + 1] / m_diagonal[2 * i + 1];
 		}
 	}
 
-	void MatrixTimeVector (dFloat64* const out, const dFloat64* const v) const
+	void MatrixTimeVector (ndFloat64* const out, const ndFloat64* const v) const
 	{
 /*
-		const dInt32 count = m_mesh->GetVertexCount();
-		for (dInt32 i = 0; i < count; i ++) {
+		const ndInt32 count = m_mesh->GetVertexCount();
+		for (ndInt32 i = 0; i < count; i ++) {
 			ndEdge* const vertex = m_vertexEdge[i];
 			dAssert (vertex->m_incidentVertex == i);
 			out[i * 2 + 0] = m_diagonal[2 * i + 0] * v[2 * i + 0];
 			out[i * 2 + 1] = m_diagonal[2 * i + 1] * v[2 * i + 1];
 		}
 		DG_DEBUG_UV (("\n"));
-		dInt32 count = m_mesh->GetVertexCount();
-		for (dInt32 i = 0; count; i ++) {
+		ndInt32 count = m_mesh->GetVertexCount();
+		for (ndInt32 i = 0; count; i ++) {
 			CalculateHessianDiagonalUU (i);
 		}
 		DG_DEBUG_UV (("\n"));
@@ -824,37 +824,37 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 	void LagrangeOptimization()
 	{
 		CalculateGradientVectorAndHessianMatrix ();
-		ndStack<dFloat64> r0(2 * m_mesh->GetVertexCount());
-		ndStack<dFloat64> z0(2 * m_mesh->GetVertexCount());
-		ndStack<dFloat64> p0(2 * m_mesh->GetVertexCount());
-		ndStack<dFloat64> q0(2 * m_mesh->GetVertexCount());
+		ndStack<ndFloat64> r0(2 * m_mesh->GetVertexCount());
+		ndStack<ndFloat64> z0(2 * m_mesh->GetVertexCount());
+		ndStack<ndFloat64> p0(2 * m_mesh->GetVertexCount());
+		ndStack<ndFloat64> q0(2 * m_mesh->GetVertexCount());
 		SetBuffers(&r0[0], &z0[0], &p0[0], &q0[0]);
 		Solve(2 * m_mesh->GetVertexCount(), dgABF_UV_TOL2, m_uvArray, m_gradients);
 		SetBuffers(nullptr, nullptr, nullptr, nullptr);
 	}
 
-	dgArray<dInt32> m_hessianCoLumnIndex;
-	dgArray<dFloat64> m_hessianCoLumnValue;
+	dgArray<ndInt32> m_hessianCoLumnIndex;
+	dgArray<ndFloat64> m_hessianCoLumnValue;
 	ndMeshEffect* m_mesh;
 	ndEdge** m_triangles;
 	ndEdge** m_vertexEdge;
-	dFloat64* m_uvArray;
-	dFloat64* m_sinTable;
-	dFloat64* m_cosTable;
-	dFloat64* m_gradients;
-	dFloat64* m_diagonal;
-	dFloat64* m_triangleAngles;
-	const dFloat64* m_pinnedPoints;
+	ndFloat64* m_uvArray;
+	ndFloat64* m_sinTable;
+	ndFloat64* m_cosTable;
+	ndFloat64* m_gradients;
+	ndFloat64* m_diagonal;
+	ndFloat64* m_triangleAngles;
+	const ndFloat64* m_pinnedPoints;
 
-	dInt32 m_trianglesCount;
-	dInt32 m_matrixElementCount;
+	ndInt32 m_trianglesCount;
+	ndInt32 m_matrixElementCount;
 	bool m_allocated;
 };
 
-class dgAngleBasedFlatteningMapping: public dgSymmetricConjugateGradientSolver<dFloat64>
+class dgAngleBasedFlatteningMapping: public dgSymmetricConjugateGradientSolver<ndFloat64>
 {
 	public: 
-	dgAngleBasedFlatteningMapping (ndMeshEffect* const mesh, dInt32 material, dgReportProgress progressReportCallback, void* const userData)
+	dgAngleBasedFlatteningMapping (ndMeshEffect* const mesh, ndInt32 material, dgReportProgress progressReportCallback, void* const userData)
 		:m_mesh(mesh)
 		,m_progressReportUserData(userData)
 		,m_progressReportCallback(progressReportCallback)
@@ -870,10 +870,10 @@ dAssert (0);
 		ndEdge* ptr = face;
 		do {
 			if (ptr->m_incidentFace > 0) {
-				dInt32 index = dInt32 (ptr->m_userData);
+				ndInt32 index = ndInt32 (ptr->m_userData);
 				ndMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
-				attribute.m_u0 = dFloat32 (0.0f);
-				attribute.m_v0 = dFloat32 (0.0f);
+				attribute.m_u0 = ndFloat32 (0.0f);
+				attribute.m_v0 = ndFloat32 (0.0f);
 			}
 			ptr = ptr->m_twin->m_next;
 		} while (ptr != face);
@@ -882,16 +882,16 @@ dAssert (0);
 		const ndBigVector& p0 = m_mesh->GetVertex(face->m_incidentVertex);
 		const ndBigVector& p1 = m_mesh->GetVertex(twinFace->m_incidentVertex);
 		ndBigVector p10 (p1 - p0);
-		dAssert(p10.m_w == dFloat32(0.0f));
-		dFloat64 e0length = sqrt (p10.DotProduct(p10).GetScalar());
+		dAssert(p10.m_w == ndFloat32(0.0f));
+		ndFloat64 e0length = sqrt (p10.DotProduct(p10).GetScalar());
 
 		ptr = twinFace;
 		do {
 			if (ptr->m_incidentFace > 0) {
-				dInt32 index = dInt32 (ptr->m_userData);
+				ndInt32 index = ndInt32 (ptr->m_userData);
 				ndMeshEffect::dgVertexAtribute& attribute = m_mesh->GetAttribute (index);
 				attribute.m_u0 = e0length;
-				attribute.m_v0 = dFloat32 (0.0f);
+				attribute.m_v0 = ndFloat32 (0.0f);
 			}
 			ptr = ptr->m_twin->m_next;
 		} while (ptr != twinFace);
@@ -900,7 +900,7 @@ dAssert (0);
 
 		m_deltaVariables[0] = 0.0f;
 		m_deltaVariables[1] = 0.0f;
-		for (dInt32 i = 2; i < m_totalVariablesCount; i ++) {
+		for (ndInt32 i = 2; i < m_totalVariablesCount; i ++) {
 			m_deltaVariables[i] = 1.0f;
 		}
 		dgTriangleAnglesToUV anglesToUV (mesh, material, progressReportCallback, userData, m_deltaVariables, m_variables);
@@ -917,20 +917,20 @@ dAssert (0);
 	void AllocVectors()
 	{
 		CalculateNumberOfVariables();
-		dInt32 vertexCount = m_mesh->GetVertexCount();
+		ndInt32 vertexCount = m_mesh->GetVertexCount();
 
 		// alloc intermediate vectors
 		m_betaEdge = (ndEdge**) m_mesh->GetAllocator()->MallocLow(m_anglesCount * sizeof (ndEdge*));
-		m_interiorIndirectMap = (dInt32*) m_mesh->GetAllocator()->MallocLow (vertexCount * sizeof (dInt32));
-		m_beta = (dFloat64*) m_mesh->GetAllocator()->MallocLow (m_anglesCount * sizeof (dFloat64));
-		m_weight= (dFloat64*) m_mesh->GetAllocator()->MallocLow (m_anglesCount * sizeof (dFloat64));
-		m_sinTable = (dFloat64*) m_mesh->GetAllocator()->MallocLow (m_anglesCount * sizeof (dFloat64));
-		m_cosTable = (dFloat64*) m_mesh->GetAllocator()->MallocLow (m_anglesCount * sizeof (dFloat64));
-		m_gradients = (dFloat64*) m_mesh->GetAllocator()->MallocLow (m_totalVariablesCount * sizeof (dFloat64));
+		m_interiorIndirectMap = (ndInt32*) m_mesh->GetAllocator()->MallocLow (vertexCount * sizeof (ndInt32));
+		m_beta = (ndFloat64*) m_mesh->GetAllocator()->MallocLow (m_anglesCount * sizeof (ndFloat64));
+		m_weight= (ndFloat64*) m_mesh->GetAllocator()->MallocLow (m_anglesCount * sizeof (ndFloat64));
+		m_sinTable = (ndFloat64*) m_mesh->GetAllocator()->MallocLow (m_anglesCount * sizeof (ndFloat64));
+		m_cosTable = (ndFloat64*) m_mesh->GetAllocator()->MallocLow (m_anglesCount * sizeof (ndFloat64));
+		m_gradients = (ndFloat64*) m_mesh->GetAllocator()->MallocLow (m_totalVariablesCount * sizeof (ndFloat64));
 		
 		// allocate angle and internal vertex vector
-		m_variables = (dFloat64*) m_mesh->GetAllocator()->MallocLow (m_totalVariablesCount * sizeof (dFloat64));
-		m_deltaVariables = (dFloat64*) m_mesh->GetAllocator()->MallocLow (m_totalVariablesCount * sizeof (dFloat64));
+		m_variables = (ndFloat64*) m_mesh->GetAllocator()->MallocLow (m_totalVariablesCount * sizeof (ndFloat64));
+		m_deltaVariables = (ndFloat64*) m_mesh->GetAllocator()->MallocLow (m_totalVariablesCount * sizeof (ndFloat64));
 	}
 
 	void DeleteAuxiliaryVectors()
@@ -961,7 +961,7 @@ dAssert (0);
 		m_triangleCount = 0;
 		m_interiorVertexCount = 0;
 
-		dInt32 mark = m_mesh->IncLRU();
+		ndInt32 mark = m_mesh->IncLRU();
 		ndMeshEffect::Iterator iter (*m_mesh);
 		for (iter.Begin(); iter; iter ++) {
 			ndEdge* const edge = &iter.GetNode()->GetInfo();
@@ -996,8 +996,8 @@ dAssert (0);
 
 	void InitEdgeVector()
 	{
-		dInt32 count = 0;
-		dInt32 mark = m_mesh->IncLRU();
+		ndInt32 count = 0;
+		ndInt32 mark = m_mesh->IncLRU();
 		ndMeshEffect::Iterator iter (*m_mesh);
 		for (iter.Begin(); iter; iter ++) {
 			ndEdge* const edge = &iter.GetNode()->GetInfo();
@@ -1036,22 +1036,22 @@ dAssert (0);
 		}
 	}
 
-	dInt32 GetAlphaLandaIndex (const ndEdge* const edge) const
+	ndInt32 GetAlphaLandaIndex (const ndEdge* const edge) const
 	{
 		return edge->m_incidentFace - 1;
 	}
 
-	dInt32 GetTriangleIndex (const dInt32 alphaIndex) const
+	ndInt32 GetTriangleIndex (const ndInt32 alphaIndex) const
 	{
 		return alphaIndex / 3 + m_anglesCount;
 	}
 
-	dInt32 GetTriangleIndex (const ndEdge* const edge) const
+	ndInt32 GetTriangleIndex (const ndEdge* const edge) const
 	{
 		return GetAlphaLandaIndex(edge) / 3 + m_anglesCount;
 	}
 
-	dInt32 GetInteriorVertex(const ndEdge* const edge) const
+	ndInt32 GetInteriorVertex(const ndEdge* const edge) const
 	{
 		return m_interiorIndirectMap[edge->m_incidentVertex];
 	}
@@ -1059,7 +1059,7 @@ dAssert (0);
 	void CalculateInitialAngles ()
 	{
 		// calculate initial beta angle for each triangle
-		for (dInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
 			ndEdge* const edge = m_betaEdge[i];
 
 			const ndBigVector& p0 = m_mesh->GetVertex(edge->m_incidentVertex);
@@ -1069,45 +1069,45 @@ dAssert (0);
 			ndBigVector e10 (p1 - p0);
 			ndBigVector e20 (p2 - p0);
 
-			e10 = e10.Scale (dFloat64 (1.0) / sqrt (e10.DotProduct(e10).GetScalar()));
-			e20 = e20.Scale (dFloat64 (1.0) / sqrt (e20.DotProduct(e20).GetScalar()));
-			dAssert(e10.m_w == dFloat32(0.0f));
-			dAssert(e20.m_w == dFloat32(0.0f));
+			e10 = e10.Scale (ndFloat64 (1.0) / sqrt (e10.DotProduct(e10).GetScalar()));
+			e20 = e20.Scale (ndFloat64 (1.0) / sqrt (e20.DotProduct(e20).GetScalar()));
+			dAssert(e10.m_w == ndFloat32(0.0f));
+			dAssert(e20.m_w == ndFloat32(0.0f));
 
-			m_beta[i] = acos (dClamp(e10.DotProduct(e20).GetScalar(), dFloat64 (-1.0f), dFloat64 (1.0f)));
-			dAssert (m_beta[i] > dFloat64 (0.0f));
+			m_beta[i] = acos (dClamp(e10.DotProduct(e20).GetScalar(), ndFloat64 (-1.0f), ndFloat64 (1.0f)));
+			dAssert (m_beta[i] > ndFloat64 (0.0f));
 		}
 
 		#ifdef _DEBUG
-		for (dInt32 i = 0; i < m_triangleCount; i ++) {
-			dInt32 i0 = i * 3 + 0;
-			dInt32 i1 = i * 3 + 1;
-			dInt32 i2 = i * 3 + 2;
-			dAssert (fabs (m_beta[i0] + m_beta[i1] + m_beta[i2] - dgABF_PI) < dFloat64 (1.0e-6f));
+		for (ndInt32 i = 0; i < m_triangleCount; i ++) {
+			ndInt32 i0 = i * 3 + 0;
+			ndInt32 i1 = i * 3 + 1;
+			ndInt32 i2 = i * 3 + 2;
+			dAssert (fabs (m_beta[i0] + m_beta[i1] + m_beta[i2] - dgABF_PI) < ndFloat64 (1.0e-6f));
 		}
 		#endif
 
 		// for each interior vertex apply the scale factor
-		dInt32 mark = m_mesh->IncLRU();
-		for (dInt32 i = 0; i < m_anglesCount; i ++) {
+		ndInt32 mark = m_mesh->IncLRU();
+		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
 			ndEdge* const edge = m_betaEdge[i];
 			if ((edge->m_mark != mark) && (GetInteriorVertex(edge) >= 0)) {
-				dFloat64 scale = dFloat64 (0.0f);
+				ndFloat64 scale = ndFloat64 (0.0f);
 				ndEdge* ptr = edge; 
 				do {
-					dInt32 index = GetAlphaLandaIndex (ptr);
+					ndInt32 index = GetAlphaLandaIndex (ptr);
 					dAssert (index >= 0);
 					dAssert (index <= m_anglesCount);
 					scale += m_beta[index];
 					ptr->m_mark = mark;
 					ptr = ptr->m_twin->m_next;
 				} while (ptr != edge);
-				dAssert (scale > dFloat32 (0.0f));
+				dAssert (scale > ndFloat32 (0.0f));
 
-				scale = dFloat64 (2.0f) * dgABF_PI / scale;
+				scale = ndFloat64 (2.0f) * dgABF_PI / scale;
 				ptr = edge;
 				do {
-					dInt32 index = GetAlphaLandaIndex (ptr);
+					ndInt32 index = GetAlphaLandaIndex (ptr);
 					dAssert (index >= 0);
 					dAssert (index <= m_anglesCount);
 					m_beta[index] *= scale;
@@ -1117,63 +1117,63 @@ dAssert (0);
 		}
 
 		// initialized each alpha lambda to the beta angle and also calcual ethe derivatoe coeficent (2.0 / (betai * betai)) 
-		for (dInt32 i = 0; i < m_anglesCount; i ++) {
-			dAssert (m_beta[i] > dFloat64 (0.0f));
+		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
+			dAssert (m_beta[i] > ndFloat64 (0.0f));
 			m_variables[i] = m_beta[i];
-			m_weight[i] = dFloat64 (2.0f) / (m_beta[i] * m_beta[i]);
+			m_weight[i] = ndFloat64 (2.0f) / (m_beta[i] * m_beta[i]);
 		}
 	}
 
 	// angular derivative component
 	// (wi * (xi - bi) + T0
 	// where wi = 2.0 / (bi ^ 2)
-	dFloat64 CalculateAngularGradientDerivative (dInt32 alphaIndex) const
+	ndFloat64 CalculateAngularGradientDerivative (ndInt32 alphaIndex) const
 	{
-		dFloat64 gradient = (m_variables[alphaIndex] - m_beta[alphaIndex]) * m_weight[alphaIndex] + m_variables[GetTriangleIndex(alphaIndex)];
-		dAssert (fabs(gradient) < dFloat64(1.0e10f));
+		ndFloat64 gradient = (m_variables[alphaIndex] - m_beta[alphaIndex]) * m_weight[alphaIndex] + m_variables[GetTriangleIndex(alphaIndex)];
+		dAssert (fabs(gradient) < ndFloat64(1.0e10f));
 		return gradient;
 	}
 
 	// Vi if the the edge is an interior vertex
-	dFloat64 CalculateInteriorVertexGradient (dInt32 alphaIndex) const
+	ndFloat64 CalculateInteriorVertexGradient (ndInt32 alphaIndex) const
 	{
-		dInt32 index = GetInteriorVertex(m_betaEdge[alphaIndex]);
-		dFloat64 gradient = (index != -1) ? m_variables[index] : dFloat32 (0.0f);
-		dAssert (fabs(gradient) < dFloat64(1.0e10f));
+		ndInt32 index = GetInteriorVertex(m_betaEdge[alphaIndex]);
+		ndFloat64 gradient = (index != -1) ? m_variables[index] : ndFloat32 (0.0f);
+		dAssert (fabs(gradient) < ndFloat64(1.0e10f));
 		return gradient;
 	}
 
 	// Wj * cos(alpha) * sum (alphai) for eadh previsu or next interior incdent vertex
-	dFloat64 CalculatePlanarityGradient (dInt32 alphaIndex) const
+	ndFloat64 CalculatePlanarityGradient (ndInt32 alphaIndex) const
 	{
-		dFloat64 gradient = dFloat64 (0.0f);
+		ndFloat64 gradient = ndFloat64 (0.0f);
 
 		ndEdge* const incidentEdge = m_betaEdge[alphaIndex];
 
 		if (GetInteriorVertex (incidentEdge->m_next) != -1) {
 			ndEdge* const edge = m_betaEdge[GetAlphaLandaIndex(incidentEdge->m_next)];
-			dFloat64 product = m_cosTable[GetAlphaLandaIndex(edge->m_prev)];
+			ndFloat64 product = m_cosTable[GetAlphaLandaIndex(edge->m_prev)];
 			ndEdge* ptr = edge->m_twin->m_next;
 			do {
 				product *= m_sinTable[GetAlphaLandaIndex(ptr->m_prev)];
 				ptr = ptr->m_twin->m_next;
 			} while (ptr != edge);
-			dInt32 interiorVertexIndex = GetInteriorVertex (incidentEdge->m_next) + m_interiorVertexCount;
+			ndInt32 interiorVertexIndex = GetInteriorVertex (incidentEdge->m_next) + m_interiorVertexCount;
 			gradient -= m_variables[interiorVertexIndex] * product;
 		}
 
 		if (GetInteriorVertex (incidentEdge->m_prev) != -1) {
 			ndEdge* const edge = m_betaEdge[GetAlphaLandaIndex(incidentEdge->m_prev)];
-			dFloat64 product = m_cosTable[GetAlphaLandaIndex(edge->m_next)];
+			ndFloat64 product = m_cosTable[GetAlphaLandaIndex(edge->m_next)];
 			ndEdge* ptr = edge->m_twin->m_next;
 			do {
 				product *= m_sinTable[GetAlphaLandaIndex(ptr->m_next)];
 				ptr = ptr->m_twin->m_next;
 			} while (ptr != edge);
-			dInt32 interiorVertexIndex = GetInteriorVertex (incidentEdge->m_prev) + m_interiorVertexCount;
+			ndInt32 interiorVertexIndex = GetInteriorVertex (incidentEdge->m_prev) + m_interiorVertexCount;
 			gradient += m_variables[interiorVertexIndex] * product;
 		}
-		dAssert (fabs(gradient) < dFloat64(1.0e10f));
+		dAssert (fabs(gradient) < ndFloat64(1.0e10f));
 		return gradient;
 	}
 
@@ -1212,42 +1212,42 @@ dAssert (0);
 	//
 	//22  Sin[x0] Sin[x5] Sin[x9] - Sin[x1] Sin[x10] Sin[x3] 
 	//23  Sin[x11] Sin[x12] Sin[x3] Sin[x8] - Sin[x13] Sin[x4] Sin[x6] Sin[x9]
-	dFloat64 CalculateGradientVector ()
+	ndFloat64 CalculateGradientVector ()
 	{
 		// pre-compute sin cos tables
-		for (dInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
 			m_sinTable[i] = sin (m_variables[i]);
 			m_cosTable[i] = cos (m_variables[i]);
 		}
 
-		dFloat64 gradientNorm = dFloat64 (0.0f);
+		ndFloat64 gradientNorm = ndFloat64 (0.0f);
 
 		// calculate gradients due to the difference between a matching edge angle and it projected angle msu be mminimal Wei * (Xei - Bei) ^ e = minimal
-		for (dInt32 i = 0; i < m_anglesCount; i ++) {
-			dFloat64 gradient = CalculateAngularGradientDerivative (i) + CalculateInteriorVertexGradient (i) + CalculatePlanarityGradient (i);
+		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
+			ndFloat64 gradient = CalculateAngularGradientDerivative (i) + CalculateInteriorVertexGradient (i) + CalculatePlanarityGradient (i);
 			m_gradients[i] = -gradient;
 			gradientNorm += gradient * gradient;
 		}
 
 		// calculate gradient due to the equality that the sum on the internal angle of a triangle must add to 180 degree. (Xt0 + Xt1 + Xt2 - pi) = 0
-		for (dInt32 i = 0; i < m_triangleCount; i ++) {
-			dFloat64 gradient = m_variables[i * 3 + 0] + m_variables[i * 3 + 1] + m_variables[i * 3 + 2] - dgABF_PI;
+		for (ndInt32 i = 0; i < m_triangleCount; i ++) {
+			ndFloat64 gradient = m_variables[i * 3 + 0] + m_variables[i * 3 + 1] + m_variables[i * 3 + 2] - dgABF_PI;
 			m_gradients[m_anglesCount + i] = -gradient;
 			gradientNorm += gradient * gradient;
 		}
 
 		// calculate the gradient due to the equality that the sum of all the angle incident to and interior vertex must be 3060 degree sum (Xvi) - 2 * pi = 0 
-		dInt32 mark = m_mesh->IncLRU();
-		for (dInt32 i = 0; i < m_anglesCount; i ++) {
+		ndInt32 mark = m_mesh->IncLRU();
+		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
 			ndEdge* const edge = m_betaEdge[i];
 
 			if ((edge->m_mark != mark) && GetInteriorVertex(edge) != -1) {
-				dInt32 vertexIndex = GetInteriorVertex(edge);
-				dFloat64 gradient = - dFloat64 (2.0f) * dgABF_PI;
+				ndInt32 vertexIndex = GetInteriorVertex(edge);
+				ndFloat64 gradient = - ndFloat64 (2.0f) * dgABF_PI;
 
 				ndEdge* ptr = edge; 
 				do {
-					dInt32 index = GetAlphaLandaIndex(ptr);
+					ndInt32 index = GetAlphaLandaIndex(ptr);
 					gradient += m_variables[index];
 					ptr->m_mark = mark;
 					ptr = ptr->m_twin->m_next;
@@ -1260,24 +1260,24 @@ dAssert (0);
 		// calculate the gradient due to the equality that the difference of the product of the sin of the angle to the
 		// incident to an interior vertex must be zero product (sin (Xvi + 1) - product (sin (Xvi - 1)  = 0 
 		mark = m_mesh->IncLRU();
-		for (dInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
 			ndEdge* const edge = m_betaEdge[i];
 
-			dInt32 vertexIndex = GetInteriorVertex(edge);
+			ndInt32 vertexIndex = GetInteriorVertex(edge);
 			if ((edge->m_mark != mark) && (vertexIndex != -1)) {
 				vertexIndex += m_interiorVertexCount;
-				dFloat64 partialProdut0 =  dFloat64 (1.0f);
-				dFloat64 partialProdut1 =  dFloat64 (1.0f);
+				ndFloat64 partialProdut0 =  ndFloat64 (1.0f);
+				ndFloat64 partialProdut1 =  ndFloat64 (1.0f);
 				ndEdge* ptr = edge; 
 				do {
-					dInt32 index0 = GetAlphaLandaIndex(ptr->m_next);
-					dInt32 index1 = GetAlphaLandaIndex(ptr->m_prev);
+					ndInt32 index0 = GetAlphaLandaIndex(ptr->m_next);
+					ndInt32 index1 = GetAlphaLandaIndex(ptr->m_prev);
 					partialProdut0 *= m_sinTable[index0];
 					partialProdut1 *= m_sinTable[index1];
 					ptr->m_mark = mark;
 					ptr = ptr->m_twin->m_next;
 				} while (ptr != edge);
-				dFloat64 gradient = partialProdut0 - partialProdut1;
+				ndFloat64 gradient = partialProdut0 - partialProdut1;
 				m_gradients[vertexIndex] = - gradient;
 				gradientNorm += gradient * gradient;
 			}
@@ -1320,42 +1320,42 @@ dAssert (0);
 
 	// [22][0-n]  Cos[x0] Sin[x5] Sin[x9], -Cos[x1] Sin[x10] Sin[x3], 0, -Cos[x3] Sin[x1] Sin[x10], 0, Cos[x5] Sin[x0] Sin[x9], 0, 0, 0, Cos[x9] Sin[x0] Sin[x5], -Cos[x10] Sin[x1] Sin[x3], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 	// [23][0-n]  0, 0, 0, Cos[x3] Sin[x11] Sin[x12] Sin[x8], -Cos[x4] Sin[x13] Sin[x6] Sin[x9], 0, -Cos[x6] Sin[x13] Sin[x4] Sin[x9], 0, Cos[x8] Sin[x11] Sin[x12] Sin[x3], -Cos[x9] Sin[x13] Sin[x4] Sin[x6], 0, Cos[x11] Sin[x12] Sin[x3] Sin[x8], Cos[x12] Sin[x11] Sin[x3] Sin[x8], -Cos[x13] Sin[x4] Sin[x6] Sin[x9], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-	void MatrixTimeVector (dFloat64* const out, const dFloat64* const v) const
+	void MatrixTimeVector (ndFloat64* const out, const ndFloat64* const v) const
 	{
-		for (dInt32 i = 0; i < m_interiorVertexCount; i ++) {
-			out[i + m_anglesCount + m_triangleCount] = dFloat64 (0.0f);
-			out[i + m_anglesCount + m_triangleCount + m_interiorVertexCount] = dFloat64 (0.0f);
+		for (ndInt32 i = 0; i < m_interiorVertexCount; i ++) {
+			out[i + m_anglesCount + m_triangleCount] = ndFloat64 (0.0f);
+			out[i + m_anglesCount + m_triangleCount + m_interiorVertexCount] = ndFloat64 (0.0f);
 		}
 
-		for (dInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
 			out[i] = m_weight[i] * v[i];
 
 			ndEdge* const edge = m_betaEdge[i];
-			dInt32 vertexIndex = GetInteriorVertex(edge);
+			ndInt32 vertexIndex = GetInteriorVertex(edge);
 			if (vertexIndex >= 0) {
 				out[i] += v[vertexIndex];
 				out[vertexIndex] += v[i];
 			}
 		}
 
-		for (dInt32 i = 0; i < m_triangleCount; i ++) {
-			dInt32 j = i * 3;
+		for (ndInt32 i = 0; i < m_triangleCount; i ++) {
+			ndInt32 j = i * 3;
 			out[j + 0] += v[i + m_anglesCount];
 			out[j + 1] += v[i + m_anglesCount];
 			out[j + 2] += v[i + m_anglesCount];
 			out[i + m_anglesCount] = v[j + 0] + v[j + 1] +  v[j + 2];
 		}
 
-		for (dInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
 			{
 				ndEdge* const edge = m_betaEdge[i]->m_prev;
-				dInt32 vertexIndex = GetInteriorVertex(edge);
+				ndInt32 vertexIndex = GetInteriorVertex(edge);
 				if (vertexIndex >= 0) {
-					dInt32 index = GetAlphaLandaIndex(edge->m_next);
-					dFloat64 product = m_cosTable[index];
+					ndInt32 index = GetAlphaLandaIndex(edge->m_next);
+					ndFloat64 product = m_cosTable[index];
 					ndEdge* ptr = edge->m_twin->m_next; 
 					do {
-						dInt32 m = GetAlphaLandaIndex(ptr->m_next);
+						ndInt32 m = GetAlphaLandaIndex(ptr->m_next);
 						product *= m_sinTable[m];
 						ptr = ptr->m_twin->m_next;
 					} while (ptr != edge);
@@ -1366,13 +1366,13 @@ dAssert (0);
 
 			{
 				ndEdge* const edge = m_betaEdge[i]->m_next;
-				dInt32 vertexIndex = GetInteriorVertex(edge);
+				ndInt32 vertexIndex = GetInteriorVertex(edge);
 				if (vertexIndex >= 0) {
-					dInt32 index = GetAlphaLandaIndex(edge->m_prev);
-					dFloat64 product = m_cosTable[index];
+					ndInt32 index = GetAlphaLandaIndex(edge->m_prev);
+					ndFloat64 product = m_cosTable[index];
 					ndEdge* ptr = edge->m_twin->m_next; 
 					do {
-						dInt32 m = GetAlphaLandaIndex(ptr->m_prev);
+						ndInt32 m = GetAlphaLandaIndex(ptr->m_prev);
 						product *= m_sinTable[m];
 						ptr = ptr->m_twin->m_next;
 					} while (ptr != edge);
@@ -1383,16 +1383,16 @@ dAssert (0);
 		}
 	}
 
-	void InversePrecoditionerTimeVector (dFloat64* const out, const dFloat64* const v) const
+	void InversePrecoditionerTimeVector (ndFloat64* const out, const ndFloat64* const v) const
 	{
-		for (dInt32 i = 0; i < m_anglesCount; i ++) {
+		for (ndInt32 i = 0; i < m_anglesCount; i ++) {
 			out[i] = v[i] / m_weight[i];
 		}
-		for (dInt32 i = 0; i < m_triangleCount; i ++) {
+		for (ndInt32 i = 0; i < m_triangleCount; i ++) {
 			out[i + m_anglesCount] = v[i + m_anglesCount];
 		}
 
-		for (dInt32 i = 0; i < m_interiorVertexCount; i ++) {
+		for (ndInt32 i = 0; i < m_interiorVertexCount; i ++) {
 			out[i + m_anglesCount + m_triangleCount] = v[i + m_anglesCount + m_triangleCount];
 			out[i + m_anglesCount + m_triangleCount + m_interiorVertexCount] = v[i + m_anglesCount + m_triangleCount + m_interiorVertexCount];
 		}
@@ -1400,35 +1400,35 @@ dAssert (0);
 		m_progressNum ++;
 		if (m_progressReportCallback) {
 			if ((m_progressNum & 127) == 127) {
-				m_continueExecution = m_progressReportCallback (dMin (dFloat32 (m_progressNum) / m_progressDen, dFloat32 (1.0f)), m_progressReportUserData);
+				m_continueExecution = m_progressReportCallback (dMin (ndFloat32 (m_progressNum) / m_progressDen, ndFloat32 (1.0f)), m_progressReportUserData);
 			}
 		}
 	}
 
 	void LagrangeOptimization()
 	{
-		memset (m_deltaVariables, 0, m_totalVariablesCount * sizeof (dFloat64));
-		memset (&m_variables[m_anglesCount], 0, m_triangleCount * sizeof (dFloat64));	
+		memset (m_deltaVariables, 0, m_totalVariablesCount * sizeof (ndFloat64));
+		memset (&m_variables[m_anglesCount], 0, m_triangleCount * sizeof (ndFloat64));	
 
-		for (dInt32 i = 0; i < m_interiorVertexCount; i ++) {
-			m_variables[i + m_anglesCount + m_triangleCount] = dFloat32 (1.0f);
-			m_variables[i + m_anglesCount + m_triangleCount + m_interiorVertexCount] = dFloat32 (1.0f);
+		for (ndInt32 i = 0; i < m_interiorVertexCount; i ++) {
+			m_variables[i + m_anglesCount + m_triangleCount] = ndFloat32 (1.0f);
+			m_variables[i + m_anglesCount + m_triangleCount + m_interiorVertexCount] = ndFloat32 (1.0f);
 		}
 		
 		m_progressNum = 0;
 		m_continueExecution = true;
 
 /*
-		ndStack<dFloat64> r0(2 * m_mesh->GetVertexCount());
-		ndStack<dFloat64> z0(2 * m_mesh->GetVertexCount());
-		ndStack<dFloat64> p0(2 * m_mesh->GetVertexCount());
-		ndStack<dFloat64> q0(2 * m_mesh->GetVertexCount());
+		ndStack<ndFloat64> r0(2 * m_mesh->GetVertexCount());
+		ndStack<ndFloat64> z0(2 * m_mesh->GetVertexCount());
+		ndStack<ndFloat64> p0(2 * m_mesh->GetVertexCount());
+		ndStack<ndFloat64> q0(2 * m_mesh->GetVertexCount());
 		SetBuffers(&r0[0], &z0[0], &p0[0], &q0[0]);
-		dFloat64 gradientNorm = CalculateGradientVector ();
-		for (dInt32 iter = 0; (iter < dgABF_MAX_ITERATIONS) && (gradientNorm > dgABF_TOL2) && m_continueExecution; iter++) {
+		ndFloat64 gradientNorm = CalculateGradientVector ();
+		for (ndInt32 iter = 0; (iter < dgABF_MAX_ITERATIONS) && (gradientNorm > dgABF_TOL2) && m_continueExecution; iter++) {
 			m_progressDen = m_progressNum + m_totalVariablesCount;
 			Solve(m_totalVariablesCount, dgABF_LINEAR_SOLVER_TOL, m_deltaVariables, m_gradients);
-			for (dInt32 i = 0; i < m_totalVariablesCount; i ++) {
+			for (ndInt32 i = 0; i < m_totalVariablesCount; i ++) {
 				m_variables[i] += m_deltaVariables[i];
 			}
 			gradientNorm = CalculateGradientVector ();
@@ -1438,34 +1438,34 @@ dAssert (0);
 
 #ifdef _DEBUG
 		// calculate gradient due to the equality that the sum on the internal angle of a triangle must add to 180 degree. (Xt0 + Xt1 + Xt2 - pi) = 0
-//		for (dInt32 i = 0; i < m_triangleCount; i ++) {
-//			dFloat64 gradient = m_variables[i * 3 + 0] + m_variables[i * 3 + 1] + m_variables[i * 3 + 2] - dgABF_PI;
-//			dAssert (fabs (gradient) < dFloat64 (1.0e-2f));
+//		for (ndInt32 i = 0; i < m_triangleCount; i ++) {
+//			ndFloat64 gradient = m_variables[i * 3 + 0] + m_variables[i * 3 + 1] + m_variables[i * 3 + 2] - dgABF_PI;
+//			dAssert (fabs (gradient) < ndFloat64 (1.0e-2f));
 //		}
 #endif
 	}
 
 	ndMeshEffect* m_mesh;
 	ndEdge** m_betaEdge;
-	dInt32* m_interiorIndirectMap;
+	ndInt32* m_interiorIndirectMap;
 
-	dFloat64* m_beta;
-	dFloat64* m_weight;
-	dFloat64* m_sinTable;
-	dFloat64* m_cosTable;
-	dFloat64* m_variables;
-	dFloat64* m_gradients;
-	dFloat64* m_deltaVariables;
+	ndFloat64* m_beta;
+	ndFloat64* m_weight;
+	ndFloat64* m_sinTable;
+	ndFloat64* m_cosTable;
+	ndFloat64* m_variables;
+	ndFloat64* m_gradients;
+	ndFloat64* m_deltaVariables;
 
-	dInt32 m_anglesCount;
-	dInt32 m_triangleCount;
-	dInt32 m_interiorVertexCount;
-	dInt32 m_totalVariablesCount;
+	ndInt32 m_anglesCount;
+	ndInt32 m_triangleCount;
+	ndInt32 m_interiorVertexCount;
+	ndInt32 m_totalVariablesCount;
 
 	void* m_progressReportUserData;
 	dgReportProgress m_progressReportCallback;
-	mutable dInt32 m_progressNum;
-	mutable dInt32 m_progressDen;
+	mutable ndInt32 m_progressNum;
+	mutable ndInt32 m_progressDen;
 	mutable bool m_continueExecution;
 };	
 
@@ -1478,14 +1478,14 @@ void ndMeshEffect::ClearAttributeArray ()
     ndStack<dgVertexAtribute>attribArray (m_pointCount);
 
     memset (&attribArray[0], 0, m_pointCount * sizeof (dgVertexAtribute));
-    dInt32 mark = IncLRU();
+    ndInt32 mark = IncLRU();
     dPolyhedra::Iterator iter (*this);	
     for(iter.Begin(); iter; iter ++){
         ndEdge* const edge = &(*iter);
         if (edge->m_mark < mark){
             ndEdge* ptr = edge;
 
-            dInt32 index = ptr->m_incidentVertex;
+            ndInt32 index = ptr->m_incidentVertex;
             dgVertexAtribute& attrib = attribArray[index];
             attrib.m_vertex = m_points[index];
             do {
@@ -1502,14 +1502,14 @@ void ndMeshEffect::ClearAttributeArray ()
 
 
 
-void ndMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMaterial, const ndMatrix& uvAligment)
+void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMaterial, const ndMatrix& uvAligment)
 {
 	ndBigVector origin (GetOrigin());
 	ndStack<ndBigVector> buffer(m_points.m_vertex.m_count);
-	ndBigVector pMin(dFloat64(1.0e10f), dFloat64(1.0e10f), dFloat64(1.0e10f), dFloat64(0.0f));
-	ndBigVector pMax(dFloat64(-1.0e10f), dFloat64(-1.0e10f), dFloat64(-1.0e10f), dFloat64(0.0f));
+	ndBigVector pMin(ndFloat64(1.0e10f), ndFloat64(1.0e10f), ndFloat64(1.0e10f), ndFloat64(0.0f));
+	ndBigVector pMax(ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(0.0f));
 
-	for (dInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
+	for (ndInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
 		buffer[i] = uvAligment.RotateVector (m_points.m_vertex[i] - origin);
 		const ndBigVector& tmp = buffer[i];
 		pMin.m_x = dMin (pMin.m_x, tmp.m_x);
@@ -1521,18 +1521,18 @@ void ndMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMateri
 	}
 
 	ndStack<ndBigVector>cylinder (m_points.m_vertex.m_count);
-    ndBigVector scale (dFloat64 (1.0f)/ (pMax.m_x - pMin.m_x), dFloat64 (1.0f)/ (pMax.m_y - pMin.m_y), dFloat64 (1.0f)/ (pMax.m_z - pMin.m_z), dFloat64 (0.0f));
-    for (dInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
+    ndBigVector scale (ndFloat64 (1.0f)/ (pMax.m_x - pMin.m_x), ndFloat64 (1.0f)/ (pMax.m_y - pMin.m_y), ndFloat64 (1.0f)/ (pMax.m_z - pMin.m_z), ndFloat64 (0.0f));
+    for (ndInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
 		//ndBigVector point (uvAligment.RotateVector (m_points.m_vertex[i] - origin));
 		ndBigVector point (buffer[i]);
-		dFloat64 u = (point.m_x - pMin.m_x) * scale.m_x;
+		ndFloat64 u = (point.m_x - pMin.m_x) * scale.m_x;
 
-		dAssert(point.m_w == dFloat32(0.0f));
-		dAssert(point.DotProduct(point).GetScalar() > dFloat32 (0.0f));
+		dAssert(point.m_w == ndFloat32(0.0f));
+		dAssert(point.DotProduct(point).GetScalar() > ndFloat32 (0.0f));
 		point = point.Normalize();
-		dFloat64 v = dAtan2 (point.m_y, point.m_z);
+		ndFloat64 v = ndAtan2 (point.m_y, point.m_z);
 
-		v = v + dPi;
+		v = v + ndPi;
 		cylinder[i].m_x = u;
 		cylinder[i].m_y = v;
     }
@@ -1545,28 +1545,28 @@ void ndMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMateri
     for(iter.Begin(); iter; iter ++){
         ndEdge* const edge = &(*iter);
 		dAttibutFormat::dgUV uv;
-		uv.m_u = dFloat32(cylinder[edge->m_incidentVertex].m_x);
-		uv.m_v = dFloat32(cylinder[edge->m_incidentVertex].m_y);
-		m_attrib.m_uv0Channel[dInt32(edge->m_userData)] = uv;
-		m_attrib.m_materialChannel[dInt32(edge->m_userData)] = cylinderMaterial;
+		uv.m_u = ndFloat32(cylinder[edge->m_incidentVertex].m_x);
+		uv.m_v = ndFloat32(cylinder[edge->m_incidentVertex].m_y);
+		m_attrib.m_uv0Channel[ndInt32(edge->m_userData)] = uv;
+		m_attrib.m_materialChannel[ndInt32(edge->m_userData)] = cylinderMaterial;
     }
 
-    dInt32 mark = IncLRU ();
+    ndInt32 mark = IncLRU ();
     for(iter.Begin(); iter; iter ++){
         ndEdge* const edge = &(*iter);
         if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) {
-			dAttibutFormat::dgUV uvRef(m_attrib.m_uv0Channel[dInt32(edge->m_userData)]);
-			dFloat32 UVrefSin = dSin(uvRef.m_v);
-			dFloat32 UVrefCos = dCos(uvRef.m_v);
+			dAttibutFormat::dgUV uvRef(m_attrib.m_uv0Channel[ndInt32(edge->m_userData)]);
+			ndFloat32 UVrefSin = ndSin(uvRef.m_v);
+			ndFloat32 UVrefCos = ndCos(uvRef.m_v);
 			ndEdge* ptr = edge;
             do {
 				ptr->m_mark = mark;
-				dAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[dInt32(ptr->m_userData)]);
-				dFloat32 sinAngle = UVrefCos * dSin(uv.m_v) - UVrefSin * dCos(uv.m_v);
-				dFloat32 cosAngle = UVrefCos * dCos(uv.m_v) + UVrefSin * dSin(uv.m_v);
-				dFloat32 deltaAngle = dAtan2(sinAngle, cosAngle);
+				dAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)]);
+				ndFloat32 sinAngle = UVrefCos * ndSin(uv.m_v) - UVrefSin * ndCos(uv.m_v);
+				ndFloat32 cosAngle = UVrefCos * ndCos(uv.m_v) + UVrefSin * ndSin(uv.m_v);
+				ndFloat32 deltaAngle = ndAtan2(sinAngle, cosAngle);
 				uv.m_v = (uvRef.m_v + deltaAngle) / dPi2;
-				m_attrib.m_uv0Channel[dInt32(ptr->m_userData)] = uv;
+				m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)] = uv;
                 ptr = ptr->m_next;
             } while (ptr != edge);
         }
@@ -1583,7 +1583,7 @@ void ndMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMateri
 			ndVector p1(buffer[edge->m_next->m_incidentVertex]);
 
 			ndVector e1(p1 - p0);
-			ndBigVector normal(dFloat32(0.0f));
+			ndBigVector normal(ndFloat32(0.0f));
 			for (ndEdge* ptr = edge->m_next; ptr != edge; ptr = ptr->m_next) {
 				//ndVector p2(uvAligment.RotateVector(m_points.m_vertex[ptr->m_next->m_incidentVertex] - origin));
 				ndVector p2(buffer[ptr->m_next->m_incidentVertex]);
@@ -1592,16 +1592,16 @@ void ndMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMateri
 				e1 = e2;
 			}
 			normal = normal.Normalize();
-			if (dAbs(normal.m_x) > dFloat32 (0.99f)) {
+			if (dAbs(normal.m_x) > ndFloat32 (0.99f)) {
 				ndEdge* ptr = edge;
 				do {
 					dAttibutFormat::dgUV uv;
 					//ndVector p(uvAligment.RotateVector(m_points.m_vertex[ptr->m_incidentVertex] - origin));
 					ndVector p(buffer[ptr->m_incidentVertex]);
-					uv.m_u = dFloat32((p.m_y - pMin.m_y) * scale.m_y);
-					uv.m_v = dFloat32((p.m_z - pMin.m_z) * scale.m_z);
-					m_attrib.m_uv0Channel[dInt32(ptr->m_userData)] = uv;
-					m_attrib.m_materialChannel[dInt32(ptr->m_userData)] = capMaterial;
+					uv.m_u = ndFloat32((p.m_y - pMin.m_y) * scale.m_y);
+					uv.m_v = ndFloat32((p.m_z - pMin.m_z) * scale.m_z);
+					m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)] = uv;
+					m_attrib.m_materialChannel[ndInt32(ptr->m_userData)] = capMaterial;
 					ptr = ptr->m_next;
 				} while (ptr != edge);
 			}
@@ -1617,7 +1617,7 @@ void ndMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMateri
 	PackAttibuteData();
 }
 
-void ndMeshEffect::AngleBaseFlatteningMapping (dInt32 material, dgReportProgress progressReportCallback, void* const userData)
+void ndMeshEffect::AngleBaseFlatteningMapping (ndInt32 material, dgReportProgress progressReportCallback, void* const userData)
 {
 	dgSetPrecisionDouble presicion;
 
@@ -1628,7 +1628,7 @@ void ndMeshEffect::AngleBaseFlatteningMapping (dInt32 material, dgReportProgress
 	tmp.CalculateAABB(minBox, maxBox);
 
 	ndBigVector size (maxBox - minBox);
-	dFloat32 scale = dFloat32 (1.0 / dMax (size.m_x, size.m_y, size.m_z));
+	ndFloat32 scale = ndFloat32 (1.0 / dMax (size.m_x, size.m_y, size.m_z));
 
 	ndMatrix matrix (dGetIdentityMatrix());
 	matrix[0][0] = scale;
@@ -1642,7 +1642,7 @@ void ndMeshEffect::AngleBaseFlatteningMapping (dInt32 material, dgReportProgress
 #endif
 
 
-void ndMeshEffect::CalculateNormals(dFloat64 angleInRadians)
+void ndMeshEffect::CalculateNormals(ndFloat64 angleInRadians)
 {
 	ndEdge* edgeBuffer[256];
 	ndBigVector faceNormal[256];
@@ -1652,24 +1652,24 @@ void ndMeshEffect::CalculateNormals(dFloat64 angleInRadians)
 	m_attrib.m_normalChannel.SetCount(m_attrib.m_pointChannel.GetCount());
 	m_attrib.m_normalChannel.m_isValid = true;
 
-	dInt32 mark = IncLRU();
+	ndInt32 mark = IncLRU();
 	ndPolyhedra::Iterator iter(*this);
-	dFloat32 smoothValue = dCos(angleInRadians);
+	ndFloat32 smoothValue = ndCos(angleInRadians);
 
-	ndTree<dInt32, ndEdge*> normalsMap;
+	ndTree<ndInt32, ndEdge*> normalsMap;
 	for (iter.Begin(); iter; iter++) 
 	{
 		ndEdge* const edge = &(*iter);
 		if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) 
 		{
-			dInt32 edgeIndex = 0;
+			ndInt32 edgeIndex = 0;
 			normalsMap.RemoveAll();
 			ndEdge* edgePtr = edge;
 			do 
 			{
 				ndVector normal(FaceNormal(edgePtr, &m_points.m_vertex[0].m_x, sizeof(ndBigVector)));
-				dAssert(normal.m_w == dFloat32(0.0f));
-				normal = normal.Scale(dFloat32(1.0f) / dFloat32(sqrt(normal.DotProduct(normal).GetScalar()) + dFloat32(1.0e-16f)));
+				dAssert(normal.m_w == ndFloat32(0.0f));
+				normal = normal.Scale(ndFloat32(1.0f) / ndFloat32(sqrt(normal.DotProduct(normal).GetScalar()) + ndFloat32(1.0e-16f)));
 				faceNormal[edgeIndex] = normal;
 				normalsMap.Insert(edgeIndex, edgePtr);
 				edgeIndex++;
@@ -1681,8 +1681,8 @@ void ndMeshEffect::CalculateNormals(dFloat64 angleInRadians)
 			for (ndEdge* ptr = edge->m_prev->m_twin; (ptr->m_mark != mark) && (ptr != edge) && (ptr->m_incidentFace > 0); ptr = ptr->m_prev->m_twin) 
 			{
 				const ndVector& normal1(faceNormal[normalsMap.Find(ptr)->GetInfo()]);
-				dAssert(normal0.m_w == dFloat32(0.0f));
-				dFloat32 dot = normal0.DotProduct(normal1).GetScalar();
+				dAssert(normal0.m_w == ndFloat32(0.0f));
+				ndFloat32 dot = normal0.DotProduct(normal1).GetScalar();
 				if (dot < smoothValue) 
 				{
 					break;
@@ -1691,15 +1691,15 @@ void ndMeshEffect::CalculateNormals(dFloat64 angleInRadians)
 				normal0 = normal1;
 			}
 
-			dInt32 attribCount = 1;
+			ndInt32 attribCount = 1;
 			edgeBuffer[0] = startEdge;
 			normal0 = faceNormal[normalsMap.Find(startEdge)->GetInfo()];
 			ndVector normal(normal0);
 			for (ndEdge* ptr = startEdge->m_twin->m_next; (ptr->m_mark != mark) && (ptr != startEdge) && (ptr->m_incidentFace > 0); ptr = ptr->m_twin->m_next) 
 			{
 				const ndVector& normal1(faceNormal[normalsMap.Find(ptr)->GetInfo()]);
-				dAssert(normal0.m_w == dFloat32(0.0f));
-				dFloat32 dot = normal0.DotProduct(normal1).GetScalar();
+				dAssert(normal0.m_w == ndFloat32(0.0f));
+				ndFloat32 dot = normal0.DotProduct(normal1).GetScalar();
 				if (dot < smoothValue) 
 				{
 					break;
@@ -1710,16 +1710,16 @@ void ndMeshEffect::CalculateNormals(dFloat64 angleInRadians)
 				normal0 = normal1;
 			}
 
-			dAssert(normal.m_w == dFloat32(0.0f));
-			normal = normal.Scale(dFloat32(1.0f) / dFloat32(sqrt(normal.DotProduct(normal).GetScalar()) + dFloat32(1.0e-16f)));
+			dAssert(normal.m_w == ndFloat32(0.0f));
+			normal = normal.Scale(ndFloat32(1.0f) / ndFloat32(sqrt(normal.DotProduct(normal).GetScalar()) + ndFloat32(1.0e-16f)));
 			ndTriplex n;
 			n.m_x = normal.m_x;
 			n.m_y = normal.m_y;
 			n.m_z = normal.m_z;
-			for (dInt32 i = 0; i < attribCount; i++) 
+			for (ndInt32 i = 0; i < attribCount; i++) 
 			{
 				edgeBuffer[i]->m_mark = mark;
-				dInt32 index = dInt32(edgeBuffer[i]->m_userData);
+				ndInt32 index = ndInt32(edgeBuffer[i]->m_userData);
 				m_attrib.m_normalChannel[index] = n;
 			}
 		}
@@ -1729,22 +1729,22 @@ void ndMeshEffect::CalculateNormals(dFloat64 angleInRadians)
 
 ndBigVector ndMeshEffect::GetOrigin()const
 {
-	ndBigVector origin(dFloat64(0.0f), dFloat64(0.0f), dFloat64(0.0f), dFloat64(0.0f));
-	for (dInt32 i = 0; i < m_points.m_vertex.GetCount(); i++) 
+	ndBigVector origin(ndFloat64(0.0f), ndFloat64(0.0f), ndFloat64(0.0f), ndFloat64(0.0f));
+	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); i++) 
 	{
 		origin += m_points.m_vertex[i];
 	}
-	return origin.Scale(dFloat64(1.0f) / m_points.m_vertex.GetCount());
+	return origin.Scale(ndFloat64(1.0f) / m_points.m_vertex.GetCount());
 }
 
-void ndMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const ndMatrix& uvAligment)
+void ndMeshEffect::BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const ndMatrix& uvAligment)
 {
 	ndBigVector origin(GetOrigin());
 	ndStack<ndBigVector> buffer(m_points.m_vertex.GetCount());
-	ndBigVector pMin(dFloat64(1.0e10f), dFloat64(1.0e10f), dFloat64(1.0e10f), dFloat64(0.0f));
-	ndBigVector pMax(dFloat64(-1.0e10f), dFloat64(-1.0e10f), dFloat64(-1.0e10f), dFloat64(0.0f));
+	ndBigVector pMin(ndFloat64(1.0e10f), ndFloat64(1.0e10f), ndFloat64(1.0e10f), ndFloat64(0.0f));
+	ndBigVector pMax(ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(-1.0e10f), ndFloat64(0.0f));
 
-	for (dInt32 i = 0; i < m_points.m_vertex.GetCount(); i++) 
+	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); i++) 
 	{
 		buffer[i] = uvAligment.RotateVector(m_points.m_vertex[i] - origin);
 		const ndBigVector& tmp = buffer[i];
@@ -1755,13 +1755,13 @@ void ndMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const ndMat
 		pMin.m_z = dMin(pMin.m_z, tmp.m_z);
 		pMax.m_z = dMax(pMax.m_z, tmp.m_z);
 	}
-	dInt32 materialArray[3];
+	ndInt32 materialArray[3];
 
 	ndBigVector dist(pMax);
-	dist[0] = dMax(dFloat64(1.0e-3f), dist[0]);
-	dist[1] = dMax(dFloat64(1.0e-3f), dist[1]);
-	dist[2] = dMax(dFloat64(1.0e-3f), dist[2]);
-	ndBigVector scale(dFloat64(0.5f) / dist[0], dFloat64(0.5f) / dist[1], dFloat64(0.5f) / dist[2], dFloat64(0.0f));
+	dist[0] = dMax(ndFloat64(1.0e-3f), dist[0]);
+	dist[1] = dMax(ndFloat64(1.0e-3f), dist[1]);
+	dist[2] = dMax(ndFloat64(1.0e-3f), dist[2]);
+	ndBigVector scale(ndFloat64(0.5f) / dist[0], ndFloat64(0.5f) / dist[1], ndFloat64(0.5f) / dist[2], ndFloat64(0.0f));
 
 	UnpackAttibuteData();
 	m_attrib.m_uv0Channel.SetCount(m_attrib.m_pointChannel.GetCount());
@@ -1773,7 +1773,7 @@ void ndMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const ndMat
 	materialArray[1] = side;
 	materialArray[2] = top;
 
-	dInt32 mark = IncLRU();
+	ndInt32 mark = IncLRU();
 	ndPolyhedra::Iterator iter(*this);
 	for (iter.Begin(); iter; iter++) 
 	{
@@ -1792,12 +1792,12 @@ void ndMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const ndMat
 			ndBigVector e1(p2 - p0);
 			ndBigVector n(e0.CrossProduct(e1));
 
-			dInt32 index = 0;
-			dFloat64 maxProjection = dFloat32(0.0f);
+			ndInt32 index = 0;
+			ndFloat64 maxProjection = ndFloat32(0.0f);
 
-			for (dInt32 i = 0; i < 3; i++) 
+			for (ndInt32 i = 0; i < 3; i++) 
 			{
-				dFloat64 proj = fabs(n[i]);
+				ndFloat64 proj = fabs(n[i]);
 				if (proj > maxProjection) 
 				{
 					index = i;
@@ -1805,8 +1805,8 @@ void ndMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const ndMat
 				}
 			}
 
-			dInt32 u = (index + 1) % 3;
-			dInt32 v = (u + 1) % 3;
+			ndInt32 u = (index + 1) % 3;
+			ndInt32 v = (u + 1) % 3;
 			if (index == 1) 
 			{
 				dSwap(u, v);
@@ -1815,11 +1815,11 @@ void ndMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const ndMat
 			do 
 			{
 				dAttibutFormat::dgUV uv;
-				ndBigVector p(scale * buffer[ptr->m_incidentVertex] - dFloat32(0.5f));
-				uv.m_u = dFloat32(p[u]);
-				uv.m_v = dFloat32(p[v]);
-				m_attrib.m_uv0Channel[dInt32(ptr->m_userData)] = uv;
-				m_attrib.m_materialChannel[dInt32(ptr->m_userData)] = materialArray[index];
+				ndBigVector p(scale * buffer[ptr->m_incidentVertex] - ndFloat32(0.5f));
+				uv.m_u = ndFloat32(p[u]);
+				uv.m_v = ndFloat32(p[v]);
+				m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)] = uv;
+				m_attrib.m_materialChannel[ndInt32(ptr->m_userData)] = materialArray[index];
 				ptr = ptr->m_next;
 			} while (ptr != edge);
 		}
@@ -1827,7 +1827,7 @@ void ndMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const ndMat
 	PackAttibuteData();
 }
 
-void ndMeshEffect::UniformBoxMapping(dInt32 material, const ndMatrix& textureMatrix)
+void ndMeshEffect::UniformBoxMapping(ndInt32 material, const ndMatrix& textureMatrix)
 {
 	UnpackAttibuteData();
 
@@ -1840,17 +1840,17 @@ void ndMeshEffect::UniformBoxMapping(dInt32 material, const ndMatrix& textureMat
 	m_attrib.m_uv0Channel.m_isValid = true;
 	m_attrib.m_materialChannel.m_isValid = true;
 
-	dInt32 mark = IncLRU();
-	for (dInt32 i = 0; i < 3; i++) 
+	ndInt32 mark = IncLRU();
+	for (ndInt32 i = 0; i < 3; i++) 
 	{
 		ndMatrix rotationMatrix(dGetIdentityMatrix());
 		if (i == 1) 
 		{
-			rotationMatrix = dYawMatrix(dFloat32(90.0f * dDegreeToRad));
+			rotationMatrix = dYawMatrix(ndFloat32(90.0f * ndDegreeToRad));
 		}
 		else if (i == 2) 
 		{
-			rotationMatrix = dPitchMatrix(dFloat32(90.0f * dDegreeToRad));
+			rotationMatrix = dPitchMatrix(ndFloat32(90.0f * ndDegreeToRad));
 		}
 
 		ndPolyhedra::Iterator iter(*this);
@@ -1865,7 +1865,7 @@ void ndMeshEffect::UniformBoxMapping(dInt32 material, const ndMatrix& textureMat
 				normal.m_x = dAbs(normal.m_x);
 				normal.m_y = dAbs(normal.m_y);
 				normal.m_z = dAbs(normal.m_z);
-				if ((normal.m_z >= (normal.m_x - dFloat32(1.0e-4f))) && (normal.m_z >= (normal.m_y - dFloat32(1.0e-4f)))) 
+				if ((normal.m_z >= (normal.m_x - ndFloat32(1.0e-4f))) && (normal.m_z >= (normal.m_y - ndFloat32(1.0e-4f)))) 
 				{
 					ndEdge* ptr = edge;
 					do 
@@ -1876,8 +1876,8 @@ void ndMeshEffect::UniformBoxMapping(dInt32 material, const ndMatrix& textureMat
 						ndVector p(textureMatrix.TransformVector(point));
 						uv.m_u = p.m_x;
 						uv.m_v = p.m_y;
-						m_attrib.m_uv0Channel[dInt32(ptr->m_userData)] = uv;
-						m_attrib.m_materialChannel[dInt32(ptr->m_userData)] = material;
+						m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)] = uv;
+						m_attrib.m_materialChannel[ndInt32(ptr->m_userData)] = material;
 
 						ptr = ptr->m_next;
 					} while (ptr != edge);
@@ -1889,25 +1889,25 @@ void ndMeshEffect::UniformBoxMapping(dInt32 material, const ndMatrix& textureMat
 	PackAttibuteData();
 }
 
-void ndMeshEffect::SphericalMapping(dInt32 material, const ndMatrix& uvAligment)
+void ndMeshEffect::SphericalMapping(ndInt32 material, const ndMatrix& uvAligment)
 {
 	ndBigVector origin(GetOrigin());
 	ndStack<ndBigVector>sphere(m_points.m_vertex.GetCount());
-	for (dInt32 i = 0; i < m_points.m_vertex.GetCount(); i++)
+	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); i++)
 	{
 		ndBigVector point(uvAligment.RotateVector(m_points.m_vertex[i] - origin));
-		dAssert(point.m_w == dFloat32(0.0f));
-		dAssert(point.DotProduct(point).GetScalar() > dFloat32(0.0f));
+		dAssert(point.m_w == ndFloat32(0.0f));
+		dAssert(point.DotProduct(point).GetScalar() > ndFloat32(0.0f));
 		point = point.Normalize();
 
-		dFloat64 u = dAsin(dClamp(point.m_x, dFloat64(-1.0f + 1.0e-6f), dFloat64(1.0f - 1.0e-6f)));
-		dFloat64 v = dAtan2(point.m_y, point.m_z);
+		ndFloat64 u = ndAsin(dClamp(point.m_x, ndFloat64(-1.0f + 1.0e-6f), ndFloat64(1.0f - 1.0e-6f)));
+		ndFloat64 v = ndAtan2(point.m_y, point.m_z);
 
-		u = dFloat32(1.0f) - (dFloat64(dPi / 2.0f) - u) / dFloat64(dPi);
-		dAssert(u >= dFloat32(0.0f));
-		dAssert(u <= dFloat32(1.0f));
+		u = ndFloat32(1.0f) - (ndFloat64(ndPi / 2.0f) - u) / ndFloat64(ndPi);
+		dAssert(u >= ndFloat32(0.0f));
+		dAssert(u <= ndFloat32(1.0f));
 
-		v = v + dPi;
+		v = v + ndPi;
 		sphere[i].m_x = u;
 		sphere[i].m_y = v;
 	}
@@ -1928,31 +1928,31 @@ void ndMeshEffect::SphericalMapping(dInt32 material, const ndMatrix& uvAligment)
 	{
 		ndEdge* const edge = &(*iter);
 		dAttibutFormat::dgUV uv;
-		uv.m_u = dFloat32(sphere[edge->m_incidentVertex].m_x);
-		uv.m_v = dFloat32(sphere[edge->m_incidentVertex].m_y);
-		m_attrib.m_uv0Channel[dInt32(edge->m_userData)] = uv;
-		m_attrib.m_materialChannel[dInt32(edge->m_userData)] = material;
+		uv.m_u = ndFloat32(sphere[edge->m_incidentVertex].m_x);
+		uv.m_v = ndFloat32(sphere[edge->m_incidentVertex].m_y);
+		m_attrib.m_uv0Channel[ndInt32(edge->m_userData)] = uv;
+		m_attrib.m_materialChannel[ndInt32(edge->m_userData)] = material;
 	}
 
-	dInt32 mark = IncLRU();
+	ndInt32 mark = IncLRU();
 	for (iter.Begin(); iter; iter++) 
 	{
 		ndEdge* const edge = &(*iter);
 		if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) 
 		{
-			dAttibutFormat::dgUV uvRef(m_attrib.m_uv0Channel[dInt32(edge->m_userData)]);
-			dFloat32 UVrefSin = dSin(uvRef.m_v);
-			dFloat32 UVrefCos = dCos(uvRef.m_v);
+			dAttibutFormat::dgUV uvRef(m_attrib.m_uv0Channel[ndInt32(edge->m_userData)]);
+			ndFloat32 UVrefSin = ndSin(uvRef.m_v);
+			ndFloat32 UVrefCos = ndCos(uvRef.m_v);
 			ndEdge* ptr = edge;
 			do 
 			{
 				ptr->m_mark = mark;
-				dAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[dInt32(ptr->m_userData)]);
-				dFloat32 sinAngle = UVrefCos * dSin(uv.m_v) - UVrefSin * dCos(uv.m_v);
-				dFloat32 cosAngle = UVrefCos * dCos(uv.m_v) + UVrefSin * dSin(uv.m_v);
-				dFloat32 deltaAngle = dAtan2(sinAngle, cosAngle);
-				uv.m_v = (uvRef.m_v + deltaAngle) / (dFloat32(2.0f) * dPi);
-				m_attrib.m_uv0Channel[dInt32(ptr->m_userData)] = uv;
+				dAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)]);
+				ndFloat32 sinAngle = UVrefCos * ndSin(uv.m_v) - UVrefSin * ndCos(uv.m_v);
+				ndFloat32 cosAngle = UVrefCos * ndCos(uv.m_v) + UVrefSin * ndSin(uv.m_v);
+				ndFloat32 deltaAngle = ndAtan2(sinAngle, cosAngle);
+				uv.m_v = (uvRef.m_v + deltaAngle) / (ndFloat32(2.0f) * ndPi);
+				m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)] = uv;
 				ptr = ptr->m_next;
 			} while (ptr != edge);
 		}

@@ -38,9 +38,9 @@ class ndAdjacentdFace
 {
 	public:
 	ndPlane m_normal;
-	dInt32 m_count;
-	dInt32 *m_index;
-	dInt64 m_edgeMap[256];
+	ndInt32 m_count;
+	ndInt32 *m_index;
+	ndInt64 m_edgeMap[256];
 };
 
 class ndPolygonSoupBuilder: public ndClassAlloc 
@@ -57,19 +57,19 @@ class ndPolygonSoupBuilder: public ndClassAlloc
 
 	D_CORE_API void Begin();
 	D_CORE_API void End(bool optimize);
-	D_CORE_API void AddFace(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 vertexCount, const dInt32 faceId);
-	D_CORE_API void AddFaceIndirect(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 faceId, const dInt32* const indexArray, dInt32 indexCount);
+	D_CORE_API void AddFace(const ndFloat32* const vertex, ndInt32 strideInBytes, ndInt32 vertexCount, const ndInt32 faceId);
+	D_CORE_API void AddFaceIndirect(const ndFloat32* const vertex, ndInt32 strideInBytes, ndInt32 faceId, const ndInt32* const indexArray, ndInt32 indexCount);
 
 	D_CORE_API void SavePLY(const char* const fileName) const;
 
 	private:
-	void Optimize(dInt32 faceId, const dgFaceBucket& faceBucket, const ndPolygonSoupBuilder& source);
+	void Optimize(ndInt32 faceId, const dgFaceBucket& faceBucket, const ndPolygonSoupBuilder& source);
 
 	void Finalize();
 	void OptimizeByIndividualFaces();
-	void FinalizeAndOptimize(dInt32 id);
-	dInt32 FilterFace (dInt32 count, dInt32* const indexArray);
-	dInt32 AddConvexFace (dInt32 count, dInt32* const indexArray, dInt32* const  facesArray);
+	void FinalizeAndOptimize(ndInt32 id);
+	ndInt32 FilterFace (ndInt32 count, ndInt32* const indexArray);
+	ndInt32 AddConvexFace (ndInt32 count, ndInt32* const indexArray, ndInt32* const  facesArray);
 	void PackArray();
 
 	public:
@@ -81,22 +81,22 @@ class ndPolygonSoupBuilder: public ndClassAlloc
 		{
 		}
 
-		ndVertexArray(dInt32 count)
+		ndVertexArray(ndInt32 count)
 			:ndArray<ndBigVector>(count)
 		{
 		}
 	};
 
-	class ndIndexArray: public ndArray<dInt32>
+	class ndIndexArray: public ndArray<ndInt32>
 	{
 		public:
 		ndIndexArray()
-			:ndArray<dInt32>()
+			:ndArray<ndInt32>()
 		{
 		}
 
-		ndIndexArray(dInt32 count)
-			:ndArray<dInt32>(count)
+		ndIndexArray(ndInt32 count)
+			:ndArray<ndInt32>(count)
 		{
 		}
 	};
@@ -106,7 +106,7 @@ class ndPolygonSoupBuilder: public ndClassAlloc
 	ndIndexArray m_normalIndex;
 	ndVertexArray m_vertexPoints;
 	ndVertexArray m_normalPoints;
-	dInt32 m_run;
+	ndInt32 m_run;
 };
 
 #endif

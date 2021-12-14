@@ -20,7 +20,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 
-static glVector3 CalculatePoint(const ndMatrix& matrix, const ndVector& center, dFloat32 x, dFloat32 y, dFloat32 w)
+static glVector3 CalculatePoint(const ndMatrix& matrix, const ndVector& center, ndFloat32 x, ndFloat32 y, ndFloat32 w)
 {
 	ndVector point(center.m_x + x, center.m_y + y, center.m_z, center.m_w);
 	point = matrix.TransformVector1x4(point.Scale(w));
@@ -87,8 +87,8 @@ void RenderBodiesAABB(ndDemoEntityManager* const scene)
 
 	glUseProgram(shader);
 
-	dInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
-	dInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+	ndInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	ndInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
 
 	glUniform4fv(shadeColorLocation, 1, &color.m_x);
 	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
@@ -121,8 +121,8 @@ void RenderWorldScene(ndDemoEntityManager* const scene)
 
 	glUseProgram(shader);
 
-	dInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
-	dInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+	ndInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	ndInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
 
 	glUniform4fv(shadeColorLocation, 1, &color[0]);
 	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
@@ -168,15 +168,15 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 
 	glUseProgram(shader);
 
-	dInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
-	dInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+	ndInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	ndInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
 	glUniform4fv(shadeColorLocation, 1, &color[0]);
 	const glMatrix viewProjMatrix(viewProjectionMatrix);
 	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjMatrix[0][0]);
 
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	dFloat32 pizelSize = 8.0f / viewport[2];
+	ndFloat32 pizelSize = 8.0f / viewport[2];
 
 	glVector3 pointBuffer[4];
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -192,7 +192,7 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 			{
 				const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
 				ndVector point(viewProjectionMatrix.TransformVector1x4(contactPoint.m_point));
-				dFloat32 zDist = point.m_w;
+				ndFloat32 zDist = point.m_w;
 				point = point.Scale(1.0f / zDist);
 
 				pointBuffer[0] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, pizelSize, zDist);
@@ -218,8 +218,8 @@ void RenderBodyFrame(ndDemoEntityManager* const scene)
 
 	glUseProgram(shader);
 
-	dInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
-	dInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+	ndInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	ndInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
 	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
 
 	glVector3 line[2];
@@ -275,8 +275,8 @@ void RenderCenterOfMass(ndDemoEntityManager* const scene)
 	
 	glUseProgram(shader);
 
-	dInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
-	dInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+	ndInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	ndInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
 	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
 
 	glVector3 line[2];
@@ -342,8 +342,8 @@ void RenderParticles(ndDemoEntityManager* const scene)
 
 	glUseProgram(shader);
 
-	dInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
-	dInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+	ndInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	ndInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
 
 	glUniform4fv(shadeColorLocation, 1, &color.m_x);
 	const glMatrix viewProjMatrix(viewProjectionMatrix);
@@ -351,7 +351,7 @@ void RenderParticles(ndDemoEntityManager* const scene)
 
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	dFloat32 pizelSize = 8.0f / viewport[2];
+	ndFloat32 pizelSize = 8.0f / viewport[2];
 
 	glVector3 pointBuffer[4];
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -362,12 +362,12 @@ void RenderParticles(ndDemoEntityManager* const scene)
 	{
 		ndBodyParticleSet* const particle = particleNode->GetInfo();
 		const ndArray<ndVector>& positions = particle->GetPositions();
-		for (dInt32 i = 0; i < positions.GetCount(); i ++)
+		for (ndInt32 i = 0; i < positions.GetCount(); i ++)
 		{
 			ndVector particlePosit(positions[i]);
 			particlePosit.m_w = 1.0f;
 			ndVector point(viewProjectionMatrix.TransformVector1x4(particlePosit));
-			dFloat32 zDist = point.m_w;
+			ndFloat32 zDist = point.m_w;
 			point = point.Scale(1.0f / zDist);
 
 			pointBuffer[0] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, pizelSize, zDist);
@@ -409,7 +409,7 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 			glUseProgram(0);
 		}
 
-		void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, dFloat32 thickness)
+		void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32 thickness)
 		{
 			m_line[0].m_x = GLfloat(p0.m_x);
 			m_line[0].m_y = GLfloat(p0.m_y);
@@ -426,8 +426,8 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 		}
 
 		GLuint m_shader;
-		dInt32 m_shadeColorLocation;
-		dInt32 m_projectionViewModelMatrixLocation;
+		ndInt32 m_shadeColorLocation;
+		ndInt32 m_projectionViewModelMatrixLocation;
 
 		glVector3 m_line[2];
 	};
@@ -470,7 +470,7 @@ void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 			glUseProgram(0);
 		}
 		
-		void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, dFloat32 thickness)
+		void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32 thickness)
 		{
 			m_line[0].m_x = GLfloat(p0.m_x);
 			m_line[0].m_y = GLfloat(p0.m_y);
@@ -487,8 +487,8 @@ void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
 		}
 
 		GLuint m_shader;
-		dInt32 m_shadeColorLocation;
-		dInt32 m_projectionViewModelMatrixLocation;
+		ndInt32 m_shadeColorLocation;
+		ndInt32 m_projectionViewModelMatrixLocation;
 
 		glVector3 m_line[2];
 	};

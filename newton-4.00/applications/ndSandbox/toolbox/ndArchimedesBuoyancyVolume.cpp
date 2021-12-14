@@ -42,7 +42,7 @@ void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)
 		{
 		}
 
-		dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
+		ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
 		{
 			return ((ndBody*)body)->GetAsBodyTriggerVolume() ? 1 : 0;
 		}
@@ -60,17 +60,17 @@ void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)
 	m_hasPlane = body->GetScene()->RayCast(rayCaster, p0, p1);
 	if (m_hasPlane)
 	{ 
-		dFloat32 dist = -rayCaster.m_contact.m_normal.DotProduct(rayCaster.m_contact.m_point).GetScalar();
+		ndFloat32 dist = -rayCaster.m_contact.m_normal.DotProduct(rayCaster.m_contact.m_point).GetScalar();
 		m_plane = ndPlane(rayCaster.m_contact.m_normal, dist);
 	}
 }
 
-void ndArchimedesBuoyancyVolume::OnTriggerEnter(ndBodyKinematic* const body, dFloat32)
+void ndArchimedesBuoyancyVolume::OnTriggerEnter(ndBodyKinematic* const body, ndFloat32)
 {
 	CalculatePlane(body);
 }
 	
-void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, dFloat32)
+void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, ndFloat32)
 {
 	ndBodyDynamic* const body = kinBody->GetAsBodyDynamic();
 	if (!m_hasPlane)
@@ -85,26 +85,26 @@ void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, dFloa
 		ndMatrix matrix (body->GetMatrix());
 		ndShapeInstance& collision = body->GetCollisionShape();
 
-		dFloat32 volume = collision.CalculateBuoyancyCenterOfPresure (centerOfPreasure, matrix, m_plane);
+		ndFloat32 volume = collision.CalculateBuoyancyCenterOfPresure (centerOfPreasure, matrix, m_plane);
 		if (volume > 0.0f)
 		{
 			// if some part of the shape si under water, calculate the buoyancy force base on 
 			// Archimedes's buoyancy principle, which is the buoyancy force is equal to the 
 			// weight of the fluid displaced by the volume under water. 
 			//ndVector cog(ndVector::m_zero);
-			const dFloat32 viscousDrag = 0.99f;
+			const ndFloat32 viscousDrag = 0.99f;
 
 			ndShapeMaterial material(collision.GetMaterial());
 			body->GetCollisionShape().SetMaterial(material);
-			dFloat32 density = material.m_userParam[0].m_floatData;
-			dFloat32 desplacedVolume = density * collision.GetVolume();
+			ndFloat32 density = material.m_userParam[0].m_floatData;
+			ndFloat32 desplacedVolume = density * collision.GetVolume();
 				
-			dFloat32 displacedMass = mass.m_w * volume / desplacedVolume;
+			ndFloat32 displacedMass = mass.m_w * volume / desplacedVolume;
 			ndVector cog(body->GetCentreOfMass());
 			centerOfPreasure -= matrix.TransformVector(cog);
 				
 			// now with the mass and center of mass of the volume under water, calculate buoyancy force and torque
-			ndVector force(dFloat32(0.0f), dFloat32(-DEMO_GRAVITY * displacedMass), dFloat32(0.0f), dFloat32(0.0f));
+			ndVector force(ndFloat32(0.0f), ndFloat32(-DEMO_GRAVITY * displacedMass), ndFloat32(0.0f), ndFloat32(0.0f));
 			ndVector torque(centerOfPreasure.CrossProduct(force));
 				
 			body->SetForce(body->GetForce() + force);
@@ -129,7 +129,7 @@ void ndArchimedesBuoyancyVolume::OnTrigger(ndBodyKinematic* const kinBody, dFloa
 	}
 }
 
-void ndArchimedesBuoyancyVolume::OnTriggerExit(ndBodyKinematic* const, dFloat32)
+void ndArchimedesBuoyancyVolume::OnTriggerExit(ndBodyKinematic* const, ndFloat32)
 {
 	//dTrace(("exit trigger body: %d\n", body->GetId()));
 }

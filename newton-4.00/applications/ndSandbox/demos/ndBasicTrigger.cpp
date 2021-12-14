@@ -52,7 +52,7 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	geometry->Release();
 }
 
-static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 density, dFloat32 mass)
+static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 density, ndFloat32 mass)
 {
 	ndBodyKinematic* const body = AddBox(scene, origin, mass, 1.0f, 1.0f, 1.0f);
 	ndShapeMaterial material;
@@ -60,7 +60,7 @@ static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, dFl
 	body->GetCollisionShape().SetMaterial(material);
 }
 
-static void AddSphere1(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 density, dFloat32 mass)
+static void AddSphere1(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 density, ndFloat32 mass)
 {
 	ndBodyKinematic* const body = AddSphere(scene, origin, mass, 0.5f);
 	ndShapeMaterial material;
@@ -68,7 +68,7 @@ static void AddSphere1(ndDemoEntityManager* const scene, const ndVector& origin,
 	body->GetCollisionShape().SetMaterial(material);
 }
 
-static void AddCapsule(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 density, dFloat32 mass)
+static void AddCapsule(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 density, ndFloat32 mass)
 {
 	ndBodyKinematic* const body = AddCapsule(scene, origin, mass, 0.5f, 0.5f, 1.0f);
 	ndShapeMaterial material;
@@ -76,7 +76,7 @@ static void AddCapsule(ndDemoEntityManager* const scene, const ndVector& origin,
 	body->GetCollisionShape().SetMaterial(material);
 }
 
-static void AddConvexHull(ndDemoEntityManager* const scene, const ndVector& origin, const dInt32 segments, dFloat32 radius, dFloat32 high, dFloat32 density, dFloat32 mass)
+static void AddConvexHull(ndDemoEntityManager* const scene, const ndVector& origin, const ndInt32 segments, ndFloat32 radius, ndFloat32 high, ndFloat32 density, ndFloat32 mass)
 {
 	ndBodyKinematic* const body = AddConvexHull(scene, origin, mass, radius, high, segments);
 	ndShapeMaterial material;

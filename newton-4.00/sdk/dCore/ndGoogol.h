@@ -40,7 +40,7 @@ class ndGoogol
 	D_OPERATOR_NEW_AND_DELETE
 
 	ndGoogol(void);
-	ndGoogol(dFloat64 value);
+	ndGoogol(ndFloat64 value);
 
 	operator double() const;	
 	ndGoogol operator+ (const ndGoogol &A) const; 
@@ -67,20 +67,20 @@ class ndGoogol
 	void ToString (char* const string) const;
 
 	private:
-	void InitFloatFloat (dFloat64 value);
-	void NegateMantissa (dUnsigned64* const mantissa) const;
-	void CopySignedMantissa (dUnsigned64* const mantissa) const;
-	dInt32 NormalizeMantissa (dUnsigned64* const mantissa) const;
-	dUnsigned64 CheckCarrier (dUnsigned64 a, dUnsigned64 b) const;
-	void ShiftRightMantissa (dUnsigned64* const mantissa, dInt32 bits) const;
+	void InitFloatFloat (ndFloat64 value);
+	void NegateMantissa (ndUnsigned64* const mantissa) const;
+	void CopySignedMantissa (ndUnsigned64* const mantissa) const;
+	ndInt32 NormalizeMantissa (ndUnsigned64* const mantissa) const;
+	ndUnsigned64 CheckCarrier (ndUnsigned64 a, ndUnsigned64 b) const;
+	void ShiftRightMantissa (ndUnsigned64* const mantissa, ndInt32 bits) const;
 
-	dInt32 LeadingZeros (dUnsigned64 a) const;
-	void ExtendeMultiply (dUnsigned64 a, dUnsigned64 b, dUnsigned64& high, dUnsigned64& low) const;
-	void ScaleMantissa (dUnsigned64* const out, dUnsigned64 scale) const;
+	ndInt32 LeadingZeros (ndUnsigned64 a) const;
+	void ExtendeMultiply (ndUnsigned64 a, ndUnsigned64 b, ndUnsigned64& high, ndUnsigned64& low) const;
+	void ScaleMantissa (ndUnsigned64* const out, ndUnsigned64 scale) const;
 
-	dInt32 m_sign;
-	dInt32 m_exponent;
-	dUnsigned64 m_mantissa[ND_GOOGOL_SIZE];
+	ndInt32 m_sign;
+	ndInt32 m_exponent;
+	ndUnsigned64 m_mantissa[ND_GOOGOL_SIZE];
 
 	public:
 	D_CORE_API static ndGoogol m_zero; 
@@ -108,7 +108,7 @@ class ndHugeVector: public ndTemplateVector<ndGoogol>
 	{
 	}
 
-	ndHugeVector (dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w)
+	ndHugeVector (ndFloat64 x, ndFloat64 y, ndFloat64 z, ndFloat64 w)
 		:ndTemplateVector<ndGoogol>(x, y, z, w)
 	{
 	}

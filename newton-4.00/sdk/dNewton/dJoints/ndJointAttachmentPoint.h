@@ -42,12 +42,12 @@ class ndJointAttachmentPoint: public ndJointBilateralConstraint
 
 	union ndLockedDOF
 	{
-		dInt32 m_lockDof;
+		ndInt32 m_lockDof;
 		struct
 		{
-			dInt32 m_lock_x : 1;
-			dInt32 m_lock_y : 1;
-			dInt32 m_lock_z : 1;
+			ndInt32 m_lock_x : 1;
+			ndInt32 m_lock_y : 1;
+			ndInt32 m_lock_z : 1;
 		};
 	};
 	

@@ -28,7 +28,7 @@
 #include "ndContactList.h"
 
 #define D_SCENE_MAX_STACK_DEPTH	256
-#define D_PRUNE_CONTACT_TOLERANCE		dFloat32 (5.0e-2f)
+#define D_PRUNE_CONTACT_TOLERANCE		ndFloat32 (5.0e-2f)
 
 class ndWorld;
 class ndScene;
@@ -63,7 +63,7 @@ class ndScene : public ndThreadPool
 	{
 		public:
 		ndScene* m_owner;
-		dFloat32 m_timestep;
+		ndFloat32 m_timestep;
 		void* m_context;
 	};
 
@@ -73,14 +73,14 @@ class ndScene : public ndThreadPool
 	{
 		public:
 		ndFitnessList();
-		dFloat64 TotalCost() const;
+		ndFloat64 TotalCost() const;
 
 		void AddNode(ndSceneTreeNode* const node);
 		void RemoveNode(ndSceneTreeNode* const node);
 		
-		dFloat64 m_currentCost;
+		ndFloat64 m_currentCost;
 		ndNode* m_currentNode;
-		dInt32 m_index;
+		ndInt32 m_index;
 	};
 
 	public:
@@ -88,7 +88,7 @@ class ndScene : public ndThreadPool
 
 	void Sync();
 
-	dInt32 GetThreadCount() const;
+	ndInt32 GetThreadCount() const;
 	virtual ndWorld* GetWorld() const;
 	const ndBodyList& GetBodyList() const;
 
@@ -101,17 +101,17 @@ class ndScene : public ndThreadPool
 	template <class T> 
 	void SubmitJobs(void* const context = nullptr);
 
-	template <class T, dInt32 bits, class dEvaluateKey, class dKey = dUnsigned32>
-	void CountingSort(T* const array, T* const scratchBuffer, dInt32 elements, dInt32 digitLocation);
+	template <class T, ndInt32 bits, class dEvaluateKey, class dKey = ndUnsigned32>
+	void CountingSort(T* const array, T* const scratchBuffer, ndInt32 elements, ndInt32 digitLocation);
 
-	dFloat32 GetTimestep() const;
-	void SetTimestep(dFloat32 timestep);
+	ndFloat32 GetTimestep() const;
+	void SetTimestep(ndFloat32 timestep);
 
 	D_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
 	D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
 
 	D_COLLISION_API virtual void Cleanup();
-	D_COLLISION_API void Update(dFloat32 timestep);
+	D_COLLISION_API void Update(ndFloat32 timestep);
 
 	D_COLLISION_API ndContactNotify* GetContactNotify() const;
 	D_COLLISION_API void SetContactNotify(ndContactNotify* const notify);
@@ -124,7 +124,7 @@ class ndScene : public ndThreadPool
 
 	private:
 	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
-	dFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, ndVector& minBox, ndVector& maxBox) const;
+	ndFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, ndVector& minBox, ndVector& maxBox) const;
 
 	D_COLLISION_API virtual void FindCollidingPairs(ndBodyKinematic* const body);
 	D_COLLISION_API virtual void FindCollidingPairsForward(ndBodyKinematic* const body);
@@ -132,19 +132,19 @@ class ndScene : public ndThreadPool
 	void AddNode(ndSceneNode* const newNode);
 	void RemoveNode(ndSceneNode* const newNode);
 
-	D_COLLISION_API virtual void UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body);
-	D_COLLISION_API virtual void UpdateTransformNotify(dInt32 threadIndex, ndBodyKinematic* const body);
-	D_COLLISION_API virtual void CalculateContacts(dInt32 threadIndex, ndContact* const contact);
+	D_COLLISION_API virtual void UpdateAabb(ndInt32 threadIndex, ndBodyKinematic* const body);
+	D_COLLISION_API virtual void UpdateTransformNotify(ndInt32 threadIndex, ndBodyKinematic* const body);
+	D_COLLISION_API virtual void CalculateContacts(ndInt32 threadIndex, ndContact* const contact);
 
-	void CalculateJointContacts(dInt32 threadIndex, ndContact* const contact);
-	void ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContactSolver* const contactSolver);
+	void CalculateJointContacts(ndInt32 threadIndex, ndContact* const contact);
+	void ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndContactSolver* const contactSolver);
 
 	void RotateLeft(ndSceneTreeNode* const node, ndSceneNode** const root);
 	void RotateRight(ndSceneTreeNode* const node, ndSceneNode** const root);
-	dFloat64 ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const root);
+	ndFloat64 ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const root);
 	void ImproveNodeFitness(ndSceneTreeNode* const node, ndSceneNode** const root);
-	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::ndNode** const nextNode);
-	ndSceneNode* BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::ndNode** const nextNode);
+	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode);
+	ndSceneNode* BuildTopDownBig(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode);
 
 	D_COLLISION_API void CollisionOnlyUpdate();
 	const ndContactList& GetContactList() const;
@@ -153,14 +153,14 @@ class ndScene : public ndThreadPool
 	ndContact* FindContactJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 
-	void UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndSceneNode** const root);
+	void UpdateFitness(ndFitnessList& fitness, ndFloat64& oldEntropy, ndSceneNode** const root);
 	void AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 	bool TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const;
 	void SubmitPairs(ndSceneNode* const leaftNode, ndSceneNode* const node);
 
-	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, dInt32 stack) const;
-	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const ndFastRay& ray) const;
-	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
+	void BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** stackPool, ndInt32 stack) const;
+	bool RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray) const;
+	bool ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const distance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 
 	protected:
 	D_COLLISION_API ndScene();
@@ -184,10 +184,10 @@ class ndScene : public ndThreadPool
 	ndSpinLock m_contactLock;
 	ndSceneNode* m_rootNode;
 	ndContactNotify* m_contactNotifyCallback;
-	dFloat64 m_treeEntropy;
+	ndFloat64 m_treeEntropy;
 	ndFitnessList m_fitness;
-	dFloat32 m_timestep;
-	dUnsigned32 m_lru;
+	ndFloat32 m_timestep;
+	ndUnsigned32 m_lru;
 
 	static ndVector m_velocTol;
 	static ndVector m_linearContactError2;
@@ -209,7 +209,7 @@ inline ndWorld* ndScene::GetWorld() const
 	return nullptr;
 }
 
-inline dInt32 ndScene::GetThreadCount() const
+inline ndInt32 ndScene::GetThreadCount() const
 {
 	const ndThreadPool& pool = *this;
 	return pool.GetCount();
@@ -251,8 +251,8 @@ void ndScene::SubmitJobs(void* const context)
 	T extJob[D_MAX_THREADS_COUNT];
 	ndThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
 
-	const dInt32 threadCount = GetThreadCount();
-	for (dInt32 i = 0; i < threadCount; i++)
+	const ndInt32 threadCount = GetThreadCount();
+	for (ndInt32 i = 0; i < threadCount; i++)
 	{
 		extJob[i].m_owner = this;
 		extJob[i].m_context = context;
@@ -262,17 +262,17 @@ void ndScene::SubmitJobs(void* const context)
 	ExecuteJobs(extJobPtr);
 }
 
-inline dFloat32 ndScene::GetTimestep() const
+inline ndFloat32 ndScene::GetTimestep() const
 {
 	return m_timestep;
 }
 
-inline void ndScene::SetTimestep(dFloat32 timestep)
+inline void ndScene::SetTimestep(ndFloat32 timestep)
 {
 	m_timestep = timestep;
 }
 
-inline dFloat32 ndScene::CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, ndVector& minBox, ndVector& maxBox) const
+inline ndFloat32 ndScene::CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, ndVector& minBox, ndVector& maxBox) const
 {
 	minBox = node0->m_minBox.GetMin(node1->m_minBox);
 	maxBox = node0->m_maxBox.GetMax(node1->m_maxBox);
@@ -280,17 +280,17 @@ inline dFloat32 ndScene::CalculateSurfaceArea(const ndSceneNode* const node0, co
 	return side0.DotProduct(side0.ShiftTripleRight()).GetScalar();
 }
 
-template <class T, dInt32 bits, class dEvaluateKey, class dKey>
-void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elementsCount, dInt32 digitLocation)
+template <class T, ndInt32 bits, class dEvaluateKey, class dKey>
+void ndScene::CountingSort(T* const array, T* const scratchBuffer, ndInt32 elementsCount, ndInt32 digitLocation)
 {
 	class ndInfo
 	{
 		public:
 		T* m_sourceBuffer;
 		T* m_scratchBuffer;
-		dInt32 m_elementCount;
-		dInt32 m_digitNumber;
-		dInt32 m_digitScan[D_MAX_THREADS_COUNT][1 << bits];
+		ndInt32 m_elementCount;
+		ndInt32 m_digitNumber;
+		ndInt32 m_digitScan[D_MAX_THREADS_COUNT][1 << bits];
 	};
 
 	class ndScanDigit : public ndBaseJob
@@ -304,27 +304,27 @@ void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elemen
 		{
 			D_TRACKTIME();
 			ndInfo& info = *((ndInfo*)m_context);
-			const dInt32 threadIndex = GetThreadId();
-			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 stride = info.m_elementCount / threadCount;
-			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : info.m_elementCount - start;
+			const ndInt32 threadIndex = GetThreadId();
+			const ndInt32 threadCount = m_owner->GetThreadCount();
+			const ndInt32 stride = info.m_elementCount / threadCount;
+			const ndInt32 start = threadIndex * stride;
+			const ndInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : info.m_elementCount - start;
 			
-			const dInt32 digitCount = 1 << bits;
+			const ndInt32 digitCount = 1 << bits;
 			const dKey digitMask = digitCount - 1;
-			const dInt32 shiftBits = info.m_digitNumber * bits;
+			const ndInt32 shiftBits = info.m_digitNumber * bits;
 
-			dInt32* const digitBuffer = &info.m_digitScan[threadIndex][0];
-			memset(digitBuffer, 0, digitCount * sizeof(dInt32));
+			ndInt32* const digitBuffer = &info.m_digitScan[threadIndex][0];
+			memset(digitBuffer, 0, digitCount * sizeof(ndInt32));
 						
 			const dEvaluateKey evaluator;
-			for (dInt32 i = 0; i < blockSize; i++)
+			for (ndInt32 i = 0; i < blockSize; i++)
 			{
 				const T data(info.m_sourceBuffer[i + start]);
 				info.m_scratchBuffer[i + start] = data;
 
 				const dKey key = evaluator.GetKey(data);
-				const dInt32 entry = dInt32 ((key >> shiftBits) & digitMask);
+				const ndInt32 entry = ndInt32 ((key >> shiftBits) & digitMask);
 				digitBuffer[entry] ++;
 			}
 		}
@@ -341,24 +341,24 @@ void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elemen
 		{
 			D_TRACKTIME();
 			ndInfo& info = *((ndInfo*)m_context);
-			const dInt32 threadIndex = GetThreadId();
-			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 stride = info.m_elementCount / threadCount;
-			const dInt32 start = threadIndex * stride;
-			const dInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : info.m_elementCount - start;
+			const ndInt32 threadIndex = GetThreadId();
+			const ndInt32 threadCount = m_owner->GetThreadCount();
+			const ndInt32 stride = info.m_elementCount / threadCount;
+			const ndInt32 start = threadIndex * stride;
+			const ndInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : info.m_elementCount - start;
 
-			const dInt32 digitCount = 1 << bits;
+			const ndInt32 digitCount = 1 << bits;
 			const dKey digitMask = digitCount - 1;
-			const dInt32 shiftBits = info.m_digitNumber * bits;
-			dInt32* const digitBuffer = &info.m_digitScan[threadIndex][0];
+			const ndInt32 shiftBits = info.m_digitNumber * bits;
+			ndInt32* const digitBuffer = &info.m_digitScan[threadIndex][0];
 
 			const dEvaluateKey evaluator;
-			for (dInt32 i = 0; i < blockSize; i++)
+			for (ndInt32 i = 0; i < blockSize; i++)
 			{
 				const T data(info.m_scratchBuffer[i + start]);
 				const dKey key = evaluator.GetKey(data);
-				const dInt32 digitEntry = dInt32((key >> shiftBits) & digitMask);
-				const dInt32 dstIndex = digitBuffer[digitEntry];
+				const ndInt32 digitEntry = ndInt32((key >> shiftBits) & digitMask);
+				const ndInt32 dstIndex = digitBuffer[digitEntry];
 				info.m_sourceBuffer[dstIndex] = data;
 				digitBuffer[digitEntry] ++;
 			}
@@ -371,16 +371,16 @@ void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elemen
 	info.m_elementCount = elementsCount;
 	info.m_digitNumber = digitLocation;
 
-	const dInt32 threadCount = GetThreadCount();
+	const ndInt32 threadCount = GetThreadCount();
 	SubmitJobs<ndScanDigit>(&info);
 
-	dInt32 sum = 0;
-	const dInt32 scanSize = 1 << bits;
-	for (dInt32 j = 0; j < scanSize; j++)
+	ndInt32 sum = 0;
+	const ndInt32 scanSize = 1 << bits;
+	for (ndInt32 j = 0; j < scanSize; j++)
 	{
-		for (dInt32 i = 0; i < threadCount; i++)
+		for (ndInt32 i = 0; i < threadCount; i++)
 		{
-			const dInt32 count = info.m_digitScan[i][j];
+			const ndInt32 count = info.m_digitScan[i][j];
 			info.m_digitScan[i][j] = sum;
 			sum += count;
 		}
@@ -389,17 +389,17 @@ void ndScene::CountingSort(T* const array, T* const scratchBuffer, dInt32 elemen
 	SubmitJobs<ndSortBuffer>(&info);
 
 	#ifdef _DEBUG
-		const dInt32 digitCount = 1 << bits;
+		const ndInt32 digitCount = 1 << bits;
 		const dKey digitMask = digitCount - 1;
-		const dInt32 shiftBits = info.m_digitNumber * bits;
+		const ndInt32 shiftBits = info.m_digitNumber * bits;
 
 		const dEvaluateKey evaluator;
-		for (dInt32 i = elementsCount - 1; i; i--)
+		for (ndInt32 i = elementsCount - 1; i; i--)
 		{
 			const dKey key0 = evaluator.GetKey(array[i - 1]);
 			const dKey key1 = evaluator.GetKey(array[i - 0]);
-			const dInt32 digitEntry0 = dInt32((key0 >> shiftBits) & digitMask);
-			const dInt32 digitEntry1 = dInt32((key1 >> shiftBits) & digitMask);
+			const ndInt32 digitEntry0 = ndInt32((key0 >> shiftBits) & digitMask);
+			const ndInt32 digitEntry1 = ndInt32((key1 >> shiftBits) & digitMask);
 			dAssert(digitEntry0 <= digitEntry1);
 		}
 	#endif

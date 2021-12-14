@@ -23,7 +23,7 @@ class ndTextureEntry: public ndRefCounter<ndTextureEntry>
 	ndString m_textureName;
 };
 
-class ndTextureCache: public ndTree<ndTextureEntry, dUnsigned64>
+class ndTextureCache: public ndTree<ndTextureEntry, ndUnsigned64>
 {
 	public: 
 	GLuint GetTexture(const char* const texName)
@@ -34,11 +34,11 @@ class ndTextureCache: public ndTree<ndTextureEntry, dUnsigned64>
 		//ndTextureEntry entry;
 		//entry.m_textureName = texName;
 		//entry.m_textureName.ToLower();
-		//dUnsigned64 crc = dCRC64 (entry.m_textureName.GetStr());
+		//ndUnsigned64 crc = dCRC64 (entry.m_textureName.GetStr());
 		char name[256];
 		strcpy(name, texName);
 		_strlwr(name);
-		dUnsigned64 crc = dCRC64(name);
+		ndUnsigned64 crc = dCRC64(name);
 
 		ndNode* node = Find(crc);
 		if (node) 
@@ -55,7 +55,7 @@ class ndTextureCache: public ndTree<ndTextureEntry, dUnsigned64>
 		entry.m_textureID = id;
 		entry.m_textureName = texName;
 		entry.m_textureName.ToLower();
-		dUnsigned64 crc = dCRC64 (entry.m_textureName.GetStr());
+		ndUnsigned64 crc = dCRC64 (entry.m_textureName.GetStr());
 		Insert(entry, crc);
 	}
 
@@ -108,7 +108,7 @@ class ndTextureCache: public ndTree<ndTextureEntry, dUnsigned64>
 };
 
 
-static GLuint LoadTargaImage(const char* const cacheName, const char* const buffer, dInt32 width, dInt32 hight, TextureImageFormat format)
+static GLuint LoadTargaImage(const char* const cacheName, const char* const buffer, ndInt32 width, ndInt32 hight, TextureImageFormat format)
 {
 	// Get width, height, and depth of texture
 	GLint iWidth = width;
@@ -223,8 +223,8 @@ GLuint LoadTexture(const char* const filename)
 		tgaHeader.height = SWAP_INT16(tgaHeader.height);
 
 		// Get width, height, and depth of texture
-		dInt32 width = tgaHeader.width;
-		dInt32 height = tgaHeader.height;
+		ndInt32 width = tgaHeader.width;
+		ndInt32 height = tgaHeader.height;
 		short sDepth = tgaHeader.bits / 8;
 		dAssert ((sDepth == 3) || (sDepth == 4));
 
@@ -240,7 +240,7 @@ GLuint LoadTexture(const char* const filename)
 		unsigned lImageSize = width * height * sDepth;
 
 		// Allocate memory and check for success
-		char* const pBits = (char*)ndMemory::Malloc (width * height * sizeof (dInt32));
+		char* const pBits = (char*)ndMemory::Malloc (width * height * sizeof (ndInt32));
 		if(pBits == nullptr) 
 		{
 			fclose(pFile);
@@ -250,7 +250,7 @@ GLuint LoadTexture(const char* const filename)
 		// Read in the bits
 		// Check for read error. This should catch RLE or other 
 		// weird formats that I don't want to recognize
-		dInt32 readret = dInt32 (fread(pBits, lImageSize, 1, pFile));
+		ndInt32 readret = ndInt32 (fread(pBits, lImageSize, 1, pFile));
 		if(readret != 1)  
 		{
 			fclose(pFile);

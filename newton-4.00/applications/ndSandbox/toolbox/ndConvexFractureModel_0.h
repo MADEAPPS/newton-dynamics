@@ -37,16 +37,16 @@ class ndConvexFracture : public ndClassAlloc
 
 	void AddEffect(ndDemoEntityManager* const scene, const ndMatrix& location);
 
-	void ExplodeLocation(ndBodyDynamic* const body, const ndMatrix& location, dFloat32 factor) const;
+	void ExplodeLocation(ndBodyDynamic* const body, const ndMatrix& location, ndFloat32 factor) const;
 
 	ndMatrix m_textureMatrix;
 	ndArray<ndVector> m_pointCloud;
 	ndMeshEffect* m_singleManifoldMesh;
 	const char* m_innerTexture;
-	dFloat32 m_tileFactor;
-	dFloat32 m_mass;
-	dFloat32 m_breakImpactSpeed;
-	dInt32 m_interiorMaterialIndex;
+	ndFloat32 m_tileFactor;
+	ndFloat32 m_mass;
+	ndFloat32 m_breakImpactSpeed;
+	ndInt32 m_interiorMaterialIndex;
 
 	private:
 	ndDemoDebrisRootEntity* m_debriRootEnt;

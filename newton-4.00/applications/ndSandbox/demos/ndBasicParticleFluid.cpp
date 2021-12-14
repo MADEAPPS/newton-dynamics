@@ -42,7 +42,7 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 		m_hasTransparency = true;
 	}
 
-	void UpdateBuffers(const ndArray<glPositionNormalUV>& points, const ndArray<dInt32>& indexList)
+	void UpdateBuffers(const ndArray<glPositionNormalUV>& points, const ndArray<ndInt32>& indexList)
 	{
 		//OptimizeForRender(points, indexList);
 		OptimizeForRender(&points[0], points.GetCount(), &indexList[0], indexList.GetCount());
@@ -55,8 +55,8 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 class ndWaterVolumeEntity : public ndDemoEntity
 {
 	public:
-	//ndWaterVolumeEntity(ndDemoEntityManager* const scene, const ndMatrix& location, const ndVector& size, ndBodySphFluid* const fluidBody, dFloat32 radius)
-		ndWaterVolumeEntity(ndDemoEntityManager* const scene, const ndMatrix& location, const ndVector&, ndBodySphFluid* const fluidBody, dFloat32)
+	//ndWaterVolumeEntity(ndDemoEntityManager* const scene, const ndMatrix& location, const ndVector& size, ndBodySphFluid* const fluidBody, ndFloat32 radius)
+		ndWaterVolumeEntity(ndDemoEntityManager* const scene, const ndMatrix& location, const ndVector&, ndBodySphFluid* const fluidBody, ndFloat32)
 		:ndDemoEntity(location, nullptr)
 		,m_fluidBody(fluidBody)
 		,m_hasNewMesh(false)
@@ -85,7 +85,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		m_isoSurfaceMesh1->Release();
 	}
 
-	void Render(dFloat32, ndDemoEntityManager* const scene, const ndMatrix&) const
+	void Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatrix&) const
 	{
 		// for now the mesh in is global space I need to fix that
 		//ndMatrix nodeMatrix(m_matrix * matrix);
@@ -116,7 +116,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 			m_points.SetCount(isoSurface.GetVertexCount());
 			const ndVector* const points = isoSurface.GetPoints();
 			const ndVector* const normals = isoSurface.GetNormals();
-			for (dInt32 i = 0; i < isoSurface.GetVertexCount(); i++)
+			for (ndInt32 i = 0; i < isoSurface.GetVertexCount(); i++)
 			{
 				m_points[i].m_posit = glVector3(GLfloat(points[i].m_x), GLfloat(points[i].m_y), GLfloat(points[i].m_z));
 				m_points[i].m_normal = glVector3(GLfloat(normals[i].m_x), GLfloat(normals[i].m_y), GLfloat(normals[i].m_z));
@@ -126,10 +126,10 @@ class ndWaterVolumeEntity : public ndDemoEntity
 
 			m_indexList.Resize(isoSurface.GetIndexCount());
 			m_indexList.SetCount(isoSurface.GetIndexCount());
-			const dUnsigned64* const indexList = isoSurface.GetIndexList();
-			for (dInt32 i = 0; i < isoSurface.GetIndexCount(); i++)
+			const ndUnsigned64* const indexList = isoSurface.GetIndexList();
+			for (ndInt32 i = 0; i < isoSurface.GetIndexCount(); i++)
 			{
-				m_indexList[i] = dInt32(indexList[i]);
+				m_indexList[i] = ndInt32(indexList[i]);
 			}
 
 			ndScopeSpinLock lock(m_lock);
@@ -138,7 +138,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 	}
 
 	ndBodySphFluid* m_fluidBody;
-	ndArray<dInt32> m_indexList;
+	ndArray<ndInt32> m_indexList;
 	ndArray<glPositionNormalUV> m_points;
 	mutable bool m_hasNewMesh;
 	mutable ndSpinLock m_lock;
@@ -154,7 +154,7 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 	{
 	}
 
-	void OnTransform(dInt32, const ndMatrix&)
+	void OnTransform(ndInt32, const ndMatrix&)
 	{
 		ndBodySphFluid* const fluid = GetBody()->GetAsBodySphFluid();
 		dAssert(fluid);
@@ -177,7 +177,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	matrix.m_posit = floor;
 	matrix.m_posit.m_w = 1.0f;
 
-	dFloat32 diameter = 0.25f;
+	ndFloat32 diameter = 0.25f;
 	ndBodySphFluid* const fluidObject = new ndBodySphFluid();
 	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, ndVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject, diameter * 0.5f);
 
@@ -186,26 +186,26 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 
 	fluidObject->SetParticleRadius(diameter * 0.5f);
 
-	//dInt32 particleCountPerAxis = 32;
-	//dInt32 particleCountPerAxis = 25;
-	dInt32 particleCountPerAxis = 32;
-	dFloat32 spacing = diameter * 1.0f;
+	//ndInt32 particleCountPerAxis = 32;
+	//ndInt32 particleCountPerAxis = 25;
+	ndInt32 particleCountPerAxis = 32;
+	ndFloat32 spacing = diameter * 1.0f;
 
-	dFloat32 offset = spacing * particleCountPerAxis / 2.0f;
-	ndVector origin(-offset, 1.0f, -offset, dFloat32(0.0f));
+	ndFloat32 offset = spacing * particleCountPerAxis / 2.0f;
+	ndVector origin(-offset, 1.0f, -offset, ndFloat32(0.0f));
 
 	matrix.m_posit += origin;
 	
-	for (dInt32 z = 0; z < particleCountPerAxis; z++)
-	//for (dInt32 z = 0; z < 1; z++)
+	for (ndInt32 z = 0; z < particleCountPerAxis; z++)
+	//for (ndInt32 z = 0; z < 1; z++)
 	{
-		for (dInt32 y = 0; y < particleCountPerAxis; y++)
-		//for (dInt32 y = 0; y < 1; y++)
+		for (ndInt32 y = 0; y < particleCountPerAxis; y++)
+		//for (ndInt32 y = 0; y < 1; y++)
 		{
-			for (dInt32 x = 0; x < particleCountPerAxis; x++)
-			//for (dInt32 x = 0; x < 1; x++)
+			for (ndInt32 x = 0; x < particleCountPerAxis; x++)
+			//for (ndInt32 x = 0; x < 1; x++)
 			{
-				ndVector posit (matrix.TransformVector(ndVector (x * spacing, y * spacing, z * spacing, dFloat32 (1.0f))));
+				ndVector posit (matrix.TransformVector(ndVector (x * spacing, y * spacing, z * spacing, ndFloat32 (1.0f))));
 				fluidObject->AddParticle(0.1f, posit, ndVector::m_zero);
 
 				//ndVector xxxx(ndVector::m_zero);

@@ -21,7 +21,7 @@ class ndJointPulley: public ndJointBilateralConstraint
 	public:
 	D_CLASS_REFLECTION(ndJointPulley);
 	D_NEWTON_API ndJointPulley(const ndLoadSaveBase::dLoadDescriptor& desc);
-	D_NEWTON_API ndJointPulley(dFloat32 gearRatio,
+	D_NEWTON_API ndJointPulley(ndFloat32 gearRatio,
 		const ndVector& body0Pin, ndBodyKinematic* const body0,
 		const ndVector& body1Pin, ndBodyKinematic* const body1);
 	D_NEWTON_API virtual ~ndJointPulley();
@@ -30,7 +30,7 @@ class ndJointPulley: public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	dFloat32 m_gearRatio;
+	ndFloat32 m_gearRatio;
 };
 
 #endif 

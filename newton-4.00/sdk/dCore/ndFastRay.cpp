@@ -24,45 +24,45 @@
 #include "ndVector.h"
 #include "ndFastRay.h"
 
-dFloat32 ndFastRay::PolygonIntersect (const ndVector& faceNormal, dFloat32 maxT, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount) const
+ndFloat32 ndFastRay::PolygonIntersect (const ndVector& faceNormal, ndFloat32 maxT, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount) const
 {
-	dAssert (m_p0.m_w == dFloat32 (0.0f));
-	dAssert (m_p1.m_w == dFloat32 (0.0f));
+	dAssert (m_p0.m_w == ndFloat32 (0.0f));
+	dAssert (m_p1.m_w == ndFloat32 (0.0f));
 
-	if (faceNormal.DotProduct(m_unitDir).GetScalar() < dFloat32 (0.0f)) 
+	if (faceNormal.DotProduct(m_unitDir).GetScalar() < ndFloat32 (0.0f)) 
 	{
-		dInt32 stride = dInt32(strideInBytes / sizeof (dFloat32));
+		ndInt32 stride = ndInt32(strideInBytes / sizeof (ndFloat32));
 		ndBigVector v0(ndVector(&polygon[indexArray[indexCount - 1] * stride]) & ndVector::m_triplexMask);
 		ndBigVector p0(m_p0);
 		ndBigVector p0v0(v0 - p0);
 
 		ndBigVector diff(m_diff);
 		ndBigVector normal(faceNormal);
-		dFloat64 tOut = normal.DotProduct(p0v0).GetScalar() / normal.DotProduct(diff).GetScalar();
-		if ((tOut >= dFloat64(0.0f)) && (tOut <= maxT)) 
+		ndFloat64 tOut = normal.DotProduct(p0v0).GetScalar() / normal.DotProduct(diff).GetScalar();
+		if ((tOut >= ndFloat64(0.0f)) && (tOut <= maxT)) 
 		{
 			ndBigVector p (p0 + diff.Scale (tOut));
 			ndBigVector unitDir(m_unitDir);
-			for (dInt32 i = 0; i < indexCount; i++) 
+			for (ndInt32 i = 0; i < indexCount; i++) 
 			{
-				dInt32 i2 = indexArray[i] * stride;
+				ndInt32 i2 = indexArray[i] * stride;
 				ndBigVector v1(ndVector(&polygon[i2]) & ndVector::m_triplexMask);
 
 				ndBigVector edge0(p - v0);
 				ndBigVector edge1(v1 - v0);
-				dFloat64 area = unitDir.DotProduct (edge0.CrossProduct(edge1)).GetScalar();
-				if (area < dFloat32 (0.0f)) 
+				ndFloat64 area = unitDir.DotProduct (edge0.CrossProduct(edge1)).GetScalar();
+				if (area < ndFloat32 (0.0f)) 
 				{
-					return dFloat32 (1.2f);
+					return ndFloat32 (1.2f);
 				}
 				v0 = v1;
 			}
 
-			return dFloat32(tOut);
+			return ndFloat32(tOut);
 		}
 	}
 
-	return dFloat32 (1.2f);
+	return ndFloat32 (1.2f);
 }
 
 ndRay ndFastRay::RayDistance(const ndVector& ray_q0, const ndVector& ray_q1) const
@@ -70,27 +70,27 @@ ndRay ndFastRay::RayDistance(const ndVector& ray_q0, const ndVector& ray_q1) con
 	const ndVector u(m_diff);
 	const ndVector v(ndVector::m_triplexMask & (ray_q1 - ray_q0));
 	const ndVector w(ndVector::m_triplexMask & (m_p0 - ray_q0));
-	dAssert(u.m_w == dFloat32(0.0f));
-	dAssert(v.m_w == dFloat32(0.0f));
-	dAssert(w.m_w == dFloat32(0.0f));
+	dAssert(u.m_w == ndFloat32(0.0f));
+	dAssert(v.m_w == ndFloat32(0.0f));
+	dAssert(w.m_w == ndFloat32(0.0f));
 	
-	const dFloat32 a = u.DotProduct(u).GetScalar();
-	const dFloat32 b = u.DotProduct(v).GetScalar();
-	const dFloat32 c = v.DotProduct(v).GetScalar();
-	const dFloat32 d = u.DotProduct(w).GetScalar();
-	const dFloat32 e = v.DotProduct(w).GetScalar();
-	const dFloat32 D = a*c - b*b;
+	const ndFloat32 a = u.DotProduct(u).GetScalar();
+	const ndFloat32 b = u.DotProduct(v).GetScalar();
+	const ndFloat32 c = v.DotProduct(v).GetScalar();
+	const ndFloat32 d = u.DotProduct(w).GetScalar();
+	const ndFloat32 e = v.DotProduct(w).GetScalar();
+	const ndFloat32 D = a*c - b*b;
 
-	dFloat32 sD = D;
-	dFloat32 tD = D;
-	dFloat32 sN;
-	dFloat32 tN;
+	ndFloat32 sD = D;
+	ndFloat32 tD = D;
+	ndFloat32 sN;
+	ndFloat32 tN;
 
 	// compute the line parameters of the two closest points
-	if (D < dFloat32(1.0e-8f))
+	if (D < ndFloat32(1.0e-8f))
 	{
-		sN = dFloat32(0.0f);
-		sD = dFloat32(1.0f);
+		sN = ndFloat32(0.0f);
+		sD = ndFloat32(1.0f);
 		tN = e;
 		tD = c;
 	}
@@ -99,10 +99,10 @@ ndRay ndFastRay::RayDistance(const ndVector& ray_q0, const ndVector& ray_q1) con
 		// get the closest points on the infinite lines
 		sN = (b*e - c*d);
 		tN = (a*e - b*d);
-		if (sN < dFloat32(0.0f))
+		if (sN < ndFloat32(0.0f))
 		{
 			// sc < 0 => the s=0 edge is visible
-			sN = dFloat32(0.0f);
+			sN = ndFloat32(0.0f);
 			tN = e;
 			tD = c;
 		}
@@ -115,14 +115,14 @@ ndRay ndFastRay::RayDistance(const ndVector& ray_q0, const ndVector& ray_q1) con
 		}
 	}
 	
-	if (tN < dFloat32(0.0f))
+	if (tN < ndFloat32(0.0f))
 	{
 		// tc < 0 => the t=0 edge is visible
-		tN = dFloat32(0.0f);
+		tN = ndFloat32(0.0f);
 		// recompute sc for this edge
-		if (-d < dFloat32(0.0f))
+		if (-d < ndFloat32(0.0f))
 		{
-			sN = dFloat32(0.0f);
+			sN = ndFloat32(0.0f);
 		}
 		else if (-d > a)
 		{
@@ -139,9 +139,9 @@ ndRay ndFastRay::RayDistance(const ndVector& ray_q0, const ndVector& ray_q1) con
 		// tc > 1 => the t=1 edge is visible
 		tN = tD;
 		// recompute sc for this edge
-		if ((-d + b) < dFloat32(0.0f))
+		if ((-d + b) < ndFloat32(0.0f))
 		{
-			sN = dFloat32(0.0f);
+			sN = ndFloat32(0.0f);
 		}
 		else if ((-d + b) > a)
 		{
@@ -155,10 +155,10 @@ ndRay ndFastRay::RayDistance(const ndVector& ray_q0, const ndVector& ray_q1) con
 	}
 	
 	// finally do the division to get sc and tc
-	dFloat32 sc = (dAbs(sN) < dFloat32(1.0e-8f) ? dFloat32(0.0f) : sN / sD);
-	dFloat32 tc = (dAbs(tN) < dFloat32(1.0e-8f) ? dFloat32(0.0f) : tN / tD);
+	ndFloat32 sc = (dAbs(sN) < ndFloat32(1.0e-8f) ? ndFloat32(0.0f) : sN / sD);
+	ndFloat32 tc = (dAbs(tN) < ndFloat32(1.0e-8f) ? ndFloat32(0.0f) : tN / tD);
 	
-	dAssert(u.m_w == dFloat32(0.0f));
-	dAssert(v.m_w == dFloat32(0.0f));
+	dAssert(u.m_w == ndFloat32(0.0f));
+	dAssert(v.m_w == ndFloat32(0.0f));
 	return ndRay(m_p0 + u.Scale(sc), ray_q0 + v.Scale(tc));
 }

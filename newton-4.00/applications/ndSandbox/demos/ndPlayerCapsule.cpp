@@ -38,9 +38,9 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
-	dFloat32 height = 1.9f;
-	dFloat32 radio = 0.5f;
-	dFloat32 mass = 100.0f;
+	ndFloat32 height = 1.9f;
+	ndFloat32 radio = 0.5f;
+	ndFloat32 mass = 100.0f;
 	ndDemoEntity* const entity = scene->LoadFbxMesh("whiteMan.fbx");
 	new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height/4.0f, true);
 	

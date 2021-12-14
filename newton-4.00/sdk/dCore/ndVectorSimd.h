@@ -55,18 +55,18 @@ class ndVector
 	{
 	}
 
-	inline ndVector (const dFloat32 a)
+	inline ndVector (const ndFloat32 a)
 		:m_type(_mm_set_ps1(a)) 
 	{
 	}
 
-	inline ndVector (const dFloat32* const ptr)
+	inline ndVector (const ndFloat32* const ptr)
 		:m_type(_mm_loadu_ps (ptr))
 	{
 	}
 
 	// emulate gather instruction
-	inline ndVector(const dFloat32* const baseAddr, const dInt32* const index)
+	inline ndVector(const ndFloat32* const baseAddr, const ndInt32* const index)
 		:m_x(baseAddr[index[0]])
 		,m_y(baseAddr[index[1]])
 		,m_z(baseAddr[index[2]])
@@ -75,8 +75,8 @@ class ndVector
 	}
 
 #ifndef	D_NEWTON_USE_DOUBLE
-	inline ndVector(const dFloat64* const ptr)
-		:m_type(_mm_set_ps(dFloat32(ptr[3]), dFloat32(ptr[2]), dFloat32(ptr[1]), dFloat32(ptr[0])))
+	inline ndVector(const ndFloat64* const ptr)
+		:m_type(_mm_set_ps(ndFloat32(ptr[3]), ndFloat32(ptr[2]), ndFloat32(ptr[1]), ndFloat32(ptr[0])))
 	{
 	}
 #endif
@@ -92,62 +92,62 @@ class ndVector
 		dAssert (dCheckVector ((*this)));
 	}
 
-	inline ndVector (dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w)
+	inline ndVector (ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w)
 		:m_type(_mm_set_ps(w, z, y, x))
 	{
 	}
 
-	inline ndVector (dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
-		:m_type(_mm_set_ps(*(dFloat32*)&iw, *(dFloat32*)&iz, *(dFloat32*)&iy, *(dFloat32*)&ix))
+	inline ndVector (ndInt32 ix, ndInt32 iy, ndInt32 iz, ndInt32 iw)
+		:m_type(_mm_set_ps(*(ndFloat32*)&iw, *(ndFloat32*)&iz, *(ndFloat32*)&iy, *(ndFloat32*)&ix))
 	{
 	}
 
-	inline dFloat32 GetX() const
+	inline ndFloat32 GetX() const
 	{
 		return m_x;
 	}
 
-	inline dFloat32 GetY() const
+	inline ndFloat32 GetY() const
 	{
 		return m_y;
 	}
 
-	inline dFloat32 GetZ() const
+	inline ndFloat32 GetZ() const
 	{
 		return m_z;
 	}
 
-	inline dFloat32 GetW() const
+	inline ndFloat32 GetW() const
 	{
 		return m_w;
 	}
 
-	inline void SetX(dFloat32 x)
+	inline void SetX(ndFloat32 x)
 	{
 		m_x = x;
 	}
 
-	inline void SetY(dFloat32 x)
+	inline void SetY(ndFloat32 x)
 	{
 		m_y = x;
 	}
 
-	inline void SetZ(dFloat32 x)
+	inline void SetZ(ndFloat32 x)
 	{
 		m_z = x;
 	}
 
-	inline void SetW(dFloat32 x)
+	inline void SetW(ndFloat32 x)
 	{
 		m_w = x;
 	}
 
-	inline dFloat32 GetScalar () const
+	inline ndFloat32 GetScalar () const
 	{
 		return _mm_cvtss_f32 (m_type);
 	}
 
-	inline void Store (dFloat32* const dst) const
+	inline void Store (ndFloat32* const dst) const
 	{
 		_mm_storeu_ps(dst, m_type);
 	}
@@ -172,19 +172,19 @@ class ndVector
 		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 3, 3, 3));
 	}
 
-	inline ndVector Scale (dFloat32 s) const
+	inline ndVector Scale (ndFloat32 s) const
 	{
 		return _mm_mul_ps (m_type, _mm_set_ps1(s));
 	}
 
-	inline dFloat32& operator[] (dInt32 i)
+	inline ndFloat32& operator[] (ndInt32 i)
 	{
 		dAssert (i < 4);
 		dAssert (i >= 0);
 		return m_f[i];
 	}
 
-	inline const dFloat32& operator[] (dInt32 i) const
+	inline const ndFloat32& operator[] (ndInt32 i) const
 	{
 		dAssert (i < 4);
 		dAssert (i >= 0);
@@ -246,26 +246,26 @@ class ndVector
 	// return 4d cross product
 	inline ndVector CrossProduct (const ndVector& A, const ndVector& B) const
 	{
-		dFloat32 cofactor[3][3];
-		dFloat32 array[4][4];
+		ndFloat32 cofactor[3][3];
+		ndFloat32 array[4][4];
 
 		const ndVector& me = *this;
-		for (dInt32 i = 0; i < 4; i ++) 
+		for (ndInt32 i = 0; i < 4; i ++) 
 		{
 			array[0][i] = me[i];
 			array[1][i] = A[i];
 			array[2][i] = B[i];
-			array[3][i] = dFloat32 (1.0f);
+			array[3][i] = ndFloat32 (1.0f);
 		}
 
 		ndVector normal;
-		dFloat32  sign = dFloat32 (-1.0f);
-		for (dInt32 i = 0; i < 4; i ++)  
+		ndFloat32  sign = ndFloat32 (-1.0f);
+		for (ndInt32 i = 0; i < 4; i ++)  
 		{
-			for (dInt32 j = 0; j < 3; j ++) 
+			for (ndInt32 j = 0; j < 3; j ++) 
 			{
-				dInt32 k0 = 0;
-				for (dInt32 k = 0; k < 4; k ++) 
+				ndInt32 k0 = 0;
+				for (ndInt32 k = 0; k < 4; k ++) 
 				{
 					if (k != i) 
 					{
@@ -274,13 +274,13 @@ class ndVector
 					}
 				}
 			}
-			dFloat32  x = cofactor[0][0] * (cofactor[1][1] * cofactor[2][2] - cofactor[1][2] * cofactor[2][1]);
-			dFloat32  y = cofactor[0][1] * (cofactor[1][2] * cofactor[2][0] - cofactor[1][0] * cofactor[2][2]);
-			dFloat32  z = cofactor[0][2] * (cofactor[1][0] * cofactor[2][1] - cofactor[1][1] * cofactor[2][0]);
-			dFloat32  det = x + y + z;
+			ndFloat32  x = cofactor[0][0] * (cofactor[1][1] * cofactor[2][2] - cofactor[1][2] * cofactor[2][1]);
+			ndFloat32  y = cofactor[0][1] * (cofactor[1][2] * cofactor[2][0] - cofactor[1][0] * cofactor[2][2]);
+			ndFloat32  z = cofactor[0][2] * (cofactor[1][0] * cofactor[2][1] - cofactor[1][1] * cofactor[2][0]);
+			ndFloat32  det = x + y + z;
 
 			normal[i] = sign * det;
-			sign *= dFloat32 (-1.0f);
+			sign *= ndFloat32 (-1.0f);
 		}
 
 		return normal;
@@ -348,10 +348,10 @@ class ndVector
 	{
 		ndVector truncated (_mm_cvtepi32_ps (_mm_cvttps_epi32 (m_type)));
 		ndVector ret (truncated - (ndVector::m_one & (*this < truncated)));
-		dAssert (ret.m_f[0] == dFloor(m_f[0]));
-		dAssert (ret.m_f[1] == dFloor(m_f[1]));
-		dAssert (ret.m_f[2] == dFloor(m_f[2]));
-		dAssert (ret.m_f[3] == dFloor(m_f[3]));
+		dAssert (ret.m_f[0] == ndFloor(m_f[0]));
+		dAssert (ret.m_f[1] == ndFloor(m_f[1]));
+		dAssert (ret.m_f[2] == ndFloor(m_f[2]));
+		dAssert (ret.m_f[3] == ndFloor(m_f[3]));
 		return ret;
 	}
 
@@ -373,7 +373,7 @@ class ndVector
 
 	inline ndVector Normalize () const
 	{
-		return Scale(dFloat32(1.0f) / dSqrt(DotProduct(*this).GetScalar()));
+		return Scale(ndFloat32(1.0f) / ndSqrt(DotProduct(*this).GetScalar()));
 	}
 
 	// relational operators
@@ -430,7 +430,7 @@ class ndVector
 		return  _mm_xor_ps(m_type, _mm_and_ps (mask.m_type, _mm_xor_ps(m_type, data.m_type)));
 	}
 
-	inline dInt32 GetSignMask() const
+	inline ndInt32 GetSignMask() const
 	{
 		return _mm_movemask_ps(m_type);
 	} 
@@ -450,7 +450,7 @@ class ndVector
 		return _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 0, 2, 1));
 	}
 
-	inline ndVector ShiftRightLogical (dInt32 bits) const
+	inline ndVector ShiftRightLogical (ndInt32 bits) const
 	{
 		return ndVector (_mm_srli_epi32(m_typeInt, bits)); 
 	}
@@ -481,23 +481,23 @@ class ndVector
 
 	union 
 	{
-		dFloat32 m_f[4];
-		dInt32 m_i[4];
+		ndFloat32 m_f[4];
+		ndInt32 m_i[4];
 		__m128 m_type;
 		__m128i m_typeInt;
 		struct 
 		{
-			dFloat32 m_x;
-			dFloat32 m_y;
-			dFloat32 m_z;
-			dFloat32 m_w;
+			ndFloat32 m_x;
+			ndFloat32 m_y;
+			ndFloat32 m_z;
+			ndFloat32 m_w;
 		};
 		struct 
 		{
-			dInt32 m_ix;
-			dInt32 m_iy;
-			dInt32 m_iz;
-			dInt32 m_iw;
+			ndInt32 m_ix;
+			ndInt32 m_iy;
+			ndInt32 m_iz;
+			ndInt32 m_iw;
 		};
 	};
 
@@ -555,13 +555,13 @@ class ndBigVector
 	{
 	}
 
-	inline ndBigVector(const dFloat64 a)
+	inline ndBigVector(const ndFloat64 a)
 		:m_typeLow(_mm_set1_pd(a))
 		,m_typeHigh(_mm_set1_pd(a))
 	{
 	}
 
-	inline ndBigVector(const dFloat64* const baseAddr, const dInt64* const index)
+	inline ndBigVector(const ndFloat64* const baseAddr, const ndInt64* const index)
 		:m_x(baseAddr[index[0]])
 		,m_y(baseAddr[index[1]])
 		,m_z(baseAddr[index[2]])
@@ -570,7 +570,7 @@ class ndBigVector
 	}
 
 #ifdef D_NEWTON_USE_DOUBLE
-	inline ndBigVector (const dFloat32* const ptr)
+	inline ndBigVector (const ndFloat32* const ptr)
 		:m_typeLow(_mm_loadu_pd(ptr))
 		,m_typeHigh(_mm_loadu_pd(&ptr[2]))
 	{
@@ -584,83 +584,83 @@ class ndBigVector
 		dAssert(dCheckVector((*this)));
 	}
 
-	inline ndBigVector(const dFloat64* const ptr)
+	inline ndBigVector(const ndFloat64* const ptr)
 		:m_typeLow(_mm_loadu_pd(ptr))
 		,m_typeHigh(_mm_loadu_pd(&ptr[2]))
 	{
 	}
 #endif
 
-	inline ndBigVector(dFloat64 x, dFloat64 y, dFloat64 z, dFloat64 w)
+	inline ndBigVector(ndFloat64 x, ndFloat64 y, ndFloat64 z, ndFloat64 w)
 		:m_typeLow(_mm_set_pd(y, x))
 		,m_typeHigh(_mm_set_pd(w, z))
 	{
 	}
 
-	inline ndBigVector(dInt32 ix, dInt32 iy, dInt32 iz, dInt32 iw)
-		:m_ix(dInt64(ix)), m_iy(dInt64(iy)), m_iz(dInt64(iz)), m_iw(dInt64(iw))
+	inline ndBigVector(ndInt32 ix, ndInt32 iy, ndInt32 iz, ndInt32 iw)
+		:m_ix(ndInt64(ix)), m_iy(ndInt64(iy)), m_iz(ndInt64(iz)), m_iw(ndInt64(iw))
 	{
 	}
 
-	inline ndBigVector(dInt64 ix, dInt64 iy, dInt64 iz, dInt64 iw)
+	inline ndBigVector(ndInt64 ix, ndInt64 iy, ndInt64 iz, ndInt64 iw)
 		:m_ix(ix), m_iy(iy), m_iz(iz), m_iw(iw)
 	{
 	}
 
-	inline dFloat64 GetX() const
+	inline ndFloat64 GetX() const
 	{
 		return m_x;
 	}
 
-	inline dFloat64 GetY() const
+	inline ndFloat64 GetY() const
 	{
 		return m_y;
 	}
 
-	inline dFloat64 GetZ() const
+	inline ndFloat64 GetZ() const
 	{
 		return m_z;
 	}
 
-	inline dFloat64 GetW() const
+	inline ndFloat64 GetW() const
 	{
 		return m_w;
 	}
 
-	inline void SetX(dFloat64 x)
+	inline void SetX(ndFloat64 x)
 	{
 		m_x = x;
 	}
 
-	inline void SetY(dFloat64 x)
+	inline void SetY(ndFloat64 x)
 	{
 		m_y = x;
 	}
 
-	inline void SetZ(dFloat64 x)
+	inline void SetZ(ndFloat64 x)
 	{
 		m_z = x;
 	}
 
-	inline void SetW(dFloat64 x)
+	inline void SetW(ndFloat64 x)
 	{
 		m_w = x;
 	}
 
-	inline dFloat64 GetScalar() const
+	inline ndFloat64 GetScalar() const
 	{
 		//return m_x;
 		return _mm_cvtsd_f64(m_typeLow);
 	}
 
-	inline dFloat64& operator[] (dInt32 i)
+	inline ndFloat64& operator[] (ndInt32 i)
 	{
 		dAssert(i < 4);
 		dAssert(i >= 0);
 		return m_f[i];
 	}
 
-	inline const dFloat64& operator[] (dInt32 i) const
+	inline const ndFloat64& operator[] (ndInt32 i) const
 	{
 		dAssert(i < 4);
 		dAssert(i >= 0);
@@ -744,7 +744,7 @@ class ndBigVector
 		return ndBigVector(m_w);
 	}
 
-	inline ndBigVector Scale(dFloat64 s) const
+	inline ndBigVector Scale(ndFloat64 s) const
 	{
 		__m128d tmp0(_mm_set1_pd(s));
 		return ndBigVector(_mm_mul_pd(m_typeLow, tmp0), _mm_mul_pd(m_typeHigh, tmp0));
@@ -777,8 +777,8 @@ class ndBigVector
 
 	inline ndBigVector Normalize() const
 	{
-		dFloat64 mag2 = DotProduct(*this).GetScalar();
-		return Scale(dFloat64 (1.0f) / sqrt (mag2));
+		ndFloat64 mag2 = DotProduct(*this).GetScalar();
+		return Scale(ndFloat64 (1.0f) / sqrt (mag2));
 	}
 
 	ndBigVector GetMax() const
@@ -801,11 +801,11 @@ class ndBigVector
 	inline ndBigVector GetInt() const
 	{
 		ndBigVector temp(Floor());
-		dInt64 x = _mm_cvtsd_si32(temp.m_typeLow);
-		dInt64 y = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeLow, temp.m_typeLow, PERMUT_MASK_DOUBLE(1, 1)));
-		dInt64 z = _mm_cvtsd_si32(temp.m_typeHigh);
-		dInt64 w = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeHigh, temp.m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
-		return ndBigVector(_mm_set_pd(*(dFloat32*)&y, *(dFloat32*)&x), _mm_set_pd(*(dFloat32*)&w, *(dFloat32*)&z));
+		ndInt64 x = _mm_cvtsd_si32(temp.m_typeLow);
+		ndInt64 y = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeLow, temp.m_typeLow, PERMUT_MASK_DOUBLE(1, 1)));
+		ndInt64 z = _mm_cvtsd_si32(temp.m_typeHigh);
+		ndInt64 w = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeHigh, temp.m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
+		return ndBigVector(_mm_set_pd(*(ndFloat32*)&y, *(ndFloat32*)&x), _mm_set_pd(*(ndFloat32*)&w, *(ndFloat32*)&z));
 	}
 
 	// relational operators
@@ -878,13 +878,13 @@ class ndBigVector
 		return ndBigVector(_mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(0, 1)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(1, 0)));
 	}
 
-	inline ndBigVector ShiftRightLogical(dInt32 bits) const
+	inline ndBigVector ShiftRightLogical(ndInt32 bits) const
 	{
-		//return ndBigVector(dInt64(dUnsigned64(m_ix) >> bits), dInt64(dUnsigned64(m_iy) >> bits), dInt64(dUnsigned64(m_iz) >> bits), dInt64(dUnsigned64(m_iw) >> bits));
+		//return ndBigVector(ndInt64(dUnsigned64(m_ix) >> bits), ndInt64(dUnsigned64(m_iy) >> bits), ndInt64(dUnsigned64(m_iz) >> bits), ndInt64(dUnsigned64(m_iw) >> bits));
 		return ndBigVector(_mm_srli_epi64(m_typeIntLow, bits), _mm_srli_epi64(m_typeIntHigh, bits));
 	}
 
-	inline dInt32 GetSignMask() const
+	inline ndInt32 GetSignMask() const
 	{
 		return _mm_movemask_pd(m_typeLow) | (_mm_movemask_pd(m_typeHigh) << 2);
 	}
@@ -929,26 +929,26 @@ class ndBigVector
 	// return 4d cross product
 	inline ndBigVector CrossProduct(const ndBigVector& A, const ndBigVector& B) const
 	{
-		dFloat64 cofactor[3][3];
-		dFloat64 array[4][4];
+		ndFloat64 cofactor[3][3];
+		ndFloat64 array[4][4];
 
 		const ndBigVector& me = *this;
-		for (dInt32 i = 0; i < 4; i++) 
+		for (ndInt32 i = 0; i < 4; i++) 
 		{
 			array[0][i] = me[i];
 			array[1][i] = A[i];
 			array[2][i] = B[i];
-			array[3][i] = dFloat64(1.0f);
+			array[3][i] = ndFloat64(1.0f);
 		}
 
 		ndBigVector normal;
-		dFloat64 sign = dFloat64(-1.0f);
-		for (dInt32 i = 0; i < 4; i++) 
+		ndFloat64 sign = ndFloat64(-1.0f);
+		for (ndInt32 i = 0; i < 4; i++) 
 		{
-			for (dInt32 j = 0; j < 3; j++) 
+			for (ndInt32 j = 0; j < 3; j++) 
 			{
-				dInt32 k0 = 0;
-				for (dInt32 k = 0; k < 4; k++) 
+				ndInt32 k0 = 0;
+				for (ndInt32 k = 0; k < 4; k++) 
 				{
 					if (k != i) 
 					{
@@ -957,13 +957,13 @@ class ndBigVector
 					}
 				}
 			}
-			dFloat64 x = cofactor[0][0] * (cofactor[1][1] * cofactor[2][2] - cofactor[1][2] * cofactor[2][1]);
-			dFloat64 y = cofactor[0][1] * (cofactor[1][2] * cofactor[2][0] - cofactor[1][0] * cofactor[2][2]);
-			dFloat64 z = cofactor[0][2] * (cofactor[1][0] * cofactor[2][1] - cofactor[1][1] * cofactor[2][0]);
-			dFloat64 det = x + y + z;
+			ndFloat64 x = cofactor[0][0] * (cofactor[1][1] * cofactor[2][2] - cofactor[1][2] * cofactor[2][1]);
+			ndFloat64 y = cofactor[0][1] * (cofactor[1][2] * cofactor[2][0] - cofactor[1][0] * cofactor[2][2]);
+			ndFloat64 z = cofactor[0][2] * (cofactor[1][0] * cofactor[2][1] - cofactor[1][1] * cofactor[2][0]);
+			ndFloat64 det = x + y + z;
 
 			normal[i] = sign * det;
-			sign *= dFloat64(-1.0f);
+			sign *= ndFloat64(-1.0f);
 		}
 
 		return normal;
@@ -971,8 +971,8 @@ class ndBigVector
 
 	union
 	{
-		dFloat64 m_f[4];
-		dInt64 m_i[4];
+		ndFloat64 m_f[4];
+		ndInt64 m_i[4];
 		struct
 		{
 			__m128d m_typeLow;
@@ -985,17 +985,17 @@ class ndBigVector
 		};
 		struct
 		{
-			dFloat64 m_x;
-			dFloat64 m_y;
-			dFloat64 m_z;
-			dFloat64 m_w;
+			ndFloat64 m_x;
+			ndFloat64 m_y;
+			ndFloat64 m_z;
+			ndFloat64 m_w;
 		};
 		struct
 		{
-			dInt64 m_ix;
-			dInt64 m_iy;
-			dInt64 m_iz;
-			dInt64 m_iw;
+			ndInt64 m_ix;
+			ndInt64 m_iy;
+			ndInt64 m_iz;
+			ndInt64 m_iw;
 		};
 	};
 

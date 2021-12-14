@@ -34,10 +34,10 @@ class ndSceneNode: public ndClassAlloc
 	public:
 	ndSceneNode(ndSceneNode* const parent)
 		:ndClassAlloc()
-		,m_minBox(dFloat32(-1.0e15f))
-		,m_maxBox(dFloat32( 1.0e15f))
+		,m_minBox(ndFloat32(-1.0e15f))
+		,m_maxBox(ndFloat32( 1.0e15f))
 		,m_parent(parent)
-		,m_surfaceArea(dFloat32(1.0e20f))
+		,m_surfaceArea(ndFloat32(1.0e20f))
 		,m_lock()
 	{
 	}
@@ -71,7 +71,7 @@ class ndSceneNode: public ndClassAlloc
 	ndVector m_minBox;
 	ndVector m_maxBox;
 	ndSceneNode* m_parent;
-	dFloat32 m_surfaceArea;
+	ndFloat32 m_surfaceArea;
 	ndSpinLock m_lock;
 
 	static ndVector m_aabbQuantization;
@@ -137,8 +137,8 @@ inline void ndSceneNode::SetAabb(const ndVector& minBox, const ndVector& maxBox)
 	m_minBox = p0.Floor() * m_aabbInvQuantization;
 	m_maxBox = p1.Floor() * m_aabbInvQuantization;
 
-	dAssert(m_minBox.m_w == dFloat32(0.0f));
-	dAssert(m_maxBox.m_w == dFloat32(0.0f));
+	dAssert(m_minBox.m_w == ndFloat32(0.0f));
+	dAssert(m_maxBox.m_w == ndFloat32(0.0f));
 
 	const ndVector size(m_maxBox - m_minBox);
 	m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();

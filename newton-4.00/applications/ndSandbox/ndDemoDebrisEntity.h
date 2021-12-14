@@ -30,13 +30,13 @@ class ndDemoDebrisMesh : public ndDemoMesh
 {
 	public:
 	ndDemoDebrisMesh(ndDemoDebrisMesh* const srcMesh, const ndArray<glDebrisPoint>& vertexArray);
-	ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, dInt32 offsetBase, ndArray<glDebrisPoint>& vertexArray);
+	ndDemoDebrisMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, ndInt32 offsetBase, ndArray<glDebrisPoint>& vertexArray);
 
 	void Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 
 	private:
 	ndDemoSubMeshMaterial m_material[2];
-	dInt32 m_textureLocation1;
+	ndInt32 m_textureLocation1;
 
 	friend class ndDemoDebrisRootEntity;
 };
@@ -50,10 +50,10 @@ class ndDemoDebrisRootEntity: public ndDemoEntity
 
 	void FinalizeConstruction(const ndArray<glDebrisPoint>& vertexArray);
 
-	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
+	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
-	//dInt32 m_vertexCount;
-	//dInt32 m_buffRefCount;
+	//ndInt32 m_vertexCount;
+	//ndInt32 m_buffRefCount;
 	//GLuint m_vertexBuffer;
 	//GLuint m_vertextArrayBuffer;
 };
@@ -66,9 +66,9 @@ class ndDemoDebrisEntity : public ndDemoEntity
 	virtual ~ndDemoDebrisEntity();
 	ndNodeBaseHierarchy* CreateClone() const;
 
-	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
+	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
-	//dInt32 m_vertexOffsetBase;
+	//ndInt32 m_vertexOffsetBase;
 };
 
 

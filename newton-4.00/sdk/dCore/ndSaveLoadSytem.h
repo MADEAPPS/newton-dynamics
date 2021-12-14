@@ -36,19 +36,19 @@ class ndCharacterNode;
 class ndCharacterNode;
 class ndJointBilateralConstraint;
 
-class ndShapeLoaderCache : public ndTree<const ndShapeInstance, dInt32>
+class ndShapeLoaderCache : public ndTree<const ndShapeInstance, ndInt32>
 {
 };
 
-class ndBodyLoaderCache: public ndTree<const ndBody*, dInt32>
+class ndBodyLoaderCache: public ndTree<const ndBody*, ndInt32>
 {
 };
 
-class ndJointLoaderCache: public ndTree<const ndJointBilateralConstraint*, dInt32>
+class ndJointLoaderCache: public ndTree<const ndJointBilateralConstraint*, ndInt32>
 {
 };
 
-class ndModelLoaderCache: public ndTree<const ndModel*, dInt32>
+class ndModelLoaderCache: public ndTree<const ndModel*, ndInt32>
 {
 };
 
@@ -125,14 +125,14 @@ class ndLoadSaveBase: public ndClassAlloc
 		const char* m_assetPath;
 		const char* m_assetName;
 		nd::TiXmlNode* m_rootNode;
-		dInt32 m_nodeNodeHash;
-		dInt32 m_shapeNodeHash;
-		dInt32 m_body0NodeHash;
-		dInt32 m_body1NodeHash;
-		mutable dInt32 m_assetIndex;
-		ndTree<dInt32, const ndShape*>* m_shapeMap;
-		ndTree<dInt32, const ndBodyKinematic*>* m_bodyMap;
-		ndTree<dInt32, const ndJointBilateralConstraint*>* m_jointMap;
+		ndInt32 m_nodeNodeHash;
+		ndInt32 m_shapeNodeHash;
+		ndInt32 m_body0NodeHash;
+		ndInt32 m_body1NodeHash;
+		mutable ndInt32 m_assetIndex;
+		ndTree<ndInt32, const ndShape*>* m_shapeMap;
+		ndTree<ndInt32, const ndBodyKinematic*>* m_bodyMap;
+		ndTree<ndInt32, const ndJointBilateralConstraint*>* m_jointMap;
 	};
 
 	virtual void* CreateClass(const dLoadDescriptor&)

@@ -23,7 +23,7 @@
 
 static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 	ndDemoInstanceEntity* const rootEntity,
-	const ndShapeInstance& shape, dFloat32 mass, dFloat32 density)
+	const ndShapeInstance& shape, ndFloat32 mass, ndFloat32 density)
 {
 	ndMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
@@ -50,37 +50,37 @@ static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 	world->AddBody(body);
 }
 
-//static void AddSphere(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 density)
+//static void AddSphere(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 density)
 //{
-//	dFloat32 diameter = 0.5f;
+//	ndFloat32 diameter = 0.5f;
 //	ndShapeInstance shape(new ndShapeSphere(diameter));
 //
-//	ndMatrix matrix(dPitchMatrix(15.0f*dDegreeToRad) * dRollMatrix(15.0f*dDegreeToRad));
+//	ndMatrix matrix(dPitchMatrix(15.0f*ndDegreeToRad) * dRollMatrix(15.0f*ndDegreeToRad));
 //	matrix.m_posit = origin;
 //
 //	AddShape(scene, matrix, shape, 10.0f, density);
 //}
 //
-//static void AddCapsule(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 density)
+//static void AddCapsule(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 density)
 //{
-//	dFloat32 diameter = 1.0f;
+//	ndFloat32 diameter = 1.0f;
 //	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 //
-//	//ndMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
-//	ndMatrix matrix(dPitchMatrix(35.0f*dDegreeToRad) * dRollMatrix(25.0f*dDegreeToRad));
+//	//ndMatrix matrix(dRollMatrix(90.0f * ndDegreeToRad));
+//	ndMatrix matrix(dPitchMatrix(35.0f*ndDegreeToRad) * dRollMatrix(25.0f*ndDegreeToRad));
 //	matrix.m_posit = origin;
 //
 //	AddShape(scene, matrix, shape, 10.0f, density);
 //}
 
-//static void AddConvexHull(ndDemoEntityManager* const scene, const ndVector& origin, const dInt32 segments, dFloat32 density)
+//static void AddConvexHull(ndDemoEntityManager* const scene, const ndVector& origin, const ndInt32 segments, ndFloat32 density)
 //{
 //	ndVector points[1024];
-//	dInt32 count = 0;
-//	for (dInt32 i = 0; i < segments; i++)
+//	ndInt32 count = 0;
+//	for (ndInt32 i = 0; i < segments; i++)
 //	{
-//		dFloat32 y = 0.7f * dCos((dFloat32(2.0f) * dPi) * i / segments);
-//		dFloat32 z = 0.7f * dSin((dFloat32(2.0f) * dPi) * i / segments);
+//		ndFloat32 y = 0.7f * dCos((ndFloat32(2.0f) * dPi) * i / segments);
+//		ndFloat32 z = 0.7f * dSin((ndFloat32(2.0f) * dPi) * i / segments);
 //		points[count++] = ndVector(-0.5f, 0.7f * y, 0.7f* z, 0.0f);
 //		points[count++] = ndVector( 0.5f, 0.7f * y, 0.7f* z, 0.0f);
 //		//points[count++] = ndVector(0.25f, y, z, 0.0f);
@@ -89,16 +89,16 @@ static void AddShape(ndDemoEntityManager* const scene, const ndMatrix& location,
 //
 //	//ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.7f));
 //	ndShapeInstance shape(new ndShapeConvexHull(count, sizeof (ndVector), 0.0f, &points[0].m_x));
-//	ndMatrix matrix(dPitchMatrix(135.0f*dDegreeToRad) * dRollMatrix(75.0f*dDegreeToRad));
+//	ndMatrix matrix(dPitchMatrix(135.0f*ndDegreeToRad) * dRollMatrix(75.0f*ndDegreeToRad));
 //	matrix.m_posit = origin;
 //
 //	AddShape(scene, matrix, shape, 10.0f, density);
 //}
 
-static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 density, int count)
+static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 density, int count)
 {
 	ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.7f));
-	ndMatrix matrix(dPitchMatrix(10.0f*dDegreeToRad) * dRollMatrix(150.0f*dDegreeToRad));
+	ndMatrix matrix(dPitchMatrix(10.0f*ndDegreeToRad) * dRollMatrix(150.0f*ndDegreeToRad));
 	matrix.m_posit = origin;
 
 	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
@@ -106,12 +106,12 @@ static void AddBox(ndDemoEntityManager* const scene, const ndVector& origin, dFl
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
-	dFloat32 step = 4.0f;
-	for (dInt32 i = 0; i < count; i ++)
+	ndFloat32 step = 4.0f;
+	for (ndInt32 i = 0; i < count; i ++)
 	{
-		for (dInt32 j = 0; j < count; j++)
+		for (ndInt32 j = 0; j < count; j++)
 		{
-			for (dInt32 k = 0; k < count; k++)
+			for (ndInt32 k = 0; k < count; k++)
 			{
 				ndVector posit(step * (i - count/2), step * (j - count / 2), step * (k - count / 2), 0.0f);
 				ndQuaternion rotation(dGaussianRandom(1.0f), dGaussianRandom(1.0f), dGaussianRandom(1.0f), dGaussianRandom(1.0f) + 0.1f);
@@ -130,7 +130,7 @@ void ndBasicGpuRigidBody(ndDemoEntityManager* const scene)
 	// build a floor
 	//BuildFloorBox(scene, dGetIdentityMatrix());
 
-	dInt32 count = 30;
+	ndInt32 count = 30;
 	AddBox(scene, ndVector(0.0f, 2.0f, -3.0f, 1.0f), 1.0f, count);
 
 	ndQuaternion rot;

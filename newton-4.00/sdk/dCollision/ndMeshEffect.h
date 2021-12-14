@@ -25,10 +25,10 @@
 #include "ndCollisionStdafx.h"
 
 #define DG_MESH_EFFECT_PRECISION_BITS		48
-#define DG_MESH_EFFECT_PRECISION_SCALE		dFloat64(dInt64(1)<<DG_MESH_EFFECT_PRECISION_BITS)
-#define DG_MESH_EFFECT_PRECISION_SCALE_INV	(dFloat64 (1.0f) / DG_MESH_EFFECT_PRECISION_SCALE)
+#define DG_MESH_EFFECT_PRECISION_SCALE		ndFloat64(ndInt64(1)<<DG_MESH_EFFECT_PRECISION_BITS)
+#define DG_MESH_EFFECT_PRECISION_SCALE_INV	(ndFloat64 (1.0f) / DG_MESH_EFFECT_PRECISION_SCALE)
 
-#define DG_VERTEXLIST_INDEXLIST_TOL			(dFloat64 (0.0f))
+#define DG_VERTEXLIST_INDEXLIST_TOL			(ndFloat64 (0.0f))
 #define DG_MESH_EFFECT_POINT_SPLITED		512
 #define DG_MESH_EFFECT_BVH_STACK_DEPTH		256
 
@@ -37,11 +37,11 @@ class ndShapeInstance;
 class ndIndexArray
 {
 	public:
-	dInt32 m_materialCount;
-	dInt32 m_indexCount;
-	dInt32 m_materials[256];
-	dInt32 m_materialsIndexCount[256];
-	dInt32* m_indexList;
+	ndInt32 m_materialCount;
+	ndInt32 m_indexCount;
+	ndInt32 m_materials[256];
+	ndInt32 m_materialsIndexCount[256];
+	ndInt32* m_indexList;
 };
 
 class ndMeshEffect: public ndPolyhedra
@@ -244,20 +244,20 @@ class ndMeshEffect: public ndPolyhedra
 		class dSortKey
 		{
 			public:
-			dInt32 m_mask;
-			dInt32 m_ordinal;
-			dInt32 m_vertexIndex;
-			dInt32 m_attibuteIndex;
+			ndInt32 m_mask;
+			ndInt32 m_ordinal;
+			ndInt32 m_vertexIndex;
+			ndInt32 m_attibuteIndex;
 		};
 		class dVertexSortData
 		{
 			public:
 			const dChannel<ndBigVector, m_point>* m_points;
-			dInt32 m_vertexSortIndex;
+			ndInt32 m_vertexSortIndex;
 		};
 
-		dInt32 GetSortIndex(const dChannel<ndBigVector, m_point>& points, dFloat64& dist) const;
-		static dInt32 CompareVertex(const dSortKey* const ptr0, const dSortKey* const ptr1, void* const context);
+		ndInt32 GetSortIndex(const dChannel<ndBigVector, m_point>& points, ndFloat64& dist) const;
+		static ndInt32 CompareVertex(const dSortKey* const ptr0, const dSortKey* const ptr1, void* const context);
 	};
 
 	class dPointFormat: public dFormat
@@ -268,10 +268,10 @@ class ndMeshEffect: public ndPolyhedra
 		~dPointFormat();
 
 		void Clear();
-		void SetCount(dInt32 count);
-		void CompressData(dInt32* const indexList);
+		void SetCount(ndInt32 count);
+		void CompressData(ndInt32* const indexList);
 		
-		dChannel<dInt32, m_layer> m_layers;
+		dChannel<ndInt32, m_layer> m_layers;
 		dChannel<ndBigVector, m_point> m_vertex;
 	};
 
@@ -281,8 +281,8 @@ class ndMeshEffect: public ndPolyhedra
 		class dgUV
 		{
 			public:
-			dFloat32 m_u;
-			dFloat32 m_v;
+			ndFloat32 m_u;
+			ndFloat32 m_v;
 		};
 
 		dAttibutFormat();
@@ -290,13 +290,13 @@ class ndMeshEffect: public ndPolyhedra
 		~dAttibutFormat();
 
 		void Clear();
-		void SetCount(dInt32 count);
+		void SetCount(ndInt32 count);
 		void CopyFrom(const dAttibutFormat& source);
-		void CopyEntryFrom(dInt32 index, const dAttibutFormat& source, dInt32 sourceIndex);
-		void CompressData(const dPointFormat& points, dInt32* const indexList);
+		void CopyEntryFrom(ndInt32 index, const dAttibutFormat& source, ndInt32 sourceIndex);
+		void CompressData(const dPointFormat& points, ndInt32* const indexList);
 
-		dChannel<dInt32, m_vertex> m_pointChannel;
-		dChannel<dInt32, m_material> m_materialChannel;
+		dChannel<ndInt32, m_vertex> m_pointChannel;
+		dChannel<ndInt32, m_material> m_materialChannel;
 		dChannel<ndTriplex, m_normal> m_normalChannel;
 		dChannel<ndTriplex, m_binormal> m_binormalChannel;
 		dChannel<ndVector, m_color> m_colorChannel;
@@ -309,11 +309,11 @@ class ndMeshEffect: public ndPolyhedra
 	{
 		public:
 		dMaterial()
-			:m_ambient(dFloat32(0.8f), dFloat32(0.8f), dFloat32(0.8f), dFloat32(1.0f))
-			,m_diffuse(dFloat32(0.8f), dFloat32(0.8f), dFloat32(0.8f), dFloat32(1.0f))
-			,m_specular(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f))
-			,m_opacity(dFloat32(1.0f))
-			,m_shiness(dFloat32 (60.0f))
+			:m_ambient(ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(1.0f))
+			,m_diffuse(ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(0.8f), ndFloat32(1.0f))
+			,m_specular(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f))
+			,m_opacity(ndFloat32(1.0f))
+			,m_shiness(ndFloat32 (60.0f))
 		{
 			m_textureName[0] = 0;
 		}
@@ -321,8 +321,8 @@ class ndMeshEffect: public ndPolyhedra
 		ndVector m_ambient;
 		ndVector m_diffuse;
 		ndVector m_specular;
-		dFloat32 m_opacity;
-		dFloat32 m_shiness;
+		ndFloat32 m_opacity;
+		ndFloat32 m_shiness;
 		char m_textureName[32];
 	};
 
@@ -332,17 +332,17 @@ class ndMeshEffect: public ndPolyhedra
 		class dDoubleData
 		{
 			public:
-			const dFloat64* m_data;
-			const dInt32* m_indexList;
-			dInt32 m_strideInBytes;
+			const ndFloat64* m_data;
+			const ndInt32* m_indexList;
+			ndInt32 m_strideInBytes;
 		};
 
 		class dFloatData
 		{
 			public:
-			const dFloat32* m_data;
-			const dInt32* m_indexList;
-			dInt32 m_strideInBytes;
+			const ndFloat32* m_data;
+			const ndInt32* m_indexList;
+			ndInt32 m_strideInBytes;
 		};
 
 		dMeshVertexFormat()
@@ -355,9 +355,9 @@ class ndMeshEffect: public ndPolyhedra
 			memset(this, 0, sizeof(dMeshVertexFormat));
 		}
 
-		dInt32 m_faceCount;
-		const dInt32* m_faceIndexCount;
-		const dInt32* m_faceMaterial;
+		ndInt32 m_faceCount;
+		const ndInt32* m_faceIndexCount;
+		const ndInt32* m_faceMaterial;
 		dDoubleData m_vertex;
 		dFloatData m_normal;
 		dFloatData m_binormal;
@@ -372,8 +372,8 @@ class ndMeshEffect: public ndPolyhedra
 		dVertexCluster()
 		{
 		}
-		ndArray<dInt32> m_vertexIndex;
-		ndArray<dFloat32> m_vertexWeigh;
+		ndArray<ndInt32> m_vertexIndex;
+		ndArray<ndFloat32> m_vertexWeigh;
 	};
 
 	class dClusterMap: public ndTree<dVertexCluster, const ndString>
@@ -386,7 +386,7 @@ class ndMeshEffect: public ndPolyhedra
 	D_COLLISION_API ndMeshEffect(ndPolyhedra& mesh, const ndMeshEffect& source);
 	
 	// Create a convex hull Mesh from point cloud
-	D_COLLISION_API ndMeshEffect(const dFloat64* const vertexCloud, dInt32 count, dInt32 strideInByte, dFloat64 distTol);
+	D_COLLISION_API ndMeshEffect(const ndFloat64* const vertexCloud, ndInt32 count, ndInt32 strideInByte, ndFloat64 distTol);
 
 	D_COLLISION_API virtual ~ndMeshEffect();
 
@@ -394,61 +394,61 @@ class ndMeshEffect: public ndPolyhedra
 	const ndString& GetName() const;
 
 	ndArray<dMaterial>& GetMaterials();
-	dInt32 GetPropertiesCount() const;
+	ndInt32 GetPropertiesCount() const;
 
-	dInt32 GetVertexCount() const;
-	dInt32 GetVertexStrideInByte() const;
-	const dFloat64* GetVertexPool() const;
+	ndInt32 GetVertexCount() const;
+	ndInt32 GetVertexStrideInByte() const;
+	const ndFloat64* GetVertexPool() const;
 
-	dInt32 GetFaceMaterial(ndEdge* const faceEdge) const;
+	ndInt32 GetFaceMaterial(ndEdge* const faceEdge) const;
 
 	const dClusterMap& GetCluster() const;
 	D_COLLISION_API dVertexCluster* CreateCluster(const char* const name);
 	D_COLLISION_API dVertexCluster* FindCluster(const char* const name) const;
 
-	D_COLLISION_API dFloat64 CalculateVolume() const;
+	D_COLLISION_API ndFloat64 CalculateVolume() const;
 	D_COLLISION_API ndMatrix CalculateOOBB(ndBigVector& size) const;
 	D_COLLISION_API void CalculateAABB(ndBigVector& min, ndBigVector& max) const;
 
 	D_COLLISION_API void ApplyTransform(const ndMatrix& matrix);
-	D_COLLISION_API void CalculateNormals(dFloat64 angleInRadians);
+	D_COLLISION_API void CalculateNormals(ndFloat64 angleInRadians);
 	D_COLLISION_API void BuildFromIndexList(const dMeshVertexFormat* const format);
 	
-	D_COLLISION_API void GetVertexIndexChannel(dInt32* const bufferOut) const;
-	D_COLLISION_API void GetVertexChannel64(dInt32 strideInByte, dFloat64* const bufferOut) const;
-	D_COLLISION_API void GetVertexChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
-	D_COLLISION_API void GetNormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
-	D_COLLISION_API void GetBinormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
-	D_COLLISION_API void GetUV0Channel(dInt32 strideInByte, dFloat32* const bufferOut) const;
-	D_COLLISION_API void GetUV1Channel(dInt32 strideInByte, dFloat32* const bufferOut) const;
-	D_COLLISION_API void GetVertexColorChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
+	D_COLLISION_API void GetVertexIndexChannel(ndInt32* const bufferOut) const;
+	D_COLLISION_API void GetVertexChannel64(ndInt32 strideInByte, ndFloat64* const bufferOut) const;
+	D_COLLISION_API void GetVertexChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
+	D_COLLISION_API void GetNormalChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
+	D_COLLISION_API void GetBinormalChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
+	D_COLLISION_API void GetUV0Channel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
+	D_COLLISION_API void GetUV1Channel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
+	D_COLLISION_API void GetVertexColorChannel(ndInt32 strideInByte, ndFloat32* const bufferOut) const;
 
 	D_COLLISION_API ndIndexArray* MaterialGeometryBegin();
-		D_COLLISION_API dInt32 GetFirstMaterial(ndIndexArray* const handle) const;
-		D_COLLISION_API dInt32 GetNextMaterial(ndIndexArray* const handle, dInt32 materialHandle) const;
-		D_COLLISION_API dInt32 GetMaterialID(ndIndexArray* const handle, dInt32 materialHandle) const;
-		D_COLLISION_API dInt32 GetMaterialIndexCount(ndIndexArray* const handle, dInt32 materialHandle) const;
-		D_COLLISION_API void GetMaterialGetIndexStream(ndIndexArray* const handle, dInt32 materialHandle, dInt32* const index) const;
-		D_COLLISION_API void GetMaterialGetIndexStreamShort(ndIndexArray* const handle, dInt32 materialHandle, dInt16* const index) const;
+		D_COLLISION_API ndInt32 GetFirstMaterial(ndIndexArray* const handle) const;
+		D_COLLISION_API ndInt32 GetNextMaterial(ndIndexArray* const handle, ndInt32 materialHandle) const;
+		D_COLLISION_API ndInt32 GetMaterialID(ndIndexArray* const handle, ndInt32 materialHandle) const;
+		D_COLLISION_API ndInt32 GetMaterialIndexCount(ndIndexArray* const handle, ndInt32 materialHandle) const;
+		D_COLLISION_API void GetMaterialGetIndexStream(ndIndexArray* const handle, ndInt32 materialHandle, ndInt32* const index) const;
+		D_COLLISION_API void GetMaterialGetIndexStreamShort(ndIndexArray* const handle, ndInt32 materialHandle, ndInt16* const index) const;
 	D_COLLISION_API void MaterialGeometryEnd(ndIndexArray* const handle);
 
 	D_COLLISION_API void BeginBuild();
 		D_COLLISION_API void BeginBuildFace();
-			D_COLLISION_API void AddPoint(dFloat64 x, dFloat64 y, dFloat64 z);
-			D_COLLISION_API void AddLayer(dInt32 layer);
-			D_COLLISION_API void AddMaterial(dInt32 materialIndex);
-			D_COLLISION_API void AddNormal(dFloat32 x, dFloat32 y, dFloat32 z);
-			D_COLLISION_API void AddBinormal(dFloat32 x, dFloat32 y, dFloat32 z);
-			D_COLLISION_API void AddVertexColor(dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w);
-			D_COLLISION_API void AddUV0(dFloat32 u, dFloat32 v);
-			D_COLLISION_API void AddUV1(dFloat32 u, dFloat32 v);
+			D_COLLISION_API void AddPoint(ndFloat64 x, ndFloat64 y, ndFloat64 z);
+			D_COLLISION_API void AddLayer(ndInt32 layer);
+			D_COLLISION_API void AddMaterial(ndInt32 materialIndex);
+			D_COLLISION_API void AddNormal(ndFloat32 x, ndFloat32 y, ndFloat32 z);
+			D_COLLISION_API void AddBinormal(ndFloat32 x, ndFloat32 y, ndFloat32 z);
+			D_COLLISION_API void AddVertexColor(ndFloat32 x, ndFloat32 y, ndFloat32 z, ndFloat32 w);
+			D_COLLISION_API void AddUV0(ndFloat32 u, ndFloat32 v);
+			D_COLLISION_API void AddUV1(ndFloat32 u, ndFloat32 v);
 		D_COLLISION_API void EndBuildFace();
-	D_COLLISION_API void EndBuild(dFloat64 tol, bool fixTjoint = true);
+	D_COLLISION_API void EndBuild(ndFloat64 tol, bool fixTjoint = true);
 
 	D_COLLISION_API ndBigVector GetOrigin()const;
-	D_COLLISION_API void SphericalMapping(dInt32 materialIndex, const ndMatrix& uvAligment);
-	D_COLLISION_API void UniformBoxMapping(dInt32 materialIndex, const ndMatrix& textureMatrix);
-	D_COLLISION_API void BoxMapping(dInt32 front, dInt32 side, dInt32 top, const ndMatrix& uvAligment);
+	D_COLLISION_API void SphericalMapping(ndInt32 materialIndex, const ndMatrix& uvAligment);
+	D_COLLISION_API void UniformBoxMapping(ndInt32 materialIndex, const ndMatrix& textureMatrix);
+	D_COLLISION_API void BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const ndMatrix& uvAligment);
 	D_COLLISION_API void RepairTJoints();
 
 	ndMeshEffect* GetFirstLayer();
@@ -458,39 +458,39 @@ class ndMeshEffect: public ndPolyhedra
 	D_COLLISION_API bool HasOpenEdges() const;
 	D_COLLISION_API void Triangulate();
 	D_COLLISION_API void ConvertToPolygons();
-	D_COLLISION_API ndEdge* InsertEdgeVertex(ndEdge* const edge, dFloat64 param);
-	D_COLLISION_API void AddInterpolatedEdgeAttribute(ndEdge* const edge, dFloat64 param);
-	D_COLLISION_API void RemoveUnusedVertices(dInt32* const vertexRemapTable);
-	D_COLLISION_API dInt32 PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* const face);
-	D_COLLISION_API ndShapeInstance* CreateConvexCollision(dFloat64 tolerance) const;
+	D_COLLISION_API ndEdge* InsertEdgeVertex(ndEdge* const edge, ndFloat64 param);
+	D_COLLISION_API void AddInterpolatedEdgeAttribute(ndEdge* const edge, ndFloat64 param);
+	D_COLLISION_API void RemoveUnusedVertices(ndInt32* const vertexRemapTable);
+	D_COLLISION_API ndInt32 PlaneClip(const ndMeshEffect& convexMesh, const ndEdge* const face);
+	D_COLLISION_API ndShapeInstance* CreateConvexCollision(ndFloat64 tolerance) const;
 	D_COLLISION_API ndMeshEffect* ConvexMeshIntersection(const ndMeshEffect* const convexMesh) const;
 	D_COLLISION_API ndMeshEffect* InverseConvexMeshIntersection(const ndMeshEffect* const convexMesh) const;
-	D_COLLISION_API ndMeshEffect* CreateVoronoiConvexDecomposition(const ndArray<ndVector>& pointCloud, dInt32 interiorMaterialIndex, const ndMatrix& textureProjectionMatrix);
+	D_COLLISION_API ndMeshEffect* CreateVoronoiConvexDecomposition(const ndArray<ndVector>& pointCloud, ndInt32 interiorMaterialIndex, const ndMatrix& textureProjectionMatrix);
 
 	protected:
 	D_COLLISION_API void Init();
 	D_COLLISION_API virtual void BeginFace();
 	D_COLLISION_API virtual bool EndFace();
-	dFloat64 QuantizeCordinade(dFloat64 val) const;
+	ndFloat64 QuantizeCordinade(ndFloat64 val) const;
 
 	bool Sanity() const;
-	void PackPoints(dFloat64 tol);
+	void PackPoints(ndFloat64 tol);
 	void UnpackPoints();
 	void PackAttibuteData();
 	void UnpackAttibuteData();
 	bool SeparateDuplicateLoops(ndEdge* const face);
-	dInt32 AddInterpolatedHalfAttribute(ndEdge* const edge, dInt32 midPoint);
+	ndInt32 AddInterpolatedHalfAttribute(ndEdge* const edge, ndInt32 midPoint);
 	
 	void MergeFaces(const ndMeshEffect* const source);
-	D_COLLISION_API ndMeshEffect* GetNextLayer(dInt32 mark);
+	D_COLLISION_API ndMeshEffect* GetNextLayer(ndInt32 mark);
 
 	ndString m_name;
 	dPointFormat m_points;
 	dAttibutFormat m_attrib;
 	dClusterMap m_clusters;
 	ndArray<dMaterial> m_materials;
-	dInt32 m_vertexBaseCount;
-	dInt32 m_constructionIndex;
+	ndInt32 m_vertexBaseCount;
+	ndInt32 m_constructionIndex;
 };
 
 #if 0
@@ -531,13 +531,13 @@ inline dInt32 ndMeshEffect::GetVertexLayer(dInt32 index) const
 }
 #endif
 
-inline dFloat64 ndMeshEffect::QuantizeCordinade(dFloat64 x) const
+inline ndFloat64 ndMeshEffect::QuantizeCordinade(ndFloat64 x) const
 {
-	dInt32 exp;
-	dFloat64 mantissa = frexp(x, &exp);
+	ndInt32 exp;
+	ndFloat64 mantissa = frexp(x, &exp);
 	mantissa = DG_MESH_EFFECT_PRECISION_SCALE_INV * floor (mantissa * DG_MESH_EFFECT_PRECISION_SCALE);
 
-	dFloat64 x1 = ldexp(mantissa, exp);
+	ndFloat64 x1 = ldexp(mantissa, exp);
 	return x1;
 }
 
@@ -599,7 +599,7 @@ inline void ndMeshEffect::dPointFormat::Clear()
 	m_vertex.Clear();
 }
 
-inline void ndMeshEffect::dPointFormat::SetCount(dInt32 count)
+inline void ndMeshEffect::dPointFormat::SetCount(ndInt32 count)
 {
 	m_vertex.Resize(count);
 	m_vertex.SetCount(count);
@@ -645,7 +645,7 @@ inline void ndMeshEffect::dAttibutFormat::Clear()
 	m_uv1Channel.Clear();
 }
 
-inline void ndMeshEffect::dAttibutFormat::SetCount(dInt32 count)
+inline void ndMeshEffect::dAttibutFormat::SetCount(ndInt32 count)
 {
 	m_pointChannel.Resize(count);
 	m_pointChannel.SetCount(count);
@@ -669,7 +669,7 @@ inline void ndMeshEffect::dAttibutFormat::SetCount(dInt32 count)
 	m_uv1Channel.SetCount(count);
 }
 
-inline dInt32 ndMeshEffect::GetPropertiesCount() const
+inline ndInt32 ndMeshEffect::GetPropertiesCount() const
 {
 	return m_attrib.m_pointChannel.GetCount();
 }
@@ -689,24 +689,24 @@ inline ndArray<ndMeshEffect::dMaterial>& ndMeshEffect::GetMaterials()
 	return m_materials;
 }
 
-inline dInt32 ndMeshEffect::GetVertexCount() const
+inline ndInt32 ndMeshEffect::GetVertexCount() const
 {
 	return m_points.m_vertex.GetCount();
 }
 
-inline dInt32 ndMeshEffect::GetVertexStrideInByte() const
+inline ndInt32 ndMeshEffect::GetVertexStrideInByte() const
 {
 	return sizeof(ndBigVector);
 }
 
-inline const dFloat64* ndMeshEffect::GetVertexPool() const
+inline const ndFloat64* ndMeshEffect::GetVertexPool() const
 {
 	return &m_points.m_vertex[0].m_x;
 }
 
-inline dInt32 ndMeshEffect::GetFaceMaterial(ndEdge* const faceEdge) const
+inline ndInt32 ndMeshEffect::GetFaceMaterial(ndEdge* const faceEdge) const
 {
-	return dInt32(m_attrib.m_materialChannel.GetCount() ? m_attrib.m_materialChannel[dInt32(faceEdge->m_userData)] : 0);
+	return ndInt32(m_attrib.m_materialChannel.GetCount() ? m_attrib.m_materialChannel[ndInt32(faceEdge->m_userData)] : 0);
 }
 
 inline ndMeshEffect* ndMeshEffect::GetFirstLayer()

@@ -29,7 +29,7 @@ class ndAsymetricInertiaBody: public ndBodyDynamic
 	{
 	}
 	
-	virtual void SetMassMatrix(dFloat32 mass, const ndMatrix& inertia)
+	virtual void SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia)
 	{
 		m_principalAxis = inertia;
 		ndVector eigenValues(m_principalAxis.EigenVectors());
@@ -54,7 +54,7 @@ class ndAsymetricInertiaBody: public ndBodyDynamic
 	ndMatrix m_principalAxis;
 };
 
-static void DzhanibekovEffect(ndDemoEntityManager* const scene, dFloat32 mass, dFloat32 angularSpeed, const ndVector& origin)
+static void DzhanibekovEffect(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 angularSpeed, const ndVector& origin)
 {
 	ndMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -85,9 +85,9 @@ static void DzhanibekovEffect(ndDemoEntityManager* const scene, dFloat32 mass, d
 	mesh->Release();
 }
 
-static void Phitop(ndDemoEntityManager* const scene, dFloat32 mass, dFloat32 angularSpeed, const ndVector& origin)
+static void Phitop(ndDemoEntityManager* const scene, ndFloat32 mass, ndFloat32 angularSpeed, const ndVector& origin)
 {
-	ndMatrix matrix(dPitchMatrix(15.0f * dDegreeToRad));
+	ndMatrix matrix(dPitchMatrix(15.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -118,9 +118,9 @@ static void Phitop(ndDemoEntityManager* const scene, dFloat32 mass, dFloat32 ang
 	mesh->Release();
 }
 
-static void RattleBack(ndDemoEntityManager* const scene, dFloat32 mass, const ndVector& origin)
+static void RattleBack(ndDemoEntityManager* const scene, ndFloat32 mass, const ndVector& origin)
 {
-	ndMatrix matrix(dPitchMatrix(15.0f * dDegreeToRad));
+	ndMatrix matrix(dPitchMatrix(15.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -129,7 +129,7 @@ static void RattleBack(ndDemoEntityManager* const scene, dFloat32 mass, const nd
 	ndVector floor(FindFloor(*world, matrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y += floor.m_y + 0.4f;
 
-	ndMatrix shapeMatrix(dYawMatrix(5.0f * dDegreeToRad));
+	ndMatrix shapeMatrix(dYawMatrix(5.0f * ndDegreeToRad));
 
 	ndShapeInstance shape(new ndShapeSphere(1.0f));
 	shape.SetLocalMatrix(shapeMatrix);
@@ -158,9 +158,9 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const ndVector& orig
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndShapeInstance shape(new ndShapeCone(0.7f, 1.0f));
-	shape.SetLocalMatrix(dRollMatrix(-90.0f * dDegreeToRad));
+	shape.SetLocalMatrix(dRollMatrix(-90.0f * ndDegreeToRad));
 
-	ndMatrix matrix(dPitchMatrix(15.0f * dDegreeToRad));
+	ndMatrix matrix(dPitchMatrix(15.0f * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 	ndDemoMesh* const geometry = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
@@ -168,7 +168,7 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const ndVector& orig
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 	matrix.m_posit.m_y += 1.0f;
 
-	const dFloat32 mass = 1.0f;
+	const ndFloat32 mass = 1.0f;
 	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
@@ -181,11 +181,11 @@ static void PrecessingTop(ndDemoEntityManager* const scene, const ndVector& orig
 	scene->AddEntity(entity);
 }
 
-static void CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& origin, dFloat32 mass, dFloat32 speed, dFloat32 radius, dFloat32 lenght, dFloat32 tiltAnsgle)
+static void CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& origin, ndFloat32 mass, ndFloat32 speed, ndFloat32 radius, ndFloat32 lenght, ndFloat32 tiltAnsgle)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	dFloat32 smallRadius = 0.0625f;
+	ndFloat32 smallRadius = 0.0625f;
 	ndShapeInstance rod(new ndShapeCapsule(smallRadius * 0.5f, smallRadius * 0.5f, lenght));
 	ndShapeInstance wheel(new ndShapeCylinder(radius, radius, 0.125f));
 
@@ -200,7 +200,7 @@ static void CreateFlyWheel(ndDemoEntityManager* const scene, const ndVector& ori
 	compound->AddCollision(&wheel);
 	compound->EndAddRemove();
 
-	ndMatrix matrix(dRollMatrix(tiltAnsgle * dDegreeToRad));
+	ndMatrix matrix(dRollMatrix(tiltAnsgle * ndDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_y += 5.0f;
 	matrix.m_posit.m_w = 1.0f;

@@ -15,7 +15,7 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointPulley)
 
-ndJointPulley::ndJointPulley(dFloat32 gearRatio,
+ndJointPulley::ndJointPulley(ndFloat32 gearRatio,
 	const ndVector& body0Pin, ndBodyKinematic* const body0,
 	const ndVector& body1Pin, ndBodyKinematic* const body1)
 	:ndJointBilateralConstraint(1, body0, body1, dGetIdentityMatrix())
@@ -40,7 +40,7 @@ ndJointPulley::ndJointPulley(dFloat32 gearRatio,
 
 ndJointPulley::ndJointPulley(const ndLoadSaveBase::dLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
-	,m_gearRatio(dFloat32(1.0f))
+	,m_gearRatio(ndFloat32(1.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
@@ -59,7 +59,7 @@ void ndJointPulley::JacobianDerivative(ndConstraintDescritor& desc)
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	AddAngularRowJacobian(desc, matrix0.m_front, dFloat32(0.0f));
+	AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
 
 	ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
 	ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
@@ -71,7 +71,7 @@ void ndJointPulley::JacobianDerivative(ndConstraintDescritor& desc)
 	const ndVector& veloc1 = m_body1->GetVelocity();
 
 	const ndVector relVeloc(veloc0 * jacobian0.m_linear + veloc1 * jacobian1.m_linear);
-	const dFloat32 w = relVeloc.AddHorizontal().GetScalar() * dFloat32(0.5f);
+	const ndFloat32 w = relVeloc.AddHorizontal().GetScalar() * ndFloat32(0.5f);
 	SetMotorAcceleration(desc, -w * desc.m_invTimestep);
 }
 

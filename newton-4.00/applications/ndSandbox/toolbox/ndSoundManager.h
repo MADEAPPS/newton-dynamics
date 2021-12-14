@@ -32,14 +32,14 @@ class ndSoundChannel: public ndClassAlloc
 	bool GetLoop() const;
 	void SetLoop(bool mode);
 	
-	dFloat32 GetPitch() const;
-	void SetPitch(dFloat32 pitch);
+	ndFloat32 GetPitch() const;
+	void SetPitch(ndFloat32 pitch);
 
-	dFloat32 GetVolume() const;
-	void SetVolume(dFloat32 volumne);
+	ndFloat32 GetVolume() const;
+	void SetVolume(ndFloat32 volumne);
 
-	dFloat32 GetLengthInSeconds() const;
-	dFloat32 GetPositionInSeconds() const;
+	ndFloat32 GetLengthInSeconds() const;
+	ndFloat32 GetPositionInSeconds() const;
 
 	const ndVector GetPosition() const;
 	void SetPosition(const ndVector& posit);
@@ -47,12 +47,12 @@ class ndSoundChannel: public ndClassAlloc
 	const ndVector GetVelocity() const;
 	void SetVelocity(const ndVector& velocity);
 
-	void SetAttenuationRefDistance(dFloat32 refDist, dFloat32 minDropOffDist, dFloat32 maxDropOffDist);
+	void SetAttenuationRefDistance(ndFloat32 refDist, ndFloat32 minDropOffDist, ndFloat32 maxDropOffDist);
 
 	private:
 	void ApplyAttenuation(const ndVector& listenerPosit);
 
-	dInt32 m_source;
+	ndInt32 m_source;
 	ndSoundAsset* m_asset;
 	ndSoundManager* m_manager;
 	ndList<ndSoundChannel*>::ndNode* m_assetNode;
@@ -63,11 +63,11 @@ class ndSoundChannel: public ndClassAlloc
 	ndVector m_posit;
 	ndVector m_veloc;
 
-	dFloat32 m_gain;
-	dFloat32 m_pitch;
-	dFloat32 m_volume;
-	dFloat32 m_minDropOffDist;
-	dFloat32 m_maxDropOffDist;
+	ndFloat32 m_gain;
+	ndFloat32 m_pitch;
+	ndFloat32 m_volume;
+	ndFloat32 m_minDropOffDist;
+	ndFloat32 m_maxDropOffDist;
 
 	friend class ndSoundAsset;
 	friend class ndSoundManager;
@@ -84,14 +84,14 @@ class ndSoundAsset: public ndSoundChannelList
 	ndSoundAsset(const ndSoundAsset& copy);
 	virtual ~ndSoundAsset();
 
-	dInt32 m_buffer;
-	dFloat32 m_frequecy;
-	dFloat32 m_durationInSeconds;
-	ndTree<ndSoundAsset, dUnsigned64>::ndNode* m_node;
+	ndInt32 m_buffer;
+	ndFloat32 m_frequecy;
+	ndFloat32 m_durationInSeconds;
+	ndTree<ndSoundAsset, ndUnsigned64>::ndNode* m_node;
 	friend class ndSoundManager;
 };
 
-class ndSoundAssetList: public ndTree<ndSoundAsset, dUnsigned64>
+class ndSoundAssetList: public ndTree<ndSoundAsset, ndUnsigned64>
 {
 };
 
@@ -111,7 +111,7 @@ class ndSoundManager: public ndClassAlloc
 	// sound play tracks or channels 
 	ndSoundChannel* CreateSoundChannel(const char* const fileName);
 
-	void Update(ndWorld* const world, dFloat32 timestep);
+	void Update(ndWorld* const world, ndFloat32 timestep);
 
 	private:
 	void LoadWaveFile(ndSoundAsset* const asset, const char* const fileName);

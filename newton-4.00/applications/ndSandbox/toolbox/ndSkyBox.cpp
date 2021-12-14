@@ -38,7 +38,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 
 	// index array for glDrawElements()
 	// A cube requires 36 indices = 6 sides * 2 tris * 3 verts
-	static dInt32 indices[] =
+	static ndInt32 indices[] =
 	{
 		0, 1, 2,   2, 3, 0,    // v0-v1-v2, v2-v3-v0 (front)
 		4, 5, 6,   6, 7, 4,    // v0-v3-v4, v4-v5-v0 (right)
@@ -122,8 +122,8 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 	tgaHeader.height = SWAP_INT16(tgaHeader.height);
 	
 	// Get width, height, and depth of texture
-	dInt32 width = tgaHeader.width;
-	dInt32 height = tgaHeader.height;
+	ndInt32 width = tgaHeader.width;
+	ndInt32 height = tgaHeader.height;
 	short sDepth = tgaHeader.bits / 8;
 	dAssert((sDepth == 3) || (sDepth == 4));
 	
@@ -140,7 +140,7 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 	unsigned lImageSize = width * height * sDepth;
 	
 	// Allocate memory and check for success
-	char* const pBits = (char*)ndMemory::Malloc(width * height * sizeof(dInt32));
+	char* const pBits = (char*)ndMemory::Malloc(width * height * sizeof(ndInt32));
 	if (pBits == nullptr)
 	{
 		dAssert(0);
@@ -148,7 +148,7 @@ void ndSkyBox::LoadCubeTexture(GLenum face, const char* const filename)
 		return;
 	}
 	
-	dInt32 readret = dInt32(fread(pBits, lImageSize, 1, pFile));
+	ndInt32 readret = ndInt32(fread(pBits, lImageSize, 1, pFile));
 	if (readret != 1)
 	{
 		dAssert(0);
@@ -216,7 +216,7 @@ ndSkyBox::~ndSkyBox()
 	}
 }
 
-void ndSkyBox::Render(dFloat32, ndDemoEntityManager* const scene, const ndMatrix&) const
+void ndSkyBox::Render(ndFloat32, ndDemoEntityManager* const scene, const ndMatrix&) const
 {
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);

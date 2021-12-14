@@ -35,13 +35,13 @@ bool ndRayCastNotify::TraceShape(const ndVector& globalOrigin, const ndVector& g
 
 	const ndVector& localOrigin(shapeGlobal.UntransformVector(globalOrigin) & ndVector::m_triplexMask);
 	const ndVector& localDestination(shapeGlobal.UntransformVector(globalDestination) & ndVector::m_triplexMask);
-	dFloat32 t = shapeInstance.RayCast(*this, localOrigin, localDestination, &tmpBody, contactOut);
+	ndFloat32 t = shapeInstance.RayCast(*this, localOrigin, localDestination, &tmpBody, contactOut);
 	bool state = false;
-	if (t <= dFloat32 (1.0f))
+	if (t <= ndFloat32 (1.0f))
 	{
 		ndVector p(shapeGlobal.TransformVector(localOrigin + (localDestination - localOrigin).Scale(t)));
-		dAssert(t >= dFloat32(0.0f));
-		dAssert(t <= dFloat32(1.0f));
+		dAssert(t >= ndFloat32(0.0f));
+		dAssert(t <= ndFloat32(1.0f));
 		m_param = t;
 		state = true;
 		m_contact.m_body0 = nullptr;

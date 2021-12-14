@@ -31,7 +31,7 @@ class ndRayCastNotify : public ndClassAlloc
 {
 	public: 
 	ndRayCastNotify()
-		:m_param(dFloat32 (1.0f))
+		:m_param(ndFloat32 (1.0f))
 	{
 	}
 
@@ -41,16 +41,16 @@ class ndRayCastNotify : public ndClassAlloc
 
 	D_COLLISION_API bool TraceShape(const ndVector& globalOrigin, const ndVector& globalDestination, const ndShapeInstance& shapeInstance, const ndMatrix& shapeGlobal);
 
-	virtual dUnsigned32 OnRayPrecastAction(const ndBody* const, const ndShapeInstance* const)
+	virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const, const ndShapeInstance* const)
 	{
 		return 1;
 	}
 
-	virtual dFloat32 OnRayCastAction(const ndContactPoint& contact, dFloat32 intersetParam) = 0;
+	virtual ndFloat32 OnRayCastAction(const ndContactPoint& contact, ndFloat32 intersetParam) = 0;
 
 
 	ndContactPoint m_contact;
-	dFloat32 m_param;
+	ndFloat32 m_param;
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -62,13 +62,13 @@ class ndRayCastClosestHitCallback: public ndRayCastNotify
 	{
 	}
 
-	dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
+	ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
 	{
 		// do not let player capsule picking
 		return ((ndBody*)body)->GetAsBodyPlayerCapsule() ? 0 : 1;
 	}
 
-	dFloat32 OnRayCastAction(const ndContactPoint& contact, dFloat32 intersetParam)
+	ndFloat32 OnRayCastAction(const ndContactPoint& contact, ndFloat32 intersetParam)
 	{
 		if (intersetParam < m_param)
 		{

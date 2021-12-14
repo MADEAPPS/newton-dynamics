@@ -50,7 +50,7 @@
 				#if defined(_DEBUG) && defined(_MSC_VER)
 					// Track all memory leaks at the operating system level.
 					// make sure no Newton tool or utility leaves leaks behind.
-					dUnsigned32 flags = _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF) & 0xffff;
+					ndUnsigned32 flags = _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF) & 0xffff;
 					flags = flags | _CRTDBG_REPORT_FLAG;
 					flags = flags | _CRTDBG_CHECK_EVERY_1024_DF;
 					_CrtSetDbgFlag(flags);

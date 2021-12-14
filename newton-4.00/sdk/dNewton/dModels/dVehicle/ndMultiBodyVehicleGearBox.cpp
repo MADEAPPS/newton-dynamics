@@ -29,20 +29,20 @@
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleGearBox)
 
 ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, ndMultiBodyVehicle* const chassis)
-	:ndJointGear(dFloat32 (1.0f), motor->GetMatrix().m_front, differential,	motor->GetMatrix().m_front, motor)
+	:ndJointGear(ndFloat32 (1.0f), motor->GetMatrix().m_front, differential,	motor->GetMatrix().m_front, motor)
 	,m_chassis(chassis)
-	,m_clutchTorque(dFloat32 (1.0e5f))
-	,m_driveTrainResistanceTorque(dFloat32(1000.0f))
+	,m_clutchTorque(ndFloat32 (1.0e5f))
+	,m_driveTrainResistanceTorque(ndFloat32(1000.0f))
 {
-	SetRatio(dFloat32(0.0f));
+	SetRatio(ndFloat32(0.0f));
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
 ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(const ndLoadSaveBase::dLoadDescriptor& desc)
 	:ndJointGear(ndLoadSaveBase::dLoadDescriptor(desc))
 	,m_chassis(nullptr)
-	,m_clutchTorque(dFloat32(1.0e5f))
-	,m_driveTrainResistanceTorque(dFloat32(1000.0f))
+	,m_clutchTorque(ndFloat32(1.0e5f))
+	,m_driveTrainResistanceTorque(ndFloat32(1000.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
@@ -50,19 +50,19 @@ ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(const ndLoadSaveBase::dLoad
 	m_driveTrainResistanceTorque = xmlGetFloat(xmlNode, "driveTrainResistanceTorque");
 }
 
-void ndMultiBodyVehicleGearBox::SetClutchTorque(dFloat32 torqueInNewtonMeters)
+void ndMultiBodyVehicleGearBox::SetClutchTorque(ndFloat32 torqueInNewtonMeters)
 {
 	m_clutchTorque = dAbs(torqueInNewtonMeters);
 }
 
-void ndMultiBodyVehicleGearBox::SetInternalLosesTorque(dFloat32 torqueInNewtonMeters)
+void ndMultiBodyVehicleGearBox::SetInternalLosesTorque(ndFloat32 torqueInNewtonMeters)
 {
 	m_driveTrainResistanceTorque = dAbs(torqueInNewtonMeters);
 }
 
 void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 {
-	if (dAbs(m_gearRatio) > dFloat32(1.0e-2f))
+	if (dAbs(m_gearRatio) > ndFloat32(1.0e-2f))
 	{
 		ndMatrix matrix0;
 		ndMatrix matrix1;
@@ -70,12 +70,12 @@ void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 		CalculateGlobalMatrix(matrix0, matrix1);
 		
-		AddAngularRowJacobian(desc, matrix0.m_front, dFloat32(0.0f));
+		AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
 		
 		ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
 		ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
 
-		dFloat32 gearRatio = dFloat32(1.0f) / m_gearRatio;
+		ndFloat32 gearRatio = ndFloat32(1.0f) / m_gearRatio;
 		
 		jacobian0.m_angular = matrix0.m_front;
 		jacobian1.m_angular = matrix1.m_front.Scale(gearRatio);
@@ -85,16 +85,16 @@ void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 		
 		dAssert(m_chassis->m_motor);
 		ndMultiBodyVehicleMotor* const rotor = m_chassis->m_motor;
-		dFloat32 idleOmega = rotor->m_idleOmega * gearRatio * dFloat32(0.95f);
+		ndFloat32 idleOmega = rotor->m_idleOmega * gearRatio * ndFloat32(0.95f);
 
-		dFloat32 w0 = omega0.DotProduct(jacobian0.m_angular).GetScalar();
-		dFloat32 w1 = omega1.DotProduct(jacobian1.m_angular).GetScalar() + idleOmega;
-		w1 = (gearRatio > dFloat32(0.0f)) ? dMin(w1, dFloat32(0.0f)) : dMax(w1, dFloat32(0.0f));
+		ndFloat32 w0 = omega0.DotProduct(jacobian0.m_angular).GetScalar();
+		ndFloat32 w1 = omega1.DotProduct(jacobian1.m_angular).GetScalar() + idleOmega;
+		w1 = (gearRatio > ndFloat32(0.0f)) ? dMin(w1, ndFloat32(0.0f)) : dMax(w1, ndFloat32(0.0f));
 		
-		const dFloat32 w = (w0 + w1) * dFloat32(0.5f);
+		const ndFloat32 w = (w0 + w1) * ndFloat32(0.5f);
 		SetMotorAcceleration(desc, -w * desc.m_invTimestep);
 
-		if (m_gearRatio > dFloat32 (0.0f))
+		if (m_gearRatio > ndFloat32 (0.0f))
 		{
 			SetHighFriction(desc, m_clutchTorque);
 			SetLowerFriction(desc, -m_driveTrainResistanceTorque);

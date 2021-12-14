@@ -47,9 +47,9 @@ class ndModel: public ndClassAlloc
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 
 	protected:
-	virtual void Update(ndWorld* const world, dFloat32 timestep);
-	virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
-	virtual void PostTransformUpdate(ndWorld* const world, dFloat32 timestep);
+	virtual void Update(ndWorld* const world, ndFloat32 timestep);
+	virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
+	virtual void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep);
 
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
@@ -84,15 +84,15 @@ inline void ndModel::Debug(ndConstraintDebugCallback&) const
 {
 }
 
-inline void ndModel::Update(ndWorld* const, dFloat32)
+inline void ndModel::Update(ndWorld* const, ndFloat32)
 {
 }
 
-inline void ndModel::PostUpdate(ndWorld* const, dFloat32)
+inline void ndModel::PostUpdate(ndWorld* const, ndFloat32)
 {
 }
 
-inline void ndModel::PostTransformUpdate(ndWorld* const, dFloat32)
+inline void ndModel::PostTransformUpdate(ndWorld* const, ndFloat32)
 {
 }
 

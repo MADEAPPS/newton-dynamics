@@ -40,26 +40,26 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 		{
 		}
 
-		virtual void DrawPolygon(dInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const)
+		virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceVertex, const ndEdgeType* const)
 		{
 			m_faceIndexCount.PushBack(vertexCount);
-			for (dInt32 i = 0; i < vertexCount; i++) 
+			for (ndInt32 i = 0; i < vertexCount; i++) 
 			{
-				ndBigVector point(faceVertex[i].m_x, faceVertex[i].m_y, faceVertex[i].m_z, dFloat32(m_brush));
+				ndBigVector point(faceVertex[i].m_x, faceVertex[i].m_y, faceVertex[i].m_z, ndFloat32(m_brush));
 				m_vertex.PushBack(point);
 			}
 		}
 	
 		ndArray<ndBigVector> m_vertex;
-		ndArray<dInt32> m_faceIndexCount;
-		dInt32 m_brush;
+		ndArray<ndInt32> m_faceIndexCount;
+		ndInt32 m_brush;
 	};
 	dgMeshEffectBuilder builder;
 
 	Init();
 	if (((ndShape*)instance.GetShape())->GetAsShapeCompound())
 	{
-		dInt32 brush = 0;
+		ndInt32 brush = 0;
 		ndMatrix matrix(instance.GetLocalMatrix());
 		const ndShapeCompound* const compound = ((ndShape*)instance.GetShape())->GetAsShapeCompound();
 		const ndShapeCompound::ndTreeArray& array = compound->GetTree();
@@ -78,8 +78,8 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 		instance.DebugShape(matrix, builder);
 	}
 
-	ndStack<dInt32>indexListBuffer(builder.m_vertex.GetCount());
-	dInt32* const indexList = &indexListBuffer[0];
+	ndStack<ndInt32>indexListBuffer(builder.m_vertex.GetCount());
+	ndInt32* const indexList = &indexListBuffer[0];
 	dVertexListToIndexList(&builder.m_vertex[0].m_x, sizeof(ndBigVector), 4, builder.m_vertex.GetCount(), &indexList[0], DG_VERTEXLIST_INDEXLIST_TOL);
 	
 	ndMeshEffect::dMeshVertexFormat vertexFormat;
@@ -94,5 +94,5 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 	
 	BuildFromIndexList(&vertexFormat);
 	RepairTJoints();
-	CalculateNormals(dFloat32(45.0f) * dDegreeToRad);
+	CalculateNormals(ndFloat32(45.0f) * ndDegreeToRad);
 }

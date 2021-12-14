@@ -27,51 +27,51 @@
 
 #ifndef D_NEWTON_USE_DOUBLE
 
-	ndVector ndVector::m_xMask(dInt32(-1), dInt32(0), dInt32(0), dInt32(0));
-	ndVector ndVector::m_yMask(dInt32(0), dInt32(-1), dInt32(0), dInt32(0));
-	ndVector ndVector::m_zMask(dInt32(0), dInt32(0), dInt32(-1), dInt32(0));
-	ndVector ndVector::m_wMask(dInt32(0), dInt32(0), dInt32(0), dInt32(-1));
-	ndVector ndVector::m_xyzwMask(dInt32(-1), dInt32(-1), dInt32(-1), dInt32(-1));
-	ndVector ndVector::m_triplexMask(dInt32(-1), dInt32(-1), dInt32(-1), dInt32(0));
-	ndVector ndVector::m_signMask(ndVector(dInt32(-1), dInt32(-1), dInt32(-1), dInt32(-1)).ShiftRightLogical(1));
+	ndVector ndVector::m_xMask(ndInt32(-1), ndInt32(0), ndInt32(0), ndInt32(0));
+	ndVector ndVector::m_yMask(ndInt32(0), ndInt32(-1), ndInt32(0), ndInt32(0));
+	ndVector ndVector::m_zMask(ndInt32(0), ndInt32(0), ndInt32(-1), ndInt32(0));
+	ndVector ndVector::m_wMask(ndInt32(0), ndInt32(0), ndInt32(0), ndInt32(-1));
+	ndVector ndVector::m_xyzwMask(ndInt32(-1), ndInt32(-1), ndInt32(-1), ndInt32(-1));
+	ndVector ndVector::m_triplexMask(ndInt32(-1), ndInt32(-1), ndInt32(-1), ndInt32(0));
+	ndVector ndVector::m_signMask(ndVector(ndInt32(-1), ndInt32(-1), ndInt32(-1), ndInt32(-1)).ShiftRightLogical(1));
 
-	ndVector ndVector::m_zero(dFloat32(0.0f));
-	ndVector ndVector::m_one(dFloat32(1.0f));
-	ndVector ndVector::m_two(dFloat32(2.0f));
-	ndVector ndVector::m_half(dFloat32(0.5f));
-	ndVector ndVector::m_three(dFloat32(3.0f));
-	ndVector ndVector::m_negOne(dFloat32(-1.0f));
-	ndVector ndVector::m_epsilon(dFloat32(1.0e-20f));
-	ndVector ndVector::m_wOne(dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f));
+	ndVector ndVector::m_zero(ndFloat32(0.0f));
+	ndVector ndVector::m_one(ndFloat32(1.0f));
+	ndVector ndVector::m_two(ndFloat32(2.0f));
+	ndVector ndVector::m_half(ndFloat32(0.5f));
+	ndVector ndVector::m_three(ndFloat32(3.0f));
+	ndVector ndVector::m_negOne(ndFloat32(-1.0f));
+	ndVector ndVector::m_epsilon(ndFloat32(1.0e-20f));
+	ndVector ndVector::m_wOne(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f));
 #endif
 
-ndBigVector ndBigVector::m_zero (dFloat64 (0.0f));
-ndBigVector ndBigVector::m_one (dFloat64 (1.0f));
-ndBigVector ndBigVector::m_two (dFloat64 (2.0f));
-ndBigVector ndBigVector::m_half (dFloat32 (0.5f));
-ndBigVector ndBigVector::m_three (dFloat32 (3.0f));
-ndBigVector ndBigVector::m_negOne (dFloat32 (-1.0f));
-ndBigVector ndBigVector::m_epsilon(dFloat32(1.0e-20f));
-ndBigVector ndBigVector::m_wOne (dFloat32 (0.0f), dFloat32 (0.0f), dFloat32 (0.0f), dFloat32 (1.0f));
-ndBigVector ndBigVector::m_triplexMask (dInt32 (-1), dInt32 (-1),	dInt32 (-1), dInt32 (0));
-ndBigVector ndBigVector::m_signMask (ndBigVector(dInt32 (-1), dInt32 (-1), dInt32 (-1), dInt32 (-1)).ShiftRightLogical(1));
+ndBigVector ndBigVector::m_zero (ndFloat64 (0.0f));
+ndBigVector ndBigVector::m_one (ndFloat64 (1.0f));
+ndBigVector ndBigVector::m_two (ndFloat64 (2.0f));
+ndBigVector ndBigVector::m_half (ndFloat32 (0.5f));
+ndBigVector ndBigVector::m_three (ndFloat32 (3.0f));
+ndBigVector ndBigVector::m_negOne (ndFloat32 (-1.0f));
+ndBigVector ndBigVector::m_epsilon(ndFloat32(1.0e-20f));
+ndBigVector ndBigVector::m_wOne (ndFloat32 (0.0f), ndFloat32 (0.0f), ndFloat32 (0.0f), ndFloat32 (1.0f));
+ndBigVector ndBigVector::m_triplexMask (ndInt32 (-1), ndInt32 (-1),	ndInt32 (-1), ndInt32 (0));
+ndBigVector ndBigVector::m_signMask (ndBigVector(ndInt32 (-1), ndInt32 (-1), ndInt32 (-1), ndInt32 (-1)).ShiftRightLogical(1));
 
-ndBigVector ndBigVector::m_xMask (dInt32 (-1), dInt32 ( 0),	dInt32 ( 0), dInt32 ( 0));
-ndBigVector ndBigVector::m_yMask (dInt32 ( 0), dInt32 (-1),	dInt32 ( 0), dInt32 ( 0));
-ndBigVector ndBigVector::m_zMask (dInt32 ( 0), dInt32 ( 0),	dInt32 (-1), dInt32 ( 0));
-ndBigVector ndBigVector::m_wMask (dInt32 ( 0), dInt32 ( 0),	dInt32 ( 0), dInt32 (-1));
-ndBigVector ndBigVector::m_xyzwMask (dInt32(-1), dInt32(-1), dInt32(-1), dInt32(-1));
+ndBigVector ndBigVector::m_xMask (ndInt32 (-1), ndInt32 ( 0),	ndInt32 ( 0), ndInt32 ( 0));
+ndBigVector ndBigVector::m_yMask (ndInt32 ( 0), ndInt32 (-1),	ndInt32 ( 0), ndInt32 ( 0));
+ndBigVector ndBigVector::m_zMask (ndInt32 ( 0), ndInt32 ( 0),	ndInt32 (-1), ndInt32 ( 0));
+ndBigVector ndBigVector::m_wMask (ndInt32 ( 0), ndInt32 ( 0),	ndInt32 ( 0), ndInt32 (-1));
+ndBigVector ndBigVector::m_xyzwMask (ndInt32(-1), ndInt32(-1), ndInt32(-1), ndInt32(-1));
 
-ndSpatialVector ndSpatialVector::m_zero (dFloat32 (0.0f));
+ndSpatialVector ndSpatialVector::m_zero (ndFloat32 (0.0f));
 
 //dMatrix dMatrix::m_zeroMatrix(
-//	ndVector(dFloat32(0.0f)),
-//	ndVector(dFloat32(0.0f)),
-//	ndVector(dFloat32(0.0f)),
-//	ndVector(dFloat32(0.0f)));
+//	ndVector(ndFloat32(0.0f)),
+//	ndVector(ndFloat32(0.0f)),
+//	ndVector(ndFloat32(0.0f)),
+//	ndVector(ndFloat32(0.0f)));
 //
 //dMatrix dMatrix::m_identityMatrix(
-//	ndVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)),
-//	ndVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f)),
-//	ndVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)),
-//	ndVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f)));
+//	ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
+//	ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f)),
+//	ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f)),
+//	ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f)));

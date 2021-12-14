@@ -132,7 +132,7 @@ class ndList: public ndClassAlloc
 		{
 		}
 
-		operator dInt32() const
+		operator ndInt32() const
 		{
 			return m_ptr != nullptr;
 		}
@@ -163,7 +163,7 @@ class ndList: public ndClassAlloc
 			m_ptr = m_ptr->m_next();
 		}
 
-		void operator++ (dInt32)
+		void operator++ (ndInt32)
 		{
 			dAssert (m_ptr);
 			m_ptr = m_ptr->GetNext();
@@ -175,7 +175,7 @@ class ndList: public ndClassAlloc
 			m_ptr = m_ptr->GetPrev();
 		}
 
-		void operator-- (dInt32) 
+		void operator-- (ndInt32) 
 		{
 			dAssert (m_ptr);
 			m_ptr = m_ptr->GetPrev();
@@ -203,8 +203,8 @@ class ndList: public ndClassAlloc
 	ndList ();
 	~ndList ();
 
-	operator dInt32() const;
-	dInt32 GetCount() const;
+	operator ndInt32() const;
+	ndInt32 GetCount() const;
 	ndNode* GetLast() const;
 	ndNode* GetFirst() const;
 	ndNode* Append ();
@@ -241,7 +241,7 @@ class ndList: public ndClassAlloc
 	private:
 	ndNode* m_first;
 	ndNode* m_last;
-	dInt32 m_count;
+	ndInt32 m_count;
 	friend class ndNode;
 };
 
@@ -261,13 +261,13 @@ ndList<T,allocator>::~ndList ()
 }
 
 template<class T, class allocator>
-dInt32 ndList<T,allocator>::GetCount() const
+ndInt32 ndList<T,allocator>::GetCount() const
 {
 	return m_count;
 }
 
 template<class T, class allocator>
-ndList<T,allocator>::operator dInt32() const
+ndList<T,allocator>::operator ndInt32() const
 {
 	return m_first != nullptr;
 }
@@ -545,7 +545,7 @@ template<class T, class allocator>
 typename ndList<T,allocator>::ndNode *ndList<T,allocator>::GetNodeFromInfo (T &info) const
 {
 	ndNode* const node = (ndNode *) &info;
-	dInt64 offset = ((char*) &node->m_info) - ((char *) node);
+	ndInt64 offset = ((char*) &node->m_info) - ((char *) node);
 	ndNode* const retnode = (ndNode *) (((char *) node) - offset);
 
 	dAssert (&retnode->GetInfo () == &info);
@@ -637,7 +637,7 @@ template<class T, class allocator>
 bool ndList<T,allocator>::SanityCheck () const
 {
 	#ifdef _DEBUG
-	dInt32 tCount = 0;
+	ndInt32 tCount = 0;
 	for (ndNode * node = m_first; node; node = node->GetNext()) 
 	{
 		tCount ++;

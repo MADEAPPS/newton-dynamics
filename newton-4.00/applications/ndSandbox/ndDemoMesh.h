@@ -26,7 +26,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public ndList<ndDemoSubMesh>
 	ndDemoMesh(const char* const name);
 	ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCache);
 	ndDemoMesh(const char* const name, ndMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
-	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = dGetIdentityMatrix());
+	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, ndFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = dGetIdentityMatrix());
 
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const) 
 	{ 
@@ -40,8 +40,8 @@ class ndDemoMesh: public ndDemoMeshInterface, public ndList<ndDemoSubMesh>
 	virtual void RenderNormals();
 	virtual void Render (ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 	virtual void RenderTransparency(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
-	void OptimizeForRender(const glPositionNormalUV* const points, dInt32 pointCount,
-						   const dInt32* const indices, dInt32 indexCount);
+	void OptimizeForRender(const glPositionNormalUV* const points, ndInt32 pointCount,
+						   const ndInt32* const indices, ndInt32 indexCount);
 	void GetVertexArray(ndArray<ndVector>& points) const;
 
 	protected:
@@ -49,18 +49,18 @@ class ndDemoMesh: public ndDemoMeshInterface, public ndList<ndDemoSubMesh>
 	void ResetOptimization();
 	void RenderGeometry(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 
-	dInt32 m_indexCount;
-	dInt32 m_vertexCount;
-	dInt32 m_textureLocation;
-	dInt32 m_transparencyLocation;
-	dInt32 m_normalMatrixLocation;
-	dInt32 m_projectMatrixLocation;
-	dInt32 m_viewModelMatrixLocation;
-	dInt32 m_directionalLightDirLocation;
+	ndInt32 m_indexCount;
+	ndInt32 m_vertexCount;
+	ndInt32 m_textureLocation;
+	ndInt32 m_transparencyLocation;
+	ndInt32 m_normalMatrixLocation;
+	ndInt32 m_projectMatrixLocation;
+	ndInt32 m_viewModelMatrixLocation;
+	ndInt32 m_directionalLightDirLocation;
 
-	dInt32 m_materialAmbientLocation;
-	dInt32 m_materialDiffuseLocation;
-	dInt32 m_materialSpecularLocation;
+	ndInt32 m_materialAmbientLocation;
+	ndInt32 m_materialDiffuseLocation;
+	ndInt32 m_materialSpecularLocation;
 
 	GLuint m_shader;
 	GLuint m_indexBuffer;

@@ -25,8 +25,8 @@
 #include "ndNewtonStdafx.h"
 
 #define D_SMALL_ISLAND_COUNT		32
-#define	D_FREEZZING_VELOCITY_DRAG	dFloat32 (0.9f)
-#define	D_SOLVER_MAX_ERROR			(D_FREEZE_MAG * dFloat32 (0.5f))
+#define	D_FREEZZING_VELOCITY_DRAG	ndFloat32 (0.9f)
+#define	D_SOLVER_MAX_ERROR			(D_FREEZE_MAG * ndFloat32 (0.5f))
 
 #define D_MAX_BODY_RADIX_BIT		9
 
@@ -51,8 +51,8 @@ class ndDynamicsUpdate : public ndClassAlloc
 	class ndJointBodyPairIndex
 	{
 		public:
-		dInt32 m_body;
-		dInt32 m_joint;
+		ndInt32 m_body;
+		ndInt32 m_joint;
 	};
 
 	class ndBodyIndexPair
@@ -72,8 +72,8 @@ class ndDynamicsUpdate : public ndClassAlloc
 		{
 		}
 
-		dInt32 m_start;
-		dInt32 m_count;
+		ndInt32 m_start;
+		ndInt32 m_count;
 		ndBodyKinematic* m_root;
 	};
 
@@ -83,13 +83,13 @@ class ndDynamicsUpdate : public ndClassAlloc
 
 	void* GetTempBuffer() const;
 	virtual const char* GetStringId() const;
-	dInt32 GetUnconstrainedBodyCount() const;
-	void ClearBuffer(void* const buffer, dInt32 sizeInByte) const;
-	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
+	ndInt32 GetUnconstrainedBodyCount() const;
+	void ClearBuffer(void* const buffer, ndInt32 sizeInByte) const;
+	void ClearJacobianBuffer(ndInt32 count, ndJacobian* const dst) const;
 
 	ndArray<ndJacobian>& GetInternalForces();
 	ndArray<ndLeftHandSide>& GetLeftHandSide();
-	ndArray<dInt32>& GetJointForceIndexBuffer();
+	ndArray<ndInt32>& GetJointForceIndexBuffer();
 	ndArray<ndRightHandSide>& GetRightHandSide();
 	ndArray<ndJacobian>& GetTempInternalForces();
 	ndArray<ndBodyKinematic*>& GetBodyIslandOrder();
@@ -125,7 +125,7 @@ class ndDynamicsUpdate : public ndClassAlloc
 
 	ndVector m_velocTol;
 	ndArray<ndIsland> m_islands;
-	ndArray<dInt32> m_jointForcesIndex;
+	ndArray<ndInt32> m_jointForcesIndex;
 	ndArray<ndJacobian> m_internalForces;
 	ndArray<ndLeftHandSide> m_leftHandSide;
 	ndArray<ndRightHandSide> m_rightHandSide;
@@ -134,15 +134,15 @@ class ndDynamicsUpdate : public ndClassAlloc
 	ndArray<ndJointBodyPairIndex> m_jointBodyPairIndexBuffer;
 
 	ndWorld* m_world;
-	dFloat32 m_timestep;
-	dFloat32 m_invTimestep;
-	dFloat32 m_firstPassCoef;
-	dFloat32 m_invStepRK;
-	dFloat32 m_timestepRK;
-	dFloat32 m_invTimestepRK;
-	dUnsigned32 m_solverPasses;
-	dInt32 m_activeJointCount;
-	dInt32 m_unConstrainedBodyCount;
+	ndFloat32 m_timestep;
+	ndFloat32 m_invTimestep;
+	ndFloat32 m_firstPassCoef;
+	ndFloat32 m_invStepRK;
+	ndFloat32 m_timestepRK;
+	ndFloat32 m_invTimestepRK;
+	ndUnsigned32 m_solverPasses;
+	ndInt32 m_activeJointCount;
+	ndInt32 m_unConstrainedBodyCount;
 
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
@@ -177,7 +177,7 @@ inline  ndArray<ndBodyKinematic*>& ndDynamicsUpdate::GetBodyIslandOrder()
 	return m_bodyIslandOrder;
 }
 
-inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
+inline ndInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
 {
 	return m_unConstrainedBodyCount;
 }
@@ -187,28 +187,28 @@ inline ndArray<ndDynamicsUpdate::ndJointBodyPairIndex>& ndDynamicsUpdate::GetJoi
 	return m_jointBodyPairIndexBuffer;
 }
 
-inline ndArray<dInt32>& ndDynamicsUpdate::GetJointForceIndexBuffer()
+inline ndArray<ndInt32>& ndDynamicsUpdate::GetJointForceIndexBuffer()
 {
 	return m_jointForcesIndex;
 }
 
-inline void ndDynamicsUpdate::ClearJacobianBuffer(dInt32 count, ndJacobian* const buffer) const
+inline void ndDynamicsUpdate::ClearJacobianBuffer(ndInt32 count, ndJacobian* const buffer) const
 {
 	const ndVector zero(ndVector::m_zero);
 	ndVector* const dst = &buffer[0].m_linear;
-	for (dInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; i++)
 	{
 		dst[i * 2 + 0] = zero;
 		dst[i * 2 + 1] = zero;
 	}
 }
 
-inline void ndDynamicsUpdate::ClearBuffer(void* const buffer, dInt32 sizeInByte) const
+inline void ndDynamicsUpdate::ClearBuffer(void* const buffer, ndInt32 sizeInByte) const
 {
-	dInt32 sizeInJacobian = sizeInByte / sizeof(ndJacobian);
+	ndInt32 sizeInJacobian = sizeInByte / sizeof(ndJacobian);
 	ClearJacobianBuffer(sizeInJacobian, (ndJacobian*)buffer);
 	char* const ptr = (char*)buffer;
-	for (dInt32 i = sizeInJacobian * sizeof(ndJacobian); i < sizeInByte; i++)
+	for (ndInt32 i = sizeInJacobian * sizeof(ndJacobian); i < sizeInByte; i++)
 	{
 		ptr[i] = 0;
 	}

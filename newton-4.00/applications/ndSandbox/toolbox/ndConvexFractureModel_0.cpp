@@ -31,31 +31,31 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 		{
 			ndVector pointCloud2d[16*16];
 			ndVector dir(m_plane & ndVector::m_triplexMask);
-			dFloat32 project = dir.DotProduct(plane.m_plane).GetScalar();
-			if (project > dFloat32(0.9999f)) 
+			ndFloat32 project = dir.DotProduct(plane.m_plane).GetScalar();
+			if (project > ndFloat32(0.9999f)) 
 			{
-				dFloat32 dist = m_plane.m_w - plane.m_plane.m_w;
-				if (dAbs(dist) < dFloat32(1.0e-4f)) 
+				ndFloat32 dist = m_plane.m_w - plane.m_plane.m_w;
+				if (dAbs(dist) < ndFloat32(1.0e-4f)) 
 				{
-					dInt32 pointCount = 0;
-					for (dInt32 i = 0; i < m_count; i++)
+					ndInt32 pointCount = 0;
+					for (ndInt32 i = 0; i < m_count; i++)
 					{
-						for (dInt32 j = 0; j < plane.m_count; j++)
+						for (ndInt32 j = 0; j < plane.m_count; j++)
 						{
 							pointCloud2d[pointCount] = plane2d.m_polygon[i] - matrix.TransformVector(plane.m_polygon[j]);
 							pointCount++;
-							dAssert(pointCount < dInt32(sizeof(pointCloud2d) / sizeof(pointCloud2d[0])));
+							dAssert(pointCount < ndInt32(sizeof(pointCloud2d) / sizeof(pointCloud2d[0])));
 						}
 					}
 					pointCount = dConvexHull2d(pointCloud2d, pointCount);
 
-					dInt32 k0 = pointCount - 1;
-					for (dInt32 k = 0; k < pointCount; k++)
+					ndInt32 k0 = pointCount - 1;
+					for (ndInt32 k = 0; k < pointCount; k++)
 					{
 						const ndVector e0(ndVector::m_zero - pointCloud2d[k0]);
 						const ndVector e1(pointCloud2d[k] - pointCloud2d[k0]);
 						const ndVector cross(e1.CrossProduct(e0));
-						if (cross.m_z < dFloat32 (1.0e-6f))
+						if (cross.m_z < ndFloat32 (1.0e-6f))
 						{
 							return false;
 						}
@@ -70,29 +70,29 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 
 		ndPlane m_plane;
 		ndFixSizeArray<ndVector, 16> m_polygon;
-		dInt32 m_count;
+		ndInt32 m_count;
 	};
 
-	ndFaceArrayDatabase(dFloat32 sign = 1.0f)
+	ndFaceArrayDatabase(ndFloat32 sign = 1.0f)
 		:ndShapeDebugNotify()
 		,m_sign(sign)
 		,m_count(0)
 	{
 	}
 
-	void DrawPolygon(dInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const)
+	void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const)
 	{
 		ndFaceInfo& face = m_polygons[m_count];
 		face.m_count = vertexCount;
 		dAssert(vertexCount <= face.m_polygon.GetCapacity());
-		for (dInt32 i = 0; i < vertexCount; i++)
+		for (ndInt32 i = 0; i < vertexCount; i++)
 		{
 			face.m_polygon[i] = faceArray[i];
 		}
 
 		ndVector normal(ndVector::m_zero);
 		ndVector edge0(faceArray[1] - faceArray[0]);
-		for (dInt32 i = 2; i < vertexCount; i++)
+		for (ndInt32 i = 2; i < vertexCount; i++)
 		{
 			ndVector edge1(faceArray[i] - faceArray[0]);
 			normal += edge0.CrossProduct(edge1);
@@ -111,7 +111,7 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 		ndFaceArrayDatabase siblingDataBase(-1.0f);
 		shape->DebugShape(dGetIdentityMatrix(), siblingDataBase);
 
-		for (dInt32 i = 0; i < m_count; i++)
+		for (ndInt32 i = 0; i < m_count; i++)
 		{
 			const ndFaceInfo& face0 = m_polygons[i];
 
@@ -125,12 +125,12 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 			matrix = matrix.Inverse();
 
 			ndFaceInfo transformedFace;
-			for (dInt32 j = 0; j < face0.m_count; j++)
+			for (ndInt32 j = 0; j < face0.m_count; j++)
 			{
 				transformedFace.m_polygon[j] = matrix.TransformVector(face0.m_polygon[j]);
 			}
 
-			for (dInt32 j = 0; j < siblingDataBase.m_count; j++)
+			for (ndInt32 j = 0; j < siblingDataBase.m_count; j++)
 			{
 				const ndFaceInfo& face1 = siblingDataBase.m_polygons[j];
 				if (face0.CheckCoplanal(face1, matrix, transformedFace))
@@ -143,18 +143,18 @@ class ndFaceArrayDatabase : public ndShapeDebugNotify
 	}
 
 	ndFixSizeArray<ndFaceInfo, 128> m_polygons;
-	dFloat32 m_sign;
-	dInt32 m_count;
+	ndFloat32 m_sign;
+	ndInt32 m_count;
 };
 
 
 class ndConvexFractureRootEntity : public ndDemoDebrisRootEntity
 {
 	public:
-	ndConvexFractureRootEntity(ndMeshEffect* const singleManifoldMesh, dFloat32 mass)
+	ndConvexFractureRootEntity(ndMeshEffect* const singleManifoldMesh, ndFloat32 mass)
 		:ndDemoDebrisRootEntity()
 		,m_mass(mass)
-		,m_meshVolume(dFloat32(singleManifoldMesh->CalculateVolume()))
+		,m_meshVolume(ndFloat32(singleManifoldMesh->CalculateVolume()))
 	{
 	}
 
@@ -167,19 +167,19 @@ class ndConvexFractureRootEntity : public ndDemoDebrisRootEntity
 
 	struct JointPair
 	{
-		dInt32 m_m0;
-		dInt32 m_m1;
+		ndInt32 m_m0;
+		ndInt32 m_m1;
 	};
 
 	ndArray<JointPair> m_jointConnection;
-	dFloat32 m_mass;
-	dFloat32 m_meshVolume;
+	ndFloat32 m_mass;
+	ndFloat32 m_meshVolume;
 };
 
 class ndConvexFractureEntity: public ndDemoDebrisEntity
 {
 	public:
-	ndConvexFractureEntity(ndMeshEffect* const meshNode, ndArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache, ndShapeInstance* const collision, dInt32 enumerator)
+	ndConvexFractureEntity(ndMeshEffect* const meshNode, ndArray<glDebrisPoint>& vertexArray, ndDemoDebrisRootEntity* const parent, const ndShaderPrograms& shaderCache, ndShapeInstance* const collision, ndInt32 enumerator)
 		:ndDemoDebrisEntity(meshNode, vertexArray, parent, shaderCache)
 		,m_collision(collision)
 		,m_drebriBody(nullptr)
@@ -190,8 +190,8 @@ class ndConvexFractureEntity: public ndDemoDebrisEntity
 		m_centerOfMass = inertia.m_posit;
 		
 		// get the mass fraction;
-		const dFloat32 debriVolume = collision->GetVolume();
-		const dFloat32 volume = ((ndConvexFractureRootEntity*)GetParent())->m_meshVolume;
+		const ndFloat32 debriVolume = collision->GetVolume();
+		const ndFloat32 volume = ((ndConvexFractureRootEntity*)GetParent())->m_meshVolume;
 		m_massFraction = debriVolume / volume;
 		
 		// transform the mesh the center mass in order to get the 
@@ -200,9 +200,9 @@ class ndConvexFractureEntity: public ndDemoDebrisEntity
 		translateMatrix.m_posit = m_centerOfMass.Scale(-1.0f);
 		translateMatrix.m_posit.m_w = 1.0f;
 		meshNode->ApplyTransform(translateMatrix);
-		ndShapeInstance* const inertiaShape = meshNode->CreateConvexCollision(dFloat32(0.0f));
+		ndShapeInstance* const inertiaShape = meshNode->CreateConvexCollision(ndFloat32(0.0f));
 		ndMatrix momentOfInertia(inertiaShape->CalculateInertia());
-		m_momentOfInertia = ndVector(momentOfInertia[0][0], momentOfInertia[1][1], momentOfInertia[2][2], dFloat32(0.0f));
+		m_momentOfInertia = ndVector(momentOfInertia[0][0], momentOfInertia[1][1], momentOfInertia[2][2], ndFloat32(0.0f));
 		delete inertiaShape;
 	}
 
@@ -218,12 +218,12 @@ class ndConvexFractureEntity: public ndDemoDebrisEntity
 		m_drebriBody->SetCollisionShape(*m_collision);
 
 		ndConvexFractureRootEntity* const cloneParent = ((ndConvexFractureRootEntity*)clone.GetParent());
-		dFloat32 debriMass = m_massFraction * cloneParent->m_mass;
+		ndFloat32 debriMass = m_massFraction * cloneParent->m_mass;
 		ndVector debriMassMatrix(m_momentOfInertia.Scale(debriMass));
 		debriMassMatrix.m_w = debriMass;
 		m_drebriBody->SetMassMatrix(debriMassMatrix);
 		m_drebriBody->SetCentreOfMass(m_centerOfMass);
-		m_drebriBody->SetAngularDamping(ndVector(dFloat32(0.1f)));
+		m_drebriBody->SetAngularDamping(ndVector(ndFloat32(0.1f)));
 		
 		//body->SetOmega(omega);
 		//body->SetVelocity(debriVeloc);
@@ -243,8 +243,8 @@ class ndConvexFractureEntity: public ndDemoDebrisEntity
 	ndVector m_momentOfInertia;
 	ndShapeInstance* m_collision;
 	ndBodyDynamic* m_drebriBody;
-	dFloat32 m_massFraction;
-	dInt32 m_enumerator;
+	ndFloat32 m_massFraction;
+	ndInt32 m_enumerator;
 };
 
 ndConvexFracture::ndDebrisNotify::ndDebrisNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity)
@@ -279,12 +279,12 @@ ndConvexFracture::~ndConvexFracture()
 	}
 }
 
-void ndConvexFracture::ExplodeLocation(ndBodyDynamic* const body, const ndMatrix& location, dFloat32 factor) const
+void ndConvexFracture::ExplodeLocation(ndBodyDynamic* const body, const ndMatrix& location, ndFloat32 factor) const
 {
 	ndVector center(location.TransformVector(body->GetCentreOfMass()));
 	ndVector radios((center - location.m_posit) & ndVector::m_triplexMask);
 	ndVector dir(radios.Normalize());
-	dFloat32 lenght = dSqrt(radios.DotProduct(radios).GetScalar());
+	ndFloat32 lenght = ndSqrt(radios.DotProduct(radios).GetScalar());
 	dir = dir.Scale(lenght * factor);
 	ndMatrix matrix(location);
 	matrix.m_posit += dir;
@@ -298,7 +298,7 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 	ndArray<glDebrisPoint> vertexArray;
 	m_debriRootEnt = new ndConvexFractureRootEntity(m_singleManifoldMesh, m_mass);
 
-	dInt32 enumerator = 0;
+	ndInt32 enumerator = 0;
 	ndMeshEffect* nextDebris;
 	for (ndMeshEffect* debri = debrisMeshPieces->GetFirstLayer(); debri; debri = nextDebris)
 	{
@@ -310,7 +310,7 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 		if (fracturePiece)
 		{
 			// make a convex hull collision shape
-			ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(dFloat32(0.0f));
+			ndShapeInstance* const collision = fracturePiece->CreateConvexCollision(ndFloat32(0.0f));
 			if (collision)
 			{
 				new ndConvexFractureEntity(fracturePiece, vertexArray, m_debriRootEnt, scene->GetShaderCache(), collision, enumerator);
@@ -340,8 +340,8 @@ void ndConvexFracture::GenerateEffect(ndDemoEntityManager* const scene)
 			distanceCalculator.m_shape1 = ent1->m_collision;
 			if (distanceCalculator.ClosestPoint())
 			{
-				dFloat32 dist = distanceCalculator.m_normal.DotProduct(distanceCalculator.m_point1 - distanceCalculator.m_point0).GetScalar();
-				if (dist <= dFloat32(1.0e-2f))
+				ndFloat32 dist = distanceCalculator.m_normal.DotProduct(distanceCalculator.m_point1 - distanceCalculator.m_point0).GetScalar();
+				if (dist <= ndFloat32(1.0e-2f))
 				{
 					if (checkConectivitity.IsFaceContact(ent1->m_collision))
 					{
@@ -365,7 +365,7 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const ndMatri
 
 	ndWorld* const world = scene->GetWorld();
 
-	dInt32 bodyCount = 0;
+	ndInt32 bodyCount = 0;
 	for (ndConvexFractureEntity* debrisEnt = (ndConvexFractureEntity*)entity->GetChild(); debrisEnt; debrisEnt = (ndConvexFractureEntity*)debrisEnt->GetSibling())
 	{
 		bodyCount = dMax(bodyCount, debrisEnt->m_enumerator + 1);
@@ -377,7 +377,7 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const ndMatri
 	ndBodyDynamic** const bodyArray = dAlloca(ndBodyDynamic*, bodyCount);
 	memset(bodyArray, 0, bodyCount * sizeof(ndBodyDynamic*));
 	
-	dInt32 debrisID = ndContactCallback::m_dedris;
+	ndInt32 debrisID = ndContactCallback::m_dedris;
 	dAssert(0);
 	//ndMaterial& material0 = callback->RegisterMaterial(ndContactCallback::m_default, ndContactCallback::m_dedris);
 	//dAssert(0);
@@ -387,7 +387,7 @@ void ndConvexFracture::AddEffect(ndDemoEntityManager* const scene, const ndMatri
 
 	// register a contact joint physics material pair and 
 	// set the physics parameters and application custom options 
-	//dFloat32 frictionValue = dFloat32(i) / 15.0f;
+	//ndFloat32 frictionValue = ndFloat32(i) / 15.0f;
 	//material.m_staticFriction0 = frictionValue;
 	//material.m_staticFriction1 = frictionValue;
 	//material.m_dynamicFriction0 = frictionValue;
@@ -424,7 +424,7 @@ else
 
 	// create all the joints
 	const ndArray<ndConvexFractureRootEntity::JointPair>& jointConnection = rootEntity->m_jointConnection;
-	for (dInt32 i = 0; i < jointConnection.GetCount(); i++)
+	for (ndInt32 i = 0; i < jointConnection.GetCount(); i++)
 	{
 		bool test = false;
 		test = test || ((jointConnection[i].m_m0 == 0) && (jointConnection[i].m_m1 == 1));

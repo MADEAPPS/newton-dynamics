@@ -27,7 +27,7 @@
 
 #define D_TERRAIN_NOISE_OCTAVES		8
 #define D_TERRAIN_NOISE_PERSISTANCE	0.5f
-//#define D_TERRAIN_NOISE_GRID_SCALE  1.0f / (dFloat32 (D_TERRAIN_WIDTH) / 5)
+//#define D_TERRAIN_NOISE_GRID_SCALE  1.0f / (ndFloat32 (D_TERRAIN_WIDTH) / 5)
 #define D_TERRAIN_NOISE_GRID_SCALE  (1.0f / 500.0f)
 
 #define D_TERRAIN_GRID_SIZE			4.0f
@@ -43,7 +43,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 		:ndDemoMesh ("heightfield")
 	{
 		ndArray<glPositionNormalUV> points(heightfield.GetCount());
-		ndArray<dInt32> indexList(6 * D_TERRAIN_WIDTH * D_TERRAIN_WIDTH + 1024);
+		ndArray<ndInt32> indexList(6 * D_TERRAIN_WIDTH * D_TERRAIN_WIDTH + 1024);
 
 		m_shader = shaderCache.m_diffuseEffect;
 
@@ -53,26 +53,26 @@ class ndHeightfieldMesh : public ndDemoMesh
 	}
 
 	private:
-	void BuildTilesArray(ndArray<dInt32>& indexList, const char* const texName)
+	void BuildTilesArray(ndArray<ndInt32>& indexList, const char* const texName)
 	{
-		for (dInt32 z = 0; z < D_TERRAIN_HEIGHT - 1; z += D_TERRAIN_TILE_SIZE)
+		for (ndInt32 z = 0; z < D_TERRAIN_HEIGHT - 1; z += D_TERRAIN_TILE_SIZE)
 		{
-			for (dInt32 x = 0; x < D_TERRAIN_WIDTH - 1; x += D_TERRAIN_TILE_SIZE)
+			for (ndInt32 x = 0; x < D_TERRAIN_WIDTH - 1; x += D_TERRAIN_TILE_SIZE)
 			{
 				BuildTile(indexList, x, z, texName);
 			}
 		}
 	}
 
-	void BuildTile(ndArray<dInt32>& indexList, dInt32 x0, dInt32 z0, const char* const texName)
+	void BuildTile(ndArray<ndInt32>& indexList, ndInt32 x0, ndInt32 z0, const char* const texName)
 	{
-		const dInt32 start = indexList.GetCount();
-		const dInt32 zMax = ((z0 + D_TERRAIN_TILE_SIZE) >= D_TERRAIN_HEIGHT) ? D_TERRAIN_HEIGHT - 1 : z0 + D_TERRAIN_TILE_SIZE;
-		const dInt32 xMax = ((x0 + D_TERRAIN_TILE_SIZE) >= D_TERRAIN_WIDTH) ? D_TERRAIN_WIDTH - 1 : x0 + D_TERRAIN_TILE_SIZE;
+		const ndInt32 start = indexList.GetCount();
+		const ndInt32 zMax = ((z0 + D_TERRAIN_TILE_SIZE) >= D_TERRAIN_HEIGHT) ? D_TERRAIN_HEIGHT - 1 : z0 + D_TERRAIN_TILE_SIZE;
+		const ndInt32 xMax = ((x0 + D_TERRAIN_TILE_SIZE) >= D_TERRAIN_WIDTH) ? D_TERRAIN_WIDTH - 1 : x0 + D_TERRAIN_TILE_SIZE;
 
-		for (dInt32 z = z0; z < zMax; z ++)
+		for (ndInt32 z = z0; z < zMax; z ++)
 		{
-			for (dInt32 x = x0; x < xMax; x ++)
+			for (ndInt32 x = x0; x < xMax; x ++)
 			{
 				indexList.PushBack((z + 0) * D_TERRAIN_WIDTH + x + 0);
 				indexList.PushBack((z + 1) * D_TERRAIN_WIDTH + x + 1);
@@ -86,7 +86,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 
 		ndDemoSubMesh* const segment = AddSubMesh();
 		strcpy(segment->m_material.m_textureName, texName);
-		dInt32 texHandle = LoadTexture("texture1.tga");
+		ndInt32 texHandle = LoadTexture("texture1.tga");
 		segment->m_material.m_textureHandle = (GLuint)texHandle;
 
 		segment->SetOpacity(1.0f);
@@ -94,16 +94,16 @@ class ndHeightfieldMesh : public ndDemoMesh
 		segment->m_indexCount = indexList.GetCount() - start;
 	}
 
-	void BuildVertexAndNormals(const ndArray<dInt32>& indexList, const ndArray<ndVector>& heightfield, ndArray<glPositionNormalUV>& points)
+	void BuildVertexAndNormals(const ndArray<ndInt32>& indexList, const ndArray<ndVector>& heightfield, ndArray<glPositionNormalUV>& points)
 	{
 		points.SetCount(heightfield.GetCount());
 		memset(&points[0], 0, heightfield.GetCount() * sizeof(glPositionNormalUV));
 
-		for (dInt32 i = 0; i < indexList.GetCount(); i += 3)
+		for (ndInt32 i = 0; i < indexList.GetCount(); i += 3)
 		{
-			const dInt32 i0 = indexList[i + 0];
-			const dInt32 i1 = indexList[i + 1];
-			const dInt32 i2 = indexList[i + 2];
+			const ndInt32 i0 = indexList[i + 0];
+			const ndInt32 i1 = indexList[i + 1];
+			const ndInt32 i2 = indexList[i + 2];
 			const ndVector& p0 = heightfield[i0];
 			const ndVector& p1 = heightfield[i1];
 			const ndVector& p2 = heightfield[i2];
@@ -111,7 +111,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 			ndVector e10(p1 - p0);
 			ndVector e20(p2 - p0);
 			ndVector normal(e10.CrossProduct(e20));
-			dAssert(normal.m_w == dFloat32(0.0f));
+			dAssert(normal.m_w == ndFloat32(0.0f));
 			normal = normal.Normalize();
 
 			points[i0].m_normal.m_x += GLfloat(normal.m_x);
@@ -127,10 +127,10 @@ class ndHeightfieldMesh : public ndDemoMesh
 			points[i2].m_normal.m_z += GLfloat(normal.m_z);
 		}
 
-		dFloat32 uvScale = 1.0f / 32.0f;
-		for (dInt32 i = 0; i < points.GetCount(); i++)
+		ndFloat32 uvScale = 1.0f / 32.0f;
+		for (ndInt32 i = 0; i < points.GetCount(); i++)
 		{
-			ndVector normal(points[i].m_normal.m_x, points[i].m_normal.m_y, points[i].m_normal.m_z, dFloat32(0.0f));
+			ndVector normal(points[i].m_normal.m_x, points[i].m_normal.m_y, points[i].m_normal.m_z, ndFloat32(0.0f));
 			normal = normal.Normalize();
 			points[i].m_posit = glVector3(GLfloat(heightfield[i].m_x), GLfloat(heightfield[i].m_y), GLfloat(heightfield[i].m_z));
 			points[i].m_normal = glVector3(GLfloat(normal.m_x), GLfloat(normal.m_y), GLfloat(normal.m_z));
@@ -144,30 +144,30 @@ static void MakeNoiseHeightfield(ndArray<ndVector>& heightfield)
 {
 	heightfield.SetCount(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
 	
-	const dInt32 octaves = D_TERRAIN_NOISE_OCTAVES;
-	const dFloat32 cellSize = D_TERRAIN_GRID_SIZE;
-	const dFloat32 persistance = D_TERRAIN_NOISE_PERSISTANCE;
-	const dFloat32 noiseGridScale = D_TERRAIN_NOISE_GRID_SCALE;
+	const ndInt32 octaves = D_TERRAIN_NOISE_OCTAVES;
+	const ndFloat32 cellSize = D_TERRAIN_GRID_SIZE;
+	const ndFloat32 persistance = D_TERRAIN_NOISE_PERSISTANCE;
+	const ndFloat32 noiseGridScale = D_TERRAIN_NOISE_GRID_SCALE;
 	
-	dFloat32 minHeight = dFloat32(1.0e10f);
-	dFloat32 maxHight = dFloat32(-1.0e10f);
-	for (dInt32 z = 0; z < D_TERRAIN_HEIGHT; z++)
+	ndFloat32 minHeight = ndFloat32(1.0e10f);
+	ndFloat32 maxHight = ndFloat32(-1.0e10f);
+	for (ndInt32 z = 0; z < D_TERRAIN_HEIGHT; z++)
 	{
-		for (dInt32 x = 0; x < D_TERRAIN_WIDTH; x++)
+		for (ndInt32 x = 0; x < D_TERRAIN_WIDTH; x++)
 		{
-			dFloat32 noiseVal = BrownianMotion(octaves, persistance, noiseGridScale * dFloat32(x), noiseGridScale * dFloat32(z));
-			heightfield[z * D_TERRAIN_WIDTH + x] = ndVector(x * cellSize, noiseVal, z * cellSize, dFloat32 (0.0f));
+			ndFloat32 noiseVal = BrownianMotion(octaves, persistance, noiseGridScale * ndFloat32(x), noiseGridScale * ndFloat32(z));
+			heightfield[z * D_TERRAIN_WIDTH + x] = ndVector(x * cellSize, noiseVal, z * cellSize, ndFloat32 (0.0f));
 			minHeight = dMin(minHeight, noiseVal);
 			maxHight = dMax(maxHight, noiseVal);
 		}
 	}
 
-	dFloat32 highScale = D_TERRAIN_ELEVATION_SCALE;
-	dFloat32 scale = dFloat32(2.0f) / (maxHight - minHeight);
-	for (dInt32 i = 0; i < heightfield.GetCapacity(); i++)
+	ndFloat32 highScale = D_TERRAIN_ELEVATION_SCALE;
+	ndFloat32 scale = ndFloat32(2.0f) / (maxHight - minHeight);
+	for (ndInt32 i = 0; i < heightfield.GetCapacity(); i++)
 	{
-		dFloat32 y = heightfield[i].m_y;
-		y = scale * (y - minHeight) - dFloat32(1.0f);
+		ndFloat32 y = heightfield[i].m_y;
+		y = scale * (y - minHeight) - ndFloat32(1.0f);
 		heightfield[i].m_y *= highScale;
 	}
 }
@@ -190,14 +190,14 @@ ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene, const
 		1.0f / 100.0f, D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
 
 	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
-	ndArray<dInt16>& hightMap = shape->GetElevationMap();
+	ndArray<ndInt16>& hightMap = shape->GetElevationMap();
 	dAssert(hightMap.GetCount() == heightfield.GetCount());
 	for (int i = 0; i < heightfield.GetCount(); i++)
 	{
-		dFloat32 high = heightfield[i].m_y * 100.0f;
-		dAssert(high <  dFloat32(1 << 15));
-		dAssert(high > -dFloat32(1 << 15));
-		hightMap[i] = dInt16(high);
+		ndFloat32 high = heightfield[i].m_y * 100.0f;
+		dAssert(high <  ndFloat32(1 << 15));
+		dAssert(high > -ndFloat32(1 << 15));
+		hightMap[i] = ndInt16(high);
 	}
 	shape->UpdateElevationMapAabb();
 
@@ -226,14 +226,14 @@ void AddHeightfieldSubShape(ndDemoEntityManager* const scene, ndShapeInstance& s
 		1.0f / 100.0f, D_TERRAIN_GRID_SIZE, D_TERRAIN_GRID_SIZE));
 
 	ndShapeHeightfield* const shape = heighfieldInstance.GetShape()->GetAsShapeHeightfield();
-	ndArray<dInt16>& hightMap = shape->GetElevationMap();
+	ndArray<ndInt16>& hightMap = shape->GetElevationMap();
 	dAssert(hightMap.GetCount() == heightfield.GetCount());
 	for (int i = 0; i < heightfield.GetCount(); i++)
 	{
-		dFloat32 high = heightfield[i].m_y * 100.0f;
-		dAssert(high <  dFloat32(1 << 15));
-		dAssert(high > -dFloat32(1 << 15));
-		hightMap[i] = dInt16(high);
+		ndFloat32 high = heightfield[i].m_y * 100.0f;
+		dAssert(high <  ndFloat32(1 << 15));
+		dAssert(high > -ndFloat32(1 << 15));
+		hightMap[i] = ndInt16(high);
 	}
 	shape->UpdateElevationMapAabb();
 

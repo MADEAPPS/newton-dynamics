@@ -29,7 +29,7 @@ ndAnimationTwoWayBlend::~ndAnimationTwoWayBlend()
 	delete m_node1;
 }
 
-void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose& output, dFloat32 timestep)
+void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose& output, ndFloat32 timestep)
 {
 	if (m_param < 0.001f) 
 	{
@@ -50,7 +50,7 @@ void ndAnimationTwoWayBlend::Evaluate(ndAnimationPose& output, dFloat32 timestep
 
 		ndAnimKeyframe* const dst = &output[0];
 		const ndAnimKeyframe* const src = &localPose[0];
-		for (dInt32 i = 0; i < count; i ++) 
+		for (ndInt32 i = 0; i < count; i ++) 
 		{
 			ndAnimKeyframe& dstFrame = dst[i];
 			const ndAnimKeyframe& srcFrame = src[i];

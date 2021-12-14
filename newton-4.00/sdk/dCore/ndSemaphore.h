@@ -35,7 +35,7 @@ class ndSemaphore
 	D_CORE_API ~ndSemaphore();
 
 	/// Returns counter counter value
-	D_CORE_API dInt32 GetCount() const;
+	D_CORE_API ndInt32 GetCount() const;
 
 	/// Synchronize with another threads.
 	/// \return returns false if member function Terminate has not been called. 
@@ -57,7 +57,7 @@ class ndSemaphore
 	private:
 	mutable std::mutex m_mutex;
 	std::condition_variable m_condition;
-	dInt32 m_count;
+	ndInt32 m_count;
 	ndAtomic<bool> m_terminate;
 #endif
 };

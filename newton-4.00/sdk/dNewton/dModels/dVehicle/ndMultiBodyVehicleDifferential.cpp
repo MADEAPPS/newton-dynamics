@@ -25,7 +25,7 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleDifferential)
 
-ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(ndBodyKinematic* const differential, ndBodyKinematic* const chassis, dFloat32 slipOmegaLock)
+ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(ndBodyKinematic* const differential, ndBodyKinematic* const chassis, ndFloat32 slipOmegaLock)
 	:ndJointBilateralConstraint(2, differential, chassis, differential->GetMatrix())
 	,m_limitedSlipOmega(slipOmegaLock)
 {
@@ -34,7 +34,7 @@ ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(ndBodyKinematic* 
 
 ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(const ndLoadSaveBase::dLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
-	,m_limitedSlipOmega(dFloat32 (0.0f))
+	,m_limitedSlipOmega(ndFloat32 (0.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
@@ -69,32 +69,32 @@ void ndMultiBodyVehicleDifferential::JacobianDerivative(ndConstraintDescritor& d
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	//one rows to restrict rotation around around the parent coordinate system
-	const dFloat32 angle = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+	const ndFloat32 angle = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle);
 
 	const ndVector omega0(m_body0->GetOmega());
 	const ndVector omega1(m_body1->GetOmega());
 
-	dFloat32 slipOmega = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
+	ndFloat32 slipOmega = matrix1.m_up.DotProduct(omega0 - omega1).GetScalar();
 	if (dAbs(slipOmega) > m_limitedSlipOmega) 
 	{
-		AddAngularRowJacobian(desc, matrix1.m_up, dFloat32 (0.0f));
+		AddAngularRowJacobian(desc, matrix1.m_up, ndFloat32 (0.0f));
 		ndJacobian& jacobian = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
 		jacobian.m_angular = ndVector::m_zero;
 		if (slipOmega > m_limitedSlipOmega)
 		{
 			slipOmega -= m_limitedSlipOmega;
-			dFloat32 alpha = slipOmega * desc.m_invTimestep;
+			ndFloat32 alpha = slipOmega * desc.m_invTimestep;
 			SetMotorAcceleration(desc, -alpha);
-			SetHighFriction(desc, dFloat32(0.0f));
+			SetHighFriction(desc, ndFloat32(0.0f));
 		} 
 		else
 		{
 			dAssert(slipOmega < -m_limitedSlipOmega);
 			slipOmega += m_limitedSlipOmega;
-			dFloat32 alpha = slipOmega * desc.m_invTimestep;
+			ndFloat32 alpha = slipOmega * desc.m_invTimestep;
 			SetMotorAcceleration(desc, -alpha);
-			SetLowerFriction(desc, dFloat32(0.0f));
+			SetLowerFriction(desc, ndFloat32(0.0f));
 		}
 	}
 }

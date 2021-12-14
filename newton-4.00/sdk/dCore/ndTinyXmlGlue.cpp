@@ -22,7 +22,7 @@
 #include "ndCoreStdafx.h"
 #include "ndTinyXmlGlue.h"
 
-static char* FloatToString(char* const buffer, dFloat32 value)
+static char* FloatToString(char* const buffer, ndFloat32 value)
 {
 	sprintf(buffer, "%f", value);
 	char* ptr = buffer + strlen(buffer);
@@ -60,14 +60,14 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	node->SetAttribute(type, value);
 }
 
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 value)
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 value)
 {
 	char buffer[1024];
 	sprintf(buffer, "%d", value);
 	xmlSaveParam(rootNode, name, "int32", buffer);
 }
 
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt64 value)
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt64 value)
 {
 	char buffer[1024];
 	long long x = value;
@@ -75,7 +75,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt
 	xmlSaveParam(rootNode, name, "int64", buffer);
 }
 
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dFloat32 value)
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndFloat32 value)
 {
 	char buffer[1024];
 	FloatToString(buffer, value);
@@ -96,7 +96,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	ndVector euler0;
 	ndVector euler1;
 	value.CalcPitchYawRoll(euler0, euler1);
-	euler0 = euler0.Scale(dRadToDegree);
+	euler0 = euler0.Scale(ndRadToDegree);
 
 	char buffer[256];
 	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
@@ -113,14 +113,14 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	xmlSaveParam(rootNode, name, "char", value);
 }
 
-void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 count, const ndVector* const array)
+void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndInt32 count, const ndVector* const array)
 {
 	char* const buffer = dAlloca(char, count * 4 * 12);
 
 	char* ptr = buffer;
-	for (dInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; i++)
 	{
-		for (dInt32 j = 0; j < 3; j++)
+		for (ndInt32 j = 0; j < 3; j++)
 		{
 			ptr = FloatToString(ptr, array[i][j]);
 		}
@@ -134,16 +134,16 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt
 	node->SetAttribute("floatArray", buffer);
 }
 
-D_CORE_API dInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name)
+D_CORE_API ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
 	dAssert(element);
-	dInt32 value;
+	ndInt32 value;
 	element->Attribute("int32", &value);
 	return value;
 }
 
-dInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name)
+ndInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
 	dAssert(element);
@@ -151,23 +151,23 @@ dInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name)
 
 	long long int value;
 	sscanf(data, "%lld", &value);
-	return dInt64 (value);
+	return ndInt64 (value);
 }
 
-dFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name)
+ndFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
 	dAssert(element);
-	dFloat64 value;
+	ndFloat64 value;
 	element->Attribute("float", &value);
-	return dFloat32 (value);
+	return ndFloat32 (value);
 }
 
 void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, ndArray<ndVector>& array)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
 	dAssert(element);
-	dInt32 count;
+	ndInt32 count;
 	element->Attribute("count", &count);
 	array.Resize(count);
 	array.SetCount(count);
@@ -176,7 +176,7 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 
 	size_t start = 0;
 	ndVector point(ndVector::m_zero);
-	for (dInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; i++)
 	{
 		char x[64];
 		char y[64];
@@ -184,17 +184,17 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 		sscanf(&data[start], "%[^ ] %[^ ] %[^ ]", x, y, z);
 		start += strlen(x) + strlen(y) + strlen(z) + 3;
 
-		dFloat64 fx;
-		dFloat64 fy;
-		dFloat64 fz;
+		ndFloat64 fx;
+		ndFloat64 fy;
+		ndFloat64 fz;
 		
 		sscanf(x, "%lf", &fx);
 		sscanf(y, "%lf", &fy);
 		sscanf(z, "%lf", &fz);
 
-		point.m_x = dFloat32(fx);
-		point.m_y = dFloat32(fy);
-		point.m_z = dFloat32(fz);
+		point.m_x = ndFloat32(fx);
+		point.m_y = ndFloat32(fy);
+		point.m_z = ndFloat32(fz);
 
 		array[i] = point;
 	}
@@ -207,15 +207,15 @@ D_CORE_API ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const cha
 
 	const char* const positData = element->Attribute("float3");
 
-	dFloat64 fx;
-	dFloat64 fy;
-	dFloat64 fz;
+	ndFloat64 fx;
+	ndFloat64 fy;
+	ndFloat64 fz;
 	sscanf(positData, "%lf %lf %lf", &fx, &fy, &fz);
 
 	ndVector posit(ndVector::m_zero);
-	posit.m_x = dFloat32(fx);
-	posit.m_y = dFloat32(fy);
-	posit.m_z = dFloat32(fz);
+	posit.m_x = ndFloat32(fx);
+	posit.m_y = ndFloat32(fy);
+	posit.m_z = ndFloat32(fz);
 	return posit;
 }
 
@@ -230,21 +230,21 @@ ndMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const nam
 	ndVector posit(ndVector::m_one);
 	ndVector euler(ndVector::m_zero);
 
-	dFloat64 fx;
-	dFloat64 fy;
-	dFloat64 fz;
+	ndFloat64 fx;
+	ndFloat64 fy;
+	ndFloat64 fz;
 	//sscanf(positData, "%f %f %f", &posit.m_x, &posit.m_y, &posit.m_z);
 	sscanf(positData, "%lf %lf %lf", &fx, &fy, &fz);
-	posit.m_x = dFloat32(fx);
-	posit.m_y = dFloat32(fy);
-	posit.m_z = dFloat32(fz);
+	posit.m_x = ndFloat32(fx);
+	posit.m_y = ndFloat32(fy);
+	posit.m_z = ndFloat32(fz);
 
 	//sscanf(angleData, "%f %f %f", &euler.m_x, &euler.m_y, &euler.m_z);
 	sscanf(angleData, "%lf %lf %lf", &fx, &fy, &fz);
-	euler.m_x = dFloat32(fx);
-	euler.m_y = dFloat32(fy);
-	euler.m_z = dFloat32(fz);
-	euler = euler.Scale(dDegreeToRad);
+	euler.m_x = ndFloat32(fx);
+	euler.m_y = ndFloat32(fy);
+	euler.m_z = ndFloat32(fz);
+	euler = euler.Scale(ndDegreeToRad);
 
 	ndMatrix matrix (dPitchMatrix(euler.m_x) * dYawMatrix(euler.m_y) * dRollMatrix(euler.m_z));
 	matrix.m_posit = posit;

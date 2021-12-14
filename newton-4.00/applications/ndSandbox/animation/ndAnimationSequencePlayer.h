@@ -24,12 +24,12 @@ class ndAnimationSequencePlayer: public ndAnimationBlendTreeNode
 	ndAnimationSequencePlayer(ndAnimationSequence* const sequence);
 	virtual ~ndAnimationSequencePlayer();
 
-	virtual void Evaluate(ndAnimationPose& output, dFloat32 timestep);
+	virtual void Evaluate(ndAnimationPose& output, ndFloat32 timestep);
 
-	void SetFrame(dFloat32 timestep);
-	void AdvanceFrame(dFloat32 timestep);
+	void SetFrame(ndFloat32 timestep);
+	void AdvanceFrame(ndFloat32 timestep);
 
-	dFloat32 GetFrame() const 
+	ndFloat32 GetFrame() const 
 	{
 		return m_time;
 	}
@@ -41,10 +41,10 @@ class ndAnimationSequencePlayer: public ndAnimationBlendTreeNode
 
 	private:
 	ndAnimationSequence* m_sequence;
-	dFloat32 m_time;
+	ndFloat32 m_time;
 };
 
-inline void ndAnimationSequencePlayer::AdvanceFrame(dFloat32 timestep)
+inline void ndAnimationSequencePlayer::AdvanceFrame(ndFloat32 timestep)
 {
 	SetFrame(m_time + timestep);
 }

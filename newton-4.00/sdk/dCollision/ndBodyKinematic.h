@@ -39,7 +39,7 @@ class ndBodyKinematic: public ndBody
 	class ndContactkey
 	{
 		public:
-		ndContactkey(dUnsigned32 tag0, dUnsigned32 tag1)
+		ndContactkey(ndUnsigned32 tag0, ndUnsigned32 tag1)
 			:m_tagLow(dMin(tag0, tag1))
 			,m_tagHigh(dMax(tag0, tag1))
 		{
@@ -64,11 +64,11 @@ class ndBodyKinematic: public ndBody
 		private:
 		union
 		{
-			dUnsigned64 m_tag;
+			ndUnsigned64 m_tag;
 			struct
 			{
-				dUnsigned32 m_tagLow;
-				dUnsigned32 m_tagHigh;
+				ndUnsigned32 m_tagLow;
+				ndUnsigned32 m_tagHigh;
 			};
 		};
 	};
@@ -92,8 +92,8 @@ class ndBodyKinematic: public ndBody
 
 	ndScene* GetScene() const;
 
-	dUnsigned32 GetIndex() const;
-	dFloat32 GetInvMass() const;
+	ndUnsigned32 GetIndex() const;
+	ndFloat32 GetInvMass() const;
 	const ndVector GetInvInertia() const;
 	const ndVector& GetMassMatrix() const;
 	const ndMatrix& GetInvInertiaMatrix() const;
@@ -109,10 +109,10 @@ class ndBodyKinematic: public ndBody
 
 	bool GetAutoSleep() const;
 	void SetAutoSleep(bool state);
-	void SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32 angleInRadian, dFloat32 speedInMitersPerSeconds);
+	void SetDebugMaxAngularIntegrationSteepAndLinearSpeed(ndFloat32 angleInRadian, ndFloat32 speedInMitersPerSeconds);
 
-	virtual dFloat32 GetLinearDamping() const;
-	virtual void SetLinearDamping(dFloat32 linearDamp);
+	virtual ndFloat32 GetLinearDamping() const;
+	virtual void SetLinearDamping(ndFloat32 linearDamp);
 
 	virtual ndVector GetAngularDamping() const;
 	virtual void SetAngularDamping(const ndVector& angularDamp);
@@ -120,22 +120,22 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API ndShapeInstance& GetCollisionShape();
 	D_COLLISION_API const ndShapeInstance& GetCollisionShape() const;
 	D_COLLISION_API virtual void SetCollisionShape(const ndShapeInstance& shapeInstance);
-	D_COLLISION_API virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const dFloat32 maxT) const;
+	D_COLLISION_API virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const;
 
 	D_COLLISION_API ndVector CalculateLinearMomentum() const;
 	D_COLLISION_API ndVector CalculateAngularMomentum() const;
-	D_COLLISION_API dFloat32 TotalEnergy() const;
+	D_COLLISION_API ndFloat32 TotalEnergy() const;
 
 	D_COLLISION_API ndMatrix CalculateInertiaMatrix() const;
 	D_COLLISION_API virtual ndMatrix CalculateInvInertiaMatrix() const;
 	
-	D_COLLISION_API virtual void IntegrateVelocity(dFloat32 timestep);
+	D_COLLISION_API virtual void IntegrateVelocity(ndFloat32 timestep);
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	void UpdateInvInertiaMatrix();
-	void SetMassMatrix(dFloat32 mass, const ndShapeInstance& shapeInstance);
-	void SetMassMatrix(dFloat32 Ixx, dFloat32 Iyy, dFloat32 Izz, dFloat32 mass);
-	void GetMassMatrix(dFloat32& Ixx, dFloat32& Iyy, dFloat32& Izz, dFloat32& mass);
+	void SetMassMatrix(ndFloat32 mass, const ndShapeInstance& shapeInstance);
+	void SetMassMatrix(ndFloat32 Ixx, ndFloat32 Iyy, ndFloat32 Izz, ndFloat32 mass);
+	void GetMassMatrix(ndFloat32& Ixx, ndFloat32& Iyy, ndFloat32& Izz, ndFloat32& mass);
 
 	D_COLLISION_API virtual ndContact* FindContact(const ndBody* const otherBody) const;
 
@@ -150,9 +150,9 @@ class ndBodyKinematic: public ndBody
 	virtual void SetForce(const ndVector& force);
 	virtual void SetTorque(const ndVector& torque);
 
-	virtual void AddImpulse(const ndVector& pointVeloc, const ndVector& pointPosit, dFloat32 timestep);
-	virtual void ApplyImpulsePair(const ndVector& linearImpulse, const ndVector& angularImpulse, dFloat32 timestep);
-	virtual void ApplyImpulsesAtPoint(dInt32 count, const ndVector* const impulseArray, const ndVector* const pointArray, dFloat32 timestep);
+	virtual void AddImpulse(const ndVector& pointVeloc, const ndVector& pointPosit, ndFloat32 timestep);
+	virtual void ApplyImpulsePair(const ndVector& linearImpulse, const ndVector& angularImpulse, ndFloat32 timestep);
+	virtual void ApplyImpulsesAtPoint(ndInt32 count, const ndVector* const impulseArray, const ndVector* const pointArray, ndFloat32 timestep);
 
 	ndVector GetAccel() const;
 	ndVector GetAlpha() const;
@@ -166,23 +166,23 @@ class ndBodyKinematic: public ndBody
 	protected:
 	D_COLLISION_API virtual void AttachContact(ndContact* const contact);
 	D_COLLISION_API virtual void DetachContact(ndContact* const contact);
-	D_COLLISION_API virtual void SetMassMatrix(dFloat32 mass, const ndMatrix& inertia);
+	D_COLLISION_API virtual void SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia);
 
 	D_COLLISION_API virtual ndJointList::ndNode* AttachJoint(ndJointBilateralConstraint* const joint);
 	D_COLLISION_API virtual void DetachJoint(ndJointList::ndNode* const node);
-	D_COLLISION_API virtual void IntegrateExternalForce(dFloat32 timestep);
+	D_COLLISION_API virtual void IntegrateExternalForce(ndFloat32 timestep);
 
 	void SetAccel(const ndJacobian& accel);
 	virtual void IntegrateGyroSubstep(const ndVector& timestep);
 	virtual ndJacobian IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const;
 
 	void UpdateCollisionMatrix();
-	void PrepareStep(dInt32 index);
+	void PrepareStep(ndInt32 index);
 	void SetSceneNodes(ndScene* const scene, ndBodyList::ndNode* const node);
 
 	ndSceneBodyNode* GetSceneBodyNode() const;
 	void SetSceneBodyNode(ndSceneBodyNode* const node);
-	virtual void AddDampingAcceleration(dFloat32 timestep);
+	virtual void AddDampingAcceleration(ndFloat32 timestep);
 	
 	ndMatrix m_invWorldInertiaMatrix;
 	ndShapeInstance m_shapeInstance;
@@ -202,12 +202,12 @@ class ndBodyKinematic: public ndBody
 	ndSceneBodyNode* m_sceneBodyBodyNode;
 	ndSkeletonContainer* m_skeletonContainer;
 
-	dFloat32 m_maxAngleStep;
-	dFloat32 m_maxLinearSpeed;
-	dFloat32 m_weigh;
-	dInt32 m_rank;
-	dInt32 m_index;
-	dInt32 m_sleepingCounter;
+	ndFloat32 m_maxAngleStep;
+	ndFloat32 m_maxLinearSpeed;
+	ndFloat32 m_weigh;
+	ndInt32 m_rank;
+	ndInt32 m_index;
+	ndInt32 m_sleepingCounter;
 
 	friend class ndWorld;
 	friend class ndScene;
@@ -221,12 +221,12 @@ class ndBodyKinematic: public ndBody
 	friend class ndJointBilateralConstraint;
 } D_GCC_NEWTON_ALIGN_32;
 
-inline dUnsigned32 ndBodyKinematic::GetIndex() const
+inline ndUnsigned32 ndBodyKinematic::GetIndex() const
 {
 	return m_index;
 }
 
-inline dFloat32 ndBodyKinematic::GetInvMass() const
+inline ndFloat32 ndBodyKinematic::GetInvMass() const
 {
 	return m_invMass.m_w;
 }
@@ -256,7 +256,7 @@ inline ndVector ndBodyKinematic::GetGyroTorque() const
 	return m_gyroTorque;
 }
 
-inline void ndBodyKinematic::GetMassMatrix(dFloat32& Ixx, dFloat32& Iyy, dFloat32& Izz, dFloat32& mass)
+inline void ndBodyKinematic::GetMassMatrix(ndFloat32& Ixx, ndFloat32& Iyy, ndFloat32& Izz, ndFloat32& mass)
 {
 	Ixx = m_mass.m_x;
 	Iyy = m_mass.m_y;
@@ -273,22 +273,22 @@ inline void ndBodyKinematic::SetMassMatrix(const ndVector& massMatrix)
 	SetMassMatrix(massMatrix.m_w, inertia);
 }
 
-inline void ndBodyKinematic::SetMassMatrix(dFloat32 Ixx, dFloat32 Iyy, dFloat32 Izz, dFloat32 mass)
+inline void ndBodyKinematic::SetMassMatrix(ndFloat32 Ixx, ndFloat32 Iyy, ndFloat32 Izz, ndFloat32 mass)
 {
 	SetMassMatrix(ndVector(Ixx, Iyy, Izz, mass));
 }
 
-inline void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const ndShapeInstance& shapeInstance)
+inline void ndBodyKinematic::SetMassMatrix(ndFloat32 mass, const ndShapeInstance& shapeInstance)
 {
 	ndMatrix inertia(shapeInstance.CalculateInertia());
 
 	ndVector origin(inertia.m_posit);
-	for (dInt32 i = 0; i < 3; i++) 
+	for (ndInt32 i = 0; i < 3; i++) 
 	{
 		inertia[i] = inertia[i].Scale(mass);
 		//inertia[i][i] = (inertia[i][i] + origin[i] * origin[i]) * mass;
-		//for (dInt32 j = i + 1; j < 3; j ++) {
-		//	dFloat32 crossIJ = origin[i] * origin[j];
+		//for (ndInt32 j = i + 1; j < 3; j ++) {
+		//	ndFloat32 crossIJ = origin[i] * origin[j];
 		//	inertia[i][j] = (inertia[i][j] + crossIJ) * mass;
 		//	inertia[j][i] = (inertia[j][i] + crossIJ) * mass;
 		//}
@@ -363,7 +363,7 @@ inline void ndBodyKinematic::SetAlpha(const ndVector& alpha)
 	m_alpha = alpha;
 }
 
-inline void ndBodyKinematic::AddDampingAcceleration(dFloat32)
+inline void ndBodyKinematic::AddDampingAcceleration(ndFloat32)
 {
 }
 
@@ -374,7 +374,7 @@ inline void ndBodyKinematic::SetAccel(const ndJacobian& accel)
 }
 
 
-inline void ndBodyKinematic::PrepareStep(dInt32 index)
+inline void ndBodyKinematic::PrepareStep(ndInt32 index)
 {
 	m_rank = 0;
 	m_index = index;
@@ -382,8 +382,8 @@ inline void ndBodyKinematic::PrepareStep(dInt32 index)
 	m_isJointFence1 = 1;
 	m_islandParent = this;
 	m_bodyIsConstrained = 0;
-	m_weigh = dFloat32(1.0f);
-	m_isStatic = (m_invMass.m_w == dFloat32(0.0f));
+	m_weigh = ndFloat32(1.0f);
+	m_isStatic = (m_invMass.m_w == ndFloat32(0.0f));
 	m_equilibrium = m_isStatic | m_equilibrium;
 	m_islandSleep = m_equilibrium;
 	m_equilibrium0 = m_equilibrium;
@@ -447,19 +447,19 @@ inline void ndBodyKinematic::SetSkeleton(ndSkeletonContainer* const skeleton)
 	m_skeletonContainer = skeleton;
 }
 
-inline void ndBodyKinematic::SetDebugMaxAngularIntegrationSteepAndLinearSpeed(dFloat32 angleInRadian, dFloat32 speedInMitersPerSeconds)
+inline void ndBodyKinematic::SetDebugMaxAngularIntegrationSteepAndLinearSpeed(ndFloat32 angleInRadian, ndFloat32 speedInMitersPerSeconds)
 {
-	m_maxAngleStep = dMax(dAbs(angleInRadian), dFloat32(90.0f) * dDegreeToRad);
-	m_maxLinearSpeed = dMax(speedInMitersPerSeconds, dFloat32 (100.0f));
+	m_maxAngleStep = dMax(dAbs(angleInRadian), ndFloat32(90.0f) * ndDegreeToRad);
+	m_maxLinearSpeed = dMax(speedInMitersPerSeconds, ndFloat32 (100.0f));
 }
 
-inline void ndBodyKinematic::SetLinearDamping(dFloat32)
+inline void ndBodyKinematic::SetLinearDamping(ndFloat32)
 {
 }
 
-inline dFloat32 ndBodyKinematic::GetLinearDamping() const
+inline ndFloat32 ndBodyKinematic::GetLinearDamping() const
 {
-	return dFloat32(0.0f);
+	return ndFloat32(0.0f);
 }
 
 inline void ndBodyKinematic::SetAngularDamping(const ndVector&)
@@ -473,17 +473,17 @@ inline ndVector ndBodyKinematic::GetAngularDamping() const
 
 inline void ndBodyKinematic::UpdateInvInertiaMatrix()
 {
-	dAssert(m_invWorldInertiaMatrix[0][3] == dFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[1][3] == dFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[2][3] == dFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[3][3] == dFloat32(1.0f));
+	dAssert(m_invWorldInertiaMatrix[0][3] == ndFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[1][3] == ndFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[2][3] == ndFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[3][3] == ndFloat32(1.0f));
 
 	m_invWorldInertiaMatrix = CalculateInvInertiaMatrix();
 
-	dAssert(m_invWorldInertiaMatrix[0][3] == dFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[1][3] == dFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[2][3] == dFloat32(0.0f));
-	dAssert(m_invWorldInertiaMatrix[3][3] == dFloat32(1.0f));
+	dAssert(m_invWorldInertiaMatrix[0][3] == ndFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[1][3] == ndFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[2][3] == ndFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[3][3] == ndFloat32(1.0f));
 }
 
 inline void ndBodyKinematic::IntegrateGyroSubstep(const ndVector&)
@@ -498,15 +498,15 @@ inline ndJacobian ndBodyKinematic::IntegrateForceAndToque(const ndVector&, const
 	return step;
 }
 
-inline void ndBodyKinematic::AddImpulse(const ndVector&, const ndVector&, dFloat32)
+inline void ndBodyKinematic::AddImpulse(const ndVector&, const ndVector&, ndFloat32)
 {
 }
 
-inline void ndBodyKinematic::ApplyImpulsePair(const ndVector&, const ndVector&, dFloat32)
+inline void ndBodyKinematic::ApplyImpulsePair(const ndVector&, const ndVector&, ndFloat32)
 {
 }
 
-inline void ndBodyKinematic::ApplyImpulsesAtPoint(dInt32, const ndVector* const, const ndVector* const, dFloat32)
+inline void ndBodyKinematic::ApplyImpulsesAtPoint(ndInt32, const ndVector* const, const ndVector* const, ndFloat32)
 {
 }
 

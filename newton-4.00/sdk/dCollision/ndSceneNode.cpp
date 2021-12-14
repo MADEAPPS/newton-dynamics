@@ -24,12 +24,12 @@
 #include "ndBodyKinematic.h"
 #include "ndSceneNode.h"
 
-//#define D_AABB_QUANTIZATION		dFloat32 (8.0f)
-#define D_AABB_QUANTIZATION		dFloat32 (4.0f)
-#define D_AABB_INV_QUANTIZATION	(dFloat32 (1.0f) / D_AABB_QUANTIZATION)
+//#define D_AABB_QUANTIZATION		ndFloat32 (8.0f)
+#define D_AABB_QUANTIZATION		ndFloat32 (4.0f)
+#define D_AABB_INV_QUANTIZATION	(ndFloat32 (1.0f) / D_AABB_QUANTIZATION)
 
-ndVector ndSceneNode::m_aabbQuantization(D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, dFloat32 (0.0f));
-ndVector ndSceneNode::m_aabbInvQuantization(D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, dFloat32(0.0f));
+ndVector ndSceneNode::m_aabbQuantization(D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, ndFloat32 (0.0f));
+ndVector ndSceneNode::m_aabbInvQuantization(D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, ndFloat32(0.0f));
 
 ndSceneBodyNode::ndSceneBodyNode(ndBodyKinematic* const body)
 	:ndSceneNode(nullptr)

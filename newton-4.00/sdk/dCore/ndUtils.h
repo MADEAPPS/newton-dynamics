@@ -30,9 +30,9 @@
 // assume this function returns memory aligned to 16 bytes
 #define dAlloca(type, count) (type*) alloca (sizeof (type) * (count))
 
-inline dInt32 dExp2 (dInt32 x)
+inline ndInt32 dExp2 (ndInt32 x)
 {
-	dInt32 exp;
+	ndInt32 exp;
 	for (exp = -1; x; x >>= 1) 
 	{
 		exp ++;
@@ -40,10 +40,10 @@ inline dInt32 dExp2 (dInt32 x)
 	return exp;
 }
 
-inline dInt32 dBitReversal(dInt32 v, dInt32 base)
+inline ndInt32 dBitReversal(ndInt32 v, ndInt32 base)
 {
-	dInt32 x = 0;
-	dInt32 power = dExp2 (base) - 1;
+	ndInt32 x = 0;
+	ndInt32 power = dExp2 (base) - 1;
 	do 
 	{
 		x += (v & 1) << power;
@@ -108,11 +108,11 @@ inline bool dAreEqual(T A, T B, T tol)
 		return true;
 	}
 
-	dInt32 exp0;
-	dFloat64 mantissa0 = frexp(dFloat64 (A), &exp0);
+	ndInt32 exp0;
+	ndFloat64 mantissa0 = frexp(ndFloat64 (A), &exp0);
 	
-	dInt32 exp1;
-	dFloat64 mantissa1 = frexp(dFloat64(B), &exp1);
+	ndInt32 exp1;
+	ndFloat64 mantissa1 = frexp(ndFloat64(B), &exp1);
 	if (dAbs(exp0 - exp1) > 1)
 	{
 		return false;
@@ -121,11 +121,11 @@ inline bool dAreEqual(T A, T B, T tol)
 	{
 		if (exp0 > exp1)
 		{
-			mantissa0 *= dFloat32(2.0f);
+			mantissa0 *= ndFloat32(2.0f);
 		}
 		else
 		{
-			mantissa1 *= dFloat32(2.0f);
+			mantissa1 *= ndFloat32(2.0f);
 		}
 	}
 	return dAbs(mantissa0 - mantissa1) < tol;
@@ -134,49 +134,49 @@ inline bool dAreEqual(T A, T B, T tol)
 template <class T>
 inline T AnglesAdd (T angleInRadiand1, T angleInRadiand0)
 {
-	T s1 = T(dSin(angleInRadiand1));
-	T c1 = T(dCos(angleInRadiand1));
-	T s0 = T(dSin(angleInRadiand0));
-	T c0 = T(dCos(angleInRadiand0));
+	T s1 = T(ndSin(angleInRadiand1));
+	T c1 = T(ndCos(angleInRadiand1));
+	T s0 = T(ndSin(angleInRadiand0));
+	T c0 = T(ndCos(angleInRadiand0));
 
 	T s = s1 * c0 + s0 * c1;
 	T c = c1 * c0 - s0 * s1;
-	return T(dAtan2(s, c));
+	return T(ndAtan2(s, c));
 }
 
 /// Returns the time in micro seconds since application started 
-D_CORE_API dUnsigned64 dGetTimeInMicroseconds();
+D_CORE_API ndUnsigned64 dGetTimeInMicroseconds();
 
 /// Round a 64 bit float to a 32 bit float by truncating the mantissa a 24 bit 
-/// \param dFloat64 val: 64 bit float 
+/// \param ndFloat64 val: 64 bit float 
 /// \return a 64 bit double precision with a 32 bit mantissa
-D_CORE_API dFloat64 dRoundToFloat(dFloat64 val);
+D_CORE_API ndFloat64 dRoundToFloat(ndFloat64 val);
 
-D_CORE_API dInt32 dVertexListToIndexList(dFloat64* const vertexList, dInt32 strideInBytes, dInt32 compareCount, dInt32 vertexCount, dInt32* const indexListOut, dFloat64 tolerance = dEpsilon);
+D_CORE_API ndInt32 dVertexListToIndexList(ndFloat64* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, ndFloat64 tolerance = ndEpsilon);
 
 template <class T>
-dInt32 dVertexListToIndexList(T* const vertexList, dInt32 strideInBytes, dInt32 compareCount, dInt32 vertexCount, dInt32* const indexListOut, T tolerance = dEpsilon)
+ndInt32 dVertexListToIndexList(T* const vertexList, ndInt32 strideInBytes, ndInt32 compareCount, ndInt32 vertexCount, ndInt32* const indexListOut, T tolerance = ndEpsilon)
 {
-	dInt32 stride = dInt32(strideInBytes / sizeof(T));
-	ndStack<dFloat64> pool(vertexCount * stride);
+	ndInt32 stride = ndInt32(strideInBytes / sizeof(T));
+	ndStack<ndFloat64> pool(vertexCount * stride);
 
-	dFloat64* const data = &pool[0];
-	for (dInt32 i = 0; i < vertexCount; i++)
+	ndFloat64* const data = &pool[0];
+	for (ndInt32 i = 0; i < vertexCount; i++)
 	{
-		dFloat64* const dst = &data[i * stride];
+		ndFloat64* const dst = &data[i * stride];
 		const T* const src = &vertexList[i * stride];
-		for (dInt32 j = 0; j < stride; j++)
+		for (ndInt32 j = 0; j < stride; j++)
 		{
 			dst[j] = src[j];
 		}
 	}
 
-	dInt32 count = dVertexListToIndexList(data, dInt32(stride * sizeof(dFloat64)), compareCount, vertexCount, indexListOut, dFloat64(tolerance));
-	for (dInt32 i = 0; i < count; i++)
+	ndInt32 count = dVertexListToIndexList(data, ndInt32(stride * sizeof(ndFloat64)), compareCount, vertexCount, indexListOut, ndFloat64(tolerance));
+	for (ndInt32 i = 0; i < count; i++)
 	{
-		const dFloat64* const src = &data[i * stride];
+		const ndFloat64* const src = &data[i * stride];
 		T* const dst = &vertexList[i * stride];
-		for (dInt32 j = 0; j < stride; j++)
+		for (ndInt32 j = 0; j < stride; j++)
 		{
 			dst[j] = T(src[j]);
 		}
@@ -195,12 +195,12 @@ class ndFloatExceptions
 		#define D_FLOAT_EXECTIONS_MASK	0
 	#endif
 
-	ndFloatExceptions(dUnsigned32 mask = D_FLOAT_EXECTIONS_MASK);
+	ndFloatExceptions(ndUnsigned32 mask = D_FLOAT_EXECTIONS_MASK);
 	~ndFloatExceptions();
 
 	private:
 	#if (defined(WIN32) || defined(_WIN32))
-		dUnsigned32 m_mask;
+		ndUnsigned32 m_mask;
 	#endif
 };
 
@@ -211,7 +211,7 @@ class ndSetPrecisionDouble
 	ndSetPrecisionDouble();
 	~ndSetPrecisionDouble();
 	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
-	dInt32 m_mask; 
+	ndInt32 m_mask; 
 	#endif
 };
 

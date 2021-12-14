@@ -31,11 +31,11 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleMotor)
 
 ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel)
 	:ndJointBilateralConstraint(3, motor, vehicelModel->m_chassis, motor->GetMatrix())
-	,m_omega(dFloat32(0.0f))
-	,m_idleOmega(dFloat32(0.0f))
-	,m_throttle(dFloat32(0.0f))
-	,m_engineTorque(dFloat32(0.0f))
-	,m_fuelValveRate(dFloat32(10.0f))
+	,m_omega(ndFloat32(0.0f))
+	,m_idleOmega(ndFloat32(0.0f))
+	,m_throttle(ndFloat32(0.0f))
+	,m_engineTorque(ndFloat32(0.0f))
+	,m_fuelValveRate(ndFloat32(10.0f))
 	,m_vehicelModel(vehicelModel)
 	,m_startEngine(false)
 {
@@ -43,11 +43,11 @@ ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, n
 
 ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(const ndLoadSaveBase::dLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
-	,m_omega(dFloat32(0.0f))
-	,m_idleOmega(dFloat32(0.0f))
-	,m_throttle(dFloat32(0.0f))
-	,m_engineTorque(dFloat32(0.0f))
-	,m_fuelValveRate(dFloat32(10.0f))
+	,m_omega(ndFloat32(0.0f))
+	,m_idleOmega(ndFloat32(0.0f))
+	,m_throttle(ndFloat32(0.0f))
+	,m_engineTorque(ndFloat32(0.0f))
+	,m_fuelValveRate(ndFloat32(10.0f))
 	,m_vehicelModel(nullptr)
 	,m_startEngine(false)
 {
@@ -82,7 +82,7 @@ void ndMultiBodyVehicleMotor::AlignMatrix()
 	m_body0->SetOmega(omega);
 }
 
-void ndMultiBodyVehicleMotor::SetFuelRate(dFloat32 radPerSecondsStep)
+void ndMultiBodyVehicleMotor::SetFuelRate(ndFloat32 radPerSecondsStep)
 {
 	m_fuelValveRate = dAbs(radPerSecondsStep);
 }
@@ -92,32 +92,32 @@ void ndMultiBodyVehicleMotor::SetStart(bool startkey)
 	m_startEngine = startkey;
 }
 
-void ndMultiBodyVehicleMotor::SetRpmLimits(dFloat32 idleRpm, dFloat32 redLineRpm)
+void ndMultiBodyVehicleMotor::SetRpmLimits(ndFloat32 idleRpm, ndFloat32 redLineRpm)
 {
 	m_idleOmega = dAbs(idleRpm / dRadPerSecToRpm);
 	m_maxOmega = dMax(redLineRpm / dRadPerSecToRpm, m_idleOmega);
 }
 
-void ndMultiBodyVehicleMotor::SetTorque(dFloat32 torqueInNewtonMeters)
+void ndMultiBodyVehicleMotor::SetTorque(ndFloat32 torqueInNewtonMeters)
 {
 	m_engineTorque = torqueInNewtonMeters;
 }
 
-void ndMultiBodyVehicleMotor::SetThrottle(dFloat32 param)
+void ndMultiBodyVehicleMotor::SetThrottle(ndFloat32 param)
 {
-	m_throttle = dClamp(param, dFloat32(0.0f), dFloat32(1.0f));
+	m_throttle = dClamp(param, ndFloat32(0.0f), ndFloat32(1.0f));
 }
 
-dFloat32 ndMultiBodyVehicleMotor::CalculateAcceleration(ndConstraintDescritor& desc)
+ndFloat32 ndMultiBodyVehicleMotor::CalculateAcceleration(ndConstraintDescritor& desc)
 {
 	const ndVector& omega0 = m_body0->GetOmega();
 	const ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
 	const ndVector relOmega(omega0 * jacobian0.m_angular);
 
 	m_omega = -relOmega.AddHorizontal().GetScalar();
-	const dFloat32 throttleOmega = dClamp(m_throttle * m_maxOmega, m_idleOmega, m_maxOmega);
-	const dFloat32 deltaOmega = throttleOmega - m_omega;
-	dFloat32 omegaError = dClamp(deltaOmega, -m_fuelValveRate, m_fuelValveRate);
+	const ndFloat32 throttleOmega = dClamp(m_throttle * m_maxOmega, m_idleOmega, m_maxOmega);
+	const ndFloat32 deltaOmega = throttleOmega - m_omega;
+	ndFloat32 omegaError = dClamp(deltaOmega, -m_fuelValveRate, m_fuelValveRate);
 	//dTrace(("%f %f\n", throttleOmega, m_omega));
 	return -omegaError * desc.m_invTimestep;
 }
@@ -129,37 +129,37 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	CalculateGlobalMatrix(matrix0, matrix1);
 
 	// two rows to restrict rotation around around the parent coordinate system
-	const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+	const ndFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+	const ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 
 	AddAngularRowJacobian(desc, matrix1.m_up, angle0);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
 
 	// add rotor joint
-	AddAngularRowJacobian(desc, matrix0.m_front, dFloat32(0.0f));
-	const dFloat32 accel = CalculateAcceleration(desc);
+	AddAngularRowJacobian(desc, matrix0.m_front, ndFloat32(0.0f));
+	const ndFloat32 accel = CalculateAcceleration(desc);
 	//dTrace(("%f\n", accel));
 	if (m_startEngine)
 	{
 		const ndMultiBodyVehicleGearBox* const gearBox = m_vehicelModel->m_gearBox;
 		dAssert(gearBox);
-		if (gearBox && dAbs(gearBox->GetRatio()) > dFloat32(0.0f))
+		if (gearBox && dAbs(gearBox->GetRatio()) > ndFloat32(0.0f))
 		{
 			ndJacobian& jacobian = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
 			jacobian.m_angular = ndVector::m_zero;
 		}
 
-		if (m_omega <= dFloat32(0.0f))
+		if (m_omega <= ndFloat32(0.0f))
 		{
 			// engine rpm can not be negative
-			dFloat32 stopAccel = dMin ((m_omega - 0.5f) * desc.m_invTimestep, accel);
+			ndFloat32 stopAccel = dMin ((m_omega - 0.5f) * desc.m_invTimestep, accel);
 			SetMotorAcceleration(desc, stopAccel);
 			SetHighFriction(desc, m_engineTorque);
 		}
 		else if (m_omega >= m_maxOmega)
 		{
 			// engine rpm can not pass maximum allowed
-			dFloat32 stopAccel = dMax ((m_omega - m_maxOmega) * desc.m_invTimestep, accel);
+			ndFloat32 stopAccel = dMax ((m_omega - m_maxOmega) * desc.m_invTimestep, accel);
 			SetMotorAcceleration(desc, stopAccel);
 			SetLowerFriction(desc, -m_engineTorque);
 		}
@@ -173,8 +173,8 @@ void ndMultiBodyVehicleMotor::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 	else
 	{
-		SetHighFriction(desc, m_engineTorque * dFloat32(4.0f));
-		SetLowerFriction(desc, -m_engineTorque * dFloat32(4.0f));
+		SetHighFriction(desc, m_engineTorque * ndFloat32(4.0f));
+		SetLowerFriction(desc, -m_engineTorque * ndFloat32(4.0f));
 		SetMotorAcceleration(desc, m_omega * desc.m_invTimestep);
 	}
 }

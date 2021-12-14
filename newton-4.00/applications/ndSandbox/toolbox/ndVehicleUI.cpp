@@ -27,7 +27,7 @@
 //	strcpy(material.m_textureName, texName);
 //	materialArray.PushBack(material);
 //
-//	dFloat32 gageSize = 100.0f;
+//	ndFloat32 gageSize = 100.0f;
 //	mesh.BeginBuild();
 //	mesh.BeginBuildFace();
 //	mesh.AddPoint(-gageSize, gageSize, 0.0f);
@@ -142,14 +142,14 @@ ndVehicleUI::~ndVehicleUI()
 	}
 };
 
-void ndVehicleUI::CreateOrthoViewMatrix(ndDemoEntityManager* const uscene, dFloat32 origin_x, const dFloat32 origin_y, ndMatrix& projmatrix)
+void ndVehicleUI::CreateOrthoViewMatrix(ndDemoEntityManager* const uscene, ndFloat32 origin_x, const ndFloat32 origin_y, ndMatrix& projmatrix)
 {
-	dFloat32 sizeX = (dFloat32)(1.0f * uscene->GetWidth());
-	dFloat32 sizeY = (dFloat32)(1.0f * uscene->GetHeight());
-	dFloat32 L = origin_x;
-	dFloat32 R = origin_x + sizeX;
-	dFloat32 T = origin_y;
-	dFloat32 B = origin_y + sizeY;
+	ndFloat32 sizeX = (ndFloat32)(1.0f * uscene->GetWidth());
+	ndFloat32 sizeY = (ndFloat32)(1.0f * uscene->GetHeight());
+	ndFloat32 L = origin_x;
+	ndFloat32 R = origin_x + sizeX;
+	ndFloat32 T = origin_y;
+	ndFloat32 B = origin_y + sizeY;
 	projmatrix = ndMatrix({ 2.0f / (R - L), 0.0f,   0.0f, 0.0f },
 	{ 0.0f,   2.0f / (T - B), 0.0f, 0.0f },
 	{ 0.0f,   0.0f,          -1.0f, 0.0f },
@@ -166,7 +166,7 @@ void ndVehicleUI::CreateBufferUI()
 		GLuint m_fragHandle = glCreateShader(GL_FRAGMENT_SHADER);
 
 		GLint Result = GL_FALSE;
-		dInt32 InfoLogLength = 0;
+		ndInt32 InfoLogLength = 0;
 
 		glShaderSource(m_vertHandle, 2, m_vertexShaderWithVersion, NULL);
 		glCompileShader(m_vertHandle);
@@ -298,17 +298,17 @@ void ndVehicleUI::CreateBufferUI()
 	}
 };
 
-void ndVehicleUI::RenderGageUI(ndDemoEntityManager* const uscene, const GLuint tex1, const dFloat32 origin_x, const dFloat32 origin_y, const dFloat32 ptsize, dFloat32 cparam, dFloat32 minAngle, dFloat32 maxAngle)
+void ndVehicleUI::RenderGageUI(ndDemoEntityManager* const uscene, const GLuint tex1, const ndFloat32 origin_x, const ndFloat32 origin_y, const ndFloat32 ptsize, ndFloat32 cparam, ndFloat32 minAngle, ndFloat32 maxAngle)
 {
 	if (m_vaoSta)
 	{
 		ndMatrix aprojm(dGetIdentityMatrix());
 		CreateOrthoViewMatrix(uscene, origin_x, origin_y, aprojm);
 		//
-		minAngle *= -dDegreeToRad;
-		maxAngle *= -dDegreeToRad;
+		minAngle *= -ndDegreeToRad;
+		maxAngle *= -ndDegreeToRad;
 		
-		dFloat32 angle = minAngle + (maxAngle - minAngle) * cparam;
+		ndFloat32 angle = minAngle + (maxAngle - minAngle) * cparam;
 
 		ndMatrix modm(dRollMatrix(-angle));
 		glVector4 color(GLfloat(1.0f), GLfloat(1.0f), GLfloat(1.0f), GLfloat(1.0f));
@@ -350,7 +350,7 @@ void ndVehicleUI::RenderGageUI(ndDemoEntityManager* const uscene, const GLuint t
 	}
 };
 
-void ndVehicleUI::RenderGearUI(ndDemoEntityManager* const uscene, const dInt32 gearid, GLuint tex1, dFloat32 origin_x, dFloat32 origin_y, dFloat32 ptsize)
+void ndVehicleUI::RenderGearUI(ndDemoEntityManager* const uscene, const ndInt32 gearid, GLuint tex1, ndFloat32 origin_x, ndFloat32 origin_y, ndFloat32 ptsize)
 {
 	if (m_vaoDyn)
 	{
@@ -361,10 +361,10 @@ void ndVehicleUI::RenderGearUI(ndDemoEntityManager* const uscene, const dInt32 g
 		origin[1][1] = -1.0f;
 		origin.m_posit = ndVector(origin_x + ptsize * 1.9f, 50.0f, 0.0f, 1.0f);
 
-		dFloat32 uwith = 0.1f;
-		dFloat32 u0 = uwith * gearid;
-		dFloat32 u1 = u0 + uwith;
-		dFloat32 xy1 = 10.0f;
+		ndFloat32 uwith = 0.1f;
+		ndFloat32 u0 = uwith * gearid;
+		ndFloat32 u1 = u0 + uwith;
+		ndFloat32 xy1 = 10.0f;
 
 		glVector4 color;
 		if (gearid == 0)

@@ -23,18 +23,18 @@ class ndDemoEntityManager;
 class ndDemoSplinePathMesh: public ndDemoMeshInterface
 {
 	public:
-	ndDemoSplinePathMesh(const ndBezierSpline& curve, const ndShaderPrograms& shaderCache, dInt32 resolution);
+	ndDemoSplinePathMesh(const ndBezierSpline& curve, const ndShaderPrograms& shaderCache, ndInt32 resolution);
 	~ndDemoSplinePathMesh();
 
 	void SetColor(const ndVector& color);
-	dInt32 GetRenderResolution() const;
-	void SetRenderResolution(dInt32 breaks);
+	ndInt32 GetRenderResolution() const;
+	void SetRenderResolution(ndInt32 breaks);
 
 	virtual void Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 	
 	ndBezierSpline m_curve;
 	ndVector m_color;
-	dInt32 m_renderResolution;
+	ndInt32 m_renderResolution;
 	GLuint m_shader;
 	GLuint m_vertexBuffer;
 	GLuint m_vertextArrayBuffer;

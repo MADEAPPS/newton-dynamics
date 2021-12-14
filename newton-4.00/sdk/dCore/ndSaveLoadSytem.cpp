@@ -31,7 +31,7 @@
 class ndLoaderFactory
 {
 	public:
-	dUnsigned64 m_classNameHash;
+	ndUnsigned64 m_classNameHash;
 	ndLoadSaveBase* m_loader;
 };
 
@@ -69,7 +69,7 @@ void RegisterLoaderClass(const char* const className, ndLoadSaveBase* const load
 	entry.m_loader = loaderClass;
 	ndFixSizeArray<ndLoaderFactory, D_LOADER_DICTIONARY_SIZE>& factory = GetFactory();
 	factory.PushBack(entry);
-	for (dInt32 i = factory.GetCount() - 2; i >= 0; i--)
+	for (ndInt32 i = factory.GetCount() - 2; i >= 0; i--)
 	{
 		if (entry.m_classNameHash < factory[i].m_classNameHash)
 		{
@@ -85,15 +85,15 @@ void RegisterLoaderClass(const char* const className, ndLoadSaveBase* const load
 
 void* LoadClass(const char* const className, const ndLoadSaveBase::dLoadDescriptor& descriptor)
 {
-	dUnsigned64 classNameHash = dCRC64(className);
+	ndUnsigned64 classNameHash = dCRC64(className);
 
 	const ndFixSizeArray<ndLoaderFactory, D_LOADER_DICTIONARY_SIZE>& factory = GetFactory();
 
-	dInt32 i0 = 0; 
-	dInt32 i1 = factory.GetCount() - 1;
+	ndInt32 i0 = 0; 
+	ndInt32 i1 = factory.GetCount() - 1;
 	while ((i1 - i0 > 4))
 	{
-		dInt32 mid = (i1 + i0) / 2;
+		ndInt32 mid = (i1 + i0) / 2;
 		if (factory[mid].m_classNameHash <= classNameHash)
 		{
 			i0 = mid;
@@ -104,7 +104,7 @@ void* LoadClass(const char* const className, const ndLoadSaveBase::dLoadDescript
 		}
 	}
 
-	for (dInt32 i = i0; i <= i1; i++)
+	for (ndInt32 i = i0; i <= i1; i++)
 	{
 		if (factory[i].m_classNameHash == classNameHash)
 		{
@@ -113,7 +113,7 @@ void* LoadClass(const char* const className, const ndLoadSaveBase::dLoadDescript
 	}
 	
 	#ifdef _DEBUG
-	for (dInt32 i = 0; i < factory.GetCount(); i++)
+	for (ndInt32 i = 0; i < factory.GetCount(); i++)
 	{
 		if (factory[i].m_classNameHash == classNameHash)
 		{

@@ -58,8 +58,8 @@ class ndRedBackNode
 	D_CORE_API inline void Initdata (ndRedBackNode* const parent);
 	D_CORE_API inline void SetColor (REDBLACK_COLOR color);
 	D_CORE_API REDBLACK_COLOR GetColor () const;
-	D_CORE_API dUnsigned32 IsInTree () const;
-	D_CORE_API inline void SetInTreeFlag (dUnsigned32 flag);
+	D_CORE_API ndUnsigned32 IsInTree () const;
+	D_CORE_API inline void SetInTreeFlag (ndUnsigned32 flag);
 
 	D_CORE_API void RemoveAll ();
 	D_CORE_API ndRedBackNode* Prev() const;
@@ -73,8 +73,8 @@ class ndRedBackNode
 	ndRedBackNode* m_left;
 	ndRedBackNode* m_right;
 	ndRedBackNode* m_parent;
-	dUnsigned32  m_color	: 1;
-	dUnsigned32  m_inTree	: 1;
+	ndUnsigned32  m_color	: 1;
+	ndUnsigned32  m_inTree	: 1;
 };
 
 template<class OBJECT, class KEY, class allocator = ndContainersAlloc<OBJECT> >
@@ -179,7 +179,7 @@ class ndTree: public ndClassAlloc
 			m_ptr = node;
 		}
 
-		operator dInt32() const 
+		operator ndInt32() const 
 		{
 			return m_ptr != nullptr;
 		}
@@ -190,7 +190,7 @@ class ndTree: public ndClassAlloc
 			m_ptr = m_ptr->Next();
 		}
 
-		void operator++ (dInt32)
+		void operator++ (ndInt32)
 		{
 			dAssert (m_ptr);
 			m_ptr = m_ptr->Next();
@@ -202,7 +202,7 @@ class ndTree: public ndClassAlloc
 			m_ptr = m_ptr->Prev();
 		}
 
-		void operator-- (dInt32) 
+		void operator-- (ndInt32) 
 		{
 			dAssert (m_ptr);
 			m_ptr = m_ptr->Prev();
@@ -237,8 +237,8 @@ class ndTree: public ndClassAlloc
 	ndTree ();
 	~ndTree (); 
 
-	operator dInt32() const;
-	dInt32 GetCount() const;
+	operator ndInt32() const;
+	ndInt32 GetCount() const;
 
 	ndNode* GetRoot () const;
 	ndNode* Minimum () const;
@@ -280,10 +280,10 @@ class ndTree: public ndClassAlloc
 	// ***********************************************************
 	private:
 	ndNode* m_head;
-	dInt32 m_count;
+	ndInt32 m_count;
 
-	dInt32 CompareKeys (const KEY &key0, const KEY &key1) const;
-	bool SanityCheck (ndNode* const ptr, dInt32 height) const;
+	ndInt32 CompareKeys (const KEY &key0, const KEY &key1) const;
+	bool SanityCheck (ndNode* const ptr, ndInt32 height) const;
 
 	friend class ndNode;
 };
@@ -312,12 +312,12 @@ inline ndRedBackNode::REDBLACK_COLOR  ndRedBackNode::GetColor () const
 	return REDBLACK_COLOR (m_color);
 }
 
-inline void ndRedBackNode::SetInTreeFlag (dUnsigned32 flag)
+inline void ndRedBackNode::SetInTreeFlag (ndUnsigned32 flag)
 {
 	m_inTree = flag;
 }
 
-inline dUnsigned32 ndRedBackNode::IsInTree () const
+inline ndUnsigned32 ndRedBackNode::IsInTree () const
 {
 	return m_inTree;
 }
@@ -337,13 +337,13 @@ ndTree<OBJECT, KEY, allocator>::~ndTree ()
 }
 
 template<class OBJECT, class KEY, class allocator>
-ndTree<OBJECT, KEY, allocator>::operator dInt32() const
+ndTree<OBJECT, KEY, allocator>::operator ndInt32() const
 {
 	return m_head != nullptr;
 }
 
 template<class OBJECT, class KEY, class allocator>
-dInt32 ndTree<OBJECT, KEY, allocator>::GetCount() const
+ndInt32 ndTree<OBJECT, KEY, allocator>::GetCount() const
 {
 	return m_count;
 }
@@ -400,7 +400,7 @@ template<class OBJECT, class KEY, class allocator>
 typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::GetNodeFromInfo (OBJECT &info) const
 {
 	ndNode* const node = (ndNode* ) &info;
-	dInt64 offset = ((char*) &node->m_info) - ((char *) node);
+	ndInt64 offset = ((char*) &node->m_info) - ((char *) node);
 	ndNode* const retnode = (ndNode* ) (((char *) node) - offset);
 
 	dAssert (retnode->IsInTree ());
@@ -555,7 +555,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 {
 	ndNode* parent = nullptr;
 	ndNode* ptr = m_head;
-	dInt32 val = 0;
+	ndInt32 val = 0;
 	while (ptr != nullptr) 
 	{
 		parent = ptr;
@@ -609,7 +609,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 {
 	ndNode* parent = nullptr;
 	ndNode* ptr = m_head;
-	dInt32 val = 0;
+	ndInt32 val = 0;
 	while (ptr != nullptr)
 	{
 		parent = ptr;
@@ -680,7 +680,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 template<class OBJECT, class KEY, class allocator>
 typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>::Insert (typename ndTree<OBJECT, KEY, allocator>::ndNode* const node, KEY key)
 {
-	dInt32 val = 0;
+	ndInt32 val = 0;
 	ndNode* ptr = m_head;
 	ndNode* parent = nullptr;
 	while (ptr != nullptr) 
@@ -738,7 +738,7 @@ typename ndTree<OBJECT, KEY, allocator>::ndNode* ndTree<OBJECT, KEY, allocator>:
 {
 	ndNode* parent = nullptr;
 	ndNode* ptr = m_head;
-	dInt32 val = 0;
+	ndInt32 val = 0;
 
 	while (ptr != nullptr) 
 	{
@@ -846,7 +846,7 @@ bool ndTree<OBJECT, KEY, allocator>::SanityCheck () const
 }
 
 template<class OBJECT, class KEY, class allocator>
-bool ndTree<OBJECT, KEY, allocator>::SanityCheck (typename ndTree<OBJECT, KEY, allocator>::ndNode* const ptr, dInt32 height) const
+bool ndTree<OBJECT, KEY, allocator>::SanityCheck (typename ndTree<OBJECT, KEY, allocator>::ndNode* const ptr, ndInt32 height) const
 {
 	if (!ptr) 
 	{
@@ -886,7 +886,7 @@ bool ndTree<OBJECT, KEY, allocator>::SanityCheck (typename ndTree<OBJECT, KEY, a
 
 	if (!ptr->m_left && !ptr->m_right) 
 	{
-		dInt32 bh = 0;
+		ndInt32 bh = 0;
 		for (ndNode* x = ptr; x; x = x->GetParent()) 
 		{
 	 		if (x->GetColor() == ndNode::BLACK) 
@@ -913,7 +913,7 @@ bool ndTree<OBJECT, KEY, allocator>::SanityCheck (typename ndTree<OBJECT, KEY, a
 }
 
 template<class OBJECT, class KEY, class allocator>
-dInt32 ndTree<OBJECT, KEY, allocator>::CompareKeys (const KEY &key0, const KEY &key1) const
+ndInt32 ndTree<OBJECT, KEY, allocator>::CompareKeys (const KEY &key0, const KEY &key1) const
 {
 	if (key1 < key0) 
 	{
@@ -933,7 +933,7 @@ void ndTree<OBJECT, KEY, allocator>::SwapInfo (ndTree<OBJECT, KEY, allocator>& t
 	dSwap (m_count, tree.m_count);
 }
 
-//template<class OBJECT, class KEY, class allocator> dInt32 ndTree<OBJECT, KEY, allocator>::m_size = 0;
+//template<class OBJECT, class KEY, class allocator> ndInt32 ndTree<OBJECT, KEY, allocator>::m_size = 0;
 //template<class OBJECT, class KEY, class allocator> dgMemoryAllocator* ndTree<OBJECT, KEY, allocator>::m_staticAllocator = nullptr;
 
 

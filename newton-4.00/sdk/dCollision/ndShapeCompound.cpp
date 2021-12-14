@@ -27,7 +27,7 @@
 #include "ndBodyKinematic.h"
 #include "ndShapeCompound.h"
 
-#define D_MAX_MIN_VOLUME	dFloat32 (1.0e-3f)
+#define D_MAX_MIN_VOLUME	ndFloat32 (1.0e-3f)
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndShapeCompound)
 
 ndShapeCompound::ndNodeBase::~ndNodeBase()
@@ -49,15 +49,15 @@ ndShapeCompound::ndNodeBase::~ndNodeBase()
 class ndShapeCompound::ndSpliteInfo
 {
 	public:
-	ndSpliteInfo(ndNodeBase** const boxArray, dInt32 boxCount)
+	ndSpliteInfo(ndNodeBase** const boxArray, ndInt32 boxCount)
 	{
-		ndVector minP(dFloat32(1.0e15f));
-		ndVector maxP(-dFloat32(1.0e15f));
+		ndVector minP(ndFloat32(1.0e15f));
+		ndVector maxP(-ndFloat32(1.0e15f));
 
 		if (boxCount == 2)
 		{
 			m_axis = 1;
-			for (dInt32 i = 0; i < boxCount; i++)
+			for (ndInt32 i = 0; i < boxCount; i++)
 			{
 				ndNodeBase* const node = boxArray[i];
 				dAssert(node->m_type == m_leaf);
@@ -70,7 +70,7 @@ class ndShapeCompound::ndSpliteInfo
 			ndVector median(ndVector::m_zero);
 			ndVector varian(ndVector::m_zero);
 
-			for (dInt32 i = 0; i < boxCount; i++)
+			for (ndInt32 i = 0; i < boxCount; i++)
 			{
 				ndNodeBase* const node = boxArray[i];
 				dAssert(node->m_type == m_leaf);
@@ -81,11 +81,11 @@ class ndShapeCompound::ndSpliteInfo
 				varian += p * p;
 			}
 
-			varian = varian.Scale(dFloat32(boxCount)) - median * median;
+			varian = varian.Scale(ndFloat32(boxCount)) - median * median;
 
-			dInt32 index = 0;
-			dFloat32 maxVarian = dFloat32(-1.0e10f);
-			for (dInt32 i = 0; i < 3; i++)
+			ndInt32 index = 0;
+			ndFloat32 maxVarian = ndFloat32(-1.0e10f);
+			for (ndInt32 i = 0; i < 3; i++)
 			{
 				if (varian[i] > maxVarian)
 				{
@@ -94,18 +94,18 @@ class ndShapeCompound::ndSpliteInfo
 				}
 			}
 
-			ndVector center = median.Scale(dFloat32(1.0f) / dFloat32(boxCount));
+			ndVector center = median.Scale(ndFloat32(1.0f) / ndFloat32(boxCount));
 
-			dFloat32 test = center[index];
+			ndFloat32 test = center[index];
 
-			dInt32 i0 = 0;
-			dInt32 i1 = boxCount - 1;
+			ndInt32 i0 = 0;
+			ndInt32 i1 = boxCount - 1;
 			do
 			{
 				for (; i0 <= i1; i0++)
 				{
 					ndNodeBase* const node = boxArray[i0];
-					dFloat32 val = (node->m_p0[index] + node->m_p1[index]) * dFloat32(0.5f);
+					ndFloat32 val = (node->m_p0[index] + node->m_p1[index]) * ndFloat32(0.5f);
 					if (val > test)
 					{
 						break;
@@ -115,7 +115,7 @@ class ndShapeCompound::ndSpliteInfo
 				for (; i1 >= i0; i1--)
 				{
 					ndNodeBase* const node = boxArray[i1];
-					dFloat32 val = (node->m_p0[index] + node->m_p1[index]) * dFloat32(0.5f);
+					ndFloat32 val = (node->m_p0[index] + node->m_p1[index]) * ndFloat32(0.5f);
 					if (val < test)
 					{
 						break;
@@ -143,24 +143,24 @@ class ndShapeCompound::ndSpliteInfo
 			m_axis = i0 + 1;
 		}
 
-		dAssert(maxP.m_x - minP.m_x >= dFloat32(0.0f));
-		dAssert(maxP.m_y - minP.m_y >= dFloat32(0.0f));
-		dAssert(maxP.m_z - minP.m_z >= dFloat32(0.0f));
+		dAssert(maxP.m_x - minP.m_x >= ndFloat32(0.0f));
+		dAssert(maxP.m_y - minP.m_y >= ndFloat32(0.0f));
+		dAssert(maxP.m_z - minP.m_z >= ndFloat32(0.0f));
 		m_p0 = minP;
 		m_p1 = maxP;
 	}
 
-	dInt32 m_axis;
+	ndInt32 m_axis;
 	ndVector m_p0;
 	ndVector m_p1;
 };
 
 ndShapeCompound::ndTreeArray::ndTreeArray()
-	:ndTree<ndNodeBase*, dInt32, ndContainersFreeListAlloc<ndNodeBase*>>()
+	:ndTree<ndNodeBase*, ndInt32, ndContainersFreeListAlloc<ndNodeBase*>>()
 {
 }
 
-void ndShapeCompound::ndTreeArray::AddNode(ndNodeBase* const node, dInt32 index, const ndShapeInstance* const parent)
+void ndShapeCompound::ndTreeArray::AddNode(ndNodeBase* const node, ndInt32 index, const ndShapeInstance* const parent)
 {
 	ndTreeArray::ndNode* const myNode = Insert(node, index);
 	node->m_myNode = myNode;
@@ -171,9 +171,9 @@ void ndShapeCompound::ndTreeArray::AddNode(ndNodeBase* const node, dInt32 index,
 ndShapeCompound::ndShapeCompound()
 	:ndShape(m_compound)
 	,m_array()
-	,m_treeEntropy(dFloat32(0.0f))
-	,m_boxMinRadius(dFloat32(0.0f))
-	,m_boxMaxRadius(dFloat32(0.0f))
+	,m_treeEntropy(ndFloat32(0.0f))
+	,m_boxMinRadius(ndFloat32(0.0f))
+	,m_boxMaxRadius(ndFloat32(0.0f))
 	,m_root(nullptr)
 	,m_myInstance(nullptr)
 	,m_idIndex(0)
@@ -183,9 +183,9 @@ ndShapeCompound::ndShapeCompound()
 ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeInstance* const myInstance)
 	:ndShape(source)
 	,m_array()
-	,m_treeEntropy(dFloat32(0.0f))
-	,m_boxMinRadius(dFloat32(0.0f))
-	,m_boxMaxRadius(dFloat32(0.0f))
+	,m_treeEntropy(ndFloat32(0.0f))
+	,m_boxMinRadius(ndFloat32(0.0f))
+	,m_boxMaxRadius(ndFloat32(0.0f))
 	,m_root(nullptr)
 	,m_myInstance(myInstance)
 	,m_idIndex(0)
@@ -205,7 +205,7 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeIns
 		ndNodeBase* parents[D_COMPOUND_STACK_DEPTH];
 		pool[0] = source.m_root;
 		parents[0] = nullptr;
-		dInt32 stack = 1;
+		ndInt32 stack = 1;
 		while (stack) 
 		{
 			stack--;
@@ -281,9 +281,9 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeIns
 ndShapeCompound::ndShapeCompound(const ndLoadSaveBase::dLoadDescriptor&)
 	:ndShape(m_compound)
 	,m_array()
-	,m_treeEntropy(dFloat32 (0.0f))
-	,m_boxMinRadius(dFloat32(0.0f))
-	,m_boxMaxRadius(dFloat32(0.0f))
+	,m_treeEntropy(ndFloat32 (0.0f))
+	,m_boxMinRadius(ndFloat32(0.0f))
+	,m_boxMaxRadius(ndFloat32(0.0f))
 	,m_root(nullptr)
 	,m_myInstance(nullptr)
 	,m_idIndex(0)
@@ -313,30 +313,30 @@ void ndShapeCompound::CalculateAabb(const ndMatrix& matrix, ndVector &p0, ndVect
 }
 
 
-//dInt32 ndShapeCompound::CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 stride, const dPlane& localPlane, ndVector* const contactsOut) const
-dInt32 ndShapeCompound::CalculatePlaneIntersection(const dFloat32* const, const dInt32* const, dInt32, dInt32, const dPlane&, ndVector* const) const
+//ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndFloat32* const vertex, const ndInt32* const index, ndInt32 indexCount, ndInt32 stride, const dPlane& localPlane, ndVector* const contactsOut) const
+ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndFloat32* const, const ndInt32* const, ndInt32, ndInt32, const dPlane&, ndVector* const) const
 {
 	dAssert(0);
 	return 0;
-	//dInt32 count = 0;
-	//dInt32 j = index[indexCount - 1] * stride;
+	//ndInt32 count = 0;
+	//ndInt32 j = index[indexCount - 1] * stride;
 	//ndVector p0(&vertex[j]);
 	//p0 = p0 & ndVector::m_triplexMask;
-	//dFloat32 side0 = localPlane.Evalue(p0);
-	//for (dInt32 i = 0; i < indexCount; i++) {
+	//ndFloat32 side0 = localPlane.Evalue(p0);
+	//for (ndInt32 i = 0; i < indexCount; i++) {
 	//	j = index[i] * stride;
 	//	ndVector p1(&vertex[j]);
 	//	p1 = p1 & ndVector::m_triplexMask;
-	//	dFloat32 side1 = localPlane.Evalue(p1);
+	//	ndFloat32 side1 = localPlane.Evalue(p1);
 	//
-	//	if (side0 < dFloat32(0.0f)) {
-	//		if (side1 >= dFloat32(0.0f)) {
+	//	if (side0 < ndFloat32(0.0f)) {
+	//		if (side1 >= ndFloat32(0.0f)) {
 	//			ndVector dp(p1 - p0);
-	//			dAssert(dp.m_w == dFloat32(0.0f));
-	//			dFloat32 t = localPlane.DotProduct(dp).GetScalar();
-	//			dAssert(dgAbs(t) >= dFloat32(0.0f));
-	//			if (dgAbs(t) < dFloat32(1.0e-8f)) {
-	//				t = dgSign(t) * dFloat32(1.0e-8f);
+	//			dAssert(dp.m_w == ndFloat32(0.0f));
+	//			ndFloat32 t = localPlane.DotProduct(dp).GetScalar();
+	//			dAssert(dgAbs(t) >= ndFloat32(0.0f));
+	//			if (dgAbs(t) < ndFloat32(1.0e-8f)) {
+	//				t = dgSign(t) * ndFloat32(1.0e-8f);
 	//			}
 	//			dAssert(0);
 	//			contactsOut[count] = p0 - dp.Scale(side0 / t);
@@ -344,13 +344,13 @@ dInt32 ndShapeCompound::CalculatePlaneIntersection(const dFloat32* const, const 
 	//
 	//		}
 	//	}
-	//	else if (side1 <= dFloat32(0.0f)) {
+	//	else if (side1 <= ndFloat32(0.0f)) {
 	//		ndVector dp(p1 - p0);
-	//		dAssert(dp.m_w == dFloat32(0.0f));
-	//		dFloat32 t = localPlane.DotProduct(dp).GetScalar();
-	//		dAssert(dgAbs(t) >= dFloat32(0.0f));
-	//		if (dgAbs(t) < dFloat32(1.0e-8f)) {
-	//			t = dgSign(t) * dFloat32(1.0e-8f);
+	//		dAssert(dp.m_w == ndFloat32(0.0f));
+	//		ndFloat32 t = localPlane.DotProduct(dp).GetScalar();
+	//		dAssert(dgAbs(t) >= ndFloat32(0.0f));
+	//		if (dgAbs(t) < ndFloat32(1.0e-8f)) {
+	//			t = dgSign(t) * ndFloat32(1.0e-8f);
 	//		}
 	//		dAssert(0);
 	//		contactsOut[count] = p0 - dp.Scale(side0 / t);
@@ -382,18 +382,18 @@ void ndShapeCompound::DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& deb
 	}
 }
 
-dFloat32 ndShapeCompound::GetVolume() const
+ndFloat32 ndShapeCompound::GetVolume() const
 {
 	dAssert(0);
-	return dFloat32(0.0f);
+	return ndFloat32(0.0f);
 }
 
-dFloat32 ndShapeCompound::GetBoxMinRadius() const
+ndFloat32 ndShapeCompound::GetBoxMinRadius() const
 {
 	return m_boxMinRadius;
 }
 
-dFloat32 ndShapeCompound::GetBoxMaxRadius() const
+ndFloat32 ndShapeCompound::GetBoxMaxRadius() const
 {
 	return m_boxMaxRadius;
 }
@@ -414,7 +414,7 @@ void ndShapeCompound::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVect
 	}
 }
 
-ndVector ndShapeCompound::SupportVertex(const ndVector&, dInt32* const) const
+ndVector ndShapeCompound::SupportVertex(const ndVector&, ndInt32* const) const
 {
 	dAssert(0);
 	return ndVector::m_zero;
@@ -427,13 +427,13 @@ ndVector ndShapeCompound::SupportVertexSpecialProjectPoint(const ndVector&, cons
 	return ndVector::m_zero;
 }
 
-ndVector ndShapeCompound::SupportVertexSpecial(const ndVector& dir, dFloat32, dInt32* const vertexIndex) const
+ndVector ndShapeCompound::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt32* const vertexIndex) const
 {
 	dAssert(0);
 	return SupportVertex(dir, vertexIndex);
 }
 
-dInt32 ndShapeCompound::CalculatePlaneIntersection(const ndVector&, const ndVector&, ndVector* const) const
+ndInt32 ndShapeCompound::CalculatePlaneIntersection(const ndVector&, const ndVector&, ndVector* const) const
 {
 	dAssert(0);
 	return 0;
@@ -445,26 +445,26 @@ ndVector ndShapeCompound::CalculateVolumeIntegral(const ndMatrix&, const ndVecto
 	return ndVector::m_zero;
 }
 
-dFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
+ndFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
 	if (!m_root) 
 	{
-		return dFloat32 (1.2f);
+		return ndFloat32 (1.2f);
 	}
 
-	dFloat32 distance[D_COMPOUND_STACK_DEPTH];
+	ndFloat32 distance[D_COMPOUND_STACK_DEPTH];
 	const ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
 
-//	dFloat32 maxParam = maxT;
+//	ndFloat32 maxParam = maxT;
 	ndFastRay ray (localP0, localP1);
 
-	dInt32 stack = 1;
+	ndInt32 stack = 1;
 	stackPool[0] = m_root;
 	distance[0] = ray.BoxIntersect(m_root->m_p0, m_root->m_p1);
 	while (stack) 
 	{
 		stack --;
-		dFloat32 dist = distance[stack];
+		ndFloat32 dist = distance[stack];
 
 		if (dist > maxT) 
 		{
@@ -480,8 +480,8 @@ dFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& loc
 				ndShapeInstance* const shape = me->GetShape();
 				const ndVector p0 (shape->GetLocalMatrix().UntransformVector (localP0) & ndVector::m_triplexMask);
 				const ndVector p1 (shape->GetLocalMatrix().UntransformVector (localP1) & ndVector::m_triplexMask);
-				//dFloat32 param = shape->RayCast (p0, p1, maxT, tmpContactOut, preFilter, body, userData);
-				dFloat32 param = shape->RayCast(callback, p0, p1, body, tmpContactOut);
+				//ndFloat32 param = shape->RayCast (p0, p1, maxT, tmpContactOut, preFilter, body, userData);
+				ndFloat32 param = shape->RayCast(callback, p0, p1, body, tmpContactOut);
 				if (param < maxT) 
 				{
 					maxT = param;
@@ -497,10 +497,10 @@ dFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& loc
 				dAssert (me->m_type == m_node);
 				const ndNodeBase* const left = me->m_left;
 				dAssert (left);
-				dFloat32 dist1 = ray.BoxIntersect(left->m_p0, left->m_p1);
+				ndFloat32 dist1 = ray.BoxIntersect(left->m_p0, left->m_p1);
 				if (dist1 < maxT) 
 				{
-					dInt32 j = stack;
+					ndInt32 j = stack;
 					for ( ; j && (dist1 > distance[j - 1]); j --) 
 					{
 						stackPool[j] = stackPool[j - 1];
@@ -509,7 +509,7 @@ dFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& loc
 					stackPool[j] = left;
 					distance[j] = dist1;
 					stack++;
-					dAssert (stack < dInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
+					dAssert (stack < ndInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
 				}
 				
 				const ndNodeBase* const right = me->m_right;
@@ -517,7 +517,7 @@ dFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& loc
 				dist1 = ray.BoxIntersect(right->m_p0, right->m_p1);
 				if (dist1 < maxT) 
 				{
-					dInt32 j = stack;
+					ndInt32 j = stack;
 					for ( ; j && (dist1 > distance[j - 1]); j --) 
 					{
 						stackPool[j] = stackPool[j - 1];
@@ -526,7 +526,7 @@ dFloat32 ndShapeCompound::RayCast(ndRayCastNotify& callback, const ndVector& loc
 					stackPool[j] = right;
 					distance[j] = dist1;
 					stack++;
-					dAssert (stack < dInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
+					dAssert (stack < ndInt32 (sizeof (stackPool) / sizeof (stackPool[0])));
 				}
 			}
 		}
@@ -539,7 +539,7 @@ void ndShapeCompound::BeginAddRemove()
 	dAssert(m_myInstance);
 }
 
-dFloat32 ndShapeCompound::CalculateSurfaceArea(ndNodeBase* const node0, ndNodeBase* const node1, ndVector& minBox, ndVector& maxBox) const
+ndFloat32 ndShapeCompound::CalculateSurfaceArea(ndNodeBase* const node0, ndNodeBase* const node1, ndVector& minBox, ndVector& maxBox) const
 {
 	minBox = node0->m_p0.GetMin(node1->m_p0);
 	maxBox = node0->m_p1.GetMax(node1->m_p1);
@@ -557,18 +557,18 @@ void ndShapeCompound::ImproveNodeFitness(ndNodeBase* const node) const
 	{
 		if (node->m_parent->m_left == node) 
 		{
-			dFloat32 cost0 = node->m_area;
+			ndFloat32 cost0 = node->m_area;
 
 			ndVector cost1P0;
 			ndVector cost1P1;
-			dFloat32 cost1 = CalculateSurfaceArea(node->m_right, node->m_parent->m_right, cost1P0, cost1P1);
+			ndFloat32 cost1 = CalculateSurfaceArea(node->m_right, node->m_parent->m_right, cost1P0, cost1P1);
 
 			ndVector cost2P0;
 			ndVector cost2P1;
-			dFloat32 cost2 = CalculateSurfaceArea(node->m_left, node->m_parent->m_right, cost2P0, cost2P1);
+			ndFloat32 cost2 = CalculateSurfaceArea(node->m_left, node->m_parent->m_right, cost2P0, cost2P1);
 
-			dAssert(node->m_parent->m_p0.m_w == dFloat32(0.0f));
-			dAssert(node->m_parent->m_p1.m_w == dFloat32(0.0f));
+			dAssert(node->m_parent->m_p0.m_w == ndFloat32(0.0f));
+			dAssert(node->m_parent->m_p1.m_w == ndFloat32(0.0f));
 
 			if ((cost1 <= cost0) && (cost1 <= cost2)) 
 			{
@@ -639,15 +639,15 @@ void ndShapeCompound::ImproveNodeFitness(ndNodeBase* const node) const
 		}
 		else 
 		{
-			dFloat32 cost0 = node->m_area;
+			ndFloat32 cost0 = node->m_area;
 
 			ndVector cost1P0;
 			ndVector cost1P1;
-			dFloat32 cost1 = CalculateSurfaceArea(node->m_left, node->m_parent->m_left, cost1P0, cost1P1);
+			ndFloat32 cost1 = CalculateSurfaceArea(node->m_left, node->m_parent->m_left, cost1P0, cost1P1);
 
 			ndVector cost2P0;
 			ndVector cost2P1;
-			dFloat32 cost2 = CalculateSurfaceArea(node->m_right, node->m_parent->m_left, cost2P0, cost2P1);
+			ndFloat32 cost2 = CalculateSurfaceArea(node->m_right, node->m_parent->m_left, cost2P0, cost2P1);
 
 			if ((cost1 <= cost0) && (cost1 <= cost2)) 
 			{
@@ -720,33 +720,33 @@ void ndShapeCompound::ImproveNodeFitness(ndNodeBase* const node) const
 	}
 }
 
-dFloat64 ndShapeCompound::CalculateEntropy(dInt32 count, ndNodeBase** array)
+ndFloat64 ndShapeCompound::CalculateEntropy(ndInt32 count, ndNodeBase** array)
 {
-	dFloat64 cost0 = dFloat32(1.0e20f);
-	dFloat64 cost1 = cost0;
+	ndFloat64 cost0 = ndFloat32(1.0e20f);
+	ndFloat64 cost1 = cost0;
 	do {
 		cost1 = cost0;
 		//for (dgList<ndNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
-		for (dInt32 i = 0; i < count; i ++) 
+		for (ndInt32 i = 0; i < count; i ++) 
 		{
 			ndNodeBase* const node = array[i];
 			ImproveNodeFitness(node);
 		}
 
-		cost0 = dFloat32(0.0f);
+		cost0 = ndFloat32(0.0f);
 		//for (dgList<ndNodeBase*>::dgListNode* listNode = list.GetFirst(); listNode; listNode = listNode->GetNext()) {
-		for (dInt32 i = 0; i < count; i++)
+		for (ndInt32 i = 0; i < count; i++)
 		{
 			//ndNodeBase* const node = listNode->GetInfo();
 			ndNodeBase* const node = array[i];
 			cost0 += node->m_area;
 		}
-	} while (cost0 < (cost1 * dFloat32(0.9999f)));
+	} while (cost0 < (cost1 * ndFloat32(0.9999f)));
 	return cost0;
 }
 
 
-ndShapeCompound::ndNodeBase* ndShapeCompound::BuildTopDown(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory, dInt32& rootIndex)
+ndShapeCompound::ndNodeBase* ndShapeCompound::BuildTopDown(ndNodeBase** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndNodeBase** rootNodesMemory, ndInt32& rootIndex)
 {
 	dAssert(lastBox >= 0);
 	dAssert(firstBox >= 0);
@@ -772,18 +772,18 @@ ndShapeCompound::ndNodeBase* ndShapeCompound::BuildTopDown(ndNodeBase** const le
 	return parent;
 }
 
-ndShapeCompound::ndNodeBase* ndShapeCompound::BuildTopDownBig(ndNodeBase** const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBase** rootNodesMemory, dInt32& rootIndex)
+ndShapeCompound::ndNodeBase* ndShapeCompound::BuildTopDownBig(ndNodeBase** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndNodeBase** rootNodesMemory, ndInt32& rootIndex)
 {
 	if (lastBox == firstBox) 
 	{
 		return BuildTopDown(leafArray, firstBox, lastBox, rootNodesMemory, rootIndex);
 	}
 
-	dInt32 midPoint = -1;
-	const dFloat32 scale = dFloat32(10.0f);
-	const dFloat32 scale2 = dFloat32(3.0f) * scale * scale;
-	const dInt32 count = lastBox - firstBox;
-	for (dInt32 i = 0; i < count; i++) 
+	ndInt32 midPoint = -1;
+	const ndFloat32 scale = ndFloat32(10.0f);
+	const ndFloat32 scale2 = ndFloat32(3.0f) * scale * scale;
+	const ndInt32 count = lastBox - firstBox;
+	for (ndInt32 i = 0; i < count; i++) 
 	{
 		const ndNodeBase* const node0 = leafArray[firstBox + i];
 		const ndNodeBase* const node1 = leafArray[firstBox + i + 1];
@@ -803,9 +803,9 @@ ndShapeCompound::ndNodeBase* ndShapeCompound::BuildTopDownBig(ndNodeBase** const
 	rootIndex++;
 	parent->m_parent = nullptr;
 	
-	ndVector minP(dFloat32(1.0e15f));
-	ndVector maxP(-dFloat32(1.0e15f));
-	for (dInt32 i = 0; i <= count; i++) 
+	ndVector minP(ndFloat32(1.0e15f));
+	ndVector maxP(-ndFloat32(1.0e15f));
+	for (ndInt32 i = 0; i <= count; i++) 
 	{
 		const ndNodeBase* const node = leafArray[firstBox + i];
 		dAssert(node->m_shapeInstance);
@@ -835,8 +835,8 @@ void ndShapeCompound::EndAddRemove()
 			node->CalculateAABB();
 		}
 
-		dInt32 stack = 1;
-		dInt32 nodeCount = 0;
+		ndInt32 stack = 1;
+		ndInt32 nodeCount = 0;
 		ndNodeBase** nodeArray = dAlloca(ndNodeBase*, m_array.GetCount() + 10);
 		ndNodeBase* stackBuffer[D_COMPOUND_STACK_DEPTH];
 
@@ -854,22 +854,22 @@ void ndShapeCompound::EndAddRemove()
 
 				stackBuffer[stack] = node->m_right;
 				stack++;
-				dAssert(stack < dInt32 (sizeof(stackBuffer) / sizeof(stackBuffer[0])));
+				dAssert(stack < ndInt32 (sizeof(stackBuffer) / sizeof(stackBuffer[0])));
 
 				stackBuffer[stack] = node->m_left;
 				stack++;
-				dAssert(stack < dInt32(sizeof(stackBuffer) / sizeof(stackBuffer[0])));
+				dAssert(stack < ndInt32(sizeof(stackBuffer) / sizeof(stackBuffer[0])));
 			}
 		}
 		
 		if (nodeCount)
 		{
-			dFloat64 cost = CalculateEntropy(nodeCount, nodeArray);
-			if ((cost > m_treeEntropy * dFloat32(2.0f)) || (cost < m_treeEntropy * dFloat32(0.5f))) 
+			ndFloat64 cost = CalculateEntropy(nodeCount, nodeArray);
+			if ((cost > m_treeEntropy * ndFloat32(2.0f)) || (cost < m_treeEntropy * ndFloat32(0.5f))) 
 			{
-				dInt32 leafNodesCount = 0;
+				ndInt32 leafNodesCount = 0;
 				ndNodeBase** leafArray = dAlloca(ndNodeBase*, nodeCount + 12);
-				for (dInt32 i = 0; i < nodeCount; i++)
+				for (ndInt32 i = 0; i < nodeCount; i++)
 				{ 
 					ndNodeBase* const node = nodeArray[i];
 					if (node->m_left->m_type == m_leaf) 
@@ -889,10 +889,10 @@ void ndShapeCompound::EndAddRemove()
 				class CompareNodes
 				{
 					public:
-					dInt32 Compare(const ndNodeBase* const elementA, const ndNodeBase* const elementB, void* const) const
+					ndInt32 Compare(const ndNodeBase* const elementA, const ndNodeBase* const elementB, void* const) const
 					{
-						dFloat32 areaA = elementA->m_area;
-						dFloat32 areaB = elementB->m_area;
+						ndFloat32 areaA = elementA->m_area;
+						ndFloat32 areaB = elementB->m_area;
 						if (areaA < areaB)
 						{
 							return 1;
@@ -906,7 +906,7 @@ void ndShapeCompound::EndAddRemove()
 				};
 				ndSort<ndNodeBase*, CompareNodes>(leafArray, leafNodesCount);
 
-				dInt32 rootIndex = 0;
+				ndInt32 rootIndex = 0;
 				m_root = BuildTopDownBig(&leafArray[0], 0, leafNodesCount - 1, nodeArray, rootIndex);
 
 				//m_root->Sanity();
@@ -921,12 +921,12 @@ void ndShapeCompound::EndAddRemove()
 		}
 		else 
 		{
-			m_treeEntropy = dFloat32(2.0f);
+			m_treeEntropy = ndFloat32(2.0f);
 		}
 		
-		dAssert(m_root->m_size.m_w == dFloat32(0.0f));
+		dAssert(m_root->m_size.m_w == ndFloat32(0.0f));
 		m_boxMinRadius = dMin(dMin(m_root->m_size.m_x, m_root->m_size.m_y), m_root->m_size.m_z);
-		m_boxMaxRadius = dSqrt(m_root->m_size.DotProduct(m_root->m_size).GetScalar());
+		m_boxMaxRadius = ndSqrt(m_root->m_size.DotProduct(m_root->m_size).GetScalar());
 		
 		m_boxSize = m_root->m_size;
 		m_boxOrigin = m_root->m_origin;
@@ -951,7 +951,7 @@ ndShapeCompound::ndTreeArray::ndNode* ndShapeCompound::AddCollision(ndShapeInsta
 		ndVector p0;
 		ndVector p1;
 		ndNodeBase* sibling = m_root;
-		dFloat32 surfaceArea = CalculateSurfaceArea(newNode, sibling, p0, p1);
+		ndFloat32 surfaceArea = CalculateSurfaceArea(newNode, sibling, p0, p1);
 		while (sibling->m_left && sibling->m_right) 
 		{
 			if (surfaceArea > sibling->m_area) 
@@ -963,11 +963,11 @@ ndShapeCompound::ndTreeArray::ndNode* ndShapeCompound::AddCollision(ndShapeInsta
 	
 			ndVector leftP0;
 			ndVector leftP1;
-			dFloat32 leftSurfaceArea = CalculateSurfaceArea(newNode, sibling->m_left, leftP0, leftP1);
+			ndFloat32 leftSurfaceArea = CalculateSurfaceArea(newNode, sibling->m_left, leftP0, leftP1);
 	
 			ndVector rightP0;
 			ndVector rightP1;
-			dFloat32 rightSurfaceArea = CalculateSurfaceArea(newNode, sibling->m_right, rightP0, rightP1);
+			ndFloat32 rightSurfaceArea = CalculateSurfaceArea(newNode, sibling->m_right, rightP0, rightP1);
 	
 			if (leftSurfaceArea < rightSurfaceArea) 
 			{
@@ -1019,16 +1019,16 @@ void ndShapeCompound::MassProperties()
 	//	ndVector crossInertia_ (ndVector::m_zero);
 	//	dgPolyhedraMassProperties localData;
 	//	DebugCollision (dgGetIdentityMatrix(), CalculateInertia, &localData);
-	//	dFloat32 volume_ = localData.MassProperties (origin_, inertia_, crossInertia_);
-	//	dAssert (volume_ > dFloat32 (0.0f));
-	//	dFloat32 invVolume_ = dFloat32 (1.0f)/volume_;
+	//	ndFloat32 volume_ = localData.MassProperties (origin_, inertia_, crossInertia_);
+	//	dAssert (volume_ > ndFloat32 (0.0f));
+	//	ndFloat32 invVolume_ = ndFloat32 (1.0f)/volume_;
 	//	m_centerOfMass = origin_.Scale (invVolume_);
 	//	m_centerOfMass.m_w = volume_;
 	//	m_inertia = inertia_.Scale (invVolume_);
 	//	m_crossInertia = crossInertia_.Scale(invVolume_);
 #endif
 
-	dFloat32 volume = dFloat32(0.0f);
+	ndFloat32 volume = ndFloat32(0.0f);
 	ndVector origin(ndVector::m_zero);
 	ndVector inertiaII(ndVector::m_zero);
 	ndVector inertiaIJ(ndVector::m_zero);
@@ -1038,21 +1038,21 @@ void ndShapeCompound::MassProperties()
 	{
 		ndShapeInstance* const collision = iter.GetNode()->GetInfo()->GetShape();
 		ndMatrix shapeInertia(collision->CalculateInertia());
-		dFloat32 shapeVolume = collision->GetVolume();
+		ndFloat32 shapeVolume = collision->GetVolume();
 
 		hasVolume = hasVolume && (collision->GetShape()->GetAsShapeStaticMesh() != nullptr);
 		volume += shapeVolume;
 		origin += shapeInertia.m_posit.Scale(shapeVolume);
-		inertiaII += ndVector(shapeInertia[0][0], shapeInertia[1][1], shapeInertia[2][2], dFloat32(0.0f)).Scale(shapeVolume);
-		inertiaIJ += ndVector(shapeInertia[1][2], shapeInertia[0][2], shapeInertia[0][1], dFloat32(0.0f)).Scale(shapeVolume);
+		inertiaII += ndVector(shapeInertia[0][0], shapeInertia[1][1], shapeInertia[2][2], ndFloat32(0.0f)).Scale(shapeVolume);
+		inertiaIJ += ndVector(shapeInertia[1][2], shapeInertia[0][2], shapeInertia[0][1], ndFloat32(0.0f)).Scale(shapeVolume);
 	}
 
 	m_inertia = ndVector::m_zero;
 	m_crossInertia = ndVector::m_zero;
 	m_centerOfMass = ndVector::m_zero;
-	if (hasVolume && (volume > dFloat32(0.0f)))
+	if (hasVolume && (volume > ndFloat32(0.0f)))
 	{
-		dFloat32 invVolume = dFloat32(1.0f) / volume;
+		ndFloat32 invVolume = ndFloat32(1.0f) / volume;
 		m_inertia = inertiaII.Scale(invVolume);
 		m_crossInertia = inertiaIJ.Scale(invVolume);
 		m_centerOfMass = origin.Scale(invVolume);
@@ -1081,17 +1081,17 @@ void ndShapeCompound::ApplyScale(const ndVector& scale)
 		ndShapeInstance* const collision = node->GetShape();
 		collision->SetGlobalScale(scale);
 	}
-	m_treeEntropy = dFloat32(0.0f);
+	m_treeEntropy = ndFloat32(0.0f);
 	EndAddRemove();
 }
 
-dFloat32 ndShapeCompound::CalculateMassProperties(const ndMatrix& offset, ndVector& inertia, ndVector& crossInertia, ndVector& centerOfMass) const
+ndFloat32 ndShapeCompound::CalculateMassProperties(const ndMatrix& offset, ndVector& inertia, ndVector& crossInertia, ndVector& centerOfMass) const
 {
 	class ndCalculateMassProperties: public ndShapeDebugNotify
 	{
 		public:
 
-		virtual void DrawPolygon(dInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const)
+		virtual void DrawPolygon(ndInt32 vertexCount, const ndVector* const faceArray, const ndEdgeType* const)
 		{
 			m_localData.AddInertiaAndCrossFace(vertexCount, faceArray);
 		}
@@ -1115,13 +1115,13 @@ ndMatrix ndShapeCompound::CalculateInertiaAndCenterOfMass(const ndMatrix& alignM
 	scaledMatrix[2] = scaledMatrix[2].Scale(localScale.m_z);
 	scaledMatrix = alignMatrix * scaledMatrix;
 
-	dFloat32 volume = CalculateMassProperties(scaledMatrix, inertiaII, crossInertia, centerOfMass);
+	ndFloat32 volume = CalculateMassProperties(scaledMatrix, inertiaII, crossInertia, centerOfMass);
 	if (volume < D_MAX_MIN_VOLUME)
 	{
 		volume = D_MAX_MIN_VOLUME;
 	}
 
-	dFloat32 invVolume = dFloat32(1.0f) / volume;
+	ndFloat32 invVolume = ndFloat32(1.0f) / volume;
 	centerOfMass = centerOfMass.Scale(invVolume);
 	inertiaII = inertiaII.Scale(invVolume);
 	crossInertia = crossInertia.Scale(invVolume);

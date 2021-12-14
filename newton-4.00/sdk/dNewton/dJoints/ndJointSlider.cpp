@@ -17,14 +17,14 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointSlider)
 
 ndJointSlider::ndJointSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
-	,m_posit(dFloat32 (0.0f))
-	,m_speed(dFloat32(0.0f))
-	,m_springK(dFloat32(0.0f))
-	,m_damperC(dFloat32(0.0f))
-	,m_minLimit(dFloat32(0.0f))
-	,m_maxLimit(dFloat32(0.0f))
-	,m_friction(dFloat32(0.0f))
-	,m_springDamperRegularizer(dFloat32(0.1f))
+	,m_posit(ndFloat32 (0.0f))
+	,m_speed(ndFloat32(0.0f))
+	,m_springK(ndFloat32(0.0f))
+	,m_damperC(ndFloat32(0.0f))
+	,m_minLimit(ndFloat32(0.0f))
+	,m_maxLimit(ndFloat32(0.0f))
+	,m_friction(ndFloat32(0.0f))
+	,m_springDamperRegularizer(ndFloat32(0.1f))
 	,m_hasLimits(false)
 	,m_isSpringDamper(false)
 {
@@ -32,14 +32,14 @@ ndJointSlider::ndJointSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* 
 
 ndJointSlider::ndJointSlider(const ndLoadSaveBase::dLoadDescriptor& desc)
 	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
-	,m_posit(dFloat32(0.0f))
-	,m_speed(dFloat32(0.0f))
-	,m_springK(dFloat32(0.0f))
-	,m_damperC(dFloat32(0.0f))
-	,m_minLimit(dFloat32(0.0f))
-	,m_maxLimit(dFloat32(0.0f))
-	,m_friction(dFloat32(0.0f))
-	,m_springDamperRegularizer(dFloat32(0.1f))
+	,m_posit(ndFloat32(0.0f))
+	,m_speed(ndFloat32(0.0f))
+	,m_springK(ndFloat32(0.0f))
+	,m_damperC(ndFloat32(0.0f))
+	,m_minLimit(ndFloat32(0.0f))
+	,m_maxLimit(ndFloat32(0.0f))
+	,m_friction(ndFloat32(0.0f))
+	,m_springDamperRegularizer(ndFloat32(0.1f))
 	,m_hasLimits(false)
 	,m_isSpringDamper(false)
 {
@@ -59,27 +59,27 @@ ndJointSlider::~ndJointSlider()
 {
 }
 
-dFloat32 ndJointSlider::GetSpeed() const
+ndFloat32 ndJointSlider::GetSpeed() const
 {
 	return m_speed;
 }
 
-dFloat32 ndJointSlider::GetPosit() const
+ndFloat32 ndJointSlider::GetPosit() const
 {
 	return m_posit;
 }
 
-dFloat32 ndJointSlider::GetFriction() const
+ndFloat32 ndJointSlider::GetFriction() const
 {
 	return m_friction;
 }
 
-void ndJointSlider::SetFriction(dFloat32 friction)
+void ndJointSlider::SetFriction(ndFloat32 friction)
 {
 	m_friction = dAbs(friction);
 }
 
-void ndJointSlider::EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimit)
+void ndJointSlider::EnableLimits(bool state, ndFloat32 minLimit, ndFloat32 maxLimit)
 {
 	m_hasLimits = state;
 	dAssert(minLimit <= 0.0f);
@@ -92,11 +92,11 @@ void ndJointSlider::EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimi
 	m_maxDof = (m_isSpringDamper && m_hasLimits) ? 7 : 6;
 }
 
-void ndJointSlider::SetAsSpringDamper(bool state, dFloat32 regularizer, dFloat32 spring, dFloat32 damper)
+void ndJointSlider::SetAsSpringDamper(bool state, ndFloat32 regularizer, ndFloat32 spring, ndFloat32 damper)
 {
 	m_springK = dAbs(spring);
 	m_damperC = dAbs(damper);
-	m_springDamperRegularizer = dClamp(regularizer, dFloat32(1.0e-2f), dFloat32(0.99f));
+	m_springDamperRegularizer = dClamp(regularizer, ndFloat32(1.0e-2f), ndFloat32(0.99f));
 	m_isSpringDamper = state;
 
 	// adding one extra dof, this makes the mass matrix ill conditioned, 
@@ -106,36 +106,36 @@ void ndJointSlider::SetAsSpringDamper(bool state, dFloat32 regularizer, dFloat32
 
 void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const ndMatrix& matrix0, const ndMatrix& matrix1)
 {
-	if ((m_minLimit == dFloat32 (0.0f)) && (m_maxLimit == dFloat32(0.0f)))
+	if ((m_minLimit == ndFloat32 (0.0f)) && (m_maxLimit == ndFloat32(0.0f)))
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
 	}
 	else 
 	{
-		dFloat32 x = m_posit + m_speed * desc.m_timestep;
+		ndFloat32 x = m_posit + m_speed * desc.m_timestep;
 		if (x < m_minLimit)
 		{
 			ndVector p1(matrix1.m_posit + matrix1.m_front.Scale (m_minLimit));
 			AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
-			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-			const dFloat32 penetration = x - m_minLimit;
-			const dFloat32 recoveringAceel = -desc.m_invTimestep * D_SLIDER_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_SLIDER_PENETRATION_LIMIT), dFloat32(1.0f));
+			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const ndFloat32 penetration = x - m_minLimit;
+			const ndFloat32 recoveringAceel = -desc.m_invTimestep * D_SLIDER_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_SLIDER_PENETRATION_LIMIT), ndFloat32(1.0f));
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetLowerFriction(desc, -m_friction); 
 		}
 		else if (x > m_maxLimit)
 		{
 			AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1.m_front);
-			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-			const dFloat32 penetration = x - m_maxLimit;
-			const dFloat32 recoveringAceel = desc.m_invTimestep * D_SLIDER_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_SLIDER_PENETRATION_LIMIT), dFloat32(1.0f));
+			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const ndFloat32 penetration = x - m_maxLimit;
+			const ndFloat32 recoveringAceel = desc.m_invTimestep * D_SLIDER_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_SLIDER_PENETRATION_LIMIT), ndFloat32(1.0f));
 			SetMotorAcceleration(desc, stopAccel - recoveringAceel);
 			SetHighFriction(desc, m_friction);
 		}
-		else if (m_friction > dFloat32 (0.0f)) 
+		else if (m_friction > ndFloat32 (0.0f)) 
 		{
 			AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1.m_front);
-			const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+			const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 			SetMotorAcceleration(desc, stopAccel);
 			SetLowerFriction(desc, -m_friction);
 			SetHighFriction(desc, m_friction);
@@ -149,26 +149,26 @@ void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& des
 	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
 	SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 
-	dFloat32 x = m_posit + m_speed * desc.m_timestep;
+	ndFloat32 x = m_posit + m_speed * desc.m_timestep;
 	if (x < m_minLimit)
 	{
 		const ndVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_minLimit));
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
-		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-		const dFloat32 penetration = x - m_minLimit;
-		const dFloat32 recoveringAceel = -desc.m_invTimestep * D_SLIDER_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_SLIDER_PENETRATION_LIMIT), dFloat32(1.0f));
+		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		const ndFloat32 penetration = x - m_minLimit;
+		const ndFloat32 recoveringAceel = -desc.m_invTimestep * D_SLIDER_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_SLIDER_PENETRATION_LIMIT), ndFloat32(1.0f));
 		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
-		SetLowerFriction(desc, dFloat32(0.0f));
+		SetLowerFriction(desc, ndFloat32(0.0f));
 	}
 	else if (x > m_maxLimit)
 	{
 		const ndVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_maxLimit));
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
-		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
-		const dFloat32 penetration = x - m_maxLimit;
-		const dFloat32 recoveringAceel = desc.m_invTimestep * D_SLIDER_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_SLIDER_PENETRATION_LIMIT), dFloat32(1.0f));
+		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		const ndFloat32 penetration = x - m_maxLimit;
+		const ndFloat32 recoveringAceel = desc.m_invTimestep * D_SLIDER_PENETRATION_RECOVERY_SPEED * dMin(dAbs(penetration / D_SLIDER_PENETRATION_LIMIT), ndFloat32(1.0f));
 		SetMotorAcceleration(desc, stopAccel - recoveringAceel);
-		SetHighFriction(desc, dFloat32(0.0f));
+		SetHighFriction(desc, ndFloat32(0.0f));
 	}
 }
 
@@ -197,13 +197,13 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[1]);
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[2]);
 
-	const dFloat32 angle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
+	const ndFloat32 angle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
 	AddAngularRowJacobian(desc, matrix1.m_front, angle0);
 	
-	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+	const ndFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	AddAngularRowJacobian(desc, matrix1.m_up, angle1);
 	
-	const dFloat32 angle2 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+	const ndFloat32 angle2 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle2);
 
 	if (m_hasLimits)
@@ -225,10 +225,10 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
 		SetMassSpringDamperAcceleration(desc, m_springDamperRegularizer, m_springK, m_damperC);
 	}
-	else if (m_friction > dFloat32(0.0f))
+	else if (m_friction > ndFloat32(0.0f))
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1.m_front);
-		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc);
+		const ndFloat32 stopAccel = GetMotorZeroAcceleration(desc);
 		SetMotorAcceleration(desc, stopAccel);
 		SetLowerFriction(desc, -m_friction);
 		SetHighFriction(desc, m_friction);

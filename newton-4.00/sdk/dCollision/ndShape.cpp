@@ -23,7 +23,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndShape.h"
 
-ndVector ndShape::m_flushZero(dFloat32(1.0e-7f));
+ndVector ndShape::m_flushZero(ndFloat32(1.0e-7f));
 
 ndShape::ndShape(ndShapeID id)
 	//:ndClassAlloc()
@@ -73,15 +73,15 @@ void ndShape::MassProperties()
 	inertia[2][1] = m_crossInertia[0];
 
 	ndVector origin(m_centerOfMass);
-	dFloat32 originMag2 = origin.DotProduct(origin & ndVector::m_triplexMask).GetScalar();
+	ndFloat32 originMag2 = origin.DotProduct(origin & ndVector::m_triplexMask).GetScalar();
 
 	ndMatrix Covariance(origin, origin);
 	ndMatrix parallel(dGetIdentityMatrix());
-	for (dInt32 i = 0; i < 3; i++) 
+	for (ndInt32 i = 0; i < 3; i++) 
 	{
 		parallel[i][i] = originMag2;
 		inertia[i] += (parallel[i] - Covariance[i]);
-		dAssert(inertia[i][i] > dFloat32(0.0f));
+		dAssert(inertia[i][i] > ndFloat32(0.0f));
 	}
 
 	m_inertia[0] = inertia[0][0];

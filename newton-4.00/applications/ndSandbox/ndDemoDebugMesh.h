@@ -34,11 +34,11 @@ class ndFlatShadedDebugMesh: public ndDemoMeshInterface
 	void Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 
 	ndVector m_color;
-	dInt32 m_indexCount;
-	dInt32 m_shadeColorLocation;
-	dInt32 m_normalMatrixLocation;
-	dInt32 m_projectMatrixLocation;
-	dInt32 m_viewModelMatrixLocation;
+	ndInt32 m_indexCount;
+	ndInt32 m_shadeColorLocation;
+	ndInt32 m_normalMatrixLocation;
+	ndInt32 m_projectMatrixLocation;
+	ndInt32 m_viewModelMatrixLocation;
 
 	GLuint m_shader;
 	GLuint m_vertexBuffer;
@@ -60,9 +60,9 @@ class ndWireFrameDebugMesh: public ndDemoMeshInterface
 	void Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 
 	ndVector m_color;
-	dInt32 m_indexCount;
-	dInt32 m_shadeColorLocation;
-	dInt32 m_projectionViewModelMatrixLocation;
+	ndInt32 m_indexCount;
+	ndInt32 m_shadeColorLocation;
+	ndInt32 m_projectionViewModelMatrixLocation;
 
 	GLuint m_shader;
 	GLuint m_vertexBuffer;

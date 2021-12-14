@@ -27,17 +27,17 @@
 
 /*
 {
-dFloat32 xxx[6][6][6];
-for (dInt32 i = 0; i < 6 * 6 * 6; i++)
+ndFloat32 xxx[6][6][6];
+for (ndInt32 i = 0; i < 6 * 6 * 6; i++)
 {
-dFloat32* yyy = &xxx[0][0][0];
+ndFloat32* yyy = &xxx[0][0][0];
 yyy[i] = 1.0f;
 }
-for (dInt32 i = 0; i < uniqueCount; i++)
+for (ndInt32 i = 0; i < uniqueCount; i++)
 {
-dInt32 x = m_hashGridMap[i].m_x;
-dInt32 y = m_hashGridMap[i].m_y;
-dInt32 z = m_hashGridMap[i].m_z;
+ndInt32 x = m_hashGridMap[i].m_x;
+ndInt32 y = m_hashGridMap[i].m_y;
+ndInt32 z = m_hashGridMap[i].m_z;
 
 xxx[z][y][x] = 0.0f;
 }
@@ -50,8 +50,8 @@ cellCount *= 1;
 
 ndBodySphFluid::ndBodySphFluid()
 	:ndBodyParticleSet()
-	,m_box0(dFloat32(-1e10f))
-	,m_box1(dFloat32(1e10f))
+	,m_box0(ndFloat32(-1e10f))
+	,m_box1(ndFloat32(1e10f))
 	,m_hashGridMap(1024)
 	,m_particlesPairs(1024)
 	,m_hashGridMapScratchBuffer(1024)
@@ -61,8 +61,8 @@ ndBodySphFluid::ndBodySphFluid()
 
 ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::dLoadDescriptor& desc)
 	:ndBodyParticleSet(desc)
-	,m_box0(dFloat32(-1e10f))
-	,m_box1(dFloat32(1e10f))
+	,m_box0(ndFloat32(-1e10f))
+	,m_box1(ndFloat32(1e10f))
 	,m_hashGridMap()
 	,m_hashGridMapScratchBuffer()
 {
@@ -82,19 +82,19 @@ void ndBodySphFluid::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
 }
 
-void ndBodySphFluid::AddParticle(const dFloat32, const ndVector& position, const ndVector&)
+void ndBodySphFluid::AddParticle(const ndFloat32, const ndVector& position, const ndVector&)
 {
 	ndVector point(position);
-	point.m_w = dFloat32(1.0f);
+	point.m_w = ndFloat32(1.0f);
 	m_posit.PushBack(point);
 }
 
 void ndBodySphFluid::CaculateAABB(const ndWorld* const, ndVector& boxP0, ndVector& boxP1) const
 {
 	D_TRACKTIME();
-	ndVector box0(dFloat32(1e20f));
-	ndVector box1(dFloat32(-1e20f));
-	for (dInt32 i = m_posit.GetCount() - 1; i >= 0; i--)
+	ndVector box0(ndFloat32(1e20f));
+	ndVector box1(ndFloat32(-1e20f));
+	for (ndInt32 i = m_posit.GetCount() - 1; i >= 0; i--)
 	{
 		box0 = box0.GetMin(m_posit[i]);
 		box1 = box1.GetMax(m_posit[i]);
@@ -103,12 +103,12 @@ void ndBodySphFluid::CaculateAABB(const ndWorld* const, ndVector& boxP0, ndVecto
 	boxP1 = box1;
 }
 
-void ndBodySphFluid::Update(const ndWorld* const world, dFloat32)
+void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32)
 {
 	ndVector boxP0;
 	ndVector boxP1;
 	CaculateAABB(world, boxP0, boxP1);
-	const dFloat32 gridSize = CalculateGridSize();
+	const ndFloat32 gridSize = CalculateGridSize();
 	m_box0 = boxP0 - ndVector(gridSize);
 	m_box1 = boxP1 + ndVector(gridSize);
 
@@ -121,33 +121,33 @@ void ndBodySphFluid::Update(const ndWorld* const world, dFloat32)
 void ndBodySphFluid::SortByCenterType()
 {
 	D_TRACKTIME();
-	const dInt32 count = m_hashGridMap.GetCount();
+	const ndInt32 count = m_hashGridMap.GetCount();
 
-	dInt32 histogram[2];
+	ndInt32 histogram[2];
 	memset(histogram, 0, sizeof(histogram));
 
 	const ndGridHash* const srcArray = &m_hashGridMap[0];
-	for (dInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; i++)
 	{
 		const ndGridHash& entry = srcArray[i];
-		const dInt32 index = dInt32(entry.m_cellType);
+		const ndInt32 index = ndInt32(entry.m_cellType);
 		histogram[index] = histogram[index] + 1;
 	}
 
-	dInt32 acc = 0;
-	for (dInt32 i = 0; i < 2; i++)
+	ndInt32 acc = 0;
+	for (ndInt32 i = 0; i < 2; i++)
 	{
-		const dInt32 n = histogram[i];
+		const ndInt32 n = histogram[i];
 		histogram[i] = acc;
 		acc += n;
 	}
 
 	ndGridHash* const dstArray = &m_hashGridMapScratchBuffer[0];
-	for (dInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; i++)
 	{
 		const ndGridHash& entry = srcArray[i];
-		const dInt32 key = dInt32(entry.m_cellType);
-		const dInt32 index = histogram[key];
+		const ndInt32 key = ndInt32(entry.m_cellType);
+		const ndInt32 index = histogram[key];
 		dstArray[index] = entry;
 		histogram[key] = index + 1;
 	}
@@ -157,58 +157,58 @@ void ndBodySphFluid::SortByCenterType()
 void ndBodySphFluid::SortSingleThreaded()
 {
 	D_TRACKTIME();
-	const dInt32 count = m_hashGridMap.GetCount();
+	const ndInt32 count = m_hashGridMap.GetCount();
 
-	dInt32 histograms[6][1 << D_RADIX_DIGIT_SIZE];
+	ndInt32 histograms[6][1 << D_RADIX_DIGIT_SIZE];
 	memset(histograms, 0, sizeof(histograms));
 
 	ndGridHash* srcArray = &m_hashGridMap[0];
-	for (dInt32 i = 0; i < count; i++)
+	for (ndInt32 i = 0; i < count; i++)
 	{
 		const ndGridHash& entry = srcArray[i];
 
-		const dInt32 xlow = entry.m_xLow;
+		const ndInt32 xlow = entry.m_xLow;
 		histograms[0][xlow] = histograms[0][xlow] + 1;
 
-		const dInt32 xHigh = entry.m_xHigh;
+		const ndInt32 xHigh = entry.m_xHigh;
 		histograms[1][xHigh] = histograms[1][xHigh] + 1;
 
-		const dInt32 ylow = entry.m_yLow;
+		const ndInt32 ylow = entry.m_yLow;
 		histograms[2][ylow] = histograms[2][ylow] + 1;
 
-		const dInt32 yHigh = entry.m_yHigh;
+		const ndInt32 yHigh = entry.m_yHigh;
 		histograms[3][yHigh] = histograms[3][yHigh] + 1;
 
-		const dInt32 zlow = entry.m_zLow;
+		const ndInt32 zlow = entry.m_zLow;
 		histograms[4][zlow] = histograms[4][zlow] + 1;
 
-		const dInt32 zHigh = entry.m_zHigh;
+		const ndInt32 zHigh = entry.m_zHigh;
 		histograms[5][zHigh] = histograms[5][zHigh] + 1;
 	}
 
-	dInt32 acc[6];
+	ndInt32 acc[6];
 	memset(acc, 0, sizeof(acc));
-	for (dInt32 i = 0; i < (1 << D_RADIX_DIGIT_SIZE); i++)
+	for (ndInt32 i = 0; i < (1 << D_RADIX_DIGIT_SIZE); i++)
 	{
-		for (dInt32 j = 0; j < 6; j++)
+		for (ndInt32 j = 0; j < 6; j++)
 		{
-			const dInt32 n = histograms[j][i];
+			const ndInt32 n = histograms[j][i];
 			histograms[j][i] = acc[j];
 			acc[j] += n;
 		}
 	}
 
-	dInt32 shiftbits = 0;
-	dUnsigned64 mask = (1 << D_RADIX_DIGIT_SIZE) - 1;
+	ndInt32 shiftbits = 0;
+	ndUnsigned64 mask = (1 << D_RADIX_DIGIT_SIZE) - 1;
 	ndGridHash* dstArray = &m_hashGridMapScratchBuffer[0];
-	for (dInt32 radix = 0; radix < 3; radix++)
+	for (ndInt32 radix = 0; radix < 3; radix++)
 	{
-		dInt32* const scan0 = &histograms[radix * 2][0];
-		for (dInt32 i = 0; i < count; i++)
+		ndInt32* const scan0 = &histograms[radix * 2][0];
+		for (ndInt32 i = 0; i < count; i++)
 		{
 			const ndGridHash& entry = srcArray[i];
-			const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-			const dInt32 index = scan0[key];
+			const ndInt32 key = ndUnsigned32((entry.m_gridHash & mask) >> shiftbits);
+			const ndInt32 index = scan0[key];
 			dstArray[index] = entry;
 			scan0[key] = index + 1;
 		}
@@ -218,12 +218,12 @@ void ndBodySphFluid::SortSingleThreaded()
 
 		if (m_upperDigisIsValid[radix])
 		{
-			dInt32* const scan1 = &histograms[radix * 2 + 1][0];
-			for (dInt32 i = 0; i < count; i++)
+			ndInt32* const scan1 = &histograms[radix * 2 + 1][0];
+			for (ndInt32 i = 0; i < count; i++)
 			{
 				const ndGridHash& entry = dstArray[i];
-				const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-				const dInt32 index = scan1[key];
+				const ndInt32 key = ndUnsigned32((entry.m_gridHash & mask) >> shiftbits);
+				const ndInt32 index = scan1[key];
 				srcArray[index] = entry;
 				scan1[key] = index + 1;
 			}
@@ -244,24 +244,24 @@ void ndBodySphFluid::AddCounters(const ndWorld* const world, ndContext& context)
 {
 	D_TRACKTIME();
 
-	dInt32 acc = 0;
-	for (dInt32 i = 0; i < dInt32 (sizeof(context.m_scan) / sizeof(dInt32)); i++)
+	ndInt32 acc = 0;
+	for (ndInt32 i = 0; i < ndInt32 (sizeof(context.m_scan) / sizeof(ndInt32)); i++)
 	{
-		dInt32 sum = context.m_scan[i];
+		ndInt32 sum = context.m_scan[i];
 		context.m_scan[i] = acc;
 		acc += sum;
 	}
 
-	dInt32 accTemp[1 << D_RADIX_DIGIT_SIZE];
+	ndInt32 accTemp[1 << D_RADIX_DIGIT_SIZE];
 	memset(accTemp, 0, sizeof(accTemp));
 
-	const dInt32 count = sizeof(context.m_scan) / sizeof(dInt32);
-	const dInt32 threadCount = world->GetThreadCount();
-	for (dInt32 threadId = 0; threadId < threadCount; threadId++)
+	const ndInt32 count = sizeof(context.m_scan) / sizeof(ndInt32);
+	const ndInt32 threadCount = world->GetThreadCount();
+	for (ndInt32 threadId = 0; threadId < threadCount; threadId++)
 	{
-		for (dInt32 i = 0; i < count; i++)
+		for (ndInt32 i = 0; i < count; i++)
 		{
-			dInt32 a = context.m_histogram[threadId][i];
+			ndInt32 a = context.m_histogram[threadId][i];
 			context.m_histogram[threadId][i] = accTemp[i] + context.m_scan[i];
 			accTemp[i] += a;
 		}
@@ -280,25 +280,25 @@ void ndBodySphFluid::SortParallel(const ndWorld* const world)
 			ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
 			ndBodySphFluid* const fluid = context->m_fluid;
-			const dInt32 threadId = GetThreadId();
-			const dInt32 threadCount = world->GetThreadCount();
+			const ndInt32 threadId = GetThreadId();
+			const ndInt32 threadCount = world->GetThreadCount();
 			
-			const dInt32 count = fluid->m_hashGridMap.GetCount();
-			const dInt32 size = count / threadCount;
-			const dInt32 start = threadId * size;
-			const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
+			const ndInt32 count = fluid->m_hashGridMap.GetCount();
+			const ndInt32 size = count / threadCount;
+			const ndInt32 start = threadId * size;
+			const ndInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
 
 			ndGridHash* const hashArray = &fluid->m_hashGridMap[0];
-			dInt32* const histogram = context->m_histogram[threadId];
+			ndInt32* const histogram = context->m_histogram[threadId];
 
 			memset(histogram, 0, sizeof(context->m_scan));
-			const dInt32 shiftbits = context->m_pass * D_RADIX_DIGIT_SIZE;
-			const dUnsigned64 mask = (dUnsigned64((1 << D_RADIX_DIGIT_SIZE) - 1)) << shiftbits;
+			const ndInt32 shiftbits = context->m_pass * D_RADIX_DIGIT_SIZE;
+			const ndUnsigned64 mask = (ndUnsigned64((1 << D_RADIX_DIGIT_SIZE) - 1)) << shiftbits;
 
-			for (dInt32 i = 0; i < batchSize; i++)
+			for (ndInt32 i = 0; i < batchSize; i++)
 			{
 				const ndGridHash& entry = hashArray[i + start];
-				const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
+				const ndInt32 key = ndUnsigned32((entry.m_gridHash & mask) >> shiftbits);
 				histogram[key] += 1;
 			}
 		}
@@ -311,20 +311,20 @@ void ndBodySphFluid::SortParallel(const ndWorld* const world)
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
-			const dInt32 threadId = GetThreadId();
-			const dInt32 threadCount = world->GetThreadCount();
+			const ndInt32 threadId = GetThreadId();
+			const ndInt32 threadCount = world->GetThreadCount();
 
-			const dInt32 count = sizeof (context->m_scan) / sizeof (context->m_scan[0]);
+			const ndInt32 count = sizeof (context->m_scan) / sizeof (context->m_scan[0]);
 
-			const dInt32 size = count / threadCount;
-			const dInt32 start = threadId * size;
-			const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
+			const ndInt32 size = count / threadCount;
+			const ndInt32 start = threadId * size;
+			const ndInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
 
-			dInt32* const scan = context->m_scan;
-			for (dInt32 i = 0; i < batchSize; i++)
+			ndInt32* const scan = context->m_scan;
+			for (ndInt32 i = 0; i < batchSize; i++)
 			{
-				dInt32 acc = 0;
-				for (dInt32 j = 0; j < threadCount; j++)
+				ndInt32 acc = 0;
+				for (ndInt32 j = 0; j < threadCount; j++)
 				{
 					acc += context->m_histogram[j][i + start];
 				}
@@ -341,26 +341,26 @@ void ndBodySphFluid::SortParallel(const ndWorld* const world)
 			ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
 			ndBodySphFluid* const fluid = context->m_fluid;
-			const dInt32 threadId = GetThreadId();
-			const dInt32 threadCount = world->GetThreadCount();
+			const ndInt32 threadId = GetThreadId();
+			const ndInt32 threadCount = world->GetThreadCount();
 
-			const dInt32 count = fluid->m_hashGridMap.GetCount();
-			const dInt32 size = count / threadCount;
-			const dInt32 start = threadId * size;
-			const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
+			const ndInt32 count = fluid->m_hashGridMap.GetCount();
+			const ndInt32 size = count / threadCount;
+			const ndInt32 start = threadId * size;
+			const ndInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
 
 			ndGridHash* const srcArray = &fluid->m_hashGridMap[0];
 			ndGridHash* const dstArray = &fluid->m_hashGridMapScratchBuffer[0];
 
-			const dInt32 shiftbits = context->m_pass * D_RADIX_DIGIT_SIZE;
-			const dUnsigned64 mask = (dUnsigned64((1 << D_RADIX_DIGIT_SIZE)) - 1) << shiftbits;
+			const ndInt32 shiftbits = context->m_pass * D_RADIX_DIGIT_SIZE;
+			const ndUnsigned64 mask = (ndUnsigned64((1 << D_RADIX_DIGIT_SIZE)) - 1) << shiftbits;
 
-			dInt32* const histogram = context->m_histogram[threadId];
-			for (dInt32 i = 0; i < batchSize; i++)
+			ndInt32* const histogram = context->m_histogram[threadId];
+			for (ndInt32 i = 0; i < batchSize; i++)
 			{
 				const ndGridHash& entry = srcArray[i + start];
-				const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-				const dInt32 index = histogram[key];
+				const ndInt32 key = ndUnsigned32((entry.m_gridHash & mask) >> shiftbits);
+				const ndInt32 index = histogram[key];
 				dstArray[index] = entry;
 				histogram[key] = index + 1;
 			}
@@ -370,7 +370,7 @@ void ndBodySphFluid::SortParallel(const ndWorld* const world)
 	ndContext context;
 	context.m_fluid = this;
 	ndScene* const scene = world->GetScene();
-	for (dInt32 pass = 0; pass < 6; pass++)
+	for (ndInt32 pass = 0; pass < 6; pass++)
 	{
 		if (!(pass & 1) || m_upperDigisIsValid[pass >> 1])
 		{
@@ -489,14 +489,14 @@ return;
 }
 
 
-void ndBodySphFluid::CalculateScansDebug(ndArray<dInt32>& gridScans)
+void ndBodySphFluid::CalculateScansDebug(ndArray<ndInt32>& gridScans)
 {
-	dInt32 count = 0;
+	ndInt32 count = 0;
 	gridScans.SetCount(0);
-	dUnsigned64 gridHash0 = m_hashGridMap[0].m_gridHash;
-	for (dInt32 i = 0; i < m_hashGridMap.GetCount(); i++)
+	ndUnsigned64 gridHash0 = m_hashGridMap[0].m_gridHash;
+	for (ndInt32 i = 0; i < m_hashGridMap.GetCount(); i++)
 	{
-		dUnsigned64 gridHash = m_hashGridMap[i].m_gridHash;
+		ndUnsigned64 gridHash = m_hashGridMap[i].m_gridHash;
 		if (gridHash != gridHash0)
 		{
 			gridScans.PushBack(count);
@@ -507,10 +507,10 @@ void ndBodySphFluid::CalculateScansDebug(ndArray<dInt32>& gridScans)
 	}
 	gridScans.PushBack(count);
 
-	dInt32 acc = 0;
-	for (dInt32 i = 0; i < gridScans.GetCount(); i++)
+	ndInt32 acc = 0;
+	for (ndInt32 i = 0; i < gridScans.GetCount(); i++)
 	{
-		dInt32 sum = gridScans[i];
+		ndInt32 sum = gridScans[i];
 		gridScans[i] = acc;
 		acc += sum;
 	}
@@ -532,13 +532,13 @@ void ndBodySphFluid::CalculateScans(const ndWorld* const world)
 			{
 				memset(m_scan, 0, sizeof(m_scan));
 
-				const dInt32 threadCount = world->GetThreadCount();
-				dInt32 particleCount = m_fluid->m_hashGridMap.GetCount();
+				const ndInt32 threadCount = world->GetThreadCount();
+				ndInt32 particleCount = m_fluid->m_hashGridMap.GetCount();
 
-				dInt32 acc0 = 0;
-				dInt32 stride = particleCount / threadCount;
+				ndInt32 acc0 = 0;
+				ndInt32 stride = particleCount / threadCount;
 				const ndGridHash* const hashGridMap = &m_fluid->m_hashGridMap[0];
-				for (dInt32 threadIndex = 0; threadIndex < threadCount; threadIndex++)
+				for (ndInt32 threadIndex = 0; threadIndex < threadCount; threadIndex++)
 				{
 					m_scan[threadIndex] = acc0;
 					acc0 += stride;
@@ -551,7 +551,7 @@ void ndBodySphFluid::CalculateScans(const ndWorld* const world)
 			}
 
 			ndBodySphFluid* m_fluid;
-			dInt32 m_scan[D_MAX_THREADS_COUNT + 1];
+			ndInt32 m_scan[D_MAX_THREADS_COUNT + 1];
 		};
 
 		virtual void Execute()
@@ -559,22 +559,22 @@ void ndBodySphFluid::CalculateScans(const ndWorld* const world)
 			D_TRACKTIME();
 			//ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
-			//const dInt32 threadCount = world->GetThreadCount();
+			//const ndInt32 threadCount = world->GetThreadCount();
 		
-			const dInt32 threadIndex = GetThreadId();
+			const ndInt32 threadIndex = GetThreadId();
 			ndBodySphFluid* const fluid = context->m_fluid;
 			const ndGridHash* const hashGridMap = &context->m_fluid->m_hashGridMap[0];
 				
-			const dInt32 start = context->m_scan[threadIndex];
-			const dInt32 strideCount = context->m_scan[threadIndex + 1] - start;
-			ndArray<dInt32>& gridScans = fluid->m_gridScans[threadIndex];
-			dUnsigned64 gridHash0 = hashGridMap[start].m_gridHash;
+			const ndInt32 start = context->m_scan[threadIndex];
+			const ndInt32 strideCount = context->m_scan[threadIndex + 1] - start;
+			ndArray<ndInt32>& gridScans = fluid->m_gridScans[threadIndex];
+			ndUnsigned64 gridHash0 = hashGridMap[start].m_gridHash;
 
-			dInt32 count = 0;
+			ndInt32 count = 0;
 			gridScans.SetCount(0);
-			for (dInt32 i = 0; i < strideCount; i++)
+			for (ndInt32 i = 0; i < strideCount; i++)
 			{
-				dUnsigned64 gridHash = hashGridMap[start + i].m_gridHash;
+				ndUnsigned64 gridHash = hashGridMap[start + i].m_gridHash;
 				if (gridHash != gridHash0)
 				{
 					gridScans.PushBack(count);
@@ -591,27 +591,27 @@ void ndBodySphFluid::CalculateScans(const ndWorld* const world)
 	ndScene* const scene = world->GetScene();
 	scene->SubmitJobs<ndCalculateScans>(&context);
 
-	dInt32 acc = 0;
-	ndArray<dInt32>& gridScans = m_gridScans[0];
-	for (dInt32 i = 0; i < gridScans.GetCount(); i++)
+	ndInt32 acc = 0;
+	ndArray<ndInt32>& gridScans = m_gridScans[0];
+	for (ndInt32 i = 0; i < gridScans.GetCount(); i++)
 	{
-		dInt32 sum = gridScans[i];
+		ndInt32 sum = gridScans[i];
 		gridScans[i] = acc;
 		acc += sum;
 	}
 
-	dInt32 threadCount = scene->GetThreadCount();
-	for (dInt32 threadIndex = 1; threadIndex < threadCount; threadIndex++)
+	ndInt32 threadCount = scene->GetThreadCount();
+	for (ndInt32 threadIndex = 1; threadIndex < threadCount; threadIndex++)
 	{
-		ndArray<dInt32>& dstGridScans = m_gridScans[0];
-		const ndArray<dInt32>& srcGridScans = m_gridScans[threadIndex];
-		const dInt32 base = dstGridScans.GetCount();
+		ndArray<ndInt32>& dstGridScans = m_gridScans[0];
+		const ndArray<ndInt32>& srcGridScans = m_gridScans[threadIndex];
+		const ndInt32 base = dstGridScans.GetCount();
 		dstGridScans.SetCount(base + srcGridScans.GetCount());
 
-		dInt32* const dst = &dstGridScans[base];
-		for (dInt32 i = 0; i < srcGridScans.GetCount(); i++)
+		ndInt32* const dst = &dstGridScans[base];
+		for (ndInt32 i = 0; i < srcGridScans.GetCount(); i++)
 		{
-			dInt32 sum = srcGridScans[i];
+			ndInt32 sum = srcGridScans[i];
 			dst[i] = acc;
 			acc += sum;
 		}
@@ -621,7 +621,7 @@ void ndBodySphFluid::CalculateScans(const ndWorld* const world)
 	#ifdef _DEBUG
 	CalculateScansDebug(m_gridScans[1]);
 	dAssert(m_gridScans[1].GetCount() == m_gridScans[0].GetCount());
-	for (dInt32 i = 0; i < m_gridScans[0].GetCount(); i++)
+	for (ndInt32 i = 0; i < m_gridScans[0].GetCount(); i++)
 	{
 		dAssert(m_gridScans[1][i] == m_gridScans[0][i]);
 	}
@@ -664,18 +664,18 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 
 			void PushBack(const ndGridHash& element)
 			{
-				dInt32 index = m_size;
+				ndInt32 index = m_size;
 				m_size++;
 				(*this)[index] = element;
 			}
 
-			void AddCell(dInt32 count, const ndGridHash& origin, const ndGridHash& cell, const ndGridHash* const neigborgh)
+			void AddCell(ndInt32 count, const ndGridHash& origin, const ndGridHash& cell, const ndGridHash* const neigborgh)
 			{
 				#ifdef _DEBUG 
-				dInt32 debugCheck = 0;
+				ndInt32 debugCheck = 0;
 				#endif
 
-				for (dInt32 j = 0; j < count; j++)
+				for (ndInt32 j = 0; j < count; j++)
 				{
 					ndGridHash quadrand(cell);
 					quadrand.m_gridHash += neigborgh[j].m_gridHash;
@@ -690,7 +690,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 				dAssert(debugCheck == 1);
 			}
 
-			dInt32 m_size;
+			ndInt32 m_size;
 		};
 
 		virtual void Execute()
@@ -700,24 +700,24 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			ndVector m_neighborkDirs[8];
 
 			ndBodySphFluid* const fluid = ((ndContext*)m_context)->m_fluid;
-			const dFloat32 radius = fluid->m_radius;
+			const ndFloat32 radius = fluid->m_radius;
 
-			const dInt32 threadIndex = GetThreadId();
-			const dInt32 threadCount = m_owner->GetThreadCount();
-			const dInt32 particleCount = fluid->m_posit.GetCount();
+			const ndInt32 threadIndex = GetThreadId();
+			const ndInt32 threadCount = m_owner->GetThreadCount();
+			const ndInt32 particleCount = fluid->m_posit.GetCount();
 
-			const dInt32 step = particleCount / threadCount;
-			const dInt32 start = threadIndex * step;
-			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : particleCount - start;
+			const ndInt32 step = particleCount / threadCount;
+			const ndInt32 start = threadIndex * step;
+			const ndInt32 count = ((threadIndex + 1) < threadCount) ? step : particleCount - start;
 
-			const dFloat32 gridSize = fluid->CalculateGridSize();
+			const ndFloat32 gridSize = fluid->CalculateGridSize();
 
 			const ndVector origin(fluid->m_box0);
-			const ndVector invGridSize(dFloat32(1.0f) / gridSize);
+			const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
 			const ndVector* const posit = &fluid->m_posit[0];
 
-			const ndVector box0(-radius, -radius, -radius, dFloat32(0.0f));
-			const ndVector box1(radius, radius, radius, dFloat32(0.0f));
+			const ndVector box0(-radius, -radius, -radius, ndFloat32(0.0f));
+			const ndVector box1(radius, radius, radius, ndFloat32(0.0f));
 
 			ndGridHash stepsCode_xyz[8];
 			stepsCode_xyz[0] = ndGridHash(0, 0, 0);
@@ -760,7 +760,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			stepsCode_z[1] = ndGridHash(0, 0, 1);
 
 			ndHashCacheBuffer bufferOut;
-			for (dInt32 i = 0; i < count; i++)
+			for (ndInt32 i = 0; i < count; i++)
 			{
 				ndVector r(posit[start + i] - origin);
 				ndVector p(r * invGridSize);
@@ -779,7 +779,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 				dAssert(codeHash.m_x <= 1);
 				dAssert(codeHash.m_y <= 1);
 				dAssert(codeHash.m_z <= 1);
-				dUnsigned32 code = dUnsigned32(codeHash.m_z * 4 + codeHash.m_y * 2 + codeHash.m_x);
+				ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 4 + codeHash.m_y * 2 + codeHash.m_x);
 
 				switch (code)
 				{
@@ -844,11 +844,11 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 						dAssert(0);
 				}
 
-				if (bufferOut.m_size > dInt32 (D_SCRATCH_BUFFER_SIZE))
+				if (bufferOut.m_size > ndInt32 (D_SCRATCH_BUFFER_SIZE))
 				{
 					D_TRACKTIME();
 					ndScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
-					dInt32 dstIndex = fluid->m_hashGridMap.GetCount();
+					ndInt32 dstIndex = fluid->m_hashGridMap.GetCount();
 					fluid->m_hashGridMap.SetCount(dstIndex + bufferOut.m_size);
 					memcpy(&fluid->m_hashGridMap[dstIndex], &bufferOut[0], bufferOut.m_size * sizeof(ndGridHash));
 					bufferOut.m_size = 0;
@@ -859,7 +859,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			{
 				D_TRACKTIME();
 				ndScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
-				dInt32 dstIndex = fluid->m_hashGridMap.GetCount();
+				ndInt32 dstIndex = fluid->m_hashGridMap.GetCount();
 				fluid->m_hashGridMap.SetCount(dstIndex + bufferOut.m_size);
 				memcpy(&fluid->m_hashGridMap[dstIndex], &bufferOut[0], bufferOut.m_size * sizeof(ndGridHash));
 			}
@@ -879,7 +879,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 void ndBodySphFluid::SortGrids(const ndWorld* const world)
 {
 	D_TRACKTIME();
-	const dInt32 threadCount = world->GetThreadCount();
+	const ndInt32 threadCount = world->GetThreadCount();
 	m_hashGridMapScratchBuffer.SetCount(m_hashGridMap.GetCount());
 
 	SortByCenterType();
@@ -894,12 +894,12 @@ void ndBodySphFluid::SortGrids(const ndWorld* const world)
 	}
 
 	#ifdef _DEBUG
-	for (dInt32 i = 0; i < (m_hashGridMap.GetCount() - 1); i++)
+	for (ndInt32 i = 0; i < (m_hashGridMap.GetCount() - 1); i++)
 	{
 		const ndGridHash& entry0 = m_hashGridMap[i + 0];
 		const ndGridHash& entry1 = m_hashGridMap[i + 1];
-		dUnsigned64 gridHashA = entry0.m_gridHash;
-		dUnsigned64 gridHashB = entry1.m_gridHash;
+		ndUnsigned64 gridHashA = entry0.m_gridHash;
+		ndUnsigned64 gridHashB = entry1.m_gridHash;
 		dAssert(gridHashA <= gridHashB);
 	}
 	#endif
@@ -938,17 +938,17 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 				dAssert(GetCapacity() * sizeof(ndParticlePair) < 32 * 1024);
 			}
 
-			void PushBack(dInt32 m0, dInt32 m1)
+			void PushBack(ndInt32 m0, ndInt32 m1)
 			{
 				dAssert(0);
-				dInt32 index = m_size;
+				ndInt32 index = m_size;
 				m_size++;
 				dAssert(m_size < GetCapacity());
 				ndParticlePair& pair = (*this)[index];
 				pair.m_m0 = m0;
 				pair.m_m1 = m1;
 			}
-			dInt32 m_size;
+			ndInt32 m_size;
 		};
 
 		virtual void Execute()
@@ -956,44 +956,44 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndBodySphFluid* const fluid = ((ndContext*)m_context)->m_fluid;
-			const dInt32 threadId = GetThreadId();
-			const dInt32 threadCount = world->GetThreadCount();
+			const ndInt32 threadId = GetThreadId();
+			const ndInt32 threadCount = world->GetThreadCount();
 			
-			const ndArray<dInt32>& gridCounts = fluid->m_gridScans[0];
-			const dInt32 count = gridCounts.GetCount() - 1;
-			const dInt32 size = count / threadCount;
-			const dInt32 start = threadId * size;
-			const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
+			const ndArray<ndInt32>& gridCounts = fluid->m_gridScans[0];
+			const ndInt32 count = gridCounts.GetCount() - 1;
+			const ndInt32 size = count / threadCount;
+			const ndInt32 start = threadId * size;
+			const ndInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
 			const ndGridHash* const srcArray = &fluid->m_hashGridMap[0];
 
 			//const ndVector* const positions = &fluid->m_posit[0];
-			//const dFloat32 diameter = dFloat32(2.0f) * fluid->m_radius;
-			//const dFloat32 diameter2 = diameter * diameter;
+			//const ndFloat32 diameter = ndFloat32(2.0f) * fluid->m_radius;
+			//const ndFloat32 diameter2 = diameter * diameter;
 			
 			ndParticlePairCacheBuffer buffer;
-			for (dInt32 i = 0; i < batchSize; i++)
+			for (ndInt32 i = 0; i < batchSize; i++)
 			{
-				const dInt32 cellStart = gridCounts[i + start];
-				const dInt32 cellCount = gridCounts[i + start + 1] - cellStart;
+				const ndInt32 cellStart = gridCounts[i + start];
+				const ndInt32 cellCount = gridCounts[i + start + 1] - cellStart;
 			
 				const ndGridHash* const ptr = &srcArray[cellStart];
-				for (dInt32 j = cellCount - 1; j > 0; j--)
+				for (ndInt32 j = cellCount - 1; j > 0; j--)
 				{
 					const ndGridHash& cell0 = ptr[j];
 					if (cell0.m_cellType == ndHomeGrid)
 					{
-						const dInt32 m0 = cell0.m_particleIndex;
+						const ndInt32 m0 = cell0.m_particleIndex;
 						//const ndVector& posit0 = positions[m0];
 			
-						for (dInt32 k = j - 1; k >= 0; k--)
+						for (ndInt32 k = j - 1; k >= 0; k--)
 						{
 							const ndGridHash& cell1 = ptr[k];
-							const dInt32 m1 = cell1.m_particleIndex;
+							const ndInt32 m1 = cell1.m_particleIndex;
 							bool test = (cell1.m_cellType == ndHomeGrid);
 							dAssert(0);
 							//const ndVector& posit1 = positions[m1];
 							//const ndVector dist(posit1 - posit0);
-							//dFloat32 dist2 = dist.DotProduct(dist).GetScalar();
+							//ndFloat32 dist2 = dist.DotProduct(dist).GetScalar();
 							//test = test | (cell0.m_particleIndex <= cell1.m_gridHash);
 							//test = test & (dist2 <= diameter2);
 							if (test)
@@ -1004,10 +1004,10 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 					}
 				}
 			
-				if (buffer.m_size > dInt32 (D_SCRATCH_PAIR_BUFFER_SIZE))
+				if (buffer.m_size > ndInt32 (D_SCRATCH_PAIR_BUFFER_SIZE))
 				{
 					ndScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
-					dInt32 dstIndex = fluid->m_particlesPairs.GetCount();
+					ndInt32 dstIndex = fluid->m_particlesPairs.GetCount();
 					fluid->m_particlesPairs.SetCount(dstIndex + buffer.m_size);
 					memcpy(&fluid->m_particlesPairs[dstIndex], &buffer[0], buffer.m_size * sizeof(ndParticlePair));
 					buffer.m_size = 0;
@@ -1018,7 +1018,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			{
 				D_TRACKTIME();
 				ndScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
-				dInt32 dstIndex = fluid->m_particlesPairs.GetCount();
+				ndInt32 dstIndex = fluid->m_particlesPairs.GetCount();
 				fluid->m_particlesPairs.SetCount(dstIndex + buffer.m_size);
 				memcpy(&fluid->m_particlesPairs[dstIndex], &buffer[0], buffer.m_size * sizeof(ndParticlePair));
 			}
@@ -1056,17 +1056,17 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndBodySphFluid* const fluid = ((ndContext*)m_context)->m_fluid;
-			const dInt32 threadId = GetThreadId();
-			const dInt32 threadCount = world->GetThreadCount();
+			const ndInt32 threadId = GetThreadId();
+			const ndInt32 threadCount = world->GetThreadCount();
 			
 
 			ndArray<ndParticlePair>& particlesPairs = fluid->m_particlesPairs;
-			const dInt32 count = particlesPairs.GetCount();
-			const dInt32 stride = count / threadCount;
-			const dInt32 start = threadId * stride;
-			const dInt32 batchStride = (threadId == threadCount - 1) ? count - start : stride;
+			const ndInt32 count = particlesPairs.GetCount();
+			const ndInt32 stride = count / threadCount;
+			const ndInt32 start = threadId * stride;
+			const ndInt32 batchStride = (threadId == threadCount - 1) ? count - start : stride;
 
-			for (dInt32 i = 0; i < batchStride; i++)
+			for (ndInt32 i = 0; i < batchStride; i++)
 			{
 				//ndParticlePair& pair = particlesPairs[i];
 			}

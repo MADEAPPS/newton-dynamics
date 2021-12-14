@@ -112,14 +112,14 @@
 
 #define dRAND_MAX		0x00ffffff
 
-dFloat32 dRand();
-dInt32 dRandInt();
-void dSetRandSeed (dUnsigned32 seed);
-dFloat32 dGaussianRandom (dFloat32 amp);
+ndFloat32 dRand();
+ndInt32 dRandInt();
+void dSetRandSeed (ndUnsigned32 seed);
+ndFloat32 dGaussianRandom (ndFloat32 amp);
 
-inline dInt32 dTwosPower (dInt32 x)
+inline ndInt32 dTwosPower (ndInt32 x)
 {
-	dInt32 rval=1;
+	ndInt32 rval=1;
 	for (; rval < x; rval *= 2);
 	return rval;
 }
@@ -131,8 +131,8 @@ inline dInt32 dTwosPower (dInt32 x)
 void dGetWorkingFileName (const char* const name, char* const outPathName);
 
 // endian conversion
-dUnsigned32 SWAP_INT32(dUnsigned32 x);
-dUnsigned16 SWAP_INT16(dUnsigned16 x);
-void SWAP_FLOAT32_ARRAY (void* const array, dInt32 count);
+ndUnsigned32 SWAP_INT32(ndUnsigned32 x);
+ndUnsigned16 SWAP_INT16(ndUnsigned16 x);
+void SWAP_FLOAT32_ARRAY (void* const array, ndInt32 count);
 #endif 
 

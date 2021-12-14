@@ -33,7 +33,7 @@ class ndConvexFractureModel_2: public ndModel
 		ndVector m_momentOfInertia;
 		ndDemoDebrisEntity* m_mesh;
 		ndShapeInstance* m_collision;
-		dFloat32 m_massFraction;
+		ndFloat32 m_massFraction;
 	};
 
 	public:
@@ -53,7 +53,7 @@ class ndConvexFractureModel_2: public ndModel
 		ndShapeInstance* m_shape;
 		const char* m_outTexture;
 		const char* m_innerTexture;
-		dFloat32 m_breakImpactSpeed;
+		ndFloat32 m_breakImpactSpeed;
 	};
 
 	class ndEffect : public ndList<ndAtom>
@@ -68,7 +68,7 @@ class ndConvexFractureModel_2: public ndModel
 		ndShapeInstance* m_shape;
 		ndDemoMesh* m_visualMesh;
 		ndDemoDebrisRootEntity* m_debrisRootEnt;
-		dFloat32 m_breakImpactSpeed;
+		ndFloat32 m_breakImpactSpeed;
 		friend ndConvexFractureModel_2;
 	};
 
@@ -76,15 +76,15 @@ class ndConvexFractureModel_2: public ndModel
 	ndConvexFractureModel_2(ndDemoEntityManager* const scene);
 	~ndConvexFractureModel_2();
 
-	void AddEffect(const ndEffect& effect, dFloat32 mass, const ndMatrix& location);
+	void AddEffect(const ndEffect& effect, ndFloat32 mass, const ndMatrix& location);
 
 	//virtual void AppUpdate(ndWorld* const world);
-	virtual void Update(ndWorld* const world, dFloat32 timestep);
-	virtual void PostUpdate(ndWorld* const world, dFloat32 timestep);
+	virtual void Update(ndWorld* const world, ndFloat32 timestep);
+	virtual void PostUpdate(ndWorld* const world, ndFloat32 timestep);
 
 	void UpdateEffect(ndWorld* const world, ndEffect& effect);
 
-	void ExplodeLocation(ndBodyDynamic* const body, const ndMatrix& matrix, dFloat32 factor) const;
+	void ExplodeLocation(ndBodyDynamic* const body, const ndMatrix& matrix, ndFloat32 factor) const;
 
 	ndList<ndEffect> m_effectList;
 	ndList<ndEffect> m_pendingEffect;

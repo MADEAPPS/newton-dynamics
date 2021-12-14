@@ -21,35 +21,35 @@ class ndAnimationTwoWayBlend: public ndAnimationBlendTreeNode
 	ndAnimationTwoWayBlend(ndAnimationBlendTreeNode* const node0, ndAnimationBlendTreeNode* const node1);
 	virtual ~ndAnimationTwoWayBlend();
 
-	dFloat32 GetParam() const;
-	void SetParam(dFloat32 param);
+	ndFloat32 GetParam() const;
+	void SetParam(ndFloat32 param);
 
-	void SetTimeDilation0 (dFloat32 dilation)
+	void SetTimeDilation0 (ndFloat32 dilation)
 	{
 		m_timeDilation0 = dilation;
 	}
 
-	void SetTimeDilation1(dFloat32 dilation)
+	void SetTimeDilation1(ndFloat32 dilation)
 	{
 		m_timeDilation1 = dilation;
 	}
 
-	virtual void Evaluate(ndAnimationPose& output, dFloat32 timestep);
+	virtual void Evaluate(ndAnimationPose& output, ndFloat32 timestep);
 
 	protected:
 	ndAnimationBlendTreeNode* m_node0;
 	ndAnimationBlendTreeNode* m_node1;
-	dFloat32 m_timeDilation0;
-	dFloat32 m_timeDilation1;
-	dFloat32 m_param;
+	ndFloat32 m_timeDilation0;
+	ndFloat32 m_timeDilation1;
+	ndFloat32 m_param;
 };
 
-inline dFloat32 ndAnimationTwoWayBlend::GetParam() const
+inline ndFloat32 ndAnimationTwoWayBlend::GetParam() const
 {
 	return m_param; 
 }
 
-inline void ndAnimationTwoWayBlend::SetParam(dFloat32 param) 
+inline void ndAnimationTwoWayBlend::SetParam(ndFloat32 param) 
 { 
 	m_param = param; 
 }

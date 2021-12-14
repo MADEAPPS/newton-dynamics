@@ -28,7 +28,7 @@
 #define D_MIN_BOUND				(-D_LCP_MAX_VALUE)
 #define D_INDEPENDENT_ROW		-1 
 #define D_CONSTRAINT_MAX_ROWS	(3 * 16)
-#define MIN_JOINT_PIN_LENGTH	dFloat32 (50.0f)
+#define MIN_JOINT_PIN_LENGTH	ndFloat32 (50.0f)
 
 class ndBody;
 class ndContact;
@@ -44,44 +44,44 @@ class ndConstraintDebugCallback: public ndClassAlloc
 	public:
 	ndConstraintDebugCallback()
 	{
-		m_debugScale = dFloat32(1.0f);
+		m_debugScale = ndFloat32(1.0f);
 	}
 
 	virtual ~ndConstraintDebugCallback() 
 	{
 	}
 
-	virtual void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, dFloat32 thickness = dFloat32 (1.0f)) = 0;
+	virtual void DrawLine(const ndVector& p0, const ndVector& p1, const ndVector& color, ndFloat32 thickness = ndFloat32 (1.0f)) = 0;
 
-	virtual void SetScale(dFloat32 scale)
+	virtual void SetScale(ndFloat32 scale)
 	{
 		m_debugScale = scale;
 	}
 
-	virtual dFloat32 GetScale() const
+	virtual ndFloat32 GetScale() const
 	{
 		return m_debugScale;
 	}
 
 	virtual void DrawFrame(const ndMatrix& matrix)
 	{
-		ndVector x(matrix.m_posit + matrix.RotateVector(ndVector(m_debugScale, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f))));
-		DrawLine(matrix.m_posit, x, ndVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)));
+		ndVector x(matrix.m_posit + matrix.RotateVector(ndVector(m_debugScale, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f))));
+		DrawLine(matrix.m_posit, x, ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)));
 
-		ndVector y(matrix.m_posit + matrix.RotateVector(ndVector(dFloat32(0.0f), m_debugScale, dFloat32(0.0f), dFloat32(0.0f))));
-		DrawLine(matrix.m_posit, y, ndVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f)));
+		ndVector y(matrix.m_posit + matrix.RotateVector(ndVector(ndFloat32(0.0f), m_debugScale, ndFloat32(0.0f), ndFloat32(0.0f))));
+		DrawLine(matrix.m_posit, y, ndVector(ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f)));
 
-		ndVector z(matrix.m_posit + matrix.RotateVector(ndVector(dFloat32(0.0f), dFloat32(0.0f), m_debugScale, dFloat32(0.0f))));
-		DrawLine(matrix.m_posit, z, ndVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)));
+		ndVector z(matrix.m_posit + matrix.RotateVector(ndVector(ndFloat32(0.0f), ndFloat32(0.0f), m_debugScale, ndFloat32(0.0f))));
+		DrawLine(matrix.m_posit, z, ndVector(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f)));
 	}
 
-	virtual void DrawArrow(const ndMatrix& matrix, const ndVector& color, dFloat32 length)
+	virtual void DrawArrow(const ndMatrix& matrix, const ndVector& color, ndFloat32 length)
 	{
-		ndVector p1(matrix.m_posit + matrix.RotateVector(ndVector(m_debugScale * length, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f))));
+		ndVector p1(matrix.m_posit + matrix.RotateVector(ndVector(m_debugScale * length, ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f))));
 		DrawLine(matrix.m_posit, p1, color);
 	}
 		
-	dFloat32 m_debugScale;
+	ndFloat32 m_debugScale;
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -115,31 +115,31 @@ class ndForceImpactPair
 	public:
 	void Clear()
 	{
-		m_force = dFloat32(dFloat32(0.0f));
-		m_impact = dFloat32(dFloat32(0.0f));
-		for (dInt32 i = 0; i < dInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); i++)
+		m_force = ndFloat32(ndFloat32(0.0f));
+		m_impact = ndFloat32(ndFloat32(0.0f));
+		for (ndInt32 i = 0; i < ndInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); i++)
 		{
-			m_initialGuess[i] = dFloat32(dFloat32(0.0f));
+			m_initialGuess[i] = ndFloat32(ndFloat32(0.0f));
 		}
 	}
 
-	void Push(dFloat32 val)
+	void Push(ndFloat32 val)
 	{
-		for (dInt32 i = 1; i < dInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); i++)
+		for (ndInt32 i = 1; i < ndInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); i++)
 		{
 			m_initialGuess[i - 1] = m_initialGuess[i];
 		}
 		m_initialGuess[sizeof(m_initialGuess) / sizeof(m_initialGuess[0]) - 1] = val;
 	}
 
-	dFloat32 GetInitialGuess() const
+	ndFloat32 GetInitialGuess() const
 	{
 		//return 100.0f;
-		dFloat32 smallest = dFloat32(1.0e15f);
-		dFloat32 value = dFloat32(dFloat32(0.0f));
-		for (dInt32 i = 0; i < dInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); i++)
+		ndFloat32 smallest = ndFloat32(1.0e15f);
+		ndFloat32 value = ndFloat32(ndFloat32(0.0f));
+		for (ndInt32 i = 0; i < ndInt32(sizeof(m_initialGuess) / sizeof(m_initialGuess[0])); i++)
 		{
-			dFloat32 mag = dAbs(m_initialGuess[i]);
+			ndFloat32 mag = dAbs(m_initialGuess[i]);
 			if (mag < smallest) 
 			{
 				smallest = mag;
@@ -149,18 +149,18 @@ class ndForceImpactPair
 		return value;
 	}
 
-	dFloat32 m_force;
-	dFloat32 m_impact;
-	dFloat32 m_initialGuess[4];
+	ndFloat32 m_force;
+	ndFloat32 m_impact;
+	ndFloat32 m_initialGuess[4];
 };
 
 class ndJointAccelerationDecriptor
 {
 	public:
-	dInt32 m_rowsCount;
-	dFloat32 m_timestep;
-	dFloat32 m_invTimestep;
-	dFloat32 m_firstPassCoefFlag;
+	ndInt32 m_rowsCount;
+	ndFloat32 m_timestep;
+	ndFloat32 m_invTimestep;
+	ndFloat32 m_firstPassCoefFlag;
 	ndRightHandSide* m_rightHandSide;
 	const ndLeftHandSide* m_leftHandSide;
 };
@@ -169,9 +169,9 @@ class ndBilateralBounds
 {
 	public:
 	ndForceImpactPair* m_jointForce;
-	dFloat32 m_low;
-	dFloat32 m_upper;
-	dInt32 m_normalIndex;
+	ndFloat32 m_low;
+	ndFloat32 m_upper;
+	ndInt32 m_normalIndex;
 };
 
 D_MSV_NEWTON_ALIGN_32
@@ -180,16 +180,16 @@ class ndConstraintDescritor
 	public:
 	ndJacobianPair m_jacobian[D_CONSTRAINT_MAX_ROWS];
 	ndBilateralBounds m_forceBounds[D_CONSTRAINT_MAX_ROWS];
-	dFloat32 m_jointAccel[D_CONSTRAINT_MAX_ROWS];
-	dFloat32 m_restitution[D_CONSTRAINT_MAX_ROWS];
-	dFloat32 m_penetration[D_CONSTRAINT_MAX_ROWS];
-	dFloat32 m_diagonalRegularizer[D_CONSTRAINT_MAX_ROWS];
-	dFloat32 m_penetrationStiffness[D_CONSTRAINT_MAX_ROWS];
-	dFloat32 m_zeroRowAcceleration[D_CONSTRAINT_MAX_ROWS];
-	dInt32 m_flags[D_CONSTRAINT_MAX_ROWS];
-	dFloat32 m_timestep;
-	dFloat32 m_invTimestep;
-	dInt32 m_rowsCount;
+	ndFloat32 m_jointAccel[D_CONSTRAINT_MAX_ROWS];
+	ndFloat32 m_restitution[D_CONSTRAINT_MAX_ROWS];
+	ndFloat32 m_penetration[D_CONSTRAINT_MAX_ROWS];
+	ndFloat32 m_diagonalRegularizer[D_CONSTRAINT_MAX_ROWS];
+	ndFloat32 m_penetrationStiffness[D_CONSTRAINT_MAX_ROWS];
+	ndFloat32 m_zeroRowAcceleration[D_CONSTRAINT_MAX_ROWS];
+	ndInt32 m_flags[D_CONSTRAINT_MAX_ROWS];
+	ndFloat32 m_timestep;
+	ndFloat32 m_invTimestep;
+	ndInt32 m_rowsCount;
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -204,24 +204,24 @@ D_MSV_NEWTON_ALIGN_32
 class ndRightHandSide
 {
 	public:
-	dFloat32 m_force;
-	dFloat32 m_diagDamp;
-	dFloat32 m_invJinvMJt;
-	dFloat32 m_coordenateAccel;
+	ndFloat32 m_force;
+	ndFloat32 m_diagDamp;
+	ndFloat32 m_invJinvMJt;
+	ndFloat32 m_coordenateAccel;
 
-	dFloat32 m_lowerBoundFrictionCoefficent;
-	dFloat32 m_upperBoundFrictionCoefficent;
-	dFloat32 m_deltaAccel;
-	dFloat32 m_restitution;
+	ndFloat32 m_lowerBoundFrictionCoefficent;
+	ndFloat32 m_upperBoundFrictionCoefficent;
+	ndFloat32 m_deltaAccel;
+	ndFloat32 m_restitution;
 
-	dFloat32 m_maxImpact;
-	dFloat32 m_penetration;
-	dFloat32 m_diagonalRegularizer;
-	dFloat32 m_penetrationStiffness;
+	ndFloat32 m_maxImpact;
+	ndFloat32 m_penetration;
+	ndFloat32 m_diagonalRegularizer;
+	ndFloat32 m_penetrationStiffness;
 
 	ndForceImpactPair* m_jointFeebackForce;
-	dInt32 m_normalForceIndex;
-	dInt32 m_normalForceIndexFlat;
+	ndInt32 m_normalForceIndex;
+	ndInt32 m_normalForceIndexFlat;
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -240,7 +240,7 @@ class ndConstraint
 	void SetActive(bool state);
 	virtual bool IsBilateral() const;
 
-	virtual dUnsigned32 GetRowsCount() const = 0;
+	virtual ndUnsigned32 GetRowsCount() const = 0;
 	virtual ndBodyKinematic* GetBody0() const;
 	virtual ndBodyKinematic* GetBody1() const;
 	virtual void JacobianDerivative(ndConstraintDescritor& desc) = 0;
@@ -249,15 +249,15 @@ class ndConstraint
 	virtual void DebugJoint(ndConstraintDebugCallback&) const;
 	void InitPointParam(dgPointParam& param, const ndVector& p0Global, const ndVector& p1Global) const;
 
-	dFloat32 m_preconditioner0;
-	dFloat32 m_preconditioner1;
-	dInt32 m_rowCount;
-	dInt32 m_rowStart;
-	dUnsigned8 m_active;
-	dUnsigned8 m_fence0;
-	dUnsigned8 m_fence1;
-	dUnsigned8 m_resting;   // this should be identical to m_fence0, should be removed. 
-	dUnsigned8 m_isInSkeletonLoop;
+	ndFloat32 m_preconditioner0;
+	ndFloat32 m_preconditioner1;
+	ndInt32 m_rowCount;
+	ndInt32 m_rowStart;
+	ndUnsigned8 m_active;
+	ndUnsigned8 m_fence0;
+	ndUnsigned8 m_fence1;
+	ndUnsigned8 m_resting;   // this should be identical to m_fence0, should be removed. 
+	ndUnsigned8 m_isInSkeletonLoop;
 	
 	protected:
 	ndConstraint();

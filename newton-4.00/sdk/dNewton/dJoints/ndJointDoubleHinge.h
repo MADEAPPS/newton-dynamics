@@ -27,10 +27,10 @@ class ndJointDoubleHinge: public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 	D_NEWTON_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	dFloat32 m_angle0;
-	dFloat32 m_omega0;
-	dFloat32 m_angle1;
-	dFloat32 m_omega1;
+	ndFloat32 m_angle0;
+	ndFloat32 m_omega0;
+	ndFloat32 m_angle1;
+	ndFloat32 m_omega1;
 };
 
 #endif 

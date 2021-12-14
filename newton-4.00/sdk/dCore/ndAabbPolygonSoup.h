@@ -57,30 +57,30 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 				dAssert (0);
 			}
 
-			inline ndLeafNodePtr (dUnsigned32 node)
+			inline ndLeafNodePtr (ndUnsigned32 node)
 			{
 				m_node = node;
 				dAssert (!IsLeaf());
 			}
 
-			inline dUnsigned32 IsLeaf () const 
+			inline ndUnsigned32 IsLeaf () const 
 			{
 				return m_node & 0x80000000;
 			}
 
-			inline dUnsigned32 GetCount() const 
+			inline ndUnsigned32 GetCount() const 
 			{
 				dAssert (IsLeaf());
 				return (m_node & (~0x80000000)) >> (32 - DG_INDEX_COUNT_BITS - 1);
 			}
 
-			inline dUnsigned32 GetIndex() const 
+			inline ndUnsigned32 GetIndex() const 
 			{
 				dAssert (IsLeaf());
 				return m_node & (~(-(1 << (32 - DG_INDEX_COUNT_BITS - 1))));
 			}
 
-			inline ndLeafNodePtr (dUnsigned32 faceIndexCount, dUnsigned32 faceIndexStart)
+			inline ndLeafNodePtr (ndUnsigned32 faceIndexCount, ndUnsigned32 faceIndexStart)
 			{
 				dAssert (faceIndexCount < (1<<DG_INDEX_COUNT_BITS));
 				m_node = 0x80000000 | (faceIndexCount << (32 - DG_INDEX_COUNT_BITS - 1)) | faceIndexStart;
@@ -91,7 +91,7 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 				return ((ndNode*) root) + m_node;
 			}
 
-			dUnsigned32 m_node;
+			ndUnsigned32 m_node;
 		};
 
 		ndNode ()
@@ -102,7 +102,7 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 		{
 		}
 
-		inline dFloat32 RayDistance (const ndFastRay& ray, const ndTriplex* const vertexArray) const
+		inline ndFloat32 RayDistance (const ndFastRay& ray, const ndTriplex* const vertexArray) const
 		{
 			ndVector minBox (&vertexArray[m_indexBox0].m_x);
 			ndVector maxBox (&vertexArray[m_indexBox1].m_x);
@@ -111,7 +111,7 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 			return ray.BoxIntersect(minBox, maxBox);
 		}
 
-		inline dFloat32 BoxPenetration (const ndFastAabb& obb, const ndTriplex* const vertexArray) const
+		inline ndFloat32 BoxPenetration (const ndFastAabb& obb, const ndTriplex* const vertexArray) const
 		{
 			ndVector p0 (&vertexArray[m_indexBox0].m_x);
 			ndVector p1 (&vertexArray[m_indexBox1].m_x);
@@ -128,7 +128,7 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 			dist = dist.GetMin(dist.ShiftTripleRight());
 			dist = dist.GetMin(dist.ShiftTripleRight());
 
-			if (dist.GetScalar() > dFloat32 (0.0f)) 
+			if (dist.GetScalar() > ndFloat32 (0.0f)) 
 			{
 				ndVector origin (ndVector::m_half * (p1 + p0));
 				ndVector size (ndVector::m_half * (p1 - p0));
@@ -157,7 +157,7 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 			return	dist.GetScalar();
 		}
 
-		inline dFloat32 BoxIntersect (const ndFastRay& ray, const ndFastRay& obbRay, const ndFastAabb& obb, const ndTriplex* const vertexArray) const
+		inline ndFloat32 BoxIntersect (const ndFastRay& ray, const ndFastRay& obbRay, const ndFastAabb& obb, const ndTriplex* const vertexArray) const
 		{
 			ndVector p0 (&vertexArray[m_indexBox0].m_x);
 			ndVector p1 (&vertexArray[m_indexBox1].m_x);
@@ -166,8 +166,8 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 
 			ndVector minBox (p0 - obb.m_p1);
 			ndVector maxBox (p1 - obb.m_p0);
-			dFloat32 dist = ray.BoxIntersect(minBox, maxBox);
-			if (dist < dFloat32 (1.0f)) 
+			ndFloat32 dist = ray.BoxIntersect(minBox, maxBox);
+			if (dist < ndFloat32 (1.0f)) 
 			{
 				ndVector origin (ndVector::m_half * (p1 + p0));
 				ndVector size (ndVector::m_half * (p1 - p0));
@@ -179,14 +179,14 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 
 				ndVector minBox1 (q0 - obb.m_size);
 				ndVector maxBox1 (q1 + obb.m_size);
-				dFloat32 dist1 = obbRay.BoxIntersect(minBox1, maxBox1);
-				dist = (dist1  > dFloat32 (1.0f)) ? dist1 : dMax (dist1, dist);
+				ndFloat32 dist1 = obbRay.BoxIntersect(minBox1, maxBox1);
+				dist = (dist1  > ndFloat32 (1.0f)) ? dist1 : dMax (dist1, dist);
 			}
 			return dist;
 		}
 
-		dInt32 m_indexBox0;
-		dInt32 m_indexBox1;
+		ndInt32 m_indexBox0;
+		ndInt32 m_indexBox1;
 		ndLeafNodePtr m_left;
 		ndLeafNodePtr m_right;
 	};
@@ -205,9 +205,9 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 	D_CORE_API void Create (const ndPolygonSoupBuilder& builder);
 	D_CORE_API void CalculateAdjacendy ();
 	D_CORE_API virtual ndVector ForAllSectorsSupportVectex(const ndVector& dir) const;
-	D_CORE_API virtual void ForAllSectorsRayHit (const ndFastRay& ray, dFloat32 maxT, dRayIntersectCallback callback, void* const context) const;
-	D_CORE_API virtual void ForAllSectors (const ndFastAabb& obbAabb, const ndVector& boxDistanceTravel, dFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
-	D_CORE_API virtual void ForThisSector(const ndAabbPolygonSoup::ndNode* const node, const ndFastAabb& obbAabb, const ndVector& boxDistanceTravel, dFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
+	D_CORE_API virtual void ForAllSectorsRayHit (const ndFastRay& ray, ndFloat32 maxT, dRayIntersectCallback callback, void* const context) const;
+	D_CORE_API virtual void ForAllSectors (const ndFastAabb& obbAabb, const ndVector& boxDistanceTravel, ndFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
+	D_CORE_API virtual void ForThisSector(const ndAabbPolygonSoup::ndNode* const node, const ndFastAabb& obbAabb, const ndVector& boxDistanceTravel, ndFloat32 maxT, dAaabbIntersectCallback callback, void* const context) const;
 
 	public:
 	inline ndNode* GetRootNode() const
@@ -234,16 +234,16 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 	}
 
 	private:
-	ndNodeBuilder* BuildTopDown (ndNodeBuilder* const leafArray, dInt32 firstBox, dInt32 lastBox, ndNodeBuilder** const allocator) const;
-	dFloat32 CalculateFaceMaxSize (const ndVector* const vertex, dInt32 indexCount, const dInt32* const indexArray) const;
-	static dIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
-	static dIntersectStatus CalculateAllFaceEdgeNormals(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
+	ndNodeBuilder* BuildTopDown (ndNodeBuilder* const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndNodeBuilder** const allocator) const;
+	ndFloat32 CalculateFaceMaxSize (const ndVector* const vertex, ndInt32 indexCount, const ndInt32* const indexArray) const;
+	static dIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
+	static dIntersectStatus CalculateAllFaceEdgeNormals(void* const context, const ndFloat32* const polygon, ndInt32 strideInBytes, const ndInt32* const indexArray, ndInt32 indexCount, ndFloat32 hitDistance);
 	void ImproveNodeFitness (ndNodeBuilder* const node) const;
 
 	ndNode* m_aabb;
-	dInt32* m_indices;
-	dInt32 m_nodesCount;
-	dInt32 m_indexCount;
+	ndInt32* m_indices;
+	ndInt32 m_nodesCount;
+	ndInt32 m_indexCount;
 	friend class ndContactSolver;
 };
 

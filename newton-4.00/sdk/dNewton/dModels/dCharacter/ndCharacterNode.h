@@ -52,7 +52,7 @@ class ndCharacterLoadDescriptor: public ndLoadSaveBase::dLoadDescriptor
 		m_limbMap = modelDesc->m_limbMap;
 	}
 
-	ndCharacterLoadDescriptor(const ndLoadSaveBase::dLoadDescriptor& desc, ndTree<const ndCharacterNode*, dUnsigned32>* const limbMap)
+	ndCharacterLoadDescriptor(const ndLoadSaveBase::dLoadDescriptor& desc, ndTree<const ndCharacterNode*, ndUnsigned32>* const limbMap)
 		:dLoadDescriptor(desc)
 		,m_limbMap(limbMap)
 	{
@@ -64,7 +64,7 @@ class ndCharacterLoadDescriptor: public ndLoadSaveBase::dLoadDescriptor
 	{
 	}
 
-	ndTree<const ndCharacterNode*, dUnsigned32>* m_limbMap;
+	ndTree<const ndCharacterNode*, ndUnsigned32>* m_limbMap;
 };
 
 class ndCharacterSaveDescriptor: public ndLoadSaveBase::ndSaveDescriptor
@@ -88,7 +88,7 @@ class ndCharacterSaveDescriptor: public ndLoadSaveBase::ndSaveDescriptor
 	{
 	}
 
-	ndTree<dInt32, const ndCharacterNode*>* m_limbMap;
+	ndTree<ndInt32, const ndCharacterNode*>* m_limbMap;
 };
 
 class ndCharacterNode: public ndNodeHierarchy<ndCharacterNode>

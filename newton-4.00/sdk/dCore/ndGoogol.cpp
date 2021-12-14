@@ -37,25 +37,25 @@ ndGoogol::ndGoogol(void)
 	memset (m_mantissa, 0, sizeof (m_mantissa));
 }
 
-ndGoogol::ndGoogol(dFloat64 value)
+ndGoogol::ndGoogol(ndFloat64 value)
 	:m_sign(0)
 	,m_exponent(0)
 {
-	dInt32 exp;
-	dFloat64 mantissa = fabs (frexp(value, &exp));
+	ndInt32 exp;
+	ndFloat64 mantissa = fabs (frexp(value, &exp));
 
-	m_exponent = dInt16 (exp);
+	m_exponent = ndInt16 (exp);
 	m_sign = (value >= 0) ? 0 : 1;
 
 	memset (m_mantissa, 0, sizeof (m_mantissa));
-	m_mantissa[0] = dUnsigned64 (dFloat64 (dUnsigned64(1)<<62) * mantissa);
+	m_mantissa[0] = ndUnsigned64 (ndFloat64 (ndUnsigned64(1)<<62) * mantissa);
 
 	// it looks like GCC have problems with this
 	//dAssert (m_mantissa[0] >= 0);
-	dAssert ((m_mantissa[0] & dUnsigned64(1)<<63) == 0);
+	dAssert ((m_mantissa[0] & ndUnsigned64(1)<<63) == 0);
 }
 
-void ndGoogol::CopySignedMantissa (dUnsigned64* const mantissa) const
+void ndGoogol::CopySignedMantissa (ndUnsigned64* const mantissa) const
 {
 	memcpy (mantissa, m_mantissa, sizeof (m_mantissa));
 	if (m_sign) 
@@ -66,28 +66,28 @@ void ndGoogol::CopySignedMantissa (dUnsigned64* const mantissa) const
 
 ndGoogol::operator double() const
 {
-	dFloat64 mantissa = (dFloat64(1.0f) / dFloat64 (dUnsigned64(1)<<62)) * dFloat64 (m_mantissa[0]);
-	mantissa = ldexp(mantissa, m_exponent) * (m_sign ?  dFloat64 (-1.0f) : dFloat64 (1.0f));
+	ndFloat64 mantissa = (ndFloat64(1.0f) / ndFloat64 (ndUnsigned64(1)<<62)) * ndFloat64 (m_mantissa[0]);
+	mantissa = ldexp(mantissa, m_exponent) * (m_sign ?  ndFloat64 (-1.0f) : ndFloat64 (1.0f));
 	return mantissa;
 }
 
 ndGoogol ndGoogol::operator+ (const ndGoogol &A) const
 {
 	ndGoogol tmp;
-	dAssert (dInt64 (m_mantissa[0]) >= 0);
-	dAssert (dInt64 (A.m_mantissa[0]) >= 0);
+	dAssert (ndInt64 (m_mantissa[0]) >= 0);
+	dAssert (ndInt64 (A.m_mantissa[0]) >= 0);
 
 	if (m_mantissa[0] && A.m_mantissa[0]) 
 	{
-		dUnsigned64 mantissa0[ND_GOOGOL_SIZE];
-		dUnsigned64 mantissa1[ND_GOOGOL_SIZE];
-		dUnsigned64 mantissa[ND_GOOGOL_SIZE];
+		ndUnsigned64 mantissa0[ND_GOOGOL_SIZE];
+		ndUnsigned64 mantissa1[ND_GOOGOL_SIZE];
+		ndUnsigned64 mantissa[ND_GOOGOL_SIZE];
 
 		CopySignedMantissa (mantissa0);
 		A.CopySignedMantissa (mantissa1);
 
-		dInt32 exponetDiff = m_exponent - A.m_exponent;
-		dInt32 exponent = m_exponent;
+		ndInt32 exponetDiff = m_exponent - A.m_exponent;
+		ndInt32 exponent = m_exponent;
 		if (exponetDiff > 0) 
 		{
 			ShiftRightMantissa (mantissa1, exponetDiff);
@@ -98,23 +98,23 @@ ndGoogol ndGoogol::operator+ (const ndGoogol &A) const
 			ShiftRightMantissa (mantissa0, -exponetDiff);
 		} 
 
-		dUnsigned64 carrier = 0;
-		for (dInt32 i = ND_GOOGOL_SIZE - 1; i >= 0; i --) 
+		ndUnsigned64 carrier = 0;
+		for (ndInt32 i = ND_GOOGOL_SIZE - 1; i >= 0; i --) 
 		{
-			dUnsigned64 m0 = mantissa0[i];
-			dUnsigned64 m1 = mantissa1[i];
+			ndUnsigned64 m0 = mantissa0[i];
+			ndUnsigned64 m1 = mantissa1[i];
 			mantissa[i] = m0 + m1 + carrier;
 			carrier = CheckCarrier (m0, m1) | CheckCarrier (m0 + m1, carrier);
 		}
 
-		dInt8 sign = 0;
-		if (dInt64 (mantissa[0]) < 0) 
+		ndInt8 sign = 0;
+		if (ndInt64 (mantissa[0]) < 0) 
 		{
 			sign = 1;
 			NegateMantissa (mantissa);
 		}
 
-		dInt32 bits = NormalizeMantissa (mantissa);
+		ndInt32 bits = NormalizeMantissa (mantissa);
 		if (bits <= (-64 * ND_GOOGOL_SIZE)) 
 		{
 			tmp.m_sign = 0;
@@ -123,7 +123,7 @@ ndGoogol ndGoogol::operator+ (const ndGoogol &A) const
 		else 
 		{
 			tmp.m_sign = sign;
-			tmp.m_exponent =  dInt16 (exponent + bits);
+			tmp.m_exponent =  ndInt16 (exponent + bits);
 		}
 
 		memcpy (tmp.m_mantissa, mantissa, sizeof (m_mantissa));
@@ -137,7 +137,7 @@ ndGoogol ndGoogol::operator+ (const ndGoogol &A) const
 		tmp = *this;
 	}
 
-	dAssert (dInt64 (tmp.m_mantissa[0]) >= 0);
+	dAssert (ndInt64 (tmp.m_mantissa[0]) >= 0);
 	return tmp;
 }
 
@@ -148,17 +148,17 @@ ndGoogol ndGoogol::operator- (const ndGoogol &A) const
 	return *this + tmp;
 }
 
-void ndGoogol::ScaleMantissa (dUnsigned64* const dst, dUnsigned64 scale) const
+void ndGoogol::ScaleMantissa (ndUnsigned64* const dst, ndUnsigned64 scale) const
 {
-	dUnsigned64 carrier = 0;
-	for (dInt32 i = ND_GOOGOL_SIZE - 1; i >= 0; i --) 
+	ndUnsigned64 carrier = 0;
+	for (ndInt32 i = ND_GOOGOL_SIZE - 1; i >= 0; i --) 
 	{
 		if (m_mantissa[i]) 
 		{
-			dUnsigned64 low;
-			dUnsigned64 high;
+			ndUnsigned64 low;
+			ndUnsigned64 high;
 			ExtendeMultiply (scale, m_mantissa[i], high, low);
-			dUnsigned64 acc = low + carrier;
+			ndUnsigned64 acc = low + carrier;
 			carrier = CheckCarrier (low, carrier);	
 			dAssert (CheckCarrier (carrier, high) == 0);
 			carrier += high;
@@ -176,50 +176,50 @@ void ndGoogol::ScaleMantissa (dUnsigned64* const dst, dUnsigned64 scale) const
 
 ndGoogol ndGoogol::operator* (const ndGoogol &A) const
 {
-	dAssert (dInt64 (m_mantissa[0]) >= 0);
-	dAssert (dInt64 (A.m_mantissa[0]) >= 0);
+	dAssert (ndInt64 (m_mantissa[0]) >= 0);
+	dAssert (ndInt64 (A.m_mantissa[0]) >= 0);
 
 	if (m_mantissa[0] && A.m_mantissa[0]) 
 	{
-		dUnsigned64 mantissaAcc[ND_GOOGOL_SIZE * 2];
+		ndUnsigned64 mantissaAcc[ND_GOOGOL_SIZE * 2];
 		memset (mantissaAcc, 0, sizeof (mantissaAcc));
-		for (dInt32 i = ND_GOOGOL_SIZE - 1; i >= 0; i --) 
+		for (ndInt32 i = ND_GOOGOL_SIZE - 1; i >= 0; i --) 
 		{
-			dUnsigned64 a = m_mantissa[i];
+			ndUnsigned64 a = m_mantissa[i];
 			if (a) 
 			{
-				dUnsigned64 mantissaScale[2 * ND_GOOGOL_SIZE];
+				ndUnsigned64 mantissaScale[2 * ND_GOOGOL_SIZE];
 				memset (mantissaScale, 0, sizeof (mantissaScale));
 				A.ScaleMantissa (&mantissaScale[i], a);
 
-				dUnsigned64 carrier = 0;
-				for (dInt32 j = 0; j < 2 * ND_GOOGOL_SIZE; j ++) 
+				ndUnsigned64 carrier = 0;
+				for (ndInt32 j = 0; j < 2 * ND_GOOGOL_SIZE; j ++) 
 				{
-					const dInt32 k = 2 * ND_GOOGOL_SIZE - 1 - j;
-					dUnsigned64 m0 = mantissaAcc[k];
-					dUnsigned64 m1 = mantissaScale[k];
+					const ndInt32 k = 2 * ND_GOOGOL_SIZE - 1 - j;
+					ndUnsigned64 m0 = mantissaAcc[k];
+					ndUnsigned64 m1 = mantissaScale[k];
 					mantissaAcc[k] = m0 + m1 + carrier;
 					carrier = CheckCarrier (m0, m1) | CheckCarrier (m0 + m1, carrier);
 				}
 			}
 		}
 
-		dUnsigned64 carrier = 0;
-		//dInt32 bits = dUnsigned64(LeadingZeros (mantissaAcc[0]) - 2);
-		dInt32 bits = LeadingZeros (mantissaAcc[0]) - 2;
-		for (dInt32 i = 0; i < 2 * ND_GOOGOL_SIZE; i ++) 
+		ndUnsigned64 carrier = 0;
+		//ndInt32 bits = ndUnsigned64(LeadingZeros (mantissaAcc[0]) - 2);
+		ndInt32 bits = LeadingZeros (mantissaAcc[0]) - 2;
+		for (ndInt32 i = 0; i < 2 * ND_GOOGOL_SIZE; i ++) 
 		{
-			const dInt32 k = 2 * ND_GOOGOL_SIZE - 1 - i;
-			dUnsigned64 a = mantissaAcc[k];
-			mantissaAcc[k] = (a << dUnsigned64(bits)) | carrier;
-			carrier = a >> dUnsigned64(64 - bits);
+			const ndInt32 k = 2 * ND_GOOGOL_SIZE - 1 - i;
+			ndUnsigned64 a = mantissaAcc[k];
+			mantissaAcc[k] = (a << ndUnsigned64(bits)) | carrier;
+			carrier = a >> ndUnsigned64(64 - bits);
 		}
 
-		dInt32 exp = m_exponent + A.m_exponent - (bits - 2);
+		ndInt32 exp = m_exponent + A.m_exponent - (bits - 2);
 
 		ndGoogol tmp;
 		tmp.m_sign = m_sign ^ A.m_sign;
-		tmp.m_exponent = dInt16 (exp);
+		tmp.m_exponent = ndInt16 (exp);
 		memcpy (tmp.m_mantissa, mantissaAcc, sizeof (m_mantissa));
 
 		return tmp;
@@ -232,8 +232,8 @@ ndGoogol ndGoogol::operator/ (const ndGoogol &A) const
 	ndGoogol tmp (1.0 / A);
 	tmp = tmp * (m_two - A * tmp);
 	tmp = tmp * (m_two - A * tmp);
-	dInt32 test = 0;
-	dInt32 passes = 0;
+	ndInt32 test = 0;
+	ndInt32 passes = 0;
 	do 
 	{
 		passes ++;
@@ -258,8 +258,8 @@ ndGoogol ndGoogol::Floor () const
 	{
 		return ndGoogol (0.0);
 	} 
-	dInt32 bits = m_exponent + 2;
-	dInt32 start = 0;
+	ndInt32 bits = m_exponent + 2;
+	ndInt32 start = 0;
 	while (bits >= 64) 
 	{
 		bits -= 64;
@@ -267,13 +267,13 @@ ndGoogol ndGoogol::Floor () const
 	}
 
 	ndGoogol tmp (*this);
-	for (dInt32 i = ND_GOOGOL_SIZE - 1; i > start; i --) 
+	for (ndInt32 i = ND_GOOGOL_SIZE - 1; i > start; i --) 
 	{
 		tmp.m_mantissa[i] = 0;
 	}
 	// some compilers do no like this and I do not know why is that
-	//dUnsigned64 mask = (-1LL) << (64 - bits);
-	dUnsigned64 mask (~0ULL);
+	//ndUnsigned64 mask = (-1LL) << (64 - bits);
+	ndUnsigned64 mask (~0ULL);
 	mask <<= (64 - bits);
 	tmp.m_mantissa[start] &= mask;
 	if (m_sign) {
@@ -288,8 +288,8 @@ ndGoogol ndGoogol::InvSqrt () const
 	const ndGoogol& me = *this;
 	ndGoogol x (1.0f / sqrt (me));
 
-	dInt32 test = 0;
-	dInt32 passes = 0;
+	ndInt32 test = 0;
+	ndInt32 passes = 0;
 	do 
 	{
 		passes ++;
@@ -310,30 +310,30 @@ void ndGoogol::ToString (char* const string) const
 {
 	ndGoogol tmp (*this);
 	ndGoogol base (10.0);
-	while (dFloat64 (tmp) > 1.0) 
+	while (ndFloat64 (tmp) > 1.0) 
 	{
 		tmp = tmp/base;
 	}
 
-	dInt32 index = 0;
+	ndInt32 index = 0;
 	while (tmp.m_mantissa[0]) 
 	{
 		tmp = tmp * base;
 		ndGoogol digit (tmp.Floor());
 		tmp -= digit;
-		dFloat64 val = digit;
+		ndFloat64 val = digit;
 		string[index] = char (val) + '0';
 		index ++;
 	}
 	string[index] = 0;
 }
 
-void ndGoogol::NegateMantissa (dUnsigned64* const mantissa) const
+void ndGoogol::NegateMantissa (ndUnsigned64* const mantissa) const
 {
-	dUnsigned64 carrier = 1;
-	for (dInt32 i = ND_GOOGOL_SIZE - 1; i >= 0; i --) 
+	ndUnsigned64 carrier = 1;
+	for (ndInt32 i = ND_GOOGOL_SIZE - 1; i >= 0; i --) 
 	{
-		dUnsigned64 a = ~mantissa[i] + carrier;
+		ndUnsigned64 a = ~mantissa[i] + carrier;
 		if (a) 
 		{
 			carrier = 0;
@@ -342,17 +342,17 @@ void ndGoogol::NegateMantissa (dUnsigned64* const mantissa) const
 	}
 }
 
-void ndGoogol::ShiftRightMantissa (dUnsigned64* const mantissa, dInt32 bits) const
+void ndGoogol::ShiftRightMantissa (ndUnsigned64* const mantissa, ndInt32 bits) const
 {
-	dUnsigned64 carrier = 0;
-	if (dInt64 (mantissa[0]) < dInt64 (0)) 
+	ndUnsigned64 carrier = 0;
+	if (ndInt64 (mantissa[0]) < ndInt64 (0)) 
 	{
-		carrier = dUnsigned64 (-1);
+		carrier = ndUnsigned64 (-1);
 	}
 	
 	while (bits >= 64) 
 	{
-		for (dInt32 i = ND_GOOGOL_SIZE - 2; i >= 0; i --) 
+		for (ndInt32 i = ND_GOOGOL_SIZE - 2; i >= 0; i --) 
 		{
 			mantissa[i + 1] = mantissa[i];
 		}
@@ -363,25 +363,25 @@ void ndGoogol::ShiftRightMantissa (dUnsigned64* const mantissa, dInt32 bits) con
 	if (bits > 0) 
 	{
 		carrier <<= (64 - bits);
-		for (dInt32 i = 0; i < ND_GOOGOL_SIZE; i ++) 
+		for (ndInt32 i = 0; i < ND_GOOGOL_SIZE; i ++) 
 		{
-			dUnsigned64 a = mantissa[i];
+			ndUnsigned64 a = mantissa[i];
 			mantissa[i] = (a >> bits) | carrier;
 			carrier = a << (64 - bits);
 		}
 	}
 }
 
-dInt32 ndGoogol::LeadingZeros (dUnsigned64 a) const
+ndInt32 ndGoogol::LeadingZeros (ndUnsigned64 a) const
 {
 	#define dgCOUNTBIT(mask,add)		\
 	{									\
-		dUnsigned64 test = a & mask;	\
+		ndUnsigned64 test = a & mask;	\
 		n += test ? 0 : add;			\
 		a = test ? test : (a & ~mask);	\
 	}
 
-	dInt32 n = 0;
+	ndInt32 n = 0;
     dAssert (a);
 	dgCOUNTBIT (0xffffffff00000000LL, 32);
 	dgCOUNTBIT (0xffff0000ffff0000LL, 16);
@@ -393,12 +393,12 @@ dInt32 ndGoogol::LeadingZeros (dUnsigned64 a) const
 	return n;
 }
 
-dInt32 ndGoogol::NormalizeMantissa (dUnsigned64* const mantissa) const
+ndInt32 ndGoogol::NormalizeMantissa (ndUnsigned64* const mantissa) const
 {
-	dAssert (dInt64 (mantissa[0]) >= 0);
+	dAssert (ndInt64 (mantissa[0]) >= 0);
 
-	dInt32 bits = 0;
-	if(dInt64 (mantissa[0] * 2) < 0) 
+	ndInt32 bits = 0;
+	if(ndInt64 (mantissa[0] * 2) < 0) 
 	{
 		bits = 1;
 		ShiftRightMantissa (mantissa, 1);
@@ -408,7 +408,7 @@ dInt32 ndGoogol::NormalizeMantissa (dUnsigned64* const mantissa) const
 		while (!mantissa[0] && bits > (-64 * ND_GOOGOL_SIZE)) 
 		{
 			bits -= 64;
-			for (dInt32 i = 1; i < ND_GOOGOL_SIZE; i ++) {
+			for (ndInt32 i = 1; i < ND_GOOGOL_SIZE; i ++) {
 				mantissa[i - 1] = mantissa[i];
 			}
 			mantissa[ND_GOOGOL_SIZE - 1] = 0;
@@ -416,12 +416,12 @@ dInt32 ndGoogol::NormalizeMantissa (dUnsigned64* const mantissa) const
 
 		if (bits > (-64 * ND_GOOGOL_SIZE)) 
 		{
-			dInt32 n = LeadingZeros (mantissa[0]) - 2;
+			ndInt32 n = LeadingZeros (mantissa[0]) - 2;
 			if (n > 0) {
 				dAssert (n > 0);
-				dUnsigned64 carrier = 0;
-				for (dInt32 i = ND_GOOGOL_SIZE-1; i >= 0; i --) {
-					dUnsigned64 a = mantissa[i];
+				ndUnsigned64 carrier = 0;
+				for (ndInt32 i = ND_GOOGOL_SIZE-1; i >= 0; i --) {
+					ndUnsigned64 a = mantissa[i];
 					mantissa[i] = (a << n) | carrier;
 					carrier = a >> (64 - n);
 				}
@@ -430,12 +430,12 @@ dInt32 ndGoogol::NormalizeMantissa (dUnsigned64* const mantissa) const
 			else if (n < 0) 
 			{
 				// this is very rare but it does happens, whee the leading zeros of the mantissa is an exact multiple of 64
-				dAssert (mantissa[0] & dUnsigned64(3)<<62);
-				dUnsigned64 carrier = 0;
-				dInt32 shift = -n;
-				for (dInt32 i = 0; i < ND_GOOGOL_SIZE; i ++) 
+				dAssert (mantissa[0] & ndUnsigned64(3)<<62);
+				ndUnsigned64 carrier = 0;
+				ndInt32 shift = -n;
+				for (ndInt32 i = 0; i < ND_GOOGOL_SIZE; i ++) 
 				{
-					dUnsigned64 a = mantissa[i];
+					ndUnsigned64 a = mantissa[i];
 					mantissa[i] = (a >> shift) | carrier;
 					carrier = a << (64 - shift);
 				}
@@ -446,33 +446,33 @@ dInt32 ndGoogol::NormalizeMantissa (dUnsigned64* const mantissa) const
 	return bits;
 }
 
-dUnsigned64 ndGoogol::CheckCarrier (dUnsigned64 a, dUnsigned64 b) const
+ndUnsigned64 ndGoogol::CheckCarrier (ndUnsigned64 a, ndUnsigned64 b) const
 {
-	return ((dUnsigned64 (-1) - b) < a) ? dUnsigned64(1) : 0;
+	return ((ndUnsigned64 (-1) - b) < a) ? ndUnsigned64(1) : 0;
 }
 
-void ndGoogol::ExtendeMultiply (dUnsigned64 a, dUnsigned64 b, dUnsigned64& high, dUnsigned64& low) const
+void ndGoogol::ExtendeMultiply (ndUnsigned64 a, ndUnsigned64 b, ndUnsigned64& high, ndUnsigned64& low) const
 {
-	dUnsigned64 bLow = b & 0xffffffff; 
-	dUnsigned64 bHigh = b >> 32; 
-	dUnsigned64 aLow = a & 0xffffffff; 
-	dUnsigned64 aHigh = a >> 32; 
+	ndUnsigned64 bLow = b & 0xffffffff; 
+	ndUnsigned64 bHigh = b >> 32; 
+	ndUnsigned64 aLow = a & 0xffffffff; 
+	ndUnsigned64 aHigh = a >> 32; 
 
-	dUnsigned64 l = bLow * aLow;
+	ndUnsigned64 l = bLow * aLow;
 
-	dUnsigned64 c1 = bHigh * aLow;
-	dUnsigned64 c2 = bLow * aHigh;
-	dUnsigned64 m = c1 + c2;
-	dUnsigned64 carrier = CheckCarrier (c1, c2) << 32;
+	ndUnsigned64 c1 = bHigh * aLow;
+	ndUnsigned64 c2 = bLow * aHigh;
+	ndUnsigned64 m = c1 + c2;
+	ndUnsigned64 carrier = CheckCarrier (c1, c2) << 32;
 
-	dUnsigned64 h = bHigh * aHigh + carrier;
+	ndUnsigned64 h = bHigh * aHigh + carrier;
 
-	dUnsigned64 ml = m << 32;	
-	dUnsigned64 ll = l + ml;
-	dUnsigned64 mh = (m >> 32) + CheckCarrier (l, ml);	
+	ndUnsigned64 ml = m << 32;	
+	ndUnsigned64 ll = l + ml;
+	ndUnsigned64 mh = (m >> 32) + CheckCarrier (l, ml);	
 	dAssert ((mh & ~0xffffffff) == 0);
 
-	dUnsigned64 hh = h + mh;
+	ndUnsigned64 hh = h + mh;
 
 	low = ll;
 	high = hh;
@@ -493,41 +493,41 @@ ndGoogol ndGoogol::operator-= (const ndGoogol &A)
 bool ndGoogol::operator> (const ndGoogol &A) const
 {
 	ndGoogol tmp (*this - A);
-	return dFloat64(tmp) > 0.0;
+	return ndFloat64(tmp) > 0.0;
 }
 
 bool ndGoogol::operator>= (const ndGoogol &A) const 
 {
 	ndGoogol tmp (*this - A);
-	return dFloat64 (tmp) >= 0.0;
+	return ndFloat64 (tmp) >= 0.0;
 }
 
 bool ndGoogol::operator< (const ndGoogol &A) const 
 {
 	ndGoogol tmp (*this - A);
-	return dFloat64 (tmp) < 0.0;
+	return ndFloat64 (tmp) < 0.0;
 }
 
 bool ndGoogol::operator<= (const ndGoogol &A) const 
 {
 	ndGoogol tmp (*this - A);
-	return dFloat64 (tmp) <= 0.0;
+	return ndFloat64 (tmp) <= 0.0;
 }
 
 bool ndGoogol::operator== (const ndGoogol &A) const 
 {
 	ndGoogol tmp (*this - A);
-	return dFloat64 (tmp) == 0.0;
+	return ndFloat64 (tmp) == 0.0;
 }
 
 bool ndGoogol::operator!= (const ndGoogol &A) const 
 {
 	ndGoogol tmp (*this - A);
-	return dFloat64 (tmp) != 0.0;
+	return ndFloat64 (tmp) != 0.0;
 }
 
 void ndGoogol::Trace () const
 {
 	dAssert(0);
-	//dTrace (("%f ", dFloat64 (*this)));
+	//dTrace (("%f ", ndFloat64 (*this)));
 }

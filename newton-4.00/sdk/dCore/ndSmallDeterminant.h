@@ -26,9 +26,9 @@
 #include "ndTypes.h"
 
 class ndGoogol;
-dFloat64 Determinant2x2 (const dFloat64 matrix[2][2], dFloat64* const error);
-dFloat64 Determinant3x3 (const dFloat64 matrix[3][3], dFloat64* const error);
-dFloat64 Determinant4x4 (const dFloat64 matrix[4][4], dFloat64* const error);
+ndFloat64 Determinant2x2 (const ndFloat64 matrix[2][2], ndFloat64* const error);
+ndFloat64 Determinant3x3 (const ndFloat64 matrix[3][3], ndFloat64* const error);
+ndFloat64 Determinant4x4 (const ndFloat64 matrix[4][4], ndFloat64* const error);
 
 ndGoogol Determinant2x2 (const ndGoogol matrix[2][2]);
 ndGoogol Determinant3x3 (const ndGoogol matrix[3][3]);

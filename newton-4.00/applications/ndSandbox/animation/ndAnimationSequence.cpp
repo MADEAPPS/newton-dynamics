@@ -16,7 +16,7 @@
 ndAnimationSequence::ndAnimationSequence()
 	:m_name("")
 	,m_tracks()
-	,m_period(dFloat32 (1.0f))
+	,m_period(ndFloat32 (1.0f))
 {
 }
 
@@ -30,11 +30,11 @@ ndAnimationKeyFramesTrack* ndAnimationSequence::AddTrack()
 	return &node->GetInfo();
 }
 
-void ndAnimationSequence::CalculatePose(ndAnimationPose& output, dFloat32 t) const
+void ndAnimationSequence::CalculatePose(ndAnimationPose& output, ndFloat32 t) const
 {
 	if (output.GetCount())
 	{
-		dInt32 index = 0;
+		ndInt32 index = 0;
 		ndAnimKeyframe* const keyFrames = &output[0];
 		for (ndList<ndAnimationKeyFramesTrack>::ndNode* srcNode = m_tracks.GetFirst(); srcNode; srcNode = srcNode->GetNext())
 		{

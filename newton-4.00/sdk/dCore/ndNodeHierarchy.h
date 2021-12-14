@@ -33,10 +33,10 @@ class ndNodeBaseHierarchy: public ndClassAlloc
 	D_CORE_API ndNodeBaseHierarchy* GetNext() const;
 	D_CORE_API ndNodeBaseHierarchy* GetPrev() const;
 
-	D_CORE_API ndNodeBaseHierarchy* Find (dUnsigned64 nameCRC) const; 
+	D_CORE_API ndNodeBaseHierarchy* Find (ndUnsigned64 nameCRC) const; 
 	D_CORE_API ndNodeBaseHierarchy* Find (const char* const name) const;
 
-	dUnsigned64 GetNameID() const;
+	ndUnsigned64 GetNameID() const;
 	const ndString& GetName() const;
 	void SetName(const char* const name);
 	
@@ -52,7 +52,7 @@ class ndNodeBaseHierarchy: public ndClassAlloc
 	inline void Clear();
 
 	ndString m_name;
-	dUnsigned64 m_nameID;
+	ndUnsigned64 m_nameID;
 	ndNodeBaseHierarchy* m_parent;
 	ndNodeBaseHierarchy* m_child;
 	ndNodeBaseHierarchy* m_sibling;
@@ -74,7 +74,7 @@ class ndNodeHierarchy: public ndNodeBaseHierarchy
 	T* GetLast() const;
 	T* GetNext() const;
 	T* GetPrev() const;
-	T* Find (dUnsigned64 nameCRC) const;
+	T* Find (ndUnsigned64 nameCRC) const;
 	T* Find (const char* const name) const;
 
 	protected:
@@ -130,7 +130,7 @@ inline void ndNodeBaseHierarchy::SetName(const char* const name)
 	m_nameID = dCRC64 (name);
 }
 
-inline dUnsigned64  ndNodeBaseHierarchy::GetNameID() const
+inline ndUnsigned64  ndNodeBaseHierarchy::GetNameID() const
 {
 	return m_nameID;
 }
@@ -235,7 +235,7 @@ T* ndNodeHierarchy<T>::GetPrev() const
 
 
 template<class T>
-T* ndNodeHierarchy<T>::Find (dUnsigned64 nameCRC) const 
+T* ndNodeHierarchy<T>::Find (ndUnsigned64 nameCRC) const 
 {
 	return (T*) ndNodeBaseHierarchy::Find (nameCRC);
 }

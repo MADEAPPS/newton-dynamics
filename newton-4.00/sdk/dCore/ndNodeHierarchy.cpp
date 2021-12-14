@@ -127,7 +127,7 @@ ndNodeBaseHierarchy* ndNodeBaseHierarchy::GetPrev() const
 	return ptr;
 }
 
-ndNodeBaseHierarchy* ndNodeBaseHierarchy::Find (dUnsigned64 nameCRC) const 
+ndNodeBaseHierarchy* ndNodeBaseHierarchy::Find (ndUnsigned64 nameCRC) const 
 {
 	if (nameCRC == GetNameID()) 
 	{

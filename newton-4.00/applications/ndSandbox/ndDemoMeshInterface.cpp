@@ -43,7 +43,7 @@ ndDemoMeshInterface::~ndDemoMeshInterface()
 {
 }
 
-dInt32 ndDemoMeshInterface::Release()
+ndInt32 ndDemoMeshInterface::Release()
 {
 	return ndRefCounter<ndDemoMeshInterface>::Release();
 }
@@ -75,7 +75,7 @@ ndDemoSubMesh::~ndDemoSubMesh ()
 {
 }
 
-void ndDemoSubMesh::SetOpacity(dFloat32 opacity)
+void ndDemoSubMesh::SetOpacity(ndFloat32 opacity)
 {
 	m_material.m_opacity = GLfloat(opacity);
 	m_material.m_ambient[3] = GLfloat(opacity);

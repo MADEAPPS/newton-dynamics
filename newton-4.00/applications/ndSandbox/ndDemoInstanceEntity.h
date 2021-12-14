@@ -18,18 +18,18 @@
 class ndDemoMeshIntance : public ndDemoMesh
 {
 	public:
-	ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = dGetIdentityMatrix());
+	ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, ndFloat32 opacity = 1.0f, const ndMatrix& uvMatrix = dGetIdentityMatrix());
 	~ndDemoMeshIntance();
 
 	virtual void Render(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
-	void SetTransforms(dInt32 count, const ndMatrix* const matrixArray);
+	void SetTransforms(ndInt32 count, const ndMatrix* const matrixArray);
 
 	private:
-	void RenderBatch(dInt32 start, ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
+	void RenderBatch(ndInt32 start, ndDemoEntityManager* const scene, const ndMatrix& modelMatrix);
 
 	const ndMatrix* m_offsets;
-	dInt32 m_instanceCount;
-	dInt32 m_maxInstanceCount;
+	ndInt32 m_instanceCount;
+	ndInt32 m_maxInstanceCount;
 	GLuint m_matrixOffsetBuffer;
 };
 
@@ -40,7 +40,7 @@ class ndDemoInstanceEntity: public ndDemoEntity
 	ndDemoInstanceEntity(const ndDemoInstanceEntity& copyFrom);
 	virtual ~ndDemoInstanceEntity(void);
 
-	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
+	virtual void Render(ndFloat32 timeStep, ndDemoEntityManager* const scene, const ndMatrix& matrix) const;
 
 	ndDemoMeshIntance* m_instanceMesh;
 	static ndArray<ndMatrix> m_matrixStack;

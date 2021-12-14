@@ -44,9 +44,9 @@ ndPolygonSoupDatabase::~ndPolygonSoupDatabase ()
 	}
 }
 
-void ndPolygonSoupDatabase::SetTagId(const dInt32* const facePtr, dInt32 indexCount, dUnsigned32 newID) const
+void ndPolygonSoupDatabase::SetTagId(const ndInt32* const facePtr, ndInt32 indexCount, ndUnsigned32 newID) const
 {
-	dUnsigned32* const face = (dUnsigned32*) facePtr;
+	ndUnsigned32* const face = (ndUnsigned32*) facePtr;
 	face[indexCount] = newID;
 }
 

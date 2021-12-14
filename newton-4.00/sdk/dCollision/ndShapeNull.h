@@ -33,18 +33,18 @@ class ndShapeNull : public ndShape
 
 	virtual ndShapeNull* GetAsShapeNull();
 
-	virtual dFloat32 GetVolume() const;
+	virtual ndFloat32 GetVolume() const;
 	virtual ndShapeInfo GetShapeInfo() const;
-	virtual dFloat32 GetBoxMinRadius() const;
-	virtual dFloat32 GetBoxMaxRadius() const;
+	virtual ndFloat32 GetBoxMinRadius() const;
+	virtual ndFloat32 GetBoxMaxRadius() const;
 	virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
-	virtual ndVector SupportVertex(const ndVector& dir, dInt32* const vertexIndex) const;
+	virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
-	virtual ndVector SupportVertexSpecial(const ndVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
-	virtual dInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
+	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinThickness, ndInt32* const vertexIndex) const;
+	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 	virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& globalPlane, const ndShapeInstance& parentScale) const;
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 };
 
 inline ndShapeNull::ndShapeNull()
@@ -62,19 +62,19 @@ inline ndShapeNull* ndShapeNull::GetAsShapeNull()
 	return this; 
 }
 
-inline ndVector ndShapeNull::SupportVertex(const ndVector&, dInt32* const) const
+inline ndVector ndShapeNull::SupportVertex(const ndVector&, ndInt32* const) const
 {
 	return ndVector::m_zero;
 }
 
-inline ndVector ndShapeNull::SupportVertexSpecial(const ndVector&, dFloat32, dInt32* const) const
+inline ndVector ndShapeNull::SupportVertexSpecial(const ndVector&, ndFloat32, ndInt32* const) const
 {
 	return ndVector::m_zero;
 }
 
-inline dFloat32 ndShapeNull::RayCast(ndRayCastNotify&, const ndVector&, const ndVector&, dFloat32, const ndBody* const, ndContactPoint&) const
+inline ndFloat32 ndShapeNull::RayCast(ndRayCastNotify&, const ndVector&, const ndVector&, ndFloat32, const ndBody* const, ndContactPoint&) const
 {
-	return dFloat32(1.2f);
+	return ndFloat32(1.2f);
 }
 
 inline void ndShapeNull::DebugShape(const ndMatrix&, ndShapeDebugNotify&) const
@@ -94,19 +94,19 @@ inline ndShapeInfo ndShapeNull::GetShapeInfo() const
 	return info;
 }
 
-inline dFloat32 ndShapeNull::GetVolume() const
+inline ndFloat32 ndShapeNull::GetVolume() const
 {
-	return dFloat32(0.0f);
+	return ndFloat32(0.0f);
 }
 
-inline dFloat32 ndShapeNull::GetBoxMinRadius() const
+inline ndFloat32 ndShapeNull::GetBoxMinRadius() const
 {
-	return dFloat32(0.0f);
+	return ndFloat32(0.0f);
 }
 
-inline dFloat32 ndShapeNull::GetBoxMaxRadius() const
+inline ndFloat32 ndShapeNull::GetBoxMaxRadius() const
 {
-	return dFloat32(0.0f);
+	return ndFloat32(0.0f);
 }
 
 inline ndVector ndShapeNull::CalculateVolumeIntegral(const ndMatrix&, const ndVector&, const ndShapeInstance&) const
@@ -119,7 +119,7 @@ inline ndVector ndShapeNull::SupportVertexSpecialProjectPoint(const ndVector& po
 	return point;
 }
 
-inline dInt32 ndShapeNull::CalculatePlaneIntersection(const ndVector&, const ndVector&, ndVector* const) const
+inline ndInt32 ndShapeNull::CalculatePlaneIntersection(const ndVector&, const ndVector&, ndVector* const) const
 {
 	return 0;
 }

@@ -32,7 +32,7 @@ template<class T>
 class dTempArray : public ndArray<T>
 {
 	public:
-	dTempArray(dInt32 maxSize, T* const buffer) 
+	dTempArray(ndInt32 maxSize, T* const buffer) 
 		:ndArray<T>()
 		,m_buffer(buffer)
 	{
@@ -48,10 +48,10 @@ class dTempArray : public ndArray<T>
 	T* m_buffer;
 };
 
-ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(dFloat32 sizex, dFloat32 sizey, dFloat32 sizez)
+ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez)
 	:ndShapeStaticMesh(m_staticProceduralMesh)
-	,m_minBox(ndVector::m_negOne * ndVector::m_half * ndVector(sizex, sizey, sizez, dFloat32(0.0f)))
-	,m_maxBox(ndVector::m_half * ndVector(sizex, sizey, sizez, dFloat32(0.0f)))
+	,m_minBox(ndVector::m_negOne * ndVector::m_half * ndVector(sizex, sizey, sizez, ndFloat32(0.0f)))
+	,m_maxBox(ndVector::m_half * ndVector(sizex, sizey, sizez, ndFloat32(0.0f)))
 	,m_localData()
 	,m_maxFaceCount(64)
 	,m_maxVertexCount(256)
@@ -75,7 +75,7 @@ ndShapeStaticProceduralMesh::~ndShapeStaticProceduralMesh(void)
 {
 }
 
-void ndShapeStaticProceduralMesh::SetMaxVertexAndFaces(dInt32 maxVertex, dInt32 maxFaces)
+void ndShapeStaticProceduralMesh::SetMaxVertexAndFaces(ndInt32 maxVertex, ndInt32 maxFaces)
 {
 	m_maxFaceCount = maxFaces;
 	m_maxVertexCount = maxVertex;
@@ -110,14 +110,14 @@ void ndShapeStaticProceduralMesh::CalculateLocalObb()
 void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 {
 	ndVector* const vertexBuffer = dAlloca(ndVector, m_maxVertexCount);
-	dInt32* const faceBuffer = dAlloca(dInt32, m_maxFaceCount);
-	dInt32* const materialBuffer = dAlloca(dInt32, m_maxFaceCount);
-	dInt32* const indexBuffer = dAlloca(dInt32, m_maxFaceCount * 4);
+	ndInt32* const faceBuffer = dAlloca(ndInt32, m_maxFaceCount);
+	ndInt32* const materialBuffer = dAlloca(ndInt32, m_maxFaceCount);
+	ndInt32* const indexBuffer = dAlloca(ndInt32, m_maxFaceCount * 4);
 
 	dTempArray<ndVector> vertexList(m_maxVertexCount, vertexBuffer);
-	dTempArray<dInt32> faceList(m_maxFaceCount, faceBuffer);
-	dTempArray<dInt32> faceMaterialList(m_maxFaceCount, materialBuffer);
-	dTempArray<dInt32> indexList(m_maxFaceCount * 4, indexBuffer);
+	dTempArray<ndInt32> faceList(m_maxFaceCount, faceBuffer);
+	dTempArray<ndInt32> faceMaterialList(m_maxFaceCount, materialBuffer);
+	dTempArray<ndInt32> indexList(m_maxFaceCount * 4, indexBuffer);
 
 	GetCollidingFaces(data->GetOrigin(), data->GetTarget(), vertexList, faceList, faceMaterialList, indexList);
 	if (faceList.GetCount() == 0)
@@ -148,43 +148,43 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	memcpy(&vertex[0], &vertexList[0], vertexList.GetCount() * sizeof(ndVector));
 	
 	ndEdgeMap edgeMap;
-	dInt32 index = 0;
-	dInt32 faceStart = 0;
-	dInt32* const indices = data->m_globalFaceVertexIndex;
-	dInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
+	ndInt32 index = 0;
+	ndInt32 faceStart = 0;
+	ndInt32* const indices = data->m_globalFaceVertexIndex;
+	ndInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
 	
-	for (dInt32 i = 0; i < faceList.GetCount(); i++)
+	for (ndInt32 i = 0; i < faceList.GetCount(); i++)
 	{
-		dInt32 i0 = indexList[faceStart + 0];
-		dInt32 i1 = indexList[faceStart + 1];
+		ndInt32 i0 = indexList[faceStart + 0];
+		ndInt32 i1 = indexList[faceStart + 1];
 		ndVector area(ndVector::m_zero);
 		ndVector edge0(vertex[i1] - vertex[i0]);
 
-		for (dInt32 j = 2; j < faceList[i]; j++)
+		for (ndInt32 j = 2; j < faceList[i]; j++)
 		{
-			dInt32 i2 = indexList[faceStart + j];
+			ndInt32 i2 = indexList[faceStart + j];
 			const ndVector edge1(vertex[i2] - vertex[i0]);
 			area += edge0.CrossProduct(edge1);
 			edge0 = edge1;
 		}
 
-		dFloat32 faceSize = dSqrt(area.DotProduct(area).GetScalar());
-		dInt32 normalIndex = vertexList.GetCount() + i;
+		ndFloat32 faceSize = ndSqrt(area.DotProduct(area).GetScalar());
+		ndInt32 normalIndex = vertexList.GetCount() + i;
 
-		vertex[normalIndex] = area.Scale (dFloat32 (1.0f) / faceSize);
+		vertex[normalIndex] = area.Scale (ndFloat32 (1.0f) / faceSize);
 
 		indices[index + faceList[i] + 0] = faceMaterialList[i];
 		indices[index + faceList[i] + 1] = normalIndex;
-		indices[index + 2 * faceList[i] + 2] = dInt32(faceSize * dFloat32(0.5f));
+		indices[index + 2 * faceList[i] + 2] = ndInt32(faceSize * ndFloat32(0.5f));
 
-		dInt32 j0 = faceList[i] - 1;
+		ndInt32 j0 = faceList[i] - 1;
 		faceIndexCount[i] = faceList[i];
-		for (dInt32 j = 0; j < faceList[i]; j++) 
+		for (ndInt32 j = 0; j < faceList[i]; j++) 
 		{
 			ndEdge edge;
 			edge.m_i0 = indexList[faceStart + j0];
 			edge.m_i1 = indexList[faceStart + j];
-			dInt32 normalEntryIndex = index + j + faceList[i] + 2;
+			ndInt32 normalEntryIndex = index + j + faceList[i] + 2;
 			edgeMap.Insert(normalEntryIndex, edge);
 
 			indices[index + j] = indexList[faceStart + j];
@@ -207,8 +207,8 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 			ndEdgeMap::ndNode* const twinNode = edgeMap.Find(twin);
 			if (twinNode)
 			{
-				dInt32 i0 = edgeNode->GetInfo();
-				dInt32 i1 = twinNode->GetInfo();
+				ndInt32 i0 = edgeNode->GetInfo();
+				ndInt32 i1 = twinNode->GetInfo();
 				dSwap(indices[i0], indices[i1]);
 				twinNode->GetInfo() = -1;
 			}
@@ -216,27 +216,27 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 		edgeNode->GetInfo() = -1;
 	}
 
-	dInt32 faceCount0 = 0;
-	dInt32 faceIndexCount0 = 0;
-	dInt32 faceIndexCount1 = 0;
-	dInt32 stride = sizeof(ndVector) / sizeof(dFloat32);
+	ndInt32 faceCount0 = 0;
+	ndInt32 faceIndexCount0 = 0;
+	ndInt32 faceIndexCount1 = 0;
+	ndInt32 stride = sizeof(ndVector) / sizeof(ndFloat32);
 	
-	dInt32* const address = data->m_meshData.m_globalFaceIndexStart;
-	dFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
+	ndInt32* const address = data->m_meshData.m_globalFaceIndexStart;
+	ndFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
 	if (data->m_doContinuesCollisionTest) 
 	{
 		dAssert(0);
 		//dFastRay ray(ndVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
-		//for (dInt32 i = 0; i < faceCount; i++) 
+		//for (ndInt32 i = 0; i < faceCount; i++) 
 		//{
-		//	const dInt32* const indexArray = &indices[faceIndexCount1];
+		//	const ndInt32* const indexArray = &indices[faceIndexCount1];
 		//	const ndVector& faceNormal = vertex[indexArray[4]];
-		//	dFloat32 dist = data->PolygonBoxRayDistance(faceNormal, 3, indexArray, stride, &vertex[0].m_x, ray);
-		//	if (dist < dFloat32(1.0f)) 
+		//	ndFloat32 dist = data->PolygonBoxRayDistance(faceNormal, 3, indexArray, stride, &vertex[0].m_x, ray);
+		//	if (dist < ndFloat32(1.0f)) 
 		//	{
 		//		hitDistance[faceCount0] = dist;
 		//		address[faceCount0] = faceIndexCount0;
-		//		memcpy(&indices[faceIndexCount0], indexArray, 9 * sizeof(dInt32));
+		//		memcpy(&indices[faceIndexCount0], indexArray, 9 * sizeof(ndInt32));
 		//		faceCount0++;
 		//		faceIndexCount0 += 9;
 		//	}
@@ -245,17 +245,17 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	}
 	else 
 	{
-		for (dInt32 i = 0; i < faceList.GetCount(); i++)
+		for (ndInt32 i = 0; i < faceList.GetCount(); i++)
 		{
-			const dInt32 vertexCount = faceIndexCount[i];
-			const dInt32* const indexArray = &indices[faceIndexCount1];
+			const ndInt32 vertexCount = faceIndexCount[i];
+			const ndInt32* const indexArray = &indices[faceIndexCount1];
 			const ndVector& faceNormal = vertex[indexArray[vertexCount + 1]];
-			dFloat32 dist = data->PolygonBoxDistance(faceNormal, vertexCount, indexArray, stride, &vertex[0].m_x);
-			if (dist > dFloat32(0.0f)) 
+			ndFloat32 dist = data->PolygonBoxDistance(faceNormal, vertexCount, indexArray, stride, &vertex[0].m_x);
+			if (dist > ndFloat32(0.0f)) 
 			{
 				hitDistance[faceCount0] = dist;
 				address[faceCount0] = faceIndexCount0;
-				memcpy(&indices[faceIndexCount0], indexArray, (vertexCount * 2 + 3) * sizeof(dInt32));
+				memcpy(&indices[faceIndexCount0], indexArray, (vertexCount * 2 + 3) * sizeof(ndInt32));
 				faceCount0++;
 				faceIndexCount0 += vertexCount * 2 + 3;
 			}

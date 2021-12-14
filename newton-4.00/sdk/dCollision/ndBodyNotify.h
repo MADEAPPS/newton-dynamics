@@ -41,10 +41,10 @@ class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 	ndVector GetGravity() const;
 	void SetGravity(const ndVector& defualtGravity);
 
-	virtual void OnTransform(dInt32 threadIndex, const ndMatrix& matrix);
+	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
 
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
-	D_COLLISION_API virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep);
+	D_COLLISION_API virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);
 
 	private:
 	ndVector m_defualtGravity;
@@ -90,7 +90,7 @@ inline void* ndBodyNotify::GetUserData() const
 	return nullptr;
 }
 
-inline void ndBodyNotify::OnTransform(dInt32, const ndMatrix&)
+inline void ndBodyNotify::OnTransform(ndInt32, const ndMatrix&)
 {
 }
 

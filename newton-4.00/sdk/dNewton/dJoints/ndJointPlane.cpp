@@ -54,10 +54,10 @@ void ndJointPlane::JacobianDerivative(ndConstraintDescritor& desc)
 	//NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &dir[0]);
 	AddLinearRowJacobian(desc, p0, p1, dir);
 	
-	//const dFloat32 invTimeStep = 1.0f / timestep;
-	const dFloat32 dist = 0.25f * dir.DotProduct((p1 - p0) & ndVector::m_triplexMask).GetScalar();
-	//const dFloat32 accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dist * invTimeStep * invTimeStep;
-	const dFloat32 accel = GetMotorZeroAcceleration(desc) + dist * desc.m_invTimestep * desc.m_invTimestep;
+	//const ndFloat32 invTimeStep = 1.0f / timestep;
+	const ndFloat32 dist = 0.25f * dir.DotProduct((p1 - p0) & ndVector::m_triplexMask).GetScalar();
+	//const ndFloat32 accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dist * invTimeStep * invTimeStep;
+	const ndFloat32 accel = GetMotorZeroAcceleration(desc) + dist * desc.m_invTimestep * desc.m_invTimestep;
 
 	//NewtonUserJointSetRowAcceleration(m_joint, accel);
 	SetMotorAcceleration(desc, accel);

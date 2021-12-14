@@ -38,17 +38,17 @@ class ndJointKinematicChain: public ndJointBilateralConstraint
 	ndMatrix m_baseFrame;
 	ndVector m_hipPivot;
 
-	dFloat32 m_angle;
-	dFloat32 m_minAngle;
-	dFloat32 m_maxAngle;
-	dFloat32 m_angularSpring;
-	dFloat32 m_angularDamper;
-	dFloat32 m_angularRegularizer;
+	ndFloat32 m_angle;
+	ndFloat32 m_minAngle;
+	ndFloat32 m_maxAngle;
+	ndFloat32 m_angularSpring;
+	ndFloat32 m_angularDamper;
+	ndFloat32 m_angularRegularizer;
 
-	dFloat32 m_maxDist;
-	dFloat32 m_linearSpring;
-	dFloat32 m_linearDamper;
-	dFloat32 m_linearRegularizer;
+	ndFloat32 m_maxDist;
+	ndFloat32 m_linearSpring;
+	ndFloat32 m_linearDamper;
+	ndFloat32 m_linearRegularizer;
 };
 
 

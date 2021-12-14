@@ -31,33 +31,33 @@ class ndShapeSphere: public ndShapeConvex
 {
 	public:
 	D_CLASS_REFLECTION(ndShapeSphere);
-	D_COLLISION_API ndShapeSphere(dFloat32 radius);
+	D_COLLISION_API ndShapeSphere(ndFloat32 radius);
 	D_COLLISION_API ndShapeSphere(const ndLoadSaveBase::dLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeSphere();
 
 	virtual ndShapeSphere* GetAsShapeSphere() { return this; }
 
 	protected:
-	D_COLLISION_API void Init(dFloat32 radius);
+	D_COLLISION_API void Init(ndFloat32 radius);
 	D_COLLISION_API virtual void MassProperties();
 
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
 	D_COLLISION_API virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
 	D_COLLISION_API virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
-	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir, dInt32* const vertexIndex) const;
-	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
-	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
+	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinThickness, ndInt32* const vertexIndex) const;
+	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	virtual dInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
+	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 
-	void TesselateTriangle(dInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, dInt32& count, ndVector* const ouput) const;
+	void TesselateTriangle(ndInt32 level, const ndVector& p0, const ndVector& p1, const ndVector& p2, ndInt32& count, ndVector* const ouput) const;
 
 	ndVector m_vertex[D_SPHERE_VERTEX_COUNT];
-	dFloat32 m_radius;
+	ndFloat32 m_radius;
 
-	static dInt32 m_shapeRefCount;
+	static ndInt32 m_shapeRefCount;
 	static ndVector m_unitSphere[];
 	static ndConvexSimplexEdge m_edgeArray[];
 

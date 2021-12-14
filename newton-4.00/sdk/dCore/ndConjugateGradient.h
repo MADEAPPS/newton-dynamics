@@ -36,7 +36,7 @@ template<class T>
 class ndDefaultMatrixOperator
 {
 	public:
-	ndDefaultMatrixOperator(dInt32 size, const T* const matrix, T* const preconditonerBuffer)
+	ndDefaultMatrixOperator(ndInt32 size, const T* const matrix, T* const preconditonerBuffer)
 		:m_matrix(matrix)
 		,m_preconditoner(preconditonerBuffer)
 		,m_size(size)
@@ -44,7 +44,7 @@ class ndDefaultMatrixOperator
 #ifdef D_USE_JACOBI_PRECONDITIONER
 		// use Jacobi preconditiner
 		const T* row = m_matrix;
-		for (dInt32 i = 0; i < size; i++)
+		for (ndInt32 i = 0; i < size; i++)
 		{
 			m_preconditoner[i] = T(1.0f) / row[i];
 			row += m_size;
@@ -55,24 +55,24 @@ class ndDefaultMatrixOperator
 		//memcpy(A, matrix, sizeof(A));
 		//
 		//dCholeskyFactorization(size, size, &A[0][0]);
-		//for (dInt32 i = 2; i < 6; i++)
+		//for (ndInt32 i = 2; i < 6; i++)
 		//{
-		//	for (dInt32 j = 0; j < i - 1; j++)
+		//	for (ndInt32 j = 0; j < i - 1; j++)
 		//	{
 		//		A[i][j] = 0.0f;
 		//	}
 		//}
 
-		//for (dInt32 i = 0; i < 6; i++)
+		//for (ndInt32 i = 0; i < 6; i++)
 		//{
-		//	for (dInt32 j = i + 2; j < 6; j++)
+		//	for (ndInt32 j = i + 2; j < 6; j++)
 		//	{
 		//		A[i][j] = 0.0f;
 		//		A[j][i] = 0.0f;
 		//	}
 		//}
 		//
-		//for (dInt32 i = 0; i < 5; i++)
+		//for (ndInt32 i = 0; i < 5; i++)
 		//{
 		//	T val = dAbs(A[i][i] * T(0.99f));
 		//	if (val < dAbs(A[i][i + 1]))
@@ -86,7 +86,7 @@ class ndDefaultMatrixOperator
 		//	}
 		//}
 		//
-		//for (dInt32 i = 1; i < 6; i++)
+		//for (ndInt32 i = 1; i < 6; i++)
 		//{
 		//	T val = dAbs(A[i][i] * T(0.99f));
 		//	if (val < dAbs(A[i][i - 1]))
@@ -105,7 +105,7 @@ class ndDefaultMatrixOperator
 	void PreconditionerSolve(const T* const input, T* const output)
 	{
 #ifdef D_USE_JACOBI_PRECONDITIONER
-		for (dInt32 i = 0; i < m_size; i++)
+		for (ndInt32 i = 0; i < m_size; i++)
 		{
 			output[i] = input[i] * m_preconditoner[i];
 		}
@@ -120,7 +120,7 @@ class ndDefaultMatrixOperator
 
 	const T* m_matrix;
 	T* m_preconditoner;
-	dInt32 m_size;
+	ndInt32 m_size;
 
 	T A[6][6];
 };
@@ -134,10 +134,10 @@ class ndConjugateGradient : public ndClassAlloc
 	~ndConjugateGradient();
 
 	void SetBuffers(T* const r0, T* const z0, T* const p0, T* const q0);
-	T Solve(dInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer);
+	T Solve(ndInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer);
 
 	private:
-	T SolveInternal(dInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer) const;
+	T SolveInternal(ndInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer) const;
 
 	T* m_r0;
 	T* m_z0;
@@ -172,7 +172,7 @@ void ndConjugateGradient<T, ndMatrixOperator>::SetBuffers(T* const r0, T* const 
 }
 
 template<class T, class ndMatrixOperator>
-T ndConjugateGradient<T, ndMatrixOperator>::Solve(dInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer)
+T ndConjugateGradient<T, ndMatrixOperator>::Solve(ndInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer)
 {
 	if (m_r0) 
 	{
@@ -192,7 +192,7 @@ T ndConjugateGradient<T, ndMatrixOperator>::Solve(dInt32 size, T tolerance, T* c
 }
 
 template<class T, class ndMatrixOperator>
-T ndConjugateGradient<T, ndMatrixOperator>::SolveInternal(dInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer) const
+T ndConjugateGradient<T, ndMatrixOperator>::SolveInternal(ndInt32 size, T tolerance, T* const x, const T* const b, const T* const matrix, T* const preconditionerBuffer) const
 {
 	ndMatrixOperator matrixOper(size, matrix, preconditionerBuffer);
 
@@ -200,10 +200,10 @@ T ndConjugateGradient<T, ndMatrixOperator>::SolveInternal(dInt32 size, T toleran
 	dSub(size, m_r0, b, m_z0);
 	matrixOper.PreconditionerSolve(m_r0, m_p0);
 	
-	dInt32 iter = 0;
+	ndInt32 iter = 0;
 	T num = dDotProduct(size, m_r0, m_p0);
 	T error2 = num;
-	for (dInt32 j = 0; (j < size) && (error2 > tolerance); j++) 
+	for (ndInt32 j = 0; (j < size) && (error2 > tolerance); j++) 
 	{
 		matrixOper.MatrixTimeVector(m_p0, m_z0);
 		T den = dDotProduct(size, m_p0, m_z0);

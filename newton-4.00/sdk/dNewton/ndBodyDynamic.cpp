@@ -36,7 +36,7 @@ ndBodyDynamic::ndBodyDynamic()
 	,m_savedExternalTorque(ndVector::m_zero)
 	,m_dampCoef(ndVector::m_zero)
 	,m_cachedDampCoef(ndVector::m_zero)
-	,m_cachedTimeStep(dFloat32 (0.0f))
+	,m_cachedTimeStep(ndFloat32 (0.0f))
 {
 	m_isDynamics = 1;
 }
@@ -51,7 +51,7 @@ ndBodyDynamic::ndBodyDynamic(const ndLoadSaveBase::dLoadDescriptor& desc)
 	,m_savedExternalTorque(ndVector::m_zero)
 	,m_dampCoef(ndVector::m_zero)
 	,m_cachedDampCoef(ndVector::m_zero)
-	,m_cachedTimeStep(dFloat32(0.0f))
+	,m_cachedTimeStep(ndFloat32(0.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
@@ -78,7 +78,7 @@ void ndBodyDynamic::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 void ndBodyDynamic::SetForce(const ndVector& force)
 {
 	m_externalForce = force & ndVector::m_triplexMask;
-	if (m_invMass.m_w == dFloat32(0.0f))
+	if (m_invMass.m_w == ndFloat32(0.0f))
 	{
 		m_externalForce = ndVector::m_zero;
 	}
@@ -86,8 +86,8 @@ void ndBodyDynamic::SetForce(const ndVector& force)
 	if (m_equilibrium)
 	{
 		ndVector deltaAccel((m_externalForce - m_savedExternalForce).Scale(m_invMass.m_w));
-		dAssert(deltaAccel.m_w == dFloat32(0.0f));
-		dFloat32 deltaAccel2 = deltaAccel.DotProduct(deltaAccel).GetScalar();
+		dAssert(deltaAccel.m_w == ndFloat32(0.0f));
+		ndFloat32 deltaAccel2 = deltaAccel.DotProduct(deltaAccel).GetScalar();
 		m_equilibrium = (deltaAccel2 < D_ERR_TOLERANCE2);
 	}
 }
@@ -95,7 +95,7 @@ void ndBodyDynamic::SetForce(const ndVector& force)
 void ndBodyDynamic::SetTorque(const ndVector& torque)
 {
 	m_externalTorque = torque & ndVector::m_triplexMask;
-	if (m_invMass.m_w == dFloat32(0.0f))
+	if (m_invMass.m_w == ndFloat32(0.0f))
 	{
 		m_externalTorque = ndVector::m_zero;
 	}
@@ -103,21 +103,21 @@ void ndBodyDynamic::SetTorque(const ndVector& torque)
 	if (m_equilibrium)
 	{
 		ndVector deltaAlpha(m_matrix.UnrotateVector(m_externalTorque - m_savedExternalTorque) * m_invMass);
-		dAssert(deltaAlpha.m_w == dFloat32(0.0f));
-		dFloat32 deltaAlpha2 = deltaAlpha.DotProduct(deltaAlpha).GetScalar();
+		dAssert(deltaAlpha.m_w == ndFloat32(0.0f));
+		ndFloat32 deltaAlpha2 = deltaAlpha.DotProduct(deltaAlpha).GetScalar();
 		m_equilibrium = (deltaAlpha2 < D_ERR_TOLERANCE2);
 	}
 }
 
-void ndBodyDynamic::ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep)
+void ndBodyDynamic::ApplyExternalForces(ndInt32 threadIndex, ndFloat32 timestep)
 {
 	m_externalForce = ndVector::m_zero;
 	m_externalTorque = ndVector::m_zero;
 	if (m_notifyCallback)
 	{
 		m_notifyCallback->OnApplyExternalForce(threadIndex, timestep);
-		dAssert(m_externalForce.m_w == dFloat32(0.0f));
-		dAssert(m_externalTorque.m_w == dFloat32(0.0f));
+		dAssert(m_externalForce.m_w == ndFloat32(0.0f));
+		dAssert(m_externalTorque.m_w == ndFloat32(0.0f));
 	}
 
 	m_externalForce += m_impulseForce;
@@ -126,7 +126,7 @@ void ndBodyDynamic::ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep)
 	m_impulseTorque = ndVector::m_zero;
 }
 
-void ndBodyDynamic::AddImpulse(const ndVector& pointDeltaVeloc, const ndVector& pointPosit, dFloat32 timestep)
+void ndBodyDynamic::AddImpulse(const ndVector& pointDeltaVeloc, const ndVector& pointPosit, ndFloat32 timestep)
 {
 	ndMatrix invInertia(CalculateInvInertiaMatrix());
 
@@ -134,32 +134,32 @@ void ndBodyDynamic::AddImpulse(const ndVector& pointDeltaVeloc, const ndVector& 
 	ndMatrix tmp;
 	ndVector globalContact(pointPosit - m_globalCentreOfMass);
 
-	tmp[0][0] = dFloat32(0.0f);
+	tmp[0][0] = ndFloat32(0.0f);
 	tmp[0][1] = +globalContact[2];
 	tmp[0][2] = -globalContact[1];
-	tmp[0][3] = dFloat32(0.0f);
+	tmp[0][3] = ndFloat32(0.0f);
 
 	tmp[1][0] = -globalContact[2];
-	tmp[1][1] = dFloat32(0.0f);
+	tmp[1][1] = ndFloat32(0.0f);
 	tmp[1][2] = +globalContact[0];
-	tmp[1][3] = dFloat32(0.0f);
+	tmp[1][3] = ndFloat32(0.0f);
 
 	tmp[2][0] = +globalContact[1];
 	tmp[2][1] = -globalContact[0];
-	tmp[2][2] = dFloat32(0.0f);
-	tmp[2][3] = dFloat32(0.0f);
+	tmp[2][2] = ndFloat32(0.0f);
+	tmp[2][3] = ndFloat32(0.0f);
 
-	tmp[3][0] = dFloat32(0.0f);
-	tmp[3][1] = dFloat32(0.0f);
-	tmp[3][2] = dFloat32(0.0f);
-	tmp[3][3] = dFloat32(1.0f);
+	tmp[3][0] = ndFloat32(0.0f);
+	tmp[3][1] = ndFloat32(0.0f);
+	tmp[3][2] = ndFloat32(0.0f);
+	tmp[3][3] = ndFloat32(1.0f);
 
 	ndMatrix contactMatrix(tmp * invInertia * tmp);
-	//for (dInt32 i = 0; i < 3; i++) 
+	//for (ndInt32 i = 0; i < 3; i++) 
 	//{
-	//	for (dInt32 j = 0; j < 3; j++) 
+	//	for (ndInt32 j = 0; j < 3; j++) 
 	//	{
-	//		contactMatrix[i][j] *= -dFloat32(1.0f);
+	//		contactMatrix[i][j] *= -ndFloat32(1.0f);
 	//	}
 	//}
 	contactMatrix[0] = contactMatrix[0] * ndVector::m_negOne;
@@ -174,7 +174,7 @@ void ndBodyDynamic::AddImpulse(const ndVector& pointDeltaVeloc, const ndVector& 
 	// change of momentum
 	ndVector changeOfMomentum(contactMatrix.RotateVector(pointDeltaVeloc));
 
-	if (changeOfMomentum.DotProduct(changeOfMomentum).GetScalar() > dFloat32(1.0e-6f))
+	if (changeOfMomentum.DotProduct(changeOfMomentum).GetScalar() > ndFloat32(1.0e-6f))
 	{
 		m_impulseForce += changeOfMomentum.Scale(1.0f / timestep);
 		m_impulseTorque += globalContact.CrossProduct(m_impulseForce);
@@ -184,12 +184,12 @@ void ndBodyDynamic::AddImpulse(const ndVector& pointDeltaVeloc, const ndVector& 
 	}
 }
 
-void ndBodyDynamic::ApplyImpulsePair(const ndVector& linearImpulse, const ndVector& angularImpulse, dFloat32 timestep)
+void ndBodyDynamic::ApplyImpulsePair(const ndVector& linearImpulse, const ndVector& angularImpulse, ndFloat32 timestep)
 {
-	dAssert(linearImpulse.m_w == dFloat32(0.0f));
-	dAssert(angularImpulse.m_w == dFloat32(0.0f));
-	if ((linearImpulse.DotProduct(linearImpulse).GetScalar() > dFloat32(1.0e-6f)) ||
-		(angularImpulse.DotProduct(angularImpulse).GetScalar() > dFloat32(1.0e-6f))) 
+	dAssert(linearImpulse.m_w == ndFloat32(0.0f));
+	dAssert(angularImpulse.m_w == ndFloat32(0.0f));
+	if ((linearImpulse.DotProduct(linearImpulse).GetScalar() > ndFloat32(1.0e-6f)) ||
+		(angularImpulse.DotProduct(angularImpulse).GetScalar() > ndFloat32(1.0e-6f))) 
 	{
 		m_impulseForce += linearImpulse.Scale(1.0f / timestep);
 		m_impulseTorque += angularImpulse.Scale(1.0f / timestep);
@@ -198,13 +198,13 @@ void ndBodyDynamic::ApplyImpulsePair(const ndVector& linearImpulse, const ndVect
 	}
 }
 
-void ndBodyDynamic::ApplyImpulsesAtPoint(dInt32 count, const ndVector* const impulseArray, const ndVector* const pointArray, dFloat32 timestep)
+void ndBodyDynamic::ApplyImpulsesAtPoint(ndInt32 count, const ndVector* const impulseArray, const ndVector* const pointArray, ndFloat32 timestep)
 {
 	ndVector impulse(ndVector::m_zero);
 	ndVector angularImpulse(ndVector::m_zero);
 
 	ndVector com(m_globalCentreOfMass);
-	for (dInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; i++) 
 	{
 		ndVector r(pointArray[i]);
 		ndVector L(impulseArray[i]);
@@ -217,8 +217,8 @@ void ndBodyDynamic::ApplyImpulsesAtPoint(dInt32 count, const ndVector* const imp
 	impulse = impulse & ndVector::m_triplexMask;
 	angularImpulse = angularImpulse & ndVector::m_triplexMask;
 
-	if ((impulse.DotProduct(impulse).GetScalar() > dFloat32(1.0e-6f)) ||
-		(angularImpulse.DotProduct(angularImpulse).GetScalar() > dFloat32(1.0e-6f))) 
+	if ((impulse.DotProduct(impulse).GetScalar() > ndFloat32(1.0e-6f)) ||
+		(angularImpulse.DotProduct(angularImpulse).GetScalar() > ndFloat32(1.0e-6f))) 
 	{
 		m_impulseForce += impulse.Scale(1.0f / timestep);
 		m_impulseTorque += angularImpulse.Scale(1.0f / timestep);
@@ -227,14 +227,14 @@ void ndBodyDynamic::ApplyImpulsesAtPoint(dInt32 count, const ndVector* const imp
 	}
 }
 
-void ndBodyDynamic::SetLinearDamping(dFloat32 linearDamp)
+void ndBodyDynamic::SetLinearDamping(ndFloat32 linearDamp)
 {
-	linearDamp = dClamp(linearDamp, dFloat32(0.0f), dFloat32(1.0f));
+	linearDamp = dClamp(linearDamp, ndFloat32(0.0f), ndFloat32(1.0f));
 	m_dampCoef.m_w = D_MAX_SPEED_ATT * linearDamp;
-	m_cachedTimeStep = dFloat32(0.0f);
+	m_cachedTimeStep = ndFloat32(0.0f);
 }
 
-dFloat32 ndBodyDynamic::GetLinearDamping() const
+ndFloat32 ndBodyDynamic::GetLinearDamping() const
 {
 	return m_dampCoef.m_w / D_MAX_SPEED_ATT;
 }
@@ -243,36 +243,36 @@ ndVector ndBodyDynamic::GetAngularDamping() const
 {
 	return ndVector(m_dampCoef.m_x / D_MAX_SPEED_ATT,
 				   m_dampCoef.m_y / D_MAX_SPEED_ATT,
-				   m_dampCoef.m_z / D_MAX_SPEED_ATT, dFloat32(0.0f));
+				   m_dampCoef.m_z / D_MAX_SPEED_ATT, ndFloat32(0.0f));
 }
 
 
 void ndBodyDynamic::SetAngularDamping(const ndVector& angularDamp)
 {
-	dFloat32 tmp = dClamp(angularDamp.m_x, dFloat32(0.0f), dFloat32(1.0f));
+	ndFloat32 tmp = dClamp(angularDamp.m_x, ndFloat32(0.0f), ndFloat32(1.0f));
 	m_dampCoef.m_x = D_MAX_SPEED_ATT * tmp;
 
-	tmp = dClamp(angularDamp.m_y, dFloat32(0.0f), dFloat32(1.0f));
+	tmp = dClamp(angularDamp.m_y, ndFloat32(0.0f), ndFloat32(1.0f));
 	m_dampCoef.m_y = D_MAX_SPEED_ATT * tmp;
 
-	tmp = dClamp(angularDamp.m_z, dFloat32(0.0f), dFloat32(1.0f));
+	tmp = dClamp(angularDamp.m_z, ndFloat32(0.0f), ndFloat32(1.0f));
 	m_dampCoef.m_z = D_MAX_SPEED_ATT * tmp;
 
-	m_cachedTimeStep = dFloat32(0.0f);
+	m_cachedTimeStep = ndFloat32(0.0f);
 }
 
-void ndBodyDynamic::AddDampingAcceleration(dFloat32 timestep)
+void ndBodyDynamic::AddDampingAcceleration(ndFloat32 timestep)
 {
-	if (dAbs(m_cachedTimeStep - timestep) > dFloat32(1.0e-6f)) 
+	if (dAbs(m_cachedTimeStep - timestep) > ndFloat32(1.0e-6f)) 
 	{
 		m_cachedTimeStep = timestep;
 		// assume a nominal 60 frame seconds time step.
-		dFloat32 tau = dFloat32(60.0f) * timestep;
+		ndFloat32 tau = ndFloat32(60.0f) * timestep;
 		// recalculate damping to match the time independent drag
-		m_cachedDampCoef.m_x = dPow(dFloat32(1.0f) - m_dampCoef.m_x, tau);
-		m_cachedDampCoef.m_y = dPow(dFloat32(1.0f) - m_dampCoef.m_y, tau);
-		m_cachedDampCoef.m_z = dPow(dFloat32(1.0f) - m_dampCoef.m_z, tau);
-		m_cachedDampCoef.m_w = dPow(dFloat32(1.0f) - m_dampCoef.m_w, tau);
+		m_cachedDampCoef.m_x = ndPow(ndFloat32(1.0f) - m_dampCoef.m_x, tau);
+		m_cachedDampCoef.m_y = ndPow(ndFloat32(1.0f) - m_dampCoef.m_y, tau);
+		m_cachedDampCoef.m_z = ndPow(ndFloat32(1.0f) - m_dampCoef.m_z, tau);
+		m_cachedDampCoef.m_w = ndPow(ndFloat32(1.0f) - m_dampCoef.m_w, tau);
 	}
 
 	const ndVector omegaDamp(m_cachedDampCoef & ndVector::m_triplexMask);
@@ -281,7 +281,7 @@ void ndBodyDynamic::AddDampingAcceleration(dFloat32 timestep)
 	m_veloc = m_veloc.Scale(m_cachedDampCoef.m_w);
 }
 
-void ndBodyDynamic::IntegrateVelocity(dFloat32 timestep)
+void ndBodyDynamic::IntegrateVelocity(ndFloat32 timestep)
 {
 	ndBodyKinematic::IntegrateVelocity(timestep);
 	SaveExternalForces();
@@ -297,9 +297,9 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const ndVector& force, const nd
 	// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
 	const ndVector dw(localOmega * timestep);
 	const ndMatrix jacobianMatrix(
-		ndVector(m_mass.m_x, (m_mass.m_z - m_mass.m_y) * dw.m_z, (m_mass.m_z - m_mass.m_y) * dw.m_y, dFloat32(0.0f)),
-		ndVector((m_mass.m_x - m_mass.m_z) * dw.m_z, m_mass.m_y, (m_mass.m_x - m_mass.m_z) * dw.m_x, dFloat32(0.0f)),
-		ndVector((m_mass.m_y - m_mass.m_x) * dw.m_y, (m_mass.m_y - m_mass.m_x) * dw.m_x, m_mass.m_z, dFloat32(0.0f)),
+		ndVector(m_mass.m_x, (m_mass.m_z - m_mass.m_y) * dw.m_z, (m_mass.m_z - m_mass.m_y) * dw.m_y, ndFloat32(0.0f)),
+		ndVector((m_mass.m_x - m_mass.m_z) * dw.m_z, m_mass.m_y, (m_mass.m_x - m_mass.m_z) * dw.m_x, ndFloat32(0.0f)),
+		ndVector((m_mass.m_y - m_mass.m_x) * dw.m_y, (m_mass.m_y - m_mass.m_x) * dw.m_x, m_mass.m_z, ndFloat32(0.0f)),
 		ndVector::m_wOne);
 	
 	// and solving for alpha we get the angular acceleration at t + dt
@@ -313,17 +313,17 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const ndVector& force, const nd
 
 void ndBodyDynamic::IntegrateGyroSubstep(const ndVector& timestep)
 {
-	const dFloat32 omegaMag2 = m_omega.DotProduct(m_omega).GetScalar() + dFloat32(1.0e-12f);
-	const dFloat32 tol = (dFloat32(0.0125f) * dDegreeToRad);
+	const ndFloat32 omegaMag2 = m_omega.DotProduct(m_omega).GetScalar() + ndFloat32(1.0e-12f);
+	const ndFloat32 tol = (ndFloat32(0.0125f) * ndDegreeToRad);
 	if (omegaMag2 > (tol * tol))
 	{
 		// calculate new matrix
-		const dFloat32 invOmegaMag = dRsqrt(omegaMag2);
+		const ndFloat32 invOmegaMag = ndRsqrt(omegaMag2);
 		const ndVector omegaAxis(m_omega.Scale(invOmegaMag));
-		dFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep.GetScalar();
+		ndFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep.GetScalar();
 		const ndQuaternion rotationStep(omegaAxis, omegaAngle);
 		m_gyroRotation = m_gyroRotation * rotationStep;
-		dAssert((m_gyroRotation.DotProduct(m_gyroRotation).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-5f));
+		dAssert((m_gyroRotation.DotProduct(m_gyroRotation).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-5f));
 		
 		// calculate new Gyro torque and Gyro acceleration
 		const ndMatrix matrix(m_gyroRotation, ndVector::m_wOne);

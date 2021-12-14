@@ -34,22 +34,22 @@ class dJointDefinition
 
 	struct dJointLimit
 	{
-		dFloat32 m_minTwistAngle;
-		dFloat32 m_maxTwistAngle;
-		dFloat32 m_coneAngle;
+		ndFloat32 m_minTwistAngle;
+		ndFloat32 m_maxTwistAngle;
+		ndFloat32 m_coneAngle;
 	};
 
 	struct dFrameMatrix
 	{
-		dFloat32 m_pitch;
-		dFloat32 m_yaw;
-		dFloat32 m_roll;
+		ndFloat32 m_pitch;
+		ndFloat32 m_yaw;
+		ndFloat32 m_roll;
 	};
 
 	char m_boneName[32];
-	dInt32 m_type;
-	dInt32 m_typeMask;
-	dFloat32 m_friction;
+	ndInt32 m_type;
+	ndInt32 m_typeMask;
+	ndFloat32 m_friction;
 	dJointLimit m_jointLimits;
 	dFrameMatrix m_frameBasics;
 };
@@ -68,7 +68,7 @@ class ndRagdollEntityNotify : public ndDemoEntityNotify
 		}
 	}
 
-	void OnTransform(dInt32 thread, const ndMatrix& matrix)
+	void OnTransform(ndInt32 thread, const ndMatrix& matrix)
 	{
 		if (!m_parentBody)
 		{
@@ -83,7 +83,7 @@ class ndRagdollEntityNotify : public ndDemoEntityNotify
 		}
 	}
 
-	void OnApplyExternalForce(dInt32 thread, dFloat32 timestep)
+	void OnApplyExternalForce(ndInt32 thread, ndFloat32 timestep)
 	{
 		ndDemoEntityNotify::OnApplyExternalForce(thread, timestep);
 		// remember to check and clamp huge angular velocities
@@ -139,7 +139,7 @@ class ndRagdollModel : public ndCharacter
 		ndBodyDynamic* const rootBody = CreateBodyPart(scene, rootEntity, nullptr);
 		ndCharacterRootNode* const rootNode = CreateRoot(rootBody);
 
-		dInt32 stack = 0;
+		ndInt32 stack = 0;
 		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
 		
 		ndDemoEntity* childEntities[32];
@@ -151,7 +151,7 @@ class ndRagdollModel : public ndCharacter
 			stack++;
 		}
 		
-		dInt32 bodyCount = 1;
+		ndInt32 bodyCount = 1;
 		ndBodyDynamic* bodyArray[1024];
 		bodyArray[0] = rootBody;
 		
@@ -163,7 +163,7 @@ class ndRagdollModel : public ndCharacter
 			ndDemoEntity* const childEntity = childEntities[stack];
 			const char* const name = childEntity->GetName().GetStr();
 			//dTrace(("name: %s\n", name));
-			for (dInt32 i = 0; i < definitionCount; i++) 
+			for (ndInt32 i = 0; i < definitionCount; i++) 
 			{
 				if (!strcmp(jointsDefinition[i].m_boneName, name)) 
 				{
@@ -187,7 +187,7 @@ class ndRagdollModel : public ndCharacter
 		
 		SetModelMass(100.0f, bodyCount, bodyArray);
 		
-		for (dInt32 i = 0; i < bodyCount; i++)
+		for (ndInt32 i = 0; i < bodyCount; i++)
 		{
 			ndDemoEntity* ent = (ndDemoEntity*)bodyArray[i]->GetNotifyCallback()->GetUserData();
 			if (ent->GetName() == "mixamorig:Neck") 
@@ -198,19 +198,19 @@ class ndRagdollModel : public ndCharacter
 		}
 	}
 
-	void SetModelMass(dFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray) const
+	void SetModelMass(ndFloat32 mass, int bodyCount, ndBodyDynamic** const bodyArray) const
 	{
-		dFloat32 volume = 0.0f;
+		ndFloat32 volume = 0.0f;
 		for (int i = 0; i < bodyCount; i++) 
 		{
 			volume += bodyArray[i]->GetCollisionShape().GetVolume();
 		}
-		dFloat32 density = mass / volume;
+		ndFloat32 density = mass / volume;
 
 		for (int i = 0; i < bodyCount; i++) 
 		{
 			ndBodyDynamic* const body = bodyArray[i];
-			dFloat32 scale = density * body->GetCollisionShape().GetVolume();
+			ndFloat32 scale = density * body->GetCollisionShape().GetVolume();
 			ndVector inertia(body->GetMassMatrix().Scale (scale));
 			body->SetMassMatrix(inertia);
 		}
@@ -238,30 +238,30 @@ class ndRagdollModel : public ndCharacter
 	{
 		ndMatrix matrix(childBody->GetMatrix());
 		dJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
-		ndMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad) * matrix);
+		ndMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * dYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * dRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
 
 		ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentBone);
 		ndJointPdActuator* const joint = (ndJointPdActuator*)jointNode->GetJoint();
 		
 		dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-		joint->SetConeLimit(jointLimits.m_coneAngle * dDegreeToRad);
-		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
+		joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
+		joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
 		joint->SetConeAngleSpringDamperRegularizer(0.0f, definition.m_friction, 0.005f);
 
 		return jointNode;
 	}
 
-	void Update(ndWorld* const, dFloat32) 
+	void Update(ndWorld* const, ndFloat32) 
 	{
 	}
 
-	//void PostUpdate(ndWorld* const world, dFloat32)
-	void PostUpdate(ndWorld* const, dFloat32)
+	//void PostUpdate(ndWorld* const world, ndFloat32)
+	void PostUpdate(ndWorld* const, ndFloat32)
 	{
 	}
 
-	//void PostTransformUpdate(ndWorld* const world, dFloat32 timestep)
-	void PostTransformUpdate(ndWorld* const, dFloat32)
+	//void PostTransformUpdate(ndWorld* const world, ndFloat32 timestep)
+	void PostTransformUpdate(ndWorld* const, ndFloat32)
 	{
 	}
 };

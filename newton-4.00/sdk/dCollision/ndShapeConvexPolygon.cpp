@@ -27,8 +27,8 @@
 #include "ndBodyKinematic.h"
 #include "ndShapeConvexPolygon.h"
 
-//#define D_CONVEX_POLYGON_SKIRT_LENGTH dFloat32 (0.025f)
-#define D_CONVEX_POLYGON_SKIRT_LENGTH dFloat32 (0.25f)
+//#define D_CONVEX_POLYGON_SKIRT_LENGTH ndFloat32 (0.025f)
+#define D_CONVEX_POLYGON_SKIRT_LENGTH ndFloat32 (0.25f)
 
 ndShapeConvexPolygon::ndShapeConvexPolygon ()
 	:ndShapeConvex(m_polygonCollision)
@@ -47,58 +47,58 @@ ndShapeConvexPolygon::~ndShapeConvexPolygon ()
 {
 }
 
-dInt32 ndShapeConvexPolygon::Release() const
+ndInt32 ndShapeConvexPolygon::Release() const
 {
-	dInt32 count = m_refCount.fetch_add(-1);
+	ndInt32 count = m_refCount.fetch_add(-1);
 	return count;
 }
 
-dInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normalIn, const ndVector& origin, ndVector* const contactsOut) const
+ndInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normalIn, const ndVector& origin, ndVector* const contactsOut) const
 {
-	dAssert (normalIn.m_w == dFloat32 (0.0f));
+	dAssert (normalIn.m_w == ndFloat32 (0.0f));
 	ndVector normal(normalIn);
-	dInt32 count = 0;
-	dFloat32 maxDist = dFloat32 (1.0f);
-	dFloat32 projectFactor = m_normal.DotProduct(normal).GetScalar();
-	if (projectFactor < dFloat32 (0.0f)) 
+	ndInt32 count = 0;
+	ndFloat32 maxDist = ndFloat32 (1.0f);
+	ndFloat32 projectFactor = m_normal.DotProduct(normal).GetScalar();
+	if (projectFactor < ndFloat32 (0.0f)) 
 	{
-		projectFactor *= dFloat32 (-1.0f);
+		projectFactor *= ndFloat32 (-1.0f);
 		normal = normal * ndVector::m_negOne;
 	}
 
-	if (projectFactor > dFloat32 (0.9999f)) 
+	if (projectFactor > ndFloat32 (0.9999f)) 
 	{
-		for (dInt32 i = 0; i < m_count; i ++) 
+		for (ndInt32 i = 0; i < m_count; i ++) 
 		{
 			contactsOut[count] = m_localPoly[i];
 			count ++;
 		}
 
 		#ifdef _DEBUG
-			dInt32 j = count - 1;
-			for (dInt32 i = 0; i < count; i ++) 
+			ndInt32 j = count - 1;
+			for (ndInt32 i = 0; i < count; i ++) 
 			{
 				ndVector error (contactsOut[i] - contactsOut[j]);
-				dAssert (error.m_w == dFloat32 (0.0f));
-				dAssert (error.DotProduct(error).GetScalar() > dFloat32 (1.0e-20f));
+				dAssert (error.m_w == ndFloat32 (0.0f));
+				dAssert (error.DotProduct(error).GetScalar() > ndFloat32 (1.0e-20f));
 				j = i;
 			}
 		#endif
 
 	} 
-	else if (projectFactor > dFloat32 (0.1736f)) 
+	else if (projectFactor > ndFloat32 (0.1736f)) 
 	{
-		maxDist = dFloat32 (0.0f);
+		maxDist = ndFloat32 (0.0f);
 		ndPlane plane (normal, - normal.DotProduct(origin).GetScalar());
 
 		ndVector p0 (m_localPoly[m_count - 1]);
-		dFloat32 side0 = plane.Evalue (p0);
-		for (dInt32 i = 0; i < m_count; i ++) 
+		ndFloat32 side0 = plane.Evalue (p0);
+		for (ndInt32 i = 0; i < m_count; i ++) 
 		{
 			ndVector p1 (m_localPoly[i]);
-			dFloat32 side1 = plane.Evalue (p1);
+			ndFloat32 side1 = plane.Evalue (p1);
 
-			if (side0 > dFloat32 (0.0f)) 
+			if (side0 > ndFloat32 (0.0f)) 
 			{
 				maxDist = dMax (maxDist, side0);
 				contactsOut[count] = p0 - normal.Scale (side0);
@@ -106,53 +106,53 @@ dInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normalI
 				if (count > 1) 
 				{
 					ndVector edgeSegment (contactsOut[count - 1] - contactsOut[count - 2]);
-					dAssert (edgeSegment.m_w == dFloat32 (0.0f));
-					dFloat32 error = edgeSegment.DotProduct(edgeSegment).GetScalar();
-					if (error < dFloat32 (1.0e-8f)) {
+					dAssert (edgeSegment.m_w == ndFloat32 (0.0f));
+					ndFloat32 error = edgeSegment.DotProduct(edgeSegment).GetScalar();
+					if (error < ndFloat32 (1.0e-8f)) {
 						count --;
 					}
 				}
 
-				if (side1 <= dFloat32 (0.0f)) 
+				if (side1 <= ndFloat32 (0.0f)) 
 				{
 					ndVector dp (p1 - p0);
-					dFloat32 t = normal.DotProduct(dp).GetScalar();
-					dAssert (dAbs (t) >= dFloat32 (0.0f));
-					if (dAbs (t) < dFloat32 (1.0e-8f)) 
+					ndFloat32 t = normal.DotProduct(dp).GetScalar();
+					dAssert (dAbs (t) >= ndFloat32 (0.0f));
+					if (dAbs (t) < ndFloat32 (1.0e-8f)) 
 					{
-						t = dSign(t) * dFloat32 (1.0e-8f);	
+						t = dSign(t) * ndFloat32 (1.0e-8f);	
 					}
 					contactsOut[count] = p0 - dp.Scale (side0 / t);
 					count ++;
 					if (count > 1) 
 					{
 						ndVector edgeSegment (contactsOut[count - 1] - contactsOut[count - 2]);
-						dAssert (edgeSegment.m_w == dFloat32 (0.0f));
-						dFloat32 error = edgeSegment.DotProduct(edgeSegment).GetScalar();
-						if (error < dFloat32 (1.0e-8f)) 
+						dAssert (edgeSegment.m_w == ndFloat32 (0.0f));
+						ndFloat32 error = edgeSegment.DotProduct(edgeSegment).GetScalar();
+						if (error < ndFloat32 (1.0e-8f)) 
 						{
 							count --;
 						}
 					}
 				} 
 			} 
-			else if (side1 > dFloat32 (0.0f)) 
+			else if (side1 > ndFloat32 (0.0f)) 
 			{
 				ndVector dp (p1 - p0);
-				dFloat32 t = normal.DotProduct(dp).GetScalar();
-				dAssert (dAbs (t) >= dFloat32 (0.0f));
-				if (dAbs (t) < dFloat32 (1.0e-8f)) 
+				ndFloat32 t = normal.DotProduct(dp).GetScalar();
+				dAssert (dAbs (t) >= ndFloat32 (0.0f));
+				if (dAbs (t) < ndFloat32 (1.0e-8f)) 
 				{
-					t = dSign(t) * dFloat32 (1.0e-8f);	
+					t = dSign(t) * ndFloat32 (1.0e-8f);	
 				}
 				contactsOut[count] = p0 - dp.Scale (side0 / t);
 				count ++;
 				if (count > 1) 
 				{
 					ndVector edgeSegment (contactsOut[count - 1] - contactsOut[count - 2]);
-					dAssert (edgeSegment.m_w == dFloat32 (0.0f));
-					dFloat32 error = edgeSegment.DotProduct(edgeSegment).GetScalar();
-					if (error < dFloat32 (1.0e-8f)) 
+					dAssert (edgeSegment.m_w == ndFloat32 (0.0f));
+					ndFloat32 error = edgeSegment.DotProduct(edgeSegment).GetScalar();
+					if (error < ndFloat32 (1.0e-8f)) 
 					{
 						count --;
 					}
@@ -165,33 +165,33 @@ dInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normalI
 	} 
 	else 
 	{
-		maxDist = dFloat32 (1.0e10f);
+		maxDist = ndFloat32 (1.0e10f);
 		ndPlane plane (normal, - normal.DotProduct(origin).GetScalar());
 
 		ndVector p0 (m_localPoly[m_count - 1]);
-		dFloat32 side0 = plane.Evalue (p0);
-		for (dInt32 i = 0; i < m_count; i ++) 
+		ndFloat32 side0 = plane.Evalue (p0);
+		for (ndInt32 i = 0; i < m_count; i ++) 
 		{
 			ndVector p1 (m_localPoly[i]);
-			dFloat32 side1 = plane.Evalue (p1);
+			ndFloat32 side1 = plane.Evalue (p1);
 
-			if ((side0 * side1) < dFloat32 (0.0f)) 
+			if ((side0 * side1) < ndFloat32 (0.0f)) 
 			{
 				ndVector dp (p1 - p0);
-				dFloat32 t = normal.DotProduct(dp).GetScalar();
-				dAssert (dAbs (t) >= dFloat32 (0.0f));
-				if (dAbs (t) < dFloat32 (1.0e-8f)) 
+				ndFloat32 t = normal.DotProduct(dp).GetScalar();
+				dAssert (dAbs (t) >= ndFloat32 (0.0f));
+				if (dAbs (t) < ndFloat32 (1.0e-8f)) 
 				{
-					t = dSign(t) * dFloat32 (1.0e-8f);	
+					t = dSign(t) * ndFloat32 (1.0e-8f);	
 				}
 				contactsOut[count] = p0 - dp.Scale (side0 / t);
 				count ++;
 				if (count > 1) 
 				{
 					ndVector edgeSegment (contactsOut[count - 1] - contactsOut[count - 2]);
-					dAssert (edgeSegment.m_w == dFloat32 (0.0f));
-					dFloat32 error = edgeSegment.DotProduct(edgeSegment).GetScalar();
-					if (error < dFloat32 (1.0e-8f)) 
+					dAssert (edgeSegment.m_w == ndFloat32 (0.0f));
+					ndFloat32 error = edgeSegment.DotProduct(edgeSegment).GetScalar();
+					if (error < ndFloat32 (1.0e-8f)) 
 					{
 						count --;
 					}
@@ -204,17 +204,17 @@ dInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normalI
 
 	if (count > 1) 
 	{
-		if (maxDist < dFloat32 (1.0e-3f)) 
+		if (maxDist < ndFloat32 (1.0e-3f)) 
 		{
 			ndVector maxPoint (contactsOut[0]);
 			ndVector minPoint (contactsOut[0]);
 			ndVector lineDir (m_normal.CrossProduct(normal));
 
-			dAssert (lineDir.m_w == dFloat32 (0.0f));
-			dFloat32 proj = contactsOut[0].DotProduct(lineDir).GetScalar();
-			dFloat32 maxProjection = proj;
-			dFloat32 minProjection = proj;
-			for (dInt32 i = 1; i < count; i ++) 
+			dAssert (lineDir.m_w == ndFloat32 (0.0f));
+			ndFloat32 proj = contactsOut[0].DotProduct(lineDir).GetScalar();
+			ndFloat32 maxProjection = proj;
+			ndFloat32 minProjection = proj;
+			for (ndInt32 i = 1; i < count; i ++) 
 			{
 				proj = contactsOut[i].DotProduct(lineDir).GetScalar();
 				if (proj > maxProjection) 
@@ -235,8 +235,8 @@ dInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normalI
 		}
 
 		ndVector error (contactsOut[count - 1] - contactsOut[0]);
-		dAssert (error.m_w == dFloat32 (0.0f));
-		if (error.DotProduct(error).GetScalar() < dFloat32 (1.0e-8f)) 
+		dAssert (error.m_w == ndFloat32 (0.0f));
+		if (error.DotProduct(error).GetScalar() < ndFloat32 (1.0e-8f)) 
 		{
 			count --;
 		}
@@ -245,44 +245,44 @@ dInt32 ndShapeConvexPolygon::CalculatePlaneIntersection (const ndVector& normalI
 	#ifdef _DEBUG
 		if (count > 1) 
 		{
-			dInt32 j = count - 1;
-			for (dInt32 i = 0; i < count; i ++) 
+			ndInt32 j = count - 1;
+			for (ndInt32 i = 0; i < count; i ++) 
 			{
 				ndVector error (contactsOut[i] - contactsOut[j]);
-				dAssert (error.m_w == dFloat32 (0.0f));
-				dAssert (error.DotProduct(error).GetScalar() > dFloat32 (1.0e-20f));
+				dAssert (error.m_w == ndFloat32 (0.0f));
+				dAssert (error.DotProduct(error).GetScalar() > ndFloat32 (1.0e-20f));
 				j = i;
 			}
 
 			if (count >= 3) 
 			{
-				ndVector n (dFloat32 (0.0f));
+				ndVector n (ndFloat32 (0.0f));
 				ndVector e0 (contactsOut[1] - contactsOut[0]);
-				for (dInt32 i = 2; i < count; i ++) 
+				for (ndInt32 i = 2; i < count; i ++) 
 				{
 					ndVector e1 (contactsOut[i] - contactsOut[0]);
 					n += e0.CrossProduct(e1);
 					e0 = e1;
 				} 
-				dAssert (n.m_w == dFloat32 (0.0f));
+				dAssert (n.m_w == ndFloat32 (0.0f));
 				n = n.Normalize();
-				dAssert (n.DotProduct(normal).GetScalar() > dFloat32 (0.9f));
+				dAssert (n.DotProduct(normal).GetScalar() > ndFloat32 (0.9f));
 			}
 		}
 	#endif
 	return count;
 }
 
-ndVector ndShapeConvexPolygon::SupportVertex(const ndVector& dir, dInt32* const) const
+ndVector ndShapeConvexPolygon::SupportVertex(const ndVector& dir, ndInt32* const) const
 {
-	dAssert(dAbs(dir.m_w) == dFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - 1.0f) < dFloat32(1.0e-2f));
+	dAssert(dAbs(dir.m_w) == ndFloat32(0.0f));
+	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - 1.0f) < ndFloat32(1.0e-2f));
 
-	dInt32 index = 0;
-	dFloat32 val = m_localPoly[0].DotProduct(dir).GetScalar();
-	for (dInt32 i = 1; i < m_paddedCount; i++) 
+	ndInt32 index = 0;
+	ndFloat32 val = m_localPoly[0].DotProduct(dir).GetScalar();
+	for (ndInt32 i = 1; i < m_paddedCount; i++) 
 	{
-		dFloat32 val1 = m_localPoly[i].DotProduct(dir).GetScalar();
+		ndFloat32 val1 = m_localPoly[i].DotProduct(dir).GetScalar();
 		if (val1 > val) 
 		{
 			val = val1;
@@ -301,12 +301,12 @@ ndVector ndShapeConvexPolygon::CalculateGlobalNormal(const ndShapeInstance* cons
 
 	ndVector normal(aligmentMatrix.RotateVector(localNormal));
 	normal = normal * invScale;
-	dAssert(normal.m_w == dFloat32(0.0f));
+	dAssert(normal.m_w == ndFloat32(0.0f));
 	normal = normal.Normalize();
 	return globalMatrix.RotateVector(normal);
 }
 
-bool ndShapeConvexPolygon::BeamClipping(const ndVector& origin, dFloat32 dist, const ndShapeInstance* const parentMesh)
+bool ndShapeConvexPolygon::BeamClipping(const ndVector& origin, ndFloat32 dist, const ndShapeInstance* const parentMesh)
 {
 	ndPlane planes[4];
 	ndVector points[128];
@@ -314,23 +314,23 @@ bool ndShapeConvexPolygon::BeamClipping(const ndVector& origin, dFloat32 dist, c
 	dgClippedFaceEdge clippedFace[2 * sizeof(m_localPoly) / sizeof(m_localPoly[0]) + 8];
 
 	ndVector dir(m_localPoly[1] - m_localPoly[0]);
-	dAssert(dir.m_w == dFloat32(0.0f));
-	dAssert(dir.DotProduct(dir).GetScalar() > dFloat32(1.0e-8f));
+	dAssert(dir.m_w == ndFloat32(0.0f));
+	dAssert(dir.DotProduct(dir).GetScalar() > ndFloat32(1.0e-8f));
 	dir = dir.Normalize();
 
-	dFloat32 distH = origin.DotProduct(dir).GetScalar();
+	ndFloat32 distH = origin.DotProduct(dir).GetScalar();
 	planes[0] = ndPlane(dir, dist - distH);
 	planes[2] = ndPlane(dir * ndVector::m_negOne, dist + distH);
 
 	dir = m_normal.CrossProduct(dir);
-	dFloat32 distV = origin.DotProduct(dir).GetScalar();
+	ndFloat32 distV = origin.DotProduct(dir).GetScalar();
 	planes[1] = ndPlane(dir, dist - distV);
 	planes[3] = ndPlane(dir * ndVector::m_negOne, dist + distV);
 
-	for (dInt32 i = 0; i < m_count; i++) 
+	for (ndInt32 i = 0; i < m_count; i++) 
 	{
-		dInt32 j = i << 1;
-		dAssert(j < dInt32 (sizeof(clippedFace) / sizeof(clippedFace[0])));
+		ndInt32 j = i << 1;
+		dAssert(j < ndInt32 (sizeof(clippedFace) / sizeof(clippedFace[0])));
 
 		points[i] = m_localPoly[i];
 
@@ -350,22 +350,22 @@ bool ndShapeConvexPolygon::BeamClipping(const ndVector& origin, dFloat32 dist, c
 	clippedFace[m_count * 2 - 2].m_next = &clippedFace[0];
 	clippedFace[m_count * 2 - 2 + 1].m_incidentVertex = 0;
 
-	const dFloat32 tol = dFloat32(1.0e-5f);
-	dInt32 edgeCount = m_count * 2;
-	dInt32 indexCount = m_count;
+	const ndFloat32 tol = ndFloat32(1.0e-5f);
+	ndInt32 edgeCount = m_count * 2;
+	ndInt32 indexCount = m_count;
 	dgClippedFaceEdge* first = &clippedFace[0];
-	for (dInt32 i = 0; i < 4; i++) 
+	for (ndInt32 i = 0; i < 4; i++) 
 	{
 		const ndPlane& plane = planes[i];
 
-		dInt32 conectCount = 0;
+		ndInt32 conectCount = 0;
 		dgClippedFaceEdge* connect[2];
 		dgClippedFaceEdge* ptr = first;
 		dgClippedFaceEdge* newFirst = first;
-		dFloat32 test0 = plane.Evalue(points[ptr->m_incidentVertex]);
+		ndFloat32 test0 = plane.Evalue(points[ptr->m_incidentVertex]);
 		do 
 		{
-			dFloat32 test1 = plane.Evalue(points[ptr->m_next->m_incidentVertex]);
+			ndFloat32 test1 = plane.Evalue(points[ptr->m_next->m_incidentVertex]);
 
 			if (test0 > tol) 
 			{
@@ -397,12 +397,12 @@ bool ndShapeConvexPolygon::BeamClipping(const ndVector& origin, dFloat32 dist, c
 					indexCount++;
 					edgeCount += 2;
 					ptr = newEdge;
-					dAssert(indexCount < dInt32 (sizeof(points) / sizeof(points[0])));
+					dAssert(indexCount < ndInt32 (sizeof(points) / sizeof(points[0])));
 				}
 			}
 			else 
 			{
-				if ((test1 > tol) && (test0 * test1) < dFloat32(0.0f)) 
+				if ((test1 > tol) && (test0 * test1) < ndFloat32(0.0f)) 
 				{
 					newFirst = ptr->m_next;
 
@@ -433,7 +433,7 @@ bool ndShapeConvexPolygon::BeamClipping(const ndVector& origin, dFloat32 dist, c
 					edgeCount += 2;
 
 					ptr = newEdge;
-					dAssert(indexCount < dInt32 (sizeof(points) / sizeof(points[0])));
+					dAssert(indexCount < ndInt32 (sizeof(points) / sizeof(points[0])));
 				}
 			}
 
@@ -468,9 +468,9 @@ bool ndShapeConvexPolygon::BeamClipping(const ndVector& origin, dFloat32 dist, c
 	do 
 	{
 		ndVector dist1(points[ptr->m_next->m_incidentVertex] - points[ptr->m_incidentVertex]);
-		dAssert(dist1.m_w == dFloat32(0.0f));
-		dFloat32 error = dist1.DotProduct(dist1).GetScalar();
-		if (error < dFloat32(1.0e-6f)) 
+		dAssert(dist1.m_w == ndFloat32(0.0f));
+		ndFloat32 error = dist1.DotProduct(dist1).GetScalar();
+		if (error < ndFloat32(1.0e-6f)) 
 		{
 			ptr->m_next = ptr->m_next->m_next;
 			first = ptr;
@@ -478,7 +478,7 @@ bool ndShapeConvexPolygon::BeamClipping(const ndVector& origin, dFloat32 dist, c
 		ptr = ptr->m_next;
 	} while (ptr != first);
 
-	dInt32 count = 0;
+	ndInt32 count = 0;
 	m_adjacentFaceEdgeNormalIndex = &m_clippEdgeNormal[0];
 	do 
 	{
@@ -494,17 +494,17 @@ bool ndShapeConvexPolygon::BeamClipping(const ndVector& origin, dFloat32 dist, c
 	if (m_count >= 3) 
 	{
 		const ndVector skirt(D_CONVEX_POLYGON_SKIRT_LENGTH);
-		dInt32 i0 = m_count - 1;
-		for (dInt32 i = 0; i < m_count; i++) 
+		ndInt32 i0 = m_count - 1;
+		for (ndInt32 i = 0; i < m_count; i++) 
 		{
 			const ndVector faceEddge(m_localPoly[i] - m_localPoly[i0]);
-			dAssert(faceEddge.m_w == dFloat32(0.0f));
-			dAssert(faceEddge.DotProduct(faceEddge).GetScalar() > dFloat32(0.0f));
+			dAssert(faceEddge.m_w == ndFloat32(0.0f));
+			dAssert(faceEddge.DotProduct(faceEddge).GetScalar() > ndFloat32(0.0f));
 			const ndVector edge (faceEddge.Normalize());
-			const dInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[i0];
+			const ndInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[i0];
 			const ndVector localAdjacentNormal(&m_vertex[adjacentNormalIndex * m_stride]);
 			const ndVector adjacentNormal(CalculateGlobalNormal(parentMesh, localAdjacentNormal & ndVector::m_triplexMask));
-			dAssert(edge.DotProduct(adjacentNormal).GetScalar() < dFloat32(5.0e-2f));
+			dAssert(edge.DotProduct(adjacentNormal).GetScalar() < ndFloat32(5.0e-2f));
 			const ndVector edgeSkirt(edge.CrossProduct(adjacentNormal) * skirt);
 
 			m_localPoly[count + 0] = m_localPoly[i] + edgeSkirt;
@@ -518,33 +518,33 @@ bool ndShapeConvexPolygon::BeamClipping(const ndVector& origin, dFloat32 dist, c
 	return (m_count >= 3);
 }
 
-dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeInstance* const parentMesh, ndContactSolver& contactSolver)
+ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeInstance* const parentMesh, ndContactSolver& contactSolver)
 {
 	dAssert(contactSolver.m_instance0.GetShape()->GetAsShapeConvex());
 	dAssert(contactSolver.m_instance1.GetShape()->GetAsShapeAsConvexPolygon());
 	dAssert(contactSolver.m_instance1.GetGlobalMatrix().TestIdentity());
 	dAssert(this == contactSolver.m_instance1.GetShape());
 	dAssert(m_count);
-	dAssert(m_count < dInt32(sizeof(m_localPoly) / sizeof(m_localPoly[0])));
+	dAssert(m_count < ndInt32(sizeof(m_localPoly) / sizeof(m_localPoly[0])));
 
 	const ndMatrix& hullMatrix = contactSolver.m_instance0.m_globalMatrix;
 	const ndShapeInstance* const hull = &contactSolver.m_instance0;
 
-	dAssert(m_normal.m_w == dFloat32(0.0f));
+	dAssert(m_normal.m_w == ndFloat32(0.0f));
 	const ndVector obbOrigin(hullMatrix.TransformVector(contactSolver.m_instance0.GetShape()->GetObbOrigin()));
-	const dFloat32 shapeSide = m_normal.DotProduct(obbOrigin - m_localPoly[0]).GetScalar();
-	if (shapeSide < dFloat32(0.0f))
+	const ndFloat32 shapeSide = m_normal.DotProduct(obbOrigin - m_localPoly[0]).GetScalar();
+	if (shapeSide < ndFloat32(0.0f))
 	{
 		//dgTrace(("normal face away (%f %f %f)\n", m_normal[0], m_normal[1], m_normal[2]));
 		return 0;
 	}
 
 	const ndVector normalInHull(hullMatrix.UnrotateVector(m_normal));
-	const ndVector pointInHull(hull->SupportVertex(normalInHull.Scale(dFloat32(-1.0f))));
+	const ndVector pointInHull(hull->SupportVertex(normalInHull.Scale(ndFloat32(-1.0f))));
 	const ndVector p0(hullMatrix.TransformVector(pointInHull));
 
-	dFloat32 penetration = m_normal.DotProduct(m_localPoly[0] - p0).GetScalar() + contactSolver.m_skinThickness;
-	if (penetration < -(D_PENETRATION_TOL * dFloat32(5.0f)))
+	ndFloat32 penetration = m_normal.DotProduct(m_localPoly[0] - p0).GetScalar() + contactSolver.m_skinThickness;
+	if (penetration < -(D_PENETRATION_TOL * ndFloat32(5.0f)))
 	{
 		contactSolver.m_separatingVector = m_normal;
 		contactSolver.m_closestPoint0 = p0;
@@ -555,40 +555,40 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 
 	const ndVector p1(hullMatrix.TransformVector(hull->SupportVertex(normalInHull)));
 
-	//contactJoint->m_separationDistance = dFloat32(0.0f);
-	dFloat32 distance = m_normal.DotProduct(m_localPoly[0] - p1).GetScalar();
-	if (distance >= dFloat32(0.0f))
+	//contactJoint->m_separationDistance = ndFloat32(0.0f);
+	ndFloat32 distance = m_normal.DotProduct(m_localPoly[0] - p1).GetScalar();
+	if (distance >= ndFloat32(0.0f))
 	{
-		//contactSolver.m_separationDistance = dFloat32 (0.0f);
+		//contactSolver.m_separationDistance = ndFloat32 (0.0f);
 		return 0;
 	}
 
 	ndVector boxSize;
 	ndVector boxOrigin;
 	hull->CalculateObb(boxOrigin, boxSize);
-	dAssert(boxOrigin.m_w == dFloat32(0.0f));
+	dAssert(boxOrigin.m_w == ndFloat32(0.0f));
 	boxOrigin += ndVector::m_wOne;
 
 	bool inside = true;
-	dInt32 i0 = m_count - 1;
-	for (dInt32 i = 0; i < m_count; i++)
+	ndInt32 i0 = m_count - 1;
+	for (ndInt32 i = 0; i < m_count; i++)
 	{
 		ndVector e(m_localPoly[i] - m_localPoly[i0]);
 		ndVector edgeBoundaryNormal(m_normal.CrossProduct(e));
-		dAssert(edgeBoundaryNormal.m_w == dFloat32(0.0f));
+		dAssert(edgeBoundaryNormal.m_w == ndFloat32(0.0f));
 		ndPlane plane(edgeBoundaryNormal, -m_localPoly[i0].DotProduct(edgeBoundaryNormal).GetScalar());
 		plane = hullMatrix.UntransformPlane(plane);
 
-		dFloat32 supportDist = boxSize.DotProduct(plane.Abs()).GetScalar();
-		dFloat32 centerDist = plane.DotProduct(boxOrigin).GetScalar();
+		ndFloat32 supportDist = boxSize.DotProduct(plane.Abs()).GetScalar();
+		ndFloat32 centerDist = plane.DotProduct(boxOrigin).GetScalar();
 
-		if ((centerDist + supportDist) < dFloat32(0.0f))
+		if ((centerDist + supportDist) < ndFloat32(0.0f))
 		{
-			//contactSolver.m_separationDistance = dFloat32(0.0f);
+			//contactSolver.m_separationDistance = ndFloat32(0.0f);
 			return 0;
 		}
 
-		if ((centerDist - supportDist) < dFloat32(0.0f))
+		if ((centerDist - supportDist) < ndFloat32(0.0f))
 		{
 			inside = false;
 			break;
@@ -596,7 +596,7 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 		i0 = i;
 	}
 
-	dFloat32 convexSphapeUmbra = hull->GetUmbraClipSize();
+	ndFloat32 convexSphapeUmbra = hull->GetUmbraClipSize();
 	if (m_faceClipSize > convexSphapeUmbra)
 	{
 		ndVector boxP0;
@@ -611,8 +611,8 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 		m_faceClipSize = hull->GetShape()->GetBoxMaxRadius();
 	}
 
-	dInt32 count = 0;
-	const dInt64 hullId = hull->GetUserDataID();
+	ndInt32 count = 0;
+	const ndInt64 hullId = hull->GetUserDataID();
 	if (inside & !contactSolver.m_intersectionTestOnly)
 	{
 		contactSolver.m_separationDistance = -penetration;
@@ -620,16 +620,16 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 		contactSolver.m_closestPoint0 = p0;
 		contactSolver.m_closestPoint1 = p0 + m_normal.Scale(penetration);
 
-		penetration = dMax(dFloat32(0.0f), penetration);
-		dAssert(penetration >= dFloat32(0.0f));
+		penetration = dMax(ndFloat32(0.0f), penetration);
+		dAssert(penetration >= ndFloat32(0.0f));
 		ndVector contactPoints[128];
 		ndVector point(pointInHull + normalInHull.Scale(penetration - D_PENETRATION_TOL));
 
-		count = hull->CalculatePlaneIntersection(normalInHull.Scale(dFloat32(-1.0f)), point, contactPoints);
-		ndVector step(normalInHull.Scale((contactSolver.m_skinThickness - penetration) * dFloat32(0.5f)));
+		count = hull->CalculatePlaneIntersection(normalInHull.Scale(ndFloat32(-1.0f)), point, contactPoints);
+		ndVector step(normalInHull.Scale((contactSolver.m_skinThickness - penetration) * ndFloat32(0.5f)));
 
 		ndContactPoint* const contactsOut = contactSolver.m_contactBuffer;
-		for (dInt32 i = 0; i < count; i++)
+		for (ndInt32 i = 0; i < count; i++)
 		{
 			contactsOut[i].m_point = hullMatrix.TransformVector(contactPoints[i] + step);
 			contactsOut[i].m_normal = m_normal;
@@ -640,13 +640,13 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 	}
 	else
 	{
-		m_vertexCount = dUnsigned16(m_count);
+		m_vertexCount = ndUnsigned16(m_count);
 		count = contactSolver.ConvexToConvexContactsDiscrete();
 		dAssert(contactSolver.m_intersectionTestOnly || (count >= 0));
 		if (count >= 1)
 		{
 			ndContactPoint* const contactsOut = contactSolver.m_contactBuffer;
-			for (dInt32 i = 0; i < count; i++)
+			for (ndInt32 i = 0; i < count; i++)
 			{
 				contactsOut[i].m_shapeId0 = hullId;
 				contactsOut[i].m_shapeId1 = m_faceId;
@@ -657,28 +657,28 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShapeI
 	return count;
 }
 
-dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeInstance* const parentMesh, ndContactSolver& contactSolver)
+ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeInstance* const parentMesh, ndContactSolver& contactSolver)
 {
 	dAssert(contactSolver.m_instance0.GetShape()->GetAsShapeConvex());
 	dAssert(contactSolver.m_instance1.GetShape()->GetAsShapeAsConvexPolygon());
 	dAssert(contactSolver.m_instance1.GetGlobalMatrix().TestIdentity());
 	dAssert(this == contactSolver.m_instance1.GetShape());
 	dAssert(m_count);
-	dAssert(m_count < dInt32(sizeof(m_localPoly) / sizeof(m_localPoly[0])));
+	dAssert(m_count < ndInt32(sizeof(m_localPoly) / sizeof(m_localPoly[0])));
 	dAssert(contactSolver.m_instance1.GetGlobalMatrix().TestIdentity());
 
 	const ndBodyKinematic* const body0 = contactSolver.m_contact->m_body0;
 	const ndBodyKinematic* const body1 = contactSolver.m_contact->m_body1;
 
 	ndVector relativeVelocity(body0->GetVelocity() - body1->GetVelocity());
-	dAssert(relativeVelocity.m_w == dFloat32(0.0f));
-	if (relativeVelocity.DotProduct(relativeVelocity).GetScalar() < dFloat32(1.0e-4f)) 
+	dAssert(relativeVelocity.m_w == ndFloat32(0.0f));
+	if (relativeVelocity.DotProduct(relativeVelocity).GetScalar() < ndFloat32(1.0e-4f)) 
 	{
 		return 0;
 	}
 
-	dFloat32 den = m_normal.DotProduct(relativeVelocity).GetScalar();
-	if (den > dFloat32(-1.0e-10f)) 
+	ndFloat32 den = m_normal.DotProduct(relativeVelocity).GetScalar();
+	if (den > ndFloat32(-1.0e-10f)) 
 	{
 		return 0;
 	}
@@ -689,12 +689,12 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeI
 	polygonMatrix[1] = m_normal;
 	polygonMatrix[2] = polygonMatrix[0].CrossProduct(m_normal);
 	polygonMatrix[3] = m_localPoly[0];
-	polygonMatrix[3].m_w = dFloat32(1.0f);
+	polygonMatrix[3].m_w = ndFloat32(1.0f);
 	dAssert(polygonMatrix.TestOrthogonal());
 	
-	ndVector polyBoxP0(dFloat32(1.0e15f));
-	ndVector polyBoxP1(dFloat32(-1.0e15f));
-	for (dInt32 i = 0; i < m_count; i++) 
+	ndVector polyBoxP0(ndFloat32(1.0e15f));
+	ndVector polyBoxP1(ndFloat32(-1.0e15f));
+	for (ndInt32 i = 0; i < m_count; i++) 
 	{
 		const ndVector point(polygonMatrix.UntransformVector(m_localPoly[i]));
 		polyBoxP0 = polyBoxP0.GetMin(point);
@@ -708,69 +708,69 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeI
 	ndVector minBox(polyBoxP0 - hullBoxP1);
 	ndVector maxBox(polyBoxP1 - hullBoxP0);
 	
-	ndVector relStep(relativeVelocity.Scale(dMax(contactSolver.m_timestep, dFloat32(1.0e-12f))));
+	ndVector relStep(relativeVelocity.Scale(dMax(contactSolver.m_timestep, ndFloat32(1.0e-12f))));
 	ndFastRay ray(ndVector::m_zero, polygonMatrix.UnrotateVector(relStep));
-	dFloat32 distance = ray.BoxIntersect(minBox, maxBox);
+	ndFloat32 distance = ray.BoxIntersect(minBox, maxBox);
 	
-	dFloat32 relStepSpeed = m_normal.DotProduct(relStep).GetScalar();
-	dInt32 count = 0;
-	if ((distance < dFloat32(1.0f)) && (dAbs(relStepSpeed) > dFloat32(1.0e-12f))) 
+	ndFloat32 relStepSpeed = m_normal.DotProduct(relStep).GetScalar();
+	ndInt32 count = 0;
+	if ((distance < ndFloat32(1.0f)) && (dAbs(relStepSpeed) > ndFloat32(1.0e-12f))) 
 	{
 		bool inside = false;
 		dAssert(m_normal.DotProduct(relStep).GetScalar() == relStepSpeed);
-		dFloat32 invSpeed = dFloat32(1.0f) / relStepSpeed;
+		ndFloat32 invSpeed = ndFloat32(1.0f) / relStepSpeed;
 		ndVector sphOrigin(polygonMatrix.TransformVector((hullBoxP1 + hullBoxP0) * ndVector::m_half));
 		ndVector pointInPlane(sphOrigin - relStep.Scale(m_normal.DotProduct(sphOrigin - m_localPoly[0]).GetScalar() * invSpeed));
 	
 		ndVector sphRadius(ndVector::m_half * (hullBoxP1 - hullBoxP0));
-		dFloat32 radius = dSqrt(sphRadius.DotProduct(sphRadius).GetScalar());
+		ndFloat32 radius = ndSqrt(sphRadius.DotProduct(sphRadius).GetScalar());
 		ndVector planeMinkStep(m_normal.Scale(radius));
 		sphOrigin -= planeMinkStep;
 		dAssert(m_normal.DotProduct(relStep).GetScalar() == relStepSpeed);
 		ndVector supportPoint(sphOrigin - relStep.Scale(m_normal.DotProduct(sphOrigin - m_localPoly[0]).GetScalar() * invSpeed));
 	
 		supportPoint -= pointInPlane;
-		dAssert(supportPoint.m_w == dFloat32(0.0f));
-		radius = dMax(dSqrt(supportPoint.DotProduct(supportPoint).GetScalar()), radius);
+		dAssert(supportPoint.m_w == ndFloat32(0.0f));
+		radius = dMax(ndSqrt(supportPoint.DotProduct(supportPoint).GetScalar()), radius);
 	
 		inside = true;
-		dInt32 i0 = m_count - 1;
-		for (dInt32 i = 0; i < m_count; i++) 
+		ndInt32 i0 = m_count - 1;
+		for (ndInt32 i = 0; i < m_count; i++) 
 		{
 			const ndVector e(m_localPoly[i] - m_localPoly[i0]);
 			const ndVector n((e.CrossProduct(m_normal) & ndVector::m_triplexMask).Normalize());
-			dFloat32 dist1 = n.DotProduct(pointInPlane - m_localPoly[i0]).GetScalar();
+			ndFloat32 dist1 = n.DotProduct(pointInPlane - m_localPoly[i0]).GetScalar();
 	
 			if (dist1 > radius) 
 			{
 				return 0;
 			}
-			inside &= (dist1 <= dFloat32(0.0f));
+			inside &= (dist1 <= ndFloat32(0.0f));
 			i0 = i;
 		}
 	
-		dFloat32 convexSphapeUmbra = dMax(contactSolver.m_instance0.GetUmbraClipSize(), radius);
+		ndFloat32 convexSphapeUmbra = dMax(contactSolver.m_instance0.GetUmbraClipSize(), radius);
 		if (m_faceClipSize > convexSphapeUmbra) 
 		{
 			BeamClipping(pointInPlane, convexSphapeUmbra, parentMesh);
 			m_faceClipSize = contactSolver.m_instance0.GetShape()->GetBoxMaxRadius();
 		}
 	
-		const dInt64 hullId = contactSolver.m_instance0.GetUserDataID();
+		const ndInt64 hullId = contactSolver.m_instance0.GetUserDataID();
 		if (inside & !contactSolver.m_intersectionTestOnly) 
 		{
 			const ndMatrix& matrixInstance0 = contactSolver.m_instance0.m_globalMatrix;
-			const ndVector normalInHull(matrixInstance0.UnrotateVector(m_normal.Scale(dFloat32(-1.0f))));
+			const ndVector normalInHull(matrixInstance0.UnrotateVector(m_normal.Scale(ndFloat32(-1.0f))));
 			ndVector pointInHull(contactSolver.m_instance0.SupportVertex(normalInHull));
 			const ndVector p0(matrixInstance0.TransformVector(pointInHull));
 	
-			dFloat32 timetoImpact = dFloat32(0.0f);
-			dAssert(m_normal.m_w == dFloat32(0.0f));
-			dFloat32 penetration = m_normal.DotProduct(m_localPoly[0] - p0).GetScalar() + contactSolver.m_skinThickness;
-			if (penetration < dFloat32(0.0f)) 
+			ndFloat32 timetoImpact = ndFloat32(0.0f);
+			dAssert(m_normal.m_w == ndFloat32(0.0f));
+			ndFloat32 penetration = m_normal.DotProduct(m_localPoly[0] - p0).GetScalar() + contactSolver.m_skinThickness;
+			if (penetration < ndFloat32(0.0f)) 
 			{
 				timetoImpact = penetration / relativeVelocity.DotProduct(m_normal).GetScalar();
-				dAssert(timetoImpact >= dFloat32(0.0f));
+				dAssert(timetoImpact >= ndFloat32(0.0f));
 			}
 	
 			if (timetoImpact <= contactSolver.m_timestep) 
@@ -787,9 +787,9 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeI
 					count = contactSolver.m_instance0.CalculatePlaneIntersection(normalInHull, pointInHull, contactPoints);
 	
 					ndVector step(relativeVelocity.Scale(timetoImpact));
-					penetration = dMax(penetration, dFloat32(0.0f));
+					penetration = dMax(penetration, ndFloat32(0.0f));
 					ndContactPoint* const contactsOut = contactSolver.m_contactBuffer;
-					for (dInt32 i = 0; i < count; i++) 
+					for (ndInt32 i = 0; i < count; i++) 
 					{
 						contactsOut[i].m_point = matrixInstance0.TransformVector(contactPoints[i]) + step;
 						contactsOut[i].m_normal = m_normal;
@@ -802,12 +802,12 @@ dInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShapeI
 		}
 		else 
 		{
-			m_vertexCount = dUnsigned16(m_count);
+			m_vertexCount = ndUnsigned16(m_count);
 			count = contactSolver.ConvexToConvexContactsContinue();
 			if (count >= 1) 
 			{
 				ndContactPoint* const contactsOut = contactSolver.m_contactBuffer;
-				for (dInt32 i = 0; i < count; i++) 
+				for (ndInt32 i = 0; i < count; i++) 
 				{
 					contactsOut[i].m_shapeId0 = hullId;
 					contactsOut[i].m_shapeId1 = m_faceId;

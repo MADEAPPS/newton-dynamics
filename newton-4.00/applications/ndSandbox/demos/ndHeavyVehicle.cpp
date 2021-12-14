@@ -38,21 +38,21 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 
 		m_useHardSolverMode = false;
 
-		dFloat32 fuelInjectionRate = 10.0f;
-		dFloat32 idleTorquePoundFoot = 250.0f;
-		dFloat32 idleRmp = 600.0f;
-		dFloat32 horsePower = 500.0f;
-		dFloat32 rpm0 = 3000.0f;
-		dFloat32 rpm1 = 4000.0f;
-		dFloat32 horsePowerAtRedLine = 150.0f;
-		dFloat32 redLineRpm = 5000.0f;
+		ndFloat32 fuelInjectionRate = 10.0f;
+		ndFloat32 idleTorquePoundFoot = 250.0f;
+		ndFloat32 idleRmp = 600.0f;
+		ndFloat32 horsePower = 500.0f;
+		ndFloat32 rpm0 = 3000.0f;
+		ndFloat32 rpm1 = 4000.0f;
+		ndFloat32 horsePowerAtRedLine = 150.0f;
+		ndFloat32 redLineRpm = 5000.0f;
 		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_transmission.m_torqueConverter = 10000.0f;
 
 		m_frontTire.m_mass = 100.0f;
-		m_frontTire.m_steeringAngle = 25.0f * dDegreeToRad;
+		m_frontTire.m_steeringAngle = 25.0f * ndDegreeToRad;
 		m_frontTire.m_springK = 500.0f;
 		m_frontTire.m_damperC = 50.0f;
 		m_frontTire.m_regularizer = 0.2f;
@@ -95,14 +95,14 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 
 		m_useHardSolverMode = false;
 
-		dFloat32 fuelInjectionRate = 10.0f;
-		dFloat32 idleTorquePoundFoot = 250.0f;
-		dFloat32 idleRmp = 600.0f;
-		dFloat32 horsePower = 500.0f;
-		dFloat32 rpm0 = 3000.0f;
-		dFloat32 rpm1 = 4000.0f;
-		dFloat32 horsePowerAtRedLine = 150.0f;
-		dFloat32 redLineRpm = 5000.0f;
+		ndFloat32 fuelInjectionRate = 10.0f;
+		ndFloat32 idleTorquePoundFoot = 250.0f;
+		ndFloat32 idleRmp = 600.0f;
+		ndFloat32 horsePower = 500.0f;
+		ndFloat32 rpm0 = 3000.0f;
+		ndFloat32 rpm1 = 4000.0f;
+		ndFloat32 horsePowerAtRedLine = 150.0f;
+		ndFloat32 redLineRpm = 5000.0f;
 		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp,
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
@@ -113,7 +113,7 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		m_transmission.m_forwardRatios[1] = 3.0f;
 
 		m_frontTire.m_mass = 100.0f;
-		m_frontTire.m_steeringAngle = 25.0f * dDegreeToRad;
+		m_frontTire.m_steeringAngle = 25.0f * ndDegreeToRad;
 		m_frontTire.m_springK = 1000.0f;
 		m_frontTire.m_damperC = 25.0f;
 		m_frontTire.m_regularizer = 0.01f;
@@ -158,14 +158,14 @@ class ndVehicleDectriptorBigRig : public ndVehicleDectriptor
 
 		m_useHardSolverMode = false;
 
-		dFloat32 fuelInjectionRate = 10.0f;
-		dFloat32 idleTorquePoundFoot = 250.0f;
-		dFloat32 idleRmp = 600.0f;
-		dFloat32 horsePower = 500.0f;
-		dFloat32 rpm0 = 3000.0f;
-		dFloat32 rpm1 = 4000.0f;
-		dFloat32 horsePowerAtRedLine = 150.0f;
-		dFloat32 redLineRpm = 5000.0f;
+		ndFloat32 fuelInjectionRate = 10.0f;
+		ndFloat32 idleTorquePoundFoot = 250.0f;
+		ndFloat32 idleRmp = 600.0f;
+		ndFloat32 horsePower = 500.0f;
+		ndFloat32 rpm0 = 3000.0f;
+		ndFloat32 rpm1 = 4000.0f;
+		ndFloat32 horsePowerAtRedLine = 150.0f;
+		ndFloat32 redLineRpm = 5000.0f;
 		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp,
 			horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
@@ -173,7 +173,7 @@ class ndVehicleDectriptorBigRig : public ndVehicleDectriptor
 
 		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_verticalOffset = -0.3f;
-		m_frontTire.m_steeringAngle = 25.0f * dDegreeToRad;
+		m_frontTire.m_steeringAngle = 25.0f * ndDegreeToRad;
 		m_frontTire.m_springK = 500.0f;
 		m_frontTire.m_damperC = 50.0f;
 		m_frontTire.m_regularizer = 0.2f;
@@ -287,7 +287,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 	}
 
 	protected:
-	ndBodyDynamic* MakeChildPart(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, const char* const partName, dFloat32 mass) const
+	ndBodyDynamic* MakeChildPart(ndDemoEntityManager* const scene, ndBodyDynamic* const parentBody, const char* const partName, ndFloat32 mass) const
 	{
 		ndDemoEntity* const parentEntity = (ndDemoEntity*)parentBody->GetNotifyCallback()->GetUserData();
 
@@ -308,7 +308,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 	private:
 	virtual void VehicleAssembly(ndDemoEntityManager* const scene) = 0;
 
-	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, dFloat32 mass)
+	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, ndFloat32 mass)
 	{
 		ndMatrix matrix(chassisEntity->CalculateGlobalMatrix(nullptr));
 		ndShapeInstance* const chassisCollision = chassisEntity->CreateCollisionFromchildren();
@@ -323,13 +323,13 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 		return body;
 	}
 
-	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, dFloat32 timestep)
+	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, ndFloat32 timestep)
 	{
 		ndHeavyMultiBodyVehicle* const me = (ndHeavyMultiBodyVehicle*)context;
 		me->SetCamera(manager, timestep);
 	}
 
-	void SetCamera(ndDemoEntityManager* const manager, dFloat32)
+	void SetCamera(ndDemoEntityManager* const manager, ndFloat32)
 	{
 		ndDemoCamera* const camera = manager->GetCamera();
 		ndDemoEntity* const chassisEntity = (ndDemoEntity*)m_chassis->GetNotifyCallback()->GetUserData();
@@ -374,16 +374,16 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 			dAssert(motor);
 
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			dFloat32 gageSize = 200.0f;
-			dFloat32 y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
+			ndFloat32 gageSize = 200.0f;
+			ndFloat32 y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
 
 			// draw the tachometer
-			dFloat32 x = gageSize / 2 + 20.0f;
-			dFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm;
+			ndFloat32 x = gageSize / 2 + 20.0f;
+			ndFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm;
 			maxRpm += 500.0f;
 			//printf("%.3f \n", m_configuration.m_transmission.m_forwardRatios[m_currentGear]);
-			//dFloat32 rpm = (motor->GetRpm() / maxRpm) * m_configuration.m_transmission.m_forwardRatios[m_currentGear]; 
-			dFloat32 rpm = (motor->GetRpm() / maxRpm) * 2.85f;
+			//ndFloat32 rpm = (motor->GetRpm() / maxRpm) * m_configuration.m_transmission.m_forwardRatios[m_currentGear]; 
+			ndFloat32 rpm = (motor->GetRpm() / maxRpm) * 2.85f;
 
 			if (m_vehicleUI)
 			{
@@ -395,13 +395,13 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 					//
 					m_vehicleUI->RenderGageUI(scene, m_tachometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
 
-					dFloat32 s = gageSize * 0.7f;
+					ndFloat32 s = gageSize * 0.7f;
 					m_vehicleUI->RenderGageUI(scene, m_redNeedle, -x, -y, s * 0.5f, rpm, -0.0f, 90.0f);
 
 					x += gageSize;
 					m_vehicleUI->RenderGageUI(scene, m_odometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
 
-					dFloat32 speed = (GetSpeed() / 100.0f) * 2.85f;
+					ndFloat32 speed = (GetSpeed() / 100.0f) * 2.85f;
 					m_vehicleUI->RenderGageUI(scene, m_greenNeedle, -x, -y, s * 0.5f, dAbs(speed), -0.0f, 90.0f);
 
 					// draw the current gear
@@ -419,7 +419,7 @@ class ndHeavyMultiBodyVehicle : public ndBasicVehicle
 	GLuint m_redNeedle;
 	GLuint m_tachometer;
 	GLuint m_greenNeedle;
-	dInt32 m_gearMap[8];
+	ndInt32 m_gearMap[8];
 	ndVehicleUI* m_vehicleUI;
 };
 
@@ -523,21 +523,21 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 		//turret servo controller actuator
 		ndBodyDynamic* const turretBody = MakeChildPart(scene, m_chassis, "turret", m_configuration.m_chassisMass * 0.05f);
 		ndMatrix turretMatrix(m_localFrame * turretBody->GetMatrix());
-		m_turretHinge = new ndJointHingeActuator(turretMatrix, 1.5f, -5000.0f * dDegreeToRad, 5000.0f * dDegreeToRad, turretBody, m_chassis);
-		m_turrectAngle0 = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+		m_turretHinge = new ndJointHingeActuator(turretMatrix, 1.5f, -5000.0f * ndDegreeToRad, 5000.0f * ndDegreeToRad, turretBody, m_chassis);
+		m_turrectAngle0 = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
 		AddExtraBody(turretBody);
 		AddExtraJoint(m_turretHinge);
 
 		//cannon servo controller actuator
 		ndBodyDynamic* const canonBody = MakeChildPart(scene, turretBody, "canon", m_configuration.m_chassisMass * 0.025f);
 		ndMatrix cannonMatrix(m_localFrame * canonBody->GetMatrix());
-		m_cannonHinge = new ndJointHingeActuator(cannonMatrix, 1.5f, -45.0f * dDegreeToRad, 5.0f * dDegreeToRad, canonBody, turretBody);
+		m_cannonHinge = new ndJointHingeActuator(cannonMatrix, 1.5f, -45.0f * ndDegreeToRad, 5.0f * ndDegreeToRad, canonBody, turretBody);
 		AddExtraBody(canonBody);
 		AddExtraJoint(m_cannonHinge);
 
-		dFloat32 y = cannonMatrix[1][1];
-		dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
-		m_cannonAngle0 = -dAtan2(y, x);
+		ndFloat32 y = cannonMatrix[1][1];
+		ndFloat32 x = ndSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
+		m_cannonAngle0 = -ndAtan2(y, x);
 	}
 
 	void LinkTires(ndWorld* const world, const ndMultiBodyVehicleTireJoint* const tire0, const ndMultiBodyVehicleTireJoint* const tire1) const
@@ -547,14 +547,14 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 
 		ndShapeInfo rearInfo(body0->GetCollisionShape().GetShapeInfo());
 		ndShapeInfo frontInfo(body1->GetCollisionShape().GetShapeInfo());
-		dFloat32 tireRatio = rearInfo.m_scale.m_y / frontInfo.m_scale.m_y;
+		ndFloat32 tireRatio = rearInfo.m_scale.m_y / frontInfo.m_scale.m_y;
 
 		ndMatrix pin0(tire0->GetLocalMatrix0() * body0->GetMatrix());
 		ndMatrix pin1(tire1->GetLocalMatrix0() * body1->GetMatrix());
 		world->AddJoint(new ndJointGear(tireRatio, pin0.m_front.Scale(-1.0f), body0, pin1.m_front, body1));
 	}
 
-	void ApplyInputs(ndWorld* const world, dFloat32 timestep)
+	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndBasicVehicle::ApplyInputs(world, timestep);
 
@@ -597,23 +597,23 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 
 			// apply inputs to actuators joint
 			const ndMatrix turretMatrix(m_turretHinge->GetLocalMatrix0() * m_turretHinge->GetBody0()->GetMatrix());
-			dFloat32 turretAngle = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
-			dFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turrectAngle0), -turretAngle);
-			dFloat32 turretTargetAngle = m_turretHinge->GetAngle();
-			if (dAbs(turretErrorAngle) > (0.25f * dDegreeToRad))
+			ndFloat32 turretAngle = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+			ndFloat32 turretErrorAngle = AnglesAdd(AnglesAdd(m_turretAngle, m_turrectAngle0), -turretAngle);
+			ndFloat32 turretTargetAngle = m_turretHinge->GetAngle();
+			if (dAbs(turretErrorAngle) > (0.25f * ndDegreeToRad))
 			{
 				turretTargetAngle += turretErrorAngle;
 			}
 			m_turretHinge->SetTargetAngle(turretTargetAngle);
 
 			const ndMatrix cannonMatrix(m_cannonHinge->GetLocalMatrix0() * m_cannonHinge->GetBody0()->GetMatrix());
-			dFloat32 y = cannonMatrix[1][1];
-			dFloat32 x = dSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
-			dFloat32 cannonAngle = -dAtan2(y, x);
-			dFloat32 cannonErrorAngle = AnglesAdd(AnglesAdd(m_cannonAngle, m_cannonAngle0), -cannonAngle);
+			ndFloat32 y = cannonMatrix[1][1];
+			ndFloat32 x = ndSqrt(cannonMatrix[1][0] * cannonMatrix[1][0] + cannonMatrix[1][2] * cannonMatrix[1][2] + 1.0e-6f);
+			ndFloat32 cannonAngle = -ndAtan2(y, x);
+			ndFloat32 cannonErrorAngle = AnglesAdd(AnglesAdd(m_cannonAngle, m_cannonAngle0), -cannonAngle);
 
-			dFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
-			const dFloat32 error = 0.125f * dDegreeToRad;
+			ndFloat32 cannonTargetAngle = m_cannonHinge->GetAngle();
+			const ndFloat32 error = 0.125f * ndDegreeToRad;
 			if (dAbs(cannonErrorAngle) > error)
 			{
 				cannonTargetAngle += cannonErrorAngle;
@@ -629,10 +629,10 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 
 	ndJointHingeActuator* m_turretHinge;
 	ndJointHingeActuator* m_cannonHinge;
-	dFloat32 m_turretAngle;
-	dFloat32 m_turrectAngle0;
-	dFloat32 m_cannonAngle;
-	dFloat32 m_cannonAngle0;
+	ndFloat32 m_turretAngle;
+	ndFloat32 m_turrectAngle0;
+	ndFloat32 m_cannonAngle;
+	ndFloat32 m_cannonAngle0;
 };
 
 class ndTractorVehicle : public ndHeavyMultiBodyVehicle
@@ -704,7 +704,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		// connect the part to the main body with a hinge
 		ndMatrix hingeFrame(m_localFrame * axleBody->GetMatrix());
 		ndJointHinge* const hinge = new ndJointHinge(hingeFrame, axleBody, chassis);
-		hinge->EnableLimits(true, -15.0f * dDegreeToRad, 15.0f * dDegreeToRad);
+		hinge->EnableLimits(true, -15.0f * ndDegreeToRad, 15.0f * ndDegreeToRad);
 
 		AddExtraBody(axleBody);
 		AddExtraJoint(hinge);
@@ -746,29 +746,29 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 	{
 		ndBodyDynamic* const frontBucketArmBody = MakeChildPart(scene, m_chassis, "arms", m_configuration.m_chassisMass * 0.05f);
 		ndMatrix turretMatrix(m_localFrame * frontBucketArmBody->GetMatrix());
-		m_armHinge = new ndJointHingeActuator(turretMatrix, 1.5f, -10.0f * dDegreeToRad, 55.0f * dDegreeToRad, frontBucketArmBody, m_chassis);
+		m_armHinge = new ndJointHingeActuator(turretMatrix, 1.5f, -10.0f * ndDegreeToRad, 55.0f * ndDegreeToRad, frontBucketArmBody, m_chassis);
 		AddExtraBody(frontBucketArmBody);
 		AddExtraJoint(m_armHinge);
 		
-		m_armAngle = -dAtan2(turretMatrix[1][2], turretMatrix[1][0]);
+		m_armAngle = -ndAtan2(turretMatrix[1][2], turretMatrix[1][0]);
 		AddHydraulic(scene, m_chassis, "armHydraulicPiston_left", "armHydraulic_left", frontBucketArmBody, "attach0_left");
 		AddHydraulic(scene, m_chassis, "armHydraulicPiston_right", "armHydraulic_right", frontBucketArmBody, "attach0_right");
 
 		//cannon servo controller actuator
 		ndBodyDynamic* const frontBucketBody = MakeChildPart(scene, frontBucketArmBody, "frontBucket", m_configuration.m_chassisMass * 0.025f);
 		ndMatrix frontBucketMatrix(m_localFrame * frontBucketBody->GetMatrix());
-		m_bucketHinge = new ndJointHingeActuator(frontBucketMatrix, 2.5f, -75.0f * dDegreeToRad, 80.0f * dDegreeToRad, frontBucketBody, frontBucketArmBody);
+		m_bucketHinge = new ndJointHingeActuator(frontBucketMatrix, 2.5f, -75.0f * ndDegreeToRad, 80.0f * ndDegreeToRad, frontBucketBody, frontBucketArmBody);
 		AddExtraBody(frontBucketBody);
 		AddExtraJoint(m_bucketHinge);
 		
-		dFloat32 y = frontBucketMatrix[1][1];
-		dFloat32 x = dSqrt(frontBucketMatrix[1][0] * frontBucketMatrix[1][0] + frontBucketMatrix[1][2] * frontBucketMatrix[1][2] + 1.0e-6f);
-		m_bucketAngle = -dAtan2(y, x);
+		ndFloat32 y = frontBucketMatrix[1][1];
+		ndFloat32 x = ndSqrt(frontBucketMatrix[1][0] * frontBucketMatrix[1][0] + frontBucketMatrix[1][2] * frontBucketMatrix[1][2] + 1.0e-6f);
+		m_bucketAngle = -ndAtan2(y, x);
 		AddHydraulic(scene, frontBucketArmBody, "frontBucketHydraulic001", "frontBucketHydraulicPiston001", frontBucketBody, "attachment_frontBucket001");
 		AddHydraulic(scene, frontBucketArmBody, "frontBucketHydraulic002", "frontBucketHydraulicPiston002", frontBucketBody, "attachment_frontBucket002");
 	}
 
-	void ApplyInputs(ndWorld* const world, dFloat32 timestep)
+	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndBasicVehicle::ApplyInputs(world, timestep);
 		if (m_isPlayer)
@@ -804,12 +804,12 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 				m_bucketHinge->SetTargetAngle(m_bucketAngle);
 			}
 			const ndMatrix bucketMatrix(m_bucketHinge->GetLocalMatrix0() * m_bucketHinge->GetBody0()->GetMatrix());
-			dFloat32 y = bucketMatrix[1][1];
-			dFloat32 x = dSqrt(bucketMatrix[1][0] * bucketMatrix[1][0] + bucketMatrix[1][2] * bucketMatrix[1][2] + 1.0e-6f);
-			dFloat32 bucketAngle = -dAtan2(y, x);
-			dFloat32 bucketErrorAngle = AnglesAdd(AnglesAdd(m_bucketAngle, m_bucketAngle), -bucketAngle);
-			dFloat32 bucketTargetAngle = m_bucketHinge->GetAngle();
-			const dFloat32 error = 0.125f * dDegreeToRad;
+			ndFloat32 y = bucketMatrix[1][1];
+			ndFloat32 x = ndSqrt(bucketMatrix[1][0] * bucketMatrix[1][0] + bucketMatrix[1][2] * bucketMatrix[1][2] + 1.0e-6f);
+			ndFloat32 bucketAngle = -ndAtan2(y, x);
+			ndFloat32 bucketErrorAngle = AnglesAdd(AnglesAdd(m_bucketAngle, m_bucketAngle), -bucketAngle);
+			ndFloat32 bucketTargetAngle = m_bucketHinge->GetAngle();
+			const ndFloat32 error = 0.125f * ndDegreeToRad;
 			if (dAbs(bucketErrorAngle) > error)
 			{
 				bucketTargetAngle += bucketErrorAngle;
@@ -825,8 +825,8 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 
 	ndJointHingeActuator* m_armHinge;
 	ndJointHingeActuator* m_bucketHinge;
-	dFloat32 m_armAngle;
-	dFloat32 m_bucketAngle;
+	ndFloat32 m_armAngle;
+	ndFloat32 m_bucketAngle;
 };
 
 class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
@@ -888,7 +888,7 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 		SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);
 	}
 
-	void ApplyInputs(ndWorld* const world, dFloat32 timestep)
+	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndBasicVehicle::ApplyInputs(world, timestep);
 	}

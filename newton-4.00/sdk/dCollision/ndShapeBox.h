@@ -30,31 +30,31 @@ class ndShapeBox: public ndShapeConvex
 	public:
 	D_CLASS_REFLECTION(ndShapeBox);
 	D_COLLISION_API ndShapeBox(const ndLoadSaveBase::dLoadDescriptor& desc);
-	D_COLLISION_API ndShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
+	D_COLLISION_API ndShapeBox(ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z);
 	D_COLLISION_API virtual ~ndShapeBox();
 
 	virtual ndShapeBox* GetAsShapeBox() { return this; }
 
 	protected:
-	D_COLLISION_API void Init (dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
+	D_COLLISION_API void Init (ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z);
 	D_COLLISION_API virtual void MassProperties();
 
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
 	D_COLLISION_API virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
-	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir, dInt32* const vertexIndex) const;
-	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
-	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
+	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinThickness, ndInt32* const vertexIndex) const;
+	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
 	const ndConvexSimplexEdge** GetVertexToEdgeMapping() const;
-	virtual dInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
+	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	ndVector m_size[2];
 	ndVector m_vertex[8];
 
-	static dInt32 m_initSimplex;
-	static dInt32 m_faces[][4];
+	static ndInt32 m_initSimplex;
+	static ndInt32 m_faces[][4];
 	static ndVector m_indexMark;
 	static ndVector m_penetrationTol;
 	static ndConvexSimplexEdge m_edgeArray[];

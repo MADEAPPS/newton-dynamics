@@ -37,14 +37,14 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 		//m_useHardSolverMode = false;
 		m_comDisplacement = ndVector(0.25f, -0.35f, 0.0f, 0.0f);
 
-		dFloat32 fuelInjectionRate = 10.0f;
-		dFloat32 idleTorquePoundFoot = 100.0f;
-		dFloat32 idleRmp = 700.0f;
-		dFloat32 horsePower = 400.0f;
-		dFloat32 rpm0 = 5000.0f;
-		dFloat32 rpm1 = 6200.0f;
-		dFloat32 horsePowerAtRedLine = 100.0f;
-		dFloat32 redLineRpm = 8000.0f;
+		ndFloat32 fuelInjectionRate = 10.0f;
+		ndFloat32 idleTorquePoundFoot = 100.0f;
+		ndFloat32 idleRmp = 700.0f;
+		ndFloat32 horsePower = 400.0f;
+		ndFloat32 rpm0 = 5000.0f;
+		ndFloat32 rpm1 = 6200.0f;
+		ndFloat32 horsePowerAtRedLine = 100.0f;
+		ndFloat32 redLineRpm = 8000.0f;
 		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 	}
@@ -61,20 +61,20 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		//m_comDisplacement = ndVector(0.0f, -0.55f, 0.0f, 0.0f);
 		m_comDisplacement = ndVector(0.0f, -0.35f, 0.0f, 0.0f);
 
-		dFloat32 fuelInjectionRate = 10.0f;
-		dFloat32 idleTorquePoundFoot = 200.0f;
-		dFloat32 idleRmp = 800.0f;
-		dFloat32 horsePower = 400.0f;
-		dFloat32 rpm0 = 5000.0f;
-		dFloat32 rpm1 = 6200.0f;
-		dFloat32 horsePowerAtRedLine = 400.0f;
-		dFloat32 redLineRpm = 8000.0f;
+		ndFloat32 fuelInjectionRate = 10.0f;
+		ndFloat32 idleTorquePoundFoot = 200.0f;
+		ndFloat32 idleRmp = 800.0f;
+		ndFloat32 horsePower = 400.0f;
+		ndFloat32 rpm0 = 5000.0f;
+		ndFloat32 rpm1 = 6200.0f;
+		ndFloat32 horsePowerAtRedLine = 400.0f;
+		ndFloat32 redLineRpm = 8000.0f;
 		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_verticalOffset = -0.15f;
-		m_frontTire.m_steeringAngle = 35.0f * dDegreeToRad;
+		m_frontTire.m_steeringAngle = 35.0f * ndDegreeToRad;
 		m_frontTire.m_springK = 800.0f;
 		m_frontTire.m_damperC = 50.0f;
 		m_frontTire.m_regularizer = 0.3f;
@@ -112,20 +112,20 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 	{
 		m_comDisplacement = ndVector(0.0f, -0.55f, 0.0f, 0.0f);
 
-		dFloat32 fuelInjectionRate = 10.0f;
-		dFloat32 idleTorquePoundFoot = 250.0f;
-		dFloat32 idleRmp = 800.0f;
-		dFloat32 horsePower = 400.0f;
-		dFloat32 rpm0 = 5000.0f;
-		dFloat32 rpm1 = 6200.0f;
-		dFloat32 horsePowerAtRedLine = 150.0f;
-		dFloat32 redLineRpm = 8000.0f;
+		ndFloat32 fuelInjectionRate = 10.0f;
+		ndFloat32 idleTorquePoundFoot = 250.0f;
+		ndFloat32 idleRmp = 800.0f;
+		ndFloat32 horsePower = 400.0f;
+		ndFloat32 rpm0 = 5000.0f;
+		ndFloat32 rpm1 = 6200.0f;
+		ndFloat32 horsePowerAtRedLine = 150.0f;
+		ndFloat32 redLineRpm = 8000.0f;
 		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_frontTire.m_mass = 100.0f;
 		m_frontTire.m_verticalOffset = 0.0f;
-		m_frontTire.m_steeringAngle = 35.0f * dDegreeToRad;
+		m_frontTire.m_steeringAngle = 35.0f * ndDegreeToRad;
 		m_frontTire.m_springK = 500.0f;
 		m_frontTire.m_damperC = 50.0f;
 		m_frontTire.m_regularizer = 0.2f;
@@ -369,7 +369,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	}
 
 	private:
-	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, dFloat32 mass)
+	ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, ndDemoEntity* const chassisEntity, ndFloat32 mass)
 	{
 		ndMatrix matrix(chassisEntity->CalculateGlobalMatrix(nullptr));
 		ndShapeInstance* const chassisCollision = chassisEntity->CreateCollisionFromchildren();
@@ -384,13 +384,13 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		return body;
 	}
 
-	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, dFloat32 timestep)
+	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, ndFloat32 timestep)
 	{
 		ndBasicMultiBodyVehicle* const me = (ndBasicMultiBodyVehicle*)context;
 		me->SetCamera(manager, timestep);
 	}
 
-	void SetCamera(ndDemoEntityManager* const manager, dFloat32)
+	void SetCamera(ndDemoEntityManager* const manager, ndFloat32)
 	{
 		ndDemoCamera* const camera = manager->GetCamera();
 		ndDemoEntity* const chassisEntity = (ndDemoEntity*)m_chassis->GetNotifyCallback()->GetUserData();
@@ -435,16 +435,16 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			dAssert(motor);
 
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			dFloat32 gageSize = 200.0f;
-			dFloat32 y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
+			ndFloat32 gageSize = 200.0f;
+			ndFloat32 y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
 
 			// draw the tachometer
-			dFloat32 x = gageSize / 2 + 20.0f;
-			dFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm;
+			ndFloat32 x = gageSize / 2 + 20.0f;
+			ndFloat32 maxRpm = m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm;
 			maxRpm += 500.0f;
 			//printf("%.3f \n", m_configuration.m_transmission.m_forwardRatios[m_currentGear]);
-			//dFloat32 rpm = (motor->GetRpm() / maxRpm) * m_configuration.m_transmission.m_forwardRatios[m_currentGear]; 
-			dFloat32 rpm = (motor->GetRpm() / maxRpm) * 2.85f;
+			//ndFloat32 rpm = (motor->GetRpm() / maxRpm) * m_configuration.m_transmission.m_forwardRatios[m_currentGear]; 
+			ndFloat32 rpm = (motor->GetRpm() / maxRpm) * 2.85f;
 			
 			if (m_vehicleUI) 
 			{
@@ -456,13 +456,13 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 					//
 					m_vehicleUI->RenderGageUI(scene, m_tachometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
 
-					dFloat32 s = gageSize * 0.7f;
+					ndFloat32 s = gageSize * 0.7f;
 					m_vehicleUI->RenderGageUI(scene, m_redNeedle, -x, -y, s * 0.5f, rpm, -0.0f, 90.0f);
 					
 					x += gageSize;
 					m_vehicleUI->RenderGageUI(scene, m_odometer, -x, -y, gageSize * 0.5f, 0.0f, -180.0f, 90.0f);
 
-					dFloat32 speed = (GetSpeed() / 100.0f) * 2.85f;
+					ndFloat32 speed = (GetSpeed() / 100.0f) * 2.85f;
 					m_vehicleUI->RenderGageUI(scene, m_greenNeedle, -x, -y, s * 0.5f, dAbs(speed), -0.0f, 90.0f);
 
 					// draw the current gear
@@ -474,7 +474,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		}
 	}
 
-	void ApplyInputs(ndWorld* const world, dFloat32 timestep)
+	void ApplyInputs(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndBasicVehicle::ApplyInputs(world, timestep);
 
@@ -498,13 +498,13 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 				}
 			}
 
-			dFloat32 maxRpm = 9000.0f;
-			dFloat32 rpm = m_motor->GetRpm() / maxRpm;
-			dFloat32 pitchFactor = 0.5f + 0.7f * rpm;
+			ndFloat32 maxRpm = 9000.0f;
+			ndFloat32 rpm = m_motor->GetRpm() / maxRpm;
+			ndFloat32 pitchFactor = 0.5f + 0.7f * rpm;
 			m_engineRpmSound->SetPitch(pitchFactor);
 
 			// up to two decibels of volume
-			dFloat32 volumeFactor = 0.25f + 0.75f * rpm;
+			ndFloat32 volumeFactor = 0.25f + 0.75f * rpm;
 			m_engineRpmSound->SetVolume(volumeFactor);
 			//dTrace(("%f\n", volumeFactor));
 
@@ -532,7 +532,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 					{
 					}
 
-					virtual dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
+					virtual ndUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const)
 					{
 						return !((body == m_chassis) || (body == m_tire));
 					}
@@ -552,7 +552,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		}
 	}
 
-	void PostTransformUpdate(ndWorld* const, dFloat32)
+	void PostTransformUpdate(ndWorld* const, ndFloat32)
 	{
 		// play body part animations
 		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)m_chassis->GetNotifyCallback();
@@ -564,8 +564,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			const ndVector rearOrigin(ndVector::m_half * (rearRightTireMatrix.m_posit + rearLeftTireMatrix.m_posit));
 			const ndVector rearStep(rearRightTireMatrix.m_posit - rearLeftTireMatrix.m_posit);
 
-			const dFloat32 rearAxleAngle = dAtan2(-rearStep.m_y, rearStep.m_z);
-			const ndQuaternion rearAxelRotation(ndVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)), rearAxleAngle);
+			const ndFloat32 rearAxleAngle = ndAtan2(-rearStep.m_y, rearStep.m_z);
+			const ndQuaternion rearAxelRotation(ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)), rearAxleAngle);
 			m_rearAxlePivot->GetChild()->SetNextMatrix(rearAxelRotation, rearOrigin);
 
 			const ndMatrix frontPivotMatrix((m_frontAxlePivot->CalculateGlobalMatrix(notify->m_entity) * m_chassis->GetMatrix()).Inverse());
@@ -574,8 +574,8 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 			const ndVector frontOrigin(ndVector::m_half * (frontRightTireMatrix.m_posit + frontLeftTireMatrix.m_posit));
 			const ndVector frontStep(frontRightTireMatrix.m_posit - frontLeftTireMatrix.m_posit);
 
-			const dFloat32 frontAxleAngle = dAtan2(-frontStep.m_y, frontStep.m_z);
-			const ndQuaternion frontAxelRotation(ndVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)), frontAxleAngle);
+			const ndFloat32 frontAxleAngle = ndAtan2(-frontStep.m_y, frontStep.m_z);
+			const ndQuaternion frontAxelRotation(ndVector(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f)), frontAxleAngle);
 			m_frontAxlePivot->GetChild()->SetNextMatrix(frontAxelRotation, frontOrigin);
 		}
 	}
@@ -585,7 +585,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	GLuint m_redNeedle;
 	GLuint m_tachometer;
 	GLuint m_greenNeedle;
-	dInt32 m_gearMap[8];
+	ndInt32 m_gearMap[8];
 
 	ndSoundChannel* m_skipMarks;
 	ndSoundChannel* m_startSound;
@@ -609,9 +609,9 @@ static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const 
 	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
-	dFloat32 height = 1.9f;
-	dFloat32 radio = 0.5f;
-	dFloat32 mass = 100.0f;
+	ndFloat32 height = 1.9f;
+	ndFloat32 radio = 0.5f;
+	ndFloat32 mass = 100.0f;
 	ndDemoEntity* const entity = scene->LoadFbxMesh("whiteMan.fbx");
 	new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
 	delete entity;
@@ -642,12 +642,12 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 
 	//ndVector location(0.0f, 1.75f, 0.0f, 1.0f);
 	//ndMatrix matrix(dGetIdentityMatrix());
-	//matrix = dYawMatrix(180.0f * dDegreeToRad);
-	//matrix = matrix * dRollMatrix(-70.0f * dDegreeToRad);
+	//matrix = dYawMatrix(180.0f * ndDegreeToRad);
+	//matrix = matrix * dRollMatrix(-70.0f * ndDegreeToRad);
 	//matrix.m_posit = location;
 
 	ndSoundManager* const soundManager = world->GetSoundManager();
-	for (int i = 0; i < dInt32 (sizeof(engineSounds) / sizeof(engineSounds[0])); i++)
+	for (int i = 0; i < ndInt32 (sizeof(engineSounds) / sizeof(engineSounds[0])); i++)
 	{
 		soundManager->CreateSoundAsset(engineSounds[i]);
 	}

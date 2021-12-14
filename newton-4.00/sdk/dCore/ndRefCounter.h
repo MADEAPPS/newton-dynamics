@@ -20,16 +20,16 @@ class ndRefCounter: public ndClassAlloc
 {
 	public:
 	ndRefCounter();
-	dInt32 GetRef() const;
+	ndInt32 GetRef() const;
 
 	T* AddRef();
-	virtual dInt32 Release();
+	virtual ndInt32 Release();
 
 	protected:
 	virtual ~ndRefCounter(void);
 
 	private:
-	dInt32 m_refCount;
+	ndInt32 m_refCount;
 };
 
 template<class T>
@@ -52,7 +52,7 @@ inline T* ndRefCounter<T>::AddRef()
 }
 
 template<class T>
-inline dInt32 ndRefCounter<T>::Release()
+inline ndInt32 ndRefCounter<T>::Release()
 {
 	m_refCount--;
 	dAssert(m_refCount >= 0);
@@ -65,7 +65,7 @@ inline dInt32 ndRefCounter<T>::Release()
 }
 
 template<class T>
-inline dInt32 ndRefCounter<T>::GetRef() const
+inline ndInt32 ndRefCounter<T>::GetRef() const
 {
 	return m_refCount;
 }
