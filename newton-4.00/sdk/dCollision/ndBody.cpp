@@ -54,7 +54,7 @@ ndBody::ndBody()
 	m_transformIsDirty = 1;
 }
 
-ndBody::ndBody(const ndLoadSaveBase::dLoadDescriptor& desc)
+ndBody::ndBody(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndContainersFreeListAlloc<ndBody>()
 	,m_matrix(dGetIdentityMatrix())
 	,m_veloc(ndVector::m_zero)
@@ -95,7 +95,7 @@ ndBody::ndBody(const ndLoadSaveBase::dLoadDescriptor& desc)
 		const nd::TiXmlNode* node = notifyNode->FirstChild();
 		const char* const className = node->Value();
 
-		ndLoadSaveBase::dLoadDescriptor notifyDesc(desc);
+		ndLoadSaveBase::ndLoadDescriptor notifyDesc(desc);
 		notifyDesc.m_rootNode = node;
 		m_notifyCallback = D_CLASS_REFLECTION_LOAD_NODE(ndBodyNotify, className, notifyDesc);
 		m_notifyCallback->m_body = this;

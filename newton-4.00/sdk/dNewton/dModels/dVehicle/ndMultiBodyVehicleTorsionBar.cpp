@@ -41,8 +41,8 @@ ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehi
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
-ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_springK(ndFloat32(10.0f))
 	,m_damperC(ndFloat32(1.0f))
 	,m_springDamperRegularizer(ndFloat32(0.1f))

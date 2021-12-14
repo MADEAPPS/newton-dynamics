@@ -130,8 +130,8 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(
 	m_animBlendTree->Evaluate(m_output, ndFloat32(0.0f));
 }
 
-ndBasicPlayerCapsule::ndBasicPlayerCapsule(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndBodyPlayerCapsule(ndLoadSaveBase::dLoadDescriptor(desc))
+ndBasicPlayerCapsule::ndBasicPlayerCapsule(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndBodyPlayerCapsule(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_scene(nullptr)
 	,m_isPlayer(false)
 	,m_output()

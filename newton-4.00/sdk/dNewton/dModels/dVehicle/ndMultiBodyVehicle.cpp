@@ -59,8 +59,8 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const ndVector& frontDir, const ndVector&
 	m_localFrame.m_up = m_localFrame.m_right.CrossProduct(m_localFrame.m_front).Normalize();
 }
 
-ndMultiBodyVehicle::ndMultiBodyVehicle(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndModel(ndLoadSaveBase::dLoadDescriptor(desc))
+ndMultiBodyVehicle::ndMultiBodyVehicle(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_localFrame(dGetIdentityMatrix())
 	,m_chassis(nullptr)
 	,m_motor(nullptr)

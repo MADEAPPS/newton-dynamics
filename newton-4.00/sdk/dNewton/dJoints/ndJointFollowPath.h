@@ -20,7 +20,7 @@ class ndJointFollowPath: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointFollowPath);
-	D_NEWTON_API ndJointFollowPath(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointFollowPath(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndJointFollowPath (const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointFollowPath();
 

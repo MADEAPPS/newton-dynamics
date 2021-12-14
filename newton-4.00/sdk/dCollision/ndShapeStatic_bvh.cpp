@@ -79,7 +79,7 @@ ndShapeStatic_bvh::ndShapeStatic_bvh(const ndPolygonSoupBuilder& builder)
 	m_trianglesCount = data.m_triangleCount;
 }
 
-ndShapeStatic_bvh::ndShapeStatic_bvh(const ndLoadSaveBase::dLoadDescriptor& desc)
+ndShapeStatic_bvh::ndShapeStatic_bvh(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndShapeStaticMesh(m_boundingBoxHierachy)
 	,ndAabbPolygonSoup()
 	,m_trianglesCount(0)

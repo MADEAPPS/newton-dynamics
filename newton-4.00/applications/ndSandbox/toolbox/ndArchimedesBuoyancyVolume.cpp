@@ -22,8 +22,8 @@ ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume()
 {
 }
 
-ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndBodyTriggerVolume(ndLoadSaveBase::dLoadDescriptor(desc))
+ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndBodyTriggerVolume(ndLoadSaveBase::ndLoadDescriptor(desc))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	m_plane = xmlGetVector3(xmlNode, "planeNormal");

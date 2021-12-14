@@ -193,7 +193,7 @@ ndShapeStaticMesh::ndShapeStaticMesh(ndShapeID id)
 {
 }
 
-ndShapeStaticMesh::ndShapeStaticMesh(const ndLoadSaveBase::dLoadDescriptor&)
+ndShapeStaticMesh::ndShapeStaticMesh(const ndLoadSaveBase::ndLoadDescriptor&)
 	:ndShape(m_staticMesh)
 {
 }

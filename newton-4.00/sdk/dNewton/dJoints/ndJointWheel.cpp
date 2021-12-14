@@ -71,8 +71,8 @@ ndJointWheel::ndJointWheel(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* co
 {
 }
 
-ndJointWheel::ndJointWheel(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointWheel::ndJointWheel(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_baseFrame(dGetIdentityMatrix())
 	,m_info()
 	,m_posit(ndFloat32(0.0f))

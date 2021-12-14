@@ -38,7 +38,7 @@ ndShapeSphere::ndShapeSphere(ndFloat32 radius)
 	Init(radius);
 }
 
-ndShapeSphere::ndShapeSphere(const ndLoadSaveBase::dLoadDescriptor& desc)
+ndShapeSphere::ndShapeSphere(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndShapeConvex(m_sphere)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

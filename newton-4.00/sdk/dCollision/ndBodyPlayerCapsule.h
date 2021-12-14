@@ -33,7 +33,7 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 {
 	public:
 	D_CLASS_REFLECTION(ndBodyPlayerCapsule);
-	D_COLLISION_API ndBodyPlayerCapsule(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndBodyPlayerCapsule(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API ndBodyPlayerCapsule(const ndMatrix& localAxis, ndFloat32 mass, ndFloat32 radius, ndFloat32 height, ndFloat32 stepHeight);
 	D_COLLISION_API virtual ~ndBodyPlayerCapsule();
 

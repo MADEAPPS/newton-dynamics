@@ -26,8 +26,8 @@ ndJointHingeActuator::ndJointHingeActuator(const ndMatrix& pinAndPivotFrame, ndF
 	EnableLimits(false, minAngle, maxAngle);
 }
 
-ndJointHingeActuator::ndJointHingeActuator(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointHinge(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointHingeActuator::ndJointHingeActuator(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointHinge(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_targetAngle(ndFloat32 (0.0f))
 	,m_motorSpeed(ndFloat32(0.0f))
 	,m_maxTorque(D_LCP_MAX_VALUE)

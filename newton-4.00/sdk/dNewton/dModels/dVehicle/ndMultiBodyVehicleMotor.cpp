@@ -41,8 +41,8 @@ ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, n
 {
 }
 
-ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndMultiBodyVehicleMotor::ndMultiBodyVehicleMotor(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_omega(ndFloat32(0.0f))
 	,m_idleOmega(ndFloat32(0.0f))
 	,m_throttle(ndFloat32(0.0f))

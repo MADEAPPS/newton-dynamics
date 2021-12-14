@@ -26,7 +26,7 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndModel)
 
-ndModel::ndModel(const ndLoadSaveBase::dLoadDescriptor&)
+ndModel::ndModel(const ndLoadSaveBase::ndLoadDescriptor&)
 	:ndClassAlloc()
 	,m_node(nullptr)
 {

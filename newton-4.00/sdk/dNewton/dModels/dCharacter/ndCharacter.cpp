@@ -40,8 +40,8 @@ ndCharacter::ndCharacter()
 {
 }
 
-ndCharacter::ndCharacter(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndModel(ndLoadSaveBase::dLoadDescriptor(desc))
+ndCharacter::ndCharacter(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_rootNode(nullptr)
 	,m_effectors()
 	,m_extraJointAttachments()

@@ -34,17 +34,17 @@ class ndJointBilateralConstraint;
 class ndCharacterForwardDynamicNode;
 class ndCharacterInverseDynamicNode;
 
-class ndCharacterLoadDescriptor: public ndLoadSaveBase::dLoadDescriptor
+class ndCharacterLoadDescriptor: public ndLoadSaveBase::ndLoadDescriptor
 {
 	public:
 	ndCharacterLoadDescriptor()
-		:ndLoadSaveBase::dLoadDescriptor()
+		:ndLoadSaveBase::ndLoadDescriptor()
 		,m_limbMap(nullptr)
 	{
 	}
 
-	ndCharacterLoadDescriptor(const ndLoadSaveBase::dLoadDescriptor& desc)
-		:dLoadDescriptor(desc)
+	ndCharacterLoadDescriptor(const ndLoadSaveBase::ndLoadDescriptor& desc)
+		:ndLoadDescriptor(desc)
 		,m_limbMap(nullptr)
 	{
 		ndCharacterLoadDescriptor* const modelDesc = (ndCharacterLoadDescriptor*)&desc;
@@ -52,14 +52,14 @@ class ndCharacterLoadDescriptor: public ndLoadSaveBase::dLoadDescriptor
 		m_limbMap = modelDesc->m_limbMap;
 	}
 
-	ndCharacterLoadDescriptor(const ndLoadSaveBase::dLoadDescriptor& desc, ndTree<const ndCharacterNode*, ndUnsigned32>* const limbMap)
-		:dLoadDescriptor(desc)
+	ndCharacterLoadDescriptor(const ndLoadSaveBase::ndLoadDescriptor& desc, ndTree<const ndCharacterNode*, ndUnsigned32>* const limbMap)
+		:ndLoadDescriptor(desc)
 		,m_limbMap(limbMap)
 	{
 	}
 
 	ndCharacterLoadDescriptor(const ndCharacterLoadDescriptor& desc)
-		:dLoadDescriptor(desc)
+		:ndLoadDescriptor(desc)
 		,m_limbMap(desc.m_limbMap)
 	{
 	}

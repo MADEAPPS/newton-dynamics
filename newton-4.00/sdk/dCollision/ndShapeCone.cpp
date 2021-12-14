@@ -36,7 +36,7 @@ ndShapeCone::ndShapeCone(ndFloat32 radius, ndFloat32 height)
 	Init(radius, height);
 }
 
-ndShapeCone::ndShapeCone(const ndLoadSaveBase::dLoadDescriptor& desc)
+ndShapeCone::ndShapeCone(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	: ndShapeConvex(m_cone)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

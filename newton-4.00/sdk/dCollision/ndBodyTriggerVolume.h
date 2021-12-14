@@ -31,7 +31,7 @@ class ndBodyTriggerVolume : public ndBodyKinematic
 	public:
 	D_CLASS_REFLECTION(ndBodyTriggerVolume);
 	D_COLLISION_API ndBodyTriggerVolume();
-	D_COLLISION_API ndBodyTriggerVolume(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndBodyTriggerVolume(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndBodyTriggerVolume();
 
 	ndBodyTriggerVolume* GetAsBodyTriggerVolume();

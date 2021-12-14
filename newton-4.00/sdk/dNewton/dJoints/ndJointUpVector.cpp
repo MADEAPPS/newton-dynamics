@@ -24,8 +24,8 @@ ndJointUpVector::ndJointUpVector(const ndVector& normal, ndBodyKinematic* const 
 	CalculateLocalMatrix (matrix, m_localMatrix0, m_localMatrix1);
 }
 
-ndJointUpVector::ndJointUpVector(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointUpVector::ndJointUpVector(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 {
 	//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 }

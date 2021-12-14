@@ -38,7 +38,7 @@ ndShapeChamferCylinder::ndShapeChamferCylinder(ndFloat32 radius, ndFloat32 heigh
 	Init (radius, height);
 }
 
-ndShapeChamferCylinder::ndShapeChamferCylinder(const ndLoadSaveBase::dLoadDescriptor& desc)
+ndShapeChamferCylinder::ndShapeChamferCylinder(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndShapeConvex(m_chamferCylinder)
 {
 	//ndVector size;

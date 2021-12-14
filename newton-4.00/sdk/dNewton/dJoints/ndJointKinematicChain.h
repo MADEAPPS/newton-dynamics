@@ -19,7 +19,7 @@ class ndJointKinematicChain: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointKinematicChain);
-	D_NEWTON_API ndJointKinematicChain(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointKinematicChain(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndJointKinematicChain(const ndVector& globalHipPivot, const ndMatrix& globalPinAndPivot, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointKinematicChain();
 

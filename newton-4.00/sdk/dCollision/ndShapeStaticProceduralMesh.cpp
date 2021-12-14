@@ -59,7 +59,7 @@ ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(ndFloat32 sizex, ndFloa
 	CalculateLocalObb();
 }
 
-ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const ndLoadSaveBase::dLoadDescriptor& desc)
+ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndShapeStaticMesh(m_staticProceduralMesh)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

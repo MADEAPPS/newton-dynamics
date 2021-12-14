@@ -32,7 +32,7 @@ class ndShapeCone : public ndShapeConvex
 	public:
 	D_CLASS_REFLECTION(ndShapeCone);
 	D_COLLISION_API ndShapeCone(ndFloat32 radio, ndFloat32 height);
-	D_COLLISION_API ndShapeCone(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndShapeCone(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API ~ndShapeCone();
 
 	virtual ndShapeCone* GetAsShapeCone() { return this; }

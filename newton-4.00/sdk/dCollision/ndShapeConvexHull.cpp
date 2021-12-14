@@ -61,7 +61,7 @@ ndShapeConvexHull::ndShapeConvexHull (ndInt32 count, ndInt32 strideInBytes, ndFl
 	Create(count, strideInBytes, vertexArray, tolerance);
 }
 
-ndShapeConvexHull::ndShapeConvexHull(const ndLoadSaveBase::dLoadDescriptor& desc)
+ndShapeConvexHull::ndShapeConvexHull(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndShapeConvex(m_convexHull)
 	,m_supportTree(nullptr)
 	,m_faceArray(nullptr)

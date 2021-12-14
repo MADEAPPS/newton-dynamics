@@ -54,7 +54,7 @@ class ndCharacter: public ndModel
 
 	D_CLASS_REFLECTION(ndCharacter);
 	D_NEWTON_API ndCharacter();
-	D_NEWTON_API ndCharacter(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndCharacter(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API virtual ~ndCharacter ();
 
 	D_NEWTON_API virtual void AddToWorld(ndWorld* const world);

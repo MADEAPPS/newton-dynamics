@@ -38,8 +38,8 @@ ndJointPulley::ndJointPulley(ndFloat32 gearRatio,
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
-ndJointPulley::ndJointPulley(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointPulley::ndJointPulley(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_gearRatio(ndFloat32(1.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

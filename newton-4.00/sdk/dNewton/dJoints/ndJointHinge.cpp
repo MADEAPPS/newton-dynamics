@@ -48,8 +48,8 @@ ndJointHinge::ndJointHinge(const ndMatrix& pinAndPivotInChild, const ndMatrix& p
 	CalculateLocalMatrix(pinAndPivotInParent, tmp, m_localMatrix1);
 }
 
-ndJointHinge::ndJointHinge(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointHinge::ndJointHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_angle(ndFloat32(0.0f))
 	,m_omega(ndFloat32(0.0f))
 	,m_springK(ndFloat32(0.0f))

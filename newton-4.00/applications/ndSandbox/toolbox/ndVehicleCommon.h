@@ -172,7 +172,7 @@ class ndVehicleSelector : public ndModel
 	public:
 	D_CLASS_REFLECTION(ndVehicleSelector);
 	ndVehicleSelector();
-	ndVehicleSelector(const ndLoadSaveBase::dLoadDescriptor& desc);
+	ndVehicleSelector(const ndLoadSaveBase::ndLoadDescriptor& desc);
 
 	void Update(ndWorld* const, ndFloat32){}
 	void PostUpdate(ndWorld* const world, ndFloat32);

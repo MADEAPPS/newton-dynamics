@@ -44,7 +44,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	public:
 	D_CLASS_REFLECTION(ndBodyDynamic);
 	D_NEWTON_API ndBodyDynamic();
-	D_NEWTON_API ndBodyDynamic(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndBodyDynamic(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API virtual ~ndBodyDynamic ();
 
 	D_NEWTON_API virtual ndBodyDynamic* GetAsBodyDynamic() { return this; }

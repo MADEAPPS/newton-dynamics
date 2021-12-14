@@ -22,8 +22,8 @@ ndJointAttachmentPoint::ndJointAttachmentPoint(const ndMatrix& pinAndPivotFrame,
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
-ndJointAttachmentPoint::ndJointAttachmentPoint(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointAttachmentPoint::ndJointAttachmentPoint(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	m_lockedDimnetions.m_lockDof = xmlGetInt(xmlNode, "lockDof");

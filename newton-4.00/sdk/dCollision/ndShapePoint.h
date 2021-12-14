@@ -30,7 +30,7 @@ class ndShapePoint: public ndShapeConvex
 {
 	public:
 	D_COLLISION_API ndShapePoint();
-	D_COLLISION_API ndShapePoint(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndShapePoint(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapePoint();
 
 	virtual ndShapePoint* GetAsShapePoint() { return this; }

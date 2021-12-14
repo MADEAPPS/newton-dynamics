@@ -37,8 +37,8 @@ ndJointPdActuator::ndJointPdActuator(const ndMatrix& pinAndPivotFrame, ndBodyKin
 {
 }
 
-ndJointPdActuator::ndJointPdActuator(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointPdActuator::ndJointPdActuator(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_pivotFrame(dGetIdentityMatrix())
 	,m_minTwistAngle(-ndFloat32(1.0e10f))
 	,m_maxTwistAngle(ndFloat32(1.0e10f))

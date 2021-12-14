@@ -155,7 +155,7 @@ void BuildPyramid(ndWorld& world, ndFloat32 mass, const ndVector& origin, const 
 
 	z0 = 0.0f;
 	count = 1;
-	for (int j = 0; j < count; j++) 
+	for (ndInt32 j = 0; j < count; j++)
 	{
 		matrix.m_posit.m_z = z0;
 		const ndInt32 count1 = count - j;
@@ -221,7 +221,7 @@ int main (int, const char*)
 	//BuildSphere(world, 1.0f, origin + ndVector(9.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
 	
 	ndFloat32 totalTime = 0;
-	for (ndInt32 i = 0; i < 10000; i ++)
+	for (int i = 0; i < 10000; i ++)
 	{
 		world.Update(1.0f / 60.0f);
 		totalTime += world.GetUpdateTime();

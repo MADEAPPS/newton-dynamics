@@ -39,7 +39,7 @@ ndBodyParticleSet::ndBodyParticleSet()
 	//dAssert(0);
 }
 
-ndBodyParticleSet::ndBodyParticleSet(const ndLoadSaveBase::dLoadDescriptor& desc)
+ndBodyParticleSet::ndBodyParticleSet(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndBody(desc)
 	//,m_accel(dVector::m_zero)
 	//,m_alpha(dVector::m_zero)

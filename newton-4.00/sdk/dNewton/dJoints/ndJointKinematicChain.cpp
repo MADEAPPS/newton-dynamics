@@ -50,8 +50,8 @@ ndJointKinematicChain::ndJointKinematicChain(const ndVector& globalHipPivot, con
 	SetTargetGlobalMatrix(matrix * m_body1->GetMatrix());
 }
 
-ndJointKinematicChain::ndJointKinematicChain(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointKinematicChain::ndJointKinematicChain(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_hipPivot(ndVector::m_wOne)
 	,m_angle(ndFloat32(0.0f))
 	,m_minAngle(-ndFloat32(45.0f) * ndDegreeToRad)

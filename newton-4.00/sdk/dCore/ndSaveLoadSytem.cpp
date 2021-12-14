@@ -83,7 +83,7 @@ void RegisterLoaderClass(const char* const className, ndLoadSaveBase* const load
 	}
 }
 
-void* LoadClass(const char* const className, const ndLoadSaveBase::dLoadDescriptor& descriptor)
+void* LoadClass(const char* const className, const ndLoadSaveBase::ndLoadDescriptor& descriptor)
 {
 	ndUnsigned64 classNameHash = dCRC64(className);
 
@@ -122,7 +122,7 @@ void* LoadClass(const char* const className, const ndLoadSaveBase::dLoadDescript
 	}
 	#endif
 	
-	ndLoadSaveBase::dLoadDescriptor baseClassDesc(descriptor);
+	ndLoadSaveBase::ndLoadDescriptor baseClassDesc(descriptor);
 	for (const nd::TiXmlNode* node = descriptor.m_rootNode->FirstChild(); node; node = node->NextSibling())
 	{
 		const char* const name = node->Value();

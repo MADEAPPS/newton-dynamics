@@ -37,15 +37,15 @@ class ndPhysicsWorldSettings : public ndWordSettings
 	{
 	}
 
-	ndPhysicsWorldSettings(const ndLoadSaveBase::dLoadDescriptor& desc)
-		:ndWordSettings(ndLoadSaveBase::dLoadDescriptor(desc))
+	ndPhysicsWorldSettings(const ndLoadSaveBase::ndLoadDescriptor& desc)
+		:ndWordSettings(ndLoadSaveBase::ndLoadDescriptor(desc))
 		,m_world(nullptr)
 	{
 	}
 
-	virtual void Load(const ndLoadSaveBase::dLoadDescriptor& desc)
+	virtual void Load(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	{
-		ndLoadSaveBase::dLoadDescriptor childDesc(desc);
+		ndLoadSaveBase::ndLoadDescriptor childDesc(desc);
 		ndWordSettings::Load(childDesc);
 		
 		// load application specific settings here

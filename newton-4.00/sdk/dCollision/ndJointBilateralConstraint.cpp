@@ -67,7 +67,7 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 	memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
 }
 
-ndJointBilateralConstraint::ndJointBilateralConstraint(const ndLoadSaveBase::dLoadDescriptor& desc)
+ndJointBilateralConstraint::ndJointBilateralConstraint(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndConstraint()
 	//,dClassAlloc()
 	,ndContainersFreeListAlloc<ndJointBilateralConstraint>()

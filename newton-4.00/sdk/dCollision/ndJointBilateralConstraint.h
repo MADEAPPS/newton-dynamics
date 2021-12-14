@@ -44,7 +44,7 @@ class ndJointBilateralConstraint : public ndConstraint, public ndContainersFreeL
 {
 	public:
 	D_CLASS_REFLECTION(ndJointBilateralConstraint);
-	D_COLLISION_API ndJointBilateralConstraint(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndJointBilateralConstraint(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrix);
 	D_COLLISION_API virtual ~ndJointBilateralConstraint();
 

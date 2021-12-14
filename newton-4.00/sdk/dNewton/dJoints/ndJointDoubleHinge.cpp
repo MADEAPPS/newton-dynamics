@@ -24,8 +24,8 @@ ndJointDoubleHinge::ndJointDoubleHinge(const ndMatrix& pinAndPivotFrame, ndBodyK
 {
 }
 
-ndJointDoubleHinge::ndJointDoubleHinge(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointDoubleHinge::ndJointDoubleHinge(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_angle0(ndFloat32(0.0f))
 	,m_omega0(ndFloat32(0.0f))
 	,m_angle1(ndFloat32(0.0f))

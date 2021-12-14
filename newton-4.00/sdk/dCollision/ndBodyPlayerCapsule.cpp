@@ -116,8 +116,8 @@ ndBodyPlayerCapsule::ndBodyPlayerCapsule(const ndMatrix& localAxis, ndFloat32 ma
 	m_stepHeight = dMax(stepHeight, m_contactPatch * ndFloat32(2.0f));
 }
 
-ndBodyPlayerCapsule::ndBodyPlayerCapsule(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndBodyKinematic(ndLoadSaveBase::dLoadDescriptor(desc))
+ndBodyPlayerCapsule::ndBodyPlayerCapsule(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndBodyKinematic(ndLoadSaveBase::ndLoadDescriptor(desc))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	m_contactTestOnly = 1;

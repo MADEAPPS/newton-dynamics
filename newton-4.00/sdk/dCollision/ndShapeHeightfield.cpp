@@ -79,7 +79,7 @@ ndShapeHeightfield::ndShapeHeightfield(
 	CalculateLocalObb();
 }
 
-ndShapeHeightfield::ndShapeHeightfield(const ndLoadSaveBase::dLoadDescriptor& desc)
+ndShapeHeightfield::ndShapeHeightfield(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndShapeStaticMesh(m_heightField)
 	,m_minBox(ndVector::m_zero)
 	,m_maxBox(ndVector::m_zero)

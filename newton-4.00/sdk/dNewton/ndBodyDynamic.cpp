@@ -41,8 +41,8 @@ ndBodyDynamic::ndBodyDynamic()
 	m_isDynamics = 1;
 }
 
-ndBodyDynamic::ndBodyDynamic(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndBodyKinematic(ndLoadSaveBase::dLoadDescriptor(desc))
+ndBodyDynamic::ndBodyDynamic(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndBodyKinematic(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_externalForce(ndVector::m_zero)
 	,m_externalTorque(ndVector::m_zero)
 	,m_impulseForce(ndVector::m_zero)

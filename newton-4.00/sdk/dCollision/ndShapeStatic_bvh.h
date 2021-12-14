@@ -30,7 +30,7 @@ class ndShapeStatic_bvh: public ndShapeStaticMesh, public ndAabbPolygonSoup
 	public:
 	D_CLASS_REFLECTION(ndShapeStatic_bvh);
 	D_COLLISION_API ndShapeStatic_bvh(const ndPolygonSoupBuilder& builder);
-	D_COLLISION_API ndShapeStatic_bvh(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndShapeStatic_bvh(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeStatic_bvh();
 
 	void *operator new (size_t size);

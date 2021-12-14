@@ -30,8 +30,8 @@ ndJointSlider::ndJointSlider(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* 
 {
 }
 
-ndJointSlider::ndJointSlider(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointSlider::ndJointSlider(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_posit(ndFloat32(0.0f))
 	,m_speed(ndFloat32(0.0f))
 	,m_springK(ndFloat32(0.0f))

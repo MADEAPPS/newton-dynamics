@@ -26,7 +26,7 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyNotify)
 
-ndBodyNotify::ndBodyNotify(const ndLoadSaveBase::dLoadDescriptor& desc)
+ndBodyNotify::ndBodyNotify(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndContainersFreeListAlloc<ndBodyNotify>()
 	,m_body(nullptr)
 {

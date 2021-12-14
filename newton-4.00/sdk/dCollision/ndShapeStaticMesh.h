@@ -117,7 +117,7 @@ class ndShapeStaticMesh: public ndShape
 	public:
 	D_CLASS_REFLECTION(ndShapeStaticMesh);
 	D_COLLISION_API ndShapeStaticMesh(ndShapeID id);
-	D_COLLISION_API ndShapeStaticMesh(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndShapeStaticMesh(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeStaticMesh();
 
 	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;

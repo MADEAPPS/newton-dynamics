@@ -30,7 +30,7 @@ ndShapePoint::ndShapePoint()
 {
 }
 
-ndShapePoint::ndShapePoint(const ndLoadSaveBase::dLoadDescriptor&)
+ndShapePoint::ndShapePoint(const ndLoadSaveBase::ndLoadDescriptor&)
 	:ndShapeConvex(m_pointCollision)
 {
 	dAssert(0);

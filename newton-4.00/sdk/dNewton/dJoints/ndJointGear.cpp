@@ -39,8 +39,8 @@ ndJointGear::ndJointGear(ndFloat32 gearRatio,
 	SetSolverModel(m_jointkinematicOpenLoop);
 }
 
-ndJointGear::ndJointGear(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointGear::ndJointGear(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_gearRatio(ndFloat32 (1.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

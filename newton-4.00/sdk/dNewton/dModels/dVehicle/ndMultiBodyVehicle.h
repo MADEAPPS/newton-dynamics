@@ -68,7 +68,7 @@ class ndMultiBodyVehicle: public ndModel
 	};
 
 	D_CLASS_REFLECTION(ndMultiBodyVehicle);
-	D_NEWTON_API ndMultiBodyVehicle(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndMultiBodyVehicle(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndMultiBodyVehicle(const ndVector& frontDir, const ndVector& upDir);
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
 

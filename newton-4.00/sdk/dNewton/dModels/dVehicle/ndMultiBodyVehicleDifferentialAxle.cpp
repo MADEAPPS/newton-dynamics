@@ -38,8 +38,8 @@ ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle(
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
-ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndMultiBodyVehicleDifferentialAxle::ndMultiBodyVehicleDifferentialAxle(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 {
 }
 

@@ -48,7 +48,7 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 
 	~ndBasicPlayerCapsule();
 
-	ndBasicPlayerCapsule(const ndLoadSaveBase::dLoadDescriptor& desc);
+	ndBasicPlayerCapsule(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	void ApplyInputs(ndFloat32 timestep);

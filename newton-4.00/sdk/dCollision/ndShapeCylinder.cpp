@@ -36,7 +36,7 @@ ndShapeCylinder::ndShapeCylinder(ndFloat32 radius0, ndFloat32 radius1, ndFloat32
 	Init(radius0, radius1, height);
 }
 
-ndShapeCylinder::ndShapeCylinder(const ndLoadSaveBase::dLoadDescriptor& desc)
+ndShapeCylinder::ndShapeCylinder(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	: ndShapeConvex(m_cylinder)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

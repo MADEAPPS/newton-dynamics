@@ -32,7 +32,7 @@ class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 	public:  
 	D_CLASS_REFLECTION(ndBodyNotify);
 	ndBodyNotify(const ndVector& defualtGravity);
-	D_COLLISION_API ndBodyNotify(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndBodyNotify(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	virtual ~ndBodyNotify();
 
 	ndBody* GetBody();

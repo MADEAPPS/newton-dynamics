@@ -33,7 +33,7 @@ class ndShapeChamferCylinder: public ndShapeConvex
 	public:
 	D_CLASS_REFLECTION(ndShapeChamferCylinder);
 	D_COLLISION_API ndShapeChamferCylinder(ndFloat32 radius, ndFloat32 height);
-	D_COLLISION_API ndShapeChamferCylinder(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndShapeChamferCylinder(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeChamferCylinder();
 
 	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return this; }

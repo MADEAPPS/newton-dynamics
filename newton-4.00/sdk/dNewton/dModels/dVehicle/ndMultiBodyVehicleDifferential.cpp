@@ -32,8 +32,8 @@ ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(ndBodyKinematic* 
 	dAssert(slipOmegaLock >= 0.0f);
 }
 
-ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndMultiBodyVehicleDifferential::ndMultiBodyVehicleDifferential(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_limitedSlipOmega(ndFloat32 (0.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

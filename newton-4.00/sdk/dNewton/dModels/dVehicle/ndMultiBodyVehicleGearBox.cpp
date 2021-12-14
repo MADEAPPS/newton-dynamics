@@ -38,8 +38,8 @@ ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const moto
 	SetSolverModel(m_jointkinematicCloseLoop);
 }
 
-ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointGear(ndLoadSaveBase::dLoadDescriptor(desc))
+ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointGear(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_chassis(nullptr)
 	,m_clutchTorque(ndFloat32(1.0e5f))
 	,m_driveTrainResistanceTorque(ndFloat32(1000.0f))

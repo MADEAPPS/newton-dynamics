@@ -19,7 +19,7 @@ class ndJointPdActuator : public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointPdActuator);
-	D_NEWTON_API ndJointPdActuator(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointPdActuator(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndJointPdActuator(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointPdActuator();
 

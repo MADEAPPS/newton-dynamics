@@ -278,7 +278,7 @@ ndShapeCompound::ndShapeCompound(const ndShapeCompound& source, const ndShapeIns
 	}
 }
 
-ndShapeCompound::ndShapeCompound(const ndLoadSaveBase::dLoadDescriptor&)
+ndShapeCompound::ndShapeCompound(const ndLoadSaveBase::ndLoadDescriptor&)
 	:ndShape(m_compound)
 	,m_array()
 	,m_treeEntropy(ndFloat32 (0.0f))

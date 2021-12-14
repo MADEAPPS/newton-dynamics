@@ -53,7 +53,7 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	};
 
 	D_CLASS_REFLECTION(ndShapeStaticProceduralMesh);
-	D_COLLISION_API ndShapeStaticProceduralMesh(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndShapeStaticProceduralMesh(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API ndShapeStaticProceduralMesh(ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez);
 	D_COLLISION_API virtual ~ndShapeStaticProceduralMesh();
 

@@ -96,7 +96,7 @@ class ndLoadSaveInfo
 	ndTree<ndInt32, const ndJointBilateralConstraint*> m_jointMap;
 };
 
-ndWordSettings::ndWordSettings(const ndLoadSaveBase::dLoadDescriptor&)
+ndWordSettings::ndWordSettings(const ndLoadSaveBase::ndLoadDescriptor&)
 	:ndClassAlloc()
 	,m_subSteps(2)
 	,m_solverIterations(4)
@@ -114,7 +114,7 @@ void ndWordSettings::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	xmlSaveParam(childNode, "solverIterations", m_solverIterations);
 }
 
-void ndWordSettings::Load(const ndLoadSaveBase::dLoadDescriptor& desc)
+void ndWordSettings::Load(const ndLoadSaveBase::ndLoadDescriptor& desc)
 {
 	m_subSteps = xmlGetInt(desc.m_rootNode, "solverSubsteps");
 	m_solverIterations = xmlGetInt(desc.m_rootNode, "solverIterations");
@@ -128,7 +128,7 @@ void ndLoadSave::LoadSceneSettings(const nd::TiXmlNode* const rootNode, const ch
 	const nd::TiXmlNode* node = setting->FirstChild();
 	const char* const className = node->Value();
 
-	ndLoadSaveBase::dLoadDescriptor settingDesc;
+	ndLoadSaveBase::ndLoadDescriptor settingDesc;
 	settingDesc.m_rootNode = node;
 	settingDesc.m_assetPath = assetPath;
 
@@ -142,7 +142,7 @@ void ndLoadSave::LoadShapes(const nd::TiXmlNode* const rootNode,
 	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndShapes");
 	if (shapes)
 	{
-		ndLoadSaveBase::dLoadDescriptor descriptor;
+		ndLoadSaveBase::ndLoadDescriptor descriptor;
 		descriptor.m_assetPath = assetPath;
 
 		class ndPendingCompounds
@@ -197,7 +197,7 @@ void ndLoadSave::LoadBodies(const nd::TiXmlNode* const rootNode,
 	const nd::TiXmlNode* const bodies = rootNode->FirstChild("ndBodies");
 	if (bodies)
 	{
-		ndLoadSaveBase::dLoadDescriptor descriptor;
+		ndLoadSaveBase::ndLoadDescriptor descriptor;
 		descriptor.m_assetPath = assetPath;
 		descriptor.m_shapeMap = &shapesMap;
 
@@ -222,7 +222,7 @@ void ndLoadSave::LoadJoints(const nd::TiXmlNode* const rootNode, const char* con
 	const nd::TiXmlNode* const joints = rootNode->FirstChild("ndJoints");
 	if (joints)
 	{
-		ndLoadSaveBase::dLoadDescriptor descriptor;
+		ndLoadSaveBase::ndLoadDescriptor descriptor;
 		descriptor.m_assetPath = assetPath;
 		descriptor.m_bodyMap = &m_bodyMap;
 
@@ -251,7 +251,7 @@ void ndLoadSave::LoadModels(const nd::TiXmlNode* const rootNode, const char* con
 	const nd::TiXmlNode* const models = rootNode->FirstChild("ndModels");
 	if (models)
 	{
-		ndLoadSaveBase::dLoadDescriptor descriptor;
+		ndLoadSaveBase::ndLoadDescriptor descriptor;
 		descriptor.m_assetPath = assetPath;
 		descriptor.m_bodyMap = &m_bodyMap;
 		descriptor.m_jointMap = &m_jointMap;

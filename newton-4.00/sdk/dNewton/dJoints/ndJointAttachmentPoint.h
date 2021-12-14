@@ -24,7 +24,7 @@ class ndJointAttachmentPoint: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointAttachmentPoint);
-	D_NEWTON_API ndJointAttachmentPoint(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointAttachmentPoint(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndJointAttachmentPoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 	D_NEWTON_API virtual ~ndJointAttachmentPoint();
 

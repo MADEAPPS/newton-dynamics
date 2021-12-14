@@ -26,8 +26,8 @@ ndJointDryRollingFriction::ndJointDryRollingFriction(ndBodyKinematic* const body
 	SetSolverModel(m_jointIterativeSoft);
 }
 
-ndJointDryRollingFriction::ndJointDryRollingFriction(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointDryRollingFriction::ndJointDryRollingFriction(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 

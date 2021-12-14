@@ -193,8 +193,8 @@ ndVehicleSelector::ndVehicleSelector()
 {
 }
 
-ndVehicleSelector::ndVehicleSelector(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndModel(ndLoadSaveBase::dLoadDescriptor(desc))
+ndVehicleSelector::ndVehicleSelector(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_changeVehicle()
 {
 }

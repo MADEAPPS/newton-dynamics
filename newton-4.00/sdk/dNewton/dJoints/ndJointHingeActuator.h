@@ -19,7 +19,7 @@ class ndJointHingeActuator: public ndJointHinge
 {
 	public:
 	D_CLASS_REFLECTION(ndJointHingeActuator);
-	D_NEWTON_API ndJointHingeActuator(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointHingeActuator(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	//D_NEWTON_API ndJointHingeActuator(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API ndJointHingeActuator(const ndMatrix& pinAndPivotFrame, ndFloat32 angularRate, ndFloat32 minAngle, ndFloat32 maxAngle, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointHingeActuator();

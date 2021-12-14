@@ -27,8 +27,8 @@ ndJointBallAndSocket::ndJointBallAndSocket(const ndMatrix& pinAndPivotFrame, ndB
 {
 }
 
-ndJointBallAndSocket::ndJointBallAndSocket(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointBallAndSocket::ndJointBallAndSocket(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_maxConeAngle(ndFloat32(1.0e10f))
 	,m_coneFriction(ndFloat32(0.0))
 	,m_minTwistAngle(-ndFloat32(1.0e10f))

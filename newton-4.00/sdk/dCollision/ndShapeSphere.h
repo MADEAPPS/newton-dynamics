@@ -32,7 +32,7 @@ class ndShapeSphere: public ndShapeConvex
 	public:
 	D_CLASS_REFLECTION(ndShapeSphere);
 	D_COLLISION_API ndShapeSphere(ndFloat32 radius);
-	D_COLLISION_API ndShapeSphere(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndShapeSphere(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeSphere();
 
 	virtual ndShapeSphere* GetAsShapeSphere() { return this; }

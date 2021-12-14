@@ -55,10 +55,10 @@ class ndModelLoaderCache: public ndTree<const ndModel*, ndInt32>
 class ndLoadSaveBase: public ndClassAlloc
 {
 	public:
-	class dLoadDescriptor
+	class ndLoadDescriptor
 	{
 		public:
-		dLoadDescriptor()
+		ndLoadDescriptor()
 			:m_assetPath(nullptr)
 			,m_rootNode(nullptr)
 			,m_bodyMap(nullptr)
@@ -69,7 +69,7 @@ class ndLoadSaveBase: public ndClassAlloc
 		{
 		}
 
-		dLoadDescriptor(const dLoadDescriptor& desc)
+		ndLoadDescriptor(const ndLoadDescriptor& desc)
 			:m_assetPath(desc.m_assetPath)
 			,m_rootNode(desc.m_rootNode->FirstChild())
 			,m_bodyMap(desc.m_bodyMap)
@@ -135,14 +135,14 @@ class ndLoadSaveBase: public ndClassAlloc
 		ndTree<ndInt32, const ndJointBilateralConstraint*>* m_jointMap;
 	};
 
-	virtual void* CreateClass(const dLoadDescriptor&)
+	virtual void* CreateClass(const ndLoadDescriptor&)
 	{
 		dAssert(0);
 		return nullptr;
 	}
 };
 
-D_CORE_API void* LoadClass(const char* const className, const ndLoadSaveBase::dLoadDescriptor& desc);
+D_CORE_API void* LoadClass(const char* const className, const ndLoadSaveBase::ndLoadDescriptor& desc);
 D_CORE_API void RegisterLoaderClass(const char* const className, ndLoadSaveBase* const loaderClass);
 
 template<class T>
@@ -154,7 +154,7 @@ class ndLoadSaveClass: public ndLoadSaveBase
 		RegisterLoaderClass(className, this);
 	}
 
-	virtual void* CreateClass(const dLoadDescriptor& desc)
+	virtual void* CreateClass(const ndLoadDescriptor& desc)
 	{
 		return new T(desc);
 	}

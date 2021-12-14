@@ -30,7 +30,7 @@ class ndBodyParticleSet: public ndBody
 {
 	public:
 	D_NEWTON_API ndBodyParticleSet();
-	D_NEWTON_API ndBodyParticleSet(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndBodyParticleSet(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API virtual ~ndBodyParticleSet ();
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 

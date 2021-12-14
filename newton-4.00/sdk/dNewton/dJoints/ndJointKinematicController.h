@@ -33,7 +33,7 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	};
 
 	D_CLASS_REFLECTION(ndJointKinematicController);
-	D_NEWTON_API ndJointKinematicController(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointKinematicController(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const ndVector& attachmentPointInGlobalSpace);
 	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const ndMatrix& attachmentMatrixInGlobalSpace);
 	D_NEWTON_API virtual ~ndJointKinematicController();

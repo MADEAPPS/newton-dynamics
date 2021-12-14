@@ -48,7 +48,7 @@ class ndShapeCompound: public ndShape
 
 	D_CLASS_REFLECTION(ndShapeCompound);
 	D_COLLISION_API ndShapeCompound();
-	D_COLLISION_API ndShapeCompound(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_COLLISION_API ndShapeCompound(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeCompound();
 
 	void SetOwner(const ndShapeInstance* const myInstance);

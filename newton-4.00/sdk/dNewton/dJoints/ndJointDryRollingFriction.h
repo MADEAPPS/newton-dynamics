@@ -25,7 +25,7 @@ class ndJointDryRollingFriction: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointDryRollingFriction);
-	D_NEWTON_API ndJointDryRollingFriction(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointDryRollingFriction(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndJointDryRollingFriction(ndBodyKinematic* const body0, ndBodyKinematic* const body1, ndFloat32 coefficient);
 	D_NEWTON_API virtual ~ndJointDryRollingFriction();
 

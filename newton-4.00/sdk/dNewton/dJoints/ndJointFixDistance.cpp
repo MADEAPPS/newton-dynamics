@@ -35,8 +35,8 @@ ndJointFixDistance::ndJointFixDistance(const ndVector& pivotInChildInGlobalSpace
 	CalculateLocalMatrix(parentMatrix, dummy, m_localMatrix1);
 }
 
-ndJointFixDistance::ndJointFixDistance(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointFixDistance::ndJointFixDistance(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_distance(ndFloat32(0.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

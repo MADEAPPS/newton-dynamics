@@ -24,8 +24,8 @@ ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const ndMatrix& pinAndP
 {
 }
 
-ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointWheel(ndLoadSaveBase::dLoadDescriptor(desc))
+ndMultiBodyVehicleTireJoint::ndMultiBodyVehicleTireJoint(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointWheel(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_vehicle(nullptr)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

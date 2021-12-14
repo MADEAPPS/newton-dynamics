@@ -19,7 +19,7 @@ class ndMultiBodyVehicleTireJoint: public ndJointWheel
 {
 	public:
 	D_CLASS_REFLECTION(ndMultiBodyVehicleTireJoint);
-	D_NEWTON_API ndMultiBodyVehicleTireJoint(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndMultiBodyVehicleTireJoint(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndMultiBodyVehicleTireJoint(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& desc, ndMultiBodyVehicle* const vehicle);
 	D_NEWTON_API virtual ~ndMultiBodyVehicleTireJoint();
 

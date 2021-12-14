@@ -34,7 +34,7 @@ class ndModel: public ndClassAlloc
 	public:
 	D_CLASS_REFLECTION(ndModel);
 	ndModel();
-	D_NEWTON_API ndModel(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndModel(const ndLoadSaveBase::ndLoadDescriptor& desc);
 
 	virtual ~ndModel ();
 	

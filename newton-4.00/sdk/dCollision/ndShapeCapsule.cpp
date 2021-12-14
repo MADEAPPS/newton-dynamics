@@ -36,7 +36,7 @@ ndShapeCapsule::ndShapeCapsule(ndFloat32 radius0, ndFloat32 radius1, ndFloat32 h
 	Init(radius0, radius1, height);
 }
 
-ndShapeCapsule::ndShapeCapsule(const ndLoadSaveBase::dLoadDescriptor& desc)
+ndShapeCapsule::ndShapeCapsule(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndShapeConvex(m_capsule)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

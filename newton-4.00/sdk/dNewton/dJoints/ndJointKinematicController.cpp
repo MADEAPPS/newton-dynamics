@@ -190,8 +190,8 @@ ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const re
 	Init(attachmentMatrixInGlobalSpace);
 }
 
-ndJointKinematicController::ndJointKinematicController(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointKinematicController::ndJointKinematicController(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 	ndMatrix attachmentMatrixInGlobalSpace(m_localMatrix0 * GetBody0()->GetMatrix());

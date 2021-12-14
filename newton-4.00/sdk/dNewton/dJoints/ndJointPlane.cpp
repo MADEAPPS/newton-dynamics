@@ -26,8 +26,8 @@ ndJointPlane::ndJointPlane (const ndVector& pivot, const ndVector& normal, ndBod
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
-ndJointPlane::ndJointPlane(const ndLoadSaveBase::dLoadDescriptor& desc)
-	:ndJointBilateralConstraint(ndLoadSaveBase::dLoadDescriptor(desc))
+ndJointPlane::ndJointPlane(const ndLoadSaveBase::ndLoadDescriptor& desc)
+	:ndJointBilateralConstraint(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_enableControlRotation(true)
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;

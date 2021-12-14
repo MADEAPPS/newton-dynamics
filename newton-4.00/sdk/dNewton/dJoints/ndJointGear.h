@@ -19,7 +19,7 @@ class ndJointGear: public ndJointBilateralConstraint
 {
 	public:
 	D_CLASS_REFLECTION(ndJointGear);
-	D_NEWTON_API ndJointGear(const ndLoadSaveBase::dLoadDescriptor& desc);
+	D_NEWTON_API ndJointGear(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndJointGear(ndFloat32 gearRatio,
 		const ndVector& body0Pin, ndBodyKinematic* const body0,
 		const ndVector& body1Pin, ndBodyKinematic* const body1);
