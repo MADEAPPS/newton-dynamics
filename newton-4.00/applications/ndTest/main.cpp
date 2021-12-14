@@ -46,7 +46,7 @@ class CheckMemoryLeaks
 		#if defined(_DEBUG) && defined(_MSC_VER)
 			// Track all memory leaks at the operating system level.
 			// make sure no Newton tool or utility leaves leaks behind.
-			dUnsigned32 flags = _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF) & 0xffff;
+			ndUnsigned32 flags = _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF) & 0xffff;
 			flags = flags | _CRTDBG_REPORT_FLAG;
 			flags = flags | _CRTDBG_CHECK_EVERY_1024_DF;
 			_CrtSetDbgFlag(flags);
@@ -80,8 +80,8 @@ class ndDemoEntityNotify: public ndBodyNotify
 		m_applicationUserData = nullptr;
 	}
 
-	//virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
-	virtual void OnApplyExternalForce(dInt32, dFloat32)
+	//virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep)
+	virtual void OnApplyExternalForce(ndInt32, ndFloat32)
 	{
 		ndBodyDynamic* const dynamicBody = GetBody()->GetAsBodyDynamic();
 		if (dynamicBody)
@@ -93,8 +93,8 @@ class ndDemoEntityNotify: public ndBodyNotify
 		}
 	}
 
-	//virtual void OnTransform(dInt32 threadIndex, const ndMatrix& matrix)
-	virtual void OnTransform(dInt32, const ndMatrix&)
+	//virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix)
+	virtual void OnTransform(ndInt32, const ndMatrix&)
 	{
 		// apply this transformation matrix to the application user data.
 		//dAssert(0);
@@ -103,7 +103,7 @@ class ndDemoEntityNotify: public ndBodyNotify
 	void* m_applicationUserData;
 };
 
-ndVector FindFloor(const ndWorld& world, const ndVector& origin, dFloat32 dist)
+ndVector FindFloor(const ndWorld& world, const ndVector& origin, ndFloat32 dist)
 {
 	// shot a vertical ray from a high altitude and collect the intersection parameter.
 	ndVector p0(origin);
@@ -129,7 +129,7 @@ void BuildFloorBox(ndWorld& world)
 	world.AddBody(body);
 }
 
-void BuildPyramid(ndWorld& world, dFloat32 mass, const ndVector& origin, const ndVector& size, int count)
+void BuildPyramid(ndWorld& world, ndFloat32 mass, const ndVector& origin, const ndVector& size, int count)
 {
 	ndMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -147,19 +147,19 @@ void BuildPyramid(ndWorld& world, dFloat32 mass, const ndVector& origin, const n
 	ndVector maxP(0.0f);
 	box.CalculateAabb(dGetIdentityMatrix(), minP, maxP);
 
-	dFloat32 stepz = maxP.m_z - minP.m_z + 0.03125f;
-	dFloat32 stepy = (maxP.m_y - minP.m_y) - 0.01f;
+	ndFloat32 stepz = maxP.m_z - minP.m_z + 0.03125f;
+	ndFloat32 stepy = (maxP.m_y - minP.m_y) - 0.01f;
 		  
-	//dFloat32 y0 = matrix.m_posit.m_y + stepy / 2.0f;
-	dFloat32 z0 = matrix.m_posit.m_z - stepz * count / 2;
+	//ndFloat32 y0 = matrix.m_posit.m_y + stepy / 2.0f;
+	ndFloat32 z0 = matrix.m_posit.m_z - stepz * count / 2;
 
 	z0 = 0.0f;
 	count = 1;
 	for (int j = 0; j < count; j++) 
 	{
 		matrix.m_posit.m_z = z0;
-		const dInt32 count1 = count - j;
-		for (int i = 0; i < count1; i++)
+		const ndInt32 count1 = count - j;
+		for (ndInt32 i = 0; i < count1; i++)
 		{
 			ndBodyDynamic* const body = new ndBodyDynamic();
 
@@ -176,7 +176,7 @@ void BuildPyramid(ndWorld& world, dFloat32 mass, const ndVector& origin, const n
 	}
 }
 
-void BuildSphere(ndWorld& world, dFloat32 mass, const ndVector& origin, const dFloat32 diameter, int count, dFloat32 offsetHigh)
+void BuildSphere(ndWorld& world, ndFloat32 mass, const ndVector& origin, const ndFloat32 diameter, int count, ndFloat32 offsetHigh)
 {
 	ndMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -220,8 +220,8 @@ int main (int, const char*)
 	//BuildSphere(world, 1.0f, origin + ndVector(6.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
 	//BuildSphere(world, 1.0f, origin + ndVector(9.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
 	
-	dFloat32 totalTime = 0;
-	for (dInt32 i = 0; i < 10000; i ++)
+	ndFloat32 totalTime = 0;
+	for (ndInt32 i = 0; i < 10000; i ++)
 	{
 		world.Update(1.0f / 60.0f);
 		totalTime += world.GetUpdateTime();

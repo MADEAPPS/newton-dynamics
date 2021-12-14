@@ -61,7 +61,6 @@ class ndPolygonSoupBuilder::dgFaceMap: public ndTree<dgFaceBucket, ndInt32>
 		:ndTree<dgFaceBucket, ndInt32>()
 	{
 		ndInt32 polygonIndex = 0;
-		//ndInt32 faceCount = builder.m_faceCount;
 		ndInt32 faceCount = builder.m_faceVertexCount.GetCount();
 		const ndInt32* const faceVertexCounts = &builder.m_faceVertexCount[0];
 		const ndInt32* const faceVertexIndex = &builder.m_vertexIndex[0];

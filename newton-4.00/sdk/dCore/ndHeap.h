@@ -227,7 +227,6 @@ void ndDownHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 {
 	ndHeapBase<OBJECT,KEY>::m_curCount ++;
 
-	//ndInt32 j;
 	ndInt32 i = ndHeapBase<OBJECT,KEY>::m_curCount;
 	for (ndInt32 j = 0; i; i = j)
 	{
