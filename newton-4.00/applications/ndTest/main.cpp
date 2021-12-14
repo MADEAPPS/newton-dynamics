@@ -221,7 +221,7 @@ int main (int, const char*)
 	//BuildSphere(world, 1.0f, origin + ndVector(9.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
 	
 	ndFloat32 totalTime = 0;
-	for (int i = 0; i < 10000; i ++)
+	for (ndInt32 i = 0; i < 10000; i ++)
 	{
 		world.Update(1.0f / 60.0f);
 		totalTime += world.GetUpdateTime();
