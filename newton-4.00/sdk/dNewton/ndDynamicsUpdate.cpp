@@ -30,6 +30,8 @@
 #define D_MAX_BODY_RADIX_BIT		9
 #define D_DEFAULT_BUFFER_SIZE		1024
 
+static int xxxx;
+
 ndDynamicsUpdate::ndDynamicsUpdate(ndWorld* const world)
 	:m_velocTol(dFloat32(1.0e-8f))
 	,m_islands(D_DEFAULT_BUFFER_SIZE)
@@ -124,13 +126,18 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	ndScene* const scene = m_world->GetScene();
 	const dInt32 threadCount = scene->GetThreadCount();
 	ndConstraintArray& jointArray = scene->GetActiveContactArray();
+	ndArray<ndJointBodyPairIndex>& bodyJointPairs = GetJointBodyPairIndexBuffer();
+
+	bodyJointPairs.SetCount(jointArray.GetCount() * 2);
 	GetTempInternalForces().SetCount(jointArray.GetCount() * 2);
-	GetJointBodyPairIndexBuffer().SetCount(jointArray.GetCount() * 2);
 
 	scene->SubmitJobs<ndCountJointBodyPairs>();
-	scene->CountingSort<ndJointBodyPairIndex, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&GetJointBodyPairIndexBuffer()[0], (ndJointBodyPairIndex*)GetTempBuffer(), GetJointBodyPairIndexBuffer().GetCount(), 0);
-	scene->CountingSort<ndJointBodyPairIndex, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&GetJointBodyPairIndexBuffer()[0], (ndJointBodyPairIndex*)GetTempBuffer(), GetJointBodyPairIndexBuffer().GetCount(), 1);
+	scene->CountingSort<ndJointBodyPairIndex, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&bodyJointPairs[0], (ndJointBodyPairIndex*)GetTempBuffer(), bodyJointPairs.GetCount(), 0);
+	scene->CountingSort<ndJointBodyPairIndex, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&bodyJointPairs[0], (ndJointBodyPairIndex*)GetTempBuffer(), bodyJointPairs.GetCount(), 1);
 
+	//bodyJointPairs.SetCount(bodyJointPairs.GetCount() + 1);
+	//bodyJointPairs[bodyJointPairs.GetCount() - 1] = bodyJointPairs[bodyJointPairs.GetCount() - 2];
+	
 	ndArray<dInt32>& bodyJointIndex = GetJointForceIndexBuffer();
 	const dInt32 bodyJointIndexCount = scene->GetActiveBodyArray().GetCount() + 1;
 	bodyJointIndex.SetCount(bodyJointIndexCount);
@@ -138,11 +145,11 @@ void ndDynamicsUpdate::SortBodyJointScan()
 
 	for (dInt32 i = 0; i < jointArray.GetCount(); ++i)
 	{
-		ndConstraint* const joint = jointArray[i];
+		const ndConstraint* const joint = jointArray[i];
 		const ndBodyKinematic* const body0 = joint->GetBody0();
 		const ndBodyKinematic* const body1 = joint->GetBody1();
-		dInt32 m0 = body0->m_index;
-		dInt32 m1 = body1->m_index;
+		const dInt32 m0 = body0->m_index;
+		const dInt32 m1 = body1->m_index;
 		bodyJointIndex[m0] ++;
 		bodyJointIndex[m1] ++;
 	}
@@ -363,19 +370,19 @@ void ndDynamicsUpdate::SortJointsScan()
 	const ndJointList& jointList = m_world->GetJointList();
 	ndConstraintArray& jointArray = scene->GetActiveContactArray();
 
-	dInt32 index = jointArray.GetCount();
-	jointArray.SetCount(index + jointList.GetCount());
+	dInt32 jointCount = jointArray.GetCount();
+	jointArray.SetCount(jointCount + jointList.GetCount());
 
 	for (ndJointList::ndNode* node = jointList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointBilateralConstraint* const joint = node->GetInfo();
 		if (joint->IsActive())
 		{
-			jointArray[index] = joint;
-			index++;
+			jointArray[jointCount] = joint;
+			jointCount++;
 		}
 	}
-	jointArray.SetCount(index);
+	jointArray.SetCount(jointCount);
 
 	m_leftHandSide.SetCount(jointArray.GetCount() + 32);
 
@@ -437,8 +444,6 @@ void ndDynamicsUpdate::SortJointsScan()
 		ndConstraint* const joint = jointArray[i];
 		ndBodyKinematic* const body0 = joint->GetBody0();
 		ndBodyKinematic* const body1 = joint->GetBody1();
-
-		//if (body1->m_invMass.m_w > dFloat32(0.0f))
 		if (!body1->m_isStatic)
 		{
 			ndBodyKinematic* root0 = FindRootAndSplit(body0);
@@ -488,7 +493,6 @@ void ndDynamicsUpdate::SortJoints()
 
 	if (!m_activeJointCount)
 	{
-		//	jointArray.SetCount(0);
 		return;
 	}
 
@@ -544,6 +548,17 @@ void ndDynamicsUpdate::SortJoints()
 void ndDynamicsUpdate::SortIslands()
 {
 	D_TRACKTIME();
+	class ndEvaluateKey
+	{
+		public:
+		dUnsigned32 GetKey(const ndIsland& island) const
+		{
+			dUnsigned32 key = island.m_count * 2 + island.m_root->m_bodyIsConstrained;
+			const dUnsigned32 maxVal = 1 << (D_MAX_BODY_RADIX_BIT * 2);
+			dAssert(key < maxVal);
+			return maxVal - key;
+		}
+	};
 
 	ndScene* const scene = m_world->GetScene();
 	const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
@@ -635,17 +650,7 @@ void ndDynamicsUpdate::SortIslands()
 		}
 
 		m_unConstrainedBodyCount = unConstrainedCount;
-		class ndEvaluateKey
-		{
-			public:
-			dUnsigned32 GetKey(const ndIsland& island) const
-			{
-				dUnsigned32 key = island.m_count * 2 + island.m_root->m_bodyIsConstrained;
-				const dUnsigned32 maxVal = 1 << (D_MAX_BODY_RADIX_BIT * 2);
-				dAssert(key < maxVal);
-				return maxVal - key;
-			}
-		};
+
 		scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 0);
 		if (islandMaxKeySize >= 1 << (D_MAX_BODY_RADIX_BIT - 1))
 		{
@@ -1981,6 +1986,8 @@ void ndDynamicsUpdate::Update()
 {
 	D_TRACKTIME();
 	m_timestep = m_world->GetScene()->GetTimestep();
+
+xxxx++;
 
 	BuildIsland();
 	if (m_islands.GetCount())
