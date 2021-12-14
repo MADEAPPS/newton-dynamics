@@ -125,6 +125,8 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	dUnsigned8 m_isJointFence0;
 	dUnsigned8 m_isJointFence1;
 	dUnsigned8 m_bodyIsConstrained;
+
+	dUnsigned8 m_resting;
 	D_COLLISION_API static dUnsigned32 m_uniqueIdCount;
 
 	friend class ndWorld;

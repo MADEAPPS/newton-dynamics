@@ -387,6 +387,8 @@ inline void ndBodyKinematic::PrepareStep(dInt32 index)
 	m_equilibrium = m_isStatic | m_equilibrium;
 	m_islandSleep = m_equilibrium;
 	m_equilibrium0 = m_equilibrium;
+
+	m_resting = 1;
 }
 
 inline ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap()

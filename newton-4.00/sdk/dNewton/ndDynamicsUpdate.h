@@ -44,8 +44,6 @@
 
 class ndWorld;
 
-
-
 D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate : public ndClassAlloc
 {
@@ -89,13 +87,12 @@ class ndDynamicsUpdate : public ndClassAlloc
 	void ClearBuffer(void* const buffer, dInt32 sizeInByte) const;
 	void ClearJacobianBuffer(dInt32 count, ndJacobian* const dst) const;
 
-	ndArray<dInt32>& GetActiveBodyArray();
 	ndArray<ndJacobian>& GetInternalForces();
 	ndArray<ndLeftHandSide>& GetLeftHandSide();
 	ndArray<dInt32>& GetJointForceIndexBuffer();
 	ndArray<ndRightHandSide>& GetRightHandSide();
 	ndArray<ndJacobian>& GetTempInternalForces();
-	ndArray<ndBodyKinematic*>& GetActiveBodyArray____();
+	ndArray<ndBodyKinematic*>& GetBodyIslandOrder();
 	ndArray<ndJointBodyPairIndex>& GetJointBodyPairIndexBuffer();
 
 	private:
@@ -129,11 +126,11 @@ class ndDynamicsUpdate : public ndClassAlloc
 	ndVector m_velocTol;
 	ndArray<ndIsland> m_islands;
 	ndArray<dInt32> m_jointForcesIndex;
-	ndArray<dInt32> m_activeBodiesArray;
 	ndArray<ndJacobian> m_internalForces;
 	ndArray<ndLeftHandSide> m_leftHandSide;
 	ndArray<ndRightHandSide> m_rightHandSide;
 	ndArray<ndJacobian> m_tempInternalForces;
+	ndArray<ndBodyKinematic*> m_bodyIslandOrder;
 	ndArray<ndJointBodyPairIndex> m_jointBodyPairIndexBuffer;
 
 	ndWorld* m_world;
@@ -175,9 +172,9 @@ inline  ndArray<ndRightHandSide>& ndDynamicsUpdate::GetRightHandSide()
 	return m_rightHandSide;
 }
 
-inline ndArray<dInt32>& ndDynamicsUpdate::GetActiveBodyArray()
+inline  ndArray<ndBodyKinematic*>& ndDynamicsUpdate::GetBodyIslandOrder()
 {
-	return m_activeBodiesArray;
+	return m_bodyIslandOrder;
 }
 
 inline dInt32 ndDynamicsUpdate::GetUnconstrainedBodyCount() const
