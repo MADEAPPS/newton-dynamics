@@ -41,7 +41,7 @@ class ndAabbPolygonSoup: public ndPolygonSoupDatabase
 	class ndNode
 	{
 		public:
-		enum dNodeType
+		enum ndNodeType
 		{
 			m_binary = 0,
 			m_leaf,
