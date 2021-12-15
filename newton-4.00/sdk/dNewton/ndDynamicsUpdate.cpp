@@ -1359,10 +1359,10 @@ void ndDynamicsUpdate::IntegrateBodies()
 				}
 				else
 				{
-					dynBody->m_accel = ndVector::m_zero;
-					dynBody->m_alpha = ndVector::m_zero;
 					ndBodyKinematic* const kinBody = bodyArray[i]->GetAsBodyKinematic();
 					dAssert(kinBody);
+					kinBody->m_accel = ndVector::m_zero;
+					kinBody->m_alpha = ndVector::m_zero;
 					if (!kinBody->m_equilibrium)
 					{
 						kinBody->IntegrateVelocity(timestep);
@@ -1541,7 +1541,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 				kinBody->m_veloc = ndVector::m_zero;
 				kinBody->m_omega = ndVector::m_zero;
 				//kinBody->m_equilibrium = (kinBody->m_invMass.m_w == ndFloat32(0.0f)) ? 1 : kinBody->m_autoSleep;
-				kinBody->m_equilibrium = body->m_isStatic | body->m_autoSleep;
+				kinBody->m_equilibrium = kinBody->m_isStatic | kinBody->m_autoSleep;
 			}
 		}
 	}
