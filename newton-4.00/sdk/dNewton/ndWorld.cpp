@@ -531,8 +531,6 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	sentinelBody->m_bodyIsConstrained = 0;
 	sentinelBody->m_weigh = ndFloat32(0.0f);
 
-	sentinelBody->m_resting = 1;
-	
 	m_scene->GetActiveBodyArray().PushBack(sentinelBody);
 
 	ApplyExternalForces();

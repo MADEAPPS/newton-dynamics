@@ -113,7 +113,6 @@ class ndDynamicsUpdate : public ndClassAlloc
 	void IntegrateUnconstrainedBodies();
 
 	void DetermineSleepStates();
-	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
 	protected:
