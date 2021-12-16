@@ -87,6 +87,7 @@ class ndDynamicsUpdate : public ndClassAlloc
 	void ClearBuffer(void* const buffer, ndInt32 sizeInByte) const;
 	void ClearJacobianBuffer(ndInt32 count, ndJacobian* const dst) const;
 
+	ndArray<ndIsland>& GetIslands();
 	ndArray<ndJacobian>& GetInternalForces();
 	ndArray<ndLeftHandSide>& GetLeftHandSide();
 	ndArray<ndInt32>& GetJointForceIndexBuffer();
@@ -145,6 +146,11 @@ class ndDynamicsUpdate : public ndClassAlloc
 
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
+
+inline ndArray<ndDynamicsUpdate::ndIsland>& ndDynamicsUpdate::GetIslands()
+{
+	return m_islands;
+}
 
 inline void* ndDynamicsUpdate::GetTempBuffer() const
 {

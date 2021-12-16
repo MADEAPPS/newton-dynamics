@@ -563,14 +563,14 @@ void ndDynamicsUpdate::SortIslands()
 	const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	GetInternalForces().SetCount(bodyArray.GetCount());
 
-	ndInt32 count = 0;
+	ndInt32 bodyCount = 0;
 	ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)&GetInternalForces()[0];
 	for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
 		if (!(body->m_equilibrium0 & body->m_islandSleep) || body->GetAsBodyPlayerCapsule())
 		{
-			buffer0[count].m_body = body;
+			buffer0[bodyCount].m_body = body;
 			if (!body->m_isStatic)
 			{
 				ndBodyKinematic* root = body->m_islandParent;
@@ -579,7 +579,7 @@ void ndDynamicsUpdate::SortIslands()
 					root = root->m_islandParent;
 				}
 
-				buffer0[count].m_root = root;
+				buffer0[bodyCount].m_root = root;
 				if (root->m_rank != -1)
 				{
 					root->m_rank = -1;
@@ -587,33 +587,35 @@ void ndDynamicsUpdate::SortIslands()
 			}
 			else
 			{
-				buffer0[count].m_root = body;
+				buffer0[bodyCount].m_root = body;
 				body->m_rank = -1;
 			}
-			count++;
+			bodyCount++;
 		}
 	}
 
+	ndArray<ndIsland>& islands = GetIslands();
 	ndArray<ndBodyKinematic*>& activeBodyArray = GetBodyIslandOrder();
-	m_islands.SetCount(0);
-	activeBodyArray.SetCount(count);
+
+	islands.SetCount(0);
+	activeBodyArray.SetCount(bodyCount);
 
 	ndInt32 unConstrainedCount = 0;
-	if (count)
+	if (bodyCount)
 	{
 		// sort using counting sort o(n)
 		ndInt32 scans[2];
 		scans[0] = 0;
 		scans[1] = 0;
-		for (ndInt32 i = 0; i < count; ++i)
+		for (ndInt32 i = 0; i < bodyCount; ++i)
 		{
 			ndInt32 index = 1 - buffer0[i].m_root->m_bodyIsConstrained;
 			scans[index] ++;
 		}
 		scans[1] = scans[0];
 		scans[0] = 0;
-		ndBodyIndexPair* const buffer2 = buffer0 + count;
-		for (ndInt32 i = 0; i < count; ++i)
+		ndBodyIndexPair* const buffer2 = buffer0 + bodyCount;
+		for (ndInt32 i = 0; i < bodyCount; ++i)
 		{
 			const ndBodyKinematic* const body = buffer0[i].m_root;
 			const ndInt32 key = 1 - body->m_bodyIsConstrained;
@@ -622,38 +624,38 @@ void ndDynamicsUpdate::SortIslands()
 			scans[key] = index + 1;
 		}
 
-		const ndBodyIndexPair* const buffer1 = buffer0 + count;
-		for (ndInt32 i = 0; i < count; ++i)
+		const ndBodyIndexPair* const buffer1 = buffer0 + bodyCount;
+		for (ndInt32 i = 0; i < bodyCount; ++i)
 		{
-			dAssert((i == count - 1) || (buffer1[i].m_root->m_bodyIsConstrained >= buffer1[i + 1].m_root->m_bodyIsConstrained));
+			dAssert((i == bodyCount - 1) || (buffer1[i].m_root->m_bodyIsConstrained >= buffer1[i + 1].m_root->m_bodyIsConstrained));
 
 			activeBodyArray[i] = buffer1[i].m_body;
 			if (buffer1[i].m_root->m_rank == -1)
 			{
 				buffer1[i].m_root->m_rank = 0;
 				ndIsland island(buffer1[i].m_root);
-				m_islands.PushBack(island);
+				islands.PushBack(island);
 			}
 			buffer1[i].m_root->m_rank += 1;
 		}
 
 		ndInt32 start = 0;
 		ndInt32 islandMaxKeySize = 0;
-		for (ndInt32 i = 0; i < m_islands.GetCount(); ++i)
+		for (ndInt32 i = 0; i < islands.GetCount(); ++i)
 		{
-			ndIsland& island = m_islands[i];
+			ndIsland& island = islands[i];
 			island.m_start = start;
 			island.m_count = island.m_root->m_rank;
 			islandMaxKeySize = dMax(islandMaxKeySize, island.m_count);
 			start += island.m_count;
 			unConstrainedCount -= island.m_root->m_bodyIsConstrained;
 		}
-		unConstrainedCount += m_islands.GetCount();
+		unConstrainedCount += islands.GetCount();
 
-		scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 0);
+		scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&islands[0], (ndIsland*)GetTempBuffer(), islands.GetCount(), 0);
 		if (islandMaxKeySize >= (1 << (D_MAX_BODY_RADIX_BIT - 1)))
 		{
-			scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&m_islands[0], (ndIsland*)GetTempBuffer(), m_islands.GetCount(), 1);
+			scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&islands[0], (ndIsland*)GetTempBuffer(), islands.GetCount(), 1);
 		}
 	}
 	m_unConstrainedBodyCount = unConstrainedCount;
@@ -682,7 +684,7 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
-			ndArray<ndBodyKinematic*>& bodyArray = me->m_bodyIslandOrder;
+			ndArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
 
 			const ndFloat32 timestep = m_timestep;
 			const ndInt32 threadIndex = GetThreadId();
@@ -696,16 +698,16 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 
 			for (ndInt32 i = 0; i < blockSize; ++i)
 			{
-				ndBodyKinematic* const body = bodyArray[base + i]->GetAsBodyKinematic();
+				ndBodyKinematic* const body = bodyArray[base + i];
 				dAssert(body);
 				body->UpdateInvInertiaMatrix();
-				body->AddDampingAcceleration(m_timestep);
+				body->AddDampingAcceleration(timestep);
 				body->IntegrateExternalForce(timestep);
 			}
 		}
 	};
 
-	if (m_unConstrainedBodyCount)
+	if (GetUnconstrainedBodyCount())
 	{
 		D_TRACKTIME();
 		ndScene* const scene = m_world->GetScene();
@@ -1208,6 +1210,8 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 			{
 				ndBodyKinematic* const body = bodyArray[i + start];
 
+				dAssert(body);
+				dAssert(body->GetAsBodyDynamic());
 				dAssert(body->m_bodyIsConstrained);
 				const ndInt32 index = body->m_index;
 				const ndJacobian& forceAndTorque = internalForces[index];
@@ -1568,7 +1572,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
-			const ndArray<ndIsland>& islandArray = me->m_islands;
+			const ndArray<ndIsland>& islandArray = me->GetIslands();
 
 			const ndInt32 threadIndex = GetThreadId();
 			const ndInt32 threadCount = m_owner->GetThreadCount();
@@ -1947,7 +1951,7 @@ void ndDynamicsUpdate::Update()
 	m_timestep = m_world->GetScene()->GetTimestep();
 
 	BuildIsland();
-	if (m_islands.GetCount())
+	if (GetIslands().GetCount())
 	{
 		IntegrateUnconstrainedBodies();
 		InitWeights();
