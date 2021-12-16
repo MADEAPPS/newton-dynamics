@@ -547,6 +547,17 @@ void ndDynamicsUpdate::SortJoints()
 void ndDynamicsUpdate::SortIslands()
 {
 	D_TRACKTIME();
+	class ndIslandKey
+	{
+		public:
+		ndUnsigned32 GetKey(const ndBodyIndexPair& pair) const
+		{
+			const ndBodyKinematic* const body = pair.m_root;
+			const ndInt32 key = 1 - body->m_bodyIsConstrained;
+			return key;
+		}
+	};
+
 	class ndEvaluateKey
 	{
 		public:
@@ -603,40 +614,19 @@ void ndDynamicsUpdate::SortIslands()
 	ndInt32 unConstrainedCount = 0;
 	if (bodyCount)
 	{
-		// sort using counting sort o(n)
-		ndInt32 scans[2];
-		scans[0] = 0;
-		scans[1] = 0;
+		scene->CountingSort<ndBodyIndexPair, 1, ndIslandKey>(buffer0, buffer0 + bodyCount, bodyCount, 0);
 		for (ndInt32 i = 0; i < bodyCount; ++i)
 		{
-			ndInt32 index = 1 - buffer0[i].m_root->m_bodyIsConstrained;
-			scans[index] ++;
-		}
-		scans[1] = scans[0];
-		scans[0] = 0;
-		ndBodyIndexPair* const buffer2 = buffer0 + bodyCount;
-		for (ndInt32 i = 0; i < bodyCount; ++i)
-		{
-			const ndBodyKinematic* const body = buffer0[i].m_root;
-			const ndInt32 key = 1 - body->m_bodyIsConstrained;
-			const ndInt32 index = scans[key];
-			buffer2[index] = buffer0[i];
-			scans[key] = index + 1;
-		}
+			dAssert((i == bodyCount - 1) || (buffer0[i].m_root->m_bodyIsConstrained >= buffer0[i + 1].m_root->m_bodyIsConstrained));
 
-		const ndBodyIndexPair* const buffer1 = buffer0 + bodyCount;
-		for (ndInt32 i = 0; i < bodyCount; ++i)
-		{
-			dAssert((i == bodyCount - 1) || (buffer1[i].m_root->m_bodyIsConstrained >= buffer1[i + 1].m_root->m_bodyIsConstrained));
-
-			activeBodyArray[i] = buffer1[i].m_body;
-			if (buffer1[i].m_root->m_rank == -1)
+			activeBodyArray[i] = buffer0[i].m_body;
+			if (buffer0[i].m_root->m_rank == -1)
 			{
-				buffer1[i].m_root->m_rank = 0;
-				ndIsland island(buffer1[i].m_root);
+				buffer0[i].m_root->m_rank = 0;
+				ndIsland island(buffer0[i].m_root);
 				islands.PushBack(island);
 			}
-			buffer1[i].m_root->m_rank += 1;
+			buffer0[i].m_root->m_rank += 1;
 		}
 
 		ndInt32 start = 0;
