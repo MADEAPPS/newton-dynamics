@@ -529,9 +529,9 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	sentinelBody->m_isJointFence0 = 1;
 	sentinelBody->m_isJointFence1 = 1;
 	sentinelBody->m_bodyIsConstrained = 0;
+	sentinelBody->m_weigh = ndFloat32(0.0f);
 
 	sentinelBody->m_resting = 1;
-	dAssert(sentinelBody->m_weigh == ndFloat32(1.0f));
 	
 	m_scene->GetActiveBodyArray().PushBack(sentinelBody);
 
