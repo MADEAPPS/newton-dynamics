@@ -122,7 +122,6 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	};
 
 	ndScene* const scene = m_world->GetScene();
-	const ndInt32 threadCount = scene->GetThreadCount();
 	ndConstraintArray& jointArray = scene->GetActiveContactArray();
 	ndArray<ndJointBodyPairIndex>& bodyJointPairs = GetJointBodyPairIndexBuffer();
 
@@ -943,8 +942,6 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			const ndVector force1(body1->GetForce());
 			const ndVector torque1(body1->GetTorque());
 
-			const ndInt32 m0 = body0->m_index;
-			const ndInt32 m1 = body1->m_index;
 			const ndInt32 index = joint->m_rowStart;
 			const ndInt32 count = joint->m_rowCount;
 			const ndMatrix& invInertia0 = body0->m_invWorldInertiaMatrix;

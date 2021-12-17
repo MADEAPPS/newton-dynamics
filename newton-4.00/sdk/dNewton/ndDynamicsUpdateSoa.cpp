@@ -331,7 +331,6 @@ void ndDynamicsUpdateSoa::SortJoints()
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
 			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
-			const ndInt32 count = jointArray.GetCount();
 
 			ndInt32 soaJointRowCount = 0;
 			ndArray<ndInt32>& soaJointRows = me->m_soaJointRows;
@@ -887,8 +886,6 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 			const ndVector force1(body1->GetForce());
 			const ndVector torque1(body1->GetTorque());
 
-			const ndInt32 m0 = body0->m_index;
-			const ndInt32 m1 = body1->m_index;
 			const ndInt32 index = joint->m_rowStart;
 			const ndInt32 count = joint->m_rowCount;
 
@@ -902,6 +899,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 			
 			const bool test = !((body0->m_isStatic | body1->m_isStatic) || (body0->GetSkeleton() && body1->GetSkeleton()));
 			dAssert(test == ((invMass0.GetScalar() > ndFloat32(0.0f)) && (invMass1.GetScalar() > ndFloat32(0.0f)) && !(body0->GetSkeleton() && body1->GetSkeleton())));
+			if (test)
 			{
 				const ndFloat32 mass0 = body0->GetMassMatrix().m_w;
 				const ndFloat32 mass1 = body1->GetMassMatrix().m_w;
@@ -1986,14 +1984,10 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 				const ndConstraint* const joint = jointGroup[i];
 				if (joint)
 				{
-					const ndBodyKinematic* const body0 = joint->GetBody0();
-					const ndBodyKinematic* const body1 = joint->GetBody1();
-
-					const ndInt32 m0 = body0->m_index;
-					const ndInt32 m1 = body1->m_index;
-
-					ndInt32 const rowCount = joint->m_rowCount;
-					ndInt32 const rowStartBase = joint->m_rowStart;
+					//const ndBodyKinematic* const body0 = joint->GetBody0();
+					//const ndBodyKinematic* const body1 = joint->GetBody1();
+					const ndInt32 rowCount = joint->m_rowCount;
+					const ndInt32 rowStartBase = joint->m_rowStart;
 					for (ndInt32 j = 0; j < rowCount; j++)
 					{
 						const ndSoaMatrixElement* const row = &massMatrix[j];
