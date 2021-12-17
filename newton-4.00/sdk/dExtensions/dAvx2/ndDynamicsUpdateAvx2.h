@@ -58,8 +58,7 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	void DetermineSleepStates();
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
-	dVector m_zero;
-	dArray<dInt32> m_avxJointRows;
+	ndArray<ndInt32> m_avxJointRows;
 	dAvxMatrixArray* m_avxMassMatrixArray;
 
 } D_GCC_NEWTON_ALIGN_32;
