@@ -954,6 +954,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 
 			joint->m_preconditioner0 = ndFloat32(1.0f);
 			joint->m_preconditioner1 = ndFloat32(1.0f);
+
 			const bool test = !((body0->m_isStatic | body1->m_isStatic) || (body0->GetSkeleton() && body1->GetSkeleton()));
 			dAssert(test == ((invMass0.GetScalar() > ndFloat32(0.0f)) && (invMass1.GetScalar() > ndFloat32(0.0f)) && !(body0->GetSkeleton() && body1->GetSkeleton())));
 			if (test)
@@ -1313,8 +1314,8 @@ void ndDynamicsUpdate::IntegrateBodies()
 			ndDynamicsUpdate* const me = world->m_solver;
 			ndArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
 
-			const ndFloat32 timestep = m_timestep;
 			const ndVector invTime(me->m_invTimestep);
+			const ndFloat32 timestep = m_timestep;
 
 			const ndInt32 threadIndex = GetThreadId();
 			const ndInt32 threadCount = m_owner->GetThreadCount();

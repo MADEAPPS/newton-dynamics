@@ -487,7 +487,8 @@ void ndDynamicsUpdateSoa::SortIslands()
 		if (!(body->m_equilibrium0 & body->m_islandSleep) || body->GetAsBodyPlayerCapsule())
 		{
 			buffer0[bodyCount].m_body = body;
-			if (body->m_invMass.m_w > ndFloat32(0.0f))
+			//if (body->m_invMass.m_w > ndFloat32(0.0f))
+			if (!body->m_isStatic)
 			{
 				ndBodyKinematic* root = body->m_islandParent;
 				while (root != root->m_islandParent)
@@ -623,8 +624,9 @@ void ndDynamicsUpdateSoa::IntegrateBodies()
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
 			ndArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
-			const ndFloat32 timestep = m_timestep;
+
 			const ndVector invTime(me->m_invTimestep);
+			const ndFloat32 timestep = m_timestep;
 
 			const ndInt32 threadIndex = GetThreadId();
 			const ndInt32 threadCount = m_owner->GetThreadCount();
@@ -897,7 +899,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 
 			joint->m_preconditioner0 = ndFloat32(1.0f);
 			joint->m_preconditioner1 = ndFloat32(1.0f);
-			//if ((invMass0.GetScalar() > ndFloat32(0.0f)) && (invMass1.GetScalar() > ndFloat32(0.0f)) && !(body0->GetSkeleton() && body1->GetSkeleton()))
+			
 			const bool test = !((body0->m_isStatic | body1->m_isStatic) || (body0->GetSkeleton() && body1->GetSkeleton()));
 			dAssert(test == ((invMass0.GetScalar() > ndFloat32(0.0f)) && (invMass1.GetScalar() > ndFloat32(0.0f)) && !(body0->GetSkeleton() && body1->GetSkeleton())));
 			{
