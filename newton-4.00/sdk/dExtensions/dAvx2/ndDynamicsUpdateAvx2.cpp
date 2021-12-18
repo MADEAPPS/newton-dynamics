@@ -964,16 +964,10 @@ void ndDynamicsUpdateAvx2::IntegrateUnconstrainedBodies()
 			ndArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
 
 			const ndFloat32 timestep = m_timestep;
-			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 bodyCount = me->GetUnconstrainedBodyCount();
+			const ndInt32 base = bodyArray.GetCount() - me->GetUnconstrainedBodyCount();
 
-			const ndInt32 stride = bodyCount / threadCount;
-			const ndInt32 start = threadIndex * stride;
-			const ndInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-			const ndInt32 base = bodyArray.GetCount() - bodyCount + start;
-
-			for (ndInt32 i = 0; i < blockSize; ++i)
+			const ndStartEnd startEnd(me->GetUnconstrainedBodyCount(), GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBodyKinematic* const body = bodyArray[base + i];
 				dAssert(body);
@@ -1008,16 +1002,10 @@ void ndDynamicsUpdateAvx2::IntegrateBodies()
 			const ndVector invTime(me->m_invTimestep);
 			const ndFloat32 timestep = m_timestep;
 
-			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 bodyCount = bodyArray.GetCount();
-			const ndInt32 stride = bodyCount / threadCount;
-			const ndInt32 start = threadIndex * stride;
-			const ndInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-
-			for (ndInt32 i = 0; i < blockSize; ++i)
+			const ndStartEnd startEnd(bodyArray.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
-				ndBodyKinematic* const body = bodyArray[i + start];
+				ndBodyKinematic* const body = bodyArray[i];
 				if (!body->m_equilibrium)
 				{
 					body->m_accel = invTime * (body->m_veloc - body->m_accel);
@@ -1048,23 +1036,17 @@ void ndDynamicsUpdateAvx2::InitWeights()
 			const ndArray<ndInt32>& jointForceIndexBuffer = me->GetJointForceIndexBuffer();
 			const ndArray<ndJointBodyPairIndex>& jointBodyPairIndex = me->GetJointBodyPairIndexBuffer();
 
-			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 bodyCount = jointForceIndexBuffer.GetCount() - 2;
-
-			const ndInt32 stride = bodyCount / threadCount;
-			const ndInt32 start = threadIndex * stride;
-			const ndInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-
 			ndInt32 maxExtraPasses = 1;
-			for (ndInt32 i = 0; i < blockSize; ++i)
+
+			const ndStartEnd startEnd(jointForceIndexBuffer.GetCount() - 2, GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
-				const ndInt32 index = jointForceIndexBuffer[start + i];
+				const ndInt32 index = jointForceIndexBuffer[i];
 				const ndJointBodyPairIndex& scan = jointBodyPairIndex[index];
 				ndBodyKinematic* const body = bodyArray[scan.m_body];
 				dAssert(body->m_index == scan.m_body);
 				dAssert(body->m_bodyIsConstrained <= 1);
-				const ndInt32 count = jointForceIndexBuffer[start + i + 1] - index - 1;
+				const ndInt32 count = jointForceIndexBuffer[i + 1] - index - 1;
 				const ndInt32 mask = -ndInt32(body->m_bodyIsConstrained & ~body->m_isStatic);
 				const ndInt32 weigh = 1 + (mask & count);
 				dAssert(weigh >= 0);
@@ -1075,7 +1057,7 @@ void ndDynamicsUpdateAvx2::InitWeights()
 				maxExtraPasses = dMax(weigh, maxExtraPasses);
 			}
 			ndInt32* const extraPasses = (ndInt32*)m_context;
-			extraPasses[threadIndex] = maxExtraPasses;
+			extraPasses[GetThreadId()] = maxExtraPasses;
 		}
 	};
 
@@ -1116,18 +1098,12 @@ void ndDynamicsUpdateAvx2::InitBodyArray()
 			ndDynamicsUpdate* const me = world->m_solver;
 			ndArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
 
-			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 bodyCount = bodyArray.GetCount() - me->GetUnconstrainedBodyCount();
-
-			const ndInt32 stride = bodyCount / threadCount;
-			const ndInt32 start = threadIndex * stride;
-			const ndInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-
 			const ndFloat32 timestep = m_timestep;
-			for (ndInt32 i = 0; i < blockSize; ++i)
+
+			const ndStartEnd startEnd(bodyArray.GetCount() - me->GetUnconstrainedBodyCount(), GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
-				ndBodyKinematic* const body = bodyArray[i + start];
+				ndBodyKinematic* const body = bodyArray[i];
 				dAssert(body);
 				dAssert(body->m_bodyIsConstrained | body->m_isStatic);
 
@@ -1386,18 +1362,18 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			ndConstraint** const jointArray = &m_owner->GetActiveContactArray()[0];
 			const ndInt32 jointCount = m_owner->GetActiveContactArray().GetCount();
 
-			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
 			const ndLeftHandSide* const leftHandSide = &me->GetLeftHandSide()[0];
 			const ndRightHandSide* const rightHandSide = &me->GetRightHandSide()[0];
 			dAvxMatrixArray& massMatrix = *me->m_avxMassMatrixArray;
 
+			const ndAvxFloat zero(ndAvxFloat::m_zero);
+			const ndAvxFloat ordinals(ndAvxFloat::m_ordinals);
 			const ndInt32 mask = -ndInt32(D_AVX_WORK_GROUP);
 			const ndInt32 soaJointCount = ((jointCount + D_AVX_WORK_GROUP - 1) & mask) / D_AVX_WORK_GROUP;
 			const ndInt32* const soaJointRows = &me->m_avxJointRows[0];
-			
-			const ndAvxFloat zero(ndAvxFloat::m_zero);
-			const ndAvxFloat ordinals(ndAvxFloat::m_ordinals);
+
+			const ndInt32 threadIndex = GetThreadId();
+			const ndInt32 threadCount = m_owner->GetThreadCount();
 			for (ndInt32 i = threadIndex; i < soaJointCount; i += threadCount)
 			{
 				const ndInt32 index = i * D_AVX_WORK_GROUP;
@@ -1687,33 +1663,26 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			const ndAvxFloat* const jointInternalForces = (ndAvxFloat*)&me->GetTempInternalForces()[0];
 			const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 
-			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 bodyCount = bodyIndex.GetCount() - 2;
-
-			const ndInt32 stride = bodyCount / threadCount;
-			const ndInt32 start = threadIndex * stride;
-			const ndInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-
-			for (ndInt32 i = 0; i < blockSize; ++i)
+			const ndStartEnd startEnd(bodyIndex.GetCount() - 2, GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndAvxFloat force(ndAvxFloat::m_zero);
 
-				const ndInt32 index = bodyIndex[start + i];
+				const ndInt32 index = bodyIndex[i];
 				const ndJointBodyPairIndex& scan = jointBodyPairIndexBuffer[index];
 				ndBodyKinematic* const body = bodyArray[scan.m_body];
 
 				dAssert(body->m_isStatic <= 1);
 				dAssert(body->m_index == scan.m_body);
 				const ndInt32 mask = ndInt32(body->m_isStatic) - 1;
-				const ndInt32 count = mask & (bodyIndex[start + i + 1] - index);
+				const ndInt32 count = mask & (bodyIndex[i + 1] - index);
 
 				for (ndInt32 j = 0; j < count; ++j)
 				{
 					const ndInt32 jointIndex = jointBodyPairIndexBuffer[index + j].m_joint;
 					force = force + jointInternalForces[jointIndex];
 				}
-				internalForces[start + i] = force;
+				internalForces[i] = force;
 			}
 		}
 	};
@@ -1996,17 +1965,10 @@ void ndDynamicsUpdateAvx2::IntegrateBodiesVelocity()
 			const ndVector timestep4(me->GetTimestepRK());
 			const ndVector speedFreeze2(world->m_freezeSpeed2 * ndFloat32(0.1f));
 
-			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 bodyCount = bodyArray.GetCount() - me->GetUnconstrainedBodyCount();;
-
-			const ndInt32 stride = bodyCount / threadCount;
-			const ndInt32 start = threadIndex * stride;
-			const ndInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-
-			for (ndInt32 i = 0; i < blockSize; ++i)
+			const ndStartEnd startEnd(bodyArray.GetCount() - me->GetUnconstrainedBodyCount(), GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
-				ndBodyKinematic* const body = bodyArray[i + start];
+				ndBodyKinematic* const body = bodyArray[i];
 
 				dAssert(body);
 				dAssert(body->GetAsBodyDynamic());
@@ -2504,29 +2466,22 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			const ndAvxFloat* const jointInternalForces = (ndAvxFloat*)&me->GetTempInternalForces()[0];
 			const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 
-			const ndInt32 bodyCount = bodyArray.GetCount();
-			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-
-			const ndInt32 stride = bodyCount / threadCount;
-			const ndInt32 start = threadIndex * stride;
-			const ndInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-
-			for (ndInt32 i = 0; i < blockSize; ++i)
+			const ndStartEnd startEnd(bodyArray.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndAvxFloat force(zero);
 				ndAvxFloat torque(zero);
-				const ndBodyKinematic* const body = bodyArray[i + start];
+				const ndBodyKinematic* const body = bodyArray[i];
 
-				const ndInt32 startIndex = bodyIndex[i + start];
+				const ndInt32 startIndex = bodyIndex[i];
 				const ndInt32 mask = body->m_isStatic - 1;
-				const ndInt32 count = mask & (bodyIndex[i + start + 1] - startIndex);
+				const ndInt32 count = mask & (bodyIndex[i + 1] - startIndex);
 				for (ndInt32 j = 0; j < count; ++j)
 				{
 					const ndInt32 index = jointBodyPairIndexBuffer[startIndex + j].m_joint;
 					force = force + jointInternalForces[index];
 				}
-				internalForces[i + start] = force;
+				internalForces[i] = force;
 			}
 		}
 	};

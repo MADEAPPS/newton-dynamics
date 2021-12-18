@@ -283,6 +283,7 @@ inline ndFloat32 ndScene::CalculateSurfaceArea(const ndSceneNode* const node0, c
 template <class T, ndInt32 bits, class dEvaluateKey, class dKey>
 void ndScene::CountingSort(T* const array, T* const scratchBuffer, ndInt32 elementsCount, ndInt32 digitLocation)
 {
+	D_TRACKTIME();
 	class ndInfo
 	{
 		public:

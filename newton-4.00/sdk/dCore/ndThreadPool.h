@@ -35,6 +35,20 @@
 class ndThreadPoolJob
 {
 	public:
+	class ndStartEnd
+	{
+		public:
+		ndStartEnd(ndInt32 count, ndInt32 threadIndex, ndInt32 threads)
+		{
+			ndInt32 stride = count / threads;
+			m_start = stride * threadIndex;
+			m_end = (threadIndex != (threads - 1)) ? stride + m_start : count;
+		}
+
+		ndInt32 m_start;
+		ndInt32 m_end;
+	};
+
 	ndThreadPoolJob() 
 	{
 	}
