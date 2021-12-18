@@ -1523,7 +1523,6 @@ void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMate
 	ndStack<ndBigVector>cylinder (m_points.m_vertex.m_count);
     ndBigVector scale (ndFloat64 (1.0f)/ (pMax.m_x - pMin.m_x), ndFloat64 (1.0f)/ (pMax.m_y - pMin.m_y), ndFloat64 (1.0f)/ (pMax.m_z - pMin.m_z), ndFloat64 (0.0f));
     for (ndInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
-		//ndBigVector point (uvAligment.RotateVector (m_points.m_vertex[i] - origin));
 		ndBigVector point (buffer[i]);
 		ndFloat64 u = (point.m_x - pMin.m_x) * scale.m_x;
 
@@ -1577,15 +1576,12 @@ void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMate
     for(iter.Begin(); iter; iter ++){
         ndEdge* const edge = &(*iter);
 		if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) {
-			//ndVector p0(uvAligment.RotateVector(m_points.m_vertex[edge->m_incidentVertex] - origin));
-			//ndVector p1(uvAligment.RotateVector(m_points.m_vertex[edge->m_next->m_incidentVertex] - origin));
 			ndVector p0(buffer[edge->m_incidentVertex]);
 			ndVector p1(buffer[edge->m_next->m_incidentVertex]);
 
 			ndVector e1(p1 - p0);
 			ndBigVector normal(ndFloat32(0.0f));
 			for (ndEdge* ptr = edge->m_next; ptr != edge; ptr = ptr->m_next) {
-				//ndVector p2(uvAligment.RotateVector(m_points.m_vertex[ptr->m_next->m_incidentVertex] - origin));
 				ndVector p2(buffer[ptr->m_next->m_incidentVertex]);
 				ndBigVector e2(p2 - p0);
 				normal += e1.CrossProduct(e2);
@@ -1596,7 +1592,6 @@ void ndMeshEffect::CylindricalMapping (ndInt32 cylinderMaterial, ndInt32 capMate
 				ndEdge* ptr = edge;
 				do {
 					dAttibutFormat::dgUV uv;
-					//ndVector p(uvAligment.RotateVector(m_points.m_vertex[ptr->m_incidentVertex] - origin));
 					ndVector p(buffer[ptr->m_incidentVertex]);
 					uv.m_u = ndFloat32((p.m_y - pMin.m_y) * scale.m_y);
 					uv.m_v = ndFloat32((p.m_z - pMin.m_z) * scale.m_z);
@@ -1737,7 +1732,7 @@ ndBigVector ndMeshEffect::GetOrigin()const
 	return origin.Scale(ndFloat64(1.0f) / m_points.m_vertex.GetCount());
 }
 
-void ndMeshEffect::BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const ndMatrix& uvAligment)
+void ndMeshEffect::BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const ndMatrix& textureMatrix)
 {
 	ndBigVector origin(GetOrigin());
 	ndStack<ndBigVector> buffer(m_points.m_vertex.GetCount());
@@ -1746,7 +1741,7 @@ void ndMeshEffect::BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const nd
 
 	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); i++) 
 	{
-		buffer[i] = uvAligment.RotateVector(m_points.m_vertex[i] - origin);
+		buffer[i] = textureMatrix.RotateVector(m_points.m_vertex[i] - origin);
 		const ndBigVector& tmp = buffer[i];
 		pMin.m_x = dMin(pMin.m_x, tmp.m_x);
 		pMax.m_x = dMax(pMax.m_x, tmp.m_x);
@@ -1889,25 +1884,19 @@ void ndMeshEffect::UniformBoxMapping(ndInt32 material, const ndMatrix& textureMa
 	PackAttibuteData();
 }
 
-void ndMeshEffect::SphericalMapping(ndInt32 material, const ndMatrix& uvAligment)
+void ndMeshEffect::SphericalMapping(ndInt32 material, const ndMatrix& textureMatrix)
 {
 	ndBigVector origin(GetOrigin());
 	ndStack<ndBigVector>sphere(m_points.m_vertex.GetCount());
 	for (ndInt32 i = 0; i < m_points.m_vertex.GetCount(); i++)
 	{
-		ndBigVector point(uvAligment.RotateVector(m_points.m_vertex[i] - origin));
-		dAssert(point.m_w == ndFloat32(0.0f));
-		dAssert(point.DotProduct(point).GetScalar() > ndFloat32(0.0f));
-		point = point.Normalize();
+		ndBigVector geoPoint(m_points.m_vertex[i] - origin);
+		dAssert(geoPoint.m_w == ndFloat32(0.0f));
+		ndVector point(textureMatrix.RotateVector(geoPoint.Normalize()));
+		point.m_x = dClamp(point.m_x, ndFloat32(-1.0f + 1.0e-6f), ndFloat32(1.0f - 1.0e-6f));
 
-		ndFloat64 u = ndAsin(dClamp(point.m_x, ndFloat64(-1.0f + 1.0e-6f), ndFloat64(1.0f - 1.0e-6f)));
-		ndFloat64 v = ndAtan2(point.m_y, point.m_z);
-
-		u = ndFloat32(1.0f) - (ndFloat64(ndPi / 2.0f) - u) / ndFloat64(ndPi);
-		dAssert(u >= ndFloat32(0.0f));
-		dAssert(u <= ndFloat32(1.0f));
-
-		v = v + ndPi;
+		ndFloat64 v = dClamp(ndAsin(point.m_x) / ndPi + ndFloat64(0.5f), ndFloat64(0.0f), ndFloat64(1.0f));
+		ndFloat64 u = dClamp(ndAtan2(point.m_y, point.m_z) / (ndFloat32(2.0f) * ndPi) + ndFloat64(0.5f), ndFloat64(0.0f), ndFloat64(1.0f));
 		sphere[i].m_x = u;
 		sphere[i].m_y = v;
 	}
@@ -1941,17 +1930,19 @@ void ndMeshEffect::SphericalMapping(ndInt32 material, const ndMatrix& uvAligment
 		if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) 
 		{
 			dAttibutFormat::dgUV uvRef(m_attrib.m_uv0Channel[ndInt32(edge->m_userData)]);
-			ndFloat32 UVrefSin = ndSin(uvRef.m_v);
-			ndFloat32 UVrefCos = ndCos(uvRef.m_v);
+			ndFloat32 angle0 = uvRef.m_u * ndPi * ndFloat32(2.0f);
+			ndFloat32 UVrefSin = ndSin(angle0);
+			ndFloat32 UVrefCos = ndCos(angle0);
 			ndEdge* ptr = edge;
 			do 
 			{
 				ptr->m_mark = mark;
 				dAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)]);
-				ndFloat32 sinAngle = UVrefCos * ndSin(uv.m_v) - UVrefSin * ndCos(uv.m_v);
-				ndFloat32 cosAngle = UVrefCos * ndCos(uv.m_v) + UVrefSin * ndSin(uv.m_v);
+				ndFloat32 angle1 = uv.m_u * ndPi * ndFloat32(2.0f);
+				ndFloat32 sinAngle = ndSin(angle1) * UVrefCos - ndCos(angle1) * UVrefSin;
+				ndFloat32 cosAngle = ndCos(angle1) * UVrefCos + ndSin(angle1) * UVrefSin;
 				ndFloat32 deltaAngle = ndAtan2(sinAngle, cosAngle);
-				uv.m_v = (uvRef.m_v + deltaAngle) / (ndFloat32(2.0f) * ndPi);
+				uv.m_u = uvRef.m_u + deltaAngle / (ndFloat32 (2.0f) * ndPi);
 				m_attrib.m_uv0Channel[ndInt32(ptr->m_userData)] = uv;
 				ptr = ptr->m_next;
 			} while (ptr != edge);

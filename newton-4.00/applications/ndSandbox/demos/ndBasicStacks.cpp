@@ -36,7 +36,39 @@ static void AddRigidBody(ndDemoEntityManager* const scene,
 	world->AddBody(body);
 }
 
-static void BuildBoxStack(ndDemoEntityManager* const scene, ndFloat32 mass, const ndVector& origin, const ndVector& size, ndInt32 count)
+static void BuildSphereColumn(ndDemoEntityManager* const scene, ndFloat32 mass, const ndVector& origin, const ndVector& size, ndInt32 count)
+{
+	// build a standard block stack of 20 * 3 boxes for a total of 60
+	ndWorld* const world = scene->GetWorld();
+
+	ndVector blockBoxSize(size);
+
+	// create the stack
+	ndMatrix baseMatrix(dGetIdentityMatrix());
+
+	// for the elevation of the floor at the stack position
+	baseMatrix.m_posit.m_x = origin.m_x;
+	baseMatrix.m_posit.m_z = origin.m_z;
+
+	ndVector floor(FindFloor(*world, baseMatrix.m_posit + ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_x;
+
+	ndShapeInstance shape(new ndShapeSphere(blockBoxSize.m_x));
+	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "earthmap.tga", "earthmap.tga", "earthmap.tga", 1.0f, dRollMatrix (ndFloat32 (-90.0f) * ndDegreeToRad));
+
+	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
+	scene->AddEntity(rootEntity);
+	
+	for (ndInt32 i = 0; i < count; i++)
+	{
+		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
+		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x * 2.0f);
+	}
+
+	geometry->Release();
+}
+
+static void BuildBoxColumn(ndDemoEntityManager* const scene, ndFloat32 mass, const ndVector& origin, const ndVector& size, ndInt32 count)
 {
 	// build a standard block stack of 20 * 3 boxes for a total of 60
 	ndWorld* const world = scene->GetWorld();
@@ -55,26 +87,24 @@ static void BuildBoxStack(ndDemoEntityManager* const scene, ndFloat32 mass, cons
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y * 0.5f;
 
 	ndShapeInstance shape(new ndShapeBox(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z));
-	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
-baseMatrix.m_posit.m_y -= 0.02f;
+//baseMatrix.m_posit.m_y -= 0.02f;
 	ndMatrix rotation(dYawMatrix(20.0f * ndDegreeToRad));
 	for (ndInt32 i = 0; i < count; i++) 
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
-//baseMatrix.m_posit.m_y += 2.0f;
-//baseMatrix.m_posit.m_y -= 0.1f;
 		baseMatrix = rotation * baseMatrix;
 	}
 
 	geometry->Release();
 }
 
-static void BuildCylinderStack(ndDemoEntityManager* const scene, ndFloat32 mass, const ndVector& origin, const ndVector& size, ndInt32 count)
+static void BuildCylinderColumn(ndDemoEntityManager* const scene, ndFloat32 mass, const ndVector& origin, const ndVector& size, ndInt32 count)
 {
 	// build a standard block stack of 20 * 3 boxes for a total of 60
 	ndWorld* const world = scene->GetWorld();
@@ -93,7 +123,7 @@ static void BuildCylinderStack(ndDemoEntityManager* const scene, ndFloat32 mass,
 
 	ndShapeInstance shape(new ndShapeCylinder(blockBoxSize.m_x, blockBoxSize.m_y, blockBoxSize.m_z));
 	shape.SetLocalMatrix(dRollMatrix(ndPi * 0.5f));
-	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
@@ -126,8 +156,7 @@ static void BuildPyramid(ndDemoEntityManager* const scene,
 	
 	ndFloat32 stepz = boxSize.m_z + 1.0e-2f;
 	ndFloat32 stepy = boxSize.m_y + 1.0e-2f;
-	
-stepy = boxSize.m_y;
+	stepy = boxSize.m_y;
 	
 	ndFloat32 y0 = matrix.m_posit.m_y + stepy / 2.0f;
 	ndFloat32 z0 = matrix.m_posit.m_z - stepz * count / 2;
@@ -154,7 +183,7 @@ void BuildPyramidStacks(ndDemoEntityManager* const scene, ndFloat32 mass, const 
 
 	ndVector size(boxSize.Scale(1.0f));
 	ndShapeInstance shape(new ndShapeBox(size.m_x, size.m_y, size.m_z));
-	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
@@ -184,11 +213,14 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	origin = ndVector::m_zero;
 	origin.m_x -= 2.0f;
 	origin.m_z -= 3.0f;
-	//BuildBoxStack(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 7);
-	//BuildBoxStack(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 40);
+	BuildSphereColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
+
+	origin.m_z += 6.0f;
+	//BuildBoxColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 7);
+	//BuildBoxColumn(scene, 10.0f, origin, ndVector(0.5f, 0.5f, 0.5f, 0.0f), 40);
 	
 	origin.m_z += 6.0f;
-	//BuildCylinderStack(scene, 10.0f, origin, ndVector(0.75f, 0.6f, 1.0f, 0.0f), 40);
+	//BuildCylinderColumn(scene, 10.0f, origin, ndVector(0.75f, 0.6f, 1.0f, 0.0f), 40);
 
 	ndQuaternion rot(dYawMatrix (45.0f * ndDegreeToRad));
 	origin = ndVector::m_zero;

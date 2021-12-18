@@ -1293,7 +1293,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			ndAvxFloat forceAcc1(ndAvxFloat::m_zero);
 
 			const ndAvxFloat weigh0(body0->m_weigh * joint->m_preconditioner0);
-			const ndAvxFloat weigh1(body1->m_weigh * joint->m_preconditioner0);
+			const ndAvxFloat weigh1(body1->m_weigh * joint->m_preconditioner1);
 
 			const ndFloat32 preconditioner0 = joint->m_preconditioner0;
 			const ndFloat32 preconditioner1 = joint->m_preconditioner1;

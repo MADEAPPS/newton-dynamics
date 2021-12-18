@@ -36,6 +36,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 		case ndShapeID::m_sphere:
 		case ndShapeID::m_capsule:
 		{
+			//aligmentUV = dRollMatrix(ndFloat32(90.0f) * ndDegreeToRad) * aligmentUV;
 			mesh.SphericalMapping(LoadTexture(texture0), &aligmentUV[0][0]);
 			break;
 		}
@@ -43,7 +44,8 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 		case ndShapeID::m_box:
 		{
 			ndInt32 tex0 = LoadTexture(texture0);
-			mesh.UniformBoxMapping(tex0, aligmentUV);
+			//mesh.UniformBoxMapping(tex0, aligmentUV);
+			mesh.BoxMapping(tex0, tex0, tex0, aligmentUV);
 			break;
 		}
 

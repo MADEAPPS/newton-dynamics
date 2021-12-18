@@ -919,7 +919,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 			ndVector torqueAcc1(m_zero);
 
 			const ndVector weigh0(body0->m_weigh * joint->m_preconditioner0);
-			const ndVector weigh1(body1->m_weigh * joint->m_preconditioner0);
+			const ndVector weigh1(body1->m_weigh * joint->m_preconditioner1);
 
 			const ndFloat32 preconditioner0 = joint->m_preconditioner0;
 			const ndFloat32 preconditioner1 = joint->m_preconditioner1;

@@ -446,9 +446,9 @@ class ndMeshEffect: public ndPolyhedra
 	D_COLLISION_API void EndBuild(ndFloat64 tol, bool fixTjoint = true);
 
 	D_COLLISION_API ndBigVector GetOrigin()const;
-	D_COLLISION_API void SphericalMapping(ndInt32 materialIndex, const ndMatrix& uvAligment);
+	D_COLLISION_API void SphericalMapping(ndInt32 materialIndex, const ndMatrix& textureMatrix);
 	D_COLLISION_API void UniformBoxMapping(ndInt32 materialIndex, const ndMatrix& textureMatrix);
-	D_COLLISION_API void BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const ndMatrix& uvAligment);
+	D_COLLISION_API void BoxMapping(ndInt32 front, ndInt32 side, ndInt32 top, const ndMatrix& textureMatrix);
 	D_COLLISION_API void RepairTJoints();
 
 	ndMeshEffect* GetFirstLayer();
