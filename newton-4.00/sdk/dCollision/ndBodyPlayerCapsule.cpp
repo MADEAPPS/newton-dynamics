@@ -615,7 +615,7 @@ ndVector ndBodyPlayerCapsuleImpulseSolver::CalculateImpulse()
 	{
 		bodyArray[i] = m_contactPoint[i] ? m_contactPoint[i]->m_body0 : nullptr;
 	}
-
+	
 	for (ndInt32 i = 0; i < m_rowCount; i++) 
 	{
 		ndJacobianPair jInvMass(m_jacobianPairs[i]);
@@ -749,7 +749,7 @@ void ndBodyPlayerCapsuleImpulseSolver::ApplyReaction(ndFloat32 timestep)
 	}
 }
 
-void ndBodyPlayerCapsule::IntegrateExternalForce(ndFloat32 timestep)
+void ndBodyPlayerCapsule::SpecialUpdate(ndFloat32 timestep)
 {
 	ndBodyPlayerCapsuleContactSolver contactSolver(this);
 	ndFloat32 timeLeft = timestep;
@@ -788,6 +788,7 @@ void ndBodyPlayerCapsule::IntegrateExternalForce(ndFloat32 timestep)
 	SetVelocity(veloc);
 
 	// determine if player has to step over obstacles lower than step hight
+	UpdateInvInertiaMatrix();
 	ResolveStep(contactSolver, timestep);
 
 	// advance player until it hit a collision point, until there is not more time left

@@ -19,7 +19,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndContact.h"
@@ -28,15 +27,11 @@
 
 ndContact* ndContactList::CreateContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 {
-	ndNode* node;
-	{
-		ndScopeSpinLock lock(m_lock);
-		node = Append();
-	}
-	ndContact* const contact = &node->GetInfo();
+	ndContact* const contact = new ndContact;
 	contact->SetBodies(body0, body1);
-	contact->m_linkNode = node;
 	contact->AttachToBodies();
+	ndScopeSpinLock lock(m_lock);
+	PushBack(contact);
 	return contact;
 }
 
@@ -44,14 +39,21 @@ void ndContactList::DeleteContact(ndContact* const contact)
 {
 	dAssert(contact->m_isAttached);
 	contact->DetachFromBodies();
-	Remove(contact->m_linkNode);
+	contact->m_isDead = 1;
+	//Remove(contact->m_linkNode);
 }
 
 void ndContactList::DeleteAllContacts()
 {
-	while (GetFirst())
+	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{
-		DeleteContact(&GetFirst()->GetInfo());
+		ndContact* const contact = m_array[i];
+		if (contact->m_isAttached)
+		{
+			DeleteContact(contact);
+		}
+		delete (contact);
 	}
-	//FlushFreeList();
+	Resize(1024);
+	SetCount(0);
 }

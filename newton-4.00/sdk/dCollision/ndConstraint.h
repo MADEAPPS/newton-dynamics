@@ -225,7 +225,7 @@ class ndRightHandSide
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
-class ndConstraint
+class ndConstraint: public ndContainersFreeListAlloc<ndConstraint>
 {
 	public:
 	// add some reflexion to the classes

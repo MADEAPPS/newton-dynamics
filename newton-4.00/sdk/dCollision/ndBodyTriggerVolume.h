@@ -40,6 +40,7 @@ class ndBodyTriggerVolume : public ndBodyKinematic
 	virtual void OnTriggerEnter(ndBodyKinematic* const body, ndFloat32 timestep);
 	virtual void OnTriggerExit(ndBodyKinematic* const body, ndFloat32 timestep);
 
+	D_COLLISION_API virtual void SpecialUpdate(ndFloat32 timestep);
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	private:

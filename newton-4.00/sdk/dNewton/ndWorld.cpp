@@ -200,6 +200,10 @@ void ndWorld::CleanUp()
 		delete body;
 	}
 
+	m_scene->m_contactList.DeleteAllContacts();
+	m_scene->m_scrathContactList.SetCount(0);
+	m_scene->m_activeConstraintArray.SetCount(0);
+
 	ndBody::m_uniqueIdCount = 1;
 	dAssert(!m_scene->GetContactList().GetCount());
 }
@@ -275,12 +279,11 @@ void ndWorld::ApplyExternalForces()
 		{
 			D_TRACKTIME();
 			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 bodyCount = bodyArray.GetCount() - 1;
-			const ndFloat32 timestep = m_timestep;
 
-			for (ndInt32 i = threadIndex; i < bodyCount; i += threadCount)
+			const ndFloat32 timestep = m_timestep;
+			const ndInt32 threadIndex = GetThreadId();
+			const ndStartEnd startEnd(bodyArray.GetCount() - 1, GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
 				if (body)
@@ -538,11 +541,10 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	// update the collision system
 	m_scene->UpdateAabb();
 	m_scene->FindCollidingPairs();
-	m_scene->BuildContactArray();
 	m_scene->CalculateContacts();
-	m_scene->DeleteDeadContact();
 
 	// update all special models, particle, models, ect.
+	m_scene->UpdateSpecial();
 
 	// Update Particle base physics
 	ParticleUpdate();
@@ -577,10 +579,11 @@ void ndWorld::ModelUpdate()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			const ndFloat32 timestep = m_timestep;
 			const ndInt32 threadId = GetThreadId();
 			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndFloat32 timestep = m_timestep;
-			ndWorld* const world = m_owner->GetWorld();
+
 			ndModelList& modelList = world->m_modelList;
 			ndModelList::ndNode* node = modelList.GetFirst();
 			for (ndInt32 i = 0; i < threadId; i++)
@@ -613,6 +616,7 @@ void ndWorld::ModelPostUpdate()
 		{
 			D_TRACKTIME();
 			const ndInt32 threadId = GetThreadId();
+
 			const ndInt32 threadCount = m_owner->GetThreadCount();
 			const ndFloat32 timestep = m_timestep;
 			ndWorld* const world = m_owner->GetWorld();
@@ -648,6 +652,7 @@ void ndWorld::PostModelTransform()
 		{
 			D_TRACKTIME();
 			const ndInt32 threadId = GetThreadId();
+
 			const ndInt32 threadCount = m_owner->GetThreadCount();
 			const ndFloat32 timestep = m_timestep;
 			ndWorld* const world = m_owner->GetWorld();

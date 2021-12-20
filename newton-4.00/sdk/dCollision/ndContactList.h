@@ -35,11 +35,11 @@ class ndConstraintArray: public ndArray<ndConstraint*>
 	}
 };
 
-class ndContactList: public ndList<ndContact, ndContainersFreeListAlloc<ndContact>>
+class ndContactList : public ndArray<ndContact*>
 {
 	public:
 	ndContactList()
-		:ndList<ndContact, ndContainersFreeListAlloc<ndContact>>()
+		:ndArray<ndContact*>(1024)
 		,m_lock()
 	{
 	}
@@ -48,9 +48,10 @@ class ndContactList: public ndList<ndContact, ndContainersFreeListAlloc<ndContac
 	{
 	}
 
-	D_COLLISION_API void DeleteAllContacts();
-	D_COLLISION_API void DeleteContact(ndContact* const contact);
-	D_COLLISION_API ndContact* CreateContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
+	void DeleteAllContacts();
+	void DeleteContact(ndContact* const contact);
+	ndContact* CreateContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
+
 	ndSpinLock m_lock;
 };
 

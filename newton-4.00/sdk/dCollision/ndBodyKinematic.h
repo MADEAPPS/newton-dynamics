@@ -173,6 +173,7 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API virtual void IntegrateExternalForce(ndFloat32 timestep);
 
 	void SetAccel(const ndJacobian& accel);
+	virtual void SpecialUpdate(ndFloat32 timestep);
 	virtual void IntegrateGyroSubstep(const ndVector& timestep);
 	virtual ndJacobian IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const;
 
@@ -201,6 +202,7 @@ class ndBodyKinematic: public ndBody
 	ndBodyList::ndNode* m_sceneNode;
 	ndSceneBodyNode* m_sceneBodyBodyNode;
 	ndSkeletonContainer* m_skeletonContainer;
+	ndList<ndBodyKinematic*>::ndNode* m_spetialUpdateNode;
 
 	ndFloat32 m_maxAngleStep;
 	ndFloat32 m_maxLinearSpeed;
@@ -508,5 +510,9 @@ inline void ndBodyKinematic::ApplyImpulsesAtPoint(ndInt32, const ndVector* const
 {
 }
 
+inline void ndBodyKinematic::SpecialUpdate(ndFloat32)
+{
+	dAssert(0);
+}
 #endif 
 

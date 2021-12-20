@@ -191,10 +191,12 @@ ndScene::ndScene()
 	:ndThreadPool("newtonWorker")
 	,m_bodyList()
 	,m_contactList()
+	,m_scrathContactList()
 	,m_activeConstraintArray()
 	,m_sceneBodyArray(1024)
 	,m_activeBodyArray(1024)
 	,m_activeBodyArrayBuffer(1024)
+	,m_specialUpdateList()
 	,m_contactLock()
 	,m_rootNode(nullptr)
 	,m_contactNotifyCallback(new ndContactNotify())
@@ -212,10 +214,6 @@ ndScene::~ndScene()
 	Finish();
 	delete m_contactNotifyCallback;
 	ndFreeListAlloc::Flush();
-	//ndContactList::FlushFreeList();
-	//ndContactPointList::FlushFreeList();
-	//ndShapeCompound::ndTreeArray::FlushFreeList();
-	//ndShapeStaticProceduralMesh::ndEdgeMap::FlushFreeList();
 }
 
 void ndScene::CollisionOnlyUpdate()
@@ -227,9 +225,7 @@ void ndScene::CollisionOnlyUpdate()
 	UpdateAabb();
 	BalanceScene();
 	FindCollidingPairs();
-	BuildContactArray();
 	CalculateContacts();
-	DeleteDeadContact();
 	End();
 }
 
@@ -298,6 +294,12 @@ bool ndScene::AddBody(ndBodyKinematic* const body)
 		body->UpdateCollisionMatrix();
 		ndSceneBodyNode* const bodyNode = new ndSceneBodyNode(body);
 		AddNode(bodyNode);
+
+		if (body->GetAsBodyTriggerVolume() || body->GetAsBodyPlayerCapsule())
+		{
+			body->m_spetialUpdateNode = m_specialUpdateList.Append(body);
+		}
+
 		return true;
 	}
 	return false;
@@ -320,6 +322,12 @@ bool ndScene::RemoveBody(ndBodyKinematic* const body)
 
 	if (body->m_scene && body->m_sceneNode)
 	{
+		if (body->GetAsBodyTriggerVolume() || body->GetAsBodyPlayerCapsule())
+		{
+			m_specialUpdateList.Remove(body->m_spetialUpdateNode);
+			body->m_spetialUpdateNode = nullptr;
+		}
+
 		m_bodyList.Remove(body->m_sceneNode);
 		body->SetSceneNodes(nullptr, nullptr);
 		m_contactNotifyCallback->OnBodyRemoved(body);
@@ -871,7 +879,6 @@ void ndScene::CalculateJointContacts(ndInt32 threadIndex, ndContact* const conta
 				{
 					body1->GetAsBodyTriggerVolume()->OnTriggerExit(body0, m_timestep);
 				}
-				//contact->m_isIntersetionTestOnly = 0;
 				contact->m_isIntersetionTestOnly = 1;
 			}
 			contact->m_maxDOF = 0;
@@ -1323,25 +1330,119 @@ void ndScene::BuildBodyArray()
 void ndScene::CalculateContacts()
 {
 	D_TRACKTIME();
+	class ndContactInfo
+	{
+		public:
+		ndInt32 m_digitScan[D_MAX_THREADS_COUNT][4];
+	};
+
 	class ndCalculateContacts : public ndBaseJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndConstraintArray& activeContacts = m_owner->m_activeConstraintArray;
+			ndContactList& activeContacts = m_owner->m_contactList;
+			ndContactInfo& info = *((ndContactInfo*)m_context);
+			ndContactList& dstContacts = m_owner->m_scrathContactList;
 			const ndInt32 threadIndex = GetThreadId();
+			ndInt32* const scan = &info.m_digitScan[threadIndex][0];
+
+			ndInt32 keyLookUp[4];
+			scan[0] = 0;
+			scan[1] = 0;
+			scan[2] = 0;
+			scan[3] = 0;
+			keyLookUp[0] = 0;
+			keyLookUp[1] = 1;
+			keyLookUp[2] = 2;
+			keyLookUp[3] = 2;
+
 			const ndStartEnd startEnd(activeContacts.GetCount(), GetThreadId(), m_owner->GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndContact* const contact = activeContacts[i]->GetAsContact();
 				dAssert(contact);
 				m_owner->CalculateContacts(threadIndex, contact);
+				dstContacts[i] = contact;
+				const ndInt32 entry = (!contact->IsActive() | !contact->m_maxDOF) + contact->m_isDead * 2;
+				const ndInt32 key = keyLookUp[entry];
+				scan[key] ++;
 			}
 		}
 	};
 
-	SubmitJobs<ndCalculateContacts>();
+	class ndClasifyContacts : public ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndContactInfo& info = *((ndContactInfo*)m_context);
+			ndContactList& dstContacts = m_owner->m_contactList;
+			ndContactList& srcContacts = m_owner->m_scrathContactList;
+			ndConstraintArray& activeConstraintArray = m_owner->m_activeConstraintArray;
+			const ndInt32 threadIndex = GetThreadId();
+
+			ndInt32 keyLookUp[4];
+			keyLookUp[0] = 0;
+			keyLookUp[1] = 1;
+			keyLookUp[2] = 2;
+			keyLookUp[3] = 2;
+			ndInt32* const scan = &info.m_digitScan[threadIndex][0];
+
+			const ndStartEnd startEnd(dstContacts.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			{
+				ndContact* const contact = srcContacts[i]->GetAsContact();
+				const ndInt32 entry = (!contact->IsActive() | !contact->m_maxDOF) + contact->m_isDead * 2;
+				const ndInt32 key = keyLookUp[entry];
+				const ndInt32 index = scan[key];
+				dstContacts[index] = contact;
+				activeConstraintArray[index] = contact;
+				scan[key]++;
+			}
+		}
+	};
+
+	ndContactInfo info;
+	m_scrathContactList.SetCount(m_contactList.GetCount());
+	m_activeConstraintArray.SetCount(m_contactList.GetCount());
+	SubmitJobs<ndCalculateContacts>(&info);
+
+	ndInt32 sum = 0;
+	ndInt32 threadCount = GetThreadCount();
+	for (ndInt32 j = 0; j < 4; j++)
+	{
+		for (ndInt32 i = 0; i < threadCount; i++)
+		{
+			const ndInt32 count = info.m_digitScan[i][j];
+			info.m_digitScan[i][j] = sum;
+			sum += count;
+		}
+	}
+
+	ndInt32 activeJoints = info.m_digitScan[0][1] - info.m_digitScan[0][0];
+	ndInt32 inactiveJoints = info.m_digitScan[0][2] - info.m_digitScan[0][1];
+	ndInt32 deadJoints = info.m_digitScan[0][3] - info.m_digitScan[0][2];
+	
+	SubmitJobs<ndClasifyContacts>(&info);
+	if (deadJoints)
+	{
+		D_TRACKTIME();
+		// this could be parallelized, monitor it to see if is worth doing it.
+		const ndInt32 start = activeJoints + inactiveJoints;
+		for (ndInt32 i = 0; i < deadJoints; i++)
+		{
+			ndContact* const contact = m_contactList[start + i];
+			dAssert(contact->m_isDead);
+			dAssert(contact->m_isAttached);
+			m_contactList.DeleteContact(contact);
+		}
+	}
+
+	m_activeConstraintArray.SetCount(activeJoints);
+	m_contactList.SetCount(activeJoints + inactiveJoints);
 }
 
 void ndScene::UpdateAabb()
@@ -1612,47 +1713,13 @@ void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
 	}
 }
 
-void ndScene::BuildContactArray()
+void ndScene::UpdateSpecial()
 {
-	D_TRACKTIME();
-	ndInt32 count = 0;
-	m_activeConstraintArray.SetCount(m_contactList.GetCount());
-	for (ndContactList::ndNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
+	for (ndList<ndBodyKinematic*>::ndNode* node = m_specialUpdateList.GetFirst(); node; node = node->GetNext())
 	{
-		ndContact* const contact = &node->GetInfo();
-		dAssert(contact->m_isAttached);
-		m_activeConstraintArray[count] = contact;
-		count++;
-		dAssert(count <= m_activeConstraintArray.GetCount());
-		ndBodyTriggerVolume* const trigger = contact->GetBody1()->GetAsBodyTriggerVolume();
-		if (trigger)
-		{
-			trigger->OnTrigger(contact->GetBody0(), m_timestep);
-		}
+		ndBodyKinematic* const body = node->GetInfo();
+		body->SpecialUpdate(m_timestep);
 	}
-}
-
-void ndScene::DeleteDeadContact()
-{
-	D_TRACKTIME();
-	ndInt32 activeCount = m_activeConstraintArray.GetCount();
-	for (ndInt32 i = activeCount - 1; i >= 0; i--)
-	{
-		ndContact* const contact = m_activeConstraintArray[i]->GetAsContact();
-		dAssert(contact);
-		if (contact->m_isDead)
-		{
-			activeCount--;
-			m_contactList.DeleteContact(contact);
-			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
-		}
-		else if (!contact->IsActive() || !contact->m_maxDOF)
-		{
-			activeCount--;
-			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
-		}
-	}
-	m_activeConstraintArray.SetCount(activeCount);
 }
 
 bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stackPool, ndFloat32* const stackDistance, ndInt32 stack, const ndFastRay& ray, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const
@@ -1884,6 +1951,7 @@ void ndScene::Cleanup()
 	ndFreeListAlloc::Flush();
 	m_sceneBodyArray.Resize(1024);
 	m_activeBodyArray.Resize(1024);
+	m_scrathContactList.Resize(1024);
 	m_activeConstraintArray.Resize(1024);
 	m_activeBodyArrayBuffer.Resize(1024);
 }

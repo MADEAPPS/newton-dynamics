@@ -61,7 +61,8 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 		m_deepPenetration,
 	};
 
-	D_COLLISION_API virtual void IntegrateExternalForce(ndFloat32 timestep);
+	virtual void IntegrateExternalForce(ndFloat32 timestep);
+	D_COLLISION_API virtual void SpecialUpdate(ndFloat32 timestep);
 	virtual void SetCollisionShape(const ndShapeInstance& shapeInstance);
 	
 	void UpdatePlayerStatus(ndBodyPlayerCapsuleContactSolver& contactSolver);
@@ -157,6 +158,11 @@ inline void ndBodyPlayerCapsule::IntegrateVelocity(ndFloat32)
 inline bool ndBodyPlayerCapsule::IsOnFloor() const 
 { 
 	return m_isOnFloor; 
+}
+
+inline void ndBodyPlayerCapsule::IntegrateExternalForce(ndFloat32)
+{
+	// do nothing
 }
 
 #endif

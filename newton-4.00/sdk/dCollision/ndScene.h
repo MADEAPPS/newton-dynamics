@@ -166,21 +166,22 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API ndScene();
 	
 	D_COLLISION_API void UpdateAabb();
+	D_COLLISION_API void UpdateSpecial();
 	D_COLLISION_API void BuildBodyArray();
 	D_COLLISION_API void UpdateTransform();
-	D_COLLISION_API void BuildContactArray();
 	D_COLLISION_API void CalculateContacts();
-	D_COLLISION_API void DeleteDeadContact();
 	D_COLLISION_API void FindCollidingPairs();
 	D_COLLISION_API virtual void BalanceScene();
 	D_COLLISION_API virtual void ThreadFunction();
 	
 	ndBodyList m_bodyList;
 	ndContactList m_contactList;
+	ndContactList m_scrathContactList;
 	ndConstraintArray m_activeConstraintArray;
 	ndArray<ndBodyKinematic*> m_sceneBodyArray;
 	ndArray<ndBodyKinematic*> m_activeBodyArray;
 	ndArray<ndBodyKinematic*> m_activeBodyArrayBuffer;
+	ndList<ndBodyKinematic*> m_specialUpdateList;
 	ndSpinLock m_contactLock;
 	ndSceneNode* m_rootNode;
 	ndContactNotify* m_contactNotifyCallback;

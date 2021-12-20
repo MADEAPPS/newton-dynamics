@@ -182,9 +182,9 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof (glVector3), pointBuffer);
 	const ndContactList& contactList = world->GetContactList();
-	for (ndContactList::ndNode* contactNode = contactList.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+	for (ndInt32 i = 0; i < contactList.GetCount(); ++i)
 	{
-		const ndContact* const contact = &contactNode->GetInfo();
+		const ndContact* const contact = contactList[i];
 		if (contact->IsActive())
 		{
 			const ndContactPointList& contactPoints = contact->GetContactPoints();

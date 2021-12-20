@@ -102,6 +102,7 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_sceneNode(nullptr)
 	,m_sceneBodyBodyNode(nullptr)
 	,m_skeletonContainer(nullptr)
+	,m_spetialUpdateNode(nullptr)
 	,m_maxAngleStep(ndFloat32 (90.0f) * ndDegreeToRad)
 	,m_maxLinearSpeed(ndFloat32 (100.0f))
 	,m_weigh(ndFloat32 (0.0f))
@@ -133,6 +134,7 @@ ndBodyKinematic::ndBodyKinematic(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_sceneNode(nullptr)
 	,m_sceneBodyBodyNode(nullptr)
 	,m_skeletonContainer(nullptr)
+	,m_spetialUpdateNode(nullptr)
 	,m_weigh(ndFloat32(0.0f))
 	,m_rank(0)
 	,m_index(0)
@@ -159,6 +161,7 @@ ndBodyKinematic::~ndBodyKinematic()
 {
 	dAssert(m_scene == nullptr);
 	dAssert(m_sceneNode == nullptr);
+	dAssert(m_spetialUpdateNode == nullptr);
 }
 
 void ndBodyKinematic::SetSleepState(bool state)
@@ -540,3 +543,4 @@ void ndBodyKinematic::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 
 	m_shapeInstance.Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
 }
+

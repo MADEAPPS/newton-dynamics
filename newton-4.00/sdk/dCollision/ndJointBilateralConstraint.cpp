@@ -31,8 +31,6 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndJointBilateralConstraint)
 
 ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const ndMatrix& globalMatrix)
 	:ndConstraint()
-	//,dClassAlloc()
-	,ndContainersFreeListAlloc<ndJointBilateralConstraint>()
 	,m_forceBody0(ndVector::m_zero)
 	,m_torqueBody0(ndVector::m_zero)
 	,m_forceBody1(ndVector::m_zero)
@@ -69,8 +67,6 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 
 ndJointBilateralConstraint::ndJointBilateralConstraint(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndConstraint()
-	//,dClassAlloc()
-	,ndContainersFreeListAlloc<ndJointBilateralConstraint>()
 	,m_forceBody0(ndVector::m_zero)
 	,m_torqueBody0(ndVector::m_zero)
 	,m_forceBody1(ndVector::m_zero)

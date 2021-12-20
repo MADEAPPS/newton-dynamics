@@ -81,7 +81,7 @@ class ndContactPointList : public ndList<ndContactMaterial, ndContainersFreeList
 };
 
 D_MSV_NEWTON_ALIGN_32 
-class ndContact: public ndConstraint, public ndContainersFreeListAlloc<ndContact*>
+class ndContact: public ndConstraint
 {
 	public:
 	D_COLLISION_API ndContact();
@@ -119,7 +119,6 @@ class ndContact: public ndConstraint, public ndContainersFreeListAlloc<ndContact
 	ndContactPointList m_contacPointsList;
 	ndBodyKinematic* m_body0;
 	ndBodyKinematic* m_body1;
-	ndList<ndContact, ndContainersFreeListAlloc<ndContact>>::ndNode* m_linkNode;
 	ndMaterial m_material;
 	ndFloat32 m_timeOfImpact;
 	ndFloat32 m_separationDistance;

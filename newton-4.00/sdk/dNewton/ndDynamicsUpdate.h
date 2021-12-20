@@ -42,6 +42,8 @@
 // For more detail on the derivation of the Runge Kutta coefficients you can go to:  
 // http://pathfinder.scar.utoronto.ca/~dyer/csca57/book_P/node51.html
 
+//#define D_PROGRESSIVE_SLEEP_EXPERIMENT
+
 class ndWorld;
 
 D_MSV_NEWTON_ALIGN_32

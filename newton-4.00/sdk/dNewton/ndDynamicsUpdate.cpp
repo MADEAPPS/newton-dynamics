@@ -929,16 +929,30 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			ndVector forceAcc1(m_zero);
 			ndVector torqueAcc1(m_zero);
 
-			//if (body0->m_isJointFence0 & !body0->m_isStatic)
-			//if (body0->m_equilibrium & !body0->m_isStatic)
-			//{
-			//	joint->m_preconditioner0 *= 100.0f;
-			//}
-			//
-			//if (body1->m_equilibrium & !body1->m_isStatic)
-			//{
-			//	joint->m_preconditioner1 *= 100.0f;
-			//}
+#ifdef D_PROGRESSIVE_SLEEP_EXPERIMENT
+			ndFloat32 xxxxxxxxxxxxxx = 0.01f;
+			if (body0->m_isJointFence1 & !body0->m_isStatic)
+			{
+				ndVector xxxxxx(xxxxxxxxxxxxxx);
+				for (ndInt32 i = 0; i < count; ++i)
+				{
+					ndLeftHandSide* const row = &m_leftHandSide[index + i];
+					row->m_Jt.m_jacobianM0.m_linear = row->m_Jt.m_jacobianM0.m_linear * xxxxxx;
+					row->m_Jt.m_jacobianM0.m_angular = row->m_Jt.m_jacobianM0.m_linear * xxxxxx;
+				}
+			}
+
+			if (body1->m_isJointFence1 & !body1->m_isStatic)
+			{
+				ndVector xxxxxx(xxxxxxxxxxxxxx);
+				for (ndInt32 i = 0; i < count; ++i)
+				{
+					ndLeftHandSide* const row = &m_leftHandSide[index + i];
+					row->m_Jt.m_jacobianM1.m_linear = row->m_Jt.m_jacobianM1.m_linear * xxxxxx;
+					row->m_Jt.m_jacobianM1.m_angular = row->m_Jt.m_jacobianM1.m_linear * xxxxxx;
+				}
+			}
+#endif
 
 			const ndVector weigh0(body0->m_weigh * joint->m_preconditioner0);
 			const ndVector weigh1(body1->m_weigh * joint->m_preconditioner1);
