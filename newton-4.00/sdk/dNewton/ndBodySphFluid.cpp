@@ -702,13 +702,13 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			ndBodySphFluid* const fluid = ((ndContext*)m_context)->m_fluid;
 			const ndFloat32 radius = fluid->m_radius;
 
-			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 particleCount = fluid->m_posit.GetCount();
-
-			const ndInt32 step = particleCount / threadCount;
-			const ndInt32 start = threadIndex * step;
-			const ndInt32 count = ((threadIndex + 1) < threadCount) ? step : particleCount - start;
+			//onst ndInt32 threadIndex = GetThreadId();
+			//onst ndInt32 threadCount = m_owner->GetThreadCount();
+			//onst ndInt32 particleCount = fluid->m_posit.GetCount();
+			//
+			//onst ndInt32 step = particleCount / threadCount;
+			//onst ndInt32 start = threadIndex * step;
+			//onst ndInt32 count = ((threadIndex + 1) < threadCount) ? step : particleCount - start;
 
 			const ndFloat32 gridSize = fluid->CalculateGridSize();
 
@@ -760,9 +760,11 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			stepsCode_z[1] = ndGridHash(0, 0, 1);
 
 			ndHashCacheBuffer bufferOut;
-			for (ndInt32 i = 0; i < count; i++)
+			//for (ndInt32 i = 0; i < count; i++)
+			const ndStartEnd startEnd(fluid->m_posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
-				ndVector r(posit[start + i] - origin);
+				ndVector r(posit[i] - origin);
 				ndVector p(r * invGridSize);
 				ndGridHash hashKey(p, i);
 

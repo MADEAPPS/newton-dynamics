@@ -1259,16 +1259,10 @@ void ndScene::BuildBodyArray()
 			const ndArray<ndBodyKinematic*>& bodyArrayBuffer = m_owner->m_activeBodyArrayBuffer;
 			
 			ndInt32 bodyCount = 0;
-			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 bodyBufferCount = bodyArrayBuffer.GetCount();
-			const ndInt32 stride = bodyBufferCount / threadCount;
-			const ndInt32 start = threadIndex * stride;
-			const ndInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyBufferCount - start;
-
-			for (ndInt32 j = 0; j < blockSize; j++)
+			const ndStartEnd startEnd(bodyArrayBuffer.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 j = startEnd.m_start; j < startEnd.m_end; ++j)
 			{
-				ndBodyKinematic* const body = bodyArrayBuffer[j + start];
+				ndBodyKinematic* const body = bodyArrayBuffer[j];
 				const ndShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
 				if (!shape)
 				{
@@ -1337,9 +1331,8 @@ void ndScene::CalculateContacts()
 			D_TRACKTIME();
 			ndConstraintArray& activeContacts = m_owner->m_activeConstraintArray;
 			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 contactCount = activeContacts.GetCount();
-			for (ndInt32 i = threadIndex; i < contactCount; i += threadCount)
+			const ndStartEnd startEnd(activeContacts.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndContact* const contact = activeContacts[i]->GetAsContact();
 				dAssert(contact);
@@ -1362,10 +1355,8 @@ void ndScene::UpdateAabb()
 			D_TRACKTIME();
 			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
 			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 bodyCount = bodyArray.GetCount() - 1;
-
-			for (ndInt32 i = threadIndex; i < bodyCount; i += threadCount)
+			const ndStartEnd startEnd(bodyArray.GetCount() - 1, GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBodyKinematic* const body = bodyArray[i];
 				if (!body->m_equilibrium)
@@ -1434,16 +1425,10 @@ void ndScene::FindCollidingPairs()
 		{
 			D_TRACKTIME();
 			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 bodyCount = bodyArray.GetCount() - 1;
-			const ndInt32 stride = bodyCount / threadCount;
-			const ndInt32 start = threadIndex * stride;
-			const ndInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-
-			for (ndInt32 i = 0; i < blockSize; i++)
+			const ndStartEnd startEnd(bodyArray.GetCount() - 1, GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
-				ndBodyKinematic* const body = bodyArray[i + start];
+				ndBodyKinematic* const body = bodyArray[i];
 				m_owner->FindCollidingPairs(body);
 			}
 		}
@@ -1457,16 +1442,10 @@ void ndScene::FindCollidingPairs()
 			D_TRACKTIME();
 
 			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->m_sceneBodyArray;
-			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 bodyCount = bodyArray.GetCount();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 stride = bodyCount / threadCount;
-			const ndInt32 start = threadIndex * stride;
-			const ndInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-
-			for (ndInt32 i = 0; i < blockSize; i++)
+			const ndStartEnd startEnd(bodyArray.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
-				ndBodyKinematic* const body = bodyArray[i + start];
+				ndBodyKinematic* const body = bodyArray[i];
 				m_owner->FindCollidingPairsForward(body);
 			}
 		}
@@ -1480,16 +1459,10 @@ void ndScene::FindCollidingPairs()
 			D_TRACKTIME();
 
 			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->m_sceneBodyArray;
-			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 bodyCount = bodyArray.GetCount();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 stride = bodyCount / threadCount;
-			const ndInt32 start = threadIndex * stride;
-			const ndInt32 blockSize = (threadIndex != (threadCount - 1)) ? stride : bodyCount - start;
-
-			for (ndInt32 i = 0; i < blockSize; i++)
+			const ndStartEnd startEnd(bodyArray.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
-				ndBodyKinematic* const body = bodyArray[i + start];
+				ndBodyKinematic* const body = bodyArray[i];
 				m_owner->FindCollidingPairsBackward(body);
 			}
 		}
@@ -1534,9 +1507,8 @@ void ndScene::UpdateTransform()
 			D_TRACKTIME();
 			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
 			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 bodyCount = bodyArray.GetCount() - 1;
-			for (ndInt32 i = threadIndex; i < bodyCount; i += threadCount)
+			const ndStartEnd startEnd(bodyArray.GetCount() - 1, GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBodyKinematic* const body = bodyArray[i];
 				m_owner->UpdateTransformNotify(threadIndex, body);
@@ -1651,13 +1623,13 @@ void ndScene::BuildContactArray()
 		dAssert(contact->m_isAttached);
 		m_activeConstraintArray[count] = contact;
 		count++;
+		dAssert(count <= m_activeConstraintArray.GetCount());
 		ndBodyTriggerVolume* const trigger = contact->GetBody1()->GetAsBodyTriggerVolume();
 		if (trigger)
 		{
 			trigger->OnTrigger(contact->GetBody0(), m_timestep);
 		}
 	}
-	m_activeConstraintArray.SetCount(count);
 }
 
 void ndScene::DeleteDeadContact()
