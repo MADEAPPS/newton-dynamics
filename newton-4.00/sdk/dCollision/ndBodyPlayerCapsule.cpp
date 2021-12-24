@@ -777,6 +777,7 @@ void ndBodyPlayerCapsule::SpecialUpdate(ndFloat32 timestep)
 		}
 	#endif
 #endif
+	m_equilibrium0 = 0;
 
 	// set player orientation
 	ndMatrix matrix(dYawMatrix(GetHeadingAngle()));

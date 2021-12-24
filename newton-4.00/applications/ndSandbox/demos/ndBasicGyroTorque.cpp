@@ -233,25 +233,25 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, dGetIdentityMatrix()); 
 
 	// should spins very slowly, with a tilt angle of 30 degrees
-	//CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -12.0f, 0.0f), 10.0f, 50.0f, 0.6f, 0.5f, 30.0f);
-	//CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -10.0f, 0.0f), 10.0f, 100.0f, 0.6f, 0.5f, 0.0f);
-	//CreateFlyWheel(scene, ndVector(15.0f, 0.0f,  -8.0f, 0.0f), 10.0f, -30.0f, 0.6f, 0.5f, 0.0f);
+	CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -12.0f, 0.0f), 10.0f, 50.0f, 0.6f, 0.5f, 30.0f);
+	CreateFlyWheel(scene, ndVector(15.0f, 0.0f, -10.0f, 0.0f), 10.0f, 100.0f, 0.6f, 0.5f, 0.0f);
+	CreateFlyWheel(scene, ndVector(15.0f, 0.0f,  -8.0f, 0.0f), 10.0f, -30.0f, 0.6f, 0.5f, 0.0f);
 	
 	DzhanibekovEffect(scene, 10.0f, 5.0f, ndVector(15.0f, 0.0f, -4.0f, 0.0f));
-	//DzhanibekovEffect(scene, 10.0f, -5.0f, ndVector(15.0f, 0.0f, 0.0f, 0.0f));
-	//DzhanibekovEffect(scene, 10.0f, 10.0f, ndVector(15.0f, 0.0f, 4.0f, 0.0f));
-	//
-	//Phitop(scene, 10.0f,  25.0f, ndVector(10.0f, 0.0f, -6.0f, 0.0f));
-	//Phitop(scene, 10.0f, -25.0f, ndVector(10.0f, 0.0f, 0.0f, 0.0f));
-	//Phitop(scene, 10.0f,  35.0f, ndVector(10.0f, 0.0f, 6.0f, 0.0f));
-	//
-	//PrecessingTop(scene, ndVector(5.0f, 0.0f, -4.0f, 0.0f));
-	//PrecessingTop(scene, ndVector(5.0f, 0.0f, 0.0f, 0.0f));
-	//PrecessingTop(scene, ndVector(5.0f, 0.0f, 4.0f, 0.0f));
-	//
-	//RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f, -4.0f, 0.0f));
-	//RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f, 0.0f, 0.0f));
-	//RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f,  4.0f, 0.0f));
+	DzhanibekovEffect(scene, 10.0f, -5.0f, ndVector(15.0f, 0.0f, 0.0f, 0.0f));
+	DzhanibekovEffect(scene, 10.0f, 10.0f, ndVector(15.0f, 0.0f, 4.0f, 0.0f));
+	
+	Phitop(scene, 10.0f,  25.0f, ndVector(10.0f, 0.0f, -6.0f, 0.0f));
+	Phitop(scene, 10.0f, -25.0f, ndVector(10.0f, 0.0f, 0.0f, 0.0f));
+	Phitop(scene, 10.0f,  35.0f, ndVector(10.0f, 0.0f, 6.0f, 0.0f));
+	
+	PrecessingTop(scene, ndVector(5.0f, 0.0f, -4.0f, 0.0f));
+	PrecessingTop(scene, ndVector(5.0f, 0.0f, 0.0f, 0.0f));
+	PrecessingTop(scene, ndVector(5.0f, 0.0f, 4.0f, 0.0f));
+	
+	RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f, -4.0f, 0.0f));
+	RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f, 0.0f, 0.0f));
+	RattleBack(scene, 10.0f, ndVector(0.0f, 0.0f,  4.0f, 0.0f));
 	
 	scene->GetCameraManager()->SetPickMode(true);
 

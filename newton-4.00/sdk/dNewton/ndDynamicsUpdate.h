@@ -30,6 +30,9 @@
 
 #define D_MAX_BODY_RADIX_BIT		9
 
+#define D_USE_EARLY_OUT_JOINT
+#define D_PROGRESSIVE_SLEEP_EXPERIMENT
+
 // the solver is a RK order 4, but instead of weighting the intermediate derivative by the usual 1/6, 1/3, 1/3, 1/6 coefficients
 // I am using 1/4, 1/4, 1/4, 1/4.
 // This is correct.The weighting coefficients of any RK method comes from an arbitrary criteria
@@ -41,8 +44,6 @@
 // but it allows for simpler calculation of the intermediate derivatives and also for less intermediate memory.
 // For more detail on the derivation of the Runge Kutta coefficients you can go to:  
 // http://pathfinder.scar.utoronto.ca/~dyer/csca57/book_P/node51.html
-
-//#define D_PROGRESSIVE_SLEEP_EXPERIMENT
 
 class ndWorld;
 

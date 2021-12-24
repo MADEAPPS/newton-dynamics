@@ -95,7 +95,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "active ragdoll", ndActiveRagdoll },
 	{ "basic vehicle", ndBasicVehicle },
 	{ "heavy vehicle", ndHeavyVehicle },
-	{ "simple convex fracture", ndBasicExplodeConvexShape },
+	//{ "simple convex fracture", ndBasicExplodeConvexShape },
 	//{ "basic convex fracture", ndBasicFracture_0 },
 	//{ "linked convex fracture", ndBasicFracture_2 },
 	//{ "simple skin peeling fracture", ndBasicFracture_4 },

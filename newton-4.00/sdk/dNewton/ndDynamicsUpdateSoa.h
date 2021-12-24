@@ -78,6 +78,13 @@ class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 	virtual void Update();
 
 	private:
+	class ndGroupType
+	{
+		public:
+		ndInt8 m_rows____;
+		ndInt8 m_isUniformGroup;
+	};
+
 	void SortJoints();
 	void SortIslands();
 	void BuildIsland();
@@ -98,6 +105,8 @@ class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
 	ndVector m_ordinals;
+	ndArray<ndInt8> m_groupType;
+	ndArray<ndVector> m_jointMask;
 	ndArray<ndInt32> m_soaJointRows;
 	ndArray<ndSoa::ndSoaMatrixElement> m_soaMassMatrix;
 

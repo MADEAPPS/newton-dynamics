@@ -39,6 +39,13 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	virtual void Update();
 
 	private:
+	class ndGroupType
+	{
+		public:
+		ndInt8 m_rows____;
+		ndInt8 m_isUniformGroup;
+	};
+
 	void SortJoints();
 	void SortIslands();
 	void BuildIsland();
@@ -58,6 +65,8 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	void DetermineSleepStates();
 	void GetJacobianDerivatives(ndConstraint* const joint);
 
+	ndArray<ndInt8> m_groupType;
+	ndArray<ndJacobian> m_jointMask;
 	ndArray<ndInt32> m_avxJointRows;
 	dAvxMatrixArray* m_avxMassMatrixArray;
 

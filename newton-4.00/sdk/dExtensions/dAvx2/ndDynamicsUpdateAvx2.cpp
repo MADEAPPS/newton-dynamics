@@ -313,13 +313,30 @@
 			return  _mm256_xor_ps(m_type, _mm256_and_ps(mask.m_type, _mm256_xor_ps(m_type, data.m_type)));
 		}
 
+		inline ndVector GetLow() const
+		{
+			return _mm256_castps256_ps128(m_type);
+		}
+
+		inline ndVector GetHigh() const
+		{
+			return _mm256_extractf128_ps(m_type, 1);
+		}
+
+		inline ndFloat32 GetMax() const
+		{
+			__m128 tmp0(_mm_max_ps(_mm256_castps256_ps128(m_type), _mm256_extractf128_ps(m_type, 1)));
+			__m128 tmp1(_mm_max_ps(tmp0, _mm_shuffle_ps(tmp0, tmp0, PERMUTE_MASK(1, 0, 3, 2))));
+			__m128 tmp2(_mm_max_ps(tmp1, _mm_shuffle_ps(tmp1, tmp1, PERMUTE_MASK(2, 3, 0, 1))));
+			return _mm_cvtss_f32(tmp2);
+		}
 
 		inline ndFloat32 AddHorizontal() const
 		{
-			__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
-			__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
-			__m256 tmp2(_mm256_hadd_ps(tmp1, tmp1));
-			return *((ndFloat32*)&tmp2);
+			__m128 tmp0(_mm_add_ps(_mm256_castps256_ps128(m_type), _mm256_extractf128_ps(m_type, 1)));
+			__m128 tmp1(_mm_add_ps(tmp0, _mm_shuffle_ps(tmp0, tmp0, PERMUTE_MASK(1, 0, 3, 2))));
+			__m128 tmp2(_mm_add_ps(tmp1, _mm_shuffle_ps(tmp1, tmp1, PERMUTE_MASK(2, 3, 0, 1))));
+			return _mm_cvtss_f32(tmp2);
 		}
 
 		static inline void FlushRegisters()
@@ -394,7 +411,9 @@ class dAvxMatrixArray : public ndArray<ndSoaMatrixElement>
 
 ndDynamicsUpdateAvx2::ndDynamicsUpdateAvx2(ndWorld* const world)
 	:ndDynamicsUpdate(world)
-	,m_avxJointRows(D_AVX_DEFAULT_BUFFER_SIZE * 4)
+	,m_groupType(D_AVX_DEFAULT_BUFFER_SIZE)
+	,m_jointMask(D_AVX_DEFAULT_BUFFER_SIZE)
+	,m_avxJointRows(D_AVX_DEFAULT_BUFFER_SIZE)
 	,m_avxMassMatrixArray(new dAvxMatrixArray)
 {
 }
@@ -402,7 +421,9 @@ ndDynamicsUpdateAvx2::ndDynamicsUpdateAvx2(ndWorld* const world)
 ndDynamicsUpdateAvx2::~ndDynamicsUpdateAvx2()
 {
 	Clear();
-	m_avxJointRows.Resize(D_AVX_DEFAULT_BUFFER_SIZE * 4);
+	m_jointMask.Resize(D_AVX_DEFAULT_BUFFER_SIZE);
+	m_groupType.Resize(D_AVX_DEFAULT_BUFFER_SIZE);
+	m_avxJointRows.Resize(D_AVX_DEFAULT_BUFFER_SIZE);
 	delete m_avxMassMatrixArray;
 }
 
@@ -628,7 +649,6 @@ void ndDynamicsUpdateAvx2::DetermineSleepStates()
 			}
 		}
 
-
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -676,7 +696,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 			const ndInt32 count = jointArray.GetCount();
 
 			ndInt32 rowCount = 1;
-			for (ndInt32 i = 0; i < count; i++)
+			for (ndInt32 i = 0; i < count; ++i)
 			{
 				ndConstraint* const joint = jointArray[i];
 				joint->m_rowStart = rowCount;
@@ -695,7 +715,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 			ndInt32 soaJointRowCount = 0;
 			ndArray<ndInt32>& soaJointRows = me->m_avxJointRows;
 			ndInt32 soaJointCountBatches = soaJointRows.GetCount();
-			for (ndInt32 i = 0; i < soaJointCountBatches; i++)
+			for (ndInt32 i = 0; i < soaJointCountBatches; ++i)
 			{
 				const ndConstraint* const joint = jointArray[i * D_AVX_WORK_GROUP];
 				soaJointRows[i] = soaJointRowCount;
@@ -738,7 +758,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	ndConstraintArray& jointArray = scene->GetActiveContactArray();
 
 	#ifdef _DEBUG
-		for (ndInt32 i = 1; i < m_activeJointCount; i++)
+		for (ndInt32 i = 1; i < m_activeJointCount; ++i)
 		{
 			ndConstraint* const joint0 = jointArray[i - 1];
 			ndConstraint* const joint1 = jointArray[i - 0];
@@ -749,7 +769,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 			dAssert(!(joint1->GetBody0()->m_equilibrium0 & joint1->GetBody1()->m_equilibrium0));
 		}
 
-		for (ndInt32 i = m_activeJointCount + 1; i < jointArray.GetCount(); i++)
+		for (ndInt32 i = m_activeJointCount + 1; i < jointArray.GetCount(); ++i)
 		{
 			ndConstraint* const joint0 = jointArray[i - 1];
 			ndConstraint* const joint1 = jointArray[i - 0];
@@ -766,7 +786,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	const ndInt32 soaJointCount = (jointCount + D_AVX_WORK_GROUP - 1) & mask;
 	dAssert(jointArray.GetCapacity() > soaJointCount);
 	ndConstraint** const jointArrayPtr = &jointArray[0];
-	for (ndInt32 i = jointCount; i < soaJointCount; i++)
+	for (ndInt32 i = jointCount; i < soaJointCount; ++i)
 	{
 		jointArrayPtr[i] = nullptr;
 	}
@@ -777,7 +797,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		const ndInt32 count = jointArrayPtr[base + D_AVX_WORK_GROUP - 1] ? D_AVX_WORK_GROUP : jointArray.GetCount() - base;
 		dAssert(count <= D_AVX_WORK_GROUP);
 		ndConstraint** const array = &jointArrayPtr[base];
-		for (ndInt32 j = 1; j < count; j++)
+		for (ndInt32 j = 1; j < count; ++j)
 		{
 			ndInt32 slot = j;
 			ndConstraint* const joint = array[slot];
@@ -791,11 +811,13 @@ void ndDynamicsUpdateAvx2::SortJoints()
 
 	ndRowsCount rowsCount;
 	const ndInt32 soaJointCountBatches = soaJointCount / D_AVX_WORK_GROUP;
+	m_jointMask.SetCount(soaJointCountBatches);
+	m_groupType.SetCount(soaJointCountBatches);
 	m_avxJointRows.SetCount(soaJointCountBatches);
 	scene->SubmitJobs<ndSetRowStarts>(&rowsCount);
 	
 	ndInt32 rowCount = 1;
-	for (ndInt32 i = 0; i < jointArray.GetCount(); i++)
+	for (ndInt32 i = 0; i < jointArray.GetCount(); ++i)
 	{
 		ndConstraint* const joint = jointArray[i];
 		joint->m_rowStart = rowCount;
@@ -809,7 +831,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	#ifdef _DEBUG
 		dAssert(m_activeJointCount <= jointArray.GetCount());
 		const ndInt32 maxRowCount = m_leftHandSide.GetCount();
-		for (ndInt32 i = 0; i < jointArray.GetCount(); i++)
+		for (ndInt32 i = 0; i < jointArray.GetCount(); ++i)
 		{
 			ndConstraint* const joint = jointArray[i];
 			dAssert(joint->m_rowStart < m_leftHandSide.GetCount());
@@ -819,7 +841,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		for (ndInt32 i = 0; i < jointCount; i += D_AVX_WORK_GROUP)
 		{
 			const ndInt32 count = jointArrayPtr[i + D_AVX_WORK_GROUP - 1] ? D_AVX_WORK_GROUP : jointCount - i;
-			for (ndInt32 j = 1; j < count; j++)
+			for (ndInt32 j = 1; j < count; ++j)
 			{
 				ndConstraint* const joint0 = jointArrayPtr[i + j - 1];
 				ndConstraint* const joint1 = jointArrayPtr[i + j - 0];
@@ -860,15 +882,13 @@ void ndDynamicsUpdateAvx2::SortIslands()
 	GetInternalForces().SetCount(bodyArray.GetCount());
 
 	ndInt32 bodyCount = 0;
-	const ndInt32 totalBodyCount = bodyArray.GetCount() - 1;
 	ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)&GetInternalForces()[0];
-	for (ndInt32 i = 0; i < totalBodyCount; i++)
+	for (ndInt32 i = 0; i < bodyArray.GetCount(); ++i)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
-		if (!(body->m_equilibrium0 & body->m_islandSleep) || body->GetAsBodyPlayerCapsule())
+		if (!(body->m_equilibrium0 & body->m_islandSleep))
 		{
 			buffer0[bodyCount].m_body = body;
-			//if (body->m_invMass.m_w > ndFloat32(0.0f))
 			if (!body->m_isStatic)
 			{
 				ndBodyKinematic* root = body->m_islandParent;
@@ -1038,7 +1058,7 @@ void ndDynamicsUpdateAvx2::InitWeights()
 
 			ndInt32 maxExtraPasses = 1;
 
-			const ndStartEnd startEnd(jointForceIndexBuffer.GetCount() - 2, GetThreadId(), m_owner->GetThreadCount());
+			const ndStartEnd startEnd(jointForceIndexBuffer.GetCount() - 1, GetThreadId(), m_owner->GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				const ndInt32 index = jointForceIndexBuffer[i];
@@ -1076,7 +1096,7 @@ void ndDynamicsUpdateAvx2::InitWeights()
 
 	ndInt32 extraPasses = 0;
 	const ndInt32 threadCount = scene->GetThreadCount();
-	for (ndInt32 i = 0; i < threadCount; i++)
+	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
 		extraPasses = dMax(extraPasses, extraPassesArray[i]);
 	}
@@ -1197,7 +1217,7 @@ void ndDynamicsUpdateAvx2::GetJacobianDerivatives(ndConstraint* const joint)
 
 	joint->m_rowCount = dof;
 	const ndInt32 baseIndex = joint->m_rowStart;
-	for (ndInt32 i = 0; i < dof; i++)
+	for (ndInt32 i = 0; i < dof; ++i)
 	{
 		dAssert(constraintParam.m_forceBounds[i].m_jointForce);
 
@@ -1268,13 +1288,34 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			ndAvxFloat forceAcc0(ndAvxFloat::m_zero);
 			ndAvxFloat forceAcc1(ndAvxFloat::m_zero);
 
+#ifdef D_PROGRESSIVE_SLEEP_EXPERIMENT
+			const ndAvxFloat progressiveSleepWeigh(ndFloat32(0.01f));
+			if (body0->m_isJointFence1 & !body0->m_isStatic)
+			{
+				for (ndInt32 i = 0; i < count; ++i)
+				{
+					ndAvxFloat& row = (ndAvxFloat&)m_leftHandSide[index + i].m_Jt.m_jacobianM0;
+					row = progressiveSleepWeigh * row;
+				}
+			}
+
+			if (body1->m_isJointFence1 & !body1->m_isStatic)
+			{
+				for (ndInt32 i = 0; i < count; ++i)
+				{
+					ndAvxFloat& row = (ndAvxFloat&)m_leftHandSide[index + i].m_Jt.m_jacobianM1;
+					row = progressiveSleepWeigh * row;
+				}
+			}
+#endif
+
 			const ndAvxFloat weigh0(body0->m_weigh * joint->m_preconditioner0);
 			const ndAvxFloat weigh1(body1->m_weigh * joint->m_preconditioner1);
 
 			const ndFloat32 preconditioner0 = joint->m_preconditioner0;
 			const ndFloat32 preconditioner1 = joint->m_preconditioner1;
 
-			for (ndInt32 i = 0; i < count; i++)
+			for (ndInt32 i = 0; i < count; ++i)
 			{
 				ndLeftHandSide* const row = &m_leftHandSide[index + i];
 				ndRightHandSide* const rhs = &m_rightHandSide[index + i];
@@ -1333,10 +1374,10 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			m_jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 			ndConstraint** const jointArray = &m_owner->GetActiveContactArray()[0];
 
-			const ndInt32 jointCount = m_owner->GetActiveContactArray().GetCount();
 			const ndInt32 threadIndex = GetThreadId();
 			const ndInt32 threadCount = m_owner->GetThreadCount();
-			
+			const ndInt32 jointCount = m_owner->GetActiveContactArray().GetCount();
+
 			for (ndInt32 i = threadIndex; i < jointCount; i += threadCount)
 			{
 				ndConstraint* const joint = jointArray[i];
@@ -1370,6 +1411,9 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			const ndAvxFloat ordinals(ndAvxFloat::m_ordinals);
 			const ndInt32 mask = -ndInt32(D_AVX_WORK_GROUP);
 			const ndInt32 soaJointCount = ((jointCount + D_AVX_WORK_GROUP - 1) & mask) / D_AVX_WORK_GROUP;
+
+			ndInt8* const groupType = &me->m_groupType[0];
+			ndAvxFloat* const jointMask = (ndAvxFloat*)&me->m_jointMask[0];
 			const ndInt32* const soaJointRows = &me->m_avxJointRows[0];
 
 			const ndInt32 threadIndex = GetThreadId();
@@ -1377,23 +1421,38 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			for (ndInt32 i = threadIndex; i < soaJointCount; i += threadCount)
 			{
 				const ndInt32 index = i * D_AVX_WORK_GROUP;
-				for (ndInt32 j = 1; j < D_AVX_WORK_GROUP; j++)
+				ndInt32 maxRow = 0;
+				ndInt32 minRow = 255;
+				ndAvxFloat selectMask(-1);
+				for (ndInt32 j = 0; j < D_AVX_WORK_GROUP; ++j)
 				{
 					ndConstraint* const joint = jointArray[index + j];
 					if (joint)
 					{
-						ndInt32 slot = j;
-						for (; (slot > 0) && (jointArray[index + slot - 1]->m_rowCount < joint->m_rowCount); slot--)
+						const ndInt32 maxMask = (maxRow - joint->m_rowCount) >> 8;
+						const ndInt32 minMask = (minRow - joint->m_rowCount) >> 8;
+						maxRow = maxMask & joint->m_rowCount | ~maxMask & maxRow;
+						minRow = ~minMask & joint->m_rowCount | minMask & minRow;
+						if (!joint->m_rowCount)
 						{
-							jointArray[index + slot] = jointArray[index + slot - 1];
+							selectMask[j] = ndFloat32(0.0f);
 						}
-						jointArray[index + slot] = joint;
+					}
+					else
+					{
+						minRow = 0;
+						selectMask[j] = ndFloat32(0.0f);
 					}
 				}
+				dAssert(maxRow >= 0);
+				dAssert(minRow < 255);
+				jointMask[i] = selectMask;
+
+				const ndInt8 isUniformGroup = (maxRow == minRow) & (maxRow > 0);
+				groupType[i] = isUniformGroup;
 
 				const ndInt32 soaRowBase = soaJointRows[i];
-				const ndConstraint* const lastJoint = jointArray[index + D_AVX_WORK_GROUP - 1];
-				if (lastJoint && (lastJoint->m_rowCount == jointArray[index]->m_rowCount))
+				if (isUniformGroup)
 				{
 					const ndConstraint* const joint0 = jointArray[index + 0];
 					const ndConstraint* const joint1 = jointArray[index + 1];
@@ -1407,7 +1466,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 					const ndConstraint* const joint = jointArray[index];
 					const ndInt32 rowCount = joint->m_rowCount;
 					
-					for (ndInt32 j = 0; j < rowCount; j++)
+					for (ndInt32 j = 0; j < rowCount; ++j)
 					{
 						ndVector tmp[D_AVX_WORK_GROUP];
 						const ndLeftHandSide* const row0 = &leftHandSide[joint0->m_rowStart + j];
@@ -1533,7 +1592,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 						#else
 							ndInt32* const normalIndex = (ndInt32*)&row.m_normalForceIndex[0];
 						#endif
-						for (ndInt32 k = 0; k < D_AVX_WORK_GROUP; k++)
+						for (ndInt32 k = 0; k < D_AVX_WORK_GROUP; ++k)
 						{
 							const ndConstraint* const soaJoint = jointArray[index + k];
 							const ndRightHandSide* const rhs = &rightHandSide[soaJoint->m_rowStart + j];
@@ -1550,7 +1609,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 				else
 				{
 					const ndConstraint* const firstJoint = jointArray[index];
-					for (ndInt32 j = 0; j < firstJoint->m_rowCount; j++)
+					for (ndInt32 j = 0; j < firstJoint->m_rowCount; ++j)
 					{
 						ndSoaMatrixElement& row = massMatrix[soaRowBase + j];
 						row.m_Jt.m_jacobianM0.m_linear.m_x = zero;
@@ -1588,12 +1647,12 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 						row.m_upperBoundFrictionCoefficent = zero;
 					}
 					
-					for (ndInt32 j = 0; j < D_AVX_WORK_GROUP; j++)
+					for (ndInt32 j = 0; j < D_AVX_WORK_GROUP; ++j)
 					{
 						const ndConstraint* const joint = jointArray[index + j];
 						if (joint)
 						{
-							for (ndInt32 k = 0; k < joint->m_rowCount; k++)
+							for (ndInt32 k = 0; k < joint->m_rowCount; ++k)
 							{
 								ndSoaMatrixElement& row = massMatrix[soaRowBase + k];
 								const ndLeftHandSide* const lhs = &leftHandSide[joint->m_rowStart + k];
@@ -1663,7 +1722,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			const ndAvxFloat* const jointInternalForces = (ndAvxFloat*)&me->GetTempInternalForces()[0];
 			const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 
-			const ndStartEnd startEnd(bodyIndex.GetCount() - 2, GetThreadId(), m_owner->GetThreadCount());
+			const ndStartEnd startEnd(bodyIndex.GetCount() - 1, GetThreadId(), m_owner->GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndAvxFloat force(ndAvxFloat::m_zero);
@@ -1716,6 +1775,7 @@ void ndDynamicsUpdateAvx2::UpdateForceFeedback()
 			const ndInt32 threadCount = m_owner->GetThreadCount();
 			const ndInt32 jointCount = jointArray.GetCount();
 
+			ndAvxFloat zero(ndFloat32(0.0f));
 			const ndFloat32 timestepRK = me->m_timestepRK;
 			for (ndInt32 i = threadIndex; i < jointCount; i += threadCount)
 			{
@@ -1723,7 +1783,7 @@ void ndDynamicsUpdateAvx2::UpdateForceFeedback()
 				const ndInt32 rows = joint->m_rowCount;
 				const ndInt32 first = joint->m_rowStart;
 
-				for (ndInt32 j = 0; j < rows; j++)
+				for (ndInt32 j = 0; j < rows; ++j)
 				{
 					const ndRightHandSide* const rhs = &rightHandSide[j + first];
 					dAssert(dCheckFloat(rhs->m_force));
@@ -1735,25 +1795,21 @@ void ndDynamicsUpdateAvx2::UpdateForceFeedback()
 				if (joint->GetAsBilateral())
 				{
 					const ndArray<ndLeftHandSide>& leftHandSide = me->m_leftHandSide;
-					ndVector force0(ndVector::m_zero);
-					ndVector force1(ndVector::m_zero);
-					ndVector torque0(ndVector::m_zero);
-					ndVector torque1(ndVector::m_zero);
-					for (ndInt32 j = 0; j < rows; j++)
+					ndAvxFloat force0(zero);
+					ndAvxFloat force1(zero);
+					for (ndInt32 j = 0; j < rows; ++j)
 					{
 						const ndRightHandSide* const rhs = &rightHandSide[j + first];
 						const ndLeftHandSide* const lhs = &leftHandSide[j + first];
-						const ndVector f(rhs->m_force);
-						force0 += lhs->m_Jt.m_jacobianM0.m_linear * f;
-						torque0 += lhs->m_Jt.m_jacobianM0.m_angular * f;
-						force1 += lhs->m_Jt.m_jacobianM1.m_linear * f;
-						torque1 += lhs->m_Jt.m_jacobianM1.m_angular * f;
+						const ndAvxFloat f(rhs->m_force);
+						force0 = force0.MulAdd((ndAvxFloat&)lhs->m_Jt.m_jacobianM0, f);
+						force1 = force1.MulAdd((ndAvxFloat&)lhs->m_Jt.m_jacobianM1, f);
 					}
-					ndJointBilateralConstraint* const bilateral = joint->GetAsBilateral();
-					bilateral->m_forceBody0 = force0;
-					bilateral->m_torqueBody0 = torque0;
-					bilateral->m_forceBody1 = force1;
-					bilateral->m_torqueBody1 = torque1;
+					ndJointBilateralConstraint* const bilateral = (ndJointBilateralConstraint*)joint;
+					bilateral->m_forceBody0 = force0.GetLow();
+					bilateral->m_torqueBody0 = force0.GetHigh();
+					bilateral->m_forceBody1 = force1.GetLow();
+					bilateral->m_torqueBody1 = force1.GetHigh();
 				}
 			}
 		}
@@ -1777,7 +1833,7 @@ void ndDynamicsUpdateAvx2::InitSkeletons()
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			ndSkeletonList::ndNode* node = world->GetSkeletonList().GetFirst();
-			for (ndInt32 i = 0; i < threadIndex; i++)
+			for (ndInt32 i = 0; i < threadIndex; ++i)
 			{
 				node = node ? node->GetNext() : nullptr;
 			}
@@ -1791,7 +1847,7 @@ void ndDynamicsUpdateAvx2::InitSkeletons()
 				ndSkeletonContainer* const skeleton = &node->GetInfo();
 				skeleton->InitMassMatrix(&leftHandSide[0], &rightHandSide[0]);
 
-				for (ndInt32 i = 0; i < threadCount; i++)
+				for (ndInt32 i = 0; i < threadCount; ++i)
 				{
 					node = node ? node->GetNext() : nullptr;
 				}
@@ -1816,7 +1872,7 @@ void ndDynamicsUpdateAvx2::UpdateSkeletons()
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			ndSkeletonList::ndNode* node = world->GetSkeletonList().GetFirst();
-			for (ndInt32 i = 0; i < threadIndex; i++)
+			for (ndInt32 i = 0; i < threadIndex; ++i)
 			{
 				node = node ? node->GetNext() : nullptr;
 			}
@@ -1831,7 +1887,7 @@ void ndDynamicsUpdateAvx2::UpdateSkeletons()
 				ndSkeletonContainer* const skeleton = &node->GetInfo();
 				skeleton->CalculateJointForce(bodyArray, internalForces);
 
-				for (ndInt32 i = 0; i < threadCount; i++)
+				for (ndInt32 i = 0; i < threadCount; ++i)
 				{
 					node = node ? node->GetNext() : nullptr;
 				}
@@ -1896,24 +1952,23 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 			const ndInt32 mask = -ndInt32(D_AVX_WORK_GROUP);
 			const ndInt32* const soaJointRows = &me->m_avxJointRows[0];
 			const ndInt32 soaJointCountBatches = ((jointCount + D_AVX_WORK_GROUP - 1) & mask) / D_AVX_WORK_GROUP;
+			const ndInt8* const groupType = &me->m_groupType[0];
 
 			const ndConstraint* const * jointArrayPtr = &jointArray[0];
 			dAvxMatrixArray& massMatrix = *me->m_avxMassMatrixArray;
-
 			for (ndInt32 i = threadIndex; i < soaJointCountBatches; i += threadCount)
 			{
-				const ndConstraint* const * jointGroup = &jointArrayPtr[i * D_AVX_WORK_GROUP];
-				const ndConstraint* const firstJoint = jointGroup[0];
-				const ndConstraint* const lastJoint = jointGroup[D_AVX_WORK_GROUP - 1];
-				const ndInt32 soaRowStartBase = soaJointRows[i];
-				if (lastJoint && (firstJoint->m_rowCount == lastJoint->m_rowCount))
-				{
+				if (groupType[i])
+				{ 
+					const ndInt32 soaRowStartBase = soaJointRows[i];
+					const ndConstraint* const * jointGroup = &jointArrayPtr[i * D_AVX_WORK_GROUP];
+					const ndConstraint* const firstJoint = jointGroup[0];
 					const ndInt32 rowCount = firstJoint->m_rowCount;
-					for (ndInt32 j = 0; j < D_AVX_WORK_GROUP; j++)
+					for (ndInt32 j = 0; j < D_AVX_WORK_GROUP; ++j)
 					{
 						const ndConstraint* const Joint = jointGroup[j];
 						const ndInt32 base = Joint->m_rowStart;
-						for (ndInt32 k = 0; k < rowCount; k++)
+						for (ndInt32 k = 0; k < rowCount; ++k)
 						{
 							ndSoaMatrixElement* const row = &massMatrix[soaRowStartBase + k];
 							row->m_coordenateAccel[j] = rightHandSide[base + k].m_coordenateAccel;
@@ -1922,14 +1977,16 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 				}
 				else
 				{
-					for (ndInt32 j = 0; j < D_AVX_WORK_GROUP; j++)
+					const ndInt32 soaRowStartBase = soaJointRows[i];
+					const ndConstraint* const * jointGroup = &jointArrayPtr[i * D_AVX_WORK_GROUP];
+					for (ndInt32 j = 0; j < D_AVX_WORK_GROUP; ++j)
 					{
 						const ndConstraint* const Joint = jointGroup[j];
 						if (Joint)
 						{
-							const ndInt32 rowCount = Joint->m_rowCount;
 							const ndInt32 base = Joint->m_rowStart;
-							for (ndInt32 k = 0; k < rowCount; k++)
+							const ndInt32 rowCount = Joint->m_rowCount;
+							for (ndInt32 k = 0; k < rowCount; ++k)
 							{
 								ndSoaMatrixElement* const row = &massMatrix[soaRowStartBase + k];
 								row->m_coordenateAccel[j] = rightHandSide[base + k].m_coordenateAccel;
@@ -2015,7 +2072,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 		{
 		}
 
-		ndFloat32 JointForce(ndInt32 block, ndSoaMatrixElement* const massMatrix)
+		void JointForce(ndInt32 group, ndSoaMatrixElement* const massMatrix)
 		{
 			ndAvxFloat weight0;
 			ndAvxFloat weight1;
@@ -2025,11 +2082,13 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			ndAvxFloat preconditioner1;
 			ndAvxFloat normalForce[D_CONSTRAINT_MAX_ROWS + 1];
 
+			const ndInt32 block = group * D_AVX_WORK_GROUP;
 			ndConstraint** const jointGroup = &m_jointArray[block];
 
-			if (jointGroup[D_AVX_WORK_GROUP - 1])
+			const ndInt8 isUniformGruop = m_groupType[group];
+			if (isUniformGruop)
 			{
-				for (ndInt32 i = 0; i < D_AVX_WORK_GROUP; i++)
+				for (ndInt32 i = 0; i < D_AVX_WORK_GROUP; ++i)
 				{
 					const ndConstraint* const joint = jointGroup[i];
 					const ndBodyKinematic* const body0 = joint->GetBody0();
@@ -2078,10 +2137,10 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 				forceM1.m_angular.m_x = m_zero;
 				forceM1.m_angular.m_y = m_zero;
 				forceM1.m_angular.m_z = m_zero;
-				for (ndInt32 i = 0; i < D_AVX_WORK_GROUP; i++)
+				for (ndInt32 i = 0; i < D_AVX_WORK_GROUP; ++i)
 				{
 					const ndConstraint* const joint = jointGroup[i];
-					if (joint)
+					if (joint && joint->m_rowCount)
 					{
 						const ndBodyKinematic* const body0 = joint->GetBody0();
 						const ndBodyKinematic* const body1 = joint->GetBody1();
@@ -2129,11 +2188,14 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			preconditioner0 = preconditioner0 * weight0;
 			preconditioner1 = preconditioner1 * weight1;
 
-			normalForce[0] = m_one;
+			#ifdef D_USE_EARLY_OUT_JOINT
 			ndAvxFloat accNorm(m_zero);
+			#endif
+
+			normalForce[0] = m_one;
 			const ndInt32 rowsCount = jointGroup[0]->m_rowCount;
 		
-			for (ndInt32 j = 0; j < rowsCount; j++)
+			for (ndInt32 j = 0; j < rowsCount; ++j)
 			{
 				ndSoaMatrixElement* const row = &massMatrix[j];
 
@@ -2160,10 +2222,12 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 				const ndAvxFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
 				const ndAvxFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
 
+				#ifdef D_USE_EARLY_OUT_JOINT
 				a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
-				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-
 				accNorm = accNorm.MulAdd(a, a);
+				#endif
+
+				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 				normalForce[j + 1] = f;
 
 				const ndAvxFloat deltaForce(f - row->m_force);
@@ -2185,14 +2249,21 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 				forceM1.m_angular.m_z = forceM1.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_z, deltaForce1);
 			}
 
-			const ndFloat32 tol = ndFloat32(0.5f);
+			const ndFloat32 tol = ndFloat32(0.125f);
 			const ndFloat32 tol2 = tol * tol;
 
+			#ifdef D_USE_EARLY_OUT_JOINT
 			ndAvxFloat maxAccel(accNorm);
-			for (ndInt32 k = 0; (k < 4) && (maxAccel.AddHorizontal() > tol2); k++)
+			for (ndInt32 k = 0; (k < 4) && (maxAccel.GetMax() > tol2); ++k)
+			#else
+			for (ndInt32 k = 0; k < 4; ++k)
+			#endif
 			{
+				#ifdef D_USE_EARLY_OUT_JOINT
 				maxAccel = m_zero;
-				for (ndInt32 j = 0; j < rowsCount; j++)
+				#endif
+
+				for (ndInt32 j = 0; j < rowsCount; ++j)
 				{
 					ndSoaMatrixElement* const row = &massMatrix[j];
 
@@ -2220,10 +2291,12 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 					const ndAvxFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
 					const ndAvxFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
 
+					#ifdef D_USE_EARLY_OUT_JOINT
 					a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
-					f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-
 					maxAccel = maxAccel.MulAdd(a, a);
+					#endif
+
+					f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 					normalForce[j + 1] = f;
 
 					const ndAvxFloat deltaForce(f - force);
@@ -2247,25 +2320,17 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			}
 
 			ndAvxFloat mask(ndAvxFloat::m_mask);
-			if ((block + D_AVX_WORK_GROUP) > m_activeCount)
+			for (ndInt32 i = 0; i < D_AVX_WORK_GROUP; ++i)
 			{
-				for (ndInt32 i = 0; i < D_AVX_WORK_GROUP; i++)
+				const ndConstraint* const joint = jointGroup[i];
+				if (joint && joint->m_rowCount)
 				{
-					const ndConstraint* const joint = jointGroup[i];
-					if (joint)
-					{
-						const ndBodyKinematic* const body0 = joint->GetBody0();
-						const ndBodyKinematic* const body1 = joint->GetBody1();
-						dAssert(body0);
-						dAssert(body1);
-
-						const ndInt32 resting = body0->m_equilibrium0 & body1->m_equilibrium0;
-						if (resting)
-						{
-							mask[i] = ndFloat32(0.0f);
-						}
-					}
-					else
+					const ndBodyKinematic* const body0 = joint->GetBody0();
+					const ndBodyKinematic* const body1 = joint->GetBody1();
+					dAssert(body0);
+					dAssert(body1);
+					const ndInt32 resting = body0->m_equilibrium0 & body1->m_equilibrium0;
+					if (resting)
 					{
 						mask[i] = ndFloat32(0.0f);
 					}
@@ -2285,7 +2350,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			forceM1.m_angular.m_x = m_zero;
 			forceM1.m_angular.m_y = m_zero;
 			forceM1.m_angular.m_z = m_zero;
-			for (ndInt32 i = 0; i < rowsCount; i++)
+			for (ndInt32 i = 0; i < rowsCount; ++i)
 			{
 				ndSoaMatrixElement* const row = &massMatrix[i];
 				const ndAvxFloat force(row->m_force.Select(normalForce[i + 1], mask));
@@ -2375,16 +2440,14 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 				forceM1.m_angular.m_z.m_vector8.m_angular, ndVector::m_zero);
 
 			ndRightHandSide* const rightHandSide = &m_rightHandSide[0];
-			for (ndInt32 i = 0; i < D_AVX_WORK_GROUP; i++)
+			for (ndInt32 i = 0; i < D_AVX_WORK_GROUP; ++i)
 			{
 				const ndConstraint* const joint = jointGroup[i];
 				if (joint)
 				{
-					//const ndBodyKinematic* const body0 = joint->GetBody0();
-					//const ndBodyKinematic* const body1 = joint->GetBody1();
 					const ndInt32 rowCount = joint->m_rowCount;
 					const ndInt32 rowStartBase = joint->m_rowStart;
-					for (ndInt32 j = 0; j < rowCount; j++)
+					for (ndInt32 j = 0; j < rowCount; ++j)
 					{
 						const ndSoaMatrixElement* const row = &massMatrix[j];
 						rightHandSide[j + rowStartBase].m_force = row->m_force[i];
@@ -2400,9 +2463,6 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 					outBody1 = force1[i];
 				}
 			}
-
-			accNorm = m_zero.Select(accNorm, mask);
-			return accNorm.AddHorizontal();
 		}
 
 		virtual void Execute()
@@ -2417,31 +2477,33 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			m_jointPartialForces = &me->GetTempInternalForces()[0];
 			m_jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+
 			const ndInt32* const soaJointRows = &me->m_avxJointRows[0];
 			dAvxMatrixArray& soaMassMatrixArray = *me->m_avxMassMatrixArray;
 			ndSoaMatrixElement* const soaMassMatrix = &soaMassMatrixArray[0];
-			m_jointArray = &jointArray[0];
 
-			ndFloat32 accNorm = ndFloat32(0.0f);
+			m_jointArray = &jointArray[0];
+			m_groupType = &me->m_groupType[0];
+			m_jointMask = (ndAvxFloat*)&me->m_jointMask[0];
 			m_activeCount = me->m_activeJointCount;
-			const ndInt32 jointCount = jointArray.GetCount();
+
 			const ndInt32 threadIndex = GetThreadId();
+			const ndInt32 jointCount = jointArray.GetCount();
 			const ndInt32 threadCount = m_owner->GetThreadCount();
 
 			const ndInt32 mask = -ndInt32(D_AVX_WORK_GROUP);
 			const ndInt32 soaJointCount = ((jointCount + D_AVX_WORK_GROUP - 1) & mask) / D_AVX_WORK_GROUP;
 			for (ndInt32 i = threadIndex; i < soaJointCount; i += threadCount)
 			{
-				accNorm += JointForce(i * D_AVX_WORK_GROUP, &soaMassMatrix[soaJointRows[i]]);
+				JointForce(i, &soaMassMatrix[soaJointRows[i]]);
 			}
-
-			ndFloat32* const accelNorm = (ndFloat32*)m_context;
-			accelNorm[threadIndex] = accNorm;
 		}
 
 		ndAvxFloat m_one;
 		ndAvxFloat m_zero;
+		const ndInt8* m_groupType;
 		ndConstraint** m_jointArray;
+		const ndAvxFloat* m_jointMask;
 		ndJacobian* m_jointPartialForces;
 		ndRightHandSide* m_rightHandSide;
 		const ndJacobian* m_internalForces;
@@ -2490,19 +2552,10 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 	const ndInt32 passes = m_solverPasses;
 	const ndInt32 threadsCount = scene->GetThreadCount();
 
-	ndFloat32 m_accelNorm[D_MAX_THREADS_COUNT];
-	ndFloat32 accNorm = D_SOLVER_MAX_ERROR * ndFloat32(2.0f);
-
-	for (ndInt32 i = 0; (i < passes) && (accNorm > D_SOLVER_MAX_ERROR); i++)
+	for (ndInt32 i = 0; i < passes; ++i)
 	{
-		scene->SubmitJobs<ndCalculateJointsForce>(m_accelNorm);
+		scene->SubmitJobs<ndCalculateJointsForce>();
 		scene->SubmitJobs<ndApplyJacobianAccumulatePartialForces>();
-
-		accNorm = ndFloat32(0.0f);
-		for (ndInt32 j = 0; j < threadsCount; j++)
-		{
-			accNorm = dMax(accNorm, m_accelNorm[j]);
-		}
 	}
 }
 

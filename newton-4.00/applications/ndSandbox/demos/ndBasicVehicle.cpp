@@ -211,7 +211,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 0] = 1;
 		m_gearMap[sizeof(m_configuration.m_transmission.m_forwardRatios) / sizeof(m_configuration.m_transmission.m_forwardRatios[0]) + 1] = 0;
-		for (int i = 0; i < m_configuration.m_transmission.m_gearsCount; i++)
+		for (ndInt32 i = 0; i < m_configuration.m_transmission.m_gearsCount; i++)
 		{
 			m_gearMap[i] = i + 2;
 		}
@@ -647,7 +647,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	//matrix.m_posit = location;
 
 	ndSoundManager* const soundManager = world->GetSoundManager();
-	for (int i = 0; i < ndInt32 (sizeof(engineSounds) / sizeof(engineSounds[0])); i++)
+	for (ndInt32 i = 0; i < ndInt32 (sizeof(engineSounds) / sizeof(engineSounds[0])); i++)
 	{
 		soundManager->CreateSoundAsset(engineSounds[i]);
 	}

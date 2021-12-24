@@ -230,7 +230,6 @@ void ndExplodeConvexShapeModel::Update(ndWorld* const, ndFloat32)
 	}
 }
 
-//void ndExplodeConvexShapeModel::PostUpdate(ndWorld* const world, ndFloat32 timestep)
 void ndExplodeConvexShapeModel::PostUpdate(ndWorld* const world, ndFloat32)
 {
 	if (m_pendingEffect.GetCount())

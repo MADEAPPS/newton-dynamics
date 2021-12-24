@@ -182,30 +182,30 @@ ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, ndInt32 grids,
 
 ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
 {
-#if 0
-	dVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
+#if 1
+	ndVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
 	
-	dArray<dVector> points;
-	for (dInt32 iz = 0; iz <= grids; iz++)
+	ndArray<ndVector> points;
+	for (ndInt32 iz = 0; iz <= grids; iz++)
 	{
-		dFloat32 z0 = origin.m_z + iz * gridSize;
-		for (dInt32 ix = 0; ix <= grids; ix++)
+		ndFloat32 z0 = origin.m_z + iz * gridSize;
+		for (ndInt32 ix = 0; ix <= grids; ix++)
 		{
-			dFloat32 x0 = origin.m_x + ix * gridSize;
-			points.PushBack(dVector(x0, dGaussianRandom(perturbation), z0, 1.0f));
+			ndFloat32 x0 = origin.m_x + ix * gridSize;
+			points.PushBack(ndVector(x0, dGaussianRandom(perturbation), z0, 1.0f));
 		}
 	}
 	
 	ndMeshEffect meshEffect;
 	meshEffect.BeginBuild();
-	for (dInt32 iz = 0; iz < grids; iz++)
+	for (ndInt32 iz = 0; iz < grids; iz++)
 	{ 
-		for (dInt32 ix = 0; ix < grids; ix++)
+		for (ndInt32 ix = 0; ix < grids; ix++)
 		{
-			dVector p0(points[(ix + 0) * (grids + 1) + iz + 0]);
-			dVector p1(points[(ix + 1) * (grids + 1) + iz + 0]);
-			dVector p2(points[(ix + 1) * (grids + 1) + iz + 1]);
-			dVector p3(points[(ix + 0) * (grids + 1) + iz + 1]);
+			ndVector p0(points[(ix + 0) * (grids + 1) + iz + 0]);
+			ndVector p1(points[(ix + 1) * (grids + 1) + iz + 0]);
+			ndVector p2(points[(ix + 1) * (grids + 1) + iz + 1]);
+			ndVector p3(points[(ix + 0) * (grids + 1) + iz + 1]);
 	
 			meshEffect.BeginBuildFace();
 			meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
@@ -222,36 +222,35 @@ ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, ndInt32 gr
 	}
 	meshEffect.EndBuild(0.0f);
 	
-	
-	dPolygonSoupBuilder meshBuilder;
+	ndPolygonSoupBuilder meshBuilder;
 	meshBuilder.Begin();
 	
-	dInt32 vertexStride = meshEffect.GetVertexStrideInByte() / sizeof(dFloat64);
-	const dFloat64* const vertexData = meshEffect.GetVertexPool();
+	ndInt32 vertexStride = meshEffect.GetVertexStrideInByte() / sizeof(ndFloat64);
+	const ndFloat64* const vertexData = meshEffect.GetVertexPool();
 	
-	dInt32 mark = meshEffect.IncLRU();
+	ndInt32 mark = meshEffect.IncLRU();
 	
-	dVector face[16];
-	dPolyhedra::Iterator iter(meshEffect);
+	ndVector face[16];
+	ndPolyhedra::Iterator iter(meshEffect);
 	for (iter.Begin(); iter; iter++)
 	{
-		dEdge* const edge = &(*iter);
+		ndEdge* const edge = &(*iter);
 		if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark))
 		{
-			dInt32 count = 0;
-			dEdge* ptr = edge;
+			ndInt32 count = 0;
+			ndEdge* ptr = edge;
 			do
 			{
-				dInt32 i = ptr->m_incidentVertex * vertexStride;
-				dVector point(dFloat32(vertexData[i + 0]), dFloat32(vertexData[i + 1]), dFloat32(vertexData[i + 2]), dFloat32(1.0f));
+				ndInt32 i = ptr->m_incidentVertex * vertexStride;
+				ndVector point(ndFloat32(vertexData[i + 0]), ndFloat32(vertexData[i + 1]), ndFloat32(vertexData[i + 2]), ndFloat32(1.0f));
 				face[count] = point;
 				count++;
 				ptr->m_mark = mark;
 				ptr = ptr->m_next;
 			} while (ptr != edge);
 	
-			dInt32 materialIndex = meshEffect.GetFaceMaterial(edge);
-			meshBuilder.AddFace(&face[0].m_x, sizeof(dVector), 3, materialIndex);
+			ndInt32 materialIndex = meshEffect.GetFaceMaterial(edge);
+			meshBuilder.AddFace(&face[0].m_x, sizeof(ndVector), 3, materialIndex);
 		}
 	}
 	meshBuilder.End(false);
