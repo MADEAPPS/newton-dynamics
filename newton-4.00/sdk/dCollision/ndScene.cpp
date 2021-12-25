@@ -1363,7 +1363,10 @@ void ndScene::CalculateContacts()
 			{
 				ndContact* const contact = activeContacts[i]->GetAsContact();
 				dAssert(contact);
-				m_owner->CalculateContacts(threadIndex, contact);
+				if (!contact->m_isDead)
+				{
+					m_owner->CalculateContacts(threadIndex, contact);
+				}
 				dstContacts[i] = contact;
 				const ndInt32 entry = (!contact->IsActive() | !contact->m_maxDOF) + contact->m_isDead * 2;
 				const ndInt32 key = keyLookUp[entry];
@@ -1435,9 +1438,8 @@ void ndScene::CalculateContacts()
 		for (ndInt32 i = 0; i < deadJoints; i++)
 		{
 			ndContact* const contact = m_contactList[start + i];
-			dAssert(contact->m_isDead);
-			dAssert(contact->m_isAttached);
 			m_contactList.DeleteContact(contact);
+			delete contact;
 		}
 	}
 

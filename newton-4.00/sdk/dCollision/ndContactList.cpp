@@ -37,10 +37,11 @@ ndContact* ndContactList::CreateContact(ndBodyKinematic* const body0, ndBodyKine
 
 void ndContactList::DeleteContact(ndContact* const contact)
 {
-	dAssert(contact->m_isAttached);
-	contact->DetachFromBodies();
+	if (contact->m_isAttached)
+	{
+		contact->DetachFromBodies();
+	}
 	contact->m_isDead = 1;
-	//Remove(contact->m_linkNode);
 }
 
 void ndContactList::DeleteAllContacts()

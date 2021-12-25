@@ -39,7 +39,7 @@
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// conservation of momentum 
-#define DEFAULT_SCENE	4		// basic Stacks
+//#define DEFAULT_SCENE	4		// basic Stacks
 //#define DEFAULT_SCENE	5		// basic Trigger
 //#define DEFAULT_SCENE	6		// basic player
 //#define DEFAULT_SCENE	7		// particle fluid
@@ -50,7 +50,7 @@
 //#define DEFAULT_SCENE	12		// active rag doll
 //#define DEFAULT_SCENE	13		// basic vehicle
 //#define DEFAULT_SCENE	14		// heavy vehicle
-//#define DEFAULT_SCENE	15		// simple voronoi fracture
+#define DEFAULT_SCENE	15		// simple voronoi fracture
 //#define DEFAULT_SCENE	16		// basic voronoi fracture
 //#define DEFAULT_SCENE	17		// linked voronoi fracture
 //#define DEFAULT_SCENE	18		// skin peel voronoi fracture
@@ -63,18 +63,17 @@ void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndHeavyVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndActiveRagdoll(ndDemoEntityManager* const scene);
-void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
+void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
+void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
-void ndBasicFracture_4(ndDemoEntityManager* const scene);
 void ndBasicParticleFluid(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndBasicExplodeConvexShape(ndDemoEntityManager* const scene);
 //void ndBasicFracture_0(ndDemoEntityManager* const scene);
 //void ndBasicFracture_2(ndDemoEntityManager* const scene);
 //void ndBasicFracture_4(ndDemoEntityManager* const scene);
-void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
 void ndStaticUserMeshCollisionDemo(ndDemoEntityManager* const scene);
 
@@ -95,7 +94,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "active ragdoll", ndActiveRagdoll },
 	{ "basic vehicle", ndBasicVehicle },
 	{ "heavy vehicle", ndHeavyVehicle },
-	//{ "simple convex fracture", ndBasicExplodeConvexShape },
+	{ "simple convex fracture", ndBasicExplodeConvexShape },
 	//{ "basic convex fracture", ndBasicFracture_0 },
 	//{ "linked convex fracture", ndBasicFracture_2 },
 	//{ "simple skin peeling fracture", ndBasicFracture_4 },
@@ -359,7 +358,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showJointDebugInfo = true;
 	//m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 2;	
-	m_collisionDisplayMode = 3;		// solid wire frame
+	//m_collisionDisplayMode = 3;		// solid wire frame
 	//m_synchronousPhysicsUpdate = false;
 
 	Cleanup();
