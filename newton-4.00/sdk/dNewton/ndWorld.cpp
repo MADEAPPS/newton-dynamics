@@ -192,20 +192,8 @@ void ndWorld::CleanUp()
 		delete body;
 	}
 
-	const ndBodyList& bodyList = GetBodyList();
-	while (bodyList.GetFirst())
-	{
-		ndBodyKinematic* const body = bodyList.GetFirst()->GetInfo();
-		RemoveBody(body);
-		delete body;
-	}
-
-	m_scene->m_contactList.DeleteAllContacts();
-	m_scene->m_scrathContactList.SetCount(0);
-	m_scene->m_activeConstraintArray.SetCount(0);
-
 	ndBody::m_uniqueIdCount = 1;
-	dAssert(!m_scene->GetContactList().GetCount());
+	m_scene->Cleanup();
 }
 
 void ndWorld::SelectSolver(ndSolverModes solverMode)
@@ -267,33 +255,6 @@ void ndWorld::UpdateTransforms()
 	}
 
 	m_scene->UpdateTransform();
-}
-
-void ndWorld::ApplyExternalForces()
-{
-	D_TRACKTIME();
-	class ndApplyExternalForces: public ndScene::ndBaseJob
-	{
-		public:
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-
-			const ndFloat32 timestep = m_timestep;
-			const ndInt32 threadIndex = GetThreadId();
-			const ndStartEnd startEnd(bodyArray.GetCount() - 1, GetThreadId(), m_owner->GetThreadCount());
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
-				if (body)
-				{
-					body->ApplyExternalForces(threadIndex, timestep);
-				}
-			}
-		}
-	};
-	m_scene->SubmitJobs<ndApplyExternalForces>();
 }
 
 void ndWorld::PostUpdate(ndFloat32)
@@ -519,7 +480,7 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	m_scene->SetTimestep(timestep);
 
 	UpdateSkeletons();
-	m_scene->BuildBodyArray();
+	m_scene->InitBodyArray();
 
 	ndBodyKinematic* sentinelBody = m_sentinelBody;
 	sentinelBody->PrepareStep(m_scene->GetActiveBodyArray().GetCount());
@@ -533,17 +494,13 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	sentinelBody->m_isJointFence1 = 1;
 	sentinelBody->m_bodyIsConstrained = 0;
 	sentinelBody->m_weigh = ndFloat32(0.0f);
-
 	m_scene->GetActiveBodyArray().PushBack(sentinelBody);
 
-	ApplyExternalForces();
-
 	// update the collision system
-	m_scene->UpdateAabb();
 	m_scene->FindCollidingPairs();
 	m_scene->CalculateContacts();
 
-	// update all special models, particle, models, ect.
+	// update all special bodies.
 	m_scene->UpdateSpecial();
 
 	// Update Particle base physics
@@ -701,7 +658,7 @@ void ndWorld::UpdateSkeletons()
 			m_skeletonList.Remove(m_skeletonList.GetFirst());
 		}
 
-		m_scene->BuildBodyArray();
+		m_scene->InitBodyArray();
 
 		// build connectivity graph and reset of all joint dirty state
 		ndDynamicsUpdate& solverUpdate = *m_solver;

@@ -471,7 +471,7 @@ void ndSkeletonContainer::ClearSelfCollision()
 
 void ndSkeletonContainer::AddSelfCollisionJoint(ndConstraint* const joint)
 {
-	ndScopeSpinLock lock(joint->GetBody0()->GetScene()->m_contactLock);
+	ndScopeSpinLock lock(joint->GetBody0()->GetScene()->m_lock);
 	if (m_loopingJoints.GetCount() < (m_loopCount + m_dynamicsLoopCount + 1)) 
 	{
 		m_loopingJoints.SetCount(2 * (m_loopCount + m_dynamicsLoopCount + 1));

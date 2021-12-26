@@ -93,7 +93,7 @@ class ndWorld: public ndClassAlloc
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
 	const ndModelList& GetModelList() const;
-	const ndContactList& GetContactList() const;
+	const ndContactArray& GetContactList() const;
 	const ndSkeletonList& GetSkeletonList() const;
 	const ndBodyParticleSetList& GetParticleList() const;
 
@@ -127,7 +127,6 @@ class ndWorld: public ndClassAlloc
 	D_NEWTON_API virtual void UpdateSkeletons();
 	D_NEWTON_API virtual void UpdateTransforms();
 	D_NEWTON_API virtual void PostModelTransform();
-	D_NEWTON_API virtual void ApplyExternalForces();
 
 	private:
 	class dgSolverProgressiveSleepEntry
@@ -258,9 +257,9 @@ inline const ndJointList& ndWorld::GetJointList() const
 	return m_jointList;
 }
 
-inline const ndContactList& ndWorld::GetContactList() const
+inline const ndContactArray& ndWorld::GetContactList() const
 {
-	return m_scene->GetContactList();
+	return m_scene->GetContactArray();
 }
 
 inline const ndSkeletonList& ndWorld::GetSkeletonList() const

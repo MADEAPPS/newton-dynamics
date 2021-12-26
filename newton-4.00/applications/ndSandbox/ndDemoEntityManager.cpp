@@ -39,7 +39,7 @@
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// conservation of momentum 
-//#define DEFAULT_SCENE	4		// basic Stacks
+#define DEFAULT_SCENE	4		// basic Stacks
 //#define DEFAULT_SCENE	5		// basic Trigger
 //#define DEFAULT_SCENE	6		// basic player
 //#define DEFAULT_SCENE	7		// particle fluid
@@ -50,7 +50,7 @@
 //#define DEFAULT_SCENE	12		// active rag doll
 //#define DEFAULT_SCENE	13		// basic vehicle
 //#define DEFAULT_SCENE	14		// heavy vehicle
-#define DEFAULT_SCENE	15		// simple voronoi fracture
+//#define DEFAULT_SCENE	15		// simple voronoi fracture
 //#define DEFAULT_SCENE	16		// basic voronoi fracture
 //#define DEFAULT_SCENE	17		// linked voronoi fracture
 //#define DEFAULT_SCENE	18		// skin peel voronoi fracture

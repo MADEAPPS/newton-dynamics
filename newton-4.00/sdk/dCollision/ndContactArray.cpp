@@ -22,10 +22,10 @@
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndContact.h"
-#include "ndContactList.h"
+#include "ndContactArray.h"
 #include "ndBodyKinematic.h"
 
-ndContact* ndContactList::CreateContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
+ndContact* ndContactArray::CreateContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 {
 	ndContact* const contact = new ndContact;
 	contact->SetBodies(body0, body1);
@@ -35,16 +35,16 @@ ndContact* ndContactList::CreateContact(ndBodyKinematic* const body0, ndBodyKine
 	return contact;
 }
 
-void ndContactList::DeleteContact(ndContact* const contact)
+void ndContactArray::DeleteContact(ndContact* const contact)
 {
 	if (contact->m_isAttached)
 	{
-		contact->DetachFromBodies();
+	contact->DetachFromBodies();
 	}
 	contact->m_isDead = 1;
 }
 
-void ndContactList::DeleteAllContacts()
+void ndContactArray::DeleteAllContacts()
 {
 	for (ndInt32 i = GetCount() - 1; i >= 0; --i)
 	{

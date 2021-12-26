@@ -316,7 +316,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 		public:
 		void SetRowsCount()
 		{
-			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 			const ndInt32 count = jointArray.GetCount();
 		
 			ndInt32 rowCount = 1;
@@ -334,7 +334,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 		{
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
-			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 
 			ndInt32 soaJointRowCount = 0;
 			ndArray<ndInt32>& soaJointRows = me->m_soaJointRows;
@@ -379,7 +379,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 	}
 
 	ndScene* const scene = m_world->GetScene();
-	ndConstraintArray& jointArray = scene->GetActiveContactArray();
+	ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 
 	const ndInt32 mask = -ndInt32(D_SSE_WORK_GROUP);
 	const ndInt32 jointCount = jointArray.GetCount();
@@ -1353,7 +1353,7 @@ void ndDynamicsUpdateSoa::UpdateForceFeedback()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
-			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			const ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 			ndArray<ndRightHandSide>& rightHandSide = me->m_rightHandSide;
 
 			const ndInt32 threadIndex = GetThreadId();
@@ -1498,7 +1498,7 @@ void ndDynamicsUpdateSoa::CalculateJointsAcceleration()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
-			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			const ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 
 			ndJointAccelerationDecriptor joindDesc;
 			joindDesc.m_timestep = me->m_timestepRK;
@@ -1531,7 +1531,7 @@ void ndDynamicsUpdateSoa::CalculateJointsAcceleration()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
-			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			const ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 			const ndArray<ndRightHandSide>& rightHandSide = me->m_rightHandSide;
 
 			const ndInt32 threadIndex = GetThreadId();
@@ -2033,7 +2033,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 			m_internalForces = &me->GetInternalForces()[0];
 			m_jointPartialForces = &me->GetTempInternalForces()[0];
 			m_jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
-			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 
 			const ndInt32* const soaJointRows = &me->m_soaJointRows[0];
 			ndSoaMatrixElement* const soaMassMatrix = &me->m_soaMassMatrix[0];

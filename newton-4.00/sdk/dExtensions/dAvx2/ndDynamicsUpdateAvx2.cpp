@@ -692,7 +692,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		public:
 		void SetRowsCount()
 		{
-			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 			const ndInt32 count = jointArray.GetCount();
 
 			ndInt32 rowCount = 1;
@@ -710,7 +710,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		{
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 
 			ndInt32 soaJointRowCount = 0;
 			ndArray<ndInt32>& soaJointRows = me->m_avxJointRows;
@@ -755,7 +755,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 	}
 
 	ndScene* const scene = m_world->GetScene();
-	ndConstraintArray& jointArray = scene->GetActiveContactArray();
+	ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 
 	#ifdef _DEBUG
 		for (ndInt32 i = 1; i < m_activeJointCount; ++i)
@@ -1768,7 +1768,7 @@ void ndDynamicsUpdateAvx2::UpdateForceFeedback()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			const ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 			ndArray<ndRightHandSide>& rightHandSide = me->m_rightHandSide;
 
 			const ndInt32 threadIndex = GetThreadId();
@@ -1910,7 +1910,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			const ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 
 			ndJointAccelerationDecriptor joindDesc;
 			joindDesc.m_timestep = me->m_timestepRK;
@@ -1943,7 +1943,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			const ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 			const ndArray<ndRightHandSide>& rightHandSide = me->m_rightHandSide;
 
 			const ndInt32 threadIndex = GetThreadId();
@@ -2295,7 +2295,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 					a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 					maxAccel = maxAccel.MulAdd(a, a);
 					#endif
-
+					
 					f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 					normalForce[j + 1] = f;
 
@@ -2476,7 +2476,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			m_internalForces = &me->GetInternalForces()[0];
 			m_jointPartialForces = &me->GetTempInternalForces()[0];
 			m_jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
-			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 
 			const ndInt32* const soaJointRows = &me->m_avxJointRows[0];
 			dAvxMatrixArray& soaMassMatrixArray = *me->m_avxMassMatrixArray;

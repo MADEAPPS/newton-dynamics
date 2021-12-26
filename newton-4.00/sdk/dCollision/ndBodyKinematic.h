@@ -175,6 +175,7 @@ class ndBodyKinematic: public ndBody
 	void SetAccel(const ndJacobian& accel);
 	virtual void SpecialUpdate(ndFloat32 timestep);
 	virtual void IntegrateGyroSubstep(const ndVector& timestep);
+	virtual void ApplyExternalForces(ndInt32 threadIndex, ndFloat32 timestep);
 	virtual ndJacobian IntegrateForceAndToque(const ndVector& force, const ndVector& torque, const ndVector& timestep) const;
 
 	void UpdateCollisionMatrix();
@@ -514,5 +515,10 @@ inline void ndBodyKinematic::SpecialUpdate(ndFloat32)
 {
 	dAssert(0);
 }
+
+inline void ndBodyKinematic::ApplyExternalForces(ndInt32, ndFloat32)
+{
+}
+
 #endif 
 

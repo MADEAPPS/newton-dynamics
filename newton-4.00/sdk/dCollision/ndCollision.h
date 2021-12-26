@@ -45,7 +45,7 @@
 #include <ndShapePoint.h>
 #include <ndShapeSphere.h>
 #include <ndShapeConvex.h>
-#include <ndContactList.h>
+#include <ndContactArray.h>
 #include <ndShapeCapsule.h>
 #include <ndShapeCylinder.h>
 #include <ndBodyKinematic.h>

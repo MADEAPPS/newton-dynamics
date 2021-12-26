@@ -72,7 +72,6 @@ static void DrawBox(const ndVector& p0, const ndVector& p1, glVector3 box[12][2]
 void RenderBodiesAABB(ndDemoEntityManager* const scene)
 {
 	ndWorld* const world = scene->GetWorld();
-	const ndBodyList& bodyList = world->GetBodyList();
 
 	GLuint shader = scene->GetShaderCache().m_wireFrame;
 
@@ -97,6 +96,7 @@ void RenderBodiesAABB(ndDemoEntityManager* const scene)
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof (glVector3), box);
 
+	const ndBodyList& bodyList = world->GetBodyList();
 	for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndVector p0;
@@ -181,7 +181,7 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	glVector3 pointBuffer[4];
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof (glVector3), pointBuffer);
-	const ndContactList& contactList = world->GetContactList();
+	const ndContactArray& contactList = world->GetContactList();
 	for (ndInt32 i = 0; i < contactList.GetCount(); ++i)
 	{
 		const ndContact* const contact = contactList[i];

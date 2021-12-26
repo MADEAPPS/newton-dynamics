@@ -25,10 +25,10 @@
 #include "ndCollisionStdafx.h"
 #include "ndBodyList.h"
 #include "ndSceneNode.h"
-#include "ndContactList.h"
+#include "ndContactArray.h"
 
-#define D_SCENE_MAX_STACK_DEPTH	256
-#define D_PRUNE_CONTACT_TOLERANCE		ndFloat32 (5.0e-2f)
+#define D_SCENE_MAX_STACK_DEPTH		256
+#define D_PRUNE_CONTACT_TOLERANCE	ndFloat32 (5.0e-2f)
 
 class ndWorld;
 class ndScene;
@@ -92,8 +92,8 @@ class ndScene : public ndThreadPool
 	virtual ndWorld* GetWorld() const;
 	const ndBodyList& GetBodyList() const;
 
-	ndConstraintArray& GetActiveContactArray();
-	const ndConstraintArray& GetActiveContactArray() const;
+	ndArray<ndConstraint*>& GetActiveContactArray();
+	const ndArray<ndConstraint*>& GetActiveContactArray() const;
 
 	ndArray<ndBodyKinematic*>& GetActiveBodyArray();
 	const ndArray<ndBodyKinematic*>& GetActiveBodyArray() const;
@@ -147,7 +147,7 @@ class ndScene : public ndThreadPool
 	ndSceneNode* BuildTopDownBig(ndSceneNode** const leafArray, ndInt32 firstBox, ndInt32 lastBox, ndFitnessList::ndNode** const nextNode);
 
 	D_COLLISION_API void CollisionOnlyUpdate();
-	const ndContactList& GetContactList() const;
+	const ndContactArray& GetContactArray() const;
 
 	ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
 	ndContact* FindContactJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
@@ -165,30 +165,40 @@ class ndScene : public ndThreadPool
 	protected:
 	D_COLLISION_API ndScene();
 	
-	D_COLLISION_API void UpdateAabb();
 	D_COLLISION_API void UpdateSpecial();
-	D_COLLISION_API void BuildBodyArray();
+	D_COLLISION_API void InitBodyArray();
 	D_COLLISION_API void UpdateTransform();
 	D_COLLISION_API void CalculateContacts();
 	D_COLLISION_API void FindCollidingPairs();
 	D_COLLISION_API virtual void BalanceScene();
 	D_COLLISION_API virtual void ThreadFunction();
+
+	class ndBodyListRun
+	{
+		public:
+		ndBodyList::ndNode* m_begin;
+		ndInt32 m_count;
+		ndInt32 m_start;
+	};
 	
 	ndBodyList m_bodyList;
-	ndContactList m_contactList;
-	ndContactList m_scrathContactList;
-	ndConstraintArray m_activeConstraintArray;
+	ndContactArray m_contactArray;
+
+	ndArray<void*> m_scratchBuffer;
 	ndArray<ndBodyKinematic*> m_sceneBodyArray;
 	ndArray<ndBodyKinematic*> m_activeBodyArray;
-	ndArray<ndBodyKinematic*> m_activeBodyArrayBuffer;
+	ndArray<ndConstraint*> m_activeConstraintArray;
 	ndList<ndBodyKinematic*> m_specialUpdateList;
-	ndSpinLock m_contactLock;
+	ndSpinLock m_lock;
+	ndBodyListRun m_bodyListRuns[D_MAX_THREADS_COUNT];
 	ndSceneNode* m_rootNode;
 	ndContactNotify* m_contactNotifyCallback;
 	ndFloat64 m_treeEntropy;
 	ndFitnessList m_fitness;
 	ndFloat32 m_timestep;
 	ndUnsigned32 m_lru;
+	ndUnsigned8 m_bodyListChanged;
+	ndUnsigned8 m_currentThreadsMem;
 
 	static ndVector m_velocTol;
 	static ndVector m_linearContactError2;
@@ -221,12 +231,12 @@ inline const ndBodyList& ndScene::GetBodyList() const
 	return m_bodyList;
 }
 
-inline ndConstraintArray& ndScene::GetActiveContactArray()
+inline ndArray<ndConstraint*>& ndScene::GetActiveContactArray()
 {
 	return m_activeConstraintArray;
 }
 
-inline const ndConstraintArray& ndScene::GetActiveContactArray() const
+inline const ndArray<ndConstraint*>& ndScene::GetActiveContactArray() const
 {
 	return m_activeConstraintArray;
 }
@@ -241,9 +251,9 @@ inline const ndArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray() const
 	return m_activeBodyArray;
 }
 
-inline const ndContactList& ndScene::GetContactList() const
+inline const ndContactArray& ndScene::GetContactArray() const
 {
-	return m_contactList;
+	return m_contactArray;
 }
 
 template <class T>

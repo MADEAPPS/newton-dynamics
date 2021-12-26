@@ -26,7 +26,6 @@
 ndVector ndShape::m_flushZero(ndFloat32(1.0e-7f));
 
 ndShape::ndShape(ndShapeID id)
-	//:ndClassAlloc()
 	:ndContainersFreeListAlloc<ndShape>()
 	,m_inertia(ndVector::m_zero)
 	,m_crossInertia(ndVector::m_zero)

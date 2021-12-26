@@ -25,26 +25,16 @@
 #include "ndCollisionStdafx.h"
 #include "ndContact.h"
 
-
-class ndConstraintArray: public ndArray<ndConstraint*>
-{
-	public: 
-	ndConstraintArray()
-		:ndArray<ndConstraint*>(1024)
-	{
-	}
-};
-
-class ndContactList : public ndArray<ndContact*>
+class ndContactArray : public ndArray<ndContact*>
 {
 	public:
-	ndContactList()
+	ndContactArray()
 		:ndArray<ndContact*>(1024)
 		,m_lock()
 	{
 	}
 
-	~ndContactList()
+	~ndContactArray()
 	{
 	}
 

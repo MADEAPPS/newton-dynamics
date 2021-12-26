@@ -95,7 +95,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
-			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			const ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 			ndJointBodyPairIndex* const jointBodyBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 
 			const ndStartEnd startEnd(jointArray.GetCount(), GetThreadId(), m_owner->GetThreadCount());
@@ -117,7 +117,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	};
 
 	ndScene* const scene = m_world->GetScene();
-	ndConstraintArray& jointArray = scene->GetActiveContactArray();
+	ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 	ndArray<ndJointBodyPairIndex>& bodyJointPairs = GetJointBodyPairIndexBuffer();
 
 	bodyJointPairs.SetCount(jointArray.GetCount() * 2);
@@ -179,7 +179,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 
 			const ndStartEnd startEnd(jointArray.GetCount(), GetThreadId(), m_owner->GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -215,7 +215,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 
 			ndInt32 activeJointCount = 0;
 
@@ -250,7 +250,7 @@ void ndDynamicsUpdate::SortJointsScan()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
-			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 
 			ndInt32* const histogram = ((ndInt32*)m_context) + 2 * GetThreadId();
 			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
@@ -278,7 +278,7 @@ void ndDynamicsUpdate::SortJointsScan()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
-			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 
 			ndInt32* const histogram = ((ndInt32*)m_context) + 2 * GetThreadId();
 			ndConstraint** const sortBuffer = (ndConstraint**)me->GetTempBuffer();
@@ -338,7 +338,7 @@ void ndDynamicsUpdate::SortJointsScan()
 	}
 
 	const ndJointList& jointList = m_world->GetJointList();
-	ndConstraintArray& jointArray = scene->GetActiveContactArray();
+	ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 
 	ndInt32 jointCount = jointArray.GetCount();
 	jointArray.SetCount(jointCount + jointList.GetCount());
@@ -467,7 +467,7 @@ void ndDynamicsUpdate::SortJoints()
 	}
 
 	ndScene* const scene = m_world->GetScene();
-	ndConstraintArray& jointArray = scene->GetActiveContactArray();
+	ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 
 	ndInt32 rowCount = 1;
 	for (ndInt32 i = 0; i < jointArray.GetCount(); ++i)
@@ -1108,7 +1108,7 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
-			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			const ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 
 			ndJointAccelerationDecriptor joindDesc;
 			joindDesc.m_timestep = me->m_timestepRK;
@@ -1201,7 +1201,7 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
-			const ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			const ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 			ndArray<ndRightHandSide>& rightHandSide = me->m_rightHandSide;
 
 			const ndFloat32 timestepRK = me->GetTimestepRK();
@@ -1783,7 +1783,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			m_internalForces = &me->GetInternalForces()[0];
 			m_jointPartialForces = &me->GetTempInternalForces()[0];
 			m_jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
-			ndConstraintArray& jointArray = m_owner->GetActiveContactArray();
+			ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
 
 			const ndInt32 threadIndex = GetThreadId();
 			const ndInt32 jointCount = jointArray.GetCount();

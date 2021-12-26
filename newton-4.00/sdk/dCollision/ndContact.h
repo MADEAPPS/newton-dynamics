@@ -133,7 +133,7 @@ class ndContact: public ndConstraint
 	static ndVector m_initialSeparatingVector;
 
 	friend class ndScene;
-	friend class ndContactList;
+	friend class ndContactArray;
 	friend class ndBodyKinematic;
 	friend class ndContactSolver;
 	friend class ndShapeInstance;

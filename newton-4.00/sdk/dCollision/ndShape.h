@@ -207,7 +207,6 @@ class ndShapeInfo
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
-//class ndShape: public ndClassAlloc
 class ndShape: public ndContainersFreeListAlloc<ndShape>
 {
 	public:
