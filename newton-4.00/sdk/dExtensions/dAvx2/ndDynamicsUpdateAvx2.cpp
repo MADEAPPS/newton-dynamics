@@ -40,8 +40,8 @@
 		}
 
 		inline ndAvxFloat(const ndInt32 val)
-			:m_low(_mm256_castsi256_pd(_mm256_set1_epi64x(dInt64(val))))
-			,m_high(_mm256_castsi256_pd(_mm256_set1_epi64x(dInt64(val))))
+			:m_low(_mm256_castsi256_pd(_mm256_set1_epi64x(ndInt64(val))))
+			,m_high(_mm256_castsi256_pd(_mm256_set1_epi64x(ndInt64(val))))
 		{
 		}
 				
@@ -158,16 +158,30 @@
 			return ndAvxFloat(low, high);
 		}
 
+		inline ndVector GetLow() const
+		{
+			return m_vector8.m_linear;
+		}
+
+		inline ndVector GetHigh() const
+		{
+			return m_vector8.m_angular;
+		}
+
+		inline ndFloat32 GetMax() const
+		{
+			__m256d tmp0(_mm256_max_pd(m_low, m_high));
+			__m128d tmp1(_mm_max_pd(_mm256_castpd256_pd128(tmp0), _mm256_extractf128_pd(tmp0, 1)));
+			__m128d tmp2(_mm_max_pd(tmp1, _mm_unpackhi_pd(tmp1, tmp1)));
+			return _mm_cvtsd_f64(tmp2);
+		}
+
 		inline ndFloat32 AddHorizontal() const
 		{
-			//__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
-			//__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
-			//__m256 tmp2(_mm256_hadd_ps(tmp1, tmp1));
-			//return *((ndFloat32*)&tmp2);
 			__m256d tmp0(_mm256_add_pd(m_low, m_high));
-			__m256d tmp1(_mm256_hadd_pd(tmp0, tmp0));
-			__m256d tmp2(_mm256_add_pd(tmp1, _mm256_permute2f128_pd(tmp1, tmp1, 1)));
-			return *((ndFloat32*)&tmp2);
+			__m128d tmp1(_mm_add_pd(_mm256_castpd256_pd128(tmp0), _mm256_extractf128_pd(tmp0, 1)));
+			__m128d tmp2(_mm_hadd_pd(tmp1, tmp1));
+			return _mm_cvtsd_f64(tmp2);
 		}
 
 		static inline void FlushRegisters()
@@ -188,8 +202,13 @@
 				__m256i m_highInt;
 			};
 			ndJacobian m_vector8;
-			dInt64 m_ints[D_AVX_WORK_GROUP];
+			ndInt64 m_int[D_AVX_WORK_GROUP];
 		};
+
+		static ndAvxFloat m_one;
+		static ndAvxFloat m_zero;
+		static ndAvxFloat m_mask;
+		static ndAvxFloat m_ordinals;
 	} D_GCC_NEWTON_ALIGN_32;
 
 #else
@@ -349,7 +368,7 @@
 			__m256 m_type;
 			__m256i m_typeInt;
 			ndJacobian m_vector8;
-			ndInt32 m_ints[D_AVX_WORK_GROUP];
+			ndInt32 m_int[D_AVX_WORK_GROUP];
 		};
 
 		static ndAvxFloat m_one;
@@ -1588,7 +1607,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 						row.m_JMinv.m_jacobianM1.m_angular.m_z = ndAvxFloat(tmp[2], tmp[6]);
 					
 						#ifdef D_NEWTON_USE_DOUBLE
-							dInt64* const normalIndex = (dInt64*)&row.m_normalForceIndex[0];
+							ndInt64* const normalIndex = (ndInt64*)&row.m_normalForceIndex[0];
 						#else
 							ndInt32* const normalIndex = (ndInt32*)&row.m_normalForceIndex[0];
 						#endif
@@ -1690,7 +1709,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 								row.m_coordenateAccel[j] = rhs->m_coordenateAccel;
 			
 								#ifdef D_NEWTON_USE_DOUBLE
-									dInt64* const normalIndex = (dInt64*)&row.m_normalForceIndex[0];
+									ndInt64* const normalIndex = (ndInt64*)&row.m_normalForceIndex[0];
 								#else
 									ndInt32* const normalIndex = (ndInt32*)&row.m_normalForceIndex[0];
 								#endif

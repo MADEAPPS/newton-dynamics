@@ -39,7 +39,7 @@ void ndContactArray::DeleteContact(ndContact* const contact)
 {
 	if (contact->m_isAttached)
 	{
-	contact->DetachFromBodies();
+		contact->DetachFromBodies();
 	}
 	contact->m_isDead = 1;
 }
