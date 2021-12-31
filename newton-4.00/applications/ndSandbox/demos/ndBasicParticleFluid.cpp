@@ -216,9 +216,6 @@ matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 0.0f);
 	}
 	fluidObject->EndAddRemove();
 
-	//const ndIsoSurface& isoSurface = fluidObject->GetIsoSurface();
-	//entity->UpdateIsoSuface(isoSurface);
-	//entity->m_isoSurfaceMesh0->UpdateBuffers(m_points, m_indexList);
 	entity->UpdateIsoSuface();
 	world->AddBody(fluidObject);
 }
