@@ -91,6 +91,8 @@ class ndIsoSurface: public ndClassAlloc
 		virtual void ProccessCells(ndIsoSurface* const isoSurface);
 		virtual void Insert(const ndVector& point, ndInt32 parentQuadrant);
 
+		virtual void ProccessSmallSolidCells(ndIsoSurface* const isoSurface);
+
 		ndVector m_box0;
 		ndVector m_box1;
 		static ndVector m_quadrantCode;

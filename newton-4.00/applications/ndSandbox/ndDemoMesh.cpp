@@ -420,7 +420,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelM
 
 		if (!hasTransparency)
 		{
-			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glUseProgram(m_shader);
 
 			ndDemoCamera* const camera = scene->GetCamera();
@@ -468,7 +468,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelM
 			glBindVertexArray(0);
 			glUseProgram(0);
 
-			//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 	}
 }

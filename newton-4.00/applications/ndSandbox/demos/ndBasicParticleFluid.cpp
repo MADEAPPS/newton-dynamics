@@ -104,22 +104,20 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		//nodeMatrix.m_posit.m_y += 0.125f;
 	
 		// render the fluid;
+		ndScopeSpinLock lock(m_lock);
 		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
 		
-		//ndScopeSpinLock lock(m_lock);
-		//if (m_hasNewMesh)
-		//{
-		//	m_hasNewMesh = false;
-		//	m_isoSurfaceMesh1->UpdateBuffers(m_points, m_indexList);
-		//	dSwap(m_isoSurfaceMesh0, m_isoSurfaceMesh1);
-		//}
+		if (m_hasNewMesh)
+		{
+			UpdateIsoSuface();
+			m_hasNewMesh = false;
+		}
 
 		// render the cage;
 		//ndDemoEntity::Render(timeStep, scene, matrix);
 	}
 
-	//void UpdateIsoSuface(const ndIsoSurface& isoSurface)
-	void UpdateIsoSuface()
+	void UpdateIsoSuface() const
 	{
 		const ndIsoSurface& isoSurface = m_fluidBody->GetIsoSurface();
 		dAssert(isoSurface.GetVertexCount());
@@ -143,14 +141,11 @@ class ndWaterVolumeEntity : public ndDemoEntity
 
 		m_isoSurfaceMesh1->UpdateBuffers(m_points, m_indexList);
 		dSwap(m_isoSurfaceMesh0, m_isoSurfaceMesh1);
-
-		//	ndScopeSpinLock lock(m_lock);
-		//	m_hasNewMesh = true;
 	}
 
 	ndBodySphFluid* m_fluidBody;
-	ndArray<ndInt32> m_indexList;
-	ndArray<glPositionNormalUV> m_points;
+	mutable ndArray<ndInt32> m_indexList;
+	mutable ndArray<glPositionNormalUV> m_points;
 	mutable bool m_hasNewMesh;
 	mutable ndSpinLock m_lock;
 	mutable ndIsoSurfaceMesh* m_isoSurfaceMesh0;
@@ -168,15 +163,13 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 	void OnTransform(ndInt32, const ndMatrix&)
 	{
 		//dAssert(0);
-		dTrace(("skip OnTransform for now\n"));
-		//ndBodySphFluid* const fluid = GetBody()->GetAsBodySphFluid();
-		//dAssert(fluid);
-		//
-		//fluid->GenerateIsoSurface();
-		//const ndIsoSurface& isoSurface = fluid->GetIsoSurface();
-		//
-		//ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
-		//entity->UpdateIsoSuface(isoSurface);
+		//dTrace(("skip OnTransform for now\n"));
+		ndBodySphFluid* const fluid = GetBody()->GetAsBodySphFluid();
+		fluid->GenerateIsoSurface();
+
+		ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
+		ndScopeSpinLock lock(entity->m_lock);
+		entity->m_hasNewMesh = true;
 	}
 };
 
@@ -207,14 +200,12 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	matrix.m_posit += origin;
 matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 0.0f);
 	
-	particleCountPerAxis = 2;
+	particleCountPerAxis = 16;
 	fluidObject->BeginAddRemove();
-	
-	//for (ndInt32 y = 0; y < particleCountPerAxis; y++)
-	for (ndInt32 y = 0; y < 1; y++)
+
+	for (ndInt32 y = 0; y < particleCountPerAxis; y++)
 	{
-		//for (ndInt32 z = 0; z < particleCountPerAxis; z++)
-		for (ndInt32 z = 0; z < 1; z++)
+		for (ndInt32 z = 0; z < particleCountPerAxis; z++)
 		{
 			for (ndInt32 x = 0; x < particleCountPerAxis; x++)
 			{
