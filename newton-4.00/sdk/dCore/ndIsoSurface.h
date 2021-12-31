@@ -128,6 +128,7 @@ class ndIsoSurface: public ndClassAlloc
 	const ndUnsigned64* GetIndexList() const;
 
 	private:
+	void ProcessCells();
 	void ProcessCell(const ndIsoCell& cell);
 	ndUnsigned64 GetVertexID(ndInt32 x, ndInt32 y, ndInt32 z);
 	ndUnsigned64 GetEdgeID(const ndIsoCell& cell, ndInt32 edgeCode);

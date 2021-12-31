@@ -428,17 +428,14 @@ void ndIsoSurface::AddPoint(const ndVector& point)
 	m_octree->Insert(cellPoint, 0);
 }
 
-void ndIsoSurface::End()
+void ndIsoSurface::ProcessCells()
 {
+	D_TRACKTIME();
 	dAssert(m_octree);
-
 	m_points.SetCount(0);
 	m_trianglesList.SetCount(0);
 
-	{
-		D_TRACKTIME();
-		m_octree->ProccessCells(this);
-	}
+	m_octree->ProccessCells(this);
 
 	m_trianglesList.SetCount(m_triangleMap.GetCount());
 	ndIsoTriangleMap::Iterator iter(m_triangleMap);
@@ -448,12 +445,17 @@ void ndIsoSurface::End()
 		m_trianglesList[index] = iter.GetKey();
 		index++;
 	}
+	delete m_octree;
+	m_octree = nullptr;
+}
 
+void ndIsoSurface::End()
+{
+	D_TRACKTIME();
+	ProcessCells();
 	RemapIndexList();
 	CalculateNormals();
 
-	delete m_octree;
-	m_octree = nullptr;
 	m_vertexMap.RemoveAll();
 	m_triangleMap.RemoveAll();
 }
@@ -687,6 +689,7 @@ void ndIsoSurface::ProcessCell(const ndIsoCell& cell)
 
 void ndIsoSurface::RemapIndexList()
 {
+	D_TRACKTIME();
 	ndInt32 nextID = 0;
 
 	// calculate monotonic index list
@@ -716,6 +719,7 @@ void ndIsoSurface::RemapIndexList()
 
 void ndIsoSurface::CalculateNormals()
 {
+	D_TRACKTIME();
 	m_normals.SetCount(m_points.GetCount());
 
 	// Set all normals to 0.
@@ -744,7 +748,6 @@ void ndIsoSurface::CalculateNormals()
 		}
 	}
 }
-
 
 ndIsoSurface::ndOctree::ndOctree(const ndVector& box0, const ndVector& box1, ndOctreeInterface* const parent)
 	:ndOctreeInterface(parent)

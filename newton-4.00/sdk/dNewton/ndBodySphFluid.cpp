@@ -58,7 +58,7 @@ ndBodySphFluid::ndBodySphFluid()
 	,m_gridScans(1024)
 	//,m_partialsGridScans(1024)
 	,m_upperDigitsIsValid()
-	,m_isoSurcase()
+	,m_isoSurfase()
 	,m_beginEndState(false)
 {
 	for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; i++)
@@ -279,6 +279,15 @@ void ndBodySphFluid::SortCellBuckects(const ndWorld* const world)
 	}
 }
 
+void ndBodySphFluid::AddIsoSurfacePoints()
+{
+	D_TRACKTIME();
+	for (ndInt32 i = 0; i < m_posit.GetCount(); ++i)
+	{
+		m_isoSurfase.AddPoint(m_posit[i]);
+	}
+}
+
 void ndBodySphFluid::GenerateIsoSurface()
 {
 	D_TRACKTIME();
@@ -293,12 +302,9 @@ void ndBodySphFluid::GenerateIsoSurface()
 
 	ndFloat32 gridSize = m_radius * ndFloat32(2.0f);
 
-	m_isoSurcase.Begin(boxP0, boxP1, gridSize);
-	for (ndInt32 i = 0; i < m_posit.GetCount(); ++i)
-	{
-		m_isoSurcase.AddPoint(m_posit[i]);
-	}
-	m_isoSurcase.End();
+	m_isoSurfase.Begin(boxP0, boxP1, gridSize);
+	AddIsoSurfacePoints();
+	m_isoSurfase.End();
 
 	return;
 }

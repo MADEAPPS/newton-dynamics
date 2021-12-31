@@ -155,12 +155,12 @@ class ndBodySphFluid: public ndBodyParticleSet
 		ndInt32 m_histogram[D_MAX_THREADS_COUNT][1 << D_RADIX_DIGIT_SIZE];
 	};
 
+	void AddIsoSurfacePoints();
 	void SortGrids(const ndWorld* const world);
 	void BuildPairs(const ndWorld* const world);
 	void CreateGrids(const ndWorld* const world);
 	void CalculateAccelerations(const ndWorld* const world);
 	void CaculateAABB(const ndWorld* const world, ndVector& boxP0, ndVector& boxP1) const;
-
 	void SortCellBuckects(const ndWorld* const world);
 	void SortByCenterType(const ndWorld* const world);
 	void CalculateScans(const ndWorld* const world);
@@ -174,7 +174,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	ndArray<ndInt32> m_gridScans;
 	ndArray<ndInt32> m_partialsGridScans[D_MAX_THREADS_COUNT];
 	ndUpperDidit m_upperDigitsIsValid;
-	ndIsoSurface m_isoSurcase;
+	ndIsoSurface m_isoSurfase;
 	bool m_beginEndState;
 } D_GCC_NEWTON_ALIGN_32 ;
 
@@ -190,7 +190,7 @@ inline ndBodySphFluid* ndBodySphFluid::GetAsBodySphFluid()
 
 inline const ndIsoSurface& ndBodySphFluid::GetIsoSurface() const
 {
-	return m_isoSurcase;
+	return m_isoSurfase;
 }
 
 inline ndFloat32 ndBodySphFluid::CalculateGridSize() const
