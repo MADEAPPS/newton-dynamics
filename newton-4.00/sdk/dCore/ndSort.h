@@ -23,7 +23,7 @@
 #define __ND_SORT_H__
 
 #include "ndCoreStdafx.h"
-#include "ndHeap.h"
+#include "ndArray.h"
 #include "ndProfiler.h"
 #include "ndThreadPool.h"
 
@@ -51,7 +51,7 @@ void ndBinarySearch(T* const array, ndInt32 elements, void* const context = null
 	//index0 = (index0 > 0) ? index0 - 1 : 0;
 	//index2 = ((index2 + 1) < elements) ? index2 + 1 : elements;
 	//ndInt32 index = index0 - 1;
-	//for (ndInt32 i = index0; i < index2; i++) 
+	//for (ndInt32 i = index0; i < index2; ++i) 
 	//{
 	//	ndInt32 test = compare(&array[i], &entry, context);
 	//	if (!test) 
@@ -135,7 +135,7 @@ void ndSort(T* const array, ndInt32 elements, void* const context = nullptr)
 	{
 		stride = elements;
 	}
-	for (ndInt32 i = 1; i < stride; i++)
+	for (ndInt32 i = 1; i < stride; ++i)
 	{
 		if (comparator.Compare(array[0], array[i], context) > 0)
 		{
@@ -143,11 +143,11 @@ void ndSort(T* const array, ndInt32 elements, void* const context = nullptr)
 		}
 	}
 
-	for (ndInt32 i = 1; i < elements; i++)
+	for (ndInt32 i = 1; i < elements; ++i)
 	{
 		ndInt32 j = i;
 		const T tmp(array[i]);
-		for (; comparator.Compare(array[j - 1], tmp, context) > 0; j--)
+		for (; comparator.Compare(array[j - 1], tmp, context) > 0; --j)
 		{
 			dAssert(j > 0);
 			array[j] = array[j - 1];
@@ -155,79 +155,134 @@ void ndSort(T* const array, ndInt32 elements, void* const context = nullptr)
 		array[j] = tmp;
 	}
 
-	#ifdef _DEBUG
-		for (ndInt32 i = 0; i < (elements - 1); i++)
+	//#ifdef _DEBUG
+	#if 0
+		for (ndInt32 i = 0; i < (elements - 1); ++i)
 		{
 			dAssert(comparator.Compare(array[i], array[i + 1], context) <= 0);
 		}
 	#endif
 }
 
-template <class T, ndInt32 bits, class nEvaluateKey, class dKey>
-void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 elementsCount, ndInt32 digitLocation)
+template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
+void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scratchBuffer)
 {
-	dAssert(0);
-//	ndInt32 scanCount[256];
-//	ndInt32 histogram[256][4];
-//
-//	dAssert(radixPass >= 1);
-//	dAssert(radixPass <= 4);
-//
-//	memset(histogram, 0, sizeof(histogram));
-//	for (ndInt32 i = 0; i < elements; i++)
-//	{
-//		ndInt32 key = getRadixKey(&array[i], context);
-//		for (ndInt32 j = 0; j < radixPass; j++)
-//		{
-//			ndInt32 radix = (key >> (j << 3)) & 0xff;
-//			histogram[radix][j] = histogram[radix][j] + 1;
-//		}
-//	}
-//
-//	for (ndInt32 radix = 0; radix < radixPass; radix += 2)
-//	{
-//		scanCount[0] = 0;
-//		for (ndInt32 i = 1; i < 256; i++)
-//		{
-//			scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix];
-//		}
-//		ndInt32 radixShift = radix << 3;
-//		for (ndInt32 i = 0; i < elements; i++)
-//		{
-//			ndInt32 key = (getRadixKey(&array[i], context) >> radixShift) & 0xff;
-//			ndInt32 index = scanCount[key];
-//			tmpArray[index] = array[i];
-//			scanCount[key] = index + 1;
-//		}
-//
-//		if ((radix + 1) < radixPass)
-//		{
-//			scanCount[0] = 0;
-//			for (ndInt32 i = 1; i < 256; i++) {
-//				scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix + 1];
-//			}
-//
-//			ndInt32 radixShift = (radix + 1) << 3;
-//			for (ndInt32 i = 0; i < elements; i++)
-//			{
-//				ndInt32 key = (getRadixKey(&array[i], context) >> radixShift) & 0xff;
-//				ndInt32 index = scanCount[key];
-//				array[index] = tmpArray[i];
-//				scanCount[key] = index + 1;
-//			}
-//		}
-//		else
-//		{
-//			memcpy(array, tmpArray, elements * sizeof(T));
-//		}
-//	}
-//
+	D_TRACKTIME();
+	dAssert(keyBitSize > 0);
+	scratchBuffer.SetCount(array.GetCount());
+
+	class ndCountKeys : public ndThreadPoolJob
+	{
+		public:
+		void Execute()
+		{
+			D_TRACKTIME();
+			const ndArray<T>& array = *m_array;
+
+			ndEvaluateKey evaluator;
+			for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
+			{
+				m_scan[i] = 0;
+			}
+			ndStartEnd startEnd(array.GetCount(), GetThreadId(), m_threadCount);
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			{
+				const T& entry = array[i];
+				const ndInt32 key = evaluator.GetKey(entry);
+				dAssert(key >= 0);
+				dAssert(key < (1<<keyBitSize));
+				m_scan[key] ++;
+			}
+		}
+
+		ndInt32* m_scan;
+		const ndArray<T>* m_array;
+		ndInt32 m_threadCount;
+	};
+
+	class ndSortArray : public ndThreadPoolJob
+	{
+		public:
+		void Execute()
+		{
+			D_TRACKTIME();
+			ndArray<T>& dst = *m_dst;
+			const ndArray<T>& src = *m_src;
+
+			ndEvaluateKey evaluator;
+			ndStartEnd startEnd(src.GetCount(), GetThreadId(), m_threadCount);
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			{
+				const T& entry = src[i];
+				const ndInt32 key = evaluator.GetKey(entry);
+				dAssert(key >= 0);
+				dAssert(key < (1 << keyBitSize));
+				const ndInt32 index = m_scan[key];
+				dst[index] = entry;
+				m_scan[key] = index + 1;
+			}
+		}
+
+		ndInt32* m_scan;
+		ndArray<T>* m_dst;
+		const ndArray<T>* m_src;
+		ndInt32 m_threadCount;
+	};
+
+	ndInt32 scans[D_MAX_THREADS_COUNT][1 << keyBitSize];
+
+	ndThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
+	ndCountKeys countKeyKernels[D_MAX_THREADS_COUNT];
+	
+	const ndInt32 threadCount = threadPool.GetCount();
+	for (ndInt32 i = 0; i < threadCount; ++i)
+	{
+		countKeyKernels[i].m_array = &array;
+		countKeyKernels[i].m_scan = &scans[i][0];
+		countKeyKernels[i].m_threadCount = threadCount;
+		extJobPtr[i] = &countKeyKernels[i];
+	}
+	threadPool.ExecuteJobs(extJobPtr);
+
+	ndInt32 bits = keyBitSize;
+	if (bits < 11)
+	{
+		ndInt32 sum = 0;
+		for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
+		{
+			for (ndInt32 j = 0; j < threadCount; ++j)
+			{
+				ndInt32 partialSum = scans[j][i];
+				scans[j][i] = sum;
+				sum += partialSum;
+			}
+		}
+	}
+	else
+	{
+		dAssert(0);
+	}
+
+	ndSortArray sortArray[D_MAX_THREADS_COUNT];
+	for (ndInt32 i = 0; i < threadCount; ++i)
+	{
+		sortArray[i].m_src = &array;
+		sortArray[i].m_dst = &scratchBuffer;
+		sortArray[i].m_scan = &scans[i][0];
+		sortArray[i].m_threadCount = threadCount;
+		extJobPtr[i] = &sortArray[i];
+	}
+	threadPool.ExecuteJobs(extJobPtr);
+
+	array.Swap(scratchBuffer);
 //#ifdef _DEBUG
-//	for (ndInt32 i = 0; i < (elements - 1); i++)
-//	{
-//		dAssert(getRadixKey(&array[i], context) <= getRadixKey(&array[i + 1], context));
-//	}
-//#endif
+#if 0
+	ndEvaluateKey evaluator;
+	for (ndInt32 i = array.GetCount() - 2; i >= 0; --i)
+	{
+		dAssert(evaluator.GetKey(array[i]) <= evaluator.GetKey(array[i + 1]));
+	}
+#endif
 }
 
 #endif

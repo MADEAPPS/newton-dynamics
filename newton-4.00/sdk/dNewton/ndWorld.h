@@ -63,6 +63,7 @@ class ndWorld: public ndClassAlloc
 	ndInt32 GetEngineVersion() const;
 
 	void Sync() const;
+	void CollisionUpdate();
 	void Update(ndFloat32 timestep);
 
 	virtual void OnPostUpdate(ndFloat32 timestep);
@@ -241,7 +242,6 @@ inline void ndWorld::SetContactNotify(ndContactNotify* const notify)
 	m_scene->SetContactNotify(notify);
 }
 
-
 inline ndBodyDynamic* ndWorld::GetSentinelBody() const
 {
 	return m_sentinelBody;
@@ -301,6 +301,16 @@ inline void ndWorld::DebugScene(ndSceneTreeNotiFy* const notify)
 	m_scene->DebugScene(notify);
 }
 
+inline void ndWorld::CollisionUpdate()
+{
+	// wait until previous update complete.
+	Sync();
+
+	// update the next frame asynchronous 
+	m_collisionUpdate = true;
+	m_scene->TickOne();
+}
+
 inline void ndWorld::Update(ndFloat32 timestep)
 {
 	// wait until previous update complete.
@@ -308,9 +318,9 @@ inline void ndWorld::Update(ndFloat32 timestep)
 
 	// save time state for use by the update callback
 	m_timestep = timestep;
-	m_collisionUpdate = false;
 
 	// update the next frame asynchronous 
+	m_collisionUpdate = false;
 	m_scene->TickOne();
 }
 
