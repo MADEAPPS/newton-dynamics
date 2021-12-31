@@ -403,22 +403,22 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const ndMatrix& modelM
 {
 	if (m_isVisible)
 	{
-		bool hasTrasnparency = m_hasTransparency;
-		if (hasTrasnparency) 
+		bool hasTransparency = m_hasTransparency;
+		if (hasTransparency) 
 		{
 			scene->PushTransparentMesh(this, modelMatrix);
 		}
 
-		if (hasTrasnparency)
+		if (hasTransparency)
 		{
 			for (ndNode* node = GetFirst(); node; node = node->GetNext())
 			{
 				ndDemoSubMesh& segment = node->GetInfo();
-				hasTrasnparency = hasTrasnparency & segment.m_hasTranparency;
+				hasTransparency = hasTransparency & segment.m_hasTranparency;
 			}
 		}
 
-		if (!hasTrasnparency)
+		if (!hasTransparency)
 		{
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glUseProgram(m_shader);

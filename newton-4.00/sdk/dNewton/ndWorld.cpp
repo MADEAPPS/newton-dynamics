@@ -441,6 +441,7 @@ void ndWorld::ThreadFunction()
 
 		m_scene->SetTimestep(m_timestep);
 		
+		ParticleUpdate(m_timestep);
 		UpdateTransformsLock();
 		UpdateTransforms();
 		PostModelTransform();
@@ -504,7 +505,7 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	m_scene->UpdateSpecial();
 
 	// Update Particle base physics
-	ParticleUpdate();
+	//ParticleUpdate();
 
 	// Update all models
 	ModelUpdate();
@@ -517,13 +518,13 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	ModelPostUpdate();
 }
 
-void ndWorld::ParticleUpdate()
+void ndWorld::ParticleUpdate(ndFloat32 timestep)
 {
 	D_TRACKTIME();
 	for (ndBodyParticleSetList::ndNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyParticleSet* const body = node->GetInfo();
-		body->Update(this, m_timestep);
+		body->Update(this, timestep);
 	}
 }
 

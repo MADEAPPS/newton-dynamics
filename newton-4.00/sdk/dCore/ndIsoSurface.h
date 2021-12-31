@@ -33,18 +33,16 @@
 class ndIsoSurface: public ndClassAlloc
 {
 	public:
-	class ndIsoCell
-	{
-		public:
-		ndFloat32 m_isoValues[2][2][2];
-		ndInt32 m_x;
-		ndInt32 m_y;
-		ndInt32 m_z;
-	};
+	class ndIsoCell;
 
 	class ndIsoTriangle
 	{
 		public:
+		ndIsoTriangle() {}
+		ndIsoTriangle(ndInt32) {}
+		bool operator<(const ndIsoTriangle& triangle) const;
+		bool operator>(const ndIsoTriangle& triangle) const;
+
 		ndUnsigned64 m_pointId[3];
 	};
 
@@ -53,11 +51,72 @@ class ndIsoSurface: public ndClassAlloc
 		public: 
 	};
 
+	class ndIsoTriangleMap : public ndTree<ndInt32, ndIsoTriangle, ndContainersFreeListAlloc<ndIsoTriangle>>
+	{
+		public:
+	};
+
+	class ndOctreeInterface : public ndContainersFreeListAlloc<ndOctreeInterface>
+	{
+		public:
+		ndOctreeInterface(ndOctreeInterface* const parent)
+			:ndContainersFreeListAlloc<ndOctreeInterface>() 
+			,m_parent(parent)
+			,m_isLeaf(0)
+			,m_fullMask(0)
+		{
+		}
+
+		virtual ~ndOctreeInterface() {}
+
+		virtual void ProccessCells(ndIsoSurface* const isoSurface) = 0;
+		virtual void Insert(const ndVector&, ndInt32) {}
+		virtual bool Find(const ndVector&) const { dAssert(0); return false; }
+		ndInt32 CheckInside(const ndVector& point, const ndVector& box0, const ndVector& box1) const;
+		
+		ndOctreeInterface* m_parent;
+		ndUnsigned8 m_isLeaf;
+		ndUnsigned8 m_fullMask;
+
+		static ndVector m_neighbors[3][3][3];
+	};
+
+	class ndOctree : public ndOctreeInterface
+	{
+		public: 
+		ndOctree(const ndVector& box0, const ndVector& box1, ndOctreeInterface* const parent);
+		virtual ~ndOctree();
+
+		virtual bool Find(const ndVector& point) const;
+		virtual void ProccessCells(ndIsoSurface* const isoSurface);
+		virtual void Insert(const ndVector& point, ndInt32 parentQuadrant);
+
+		ndVector m_box0;
+		ndVector m_box1;
+		static ndVector m_quadrantCode;
+		ndOctreeInterface* m_children[8];
+	};
+
+	class ndOctreeLeaf : public ndOctreeInterface
+	{
+		public:
+		ndOctreeLeaf(const ndVector& point, ndOctreeInterface* const parent)
+			:ndOctreeInterface(parent)
+			,m_point(point)
+		{
+			m_isLeaf = 1;
+		}
+		virtual ~ndOctreeLeaf() {}
+		virtual void ProccessCells(ndIsoSurface* const isoSurface);
+
+		ndVector m_point;
+	};
+
 	D_CORE_API ndIsoSurface();
 	D_CORE_API ~ndIsoSurface();
 
-	D_CORE_API void Begin(const ndVector& origin, ndFloat32 isovalue, ndFloat32 gridSize, ndInt32 sizex, ndInt32 sizey, ndInt32 sizez);
-	D_CORE_API void ProcessCell(const ndIsoCell& cell);
+	D_CORE_API void Begin(const ndVector& boxP0, const ndVector& boxP1, ndFloat32 gridSize);
+	D_CORE_API void	AddPoint(const ndVector& point);
 	D_CORE_API void End();
 
 	ndInt32 GetIndexCount() const;
@@ -67,6 +126,7 @@ class ndIsoSurface: public ndClassAlloc
 	const ndUnsigned64* GetIndexList() const;
 
 	private:
+	void ProcessCell(const ndIsoCell& cell);
 	ndUnsigned64 GetVertexID(ndInt32 x, ndInt32 y, ndInt32 z);
 	ndUnsigned64 GetEdgeID(const ndIsoCell& cell, ndInt32 edgeCode);
 	ndVector CalculateIntersection(const ndIsoCell& cell, ndInt32 edgeCode);
@@ -76,15 +136,20 @@ class ndIsoSurface: public ndClassAlloc
 	void CalculateNormals();
 
 	ndVector m_origin;
+	ndVector m_gridSize;
+	ndVector m_invGridSize;
 	ndArray<ndVector> m_points;
 	ndArray<ndVector> m_normals;
 	ndArray<ndIsoTriangle> m_trianglesList;
 
 	ndIsoVertexMap m_vertexMap;
+	ndIsoTriangleMap m_triangleMap;
+
+	ndOctreeInterface* m_octree;
 	ndInt32 m_xCellSize;
 	ndInt32 m_yCellSize;
 	ndInt32 m_zCellSize;
-	ndFloat32 m_gridSize;
+	
 	ndFloat32 m_isoValue;
 
 	static const ndInt32 m_edgeTable[];
@@ -114,6 +179,42 @@ inline const ndVector* ndIsoSurface::GetNormals() const
 inline const ndUnsigned64* ndIsoSurface::GetIndexList() const
 {
 	return m_trianglesList.GetCount() ? &m_trianglesList[0].m_pointId[0] : nullptr;
+}
+
+inline ndInt32 ndIsoSurface::ndOctreeInterface::CheckInside(const ndVector& point, const ndVector& box0, const ndVector& box1) const
+{
+	const ndVector p0(box0 - point);
+	const ndVector p1(box1 - point);
+	const ndVector diff(p1 * p0);
+	const ndVector mask(diff <= ndVector::m_zero);
+	ndInt32 isInsize = mask.m_ix & mask.m_iy & mask.m_iz;
+	return isInsize;
+}
+
+inline bool ndIsoSurface::ndIsoTriangle::operator<(const ndIsoTriangle& triangle) const
+{
+	if (m_pointId[2] < triangle.m_pointId[2])
+	{
+		return true;
+	}
+	if (m_pointId[1] < triangle.m_pointId[1])
+	{
+		return true;
+	}
+	return m_pointId[0] < triangle.m_pointId[0];
+}
+
+inline bool ndIsoSurface::ndIsoTriangle::operator>(const ndIsoTriangle& triangle) const
+{
+	if (m_pointId[2] > triangle.m_pointId[2])
+	{
+		return true;
+	}
+	if (m_pointId[1] > triangle.m_pointId[1])
+	{
+		return true;
+	}
+	return m_pointId[0] > triangle.m_pointId[0];
 }
 
 #endif

@@ -28,12 +28,12 @@
 /*
 {
 ndFloat32 xxx[6][6][6];
-for (ndInt32 i = 0; i < 6 * 6 * 6; i++)
+for (ndInt32 i = 0; i < 6 * 6 * 6; ++i)
 {
 ndFloat32* yyy = &xxx[0][0][0];
 yyy[i] = 1.0f;
 }
-for (ndInt32 i = 0; i < uniqueCount; i++)
+for (ndInt32 i = 0; i < uniqueCount; ++i)
 {
 ndInt32 x = m_hashGridMap[i].m_x;
 ndInt32 y = m_hashGridMap[i].m_y;
@@ -55,8 +55,16 @@ ndBodySphFluid::ndBodySphFluid()
 	,m_hashGridMap(1024)
 	,m_particlesPairs(1024)
 	,m_hashGridMapScratchBuffer(1024)
-//	,m_gridScans(1024)
+	,m_gridScans(1024)
+	//,m_partialsGridScans(1024)
+	,m_upperDigitsIsValid()
+	,m_isoSurcase()
+	,m_beginEndState(false)
 {
+	for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; i++)
+	{
+		m_partialsGridScans[i].Resize(256);
+	}
 }
 
 ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
@@ -65,6 +73,7 @@ ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_box1(ndFloat32(1e10f))
 	,m_hashGridMap()
 	,m_hashGridMapScratchBuffer()
+	,m_beginEndState(false)
 {
 	// nothing was saved
 	dAssert(0);
@@ -82,25 +91,81 @@ void ndBodySphFluid::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
 }
 
+void ndBodySphFluid::BeginAddRemove()
+{
+	m_beginEndState = true;
+}
+
 void ndBodySphFluid::AddParticle(const ndFloat32, const ndVector& position, const ndVector&)
 {
+	dAssert(m_beginEndState);
 	ndVector point(position);
 	point.m_w = ndFloat32(1.0f);
 	m_posit.PushBack(point);
 }
 
-void ndBodySphFluid::CaculateAABB(const ndWorld* const, ndVector& boxP0, ndVector& boxP1) const
+void ndBodySphFluid::EndAddRemove()
+{
+	m_beginEndState = false;
+	GenerateIsoSurface();
+}
+
+void ndBodySphFluid::CaculateAABB(const ndWorld* const world, ndVector& boxP0, ndVector& boxP1) const
 {
 	D_TRACKTIME();
-	ndVector box0(ndFloat32(1e20f));
-	ndVector box1(ndFloat32(-1e20f));
-	for (ndInt32 i = m_posit.GetCount() - 1; i >= 0; i--)
+	class ndBox
 	{
-		box0 = box0.GetMin(m_posit[i]);
-		box1 = box1.GetMax(m_posit[i]);
+		public:
+		ndBox()
+			:m_min(ndFloat32(1.0e10f))
+			,m_max(ndFloat32(-1.0e10f))
+		{
+		}
+		ndVector m_min;
+		ndVector m_max;
+	};
+
+	class ndContext
+	{
+		public:
+		ndBox m_boxes[D_MAX_THREADS_COUNT];
+		const ndBodySphFluid* m_fluid;
+	};
+
+	class ndCaculateAabb : public ndScene::ndBaseJob
+	{
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndContext* const context = (ndContext*)m_context;
+			const ndBodySphFluid* const fluid = context->m_fluid;
+			const ndArray<ndVector>& posit = fluid->m_posit;
+
+			ndBox box;
+			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			{
+				box.m_min = box.m_min.GetMin(posit[i]);
+				box.m_max = box.m_max.GetMax(posit[i]);
+			}
+			context->m_boxes[GetThreadId()] = box;
+		}
+	};
+
+	ndBox box;
+	ndContext context;
+	context.m_fluid = this;
+	ndScene* const scene = world->GetScene();
+	scene->SubmitJobs<ndCaculateAabb>(&context);
+	
+	const ndInt32 threadCount = scene->GetThreadCount();
+	for (ndInt32 i = 0; i < threadCount; ++i)
+	{
+		box.m_min = box.m_min.GetMin(context.m_boxes[i].m_min);
+		box.m_max = box.m_max.GetMax(context.m_boxes[i].m_max);
 	}
-	boxP0 = box0;
-	boxP1 = box1;
+	boxP0 = box.m_min;
+	boxP1 = box.m_max;
 }
 
 void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32)
@@ -115,466 +180,185 @@ void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32)
 	CreateGrids(world);
 	SortGrids(world);
 	BuildPairs(world);
-	CalculateAccelerations(world);
+	//CalculateAccelerations(world);
 }
 
-void ndBodySphFluid::SortByCenterType()
+void ndBodySphFluid::SortByCenterType(const ndWorld* const world)
 {
 	D_TRACKTIME();
-	const ndInt32 count = m_hashGridMap.GetCount();
-
-	ndInt32 histogram[2];
-	memset(histogram, 0, sizeof(histogram));
-
-	const ndGridHash* const srcArray = &m_hashGridMap[0];
-	for (ndInt32 i = 0; i < count; i++)
+	class ndKey
 	{
-		const ndGridHash& entry = srcArray[i];
-		const ndInt32 index = ndInt32(entry.m_cellType);
-		histogram[index] = histogram[index] + 1;
-	}
-
-	ndInt32 acc = 0;
-	for (ndInt32 i = 0; i < 2; i++)
-	{
-		const ndInt32 n = histogram[i];
-		histogram[i] = acc;
-		acc += n;
-	}
-
-	ndGridHash* const dstArray = &m_hashGridMapScratchBuffer[0];
-	for (ndInt32 i = 0; i < count; i++)
-	{
-		const ndGridHash& entry = srcArray[i];
-		const ndInt32 key = ndInt32(entry.m_cellType);
-		const ndInt32 index = histogram[key];
-		dstArray[index] = entry;
-		histogram[key] = index + 1;
-	}
-	m_hashGridMap.Swap(m_hashGridMapScratchBuffer);
-}
-
-void ndBodySphFluid::SortSingleThreaded()
-{
-	D_TRACKTIME();
-	const ndInt32 count = m_hashGridMap.GetCount();
-
-	ndInt32 histograms[6][1 << D_RADIX_DIGIT_SIZE];
-	memset(histograms, 0, sizeof(histograms));
-
-	ndGridHash* srcArray = &m_hashGridMap[0];
-	for (ndInt32 i = 0; i < count; i++)
-	{
-		const ndGridHash& entry = srcArray[i];
-
-		const ndInt32 xlow = entry.m_xLow;
-		histograms[0][xlow] = histograms[0][xlow] + 1;
-
-		const ndInt32 xHigh = entry.m_xHigh;
-		histograms[1][xHigh] = histograms[1][xHigh] + 1;
-
-		const ndInt32 ylow = entry.m_yLow;
-		histograms[2][ylow] = histograms[2][ylow] + 1;
-
-		const ndInt32 yHigh = entry.m_yHigh;
-		histograms[3][yHigh] = histograms[3][yHigh] + 1;
-
-		const ndInt32 zlow = entry.m_zLow;
-		histograms[4][zlow] = histograms[4][zlow] + 1;
-
-		const ndInt32 zHigh = entry.m_zHigh;
-		histograms[5][zHigh] = histograms[5][zHigh] + 1;
-	}
-
-	ndInt32 acc[6];
-	memset(acc, 0, sizeof(acc));
-	for (ndInt32 i = 0; i < (1 << D_RADIX_DIGIT_SIZE); i++)
-	{
-		for (ndInt32 j = 0; j < 6; j++)
+		public:
+		ndInt32 GetKey(const ndGridHash& cell) const
 		{
-			const ndInt32 n = histograms[j][i];
-			histograms[j][i] = acc[j];
-			acc[j] += n;
-		}
-	}
-
-	ndInt32 shiftbits = 0;
-	ndUnsigned64 mask = (1 << D_RADIX_DIGIT_SIZE) - 1;
-	ndGridHash* dstArray = &m_hashGridMapScratchBuffer[0];
-	for (ndInt32 radix = 0; radix < 3; radix++)
-	{
-		ndInt32* const scan0 = &histograms[radix * 2][0];
-		for (ndInt32 i = 0; i < count; i++)
-		{
-			const ndGridHash& entry = srcArray[i];
-			const ndInt32 key = ndUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-			const ndInt32 index = scan0[key];
-			dstArray[index] = entry;
-			scan0[key] = index + 1;
-		}
-		mask <<= D_RADIX_DIGIT_SIZE;
-		shiftbits += D_RADIX_DIGIT_SIZE;
-		dSwap(dstArray, srcArray);
-
-		if (m_upperDigisIsValid[radix])
-		{
-			ndInt32* const scan1 = &histograms[radix * 2 + 1][0];
-			for (ndInt32 i = 0; i < count; i++)
-			{
-				const ndGridHash& entry = dstArray[i];
-				const ndInt32 key = ndUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-				const ndInt32 index = scan1[key];
-				srcArray[index] = entry;
-				scan1[key] = index + 1;
-			}
-			dSwap(dstArray, srcArray);
-		}
-		mask <<= D_RADIX_DIGIT_SIZE;
-		shiftbits += D_RADIX_DIGIT_SIZE;
-	}
-
-	if (srcArray != &m_hashGridMap[0])
-	{
-		m_hashGridMap.Swap(m_hashGridMapScratchBuffer);
-	}
-	dAssert(srcArray == &m_hashGridMap[0]);
-}
-
-void ndBodySphFluid::AddCounters(const ndWorld* const world, ndContext& context) const
-{
-	D_TRACKTIME();
-
-	ndInt32 acc = 0;
-	for (ndInt32 i = 0; i < ndInt32 (sizeof(context.m_scan) / sizeof(ndInt32)); i++)
-	{
-		ndInt32 sum = context.m_scan[i];
-		context.m_scan[i] = acc;
-		acc += sum;
-	}
-
-	ndInt32 accTemp[1 << D_RADIX_DIGIT_SIZE];
-	memset(accTemp, 0, sizeof(accTemp));
-
-	const ndInt32 count = sizeof(context.m_scan) / sizeof(ndInt32);
-	const ndInt32 threadCount = world->GetThreadCount();
-	for (ndInt32 threadId = 0; threadId < threadCount; threadId++)
-	{
-		for (ndInt32 i = 0; i < count; i++)
-		{
-			ndInt32 a = context.m_histogram[threadId][i];
-			context.m_histogram[threadId][i] = accTemp[i] + context.m_scan[i];
-			accTemp[i] += a;
-		}
-	}
-}
-
-void ndBodySphFluid::SortParallel(const ndWorld* const world)
-{
-	D_TRACKTIME();
-	class ndBodySphFluidCountDigits : public ndScene::ndBaseJob
-	{
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-
-			ndWorld* const world = m_owner->GetWorld();
-			ndContext* const context = (ndContext*)m_context;
-			ndBodySphFluid* const fluid = context->m_fluid;
-			const ndInt32 threadId = GetThreadId();
-			const ndInt32 threadCount = world->GetThreadCount();
-			
-			const ndInt32 count = fluid->m_hashGridMap.GetCount();
-			const ndInt32 size = count / threadCount;
-			const ndInt32 start = threadId * size;
-			const ndInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
-
-			ndGridHash* const hashArray = &fluid->m_hashGridMap[0];
-			ndInt32* const histogram = context->m_histogram[threadId];
-
-			memset(histogram, 0, sizeof(context->m_scan));
-			const ndInt32 shiftbits = context->m_pass * D_RADIX_DIGIT_SIZE;
-			const ndUnsigned64 mask = (ndUnsigned64((1 << D_RADIX_DIGIT_SIZE) - 1)) << shiftbits;
-
-			for (ndInt32 i = 0; i < batchSize; i++)
-			{
-				const ndGridHash& entry = hashArray[i + start];
-				const ndInt32 key = ndUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-				histogram[key] += 1;
-			}
+			return 1-cell.m_cellType;
 		}
 	};
 
-	class ndBodySphFluidAddPartialSum : public ndScene::ndBaseJob
-	{
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
-			ndContext* const context = (ndContext*)m_context;
-			const ndInt32 threadId = GetThreadId();
-			const ndInt32 threadCount = world->GetThreadCount();
-
-			const ndInt32 count = sizeof (context->m_scan) / sizeof (context->m_scan[0]);
-
-			const ndInt32 size = count / threadCount;
-			const ndInt32 start = threadId * size;
-			const ndInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
-
-			ndInt32* const scan = context->m_scan;
-			for (ndInt32 i = 0; i < batchSize; i++)
-			{
-				ndInt32 acc = 0;
-				for (ndInt32 j = 0; j < threadCount; j++)
-				{
-					acc += context->m_histogram[j][i + start];
-				}
-				scan[i + start] = acc;
-			}
-		}
-	};
-
-	class ndBodySphFluidReorderBuckets: public ndScene::ndBaseJob
-	{
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
-			ndContext* const context = (ndContext*)m_context;
-			ndBodySphFluid* const fluid = context->m_fluid;
-			const ndInt32 threadId = GetThreadId();
-			const ndInt32 threadCount = world->GetThreadCount();
-
-			const ndInt32 count = fluid->m_hashGridMap.GetCount();
-			const ndInt32 size = count / threadCount;
-			const ndInt32 start = threadId * size;
-			const ndInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
-
-			ndGridHash* const srcArray = &fluid->m_hashGridMap[0];
-			ndGridHash* const dstArray = &fluid->m_hashGridMapScratchBuffer[0];
-
-			const ndInt32 shiftbits = context->m_pass * D_RADIX_DIGIT_SIZE;
-			const ndUnsigned64 mask = (ndUnsigned64((1 << D_RADIX_DIGIT_SIZE)) - 1) << shiftbits;
-
-			ndInt32* const histogram = context->m_histogram[threadId];
-			for (ndInt32 i = 0; i < batchSize; i++)
-			{
-				const ndGridHash& entry = srcArray[i + start];
-				const ndInt32 key = ndUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-				const ndInt32 index = histogram[key];
-				dstArray[index] = entry;
-				histogram[key] = index + 1;
-			}
-		}
-	};
-
-	ndContext context;
-	context.m_fluid = this;
 	ndScene* const scene = world->GetScene();
-	for (ndInt32 pass = 0; pass < 6; pass++)
-	{
-		if (!(pass & 1) || m_upperDigisIsValid[pass >> 1])
-		{
-			D_TRACKTIME();
-			context.m_pass = pass;
-			scene->SubmitJobs<ndBodySphFluidCountDigits>(&context);
-			scene->SubmitJobs<ndBodySphFluidAddPartialSum>(&context);
-
-			AddCounters(world, context);
-
-			scene->SubmitJobs<ndBodySphFluidReorderBuckets>(&context);
-			m_hashGridMap.Swap(m_hashGridMapScratchBuffer);
-		}
-	}	
+	ndCountingSort<ndGridHash, ndKey, 1>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
 }
 
-
-D_NEWTON_API void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const)
+void ndBodySphFluid::SortCellBuckects(const ndWorld* const world)
 {
-return;
-#if 0
 	D_TRACKTIME();
-	dVector boxP0;
-	dVector boxP1;
-	CaculateAABB(world, boxP0, boxP1);
+	class ndKey_xlow
+	{
+		public:
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_xLow;
+		}
+	};
 
-	dFloat32 gridSize = m_radius * dFloat32(2.0f);
-	const dVector invGridSize (dFloat32 (1.0f) / gridSize);
+	class ndKey_ylow
+	{
+		public:
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_yLow;
+		}
+	};
 
-	dVector padd(dFloat32(2.0f) * gridSize);
-	boxP0 -= padd & dVector::m_triplexMask;
-	boxP1 += padd & dVector::m_triplexMask;
+	class ndKey_zlow
+	{
+		public:
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_zLow;
+		}
+	};
 
-	m_hashGridMap.SetCount(m_posit.GetCount());
-	m_hashGridMapScratchBuffer.SetCount(m_posit.GetCount());
-	const dVector* const posit = &m_posit[0];
-	
-	for (dInt32 i = m_posit.GetCount() - 1; i >= 0; i--)
+	class ndKey_xhigh
+	{
+		public:
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_xHigh;
+		}
+	};
+
+	class ndKey_yhigh
+	{
+		public:
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_yHigh;
+		}
+	};
+
+	class ndKey_zhigh
+	{
+		public:
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_zHigh;
+		}
+	};
+
+	ndScene* const scene = world->GetScene();
+	ndCountingSort<ndGridHash, ndKey_xlow, D_RADIX_DIGIT_SIZE>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
+	if (m_upperDigitsIsValid.m_x)
 	{
 		dAssert(0);
-		//dVector r(posit[i] - boxP0);
-		//dVector p(r * invGridSize);
-		//ndGridHash hashKey(p, i, ndHomeGrid);
-		//m_hashGridMap[i] = hashKey;
+		ndCountingSort<ndGridHash, ndKey_xhigh, D_RADIX_DIGIT_SIZE>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
 	}
 
-	ndContext context;
-	context.m_fluid = this;
-
-	SortSingleThreaded(world);
-	dInt32 uniqueCount = 0;
-	for (dInt32 i = 0; i < m_hashGridMap.GetCount();)
+	ndCountingSort<ndGridHash, ndKey_ylow, D_RADIX_DIGIT_SIZE>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
+	if (m_upperDigitsIsValid.m_y)
 	{
-		dUnsigned64 key0 = m_hashGridMap[i].m_gridHash;
-		m_hashGridMap[uniqueCount].m_gridHash = m_hashGridMap[i].m_gridHash;
-		uniqueCount++;
-		for (i ++; (i < m_hashGridMap.GetCount()) && (key0 == m_hashGridMap[i].m_gridHash); i++);
+		dAssert(0);
+		ndCountingSort<ndGridHash, ndKey_yhigh, D_RADIX_DIGIT_SIZE>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
 	}
 
-	dAssert(0);
-	//ndGridHash hashBox0(dVector::m_zero, 0, ndHomeGrid);
-	//ndGridHash hashBox1((boxP1 - boxP0) * invGridSize, 0, ndHomeGrid);
-	//
-	//dUnsigned64 cellCount = (hashBox1.m_z - hashBox0.m_z) * (hashBox1.m_y - hashBox0.m_y) * (hashBox1.m_x - hashBox0.m_x);
-	//
-	////if (cellCount <= 128)
-	//if (cellCount <= 256)
-	//{
-	//	dAssert((hashBox1.m_z - hashBox0.m_z) > 1);
-	//	dAssert((hashBox1.m_y - hashBox0.m_y) > 1);
-	//	dAssert((hashBox1.m_x - hashBox0.m_x) > 1);
-	//
-	//	const dInt32 x_ = 6;
-	//	const dInt32 y_ = 6;
-	//	const dInt32 z_ = 20;
-	//	dFloat32 xxx[z_][y_][x_];
-	//	memset(xxx, 0, sizeof(xxx));
-	//	for (dInt32 i = 0; i < uniqueCount; i++)
-	//	{
-	//		dInt32 x = m_hashGridMap[i].m_x;
-	//		dInt32 y = m_hashGridMap[i].m_y;
-	//		dInt32 z = m_hashGridMap[i].m_z;
-	//		xxx[z][y][x] = 1.0f;
-	//	}
-	//	
-	//	dInt32 gridCountX = dInt32(hashBox1.m_x - hashBox0.m_x) + 32;
-	//	dInt32 gridCountY = dInt32(hashBox1.m_y - hashBox0.m_y) + 32;
-	//	dInt32 gridCountZ = dInt32(hashBox1.m_z - hashBox0.m_z) + 32;
-	//	m_isoSurcase.Begin(boxP0, dFloat32(0.5f), gridSize, gridCountX, gridCountY, gridCountZ);
-	//	
-	//	dIsoSurface::dIsoCell cell;
-	//	for (dInt32 z = 0; z < z_-1; z++)
-	//	{
-	//		cell.m_z = z;
-	//		for (dInt32 y = 0; y < y_-1; y++)
-	//		{
-	//			cell.m_y = y;
-	//			for (dInt32 x = 0; x < x_-1; x++)
-	//			{
-	//				cell.m_x = x;
-	//				cell.m_isoValues[0][0][0] = xxx[z + 0][y + 0][x + 0];
-	//				cell.m_isoValues[0][0][1] = xxx[z + 0][y + 0][x + 1];
-	//				cell.m_isoValues[0][1][0] = xxx[z + 0][y + 1][x + 0];
-	//				cell.m_isoValues[0][1][1] = xxx[z + 0][y + 1][x + 1];
-	//				cell.m_isoValues[1][0][0] = xxx[z + 1][y + 0][x + 0];
-	//				cell.m_isoValues[1][0][1] = xxx[z + 1][y + 0][x + 1];
-	//				cell.m_isoValues[1][1][0] = xxx[z + 1][y + 1][x + 0];
-	//				cell.m_isoValues[1][1][1] = xxx[z + 1][y + 1][x + 1];
-	//				m_isoSurcase.ProcessCell(cell);
-	//			}
-	//		}
-	//	}
-	//	m_isoSurcase.End();
-	//}
-#endif
+	ndCountingSort<ndGridHash, ndKey_zlow, D_RADIX_DIGIT_SIZE>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
+	if (m_upperDigitsIsValid.m_z)
+	{
+		dAssert(0);
+		ndCountingSort<ndGridHash, ndKey_zhigh, D_RADIX_DIGIT_SIZE>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
+	}
 }
 
-
-void ndBodySphFluid::CalculateScansDebug(ndArray<ndInt32>& gridScans)
+void ndBodySphFluid::GenerateIsoSurface()
 {
-	ndInt32 count = 0;
-	gridScans.SetCount(0);
-	ndUnsigned64 gridHash0 = m_hashGridMap[0].m_gridHash;
-	for (ndInt32 i = 0; i < m_hashGridMap.GetCount(); i++)
+	D_TRACKTIME();
+	ndVector boxP0(ndFloat32(1.0e10f));
+	ndVector boxP1(ndFloat32(-1.0e10f));
+	//CaculateAABB(world, boxP0, boxP1);
+	for (ndInt32 i = 0; i < m_posit.GetCount(); ++i)
 	{
-		ndUnsigned64 gridHash = m_hashGridMap[i].m_gridHash;
-		if (gridHash != gridHash0)
-		{
-			gridScans.PushBack(count);
-			count = 0;
-			gridHash0 = gridHash;
-		}
-		count++;
+		boxP0 = boxP0.GetMin(m_posit[i]);
+		boxP1 = boxP1.GetMax(m_posit[i]);
 	}
-	gridScans.PushBack(count);
 
-	ndInt32 acc = 0;
-	for (ndInt32 i = 0; i < gridScans.GetCount(); i++)
+	ndFloat32 gridSize = m_radius * ndFloat32(2.0f);
+
+	m_isoSurcase.Begin(boxP0, boxP1, gridSize);
+	for (ndInt32 i = 0; i < m_posit.GetCount(); ++i)
 	{
-		ndInt32 sum = gridScans[i];
-		gridScans[i] = acc;
-		acc += sum;
+		m_isoSurcase.AddPoint(m_posit[i]);
 	}
-	gridScans.PushBack(acc);
+	m_isoSurcase.End();
+
+	return;
 }
 
 void ndBodySphFluid::CalculateScans(const ndWorld* const world)
 {
 	D_TRACKTIME();
-
-	class ndCalculateScans : public ndScene::ndBaseJob
+	class ndContext
 	{
 		public:
-		class ndContext
+		ndContext(ndBodySphFluid* const fluid, const ndWorld* const world)
+			:m_fluid(fluid)
 		{
-			public:
-			ndContext(ndBodySphFluid* const fluid, const ndWorld* const world)
-				:m_fluid(fluid)
+			memset(m_scan, 0, sizeof(m_scan));
+
+			const ndInt32 threadCount = world->GetThreadCount();
+			ndInt32 particleCount = m_fluid->m_hashGridMap.GetCount();
+
+			ndInt32 acc0 = 0;
+			ndInt32 stride = particleCount / threadCount;
+			const ndGridHash* const hashGridMap = &m_fluid->m_hashGridMap[0];
+			for (ndInt32 threadIndex = 0; threadIndex < threadCount; threadIndex++)
 			{
-				memset(m_scan, 0, sizeof(m_scan));
-
-				const ndInt32 threadCount = world->GetThreadCount();
-				ndInt32 particleCount = m_fluid->m_hashGridMap.GetCount();
-
-				ndInt32 acc0 = 0;
-				ndInt32 stride = particleCount / threadCount;
-				const ndGridHash* const hashGridMap = &m_fluid->m_hashGridMap[0];
-				for (ndInt32 threadIndex = 0; threadIndex < threadCount; threadIndex++)
+				m_scan[threadIndex] = acc0;
+				acc0 += stride;
+				while (acc0 < particleCount && (hashGridMap[acc0].m_gridHash == hashGridMap[acc0 - 1].m_gridHash))
 				{
-					m_scan[threadIndex] = acc0;
-					acc0 += stride;
-					while (acc0 < particleCount && (hashGridMap[acc0].m_gridHash == hashGridMap[acc0 - 1].m_gridHash))
-					{
-						acc0++;
-					}
+					acc0++;
 				}
-				m_scan[threadCount] = particleCount;
 			}
+			m_scan[threadCount] = particleCount;
+		}
 
-			ndBodySphFluid* m_fluid;
-			ndInt32 m_scan[D_MAX_THREADS_COUNT + 1];
-		};
+		ndBodySphFluid* m_fluid;
+		ndInt32 m_sums[D_MAX_THREADS_COUNT + 1];
+		ndInt32 m_scan[D_MAX_THREADS_COUNT + 1];
+	};
 
+	class ndCountGridScans : public ndScene::ndBaseJob
+	{
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			//ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
-			//const ndInt32 threadCount = world->GetThreadCount();
 		
 			const ndInt32 threadIndex = GetThreadId();
 			ndBodySphFluid* const fluid = context->m_fluid;
 			const ndGridHash* const hashGridMap = &context->m_fluid->m_hashGridMap[0];
 				
 			const ndInt32 start = context->m_scan[threadIndex];
-			const ndInt32 strideCount = context->m_scan[threadIndex + 1] - start;
-			ndArray<ndInt32>& gridScans = fluid->m_gridScans[threadIndex];
+			const ndInt32 end = context->m_scan[threadIndex + 1];
+			ndArray<ndInt32>& gridScans = fluid->m_partialsGridScans[threadIndex];
 			ndUnsigned64 gridHash0 = hashGridMap[start].m_gridHash;
 
 			ndInt32 count = 0;
 			gridScans.SetCount(0);
-			for (ndInt32 i = 0; i < strideCount; i++)
+			for (ndInt32 i = start; i < end; ++i)
 			{
-				ndUnsigned64 gridHash = hashGridMap[start + i].m_gridHash;
+				ndUnsigned64 gridHash = hashGridMap[i].m_gridHash;
 				if (gridHash != gridHash0)
 				{
 					gridScans.PushBack(count);
@@ -587,316 +371,406 @@ void ndBodySphFluid::CalculateScans(const ndWorld* const world)
 		}
 	};
 
-	ndCalculateScans::ndContext context(this, world);
-	ndScene* const scene = world->GetScene();
-	scene->SubmitJobs<ndCalculateScans>(&context);
-
-	ndInt32 acc = 0;
-	ndArray<ndInt32>& gridScans = m_gridScans[0];
-	for (ndInt32 i = 0; i < gridScans.GetCount(); i++)
+	class ndCalculateScans : public ndScene::ndBaseJob
 	{
-		ndInt32 sum = gridScans[i];
-		gridScans[i] = acc;
-		acc += sum;
-	}
-
-	ndInt32 threadCount = scene->GetThreadCount();
-	for (ndInt32 threadIndex = 1; threadIndex < threadCount; threadIndex++)
-	{
-		ndArray<ndInt32>& dstGridScans = m_gridScans[0];
-		const ndArray<ndInt32>& srcGridScans = m_gridScans[threadIndex];
-		const ndInt32 base = dstGridScans.GetCount();
-		dstGridScans.SetCount(base + srcGridScans.GetCount());
-
-		ndInt32* const dst = &dstGridScans[base];
-		for (ndInt32 i = 0; i < srcGridScans.GetCount(); i++)
+		public:
+		virtual void Execute()
 		{
-			ndInt32 sum = srcGridScans[i];
-			dst[i] = acc;
-			acc += sum;
-		}
-	}
-	gridScans.PushBack(acc);
+			D_TRACKTIME();
+			ndContext* const context = (ndContext*)m_context;
+			const ndInt32 threadIndex = GetThreadId();
+			ndBodySphFluid* const fluid = context->m_fluid;
 
-	#ifdef _DEBUG
-	CalculateScansDebug(m_gridScans[1]);
-	dAssert(m_gridScans[1].GetCount() == m_gridScans[0].GetCount());
-	for (ndInt32 i = 0; i < m_gridScans[0].GetCount(); i++)
+			ndArray<ndInt32>& gridScans = fluid->m_gridScans;
+			const ndArray<ndInt32>& partialScan = fluid->m_partialsGridScans[threadIndex];
+			const ndInt32 base = context->m_sums[threadIndex];
+			ndInt32 sum = context->m_scan[threadIndex];
+			for (ndInt32 i = 0; i < partialScan.GetCount(); ++i)
+			{
+				gridScans[base + i] = sum;
+				sum += partialScan[i];
+			}
+		}
+	};
+
+	ndContext context(this, world);
+	ndScene* const scene = world->GetScene();
+	scene->SubmitJobs<ndCountGridScans>(&context);
+
+	ndInt32 scansCount = 0;
+	const ndInt32 threadCount = scene->GetThreadCount();
+	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
-		dAssert(m_gridScans[1][i] == m_gridScans[0][i]);
+		context.m_sums[i] = scansCount;
+		scansCount += m_partialsGridScans[i].GetCount();
 	}
-	#endif
+	context.m_sums[threadCount] = scansCount;
+	m_gridScans.SetCount(scansCount + 1);
+	scene->SubmitJobs<ndCalculateScans>(&context);
+	m_gridScans[scansCount] = context.m_scan[threadCount];
 }
 
 void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 {
+	//#define D_USE_PARALLEL_CLASSIFY
 	D_TRACKTIME();
-	class ndCreateGrids : public ndScene::ndBaseJob
+	class ndGridCounters
 	{
 		public:
-		class ndContext
+		ndInt32 m_scan[D_MAX_THREADS_COUNT][2];
+		ndUpperDidit m_upperDigisIsValid[D_MAX_THREADS_COUNT];
+	};
+
+	class ndGridNeighborInfo
+	{
+		public:
+		ndGridNeighborInfo()
 		{
-			public:
-			ndContext(ndBodySphFluid* const fluid)
-				:m_fluid(fluid)
-				, m_lock()
-			{
-			}
+			//ndGridHash stepsCode;
+			m_neighborDirs[0][0] = ndGridHash(0, 0, 0);
+			m_neighborDirs[0][1] = ndGridHash(0, 0, 0);
+			m_neighborDirs[0][2] = ndGridHash(0, 0, 0);
+			m_neighborDirs[0][3] = ndGridHash(0, 0, 0);
+			m_neighborDirs[0][4] = ndGridHash(0, 0, 0);
+			m_neighborDirs[0][5] = ndGridHash(0, 0, 0);
+			m_neighborDirs[0][6] = ndGridHash(0, 0, 0);
+			m_neighborDirs[0][7] = ndGridHash(0, 0, 0);
 
-			ndBodySphFluid* m_fluid;
-			ndSpinLock m_lock;
-		};
+			m_counter[0] = 1;
+			m_isPadd[0][0] = 0;
+			m_isPadd[0][1] = 1;
+			m_isPadd[0][2] = 1;
+			m_isPadd[0][3] = 1;
+			m_isPadd[0][4] = 1;
+			m_isPadd[0][5] = 1;
+			m_isPadd[0][6] = 1;
+			m_isPadd[0][7] = 1;
 
-		// size of the level one cache minus few values for local variables.
-		#define D_SCRATCH_BUFFER_SIZE		(1024 * 24 / sizeof (ndGridHash))
-		#define D_SCRATCH_BUFFER_SIZE_PADD	(32)
+			//ndGridHash stepsCode_x;
+			m_neighborDirs[1][0] = ndGridHash(0, 0, 0);
+			m_neighborDirs[1][1] = ndGridHash(1, 0, 0);
+			m_neighborDirs[1][2] = ndGridHash(0, 0, 0);
+			m_neighborDirs[1][3] = ndGridHash(0, 0, 0);
+			m_neighborDirs[1][4] = ndGridHash(0, 0, 0);
+			m_neighborDirs[1][5] = ndGridHash(0, 0, 0);
+			m_neighborDirs[1][6] = ndGridHash(0, 0, 0);
+			m_neighborDirs[1][7] = ndGridHash(0, 0, 0);
 
-		class ndHashCacheBuffer : public ndFixSizeArray<ndGridHash, D_SCRATCH_BUFFER_SIZE + D_SCRATCH_BUFFER_SIZE_PADD>
+			m_counter[1] = 2;
+			m_isPadd[1][0] = 0;
+			m_isPadd[1][1] = 0;
+			m_isPadd[1][2] = 1;
+			m_isPadd[1][3] = 1;
+			m_isPadd[1][4] = 1;
+			m_isPadd[1][5] = 1;
+			m_isPadd[1][6] = 1;
+			m_isPadd[1][7] = 1;
+
+			//ndGridHash stepsCode_y;
+			m_neighborDirs[2][0] = ndGridHash(0, 0, 0);
+			m_neighborDirs[2][1] = ndGridHash(0, 1, 0);
+			m_neighborDirs[2][2] = ndGridHash(0, 0, 0);
+			m_neighborDirs[2][3] = ndGridHash(0, 0, 0);
+			m_neighborDirs[2][4] = ndGridHash(0, 0, 0);
+			m_neighborDirs[2][5] = ndGridHash(0, 0, 0);
+			m_neighborDirs[2][6] = ndGridHash(0, 0, 0);
+			m_neighborDirs[2][7] = ndGridHash(0, 0, 0);
+
+			m_counter[2] = 2;
+			m_isPadd[2][0] = 0;
+			m_isPadd[2][1] = 0;
+			m_isPadd[2][2] = 1;
+			m_isPadd[2][3] = 1;
+			m_isPadd[2][4] = 1;
+			m_isPadd[2][5] = 1;
+			m_isPadd[2][6] = 1;
+			m_isPadd[2][7] = 1;
+
+			//ndGridHash stepsCode_xy;
+			m_neighborDirs[3][0] = ndGridHash(0, 0, 0);
+			m_neighborDirs[3][1] = ndGridHash(1, 0, 0);
+			m_neighborDirs[3][2] = ndGridHash(0, 1, 0);
+			m_neighborDirs[3][3] = ndGridHash(1, 1, 0);
+			m_neighborDirs[3][4] = ndGridHash(0, 0, 0);
+			m_neighborDirs[3][5] = ndGridHash(0, 0, 0);
+			m_neighborDirs[3][6] = ndGridHash(0, 0, 0);
+			m_neighborDirs[3][7] = ndGridHash(0, 0, 0);
+
+			m_counter[3] = 4;
+			m_isPadd[3][0] = 0;
+			m_isPadd[3][1] = 0;
+			m_isPadd[3][2] = 0;
+			m_isPadd[3][3] = 0;
+			m_isPadd[3][4] = 1;
+			m_isPadd[3][5] = 1;
+			m_isPadd[3][6] = 1;
+			m_isPadd[3][7] = 1;
+
+			//ndGridHash stepsCode_z;
+			m_neighborDirs[4][0] = ndGridHash(0, 0, 0);
+			m_neighborDirs[4][1] = ndGridHash(0, 0, 1);
+			m_neighborDirs[4][2] = ndGridHash(0, 0, 0);
+			m_neighborDirs[4][3] = ndGridHash(0, 0, 0);
+			m_neighborDirs[4][4] = ndGridHash(0, 0, 0);
+			m_neighborDirs[4][5] = ndGridHash(0, 0, 0);
+			m_neighborDirs[4][6] = ndGridHash(0, 0, 0);
+			m_neighborDirs[4][7] = ndGridHash(0, 0, 0);
+
+			m_counter[4] = 2;
+			m_isPadd[4][0] = 0;
+			m_isPadd[4][1] = 0;
+			m_isPadd[4][2] = 1;
+			m_isPadd[4][3] = 1;
+			m_isPadd[4][4] = 1;
+			m_isPadd[4][5] = 1;
+			m_isPadd[4][6] = 1;
+			m_isPadd[4][7] = 1;
+
+			//ndGridHash stepsCode_xz;
+			m_neighborDirs[5][0] = ndGridHash(0, 0, 0);
+			m_neighborDirs[5][1] = ndGridHash(1, 0, 0);
+			m_neighborDirs[5][2] = ndGridHash(0, 0, 1);
+			m_neighborDirs[5][3] = ndGridHash(1, 0, 1);
+			m_neighborDirs[5][4] = ndGridHash(0, 0, 0);
+			m_neighborDirs[5][5] = ndGridHash(0, 0, 0);
+			m_neighborDirs[5][6] = ndGridHash(0, 0, 0);
+			m_neighborDirs[5][7] = ndGridHash(0, 0, 0);
+
+			m_counter[5] = 4;
+			m_isPadd[5][0] = 0;
+			m_isPadd[5][1] = 0;
+			m_isPadd[5][2] = 0;
+			m_isPadd[5][3] = 0;
+			m_isPadd[5][4] = 1;
+			m_isPadd[5][5] = 1;
+			m_isPadd[5][6] = 1;
+			m_isPadd[5][7] = 1;
+
+			//ndGridHash stepsCode_yz;
+			m_neighborDirs[6][0] = ndGridHash(0, 0, 0);
+			m_neighborDirs[6][1] = ndGridHash(0, 1, 0);
+			m_neighborDirs[6][2] = ndGridHash(0, 0, 1);
+			m_neighborDirs[6][3] = ndGridHash(0, 1, 1);
+			m_neighborDirs[6][4] = ndGridHash(0, 0, 0);
+			m_neighborDirs[6][5] = ndGridHash(0, 0, 0);
+			m_neighborDirs[6][6] = ndGridHash(0, 0, 0);
+			m_neighborDirs[6][7] = ndGridHash(0, 0, 0);
+
+			m_counter[6] = 4;
+			m_isPadd[6][0] = 0;
+			m_isPadd[6][1] = 0;
+			m_isPadd[6][2] = 0;
+			m_isPadd[6][3] = 0;
+			m_isPadd[6][4] = 1;
+			m_isPadd[6][5] = 1;
+			m_isPadd[6][6] = 1;
+			m_isPadd[6][7] = 1;
+
+			//ndGridHash stepsCode_xyz;
+			m_neighborDirs[7][0] = ndGridHash(0, 0, 0);
+			m_neighborDirs[7][1] = ndGridHash(1, 0, 0);
+			m_neighborDirs[7][2] = ndGridHash(0, 1, 0);
+			m_neighborDirs[7][3] = ndGridHash(1, 1, 0);
+			m_neighborDirs[7][4] = ndGridHash(0, 0, 1);
+			m_neighborDirs[7][5] = ndGridHash(1, 0, 1);
+			m_neighborDirs[7][6] = ndGridHash(0, 1, 1);
+			m_neighborDirs[7][7] = ndGridHash(1, 1, 1);
+
+			m_counter[7] = 8;
+			m_isPadd[7][0] = 0;
+			m_isPadd[7][1] = 0;
+			m_isPadd[7][2] = 0;
+			m_isPadd[7][3] = 0;
+			m_isPadd[7][4] = 0;
+			m_isPadd[7][5] = 0;
+			m_isPadd[7][6] = 0;
+			m_isPadd[7][7] = 0;
+		}
+		
+		ndGridHash m_neighborDirs[8][8];
+		ndInt8 m_isPadd[8][8];
+		ndInt8 m_counter[8];
+	};
+
+	class ndContext
+	{
+		public:
+		ndContext(ndBodySphFluid* const fluid)
+			:m_scan()
+			,m_neighbors()
+			,m_fluid(fluid)
 		{
-			public:
-			ndHashCacheBuffer()
-				:ndFixSizeArray<ndGridHash, D_SCRATCH_BUFFER_SIZE + D_SCRATCH_BUFFER_SIZE_PADD>()
-				, m_size(0)
-			{
-				// check the local scratch buffer is smaller than level one cache
-				dAssert(GetCapacity() * sizeof(ndGridHash) < 32 * 1024);
-			}
+		}
 
-			void PushBack(const ndGridHash& element)
-			{
-				ndInt32 index = m_size;
-				m_size++;
-				(*this)[index] = element;
-			}
+		ndGridCounters m_scan;
+		ndGridNeighborInfo m_neighbors;
+		ndBodySphFluid* m_fluid;
+	};
 
-			void AddCell(ndInt32 count, const ndGridHash& origin, const ndGridHash& cell, const ndGridHash* const neigborgh)
-			{
-				#ifdef _DEBUG 
-				ndInt32 debugCheck = 0;
-				#endif
-
-				for (ndInt32 j = 0; j < count; j++)
-				{
-					ndGridHash quadrand(cell);
-					quadrand.m_gridHash += neigborgh[j].m_gridHash;
-					quadrand.m_cellType = ndGridType(quadrand.m_gridHash == origin.m_gridHash);
-					dAssert(quadrand.m_cellType == ((quadrand.m_gridHash == origin.m_gridHash) ? ndHomeGrid : ndAdjacentGrid));
-
-					PushBack(quadrand);
-					#ifdef _DEBUG 
-					debugCheck += quadrand.m_cellType ? 1 : 0;
-					#endif
-				}
-				dAssert(debugCheck == 1);
-			}
-
-			ndInt32 m_size;
-		};
-
+	class ndCreateGrids: public ndScene::ndBaseJob
+	{
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-
-			ndVector m_neighborkDirs[8];
-
-			ndBodySphFluid* const fluid = ((ndContext*)m_context)->m_fluid;
+			ndContext* const context = (ndContext*)m_context;
+			ndBodySphFluid* const fluid = context->m_fluid;
 			const ndFloat32 radius = fluid->m_radius;
-
-			//onst ndInt32 threadIndex = GetThreadId();
-			//onst ndInt32 threadCount = m_owner->GetThreadCount();
-			//onst ndInt32 particleCount = fluid->m_posit.GetCount();
-			//
-			//onst ndInt32 step = particleCount / threadCount;
-			//onst ndInt32 start = threadIndex * step;
-			//onst ndInt32 count = ((threadIndex + 1) < threadCount) ? step : particleCount - start;
-
 			const ndFloat32 gridSize = fluid->CalculateGridSize();
 
 			const ndVector origin(fluid->m_box0);
 			const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
 			const ndVector* const posit = &fluid->m_posit[0];
 
+			ndGridHash* const dst = &fluid->m_hashGridMapScratchBuffer[0];
+
 			const ndVector box0(-radius, -radius, -radius, ndFloat32(0.0f));
 			const ndVector box1(radius, radius, radius, ndFloat32(0.0f));
+			const ndGridNeighborInfo& gridNeighborInfo = context->m_neighbors;
 
-			ndGridHash stepsCode_xyz[8];
-			stepsCode_xyz[0] = ndGridHash(0, 0, 0);
-			stepsCode_xyz[1] = ndGridHash(1, 0, 0);
-			stepsCode_xyz[2] = ndGridHash(0, 1, 0);
-			stepsCode_xyz[3] = ndGridHash(1, 1, 0);
-			stepsCode_xyz[4] = ndGridHash(0, 0, 1);
-			stepsCode_xyz[5] = ndGridHash(1, 0, 1);
-			stepsCode_xyz[6] = ndGridHash(0, 1, 1);
-			stepsCode_xyz[7] = ndGridHash(1, 1, 1);
+			#ifdef D_USE_PARALLEL_CLASSIFY
+			ndInt32* const scan = &context->m_scan.m_scan[GetThreadId()][0];
+			scan[0] = 0;
+			scan[1] = 0;
+			#endif
 
-			ndGridHash stepsCode_xy[4];
-			stepsCode_xy[0] = ndGridHash(0, 0, 0);
-			stepsCode_xy[1] = ndGridHash(1, 0, 0);
-			stepsCode_xy[2] = ndGridHash(0, 1, 0);
-			stepsCode_xy[3] = ndGridHash(1, 1, 0);
-
-			ndGridHash stepsCode_yz[4];
-			stepsCode_yz[0] = ndGridHash(0, 0, 0);
-			stepsCode_yz[1] = ndGridHash(0, 1, 0);
-			stepsCode_yz[2] = ndGridHash(0, 0, 1);
-			stepsCode_yz[3] = ndGridHash(0, 1, 1);
-
-			ndGridHash stepsCode_xz[4];
-			stepsCode_xz[0] = ndGridHash(0, 0, 0);
-			stepsCode_xz[1] = ndGridHash(1, 0, 0);
-			stepsCode_xz[2] = ndGridHash(0, 0, 1);
-			stepsCode_xz[3] = ndGridHash(1, 0, 1);
-
-			ndGridHash stepsCode_x[2];
-			stepsCode_x[0] = ndGridHash(0, 0, 0);
-			stepsCode_x[1] = ndGridHash(1, 0, 0);
-
-			ndGridHash stepsCode_y[2];
-			stepsCode_y[0] = ndGridHash(0, 0, 0);
-			stepsCode_y[1] = ndGridHash(0, 1, 0);
-
-			ndGridHash stepsCode_z[2];
-			stepsCode_z[0] = ndGridHash(0, 0, 0);
-			stepsCode_z[1] = ndGridHash(0, 0, 1);
-
-			ndHashCacheBuffer bufferOut;
-			//for (ndInt32 i = 0; i < count; i++)
 			const ndStartEnd startEnd(fluid->m_posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
-				ndVector r(posit[i] - origin);
-				ndVector p(r * invGridSize);
-				ndGridHash hashKey(p, i);
+				const ndVector r(posit[i] - origin);
+				const ndVector p(r * invGridSize);
+				const ndGridHash hashKey(p, i);
 
-				fluid->m_upperDigisIsValid[0] |= hashKey.m_xHigh;
-				fluid->m_upperDigisIsValid[1] |= hashKey.m_yHigh;
-				fluid->m_upperDigisIsValid[2] |= hashKey.m_zHigh;
-				ndVector p0((r + box0) * invGridSize);
-				ndVector p1((r + box1) * invGridSize);
-
+				fluid->m_upperDigitsIsValid.m_x |= hashKey.m_xHigh;
+				fluid->m_upperDigitsIsValid.m_y |= hashKey.m_yHigh;
+				fluid->m_upperDigitsIsValid.m_z |= hashKey.m_zHigh;
+				const ndVector p0((r + box0) * invGridSize);
+				const ndVector p1((r + box1) * invGridSize);
 				ndGridHash box0Hash(p0, i);
-				ndGridHash box1Hash(p1, i);
-				ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
+				const ndGridHash box1Hash(p1, i);
+				const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
 
 				dAssert(codeHash.m_x <= 1);
 				dAssert(codeHash.m_y <= 1);
 				dAssert(codeHash.m_z <= 1);
-				ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 4 + codeHash.m_y * 2 + codeHash.m_x);
+				const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 4 + codeHash.m_y * 2 + codeHash.m_x);
 
-				switch (code)
+				#ifdef D_USE_PARALLEL_CLASSIFY
+				scan[0] += gridNeighborInfo.m_counter[code];
+				scan[1] += (8 - gridNeighborInfo.m_counter[code]);
+				#endif
+
+				const ndInt8* const padding = &gridNeighborInfo.m_isPadd[code][0];
+				const ndGridHash* const neigborgh = &gridNeighborInfo.m_neighborDirs[code][0];
+				for (ndInt32 j = 0; j < 8; j++)
 				{
-					case 0:
-					{
-						box0Hash.m_cellType = ndHomeGrid;
-						bufferOut.PushBack(box0Hash);
-						break;
-					}
-
-					case 1:
-					{
-						// this grid goes across all cell.
-						bufferOut.AddCell(2, hashKey, box0Hash, stepsCode_x);
-						break;
-					}
-
-					case 2:
-					{
-						// this grid goes across all cell.
-						bufferOut.AddCell(2, hashKey, box0Hash, stepsCode_y);
-						break;
-					}
-
-					case 4:
-					{
-						// this grid goes across all cell.
-						bufferOut.AddCell(2, hashKey, box0Hash, stepsCode_z);
-						break;
-					}
-
-
-					case 3:
-					{
-						// this grid goes across all cell.
-						bufferOut.AddCell(4, hashKey, box0Hash, stepsCode_xy);
-						break;
-					}
-
-					case 5:
-					{
-						// this grid goes across all cell.
-						bufferOut.AddCell(4, hashKey, box0Hash, stepsCode_xz);
-						break;
-					}
-
-					case 6:
-					{
-						// this grid goes across all cell.
-						bufferOut.AddCell(4, hashKey, box0Hash, stepsCode_yz);
-						break;
-					}
-
-					case 7:
-					{
-						// this grid goes across all cell.
-						bufferOut.AddCell(8, hashKey, box0Hash, stepsCode_xyz);
-						break;
-					}
-
-					default:
-						dAssert(0);
+					ndGridHash quadrand(box0Hash);
+					quadrand.m_cellIsPadd = padding[j];
+					quadrand.m_gridHash += neigborgh[j].m_gridHash;
+					quadrand.m_cellType = ndGridType(quadrand.m_gridHash == hashKey.m_gridHash);
+					dAssert(quadrand.m_cellIsPadd <= 1);
+					dAssert(quadrand.m_cellType == ((quadrand.m_gridHash == hashKey.m_gridHash) ? ndHomeGrid : ndAdjacentGrid));
+					dst[i * 8 + j] = quadrand;
 				}
-
-				if (bufferOut.m_size > ndInt32 (D_SCRATCH_BUFFER_SIZE))
-				{
-					D_TRACKTIME();
-					ndScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
-					ndInt32 dstIndex = fluid->m_hashGridMap.GetCount();
-					fluid->m_hashGridMap.SetCount(dstIndex + bufferOut.m_size);
-					memcpy(&fluid->m_hashGridMap[dstIndex], &bufferOut[0], bufferOut.m_size * sizeof(ndGridHash));
-					bufferOut.m_size = 0;
-				}
-			}
-
-			if (bufferOut.m_size)
-			{
-				D_TRACKTIME();
-				ndScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
-				ndInt32 dstIndex = fluid->m_hashGridMap.GetCount();
-				fluid->m_hashGridMap.SetCount(dstIndex + bufferOut.m_size);
-				memcpy(&fluid->m_hashGridMap[dstIndex], &bufferOut[0], bufferOut.m_size * sizeof(ndGridHash));
 			}
 		}
 	};
 
-	ndScene* const scene = world->GetScene();
-	m_upperDigisIsValid[0] = 0;
-	m_upperDigisIsValid[1] = 0;
-	m_upperDigisIsValid[2] = 0;
+	class ndClassifyGrids : public ndScene::ndBaseJob
+	{
+		public:
+		void Execute()
+		{
+			D_TRACKTIME();
+			ndContext* const context = (ndContext*)m_context;
+			ndBodySphFluid* const fluid = context->m_fluid;
+			
+			ndArray<ndGridHash>& dst = fluid->m_hashGridMap;
+			const ndGridHash* const src = &fluid->m_hashGridMapScratchBuffer[0];
+			
+			const ndInt32 threadID = GetThreadId();
+			const ndInt32 threadCount = m_owner->GetThreadCount();
+			
+			ndInt32* const scan = &context->m_scan.m_scan[threadID][0];
+			ndUpperDidit& upperDigisIsValid = context->m_scan.m_upperDigisIsValid[threadID];
 
-	ndCreateGrids::ndContext context(this);
-	m_hashGridMap.SetCount(0);
+			const ndStartEnd startEnd(dst.GetCount(), threadID, threadCount);
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			{
+				const ndGridHash grid(src[i]);
+				const ndInt32 key = grid.m_cellIsPadd;
+				const ndInt32 index = scan[key];
+
+				upperDigisIsValid.m_x |= grid.m_xHigh;
+				upperDigisIsValid.m_y |= grid.m_yHigh;
+				upperDigisIsValid.m_z |= grid.m_zHigh;
+
+				dst[index] = grid;
+				scan[key] = index + 1;
+			}
+		}
+	};
+
+	dAssert (sizeof(ndGridHash) <= 16);
+	ndScene* const scene = world->GetScene();
+
+	ndContext context(this);
+	m_hashGridMap.SetCount(m_posit.GetCount() * 8);
+	m_hashGridMapScratchBuffer.SetCount(m_posit.GetCount() * 8);
 	scene->SubmitJobs<ndCreateGrids>(&context);
+
+#ifdef D_USE_PARALLEL_CLASSIFY
+	ndInt32 sum = 0;
+	const ndInt32 threadCount = scene->GetThreadCount();
+	for (ndInt32 i = 0; i < 2; ++i)
+	{
+		for (ndInt32 j = 0; j < threadCount; ++j)
+		{
+			ndInt32 partialSum = context.m_scan.m_scan[j][i];
+			context.m_scan.m_scan[j][i] = sum;
+			sum += partialSum;
+		}
+	}
+
+	ndInt32 gridCount = context.m_scan.m_scan[0][1] - context.m_scan.m_scan[0][0];
+	scene->SubmitJobs<ndClassifyGrids>(&context);
+
+	ndUpperDidit upperDigits;
+	for (ndInt32 j = 0; j < threadCount; ++j)
+	{
+		upperDigits.m_x |= context.m_scan.m_upperDigisIsValid[j].m_x;
+		upperDigits.m_y |= context.m_scan.m_upperDigisIsValid[j].m_y;
+		upperDigits.m_z |= context.m_scan.m_upperDigisIsValid[j].m_z;
+	}
+#else
+	ndInt32 gridCount = 0;
+	ndUpperDidit upperDigits;
+	{
+		D_TRACKTIME();
+		for (ndInt32 i = 0; i < m_hashGridMapScratchBuffer.GetCount(); ++i)
+		{
+			const ndGridHash cell(m_hashGridMapScratchBuffer[i]);
+			upperDigits.m_x |= cell.m_xHigh;
+			upperDigits.m_y |= cell.m_yHigh;
+			upperDigits.m_z |= cell.m_zHigh;
+
+			m_hashGridMap[gridCount] = cell;
+			gridCount += (1 - cell.m_cellIsPadd);
+		}
+	}
+#endif
+	m_hashGridMap.SetCount(gridCount);
+	m_upperDigitsIsValid = upperDigits;
 }
 
 void ndBodySphFluid::SortGrids(const ndWorld* const world)
 {
 	D_TRACKTIME();
-	const ndInt32 threadCount = world->GetThreadCount();
-	m_hashGridMapScratchBuffer.SetCount(m_hashGridMap.GetCount());
-
-	SortByCenterType();
-	if (threadCount <= 1)
-	{
-		dAssert(threadCount == 1);
-		SortSingleThreaded();
-	}
-	else
-	{
-		SortParallel(world);
-	}
+	SortByCenterType(world);
+	SortCellBuckects(world);
 
 	#ifdef _DEBUG
-	for (ndInt32 i = 0; i < (m_hashGridMap.GetCount() - 1); i++)
+	for (ndInt32 i = 0; i < (m_hashGridMap.GetCount() - 1); ++i)
 	{
 		const ndGridHash& entry0 = m_hashGridMap[i + 0];
 		const ndGridHash& entry1 = m_hashGridMap[i + 1];
@@ -918,7 +792,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			public:
 			ndContext(ndBodySphFluid* const fluid)
 				:m_fluid(fluid)
-				, m_lock()
+				,m_lock()
 			{
 			}
 
@@ -934,7 +808,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			public:
 			ndParticlePairCacheBuffer()
 				:ndFixSizeArray<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>()
-				, m_size(0)
+				,m_size(0)
 			{
 				// check the local scratch buffer is smaller than level one cache
 				dAssert(GetCapacity() * sizeof(ndParticlePair) < 32 * 1024);
@@ -961,7 +835,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			const ndInt32 threadId = GetThreadId();
 			const ndInt32 threadCount = world->GetThreadCount();
 			
-			const ndArray<ndInt32>& gridCounts = fluid->m_gridScans[0];
+			const ndArray<ndInt32>& gridCounts = fluid->m_partialsGridScans[0];
 			const ndInt32 count = gridCounts.GetCount() - 1;
 			const ndInt32 size = count / threadCount;
 			const ndInt32 start = threadId * size;
@@ -973,7 +847,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			//const ndFloat32 diameter2 = diameter * diameter;
 			
 			ndParticlePairCacheBuffer buffer;
-			for (ndInt32 i = 0; i < batchSize; i++)
+			for (ndInt32 i = 0; i < batchSize; ++i)
 			{
 				const ndInt32 cellStart = gridCounts[i + start];
 				const ndInt32 cellCount = gridCounts[i + start + 1] - cellStart;
@@ -1028,16 +902,17 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 	};
 
 	CalculateScans(world);
-	ndScene* const scene = world->GetScene();
-	m_particlesPairs.SetCount(0);
-	ndBodySphFluidCreatePair::ndContext context(this);
-	scene->SubmitJobs<ndBodySphFluidCreatePair>(&context);
+
+	// do not save pairs, instead buidl them at run time.
+	//ndScene* const scene = world->GetScene();
+	//m_particlesPairs.SetCount(0);
+	//ndBodySphFluidCreatePair::ndContext context(this);
+	//scene->SubmitJobs<ndBodySphFluidCreatePair>(&context);
 }
 
 void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 {
 	D_TRACKTIME();
-
 	class ndCalculateDensity: public ndScene::ndBaseJob
 	{
 		public:
@@ -1051,8 +926,7 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 
 			ndBodySphFluid* m_fluid;
 		};
-
-
+		
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -1068,7 +942,7 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 			const ndInt32 start = threadId * stride;
 			const ndInt32 batchStride = (threadId == threadCount - 1) ? count - start : stride;
 
-			for (ndInt32 i = 0; i < batchStride; i++)
+			for (ndInt32 i = 0; i < batchStride; ++i)
 			{
 				//ndParticlePair& pair = particlesPairs[i];
 			}

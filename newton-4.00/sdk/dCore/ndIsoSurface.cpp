@@ -321,16 +321,73 @@ const ndInt32 ndIsoSurface::m_triangleTable[256][16] =
 	{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }
 };
 
+ndVector ndIsoSurface::ndOctreeInterface::m_neighbors[3][3][3] =
+{
+	// z = -1
+	ndVector(ndFloat32(-1.0f), ndFloat32(-1.0f), ndFloat32(-1.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 0.0f), ndFloat32(-1.0f), ndFloat32(-1.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 1.0f), ndFloat32(-1.0f), ndFloat32(-1.0f), ndFloat32(0.0f)),
+
+	ndVector(ndFloat32(-1.0f), ndFloat32( 0.0f), ndFloat32(-1.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 0.0f), ndFloat32( 0.0f), ndFloat32(-1.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 0.0f), ndFloat32( 0.0f), ndFloat32(-1.0f), ndFloat32(0.0f)),
+
+	ndVector(ndFloat32(-1.0f), ndFloat32( 1.0f), ndFloat32(-1.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32(-1.0f), ndFloat32( 1.0f), ndFloat32(-1.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32(-1.0f), ndFloat32( 1.0f), ndFloat32(-1.0f), ndFloat32(0.0f)),
+
+	// z = 0
+	ndVector(ndFloat32(-1.0f), ndFloat32(-1.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 0.0f), ndFloat32(-1.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 1.0f), ndFloat32(-1.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+
+	ndVector(ndFloat32(-1.0f), ndFloat32( 0.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 0.0f), ndFloat32( 0.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 1.0f), ndFloat32( 0.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+
+	ndVector(ndFloat32(-1.0f), ndFloat32( 1.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 0.0f), ndFloat32( 1.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 1.0f), ndFloat32( 1.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+
+	// z = 1
+	ndVector(ndFloat32(-1.0f), ndFloat32(-1.0f), ndFloat32( 1.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 0.0f), ndFloat32(-1.0f), ndFloat32( 1.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 1.0f), ndFloat32(-1.0f), ndFloat32( 1.0f), ndFloat32(0.0f)),
+
+	ndVector(ndFloat32(-1.0f), ndFloat32( 0.0f), ndFloat32( 1.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 0.0f), ndFloat32( 0.0f), ndFloat32( 1.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 1.0f), ndFloat32( 0.0f), ndFloat32( 1.0f), ndFloat32(0.0f)),
+
+	ndVector(ndFloat32(-1.0f), ndFloat32( 1.0f), ndFloat32(1.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 0.0f), ndFloat32( 1.0f), ndFloat32(1.0f), ndFloat32(0.0f)),
+	ndVector(ndFloat32( 1.0f), ndFloat32( 1.0f), ndFloat32(1.0f), ndFloat32(0.0f)),
+};
+
+ndVector ndIsoSurface::ndOctree::m_quadrantCode(1, 2, 4, 0);
+
+
+class ndIsoSurface::ndIsoCell
+{
+	public:
+	ndFloat32 m_isoValues[2][2][2];
+	ndInt32 m_x;
+	ndInt32 m_y;
+	ndInt32 m_z;
+};
+
 ndIsoSurface::ndIsoSurface()
 	:m_origin(ndVector::m_zero)
+	,m_gridSize(ndVector::m_zero)
+	,m_invGridSize(ndVector::m_zero)
+	,m_octree()
 	,m_points(1024)
 	,m_normals(1024)
 	,m_trianglesList(1024)
 	,m_vertexMap()
+	,m_triangleMap()
 	,m_xCellSize(0)
 	,m_yCellSize(0)
 	,m_zCellSize(0)
-	,m_gridSize(ndFloat32 (0.0f))
 	,m_isoValue(ndFloat32(0.0f))
 {
 }
@@ -339,23 +396,61 @@ ndIsoSurface::~ndIsoSurface()
 {
 }
 
-void ndIsoSurface::Begin(const ndVector& origin, ndFloat32 isovalue, ndFloat32 gridSize, ndInt32 sizex, ndInt32 sizey, ndInt32 sizez)
+void ndIsoSurface::Begin(const ndVector& boxP0, const ndVector& boxP1, ndFloat32 gridSize)
 {
-	m_origin = origin & ndVector::m_triplexMask;
-	m_xCellSize = sizex;
-	m_yCellSize = sizey;
-	m_zCellSize = sizez;
-	m_gridSize = gridSize;
-	m_isoValue = isovalue;
+	m_isoValue = ndFloat32(0.5f);
+	m_gridSize = ndVector(gridSize) & ndVector::m_triplexMask;
+	m_invGridSize = ndVector(ndFloat32(1.0f) / gridSize) & ndVector::m_triplexMask;
 
-	m_points.SetCount(0);
-	m_trianglesList.SetCount(0);
+	m_origin = boxP0 - m_gridSize - m_gridSize * ndVector::m_half;
+	ndVector size((boxP1 - m_origin) * m_invGridSize + ndVector::m_half);
+
+	ndVector cells(size.Floor().GetInt());
+	m_xCellSize = cells.m_ix + 2;
+	m_yCellSize = cells.m_iy + 2;
+	m_zCellSize = cells.m_iz + 2;
+	ndInt32 maxAxis = dMax(dMax(m_xCellSize, m_yCellSize), m_zCellSize);
+
+	ndInt32 maxAxisTwosPower = 1;
+	for (; maxAxisTwosPower < maxAxis; maxAxisTwosPower *= 2);
+
+	const ndVector boundP0(ndVector::m_zero);
+	const ndVector boundP1(ndVector(ndFloat32(maxAxisTwosPower)) & ndVector::m_triplexMask);
+	m_octree = new ndOctree(boundP0, boundP1, nullptr);
+}
+
+void ndIsoSurface::AddPoint(const ndVector& point)
+{
+	const ndVector p(ndVector::m_triplexMask & (m_invGridSize * (point - m_origin) + ndVector::m_half));
+	const ndVector cellPoint(p.Floor() - ndVector::m_half);
+	m_octree->Insert(cellPoint, 0);
 }
 
 void ndIsoSurface::End()
 {
+	dAssert(m_octree);
+
+	m_points.SetCount(0);
+	m_trianglesList.SetCount(0);
+
+	m_octree->ProccessCells(this);
+
+	m_trianglesList.SetCount(m_triangleMap.GetCount());
+	ndIsoTriangleMap::Iterator iter(m_triangleMap);
+	ndInt32 index = 0;
+	for (iter.Begin(); iter; iter++)
+	{
+		m_trianglesList[index] = iter.GetKey();
+		index++;
+	}
+
 	RemapIndexList();
 	CalculateNormals();
+
+	delete m_octree;
+	m_octree = nullptr;
+	m_vertexMap.RemoveAll();
+	m_triangleMap.RemoveAll();
 }
 
 ndUnsigned64 ndIsoSurface::GetVertexID(ndInt32 gridX, ndInt32 gridY, ndInt32 gridZ)
@@ -418,7 +513,7 @@ ndVector ndIsoSurface::CalculateIntersection(const ndIsoCell& cell, ndInt32 edge
 	ndInt32 v2x = cell.m_x;
 	ndInt32 v2y = cell.m_y;
 	ndInt32 v2z = cell.m_z;
-
+	
 	switch (edgeCode)
 	{
 		case 0:
@@ -482,14 +577,14 @@ ndVector ndIsoSurface::CalculateIntersection(const ndIsoCell& cell, ndInt32 edge
 			v2z += 1;
 			break;
 	}
-
-	ndFloat32 x1 = v1x * m_gridSize;
-	ndFloat32 y1 = v1y * m_gridSize;
-	ndFloat32 z1 = v1z * m_gridSize;
-	ndFloat32 x2 = v2x * m_gridSize;
-	ndFloat32 y2 = v2y * m_gridSize;
-	ndFloat32 z2 = v2z * m_gridSize;
-
+	
+	ndFloat32 x1 = v1x * m_gridSize.m_x;
+	ndFloat32 y1 = v1y * m_gridSize.m_y;
+	ndFloat32 z1 = v1z * m_gridSize.m_z;
+	ndFloat32 x2 = v2x * m_gridSize.m_x;
+	ndFloat32 y2 = v2y * m_gridSize.m_y;
+	ndFloat32 z2 = v2z * m_gridSize.m_z;
+	
 	ndFloat32 val1 = cell.m_isoValues[v1z-cell.m_z][v1y-cell.m_y][v1x-cell.m_x];
 	ndFloat32 val2 = cell.m_isoValues[v2z - cell.m_z][v2y - cell.m_y][v2x - cell.m_x];
 	return InterpolateEdge(x1, y1, z1, x2, y2, z2, val1, val2);
@@ -497,27 +592,43 @@ ndVector ndIsoSurface::CalculateIntersection(const ndIsoCell& cell, ndInt32 edge
 
 void ndIsoSurface::ProcessCell(const ndIsoCell& cell)
 {
-	dAssert(cell.m_x < m_xCellSize - 1);
-	dAssert(cell.m_y < m_yCellSize - 1);
-	dAssert(cell.m_z < m_zCellSize - 1);
-
+	dAssert(cell.m_x < (m_xCellSize));
+	dAssert(cell.m_y < (m_yCellSize));
+	dAssert(cell.m_z < (m_zCellSize));
+	
 	ndInt32 tableIndex = 0;
 	if (cell.m_isoValues[0][0][0] > m_isoValue)
+	{
 		tableIndex |= 1;
+	}
 	if (cell.m_isoValues[0][1][0] > m_isoValue)
+	{
 		tableIndex |= 2;
+	}
 	if (cell.m_isoValues[0][1][1] > m_isoValue)
+	{
 		tableIndex |= 4;
+	}
 	if (cell.m_isoValues[0][0][1] > m_isoValue)
+	{
 		tableIndex |= 8;
+	}
 	if (cell.m_isoValues[1][0][0] > m_isoValue)
+	{
 		tableIndex |= 16;
+	}
 	if (cell.m_isoValues[1][1][0] > m_isoValue)
+	{
 		tableIndex |= 32;
+	}
 	if (cell.m_isoValues[1][1][1] > m_isoValue)
+	{
 		tableIndex |= 64;
+	}
 	if (cell.m_isoValues[1][0][1] > m_isoValue)
+	{
 		tableIndex |= 128;
+	}
 
 	// Now create a triangulation of the iso surface in this cell.
 	ndInt32 edgeBits = m_edgeTable[tableIndex];
@@ -527,21 +638,18 @@ void ndIsoSurface::ProcessCell(const ndIsoCell& cell)
 		{
 			ndVector pt (CalculateIntersection(cell, 3));
 			ndUnsigned64 id = GetEdgeID(cell, 3);
-			dAssert(!m_vertexMap.Find(id));
 			m_vertexMap.Insert(pt, id);
 		}
 		if (edgeBits & 1)
 		{
 			ndVector pt (CalculateIntersection(cell, 0));
 			ndUnsigned64 id = GetEdgeID(cell, 0);
-			dAssert(!m_vertexMap.Find(id));
 			m_vertexMap.Insert(pt, id);
 		}
 		if (edgeBits & 256)
 		{
 			ndVector pt (CalculateIntersection(cell, 8));
 			ndUnsigned64 id = GetEdgeID(cell, 8);
-			dAssert(!m_vertexMap.Find(id));
 			m_vertexMap.Insert(pt, id);
 		}
 	
@@ -554,7 +662,20 @@ void ndIsoSurface::ProcessCell(const ndIsoCell& cell)
 			triangle.m_pointId[0] = pointID0;
 			triangle.m_pointId[1] = pointID1;
 			triangle.m_pointId[2] = pointID2;
-			m_trianglesList.PushBack(triangle);
+			m_triangleMap.Insert(0, triangle);
+			#ifdef _DEBUG
+				ndIsoTriangle triangle1;
+				triangle1.m_pointId[0] = triangle.m_pointId[1];
+				triangle1.m_pointId[1] = triangle.m_pointId[2];
+				triangle1.m_pointId[2] = triangle.m_pointId[0];
+				dAssert(!m_triangleMap.Find(triangle1));
+
+				triangle1.m_pointId[0] = triangle.m_pointId[2];
+				triangle1.m_pointId[1] = triangle.m_pointId[0];
+				triangle1.m_pointId[2] = triangle.m_pointId[1];
+				dAssert(!m_triangleMap.Find(triangle1));
+			#endif
+			
 		}
 	}
 }
@@ -570,7 +691,6 @@ void ndIsoSurface::RemapIndexList()
 	{
 		ndVector& point = iter.GetNode()->GetInfo();
 		m_points[nextID] = point + m_origin;
-		dAssert(m_points[nextID].m_w == ndFloat32(0.0f));
 		point.m_w = ndFloat32(nextID);
 		nextID ++;
 	}
@@ -578,15 +698,15 @@ void ndIsoSurface::RemapIndexList()
 	// Now remap triangles.
 	for (ndInt32 k = 0; k < m_trianglesList.GetCount(); k++)
 	{
+		const ndIsoTriangle& triangle = m_trianglesList[k];
 		for (ndInt32 i = 0; i < 3; i++)
 		{
-			ndIsoVertexMap::ndNode* const node = m_vertexMap.Find(m_trianglesList[k].m_pointId[i]);
+			ndIsoVertexMap::ndNode* const node = m_vertexMap.Find(triangle.m_pointId[i]);
 			dAssert(node);
 			ndInt32 id = ndInt32 (node->GetInfo().m_w);
 			m_trianglesList[k].m_pointId[i] = id;
 		}
 	}
-	m_vertexMap.RemoveAll();
 }
 
 void ndIsoSurface::CalculateNormals()
@@ -610,7 +730,7 @@ void ndIsoSurface::CalculateNormals()
 			m_normals[id1] += normal;
 			m_normals[id2] += normal;
 		}
-
+		
 		// Normalize normals.
 		for (ndInt32 i = 0; i < m_normals.GetCount(); i++)
 		{
@@ -619,3 +739,205 @@ void ndIsoSurface::CalculateNormals()
 		}
 	}
 }
+
+
+ndIsoSurface::ndOctree::ndOctree(const ndVector& box0, const ndVector& box1, ndOctreeInterface* const parent)
+	:ndOctreeInterface(parent)
+	,m_box0(box0)
+	,m_box1(box1)
+{
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		m_children[i] = nullptr;
+	}
+}
+
+ndIsoSurface::ndOctree::~ndOctree()
+{
+	for (ndInt32 i = 0; i < 8; ++i)
+	{
+		if (m_children[i])
+		{
+			delete m_children[i];
+		}
+	}
+}
+
+void ndIsoSurface::ndOctree::Insert(const ndVector& point, ndInt32 parentQuadrant)
+{
+	if (m_fullMask == 0xff)
+	{
+		dAssert(0);
+		return;
+	}
+
+	const ndVector size(ndVector::m_half * (m_box1 - m_box0));
+	const ndVector center(ndVector::m_half * (m_box1 + m_box0));
+	const ndVector mask(point > center);
+	const ndVector box0(m_box0.Select(center, mask));
+	const ndVector box1(box0 + size);
+	const ndVector quadrant(mask & m_quadrantCode);
+	const ndInt32 code = quadrant.m_iz + quadrant.m_iy + quadrant.m_ix;
+	
+	if (size.m_x > ndFloat32 (1.0f))
+	{
+		if (!m_children[code])
+		{
+			m_children[code] = new ndOctree(box0, box1, this);
+		}
+		m_children[code]->Insert(point, code);
+	
+		if (m_fullMask == 0xff)
+		{
+			for (ndInt32 i = 0; i < 8; ++i)
+			{
+				dAssert(m_children[i]);
+				delete m_children[i];
+				m_children[i] = nullptr;
+			}
+			if (m_parent)
+			{
+				m_parent->m_fullMask = m_parent->m_fullMask | (1 << parentQuadrant);
+			}
+		}
+	}
+	else if (!m_children[code])
+	{
+		m_children[code] = new ndOctreeLeaf(point, this);
+		m_fullMask = m_fullMask | (1 << code);
+		if (m_fullMask == 0xff)
+		{
+			for (ndInt32 i = 0; i < 8; ++i)
+			{
+				dAssert(m_children[i]);
+				delete m_children[i];
+				m_children[i] = nullptr;
+			}
+			if (m_parent)
+			{
+				m_parent->m_fullMask = m_parent->m_fullMask | (1 << parentQuadrant);
+			}
+		}
+	}
+}
+
+bool ndIsoSurface::ndOctree::Find(const ndVector& point) const
+{
+	const ndOctree* root = this;
+	
+	ndInt32 isInsize = CheckInside(point, root->m_box0, root->m_box1);
+	while (!isInsize)
+	{
+		root = (ndOctree*)root->m_parent;
+		dAssert(root);
+		isInsize = CheckInside(point, root->m_box0, root->m_box1);
+	}
+	
+	ndInt32 stack = 1;
+	const ndOctreeInterface* stackPool[32];
+	stackPool[0] = root;
+	while (stack)
+	{
+		stack--;
+		const ndOctreeInterface* const node = stackPool[stack];
+		if (node->m_fullMask == 0xff)
+		{
+			return true;
+		}
+		if (node->m_isLeaf)
+		{
+			const ndOctreeLeaf* const leafNode = (ndOctreeLeaf*)node;
+			const ndVector diff(leafNode->m_point - point);
+			const ndVector mask(diff == ndVector::m_zero);
+			ndInt32 test = mask.m_ix & mask.m_iy & mask.m_iz;
+			if (test) 
+			{
+				return true;
+			}
+		}
+		else
+		{
+			const ndOctree* const parent = (ndOctree*)node;
+			for (ndInt32 i = 0; i < 8; i++)
+			{
+				const ndOctreeInterface* const child = parent->m_children[i];
+				if (child)
+				{
+					if (child->m_isLeaf) 
+					{
+						stackPool[stack] = child;
+						stack++;
+					}
+					else
+					{
+						const ndOctree* const childNode = (ndOctree*)child;
+						ndInt32 test = CheckInside(point, childNode->m_box0, childNode->m_box1);
+						if (test)
+						{
+							stackPool[stack] = childNode;
+							stack++;
+						}
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+void ndIsoSurface::ndOctreeLeaf::ProccessCells(ndIsoSurface* const isoSurface)
+{
+	ndFloat32 isoValue[3][3][3];
+	const ndVector* const src = &m_neighbors[0][0][0];
+	ndFloat32* const dstIsoValue = &isoValue[0][0][0];
+	
+	for (ndInt32 i = 0; i < sizeof (isoValue)/sizeof (ndFloat32); ++i)
+	{
+		ndVector p(m_point + src[i]);
+		bool hasNeigborg = m_parent->Find(p);
+		dstIsoValue[i] = hasNeigborg ? ndFloat32(1.0f) : ndFloat32(0.0f);
+	}
+
+	ndIsoCell cell;
+	ndVector point((m_point + ndVector::m_half).GetInt());
+	for (ndInt32 z = 0; z < 2; ++z)
+	{
+		cell.m_z = point.m_iz + z;
+		for (ndInt32 y = 0; y < 2; ++y)
+		{
+			cell.m_y = point.m_iy + y;
+			for (ndInt32 x = 0; x < 2; ++x)
+			{
+				cell.m_x = point.m_ix + x;
+				cell.m_isoValues[0][0][0] = isoValue[z + 0][y + 0][x + 0];
+				cell.m_isoValues[0][0][1] = isoValue[z + 0][y + 0][x + 1];
+				cell.m_isoValues[0][1][0] = isoValue[z + 0][y + 1][x + 0];
+				cell.m_isoValues[0][1][1] = isoValue[z + 0][y + 1][x + 1];
+				cell.m_isoValues[1][0][0] = isoValue[z + 1][y + 0][x + 0];
+				cell.m_isoValues[1][0][1] = isoValue[z + 1][y + 0][x + 1];
+				cell.m_isoValues[1][1][0] = isoValue[z + 1][y + 1][x + 0];
+				cell.m_isoValues[1][1][1] = isoValue[z + 1][y + 1][x + 1];
+				isoSurface->ProcessCell(cell);
+			}
+		}
+	}
+}
+
+void ndIsoSurface::ndOctree::ProccessCells(ndIsoSurface* const isoSurface)
+{
+	if (m_fullMask == 0xff)
+	{
+		dAssert(0);
+	}
+	else
+	{
+		for (ndInt32 i = 0; i < 8; i++)
+		{
+			if (m_children[i])
+			{
+				m_children[i]->ProccessCells(isoSurface);
+			}
+		}
+	}
+}
+

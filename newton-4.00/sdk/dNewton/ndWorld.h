@@ -149,9 +149,9 @@ class ndWorld: public ndClassAlloc
 
 	void ModelUpdate();
 	void ModelPostUpdate();
-	void ParticleUpdate();
 	void CalculateAverageUpdateTime();
 	void SubStepUpdate(ndFloat32 timestep);
+	void ParticleUpdate(ndFloat32 timestep);
 
 	bool SkeletonJointTest(ndJointBilateralConstraint* const jointA) const;
 	static ndInt32 CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void* notUsed);

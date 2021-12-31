@@ -39,9 +39,11 @@ class ndBodySphFluid: public ndBodyParticleSet
 	virtual ndBodySphFluid* GetAsBodySphFluid();
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
+	D_NEWTON_API virtual void BeginAddRemove();
 	D_NEWTON_API virtual void AddParticle(const ndFloat32 mass, const ndVector& position, const ndVector& velocity);
+	D_NEWTON_API virtual void EndAddRemove();
 
-	D_NEWTON_API virtual void GenerateIsoSurface(const ndWorld* const world);
+	D_NEWTON_API virtual void GenerateIsoSurface();
 
 	const ndIsoSurface& GetIsoSurface() const;
 
@@ -54,6 +56,20 @@ class ndBodySphFluid: public ndBodyParticleSet
 	{
 		ndAdjacentGrid = 0,
 		ndHomeGrid = 1,
+	};
+
+	class ndUpperDidit
+	{
+		public:
+		ndUpperDidit()
+			:m_x(0)
+			,m_y(0)
+			,m_z(0)
+		{
+		}
+		ndInt32 m_x;
+		ndInt32 m_y;
+		ndInt32 m_z;
 	};
 
 	class ndGridHash
@@ -76,7 +92,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 			m_z = z;
 		}
 
-		ndGridHash(const ndVector& grid, ndInt32 particelIndex)
+		ndGridHash(const ndVector& grid, ndInt32 particleIndex)
 		{
 			dAssert(grid.m_x >= ndFloat32 (0.0f));
 			dAssert(grid.m_y >= ndFloat32 (0.0f));
@@ -92,8 +108,9 @@ class ndBodySphFluid: public ndBodyParticleSet
 			m_y = hash.m_iy;
 			m_z = hash.m_iz;
 
+			m_cellIsPadd = 1;
 			m_cellType = ndAdjacentGrid;
-			m_particleIndex = particelIndex;
+			m_particleIndex = particleIndex;
 		}
 
 		union
@@ -118,7 +135,8 @@ class ndBodySphFluid: public ndBodyParticleSet
 		};
 
 		ndInt32 m_particleIndex;
-		ndGridType m_cellType;
+		ndInt8 m_cellType;
+		ndInt8 m_cellIsPadd;
 	};
 
 	class ndParticlePair
@@ -141,14 +159,11 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void BuildPairs(const ndWorld* const world);
 	void CreateGrids(const ndWorld* const world);
 	void CalculateAccelerations(const ndWorld* const world);
-	void AddCounters(const ndWorld* const world, ndContext& context) const;
 	void CaculateAABB(const ndWorld* const world, ndVector& boxP0, ndVector& boxP1) const;
 
-	void SortByCenterType();
-	void SortSingleThreaded();
-	void SortParallel(const ndWorld* const world);
+	void SortCellBuckects(const ndWorld* const world);
+	void SortByCenterType(const ndWorld* const world);
 	void CalculateScans(const ndWorld* const world);
-	void CalculateScansDebug(ndArray<ndInt32>& gridScans);
 	ndFloat32 CalculateGridSize() const;
 
 	ndVector m_box0;
@@ -156,9 +171,11 @@ class ndBodySphFluid: public ndBodyParticleSet
 	ndArray<ndGridHash> m_hashGridMap;
 	ndArray<ndParticlePair> m_particlesPairs;
 	ndArray<ndGridHash> m_hashGridMapScratchBuffer;
-	ndArray<ndInt32> m_gridScans[D_MAX_THREADS_COUNT];
-	ndInt32 m_upperDigisIsValid[3];
+	ndArray<ndInt32> m_gridScans;
+	ndArray<ndInt32> m_partialsGridScans[D_MAX_THREADS_COUNT];
+	ndUpperDidit m_upperDigitsIsValid;
 	ndIsoSurface m_isoSurcase;
+	bool m_beginEndState;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const ndFastRay&, const ndFloat32) const

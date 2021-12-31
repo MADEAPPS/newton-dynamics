@@ -20,12 +20,12 @@
 #include "ndDemoEntityManager.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
-
 class ndIsoSurfaceMesh : public ndDemoMesh
 {
 	public:
-	ndIsoSurfaceMesh(const ndShaderPrograms& shaderCache)
+	ndIsoSurfaceMesh(const ndShaderPrograms& shaderCache, ndDemoMesh* const parentMesh)
 		:ndDemoMesh("isoSurface")
+		,m_parentMesh(parentMesh)
 	{
 		m_shader = shaderCache.m_diffuseEffect;
 
@@ -36,27 +36,38 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 		segment->m_material.m_diffuse = ndVector(0.1f, 0.6f, 0.9f, 0.0f);
 		segment->m_material.m_ambient = ndVector(0.1f, 0.6f, 0.9f, 0.0f);
 
-		segment->SetOpacity(0.4f);
+		//segment->SetOpacity(0.4f);
+		segment->SetOpacity(1.0f);
 		segment->m_segmentStart = 0;
 		segment->m_indexCount = 0;
-		m_hasTransparency = true;
+		//m_hasTransparency = true;
+		m_hasTransparency = false;
 	}
 
 	void UpdateBuffers(const ndArray<glPositionNormalUV>& points, const ndArray<ndInt32>& indexList)
 	{
-		//OptimizeForRender(points, indexList);
 		OptimizeForRender(&points[0], points.GetCount(), &indexList[0], indexList.GetCount());
 
 		ndDemoSubMesh& segment = GetFirst()->GetInfo();
 		segment.m_indexCount = indexList.GetCount();
 	}
+
+	//void RenderTransparency(ndDemoEntityManager* const scene, const ndMatrix& modelMatrix)
+	void RenderTransparency(ndDemoEntityManager* const, const ndMatrix&)
+	{
+		dAssert(0);
+		dTrace(("implement traparent iso surface render\n"));
+		//ndDemoMesh::RenderTransparency(scene, modelMatrix);
+	}
+
+	ndDemoMesh* m_parentMesh;
 };
 
 class ndWaterVolumeEntity : public ndDemoEntity
 {
 	public:
 	//ndWaterVolumeEntity(ndDemoEntityManager* const scene, const ndMatrix& location, const ndVector& size, ndBodySphFluid* const fluidBody, ndFloat32 radius)
-		ndWaterVolumeEntity(ndDemoEntityManager* const scene, const ndMatrix& location, const ndVector&, ndBodySphFluid* const fluidBody, ndFloat32)
+	ndWaterVolumeEntity(ndDemoEntityManager* const scene, const ndMatrix& location, const ndVector&, ndBodySphFluid* const fluidBody, ndFloat32)
 		:ndDemoEntity(location, nullptr)
 		,m_fluidBody(fluidBody)
 		,m_hasNewMesh(false)
@@ -72,10 +83,9 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		SetMesh(geometry, dGetIdentityMatrix());
 
 		scene->AddEntity(this);
+		m_isoSurfaceMesh0 = new ndIsoSurfaceMesh(scene->GetShaderCache(), geometry);
+		m_isoSurfaceMesh1 = new ndIsoSurfaceMesh(scene->GetShaderCache(), geometry);
 		geometry->Release();
-
-		m_isoSurfaceMesh0 = new ndIsoSurfaceMesh(scene->GetShaderCache());
-		m_isoSurfaceMesh1 = new ndIsoSurfaceMesh(scene->GetShaderCache());
 	}
 
 	~ndWaterVolumeEntity()
@@ -96,45 +106,46 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		// render the fluid;
 		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
 		
-		ndScopeSpinLock lock(m_lock);
-		if (m_hasNewMesh)
-		{
-			m_hasNewMesh = false;
-			m_isoSurfaceMesh1->UpdateBuffers(m_points, m_indexList);
-			dSwap(m_isoSurfaceMesh0, m_isoSurfaceMesh1);
-		}
+		//ndScopeSpinLock lock(m_lock);
+		//if (m_hasNewMesh)
+		//{
+		//	m_hasNewMesh = false;
+		//	m_isoSurfaceMesh1->UpdateBuffers(m_points, m_indexList);
+		//	dSwap(m_isoSurfaceMesh0, m_isoSurfaceMesh1);
+		//}
 
 		// render the cage;
 		//ndDemoEntity::Render(timeStep, scene, matrix);
 	}
 
-	void UpdateIsoSuface(const ndIsoSurface& isoSurface)
+	//void UpdateIsoSuface(const ndIsoSurface& isoSurface)
+	void UpdateIsoSuface()
 	{
-		if (isoSurface.GetVertexCount())
+		const ndIsoSurface& isoSurface = m_fluidBody->GetIsoSurface();
+		dAssert(isoSurface.GetVertexCount());
+		m_points.SetCount(isoSurface.GetVertexCount());
+		const ndVector* const points = isoSurface.GetPoints();
+		const ndVector* const normals = isoSurface.GetNormals();
+		for (ndInt32 i = 0; i < isoSurface.GetVertexCount(); i++)
 		{
-			m_points.Resize(isoSurface.GetVertexCount());
-			m_points.SetCount(isoSurface.GetVertexCount());
-			const ndVector* const points = isoSurface.GetPoints();
-			const ndVector* const normals = isoSurface.GetNormals();
-			for (ndInt32 i = 0; i < isoSurface.GetVertexCount(); i++)
-			{
-				m_points[i].m_posit = glVector3(GLfloat(points[i].m_x), GLfloat(points[i].m_y), GLfloat(points[i].m_z));
-				m_points[i].m_normal = glVector3(GLfloat(normals[i].m_x), GLfloat(normals[i].m_y), GLfloat(normals[i].m_z));
-				m_points[i].m_uv.m_u = GLfloat(0.0f);
-				m_points[i].m_uv.m_v = GLfloat(0.0f);
-			}
-
-			m_indexList.Resize(isoSurface.GetIndexCount());
-			m_indexList.SetCount(isoSurface.GetIndexCount());
-			const ndUnsigned64* const indexList = isoSurface.GetIndexList();
-			for (ndInt32 i = 0; i < isoSurface.GetIndexCount(); i++)
-			{
-				m_indexList[i] = ndInt32(indexList[i]);
-			}
-
-			ndScopeSpinLock lock(m_lock);
-			m_hasNewMesh = true;
+			m_points[i].m_posit = glVector3(GLfloat(points[i].m_x), GLfloat(points[i].m_y), GLfloat(points[i].m_z));
+			m_points[i].m_normal = glVector3(GLfloat(normals[i].m_x), GLfloat(normals[i].m_y), GLfloat(normals[i].m_z));
+			m_points[i].m_uv.m_u = GLfloat(0.0f);
+			m_points[i].m_uv.m_v = GLfloat(0.0f);
 		}
+		
+		m_indexList.SetCount(isoSurface.GetIndexCount());
+		const ndUnsigned64* const indexList = isoSurface.GetIndexList();
+		for (ndInt32 i = 0; i < isoSurface.GetIndexCount(); i++)
+		{
+			m_indexList[i] = ndInt32(indexList[i]);
+		}
+
+		m_isoSurfaceMesh1->UpdateBuffers(m_points, m_indexList);
+		dSwap(m_isoSurfaceMesh0, m_isoSurfaceMesh1);
+
+		//	ndScopeSpinLock lock(m_lock);
+		//	m_hasNewMesh = true;
 	}
 
 	ndBodySphFluid* m_fluidBody;
@@ -156,15 +167,16 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 
 	void OnTransform(ndInt32, const ndMatrix&)
 	{
-		ndBodySphFluid* const fluid = GetBody()->GetAsBodySphFluid();
-		dAssert(fluid);
-
-		//fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.25f);
-		fluid->GenerateIsoSurface(m_manager->GetWorld());
-		const ndIsoSurface& isoSurface = fluid->GetIsoSurface();
-
-		ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
-		entity->UpdateIsoSuface(isoSurface);
+		//dAssert(0);
+		dTrace(("skip OnTransform for now\n"));
+		//ndBodySphFluid* const fluid = GetBody()->GetAsBodySphFluid();
+		//dAssert(fluid);
+		//
+		//fluid->GenerateIsoSurface();
+		//const ndIsoSurface& isoSurface = fluid->GetIsoSurface();
+		//
+		//ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
+		//entity->UpdateIsoSuface(isoSurface);
 	}
 };
 
@@ -186,8 +198,6 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 
 	fluidObject->SetParticleRadius(diameter * 0.5f);
 
-	//ndInt32 particleCountPerAxis = 32;
-	//ndInt32 particleCountPerAxis = 25;
 	ndInt32 particleCountPerAxis = 32;
 	ndFloat32 spacing = diameter * 1.0f;
 
@@ -195,28 +205,30 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	ndVector origin(-offset, 1.0f, -offset, ndFloat32(0.0f));
 
 	matrix.m_posit += origin;
+matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 0.0f);
 	
-	for (ndInt32 z = 0; z < particleCountPerAxis; z++)
-	//for (ndInt32 z = 0; z < 1; z++)
+	particleCountPerAxis = 2;
+	fluidObject->BeginAddRemove();
+	
+	//for (ndInt32 y = 0; y < particleCountPerAxis; y++)
+	for (ndInt32 y = 0; y < 1; y++)
 	{
-		for (ndInt32 y = 0; y < particleCountPerAxis; y++)
-		//for (ndInt32 y = 0; y < 1; y++)
+		//for (ndInt32 z = 0; z < particleCountPerAxis; z++)
+		for (ndInt32 z = 0; z < 1; z++)
 		{
 			for (ndInt32 x = 0; x < particleCountPerAxis; x++)
-			//for (ndInt32 x = 0; x < 1; x++)
 			{
 				ndVector posit (matrix.TransformVector(ndVector (x * spacing, y * spacing, z * spacing, ndFloat32 (1.0f))));
 				fluidObject->AddParticle(0.1f, posit, ndVector::m_zero);
-
-				//ndVector xxxx(ndVector::m_zero);
-				//fluidObject->AddParticle(0.1f, xxxx, ndVector::m_zero);
-
-				//posit += ndVector(0.01f, 0.01f, 0.01f, 0.0f);
-				//fluidObject->AddParticle(0.1f, origin + posit, ndVector::m_zero);
 			}
 		}
 	}
+	fluidObject->EndAddRemove();
 
+	//const ndIsoSurface& isoSurface = fluidObject->GetIsoSurface();
+	//entity->UpdateIsoSuface(isoSurface);
+	//entity->m_isoSurfaceMesh0->UpdateBuffers(m_points, m_indexList);
+	entity->UpdateIsoSuface();
 	world->AddBody(fluidObject);
 }
 
