@@ -105,7 +105,9 @@ class ndWaterVolumeEntity : public ndDemoEntity
 	
 		// render the fluid;
 		ndScopeSpinLock lock(m_lock);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		
 		if (m_hasNewMesh)
 		{
