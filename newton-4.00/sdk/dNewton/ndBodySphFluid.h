@@ -155,7 +155,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 		ndInt32 m_histogram[D_MAX_THREADS_COUNT][1 << D_RADIX_DIGIT_SIZE];
 	};
 
-	void AddIsoSurfacePoints();
 	void SortGrids(const ndWorld* const world);
 	void BuildPairs(const ndWorld* const world);
 	void CreateGrids(const ndWorld* const world);

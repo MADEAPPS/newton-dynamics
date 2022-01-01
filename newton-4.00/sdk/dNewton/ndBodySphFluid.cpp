@@ -279,34 +279,13 @@ void ndBodySphFluid::SortCellBuckects(const ndWorld* const world)
 	}
 }
 
-void ndBodySphFluid::AddIsoSurfacePoints()
-{
-	D_TRACKTIME();
-	for (ndInt32 i = 0; i < m_posit.GetCount(); ++i)
-	{
-		m_isoSurfase.AddPoint(m_posit[i]);
-	}
-}
 
 void ndBodySphFluid::GenerateIsoSurface()
 {
 	D_TRACKTIME();
-	ndVector boxP0(ndFloat32(1.0e10f));
-	ndVector boxP1(ndFloat32(-1.0e10f));
-	//CaculateAABB(world, boxP0, boxP1);
-	for (ndInt32 i = 0; i < m_posit.GetCount(); ++i)
-	{
-		boxP0 = boxP0.GetMin(m_posit[i]);
-		boxP1 = boxP1.GetMax(m_posit[i]);
-	}
 
 	ndFloat32 gridSize = m_radius * ndFloat32(2.0f);
-
-	m_isoSurfase.Begin(boxP0, boxP1, gridSize);
-	AddIsoSurfacePoints();
-	m_isoSurfase.End();
-
-	return;
+	m_isoSurfase.GenerateMesh(m_posit, gridSize);
 }
 
 void ndBodySphFluid::CalculateScans(const ndWorld* const world)

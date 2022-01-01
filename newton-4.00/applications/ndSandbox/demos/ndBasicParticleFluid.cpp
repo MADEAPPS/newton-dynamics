@@ -122,11 +122,12 @@ class ndWaterVolumeEntity : public ndDemoEntity
 	void UpdateIsoSuface() const
 	{
 		const ndIsoSurface& isoSurface = m_fluidBody->GetIsoSurface();
-		dAssert(isoSurface.GetVertexCount());
-		m_points.SetCount(isoSurface.GetVertexCount());
-		const ndVector* const points = isoSurface.GetPoints();
-		const ndVector* const normals = isoSurface.GetNormals();
-		for (ndInt32 i = 0; i < isoSurface.GetVertexCount(); i++)
+
+		const ndArray<ndVector>& points = isoSurface.GetPoints();
+		const ndArray<ndVector>& normals = isoSurface.GetNormals();
+		dAssert(points.GetCount());
+		m_points.SetCount(points.GetCount());
+		for (ndInt32 i = 0; i < points.GetCount(); ++i)
 		{
 			m_points[i].m_posit = glVector3(GLfloat(points[i].m_x), GLfloat(points[i].m_y), GLfloat(points[i].m_z));
 			m_points[i].m_normal = glVector3(GLfloat(normals[i].m_x), GLfloat(normals[i].m_y), GLfloat(normals[i].m_z));
@@ -134,11 +135,13 @@ class ndWaterVolumeEntity : public ndDemoEntity
 			m_points[i].m_uv.m_v = GLfloat(0.0f);
 		}
 		
-		m_indexList.SetCount(isoSurface.GetIndexCount());
-		const ndUnsigned64* const indexList = isoSurface.GetIndexList();
-		for (ndInt32 i = 0; i < isoSurface.GetIndexCount(); i++)
+		const ndArray<ndIsoSurface::ndTriangle>& indexList = isoSurface.GetTriangles();
+		m_indexList.SetCount(indexList.GetCount() * 3);
+		for (ndInt32 i = 0; i < indexList.GetCount(); i++)
 		{
-			m_indexList[i] = ndInt32(indexList[i]);
+			m_indexList[i * 3 + 0] = indexList[i].m_index[0];
+			m_indexList[i * 3 + 1] = indexList[i].m_index[1];
+			m_indexList[i * 3 + 2] = indexList[i].m_index[2];
 		}
 
 		m_isoSurfaceMesh1->UpdateBuffers(m_points, m_indexList);
@@ -203,8 +206,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 0.0f);
 	
 	particleCountPerAxis = 16;
-	fluidObject->BeginAddRemove();
 
+	fluidObject->BeginAddRemove();
 	for (ndInt32 y = 0; y < particleCountPerAxis; y++)
 	{
 		for (ndInt32 z = 0; z < particleCountPerAxis; z++)
