@@ -26,6 +26,8 @@
 #include "ndProfiler.h"
 #include "ndIsoSurface.h"
 
+#define D_USE_ALL_GRIDS
+
 // adapted from code by written by Paul Bourke may 1994
 //http://paulbourke.net/geometry/polygonise/
 
@@ -512,13 +514,6 @@ ndIsoSurface::ndImplementation& ndIsoSurface::GetImplementation() const
 	return implementation;
 }
 
-void ndIsoSurface::GenerateMesh(const ndArray<ndVector>& pointCloud, ndFloat32 gridSize)
-{
-	ndImplementation& implementation = GetImplementation();
-
-	implementation.BuildMesh(this, pointCloud, gridSize);
-}
-
 ndIsoSurface::ndImplementation::ndOctreeInterface::ndOctreeInterface(ndOctreeInterface* const parent)
 	:ndContainersFreeListAlloc<ndOctreeInterface>()
 	,m_parent(parent)
@@ -750,16 +745,21 @@ void ndIsoSurface::ndImplementation::ndOctree::Insert(const ndVector& point, ndI
 				delete m_children[i];
 				m_children[i] = nullptr;
 			}
+
+			#ifndef D_USE_ALL_GRIDS
 			if (m_parent)
 			{
-				//m_parent->m_fullMask = m_parent->m_fullMask | (1 << parentQuadrant);
+				m_parent->m_fullMask = m_parent->m_fullMask | (1 << parentQuadrant);
 			}
+			#endif
 		}
 	}
 	else if (!m_children[code])
 	{
+		#ifndef D_USE_ALL_GRIDS
+		m_fullMask = m_fullMask | (1 << code);
+		#endif
 		m_children[code] = new ndOctreeLeaf(point, this);
-		//m_fullMask = m_fullMask | (1 << code);
 		if (m_fullMask == 0xff)
 		{
 			for (ndInt32 i = 0; i < 8; ++i)
@@ -768,10 +768,13 @@ void ndIsoSurface::ndImplementation::ndOctree::Insert(const ndVector& point, ndI
 				delete m_children[i];
 				m_children[i] = nullptr;
 			}
+
+			#ifndef D_USE_ALL_GRIDS
 			if (m_parent)
 			{
-				//m_parent->m_fullMask = m_parent->m_fullMask | (1 << parentQuadrant);
+				m_parent->m_fullMask = m_parent->m_fullMask | (1 << parentQuadrant);
 			}
+			#endif
 		}
 	}
 }
@@ -1152,4 +1155,18 @@ void ndIsoSurface::ndImplementation::BuildMesh(ndIsoSurface* const me, const ndA
 	m_triangleMap.RemoveAll();
 	delete m_octree;
 	m_octree = nullptr;
+}
+
+void ndIsoSurface::GenerateMeshNaive(const ndArray<ndVector>& pointCloud, ndFloat32 gridSize)
+{
+	ndImplementation& implementation = GetImplementation();
+
+	implementation.BuildMesh(this, pointCloud, gridSize);
+}
+
+void ndIsoSurface::GenerateMesh(const ndArray<ndVector>& pointCloud, ndFloat32 gridSize)
+{
+	ndImplementation& implementation = GetImplementation();
+
+	implementation.BuildMesh(this, pointCloud, gridSize);
 }

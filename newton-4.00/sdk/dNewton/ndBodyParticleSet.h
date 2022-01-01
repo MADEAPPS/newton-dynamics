@@ -34,16 +34,13 @@ class ndBodyParticleSet: public ndBody
 	D_NEWTON_API virtual ~ndBodyParticleSet ();
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
+	ndArray<ndVector>& GetPositions();
 	const ndArray<ndVector>& GetPositions() const;
 	virtual ndBodyParticleSet* GetAsBodyParticleSet();
 
 	ndFloat32 GetParticleRadius() const;
 	void SetParticleRadius(ndFloat32 raidus);
 	
-	D_NEWTON_API virtual void BeginAddRemove() = 0;
-	D_NEWTON_API virtual void AddParticle(const ndFloat32 mass, const ndVector& position, const ndVector& velocity) = 0;
-	D_NEWTON_API virtual void EndAddRemove() = 0;
-
 	D_NEWTON_API virtual void Update(const ndWorld* const workd, ndFloat32 timestep) = 0;
 
 	protected:
@@ -66,6 +63,11 @@ inline ndFloat32 ndBodyParticleSet::GetParticleRadius() const
 inline void ndBodyParticleSet::SetParticleRadius(ndFloat32 raidus)
 {
 	m_radius = raidus;
+}
+
+inline ndArray<ndVector>& ndBodyParticleSet::GetPositions()
+{
+	return m_posit;
 }
 
 inline const ndArray<ndVector>& ndBodyParticleSet::GetPositions() const

@@ -24,30 +24,6 @@
 #include "ndWorld.h"
 #include "ndBodySphFluid.h"
 
-
-/*
-{
-ndFloat32 xxx[6][6][6];
-for (ndInt32 i = 0; i < 6 * 6 * 6; ++i)
-{
-ndFloat32* yyy = &xxx[0][0][0];
-yyy[i] = 1.0f;
-}
-for (ndInt32 i = 0; i < uniqueCount; ++i)
-{
-ndInt32 x = m_hashGridMap[i].m_x;
-ndInt32 y = m_hashGridMap[i].m_y;
-ndInt32 z = m_hashGridMap[i].m_z;
-
-xxx[z][y][x] = 0.0f;
-}
-
-dIsoSurfaceOld isoSurcase;
-isoSurcase.GenerateSurface(&xxx[0][0][0], 0.5f, 5, 5, 5, gridSize, gridSize, gridSize);
-cellCount *= 1;
-}
-*/
-
 ndBodySphFluid::ndBodySphFluid()
 	:ndBodyParticleSet()
 	,m_box0(ndFloat32(-1e10f))
@@ -56,10 +32,7 @@ ndBodySphFluid::ndBodySphFluid()
 	,m_particlesPairs(1024)
 	,m_hashGridMapScratchBuffer(1024)
 	,m_gridScans(1024)
-	//,m_partialsGridScans(1024)
 	,m_upperDigitsIsValid()
-	,m_isoSurfase()
-	,m_beginEndState(false)
 {
 	for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; i++)
 	{
@@ -73,7 +46,6 @@ ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_box1(ndFloat32(1e10f))
 	,m_hashGridMap()
 	,m_hashGridMapScratchBuffer()
-	,m_beginEndState(false)
 {
 	// nothing was saved
 	dAssert(0);
@@ -89,25 +61,6 @@ void ndBodySphFluid::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 	dAssert(0);
 	//nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodySphFluid", nodeid);
 	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
-}
-
-void ndBodySphFluid::BeginAddRemove()
-{
-	m_beginEndState = true;
-}
-
-void ndBodySphFluid::AddParticle(const ndFloat32, const ndVector& position, const ndVector&)
-{
-	dAssert(m_beginEndState);
-	ndVector point(position);
-	point.m_w = ndFloat32(1.0f);
-	m_posit.PushBack(point);
-}
-
-void ndBodySphFluid::EndAddRemove()
-{
-	m_beginEndState = false;
-	GenerateIsoSurface();
 }
 
 void ndBodySphFluid::CaculateAABB(const ndWorld* const world, ndVector& boxP0, ndVector& boxP1) const
@@ -277,15 +230,6 @@ void ndBodySphFluid::SortCellBuckects(const ndWorld* const world)
 		dAssert(0);
 		ndCountingSort<ndGridHash, ndKey_zhigh, D_RADIX_DIGIT_SIZE>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
 	}
-}
-
-
-void ndBodySphFluid::GenerateIsoSurface()
-{
-	D_TRACKTIME();
-
-	ndFloat32 gridSize = m_radius * ndFloat32(2.0f);
-	m_isoSurfase.GenerateMesh(m_posit, gridSize);
 }
 
 void ndBodySphFluid::CalculateScans(const ndWorld* const world)

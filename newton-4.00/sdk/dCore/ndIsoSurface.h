@@ -45,6 +45,7 @@ class ndIsoSurface: public ndClassAlloc
 	const ndArray<ndTriangle>& GetTriangles() const;
 
 	D_CORE_API void GenerateMesh(const ndArray<ndVector>& pointCloud, ndFloat32 gridSize);
+	D_CORE_API void GenerateMeshNaive(const ndArray<ndVector>& pointCloud, ndFloat32 gridSize);
 
 	private:
 	ndImplementation& GetImplementation() const;

@@ -39,14 +39,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 	virtual ndBodySphFluid* GetAsBodySphFluid();
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	D_NEWTON_API virtual void BeginAddRemove();
-	D_NEWTON_API virtual void AddParticle(const ndFloat32 mass, const ndVector& position, const ndVector& velocity);
-	D_NEWTON_API virtual void EndAddRemove();
-
-	D_NEWTON_API virtual void GenerateIsoSurface();
-
-	const ndIsoSurface& GetIsoSurface() const;
-
 	protected:
 	D_NEWTON_API virtual void Update(const ndWorld* const world, ndFloat32 timestep);
 	virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const;
@@ -173,8 +165,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 	ndArray<ndInt32> m_gridScans;
 	ndArray<ndInt32> m_partialsGridScans[D_MAX_THREADS_COUNT];
 	ndUpperDidit m_upperDigitsIsValid;
-	ndIsoSurface m_isoSurfase;
-	bool m_beginEndState;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const ndFastRay&, const ndFloat32) const
@@ -185,11 +175,6 @@ inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const ndFastRay&, const nd
 inline ndBodySphFluid* ndBodySphFluid::GetAsBodySphFluid()
 { 
 	return this; 
-}
-
-inline const ndIsoSurface& ndBodySphFluid::GetIsoSurface() const
-{
-	return m_isoSurfase;
 }
 
 inline ndFloat32 ndBodySphFluid::CalculateGridSize() const
