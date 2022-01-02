@@ -144,7 +144,7 @@ void ndBodySphFluid::SortByCenterType(const ndWorld* const world)
 		public:
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
-			return 1-cell.m_cellType;
+			return 1 - ndInt32(cell.m_cellType);
 		}
 	};
 
@@ -690,7 +690,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			upperDigits.m_z |= cell.m_zHigh;
 
 			m_hashGridMap[gridCount] = cell;
-			gridCount += (1 - cell.m_cellIsPadd);
+			gridCount += (1 - ndInt32 (cell.m_cellIsPadd));
 		}
 	}
 #endif
@@ -838,7 +838,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 
 	CalculateScans(world);
 
-	// do not save pairs, instead buidl them at run time.
+	// do not save pairs, instead build them at run time.
 	//ndScene* const scene = world->GetScene();
 	//m_particlesPairs.SetCount(0);
 	//ndBodySphFluidCreatePair::ndContext context(this);

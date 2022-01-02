@@ -25,7 +25,13 @@
 #include "ndNewtonStdafx.h"
 #include "ndBodyParticleSet.h"
 
-#define D_RADIX_DIGIT_SIZE	10
+#define D_USE_SMALL_HASH
+#ifdef D_USE_SMALL_HASH
+	#define D_RADIX_DIGIT_SIZE		7
+#else
+	#define D_RADIX_DIGIT_SIZE		10
+#endif
+
 //#define D_GRID_SIZE_FACTOR	ndFloat32(4.0f)
 
 D_MSV_NEWTON_ALIGN_32
@@ -105,29 +111,53 @@ class ndBodySphFluid: public ndBodyParticleSet
 			m_particleIndex = particleIndex;
 		}
 
-		union
-		{
-			struct
+		#ifdef D_USE_SMALL_HASH
+			union
 			{
-				ndUnsigned64 m_x : D_RADIX_DIGIT_SIZE * 2;
-				ndUnsigned64 m_y : D_RADIX_DIGIT_SIZE * 2;
-				ndUnsigned64 m_z : D_RADIX_DIGIT_SIZE * 2;
+				struct
+				{
+					ndUnsigned64 m_x			 : D_RADIX_DIGIT_SIZE * 2;
+					ndUnsigned64 m_y			 : D_RADIX_DIGIT_SIZE * 2;
+					ndUnsigned64 m_z			 : D_RADIX_DIGIT_SIZE * 2;
+					ndUnsigned64 m_particleIndex : 20;
+					ndUnsigned64 m_cellType		 : 1;
+					ndUnsigned64 m_cellIsPadd	 : 1;
+				};
+				struct
+				{
+					ndUnsigned64 m_xLow		: D_RADIX_DIGIT_SIZE;
+					ndUnsigned64 m_xHigh	: D_RADIX_DIGIT_SIZE;
+					ndUnsigned64 m_yLow		: D_RADIX_DIGIT_SIZE;
+					ndUnsigned64 m_yHigh	: D_RADIX_DIGIT_SIZE;
+					ndUnsigned64 m_zLow		: D_RADIX_DIGIT_SIZE;
+					ndUnsigned64 m_zHigh	: D_RADIX_DIGIT_SIZE;
+				};
+				ndUnsigned64 m_gridHash		: D_RADIX_DIGIT_SIZE * 2 * 3;
 			};
-			struct
+		#else
+			union
 			{
-				ndUnsigned64 m_xLow  : D_RADIX_DIGIT_SIZE;
-				ndUnsigned64 m_xHigh : D_RADIX_DIGIT_SIZE;
-				ndUnsigned64 m_yLow  : D_RADIX_DIGIT_SIZE;
-				ndUnsigned64 m_yHigh : D_RADIX_DIGIT_SIZE;
-				ndUnsigned64 m_zLow  : D_RADIX_DIGIT_SIZE;
-				ndUnsigned64 m_zHigh : D_RADIX_DIGIT_SIZE;
+				struct
+				{
+					ndUnsigned64 m_x : D_RADIX_DIGIT_SIZE * 2;
+					ndUnsigned64 m_y : D_RADIX_DIGIT_SIZE * 2;
+					ndUnsigned64 m_z : D_RADIX_DIGIT_SIZE * 2;
+				};
+				struct
+				{
+					ndUnsigned64 m_xLow : D_RADIX_DIGIT_SIZE;
+					ndUnsigned64 m_xHigh : D_RADIX_DIGIT_SIZE;
+					ndUnsigned64 m_yLow : D_RADIX_DIGIT_SIZE;
+					ndUnsigned64 m_yHigh : D_RADIX_DIGIT_SIZE;
+					ndUnsigned64 m_zLow : D_RADIX_DIGIT_SIZE;
+					ndUnsigned64 m_zHigh : D_RADIX_DIGIT_SIZE;
+				};
+				ndUnsigned64 m_gridHash;
 			};
-			ndUnsigned64 m_gridHash;
-		};
-
-		ndInt32 m_particleIndex;
-		ndInt8 m_cellType;
-		ndInt8 m_cellIsPadd;
+			ndInt32 m_particleIndex;
+			ndInt8 m_cellType;
+			ndInt8 m_cellIsPadd;
+		#endif
 	};
 
 	class ndParticlePair
