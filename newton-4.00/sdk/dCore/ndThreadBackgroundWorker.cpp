@@ -31,6 +31,7 @@ ndThreadBackgroundWorker::ndThreadBackgroundWorker()
 	,m_lock()
 	,m_queueSemaphore()
 	,m_teminate(false)
+	,m_inLoop(false)
 {
 	SetName(__FUNCTION__);
 	Signal();
@@ -44,7 +45,12 @@ ndThreadBackgroundWorker::~ndThreadBackgroundWorker()
 
 void ndThreadBackgroundWorker::Terminate()
 {
-	m_teminate = true;
+	if (m_inLoop)
+	{
+		m_teminate = true;
+		m_queueSemaphore.Terminate();
+		while (m_inLoop);
+	}
 }
 
 void ndThreadBackgroundWorker::SendJob(ndBackgroundJob* const job)
@@ -59,6 +65,7 @@ void ndThreadBackgroundWorker::SendJob(ndBackgroundJob* const job)
 
 void ndThreadBackgroundWorker::ThreadFunction()
 {
+	m_inLoop = true;
 	while (!m_queueSemaphore.Wait() && !m_teminate)
 	{
 		ndBackgroundJob* job;
@@ -71,4 +78,5 @@ void ndThreadBackgroundWorker::ThreadFunction()
 		job->Execute();
 		job->m_jobState = ndBackgroundJob::m_jobCompleted;
 	}
+	m_inLoop = false;
 }
