@@ -49,7 +49,10 @@ void ndThreadBackgroundWorker::Terminate()
 	{
 		m_teminate = true;
 		m_queueSemaphore.Terminate();
-		while (m_inLoop);
+		while (m_inLoop)
+		{
+			std::this_thread::yield();
+		}
 	}
 }
 
