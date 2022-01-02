@@ -57,8 +57,7 @@ class ndBackgroundJob
 	}
 
 	private:
-	ndJobState m_jobState;
-
+	ndAtomic<ndJobState> m_jobState;
 	friend class ndThreadBackgroundWorker;
 };
 
