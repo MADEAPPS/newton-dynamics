@@ -27,6 +27,8 @@
 #include "ndProfiler.h"
 #include "ndIsoSurface.h"
 
+#define D_RADIX_DIGIT_SIZE 8
+
 // adapted from code by written by Paul Bourke may 1994
 //http://paulbourke.net/geometry/polygonise/
 
@@ -90,32 +92,12 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 	void BuildMesh(ndIsoSurface* const me, const ndArray<ndVector>& pointCloud, ndFloat32 gridSize);
 
 	private:
-	void ProcessCell(const ndIsoCell& cell);
-	void RemapIndexArray(ndIsoSurface* const me);
-	void RemapVertexArray(ndIsoSurface* const me);
-	void CalculateNormals(ndIsoSurface* const me);
-	void CalculatedAabb(const ndArray<ndVector>& points);
-	ndUnsigned64 GetEdgeID(const ndIsoCell& cell, ndInt32 edgeCode);
-	ndUnsigned64 GetVertexID(ndInt32 gridX, ndInt32 gridY, ndInt32 gridZ);
-	ndVector CalculateIntersection(const ndIsoCell& cell, ndInt32 edgeCode);
-	ndVector InterpolateEdge(ndFloat32 fX1, ndFloat32 fY1, ndFloat32 fZ1, ndFloat32 fX2, ndFloat32 fY2, ndFloat32 fZ2, ndFloat32 tVal1, ndFloat32 tVal2);
-
-	// ***************
-
-	#define D_RADIX_DIGIT_SIZE 8
-
 	class ndGridHash
 	{
 		public:
 		ndGridHash()
 		{
 		}
-
-		//ndGridHash(const ndGridHash& src)
-		//	:m_gridCellHash(src.m_gridCellHash)
-		//	,m_cellType(0)
-		//{
-		//}
 
 		ndGridHash(const ndGridHash& src, ndInt8 cellType)
 			:m_gridCellHash(src.m_gridCellHash)
@@ -212,10 +194,21 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 		ndInt32 m_z;
 	};
 
+	void xxxxxxxxxx(ndArray<ndIsoCell>& xxxx);
+
 	void RemoveDuplicates();
 	void SortCellBuckects();
 	void GenerateIsoSurface();
+	void ProcessCell(const ndIsoCell& cell);
+	void RemapIndexArray(ndIsoSurface* const me);
+	void RemapVertexArray(ndIsoSurface* const me);
+	void CalculateNormals(ndIsoSurface* const me);
 	void CreateGrids(const ndArray<ndVector>& points);
+	void CalculatedAabb(const ndArray<ndVector>& points);
+	ndUnsigned64 GetEdgeID(const ndIsoCell& cell, ndInt32 edgeCode);
+	ndUnsigned64 GetVertexID(ndInt32 gridX, ndInt32 gridY, ndInt32 gridZ);
+	ndVector CalculateIntersection(const ndIsoCell& cell, ndInt32 edgeCode);
+	ndVector InterpolateEdge(ndFloat32 fX1, ndFloat32 fY1, ndFloat32 fZ1, ndFloat32 fX2, ndFloat32 fY2, ndFloat32 fZ2, ndFloat32 tVal1, ndFloat32 tVal2);
 
 	ndVector m_boxP0;
 	ndVector m_boxP1;
@@ -229,7 +222,6 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 	ndInt32 m_yCellSize;
 	ndInt32 m_zCellSize;
 
-	// *********************
 	ndArray<ndGridHash> m_hashGridMap;
 	ndArray<ndGridHash> m_hashGridMapScratchBuffer;
 	ndUpperDigit m_upperDigitsIsValid;
@@ -970,12 +962,24 @@ void ndIsoSurface::ndImplementation::RemoveDuplicates()
 	m_hashGridMap.SetCount(gridCount);
 }
 
+void ndIsoSurface::ndImplementation::xxxxxxxxxx(ndArray<ndIsoCell>& xxxx)
+{
+	D_TRACKTIME();
+	for (ndInt32 i = 0; i < xxxx.GetCount(); ++i)
+	{
+		ProcessCell(xxxx[i]);
+	}
+}
+
 void ndIsoSurface::ndImplementation::GenerateIsoSurface()
 {
 	D_TRACKTIME();
 	ndInt32 end = 0;
 	const ndInt32 gridCount = m_hashGridMap.GetCount();
 	m_hashGridMap.PushBack(ndGridHash(0xffff, 0xffff, 0xffff));
+
+	static ndArray<ndIsoCell> xxxx(1024);
+	xxxx.SetCount(0);
 	for (ndInt32 i = 0; i < gridCount; i = end)
 	{
 		end = i + 1;
@@ -1005,9 +1009,11 @@ void ndIsoSurface::ndImplementation::GenerateIsoSurface()
 			cell.m_x++;
 			cell.m_y++;
 			cell.m_z++;
-			ProcessCell(cell);
+			//ProcessCell(cell);
+			xxxx.PushBack(cell);
 		}
 	}
+	xxxxxxxxxx(xxxx);
 }
 	
 void ndIsoSurface::ndImplementation::CreateGrids(const ndArray<ndVector>& points)

@@ -80,6 +80,7 @@ ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	,m_deletedBodies()
 	,m_hasPendingObjectToDelete(false)
 	,m_deletedLock()
+	,m_backgroundThread()
 {
 	ClearCache();
 	SetContactNotify(new ndContactCallback);
@@ -87,10 +88,18 @@ ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 
 ndPhysicsWorld::~ndPhysicsWorld()
 {
+	CleanUp();
+}
+
+void ndPhysicsWorld::CleanUp()
+{
+	m_backgroundThread.Terminate();
 	if (m_soundManager)
 	{
 		delete m_soundManager;
+		m_soundManager = nullptr;
 	}
+	ndWorld::CleanUp();
 }
 
 ndDemoEntityManager* ndPhysicsWorld::GetManager() const
@@ -150,6 +159,11 @@ void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 ndSoundManager* ndPhysicsWorld::GetSoundManager() const
 {
 	return m_soundManager;
+}
+
+void ndPhysicsWorld::SendBackgroundJob(ndBackgroundJob* const job)
+{
+	m_backgroundThread.SendJob(job);
 }
 
 void ndPhysicsWorld::OnPostUpdate(ndFloat32 timestep)

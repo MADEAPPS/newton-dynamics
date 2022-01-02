@@ -20,19 +20,20 @@
 #include "ndDemoEntityManager.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
-class ndIsoSurfaceParticleVolume : public ndBodySphFluid
+class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundJob
 {
 	public:
 	ndIsoSurfaceParticleVolume(ndFloat32 radius)
-		:m_indexList(1024)
+		:ndBodySphFluid()
+		,ndBackgroundJob()
+		,m_indexList(1024)
 		,m_points(1024)
-		,ndBodySphFluid()
 		,m_meshIsReady(0)
 	{
 		SetParticleRadius(radius);
 	}
 
-	void UpdateIsoSuface()
+	void UpdateIsoSurface()
 	{
 		m_isoSurface.GenerateMesh(GetPositions(), GetParticleRadius() * ndFloat32 (2.0f));
 		const ndArray<ndVector>& points = m_isoSurface.GetPoints();
@@ -56,9 +57,11 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid
 			m_indexList[i * 3 + 2] = indexList[i].m_index[2];
 		}
 		m_meshIsReady.store(1);
+	}
 		
-		//m_isoSurfaceMesh1->UpdateBuffers(m_points, m_indexList);
-		//dSwap(m_isoSurfaceMesh0, m_isoSurfaceMesh1);
+	virtual void Execute()
+	{
+		UpdateIsoSurface();
 	}
 
 	ndArray<ndInt32> m_indexList;
@@ -149,11 +152,14 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		{
 			ndScopeSpinLock lock(m_lock);
 
-			m_fluidBody->m_meshIsReady.store(0);
-			const ndArray<ndInt32>& indexList = m_fluidBody->m_indexList;
-			const ndArray<glPositionNormalUV>& points = m_fluidBody->m_points;
-			m_isoSurfaceMesh1->UpdateBuffers(points, indexList);
-			dSwap(m_isoSurfaceMesh0, m_isoSurfaceMesh1);
+			if (m_fluidBody->JobState() == ndBackgroundJob::m_jobCompleted)
+			{
+				m_fluidBody->m_meshIsReady.store(0);
+				const ndArray<ndInt32>& indexList = m_fluidBody->m_indexList;
+				const ndArray<glPositionNormalUV>& points = m_fluidBody->m_points;
+				m_isoSurfaceMesh1->UpdateBuffers(points, indexList);
+				dSwap(m_isoSurfaceMesh0, m_isoSurfaceMesh1);
+			}
 		}
 
 		ndMatrix nodeMatrix(dGetIdentityMatrix());
@@ -187,7 +193,13 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 	{
 		ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
 		ndScopeSpinLock lock(entity->m_lock);
-		entity->m_fluidBody->UpdateIsoSuface();
+		//entity->m_fluidBody->UpdateIsoSurface();
+
+		if (entity->m_fluidBody->JobState() == ndBackgroundJob::m_jobCompleted)
+		{
+			ndPhysicsWorld* const world = m_manager->GetWorld();
+			world->SendBackgroundJob(entity->m_fluidBody);
+		}
 	}
 };
 
@@ -232,7 +244,7 @@ matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 0.0f);
 	}
 
 	// make sure we have the first surface generated before rendering.
-	fluidObject->UpdateIsoSuface();
+	fluidObject->UpdateIsoSurface();
 
 	// add particle volume to world
 	world->AddBody(fluidObject);
