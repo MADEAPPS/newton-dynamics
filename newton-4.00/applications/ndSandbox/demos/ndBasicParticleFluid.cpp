@@ -218,8 +218,6 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	matrix.m_posit += origin;
 matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 0.0f);
 	
-	particleCountPerAxis = 16;
-
 	ndArray<ndVector>& particles = fluidObject->GetPositions();
 	for (ndInt32 y = 0; y < particleCountPerAxis; y++)
 	{

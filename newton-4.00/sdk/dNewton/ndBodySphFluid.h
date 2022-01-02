@@ -122,7 +122,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 				ndUnsigned64 m_zLow  : D_RADIX_DIGIT_SIZE;
 				ndUnsigned64 m_zHigh : D_RADIX_DIGIT_SIZE;
 			};
-
 			ndUnsigned64 m_gridHash;
 		};
 

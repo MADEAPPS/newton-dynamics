@@ -563,6 +563,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			scan[1] = 0;
 			#endif
 
+			ndUpperDidit upperDigisIsValid;
 			const ndStartEnd startEnd(fluid->m_posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
@@ -570,9 +571,9 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 				const ndVector p(r * invGridSize);
 				const ndGridHash hashKey(p, i);
 
-				fluid->m_upperDigitsIsValid.m_x |= hashKey.m_xHigh;
-				fluid->m_upperDigitsIsValid.m_y |= hashKey.m_yHigh;
-				fluid->m_upperDigitsIsValid.m_z |= hashKey.m_zHigh;
+				upperDigisIsValid.m_x |= hashKey.m_xHigh;
+				upperDigisIsValid.m_y |= hashKey.m_yHigh;
+				upperDigisIsValid.m_z |= hashKey.m_zHigh;
 				const ndVector p0((r + box0) * invGridSize);
 				const ndVector p1((r + box1) * invGridSize);
 				ndGridHash box0Hash(p0, i);
@@ -602,10 +603,14 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 					dst[i * 8 + j] = quadrand;
 				}
 			}
+
+			fluid->m_upperDigitsIsValid.m_x |= upperDigisIsValid.m_x;
+			fluid->m_upperDigitsIsValid.m_y |= upperDigisIsValid.m_y;
+			fluid->m_upperDigitsIsValid.m_z |= upperDigisIsValid.m_z;
 		}
 	};
 
-	class ndClassifyGrids : public ndScene::ndBaseJob
+	class ndCompactGrids : public ndScene::ndBaseJob
 	{
 		public:
 		void Execute()
@@ -620,8 +625,8 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			const ndInt32 threadID = GetThreadId();
 			const ndInt32 threadCount = m_owner->GetThreadCount();
 			
+			ndUpperDidit upperDigisIsValid;
 			ndInt32* const scan = &context->m_scan.m_scan[threadID][0];
-			ndUpperDidit& upperDigisIsValid = context->m_scan.m_upperDigisIsValid[threadID];
 
 			const ndStartEnd startEnd(dst.GetCount(), threadID, threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -637,6 +642,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 				dst[index] = grid;
 				scan[key] = index + 1;
 			}
+			context->m_scan.m_upperDigisIsValid[threadID] = upperDigisIsValid;
 		}
 	};
 
@@ -662,7 +668,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 	}
 
 	ndInt32 gridCount = context.m_scan.m_scan[0][1] - context.m_scan.m_scan[0][0];
-	scene->SubmitJobs<ndClassifyGrids>(&context);
+	scene->SubmitJobs<ndCompactGrids>(&context);
 
 	ndUpperDidit upperDigits;
 	for (ndInt32 j = 0; j < threadCount; ++j)

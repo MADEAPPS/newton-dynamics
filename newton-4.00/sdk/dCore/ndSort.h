@@ -292,110 +292,39 @@ void ndCountingSort(ndArray<T>& array, ndArray<T>& scratchBuffer)
 	dAssert(keyBitSize > 0);
 	scratchBuffer.SetCount(array.GetCount());
 
-dAssert(0);
-	class ndCountKeys
+	ndInt32 scans[1 << keyBitSize];
+	ndEvaluateKey evaluator;
+	for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 	{
-		public:
-		void Execute()
-		{
-			D_TRACKTIME();
-			const ndArray<T>& array = *m_array;
-
-			ndEvaluateKey evaluator;
-			for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
-			{
-				m_scan[i] = 0;
-			}
-			ndStartEnd startEnd(array.GetCount(), GetThreadId(), m_threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				const T& entry = array[i];
-				const ndInt32 key = evaluator.GetKey(entry);
-				dAssert(key >= 0);
-				dAssert(key < (1 << keyBitSize));
-				m_scan[key] ++;
-			}
-		}
-
-		ndInt32* m_scan;
-		const ndArray<T>* m_array;
-		ndInt32 m_threadCount;
-	};
-
-	class ndSortArray
-	{
-		public:
-		void Execute()
-		{
-			D_TRACKTIME();
-			ndArray<T>& dst = *m_dst;
-			const ndArray<T>& src = *m_src;
-
-			ndEvaluateKey evaluator;
-			ndStartEnd startEnd(src.GetCount(), GetThreadId(), m_threadCount);
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				const T& entry = src[i];
-				const ndInt32 key = evaluator.GetKey(entry);
-				dAssert(key >= 0);
-				dAssert(key < (1 << keyBitSize));
-				const ndInt32 index = m_scan[key];
-				dst[index] = entry;
-				m_scan[key] = index + 1;
-			}
-		}
-
-		ndInt32* m_scan;
-		ndArray<T>* m_dst;
-		const ndArray<T>* m_src;
-		ndInt32 m_threadCount;
-	};
-
-	ndInt32 scans[D_MAX_THREADS_COUNT][1 << keyBitSize];
-
-	ndThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
-	ndCountKeys countKeyKernels[D_MAX_THREADS_COUNT];
-
-	const ndInt32 threadCount = threadPool.GetCount();
-	for (ndInt32 i = 0; i < threadCount; ++i)
-	{
-		countKeyKernels[i].m_array = &array;
-		countKeyKernels[i].m_scan = &scans[i][0];
-		countKeyKernels[i].m_threadCount = threadCount;
-		extJobPtr[i] = &countKeyKernels[i];
+		scans[i] = 0;
 	}
-	threadPool.ExecuteJobs(extJobPtr);
-
-	ndInt32 bits = keyBitSize;
-	if (bits < 11)
+	for (ndInt32 i = 0; i < array.GetCount(); ++i)
 	{
-		ndInt32 sum = 0;
-		for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
-		{
-			for (ndInt32 j = 0; j < threadCount; ++j)
-			{
-				ndInt32 partialSum = scans[j][i];
-				scans[j][i] = sum;
-				sum += partialSum;
-			}
-		}
-	}
-	else
-	{
-		dAssert(0);
+		const T& entry = array[i];
+		const ndInt32 key = evaluator.GetKey(entry);
+		dAssert(key >= 0);
+		dAssert(key < (1 << keyBitSize));
+		scans[key] ++;
 	}
 
-	ndSortArray sortArray[D_MAX_THREADS_COUNT];
-	for (ndInt32 i = 0; i < threadCount; ++i)
+	ndInt32 sum = 0;
+	for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 	{
-		sortArray[i].m_src = &array;
-		sortArray[i].m_dst = &scratchBuffer;
-		sortArray[i].m_scan = &scans[i][0];
-		sortArray[i].m_threadCount = threadCount;
-		extJobPtr[i] = &sortArray[i];
+		ndInt32 partialSum = scans[i];
+		scans[i] = sum;
+		sum += partialSum;
 	}
-	threadPool.ExecuteJobs(extJobPtr);
 
+	for (ndInt32 i = 0; i < array.GetCount(); ++i)
+	{
+		const T& entry = array[i];
+		const ndInt32 key = evaluator.GetKey(entry);
+		dAssert(key >= 0);
+		dAssert(key < (1 << keyBitSize));
+		const ndInt32 index = scans[key];
+		scratchBuffer[index] = entry;
+		scans[key] = index + 1;
+	}
 	array.Swap(scratchBuffer);
 	//#ifdef _DEBUG
 #if 0
@@ -406,6 +335,4 @@ dAssert(0);
 	}
 #endif
 }
-
-
 #endif

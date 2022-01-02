@@ -20,6 +20,7 @@
 */
 
 #include "ndCoreStdafx.h"
+#include "ndSort.h"
 #include "ndDebug.h"
 #include "ndVector.h"
 #include "ndMatrix.h"
@@ -137,19 +138,140 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 	{
 	}
 
+	void BuildMesh(ndIsoSurface* const me, const ndArray<ndVector>& pointCloud, ndFloat32 gridSize);
+	void BuildMeshNaive(ndIsoSurface* const me, const ndArray<ndVector>& pointCloud, ndFloat32 gridSize);
+
+	private:
 	void ProcessCells();
 	void Begin(ndFloat32 gridSize);
 	void ProcessCell(const ndIsoCell& cell);
 	void RemapIndexArray(ndIsoSurface* const me);
 	void RemapVertexArray(ndIsoSurface* const me);
 	void CalculateNormals(ndIsoSurface* const me);
-	void BuildAabb(const ndArray<ndVector>& points);
+	void CalculatedAabb(const ndArray<ndVector>& points);
 	void AddPoints(const ndArray<ndVector>& points);
 	ndUnsigned64 GetEdgeID(const ndIsoCell& cell, ndInt32 edgeCode);
 	ndUnsigned64 GetVertexID(ndInt32 gridX, ndInt32 gridY, ndInt32 gridZ);
 	ndVector CalculateIntersection(const ndIsoCell& cell, ndInt32 edgeCode);
-	void BuildMesh(ndIsoSurface* const me, const ndArray<ndVector>& pointCloud, ndFloat32 gridSize);
 	ndVector InterpolateEdge(ndFloat32 fX1, ndFloat32 fY1, ndFloat32 fZ1, ndFloat32 fX2, ndFloat32 fY2, ndFloat32 fZ2, ndFloat32 tVal1, ndFloat32 tVal2);
+
+	// ***************
+
+	#define D_RADIX_DIGIT_SIZE 8
+
+	class ndGridHash
+	{
+		public:
+		ndGridHash()
+		{
+		}
+
+		//ndGridHash(const ndGridHash& src)
+		//	:m_gridCellHash(src.m_gridCellHash)
+		//	,m_cellType(0)
+		//{
+		//}
+
+		ndGridHash(const ndGridHash& src, ndInt8 cellType)
+			:m_gridCellHash(src.m_gridCellHash)
+			,m_cellType(cellType)
+		{
+		}
+
+
+		ndGridHash(ndInt32 x, ndInt32 y, ndInt32 z)
+		{
+			m_gridCellHash = 0;
+			m_x = ndInt16(x);
+			m_y = ndInt16(y);
+			m_z = ndInt16(z);
+		}
+
+		ndGridHash(const ndVector& grid)
+		{
+			dAssert(grid.m_x >= ndFloat32(0.0f));
+			dAssert(grid.m_y >= ndFloat32(0.0f));
+			dAssert(grid.m_z >= ndFloat32(0.0f));
+			dAssert(grid.m_x < ndFloat32(1 << (D_RADIX_DIGIT_SIZE * 2)));
+			dAssert(grid.m_y < ndFloat32(1 << (D_RADIX_DIGIT_SIZE * 2)));
+			dAssert(grid.m_z < ndFloat32(1 << (D_RADIX_DIGIT_SIZE * 2)));
+			
+			ndVector hash(grid.GetInt());
+			m_gridCellHash = 0;
+			m_x = ndInt16(hash.m_ix);
+			m_y = ndInt16(hash.m_iy);
+			m_z = ndInt16(hash.m_iz);
+		}
+
+		union
+		{
+			struct
+			{
+				ndUnsigned16 m_x;
+				ndUnsigned16 m_y;
+				ndUnsigned16 m_z;
+				ndUnsigned8 m_cellType;
+			};
+			struct
+			{
+				ndUnsigned8 m_xLow;
+				ndUnsigned8 m_xHigh;
+				ndUnsigned8 m_yLow;
+				ndUnsigned8 m_yHigh;
+				ndUnsigned8 m_zLow;
+				ndUnsigned8 m_zHigh;
+			};
+			ndUnsigned64 m_gridCellHash : 48;
+			ndUnsigned64 m_gridFullHash;
+		};
+	};
+
+	class ndGridHashSteps
+	{
+		public:
+		ndGridHashSteps()
+		{
+			m_steps[0] = ndGridHash(-1, -1, -1);
+			m_steps[1] = ndGridHash( 0, -1, -1);
+			m_steps[2] = ndGridHash(-1,  0, -1);
+			m_steps[3] = ndGridHash( 0,  0, -1);
+			m_steps[4] = ndGridHash(-1, -1,  0);
+			m_steps[5] = ndGridHash( 0, -1,  0);
+			m_steps[6] = ndGridHash(-1,  0,  0);
+			m_steps[7] = ndGridHash( 0,  0,  0);
+
+			m_cellType[0] = 7;
+			m_cellType[1] = 6;
+			m_cellType[2] = 5;
+			m_cellType[3] = 4;
+			m_cellType[4] = 3;
+			m_cellType[5] = 2;
+			m_cellType[6] = 1;
+			m_cellType[7] = 0;
+		}
+
+		ndGridHash m_steps[8];
+		ndUnsigned8 m_cellType[8];
+	};
+
+	class ndUpperDigit
+	{
+		public:
+		ndUpperDigit()
+			:m_x(0)
+			,m_y(0)
+			,m_z(0)
+		{
+		}
+		ndInt32 m_x;
+		ndInt32 m_y;
+		ndInt32 m_z;
+	};
+
+	void RemoveDuplicates();
+	void SortCellBuckects();
+	void GenerateIsoSurface();
+	void CreateGrids(const ndArray<ndVector>& points);
 
 	ndVector m_boxP0;
 	ndVector m_boxP1;
@@ -163,6 +285,11 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 	ndInt32 m_xCellSize;
 	ndInt32 m_yCellSize;
 	ndInt32 m_zCellSize;
+
+	// *********************
+	ndArray<ndGridHash> m_hashGridMap;
+	ndArray<ndGridHash> m_hashGridMapScratchBuffer;
+	ndUpperDigit m_upperDigitsIsValid;
 
 	static const ndInt32 m_edgeTable[];
 	static const ndInt32 m_triangleTable[][16];
@@ -713,7 +840,11 @@ void ndIsoSurface::ndImplementation::ndOctree::ProccessCells(ndImplementation* c
 	}
 }
 
+#ifndef D_USE_ALL_GRIDS
 void ndIsoSurface::ndImplementation::ndOctree::Insert(const ndVector& point, ndInt32 parentQuadrant)
+#else
+void ndIsoSurface::ndImplementation::ndOctree::Insert(const ndVector& point, ndInt32)
+#endif
 {
 	if (m_fullMask == 0xff)
 	{
@@ -785,7 +916,7 @@ void ndIsoSurface::ndImplementation::ndOctree::ProccessSmallSolidCells(ndImpleme
 	dAssert(0);
 }
 
-void ndIsoSurface::ndImplementation::BuildAabb(const ndArray<ndVector>& points)
+void ndIsoSurface::ndImplementation::CalculatedAabb(const ndArray<ndVector>& points)
 {
 	D_TRACKTIME();
 	ndVector boxP0(ndFloat32(1.0e10f));
@@ -1140,12 +1271,12 @@ void ndIsoSurface::ndImplementation::CalculateNormals(ndIsoSurface* const me)
 	}
 }
 
-void ndIsoSurface::ndImplementation::BuildMesh(ndIsoSurface* const me, const ndArray<ndVector>& pointCloud, ndFloat32 gridSize)
+void ndIsoSurface::ndImplementation::BuildMeshNaive(ndIsoSurface* const me, const ndArray<ndVector>& points, ndFloat32 gridSize)
 {
 	D_TRACKTIME();
-	BuildAabb(pointCloud);
+	CalculatedAabb(points);
 	Begin(gridSize);
-	AddPoints(pointCloud);
+	AddPoints(points);
 	ProcessCells();
 	RemapVertexArray(me);
 	RemapIndexArray(me);
@@ -1161,7 +1292,203 @@ void ndIsoSurface::GenerateMeshNaive(const ndArray<ndVector>& pointCloud, ndFloa
 {
 	ndImplementation& implementation = GetImplementation();
 
-	implementation.BuildMesh(this, pointCloud, gridSize);
+	implementation.BuildMeshNaive(this, pointCloud, gridSize);
+}
+
+void ndIsoSurface::ndImplementation::SortCellBuckects()
+{
+	D_TRACKTIME();
+	class ndKey_xlow
+	{
+		public:
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_xLow;
+		}
+	};
+
+	class ndKey_ylow
+	{
+		public:
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_yLow;
+		}
+	};
+
+	class ndKey_zlow
+	{
+		public:
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_zLow;
+		}
+	};
+
+	class ndKey_xhigh
+	{
+		public:
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_xHigh;
+		}
+	};
+
+	class ndKey_yhigh
+	{
+		public:
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_yHigh;
+		}
+	};
+
+	class ndKey_zhigh
+	{
+		public:
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_zHigh;
+		}
+	};
+
+	ndCountingSort<ndGridHash, ndKey_xlow, D_RADIX_DIGIT_SIZE>(m_hashGridMap, m_hashGridMapScratchBuffer);
+	if (m_upperDigitsIsValid.m_x)
+	{
+		dAssert(0);
+		ndCountingSort<ndGridHash, ndKey_xhigh, D_RADIX_DIGIT_SIZE>(m_hashGridMap, m_hashGridMapScratchBuffer);
+	}
+
+	ndCountingSort<ndGridHash, ndKey_ylow, D_RADIX_DIGIT_SIZE>(m_hashGridMap, m_hashGridMapScratchBuffer);
+	if (m_upperDigitsIsValid.m_y)
+	{
+		dAssert(0);
+		ndCountingSort<ndGridHash, ndKey_yhigh, D_RADIX_DIGIT_SIZE>(m_hashGridMap, m_hashGridMapScratchBuffer);
+	}
+
+	ndCountingSort<ndGridHash, ndKey_zlow, D_RADIX_DIGIT_SIZE>(m_hashGridMap, m_hashGridMapScratchBuffer);
+	if (m_upperDigitsIsValid.m_z)
+	{
+		dAssert(0);
+		ndCountingSort<ndGridHash, ndKey_zhigh, D_RADIX_DIGIT_SIZE>(m_hashGridMap, m_hashGridMapScratchBuffer);
+	}
+}
+
+void ndIsoSurface::ndImplementation::RemoveDuplicates()
+{
+	D_TRACKTIME();
+	ndInt32 gridCount = 0;
+	ndUpperDigit upperDigits;
+	for (ndInt32 i = 1; i < m_hashGridMap.GetCount(); ++i)
+	{
+		const ndGridHash cell(m_hashGridMap[i]);
+		gridCount += (m_hashGridMap[i].m_gridFullHash != m_hashGridMap[i - 1].m_gridFullHash);
+		m_hashGridMap[gridCount] = cell;
+	}
+	gridCount++;
+	m_hashGridMap.SetCount(gridCount);
+}
+
+void ndIsoSurface::ndImplementation::GenerateIsoSurface()
+{
+	D_TRACKTIME();
+	ndInt32 end = 0;
+	const ndInt32 gridCount = m_hashGridMap.GetCount();
+	m_hashGridMap.PushBack(ndGridHash(0xffff, 0xffff, 0xffff));
+	for (ndInt32 i = 0; i < gridCount; i = end)
+	{
+		end = i + 1;
+		ndInt32 start = i;
+		const ndGridHash startGrid(m_hashGridMap[start], 0);
+		while (startGrid.m_gridCellHash == ndGridHash(m_hashGridMap[end], 0).m_gridCellHash)
+		{
+			end++;
+		}
+		ndInt32 count = end - start;
+		if (count < 8)
+		{
+			ndIsoCell cell;
+			cell.m_x = startGrid.m_x;
+			cell.m_y = startGrid.m_y;
+			cell.m_z = startGrid.m_z;
+			ndFloat32* const isoValue = &cell.m_isoValues[0][0][0];
+			for (ndInt32 j = 0; j < 8; j++)
+			{
+				isoValue[j] = ndFloat32(0.0f);
+			}
+			for (ndInt32 j = 0; j < count; j++)
+			{
+				ndInt32 index = m_hashGridMap[start + j].m_cellType;
+				isoValue[index] = ndFloat32 (1.0f);
+			}
+			cell.m_x++;
+			cell.m_y++;
+			cell.m_z++;
+			ProcessCell(cell);
+		}
+	}
+}
+	
+void ndIsoSurface::ndImplementation::CreateGrids(const ndArray<ndVector>& points)
+{
+	D_TRACKTIME();
+	const ndVector origin(m_boxP0);
+	const ndVector invGridSize(m_invGridSize);
+
+	ndUpperDigit upperDigits;
+	m_hashGridMap.SetCount(points.GetCount() * 8);
+	for (ndInt32 i = 0; i < points.GetCount(); ++i)
+	{
+		const ndVector r(points[i] - origin);
+		const ndVector p(r * invGridSize);
+		const ndGridHash hashKey(p);
+	
+		upperDigits.m_x = dMax(upperDigits.m_x, ndInt32(hashKey.m_xHigh));
+		upperDigits.m_y = dMax(upperDigits.m_y, ndInt32(hashKey.m_yHigh));
+		upperDigits.m_z = dMax(upperDigits.m_z, ndInt32(hashKey.m_zHigh));
+		
+		ndGridHashSteps steps;
+		for (ndInt32 j = 0; j < 8; ++j)
+		{
+			ndGridHash cell(hashKey);
+			cell.m_x += steps.m_steps[j].m_x;
+			cell.m_y += steps.m_steps[j].m_y;
+			cell.m_z += steps.m_steps[j].m_z;
+			cell.m_cellType = steps.m_cellType[j];
+			m_hashGridMap[i * 8 + j] = cell;
+		}
+	}
+	m_upperDigitsIsValid = upperDigits;
+}
+
+void ndIsoSurface::ndImplementation::BuildMesh(ndIsoSurface* const me, const ndArray<ndVector>& points, ndFloat32 gridSize)
+{
+	D_TRACKTIME();
+	CalculatedAabb(points);
+
+	m_isoValue = ndFloat32(0.5f);
+	m_gridSize = ndVector::m_triplexMask & ndVector(gridSize);
+	m_invGridSize = ndVector::m_triplexMask & ndVector(ndFloat32(1.0f) / gridSize);
+
+	m_boxP0 = m_boxP0 - m_gridSize;
+	m_origin = m_boxP0;
+	ndVector size((m_boxP1 - m_origin) * m_invGridSize + ndVector::m_half);
+
+	ndVector cells(size.Floor().GetInt());
+	m_xCellSize = cells.m_ix + 2;
+	m_yCellSize = cells.m_iy + 2;
+	m_zCellSize = cells.m_iz + 2;
+	
+	CreateGrids(points);
+	SortCellBuckects();
+	RemoveDuplicates();
+	GenerateIsoSurface();
+	
+	RemapVertexArray(me);
+	RemapIndexArray(me);
+	CalculateNormals(me);
+	m_vertexMap.RemoveAll();
+	m_triangleMap.RemoveAll();
 }
 
 void ndIsoSurface::GenerateMesh(const ndArray<ndVector>& pointCloud, ndFloat32 gridSize)
