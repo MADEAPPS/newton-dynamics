@@ -76,8 +76,8 @@ class ndThreadBackgroundWorker : public ndThread, public ndList<ndBackgroundJob*
 
 	ndSpinLock m_lock;
 	ndSemaphore m_queueSemaphore;
-	bool m_teminate;
-	bool m_inLoop;
+	ndAtomic<bool> m_teminate;
+	ndAtomic<bool> m_inLoop;
 };
 
 
