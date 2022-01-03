@@ -1441,7 +1441,7 @@ void ndScene::CalculateContacts()
 		}
 	};
 
-	class ndClasifyContacts : public ndBaseJob
+	class ndCompactContacts : public ndBaseJob
 	{
 		public:
 		virtual void Execute()
@@ -1498,7 +1498,7 @@ void ndScene::CalculateContacts()
 		ndInt32 inactiveJoints = info.m_digitScan[0][2] - info.m_digitScan[0][1];
 		ndInt32 deadContacts = info.m_digitScan[0][3] - info.m_digitScan[0][2];
 
-		SubmitJobs<ndClasifyContacts>(&info);
+		SubmitJobs<ndCompactContacts>(&info);
 		if (deadContacts)
 		{
 			D_TRACKTIME();

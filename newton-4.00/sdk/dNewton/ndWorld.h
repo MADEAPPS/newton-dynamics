@@ -63,8 +63,8 @@ class ndWorld: public ndClassAlloc
 	ndInt32 GetEngineVersion() const;
 
 	void Sync() const;
-	void CollisionUpdate();
 	void Update(ndFloat32 timestep);
+	void CollisionUpdate(ndFloat32 timestep);
 
 	virtual void OnPostUpdate(ndFloat32 timestep);
 
@@ -301,10 +301,11 @@ inline void ndWorld::DebugScene(ndSceneTreeNotiFy* const notify)
 	m_scene->DebugScene(notify);
 }
 
-inline void ndWorld::CollisionUpdate()
+inline void ndWorld::CollisionUpdate(ndFloat32 timestep)
 {
 	// wait until previous update complete.
 	Sync();
+	m_timestep = timestep;
 
 	// update the next frame asynchronous 
 	m_collisionUpdate = true;
