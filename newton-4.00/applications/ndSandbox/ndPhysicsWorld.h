@@ -35,8 +35,6 @@ class ndPhysicsWorld: public ndWorld
 	void SaveScene(const char* const path);
 	void SaveSceneModel(const char* const path);
 
-	void SendBackgroundJob(ndBackgroundJob* const job);
-
 	private:
 	void DeletePendingObjects();
 	void OnPostUpdate(ndFloat32 timestep);
@@ -47,7 +45,6 @@ class ndPhysicsWorld: public ndWorld
 	ndArray<ndBody*> m_deletedBodies;
 	ndAtomic<bool> m_hasPendingObjectToDelete;
 	ndSpinLock m_deletedLock;
-	ndThreadBackgroundWorker m_backgroundThread;
 };
 
 #endif

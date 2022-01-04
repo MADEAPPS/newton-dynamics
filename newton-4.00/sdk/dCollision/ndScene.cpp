@@ -196,6 +196,7 @@ ndScene::ndScene()
 	,m_activeBodyArray(1024)
 	,m_activeConstraintArray(1024)
 	,m_specialUpdateList()
+	,m_backgroundThread()
 	,m_lock()
 	,m_rootNode(nullptr)
 	,m_contactNotifyCallback(new ndContactNotify())
@@ -1988,6 +1989,8 @@ void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback, const ndSceneNode** s
 void ndScene::Cleanup()
 {
 	Sync();
+	m_backgroundThread.Terminate();
+
 	m_bodyListChanged = 1;
 	while (m_bodyList.GetFirst())
 	{
@@ -2166,4 +2169,9 @@ void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback) const
 		stackPool[0] = m_rootNode;
 		ndScene::BodiesInAabb(callback, stackPool, 1);
 	}
+}
+
+void ndScene::SendBackgroundJob(ndBackgroundJob* const job)
+{
+	m_backgroundThread.SendJob(job);
 }

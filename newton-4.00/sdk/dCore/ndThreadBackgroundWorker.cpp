@@ -25,7 +25,7 @@
 #include "ndProfiler.h"
 #include "ndThreadBackgroundWorker.h"
 
-#define D_EXECUTE_IMMIDIATE
+//#define D_EXECUTE_IMMIDIATE
 
 ndThreadBackgroundWorker::ndThreadBackgroundWorker()
 	:ndThread()

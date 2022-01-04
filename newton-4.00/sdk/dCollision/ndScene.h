@@ -173,6 +173,8 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void BalanceScene();
 	D_COLLISION_API virtual void ThreadFunction();
 
+	D_COLLISION_API void SendBackgroundJob(ndBackgroundJob* const job);
+
 	class ndBodyListRun
 	{
 		public:
@@ -189,6 +191,7 @@ class ndScene : public ndThreadPool
 	ndArray<ndBodyKinematic*> m_activeBodyArray;
 	ndArray<ndConstraint*> m_activeConstraintArray;
 	ndList<ndBodyKinematic*> m_specialUpdateList;
+	ndThreadBackgroundWorker m_backgroundThread;
 	ndSpinLock m_lock;
 	ndBodyListRun m_bodyListRuns[D_MAX_THREADS_COUNT];
 	ndSceneNode* m_rootNode;

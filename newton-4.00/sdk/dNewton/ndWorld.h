@@ -113,9 +113,9 @@ class ndWorld: public ndClassAlloc
 	void SetContactNotify(ndContactNotify* const notify);
 
 	void DebugScene(ndSceneTreeNotiFy* const notify);
+	void SendBackgroundJob(ndBackgroundJob* const job);
 
 	D_NEWTON_API void ClearCache();
-
 	D_NEWTON_API void BodiesInAabb(ndBodiesInAabbNotify& callback) const;
 	D_NEWTON_API bool RayCast(ndRayCastNotify& callback, const ndVector& globalOrigin, const ndVector& globalDest) const;
 	D_NEWTON_API bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
@@ -163,7 +163,6 @@ class ndWorld: public ndClassAlloc
 	ndModelList m_modelList;
 	ndSkeletonList m_skeletonList;
 	ndBodyParticleSetList m_particleSetList;
-
 	ndFloat32 m_timestep;
 	ndFloat32 m_freezeAccel2;
 	ndFloat32 m_freezeAlpha2;
@@ -345,5 +344,8 @@ inline ndInt32 ndWorld::GetEngineVersion() const
 	return D_NEWTON_ENGINE_MAJOR_VERSION * 100 + D_NEWTON_ENGINE_MINOR_VERSION;
 }
 
-
+inline void ndWorld::SendBackgroundJob(ndBackgroundJob* const job)
+{
+	m_scene->SendBackgroundJob(job);
+}
 #endif

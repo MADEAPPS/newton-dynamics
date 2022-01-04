@@ -166,6 +166,8 @@ ndWorld::~ndWorld()
 void ndWorld::CleanUp()
 {
 	Sync();
+	m_scene->m_backgroundThread.Terminate();
+
 	while (m_skeletonList.GetFirst())
 	{
 		m_skeletonList.Remove(m_skeletonList.GetFirst());
