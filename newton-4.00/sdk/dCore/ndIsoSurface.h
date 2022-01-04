@@ -30,11 +30,11 @@
 class ndIsoSurface: public ndClassAlloc
 {
 	public:
-	class ndTriangle
-	{
-		public:
-		ndInt32 m_index[3];
-	};
+	//class ndTriangle
+	//{
+	//	public:
+	//	ndInt32 m_index[3];
+	//};
 
 	class ndImplementation;
 
@@ -42,7 +42,7 @@ class ndIsoSurface: public ndClassAlloc
 	~ndIsoSurface();
 	const ndArray<ndVector>& GetPoints() const;
 	const ndArray<ndVector>& GetNormals() const;
-	const ndArray<ndTriangle>& GetTriangles() const;
+	const ndArray<ndInt32>& GetTriangles() const;
 	D_CORE_API void GenerateMesh(const ndArray<ndVector>& pointCloud, ndFloat32 gridSize);
 
 	private:
@@ -50,7 +50,7 @@ class ndIsoSurface: public ndClassAlloc
 
 	ndArray<ndVector> m_points;
 	ndArray<ndVector> m_normals;
-	ndArray<ndTriangle> m_triangles;
+	ndArray<ndInt32> m_triangles;
 	friend class ndImplementation;
 };
 
@@ -75,7 +75,7 @@ inline const ndArray<ndVector>& ndIsoSurface::GetNormals() const
 	return m_normals;
 }
 
-inline const ndArray<ndIsoSurface::ndTriangle>& ndIsoSurface::GetTriangles() const
+inline const ndArray<ndInt32>& ndIsoSurface::GetTriangles() const
 {
 	return m_triangles;
 }

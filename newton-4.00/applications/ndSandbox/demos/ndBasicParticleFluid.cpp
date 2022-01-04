@@ -49,13 +49,11 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundJob
 			m_points[i].m_uv.m_v = GLfloat(0.0f);
 		}
 		
-		const ndArray<ndIsoSurface::ndTriangle>& indexList = m_isoSurface.GetTriangles();
-		m_indexList.SetCount(indexList.GetCount() * 3);
-		for (ndInt32 i = 0; i < indexList.GetCount(); i++)
+		const ndArray<ndInt32>& indexList = m_isoSurface.GetTriangles();
+		m_indexList.SetCount(indexList.GetCount());
+		for (ndInt32 i = 0; i < indexList.GetCount(); ++i)
 		{
-			m_indexList[i * 3 + 0] = indexList[i].m_index[0];
-			m_indexList[i * 3 + 1] = indexList[i].m_index[1];
-			m_indexList[i * 3 + 2] = indexList[i].m_index[2];
+			m_indexList[i] = indexList[i];
 		}
 		m_meshIsReady.store(1);
 	}
@@ -222,9 +220,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 
 	fluidObject->SetParticleRadius(diameter * 0.5f);
 
-	ndInt32 particleCountPerAxis = 40;
-	//ndInt32 particleCountPerAxis = 32;
-	//ndInt32 particleCountPerAxis = 10;
+	//ndInt32 particleCountPerAxis = 40;
+	ndInt32 particleCountPerAxis = 32;
 	//ndInt32 particleCountPerAxis = 1;
 	ndFloat32 spacing = diameter * 1.0f;
 
