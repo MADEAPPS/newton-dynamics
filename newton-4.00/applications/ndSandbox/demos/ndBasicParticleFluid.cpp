@@ -259,7 +259,7 @@ static void BuildSphere(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* cons
 				ndInt32 x0 = x - size / 2;
 				ndInt32 y0 = y - size / 2;
 				ndInt32 z0 = z - size / 2;
-				ndFloat32 tesRadius = x0 * x0 + y0 * y0 + z0 * z0;
+				ndFloat32 tesRadius = ndFloat32 (x0 * x0 + y0 * y0 + z0 * z0);
 				if (tesRadius < radius2)
 				{
 					const ndVector posit(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
@@ -279,7 +279,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	matrix.m_posit = floor;
 	matrix.m_posit.m_w = 1.0f;
 
-	ndFloat32 diameter = 0.25f;
+	ndFloat32 diameter = 0.125f;
 	ndIsoSurfaceParticleVolume* const fluidObject = new ndIsoSurfaceParticleVolume(diameter * 0.5f);
 	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, ndVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject);
 
