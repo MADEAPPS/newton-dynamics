@@ -25,7 +25,7 @@
 #include "ndProfiler.h"
 #include "ndThreadBackgroundWorker.h"
 
-//#define D_EXECUTE_IMMIDIATE
+//#define D_EXECUTE_IMMEDIATE
 
 ndThreadBackgroundWorker::ndThreadBackgroundWorker()
 	:ndThread()
@@ -60,7 +60,7 @@ void ndThreadBackgroundWorker::Terminate()
 
 void ndThreadBackgroundWorker::SendJob(ndBackgroundJob* const job)
 {
-#ifdef D_EXECUTE_IMMIDIATE
+#ifdef D_EXECUTE_IMMEDIATE
 	job->m_jobState = ndBackgroundJob::m_jobInProccess;
 	job->Execute();
 	job->m_jobState = ndBackgroundJob::m_jobCompleted;

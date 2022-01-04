@@ -166,9 +166,10 @@ class ndWaterVolumeEntity : public ndDemoEntity
 	
 		// render the fluid;
 		ndScopeSpinLock lock(m_lock);
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		
 		// render the cage;
 		//ndDemoEntity::Render(timeStep, scene, matrix);
@@ -289,8 +290,9 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 
 	fluidObject->SetParticleRadius(diameter * 0.5f);
 
+	ndInt32 particleCountPerAxis = 64;
 	//ndInt32 particleCountPerAxis = 40;
-	ndInt32 particleCountPerAxis = 32;
+	//ndInt32 particleCountPerAxis = 32;
 	//ndInt32 particleCountPerAxis = 1;
 	ndFloat32 spacing = diameter * 1.0f;
 
@@ -304,7 +306,7 @@ matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 0.0f);
 	//BuildHollowBox(matrix, fluidObject, particleCountPerAxis);
 	BuildSphere(matrix, fluidObject, particleCountPerAxis);
 
-	matrix.m_posit.m_z -= 10.0f;
+	matrix.m_posit.m_z -= 15.0f;
 	BuildHollowBox(matrix, fluidObject, particleCountPerAxis);
 
 	// make sure we have the first surface generated before rendering.
