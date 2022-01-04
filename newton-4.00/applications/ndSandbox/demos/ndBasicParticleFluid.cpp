@@ -202,6 +202,49 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 	}
 };
 
+static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const surface, ndInt32 size)
+{
+	ndFloat32 spacing = surface->GetParticleRadius() * ndFloat32 (2.0f);
+	ndArray<ndVector>& particles = surface->GetPositions();
+	for (ndInt32 z = 0; z < size; z++)
+	{
+		for (ndInt32 y = 0; y < size; y++)
+		{
+			for (ndInt32 x = 0; x < size; x++)
+			{
+				const ndVector posit(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
+				particles.PushBack(posit);
+			}
+		}
+	}
+}
+
+static void BuildHollowBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const surface, ndInt32 size)
+{
+	ndFloat32 spacing = surface->GetParticleRadius() * ndFloat32(2.0f);
+	ndArray<ndVector>& particles = surface->GetPositions();
+	for (ndInt32 z = 0; z < size; z++)
+	{
+		for (ndInt32 y = 0; y < size; y++)
+		{
+			for (ndInt32 x = 0; x < size; x++)
+			{
+				if (x < 1 ||
+					y < 1 ||
+					z < 1 ||
+					x >= (size - 1) ||
+					y >= (size - 1) ||
+					z >= (size - 1))
+				{
+					const ndVector posit(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
+					particles.PushBack(posit);
+				}
+			}
+		}
+	}
+}
+
+
 static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
@@ -231,18 +274,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	matrix.m_posit += origin;
 matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 0.0f);
 	
-	ndArray<ndVector>& particles = fluidObject->GetPositions();
-	for (ndInt32 y = 0; y < particleCountPerAxis; y++)
-	{
-		for (ndInt32 z = 0; z < particleCountPerAxis; z++)
-		{
-			for (ndInt32 x = 0; x < particleCountPerAxis; x++)
-			{
-				const ndVector posit (matrix.TransformVector(ndVector (x * spacing, y * spacing, z * spacing, ndFloat32 (1.0f))));
-				particles.PushBack(posit);
-			}
-		}
-	}
+	//BuildBox(matrix, fluidObject, particleCountPerAxis);
+	BuildHollowBox(matrix, fluidObject, particleCountPerAxis);
 
 	// make sure we have the first surface generated before rendering.
 	fluidObject->UpdateIsoSurface();
