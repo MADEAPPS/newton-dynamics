@@ -159,7 +159,7 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 	void ProcessTriangleListCell(const ndIsoCell& cell);
 	void CalculatedAabb(const ndArray<ndVector>& points, ndFloat32 gridSize);
 
-	ndVector VertexInterp(ndFloat32 isolevel, const ndVector& p1, const ndVector& p2) const;
+	ndVector InterpolateVertex(ndFloat32 isolevel, const ndVector& p1, const ndVector& p2) const;
 
 	ndArray<ndGridHash> m_hashGridMap;
 	ndArray<ndGridHash> m_hashGridMapScratchBuffer;
@@ -536,8 +536,8 @@ void ndIsoSurface::ndImplementation::CalculatedAabb(const ndArray<ndVector>& poi
 	m_volumeSizeZ = volume.m_iz + 2;
 }
 
-//ndVector ndIsoSurface::ndImplementation::VertexInterp(ndFloat32 isolevel, const ndVector& p0, const ndVector& p1) const
-ndVector ndIsoSurface::ndImplementation::VertexInterp(ndFloat32, const ndVector& p0, const ndVector& p1) const
+//ndVector ndIsoSurface::ndImplementation::InterpolateVertex(ndFloat32 isolevel, const ndVector& p0, const ndVector& p1) const
+ndVector ndIsoSurface::ndImplementation::InterpolateVertex(ndFloat32, const ndVector& p0, const ndVector& p1) const
 {
 	//ndVector p;
 	//ndFloat32 mu = (isolevel - p0.m_w) / (p1.m_w - p0.m_w);
@@ -572,51 +572,51 @@ void ndIsoSurface::ndImplementation::ProcessTriangleListCell(const ndIsoCell& ce
 	// Find the vertices where the surface intersects the cube
 	if (edgeBits & 1)
 	{
-		vertlist[0] = VertexInterp(m_isoValue, cell.m_isoValues[0], cell.m_isoValues[1]);
+		vertlist[0] = InterpolateVertex(m_isoValue, cell.m_isoValues[0], cell.m_isoValues[1]);
 	}
 	if (edgeBits & 2)
 	{
-		vertlist[1] = VertexInterp(m_isoValue, cell.m_isoValues[1], cell.m_isoValues[2]);
+		vertlist[1] = InterpolateVertex(m_isoValue, cell.m_isoValues[1], cell.m_isoValues[2]);
 	}
 	if (edgeBits & 4)
 	{
-		vertlist[2] = VertexInterp(m_isoValue, cell.m_isoValues[2], cell.m_isoValues[3]);
+		vertlist[2] = InterpolateVertex(m_isoValue, cell.m_isoValues[2], cell.m_isoValues[3]);
 	}
 	if (edgeBits & 8)
 	{
-		vertlist[3] = VertexInterp(m_isoValue, cell.m_isoValues[3], cell.m_isoValues[0]);
+		vertlist[3] = InterpolateVertex(m_isoValue, cell.m_isoValues[3], cell.m_isoValues[0]);
 	}
 	if (edgeBits & 16)
 	{
-		vertlist[4] = VertexInterp(m_isoValue, cell.m_isoValues[4], cell.m_isoValues[5]);
+		vertlist[4] = InterpolateVertex(m_isoValue, cell.m_isoValues[4], cell.m_isoValues[5]);
 	}
 	if (edgeBits & 32)
 	{
-		vertlist[5] = VertexInterp(m_isoValue, cell.m_isoValues[6], cell.m_isoValues[5]);
+		vertlist[5] = InterpolateVertex(m_isoValue, cell.m_isoValues[6], cell.m_isoValues[5]);
 	}
 	if (edgeBits & 64)
 	{
-		vertlist[6] = VertexInterp(m_isoValue, cell.m_isoValues[7], cell.m_isoValues[6]);
+		vertlist[6] = InterpolateVertex(m_isoValue, cell.m_isoValues[7], cell.m_isoValues[6]);
 	}
 	if (edgeBits & 128)
 	{
-		vertlist[7] = VertexInterp(m_isoValue, cell.m_isoValues[7], cell.m_isoValues[4]);
+		vertlist[7] = InterpolateVertex(m_isoValue, cell.m_isoValues[7], cell.m_isoValues[4]);
 	}
 	if (edgeBits & 256)
 	{
-		vertlist[8] = VertexInterp(m_isoValue, cell.m_isoValues[0], cell.m_isoValues[4]);
+		vertlist[8] = InterpolateVertex(m_isoValue, cell.m_isoValues[0], cell.m_isoValues[4]);
 	}
 	if (edgeBits & 512)
 	{
-		vertlist[9] = VertexInterp(m_isoValue, cell.m_isoValues[1], cell.m_isoValues[5]);
+		vertlist[9] = InterpolateVertex(m_isoValue, cell.m_isoValues[1], cell.m_isoValues[5]);
 	}
 	if (edgeBits & 1024)
 	{
-		vertlist[10] = VertexInterp(m_isoValue, cell.m_isoValues[2], cell.m_isoValues[6]);
+		vertlist[10] = InterpolateVertex(m_isoValue, cell.m_isoValues[2], cell.m_isoValues[6]);
 	}
 	if (edgeBits & 2048)
 	{
-		vertlist[11] = VertexInterp(m_isoValue, cell.m_isoValues[3], cell.m_isoValues[7]);
+		vertlist[11] = InterpolateVertex(m_isoValue, cell.m_isoValues[3], cell.m_isoValues[7]);
 	}
 	
 	for (ndInt32 i = 0; m_triangleTable[tableIndex][i] != -1; i += 3)
@@ -732,21 +732,18 @@ void ndIsoSurface::ndImplementation::SortCellBuckects()
 	ndCountingSort<ndGridHash, ndKey_xlow, D_RADIX_DIGIT_SIZE>(m_hashGridMap, m_hashGridMapScratchBuffer);
 	if (m_upperDigitsIsValid.m_x)
 	{
-		dAssert(0);
 		ndCountingSort<ndGridHash, ndKey_xhigh, D_RADIX_DIGIT_SIZE>(m_hashGridMap, m_hashGridMapScratchBuffer);
 	}
 
 	ndCountingSort<ndGridHash, ndKey_ylow, D_RADIX_DIGIT_SIZE>(m_hashGridMap, m_hashGridMapScratchBuffer);
 	if (m_upperDigitsIsValid.m_y)
 	{
-		dAssert(0);
 		ndCountingSort<ndGridHash, ndKey_yhigh, D_RADIX_DIGIT_SIZE>(m_hashGridMap, m_hashGridMapScratchBuffer);
 	}
 
 	ndCountingSort<ndGridHash, ndKey_zlow, D_RADIX_DIGIT_SIZE>(m_hashGridMap, m_hashGridMapScratchBuffer);
 	if (m_upperDigitsIsValid.m_z)
 	{
-		dAssert(0);
 		ndCountingSort<ndGridHash, ndKey_zhigh, D_RADIX_DIGIT_SIZE>(m_hashGridMap, m_hashGridMapScratchBuffer);
 	}
 }
@@ -805,22 +802,17 @@ void ndIsoSurface::ndImplementation::GenerateIsoSurface()
 void ndIsoSurface::ndImplementation::GenerateIndexList(ndIsoSurface* const me)
 {
 	D_TRACKTIME();
+	#define D_RESOLUTION_BITS		2
+	#define D_RESOLUTION_FRACTION	(1<<D_RESOLUTION_BITS)
+	#define D_RESOLUTION_DIGIT_BITS (8 + D_RESOLUTION_BITS)
+	#define D_RESOLUTION_MASK		((1<<D_RESOLUTION_DIGIT_BITS) - 1)
+
 	class ndKey_lowX
 	{
 		public:
 		ndInt32 GetKey(const ndVector& point) const
 		{
-			ndInt32 key = ndInt32 (point.m_x * ndFloat32(2.0f)) & 0xff;
-			return key;
-		}
-	};
-
-	class ndKey_highX
-	{
-		public:
-		ndInt32 GetKey(const ndVector& point) const
-		{
-			ndInt32 key = ndInt32(point.m_x * ndFloat32(2.0f)) >> 8;
+			ndInt32 key = ndInt32 (point.m_x * ndFloat32(D_RESOLUTION_FRACTION)) & D_RESOLUTION_MASK;
 			return key;
 		}
 	};
@@ -830,17 +822,7 @@ void ndIsoSurface::ndImplementation::GenerateIndexList(ndIsoSurface* const me)
 		public:
 		ndInt32 GetKey(const ndVector& point) const
 		{
-			ndInt32 key = ndInt32(point.m_y * ndFloat32(2.0f)) & 0xff;
-			return key;
-		}
-	};
-
-	class ndKey_highY
-	{
-		public:
-		ndInt32 GetKey(const ndVector& point) const
-		{
-			ndInt32 key = ndInt32(point.m_y * ndFloat32(2.0f)) >> 8;
+			ndInt32 key = ndInt32(point.m_y * ndFloat32(D_RESOLUTION_FRACTION)) & D_RESOLUTION_MASK;
 			return key;
 		}
 	};
@@ -850,7 +832,27 @@ void ndIsoSurface::ndImplementation::GenerateIndexList(ndIsoSurface* const me)
 		public:
 		ndInt32 GetKey(const ndVector& point) const
 		{
-			ndInt32 key = ndInt32(point.m_z * ndFloat32(2.0f)) & 0xff;
+			ndInt32 key = ndInt32(point.m_z * ndFloat32(D_RESOLUTION_FRACTION)) & D_RESOLUTION_MASK;
+			return key;
+		}
+	};
+
+	class ndKey_highX
+	{
+		public:
+		ndInt32 GetKey(const ndVector& point) const
+		{
+			ndInt32 key = ndInt32(point.m_x * ndFloat32(D_RESOLUTION_FRACTION)) >> D_RESOLUTION_BITS;
+			return key;
+		}
+	};
+
+	class ndKey_highY
+	{
+		public:
+		ndInt32 GetKey(const ndVector& point) const
+		{
+			ndInt32 key = ndInt32(point.m_y * ndFloat32(D_RESOLUTION_FRACTION)) >> D_RESOLUTION_BITS;
 			return key;
 		}
 	};
@@ -860,7 +862,7 @@ void ndIsoSurface::ndImplementation::GenerateIndexList(ndIsoSurface* const me)
 		public:
 		ndInt32 GetKey(const ndVector& point) const
 		{
-			ndInt32 key = ndInt32(point.m_z * ndFloat32(2.0f)) >> 8;
+			ndInt32 key = ndInt32(point.m_z * ndFloat32(D_RESOLUTION_FRACTION)) >> D_RESOLUTION_BITS;
 			return key;
 		}
 	};
@@ -882,22 +884,22 @@ void ndIsoSurface::ndImplementation::GenerateIndexList(ndIsoSurface* const me)
 		ndVector m_base;
 	};
 
-	ndCountingSort<ndVector, ndKey_lowX, 8>(m_triangles, m_trianglesScratchBuffer);
+	ndCountingSort<ndVector, ndKey_lowX, D_RESOLUTION_DIGIT_BITS>(m_triangles, m_trianglesScratchBuffer);
 	if (m_volumeSizeX >= 256)
 	{
-		ndCountingSort<ndVector, ndKey_highX, 8>(m_triangles, m_trianglesScratchBuffer);
+		ndCountingSort<ndVector, ndKey_highX, D_RESOLUTION_DIGIT_BITS>(m_triangles, m_trianglesScratchBuffer);
 	} 
 
-	ndCountingSort<ndVector, ndKey_lowY, 8>(m_triangles, m_trianglesScratchBuffer);
+	ndCountingSort<ndVector, ndKey_lowY, D_RESOLUTION_DIGIT_BITS>(m_triangles, m_trianglesScratchBuffer);
 	if (m_volumeSizeY >= 256)
 	{
-		ndCountingSort<ndVector, ndKey_highY, 8>(m_triangles, m_trianglesScratchBuffer);
+		ndCountingSort<ndVector, ndKey_highY, D_RESOLUTION_DIGIT_BITS>(m_triangles, m_trianglesScratchBuffer);
 	}
 
-	ndCountingSort<ndVector, ndKey_lowZ, 8>(m_triangles, m_trianglesScratchBuffer);
+	ndCountingSort<ndVector, ndKey_lowZ, D_RESOLUTION_DIGIT_BITS>(m_triangles, m_trianglesScratchBuffer);
 	if (m_volumeSizeZ >= 256)
 	{
-		ndCountingSort<ndVector, ndKey_highZ, 8>(m_triangles, m_trianglesScratchBuffer);
+		ndCountingSort<ndVector, ndKey_highZ, D_RESOLUTION_DIGIT_BITS>(m_triangles, m_trianglesScratchBuffer);
 	}
 	
 	const ndInt32 count = m_triangles.GetCount();
