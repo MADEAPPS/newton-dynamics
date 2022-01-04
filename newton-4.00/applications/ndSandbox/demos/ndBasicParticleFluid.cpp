@@ -166,9 +166,9 @@ class ndWaterVolumeEntity : public ndDemoEntity
 	
 		// render the fluid;
 		ndScopeSpinLock lock(m_lock);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		
 		// render the cage;
 		//ndDemoEntity::Render(timeStep, scene, matrix);
@@ -279,7 +279,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	matrix.m_posit = floor;
 	matrix.m_posit.m_w = 1.0f;
 
-	ndFloat32 diameter = 0.125f;
+	ndFloat32 diameter = 0.25f;
 	ndIsoSurfaceParticleVolume* const fluidObject = new ndIsoSurfaceParticleVolume(diameter * 0.5f);
 	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, ndVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject);
 
