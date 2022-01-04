@@ -244,6 +244,31 @@ static void BuildHollowBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* c
 	}
 }
 
+static void BuildSphere(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const surface, ndInt32 size)
+{
+	ndFloat32 spacing = surface->GetParticleRadius() * ndFloat32(2.0f);
+	ndArray<ndVector>& particles = surface->GetPositions();
+
+	ndInt32 radius2 = (size / 2) * (size / 2);
+	for (ndInt32 z = 0; z < size; z++)
+	{
+		for (ndInt32 y = 0; y < size; y++)
+		{
+			for (ndInt32 x = 0; x < size; x++)
+			{
+				ndInt32 x0 = x - size / 2;
+				ndInt32 y0 = y - size / 2;
+				ndInt32 z0 = z - size / 2;
+				ndFloat32 tesRadius = x0 * x0 + y0 * y0 + z0 * z0;
+				if (tesRadius < radius2)
+				{
+					const ndVector posit(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
+					particles.PushBack(posit);
+				}
+			}
+		}
+	}
+}
 
 static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
@@ -275,6 +300,10 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 0.0f);
 	
 	//BuildBox(matrix, fluidObject, particleCountPerAxis);
+	//BuildHollowBox(matrix, fluidObject, particleCountPerAxis);
+	BuildSphere(matrix, fluidObject, particleCountPerAxis);
+
+	matrix.m_posit.m_z -= 10.0f;
 	BuildHollowBox(matrix, fluidObject, particleCountPerAxis);
 
 	// make sure we have the first surface generated before rendering.
