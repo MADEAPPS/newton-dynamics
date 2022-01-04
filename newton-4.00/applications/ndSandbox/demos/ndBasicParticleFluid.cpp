@@ -279,7 +279,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	matrix.m_posit = floor;
 	matrix.m_posit.m_w = 1.0f;
 
-	ndFloat32 diameter = 0.25f;
+	//ndFloat32 diameter = 0.25f;
+	ndFloat32 diameter = 0.2f;
 	ndIsoSurfaceParticleVolume* const fluidObject = new ndIsoSurfaceParticleVolume(diameter * 0.5f);
 	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, ndVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject);
 

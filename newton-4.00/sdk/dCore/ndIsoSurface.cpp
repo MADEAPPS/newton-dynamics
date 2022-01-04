@@ -44,7 +44,7 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 	ndImplementation();
 	~ndImplementation();
 
-	void BuildTriangleListMesh(ndIsoSurface* const me, const ndArray<ndVector>& pointCloud, ndFloat32 gridSize);
+	void BuildMesh(ndIsoSurface* const me, const ndArray<ndVector>& pointCloud, ndFloat32 gridSize);
 
 	private:
 	class ndGridHash
@@ -937,11 +937,12 @@ void ndIsoSurface::ndImplementation::CreateGrids(const ndArray<ndVector>& points
 
 	ndUpperDigit upperDigits;
 	const ndGridHashSteps steps;
+	const ndVector rounding(ndVector::m_half);
 	m_hashGridMap.SetCount(points.GetCount() * 8);
 	for (ndInt32 i = 0; i < points.GetCount(); ++i)
 	{
 		const ndVector r(points[i] - origin);
-		const ndVector p(r * invGridSize);
+		const ndVector p(r * invGridSize + rounding);
 		const ndGridHash hashKey(p);
 
 		upperDigits.m_x = dMax(upperDigits.m_x, ndInt32(hashKey.m_xHigh));
@@ -971,7 +972,7 @@ void ndIsoSurface::ndImplementation::ClearBuffers()
 	m_hashGridMapScratchBuffer.SetCount(0);
 }
 
-void ndIsoSurface::ndImplementation::BuildTriangleListMesh(ndIsoSurface* const me, const ndArray<ndVector>& points, ndFloat32 gridSize)
+void ndIsoSurface::ndImplementation::BuildMesh(ndIsoSurface* const me, const ndArray<ndVector>& points, ndFloat32 gridSize)
 {
 	D_TRACKTIME();
 	CalculatedAabb(points, gridSize);
@@ -987,6 +988,5 @@ void ndIsoSurface::ndImplementation::BuildTriangleListMesh(ndIsoSurface* const m
 void ndIsoSurface::GenerateMesh(const ndArray<ndVector>& pointCloud, ndFloat32 gridSize)
 {
 	ndImplementation& implementation = GetImplementation();
-	implementation.BuildTriangleListMesh(this, pointCloud, gridSize);
-	//implementation.BuildIndexListMesh(this, pointCloud, gridSize);
+	implementation.BuildMesh(this, pointCloud, gridSize);
 }
