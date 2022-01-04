@@ -44,6 +44,18 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 		ndInt32 m_z;
 	};
 
+	class ndIsoCell_1
+	{
+		public:
+		ndVector m_isoValues[8];
+	};
+
+	class ndIsoTriangle_1
+	{
+		public:
+		ndVector m_p[3];
+	};
+	
 	class ndIsoTriangle
 	{
 		public:
@@ -89,7 +101,9 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 
 	ndImplementation();
 	~ndImplementation();
-	void BuildMesh(ndIsoSurface* const me, const ndArray<ndVector>& pointCloud, ndFloat32 gridSize);
+
+	void BuildIndexListMesh(ndIsoSurface* const me, const ndArray<ndVector>& pointCloud, ndFloat32 gridSize);
+	void BuildTriangleListMesh(ndIsoSurface* const me, const ndArray<ndVector>& pointCloud, ndFloat32 gridSize);
 
 	private:
 	class ndGridHash
@@ -180,6 +194,34 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 		ndUnsigned8 m_cellType[8];
 	};
 
+	class ndGridHashSteps_1
+	{
+		public:
+		ndGridHashSteps_1()
+		{
+			m_steps[0] = ndGridHash(-1, -1, -1);
+			m_steps[1] = ndGridHash(0, -1, -1);
+			m_steps[2] = ndGridHash(-1, 0, -1);
+			m_steps[3] = ndGridHash(0, 0, -1);
+			m_steps[4] = ndGridHash(-1, -1, 0);
+			m_steps[5] = ndGridHash(0, -1, 0);
+			m_steps[6] = ndGridHash(-1, 0, 0);
+			m_steps[7] = ndGridHash(0, 0, 0);
+
+			m_cellType[0] = 5;
+			m_cellType[1] = 6;
+			m_cellType[2] = 1;
+			m_cellType[3] = 2;
+			m_cellType[4] = 4;
+			m_cellType[5] = 7;
+			m_cellType[6] = 0;
+			m_cellType[7] = 3;
+		}
+
+		ndGridHash m_steps[8];
+		ndUnsigned8 m_cellType[8];
+	};
+	
 	class ndUpperDigit
 	{
 		public:
@@ -194,20 +236,26 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 		ndInt32 m_z;
 	};
 
-	void xxxxxxxxxx(ndArray<ndIsoCell>& xxxx);
-
+	void ClearBuffers();
+	void ClearBuffers_1();
 	void RemoveDuplicates();
 	void SortCellBuckects();
 	void GenerateIsoSurface();
-	void ProcessCell(const ndIsoCell& cell);
+	void GenerateIsoSurface_1();
 	void RemapIndexArray(ndIsoSurface* const me);
 	void RemapVertexArray(ndIsoSurface* const me);
 	void CalculateNormals(ndIsoSurface* const me);
+	void GenerateIndexList(ndIsoSurface* const me);
+	void ProcessIndexListCell(const ndIsoCell& cell);
 	void CreateGrids(const ndArray<ndVector>& points);
-	void CalculatedAabb(const ndArray<ndVector>& points);
+	void CreateGrids_1(const ndArray<ndVector>& points);
+	void ProcessTriangleListCell(const ndIsoCell_1& cell);
 	ndUnsigned64 GetEdgeID(const ndIsoCell& cell, ndInt32 edgeCode);
 	ndUnsigned64 GetVertexID(ndInt32 gridX, ndInt32 gridY, ndInt32 gridZ);
 	ndVector CalculateIntersection(const ndIsoCell& cell, ndInt32 edgeCode);
+	void CalculatedAabb(const ndArray<ndVector>& points, ndFloat32 gridSize);
+
+	ndVector VertexInterp(ndFloat32 isolevel, const ndVector& p1, const ndVector& p2) const;
 	ndVector InterpolateEdge(ndFloat32 fX1, ndFloat32 fY1, ndFloat32 fZ1, ndFloat32 fX2, ndFloat32 fY2, ndFloat32 fZ2, ndFloat32 tVal1, ndFloat32 tVal2);
 
 	ndVector m_boxP0;
@@ -225,6 +273,8 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 	ndArray<ndGridHash> m_hashGridMap;
 	ndArray<ndGridHash> m_hashGridMapScratchBuffer;
 	ndUpperDigit m_upperDigitsIsValid;
+
+	ndArray<ndIsoTriangle_1> m_triangles;
 
 	static const ndInt32 m_edgeTable[];
 	static const ndInt32 m_triangleTable[][16];
@@ -542,16 +592,7 @@ ndIsoSurface::ndImplementation& ndIsoSurface::GetImplementation() const
 	return implementation;
 }
 
-
-
-
-
-
-
-
-
-
-void ndIsoSurface::ndImplementation::CalculatedAabb(const ndArray<ndVector>& points)
+void ndIsoSurface::ndImplementation::CalculatedAabb(const ndArray<ndVector>& points, ndFloat32 gridSize)
 {
 	D_TRACKTIME();
 	ndVector boxP0(ndFloat32(1.0e10f));
@@ -563,8 +604,36 @@ void ndIsoSurface::ndImplementation::CalculatedAabb(const ndArray<ndVector>& poi
 	}
 	m_boxP0 = boxP0 & ndVector::m_triplexMask;
 	m_boxP1 = boxP1 & ndVector::m_triplexMask;
+
+	m_isoValue = ndFloat32(0.5f);
+	m_gridSize = ndVector::m_triplexMask & ndVector(gridSize);
+	m_invGridSize = ndVector::m_triplexMask & ndVector(ndFloat32(1.0f) / gridSize);
+
+	m_boxP0 = m_boxP0 - m_gridSize;
+	m_origin = m_boxP0;
+	ndVector size((m_boxP1 - m_origin) * m_invGridSize + ndVector::m_half);
+
+	ndVector cells(size.Floor().GetInt());
+	m_xCellSize = cells.m_ix + 2;
+	m_yCellSize = cells.m_iy + 2;
+	m_zCellSize = cells.m_iz + 2;
 }
 
+ndVector ndIsoSurface::ndImplementation::VertexInterp(ndFloat32 isolevel, const ndVector& p0, const ndVector& p1) const
+{
+	//ndVector p;
+	//ndFloat32 mu = (isolevel - p0.m_w) / (p1.m_w - p0.m_w);
+	//p.m_x = p0.m_x + mu * (p1.m_x - p0.m_x);
+	//p.m_y = p0.m_y + mu * (p1.m_y - p0.m_y);
+	//p.m_z = p0.m_z + mu * (p1.m_z - p0.m_z);
+	//p.m_w = ndFloat32(0.0f);
+	//return p;
+
+	dAssert(isolevel == ndFloat32(0.5f));
+	dAssert(dAbs(p1.m_w - p0.m_w) == ndFloat32(1.0f));
+	const ndVector p1p0(p1 - p0);
+	return ndVector(p0 + p1p0 * ndVector::m_half);
+}
 ndVector ndIsoSurface::ndImplementation::InterpolateEdge(ndFloat32 fX1, ndFloat32 fY1, ndFloat32 fZ1, ndFloat32 fX2, ndFloat32 fY2, ndFloat32 fZ2, ndFloat32 tVal1, ndFloat32 tVal2)
 {
 	ndFloat32 mu = (m_isoValue - tVal1) / (tVal2 - tVal1);
@@ -702,7 +771,7 @@ ndUnsigned64 ndIsoSurface::ndImplementation::GetEdgeID(const ndIsoCell& cell, nd
 	}
 }
 
-void ndIsoSurface::ndImplementation::ProcessCell(const ndIsoCell& cell)
+void ndIsoSurface::ndImplementation::ProcessIndexListCell(const ndIsoCell& cell)
 {
 	dAssert(cell.m_x < (m_xCellSize));
 	dAssert(cell.m_y < (m_yCellSize));
@@ -794,6 +863,85 @@ void ndIsoSurface::ndImplementation::ProcessCell(const ndIsoCell& cell)
 	}
 }
 
+void ndIsoSurface::ndImplementation::ProcessTriangleListCell(const ndIsoCell_1& cell)
+{
+	ndInt32 tableIndex = 0;
+	for (ndInt32 i = 0; i < 8; i++)
+	{
+		tableIndex |= (cell.m_isoValues[i].m_w > m_isoValue) << i;
+	}
+	
+	// Now create a triangulation of the iso surface in this cell.
+	ndInt32 edgeBits = m_edgeTable[tableIndex];
+	if (edgeBits == 0)
+	{
+		return;
+	}
+	
+	ndVector vertlist[12];
+	// Find the vertices where the surface intersects the cube
+	if (edgeBits & 1)
+	{
+		vertlist[0] = VertexInterp(m_isoValue, cell.m_isoValues[0], cell.m_isoValues[1]);
+	}
+	if (edgeBits & 2)
+	{
+		vertlist[1] = VertexInterp(m_isoValue, cell.m_isoValues[1], cell.m_isoValues[2]);
+	}
+	if (edgeBits & 4)
+	{
+		vertlist[2] = VertexInterp(m_isoValue, cell.m_isoValues[2], cell.m_isoValues[3]);
+	}
+	if (edgeBits & 8)
+	{
+		vertlist[3] = VertexInterp(m_isoValue, cell.m_isoValues[3], cell.m_isoValues[0]);
+	}
+	if (edgeBits & 16)
+	{
+		vertlist[4] = VertexInterp(m_isoValue, cell.m_isoValues[4], cell.m_isoValues[5]);
+	}
+	if (edgeBits & 32)
+	{
+		vertlist[5] = VertexInterp(m_isoValue, cell.m_isoValues[6], cell.m_isoValues[5]);
+	}
+	if (edgeBits & 64)
+	{
+		vertlist[6] = VertexInterp(m_isoValue, cell.m_isoValues[7], cell.m_isoValues[6]);
+	}
+	if (edgeBits & 128)
+	{
+		vertlist[7] = VertexInterp(m_isoValue, cell.m_isoValues[7], cell.m_isoValues[4]);
+	}
+	if (edgeBits & 256)
+	{
+		vertlist[8] = VertexInterp(m_isoValue, cell.m_isoValues[0], cell.m_isoValues[4]);
+	}
+	if (edgeBits & 512)
+	{
+		vertlist[9] = VertexInterp(m_isoValue, cell.m_isoValues[1], cell.m_isoValues[5]);
+	}
+	if (edgeBits & 1024)
+	{
+		vertlist[10] = VertexInterp(m_isoValue, cell.m_isoValues[2], cell.m_isoValues[6]);
+	}
+	if (edgeBits & 2048)
+	{
+		vertlist[11] = VertexInterp(m_isoValue, cell.m_isoValues[3], cell.m_isoValues[7]);
+	}
+	
+	for (ndInt32 i = 0; m_triangleTable[tableIndex][i] != -1; i += 3)
+	{
+		ndIsoTriangle_1 triangle;
+		ndInt32 j0 = m_triangleTable[tableIndex][i + 0];
+		ndInt32 j1 = m_triangleTable[tableIndex][i + 1];
+		ndInt32 j2 = m_triangleTable[tableIndex][i + 2];
+		triangle.m_p[0] = vertlist[j0];
+		triangle.m_p[1] = vertlist[j1];
+		triangle.m_p[2] = vertlist[j2];
+		m_triangles.PushBack(triangle);
+	}
+}
+
 void ndIsoSurface::ndImplementation::RemapVertexArray(ndIsoSurface* const me)
 {
 	D_TRACKTIME();
@@ -822,7 +970,7 @@ void ndIsoSurface::ndImplementation::RemapIndexArray(ndIsoSurface* const me)
 	for (iter.Begin(); iter; iter++)
 	{
 		const ndIsoTriangle& triangle = iter.GetKey();
-		for (ndInt32 i = 0; i < 3; i++)
+		for (ndInt32 i = 0; i < 3; ++i)
 		{
 			ndIsoVertexMap::ndNode* const node = m_vertexMap.Find(triangle.m_pointId[i]);
 			dAssert(node);
@@ -846,7 +994,7 @@ void ndIsoSurface::ndImplementation::CalculateNormals(ndIsoSurface* const me)
 	{
 		memset(&normals[0], 0, normals.GetCount() * sizeof(ndVector));
 
-		for (ndInt32 i = 0; i < triangles.GetCount(); i++)
+		for (ndInt32 i = 0; i < triangles.GetCount(); ++i)
 		{
 			ndInt32 id0 = triangles[i].m_index[0];
 			ndInt32 id1 = triangles[i].m_index[1];
@@ -860,7 +1008,7 @@ void ndIsoSurface::ndImplementation::CalculateNormals(ndIsoSurface* const me)
 		}
 
 		// Normalize normals.
-		for (ndInt32 i = 0; i < normals.GetCount(); i++)
+		for (ndInt32 i = 0; i < normals.GetCount(); ++i)
 		{
 			//m_normals[i] = m_normals[i].Normalize();
 			normals[i] = normals[i] * normals[i].InvMagSqrt();
@@ -962,15 +1110,6 @@ void ndIsoSurface::ndImplementation::RemoveDuplicates()
 	m_hashGridMap.SetCount(gridCount);
 }
 
-void ndIsoSurface::ndImplementation::xxxxxxxxxx(ndArray<ndIsoCell>& xxxx)
-{
-	D_TRACKTIME();
-	for (ndInt32 i = 0; i < xxxx.GetCount(); ++i)
-	{
-		ProcessCell(xxxx[i]);
-	}
-}
-
 void ndIsoSurface::ndImplementation::GenerateIsoSurface()
 {
 	D_TRACKTIME();
@@ -978,8 +1117,6 @@ void ndIsoSurface::ndImplementation::GenerateIsoSurface()
 	const ndInt32 gridCount = m_hashGridMap.GetCount();
 	m_hashGridMap.PushBack(ndGridHash(0xffff, 0xffff, 0xffff));
 
-	static ndArray<ndIsoCell> xxxx(1024);
-	xxxx.SetCount(0);
 	for (ndInt32 i = 0; i < gridCount; i = end)
 	{
 		end = i + 1;
@@ -1009,11 +1146,79 @@ void ndIsoSurface::ndImplementation::GenerateIsoSurface()
 			cell.m_x++;
 			cell.m_y++;
 			cell.m_z++;
-			//ProcessCell(cell);
-			xxxx.PushBack(cell);
+			ProcessIndexListCell(cell);
 		}
 	}
-	xxxxxxxxxx(xxxx);
+}
+	
+void ndIsoSurface::ndImplementation::GenerateIsoSurface_1()
+{
+	D_TRACKTIME();
+	ndInt32 end = 0;
+	const ndInt32 gridCount = m_hashGridMap.GetCount();
+	m_hashGridMap.PushBack(ndGridHash(0xffff, 0xffff, 0xffff));
+
+	static ndVector gridCorners[] =
+	{
+		ndVector(ndFloat32( 0.0f), ndFloat32(-1.0f), ndFloat32(-1.0f), ndFloat32(0.0f)),
+		ndVector(ndFloat32( 0.0f), ndFloat32(-1.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+		ndVector(ndFloat32(-1.0f), ndFloat32(-1.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+		ndVector(ndFloat32(-1.0f), ndFloat32(-1.0f), ndFloat32(-1.0f), ndFloat32(0.0f)),
+		ndVector(ndFloat32( 0.0f), ndFloat32( 0.0f), ndFloat32(-1.0f), ndFloat32(0.0f)),
+		ndVector(ndFloat32( 0.0f), ndFloat32( 0.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+		ndVector(ndFloat32(-1.0f), ndFloat32( 0.0f), ndFloat32( 0.0f), ndFloat32(0.0f)),
+		ndVector(ndFloat32(-1.0f), ndFloat32( 0.0f), ndFloat32(-1.0f), ndFloat32(0.0f))
+	};
+
+	for (ndInt32 i = 0; i < gridCount; i = end)
+	{
+		end = i + 1;
+		ndInt32 start = i;
+		const ndGridHash startGrid(m_hashGridMap[start], 0);
+		while (startGrid.m_gridCellHash == ndGridHash(m_hashGridMap[end], 0).m_gridCellHash)
+		{
+			end++;
+		}
+		ndInt32 count = end - start;
+		if (count < 8)
+		{
+			ndIsoCell_1 cell;
+			ndVector* const isoValue = &cell.m_isoValues[0];
+			ndVector origin(ndFloat32(startGrid.m_x + 1), ndFloat32(startGrid.m_y + 1), ndFloat32(startGrid.m_z + 1), ndFloat32(0.0f));
+			for (ndInt32 j = 0; j < 8; j++)
+			{
+				isoValue[j] = origin + gridCorners[j];
+			}
+			for (ndInt32 j = 0; j < count; j++)
+			{
+				ndInt32 index = m_hashGridMap[start + j].m_cellType;
+				isoValue[index].m_w = ndFloat32(1.0f);
+			}
+			ProcessTriangleListCell(cell);
+		}
+	}
+}
+
+void ndIsoSurface::ndImplementation::GenerateIndexList(ndIsoSurface* const me)
+{
+	D_TRACKTIME();
+	
+	ndArray<ndVector>& points = me->m_points;
+	ndArray<ndTriangle>& indexList = me->m_triangles;
+	const ndArray<ndIsoTriangle_1>& triangleList = m_triangles;
+	indexList.SetCount(triangleList.GetCount());
+	points.SetCount(triangleList.GetCount() * 3);
+	for (ndInt32 i = 0; i < triangleList.GetCount(); ++i)
+	{
+		const ndIsoTriangle_1& triag = triangleList[i];
+		indexList[i].m_index[0] = i * 3 + 0;
+		indexList[i].m_index[1] = i * 3 + 1;
+		indexList[i].m_index[2] = i * 3 + 2;
+
+		points[i * 3 + 0] = triag.m_p[0] * m_gridSize + m_origin;
+		points[i * 3 + 1] = triag.m_p[1] * m_gridSize + m_origin;
+		points[i * 3 + 2] = triag.m_p[2] * m_gridSize + m_origin;
+	}
 }
 	
 void ndIsoSurface::ndImplementation::CreateGrids(const ndArray<ndVector>& points)
@@ -1023,6 +1228,7 @@ void ndIsoSurface::ndImplementation::CreateGrids(const ndArray<ndVector>& points
 	const ndVector invGridSize(m_invGridSize);
 
 	ndUpperDigit upperDigits;
+	const ndGridHashSteps steps;
 	m_hashGridMap.SetCount(points.GetCount() * 8);
 	for (ndInt32 i = 0; i < points.GetCount(); ++i)
 	{
@@ -1034,7 +1240,6 @@ void ndIsoSurface::ndImplementation::CreateGrids(const ndArray<ndVector>& points
 		upperDigits.m_y = dMax(upperDigits.m_y, ndInt32(hashKey.m_yHigh));
 		upperDigits.m_z = dMax(upperDigits.m_z, ndInt32(hashKey.m_zHigh));
 		
-		ndGridHashSteps steps;
 		for (ndInt32 j = 0; j < 8; ++j)
 		{
 			ndGridHash cell(hashKey);
@@ -1048,39 +1253,82 @@ void ndIsoSurface::ndImplementation::CreateGrids(const ndArray<ndVector>& points
 	m_upperDigitsIsValid = upperDigits;
 }
 
-void ndIsoSurface::ndImplementation::BuildMesh(ndIsoSurface* const me, const ndArray<ndVector>& points, ndFloat32 gridSize)
+void ndIsoSurface::ndImplementation::CreateGrids_1(const ndArray<ndVector>& points)
 {
 	D_TRACKTIME();
-	CalculatedAabb(points);
+	const ndVector origin(m_boxP0);
+	const ndVector invGridSize(m_invGridSize);
 
-	m_isoValue = ndFloat32(0.5f);
-	m_gridSize = ndVector::m_triplexMask & ndVector(gridSize);
-	m_invGridSize = ndVector::m_triplexMask & ndVector(ndFloat32(1.0f) / gridSize);
+	ndUpperDigit upperDigits;
+	const ndGridHashSteps_1 steps;
+	m_hashGridMap.SetCount(points.GetCount() * 8);
+	for (ndInt32 i = 0; i < points.GetCount(); ++i)
+	{
+		const ndVector r(points[i] - origin);
+		const ndVector p(r * invGridSize);
+		const ndGridHash hashKey(p);
 
-	m_boxP0 = m_boxP0 - m_gridSize;
-	m_origin = m_boxP0;
-	ndVector size((m_boxP1 - m_origin) * m_invGridSize + ndVector::m_half);
+		upperDigits.m_x = dMax(upperDigits.m_x, ndInt32(hashKey.m_xHigh));
+		upperDigits.m_y = dMax(upperDigits.m_y, ndInt32(hashKey.m_yHigh));
+		upperDigits.m_z = dMax(upperDigits.m_z, ndInt32(hashKey.m_zHigh));
+		
+		for (ndInt32 j = 0; j < 8; ++j)
+		{
+			ndGridHash cell(hashKey);
+			cell.m_x += steps.m_steps[j].m_x;
+			cell.m_y += steps.m_steps[j].m_y;
+			cell.m_z += steps.m_steps[j].m_z;
+			cell.m_cellType = steps.m_cellType[j];
+			m_hashGridMap[i * 8 + j] = cell;
+		}
+	}
+	m_upperDigitsIsValid = upperDigits;
+}
 
-	ndVector cells(size.Floor().GetInt());
-	m_xCellSize = cells.m_ix + 2;
-	m_yCellSize = cells.m_iy + 2;
-	m_zCellSize = cells.m_iz + 2;
 
+void ndIsoSurface::ndImplementation::ClearBuffers()
+{
+	D_TRACKTIME();
+	m_vertexMap.RemoveAll();
+	m_triangleMap.RemoveAll();
+}
+
+void ndIsoSurface::ndImplementation::ClearBuffers_1()
+{
+	D_TRACKTIME();
+	m_triangles.SetCount(0);
+}
+
+void ndIsoSurface::ndImplementation::BuildIndexListMesh(ndIsoSurface* const me, const ndArray<ndVector>& points, ndFloat32 gridSize)
+{
+	D_TRACKTIME();
+	CalculatedAabb(points, gridSize);
 	CreateGrids(points);
 	SortCellBuckects();
 	RemoveDuplicates();
 	GenerateIsoSurface();
-	
 	RemapVertexArray(me);
 	RemapIndexArray(me);
 	CalculateNormals(me);
-	m_vertexMap.RemoveAll();
-	m_triangleMap.RemoveAll();
+	ClearBuffers();
+}
+
+void ndIsoSurface::ndImplementation::BuildTriangleListMesh(ndIsoSurface* const me, const ndArray<ndVector>& points, ndFloat32 gridSize)
+{
+	D_TRACKTIME();
+	CalculatedAabb(points, gridSize);
+	CreateGrids_1(points);
+	SortCellBuckects();
+	RemoveDuplicates();
+	GenerateIsoSurface_1();
+	GenerateIndexList(me);
+	CalculateNormals(me);
+	ClearBuffers_1();
 }
 
 void ndIsoSurface::GenerateMesh(const ndArray<ndVector>& pointCloud, ndFloat32 gridSize)
 {
 	ndImplementation& implementation = GetImplementation();
-
-	implementation.BuildMesh(this, pointCloud, gridSize);
+	implementation.BuildTriangleListMesh(this, pointCloud, gridSize);
+	//implementation.BuildIndexListMesh(this, pointCloud, gridSize);
 }

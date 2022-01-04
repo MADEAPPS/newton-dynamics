@@ -13,8 +13,6 @@
 
 #include "ndSandboxStdafx.h"
 
-//#define TEST_FREEZING
-
 #define MAX_PHYSICS_FPS			60.0f
 
 class ndSoundManager;
@@ -49,9 +47,7 @@ class ndPhysicsWorld: public ndWorld
 	ndArray<ndBody*> m_deletedBodies;
 	ndAtomic<bool> m_hasPendingObjectToDelete;
 	ndSpinLock m_deletedLock;
-#ifndef TEST_FREEZING
 	ndThreadBackgroundWorker m_backgroundThread;
-#endif
 };
 
 #endif

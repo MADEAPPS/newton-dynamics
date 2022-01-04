@@ -25,6 +25,8 @@
 #include "ndProfiler.h"
 #include "ndThreadBackgroundWorker.h"
 
+//#define D_EXECUTE_IMMIDIATE
+
 ndThreadBackgroundWorker::ndThreadBackgroundWorker()
 	:ndThread()
 	,ndList<ndBackgroundJob*, ndContainersFreeListAlloc<ndBackgroundJob*>>()
@@ -33,7 +35,7 @@ ndThreadBackgroundWorker::ndThreadBackgroundWorker()
 	,m_teminate(false)
 	,m_inLoop(false)
 {
-	SetName(__FUNCTION__);
+	SetName("BackgroundWorker");
 	Signal();
 }
 
@@ -58,12 +60,18 @@ void ndThreadBackgroundWorker::Terminate()
 
 void ndThreadBackgroundWorker::SendJob(ndBackgroundJob* const job)
 {
+#ifdef D_EXECUTE_IMMIDIATE
+	job->m_jobState = ndBackgroundJob::m_jobInProccess;
+	job->Execute();
+	job->m_jobState = ndBackgroundJob::m_jobCompleted;
+#else
 	{
 		ndScopeSpinLock lock(m_lock);
 		job->m_jobState = ndBackgroundJob::m_jobInProccess;
 		Append(job);
 	}
 	m_queueSemaphore.Signal();
+#endif
 }
 
 void ndThreadBackgroundWorker::ThreadFunction()

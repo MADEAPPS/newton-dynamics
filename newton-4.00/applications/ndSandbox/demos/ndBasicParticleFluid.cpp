@@ -35,6 +35,7 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundJob
 
 	void UpdateIsoSurface()
 	{
+		D_TRACKTIME();
 		m_isoSurface.GenerateMesh(GetPositions(), GetParticleRadius() * ndFloat32 (2.0f));
 		const ndArray<ndVector>& points = m_isoSurface.GetPoints();
 		const ndArray<ndVector>& normals = m_isoSurface.GetNormals();
@@ -221,7 +222,10 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 
 	fluidObject->SetParticleRadius(diameter * 0.5f);
 
-	ndInt32 particleCountPerAxis = 32;
+	ndInt32 particleCountPerAxis = 40;
+	//ndInt32 particleCountPerAxis = 32;
+	//ndInt32 particleCountPerAxis = 10;
+	//ndInt32 particleCountPerAxis = 1;
 	ndFloat32 spacing = diameter * 1.0f;
 
 	ndFloat32 offset = spacing * particleCountPerAxis / 2.0f;

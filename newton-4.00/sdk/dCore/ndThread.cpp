@@ -102,7 +102,7 @@ void ndThread::ThreadFunctionCallback()
 	// wait until constructor was fully initialized.
 
 	store(false);
-	D_SET_TRACK_NAME(m_name);
+	//D_SET_TRACK_NAME(m_name);
 	ndFloatExceptions exception;
 
 	while (!Wait())
