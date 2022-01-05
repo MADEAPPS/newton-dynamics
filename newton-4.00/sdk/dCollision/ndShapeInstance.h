@@ -128,6 +128,7 @@ class ndShapeInstance: public ndClassAlloc
 
 	ndShape* GetShape();
 	const ndShape* GetShape() const;
+	void SetShape(ndShape* const shape);
 	ndVector SupportVertex(const ndVector& dir) const;
 	ndMatrix GetScaledTransform(const ndMatrix& matrix) const;
 	ndVector SupportVertexSpecial(const ndVector& dir, ndInt32* const vertexIndex) const;
@@ -373,6 +374,14 @@ inline ndUnsigned64 ndShapeInstance::GetUserDataID() const
 	return m_shapeMaterial.m_userId;
 }
 
+inline void ndShapeInstance::SetShape(ndShape* const shape)
+{
+	if (m_shape)
+	{
+		m_shape->Release();
+	}
+	m_shape = shape->AddRef();
+}
 #endif 
 
 
