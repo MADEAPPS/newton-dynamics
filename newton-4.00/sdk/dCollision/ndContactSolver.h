@@ -62,9 +62,6 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 	class ndBoxBoxDistance2;
 
 	D_COLLISION_API ndContactSolver();
-	ndContactSolver(ndContact* const contact, ndContactNotify* const notification, ndFloat32 timestep);
-	ndContactSolver(ndShapeInstance* const instance, ndContactNotify* const notification, ndFloat32 timestep);
-	ndContactSolver(const ndContactSolver& src, const ndShapeInstance& instance0, const ndShapeInstance& instance1);
 	~ndContactSolver() {}
 
 	D_COLLISION_API void CalculateContacts(
@@ -72,12 +69,15 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 		const ndShape* const shapeB, const ndMatrix& matrixB, const ndVector& velocB,
 		ndFixSizeArray<ndContactPoint, 16>& contactOut);
 
+	private:
+	ndContactSolver(ndContact* const contact, ndContactNotify* const notification, ndFloat32 timestep);
+	ndContactSolver(ndShapeInstance* const instance, ndContactNotify* const notification, ndFloat32 timestep);
+	ndContactSolver(const ndContactSolver& src, const ndShapeInstance& instance0, const ndShapeInstance& instance1);
+
 	ndInt32 CalculateContactsDiscrete(); // done
 	ndInt32 CalculateContactsContinue(); // done
+	ndFloat32 RayCast(const ndVector& localP0, const ndVector& localP1, ndContactPoint& contactOut);
 
-	ndFloat32 RayCast (const ndVector& localP0, const ndVector& localP1, ndContactPoint& contactOut);
-	
-	private:
 	ndInt32 ConvexContactsDiscrete(); // done
 	ndInt32 CompoundContactsDiscrete(); // done
 	ndInt32 ConvexToConvexContactsDiscrete(); // done
@@ -178,6 +178,7 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 	static ndInt32 m_rayCastSimplex[4][4];
 
 	friend class ndScene;
+	friend class ndShapeConvex;
 	friend class ndShapeInstance;
 	friend class ndPolygonMeshDesc;
 	friend class ndConvexCastNotify;
