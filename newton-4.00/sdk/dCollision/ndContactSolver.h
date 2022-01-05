@@ -60,10 +60,17 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 {
 	public: 
 	class ndBoxBoxDistance2;
+
+	D_COLLISION_API ndContactSolver();
 	ndContactSolver(ndContact* const contact, ndContactNotify* const notification, ndFloat32 timestep);
 	ndContactSolver(ndShapeInstance* const instance, ndContactNotify* const notification, ndFloat32 timestep);
 	ndContactSolver(const ndContactSolver& src, const ndShapeInstance& instance0, const ndShapeInstance& instance1);
 	~ndContactSolver() {}
+
+	D_COLLISION_API void CalculateContacts(
+		const ndShape* const shapeA, const ndMatrix& matrixA, const ndVector& velocA,
+		const ndShape* const shapeB, const ndMatrix& matrixB, const ndVector& velocB,
+		ndFixSizeArray<ndContactPoint, 16>& contactOut);
 
 	ndInt32 CalculateContactsDiscrete(); // done
 	ndInt32 CalculateContactsContinue(); // done

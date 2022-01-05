@@ -318,6 +318,25 @@ static ndFloat32 CalculateHeighfieldDist2(const ndContactSolver::ndBoxBoxDistanc
 	return dist2;
 }
 
+ndContactSolver::ndContactSolver()
+	:ndDownHeap<ndMinkFace*, ndFloat32>(m_heapBuffer, sizeof(m_heapBuffer))
+	,m_instance0(nullptr)
+	,m_instance1(nullptr)
+	,m_separatingVector(ndContact::m_initialSeparatingVector)
+	,m_contact(nullptr)
+	,m_freeFace(nullptr)
+	,m_notification(nullptr)
+	,m_contactBuffer(nullptr)
+	,m_timestep(ndFloat32 (0.0f))
+	,m_skinThickness(ndFloat32(0.0f))
+	,m_separationDistance(ndFloat32(0.0f))
+	,m_maxCount(D_MAX_CONTATCS)
+	,m_vertexIndex(0)
+	,m_pruneContacts(1)
+	,m_intersectionTestOnly(0)
+{
+}
+
 ndContactSolver::ndContactSolver(ndShapeInstance* const instance, ndContactNotify* const notification, ndFloat32 timestep)
 	:ndDownHeap<ndMinkFace*, ndFloat32>(m_heapBuffer, sizeof (m_heapBuffer))
 	,m_instance0(*instance, (ndShape*)instance->GetShape())
@@ -3930,4 +3949,12 @@ ndInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 	}
 
 	return count;
+}
+
+void ndContactSolver::CalculateContacts(
+	const ndShape* const shapeA, const ndMatrix& matrixA, const ndVector& velocA,
+	const ndShape* const shapeB, const ndMatrix& matrixB, const ndVector& velocB,
+	ndFixSizeArray<ndContactPoint, 16>& contactOut)
+{
+	dAssert(0);
 }
