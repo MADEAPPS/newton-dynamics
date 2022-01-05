@@ -38,7 +38,7 @@ ndShapeInstance::ndShapeInstance(ndShape* const shape)
 	,m_scale(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f))
 	,m_invScale(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f))
 	,m_maxScale(ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(1.0f), ndFloat32(0.0f))
-	,m_shape(shape->AddRef())
+	,m_shape(shape ? shape->AddRef() : shape)
 	,m_ownerBody(nullptr)
 	,m_subCollisionHandle(nullptr)
 	,m_parent(nullptr)
@@ -46,10 +46,13 @@ ndShapeInstance::ndShapeInstance(ndShape* const shape)
 	,m_scaleType(m_unit)
 	,m_collisionMode(true)
 {
-	ndShapeCompound* const compound = shape->GetAsShapeCompound();
-	if (compound)
+	if (shape)
 	{
-		compound->SetOwner(this);
+		ndShapeCompound* const compound = shape->GetAsShapeCompound();
+		if (compound)
+		{
+			compound->SetOwner(this);
+		}
 	}
 }
 
@@ -139,7 +142,10 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndSha
 
 ndShapeInstance::~ndShapeInstance()
 {
-	m_shape->Release();
+	if (m_shape)
+	{
+		m_shape->Release();
+	}
 }
 
 ndShapeInstance& ndShapeInstance::operator=(const ndShapeInstance& instance)

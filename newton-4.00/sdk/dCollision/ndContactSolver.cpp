@@ -3952,9 +3952,9 @@ ndInt32 ndContactSolver::ConvexToStaticMeshContactsContinue()
 }
 
 void ndContactSolver::CalculateContacts(
-	const ndShape* const shapeA, const ndMatrix& matrixA, const ndVector& velocA,
-	const ndShape* const shapeB, const ndMatrix& matrixB, const ndVector& velocB,
+	const ndShapeInstance* const shapeA, const ndMatrix& matrixA, const ndVector& velocA,
+	const ndShapeInstance* const shapeB, const ndMatrix& matrixB, const ndVector& velocB,
 	ndFixSizeArray<ndContactPoint, 16>& contactOut)
 {
-	dAssert(0);
+	//dAssert(0);
 }
