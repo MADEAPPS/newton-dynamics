@@ -120,6 +120,7 @@ void ndContactCallback::OnContactCallback(ndInt32, const ndContact* const contac
 		PlaySoundTest(contactJoint);
 	}
 
+#if 0
 	ndContactSolver solver;
 	ndFixSizeArray<ndContactPoint, 16> contactOut;
 	ndBodyKinematic* bodyA = contactJoint->GetBody0();
@@ -130,5 +131,5 @@ void ndContactCallback::OnContactCallback(ndInt32, const ndContact* const contac
 		&shapeA, bodyA->GetMatrix(), bodyA->GetVelocity(),
 		&shapeB, bodyB->GetMatrix(), bodyB->GetVelocity(),
 		contactOut);
-
+#endif
 }
