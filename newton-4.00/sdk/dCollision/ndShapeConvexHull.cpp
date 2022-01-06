@@ -133,7 +133,7 @@ bool ndShapeConvexHull::Create(ndInt32 count, ndInt32 strideInBytes, const ndFlo
 		//	tmp[i][0] = ndFloat32(buffer[i].m_x);
 		//	tmp[i][1] = ndFloat32(buffer[i].m_y);
 		//	tmp[i][2] = ndFloat32(buffer[i].m_z);
-		//	tmp[i][2] = ndFloat32(0.0f);
+		//	tmp[i][3] = ndFloat32(0.0f);
 		//}
 		//
 		//dObb sphere;

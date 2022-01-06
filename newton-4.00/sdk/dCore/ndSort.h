@@ -27,46 +27,6 @@
 #include "ndProfiler.h"
 #include "ndThreadPool.h"
 
-template <class T, class CompareKey>
-void ndBinarySearch(T* const array, ndInt32 elements, void* const context = nullptr)
-{
-	dAssert(0);
-	//ndInt32 index0 = 0;
-	//ndInt32 index2 = elements - 1;
-	//
-	//while ((index2 - index0) > 4) 
-	//{
-	//	ndInt32 index1 = (index0 + index2) >> 1;
-	//	ndInt32 test = compare(&array[index1], &entry, context);
-	//	if (test < 0) 
-	//	{
-	//		index0 = index1;
-	//	}
-	//	else 
-	//	{
-	//		index2 = index1;
-	//	}
-	//}
-	//
-	//index0 = (index0 > 0) ? index0 - 1 : 0;
-	//index2 = ((index2 + 1) < elements) ? index2 + 1 : elements;
-	//ndInt32 index = index0 - 1;
-	//for (ndInt32 i = index0; i < index2; ++i) 
-	//{
-	//	ndInt32 test = compare(&array[i], &entry, context);
-	//	if (!test) 
-	//	{
-	//		return i;
-	//	}
-	//	else if (test > 0) 
-	//	{
-	//		break;
-	//	}
-	//	index = i;
-	//}
-	//return index;
-}
-
 template <class T, class dCompareKey>
 void ndSort(T* const array, ndInt32 elements, void* const context = nullptr)
 {
@@ -165,6 +125,7 @@ void ndSort(T* const array, ndInt32 elements, void* const context = nullptr)
 }
 
 template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
+//void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scratchBuffer, void* const context = nullptr)
 void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scratchBuffer)
 {
 	D_TRACKTIME();
@@ -286,14 +247,14 @@ void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scr
 }
 
 template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
-void ndCountingSort(ndArray<T>& array, ndArray<T>& scratchBuffer)
+void ndCountingSort(ndArray<T>& array, ndArray<T>& scratchBuffer, void* const context = nullptr)
 {
 	D_TRACKTIME();
 	dAssert(keyBitSize > 0);
 	scratchBuffer.SetCount(array.GetCount());
 
 	ndInt32 scans[1 << keyBitSize];
-	ndEvaluateKey evaluator;
+	ndEvaluateKey evaluator(context);
 	for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 	{
 		scans[i] = 0;

@@ -20,11 +20,11 @@
 #include "ndDemoEntityManager.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
-class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundJob
+class ndIsoSurfaceParticleVolume : public ndBodySphFluid_forCPU, public ndBackgroundJob
 {
 	public:
 	ndIsoSurfaceParticleVolume(ndFloat32 radius)
-		:ndBodySphFluid()
+		:ndBodySphFluid_forCPU()
 		,ndBackgroundJob()
 		,m_indexList(1024)
 		,m_points(1024)
@@ -193,8 +193,6 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 	{
 		ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
 		ndScopeSpinLock lock(entity->m_lock);
-		//entity->m_fluidBody->UpdateIsoSurface();
-
 		if (entity->m_fluidBody->JobState() == ndBackgroundJob::m_jobCompleted)
 		{
 			ndPhysicsWorld* const world = m_manager->GetWorld();

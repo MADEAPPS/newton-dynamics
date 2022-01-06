@@ -2773,6 +2773,7 @@ void ndIsoSurface::ndImplementation::SortCellBuckects()
 	class ndKey_xlow
 	{
 		public:
+		ndKey_xlow(void* const){}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_xLow;
@@ -2782,6 +2783,7 @@ void ndIsoSurface::ndImplementation::SortCellBuckects()
 	class ndKey_ylow
 	{
 		public:
+		ndKey_ylow(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_yLow;
@@ -2791,6 +2793,7 @@ void ndIsoSurface::ndImplementation::SortCellBuckects()
 	class ndKey_zlow
 	{
 		public:
+		ndKey_zlow(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_zLow;
@@ -2800,6 +2803,7 @@ void ndIsoSurface::ndImplementation::SortCellBuckects()
 	class ndKey_xhigh
 	{
 		public:
+		ndKey_xhigh(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_xHigh;
@@ -2809,6 +2813,7 @@ void ndIsoSurface::ndImplementation::SortCellBuckects()
 	class ndKey_yhigh
 	{
 		public:
+		ndKey_yhigh(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_yHigh;
@@ -2818,6 +2823,7 @@ void ndIsoSurface::ndImplementation::SortCellBuckects()
 	class ndKey_zhigh
 	{
 		public:
+		ndKey_zhigh(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_zHigh;
@@ -2941,6 +2947,7 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 	class ndKey_lowX
 	{
 		public:
+		ndKey_lowX(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
 			ndInt32 key = ndInt32 (point.m_x * ndFloat32(D_LOW_RES_FRACTION)) & D_LOW_RES_MASK;
@@ -2951,6 +2958,7 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 	class ndKey_lowY
 	{
 		public:
+		ndKey_lowY(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
 			ndInt32 key = ndInt32(point.m_y * ndFloat32(D_LOW_RES_FRACTION)) & D_LOW_RES_MASK;
@@ -2961,6 +2969,7 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 	class ndKey_lowZ
 	{
 		public:
+		ndKey_lowZ(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
 			ndInt32 key = ndInt32(point.m_z * ndFloat32(D_LOW_RES_FRACTION)) & D_LOW_RES_MASK;
@@ -2971,6 +2980,7 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 	class ndKey_highX
 	{
 		public:
+		ndKey_highX(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
 			ndInt32 key = ndInt32(point.m_x * ndFloat32(D_LOW_RES_FRACTION)) >> D_LOW_RES_BITS;
@@ -2981,6 +2991,7 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 	class ndKey_highY
 	{
 		public:
+		ndKey_highY(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
 			ndInt32 key = ndInt32(point.m_y * ndFloat32(D_LOW_RES_FRACTION)) >> D_LOW_RES_BITS;
@@ -2991,6 +3002,7 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 	class ndKey_highZ
 	{
 		public:
+		ndKey_highZ(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
 			ndInt32 key = ndInt32(point.m_z * ndFloat32(D_LOW_RES_FRACTION)) >> D_LOW_RES_BITS;
@@ -3073,6 +3085,7 @@ void ndIsoSurface::ndImplementation::GenerateHighResIndexList(ndIsoSurface* cons
 	class ndKey_lowX
 	{
 		public:
+		ndKey_lowX(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
 			ndInt32 key = ndInt32(point.m_x * ndFloat32(D_HIGH_RES_FRACTION)) & D_HIGH_RES_MASK;
@@ -3083,6 +3096,7 @@ void ndIsoSurface::ndImplementation::GenerateHighResIndexList(ndIsoSurface* cons
 	class ndKey_lowY
 	{
 		public:
+		ndKey_lowY(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
 			ndInt32 key = ndInt32(point.m_y * ndFloat32(D_HIGH_RES_FRACTION)) & D_HIGH_RES_MASK;
@@ -3093,6 +3107,7 @@ void ndIsoSurface::ndImplementation::GenerateHighResIndexList(ndIsoSurface* cons
 	class ndKey_lowZ
 	{
 		public:
+		ndKey_lowZ(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
 			ndInt32 key = ndInt32(point.m_z * ndFloat32(D_HIGH_RES_FRACTION)) & D_HIGH_RES_MASK;
@@ -3103,6 +3118,7 @@ void ndIsoSurface::ndImplementation::GenerateHighResIndexList(ndIsoSurface* cons
 	class ndKey_highX
 	{
 		public:
+		ndKey_highX(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
 			ndInt32 key = ndInt32(point.m_x * ndFloat32(D_HIGH_RES_FRACTION)) >> D_HIGH_RES_BITS;
@@ -3113,6 +3129,7 @@ void ndIsoSurface::ndImplementation::GenerateHighResIndexList(ndIsoSurface* cons
 	class ndKey_highY
 	{
 		public:
+		ndKey_highY(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
 			ndInt32 key = ndInt32(point.m_y * ndFloat32(D_HIGH_RES_FRACTION)) >> D_HIGH_RES_BITS;
@@ -3123,6 +3140,7 @@ void ndIsoSurface::ndImplementation::GenerateHighResIndexList(ndIsoSurface* cons
 	class ndKey_highZ
 	{
 		public:
+		ndKey_highZ(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
 			ndInt32 key = ndInt32(point.m_z * ndFloat32(D_HIGH_RES_FRACTION)) >> D_HIGH_RES_BITS;

@@ -29,9 +29,9 @@ class ndContact;
 class ndBodyNotify;
 class ndBodyDynamic;
 class ndBodySentinel;
+class ndBodySphFluid;
 class ndBodyKinematic;
 class ndRayCastNotify;
-class ndBodySphFluid;
 class ndBodyParticleSet;
 class ndBodyTriggerVolume;
 class ndJointBilateralConstraint;
@@ -48,9 +48,9 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	virtual ndBody* GetAsBody() { return this;}
 	virtual ndBodyDynamic* GetAsBodyDynamic() { return nullptr; }
 	virtual ndBodySentinel* GetAsBodySentinel() { return nullptr; }
+	virtual ndBodySphFluid* GetAsBodySphFluid() { return nullptr; }
 	virtual ndBodyKinematic* GetAsBodyKinematic() { return nullptr; }
 	virtual ndBodyKinematic* GetAsBodyPlayerCapsule() { return nullptr; }
-	virtual ndBodySphFluid* GetAsBodySphFluid() { return nullptr; }
 	virtual ndBodyParticleSet* GetAsBodyParticleSet() { return nullptr; }
 	virtual ndBodyTriggerVolume* GetAsBodyTriggerVolume() { return nullptr; }
 
