@@ -393,7 +393,7 @@ inline void operator delete[](void* ptr)	\
 		}
 
 		ndAtomic<T>(const ndAtomic<T>& copy)
-			: std::atomic<T>(copy)
+			: std::atomic<T>(copy.load())
 		{
 		}
 
