@@ -466,7 +466,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 			tmp[i][0] = dgFloat32 (buffer[i*3 + 0]);
 			tmp[i][1] = dgFloat32 (buffer[i*3 + 1]);
 			tmp[i][2] = dgFloat32 (buffer[i*3 + 2]);
-			tmp[i][2] = dgFloat32 (0.0f);
+			tmp[i][3] = dgFloat32 (0.0f);
 		}
 	
 		dgObb sphere;

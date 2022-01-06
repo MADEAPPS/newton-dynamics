@@ -1884,7 +1884,7 @@ void dgMeshEffect::EndBuildFace ()
 				attibutes.m_binormalChannel.PushBack(m_attrib.m_binormalChannel[m_constructionIndex + i]);
 			}
 
-			if (m_attrib.m_binormalChannel.m_count) {
+			if (m_attrib.m_colorChannel.m_count) {
 				attibutes.m_colorChannel.PushBack(m_attrib.m_colorChannel[m_constructionIndex + i]);
 			}
 

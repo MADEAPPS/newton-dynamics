@@ -1568,6 +1568,7 @@ void dgPolyhedra::Triangulate (const dgFloat64* const vertex, dgInt32 strideInBy
 					ptr = edge;
 					do {
 						dgTrace (("%d ", ptr->m_incidentVertex));
+						ptr = ptr->m_next;
 					} while (ptr != edge);
 					dgTrace (("\n"));					
 				}
