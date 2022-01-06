@@ -179,8 +179,8 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void SortGrids(const ndWorld* const world);
 	void BuildPairs(const ndWorld* const world);
 	void CreateGrids(const ndWorld* const world);
+	void CaculateAABB(const ndWorld* const world);
 	void CalculateAccelerations(const ndWorld* const world);
-	void CaculateAABB(const ndWorld* const world, ndVector& boxP0, ndVector& boxP1) const;
 	void SortCellBuckects(const ndWorld* const world);
 	void SortByCenterType(const ndWorld* const world);
 	void CalculateScans(const ndWorld* const world);
@@ -188,8 +188,10 @@ class ndBodySphFluid: public ndBodyParticleSet
 
 	ndVector m_box0;
 	ndVector m_box1;
+	ndArray<ndSpinLock> m_locks;
+	ndArray<ndInt8> m_pairCount;
+	ndArray<ndParticlePair> m_pair;
 	ndArray<ndGridHash> m_hashGridMap;
-	ndArray<ndParticlePair> m_particlesPairs;
 	ndArray<ndGridHash> m_hashGridMapScratchBuffer;
 	ndArray<ndInt32> m_gridScans;
 	ndArray<ndInt32> m_partialsGridScans[D_MAX_THREADS_COUNT];

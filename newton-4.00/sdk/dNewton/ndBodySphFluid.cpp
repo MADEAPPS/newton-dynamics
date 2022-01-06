@@ -28,8 +28,10 @@ ndBodySphFluid::ndBodySphFluid()
 	:ndBodyParticleSet()
 	,m_box0(ndFloat32(-1e10f))
 	,m_box1(ndFloat32(1e10f))
+	,m_locks(1024)
+	,m_pairCount(1024)
+	,m_pair(1024)
 	,m_hashGridMap(1024)
-	,m_particlesPairs(1024)
 	,m_hashGridMapScratchBuffer(1024)
 	,m_gridScans(1024)
 	,m_upperDigitsIsValid()
@@ -63,7 +65,7 @@ void ndBodySphFluid::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
 }
 
-void ndBodySphFluid::CaculateAABB(const ndWorld* const world, ndVector& boxP0, ndVector& boxP1) const
+void ndBodySphFluid::CaculateAABB(const ndWorld* const world)
 {
 	D_TRACKTIME();
 	class ndBox
@@ -105,35 +107,22 @@ void ndBodySphFluid::CaculateAABB(const ndWorld* const world, ndVector& boxP0, n
 		}
 	};
 
-	ndBox box;
 	ndContext context;
 	context.m_fluid = this;
 	ndScene* const scene = world->GetScene();
 	scene->SubmitJobs<ndCaculateAabb>(&context);
 	
+	ndBox box;
 	const ndInt32 threadCount = scene->GetThreadCount();
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
 		box.m_min = box.m_min.GetMin(context.m_boxes[i].m_min);
 		box.m_max = box.m_max.GetMax(context.m_boxes[i].m_max);
 	}
-	boxP0 = box.m_min;
-	boxP1 = box.m_max;
-}
 
-void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32)
-{
-	ndVector boxP0;
-	ndVector boxP1;
-	CaculateAABB(world, boxP0, boxP1);
 	const ndFloat32 gridSize = CalculateGridSize();
-	m_box0 = boxP0 - ndVector(gridSize);
-	m_box1 = boxP1 + ndVector(gridSize);
-
-	CreateGrids(world);
-	SortGrids(world);
-	BuildPairs(world);
-	//CalculateAccelerations(world);
+	m_box0 = box.m_min - ndVector(gridSize);
+	m_box1 = box.m_max + ndVector(gridSize);
 }
 
 void ndBodySphFluid::SortByCenterType(const ndWorld* const world)
@@ -719,122 +708,118 @@ void ndBodySphFluid::SortGrids(const ndWorld* const world)
 void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 {
 	D_TRACKTIME();
-	class ndBodySphFluidCreatePair : public ndScene::ndBaseJob
-	{
-		public:
-		class ndContext
-		{
-			public:
-			ndContext(ndBodySphFluid* const fluid)
-				:m_fluid(fluid)
-				,m_lock()
-			{
-			}
-
-			ndBodySphFluid* m_fluid;
-			ndSpinLock m_lock;
-		};
-
-		#define D_SCRATCH_PAIR_BUFFER_SIZE		(1024 * 24 / sizeof (ndParticlePair))
-		#define D_SCRATCH_PAIR_BUFFER_SIZE_PADD (256)
-
-		class ndParticlePairCacheBuffer : public ndFixSizeArray<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>
-		{
-			public:
-			ndParticlePairCacheBuffer()
-				:ndFixSizeArray<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>()
-				,m_size(0)
-			{
-				// check the local scratch buffer is smaller than level one cache
-				dAssert(GetCapacity() * sizeof(ndParticlePair) < 32 * 1024);
-			}
-
-			void PushBack(ndInt32 m0, ndInt32 m1)
-			{
-				dAssert(0);
-				ndInt32 index = m_size;
-				m_size++;
-				dAssert(m_size < GetCapacity());
-				ndParticlePair& pair = (*this)[index];
-				pair.m_m0 = m0;
-				pair.m_m1 = m1;
-			}
-			ndInt32 m_size;
-		};
-
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
-			ndBodySphFluid* const fluid = ((ndContext*)m_context)->m_fluid;
-			const ndInt32 threadId = GetThreadId();
-			const ndInt32 threadCount = world->GetThreadCount();
-			
-			const ndArray<ndInt32>& gridCounts = fluid->m_partialsGridScans[0];
-			const ndInt32 count = gridCounts.GetCount() - 1;
-			const ndInt32 size = count / threadCount;
-			const ndInt32 start = threadId * size;
-			const ndInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
-			const ndGridHash* const srcArray = &fluid->m_hashGridMap[0];
-
-			//const ndVector* const positions = &fluid->m_posit[0];
-			//const ndFloat32 diameter = ndFloat32(2.0f) * fluid->m_radius;
-			//const ndFloat32 diameter2 = diameter * diameter;
-			
-			ndParticlePairCacheBuffer buffer;
-			for (ndInt32 i = 0; i < batchSize; ++i)
-			{
-				const ndInt32 cellStart = gridCounts[i + start];
-				const ndInt32 cellCount = gridCounts[i + start + 1] - cellStart;
-			
-				const ndGridHash* const ptr = &srcArray[cellStart];
-				for (ndInt32 j = cellCount - 1; j > 0; j--)
-				{
-					const ndGridHash& cell0 = ptr[j];
-					if (cell0.m_cellType == ndHomeGrid)
-					{
-						const ndInt32 m0 = cell0.m_particleIndex;
-						//const ndVector& posit0 = positions[m0];
-			
-						for (ndInt32 k = j - 1; k >= 0; k--)
-						{
-							const ndGridHash& cell1 = ptr[k];
-							const ndInt32 m1 = cell1.m_particleIndex;
-							bool test = (cell1.m_cellType == ndHomeGrid);
-							dAssert(0);
-							//const ndVector& posit1 = positions[m1];
-							//const ndVector dist(posit1 - posit0);
-							//ndFloat32 dist2 = dist.DotProduct(dist).GetScalar();
-							//test = test | (cell0.m_particleIndex <= cell1.m_gridHash);
-							//test = test & (dist2 <= diameter2);
-							if (test)
-							{
-								buffer.PushBack(m0, m1);
-							}
-						}
-					}
-				}
-			
-				if (buffer.m_size > ndInt32 (D_SCRATCH_PAIR_BUFFER_SIZE))
-				{
-					ndScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
-					ndInt32 dstIndex = fluid->m_particlesPairs.GetCount();
-					fluid->m_particlesPairs.SetCount(dstIndex + buffer.m_size);
-					memcpy(&fluid->m_particlesPairs[dstIndex], &buffer[0], buffer.m_size * sizeof(ndParticlePair));
-					buffer.m_size = 0;
-				}
-			}
-			
-			if (buffer.m_size)
-			{
-				D_TRACKTIME();
-				ndScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
-				ndInt32 dstIndex = fluid->m_particlesPairs.GetCount();
-				fluid->m_particlesPairs.SetCount(dstIndex + buffer.m_size);
-				memcpy(&fluid->m_particlesPairs[dstIndex], &buffer[0], buffer.m_size * sizeof(ndParticlePair));
-			}
-		}
-	};
+	//class ndBodySphFluidCreatePair : public ndScene::ndBaseJob
+	//{
+	//	public:
+	//	class ndContext
+	//	{
+	//		public:
+	//		ndContext(ndBodySphFluid* const fluid)
+	//			:m_fluid(fluid)
+	//			,m_lock()
+	//		{
+	//		}
+	//
+	//		ndBodySphFluid* m_fluid;
+	//		ndSpinLock m_lock;
+	//	};
+	//
+	//	#define D_SCRATCH_PAIR_BUFFER_SIZE		(1024 * 24 / sizeof (ndParticlePair))
+	//	#define D_SCRATCH_PAIR_BUFFER_SIZE_PADD (256)
+	//
+	//	class ndParticlePairCacheBuffer : public ndFixSizeArray<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>
+	//	{
+	//		public:
+	//		ndParticlePairCacheBuffer()
+	//			:ndFixSizeArray<ndParticlePair, D_SCRATCH_PAIR_BUFFER_SIZE + D_SCRATCH_PAIR_BUFFER_SIZE_PADD>()
+	//			,m_size(0)
+	//		{
+	//			// check the local scratch buffer is smaller than level one cache
+	//			dAssert(GetCapacity() * sizeof(ndParticlePair) < 32 * 1024);
+	//		}
+	//
+	//		void PushBack(ndInt32 m0, ndInt32 m1)
+	//		{
+	//			dAssert(0);
+	//			ndInt32 index = m_size;
+	//			m_size++;
+	//			dAssert(m_size < GetCapacity());
+	//			ndParticlePair& pair = (*this)[index];
+	//			pair.m_m0 = m0;
+	//			pair.m_m1 = m1;
+	//		}
+	//		ndInt32 m_size;
+	//	};
+	//
+	//	virtual void Execute()
+	//	{
+	//		D_TRACKTIME();
+	//		ndWorld* const world = m_owner->GetWorld();
+	//		ndBodySphFluid* const fluid = ((ndContext*)m_context)->m_fluid;
+	//		const ndInt32 threadId = GetThreadId();
+	//		const ndInt32 threadCount = world->GetThreadCount();
+	//		
+	//		const ndArray<ndInt32>& gridCounts = fluid->m_partialsGridScans[0];
+	//		const ndInt32 count = gridCounts.GetCount() - 1;
+	//		const ndInt32 size = count / threadCount;
+	//		const ndInt32 start = threadId * size;
+	//		const ndInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
+	//		const ndGridHash* const srcArray = &fluid->m_hashGridMap[0];
+	//
+	//		ndParticlePairCacheBuffer buffer;
+	//		for (ndInt32 i = 0; i < batchSize; ++i)
+	//		{
+	//			const ndInt32 cellStart = gridCounts[i + start];
+	//			const ndInt32 cellCount = gridCounts[i + start + 1] - cellStart;
+	//		
+	//			const ndGridHash* const ptr = &srcArray[cellStart];
+	//			for (ndInt32 j = cellCount - 1; j > 0; j--)
+	//			{
+	//				const ndGridHash& cell0 = ptr[j];
+	//				if (cell0.m_cellType == ndHomeGrid)
+	//				{
+	//					const ndInt32 m0 = cell0.m_particleIndex;
+	//					//const ndVector& posit0 = positions[m0];
+	//		
+	//					for (ndInt32 k = j - 1; k >= 0; k--)
+	//					{
+	//						const ndGridHash& cell1 = ptr[k];
+	//						const ndInt32 m1 = cell1.m_particleIndex;
+	//						bool test = (cell1.m_cellType == ndHomeGrid);
+	//						dAssert(0);
+	//						//const ndVector& posit1 = positions[m1];
+	//						//const ndVector dist(posit1 - posit0);
+	//						//ndFloat32 dist2 = dist.DotProduct(dist).GetScalar();
+	//						//test = test | (cell0.m_particleIndex <= cell1.m_gridHash);
+	//						//test = test & (dist2 <= diameter2);
+	//						if (test)
+	//						{
+	//							buffer.PushBack(m0, m1);
+	//						}
+	//					}
+	//				}
+	//			}
+	//		
+	//			if (buffer.m_size > ndInt32 (D_SCRATCH_PAIR_BUFFER_SIZE))
+	//			{
+	//				ndScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
+	//				ndInt32 dstIndex = fluid->m_particlesPairs.GetCount();
+	//				fluid->m_particlesPairs.SetCount(dstIndex + buffer.m_size);
+	//				memcpy(&fluid->m_particlesPairs[dstIndex], &buffer[0], buffer.m_size * sizeof(ndParticlePair));
+	//				buffer.m_size = 0;
+	//			}
+	//		}
+	//		
+	//		if (buffer.m_size)
+	//		{
+	//			D_TRACKTIME();
+	//			ndScopeSpinLock criticalLock(((ndContext*)m_context)->m_lock);
+	//			ndInt32 dstIndex = fluid->m_particlesPairs.GetCount();
+	//			fluid->m_particlesPairs.SetCount(dstIndex + buffer.m_size);
+	//			memcpy(&fluid->m_particlesPairs[dstIndex], &buffer[0], buffer.m_size * sizeof(ndParticlePair));
+	//		}
+	//	}
+	//};
 
 	CalculateScans(world);
 
@@ -848,46 +833,57 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 {
 	D_TRACKTIME();
-	class ndCalculateDensity: public ndScene::ndBaseJob
-	{
-		public:
-		class ndContext
-		{
-			public:
-			ndContext(ndBodySphFluid* const fluid)
-				:m_fluid(fluid)
-			{
-			}
+	//class ndCalculateDensity: public ndScene::ndBaseJob
+	//{
+	//	public:
+	//	class ndContext
+	//	{
+	//		public:
+	//		ndContext(ndBodySphFluid* const fluid)
+	//			:m_fluid(fluid)
+	//		{
+	//		}
+	//
+	//		ndBodySphFluid* m_fluid;
+	//	};
+	//	
+	//	virtual void Execute()
+	//	{
+	//		D_TRACKTIME();
+	//		ndWorld* const world = m_owner->GetWorld();
+	//		ndBodySphFluid* const fluid = ((ndContext*)m_context)->m_fluid;
+	//		const ndInt32 threadId = GetThreadId();
+	//		const ndInt32 threadCount = world->GetThreadCount();
+	//		
+	//
+	//		ndArray<ndParticlePair>& particlesPairs = fluid->m_particlesPairs;
+	//		const ndInt32 count = particlesPairs.GetCount();
+	//		const ndInt32 stride = count / threadCount;
+	//		const ndInt32 start = threadId * stride;
+	//		const ndInt32 batchStride = (threadId == threadCount - 1) ? count - start : stride;
+	//
+	//		for (ndInt32 i = 0; i < batchStride; ++i)
+	//		{
+	//			//ndParticlePair& pair = particlesPairs[i];
+	//		}
+	//	}
+	//};
+	//
+	//ndScene* const scene = world->GetScene();
+	////m_particlesPairs.SetCount(0);
+	////ndBodySphFluidCreatePair::ndContext context(this);
+	//
+	//ndCalculateDensity::ndContext densityContext(this);
+	//scene->SubmitJobs<ndCalculateDensity>(&densityContext);
+}
 
-			ndBodySphFluid* m_fluid;
-		};
-		
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
-			ndBodySphFluid* const fluid = ((ndContext*)m_context)->m_fluid;
-			const ndInt32 threadId = GetThreadId();
-			const ndInt32 threadCount = world->GetThreadCount();
-			
-
-			ndArray<ndParticlePair>& particlesPairs = fluid->m_particlesPairs;
-			const ndInt32 count = particlesPairs.GetCount();
-			const ndInt32 stride = count / threadCount;
-			const ndInt32 start = threadId * stride;
-			const ndInt32 batchStride = (threadId == threadCount - 1) ? count - start : stride;
-
-			for (ndInt32 i = 0; i < batchStride; ++i)
-			{
-				//ndParticlePair& pair = particlesPairs[i];
-			}
-		}
-	};
-
-	ndScene* const scene = world->GetScene();
-	//m_particlesPairs.SetCount(0);
-	//ndBodySphFluidCreatePair::ndContext context(this);
-
-	ndCalculateDensity::ndContext densityContext(this);
-	scene->SubmitJobs<ndCalculateDensity>(&densityContext);
+void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32)
+{
+	// do the scene management 
+	CaculateAABB(world);
+	CreateGrids(world);
+	SortGrids(world);
+	CalculateScans(world);
+	BuildPairs(world);
+	//CalculateAccelerations(world);
 }
