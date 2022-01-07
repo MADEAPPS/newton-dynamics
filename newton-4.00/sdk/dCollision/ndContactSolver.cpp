@@ -1636,9 +1636,10 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 
 ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
 {
-	ndVector array[D_MAX_CONTATCS];
+	ndFixSizeArray<ndVector, D_MAX_CONTATCS> array;
 	ndFloat32 max_x = ndFloat32(1.0e20f);
 	ndInt32 maxIndex = 0;
+	array.SetCount(count);
 	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		array[i] = matrix.UntransformVector(contactArray[i].m_point);
@@ -1716,14 +1717,19 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 		tmpContact[i] = contactArray[index];
 	}
 
-	memcpy(contactArray, tmpContact, count * sizeof(ndContactPoint));
+	//memcpy(contactArray, tmpContact, count * sizeof(ndContactPoint));
+	for (ndInt32 i = count - 1; i >= 0; --i)
+	{
+		contactArray[i] = tmpContact[i];
+	}
+
 	return count;
 }
 
 ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 {
-	ndContactPoint* const contactArray = m_contactBuffer;
 	ndVector origin(ndVector::m_zero);
+	ndContactPoint* const contactArray = m_contactBuffer;
 	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		origin += contactArray[i].m_point;
