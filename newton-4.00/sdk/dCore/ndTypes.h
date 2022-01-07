@@ -249,20 +249,13 @@ typedef double ndFloat64;
 #ifdef D_NEWTON_USE_DOUBLE
 	union ndFloatSign
 	{
-		struct 
-		{
-			ndInt32 m_dommy;
-			ndInt32 m_iVal;
-		} m_integer;
+		ndInt64 m_iVal;
 		ndFloat64 m_fVal;
 	};
 #else
 	union ndFloatSign
 	{
-		struct 
-		{
-			ndInt32 m_iVal;
-		} m_integer;
+		ndInt32 m_iVal;
 		ndFloat32 m_fVal;
 	};
 #endif

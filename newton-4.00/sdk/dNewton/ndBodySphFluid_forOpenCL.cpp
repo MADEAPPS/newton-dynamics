@@ -131,6 +131,7 @@ void ndBodySphFluid_forOpenCL::SortByCenterType(const ndWorld* const world)
 	class ndKey
 	{
 		public:
+		ndKey(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return 1 - ndInt32(cell.m_cellType);
@@ -147,6 +148,7 @@ void ndBodySphFluid_forOpenCL::SortCellBuckects(const ndWorld* const world)
 	class ndKey_xlow
 	{
 		public:
+		ndKey_xlow(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_xLow;
@@ -156,6 +158,7 @@ void ndBodySphFluid_forOpenCL::SortCellBuckects(const ndWorld* const world)
 	class ndKey_ylow
 	{
 		public:
+		ndKey_ylow(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_yLow;
@@ -165,6 +168,7 @@ void ndBodySphFluid_forOpenCL::SortCellBuckects(const ndWorld* const world)
 	class ndKey_zlow
 	{
 		public:
+		ndKey_zlow(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_zLow;
@@ -174,6 +178,7 @@ void ndBodySphFluid_forOpenCL::SortCellBuckects(const ndWorld* const world)
 	class ndKey_xhigh
 	{
 		public:
+		ndKey_xhigh(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_xHigh;
@@ -183,6 +188,7 @@ void ndBodySphFluid_forOpenCL::SortCellBuckects(const ndWorld* const world)
 	class ndKey_yhigh
 	{
 		public:
+		ndKey_yhigh(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_yHigh;
@@ -192,6 +198,7 @@ void ndBodySphFluid_forOpenCL::SortCellBuckects(const ndWorld* const world)
 	class ndKey_zhigh
 	{
 		public:
+		ndKey_zhigh(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_zHigh;
@@ -702,7 +709,8 @@ void ndBodySphFluid_forOpenCL::SortGrids(const ndWorld* const world)
 	#endif
 }
 
-void ndBodySphFluid_forOpenCL::CalculateAccelerations(const ndWorld* const world)
+//void ndBodySphFluid_forOpenCL::CalculateAccelerations(const ndWorld* const world)
+void ndBodySphFluid_forOpenCL::CalculateAccelerations(const ndWorld* const)
 {
 	D_TRACKTIME();
 	//class ndCalculateDensity: public ndScene::ndBaseJob

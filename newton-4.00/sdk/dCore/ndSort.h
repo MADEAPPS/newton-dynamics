@@ -125,8 +125,7 @@ void ndSort(T* const array, ndInt32 elements, void* const context = nullptr)
 }
 
 template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
-//void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scratchBuffer, void* const context = nullptr)
-void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scratchBuffer)
+void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scratchBuffer, void* const context = nullptr)
 {
 	D_TRACKTIME();
 	dAssert(keyBitSize > 0);
@@ -140,7 +139,7 @@ void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scr
 			D_TRACKTIME();
 			const ndArray<T>& array = *m_array;
 
-			ndEvaluateKey evaluator;
+			ndEvaluateKey evaluator(m_context);
 			for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 			{
 				m_scan[i] = 0;
@@ -157,6 +156,7 @@ void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scr
 		}
 
 		ndInt32* m_scan;
+		void* m_context;
 		const ndArray<T>* m_array;
 		ndInt32 m_threadCount;
 	};
@@ -170,7 +170,7 @@ void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scr
 			ndArray<T>& dst = *m_dst;
 			const ndArray<T>& src = *m_src;
 
-			ndEvaluateKey evaluator;
+			ndEvaluateKey evaluator(m_context);
 			ndStartEnd startEnd(src.GetCount(), GetThreadId(), m_threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
@@ -185,6 +185,7 @@ void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scr
 		}
 
 		ndInt32* m_scan;
+		void* m_context;
 		ndArray<T>* m_dst;
 		const ndArray<T>* m_src;
 		ndInt32 m_threadCount;
@@ -199,6 +200,7 @@ void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scr
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
 		countKeyKernels[i].m_array = &array;
+		countKeyKernels[i].m_context = context;
 		countKeyKernels[i].m_scan = &scans[i][0];
 		countKeyKernels[i].m_threadCount = threadCount;
 		extJobPtr[i] = &countKeyKernels[i];
@@ -228,6 +230,7 @@ void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scr
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
 		sortArray[i].m_src = &array;
+		sortArray[i].m_context = context;
 		sortArray[i].m_dst = &scratchBuffer;
 		sortArray[i].m_scan = &scans[i][0];
 		sortArray[i].m_threadCount = threadCount;
@@ -238,7 +241,7 @@ void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scr
 	array.Swap(scratchBuffer);
 //#ifdef _DEBUG
 #if 0
-	ndEvaluateKey evaluator;
+	ndEvaluateKey evaluator(context);
 	for (ndInt32 i = array.GetCount() - 2; i >= 0; --i)
 	{
 		dAssert(evaluator.GetKey(array[i]) <= evaluator.GetKey(array[i + 1]));

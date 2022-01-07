@@ -25,13 +25,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndBodySphFluid.h"
 
-#define D_USE_SMALL_HASH
-#ifdef D_USE_SMALL_HASH
-	#define D_RADIX_DIGIT_SIZE		7
-#else
-	#define D_RADIX_DIGIT_SIZE		10
-#endif
-
 D_MSV_NEWTON_ALIGN_32
 class ndBodySphFluid_forOpenCL: public ndBodySphFluid
 {

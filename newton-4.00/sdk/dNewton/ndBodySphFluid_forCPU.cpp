@@ -34,7 +34,7 @@ ndBodySphFluid_forCPU::ndBodySphFluid_forCPU()
 	,m_hashGridMap(1024)
 	,m_hashGridMapScratchBuffer(1024)
 	,m_gridScans(1024)
-	,m_upperDigitsIsValid()
+	//,m_upperDigitsIsValid()
 {
 	for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; i++)
 	{
@@ -125,37 +125,65 @@ void ndBodySphFluid_forCPU::CaculateAABB(const ndWorld* const world)
 	m_box1 = box.m_max + ndVector(gridSize);
 }
 
-void ndBodySphFluid_forCPU::SortByCenterType(const ndWorld* const world)
+void ndBodySphFluid_forCPU::SortXdimension(const ndWorld* const world)
 {
 	D_TRACKTIME();
-	class ndKey
+	class ndKey_low
 	{
 		public:
+		ndKey_low(void* const context)
+			:m_fluid((ndBodySphFluid_forCPU*)context)
+		{
+			m_origin = m_fluid->m_box0.m_x;
+			m_scale = ndFloat32 (65536.0f) / ndFloat32(m_fluid->m_box1.m_x - m_fluid->m_box0.m_x);
+		}
+
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
-			return 1 - ndInt32(cell.m_cellType);
+			const ndVector& point = m_fluid->m_posit[cell.m_particleIndex];
+			ndInt32 key = ndInt32 ((point.m_x - m_origin) * m_scale);
+			return key & 0xff;
 		}
+
+		ndBodySphFluid_forCPU* m_fluid;
+		ndFloat32 m_scale;
+		ndFloat32 m_origin;
+	};
+
+	class ndKey_high
+	{
+		public:
+		ndKey_high(void* const context)
+			:m_fluid((ndBodySphFluid_forCPU*)context)
+		{
+			m_origin = m_fluid->m_box0.m_x;
+			m_scale = ndFloat32(32737.0f) / ndFloat32(m_fluid->m_box1.m_x - m_fluid->m_box0.m_x);
+		}
+
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			const ndVector& point = m_fluid->m_posit[cell.m_particleIndex];
+			ndInt32 key = ndInt32((point.m_x - m_origin) * m_scale);
+			return key >> 8;
+		}
+
+		ndBodySphFluid_forCPU* m_fluid;
+		ndFloat32 m_scale;
+		ndFloat32 m_origin;
 	};
 
 	ndScene* const scene = world->GetScene();
-	ndCountingSort<ndGridHash, ndKey, 1>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
+	ndCountingSort<ndGridHash, ndKey_low, 8>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer, this);
+	ndCountingSort<ndGridHash, ndKey_high, 8>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer, this);
 }
 
 void ndBodySphFluid_forCPU::SortCellBuckects(const ndWorld* const world)
 {
 	D_TRACKTIME();
-	class ndKey_xlow
-	{
-		public:
-		ndInt32 GetKey(const ndGridHash& cell) const
-		{
-			return cell.m_xLow;
-		}
-	};
-
 	class ndKey_ylow
 	{
 		public:
+		ndKey_ylow(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_yLow;
@@ -165,24 +193,17 @@ void ndBodySphFluid_forCPU::SortCellBuckects(const ndWorld* const world)
 	class ndKey_zlow
 	{
 		public:
+		ndKey_zlow(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_zLow;
 		}
 	};
 
-	class ndKey_xhigh
-	{
-		public:
-		ndInt32 GetKey(const ndGridHash& cell) const
-		{
-			return cell.m_xHigh;
-		}
-	};
-
 	class ndKey_yhigh
 	{
 		public:
+		ndKey_yhigh(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_yHigh;
@@ -192,6 +213,7 @@ void ndBodySphFluid_forCPU::SortCellBuckects(const ndWorld* const world)
 	class ndKey_zhigh
 	{
 		public:
+		ndKey_zhigh(void* const) {}
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
 			return cell.m_zHigh;
@@ -199,20 +221,17 @@ void ndBodySphFluid_forCPU::SortCellBuckects(const ndWorld* const world)
 	};
 
 	ndScene* const scene = world->GetScene();
-	ndCountingSort<ndGridHash, ndKey_xlow, D_RADIX_DIGIT_SIZE>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
-	if (m_upperDigitsIsValid.m_x)
-	{
-		ndCountingSort<ndGridHash, ndKey_xhigh, D_RADIX_DIGIT_SIZE>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
-	}
 
+	ndVector boxSize((m_box1 - m_box0).Scale(ndFloat32(1.0f) / CalculateGridSize()).GetInt());
 	ndCountingSort<ndGridHash, ndKey_ylow, D_RADIX_DIGIT_SIZE>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
-	if (m_upperDigitsIsValid.m_y)
+	if (boxSize.m_iy > (1 << D_RADIX_DIGIT_SIZE))
 	{
 		ndCountingSort<ndGridHash, ndKey_yhigh, D_RADIX_DIGIT_SIZE>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
 	}
-
+	
 	ndCountingSort<ndGridHash, ndKey_zlow, D_RADIX_DIGIT_SIZE>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
-	if (m_upperDigitsIsValid.m_z)
+	//if (m_upperDigitsIsValid.m_z)
+	if (boxSize.m_iz > (1 << D_RADIX_DIGIT_SIZE))
 	{
 		ndCountingSort<ndGridHash, ndKey_zhigh, D_RADIX_DIGIT_SIZE>(*scene, m_hashGridMap, m_hashGridMapScratchBuffer);
 	}
@@ -333,7 +352,6 @@ void ndBodySphFluid_forCPU::CreateGrids(const ndWorld* const world)
 	{
 		public:
 		ndInt32 m_scan[D_MAX_THREADS_COUNT][2];
-		ndUpperDidit m_upperDigisIsValid[D_MAX_THREADS_COUNT];
 	};
 
 	class ndGridNeighborInfo
@@ -342,169 +360,57 @@ void ndBodySphFluid_forCPU::CreateGrids(const ndWorld* const world)
 		ndGridNeighborInfo()
 		{
 			//ndGridHash stepsCode;
-			m_neighborDirs[0][0] = ndGridHash(0, 0, 0);
-			m_neighborDirs[0][1] = ndGridHash(0, 0, 0);
-			m_neighborDirs[0][2] = ndGridHash(0, 0, 0);
-			m_neighborDirs[0][3] = ndGridHash(0, 0, 0);
-			m_neighborDirs[0][4] = ndGridHash(0, 0, 0);
-			m_neighborDirs[0][5] = ndGridHash(0, 0, 0);
-			m_neighborDirs[0][6] = ndGridHash(0, 0, 0);
-			m_neighborDirs[0][7] = ndGridHash(0, 0, 0);
+			m_neighborDirs[0][0] = ndGridHash(0, 0);
+			m_neighborDirs[0][1] = ndGridHash(0, 0);
+			m_neighborDirs[0][2] = ndGridHash(0, 0);
+			m_neighborDirs[0][3] = ndGridHash(0, 0);
 
 			m_counter[0] = 1;
 			m_isPadd[0][0] = 0;
 			m_isPadd[0][1] = 1;
 			m_isPadd[0][2] = 1;
 			m_isPadd[0][3] = 1;
-			m_isPadd[0][4] = 1;
-			m_isPadd[0][5] = 1;
-			m_isPadd[0][6] = 1;
-			m_isPadd[0][7] = 1;
 
-			//ndGridHash stepsCode_x;
-			m_neighborDirs[1][0] = ndGridHash(0, 0, 0);
-			m_neighborDirs[1][1] = ndGridHash(1, 0, 0);
-			m_neighborDirs[1][2] = ndGridHash(0, 0, 0);
-			m_neighborDirs[1][3] = ndGridHash(0, 0, 0);
-			m_neighborDirs[1][4] = ndGridHash(0, 0, 0);
-			m_neighborDirs[1][5] = ndGridHash(0, 0, 0);
-			m_neighborDirs[1][6] = ndGridHash(0, 0, 0);
-			m_neighborDirs[1][7] = ndGridHash(0, 0, 0);
-
+			ndGridHash stepsCode_y;
+			m_neighborDirs[1][0] = ndGridHash(0, 0);
+			m_neighborDirs[1][1] = ndGridHash(1, 0);
+			m_neighborDirs[1][2] = ndGridHash(0, 0);
+			m_neighborDirs[1][3] = ndGridHash(0, 0);
+			
 			m_counter[1] = 2;
 			m_isPadd[1][0] = 0;
 			m_isPadd[1][1] = 0;
 			m_isPadd[1][2] = 1;
 			m_isPadd[1][3] = 1;
-			m_isPadd[1][4] = 1;
-			m_isPadd[1][5] = 1;
-			m_isPadd[1][6] = 1;
-			m_isPadd[1][7] = 1;
 
-			//ndGridHash stepsCode_y;
-			m_neighborDirs[2][0] = ndGridHash(0, 0, 0);
-			m_neighborDirs[2][1] = ndGridHash(0, 1, 0);
-			m_neighborDirs[2][2] = ndGridHash(0, 0, 0);
-			m_neighborDirs[2][3] = ndGridHash(0, 0, 0);
-			m_neighborDirs[2][4] = ndGridHash(0, 0, 0);
-			m_neighborDirs[2][5] = ndGridHash(0, 0, 0);
-			m_neighborDirs[2][6] = ndGridHash(0, 0, 0);
-			m_neighborDirs[2][7] = ndGridHash(0, 0, 0);
-
+			//ndGridHash stepsCode_z;
+			m_neighborDirs[2][0] = ndGridHash(0, 0);
+			m_neighborDirs[2][1] = ndGridHash(0, 1);
+			m_neighborDirs[2][2] = ndGridHash(0, 0);
+			m_neighborDirs[2][3] = ndGridHash(0, 0);
+			
 			m_counter[2] = 2;
 			m_isPadd[2][0] = 0;
 			m_isPadd[2][1] = 0;
 			m_isPadd[2][2] = 1;
 			m_isPadd[2][3] = 1;
-			m_isPadd[2][4] = 1;
-			m_isPadd[2][5] = 1;
-			m_isPadd[2][6] = 1;
-			m_isPadd[2][7] = 1;
 
-			//ndGridHash stepsCode_xy;
-			m_neighborDirs[3][0] = ndGridHash(0, 0, 0);
-			m_neighborDirs[3][1] = ndGridHash(1, 0, 0);
-			m_neighborDirs[3][2] = ndGridHash(0, 1, 0);
-			m_neighborDirs[3][3] = ndGridHash(1, 1, 0);
-			m_neighborDirs[3][4] = ndGridHash(0, 0, 0);
-			m_neighborDirs[3][5] = ndGridHash(0, 0, 0);
-			m_neighborDirs[3][6] = ndGridHash(0, 0, 0);
-			m_neighborDirs[3][7] = ndGridHash(0, 0, 0);
-
+			//ndGridHash stepsCode_yz;
+			m_neighborDirs[3][0] = ndGridHash(0, 0);
+			m_neighborDirs[3][1] = ndGridHash(1, 0);
+			m_neighborDirs[3][2] = ndGridHash(0, 1);
+			m_neighborDirs[3][3] = ndGridHash(1, 1);
+			
 			m_counter[3] = 4;
 			m_isPadd[3][0] = 0;
 			m_isPadd[3][1] = 0;
 			m_isPadd[3][2] = 0;
 			m_isPadd[3][3] = 0;
-			m_isPadd[3][4] = 1;
-			m_isPadd[3][5] = 1;
-			m_isPadd[3][6] = 1;
-			m_isPadd[3][7] = 1;
-
-			//ndGridHash stepsCode_z;
-			m_neighborDirs[4][0] = ndGridHash(0, 0, 0);
-			m_neighborDirs[4][1] = ndGridHash(0, 0, 1);
-			m_neighborDirs[4][2] = ndGridHash(0, 0, 0);
-			m_neighborDirs[4][3] = ndGridHash(0, 0, 0);
-			m_neighborDirs[4][4] = ndGridHash(0, 0, 0);
-			m_neighborDirs[4][5] = ndGridHash(0, 0, 0);
-			m_neighborDirs[4][6] = ndGridHash(0, 0, 0);
-			m_neighborDirs[4][7] = ndGridHash(0, 0, 0);
-
-			m_counter[4] = 2;
-			m_isPadd[4][0] = 0;
-			m_isPadd[4][1] = 0;
-			m_isPadd[4][2] = 1;
-			m_isPadd[4][3] = 1;
-			m_isPadd[4][4] = 1;
-			m_isPadd[4][5] = 1;
-			m_isPadd[4][6] = 1;
-			m_isPadd[4][7] = 1;
-
-			//ndGridHash stepsCode_xz;
-			m_neighborDirs[5][0] = ndGridHash(0, 0, 0);
-			m_neighborDirs[5][1] = ndGridHash(1, 0, 0);
-			m_neighborDirs[5][2] = ndGridHash(0, 0, 1);
-			m_neighborDirs[5][3] = ndGridHash(1, 0, 1);
-			m_neighborDirs[5][4] = ndGridHash(0, 0, 0);
-			m_neighborDirs[5][5] = ndGridHash(0, 0, 0);
-			m_neighborDirs[5][6] = ndGridHash(0, 0, 0);
-			m_neighborDirs[5][7] = ndGridHash(0, 0, 0);
-
-			m_counter[5] = 4;
-			m_isPadd[5][0] = 0;
-			m_isPadd[5][1] = 0;
-			m_isPadd[5][2] = 0;
-			m_isPadd[5][3] = 0;
-			m_isPadd[5][4] = 1;
-			m_isPadd[5][5] = 1;
-			m_isPadd[5][6] = 1;
-			m_isPadd[5][7] = 1;
-
-			//ndGridHash stepsCode_yz;
-			m_neighborDirs[6][0] = ndGridHash(0, 0, 0);
-			m_neighborDirs[6][1] = ndGridHash(0, 1, 0);
-			m_neighborDirs[6][2] = ndGridHash(0, 0, 1);
-			m_neighborDirs[6][3] = ndGridHash(0, 1, 1);
-			m_neighborDirs[6][4] = ndGridHash(0, 0, 0);
-			m_neighborDirs[6][5] = ndGridHash(0, 0, 0);
-			m_neighborDirs[6][6] = ndGridHash(0, 0, 0);
-			m_neighborDirs[6][7] = ndGridHash(0, 0, 0);
-
-			m_counter[6] = 4;
-			m_isPadd[6][0] = 0;
-			m_isPadd[6][1] = 0;
-			m_isPadd[6][2] = 0;
-			m_isPadd[6][3] = 0;
-			m_isPadd[6][4] = 1;
-			m_isPadd[6][5] = 1;
-			m_isPadd[6][6] = 1;
-			m_isPadd[6][7] = 1;
-
-			//ndGridHash stepsCode_xyz;
-			m_neighborDirs[7][0] = ndGridHash(0, 0, 0);
-			m_neighborDirs[7][1] = ndGridHash(1, 0, 0);
-			m_neighborDirs[7][2] = ndGridHash(0, 1, 0);
-			m_neighborDirs[7][3] = ndGridHash(1, 1, 0);
-			m_neighborDirs[7][4] = ndGridHash(0, 0, 1);
-			m_neighborDirs[7][5] = ndGridHash(1, 0, 1);
-			m_neighborDirs[7][6] = ndGridHash(0, 1, 1);
-			m_neighborDirs[7][7] = ndGridHash(1, 1, 1);
-
-			m_counter[7] = 8;
-			m_isPadd[7][0] = 0;
-			m_isPadd[7][1] = 0;
-			m_isPadd[7][2] = 0;
-			m_isPadd[7][3] = 0;
-			m_isPadd[7][4] = 0;
-			m_isPadd[7][5] = 0;
-			m_isPadd[7][6] = 0;
-			m_isPadd[7][7] = 0;
 		}
 		
-		ndGridHash m_neighborDirs[8][8];
-		ndInt8 m_isPadd[8][8];
-		ndInt8 m_counter[8];
+		ndGridHash m_neighborDirs[4][4];
+		ndInt8 m_isPadd[4][4];
+		ndInt8 m_counter[4];
 	};
 
 	class ndContext
@@ -549,7 +455,6 @@ void ndBodySphFluid_forCPU::CreateGrids(const ndWorld* const world)
 			scan[1] = 0;
 			#endif
 
-			ndUpperDidit upperDigisIsValid;
 			const ndStartEnd startEnd(fluid->m_posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
@@ -557,28 +462,24 @@ void ndBodySphFluid_forCPU::CreateGrids(const ndWorld* const world)
 				const ndVector p(r * invGridSize);
 				const ndGridHash hashKey(p, i);
 
-				upperDigisIsValid.m_x |= hashKey.m_xHigh;
-				upperDigisIsValid.m_y |= hashKey.m_yHigh;
-				upperDigisIsValid.m_z |= hashKey.m_zHigh;
 				const ndVector p0((r + box0) * invGridSize);
 				const ndVector p1((r + box1) * invGridSize);
 				ndGridHash box0Hash(p0, i);
 				const ndGridHash box1Hash(p1, i);
 				const ndGridHash codeHash(box1Hash.m_gridHash - box0Hash.m_gridHash);
 
-				dAssert(codeHash.m_x <= 1);
 				dAssert(codeHash.m_y <= 1);
 				dAssert(codeHash.m_z <= 1);
-				const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 4 + codeHash.m_y * 2 + codeHash.m_x);
+				const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
 
 				#ifdef D_USE_PARALLEL_CLASSIFY
 				scan[0] += gridNeighborInfo.m_counter[code];
-				scan[1] += (8 - gridNeighborInfo.m_counter[code]);
+				scan[1] += (4 - gridNeighborInfo.m_counter[code]);
 				#endif
 
 				const ndInt8* const padding = &gridNeighborInfo.m_isPadd[code][0];
 				const ndGridHash* const neigborgh = &gridNeighborInfo.m_neighborDirs[code][0];
-				for (ndInt32 j = 0; j < 8; j++)
+				for (ndInt32 j = 0; j < 4; j++)
 				{
 					ndGridHash quadrand(box0Hash);
 					quadrand.m_cellIsPadd = padding[j];
@@ -586,13 +487,9 @@ void ndBodySphFluid_forCPU::CreateGrids(const ndWorld* const world)
 					quadrand.m_cellType = ndGridType(quadrand.m_gridHash == hashKey.m_gridHash);
 					dAssert(quadrand.m_cellIsPadd <= 1);
 					dAssert(quadrand.m_cellType == ((quadrand.m_gridHash == hashKey.m_gridHash) ? ndHomeGrid : ndAdjacentGrid));
-					dst[i * 8 + j] = quadrand;
+					dst[i * 4 + j] = quadrand;
 				}
 			}
-
-			fluid->m_upperDigitsIsValid.m_x |= upperDigisIsValid.m_x;
-			fluid->m_upperDigitsIsValid.m_y |= upperDigisIsValid.m_y;
-			fluid->m_upperDigitsIsValid.m_z |= upperDigisIsValid.m_z;
 		}
 	};
 
@@ -611,7 +508,6 @@ void ndBodySphFluid_forCPU::CreateGrids(const ndWorld* const world)
 			const ndInt32 threadID = GetThreadId();
 			const ndInt32 threadCount = m_owner->GetThreadCount();
 
-			ndUpperDidit upperDigisIsValid;
 			ndInt32* const scan = &context->m_scan.m_scan[threadID][0];
 
 			const ndStartEnd startEnd(dst.GetCount(), threadID, threadCount);
@@ -620,15 +516,9 @@ void ndBodySphFluid_forCPU::CreateGrids(const ndWorld* const world)
 				const ndGridHash grid(src[i]);
 				const ndInt32 key = grid.m_cellIsPadd;
 				const ndInt32 index = scan[key];
-
-				upperDigisIsValid.m_x |= grid.m_xHigh;
-				upperDigisIsValid.m_y |= grid.m_yHigh;
-				upperDigisIsValid.m_z |= grid.m_zHigh;
-
 				dst[index] = grid;
 				scan[key] = index + 1;
 			}
-			context->m_scan.m_upperDigisIsValid[threadID] = upperDigisIsValid;
 		}
 	};
 
@@ -636,8 +526,8 @@ void ndBodySphFluid_forCPU::CreateGrids(const ndWorld* const world)
 	ndScene* const scene = world->GetScene();
 
 	ndContext context(this);
-	m_hashGridMap.SetCount(m_posit.GetCount() * 8);
-	m_hashGridMapScratchBuffer.SetCount(m_posit.GetCount() * 8);
+	m_hashGridMap.SetCount(m_posit.GetCount() * 4);
+	m_hashGridMapScratchBuffer.SetCount(m_posit.GetCount() * 4);
 	scene->SubmitJobs<ndCreateGrids>(&context);
 
 #ifdef D_USE_PARALLEL_CLASSIFY
@@ -655,39 +545,26 @@ void ndBodySphFluid_forCPU::CreateGrids(const ndWorld* const world)
 
 	ndInt32 gridCount = context.m_scan.m_scan[0][1] - context.m_scan.m_scan[0][0];
 	scene->SubmitJobs<ndCompactGrids>(&context);
-
-	ndUpperDidit upperDigits;
-	for (ndInt32 j = 0; j < threadCount; ++j)
-	{
-		upperDigits.m_x |= context.m_scan.m_upperDigisIsValid[j].m_x;
-		upperDigits.m_y |= context.m_scan.m_upperDigisIsValid[j].m_y;
-		upperDigits.m_z |= context.m_scan.m_upperDigisIsValid[j].m_z;
-	}
 #else
 	ndInt32 gridCount = 0;
-	ndUpperDidit upperDigits;
 	{
 		D_TRACKTIME();
+		// this seems to be very cache friendly and beating radix sort hand down.
 		for (ndInt32 i = 0; i < m_hashGridMapScratchBuffer.GetCount(); ++i)
 		{
 			const ndGridHash cell(m_hashGridMapScratchBuffer[i]);
-			upperDigits.m_x |= cell.m_xHigh;
-			upperDigits.m_y |= cell.m_yHigh;
-			upperDigits.m_z |= cell.m_zHigh;
-
 			m_hashGridMap[gridCount] = cell;
 			gridCount += (1 - ndInt32 (cell.m_cellIsPadd));
 		}
 	}
 #endif
 	m_hashGridMap.SetCount(gridCount);
-	m_upperDigitsIsValid = upperDigits;
 }
 
 void ndBodySphFluid_forCPU::SortGrids(const ndWorld* const world)
 {
 	D_TRACKTIME();
-	SortByCenterType(world);
+	SortXdimension(world);
 	SortCellBuckects(world);
 
 	#ifdef _DEBUG
@@ -702,7 +579,8 @@ void ndBodySphFluid_forCPU::SortGrids(const ndWorld* const world)
 	#endif
 }
 
-void ndBodySphFluid_forCPU::CalculateAccelerations(const ndWorld* const world)
+//void ndBodySphFluid_forCPU::CalculateAccelerations(const ndWorld* const world)
+void ndBodySphFluid_forCPU::CalculateAccelerations(const ndWorld* const)
 {
 	D_TRACKTIME();
 	//class ndCalculateDensity: public ndScene::ndBaseJob
@@ -893,8 +771,6 @@ void ndBodySphFluid_forCPU::Update(const ndWorld* const world, ndFloat32)
 	CreateGrids(world);
 	SortGrids(world);
 	CalculateScans(world);
-
-	// too slow in cpu
 	//BuildPairs(world);
 
 	// do the physics
