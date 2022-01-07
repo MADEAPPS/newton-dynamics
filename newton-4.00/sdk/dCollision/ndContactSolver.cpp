@@ -1302,6 +1302,7 @@ ndInt32 ndContactSolver::PruneSupport(ndInt32 count, const ndVector& dir, const 
 
 ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
 {
+#if 0
 	class ndConvexFaceNode
 	{
 		public:
@@ -1331,7 +1332,7 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 	// it is a big mistake to set contact to deepest penetration because si cause unwanted pops.
 	// is better to present the original contact penetrations
 	//ndFloat32 maxPenetration = ndFloat32(0.0f);
-	for (ndInt32 i = 0; i < count; ++i) 
+	for (ndInt32 i = 0; i < count; i++) 
 	{
 		array[i] = matrix.UntransformVector(contactArray[i].m_point) & xyMask;
 	}
@@ -1491,6 +1492,146 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 		ptr = ptr->m_next;
 	} while (ptr != hullPoint);
 	return hullCount;
+
+#else
+
+	class ndConvexFaceNode
+	{
+		public:
+		ndVector m_point2d;
+		ndConvexFaceNode* m_next;
+		ndConvexFaceNode* m_prev;
+		ndInt32 m_mask;
+	};
+	
+	ndFixSizeArray<ndVector, D_MAX_CONTATCS> array;
+	ndFixSizeArray<ndConvexFaceNode, D_MAX_CONTATCS> convexHull;
+	const ndVector xyMask(ndVector::m_xMask | ndVector::m_yMask);
+	ndUpHeap<ndConvexFaceNode*, ndFloat32> sortHeap(&array[0], D_MAX_CONTATCS * array.GetCapacity());
+	
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		ndVector p(matrix.UntransformVector(contactArray[i].m_point) & xyMask);
+		p.m_w = ndFloat32(i);
+		array.PushBack(p);
+	}
+	if (count == 3) 
+	{
+		return 3;
+	}
+	ndInt32 hullCount = dConvexHull2d(&array[0], array.GetCount());
+
+	ndInt32 last = hullCount - 1;
+	convexHull.SetCount(hullCount + 1);
+	for (ndInt32 i = 0; i < hullCount; i++)
+	{
+		convexHull[i].m_point2d = array[i];
+		convexHull[i].m_next = &convexHull[i + 1];
+		convexHull[i].m_prev = &convexHull[last];
+		convexHull[i].m_mask = 0;
+		last = i;
+	}
+	convexHull[last].m_next = &convexHull[0];
+	
+	ndFloat32 totalArea = ndFloat32(0.0f);
+	ndVector areaEdge0(array[1] - array[0]);
+	for (ndInt32 i = 2; i < hullCount; ++i)
+	{
+		const ndVector areaEdge1(array[i] - array[0]);
+		ndFloat32 area = areaEdge0.m_y * areaEdge1.m_x - areaEdge0.m_x * areaEdge1.m_y;
+		totalArea += area;
+		areaEdge0 = areaEdge1;
+	}
+
+	dAssert(totalArea >= ndFloat32(0.0f));
+	bool hasLinearCombination = true;
+	ndConvexFaceNode* hullPoint = &convexHull[0];
+	while (hasLinearCombination)
+	{
+		sortHeap.Flush();
+		hasLinearCombination = false;
+		ndConvexFaceNode* ptr = hullPoint;
+		ndVector e0(ptr->m_next->m_point2d - ptr->m_point2d);
+		do
+		{
+			const ndVector e1(ptr->m_next->m_next->m_point2d - ptr->m_next->m_point2d);
+			ndFloat32 area = e0.m_y * e1.m_x - e0.m_x * e1.m_y;
+			sortHeap.Push(ptr->m_next, area);
+			e0 = e1;
+			ptr->m_mask = 1;
+			ptr = ptr->m_next;
+		} while (ptr != hullPoint);
+
+		while (sortHeap.GetCount() && (sortHeap.Value() * ndFloat32(16.0f) < totalArea))
+		{
+			ndConvexFaceNode* const corner = sortHeap[0];
+			if (corner->m_mask && corner->m_prev->m_mask)
+			{
+				if (hullPoint == corner)
+				{
+					hullPoint = corner->m_prev;
+				}
+				hullCount--;
+				hasLinearCombination = true;
+				corner->m_prev->m_mask = 0;
+				corner->m_next->m_prev = corner->m_prev;
+				corner->m_prev->m_next = corner->m_next;
+			}
+			sortHeap.Pop();
+		}
+	}
+
+	while (hullCount > maxCount)
+	{
+		sortHeap.Flush();
+		ndConvexFaceNode* ptr = hullPoint;
+		ndVector e0(ptr->m_next->m_point2d - ptr->m_point2d);
+		do
+		{
+			ndVector e1(ptr->m_next->m_next->m_point2d - ptr->m_next->m_point2d);
+			ndFloat32 area = e0.m_y * e1.m_x - e0.m_x * e1.m_y;
+			sortHeap.Push(ptr->m_next, area);
+			e0 = e1;
+			ptr->m_mask = 1;
+			ptr = ptr->m_next;
+		} while (ptr != hullPoint);
+
+		while (sortHeap.GetCount() && (hullCount > maxCount))
+		{
+			ndConvexFaceNode* const corner = sortHeap[0];
+			if (corner->m_mask && corner->m_prev->m_mask)
+			{
+				if (hullPoint == corner)
+				{
+					hullPoint = corner->m_prev;
+				}
+				hullCount--;
+				hasLinearCombination = true;
+				corner->m_prev->m_mask = 0;
+				corner->m_next->m_prev = corner->m_prev;
+				corner->m_prev->m_next = corner->m_next;
+			}
+			sortHeap.Pop();
+		}
+	}
+
+	hullCount = 0;
+	ndContactPoint buffer[32];
+	ndConvexFaceNode* ptr = hullPoint;
+	do
+	{
+		ndInt32 index = ndInt32(ptr->m_point2d.m_w);
+		buffer[hullCount] = contactArray[index];
+		hullCount++;
+		ptr = ptr->m_next;
+	} while (ptr != hullPoint);
+
+	for (ndInt32 i = hullCount-1; i >= 0; --i)
+	{
+		contactArray[i] = buffer[i];
+	}
+	return hullCount;
+#endif
 }
 
 ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, ndContactPoint* const contactArray, ndInt32 maxCount) const
@@ -2921,7 +3062,7 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDe
 	ndInt32* const indexArray = (ndInt32*)data.m_faceVertexIndex;
 
 	data.SortFaceArray();
-	for (ndInt32 i = data.m_faceCount - 1; (i >= 0) && (count < 32); i--)
+	for (ndInt32 i = data.m_faceCount - 1; (i >= 0) && (count < 32); --i)
 	{
 		ndInt32 address = data.m_faceIndexStart[i];
 		const ndInt32* const localIndexArray = &indexArray[address];

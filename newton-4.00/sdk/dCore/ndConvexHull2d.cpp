@@ -25,15 +25,24 @@
 
 static ndFloat32 Cross(const ndVector &O, const ndVector &A, const ndVector &B)
 {
-	ndVector A0(A - O);
-	ndVector B0(B - O);
-	return A0.m_x * B0.m_y - A0.m_y * B0.m_x;
+	const ndVector A0(A - O);
+	const ndVector B0(B - O);
+	const ndFloat32 sign = A0.m_y * B0.m_x - A0.m_x * B0.m_y;
+	return sign;
 }
 
 ndInt32 dConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 {
 	if (count <= 3)
 	{
+		if (count == 3)
+		{
+			ndFloat32 area = Cross(vertexCloud2d[0], vertexCloud2d[1], vertexCloud2d[2]);
+			if (area < ndFloat32(0.0f)) 
+			{
+				dSwap(vertexCloud2d[1], vertexCloud2d[2]);
+			}
+		}
 		return count;
 	}
 
@@ -47,21 +56,21 @@ ndInt32 dConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 		{
 			if (elementA.m_x < elementB.m_x)
 			{
-				return 1;
+				return -1;
 			}
 			else if (elementA.m_x > elementB.m_x)
 			{
-				return -1;
+				return 1;
 			}
 			else
 			{
 				if (elementA.m_y < elementB.m_y)
 				{
-					return 1;
+					return -1;
 				}
 				else if (elementA.m_y > elementB.m_y)
 				{
-					return -1;
+					return 1;
 				}
 			}
 			return 0;
@@ -71,27 +80,30 @@ ndInt32 dConvexHull2d(ndVector* const vertexCloud2d, ndInt32 count)
 
 	// Build lower hull
 	ndInt32 k = 0;
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		while (k >= 2 && Cross(hull[k - 2], hull[k - 1], vertexCloud2d[i]) <= 0.0f)
 		{
-			k--;
+			--k;
 		}
 		hull[k] = vertexCloud2d[i];
 		k++;
 	}
 	
 	// Build upper hull
-	for (ndInt32 i = count - 1, t = k + 1; i > 0; i--) 
+	for (ndInt32 i = count - 1, t = k + 1; i > 0; --i) 
 	{
 		while (k >= t && Cross(hull[k - 2], hull[k - 1], vertexCloud2d[i - 1]) <= 0.0f)
 		{
-			k--;
+			--k;
 		}
 		hull[k] = vertexCloud2d[i - 1];
 		k++;
 	}
 
-	memcpy(vertexCloud2d, hull, k * sizeof(ndVector));
+	for (ndInt32 i = 0; i < k; ++i)
+	{
+		vertexCloud2d[i] = hull[i];
+	}
 	return k - 1;
 }
