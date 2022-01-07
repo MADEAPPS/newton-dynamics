@@ -79,13 +79,13 @@ class ndContactSolver::ndBoxBoxDistance2
 		m_localMatrix1 = m_localMatrix0.Inverse();
 
 		ndInt32 index = 0;
-		for (ndInt32 i = 0; i < 3; i++)
+		for (ndInt32 i = 0; i < 3; ++i)
 		{
 			m_matrixAbs0[i] = m_matrix0[i].Abs();
 			m_matrixAbs1[i] = m_matrix1[i].Abs();
 			m_localMatrixAbs0[i] = m_localMatrix0[i].Abs();
 			m_localMatrixAbs1[i] = m_localMatrix1[i].Abs();
-			for (ndInt32 j = 0; j < 3; j++)
+			for (ndInt32 j = 0; j < 3; ++j)
 			{
 				const ndVector axis(m_matrix0[i].CrossProduct(m_matrix1[j]));
 				if (axis.DotProduct(axis).GetScalar() > ndFloat32(1.0e-5f))
@@ -96,7 +96,7 @@ class ndContactSolver::ndBoxBoxDistance2
 			}
 		}
 
-		for (ndInt32 i = index; i < ndInt32(sizeof(m_crossAxis) / sizeof(m_crossAxis[0])); i++)
+		for (ndInt32 i = index; i < ndInt32(sizeof(m_crossAxis) / sizeof(m_crossAxis[0])); ++i)
 		{
 			m_crossAxis[i] = m_crossAxis[0];
 		}
@@ -401,7 +401,7 @@ ndContactSolver::ndContactSolver(const ndContactSolver& src, const ndShapeInstan
 void ndContactSolver::TranslateSimplex(const ndVector& step)
 {
 	m_instance1.m_globalMatrix.m_posit -= step;
-	for (ndInt32 i = 0; i < m_vertexIndex; i++) 
+	for (ndInt32 i = 0; i < m_vertexIndex; ++i) 
 	{
 		m_hullSum[i] -= step;
 		m_hullDiff[i] += step;
@@ -785,7 +785,7 @@ void ndContactSolver::CalculateContactFromFeacture(ndInt32 featureType)
 				ndInt32 minIndex = 0;
 				ndFloat64 maxVal = ndFloat32(-1.0e20f);
 				ndFloat64 minVal = ndFloat32( 1.0e20f);
-				for (ndInt32 i = 0; i < 3; i++)
+				for (ndInt32 i = 0; i < 3; ++i)
 				{
 					ndFloat64 val = dir.DotProduct(m_hullDiff[i]).GetScalar();
 					if (val > maxVal) 
@@ -891,14 +891,14 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 	{
 		ndVector step(normal.Scale(D_PENETRATION_TOL * ndFloat32(2.0f)));
 		ndVector alternatePoint(point1);
-		for (ndInt32 i = 0; (i < 3) && !count1; i++) 
+		for (ndInt32 i = 0; (i < 3) && !count1; ++i) 
 		{
 			alternatePoint -= step;
 			ndVector alternatePointOnInstance1(matrix1.UntransformVector(alternatePoint));
 			count1 = m_instance1.CalculatePlaneIntersection(normalOnInstance1, alternatePointOnInstance1, shape1);
 		}
 		step = matrix1.UnrotateVector(normal * ((alternatePoint - origin).DotProduct(normal)));
-		for (ndInt32 i = 0; i < count1; i++) 
+		for (ndInt32 i = 0; i < count1; ++i) 
 		{
 			shape1[i] -= step;
 		}
@@ -906,7 +906,7 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 
 	if (count1) 
 	{
-		for (ndInt32 i = 0; i < count1; i++) 
+		for (ndInt32 i = 0; i < count1; ++i) 
 		{
 			shape1[i] = matrix1.TransformVector(shape1[i]);
 		}
@@ -926,7 +926,7 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 		{
 			ndVector step(normal.Scale(D_PENETRATION_TOL * ndFloat32(2.0f)));
 			ndVector alternatePoint(point0);
-			for (ndInt32 i = 0; (i < 3) && !count0; i++) 
+			for (ndInt32 i = 0; (i < 3) && !count0; ++i) 
 			{
 				alternatePoint += step;
 				ndVector alternatePointOnInstance0(matrix0.UntransformVector(alternatePoint));
@@ -935,7 +935,7 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 			//dTrace (("If this is a frequent event, this routine should return the translation distance as the contact point\n"))
 			//dAssert(count0);
 			step = matrix0.UnrotateVector(normal * ((alternatePoint - origin).DotProduct(normal)));
-			for (ndInt32 i = 0; i < count0; i++) 
+			for (ndInt32 i = 0; i < count0; ++i) 
 			{
 				shape0[i] -= step;
 			}
@@ -943,7 +943,7 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 
 		if (count0) 
 		{
-			for (ndInt32 i = 0; i < count0; i++) 
+			for (ndInt32 i = 0; i < count0; ++i) 
 			{
 				shape0[i] = matrix0.TransformVector(shape0[i]);
 			}
@@ -1288,7 +1288,7 @@ ndInt32 ndContactSolver::PruneSupport(ndInt32 count, const ndVector& dir, const 
 {
 	ndInt32 index = 0;
 	ndFloat32 maxVal = ndFloat32(-1.0e20f);
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		ndFloat32 dist = dir.DotProduct(points[i]).GetScalar();
 		if (dist > maxVal) 
@@ -1331,7 +1331,7 @@ ndInt32 ndContactSolver::Prune2dContacts(const ndMatrix& matrix, ndInt32 count, 
 	// it is a big mistake to set contact to deepest penetration because si cause unwanted pops.
 	// is better to present the original contact penetrations
 	//ndFloat32 maxPenetration = ndFloat32(0.0f);
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		array[i] = matrix.UntransformVector(contactArray[i].m_point) & xyMask;
 	}
@@ -1498,7 +1498,7 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 	ndVector array[D_MAX_CONTATCS];
 	ndFloat32 max_x = ndFloat32(1.0e20f);
 	ndInt32 maxIndex = 0;
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		array[i] = matrix.UntransformVector(contactArray[i].m_point);
 		array[i].m_w = ndFloat32(i);
@@ -1510,7 +1510,7 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 	}
 	dSwap(array[0], array[maxIndex]);
 
-	for (ndInt32 i = 2; i < count; i++) 
+	for (ndInt32 i = 2; i < count; ++i) 
 	{
 		ndInt32 j = i;
 		ndVector tmp(array[i]);
@@ -1531,12 +1531,12 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 
 		ndUnsigned8 mask[D_MAX_CONTATCS];
 		memset(mask, 0, count * sizeof(ndUnsigned8));
-		for (ndInt32 i = 0; i < count; i++) 
+		for (ndInt32 i = 0; i < count; ++i) 
 		{
 			if (!mask[i]) 
 			{
 				const ndFloat32 val = array[i].m_x + window;
-				for (ndInt32 j = i + 1; (j < count) && (array[j].m_x < val); j++) 
+				for (ndInt32 j = i + 1; (j < count) && (array[j].m_x < val); ++j) 
 				{
 					if (!mask[j]) 
 					{
@@ -1556,7 +1556,7 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 		if (packContacts) 
 		{
 			ndInt32 j = 0;
-			for (ndInt32 i = 0; i < count; i++) 
+			for (ndInt32 i = 0; i < count; ++i) 
 			{
 				if (!mask[i]) 
 				{
@@ -1569,7 +1569,7 @@ ndInt32 ndContactSolver::Prune3dContacts(const ndMatrix& matrix, ndInt32 count, 
 	} while (count > maxCount);
 
 	ndContactPoint tmpContact[16];
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		ndInt32 index = ndInt32(array[i].m_w);
 		tmpContact[i] = contactArray[index];
@@ -1583,7 +1583,7 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 {
 	ndContactPoint* const contactArray = m_contactBuffer;
 	ndVector origin(ndVector::m_zero);
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		origin += contactArray[i].m_point;
 	}
@@ -1592,7 +1592,7 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 	origin.m_w = ndFloat32(1.0f);
 
 	ndMatrix covariance(dGetZeroMatrix());
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		ndVector p((contactArray[i].m_point - origin) & ndVector::m_triplexMask);
 		dAssert(p.m_w == ndFloat32(0.0f));
@@ -1602,11 +1602,11 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 		covariance.m_right += matrix.m_right;
 	}
 
-	for (ndInt32 i = 0; i < 3; i++) 
+	for (ndInt32 i = 0; i < 3; ++i) 
 	{
 		if (dAbs(covariance[i][i]) < (1.0e-6f)) 
 		{
-			for (ndInt32 j = 0; j < 3; j++) 
+			for (ndInt32 j = 0; j < 3; ++j) 
 			{
 				covariance[i][j] = ndFloat32(0.0f);
 				covariance[j][i] = ndFloat32(0.0f);
@@ -1652,7 +1652,7 @@ ndInt32 ndContactSolver::PruneContacts(ndInt32 count, ndInt32 maxCount) const
 			ndFloat32 minValue = ndFloat32(-1.0e10f);
 			ndInt32 j0 = 0;
 			ndInt32 j1 = 0;
-			for (ndInt32 i = 0; i < count; i++) 
+			for (ndInt32 i = 0; i < count; ++i) 
 			{
 				ndFloat32 dist = contactArray[i].m_point.DotProduct(covariance.m_front).GetScalar();
 				if (dist > maxValue) 
@@ -1804,7 +1804,7 @@ ndFloat32 ndContactSolver::RayCast(const ndVector& localP0, const ndVector& loca
 			point = localP0 - p0p1.Scale(param);
 			ndVector step(point0 - point);
 			point0 = point;
-			for (ndInt32 i = 0; i < index; i++) 
+			for (ndInt32 i = 0; i < index; ++i) 
 			{
 				m_hullDiff[i] += step;
 			}
@@ -1933,7 +1933,7 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 		ndMatrix matrix(e0.Scale(ndRsqrt(e0.DotProduct(e0).GetScalar())));
 		ndMatrix rotation(dPitchMatrix(ndFloat32(45.0f * ndDegreeToRad)));
 		ndFloat32 maxArea = ndFloat32(0.0f);
-		for (ndInt32 i = 0; i < 8; i++) 
+		for (ndInt32 i = 0; i < 8; ++i) 
 		{
 			SupportVertex(matrix[1], 3);
 			ndVector e1(m_hullDiff[3] - m_hullDiff[0]);
@@ -2012,7 +2012,7 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 		SupportVertex(m_hullDirs[0], 0);
 
 		ndInt32 i = 1;
-		for (; i < nCount; i++) 
+		for (; i < nCount; ++i) 
 		{
 			SupportVertex(m_hullDirs[i], 1);
 			e1 = m_hullDiff[1] - m_hullDiff[0];
@@ -2024,7 +2024,7 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 			}
 		}
 
-		for (i++; i < nCount; i++) 
+		for (i++; i < nCount; ++i) 
 		{
 			SupportVertex(m_hullDirs[i], 2);
 			e2 = m_hullDiff[2] - m_hullDiff[0];
@@ -2038,7 +2038,7 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 		}
 
 		error2 = ndFloat32(0.0f);
-		for (i++; i < nCount; i++) 
+		for (i++; i < nCount; ++i) 
 		{
 			SupportVertex(m_hullDirs[i], 3);
 			e3 = m_hullDiff[3] - m_hullDiff[0];
@@ -2133,13 +2133,13 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 				ndVector sum[3];
 				ndVector diff[3];
 				m_separatingVector = faceNode->m_plane & ndVector::m_triplexMask;
-				for (ndInt32 i = 0; i < 3; i++) 
+				for (ndInt32 i = 0; i < 3; ++i) 
 				{
 					ndInt32 j = faceNode->m_vertex[i];
 					sum[i] = m_hullSum[j];
 					diff[i] = m_hullDiff[j];
 				}
-				for (ndInt32 i = 0; i < 3; i++) 
+				for (ndInt32 i = 0; i < 3; ++i) 
 				{
 					m_hullSum[i] = sum[i];
 					m_hullDiff[i] = diff[i];
@@ -2153,7 +2153,7 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 			if (iterCount > 10) 
 			{
 				ndInt32 cyclingIndex = cycling;
-				for (ndInt32 i = 0; i < 3; i++) 
+				for (ndInt32 i = 0; i < 3; ++i) 
 				{
 					ndInt32 cyclingIndex0 = (cyclingIndex - 1) & 3;
 					if (((cyclingMem[cyclingIndex0] - cyclingMem[cyclingIndex]) < ndFloat32(-1.0e-5f))) 
@@ -2184,7 +2184,7 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 					if (!face->m_mark && (face->m_plane.Evalue(p) > ndFloat32(0.0f))) 
 					{
 						#ifdef _DEBUG
-						for (ndInt32 i = 0; i < deletedCount; i++) 
+						for (ndInt32 i = 0; i < deletedCount; ++i) 
 						{
 							dAssert(m_deletedFaceList[i] != face);
 						}
@@ -2195,7 +2195,7 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 						dAssert(deletedCount < ndInt32 (sizeof(m_deletedFaceList) / sizeof(m_deletedFaceList[0])));
 						face->m_mark = 1;
 
-						for (ndInt32 i = 0; i < 3; i++) 
+						for (ndInt32 i = 0; i < 3; ++i) 
 						{
 							ndMinkFace* const twinFace = face->m_twin[i];
 							if (twinFace && !twinFace->m_mark) 
@@ -2210,7 +2210,7 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 
 				//dAssert (SanityCheck());
 				ndInt32 newCount = 0;
-				for (ndInt32 i = 0; i < deletedCount; i++) 
+				for (ndInt32 i = 0; i < deletedCount; ++i) 
 				{
 					ndMinkFace* const face = m_deletedFaceList[i];
 					face->m_alive = 0;
@@ -2546,7 +2546,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsDiscrete()
 					closestDist = dMin(closestDist, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
-						for (ndInt32 i = 0; i < count; i++)
+						for (ndInt32 i = 0; i < count; ++i)
 						{
 							contacts[contactCount + i].m_shapeInstance0 = subShape;
 						}
@@ -2668,7 +2668,7 @@ ndInt32 ndContactSolver::CompoundToConvexContactsDiscrete()
 					closestDist = dMin(closestDist, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
-						for (ndInt32 i = 0; i < count; i++)
+						for (ndInt32 i = 0; i < count; ++i)
 						{
 							contacts[contactCount + i].m_shapeInstance0 = subShape;
 						}
@@ -2795,7 +2795,7 @@ ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 					closestDist = dMin(closestDist, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
-						for (ndInt32 i = 0; i < count; i++)
+						for (ndInt32 i = 0; i < count; ++i)
 						{
 							contacts[contactCount + i].m_shapeInstance0 = subShape0;
 							contacts[contactCount + i].m_shapeInstance1 = subShape1;
@@ -2934,7 +2934,7 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDe
 		polygon.m_faceNormalIndex = data.GetNormalIndex(localIndexArray, polygon.m_count);
 		polygon.m_normal = polygon.CalculateGlobalNormal(&polySoupInstance, ndVector(&vertex[polygon.m_faceNormalIndex * stride]) & ndVector::m_triplexMask);
 		dAssert(polygon.m_normal.m_w == ndFloat32(0.0f));
-		for (ndInt32 j = 0; j < polygon.m_count; j++)
+		for (ndInt32 j = 0; j < polygon.m_count; ++j)
 		{
 			polygon.m_localPoly[j] = polySoupScaledMatrix.TransformVector(ndVector(&vertex[localIndexArray[j] * stride]) & ndVector::m_triplexMask);
 		}
@@ -3158,7 +3158,7 @@ ndInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 					closestDist = dMin(closestDist, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
-						for (ndInt32 i = 0; i < count; i++)
+						for (ndInt32 i = 0; i < count; ++i)
 						{
 							contacts[contactCount + i].m_shapeInstance0 = subShape;
 						}
@@ -3330,7 +3330,7 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 					closestDist = dMin(closestDist, dist * dist);
 					if (!m_intersectionTestOnly)
 					{
-						for (ndInt32 i = 0; i < count; i++)
+						for (ndInt32 i = 0; i < count; ++i)
 						{
 							contacts[contactCount + i].m_shapeInstance0 = subShape;
 						}
@@ -3574,7 +3574,7 @@ ndInt32 ndContactSolver::ConvexToConvexContactsContinue()
 						count = dMin(m_maxCount, count);
 						ndContactPoint* const contactOut = m_contactBuffer;
 
-						for (int i = 0; i < count; i++)
+						for (int i = 0; i < count; ++i)
 						{
 							contactOut[i].m_point = m_hullDiff[i] + step;
 							contactOut[i].m_normal = m_separatingVector;
@@ -3678,7 +3678,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 					ndInt32 count = contactSolver.ConvexContactsContinue();
 					if (!m_intersectionTestOnly)
 					{
-						for (ndInt32 i = 0; i < count; i++)
+						for (ndInt32 i = 0; i < count; ++i)
 						{
 							contacts[contactCount + i].m_shapeInstance1 = subShape;
 						}
@@ -3688,7 +3688,7 @@ ndInt32 ndContactSolver::ConvexToCompoundContactsContinue()
 						{
 							if (contactCount)
 							{
-								for (ndInt32 i = 0; i < count; i++)
+								for (ndInt32 i = 0; i < count; ++i)
 								{
 									contacts[i] = contacts[contactCount + i];
 								}
@@ -3826,7 +3826,7 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDe
 	ndFloat32 savedTimestep = m_timestep;
 	ndFloat32 epsilon = ndFloat32(-1.0e-3f) * m_timestep;
 
-	for (ndInt32 i = 0; (i < data.m_faceCount) && (m_timestep >= (data.m_hitDistance[i] * savedTimestep)); i++)
+	for (ndInt32 i = 0; (i < data.m_faceCount) && (m_timestep >= (data.m_hitDistance[i] * savedTimestep)); ++i)
 	{
 		ndInt32 address = data.m_faceIndexStart[i];
 		const ndInt32* const localIndexArray = &indexArray[address];
@@ -3839,7 +3839,7 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDe
 		polygon.m_faceNormalIndex = data.GetNormalIndex(localIndexArray, polygon.m_count);
 		polygon.m_normal = polygon.CalculateGlobalNormal(&polySoupInstance, ndVector(&vertex[polygon.m_faceNormalIndex * stride]) & ndVector::m_triplexMask);
 		dAssert(polygon.m_normal.m_w == ndFloat32(0.0f));
-		for (ndInt32 j = 0; j < polygon.m_count; j++)
+		for (ndInt32 j = 0; j < polygon.m_count; ++j)
 		{
 			polygon.m_localPoly[j] = polySoupScaledMatrix.TransformVector(ndVector(&vertex[localIndexArray[j] * stride]) & ndVector::m_triplexMask);
 		}
@@ -3856,7 +3856,7 @@ ndInt32 ndContactSolver::CalculatePolySoupToHullContactsContinue(ndPolygonMeshDe
 			{
 				count = 0;
 				countleft = maxContacts;
-				for (ndInt32 j = 0; j < count1; j++)
+				for (ndInt32 j = 0; j < count1; ++j)
 				{
 					contactOut[j] = m_contactBuffer[j];
 				}
@@ -4002,8 +4002,8 @@ void ndContactSolver::CalculateContacts(
 	m_pruneContacts = 1;
 	m_intersectionTestOnly = 0;
 
-	ndInt32 count = CalculateContactsDiscrete();
-	for (ndInt32 i = 0; i < count; i++)
+	const ndInt32 count = dMin (CalculateContactsDiscrete(), contactOut.GetCapacity());
+	for (ndInt32 i = 0; i < count; ++i)
 	{
 		ndContactPoint& contactPoint = contactBuffer[i];
 		contactPoint.m_body0 = nullptr;

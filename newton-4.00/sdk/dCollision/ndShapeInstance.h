@@ -380,7 +380,7 @@ inline void ndShapeInstance::SetShape(ndShape* const shape)
 	{
 		m_shape->Release();
 	}
-	m_shape = m_shape ? shape->AddRef() : m_shape;
+	m_shape = shape ? shape->AddRef() : shape;
 }
 #endif 
 
