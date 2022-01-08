@@ -665,22 +665,26 @@ void ndBodySphFluid_forCPU::BuildPairs(const ndWorld* const world)
 				,m_posit(fluid->m_posit)
 				,m_pairCount(fluid->m_pairCount)
 				,m_pair(fluid->m_pair)
-				,m_dist2(fluid->CalculateGridSize() * fluid->CalculateGridSize())
+				,m_diameter(fluid->GetParticleRadius() * ndFloat32 (2.0f))
+				,m_diameter2(m_diameter * m_diameter)
 			{
+				//m_diameter *= 1.1;
+				//m_diameter2 = m_diameter * m_diameter;
 			}
 
 			ndArray<ndSpinLock>& m_locks;
 			const ndArray<ndVector>& m_posit;
 			ndArray<ndInt8>& m_pairCount;
 			ndArray<ndParticlePair>& m_pair;
-			ndFloat32 m_dist2;
+			ndFloat32 m_diameter;
+			ndFloat32 m_diameter2;
 		};
 
 		void AddPair(ndPairInfo& info, ndInt32 particle0, ndInt32 particle1)
 		{
 			ndVector p1p0(info.m_posit[particle0] - info.m_posit[particle1]);
 			ndFloat32 dist2(p1p0.DotProduct(p1p0).GetScalar());
-			if (dist2 <= info.m_dist2)
+			if (dist2 < info.m_diameter2)
 			{
 				{
 					ndSpinLock lock(info.m_locks[particle0]);
@@ -712,9 +716,19 @@ void ndBodySphFluid_forCPU::BuildPairs(const ndWorld* const world)
 			{
 				const ndGridHash hash0 = hashGridMap[start + i];
 				bool test0 = (hash0.m_cellType == ndHomeGrid);
-				for (ndInt32 j = i; j < count; ++j)
+				ndInt32 index0 = hash0.m_particleIndex;
+				ndFloat32 x0 = info.m_posit[index0].m_x;
+				for (ndInt32 j = i + 1; j < count; ++j)
 				{
 					const ndGridHash hash1 = hashGridMap[start + j];
+					ndInt32 index1 = hash1.m_particleIndex;
+					ndFloat32 x1 = info.m_posit[index1].m_x;
+					dAssert(x1 >= x0);
+					bool test3 = ((x1 - x0) >= info.m_diameter);
+					if (test3)
+					{
+						break;
+					}
 					bool test1 = (hash1.m_cellType == ndHomeGrid);
 					bool test2 = (hash0.m_particleIndex < hash1.m_particleIndex);
 					bool test = test0 & (test1 | test2);
@@ -771,7 +785,7 @@ void ndBodySphFluid_forCPU::Update(const ndWorld* const world, ndFloat32)
 	CreateGrids(world);
 	SortGrids(world);
 	CalculateScans(world);
-	//BuildPairs(world);
+	BuildPairs(world);
 
 	// do the physics
 	//CalculateAccelerations(world);

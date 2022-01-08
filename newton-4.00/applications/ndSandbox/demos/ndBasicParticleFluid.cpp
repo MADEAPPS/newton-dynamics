@@ -288,8 +288,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 
 	fluidObject->SetParticleRadius(diameter * 0.5f);
 
-	ndInt32 particleCountPerAxis = 64;
-	//ndInt32 particleCountPerAxis = 40;
+	//ndInt32 particleCountPerAxis = 64;
+	ndInt32 particleCountPerAxis = 40;
 	//ndInt32 particleCountPerAxis = 32;
 	//ndInt32 particleCountPerAxis = 1;
 	ndFloat32 spacing = diameter * 1.0f;
@@ -300,12 +300,12 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	matrix.m_posit += origin;
 matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 0.0f);
 	
-	//BuildBox(matrix, fluidObject, particleCountPerAxis);
+	BuildBox(matrix, fluidObject, particleCountPerAxis);
 	//BuildHollowBox(matrix, fluidObject, particleCountPerAxis);
-	BuildSphere(matrix, fluidObject, particleCountPerAxis);
+	//BuildSphere(matrix, fluidObject, particleCountPerAxis);
 
 	matrix.m_posit.m_z -= 15.0f;
-	BuildHollowBox(matrix, fluidObject, particleCountPerAxis);
+	//BuildHollowBox(matrix, fluidObject, particleCountPerAxis);
 
 	// make sure we have the first surface generated before rendering.
 	fluidObject->UpdateIsoSurface();
