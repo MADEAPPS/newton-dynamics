@@ -19,19 +19,11 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __ND_BODY_SPH_FLUID_H__
-#define __ND_BODY_SPH_FLUID_H__
+#ifndef __ND_BODY_SPH_FLUID_CPU_H__
+#define __ND_BODY_SPH_FLUID_CPU_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndBodyParticleSet.h"
-
-#define D_USE_SMALL_HASH
-	#ifdef D_USE_SMALL_HASH
-#define D_RADIX_DIGIT_SIZE		7
-#else
-	#define D_RADIX_DIGIT_SIZE	10
-#endif
-
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodySphFluid: public ndBodyParticleSet
@@ -45,9 +37,32 @@ class ndBodySphFluid: public ndBodyParticleSet
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	protected:
+	D_NEWTON_API virtual void Update(const ndWorld* const world, ndFloat32 timestep);
 	virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const;
 
 	private:
+	enum ndGridType
+	{
+		ndAdjacentGrid = 0,
+		ndHomeGrid = 1,
+	};
+
+	class ndGridHash;
+	class ndWorkingData;
+	class ndParticlePair;
+	class ndParticleKernelDistance;
+
+	ndWorkingData& WorkingData();
+	ndFloat32 CalculateGridSize() const;
+	void SortGrids(const ndWorld* const world);
+	void BuildPairs(const ndWorld* const world);
+	void CreateGrids(const ndWorld* const world);
+	void CaculateAABB(const ndWorld* const world);
+	void SortXdimension(const ndWorld* const world);
+	void CalculateScans(const ndWorld* const world);
+	void CalculateDensity(const ndWorld* const world);
+	void SortCellBuckects(const ndWorld* const world);
+	void CalculateAccelerations(const ndWorld* const world);
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const ndFastRay&, const ndFloat32) const
@@ -59,7 +74,6 @@ inline ndBodySphFluid* ndBodySphFluid::GetAsBodySphFluid()
 { 
 	return this; 
 }
-
 
 #endif 
 

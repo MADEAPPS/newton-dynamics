@@ -26,29 +26,17 @@
 
 ndBodyParticleSet::ndBodyParticleSet()
 	:ndBody()
+	,m_box0(ndFloat32(-1e10f))
+	,m_box1(ndFloat32(1e10f))
 	,m_listNode(nullptr)
-	//,m_accel(dVector::m_zero)
-	//,m_alpha(dVector::m_zero)
-	//,m_externalForce(dVector::m_zero)
-	//,m_externalTorque(dVector::m_zero)
-	//,m_impulseForce(dVector::m_zero)
-	//,m_impulseTorque(dVector::m_zero)
-	//,m_savedExternalForce(dVector::m_zero)
-	//,m_savedExternalTorque(dVector::m_zero)
 {
-	//dAssert(0);
 }
 
 ndBodyParticleSet::ndBodyParticleSet(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndBody(desc)
-	//,m_accel(dVector::m_zero)
-	//,m_alpha(dVector::m_zero)
-	//,m_externalForce(dVector::m_zero)
-	//,m_externalTorque(dVector::m_zero)
-	//,m_impulseForce(dVector::m_zero)
-	//,m_impulseTorque(dVector::m_zero)
-	//,m_savedExternalForce(dVector::m_zero)
-	//,m_savedExternalTorque(dVector::m_zero)
+	,m_box0(ndFloat32(-1e10f))
+	,m_box1(ndFloat32(1e10f))
+	,m_listNode(nullptr)
 {
 	//xmlNode->FirstChild("ndBodyKinematic"), shapesCache
 	// nothing was saved

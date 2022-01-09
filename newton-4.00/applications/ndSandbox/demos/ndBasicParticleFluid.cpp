@@ -20,11 +20,11 @@
 #include "ndDemoEntityManager.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
-class ndIsoSurfaceParticleVolume : public ndBodySphFluid_forCPU, public ndBackgroundJob
+class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundJob
 {
 	public:
 	ndIsoSurfaceParticleVolume(ndFloat32 radius)
-		:ndBodySphFluid_forCPU()
+		:ndBodySphFluid()
 		,ndBackgroundJob()
 		,m_indexList(1024)
 		,m_points(1024)

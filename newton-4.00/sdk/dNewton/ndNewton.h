@@ -50,6 +50,7 @@
 #include <ndJointPulley.h>
 #include <ndShapeConvex.h>
 #include <ndBodyDynamic.h>
+#include <ndBodySphFluid.h>
 #include <ndContactArray.h>
 #include <ndJointFix6dof.h>
 #include <ndBodySphFluid.h>
@@ -76,8 +77,6 @@
 #include <ndBodyParticleSetList.h>
 #include <ndJointAttachmentPoint.h>
 #include <ndMultiBodyVehicleMotor.h>
-#include <ndBodySphFluid_forCPU.h>
-#include <ndBodySphFluid_forOpenCL.h>
 #include <ndMultiBodyVehicleGearBox.h>
 #include <ndJointDryRollingFriction.h>
 #include <ndJointKinematicController.h>
