@@ -28,6 +28,9 @@ ndBodyParticleSet::ndBodyParticleSet()
 	:ndBody()
 	,m_box0(ndFloat32(-1e10f))
 	,m_box1(ndFloat32(1e10f))
+	,m_gravity(ndVector::m_zero)
+	,m_posit(1024)
+	,m_veloc(1024)
 	,m_listNode(nullptr)
 {
 }
@@ -36,6 +39,9 @@ ndBodyParticleSet::ndBodyParticleSet(const ndLoadSaveBase::ndLoadDescriptor& des
 	:ndBody(desc)
 	,m_box0(ndFloat32(-1e10f))
 	,m_box1(ndFloat32(1e10f))
+	,m_gravity(ndVector::m_zero)
+	,m_posit(1024)
+	,m_veloc(1024)
 	,m_listNode(nullptr)
 {
 	//xmlNode->FirstChild("ndBodyKinematic"), shapesCache

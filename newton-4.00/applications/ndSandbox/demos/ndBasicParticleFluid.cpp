@@ -31,6 +31,7 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundJob
 		,m_meshIsReady(0)
 	{
 		SetParticleRadius(radius);
+		SetGravity(ndVector(ndFloat32(0.0f), DEMO_GRAVITY, ndFloat32(0.0f), ndFloat32(0.0f)));
 	}
 
 	void UpdateIsoSurface()
@@ -204,15 +205,19 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const surface, ndInt32 size)
 {
 	ndFloat32 spacing = surface->GetParticleRadius() * ndFloat32 (2.0f);
-	ndArray<ndVector>& particles = surface->GetPositions();
+	ndArray<ndVector>& veloc = surface->GetVelocity();
+	ndArray<ndVector>& posit = surface->GetPositions();
+
+	ndVector v(ndVector::m_zero);
 	for (ndInt32 z = 0; z < size; z++)
 	{
 		for (ndInt32 y = 0; y < size; y++)
 		{
 			for (ndInt32 x = 0; x < size; x++)
 			{
-				const ndVector posit(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
-				particles.PushBack(posit);
+				const ndVector p(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
+				posit.PushBack(p);
+				veloc.PushBack(v);
 			}
 		}
 	}
@@ -221,7 +226,10 @@ static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const s
 static void BuildHollowBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const surface, ndInt32 size)
 {
 	ndFloat32 spacing = surface->GetParticleRadius() * ndFloat32(2.0f);
-	ndArray<ndVector>& particles = surface->GetPositions();
+	ndArray<ndVector>& veloc = surface->GetVelocity();
+	ndArray<ndVector>& posit = surface->GetPositions();
+
+	ndVector v(ndVector::m_zero);
 	for (ndInt32 z = 0; z < size; z++)
 	{
 		for (ndInt32 y = 0; y < size; y++)
@@ -235,8 +243,9 @@ static void BuildHollowBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* c
 					y >= (size - 1) ||
 					z >= (size - 1))
 				{
-					const ndVector posit(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
-					particles.PushBack(posit);
+					const ndVector p(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
+					posit.PushBack(p);
+					veloc.PushBack(v);
 				}
 			}
 		}
@@ -246,8 +255,10 @@ static void BuildHollowBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* c
 static void BuildSphere(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const surface, ndInt32 size)
 {
 	ndFloat32 spacing = surface->GetParticleRadius() * ndFloat32(2.0f);
-	ndArray<ndVector>& particles = surface->GetPositions();
+	ndArray<ndVector>& veloc = surface->GetVelocity();
+	ndArray<ndVector>& posit = surface->GetPositions();
 
+	ndVector v(ndVector::m_zero);
 	ndInt32 radius2 = (size / 2) * (size / 2);
 	for (ndInt32 z = 0; z < size; z++)
 	{
@@ -261,8 +272,9 @@ static void BuildSphere(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* cons
 				ndFloat32 tesRadius = ndFloat32 (x0 * x0 + y0 * y0 + z0 * z0);
 				if (tesRadius < radius2)
 				{
-					const ndVector posit(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
-					particles.PushBack(posit);
+					const ndVector p(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
+					posit.PushBack(p);
+					veloc.PushBack(v);
 				}
 			}
 		}

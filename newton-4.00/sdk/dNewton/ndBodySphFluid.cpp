@@ -918,6 +918,7 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 			//const ndFloat32 h9 = h2 * h2 * h2 * h2 * h;
 			//const ndFloat32 kernelConst = ndFloat32(315.0f) / (ndFloat32(64.0f) * ndPi * h9);
 
+			const ndVector gravity(fluid->m_gravity);
 			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
@@ -926,7 +927,7 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 				//ndParticleKernelDistance& distance = data.m_kernelDistance[i];
 				const ndVector p0(posit[i]);
 				//ndFloat32 density = ndFloat32(0.0f);
-				ndVector accel(ndVector::m_zero);
+				ndVector accel(gravity);
 				for (ndInt32 j = 0; j < count; ++j)
 				{
 					const ndInt32 i1 = pairs.m_m1[j];

@@ -34,6 +34,9 @@ class ndBodyParticleSet: public ndBody
 	D_NEWTON_API virtual ~ndBodyParticleSet ();
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
+	const ndVector GetGravity() const;
+	void SetGravity(const ndVector& gravity);
+
 	ndArray<ndVector>& GetVelocity();
 	ndArray<ndVector>& GetPositions();
 	const ndArray<ndVector>& GetVelocity() const;
@@ -48,6 +51,7 @@ class ndBodyParticleSet: public ndBody
 	protected:
 	ndVector m_box0;
 	ndVector m_box1;
+	ndVector m_gravity;
 	ndArray<ndVector> m_posit;
 	ndArray<ndVector> m_veloc;
 	ndBodyParticleSetList::ndNode* m_listNode;
@@ -88,6 +92,16 @@ inline ndArray<ndVector>& ndBodyParticleSet::GetVelocity()
 inline const ndArray<ndVector>& ndBodyParticleSet::GetVelocity() const
 {
 	return m_veloc;
+}
+
+inline const ndVector ndBodyParticleSet::GetGravity() const
+{
+	return m_gravity;
+}
+
+inline void ndBodyParticleSet::SetGravity(const ndVector& gravity)
+{
+	m_gravity = gravity & ndVector::m_triplexMask;
 }
 
 #endif 
