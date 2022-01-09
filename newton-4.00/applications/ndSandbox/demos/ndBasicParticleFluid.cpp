@@ -37,7 +37,9 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundJob
 	void UpdateIsoSurface()
 	{
 		D_TRACKTIME();
-		m_isoSurface.GenerateMesh(GetPositions(), GetParticleRadius() * ndFloat32 (2.0f));
+		ndArray<ndVector>& pointCloud = GetPositions();
+		m_isoSurface.GenerateMesh(pointCloud, GetParticleRadius() * ndFloat32 (2.0f));
+
 		const ndArray<ndVector>& points = m_isoSurface.GetPoints();
 		const ndArray<ndVector>& normals = m_isoSurface.GetNormals();
 		dAssert(points.GetCount());

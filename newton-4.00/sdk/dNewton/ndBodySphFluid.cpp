@@ -159,11 +159,13 @@ class ndBodySphFluid::ndWorkingData
 
 ndBodySphFluid::ndBodySphFluid()
 	:ndBodyParticleSet()
+	,m_viscosity(ndFloat32 (1.0f))
 {
 }
 
 ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	: ndBodyParticleSet(desc)
+	,m_viscosity(ndFloat32(1.0f))
 {
 	// nothing was saved
 	dAssert(0);
@@ -856,7 +858,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 	scene->SubmitJobs<ndAddPairs>(this);
 }
 
-void ndBodySphFluid::CalculateDensity(const ndWorld* const world)
+void ndBodySphFluid::CalculateParticlesDensity(const ndWorld* const world)
 {
 	D_TRACKTIME();
 	class CalculateDensity : public ndScene::ndBaseJob
@@ -886,7 +888,8 @@ void ndBodySphFluid::CalculateDensity(const ndWorld* const world)
 					const ndFloat32 dist6 = dist2 * dist2 * dist2;
 					density += kernelConst * dist6;
 				}
-				data.m_invDensity[i] = ndFloat32 (1.0f) / (density + 1.0e-6f);
+				const bool text = (count != 0) & (density >= ndFloat32(1.0e-6f));
+				data.m_invDensity[i] = text ? ndFloat32 (1.0f) / density : ndFloat32 (0.0f);
 			}
 		}
 	};
@@ -900,47 +903,60 @@ void ndBodySphFluid::CalculateDensity(const ndWorld* const world)
 void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 {
 	D_TRACKTIME();
-
-	class CalculateAcceleration : public ndScene::ndBaseJob
+	class ndCalculateAcceleration : public ndScene::ndBaseJob
 	{
 		virtual void Execute()
 		{
 			D_TRACKTIME();
 			ndBodySphFluid* const fluid = (ndBodySphFluid*)m_context;
 
-			//ndArray<ndVector>& veloc = fluid->m_veloc;
-			const ndArray<ndVector>& posit = fluid->m_posit;
-
 			ndWorkingData& data = fluid->WorkingData();
+			const ndArray<ndVector>& veloc = fluid->m_veloc;
+			const ndArray<ndVector>& posit = fluid->m_posit;
+			const ndFloat32* const invDensity = &data.m_invDensity[0];
 
-			//const ndFloat32 h = fluid->GetParticleRadius() * ndFloat32(2.0f);
-			//const ndFloat32 h2 = h * h;
-			//const ndFloat32 h9 = h2 * h2 * h2 * h2 * h;
-			//const ndFloat32 kernelConst = ndFloat32(315.0f) / (ndFloat32(64.0f) * ndPi * h9);
+			const ndFloat32 h = fluid->GetParticleRadius() * ndFloat32(2.0f);
+			const ndFloat32 h6 = h * h * h * h * h * h;
+			const ndVector kernelConst (ndFloat32(45.0f) / (ndPi * h6));
 
+			const ndFloat32 u = fluid->m_viscosity;
 			const ndVector gravity(fluid->m_gravity);
 			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
+				const ndVector p0(posit[i]);
+				const ndVector v0(veloc[i]);
+
 				const ndInt32 count = data.m_pairCount[i];
 				const ndParticlePair& pairs = data.m_pairs[i];
-				//ndParticleKernelDistance& distance = data.m_kernelDistance[i];
-				const ndVector p0(posit[i]);
-				//ndFloat32 density = ndFloat32(0.0f);
-				ndVector accel(gravity);
+				ndParticleKernelDistance& distance = data.m_kernelDistance[i];
+
+				ndVector pressureAccel(ndVector::m_zero);
+				ndVector viscosityAccel(ndVector::m_zero);
 				for (ndInt32 j = 0; j < count; ++j)
 				{
 					const ndInt32 i1 = pairs.m_m1[j];
-					//const ndFloat32 d = distance.m_dist[j];
-					//const ndFloat32 dist2 = h2 - d * d;
-					//const ndFloat32 dist6 = dist2 * dist2 * dist2;
-					//density += kernelConst * dist6;
-					const ndVector p1(posit[i1]);
-					const ndVector dir(p0 - p1);
+					const ndVector p01(p0 - posit[i1]);
+					const ndVector dir(p01 * p01.InvMagSqrt());
 					dAssert(dir.m_w == ndFloat32(0.0f));
-					const ndVector dir1(dir * dir.InvMagSqrt());
-					accel += dir1;
+
+					// kernel distance
+					const ndFloat32 d = distance.m_dist[j];
+					const ndFloat32 dist = h - d;
+
+					// calculate pressure
+					//const ndVector preasureAccel(dist2 * dir * dir.InvMagSqrt());
+					//const ndVector pressureAccel(dist2 * dir * dir.InvMagSqrt());
+					//const ndVector pressureAccel(ndVector::m_zero);
+					//pressure
+
+					// calculate viscosity acceleration
+					const ndVector v01(veloc[i1] - v0);
+					viscosityAccel += v01 * ndVector(invDensity[i1]);
 				}
+
+				const ndVector viscosity(invDensity[i] * u);
+				const ndVector accel(gravity + kernelConst * (viscosity * viscosityAccel + pressureAccel));
 				data.m_accel[i] = accel;
 			}
 		}
@@ -949,10 +965,55 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 	ndWorkingData& data = WorkingData();
 	data.m_accel.SetCount(m_posit.GetCount());
 	ndScene* const scene = world->GetScene();
-	scene->SubmitJobs<CalculateAcceleration>(this);
+	scene->SubmitJobs<ndCalculateAcceleration>(this);
 }
 
-void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32)
+void ndBodySphFluid::IntegrateParticles(const ndWorld* const world, ndFloat32 timestep)
+{
+	D_TRACKTIME();
+	class ndContext
+	{
+		public:
+		ndContext(ndBodySphFluid* const fluid, ndFloat32 timestep)
+			:m_fluid(fluid)
+			,m_timestep(timestep)
+		{
+		}
+
+		ndBodySphFluid* m_fluid;
+		ndFloat32 m_timestep;
+	};
+
+	class ndIntegrateParticles : public ndScene::ndBaseJob
+	{
+		virtual void Execute()
+		{
+			const ndContext& context = *((ndContext*)m_context);
+			ndBodySphFluid* const fluid = context.m_fluid;
+
+			ndWorkingData& data = fluid->WorkingData();
+			const ndArray<ndVector>& accel = data.m_accel;
+			ndArray<ndVector>& veloc = fluid->m_veloc;
+			ndArray<ndVector>& posit = fluid->m_posit;
+
+			ndVector timestep(context.m_timestep);
+			ndVector halfTime(timestep * ndVector::m_half);
+			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			{
+				ndVector halfVeloc(accel[i] * halfTime);
+				posit[i] = posit[i] + halfVeloc * timestep;
+				veloc[i] = halfVeloc + halfVeloc;
+			}
+		}
+	};
+
+	ndContext context(this, timestep);
+	ndScene* const scene = world->GetScene();
+	scene->SubmitJobs<ndIntegrateParticles>(&context);
+}
+
+void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
 {
 	// do the scene management 
 	CaculateAABB(world);
@@ -960,6 +1021,7 @@ void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32)
 	SortGrids(world);
 	CalculateScans(world);
 	BuildPairs(world);
-	CalculateDensity(world);
+	CalculateParticlesDensity(world);
 	CalculateAccelerations(world);
+	IntegrateParticles(world, timestep);
 }

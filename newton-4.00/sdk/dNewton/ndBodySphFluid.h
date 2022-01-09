@@ -33,6 +33,9 @@ class ndBodySphFluid: public ndBodyParticleSet
 	D_NEWTON_API ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API virtual ~ndBodySphFluid ();
 
+	ndFloat32 GetViscosity() const;
+	void SetViscosity(ndFloat32 viscosity);
+	
 	virtual ndBodySphFluid* GetAsBodySphFluid();
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
@@ -60,9 +63,12 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void CaculateAABB(const ndWorld* const world);
 	void SortXdimension(const ndWorld* const world);
 	void CalculateScans(const ndWorld* const world);
-	void CalculateDensity(const ndWorld* const world);
 	void SortCellBuckects(const ndWorld* const world);
 	void CalculateAccelerations(const ndWorld* const world);
+	void CalculateParticlesDensity(const ndWorld* const world);
+	void IntegrateParticles(const ndWorld* const world, ndFloat32 tiemstep);
+
+	ndFloat32 m_viscosity;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const ndFastRay&, const ndFloat32) const
@@ -73,6 +79,16 @@ inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const ndFastRay&, const nd
 inline ndBodySphFluid* ndBodySphFluid::GetAsBodySphFluid()
 { 
 	return this; 
+}
+
+inline ndFloat32 ndBodySphFluid::GetViscosity() const
+{
+	return m_viscosity;
+}
+
+inline void ndBodySphFluid::SetViscosity(ndFloat32 viscosity)
+{
+	m_viscosity = viscosity;
 }
 
 #endif 

@@ -126,34 +126,6 @@ void ndPhysicsWorld::DeletePendingObjects()
 	}
 }
 
-void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
-{
-	const ndFloat32 descreteStep = (1.0f / MAX_PHYSICS_FPS);
-
-	ndInt32 maxSteps = MAX_PHYSICS_STEPS;
-	m_timeAccumulator += timestep;
-
-	// if the time step is more than max timestep par frame, throw away the extra steps.
-	if (m_timeAccumulator > descreteStep * maxSteps)
-	{
-		ndFloat32 steps = ndFloor(m_timeAccumulator / descreteStep) - maxSteps;
-		dAssert(steps >= 0.0f);
-		m_timeAccumulator -= descreteStep * steps;
-	}
-	
-	while (m_timeAccumulator > descreteStep)
-	{
-		Update(descreteStep);
-		m_timeAccumulator -= descreteStep;
-
-		DeletePendingObjects();
-	}
-	if (m_manager->m_synchronousPhysicsUpdate)
-	{
-		Sync();
-	}
-}
-
 ndSoundManager* ndPhysicsWorld::GetSoundManager() const
 {
 	return m_soundManager;
@@ -242,4 +214,32 @@ bool ndPhysicsWorld::LoadScene(const char* const path)
 	}
 
 	return true;
+}
+
+void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
+{
+	const ndFloat32 descreteStep = (1.0f / MAX_PHYSICS_FPS);
+
+	ndInt32 maxSteps = MAX_PHYSICS_STEPS;
+	m_timeAccumulator += timestep;
+
+	// if the time step is more than max timestep par frame, throw away the extra steps.
+	if (m_timeAccumulator > descreteStep * maxSteps)
+	{
+		ndFloat32 steps = ndFloor(m_timeAccumulator / descreteStep) - maxSteps;
+		dAssert(steps >= 0.0f);
+		m_timeAccumulator -= descreteStep * steps;
+	}
+
+	while (m_timeAccumulator > descreteStep)
+	{
+		Update(descreteStep);
+		m_timeAccumulator -= descreteStep;
+
+		DeletePendingObjects();
+	}
+	if (m_manager->m_synchronousPhysicsUpdate)
+	{
+		Sync();
+	}
 }
