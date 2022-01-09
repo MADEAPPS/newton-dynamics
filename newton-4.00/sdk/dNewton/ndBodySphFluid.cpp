@@ -1001,9 +1001,10 @@ void ndBodySphFluid::IntegrateParticles(const ndWorld* const world, ndFloat32 ti
 			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
-				ndVector halfVeloc(accel[i] * halfTime);
-				posit[i] = posit[i] + halfVeloc * timestep;
-				veloc[i] = halfVeloc + halfVeloc;
+				const ndVector halfStep(accel[i] * halfTime);
+				const ndVector midPointVeloc(veloc[i] + halfStep);
+				posit[i] = posit[i] + midPointVeloc * timestep;
+				veloc[i] = midPointVeloc + halfStep;
 			}
 		}
 	};
