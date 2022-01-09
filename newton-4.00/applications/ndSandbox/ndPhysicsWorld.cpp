@@ -234,6 +234,9 @@ void ndPhysicsWorld::AdvanceTime(ndFloat32 timestep)
 	while (m_timeAccumulator > descreteStep)
 	{
 		Update(descreteStep);
+		// testing Zak bug
+		Sync();
+
 		m_timeAccumulator -= descreteStep;
 
 		DeletePendingObjects();

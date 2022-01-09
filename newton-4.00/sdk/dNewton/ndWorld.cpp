@@ -485,7 +485,7 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	UpdateSkeletons();
 	m_scene->InitBodyArray();
 
-	ndBodyKinematic* sentinelBody = m_sentinelBody;
+	ndBodyKinematic* const sentinelBody = m_sentinelBody;
 	sentinelBody->PrepareStep(m_scene->GetActiveBodyArray().GetCount());
 	
 	sentinelBody->m_isStatic = 1;

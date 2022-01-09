@@ -35,14 +35,14 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0		// basic rigidbody
+#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
 //#define DEFAULT_SCENE	3		// conservation of momentum 
 //#define DEFAULT_SCENE	4		// basic Stacks
 //#define DEFAULT_SCENE	5		// basic Trigger
 //#define DEFAULT_SCENE	6		// basic player
-#define DEFAULT_SCENE	7		// particle fluid
+//#define DEFAULT_SCENE	7		// particle fluid
 //#define DEFAULT_SCENE	8		// static mesh collision 
 //#define DEFAULT_SCENE	9		// static user mesh collision 
 //#define DEFAULT_SCENE	10		// basic joints
@@ -349,7 +349,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_solverMode = ndWorld::ndSimdAvx2Solver;
 	//m_solverMode = ndWorld::ndStandardSolver;
 	//m_solverPasses = 4;
-	m_workerThreads = 2;
+	m_workerThreads = 1;
 	//m_solverSubSteps = 2;
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
