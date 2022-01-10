@@ -183,13 +183,6 @@ ndBodySphFluid::~ndBodySphFluid()
 {
 }
 
-ndFloat32 ndBodySphFluid::CalculateGridSize() const
-{
-	return m_radius * ndFloat32(2.0f) * 1.5f;
-	//return m_radius * ndFloat32(2.0f) * ndFloat32(1.125f);
-	//return m_radius * (ndFloat32(2.0f) * ndFloat32(2.0f));
-}
-
 ndBodySphFluid::ndWorkingData& ndBodySphFluid::WorkingData()
 {
 	static ndWorkingData workingBuffers;
@@ -259,7 +252,7 @@ void ndBodySphFluid::CaculateAABB(const ndWorld* const world)
 		box.m_max = box.m_max.GetMax(context.m_boxes[i].m_max);
 	}
 
-	const ndFloat32 gridSize = CalculateGridSize();
+	const ndFloat32 gridSize = GetSphGridSize();
 
 	ndVector grid(gridSize);
 	ndVector invGrid(ndFloat32 (1.0f) / gridSize);
@@ -405,7 +398,7 @@ void ndBodySphFluid::SortCellBuckects(const ndWorld* const world)
 	ndWorkingData& data = WorkingData();
 	ndScene* const scene = world->GetScene();
 
-	ndVector boxSize((m_box1 - m_box0).Scale(ndFloat32(1.0f) / CalculateGridSize()).GetInt());
+	ndVector boxSize((m_box1 - m_box0).Scale(ndFloat32(1.0f) / GetSphGridSize()).GetInt());
 	ndCountingSort<ndGridHash, ndKey_ylow, D_RADIX_DIGIT_SIZE>(*scene, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
 	if (boxSize.m_iy > (1 << D_RADIX_DIGIT_SIZE))
 	{
@@ -625,18 +618,15 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			ndContext* const context = (ndContext*)m_context;
 			ndBodySphFluid* const fluid = context->m_fluid;
 			ndWorkingData& data = fluid->WorkingData();
+			ndGridHash* const dst = &data.m_hashGridMapScratchBuffer[0];
 
 			const ndFloat32 radius = fluid->m_radius;
-			const ndFloat32 gridSize = fluid->CalculateGridSize();
-
+			const ndFloat32 gridSize = fluid->GetSphGridSize();
 			const ndVector origin(fluid->m_box0);
 			const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
 			const ndVector* const posit = &fluid->m_posit[0];
-
-			ndGridHash* const dst = &data.m_hashGridMapScratchBuffer[0];
-
-			const ndVector box0(-radius, -radius, -radius, ndFloat32(0.0f));
-			const ndVector box1( radius,  radius,  radius, ndFloat32(0.0f));
+			const ndVector box0(-radius);
+			const ndVector box1( radius);
 			const ndGridNeighborInfo& gridNeighborInfo = context->m_neighbors;
 
 			#ifdef D_USE_PARALLEL_CLASSIFY
@@ -787,7 +777,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 				,m_pairCount(fluid->WorkingData().m_pairCount)
 				,m_pair(fluid->WorkingData().m_pairs)
 				,m_distance(fluid->WorkingData().m_kernelDistance)
-				,m_diameter(fluid->CalculateGridSize())
+				,m_diameter(fluid->GetSphGridSize())
 				,m_diameter2(m_diameter * m_diameter)
 			{
 			}
@@ -918,7 +908,7 @@ void ndBodySphFluid::CalculateParticlesDensity(const ndWorld* const world)
 			const ndArray<ndVector>& posit = fluid->m_posit;
 	
 			ndWorkingData& data = fluid->WorkingData();
-			const ndFloat32 h = fluid->CalculateGridSize();
+			const ndFloat32 h = fluid->GetSphGridSize();
 			const ndFloat32 h2 = h * h;
 			const ndFloat32 kernelMagicConst = ndFloat32(315.0f) / (ndFloat32(64.0f) * ndPi * ndPow(h, 9));
 			const ndFloat32 kernelConst = fluid->m_mass * kernelMagicConst;
@@ -977,7 +967,7 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 			const ndFloat32* const density = &data.m_density[0];
 			const ndFloat32* const invDensity = &data.m_invDensity[0];
 
-			const ndFloat32 h = fluid->CalculateGridSize();
+			const ndFloat32 h = fluid->GetSphGridSize();
 			const ndFloat32 u = fluid->m_viscosity;
 			const ndVector kernelConst(fluid->m_mass * ndFloat32(45.0f) / (ndPi * ndPow(h, 6)));
 
@@ -1056,6 +1046,7 @@ void ndBodySphFluid::IntegrateParticles(const ndWorld* const world, ndFloat32 ti
 	{
 		virtual void Execute()
 		{
+			D_TRACKTIME();
 			const ndContext& context = *((ndContext*)m_context);
 			ndBodySphFluid* const fluid = context.m_fluid;
 

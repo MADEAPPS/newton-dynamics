@@ -45,6 +45,8 @@ class ndBodySphFluid: public ndBodyParticleSet
 	ndFloat32 GetDensityToPressureConst() const;
 	void GetDensityToPressureConst(ndFloat32 densityToPressureConst);
 
+	ndFloat32 GetSphGridSize() const;
+
 	virtual ndBodySphFluid* GetAsBodySphFluid();
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
@@ -65,7 +67,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 	class ndParticleKernelDistance;
 
 	ndWorkingData& WorkingData();
-	ndFloat32 CalculateGridSize() const;
 	void SortGrids(const ndWorld* const world);
 	void BuildPairs(const ndWorld* const world);
 	void CreateGrids(const ndWorld* const world);
@@ -133,6 +134,12 @@ inline void ndBodySphFluid::GetDensityToPressureConst(ndFloat32 densityToPressur
 	m_densityToPressureConst = densityToPressureConst;
 }
 
+inline ndFloat32 ndBodySphFluid::GetSphGridSize() const
+{
+	return m_radius * ndFloat32(2.0f) * 1.5f;
+	//return m_radius * ndFloat32(2.0f) * ndFloat32(1.125f);
+	//return m_radius * (ndFloat32(2.0f) * ndFloat32(2.0f));
+}
 
 #endif 
 
