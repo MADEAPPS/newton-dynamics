@@ -176,7 +176,6 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void ThreadFunction();
 	D_COLLISION_API void SendBackgroundJob(ndBackgroundJob* const job);
 	
-
 	class ndBodyListRun
 	{
 		public:

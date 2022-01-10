@@ -1001,7 +1001,7 @@ void ndBodySphFluid::IntegrateParticles(const ndWorld* const world, ndFloat32 ti
 			:m_fluid(fluid)
 			,m_timestep(timestep)
 		{
-			m_timestep = 2.e-3f;
+			m_timestep = 0.003f;
 		}
 
 		ndBodySphFluid* m_fluid;

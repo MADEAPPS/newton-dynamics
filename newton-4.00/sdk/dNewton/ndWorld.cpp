@@ -479,20 +479,6 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	m_scene->SetTimestep(timestep);
 	m_scene->InitBodyArray();
 
-	//ndBodyKinematic* const sentinelBody = m_sentinelBody;
-	//sentinelBody->PrepareStep(m_scene->GetActiveBodyArray().GetCount());
-	//
-	//sentinelBody->m_isStatic = 1;
-	//sentinelBody->m_autoSleep = 1;
-	//sentinelBody->m_islandSleep = 1;
-	//sentinelBody->m_equilibrium = 1;
-	//sentinelBody->m_equilibrium0 = 1;
-	//sentinelBody->m_isJointFence0 = 1;
-	//sentinelBody->m_isJointFence1 = 1;
-	//sentinelBody->m_bodyIsConstrained = 0;
-	//sentinelBody->m_weigh = ndFloat32(0.0f);
-	//m_scene->GetActiveBodyArray().PushBack(sentinelBody);
-
 	// update the collision system
 	m_scene->FindCollidingPairs();
 	m_scene->CalculateContacts();
@@ -654,8 +640,6 @@ void ndWorld::UpdateSkeletons()
 		{
 			m_skeletonList.Remove(m_skeletonList.GetFirst());
 		}
-
-		//m_scene->InitBodyArray();
 
 		// build connectivity graph and reset of all joint dirty state
 		ndDynamicsUpdate& solverUpdate = *m_solver;
