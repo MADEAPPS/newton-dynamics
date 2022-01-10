@@ -114,7 +114,7 @@ ndVector FindFloor(const ndWorld& world, const ndVector& origin, ndFloat32 dist)
 	return (rayCaster.m_param < 1.0f) ? rayCaster.m_contact.m_point : p0;
 }
 
-void BuildFloorBox(ndWorld& world)
+ndBodyDynamic* BuildFloorBox(ndWorld& world)
 {
 	world.Sync();
 	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
@@ -127,56 +127,10 @@ void BuildFloorBox(ndWorld& world)
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(box);
 	world.AddBody(body);
+	return body;
 }
 
-void BuildPyramid(ndWorld& world, ndFloat32 mass, const ndVector& origin, const ndVector& size, int count)
-{
-	ndMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
-	world.Sync();
-	//ndShapeInstance xxx(new ndShapeSphere(1.0f));
-	ndShapeInstance box(new ndShapeBox(size.m_x, size.m_y, size.m_z));
-
-	ndVector floor(FindFloor(world, ndVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y + size.m_y / 2.0f;
-
-	// get the dimension from shape itself
-	ndVector minP(0.0f);
-	ndVector maxP(0.0f);
-	box.CalculateAabb(dGetIdentityMatrix(), minP, maxP);
-
-	ndFloat32 stepz = maxP.m_z - minP.m_z + 0.03125f;
-	ndFloat32 stepy = (maxP.m_y - minP.m_y) - 0.01f;
-		  
-	//ndFloat32 y0 = matrix.m_posit.m_y + stepy / 2.0f;
-	ndFloat32 z0 = matrix.m_posit.m_z - stepz * count / 2;
-
-	z0 = 0.0f;
-	count = 1;
-	for (ndInt32 j = 0; j < count; j++)
-	{
-		matrix.m_posit.m_z = z0;
-		const ndInt32 count1 = count - j;
-		for (ndInt32 i = 0; i < count1; i++)
-		{
-			ndBodyDynamic* const body = new ndBodyDynamic();
-
-			body->SetNotifyCallback(new ndDemoEntityNotify);
-			body->SetMatrix(matrix);
-			body->SetCollisionShape(box);
-			body->SetMassMatrix(mass, box);
-
-			world.AddBody(body);
-			matrix.m_posit.m_z += stepz;
-		}
-		z0 += stepz * 0.5f;
-		matrix.m_posit.m_y += stepy;
-	}
-}
-
-void BuildSphere(ndWorld& world, ndFloat32 mass, const ndVector& origin, const ndFloat32 diameter, int count, ndFloat32 offsetHigh)
+ndBodyDynamic* BuildSphere(ndWorld& world, ndFloat32 mass, const ndVector& origin, const ndFloat32 diameter, ndFloat32 offsetHigh)
 {
 	ndMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -191,42 +145,37 @@ void BuildSphere(ndWorld& world, ndFloat32 mass, const ndVector& origin, const n
 
 	matrix.m_posit.m_y += offsetHigh;
 
-	for (int i = 0; i < count; i++)
-	{
-		ndBodyDynamic* const body = new ndBodyDynamic();
-
-		body->SetNotifyCallback(new ndDemoEntityNotify);
-		body->SetMatrix(matrix);
-		body->SetCollisionShape(sphere);
-		body->SetMassMatrix(mass, sphere);
-
-		world.AddBody(body);
-		matrix.m_posit += matrix.m_up.Scale(diameter * 0.99f);
-	}
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	body->SetNotifyCallback(new ndDemoEntityNotify);
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(sphere);
+	body->SetMassMatrix(mass, sphere);
+	world.AddBody(body);
+	return body;
 }
 
-int main (int, const char*) 
+int main(int, const char*)
 {
 	ndWorld world;
-	world.SetSubSteps(2);
-	//world.SetThreadCount(2);
+	world.SetSubSteps(1);
 
-	ndVector size(0.5f, 0.25f, 0.8f, 0.0f); 
+	ndVector size(0.5f, 0.25f, 0.8f, 0.0f);
+
 	ndVector origin(0.0f, 0.0f, 0.0f, 0.0f);
-	BuildFloorBox(world);
-	//BuildPyramid(world, 10.0f, origin, size, 20);
-	//BuildSphere(world, 1.0f, origin + ndVector(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 2, 0.0f);
-	BuildSphere(world, 1.0f, origin + ndVector(3.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 1.0f);
-	//BuildSphere(world, 1.0f, origin + ndVector(6.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
-	//BuildSphere(world, 1.0f, origin + ndVector(9.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
-	
+	ndBodyDynamic* bodyFloor = BuildFloorBox(world);
+	ndBodyDynamic* bodySphere = BuildSphere(world, 1.0f, origin + ndVector(3.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f);
+
+	ndJointBallAndSocket joint(bodySphere->GetMatrix(), bodySphere, bodyFloor);
+
 	ndFloat32 totalTime = 0;
-	for (ndInt32 i = 0; i < 10000; i ++)
+	for (ndInt32 i = 0; i < 10000; i++)
 	{
+		if (i == 0) world.AddJoint(&joint);
+		if (i == 2) world.RemoveJoint(&joint);
+
 		world.Update(1.0f / 60.0f);
 		totalTime += world.GetUpdateTime();
-		//newton.Sync();
+		world.Sync();
 	}
-
 	return 0;
 }

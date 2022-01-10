@@ -1616,22 +1616,7 @@ void ndScene::FindCollidingPairs()
 		}
 	};
 
-#ifdef _DEBUG
-	ndInt32 count = 0;
-	for (ndInt32 i = 0; i < m_activeBodyArray.GetCount(); i++)
-	{
-		ndBodyKinematic* const body = m_activeBodyArray[i];
-		if (!body->m_equilibrium)
-		{
-			dAssert(body == m_sceneBodyArray[count]);
-			count++;
-		}
-	}
-	m_sceneBodyArray.SetCount(count);
-#endif
-	
 	bool fullScan = (3 * m_sceneBodyArray.GetCount()) > m_activeBodyArray.GetCount();
-
 	// uncomment line below to test full versus partial scan
 	//fullScan = true;
 	if (fullScan)

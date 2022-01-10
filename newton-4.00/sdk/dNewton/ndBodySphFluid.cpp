@@ -133,6 +133,7 @@ class ndBodySphFluid::ndWorkingData
 		,m_locks(1024)
 		,m_pairCount(1024)
 		,m_gridScans(1024)
+		,m_density(1024)
 		,m_invDensity(1024)
 		,m_pairs(1024)
 		,m_hashGridMap(1024)
@@ -149,6 +150,7 @@ class ndBodySphFluid::ndWorkingData
 	ndArray<ndSpinLock> m_locks;
 	ndArray<ndInt8> m_pairCount;
 	ndArray<ndInt32> m_gridScans;
+	ndArray<ndFloat32> m_density;
 	ndArray<ndFloat32> m_invDensity;
 	ndArray<ndParticlePair> m_pairs;
 	ndArray<ndGridHash> m_hashGridMap;
@@ -746,8 +748,6 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 				,m_diameter(fluid->GetParticleRadius() * ndFloat32 (2.0f))
 				,m_diameter2(m_diameter * m_diameter)
 			{
-				m_diameter = m_diameter * 1.1f;
-				m_diameter2 = m_diameter * m_diameter;
 			}
 
 			ndArray<ndSpinLock>& m_locks;
@@ -896,12 +896,14 @@ void ndBodySphFluid::CalculateParticlesDensity(const ndWorld* const world)
 					density += kernelConst * dist6;
 				}
 				dAssert(density > ndFloat32(0.0f));
+				data.m_density[i] = density;
 				data.m_invDensity[i] = ndFloat32 (1.0f) / density;
 			}
 		}
 	};
 
 	ndWorkingData& data = WorkingData();
+	data.m_density.SetCount(m_posit.GetCount());
 	data.m_invDensity.SetCount(m_posit.GetCount());
 	ndScene* const scene = world->GetScene();
 	scene->SubmitJobs<CalculateDensity>(this);
@@ -929,56 +931,54 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 			ndWorkingData& data = fluid->WorkingData();
 			const ndArray<ndVector>& veloc = fluid->m_veloc;
 			const ndArray<ndVector>& posit = fluid->m_posit;
+			const ndFloat32* const density = &data.m_density[0];
 			const ndFloat32* const invDensity = &data.m_invDensity[0];
 
 			const ndFloat32 h = fluid->GetParticleRadius() * ndFloat32(2.0f);
-			const ndVector kernelConst (ndFloat32(45.0f) / (ndPi * ndPow(h, 6)));
-
 			const ndFloat32 u = fluid->m_viscosity;
+			const ndVector kernelConst(fluid->m_mass * ndFloat32(45.0f) / (ndPi * ndPow(h, 6)));
+
+			const ndFloat32 viscosity = fluid->m_viscosity;
 			const ndFloat32 restDensity = fluid->m_restDensity;
-			const ndFloat32 massDensityToPressure = fluid->m_densityToPressureConst * fluid->m_mass;
+			const ndFloat32 densityToPressure = fluid->m_densityToPressureConst;
 
 			//const ndVector gravity(fluid->m_gravity);
-			const ndVector gravity(0.0f, -0.02f, 0.0f, 0.0f);
+			const ndVector gravity(0.0f, -9.8f, 0.0f, 0.0f);
 			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			for (ndInt32 i0 = startEnd.m_start; i0 < startEnd.m_end; ++i0)
 			{
-				const ndVector p0(posit[i]);
-				const ndVector v0(veloc[i]);
+				const ndVector p0(posit[i0]);
+				const ndVector v0(veloc[i0]);
 
-				const ndInt32 count = data.m_pairCount[i];
-				const ndParticlePair& pairs = data.m_pairs[i];
-				ndParticleKernelDistance& distance = data.m_kernelDistance[i];
+				const ndInt32 count = data.m_pairCount[i0];
+				const ndParticlePair& pairs = data.m_pairs[i0];
+				ndParticleKernelDistance& distance = data.m_kernelDistance[i0];
+				const ndFloat32 pressureI0 = densityToPressure * (density[i0] - restDensity);
 
-				ndVector pressureAccel(ndVector::m_zero);
-				ndVector viscosityAccel(ndVector::m_zero);
-				ndFloat32 pressureI = data.m_invDensity[i] * (ndFloat32(1.0) - restDensity * data.m_invDensity[i]);
-
+				ndVector forceAcc(ndVector::m_zero);
 				for (ndInt32 j = 0; j < count; ++j)
 				{
 					const ndInt32 i1 = pairs.m_m1[j];
 					const ndVector p10(posit[i1] - p0);
 					const ndVector dir(Normalize(p10));
 					dAssert(dir.m_w == ndFloat32(0.0f));
-
+				
 					// kernel distance
 					const ndFloat32 d = distance.m_dist[j];
 					const ndFloat32 dist = h - d;
-
+				
 					// calculate pressure
 					const ndFloat32 dist2 = dist * dist;
-					ndFloat32 pressureJ = data.m_invDensity[i] * (ndFloat32(1.0) - restDensity * data.m_invDensity[i1]);
-					ndVector force(dist2 * massDensityToPressure * (pressureI + pressureJ));
-					pressureAccel += force * dir;
-
+					const ndFloat32 pressureI1 = densityToPressure * (density[i1] - restDensity);
+					const ndVector force(ndFloat32(0.5f) * dist2 * invDensity[i1] * (pressureI0 + pressureI1));
+					forceAcc += force * dir;
+				
 					// calculate viscosity acceleration
 					const ndVector v01(veloc[i1] - v0);
-					viscosityAccel += v01 * ndVector(invDensity[i1] * dist);
+					forceAcc += v01 * ndVector(dist * viscosity * invDensity[j]);
 				}
-
-				const ndVector viscosity(invDensity[i] * u);
-				const ndVector accel(gravity + kernelConst * (viscosity * viscosityAccel + pressureAccel));
-				data.m_accel[i] = accel;
+				const ndVector accel(gravity + ndVector(invDensity[i0]) * kernelConst * forceAcc);
+				data.m_accel[i0] = accel;
 			}
 		}
 
@@ -1001,6 +1001,7 @@ void ndBodySphFluid::IntegrateParticles(const ndWorld* const world, ndFloat32 ti
 			:m_fluid(fluid)
 			,m_timestep(timestep)
 		{
+			m_timestep = 2.e-3f;
 		}
 
 		ndBodySphFluid* m_fluid;
@@ -1024,14 +1025,17 @@ void ndBodySphFluid::IntegrateParticles(const ndWorld* const world, ndFloat32 ti
 			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
-				const ndVector halfStep(accel[i] * halfTime);
-				const ndVector midPointVeloc(veloc[i] + halfStep);
-				posit[i] = posit[i] + midPointVeloc * timestep;
-				veloc[i] = midPointVeloc + halfStep;
+				//const ndVector halfStep(accel[i] * halfTime);
+				//const ndVector midPointVeloc(veloc[i] + halfStep);
+				//posit[i] = posit[i] + midPointVeloc * timestep;
+				//veloc[i] = midPointVeloc + halfStep;
+				veloc[i] = veloc[i] + accel[i] * timestep;
+				posit[i] = posit[i] + veloc[i] * timestep;
 
 				if (posit[i].m_y <= 1.0f)
 				{
 					posit[i].m_y = 1.0f;
+					veloc[i].m_y = 0.0f;
 				}
 			}
 		}
@@ -1045,6 +1049,11 @@ void ndBodySphFluid::IntegrateParticles(const ndWorld* const world, ndFloat32 ti
 void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
 {
 	// do the scene management 
+static int xxxx;
+xxxx++;
+if (xxxx >= 600)
+xxxx *= 1;
+
 	CaculateAABB(world);
 	CreateGrids(world);
 	SortGrids(world);

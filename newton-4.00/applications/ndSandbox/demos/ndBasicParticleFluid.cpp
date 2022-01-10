@@ -14,6 +14,7 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoMesh.h"
 #include "ndDemoCamera.h"
+#include "ndDebugDisplay.h"
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
@@ -172,8 +173,10 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		ndScopeSpinLock lock(m_lock);
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
+		//m_isoSurfaceMesh0->Render(scene, nodeMatrix);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+		RenderParticles(scene);
 		
 		// render the cage;
 		//ndDemoEntity::Render(timeStep, scene, matrix);
@@ -218,7 +221,10 @@ static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const s
 		{
 			for (ndInt32 x = 0; x < size; x++)
 			{
-				const ndVector p(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
+				ndVector p(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
+				p.m_x += dGaussianRandom(0.01f);
+				p.m_y += dGaussianRandom(0.01f);
+				p.m_z += dGaussianRandom(0.01f);
 				posit.PushBack(p);
 				veloc.PushBack(v);
 			}
@@ -315,7 +321,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	matrix.m_posit += origin;
 matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 0.0f);
 	
-particleCountPerAxis = 2;
+particleCountPerAxis = 20;
 	BuildBox(matrix, fluidObject, particleCountPerAxis);
 	//BuildHollowBox(matrix, fluidObject, particleCountPerAxis);
 	//BuildSphere(matrix, fluidObject, particleCountPerAxis);
