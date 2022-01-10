@@ -29,7 +29,7 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleTorsionBar)
 
-ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehicle* const vehicle, ndBodyDynamic* const fixedbody)
+ndMultiBodyVehicleTorsionBar::ndMultiBodyVehicleTorsionBar(const ndMultiBodyVehicle* const vehicle, ndBodyKinematic* const fixedbody)
 	:ndJointBilateralConstraint(1, vehicle->m_chassis, fixedbody, dGetIdentityMatrix())
 	,m_springK(ndFloat32 (10.0f))
 	,m_damperC(ndFloat32(1.0f))

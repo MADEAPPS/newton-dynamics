@@ -88,7 +88,7 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndMultiBodyVehicleGearBox* AddGearBox(ndMultiBodyVehicleMotor* const motor, ndMultiBodyVehicleDifferential* const differential);
 	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleTireJoint* const leftTire, ndMultiBodyVehicleTireJoint* const rightTire, ndFloat32 slipOmegaLock);
 	D_NEWTON_API ndMultiBodyVehicleDifferential* AddDifferential(ndFloat32 mass, ndFloat32 radius, ndMultiBodyVehicleDifferential* const leftDifferential, ndMultiBodyVehicleDifferential* const rightDifferential, ndFloat32 slipOmegaLock);
-	D_NEWTON_API ndMultiBodyVehicleTorsionBar* AddTorsionBar(ndBodyDynamic* const sentinel);
+	D_NEWTON_API ndMultiBodyVehicleTorsionBar* AddTorsionBar(ndBodyKinematic* const sentinel);
 
 	D_NEWTON_API void AddExtraBody(ndBodyDynamic* const body);
 	D_NEWTON_API void AddExtraJoint(ndJointBilateralConstraint* const joint);

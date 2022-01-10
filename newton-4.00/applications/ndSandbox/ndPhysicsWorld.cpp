@@ -92,12 +92,12 @@ ndPhysicsWorld::~ndPhysicsWorld()
 
 void ndPhysicsWorld::CleanUp()
 {
+	ndWorld::CleanUp();
 	if (m_soundManager)
 	{
 		delete m_soundManager;
 		m_soundManager = nullptr;
 	}
-	ndWorld::CleanUp();
 }
 
 ndDemoEntityManager* ndPhysicsWorld::GetManager() const

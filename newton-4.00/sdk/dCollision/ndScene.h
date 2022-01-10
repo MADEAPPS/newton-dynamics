@@ -107,6 +107,8 @@ class ndScene : public ndThreadPool
 	ndFloat32 GetTimestep() const;
 	void SetTimestep(ndFloat32 timestep);
 
+	ndBodyKinematic* GetSentinelBody() const;
+
 	D_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
 	D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
 
@@ -165,15 +167,15 @@ class ndScene : public ndThreadPool
 	protected:
 	D_COLLISION_API ndScene();
 	
-	D_COLLISION_API void UpdateSpecial();
 	D_COLLISION_API void InitBodyArray();
+	D_COLLISION_API void UpdateSpecial();
 	D_COLLISION_API void UpdateTransform();
 	D_COLLISION_API void CalculateContacts();
 	D_COLLISION_API void FindCollidingPairs();
 	D_COLLISION_API virtual void BalanceScene();
 	D_COLLISION_API virtual void ThreadFunction();
-
 	D_COLLISION_API void SendBackgroundJob(ndBackgroundJob* const job);
+	
 
 	class ndBodyListRun
 	{
@@ -195,6 +197,7 @@ class ndScene : public ndThreadPool
 	ndSpinLock m_lock;
 	ndBodyListRun m_bodyListRuns[D_MAX_THREADS_COUNT];
 	ndSceneNode* m_rootNode;
+	ndBodyKinematic* m_sentinelBody;
 	ndContactNotify* m_contactNotifyCallback;
 	ndFloat64 m_treeEntropy;
 	ndFitnessList m_fitness;
@@ -420,5 +423,9 @@ void ndScene::CountingSort(T* const array, T* const scratchBuffer, ndInt32 eleme
 	#endif
 }
 
+inline ndBodyKinematic* ndScene::GetSentinelBody() const
+{
+	return m_sentinelBody;
+}
 
 #endif

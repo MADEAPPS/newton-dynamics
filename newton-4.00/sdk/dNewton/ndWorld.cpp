@@ -93,7 +93,6 @@ class ndSkeletonQueue : public ndFixSizeArray<ndSkeletonContainer::ndNode*, 1024
 ndWorld::ndWorld()
 	:ndClassAlloc()
 	,m_scene(nullptr)
-	,m_sentinelBody(nullptr)
 	,m_solver(nullptr)
 	,m_jointList()
 	,m_modelList()
@@ -117,6 +116,7 @@ ndWorld::ndWorld()
 	,m_collisionUpdate(true)
 {
 	// start the engine thread;
+	ndBody::m_uniqueIdCount = 0;
 	m_scene = new ndWorldDefaultScene(this);
 	m_solver = new ndDynamicsUpdate(this);
 
@@ -148,16 +148,12 @@ ndWorld::ndWorld()
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxVeloc = 0.25f;
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxOmega = 0.1f;
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_steps = steps;
-
-	ndBody::m_uniqueIdCount = 0;
-	m_sentinelBody = new ndBodySentinel;
 }
 
 ndWorld::~ndWorld()
 {
 	CleanUp();
 
-	delete m_sentinelBody;
 	delete m_scene;
 	delete m_solver;
 	ClearCache();
@@ -268,7 +264,7 @@ void ndWorld::PostUpdate(ndFloat32)
 bool ndWorld::AddBody(ndBody* const body)
 {
 	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
-	dAssert(kinematicBody != m_sentinelBody);
+	dAssert(kinematicBody != GetSentinelBody());
 	if (kinematicBody)
 	{
 		return m_scene->AddBody(kinematicBody);
@@ -287,7 +283,7 @@ void ndWorld::RemoveBody(ndBody* const body)
 {
 	dAssert(!m_inUpdate);
 	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
-	dAssert(kinematicBody != m_sentinelBody);
+	dAssert(kinematicBody != GetSentinelBody());
 	if (kinematicBody)
 	{
 		const ndJointList& jointList = kinematicBody->GetJointList();
@@ -329,7 +325,7 @@ void ndWorld::AddJoint(ndJointBilateralConstraint* const joint)
 	// if the second body is nullPtr, replace it the sentinel
 	if (joint->m_body1 == nullptr)
 	{
-		joint->m_body1 = m_sentinelBody;
+		joint->m_body1 = GetSentinelBody();
 	}
 	if (joint->m_worldNode == nullptr)
 	{
@@ -481,23 +477,21 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	// do the a pre-physics step
 	m_scene->m_lru = m_scene->m_lru + 1;
 	m_scene->SetTimestep(timestep);
-
-	UpdateSkeletons();
 	m_scene->InitBodyArray();
 
-	ndBodyKinematic* const sentinelBody = m_sentinelBody;
-	sentinelBody->PrepareStep(m_scene->GetActiveBodyArray().GetCount());
-	
-	sentinelBody->m_isStatic = 1;
-	sentinelBody->m_autoSleep = 1;
-	sentinelBody->m_islandSleep = 1;
-	sentinelBody->m_equilibrium = 1;
-	sentinelBody->m_equilibrium0 = 1;
-	sentinelBody->m_isJointFence0 = 1;
-	sentinelBody->m_isJointFence1 = 1;
-	sentinelBody->m_bodyIsConstrained = 0;
-	sentinelBody->m_weigh = ndFloat32(0.0f);
-	m_scene->GetActiveBodyArray().PushBack(sentinelBody);
+	//ndBodyKinematic* const sentinelBody = m_sentinelBody;
+	//sentinelBody->PrepareStep(m_scene->GetActiveBodyArray().GetCount());
+	//
+	//sentinelBody->m_isStatic = 1;
+	//sentinelBody->m_autoSleep = 1;
+	//sentinelBody->m_islandSleep = 1;
+	//sentinelBody->m_equilibrium = 1;
+	//sentinelBody->m_equilibrium0 = 1;
+	//sentinelBody->m_isJointFence0 = 1;
+	//sentinelBody->m_isJointFence1 = 1;
+	//sentinelBody->m_bodyIsConstrained = 0;
+	//sentinelBody->m_weigh = ndFloat32(0.0f);
+	//m_scene->GetActiveBodyArray().PushBack(sentinelBody);
 
 	// update the collision system
 	m_scene->FindCollidingPairs();
@@ -514,6 +508,7 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 
 	// calculate internal forces, integrate bodies and update matrices.
 	dAssert(m_solver);
+	UpdateSkeletons();
 	m_solver->Update();
 
 	// second pass on models
@@ -638,7 +633,6 @@ void ndWorld::PostModelTransform()
 	m_scene->SubmitJobs<ndPostModelTransform>();
 }
 
-
 bool ndWorld::SkeletonJointTest(ndJointBilateralConstraint* const constraint) const
 {
 	bool test = true;
@@ -661,7 +655,7 @@ void ndWorld::UpdateSkeletons()
 			m_skeletonList.Remove(m_skeletonList.GetFirst());
 		}
 
-		m_scene->InitBodyArray();
+		//m_scene->InitBodyArray();
 
 		// build connectivity graph and reset of all joint dirty state
 		ndDynamicsUpdate& solverUpdate = *m_solver;
@@ -897,6 +891,13 @@ void ndWorld::UpdateSkeletons()
 				}
 				skeleton->Finalize(loopCount, loopJoints);
 			}
+		}
+
+		for (ndInt32 i = bodyArray.GetCount() - 1; i >= 0; i--)
+		{
+			ndBodyKinematic* const body = bodyArray[i];
+			body->PrepareStep(i);
+			dAssert (bodyArray[i] == body);
 		}
 	}
 

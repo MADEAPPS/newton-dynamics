@@ -432,7 +432,7 @@ ndMultiBodyVehicleGearBox* ndMultiBodyVehicle::AddGearBox(ndMultiBodyVehicleMoto
 	return m_gearBox;
 }
 
-ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyDynamic* const sentinel)
+ndMultiBodyVehicleTorsionBar* ndMultiBodyVehicle::AddTorsionBar(ndBodyKinematic* const sentinel)
 {
 	m_torsionBar = new ndMultiBodyVehicleTorsionBar(this, sentinel);
 	return m_torsionBar;

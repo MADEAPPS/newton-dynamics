@@ -2619,9 +2619,9 @@ void ndIsoSurface::ndImplementation::CalculatedAabb(const ndArray<ndVector>& poi
 	ndVector size((m_boxP1 - m_origin) * m_invGridSize + ndVector::m_half);
 
 	ndVector volume(size.Floor().GetInt());
-	m_volumeSizeX = volume.m_ix + 2;
-	m_volumeSizeY = volume.m_iy + 2;
-	m_volumeSizeZ = volume.m_iz + 2;
+	m_volumeSizeX = ndInt32(volume.m_ix + 2);
+	m_volumeSizeY = ndInt32(volume.m_iy + 2);
+	m_volumeSizeZ = ndInt32(volume.m_iz + 2);
 }
 
 ndVector ndIsoSurface::ndImplementation::InterpolateLowResVertex(const ndVector& p0, const ndVector& p1) const
@@ -3027,7 +3027,7 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 		ndInt32 Test(const ndVector& point) const
 		{
 			const ndVector test(point == m_base);
-			return test.m_ix & test.m_iy & test.m_iz;
+			return ndInt32 (test.m_ix & test.m_iy & test.m_iz);
 		}
 
 		ndVector m_base;
@@ -3165,7 +3165,7 @@ void ndIsoSurface::ndImplementation::GenerateHighResIndexList(ndIsoSurface* cons
 		ndInt32 Test(const ndVector& point) const
 		{
 			const ndVector test(point == m_base);
-			return test.m_ix & test.m_iy & test.m_iz;
+			return ndInt32 (test.m_ix & test.m_iy & test.m_iz);
 		}
 
 		ndVector m_base;

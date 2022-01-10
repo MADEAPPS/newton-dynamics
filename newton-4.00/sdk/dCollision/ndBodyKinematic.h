@@ -224,6 +224,13 @@ class ndBodyKinematic: public ndBody
 	friend class ndJointBilateralConstraint;
 } D_GCC_NEWTON_ALIGN_32;
 
+
+//class ndBodySentinel : public ndBodyDynamic
+class ndBodySentinel : public ndBodyKinematic
+{
+	ndBodySentinel* GetAsBodySentinel() { return this; }
+};
+
 inline ndUnsigned32 ndBodyKinematic::GetIndex() const
 {
 	return m_index;
@@ -375,7 +382,6 @@ inline void ndBodyKinematic::SetAccel(const ndJacobian& accel)
 	SetAccel(accel.m_linear);
 	SetAlpha(accel.m_angular);
 }
-
 
 inline void ndBodyKinematic::PrepareStep(ndInt32 index)
 {

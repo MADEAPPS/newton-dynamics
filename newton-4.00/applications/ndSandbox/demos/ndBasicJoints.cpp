@@ -111,7 +111,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const ndVector& or
 
 	
 	bodyMatrix1.m_posit.m_y += 0.5f;
-	ndBodyDynamic* const fixBody = world->GetSentinelBody();
+	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 	ndJointBallAndSocket* const joint1 = new ndJointBallAndSocket(bodyMatrix1, body2, fixBody);
 	world->AddJoint(joint1);
 
@@ -159,7 +159,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const ndVector& origin
 
 	matrix.m_posit.m_y += 2.0f;
 
-	ndBodyDynamic* const fixBody = world->GetSentinelBody();
+	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 	
 	ndJointSlider* const joint = new ndJointSlider(matrix, body, fixBody);
@@ -189,7 +189,7 @@ static void BuildHinge(ndDemoEntityManager* const scene, const ndVector& origin,
 
 	matrix.m_posit.m_y += 2.0f;
 
-	ndBodyDynamic* const fixBody = world->GetSentinelBody();
+	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 
 	ndJointHinge* const joint = new ndJointHinge(matrix, body, fixBody);
@@ -217,7 +217,7 @@ static void BuildDoubleHinge(ndDemoEntityManager* const scene, const ndVector& o
 
 	matrix.m_posit.m_y += 2.0f;
 
-	ndBodyDynamic* const fixBody = world->GetSentinelBody();
+	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 
 	ndVector massMatrix(body->GetMassMatrix());
@@ -301,7 +301,7 @@ static void BuildGear(ndDemoEntityManager* const scene, const ndVector& origin, 
 
 	matrix.m_posit.m_y += 2.0f;
 
-	ndBodyDynamic* const fixBody = world->GetSentinelBody();
+	ndBodyKinematic* const fixBody = world->GetSentinelBody();
 	ndBodyDynamic* const body0 = MakePrimitive(scene, matrix, shape, mesh, mass);
 
 	matrix.m_posit.m_y += diameter * 1.5f;

@@ -199,6 +199,7 @@ ndScene::ndScene()
 	,m_backgroundThread()
 	,m_lock()
 	,m_rootNode(nullptr)
+	,m_sentinelBody(nullptr)
 	,m_contactNotifyCallback(new ndContactNotify())
 	,m_treeEntropy(ndFloat32(0.0f))
 	,m_fitness()
@@ -207,6 +208,7 @@ ndScene::ndScene()
 	,m_bodyListChanged(0)
 	,m_currentThreadsMem(0)
 {
+	m_sentinelBody = new ndBodySentinel;
 	m_contactNotifyCallback->m_scene = this;
 }
 
@@ -1391,6 +1393,20 @@ void ndScene::InitBodyArray()
 	m_sceneBodyArray.SetCount(m_bodyList.GetCount());
 	SubmitJobs<ndClassifyMovingBodies>(&info);
 	m_sceneBodyArray.SetCount(movingBodyCount);
+
+	ndBodyKinematic* const sentinelBody = m_sentinelBody;
+	sentinelBody->PrepareStep(GetActiveBodyArray().GetCount());
+
+	sentinelBody->m_isStatic = 1;
+	sentinelBody->m_autoSleep = 1;
+	sentinelBody->m_islandSleep = 1;
+	sentinelBody->m_equilibrium = 1;
+	sentinelBody->m_equilibrium0 = 1;
+	sentinelBody->m_isJointFence0 = 1;
+	sentinelBody->m_isJointFence1 = 1;
+	sentinelBody->m_bodyIsConstrained = 0;
+	sentinelBody->m_weigh = ndFloat32(0.0f);
+	GetActiveBodyArray().PushBack(sentinelBody);
 }
 
 void ndScene::CalculateContacts()
@@ -1983,10 +1999,14 @@ void ndScene::Cleanup()
 		RemoveBody(body);
 		delete body;
 	}
+	if (m_sentinelBody)
+	{
+		delete m_sentinelBody;
+		m_sentinelBody = nullptr;
+	}
 	m_contactArray.DeleteAllContacts();
 
 	ndFreeListAlloc::Flush();
-
 	m_contactArray.Resize(1024);
 	m_scratchBuffer.Resize(1024);
 	m_sceneBodyArray.Resize(1024);

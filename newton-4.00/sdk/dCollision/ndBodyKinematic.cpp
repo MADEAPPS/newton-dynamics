@@ -32,27 +32,6 @@
 #define D_INFINITE_MASS	ndFloat32(1.0e15f)
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyKinematic);
 
-//class ndDummyCollision: public ndShapeNull
-//{
-//	public:
-//	ndDummyCollision()
-//		:ndShapeNull()
-//	{
-//		m_refCount.fetch_add(1);
-//	}
-//
-//	~ndDummyCollision()
-//	{
-//		m_refCount.fetch_add(-1);
-//	}
-//
-//	static ndShapeNull* GetNullShape()
-//	{
-//		static ndDummyCollision nullShape;
-//		return &nullShape;
-//	}
-//};
-
 ndBodyKinematic::ndContactMap::ndContactMap()
 	:ndTree<ndContact*, ndContactkey, ndContainersFreeListAlloc<ndContact*>>()
 {

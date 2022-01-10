@@ -98,7 +98,7 @@ class ndWorld: public ndClassAlloc
 	const ndSkeletonList& GetSkeletonList() const;
 	const ndBodyParticleSetList& GetParticleList() const;
 
-	ndBodyDynamic* GetSentinelBody() const;
+	ndBodyKinematic* GetSentinelBody() const;
 
 	ndInt32 GetSolverIterations() const;
 	void SetSolverIterations(ndInt32 iterations);
@@ -157,7 +157,6 @@ class ndWorld: public ndClassAlloc
 	static ndInt32 CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void* notUsed);
 
 	ndScene* m_scene;
-	ndBodyDynamic* m_sentinelBody;
 	ndDynamicsUpdate* m_solver;
 	ndJointList m_jointList;
 	ndModelList m_modelList;
@@ -241,9 +240,9 @@ inline void ndWorld::SetContactNotify(ndContactNotify* const notify)
 	m_scene->SetContactNotify(notify);
 }
 
-inline ndBodyDynamic* ndWorld::GetSentinelBody() const
+inline ndBodyKinematic* ndWorld::GetSentinelBody() const
 {
-	return m_sentinelBody;
+	return m_scene->GetSentinelBody();
 }
 
 inline const ndBodyList& ndWorld::GetBodyList() const
