@@ -36,6 +36,15 @@ class ndBodySphFluid: public ndBodyParticleSet
 	ndFloat32 GetViscosity() const;
 	void SetViscosity(ndFloat32 viscosity);
 	
+	ndFloat32 GetParticleMass() const;
+	void SetParticleMass(ndFloat32 mass);
+
+	ndFloat32 GetRestDensity() const;
+	void SetRestDensity(ndFloat32 resDensity);
+	
+	ndFloat32 GetDensityToPressureConst() const;
+	void GetDensityToPressureConst(ndFloat32 densityToPressureConst);
+
 	virtual ndBodySphFluid* GetAsBodySphFluid();
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
@@ -68,7 +77,10 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void CalculateParticlesDensity(const ndWorld* const world);
 	void IntegrateParticles(const ndWorld* const world, ndFloat32 tiemstep);
 
+	ndFloat32 m_mass;
 	ndFloat32 m_viscosity;
+	ndFloat32 m_restDensity;
+	ndFloat32 m_densityToPressureConst;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const ndFastRay&, const ndFloat32) const
@@ -90,6 +102,37 @@ inline void ndBodySphFluid::SetViscosity(ndFloat32 viscosity)
 {
 	m_viscosity = viscosity;
 }
+
+inline ndFloat32 ndBodySphFluid::GetParticleMass() const
+{
+	return m_mass;
+}
+
+inline void ndBodySphFluid::SetParticleMass(ndFloat32 mass)
+{
+	m_mass = mass;
+}
+
+inline ndFloat32 ndBodySphFluid::GetRestDensity() const
+{
+	return m_restDensity;
+}
+
+inline void ndBodySphFluid::SetRestDensity(ndFloat32 restDensity)
+{
+	m_restDensity = restDensity;
+}
+
+inline ndFloat32 ndBodySphFluid::GetDensityToPressureConst() const
+{
+	return m_densityToPressureConst;
+}
+
+inline void ndBodySphFluid::GetDensityToPressureConst(ndFloat32 densityToPressureConst)
+{
+	m_densityToPressureConst = densityToPressureConst;
+}
+
 
 #endif 
 

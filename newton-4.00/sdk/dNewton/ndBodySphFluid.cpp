@@ -159,13 +159,19 @@ class ndBodySphFluid::ndWorkingData
 
 ndBodySphFluid::ndBodySphFluid()
 	:ndBodyParticleSet()
+	,m_mass(ndFloat32(0.02f))
 	,m_viscosity(ndFloat32 (1.0f))
+	,m_restDensity(ndFloat32(1000.0f))
+	,m_densityToPressureConst(ndFloat32(1.0f))
 {
 }
 
 ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	: ndBodyParticleSet(desc)
+	:ndBodyParticleSet(desc)
+	,m_mass(ndFloat32(0.02f))
 	,m_viscosity(ndFloat32(1.0f))
+	,m_restDensity(ndFloat32(1000.0f))
+	,m_densityToPressureConst(ndFloat32(1.0f))
 {
 	// nothing was saved
 	dAssert(0);
@@ -759,7 +765,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			ndFloat32 dist2(p1p0.DotProduct(p1p0).GetScalar());
 			if (dist2 < info.m_diameter2)
 			{
-				dAssert(dist2 > ndFloat32(0.0f));
+				dAssert(dist2 >= ndFloat32(0.0f));
 				ndFloat32 dist = ndSqrt(dist2);
 				{
 					ndSpinLock lock(info.m_locks[particle0]);
@@ -872,15 +878,16 @@ void ndBodySphFluid::CalculateParticlesDensity(const ndWorld* const world)
 			ndWorkingData& data = fluid->WorkingData();
 			const ndFloat32 h = fluid->GetParticleRadius() * ndFloat32(2.0f);
 			const ndFloat32 h2 = h * h;
-			const ndFloat32 h9 = h2 * h2 * h2 * h2 * h;
-			const ndFloat32 kernelConst = ndFloat32(315.0f) / (ndFloat32(64.0f) * ndPi * h9);
+			const ndFloat32 kernelMagicConst = ndFloat32(315.0f) / (ndFloat32(64.0f) * ndPi * ndPow(h, 9));
+			const ndFloat32 kernelConst = fluid->m_mass * kernelMagicConst;
+			const ndFloat32 selfDensity = kernelConst * h2 * h2 * h2;
 
 			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				const ndInt32 count = data.m_pairCount[i];
 				const ndParticleKernelDistance& distance = data.m_kernelDistance[i];
-				ndFloat32 density = ndFloat32 (0.0f);
+				ndFloat32 density = selfDensity;
 				for (ndInt32 j = 0; j < count; ++j)
 				{
 					const ndFloat32 d = distance.m_dist[j];
@@ -888,8 +895,8 @@ void ndBodySphFluid::CalculateParticlesDensity(const ndWorld* const world)
 					const ndFloat32 dist6 = dist2 * dist2 * dist2;
 					density += kernelConst * dist6;
 				}
-				const bool text = (count != 0) & (density >= ndFloat32(1.0e-6f));
-				data.m_invDensity[i] = text ? ndFloat32 (1.0f) / density : ndFloat32 (0.0f);
+				dAssert(density > ndFloat32(0.0f));
+				data.m_invDensity[i] = ndFloat32 (1.0f) / density;
 			}
 		}
 	};
@@ -905,9 +912,18 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 	D_TRACKTIME();
 	class ndCalculateAcceleration : public ndScene::ndBaseJob
 	{
+		inline ndVector Normalize(const ndVector& dir) const 
+		{
+			const ndVector dot (dir.DotProduct(dir) + m_epsilon2);
+			const ndVector normal(dir * dot.InvSqrt());
+			return normal;
+		}
+
 		virtual void Execute()
 		{
 			D_TRACKTIME();
+
+			m_epsilon2 = ndVector(ndFloat32(1.0e-12f));
 			ndBodySphFluid* const fluid = (ndBodySphFluid*)m_context;
 
 			ndWorkingData& data = fluid->WorkingData();
@@ -916,11 +932,14 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 			const ndFloat32* const invDensity = &data.m_invDensity[0];
 
 			const ndFloat32 h = fluid->GetParticleRadius() * ndFloat32(2.0f);
-			const ndFloat32 h6 = h * h * h * h * h * h;
-			const ndVector kernelConst (ndFloat32(45.0f) / (ndPi * h6));
+			const ndVector kernelConst (ndFloat32(45.0f) / (ndPi * ndPow(h, 6)));
 
 			const ndFloat32 u = fluid->m_viscosity;
-			const ndVector gravity(fluid->m_gravity);
+			const ndFloat32 restDensity = fluid->m_restDensity;
+			const ndFloat32 massDensityToPressure = fluid->m_densityToPressureConst * fluid->m_mass;
+
+			//const ndVector gravity(fluid->m_gravity);
+			const ndVector gravity(0.0f, -0.02f, 0.0f, 0.0f);
 			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
@@ -933,11 +952,13 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 
 				ndVector pressureAccel(ndVector::m_zero);
 				ndVector viscosityAccel(ndVector::m_zero);
+				ndFloat32 pressureI = data.m_invDensity[i] * (ndFloat32(1.0) - restDensity * data.m_invDensity[i]);
+
 				for (ndInt32 j = 0; j < count; ++j)
 				{
 					const ndInt32 i1 = pairs.m_m1[j];
-					const ndVector p01(p0 - posit[i1]);
-					const ndVector dir(p01 * p01.InvMagSqrt());
+					const ndVector p10(posit[i1] - p0);
+					const ndVector dir(Normalize(p10));
 					dAssert(dir.m_w == ndFloat32(0.0f));
 
 					// kernel distance
@@ -945,14 +966,14 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 					const ndFloat32 dist = h - d;
 
 					// calculate pressure
-					//const ndVector preasureAccel(dist2 * dir * dir.InvMagSqrt());
-					//const ndVector pressureAccel(dist2 * dir * dir.InvMagSqrt());
-					//const ndVector pressureAccel(ndVector::m_zero);
-					//pressure
+					const ndFloat32 dist2 = dist * dist;
+					ndFloat32 pressureJ = data.m_invDensity[i] * (ndFloat32(1.0) - restDensity * data.m_invDensity[i1]);
+					ndVector force(dist2 * massDensityToPressure * (pressureI + pressureJ));
+					pressureAccel += force * dir;
 
 					// calculate viscosity acceleration
 					const ndVector v01(veloc[i1] - v0);
-					viscosityAccel += v01 * ndVector(invDensity[i1]);
+					viscosityAccel += v01 * ndVector(invDensity[i1] * dist);
 				}
 
 				const ndVector viscosity(invDensity[i] * u);
@@ -960,6 +981,8 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 				data.m_accel[i] = accel;
 			}
 		}
+
+		ndVector m_epsilon2;
 	};
 
 	ndWorkingData& data = WorkingData();
@@ -1005,6 +1028,11 @@ void ndBodySphFluid::IntegrateParticles(const ndWorld* const world, ndFloat32 ti
 				const ndVector midPointVeloc(veloc[i] + halfStep);
 				posit[i] = posit[i] + midPointVeloc * timestep;
 				veloc[i] = midPointVeloc + halfStep;
+
+				if (posit[i].m_y <= 1.0f)
+				{
+					posit[i].m_y = 1.0f;
+				}
 			}
 		}
 	};

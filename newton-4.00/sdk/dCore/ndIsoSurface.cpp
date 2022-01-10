@@ -2950,7 +2950,8 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 		ndKey_lowX(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
-			ndInt32 key = ndInt32 (point.m_x * ndFloat32(D_LOW_RES_FRACTION)) & D_LOW_RES_MASK;
+			ndFloat32 val = point.m_x * ndFloat32(D_LOW_RES_FRACTION);
+			ndInt32 key = ndInt32(val) & D_LOW_RES_MASK;
 			return key;
 		}
 	};
@@ -2961,7 +2962,8 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 		ndKey_lowY(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
-			ndInt32 key = ndInt32(point.m_y * ndFloat32(D_LOW_RES_FRACTION)) & D_LOW_RES_MASK;
+			ndFloat32 val = point.m_y * ndFloat32(D_LOW_RES_FRACTION);
+			ndInt32 key = ndInt32(val) & D_LOW_RES_MASK;
 			return key;
 		}
 	};
@@ -2972,7 +2974,8 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 		ndKey_lowZ(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
-			ndInt32 key = ndInt32(point.m_z * ndFloat32(D_LOW_RES_FRACTION)) & D_LOW_RES_MASK;
+			ndFloat32 val = point.m_z * ndFloat32(D_LOW_RES_FRACTION);
+			ndInt32 key = ndInt32(val) & D_LOW_RES_MASK;
 			return key;
 		}
 	};
@@ -2983,7 +2986,8 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 		ndKey_highX(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
-			ndInt32 key = ndInt32(point.m_x * ndFloat32(D_LOW_RES_FRACTION)) >> D_LOW_RES_BITS;
+			ndFloat32 val = point.m_x * ndFloat32(D_LOW_RES_FRACTION);
+			ndInt32 key = ndInt32(val) >> D_LOW_RES_DIGIT_BITS;
 			return key;
 		}
 	};
@@ -2994,7 +2998,8 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 		ndKey_highY(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
-			ndInt32 key = ndInt32(point.m_y * ndFloat32(D_LOW_RES_FRACTION)) >> D_LOW_RES_BITS;
+			ndFloat32 val = point.m_y * ndFloat32(D_LOW_RES_FRACTION);
+			ndInt32 key = ndInt32(val) >> D_LOW_RES_DIGIT_BITS;
 			return key;
 		}
 	};
@@ -3005,7 +3010,8 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 		ndKey_highZ(void* const) {}
 		ndInt32 GetKey(const ndVector& point) const
 		{
-			ndInt32 key = ndInt32(point.m_z * ndFloat32(D_LOW_RES_FRACTION)) >> D_LOW_RES_BITS;
+			ndFloat32 val = point.m_z * ndFloat32(D_LOW_RES_FRACTION);
+			ndInt32 key = ndInt32(val) >> D_LOW_RES_DIGIT_BITS;
 			return key;
 		}
 	};

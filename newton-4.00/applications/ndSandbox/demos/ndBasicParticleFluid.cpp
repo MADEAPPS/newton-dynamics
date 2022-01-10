@@ -44,6 +44,7 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundJob
 		const ndArray<ndVector>& normals = m_isoSurface.GetNormals();
 		dAssert(points.GetCount());
 		m_points.SetCount(points.GetCount());
+
 		for (ndInt32 i = 0; i < points.GetCount(); ++i)
 		{
 			m_points[i].m_posit = glVector3(GLfloat(points[i].m_x), GLfloat(points[i].m_y), GLfloat(points[i].m_z));
@@ -293,7 +294,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	matrix.m_posit.m_w = 1.0f;
 
 	//ndFloat32 diameter = 0.25f;
-	ndFloat32 diameter = 0.1f;
+	ndFloat32 diameter = 0.15f;
+	//ndFloat32 diameter = 0.125f;
 	ndIsoSurfaceParticleVolume* const fluidObject = new ndIsoSurfaceParticleVolume(diameter * 0.5f);
 	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, ndVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject);
 
@@ -305,7 +307,6 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	//ndInt32 particleCountPerAxis = 64;
 	ndInt32 particleCountPerAxis = 40;
 	//ndInt32 particleCountPerAxis = 32;
-	//ndInt32 particleCountPerAxis = 1;
 	ndFloat32 spacing = diameter * 1.0f;
 
 	ndFloat32 offset = spacing * particleCountPerAxis / 2.0f;
@@ -314,6 +315,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	matrix.m_posit += origin;
 matrix.m_posit = ndVector (2.0f, 2.0f, 2.0f, 0.0f);
 	
+particleCountPerAxis = 2;
 	BuildBox(matrix, fluidObject, particleCountPerAxis);
 	//BuildHollowBox(matrix, fluidObject, particleCountPerAxis);
 	//BuildSphere(matrix, fluidObject, particleCountPerAxis);
@@ -339,6 +341,6 @@ void ndBasicParticleFluid (ndDemoEntityManager* const scene)
 	AddWaterVolume(scene, location);
 
 	ndQuaternion rot;
-	ndVector origin(-15.0f, 4.0f, 0.0f, 0.0f);
+	ndVector origin(-5.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
