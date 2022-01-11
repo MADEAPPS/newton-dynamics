@@ -81,10 +81,19 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	class ndEvaluateKey
 	{
 		public:
+		ndEvaluateKey(void* const context)
+		{
+			ndInt32 digit = *((ndInt32*)context);
+			m_shit = digit * D_MAX_BODY_RADIX_BIT;
+		}
+
 		ndUnsigned32 GetKey(const ndDynamicsUpdate::ndJointBodyPairIndex& entry) const
 		{
-			return entry.m_body;
+			ndUnsigned32 key = entry.m_body >> m_shit;
+			return key & ((1<< D_MAX_BODY_RADIX_BIT)-1);
 		}
+
+		ndUnsigned32 m_shit;
 	};
 
 	class ndCountJointBodyPairs : public ndScene::ndBaseJob
@@ -124,8 +133,14 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	GetTempInternalForces().SetCount(jointArray.GetCount() * 2);
 
 	scene->SubmitJobs<ndCountJointBodyPairs>();
-	scene->CountingSort<ndJointBodyPairIndex, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&bodyJointPairs[0], (ndJointBodyPairIndex*)GetTempBuffer(), bodyJointPairs.GetCount(), 0);
-	scene->CountingSort<ndJointBodyPairIndex, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&bodyJointPairs[0], (ndJointBodyPairIndex*)GetTempBuffer(), bodyJointPairs.GetCount(), 1);
+
+	ndJointBodyPairIndex* const tempBuffer = (ndJointBodyPairIndex*)GetTempBuffer();
+
+	ndInt32 digit = 0;
+	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &bodyJointPairs[0], tempBuffer, bodyJointPairs.GetCount(), &digit);
+
+	digit = 1;
+	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, tempBuffer, &bodyJointPairs[0], bodyJointPairs.GetCount(), &digit);
 
 	bodyJointPairs.SetCount(bodyJointPairs.GetCount() + 1);
 	bodyJointPairs[bodyJointPairs.GetCount() - 1] = bodyJointPairs[bodyJointPairs.GetCount() - 2];

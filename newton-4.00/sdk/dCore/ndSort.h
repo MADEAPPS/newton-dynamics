@@ -190,19 +190,25 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		ndInt32 m_threadCount;
 	};
 
-	ndInt32 scans[D_MAX_THREADS_COUNT][1 << keyBitSize];
+	const ndInt32 threadCount = threadPool.GetCount();
+	//ndInt32 scans[D_MAX_THREADS_COUNT][1 << keyBitSize];
+	//ndThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
+	//ndCountKeys countKeyKernels[D_MAX_THREADS_COUNT];
 
-	ndThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
-	ndCountKeys countKeyKernels[D_MAX_THREADS_COUNT];
+	ndInt32* const scans = dAlloca (ndInt32, threadCount * (1 << keyBitSize));
+	ndThreadPoolJob** const extJobPtr = dAlloca(ndThreadPoolJob*, threadCount);
+	ndCountKeys* const countKeyKernels = dAlloca(ndCountKeys, threadCount);
 
 	dAssert(keyBitSize > 0);
-	const ndInt32 threadCount = threadPool.GetCount();
+	
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
+		new (&countKeyKernels[i]) ndCountKeys();
 		countKeyKernels[i].m_size = size;
 		countKeyKernels[i].m_array = &array[0];
 		countKeyKernels[i].m_context = context;
-		countKeyKernels[i].m_scan = &scans[i][0];
+		//sortArray[i].m_scan = &scans[i][0];
+		countKeyKernels[i].m_scan = &scans[i * (1 << keyBitSize)];
 		countKeyKernels[i].m_threadCount = threadCount;
 		extJobPtr[i] = &countKeyKernels[i];
 	}
@@ -216,8 +222,10 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		{
 			for (ndInt32 j = 0; j < threadCount; ++j)
 			{
-				ndInt32 partialSum = scans[j][i];
-				scans[j][i] = sum;
+				//ndInt32 partialSum = scans[j][i];
+				ndInt32 k = j * (1 << keyBitSize) + i;
+				ndInt32 partialSum = scans[k];
+				scans[k] = sum;
 				sum += partialSum;
 			}
 		}
@@ -227,13 +235,16 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		dAssert(0);
 	}
 
-	ndSortArray sortArray[D_MAX_THREADS_COUNT];
+	//ndSortArray sortArray[D_MAX_THREADS_COUNT];
+	ndSortArray* const sortArray = dAlloca(ndSortArray, threadCount);
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
+		new (&sortArray[i]) ndSortArray();
 		sortArray[i].m_size = size;
 		sortArray[i].m_src = &array[0];
 		sortArray[i].m_context = context;
-		sortArray[i].m_scan = &scans[i][0];
+		//sortArray[i].m_scan = &scans[i][0];
+		sortArray[i].m_scan = &scans[i * (1 << keyBitSize)];
 		sortArray[i].m_dst = &scratchBuffer[0];
 		sortArray[i].m_threadCount = threadCount;
 		extJobPtr[i] = &sortArray[i];
