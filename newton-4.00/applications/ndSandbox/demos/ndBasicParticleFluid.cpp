@@ -222,9 +222,9 @@ static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const s
 			for (ndInt32 x = 0; x < size; x++)
 			{
 				ndVector p(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
-				//p.m_x += dGaussianRandom(0.01f);
-				//p.m_y += dGaussianRandom(0.01f);
-				//p.m_z += dGaussianRandom(0.01f);
+				p.m_x += dGaussianRandom(spacing * 0.01f);
+				p.m_y += dGaussianRandom(spacing * 0.01f);
+				p.m_z += dGaussianRandom(spacing * 0.01f);
 				posit.PushBack(p);
 				veloc.PushBack(v);
 			}

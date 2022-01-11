@@ -24,6 +24,8 @@
 #include "ndWorld.h"
 #include "ndBodySphFluid.h"
 
+//#define D_DEBUG_SOLVER
+
 #define D_USE_SMALL_HASH
 
 #ifdef D_USE_SMALL_HASH
@@ -157,6 +159,38 @@ class ndBodySphFluid::ndWorkingData
 	ndArray<ndGridHash> m_hashGridMapScratchBuffer;
 	ndArray<ndParticleKernelDistance> m_kernelDistance;
 	ndArray<ndInt32> m_partialsGridScans[D_MAX_THREADS_COUNT];
+
+#ifdef D_DEBUG_SOLVER
+	class ndPair
+	{
+		public:
+		ndPair() {}
+		ndPair(ndInt32 m0, ndInt32 m1)
+			:m_m0(m0)
+			,m_m1(m1)
+		{
+		}
+
+		bool operator< (const ndPair& other) const
+		{
+			ndUnsigned64 key0 = (ndUnsigned64(m_m1) << 32) + m_m0;
+			ndUnsigned64 key1 = (ndUnsigned64(other.m_m1) << 32) + other.m_m0;
+			return key0 < key1;
+		}
+
+		bool operator> (const ndPair& other) const
+		{
+			ndUnsigned64 key0 = (ndUnsigned64(m_m1) << 32) + m_m0;
+			ndUnsigned64 key1 = (ndUnsigned64(other.m_m1) << 32) + other.m_m0;
+			return key0 > key1;
+		}
+
+		ndInt32 m_m0;
+		ndInt32 m_m1;
+	};
+	ndTree<ndInt32, ndPair> m_pairfilter;
+#endif
+
 };
 
 ndBodySphFluid::ndBodySphFluid()
@@ -258,13 +292,10 @@ void ndBodySphFluid::CaculateAABB(const ndWorld* const world)
 	ndVector invGrid(ndFloat32 (1.0f) / gridSize);
 
 	box.m_min -= ndVector(gridSize);
-	box.m_max += ndVector(gridSize);
+	box.m_max = ndVector(box.m_min + grid * (invGrid * (box.m_max - box.m_min)).Floor() + grid + grid);
 
-	box.m_min = (box.m_min * invGrid).Floor() * grid;
-	box.m_max = ((box.m_max * invGrid).Floor() + ndVector::m_one) * grid;
-
-	m_box0 = box.m_min.Floor() & ndVector::m_triplexMask;
-	m_box1 = (box.m_max.Floor() + ndVector::m_one) & ndVector::m_triplexMask;
+	m_box0 = box.m_min & ndVector::m_triplexMask;
+	m_box1 = box.m_max & ndVector::m_triplexMask;
 }
 
 void ndBodySphFluid::SortXdimension(const ndWorld* const world)
@@ -779,6 +810,9 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 				,m_distance(fluid->WorkingData().m_kernelDistance)
 				,m_diameter(fluid->GetSphGridSize())
 				,m_diameter2(m_diameter * m_diameter)
+				#ifdef D_DEBUG_SOLVER
+				,m_pairfilter(fluid->WorkingData().m_pairfilter)
+				#endif
 			{
 			}
 
@@ -789,6 +823,9 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			ndArray<ndParticleKernelDistance>& m_distance;
 			ndFloat32 m_diameter;
 			ndFloat32 m_diameter2;
+			#ifdef D_DEBUG_SOLVER
+			ndTree <ndInt32, ndWorkingData::ndPair>& m_pairfilter;
+			#endif
 		};
 
 		void AddPair(ndPairInfo& info, ndInt32 particle0, ndInt32 particle1)
@@ -807,6 +844,11 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 						info.m_pair[particle0].m_m1[count] = particle1;
 						info.m_distance[particle0].m_dist[count] = dist;
 						info.m_pairCount[particle0] = count + 1;
+
+						#ifdef D_DEBUG_SOLVER
+						dAssert(!info.m_pairfilter.Find(ndWorkingData::ndPair(particle0, particle1)));
+						info.m_pairfilter.Insert(ndWorkingData::ndPair(particle0, particle1));
+						#endif
 					}
 				}
 			
@@ -818,6 +860,11 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 						info.m_pair[particle1].m_m1[count] = particle0;
 						info.m_distance[particle1].m_dist[count] = dist;
 						info.m_pairCount[particle1] = count + 1;
+
+						#ifdef D_DEBUG_SOLVER
+						dAssert(!info.m_pairfilter.Find(ndWorkingData::ndPair(particle1, particle0)));
+						info.m_pairfilter.Insert(ndWorkingData::ndPair(particle1, particle0));
+						#endif
 					}
 				}
 			}
@@ -830,26 +877,37 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			for (ndInt32 i = 0; i < count0; ++i)
 			{
 				const ndGridHash hash0 = hashGridMap[start + i];
-				bool test0 = (hash0.m_cellType == ndHomeGrid);
-				ndInt32 index0 = hash0.m_particleIndex;
-				ndFloat32 x0 = info.m_posit[index0].m_x;
+				const ndInt32 homeGridTest0 = (hash0.m_cellType == ndHomeGrid);
+				const ndInt32 particle0 = hash0.m_particleIndex;
+				const ndFloat32 x0 = info.m_posit[particle0].m_x;
 				for (ndInt32 j = i + 1; j < count; ++j)
 				{
 					const ndGridHash hash1 = hashGridMap[start + j];
-					ndInt32 index1 = hash1.m_particleIndex;
-					ndFloat32 x1 = info.m_posit[index1].m_x;
-					//dAssert(x1 >= x0);
-					bool test3 = ((x1 - x0) >= info.m_diameter);
-					if (test3)
+					const ndInt32 particle1 = hash1.m_particleIndex;
+					dAssert(particle0 != particle1);
+					const ndFloat32 x1 = info.m_posit[particle1].m_x;
+					dAssert((x1 - x0) > ndFloat32 (-1.0e-3f));
+					const ndInt32 sweeptTest = ((x1 - x0) >= info.m_diameter);
+					if (sweeptTest)
 					{
 						break;
 					}
-					bool test1 = (hash1.m_cellType == ndHomeGrid);
-					bool test2 = (hash0.m_particleIndex < hash1.m_particleIndex);
-					bool test = test0 & (test1 | test2);
+					dAssert(particle0 != particle1);
+					const ndInt32 homeGridTest1 = (hash1.m_cellType == ndHomeGrid);
+
+					ndInt32 mask0 = (ndUnsigned32(hash0.m_cellType) << 30) | particle0;
+					ndInt32 mask1 = (ndUnsigned32(hash1.m_cellType) << 30) | particle1;
+					ndInt32 mask = (mask1 - mask0) >> 31;
+
+					ndInt32 i0 = mask & particle1 | ~mask & particle0;
+					ndInt32 i1 = mask & particle0 | ~mask & particle1;
+
+					const ndInt32 indexOrdinalTest = (i0 < i1);
+					const ndInt32 test = (homeGridTest0 & homeGridTest1) | (indexOrdinalTest & (homeGridTest0 | homeGridTest1));
 					if (test)
 					{
-						AddPair(info, hash0.m_particleIndex, hash1.m_particleIndex);
+						dAssert(i0 != i1);
+						AddPair(info, i0, i1);
 					}
 				}
 			}
@@ -892,6 +950,9 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 		data.m_pairCount[i] = 0;
 	}
 	
+#ifdef D_DEBUG_SOLVER
+	data.m_pairfilter.RemoveAll();
+#endif
 	ndScene* const scene = world->GetScene();
 	scene->SubmitJobs<ndAddPairs>(this);
 }
@@ -997,19 +1058,19 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 					dAssert(dir.m_w == ndFloat32(0.0f));
 				
 					// kernel distance
-					const ndFloat32 d = distance.m_dist[j];
-					const ndFloat32 dist = h - d;
-					dAssert(dist >= ndFloat32(0.0f));
+					const ndFloat32 dist = distance.m_dist[j];
+					const ndFloat32 kernelDist = h - dist;
+					dAssert(kernelDist >= ndFloat32(0.0f));
 				
 					// calculate pressure
-					const ndFloat32 dist2 = dist * dist;
+					const ndFloat32 kernelDist2 = kernelDist * kernelDist;
 					const ndFloat32 pressureI1 = densityToPressure * (density[i1] - restDensity);
-					const ndVector force(ndFloat32(0.5f) * dist2 * invDensity[i1] * (pressureI0 + pressureI1));
+					const ndVector force(ndFloat32(0.5f) * kernelDist2 * invDensity[i1] * (pressureI0 + pressureI1));
 					forceAcc += force * dir;
 				
 					// calculate viscosity acceleration
 					const ndVector v01(veloc[i1] - v0);
-					forceAcc += v01 * ndVector(dist * viscosity * invDensity[j]);
+					forceAcc += v01 * ndVector(kernelDist * viscosity * invDensity[j]);
 				}
 				const ndVector accel(gravity + ndVector(invDensity[i0]) * kernelConst * forceAcc);
 				data.m_accel[i0] = accel;
@@ -1060,13 +1121,8 @@ void ndBodySphFluid::IntegrateParticles(const ndWorld* const world, ndFloat32 ti
 			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
-				//const ndVector halfStep(accel[i] * halfTime);
-				//const ndVector midPointVeloc(veloc[i] + halfStep);
-				//posit[i] = posit[i] + midPointVeloc * timestep;
-				//veloc[i] = midPointVeloc + halfStep;
 				veloc[i] = veloc[i] + accel[i] * timestep;
 				posit[i] = posit[i] + veloc[i] * timestep;
-
 				if (posit[i].m_y <= 1.0f)
 				{
 					posit[i].m_y = 1.0f;
