@@ -889,13 +889,21 @@ void ndDynamicsUpdateAvx2::SortIslands()
 	class ndEvaluateKey
 	{
 		public:
+		ndEvaluateKey(void* const context)
+		{
+			ndInt32 digitLocation = *((ndInt32*)context);
+			m_shift = digitLocation * D_MAX_BODY_RADIX_BIT;
+		}
+
 		ndUnsigned32 GetKey(const ndIsland& island) const
 		{
 			ndUnsigned32 key = island.m_count * 2 + island.m_root->m_bodyIsConstrained;
 			const ndUnsigned32 maxVal = 1 << (D_MAX_BODY_RADIX_BIT * 2);
 			dAssert(key < maxVal);
-			return maxVal - key;
+			const ndUnsigned32 lowKey = (maxVal - key) >> m_shift;
+			return lowKey & ((1 << D_MAX_BODY_RADIX_BIT) - 1);
 		}
+		ndInt32 m_shift;
 	};
 	ndScene* const scene = m_world->GetScene();
 	const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
@@ -970,10 +978,20 @@ void ndDynamicsUpdateAvx2::SortIslands()
 		}
 		unConstrainedCount += islands.GetCount();
 
-		scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&islands[0], (ndIsland*)GetTempBuffer(), islands.GetCount(), 0);
+		ndInt32 context = 0;
+		ndIsland* const islandTempBuffer = (ndIsland*)GetTempBuffer();
+		ndCountingSort<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &islands[0], islandTempBuffer, islands.GetCount(), &context);
 		if (islandMaxKeySize >= (1 << (D_MAX_BODY_RADIX_BIT - 1)))
 		{
-			scene->CountingSort<ndIsland, D_MAX_BODY_RADIX_BIT, ndEvaluateKey>(&islands[0], (ndIsland*)GetTempBuffer(), islands.GetCount(), 1);
+			context = 1;
+			ndCountingSort<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, islandTempBuffer, &islands[0], islands.GetCount(), &context);
+		}
+		else
+		{
+			for (ndInt32 i = 0; i < islands.GetCount(); ++i)
+			{
+				islands[i] = islandTempBuffer[i];
+			}
 		}
 	}
 	m_unConstrainedBodyCount = unConstrainedCount;
