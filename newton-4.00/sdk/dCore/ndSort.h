@@ -125,39 +125,37 @@ void ndSort(T* const array, ndInt32 elements, void* const context = nullptr)
 }
 
 template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
-void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scratchBuffer, void* const context = nullptr)
+void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBuffer, ndInt32 size, void* const context = nullptr)
 {
 	D_TRACKTIME();
-	dAssert(keyBitSize > 0);
-	scratchBuffer.SetCount(array.GetCount());
-
 	class ndCountKeys : public ndThreadPoolJob
 	{
 		public:
 		void Execute()
 		{
 			D_TRACKTIME();
-			const ndArray<T>& array = *m_array;
+			const T* const array = m_array;
 
 			ndEvaluateKey evaluator(m_context);
 			for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 			{
 				m_scan[i] = 0;
 			}
-			ndStartEnd startEnd(array.GetCount(), GetThreadId(), m_threadCount);
+			ndStartEnd startEnd(m_size, GetThreadId(), m_threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				const T& entry = array[i];
 				const ndInt32 key = evaluator.GetKey(entry);
 				dAssert(key >= 0);
-				dAssert(key < (1<<keyBitSize));
+				dAssert(key < (1 << keyBitSize));
 				m_scan[key] ++;
 			}
 		}
 
 		ndInt32* m_scan;
 		void* m_context;
-		const ndArray<T>* m_array;
+		T* m_array;
+		ndInt32 m_size;
 		ndInt32 m_threadCount;
 	};
 
@@ -167,11 +165,11 @@ void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scr
 		void Execute()
 		{
 			D_TRACKTIME();
-			ndArray<T>& dst = *m_dst;
-			const ndArray<T>& src = *m_src;
+			T* const dst = m_dst;
+			const T* const src = m_src;
 
 			ndEvaluateKey evaluator(m_context);
-			ndStartEnd startEnd(src.GetCount(), GetThreadId(), m_threadCount);
+			ndStartEnd startEnd(m_size, GetThreadId(), m_threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				const T& entry = src[i];
@@ -186,8 +184,9 @@ void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scr
 
 		ndInt32* m_scan;
 		void* m_context;
-		ndArray<T>* m_dst;
-		const ndArray<T>* m_src;
+		T* m_dst;
+		const T* m_src;
+		ndInt32 m_size;
 		ndInt32 m_threadCount;
 	};
 
@@ -195,11 +194,13 @@ void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scr
 
 	ndThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
 	ndCountKeys countKeyKernels[D_MAX_THREADS_COUNT];
-	
+
+	dAssert(keyBitSize > 0);
 	const ndInt32 threadCount = threadPool.GetCount();
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
-		countKeyKernels[i].m_array = &array;
+		countKeyKernels[i].m_size = size;
+		countKeyKernels[i].m_array = &array[0];
 		countKeyKernels[i].m_context = context;
 		countKeyKernels[i].m_scan = &scans[i][0];
 		countKeyKernels[i].m_threadCount = threadCount;
@@ -229,20 +230,20 @@ void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scr
 	ndSortArray sortArray[D_MAX_THREADS_COUNT];
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
-		sortArray[i].m_src = &array;
+		sortArray[i].m_size = size;
+		sortArray[i].m_src = &array[0];
 		sortArray[i].m_context = context;
-		sortArray[i].m_dst = &scratchBuffer;
 		sortArray[i].m_scan = &scans[i][0];
+		sortArray[i].m_dst = &scratchBuffer[0];
 		sortArray[i].m_threadCount = threadCount;
 		extJobPtr[i] = &sortArray[i];
 	}
 	threadPool.ExecuteJobs(extJobPtr);
 
-	array.Swap(scratchBuffer);
-//#ifdef _DEBUG
+	//#ifdef _DEBUG
 #if 0
 	ndEvaluateKey evaluator(context);
-	for (ndInt32 i = array.GetCount() - 2; i >= 0; --i)
+	for (ndInt32 i = size - 2; i >= 0; --i)
 	{
 		dAssert(evaluator.GetKey(array[i]) <= evaluator.GetKey(array[i + 1]));
 	}
@@ -250,19 +251,18 @@ void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scr
 }
 
 template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
-void ndCountingSort(ndArray<T>& array, ndArray<T>& scratchBuffer, void* const context = nullptr)
+void ndCountingSort(T* const array, T* const scratchBuffer, ndInt32 size, void* const context = nullptr)
 {
 	D_TRACKTIME();
-	dAssert(keyBitSize > 0);
-	scratchBuffer.SetCount(array.GetCount());
 
+	dAssert(keyBitSize > 0);
 	ndInt32 scans[1 << keyBitSize];
 	ndEvaluateKey evaluator(context);
 	for (ndInt32 i = 0; i < (1 << keyBitSize); ++i)
 	{
 		scans[i] = 0;
 	}
-	for (ndInt32 i = 0; i < array.GetCount(); ++i)
+	for (ndInt32 i = 0; i < size; ++i)
 	{
 		const T& entry = array[i];
 		const ndInt32 key = evaluator.GetKey(entry);
@@ -279,7 +279,7 @@ void ndCountingSort(ndArray<T>& array, ndArray<T>& scratchBuffer, void* const co
 		sum += partialSum;
 	}
 
-	for (ndInt32 i = 0; i < array.GetCount(); ++i)
+	for (ndInt32 i = 0; i < size; ++i)
 	{
 		const T& entry = array[i];
 		const ndInt32 key = evaluator.GetKey(entry);
@@ -289,14 +289,31 @@ void ndCountingSort(ndArray<T>& array, ndArray<T>& scratchBuffer, void* const co
 		scratchBuffer[index] = entry;
 		scans[key] = index + 1;
 	}
-	array.Swap(scratchBuffer);
+
 	//#ifdef _DEBUG
 #if 0
-	ndEvaluateKey evaluator;
-	for (ndInt32 i = array.GetCount() - 2; i >= 0; --i)
+	for (ndInt32 i = size - 2; i >= 0; --i)
 	{
-		dAssert(evaluator.GetKey(array[i]) <= evaluator.GetKey(array[i + 1]));
+		dAssert(evaluator.GetKey(scratchBuffer[i]) <= evaluator.GetKey(scratchBuffer[i + 1]));
 	}
 #endif
 }
+
+// high level wrappers
+template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
+void ndCountingSort(ndThreadPool& threadPool, ndArray<T>& array, ndArray<T>& scratchBuffer, void* const context = nullptr)
+{
+	scratchBuffer.SetCount(array.GetCount());
+	ndCountingSort<T, ndEvaluateKey, keyBitSize>(threadPool, &array[0], &scratchBuffer[0], array.GetCount(), context);
+	array.Swap(scratchBuffer);
+}
+
+template <class T, class ndEvaluateKey, ndInt32 keyBitSize>
+void ndCountingSort(ndArray<T>& array, ndArray<T>& scratchBuffer, void* const context = nullptr)
+{
+	scratchBuffer.SetCount(array.GetCount());
+	ndCountingSort<T, ndEvaluateKey, keyBitSize>(&array[0], &scratchBuffer[0], array.GetCount(), context);
+	array.Swap(scratchBuffer);
+}
+
 #endif

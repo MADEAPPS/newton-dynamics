@@ -459,6 +459,7 @@ void ndDynamicsUpdateSoa::SortIslands()
 	class ndIslandKey
 	{
 		public:
+		ndIslandKey(void* const) {}
 		ndUnsigned32 GetKey(const ndBodyIndexPair& pair) const
 		{
 			const ndBodyKinematic* const body = pair.m_root;
@@ -523,19 +524,20 @@ void ndDynamicsUpdateSoa::SortIslands()
 	ndInt32 unConstrainedCount = 0;
 	if (bodyCount)
 	{
-		scene->CountingSort<ndBodyIndexPair, 1, ndIslandKey>(buffer0, buffer0 + bodyCount, bodyCount, 0);
+		ndBodyIndexPair* const buffer1 = buffer0 + bodyCount;
+		ndCountingSort<ndBodyIndexPair, ndIslandKey, 1>(*scene, buffer0, buffer1, bodyCount);
 		for (ndInt32 i = 0; i < bodyCount; ++i)
 		{
-			dAssert((i == bodyCount - 1) || (buffer0[i].m_root->m_bodyIsConstrained >= buffer0[i + 1].m_root->m_bodyIsConstrained));
+			dAssert((i == bodyCount - 1) || (buffer1[i].m_root->m_bodyIsConstrained >= buffer1[i + 1].m_root->m_bodyIsConstrained));
 
-			activeBodyArray[i] = buffer0[i].m_body;
-			if (buffer0[i].m_root->m_rank == -1)
+			activeBodyArray[i] = buffer1[i].m_body;
+			if (buffer1[i].m_root->m_rank == -1)
 			{
-				buffer0[i].m_root->m_rank = 0;
-				ndIsland island(buffer0[i].m_root);
+				buffer1[i].m_root->m_rank = 0;
+				ndIsland island(buffer1[i].m_root);
 				islands.PushBack(island);
 			}
-			buffer0[i].m_root->m_rank += 1;
+			buffer1[i].m_root->m_rank += 1;
 		}
 
 		ndInt32 start = 0;

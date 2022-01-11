@@ -196,7 +196,7 @@ class ndBodySphFluid::ndWorkingData
 ndBodySphFluid::ndBodySphFluid()
 	:ndBodyParticleSet()
 	,m_mass(ndFloat32(0.02f))
-	,m_viscosity(ndFloat32 (1.0f))
+	,m_viscosity(ndFloat32 (1.05f))
 	,m_restDensity(ndFloat32(1000.0f))
 	,m_densityToPressureConst(ndFloat32(1.0f))
 {

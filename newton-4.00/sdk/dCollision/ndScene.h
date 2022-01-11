@@ -382,6 +382,7 @@ void ndScene::CountingSort(T* const array, T* const scratchBuffer, ndInt32 eleme
 		}
 	};
 
+	//dAssert(0);
 	ndInfo info;
 	info.m_sourceBuffer = array;
 	info.m_scratchBuffer = scratchBuffer;
