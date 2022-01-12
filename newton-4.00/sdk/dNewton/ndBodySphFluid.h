@@ -136,7 +136,8 @@ inline void ndBodySphFluid::GetDensityToPressureConst(ndFloat32 densityToPressur
 
 inline ndFloat32 ndBodySphFluid::GetSphGridSize() const
 {
-	return m_radius * ndFloat32(2.0f) * 1.5f;
+	//return 0.5f;
+	return m_radius * ndFloat32(2.0f) * ndFloat32(1.5f);
 }
 
 #endif 

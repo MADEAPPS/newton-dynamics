@@ -894,20 +894,11 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 					}
 					dAssert(particle0 != particle1);
 					const ndInt32 homeGridTest1 = (hash1.m_cellType == ndHomeGrid);
-
-					ndInt32 mask0 = (ndUnsigned32(hash0.m_cellType) << 30) | particle0;
-					ndInt32 mask1 = (ndUnsigned32(hash1.m_cellType) << 30) | particle1;
-					ndInt32 mask = (mask1 - mask0) >> 31;
-
-					ndInt32 i0 = mask & particle1 | ~mask & particle0;
-					ndInt32 i1 = mask & particle0 | ~mask & particle1;
-
-					const ndInt32 indexOrdinalTest = (i0 < i1);
-					const ndInt32 test = (homeGridTest0 & homeGridTest1) | (indexOrdinalTest & (homeGridTest0 | homeGridTest1));
+					const ndInt32 test = homeGridTest0 | homeGridTest1;
 					if (test)
 					{
-						dAssert(i0 != i1);
-						AddPair(info, i0, i1);
+						dAssert(particle0 != particle1);
+						AddPair(info, particle0, particle1);
 					}
 				}
 			}
@@ -935,6 +926,42 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 		}
 	};
 
+	class ndRemoveDuplicates : public ndScene::ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			ndBodySphFluid* const fluid = (ndBodySphFluid*)m_context;
+			ndWorkingData& data = fluid->WorkingData();
+
+			ndArray<ndParticlePair>& pairs = data.m_pairs;
+			ndArray<ndInt8>& pairsCount = data.m_pairCount;
+
+			const ndStartEnd startEnd(pairsCount.GetCount() - 1, GetThreadId(), world->GetThreadCount());
+			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+			{
+				ndInt32 count = pairsCount[i];
+				ndParticlePair& pair = pairs[i];
+				for (ndInt32 j = count - 1; j >= 1; --j)
+				{
+					ndInt32 m = pair.m_m1[j];
+					for (ndInt32 k = j - 1; k >= 0; --k)
+					{
+						if (m == pair.m_m1[k])
+						{
+							--count;
+							pair.m_m1[j] = pair.m_m1[count];
+							break;
+						}
+					}
+				}
+				pairsCount[i] = ndInt8 (count);
+			}
+		}
+	};
+
 	ndWorkingData& data = WorkingData();
 	ndInt32 countReset = data.m_locks.GetCount();
 	data.m_pairs.SetCount(m_posit.GetCount());
@@ -950,11 +977,65 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 		data.m_pairCount[i] = 0;
 	}
 	
-#ifdef D_DEBUG_SOLVER
-	data.m_pairfilter.RemoveAll();
-#endif
 	ndScene* const scene = world->GetScene();
 	scene->SubmitJobs<ndAddPairs>(this);
+	scene->SubmitJobs<ndRemoveDuplicates>(this);
+
+#ifdef D_DEBUG_SOLVER
+	ndArray<ndVector> testPosit;
+	for (ndInt32 i = 0; i < m_posit.GetCount(); i++)
+	{
+		ndVector p(m_posit[i]);
+		p.m_w = ndFloat32(i);
+		testPosit.PushBack(p);
+	}
+
+	class ComparePosit
+	{
+		public:
+		ndInt32 Compare(const ndVector& p0, const ndVector& p1, void* const) const
+		{
+			if (p0.m_x < p1.m_x)
+			{
+				return -1;
+			}
+			if (p0.m_x > p1.m_x)
+			{
+				return 1;
+			}
+			return 0;
+		}
+	};
+	ndSort<ndVector, ComparePosit>(&testPosit[0], m_posit.GetCount());
+
+	ndTree<ndInt32, ndWorkingData::ndPair> pairfilter;
+	ndFloat32 h = GetSphGridSize();
+	ndFloat32 h2 = h * h;
+	for (ndInt32 i = 0; i < testPosit.GetCount() - 1; i++)
+	{
+		ndFloat32 x0 = testPosit[i].m_x;
+		ndInt32 i0 = ndInt32(testPosit[i].m_w);
+		for (ndInt32 j = i + 1; j < testPosit.GetCount(); j++)
+		{
+			ndFloat32 x1 = testPosit[j].m_x;
+			if (x1 >= (x0 + h))
+			{
+				break;
+			}
+			ndVector dist2(ndVector::m_triplexMask & (testPosit[i] - testPosit[j]));
+			ndFloat32 d2 = dist2.DotProduct(dist2).GetScalar();
+			if (d2 < h2)
+			{
+				ndInt32 i1 = ndInt32(testPosit[j].m_w);
+				pairfilter.Insert(0, ndWorkingData::ndPair(i0, i1));
+				pairfilter.Insert(0, ndWorkingData::ndPair(i1, i0));
+			}
+		}
+	}
+	dAssert(data.m_pairfilter.GetCount() == data.m_pairfilter.GetCount());
+	data.m_pairfilter.RemoveAll();
+#endif
+
 }
 
 void ndBodySphFluid::CalculateParticlesDensity(const ndWorld* const world)
