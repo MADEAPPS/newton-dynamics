@@ -2609,6 +2609,11 @@ ndIsoSurface::ndImplementation& ndIsoSurface::GetImplementation() const
 void ndIsoSurface::ndImplementation::CalculatedAabb(const ndArray<ndVector>& points, ndFloat32 gridSize)
 {
 	D_TRACKTIME();
+
+	m_isoValue = ndFloat32(0.5f);
+	m_gridSize = ndVector::m_triplexMask & ndVector(gridSize);
+	m_invGridSize = ndVector::m_triplexMask & ndVector(ndFloat32(1.0f) / gridSize);
+
 	ndVector boxP0(ndFloat32(1.0e10f));
 	ndVector boxP1(ndFloat32(-1.0e10f));
 	for (ndInt32 i = 0; i < points.GetCount(); ++i)
@@ -2616,21 +2621,22 @@ void ndIsoSurface::ndImplementation::CalculatedAabb(const ndArray<ndVector>& poi
 		boxP0 = boxP0.GetMin(points[i]);
 		boxP1 = boxP1.GetMax(points[i]);
 	}
+	boxP0 = m_gridSize * (boxP0 * m_invGridSize).Floor() - m_gridSize;
+	boxP1 = m_gridSize * (boxP1 * m_invGridSize).Floor() + m_gridSize + m_gridSize;
+
 	m_boxP0 = boxP0 & ndVector::m_triplexMask;
 	m_boxP1 = boxP1 & ndVector::m_triplexMask;
+	//m_boxP0 = boxP0 & ndVector::m_triplexMask;
+	//m_boxP1 = boxP1 & ndVector::m_triplexMask;
 
-	m_isoValue = ndFloat32(0.5f);
-	m_gridSize = ndVector::m_triplexMask & ndVector(gridSize);
-	m_invGridSize = ndVector::m_triplexMask & ndVector(ndFloat32(1.0f) / gridSize);
+	//m_boxP0 = m_boxP0 - m_gridSize;
+	//m_origin = m_boxP0;
 
-	m_boxP0 = m_boxP0 - m_gridSize;
-	m_origin = m_boxP0;
-	ndVector size((m_boxP1 - m_origin) * m_invGridSize + ndVector::m_half);
-
-	ndVector volume(size.Floor().GetInt());
-	m_volumeSizeX = ndInt32(volume.m_ix + 2);
-	m_volumeSizeY = ndInt32(volume.m_iy + 2);
-	m_volumeSizeZ = ndInt32(volume.m_iz + 2);
+	const ndVector sizeInGrids((m_boxP1 - m_boxP0) * m_invGridSize + ndVector::m_half);
+	const ndVector volumeInGrids(sizeInGrids.Floor().GetInt());
+	m_volumeSizeX = ndInt32(volumeInGrids.m_ix);
+	m_volumeSizeY = ndInt32(volumeInGrids.m_iy);
+	m_volumeSizeZ = ndInt32(volumeInGrids.m_iz);
 }
 
 ndVector ndIsoSurface::ndImplementation::InterpolateLowResVertex(const ndVector& p0, const ndVector& p1) const
@@ -2880,6 +2886,7 @@ void ndIsoSurface::ndImplementation::GenerateLowResIsoSurface()
 	const ndInt32 gridCount = m_hashGridMap.GetCount();
 	m_hashGridMap.PushBack(ndGridHash(0xffff, 0xffff, 0xffff));
 
+	m_triangles.SetCount(0);
 	for (ndInt32 i = 0; i < gridCount; i = end)
 	{
 		end = i + 1;
@@ -3069,7 +3076,6 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 	indexList.SetCount(count);
 
 	ndInt32 vertexCount = 0;
-	
 	m_triangles.PushBack(ndVector::m_one + (m_triangles[count - 1]));
 	for (ndInt32 i = 0; i < count; ++i)
 	{
@@ -3080,8 +3086,8 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 		indexList[index] = vertexCount;
 		for (i = i + 1; comparator.Test(m_triangles[i]); ++i)
 		{
-			const ndInt32 duplictaIndex = ndInt32(m_triangles[i].m_w);
-			indexList[duplictaIndex] = vertexCount;
+			const ndInt32 duplicateIndex = ndInt32(m_triangles[i].m_w);
+			indexList[duplicateIndex] = vertexCount;
 		}
 		--i;
 		vertexCount++;
@@ -3241,7 +3247,7 @@ void ndIsoSurface::ndImplementation::CreateGrids(const ndArray<ndVector>& points
 	for (ndInt32 i = 0; i < points.GetCount(); ++i)
 	{
 		const ndVector r(points[i] - origin);
-		const ndVector p(r * invGridSize + rounding);
+		const ndVector p(r * invGridSize);
 		const ndGridHash hashKey(p);
 
 		upperDigits.m_x = dMax(upperDigits.m_x, ndInt32(hashKey.m_xHigh));
