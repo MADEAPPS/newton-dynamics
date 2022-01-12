@@ -131,17 +131,35 @@ class ndBodySphFluid::ndWorkingData
 {
 	public:
 	ndWorkingData()
-		:m_accel(1024)
-		,m_locks(1024)
-		,m_pairCount(1024)
-		,m_gridScans(1024)
-		,m_density(1024)
-		,m_invDensity(1024)
-		,m_pairs(1024)
-		,m_hashGridMap(1024)
-		,m_hashGridMapScratchBuffer(1024)
-		,m_kernelDistance(1024)
+		:m_accel(256)
+		,m_locks(256)
+		,m_pairCount(256)
+		,m_gridScans(256)
+		,m_density(256)
+		,m_invDensity(256)
+		,m_pairs(256)
+		,m_hashGridMap(256)
+		,m_hashGridMapScratchBuffer(256)
+		,m_kernelDistance(256)
 	{
+		for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; ++i)
+		{
+			m_partialsGridScans[i].Resize(256);
+		}
+	}
+
+	void Clear()
+	{
+		m_accel.Resize(256);
+		m_locks.Resize(256);
+		m_pairs.Resize(256);
+		m_density.Resize(256);
+		m_pairCount.Resize(256);
+		m_gridScans.Resize(256);
+		m_invDensity.Resize(256);
+		m_hashGridMap.Resize(256);
+		m_kernelDistance.Resize(256);
+		m_hashGridMapScratchBuffer.Resize(256);
 		for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; ++i)
 		{
 			m_partialsGridScans[i].Resize(256);
@@ -190,7 +208,6 @@ class ndBodySphFluid::ndWorkingData
 	};
 	ndTree<ndInt32, ndPair> m_pairfilter;
 #endif
-
 };
 
 ndBodySphFluid::ndBodySphFluid()
@@ -215,6 +232,8 @@ ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
 
 ndBodySphFluid::~ndBodySphFluid()
 {
+	ndWorkingData& data = WorkingData();
+	data.Clear();
 }
 
 ndBodySphFluid::ndWorkingData& ndBodySphFluid::WorkingData()

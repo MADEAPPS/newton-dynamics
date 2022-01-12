@@ -52,6 +52,7 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 	ndImplementation();
 	~ndImplementation();
 
+	void Clear();
 	void BuildLowResolutionMesh(ndIsoSurface* const me, const ndArray<ndVector>& pointCloud, ndFloat32 gridSize);
 	void BuildHighResolutionMesh(ndIsoSurface* const me, const ndArray<ndVector>& pointCloud, ndFloat32 gridSize, ndCalculateIsoValue* const computeIsoValue);
 
@@ -196,7 +197,6 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 	static ndInt32 m_edgeScan[];
 	static ndInt32 m_facesScan[];
 	static ndVector m_gridCorners[];
-	//static const ndInt32 m_triangleTable[][16];
 };
 
 ndInt32 ndIsoSurface::ndImplementation::m_facesScan[] = { 0,0,1,2,4,5,7,9,12,13,15,17,20,22,25,28,30,31,33,35,38,40,43,46,50,52,55,58,62,65,69,73,76,77,79,81,84,86,89,92,96,98,101,104,108,111,115,119,122,124,127,130,132,135,139,143,146,149,153,157,160,164,169,174,176,177,179,181,184,186,189,192,196,198,201,204,208,211,215,219,222,224,227,230,234,237,241,245,250,253,257,261,266,270,275,280,284,286,289,292,296,299,303,305,308,311,315,319,324,328,333,336,338,341,345,349,352,356,361,364,366,370,375,380,384,389,391,395,396,397,399,401,404,406,409,412,416,418,421,424,428,431,435,439,442,444,447,450,454,457,461,465,470,473,475,479,482,486,489,494,496,498,501,504,508,511,515,519,524,527,531,535,540,544,549,554,558,561,565,569,572,576,581,586,590,594,597,602,604,609,613,615,616,618,621,624,628,631,635,639,644,647,651,655,660,662,665,668,670,673,677,681,686,690,695,700,702,706,709,714,718,721,723,727,728,731,735,739,744,748,753,756,760,764,769,774,776,779,783,785,786,788,791,794,796,799,803,805,806,809,811,815,816,818,819,820};
@@ -2580,15 +2580,24 @@ ndVector ndIsoSurface::ndImplementation::m_gridCorners[] =
 
 inline ndIsoSurface::ndImplementation::ndImplementation()
 	:ndClassAlloc()
-	,m_hashGridMap(1024)
-	,m_hashGridMapScratchBuffer(1024)
-	,m_triangles(1024)
-	,m_trianglesScratchBuffer(1024)
+	,m_hashGridMap(256)
+	,m_hashGridMapScratchBuffer(256)
+	,m_triangles(256)
+	,m_trianglesScratchBuffer(256)
 {
 }
 
-inline ndIsoSurface::ndImplementation::~ndImplementation()
+ndIsoSurface::ndImplementation::~ndImplementation()
 {
+	Clear();
+}
+
+void ndIsoSurface::ndImplementation::Clear()
+{
+	m_triangles.Resize(256);
+	m_hashGridMap.Resize(256);
+	m_trianglesScratchBuffer.Resize(256);
+	m_hashGridMapScratchBuffer.Resize(256);
 }
 
 ndIsoSurface::ndImplementation& ndIsoSurface::GetImplementation() const
@@ -3286,6 +3295,11 @@ void ndIsoSurface::ndImplementation::BuildLowResolutionMesh(ndIsoSurface* const 
 	GenerateLowResIndexList(me);
 	CalculateNormals(me);
 	ClearBuffers();
+}
+
+ndIsoSurface::~ndIsoSurface()
+{
+	GetImplementation().Clear();
 }
 
 void ndIsoSurface::GenerateMesh(const ndArray<ndVector>& pointCloud, ndFloat32 gridSize, ndCalculateIsoValue* const computeIsoValue)

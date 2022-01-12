@@ -47,7 +47,8 @@ class ndIsoSurface: public ndClassAlloc
 	class ndImplementation;
 
 	ndIsoSurface();
-	~ndIsoSurface();
+	D_CORE_API ~ndIsoSurface();
+
 	const ndArray<ndVector>& GetPoints() const;
 	const ndArray<ndVector>& GetNormals() const;
 	const ndArray<ndInt32>& GetTriangles() const;
@@ -66,10 +67,6 @@ inline ndIsoSurface::ndIsoSurface()
 	:m_points(1024)
 	,m_normals(1024)
 	,m_triangles(1024)
-{
-}
-
-inline ndIsoSurface::~ndIsoSurface()
 {
 }
 

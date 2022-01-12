@@ -166,6 +166,14 @@ void ndArray<T>::Clear()
 template<class T>
 void ndArray<T>::Resize(ndInt32 size)
 {
+	// note: I know some tolls will detect a warning here
+	// because it is copy object from one array
+	// to another with out calling the copy constructor
+	// and destructor, but the ndArray is designed for 
+	// high performance memory resizing of struct,
+	// if an application needs to use an array with
+	// for general purpose classes, 
+	// please use standart lib std::vector
 	if (size > m_capacity || (m_capacity == 0))
 	{
 		size = dMax(size, 16);

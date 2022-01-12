@@ -1391,7 +1391,10 @@ void ndScene::InitBodyArray()
 
 	ndInt32 movingBodyCount = info.m_scan[0][1] - info.m_scan[0][0];
 	m_sceneBodyArray.SetCount(m_bodyList.GetCount());
-	SubmitJobs<ndClassifyMovingBodies>(&info);
+	if (movingBodyCount)
+	{
+		SubmitJobs<ndClassifyMovingBodies>(&info);
+	}
 	m_sceneBodyArray.SetCount(movingBodyCount);
 
 	ndBodyKinematic* const sentinelBody = m_sentinelBody;
