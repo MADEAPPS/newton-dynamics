@@ -40,10 +40,8 @@ static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene,
 static void AddToCompoundShape(const ndMatrix& mLocalMatrix, ndShapeInstance& parentShape, ndShapeInstance& childInstance)
 {
 	auto pCompoundShape = parentShape.GetShape()->GetAsShapeCompound();
-	pCompoundShape->BeginAddRemove();
 	childInstance.SetLocalMatrix(mLocalMatrix);
 	pCompoundShape->AddCollision(&childInstance);
-	pCompoundShape->EndAddRemove();
 }
 
 void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
@@ -63,11 +61,15 @@ void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
 	mWall4Local.m_posit = ndVector(-1.0f, 0.0f, 0.0f, 1.0f);
 	ndMatrix mFloorLocal = dGetIdentityMatrix();
 	mFloorLocal.m_posit = ndVector(0.0f, -1.0f, 0.0f, 1.0f);
+
+	auto pCompoundShape = parentInstance.GetShape()->GetAsShapeCompound();
+	pCompoundShape->BeginAddRemove();
 	AddToCompoundShape(mWall1Local, parentInstance, wall1);
 	AddToCompoundShape(mWall2Local, parentInstance, wall2);
 	AddToCompoundShape(mWall3Local, parentInstance, wall3);
 	AddToCompoundShape(mWall4Local, parentInstance, wall4);
 	AddToCompoundShape(mFloorLocal, parentInstance, floor);
+	pCompoundShape->EndAddRemove();
 }
 
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
