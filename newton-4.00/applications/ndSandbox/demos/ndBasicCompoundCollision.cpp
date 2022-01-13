@@ -78,18 +78,21 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 	ndShapeInstance compoundShapeInstance(new ndShapeCompound());
 	CreateBoxCompoundShape(compoundShapeInstance);
+
 	ndDemoMeshIntance* const compGeometry = new ndDemoMeshIntance("compoundShape", scene->GetShaderCache(), &compoundShapeInstance, "earthmap.tga", "earthmap.tga", "earthmap.tga");
 	ndDemoInstanceEntity* const compEntity = new ndDemoInstanceEntity(compGeometry);
 	scene->AddEntity(compEntity);
 	ndMatrix mBodyMatrix = dGetIdentityMatrix();
 	mBodyMatrix.m_posit = ndVector(-2.0f, 5.0f, -5.0f, 1.0f);
 	AddRigidBody(scene, mBodyMatrix, compoundShapeInstance, compEntity, 10.0);
+
 	ndShapeInstance originShape(new ndShapeSphere(0.5));
 	ndDemoMeshIntance* const origGeometry = new ndDemoMeshIntance("origShape", scene->GetShaderCache(), &originShape, "earthmap.tga", "earthmap.tga", "earthmap.tga");
 	ndDemoInstanceEntity* const origEntity = new ndDemoInstanceEntity(origGeometry);
 	scene->AddEntity(origEntity);
 	ndMatrix mOrigMatrix = dGetIdentityMatrix();
-	AddRigidBody(scene, mOrigMatrix, originShape, origEntity, 0.0);
+	mOrigMatrix.m_posit.m_y += 2.0f;
+	AddRigidBody(scene, mOrigMatrix, originShape, origEntity, 5.0);
 
 	ndVector origin(ndVector::m_zero);
 	ndQuaternion rot(dYawMatrix(45.0f * ndDegreeToRad));

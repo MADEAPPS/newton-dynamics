@@ -128,9 +128,10 @@ class ndBodySphFluid::ndParticleKernelDistance
 	ndFloat32 m_dist[32];
 };
 
-
 class ndBodySphFluid::ndWorkingData
 {
+	#define D_SPH_GRID_X_RESOLUTION 4
+
 	public:
 	ndWorkingData()
 		:m_accel(256)
@@ -143,6 +144,8 @@ class ndBodySphFluid::ndWorkingData
 		,m_hashGridMap(256)
 		,m_hashGridMapScratchBuffer(256)
 		,m_kernelDistance(256)
+		,m_worlToGridOrigin(ndFloat32 (1.0f))
+		,m_worlToGridScale(ndFloat32(1.0f))
 	{
 		for (ndInt32 i = 0; i < D_MAX_THREADS_COUNT; ++i)
 		{
@@ -168,6 +171,17 @@ class ndBodySphFluid::ndWorkingData
 		}
 	}
 
+	void SetWorldToGridMapping(ndInt32 gridCount, ndFloat32 xMax, ndFloat32 xMin)
+	{
+		m_worlToGridOrigin = xMin;
+		m_worlToGridScale = ndFloat32(1<< D_SPH_GRID_X_RESOLUTION) * gridCount / (xMax - xMin);
+	}
+
+	ndInt32 WorldToGrid(ndFloat32 x) const
+	{
+		return ndInt32 ((x - m_worlToGridOrigin) * m_worlToGridScale);
+	}
+
 	ndArray<ndVector> m_accel;
 	ndArray<ndSpinLock> m_locks;
 	ndArray<ndInt8> m_pairCount;
@@ -179,6 +193,8 @@ class ndBodySphFluid::ndWorkingData
 	ndArray<ndGridHash> m_hashGridMapScratchBuffer;
 	ndArray<ndParticleKernelDistance> m_kernelDistance;
 	ndArray<ndInt32> m_partialsGridScans[D_MAX_THREADS_COUNT];
+	ndFloat32 m_worlToGridOrigin;
+	ndFloat32 m_worlToGridScale;
 
 #ifdef D_DEBUG_SOLVER
 	class ndPair
@@ -322,6 +338,10 @@ void ndBodySphFluid::CaculateAABB(const ndWorld* const world)
 	// make sure the w component is zero.
 	m_box0 = box.m_min & ndVector::m_triplexMask;
 	m_box1 = box.m_max & ndVector::m_triplexMask;
+
+	ndWorkingData& data = WorkingData();
+	ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
+	data.SetWorldToGridMapping(numberOfGrid, m_box1.m_x, m_box0.m_x);
 }
 
 void ndBodySphFluid::SortXdimension(const ndWorld* const world)
@@ -334,23 +354,20 @@ void ndBodySphFluid::SortXdimension(const ndWorld* const world)
 		public:
 		ndKey_low(void* const context)
 			:m_fluid((ndBodySphFluid*)context)
+			,m_data(m_fluid->WorkingData())
+			,m_point(m_fluid->GetPositions())
 		{
-			m_origin = m_fluid->m_box0.m_x;
-			m_scale = XRESOLUTION / ndFloat32(m_fluid->m_box1.m_x - m_origin);
 		}
 
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
-			const ndVector& point = m_fluid->m_posit[cell.m_particleIndex];
-			ndFloat32 x = m_scale * (point.m_x - m_origin);
-			dAssert(x > ndFloat32(0.0f));
-			ndInt32 key = ndInt32 (x);
+			ndUnsigned32 key = m_data.WorldToGrid(m_point[cell.m_particleIndex].m_x);
 			return key & 0xff;
 		}
 
 		ndBodySphFluid* m_fluid;
-		ndFloat32 m_origin;
-		ndFloat32 m_scale;
+		ndWorkingData& m_data;
+		const ndArray<ndVector>& m_point;
 	};
 
 	class ndKey_middle
@@ -358,23 +375,20 @@ void ndBodySphFluid::SortXdimension(const ndWorld* const world)
 		public:
 		ndKey_middle(void* const context)
 			:m_fluid((ndBodySphFluid*)context)
+			,m_data(m_fluid->WorkingData())
+			,m_point(m_fluid->GetPositions())
 		{
-			m_origin = m_fluid->m_box0.m_x;
-			m_scale = XRESOLUTION / ndFloat32(m_fluid->m_box1.m_x - m_origin);
 		}
 
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
-			const ndVector& point = m_fluid->m_posit[cell.m_particleIndex];
-			ndFloat32 x = m_scale * (point.m_x - m_origin);
-			dAssert(x > ndFloat32(0.0f));
-			ndInt32 key = ndInt32(x) >> 8;
-			return key & 0xff;
+			ndUnsigned32 key = m_data.WorldToGrid(m_point[cell.m_particleIndex].m_x);
+			return (key >> 8) & 0xff;
 		}
 
 		ndBodySphFluid* m_fluid;
-		ndFloat32 m_origin;
-		ndFloat32 m_scale;
+		ndWorkingData& m_data;
+		const ndArray<ndVector>& m_point;
 	};
 
 	class ndKey_high
@@ -382,31 +396,35 @@ void ndBodySphFluid::SortXdimension(const ndWorld* const world)
 		public:
 		ndKey_high(void* const context)
 			:m_fluid((ndBodySphFluid*)context)
+			,m_data(m_fluid->WorkingData())
+			,m_point(m_fluid->GetPositions())
 		{
-			m_origin = m_fluid->m_box0.m_x;
-			m_scale = XRESOLUTION / ndFloat32(m_fluid->m_box1.m_x - m_origin);
 		}
 
 		ndInt32 GetKey(const ndGridHash& cell) const
 		{
-			const ndVector& point = m_fluid->m_posit[cell.m_particleIndex];
-			ndFloat32 x = m_scale * (point.m_x - m_origin);
-			dAssert(x > ndFloat32(0.0f));
-			ndInt32 key = ndInt32(x) >> 16;
-			return key & 0xff;
+			ndUnsigned32 key = m_data.WorldToGrid(m_point[cell.m_particleIndex].m_x);
+			return (key >> 16) & 0xff;
 		}
 
 		ndBodySphFluid* m_fluid;
-		ndFloat32 m_scale;
-		ndFloat32 m_origin;
+		ndWorkingData& m_data;
+		const ndArray<ndVector>& m_point;
 	};
 
 	ndWorkingData& data = WorkingData();
 	ndScene* const scene = world->GetScene();
 
 	ndCountingSort<ndGridHash, ndKey_low, 8>(*scene, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
-	ndCountingSort<ndGridHash, ndKey_middle, 8>(*scene, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
-	ndCountingSort<ndGridHash, ndKey_high, 8>(*scene, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
+	const ndInt32 keySize = data.WorldToGrid(m_box1.m_x);
+	if (keySize >= 256)
+	{
+		ndCountingSort<ndGridHash, ndKey_middle, 8>(*scene, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
+		if (keySize >= (256 * 256))
+		{
+			ndCountingSort<ndGridHash, ndKey_high, 8>(*scene, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
+		}
+	}
 }
 
 void ndBodySphFluid::SortCellBuckects(const ndWorld* const world)
@@ -829,16 +847,19 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 		{
 			public:
 			ndPairInfo(ndBodySphFluid* const fluid)
-				:m_locks(fluid->WorkingData().m_locks)
+				:m_data(fluid->WorkingData())
+				,m_locks(m_data.m_locks)
 				,m_posit(fluid->m_posit)
-				,m_pairCount(fluid->WorkingData().m_pairCount)
-				,m_pair(fluid->WorkingData().m_pairs)
-				,m_distance(fluid->WorkingData().m_kernelDistance)
+				,m_pairCount(m_data.m_pairCount)
+				,m_pair(m_data.m_pairs)
+				,m_distance(m_data.m_kernelDistance)
 				,m_diameter(fluid->GetSphGridSize())
 				,m_diameter2(m_diameter * m_diameter)
+				,m_windosTest(m_data.WorldToGrid(m_data.m_worlToGridOrigin + m_diameter) + 1)
 			{
 			}
 
+			ndWorkingData& m_data;
 			ndArray<ndSpinLock>& m_locks;
 			const ndArray<ndVector>& m_posit;
 			ndArray<ndInt8>& m_pairCount;
@@ -846,6 +867,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 			ndArray<ndParticleKernelDistance>& m_distance;
 			ndFloat32 m_diameter;
 			ndFloat32 m_diameter2;
+			ndInt32 m_windosTest;
 		};
 
 		void AddPair(ndPairInfo& info, ndInt32 particle0, ndInt32 particle1)
@@ -889,15 +911,15 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 				const ndGridHash hash0 = hashGridMap[start + i];
 				const ndInt32 homeGridTest0 = (hash0.m_cellType == ndHomeGrid);
 				const ndInt32 particle0 = hash0.m_particleIndex;
-				const ndFloat32 x0 = info.m_posit[particle0].m_x;
+				const ndInt32 x0 = info.m_data.WorldToGrid(info.m_posit[particle0].m_x);
 				for (ndInt32 j = i + 1; j < count; ++j)
 				{
 					const ndGridHash hash1 = hashGridMap[start + j];
 					const ndInt32 particle1 = hash1.m_particleIndex;
 					dAssert(particle0 != particle1);
-					const ndFloat32 x1 = info.m_posit[particle1].m_x;
+					const ndInt32 x1 = info.m_data.WorldToGrid(info.m_posit[particle1].m_x);
 					dAssert((x1 - x0) > ndFloat32 (-1.0e-3f));
-					const ndInt32 sweeptTest = ((x1 - x0) >= info.m_diameter);
+					const ndInt32 sweeptTest = ((x1 - x0) >= info.m_windosTest);
 					if (sweeptTest)
 					{
 						break;
