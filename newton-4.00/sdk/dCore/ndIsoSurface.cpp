@@ -2923,6 +2923,7 @@ void ndIsoSurface::ndImplementation::GenerateHighResIsoSurface(ndCalculateIsoVal
 	const ndInt32 gridCount = m_hashGridMap.GetCount();
 	m_hashGridMap.PushBack(ndGridHash(0xffff, 0xffff, 0xffff));
 
+	m_triangles.SetCount(0);
 	for (ndInt32 i = 0; i < gridCount; i = end)
 	{
 		end = i + 1;
