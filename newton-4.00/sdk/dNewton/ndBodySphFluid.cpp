@@ -119,7 +119,7 @@ class ndBodySphFluid::ndGridHash
 class ndBodySphFluid::ndParticlePair
 {
 	public:
-	ndInt32 m_m1[32];
+	ndInt32 m_neighborg[32];
 };
 
 class ndBodySphFluid::ndParticleKernelDistance
@@ -883,9 +883,16 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 					ndInt8 count = info.m_pairCount[particle0];
 					if (count < 32)
 					{
-						info.m_pair[particle0].m_m1[count] = particle1;
+						ndInt8 isUnique = 1;
+						ndInt32* const neighborg = info.m_pair[particle0].m_neighborg;
+						for (ndInt32 i = count - 1; i >= 0; --i)
+						{
+							isUnique = isUnique & (neighborg[i] != particle1);
+						}
+
+						neighborg[count] = particle1;
 						info.m_distance[particle0].m_dist[count] = dist;
-						info.m_pairCount[particle0] = count + 1;
+						info.m_pairCount[particle0] = count + isUnique;
 					}
 				}
 			
@@ -894,9 +901,15 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 					ndInt8 count = info.m_pairCount[particle1];
 					if (count < 32)
 					{
-						info.m_pair[particle1].m_m1[count] = particle0;
+						ndInt8 isUnique = 1;
+						ndInt32* const neighborg = info.m_pair[particle1].m_neighborg;
+						for (ndInt32 i = count - 1; i >= 0; --i)
+						{
+							isUnique = isUnique & (neighborg[i] != particle0);
+						}
+						neighborg[count] = particle0;
 						info.m_distance[particle1].m_dist[count] = dist;
-						info.m_pairCount[particle1] = count + 1;
+						info.m_pairCount[particle1] = count + isUnique;
 					}
 				}
 			}
@@ -978,13 +991,13 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 				ndParticlePair& pair = pairs[i];
 				for (ndInt32 j = count - 1; j >= 1; --j)
 				{
-					ndInt32 m = pair.m_m1[j];
+					ndInt32 m = pair.m_neighborg[j];
 					for (ndInt32 k = j - 1; k >= 0; --k)
 					{
-						if (m == pair.m_m1[k])
+						if (m == pair.m_neighborg[k])
 						{
 							--count;
-							pair.m_m1[j] = pair.m_m1[count];
+							pair.m_neighborg[j] = pair.m_neighborg[count];
 							break;
 						}
 					}
@@ -1011,7 +1024,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 	
 	ndScene* const scene = world->GetScene();
 	scene->SubmitJobs<ndAddPairs>(this);
-	scene->SubmitJobs<ndRemoveDuplicates>(this);
+	//scene->SubmitJobs<ndRemoveDuplicates>(this);
 
 #ifdef D_DEBUG_SOLVER
 
@@ -1029,7 +1042,7 @@ void ndBodySphFluid::BuildPairs(const ndWorld* const world)
 		ndParticlePair& pair = pairs[i];
 		for (ndInt32 j = 0; j < count; ++j)
 		{
-			pairfilter0.Insert(ndWorkingData::ndPair(i, pair.m_m1[j]));
+			pairfilter0.Insert(ndWorkingData::ndPair(i, pair.m_neighborg[j]));
 		}
 	}
 
@@ -1173,7 +1186,7 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 				ndVector forceAcc(ndVector::m_zero);
 				for (ndInt32 j = 0; j < count; ++j)
 				{
-					const ndInt32 i1 = pairs.m_m1[j];
+					const ndInt32 i1 = pairs.m_neighborg[j];
 					const ndVector p10(posit[i1] - p0);
 					const ndVector dir(Normalize(p10));
 					dAssert(dir.m_w == ndFloat32(0.0f));

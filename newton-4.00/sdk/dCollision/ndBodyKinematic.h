@@ -90,8 +90,6 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API ndBodyKinematic(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndBodyKinematic();
 
-	D_COLLISION_API void SetMatrixUpdateScene(const ndMatrix& matrix);
-
 	ndScene* GetScene() const;
 
 	ndUnsigned32 GetIndex() const;
@@ -139,6 +137,7 @@ class ndBodyKinematic: public ndBody
 	void SetMassMatrix(ndFloat32 Ixx, ndFloat32 Iyy, ndFloat32 Izz, ndFloat32 mass);
 	void GetMassMatrix(ndFloat32& Ixx, ndFloat32& Iyy, ndFloat32& Izz, ndFloat32& mass);
 
+	D_COLLISION_API void SetMatrixUpdateScene(const ndMatrix& matrix);
 	D_COLLISION_API virtual ndContact* FindContact(const ndBody* const otherBody) const;
 
 	virtual ndBodyKinematic* GetAsBodyKinematic();
