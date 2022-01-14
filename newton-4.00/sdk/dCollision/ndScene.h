@@ -207,6 +207,7 @@ class ndScene : public ndThreadPool
 	static ndVector m_angularContactError2;
 
 	friend class ndWorld;
+	friend class ndBodyKinematic;
 	friend class ndRayCastNotify;
 	friend class ndConvexCastNotify;
 	friend class ndSkeletonContainer;

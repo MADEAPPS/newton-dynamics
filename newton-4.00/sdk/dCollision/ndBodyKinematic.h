@@ -90,6 +90,8 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API ndBodyKinematic(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndBodyKinematic();
 
+	D_COLLISION_API void SetMatrixUpdateScene(const ndMatrix& matrix);
+
 	ndScene* GetScene() const;
 
 	ndUnsigned32 GetIndex() const;

@@ -232,7 +232,7 @@ ndBodySphFluid::ndBodySphFluid()
 	,m_mass(ndFloat32(0.02f))
 	,m_viscosity(ndFloat32 (1.05f))
 	,m_restDensity(ndFloat32(1000.0f))
-	,m_densityToPressureConst(ndFloat32(1.0f))
+	,m_gasConstant(ndFloat32(1.0f))
 {
 }
 
@@ -241,7 +241,7 @@ ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_mass(ndFloat32(0.02f))
 	,m_viscosity(ndFloat32(1.0f))
 	,m_restDensity(ndFloat32(1000.0f))
-	,m_densityToPressureConst(ndFloat32(1.0f))
+	,m_gasConstant(ndFloat32(1.0f))
 {
 	// nothing was saved
 	dAssert(0);
@@ -1156,7 +1156,7 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 
 			const ndFloat32 viscosity = fluid->m_viscosity;
 			const ndFloat32 restDensity = fluid->m_restDensity;
-			const ndFloat32 densityToPressure = fluid->m_densityToPressureConst;
+			const ndFloat32 gasConstant = ndFloat32 (0.5f) * fluid->m_gasConstant;
 
 			const ndVector gravity(fluid->m_gravity);
 			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), m_owner->GetThreadCount());
@@ -1168,7 +1168,7 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 				const ndInt32 count = data.m_pairCount[i0];
 				const ndParticlePair& pairs = data.m_pairs[i0];
 				ndParticleKernelDistance& distance = data.m_kernelDistance[i0];
-				const ndFloat32 pressureI0 = densityToPressure * (density[i0] - restDensity);
+				const ndFloat32 pressureI0 = density[i0] - restDensity;
 
 				ndVector forceAcc(ndVector::m_zero);
 				for (ndInt32 j = 0; j < count; ++j)
@@ -1185,8 +1185,8 @@ void ndBodySphFluid::CalculateAccelerations(const ndWorld* const world)
 				
 					// calculate pressure
 					const ndFloat32 kernelDist2 = kernelDist * kernelDist;
-					const ndFloat32 pressureI1 = densityToPressure * (density[i1] - restDensity);
-					const ndVector force(ndFloat32(0.5f) * kernelDist2 * invDensity[i1] * (pressureI0 + pressureI1));
+					const ndFloat32 pressureI1 = density[i1] - restDensity;
+					const ndVector force(gasConstant * kernelDist2 * invDensity[i1] * (pressureI0 + pressureI1));
 					forceAcc += force * dir;
 				
 					// calculate viscosity acceleration

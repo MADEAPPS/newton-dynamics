@@ -42,8 +42,8 @@ class ndBodySphFluid: public ndBodyParticleSet
 	ndFloat32 GetRestDensity() const;
 	void SetRestDensity(ndFloat32 resDensity);
 	
-	ndFloat32 GetDensityToPressureConst() const;
-	void GetDensityToPressureConst(ndFloat32 densityToPressureConst);
+	ndFloat32 GetGasConstant() const;
+	void SetGasConstant(ndFloat32 gasConst);
 
 	ndFloat32 GetSphGridSize() const;
 
@@ -81,7 +81,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	ndFloat32 m_mass;
 	ndFloat32 m_viscosity;
 	ndFloat32 m_restDensity;
-	ndFloat32 m_densityToPressureConst;
+	ndFloat32 m_gasConstant;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const ndFastRay&, const ndFloat32) const
@@ -124,14 +124,14 @@ inline void ndBodySphFluid::SetRestDensity(ndFloat32 restDensity)
 	m_restDensity = restDensity;
 }
 
-inline ndFloat32 ndBodySphFluid::GetDensityToPressureConst() const
+inline ndFloat32 ndBodySphFluid::GetGasConstant() const
 {
-	return m_densityToPressureConst;
+	return m_gasConstant;
 }
 
-inline void ndBodySphFluid::GetDensityToPressureConst(ndFloat32 densityToPressureConst)
+inline void ndBodySphFluid::SetGasConstant(ndFloat32 gasConst)
 {
-	m_densityToPressureConst = densityToPressureConst;
+	m_gasConstant = gasConst;
 }
 
 inline ndFloat32 ndBodySphFluid::GetSphGridSize() const

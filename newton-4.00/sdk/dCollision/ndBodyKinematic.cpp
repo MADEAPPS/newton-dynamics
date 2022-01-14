@@ -21,6 +21,7 @@
 
 #include "ndCoreStdafx.h"
 #include "ndCollisionStdafx.h"
+#include "ndScene.h"
 #include "ndContact.h"
 #include "ndShapeNull.h"
 #include "ndRayCastNotify.h"
@@ -322,6 +323,16 @@ void ndBodyKinematic::UpdateCollisionMatrix()
 	m_transformIsDirty = 1;
 	m_shapeInstance.SetGlobalMatrix(m_shapeInstance.GetLocalMatrix() * m_matrix);
 	m_shapeInstance.CalculateAabb(m_shapeInstance.GetGlobalMatrix(), m_minAabb, m_maxAabb);
+}
+
+void ndBodyKinematic::SetMatrixUpdateScene(const ndMatrix& matrix)
+{
+	SetMatrix(matrix);
+	ndScene* const scene = GetScene();
+	if (scene)
+	{
+		scene->UpdateAabb(0, this);
+	}
 }
 
 ndMatrix ndBodyKinematic::CalculateInvInertiaMatrix() const
