@@ -39,17 +39,20 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundJob
 	{
 		D_TRACKTIME();
 		ndArray<ndVector>& pointCloud = GetPositions();
-		ndFloat32 diameter = GetParticleRadius() * ndFloat32(2.0f);
-		m_isoSurface.GenerateMesh(pointCloud, diameter);
+		//ndFloat32 gridSpacing = GetParticleRadius() * ndFloat32(2.0f);
+		ndFloat32 gridSpacing = GetSphGridSize();
+		m_isoSurface.GenerateMesh(pointCloud, gridSpacing);
 
 		const ndArray<ndVector>& points = m_isoSurface.GetPoints();
 		const ndArray<ndVector>& normals = m_isoSurface.GetNormals();
 		dAssert(points.GetCount());
 		m_points.SetCount(points.GetCount());
 
+		const ndVector origin(m_isoSurface.GetOrigin());
 		for (ndInt32 i = 0; i < points.GetCount(); ++i)
 		{
-			m_points[i].m_posit = glVector3(GLfloat(points[i].m_x), GLfloat(points[i].m_y), GLfloat(points[i].m_z));
+			const ndVector p(origin + points[i]);
+			m_points[i].m_posit = glVector3(GLfloat(p.m_x), GLfloat(p.m_y), GLfloat(p.m_z));
 			m_points[i].m_normal = glVector3(GLfloat(normals[i].m_x), GLfloat(normals[i].m_y), GLfloat(normals[i].m_z));
 			m_points[i].m_uv.m_u = GLfloat(0.0f);
 			m_points[i].m_uv.m_v = GLfloat(0.0f);
@@ -301,8 +304,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	matrix.m_posit.m_w = 1.0f;
 
 	//ndFloat32 diameter = 0.25f;
-	ndFloat32 diameter = 0.15f;
-	//ndFloat32 diameter = 0.125f;
+	//ndFloat32 diameter = 0.15f;
+	ndFloat32 diameter = 0.125f;
 	ndIsoSurfaceParticleVolume* const fluidObject = new ndIsoSurfaceParticleVolume(diameter * 0.5f);
 	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, ndVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject);
 

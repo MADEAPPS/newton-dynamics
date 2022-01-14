@@ -49,6 +49,7 @@ class ndIsoSurface: public ndClassAlloc
 	ndIsoSurface();
 	D_CORE_API ~ndIsoSurface();
 
+	ndVector GetOrigin() const;
 	const ndArray<ndVector>& GetPoints() const;
 	const ndArray<ndVector>& GetNormals() const;
 	const ndArray<ndInt32>& GetTriangles() const;
@@ -57,6 +58,7 @@ class ndIsoSurface: public ndClassAlloc
 	private:
 	ndImplementation& GetImplementation() const;
 
+	ndVector m_origin;
 	ndArray<ndVector> m_points;
 	ndArray<ndVector> m_normals;
 	ndArray<ndInt32> m_triangles;
@@ -64,7 +66,8 @@ class ndIsoSurface: public ndClassAlloc
 };
 
 inline ndIsoSurface::ndIsoSurface()
-	:m_points(1024)
+	:m_origin(ndVector::m_zero)
+	,m_points(1024)
 	,m_normals(1024)
 	,m_triangles(1024)
 {
@@ -83,6 +86,11 @@ inline const ndArray<ndVector>& ndIsoSurface::GetNormals() const
 inline const ndArray<ndInt32>& ndIsoSurface::GetTriangles() const
 {
 	return m_triangles;
+}
+
+inline ndVector ndIsoSurface::GetOrigin() const
+{
+	return m_origin;
 }
 
 #endif

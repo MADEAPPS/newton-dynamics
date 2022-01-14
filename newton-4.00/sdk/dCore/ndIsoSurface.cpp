@@ -2621,22 +2621,27 @@ void ndIsoSurface::ndImplementation::CalculatedAabb(const ndArray<ndVector>& poi
 		boxP0 = boxP0.GetMin(points[i]);
 		boxP1 = boxP1.GetMax(points[i]);
 	}
-	boxP0 = m_gridSize * (boxP0 * m_invGridSize).Floor() - m_gridSize;
-	boxP1 = m_gridSize * (boxP1 * m_invGridSize).Floor() + m_gridSize + m_gridSize;
+	//boxP0 = m_gridSize * (boxP0 * m_invGridSize).Floor() - m_gridSize;
+	//boxP1 = m_gridSize * (boxP1 * m_invGridSize).Floor() + m_gridSize + m_gridSize;
 
+	boxP0 -= m_gridSize;
+	boxP1 += (m_gridSize + m_gridSize);
+
+	// quantize the aabb to integers of the gird size
+	boxP0 = m_gridSize * (boxP0 * m_invGridSize).Floor();
+	boxP1 = m_gridSize * (boxP1 * m_invGridSize).Floor();
+
+	// make sure the w component is zero.
 	m_boxP0 = boxP0 & ndVector::m_triplexMask;
 	m_boxP1 = boxP1 & ndVector::m_triplexMask;
-	//m_boxP0 = boxP0 & ndVector::m_triplexMask;
-	//m_boxP1 = boxP1 & ndVector::m_triplexMask;
 
-	//m_boxP0 = m_boxP0 - m_gridSize;
-	//m_origin = m_boxP0;
+	//const ndVector sizeInGrids((m_boxP1 - m_boxP0) * m_invGridSize + ndVector::m_half);
+	//const ndVector volumeInGrids(sizeInGrids.Floor().GetInt());
 
-	const ndVector sizeInGrids((m_boxP1 - m_boxP0) * m_invGridSize + ndVector::m_half);
-	const ndVector volumeInGrids(sizeInGrids.Floor().GetInt());
-	m_volumeSizeX = ndInt32(volumeInGrids.m_ix);
-	m_volumeSizeY = ndInt32(volumeInGrids.m_iy);
-	m_volumeSizeZ = ndInt32(volumeInGrids.m_iz);
+	const ndVector sizeInGrids((boxP1 - boxP0) * m_invGridSize + ndVector::m_one);
+	m_volumeSizeX = ndInt32(sizeInGrids.m_ix);
+	m_volumeSizeY = ndInt32(sizeInGrids.m_iy);
+	m_volumeSizeZ = ndInt32(sizeInGrids.m_iz);
 }
 
 ndVector ndIsoSurface::ndImplementation::InterpolateLowResVertex(const ndVector& p0, const ndVector& p1) const
@@ -3093,6 +3098,8 @@ void ndIsoSurface::ndImplementation::GenerateLowResIndexList(ndIsoSurface* const
 		--i;
 		vertexCount++;
 	}
+
+	me->m_origin = m_boxP0;
 	points.SetCount(vertexCount);
 }
 
@@ -3233,7 +3240,6 @@ void ndIsoSurface::ndImplementation::GenerateHighResIndexList(ndIsoSurface* cons
 	}
 	points.SetCount(vertexCount);
 }
-
 
 void ndIsoSurface::ndImplementation::CreateGrids(const ndArray<ndVector>& points)
 {

@@ -267,7 +267,7 @@ void ndBodySphFluid::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
 }
 
-void ndBodySphFluid::CaculateAABB(const ndWorld* const world)
+void ndBodySphFluid::CaculateAabb(const ndWorld* const world)
 {
 	D_TRACKTIME();
 	class ndBox
@@ -1274,7 +1274,7 @@ void ndBodySphFluid::IntegrateParticles(const ndWorld* const world, ndFloat32 ti
 void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
 {
 	// do the scene management 
-	CaculateAABB(world);
+	CaculateAabb(world);
 	CreateGrids(world);
 	SortGrids(world);
 	CalculateScans(world);

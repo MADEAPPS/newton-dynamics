@@ -70,7 +70,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void SortGrids(const ndWorld* const world);
 	void BuildPairs(const ndWorld* const world);
 	void CreateGrids(const ndWorld* const world);
-	void CaculateAABB(const ndWorld* const world);
+	void CaculateAabb(const ndWorld* const world);
 	void SortXdimension(const ndWorld* const world);
 	void CalculateScans(const ndWorld* const world);
 	void SortCellBuckects(const ndWorld* const world);
