@@ -25,7 +25,7 @@
 #include "ndProfiler.h"
 #include "ndThreadBackgroundWorker.h"
 
-//#define D_EXECUTE_IMMEDIATE
+#define D_EXECUTE_IMMEDIATE
 
 ndThreadBackgroundWorker::ndThreadBackgroundWorker()
 	:ndThread()

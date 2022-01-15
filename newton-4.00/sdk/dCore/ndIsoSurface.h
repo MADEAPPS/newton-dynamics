@@ -51,41 +51,37 @@ class ndIsoSurface: public ndClassAlloc
 
 	ndVector GetOrigin() const;
 	const ndArray<ndVector>& GetPoints() const;
-	const ndArray<ndVector>& GetNormals() const;
-	const ndArray<ndInt32>& GetTriangles() const;
+
 	D_CORE_API void GenerateMesh(const ndArray<ndVector>& pointCloud, ndFloat32 gridSize, ndCalculateIsoValue* const computeIsoValue = nullptr);
+	D_CORE_API ndInt32 GenerateListIndexList(ndInt32 * const indexList, ndInt32 strideInFloat32, ndFloat32* const posit, ndFloat32* const normals) const;
 
 	private:
 	ndImplementation& GetImplementation() const;
 
 	ndVector m_origin;
 	ndArray<ndVector> m_points;
-	ndArray<ndVector> m_normals;
-	ndArray<ndInt32> m_triangles;
+	ndFloat32 m_gridSize;
+	ndInt32 m_volumeSizeX;
+	ndInt32 m_volumeSizeY;
+	ndInt32 m_volumeSizeZ;
+	bool m_isLowRes;
 	friend class ndImplementation;
 };
 
 inline ndIsoSurface::ndIsoSurface()
 	:m_origin(ndVector::m_zero)
 	,m_points(1024)
-	,m_normals(1024)
-	,m_triangles(1024)
+	,m_gridSize(ndFloat32 (1.0f))
+	,m_volumeSizeX(1)
+	,m_volumeSizeY(1)
+	,m_volumeSizeZ(1)
+	,m_isLowRes(true)
 {
 }
 
 inline const ndArray<ndVector>& ndIsoSurface::GetPoints() const
 {
 	return m_points;
-}
-
-inline const ndArray<ndVector>& ndIsoSurface::GetNormals() const
-{
-	return m_normals;
-}
-
-inline const ndArray<ndInt32>& ndIsoSurface::GetTriangles() const
-{
-	return m_triangles;
 }
 
 inline ndVector ndIsoSurface::GetOrigin() const

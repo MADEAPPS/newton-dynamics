@@ -28,12 +28,12 @@
 	//#define D_DEBUG_SOLVER
 #endif
 
-#define D_USE_SMALL_HASH
+#define D_USE_SPH_SMALL_HASH
 
-#ifdef D_USE_SMALL_HASH
-	#define D_RADIX_DIGIT_SIZE	7
+#ifdef D_USE_SPH_SMALL_HASH
+	#define D_SPH_HASH_BITS	7
 #else
-	#define D_RADIX_DIGIT_SIZE	10
+	#define D_SPH_HASH_BITS	10
 #endif
 
 class ndBodySphFluid::ndGridHash
@@ -59,8 +59,8 @@ class ndBodySphFluid::ndGridHash
 	{
 		dAssert(grid.m_y >= ndFloat32(0.0f));
 		dAssert(grid.m_z >= ndFloat32(0.0f));
-		dAssert(grid.m_y < ndFloat32(1 << (D_RADIX_DIGIT_SIZE * 2)));
-		dAssert(grid.m_z < ndFloat32(1 << (D_RADIX_DIGIT_SIZE * 2)));
+		dAssert(grid.m_y < ndFloat32(1 << (D_SPH_HASH_BITS * 2)));
+		dAssert(grid.m_z < ndFloat32(1 << (D_SPH_HASH_BITS * 2)));
 
 		ndVector hash(grid.GetInt());
 
@@ -73,40 +73,40 @@ class ndBodySphFluid::ndGridHash
 		m_particleIndex = particleIndex;
 	}
 
-#ifdef D_USE_SMALL_HASH
+#ifdef D_USE_SPH_SMALL_HASH
 	union
 	{
 		struct
 		{
-			ndUnsigned64 m_y : D_RADIX_DIGIT_SIZE * 2;
-			ndUnsigned64 m_z : D_RADIX_DIGIT_SIZE * 2;
+			ndUnsigned64 m_y : D_SPH_HASH_BITS * 2;
+			ndUnsigned64 m_z : D_SPH_HASH_BITS * 2;
 			ndUnsigned64 m_particleIndex : 20;
 			ndUnsigned64 m_cellType : 1;
 			ndUnsigned64 m_cellIsPadd : 1;
 		};
 		struct
 		{
-			ndUnsigned64 m_yLow : D_RADIX_DIGIT_SIZE;
-			ndUnsigned64 m_yHigh : D_RADIX_DIGIT_SIZE;
-			ndUnsigned64 m_zLow : D_RADIX_DIGIT_SIZE;
-			ndUnsigned64 m_zHigh : D_RADIX_DIGIT_SIZE;
+			ndUnsigned64 m_yLow : D_SPH_HASH_BITS;
+			ndUnsigned64 m_yHigh : D_SPH_HASH_BITS;
+			ndUnsigned64 m_zLow : D_SPH_HASH_BITS;
+			ndUnsigned64 m_zHigh : D_SPH_HASH_BITS;
 		};
-		ndUnsigned64 m_gridHash : D_RADIX_DIGIT_SIZE * 2 * 2;
+		ndUnsigned64 m_gridHash : D_SPH_HASH_BITS * 2 * 2;
 	};
 #else
 	union
 	{
 		struct
 		{
-			ndUnsigned64 m_y : D_RADIX_DIGIT_SIZE * 2;
-			ndUnsigned64 m_z : D_RADIX_DIGIT_SIZE * 2;
+			ndUnsigned64 m_y : D_SPH_HASH_BITS * 2;
+			ndUnsigned64 m_z : D_SPH_HASH_BITS * 2;
 		};
 		struct
 		{
-			ndUnsigned64 m_yLow : D_RADIX_DIGIT_SIZE;
-			ndUnsigned64 m_yHigh : D_RADIX_DIGIT_SIZE;
-			ndUnsigned64 m_zLow : D_RADIX_DIGIT_SIZE;
-			ndUnsigned64 m_zHigh : D_RADIX_DIGIT_SIZE;
+			ndUnsigned64 m_yLow : D_SPH_HASH_BITS;
+			ndUnsigned64 m_yHigh : D_SPH_HASH_BITS;
+			ndUnsigned64 m_zLow : D_SPH_HASH_BITS;
+			ndUnsigned64 m_zHigh : D_SPH_HASH_BITS;
 		};
 		ndUnsigned64 m_gridHash;
 	};
@@ -474,16 +474,16 @@ void ndBodySphFluid::SortCellBuckects(const ndWorld* const world)
 	ndScene* const scene = world->GetScene();
 
 	ndVector boxSize((m_box1 - m_box0).Scale(ndFloat32(1.0f) / GetSphGridSize()).GetInt());
-	ndCountingSort<ndGridHash, ndKey_ylow, D_RADIX_DIGIT_SIZE>(*scene, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
-	if (boxSize.m_iy > (1 << D_RADIX_DIGIT_SIZE))
+	ndCountingSort<ndGridHash, ndKey_ylow, D_SPH_HASH_BITS>(*scene, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
+	if (boxSize.m_iy > (1 << D_SPH_HASH_BITS))
 	{
-		ndCountingSort<ndGridHash, ndKey_yhigh, D_RADIX_DIGIT_SIZE>(*scene, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
+		ndCountingSort<ndGridHash, ndKey_yhigh, D_SPH_HASH_BITS>(*scene, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
 	}
 	
-	ndCountingSort<ndGridHash, ndKey_zlow, D_RADIX_DIGIT_SIZE>(*scene, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
-	if (boxSize.m_iz > (1 << D_RADIX_DIGIT_SIZE))
+	ndCountingSort<ndGridHash, ndKey_zlow, D_SPH_HASH_BITS>(*scene, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
+	if (boxSize.m_iz > (1 << D_SPH_HASH_BITS))
 	{
-		ndCountingSort<ndGridHash, ndKey_zhigh, D_RADIX_DIGIT_SIZE>(*scene, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
+		ndCountingSort<ndGridHash, ndKey_zhigh, D_SPH_HASH_BITS>(*scene, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
 	}
 }
 
@@ -695,13 +695,14 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			ndWorkingData& data = fluid->WorkingData();
 			ndGridHash* const dst = &data.m_hashGridMapScratchBuffer[0];
 
-			//const ndFloat32 radius = fluid->m_radius;
 			const ndFloat32 gridSize = fluid->GetSphGridSize();
-			const ndFloat32 radius = fluid->GetSphGridSize() * ndFloat32(0.5f * 0.99f);
 			const ndVector origin(fluid->m_box0);
+			// the 0.99 factor is to make sure the box 
+			// fits in not more than two adjacent grids.
+			const ndVector box(gridSize * ndFloat32(0.5f * 0.99f));
 			const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
 			const ndVector* const posit = &fluid->m_posit[0];
-			const ndVector box(radius);
+			
 			const ndGridNeighborInfo& gridNeighborInfo = context->m_neighbors;
 
 			#ifdef D_USE_PARALLEL_CLASSIFY
@@ -1273,6 +1274,7 @@ void ndBodySphFluid::IntegrateParticles(const ndWorld* const world, ndFloat32 ti
 
 void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
 {
+return;
 	// do the scene management 
 	CaculateAabb(world);
 	CreateGrids(world);

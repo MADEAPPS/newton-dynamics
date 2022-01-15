@@ -35,35 +35,86 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundJob
 		SetGravity(ndVector(ndFloat32(0.0f), DEMO_GRAVITY, ndFloat32(0.0f), ndFloat32(0.0f)));
 	}
 
+	void BuildTriangleList()
+	{
+		D_TRACKTIME();
+		const ndArray<ndVector>& points = m_isoSurface.GetPoints();
+		dAssert(points.GetCount());
+
+		m_points.SetCount(points.GetCount());
+		m_indexList.SetCount(points.GetCount());
+
+		const ndVector origin(m_isoSurface.GetOrigin());
+		for (ndInt32 i = 0; i < points.GetCount(); i += 3)
+		{
+			const ndVector p0(origin + points[i + 0]);
+			const ndVector p1(origin + points[i + 1]);
+			const ndVector p2(origin + points[i + 2]);
+
+			const ndVector vec1(p1 - p0);
+			const ndVector vec2(p2 - p0);
+			const ndVector cross(vec1.CrossProduct(vec2));
+			//const ndVector normal(cross * cross.InvMagSqrt());
+			const ndVector normal(cross.Normalize());
+
+			m_points[i + 0].m_posit = glVector3(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+			m_points[i + 1].m_posit = glVector3(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+			m_points[i + 2].m_posit = glVector3(GLfloat(p2.m_x), GLfloat(p2.m_y), GLfloat(p2.m_z));
+
+			m_points[i + 0].m_normal = glVector3(GLfloat(normal.m_x), GLfloat(normal.m_y), GLfloat(normal.m_z));
+			m_points[i + 1].m_normal = glVector3(GLfloat(normal.m_x), GLfloat(normal.m_y), GLfloat(normal.m_z));
+			m_points[i + 2].m_normal = glVector3(GLfloat(normal.m_x), GLfloat(normal.m_y), GLfloat(normal.m_z));
+
+			m_points[i + 0].m_uv.m_u = GLfloat(0.0f);
+			m_points[i + 0].m_uv.m_v = GLfloat(0.0f);
+			m_points[i + 1].m_uv.m_u = GLfloat(0.0f);
+			m_points[i + 1].m_uv.m_v = GLfloat(0.0f);
+			m_points[i + 2].m_uv.m_u = GLfloat(0.0f);
+			m_points[i + 2].m_uv.m_v = GLfloat(0.0f);
+
+			m_indexList[i + 0] = i + 0;
+			m_indexList[i + 1] = i + 1;
+			m_indexList[i + 2] = i + 2;
+		}
+	}
+
+	void BuildIndexList()
+	{
+		D_TRACKTIME();
+		const ndArray<ndVector>& points = m_isoSurface.GetPoints();
+		dAssert(points.GetCount());
+
+		m_points.SetCount(points.GetCount() * 3);
+		m_indexList.SetCount(points.GetCount() * 3);
+
+		ndFloat32* const posit = &m_points[0].m_posit.m_x;
+		ndFloat32* const normal = &m_points[0].m_normal.m_x;
+		ndInt32 pointCount = m_isoSurface.GenerateListIndexList(&m_indexList[0], sizeof (glPositionNormalUV)/sizeof (GLfloat), posit, normal);
+
+		const ndVector origin(m_isoSurface.GetOrigin());
+		for (ndInt32 i = 0; i < pointCount; ++i)
+		{
+			m_points[i].m_posit.m_x += GLfloat(origin.m_x);
+			m_points[i].m_posit.m_y += GLfloat(origin.m_y);
+			m_points[i].m_posit.m_z += GLfloat(origin.m_z);
+			m_points[i].m_uv.m_u = GLfloat(0.0f);
+			m_points[i].m_uv.m_v = GLfloat(0.0f);
+		}
+	}
+
 	void UpdateIsoSurface()
 	{
 		D_TRACKTIME();
 		ndArray<ndVector>& pointCloud = GetPositions();
-		//ndFloat32 gridSpacing = GetParticleRadius() * ndFloat32(2.0f);
 		ndFloat32 gridSpacing = GetSphGridSize();
+		//gridSpacing *= 1.0f;
 		m_isoSurface.GenerateMesh(pointCloud, gridSpacing);
 
-		const ndArray<ndVector>& points = m_isoSurface.GetPoints();
-		const ndArray<ndVector>& normals = m_isoSurface.GetNormals();
-		dAssert(points.GetCount());
-		m_points.SetCount(points.GetCount());
-
-		const ndVector origin(m_isoSurface.GetOrigin());
-		for (ndInt32 i = 0; i < points.GetCount(); ++i)
-		{
-			const ndVector p(origin + points[i]);
-			m_points[i].m_posit = glVector3(GLfloat(p.m_x), GLfloat(p.m_y), GLfloat(p.m_z));
-			m_points[i].m_normal = glVector3(GLfloat(normals[i].m_x), GLfloat(normals[i].m_y), GLfloat(normals[i].m_z));
-			m_points[i].m_uv.m_u = GLfloat(0.0f);
-			m_points[i].m_uv.m_v = GLfloat(0.0f);
-		}
-		
-		const ndArray<ndInt32>& indexList = m_isoSurface.GetTriangles();
-		m_indexList.SetCount(indexList.GetCount());
-		for (ndInt32 i = 0; i < indexList.GetCount(); ++i)
-		{
-			m_indexList[i] = indexList[i];
-		}
+#if 1
+		BuildIndexList();
+#else
+		BuildTriangleList();
+#endif
 		m_meshIsReady.store(1);
 	}
 		
@@ -176,11 +227,14 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		// render the fluid;
 		ndScopeSpinLock lock(m_lock);
 
+#if 1
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		//m_isoSurfaceMesh0->Render(scene, nodeMatrix);
+		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
+#else
 		RenderParticles(scene);
+#endif
+		//RenderParticles(scene);
 		
 		// render the cage;
 		//ndDemoEntity::Render(timeStep, scene, matrix);
@@ -207,7 +261,7 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 		if (entity->m_fluidBody->JobState() == ndBackgroundJob::m_jobCompleted)
 		{
 			ndPhysicsWorld* const world = m_manager->GetWorld();
-			//world->SendBackgroundJob(entity->m_fluidBody);
+			world->SendBackgroundJob(entity->m_fluidBody);
 		}
 	}
 };
@@ -226,6 +280,10 @@ static void BuildBox(const ndMatrix& matrix, ndIsoSurfaceParticleVolume* const s
 			for (ndInt32 x = 0; x < size; x++)
 			{
 				ndVector p(matrix.TransformVector(ndVector(x * spacing, y * spacing, z * spacing, ndFloat32(1.0f))));
+				p.m_x = spacing * int(p.m_x / spacing);
+				p.m_y = spacing * int(p.m_y / spacing);
+				p.m_z = spacing * int(p.m_z / spacing);
+
 				p.m_x += dGaussianRandom(spacing * 0.01f);
 				p.m_y += dGaussianRandom(spacing * 0.01f);
 				p.m_z += dGaussianRandom(spacing * 0.01f);
@@ -315,9 +373,10 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	fluidObject->SetParticleRadius(diameter * 0.5f);
 
 	//ndInt32 particleCountPerAxis = 64;
-	ndInt32 particleCountPerAxis = 40;
+	//ndInt32 particleCountPerAxis = 40;
 	//ndInt32 particleCountPerAxis = 32;
 	//ndInt32 particleCountPerAxis = 10;
+	ndInt32 particleCountPerAxis = 40;
 	ndFloat32 spacing = diameter;
 
 	ndFloat32 offset = spacing * particleCountPerAxis / 2.0f;
@@ -351,6 +410,6 @@ void ndBasicParticleFluid (ndDemoEntityManager* const scene)
 	AddWaterVolume(scene, location);
 
 	ndQuaternion rot;
-	ndVector origin(-5.0f, 2.0f, 0.0f, 0.0f);
+	ndVector origin(-5.0f, 3.0f, 3.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
