@@ -229,6 +229,7 @@ class ndBodySphFluid::ndWorkingData
 
 ndBodySphFluid::ndBodySphFluid()
 	:ndBodyParticleSet()
+	,ndBackgroundJob()
 	,m_mass(ndFloat32(0.02f))
 	,m_viscosity(ndFloat32 (1.05f))
 	,m_restDensity(ndFloat32(1000.0f))
@@ -238,6 +239,7 @@ ndBodySphFluid::ndBodySphFluid()
 
 ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndBodyParticleSet(desc)
+	,ndBackgroundJob()
 	,m_mass(ndFloat32(0.02f))
 	,m_viscosity(ndFloat32(1.0f))
 	,m_restDensity(ndFloat32(1000.0f))
@@ -1287,21 +1289,10 @@ void ndBodySphFluid::Execute()
 
 void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
 {
-	//if (m_updateAsync)
 	m_timestep = timestep;
-	if (m_updateAsync)
-	{ 
-		if (JobState() == ndBackgroundJob::m_jobCompleted)
-		{
-			ndScene* const scene = world->GetScene();
-			scene->SendBackgroundJob(this);
-		}
-	}
-	else
+	if (JobState() == ndBackgroundJob::m_jobCompleted)
 	{
-		// this is not working yet
-		//ndScene* const scene = world->GetScene();
-		//SetThreadPool(scene);
-		//Execute();
+		ndScene* const scene = world->GetScene();
+		scene->SendBackgroundJob(this);
 	}
 }

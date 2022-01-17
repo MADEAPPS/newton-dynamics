@@ -26,7 +26,6 @@
 
 ndBodyParticleSet::ndBodyParticleSet()
 	:ndBody()
-	,ndBackgroundJob()
 	,m_box0(ndFloat32(-1e10f))
 	,m_box1(ndFloat32(1e10f))
 	,m_gravity(ndVector::m_zero)
@@ -34,13 +33,11 @@ ndBodyParticleSet::ndBodyParticleSet()
 	,m_veloc(1024)
 	,m_listNode(nullptr)
 	,m_radius(ndFloat32 (1.0f))
-	,m_updateAsync(true)
 {
 }
 
 ndBodyParticleSet::ndBodyParticleSet(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndBody(desc)
-	,ndBackgroundJob()
 	,m_box0(ndFloat32(-1e10f))
 	,m_box1(ndFloat32(1e10f))
 	,m_gravity(ndVector::m_zero)
@@ -48,7 +45,6 @@ ndBodyParticleSet::ndBodyParticleSet(const ndLoadSaveBase::ndLoadDescriptor& des
 	,m_veloc(1024)
 	,m_listNode(nullptr)
 	,m_radius(ndFloat32(1.0f))
-	,m_updateAsync(true)
 {
 	//xmlNode->FirstChild("ndBodyKinematic"), shapesCache
 	// nothing was saved

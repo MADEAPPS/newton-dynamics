@@ -55,7 +55,6 @@ class ndBackgroundJob
 	{
 	}
 
-
 	ndThreadBackgroundWorker* GetThreadPool() const
 	{
 		return m_threaPool;

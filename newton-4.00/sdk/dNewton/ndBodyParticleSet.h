@@ -26,7 +26,7 @@
 #include "ndBodyParticleSetList.h"
 
 D_MSV_NEWTON_ALIGN_32
-class ndBodyParticleSet: public ndBody, public ndBackgroundJob
+class ndBodyParticleSet: public ndBody
 {
 	public:
 	D_NEWTON_API ndBodyParticleSet();
@@ -56,7 +56,6 @@ class ndBodyParticleSet: public ndBody, public ndBackgroundJob
 	ndArray<ndVector> m_veloc;
 	ndBodyParticleSetList::ndNode* m_listNode;
 	ndFloat32 m_radius;
-	bool m_updateAsync;
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32 ;
 

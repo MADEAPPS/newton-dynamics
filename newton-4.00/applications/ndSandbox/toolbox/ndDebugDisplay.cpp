@@ -353,29 +353,40 @@ void RenderParticles(ndDemoEntityManager* const scene)
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	ndFloat32 pizelSize = 8.0f / viewport[2];
 
-	glVector3 pointBuffer[4];
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(3, GL_FLOAT, sizeof(glVector3), pointBuffer);
+	//glVector3 pointBuffer[4];
+	static ndArray<glVector3> pointBuffer;
 
 	const ndBodyParticleSetList& particles = world->GetParticleList();
 	for (ndBodyParticleSetList::ndNode* particleNode = particles.GetFirst(); particleNode; particleNode = particleNode->GetNext())
 	{
 		ndBodyParticleSet* const particle = particleNode->GetInfo();
 		const ndArray<ndVector>& positions = particle->GetPositions();
-		for (ndInt32 i = 0; i < positions.GetCount(); i ++)
-		{
-			ndVector particlePosit(positions[i]);
-			particlePosit.m_w = 1.0f;
-			ndVector point(viewProjectionMatrix.TransformVector1x4(particlePosit));
-			ndFloat32 zDist = point.m_w;
-			point = point.Scale(1.0f / zDist);
 
-			pointBuffer[0] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, pizelSize, zDist);
-			pointBuffer[1] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, -pizelSize, zDist);
-			pointBuffer[2] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, pizelSize, zDist);
-			pointBuffer[3] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, -pizelSize, zDist);
-			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		pointBuffer.SetCount(6 * positions.GetCount());
+		glEnableClientState(GL_VERTEX_ARRAY);
+		//glVertexPointer(3, GL_FLOAT, sizeof(glVector3), &pointBuffer[0]);
+		glVertexPointer(3, GL_FLOAT, 0, &pointBuffer[0]);
+
+		{
+			//D_TRACKTIME();
+			for (ndInt32 i = 0; i < positions.GetCount(); i++)
+			{
+				ndVector particlePosit(positions[i]);
+				particlePosit.m_w = 1.0f;
+				ndVector point(viewProjectionMatrix.TransformVector1x4(particlePosit));
+				ndFloat32 zDist = point.m_w;
+				point = point.Scale(1.0f / zDist);
+
+				ndInt32 j = i * 6;
+				pointBuffer[j + 0] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, pizelSize, zDist);
+				pointBuffer[j + 1] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, -pizelSize, zDist);
+				pointBuffer[j + 2] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, pizelSize, zDist);
+				pointBuffer[j + 3] = pointBuffer[j + 2];
+				pointBuffer[j + 4] = pointBuffer[j + 1];
+				pointBuffer[j + 5] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, -pizelSize, zDist);
+			}
 		}
+		glDrawArrays(GL_TRIANGLES, 0, pointBuffer.GetCount());
 	}
 
 	glUseProgram(0);
