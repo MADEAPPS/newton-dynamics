@@ -454,12 +454,13 @@ const char* ndDynamicsUpdateAvx2::GetStringId() const
 void ndDynamicsUpdateAvx2::DetermineSleepStates()
 {
 	D_TRACKTIME();
-	class ndDetermineSleepStates : public ndScene::ndBaseJob
+	class ndDetermineSleepStates : public ndThreadPoolJob
 	{
 		public:
 		void UpdateIslandState(const ndIsland& island)
 		{
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndFloat32 velocityDragCoeff = D_FREEZZING_VELOCITY_DRAG;
 
 			const ndInt32 count = island.m_count;
@@ -629,7 +630,7 @@ void ndDynamicsUpdateAvx2::DetermineSleepStates()
 							body->m_equilibrium = 0;
 						}
 					}
-					ndInt32 timeScaleSleepCount = ndInt32(ndFloat32(60.0f) * sleepCounter * m_timestep);
+					ndInt32 timeScaleSleepCount = ndInt32(ndFloat32(60.0f) * sleepCounter * scene->GetTimestep());
 
 					ndInt32 sleepIndex = D_SLEEP_ENTRIES;
 					for (ndInt32 i = 1; i < D_SLEEP_ENTRIES; ++i)
@@ -671,12 +672,13 @@ void ndDynamicsUpdateAvx2::DetermineSleepStates()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			const ndArray<ndIsland>& islandArray = me->GetIslands();
 
 			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
+			const ndInt32 threadCount = GetThreadCount();
 			const ndInt32 islandCount = islandArray.GetCount();
 
 			m_zero = ndVector::m_zero;
@@ -706,12 +708,13 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		ndInt32 m_soaJointRowCount;
 	};
 
-	class ndSetRowStarts : public ndScene::ndBaseJob
+	class ndSetRowStarts : public ndThreadPoolJob
 	{
 		public:
 		void SetRowsCount()
 		{
-			ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 			const ndInt32 count = jointArray.GetCount();
 
 			ndInt32 rowCount = 1;
@@ -721,15 +724,16 @@ void ndDynamicsUpdateAvx2::SortJoints()
 				joint->m_rowStart = rowCount;
 				rowCount += joint->m_rowCount;
 			}
-			ndRowsCount* const counters = (ndRowsCount*)m_context;
+			ndRowsCount* const counters = (ndRowsCount*)GetContext();
 			counters->m_rowsCount = rowCount;
 		}
 
 		void SetSoaRowsCount()
 		{
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
+			ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 
 			ndInt32 soaJointRowCount = 0;
 			ndArray<ndInt32>& soaJointRows = me->m_avxJointRows;
@@ -741,7 +745,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 				soaJointRowCount += joint->m_rowCount;
 			}
 
-			ndRowsCount* const counters = (ndRowsCount*)m_context;
+			ndRowsCount* const counters = (ndRowsCount*)GetContext();
 			counters->m_soaJointRowCount = soaJointRowCount;
 		}
 
@@ -749,7 +753,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		{
 			D_TRACKTIME();
 			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
+			const ndInt32 threadCount = GetThreadCount();
 
 			if (threadCount == 1)
 			{
@@ -1012,20 +1016,21 @@ void ndDynamicsUpdateAvx2::BuildIsland()
 
 void ndDynamicsUpdateAvx2::IntegrateUnconstrainedBodies()
 {
-	class ndIntegrateUnconstrainedBodies : public ndScene::ndBaseJob
+	class ndIntegrateUnconstrainedBodies : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdateSoa* const me = (ndDynamicsUpdateSoa*)world->m_solver;
 			ndArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
 
-			const ndFloat32 timestep = m_timestep;
+			const ndFloat32 timestep = scene->GetTimestep();
 			const ndInt32 base = bodyArray.GetCount() - me->GetUnconstrainedBodyCount();
 
-			const ndStartEnd startEnd(me->GetUnconstrainedBodyCount(), GetThreadId(), m_owner->GetThreadCount());
+			const ndStartEnd startEnd(me->GetUnconstrainedBodyCount(), GetThreadId(), GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBodyKinematic* const body = bodyArray[base + i];
@@ -1048,20 +1053,21 @@ void ndDynamicsUpdateAvx2::IntegrateUnconstrainedBodies()
 void ndDynamicsUpdateAvx2::IntegrateBodies()
 {
 	D_TRACKTIME();
-	class ndIntegrateBodies : public ndScene::ndBaseJob
+	class ndIntegrateBodies : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			ndArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
 
 			const ndVector invTime(me->m_invTimestep);
-			const ndFloat32 timestep = m_timestep;
+			const ndFloat32 timestep = scene->GetTimestep();
 
-			const ndStartEnd startEnd(bodyArray.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			const ndStartEnd startEnd(bodyArray.GetCount(), GetThreadId(), GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBodyKinematic* const body = bodyArray[i];
@@ -1082,22 +1088,23 @@ void ndDynamicsUpdateAvx2::IntegrateBodies()
 void ndDynamicsUpdateAvx2::InitWeights()
 {
 	D_TRACKTIME();
-	class ndInitWeights : public ndScene::ndBaseJob
+	class ndInitWeights : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
 
-			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
 			const ndArray<ndInt32>& jointForceIndexBuffer = me->GetJointForceIndexBuffer();
 			const ndArray<ndJointBodyPairIndex>& jointBodyPairIndex = me->GetJointBodyPairIndexBuffer();
 
 			ndInt32 maxExtraPasses = 1;
 
-			const ndStartEnd startEnd(jointForceIndexBuffer.GetCount() - 1, GetThreadId(), m_owner->GetThreadCount());
+			const ndStartEnd startEnd(jointForceIndexBuffer.GetCount() - 1, GetThreadId(), GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				const ndInt32 index = jointForceIndexBuffer[i];
@@ -1115,7 +1122,7 @@ void ndDynamicsUpdateAvx2::InitWeights()
 				}
 				maxExtraPasses = dMax(weigh, maxExtraPasses);
 			}
-			ndInt32* const extraPasses = (ndInt32*)m_context;
+			ndInt32* const extraPasses = (ndInt32*)GetContext();
 			extraPasses[GetThreadId()] = maxExtraPasses;
 		}
 	};
@@ -1147,19 +1154,20 @@ void ndDynamicsUpdateAvx2::InitWeights()
 void ndDynamicsUpdateAvx2::InitBodyArray()
 {
 	D_TRACKTIME();
-	class ndInitBodyArray : public ndScene::ndBaseJob
+	class ndInitBodyArray : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			ndArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
 
-			const ndFloat32 timestep = m_timestep;
+			const ndFloat32 timestep = scene->GetTimestep();
 
-			const ndStartEnd startEnd(bodyArray.GetCount() - me->GetUnconstrainedBodyCount(), GetThreadId(), m_owner->GetThreadCount());
+			const ndStartEnd startEnd(bodyArray.GetCount() - me->GetUnconstrainedBodyCount(), GetThreadId(), GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBodyKinematic* const body = bodyArray[i];
@@ -1282,7 +1290,7 @@ void ndDynamicsUpdateAvx2::GetJacobianDerivatives(ndConstraint* const joint)
 
 void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 {
-	class ndInitJacobianMatrix : public ndScene::ndBaseJob
+	class ndInitJacobianMatrix : public ndThreadPoolJob
 	{
 		public:
 		void BuildJacobianMatrix(ndConstraint* const joint, ndInt32 jointIndex)
@@ -1405,17 +1413,18 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			m_leftHandSide = &me->GetLeftHandSide()[0];
 			m_rightHandSide = &me->GetRightHandSide()[0];
 			m_internalForces = (ndAvxFloat*)&me->GetTempInternalForces()[0];
 			m_jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
-			ndConstraint** const jointArray = &m_owner->GetActiveContactArray()[0];
+			ndConstraint** const jointArray = &scene->GetActiveContactArray()[0];
 
 			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndInt32 jointCount = m_owner->GetActiveContactArray().GetCount();
+			const ndInt32 threadCount = GetThreadCount();
+			const ndInt32 jointCount = scene->GetActiveContactArray().GetCount();
 
 			for (ndInt32 i = threadIndex; i < jointCount; i += threadCount)
 			{
@@ -1431,16 +1440,17 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 		const ndJointBodyPairIndex* m_jointBodyPairIndexBuffer;
 	};
 
-	class ndTransposeMassMatrix : public ndScene::ndBaseJob
+	class ndTransposeMassMatrix : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			ndConstraint** const jointArray = &m_owner->GetActiveContactArray()[0];
-			const ndInt32 jointCount = m_owner->GetActiveContactArray().GetCount();
+			ndConstraint** const jointArray = &scene->GetActiveContactArray()[0];
+			const ndInt32 jointCount = scene->GetActiveContactArray().GetCount();
 
 			const ndLeftHandSide* const leftHandSide = &me->GetLeftHandSide()[0];
 			const ndRightHandSide* const rightHandSide = &me->GetRightHandSide()[0];
@@ -1456,7 +1466,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 			const ndInt32* const soaJointRows = &me->m_avxJointRows[0];
 
 			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
+			const ndInt32 threadCount = GetThreadCount();
 			for (ndInt32 i = threadIndex; i < soaJointCount; i += threadCount)
 			{
 				const ndInt32 index = i * D_AVX_WORK_GROUP;
@@ -1744,24 +1754,25 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 		}
 	};
 
-	class ndInitJacobianAccumulatePartialForces : public ndScene::ndBaseJob
+	class ndInitJacobianAccumulatePartialForces : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
 			const ndAvxFloat zero(ndAvxFloat::m_zero);
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
 
 			const ndArray<ndInt32>& bodyIndex = me->GetJointForceIndexBuffer();
-			ndBodyKinematic** const bodyArray = &m_owner->GetActiveBodyArray()[0];
+			ndBodyKinematic** const bodyArray = &scene->GetActiveBodyArray()[0];
 			ndAvxFloat* const internalForces = (ndAvxFloat*)&me->GetInternalForces()[0];
 
 			const ndAvxFloat* const jointInternalForces = (ndAvxFloat*)&me->GetTempInternalForces()[0];
 			const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 
-			const ndStartEnd startEnd(bodyIndex.GetCount() - 1, GetThreadId(), m_owner->GetThreadCount());
+			const ndStartEnd startEnd(bodyIndex.GetCount() - 1, GetThreadId(), GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndAvxFloat force(ndAvxFloat::m_zero);
@@ -1799,19 +1810,20 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 void ndDynamicsUpdateAvx2::UpdateForceFeedback()
 {
 	D_TRACKTIME();
-	class ndUpdateForceFeedback : public ndScene::ndBaseJob
+	class ndUpdateForceFeedback : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			const ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
+			const ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 			ndArray<ndRightHandSide>& rightHandSide = me->m_rightHandSide;
 
 			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
+			const ndInt32 threadCount = GetThreadCount();
 			const ndInt32 jointCount = jointArray.GetCount();
 
 			ndAvxFloat zero(ndFloat32(0.0f));
@@ -1862,14 +1874,15 @@ void ndDynamicsUpdateAvx2::InitSkeletons()
 {
 	D_TRACKTIME();
 
-	class ndInitSkeletons : public ndScene::ndBaseJob
+	class ndInitSkeletons : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			const ndInt32 threadIndex = GetThreadId();
-			ndWorld* const world = m_owner->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			ndSkeletonList::ndNode* node = world->GetSkeletonList().GetFirst();
 			for (ndInt32 i = 0; i < threadIndex; ++i)
@@ -1880,7 +1893,7 @@ void ndDynamicsUpdateAvx2::InitSkeletons()
 			ndArray<ndRightHandSide>& rightHandSide = me->m_rightHandSide;
 			const ndArray<ndLeftHandSide>& leftHandSide = me->m_leftHandSide;
 
-			const ndInt32 threadCount = m_owner->GetThreadCount();
+			const ndInt32 threadCount = GetThreadCount();
 			while (node)
 			{
 				ndSkeletonContainer* const skeleton = &node->GetInfo();
@@ -1901,14 +1914,15 @@ void ndDynamicsUpdateAvx2::InitSkeletons()
 void ndDynamicsUpdateAvx2::UpdateSkeletons()
 {
 	D_TRACKTIME();
-	class ndUpdateSkeletons : public ndScene::ndBaseJob
+	class ndUpdateSkeletons : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
+			ndScene* const scene = (ndScene*)GetThreadPool();
 			const ndInt32 threadIndex = GetThreadId();
-			ndWorld* const world = m_owner->GetWorld();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 			ndSkeletonList::ndNode* node = world->GetSkeletonList().GetFirst();
 			for (ndInt32 i = 0; i < threadIndex; ++i)
@@ -1917,10 +1931,10 @@ void ndDynamicsUpdateAvx2::UpdateSkeletons()
 			}
 
 			ndJacobian* const internalForces = &me->GetInternalForces()[0];
-			const ndArray<ndBodyKinematic*>& activeBodies = m_owner->ndScene::GetActiveBodyArray();
+			const ndArray<ndBodyKinematic*>& activeBodies = scene->GetActiveBodyArray();
 			const ndBodyKinematic** const bodyArray = (const ndBodyKinematic**)&activeBodies[0];
 
-			const ndInt32 threadCount = m_owner->GetThreadCount();
+			const ndInt32 threadCount = GetThreadCount();
 			while (node)
 			{
 				ndSkeletonContainer* const skeleton = &node->GetInfo();
@@ -1941,15 +1955,16 @@ void ndDynamicsUpdateAvx2::UpdateSkeletons()
 void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 {
 	D_TRACKTIME();
-	class ndCalculateJointsAcceleration : public ndScene::ndBaseJob
+	class ndCalculateJointsAcceleration : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			const ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
+			const ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 
 			ndJointAccelerationDecriptor joindDesc;
 			joindDesc.m_timestep = me->m_timestepRK;
@@ -1959,7 +1974,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 			ndArray<ndRightHandSide>& rightHandSide = me->m_rightHandSide;
 
 			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
+			const ndInt32 threadCount = GetThreadCount();
 			const ndInt32 jointCount = jointArray.GetCount();
 
 			for (ndInt32 i = threadIndex; i < jointCount; i += threadCount)
@@ -1974,19 +1989,20 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 		}
 	};
 
-	class ndUpdateAcceleration : public ndScene::ndBaseJob
+	class ndUpdateAcceleration : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			const ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
+			const ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 			const ndArray<ndRightHandSide>& rightHandSide = me->m_rightHandSide;
 
 			const ndInt32 threadIndex = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
+			const ndInt32 threadCount = GetThreadCount();
 			const ndInt32 jointCount = jointArray.GetCount();
 			const ndInt32 mask = -ndInt32(D_AVX_WORK_GROUP);
 			const ndInt32* const soaJointRows = &me->m_avxJointRows[0];
@@ -2047,13 +2063,14 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 void ndDynamicsUpdateAvx2::IntegrateBodiesVelocity()
 {
 	D_TRACKTIME();
-	class ndIntegrateBodiesVelocity : public ndScene::ndBaseJob
+	class ndIntegrateBodiesVelocity : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdate* const me = world->m_solver;
 			ndArray<ndBodyKinematic*>& bodyArray = me->GetBodyIslandOrder();
 			const ndArray<ndJacobian>& internalForces = me->GetInternalForces();
@@ -2061,7 +2078,7 @@ void ndDynamicsUpdateAvx2::IntegrateBodiesVelocity()
 			const ndVector timestep4(me->GetTimestepRK());
 			const ndVector speedFreeze2(world->m_freezeSpeed2 * ndFloat32(0.1f));
 
-			const ndStartEnd startEnd(bodyArray.GetCount() - me->GetUnconstrainedBodyCount(), GetThreadId(), m_owner->GetThreadCount());
+			const ndStartEnd startEnd(bodyArray.GetCount() - me->GetUnconstrainedBodyCount(), GetThreadId(), GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBodyKinematic* const body = bodyArray[i];
@@ -2102,7 +2119,7 @@ void ndDynamicsUpdateAvx2::IntegrateBodiesVelocity()
 void ndDynamicsUpdateAvx2::CalculateJointsForce()
 {
 	D_TRACKTIME();
-	class ndCalculateJointsForce : public ndScene::ndBaseJob
+	class ndCalculateJointsForce : public ndThreadPoolJob
 	{
 		public:
 		ndCalculateJointsForce()
@@ -2507,7 +2524,8 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
 
 			m_leftHandSide = &me->GetLeftHandSide()[0];
@@ -2515,7 +2533,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 			m_internalForces = &me->GetInternalForces()[0];
 			m_jointPartialForces = &me->GetTempInternalForces()[0];
 			m_jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
-			ndArray<ndConstraint*>& jointArray = m_owner->GetActiveContactArray();
+			ndArray<ndConstraint*>& jointArray = scene->GetActiveContactArray();
 
 			const ndInt32* const soaJointRows = &me->m_avxJointRows[0];
 			dAvxMatrixArray& soaMassMatrixArray = *me->m_avxMassMatrixArray;
@@ -2528,7 +2546,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 
 			const ndInt32 threadIndex = GetThreadId();
 			const ndInt32 jointCount = jointArray.GetCount();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
+			const ndInt32 threadCount = GetThreadCount();
 
 			const ndInt32 mask = -ndInt32(D_AVX_WORK_GROUP);
 			const ndInt32 soaJointCount = ((jointCount + D_AVX_WORK_GROUP - 1) & mask) / D_AVX_WORK_GROUP;
@@ -2551,23 +2569,24 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 		ndInt32 m_activeCount;
 	};
 
-	class ndApplyJacobianAccumulatePartialForces : public ndScene::ndBaseJob
+	class ndApplyJacobianAccumulatePartialForces : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
 			const ndAvxFloat zero(ndAvxFloat::m_zero);
-			ndWorld* const world = m_owner->GetWorld();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
 			ndDynamicsUpdate* const me = (ndDynamicsUpdate*)world->m_solver;
 
 			const ndInt32* const bodyIndex = &me->GetJointForceIndexBuffer()[0];
-			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+			const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 			ndAvxFloat* const internalForces = (ndAvxFloat*)&me->GetInternalForces()[0];
 			const ndAvxFloat* const jointInternalForces = (ndAvxFloat*)&me->GetTempInternalForces()[0];
 			const ndJointBodyPairIndex* const jointBodyPairIndexBuffer = &me->GetJointBodyPairIndexBuffer()[0];
 
-			const ndStartEnd startEnd(bodyArray.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			const ndStartEnd startEnd(bodyArray.GetCount(), GetThreadId(), GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndAvxFloat force(zero);

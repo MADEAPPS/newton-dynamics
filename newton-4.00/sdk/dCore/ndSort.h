@@ -190,7 +190,7 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		ndInt32 m_threadCount;
 	};
 
-	const ndInt32 threadCount = threadPool.GetCount();
+	const ndInt32 threadCount = threadPool.GetThreadCount();
 	ndInt32* const scans = dAlloca (ndInt32, threadCount * (1 << keyBitSize));
 	ndThreadPoolJob** const extJobPtr = dAlloca(ndThreadPoolJob*, threadCount);
 	ndCountKeys* const countKeyKernels = dAlloca(ndCountKeys, threadCount);
@@ -206,7 +206,7 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		countKeyKernels[i].m_threadCount = threadCount;
 		extJobPtr[i] = &countKeyKernels[i];
 	}
-	threadPool.ExecuteJobs(extJobPtr);
+	threadPool.ExecuteJobs(extJobPtr, nullptr);
 
 	ndInt32 bits = keyBitSize;
 	if (bits < 11)
@@ -240,7 +240,7 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		sortArray[i].m_threadCount = threadCount;
 		extJobPtr[i] = &sortArray[i];
 	}
-	threadPool.ExecuteJobs(extJobPtr);
+	threadPool.ExecuteJobs(extJobPtr, nullptr);
 
 	//#ifdef _DEBUG
 #if 0

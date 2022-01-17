@@ -26,7 +26,7 @@
 #include "ndBodyParticleSet.h"
 
 D_MSV_NEWTON_ALIGN_32
-class ndBodySphFluid: public ndBodyParticleSet
+class ndBodySphFluid: public ndBodyParticleSet, public ndBackgroundJob
 {
 	public:
 	D_NEWTON_API ndBodySphFluid();
@@ -50,6 +50,8 @@ class ndBodySphFluid: public ndBodyParticleSet
 	virtual ndBodySphFluid* GetAsBodySphFluid();
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
+	D_NEWTON_API void Execute();
+
 	protected:
 	D_NEWTON_API virtual void Update(const ndWorld* const world, ndFloat32 timestep);
 	virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const;
@@ -67,21 +69,22 @@ class ndBodySphFluid: public ndBodyParticleSet
 	class ndParticleKernelDistance;
 
 	ndWorkingData& WorkingData();
-	void SortGrids(const ndWorld* const world);
-	void BuildPairs(const ndWorld* const world);
-	void CreateGrids(const ndWorld* const world);
-	void CaculateAabb(const ndWorld* const world);
-	void SortXdimension(const ndWorld* const world);
-	void CalculateScans(const ndWorld* const world);
-	void SortCellBuckects(const ndWorld* const world);
-	void CalculateAccelerations(const ndWorld* const world);
-	void CalculateParticlesDensity(const ndWorld* const world);
-	void IntegrateParticles(const ndWorld* const world, ndFloat32 tiemstep);
+	void SortGrids();
+	void BuildPairs();
+	void CreateGrids();
+	void CaculateAabb();
+	void SortXdimension();
+	void CalculateScans();
+	void SortCellBuckects();
+	void CalculateAccelerations();
+	void CalculateParticlesDensity();
+	void IntegrateParticles();
 
 	ndFloat32 m_mass;
 	ndFloat32 m_viscosity;
 	ndFloat32 m_restDensity;
 	ndFloat32 m_gasConstant;
+	ndFloat32 m_timestep;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const ndFastRay&, const ndFloat32) const

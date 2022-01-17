@@ -25,17 +25,16 @@
 #include "ndProfiler.h"
 #include "ndThreadBackgroundWorker.h"
 
-#define D_EXECUTE_IMMEDIATE
+//#define D_EXECUTE_IMMEDIATE
 
 ndThreadBackgroundWorker::ndThreadBackgroundWorker()
-	:ndThread()
-	,ndList<ndBackgroundJob*, ndContainersFreeListAlloc<ndBackgroundJob*>>()
+	:ndList<ndBackgroundJob*, ndContainersFreeListAlloc<ndBackgroundJob*>>()
+	,ndThreadPool("backgroundWorkers")
 	,m_lock()
-	,m_queueSemaphore()
-	,m_teminate(false)
 	,m_inLoop(false)
+	,m_teminate(false)
+	,m_queueSemaphore()
 {
-	SetName("BackgroundWorker");
 	Signal();
 }
 
@@ -60,14 +59,17 @@ void ndThreadBackgroundWorker::Terminate()
 
 void ndThreadBackgroundWorker::SendJob(ndBackgroundJob* const job)
 {
-#ifdef D_EXECUTE_IMMEDIATE
+#if defined (D_EXECUTE_IMMEDIATE) || defined (D_USE_THREAD_EMULATION)
 	job->m_jobState = ndBackgroundJob::m_jobInProccess;
+	job->m_threaPool = this;
 	job->Execute();
+	job->m_threaPool = nullptr;
 	job->m_jobState = ndBackgroundJob::m_jobCompleted;
 #else
 	{
 		ndScopeSpinLock lock(m_lock);
-		job->m_jobState = ndBackgroundJob::m_jobInProccess;
+		job->m_threaPool = this;
+		job->m_jobState.store(ndBackgroundJob::m_jobInProccess);
 		Append(job);
 	}
 	m_queueSemaphore.Signal();
@@ -76,7 +78,7 @@ void ndThreadBackgroundWorker::SendJob(ndBackgroundJob* const job)
 
 void ndThreadBackgroundWorker::ThreadFunction()
 {
-	m_inLoop = true;
+	m_inLoop.store(true);
 	while (!m_queueSemaphore.Wait() && !m_teminate)
 	{
 		ndBackgroundJob* job;
@@ -86,8 +88,11 @@ void ndThreadBackgroundWorker::ThreadFunction()
 			job = node->GetInfo();
 			Remove(node);
 		}
+		Begin();
 		job->Execute();
-		job->m_jobState = ndBackgroundJob::m_jobCompleted;
+		End();
+		job->m_threaPool = nullptr;
+		job->m_jobState.store(ndBackgroundJob::m_jobCompleted);
 	}
-	m_inLoop = false;
+	m_inLoop.store(false);
 }

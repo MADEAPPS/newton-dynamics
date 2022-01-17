@@ -1265,23 +1265,24 @@ void ndScene::InitBodyArray()
 		ndInt32 m_scan[D_MAX_THREADS_COUNT][2];
 	};
 
-	class ndBuildBodyArray : public ndBaseJob
+	class ndBuildBodyArray : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndArray<ndBodyKinematic*>& activeBodyArray = m_owner->m_activeBodyArray;
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndArray<ndBodyKinematic*>& activeBodyArray = scene->m_activeBodyArray;
 
 			const ndInt32 threadIndex = GetThreadId();
-			const ndBodyListRun& run = m_owner->m_bodyListRuns[GetThreadId()];
+			const ndBodyListRun& run = scene->m_bodyListRuns[GetThreadId()];
 
-			ndBodyInfo& info = *((ndBodyInfo*)m_context);
+			ndBodyInfo& info = *((ndBodyInfo*)GetContext());
 			ndInt32* const scan = &info.m_scan[threadIndex][0];
 			scan[0] = 0;
 			scan[1] = 0;
 
-			const ndFloat32 timestep = m_timestep;
+			const ndFloat32 timestep = scene->m_timestep;
 			ndBodyList::ndNode* node = run.m_begin;
 			for (ndInt32 i = 0; i < run.m_count; ++i)
 			{
@@ -1291,8 +1292,8 @@ void ndScene::InitBodyArray()
 				bool inScene = true;
 				if (!body->GetSceneBodyNode())
 				{
-					ndScopeSpinLock lock(m_owner->m_lock);
-					inScene = m_owner->AddBody(body);
+					ndScopeSpinLock lock(scene->m_lock);
+					inScene = scene->AddBody(body);
 				}
 				dAssert(inScene && body->m_sceneNode);
 
@@ -1305,25 +1306,26 @@ void ndScene::InitBodyArray()
 				scan[key] ++;
 				if (!body->m_equilibrium)
 				{
-					m_owner->UpdateAabb(threadIndex, body);
+					scene->UpdateAabb(threadIndex, body);
 				}
 			}
 		}
 	};
 
-	class ndClassifyMovingBodies : public ndBaseJob
+	class ndClassifyMovingBodies : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const ndArray<ndBodyKinematic*>& activeBodyArray = m_owner->m_activeBodyArray;
-			ndBodyKinematic** const sceneBodyArray = &m_owner->m_sceneBodyArray[0];
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			const ndArray<ndBodyKinematic*>& activeBodyArray = scene->m_activeBodyArray;
+			ndBodyKinematic** const sceneBodyArray = &scene->m_sceneBodyArray[0];
 
 			const ndInt32 threadIndex = GetThreadId();
-			const ndBodyListRun& run = m_owner->m_bodyListRuns[GetThreadId()];
+			const ndBodyListRun& run = scene->m_bodyListRuns[GetThreadId()];
 
-			ndBodyInfo& info = *((ndBodyInfo*)m_context);
+			ndBodyInfo& info = *((ndBodyInfo*)GetContext());
 			ndInt32* const scan = &info.m_scan[threadIndex][0];
 
 			for (ndInt32 i = 0; i < run.m_count; ++i)
@@ -1421,15 +1423,16 @@ void ndScene::CalculateContacts()
 		ndInt32 m_digitScan[D_MAX_THREADS_COUNT][4];
 	};
 
-	class ndCalculateContacts : public ndBaseJob
+	class ndCalculateContacts : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndContactArray& activeContacts = m_owner->m_contactArray;
-			ndContactInfo& info = *((ndContactInfo*)m_context);
-			ndContact** const dstContacts = (ndContact**)&m_owner->m_scratchBuffer[0];
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndContactArray& activeContacts = scene->m_contactArray;
+			ndContactInfo& info = *((ndContactInfo*)GetContext());
+			ndContact** const dstContacts = (ndContact**)&scene->m_scratchBuffer[0];
 
 			const ndInt32 threadIndex = GetThreadId();
 			ndInt32* const scan = &info.m_digitScan[threadIndex][0];
@@ -1444,14 +1447,14 @@ void ndScene::CalculateContacts()
 			keyLookUp[2] = 2;
 			keyLookUp[3] = 2;
 
-			const ndStartEnd startEnd(activeContacts.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			const ndStartEnd startEnd(activeContacts.GetCount(), GetThreadId(), GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndContact* const contact = activeContacts[i]->GetAsContact();
 				dAssert(contact);
 				if (!contact->m_isDead)
 				{
-					m_owner->CalculateContacts(threadIndex, contact);
+					scene->CalculateContacts(threadIndex, contact);
 				}
 				dstContacts[i] = contact;
 				const ndInt32 entry = (!contact->IsActive() | !contact->m_maxDOF) + contact->m_isDead * 2;
@@ -1461,16 +1464,17 @@ void ndScene::CalculateContacts()
 		}
 	};
 
-	class ndCompactContacts : public ndBaseJob
+	class ndCompactContacts : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndContactInfo& info = *((ndContactInfo*)m_context);
-			ndContactArray& dstContacts = m_owner->m_contactArray;
-			ndContact** const srcContacts = (ndContact**)&m_owner->m_scratchBuffer[0];
-			ndArray<ndConstraint*>& activeConstraintArray = m_owner->m_activeConstraintArray;
+			ndContactInfo& info = *((ndContactInfo*)GetContext());
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndContactArray& dstContacts = scene->m_contactArray;
+			ndContact** const srcContacts = (ndContact**)&scene->m_scratchBuffer[0];
+			ndArray<ndConstraint*>& activeConstraintArray = scene->m_activeConstraintArray;
 			const ndInt32 threadIndex = GetThreadId();
 
 			ndInt32 keyLookUp[4];
@@ -1480,7 +1484,7 @@ void ndScene::CalculateContacts()
 			keyLookUp[3] = 2;
 			ndInt32* const scan = &info.m_digitScan[threadIndex][0];
 
-			const ndStartEnd startEnd(dstContacts.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			const ndStartEnd startEnd(dstContacts.GetCount(), GetThreadId(), GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndContact* const contact = srcContacts[i]->GetAsContact();
@@ -1585,52 +1589,53 @@ void ndScene::FindCollidingPairsBackward(ndBodyKinematic* const body)
 void ndScene::FindCollidingPairs()
 {
 	D_TRACKTIME();
-	class ndFindCollidindPairs : public ndBaseJob
+	class ndFindCollidindPairs : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			const ndStartEnd startEnd(bodyArray.GetCount() - 1, GetThreadId(), m_owner->GetThreadCount());
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
+			const ndStartEnd startEnd(bodyArray.GetCount() - 1, GetThreadId(), GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBodyKinematic* const body = bodyArray[i];
-				m_owner->FindCollidingPairs(body);
+				scene->FindCollidingPairs(body);
 			}
 		}
 	};
 
-	class ndFindCollidindPairsForward : public ndBaseJob
+	class ndFindCollidindPairsForward : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-
-			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->m_sceneBodyArray;
-			const ndStartEnd startEnd(bodyArray.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			const ndArray<ndBodyKinematic*>& bodyArray = scene->m_sceneBodyArray;
+			const ndStartEnd startEnd(bodyArray.GetCount(), GetThreadId(), GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBodyKinematic* const body = bodyArray[i];
-				m_owner->FindCollidingPairsForward(body);
+				scene->FindCollidingPairsForward(body);
 			}
 		}
 	};
 
-	class ndFindCollidindPairsBackward : public ndBaseJob
+	class ndFindCollidindPairsBackward : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-
-			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->m_sceneBodyArray;
-			const ndStartEnd startEnd(bodyArray.GetCount(), GetThreadId(), m_owner->GetThreadCount());
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			const ndArray<ndBodyKinematic*>& bodyArray = scene->m_sceneBodyArray;
+			const ndStartEnd startEnd(bodyArray.GetCount(), GetThreadId(), GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBodyKinematic* const body = bodyArray[i];
-				m_owner->FindCollidingPairsBackward(body);
+				scene->FindCollidingPairsBackward(body);
 			}
 		}
 	};
@@ -1652,19 +1657,20 @@ void ndScene::FindCollidingPairs()
 void ndScene::UpdateTransform()
 {
 	D_TRACKTIME();
-	class ndTransformUpdate : public ndBaseJob
+	class ndTransformUpdate : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const ndArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 			const ndInt32 threadIndex = GetThreadId();
-			const ndStartEnd startEnd(bodyArray.GetCount() - 1, GetThreadId(), m_owner->GetThreadCount());
+			const ndStartEnd startEnd(bodyArray.GetCount() - 1, GetThreadId(), GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndBodyKinematic* const body = bodyArray[i];
-				m_owner->UpdateTransformNotify(threadIndex, body);
+				scene->UpdateTransformNotify(threadIndex, body);
 			}
 		}
 	};

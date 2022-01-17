@@ -58,15 +58,6 @@ class ndSceneTreeNotiFy : public ndClassAlloc
 D_MSV_NEWTON_ALIGN_32
 class ndScene : public ndThreadPool
 {
-	public: 
-	class ndBaseJob: public ndThreadPoolJob
-	{
-		public:
-		ndScene* m_owner;
-		ndFloat32 m_timestep;
-		void* m_context;
-	};
-
 	protected:
 	class ndSpliteInfo;
 	class ndFitnessList: public ndList <ndSceneTreeNode*, ndContainersFreeListAlloc<ndSceneTreeNode*>>
@@ -98,9 +89,6 @@ class ndScene : public ndThreadPool
 	ndArray<ndBodyKinematic*>& GetActiveBodyArray();
 	const ndArray<ndBodyKinematic*>& GetActiveBodyArray() const;
 
-	template <class T> 
-	void SubmitJobs(void* const context = nullptr);
-
 	ndFloat32 GetTimestep() const;
 	void SetTimestep(ndFloat32 timestep);
 
@@ -120,6 +108,8 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual void BodiesInAabb(ndBodiesInAabbNotify& callback) const;
 	D_COLLISION_API virtual bool RayCast(ndRayCastNotify& callback, const ndVector& globalOrigin, const ndVector& globalDest) const;
 	D_COLLISION_API virtual bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
+
+	D_COLLISION_API void SendBackgroundJob(ndBackgroundJob* const job);
 
 	private:
 	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
@@ -171,8 +161,7 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API void FindCollidingPairs();
 	D_COLLISION_API virtual void BalanceScene();
 	D_COLLISION_API virtual void ThreadFunction();
-	D_COLLISION_API void SendBackgroundJob(ndBackgroundJob* const job);
-	
+
 	class ndBodyListRun
 	{
 		public:
@@ -226,7 +215,7 @@ inline ndWorld* ndScene::GetWorld() const
 inline ndInt32 ndScene::GetThreadCount() const
 {
 	const ndThreadPool& pool = *this;
-	return pool.GetCount();
+	return pool.GetThreadCount();
 }
 
 inline const ndBodyList& ndScene::GetBodyList() const
@@ -257,23 +246,6 @@ inline const ndArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray() const
 inline const ndContactArray& ndScene::GetContactArray() const
 {
 	return m_contactArray;
-}
-
-template <class T>
-void ndScene::SubmitJobs(void* const context)
-{
-	T extJob[D_MAX_THREADS_COUNT];
-	ndThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
-
-	const ndInt32 threadCount = GetThreadCount();
-	for (ndInt32 i = 0; i < threadCount; i++)
-	{
-		extJob[i].m_owner = this;
-		extJob[i].m_context = context;
-		extJob[i].m_timestep = m_timestep;
-		extJobPtr[i] = &extJob[i];
-	}
-	ExecuteJobs(extJobPtr);
 }
 
 inline ndFloat32 ndScene::GetTimestep() const

@@ -202,7 +202,8 @@ inline ndInt32 ndWorld::GetThreadCount() const
 
 inline void ndWorld::SetThreadCount(ndInt32 count)
 {
-	m_scene->SetCount(count);
+	m_scene->SetThreadCount(count);
+	m_scene->m_backgroundThread.SetThreadCount(count);
 }
 
 inline ndInt32 ndWorld::GetSubSteps() const

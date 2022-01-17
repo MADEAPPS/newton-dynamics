@@ -514,16 +514,17 @@ void ndWorld::ParticleUpdate(ndFloat32 timestep)
 void ndWorld::ModelUpdate()
 {
 	D_TRACKTIME();
-	class ndModelUpdate : public ndScene::ndBaseJob
+	class ndModelUpdate : public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
-			const ndFloat32 timestep = m_timestep;
+			ndScene* const scene = (ndScene*)GetThreadPool();
+			ndWorld* const world = scene->GetWorld();
+			const ndFloat32 timestep = scene->GetTimestep();
 			const ndInt32 threadId = GetThreadId();
-			const ndInt32 threadCount = m_owner->GetThreadCount();
+			const ndInt32 threadCount = GetThreadCount();
 
 			ndModelList& modelList = world->m_modelList;
 			ndModelList::ndNode* node = modelList.GetFirst();
@@ -550,17 +551,18 @@ void ndWorld::ModelUpdate()
 void ndWorld::ModelPostUpdate()
 {
 	D_TRACKTIME();
-	class ndModelPostUpdate: public ndScene::ndBaseJob
+	class ndModelPostUpdate: public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
+			ndScene* const scene = (ndScene*)GetThreadPool();
 			const ndInt32 threadId = GetThreadId();
+			const ndInt32 threadCount = GetThreadCount();
 
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndFloat32 timestep = m_timestep;
-			ndWorld* const world = m_owner->GetWorld();
+			const ndFloat32 timestep = scene->GetTimestep();
+			ndWorld* const world = scene->GetWorld();
 			ndModelList& modelList = world->m_modelList;
 			ndModelList::ndNode* node = modelList.GetFirst();
 			for (ndInt32 i = 0; i < threadId; i++)
@@ -586,17 +588,18 @@ void ndWorld::ModelPostUpdate()
 void ndWorld::PostModelTransform()
 {
 	D_TRACKTIME();
-	class ndPostModelTransform: public ndScene::ndBaseJob
+	class ndPostModelTransform: public ndThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
+			ndScene* const scene = (ndScene*)GetThreadPool();
 			const ndInt32 threadId = GetThreadId();
+			const ndInt32 threadCount = GetThreadCount();
 
-			const ndInt32 threadCount = m_owner->GetThreadCount();
-			const ndFloat32 timestep = m_timestep;
-			ndWorld* const world = m_owner->GetWorld();
+			const ndFloat32 timestep = scene->GetTimestep();
+			ndWorld* const world = scene->GetWorld();
 			ndModelList& modelList = world->m_modelList;
 			ndModelList::ndNode* node = modelList.GetFirst();
 			for (ndInt32 i = 0; i < threadId; i++)

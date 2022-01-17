@@ -32,6 +32,8 @@
 
 #define	D_MAX_THREADS_COUNT	16
 
+class ndThreadPool;
+
 class ndThreadPoolJob
 {
 	public:
@@ -62,9 +64,27 @@ class ndThreadPoolJob
 		return m_threadIndex; 
 	}
 
+	ndInt32 GetThreadCount() const
+	{
+		return m_threadCount;
+	}
+
+	ndThreadPool* GetThreadPool() const
+	{
+		return m_threadPool;
+	}
+
+	void* GetContext() const
+	{
+		return m_context;
+	}
+
 	virtual void Execute() = 0;
 
 	private:
+	void* m_context;
+	ndThreadPool* m_threadPool;
+	ndInt32 m_threadCount;
 	ndInt32 m_threadIndex;
 	friend class ndThreadPool;
 };
@@ -78,31 +98,13 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 		D_CORE_API virtual ~ndWorkerThread();
 
 		private:
-		void ExecuteJob(ndThreadPoolJob* const job);
 		virtual void ThreadFunction();
 
-		ndThreadPoolJob* m_job;
 		ndThreadPool* m_owner;
-		ndInt32 m_threadIndex;
-		friend class ndThreadPool;
-	};
-
-	class ndThreadLockFreeUpdate: public ndThreadPoolJob
-	{
-		public:
-		ndThreadLockFreeUpdate()
-			:ndThreadPoolJob()
-			,m_job(nullptr)
-			,m_begin(false)
-			,m_joindInqueue(nullptr)
-		{
-		}
-
-		virtual void Execute();
-		private:
-		ndAtomic<ndThreadPoolJob*> m_job;
 		ndAtomic<bool> m_begin;
-		ndAtomic<ndInt32>* m_joindInqueue;
+		ndAtomic<bool> m_stillLooping;
+		ndAtomic<ndThreadPoolJob*> m_job;
+		ndInt32 m_threadIndex;
 		friend class ndThreadPool;
 	};
 
@@ -110,29 +112,44 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 	D_CORE_API ndThreadPool(const char* const baseName);
 	D_CORE_API virtual ~ndThreadPool();
 
-	ndInt32 GetCount() const;
-	D_CORE_API void SetCount(ndInt32 count);
+	ndInt32 GetThreadCount() const;
+	D_CORE_API void SetThreadCount(ndInt32 count);
 
 	D_CORE_API void TickOne();
-	D_CORE_API void ExecuteJobs(ndThreadPoolJob** const jobs);
+	D_CORE_API void ExecuteJobs(ndThreadPoolJob** const jobs, void* const context);
 
 	D_CORE_API void Begin();
 	D_CORE_API void End();
 
+	template <class T>
+	void SubmitJobs(void* const context = nullptr);
+
 	private:
 	D_CORE_API virtual void Release();
 
-	ndSyncMutex m_sync;
 	ndWorkerThread* m_workers;
 	ndInt32 m_count;
 	char m_baseName[32];
-	ndAtomic<ndInt32> m_joindInqueue;
-	ndThreadLockFreeUpdate m_lockFreeJobs[D_MAX_THREADS_COUNT];
 };
 
-inline ndInt32 ndThreadPool::GetCount() const
+inline ndInt32 ndThreadPool::GetThreadCount() const
 {
 	return m_count + 1;
+}
+
+template <class T>
+void ndThreadPool::SubmitJobs(void* const context)
+{
+	T* const extJob = dAlloca(T, D_MAX_THREADS_COUNT);
+	ndThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
+
+	const ndInt32 threadCount = GetThreadCount();
+	for (ndInt32 i = 0; i < threadCount; i++)
+	{
+		new (&extJob[i]) T();
+		extJobPtr[i] = &extJob[i];
+	}
+	ExecuteJobs(extJobPtr, context);
 }
 
 #endif

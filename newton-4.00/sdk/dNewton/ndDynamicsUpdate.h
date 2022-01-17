@@ -125,6 +125,7 @@ class ndDynamicsUpdate : public ndClassAlloc
 	void Clear();
 	virtual void Update();
 	void SortJointsScan();
+	void BuildDisjointSets();
 	void SortBodyJointScan();
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
@@ -225,6 +226,7 @@ inline void ndDynamicsUpdate::ClearJacobianBuffer(ndInt32 count, ndJacobian* con
 
 inline void ndDynamicsUpdate::ClearBuffer(void* const buffer, ndInt32 sizeInByte) const
 {
+	D_TRACKTIME();
 	ndInt32 sizeInJacobian = sizeInByte / sizeof(ndJacobian);
 	ClearJacobianBuffer(sizeInJacobian, (ndJacobian*)buffer);
 	char* const ptr = (char*)buffer;

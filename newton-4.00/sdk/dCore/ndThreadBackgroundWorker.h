@@ -25,9 +25,11 @@
 #include "ndCoreStdafx.h"
 #include "ndTypes.h"
 #include "ndList.h"
-#include "ndThread.h"
 #include "ndSemaphore.h"
 #include "ndClassAlloc.h"
+#include "ndThreadPool.h"
+
+class ndThreadBackgroundWorker;
 
 class ndBackgroundJob
 {
@@ -40,28 +42,37 @@ class ndBackgroundJob
 
 	ndBackgroundJob()
 		:m_jobState(m_jobCompleted)
+		,m_threaPool(nullptr)
 	{
 	}
 
 	ndJobState JobState() const
 	{
-		return m_jobState;
+		return m_jobState.load();
 	}
 
 	virtual ~ndBackgroundJob()
 	{
 	}
 
+
+	ndThreadBackgroundWorker* GetThreadPool() const
+	{
+		return m_threaPool;
+	}
+
+	protected:
 	virtual void Execute()
 	{
 	}
 
 	private:
 	ndAtomic<ndJobState> m_jobState;
+	ndThreadBackgroundWorker* m_threaPool;
 	friend class ndThreadBackgroundWorker;
 };
 
-class ndThreadBackgroundWorker : public ndThread, public ndList<ndBackgroundJob*, ndContainersFreeListAlloc<ndBackgroundJob*>>
+class ndThreadBackgroundWorker : public ndList<ndBackgroundJob*, ndContainersFreeListAlloc<ndBackgroundJob*>>, public ndThreadPool
 {
 	public:
 	D_CORE_API ndThreadBackgroundWorker();
@@ -71,13 +82,20 @@ class ndThreadBackgroundWorker : public ndThread, public ndList<ndBackgroundJob*
 	D_CORE_API void SendJob(ndBackgroundJob* const job);
 	
 	private:
+	//class ndBackGroundSemaphore : public ndSemaphore
+	//{
+	//	public: 
+	//	bool WaitForJob();
+	//	ndThreadBackgroundWorker* m_myPool;
+	//};
+
 	virtual void ThreadFunction();
 
 	ndSpinLock m_lock;
-	ndSemaphore m_queueSemaphore;
-	ndAtomic<bool> m_teminate;
 	ndAtomic<bool> m_inLoop;
+	ndAtomic<bool> m_teminate;
+	ndSemaphore m_queueSemaphore;
+	//ndBackGroundSemaphore m_queueSemaphore;
 };
-
 
 #endif

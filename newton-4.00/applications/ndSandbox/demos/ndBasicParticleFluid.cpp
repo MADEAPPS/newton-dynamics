@@ -21,12 +21,13 @@
 #include "ndDemoEntityManager.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
-class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundJob
+//class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundJob
+class ndIsoSurfaceParticleVolume : public ndBodySphFluid
 {
 	public:
 	ndIsoSurfaceParticleVolume(ndFloat32 radius)
 		:ndBodySphFluid()
-		,ndBackgroundJob()
+		//,ndBackgroundJob()
 		,m_indexList(1024)
 		,m_points(1024)
 		,m_meshIsReady(0)
@@ -117,11 +118,11 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundJob
 #endif
 		m_meshIsReady.store(1);
 	}
-		
-	virtual void Execute()
-	{
-		UpdateIsoSurface();
-	}
+
+	//virtual void Execute()
+	//{
+	//	UpdateIsoSurface();
+	//}
 
 	ndArray<ndInt32> m_indexList;
 	ndArray<glPositionNormalUV> m_points;
@@ -225,21 +226,20 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		//nodeMatrix.m_posit.m_y += 0.125f;
 	
 		// render the fluid;
+#if 0
 		ndScopeSpinLock lock(m_lock);
-
-#if 1
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #else
-		RenderParticles(scene);
-#endif
 		//RenderParticles(scene);
-		
+#endif
+		RenderParticles(scene);
+
 		// render the cage;
 		//ndDemoEntity::Render(timeStep, scene, matrix);
 	}
-
+	
 	ndIsoSurfaceParticleVolume* m_fluidBody;
 	mutable ndSpinLock m_lock;
 	mutable ndIsoSurfaceMesh* m_isoSurfaceMesh0;
