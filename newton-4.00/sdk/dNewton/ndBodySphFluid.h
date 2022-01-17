@@ -139,8 +139,8 @@ inline void ndBodySphFluid::SetGasConstant(ndFloat32 gasConst)
 
 inline ndFloat32 ndBodySphFluid::GetSphGridSize() const
 {
-	//return 0.5f;
-	return m_radius * ndFloat32(2.0f) * ndFloat32(1.5f);
+	return GetParticleRadius() * ndFloat32(2.0f) * ndFloat32(1.5f);
+	//return GetParticleRadius() * ndFloat32(2.0f) * ndFloat32(0.75f);
 }
 
 #endif 

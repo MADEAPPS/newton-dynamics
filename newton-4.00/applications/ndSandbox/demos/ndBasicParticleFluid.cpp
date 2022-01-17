@@ -256,13 +256,13 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 
 	void OnTransform(ndInt32, const ndMatrix&)
 	{
-		ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
-		ndScopeSpinLock lock(entity->m_lock);
-		if (entity->m_fluidBody->JobState() == ndBackgroundJob::m_jobCompleted)
-		{
-			ndPhysicsWorld* const world = m_manager->GetWorld();
-			world->SendBackgroundJob(entity->m_fluidBody);
-		}
+		//ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
+		//ndScopeSpinLock lock(entity->m_lock);
+		//if (entity->m_fluidBody->JobState() == ndBackgroundJob::m_jobCompleted)
+		//{
+		//	ndPhysicsWorld* const world = m_manager->GetWorld();
+		//	world->SendBackgroundJob(entity->m_fluidBody);
+		//}
 	}
 };
 
@@ -376,7 +376,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const ndMatrix& loc
 	//ndInt32 particleCountPerAxis = 40;
 	//ndInt32 particleCountPerAxis = 32;
 	//ndInt32 particleCountPerAxis = 10;
-	ndInt32 particleCountPerAxis = 40;
+	ndInt32 particleCountPerAxis = 1;
 	ndFloat32 spacing = diameter;
 
 	ndFloat32 offset = spacing * particleCountPerAxis / 2.0f;

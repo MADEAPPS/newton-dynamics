@@ -331,8 +331,10 @@ void RenderParticles(ndDemoEntityManager* const scene)
 	GLuint shader = scene->GetShaderCache().m_wireFrame;
 
 	ndDemoCamera* const camera = scene->GetCamera();
-	const ndMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
-	const ndMatrix invViewProjectionMatrix(camera->GetProjectionMatrix().Inverse4x4() * camera->GetViewMatrix().Inverse());
+	const ndMatrix viewMatrix(camera->GetViewMatrix());
+	const ndMatrix projectionMatrix(camera->GetProjectionMatrix());
+	const ndMatrix viewProjectionMatrix(viewMatrix * projectionMatrix);
+	//const ndMatrix invViewProjectionMatrix(projectionMatrix.Inverse4x4() * viewMatrix.Inverse());
 
 	glVector4 color;
 	color.m_x = 50.0f / 255.0f;
@@ -351,9 +353,7 @@ void RenderParticles(ndDemoEntityManager* const scene)
 
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
-	ndFloat32 pizelSize = 8.0f / viewport[2];
 
-	//glVector3 pointBuffer[4];
 	static ndArray<glVector3> pointBuffer;
 
 	const ndBodyParticleSetList& particles = world->GetParticleList();
@@ -369,21 +369,31 @@ void RenderParticles(ndDemoEntityManager* const scene)
 
 		{
 			//D_TRACKTIME();
+			ndFloat32 radius = particle->GetParticleRadius();
+
+			radius *= 16.0f;
+			//radius *= .5f;
+			ndVector quad[] = 
+			{
+				ndVector(-radius,  radius, ndFloat32(0.0f), ndFloat32(0.0f)),
+				ndVector(-radius, -radius, ndFloat32(0.0f), ndFloat32(0.0f)),
+				ndVector(radius,  radius, ndFloat32(0.0f), ndFloat32(0.0f)),
+				ndVector(radius,  radius, ndFloat32(0.0f), ndFloat32(0.0f)),
+				ndVector(-radius, -radius, ndFloat32(0.0f), ndFloat32(0.0f)),
+				ndVector(radius, -radius, ndFloat32(0.0f), ndFloat32(0.0f)),
+			};
+
 			for (ndInt32 i = 0; i < positions.GetCount(); i++)
 			{
-				ndVector particlePosit(positions[i]);
-				particlePosit.m_w = 1.0f;
-				ndVector point(viewProjectionMatrix.TransformVector1x4(particlePosit));
-				ndFloat32 zDist = point.m_w;
-				point = point.Scale(1.0f / zDist);
+				const ndVector p(viewMatrix.TransformVector(positions[i]));
 
 				ndInt32 j = i * 6;
-				pointBuffer[j + 0] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, pizelSize, zDist);
-				pointBuffer[j + 1] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, -pizelSize, zDist);
-				pointBuffer[j + 2] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, pizelSize, zDist);
-				pointBuffer[j + 3] = pointBuffer[j + 2];
-				pointBuffer[j + 4] = pointBuffer[j + 1];
-				pointBuffer[j + 5] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, -pizelSize, zDist);
+				pointBuffer[j + 0] = viewMatrix.UntransformVector(p + quad[0]);
+				pointBuffer[j + 1] = viewMatrix.UntransformVector(p + quad[1]);
+				pointBuffer[j + 2] = viewMatrix.UntransformVector(p + quad[2]);
+				pointBuffer[j + 3] = viewMatrix.UntransformVector(p + quad[3]);
+				pointBuffer[j + 4] = viewMatrix.UntransformVector(p + quad[4]);
+				pointBuffer[j + 5] = viewMatrix.UntransformVector(p + quad[5]);
 			}
 		}
 		glDrawArrays(GL_TRIANGLES, 0, pointBuffer.GetCount());

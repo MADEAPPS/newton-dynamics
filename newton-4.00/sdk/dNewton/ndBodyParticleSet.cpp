@@ -32,7 +32,7 @@ ndBodyParticleSet::ndBodyParticleSet()
 	,m_posit(1024)
 	,m_veloc(1024)
 	,m_listNode(nullptr)
-	,m_radius(ndFloat32 (1.0f))
+	,m_radius(ndFloat32 (0.125f))
 {
 }
 
@@ -44,7 +44,7 @@ ndBodyParticleSet::ndBodyParticleSet(const ndLoadSaveBase::ndLoadDescriptor& des
 	,m_posit(1024)
 	,m_veloc(1024)
 	,m_listNode(nullptr)
-	,m_radius(ndFloat32(1.0f))
+	,m_radius(ndFloat32(0.125f))
 {
 	//xmlNode->FirstChild("ndBodyKinematic"), shapesCache
 	// nothing was saved

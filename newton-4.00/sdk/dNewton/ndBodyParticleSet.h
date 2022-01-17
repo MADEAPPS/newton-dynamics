@@ -44,7 +44,7 @@ class ndBodyParticleSet: public ndBody
 	virtual ndBodyParticleSet* GetAsBodyParticleSet();
 
 	ndFloat32 GetParticleRadius() const;
-	void SetParticleRadius(ndFloat32 raidus);
+	void SetParticleRadius(ndFloat32 radius);
 
 	D_NEWTON_API virtual void Update(const ndWorld* const workd, ndFloat32 timestep) = 0;
 
