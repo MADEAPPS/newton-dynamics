@@ -82,20 +82,12 @@ class ndThreadBackgroundWorker : public ndList<ndBackgroundJob*, ndContainersFre
 	D_CORE_API void SendJob(ndBackgroundJob* const job);
 	
 	private:
-	//class ndBackGroundSemaphore : public ndSemaphore
-	//{
-	//	public: 
-	//	bool WaitForJob();
-	//	ndThreadBackgroundWorker* m_myPool;
-	//};
-
 	virtual void ThreadFunction();
 
 	ndSpinLock m_lock;
 	ndAtomic<bool> m_inLoop;
 	ndAtomic<bool> m_teminate;
 	ndSemaphore m_queueSemaphore;
-	//ndBackGroundSemaphore m_queueSemaphore;
 };
 
 #endif

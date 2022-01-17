@@ -299,7 +299,6 @@ void ndBodySphFluid::CaculateAabb()
 			const ndArray<ndVector>& posit = fluid->m_posit;
 
 			ndBox box;
-			//const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), GetThreadCount());
 			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), GetThreadCount());
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
@@ -1288,10 +1287,21 @@ void ndBodySphFluid::Execute()
 
 void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
 {
-	if (JobState() == ndBackgroundJob::m_jobCompleted)
+	//if (m_updateAsync)
+	m_timestep = timestep;
+	if (m_updateAsync)
+	{ 
+		if (JobState() == ndBackgroundJob::m_jobCompleted)
+		{
+			ndScene* const scene = world->GetScene();
+			scene->SendBackgroundJob(this);
+		}
+	}
+	else
 	{
-		m_timestep = timestep;
-		ndScene* const scene = world->GetScene();
-		scene->SendBackgroundJob(this);
+		// this is not working yet
+		//ndScene* const scene = world->GetScene();
+		//SetThreadPool(scene);
+		//Execute();
 	}
 }

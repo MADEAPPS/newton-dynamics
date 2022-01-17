@@ -192,6 +192,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 
 	//void RenderUI();
 	void RenderScene();
+	ndInt32 ParticleCount() const;
 	
 	void UpdatePhysics(ndFloat32 timestep);
 	ndFloat32 CalculateInteplationParam () const;

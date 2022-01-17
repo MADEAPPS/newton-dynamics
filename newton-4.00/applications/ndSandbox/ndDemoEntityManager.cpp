@@ -1082,6 +1082,18 @@ void ndDemoEntityManager::BeginFrame()
 	ImGui::NewFrame();
 }
 
+ndInt32 ndDemoEntityManager::ParticleCount() const
+{
+	ndInt32 count = 0;
+	const ndBodyParticleSetList& particles = m_world->GetParticleList();
+	for (ndBodyParticleSetList::ndNode* node = particles.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyParticleSet* const set = node->GetInfo();
+		count += set->GetPositions().GetCount();
+	}
+	return count;
+}
+
 void ndDemoEntityManager::RenderStats()
 {
 	if (m_showStats) 
@@ -1099,19 +1111,6 @@ void ndDemoEntityManager::RenderStats()
 			sprintf(text, "update mode:    %s", m_synchronousPhysicsUpdate ? "synchronous" : "asynchronous");
 			ImGui::Text(text, "");
 
-			if (m_currentPlugin) 
-			{
-				dAssert(0);
-				//ndInt32 index = 1;
-				//for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
-				//	if (index == m_currentPlugin) {
-				//		sprintf(text, "plugin:        %s", NewtonGetPluginString(m_world, plugin));
-				//		ImGui::Text(text, "");
-				//	}
-				//	index++;
-				//}
-			}
-
 			sprintf(text, "bodies:         %d", m_world->GetBodyList().GetCount());
 			ImGui::Text(text, "");
 
@@ -1120,6 +1119,10 @@ void ndDemoEntityManager::RenderStats()
 
 			sprintf(text, "contact joints: %d", m_world->GetContactList().GetCount());
 			ImGui::Text(text, "");
+
+			sprintf(text, "particle:       %d", ParticleCount());
+			ImGui::Text(text, "");
+
 
 			sprintf(text, "memory used:   %6.3f mbytes", ndFloat32(ndFloat64(ndMemory::GetMemoryUsed()) / (1024 * 1024)));
 			ImGui::Text(text, "");

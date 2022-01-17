@@ -56,6 +56,7 @@ class ndBodyParticleSet: public ndBody
 	ndArray<ndVector> m_veloc;
 	ndBodyParticleSetList::ndNode* m_listNode;
 	ndFloat32 m_radius;
+	bool m_updateAsync;
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32 ;
 
