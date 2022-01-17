@@ -68,9 +68,9 @@ class ndIsoSurface::ndImplementation : public ndClassAlloc
 		}
 
 		ndGridHash(const ndGridHash& src, ndInt8 cellType)
-			:m_gridCellHash(src.m_gridCellHash)
-			,m_cellType(cellType)
 		{
+			m_gridCellHash = src.m_gridCellHash;
+			m_cellType = cellType;
 		}
 
 		ndGridHash(ndInt32 x, ndInt32 y, ndInt32 z)
