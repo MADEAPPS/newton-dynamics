@@ -490,11 +490,11 @@ void ndWorld::SubStepUpdate(ndFloat32 timestep)
 	//ParticleUpdate();
 
 	// Update all models
+	UpdateSkeletons();
 	ModelUpdate();
 
 	// calculate internal forces, integrate bodies and update matrices.
 	dAssert(m_solver);
-	UpdateSkeletons();
 	m_solver->Update();
 
 	// second pass on models

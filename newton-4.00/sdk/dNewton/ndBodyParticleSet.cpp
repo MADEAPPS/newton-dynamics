@@ -26,6 +26,7 @@
 
 ndBodyParticleSet::ndBodyParticleSet()
 	:ndBody()
+	,ndBackgroundJob()
 	,m_box0(ndFloat32(-1e10f))
 	,m_box1(ndFloat32(1e10f))
 	,m_gravity(ndVector::m_zero)
@@ -39,6 +40,7 @@ ndBodyParticleSet::ndBodyParticleSet()
 
 ndBodyParticleSet::ndBodyParticleSet(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndBody(desc)
+	,ndBackgroundJob()
 	,m_box0(ndFloat32(-1e10f))
 	,m_box1(ndFloat32(1e10f))
 	,m_gravity(ndVector::m_zero)

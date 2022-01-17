@@ -26,7 +26,7 @@
 #include "ndBodyParticleSet.h"
 
 D_MSV_NEWTON_ALIGN_32
-class ndBodySphFluid: public ndBodyParticleSet, public ndBackgroundJob
+class ndBodySphFluid: public ndBodyParticleSet
 {
 	public:
 	D_NEWTON_API ndBodySphFluid();

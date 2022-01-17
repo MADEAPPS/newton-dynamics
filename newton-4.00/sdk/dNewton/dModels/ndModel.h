@@ -35,14 +35,15 @@ class ndModel: public ndClassAlloc
 	D_CLASS_REFLECTION(ndModel);
 	ndModel();
 	D_NEWTON_API ndModel(const ndLoadSaveBase::ndLoadDescriptor& desc);
-
 	virtual ~ndModel ();
 	
-	virtual ndModel* GetAsModel();
 	virtual void AddToWorld(ndWorld* const world);
 	virtual void RemoveFromToWorld(ndWorld* const world);
 
+	virtual ndModel* GetAsModel();
 	virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
+
+	virtual ndSkeletonContainer* GetSkeleton() const;
 
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 
@@ -102,6 +103,11 @@ inline void ndModel::AddToWorld(ndWorld* const)
 
 inline void ndModel::RemoveFromToWorld(ndWorld* const)
 {
+}
+
+inline ndSkeletonContainer* ndModel::GetSkeleton() const
+{
+	return nullptr;
 }
 
 #endif 
