@@ -451,7 +451,7 @@ void RenderParticles(ndDemoEntityManager* const scene)
 	
 		ndFloat32 radius = particle->GetParticleRadius();
 		//radius *= 16.0f;
-		radius *= 0.75f;
+		radius *= 2.0f;
 
 		glVector4 quadUV[] =
 		{
