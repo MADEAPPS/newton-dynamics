@@ -25,14 +25,17 @@ void main()
 		discard; 
 	}
 
-	vec3 normalInPixelSpace = vec3(quadUV.x, quadUV.y, sqrt (r2));
+	vec3 normalInPixelSpace = vec3(quadUV.x, quadUV.y, sqrt (1.0 - r2));
 
+	// TODO
+	// here I nee to rest the z buffer and prevent z fitgting
+
+	// TODO
 	// now I need the light vector also in pixel space
-	// which should be an interpolated input
-	//directionalLightDir
-
-	vec3 directionalLightDir = vec3(0.0, 0.71, 0.71);
-	float difusse = max (dot(normalInPixelSpace, directionalLightDir), 0.2) ;
+	// which should be an interpolated input, 
+	// for now just hack a fix value
+	vec3 directionalLightDir = vec3(0.71, 0.71, 0.0);
+	float difusse = max (dot(normalInPixelSpace, directionalLightDir), 0.3) ;
 
 	pixelColor = quadColor * difusse;
 }
