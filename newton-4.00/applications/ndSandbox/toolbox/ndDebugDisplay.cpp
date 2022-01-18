@@ -427,7 +427,9 @@ void RenderParticles(ndDemoEntityManager* const scene)
 	ndInt32 viewModelMatrixLocation = glGetUniformLocation(shader, "viewModelMatrix");
 
 	ndInt32 projectionMatrixLocation = glGetUniformLocation(shader, "projectionMatrix");
+
 	ndInt32 quadLocation = glGetUniformLocation(shader, "quadSize");
+	ndInt32 uvSizeLocation = glGetUniformLocation(shader, "uvSize");
 
 	glUniform4fv(shadeColorLocation, 1, &color.m_x);
 
@@ -448,8 +450,17 @@ void RenderParticles(ndDemoEntityManager* const scene)
 		glVertexPointer(4, GL_FLOAT, 0, &positions[0]);
 	
 		ndFloat32 radius = particle->GetParticleRadius();
-		//radius *= 16.0f;
-		radius *= 0.5f;
+		radius *= 16.0f;
+		//radius *= 0.5f;
+
+		glVector4 quadUV[] =
+		{
+			ndVector(-1.0f, -1.0f, 0.0f, 0.0f),
+			ndVector( 1.0f, -1.0f, 0.0f, 0.0f),
+			ndVector( -1.0f, 1.0f, 0.0f, 0.0f),
+			ndVector( 1.0f, 1.0f, 0.0f, 0.0f),
+		};
+
 		glVector4 quad[] =
 		{
 			ndVector(-radius, -radius, ndFloat32(0.0f), ndFloat32(0.0f)),
@@ -458,6 +469,7 @@ void RenderParticles(ndDemoEntityManager* const scene)
 			ndVector( radius,  radius, ndFloat32(0.0f), ndFloat32(0.0f)),
 		};
 		glUniform4fv(quadLocation, 4, &quad[0].m_x);
+		glUniform4fv(uvSizeLocation, 4, &quadUV[0][0]);
 		glDrawArrays(GL_POINTS, 0, positions.GetCount());
 	}
 	

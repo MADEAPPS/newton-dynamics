@@ -11,10 +11,17 @@
    
 #version 330 core
 
+in vec4 quadUV;
 in vec4 quadColor;
 out vec4 pixelColor;
 
 void main()
 {
+	float r2 = dot(quadUV, quadUV);
+	if (r2 > 1.0) 
+	{	
+		discard; 
+	}
+
 	pixelColor = quadColor;
 }
