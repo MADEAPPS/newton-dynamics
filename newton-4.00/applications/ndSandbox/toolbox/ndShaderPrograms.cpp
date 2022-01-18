@@ -20,6 +20,7 @@ ndShaderPrograms::ndShaderPrograms(void)
 	m_decalEffect = 0;
 	m_texturedDecal = 0;
 	m_diffuseEffect = 0;
+	m_spriteSpheres = 0;
 	m_diffuseDebrisEffect = 0;
 	m_diffuseIntanceEffect = 0;
 	m_skinningDiffuseEffect = 0;
@@ -52,6 +53,10 @@ ndShaderPrograms::~ndShaderPrograms(void)
 	{
 		glDeleteShader(m_diffuseEffect);
 	}
+	if (m_spriteSpheres)
+	{
+		glDeleteShader(m_spriteSpheres);
+	}
 	if (m_diffuseDebrisEffect)
 	{
 		glDeleteShader(m_diffuseDebrisEffect);
@@ -83,6 +88,8 @@ bool ndShaderPrograms::CreateAllEffects()
 	m_diffuseNoTextureEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuseNoTexture");
 	m_diffuseIntanceEffect = CreateShaderEffect ("DirectionalDiffuseInstance", "DirectionalDiffuse");
 
+	m_spriteSpheres = CreateShaderEffect("DirectionalDiffuseSprite", "FlatShaded", "DirectionalDiffuseSprite");
+
 	return true;
 }
 
@@ -108,7 +115,7 @@ void ndShaderPrograms::LoadShaderCode (const char* const filename, char* const b
 	buffer[size + 1] = 0;
 }
 
-GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName, const char* const pixelShaderName)
+GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName, const char* const pixelShaderName, const char* const geometryShaderName)
 {
 	GLint state;
 	char tmpName[256];
@@ -118,6 +125,7 @@ GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName,
 	const char* const vPtr = buffer;
 	GLuint program = glCreateProgram();
 
+	// load and compile vertex shader
 	sprintf (tmpName, "shaders/%s.vtx", vertexShaderName);
 	LoadShaderCode (tmpName, buffer);
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -133,6 +141,25 @@ GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName,
 	}
 	glAttachShader(program, vertexShader);
 
+	// load and compile geometry shader, if any
+	GLuint geometryShader = 0;
+	if (geometryShaderName)
+	{
+		sprintf(tmpName, "shaders/%s.gs", geometryShaderName);
+		LoadShaderCode(tmpName, buffer);
+		geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+
+		glShaderSource(geometryShader, 1, &vPtr, nullptr);
+		glCompileShader(geometryShader);
+		glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &state);
+		if (state != GL_TRUE)
+		{
+			GLsizei length;
+			glGetShaderInfoLog(geometryShader, sizeof(buffer), &length, errorLog);
+			dTrace((errorLog));
+		}
+		glAttachShader(program, geometryShader);
+	}
 
 	sprintf (tmpName, "shaders/%s.ps", pixelShaderName);
 	LoadShaderCode (tmpName, buffer);
@@ -163,6 +190,10 @@ GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName,
 	dAssert (state == GL_TRUE);
 
 	glDeleteShader(pixelShader);
+	if (geometryShader)
+	{
+		glDeleteShader(geometryShader);
+	}
 	glDeleteShader(vertexShader);
 	return program;
 }

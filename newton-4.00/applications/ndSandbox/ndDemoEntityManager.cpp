@@ -38,12 +38,12 @@
 //#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
-#define DEFAULT_SCENE	3		// basic compound shapes
+//#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
 //#define DEFAULT_SCENE	7		// basic player
-//#define DEFAULT_SCENE	8		// particle fluid
+#define DEFAULT_SCENE	8		// particle fluid
 //#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	11		// basic joints
@@ -426,9 +426,9 @@ void ndDemoEntityManager::OpenMessageCallback(GLenum source,
 			case 131185:  // nvidia driver report will use VIDEO memory as the source for buffer object operations
 				return;
 		}
-		dAssert(0);
 		dTrace(("GL CALLBACK: %s source = 0x%x, type = 0x%x, id = %d, severity = 0x%x, message = %s, length = %d \n",
 			(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), source, type, id, severity, message, length));
+		dAssert(0);
 	}
 }
 #endif

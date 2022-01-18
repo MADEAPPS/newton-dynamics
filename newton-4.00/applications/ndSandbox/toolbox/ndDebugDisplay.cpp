@@ -325,6 +325,7 @@ void RenderCenterOfMass(ndDemoEntityManager* const scene)
 	glUseProgram(0);
 }
 
+#if 0
 void RenderParticles(ndDemoEntityManager* const scene)
 {
 	ndWorld* const world = scene->GetWorld();
@@ -371,8 +372,9 @@ void RenderParticles(ndDemoEntityManager* const scene)
 			//D_TRACKTIME();
 			ndFloat32 radius = particle->GetParticleRadius();
 
-			radius *= 16.0f;
-			//radius *= .5f;
+			//radius *= 16.0f;
+			//radius *= 0.7f;
+			radius *= 0.5f;
 			ndVector quad[] = 
 			{
 				ndVector(-radius,  radius, ndFloat32(0.0f), ndFloat32(0.0f)),
@@ -402,6 +404,67 @@ void RenderParticles(ndDemoEntityManager* const scene)
 	glUseProgram(0);
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
+
+#else
+void RenderParticles(ndDemoEntityManager* const scene)
+{
+	ndWorld* const world = scene->GetWorld();
+	GLuint shader = scene->GetShaderCache().m_spriteSpheres;
+
+	ndDemoCamera* const camera = scene->GetCamera();
+	const ndMatrix viewMatrix(camera->GetViewMatrix());
+	const ndMatrix projectionMatrix(camera->GetProjectionMatrix());
+
+	glVector4 color;
+	color.m_x = 50.0f / 255.0f;
+	color.m_y = 100.0f / 255.0f;
+	color.m_z = 200.0f / 255.0f;
+	color.m_w = 1.0f;
+
+	glUseProgram(shader);
+
+	ndInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	ndInt32 viewModelMatrixLocation = glGetUniformLocation(shader, "viewModelMatrix");
+
+	ndInt32 projectionMatrixLocation = glGetUniformLocation(shader, "projectionMatrix");
+	ndInt32 quadLocation = glGetUniformLocation(shader, "quadSize");
+
+	glUniform4fv(shadeColorLocation, 1, &color.m_x);
+
+	const glMatrix glViewMatrix(viewMatrix);
+	glUniformMatrix4fv(viewModelMatrixLocation, 1, false, &glViewMatrix[0][0]);
+
+	const glMatrix glProjectionMatrix(projectionMatrix);
+	glUniformMatrix4fv(projectionMatrixLocation, 1, false, &glProjectionMatrix[0][0]);
+	
+	const ndBodyParticleSetList& particles = world->GetParticleList();
+	for (ndBodyParticleSetList::ndNode* particleNode = particles.GetFirst(); particleNode; particleNode = particleNode->GetNext())
+	{
+		ndBodyParticleSet* const particle = particleNode->GetInfo();
+		const ndArray<ndVector>& positions = particle->GetPositions();
+	
+		glEnableClientState(GL_VERTEX_ARRAY);
+		//glVertexPointer(3, GL_FLOAT, sizeof(glVector3), &pointBuffer[0]);
+		glVertexPointer(4, GL_FLOAT, 0, &positions[0]);
+	
+		ndFloat32 radius = particle->GetParticleRadius();
+		//radius *= 16.0f;
+		radius *= 0.5f;
+		glVector4 quad[] =
+		{
+			ndVector(-radius, -radius, ndFloat32(0.0f), ndFloat32(0.0f)),
+			ndVector( radius, -radius, ndFloat32(0.0f), ndFloat32(0.0f)),
+			ndVector(-radius,  radius, ndFloat32(0.0f), ndFloat32(0.0f)),
+			ndVector( radius,  radius, ndFloat32(0.0f), ndFloat32(0.0f)),
+		};
+		glUniform4fv(quadLocation, 4, &quad[0].m_x);
+		glDrawArrays(GL_POINTS, 0, positions.GetCount());
+	}
+	
+	glUseProgram(0);
+	glDisableClientState(GL_VERTEX_ARRAY);
+}
+#endif
 
 void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 {
