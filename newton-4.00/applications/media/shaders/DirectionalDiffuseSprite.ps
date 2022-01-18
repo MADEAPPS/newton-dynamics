@@ -11,6 +11,8 @@
    
 #version 330 core
 
+//uniform vec4 directionalLightDir;
+
 in vec4 quadUV;
 in vec4 quadColor;
 out vec4 pixelColor;
@@ -23,5 +25,14 @@ void main()
 		discard; 
 	}
 
-	pixelColor = quadColor;
+	vec3 normalInPixelSpace = vec3(quadUV.x, quadUV.y, sqrt (r2));
+
+	// now I need the light vector also in pixel space
+	// which should be an interpolated input
+	//directionalLightDir
+
+	vec3 directionalLightDir = vec3(0.0, 0.71, 0.71);
+	float difusse = max (dot(normalInPixelSpace, directionalLightDir), 0.2) ;
+
+	pixelColor = quadColor * difusse;
 }
