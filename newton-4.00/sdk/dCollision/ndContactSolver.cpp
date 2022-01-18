@@ -233,90 +233,91 @@ class ndContactSolver::ndBoxBoxDistance2
 class ndStackBvhStackEntry
 {
 	public:
+	void PushStackEntry(
+		ndContactSolver::ndBoxBoxDistance2& data,
+		ndInt32& stack,
+		ndStackBvhStackEntry* const stackPool,
+		const ndShapeCompound::ndNodeBase* const compoundNode,
+		ndShapeStatic_bvh* const bvhTreeCollision,
+		ndInt32 treeNodeType,
+		const ndAabbPolygonSoup::ndNode* const treeNode)
+	{
+		ndVector bvhp0;
+		ndVector bvhp1;
+		bvhTreeCollision->GetNodeAabb(treeNode, bvhp0, bvhp1);
+		const ndVector bvhSize((bvhp1 - bvhp0) * ndVector::m_half);
+		const ndVector bvhOrigin((bvhp1 + bvhp0) * ndVector::m_half);
+	
+		ndInt32 j = stack;
+		ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, bvhOrigin, bvhSize);
+		for (; j && (dist2 > stackPool[j - 1].m_dist2); j--)
+		{
+			stackPool[j] = stackPool[j - 1];
+		}
+		stackPool[j].m_treeNodeIsLeaf = treeNodeType;
+		stackPool[j].m_compoundNode = compoundNode;
+		stackPool[j].m_collisionTreeNode = treeNode;
+		stackPool[j].m_dist2 = dist2;
+		stack++;
+		dAssert(stack < 2 * D_COMPOUND_STACK_DEPTH);
+	}
+
 	const ndShapeCompound::ndNodeBase* m_compoundNode;
 	const ndAabbPolygonSoup::ndNode* m_collisionTreeNode;
 	ndFloat32 m_dist2;
 	ndInt32 m_treeNodeIsLeaf;
 };
 
-static void PushStackEntry(
-	ndContactSolver::ndBoxBoxDistance2& data,
-	ndInt32& stack,
-	ndStackBvhStackEntry* const stackPool,
-	const ndShapeCompound::ndNodeBase* const compoundNode,
-	ndShapeStatic_bvh* const bvhTreeCollision,
-	ndInt32 treeNodeType,
-	const ndAabbPolygonSoup::ndNode* const treeNode)
-{
-	ndVector bvhp0;
-	ndVector bvhp1;
-	bvhTreeCollision->GetNodeAabb(treeNode, bvhp0, bvhp1);
-	const ndVector bvhSize((bvhp1 - bvhp0) * ndVector::m_half);
-	const ndVector bvhOrigin((bvhp1 + bvhp0) * ndVector::m_half);
-
-	ndInt32 j = stack;
-	ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, bvhOrigin, bvhSize);
-	for (; j && (dist2 > stackPool[j - 1].m_dist2); j--)
-	{
-		stackPool[j] = stackPool[j - 1];
-	}
-	stackPool[j].m_treeNodeIsLeaf = treeNodeType;
-	stackPool[j].m_compoundNode = compoundNode;
-	stackPool[j].m_collisionTreeNode = treeNode;
-	stackPool[j].m_dist2 = dist2;
-	stack++;
-	dAssert(stack < 2 * D_COMPOUND_STACK_DEPTH);
-}
-
 class ndStackEntry
 {
 	public:
+	void PushStackEntry(
+		ndContactSolver::ndBoxBoxDistance2& data,
+		ndInt32& stack,
+		ndStackEntry* const stackPool,
+		const ndShapeCompound::ndNodeBase* const node0,
+		const ndShapeCompound::ndNodeBase* const node1)
+	{
+		dAssert(node0);
+		dAssert(node1);
+		ndInt32 j = stack;
+		ndFloat32 subDist2 = data.CalculateDistance2(node0->m_origin, node0->m_size, node1->m_origin, node1->m_size);
+		for (; j && (subDist2 > stackPool[j - 1].m_dist2); j--)
+		{
+			stackPool[j] = stackPool[j - 1];
+		}
+		stackPool[j].m_node0 = node0;
+		stackPool[j].m_node1 = node1;
+		stackPool[j].m_dist2 = subDist2;
+		stack++;
+		dAssert(stack < 2 * D_COMPOUND_STACK_DEPTH);
+	}
+
+	ndFloat32 CalculateHeighfieldDist2(const ndContactSolver::ndBoxBoxDistance2& data, const ndShapeCompound::ndNodeBase* const compoundNode, ndShapeInstance* const heightfieldInstance)
+	{
+		const ndVector scale(heightfieldInstance->GetScale());
+		const ndVector invScale(heightfieldInstance->GetInvScale());
+		const ndVector size(invScale * data.m_localMatrixAbs1.RotateVector(compoundNode->m_size));
+		const ndVector origin(invScale * data.m_localMatrix1.TransformVector(compoundNode->m_origin));
+		const ndVector p0(origin - size);
+		const ndVector p1(origin + size);
+
+		ndVector boxP0;
+		ndVector boxP1;
+		ndShapeHeightfield* const shape = heightfieldInstance->GetShape()->GetAsShapeHeightfield();
+		shape->GetLocalAabb(p0, p1, boxP0, boxP1);
+		const ndVector boxSize((boxP1 - boxP0) * ndVector::m_half * scale);
+		const ndVector boxOrigin((boxP1 + boxP0) * ndVector::m_half * scale);
+
+		ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, boxOrigin, boxSize);
+		return dist2;
+	}
+
+
 	const ndShapeCompound::ndNodeBase* m_node0;
 	const ndShapeCompound::ndNodeBase* m_node1;
 	ndFloat32 m_dist2;
 };
-
-static void PushStackEntry(
-	ndContactSolver::ndBoxBoxDistance2& data,
-	ndInt32& stack,
-	ndStackEntry* const stackPool,
-	const ndShapeCompound::ndNodeBase* const node0,
-	const ndShapeCompound::ndNodeBase* const node1)
-{
-	dAssert(node0);
-	dAssert(node1);
-	ndInt32 j = stack;
-	ndFloat32 subDist2 = data.CalculateDistance2(node0->m_origin, node0->m_size, node1->m_origin, node1->m_size);
-	for (; j && (subDist2 > stackPool[j - 1].m_dist2); j--)
-	{
-		stackPool[j] = stackPool[j - 1];
-	}
-	stackPool[j].m_node0 = node0;
-	stackPool[j].m_node1 = node1;
-	stackPool[j].m_dist2 = subDist2;
-	stack++;
-	dAssert(stack < 2 * D_COMPOUND_STACK_DEPTH);
-}
-
-static ndFloat32 CalculateHeighfieldDist2(const ndContactSolver::ndBoxBoxDistance2& data, const ndShapeCompound::ndNodeBase* const compoundNode, ndShapeInstance* const heightfieldInstance)
-{
-	const ndVector scale(heightfieldInstance->GetScale());
-	const ndVector invScale(heightfieldInstance->GetInvScale());
-	const ndVector size(invScale * data.m_localMatrixAbs1.RotateVector(compoundNode->m_size));
-	const ndVector origin(invScale * data.m_localMatrix1.TransformVector(compoundNode->m_origin));
-	const ndVector p0(origin - size);
-	const ndVector p1(origin + size);
-
-	ndVector boxP0;
-	ndVector boxP1;
-	ndShapeHeightfield* const shape = heightfieldInstance->GetShape()->GetAsShapeHeightfield();
-	shape->GetLocalAabb(p0, p1, boxP0, boxP1);
-	const ndVector boxSize((boxP1 - boxP0) * ndVector::m_half * scale);
-	const ndVector boxOrigin((boxP1 + boxP0) * ndVector::m_half * scale);
-
-	ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, boxOrigin, boxSize);
-	return dist2;
-}
 
 ndContactSolver::ndContactSolver()
 	:ndDownHeap<ndMinkFace*, ndFloat32>(m_heapBuffer, sizeof(m_heapBuffer))
@@ -2903,6 +2904,7 @@ ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 
 	ndFloat32 closestDist = (stackPool[0].m_dist2 > ndFloat32(0.0f)) ? stackPool[0].m_dist2 : ndFloat32(1.0e10f);
 
+	ndStackEntry callback;
 	while (stack)
 	{
 		stack--;
@@ -2962,13 +2964,13 @@ ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 			{
 				const ndShapeCompound::ndNodeBase* const subNode0 = node0;
 				const ndShapeCompound::ndNodeBase* const subNode1 = node1->m_left;
-				PushStackEntry(data, stack, stackPool, subNode0, subNode1);
+				callback.PushStackEntry(data, stack, stackPool, subNode0, subNode1);
 			}
 
 			{
 				const ndShapeCompound::ndNodeBase* const subNode0 = node0;
 				const ndShapeCompound::ndNodeBase* const subNode1 = node1->m_right;
-				PushStackEntry(data, stack, stackPool, subNode0, subNode1);
+				callback.PushStackEntry(data, stack, stackPool, subNode0, subNode1);
 			}
 		}
 		else if (node1->m_type == ndShapeCompound::m_leaf)
@@ -2977,13 +2979,13 @@ ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 			{
 				const ndShapeCompound::ndNodeBase* const subNode0 = node0->m_left;
 				const ndShapeCompound::ndNodeBase* const subNode1 = node1;
-				PushStackEntry(data, stack, stackPool, subNode0, subNode1);
+				callback.PushStackEntry(data, stack, stackPool, subNode0, subNode1);
 			}
 
 			{
 				const ndShapeCompound::ndNodeBase* const subNode0 = node0->m_right;
 				const ndShapeCompound::ndNodeBase* const subNode1 = node1;
-				PushStackEntry(data, stack, stackPool, subNode0, subNode1);
+				callback.PushStackEntry(data, stack, stackPool, subNode0, subNode1);
 			}
 		}
 		else
@@ -2993,25 +2995,25 @@ ndInt32 ndContactSolver::CompoundToCompoundContactsDiscrete()
 			{
 				const ndShapeCompound::ndNodeBase* const subNode0 = node0->m_left;
 				const ndShapeCompound::ndNodeBase* const subNode1 = node1->m_left;
-				PushStackEntry(data, stack, stackPool, subNode0, subNode1);
+				callback.PushStackEntry(data, stack, stackPool, subNode0, subNode1);
 			}
 
 			{
 				const ndShapeCompound::ndNodeBase* const subNode0 = node0->m_left;
 				const ndShapeCompound::ndNodeBase* const subNode1 = node1->m_right;
-				PushStackEntry(data, stack, stackPool, subNode0, subNode1);
+				callback.PushStackEntry(data, stack, stackPool, subNode0, subNode1);
 			}
 
 			{
 				const ndShapeCompound::ndNodeBase* const subNode0 = node0->m_right;
 				const ndShapeCompound::ndNodeBase* const subNode1 = node1->m_left;
-				PushStackEntry(data, stack, stackPool, subNode0, subNode1);
+				callback.PushStackEntry(data, stack, stackPool, subNode0, subNode1);
 			}
 
 			{
 				const ndShapeCompound::ndNodeBase* const subNode0 = node0->m_right;
 				const ndShapeCompound::ndNodeBase* const subNode1 = node1->m_right;
-				PushStackEntry(data, stack, stackPool, subNode0, subNode1);
+				callback.PushStackEntry(data, stack, stackPool, subNode0, subNode1);
 			}
 		}
 	}
@@ -3266,6 +3268,7 @@ ndInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 	stackPool[0].m_collisionTreeNode = bvhTreeCollision->GetRootNode();
 	stackPool[0].m_dist2 = data.CalculateDistance2(compoundShape->m_root->m_origin, compoundShape->m_root->m_size, bvhOrigin, bvhSize);
 
+	ndStackBvhStackEntry callback;
 	ndFloat32 closestDist = (stackPool[0].m_dist2 > ndFloat32(0.0f)) ? stackPool[0].m_dist2 : ndFloat32(1.0e10f);
 	while (stack)
 	{
@@ -3326,29 +3329,29 @@ ndInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 
 			if (backNode && frontNode)
 			{
-				PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, backNode);
-				PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, frontNode);
+				callback.PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, backNode);
+				callback.PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, frontNode);
 			}
 			else if (backNode && !frontNode)
 			{
-				PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, backNode);
-				PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 1, collisionTreeNode);
+				callback.PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, backNode);
+				callback.PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 1, collisionTreeNode);
 			}
 			else if (!backNode && frontNode)
 			{
-				PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, frontNode);
-				PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 1, collisionTreeNode);
+				callback.PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, frontNode);
+				callback.PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 1, collisionTreeNode);
 			}
 			else
 			{
-				PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 1, collisionTreeNode);
+				callback.PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 1, collisionTreeNode);
 			}
 		}
 		else if (treeNodeIsLeaf)
 		{
 			dAssert(compoundNode->m_type == ndShapeCompound::m_node);
-			PushStackEntry(data, stack, stackPool, compoundNode->m_left, bvhTreeCollision, 1, collisionTreeNode);
-			PushStackEntry(data, stack, stackPool, compoundNode->m_right, bvhTreeCollision, 1, collisionTreeNode);
+			callback.PushStackEntry(data, stack, stackPool, compoundNode->m_left, bvhTreeCollision, 1, collisionTreeNode);
+			callback.PushStackEntry(data, stack, stackPool, compoundNode->m_right, bvhTreeCollision, 1, collisionTreeNode);
 		}
 		else
 		{
@@ -3369,24 +3372,24 @@ ndInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 				const ndAabbPolygonSoup::ndNode* const frontNode = bvhTreeCollision->GetFrontNode(collisionTreeNode);
 				if (backNode && frontNode)
 				{
-					PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, backNode);
-					PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, frontNode);
+					callback.PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, backNode);
+					callback.PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, frontNode);
 				}
 				else if (backNode && !frontNode)
 				{
-					PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, backNode);
-					PushStackEntry(data, stack, stackPool, compoundNode->m_left, bvhTreeCollision, 1, collisionTreeNode);
-					PushStackEntry(data, stack, stackPool, compoundNode->m_right, bvhTreeCollision, 1, collisionTreeNode);
+					callback.PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, backNode);
+					callback.PushStackEntry(data, stack, stackPool, compoundNode->m_left, bvhTreeCollision, 1, collisionTreeNode);
+					callback.PushStackEntry(data, stack, stackPool, compoundNode->m_right, bvhTreeCollision, 1, collisionTreeNode);
 				}
 				else if (!backNode && frontNode)
 				{
-					PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, frontNode);
-					PushStackEntry(data, stack, stackPool, compoundNode->m_left, bvhTreeCollision, 1, collisionTreeNode);
-					PushStackEntry(data, stack, stackPool, compoundNode->m_right, bvhTreeCollision, 1, collisionTreeNode);
+					callback.PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 0, frontNode);
+					callback.PushStackEntry(data, stack, stackPool, compoundNode->m_left, bvhTreeCollision, 1, collisionTreeNode);
+					callback.PushStackEntry(data, stack, stackPool, compoundNode->m_right, bvhTreeCollision, 1, collisionTreeNode);
 				}
 				else
 				{
-					PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 1, collisionTreeNode);
+					callback.PushStackEntry(data, stack, stackPool, compoundNode, bvhTreeCollision, 1, collisionTreeNode);
 				}
 			}
 			else
@@ -3394,8 +3397,8 @@ ndInt32 ndContactSolver::CompoundToShapeStaticBvhContactsDiscrete()
 				dAssert(!treeNodeIsLeaf);
 				dAssert(compoundNode->m_left);
 				dAssert(compoundNode->m_right);
-				PushStackEntry(data, stack, stackPool, compoundNode->m_left, bvhTreeCollision, 0, collisionTreeNode);
-				PushStackEntry(data, stack, stackPool, compoundNode->m_right, bvhTreeCollision, 0, collisionTreeNode);
+				callback.PushStackEntry(data, stack, stackPool, compoundNode->m_left, bvhTreeCollision, 0, collisionTreeNode);
+				callback.PushStackEntry(data, stack, stackPool, compoundNode->m_right, bvhTreeCollision, 0, collisionTreeNode);
 			}
 		}
 	}
@@ -3435,10 +3438,11 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 	ndFloat32 stackDistance[D_SCENE_MAX_STACK_DEPTH];
 	const ndShapeCompound::ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
 
+	ndStackEntry callback;
 	ndInt32 stack = 1;
 	ndInt32 contactCount = 0;
 	stackPool[0] = compoundShape->m_root;
-	stackDistance[0] = CalculateHeighfieldDist2(data, compoundShape->m_root, heightfieldInstance);
+	stackDistance[0] = callback.CalculateHeighfieldDist2(data, compoundShape->m_root, heightfieldInstance);
 	ndFloat32 closestDist = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
 
 	while (stack)
@@ -3496,7 +3500,7 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 			{
 				const ndShapeCompound::ndNodeBase* const left = node->m_left;
 				dAssert(left);
-				ndFloat32 subDist2 = CalculateHeighfieldDist2(data, left, heightfieldInstance);
+				ndFloat32 subDist2 = callback.CalculateHeighfieldDist2(data, left, heightfieldInstance);
 				ndInt32 j = stack;
 				for (; j && (subDist2 > stackDistance[j - 1]); j--)
 				{
@@ -3512,7 +3516,7 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 			{
 				const ndShapeCompound::ndNodeBase* const right = node->m_right;
 				dAssert(right);
-				ndFloat32 subDist2 = CalculateHeighfieldDist2(data, right, heightfieldInstance);
+				ndFloat32 subDist2 = callback.CalculateHeighfieldDist2(data, right, heightfieldInstance);
 				ndInt32 j = stack;
 				for (; j && (subDist2 > stackDistance[j - 1]); j--)
 				{

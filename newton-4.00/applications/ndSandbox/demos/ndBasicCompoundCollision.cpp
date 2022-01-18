@@ -20,7 +20,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
-#if 0
+#if 1
 static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene,
 	const ndMatrix& matrix, const ndShapeInstance& shape,
 	ndDemoInstanceEntity* const rootEntity, ndFloat32 mass)

@@ -125,8 +125,10 @@ class ndShapeCompound::ndNodeBase: public ndClassAlloc
 	~ndNodeBase();
 
 	//void Sanity(int level = 0);
-	void CalculateAABB();
 	ndShapeInstance* GetShape() const;
+
+	private:
+	void CalculateAABB();
 	void SetBox(const ndVector& p0, const ndVector& p1);
 
 	ndVector m_p0;
@@ -140,6 +142,11 @@ class ndShapeCompound::ndNodeBase: public ndClassAlloc
 	ndNodeBase* m_parent;
 	ndTreeArray::ndNode* m_myNode;
 	ndShapeInstance* m_shapeInstance;
+
+	friend class ndStackEntry;
+	friend class ndContactSolver;
+	friend class ndShapeCompound;
+	friend class ndStackBvhStackEntry;
 };
 
 inline ndShapeCompound::ndNodeBase::ndNodeBase()

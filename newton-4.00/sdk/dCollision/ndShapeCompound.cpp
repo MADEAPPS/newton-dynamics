@@ -547,7 +547,6 @@ ndFloat32 ndShapeCompound::CalculateSurfaceArea(ndNodeBase* const node0, ndNodeB
 	return side0.DotProduct(side0.ShiftTripleRight()).GetScalar();
 }
 
-
 void ndShapeCompound::ImproveNodeFitness(ndNodeBase* const node) const
 {
 	dAssert(node->m_left);
