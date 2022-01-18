@@ -882,7 +882,7 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 	ndVector pointOnInstance1(matrix1.UntransformVector(origin));
 	ndVector normalOnInstance1(matrix1.UnrotateVector(normal));
 	ndFloat32 dist = (normal.DotProduct(point0 - point1)).GetScalar();
-	//if (dist < ndFloat32(0.0f)) 
+	
 	if (dist < (D_PENETRATION_TOL * ndFloat32 (-0.5f)))
 	{
 		count1 = m_instance1.CalculatePlaneIntersection(normalOnInstance1, pointOnInstance1, shape1);
@@ -917,7 +917,7 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 		const ndMatrix& matrix0 = m_instance0.m_globalMatrix;
 		ndVector pointOnInstance0(matrix0.UntransformVector(origin));
 		ndVector normalOnInstance0(matrix0.UnrotateVector(normal.Scale(ndFloat32(-1.0f))));
-		//if (dist < ndFloat32(0.0f)) 
+
 		if (dist < (D_PENETRATION_TOL * ndFloat32(-0.5f)))
 		{
 			count0 = m_instance0.CalculatePlaneIntersection(normalOnInstance0, pointOnInstance0, shape0);
@@ -1014,13 +1014,6 @@ ndInt32 ndContactSolver::CalculateContacts(const ndVector& point0, const ndVecto
 			}
 		}
 	}
-
-	//if (!count && m_ccdMode) 
-	//{
-	//	count = 1;
-	//	contactsOut[0] = origin;
-	//}
-
 	return count;
 }
 
@@ -1091,13 +1084,11 @@ ndInt32 ndContactSolver::ConvexPolygonToLineIntersection(const ndVector& normal,
 				return 0;
 			}
 
-
 			count2 = count;
 			ptr = output;
 			output = &output[count];
 			count = 0;
 			i0 = i1;
-			//dAssert (output < &pool[sizeof (pool)/sizeof (pool[0])]);
 		}
 	}
 	else if (count2 == 1) 
@@ -2269,7 +2260,8 @@ ndInt32 ndContactSolver::CalculateIntersectingPlane(ndInt32 count)
 		ndMinkFace* const faceNode = (*this)[0];
 		Pop();
 
-		if (faceNode->m_alive) {
+		if (faceNode->m_alive) 
+		{
 			SupportVertex(faceNode->m_plane & ndVector::m_triplexMask, m_vertexIndex);
 			const ndVector& p = m_hullDiff[m_vertexIndex];
 			ndFloat32 dist = faceNode->m_plane.Evalue(p);
@@ -2561,6 +2553,14 @@ ndInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 			if (m_instance0.GetCollisionMode() & m_instance1.GetCollisionMode())
 			{
 				count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_separatingVector * ndVector::m_negOne);
+				if (!count)
+				{
+					// poly line failed probably because of rounding error
+					// but we know the shapes are colliding
+					// just return the closest points as contacts
+					m_buffer[0] = ndVector::m_half * (m_closestPoint0 + m_closestPoint1);
+					count = 1;
+				}
 			}
 		}
 
@@ -3713,8 +3713,6 @@ ndInt32 ndContactSolver::ConvexToConvexContactsContinue()
 			{
 				if (m_instance0.GetCollisionMode() & m_instance1.GetCollisionMode())
 				{
-					//m_normal = m_normal.Scale(ndFloat32(-1.0f));
-					//m_proxy->m_contactJoint->m_isActive = 1;
 					count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_separatingVector);
 					if (count)
 					{

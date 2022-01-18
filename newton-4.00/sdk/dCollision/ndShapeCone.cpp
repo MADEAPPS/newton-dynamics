@@ -203,9 +203,6 @@ ndVector ndShapeCone::SupportVertex(const ndVector& dir, ndInt32* const) const
 	
 	ndVector dir_yz(dir);
 	dir_yz.m_x = ndFloat32(0.0f);
-	//ndFloat32 mag2 = dir_yz.DotProduct(dir_yz).GetScalar();
-	//dAssert(mag2 > ndFloat32(0.0f));
-	//dir_yz = dir_yz.Scale(ndFloat32(1.0f) / dgSqrt(mag2));
 	dAssert(dir_yz.DotProduct(dir_yz).GetScalar() > ndFloat32(0.0f));
 	dir_yz = dir_yz.Normalize();
 
@@ -240,10 +237,6 @@ ndVector ndShapeCone::SupportVertexSpecial(const ndVector& dir, ndFloat32, ndInt
 	}
 
 	ndVector dir_yz(dir);
-	//dir_yz.m_x = ndFloat32(0.0f);
-	//ndFloat32 mag2 = dir_yz.DotProduct(dir_yz).GetScalar();
-	//dgAssert(mag2 > ndFloat32(0.0f));
-	//dir_yz = dir_yz.Scale(ndFloat32(1.0f) / dgSqrt(mag2));
 	dAssert(dir_yz.DotProduct(dir_yz).GetScalar() > ndFloat32(0.0f));
 	dir_yz = dir_yz.Normalize();
 
@@ -284,9 +277,9 @@ ndInt32 ndShapeCone::CalculatePlaneIntersection(const ndVector& normal, const nd
 			ndMatrix matrix(normal);
 			matrix.m_posit.m_x = origin.m_x;
 			count = BuildCylinderCapPoly(m_radius, matrix, contactsOut);
-			//count = RectifyConvexSlice(n, normal, contactsOut);
 		}
-		else {
+		else 
+		{
 			ndFloat32 magInv = ndRsqrt(normal.m_y * normal.m_y + normal.m_z * normal.m_z);
 			ndFloat32 cosAng = normal.m_y * magInv;
 			ndFloat32 sinAng = normal.m_z * magInv;
