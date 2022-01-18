@@ -14,64 +14,17 @@
 
 ndShaderPrograms::ndShaderPrograms(void)
 {
-	m_skyBox = 0;
-	m_wireFrame = 0;
-	m_flatShaded = 0;
-	m_decalEffect = 0;
-	m_texturedDecal = 0;
-	m_diffuseEffect = 0;
-	m_spriteSpheres = 0;
-	m_diffuseDebrisEffect = 0;
-	m_diffuseIntanceEffect = 0;
-	m_skinningDiffuseEffect = 0;
-	m_diffuseNoTextureEffect = 0;
+	memset(m_shaders, 0, sizeof(m_shaders));
 }
 
 ndShaderPrograms::~ndShaderPrograms(void)
 {
-	if (m_skyBox)
+	for (ndInt32 i = 0; i < sizeof(m_shaders) / sizeof(m_shaders[0]); i++)
 	{
-		glDeleteShader(m_skyBox);
-	}
-	if (m_wireFrame)
-	{
-		glDeleteShader(m_wireFrame);
-	}
-	if (m_flatShaded)
-	{
-		glDeleteShader(m_flatShaded);
-	}
-	if (m_texturedDecal) 
-	{
-		glDeleteShader(m_texturedDecal);
-	}
-	if (m_decalEffect) 
-	{
-		glDeleteShader(m_decalEffect);
-	}
-	if (m_diffuseEffect) 
-	{
-		glDeleteShader(m_diffuseEffect);
-	}
-	if (m_spriteSpheres)
-	{
-		glDeleteShader(m_spriteSpheres);
-	}
-	if (m_diffuseDebrisEffect)
-	{
-		glDeleteShader(m_diffuseDebrisEffect);
-	}
-	if (m_diffuseNoTextureEffect) 
-	{
-		glDeleteShader(m_diffuseNoTextureEffect);
-	}
-	if (m_skinningDiffuseEffect) 
-	{
-		glDeleteShader(m_skinningDiffuseEffect);
-	}
-	if (m_diffuseIntanceEffect) 
-	{
-		glDeleteShader(m_diffuseIntanceEffect);
+		if (m_shaders[i])
+		{
+			glDeleteShader(m_skyBox);
+		}
 	}
 }
 
@@ -88,6 +41,7 @@ bool ndShaderPrograms::CreateAllEffects()
 	m_diffuseNoTextureEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuseNoTexture");
 	m_diffuseIntanceEffect = CreateShaderEffect ("DirectionalDiffuseInstance", "DirectionalDiffuse");
 
+	m_thickPoints = CreateShaderEffect("ThickPoint", "ThickPoint", "ThickPoint");
 	m_spriteSpheres = CreateShaderEffect("DirectionalDiffuseSprite", "DirectionalDiffuseSprite", "DirectionalDiffuseSprite");
 
 	return true;

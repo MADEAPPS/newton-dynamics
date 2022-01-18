@@ -8,18 +8,13 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */  
-
+   
 #version 330 core
 
-uniform mat4 viewModelMatrix;
-uniform vec4 shadeColor;
-
-out vec4 color;
-out vec4 origin;
-in vec4 vertex;
+in vec4 pixelColor;
+out vec4 screenColor;
 
 void main()
-{	
-	color = shadeColor;
-	origin = viewModelMatrix * vec4(vec3(vertex), 1.0);
+{
+	screenColor = pixelColor;
 }

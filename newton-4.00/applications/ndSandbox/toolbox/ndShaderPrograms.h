@@ -30,17 +30,40 @@ class ndShaderPrograms
 	GLuint CreateShaderEffect (const char* const vertexShader, const char* const pixelShader, const char* const geometryShader = nullptr);
 
 	public:
-	GLuint m_skyBox;
-	GLuint m_wireFrame;
-	GLuint m_flatShaded;
-	GLuint m_decalEffect;
-	GLuint m_texturedDecal;
-	GLuint m_diffuseEffect;
-	GLuint m_spriteSpheres;
-	GLuint m_diffuseDebrisEffect;
-	GLuint m_diffuseIntanceEffect;
-	GLuint m_skinningDiffuseEffect;
-	GLuint m_diffuseNoTextureEffect;
+	union
+	{
+		struct
+		{
+			GLuint m_skyBox;
+			GLuint m_wireFrame;
+			GLuint m_flatShaded;
+			GLuint m_thickPoints;
+			//GLuint m_decalEffect;
+			GLuint m_texturedDecal;
+			GLuint m_diffuseEffect;
+			GLuint m_spriteSpheres;
+			GLuint m_diffuseDebrisEffect;
+			GLuint m_diffuseIntanceEffect;
+			GLuint m_skinningDiffuseEffect;
+			GLuint m_diffuseNoTextureEffect;
+		};
+		struct m_named
+		{
+			GLuint m_skyBox;
+			GLuint m_wireFrame;
+			GLuint m_flatShaded;
+			GLuint m_thickPoints;
+			//GLuint m_decalEffect;
+			GLuint m_texturedDecal;
+			GLuint m_diffuseEffect;
+			GLuint m_spriteSpheres;
+			GLuint m_diffuseDebrisEffect;
+			GLuint m_diffuseIntanceEffect;
+			GLuint m_skinningDiffuseEffect;
+			GLuint m_diffuseNoTextureEffect;
+		};
+		GLuint m_shaders[sizeof (m_named)/sizeof (GLuint)];
+	};
 };
 
 

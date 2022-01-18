@@ -12,7 +12,7 @@
 #version 330 core
 
 uniform mat4 viewModelMatrix;
-uniform vec4 shadeColor;
+uniform vec4 inputPixelColor;
 
 out vec4 color;
 out vec4 origin;
@@ -20,6 +20,6 @@ in vec4 vertex;
 
 void main()
 {	
-	color = shadeColor;
+	color = inputPixelColor;
 	origin = viewModelMatrix * vec4(vec3(vertex), 1.0);
 }
