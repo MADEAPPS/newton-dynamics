@@ -98,8 +98,6 @@ class ndBodyKinematic: public ndBody
 	const ndVector& GetMassMatrix() const;
 	const ndMatrix& GetInvInertiaMatrix() const;
 
-	void SetMassMatrix(const ndVector& massMatrix);
-
 	ndVector GetGyroAlpha() const;
 	ndVector GetGyroTorque() const;
 
@@ -133,8 +131,11 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	void UpdateInvInertiaMatrix();
+	void SetMassMatrix(const ndVector& massMatrix);
 	void SetMassMatrix(ndFloat32 mass, const ndShapeInstance& shapeInstance);
 	void SetMassMatrix(ndFloat32 Ixx, ndFloat32 Iyy, ndFloat32 Izz, ndFloat32 mass);
+	D_COLLISION_API virtual void SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia);
+
 	void GetMassMatrix(ndFloat32& Ixx, ndFloat32& Iyy, ndFloat32& Izz, ndFloat32& mass);
 
 	D_COLLISION_API void SetMatrixUpdateScene(const ndMatrix& matrix);
@@ -167,7 +168,6 @@ class ndBodyKinematic: public ndBody
 	protected:
 	D_COLLISION_API virtual void AttachContact(ndContact* const contact);
 	D_COLLISION_API virtual void DetachContact(ndContact* const contact);
-	D_COLLISION_API virtual void SetMassMatrix(ndFloat32 mass, const ndMatrix& inertia);
 
 	D_COLLISION_API virtual ndJointList::ndNode* AttachJoint(ndJointBilateralConstraint* const joint);
 	D_COLLISION_API virtual void DetachJoint(ndJointList::ndNode* const node);
