@@ -88,7 +88,7 @@ bool ndShaderPrograms::CreateAllEffects()
 	m_diffuseNoTextureEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuseNoTexture");
 	m_diffuseIntanceEffect = CreateShaderEffect ("DirectionalDiffuseInstance", "DirectionalDiffuse");
 
-	m_spriteSpheres = CreateShaderEffect("DirectionalDiffuseSprite", "FlatShaded", "DirectionalDiffuseSprite");
+	m_spriteSpheres = CreateShaderEffect("DirectionalDiffuseSprite", "DirectionalDiffuseSprite", "DirectionalDiffuseSprite");
 
 	return true;
 }

@@ -19,16 +19,14 @@ layout (points) in;
 layout (triangle_strip, max_vertices = 4) out;
 
 in vec4 color[];
-//in vec4 origin[];
+in vec4 origin[];
 out vec4 quadColor;
 
 void main()
 {	
-	//vec4 posit = origin[0];
-	vec4 posit = gl_in[0].gl_Position;
+	vec4 posit = origin[0];
 
 	quadColor = color[0];
-
 	vec4 quad0 = posit + quadSize[0];
 	gl_Position = projectionMatrix * quad0;
 	EmitVertex();

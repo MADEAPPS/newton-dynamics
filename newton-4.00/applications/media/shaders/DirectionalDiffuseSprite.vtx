@@ -16,11 +16,11 @@ uniform mat4 viewModelMatrix;
 uniform vec4 shadeColor;
 
 out vec4 color;
-//out vec4 origin;
+out vec4 origin;
 in vec4 vertex;
 
 void main()
 {	
 	color = shadeColor;
-	gl_Position = viewModelMatrix * vec4(vec3(vertex), 1.0);
+	origin = viewModelMatrix * vec4(vec3(vertex), 1.0);
 }
