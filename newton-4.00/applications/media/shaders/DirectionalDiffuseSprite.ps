@@ -11,10 +11,15 @@
    
 #version 330 core
 
+uniform mat4 projectionMatrix;
+uniform vec4 spriteRadius;
+
 //uniform vec4 directionalLightDir;
 
 in vec4 quadUV;
 in vec4 quadColor;
+in vec4 spriteOrigin;
+
 out vec4 pixelColor;
 
 void main()
@@ -25,16 +30,19 @@ void main()
 		discard; 
 	}
 
-	vec3 normalInPixelSpace = vec3(quadUV.x, quadUV.y, sqrt (1.0 - r2));
+	vec4 normalInPixelSpace = vec4(quadUV.x, quadUV.y, sqrt (1.0 - r2), 0.0f);
 
-	// TODO
-	// here I nee to rest the z buffer and prevent z fitgting
+	// here I need to rest the z buffer and prevent z fitgting
+	vec4 pointOnSphere = spriteOrigin + normalInPixelSpace * spriteRadius;
+	vec4 newPointOnSphere = projectionMatrix * pointOnSphere;
+	//gl_FragCoord = pointOnSphere;
+	gl_FragDepth = newPointOnSphere.z / newPointOnSphere.w;
 
 	// TODO
 	// now I need the light vector also in pixel space
 	// which should be an interpolated input, 
 	// for now just hack a fix value
-	vec3 directionalLightDir = vec3(0.71, 0.71, 0.0);
+	vec4 directionalLightDir = vec4(0.71, 0.71, 0.0, 0.0);
 	float difusse = max (dot(normalInPixelSpace, directionalLightDir), 0.3) ;
 
 	pixelColor = quadColor * difusse;

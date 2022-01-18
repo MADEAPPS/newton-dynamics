@@ -432,6 +432,7 @@ void RenderParticles(ndDemoEntityManager* const scene)
 
 	ndInt32 quadLocation = glGetUniformLocation(shader, "quadSize");
 	ndInt32 uvSizeLocation = glGetUniformLocation(shader, "uvSize");
+	ndInt32 radiusLocation = glGetUniformLocation(shader, "spriteRadius");
 
 	glUniform4fv(shadeColorLocation, 1, &color.m_x);
 
@@ -470,6 +471,9 @@ void RenderParticles(ndDemoEntityManager* const scene)
 			ndVector(-radius,  radius, ndFloat32(0.0f), ndFloat32(0.0f)),
 			ndVector( radius,  radius, ndFloat32(0.0f), ndFloat32(0.0f)),
 		};
+
+		glVector4 spriteRadius(radius, radius, radius, 0.0f);
+		glUniform4fv(radiusLocation, 1, &spriteRadius.m_x);
 		glUniform4fv(quadLocation, 4, &quad[0].m_x);
 		glUniform4fv(uvSizeLocation, 4, &quadUV[0][0]);
 		glDrawArrays(GL_POINTS, 0, positions.GetCount());

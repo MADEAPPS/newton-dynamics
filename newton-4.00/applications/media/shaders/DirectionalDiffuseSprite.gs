@@ -24,11 +24,14 @@ in vec4 origin[];
 
 out vec4 quadUV;
 out vec4 quadColor;
+out vec4 spriteOrigin;
 
 void GetPosit(int index)
 {
 	quadUV = uvSize[index];
-	vec4 p = origin[0] + quadSize[index];
+	spriteOrigin = origin[0];
+
+	vec4 p = spriteOrigin + quadSize[index];
 	gl_Position = projectionMatrix * p;
 	EmitVertex();
 }
