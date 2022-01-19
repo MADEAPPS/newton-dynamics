@@ -35,14 +35,13 @@ void main()
 	// here I need to rest the z buffer and prevent z fitgting
 	vec4 pointOnSphere = spriteOrigin + normalInPixelSpace * spriteRadius;
 	vec4 newPointOnSphere = projectionMatrix * pointOnSphere;
-	//gl_FragCoord = pointOnSphere;
 	gl_FragDepth = newPointOnSphere.z / newPointOnSphere.w;
 
 	// TODO
 	// now I need the light vector also in pixel space
 	// which should be an interpolated input, 
 	// for now just hack a fix value
-	vec4 directionalLightDir = vec4(0.71, 0.71, 0.0, 0.0);
+	vec4 directionalLightDir = vec4(0.577, 0.577, 0.577, 0.0);
 	float difusse = max (dot(normalInPixelSpace, directionalLightDir), 0.3) ;
 
 	pixelColor = quadColor * difusse;
