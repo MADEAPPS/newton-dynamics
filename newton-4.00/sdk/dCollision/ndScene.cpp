@@ -56,7 +56,7 @@ class ndScene::ndSpliteInfo
 		if (boxCount == 2)
 		{
 			m_axis = 1;
-			for (ndInt32 i = 0; i < boxCount; i++)
+			for (ndInt32 i = 0; i < boxCount; ++i)
 			{
 				ndSceneNode* const node = boxArray[i];
 				dAssert(node->GetAsSceneBodyNode());
@@ -68,7 +68,7 @@ class ndScene::ndSpliteInfo
 		{
 			ndVector median(ndVector::m_zero);
 			ndVector varian(ndVector::m_zero);
-			for (ndInt32 i = 0; i < boxCount; i++)
+			for (ndInt32 i = 0; i < boxCount; ++i)
 			{
 				ndSceneNode* const node = boxArray[i];
 				dAssert(node->GetAsSceneBodyNode());
@@ -83,7 +83,7 @@ class ndScene::ndSpliteInfo
 
 			ndInt32 index = 0;
 			ndFloat32 maxVarian = ndFloat32(-1.0e15f);
-			for (ndInt32 i = 0; i < 3; i++)
+			for (ndInt32 i = 0; i < 3; ++i)
 			{
 				if (varian[i] > maxVarian)
 				{
@@ -714,7 +714,7 @@ ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, ndInt32 fir
 	const ndSceneNode* const node0 = leafArray[firstBox];
 	const ndInt32 count = lastBox - firstBox;
 	ndFloat32 area0 = scale * node0->m_surfaceArea;
-	for (ndInt32 i = 1; i <= count; i++) 
+	for (ndInt32 i = 1; i <= count; ++i) 
 	{
 		const ndSceneNode* const node1 = leafArray[firstBox + i];
 		ndFloat32 area1 = node1->m_surfaceArea;
@@ -957,7 +957,7 @@ void ndScene::ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndConta
 	}
 	
 	ndFloat32 maxImpulse = ndFloat32(-1.0f);
-	for (ndInt32 i = 0; i < contactCount; i++) 
+	for (ndInt32 i = 0; i < contactCount; ++i) 
 	{
 		ndInt32 index = -1;
 		ndFloat32 min = ndFloat32(1.0e20f);
@@ -1078,7 +1078,7 @@ void ndScene::ProcessContacts(ndInt32 threadIndex, ndInt32 contactCount, ndConta
 		dAssert(contactPoint->m_normal.m_w == ndFloat32(0.0f));
 	}
 	
-	for (ndInt32 i = 0; i < count; i++) 
+	for (ndInt32 i = 0; i < count; ++i) 
 	{
 		contactPointList.Remove(nodes[i]);
 	}
@@ -1383,7 +1383,7 @@ void ndScene::InitBodyArray()
 	ndInt32 threadCount = GetThreadCount();
 	for (ndInt32 j = 0; j < 2; j++)
 	{
-		for (ndInt32 i = 0; i < threadCount; i++)
+		for (ndInt32 i = 0; i < threadCount; ++i)
 		{
 			const ndInt32 count = info.m_scan[i][j];
 			info.m_scan[i][j] = sum;
@@ -1510,7 +1510,7 @@ void ndScene::CalculateContacts()
 		ndInt32 threadCount = GetThreadCount();
 		for (ndInt32 j = 0; j < 4; j++)
 		{
-			for (ndInt32 i = 0; i < threadCount; i++)
+			for (ndInt32 i = 0; i < threadCount; ++i)
 			{
 				const ndInt32 count = info.m_digitScan[i][j];
 				info.m_digitScan[i][j] = sum;
@@ -1528,7 +1528,7 @@ void ndScene::CalculateContacts()
 			D_TRACKTIME();
 			// this could be parallelized, monitor it to see if is worth doing it.
 			const ndInt32 start = activeJoints + inactiveJoints;
-			for (ndInt32 i = 0; i < deadContacts; i++)
+			for (ndInt32 i = 0; i < deadContacts; ++i)
 			{
 				ndContact* const contact = m_contactArray[start + i];
 				m_contactArray.DeleteContact(contact);
@@ -1787,7 +1787,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 
 	dAssert(globalOrigin.TestOrthogonal());
 	convexShape.CalculateAabb(globalOrigin, boxP0, boxP1);
-
+	
 	callback.m_contacts.SetCount(0);
 	callback.m_param = ndFloat32(1.2f);
 	while (stack) 
@@ -1806,32 +1806,62 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 			ndBody* const body = me->GetBody();
 			if (body) 
 			{
-				if (callback.OnRayPrecastAction (body, &convexShape)) 
+				if (callback.OnRayPrecastAction (body, &convexShape))
 				{
-					ndConvexCastNotify castShape;
+					// save contacts and try new set
+					ndConvexCastNotify saveNotification(callback);
 					ndBodyKinematic* const kinBody = body->GetAsBodyKinematic();
-					if (castShape.CastShape(convexShape, globalOrigin, globalDest, kinBody->GetCollisionShape(), kinBody->GetMatrix()))
+					callback.m_contacts.SetCount(0);
+					if (callback.CastShape(convexShape, globalOrigin, globalDest, kinBody->GetCollisionShape(), kinBody->GetMatrix()))
 					{
-						if ((castShape.m_param - callback.m_param) < ndFloat32(-1.0e-3f))
+						// found new contacts, see how the are managed
+						if (dAbs(saveNotification.m_param - callback.m_param) < ndFloat32(-1.0e-3f))
 						{
-							callback.m_contacts.SetCount(0);
+							// merge contact
+							for (ndInt32 i = 0; i < saveNotification.m_contacts.GetCount(); ++i)
+							{
+								const ndContactPoint& contact = saveNotification.m_contacts[i];
+								bool newPoint = true;
+								for (ndInt32 j = callback.m_contacts.GetCount() - 1; j >= 0; j++)
+								{
+									const ndVector diff(callback.m_contacts[j].m_point - contact.m_point);
+									ndFloat32 mag2 = diff.DotProduct(diff & ndVector::m_triplexMask).GetScalar();
+									newPoint = newPoint & (mag2 > ndFloat32(1.0e-5f));
+								}
+								if (newPoint && (callback.m_contacts.GetCount() < callback.m_contacts.GetCapacity()))
+								{
+									callback.m_contacts.PushBack(contact);
+								}
+							}
 						}
-
-						callback.m_param = castShape.m_param;
-						if ((castShape.m_contacts.GetCount() + callback.m_contacts.GetCount()) >= callback.m_contacts.GetCapacity())
+						else if (callback.m_param > saveNotification.m_param)
 						{
-							dAssert(0);
-							//count = maxContacts - totalCount;
+							// restore contacts
+							callback.m_normal = saveNotification.m_normal;
+							callback.m_closestPoint0 = saveNotification.m_closestPoint0;
+							callback.m_closestPoint1 = saveNotification.m_closestPoint1;
+							callback.m_param = saveNotification.m_param;
+							for (ndInt32 i = 0; i < saveNotification.m_contacts.GetCount(); ++i)
+							{
+								callback.m_contacts[i] = saveNotification.m_contacts[i];
+							}
 						}
-
-						for (ndInt32 i = castShape.m_contacts.GetCount() - 1; i >= 0; i--)
-						{
-							callback.m_contacts.PushBack(castShape.m_contacts[i]);
-						}
-						callback.m_normal = castShape.m_normal;
-						callback.m_closestPoint0 = castShape.m_closestPoint0;
-						callback.m_closestPoint1 = castShape.m_closestPoint1;
 					}
+					else
+					{
+						// no new contacts restore old ones,
+						// in theory it should no copy, by the notification may change
+						// the previuos found contacts
+						callback.m_normal = saveNotification.m_normal;
+						callback.m_closestPoint0 = saveNotification.m_closestPoint0;
+						callback.m_closestPoint1 = saveNotification.m_closestPoint1;
+						callback.m_param = saveNotification.m_param;
+						for (ndInt32 i = 0; i < saveNotification.m_contacts.GetCount(); ++i)
+						{
+							callback.m_contacts[i] = saveNotification.m_contacts[i];
+						}
+					}
+
 					if (callback.m_param < ndFloat32 (1.0e-8f)) 
 					{
 						break;
@@ -1862,7 +1892,6 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 				}
 		
 				{
-					//const dgBroadPhaseNode* const right = node->m_right;
 					const ndSceneNode* const right = me->GetRight();
 					dAssert(right);
 					const ndVector minBox(right->m_minBox - boxP1);
