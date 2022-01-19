@@ -34,7 +34,7 @@ class ndSkeletonContainer;
 class ndJointBilateralConstraint;
 
 D_MSV_NEWTON_ALIGN_32
-class ndBodyKinematic: public ndBody
+class ndBodyKinematic : public ndBody
 {
 	class ndContactkey
 	{
