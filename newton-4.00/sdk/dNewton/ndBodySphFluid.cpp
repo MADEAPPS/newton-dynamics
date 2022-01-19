@@ -291,7 +291,7 @@ void ndBodySphFluid::CaculateAabb()
 		const ndBodySphFluid* m_fluid;
 	};
 
-	class ndCaculateAabb : public ndThreadPoolJob
+	class ndCalculateAabb : public ndThreadPoolJob
 	{
 		virtual void Execute()
 		{
@@ -314,7 +314,7 @@ void ndBodySphFluid::CaculateAabb()
 	ndContext context;
 	context.m_fluid = this;
 	ndThreadBackgroundWorker* const threadPool = GetThreadPool();
-	threadPool->SubmitJobs<ndCaculateAabb>(&context);
+	threadPool->SubmitJobs<ndCalculateAabb>(&context);
 
 	ndBox box;
 	const ndInt32 threadCount = threadPool->GetThreadCount();

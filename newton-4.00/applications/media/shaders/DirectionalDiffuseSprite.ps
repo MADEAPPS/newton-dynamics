@@ -10,23 +10,6 @@
 */  
    
 #version 330 core
-// from, chrornos and opengl specs 
-// "The layout qualifier for gl_FragDepth 
-// specifies constraints on the final value 
-// of gl_FragDepth written by any shader 
-// invocation. 
-// GL implementations may perform optimizations 
-// assuming that the depth test fails (or passes) 
-// for a given fragment if all values 
-// of gl_FragDepth consistent with the layout
-// qualifier would fail (or pass)."
-
-// it does not seem to do anything in my system, 
-// but I leave it anyway maybe some newer
-// hardware supports it. 
-// in fact this actually fail with some GPUs.
-//layout (depth_less) out float gl_FragDepth;
-
 uniform mat4 projectionMatrix;
 uniform vec4 spriteRadius;
 
