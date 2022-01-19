@@ -49,6 +49,10 @@ if(UNIX)
 	add_library(${projectName} SHARED ${CPP_SOURCE})
 endif()
 
+if(MSVC OR MINGW)
+	target_link_options(${projectName} PUBLIC "/DEBUG") 
+endif()
+
 install(TARGETS ${projectName}
 		LIBRARY DESTINATION lib
 		ARCHIVE DESTINATION lib

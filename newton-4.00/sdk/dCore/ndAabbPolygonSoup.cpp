@@ -19,7 +19,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ndCoreStdafx.h"
+#include "ndCoreStdAfx.h"
 #include "ndTypes.h"
 #include "ndHeap.h"
 #include "ndStack.h"

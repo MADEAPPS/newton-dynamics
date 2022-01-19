@@ -73,7 +73,6 @@ if(NEWTON_BUILD_SHARED_LIBS)
 	add_definitions(-D_D_NEWTON_EXPORT_DLL)
 	add_library(${projectName} SHARED ${CPP_SOURCE})
 
-	target_link_libraries (${projectName} ndAvx2Solver)
 
 	if(MSVC OR MINGW)
 		target_link_options(${projectName} PUBLIC "/DEBUG") 
@@ -106,6 +105,10 @@ if (MSVC)
 endif(MSVC)
 
 target_link_libraries(${projectName} ndTinyxml ndCore ndCollision)
+if(NEWTON_ENABLE_AVX2_SOLVER)
+	target_link_libraries(${projectName} ndSolverAvx2)
+endif()
+
 
 install(TARGETS ${projectName} 
 		LIBRARY DESTINATION lib
