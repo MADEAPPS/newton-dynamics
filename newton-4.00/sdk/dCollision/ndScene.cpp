@@ -1851,7 +1851,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 					{
 						// no new contacts restore old ones,
 						// in theory it should no copy, by the notification may change
-						// the previuos found contacts
+						// the previous found contacts
 						callback.m_normal = saveNotification.m_normal;
 						callback.m_closestPoint0 = saveNotification.m_closestPoint0;
 						callback.m_closestPoint1 = saveNotification.m_closestPoint1;

@@ -23,8 +23,9 @@
 
 // it does not seem to do anything in my system, 
 // but I leave it anyway maybe some newer
-// hardware supports it.
-layout (depth_less) out float gl_FragDepth;
+// hardware supports it. 
+// in fact this actually fail with some GPUs.
+//layout (depth_less) out float gl_FragDepth;
 
 uniform mat4 projectionMatrix;
 uniform vec4 spriteRadius;
