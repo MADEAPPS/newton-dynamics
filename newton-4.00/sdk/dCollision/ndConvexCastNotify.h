@@ -59,8 +59,9 @@ class ndConvexCastNotify : public ndClassAlloc
 		return 0;
 	}
 
+	D_COLLISION_API bool CastShape(const ndShapeInstance& castingInstance, const ndMatrix& globalOrigin, const ndVector& globalDest, ndBodyKinematic* const targetBody);
 	D_COLLISION_API bool CastShape(const ndShapeInstance& castingInstance, const ndMatrix& globalOrigin, const ndVector& globalDest, const ndShapeInstance& targetShape, const ndMatrix& targetMatrix);
-
+	
 	ndVector m_normal;
 	ndVector m_closestPoint0;
 	ndVector m_closestPoint1;

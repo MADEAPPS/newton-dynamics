@@ -1809,18 +1809,18 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 				if (callback.OnRayPrecastAction (body, &convexShape))
 				{
 					// save contacts and try new set
-					ndConvexCastNotify saveNotification(callback);
+					ndConvexCastNotify savedNotification(callback);
 					ndBodyKinematic* const kinBody = body->GetAsBodyKinematic();
 					callback.m_contacts.SetCount(0);
-					if (callback.CastShape(convexShape, globalOrigin, globalDest, kinBody->GetCollisionShape(), kinBody->GetMatrix()))
+					if (callback.CastShape(convexShape, globalOrigin, globalDest, kinBody))
 					{
 						// found new contacts, see how the are managed
-						if (dAbs(saveNotification.m_param - callback.m_param) < ndFloat32(-1.0e-3f))
+						if (dAbs(savedNotification.m_param - callback.m_param) < ndFloat32(-1.0e-3f))
 						{
 							// merge contact
-							for (ndInt32 i = 0; i < saveNotification.m_contacts.GetCount(); ++i)
+							for (ndInt32 i = 0; i < savedNotification.m_contacts.GetCount(); ++i)
 							{
-								const ndContactPoint& contact = saveNotification.m_contacts[i];
+								const ndContactPoint& contact = savedNotification.m_contacts[i];
 								bool newPoint = true;
 								for (ndInt32 j = callback.m_contacts.GetCount() - 1; j >= 0; j++)
 								{
@@ -1834,16 +1834,16 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 								}
 							}
 						}
-						else if (callback.m_param > saveNotification.m_param)
+						else if (callback.m_param > savedNotification.m_param)
 						{
 							// restore contacts
-							callback.m_normal = saveNotification.m_normal;
-							callback.m_closestPoint0 = saveNotification.m_closestPoint0;
-							callback.m_closestPoint1 = saveNotification.m_closestPoint1;
-							callback.m_param = saveNotification.m_param;
-							for (ndInt32 i = 0; i < saveNotification.m_contacts.GetCount(); ++i)
+							callback.m_normal = savedNotification.m_normal;
+							callback.m_closestPoint0 = savedNotification.m_closestPoint0;
+							callback.m_closestPoint1 = savedNotification.m_closestPoint1;
+							callback.m_param = savedNotification.m_param;
+							for (ndInt32 i = 0; i < savedNotification.m_contacts.GetCount(); ++i)
 							{
-								callback.m_contacts[i] = saveNotification.m_contacts[i];
+								callback.m_contacts[i] = savedNotification.m_contacts[i];
 							}
 						}
 					}
@@ -1852,13 +1852,13 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 						// no new contacts restore old ones,
 						// in theory it should no copy, by the notification may change
 						// the previous found contacts
-						callback.m_normal = saveNotification.m_normal;
-						callback.m_closestPoint0 = saveNotification.m_closestPoint0;
-						callback.m_closestPoint1 = saveNotification.m_closestPoint1;
-						callback.m_param = saveNotification.m_param;
-						for (ndInt32 i = 0; i < saveNotification.m_contacts.GetCount(); ++i)
+						callback.m_normal = savedNotification.m_normal;
+						callback.m_closestPoint0 = savedNotification.m_closestPoint0;
+						callback.m_closestPoint1 = savedNotification.m_closestPoint1;
+						callback.m_param = savedNotification.m_param;
+						for (ndInt32 i = 0; i < savedNotification.m_contacts.GetCount(); ++i)
 						{
-							callback.m_contacts[i] = saveNotification.m_contacts[i];
+							callback.m_contacts[i] = savedNotification.m_contacts[i];
 						}
 					}
 

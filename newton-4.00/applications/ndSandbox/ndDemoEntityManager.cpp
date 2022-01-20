@@ -1120,7 +1120,7 @@ void ndDemoEntityManager::RenderStats()
 			sprintf(text, "contact joints: %d", m_world->GetContactList().GetCount());
 			ImGui::Text(text, "");
 
-			sprintf(text, "particle:       %d", ParticleCount());
+			sprintf(text, "particles:      %d", ParticleCount());
 			ImGui::Text(text, "");
 
 
