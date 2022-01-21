@@ -195,7 +195,7 @@ class ndBodySphFluid::ndWorkingData
 
 ndBodySphFluid::ndBodySphFluid()
 	:ndBodyParticleSet()
-	,ndBackgroundJob()
+	,ndBackgroundTask()
 	,m_mass(ndFloat32(0.02f))
 	,m_viscosity(ndFloat32 (1.05f))
 	,m_restDensity(ndFloat32(1000.0f))
@@ -206,7 +206,7 @@ ndBodySphFluid::ndBodySphFluid()
 
 ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndBodyParticleSet(desc)
-	,ndBackgroundJob()
+	,ndBackgroundTask()
 	,m_mass(ndFloat32(0.02f))
 	,m_viscosity(ndFloat32(1.0f))
 	,m_restDensity(ndFloat32(1000.0f))
@@ -377,7 +377,7 @@ void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
 	{
 		ndCountingSort<ndGridHash, ndKey_yhigh, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
 	}
-
+	
 	ndCountingSort<ndGridHash, ndKey_zlow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
 	if (boxSize.m_iz > (1 << D_SPH_HASH_BITS))
 	{
@@ -434,7 +434,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 
 	memset(scans, 0, sizeof(scans));
 	const ndInt32 threadCount = threadPool->GetThreadCount();
-
+	
 	ndInt32 particleCount = data.m_hashGridMap.GetCount();
 
 	ndInt32 acc0 = 0;
@@ -453,7 +453,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 	threadPool->Execute(ndCountGridScans);
 
 	ndInt32 scansCount = 0;
-
+	
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
 		sums[i] = scansCount;
@@ -473,7 +473,7 @@ void ndBodySphFluid::SortGrids(ndThreadPool* const threadPool)
 	SortXdimension(threadPool);
 	SortCellBuckects(threadPool);
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	ndWorkingData& data = WorkingData();
 	for (ndInt32 i = 0; i < (data.m_hashGridMap.GetCount() - 1); ++i)
 	{
@@ -483,7 +483,7 @@ void ndBodySphFluid::SortGrids(ndThreadPool* const threadPool)
 		ndUnsigned64 gridHashB = entry1.m_gridHash;
 		dAssert(gridHashA <= gridHashB);
 	}
-#endif
+	#endif
 }
 
 void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
@@ -600,7 +600,7 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 			ProccessCell(start, count);
 		}
 	});
-
+	
 	threadPool->Execute(ndAddPairs);
 }
 
@@ -753,7 +753,7 @@ void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 		public:
 		ndBox()
 			:m_min(ndFloat32(1.0e10f))
-			,m_max(ndFloat32(-1.0e10f))
+			, m_max(ndFloat32(-1.0e10f))
 		{
 		}
 		ndVector m_min;
@@ -869,7 +869,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 		ndInt8 m_isPadd[4][4];
 		ndInt8 m_counter[4];
 	};
-
+	
 	ndGridNeighborInfo neiborghood;
 	ndWorkingData& data = WorkingData();
 	ndInt32 scans[D_MAX_THREADS_COUNT][2];
@@ -880,18 +880,18 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 		const ndVector origin(m_box0);
 		const ndFloat32 gridSize = GetSphGridSize();
 		ndGridHash* const dst = &data.m_hashGridMapScratchBuffer[0];
-
+		
 		// the 0.99 factor is to make sure the box 
 		// fits in not more than two adjacent grids.
 		const ndVector box(gridSize * ndFloat32(0.5f * 0.99f));
 		const ndVector invGridSize(ndFloat32(1.0f) / gridSize);
 		const ndVector* const posit = &m_posit[0];
 
-	#ifdef D_USE_PARALLEL_CLASSIFY
+		#ifdef D_USE_PARALLEL_CLASSIFY
 		ndInt32* const scan = &scans[threadIndex][0];
 		scan[0] = 0;
 		scan[1] = 0;
-	#endif
+		#endif
 
 		const ndStartEnd startEnd(m_posit.GetCount(), threadIndex, threadCount);
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
@@ -910,10 +910,10 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 			dAssert(codeHash.m_z <= 1);
 			const ndUnsigned32 code = ndUnsigned32(codeHash.m_z * 2 + codeHash.m_y);
 
-	#ifdef D_USE_PARALLEL_CLASSIFY
+			#ifdef D_USE_PARALLEL_CLASSIFY
 			scan[0] += neiborghood.m_counter[code];
 			scan[1] += (4 - neiborghood.m_counter[code]);
-	#endif
+			#endif
 
 			const ndInt8* const padding = &neiborghood.m_isPadd[code][0];
 			const ndGridHash* const neigborgh = &neiborghood.m_neighborDirs[code][0];
@@ -949,41 +949,41 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	});
 
 	dAssert(sizeof(ndGridHash) <= 16);
-
+	
 	data.m_hashGridMap.SetCount(m_posit.GetCount() * 4);
 	data.m_hashGridMapScratchBuffer.SetCount(m_posit.GetCount() * 4);
 	threadPool->Execute(ndCreateGrids);
 
 	#ifdef D_USE_PARALLEL_CLASSIFY
-	ndInt32 sum = 0;
-	const ndInt32 threadCount = threadPool->GetThreadCount();
-	for (ndInt32 i = 0; i < 2; ++i)
-	{
-		for (ndInt32 j = 0; j < threadCount; ++j)
+		ndInt32 sum = 0;
+		const ndInt32 threadCount = threadPool->GetThreadCount();
+		for (ndInt32 i = 0; i < 2; ++i)
 		{
-			ndInt32 partialSum = scans[j][i];
-			scans[j][i] = sum;
-			sum += partialSum;
+			for (ndInt32 j = 0; j < threadCount; ++j)
+			{
+				ndInt32 partialSum = scans[j][i];
+				scans[j][i] = sum;
+				sum += partialSum;
+			}
 		}
-	}
 
-	// there is a bug here. need to debug it
-	ndInt32 gridCount = scans[0][1] - scans[0][0];
-	threadPool->SubmitJobs(ndCompactGrids);
+		// there is a bug here. need to debug it
+		ndInt32 gridCount = scans[0][1] - scans[0][0];
+		threadPool->SubmitJobs(ndCompactGrids);
 
-#else
+	#else
 
-	ndInt32 gridCount = 0;
-	{
-		D_TRACKTIME();
-		// this seems to be very cache friendly and beating radix sort hand down.
-		for (ndInt32 i = 0; i < data.m_hashGridMapScratchBuffer.GetCount(); ++i)
+		ndInt32 gridCount = 0;
 		{
-			const ndGridHash cell(data.m_hashGridMapScratchBuffer[i]);
-			data.m_hashGridMap[gridCount] = cell;
-			gridCount += (1 - ndInt32(cell.m_cellIsPadd));
+			D_TRACKTIME();
+			// this seems to be very cache friendly and beating radix sort hand down.
+			for (ndInt32 i = 0; i < data.m_hashGridMapScratchBuffer.GetCount(); ++i)
+			{
+				const ndGridHash cell(data.m_hashGridMapScratchBuffer[i]);
+				data.m_hashGridMap[gridCount] = cell;
+				gridCount += (1 - ndInt32(cell.m_cellIsPadd));
+			}
 		}
-	}
 	#endif
 	data.m_hashGridMap.SetCount(gridCount);
 }
@@ -1007,9 +1007,9 @@ void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
 	ndScene* const scene = world->GetScene();
 	if (m_updateInBackground)
 	{
-		if (JobState() == ndBackgroundJob::m_jobCompleted)
+		if (JobState() == ndBackgroundTask::m_taskCompleted)
 		{
-			scene->SendBackgroundJob(this);
+			scene->SendBackgroundTask(this);
 		}
 	}
 	else

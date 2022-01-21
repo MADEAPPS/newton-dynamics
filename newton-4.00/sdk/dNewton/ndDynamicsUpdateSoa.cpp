@@ -536,7 +536,7 @@ void ndDynamicsUpdateSoa::SortIslands()
 	if (bodyCount)
 	{
 		ndBodyIndexPair* const buffer1 = buffer0 + bodyCount;
-		ndCountingSortOld<ndBodyIndexPair, ndIslandKey, 1>(*scene, buffer0, buffer1, bodyCount);
+		ndCountingSort<ndBodyIndexPair, ndIslandKey, 1>(*scene, buffer0, buffer1, bodyCount);
 		for (ndInt32 i = 0; i < bodyCount; ++i)
 		{
 			dAssert((i == bodyCount - 1) || (buffer1[i].m_root->m_bodyIsConstrained >= buffer1[i + 1].m_root->m_bodyIsConstrained));
@@ -566,11 +566,11 @@ void ndDynamicsUpdateSoa::SortIslands()
 	
 		ndInt32 context = 0;
 		ndIsland* const islandTempBuffer = (ndIsland*)GetTempBuffer();
-		ndCountingSortOld<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &islands[0], islandTempBuffer, islands.GetCount(), &context);
+		ndCountingSort<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &islands[0], islandTempBuffer, islands.GetCount(), &context);
 		if (islandMaxKeySize >= (1 << (D_MAX_BODY_RADIX_BIT - 1)))
 		{
 			context = 1;
-			ndCountingSortOld<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, islandTempBuffer, &islands[0], islands.GetCount(), &context);
+			ndCountingSort<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, islandTempBuffer, &islands[0], islands.GetCount(), &context);
 		}
 		else
 		{

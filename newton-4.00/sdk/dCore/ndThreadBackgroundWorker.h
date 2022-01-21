@@ -31,27 +31,27 @@
 
 class ndThreadBackgroundWorker;
 
-class ndBackgroundJob
+class ndBackgroundTask
 {
 	public:
-	enum ndJobState
+	enum ndTaskState
 	{
-		m_jobInProccess,
-		m_jobCompleted,
+		m_taskInProccess,
+		m_taskCompleted,
 	};
 
-	ndBackgroundJob()
-		:m_jobState(m_jobCompleted)
+	ndBackgroundTask()
+		:m_jobState(m_taskCompleted)
 		,m_threaPool(nullptr)
 	{
 	}
 
-	ndJobState JobState() const
+	ndTaskState JobState() const
 	{
 		return m_jobState.load();
 	}
 
-	virtual ~ndBackgroundJob()
+	virtual ~ndBackgroundTask()
 	{
 	}
 
@@ -66,19 +66,19 @@ class ndBackgroundJob
 	}
 
 	private:
-	ndAtomic<ndJobState> m_jobState;
+	ndAtomic<ndTaskState> m_jobState;
 	ndThreadBackgroundWorker* m_threaPool;
 	friend class ndThreadBackgroundWorker;
 };
 
-class ndThreadBackgroundWorker: public ndThreadPool, public ndList<ndBackgroundJob*, ndContainersFreeListAlloc<ndBackgroundJob*>>
+class ndThreadBackgroundWorker: public ndThreadPool, public ndList<ndBackgroundTask*, ndContainersFreeListAlloc<ndBackgroundTask*>>
 {
 	public:
 	D_CORE_API ndThreadBackgroundWorker();
 	D_CORE_API ~ndThreadBackgroundWorker();
 
 	D_CORE_API void Terminate();
-	D_CORE_API void SendJob(ndBackgroundJob* const job);
+	D_CORE_API void SendTask(ndBackgroundTask* const job);
 	
 	private:
 	virtual void ThreadFunction();

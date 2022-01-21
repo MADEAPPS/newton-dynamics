@@ -29,7 +29,7 @@
 
 ndThreadBackgroundWorker::ndThreadBackgroundWorker()
 	:ndThreadPool("backgroundWorkers")
-	,ndList<ndBackgroundJob*, ndContainersFreeListAlloc<ndBackgroundJob*>>()
+	,ndList<ndBackgroundTask*, ndContainersFreeListAlloc<ndBackgroundTask*>>()
 	,m_lock()
 	,m_inLoop(false)
 	,m_teminate(false)
@@ -57,19 +57,19 @@ void ndThreadBackgroundWorker::Terminate()
 	}
 }
 
-void ndThreadBackgroundWorker::SendJob(ndBackgroundJob* const job)
+void ndThreadBackgroundWorker::SendTask(ndBackgroundTask* const job)
 {
 #if defined (D_EXECUTE_IMMEDIATE) || defined (D_USE_THREAD_EMULATION)
-	job->m_jobState = ndBackgroundJob::m_jobInProccess;
+	job->m_jobState = ndBackgroundTask::m_taskInProccess;
 	job->m_threaPool = this;
 	job->Execute();
 	job->m_threaPool = nullptr;
-	job->m_jobState = ndBackgroundJob::m_jobCompleted;
+	job->m_jobState = ndBackgroundTask::m_taskCompleted;
 #else
 	{
 		ndScopeSpinLock lock(m_lock);
 		job->m_threaPool = this;
-		job->m_jobState.store(ndBackgroundJob::m_jobInProccess);
+		job->m_jobState.store(ndBackgroundTask::m_taskInProccess);
 		Append(job);
 	}
 	m_queueSemaphore.Signal();
@@ -81,7 +81,7 @@ void ndThreadBackgroundWorker::ThreadFunction()
 	m_inLoop.store(true);
 	while (!m_queueSemaphore.Wait() && !m_teminate)
 	{
-		ndBackgroundJob* job;
+		ndBackgroundTask* job;
 		{
 			ndScopeSpinLock lock(m_lock);
 			ndNode* const node = GetFirst();
@@ -92,7 +92,7 @@ void ndThreadBackgroundWorker::ThreadFunction()
 		job->Execute();
 		End();
 		job->m_threaPool = nullptr;
-		job->m_jobState.store(ndBackgroundJob::m_jobCompleted);
+		job->m_jobState.store(ndBackgroundTask::m_taskCompleted);
 	}
 	m_inLoop.store(false);
 }

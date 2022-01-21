@@ -113,7 +113,7 @@ class ndWorld: public ndClassAlloc
 	void SetContactNotify(ndContactNotify* const notify);
 
 	void DebugScene(ndSceneTreeNotiFy* const notify);
-	void SendBackgroundJob(ndBackgroundJob* const job);
+	void SendBackgroundTask(ndBackgroundTask* const job);
 
 	D_NEWTON_API void ClearCache();
 	D_NEWTON_API void BodiesInAabb(ndBodiesInAabbNotify& callback) const;
@@ -344,8 +344,8 @@ inline ndInt32 ndWorld::GetEngineVersion() const
 	return D_NEWTON_ENGINE_MAJOR_VERSION * 100 + D_NEWTON_ENGINE_MINOR_VERSION;
 }
 
-inline void ndWorld::SendBackgroundJob(ndBackgroundJob* const job)
+inline void ndWorld::SendBackgroundTask(ndBackgroundTask* const job)
 {
-	m_scene->SendBackgroundJob(job);
+	m_scene->SendBackgroundTask(job);
 }
 #endif

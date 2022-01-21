@@ -2178,7 +2178,7 @@ void ndScene::BodiesInAabb(ndBodiesInAabbNotify& callback) const
 	}
 }
 
-void ndScene::SendBackgroundJob(ndBackgroundJob* const job)
+void ndScene::SendBackgroundTask(ndBackgroundTask* const job)
 {
-	m_backgroundThread.SendJob(job);
+	m_backgroundThread.SendTask(job);
 }

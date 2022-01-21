@@ -2868,22 +2868,22 @@ void ndIsoSurface::ndImplementation::SortCellBuckects()
 		}
 	};
 
-	ndCountingSortOld<ndGridHash, ndKey_xlow, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
+	ndCountingSort<ndGridHash, ndKey_xlow, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
 	if (m_upperDigitsIsValid.m_x)
 	{
-		ndCountingSortOld<ndGridHash, ndKey_xhigh, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
+		ndCountingSort<ndGridHash, ndKey_xhigh, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
 	}
 
-	ndCountingSortOld<ndGridHash, ndKey_ylow, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
+	ndCountingSort<ndGridHash, ndKey_ylow, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
 	if (m_upperDigitsIsValid.m_y)
 	{
-		ndCountingSortOld<ndGridHash, ndKey_yhigh, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
+		ndCountingSort<ndGridHash, ndKey_yhigh, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
 	}
 
-	ndCountingSortOld<ndGridHash, ndKey_zlow, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
+	ndCountingSort<ndGridHash, ndKey_zlow, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
 	if (m_upperDigitsIsValid.m_z)
 	{
-		ndCountingSortOld<ndGridHash, ndKey_zhigh, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
+		ndCountingSort<ndGridHash, ndKey_zhigh, 8>(m_hashGridMap, m_hashGridMapScratchBuffer);
 	}
 }
 
@@ -2971,22 +2971,22 @@ void ndIsoSurface::ndImplementation::RemoveDuplicates(const ndArray<ndVector>& p
 	}
 	m_upperDigitsIsValid = upperDigits;
 
-	ndCountingSortOld<ndGridHash, ndKey_xlow, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
+	ndCountingSort<ndGridHash, ndKey_xlow, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
 	if (m_upperDigitsIsValid.m_x)
 	{
-		ndCountingSortOld<ndGridHash, ndKey_xhigh, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
+		ndCountingSort<ndGridHash, ndKey_xhigh, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
 	}
 
-	ndCountingSortOld<ndGridHash, ndKey_ylow, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
+	ndCountingSort<ndGridHash, ndKey_ylow, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
 	if (m_upperDigitsIsValid.m_y)
 	{
-		ndCountingSortOld<ndGridHash, ndKey_yhigh, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
+		ndCountingSort<ndGridHash, ndKey_yhigh, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
 	}
 
-	ndCountingSortOld<ndGridHash, ndKey_zlow, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
+	ndCountingSort<ndGridHash, ndKey_zlow, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
 	if (m_upperDigitsIsValid.m_z)
 	{
-		ndCountingSortOld<ndGridHash, ndKey_zhigh, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
+		ndCountingSort<ndGridHash, ndKey_zhigh, 8>(m_hashGridMapScratchBuffer, m_hashGridMap);
 	}
 
 	ndInt32 gridCount = 0;
@@ -3218,35 +3218,35 @@ ndInt32 ndIsoSurface::ndImplementation::GenerateLowResIndexList(
 	}
 
 	ndInt32 xDimSize = me->m_volumeSizeX * D_LOW_RES_FRACTION;
-	ndCountingSortOld<ndVector, ndKey_lowX, 8>(m_triangles, m_trianglesScratchBuffer);
+	ndCountingSort<ndVector, ndKey_lowX, 8>(m_triangles, m_trianglesScratchBuffer);
 	if (xDimSize >= 256)
 	{
-		ndCountingSortOld<ndVector, ndKey_midleX, 8>(m_triangles, m_trianglesScratchBuffer);
+		ndCountingSort<ndVector, ndKey_midleX, 8>(m_triangles, m_trianglesScratchBuffer);
 		if (xDimSize >= 256 * 256)
 		{
-			ndCountingSortOld<ndVector, ndKey_highX, 8>(m_triangles, m_trianglesScratchBuffer);
+			ndCountingSort<ndVector, ndKey_highX, 8>(m_triangles, m_trianglesScratchBuffer);
 		}
 	} 
 	
 	ndInt32 yDimSize = me->m_volumeSizeY * D_LOW_RES_FRACTION;
-	ndCountingSortOld<ndVector, ndKey_lowY, 8>(m_triangles, m_trianglesScratchBuffer);
+	ndCountingSort<ndVector, ndKey_lowY, 8>(m_triangles, m_trianglesScratchBuffer);
 	if (yDimSize >= 256)
 	{
-		ndCountingSortOld<ndVector, ndKey_midleY, 8>(m_triangles, m_trianglesScratchBuffer);
+		ndCountingSort<ndVector, ndKey_midleY, 8>(m_triangles, m_trianglesScratchBuffer);
 		if (yDimSize >= 256 * 256)
 		{
-			ndCountingSortOld<ndVector, ndKey_highY, 8>(m_triangles, m_trianglesScratchBuffer);
+			ndCountingSort<ndVector, ndKey_highY, 8>(m_triangles, m_trianglesScratchBuffer);
 		}
 	}
 	
 	ndInt32 zDimSize = me->m_volumeSizeZ * D_LOW_RES_FRACTION;
-	ndCountingSortOld<ndVector, ndKey_lowZ, 8>(m_triangles, m_trianglesScratchBuffer);
+	ndCountingSort<ndVector, ndKey_lowZ, 8>(m_triangles, m_trianglesScratchBuffer);
 	if (zDimSize >= 256)
 	{
-		ndCountingSortOld<ndVector, ndKey_midleZ, 8>(m_triangles, m_trianglesScratchBuffer);
+		ndCountingSort<ndVector, ndKey_midleZ, 8>(m_triangles, m_trianglesScratchBuffer);
 		if (yDimSize >= 256 * 256)
 		{
-			ndCountingSortOld<ndVector, ndKey_highZ, 8>(m_triangles, m_trianglesScratchBuffer);
+			ndCountingSort<ndVector, ndKey_highZ, 8>(m_triangles, m_trianglesScratchBuffer);
 		}
 	}
 	

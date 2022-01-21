@@ -21,13 +21,13 @@
 #include "ndDemoEntityManager.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
-//class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundJob
+//class ndIsoSurfaceParticleVolume : public ndBodySphFluid, public ndBackgroundTask
 class ndIsoSurfaceParticleVolume : public ndBodySphFluid
 {
 	public:
 	ndIsoSurfaceParticleVolume(ndFloat32 radius)
 		:ndBodySphFluid()
-		//,ndBackgroundJob()
+		//,ndBackgroundTask()
 		,m_indexList(1024)
 		,m_points(1024)
 		,m_meshIsReady(0)
@@ -212,7 +212,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		{
 			ndScopeSpinLock lock(m_lock);
 
-			if (m_fluidBody->JobState() == ndBackgroundJob::m_jobCompleted)
+			if (m_fluidBody->JobState() == ndBackgroundTask::m_taskCompleted)
 			{
 				m_fluidBody->m_meshIsReady.store(0);
 				const ndArray<ndInt32>& indexList = m_fluidBody->m_indexList;
@@ -258,7 +258,7 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 	{
 		//ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
 		//ndScopeSpinLock lock(entity->m_lock);
-		//if (entity->m_fluidBody->JobState() == ndBackgroundJob::m_jobCompleted)
+		//if (entity->m_fluidBody->JobState() == ndBackgroundTask::m_taskCompleted)
 		//{
 		//	ndPhysicsWorld* const world = m_manager->GetWorld();
 		//	world->SendBackgroundJob(entity->m_fluidBody);
@@ -410,6 +410,6 @@ void ndBasicParticleFluid (ndDemoEntityManager* const scene)
 	AddWaterVolume(scene, location);
 
 	ndQuaternion rot;
-	ndVector origin(-5.0f, 3.0f, 3.0f, 0.0f);
+	ndVector origin(-10.0f, 5.0f, 3.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

@@ -109,7 +109,7 @@ class ndScene : public ndThreadPool
 	D_COLLISION_API virtual bool RayCast(ndRayCastNotify& callback, const ndVector& globalOrigin, const ndVector& globalDest) const;
 	D_COLLISION_API virtual bool ConvexCast(ndConvexCastNotify& callback, const ndShapeInstance& convexShape, const ndMatrix& globalOrigin, const ndVector& globalDest) const;
 
-	D_COLLISION_API void SendBackgroundJob(ndBackgroundJob* const job);
+	D_COLLISION_API void SendBackgroundTask(ndBackgroundTask* const job);
 
 	private:
 	bool ValidateContactCache(ndContact* const contact, const ndVector& timestep) const;
