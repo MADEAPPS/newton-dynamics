@@ -514,112 +514,85 @@ void ndWorld::ParticleUpdate(ndFloat32 timestep)
 void ndWorld::ModelUpdate()
 {
 	D_TRACKTIME();
-	class ndModelUpdate : public ndThreadPoolJob_old
+	auto ModelUpdate = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		public:
-		virtual void Execute()
+		D_TRACKTIME();
+		const ndFloat32 timestep = m_scene->GetTimestep();
+		ndModelList& modelList = m_modelList;
+		ndModelList::ndNode* node = modelList.GetFirst();
+		for (ndInt32 i = 0; i < threadIndex; i++)
 		{
-			D_TRACKTIME();
-			ndScene* const scene = (ndScene*)GetThreadPool();
-			ndWorld* const world = scene->GetWorld();
-			const ndFloat32 timestep = scene->GetTimestep();
-			const ndInt32 threadId = GetThreadId();
-			const ndInt32 threadCount = GetThreadCount();
+			node = node ? node->GetNext() : nullptr;
+		}
 
-			ndModelList& modelList = world->m_modelList;
-			ndModelList::ndNode* node = modelList.GetFirst();
-			for (ndInt32 i = 0; i < threadId; i++)
+		while (node)
+		{
+			ndModel* const model = node->GetInfo();
+			model->Update(this, timestep);
+
+			for (ndInt32 i = 0; i < threadCount; i++)
 			{
 				node = node ? node->GetNext() : nullptr;
 			}
-
-			while (node)
-			{
-				ndModel* const model = node->GetInfo();
-				model->Update(world, timestep);
-
-				for (ndInt32 i = 0; i < threadCount; i++)
-				{
-					node = node ? node->GetNext() : nullptr;
-				}
-			}
 		}
-	};
-	m_scene->SubmitJobs<ndModelUpdate>();
+	});
+	m_scene->Execute(ModelUpdate);
 }
 
 void ndWorld::ModelPostUpdate()
 {
 	D_TRACKTIME();
-	class ndModelPostUpdate: public ndThreadPoolJob_old
+	auto ModelPostUpdate = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		public:
-		virtual void Execute()
+		D_TRACKTIME();
+		const ndFloat32 timestep = m_scene->GetTimestep();
+		ndModelList& modelList = m_modelList;
+		ndModelList::ndNode* node = modelList.GetFirst();
+		for (ndInt32 i = 0; i < threadIndex; i++)
 		{
-			D_TRACKTIME();
-			ndScene* const scene = (ndScene*)GetThreadPool();
-			const ndInt32 threadId = GetThreadId();
-			const ndInt32 threadCount = GetThreadCount();
+			node = node ? node->GetNext() : nullptr;
+		}
 
-			const ndFloat32 timestep = scene->GetTimestep();
-			ndWorld* const world = scene->GetWorld();
-			ndModelList& modelList = world->m_modelList;
-			ndModelList::ndNode* node = modelList.GetFirst();
-			for (ndInt32 i = 0; i < threadId; i++)
+		while (node)
+		{
+			ndModel* const model = node->GetInfo();
+			model->PostUpdate(this, timestep);
+
+			for (ndInt32 i = 0; i < threadCount; i++)
 			{
 				node = node ? node->GetNext() : nullptr;
 			}
-
-			while (node)
-			{
-				ndModel* const model = node->GetInfo();
-				model->PostUpdate(world, timestep);
-
-				for (ndInt32 i = 0; i < threadCount; i++)
-				{
-					node = node ? node->GetNext() : nullptr;
-				}
-			}
 		}
-	};
-	m_scene->SubmitJobs<ndModelPostUpdate>();
+	});
+	m_scene->Execute(ModelPostUpdate);
 }
 
 void ndWorld::PostModelTransform()
 {
 	D_TRACKTIME();
-	class ndPostModelTransform: public ndThreadPoolJob_old
+	auto PostModelTransform = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		public:
-		virtual void Execute()
+		D_TRACKTIME();
+		const ndFloat32 timestep = m_scene->GetTimestep();
+		ndModelList& modelList = m_modelList;
+		ndModelList::ndNode* node = modelList.GetFirst();
+		for (ndInt32 i = 0; i < threadIndex; i++)
 		{
-			D_TRACKTIME();
-			ndScene* const scene = (ndScene*)GetThreadPool();
-			const ndInt32 threadId = GetThreadId();
-			const ndInt32 threadCount = GetThreadCount();
+			node = node ? node->GetNext() : nullptr;
+		}
 
-			const ndFloat32 timestep = scene->GetTimestep();
-			ndWorld* const world = scene->GetWorld();
-			ndModelList& modelList = world->m_modelList;
-			ndModelList::ndNode* node = modelList.GetFirst();
-			for (ndInt32 i = 0; i < threadId; i++)
+		while (node)
+		{
+			ndModel* const model = node->GetInfo();
+			model->PostTransformUpdate(this, timestep);
+
+			for (ndInt32 i = 0; i < threadCount; i++)
 			{
 				node = node ? node->GetNext() : nullptr;
 			}
-
-			while (node)
-			{
-				ndModel* const model = node->GetInfo();
-				model->PostTransformUpdate(world, timestep);
-
-				for (ndInt32 i = 0; i < threadCount; i++)
-				{
-					node = node ? node->GetNext() : nullptr;
-				}
-			}
 		}
-	};
-	m_scene->SubmitJobs<ndPostModelTransform>();
+	});
+	m_scene->Execute(PostModelTransform);
 }
 
 bool ndWorld::SkeletonJointTest(ndJointBilateralConstraint* const constraint) const

@@ -243,22 +243,6 @@ void ndBodySphFluid::Execute()
 	Update(GetThreadPool());
 }
 
-void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
-{
-	m_timestep = timestep;
-	ndScene* const scene = world->GetScene();
-	if (m_updateInBackground)
-	{
-		if (JobState() == ndBackgroundJob::m_jobCompleted)
-		{
-			scene->SendBackgroundJob(this);
-		}
-	}
-	else
-	{
-		Update(scene);
-	}
-}
 
 void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 {
@@ -1017,3 +1001,19 @@ void ndBodySphFluid::Update(ndThreadPool* const threadPool)
 	IntegrateParticles(threadPool);
 }
 
+void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
+{
+	m_timestep = timestep;
+	ndScene* const scene = world->GetScene();
+	if (m_updateInBackground)
+	{
+		if (JobState() == ndBackgroundJob::m_jobCompleted)
+		{
+			scene->SendBackgroundJob(this);
+		}
+	}
+	else
+	{
+		Update(scene);
+	}
+}

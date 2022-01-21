@@ -1259,86 +1259,6 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 void ndScene::InitBodyArray()
 {
 	D_TRACKTIME();
-	class ndBodyInfo
-	{
-		public:
-		ndInt32 m_scan[D_MAX_THREADS_COUNT][2];
-	};
-
-	class ndBuildBodyArray : public ndThreadPoolJob_old
-	{
-		public:
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			ndScene* const scene = (ndScene*)GetThreadPool();
-			ndArray<ndBodyKinematic*>& activeBodyArray = scene->m_activeBodyArray;
-
-			const ndInt32 threadIndex = GetThreadId();
-			const ndBodyListRun& run = scene->m_bodyListRuns[GetThreadId()];
-
-			ndBodyInfo& info = *((ndBodyInfo*)GetContext());
-			ndInt32* const scan = &info.m_scan[threadIndex][0];
-			scan[0] = 0;
-			scan[1] = 0;
-
-			const ndFloat32 timestep = scene->m_timestep;
-			ndBodyList::ndNode* node = run.m_begin;
-			for (ndInt32 i = 0; i < run.m_count; ++i)
-			{
-				ndBodyKinematic* const body = node->GetInfo();
-				node = node->GetNext();
-				dAssert (!body->GetCollisionShape().GetShape()->GetAsShapeNull());
-				bool inScene = true;
-				if (!body->GetSceneBodyNode())
-				{
-					ndScopeSpinLock lock(scene->m_lock);
-					inScene = scene->AddBody(body);
-				}
-				dAssert(inScene && body->m_sceneNode);
-
-				body->ApplyExternalForces(threadIndex, timestep);
-				const ndInt32 index = i + run.m_start;
-				body->PrepareStep(index);
-				activeBodyArray[index] = body;
-
-				const ndInt32 key = body->m_equilibrium;
-				scan[key] ++;
-				if (!body->m_equilibrium)
-				{
-					scene->UpdateAabb(threadIndex, body);
-				}
-			}
-		}
-	};
-
-	class ndClassifyMovingBodies : public ndThreadPoolJob_old
-	{
-		public:
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			ndScene* const scene = (ndScene*)GetThreadPool();
-			const ndArray<ndBodyKinematic*>& activeBodyArray = scene->m_activeBodyArray;
-			ndBodyKinematic** const sceneBodyArray = &scene->m_sceneBodyArray[0];
-
-			const ndInt32 threadIndex = GetThreadId();
-			const ndBodyListRun& run = scene->m_bodyListRuns[GetThreadId()];
-
-			ndBodyInfo& info = *((ndBodyInfo*)GetContext());
-			ndInt32* const scan = &info.m_scan[threadIndex][0];
-
-			for (ndInt32 i = 0; i < run.m_count; ++i)
-			{
-				ndBodyKinematic* const body = activeBodyArray[i + run.m_start];
-				const ndInt32 key = body->m_equilibrium;
-				const ndInt32 index = scan[key];
-				sceneBodyArray[index] = body;
-				scan[key] ++;
-			}
-		}
-	};
-
 	if (m_bodyListChanged || (m_currentThreadsMem != GetThreadCount()))
 	{
 		m_bodyListChanged = 0;
@@ -1375,9 +1295,49 @@ void ndScene::InitBodyArray()
 		m_currentThreadsMem = ndInt8(GetThreadCount());
 	}
 
-	ndBodyInfo info;
+	ndInt32 scans[D_MAX_THREADS_COUNT][2];
 	m_activeBodyArray.SetCount(m_bodyList.GetCount());
-	SubmitJobs<ndBuildBodyArray>(&info);
+
+	auto BuildBodyArray = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32)
+	{
+		D_TRACKTIME();
+		ndArray<ndBodyKinematic*>& activeBodyArray = m_activeBodyArray;
+		const ndBodyListRun& run = m_bodyListRuns[threadIndex];
+
+		ndInt32* const scan = &scans[threadIndex][0];
+		scan[0] = 0;
+		scan[1] = 0;
+
+		const ndFloat32 timestep = m_timestep;
+		ndBodyList::ndNode* node = run.m_begin;
+		for (ndInt32 i = 0; i < run.m_count; ++i)
+		{
+			ndBodyKinematic* const body = node->GetInfo();
+			node = node->GetNext();
+			dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
+			bool inScene = true;
+			if (!body->GetSceneBodyNode())
+			{
+				ndScopeSpinLock lock(m_lock);
+				inScene = AddBody(body);
+			}
+			dAssert(inScene && body->m_sceneNode);
+
+			body->ApplyExternalForces(threadIndex, timestep);
+			const ndInt32 index = i + run.m_start;
+			body->PrepareStep(index);
+			activeBodyArray[index] = body;
+
+			const ndInt32 key = body->m_equilibrium;
+			scan[key] ++;
+			if (!body->m_equilibrium)
+			{
+				UpdateAabb(threadIndex, body);
+			}
+		}
+	});
+
+	Execute(BuildBodyArray);
 
 	ndInt32 sum = 0;
 	ndInt32 threadCount = GetThreadCount();
@@ -1385,17 +1345,36 @@ void ndScene::InitBodyArray()
 	{
 		for (ndInt32 i = 0; i < threadCount; ++i)
 		{
-			const ndInt32 count = info.m_scan[i][j];
-			info.m_scan[i][j] = sum;
+			const ndInt32 count = scans[i][j];
+			scans[i][j] = sum;
 			sum += count;
 		}
 	}
 
-	ndInt32 movingBodyCount = info.m_scan[0][1] - info.m_scan[0][0];
+	ndInt32 movingBodyCount = scans[0][1] - scans[0][0];
 	m_sceneBodyArray.SetCount(m_bodyList.GetCount());
+
 	if (movingBodyCount)
 	{
-		SubmitJobs<ndClassifyMovingBodies>(&info);
+		auto CompactMovingBodies = ndMakeObject::ndFunction([this, &scans](ndInt32 threadIndex, ndInt32)
+		{
+			D_TRACKTIME();
+			const ndArray<ndBodyKinematic*>& activeBodyArray = m_activeBodyArray;
+			ndBodyKinematic** const sceneBodyArray = &m_sceneBodyArray[0];
+
+			const ndBodyListRun& run = m_bodyListRuns[threadIndex];
+			ndInt32* const scan = &scans[threadIndex][0];
+
+			for (ndInt32 i = 0; i < run.m_count; ++i)
+			{
+				ndBodyKinematic* const body = activeBodyArray[i + run.m_start];
+				const ndInt32 key = body->m_equilibrium;
+				const ndInt32 index = scan[key];
+				sceneBodyArray[index] = body;
+				scan[key] ++;
+			}
+		});
+		Execute(CompactMovingBodies);
 	}
 	m_sceneBodyArray.SetCount(movingBodyCount);
 
@@ -1589,68 +1568,53 @@ void ndScene::FindCollidingPairsBackward(ndBodyKinematic* const body)
 void ndScene::FindCollidingPairs()
 {
 	D_TRACKTIME();
-	class ndFindCollidindPairs : public ndThreadPoolJob_old
+	auto FindPairs = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		public:
-		virtual void Execute()
+		D_TRACKTIME();
+		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			D_TRACKTIME();
-			ndScene* const scene = (ndScene*)GetThreadPool();
-			const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
-			const ndStartEnd startEnd(bodyArray.GetCount() - 1, GetThreadId(), GetThreadCount());
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndBodyKinematic* const body = bodyArray[i];
-				scene->FindCollidingPairs(body);
-			}
+			ndBodyKinematic* const body = bodyArray[i];
+			FindCollidingPairs(body);
 		}
-	};
+	});
 
-	class ndFindCollidindPairsForward : public ndThreadPoolJob_old
+	auto FindPairsForward = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		public:
-		virtual void Execute()
+		D_TRACKTIME();
+		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			D_TRACKTIME();
-			ndScene* const scene = (ndScene*)GetThreadPool();
-			const ndArray<ndBodyKinematic*>& bodyArray = scene->m_sceneBodyArray;
-			const ndStartEnd startEnd(bodyArray.GetCount(), GetThreadId(), GetThreadCount());
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndBodyKinematic* const body = bodyArray[i];
-				scene->FindCollidingPairsForward(body);
-			}
+			ndBodyKinematic* const body = bodyArray[i];
+			FindCollidingPairsForward(body);
 		}
-	};
+	});
 
-	class ndFindCollidindPairsBackward : public ndThreadPoolJob_old
+	auto FindPairsBackward = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		public:
-		virtual void Execute()
+		D_TRACKTIME();
+		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			D_TRACKTIME();
-			ndScene* const scene = (ndScene*)GetThreadPool();
-			const ndArray<ndBodyKinematic*>& bodyArray = scene->m_sceneBodyArray;
-			const ndStartEnd startEnd(bodyArray.GetCount(), GetThreadId(), GetThreadCount());
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndBodyKinematic* const body = bodyArray[i];
-				scene->FindCollidingPairsBackward(body);
-			}
+			ndBodyKinematic* const body = bodyArray[i];
+			FindCollidingPairsBackward(body);
 		}
-	};
+	});
 
 	bool fullScan = (3 * m_sceneBodyArray.GetCount()) > m_activeBodyArray.GetCount();
 	// uncomment line below to test full versus partial scan
 	//fullScan = true;
 	if (fullScan)
 	{
-		SubmitJobs<ndFindCollidindPairs>();
+		Execute(FindPairs);
 	}
 	else
 	{
-		SubmitJobs<ndFindCollidindPairsForward>();
-		SubmitJobs<ndFindCollidindPairsBackward>();
+		Execute(FindPairsForward);
+		Execute(FindPairsBackward);
 	}
 }
 
@@ -1787,7 +1751,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 
 	dAssert(globalOrigin.TestOrthogonal());
 	convexShape.CalculateAabb(globalOrigin, boxP0, boxP1);
-	
+
 	callback.m_contacts.SetCount(0);
 	callback.m_param = ndFloat32(1.2f);
 	while (stack) 
@@ -1806,7 +1770,7 @@ bool ndScene::ConvexCast(ndConvexCastNotify& callback, const ndSceneNode** stack
 			ndBody* const body = me->GetBody();
 			if (body) 
 			{
-				if (callback.OnRayPrecastAction (body, &convexShape))
+				if (callback.OnRayPrecastAction (body, &convexShape)) 
 				{
 					// save contacts and try new set
 					ndConvexCastNotify savedNotification(callback);
