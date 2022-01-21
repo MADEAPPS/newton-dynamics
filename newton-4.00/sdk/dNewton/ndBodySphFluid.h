@@ -71,11 +71,11 @@ class ndBodySphFluid: public ndBodyParticleSet, public ndBackgroundJob
 	ndWorkingData& WorkingData();
 	void Update(ndThreadPool* const threadPool);
 
-	void SortGrids();
+	void SortGrids(ndThreadPool* const threadPool);
 	void BuildPairs();
 	void CreateGrids(ndThreadPool* const threadPool);
 	void CaculateAabb(ndThreadPool* const threadPool);
-	void SortXdimension();
+	void SortXdimension(ndThreadPool* const threadPool);
 	void CalculateScans();
 	void SortCellBuckects();
 	void IntegrateParticles();
