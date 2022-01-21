@@ -745,6 +745,7 @@ void ndDemoEntityManager::ApplyMenuOptions()
 		body->SetAutoSleep(state);
 	}
 
+	SetParticleUpdateMode();
 	m_world->SelectSolver(m_solverMode);
 	m_solverMode = m_world->GetSelectedSolver();
 }

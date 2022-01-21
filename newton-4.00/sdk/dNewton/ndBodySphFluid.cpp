@@ -581,8 +581,15 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 			}
 		};
 
-		const ndStartEnd startEnd(gridScans.GetCount() - 1, threadIndex, threadCount);
-		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		// even step is nor good because the bashes tend to be clustered
+		// a better way is to sort, bu that takes about 1 ms,
+		// we interleaving bashes and has the randomizing 
+		// effect that balance the work load on the thread.
+		//const ndStartEnd startEnd(gridScans.GetCount() - 1, threadIndex, threadCount);
+		//for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+
+		const ndInt32 scansCount = gridScans.GetCount() - 1;
+		for (ndInt32 i = threadIndex; i < scansCount; i += threadCount)
 		{
 			const ndInt32 start = gridScans[i];
 			const ndInt32 count = gridScans[i + 1] - start;
