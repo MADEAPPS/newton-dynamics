@@ -297,15 +297,14 @@ void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
 void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
-
-#define XRESOLUTION	ndFloat32(1<<23)
+	#define XRESOLUTION	ndFloat32(1<<23)
 	class ndKey_low
 	{
 		public:
 		ndKey_low(void* const context)
 			:m_fluid((ndBodySphFluid*)context)
-			, m_data(m_fluid->WorkingData())
-			, m_point(m_fluid->GetPositions())
+			,m_data(m_fluid->WorkingData())
+			,m_point(m_fluid->GetPositions())
 		{
 		}
 
@@ -322,11 +321,11 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 
 	class ndKey_middle
 	{
-	public:
+		public:
 		ndKey_middle(void* const context)
 			:m_fluid((ndBodySphFluid*)context)
-			, m_data(m_fluid->WorkingData())
-			, m_point(m_fluid->GetPositions())
+			,m_data(m_fluid->WorkingData())
+			,m_point(m_fluid->GetPositions())
 		{
 		}
 
@@ -346,8 +345,8 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 		public:
 		ndKey_high(void* const context)
 			:m_fluid((ndBodySphFluid*)context)
-			, m_data(m_fluid->WorkingData())
-			, m_point(m_fluid->GetPositions())
+			,m_data(m_fluid->WorkingData())
+			,m_point(m_fluid->GetPositions())
 		{
 		}
 
@@ -364,18 +363,76 @@ void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 
 	ndWorkingData& data = WorkingData();
 
-	ndCountingSortOld<ndGridHash, ndKey_low, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
+	ndCountingSort<ndGridHash, ndKey_low, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
 	const ndInt32 keySize = data.WorldToGrid(m_box1.m_x);
 	if (keySize >= 256)
 	{
-		ndCountingSortOld<ndGridHash, ndKey_middle, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
+		ndCountingSort<ndGridHash, ndKey_middle, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
 		if (keySize >= (256 * 256))
 		{
-			ndCountingSortOld<ndGridHash, ndKey_high, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
+			ndCountingSort<ndGridHash, ndKey_high, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
 		}
 	}
 }
 
+void ndBodySphFluid::SortCellBuckects(ndThreadPool* const threadPool)
+{
+	D_TRACKTIME();
+	class ndKey_ylow
+	{
+		public:
+		ndKey_ylow(void* const) {}
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_yLow;
+		}
+	};
+
+	class ndKey_zlow
+	{
+		public:
+		ndKey_zlow(void* const) {}
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_zLow;
+		}
+	};
+
+	class ndKey_yhigh
+	{
+		public:
+		ndKey_yhigh(void* const) {}
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_yHigh;
+		}
+	};
+
+	class ndKey_zhigh
+	{
+		public:
+		ndKey_zhigh(void* const) {}
+		ndInt32 GetKey(const ndGridHash& cell) const
+		{
+			return cell.m_zHigh;
+		}
+	};
+
+	ndWorkingData& data = WorkingData();
+
+	ndVector boxSize((m_box1 - m_box0).Scale(ndFloat32(1.0f) / GetSphGridSize()).GetInt());
+	ndCountingSortOld<ndGridHash, ndKey_ylow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
+	if (boxSize.m_iy > (1 << D_SPH_HASH_BITS))
+	{
+		ndCountingSortOld<ndGridHash, ndKey_yhigh, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
+	}
+
+	ndCountingSortOld<ndGridHash, ndKey_zlow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
+	if (boxSize.m_iz > (1 << D_SPH_HASH_BITS))
+	{
+		ndCountingSortOld<ndGridHash, ndKey_zhigh, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
+	}
+}
 
 void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 {
@@ -437,67 +494,6 @@ void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 	ndWorkingData& data = WorkingData();
 	ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
 	data.SetWorldToGridMapping(numberOfGrid, m_box1.m_x, m_box0.m_x);
-}
-
-
-void ndBodySphFluid::SortCellBuckects()
-{
-	D_TRACKTIME();
-	class ndKey_ylow
-	{
-		public:
-		ndKey_ylow(void* const) {}
-		ndInt32 GetKey(const ndGridHash& cell) const
-		{
-			return cell.m_yLow;
-		}
-	};
-
-	class ndKey_zlow
-	{
-		public:
-		ndKey_zlow(void* const) {}
-		ndInt32 GetKey(const ndGridHash& cell) const
-		{
-			return cell.m_zLow;
-		}
-	};
-
-	class ndKey_yhigh
-	{
-		public:
-		ndKey_yhigh(void* const) {}
-		ndInt32 GetKey(const ndGridHash& cell) const
-		{
-			return cell.m_yHigh;
-		}
-	};
-
-	class ndKey_zhigh
-	{
-		public:
-		ndKey_zhigh(void* const) {}
-		ndInt32 GetKey(const ndGridHash& cell) const
-		{
-			return cell.m_zHigh;
-		}
-	};
-
-	ndWorkingData& data = WorkingData();
-	ndThreadPool* const threadPool = GetThreadPool();
-
-	ndVector boxSize((m_box1 - m_box0).Scale(ndFloat32(1.0f) / GetSphGridSize()).GetInt());
-	ndCountingSortOld<ndGridHash, ndKey_ylow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
-	if (boxSize.m_iy > (1 << D_SPH_HASH_BITS))
-	{
-		ndCountingSortOld<ndGridHash, ndKey_yhigh, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
-	}
-	
-	ndCountingSortOld<ndGridHash, ndKey_zlow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
-	if (boxSize.m_iz > (1 << D_SPH_HASH_BITS))
-	{
-		ndCountingSortOld<ndGridHash, ndKey_zhigh, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
-	}
 }
 
 void ndBodySphFluid::CalculateScans()
@@ -797,7 +793,7 @@ void ndBodySphFluid::SortGrids(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
 	SortXdimension(threadPool);
-	SortCellBuckects();
+	SortCellBuckects(threadPool);
 
 	#ifdef _DEBUG
 	ndWorkingData& data = WorkingData();

@@ -77,7 +77,7 @@ class ndBodySphFluid: public ndBodyParticleSet, public ndBackgroundJob
 	void CaculateAabb(ndThreadPool* const threadPool);
 	void SortXdimension(ndThreadPool* const threadPool);
 	void CalculateScans();
-	void SortCellBuckects();
+	void SortCellBuckects(ndThreadPool* const threadPool);
 	void IntegrateParticles();
 	void CalculateAccelerations();
 	void CalculateParticlesDensity();
