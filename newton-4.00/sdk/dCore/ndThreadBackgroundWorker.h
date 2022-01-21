@@ -71,7 +71,7 @@ class ndBackgroundJob
 	friend class ndThreadBackgroundWorker;
 };
 
-class ndThreadBackgroundWorker : public ndList<ndBackgroundJob*, ndContainersFreeListAlloc<ndBackgroundJob*>>, public ndThreadPool
+class ndThreadBackgroundWorker: public ndThreadPool, public ndList<ndBackgroundJob*, ndContainersFreeListAlloc<ndBackgroundJob*>>
 {
 	public:
 	D_CORE_API ndThreadBackgroundWorker();

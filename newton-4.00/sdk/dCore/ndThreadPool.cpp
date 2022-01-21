@@ -30,7 +30,8 @@ ndThreadPool::ndWorkerThread::ndWorkerThread()
 	,m_owner(nullptr)
 	,m_begin(false)
 	,m_stillLooping(true)
-	,m_job(nullptr)
+	,m_jobLambda(nullptr)
+	,m_jobOld(nullptr)
 	,m_threadIndex(0)
 {
 }
@@ -48,11 +49,17 @@ void ndThreadPool::ndWorkerThread::ThreadFunction()
 	m_stillLooping.store(true);
 	while (m_begin.load())
 	{
-		ndThreadPoolJob_old* const job = m_job.load();
-		if (job)
+		ndTask* const jobLambda = m_jobLambda.load();
+		ndThreadPoolJob_old* const jobOld = m_jobOld.load();
+		if (jobOld)
 		{
-			job->Execute();
-			m_job.store(nullptr);
+			jobOld->Execute();
+			m_jobOld.store(nullptr);
+		}
+		else if (jobLambda)
+		{
+			jobLambda->Execute();
+			m_jobLambda.store(nullptr);
 		}
 		else
 		{
@@ -127,7 +134,7 @@ void ndThreadPool::ExecuteJobs(ndThreadPoolJob_old** const jobs, void* const con
 			jobs[i]->m_threadCount = m_count + 1;
 			jobs[i]->m_context = context;
 			jobs[i]->m_threadPool = this;
-			m_workers[i].m_job.store(jobs[i]);
+			m_workers[i].m_jobOld.store(jobs[i]);
 		}
 	
 		jobs[m_count]->m_threadIndex = m_count;
@@ -142,7 +149,7 @@ void ndThreadPool::ExecuteJobs(ndThreadPoolJob_old** const jobs, void* const con
 			bool inProgess = false;
 			for (ndInt32 i = 0; i < m_count; ++i)
 			{
-				inProgess = inProgess | (m_workers[i].m_job.load() != nullptr);
+				inProgess = inProgess | (m_workers[i].m_jobOld.load() != nullptr);
 			}
 			jobsInProgress = jobsInProgress & inProgess;
 			if (jobsInProgress)

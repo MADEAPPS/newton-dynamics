@@ -330,7 +330,6 @@ void ndDynamicsUpdate::SortJointsScan()
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndConstraint* const joint = jointArray[i];
-				//sortBuffer[i] = joint;
 				ndBodyKinematic* const body0 = joint->GetBody0();
 				ndBodyKinematic* const body1 = joint->GetBody1();
 				const ndInt32 key = body0->m_isJointFence1 & body1->m_isJointFence1;

@@ -34,23 +34,32 @@
 
 class ndThreadPool;
 
+class ndStartEnd
+{
+	public:
+	ndStartEnd(ndInt32 count, ndInt32 threadIndex, ndInt32 threads)
+	{
+		ndInt32 stride = count / threads;
+		m_start = stride * threadIndex;
+		m_end = (threadIndex != (threads - 1)) ? stride + m_start : count;
+	}
+
+	ndInt32 m_start;
+	ndInt32 m_end;
+};
+
+class ndTask
+{
+	public:
+	ndTask(){}
+	virtual ~ndTask(){}
+	virtual void Execute() const = 0;
+	friend class ndThreadPool;
+};
+
 class ndThreadPoolJob_old
 {
 	public:
-	class ndStartEnd
-	{
-		public:
-		ndStartEnd(ndInt32 count, ndInt32 threadIndex, ndInt32 threads)
-		{
-			ndInt32 stride = count / threads;
-			m_start = stride * threadIndex;
-			m_end = (threadIndex != (threads - 1)) ? stride + m_start : count;
-		}
-
-		ndInt32 m_start;
-		ndInt32 m_end;
-	};
-
 	ndThreadPoolJob_old() 
 	{
 	}
@@ -103,7 +112,8 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 		ndThreadPool* m_owner;
 		ndAtomic<bool> m_begin;
 		ndAtomic<bool> m_stillLooping;
-		ndAtomic<ndThreadPoolJob_old*> m_job;
+		ndAtomic<ndTask*> m_jobLambda;
+		ndAtomic<ndThreadPoolJob_old*> m_jobOld;
 		ndInt32 m_threadIndex;
 		friend class ndThreadPool;
 	};
@@ -123,6 +133,9 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 
 	template <class T>
 	void SubmitJobs(void* const context = nullptr);
+
+	template <typename Function>
+	void Execute(Function ndFunction);
 
 	private:
 	D_CORE_API virtual void Release();
@@ -150,6 +163,120 @@ void ndThreadPool::SubmitJobs(void* const context)
 		extJobPtr[i] = &extJob[i];
 	}
 	ExecuteJobs(extJobPtr, context);
+}
+
+template <typename Type, typename ... Args>
+class ndFunction
+	:public ndFunction<decltype(&Type::operator())(Args...)>
+{
+};
+
+template <typename Type>
+class ndFunction<Type>
+{
+	public:
+	ndFunction(const Type& obj)
+		:m_object(obj)
+	{
+	}
+
+	template<typename... Args> typename
+		std::result_of<Type(Args...)>::type operator()(Args... args)
+	{
+		m_object.operator()(args...);
+	}
+
+	template<typename... Args> typename
+		std::result_of<const Type(Args...)>::type operator()(Args... args) const
+	{
+		m_object.operator()(args...);
+	}
+
+	private:
+	Type m_object;
+};
+
+namespace ndMakeObject
+{
+	template<typename Type> auto ndFunction(const Type & obj)
+	{
+		return ::ndFunction<Type>(obj);
+	}
+}
+
+template <typename Function>
+class ndTaskImplement : public ndTask
+{
+	public:
+	ndTaskImplement(ndInt32 threadIndex, ndThreadPool* const threadPool, Function ndFunction)
+		:ndTask()
+		,m_function(ndFunction)
+		,m_threadPool(threadPool)
+		,m_threadIndex(threadIndex)
+		,m_threadCount(threadPool->GetThreadCount())
+	{
+	}
+
+	~ndTaskImplement()
+	{
+	}
+
+	private:
+	void Execute() const
+	{
+		m_function(m_threadIndex, m_threadCount);
+	}
+
+	Function m_function;
+	ndThreadPool* m_threadPool;
+	const ndInt32 m_threadIndex;
+	const ndInt32 m_threadCount;
+	friend class ndThreadPool;
+};
+
+template <typename Function>
+void ndThreadPool::Execute(Function ndFunction)
+{
+	const ndInt32 threadCount = GetThreadCount();
+	ndTaskImplement<Function>* const jobsArray = dAlloca(ndTaskImplement<Function>, threadCount);
+
+	for (ndInt32 i = 0; i < threadCount; ++i)
+	{
+		ndTaskImplement<Function>* const job = &jobsArray[i];
+		new (job) ndTaskImplement<Function>(i, this, ndFunction);
+	}
+
+	if (m_count > 0)
+	{
+		for (ndInt32 i = 0; i < m_count; ++i)
+		{
+			ndTaskImplement<Function>* const job = &jobsArray[i];
+			m_workers[i].m_jobLambda.store(job);
+		}
+
+		ndTaskImplement<Function>* const job = &jobsArray[m_count];
+		ndFunction(job->m_threadIndex, job->m_threadCount);
+
+		bool jobsInProgress = true;
+		do
+		{
+			bool inProgess = false;
+			for (ndInt32 i = 0; i < m_count; ++i)
+			{
+				inProgess = inProgess | (m_workers[i].m_jobLambda.load() != nullptr);
+			}
+			jobsInProgress = jobsInProgress & inProgess;
+			if (jobsInProgress)
+			{
+				std::this_thread::yield();
+			}
+		} while (jobsInProgress);
+	}
+	else
+	{
+		ndTaskImplement<Function>* const job = &jobsArray[0];
+		ndFunction(job->m_threadIndex, job->m_threadCount);
+	}
 }
 
 #endif

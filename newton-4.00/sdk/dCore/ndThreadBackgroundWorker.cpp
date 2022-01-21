@@ -28,8 +28,8 @@
 //#define D_EXECUTE_IMMEDIATE
 
 ndThreadBackgroundWorker::ndThreadBackgroundWorker()
-	:ndList<ndBackgroundJob*, ndContainersFreeListAlloc<ndBackgroundJob*>>()
-	,ndThreadPool("backgroundWorkers")
+	:ndThreadPool("backgroundWorkers")
+	,ndList<ndBackgroundJob*, ndContainersFreeListAlloc<ndBackgroundJob*>>()
 	,m_lock()
 	,m_inLoop(false)
 	,m_teminate(false)
