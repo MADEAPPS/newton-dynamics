@@ -249,12 +249,19 @@ void ndThreadPool::ParallelExecute(Function ndFunction)
 
 	if (m_count > 0)
 	{
+		#ifdef	D_USE_THREAD_EMULATION
+		for (ndInt32 i = 0; i < threadCount; ++i)
+		{
+			ndTaskImplement<Function>* const job = &jobsArray[i];
+			ndFunction(job->m_threadIndex, job->m_threadCount);
+		}
+		#else
 		for (ndInt32 i = 0; i < m_count; ++i)
 		{
 			ndTaskImplement<Function>* const job = &jobsArray[i];
 			m_workers[i].m_jobLambda.store(job);
 		}
-
+	
 		ndTaskImplement<Function>* const job = &jobsArray[m_count];
 		ndFunction(job->m_threadIndex, job->m_threadCount);
 
@@ -272,6 +279,7 @@ void ndThreadPool::ParallelExecute(Function ndFunction)
 				std::this_thread::yield();
 			}
 		} while (jobsInProgress);
+		#endif
 	}
 	else
 	{

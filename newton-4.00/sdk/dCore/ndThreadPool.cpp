@@ -180,6 +180,7 @@ void ndThreadPool::Begin()
 
 void ndThreadPool::End()
 {
+	#ifndef	D_USE_THREAD_EMULATION
 	for (ndInt32 i = 0; i < m_count; ++i)
 	{
 		m_workers[i].m_begin.store(false);
@@ -195,6 +196,7 @@ void ndThreadPool::End()
 		}
 		stillLooping = stillLooping & looping;
 	} while (stillLooping);
+	#endif
 }
 
 void ndThreadPool::Release()

@@ -57,23 +57,25 @@ void ndThreadBackgroundWorker::Terminate()
 	}
 }
 
-void ndThreadBackgroundWorker::SendTask(ndBackgroundTask* const job)
+void ndThreadBackgroundWorker::SendTask(ndBackgroundTask* const task)
 {
-#if defined (D_EXECUTE_IMMEDIATE) || defined (D_USE_THREAD_EMULATION)
-	job->m_jobState = ndBackgroundTask::m_taskInProccess;
-	job->m_threaPool = this;
-	job->Execute();
-	job->m_threaPool = nullptr;
-	job->m_jobState = ndBackgroundTask::m_taskCompleted;
-#else
+	#if defined (D_EXECUTE_IMMEDIATE) || defined (D_USE_THREAD_EMULATION)
+	{
+		task->m_jobState = ndBackgroundTask::m_taskInProccess;
+		task->m_threaPool = this;
+		task->Execute();
+		task->m_threaPool = nullptr;
+		task->m_jobState = ndBackgroundTask::m_taskCompleted;
+	}
+	#else
 	{
 		ndScopeSpinLock lock(m_lock);
-		job->m_threaPool = this;
-		job->m_jobState.store(ndBackgroundTask::m_taskInProccess);
-		Append(job);
+		task->m_threaPool = this;
+		task->m_jobState.store(ndBackgroundTask::m_taskInProccess);
+		Append(task);
 	}
 	m_queueSemaphore.Signal();
-#endif
+	#endif
 }
 
 void ndThreadBackgroundWorker::ThreadFunction()
