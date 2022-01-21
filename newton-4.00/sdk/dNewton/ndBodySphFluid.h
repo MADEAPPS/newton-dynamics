@@ -69,22 +69,25 @@ class ndBodySphFluid: public ndBodyParticleSet, public ndBackgroundJob
 	class ndParticleKernelDistance;
 
 	ndWorkingData& WorkingData();
+	void Update(ndThreadPool* const threadPool);
+
 	void SortGrids();
 	void BuildPairs();
 	void CreateGrids();
-	void CaculateAabb();
+	void CaculateAabb(ndThreadPool* const threadPool);
 	void SortXdimension();
 	void CalculateScans();
 	void SortCellBuckects();
+	void IntegrateParticles();
 	void CalculateAccelerations();
 	void CalculateParticlesDensity();
-	void IntegrateParticles();
 
 	ndFloat32 m_mass;
 	ndFloat32 m_viscosity;
 	ndFloat32 m_restDensity;
 	ndFloat32 m_gasConstant;
 	ndFloat32 m_timestep;
+	bool m_updateInBackground;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const ndFastRay&, const ndFloat32) const

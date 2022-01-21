@@ -234,6 +234,7 @@ ndBodySphFluid::ndBodySphFluid()
 	,m_viscosity(ndFloat32 (1.05f))
 	,m_restDensity(ndFloat32(1000.0f))
 	,m_gasConstant(ndFloat32(1.0f))
+	,m_updateInBackground(true)
 {
 }
 
@@ -244,6 +245,7 @@ ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	,m_viscosity(ndFloat32(1.0f))
 	,m_restDensity(ndFloat32(1000.0f))
 	,m_gasConstant(ndFloat32(1.0f))
+	,m_updateInBackground(true)
 {
 	// nothing was saved
 	dAssert(0);
@@ -269,9 +271,33 @@ void ndBodySphFluid::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
 }
 
-void ndBodySphFluid::CaculateAabb()
+void ndBodySphFluid::Execute()
+{
+	// do the scene management 
+	Update(GetThreadPool());
+}
+
+void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
+{
+	m_timestep = timestep;
+	ndScene* const scene = world->GetScene();
+	if (m_updateInBackground)
+	{
+		if (JobState() == ndBackgroundJob::m_jobCompleted)
+		{
+			scene->SendBackgroundJob(this);
+		}
+	}
+	else
+	{
+		Update(scene);
+	}
+}
+
+void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
+#if 0
 	class ndBox
 	{
 		public:
@@ -313,7 +339,6 @@ void ndBodySphFluid::CaculateAabb()
 
 	ndContext context;
 	context.m_fluid = this;
-	ndThreadBackgroundWorker* const threadPool = GetThreadPool();
 	threadPool->SubmitJobs<ndCalculateAabb>(&context);
 
 	ndBox box;
@@ -344,6 +369,65 @@ void ndBodySphFluid::CaculateAabb()
 	ndWorkingData& data = WorkingData();
 	ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
 	data.SetWorldToGridMapping(numberOfGrid, m_box1.m_x, m_box0.m_x);
+#else
+	class ndBox
+	{
+	public:
+		ndBox()
+			:m_min(ndFloat32(1.0e10f))
+			, m_max(ndFloat32(-1.0e10f))
+		{
+		}
+		ndVector m_min;
+		ndVector m_max;
+	};
+
+	ndBox boxes[D_MAX_THREADS_COUNT];
+	auto CalculateAabb = ndMakeObject::ndFunction([this, &boxes](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		ndBox box;
+		const ndArray<ndVector>& posit = m_posit;
+		const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			box.m_min = box.m_min.GetMin(posit[i]);
+			box.m_max = box.m_max.GetMax(posit[i]);
+		}
+		boxes[threadIndex] = box;
+	});
+
+	threadPool->Execute(CalculateAabb);
+
+	ndBox box;
+	const ndInt32 threadCount = threadPool->GetThreadCount();
+	for (ndInt32 i = 0; i < threadCount; ++i)
+	{
+		box.m_min = box.m_min.GetMin(boxes[i].m_min);
+		box.m_max = box.m_max.GetMax(boxes[i].m_max);
+	}
+
+	const ndFloat32 gridSize = GetSphGridSize();
+
+	ndVector grid(gridSize);
+	ndVector invGrid(ndFloat32(1.0f) / gridSize);
+
+	// add one grid padding to the aabb
+	box.m_min -= grid;
+	box.m_max += (grid + grid);
+
+	// quantize the aabb to integers of the gird size
+	box.m_min = grid * (box.m_min * invGrid).Floor();
+	box.m_max = grid * (box.m_max * invGrid).Floor();
+
+	// make sure the w component is zero.
+	m_box0 = box.m_min & ndVector::m_triplexMask;
+	m_box1 = box.m_max & ndVector::m_triplexMask;
+
+	ndWorkingData& data = WorkingData();
+	ndInt32 numberOfGrid = ndInt32((box.m_max.m_x - box.m_min.m_x) * invGrid.m_x + ndFloat32(1.0f));
+	data.SetWorldToGridMapping(numberOfGrid, m_box1.m_x, m_box0.m_x);
+#endif
 }
 
 void ndBodySphFluid::SortXdimension()
@@ -1273,11 +1357,10 @@ void ndBodySphFluid::IntegrateParticles()
 	threadPool->SubmitJobs<ndIntegrateParticles>(&context);
 }
 
-void ndBodySphFluid::Execute()
+void ndBodySphFluid::Update(ndThreadPool* const threadPool)
 {
-	// do the scene management 
 	D_TRACKTIME();
-	CaculateAabb();
+	CaculateAabb(threadPool);
 	CreateGrids();
 	SortGrids();
 	CalculateScans();
@@ -1287,12 +1370,3 @@ void ndBodySphFluid::Execute()
 	IntegrateParticles();
 }
 
-void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
-{
-	m_timestep = timestep;
-	if (JobState() == ndBackgroundJob::m_jobCompleted)
-	{
-		ndScene* const scene = world->GetScene();
-		scene->SendBackgroundJob(this);
-	}
-}
