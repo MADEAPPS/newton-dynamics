@@ -276,7 +276,7 @@ void ndThreadPool::ParallelExecute(Function ndFunction)
 			jobsInProgress = jobsInProgress & inProgess;
 			if (jobsInProgress)
 			{
-				std::this_thread::yield();
+				ndYield();
 			}
 		} while (jobsInProgress);
 		#endif

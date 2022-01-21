@@ -38,7 +38,7 @@ ndThread::ndThread()
 #ifndef D_USE_THREAD_EMULATION
 	while (load())
 	{
-		std::this_thread::yield();
+		ndYield();
 	}
 #endif
 }

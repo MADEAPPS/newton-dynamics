@@ -242,6 +242,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_showCollidingFaces(false)
 	,m_suspendPhysicsUpdate(false)
 	,m_synchronousPhysicsUpdate(false)
+	,m_synchronousParticlesUpdate(false)
 	,m_showRaycastHit(false)
 	,m_profilerMode(false)
 	,m_solverMode(ndWorld::ndSimdSoaSolver)
@@ -822,6 +823,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show UI", &m_showUI);
 			ImGui::Checkbox("show stats", &m_showStats);
 			ImGui::Checkbox("synchronous physics update", &m_synchronousPhysicsUpdate);
+			ImGui::Checkbox("synchronous particle update", &m_synchronousParticlesUpdate);
 			ImGui::Separator();
 
 			ImGui::Text("solvers");
@@ -863,7 +865,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 
 			ImGui::EndMenu();
 
-			//SetDebugDisplayMode(m_showCollidingFaces ? 1 : 0);
+			SetParticleUpdateMode();
 		}
 
 		if (ImGui::BeginMenu("Help")) 
@@ -1094,6 +1096,17 @@ ndInt32 ndDemoEntityManager::ParticleCount() const
 	return count;
 }
 
+void ndDemoEntityManager::SetParticleUpdateMode() const
+{
+	const ndBodyParticleSetList& particles = m_world->GetParticleList();
+	for (ndBodyParticleSetList::ndNode* node = particles.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyParticleSet* const set = node->GetInfo();
+		set->SetAsynUpdate(!m_synchronousParticlesUpdate);
+	}
+}
+
+
 void ndDemoEntityManager::RenderStats()
 {
 	if (m_showStats) 
@@ -1111,6 +1124,9 @@ void ndDemoEntityManager::RenderStats()
 			sprintf(text, "update mode:    %s", m_synchronousPhysicsUpdate ? "synchronous" : "asynchronous");
 			ImGui::Text(text, "");
 
+			sprintf(text, "particle mode:  %s", m_synchronousParticlesUpdate ? "synchronous" : "asynchronous");
+			ImGui::Text(text, "");
+
 			sprintf(text, "bodies:         %d", m_world->GetBodyList().GetCount());
 			ImGui::Text(text, "");
 
@@ -1122,7 +1138,6 @@ void ndDemoEntityManager::RenderStats()
 
 			sprintf(text, "particles:      %d", ParticleCount());
 			ImGui::Text(text, "");
-
 
 			sprintf(text, "memory used:   %6.3f mbytes", ndFloat32(ndFloat64(ndMemory::GetMemoryUsed()) / (1024 * 1024)));
 			ImGui::Text(text, "");
@@ -1149,7 +1164,6 @@ void ndDemoEntityManager::RenderStats()
 		if (ImGui::Begin("User Interface", &m_showUI))
 		{
 			m_renderHelpMenus (this, m_renderUIContext);
-			//m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
 			ImGui::End();
 		}
 	}

@@ -233,13 +233,6 @@ void ndBodySphFluid::Save(const ndLoadSaveBase::ndSaveDescriptor&) const
 	//ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
 }
 
-void ndBodySphFluid::Execute()
-{
-	// do the scene management 
-	Update(GetThreadPool());
-}
-
-
 void ndBodySphFluid::SortXdimension(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
@@ -984,7 +977,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	data.m_hashGridMap.SetCount(gridCount);
 }
 
-void ndBodySphFluid::Update(ndThreadPool* const threadPool)
+void ndBodySphFluid::Execute(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
 	CaculateAabb(threadPool);
@@ -999,17 +992,14 @@ void ndBodySphFluid::Update(ndThreadPool* const threadPool)
 
 void ndBodySphFluid::Update(const ndWorld* const world, ndFloat32 timestep)
 {
-	m_timestep = timestep;
-	ndScene* const scene = world->GetScene();
-	if (m_updateInBackground)
+	if (taskState() == ndBackgroundTask::m_taskCompleted)
 	{
-		if (JobState() == ndBackgroundTask::m_taskCompleted)
+		m_timestep = timestep;
+		ndScene* const scene = world->GetScene();
+		scene->SendBackgroundTask(this);
+		if (!m_updateInBackground)
 		{
-			scene->SendBackgroundTask(this);
+			Sync();
 		}
-	}
-	else
-	{
-		Update(scene);
 	}
 }

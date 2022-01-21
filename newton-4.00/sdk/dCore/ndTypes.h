@@ -452,6 +452,9 @@ class ndScopeSpinLock
 	ndSpinLock& m_spinLock;
 };
 
-
+inline void ndYield()
+{
+	std::this_thread::yield();
+}
 #endif
 

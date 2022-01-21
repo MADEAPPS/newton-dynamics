@@ -50,7 +50,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	virtual ndBodySphFluid* GetAsBodySphFluid();
 	D_NEWTON_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
-	D_NEWTON_API void Execute();
+	D_NEWTON_API void Execute(ndThreadPool* const threadPool);
 
 	protected:
 	D_NEWTON_API virtual void Update(const ndWorld* const world, ndFloat32 timestep);
@@ -69,7 +69,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 	class ndParticleKernelDistance;
 
 	ndWorkingData& WorkingData();
-	void Update(ndThreadPool* const threadPool);
 	void SortGrids(ndThreadPool* const threadPool);
 	void BuildPairs(ndThreadPool* const threadPool);
 	void CreateGrids(ndThreadPool* const threadPool);

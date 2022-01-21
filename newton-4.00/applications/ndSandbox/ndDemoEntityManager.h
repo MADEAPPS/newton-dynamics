@@ -193,6 +193,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	//void RenderUI();
 	void RenderScene();
 	ndInt32 ParticleCount() const;
+	void SetParticleUpdateMode() const;
 	
 	void UpdatePhysics(ndFloat32 timestep);
 	ndFloat32 CalculateInteplationParam () const;
@@ -273,6 +274,7 @@ class ndDemoEntityManager: public ndList <ndDemoEntity*>
 	bool m_showCollidingFaces;
 	bool m_suspendPhysicsUpdate;
 	bool m_synchronousPhysicsUpdate;
+	bool m_synchronousParticlesUpdate;
 	bool m_showRaycastHit;
 	bool m_profilerMode;
 

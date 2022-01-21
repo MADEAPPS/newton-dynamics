@@ -63,7 +63,7 @@ void ndThreadPool::ndWorkerThread::ThreadFunction()
 		}
 		else
 		{
-			std::this_thread::yield();
+			ndYield();
 		}
 	}
 	m_stillLooping.store(false);
@@ -154,7 +154,7 @@ void ndThreadPool::ExecuteJobs(ndThreadPoolJob_old** const jobs, void* const con
 			jobsInProgress = jobsInProgress & inProgess;
 			if (jobsInProgress)
 			{
-				std::this_thread::yield();
+				ndYield();
 			}
 		} while (jobsInProgress);
 	}

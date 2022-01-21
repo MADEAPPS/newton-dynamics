@@ -43,6 +43,8 @@ class ndBodyParticleSet: public ndBody, public ndBackgroundTask
 	const ndArray<ndVector>& GetPositions() const;
 	virtual ndBodyParticleSet* GetAsBodyParticleSet();
 
+	bool GetAsynUpdate() const;
+	void SetAsynUpdate(bool update);
 	ndFloat32 GetParticleRadius() const;
 	void SetParticleRadius(ndFloat32 radius);
 
@@ -104,6 +106,17 @@ inline void ndBodyParticleSet::SetGravity(const ndVector& gravity)
 {
 	m_gravity = gravity & ndVector::m_triplexMask;
 }
+
+inline bool ndBodyParticleSet::GetAsynUpdate() const
+{
+	return m_updateInBackground;
+}
+
+inline void ndBodyParticleSet::SetAsynUpdate(bool updatType)
+{
+	m_updateInBackground = updatType;
+}
+
 
 #endif 
 

@@ -41,33 +41,24 @@ class ndBackgroundTask
 	};
 
 	ndBackgroundTask()
-		:m_jobState(m_taskCompleted)
-		,m_threaPool(nullptr)
+		:m_taskState(m_taskCompleted)
 	{
 	}
 
-	ndTaskState JobState() const
+	virtual ~ndBackgroundTask() {}
+
+	ndTaskState taskState() const
 	{
-		return m_jobState.load();
+		return m_taskState.load();
 	}
 
-	virtual ~ndBackgroundTask()
-	{
-	}
-
-	ndThreadBackgroundWorker* GetThreadPool() const
-	{
-		return m_threaPool;
-	}
+	D_CORE_API void Sync() const;
 
 	protected:
-	virtual void Execute()
-	{
-	}
+	virtual void Execute(ndThreadPool* const threadPool) = 0;
 
 	private:
-	ndAtomic<ndTaskState> m_jobState;
-	ndThreadBackgroundWorker* m_threaPool;
+	ndAtomic<ndTaskState> m_taskState;
 	friend class ndThreadBackgroundWorker;
 };
 

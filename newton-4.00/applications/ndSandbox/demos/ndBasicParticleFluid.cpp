@@ -212,7 +212,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		{
 			ndScopeSpinLock lock(m_lock);
 
-			if (m_fluidBody->JobState() == ndBackgroundTask::m_taskCompleted)
+			if (m_fluidBody->taskState() == ndBackgroundTask::m_taskCompleted)
 			{
 				m_fluidBody->m_meshIsReady.store(0);
 				const ndArray<ndInt32>& indexList = m_fluidBody->m_indexList;
@@ -258,7 +258,7 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 	{
 		//ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
 		//ndScopeSpinLock lock(entity->m_lock);
-		//if (entity->m_fluidBody->JobState() == ndBackgroundTask::m_taskCompleted)
+		//if (entity->m_fluidBody->taskState() == ndBackgroundTask::m_taskCompleted)
 		//{
 		//	ndPhysicsWorld* const world = m_manager->GetWorld();
 		//	world->SendBackgroundJob(entity->m_fluidBody);
