@@ -1337,7 +1337,7 @@ void ndScene::InitBodyArray()
 		}
 	});
 
-	Execute(BuildBodyArray);
+	ParallelExecute(BuildBodyArray);
 
 	ndInt32 sum = 0;
 	ndInt32 threadCount = GetThreadCount();
@@ -1374,7 +1374,7 @@ void ndScene::InitBodyArray()
 				scan[key] ++;
 			}
 		});
-		Execute(CompactMovingBodies);
+		ParallelExecute(CompactMovingBodies);
 	}
 	m_sceneBodyArray.SetCount(movingBodyCount);
 
@@ -1609,12 +1609,12 @@ void ndScene::FindCollidingPairs()
 	//fullScan = true;
 	if (fullScan)
 	{
-		Execute(FindPairs);
+		ParallelExecute(FindPairs);
 	}
 	else
 	{
-		Execute(FindPairsForward);
-		Execute(FindPairsBackward);
+		ParallelExecute(FindPairsForward);
+		ParallelExecute(FindPairsBackward);
 	}
 }
 

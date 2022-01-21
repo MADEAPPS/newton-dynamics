@@ -195,23 +195,19 @@ class ndBodySphFluid::ndWorkingData
 
 ndBodySphFluid::ndBodySphFluid()
 	:ndBodyParticleSet()
-	,ndBackgroundTask()
 	,m_mass(ndFloat32(0.02f))
 	,m_viscosity(ndFloat32 (1.05f))
 	,m_restDensity(ndFloat32(1000.0f))
 	,m_gasConstant(ndFloat32(1.0f))
-	,m_updateInBackground(true)
 {
 }
 
 ndBodySphFluid::ndBodySphFluid(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndBodyParticleSet(desc)
-	,ndBackgroundTask()
 	,m_mass(ndFloat32(0.02f))
 	,m_viscosity(ndFloat32(1.0f))
 	,m_restDensity(ndFloat32(1000.0f))
 	,m_gasConstant(ndFloat32(1.0f))
-	,m_updateInBackground(true)
 {
 	// nothing was saved
 	dAssert(0);
@@ -450,7 +446,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 		}
 	}
 	scans[threadCount] = particleCount;
-	threadPool->Execute(ndCountGridScans);
+	threadPool->ParallelExecute(ndCountGridScans);
 
 	ndInt32 scansCount = 0;
 	
@@ -462,7 +458,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 	sums[threadCount] = scansCount;
 
 	data.m_gridScans.SetCount(scansCount + 1);
-	threadPool->Execute(ndCalculateScans);
+	threadPool->ParallelExecute(ndCalculateScans);
 
 	data.m_gridScans[scansCount] = scans[threadCount];
 }
@@ -601,7 +597,7 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 		}
 	});
 	
-	threadPool->Execute(ndAddPairs);
+	threadPool->ParallelExecute(ndAddPairs);
 }
 
 void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
@@ -642,7 +638,7 @@ void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
 		}
 	});
 
-	threadPool->Execute(CalculateDensity);
+	threadPool->ParallelExecute(CalculateDensity);
 }
 
 void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
@@ -711,7 +707,7 @@ void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
 		}
 	});
 
-	threadPool->Execute(CalculateAcceleration);
+	threadPool->ParallelExecute(CalculateAcceleration);
 }
 
 void ndBodySphFluid::IntegrateParticles(ndThreadPool* const threadPool)
@@ -742,7 +738,7 @@ void ndBodySphFluid::IntegrateParticles(ndThreadPool* const threadPool)
 		}
 	});
 
-	threadPool->Execute(IntegrateParticles);
+	threadPool->ParallelExecute(IntegrateParticles);
 }
 
 void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
@@ -775,7 +771,7 @@ void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
 		boxes[threadIndex] = box;
 	});
 
-	threadPool->Execute(CalculateAabb);
+	threadPool->ParallelExecute(CalculateAabb);
 
 	ndBox box;
 	const ndInt32 threadCount = threadPool->GetThreadCount();
@@ -952,7 +948,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	
 	data.m_hashGridMap.SetCount(m_posit.GetCount() * 4);
 	data.m_hashGridMapScratchBuffer.SetCount(m_posit.GetCount() * 4);
-	threadPool->Execute(ndCreateGrids);
+	threadPool->ParallelExecute(ndCreateGrids);
 
 	#ifdef D_USE_PARALLEL_CLASSIFY
 		ndInt32 sum = 0;

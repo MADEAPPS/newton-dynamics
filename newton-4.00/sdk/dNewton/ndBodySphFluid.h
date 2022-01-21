@@ -26,7 +26,7 @@
 #include "ndBodyParticleSet.h"
 
 D_MSV_NEWTON_ALIGN_32
-class ndBodySphFluid: public ndBodyParticleSet, public ndBackgroundTask
+class ndBodySphFluid: public ndBodyParticleSet
 {
 	public:
 	D_NEWTON_API ndBodySphFluid();
@@ -86,7 +86,6 @@ class ndBodySphFluid: public ndBodyParticleSet, public ndBackgroundTask
 	ndFloat32 m_restDensity;
 	ndFloat32 m_gasConstant;
 	ndFloat32 m_timestep;
-	bool m_updateInBackground;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline bool ndBodySphFluid::RayCast(ndRayCastNotify&, const ndFastRay&, const ndFloat32) const

@@ -135,7 +135,7 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 	void SubmitJobs(void* const context = nullptr);
 
 	template <typename Function>
-	void Execute(Function ndFunction);
+	void ParallelExecute(Function ndFunction);
 
 	private:
 	D_CORE_API virtual void Release();
@@ -235,7 +235,7 @@ class ndTaskImplement : public ndTask
 };
 
 template <typename Function>
-void ndThreadPool::Execute(Function ndFunction)
+void ndThreadPool::ParallelExecute(Function ndFunction)
 {
 	const ndInt32 threadCount = GetThreadCount();
 	ndTaskImplement<Function>* const jobsArray = dAlloca(ndTaskImplement<Function>, threadCount);

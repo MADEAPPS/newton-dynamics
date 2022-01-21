@@ -536,7 +536,7 @@ void ndWorld::ModelUpdate()
 			}
 		}
 	});
-	m_scene->Execute(ModelUpdate);
+	m_scene->ParallelExecute(ModelUpdate);
 }
 
 void ndWorld::ModelPostUpdate()
@@ -564,7 +564,7 @@ void ndWorld::ModelPostUpdate()
 			}
 		}
 	});
-	m_scene->Execute(ModelPostUpdate);
+	m_scene->ParallelExecute(ModelPostUpdate);
 }
 
 void ndWorld::PostModelTransform()
@@ -592,7 +592,7 @@ void ndWorld::PostModelTransform()
 			}
 		}
 	});
-	m_scene->Execute(PostModelTransform);
+	m_scene->ParallelExecute(PostModelTransform);
 }
 
 bool ndWorld::SkeletonJointTest(ndJointBilateralConstraint* const constraint) const

@@ -401,9 +401,9 @@ void ndDynamicsUpdate::SortJointsScan()
 		}
 	});
 
-	scene->Execute(MarkFence0);
-	scene->Execute(MarkFence1);
-	scene->Execute(Scan0);
+	scene->ParallelExecute(MarkFence0);
+	scene->ParallelExecute(MarkFence1);
+	scene->ParallelExecute(Scan0);
 
 	ndInt32 scan[2];
 	scan[0] = 0;
@@ -435,7 +435,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		}
 	}
 
-	scene->Execute(Sort0);
+	scene->ParallelExecute(Sort0);
 	ndConstraint** const tempJointBuffer = (ndConstraint**)GetTempBuffer();
 
 #ifdef _DEBUG
@@ -684,7 +684,7 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 	if (GetUnconstrainedBodyCount())
 	{
 		D_TRACKTIME();
-		scene->Execute(IntegrateUnconstrainedBodies);
+		scene->ParallelExecute(IntegrateUnconstrainedBodies);
 	}
 }
 

@@ -220,7 +220,7 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		}
 	});
 
-	threadPool.Execute(ndCountKeys);
+	threadPool.ParallelExecute(ndCountKeys);
 
 	ndInt32 bits = keyBitSize;
 	if (bits < 11)
@@ -242,7 +242,7 @@ void ndCountingSort(ndThreadPool& threadPool, T* const array, T* const scratchBu
 		dAssert(0);
 	}
 
-	threadPool.Execute(ndSortArray);
+	threadPool.ParallelExecute(ndSortArray);
 
 //#ifdef _DEBUG
 #if 0
