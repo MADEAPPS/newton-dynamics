@@ -59,7 +59,7 @@ const char* ndDynamicsUpdateSoa::GetStringId() const
 void ndDynamicsUpdateSoa::DetermineSleepStates()
 {
 	D_TRACKTIME();
-	class ndDetermineSleepStates : public ndThreadPoolJob
+	class ndDetermineSleepStates : public ndThreadPoolJob_old
 	{
 		public:
 		void UpdateIslandState(const ndIsland& island)
@@ -313,7 +313,7 @@ void ndDynamicsUpdateSoa::SortJoints()
 		ndInt32 m_soaJointRowCount;
 	};
 
-	class ndSetRowStarts : public ndThreadPoolJob
+	class ndSetRowStarts : public ndThreadPoolJob_old
 	{
 		public:
 		void SetRowsCount()
@@ -536,7 +536,7 @@ void ndDynamicsUpdateSoa::SortIslands()
 	if (bodyCount)
 	{
 		ndBodyIndexPair* const buffer1 = buffer0 + bodyCount;
-		ndCountingSort<ndBodyIndexPair, ndIslandKey, 1>(*scene, buffer0, buffer1, bodyCount);
+		ndCountingSortOld<ndBodyIndexPair, ndIslandKey, 1>(*scene, buffer0, buffer1, bodyCount);
 		for (ndInt32 i = 0; i < bodyCount; ++i)
 		{
 			dAssert((i == bodyCount - 1) || (buffer1[i].m_root->m_bodyIsConstrained >= buffer1[i + 1].m_root->m_bodyIsConstrained));
@@ -566,11 +566,11 @@ void ndDynamicsUpdateSoa::SortIslands()
 	
 		ndInt32 context = 0;
 		ndIsland* const islandTempBuffer = (ndIsland*)GetTempBuffer();
-		ndCountingSort<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &islands[0], islandTempBuffer, islands.GetCount(), &context);
+		ndCountingSortOld<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &islands[0], islandTempBuffer, islands.GetCount(), &context);
 		if (islandMaxKeySize >= (1 << (D_MAX_BODY_RADIX_BIT - 1)))
 		{
 			context = 1;
-			ndCountingSort<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, islandTempBuffer, &islands[0], islands.GetCount(), &context);
+			ndCountingSortOld<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, islandTempBuffer, &islands[0], islands.GetCount(), &context);
 		}
 		else
 		{
@@ -598,7 +598,7 @@ void ndDynamicsUpdateSoa::BuildIsland()
 
 void ndDynamicsUpdateSoa::IntegrateUnconstrainedBodies()
 {
-	class ndIntegrateUnconstrainedBodies : public ndThreadPoolJob
+	class ndIntegrateUnconstrainedBodies : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -635,7 +635,7 @@ void ndDynamicsUpdateSoa::IntegrateUnconstrainedBodies()
 void ndDynamicsUpdateSoa::IntegrateBodies()
 {
 	D_TRACKTIME();
-	class ndIntegrateBodies : public ndThreadPoolJob
+	class ndIntegrateBodies : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -670,7 +670,7 @@ void ndDynamicsUpdateSoa::IntegrateBodies()
 void ndDynamicsUpdateSoa::InitWeights()
 {
 	D_TRACKTIME();
-	class ndInitWeights : public ndThreadPoolJob
+	class ndInitWeights : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -736,7 +736,7 @@ void ndDynamicsUpdateSoa::InitWeights()
 void ndDynamicsUpdateSoa::InitBodyArray()
 {
 	D_TRACKTIME();
-	class ndInitBodyArray : public ndThreadPoolJob
+	class ndInitBodyArray : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -872,7 +872,7 @@ void ndDynamicsUpdateSoa::GetJacobianDerivatives(ndConstraint* const joint)
 
 void ndDynamicsUpdateSoa::InitJacobianMatrix()
 {
-	class ndInitJacobianMatrix : public ndThreadPoolJob
+	class ndInitJacobianMatrix : public ndThreadPoolJob_old
 	{
 		public:
 		ndInitJacobianMatrix()
@@ -1042,7 +1042,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 		const ndJointBodyPairIndex* m_jointBodyPairIndexBuffer;
 	};
 
-	class ndTransposeMassMatrix : public ndThreadPoolJob
+	class ndTransposeMassMatrix : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1315,7 +1315,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 		}
 	};
 
-	class ndInitJacobianAccumulatePartialForces : public ndThreadPoolJob
+	class ndInitJacobianAccumulatePartialForces : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1374,7 +1374,7 @@ void ndDynamicsUpdateSoa::InitJacobianMatrix()
 void ndDynamicsUpdateSoa::UpdateForceFeedback()
 {
 	D_TRACKTIME();
-	class ndUpdateForceFeedback : public ndThreadPoolJob
+	class ndUpdateForceFeedback : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1441,7 +1441,7 @@ void ndDynamicsUpdateSoa::InitSkeletons()
 {
 	D_TRACKTIME();
 
-	class ndInitSkeletons : public ndThreadPoolJob
+	class ndInitSkeletons : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1481,7 +1481,7 @@ void ndDynamicsUpdateSoa::InitSkeletons()
 void ndDynamicsUpdateSoa::UpdateSkeletons()
 {
 	D_TRACKTIME();
-	class ndUpdateSkeletons : public ndThreadPoolJob
+	class ndUpdateSkeletons : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1522,7 +1522,7 @@ void ndDynamicsUpdateSoa::UpdateSkeletons()
 void ndDynamicsUpdateSoa::CalculateJointsAcceleration()
 {
 	D_TRACKTIME();
-	class ndCalculateJointsAcceleration : public ndThreadPoolJob
+	class ndCalculateJointsAcceleration : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1556,7 +1556,7 @@ void ndDynamicsUpdateSoa::CalculateJointsAcceleration()
 		}
 	};
 
-	class ndUpdateAcceleration : public ndThreadPoolJob
+	class ndUpdateAcceleration : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1630,7 +1630,7 @@ void ndDynamicsUpdateSoa::CalculateJointsAcceleration()
 void ndDynamicsUpdateSoa::IntegrateBodiesVelocity()
 {
 	D_TRACKTIME();
-	class ndIntegrateBodiesVelocity : public ndThreadPoolJob
+	class ndIntegrateBodiesVelocity : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1686,7 +1686,7 @@ void ndDynamicsUpdateSoa::IntegrateBodiesVelocity()
 void ndDynamicsUpdateSoa::CalculateJointsForce()
 {
 	D_TRACKTIME();
-	class ndCalculateJointsForce : public ndThreadPoolJob
+	class ndCalculateJointsForce : public ndThreadPoolJob_old
 	{
 		public:
 		ndCalculateJointsForce()
@@ -2104,7 +2104,7 @@ void ndDynamicsUpdateSoa::CalculateJointsForce()
 		ndInt32 m_activeCount;
 	};
 
-	class ndApplyJacobianAccumulatePartialForces : public ndThreadPoolJob
+	class ndApplyJacobianAccumulatePartialForces : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()

@@ -514,7 +514,7 @@ void ndWorld::ParticleUpdate(ndFloat32 timestep)
 void ndWorld::ModelUpdate()
 {
 	D_TRACKTIME();
-	class ndModelUpdate : public ndThreadPoolJob
+	class ndModelUpdate : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -551,7 +551,7 @@ void ndWorld::ModelUpdate()
 void ndWorld::ModelPostUpdate()
 {
 	D_TRACKTIME();
-	class ndModelPostUpdate: public ndThreadPoolJob
+	class ndModelPostUpdate: public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -588,7 +588,7 @@ void ndWorld::ModelPostUpdate()
 void ndWorld::PostModelTransform()
 {
 	D_TRACKTIME();
-	class ndPostModelTransform: public ndThreadPoolJob
+	class ndPostModelTransform: public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()

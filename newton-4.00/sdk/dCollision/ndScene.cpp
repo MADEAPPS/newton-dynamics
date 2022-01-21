@@ -1265,7 +1265,7 @@ void ndScene::InitBodyArray()
 		ndInt32 m_scan[D_MAX_THREADS_COUNT][2];
 	};
 
-	class ndBuildBodyArray : public ndThreadPoolJob
+	class ndBuildBodyArray : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1312,7 +1312,7 @@ void ndScene::InitBodyArray()
 		}
 	};
 
-	class ndClassifyMovingBodies : public ndThreadPoolJob
+	class ndClassifyMovingBodies : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1423,7 +1423,7 @@ void ndScene::CalculateContacts()
 		ndInt32 m_digitScan[D_MAX_THREADS_COUNT][4];
 	};
 
-	class ndCalculateContacts : public ndThreadPoolJob
+	class ndCalculateContacts : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1464,7 +1464,7 @@ void ndScene::CalculateContacts()
 		}
 	};
 
-	class ndCompactContacts : public ndThreadPoolJob
+	class ndCompactContacts : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1589,7 +1589,7 @@ void ndScene::FindCollidingPairsBackward(ndBodyKinematic* const body)
 void ndScene::FindCollidingPairs()
 {
 	D_TRACKTIME();
-	class ndFindCollidindPairs : public ndThreadPoolJob
+	class ndFindCollidindPairs : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1606,7 +1606,7 @@ void ndScene::FindCollidingPairs()
 		}
 	};
 
-	class ndFindCollidindPairsForward : public ndThreadPoolJob
+	class ndFindCollidindPairsForward : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1623,7 +1623,7 @@ void ndScene::FindCollidingPairs()
 		}
 	};
 
-	class ndFindCollidindPairsBackward : public ndThreadPoolJob
+	class ndFindCollidindPairsBackward : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1657,7 +1657,7 @@ void ndScene::FindCollidingPairs()
 void ndScene::UpdateTransform()
 {
 	D_TRACKTIME();
-	class ndTransformUpdate : public ndThreadPoolJob
+	class ndTransformUpdate : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()

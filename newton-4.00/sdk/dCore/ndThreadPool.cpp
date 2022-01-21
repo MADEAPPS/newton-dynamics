@@ -48,7 +48,7 @@ void ndThreadPool::ndWorkerThread::ThreadFunction()
 	m_stillLooping.store(true);
 	while (m_begin.load())
 	{
-		ndThreadPoolJob* const job = m_job.load();
+		ndThreadPoolJob_old* const job = m_job.load();
 		if (job)
 		{
 			job->Execute();
@@ -107,7 +107,7 @@ void ndThreadPool::SetThreadCount(ndInt32 count)
 	}
 }
 
-void ndThreadPool::ExecuteJobs(ndThreadPoolJob** const jobs, void* const context)
+void ndThreadPool::ExecuteJobs(ndThreadPoolJob_old** const jobs, void* const context)
 {
 #ifdef D_USE_THREAD_EMULATION	
 	for (ndInt32 i = 0; i <= m_count; ++i)

@@ -291,7 +291,7 @@ void ndBodySphFluid::CaculateAabb()
 		const ndBodySphFluid* m_fluid;
 	};
 
-	class ndCalculateAabb : public ndThreadPoolJob
+	class ndCalculateAabb : public ndThreadPoolJob_old
 	{
 		virtual void Execute()
 		{
@@ -417,14 +417,14 @@ void ndBodySphFluid::SortXdimension()
 	ndWorkingData& data = WorkingData();
 	ndThreadBackgroundWorker* const threadPool = GetThreadPool();
 
-	ndCountingSort<ndGridHash, ndKey_low, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
+	ndCountingSortOld<ndGridHash, ndKey_low, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
 	const ndInt32 keySize = data.WorldToGrid(m_box1.m_x);
 	if (keySize >= 256)
 	{
-		ndCountingSort<ndGridHash, ndKey_middle, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
+		ndCountingSortOld<ndGridHash, ndKey_middle, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
 		if (keySize >= (256 * 256))
 		{
-			ndCountingSort<ndGridHash, ndKey_high, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
+			ndCountingSortOld<ndGridHash, ndKey_high, 8>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer, this);
 		}
 	}
 }
@@ -476,16 +476,16 @@ void ndBodySphFluid::SortCellBuckects()
 	ndThreadPool* const threadPool = GetThreadPool();
 
 	ndVector boxSize((m_box1 - m_box0).Scale(ndFloat32(1.0f) / GetSphGridSize()).GetInt());
-	ndCountingSort<ndGridHash, ndKey_ylow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
+	ndCountingSortOld<ndGridHash, ndKey_ylow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
 	if (boxSize.m_iy > (1 << D_SPH_HASH_BITS))
 	{
-		ndCountingSort<ndGridHash, ndKey_yhigh, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
+		ndCountingSortOld<ndGridHash, ndKey_yhigh, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
 	}
 	
-	ndCountingSort<ndGridHash, ndKey_zlow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
+	ndCountingSortOld<ndGridHash, ndKey_zlow, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
 	if (boxSize.m_iz > (1 << D_SPH_HASH_BITS))
 	{
-		ndCountingSort<ndGridHash, ndKey_zhigh, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
+		ndCountingSortOld<ndGridHash, ndKey_zhigh, D_SPH_HASH_BITS>(*threadPool, data.m_hashGridMap, data.m_hashGridMapScratchBuffer);
 	}
 }
 
@@ -525,7 +525,7 @@ void ndBodySphFluid::CalculateScans()
 		ndInt32 m_scan[D_MAX_THREADS_COUNT + 1];
 	};
 
-	class ndCountGridScans : public ndThreadPoolJob
+	class ndCountGridScans : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -561,7 +561,7 @@ void ndBodySphFluid::CalculateScans()
 		}
 	};
 
-	class ndCalculateScans : public ndThreadPoolJob
+	class ndCalculateScans : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -686,7 +686,7 @@ void ndBodySphFluid::CreateGrids()
 		ndBodySphFluid* m_fluid;
 	};
 
-	class ndCreateGrids: public ndThreadPoolJob
+	class ndCreateGrids: public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -751,7 +751,7 @@ void ndBodySphFluid::CreateGrids()
 		}
 	};
 
-	class ndCompactGrids : public ndThreadPoolJob
+	class ndCompactGrids : public ndThreadPoolJob_old
 	{
 		public:
 		void Execute()
@@ -843,7 +843,7 @@ void ndBodySphFluid::SortGrids()
 void ndBodySphFluid::BuildPairs()
 {
 	D_TRACKTIME();
-	class ndAddPairs : public ndThreadPoolJob
+	class ndAddPairs : public ndThreadPoolJob_old
 	{
 		public:
 		class ndPairInfo
@@ -1097,7 +1097,7 @@ void ndBodySphFluid::BuildPairs()
 void ndBodySphFluid::CalculateParticlesDensity()
 {
 	D_TRACKTIME();
-	class CalculateDensity : public ndThreadPoolJob
+	class CalculateDensity : public ndThreadPoolJob_old
 	{
 		virtual void Execute()
 		{
@@ -1143,7 +1143,7 @@ void ndBodySphFluid::CalculateParticlesDensity()
 void ndBodySphFluid::CalculateAccelerations()
 {
 	D_TRACKTIME();
-	class ndCalculateAcceleration : public ndThreadPoolJob
+	class ndCalculateAcceleration : public ndThreadPoolJob_old
 	{
 		inline ndVector Normalize(const ndVector& dir) const 
 		{
@@ -1239,7 +1239,7 @@ void ndBodySphFluid::IntegrateParticles()
 		ndFloat32 m_timestep;
 	};
 
-	class ndIntegrateParticles : public ndThreadPoolJob
+	class ndIntegrateParticles : public ndThreadPoolJob_old
 	{
 		virtual void Execute()
 		{

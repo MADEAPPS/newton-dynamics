@@ -454,7 +454,7 @@ const char* ndDynamicsUpdateAvx2::GetStringId() const
 void ndDynamicsUpdateAvx2::DetermineSleepStates()
 {
 	D_TRACKTIME();
-	class ndDetermineSleepStates : public ndThreadPoolJob
+	class ndDetermineSleepStates : public ndThreadPoolJob_old
 	{
 		public:
 		void UpdateIslandState(const ndIsland& island)
@@ -708,7 +708,7 @@ void ndDynamicsUpdateAvx2::SortJoints()
 		ndInt32 m_soaJointRowCount;
 	};
 
-	class ndSetRowStarts : public ndThreadPoolJob
+	class ndSetRowStarts : public ndThreadPoolJob_old
 	{
 		public:
 		void SetRowsCount()
@@ -954,7 +954,7 @@ void ndDynamicsUpdateAvx2::SortIslands()
 	if (bodyCount)
 	{
 		ndBodyIndexPair* const buffer1 = buffer0 + bodyCount;
-		ndCountingSort<ndBodyIndexPair, ndIslandKey, 1>(*scene, buffer0, buffer1, bodyCount);
+		ndCountingSortOld<ndBodyIndexPair, ndIslandKey, 1>(*scene, buffer0, buffer1, bodyCount);
 		for (ndInt32 i = 0; i < bodyCount; ++i)
 		{
 			dAssert((i == bodyCount - 1) || (buffer1[i].m_root->m_bodyIsConstrained >= buffer1[i + 1].m_root->m_bodyIsConstrained));
@@ -984,11 +984,11 @@ void ndDynamicsUpdateAvx2::SortIslands()
 
 		ndInt32 context = 0;
 		ndIsland* const islandTempBuffer = (ndIsland*)GetTempBuffer();
-		ndCountingSort<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &islands[0], islandTempBuffer, islands.GetCount(), &context);
+		ndCountingSortOld<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &islands[0], islandTempBuffer, islands.GetCount(), &context);
 		if (islandMaxKeySize >= (1 << (D_MAX_BODY_RADIX_BIT - 1)))
 		{
 			context = 1;
-			ndCountingSort<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, islandTempBuffer, &islands[0], islands.GetCount(), &context);
+			ndCountingSortOld<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, islandTempBuffer, &islands[0], islands.GetCount(), &context);
 		}
 		else
 		{
@@ -1016,7 +1016,7 @@ void ndDynamicsUpdateAvx2::BuildIsland()
 
 void ndDynamicsUpdateAvx2::IntegrateUnconstrainedBodies()
 {
-	class ndIntegrateUnconstrainedBodies : public ndThreadPoolJob
+	class ndIntegrateUnconstrainedBodies : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1053,7 +1053,7 @@ void ndDynamicsUpdateAvx2::IntegrateUnconstrainedBodies()
 void ndDynamicsUpdateAvx2::IntegrateBodies()
 {
 	D_TRACKTIME();
-	class ndIntegrateBodies : public ndThreadPoolJob
+	class ndIntegrateBodies : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1088,7 +1088,7 @@ void ndDynamicsUpdateAvx2::IntegrateBodies()
 void ndDynamicsUpdateAvx2::InitWeights()
 {
 	D_TRACKTIME();
-	class ndInitWeights : public ndThreadPoolJob
+	class ndInitWeights : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1154,7 +1154,7 @@ void ndDynamicsUpdateAvx2::InitWeights()
 void ndDynamicsUpdateAvx2::InitBodyArray()
 {
 	D_TRACKTIME();
-	class ndInitBodyArray : public ndThreadPoolJob
+	class ndInitBodyArray : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1290,7 +1290,7 @@ void ndDynamicsUpdateAvx2::GetJacobianDerivatives(ndConstraint* const joint)
 
 void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 {
-	class ndInitJacobianMatrix : public ndThreadPoolJob
+	class ndInitJacobianMatrix : public ndThreadPoolJob_old
 	{
 		public:
 		void BuildJacobianMatrix(ndConstraint* const joint, ndInt32 jointIndex)
@@ -1440,7 +1440,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 		const ndJointBodyPairIndex* m_jointBodyPairIndexBuffer;
 	};
 
-	class ndTransposeMassMatrix : public ndThreadPoolJob
+	class ndTransposeMassMatrix : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1754,7 +1754,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 		}
 	};
 
-	class ndInitJacobianAccumulatePartialForces : public ndThreadPoolJob
+	class ndInitJacobianAccumulatePartialForces : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1810,7 +1810,7 @@ void ndDynamicsUpdateAvx2::InitJacobianMatrix()
 void ndDynamicsUpdateAvx2::UpdateForceFeedback()
 {
 	D_TRACKTIME();
-	class ndUpdateForceFeedback : public ndThreadPoolJob
+	class ndUpdateForceFeedback : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1874,7 +1874,7 @@ void ndDynamicsUpdateAvx2::InitSkeletons()
 {
 	D_TRACKTIME();
 
-	class ndInitSkeletons : public ndThreadPoolJob
+	class ndInitSkeletons : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1914,7 +1914,7 @@ void ndDynamicsUpdateAvx2::InitSkeletons()
 void ndDynamicsUpdateAvx2::UpdateSkeletons()
 {
 	D_TRACKTIME();
-	class ndUpdateSkeletons : public ndThreadPoolJob
+	class ndUpdateSkeletons : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1955,7 +1955,7 @@ void ndDynamicsUpdateAvx2::UpdateSkeletons()
 void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 {
 	D_TRACKTIME();
-	class ndCalculateJointsAcceleration : public ndThreadPoolJob
+	class ndCalculateJointsAcceleration : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1989,7 +1989,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 		}
 	};
 
-	class ndUpdateAcceleration : public ndThreadPoolJob
+	class ndUpdateAcceleration : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -2063,7 +2063,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
 void ndDynamicsUpdateAvx2::IntegrateBodiesVelocity()
 {
 	D_TRACKTIME();
-	class ndIntegrateBodiesVelocity : public ndThreadPoolJob
+	class ndIntegrateBodiesVelocity : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -2119,7 +2119,7 @@ void ndDynamicsUpdateAvx2::IntegrateBodiesVelocity()
 void ndDynamicsUpdateAvx2::CalculateJointsForce()
 {
 	D_TRACKTIME();
-	class ndCalculateJointsForce : public ndThreadPoolJob
+	class ndCalculateJointsForce : public ndThreadPoolJob_old
 	{
 		public:
 		ndCalculateJointsForce()
@@ -2569,7 +2569,7 @@ void ndDynamicsUpdateAvx2::CalculateJointsForce()
 		ndInt32 m_activeCount;
 	};
 
-	class ndApplyJacobianAccumulatePartialForces : public ndThreadPoolJob
+	class ndApplyJacobianAccumulatePartialForces : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()

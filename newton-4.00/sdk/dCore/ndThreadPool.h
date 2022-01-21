@@ -34,7 +34,7 @@
 
 class ndThreadPool;
 
-class ndThreadPoolJob
+class ndThreadPoolJob_old
 {
 	public:
 	class ndStartEnd
@@ -51,11 +51,11 @@ class ndThreadPoolJob
 		ndInt32 m_end;
 	};
 
-	ndThreadPoolJob() 
+	ndThreadPoolJob_old() 
 	{
 	}
 
-	virtual ~ndThreadPoolJob() 
+	virtual ~ndThreadPoolJob_old() 
 	{
 	}
 
@@ -103,7 +103,7 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 		ndThreadPool* m_owner;
 		ndAtomic<bool> m_begin;
 		ndAtomic<bool> m_stillLooping;
-		ndAtomic<ndThreadPoolJob*> m_job;
+		ndAtomic<ndThreadPoolJob_old*> m_job;
 		ndInt32 m_threadIndex;
 		friend class ndThreadPool;
 	};
@@ -116,7 +116,7 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 	D_CORE_API void SetThreadCount(ndInt32 count);
 
 	D_CORE_API void TickOne();
-	D_CORE_API void ExecuteJobs(ndThreadPoolJob** const jobs, void* const context);
+	D_CORE_API void ExecuteJobs(ndThreadPoolJob_old** const jobs, void* const context);
 
 	D_CORE_API void Begin();
 	D_CORE_API void End();
@@ -141,7 +141,7 @@ template <class T>
 void ndThreadPool::SubmitJobs(void* const context)
 {
 	T* const extJob = dAlloca(T, D_MAX_THREADS_COUNT);
-	ndThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
+	ndThreadPoolJob_old* extJobPtr[D_MAX_THREADS_COUNT];
 
 	const ndInt32 threadCount = GetThreadCount();
 	for (ndInt32 i = 0; i < threadCount; i++)

@@ -96,7 +96,7 @@ void ndDynamicsUpdate::SortBodyJointScan()
 		ndUnsigned32 m_shit;
 	};
 
-	class ndCountJointBodyPairs : public ndThreadPoolJob
+	class ndCountJointBodyPairs : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -138,10 +138,10 @@ void ndDynamicsUpdate::SortBodyJointScan()
 	ndJointBodyPairIndex* const tempBuffer = (ndJointBodyPairIndex*)GetTempBuffer();
 
 	ndInt32 digit = 0;
-	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &bodyJointPairs[0], tempBuffer, bodyJointPairs.GetCount(), &digit);
+	ndCountingSortOld<ndJointBodyPairIndex, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &bodyJointPairs[0], tempBuffer, bodyJointPairs.GetCount(), &digit);
 
 	digit = 1;
-	ndCountingSort<ndJointBodyPairIndex, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, tempBuffer, &bodyJointPairs[0], bodyJointPairs.GetCount(), &digit);
+	ndCountingSortOld<ndJointBodyPairIndex, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, tempBuffer, &bodyJointPairs[0], bodyJointPairs.GetCount(), &digit);
 
 	bodyJointPairs.SetCount(bodyJointPairs.GetCount() + 1);
 	bodyJointPairs[bodyJointPairs.GetCount() - 1] = bodyJointPairs[bodyJointPairs.GetCount() - 2];
@@ -242,7 +242,7 @@ void ndDynamicsUpdate::SortJointsScan()
 {
 	D_TRACKTIME();
 
-	class ndMarkFence0 : public ndThreadPoolJob
+	class ndMarkFence0 : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -279,7 +279,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		}
 	};
 
-	class ndMarkFence1 : public ndThreadPoolJob
+	class ndMarkFence1 : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -313,7 +313,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		}
 	};
 
-	class ndScan0 : public ndThreadPoolJob
+	class ndScan0 : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -339,7 +339,7 @@ void ndDynamicsUpdate::SortJointsScan()
 		}
 	};
 
-	class ndSort0 : public ndThreadPoolJob
+	class ndSort0 : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -525,7 +525,7 @@ void ndDynamicsUpdate::SortJointsScan()
 
 	GetTempInternalForces().SetCount(jointArray.GetCount() * 2);
 	GetJointBodyPairIndexBuffer().SetCount(jointArray.GetCount() * 2);
-	ndCountingSort<ndConstraint*, ndEvaluateCountRows, 7>(*scene, tempJointBuffer, &jointArray[0], jointArray.GetCount());
+	ndCountingSortOld<ndConstraint*, ndEvaluateCountRows, 7>(*scene, tempJointBuffer, &jointArray[0], jointArray.GetCount());
 }
 
 void ndDynamicsUpdate::SortJoints()
@@ -668,7 +668,7 @@ void ndDynamicsUpdate::SortIslands()
 	if (bodyCount)
 	{
 		ndBodyIndexPair* const buffer1 = buffer0 + bodyCount;
-		ndCountingSort<ndBodyIndexPair, ndIslandKey, 1>(*scene, buffer0, buffer1, bodyCount);
+		ndCountingSortOld<ndBodyIndexPair, ndIslandKey, 1>(*scene, buffer0, buffer1, bodyCount);
 		for (ndInt32 i = 0; i < bodyCount; ++i)
 		{
 			dAssert((i == bodyCount - 1) || (buffer1[i].m_root->m_bodyIsConstrained >= buffer1[i + 1].m_root->m_bodyIsConstrained));
@@ -698,11 +698,11 @@ void ndDynamicsUpdate::SortIslands()
 
 		ndInt32 context = 0;
 		ndIsland* const islandTempBuffer = (ndIsland*)GetTempBuffer();
-		ndCountingSort<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &islands[0], islandTempBuffer, islands.GetCount(), &context);
+		ndCountingSortOld<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, &islands[0], islandTempBuffer, islands.GetCount(), &context);
 		if (islandMaxKeySize >= (1 << (D_MAX_BODY_RADIX_BIT - 1)))
 		{
 			context = 1;
-			ndCountingSort<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, islandTempBuffer, &islands[0], islands.GetCount(), &context);
+			ndCountingSortOld<ndIsland, ndEvaluateKey, D_MAX_BODY_RADIX_BIT>(*scene, islandTempBuffer, &islands[0], islands.GetCount(), &context);
 		}
 		else
 		{
@@ -730,7 +730,7 @@ void ndDynamicsUpdate::BuildIsland()
 
 void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 {
-	class ndIntegrateUnconstrainedBodies : public ndThreadPoolJob
+	class ndIntegrateUnconstrainedBodies : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -767,7 +767,7 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 void ndDynamicsUpdate::InitWeights()
 {
 	D_TRACKTIME();
-	class ndInitWeights : public ndThreadPoolJob
+	class ndInitWeights : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -833,7 +833,7 @@ void ndDynamicsUpdate::InitWeights()
 void ndDynamicsUpdate::InitBodyArray()
 {
 	D_TRACKTIME();
-	class ndInitBodyArray : public ndThreadPoolJob
+	class ndInitBodyArray : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -972,7 +972,7 @@ void ndDynamicsUpdate::GetJacobianDerivatives(ndConstraint* const joint)
 
 void ndDynamicsUpdate::InitJacobianMatrix()
 {
-	class ndInitJacobianMatrix : public ndThreadPoolJob
+	class ndInitJacobianMatrix : public ndThreadPoolJob_old
 	{
 		public:
 		ndInitJacobianMatrix()
@@ -1140,7 +1140,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 		const ndJointBodyPairIndex* m_jointBodyPairIndexBuffer;
 	};
 
-	class ndInitJacobianAccumulatePartialForces : public ndThreadPoolJob
+	class ndInitJacobianAccumulatePartialForces : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1198,7 +1198,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 void ndDynamicsUpdate::CalculateJointsAcceleration()
 {
 	D_TRACKTIME();
-	class ndCalculateJointsAcceleration : public ndThreadPoolJob
+	class ndCalculateJointsAcceleration : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1237,7 +1237,7 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 void ndDynamicsUpdate::IntegrateBodiesVelocity()
 {
 	D_TRACKTIME();
-	class ndIntegrateBodiesVelocity : public ndThreadPoolJob
+	class ndIntegrateBodiesVelocity : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1293,7 +1293,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 void ndDynamicsUpdate::UpdateForceFeedback()
 {
 	D_TRACKTIME();
-	class ndUpdateForceFeedback : public ndThreadPoolJob
+	class ndUpdateForceFeedback : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1357,7 +1357,7 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 void ndDynamicsUpdate::IntegrateBodies()
 {
 	D_TRACKTIME();
-	class ndIntegrateBodies : public ndThreadPoolJob
+	class ndIntegrateBodies : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1392,7 +1392,7 @@ void ndDynamicsUpdate::IntegrateBodies()
 void ndDynamicsUpdate::DetermineSleepStates()
 {
 	D_TRACKTIME();
-	class ndDetermineSleepStates : public ndThreadPoolJob
+	class ndDetermineSleepStates : public ndThreadPoolJob_old
 	{
 		public:
 		void UpdateIslandState(const ndIsland& island)
@@ -1641,7 +1641,7 @@ void ndDynamicsUpdate::InitSkeletons()
 {
 	D_TRACKTIME();
 
-	class ndInitSkeletons : public ndThreadPoolJob
+	class ndInitSkeletons : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1681,7 +1681,7 @@ void ndDynamicsUpdate::InitSkeletons()
 void ndDynamicsUpdate::UpdateSkeletons()
 {
 	D_TRACKTIME();
-	class ndUpdateSkeletons : public ndThreadPoolJob
+	class ndUpdateSkeletons : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
@@ -1722,7 +1722,7 @@ void ndDynamicsUpdate::UpdateSkeletons()
 void ndDynamicsUpdate::CalculateJointsForce()
 {
 	D_TRACKTIME();
-	class ndCalculateJointsForce : public ndThreadPoolJob
+	class ndCalculateJointsForce : public ndThreadPoolJob_old
 	{
 		public:
 		ndCalculateJointsForce()
@@ -1911,7 +1911,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		const ndJointBodyPairIndex* m_jointBodyPairIndexBuffer;
 	};
 
-	class ndApplyJacobianAccumulatePartialForces : public ndThreadPoolJob
+	class ndApplyJacobianAccumulatePartialForces : public ndThreadPoolJob_old
 	{
 		public:
 		virtual void Execute()
