@@ -70,7 +70,6 @@ class ndBodySphFluid: public ndBodyParticleSet, public ndBackgroundJob
 
 	ndWorkingData& WorkingData();
 	void Update(ndThreadPool* const threadPool);
-
 	void SortGrids(ndThreadPool* const threadPool);
 	void BuildPairs(ndThreadPool* const threadPool);
 	void CreateGrids(ndThreadPool* const threadPool);
@@ -78,9 +77,9 @@ class ndBodySphFluid: public ndBodyParticleSet, public ndBackgroundJob
 	void SortXdimension(ndThreadPool* const threadPool);
 	void CalculateScans(ndThreadPool* const threadPool);
 	void SortCellBuckects(ndThreadPool* const threadPool);
-	void IntegrateParticles();
-	void CalculateAccelerations();
-	void CalculateParticlesDensity();
+	void IntegrateParticles(ndThreadPool* const threadPool);
+	void CalculateAccelerations(ndThreadPool* const threadPool);
+	void CalculateParticlesDensity(ndThreadPool* const threadPool);
 
 	ndFloat32 m_mass;
 	ndFloat32 m_viscosity;

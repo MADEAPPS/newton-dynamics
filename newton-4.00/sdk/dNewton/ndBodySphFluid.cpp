@@ -505,156 +505,6 @@ void ndBodySphFluid::SortGrids(ndThreadPool* const threadPool)
 void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
-#if 1
-	class ndAddPairs : public ndThreadPoolJob_old
-	{
-		public:
-		class ndPairInfo
-		{
-			public:
-			ndPairInfo(ndBodySphFluid* const fluid)
-				:m_data(fluid->WorkingData())
-				,m_locks(m_data.m_locks)
-				,m_posit(fluid->m_posit)
-				,m_pairCount(m_data.m_pairCount)
-				,m_pair(m_data.m_pairs)
-				,m_distance(m_data.m_kernelDistance)
-				,m_diameter(fluid->GetSphGridSize())
-				,m_diameter2(m_diameter * m_diameter)
-				,m_windosTest(m_data.WorldToGrid(m_data.m_worlToGridOrigin + m_diameter) + 1)
-			{
-			}
-	
-			ndWorkingData& m_data;
-			ndArray<ndSpinLock>& m_locks;
-			const ndArray<ndVector>& m_posit;
-			ndArray<ndInt8>& m_pairCount;
-			ndArray<ndParticlePair>& m_pair;
-			ndArray<ndParticleKernelDistance>& m_distance;
-			ndFloat32 m_diameter;
-			ndFloat32 m_diameter2;
-			ndInt32 m_windosTest;
-		};
-	
-		void AddPair(ndPairInfo& info, ndInt32 particle0, ndInt32 particle1)
-		{
-			ndVector p1p0(info.m_posit[particle0] - info.m_posit[particle1]);
-			ndFloat32 dist2(p1p0.DotProduct(p1p0).GetScalar());
-			if (dist2 < info.m_diameter2)
-			{
-				dAssert(dist2 >= ndFloat32(0.0f));
-				ndFloat32 dist = ndSqrt(dist2);
-				{
-					ndSpinLock lock(info.m_locks[particle0]);
-					ndInt8 count = info.m_pairCount[particle0];
-					if (count < 32)
-					{
-						ndInt8 isUnique = 1;
-						ndInt32* const neighborg = info.m_pair[particle0].m_neighborg;
-						for (ndInt32 i = count - 1; i >= 0; --i)
-						{
-							isUnique = isUnique & (neighborg[i] != particle1);
-						}
-	
-						neighborg[count] = particle1;
-						info.m_distance[particle0].m_dist[count] = dist;
-						info.m_pairCount[particle0] = count + isUnique;
-					}
-				}
-	
-				{
-					ndSpinLock lock(info.m_locks[particle1]);
-					ndInt8 count = info.m_pairCount[particle1];
-					if (count < 32)
-					{
-						ndInt8 isUnique = 1;
-						ndInt32* const neighborg = info.m_pair[particle1].m_neighborg;
-						for (ndInt32 i = count - 1; i >= 0; --i)
-						{
-							isUnique = isUnique & (neighborg[i] != particle0);
-						}
-						neighborg[count] = particle0;
-						info.m_distance[particle1].m_dist[count] = dist;
-						info.m_pairCount[particle1] = count + isUnique;
-					}
-				}
-			}
-		}
-	
-		void proccessCell(const ndArray<ndGridHash>& hashGridMap, ndPairInfo& info, const ndInt32 start, const ndInt32 count)
-		{
-			//D_TRACKTIME();
-			const ndInt32 count0 = count - 1;
-			for (ndInt32 i = 0; i < count0; ++i)
-			{
-				const ndGridHash hash0 = hashGridMap[start + i];
-				const ndInt32 homeGridTest0 = (hash0.m_cellType == ndHomeGrid);
-				const ndInt32 particle0 = hash0.m_particleIndex;
-				const ndInt32 x0 = info.m_data.WorldToGrid(info.m_posit[particle0].m_x);
-				for (ndInt32 j = i + 1; j < count; ++j)
-				{
-					const ndGridHash hash1 = hashGridMap[start + j];
-					const ndInt32 particle1 = hash1.m_particleIndex;
-					dAssert(particle0 != particle1);
-					const ndInt32 x1 = info.m_data.WorldToGrid(info.m_posit[particle1].m_x);
-					dAssert((x1 - x0) > ndFloat32(-1.0e-3f));
-					const ndInt32 sweeptTest = ((x1 - x0) >= info.m_windosTest);
-					if (sweeptTest)
-					{
-						break;
-					}
-					dAssert(particle0 != particle1);
-					const ndInt32 homeGridTest1 = (hash1.m_cellType == ndHomeGrid);
-					const ndInt32 test = homeGridTest0 | homeGridTest1;
-					if (test)
-					{
-						dAssert(particle0 != particle1);
-						AddPair(info, particle0, particle1);
-					}
-				}
-			}
-		}
-	
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			ndBodySphFluid* const fluid = (ndBodySphFluid*)GetContext();
-			ndWorkingData& data = fluid->WorkingData();
-	
-			const ndArray<ndGridHash>& hashGridMap = data.m_hashGridMap;
-			const ndArray<ndInt32>& gridScans = data.m_gridScans;
-	
-			ndPairInfo info(fluid);
-	
-			const ndStartEnd startEnd(gridScans.GetCount() - 1, GetThreadId(), GetThreadCount());
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				const ndInt32 start = gridScans[i];
-				const ndInt32 count = gridScans[i + 1] - start;
-				proccessCell(hashGridMap, info, start, count);
-			}
-		}
-	};
-	
-	ndWorkingData& data = WorkingData();
-	ndInt32 countReset = data.m_locks.GetCount();
-	data.m_pairs.SetCount(m_posit.GetCount());
-	data.m_locks.SetCount(m_posit.GetCount());
-	data.m_pairCount.SetCount(m_posit.GetCount());
-	data.m_kernelDistance.SetCount(m_posit.GetCount());
-	for (ndInt32 i = countReset; i < data.m_locks.GetCount(); ++i)
-	{
-		data.m_locks[i].Unlock();
-	}
-	for (ndInt32 i = 0; i < data.m_pairCount.GetCount(); ++i)
-	{
-		data.m_pairCount[i] = 0;
-	}
-	
-	threadPool->SubmitJobs<ndAddPairs>(this);
-	
-#else
-
 	ndWorkingData& data = WorkingData();
 	ndInt32 countReset = data.m_locks.GetCount();
 	data.m_pairs.SetCount(m_posit.GetCount());
@@ -687,13 +537,13 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 		auto ProccessCell = [this, &data, &hashGridMap, &pair, &pairCount, &locks, &distance, windowsTest, diameter2](ndInt32 start, ndInt32 count)
 		{
 			const ndInt32 count0 = count - 1;
-			for (ndInt32 k = 0; k < count0; ++k)
+			for (ndInt32 i = 0; i < count0; ++i)
 			{
-				const ndGridHash hash0 = hashGridMap[start + k];
+				const ndGridHash hash0 = hashGridMap[start + i];
 				const ndInt32 homeGridTest0 = (hash0.m_cellType == ndHomeGrid);
 				const ndInt32 particle0 = hash0.m_particleIndex;
 				const ndInt32 x0 = data.WorldToGrid(m_posit[particle0].m_x);
-				for (ndInt32 j = k + 1; k < count; ++k)
+				for (ndInt32 j = i + 1; j < count; ++j)
 				{
 					const ndGridHash hash1 = hashGridMap[start + j];
 					const ndInt32 particle1 = hash1.m_particleIndex;
@@ -725,9 +575,9 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 								{
 									ndInt8 isUnique = 1;
 									ndInt32* const neighborg = pair[particle0].m_neighborg;
-									for (ndInt32 i = neigborCount - 1; i >= 0; --i)
+									for (ndInt32 k = neigborCount - 1; k >= 0; --k)
 									{
-										isUnique = isUnique & (neighborg[i] != particle1);
+										isUnique = isUnique & (neighborg[k] != particle1);
 									}
 
 									neighborg[neigborCount] = particle1;
@@ -743,9 +593,9 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 								{
 									ndInt8 isUnique = 1;
 									ndInt32* const neighborg = pair[particle1].m_neighborg;
-									for (ndInt32 i = neigborCount - 1; i >= 0; --i)
+									for (ndInt32 k = neigborCount - 1; k >= 0; --k)
 									{
-										isUnique = isUnique & (neighborg[i] != particle0);
+										isUnique = isUnique & (neighborg[k] != particle0);
 									}
 									neighborg[neigborCount] = particle0;
 									distance[particle1].m_dist[neigborCount] = dist;
@@ -768,7 +618,147 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 	});
 
 	threadPool->Execute(ndAddPairs);
-#endif
+}
+
+void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)
+{
+	D_TRACKTIME();
+	ndWorkingData& data = WorkingData();
+	data.m_density.SetCount(m_posit.GetCount());
+	data.m_invDensity.SetCount(m_posit.GetCount());
+
+	auto CalculateDensity = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		const ndArray<ndVector>& posit = m_posit;
+
+		const ndFloat32 h = GetSphGridSize();
+		const ndFloat32 h2 = h * h;
+		const ndFloat32 kernelMagicConst = ndFloat32(315.0f) / (ndFloat32(64.0f) * ndPi * ndPow(h, 9));
+		const ndFloat32 kernelConst = m_mass * kernelMagicConst;
+		const ndFloat32 selfDensity = kernelConst * h2 * h2 * h2;
+
+		const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			const ndInt32 count = data.m_pairCount[i];
+			const ndParticleKernelDistance& distance = data.m_kernelDistance[i];
+			ndFloat32 density = selfDensity;
+			for (ndInt32 j = 0; j < count; ++j)
+			{
+				const ndFloat32 d = distance.m_dist[j];
+				const ndFloat32 dist2 = h2 - d * d;
+				dAssert(dist2 > ndFloat32(0.0f));
+				const ndFloat32 dist6 = dist2 * dist2 * dist2;
+				density += kernelConst * dist6;
+			}
+			dAssert(density > ndFloat32(0.0f));
+			data.m_density[i] = density;
+			data.m_invDensity[i] = ndFloat32(1.0f) / density;
+		}
+	});
+
+	threadPool->Execute(CalculateDensity);
+}
+
+void ndBodySphFluid::CalculateAccelerations(ndThreadPool* const threadPool)
+{
+	D_TRACKTIME();
+	ndWorkingData& data = WorkingData();
+	data.m_accel.SetCount(m_posit.GetCount());
+
+	auto CalculateAcceleration = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		const ndVector epsilon2 (ndFloat32(1.0e-12f));
+
+		const ndArray<ndVector>& veloc = m_veloc;
+		const ndArray<ndVector>& posit = m_posit;
+		const ndFloat32* const density = &data.m_density[0];
+		const ndFloat32* const invDensity = &data.m_invDensity[0];
+
+		const ndFloat32 h = GetSphGridSize();
+		const ndFloat32 u = m_viscosity;
+		const ndVector kernelConst(m_mass * ndFloat32(45.0f) / (ndPi * ndPow(h, 6)));
+
+		const ndFloat32 viscosity = m_viscosity;
+		const ndFloat32 restDensity = m_restDensity;
+		const ndFloat32 gasConstant = ndFloat32(0.5f) * m_gasConstant;
+
+		const ndVector gravity(m_gravity);
+		const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i0 = startEnd.m_start; i0 < startEnd.m_end; ++i0)
+		{
+			const ndVector p0(posit[i0]);
+			const ndVector v0(veloc[i0]);
+
+			const ndInt32 count = data.m_pairCount[i0];
+			const ndParticlePair& pairs = data.m_pairs[i0];
+			ndParticleKernelDistance& distance = data.m_kernelDistance[i0];
+			const ndFloat32 pressureI0 = density[i0] - restDensity;
+
+			ndVector forceAcc(ndVector::m_zero);
+			for (ndInt32 j = 0; j < count; ++j)
+			{
+				const ndInt32 i1 = pairs.m_neighborg[j];
+				const ndVector p10(posit[i1] - p0);
+				const ndVector dot(p10.DotProduct(p10) + epsilon2);
+				const ndVector unitDir(p10 * dot.InvSqrt());
+
+				dAssert(unitDir.m_w == ndFloat32(0.0f));
+
+				// kernel distance
+				const ndFloat32 dist = distance.m_dist[j];
+				const ndFloat32 kernelDist = h - dist;
+				dAssert(kernelDist >= ndFloat32(0.0f));
+
+				// calculate pressure
+				const ndFloat32 kernelDist2 = kernelDist * kernelDist;
+				const ndFloat32 pressureI1 = density[i1] - restDensity;
+				const ndVector force(gasConstant * kernelDist2 * invDensity[i1] * (pressureI0 + pressureI1));
+				forceAcc += force * unitDir;
+
+				// calculate viscosity acceleration
+				const ndVector v01(veloc[i1] - v0);
+				forceAcc += v01 * ndVector(kernelDist * viscosity * invDensity[j]);
+			}
+			const ndVector accel(gravity + ndVector(invDensity[i0]) * kernelConst * forceAcc);
+			data.m_accel[i0] = accel;
+		}
+	});
+
+	threadPool->Execute(CalculateAcceleration);
+}
+
+void ndBodySphFluid::IntegrateParticles(ndThreadPool* const threadPool)
+{
+	D_TRACKTIME();
+	ndWorkingData& data = WorkingData();
+	auto IntegrateParticles = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		const ndArray<ndVector>& accel = data.m_accel;
+		ndArray<ndVector>& veloc = m_veloc;
+		ndArray<ndVector>& posit = m_posit;
+
+		//const ndVector timestep(m_timestep);
+		//ndVector halfTime(timestep * ndVector::m_half);
+		const ndVector timestep (ndFloat32 (0.003f));
+
+		const ndStartEnd startEnd(posit.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			veloc[i] = veloc[i] + accel[i] * timestep;
+			posit[i] = posit[i] + veloc[i] * timestep;
+			if (posit[i].m_y <= 1.0f)
+			{
+				posit[i].m_y = 1.0f;
+				veloc[i].m_y = 0.0f;
+			}
+		}
+	});
+
+	threadPool->Execute(IntegrateParticles);
 }
 
 void ndBodySphFluid::CaculateAabb(ndThreadPool* const threadPool)
@@ -1014,185 +1004,6 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	data.m_hashGridMap.SetCount(gridCount);
 }
 
-void ndBodySphFluid::CalculateParticlesDensity()
-{
-	D_TRACKTIME();
-	class CalculateDensity : public ndThreadPoolJob_old
-	{
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			ndBodySphFluid* const fluid = (ndBodySphFluid*)GetContext();
-			const ndArray<ndVector>& posit = fluid->m_posit;
-	
-			ndWorkingData& data = fluid->WorkingData();
-			const ndFloat32 h = fluid->GetSphGridSize();
-			const ndFloat32 h2 = h * h;
-			const ndFloat32 kernelMagicConst = ndFloat32(315.0f) / (ndFloat32(64.0f) * ndPi * ndPow(h, 9));
-			const ndFloat32 kernelConst = fluid->m_mass * kernelMagicConst;
-			const ndFloat32 selfDensity = kernelConst * h2 * h2 * h2;
-
-			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), GetThreadCount());
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				const ndInt32 count = data.m_pairCount[i];
-				const ndParticleKernelDistance& distance = data.m_kernelDistance[i];
-				ndFloat32 density = selfDensity;
-				for (ndInt32 j = 0; j < count; ++j)
-				{
-					const ndFloat32 d = distance.m_dist[j];
-					const ndFloat32 dist2 = h2 - d * d;
-					dAssert(dist2 > ndFloat32(0.0f));
-					const ndFloat32 dist6 = dist2 * dist2 * dist2;
-					density += kernelConst * dist6;
-				}
-				dAssert(density > ndFloat32(0.0f));
-				data.m_density[i] = density;
-				data.m_invDensity[i] = ndFloat32 (1.0f) / density;
-			}
-		}
-	};
-
-	ndWorkingData& data = WorkingData();
-	data.m_density.SetCount(m_posit.GetCount());
-	data.m_invDensity.SetCount(m_posit.GetCount());
-	ndThreadBackgroundWorker* const threadPool = GetThreadPool();
-	threadPool->SubmitJobs<CalculateDensity>(this);
-}
-
-void ndBodySphFluid::CalculateAccelerations()
-{
-	D_TRACKTIME();
-	class ndCalculateAcceleration : public ndThreadPoolJob_old
-	{
-		inline ndVector Normalize(const ndVector& dir) const 
-		{
-			const ndVector dot (dir.DotProduct(dir) + m_epsilon2);
-			const ndVector normal(dir * dot.InvSqrt());
-			return normal;
-		}
-
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-
-			m_epsilon2 = ndVector(ndFloat32(1.0e-12f));
-			ndBodySphFluid* const fluid = (ndBodySphFluid*)GetContext();
-
-			ndWorkingData& data = fluid->WorkingData();
-			const ndArray<ndVector>& veloc = fluid->m_veloc;
-			const ndArray<ndVector>& posit = fluid->m_posit;
-			const ndFloat32* const density = &data.m_density[0];
-			const ndFloat32* const invDensity = &data.m_invDensity[0];
-
-			const ndFloat32 h = fluid->GetSphGridSize();
-			const ndFloat32 u = fluid->m_viscosity;
-			const ndVector kernelConst(fluid->m_mass * ndFloat32(45.0f) / (ndPi * ndPow(h, 6)));
-
-			const ndFloat32 viscosity = fluid->m_viscosity;
-			const ndFloat32 restDensity = fluid->m_restDensity;
-			const ndFloat32 gasConstant = ndFloat32 (0.5f) * fluid->m_gasConstant;
-
-			const ndVector gravity(fluid->m_gravity);
-			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), GetThreadCount());
-			for (ndInt32 i0 = startEnd.m_start; i0 < startEnd.m_end; ++i0)
-			{
-				const ndVector p0(posit[i0]);
-				const ndVector v0(veloc[i0]);
-
-				const ndInt32 count = data.m_pairCount[i0];
-				const ndParticlePair& pairs = data.m_pairs[i0];
-				ndParticleKernelDistance& distance = data.m_kernelDistance[i0];
-				const ndFloat32 pressureI0 = density[i0] - restDensity;
-
-				ndVector forceAcc(ndVector::m_zero);
-				for (ndInt32 j = 0; j < count; ++j)
-				{
-					const ndInt32 i1 = pairs.m_neighborg[j];
-					const ndVector p10(posit[i1] - p0);
-					const ndVector dir(Normalize(p10));
-					dAssert(dir.m_w == ndFloat32(0.0f));
-				
-					// kernel distance
-					const ndFloat32 dist = distance.m_dist[j];
-					const ndFloat32 kernelDist = h - dist;
-					dAssert(kernelDist >= ndFloat32(0.0f));
-				
-					// calculate pressure
-					const ndFloat32 kernelDist2 = kernelDist * kernelDist;
-					const ndFloat32 pressureI1 = density[i1] - restDensity;
-					const ndVector force(gasConstant * kernelDist2 * invDensity[i1] * (pressureI0 + pressureI1));
-					forceAcc += force * dir;
-				
-					// calculate viscosity acceleration
-					const ndVector v01(veloc[i1] - v0);
-					forceAcc += v01 * ndVector(kernelDist * viscosity * invDensity[j]);
-				}
-				const ndVector accel(gravity + ndVector(invDensity[i0]) * kernelConst * forceAcc);
-				data.m_accel[i0] = accel;
-			}
-		}
-
-		ndVector m_epsilon2;
-	};
-
-	ndWorkingData& data = WorkingData();
-	data.m_accel.SetCount(m_posit.GetCount());
-	ndThreadBackgroundWorker* const threadPool = GetThreadPool();
-	threadPool->SubmitJobs<ndCalculateAcceleration>(this);
-}
-
-void ndBodySphFluid::IntegrateParticles()
-{
-	D_TRACKTIME();
-	class ndContext
-	{
-		public:
-		ndContext(ndBodySphFluid* const fluid, ndFloat32 timestep)
-			:m_fluid(fluid)
-			,m_timestep(timestep)
-		{
-			m_timestep = 0.003f;
-		}
-
-		ndBodySphFluid* m_fluid;
-		ndFloat32 m_timestep;
-	};
-
-	class ndIntegrateParticles : public ndThreadPoolJob_old
-	{
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			const ndContext& context = *((ndContext*)GetContext());
-			ndBodySphFluid* const fluid = context.m_fluid;
-
-			ndWorkingData& data = fluid->WorkingData();
-			const ndArray<ndVector>& accel = data.m_accel;
-			ndArray<ndVector>& veloc = fluid->m_veloc;
-			ndArray<ndVector>& posit = fluid->m_posit;
-
-			ndVector timestep(context.m_timestep);
-			ndVector halfTime(timestep * ndVector::m_half);
-			const ndStartEnd startEnd(posit.GetCount(), GetThreadId(), GetThreadCount());
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				veloc[i] = veloc[i] + accel[i] * timestep;
-				posit[i] = posit[i] + veloc[i] * timestep;
-				if (posit[i].m_y <= 1.0f)
-				{
-					posit[i].m_y = 1.0f;
-					veloc[i].m_y = 0.0f;
-				}
-			}
-		}
-	};
-
-	ndContext context(this, m_timestep);
-	ndThreadBackgroundWorker* const threadPool = GetThreadPool();
-	threadPool->SubmitJobs<ndIntegrateParticles>(&context);
-}
-
 void ndBodySphFluid::Update(ndThreadPool* const threadPool)
 {
 	D_TRACKTIME();
@@ -1201,8 +1012,8 @@ void ndBodySphFluid::Update(ndThreadPool* const threadPool)
 	SortGrids(threadPool);
 	CalculateScans(threadPool);
 	BuildPairs(threadPool);
-	CalculateParticlesDensity();
-	CalculateAccelerations();
-	IntegrateParticles();
+	CalculateParticlesDensity(threadPool);
+	CalculateAccelerations(threadPool);
+	IntegrateParticles(threadPool);
 }
 
