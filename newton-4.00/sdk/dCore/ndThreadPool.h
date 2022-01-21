@@ -199,7 +199,7 @@ class ndFunction<Type>
 namespace ndMakeObject
 {
 	//template<typename Type> auto ndFunction(const Type & obj)
-	template<typename Type> auto ndFunction(const Type & obj) -> decltype (auto)
+	template<typename Type> auto ndFunction(const Type & obj) -> decltype (::ndFunction<Type>(obj))
 	{
 		return ::ndFunction<Type>(obj);
 	}
