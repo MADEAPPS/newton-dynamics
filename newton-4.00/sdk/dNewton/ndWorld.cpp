@@ -98,6 +98,7 @@ ndWorld::ndWorld()
 	,m_modelList()
 	,m_skeletonList()
 	,m_particleSetList()
+	,m_activeSkeletons(256)
 	,m_timestep(ndFloat32 (0.0f))
 	,m_freezeAccel2(D_FREEZE_ACCEL2)
 	,m_freezeAlpha2(D_FREEZE_ACCEL2)
@@ -164,6 +165,7 @@ void ndWorld::CleanUp()
 	Sync();
 	m_scene->m_backgroundThread.Terminate();
 
+	m_activeSkeletons.Resize(256);
 	while (m_skeletonList.GetFirst())
 	{
 		m_skeletonList.Remove(m_skeletonList.GetFirst());
@@ -859,12 +861,19 @@ void ndWorld::UpdateSkeletons()
 			body->PrepareStep(i);
 			dAssert (bodyArray[i] == body);
 		}
+
+		m_activeSkeletons.SetCount(0);
+		ndSkeletonList::Iterator iter(m_skeletonList);
+		for (iter.Begin(); iter; iter++)
+		{
+			ndSkeletonContainer* const skeleton = &iter.GetNode()->GetInfo();
+			m_activeSkeletons.PushBack(skeleton);
+		}
 	}
 
-	ndSkeletonList::Iterator iter(m_skeletonList);
-	for (iter.Begin(); iter; iter++)
+	for (ndInt32 i = 0; i < m_activeSkeletons.GetCount(); ++i)
 	{
-		ndSkeletonContainer* const skeleton = &iter.GetNode()->GetInfo();
+		ndSkeletonContainer* const skeleton = m_activeSkeletons[i];
 		skeleton->ClearSelfCollision();
 	}
 }

@@ -381,7 +381,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 	ndInt32 sums[D_MAX_THREADS_COUNT + 1];
 	ndInt32 scans[D_MAX_THREADS_COUNT + 1];
 
-	auto ndCountGridScans = ndMakeObject::ndFunction([this, &data, &scans](ndInt32 threadIndex, ndInt32)
+	auto CountGridScans = ndMakeObject::ndFunction([this, &data, &scans](ndInt32 threadIndex, ndInt32)
 	{
 		D_TRACKTIME();
 		const ndGridHash* const hashGridMap = &data.m_hashGridMap[0];
@@ -407,7 +407,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 		gridScans.PushBack(count);
 	});
 
-	auto ndCalculateScans = ndMakeObject::ndFunction([this, &data, &scans, &sums](ndInt32 threadIndex, ndInt32)
+	auto CalculateScans = ndMakeObject::ndFunction([this, &data, &scans, &sums](ndInt32 threadIndex, ndInt32)
 	{
 		D_TRACKTIME();
 		ndArray<ndInt32>& gridScans = data.m_gridScans;
@@ -439,7 +439,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 		}
 	}
 	scans[threadCount] = particleCount;
-	threadPool->ParallelExecute(ndCountGridScans);
+	threadPool->ParallelExecute(CountGridScans);
 
 	ndInt32 scansCount = 0;
 	
@@ -451,7 +451,7 @@ void ndBodySphFluid::CalculateScans(ndThreadPool* const threadPool)
 	sums[threadCount] = scansCount;
 
 	data.m_gridScans.SetCount(scansCount + 1);
-	threadPool->ParallelExecute(ndCalculateScans);
+	threadPool->ParallelExecute(CalculateScans);
 
 	data.m_gridScans[scansCount] = scans[threadCount];
 }
@@ -493,7 +493,7 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 		data.m_pairCount[i] = 0;
 	}
 
-	auto ndAddPairs = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
+	auto AddPairs = ndMakeObject::ndFunction([this, &data](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
 		const ndArray<ndGridHash>& hashGridMap = data.m_hashGridMap;
@@ -597,7 +597,7 @@ void ndBodySphFluid::BuildPairs(ndThreadPool* const threadPool)
 		}
 	});
 	
-	threadPool->ParallelExecute(ndAddPairs);
+	threadPool->ParallelExecute(AddPairs);
 }
 
 void ndBodySphFluid::CalculateParticlesDensity(ndThreadPool* const threadPool)

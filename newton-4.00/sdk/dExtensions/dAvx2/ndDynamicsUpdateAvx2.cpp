@@ -1873,83 +1873,52 @@ void ndDynamicsUpdateAvx2::UpdateForceFeedback()
 void ndDynamicsUpdateAvx2::InitSkeletons()
 {
 	D_TRACKTIME();
-
-	class ndInitSkeletons : public ndThreadPoolJob_old
-	{
-		public:
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			ndScene* const scene = (ndScene*)GetThreadPool();
-			ndWorld* const world = scene->GetWorld();
-			const ndInt32 threadIndex = GetThreadId();
-			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			ndSkeletonList::ndNode* node = world->GetSkeletonList().GetFirst();
-			for (ndInt32 i = 0; i < threadIndex; ++i)
-			{
-				node = node ? node->GetNext() : nullptr;
-			}
-
-			ndArray<ndRightHandSide>& rightHandSide = me->m_rightHandSide;
-			const ndArray<ndLeftHandSide>& leftHandSide = me->m_leftHandSide;
-
-			const ndInt32 threadCount = GetThreadCount();
-			while (node)
-			{
-				ndSkeletonContainer* const skeleton = &node->GetInfo();
-				skeleton->InitMassMatrix(&leftHandSide[0], &rightHandSide[0]);
-
-				for (ndInt32 i = 0; i < threadCount; ++i)
-				{
-					node = node ? node->GetNext() : nullptr;
-				}
-			}
-		}
-	};
-
 	ndScene* const scene = m_world->GetScene();
-	scene->SubmitJobs<ndInitSkeletons>();
+	const ndArray<ndSkeletonContainer*>& activeSkeletons = m_world->m_activeSkeletons;
+
+	auto InitSkeletons = ndMakeObject::ndFunction([this, &activeSkeletons](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		ndArray<ndRightHandSide>& rightHandSide = m_rightHandSide;
+		const ndArray<ndLeftHandSide>& leftHandSide = m_leftHandSide;
+
+		const ndStartEnd startEnd(activeSkeletons.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndSkeletonContainer* const skeleton = activeSkeletons[i];
+			skeleton->InitMassMatrix(&leftHandSide[0], &rightHandSide[0]);
+		}
+	});
+
+	if (activeSkeletons.GetCount())
+	{
+		scene->ParallelExecute(InitSkeletons);
+	}
 }
 
 void ndDynamicsUpdateAvx2::UpdateSkeletons()
 {
 	D_TRACKTIME();
-	class ndUpdateSkeletons : public ndThreadPoolJob_old
-	{
-		public:
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			ndScene* const scene = (ndScene*)GetThreadPool();
-			const ndInt32 threadIndex = GetThreadId();
-			ndWorld* const world = scene->GetWorld();
-			ndDynamicsUpdateAvx2* const me = (ndDynamicsUpdateAvx2*)world->m_solver;
-			ndSkeletonList::ndNode* node = world->GetSkeletonList().GetFirst();
-			for (ndInt32 i = 0; i < threadIndex; ++i)
-			{
-				node = node ? node->GetNext() : nullptr;
-			}
-
-			ndJacobian* const internalForces = &me->GetInternalForces()[0];
-			const ndArray<ndBodyKinematic*>& activeBodies = scene->GetActiveBodyArray();
-			const ndBodyKinematic** const bodyArray = (const ndBodyKinematic**)&activeBodies[0];
-
-			const ndInt32 threadCount = GetThreadCount();
-			while (node)
-			{
-				ndSkeletonContainer* const skeleton = &node->GetInfo();
-				skeleton->CalculateJointForce(bodyArray, internalForces);
-
-				for (ndInt32 i = 0; i < threadCount; ++i)
-				{
-					node = node ? node->GetNext() : nullptr;
-				}
-			}
-		}
-	};
-
 	ndScene* const scene = m_world->GetScene();
-	scene->SubmitJobs<ndUpdateSkeletons>();
+	const ndArray<ndSkeletonContainer*>& activeSkeletons = m_world->m_activeSkeletons;
+	const ndBodyKinematic** const bodyArray = (const ndBodyKinematic**)(&scene->GetActiveBodyArray()[0]);
+
+	auto UpdateSkeletons = ndMakeObject::ndFunction([this, &bodyArray, &activeSkeletons](ndInt32 threadIndex, ndInt32 threadCount)
+	{
+		D_TRACKTIME();
+		ndJacobian* const internalForces = &GetInternalForces()[0];
+		const ndStartEnd startEnd(activeSkeletons.GetCount(), threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
+		{
+			ndSkeletonContainer* const skeleton = activeSkeletons[i];
+			skeleton->CalculateJointForce(bodyArray, internalForces);
+		}
+	});
+
+	if (activeSkeletons.GetCount())
+	{
+		scene->ParallelExecute(UpdateSkeletons);
+	}
 }
 
 void ndDynamicsUpdateAvx2::CalculateJointsAcceleration()
@@ -2623,19 +2592,13 @@ void ndDynamicsUpdateAvx2::CalculateForces()
 	if (m_world->GetScene()->GetActiveContactArray().GetCount())
 	{
 		m_firstPassCoef = ndFloat32(0.0f);
-		if (m_world->m_skeletonList.GetCount())
-		{
-			InitSkeletons();
-		}
-		
+
+		InitSkeletons();
 		for (ndInt32 step = 0; step < 4; step++)
 		{
 			CalculateJointsAcceleration();
 			CalculateJointsForce();
-			if (m_world->m_skeletonList.GetCount())
-			{
-				UpdateSkeletons();
-			}
+			UpdateSkeletons();
 			IntegrateBodiesVelocity();
 		}
 		

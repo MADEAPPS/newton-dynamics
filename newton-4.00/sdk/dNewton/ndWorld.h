@@ -162,6 +162,7 @@ class ndWorld: public ndClassAlloc
 	ndModelList m_modelList;
 	ndSkeletonList m_skeletonList;
 	ndBodyParticleSetList m_particleSetList;
+	ndArray<ndSkeletonContainer*> m_activeSkeletons;
 	ndFloat32 m_timestep;
 	ndFloat32 m_freezeAccel2;
 	ndFloat32 m_freezeAlpha2;
