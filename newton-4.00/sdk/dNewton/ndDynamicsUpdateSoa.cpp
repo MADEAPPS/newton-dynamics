@@ -286,7 +286,7 @@ void ndDynamicsUpdateSoa::DetermineSleepStates()
 			const ndInt32 threadCount = GetThreadCount();
 			const ndInt32 islandCount = islandArray.GetCount();
 
-			m_zero = ndVector::m_zero;
+			//m_zero = ndVector::m_zero;
 			m_velocTol = me->GetVelocTol();
 			for (ndInt32 i = threadIndex; i < islandCount; i += threadCount)
 			{
@@ -295,7 +295,7 @@ void ndDynamicsUpdateSoa::DetermineSleepStates()
 			}
 		}
 
-		ndVector m_zero;
+		//ndVector m_zero;
 		ndVector m_velocTol;
 	};
 

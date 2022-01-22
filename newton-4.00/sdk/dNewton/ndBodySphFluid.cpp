@@ -870,7 +870,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	ndWorkingData& data = WorkingData();
 	ndInt32 scans[D_MAX_THREADS_COUNT][2];
 
-	auto ndCreateGrids = ndMakeObject::ndFunction([this, &data, &neiborghood, &scans](ndInt32 threadIndex, ndInt32 threadCount)
+	auto CreateGrids = ndMakeObject::ndFunction([this, &data, &neiborghood, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
 		const ndVector origin(m_box0);
@@ -926,7 +926,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 		}
 	});
 
-	auto ndCompactGrids = ndMakeObject::ndFunction([this, &data, &scans](ndInt32 threadIndex, ndInt32 threadCount)
+	auto CompactGrids = ndMakeObject::ndFunction([this, &data, &scans](ndInt32 threadIndex, ndInt32 threadCount)
 	{
 		D_TRACKTIME();
 		ndArray<ndGridHash>& dst = data.m_hashGridMap;
@@ -948,7 +948,7 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 	
 	data.m_hashGridMap.SetCount(m_posit.GetCount() * 4);
 	data.m_hashGridMapScratchBuffer.SetCount(m_posit.GetCount() * 4);
-	threadPool->ParallelExecute(ndCreateGrids);
+	threadPool->ParallelExecute(CreateGrids);
 
 	#ifdef D_USE_PARALLEL_CLASSIFY
 		ndInt32 sum = 0;
@@ -965,7 +965,8 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 
 		// there is a bug here. need to debug it
 		ndInt32 gridCount = scans[0][1] - scans[0][0];
-		threadPool->SubmitJobs(ndCompactGrids);
+		//threadPool->SubmitJobs(ndCompactGrids);
+		threadPool->ParallelExecute(CompactGrids);
 
 	#else
 

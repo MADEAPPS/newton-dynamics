@@ -1396,25 +1396,19 @@ void ndScene::InitBodyArray()
 void ndScene::CalculateContacts()
 {
 	D_TRACKTIME();
-	class ndContactInfo
+	ndInt32 digitScan[D_MAX_THREADS_COUNT][4];
+	m_activeConstraintArray.SetCount(0);
+	if (m_contactArray.GetCount())
 	{
-		public:
-		ndInt32 m_digitScan[D_MAX_THREADS_COUNT][4];
-	};
+		m_scratchBuffer.SetCount(m_contactArray.GetCount());
+		m_activeConstraintArray.SetCount(m_contactArray.GetCount());
 
-	class ndCalculateContacts : public ndThreadPoolJob_old
-	{
-		public:
-		virtual void Execute()
+		auto CalculateNewContacts = ndMakeObject::ndFunction([this, &digitScan](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			D_TRACKTIME();
-			ndScene* const scene = (ndScene*)GetThreadPool();
-			ndContactArray& activeContacts = scene->m_contactArray;
-			ndContactInfo& info = *((ndContactInfo*)GetContext());
-			ndContact** const dstContacts = (ndContact**)&scene->m_scratchBuffer[0];
-
-			const ndInt32 threadIndex = GetThreadId();
-			ndInt32* const scan = &info.m_digitScan[threadIndex][0];
+			ndContactArray& activeContacts = m_contactArray;
+			ndContact** const dstContacts = (ndContact**)&m_scratchBuffer[0];
+			ndInt32* const scan = &digitScan[threadIndex][0];
 
 			ndInt32 keyLookUp[4];
 			scan[0] = 0;
@@ -1426,44 +1420,55 @@ void ndScene::CalculateContacts()
 			keyLookUp[2] = 2;
 			keyLookUp[3] = 2;
 
-			const ndStartEnd startEnd(activeContacts.GetCount(), GetThreadId(), GetThreadCount());
+			const ndStartEnd startEnd(activeContacts.GetCount(), threadIndex, threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndContact* const contact = activeContacts[i]->GetAsContact();
 				dAssert(contact);
 				if (!contact->m_isDead)
 				{
-					scene->CalculateContacts(threadIndex, contact);
+					CalculateContacts(threadIndex, contact);
 				}
 				dstContacts[i] = contact;
 				const ndInt32 entry = (!contact->IsActive() | !contact->m_maxDOF) + contact->m_isDead * 2;
 				const ndInt32 key = keyLookUp[entry];
 				scan[key] ++;
 			}
-		}
-	};
+		});
 
-	class ndCompactContacts : public ndThreadPoolJob_old
-	{
-		public:
-		virtual void Execute()
+		ParallelExecute(CalculateNewContacts);
+
+		ndInt32 sum = 0;
+		ndInt32 threadCount = GetThreadCount();
+		for (ndInt32 j = 0; j < 4; j++)
+		{
+			for (ndInt32 i = 0; i < threadCount; ++i)
+			{
+				const ndInt32 count = digitScan[i][j];
+				digitScan[i][j] = sum;
+				sum += count;
+			}
+		}
+
+		ndInt32 activeJoints = digitScan[0][1] - digitScan[0][0];
+		ndInt32 inactiveJoints = digitScan[0][2] - digitScan[0][1];
+		ndInt32 deadContacts = digitScan[0][3] - digitScan[0][2];
+
+		auto CompactContacts = ndMakeObject::ndFunction([this, &digitScan](ndInt32 threadIndex, ndInt32 threadCount)
 		{
 			D_TRACKTIME();
-			ndContactInfo& info = *((ndContactInfo*)GetContext());
-			ndScene* const scene = (ndScene*)GetThreadPool();
-			ndContactArray& dstContacts = scene->m_contactArray;
-			ndContact** const srcContacts = (ndContact**)&scene->m_scratchBuffer[0];
-			ndArray<ndConstraint*>& activeConstraintArray = scene->m_activeConstraintArray;
-			const ndInt32 threadIndex = GetThreadId();
+			ndContactArray& dstContacts = m_contactArray;
+			ndContact** const srcContacts = (ndContact**)&m_scratchBuffer[0];
+			ndArray<ndConstraint*>& activeConstraintArray = m_activeConstraintArray;
 
 			ndInt32 keyLookUp[4];
 			keyLookUp[0] = 0;
 			keyLookUp[1] = 1;
 			keyLookUp[2] = 2;
 			keyLookUp[3] = 2;
-			ndInt32* const scan = &info.m_digitScan[threadIndex][0];
+			ndInt32* const scan = &digitScan[threadIndex][0];
 
-			const ndStartEnd startEnd(dstContacts.GetCount(), GetThreadId(), GetThreadCount());
+			const ndStartEnd startEnd(dstContacts.GetCount(), threadIndex, threadCount);
 			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 			{
 				ndContact* const contact = srcContacts[i]->GetAsContact();
@@ -1474,34 +1479,9 @@ void ndScene::CalculateContacts()
 				activeConstraintArray[index] = contact;
 				scan[key]++;
 			}
-		}
-	};
+		});
+		ParallelExecute(CompactContacts);
 
-	m_activeConstraintArray.SetCount(0);
-	if (m_contactArray.GetCount())
-	{
-		ndContactInfo info;
-		m_scratchBuffer.SetCount(m_contactArray.GetCount());
-		m_activeConstraintArray.SetCount(m_contactArray.GetCount());
-		SubmitJobs<ndCalculateContacts>(&info);
-
-		ndInt32 sum = 0;
-		ndInt32 threadCount = GetThreadCount();
-		for (ndInt32 j = 0; j < 4; j++)
-		{
-			for (ndInt32 i = 0; i < threadCount; ++i)
-			{
-				const ndInt32 count = info.m_digitScan[i][j];
-				info.m_digitScan[i][j] = sum;
-				sum += count;
-			}
-		}
-
-		ndInt32 activeJoints = info.m_digitScan[0][1] - info.m_digitScan[0][0];
-		ndInt32 inactiveJoints = info.m_digitScan[0][2] - info.m_digitScan[0][1];
-		ndInt32 deadContacts = info.m_digitScan[0][3] - info.m_digitScan[0][2];
-
-		SubmitJobs<ndCompactContacts>(&info);
 		if (deadContacts)
 		{
 			D_TRACKTIME();
@@ -1621,25 +1601,18 @@ void ndScene::FindCollidingPairs()
 void ndScene::UpdateTransform()
 {
 	D_TRACKTIME();
-	class ndTransformUpdate : public ndThreadPoolJob_old
+	auto TransformUpdate = ndMakeObject::ndFunction([this](ndInt32 threadIndex, ndInt32 threadCount)
 	{
-		public:
-		virtual void Execute()
+		D_TRACKTIME();
+		const ndArray<ndBodyKinematic*>& bodyArray = GetActiveBodyArray();
+		const ndStartEnd startEnd(bodyArray.GetCount() - 1, threadIndex, threadCount);
+		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
-			D_TRACKTIME();
-			ndScene* const scene = (ndScene*)GetThreadPool();
-			const ndArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
-			const ndInt32 threadIndex = GetThreadId();
-			const ndStartEnd startEnd(bodyArray.GetCount() - 1, GetThreadId(), GetThreadCount());
-			for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
-			{
-				ndBodyKinematic* const body = bodyArray[i];
-				scene->UpdateTransformNotify(threadIndex, body);
-			}
+			ndBodyKinematic* const body = bodyArray[i];
+			UpdateTransformNotify(threadIndex, body);
 		}
-	};
-
-	SubmitJobs<ndTransformUpdate>();
+	});
+	ParallelExecute(TransformUpdate);
 }
 
 void ndScene::CalculateContacts(ndInt32 threadIndex, ndContact* const contact)
