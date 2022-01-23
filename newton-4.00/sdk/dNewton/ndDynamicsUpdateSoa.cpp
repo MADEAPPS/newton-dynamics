@@ -577,7 +577,6 @@ void ndDynamicsUpdateSoa::IntegrateUnconstrainedBodies()
 	}
 }
 
-
 void ndDynamicsUpdateSoa::InitWeights()
 {
 	D_TRACKTIME();

@@ -100,11 +100,11 @@ class ndThreadPoolJob_old
 
 class ndThreadPool: public ndSyncMutex, public ndThread
 {
-	class ndWorkerThread: public ndThread
+	class ndWorker: public ndThread
 	{
 		public:
-		D_CORE_API ndWorkerThread();
-		D_CORE_API virtual ~ndWorkerThread();
+		D_CORE_API ndWorker();
+		D_CORE_API virtual ~ndWorker();
 
 		private:
 		virtual void ThreadFunction();
@@ -112,8 +112,7 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 		ndThreadPool* m_owner;
 		ndAtomic<bool> m_begin;
 		ndAtomic<bool> m_stillLooping;
-		ndAtomic<ndTask*> m_jobLambda;
-		ndAtomic<ndThreadPoolJob_old*> m_jobOld;
+		ndAtomic<ndTask*> m_task;
 		ndInt32 m_threadIndex;
 		friend class ndThreadPool;
 	};
@@ -126,13 +125,8 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 	D_CORE_API void SetThreadCount(ndInt32 count);
 
 	D_CORE_API void TickOne();
-	D_CORE_API void ExecuteJobs(ndThreadPoolJob_old** const jobs, void* const context);
-
 	D_CORE_API void Begin();
 	D_CORE_API void End();
-
-	template <class T>
-	void SubmitJobs(void* const context = nullptr);
 
 	template <typename Function>
 	void ParallelExecute(Function ndFunction);
@@ -140,7 +134,7 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 	private:
 	D_CORE_API virtual void Release();
 
-	ndWorkerThread* m_workers;
+	ndWorker* m_workers;
 	ndInt32 m_count;
 	char m_baseName[32];
 };
@@ -148,21 +142,6 @@ class ndThreadPool: public ndSyncMutex, public ndThread
 inline ndInt32 ndThreadPool::GetThreadCount() const
 {
 	return m_count + 1;
-}
-
-template <class T>
-void ndThreadPool::SubmitJobs(void* const context)
-{
-	T* const extJob = dAlloca(T, D_MAX_THREADS_COUNT);
-	ndThreadPoolJob_old* extJobPtr[D_MAX_THREADS_COUNT];
-
-	const ndInt32 threadCount = GetThreadCount();
-	for (ndInt32 i = 0; i < threadCount; i++)
-	{
-		new (&extJob[i]) T();
-		extJobPtr[i] = &extJob[i];
-	}
-	ExecuteJobs(extJobPtr, context);
 }
 
 template <typename Type, typename ... Args>
@@ -240,7 +219,7 @@ void ndThreadPool::ParallelExecute(Function ndFunction)
 {
 	const ndInt32 threadCount = GetThreadCount();
 	ndTaskImplement<Function>* const jobsArray = dAlloca(ndTaskImplement<Function>, threadCount);
-
+	
 	for (ndInt32 i = 0; i < threadCount; ++i)
 	{
 		ndTaskImplement<Function>* const job = &jobsArray[i];
@@ -259,7 +238,7 @@ void ndThreadPool::ParallelExecute(Function ndFunction)
 		for (ndInt32 i = 0; i < m_count; ++i)
 		{
 			ndTaskImplement<Function>* const job = &jobsArray[i];
-			m_workers[i].m_jobLambda.store(job);
+			m_workers[i].m_task.store(job);
 		}
 	
 		ndTaskImplement<Function>* const job = &jobsArray[m_count];
@@ -271,7 +250,7 @@ void ndThreadPool::ParallelExecute(Function ndFunction)
 			bool inProgess = false;
 			for (ndInt32 i = 0; i < m_count; ++i)
 			{
-				inProgess = inProgess | (m_workers[i].m_jobLambda.load() != nullptr);
+				inProgess = inProgess | (m_workers[i].m_task.load() != nullptr);
 			}
 			jobsInProgress = jobsInProgress & inProgess;
 			if (jobsInProgress)

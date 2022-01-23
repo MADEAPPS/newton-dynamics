@@ -25,23 +25,22 @@
 #include "ndProfiler.h"
 #include "ndThreadPool.h"
 
-ndThreadPool::ndWorkerThread::ndWorkerThread()
+ndThreadPool::ndWorker::ndWorker()
 	:ndThread()
 	,m_owner(nullptr)
 	,m_begin(false)
 	,m_stillLooping(true)
-	,m_jobLambda(nullptr)
-	,m_jobOld(nullptr)
+	,m_task(nullptr)
 	,m_threadIndex(0)
 {
 }
 
-ndThreadPool::ndWorkerThread::~ndWorkerThread()
+ndThreadPool::ndWorker::~ndWorker()
 {
 	Finish();
 }
 
-void ndThreadPool::ndWorkerThread::ThreadFunction()
+void ndThreadPool::ndWorker::ThreadFunction()
 {
 #ifndef	D_USE_THREAD_EMULATION
 	D_SET_TRACK_NAME(m_name);
@@ -49,17 +48,11 @@ void ndThreadPool::ndWorkerThread::ThreadFunction()
 	m_stillLooping.store(true);
 	while (m_begin.load())
 	{
-		ndTask* const jobLambda = m_jobLambda.load();
-		ndThreadPoolJob_old* const jobOld = m_jobOld.load();
-		if (jobOld)
+		ndTask* const task = m_task.load();
+		if (task)
 		{
-			jobOld->Execute();
-			m_jobOld.store(nullptr);
-		}
-		else if (jobLambda)
-		{
-			jobLambda->Execute();
-			m_jobLambda.store(nullptr);
+			task->Execute();
+			m_task.store(nullptr);
 		}
 		else
 		{
@@ -101,7 +94,7 @@ void ndThreadPool::SetThreadCount(ndInt32 count)
 		if (count)
 		{
 			m_count = count;
-			m_workers = new ndWorkerThread[count];
+			m_workers = new ndWorker[count];
 			for (ndInt32 i = 0; i < count; ++i)
 			{
 				char name[256];
@@ -112,61 +105,6 @@ void ndThreadPool::SetThreadCount(ndInt32 count)
 			}
 		}
 	}
-}
-
-void ndThreadPool::ExecuteJobs(ndThreadPoolJob_old** const jobs, void* const context)
-{
-#ifdef D_USE_THREAD_EMULATION	
-	for (ndInt32 i = 0; i <= m_count; ++i)
-	{
-		jobs[i]->m_threadIndex = i;
-		jobs[i]->m_threadCount = m_count + 1;
-		jobs[i]->m_context = context;
-		jobs[i]->m_threadPool = this;
-		jobs[i]->Execute();
-	}
-#else
-	if (m_count > 0)
-	{
-		for (ndInt32 i = 0; i < m_count; ++i)
-		{
-			jobs[i]->m_threadIndex = i;
-			jobs[i]->m_threadCount = m_count + 1;
-			jobs[i]->m_context = context;
-			jobs[i]->m_threadPool = this;
-			m_workers[i].m_jobOld.store(jobs[i]);
-		}
-	
-		jobs[m_count]->m_threadIndex = m_count;
-		jobs[m_count]->m_threadCount = m_count + 1;
-		jobs[m_count]->m_context = context;
-		jobs[m_count]->m_threadPool = this;
-		jobs[m_count]->Execute();
-
-		bool jobsInProgress = true;
-		do 
-		{
-			bool inProgess = false;
-			for (ndInt32 i = 0; i < m_count; ++i)
-			{
-				inProgess = inProgess | (m_workers[i].m_jobOld.load() != nullptr);
-			}
-			jobsInProgress = jobsInProgress & inProgess;
-			if (jobsInProgress)
-			{
-				ndYield();
-			}
-		} while (jobsInProgress);
-	}
-	else
-	{
-		jobs[0]->m_threadIndex = 0;
-		jobs[0]->m_threadCount = 1;
-		jobs[0]->m_context = context;
-		jobs[0]->m_threadPool = this;
-		jobs[0]->Execute();
-	}
-#endif
 }
 
 void ndThreadPool::Begin()

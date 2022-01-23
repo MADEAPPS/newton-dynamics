@@ -24,7 +24,7 @@
 
 #include <ndNewton.h>
 
-class dAvxMatrixArray;
+class ndAvxMatrixArray;
 
 D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
@@ -68,7 +68,7 @@ class ndDynamicsUpdateAvx2: public ndDynamicsUpdate
 	ndArray<ndInt8> m_groupType;
 	ndArray<ndJacobian> m_jointMask;
 	ndArray<ndInt32> m_avxJointRows;
-	dAvxMatrixArray* m_avxMassMatrixArray;
+	ndAvxMatrixArray* m_avxMassMatrixArray;
 
 } D_GCC_NEWTON_ALIGN_32;
 

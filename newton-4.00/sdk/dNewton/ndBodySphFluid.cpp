@@ -965,7 +965,6 @@ void ndBodySphFluid::CreateGrids(ndThreadPool* const threadPool)
 
 		// there is a bug here. need to debug it
 		ndInt32 gridCount = scans[0][1] - scans[0][0];
-		//threadPool->SubmitJobs(ndCompactGrids);
 		threadPool->ParallelExecute(CompactGrids);
 
 	#else
