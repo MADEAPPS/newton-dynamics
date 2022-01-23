@@ -61,7 +61,7 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const = 0;
 
 	const ndVector& GetCentreOfMass() const;
-	D_COLLISION_API void SetCentreOfMass(const ndVector& com);
+	D_COLLISION_API virtual void SetCentreOfMass(const ndVector& com);
 
 	ndBodyNotify* GetNotifyCallback() const;
 
@@ -73,10 +73,10 @@ class ndBody : public ndContainersFreeListAlloc<ndBody>
 	ndQuaternion GetRotation() const;
 	ndVector GetGlobalGetCentreOfMass() const;
 
-	D_COLLISION_API void SetNotifyCallback(ndBodyNotify* const notify);
-	D_COLLISION_API void SetOmega(const ndVector& veloc);
-	D_COLLISION_API void SetVelocity(const ndVector& veloc);
-	D_COLLISION_API void SetMatrix(const ndMatrix& matrix);
+	D_COLLISION_API virtual void SetNotifyCallback(ndBodyNotify* const notify);
+	D_COLLISION_API virtual void SetOmega(const ndVector& veloc);
+	D_COLLISION_API virtual void SetVelocity(const ndVector& veloc);
+	D_COLLISION_API virtual void SetMatrix(const ndMatrix& matrix);
 	
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 

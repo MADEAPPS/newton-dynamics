@@ -121,7 +121,7 @@ class ndBodyKinematic : public ndBody
 	D_COLLISION_API virtual bool RayCast(ndRayCastNotify& callback, const ndFastRay& ray, const ndFloat32 maxT) const;
 
 	D_COLLISION_API ndVector CalculateLinearMomentum() const;
-	D_COLLISION_API ndVector CalculateAngularMomentum() const;
+	D_COLLISION_API virtual ndVector CalculateAngularMomentum() const;
 	D_COLLISION_API ndFloat32 TotalEnergy() const;
 
 	D_COLLISION_API ndMatrix CalculateInertiaMatrix() const;
