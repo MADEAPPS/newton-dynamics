@@ -18,12 +18,14 @@
 * 
 * 3. This notice may not be removed or altered from any source distribution.
 */
-
+#include "ndCollisionStdafx.h"
 #include "ndCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndModel.h"
 #include "ndLoadSave.h"
+#include "ndShapeCompound.h"
+#include "ndShapeInstance.h"
 #include "ndBodyDynamic.h"
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndWordSettings);

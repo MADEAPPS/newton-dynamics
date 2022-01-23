@@ -53,7 +53,7 @@ class ndShapeCompound: public ndShape
 
 	void SetOwner(const ndShapeInstance* const myInstance);
 
-	const ndTreeArray& GetTree() const;
+	D_COLLISION_API const ndTreeArray& GetTree() const;
 
 	D_COLLISION_API virtual void BeginAddRemove();
 	D_COLLISION_API virtual ndTreeArray::ndNode* AddCollision(ndShapeInstance* const part);
@@ -125,7 +125,7 @@ class ndShapeCompound::ndNodeBase: public ndClassAlloc
 	~ndNodeBase();
 
 	//void Sanity(int level = 0);
-	ndShapeInstance* GetShape() const;
+	D_COLLISION_API ndShapeInstance* GetShape() const;
 
 	private:
 	void CalculateAABB();

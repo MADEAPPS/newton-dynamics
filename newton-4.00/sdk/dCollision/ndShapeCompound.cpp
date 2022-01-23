@@ -47,7 +47,7 @@ ndShapeCompound::ndNodeBase::~ndNodeBase()
 }
 
 
-inline ndShapeCompound::ndNodeBase::ndNodeBase()
+ndShapeCompound::ndNodeBase::ndNodeBase()
 	:ndClassAlloc()
 	, m_type(m_node)
 	, m_left(nullptr)
@@ -58,7 +58,7 @@ inline ndShapeCompound::ndNodeBase::ndNodeBase()
 {
 }
 
-inline ndShapeCompound::ndNodeBase::ndNodeBase(const ndNodeBase& copyFrom)
+ndShapeCompound::ndNodeBase::ndNodeBase(const ndNodeBase& copyFrom)
 	:ndClassAlloc()
 	, m_p0(copyFrom.m_p0)
 	, m_p1(copyFrom.m_p1)
@@ -75,7 +75,7 @@ inline ndShapeCompound::ndNodeBase::ndNodeBase(const ndNodeBase& copyFrom)
 	dAssert(!copyFrom.m_shapeInstance);
 }
 
-inline ndShapeCompound::ndNodeBase::ndNodeBase(ndShapeInstance* const instance)
+ndShapeCompound::ndNodeBase::ndNodeBase(ndShapeInstance* const instance)
 	:ndClassAlloc()
 	, m_type(m_leaf)
 	, m_left(nullptr)
@@ -87,7 +87,7 @@ inline ndShapeCompound::ndNodeBase::ndNodeBase(ndShapeInstance* const instance)
 	CalculateAABB();
 }
 
-inline ndShapeCompound::ndNodeBase::ndNodeBase(ndNodeBase* const left, ndNodeBase* const right)
+ndShapeCompound::ndNodeBase::ndNodeBase(ndNodeBase* const left, ndNodeBase* const right)
 	:ndClassAlloc()
 	, m_type(m_node)
 	, m_left(left)
@@ -104,7 +104,7 @@ inline ndShapeCompound::ndNodeBase::ndNodeBase(ndNodeBase* const left, ndNodeBas
 	SetBox(p0, p1);
 }
 
-inline ndShapeInstance* ndShapeCompound::ndNodeBase::GetShape() const
+ndShapeInstance* ndShapeCompound::ndNodeBase::GetShape() const
 {
 	return m_shapeInstance;
 }
@@ -128,7 +128,7 @@ inline void ndShapeCompound::ndNodeBase::SetBox(const ndVector& p0, const ndVect
 	m_area = m_size.DotProduct(m_size.ShiftTripleRight()).m_x;
 }
 
-inline const ndShapeCompound::ndTreeArray& ndShapeCompound::GetTree() const
+const ndShapeCompound::ndTreeArray& ndShapeCompound::GetTree() const
 {
 	return m_array;
 }
