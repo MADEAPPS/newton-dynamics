@@ -53,7 +53,7 @@ class ndShapeCompound: public ndShape
 
 	void SetOwner(const ndShapeInstance* const myInstance);
 
-	const ndTreeArray& GetTree() const;
+	D_COLLISION_API const ndTreeArray& GetTree() const;
 
 	D_COLLISION_API virtual void BeginAddRemove();
 	D_COLLISION_API virtual ndTreeArray::ndNode* AddCollision(ndShapeInstance* const part);
@@ -125,7 +125,7 @@ class ndShapeCompound::ndNodeBase: public ndClassAlloc
 	~ndNodeBase();
 
 	//void Sanity(int level = 0);
-	ndShapeInstance* GetShape() const;
+	D_COLLISION_API ndShapeInstance* GetShape() const;
 
 	private:
 	void CalculateAABB();
@@ -149,91 +149,6 @@ class ndShapeCompound::ndNodeBase: public ndClassAlloc
 	friend class ndStackBvhStackEntry;
 };
 
-inline ndShapeCompound::ndNodeBase::ndNodeBase()
-	:ndClassAlloc()
-	,m_type(m_node)
-	,m_left(nullptr)
-	,m_right(nullptr)
-	,m_parent(nullptr)
-	,m_myNode(nullptr)
-	,m_shapeInstance(nullptr)
-{
-}
-
-inline ndShapeCompound::ndNodeBase::ndNodeBase(const ndNodeBase& copyFrom)
-	:ndClassAlloc()
-	,m_p0(copyFrom.m_p0)
-	,m_p1(copyFrom.m_p1)
-	,m_size(copyFrom.m_size)
-	,m_origin(copyFrom.m_origin)
-	,m_area(copyFrom.m_area)
-	,m_type(copyFrom.m_type)
-	,m_left(nullptr)
-	,m_right(nullptr)
-	,m_parent(nullptr)
-	,m_myNode(nullptr)
-	,m_shapeInstance(nullptr)
-{
-	dAssert(!copyFrom.m_shapeInstance);
-}
-
-inline ndShapeCompound::ndNodeBase::ndNodeBase(ndShapeInstance* const instance)
-	:ndClassAlloc()
-	,m_type(m_leaf)
-	,m_left(nullptr)
-	,m_right(nullptr)
-	,m_parent(nullptr)
-	,m_myNode(nullptr)
-	,m_shapeInstance(new ndShapeInstance(*instance))
-{
-	CalculateAABB();
-}
-
-inline ndShapeCompound::ndNodeBase::ndNodeBase(ndNodeBase* const left, ndNodeBase* const right)
-	:ndClassAlloc()
-	,m_type(m_node)
-	,m_left(left)
-	,m_right(right)
-	,m_parent(nullptr)
-	,m_myNode(nullptr)
-	,m_shapeInstance(nullptr)
-{
-	m_left->m_parent = this;
-	m_right->m_parent = this;
-
-	ndVector p0(left->m_p0.GetMin(right->m_p0));
-	ndVector p1(left->m_p1.GetMax(right->m_p1));
-	SetBox(p0, p1);
-}
-
-inline ndShapeInstance* ndShapeCompound::ndNodeBase::GetShape() const
-{
-	return m_shapeInstance;
-}
-
-inline void ndShapeCompound::ndNodeBase::CalculateAABB()
-{
-	ndVector p0;
-	ndVector p1;
-	m_shapeInstance->CalculateAabb(m_shapeInstance->GetLocalMatrix(), p0, p1);
-	SetBox(p0, p1);
-}
-
-inline void ndShapeCompound::ndNodeBase::SetBox(const ndVector& p0, const ndVector& p1)
-{
-	m_p0 = p0;
-	m_p1 = p1;
-	dAssert(m_p0.m_w == ndFloat32(0.0f));
-	dAssert(m_p1.m_w == ndFloat32(0.0f));
-	m_size = ndVector::m_half * (m_p1 - m_p0);
-	m_origin = ndVector::m_half * (m_p1 + m_p0);
-	m_area = m_size.DotProduct(m_size.ShiftTripleRight()).m_x;
-}
-
-inline const ndShapeCompound::ndTreeArray& ndShapeCompound::GetTree() const
-{
-	return m_array;
-}
 
 #endif 
 
