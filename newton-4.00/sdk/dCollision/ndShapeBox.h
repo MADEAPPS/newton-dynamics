@@ -33,7 +33,7 @@ class ndShapeBox: public ndShapeConvex
 	D_COLLISION_API ndShapeBox(ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z);
 	D_COLLISION_API virtual ~ndShapeBox();
 
-	virtual ndShapeBox* GetAsShapeBox() { return this; }
+	D_COLLISION_API virtual ndShapeBox* GetAsShapeBox() { return this; }
 
 	protected:
 	D_COLLISION_API void Init (ndFloat32 size_x, ndFloat32 size_y, ndFloat32 size_z);
@@ -46,8 +46,8 @@ class ndShapeBox: public ndShapeConvex
 	D_COLLISION_API virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinThickness, ndInt32* const vertexIndex) const;
 	D_COLLISION_API virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
-	const ndConvexSimplexEdge** GetVertexToEdgeMapping() const;
-	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
+	D_COLLISION_API const ndConvexSimplexEdge** GetVertexToEdgeMapping() const;
+	D_COLLISION_API virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	ndVector m_size[2];

@@ -27,13 +27,13 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointBallAndSocket(const ndMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointBallAndSocket();
 
-	D_NEWTON_API ndFloat32 GetMaxConeAngle() const;
-	D_NEWTON_API void SetConeLimit(ndFloat32 maxConeAngle);
-	D_NEWTON_API void SetConeFriction(ndFloat32 regularizer, ndFloat32 viscousFriction);
+	D_NEWTON_API virtual ndFloat32 GetMaxConeAngle() const;
+	D_NEWTON_API virtual void SetConeLimit(ndFloat32 maxConeAngle);
+	D_NEWTON_API virtual void SetConeFriction(ndFloat32 regularizer, ndFloat32 viscousFriction);
 
-	D_NEWTON_API void SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle);
-	D_NEWTON_API void GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const;
-	D_NEWTON_API void SetTwistFriction(ndFloat32 regularizer, ndFloat32 viscousFriction);
+	D_NEWTON_API virtual void SetTwistLimits(ndFloat32 minAngle, ndFloat32 maxAngle);
+	D_NEWTON_API virtual void GetTwistLimits(ndFloat32& minAngle, ndFloat32& maxAngle) const;
+	D_NEWTON_API virtual void SetTwistFriction(ndFloat32 regularizer, ndFloat32 viscousFriction);
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
