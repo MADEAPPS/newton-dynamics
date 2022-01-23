@@ -35,6 +35,7 @@ else()
 	include_directories(dCollision/)
 	include_directories(dNewton/dJoints/)
 	include_directories(dNewton/dModels/)
+	include_directories(dNewton/dParticles/)
 	include_directories(dNewton/dModels/dVehicle)
 	include_directories(dNewton/dModels/dCharacter)
 
@@ -65,6 +66,7 @@ else()
 		dCollision/*.h 
 		dNewton/dJoints/*.h 
 		dNewton/dModels/*.h 
+		dNewton/dParticles/*.h 
 		dNewton/dModels/dVehicle/*.h
 		dNewton/dModels/dCharacter/*.h)
 
@@ -81,6 +83,8 @@ else()
 		dNewton/dModels/*.cpp
 		dNewton/dJoints/*.h 
 		dNewton/dJoints/*.cpp
+		dNewton/dParticles/*.h
+		dNewton/dParticles/*.cpp
 		dNewton/dModels/dVehicle/*.h 
 		dNewton/dModels/dVehicle/*.cpp
 		dNewton/dModels/dCharacter/*.h

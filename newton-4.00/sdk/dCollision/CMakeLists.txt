@@ -21,6 +21,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(../dCore/)
 include_directories(../dTinyxml/)
+include_directories(../dProfiler/)
 
 if (MSVC)
        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /fp:fast")
