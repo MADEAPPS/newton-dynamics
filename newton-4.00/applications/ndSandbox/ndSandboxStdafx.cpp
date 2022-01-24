@@ -68,8 +68,8 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 		_strlwr (appPath);
 
 		char* const end = strstr (appPath, "applications");
-		end [0] = 0;
-		sprintf (outPathName, "%sapplications/media/%s", appPath, name);
+		//end [0] = 0;
+		sprintf (outPathName, "%s\\..\\applications\\media\\%s", appPath, name);
 	#elif defined(__APPLE__)
         char tmp[2048];
 		CFURLRef appURL (CFBundleCopyBundleURL(CFBundleGetMainBundle()));
