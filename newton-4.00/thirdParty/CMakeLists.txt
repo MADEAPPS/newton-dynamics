@@ -18,7 +18,7 @@ if (NEWTON_BUILD_SANDBOX_DEMOS)
 	endif(MSVC OR MINGW)
 
     add_subdirectory(imgui)
-	#add_subdirectory(openAL)
+	add_subdirectory(openalSource)
 	add_subdirectory(glatter)
 	add_subdirectory(openFBX/src)
 endif()

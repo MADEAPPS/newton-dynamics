@@ -34,10 +34,10 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyNotify)
 
 
 ndBody* ndBodyNotify::GetBody()
-{ return nullptr; }
+{ return m_body; }
 
 const ndBody* ndBodyNotify::GetBody() const
-{ return nullptr; }
+{ return m_body; }
 
 void* ndBodyNotify::GetUserData() const
 { return nullptr; }
