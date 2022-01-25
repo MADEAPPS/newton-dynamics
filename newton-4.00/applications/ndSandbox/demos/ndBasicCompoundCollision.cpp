@@ -17,8 +17,10 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
+#include "ndCompoundScene.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
+#include "ndHeightFieldPrimitive.h"
 
 #if 1
 static ndBodyDynamic* AddRigidBody(ndDemoEntityManager* const scene,
@@ -75,8 +77,18 @@ void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
 
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 {
+	ndMatrix heighfieldLocation(dGetIdentityMatrix());
+	heighfieldLocation.m_posit.m_x = -200.0f;
+	heighfieldLocation.m_posit.m_z = -200.0f;
+
 	// build a floor
+	//BuildPlayArena(scene);
 	BuildFlatPlane(scene, true);
+	//BuildFloorBox(scene, dGetIdentityMatrix());
+	//BuildCompoundScene(scene, dGetIdentityMatrix());
+	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
+	//BuildHeightFieldTerrain(scene, heighfieldLocation);
+
 	ndShapeInstance compoundShapeInstance(new ndShapeCompound());
 	CreateBoxCompoundShape(compoundShapeInstance);
 
