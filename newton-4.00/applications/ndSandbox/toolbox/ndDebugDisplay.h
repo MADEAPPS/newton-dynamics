@@ -17,6 +17,25 @@
 
 class ndDemoEntityManager;
 
+class ndDebugNotify : public ndShapeDebugNotify
+{
+	public:
+	ndDebugNotify(ndDemoEntityManager* const manager = nullptr, ndBodyKinematic* const body = nullptr)
+		:ndShapeDebugNotify()
+		,m_body(body)
+		,m_manager(manager)
+	{
+	}
+
+	void DrawPolygon(ndInt32, const ndVector* const, const ndEdgeType* const)
+	{
+	}
+
+	ndBodyKinematic* m_body;
+	ndDemoEntityManager* m_manager;
+	
+};
+
 #if 0
 void RenderBodyFrame (NewtonWorld* const world);
 void RenderRayCastHit(NewtonWorld* const world);

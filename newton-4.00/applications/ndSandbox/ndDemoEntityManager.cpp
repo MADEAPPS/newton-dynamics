@@ -16,6 +16,7 @@
 #include "ndDemoCamera.h"
 #include "ndLoadFbxMesh.h"
 #include "ndFileBrowser.h"
+#include "ndDebugDisplay.h"
 #include "ndPhysicsWorld.h"
 #include "ndPhysicsUtils.h"
 #include "ndDebugDisplay.h"
@@ -1365,10 +1366,16 @@ void ndDemoEntityManager::DrawDebugShapes()
 		for (ndBodyList::ndNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
 			ndBodyKinematic* const body = bodyNode->GetInfo();
-			if (!body->GetAsBodyTriggerVolume())
+			const ndShapeInstance& shapeInstance = body->GetCollisionShape();
+			ndShape* const key = (ndShape*)shapeInstance.GetShape();
+			if (key->GetAsShapeStaticProceduralMesh())
 			{
-				const ndShapeInstance& shapeInstance = body->GetCollisionShape();
-				ndDebugMeshCache::ndNode* const shapeNode = m_debugShapeCache.Find(shapeInstance.GetShape());
+				ndDebugNotify drawShapes(this, body);
+				key->DebugShape(dGetIdentityMatrix(), drawShapes);
+			}
+			else if (!body->GetAsBodyTriggerVolume())
+			{
+				ndDebugMeshCache::ndNode* const shapeNode = m_debugShapeCache.Find(key);
 				if (shapeNode)
 				{
 					ndMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
@@ -1383,8 +1390,8 @@ void ndDemoEntityManager::DrawDebugShapes()
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
 		const ndShapeInstance& shapeInstance = body->GetCollisionShape();
-		const ndShape* const key = shapeInstance.GetShape();
-		if (!((ndShape*)key)->GetAsShapeNull())
+		ndShape* const key = (ndShape*)shapeInstance.GetShape();
+		if (!(key->GetAsShapeNull() || key->GetAsShapeStaticProceduralMesh()))
 		{
 			ndDebugMeshCache::ndNode* shapeNode = m_debugShapeCache.Find(key);
 			if (!shapeNode)

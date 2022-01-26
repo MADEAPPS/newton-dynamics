@@ -12,6 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoCamera.h"
 #include "ndDemoEntity.h"
+#include "ndDebugDisplay.h"
 #include "ndDemoDebugMesh.h"
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
@@ -28,11 +29,11 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 	,m_vertextArrayBuffer(0)
 	,m_triangleIndexBuffer(0)
 {
-	class ndDrawShape : public ndShapeDebugNotify
+	class ndDrawShape : public ndDebugNotify
 	{
 		public:
 		ndDrawShape()
-			:ndShapeDebugNotify()
+			:ndDebugNotify()
 			,m_triangles(1024)
 		{
 		}
@@ -169,7 +170,7 @@ void ndFlatShadedDebugMesh::Render(ndDemoEntityManager* const scene, const ndMat
 	}
 }
 
-ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, ndShapeDebugNotify::ndEdgeType edgeTypefilter)
+ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, ndDebugNotify::ndEdgeType edgeTypefilter)
 	:ndDemoMeshInterface()
 	,m_indexCount(0)
 	,m_shadeColorLocation(0)
@@ -179,11 +180,11 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 	,m_vertextArrayBuffer(0)
 	,m_lineIndexBuffer(0)
 {
-	class ndDrawShape : public ndShapeDebugNotify
+	class ndDrawShape : public ndDebugNotify
 	{
 		public:
 		ndDrawShape(ndEdgeType edgeTypefilter)
-			:ndShapeDebugNotify()
+			:ndDebugNotify()
 			,m_lines(1024)
 			,m_edgeType(edgeTypefilter)
 		{

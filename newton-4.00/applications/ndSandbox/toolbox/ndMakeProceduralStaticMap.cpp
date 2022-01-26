@@ -13,6 +13,7 @@
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 #include "ndLoadFbxMesh.h"
+#include "ndDebugDisplay.h"
 #include "ndPhysicsWorld.h"
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
@@ -21,6 +22,7 @@
 class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 {
 	public:
+	D_CLASS_REFLECTION(ndRegularProceduralGrid);
 	ndRegularProceduralGrid(ndFloat32 gridSize, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const ndVector& planeEquation)
 		:ndShapeStaticProceduralMesh(sizex, sizey, sizez)
 		,m_planeEquation(planeEquation)
@@ -29,9 +31,12 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 	{
 	}
 
-	virtual void DebugShape(const ndMatrix&, ndShapeDebugNotify&) const
+	virtual void DebugShape(const ndMatrix&, ndShapeDebugNotify& notify) const
 	{
-		// do nothing since it depends on the application implementation.
+		ndDebugNotify& debugDraw = (ndDebugNotify&)notify;
+		ndBodyKinematic* const body = debugDraw.m_body;
+		ndDemoEntityManager* const scene = debugDraw.m_manager;
+		// this demo will iterate over the all the body contact pairs drawing the face in aabb.
 	}
 
 	virtual ndFloat32 RayCast(ndRayCastNotify&, const ndVector& localP0, const ndVector& localP1, ndFloat32, const ndBody* const, ndContactPoint& contactOut) const
