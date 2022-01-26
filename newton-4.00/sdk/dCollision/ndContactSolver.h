@@ -81,6 +81,7 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 	ndInt32 ConvexContactsDiscrete(); // done
 	ndInt32 CompoundContactsDiscrete(); // done
 	ndInt32 ConvexToConvexContactsDiscrete(); // done
+	ndInt32 CompoundToStaticProceduralMesh();  // done
 	ndInt32 ConvexToCompoundContactsDiscrete(); // done
 	ndInt32 CompoundToConvexContactsDiscrete(); // done
 	ndInt32 CompoundToCompoundContactsDiscrete(); // done

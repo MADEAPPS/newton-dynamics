@@ -182,7 +182,7 @@ ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, ndInt32 grids,
 
 ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
 {
-#if 1
+#if 0
 	ndVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
 	
 	ndArray<ndVector> points;

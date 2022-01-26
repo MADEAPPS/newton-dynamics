@@ -33,6 +33,7 @@
 #include "ndShapeStaticMesh.h"
 #include "ndShapeHeightfield.h"
 #include "ndShapeConvexPolygon.h"
+#include "ndShapeStaticProceduralMesh.h"
 
 ndVector ndContactSolver::m_pruneUpDir(ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(1.0f), ndFloat32(0.0f));
 ndVector ndContactSolver::m_pruneSupportX(ndFloat32(1.0f), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));
@@ -312,6 +313,27 @@ class ndStackEntry
 		ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, boxOrigin, boxSize);
 		return dist2;
 	}
+
+	ndFloat32 CalculateProceduralDist2(const ndContactSolver::ndBoxBoxDistance2& data, const ndShapeCompound::ndNodeBase* const compoundNode, ndShapeInstance* const proceduralInstance)
+	{
+		const ndVector scale(proceduralInstance->GetScale());
+		const ndVector invScale(proceduralInstance->GetInvScale());
+		const ndVector size(invScale * data.m_localMatrixAbs1.RotateVector(compoundNode->m_size));
+		const ndVector origin(invScale * data.m_localMatrix1.TransformVector(compoundNode->m_origin));
+		//const ndVector p0(origin - size);
+		//const ndVector p1(origin + size);
+
+		//ndVector boxP0;
+		//ndVector boxP1;
+		//ndShapeStaticProceduralMesh* const shape = proceduralInstance->GetShape()->GetAsShapeStaticProceduralMesh();
+		//shape->GetLocalAabb(p0, p1, boxP0, boxP1);
+		//const ndVector boxSize((boxP1 - boxP0) * ndVector::m_half * scale);
+		//const ndVector boxOrigin((boxP1 + boxP0) * ndVector::m_half * scale);
+		//ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, boxOrigin, boxSize);
+		ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, origin, size);
+		return dist2;
+	}
+
 
 
 	const ndShapeCompound::ndNodeBase* m_node0;
@@ -2607,6 +2629,10 @@ ndInt32 ndContactSolver::CompoundContactsDiscrete()
 		{
 			return CompoundToStaticHeightfieldContactsDiscrete();
 		}
+		else if (m_instance1.GetShape()->GetAsShapeStaticProceduralMesh())
+		{
+			return CompoundToStaticProceduralMesh();
+		}
 		else
 		{
 			dTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->SubClassName(), m_instance1.GetShape()->SubClassName()));
@@ -2622,6 +2648,7 @@ ndInt32 ndContactSolver::CompoundContactsDiscrete()
 		}
 		else
 		{
+			dTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->SubClassName(), m_instance1.GetShape()->SubClassName()));
 			dAssert(0);
 		}
 	}
@@ -3422,9 +3449,7 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 	ndBodyKinematic* const heightfieldBody = contactJoint->GetBody1();
 	ndShapeInstance* const compoundInstance = &compoundBody->GetCollisionShape();
 	ndShapeInstance* const heightfieldInstance = &heightfieldBody->GetCollisionShape();
-
 	ndShapeCompound* const compoundShape = compoundInstance->GetShape()->GetAsShapeCompound();
-	//ndShapeHeightfield* const heightfieldShape = heightfieldInstance->GetShape()->GetAsShapeHeightfield();
 
 	ndShapeCompound::ndNodeBase nodeProxi;
 	nodeProxi.m_left = nullptr;
@@ -3518,6 +3543,131 @@ ndInt32 ndContactSolver::CompoundToStaticHeightfieldContactsDiscrete()
 				const ndShapeCompound::ndNodeBase* const right = node->m_right;
 				dAssert(right);
 				ndFloat32 subDist2 = callback.CalculateHeighfieldDist2(data, right, heightfieldInstance);
+				ndInt32 j = stack;
+				for (; j && (subDist2 > stackDistance[j - 1]); j--)
+				{
+					stackPool[j] = stackPool[j - 1];
+					stackDistance[j] = stackDistance[j - 1];
+				}
+				stackPool[j] = right;
+				stackDistance[j] = subDist2;
+				stack++;
+				dAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+			}
+		}
+	}
+
+	if (m_pruneContacts && (contactCount > 1))
+	{
+		contactCount = PruneContacts(contactCount, 16);
+	}
+	dAssert(closestDist < ndFloat32(1.0e6f));
+	m_separationDistance = ndSqrt(closestDist);
+	return contactCount;
+}
+
+
+ndInt32 ndContactSolver::CompoundToStaticProceduralMesh()
+{
+	ndContact* const contactJoint = m_contact;
+	ndContactPoint* const contacts = m_contactBuffer;
+	ndBodyKinematic* const compoundBody = contactJoint->GetBody0();
+	ndBodyKinematic* const ProceduralBody = contactJoint->GetBody1();
+	ndShapeInstance* const compoundInstance = &compoundBody->GetCollisionShape();
+	ndShapeInstance* const ProceduralInstance = &ProceduralBody->GetCollisionShape();
+	ndShapeCompound* const compoundShape = compoundInstance->GetShape()->GetAsShapeCompound();
+
+	ndShapeCompound::ndNodeBase nodeProxi;
+	nodeProxi.m_left = nullptr;
+	nodeProxi.m_right = nullptr;
+	const ndVector ProceduralScale(ProceduralInstance->GetScale());
+	const ndVector ProceduralInvScale(ProceduralInstance->GetInvScale());
+
+	const ndMatrix& compoundMatrix = compoundInstance->GetGlobalMatrix();
+	const ndMatrix& ProceduralMatrix = ProceduralInstance->GetGlobalMatrix();
+	ndBoxBoxDistance2 data(compoundMatrix, ProceduralMatrix);
+
+	ndFloat32 stackDistance[D_SCENE_MAX_STACK_DEPTH];
+	const ndShapeCompound::ndNodeBase* stackPool[D_COMPOUND_STACK_DEPTH];
+
+	ndStackEntry callback;
+	ndInt32 stack = 1;
+	ndInt32 contactCount = 0;
+	stackPool[0] = compoundShape->m_root;
+	stackDistance[0] = callback.CalculateProceduralDist2(data, compoundShape->m_root, ProceduralInstance);
+	ndFloat32 closestDist = (stackDistance[0] > ndFloat32(0.0f)) ? stackDistance[0] : ndFloat32(1.0e10f);
+
+	while (stack)
+	{
+		stack--;
+
+		ndFloat32 dist2 = stackDistance[stack];
+		if (dist2 > ndFloat32(0.0f))
+		{
+			closestDist = dMin(closestDist, dist2);
+			break;
+		}
+
+		const ndShapeCompound::ndNodeBase* const node = stackPool[stack];
+		dAssert(node);
+
+		if (node->m_type == ndShapeCompound::m_leaf)
+		{
+			ndShapeInstance* const subShape = node->GetShape();
+			if (subShape->GetCollisionMode())
+			{
+				bool processContacts = m_notification->OnCompoundSubShapeOverlap(contactJoint, m_timestep, subShape, ProceduralInstance);
+				if (processContacts)
+				{
+					ndShapeInstance childInstance(*subShape, subShape->GetShape());
+					childInstance.m_globalMatrix = childInstance.GetLocalMatrix() * compoundMatrix;
+
+					ndContactSolver contactSolver(*this, childInstance, m_instance1);
+					contactSolver.m_pruneContacts = 0;
+					contactSolver.m_maxCount = D_MAX_CONTATCS - contactCount;
+					contactSolver.m_contactBuffer += contactCount;
+
+					ndInt32 count = contactSolver.ConvexContactsDiscrete();
+					ndFloat32 dist = dMax(contactSolver.m_separationDistance, ndFloat32(0.0f));
+					closestDist = dMin(closestDist, dist * dist);
+					if (!m_intersectionTestOnly)
+					{
+						for (ndInt32 i = 0; i < count; ++i)
+						{
+							contacts[contactCount + i].m_shapeInstance0 = subShape;
+						}
+						contactCount += count;
+						if (contactCount > (D_MAX_CONTATCS - 2 * (D_CONSTRAINT_MAX_ROWS / 3)))
+						{
+							contactCount = PruneContacts(contactCount, 16);
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			dAssert(node->m_type == ndShapeCompound::m_node);
+			{
+				const ndShapeCompound::ndNodeBase* const left = node->m_left;
+				dAssert(left);
+				ndFloat32 subDist2 = callback.CalculateProceduralDist2(data, left, ProceduralInstance);
+				ndInt32 j = stack;
+				for (; j && (subDist2 > stackDistance[j - 1]); j--)
+				{
+					stackPool[j] = stackPool[j - 1];
+					stackDistance[j] = stackDistance[j - 1];
+				}
+				stackPool[j] = left;
+				stackDistance[j] = subDist2;
+				stack++;
+				dAssert(stack < ndInt32(sizeof(stackPool) / sizeof(stackPool[0])));
+			}
+
+			{
+				const ndShapeCompound::ndNodeBase* const right = node->m_right;
+				dAssert(right);
+				ndFloat32 subDist2 = callback.CalculateProceduralDist2(data, right, ProceduralInstance);
 				ndInt32 j = stack;
 				for (; j && (subDist2 > stackDistance[j - 1]); j--)
 				{

@@ -93,7 +93,6 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 
 	ndShapeInstance compoundShapeInstance(new ndShapeCompound());
 	CreateBoxCompoundShape(compoundShapeInstance);
-
 	ndDemoMeshIntance* const compGeometry = new ndDemoMeshIntance("compoundShape", scene->GetShaderCache(), &compoundShapeInstance, "earthmap.tga", "earthmap.tga", "earthmap.tga");
 	ndDemoInstanceEntity* const compEntity = new ndDemoInstanceEntity(compGeometry);
 	scene->AddEntity(compEntity);
