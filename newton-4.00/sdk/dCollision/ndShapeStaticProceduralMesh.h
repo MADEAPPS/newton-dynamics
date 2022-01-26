@@ -77,7 +77,7 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 		}
 
 		ndArray<ndVector> m_vertex;
-		std::thread::id m_threadId;
+		ndThreadId m_threadId;
 	};
 
 	void CalculateLocalObb();

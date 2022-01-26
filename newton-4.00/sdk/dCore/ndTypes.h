@@ -211,6 +211,8 @@ typedef uint32_t ndUnsigned32;
 typedef int64_t ndInt64;
 typedef uint64_t ndUnsigned64;
 
+typedef std::thread::id ndThreadId;
+
 typedef double ndFloat64;
 #ifdef D_NEWTON_USE_DOUBLE
 	typedef double ndFloat32;
@@ -456,5 +458,11 @@ inline void ndYield()
 {
 	std::this_thread::yield();
 }
+
+inline ndThreadId ndGetThreadId()
+{
+	return std::this_thread::get_id();
+}
+
 #endif
 

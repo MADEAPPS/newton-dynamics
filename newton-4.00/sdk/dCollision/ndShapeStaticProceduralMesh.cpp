@@ -125,7 +125,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 		return;
 	}
 
-	std::thread::id threadId = std::this_thread::get_id();
+	ndThreadId threadId = ndGetThreadId();
 	ndList<ndLocalThreadData>::ndNode* localDataNode = nullptr;
 	for (ndList<ndLocalThreadData>::ndNode* node = m_localData.GetFirst(); node; node = node->GetNext())
 	{
@@ -153,14 +153,14 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	ndInt32* const indices = data->m_globalFaceVertexIndex;
 	ndInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
 	
-	for (ndInt32 i = 0; i < faceList.GetCount(); i++)
+	for (ndInt32 i = 0; i < faceList.GetCount(); ++i)
 	{
 		ndInt32 i0 = indexList[faceStart + 0];
 		ndInt32 i1 = indexList[faceStart + 1];
 		ndVector area(ndVector::m_zero);
 		ndVector edge0(vertex[i1] - vertex[i0]);
 
-		for (ndInt32 j = 2; j < faceList[i]; j++)
+		for (ndInt32 j = 2; j < faceList[i]; ++j)
 		{
 			ndInt32 i2 = indexList[faceStart + j];
 			const ndVector edge1(vertex[i2] - vertex[i0]);
@@ -179,7 +179,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 
 		ndInt32 j0 = faceList[i] - 1;
 		faceIndexCount[i] = faceList[i];
-		for (ndInt32 j = 0; j < faceList[i]; j++) 
+		for (ndInt32 j = 0; j < faceList[i]; ++j) 
 		{
 			ndEdge edge;
 			edge.m_i0 = indexList[faceStart + j0];
@@ -227,7 +227,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	{
 		dAssert(0);
 		//dFastRay ray(ndVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
-		//for (ndInt32 i = 0; i < faceCount; i++) 
+		//for (ndInt32 i = 0; i < faceCount; ++i) 
 		//{
 		//	const ndInt32* const indexArray = &indices[faceIndexCount1];
 		//	const ndVector& faceNormal = vertex[indexArray[4]];
@@ -245,7 +245,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	}
 	else 
 	{
-		for (ndInt32 i = 0; i < faceList.GetCount(); i++)
+		for (ndInt32 i = 0; i < faceList.GetCount(); ++i)
 		{
 			const ndInt32 vertexCount = faceIndexCount[i];
 			const ndInt32* const indexArray = &indices[faceIndexCount1];

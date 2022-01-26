@@ -2609,6 +2609,7 @@ ndInt32 ndContactSolver::CompoundContactsDiscrete()
 		}
 		else
 		{
+			dTrace(("Fix compound contact for pair: %s %s\n", m_instance0.GetShape()->SubClassName(), m_instance1.GetShape()->SubClassName()));
 			dAssert(0);
 		}
 	}
