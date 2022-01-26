@@ -170,7 +170,7 @@ void ndFlatShadedDebugMesh::Render(ndDemoEntityManager* const scene, const ndMat
 	}
 }
 
-ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, ndDebugNotify::ndEdgeType edgeTypefilter)
+ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, ndShapeDebugNotify::ndEdgeType edgeTypefilter)
 	:ndDemoMeshInterface()
 	,m_indexCount(0)
 	,m_shadeColorLocation(0)
