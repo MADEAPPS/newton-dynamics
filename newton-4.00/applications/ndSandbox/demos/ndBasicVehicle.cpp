@@ -37,7 +37,6 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 		//m_useHardSolverMode = false;
 		m_comDisplacement = ndVector(0.25f, -0.35f, 0.0f, 0.0f);
 
-		ndFloat32 fuelInjectionRate = 10.0f;
 		ndFloat32 idleTorquePoundFoot = 100.0f;
 		ndFloat32 idleRmp = 700.0f;
 		ndFloat32 horsePower = 400.0f;
@@ -45,7 +44,7 @@ class ndVehicleDectriptorViper : public ndVehicleDectriptor
 		ndFloat32 rpm1 = 6200.0f;
 		ndFloat32 horsePowerAtRedLine = 100.0f;
 		ndFloat32 redLineRpm = 8000.0f;
-		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
+		m_engine.Init(idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 	}
 };
@@ -61,7 +60,6 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		//m_comDisplacement = ndVector(0.0f, -0.55f, 0.0f, 0.0f);
 		m_comDisplacement = ndVector(0.0f, -0.35f, 0.0f, 0.0f);
 
-		ndFloat32 fuelInjectionRate = 10.0f;
 		ndFloat32 idleTorquePoundFoot = 200.0f;
 		ndFloat32 idleRmp = 800.0f;
 		ndFloat32 horsePower = 400.0f;
@@ -69,7 +67,7 @@ class ndVehicleDectriptorJeep : public ndVehicleDectriptor
 		ndFloat32 rpm1 = 6200.0f;
 		ndFloat32 horsePowerAtRedLine = 400.0f;
 		ndFloat32 redLineRpm = 8000.0f;
-		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
+		m_engine.Init(idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_frontTire.m_mass = 100.0f;
@@ -112,7 +110,6 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 	{
 		m_comDisplacement = ndVector(0.0f, -0.55f, 0.0f, 0.0f);
 
-		ndFloat32 fuelInjectionRate = 10.0f;
 		ndFloat32 idleTorquePoundFoot = 250.0f;
 		ndFloat32 idleRmp = 800.0f;
 		ndFloat32 horsePower = 400.0f;
@@ -120,7 +117,7 @@ class ndVehicleDectriptorMonsterTruck: public ndVehicleDectriptor
 		ndFloat32 rpm1 = 6200.0f;
 		ndFloat32 horsePowerAtRedLine = 150.0f;
 		ndFloat32 redLineRpm = 8000.0f;
-		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
+		m_engine.Init(idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_frontTire.m_mass = 100.0f;
@@ -226,13 +223,13 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 				differential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire, rr_tire, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
 				break;
 			}
-
+		
 			case ndVehicleDectriptor::m_frontWheelDrive:
 			{
 				differential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, fl_tire, fr_tire, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
 				break;
 			}
-
+		
 			case ndVehicleDectriptor::m_fourWheeldrive:
 			{
 				ndMultiBodyVehicleDifferential* const rearDifferential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire, rr_tire, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
@@ -240,7 +237,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 				differential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rearDifferential, frontDifferential, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
 				break;
 			}
-
+		
 			case ndVehicleDectriptor::m_eightWheeldrive:
 			{
 				dAssert(0);
@@ -250,10 +247,11 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 		// add a motor
 		ndMultiBodyVehicleMotor* const motor = AddMotor(m_configuration.m_motorMass, m_configuration.m_motorRadius);
-		motor->SetRpmLimits(m_configuration.m_engine.GetIdleRadPerSec() * 9.55f, m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
+		motor->SetMaxRpm(m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
 
 		// add the gear box
-		AddGearBox(m_motor, differential);
+		ndMultiBodyVehicleGearBox* const gearBox = AddGearBox(m_motor, differential);
+		gearBox->SetIdleOmega(m_configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
 
 		switch (m_configuration.m_torsionBarType)
 		{
@@ -304,6 +302,7 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 		ndSoundManager* const soundManager = world->GetSoundManager();
 
 		m_startEngine = false;
+		m_startEngineMemory = false;
 		m_startSound = soundManager->CreateSoundChannel(engineSounds[0]);
 		m_engineRpmSound = soundManager->CreateSoundChannel(engineSounds[1]);
 		m_skipMarks = soundManager->CreateSoundChannel(engineSounds[2]);
@@ -480,11 +479,10 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 		if (m_motor)
 		{
-			bool startEngine = m_motor->GetStart();
-			if (m_startEngine ^ startEngine)
+			if (m_startEngineMemory ^ m_startEngine)
 			{
-				m_startEngine = startEngine;
-				if (startEngine)
+				m_startEngineMemory = m_startEngine;
+				if (m_startEngine)
 				{
 					m_startSound->Play();
 					m_engineRpmSound->Play();
@@ -493,25 +491,41 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 				}
 				else
 				{
-					m_startSound->Stop();
-					m_engineRpmSound->Stop();
+					if (m_startSound->IsPlaying())
+					{
+						m_startSound->Stop();
+					}
 				}
 			}
 
-			ndFloat32 maxRpm = 9000.0f;
-			ndFloat32 rpm = m_motor->GetRpm() / maxRpm;
-			ndFloat32 pitchFactor = 0.5f + 0.7f * rpm;
-			m_engineRpmSound->SetPitch(pitchFactor);
+			ndFloat32 rpm = m_motor->GetRpm();
+			if (rpm > 1.0f)
+			{
+				if (!m_engineRpmSound->IsPlaying())
+				{
+					m_engineRpmSound->Play();
+				}
+				// up to two decibels of volume
+				ndFloat32 maxRpm = 9000.0f;
+				rpm = rpm / maxRpm;
+				ndFloat32 pitchFactor = 0.5f + 0.7f * rpm;
+				ndFloat32 volumeFactor = 0.25f + 0.75f * rpm;
 
-			// up to two decibels of volume
-			ndFloat32 volumeFactor = 0.25f + 0.75f * rpm;
-			m_engineRpmSound->SetVolume(volumeFactor);
-			//dTrace(("%f\n", volumeFactor));
+				m_engineRpmSound->SetPitch(pitchFactor);
+				m_engineRpmSound->SetVolume(volumeFactor);
 
-			// apply positional sound
-			const ndMatrix& location = m_chassis->GetMatrix();
-			m_engineRpmSound->SetPosition(location.m_posit);
-			m_engineRpmSound->SetVelocity(m_chassis->GetVelocity());
+				// apply positional sound
+				const ndMatrix& location = m_chassis->GetMatrix();
+				m_engineRpmSound->SetPosition(location.m_posit);
+				m_engineRpmSound->SetVelocity(m_chassis->GetVelocity());
+			}
+			else
+			{
+				if (m_engineRpmSound->IsPlaying())
+				{
+					m_engineRpmSound->Stop();
+				}
+			}
 		}
 
 		// test convex cast for now
@@ -590,7 +604,6 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 	ndSoundChannel* m_skipMarks;
 	ndSoundChannel* m_startSound;
 	ndSoundChannel* m_engineRpmSound;
-	bool m_startEngine;
 	ndVehicleUI* m_vehicleUI;
 
 	ndDemoEntity* m_rearAxlePivot;
@@ -600,21 +613,24 @@ class ndBasicMultiBodyVehicle : public ndBasicVehicle
 
 	ndMultiBodyVehicleTireJoint* m_fr_tire;
 	ndMultiBodyVehicleTireJoint* m_fl_tire;
+
+	bool m_startEngineMemory;
 };
 
-static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const ndMatrix& location)
+//static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const ndMatrix& location)
+static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const, const ndMatrix&)
 {
-	ndMatrix localAxis(dGetIdentityMatrix());
-	localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
-	localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
-	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
-
-	ndFloat32 height = 1.9f;
-	ndFloat32 radio = 0.5f;
-	ndFloat32 mass = 100.0f;
-	ndDemoEntity* const entity = scene->LoadFbxMesh("whiteMan.fbx");
-	new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
-	delete entity;
+	//ndMatrix localAxis(dGetIdentityMatrix());
+	//localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
+	//localAxis[1] = ndVector(1.0, 0.0f, 0.0f, 0.0f);
+	//localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
+	//
+	//ndFloat32 height = 1.9f;
+	//ndFloat32 radio = 0.5f;
+	//ndFloat32 mass = 100.0f;
+	//ndDemoEntity* const entity = scene->LoadFbxMesh("whiteMan.fbx");
+	//new ndBasicPlayerCapsule(scene, entity, localAxis, location, mass, radio, height, height / 4.0f);
+	//delete entity;
 }
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
@@ -622,10 +638,10 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	ndMatrix sceneLocation(dGetIdentityMatrix());
 
 	//BuildFloorBox(scene, sceneLocation);
-	//BuildFlatPlane(scene, true);
+	BuildFlatPlane(scene, true);
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildStaticMesh(scene, "track.fbx", true);
-	BuildCompoundScene(scene, dGetIdentityMatrix());
+	//BuildCompoundScene(scene, dGetIdentityMatrix());
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildSplineTrack(scene, "playerarena.fbx", true);
 	sceneLocation.m_posit.m_x = -200.0f;
@@ -640,32 +656,11 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	matrix.m_posit = floor;
 	matrix.m_posit.m_y += 0.5f;
 
-	//ndVector location(0.0f, 1.75f, 0.0f, 1.0f);
-	//ndMatrix matrix(dGetIdentityMatrix());
-	//matrix = dYawMatrix(180.0f * ndDegreeToRad);
-	//matrix = matrix * dRollMatrix(-70.0f * ndDegreeToRad);
-	//matrix.m_posit = location;
-
 	ndSoundManager* const soundManager = world->GetSoundManager();
 	for (ndInt32 i = 0; i < ndInt32 (sizeof(engineSounds) / sizeof(engineSounds[0])); i++)
 	{
 		soundManager->CreateSoundAsset(engineSounds[i]);
 	}
-
-#if 0
-	// use a test tone
-	dVector testPosit(20.0f, 0.25f, 0.0f, 1.0f);
-	soundManager->CreateSoundAsset("ctone.wav");
-	ndSoundChannel* xxxx = soundManager->CreateSoundChannel("ctone.wav");
-	xxxx->SetPosition(testPosit);
-	xxxx->SetVolume(1.0f);
-	xxxx->SetLoop(true);
-	xxxx->SetAttenuationRefDistance(10.0f, 40.0f, 60.0f);
-	xxxx->Play();
-	ndBodyKinematic* xxxx1 = AddBox(scene, testPosit, 0.0f, 4.0f, 0.5f, 5.0f);
-	//xxxx1->GetCollisionShape().SetCollisionMode(false);
-#endif
-
 
 	// add a model for general controls
 	ndVehicleSelector* const controls = new ndVehicleSelector();
@@ -678,7 +673,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	scene->Set2DDisplayRenderFunction(ndBasicMultiBodyVehicle::RenderHelp, ndBasicMultiBodyVehicle::RenderUI, vehicle);
 
 	matrix.m_posit.m_x += 5.0f;
-	TestPlayerCapsuleInteaction(scene, matrix);
+	TestPlayerCapsuleInteraction(scene, matrix);
 
 	//matrix.m_posit.m_x += 8.0f;
 	//matrix.m_posit.m_z += 6.0f;

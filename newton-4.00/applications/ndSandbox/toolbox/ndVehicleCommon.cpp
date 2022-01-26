@@ -20,7 +20,6 @@ ndVehicleDectriptor::ndEngineTorqueCurve::ndEngineTorqueCurve()
 {
 	// take from the data sheet of a 2005 dodge viper, 
 	// some values are missing so I have to improvise them
-	ndFloat32 fuelInjectionRate = 10.0f;
 	ndFloat32 idleTorquePoundFoot = 100.0f;
 	ndFloat32 idleRmp = 800.0f;
 	ndFloat32 horsePower = 400.0f;
@@ -28,17 +27,15 @@ ndVehicleDectriptor::ndEngineTorqueCurve::ndEngineTorqueCurve()
 	ndFloat32 rpm1 = 6200.0f;
 	ndFloat32 horsePowerAtRedLine = 100.0f;
 	ndFloat32 redLineRpm = 8000.0f;
-	Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp,
+	Init(idleTorquePoundFoot, idleRmp,
 		horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 }
 
 void ndVehicleDectriptor::ndEngineTorqueCurve::Init(
-	ndFloat32 fuelInjectionRate,
 	ndFloat32 idleTorquePoundFoot, ndFloat32 idleRmp,
 	ndFloat32 horsePower, ndFloat32 rpm0, ndFloat32 rpm1,
 	ndFloat32 horsePowerAtRedLine, ndFloat32 redLineRpm)
 {
-	m_fuelInjectionRate = fuelInjectionRate;
 	m_torqueCurve[0] = ndTorqueTap(0.0f, idleTorquePoundFoot);
 	m_torqueCurve[1] = ndTorqueTap(idleRmp, idleTorquePoundFoot);
 	
@@ -56,11 +53,6 @@ void ndVehicleDectriptor::ndEngineTorqueCurve::Init(
 	omegaInRadPerSec = redLineRpm * 0.105f;
 	torqueInPoundFood = (power / omegaInRadPerSec) / 1.36f;
 	m_torqueCurve[4] = ndTorqueTap(redLineRpm, torqueInPoundFood);
-}
-
-ndFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetFuelRate() const
-{
-	return m_fuelInjectionRate;
 }
 
 ndFloat32 ndVehicleDectriptor::ndEngineTorqueCurve::GetIdleRadPerSec() const
@@ -112,7 +104,6 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 {
 	strncpy(m_name, fileName, sizeof(m_name));
 
-	ndFloat32 fuelInjectionRate = 10.0f;
 	ndFloat32 idleTorquePoundFoot = 100.0f;
 	ndFloat32 idleRmp = 900.0f;
 	ndFloat32 horsePower = 400.0f;
@@ -120,7 +111,7 @@ ndVehicleDectriptor::ndVehicleDectriptor(const char* const fileName)
 	ndFloat32 rpm1 = 6200.0f;
 	ndFloat32 horsePowerAtRedLine = 100.0f;
 	ndFloat32 redLineRpm = 8000.0f;
-	m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
+	m_engine.Init(idleTorquePoundFoot, idleRmp, horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 	m_chassisMass = 1000.0f;
 	m_chassisAngularDrag = 0.25f;
@@ -260,6 +251,8 @@ ndBasicVehicle::ndBasicVehicle(const ndVehicleDectriptor& desc)
 	,m_autoGearShiftTimer(0)
 	,m_isPlayer(false)
 	,m_isParked(true)
+	,m_startEngine(false)
+	,m_startEngineMemory(false)
 	,m_isManualTransmission(desc.m_transmission.m_manual)
 {
 }
@@ -377,7 +370,7 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 
 		if (m_ignition.Update(scene->GetKeyState('I') || buttons[7]))
 		{
-			m_motor->SetStart(!m_motor->GetStart());
+			m_startEngine = !m_startEngine;
 		}
 
 		if (m_manualTransmission.Update(scene->GetKeyState('?') || scene->GetKeyState('/') || buttons[8]))
@@ -497,8 +490,16 @@ void ndBasicVehicle::ApplyInputs(ndWorld* const world, ndFloat32)
 			m_gearBox->SetClutchTorque(m_configuration.m_transmission.m_lockedClutchTorque);
 		}
 
-		m_motor->SetThrottle(throttle);
-		m_motor->SetFuelRate(m_configuration.m_engine.GetFuelRate());
-		m_motor->SetTorque(m_configuration.m_engine.GetTorque(m_motor->GetRpm() / dRadPerSecToRpm));
+		if (m_startEngine)
+		{
+			ndFloat32 currentOmega = m_motor->GetRpm() / dRadPerSecToRpm;
+			ndFloat32 desiredOmega = dMax (m_configuration.m_engine.GetIdleRadPerSec(), throttle * m_configuration.m_engine.GetRedLineRadPerSec());
+			ndFloat32 torqueFromCurve = m_configuration.m_engine.GetTorque(currentOmega);
+			m_motor->SetTorqueAndRpm(torqueFromCurve, desiredOmega * dRadPerSecToRpm);
+		}
+		else
+		{
+			m_motor->SetTorqueAndRpm(0.0f, 0.0f);
+		}
 	}
 }

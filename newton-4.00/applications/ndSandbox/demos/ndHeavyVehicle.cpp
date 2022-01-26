@@ -38,7 +38,6 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 
 		m_useHardSolverMode = false;
 
-		ndFloat32 fuelInjectionRate = 10.0f;
 		ndFloat32 idleTorquePoundFoot = 250.0f;
 		ndFloat32 idleRmp = 600.0f;
 		ndFloat32 horsePower = 500.0f;
@@ -46,7 +45,7 @@ class ndVehicleDectriptorLav25: public ndVehicleDectriptor
 		ndFloat32 rpm1 = 4000.0f;
 		ndFloat32 horsePowerAtRedLine = 150.0f;
 		ndFloat32 redLineRpm = 5000.0f;
-		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp, 
+		m_engine.Init(idleTorquePoundFoot, idleRmp, 
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_transmission.m_torqueConverter = 10000.0f;
@@ -95,7 +94,6 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 
 		m_useHardSolverMode = false;
 
-		ndFloat32 fuelInjectionRate = 10.0f;
 		ndFloat32 idleTorquePoundFoot = 250.0f;
 		ndFloat32 idleRmp = 600.0f;
 		ndFloat32 horsePower = 500.0f;
@@ -103,7 +101,7 @@ class ndVehicleDectriptorTractor : public ndVehicleDectriptor
 		ndFloat32 rpm1 = 4000.0f;
 		ndFloat32 horsePowerAtRedLine = 150.0f;
 		ndFloat32 redLineRpm = 5000.0f;
-		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp,
+		m_engine.Init(idleTorquePoundFoot, idleRmp,
 					  horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_transmission.m_gearsCount = 2;
@@ -158,7 +156,6 @@ class ndVehicleDectriptorBigRig : public ndVehicleDectriptor
 
 		m_useHardSolverMode = false;
 
-		ndFloat32 fuelInjectionRate = 10.0f;
 		ndFloat32 idleTorquePoundFoot = 250.0f;
 		ndFloat32 idleRmp = 600.0f;
 		ndFloat32 horsePower = 500.0f;
@@ -166,7 +163,7 @@ class ndVehicleDectriptorBigRig : public ndVehicleDectriptor
 		ndFloat32 rpm1 = 4000.0f;
 		ndFloat32 horsePowerAtRedLine = 150.0f;
 		ndFloat32 redLineRpm = 5000.0f;
-		m_engine.Init(fuelInjectionRate, idleTorquePoundFoot, idleRmp,
+		m_engine.Init(idleTorquePoundFoot, idleRmp,
 			horsePower, rpm0, rpm1, horsePowerAtRedLine, redLineRpm);
 
 		m_transmission.m_torqueConverter = 10000.0f;
@@ -500,10 +497,11 @@ class ndLav25Vehicle : public ndHeavyMultiBodyVehicle
 
 		// add a motor
 		ndMultiBodyVehicleMotor* const motor = AddMotor(m_configuration.m_motorMass, m_configuration.m_motorRadius);
-		motor->SetRpmLimits(m_configuration.m_engine.GetIdleRadPerSec() * 9.55f, m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
+		motor->SetMaxRpm(m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
 
 		// add the gear box
-		AddGearBox(m_motor, differential);
+		ndMultiBodyVehicleGearBox* const gearBox = AddGearBox(m_motor, differential);
+		gearBox->SetIdleOmega(m_configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
 
 		// add torsion bar
 		ndMultiBodyVehicleTorsionBar* const torsionBar = AddTorsionBar(world->GetSentinelBody());
@@ -677,7 +675,7 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 
 		// add a motor
 		ndMultiBodyVehicleMotor* const motor = AddMotor(m_configuration.m_motorMass, m_configuration.m_motorRadius);
-		motor->SetRpmLimits(m_configuration.m_engine.GetIdleRadPerSec() * 9.55f, m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
+		motor->SetMaxRpm(m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
 
 		// add 4 x 4 the slip differential
 		ndMultiBodyVehicleDifferential* const rearDifferential = AddDifferential(m_configuration.m_differentialMass, m_configuration.m_differentialRadius, rl_tire0, rr_tire0, m_configuration.m_slipDifferentialRmpLock / dRadPerSecToRpm);
@@ -688,7 +686,8 @@ class ndTractorVehicle : public ndHeavyMultiBodyVehicle
 		differential->SetSlipOmega(2.0f * differential->GetSlipOmega());
 
 		// add the gear box
-		AddGearBox(m_motor, differential);
+		ndMultiBodyVehicleGearBox* const gearBox = AddGearBox(m_motor, differential);
+		gearBox->SetIdleOmega(m_configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
 
 		// add the bucket joints
 		CreateTractorBucket(scene);
@@ -879,10 +878,11 @@ class ndBigRigVehicle : public ndHeavyMultiBodyVehicle
 
 		// add a motor
 		ndMultiBodyVehicleMotor* const motor = AddMotor(m_configuration.m_motorMass, m_configuration.m_motorRadius);
-		motor->SetRpmLimits(m_configuration.m_engine.GetIdleRadPerSec() * 9.55f, m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
+		motor->SetMaxRpm(m_configuration.m_engine.GetRedLineRadPerSec() * dRadPerSecToRpm);
 
 		// add the gear box
-		AddGearBox(m_motor, differential);
+		ndMultiBodyVehicleGearBox* const gearBox = AddGearBox(m_motor, differential);
+		gearBox->SetIdleOmega(m_configuration.m_engine.GetIdleRadPerSec() * dRadPerSecToRpm);
 
 		// set a soft or hard mode
 		SetVehicleSolverModel(m_configuration.m_useHardSolverMode ? true : false);

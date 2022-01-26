@@ -23,8 +23,8 @@ include_directories(../../sdk/dNewton/)
 include_directories(../../sdk/dTinyxml/)
 include_directories(../../sdk/dCollision/)
 include_directories(../../sdk/dNewton/dJoints)
-include_directories(../../sdk/dNewton/dParticles)
 include_directories(../../sdk/dNewton/dModels)
+include_directories(../../sdk/dNewton/dParticles)
 include_directories(../../sdk/dNewton/dModels/dVehicle)
 include_directories(../../sdk/dNewton/dModels/dCharacter)
 
@@ -48,6 +48,3 @@ endif()
 if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dProfiler)
 endif ()
-
-
-

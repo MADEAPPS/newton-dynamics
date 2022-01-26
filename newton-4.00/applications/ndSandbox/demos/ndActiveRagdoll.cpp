@@ -437,7 +437,7 @@ class ndActiveRagdollModel : public ndCharacter
 	//ndCharacterBipedPoseController m_bipedController;
 };
 
-static void TestPlayerCapsuleInteaction(ndDemoEntityManager* const scene, const ndMatrix& location)
+static void TestPlayerCapsuleInteraction(ndDemoEntityManager* const scene, const ndMatrix& location)
 {
 	ndMatrix localAxis(dGetIdentityMatrix());
 	localAxis[0] = ndVector(0.0, 1.0f, 0.0f, 0.0f);
@@ -472,7 +472,7 @@ void ndActiveRagdoll (ndDemoEntityManager* const scene)
 	scene->GetWorld()->AddModel(ragdoll);
 
 	matrix.m_posit.m_x += 1.4f;
-	TestPlayerCapsuleInteaction(scene, matrix);
+	TestPlayerCapsuleInteraction(scene, matrix);
 
 	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_y += 2.0f;

@@ -34,6 +34,7 @@ class ndMultiBodyVehicleGearBox : public ndJointGear
 	D_NEWTON_API ndMultiBodyVehicleGearBox(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, ndMultiBodyVehicle* const chassis);
 
+	D_NEWTON_API void SetIdleOmega(ndFloat32 rpm);
 	D_NEWTON_API void SetClutchTorque(ndFloat32 torqueInNewtonMeters);
 	D_NEWTON_API void SetInternalLosesTorque(ndFloat32 torqueInNewtonMeters);
 
@@ -43,6 +44,7 @@ class ndMultiBodyVehicleGearBox : public ndJointGear
 	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	ndMultiBodyVehicle* m_chassis;
+	ndFloat32 m_idleOmega;
 	ndFloat32 m_clutchTorque;
 	ndFloat32 m_driveTrainResistanceTorque;
 	friend class ndMultiBodyVehicle;

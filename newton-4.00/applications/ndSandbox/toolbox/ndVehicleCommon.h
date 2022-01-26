@@ -38,12 +38,10 @@ class ndVehicleDectriptor
 		public:
 		ndEngineTorqueCurve();
 	
-		void Init(ndFloat32 fuelInjectionRate,
-			ndFloat32 idleTorquePoundFoot, ndFloat32 idleRmp,
+		void Init(ndFloat32 idleTorquePoundFoot, ndFloat32 idleRmp,
 			ndFloat32 horsePower, ndFloat32 rpm0, ndFloat32 rpm1,
 			ndFloat32 horsePowerAtRedLine, ndFloat32 redLineRpm);
 
-		ndFloat32 GetFuelRate() const;
 		ndFloat32 GetIdleRadPerSec() const;
 		ndFloat32 GetRedLineRadPerSec() const;
 		ndFloat32 GetLowGearShiftRadPerSec() const;
@@ -52,7 +50,7 @@ class ndVehicleDectriptor
 	
 		private:
 		ndTorqueTap m_torqueCurve[5];
-		ndFloat32 m_fuelInjectionRate;
+		//ndFloat32 m_fuelInjectionRate;
 	};
 
 	class ndGearBox
@@ -164,6 +162,8 @@ class ndBasicVehicle : public ndMultiBodyVehicle
 	ndInt32 m_autoGearShiftTimer;
 	bool m_isPlayer;
 	bool m_isParked;
+	bool m_startEngine;
+	bool m_startEngineMemory;
 	bool m_isManualTransmission;
 };
 

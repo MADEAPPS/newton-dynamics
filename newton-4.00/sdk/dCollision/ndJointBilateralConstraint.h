@@ -86,7 +86,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	void SetLowerFriction(ndConstraintDescritor& desc, ndFloat32 friction);
 	void SetMotorAcceleration(ndConstraintDescritor& desc, ndFloat32 acceleration);
 	ndFloat32 GetDiagonalRegularizer(const ndConstraintDescritor& desc) const;
-	void SetDiagonalRegularizer(ndConstraintDescritor& desc, ndFloat32 stiffness);
+	void SetDiagonalRegularizer(ndConstraintDescritor& desc, ndFloat32 regularizer);
 
 	bool IsSkeleton() const;
 
@@ -284,12 +284,12 @@ inline ndFloat32 ndJointBilateralConstraint::GetDiagonalRegularizer(const ndCons
 	return desc.m_diagonalRegularizer[index];
 }
 
-inline void ndJointBilateralConstraint::SetDiagonalRegularizer(ndConstraintDescritor& desc, ndFloat32 stiffness)
+inline void ndJointBilateralConstraint::SetDiagonalRegularizer(ndConstraintDescritor& desc, ndFloat32 regularizer)
 {
 	const ndInt32 index = desc.m_rowsCount - 1;
 	dAssert(index >= 0);
 	dAssert(index < ndInt32(m_maxDof));
-	desc.m_diagonalRegularizer[index] = dClamp(stiffness, ndFloat32(0.0f), ndFloat32(1.0f));
+	desc.m_diagonalRegularizer[index] = dClamp(regularizer, ndFloat32(0.0f), ndFloat32(1.0f));
 }
 
 inline bool ndJointBilateralConstraint::IsSkeleton() const

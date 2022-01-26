@@ -31,6 +31,7 @@ D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndMultiBodyVehicleGearBox)
 ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential, ndMultiBodyVehicle* const chassis)
 	:ndJointGear(ndFloat32 (1.0f), motor->GetMatrix().m_front, differential,	motor->GetMatrix().m_front, motor)
 	,m_chassis(chassis)
+	,m_idleOmega(ndFloat32(1.0f))
 	,m_clutchTorque(ndFloat32 (1.0e5f))
 	,m_driveTrainResistanceTorque(ndFloat32(1000.0f))
 {
@@ -41,13 +42,20 @@ ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(ndBodyKinematic* const moto
 ndMultiBodyVehicleGearBox::ndMultiBodyVehicleGearBox(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndJointGear(ndLoadSaveBase::ndLoadDescriptor(desc))
 	,m_chassis(nullptr)
+	,m_idleOmega(ndFloat32(1.0f))
 	,m_clutchTorque(ndFloat32(1.0e5f))
 	,m_driveTrainResistanceTorque(ndFloat32(1000.0f))
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
+	m_idleOmega = xmlGetFloat(xmlNode, "idleOmega");
 	m_clutchTorque = xmlGetFloat(xmlNode, "clutchTorque");
 	m_driveTrainResistanceTorque = xmlGetFloat(xmlNode, "driveTrainResistanceTorque");
+}
+
+void ndMultiBodyVehicleGearBox::SetIdleOmega(ndFloat32 rpm)
+{
+	m_idleOmega = dMax(rpm / dRadPerSecToRpm, ndFloat32(0.0f));
 }
 
 void ndMultiBodyVehicleGearBox::SetClutchTorque(ndFloat32 torqueInNewtonMeters)
@@ -74,7 +82,7 @@ void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 		
 		ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
 		ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
-
+		
 		ndFloat32 gearRatio = ndFloat32(1.0f) / m_gearRatio;
 		
 		jacobian0.m_angular = matrix0.m_front;
@@ -82,18 +90,15 @@ void ndMultiBodyVehicleGearBox::JacobianDerivative(ndConstraintDescritor& desc)
 		
 		const ndVector& omega0 = m_body0->GetOmega();
 		const ndVector& omega1 = m_body1->GetOmega();
+		const ndFloat32 idleOmega = m_idleOmega * gearRatio * ndFloat32(0.95f);
 		
-		dAssert(m_chassis->m_motor);
-		ndMultiBodyVehicleMotor* const rotor = m_chassis->m_motor;
-		ndFloat32 idleOmega = rotor->m_idleOmega * gearRatio * ndFloat32(0.95f);
-
 		ndFloat32 w0 = omega0.DotProduct(jacobian0.m_angular).GetScalar();
 		ndFloat32 w1 = omega1.DotProduct(jacobian1.m_angular).GetScalar() + idleOmega;
 		w1 = (gearRatio > ndFloat32(0.0f)) ? dMin(w1, ndFloat32(0.0f)) : dMax(w1, ndFloat32(0.0f));
 		
 		const ndFloat32 w = (w0 + w1) * ndFloat32(0.5f);
 		SetMotorAcceleration(desc, -w * desc.m_invTimestep);
-
+		
 		if (m_gearRatio > ndFloat32 (0.0f))
 		{
 			SetHighFriction(desc, m_clutchTorque);

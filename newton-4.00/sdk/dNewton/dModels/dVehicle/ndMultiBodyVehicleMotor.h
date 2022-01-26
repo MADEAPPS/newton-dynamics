@@ -34,16 +34,11 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 	D_NEWTON_API ndMultiBodyVehicleMotor(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_NEWTON_API ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndMultiBodyVehicle* const vehicelModel);
 
-	bool GetStart() const;
-	ndFloat32 GetRpm() const;
-
-	D_NEWTON_API void SetStart(bool startkey);
-	D_NEWTON_API void SetThrottle(ndFloat32 param);
-
-	D_NEWTON_API void SetRpmLimits(ndFloat32 idle, ndFloat32 redLineRpm);
-
-	D_NEWTON_API void SetFuelRate(ndFloat32 radPerSecondsStep);
-	D_NEWTON_API void SetTorque(ndFloat32 torqueInNewtonMeters);
+	D_NEWTON_API ndFloat32 GetRpm() const;
+	D_NEWTON_API void SetMaxRpm(ndFloat32 redLineRpm);
+	D_NEWTON_API void SetOmegaAccel(ndFloat32 rpmStep);
+	D_NEWTON_API void SetFrictionLose(ndFloat32 newtonMeters);
+	D_NEWTON_API void SetTorqueAndRpm(ndFloat32 rpm, ndFloat32 newtonMeters);
 
 	private:
 	void AlignMatrix();
@@ -55,24 +50,14 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 	protected:
 	ndFloat32 m_omega;
 	ndFloat32 m_maxOmega;
-	ndFloat32 m_idleOmega;
-	ndFloat32 m_throttle;
+	ndFloat32 m_omegaStep;
+	ndFloat32 m_targetOmega;
 	ndFloat32 m_engineTorque;
-	ndFloat32 m_fuelValveRate;
+	ndFloat32 m_internalFriction;
+	
 	ndMultiBodyVehicle* m_vehicelModel;
-	bool m_startEngine;
 	friend class ndMultiBodyVehicle;
 	friend class ndMultiBodyVehicleGearBox;
 };
-
-inline bool ndMultiBodyVehicleMotor::GetStart() const
-{
-	return m_startEngine;
-}
-
-inline ndFloat32 ndMultiBodyVehicleMotor::GetRpm() const
-{
-	return m_omega * dRadPerSecToRpm;
-}
 
 #endif
