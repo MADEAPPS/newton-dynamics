@@ -160,8 +160,8 @@ ndShapeInstance& ndShapeInstance::operator=(const ndShapeInstance& instance)
 	m_shapeMaterial = instance.m_shapeMaterial;
 	m_skinThickness = instance.m_skinThickness;
 	m_collisionMode = instance.m_collisionMode;
-
-	m_shape->Release();
+	if(m_shape != nullptr)
+		m_shape->Release();
 	m_shape = instance.m_shape->AddRef();
 	m_ownerBody = instance.m_ownerBody;
 
