@@ -78,24 +78,24 @@ class ndContactNotify: public ndClassAlloc
 	{
 	}
 
-	virtual ndMaterial GetMaterial(const ndContact* const, const ndShapeInstance&, const ndShapeInstance&) const
+	virtual ndMaterial GetMaterial(const ndContact* const contact, const ndShapeInstance& shapeA, ndShapeInstance& shapeB) const
 	{
 		return ndMaterial();
 	}
 
 	//bool OnCompoundSubShapeOverlap(const ndContact* const contact, ndFloat32 timestep, const ndShapeInstance* const subShapeA, const ndShapeInstance* const subShapeB);
-	bool OnCompoundSubShapeOverlap(const ndContact* const, ndFloat32, const ndShapeInstance* const, const ndShapeInstance* const)
+	virtual bool OnCompoundSubShapeOverlap(const ndContact* const contact, ndFloat32 timestep, const ndShapeInstance* const subShapeA, const ndShapeInstance* const subShapeB)
 	{
 		return true;
 	}
 
 	//virtual bool OnAabbOverlap(const ndContact* const contact, ndFloat32 timestep)
-	virtual bool OnAabbOverlap(const ndContact* const, ndFloat32)
+	virtual bool OnAabbOverlap(const ndContact* const contact, ndFloat32 timestep)
 	{
 		return true;
 	}
 
-	virtual void OnContactCallback(ndInt32, const ndContact* const, ndFloat32)
+	virtual void OnContactCallback(ndInt32 threadIndex, const ndContact* const contact, ndFloat32 timestep)
 	{
 	}
 
