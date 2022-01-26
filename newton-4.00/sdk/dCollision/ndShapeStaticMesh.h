@@ -120,7 +120,10 @@ class ndShapeStaticMesh: public ndShape
 	D_COLLISION_API ndShapeStaticMesh(const ndLoadSaveBase::ndLoadDescriptor& desc);
 	D_COLLISION_API virtual ~ndShapeStaticMesh();
 
+	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
+	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
+	D_COLLISION_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 
 	protected:
 	virtual ndFloat32 GetVolume() const;
@@ -135,10 +138,6 @@ class ndShapeStaticMesh: public ndShape
 
 	D_COLLISION_API virtual void CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVector& p1) const;
 	D_COLLISION_API ndInt32 CalculatePlaneIntersection(const ndFloat32* const vertex, const ndInt32* const index, ndInt32 indexCount, ndInt32 strideInFloat, const ndPlane& localPlane, ndVector* const contactsOut) const;
-	D_COLLISION_API void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
-
-	virtual void DebugShape(const ndMatrix& matrix, ndShapeDebugNotify& debugCallback) const;
-	virtual ndFloat32 RayCast(ndRayCastNotify& callback, const ndVector& localP0, const ndVector& localP1, ndFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
 	D_MSV_NEWTON_ALIGN_32 
 	class ndMeshVertexListIndexList
