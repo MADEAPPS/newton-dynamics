@@ -290,6 +290,44 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 }
 #endif
 
+void RenderPolygon(ndDemoEntityManager* const scene, const ndVector* const points, ndInt32 count, const ndVector& color)
+{
+	GLuint shader = scene->GetShaderCache().m_wireFrame;
+
+	ndDemoCamera* const camera = scene->GetCamera();
+	const glMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+
+	glUseProgram(shader);
+
+	ndInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	ndInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+
+	glVector3 line[64];
+
+	glVector4 colorgl(color);
+	glUniform4fv(shadeColorLocation, 1, &colorgl[0]);
+
+	ndInt32 i0 = count - 1;
+	for (ndInt32 i = 0; i < count; ++i)
+	{
+		line[i * 2 + 0].m_x = GLfloat(points[i0].m_x);
+		line[i * 2 + 0].m_y = GLfloat(points[i0].m_y);
+		line[i * 2 + 0].m_z = GLfloat(points[i0].m_z);
+		line[i * 2 + 1].m_x = GLfloat(points[i].m_x);
+		line[i * 2 + 1].m_y = GLfloat(points[i].m_y);
+		line[i * 2 + 1].m_z = GLfloat(points[i].m_z);
+		i0 = i;
+	}
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, sizeof(glVector3), line);
+
+	glDrawArrays(GL_LINES, 0, count * 2);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glUseProgram(0);
+}
+
 void RenderBodyFrame(ndDemoEntityManager* const scene)
 {
 	ndWorld* const world = scene->GetWorld();
@@ -347,6 +385,7 @@ void RenderBodyFrame(ndDemoEntityManager* const scene)
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glUseProgram(0);
 }
+
 void RenderCenterOfMass(ndDemoEntityManager* const scene)
 {
 	ndWorld* const world = scene->GetWorld();

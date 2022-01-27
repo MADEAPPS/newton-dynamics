@@ -54,7 +54,6 @@ void ClearDebugDisplay(NewtonWorld* const world);
 void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, dInt32 faceID, dInt32 vertexCount, const dFloat32* const vertex, dInt32 vertexstrideInBytes);
 #endif
 
-
 void RenderParticles(ndDemoEntityManager* const scene);
 void RenderWorldScene(ndDemoEntityManager* const scene);
 void RenderBodiesAABB(ndDemoEntityManager* const scene);
@@ -63,6 +62,7 @@ void RenderCenterOfMass(ndDemoEntityManager* const scene);
 void RenderContactPoints(ndDemoEntityManager* const scene);
 void RenderJointsDebugInfo(ndDemoEntityManager* const scene);
 void RenderModelsDebugInfo(ndDemoEntityManager* const scene);
+void RenderPolygon(ndDemoEntityManager* const scene, const ndVector* const points, ndInt32 count, const ndVector& color);
 
 #endif
 

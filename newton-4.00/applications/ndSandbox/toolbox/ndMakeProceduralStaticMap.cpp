@@ -36,7 +36,54 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 		ndDebugNotify& debugDraw = (ndDebugNotify&)notify;
 		ndBodyKinematic* const body = debugDraw.m_body;
 		ndDemoEntityManager* const scene = debugDraw.m_manager;
+		
 		// this demo will iterate over the all the body contact pairs drawing the face in aabb.
+		ndArray<ndVector> vertex;
+		ndArray<ndInt32> faceList;
+		ndArray<ndInt32> faceMaterial;
+		ndArray<ndInt32> indexListList;
+
+		ndBodyKinematic::ndContactMap& contactJoints = body->GetContactMap();
+		ndBodyKinematic::ndContactMap::Iterator it(contactJoints);
+		for (it.Begin(); it; it++)
+		{
+			const ndContact* const contact = it.GetNode()->GetInfo();
+			if (contact->IsActive())
+			{
+				ndBodyKinematic* const body0 = contact->GetBody0();
+				ndShapeInstance& collision = body0->GetCollisionShape();
+
+				ndVector minP; 
+				ndVector maxP;
+				ndMatrix matrix(body0->GetMatrix());
+				//collision.CalculateAabb(matrix.Inverse(), minP, maxP);
+				collision.CalculateAabb(matrix, minP, maxP);
+
+				vertex.SetCount(0);
+				faceList.SetCount(0);
+				faceMaterial.SetCount(0);
+				indexListList.SetCount(0);
+				GetCollidingFaces(minP, maxP, vertex, faceList, faceMaterial, indexListList);
+
+				ndInt32 index = 0;
+				ndVector color(50.0f / 255.0f, 100.0f / 255.0f, 200.0f / 255.0f, 1.0f);
+
+				for (ndInt32 i = 0; i < faceList.GetCount(); i++)
+				{
+					ndVector points[32];
+					ndInt32 vCount = faceList[i];
+					for (ndInt32 j = 0; j < vCount; j++)
+					{
+						ndInt32 k = indexListList[index + j];
+						points[j] = vertex[k];
+					}
+
+					// I do not know why this is not rendering
+					//RenderPolygon(scene, points, vCount, color);
+					index += vCount;
+				}
+			}
+		}
 	}
 
 	virtual ndFloat32 RayCast(ndRayCastNotify&, const ndVector& localP0, const ndVector& localP1, ndFloat32, const ndBody* const, ndContactPoint& contactOut) const
