@@ -226,11 +226,11 @@ inline ndMatrix ndShapeInstance::GetScaledTransform(const ndMatrix& matrix) cons
 	return m_aligmentMatrix * scaledMatrix;
 }
 
-inline ndVector ndShapeInstance::SupportVertex(const ndVector& dir) const
+inline ndVector ndShapeInstance::SupportVertex(const ndVector& inDir) const
 {
+	const ndVector dir(inDir & ndVector::m_triplexMask);
 	dAssert(dir.m_w == ndFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
-	dAssert(dir.m_w == ndFloat32(0.0f));
 	switch (m_scaleType)
 	{
 		case m_unit:
@@ -257,11 +257,11 @@ inline ndVector ndShapeInstance::SupportVertex(const ndVector& dir) const
 	}
 }
 
-inline ndVector ndShapeInstance::SupportVertexSpecial(const ndVector& dir, ndInt32* const vertexIndex) const
+inline ndVector ndShapeInstance::SupportVertexSpecial(const ndVector& inDir, ndInt32* const vertexIndex) const
 {
+	const ndVector dir(inDir & ndVector::m_triplexMask);
 	dAssert(dir.m_w == ndFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
-	dAssert(dir.m_w == ndFloat32(0.0f));
 	switch (m_scaleType)
 	{
 		case m_unit:
@@ -278,8 +278,9 @@ inline ndVector ndShapeInstance::SupportVertexSpecial(const ndVector& dir, ndInt
 	}
 }
 
-inline ndVector ndShapeInstance::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const
+inline ndVector ndShapeInstance::SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& inDir) const
 {
+	const ndVector dir(inDir & ndVector::m_triplexMask);
 	dAssert(dir.m_w == ndFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-2f));
 	switch (m_scaleType)
