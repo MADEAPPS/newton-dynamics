@@ -151,6 +151,7 @@ class ndShapeInstance: public ndClassAlloc
 	const ndVector& GetInvScale() const;
 	D_COLLISION_API void SetScale(const ndVector& scale);
 	D_COLLISION_API void SetGlobalScale(const ndVector& scale);
+	D_COLLISION_API void SetGlobalScale(const ndMatrix& scaleMatrix);
 	D_COLLISION_API ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 
 	ndFloat32 GetVolume() const;
