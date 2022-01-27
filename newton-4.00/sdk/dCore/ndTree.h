@@ -221,7 +221,8 @@ class ndTree: public ndClassAlloc
 		KEY GetKey () const
 		{
 			ndNode* const tmp = (ndNode*)m_ptr;
-			return tmp ? tmp->GetKey() : KEY(0);
+			//return tmp ? tmp->GetKey() : KEY(0);
+			return tmp ? tmp->GetKey() : KEY();
 		}
 
 		private:

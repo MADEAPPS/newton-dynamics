@@ -124,6 +124,10 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	{
 		return;
 	}
+	if (faceList.GetCount() > D_MAX_COLLIDING_FACES)
+	{
+		faceList.SetCount(D_MAX_COLLIDING_FACES);
+	}
 
 	ndThreadId threadId = ndGetThreadId();
 	ndList<ndLocalThreadData>::ndNode* localDataNode = nullptr;
@@ -145,13 +149,17 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	// scan the vertices's intersected by the box extend
 	ndArray<ndVector>& vertex = localDataNode->GetInfo().m_vertex;
 	vertex.SetCount(vertexList.GetCount() + faceList.GetCount());
-	memcpy(&vertex[0], &vertexList[0], vertexList.GetCount() * sizeof(ndVector));
 	
 	ndEdgeMap edgeMap;
 	ndInt32 index = 0;
 	ndInt32 faceStart = 0;
 	ndInt32* const indices = data->m_globalFaceVertexIndex;
 	ndInt32* const faceIndexCount = data->m_meshData.m_globalFaceIndexCount;
+
+	for (ndInt32 i = 0; i < vertexList.GetCount(); ++i)
+	{
+		vertex[i] = vertexList[i];
+	}
 	
 	for (ndInt32 i = 0; i < faceList.GetCount(); ++i)
 	{
@@ -168,31 +176,38 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 			edge0 = edge1;
 		}
 
-		ndFloat32 faceSize = ndSqrt(area.DotProduct(area).GetScalar());
+		ndFloat32 faceSize = ndSqrt(area.DotProduct(area & ndVector::m_triplexMask).GetScalar());
 		ndInt32 normalIndex = vertexList.GetCount() + i;
 
-		vertex[normalIndex] = area.Scale (ndFloat32 (1.0f) / faceSize);
+		const ndVector normal(area.Scale(ndFloat32(1.0f) / faceSize));
+		vertex[normalIndex] = normal;
+
+		const ndPlane plane(normal, -normal.DotProduct(vertex[i0]).GetScalar());
 
 		indices[index + faceList[i] + 0] = faceMaterialList[i];
 		indices[index + faceList[i] + 1] = normalIndex;
 		indices[index + 2 * faceList[i] + 2] = ndInt32(faceSize * ndFloat32(0.5f));
 
 		ndInt32 j0 = faceList[i] - 1;
-		faceIndexCount[i] = faceList[i];
-		for (ndInt32 j = 0; j < faceList[i]; ++j) 
+		ndInt32 testIndex = j0 - 1;
+		const ndInt32 faceVectexCount = faceList[i];
+		faceIndexCount[i] = faceVectexCount;
+		for (ndInt32 j1 = 0; j1 < faceVectexCount; ++j1)
 		{
-			ndEdge edge;
-			edge.m_i0 = indexList[faceStart + j0];
-			edge.m_i1 = indexList[faceStart + j];
-			ndInt32 normalEntryIndex = index + j + faceList[i] + 2;
+			ndInt32 k0 = indexList[faceStart + j0];
+			ndInt32 k1 = indexList[faceStart + j1];
+			ndInt32 test = indexList[faceStart + testIndex];
+			const ndEdge edge(k0, k1, plane, test);
+			ndInt32 normalEntryIndex = index + j1 + faceVectexCount + 2;
 			edgeMap.Insert(normalEntryIndex, edge);
 
-			indices[index + j] = indexList[faceStart + j];
+			indices[index + j1] = indexList[faceStart + j0];
 			indices[normalEntryIndex] = normalIndex;
 
-			j0 = j;
+			testIndex = j0;
+			j0 = j1;
 		}
-		faceStart += faceList[i];
+		faceStart += faceVectexCount;
 		index += faceList[i] * 2 + 3;
 	}
 
@@ -202,14 +217,19 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 		ndEdgeMap::ndNode* const edgeNode = iter.GetNode();
 		if (edgeNode->GetInfo() != -1)
 		{
-			ndEdge twin(iter.GetKey());
-			dSwap(twin.m_i0, twin.m_i1);
-			ndEdgeMap::ndNode* const twinNode = edgeMap.Find(twin);
+			ndEdge edge(iter.GetKey());
+			dSwap(edge.m_i0, edge.m_i1);
+			ndEdgeMap::ndNode* const twinNode = edgeMap.Find(edge);
 			if (twinNode)
 			{
-				ndInt32 i0 = edgeNode->GetInfo();
-				ndInt32 i1 = twinNode->GetInfo();
-				dSwap(indices[i0], indices[i1]);
+				const ndPlane& plane = twinNode->GetKey().m_plane;
+				ndFloat32 dist = plane.Evalue(vertex[edge.m_testIndex]);
+				if (dist < -ndFloat32(1.0e-3f))
+				{
+					ndInt32 i0 = edgeNode->GetInfo();
+					ndInt32 i1 = twinNode->GetInfo();
+					dSwap(indices[i0], indices[i1]);
+				}
 				twinNode->GetInfo() = -1;
 			}
 		}
@@ -223,7 +243,7 @@ void ndShapeStaticProceduralMesh::GetCollidingFaces(ndPolygonMeshDesc* const dat
 	
 	ndInt32* const address = data->m_meshData.m_globalFaceIndexStart;
 	ndFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
-	if (data->m_doContinuesCollisionTest) 
+	if (data->m_doContinueCollisionTest) 
 	{
 		dAssert(0);
 		//dFastRay ray(ndVector::m_zero, data->m_boxDistanceTravelInMeshSpace);

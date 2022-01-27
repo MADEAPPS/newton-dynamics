@@ -54,7 +54,7 @@ class ndPolygonMeshDesc: public ndFastAabb
 		:ndFastAabb()
 		,m_boxDistanceTravelInMeshSpace(ndFloat32 (0.0f))
 		,m_maxT(ndFloat32 (1.0f))
-		,m_doContinuesCollisionTest(false)
+		,m_doContinueCollisionTest(false)
 	{
 	}
 
@@ -107,7 +107,7 @@ class ndPolygonMeshDesc: public ndFastAabb
 	const ndShapeStaticMesh* m_me;
 	ndInt32 m_globalIndexCount;
 	ndFloat32 m_maxT;
-	bool m_doContinuesCollisionTest;
+	bool m_doContinueCollisionTest;
 	ndInt32 m_globalFaceVertexIndex[D_MAX_COLLIDING_INDICES];
 	ndMesh m_meshData;
 } D_GCC_NEWTON_ALIGN_32;
@@ -211,7 +211,7 @@ inline void ndPolygonMeshDesc::SetDistanceTravel(const ndVector& distanceInGloba
 	m_boxDistanceTravelInMeshSpace = m_polySoupInstance->GetInvScale() * soupMatrix.UnrotateVector(distanceInGlobalSpace * m_convexInstance->GetInvScale());
 	if (m_boxDistanceTravelInMeshSpace.DotProduct(m_boxDistanceTravelInMeshSpace).GetScalar() < ndFloat32(1.0e-2f))
 	{
-		m_doContinuesCollisionTest = false;
+		m_doContinueCollisionTest = false;
 	}
 }
 

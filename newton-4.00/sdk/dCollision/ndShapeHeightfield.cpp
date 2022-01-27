@@ -571,7 +571,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 
 	if (!((maxHeight < boxP0.m_y) || (minHeight > boxP1.m_y))) 
 	{
-		std::thread::id threadId = std::this_thread::get_id();
+		ndThreadId threadId = ndGetThreadId();
 		ndList<ndLocalThreadData>::ndNode* localDataNode = nullptr;
 		for (ndList<ndLocalThreadData>::ndNode* node = m_localData.GetFirst(); node; node = node->GetNext())
 		{
@@ -734,10 +734,6 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 				ndInt32 index1 = (z - z0) * stepBase + triangleIndexBase;
 				if (index1 < maxIndex) 
 				{
-					//const ndInt32 diagBase = m_width * z;
-					//const ndInt32 code = (m_diagonals[diagBase + x] << 1) + m_diagonals[diagBase + m_width + x];
-					//const ndInt32* const edgeMap = &m_verticalEdgeMap[code][0];
-	
 					ndInt32* const triangles = &indices[index1];
 					const ndInt32 i0 = triangles[verticalEdgeMap[0]];
 					const ndInt32 i1 = triangles[verticalEdgeMap[1] + stepBase];
@@ -770,7 +766,7 @@ void ndShapeHeightfield::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 		ndInt32* const address = data->m_meshData.m_globalFaceIndexStart;
 		ndFloat32* const hitDistance = data->m_meshData.m_globalHitDistance;
 	
-		if (data->m_doContinuesCollisionTest) 
+		if (data->m_doContinueCollisionTest) 
 		{
 			ndFastRay ray(ndVector::m_zero, data->m_boxDistanceTravelInMeshSpace);
 			for (ndInt32 i = 0; i < faceCount; i++) 

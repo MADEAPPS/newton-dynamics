@@ -32,9 +32,13 @@ class ndShapeStaticProceduralMesh: public ndShapeStaticMesh
 	{
 		public:
 		ndEdge();
-		ndEdge(ndUnsigned64 key);
+		ndEdge(ndInt32 i0, ndInt32 i1, const ndPlane& plane, ndInt32 testIndex);
+
 		bool operator< (const ndEdge& edge) const;
 		bool operator> (const ndEdge& edge) const;
+
+		ndPlane m_plane;
+		ndInt32 m_testIndex;
 		union
 		{
 			ndUnsigned64 m_key;
@@ -100,8 +104,12 @@ inline ndShapeStaticProceduralMesh::ndEdge::ndEdge()
 {
 }
 
-inline ndShapeStaticProceduralMesh::ndEdge::ndEdge(ndUnsigned64 key)
-	:m_key(key)
+inline ndShapeStaticProceduralMesh::ndEdge::ndEdge(ndInt32 i0, ndInt32 i1, 
+	const ndPlane& plane, ndInt32 testIndex)
+	:m_plane(plane)
+	,m_testIndex(testIndex)
+	,m_i0(i0)
+	,m_i1(i1)
 {
 }
 

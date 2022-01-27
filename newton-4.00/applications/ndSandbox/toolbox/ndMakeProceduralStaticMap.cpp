@@ -35,7 +35,6 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 	{
 		ndDebugNotify& debugDraw = (ndDebugNotify&)notify;
 		ndBodyKinematic* const body = debugDraw.m_body;
-		ndDemoEntityManager* const scene = debugDraw.m_manager;
 		
 		// this demo will iterate over the all the body contact pairs drawing the face in aabb.
 		ndArray<ndVector> vertex;
@@ -43,6 +42,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 		ndArray<ndInt32> faceMaterial;
 		ndArray<ndInt32> indexListList;
 
+		ndMatrix myMatrix(body->GetMatrix());
 		ndBodyKinematic::ndContactMap& contactJoints = body->GetContactMap();
 		ndBodyKinematic::ndContactMap::Iterator it(contactJoints);
 		for (it.Begin(); it; it++)
@@ -57,7 +57,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 				ndVector maxP;
 				ndMatrix matrix(body0->GetMatrix());
 				//collision.CalculateAabb(matrix.Inverse(), minP, maxP);
-				collision.CalculateAabb(matrix, minP, maxP);
+				collision.CalculateAabb(matrix * myMatrix.Inverse(), minP, maxP);
 
 				vertex.SetCount(0);
 				faceList.SetCount(0);
@@ -75,11 +75,11 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 					for (ndInt32 j = 0; j < vCount; j++)
 					{
 						ndInt32 k = indexListList[index + j];
-						points[j] = vertex[k];
+						points[j] = myMatrix.TransformVector(vertex[k]);
 					}
 
 					// I do not know why this is not rendering
-					//RenderPolygon(scene, points, vCount, color);
+					//RenderPolygon(debugDraw.m_manager, points, vCount, color);
 					index += vCount;
 				}
 			}

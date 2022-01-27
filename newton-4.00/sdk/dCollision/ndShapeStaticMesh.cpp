@@ -133,7 +133,7 @@ ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, bool ccdMode)
 	,m_faceIndexStart(nullptr)
 	,m_hitDistance(nullptr)
 	,m_maxT(ndFloat32 (1.0f))
-	,m_doContinuesCollisionTest(ccdMode)
+	,m_doContinueCollisionTest(ccdMode)
 {
 	const ndMatrix& hullMatrix = m_convexInstance->GetGlobalMatrix();
 	const ndMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();
