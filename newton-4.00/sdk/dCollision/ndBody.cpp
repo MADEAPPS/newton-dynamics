@@ -90,13 +90,16 @@ ndBody::ndBody(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	const nd::TiXmlNode* const notifyNode = xmlNode->FirstChild("bodyNotifyClass");
 	if (notifyNode)
 	{
-		const nd::TiXmlNode* node = notifyNode->FirstChild();
-		const char* const className = node->Value();
+		const nd::TiXmlNode* const node = notifyNode->FirstChild();
+		if (node)
+		{
+			const char* const className = node->Value();
 
-		ndLoadSaveBase::ndLoadDescriptor notifyDesc(desc);
-		notifyDesc.m_rootNode = node;
-		m_notifyCallback = D_CLASS_REFLECTION_LOAD_NODE(ndBodyNotify, className, notifyDesc);
-		m_notifyCallback->m_body = this;
+			ndLoadSaveBase::ndLoadDescriptor notifyDesc(desc);
+			notifyDesc.m_rootNode = node;
+			m_notifyCallback = D_CLASS_REFLECTION_LOAD_NODE(ndBodyNotify, className, notifyDesc);
+			m_notifyCallback->m_body = this;
+		}
 	}
 }
 
