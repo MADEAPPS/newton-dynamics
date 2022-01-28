@@ -85,11 +85,11 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	// build a floor
 	//BuildPlayArena(scene);
 	//BuildFlatPlane(scene, true);
-	//BuildFloorBox(scene, dGetIdentityMatrix());
+	BuildFloorBox(scene, dGetIdentityMatrix());
 	//BuildCompoundScene(scene, dGetIdentityMatrix());
 	//BuildGridPlane(scene, 120, 4.0f, 0.0f);
 	//BuildHeightFieldTerrain(scene, heighfieldLocation);
-	BuildProceduralMap(scene, 120, 4.0f, 0.0f);
+	//BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 
 	ndShapeInstance compoundShapeInstance(new ndShapeCompound());
 	CreateBoxCompoundShape(compoundShapeInstance);
