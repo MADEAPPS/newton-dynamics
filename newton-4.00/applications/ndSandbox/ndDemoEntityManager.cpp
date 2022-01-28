@@ -39,7 +39,7 @@
 //#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
-#define DEFAULT_SCENE	3		// basic compound shapes
+//#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
@@ -48,16 +48,18 @@
 //#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	11		// basic joints
-//#define DEFAULT_SCENE	12		// basic rag doll
-//#define DEFAULT_SCENE	13		// active rag doll
-//#define DEFAULT_SCENE	14		// basic vehicle
-//#define DEFAULT_SCENE	15		// heavy vehicle
-//#define DEFAULT_SCENE	16		// simple voronoi fracture
-//#define DEFAULT_SCENE	17		// basic voronoi fracture
-//#define DEFAULT_SCENE	18		// linked voronoi fracture
-//#define DEFAULT_SCENE	19		// skin peel voronoi fracture
+#define DEFAULT_SCENE	12		// basic robot
+//#define DEFAULT_SCENE	13		// basic rag doll
+//#define DEFAULT_SCENE	14		// active rag doll
+//#define DEFAULT_SCENE	15		// basic vehicle
+//#define DEFAULT_SCENE	16		// heavy vehicle
+//#define DEFAULT_SCENE	17		// simple voronoi fracture
+//#define DEFAULT_SCENE	18		// basic voronoi fracture
+//#define DEFAULT_SCENE	19		// linked voronoi fracture
+//#define DEFAULT_SCENE	20		// skin peel voronoi fracture
 						 
 // demos forward declaration 
+void ndBasicRobot(ndDemoEntityManager* const scene);
 void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicRagdoll(ndDemoEntityManager* const scene);
@@ -94,6 +96,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "static mesh", ndStaticMeshCollisionDemo },
 	{ "static user mesh", ndStaticUserMeshCollisionDemo },
 	{ "basic joints", ndBasicJoints },
+	{ "basic robot", ndBasicRobot },
 	{ "basic ragdoll", ndBasicRagdoll },
 	{ "active ragdoll", ndActiveRagdoll },
 	{ "basic vehicle", ndBasicVehicle },
