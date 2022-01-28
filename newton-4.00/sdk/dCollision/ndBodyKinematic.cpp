@@ -198,6 +198,24 @@ void ndBodyKinematic::DetachContact(ndContact* const contact)
 ndJointList::ndNode* ndBodyKinematic::AttachJoint(ndJointBilateralConstraint* const joint)
 {
 	m_equilibrium = 0;
+	#ifdef _DEBUG
+	ndBody* const body0 = joint->GetBody0();
+	ndBody* const body1 = joint->GetBody1();
+	for (ndJointList::ndNode* node = m_jointList.GetFirst(); node; node = node->GetNext())
+	{
+		ndJointBilateralConstraint* const bodyJoint = node->GetInfo();
+		ndBody* const bodyInJoint0 = bodyJoint->GetBody0();
+		ndBody* const bodyInJoint1 = bodyJoint->GetBody1();
+		bool test = (body0 == bodyInJoint0) && (body1 == bodyInJoint1);
+		test = test || ((body1 == bodyInJoint0) && (body0 == bodyInJoint1));
+		if (test)
+		{
+			dTrace(("warning body %d and body %d already connected by a biletaral joint\n", body0->GetId(), body1->GetId()));
+			dAssert(0, "warning bodies conected by joint more than once");
+		}
+	}
+	#endif
+
 	return m_jointList.Append(joint);
 }
 
