@@ -119,7 +119,7 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndSha
 {
 	ndInt32 index = xmlGetInt(xmlNode, "shapeHashId");
 	const ndShapeInstance& cacheInstance = shapesCache.Find(index)->GetInfo();
-		m_shape = cacheInstance.GetShape()->AddRef();
+	m_shape = cacheInstance.GetShape()->AddRef();
 	
 	m_localMatrix = xmlGetMatrix(xmlNode, "localMatrix");
 	m_aligmentMatrix = xmlGetMatrix(xmlNode, "aligmentMatrix");

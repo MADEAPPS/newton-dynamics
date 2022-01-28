@@ -68,7 +68,7 @@ ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const ndLoadSaveBase::n
 	m_maxBox = xmlGetVector3(xmlNode, "maxBox");
 	m_maxFaceCount = xmlGetInt(xmlNode, "maxFaceCount");
 	m_maxVertexCount = xmlGetInt(xmlNode, "maxVertexCount");
-	CalculateLocalObb();
+	//CalculateLocalObb();
 }
 
 ndShapeStaticProceduralMesh::~ndShapeStaticProceduralMesh(void)
