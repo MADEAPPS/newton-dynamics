@@ -207,13 +207,20 @@ bool ndPhysicsWorld::LoadScene(const char* const path)
 		dAssert(body->GetAsBodyKinematic());
 		const ndShapeInstance& collision = body->GetCollisionShape();
 
-		ndDemoMesh* const mesh = new ndDemoMesh("importMesh", m_manager->GetShaderCache(), &collision, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, scale);
 		ndDemoEntity* const entity = new ndDemoEntity(body->GetMatrix(), nullptr);
-		entity->SetMesh(mesh, dGetIdentityMatrix());
+
+		ndShape* const shape = (ndShape*)collision.GetShape();
+		if (!shape->GetAsShapeStaticProceduralMesh())
+		{
+			ndDemoMesh* const mesh = new ndDemoMesh("importMesh", m_manager->GetShaderCache(), &collision, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, scale);
+			entity->SetMesh(mesh, dGetIdentityMatrix());
+			mesh->Release();
+		}
+
 		m_manager->AddEntity(entity);
 
 		body->SetNotifyCallback(new ndDemoEntityNotify(m_manager, entity));
-		mesh->Release();
+		
 	}
 
 	return true;

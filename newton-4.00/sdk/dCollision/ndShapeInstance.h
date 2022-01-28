@@ -125,7 +125,6 @@ class ndShapeInstance: public ndClassAlloc
 
 	D_COLLISION_API static ndVector GetBoxPadding();
 	
-
 	ndShape* GetShape();
 	const ndShape* GetShape() const;
 	void SetShape(ndShape* const shape);

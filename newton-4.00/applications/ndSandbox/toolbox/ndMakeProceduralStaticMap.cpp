@@ -19,16 +19,40 @@
 #include "ndDemoEntityManager.h"
 #include "ndMakeProceduralStaticMap.h"
 
+#define D_USE_PORDEDURAL_COLLISION
+
 class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 {
 	public:
 	D_CLASS_REFLECTION(ndRegularProceduralGrid);
+
 	ndRegularProceduralGrid(ndFloat32 gridSize, ndFloat32 sizex, ndFloat32 sizey, ndFloat32 sizez, const ndVector& planeEquation)
 		:ndShapeStaticProceduralMesh(sizex, sizey, sizez)
 		,m_planeEquation(planeEquation)
 		,m_gridSize(gridSize)
 		,m_invGridSize(ndFloat32 (1.0f)/ m_gridSize)
 	{
+	}
+
+	ndRegularProceduralGrid(const ndLoadSaveBase::ndLoadDescriptor& desc)
+		:ndShapeStaticProceduralMesh(ndLoadSaveBase::ndLoadDescriptor(desc))
+	{
+		const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
+
+		m_planeEquation = xmlGetVector3(xmlNode, "planeEquation");
+		m_gridSize = xmlGetFloat(xmlNode, "gridSize");
+		m_invGridSize = ndFloat32 (1.0f) / m_gridSize;
+	}
+
+	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+	{
+		nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
+		desc.m_rootNode->LinkEndChild(childNode);
+		childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+		ndShapeStaticProceduralMesh::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+
+		xmlSaveParam(childNode, "planeEquation", m_planeEquation);
+		xmlSaveParam(childNode, "gridSize", m_gridSize);
 	}
 
 	virtual void DebugShape(const ndMatrix&, ndShapeDebugNotify& notify) const
@@ -139,6 +163,7 @@ class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 	ndFloat32 m_gridSize;
 	ndFloat32 m_invGridSize;
 };
+D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndRegularProceduralGrid)
 
 ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
 {
@@ -234,7 +259,10 @@ ndDemoEntity* BuildVisualEntiry(ndDemoEntityManager* const scene, ndInt32 grids,
 
 ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, ndInt32 grids, ndFloat32 gridSize, ndFloat32 perturbation)
 {
-#if 0
+#ifdef D_USE_PORDEDURAL_COLLISION
+	ndPlane planeEquation(ndVector(0.0f, 1.0f, 0.0f, 0.0f));
+	ndShapeInstance plane(new ndRegularProceduralGrid(gridSize, 2.0f * grids * gridSize, 1.0f, 2.0f * grids * gridSize, planeEquation));
+#else
 	ndVector origin(-grids * gridSize * 0.5f, 0.0f, -grids * gridSize * 0.5f, 0.0f);
 	
 	ndArray<ndVector> points;
@@ -307,9 +335,6 @@ ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, ndInt32 gr
 	}
 	meshBuilder.End(false);
 	ndShapeInstance plane(new ndShapeStatic_bvh(meshBuilder));
-#else
-	ndPlane planeEquation(ndVector(0.0f, 1.0f, 0.0f, 0.0f));
-	ndShapeInstance plane(new ndRegularProceduralGrid(gridSize, 2.0f * grids * gridSize, 1.0f, 2.0f * grids * gridSize, planeEquation));
 #endif
 
 	ndMatrix matrix(dGetIdentityMatrix());

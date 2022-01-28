@@ -64,11 +64,11 @@ ndShapeStaticProceduralMesh::ndShapeStaticProceduralMesh(const ndLoadSaveBase::n
 {
 	const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
 
-	//CalculateLocalObb();
 	m_minBox = xmlGetVector3(xmlNode, "minBox");
 	m_maxBox = xmlGetVector3(xmlNode, "maxBox");
 	m_maxFaceCount = xmlGetInt(xmlNode, "maxFaceCount");
 	m_maxVertexCount = xmlGetInt(xmlNode, "maxVertexCount");
+	CalculateLocalObb();
 }
 
 ndShapeStaticProceduralMesh::~ndShapeStaticProceduralMesh(void)

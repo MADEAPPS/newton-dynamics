@@ -119,15 +119,14 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndSha
 {
 	ndInt32 index = xmlGetInt(xmlNode, "shapeHashId");
 	const ndShapeInstance& cacheInstance = shapesCache.Find(index)->GetInfo();
-	//m_shape = shapesCache.Find(index)->GetInfo()->AddRef();
-	m_shape = cacheInstance.GetShape()->AddRef();
+		m_shape = cacheInstance.GetShape()->AddRef();
 	
 	m_localMatrix = xmlGetMatrix(xmlNode, "localMatrix");
 	m_aligmentMatrix = xmlGetMatrix(xmlNode, "aligmentMatrix");
 	m_skinThickness = xmlGetFloat(xmlNode, "skinThickness");
 	m_collisionMode = xmlGetInt(xmlNode, "collisionMode") ? true : false;
 	m_shapeMaterial.m_userId = xmlGetInt64(xmlNode, "materialID");
-	m_shapeMaterial.m_data.m_alignPad = xmlGetInt64(xmlNode, "materialUserData");
+	m_shapeMaterial.m_data.m_alignPad = xmlGetInt64(xmlNode, "userData");
 	
 	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); i++)
 	{
@@ -145,6 +144,28 @@ ndShapeInstance::~ndShapeInstance()
 	if (m_shape)
 	{
 		m_shape->Release();
+	}
+}
+
+void ndShapeInstance::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
+{
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeInstance");
+	desc.m_rootNode->LinkEndChild(paramNode);
+
+	xmlSaveParam(paramNode, "shapeHashId", desc.m_shapeNodeHash);
+	xmlSaveParam(paramNode, "localMatrix", m_localMatrix);
+	xmlSaveParam(paramNode, "aligmentMatrix", m_aligmentMatrix);
+	xmlSaveParam(paramNode, "scale", m_scale);
+
+	xmlSaveParam(paramNode, "skinThickness", m_skinThickness);
+	xmlSaveParam(paramNode, "collisionMode", m_collisionMode ? 1 : 0);
+	xmlSaveParam(paramNode, "materialID", m_shapeMaterial.m_userId);
+	xmlSaveParam(paramNode, "userData", ndInt64(m_shapeMaterial.m_data.m_alignPad));
+	for (ndInt32 i = 0; i < ndInt32(sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); i++)
+	{
+		char name[64];
+		sprintf(name, "intData%d", i);
+		xmlSaveParam(paramNode, name, ndInt64(m_shapeMaterial.m_userParam[i].m_intData));
 	}
 }
 
@@ -550,28 +571,6 @@ ndFloat32 ndShapeInstance::CalculateBuoyancyCenterOfPresure(ndVector& com, const
 	ndFloat32 volume = com.m_w;
 	com.m_w = ndFloat32(0.0f);
 	return volume;
-}
-
-void ndShapeInstance::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
-{
-	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeInstance");
-	desc.m_rootNode->LinkEndChild(paramNode);
-
-	xmlSaveParam(paramNode, "shapeHashId", desc.m_shapeNodeHash);
-	xmlSaveParam(paramNode, "localMatrix", m_localMatrix);
-	xmlSaveParam(paramNode, "aligmentMatrix", m_aligmentMatrix);
-	xmlSaveParam(paramNode, "scale", m_scale);
-	
-	xmlSaveParam(paramNode, "skinThickness", m_skinThickness);
-	xmlSaveParam(paramNode, "collisionMode", m_collisionMode ? 1 : 0);
-	xmlSaveParam(paramNode, "materialID", m_shapeMaterial.m_userId);
-	xmlSaveParam(paramNode, "materialUserData", ndInt64(m_shapeMaterial.m_data.m_alignPad));
-	for (ndInt32 i = 0; i < ndInt32 (sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0])); i++)
-	{
-		char name[64];
-		sprintf(name, "intData%d", i);
-		xmlSaveParam(paramNode, name, ndInt64(m_shapeMaterial.m_userParam[i].m_intData));
-	}
 }
 
 ndVector ndShapeInstance::GetBoxPadding()
