@@ -92,8 +92,9 @@ void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 	//BuildProceduralMap(scene, 120, 4.0f, 0.0f);
 
 	ndShapeInstance compoundShapeInstance(new ndShapeCompound());
-	compoundShapeInstance.SetScale(ndVector(1.5f, 1.0f, 1.0f, 0.0f));
 	CreateBoxCompoundShape(compoundShapeInstance);
+	compoundShapeInstance.SetScale(ndVector(2.0f, 1.0f, 1.0f, 0.0f));
+
 	ndDemoMeshIntance* const compGeometry = new ndDemoMeshIntance("compoundShape", scene->GetShaderCache(), &compoundShapeInstance, "earthmap.tga", "earthmap.tga", "earthmap.tga");
 	ndDemoInstanceEntity* const compEntity = new ndDemoInstanceEntity(compGeometry);
 	scene->AddEntity(compEntity);

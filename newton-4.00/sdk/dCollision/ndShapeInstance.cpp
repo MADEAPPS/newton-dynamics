@@ -452,16 +452,12 @@ void ndShapeInstance::SetScale(const ndVector& scale)
 
 void ndShapeInstance::SetGlobalScale(const ndMatrix& scaleMatrix)
 {
-	//ndMatrix matrix(dGetIdentityMatrix());
-	//matrix[0][0] = m_scale.m_x;
-	//matrix[1][1] = m_scale.m_y;
-	//matrix[2][2] = m_scale.m_z;
-	ndMatrix matrix (m_aligmentMatrix * scaleMatrix * m_localMatrix);
+	const ndMatrix matrix (m_aligmentMatrix * scaleMatrix * m_localMatrix);
 
 	// extract the original local matrix
-	ndMatrix transpose(matrix.Transpose());
-	ndVector globalScale(ndSqrt(transpose[0].DotProduct(transpose[0]).GetScalar()), ndSqrt(transpose[1].DotProduct(transpose[1]).GetScalar()), ndSqrt(transpose[2].DotProduct(transpose[2]).GetScalar()), ndFloat32(1.0f));
-	ndVector invGlobalScale(ndFloat32(1.0f) / globalScale.m_x, ndFloat32(1.0f) / globalScale.m_y, ndFloat32(1.0f) / globalScale.m_z, ndFloat32(1.0f));
+	const ndMatrix transpose(matrix.Transpose());
+	const ndVector globalScale(ndSqrt(transpose[0].DotProduct(transpose[0]).GetScalar()), ndSqrt(transpose[1].DotProduct(transpose[1]).GetScalar()), ndSqrt(transpose[2].DotProduct(transpose[2]).GetScalar()), ndFloat32(1.0f));
+	const ndVector invGlobalScale(ndFloat32(1.0f) / globalScale.m_x, ndFloat32(1.0f) / globalScale.m_y, ndFloat32(1.0f) / globalScale.m_z, ndFloat32(1.0f));
 	ndMatrix localMatrix(m_aligmentMatrix.Transpose() * m_localMatrix);
 	localMatrix.m_posit = matrix.m_posit * invGlobalScale;
 	dAssert(localMatrix.m_posit.m_w == ndFloat32(1.0f));
@@ -508,63 +504,10 @@ void ndShapeInstance::SetGlobalScale(const ndMatrix& scaleMatrix)
 void ndShapeInstance::SetGlobalScale(const ndVector& scale)
 {
 	ndMatrix matrix(dGetIdentityMatrix());
-	matrix[0][0] = m_scale.m_x;
-	matrix[1][1] = m_scale.m_y;
-	matrix[2][2] = m_scale.m_z;
+	matrix[0][0] = scale.m_x;
+	matrix[1][1] = scale.m_y;
+	matrix[2][2] = scale.m_z;
 	SetGlobalScale(matrix);
-
-	//matrix = m_aligmentMatrix * matrix * m_localMatrix;
-	//
-	//// extract the original local matrix
-	//ndMatrix transpose(matrix.Transpose());
-	//ndVector globalScale(ndSqrt(transpose[0].DotProduct(transpose[0]).GetScalar()), ndSqrt(transpose[1].DotProduct(transpose[1]).GetScalar()), ndSqrt(transpose[2].DotProduct(transpose[2]).GetScalar()), ndFloat32(1.0f));
-	//ndVector invGlobalScale(ndFloat32(1.0f) / globalScale.m_x, ndFloat32(1.0f) / globalScale.m_y, ndFloat32(1.0f) / globalScale.m_z, ndFloat32(1.0f));
-	//ndMatrix localMatrix(m_aligmentMatrix.Transpose() * m_localMatrix);
-	//localMatrix.m_posit = matrix.m_posit * invGlobalScale;
-	//dAssert(localMatrix.m_posit.m_w == ndFloat32(1.0f));
-	//
-	//if ((dAbs(scale[0] - scale[1]) < ndFloat32(1.0e-4f)) && (dAbs(scale[0] - scale[2]) < ndFloat32(1.0e-4f))) 
-	//{
-	//	m_localMatrix = localMatrix;
-	//	m_localMatrix.m_posit = m_localMatrix.m_posit * scale | ndVector::m_wOne;
-	//	m_aligmentMatrix = dGetIdentityMatrix();
-	//	SetScale(scale);
-	//}
-	//else 
-	//{
-	//	// create a new scale matrix 
-	//	localMatrix[0] = localMatrix[0] * scale;
-	//	localMatrix[1] = localMatrix[1] * scale;
-	//	localMatrix[2] = localMatrix[2] * scale;
-	//	localMatrix[3] = localMatrix[3] * scale;
-	//	localMatrix[3][3] = ndFloat32(1.0f);
-	//
-	//	// decompose into to align * scale * local
-	//	localMatrix.PolarDecomposition(m_localMatrix, m_scale, m_aligmentMatrix);
-	//
-	//	m_localMatrix = m_aligmentMatrix * m_localMatrix;
-	//	m_aligmentMatrix = m_aligmentMatrix.Transpose();
-	//
-	//	dAssert(m_localMatrix.TestOrthogonal());
-	//	dAssert(m_aligmentMatrix.TestOrthogonal());
-	//
-	//	//ndMatrix xxx1 (dgGetIdentityMatrix());
-	//	//xxx1[0][0] = m_scale.m_x;
-	//	//xxx1[1][1] = m_scale.m_y;
-	//	//xxx1[2][2] = m_scale.m_z;
-	//	//ndMatrix xxx (m_aligmentMatrix * xxx1 * m_localMatrix);
-	//
-	//	bool isIdentity = true;
-	//	for (ndInt32 i = 0; i < 3; i++) 
-	//	{
-	//		isIdentity &= dAbs(m_aligmentMatrix[i][i] - ndFloat32(1.0f)) < ndFloat32(1.0e-5f);
-	//		isIdentity &= dAbs(m_aligmentMatrix[3][i]) < ndFloat32(1.0e-5f);
-	//	}
-	//	m_scaleType = isIdentity ? m_nonUniform : m_global;
-	//
-	//	m_maxScale = dMax(dMax(m_scale[0], m_scale[1]), m_scale[2]);
-	//	m_invScale = ndVector(ndFloat32(1.0f) / m_scale[0], ndFloat32(1.0f) / m_scale[1], ndFloat32(1.0f) / m_scale[2], ndFloat32(0.0f));
-	//}
 }
 
 ndFloat32 ndShapeInstance::CalculateBuoyancyCenterOfPresure(ndVector& com, const ndMatrix& matrix, const ndVector& fluidPlane) const
