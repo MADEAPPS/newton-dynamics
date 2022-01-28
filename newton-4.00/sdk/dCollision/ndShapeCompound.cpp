@@ -1161,11 +1161,20 @@ void ndShapeCompound::SetSubShapeOwner(ndBodyKinematic* const body)
 void ndShapeCompound::ApplyScale(const ndVector& scale)
 {
 	ndTreeArray::Iterator iter(m_array);
+
+	ndMatrix scaleMatrix(dGetIdentityMatrix());
+	scaleMatrix[0][0] = scale.m_x;
+	scaleMatrix[1][1] = scale.m_y;
+	scaleMatrix[1][1] = scale.m_z;
+	ndVector resetScale(ndVector::m_one);
 	for (iter.Begin(); iter; iter++) 
 	{
 		ndNodeBase* const node = iter.GetNode()->GetInfo();
 		ndShapeInstance* const collision = node->GetShape();
-		collision->SetGlobalScale(scale);
+		const ndMatrix matrix(collision->GetScaledTransform(scaleMatrix));
+		collision->SetGlobalScale(resetScale);
+		collision->SetLocalMatrix(dGetIdentityMatrix());
+		collision->SetGlobalScale(matrix);
 	}
 	m_treeEntropy = ndFloat32(0.0f);
 	EndAddRemove();
