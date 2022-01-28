@@ -219,8 +219,8 @@ void ndShapeInstance::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVect
 			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
 			matrix1 = matrix.Inverse() * matrix1;
 
-			ndVector size0((p1 - p0) * ndVector::m_half);
-			ndVector origin(matrix1.TransformVector((p0 + p1) * ndVector::m_half));
+			ndVector size0(ndVector::m_half * (p1 - p0));
+			ndVector origin(matrix1.TransformVector( ndVector::m_half * (p0 + p1)));
 			ndVector size(matrix1.m_front.Abs().Scale(size0.m_x) + matrix1.m_up.Abs().Scale(size0.m_y) + matrix1.m_right.Abs().Scale(size0.m_z));
 
 			p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
@@ -231,13 +231,31 @@ void ndShapeInstance::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVect
 		case m_global:
 		default:
 		{
+			//ndMatrix matrix1__(matrix);
+			//matrix1__[0] = matrix1__[0].Scale(m_scale.m_x);
+			//matrix1__[1] = matrix1__[1].Scale(m_scale.m_y);
+			//matrix1__[2] = matrix1__[2].Scale(m_scale.m_z);
+			//ndVector p0_;
+			//ndVector p1_;
+			//m_shape->CalculateAabb(m_aligmentMatrix * matrix1__, p0_, p1_);
+			//p0_ -= m_padding;
+			//p1_ += m_padding;
+
+			// but some shape aabb can't take a non orthonormal scaled matrix
+			// need to do a more conservative aabb, will be a little larger, 
 			ndMatrix matrix1(matrix);
 			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
 			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
 			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
-			m_shape->CalculateAabb(m_aligmentMatrix * matrix1, p0, p1);
-			p0 -= m_padding;
-			p1 += m_padding;
+			matrix1 = matrix.Inverse() * m_aligmentMatrix * matrix1;
+
+			ndVector size0(ndVector::m_half * (p1 - p0));
+			ndVector origin(matrix1.TransformVector(ndVector::m_half * (p0 + p1)));
+			ndVector size(matrix1.m_front.Abs().Scale(size0.m_x) + matrix1.m_up.Abs().Scale(size0.m_y) + matrix1.m_right.Abs().Scale(size0.m_z));
+
+			p0 = (origin - size - m_padding) & ndVector::m_triplexMask;
+			p1 = (origin + size + m_padding) & ndVector::m_triplexMask;
+
 			break;
 		}
 	}

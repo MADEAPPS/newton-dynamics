@@ -246,14 +246,14 @@ inline ndVector ndShapeInstance::SupportVertex(const ndVector& inDir) const
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p, n * transp(S)) 
-			ndVector dir1((m_scale * dir).Normalize());
+			const ndVector dir1((m_scale * dir).Normalize());
 			return m_scale * m_shape->SupportVertex(dir1, nullptr);
 		}
 
 		case m_global:
 		default:
 		{
-			ndVector dir1(m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
+			const ndVector dir1(m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
 			return m_scale * m_aligmentMatrix.TransformVector(m_shape->SupportVertex(dir1, nullptr));
 		}
 	}

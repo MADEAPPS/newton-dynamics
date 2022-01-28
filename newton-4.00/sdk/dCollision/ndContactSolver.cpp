@@ -333,9 +333,7 @@ class ndStackEntry
 		ndFloat32 dist2 = data.CalculateDistance2(compoundNode->m_origin, compoundNode->m_size, origin, size);
 		return dist2;
 	}
-
-
-
+	
 	const ndShapeCompound::ndNodeBase* m_node0;
 	const ndShapeCompound::ndNodeBase* m_node1;
 	ndFloat32 m_dist2;
