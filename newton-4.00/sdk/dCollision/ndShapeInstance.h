@@ -220,11 +220,12 @@ inline void ndShapeInstance::SetGlobalMatrix(const ndMatrix& matrix)
 
 inline ndMatrix ndShapeInstance::GetScaledTransform(const ndMatrix& matrix) const
 {
-	ndMatrix scaledMatrix(m_localMatrix * matrix);
-	scaledMatrix[0] = scaledMatrix[0].Scale(m_scale[0]);
-	scaledMatrix[1] = scaledMatrix[1].Scale(m_scale[1]);
-	scaledMatrix[2] = scaledMatrix[2].Scale(m_scale[2]);
-	return m_aligmentMatrix * scaledMatrix;
+	ndMatrix scale(dGetIdentityMatrix());
+	scale[0][0] = m_scale.m_x;
+	scale[1][1] = m_scale.m_y;
+	scale[2][2] = m_scale.m_z;
+	//ndMatrix scaledMatrix(m_localMatrix * matrix);
+	return m_aligmentMatrix * scale * m_localMatrix * matrix;
 }
 
 inline ndVector ndShapeInstance::SupportVertex(const ndVector& inDir) const

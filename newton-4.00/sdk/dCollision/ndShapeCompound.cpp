@@ -1165,14 +1165,12 @@ void ndShapeCompound::ApplyScale(const ndVector& scale)
 	ndMatrix scaleMatrix(dGetIdentityMatrix());
 	scaleMatrix[0][0] = scale.m_x;
 	scaleMatrix[1][1] = scale.m_y;
-	scaleMatrix[1][1] = scale.m_z;
-	ndVector resetScale(ndVector::m_one);
+	scaleMatrix[2][2] = scale.m_z;
 	for (iter.Begin(); iter; iter++) 
 	{
 		ndNodeBase* const node = iter.GetNode()->GetInfo();
 		ndShapeInstance* const collision = node->GetShape();
 		const ndMatrix matrix(collision->GetScaledTransform(scaleMatrix));
-		collision->SetGlobalScale(resetScale);
 		collision->SetLocalMatrix(dGetIdentityMatrix());
 		collision->SetGlobalScale(matrix);
 	}
