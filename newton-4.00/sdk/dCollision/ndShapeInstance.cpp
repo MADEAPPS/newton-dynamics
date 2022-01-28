@@ -231,14 +231,13 @@ void ndShapeInstance::CalculateAabb(const ndMatrix& matrix, ndVector& p0, ndVect
 		case m_global:
 		default:
 		{
-			dAssert(0);
-			//ndMatrix matrix1(matrix);
-			//matrix1[0] = matrix1[0].Scale(m_scale.m_x);
-			//matrix1[1] = matrix1[1].Scale(m_scale.m_y);
-			//matrix1[2] = matrix1[2].Scale(m_scale.m_z);
-			//m_shape->CalculateAabb(m_aligmentMatrix * matrix1, p0, p1);
-			//p0 -= m_padding;
-			//p1 += m_padding;
+			ndMatrix matrix1(matrix);
+			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
+			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
+			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
+			m_shape->CalculateAabb(m_aligmentMatrix * matrix1, p0, p1);
+			p0 -= m_padding;
+			p1 += m_padding;
 			break;
 		}
 	}
@@ -397,7 +396,8 @@ ndInt32 ndShapeInstance::CalculatePlaneIntersection(const ndVector& normal, cons
 		default:
 		{
 			ndVector point1(m_aligmentMatrix.UntransformVector(m_invScale * point));
-			ndVector normal1(m_aligmentMatrix.UntransformVector(m_scale * normal));
+			//ndVector normal1(m_aligmentMatrix.UntransformVector(m_scale * normal));
+			ndVector normal1(m_aligmentMatrix.UnrotateVector(m_scale * normal));
 			normal1 = normal1.Normalize();
 			count = m_shape->CalculatePlaneIntersection(normal1, point1, contactsOut);
 			for (ndInt32 i = 0; i < count; i++) {

@@ -64,7 +64,7 @@ void CreateBoxCompoundShape(ndShapeInstance& parentInstance)
 	ndMatrix mWall4Local = dGetIdentityMatrix();
 	mWall4Local.m_posit = ndVector(-1.0f, 0.0f, 0.0f, 1.0f);
 	ndMatrix mFloorLocal = dGetIdentityMatrix();
-	//mFloorLocal = dYawMatrix(3.14f / 4.0f);//45 degree
+	mFloorLocal = dYawMatrix(3.14f / 4.0f);//45 degree
 	mFloorLocal.m_posit = ndVector(0.0f, -1.0f, 0.0f, 1.0f);
 
 	auto pCompoundShape = parentInstance.GetShape()->GetAsShapeCompound();
