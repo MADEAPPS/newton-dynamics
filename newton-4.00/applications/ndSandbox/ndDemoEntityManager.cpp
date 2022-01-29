@@ -59,7 +59,6 @@
 //#define DEFAULT_SCENE	20		// skin peel voronoi fracture
 						 
 // demos forward declaration 
-void ndBasicRobot(ndDemoEntityManager* const scene);
 void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicRagdoll(ndDemoEntityManager* const scene);
@@ -69,6 +68,7 @@ void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndActiveRagdoll(ndDemoEntityManager* const scene);
 void ndBasicGpuTest0(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
+void ndInsdustrialRobot(ndDemoEntityManager* const scene);
 void ndBasicGpuRigidBody(ndDemoEntityManager* const scene);
 void ndBasicFrictionRamp(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
@@ -100,7 +100,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "active ragdoll", ndActiveRagdoll },
 	{ "basic vehicle", ndBasicVehicle },
 	{ "heavy vehicle", ndHeavyVehicle },
-	{ "industrial robot", ndBasicRobot },
+	{ "industrial robot", ndInsdustrialRobot },
 	{ "simple convex fracture", ndBasicExplodeConvexShape },
 	//{ "basic convex fracture", ndBasicFracture_0 },
 	//{ "linked convex fracture", ndBasicFracture_2 },
