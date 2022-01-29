@@ -176,8 +176,10 @@ class ndActiveRagdollModel : public ndCharacter
 		ndInt32 stack = 0;
 		const ndInt32 definitionCount = ndInt32 (sizeof(jointsDefinition) / sizeof(jointsDefinition[0]));
 		
-		ndDemoEntity* childEntities[32];
-		ndCharacterNode* parentBones[32];
+		//ndDemoEntity* childEntities[32];
+		//ndCharacterNode* parentBones[32];
+		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
+		ndFixSizeArray<ndCharacterNode*, 32> parentBones;
 		for (ndDemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) 
 		{
 			childEntities[stack] = child;
