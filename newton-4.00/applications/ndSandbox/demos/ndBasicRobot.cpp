@@ -463,10 +463,11 @@ void ndBasicRobot (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene, dGetIdentityMatrix());
 
 	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("robot1.fbx");
+	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("robot.fbx");
 
-	ndMatrix matrix(dGetIdentityMatrix());
+	ndMatrix matrix(dYawMatrix(-90.0f * ndDegreeToRad));
 	matrix.m_posit.m_y = 0.5f;
+	robotEntity->ResetMatrix(matrix);
 
 	//ndActiveRagdollModel* const ragdoll = new ndActiveRagdollModel(scene, ragdollMesh, matrix);
 	//scene->SetSelectedModel(ragdoll);
@@ -481,5 +482,5 @@ void ndBasicRobot (ndDemoEntityManager* const scene)
 
 	matrix.m_posit.m_x -= 4.0f;
 	matrix.m_posit.m_y += 2.0f;
-	scene->SetCameraMatrix(matrix, matrix.m_posit);
+	scene->SetCameraMatrix(ndQuaternion(), matrix.m_posit);
 }
