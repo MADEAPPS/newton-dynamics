@@ -45,6 +45,7 @@ static dRobotDefinition jointsDefinition[] =
 	{ "arm_2", 5.0f, dRobotDefinition::m_hinge },
 	{ "arm_3", 3.0f, dRobotDefinition::m_hinge },
 	{ "arm_4", 2.0f, dRobotDefinition::m_hinge },
+	{ "effector", 0.0f, dRobotDefinition::m_effector },
 };
 
 class ndIndustrialRobot : public ndModel
@@ -52,6 +53,7 @@ class ndIndustrialRobot : public ndModel
 	public:
 	ndIndustrialRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
 		:ndModel()
+		,m_effector(nullptr)
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = robotMesh->CreateClone();
@@ -66,6 +68,7 @@ class ndIndustrialRobot : public ndModel
 		
 		// add the root body
 		ndBodyDynamic* const rootBody = CreateBodyPart(scene, entity, jointsDefinition[0].m_mass, nullptr);
+		m_bodyArray.PushBack(rootBody);
 		
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
 		ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
@@ -95,15 +98,20 @@ class ndIndustrialRobot : public ndModel
 					if (definition.m_type == dRobotDefinition::m_hinge)
 					{
 						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
-						ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBody, definition);
-						world->AddJoint(joint);
+						m_bodyArray.PushBack(childBody);
 
+						const ndMatrix pivotMatrix(childBody->GetMatrix());
+						ndJointHinge* const hinge = new ndJointHinge(pivotMatrix, childBody, parentBody);
+						m_jointArray.PushBack(hinge);
+						world->AddJoint(hinge);
 						parentBody = childBody;
 					}
 					else
 					{
-						dAssert(0);
+						const ndMatrix pivotMatrix(parentBody->GetMatrix());
+						m_effector = new ndJointKinematicController(rootBody, parentBody, pivotMatrix);
 					}
+					break;
 				}
 			}
 
@@ -118,6 +126,10 @@ class ndIndustrialRobot : public ndModel
 
 	~ndIndustrialRobot()
 	{
+		if (m_effector)
+		{
+			delete m_effector;
+		}
 	}
 	
 	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
@@ -141,14 +153,6 @@ class ndIndustrialRobot : public ndModel
 		return body;
 	}
 
-	//ndJointBilateralConstraint* ConnectBodyParts(ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const dRobotDefinition& definition)
-	ndJointBilateralConstraint* ConnectBodyParts(ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const dRobotDefinition&)
-	{
-		ndMatrix matrix(childBody->GetMatrix());
-		ndJointHinge* const hinge = new ndJointHinge(matrix, childBody, parentBody);
-		return hinge;
-	}
-
 	void Update(ndWorld* const world, ndFloat32 timestep) 
 	{
 		//dAssert(0);
@@ -164,6 +168,10 @@ class ndIndustrialRobot : public ndModel
 	{
 		ndModel::PostTransformUpdate(world, timestep);
 	}
+
+	ndJointKinematicController* m_effector;
+	ndFixSizeArray<ndJointHinge*, 16> m_jointArray;
+	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
 };
 
 void ndInsdustrialRobot (ndDemoEntityManager* const scene)
