@@ -32,13 +32,19 @@ class dRobotDefinition
 	};
 
 	char m_boneName[32];
+	ndFloat32 m_mass;
 	jointType m_type;
 };
 
 static dRobotDefinition jointsDefinition[] =
 {
-	{ "base", dRobotDefinition::m_root},
-	{ "base_rotator", dRobotDefinition::m_hinge },
+	{ "base", 100.0f, dRobotDefinition::m_root},
+	{ "base_rotator", 50.0f, dRobotDefinition::m_hinge },
+	{ "arm_0", 5.0f, dRobotDefinition::m_hinge },
+	{ "arm_1", 5.0f, dRobotDefinition::m_hinge },
+	{ "arm_2", 5.0f, dRobotDefinition::m_hinge },
+	{ "arm_3", 3.0f, dRobotDefinition::m_hinge },
+	{ "arm_4", 2.0f, dRobotDefinition::m_hinge },
 };
 
 class ndIndustrialRobot : public ndModel
@@ -59,7 +65,7 @@ class ndIndustrialRobot : public ndModel
 		entity->ResetMatrix(matrix);
 		
 		// add the root body
-		ndBodyDynamic* const rootBody = CreateBodyPart(scene, entity, nullptr);
+		ndBodyDynamic* const rootBody = CreateBodyPart(scene, entity, jointsDefinition[0].m_mass, nullptr);
 		
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
 		ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
@@ -88,7 +94,7 @@ class ndIndustrialRobot : public ndModel
 					dTrace(("name: %s\n", name));
 					if (definition.m_type == dRobotDefinition::m_hinge)
 					{
-						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBody);
+						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, definition.m_mass, parentBody);
 						ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBody, definition);
 						world->AddJoint(joint);
 
@@ -114,7 +120,7 @@ class ndIndustrialRobot : public ndModel
 	{
 	}
 	
-	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndBodyDynamic* const parentBone)
+	ndBodyDynamic* CreateBodyPart(ndDemoEntityManager* const scene, ndDemoEntity* const entityPart, ndFloat32 mass, ndBodyDynamic* const parentBone)
 	{
 		ndShapeInstance* const shape = entityPart->CreateCollisionFromchildren();
 		dAssert(shape);
@@ -125,7 +131,7 @@ class ndIndustrialRobot : public ndModel
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(*shape);
-		body->SetMassMatrix(1.0f, *shape);
+		body->SetMassMatrix(mass, *shape);
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entityPart, parentBone));
 		
 		delete shape;
@@ -135,7 +141,8 @@ class ndIndustrialRobot : public ndModel
 		return body;
 	}
 
-	ndJointBilateralConstraint* ConnectBodyParts(ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const dRobotDefinition& definition)
+	//ndJointBilateralConstraint* ConnectBodyParts(ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const dRobotDefinition& definition)
+	ndJointBilateralConstraint* ConnectBodyParts(ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const dRobotDefinition&)
 	{
 		ndMatrix matrix(childBody->GetMatrix());
 		ndJointHinge* const hinge = new ndJointHinge(matrix, childBody, parentBody);
