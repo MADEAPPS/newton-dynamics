@@ -48,11 +48,11 @@
 //#define DEFAULT_SCENE	9		// static mesh collision 
 //#define DEFAULT_SCENE	10		// static user mesh collision 
 //#define DEFAULT_SCENE	11		// basic joints
-#define DEFAULT_SCENE	12		// basic robot
-//#define DEFAULT_SCENE	13		// basic rag doll
-//#define DEFAULT_SCENE	14		// active rag doll
-//#define DEFAULT_SCENE	15		// basic vehicle
-//#define DEFAULT_SCENE	16		// heavy vehicle
+//#define DEFAULT_SCENE	12		// basic rag doll
+//#define DEFAULT_SCENE	13		// active rag doll
+//#define DEFAULT_SCENE	14		// basic vehicle
+//#define DEFAULT_SCENE	15		// heavy vehicle
+#define DEFAULT_SCENE	16		// basic robot
 //#define DEFAULT_SCENE	17		// simple voronoi fracture
 //#define DEFAULT_SCENE	18		// basic voronoi fracture
 //#define DEFAULT_SCENE	19		// linked voronoi fracture
@@ -96,11 +96,11 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "static mesh", ndStaticMeshCollisionDemo },
 	{ "static user mesh", ndStaticUserMeshCollisionDemo },
 	{ "basic joints", ndBasicJoints },
-	{ "basic robot", ndBasicRobot },
 	{ "basic ragdoll", ndBasicRagdoll },
 	{ "active ragdoll", ndActiveRagdoll },
 	{ "basic vehicle", ndBasicVehicle },
 	{ "heavy vehicle", ndHeavyVehicle },
+	{ "industrial robot", ndBasicRobot },
 	{ "simple convex fracture", ndBasicExplodeConvexShape },
 	//{ "basic convex fracture", ndBasicFracture_0 },
 	//{ "linked convex fracture", ndBasicFracture_2 },
