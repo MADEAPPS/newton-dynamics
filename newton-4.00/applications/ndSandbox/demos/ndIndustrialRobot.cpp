@@ -24,12 +24,21 @@
 class dRobotDefinition
 {
 	public:
+	enum jointType
+	{
+		m_root,
+		m_hinge,
+		m_effector
+	};
+
 	char m_boneName[32];
+	jointType m_type;
 };
 
 static dRobotDefinition jointsDefinition[] =
 {
-	{ "base"},
+	{ "base", dRobotDefinition::m_root},
+	{ "base_rotator", dRobotDefinition::m_hinge },
 };
 
 class ndIndustrialRobot : public ndModel
@@ -67,72 +76,35 @@ class ndIndustrialRobot : public ndModel
 		while (stack) 
 		{
 			stack--;
-			ndBodyDynamic* const parentBody = parentBone[stack];
+			ndBodyDynamic* parentBody = parentBone[stack];
 			ndDemoEntity* const childEntity = childEntities[stack];
 
 			const char* const name = childEntity->GetName().GetStr();
 			for (ndInt32 i = 0; i < definitionCount; i++) 
 			{
 				const dRobotDefinition& definition = jointsDefinition[i];
-				//if (!strcmp(definition.m_boneName, name))
-				//{
-				//	dTrace(("name: %s\n", name));
-				//	if (definition.m_limbType != dRobotDefinition::effector)
-				//	{
-				//		ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBone->GetBody());
-				//		bodyArray[bodyCount] = childBody;
-				//		massWeight[bodyCount] = definition.m_massWeight;
-				//		bodyCount++;
-				//
-				//		// connect this body part to its parentBody with a robot joint
-				//		parentBone = ConnectBodyParts(childBody, parentBone, definition);
-				//		parentBone->SetName(name);
-				//
-				//		if (strstr(name, "RightFoot"))
-				//		{
-				//			righFoot = parentBone;
-				//			//bipedConfig.m_rightFootNode = parentBone;
-				//		}
-				//		else if (strstr(name, "LeftFoot"))
-				//		{
-				//			leftFoot = parentBone;
-				//			//bipedConfig.m_leftFootNode = parentBone;
-				//		}
-				//	}
-				//	else
-				//	{
-				//		dAssert(0);
-				//		//ndMatrix effectorMatrix(childEntity->GetCurrentMatrix() * parentBone->GetBody()->GetMatrix());
-				//		//ndCharacterEffectorNode* const effectorNode = CreateInverseDynamicEffector(effectorMatrix, parentBone);
-				//		//effectorNode->SetName(name);
-				//		//if (strcmp(effectorNode->GetJoint()->SubClassName(), "ndJointTwoBodyIK") == 0)
-				//		//{
-				//		//	//ndJointTwoBodyIK* const effectorJoint = (ndJointTwoBodyIK*)effectorNode->GetJoint();
-				//		//	//effectorJoint->SetLinearSpringDamperRegularizer(definition.m_jointData.m_spring, definition.m_jointData.m_damper, definition.m_jointData.m_regularizer);
-				//		//}
-				//		//else
-				//		//{
-				//		//	dAssert(0);
-				//		//}
-				//		//
-				//		//if (strstr(name, "right"))
-				//		//{
-				//		//	bipedConfig.m_rightFootEffector = effectorNode;
-				//		//}
-				//		//else if (strstr(name, "left"))
-				//		//{
-				//		//	bipedConfig.m_leftFootEffector = effectorNode;
-				//		//}
-				//	}
-				//
-				//	break;
-				//}
+				if (!strcmp(definition.m_boneName, name))
+				{
+					dTrace(("name: %s\n", name));
+					if (definition.m_type == dRobotDefinition::m_hinge)
+					{
+						ndBodyDynamic* const childBody = CreateBodyPart(scene, childEntity, parentBody);
+						ndJointBilateralConstraint* const joint = ConnectBodyParts(childBody, parentBody, definition);
+						world->AddJoint(joint);
+
+						parentBody = childBody;
+					}
+					else
+					{
+						dAssert(0);
+					}
+				}
 			}
 
 			for (ndDemoEntity* child = childEntity->GetChild(); child; child = child->GetSibling())
 			{
 				childEntities[stack] = child;
-				//parentBones[stack] = parentBone;
+				parentBone[stack] = parentBody;
 				stack++;
 			}
 		}
@@ -163,44 +135,12 @@ class ndIndustrialRobot : public ndModel
 		return body;
 	}
 
-	//ndCharacterNode* ConnectBodyParts(ndBodyDynamic* const childBody, ndCharacterNode* const parentNode, const dRobotDefinition& definition)
-	//{
-	//	ndMatrix matrix(childBody->GetMatrix());
-	//	dRobotDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
-	//	ndMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * ndDegreeToRad) * dYawMatrix(frameAngle.m_yaw * ndDegreeToRad) * dRollMatrix(frameAngle.m_roll * ndDegreeToRad) * matrix);
-	//
-	//	if (definition.m_limbType == dRobotDefinition::forwardKinematic)
-	//	{
-	//		ndCharacterForwardDynamicNode* const jointNode = CreateForwardDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
-	//
-	//		dRobotDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-	//		ndJointPdActuator* const joint = (ndJointPdActuator*)jointNode->GetJoint();
-	//
-	//		joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
-	//		joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-	//		joint->SetConeAngleSpringDamperRegularizer(definition.m_coneSpringData.m_spring, definition.m_coneSpringData.m_damper, definition.m_coneSpringData.m_regularizer);
-	//		joint->SetTwistAngleSpringDamperRegularizer(definition.m_twistSpringData.m_spring, definition.m_twistSpringData.m_damper, definition.m_twistSpringData.m_regularizer);
-	//
-	//		return jointNode;
-	//	}
-	//	else
-	//	{
-	//		ndCharacterInverseDynamicNode* const jointNode = CreateInverseDynamicLimb(pinAndPivotInGlobalSpace, childBody, parentNode);
-	//
-	//		dRobotDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-	//		ndJointBallAndSocket* const joint = (ndJointBallAndSocket*)jointNode->GetJoint();
-	//
-	//		//dTrace (("do not forget to delete this debug\n"))
-	//		//joint->SetSolverModel(m_jointkinematicCloseLoop);
-	//
-	//		joint->SetConeLimit(jointLimits.m_coneAngle * ndDegreeToRad);
-	//		joint->SetTwistLimits(jointLimits.m_minTwistAngle * ndDegreeToRad, jointLimits.m_maxTwistAngle * ndDegreeToRad);
-	//		joint->SetConeFriction(ndFloat32(0.0f), ndFloat32(0.0f));
-	//		joint->SetTwistFriction(ndFloat32(0.0f), ndFloat32(0.0f));
-	//
-	//		return jointNode;
-	//	}
-	//}
+	ndJointBilateralConstraint* ConnectBodyParts(ndBodyDynamic* const childBody, ndBodyDynamic* const parentBody, const dRobotDefinition& definition)
+	{
+		ndMatrix matrix(childBody->GetMatrix());
+		ndJointHinge* const hinge = new ndJointHinge(matrix, childBody, parentBody);
+		return hinge;
+	}
 
 	void Update(ndWorld* const world, ndFloat32 timestep) 
 	{
