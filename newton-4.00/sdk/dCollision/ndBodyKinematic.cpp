@@ -211,7 +211,7 @@ ndJointList::ndNode* ndBodyKinematic::AttachJoint(ndJointBilateralConstraint* co
 		if (test)
 		{
 			dTrace(("warning body %d and body %d already connected by a biletaral joint\n", body0->GetId(), body1->GetId()));
-			dAssert(0, "warning bodies conected by joint more than once");
+			dAssert(0);
 		}
 	}
 	#endif
