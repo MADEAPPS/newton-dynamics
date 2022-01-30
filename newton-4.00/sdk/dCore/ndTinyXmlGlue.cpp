@@ -134,7 +134,7 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, ndIn
 	node->SetAttribute("floatArray", buffer);
 }
 
-D_CORE_API ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name)
+ndInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
 	dAssert(element);
@@ -200,7 +200,7 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 	}
 }
 
-D_CORE_API ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name)
+ndVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
 	dAssert(element);

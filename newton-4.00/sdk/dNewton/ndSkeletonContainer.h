@@ -118,8 +118,8 @@ class ndSkeletonContainer
 
 	void ClearSelfCollision();
 	void AddSelfCollisionJoint(ndConstraint* const joint);
+	void InitMassMatrix(const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide);
 	void CalculateJointForce(const ndBodyKinematic** const bodyArray, ndJacobian* const internalForces);
-	void InitMassMatrix(const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide, bool m_consideredCloseLoop = true);
 
 	void CheckSleepState();
 
@@ -162,7 +162,6 @@ class ndSkeletonContainer
 	ndInt16 m_auxiliaryRowCount;
 	ndInt16 m_loopCount;
 	ndInt16 m_dynamicsLoopCount;
-	ndInt16 m_consideredCloseLoop;
 	ndUnsigned8 m_isResting;
 };
 

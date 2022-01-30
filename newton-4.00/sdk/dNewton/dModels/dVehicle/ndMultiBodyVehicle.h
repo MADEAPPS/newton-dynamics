@@ -105,7 +105,6 @@ class ndMultiBodyVehicle: public ndModel
 	void BrushTireModel(ndMultiBodyVehicleTireJoint* const tire, ndContactMaterial& contactPoint) const;
 
 	protected:
-	D_NEWTON_API virtual ndSkeletonContainer* GetSkeleton() const;
 	virtual void ApplyInputs(ndWorld* const world, ndFloat32 timestep);
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	D_NEWTON_API virtual void Update(ndWorld* const world, ndFloat32 timestep);

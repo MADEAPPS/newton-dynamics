@@ -508,12 +508,6 @@ void ndMultiBodyVehicle::AddChassis(ndBodyDynamic* const chassis)
 	m_chassis = chassis;
 }
 
-inline ndSkeletonContainer* ndMultiBodyVehicle::GetSkeleton() const
-{
-	return m_chassis ? m_chassis->GetSkeleton() : nullptr;
-}
-
-
 ndMultiBodyVehicleTireJoint* ndMultiBodyVehicle::AddAxleTire(const ndWheelDescriptor& desc, ndBodyDynamic* const tire, ndBodyDynamic* const axleBody)
 {
 	ndMatrix tireFrame(dGetIdentityMatrix());

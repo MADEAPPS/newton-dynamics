@@ -42,9 +42,6 @@ class ndModel: public ndClassAlloc
 
 	virtual ndModel* GetAsModel();
 	virtual ndMultiBodyVehicle* GetAsMultiBodyVehicle();
-
-	virtual ndSkeletonContainer* GetSkeleton() const;
-
 	virtual void Debug(ndConstraintDebugCallback& context) const;
 
 	protected:
@@ -103,11 +100,6 @@ inline void ndModel::AddToWorld(ndWorld* const)
 
 inline void ndModel::RemoveFromToWorld(ndWorld* const)
 {
-}
-
-inline ndSkeletonContainer* ndModel::GetSkeleton() const
-{
-	return nullptr;
 }
 
 #endif 

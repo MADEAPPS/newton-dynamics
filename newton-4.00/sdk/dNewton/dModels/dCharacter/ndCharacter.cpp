@@ -82,11 +82,6 @@ ndCharacter::~ndCharacter()
 	}
 }
 
-ndSkeletonContainer* ndCharacter::GetSkeleton() const
-{
-	return (m_rootNode && m_rootNode->GetBody()) ? m_rootNode->GetBody()->GetSkeleton() : nullptr;
-}
-
 void ndCharacter::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 {
 	nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());

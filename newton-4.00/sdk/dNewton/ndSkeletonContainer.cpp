@@ -357,7 +357,6 @@ ndSkeletonContainer::ndSkeletonContainer()
 	,m_auxiliaryRowCount(0)
 	,m_loopCount(0)
 	,m_dynamicsLoopCount(0)
-	,m_consideredCloseLoop(1)
 	,m_isResting(0)
 {
 }
@@ -1402,7 +1401,7 @@ void ndSkeletonContainer::SolveAuxiliary(ndJacobian* const internalForces, const
 	}
 }
 
-void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSide, ndRightHandSide* const rightHandSide, bool consideredCloseLoop)
+void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSide, ndRightHandSide* const rightHandSide)
 {
 	D_TRACKTIME();
 	if (m_isResting)
@@ -1413,7 +1412,6 @@ void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSid
 	ndInt32 auxiliaryCount = 0;
 	m_leftHandSide = leftHandSide;
 	m_rightHandSide = rightHandSide;
-	m_consideredCloseLoop = consideredCloseLoop ? 1 : 0;
 
 	const ndInt32 nodeCount = m_nodeList.GetCount();
 	ndSpatialMatrix* const bodyMassArray = dAlloca(ndSpatialMatrix, nodeCount);
@@ -1444,7 +1442,7 @@ void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSid
 	m_rowCount += m_loopRowCount;
 	m_auxiliaryRowCount += m_loopRowCount;
 
-	if (m_auxiliaryRowCount && m_consideredCloseLoop)
+	if (m_auxiliaryRowCount)
 	{
 		InitLoopMassMatrix();
 	}
@@ -1464,7 +1462,7 @@ void ndSkeletonContainer::CalculateJointForce(const ndBodyKinematic** const, ndJ
 	
 	CalculateJointAccel(internalForces, accel);
 	CalculateForce(force, accel);
-	if (m_auxiliaryRowCount && m_consideredCloseLoop) 
+	if (m_auxiliaryRowCount) 
 	{
 		SolveAuxiliary(internalForces, accel, force);
 	}

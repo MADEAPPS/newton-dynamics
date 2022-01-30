@@ -55,6 +55,7 @@ class ndIndustrialRobot : public ndModel
 
 	ndIndustrialRobot(ndDemoEntityManager* const scene, fbxDemoEntity* const robotMesh, const ndMatrix& location)
 		:ndModel()
+		,m_rootBody(nullptr)
 		,m_effector(nullptr)
 	{
 		// make a clone of the mesh and add it to the scene
@@ -69,8 +70,8 @@ class ndIndustrialRobot : public ndModel
 		entity->ResetMatrix(matrix);
 		
 		// add the root body
-		ndBodyDynamic* const rootBody = CreateBodyPart(scene, entity, jointsDefinition[0].m_mass, nullptr);
-		m_bodyArray.PushBack(rootBody);
+		m_rootBody = CreateBodyPart(scene, entity, jointsDefinition[0].m_mass, nullptr);
+		m_bodyArray.PushBack(m_rootBody);
 		
 		ndFixSizeArray<ndDemoEntity*, 32> childEntities;
 		ndFixSizeArray<ndBodyDynamic*, 32> parentBone;
@@ -79,7 +80,7 @@ class ndIndustrialRobot : public ndModel
 		for (ndDemoEntity* child = entity->GetChild(); child; child = child->GetSibling())
 		{
 			childEntities[stack] = child;
-			parentBone[stack] = rootBody;
+			parentBone[stack] = m_rootBody;
 			stack++;
 		}
 
@@ -111,7 +112,7 @@ class ndIndustrialRobot : public ndModel
 					else
 					{
 						const ndMatrix pivotMatrix(parentBody->GetMatrix());
-						m_effector = new ndJointKinematicController(rootBody, parentBody, pivotMatrix);
+						m_effector = new ndJointKinematicController(parentBody, m_rootBody, pivotMatrix);
 					}
 					break;
 				}
@@ -129,20 +130,48 @@ class ndIndustrialRobot : public ndModel
 	ndIndustrialRobot(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
 	{
-		//const nd::TiXmlNode* const xmlNode = desc.m_rootNode;
-		//
-		//ndTree<const ndCharacterNode*, ndUnsigned32> limbMap;
-		//for (const nd::TiXmlNode* node = xmlNode->FirstChild(); node; node = node->NextSibling())
-		//{
-		//	const char* const partName = node->Value();
-		//	if (strcmp(partName, "ndCharacterRootNode") == 0)
-		//	{
-		//		ndCharacterLoadDescriptor loadDesc(desc, &limbMap);
-		//		loadDesc.m_rootNode = node;
-		//		m_rootNode = new ndCharacterRootNode(loadDesc);
-		//		m_rootNode->m_owner = this;
-		//	}
-		//}
+		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
+
+		const nd::TiXmlNode* const bodies = modelRootNode->FirstChild("bodies");
+		for (const nd::TiXmlNode* node = bodies->FirstChild(); node; node = node->NextSibling())
+		{
+			ndInt32 hashId;
+			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+			element->Attribute("int32", &hashId);
+			ndBodyLoaderCache::ndNode* const bodyNode = desc.m_bodyMap->Find(hashId);
+
+			ndBody* const body = (ndBody*)bodyNode->GetInfo();
+			m_bodyArray.PushBack(body->GetAsBodyDynamic());
+		}
+
+		const nd::TiXmlNode* const joints = modelRootNode->FirstChild("joints");
+		for (const nd::TiXmlNode* node = joints->FirstChild(); node; node = node->NextSibling())
+		{
+			ndInt32 hashId;
+			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+			element->Attribute("int32", &hashId);
+			ndJointLoaderCache::ndNode* const jointNode = desc.m_jointMap->Find(hashId);
+
+			ndJointBilateralConstraint* const joint = (ndJointBilateralConstraint*)jointNode->GetInfo();
+			m_jointArray.PushBack((ndJointHinge*)joint);
+		}
+
+		// load root body
+		ndBodyLoaderCache::ndNode* const rootBodyNode = desc.m_bodyMap->Find(xmlGetInt(modelRootNode, "rootBodyHash"));
+		ndBody* const body = (ndBody*)rootBodyNode->GetInfo();
+		m_rootBody = body->GetAsBodyDynamic();
+		
+		// load effector joint
+		const nd::TiXmlNode* const endEffectorNode = modelRootNode->FirstChild("endEffector");
+		ndBodyLoaderCache::ndNode* const effectorBodyNode0 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body0Hash"));
+		ndBodyLoaderCache::ndNode* const effectorBodyNode1 = desc.m_bodyMap->Find(xmlGetInt(endEffectorNode, "body1Hash"));
+
+		ndBody* const body0 = (ndBody*)effectorBodyNode0->GetInfo();
+		ndBody* const body1 = (ndBody*)effectorBodyNode1->GetInfo();
+		dAssert(body1 == m_rootBody);
+
+		const ndMatrix pivotMatrix(body0->GetMatrix());
+		m_effector = new ndJointKinematicController(body0->GetAsBodyDynamic(), body1->GetAsBodyDynamic(), pivotMatrix);
 	}
 
 	~ndIndustrialRobot()
@@ -155,13 +184,14 @@ class ndIndustrialRobot : public ndModel
 
 	void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	{
-		nd::TiXmlElement* const childNode = new nd::TiXmlElement(ClassName());
-		desc.m_rootNode->LinkEndChild(childNode);
-		childNode->SetAttribute("hashId", desc.m_nodeNodeHash);
-		ndModel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, childNode));
+		nd::TiXmlElement* const modelRootNode = new nd::TiXmlElement(ClassName());
+		desc.m_rootNode->LinkEndChild(modelRootNode);
+		modelRootNode->SetAttribute("hashId", desc.m_nodeNodeHash);
+		ndModel::Save(ndLoadSaveBase::ndSaveDescriptor(desc, modelRootNode));
 
+		// save all bodies.
 		nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("bodies");
-		childNode->LinkEndChild(bodiesNode);
+		modelRootNode->LinkEndChild(bodiesNode);
 		for (ndInt32 i = 0; i < m_bodyArray.GetCount(); i++)
 		{
 			nd::TiXmlElement* const paramNode = new nd::TiXmlElement("body");
@@ -171,8 +201,9 @@ class ndIndustrialRobot : public ndModel
 			paramNode->SetAttribute("int32", bodyPartNode->GetInfo());
 		}
 
+		// save all joints
 		nd::TiXmlElement* const jointsNode = new nd::TiXmlElement("joints");
-		childNode->LinkEndChild(jointsNode);
+		modelRootNode->LinkEndChild(jointsNode);
 		for (ndInt32 i = 0; i < m_jointArray.GetCount(); i++)
 		{
 			nd::TiXmlElement* const paramNode = new nd::TiXmlElement("joint");
@@ -182,8 +213,12 @@ class ndIndustrialRobot : public ndModel
 			paramNode->SetAttribute("int32", jointPartNode->GetInfo());
 		}
 
+		// indicate which body is the root
+		xmlSaveParam(modelRootNode, "rootBodyHash", desc.m_bodyMap->Find(m_rootBody)->GetInfo());
+
+		// save end effector info
 		nd::TiXmlElement* const endEffectorNode = new nd::TiXmlElement("endEffector");
-		childNode->LinkEndChild(endEffectorNode);
+		modelRootNode->LinkEndChild(endEffectorNode);
 
 		ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody0 = desc.m_bodyMap->Find(m_effector->GetBody0());
 		ndTree<ndInt32, const ndBodyKinematic*>::ndNode* const effectBody1 = desc.m_bodyMap->Find(m_effector->GetBody1());
@@ -212,12 +247,6 @@ class ndIndustrialRobot : public ndModel
 		return body;
 	}
 
-	void Update(ndWorld* const world, ndFloat32 timestep) 
-	{
-		//dAssert(0);
-		ndModel::Update(world, timestep);
-	}
-
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndModel::PostUpdate(world, timestep);
@@ -228,6 +257,18 @@ class ndIndustrialRobot : public ndModel
 		ndModel::PostTransformUpdate(world, timestep);
 	}
 
+	void Update(ndWorld* const world, ndFloat32 timestep)
+	{
+		ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
+
+		//ndSkeletonContainer* const skeleton = activeSkeletons[i];
+		//skeleton->InitMassMatrix(&leftHandSide[0], &rightHandSide[0]);
+
+
+		ndModel::Update(world, timestep);
+	}
+
+	ndBodyDynamic* m_rootBody;
 	ndJointKinematicController* m_effector;
 	ndFixSizeArray<ndJointHinge*, 16> m_jointArray;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
