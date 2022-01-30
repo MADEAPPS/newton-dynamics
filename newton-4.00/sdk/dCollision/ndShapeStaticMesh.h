@@ -93,7 +93,7 @@ class ndPolygonMeshDesc: public ndFastAabb
 	ndVector m_boxDistanceTravelInMeshSpace;
 	ndInt32 m_faceCount;
 	ndInt32 m_vertexStrideInBytes;
-	ndFloat32 m_skinThickness;
+	ndFloat32 m_skinMargin;
 	void* m_userData;
 	ndShapeInstance* m_convexInstance;
 	ndShapeInstance* m_polySoupInstance;
@@ -131,7 +131,7 @@ class ndShapeStaticMesh: public ndShape
 	virtual ndFloat32 GetBoxMaxRadius() const;
 	virtual ndShapeStaticMesh* GetAsShapeStaticMesh();
 	virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
-	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinThickness, ndInt32* const vertexIndex) const;
+	virtual ndVector SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin, ndInt32* const vertexIndex) const;
 	virtual ndVector SupportVertexSpecialProjectPoint(const ndVector& point, const ndVector& dir) const;
 	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;
 	virtual ndVector CalculateVolumeIntegral(const ndMatrix& globalMatrix, const ndVector& plane, const ndShapeInstance& parentScale) const;

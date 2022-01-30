@@ -543,7 +543,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShape
 	const ndVector pointInHull(hull->SupportVertex(normalInHull.Scale(ndFloat32(-1.0f))));
 	const ndVector p0(hullMatrix.TransformVector(pointInHull));
 
-	ndFloat32 penetration = m_normal.DotProduct(m_localPoly[0] - p0).GetScalar() + contactSolver.m_skinThickness;
+	ndFloat32 penetration = m_normal.DotProduct(m_localPoly[0] - p0).GetScalar() + contactSolver.m_skinMargin;
 	if (penetration < -(D_PENETRATION_TOL * ndFloat32(5.0f)))
 	{
 		contactSolver.m_separatingVector = m_normal;
@@ -626,7 +626,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullDescrete(const ndShape
 		ndVector point(pointInHull + normalInHull.Scale(penetration - D_PENETRATION_TOL));
 
 		count = hull->CalculatePlaneIntersection(normalInHull.Scale(ndFloat32(-1.0f)), point, contactPoints);
-		ndVector step(normalInHull.Scale((contactSolver.m_skinThickness - penetration) * ndFloat32(0.5f)));
+		ndVector step(normalInHull.Scale((contactSolver.m_skinMargin - penetration) * ndFloat32(0.5f)));
 
 		ndContactPoint* const contactsOut = contactSolver.m_contactBuffer;
 		for (ndInt32 i = 0; i < count; i++)
@@ -766,7 +766,7 @@ ndInt32 ndShapeConvexPolygon::CalculateContactToConvexHullContinue(const ndShape
 	
 			ndFloat32 timetoImpact = ndFloat32(0.0f);
 			dAssert(m_normal.m_w == ndFloat32(0.0f));
-			ndFloat32 penetration = m_normal.DotProduct(m_localPoly[0] - p0).GetScalar() + contactSolver.m_skinThickness;
+			ndFloat32 penetration = m_normal.DotProduct(m_localPoly[0] - p0).GetScalar() + contactSolver.m_skinMargin;
 			if (penetration < ndFloat32(0.0f)) 
 			{
 				timetoImpact = penetration / relativeVelocity.DotProduct(m_normal).GetScalar();

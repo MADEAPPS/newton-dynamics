@@ -39,8 +39,8 @@ class ndMaterial
 		m_staticFriction1 = ndFloat32(0.8f);
 		m_dynamicFriction0 = ndFloat32(0.4f);
 		m_dynamicFriction1 = ndFloat32(0.4f);
+		m_skinMargin = ndFloat32 (0.0f);
 		m_softness = ndFloat32(0.1f);
-		m_skinThickness = ndFloat32 (0.0f);
 		m_flags = m_collisionEnable | m_friction0Enable | m_friction1Enable;
 		m_userFlags = 0;
 	}
@@ -50,8 +50,8 @@ class ndMaterial
 	ndFloat32 m_staticFriction1;
 	ndFloat32 m_dynamicFriction0;
 	ndFloat32 m_dynamicFriction1;
+	ndFloat32 m_skinMargin;
 	ndFloat32 m_softness;
-	ndFloat32 m_skinThickness;
 	ndUnsigned32 m_flags;
 	ndUnsigned32 m_userFlags;
 };

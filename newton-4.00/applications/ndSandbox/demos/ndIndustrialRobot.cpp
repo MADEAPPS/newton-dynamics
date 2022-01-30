@@ -40,12 +40,12 @@ static dRobotDefinition jointsDefinition[] =
 {
 	{ "base", 100.0f, dRobotDefinition::m_root},
 	{ "base_rotator", 50.0f, dRobotDefinition::m_hinge },
-	{ "arm_0", 5.0f, dRobotDefinition::m_hinge },
-	{ "arm_1", 5.0f, dRobotDefinition::m_hinge },
-	{ "arm_2", 5.0f, dRobotDefinition::m_hinge },
-	{ "arm_3", 3.0f, dRobotDefinition::m_hinge },
-	{ "arm_4", 2.0f, dRobotDefinition::m_hinge },
-	{ "effector", 0.0f, dRobotDefinition::m_effector },
+	//{ "arm_0", 5.0f, dRobotDefinition::m_hinge },
+	//{ "arm_1", 5.0f, dRobotDefinition::m_hinge },
+	//{ "arm_2", 5.0f, dRobotDefinition::m_hinge },
+	//{ "arm_3", 3.0f, dRobotDefinition::m_hinge },
+	//{ "arm_4", 2.0f, dRobotDefinition::m_hinge },
+	//{ "effector", 0.0f, dRobotDefinition::m_effector },
 };
 
 class ndIndustrialRobot : public ndModel
@@ -289,9 +289,9 @@ void ndInsdustrialRobot (ndDemoEntityManager* const scene)
 	scene->SetSelectedModel(robot);
 	scene->GetWorld()->AddModel(robot);
 	
-	matrix.m_posit.m_x += 2.0f;
-	matrix.m_posit.m_z -= 2.0f;
-	scene->GetWorld()->AddModel(new ndIndustrialRobot(scene, robotEntity, matrix));
+	//matrix.m_posit.m_x += 2.0f;
+	//matrix.m_posit.m_z -= 2.0f;
+	//scene->GetWorld()->AddModel(new ndIndustrialRobot(scene, robotEntity, matrix));
 
 	delete robotEntity;
 

@@ -349,7 +349,7 @@ ndContactSolver::ndContactSolver()
 	,m_notification(nullptr)
 	,m_contactBuffer(nullptr)
 	,m_timestep(ndFloat32 (0.0f))
-	,m_skinThickness(ndFloat32(0.0f))
+	,m_skinMargin(ndFloat32(0.0f))
 	,m_separationDistance(ndFloat32(0.0f))
 	,m_maxCount(D_MAX_CONTATCS)
 	,m_vertexIndex(0)
@@ -368,7 +368,7 @@ ndContactSolver::ndContactSolver(ndShapeInstance* const instance, ndContactNotif
 	,m_notification(notification)
 	,m_contactBuffer(nullptr)
 	,m_timestep(timestep)
-	,m_skinThickness(ndFloat32(0.0f))
+	,m_skinMargin(ndFloat32(0.0f))
 	,m_separationDistance(ndFloat32(0.0f))
 	,m_maxCount(D_MAX_CONTATCS)
 	,m_vertexIndex(0)
@@ -389,7 +389,7 @@ ndContactSolver::ndContactSolver(ndContact* const contact, ndContactNotify* cons
 	,m_notification(notification)
 	,m_contactBuffer(nullptr)
 	,m_timestep(timestep)
-	,m_skinThickness(ndFloat32(0.0f))
+	,m_skinMargin(ndFloat32(0.0f))
 	,m_separationDistance(ndFloat32(0.0f))
 	,m_maxCount(D_MAX_CONTATCS)
 	,m_vertexIndex(0)
@@ -410,7 +410,7 @@ ndContactSolver::ndContactSolver(const ndContactSolver& src, const ndShapeInstan
 	,m_notification(src.m_notification)
 	,m_contactBuffer(src.m_contactBuffer)
 	,m_timestep(src.m_timestep)
-	,m_skinThickness(src.m_skinThickness)
+	,m_skinMargin(src.m_skinMargin)
 	,m_separationDistance(src.m_separationDistance)
 	,m_maxCount(D_MAX_CONTATCS)
 	,m_vertexIndex(0)
@@ -2561,7 +2561,7 @@ ndInt32 ndContactSolver::ConvexToConvexContactsDiscrete()
 
 	ndInt32 count = 0;
 	bool colliding = CalculateClosestPoints();
-	ndFloat32 penetration = m_separatingVector.DotProduct(m_closestPoint1 - m_closestPoint0).GetScalar() - m_skinThickness - D_PENETRATION_TOL;
+	ndFloat32 penetration = m_separatingVector.DotProduct(m_closestPoint1 - m_closestPoint0).GetScalar() - m_skinMargin - D_PENETRATION_TOL;
 	m_separationDistance = penetration;
 	if (m_intersectionTestOnly)
 	{
@@ -3853,7 +3853,7 @@ ndInt32 ndContactSolver::ConvexToConvexContactsContinue()
 			break;
 		}
 
-		ndFloat32 num = m_separatingVector.DotProduct(m_closestPoint1 - m_closestPoint0).GetScalar() - m_skinThickness;
+		ndFloat32 num = m_separatingVector.DotProduct(m_closestPoint1 - m_closestPoint0).GetScalar() - m_skinMargin;
 		if ((num <= ndFloat32(1.0e-5f)) && (tacc <= timestep))
 		{
 			// bodies collide at time tacc, but we do not set it yet
@@ -4293,7 +4293,7 @@ void ndContactSolver::CalculateContacts(
 	m_notification = nullptr;
 	m_contactBuffer = contactBuffer;
 	m_timestep = ndFloat32 (1.0f);
-	m_skinThickness = ndFloat32(0.0f);
+	m_skinMargin = ndFloat32(0.0f);
 	m_separationDistance = ndFloat32(1.0e10f);
 	m_maxCount = D_MAX_CONTATCS;
 	m_vertexIndex = 0;

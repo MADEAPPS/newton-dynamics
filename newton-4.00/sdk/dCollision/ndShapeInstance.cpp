@@ -42,7 +42,7 @@ ndShapeInstance::ndShapeInstance(ndShape* const shape)
 	,m_ownerBody(nullptr)
 	,m_subCollisionHandle(nullptr)
 	,m_parent(nullptr)
-	,m_skinThickness(ndFloat32(0.0f))
+	,m_skinMargin(ndFloat32(0.0f))
 	,m_scaleType(m_unit)
 	,m_collisionMode(true)
 {
@@ -69,7 +69,7 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 	,m_ownerBody(instance.m_ownerBody)
 	,m_subCollisionHandle(instance.m_subCollisionHandle)
 	,m_parent(instance.m_parent)
-	,m_skinThickness(instance.m_skinThickness)
+	,m_skinMargin(instance.m_skinMargin)
 	,m_scaleType(instance.m_scaleType)
 	,m_collisionMode(instance.m_collisionMode)
 {
@@ -95,7 +95,7 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance, ndShape* const
 	,m_ownerBody(instance.m_ownerBody)
 	,m_subCollisionHandle(instance.m_subCollisionHandle)
 	,m_parent(instance.m_parent)
-	,m_skinThickness(instance.m_skinThickness)
+	,m_skinMargin(instance.m_skinMargin)
 	,m_scaleType(instance.m_scaleType)
 	,m_collisionMode(instance.m_collisionMode)
 {
@@ -113,7 +113,7 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndSha
 	,m_ownerBody(nullptr)
 	,m_subCollisionHandle(nullptr)
 	,m_parent(nullptr)
-	,m_skinThickness(ndFloat32(0.0f))
+	,m_skinMargin(ndFloat32(0.0f))
 	,m_scaleType(m_unit)
 	,m_collisionMode(true)
 {
@@ -123,7 +123,7 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const ndSha
 	
 	m_localMatrix = xmlGetMatrix(xmlNode, "localMatrix");
 	m_aligmentMatrix = xmlGetMatrix(xmlNode, "aligmentMatrix");
-	m_skinThickness = xmlGetFloat(xmlNode, "skinThickness");
+	m_skinMargin = xmlGetFloat(xmlNode, "skinMargin");
 	m_collisionMode = xmlGetInt(xmlNode, "collisionMode") ? true : false;
 	m_shapeMaterial.m_userId = xmlGetInt64(xmlNode, "materialID");
 	m_shapeMaterial.m_data.m_alignPad = xmlGetInt64(xmlNode, "userData");
@@ -157,7 +157,7 @@ void ndShapeInstance::Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const
 	xmlSaveParam(paramNode, "aligmentMatrix", m_aligmentMatrix);
 	xmlSaveParam(paramNode, "scale", m_scale);
 
-	xmlSaveParam(paramNode, "skinThickness", m_skinThickness);
+	xmlSaveParam(paramNode, "skinMargin", m_skinMargin);
 	xmlSaveParam(paramNode, "collisionMode", m_collisionMode ? 1 : 0);
 	xmlSaveParam(paramNode, "materialID", m_shapeMaterial.m_userId);
 	xmlSaveParam(paramNode, "userData", ndInt64(m_shapeMaterial.m_data.m_alignPad));
@@ -179,7 +179,7 @@ ndShapeInstance& ndShapeInstance::operator=(const ndShapeInstance& instance)
 	m_maxScale = instance.m_maxScale;
 	m_scaleType = instance.m_scaleType;
 	m_shapeMaterial = instance.m_shapeMaterial;
-	m_skinThickness = instance.m_skinThickness;
+	m_skinMargin = instance.m_skinMargin;
 	m_collisionMode = instance.m_collisionMode;
 
 	m_shape->Release();

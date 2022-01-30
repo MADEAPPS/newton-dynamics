@@ -244,12 +244,12 @@ ndVector ndShapeCylinder::SupportVertex(const ndVector& dir, ndInt32* const) con
 	return p0;
 }
 
-ndVector ndShapeCylinder::SupportVertexSpecial(const ndVector& dir, ndFloat32 skinThickness, ndInt32* const) const
+ndVector ndShapeCylinder::SupportVertexSpecial(const ndVector& dir, ndFloat32 skinMargin, ndInt32* const) const
 {
 	dAssert(dir.m_w == ndFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - ndFloat32(1.0f)) < ndFloat32(1.0e-3f));
 
-	const ndFloat32 thickness = D_PENETRATION_TOL + skinThickness;
+	const ndFloat32 thickness = D_PENETRATION_TOL + skinMargin;
 	if (dir.m_x < ndFloat32(-0.9999f)) 
 	{
 		return ndVector(-(m_height - thickness), ndFloat32(0.0f), ndFloat32(0.0f), ndFloat32(0.0f));

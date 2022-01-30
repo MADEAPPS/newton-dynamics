@@ -158,7 +158,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	relSpeed += dMax(restitutionVelocity, penetrationVeloc);
 	
 	const bool isHardContact = !(contact.m_material.m_flags & m_isSoftContact);
-	desc.m_diagonalRegularizer[normalIndex] = isHardContact ? D_DIAGONAL_REGULARIZER : dMax(D_DIAGONAL_REGULARIZER, contact.m_material.m_skinThickness);
+	desc.m_diagonalRegularizer[normalIndex] = isHardContact ? D_DIAGONAL_REGULARIZER : dMax(D_DIAGONAL_REGULARIZER, contact.m_material.m_skinMargin);
 	const ndFloat32 relGyro = (normalJacobian0.m_angular * gyroAlpha0 + normalJacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 	
 	desc.m_jointAccel[normalIndex] = relGyro + relSpeed * desc.m_timestep;

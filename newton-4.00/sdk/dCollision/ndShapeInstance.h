@@ -173,8 +173,7 @@ class ndShapeInstance: public ndClassAlloc
 	const ndBody* m_ownerBody;
 	const void* m_subCollisionHandle;
 	const ndShapeInstance* m_parent;
-
-	ndFloat32 m_skinThickness;
+	ndFloat32 m_skinMargin;
 	ndScaleType m_scaleType;
 	bool m_collisionMode;
 
@@ -267,11 +266,11 @@ inline ndVector ndShapeInstance::SupportVertexSpecial(const ndVector& inDir, ndI
 	{
 		case m_unit:
 		{
-			return m_shape->SupportVertexSpecial(dir, m_skinThickness, vertexIndex);
+			return m_shape->SupportVertexSpecial(dir, m_skinMargin, vertexIndex);
 		}
 		case m_uniform:
 		{
-			return m_scale * m_shape->SupportVertexSpecial(dir, m_skinThickness, vertexIndex);
+			return m_scale * m_shape->SupportVertexSpecial(dir, m_skinMargin, vertexIndex);
 		}
 
 		default:

@@ -157,7 +157,7 @@ class ndContactSolver: public ndDownHeap<ndMinkFace *, ndFloat32>
 	ndContactNotify* m_notification;
 	ndContactPoint* m_contactBuffer;
 	ndFloat32 m_timestep;
-	ndFloat32 m_skinThickness;
+	ndFloat32 m_skinMargin;
 	ndFloat32 m_separationDistance;
 
 	ndInt32 m_maxCount;
