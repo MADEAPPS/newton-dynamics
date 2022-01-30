@@ -40,12 +40,12 @@ static dRobotDefinition jointsDefinition[] =
 {
 	{ "base", 100.0f, dRobotDefinition::m_root},
 	{ "base_rotator", 50.0f, dRobotDefinition::m_hinge },
-	//{ "arm_0", 5.0f, dRobotDefinition::m_hinge },
-	//{ "arm_1", 5.0f, dRobotDefinition::m_hinge },
-	//{ "arm_2", 5.0f, dRobotDefinition::m_hinge },
-	//{ "arm_3", 3.0f, dRobotDefinition::m_hinge },
-	//{ "arm_4", 2.0f, dRobotDefinition::m_hinge },
-	//{ "effector", 0.0f, dRobotDefinition::m_effector },
+	{ "arm_0", 5.0f, dRobotDefinition::m_hinge },
+	{ "arm_1", 5.0f, dRobotDefinition::m_hinge },
+	{ "arm_2", 5.0f, dRobotDefinition::m_hinge },
+	{ "arm_3", 3.0f, dRobotDefinition::m_hinge },
+	{ "arm_4", 2.0f, dRobotDefinition::m_hinge },
+	{ "effector", 0.0f, dRobotDefinition::m_effector },
 };
 
 class ndIndustrialRobot : public ndModel
@@ -247,6 +247,11 @@ class ndIndustrialRobot : public ndModel
 		return body;
 	}
 
+	ndBodyDynamic* GetRoot() const
+	{
+		return m_rootBody;
+	}
+
 	void PostUpdate(ndWorld* const world, ndFloat32 timestep)
 	{
 		ndModel::PostUpdate(world, timestep);
@@ -284,14 +289,18 @@ void ndInsdustrialRobot (ndDemoEntityManager* const scene)
 	ndVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	fbxDemoEntity* const robotEntity = scene->LoadFbxMesh("robot.fbx");
 
+	ndWorld* const world = scene->GetWorld();
 	ndMatrix matrix(dYawMatrix(-90.0f * ndDegreeToRad));
 	ndIndustrialRobot* const robot = new ndIndustrialRobot(scene, robotEntity, matrix);
 	scene->SetSelectedModel(robot);
-	scene->GetWorld()->AddModel(robot);
+	world->AddModel(robot);
+
+	ndBodyDynamic* const root = robot->GetRoot();
+	world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
 	
-	//matrix.m_posit.m_x += 2.0f;
-	//matrix.m_posit.m_z -= 2.0f;
-	//scene->GetWorld()->AddModel(new ndIndustrialRobot(scene, robotEntity, matrix));
+	matrix.m_posit.m_x += 2.0f;
+	matrix.m_posit.m_z -= 2.0f;
+	scene->GetWorld()->AddModel(new ndIndustrialRobot(scene, robotEntity, matrix));
 
 	delete robotEntity;
 
