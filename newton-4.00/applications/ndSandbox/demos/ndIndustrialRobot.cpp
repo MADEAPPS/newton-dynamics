@@ -271,6 +271,8 @@ class ndIndustrialRobot : public ndModel
 
 		ndSkeletonImmediateSolver solve;
 		solve.Solve(skeleton, world, timestep);
+
+		// use solver result to set joint motors
 	}
 
 	ndBodyDynamic* m_rootBody;

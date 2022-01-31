@@ -32,7 +32,9 @@ class ndSkeletonImmediateSolver
 {
 	public:	
 	ndSkeletonImmediateSolver()
-		:m_leftHandSide(64)
+		:m_internalForces(32)
+		,m_bodyArray(32)
+		,m_leftHandSide(64)
 		,m_rightHandSide(64)
 	{
 	}
@@ -41,7 +43,10 @@ class ndSkeletonImmediateSolver
 
 	private:
 	void GetJacobianDerivatives(ndConstraint* const joint);
+	void BuildJacobianMatrix(ndConstraint* const joint);
 
+	ndArray<ndJacobian> m_internalForces;
+	ndArray<ndBodyKinematic*> m_bodyArray;
 	ndArray<ndLeftHandSide> m_leftHandSide;
 	ndArray<ndRightHandSide> m_rightHandSide;
 	ndFloat32 m_timestep;
