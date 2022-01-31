@@ -57,6 +57,7 @@ class ndIndustrialRobot : public ndModel
 		:ndModel()
 		,m_rootBody(nullptr)
 		,m_effector(nullptr)
+		,m_invDynamicsSolver()
 	{
 		// make a clone of the mesh and add it to the scene
 		ndDemoEntity* const entity = robotMesh->CreateClone();
@@ -129,6 +130,9 @@ class ndIndustrialRobot : public ndModel
 
 	ndIndustrialRobot(const ndLoadSaveBase::ndLoadDescriptor& desc)
 		:ndModel(ndLoadSaveBase::ndLoadDescriptor(desc))
+		,m_rootBody(nullptr)
+		,m_effector(nullptr)
+		,m_invDynamicsSolver()
 	{
 		const nd::TiXmlNode* const modelRootNode = desc.m_rootNode;
 
@@ -268,9 +272,7 @@ class ndIndustrialRobot : public ndModel
 
 		ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
 		dAssert(skeleton);
-
-		ndSkeletonImmediateSolver solve;
-		solve.Solve(skeleton, world, timestep);
+		m_invDynamicsSolver.Solve(skeleton, world, timestep);
 
 		// use solver result to set joint motors
 	}
@@ -279,6 +281,7 @@ class ndIndustrialRobot : public ndModel
 	ndJointKinematicController* m_effector;
 	ndFixSizeArray<ndJointHinge*, 16> m_jointArray;
 	ndFixSizeArray<ndBodyDynamic*, 16> m_bodyArray;
+	ndSkeletonImmediateSolver m_invDynamicsSolver;
 };
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndIndustrialRobot);

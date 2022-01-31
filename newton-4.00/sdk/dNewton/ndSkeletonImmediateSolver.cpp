@@ -272,6 +272,11 @@ void ndSkeletonImmediateSolver::BuildJacobianMatrix (ndConstraint* const joint)
 
 void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
 {
+	if (skeleton->m_isResting)
+	{
+		return;
+	}
+
 	m_world = world;
 	m_skeleton = skeleton;
 	m_timestep = timestep;
@@ -306,7 +311,6 @@ void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWor
 	m_leftHandSide.SetCount(0);
 	m_rightHandSide.SetCount(0);
 	
-
 	for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
 	{
 		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
@@ -315,8 +319,8 @@ void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWor
 		BuildJacobianMatrix(joint);
 	}
 
-	ndUnsigned8 saveIsResting = m_skeleton->m_isResting;
-	m_skeleton->m_isResting = 0;
+	//ndUnsigned8 saveIsResting = m_skeleton->m_isResting;
+	//m_skeleton->m_isResting = 0;
 	m_skeleton->InitMassMatrix(&m_leftHandSide[0], &m_rightHandSide[0]);
 	m_skeleton->CalculateJointForce((const ndBodyKinematic**)&m_bodyArray[0], &m_internalForces[0]);
 
@@ -328,7 +332,6 @@ void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWor
 		body->m_index = body->m_rank;
 		body->m_rank = 0;
 	}
-	m_skeleton->m_isResting = saveIsResting;
-
+	//m_skeleton->m_isResting = saveIsResting;
 
 }
