@@ -268,7 +268,9 @@ class ndIndustrialRobot : public ndModel
 
 		ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
 		dAssert(skeleton);
-		skeleton->ImmediateSolve(world, timestep);
+
+		ndSkeletonImmediateSolver solve;
+		solve.Solve(skeleton, world, timestep);
 	}
 
 	ndBodyDynamic* m_rootBody;

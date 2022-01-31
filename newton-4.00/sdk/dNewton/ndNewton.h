@@ -77,6 +77,7 @@
 #include <ndBodyParticleSetList.h>
 #include <ndJointAttachmentPoint.h>
 #include <ndMultiBodyVehicleMotor.h>
+#include <ndSkeletonImmediateSolver.h>
 #include <ndMultiBodyVehicleGearBox.h>
 #include <ndJointDryRollingFriction.h>
 #include <ndJointKinematicController.h>

@@ -32,8 +32,6 @@ class ndSkeletonContainer
 	ndSkeletonContainer();
 	~ndSkeletonContainer();
 
-	D_NEWTON_API void ImmediateSolve(ndWorld* const world, ndFloat32 timestep);
-
 	protected:
 	class ndNodePair
 	{
@@ -144,9 +142,6 @@ class ndSkeletonContainer
 	inline void CalculateJointAccel(const ndJacobian* const internalForces, ndForcePair* const accel) const;
 	inline void SolveForward(ndForcePair* const force, const ndForcePair* const accel, ndInt32 startNode) const;
 
-	void GetJacobianDerivatives(ndConstraint* const joint, ndFloat32 timestep,
-		ndArray<ndLeftHandSide>& leftHandSide, ndArray<ndRightHandSide>& rightHandSide);
-
 	ndNode* m_skeleton;
 	ndNode** m_nodesOrder;
 	ndRightHandSide* m_rightHandSide;
@@ -176,6 +171,7 @@ class ndSkeletonContainer
 	friend class ndDynamicsUpdate;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
+	friend class ndSkeletonImmediateSolver;
 };
 
 inline ndSkeletonContainer::ndNode* ndSkeletonContainer::GetRoot() const

@@ -79,6 +79,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	bool IsBilateral() const;
 	bool IsCollidable() const;
 	void SetCollidable(bool state);
+	bool GetSkeletonFlag() const;
 	void SetSkeletonFlag(bool flag);
 	void CalculateGlobalMatrix(ndMatrix& matrix0, ndMatrix& matrix1) const;
 	ndFloat32 GetMotorZeroAcceleration(ndConstraintDescritor& desc) const;
@@ -234,6 +235,11 @@ inline void ndJointBilateralConstraint::JacobianDerivative(ndConstraintDescritor
 {
 	//dAssert(0);
 	dTrace(("error: this joint is an interface\n"));
+}
+
+inline bool ndJointBilateralConstraint::GetSkeletonFlag() const
+{
+	return m_isInSkeleton ? true : false;
 }
 
 inline void ndJointBilateralConstraint::SetSkeletonFlag(bool flag)
