@@ -1473,6 +1473,106 @@ void ndSkeletonContainer::CalculateJointForce(const ndBodyKinematic** const, ndJ
 	}
 }
 
+void ndSkeletonContainer::GetJacobianDerivatives(ndConstraint* const joint, ndFloat32 timestep, ndArray<ndLeftHandSide>& leftHandSide, ndArray<ndRightHandSide>& rightHandSide)
+{
+	ndConstraintDescritor constraintParam;
+	dAssert(joint->GetRowsCount() <= D_CONSTRAINT_MAX_ROWS);
+	for (ndInt32 i = joint->GetRowsCount() - 1; i >= 0; i--)
+	{
+		constraintParam.m_forceBounds[i].m_low = D_MIN_BOUND;
+		constraintParam.m_forceBounds[i].m_upper = D_MAX_BOUND;
+		constraintParam.m_forceBounds[i].m_jointForce = nullptr;
+		constraintParam.m_forceBounds[i].m_normalIndex = D_INDEPENDENT_ROW;
+	}
+
+	constraintParam.m_rowsCount = 0;
+	constraintParam.m_timestep = timestep;
+	constraintParam.m_invTimestep = ndFloat32 (1.0f) /timestep;
+	joint->JacobianDerivative(constraintParam);
+	const ndInt32 dof = constraintParam.m_rowsCount;
+	dAssert(dof <= joint->m_rowCount);
+
+	if (joint->GetAsContact())
+	{
+		ndContact* const contactJoint = joint->GetAsContact();
+		contactJoint->m_isInSkeletonLoop = 0;
+		ndSkeletonContainer* const skeleton0 = contactJoint->GetBody0()->GetSkeleton();
+		ndSkeletonContainer* const skeleton1 = contactJoint->GetBody1()->GetSkeleton();
+		if (skeleton0 && (skeleton0 == skeleton1))
+		{
+			if (contactJoint->IsSkeletonSelftCollision())
+			{
+				contactJoint->m_isInSkeletonLoop = 1;
+				skeleton0->AddSelfCollisionJoint(contactJoint);
+			}
+		}
+		else if (contactJoint->IsSkeletonIntraCollision())
+		{
+			if (skeleton0 && !skeleton1)
+			{
+				contactJoint->m_isInSkeletonLoop = 1;
+				skeleton0->AddSelfCollisionJoint(contactJoint);
+			}
+			else if (skeleton1 && !skeleton0)
+			{
+				contactJoint->m_isInSkeletonLoop = 1;
+				skeleton1->AddSelfCollisionJoint(contactJoint);
+			}
+		}
+	}
+	else
+	{
+		ndJointBilateralConstraint* const bilareral = joint->GetAsBilateral();
+		dAssert(bilareral);
+		if (!bilareral->m_isInSkeleton && (bilareral->GetSolverModel() == m_jointkinematicAttachment))
+		{
+			ndSkeletonContainer* const skeleton0 = bilareral->m_body0->GetSkeleton();
+			ndSkeletonContainer* const skeleton1 = bilareral->m_body1->GetSkeleton();
+			if (skeleton0 || skeleton1)
+			{
+				if (skeleton0 && !skeleton1)
+				{
+					bilareral->m_isInSkeletonLoop = 1;
+					skeleton0->AddSelfCollisionJoint(bilareral);
+				}
+				else if (skeleton1 && !skeleton0)
+				{
+					bilareral->m_isInSkeletonLoop = 1;
+					skeleton1->AddSelfCollisionJoint(bilareral);
+				}
+			}
+		}
+	}
+
+	joint->m_rowCount = dof;
+	const ndInt32 baseIndex = joint->m_rowStart;
+	for (ndInt32 i = 0; i < dof; ++i)
+	{
+		dAssert(constraintParam.m_forceBounds[i].m_jointForce);
+
+		ndLeftHandSide* const row = &leftHandSide[baseIndex + i];
+		ndRightHandSide* const rhs = &rightHandSide[baseIndex + i];
+
+		row->m_Jt = constraintParam.m_jacobian[i];
+		rhs->m_diagDamp = ndFloat32(0.0f);
+		rhs->m_diagonalRegularizer = dMax(constraintParam.m_diagonalRegularizer[i], ndFloat32(1.0e-5f));
+
+		rhs->m_coordenateAccel = constraintParam.m_jointAccel[i];
+		rhs->m_restitution = constraintParam.m_restitution[i];
+		rhs->m_penetration = constraintParam.m_penetration[i];
+		rhs->m_penetrationStiffness = constraintParam.m_penetrationStiffness[i];
+		rhs->m_lowerBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_low;
+		rhs->m_upperBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_upper;
+		rhs->m_jointFeebackForce = constraintParam.m_forceBounds[i].m_jointForce;
+
+		dAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -1);
+		const ndInt32 frictionIndex = constraintParam.m_forceBounds[i].m_normalIndex;
+		const ndInt32 mask = frictionIndex >> 31;
+		rhs->m_normalForceIndex = frictionIndex;
+		rhs->m_normalForceIndexFlat = ~mask & (frictionIndex + baseIndex);
+	}
+}
+
 void ndSkeletonContainer::ImmediateSolve(ndWorld* const world, ndFloat32 timestep)
 {
 	ndArray<ndLeftHandSide> leftHandSide(16);
@@ -1492,20 +1592,19 @@ void ndSkeletonContainer::ImmediateSolve(ndWorld* const world, ndFloat32 timeste
 	leftHandSide.SetCount(dofIndex);
 	rightHandSide.SetCount(dofIndex);
 
-	ndDynamicsUpdate* const solver = world->m_solver;
-
-	solver->m_timestep = timestep;
-	solver->m_firstPassCoef = ndFloat32 (1.0f);
-	solver->m_invTimestep = ndFloat32(1.0f) / timestep;
-	solver->m_invStepRK = ndFloat32(0.25f);
-	solver->m_timestepRK = timestep * solver->m_invStepRK;
-	solver->m_invTimestepRK = solver->m_invTimestep * ndFloat32(4.0f);
+	//ndDynamicsUpdate* const solver = world->m_solver;
+	//solver->m_timestep = timestep;
+	//solver->m_firstPassCoef = ndFloat32 (1.0f);
+	//solver->m_invTimestep = ndFloat32(1.0f) / timestep;
+	//solver->m_invStepRK = ndFloat32(0.25f);
+	//solver->m_timestepRK = timestep * solver->m_invStepRK;
+	//solver->m_invTimestepRK = solver->m_invTimestep * ndFloat32(4.0f);
 
 	for (ndInt32 i = m_nodeList.GetCount() - 2; i >= 0; i--)
 	{
 		ndNode* const node = m_nodesOrder[i];
 		ndJointBilateralConstraint* const joint = node->m_joint;
-		//solver->GetJacobianDerivatives(joint);
+		GetJacobianDerivatives(joint, timestep, leftHandSide, rightHandSide);
 		//BuildJacobianMatrix(joint, i);
 	}
 
