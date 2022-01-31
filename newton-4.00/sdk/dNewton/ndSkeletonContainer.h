@@ -29,6 +29,12 @@ class ndJointBilateralConstraint;
 class ndSkeletonContainer 
 {
 	public:
+	ndSkeletonContainer();
+	~ndSkeletonContainer();
+
+	D_NEWTON_API void ImmediateSolve(ndWorld* const world, ndFloat32 timestep);
+
+	protected:
 	class ndNodePair
 	{
 		public:
@@ -107,9 +113,6 @@ class ndSkeletonContainer
 		}
 	};
 
-	ndSkeletonContainer();
-	~ndSkeletonContainer();
-
 	void Init(ndBodyKinematic* const rootBody);
 
 	ndNode* GetRoot() const;
@@ -163,6 +166,13 @@ class ndSkeletonContainer
 	ndInt16 m_loopCount;
 	ndInt16 m_dynamicsLoopCount;
 	ndUnsigned8 m_isResting;
+
+	friend class ndWorld;
+	friend class ndSkeletonList;
+	friend class ndSkeletonQueue;
+	friend class ndDynamicsUpdate;
+	friend class ndDynamicsUpdateSoa;
+	friend class ndDynamicsUpdateAvx2;
 };
 
 inline ndSkeletonContainer::ndNode* ndSkeletonContainer::GetRoot() const

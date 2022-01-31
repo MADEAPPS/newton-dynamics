@@ -264,13 +264,11 @@ class ndIndustrialRobot : public ndModel
 
 	void Update(ndWorld* const world, ndFloat32 timestep)
 	{
-		ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
-
-		//ndSkeletonContainer* const skeleton = activeSkeletons[i];
-		//skeleton->InitMassMatrix(&leftHandSide[0], &rightHandSide[0]);
-
-
 		ndModel::Update(world, timestep);
+
+		ndSkeletonContainer* const skeleton = m_rootBody->GetSkeleton();
+		dAssert(skeleton);
+		skeleton->ImmediateSolve(world, timestep);
 	}
 
 	ndBodyDynamic* m_rootBody;
@@ -297,7 +295,6 @@ void ndInsdustrialRobot (ndDemoEntityManager* const scene)
 
 	ndBodyDynamic* const root = robot->GetRoot();
 	world->AddJoint (new ndJointFix6dof(root->GetMatrix(), root, world->GetSentinelBody()));
-	
 	matrix.m_posit.m_x += 2.0f;
 	matrix.m_posit.m_z -= 2.0f;
 	scene->GetWorld()->AddModel(new ndIndustrialRobot(scene, robotEntity, matrix));

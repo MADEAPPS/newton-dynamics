@@ -23,6 +23,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
+#include "ndDynamicsUpdate.h"
 #include "ndSkeletonContainer.h"
 #include "ndJointBilateralConstraint.h"
 
@@ -1470,4 +1471,43 @@ void ndSkeletonContainer::CalculateJointForce(const ndBodyKinematic** const, ndJ
 	{
 		UpdateForces(internalForces, force);
 	}
+}
+
+void ndSkeletonContainer::ImmediateSolve(ndWorld* const world, ndFloat32 timestep)
+{
+	ndArray<ndLeftHandSide> leftHandSide(16);
+	ndArray<ndRightHandSide> rightHandSide(16);
+
+	ndInt32 dofIndex = 0;
+	for (ndInt32 i = m_nodeList.GetCount() - 2; i >= 0; i--)
+	{
+		ndNode* const node = m_nodesOrder[i];
+		ndJointBilateralConstraint* const joint = node->m_joint;
+		ndInt32 dof = joint->GetRowsCount();
+		joint->m_rowStart = dofIndex;
+		joint->m_rowCount = dof;
+		dofIndex += dof;
+	}
+
+	leftHandSide.SetCount(dofIndex);
+	rightHandSide.SetCount(dofIndex);
+
+	ndDynamicsUpdate* const solver = world->m_solver;
+
+	solver->m_timestep = timestep;
+	solver->m_firstPassCoef = ndFloat32 (1.0f);
+	solver->m_invTimestep = ndFloat32(1.0f) / timestep;
+	solver->m_invStepRK = ndFloat32(0.25f);
+	solver->m_timestepRK = timestep * solver->m_invStepRK;
+	solver->m_invTimestepRK = solver->m_invTimestep * ndFloat32(4.0f);
+
+	for (ndInt32 i = m_nodeList.GetCount() - 2; i >= 0; i--)
+	{
+		ndNode* const node = m_nodesOrder[i];
+		ndJointBilateralConstraint* const joint = node->m_joint;
+		//solver->GetJacobianDerivatives(joint);
+		//BuildJacobianMatrix(joint, i);
+	}
+
+	//InitMassMatrix(&leftHandSide[0], &rightHandSide[0]);
 }

@@ -185,6 +185,7 @@ class ndWorld: public ndClassAlloc
 
 	friend class ndScene;
 	friend class ndDynamicsUpdate;
+	friend class ndSkeletonContainer;
 	friend class ndWorldDefaultScene;
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;

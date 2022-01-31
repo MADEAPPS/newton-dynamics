@@ -151,6 +151,7 @@ class ndDynamicsUpdate : public ndClassAlloc
 	ndInt32 m_unConstrainedBodyCount;
 
 	friend class ndWorld;
+	friend class ndSkeletonContainer;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndVector ndDynamicsUpdate::GetVelocTol() const

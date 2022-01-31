@@ -78,13 +78,6 @@ class ndDynamicsUpdateSoa: public ndDynamicsUpdate
 	virtual void Update();
 
 	private:
-	class ndGroupType
-	{
-		public:
-		ndInt8 m_rows____;
-		ndInt8 m_isUniformGroup;
-	};
-
 	void SortJoints();
 	void SortIslands();
 	void BuildIsland();
