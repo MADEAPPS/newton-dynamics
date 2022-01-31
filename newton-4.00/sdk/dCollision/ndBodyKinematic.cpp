@@ -208,6 +208,7 @@ ndJointList::ndNode* ndBodyKinematic::AttachJoint(ndJointBilateralConstraint* co
 		ndBody* const bodyInJoint1 = bodyJoint->GetBody1();
 		bool test = (body0 == bodyInJoint0) && (body1 == bodyInJoint1);
 		test = test || ((body1 == bodyInJoint0) && (body0 == bodyInJoint1));
+		test = test && (body1->GetInvMass() > ndFloat32(0.0f));
 		if (test)
 		{
 			dTrace(("warning body %d and body %d already connected by a biletaral joint\n", body0->GetId(), body1->GetId()));
