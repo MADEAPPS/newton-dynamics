@@ -52,6 +52,7 @@ class ndShapeConvexPolygon: public ndShapeConvex
 	virtual ndFloat32 GetVolume() const;
 	virtual ndFloat32 GetBoxMinRadius() const;
 	virtual ndFloat32 GetBoxMaxRadius() const;
+	void GenerateConvexCap(const ndShapeInstance* const parentMesh);
 	virtual ndVector SupportVertex(const ndVector& dir, ndInt32* const vertexIndex) const;
 	bool BeamClipping(const ndVector& origin, ndFloat32 size, const ndShapeInstance* const parentMesh);
 	virtual ndInt32 CalculatePlaneIntersection(const ndVector& normal, const ndVector& point, ndVector* const contactsOut) const;

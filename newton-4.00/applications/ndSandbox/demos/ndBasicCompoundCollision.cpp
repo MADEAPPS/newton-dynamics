@@ -291,7 +291,7 @@ ndShapeInstance CreateCompondCollision()
 	mChildWorld.m_posit = ndVector(ndFloat32(0.0), ndFloat32(1.158), ndFloat32(-0.508), ndFloat32(1.0));
 	ndMatrix mChildLocal = mChildWorld * mParentInv;
 
-#if 0
+#if 1
 	ndShapeInstance shapeInstance(new ndShapeCompound());
 	shapeInstance.GetShape()->GetAsShapeCompound()->BeginAddRemove();
 	ndShapeInstance childShapeInstance(new ndShapeConvexHull(336 / 3, sizeof(ndFloat32) * 3, 0.0, &convexHullPoints[0]));

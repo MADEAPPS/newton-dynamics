@@ -26,7 +26,7 @@
 static glVector3 CalculatePoint(const ndMatrix& matrix, const ndVector& center, ndFloat32 x, ndFloat32 y, ndFloat32 w)
 {
 	ndVector point(center.m_x + x, center.m_y + y, center.m_z, center.m_w);
-	point = matrix.TransformVector(point.Scale(w));
+	point = matrix.TransformVector1x4(point.Scale(w));
 	return glVector3(GLfloat(point.m_x), GLfloat(point.m_y), GLfloat(point.m_z));
 }
 #endif
@@ -272,7 +272,7 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 			for (ndContactPointList::ndNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
 			{
 				const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
-				ndVector pointInScreenSpace(viewProjectionMatrix.TransformVector(contactPoint.m_point));
+				ndVector pointInScreenSpace(viewProjectionMatrix.TransformVector1x4(contactPoint.m_point));
 				ndFloat32 zDist = pointInScreenSpace.m_w;
 				pointInScreenSpace = pointInScreenSpace.Scale(1.0f / zDist);
 
