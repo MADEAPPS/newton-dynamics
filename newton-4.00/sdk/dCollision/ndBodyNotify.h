@@ -31,25 +31,8 @@ class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 {
 	public:  
 	D_CLASS_REFLECTION(ndBodyNotify);
-
-
-	
-	D_COLLISION_API ndBodyNotify(const ndVector& defualtGravity) : ndContainersFreeListAlloc<ndBodyNotify>()
-		, m_defualtGravity(defualtGravity)
-		, m_body(nullptr)
-	{
-
-	}
-
-	D_COLLISION_API ndBodyNotify(const ndLoadSaveBase::ndLoadDescriptor& desc)
-		:ndContainersFreeListAlloc<ndBodyNotify>()
-		, m_body(nullptr)
-	{
-		const nd::TiXmlNode* const rootNode = desc.m_rootNode;
-		m_defualtGravity = xmlGetVector3(rootNode, "gravity");
-	}
-
-
+	D_COLLISION_API ndBodyNotify(const ndVector& defualtGravity);
+	D_COLLISION_API ndBodyNotify(const ndLoadSaveBase::ndLoadDescriptor& desc);
 
 	D_COLLISION_API virtual ~ndBodyNotify() = default;
 
