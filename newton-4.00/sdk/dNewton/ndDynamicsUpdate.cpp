@@ -1496,7 +1496,7 @@ void ndDynamicsUpdate::UpdateSkeletons()
 		for (ndInt32 i = startEnd.m_start; i < startEnd.m_end; ++i)
 		{
 			ndSkeletonContainer* const skeleton = activeSkeletons[i];
-			skeleton->CalculateJointForce(bodyArray, internalForces);
+			skeleton->CalculateReactionForces(internalForces);
 		}
 	});
 

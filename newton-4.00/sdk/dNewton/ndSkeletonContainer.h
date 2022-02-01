@@ -119,8 +119,8 @@ class ndSkeletonContainer
 
 	void ClearSelfCollision();
 	void AddSelfCollisionJoint(ndConstraint* const joint);
+	void CalculateReactionForces(ndJacobian* const internalForces);
 	void InitMassMatrix(const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide);
-	void CalculateJointForce(const ndBodyKinematic** const bodyArray, ndJacobian* const internalForces);
 
 	void CheckSleepState();
 
@@ -141,6 +141,10 @@ class ndSkeletonContainer
 	inline void UpdateForces(ndJacobian* const internalForces, const ndForcePair* const force) const;
 	inline void CalculateJointAccel(const ndJacobian* const internalForces, ndForcePair* const accel) const;
 	inline void SolveForward(ndForcePair* const force, const ndForcePair* const accel, ndInt32 startNode) const;
+
+	void CalculateJointForceImmediate(ndJacobian* const internalForces);
+	void UpdateForcesImmediate(ndJacobian* const internalForces, const ndForcePair* const force) const;
+	void SolveAuxiliaryImmediate(ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
 
 	ndNode* m_skeleton;
 	ndNode** m_nodesOrder;

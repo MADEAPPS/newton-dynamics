@@ -184,8 +184,10 @@ void ndBodyDynamic::AddImpulse(const ndVector& pointDeltaVeloc, const ndVector& 
 	}
 }
 
-void ndBodyDynamic::ApplyImpulsePair(const ndVector& linearImpulse, const ndVector& angularImpulse, ndFloat32 timestep)
+void ndBodyDynamic::ApplyImpulsePair(const ndVector& linearImpulseIn, const ndVector& angularImpulseIn, ndFloat32 timestep)
 {
+	ndVector linearImpulse(linearImpulseIn & ndVector::m_triplexMask);
+	ndVector angularImpulse(angularImpulseIn & ndVector::m_triplexMask);
 	dAssert(linearImpulse.m_w == ndFloat32(0.0f));
 	dAssert(angularImpulse.m_w == ndFloat32(0.0f));
 	if ((linearImpulse.DotProduct(linearImpulse).GetScalar() > ndFloat32(1.0e-6f)) ||

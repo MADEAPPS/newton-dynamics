@@ -124,6 +124,7 @@ class ndJointBilateralConstraint : public ndConstraint
 	friend class ndDynamicsUpdateSoa;
 	friend class ndDynamicsUpdateAvx2;
 	friend class ndDynamicsUpdateOpencl;
+	friend class ndSkeletonImmediateSolver;
 };
 
 inline ndJointBilateralSolverModel ndJointBilateralConstraint::GetSolverModel() const

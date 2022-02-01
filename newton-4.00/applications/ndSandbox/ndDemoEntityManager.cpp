@@ -39,7 +39,7 @@
 //#define DEFAULT_SCENE	0		// basic rigidbody
 //#define DEFAULT_SCENE	1		// gpu basic rigidbody
 //#define DEFAULT_SCENE	2		// friction ramp
-//#define DEFAULT_SCENE	3		// basic compound shapes
+#define DEFAULT_SCENE	3		// basic compound shapes
 //#define DEFAULT_SCENE	4		// conservation of momentum 
 //#define DEFAULT_SCENE	5		// basic Stacks
 //#define DEFAULT_SCENE	6		// basic Trigger
@@ -52,7 +52,7 @@
 //#define DEFAULT_SCENE	13		// active rag doll
 //#define DEFAULT_SCENE	14		// basic vehicle
 //#define DEFAULT_SCENE	15		// heavy vehicle
-#define DEFAULT_SCENE	16		// basic robot
+//#define DEFAULT_SCENE	16		// basic robot
 //#define DEFAULT_SCENE	17		// simple voronoi fracture
 //#define DEFAULT_SCENE	18		// basic voronoi fracture
 //#define DEFAULT_SCENE	19		// linked voronoi fracture

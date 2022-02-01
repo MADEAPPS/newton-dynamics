@@ -170,11 +170,11 @@ void ndSkeletonImmediateSolver::BuildJacobianMatrix (ndConstraint* const joint)
 	//	}
 	//}
 
-	const ndVector zero(ndVector::m_zero);
-	ndVector forceAcc0(zero);
-	ndVector torqueAcc0(zero);
-	ndVector forceAcc1(zero);
-	ndVector torqueAcc1(zero);
+	//const ndVector zero(ndVector::m_zero);
+	//ndVector forceAcc0(zero);
+	//ndVector torqueAcc0(zero);
+	//ndVector forceAcc1(zero);
+	//ndVector torqueAcc1(zero);
 
 	#ifdef D_PROGRESSIVE_SLEEP_EXPERIMENT
 	//const ndVector progressiveSleepWeigh(ndFloat32(0.01f));
@@ -206,8 +206,8 @@ void ndSkeletonImmediateSolver::BuildJacobianMatrix (ndConstraint* const joint)
 
 	const ndVector weigh0(ndVector::m_one);
 	const ndVector weigh1(ndVector::m_one);
-	const ndFloat32 preconditioner0 = ndFloat32(1.0f);
-	const ndFloat32 preconditioner1 = ndFloat32(1.0f);
+	//const ndFloat32 preconditioner0 = ndFloat32(1.0f);
+	//const ndFloat32 preconditioner1 = ndFloat32(1.0f);
 
 	//const bool isBilateral = joint->IsBilateral();
 	for (ndInt32 i = 0; i < count; ++i)
@@ -249,89 +249,81 @@ void ndSkeletonImmediateSolver::BuildJacobianMatrix (ndConstraint* const joint)
 		diag *= (ndFloat32(1.0f) + rhs->m_diagonalRegularizer);
 		rhs->m_invJinvMJt = ndFloat32(1.0f) / diag;
 		
-		ndVector f0(rhs->m_force * preconditioner0);
-		ndVector f1(rhs->m_force * preconditioner1);
-		forceAcc0 = forceAcc0 + JtM0.m_linear * f0;
-		torqueAcc0 = torqueAcc0 + JtM0.m_angular * f0;
-		forceAcc1 = forceAcc1 + JtM1.m_linear * f1;
-		torqueAcc1 = torqueAcc1 + JtM1.m_angular * f1;
+		//ndVector f0(rhs->m_force * preconditioner0);
+		//ndVector f1(rhs->m_force * preconditioner1);
+		//forceAcc0 = forceAcc0 + JtM0.m_linear * f0;
+		//torqueAcc0 = torqueAcc0 + JtM0.m_angular * f0;
+		//forceAcc1 = forceAcc1 + JtM1.m_linear * f1;
+		//torqueAcc1 = torqueAcc1 + JtM1.m_angular * f1;
 	}
 
-	//const ndInt32 index0 = jointIndex * 2 + 0;
-	ndInt32 index0 = body0->m_index;
-	ndJacobian& outBody0 = m_internalForces[index0];
-	outBody0.m_linear += forceAcc0;
-	outBody0.m_angular += torqueAcc0;
-	
-	//const ndInt32 index1 = jointIndex * 2 + 1;
-	ndInt32 index1 = body0->m_index;
-	ndJacobian& outBody1 = m_internalForces[index1];
-	outBody1.m_linear += forceAcc1;
-	outBody1.m_angular += torqueAcc1;
+	//ndInt32 index0 = body0->m_index;
+	//ndJacobian& outBody0 = m_internalForces[index0];
+	//outBody0.m_linear += forceAcc0;
+	//outBody0.m_angular += torqueAcc0;
+	//
+	//ndInt32 index1 = body0->m_index;
+	//ndJacobian& outBody1 = m_internalForces[index1];
+	//outBody1.m_linear += forceAcc1;
+	//outBody1.m_angular += torqueAcc1;
 }
 
 void ndSkeletonImmediateSolver::Solve(ndSkeletonContainer* const skeleton, ndWorld* const world, ndFloat32 timestep)
 {
-	if (skeleton->m_isResting)
+	if (!skeleton->m_isResting)
 	{
-		return;
+		m_world = world;
+		m_skeleton = skeleton;
+		m_timestep = timestep;
+		m_invTimestep = ndFloat32(1.0f) / timestep;
+
+		// initialize bodies velocity base forces
+		ndVector zero(ndVector::m_zero);
+		m_bodyArray.SetCount(m_skeleton->m_nodeList.GetCount());
+		m_internalForces.SetCount(m_skeleton->m_nodeList.GetCount());
+		for (ndInt32 i = 0; i < m_skeleton->m_nodeList.GetCount(); ++i)
+		{
+			ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
+			ndBodyKinematic* const body = node->m_body;
+			body->UpdateInvInertiaMatrix();
+
+			const ndVector angularMomentum(body->CalculateAngularMomentum());
+			body->m_gyroTorque = body->m_omega.CrossProduct(angularMomentum);
+			body->m_gyroAlpha = body->m_invWorldInertiaMatrix.RotateVector(body->m_gyroTorque);
+
+			body->m_accel = body->m_veloc;
+			body->m_alpha = body->m_omega;
+			body->m_gyroRotation = body->m_rotation;
+
+			body->m_rank = body->m_index;
+			body->m_index = i;
+
+			m_bodyArray[i] = body;
+			m_internalForces[i].m_linear = zero;
+			m_internalForces[i].m_angular = zero;
+		}
+
+		m_leftHandSide.SetCount(0);
+		m_rightHandSide.SetCount(0);
+
+		for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
+		{
+			ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
+			ndJointBilateralConstraint* const joint = node->m_joint;
+			GetJacobianDerivatives(joint);
+			BuildJacobianMatrix(joint);
+		}
+
+		m_skeleton->InitMassMatrix(&m_leftHandSide[0], &m_rightHandSide[0]);
+		m_skeleton->CalculateJointForceImmediate(&m_internalForces[0]);
+
+		// restore body info
+		for (ndInt32 i = 0; i < m_skeleton->m_nodeList.GetCount(); ++i)
+		{
+			ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
+			ndBodyKinematic* const body = node->m_body;
+			body->m_index = body->m_rank;
+			body->m_rank = 0;
+		}
 	}
-
-	m_world = world;
-	m_skeleton = skeleton;
-	m_timestep = timestep;
-	m_invTimestep = ndFloat32 (1.0f) / timestep;
-
-	// initialize bodies velocity base forces
-	ndVector zero(ndVector::m_zero);
-	m_bodyArray.SetCount(m_skeleton->m_nodeList.GetCount());
-	m_internalForces.SetCount(m_skeleton->m_nodeList.GetCount());
-	for (ndInt32 i = 0; i < m_skeleton->m_nodeList.GetCount(); ++i)
-	{
-		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
-		ndBodyKinematic* const body = node->m_body;
-		body->UpdateInvInertiaMatrix();
-
-		const ndVector angularMomentum(body->CalculateAngularMomentum());
-		body->m_gyroTorque = body->m_omega.CrossProduct(angularMomentum);
-		body->m_gyroAlpha = body->m_invWorldInertiaMatrix.RotateVector(body->m_gyroTorque);
-
-		body->m_accel = body->m_veloc;
-		body->m_alpha = body->m_omega;
-		body->m_gyroRotation = body->m_rotation;
-
-		body->m_rank = body->m_index;
-		body->m_index = i;
-
-		m_bodyArray[i] = body;
-		m_internalForces[i].m_linear = zero;
-		m_internalForces[i].m_angular = zero;
-	}
-
-	m_leftHandSide.SetCount(0);
-	m_rightHandSide.SetCount(0);
-	
-	for (ndInt32 i = m_skeleton->m_nodeList.GetCount() - 2; i >= 0; --i)
-	{
-		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
-		ndJointBilateralConstraint* const joint = node->m_joint;
-		GetJacobianDerivatives(joint);
-		BuildJacobianMatrix(joint);
-	}
-
-	//ndUnsigned8 saveIsResting = m_skeleton->m_isResting;
-	//m_skeleton->m_isResting = 0;
-	m_skeleton->InitMassMatrix(&m_leftHandSide[0], &m_rightHandSide[0]);
-	m_skeleton->CalculateJointForce((const ndBodyKinematic**)&m_bodyArray[0], &m_internalForces[0]);
-
-	// restore body info
-	for (ndInt32 i = 0; i < m_skeleton->m_nodeList.GetCount(); ++i)
-	{
-		ndSkeletonContainer::ndNode* const node = m_skeleton->m_nodesOrder[i];
-		ndBodyKinematic* const body = node->m_body;
-		body->m_index = body->m_rank;
-		body->m_rank = 0;
-	}
-	//m_skeleton->m_isResting = saveIsResting;
-
 }
