@@ -317,7 +317,7 @@ void ndShapeConvexPolygon::GenerateConvexCap(const ndShapeInstance* const parent
 		dAssert(faceEddge.m_w == ndFloat32(0.0f));
 		dAssert(faceEddge.DotProduct(faceEddge).GetScalar() > ndFloat32(0.0f));
 		const ndVector edge(faceEddge.Normalize());
-		const ndInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[i0];
+		const ndInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[i0] & (~D_CONCAVE_EDGE_MASK);
 		const ndVector localAdjacentNormal(&m_vertex[adjacentNormalIndex * m_stride]);
 		const ndVector adjacentNormal(CalculateGlobalNormal(parentMesh, localAdjacentNormal & ndVector::m_triplexMask));
 		dAssert(edge.DotProduct(adjacentNormal).GetScalar() < ndFloat32(5.0e-2f));
