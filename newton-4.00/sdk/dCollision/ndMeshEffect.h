@@ -258,6 +258,7 @@ class ndMeshEffect: public ndPolyhedra
 
 		ndInt32 GetSortIndex(const dChannel<ndBigVector, m_point>& points, ndFloat64& dist) const;
 		static ndInt32 CompareVertex(const dSortKey* const ptr0, const dSortKey* const ptr1, void* const context);
+		void GetStats(const dChannel<ndBigVector, m_point>& points, ndBigVector& min, ndBigVector& max, ndBigVector& origin, ndBigVector& median) const;
 	};
 
 	class dPointFormat: public dFormat
@@ -295,6 +296,10 @@ class ndMeshEffect: public ndPolyhedra
 		void CopyEntryFrom(ndInt32 index, const dAttibutFormat& source, ndInt32 sourceIndex);
 		void CompressData(const dPointFormat& points, ndInt32* const indexList);
 
+		private:
+		void CompressDataLow(const dPointFormat& points, ndInt32* const indexList);
+
+		public:
 		dChannel<ndInt32, m_vertex> m_pointChannel;
 		dChannel<ndInt32, m_material> m_materialChannel;
 		dChannel<ndTriplex, m_normal> m_normalChannel;

@@ -19,7 +19,7 @@
 #include "ndDemoEntityManager.h"
 #include "ndMakeProceduralStaticMap.h"
 
-#define D_USE_PORDEDURAL_COLLISION
+//#define D_USE_PORDEDURAL_COLLISION
 
 class ndRegularProceduralGrid : public ndShapeStaticProceduralMesh
 {

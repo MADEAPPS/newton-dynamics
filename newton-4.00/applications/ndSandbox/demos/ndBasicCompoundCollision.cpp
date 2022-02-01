@@ -319,7 +319,7 @@ static void AddAiVehicle(ndDemoEntityManager* const scene)
 //void ndBasicAiDemo(ndDemoEntityManager* const scene)
 void ndBasicCompoundShapeDemo(ndDemoEntityManager* const scene)
 {
-	BuildProceduralMap(scene, 200, 2.0f, 0.0f);
+	BuildProceduralMap(scene, 100, 2.0f, 0.0f);
 	AddAiVehicle(scene);
 }
 #endif
