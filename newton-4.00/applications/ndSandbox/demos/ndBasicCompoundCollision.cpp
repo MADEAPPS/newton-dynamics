@@ -140,6 +140,7 @@ public:
 		, m_dPreviousError(0.0f)
 		, m_dCombinedMaximumForce()
 	{
+		m_dDesiredSpeed *= 2;
 		m_dCombinedMaximumForce = pBody->GetMassMatrix().m_w * ndFloat32(6.0);      // Mass * Maximum acceleration of 6m/s/s
 	}
 
