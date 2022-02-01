@@ -26,15 +26,38 @@
 
 D_CLASS_REFLECTION_IMPLEMENT_LOADER(ndBodyNotify)
 
-ndBodyNotify::ndBodyNotify(const ndLoadSaveBase::ndLoadDescriptor& desc)
-	:ndContainersFreeListAlloc<ndBodyNotify>()
-	,m_body(nullptr)
+
+
+
+
+
+
+
+ndBody* ndBodyNotify::GetBody()
+{ return m_body; }
+
+const ndBody* ndBodyNotify::GetBody() const
+{ return m_body; }
+
+void* ndBodyNotify::GetUserData() const
+{ return nullptr; }
+
+ndVector ndBodyNotify::GetGravity() const
 {
-	const nd::TiXmlNode* const rootNode = desc.m_rootNode;
-	m_defualtGravity = xmlGetVector3(rootNode, "gravity");
+	return m_defualtGravity;
 }
 
-void ndBodyNotify::OnApplyExternalForce(ndInt32, ndFloat32)
+void ndBodyNotify::SetGravity(const ndVector & defualtGravity)
+{
+	m_defualtGravity = defualtGravity;
+}
+
+
+
+void ndBodyNotify::OnTransform(ndInt32 threadIndex, const ndMatrix& matrix)
+{}
+
+void ndBodyNotify::OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep)
 {
 	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
 	dAssert(body);
