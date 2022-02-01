@@ -65,6 +65,50 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKin
 	memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
 }
 
+ndJointBilateralConstraint::ndJointBilateralConstraint(ndInt32 maxDof, ndBodyKinematic* const body0,
+	ndBodyKinematic* const body1, const ndMatrix& globalMatrixBody0, const ndMatrix& globalMatrixBody1)
+	:ndConstraint()
+	, m_forceBody0(ndVector::m_zero)
+	, m_torqueBody0(ndVector::m_zero)
+	, m_forceBody1(ndVector::m_zero)
+	, m_torqueBody1(ndVector::m_zero)
+	, m_body0(body0)
+	, m_body1(body1)
+	, m_worldNode(nullptr)
+	, m_body0Node(nullptr)
+	, m_body1Node(nullptr)
+{
+	dAssert(m_body0 && m_body1);
+	dAssert(m_body0 != m_body1);
+
+	if (m_body0->GetInvMass() == ndFloat32(0.0f))
+	{
+		dSwap(m_body0, m_body1);
+	}
+	dAssert(m_body0->GetInvMass() > ndFloat32(0.0f));
+
+	ndMatrix dummyMatrix;
+	CalculateLocalMatrix(globalMatrixBody0, m_localMatrix0, dummyMatrix);
+	CalculateLocalMatrix(globalMatrixBody1, dummyMatrix, m_localMatrix1);
+
+
+
+	m_mark0 = 0;
+	m_mark1 = 0;
+	m_maxDof = maxDof;
+	m_rowIsMotor = 0;
+	m_isInSkeleton = 0;
+	m_enableCollision = 0;
+	m_solverModel = m_jointkinematicOpenLoop;
+	m_defualtDiagonalRegularizer = ndFloat32(0.0f);
+
+	memset(m_jointForce, 0, sizeof(m_jointForce));
+	memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
+}
+
+
+
+
 ndJointBilateralConstraint::ndJointBilateralConstraint(const ndLoadSaveBase::ndLoadDescriptor& desc)
 	:ndConstraint()
 	,m_forceBody0(ndVector::m_zero)
