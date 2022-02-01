@@ -31,17 +31,35 @@ class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 {
 	public:  
 	D_CLASS_REFLECTION(ndBodyNotify);
-	ndBodyNotify(const ndVector& defualtGravity);
-	D_COLLISION_API ndBodyNotify(const ndLoadSaveBase::ndLoadDescriptor& desc);
-	virtual ~ndBodyNotify();
 
-	ndBody* GetBody();
-	const ndBody* GetBody() const;
-	virtual void* GetUserData() const;
-	ndVector GetGravity() const;
-	void SetGravity(const ndVector& defualtGravity);
 
-	virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
+	
+	D_COLLISION_API ndBodyNotify(const ndVector& defualtGravity) : ndContainersFreeListAlloc<ndBodyNotify>()
+		, m_defualtGravity(defualtGravity)
+		, m_body(nullptr)
+	{
+
+	}
+
+	D_COLLISION_API ndBodyNotify(const ndLoadSaveBase::ndLoadDescriptor& desc)
+		:ndContainersFreeListAlloc<ndBodyNotify>()
+		, m_body(nullptr)
+	{
+		const nd::TiXmlNode* const rootNode = desc.m_rootNode;
+		m_defualtGravity = xmlGetVector3(rootNode, "gravity");
+	}
+
+
+
+	D_COLLISION_API virtual ~ndBodyNotify() = default;
+
+	D_COLLISION_API ndBody* GetBody();
+	D_COLLISION_API const ndBody* GetBody() const;
+	D_COLLISION_API virtual void* GetUserData() const;
+	D_COLLISION_API ndVector GetGravity() const;
+	D_COLLISION_API void SetGravity(const ndVector& defualtGravity);
+
+	D_COLLISION_API virtual void OnTransform(ndInt32 threadIndex, const ndMatrix& matrix);
 
 	D_COLLISION_API virtual void Save(const ndLoadSaveBase::ndSaveDescriptor& desc) const;
 	D_COLLISION_API virtual void OnApplyExternalForce(ndInt32 threadIndex, ndFloat32 timestep);
@@ -52,47 +70,6 @@ class ndBodyNotify : public ndContainersFreeListAlloc<ndBodyNotify>
 	friend class ndBody;
 
 } D_GCC_NEWTON_ALIGN_32;
-
-inline ndBodyNotify::ndBodyNotify(const ndVector& defualtGravity)
-	:ndContainersFreeListAlloc<ndBodyNotify>()
-	,m_defualtGravity(defualtGravity & ndVector::m_triplexMask)
-	,m_body(nullptr)
-{
-}
-
-inline ndBodyNotify::~ndBodyNotify()
-{
-}
-
-inline ndBody* ndBodyNotify::GetBody()
-{
-	return m_body;
-}
-
-inline const ndBody* ndBodyNotify::GetBody() const
-{
-	return m_body;
-}
-
-inline ndVector ndBodyNotify::GetGravity() const
-{
-	return m_defualtGravity;
-}
-
-inline void ndBodyNotify::SetGravity(const ndVector& defualtGravity)
-{
-	m_defualtGravity = defualtGravity & ndVector::m_triplexMask;
-}
-
-
-inline void* ndBodyNotify::GetUserData() const
-{
-	return nullptr;
-}
-
-inline void ndBodyNotify::OnTransform(ndInt32, const ndMatrix&)
-{
-}
 
 #endif 
 

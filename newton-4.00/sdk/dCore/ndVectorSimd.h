@@ -142,6 +142,7 @@ class ndVector
 		m_w = x;
 	}
 
+	//return the x component
 	inline ndFloat32 GetScalar () const
 	{
 		return _mm_cvtss_f32 (m_type);
