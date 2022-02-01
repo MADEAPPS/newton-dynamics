@@ -292,7 +292,7 @@ ndBodyKinematic* BuildProceduralMap(ndDemoEntityManager* const scene, ndInt32 gr
 			meshEffect.AddPoint(p1.m_x, p1.m_y, p1.m_z);
 			meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);
 			meshEffect.EndBuildFace();
-	
+			
 			meshEffect.BeginBuildFace();
 			meshEffect.AddPoint(p0.m_x, p0.m_y, p0.m_z);
 			meshEffect.AddPoint(p2.m_x, p2.m_y, p2.m_z);

@@ -289,12 +289,18 @@ ndShapeInstance CreateCompondCollision()
 	mChildWorld.m_right = ndVector(ndFloat32(0.0), ndFloat32(1.0), ndFloat32(0.0), ndFloat32(0.0));
 	mChildWorld.m_posit = ndVector(ndFloat32(0.0), ndFloat32(1.158), ndFloat32(-0.508), ndFloat32(1.0));
 	ndMatrix mChildLocal = mChildWorld * mParentInv;
+
+#if 0
 	ndShapeInstance shapeInstance(new ndShapeCompound());
 	shapeInstance.GetShape()->GetAsShapeCompound()->BeginAddRemove();
 	ndShapeInstance childShapeInstance(new ndShapeConvexHull(336 / 3, sizeof(ndFloat32) * 3, 0.0, &convexHullPoints[0]));
 	childShapeInstance.SetLocalMatrix(mChildLocal);
 	shapeInstance.GetShape()->GetAsShapeCompound()->AddCollision(&childShapeInstance);
 	shapeInstance.GetShape()->GetAsShapeCompound()->EndAddRemove();
+#else
+	ndShapeInstance shapeInstance(new ndShapeConvexHull(336 / 3, sizeof(ndFloat32) * 3, 0.0, &convexHullPoints[0]));
+	shapeInstance.SetLocalMatrix(mChildLocal);
+#endif
 	return shapeInstance;
 }
 
@@ -313,6 +319,7 @@ static void AddAiVehicle(ndDemoEntityManager* const scene)
 	scene->AddEntity(aiEntity);
 	ndMatrix mBodyMatrix = dGetIdentityMatrix();
 	mBodyMatrix.m_posit = ndVector(0.0f, 5.0f, 0.0f, 1.0f);
+	//mBodyMatrix.m_posit = ndVector(0.0f, 1.2f, 0.0f, 1.0f);
 	AddRigidBody(scene, mBodyMatrix, shapeInstance, aiEntity, 1000.0);
 }
 
