@@ -88,8 +88,8 @@ class ndIsoSurfaceParticleVolume : public ndBodySphFluid
 		m_points.SetCount(points.GetCount() * 3);
 		m_indexList.SetCount(points.GetCount() * 3);
 
-		ndFloat32* const posit = (ndFloat32*)&m_points[0].m_posit.m_x;
-		ndFloat32* const normal = (ndFloat32*)&m_points[0].m_normal.m_x;
+		ndFloat32* const posit = &m_points[0].m_posit.m_x;
+		ndFloat32* const normal = &m_points[0].m_normal.m_x;
 		ndInt32 pointCount = m_isoSurface.GenerateListIndexList(&m_indexList[0], sizeof (glPositionNormalUV)/sizeof (GLfloat), posit, normal);
 
 		const ndVector origin(m_isoSurface.GetOrigin());
