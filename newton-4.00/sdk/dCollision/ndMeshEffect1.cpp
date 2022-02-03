@@ -1903,7 +1903,7 @@ void ndMeshEffect::dPointFormat::CompressData(ndInt32* const indexList)
 				};
 		
 				#ifdef _DEBUG
-				for (ndInt32 i = 0; i < i0; i++)
+				for (ndInt32 i = 0; i < i0; ++i)
 				{
 					ndInt32 index = remapIndex[i].m_vertexIndex;
 					ndFloat64 side = plane.Evalue(tmpFormat.m_vertex[index]);
@@ -1933,7 +1933,7 @@ void ndMeshEffect::dPointFormat::CompressData(ndInt32* const indexList)
 				ndSortBatch pair_i1(batch);
 				pair_i1.m_start = batch.m_start + i0;
 				pair_i1.m_count = batch.m_count - i0;
-				pair_i1.m_p0 = maxP;
+				pair_i1.m_p0[firstSortAxis] = maxP[firstSortAxis];
 				pair_i1.m_sum -= xc;
 				pair_i1.m_variance -= x2c;
 				spliteStack[stack] = pair_i1;
@@ -1942,7 +1942,7 @@ void ndMeshEffect::dPointFormat::CompressData(ndInt32* const indexList)
 				ndSortBatch pair_i0(batch);
 				pair_i0.m_start = batch.m_start;
 				pair_i0.m_count = i0;
-				pair_i0.m_p1 = maxP;
+				pair_i0.m_p1[firstSortAxis] = maxP[firstSortAxis];
 				pair_i0.m_sum = xc;
 				pair_i0.m_variance = x2c;
 				spliteStack[stack] = pair_i0;
@@ -2273,7 +2273,7 @@ void ndMeshEffect::dAttibutFormat::CompressData(const dPointFormat& points, ndIn
 				};
 
 				#ifdef _DEBUG
-				for (ndInt32 i = 0; i < i0; i++)
+				for (ndInt32 i = 0; i < i0; ++i)
 				{
 					ndInt32 index = remapIndex[i].m_vertexIndex;
 					ndFloat64 side = plane.Evalue(points.m_vertex[index]);
@@ -2303,7 +2303,7 @@ void ndMeshEffect::dAttibutFormat::CompressData(const dPointFormat& points, ndIn
 				ndSortBatch pair_i1(batch);
 				pair_i1.m_start = batch.m_start + i0;
 				pair_i1.m_count = batch.m_count - i0;
-				pair_i1.m_p0 = maxP;
+				pair_i1.m_p0[firstSortAxis] = maxP[firstSortAxis];
 				pair_i1.m_sum -= xc;
 				pair_i1.m_variance -= x2c;
 				spliteStack[stack] = pair_i1;
@@ -2312,7 +2312,7 @@ void ndMeshEffect::dAttibutFormat::CompressData(const dPointFormat& points, ndIn
 				ndSortBatch pair_i0(batch);
 				pair_i0.m_start = batch.m_start;
 				pair_i0.m_count = i0;
-				pair_i0.m_p1 = maxP;
+				pair_i0.m_p1[firstSortAxis] = maxP[firstSortAxis];
 				pair_i0.m_sum = xc;
 				pair_i0.m_variance = x2c;
 				spliteStack[stack] = pair_i0;
